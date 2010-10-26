@@ -6,4 +6,4 @@ Ocaml native compilers can be downloaded on INRIA's website:
 http://caml.inria.fr/
 
 To create kaSim binaries, simply type make.
-
+You will need your own plotting program (like gnuplot) to visualize curves.
