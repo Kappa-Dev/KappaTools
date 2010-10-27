@@ -149,7 +149,7 @@ let eval_agent is_pattern env a ctxt =
 			)
 			port_map (IntMap.empty, ctxt, sign)
 	in 
-	let env = Environment.declare_sig sign pos_ag env 
+	let env = if !Parameter.implicitSignature then Environment.declare_sig sign pos_ag env else env
 	in
 		(ctxt, (Mixture.create_agent name_id interface), env)
 
