@@ -68,7 +68,7 @@ let main =
 					begin
 						Printf.printf "Self seeding...\n" ;
 						Random.self_init() ;
-						let i = Random.int (Misc.pow 2 29) in
+						let i = Random.bits () in
 						Random.init i ;
 						Printf.printf "Initialized random number generator with seed %d\n" i
 					end
