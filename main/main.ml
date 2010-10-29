@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "1.02"
+let version = "1.03"
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
 
@@ -68,7 +68,7 @@ let main =
 					begin
 						Printf.printf "Self seeding...\n" ;
 						Random.self_init() ;
-						let i = Random.int max_int in
+						let i = Random.int (Misc.pow 2 (Sys.word_size-3)) in
 						Random.init i ;
 						Printf.printf "Initialized random number generator with seed %d\n" i
 					end
