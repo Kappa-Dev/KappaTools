@@ -3,7 +3,8 @@
 # put here the names of your source files (in the right order)
 SOURCES = main/parameter.ml \
 		dataStructures/largeArray.ml dataStructures/memoryManagement.ml dataStructures/heap.ml  \
-		dataStructures/misc.ml dataStructures/mapExt.ml dataStructures/valMap.ml dataStructures/random_tree.ml dataStructures/mods.ml dataStructures/liftSet.ml\
+		dataStructures/misc.ml dataStructures/mapExt.ml dataStructures/valMap.ml dataStructures/mods.ml dataStructures/random_tree.ml \
+		dataStructures/liftSet.ml\
 		Error/debug.ml Error/ExceptionDefn.ml \
 		grammar/ast.ml grammar/kappaParser.mly grammar/kappaLexer.mll \
 		pattern/signature.ml pattern/environment.ml \
@@ -15,7 +16,7 @@ SOURCES = main/parameter.ml \
 		main/fileName.ml main/main.ml 
 
 # the name of the resulting executable
-RESULT  = kaSim
+RESULT  = KaSim
 
 # generate type information (.annot files)
 ANNOTATE = yes
@@ -24,9 +25,10 @@ ANNOTATE = yes
 # make target (see manual) : byte-code, debug-code, native-code, ...
 all: nc
 
+#set values below according to the location of your ocaml compilers (usually /usr/bin)
+OCAMLBINPATH = /usr/bin
+OCAMLLIBPATH = /usr/lib/ocaml
 
-OCAMLBINPATH = /sw/bin
-OCAMLLIBPATH = /sw/lib/ocaml
 OCAMLCP = $(OCAMLBINPATH)/ocamlcp
 OCAMLLEX = $(OCAMLBINPATH)/ocamllex
 OCAMLYACC = $(OCAMLBINPATH)/ocamlyacc

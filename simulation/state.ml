@@ -15,12 +15,12 @@ type implicit_state =
 		alg_variables : ((Dynamics.variable * float) option) array;
 		observables : obs list; 
 		influence_map : (int, (int IntMap.t list) IntMap.t) Hashtbl.t ;
-		mutable activity_tree : Random_tree.tree; wake_up : Precondition.t
+		mutable activity_tree : Random_tree.tree; 
+		wake_up : Precondition.t
 	}
 and component_injections =
 	(InjectionHeap.t option) array
-and obs =
-	{ label : string; expr : Dynamics.variable }
+and obs = { label : string; expr : Dynamics.variable }
 
 
 let kappa_of_id id state =
@@ -40,8 +40,8 @@ let alg_of_id id state =
 	with | Invalid_argument msg -> invalid_arg ("State.kappa_of_id: " ^ msg)
 
 (**[instance_number mix_id state] returns the number of instances of mixture [mix_id] in implicit state [state]*)
-let instance_number mix_id state =
-	if mix_id = 0 then 1. (*empty mixture has 1 instance*)
+let instance_number mix_id state env =
+	if Environment.is_empty_lhs mix_id env then 1. 
 	else
 	match state.injections.(mix_id) with
 	| None -> 0.
@@ -90,7 +90,7 @@ let instances_of_square mix_id state =
 										[] m)
 				[ (IntMap.empty, IntSet.empty) ] comp_injs
 
-let rec value state var_id counter =
+let rec value state var_id counter env =
 	let var_opt = try Some (alg_of_id var_id state) with | Not_found -> None
 	in
 	match var_opt with
@@ -100,15 +100,15 @@ let rec value state var_id counter =
 			(match var with
 				| Dynamics.CONST f -> f
 				| Dynamics.VAR v_fun ->
-						let act_of_id id = instance_number id state
+						let act_of_id id = instance_number id state env
 						
-						and v_of_var id = value state id counter
+						and v_of_var id = value state id counter env
 						in
 						v_fun act_of_id v_of_var (Counter.time counter)
 							(Counter.event counter))
 
 (**[eval_activity rule state] returns the evaluation of the activity --not divided by automorphisms-- of rule [rule] in implicit state [state]*)
-let eval_activity rule state counter =
+let eval_activity rule state counter env =
 	match rule.over_sampling with
 	| Some k -> k
 	| None ->
@@ -116,22 +116,16 @@ let eval_activity rule state counter =
 			and kin = rule.k_def
 			in
 			(match kin with
-				| Dynamics.CONST f -> f *. (instance_number mix_id state)
+				| Dynamics.CONST f -> f *. (instance_number mix_id state env)
 				| Dynamics.VAR k_fun ->
-						let act_of_id id = instance_number id state
+						let act_of_id id = instance_number id state env
 						
-						and v_of_var id = value state id counter in
+						and v_of_var id = value state id counter env in
 						let k =
 							k_fun act_of_id v_of_var (Counter.time counter)
 								(Counter.event counter)
 						in
-						if k = infinity
-						then
-							invalid_arg
-								(Printf.sprintf
-										"Kinetic rate of rule '%s' has become undefined"
-										rule.kappa)
-						else k *. (instance_number mix_id state))
+						k *. (instance_number mix_id state env))
 
 let pert_of_id state id = IntMap.find id state.perturbations
 
@@ -139,7 +133,7 @@ let update_activity state var_id counter env =
 	if not (Environment.is_rule var_id env) then ()
 	else
 	let rule = rule_of_id var_id state in
-	let alpha = eval_activity rule state counter
+	let alpha = eval_activity rule state counter env
 	in
 	try
 		Random_tree.add var_id alpha state.activity_tree
@@ -203,7 +197,7 @@ let initialize_embeddings state mix_list =
 		List.fold_left
 		(fun state mix ->
 			let injs = state.injections in
-			let opt = injs.(Mixture.get_id mix) in
+			let opt = injs.(Mixture.get_id mix) in (*returns 0 if mix is empty*)
 			let comp_injs =
 				match opt with
 				| None -> Array.create (Mixture.arity mix) None
@@ -355,8 +349,8 @@ let initialize sg rules kappa_vars alg_vars obs (pert,rule_pert) counter env =
 			(*rule could be a perturbation*)
 			if not (Environment.is_rule id env) then act_tree
 			else
-				let alpha_rule = eval_activity rule state counter
-				in (Random_tree.add id alpha_rule act_tree; act_tree)
+				let alpha_rule = eval_activity rule state counter env
+				in (Random_tree.add id alpha_rule act_tree ; act_tree)
 		)
 			state.rules state.activity_tree	
 	in
@@ -405,7 +399,7 @@ let select_injection state mix =
 			in embedding
 
 (* Draw a rule at random in the state according to its activity *)
-let draw_rule state counter =
+let draw_rule state counter env =
 	try
 		let lhs_id = Random_tree.random state.activity_tree in
 		(* Activity.random_val state.activity_tree *)
@@ -417,24 +411,28 @@ let draw_rule state counter =
 			with
 			| Not_found ->
 					invalid_arg
-						(Printf.sprintf "State.drw_rule: %d is not a valid rule indices"
+						(Printf.sprintf "State.draw_rule: %d is not a valid rule indices"
 								lhs_id)
 		and alpha =
-			try eval_activity r state counter
+			try eval_activity r state counter env
 			with | Not_found -> invalid_arg "State.draw_rule"
 		in
-		(if alpha > alpha'
-			then invalid_arg "State.draw_rule: activity invariant violation"
-			else ();
-			let rd = Random.float 1.0
-			in
-			if rd > (alpha /. alpha')
-			then
-				(Random_tree.add lhs_id alpha state.activity_tree;
-					raise Null_event)
+		let (_:unit) =
+			if alpha = infinity then ()
 			else
-				(let embedding = select_injection state r.lhs
-					in ((Some (r, embedding)), state)))
+				if alpha > alpha' then invalid_arg "State.draw_rule: activity invariant violation"
+				else ();
+				let rd = Random.float 1.0
+				in
+				if rd > (alpha /. alpha')
+				then
+					(Random_tree.add lhs_id alpha state.activity_tree; (*correcting over approxmation of activity*)
+					raise Null_event)
+				else ()
+		in
+		let embedding = select_injection state r.lhs
+		in 
+		((Some (r, embedding)), state)
 	with | Not_found -> raise Deadlock
 
 let wake_up state modif_type modifs wake_up_map =
@@ -1058,7 +1056,7 @@ let dump state counter env =
 			("("^(String.concat "," !cont)^")")
 		in
 		 	Printf.printf "***[%f] Current state***\n" (Counter.time counter);
-			SiteGraph.dump ~with_lift: true state.graph env;
+			SiteGraph.dump ~with_lift:true state.graph env;
 			Hashtbl.fold
 			(fun i r _ ->
 				let nme =
@@ -1068,10 +1066,10 @@ let dump state counter env =
 				if Environment.is_rule i env then
 					Printf.printf "\t%s %s @ %f(%f) %s\n" nme (Dynamics.to_kappa r)
 					(Random_tree.find i state.activity_tree)
-					(eval_activity r state counter) (dump_size_of_cc r.lhs)
+					(eval_activity r state counter env) (dump_size_of_cc r.lhs)
 				else
 					Printf.printf "\t%s %s [found %d]\n" nme (Dynamics.to_kappa r)
-					(int_of_float (instance_number i state))
+					(int_of_float (instance_number i state env))
 			) state.rules ();
 			print_newline ();
 			Array.iteri
@@ -1082,7 +1080,7 @@ let dump state counter env =
 									(Printf.printf "Var[%d]: '%s' %s has %d instances\n" mix_id
 											(Environment.kappa_of_num mix_id env)
 											(Mixture.to_kappa false (kappa_of_id mix_id state) env)
-											(int_of_float (instance_number mix_id state));
+											(int_of_float (instance_number mix_id state env));
 										Array.iteri
 											(fun cc_id injs_opt ->
 														match injs_opt with
@@ -1104,7 +1102,7 @@ let dump state counter env =
 							| Some (v, x) ->
 									Printf.printf "x[%d]: '%s' %f\n" var_id
 										(Environment.alg_of_num var_id env)
-										(value state var_id counter))
+										(value state var_id counter env))
 				state.alg_variables;
 			IntMap.fold
 			(fun i pert _ ->

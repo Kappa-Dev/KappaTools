@@ -333,7 +333,7 @@ let signature_of_ast s env =
 
 let rule_of_ast env (ast_rule_label, ast_rule) = (*TODO take into account no_poly*)
 	let (env, lhs_id) =
-		Environment.declare_var_kappa ~from_rule: true ast_rule_label.lbl_nme env in
+		Environment.declare_var_kappa ~from_rule:true ast_rule_label.lbl_nme env in
 	(* reserving an id for rule's lhs in the pattern table *)
 	let env = Environment.declare_rule ast_rule_label.lbl_nme lhs_id env in
 	let (k_def, dep) =
@@ -372,6 +372,7 @@ let rule_of_ast env (ast_rule_label, ast_rule) = (*TODO take into account no_pol
 						raise
 							(ExceptionDefn.Semantics_Error (pos, "undefined label " ^ ref))) in
 	let r_id = Mixture.get_id lhs in
+	let env = if Mixture.is_empty lhs then Environment.declare_empty_lhs r_id env else env in
 	let env =
 		DepSet.fold
 			(fun dep env -> Environment.add_dependencies dep (RULE r_id) env)

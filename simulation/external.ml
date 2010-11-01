@@ -6,22 +6,22 @@ open Graph
 open Mods
 open LargeArray
 
-let eval_pre_pert pert state counter = 
+let eval_pre_pert pert state counter env = 
 	match pert.precondition with
 		| BCONST b -> b
 		| BVAR b_fun -> 
-			let act_of_id = (fun id -> (instance_number id state)) (*act_of_id:functional argument*)
-			and v_of_id = (fun id -> State.value state id counter)
+			let act_of_id = (fun id -> (instance_number id state env)) (*act_of_id:functional argument*)
+			and v_of_id = (fun id -> State.value state id counter env)
 			in
 				b_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter)
 
-let eval_abort_pert just_applied pert state counter = 
+let eval_abort_pert just_applied pert state counter env = 
 	match pert.abort with
 		| None -> just_applied
 		| Some (BCONST b) -> b
 		| Some (BVAR b_fun) -> 
-			let act_of_id = (fun id -> (instance_number id state)) (*act_of_id:functional argument*)
-			and v_of_id = (fun id -> State.value state id counter)
+			let act_of_id = (fun id -> (instance_number id state env)) (*act_of_id:functional argument*)
+			and v_of_id = (fun id -> State.value state id counter env)
 			in
 				b_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter)
 
@@ -46,8 +46,8 @@ let apply_effect p_id pert state counter env =
 		close_out desc ;
 		Parameter.openOutDescriptors := List.tl (!Parameter.openOutDescriptors)
 	in
-	let act_of_id = (fun id -> (instance_number id state))  (*act_of_id:functional argument*) 
-	and v_of_id = (fun id -> State.value state id counter)
+	let act_of_id = (fun id -> (instance_number id state env))  (*act_of_id:functional argument*) 
+	and v_of_id = (fun id -> State.value state id counter env)
 	in
 	let eval_var v =
 		match v with
@@ -85,7 +85,7 @@ let apply_effect p_id pert state counter env =
 						(!envr,!st,!pert_ids)
 			| DELETE (v,mix) ->
 				let mix_id = Mixture.get_id mix in
-				let instance_num = State.instance_number mix_id state in
+				let instance_num = State.instance_number mix_id state env in
 				let r = 
 					match Environment.rule_of_pert p_id env with 
 						| None -> invalid_arg "External.apply_effect"
@@ -150,13 +150,13 @@ let rec try_perturbate state pert_ids counter env =
 				| None -> (state,env,pert_ids)
 				| Some pert ->
 					let state,pert_ids,env = 
-						if eval_pre_pert pert state counter then
+						if eval_pre_pert pert state counter env then
 							begin
 								if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "\n*************Applying perturbation %d***************" pert_id) ; 
 								let env,state,pert_ids = apply_effect pert_id pert state counter env in
 								if !Parameter.debugModeOn then Debug.tag "************End perturbation*************" ;
 								let state = 
-									if eval_abort_pert true pert state counter then 
+									if eval_abort_pert true pert state counter env then 
 										(if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "***Aborting pert[%d]***" pert_id) ;
 										{state with perturbations = IntMap.remove pert_id state.perturbations} )
 									else state
@@ -165,7 +165,7 @@ let rec try_perturbate state pert_ids counter env =
 							end
 						else (state,pert_ids,env)
 					in				
-					if eval_abort_pert false pert state counter then
+					if eval_abort_pert false pert state counter env then
 						(if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "***Aborting pert[%d]***" pert_id) ;
 						({state with perturbations = IntMap.remove pert_id state.perturbations},env,IntSet.remove pert_id pert_ids))
 					else (state,env,pert_ids)

@@ -1,0 +1,4357 @@
+Self seeding...
+Initialized random number generator with seed 548887525
+Compiling...
+	 agent signatures
+Parsing initial conditions...
+	 variable declarations
+	 rules
+	 plot instructions
+	 perturbations
+Done
+Building initial simulation state...
+	 * Initializing injections...
+	 * Initializing variables...
+	 * Initializing wake up map for side effects...
+	 * Initializing activity tree...
+	 * Computing influence map...
+->A() can be glued to var[2] by [0->0]
+Tick(x~1)->Tick(x~0) can be glued to var[0] by [0->0]
+Tick(x~1)->Tick(x~0) can be glued to var[5] by [0->0]
+Tick(x~0)->Tick(x~1) can be glued to var[1] by [0->0]
+Tick(x~0)->Tick(x~1) can be glued to var[4] by [0->0]
+Done
+[**Event 0 (Activity 3.000000)**]
+____________________________________________________________
+***[0.000000] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_2:[_{}{(4,0,2),(1,0,2)},x~1{(4,0,2),(1,0,2)}{(4,0,2),(1,0,2)}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(3.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 0.000000(0.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 0 instances
+	CC[0] : na
+Var[1]: '1' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+	CC[0] #2 : [0->2]
+Var[2]: 'A' A() has 0 instances
+	CC[0] : na
+Var[4]: 'tick0' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+	CC[0] #2 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 0 instances
+	CC[0] : na
+pert[0]: whenever ('0'>'1'), set rate of rule 'intro' to inf
+pert[1]: whenever ('A'>5.000000), set rate of rule 'intro' to 0.000000
+**********
+Drawing a rule...
+Applying 'tick0' with embedding:
+[4,0,2]: [0->2]
+Negative update as indicated by Tick#2 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 2
+New embedding: [0->2]
+Updating dependencies {PERT(0)}
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 2
+New embedding: [0->2]
+Should now try perturbations {}
+[**Event 1 (Activity 4.000000)**]
+***[0.215250] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_2:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 1.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->2]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+Var[2]: 'A' A() has 0 instances
+	CC[0] : na
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->2]
+pert[0]: whenever ('0'>'1'), set rate of rule 'intro' to inf
+pert[1]: whenever ('A'>5.000000), set rate of rule 'intro' to 0.000000
+**********
+Drawing a rule...
+Applying 'tick0' with embedding:
+[4,0,1]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 1
+New embedding: [0->1]
+Updating dependencies {PERT(0)}
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 1
+New embedding: [0->1]
+
+*************Applying perturbation 0***************
+Updating rate of rule 'intro'
+************End perturbation*************
+***Aborting pert[0]***
+Should now try perturbations {}
+[**Event 2 (Activity inf)**]
+***[0.275290] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_2:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+	'intro' ->A() @ 0.000000(inf) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[2]: 'A' A() has 0 instances
+	CC[0] : na
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+pert[1]: whenever ('A'>5.000000), set rate of rule 'intro' to 0.000000
+**********
+Drawing a rule...
+#Applying 'intro' with embedding:
+Influence map tells me I should look for new injections of var[2]
+Trying to embed Var[2] using root 0 at node 3
+New embedding: [0->3]
+Updating dependencies {PERT(1)}
+Should now try perturbations {}
+[**Event 3 (Activity inf)**]
+***[0.275290] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_2:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+	'intro' ->A() @ 0.000000(inf) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[2]: 'A' A() has 1 instances
+	CC[0] #0 : [0->3]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+pert[1]: whenever ('A'>5.000000), set rate of rule 'intro' to 0.000000
+**********
+Drawing a rule...
+Applying 'intro' with embedding:
+Influence map tells me I should look for new injections of var[2]
+Trying to embed Var[2] using root 0 at node 4
+New embedding: [0->4]
+Updating dependencies {PERT(1)}
+Should now try perturbations {}
+[**Event 4 (Activity inf)**]
+***[0.275290] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_2:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+	'intro' ->A() @ 0.000000(inf) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[2]: 'A' A() has 2 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+pert[1]: whenever ('A'>5.000000), set rate of rule 'intro' to 0.000000
+**********
+Drawing a rule...
+#Applying 'intro' with embedding:
+Influence map tells me I should look for new injections of var[2]
+Trying to embed Var[2] using root 0 at node 5
+New embedding: [0->5]
+Updating dependencies {PERT(1)}
+Should now try perturbations {}
+[**Event 5 (Activity inf)**]
+***[0.275290] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_2:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+	'intro' ->A() @ 0.000000(inf) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[2]: 'A' A() has 3 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+pert[1]: whenever ('A'>5.000000), set rate of rule 'intro' to 0.000000
+**********
+Drawing a rule...
+Applying 'intro' with embedding:
+Influence map tells me I should look for new injections of var[2]
+Trying to embed Var[2] using root 0 at node 6
+New embedding: [0->6]
+Updating dependencies {PERT(1)}
+Should now try perturbations {}
+[**Event 6 (Activity inf)**]
+***[0.275290] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_2:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+	'intro' ->A() @ 0.000000(inf) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[2]: 'A' A() has 4 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+pert[1]: whenever ('A'>5.000000), set rate of rule 'intro' to 0.000000
+**********
+Drawing a rule...
+#Applying 'intro' with embedding:
+Influence map tells me I should look for new injections of var[2]
+Trying to embed Var[2] using root 0 at node 7
+New embedding: [0->7]
+Updating dependencies {PERT(1)}
+Should now try perturbations {}
+[**Event 7 (Activity inf)**]
+***[0.275290] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_2:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+	'intro' ->A() @ 0.000000(inf) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[2]: 'A' A() has 5 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+pert[1]: whenever ('A'>5.000000), set rate of rule 'intro' to 0.000000
+**********
+Drawing a rule...
+Applying 'intro' with embedding:
+Influence map tells me I should look for new injections of var[2]
+Trying to embed Var[2] using root 0 at node 8
+New embedding: [0->8]
+Updating dependencies {PERT(1)}
+
+*************Applying perturbation 1***************
+Updating rate of rule 'intro'
+************End perturbation*************
+***Aborting pert[1]***
+Should now try perturbations {}
+[**Event 8 (Activity 5.000000)**]
+***[0.275290] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_2:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+**********
+Drawing a rule...
+#Null (clash or doesn't satisfy constraints)
+Should now try perturbations {}
+[**Event 9 (Activity 3.000000)**]
+***[0.521952] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_2:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 1.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+**********
+Drawing a rule...
+Applying 'tick1' with embedding:
+[5,0,0]: [0->2]
+Negative update as indicated by Tick#2 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 2
+reusing injection: [0->1]
+New embedding: [0->2]
+Updating dependencies {PERT(0)}
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 2
+reusing injection: [0->1]
+New embedding: [0->2]
+Should now try perturbations {}
+[**Event 10 (Activity 4.000000)**]
+***[0.675925] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+**********
+Drawing a rule...
+#Applying 'tick0' with embedding:
+[4,0,0]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 0
+reusing injection: [0->2]
+New embedding: [0->0]
+Updating dependencies {PERT(0)}
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 0
+reusing injection: [0->2]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 11 (Activity 4.000000)**]
+***[1.042828] Current state***
+Tick_0:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+**********
+Drawing a rule...
+Null (clash or doesn't satisfy constraints)
+Should now try perturbations {}
+[**Event 12 (Activity 3.000000)**]
+***[1.479515] Current state***
+Tick_0:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 1.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+**********
+Drawing a rule...
+#Applying 'tick0' with embedding:
+[4,0,0]: [0->2]
+Negative update as indicated by Tick#2 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 2
+New embedding: [0->2]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 2
+New embedding: [0->2]
+Should now try perturbations {}
+[**Event 13 (Activity 4.000000)**]
+***[2.275831] Current state***
+Tick_0:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(5,0,2),(0,0,2)},x~0{(5,0,2),(0,0,2)}{(5,0,2),(0,0,2)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 1.000000(0.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 3.000000(3.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 3 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+	CC[0] #2 : [0->2]
+Var[1]: '1' Tick(x~1) has 0 instances
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 0 instances
+Var[5]: 'tick1' Tick(x~0) has 3 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+	CC[0] #2 : [0->2]
+**********
+Drawing a rule...
+Applying 'tick1' with embedding:
+[5,0,2]: [0->2]
+Negative update as indicated by Tick#2 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 2
+reusing injection: [0->2]
+New embedding: [0->2]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 2
+reusing injection: [0->2]
+New embedding: [0->2]
+Should now try perturbations {}
+[**Event 14 (Activity 4.000000)**]
+***[2.577037] Current state***
+Tick_0:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 1.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 3.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+**********
+Drawing a rule...
+#Applying 'tick1' with embedding:
+[5,0,1]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 15 (Activity 5.000000)**]
+***[2.646122] Current state***
+Tick_0:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 3.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+**********
+Drawing a rule...
+Null (clash or doesn't satisfy constraints)
+Should now try perturbations {}
+[**Event 16 (Activity 3.000000)**]
+***[2.651984] Current state***
+Tick_0:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 1.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+**********
+Drawing a rule...
+#Applying 'tick1' with embedding:
+[5,0,0]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 1
+reusing injection: [0->2]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 1
+reusing injection: [0->2]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 17 (Activity 4.000000)**]
+***[3.445706] Current state***
+Tick_0:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_1:[_{}{(4,0,2),(1,0,2)},x~1{(4,0,2),(1,0,2)}{(4,0,2),(1,0,2)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(3.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 1.000000(0.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 0 instances
+Var[1]: '1' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+	CC[0] #2 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+	CC[0] #2 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 0 instances
+**********
+Drawing a rule...
+Applying 'tick0' with embedding:
+[4,0,2]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 1
+reusing injection: [0->1]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 1
+reusing injection: [0->1]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 18 (Activity 4.000000)**]
+***[3.508709] Current state***
+Tick_0:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 1.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+**********
+Drawing a rule...
+#Applying 'tick0' with embedding:
+[4,0,1]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 19 (Activity 5.000000)**]
+***[3.703852] Current state***
+Tick_0:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+**********
+Drawing a rule...
+Null (clash or doesn't satisfy constraints)
+Should now try perturbations {}
+[**Event 20 (Activity 3.000000)**]
+***[4.600200] Current state***
+Tick_0:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 1.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+**********
+Drawing a rule...
+#Applying 'tick0' with embedding:
+[4,0,0]: [0->2]
+Negative update as indicated by Tick#2 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 2
+reusing injection: [0->2]
+New embedding: [0->2]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 2
+reusing injection: [0->2]
+New embedding: [0->2]
+Should now try perturbations {}
+[**Event 21 (Activity 4.000000)**]
+***[4.917570] Current state***
+Tick_0:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(5,0,2),(0,0,2)},x~0{(5,0,2),(0,0,2)}{(5,0,2),(0,0,2)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 1.000000(0.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 3.000000(3.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 3 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+	CC[0] #2 : [0->2]
+Var[1]: '1' Tick(x~1) has 0 instances
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 0 instances
+Var[5]: 'tick1' Tick(x~0) has 3 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+	CC[0] #2 : [0->2]
+**********
+Drawing a rule...
+Applying 'tick1' with embedding:
+[5,0,0]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 1
+reusing injection: [0->2]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 1
+reusing injection: [0->2]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 22 (Activity 4.000000)**]
+***[5.099888] Current state***
+Tick_0:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_1:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_2:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 1.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 3.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+**********
+Drawing a rule...
+#Applying 'tick0' with embedding:
+[4,0,0]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 1
+reusing injection: [0->1]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 1
+reusing injection: [0->1]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 23 (Activity 4.000000)**]
+***[5.525931] Current state***
+Tick_0:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_1:[_{}{(5,0,2),(0,0,2)},x~0{(5,0,2),(0,0,2)}{(5,0,2),(0,0,2)}]
+Tick_2:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 1.000000(0.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 3.000000(3.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 3 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+	CC[0] #2 : [0->1]
+Var[1]: '1' Tick(x~1) has 0 instances
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 0 instances
+Var[5]: 'tick1' Tick(x~0) has 3 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+	CC[0] #2 : [0->1]
+**********
+Drawing a rule...
+Applying 'tick1' with embedding:
+[5,0,1]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 0
+reusing injection: [0->1]
+New embedding: [0->0]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 0
+reusing injection: [0->1]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 24 (Activity 4.000000)**]
+***[5.535490] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_2:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 1.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 3.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+**********
+Drawing a rule...
+#Applying 'tick1' with embedding:
+[5,0,0]: [0->2]
+Negative update as indicated by Tick#2 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 2
+reusing injection: [0->0]
+New embedding: [0->2]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 2
+reusing injection: [0->0]
+New embedding: [0->2]
+Should now try perturbations {}
+[**Event 25 (Activity 5.000000)**]
+***[6.185393] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 3.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+**********
+Drawing a rule...
+Applying 'tick1' with embedding:
+[5,0,0]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 1
+reusing injection: [0->1]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 1
+reusing injection: [0->1]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 26 (Activity 6.000000)**]
+***[6.261343] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(4,0,2),(1,0,2)},x~1{(4,0,2),(1,0,2)}{(4,0,2),(1,0,2)}]
+Tick_2:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(3.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 3.000000(0.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 0 instances
+Var[1]: '1' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+	CC[0] #2 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+	CC[0] #2 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 0 instances
+**********
+Drawing a rule...
+#Null (clash or doesn't satisfy constraints)
+Should now try perturbations {}
+[**Event 27 (Activity 3.000000)**]
+***[6.653634] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(4,0,2),(1,0,2)},x~1{(4,0,2),(1,0,2)}{(4,0,2),(1,0,2)}]
+Tick_2:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(3.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 0.000000(0.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 0 instances
+Var[1]: '1' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+	CC[0] #2 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+	CC[0] #2 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 0 instances
+**********
+Drawing a rule...
+Applying 'tick0' with embedding:
+[4,0,0]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 0
+reusing injection: [0->1]
+New embedding: [0->0]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 0
+reusing injection: [0->1]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 28 (Activity 4.000000)**]
+***[6.737429] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_2:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 1.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+**********
+Drawing a rule...
+#Null (clash or doesn't satisfy constraints)
+Should now try perturbations {}
+[**Event 29 (Activity 3.000000)**]
+***[6.874274] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_2:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 1.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+**********
+Drawing a rule...
+Applying 'tick0' with embedding:
+[4,0,0]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 1
+reusing injection: [0->2]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 1
+reusing injection: [0->2]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 30 (Activity 4.000000)**]
+***[7.133414] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+**********
+Drawing a rule...
+#Applying 'tick1' with embedding:
+[5,0,0]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 0
+reusing injection: [0->1]
+New embedding: [0->0]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 0
+reusing injection: [0->1]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 31 (Activity 4.000000)**]
+***[7.295370] Current state***
+Tick_0:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+**********
+Drawing a rule...
+Applying 'tick1' with embedding:
+[5,0,0]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 1
+reusing injection: [0->0]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 1
+reusing injection: [0->0]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 32 (Activity 5.000000)**]
+***[7.536446] Current state***
+Tick_0:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_1:[_{}{(4,0,2),(1,0,2)},x~1{(4,0,2),(1,0,2)}{(4,0,2),(1,0,2)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(3.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(0.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 0 instances
+Var[1]: '1' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+	CC[0] #2 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+	CC[0] #2 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 0 instances
+**********
+Drawing a rule...
+#Null (clash or doesn't satisfy constraints)
+Should now try perturbations {}
+[**Event 33 (Activity 3.000000)**]
+***[7.555950] Current state***
+Tick_0:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_1:[_{}{(4,0,2),(1,0,2)},x~1{(4,0,2),(1,0,2)}{(4,0,2),(1,0,2)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(3.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 0.000000(0.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 0 instances
+Var[1]: '1' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+	CC[0] #2 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+	CC[0] #2 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 0 instances
+**********
+Drawing a rule...
+Applying 'tick0' with embedding:
+[4,0,1]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 0
+reusing injection: [0->1]
+New embedding: [0->0]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 0
+reusing injection: [0->1]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 34 (Activity 4.000000)**]
+***[8.364332] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 1.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+**********
+Drawing a rule...
+#Applying 'tick0' with embedding:
+[4,0,1]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 1
+reusing injection: [0->0]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 1
+reusing injection: [0->0]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 35 (Activity 5.000000)**]
+***[8.440168] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+**********
+Drawing a rule...
+Applying 'tick1' with embedding:
+[5,0,0]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 0
+reusing injection: [0->1]
+New embedding: [0->0]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 0
+reusing injection: [0->1]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 36 (Activity 4.000000)**]
+***[8.504127] Current state***
+Tick_0:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+**********
+Drawing a rule...
+#Null (clash or doesn't satisfy constraints)
+Should now try perturbations {}
+[**Event 37 (Activity 3.000000)**]
+***[8.833294] Current state***
+Tick_0:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 1.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+**********
+Drawing a rule...
+Applying 'tick1' with embedding:
+[5,0,0]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 1
+reusing injection: [0->0]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 1
+reusing injection: [0->0]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 38 (Activity 4.000000)**]
+***[8.988801] Current state***
+Tick_0:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_1:[_{}{(4,0,2),(1,0,2)},x~1{(4,0,2),(1,0,2)}{(4,0,2),(1,0,2)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(3.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 1.000000(0.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 0 instances
+Var[1]: '1' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+	CC[0] #2 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+	CC[0] #2 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 0 instances
+**********
+Drawing a rule...
+#Applying 'tick0' with embedding:
+[4,0,2]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 1
+reusing injection: [0->1]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 1
+reusing injection: [0->1]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 39 (Activity 4.000000)**]
+***[8.998283] Current state***
+Tick_0:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 1.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+**********
+Drawing a rule...
+Applying 'tick1' with embedding:
+[5,0,0]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 1
+reusing injection: [0->1]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 1
+reusing injection: [0->1]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 40 (Activity 4.000000)**]
+***[9.049973] Current state***
+Tick_0:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_1:[_{}{(4,0,2),(1,0,2)},x~1{(4,0,2),(1,0,2)}{(4,0,2),(1,0,2)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(3.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 1.000000(0.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 0 instances
+Var[1]: '1' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+	CC[0] #2 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+	CC[0] #2 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 0 instances
+**********
+Drawing a rule...
+#Null (clash or doesn't satisfy constraints)
+Should now try perturbations {}
+[**Event 41 (Activity 3.000000)**]
+***[9.640556] Current state***
+Tick_0:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_1:[_{}{(4,0,2),(1,0,2)},x~1{(4,0,2),(1,0,2)}{(4,0,2),(1,0,2)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(3.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 0.000000(0.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 0 instances
+Var[1]: '1' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+	CC[0] #2 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+	CC[0] #2 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 0 instances
+**********
+Drawing a rule...
+Applying 'tick0' with embedding:
+[4,0,1]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 0
+reusing injection: [0->1]
+New embedding: [0->0]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 0
+reusing injection: [0->1]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 42 (Activity 4.000000)**]
+***[11.940290] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 1.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+**********
+Drawing a rule...
+#Applying 'tick1' with embedding:
+[5,0,0]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 43 (Activity 4.000000)**]
+***[11.966923] Current state***
+Tick_0:[_{}{(4,0,2),(1,0,2)},x~1{(4,0,2),(1,0,2)}{(4,0,2),(1,0,2)}]
+Tick_1:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(3.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 1.000000(0.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 0 instances
+Var[1]: '1' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+	CC[0] #2 : [0->0]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+	CC[0] #2 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 0 instances
+**********
+Drawing a rule...
+Applying 'tick0' with embedding:
+[4,0,0]: [0->2]
+Negative update as indicated by Tick#2 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 2
+reusing injection: [0->0]
+New embedding: [0->2]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 2
+reusing injection: [0->0]
+New embedding: [0->2]
+Should now try perturbations {}
+[**Event 44 (Activity 4.000000)**]
+***[12.117813] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_2:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 1.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->2]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->2]
+**********
+Drawing a rule...
+#Null (clash or doesn't satisfy constraints)
+Should now try perturbations {}
+[**Event 45 (Activity 3.000000)**]
+***[12.461321] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_2:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 1.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->2]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->2]
+**********
+Drawing a rule...
+Applying 'tick1' with embedding:
+[5,0,0]: [0->2]
+Negative update as indicated by Tick#2 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 2
+reusing injection: [0->2]
+New embedding: [0->2]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 2
+reusing injection: [0->2]
+New embedding: [0->2]
+Should now try perturbations {}
+[**Event 46 (Activity 4.000000)**]
+***[12.935345] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_2:[_{}{(4,0,2),(1,0,2)},x~1{(4,0,2),(1,0,2)}{(4,0,2),(1,0,2)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(3.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 1.000000(0.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 0 instances
+Var[1]: '1' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+	CC[0] #2 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+	CC[0] #2 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 0 instances
+**********
+Drawing a rule...
+#Null (clash or doesn't satisfy constraints)
+Should now try perturbations {}
+[**Event 47 (Activity 3.000000)**]
+***[13.031754] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_2:[_{}{(4,0,2),(1,0,2)},x~1{(4,0,2),(1,0,2)}{(4,0,2),(1,0,2)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(3.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 0.000000(0.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 0 instances
+Var[1]: '1' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+	CC[0] #2 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+	CC[0] #2 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 0 instances
+**********
+Drawing a rule...
+Applying 'tick0' with embedding:
+[4,0,0]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 0
+reusing injection: [0->2]
+New embedding: [0->0]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 0
+reusing injection: [0->2]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 48 (Activity 4.000000)**]
+***[13.626399] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 1.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+**********
+Drawing a rule...
+#Null (clash or doesn't satisfy constraints)
+Should now try perturbations {}
+[**Event 49 (Activity 3.000000)**]
+***[13.765596] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 1.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+**********
+Drawing a rule...
+Applying 'tick0' with embedding:
+[4,0,0]: [0->2]
+Negative update as indicated by Tick#2 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 2
+reusing injection: [0->0]
+New embedding: [0->2]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 2
+reusing injection: [0->0]
+New embedding: [0->2]
+Should now try perturbations {}
+[**Event 50 (Activity 4.000000)**]
+***[13.898509] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_2:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+**********
+Drawing a rule...
+#Applying 'tick0' with embedding:
+[4,0,0]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 1
+reusing injection: [0->0]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 1
+reusing injection: [0->0]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 51 (Activity 5.000000)**]
+***[13.979660] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(5,0,2),(0,0,2)},x~0{(5,0,2),(0,0,2)}{(5,0,2),(0,0,2)}]
+Tick_2:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(0.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 3.000000(3.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 3 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+	CC[0] #2 : [0->1]
+Var[1]: '1' Tick(x~1) has 0 instances
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 0 instances
+Var[5]: 'tick1' Tick(x~0) has 3 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+	CC[0] #2 : [0->1]
+**********
+Drawing a rule...
+Applying 'tick1' with embedding:
+[5,0,1]: [0->2]
+Negative update as indicated by Tick#2 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 2
+reusing injection: [0->1]
+New embedding: [0->2]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 2
+reusing injection: [0->1]
+New embedding: [0->2]
+Should now try perturbations {}
+[**Event 52 (Activity 4.000000)**]
+***[14.176240] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 1.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 3.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+**********
+Drawing a rule...
+#Applying 'tick0' with embedding:
+[4,0,0]: [0->2]
+Negative update as indicated by Tick#2 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 2
+reusing injection: [0->2]
+New embedding: [0->2]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 2
+reusing injection: [0->2]
+New embedding: [0->2]
+Should now try perturbations {}
+[**Event 53 (Activity 4.000000)**]
+***[14.268774] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_2:[_{}{(5,0,2),(0,0,2)},x~0{(5,0,2),(0,0,2)}{(5,0,2),(0,0,2)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 1.000000(0.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 3.000000(3.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 3 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+	CC[0] #2 : [0->2]
+Var[1]: '1' Tick(x~1) has 0 instances
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 0 instances
+Var[5]: 'tick1' Tick(x~0) has 3 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+	CC[0] #2 : [0->2]
+**********
+Drawing a rule...
+Applying 'tick1' with embedding:
+[5,0,1]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 1
+reusing injection: [0->2]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 1
+reusing injection: [0->2]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 54 (Activity 4.000000)**]
+***[14.318456] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_2:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 1.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 3.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+**********
+Drawing a rule...
+#Null (clash or doesn't satisfy constraints)
+Should now try perturbations {}
+[**Event 55 (Activity 3.000000)**]
+***[14.436542] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_2:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 1.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+**********
+Drawing a rule...
+Applying 'tick1' with embedding:
+[5,0,0]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 0
+reusing injection: [0->2]
+New embedding: [0->0]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 0
+reusing injection: [0->2]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 56 (Activity 4.000000)**]
+***[15.834103] Current state***
+Tick_0:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_1:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_2:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->2]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->2]
+**********
+Drawing a rule...
+#Applying 'tick0' with embedding:
+[4,0,1]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 57 (Activity 4.000000)**]
+***[15.856054] Current state***
+Tick_0:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_1:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_2:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+**********
+Drawing a rule...
+Applying 'tick1' with embedding:
+[5,0,1]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 58 (Activity 4.000000)**]
+***[15.902611] Current state***
+Tick_0:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_1:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_2:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->2]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->2]
+**********
+Drawing a rule...
+#Applying 'tick0' with embedding:
+[4,0,1]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 59 (Activity 4.000000)**]
+***[16.081475] Current state***
+Tick_0:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_1:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_2:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+**********
+Drawing a rule...
+Null (clash or doesn't satisfy constraints)
+Should now try perturbations {}
+[**Event 60 (Activity 3.000000)**]
+***[16.376733] Current state***
+Tick_0:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_1:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_2:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 1.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+**********
+Drawing a rule...
+#Applying 'tick1' with embedding:
+[5,0,0]: [0->2]
+Negative update as indicated by Tick#2 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 2
+reusing injection: [0->0]
+New embedding: [0->2]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 2
+reusing injection: [0->0]
+New embedding: [0->2]
+Should now try perturbations {}
+[**Event 61 (Activity 4.000000)**]
+***[17.331253] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_2:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+**********
+Drawing a rule...
+Applying 'tick0' with embedding:
+[4,0,1]: [0->2]
+Negative update as indicated by Tick#2 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 2
+reusing injection: [0->2]
+New embedding: [0->2]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 2
+reusing injection: [0->2]
+New embedding: [0->2]
+Should now try perturbations {}
+[**Event 62 (Activity 4.000000)**]
+***[17.496321] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_2:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+**********
+Drawing a rule...
+#Null (clash or doesn't satisfy constraints)
+Should now try perturbations {}
+[**Event 63 (Activity 3.000000)**]
+***[17.868739] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_2:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 1.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+**********
+Drawing a rule...
+Applying 'tick1' with embedding:
+[5,0,1]: [0->2]
+Negative update as indicated by Tick#2 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 2
+reusing injection: [0->2]
+New embedding: [0->2]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 2
+reusing injection: [0->2]
+New embedding: [0->2]
+Should now try perturbations {}
+[**Event 64 (Activity 4.000000)**]
+***[17.887217] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_2:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+**********
+Drawing a rule...
+#Null (clash or doesn't satisfy constraints)
+Should now try perturbations {}
+[**Event 65 (Activity 3.000000)**]
+***[18.442182] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_2:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 1.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+**********
+Drawing a rule...
+Applying 'tick0' with embedding:
+[4,0,0]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 1
+reusing injection: [0->2]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 1
+reusing injection: [0->2]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 66 (Activity 4.000000)**]
+***[18.480726] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+**********
+Drawing a rule...
+#Applying 'tick1' with embedding:
+[5,0,1]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 1
+reusing injection: [0->1]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 1
+reusing injection: [0->1]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 67 (Activity 4.000000)**]
+***[18.725129] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+**********
+Drawing a rule...
+Applying 'tick0' with embedding:
+[4,0,1]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 1
+reusing injection: [0->1]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 1
+reusing injection: [0->1]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 68 (Activity 4.000000)**]
+***[18.938473] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+**********
+Drawing a rule...
+#Applying 'tick1' with embedding:
+[5,0,0]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 0
+reusing injection: [0->1]
+New embedding: [0->0]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 0
+reusing injection: [0->1]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 69 (Activity 4.000000)**]
+***[18.970016] Current state***
+Tick_0:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+**********
+Drawing a rule...
+Null (clash or doesn't satisfy constraints)
+Should now try perturbations {}
+[**Event 70 (Activity 3.000000)**]
+***[19.150708] Current state***
+Tick_0:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 1.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+**********
+Drawing a rule...
+#Applying 'tick0' with embedding:
+[4,0,1]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 71 (Activity 4.000000)**]
+***[19.845246] Current state***
+Tick_0:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+**********
+Drawing a rule...
+Applying 'tick1' with embedding:
+[5,0,0]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 1
+reusing injection: [0->0]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 1
+reusing injection: [0->0]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 72 (Activity 4.000000)**]
+***[20.494354] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+**********
+Drawing a rule...
+#Applying 'tick0' with embedding:
+[4,0,0]: [0->2]
+Negative update as indicated by Tick#2 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 2
+reusing injection: [0->1]
+New embedding: [0->2]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 2
+reusing injection: [0->1]
+New embedding: [0->2]
+Should now try perturbations {}
+[**Event 73 (Activity 4.000000)**]
+***[20.515708] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_2:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+**********
+Drawing a rule...
+Applying 'tick1' with embedding:
+[5,0,1]: [0->2]
+Negative update as indicated by Tick#2 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 2
+reusing injection: [0->2]
+New embedding: [0->2]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 2
+reusing injection: [0->2]
+New embedding: [0->2]
+Should now try perturbations {}
+[**Event 74 (Activity 4.000000)**]
+***[20.733426] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_2:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+**********
+Drawing a rule...
+#Applying 'tick1' with embedding:
+[5,0,0]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 75 (Activity 5.000000)**]
+***[20.790428] Current state***
+Tick_0:[_{}{(4,0,2),(1,0,2)},x~1{(4,0,2),(1,0,2)}{(4,0,2),(1,0,2)}]
+Tick_1:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_2:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(3.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(0.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 0 instances
+Var[1]: '1' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->2]
+	CC[0] #2 : [0->0]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->2]
+	CC[0] #2 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 0 instances
+**********
+Drawing a rule...
+Applying 'tick0' with embedding:
+[4,0,0]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 1
+reusing injection: [0->0]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 1
+reusing injection: [0->0]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 76 (Activity 4.000000)**]
+***[20.999467] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 1.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+**********
+Drawing a rule...
+#Applying 'tick0' with embedding:
+[4,0,0]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 0
+reusing injection: [0->2]
+New embedding: [0->0]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 0
+reusing injection: [0->2]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 77 (Activity 5.000000)**]
+***[21.016361] Current state***
+Tick_0:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+**********
+Drawing a rule...
+Applying 'tick1' with embedding:
+[5,0,0]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 1
+reusing injection: [0->0]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 1
+reusing injection: [0->0]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 78 (Activity 4.000000)**]
+***[21.215536] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+**********
+Drawing a rule...
+#Applying 'tick0' with embedding:
+[4,0,1]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 1
+reusing injection: [0->1]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 1
+reusing injection: [0->1]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 79 (Activity 4.000000)**]
+***[21.664414] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+**********
+Drawing a rule...
+Applying 'tick1' with embedding:
+[5,0,1]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 1
+reusing injection: [0->1]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 1
+reusing injection: [0->1]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 80 (Activity 4.000000)**]
+***[24.105451] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+**********
+Drawing a rule...
+#Applying 'tick0' with embedding:
+[4,0,0]: [0->2]
+Negative update as indicated by Tick#2 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 2
+reusing injection: [0->1]
+New embedding: [0->2]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 2
+reusing injection: [0->1]
+New embedding: [0->2]
+Should now try perturbations {}
+[**Event 81 (Activity 4.000000)**]
+***[24.217780] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_2:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+**********
+Drawing a rule...
+Applying 'tick1' with embedding:
+[5,0,1]: [0->2]
+Negative update as indicated by Tick#2 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 2
+reusing injection: [0->2]
+New embedding: [0->2]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 2
+reusing injection: [0->2]
+New embedding: [0->2]
+Should now try perturbations {}
+[**Event 82 (Activity 4.000000)**]
+***[24.252106] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_2:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->0]
+**********
+Drawing a rule...
+#Applying 'tick0' with embedding:
+[4,0,0]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 1
+reusing injection: [0->2]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 1
+reusing injection: [0->2]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 83 (Activity 4.000000)**]
+***[24.403521] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+**********
+Drawing a rule...
+Applying 'tick0' with embedding:
+[4,0,0]: [0->2]
+Negative update as indicated by Tick#2 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 2
+reusing injection: [0->1]
+New embedding: [0->2]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 2
+reusing injection: [0->1]
+New embedding: [0->2]
+Should now try perturbations {}
+[**Event 84 (Activity 5.000000)**]
+***[24.443313] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_2:[_{}{(5,0,2),(0,0,2)},x~0{(5,0,2),(0,0,2)}{(5,0,2),(0,0,2)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(0.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 3.000000(3.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 3 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+	CC[0] #2 : [0->2]
+Var[1]: '1' Tick(x~1) has 0 instances
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 0 instances
+Var[5]: 'tick1' Tick(x~0) has 3 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->1]
+	CC[0] #2 : [0->2]
+**********
+Drawing a rule...
+#Applying 'tick1' with embedding:
+[5,0,0]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 0
+reusing injection: [0->2]
+New embedding: [0->0]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 0
+reusing injection: [0->2]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 85 (Activity 4.000000)**]
+***[24.661923] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_2:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 1.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 3.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+**********
+Drawing a rule...
+Applying 'tick1' with embedding:
+[5,0,0]: [0->2]
+Negative update as indicated by Tick#2 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 2
+reusing injection: [0->1]
+New embedding: [0->2]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 2
+reusing injection: [0->1]
+New embedding: [0->2]
+Should now try perturbations {}
+[**Event 86 (Activity 5.000000)**]
+***[25.170319] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 3.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+**********
+Drawing a rule...
+#Null (clash or doesn't satisfy constraints)
+Should now try perturbations {}
+[**Event 87 (Activity 3.000000)**]
+***[25.370889] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 1.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+**********
+Drawing a rule...
+Applying 'tick1' with embedding:
+[5,0,0]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 1
+reusing injection: [0->1]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 1
+reusing injection: [0->1]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 88 (Activity 4.000000)**]
+***[25.475857] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(4,0,2),(1,0,2)},x~1{(4,0,2),(1,0,2)}{(4,0,2),(1,0,2)}]
+Tick_2:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(3.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 1.000000(0.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 0 instances
+Var[1]: '1' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+	CC[0] #2 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 3 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+	CC[0] #2 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 0 instances
+**********
+Drawing a rule...
+#Applying 'tick0' with embedding:
+[4,0,2]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 1
+reusing injection: [0->1]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 1
+reusing injection: [0->1]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 89 (Activity 4.000000)**]
+***[25.537030] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 3.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 1.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+**********
+Drawing a rule...
+Null (clash or doesn't satisfy constraints)
+Should now try perturbations {}
+[**Event 90 (Activity 3.000000)**]
+***[25.816524] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 1.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->1]
+**********
+Drawing a rule...
+#Applying 'tick0' with embedding:
+[4,0,0]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 0
+reusing injection: [0->2]
+New embedding: [0->0]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 0
+reusing injection: [0->2]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 91 (Activity 4.000000)**]
+***[26.433108] Current state***
+Tick_0:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->2]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+**********
+Drawing a rule...
+Applying 'tick0' with embedding:
+[4,0,0]: [0->2]
+Negative update as indicated by Tick#2 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 2
+reusing injection: [0->0]
+New embedding: [0->2]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 2
+reusing injection: [0->0]
+New embedding: [0->2]
+Should now try perturbations {}
+[**Event 92 (Activity 5.000000)**]
+***[26.634316] Current state***
+Tick_0:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(5,0,2),(0,0,2)},x~0{(5,0,2),(0,0,2)}{(5,0,2),(0,0,2)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(0.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 3.000000(3.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 3 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+	CC[0] #2 : [0->2]
+Var[1]: '1' Tick(x~1) has 0 instances
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 0 instances
+Var[5]: 'tick1' Tick(x~0) has 3 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+	CC[0] #2 : [0->2]
+**********
+Drawing a rule...
+#Applying 'tick1' with embedding:
+[5,0,1]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 0
+reusing injection: [0->2]
+New embedding: [0->0]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 0
+reusing injection: [0->2]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 93 (Activity 4.000000)**]
+***[26.657516] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 1.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 3.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->2]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->2]
+**********
+Drawing a rule...
+Applying 'tick0' with embedding:
+[4,0,0]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 94 (Activity 4.000000)**]
+***[26.751801] Current state***
+Tick_0:[_{}{(5,0,2),(0,0,2)},x~0{(5,0,2),(0,0,2)}{(5,0,2),(0,0,2)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 1.000000(0.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 3.000000(3.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 3 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->2]
+	CC[0] #2 : [0->0]
+Var[1]: '1' Tick(x~1) has 0 instances
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 0 instances
+Var[5]: 'tick1' Tick(x~0) has 3 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->2]
+	CC[0] #2 : [0->0]
+**********
+Drawing a rule...
+#Applying 'tick1' with embedding:
+[5,0,2]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 95 (Activity 4.000000)**]
+***[26.939066] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 1.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 3.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->2]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->2]
+**********
+Drawing a rule...
+Applying 'tick0' with embedding:
+[4,0,0]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 96 (Activity 4.000000)**]
+***[27.296587] Current state***
+Tick_0:[_{}{(5,0,2),(0,0,2)},x~0{(5,0,2),(0,0,2)}{(5,0,2),(0,0,2)}]
+Tick_1:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_2:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 1.000000(0.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 3.000000(3.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 3 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->2]
+	CC[0] #2 : [0->0]
+Var[1]: '1' Tick(x~1) has 0 instances
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 0 instances
+Var[5]: 'tick1' Tick(x~0) has 3 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->2]
+	CC[0] #2 : [0->0]
+**********
+Drawing a rule...
+#Applying 'tick1' with embedding:
+[5,0,0]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 1
+reusing injection: [0->0]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 1
+reusing injection: [0->0]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 97 (Activity 4.000000)**]
+***[27.678589] Current state***
+Tick_0:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+Tick_1:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_2:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 1.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 3.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->1]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->1]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->0]
+	CC[0] #1 : [0->2]
+**********
+Drawing a rule...
+Applying 'tick1' with embedding:
+[5,0,0]: [0->0]
+Negative update as indicated by Tick#0 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Should now try perturbations {}
+[**Event 98 (Activity 5.000000)**]
+***[28.001565] Current state***
+Tick_0:[_{}{(4,0,1),(1,0,1)},x~1{(4,0,1),(1,0,1)}{(4,0,1),(1,0,1)}]
+Tick_1:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_2:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(2.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 3.000000(1.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->2]
+Var[1]: '1' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 2 instances
+	CC[0] #0 : [0->1]
+	CC[0] #1 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 1 instances
+	CC[0] #0 : [0->2]
+**********
+Drawing a rule...
+#Applying 'tick0' with embedding:
+[4,0,0]: [0->1]
+Negative update as indicated by Tick#1 site 1
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 1
+reusing injection: [0->0]
+New embedding: [0->1]
+Influence map tells me I should look for new injections of var[5]
+Trying to embed Var[5] using root 0 at node 1
+reusing injection: [0->0]
+New embedding: [0->1]
+Should now try perturbations {}
+[**Event 99 (Activity 4.000000)**]
+***[28.004197] Current state***
+Tick_0:[_{}{(4,0,0),(1,0,0)},x~1{(4,0,0),(1,0,0)}{(4,0,0),(1,0,0)}]
+Tick_1:[_{}{(5,0,1),(0,0,1)},x~0{(5,0,1),(0,0,1)}{(5,0,1),(0,0,1)}]
+Tick_2:[_{}{(5,0,0),(0,0,0)},x~0{(5,0,0),(0,0,0)}{(5,0,0),(0,0,0)}]
+A_3:[_{}{(2,0,0)},x{}{}]
+A_4:[_{}{(2,0,1)},x{}{}]
+A_5:[_{}{(2,0,2)},x{}{}]
+A_6:[_{}{(2,0,3)},x{}{}]
+A_7:[_{}{(2,0,4)},x{}{}]
+A_8:[_{}{(2,0,5)},x{}{}]
+	'intro' ->A() @ 0.000000(0.000000) ()
+	'tick0' Tick(x~1)->Tick(x~0) @ 2.000000(1.000000) (1)
+	'tick1' Tick(x~0)->Tick(x~1) @ 2.000000(2.000000) (1)
+
+Var[0]: '0' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+Var[1]: '1' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[2]: 'A' A() has 6 instances
+	CC[0] #0 : [0->3]
+	CC[0] #1 : [0->4]
+	CC[0] #2 : [0->5]
+	CC[0] #3 : [0->6]
+	CC[0] #4 : [0->7]
+	CC[0] #5 : [0->8]
+Var[4]: 'tick0' Tick(x~1) has 1 instances
+	CC[0] #0 : [0->0]
+Var[5]: 'tick1' Tick(x~0) has 2 instances
+	CC[0] #0 : [0->2]
+	CC[0] #1 : [0->1]
+**********
+Drawing a rule...
+Applying 'tick1' with embedding:
+[5,0,0]: [0->2]
+Negative update as indicated by Tick#2 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 2
+reusing injection: [0->1]
+New embedding: [0->2]
+Influence map tells me I should look for new injections of var[4]
+Trying to embed Var[4] using root 0 at node 2
+reusing injection: [0->1]
+New embedding: [0->2]
+Should now try perturbations {}
+[**Event 100 (Activity 4.000000)**]
+#
+Simulation ended (eff.: 0.840336)

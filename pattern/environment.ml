@@ -25,7 +25,8 @@ type t = {
 	pert_of_num : string IntMap.t ;
 	rule_of_pert : int IntMap.t ;
 	
-	rule_indices : IntSet.t
+	rule_indices : IntSet.t ;
+	empty_lhs : IntSet.t ;
 	(*log : Log.t*)
 }
 
@@ -40,7 +41,7 @@ let empty =
 	num_of_alg = StringMap.empty ;
 	alg_of_num = IntMap.empty ;
 	rule_of_num = IntMap.empty ;
-	fresh_kappa = 1 ; (*keeping 0 for empty mixture*)
+	fresh_kappa = 0 ; 
 	fresh_alg = 0 ;
 	fresh_pert = 0 ;
 	num_of_pert = StringMap.empty ;
@@ -48,9 +49,12 @@ let empty =
 	rule_of_pert = IntMap.empty ;
 	rule_indices = IntSet.empty ;
 	dependencies = DepMap.empty ;
+	empty_lhs = IntSet.empty
 }
 
 let next_pert_id env = env.fresh_pert
+let declare_empty_lhs id env = {env with empty_lhs = IntSet.add id env.empty_lhs}
+let is_empty_lhs id env = IntSet.mem id env.empty_lhs
 
 (*let log env = env.log*)
 let name i env = IntMap.find i env.name_of_num

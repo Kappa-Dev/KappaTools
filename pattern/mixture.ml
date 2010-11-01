@@ -26,11 +26,9 @@ let interface ag = ag.interface
 let is_empty m = (IntMap.size m.agents) = 0	
 
 let get_id mix =
-	if is_empty mix then 0 (*id 0 is reserved for empty mixture*)
-	else 
-		match mix.mix_id with 
-			| None -> invalid_arg "State.get_id: Not found" 
-			| Some id -> id
+	match mix.mix_id with 
+		| None -> invalid_arg "State.get_id: Not found" 
+		| Some id -> id
 
 
 let span root mix = 

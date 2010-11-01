@@ -1,3 +1,5 @@
+open Mods
+
 module type Random_tree =
 sig
 	type tree
@@ -17,6 +19,7 @@ module Random_tree =
 			mask: (int, int) Hashtbl.t ;
 			unmask: (int, int) Hashtbl.t ;
 			mutable new_mask : int ;
+			mutable inf_list : IntSet.t ;
 			size: int;
 			mutable total: float ;
 			weight_of_nodes: float array ;
@@ -37,7 +40,7 @@ module Random_tree =
 			         
 		let unmask t m = try Hashtbl.find t.unmask m with Not_found -> invalid_arg "Random_tree: incoherent hash"
 		
-		let total t = t.total
+		let total t = if IntSet.is_empty t.inf_list then t.total else infinity
 		
 		let find i t = let i = mask t i in t.weight_of_nodes.(i)
 		
@@ -52,7 +55,8 @@ module Random_tree =
 			layer = Array.copy t.layer;
 			consistent = t.consistent ;
 			unbalanced_events_by_layer = Array.copy t.unbalanced_events_by_layer ;
-			unbalanced_events = Array.copy t.unbalanced_events
+			unbalanced_events = Array.copy t.unbalanced_events ;
+			inf_list = IntSet.empty
 		}
 		
 		let copy_vect_in t t1 =
@@ -132,6 +136,7 @@ module Random_tree =
 				new_mask = 1 ;
 				mask = Hashtbl.create (n+1) ;
 				unmask = Hashtbl.create (n+1) ;
+				inf_list = IntSet.empty ;
 				consistent = true;
 				weight_of_nodes = t_node;
 				weight_of_subtrees = t_subtree;
@@ -158,6 +163,10 @@ module Random_tree =
 		
 		let add i w t =
 			let i = mask t i in
+			let w = 
+				if w = infinity then( t.inf_list <- IntSet.add i t.inf_list ; 0.)
+				else (t.inf_list <- IntSet.remove i t.inf_list ; w)
+			in 
 			let total = t.total -. t.weight_of_nodes.(i) +. w in
 			let _ = t.weight_of_nodes.(i) <- w
 			and _ = declare_unbalanced i t
@@ -165,27 +174,29 @@ module Random_tree =
 			t.total <- total
 		
 		let random t =
-			let t = update_structure t in
-			let a = t.weight_of_subtrees.(1) in
-			if a = 0.0
-			then raise Not_found
-			else
-				let r = Random.float a in
-				let rec find i r =
-					let node = t.weight_of_nodes.(i) in
-					if r < node then i
-					else if 2 * i > t.size then raise Not_found
-					else
-						let r'= r -.node in
-						let lson = 2 * i in
-						let rson = 2 * i + 1 in
-						let left = t.weight_of_subtrees.(lson) in
-						if r'< left then find lson r'
+			try unmask t (IntSet.choose t.inf_list) 
+			with Not_found ->
+				let t = update_structure t in
+				let a = t.weight_of_subtrees.(1) in
+				if a = 0.0
+				then raise Not_found
+				else
+					let r = Random.float a in
+					let rec find i r =
+						let node = t.weight_of_nodes.(i) in
+						if r < node then i
+						else if 2 * i > t.size then raise Not_found
 						else
-						if rson > t.size then raise Not_found
-						else find rson (r'-.left)
-				in
-				let rep = find 1 r in
-				unmask t rep
+							let r'= r -.node in
+							let lson = 2 * i in
+							let rson = 2 * i + 1 in
+							let left = t.weight_of_subtrees.(lson) in
+							if r'< left then find lson r'
+							else
+							if rson > t.size then raise Not_found
+							else find rson (r'-.left)
+					in
+					let rep = find 1 r in
+					unmask t rep
 		
 	end: Random_tree)

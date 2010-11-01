@@ -54,8 +54,8 @@ let output state time event plot env counter =
 			Printf.fprintf d "%c%E%c%d" !Parameter.plotSepChar time !Parameter.plotSepChar event;
 			List.iter
 			(fun obs ->
-				let inst = fun v_i -> State.instance_number v_i state 
-				and values = fun i -> State.value state i {counter with Counter.time = time ; Counter.events = event}
+				let inst = fun v_i -> State.instance_number v_i state env
+				and values = fun i -> State.value state i {counter with Counter.time = time ; Counter.events = event} env
 				in
 					let v = 
 						match obs.expr with

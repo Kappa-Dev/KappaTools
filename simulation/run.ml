@@ -20,7 +20,7 @@ let event state counter plot env =
 	(*2. Draw rule*)
 	if !Parameter.debugModeOn then Debug.tag "Drawing a rule...";
 	(*let t_draw = Profiling.start_chrono () in*)
-	let opt_instance,state = try State.draw_rule state counter with 
+	let opt_instance,state = try State.draw_rule state counter env with 
 		| Null_event -> (None,state)
 	in
 	
