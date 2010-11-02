@@ -29,7 +29,7 @@ type rule = {
 	r_id : int ;
 	added : IntSet.t;
 	side_effect : bool ;
-	modif_sites : IntSet.t IdMap.t 
+	modif_sites : Int2Set.t IdMap.t 
 }
 
 type perturbation = {precondition: boolean_variable ; effect : modification ; abort : boolean_variable option ; flag : string}
@@ -50,10 +50,10 @@ let string_of_pert pert env =
 		| STOP -> "STOP"
 
 let diff m0 m1 label_opt env =
-	let add_map id site_id map =
-		let set = try IdMap.find id map with Not_found -> IntSet.empty
+	let add_map id site_type map =
+		let set = try IdMap.find id map with Not_found -> Int2Set.empty
 		in
-			IdMap.add id (IntSet.add site_id set) map
+			IdMap.add id (Int2Set.add site_type set) map
 	in
 	let side_effect = ref false in
 	let label = match label_opt with Some (_,pos) -> (Misc.string_of_pos pos) | None -> "" in
@@ -108,64 +108,46 @@ let diff m0 m1 label_opt env =
 			)
 			[] deleted
 	in
-	let instructions,modif_sites = (*adding new agents and connections of these new agents if partner has a lower id*)
+	let instructions,modif_sites = (*adding connections of new agents if partner has a lower id*)
 		List.fold_left
-			(fun (inst,idmap) id ->
-				let name_id = Mixture.name (Mixture.agent_of_id id m1) in
-				let inst = ADD(id, name_id)::inst
-				and idmap =
-					let sign = Environment.get_sig name_id env in
-					let n = Signature.arity sign (*number of sites*)
-					and idmap = ref idmap
-					and cpt = ref 0
+		(fun (inst,idmap) id ->
+			let ag = Mixture.agent_of_id id m1 in
+			let name_id = Mixture.name ag in
+			let inst = ADD(id, name_id)::inst in
+			Mixture.fold_interface
+				(fun site_id (int, lnk) (inst,idmap) ->
+					let def_int = try Some (Environment.state_of_id (Mixture.name ag) site_id 0 env) with Not_found -> None
 					in
-					while !cpt < n do
-						idmap := add_map (FRESH id) !cpt !idmap ;
-						cpt := !cpt + 1
-					done ;
-					!idmap
-				in
-					(inst,idmap)
-			) (instructions,IdMap.empty) added
-	in
-	let instructions,modif_sites =
-		List.fold_left
-			(fun (inst,idmap) id ->
-						let ag = Mixture.agent_of_id id m1 in
-						Mixture.fold_interface
-							(fun site_id (int, lnk) (inst,idmap) ->
-										let def_int = try Some (Environment.state_of_id (Mixture.name ag) site_id 0 env) with Not_found -> None
+					let inst,idmap =
+						match (def_int, int) with
+						| (None, None) -> (inst,idmap)
+						| (Some i, None) -> invalid_arg "Dynamics.diff: adding an agent that is not fully described (int)"
+						| (Some i, Some j) -> ((MOD((FRESH id, site_id), j)):: inst,add_map (FRESH id) (site_id,0) idmap)
+						| (None, Some k) -> invalid_arg "Dynamics.diff: adding an agent that is not supposed to have an internal state"
+					in
+					match lnk with
+					| Node.WLD -> invalid_arg "Dynamics.diff: adding an agent that is not fully described (wild card lnk)"
+					| Node.FREE -> (inst,add_map (FRESH id) (site_id,1) idmap)
+					| Node.TYPE _ -> invalid_arg "Dynamics.diff: adding an agent that is not fully described (link type)"
+					| Node.BND ->
+							let opt = Mixture.follow (id, site_id) m1 in
+							match opt with
+							| None -> invalid_arg "Dynamics.diff: adding an agent that is not fully described (semi lnk)"
+							| Some (i,x) ->
+									let bnd_i =
+										if List.mem i added then (FRESH i) else (KEPT i)
+									in
+									if i < id or (i = id && x < site_id) then 
+										let inst = BND((bnd_i, x),(FRESH id, site_id)):: inst
+										and idmap = add_map bnd_i (x,1) (add_map (FRESH id) (site_id,1) idmap)
 										in
-										let inst,idmap =
-											match (def_int, int) with
-											| (None, None) -> (inst,idmap)
-											| (Some i, None) -> invalid_arg "Dynamics.diff: adding an agent that is not fully described (int)"
-											| (Some i, Some j) -> ((MOD((FRESH id, site_id), j)):: inst,add_map (FRESH id) site_id idmap)
-											| (None, Some k) -> invalid_arg "Dynamics.diff: adding an agent that is not supposed to have an internal state"
-										in
-										match lnk with
-										| Node.WLD -> invalid_arg "Dynamics.diff: adding an agent that is not fully described (wild card lnk)"
-										| Node.FREE -> (inst,idmap)
-										| Node.TYPE _ -> invalid_arg "Dynamics.diff: adding an agent that is not fully described (link type)"
-										| Node.BND ->
-												let opt = Mixture.follow (id, site_id) m1 in
-												match opt with
-												| None -> invalid_arg "Dynamics.diff: adding an agent that is not fully described (semi lnk)"
-												| Some (i,x) ->
-														let bnd_i =
-															if List.mem i added then (FRESH i) else (KEPT i)
-														in
-														if i < id or (i = id && x < site_id) then 
-															let inst = BND((bnd_i, x),(FRESH id, site_id)):: inst
-															and idmap = add_map bnd_i x (add_map (FRESH id) site_id idmap)
-															in
-																(inst,idmap)
-														else 
-															(inst,idmap)
-							)
-							ag (inst,idmap)
-			)
-			(instructions,modif_sites) added
+											(inst,idmap)
+									else 
+										(inst,idmap)
+				)
+				ag (inst,idmap)
+		)
+		(instructions,IdMap.empty) added
 	in
 	let instructions,modif_sites =
 		List.fold_left
@@ -185,7 +167,7 @@ let diff m0 m1 label_opt env =
 												if i = j then (inst,idmap) 
 												else 
 													let inst = (MOD ((KEPT id, site_id), j))::inst
-													and idmap = add_map (KEPT id) site_id idmap
+													and idmap = add_map (KEPT id) (site_id,0) idmap
 													in
 														(inst,idmap)
 											| (Some _, None) -> invalid_arg "Dynamics.diff: agent not instanciated on the right"
@@ -199,7 +181,7 @@ let diff m0 m1 label_opt env =
 															)
 													in
 													let inst = (MOD ((KEPT id, site_id), j))::inst
-													and idmap = add_map (KEPT id) site_id idmap
+													and idmap = add_map (KEPT id) (site_id,0) idmap
 													in
 													(inst,idmap)
 											| (None, None) -> (inst,idmap)
@@ -210,7 +192,7 @@ let diff m0 m1 label_opt env =
 												begin
 													match opt with
 													| Some (id', site_id') -> (*generating a FREE instruction only for the smallest port*)
-															let idmap = add_map (KEPT id) site_id (add_map (KEPT id') site_id' idmap)
+															let idmap = add_map (KEPT id) (site_id,1) (add_map (KEPT id') (site_id',1) idmap)
 															and inst =
 																if id'< id or (id'= id && site_id'< site_id) then (FREE ((KEPT id), site_id)):: inst
 																else inst
@@ -218,7 +200,7 @@ let diff m0 m1 label_opt env =
 															(inst,idmap)
 													| None -> (*breaking a semi link so generate a FREE instruction*)
 															let inst = (FREE ((KEPT id), site_id)):: inst
-															and idmap = add_map (KEPT id) site_id idmap
+															and idmap = add_map (KEPT id) (site_id,1) idmap
 															in
 															side_effect := true ;
 															let _ =
@@ -248,7 +230,7 @@ let diff m0 m1 label_opt env =
 																				)
 																		in
 																		let inst = BND((KEPT id, site_id), (KEPT id1', i1')):: inst
-																		and idmap = add_map (KEPT id) site_id (add_map (KEPT id1') i1' idmap)
+																		and idmap = add_map (KEPT id) (site_id,1) (add_map (KEPT id1') (i1',1) idmap)
 																		in
 																			side_effect := true ;
 																			(inst,idmap)
@@ -265,7 +247,7 @@ let diff m0 m1 label_opt env =
 																in
 																if id1'< id or (id1'= id && i1'< site_id) then
 																	let inst = BND((KEPT id, site_id), (KEPT id1', i1')):: inst
-																	and idmap = add_map (KEPT id) site_id (add_map (KEPT id1') i1' (add_map (KEPT id1) i1 idmap))
+																	and idmap = add_map (KEPT id) (site_id,1) (add_map (KEPT id1') (i1',1) (add_map (KEPT id1) (i1,1) idmap))
 																	in
 																		(inst,idmap)
 																else (inst,idmap)
@@ -282,7 +264,7 @@ let diff m0 m1 label_opt env =
 													| Some (id', i') -> (*sub-case: free -> connected*) 
 														if (id'< id) or (id'= id && i'< site_id) then 
 															let inst = BND((KEPT id, site_id), (KEPT id', i')):: inst 
-															and idmap = add_map (KEPT id) site_id (add_map (KEPT id') i' idmap)
+															and idmap = add_map (KEPT id) (site_id,1) (add_map (KEPT id') (i',1) idmap)
 															in
 															(inst,idmap)
 														else (inst,idmap)
@@ -301,7 +283,7 @@ let diff m0 m1 label_opt env =
 														)
 												in
 												let inst = (FREE ((KEPT id), site_id))::inst
-												and idmap = add_map (KEPT id) site_id idmap
+												and idmap = add_map (KEPT id) (site_id,1) idmap
 												in
 												(side_effect := true ;
 												(inst,idmap))
@@ -321,7 +303,7 @@ let diff m0 m1 label_opt env =
 																		)
 																in
 																let inst = BND((KEPT id, site_id), (KEPT id', i')):: inst
-																and idmap = add_map (KEPT id) site_id (add_map (KEPT id') i' idmap)
+																and idmap = add_map (KEPT id) (site_id,1) (add_map (KEPT id') (i',1) idmap)
 																in
 																(side_effect:= true;
 																(inst,idmap))
@@ -407,6 +389,7 @@ let rec superpose todo_list lhs rhs map already_done added env =
 					superpose todo_list lhs rhs (IntMap.add lhs_id rhs_id map) already_done added env
 
 let enable r mix env =
+	
 	let unify rhs lhs (root,modif_sites) glueings already_done =
 		let root_ag = Mixture.agent_of_id root rhs in
 		let name_id_root = Mixture.name root_ag in
@@ -422,10 +405,18 @@ let enable r mix env =
 		in
 			IntSet.fold
 			(fun lhs_ag_id (glueings,already_done) ->
-				if IntSet.exists (*checking that lhs contains --ie tests-- a site that is modified by rhs*) 
-				(fun site_id -> 
+				if Int2Set.exists (*checking that lhs contains --ie tests-- a site that is modified by rhs*) 
+				(fun (site_id,t) -> 
 					let ag = Mixture.agent_of_id lhs_ag_id lhs in 
-					let opt = Mixture.site_defined site_id ag false env in match opt with Some _ -> true | None -> false
+					let opt = Mixture.site_defined site_id ag false env in 
+					match opt with
+						| Some (int,lnk) -> 
+							begin
+								if t=0 (*int-modified*) then match int with Some _ -> true | None -> false
+								else
+									match lnk with Node.WLD -> false | _ -> true
+							end 
+						| None -> false
 				) modif_sites
 				then 
 					let opt = try Some (superpose [(lhs_ag_id,root)] lhs rhs IntMap.empty Int2Set.empty r.added env) with False -> None 
@@ -451,7 +442,8 @@ let enable r mix env =
 				else (glueings,already_done)
 			) candidates (glueings,already_done)
 	in
-	(*end sub function*)
+	(*end sub function unify*)
+	
 	let idmap = r.modif_sites in
 	let glueings,_ = 
 		IdMap.fold
