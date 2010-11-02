@@ -1,0 +1,20 @@
+%agent:A(x~0~1,y~0,z) 
+%agent:B(x,y~z) 
+
+#anonymous rule
+A(x,y~0) -> A(x!1,y~0!1)
+
+#named rule
+'rule' A(x!y.A) -> A(x~1)
+
+%let: 'Aself1' A(x!y.A) 
+%let: 'Aself2' A(y~0!x.A)
+%let: 'A' A()
+
+%plot: ('Aself1' + 'Aself2')/2 
+
+%pert: $(T) > 0.1 do 'rule':=$(INF)
+%pert: 'Aself1' + 'Aself2' > 'A'/2 do $(DEL) ($(INF) * A(x))
+%pert: 'Aself1'/( $(SIN) $(T)) = 23 * 'A' do $(ADD) (1000 * B()) 
+
+%init: 12 * A(x)

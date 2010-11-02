@@ -1,0 +1,14 @@
+%agent:A(x,y)
+
+'Aself op' A(x!_) -> A(x) 
+'Aself' A(x),A(y) -> A(x!1),A(y!1) 
+
+%plot:'Afree'
+%let: 'Afree' A(x,y)
+%let: 'Aclosed'  A(x!y.A)
+
+%plot: 'Aclosed'
+
+%pert: 'Aclosed' > 3 do 'Aself op':='Afree'
+
+%init: 6 * A()

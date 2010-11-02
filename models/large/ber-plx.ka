@@ -1,0 +1,277 @@
+#### I/ EXPLORATION & RECOGNITION
+#### TDG establishes a first non-specific (ns) contact with DNA
+'ns contact' TDG_RD(dbd,bb_CAT!1),TDG_CAT(bb_RD!1,cat),DNA(ns,state~op?) -> TDG_RD(dbd,bb_CAT!1),TDG_CAT(bb_RD!1,cat!0),DNA(ns!0,state~op?) @ 1.e-4
+
+'ns contact [w RD opposite]' TDG_RD(dbd!1,bb_CAT!2),TDG_CAT(bb_RD!2,cat),DNA(base!3,end5!4),DNA(end3!4,ns),DNA(base!3,end3!5),DNA(end5!5,ns!1) -> TDG_RD(dbd!1,bb_CAT!2),TDG_CAT(bb_RD!2,cat!0),DNA(base!3,end5!4),DNA(end3!4,ns!0),DNA(base!3,end3!5),DNA(end5!5,ns!1) @ 1.e+6
+
+'ns dissociation' TDG_CAT(cat!0),DNA(ns!0) -> TDG_CAT(cat),DNA(ns) @ 1.e-1
+
+#### if the base is disconnected --loop in DNA-- TDG can flip the base into its catalytic pocket
+
+'Reco T/G' TDG_CAT(cat!0),DNA(base!2,end5!1),DNA(end3!1,ns!0,base~T),DNA(base!2,end3!3),DNA(end5!3,base~G) -> TDG_CAT(cat!0),DNA(base!2,end5!1),DNA(end3!1,ns,base~T!0),DNA(base!2,end3!3),DNA(end5!3,base~G) @ 2.0
+           
+
+'TDG fold' TDG_RD(intra~false,bb_CAT!1),TDG_CAT(bb_RD!1,cat!2,sbm2),DNA(base!2) -> TDG_RD(intra~true,bb_CAT!1),TDG_CAT(bb_RD!1,cat!2,sbm2),DNA(base!2) @ 100
+
+#'Reco U/G' TDG_CAT(cat!0),DNA(ns!0,base~U) -> TDG_CAT(cat!1),DNA(ns,base~U!1) @ 2.0
+#'Reco FU/G' TDG_CAT(cat!0),DNA(ns!0,base~FU) -> TDG_CAT(cat!1),DNA(ns,base~FU!1) @ 2.0
+
+'RD stabilization [w cat]' TDG_RD(dbd,intra~true,bb_CAT!2),TDG_CAT(bb_RD!2,cat!1),DNA(base!5,end5!3),DNA(end3!3,base!1),DNA(base!5,end3!4),DNA(end5!4,ns,base~G) -> TDG_RD(dbd!0,intra~true,bb_CAT!2),TDG_CAT(bb_RD!2,cat!1),DNA(base!5,end5!3),DNA(end3!3,base!1),DNA(base!5,end3!4),DNA(end5!4,ns!0,base~G) @ 1.e+6
+
+
+'RD stabilization [w ns]'  TDG_RD(dbd,intra~true,bb_CAT!2),TDG_CAT(bb_RD!2,cat!1),DNA(base!5,end5!3),DNA(end3!3,ns!1),DNA(base!5,end3!4),DNA(end5!4,ns,base~G) -> TDG_RD(dbd!0,intra~true,bb_CAT!2),TDG_CAT(bb_RD!2,cat!1),DNA(base!5,end5!3),DNA(end3!3,ns!1),DNA(base!5,end3!4),DNA(end5!4,ns!0,base~G) @ 1.e+6
+                           
+
+'RD dissociation [w intra]' TDG_RD(dbd!0,intra~true),DNA(ns!0) -> TDG_RD(dbd,intra~true),DNA(ns) @ 1.0 ## weak
+'RD dissociation [w/o intra]' TDG_RD(dbd!0,intra~false),DNA(ns!0) -> TDG_RD(dbd,intra~false),DNA(ns) @ 100.0 ## super weak
+
+#### if no damage is detected then TDG may either unbind --see above-- or slide along DNA.
+'Slide35 [w/o ape]' TDG_RD(ape,dbd,bb_CAT!2),TDG_CAT(bb_RD!2,cat!0),DNA(ns!0,base!_,end3!1),DNA(end5!1,ns,state~op?) -> TDG_RD(ape,dbd,bb_CAT!2),TDG_CAT(bb_RD!2,cat!0),DNA(ns,base!_,end3!1),DNA(end5!1,ns!0,state~op?) @ 100.0 
+
+'Slide35 [w ape]' APEX1(tdg!3,cat),TDG_RD(ape!3,dbd,bb_CAT!2),TDG_CAT(bb_RD!2,cat!0),DNA(ns!0,base!_,end3!1),DNA(end5!1,ns,state~op?) -> APEX1(tdg!3,cat),TDG_RD(ape!3,dbd,bb_CAT!2),TDG_CAT(bb_RD!2,cat!0),DNA(ns,base!_,end3!1),DNA(end5!1,ns!0,state~op?) @ 100.0
+
+'Slide53 [w/o ape]' TDG_RD(ape,dbd,bb_CAT!2),TDG_CAT(bb_RD!2,cat!0),DNA(ns!0,base!_,end5!1),DNA(end3!1,ns,state~op?) -> TDG_RD(ape,dbd,bb_CAT!2),TDG_CAT(bb_RD!2,cat!0),DNA(ns,base!_,end5!1),DNA(end3!1,ns!0,state~op?) @ 100.0 
+
+'Slide53 [w ape]' APEX1(tdg!3,cat),TDG_RD(ape!3,dbd,bb_CAT!2),TDG_CAT(bb_RD!2,cat!0),DNA(ns!0,base!_,end5!1),DNA(end3!1,ns,state~op?) -> APEX1(tdg!3,cat),TDG_RD(ape!3,dbd,bb_CAT!2),TDG_CAT(bb_RD!2,cat!0),DNA(ns,base!_,end5!1),DNA(end3!1,ns!0,state~op?) @ 100.0
+
+
+##### II/ EXCISION
+##### If the T base is inside the catalytic pocket and the RD domain is bound to DNA,excision may take place at a very slow rate
+
+'T base excision [CpG]' TDG_RD(dbd!3,bb_CAT!4),TDG_CAT(bb_RD!4,cat!0),DNA(base!1,end5!5),DNA(end3!5,base~T!0),DNA(base~C!1,end3!8),DNA(end5!8,ns!3,base~G) -> TDG_RD(dbd!3,bb_CAT!4),TDG_CAT(bb_RD!4,cat!0),DNA(base!1,end5!5),DNA(end3!5,base~AP!0),DNA(base~C!1,end3!8),DNA(end5!8,ns!3,base~G) @ 3.7E-3 
+
+'T base excision [TpG]' TDG_RD(dbd!3,bb_CAT!4),TDG_CAT(bb_RD!4,cat!0),DNA(base!1,end5!5),DNA(end3!5,base~T!0),DNA(base~T!1,end3!8),DNA(end5!8,ns!3,base~G) -> TDG_RD(dbd!3,bb_CAT!4),TDG_CAT(bb_RD!4,cat!0),DNA(base!1,end5!5),DNA(end3!5,base~AP!0),DNA(base~T!1,end3!8),DNA(end5!8,ns!3,base~G) @ 1.0E-4
+
+'T base excision [GpG]' TDG_RD(dbd!3,bb_CAT!4),TDG_CAT(bb_RD!4,cat!0),DNA(base!1,end5!5),DNA(end3!5,base~T!0),DNA(base~G!1,end3!8),DNA(end5!8,ns!3,base~G) -> TDG_RD(dbd!3,bb_CAT!4),TDG_CAT(bb_RD!4,cat!0),DNA(base!1,end5!5),DNA(end3!5,base~AP!0),DNA(base~G!1,end3!8),DNA(end5!8,ns!3,base~G) @ 3.8e-5
+
+'T base excision [ApG]' TDG_RD(dbd!3,bb_CAT!4),TDG_CAT(bb_RD!4,cat!0),DNA(base!1,end5!5),DNA(end3!5,base~T!0),DNA(base~A!1,end3!8),DNA(end5!8,ns!3,base~G) -> TDG_RD(dbd!3,bb_CAT!4),TDG_CAT(bb_RD!4,cat!0),DNA(base!1,end5!5),DNA(end3!5,base~AP!0),DNA(base~A!1,end3!8),DNA(end5!8,ns!3,base~G) @ 6.3E-6
+
+
+##### dissociation is prevented by additional ns contact on dbd
+
+'TDG..DNA (spontaneous)' TDG_CAT(cat!0),DNA(base~AP!0) -> TDG_CAT(cat),DNA(base~AP) @ 1.e-1 # specific interaction
+
+#'TDG..DNA (APEX induced)' TDG_RD(ape!_,bb_CAT!1),TDG_CAT(bb_RD!1,cat!0),DNA(base~AP!0) -> #                          TDG_RD(ape!_,bb_CAT!1),TDG_CAT(bb_RD!1,cat!0),DNA(base~AP!0) @ 3.e-1 # APEX may actively help AP dissociation
+
+'TDG.AP:G [free]' TDG_RD(dbd,bb_CAT!1),TDG_CAT(bb_RD!1,cat),DNA(ns,base~AP) -> TDG_RD(dbd,bb_CAT!1),TDG_CAT(bb_RD!1,cat!0),DNA(ns,base~AP!0) @ 1.e-4
+
+'TDG.AP:G [with RD]' TDG_RD(dbd!1,bb_CAT!2),TDG_CAT(bb_RD!2,cat),DNA(base!4,end5!3),DNA(end3!3,base~AP),DNA(base!4,end3!5),DNA(end5!5,ns!1,base~G) -> TDG_RD(dbd!1,bb_CAT!2),TDG_CAT(bb_RD!2,cat!0),DNA(base!4,end5!3),DNA(end3!3,base~AP!0),DNA(base!4,end3!5),DNA(end5!5,ns!1,base~G) @ 1.e+6
+
+##### III/ BER 
+##### III.1/APE binding
+##### APEX binds TDG with more affinity if TDG's catalytic pocket is engaged --honey pot--
+
+'APEX1.TDG' APEX1(tdg,pol),TDG_RD(ape) -> APEX1(tdg!0,pol),TDG_RD(ape!0) @ 1.e-4
+'APEX1.TDG [ref1]' APEX1(tdg,pol!1),POLB(ape!1,dbd),TDG_RD(ape) -> APEX1(tdg!0,pol!1),POLB(ape!1,dbd),TDG_RD(ape!0) @ 1.e-4
+'APEX1.TDG [ref2]' APEX1(tdg,pol!1),POLB(ape!1,dbd!_),TDG_RD(ape,dbd) -> APEX1(tdg!0,pol!1),POLB(ape!1,dbd!_),TDG_RD(ape!0,dbd) @ 1.e-4
+
+#'APEX1.TDG [intra]'APEX1(tdg,pol!1),POLB(ape!1,dbd!2),TDG_RD(ape,dbd!3),DNA(ns!3,pol!2) -> #                   APEX1(tdg!0,pol!1),POLB(ape!1,dbd!2),TDG_RD(ape!0,dbd!3),DNA(ns!3,pol!2) @ 1.e+6
+
+'APEX1..TDG [w substrate]' APEX1(tdg!0),TDG_RD(ape!0,bb_CAT!1),TDG_CAT(bb_RD!1,cat!2),DNA(base!2) -> APEX1(tdg),TDG_RD(ape,bb_CAT!1),TDG_CAT(bb_RD!1,cat!2),DNA(base!2) @ 1.e-3
+
+'APEX1..TDG [w/o substrate 1]' APEX1(tdg!0),TDG_RD(ape!0,bb_CAT!1),TDG_CAT(bb_RD!1,cat) -> APEX1(tdg),TDG_RD(ape,bb_CAT!1),TDG_CAT(bb_RD!1,cat) 
+
+'APEX1..TDG [w/o substrate 2]' APEX1(tdg!0),TDG_RD(ape!0,bb_CAT!1),TDG_CAT(bb_RD!1,cat!2),DNA(ns!2) -> APEX1(tdg),TDG_RD(ape,bb_CAT!1),TDG_CAT(bb_RD!1,cat!2),DNA(ns!2) 
+
+'APEX1.AP [w/o TDG]' APEX1(tdg,cat),DNA(base~AP) -> APEX1(tdg,cat!0),DNA(base~AP!0) @ 1.e-4 
+
+'APEX1.AP [w TDG]' APEX1(tdg!6,cat),TDG_RD(ape!6,dbd!1,bb_CAT!2),TDG_CAT(bb_RD!2),DNA(base!4,end5!3),DNA(end3!3,base~AP),DNA(base!4,end3!5),DNA(end5!5,ns!1,base~G) -> APEX1(tdg!6,cat!0),TDG_RD(ape!6,dbd!1,bb_CAT!2),TDG_CAT(bb_RD!2),DNA(base!4,end5!3),DNA(end3!3,base~AP!0),DNA(base!4,end3!5),DNA(end5!5,ns!1,base~G) @ 1.e+6
+
+'APEX1..AP' APEX1(cat!0),DNA(base!0) -> APEX1(cat),DNA(base) @ 1.e-4 ## very strong
+
+#### III.2/APE1 catalyse
+
+'APEX1*AP' APEX1(cat!0),DNA(base~AP!0) -> APEX1(cat),DNA(base~nicked) @ 2.0 ## APE1.pdf
+
+#### III.3/POLB binding
+
+'APEX1.POLB' APEX1(pol),POLB(ape) -> APEX1(pol!0),POLB(ape!0) @ 1.e-4
+
+'APEX1..POLB [w substrate]' APEX1(cat!_,pol!0),POLB(ape!0) -> APEX1(cat!_,pol),POLB(ape) @ 1.e-2
+'APEX1..POLB [w/o substrate]' APEX1(cat,pol!0),POLB(ape!0) -> APEX1(cat,pol),POLB(ape) 
+
+'POLB.DNA [AP]' POLB(dbd),DNA(base~AP?,pol) -> POLB(dbd!0),DNA(base~AP?,pol!0) @ 1.e-4
+'POLB.DNA [nicked]' POLB(dbd),DNA(base~nicked,pol) -> POLB(dbd!0),DNA(base~nicked,pol!0) @ 1.e-4
+
+'POLB..DNA' POLB(dbd!0),DNA(pol!0) -> POLB(dbd),DNA(pol) @ 1.e-1
+
+'POLB..DNA [xCx]' POLB(dbd!0),DNA(base~xCx?,pol!0) -> POLB(dbd),DNA(base~xCx?,pol) @ 100
+'POLB..DNA [C]' POLB(dbd!0),DNA(base~C?,pol!0) -> POLB(dbd),DNA(base~C?,pol) @ 100
+
+'POLB.DNA [w APEX1]' APEX1(pol!1,cat!2),POLB(ape!1,dbd),DNA(base!2,pol) -> APEX1(pol!1,cat!2),POLB(ape!1,dbd!0),DNA(base!2,pol!0) @ 1.e+6
+
+'POLB.DNA [AP w APEX1.TDGns]' POLB(ape!7,dbd),APEX1(pol!7,tdg!6),TDG_RD(ape!6,dbd!1),DNA(base!4,end5!3),DNA(end3!3,base~AP?,pol),DNA(base!4,end3!5),DNA(end5!5,ns!1,base~G) -> POLB(ape!7,dbd!0),APEX1(pol!7,tdg!6),TDG_RD(ape!6,dbd!1),DNA(base!4,end5!3),DNA(end3!3,base~AP?,pol!0),DNA(base!4,end3!5),DNA(end5!5,ns!1,base~G) @ 1.e+6
+                          
+'POLB.DNA [nicked w APEX1.TDGns]' POLB(ape!7,dbd),APEX1(pol!7,tdg!6),TDG_RD(ape!6,dbd!1),DNA(base!4,end5!3),DNA(end3!3,base~nicked?,pol),DNA(base!4,end3!5),DNA(end5!5,ns!1,base~G) -> POLB(ape!7,dbd!0),APEX1(pol!7,tdg!6),TDG_RD(ape!6,dbd!1),DNA(base!4,end5!3),DNA(end3!3,base~nicked?,pol!0),DNA(base!4,end3!5),DNA(end5!5,ns!1,base~G) @ 1.e+6
+                          
+'POLB.DNA [AP w XRCC]' XRCC1(pol!1,dbd!2),POLB(xrcc!1,dbd),DNA(base~AP?,xrcc!2,pol) -> XRCC1(pol!1,dbd!2),POLB(xrcc!1,dbd!0),DNA(base~AP?,xrcc!2,pol!0) @ 1.e+6
+
+'POLB.DNA [nicked w XRCC]' XRCC1(pol!1,dbd!2),POLB(xrcc!1,dbd),DNA(xrcc!2,base~nicked?,pol) -> XRCC1(pol!1,dbd!2),POLB(xrcc!1,dbd!0),DNA(xrcc!2,base~nicked?,pol!0) @ 1.e+6
+
+'POLB.DNA [w cat]' POLB(dbd,cat!1),DNA(base!1,pol) -> POLB(dbd!0,cat!1),DNA(base!1,pol!0) @ 1.e+6
+
+#### III.4/POLB catalyse
+
+'POLB.nicked' POLB(dbd!0,cat),DNA(base~nicked,pol!0) -> POLB(dbd!0,cat!1),DNA(base~nicked!1,pol!0) @ 1.e+6
+'POLB*nicked' POLB(cat!0),DNA(base~nicked!0) -> POLB(cat),DNA(base~xCx) @ 2.0
+
+#### III.5/ XRCC1 
+'XRCC1.POLB [free]' XRCC1(pol),POLB(xrcc) -> XRCC1(pol!0),POLB(xrcc!0) @ 1.e-4
+
+'XRCC1.POLB [w DNA]' XRCC1(dbd!1,pol),DNA(xrcc!1,pol!2),POLB(dbd!2,xrcc) -> XRCC1(dbd!1,pol!0),DNA(xrcc!1,pol!2),POLB(dbd!2,xrcc!0) @ 1.e+6
+
+'XRCC1..POLB [w dbd]' XRCC1(pol!0),POLB(xrcc!0,dbd!_,ape) -> XRCC1(pol),POLB(xrcc,dbd!_,ape) @ 1.e-2
+'XRCC1..POLB [w ape]' XRCC1(pol!0),POLB(xrcc!0,dbd,ape!_) -> XRCC1(pol),POLB(xrcc,dbd,ape!_) @ 1.e-2
+'XRCC1..POLB [w ape & dbd]' XRCC1(pol!0),POLB(xrcc!0,dbd!_,ape!_) -> XRCC1(pol),POLB(xrcc,dbd!_,ape!_) @ 1.e-2
+'XRCC1..POLB [w/o substrate]' XRCC1(pol!0),POLB(xrcc!0,ape,dbd) -> XRCC1(pol),POLB(xrcc,ape,dbd) @ 1.
+
+'XRCC1.nicked' XRCC1(dbd),DNA(base~nicked?,xrcc) -> XRCC1(dbd!0),DNA(base~nicked?,xrcc!0) @ 1.e-4
+'XRCC1.nicked [w POLB]' XRCC1(dbd,pol!1),POLB(xrcc!1,dbd!2),DNA(base~nicked?,pol!2,xrcc) -> XRCC1(dbd!0,pol!1),POLB(xrcc!1,dbd!2),DNA(base~nicked?,pol!2,xrcc!0) @ 1.e+6
+
+'XRCC1.AP' XRCC1(dbd),DNA(base~AP?,xrcc) -> XRCC1(dbd!0),DNA(base~AP?,xrcc!0) @ 1.e-4
+'XRCC1.AP [w POLB]' XRCC1(dbd,pol!1),POLB(xrcc!1,dbd!2),DNA(base~AP?,pol!2,xrcc) -> XRCC1(dbd!0,pol!1),POLB(xrcc!1,dbd!2),DNA(base~AP?,pol!2,xrcc!0) @ 1.e+6
+
+'XRCC1..DNA [AP]' XRCC1(dbd!0,pol,lig),DNA(xrcc!0) -> XRCC1(dbd,pol,lig),DNA(xrcc) @ 1.e-1 ## XRCC1.pdf
+'XRCC1..DNA [xCx]' XRCC1(dbd!0),DNA(xrcc!0,base~xCx?) -> XRCC1(dbd),DNA(xrcc,base~xCx?) @ 1.e+3
+'XRCC1..DNA [C]' XRCC1(dbd!0),DNA(xrcc!0,base~C?) -> XRCC1(dbd),DNA(xrcc,base~C?) @ 1.e+3
+
+
+#### III.6/LIG3 binding
+
+'XRCC1.LIG3' XRCC1(lig),LIG3(xrcc) -> XRCC1(lig!0),LIG3(xrcc!0) @ 1.e-4
+'XRCC1.LIG3 [w DNA]' XRCC1(dbd!1,lig),LIG3(xrcc,cat!2),DNA(xrcc!1,base!2) -> XRCC1(dbd!1,lig!0),LIG3(xrcc!0,cat!2),DNA(xrcc!1,base!2) @ 1.e+6
+
+'XRCC1..LIG3 [w substrate]' XRCC1(lig!0,dbd!_),LIG3(xrcc!0) -> XRCC1(lig,dbd!_),LIG3(xrcc) @ 1.e-2
+'XRCC1..LIG3 [w/o substrate]' XRCC1(lig!0,dbd),LIG3(xrcc!0) -> XRCC1(lig,dbd),LIG3(xrcc) @ 1.
+
+#### III.7/LIG3 catalyse
+
+'LIG3.xCx' LIG3(cat),DNA(base~xCx) -> LIG3(cat!0),DNA(base~xCx!0) @ 1.e-4
+'LIG3.xCx [w XRCC]' XRCC1(lig!2,dbd!1),LIG3(xrcc!2,cat),DNA(base~xCx,xrcc!1) -> XRCC1(lig!2,dbd!1),LIG3(xrcc!2,cat!0),DNA(xrcc!1,base~xCx!0) @ 1.e+6
+
+'LIG3..xCx' LIG3(cat!0),DNA(base~xCx!0) -> LIG3(cat),DNA(base~xCx) @ 1.e-2
+
+'ligase' LIG3(cat!0),DNA(base~xCx!0) -> LIG3(cat),DNA(base~C) @ 2.0
+
+#### IV/Remethylation
+#### IV.1/DNMT3a binding
+
+'DNMT3a.TDG' DNMT3a(cat),TDG_RD(dnmt) -> DNMT3a(cat!0),TDG_RD(dnmt!0) @ 1.e-4
+'DNMT3a.TDG [w DNA]' DNMT3a(cat,pwwp!1),TDG_RD(dnmt,bb_CAT!2),TDG_CAT(bb_RD!2,cat!3),DNA(ns!3,dnmt!1) -> DNMT3a(cat!0,pwwp!1),TDG_RD(dnmt!0,bb_CAT!2),TDG_CAT(bb_RD!2,cat!3),DNA(ns!3,dnmt!1) @ 1.e+6
+
+'DNMT3a..TDG' DNMT3a(cat!0),TDG_RD(dnmt!0) -> DNMT3a(cat),TDG_RD(dnmt) @ 1.e-1
+
+#'DNMT3a..TDG [w dbd]' DNMT3a(cat!0),TDG_RD(dnmt!0,dbd!_) -> DNMT3a(cat),TDG_RD(dnmt,dbd!_) @ 1.e-3 # strong
+#'DNMT3a..TDG [w/o dbd]' DNMT3a(cat!0),TDG_RD(dnmt!0,dbd) -> DNMT3a(cat),TDG_RD(dnmt,dbd) @ 1.0 # weak
+
+'DNMT3a.LIG3' DNMT3a(lig),LIG3(dnmt) -> DNMT3a(lig!0),LIG3(dnmt!0) @ 1.e-4  
+
+'DNMT3a.LIG3 [w XRCC.DNA]' DNMT3a(lig,pwwp!1),LIG3(dnmt,xrcc!2),XRCC1(lig!2,dbd!3),DNA(xrcc!3,dnmt!1) -> DNMT3a(lig!0,pwwp!1),LIG3(dnmt!0,xrcc!2),XRCC1(lig!2,dbd!3),DNA(xrcc!3,dnmt!1) @ 1.e+6
+
+'DNMT3a.LIG3 [w DNA]' DNMT3a(lig,pwwp!1),LIG3(dnmt,cat!2),DNA(base!2,dnmt!1) -> DNMT3a(lig!0,pwwp!1),LIG3(dnmt!0,cat!2),DNA(base!2,dnmt!1) @ 1.e+6
+
+'DNMT3a..LIG3' DNMT3a(lig!0),LIG3(dnmt!0) -> DNMT3a(lig),LIG3(dnmt) @ 1.e-1  # unpublished data --paper Dnmt.TDG
+
+'DNMT3a.ns.DNA [free]' DNMT3a(pwwp),DNA(dnmt,base~C?,state~op) -> DNMT3a(pwwp!0),DNA(dnmt!0,base~C?,state~op) @ 1.e-4
+
+'DNMT3a.ns.DNA [w TDG]' TDG_CAT(cat!2,bb_RD!3),TDG_RD(bb_CAT!3,dnmt!1),DNMT3a(cat!1,pwwp),DNA(dnmt,base~C?,ns!2) -> TDG_CAT(cat!2,bb_RD!3),TDG_RD(bb_CAT!3,dnmt!1),DNMT3a(cat!1,pwwp!0),DNA(dnmt!0,base~C?,ns!2) @ 1.e+6
+
+'DNMT3a.ns.DNA [w LIG]' LIG3(cat!2,dnmt!1),DNMT3a(lig!1,pwwp),DNA(dnmt,base!2) -> LIG3(cat!2,dnmt!1),DNMT3a(lig!1,pwwp!0),DNA(dnmt!0,base!2) @ 1.e+6
+
+'DNMT3a.ns.DNA [w LIG.XRCC]' XRCC1(lig!2,dbd!3),LIG3(xrcc!2,dnmt!1),DNMT3a(lig!1,pwwp),DNA(dnmt,xrcc!3) -> XRCC1(lig!2,dbd!3),LIG3(xrcc!2,dnmt!1),DNMT3a(lig!1,pwwp!0),DNA(dnmt!0,xrcc!3) @ 1.e+6
+
+#'DNMT3a.cat.DNA' DNMT3a(pwwp!1,cat),DNA(dnmt!1,base~C?,meth~false) -> DNMT3a(pwwp!1,cat!0),DNA(dnmt!1,base~C?,meth~false!0) @ 1.e+6
+#'DNMT3a..cat..DNA' DNMT3a(cat!0),DNA(meth!0) -> DNMT3a(cat),DNA(meth) @ 1.0
+
+##Should consider here other cases like CpAP or CpNicked and CpxCx but these are very transient cases...
+#'DNMT3a..DNA [CpG]' DNMT3a(pwwp!0),DNA(dnmt!0,end3!1,base~C?),DNA(end5!1,base~G?) -> #                    DNMT3a(pwwp),DNA(dnmt,end3!1,base~C?),DNA(end5!1,base~G?) @ 1.e-1 # weak interaction
+#'DNMT3a..DNA [CpA]' DNMT3a(pwwp!0),DNA(dnmt!0,end3!1,base~C?),DNA(end5!1,base~A?) -> #                    DNMT3a(pwwp),DNA(dnmt,end3!1,base~C?),DNA(end5!1,base~A?) @ 2.0 # very weak interaction
+#'DNMT3a..DNA [CpT]' DNMT3a(pwwp!0),DNA(dnmt!0,end3!1,base~C?),DNA(end5!1,base~T?) -> #                    DNMT3a(pwwp),DNA(dnmt,end3!1,base~C?),DNA(end5!1,base~T?) @ 1.e+2 # probably undetectable
+#'DNMT3a..DNA [CpC]' DNMT3a(pwwp!0),DNA(dnmt!0,end3!1,base~C?),DNA(end5!1,base~C?) -> #                    DNMT3a(pwwp),DNA(dnmt,end3!1,base~C?),DNA(end5!1,base~C?) @ 1.e+2 # idem 
+
+'DNMT3a..DNA' DNMT3a(pwwp!_) -> DNMT3a(pwwp) @ 10.0
+
+#### IV.2/DNMT3a catalyse (could explain why Dnmt boosts TDG's turnover with dbd dissociation here)
+
+'DNMT3a*CpA' DNMT3a(cat,pwwp!1),DNA(dnmt!1,meth~false,end3!2),DNA(end5!2,base~A?) -> DNMT3a(cat,pwwp),DNA(dnmt,meth~true,end3!2),DNA(end5!2,base~A?) @ 1.e-2
+'DNMT3a*CpT' DNMT3a(cat,pwwp!1),DNA(dnmt!1,meth~false,end3!2),DNA(end5!2,base~T?) -> DNMT3a(cat,pwwp),DNA(dnmt,meth~true,end3!2),DNA(end5!2,base~T?) @ 1.e-3
+'DNMT3a*CpG' DNMT3a(cat,pwwp!1),DNA(dnmt!1,meth~false,end3!2),DNA(end5!2,base~G?) -> DNMT3a(cat,pwwp),DNA(dnmt,meth~true,end3!2),DNA(end5!2,base~G?) @ 1.0
+'DNMT3a*CpxC' DNMT3a(cat,pwwp!1),DNA(dnmt!1,meth~false,end3!2),DNA(end5!2,base~C?) -> DNMT3a(cat,pwwp),DNA(dnmt,meth~true,end3!2),DNA(end5!2,base~C?) @ 1.e-3
+
+#'DNMT3a*mC' DNMT3a(pwwp!0),DNA(dnmt!0,base~C!_,meth~true) -> DNMT3a(pwwp),DNA(dnmt,base~T,meth~false) @ 1.e-1 #probably quite slow
+
+#### V/ DNA reconfiguration
+
+'GC pairing' DNA(base!1,end5!0),DNA(end3!0,base~C),DNA(base!1,end3!2),DNA(end5!2,base~G) -> DNA(base!1,end5!0),DNA(end3!0,base~C!3),DNA(base!1,end3!2),DNA(end5!2,base~G!3) @ 1.e+6
+
+
+'mC deamination' DNA(end3!_,base~C!_,meth~true) -> DNA(end3!_,base~T,meth~false) @ 0.0
+'mCpT deamination' DNA(end3!1,base~C!_,meth~true),DNA(end5!1,base~T?) -> DNA(end3!1,base~T,meth~false),DNA(end5!1,base~T?) @ 0.0
+'mCpG deamination' DNA(end3!1,base~C!_,meth~true),DNA(end5!1,base~G?) -> DNA(end3!1,base~T,meth~false),DNA(end5!1,base~G?) @ 0.0
+
+'C deamination' DNA(end3!_,base~C!_,meth~false?) -> DNA(end3!_,base~U,meth~false?) @ 0.0
+
+#%init: 50 * SUMO1(x,dbd)
+
+#### OBSERVATIONS
+#%story: 'DNMT3a*CpT'
+
+#'Toxic AP' DNA(ns,base~AP)-> DNA(ns,base~AP) @$INF
+#%causal: 'Toxic AP'
+
+#'weird' DNA(base~T?,pol!_) -> DNA(base~T?,pol!_) @ $INF
+#%causal: 'weird'
+
+#'APEX1 on AP' APEX1(cat!1),DNA(base~AP!1) -> @ $INF
+#%causal: 'APEX1 on AP'
+
+##%obs: 'APEX.TDG' APEX1(tdg!_)
+#%obs: 'T/G mismatch' DNA(base!0,end5!1),DNA(end3!1,base~T?),DNA(base!0,end3!2),DNA(end5!2,base~G?) 
+
+##%obs: '5mCpG' DNA(base~C!_,meth~true,end3!0),DNA(end5!0,base~G!1),DNA(base~C!1)
+##%obs: 'CpG' DNA(base~C!_,meth~false,end3!0),DNA(end5!0,base~G!1),DNA(base~C!1)
+#%obs: 'initial 5mCpG' DNA(base~C!_,meth~true,init~mC,end3!0),DNA(end5!0,base~G?)
+#%obs: 'hyper 5mCpG' DNA(base~C!_,meth~true,init~C,end3!0),DNA(end5!0,base~G?)
+
+##%obs: '5mCpA' DNA(base~C!_,meth~true,end3!0),DNA(end5!0,base~A!1),DNA(base~T!1)
+##%obs: '5mCp*C' DNA(base~C!_,meth~true,end3!0),DNA(end5!0,base~C!1),DNA(base~G!1)
+
+#%obs: 'Covered AP' DNA(base~AP!_)
+#%obs: 'Toxic AP' DNA(base~AP)
+#%obs: 'Covered nicked' DNA(base~nicked!_)
+#%obs: 'Toxic nicked' DNA(base~nicked,pol)
+#%obs: 'xCx' DNA(base~xCx?)
+##%obs: 'C' DNA(base~C?,ns!1),TDG_RD(dbd!1)
+#%obs: 'hypo' DNA(base~C?,init~mC,meth~false)
+#%obs: 'locked TDG' TDG_RD(dbd!_,bb_CAT!0),TDG_CAT(bb_RD!0,cat!_)
+
+##%obs: 'APEX1.AP' DNA(base~AP!1),APEX1(cat!1)
+##%obs: 'TDG.DNA' DNA(base!1),TDG_CAT(cat!1)
+##%obs: 'TDG.DNA (RD)' TDG_RD(dbd!_)
+#%var: 'mismatches' DNA(init~mC,base~T?)
+##%obs: 'mC bases' DNA(init~mC,base~mC?)
+
+%obs: 'deam' DNA(base~T?,init~mC)
+#%obs: 'TDG' TDG_RD()
+#%var: 'mC bases' DNA(base~C?,meth~true)
+
+#%mod: $(T)>1 do 'mC deamination':=$INF
+#%mod: ['T/G mismatch']>['TDG']/2 do 'mC deamination':=0.0
+#%mod: (['mC bases']<1) do 'mC deamination':=0.0
+
+%mod: $(T)>1 do 'mCpG deamination':=1.E+10
+%mod: 'deam'>500 do 'mCpG deamination':=0.0
+
+#### INITIAL CONDITIONS
+%init: 500 TDG_RD(dbd,dnmt,ape,k54,k83,k84,k87,intra~false,bb_CAT!1),TDG_CAT(bb_RD!1,cat,nr,sbm2,k330~u)
+%init: 2000 APEX1(tdg,pol,cat)
+%init: 1000 POLB(ape,dbd,xrcc,cat)
+%init: 1000 XRCC1(pol,dbd,lig)
+%init: 1000 LIG3(cat,xrcc,dnmt)
+%init: 500 DNMT3a(pwwp,sbm~u,phd,lig,cat,dnmt)
+
+%init: 1000 \
+DNA(end5,ns,init~mC,state~op,base~C!1,pol,xrcc,dnmt,meth~true,end3!2),DNA(end5!2,ns,init~G,state~op,base~G!3,pol,xrcc,dnmt,meth~false,end3),\
+DNA(end3,ns,init~G,state~op,base~G!1,pol,xrcc,dnmt,meth~false,end5!4),DNA(end3!4,ns,init~mC,state~op,base~C!3,pol,xrcc,dnmt,meth~true,end5)
+
+#%causal: 'Reco T/G'

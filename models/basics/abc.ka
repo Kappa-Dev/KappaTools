@@ -1,0 +1,22 @@
+%agent: A(b)
+%agent: B(a)
+%agent: C(x~u~p,y~u~p)
+
+%var: 'kon' 0.001
+%var: 'koff' 0.1
+
+'ab' A(b),B(a) -> A(b!1),B(a!1) @ 'kon'
+'a..b' A(b!1),B(a!1) -> A(b),B(a) @ 'koff'
+
+'c@x' A(b!_),C(x~u) -> A(b!_),C(x~p)
+'c@y' A(b),C(x~p,y~u) -> A(b),C(x~p,y~p)
+
+%obs: 'c_uu' C(x~u,y~u)
+%obs: 'c_p' C(x~p,y~u)
+%obs: 'c_pp' C(x~p,y~p)
+%obs: 'a.b' B(a!b.A)
+
+%init: 5000 A
+%init: 5000 B
+%init: 5000 C
+

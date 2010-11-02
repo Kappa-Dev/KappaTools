@@ -1,0 +1,18 @@
+%var: 'kon' 0.001
+%var: 'koff' 0.1
+
+'ab' A(b),B(a) -> A(b!1),B(a!1) @ 'kon'
+'a..b' A(b!1),B(a!1) -> A(b),B(a) @ 'koff'
+
+'c@x' A(b!_),C(x~u) -> A(b!_),C(x~p)
+'c@y' A(b),C(x~p,y~u) -> A(b),C(x~p,y~p)
+
+%obs: 'c_uu' C(x~u,y~u)
+%obs: 'c_p' C(x~p,y~u)
+%obs: 'c_pp' C(x~p,y~p)
+%obs: 'a.b' B(a!b.A)
+
+%init: 2000 A(b)
+%init: 2000 B(a)
+%init: 2000 C(x~u,y~u)
+
