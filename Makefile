@@ -26,15 +26,15 @@ ANNOTATE = yes
 all: nc
 
 #set values below according to the location of your ocaml compilers (usually /usr/bin)
-OCAMLBINPATH = /usr/bin
-OCAMLLIBPATH = /usr/lib/ocaml
+#OCAMLBINPATH = /usr/bin/
+#OCAMLLIBPATH = /usr/lib/ocaml/
 
-OCAMLCP = $(OCAMLBINPATH)/ocamlcp
-OCAMLLEX = $(OCAMLBINPATH)/ocamllex
-OCAMLYACC = $(OCAMLBINPATH)/ocamlyacc
-OCAMLC = $(OCAMLBINPATH)/ocamlc.opt
-OCAMLOPT = $(OCAMLBINPATH)/ocamlopt.opt #-g -ccopt -g
-OCAMLDEP = $(OCAMLBINPATH)/ocamldep
+OCAMLCP = $(OCAMLBINPATH)ocamlcp
+OCAMLLEX = $(OCAMLBINPATH)ocamllex
+OCAMLYACC = $(OCAMLBINPATH)ocamlyacc
+OCAMLC = $(OCAMLBINPATH)ocamlc.opt
+OCAMLOPT = $(OCAMLBINPATH)ocamlopt.opt #-g -ccopt -g
+OCAMLDEP = $(OCAMLBINPATH)ocamldep
 CC = gcc
 
 include OCamlMakefile
