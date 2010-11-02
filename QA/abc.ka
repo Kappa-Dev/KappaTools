@@ -1,0 +1,18 @@
+%agent: A(x)
+%agent: Tick(x~0~1)
+%agent: UNIT()
+
+'intro' -> A @ 0.0
+'tick0' Tick(x) -> Tick(x~0)
+'tick1' Tick(x) -> Tick(x~1)
+
+%obs: '0' Tick(x~0)
+%obs: '1' Tick(x~1)
+
+%obs: 'A' A
+
+%mod: '0' > '1' do 'intro':= `inf
+%mod: 'A' > 5 do 'intro':= 0.0
+
+%init: 3 Tick(x~1)
+
