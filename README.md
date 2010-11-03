@@ -2,6 +2,10 @@
 
 <img src="http://www.pps.jussieu.fr/~jkrivine/homepage/Research_files/droppedImage.jpg" alt="KaSim logo" title="Stochastic Kappa Simulator" align="left" />
 
+
+
+
+
 KaSim is a stochastic simulator for rule-based models written in Kappa.
 
 ## Installation
