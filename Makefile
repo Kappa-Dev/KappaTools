@@ -1,6 +1,6 @@
-# see: http://www.ocaml.info/home/ocaml_sources.html#toc16
+## see: http://www.ocaml.info/home/ocaml_sources.html#toc16
 
-# put here the names of your source files (in the right order)
+## put here the names of your source files (in the right order)
 SOURCES = main/parameter.ml \
 		dataStructures/largeArray.ml dataStructures/memoryManagement.ml dataStructures/heap.ml  \
 		dataStructures/misc.ml dataStructures/mapExt.ml dataStructures/valMap.ml dataStructures/mods.ml dataStructures/random_tree.ml \
@@ -15,19 +15,21 @@ SOURCES = main/parameter.ml \
 		simulation/plot.ml simulation/b3.ml simulation/run.ml\
 		main/fileName.ml main/main.ml 
 
-# the name of the resulting executable
+## the name of the resulting executable
 RESULT  = KaSim
 
-# generate type information (.annot files)
-ANNOTATE = yes
+## generate type information (.annot files)
+ANNOTATE = no
 
 
-# make target (see manual) : byte-code, debug-code, native-code, ...
+## make target (see manual) : byte-code, debug-code, native-code, ...
 all: nc
 
-#set values below according to the location of your ocaml compilers (usually /usr/bin)
-#OCAMLBINPATH = /usr/bin/
-#OCAMLLIBPATH = /usr/lib/ocaml/
+##if ocamlopt.opt is not in your path, 
+##uncomment the line below and set value below according to the location of your ocaml compilers 
+##(usually /usr/bin/ under linux and /sw/bin under MAC OS X)
+
+#OCAMLBINPATH = 
 
 OCAMLCP = $(OCAMLBINPATH)ocamlcp
 OCAMLLEX = $(OCAMLBINPATH)ocamllex
