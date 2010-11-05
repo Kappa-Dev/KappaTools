@@ -57,20 +57,20 @@ rule token = parse
 		| '[' {let lab = read_label "" [']'] lexbuf in 
 						let pos = position lexbuf in 
 							match lab with
-								| "E" -> (EVENT pos)
-								| "T" -> (TIME pos)
-								| "log" {let pos = position lexbuf in LOG pos}
-								| "sin" {let pos = position lexbuf in SINUS pos}
-								| "cos" {let pos = position lexbuf in COSINUS pos}
-								| "tan" {let pos = position lexbuf in TAN pos}
-								| "exp" {let pos = position lexbuf in EXPONENT pos}
-								| "abs" {let pos = position lexbuf in ABS pos}
-								| "modulo" {let pos = position lexbuf in MODULO pos}
-								| "sqrt" {let pos = position lexbuf in SQRT pos}
-								| "inf" {let pos = position lexbuf in INFINITY pos}
-								| "true" {let pos = position lexbuf in TRUE pos}
-								| "false" {let pos = position lexbuf in FALSE pos}
-								| "pi" {let pos = position lexbuf in FLOAT (3.14159265,pos)}
+								| "E" -> EVENT pos
+								| "T" -> TIME pos
+								| "log" -> LOG pos
+								| "sin" -> SINUS pos
+								| "cos" -> COSINUS pos
+								| "tan" -> TAN pos
+								| "exp" -> EXPONENT pos
+								| "abs" -> ABS pos
+								| "modulo" -> MODULO pos
+								| "sqrt" -> SQRT pos
+								| "inf" -> INFINITY pos
+								| "true" -> TRUE pos
+								| "false" -> FALSE pos
+								| "pi" -> FLOAT (3.14159265,pos)
 								| _ as s -> return_error lexbuf ("Symbol \""^s^"\" is not defined")
 						}  
 		| '|' {PIPE}
