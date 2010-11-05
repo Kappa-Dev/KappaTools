@@ -12,6 +12,7 @@ type alg_expr =
 	| EXP of alg_expr * position
 	| SINUS of alg_expr * position
 	| COSINUS of alg_expr * position
+	| TAN of alg_expr * position
 	| ABS of alg_expr * position
 	| TIME_VAR of position
 	| EVENT_VAR of position

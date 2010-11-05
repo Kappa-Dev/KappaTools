@@ -48,14 +48,31 @@ rule token = parse
 		| "$(" {let lab = read_label "" [')'] lexbuf in 
 						let pos = position lexbuf in 
 							match lab with
-								| "T" -> (TIME pos)
-								| "E" -> (EVENT pos)
 								| "DEL" -> (DELETE pos)
 								| "ADD" -> (INTRO pos)
 								| "SNAPSHOT" -> (SNAPSHOT pos) 
 								| "STOP" -> (STOP pos) 
-								| _ as s -> return_error lexbuf ("Keyword \""^s^"\" is not defined")
+								| _ as s -> return_error lexbuf ("Perturbation effect \""^s^"\" is not defined")
 					 }  
+		| '[' {let lab = read_label "" [']'] lexbuf in 
+						let pos = position lexbuf in 
+							match lab with
+								| "E" -> (EVENT pos)
+								| "T" -> (TIME pos)
+								| "log" {let pos = position lexbuf in LOG pos}
+								| "sin" {let pos = position lexbuf in SINUS pos}
+								| "cos" {let pos = position lexbuf in COSINUS pos}
+								| "tan" {let pos = position lexbuf in TAN pos}
+								| "exp" {let pos = position lexbuf in EXPONENT pos}
+								| "abs" {let pos = position lexbuf in ABS pos}
+								| "modulo" {let pos = position lexbuf in MODULO pos}
+								| "sqrt" {let pos = position lexbuf in SQRT pos}
+								| "inf" {let pos = position lexbuf in INFINITY pos}
+								| "true" {let pos = position lexbuf in TRUE pos}
+								| "false" {let pos = position lexbuf in FALSE pos}
+								| "pi" {let pos = position lexbuf in FLOAT (3.14159265,pos)}
+								| _ as s -> return_error lexbuf ("Symbol \""^s^"\" is not defined")
+						}  
 		| '|' {PIPE}
     | '\n' {incr_line lexbuf ; NEWLINE}
 		| '\r' {incr_line lexbuf ; NEWLINE}
@@ -69,17 +86,6 @@ rule token = parse
     | '(' {OP_PAR}
     | ')' {CL_PAR}
 		| '.' {DOT}
-		| "`log" {let pos = position lexbuf in LOG pos}
-		| "`sin" {let pos = position lexbuf in SINUS pos}
-		| "`cos" {let pos = position lexbuf in COSINUS pos}
-		| "`exp" {let pos = position lexbuf in EXPONENT pos}
-		| "`abs" {let pos = position lexbuf in ABS pos}
-		| "`mod" {let pos = position lexbuf in MODULO pos}
-		| "`sqrt" {let pos = position lexbuf in SQRT pos}
-		| "`inf" {let pos = position lexbuf in INFINITY pos}
-		| "`true" {let pos = position lexbuf in TRUE pos}
-		| "`false" {let pos = position lexbuf in FALSE pos}
-		| "`pi" {let pos = position lexbuf in FLOAT (3.14159265,pos)}
 		| '+' {let pos = position lexbuf in PLUS pos}
 		| '*' {let pos = position lexbuf in MULT pos}
 		| '-' {let pos = position lexbuf in MINUS pos}

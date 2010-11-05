@@ -213,6 +213,7 @@ let rec partial_eval_alg env ast =
 	| POW (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> x ** y) "^"
 	| MODULO (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> float_of_int ((int_of_float x) mod (int_of_float y))) " modulo "
 	| COSINUS (ast, pos) -> un_op ast pos cos "cos"
+	| TAN (ast,pos) -> un_op ast pos tan "tan"
 	| SINUS (ast, pos) -> un_op ast pos sin "sin"
 	| EXP (ast, pos) -> un_op ast pos exp "e^"
 	| SQRT (ast, pos) -> un_op ast pos sqrt "sqrt"
