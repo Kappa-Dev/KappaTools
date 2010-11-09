@@ -31,11 +31,14 @@ sig
 	val neighborhood :?interrupt_with: Mods.IntSet.t -> t -> int -> int -> int Mods.IntMap.t
 	val add_lift : t -> Injection.t -> ((int * int) list) Mods.IntMap.t -> t
 	val marshalize : t -> Node.t Mods.IntMap.t
+	val size : t -> int
 end
 
 module Make (A : NodeMemoryModel) : SG =
 struct
 	type t = A.t
+	
+	let size sg = A.allocated sg 
 	
 	(* A is a fragmented heap so iteri might not be very efficient *)
 	let fold f sg cont =
