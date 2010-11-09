@@ -125,7 +125,10 @@ let eval_activity rule state counter env =
 							k_fun act_of_id v_of_var (Counter.time counter)
 								(Counter.event counter)
 						in
-						k *. (instance_number mix_id state env))
+						let n = instance_number mix_id state env in
+						if n = 0. then 0. else 
+						(k *. n)
+			)
 
 let pert_of_id state id = IntMap.find id state.perturbations
 
@@ -136,7 +139,7 @@ let update_activity state var_id counter env =
 	let alpha = eval_activity rule state counter env
 	in
 	try
-		Random_tree.add var_id alpha state.activity_tree
+		Random_tree.add var_id alpha state.activity_tree ;
 	with Invalid_argument msg -> invalid_arg ("State.update_activity: "^msg)
 
 (* compute complete embedding of mix into sg at given root --for           *)
@@ -498,51 +501,47 @@ let wake_up state modif_type modifs wake_up_map =
 		modifs
 
 let rec update_dep state dep_in pert_ids counter env =
-	let depset = Environment.get_dependencies dep_in env in
-	if DepSet.is_empty depset	then (env,pert_ids)
-	else
-		let env,depset',pert_ids =
-			if !Parameter.debugModeOn then if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Updating dependencies %s" (string_of_set Mods.string_of_dep DepSet.fold depset));
-			DepSet.fold
-				(fun dep (env,cont,pert_ids) ->
-							match dep with
-							| Mods.ALG v_id ->
-									let depset' =
-										Environment.get_dependencies (Mods.ALG v_id) env
-									in
-									(*if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Variable %d is changed, updating %s" v_id (Misc.string_of_set Mods.string_of_dep DepSet.fold depset')) ;*)
-									(env,DepSet.union depset' cont,pert_ids)
-							| Mods.RULE r_id ->
-									(update_activity state r_id counter env;
-										let depset' =
-											Environment.get_dependencies (Mods.RULE r_id) env
-										in
-										if !Parameter.debugModeOn then if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Rule %d is changed, updating %s" r_id (Misc.string_of_set Mods.string_of_dep DepSet.fold depset')) ;
-										(env,DepSet.union depset' cont,pert_ids)
-									)
-							| Mods.PERT p_id -> 
-								if IntMap.mem p_id state.perturbations then (env,cont,IntSet.add p_id pert_ids)
-								else 
-									(Environment.remove_dependencies dep_in (Mods.PERT p_id) env,cont,pert_ids)
-							| Mods.ABORT p_id ->
-								if IntMap.mem p_id state.perturbations then (env,cont,IntSet.add p_id pert_ids)
-								else 
-									(Environment.remove_dependencies dep_in (Mods.PERT p_id) env,cont,pert_ids)
-							| Mods.KAPPA i ->
-									invalid_arg
-										(Printf.sprintf
-												"State.update_dep: kappa variable %d should have no dependency"
-												i)
-							| Mods.EVENT | Mods.TIME ->
-									invalid_arg
-										"State.update_dep: time or event should have no dependency"
-				)
-				depset (env,DepSet.empty,pert_ids)
-		in 
+	let env,depset,pert_ids = 
+		match dep_in with
+		| Mods.ALG v_id -> (*variable v_id is changed*)
+			let depset =
+				Environment.get_dependencies (Mods.ALG v_id) env
+			in
+			begin
+				if !Parameter.debugModeOn then 
+					Debug.tag 
+					(Printf.sprintf "Variable %d is changed, updating %s" v_id (Misc.string_of_set Mods.string_of_dep DepSet.fold depset)) 
+			end;
+			(env,depset,pert_ids)
+		| Mods.RULE r_id ->
+			(update_activity state r_id counter env; 
+			let depset = Environment.get_dependencies (Mods.RULE r_id) env
+			in
+			if !Parameter.debugModeOn then if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Rule %d is changed, updating %s" r_id (Misc.string_of_set Mods.string_of_dep DepSet.fold depset)) ;
+			(env,depset,pert_ids)
+			)
+		| Mods.PERT p_id -> 
+			if IntMap.mem p_id state.perturbations then (*pertubation p_id is still alive and should be tried*)
+				(env,DepSet.empty,IntSet.add p_id pert_ids)
+			else (*pertubation p_id is removed and should be discarded from dependencies*)
+				(Environment.remove_dependencies dep_in (Mods.PERT p_id) env,DepSet.empty,pert_ids)
+		| Mods.ABORT p_id ->
+			if IntMap.mem p_id state.perturbations then (env,DepSet.empty,IntSet.add p_id pert_ids)
+			else 
+				(Environment.remove_dependencies dep_in (Mods.PERT p_id) env,DepSet.empty,pert_ids)
+		| Mods.KAPPA i -> (*No need to update kappa observable, it will be updated if plotted*) 
+			let depset =
+				Environment.get_dependencies (Mods.KAPPA i) env
+			in
+				(env,depset,pert_ids)
+		| Mods.EVENT | Mods.TIME -> 
+			let depset = Environment.get_dependencies dep_in env in
+				(env,depset,pert_ids)
+	in
 		DepSet.fold
 		(fun dep (env,pert_ids) -> update_dep state dep pert_ids counter env
 		) 
-		depset' (env,pert_ids)
+		depset (env,pert_ids)
 
 let enabled r state = 
 	let r_id = Mixture.get_id r.lhs in 
@@ -1056,7 +1055,7 @@ let dump state counter env =
 			("("^(String.concat "," !cont)^")")
 		in
 		 	Printf.printf "***[%f] Current state***\n" (Counter.time counter);
-			SiteGraph.dump ~with_lift:true state.graph env;
+			if SiteGraph.size state.graph > 100 then () else SiteGraph.dump ~with_lift:true state.graph env;
 			Hashtbl.fold
 			(fun i r _ ->
 				let nme =
@@ -1072,38 +1071,42 @@ let dump state counter env =
 					(int_of_float (instance_number i state env))
 			) state.rules ();
 			print_newline ();
-			Array.iteri
-				(fun mix_id opt ->
-							match opt with
-							| None -> ()
-							| Some comp_injs ->
-									(Printf.printf "Var[%d]: '%s' %s has %d instances\n" mix_id
-											(Environment.kappa_of_num mix_id env)
-											(Mixture.to_kappa false (kappa_of_id mix_id state) env)
-											(int_of_float (instance_number mix_id state env));
-										Array.iteri
-											(fun cc_id injs_opt ->
-														match injs_opt with
-														| None -> Printf.printf "\tCC[%d] : na\n" cc_id
-														| Some injs ->
-																InjectionHeap.iteri
-																	(fun inj_id injection ->
-																				Printf.printf "\tCC[%d] #%d : %s\n" cc_id inj_id
-																					(Injection.to_string injection))
-																	injs)
-											comp_injs))
-				state.injections;
-			Array.iteri
-				(fun var_id opt ->
-							match opt with
-							| None ->
-									Printf.printf "x[%d]: '%s' na\n" var_id
-										(Environment.alg_of_num var_id env)
-							| Some (v, x) ->
-									Printf.printf "x[%d]: '%s' %f\n" var_id
-										(Environment.alg_of_num var_id env)
-										(value state var_id counter env))
-				state.alg_variables;
+			if SiteGraph.size state.graph > 100 then ()
+			else
+				begin
+				Array.iteri
+					(fun mix_id opt ->
+								match opt with
+								| None -> ()
+								| Some comp_injs ->
+										(Printf.printf "Var[%d]: '%s' %s has %d instances\n" mix_id
+												(Environment.kappa_of_num mix_id env)
+												(Mixture.to_kappa false (kappa_of_id mix_id state) env)
+												(int_of_float (instance_number mix_id state env));
+											Array.iteri
+												(fun cc_id injs_opt ->
+															match injs_opt with
+															| None -> Printf.printf "\tCC[%d] : na\n" cc_id
+															| Some injs ->
+																	InjectionHeap.iteri
+																		(fun inj_id injection ->
+																					Printf.printf "\tCC[%d] #%d : %s\n" cc_id inj_id
+																						(Injection.to_string injection))
+																		injs)
+												comp_injs))
+					state.injections;
+				Array.iteri
+					(fun var_id opt ->
+								match opt with
+								| None ->
+										Printf.printf "x[%d]: '%s' na\n" var_id
+											(Environment.alg_of_num var_id env)
+								| Some (v, x) ->
+										Printf.printf "x[%d]: '%s' %f\n" var_id
+											(Environment.alg_of_num var_id env)
+											(value state var_id counter env))
+					state.alg_variables;
+			end ;
 			IntMap.fold
 			(fun i pert _ ->
 				Printf.printf "pert[%d]: %s\n" i (Environment.pert_of_num i env)
