@@ -22,5 +22,7 @@
 
 #### Initial conditions 
 %init: 1000 A,B
-%init: 10000 C
 
+#### Perturbation
+%mod: [T] > 25 do $ADD 10000 C
+%obs: 'A' A(x)
