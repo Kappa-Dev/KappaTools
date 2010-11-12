@@ -64,12 +64,13 @@ rule token = parse
 								| "cos" -> COSINUS pos
 								| "tan" -> TAN pos
 								| "exp" -> EXPONENT pos
-								| "abs" -> ABS pos
-								| "modulo" -> MODULO pos
+								| "int" -> ABS pos
+								| "mod" -> MODULO pos
 								| "sqrt" -> SQRT pos
 								| "inf" -> INFINITY pos
 								| "true" -> TRUE pos
 								| "false" -> FALSE pos
+								| "not" -> NOT pos
 								| "pi" -> FLOAT (3.14159265,pos)
 								| _ as s -> return_error lexbuf ("Symbol \""^s^"\" is not defined")
 						}  
