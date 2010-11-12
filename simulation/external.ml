@@ -28,7 +28,15 @@ let eval_abort_pert just_applied pert state counter env =
 let apply_effect p_id pert state counter env =
 	let snapshot () =
 		if !Parameter.debugModeOn then Debug.tag "Taking a snapshot of current state" ;
-		let filename = ref ((!Parameter.outputDirName)^(Parameter.dir_sep)^(!Parameter.snapshotFileName)^"_"^(string_of_int (Counter.event counter))) in
+		let filename = ref
+			((!Parameter.outputDirName)
+			^(Parameter.dir_sep)
+			^(!Parameter.snapshotFileName)
+			^"_"
+			^(string_of_int (Counter.event counter)
+			^".ka"
+			)) 
+		in
 		let file_exists = ref true in
 		let cpt = ref 1 in
 		while !file_exists do
