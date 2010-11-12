@@ -121,7 +121,7 @@ let diff m0 m1 label_opt env =
 					let inst,idmap =
 						match (def_int, int) with
 						| (None, None) -> (inst,idmap)
-						| (Some i, None) -> invalid_arg "Dynamics.diff: adding an agent that is not fully described (int)"
+						| (Some i, None) -> (inst,idmap) (*DCDW: default will be assumed*)
 						| (Some i, Some j) -> ((MOD((FRESH id, site_id), j)):: inst,add_map (FRESH id) (site_id,0) idmap)
 						| (None, Some k) -> invalid_arg "Dynamics.diff: adding an agent that is not supposed to have an internal state"
 					in
