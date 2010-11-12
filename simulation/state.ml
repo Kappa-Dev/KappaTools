@@ -1011,15 +1011,15 @@ let apply state r embedding counter env =
 								edit state script' phi control psi side_effects pert_ids env
 					| ADD (i, name) ->
 							let node = Node.create name env in
-							let sg' = SiteGraph.add sg node in
-							(* sg' might be different address than sg if max array size  *)
+							let sg = SiteGraph.add sg node in
+							(* sg might be different address than sg if max array size  *)
 							(* was reached                                               *)
 							let j =
 								(try SiteGraph.( & ) node
 								with
 								| Not_found -> invalid_arg "State.apply: not allocated") 
 							in
-							edit {state with graph = sg'} script' phi control	(IntMap.add i j psi) side_effects pert_ids env
+							edit {state with graph = sg} script' phi control	(IntMap.add i j psi) side_effects pert_ids env
 				end
 	in
 	edit state r.script embedding IntMap.empty IntMap.empty Int2Set.empty IntSet.empty env
