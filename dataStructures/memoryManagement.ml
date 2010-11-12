@@ -64,21 +64,26 @@ module Make(T:Content) =
 				| [] -> 
 					if h.fresh = dimension h (*If heap has reached the actual size of the array*)
 					then
-						( 
 						let size' = 2 * (dimension h + 1) in
 						let ar' = 
 							GenArray.init size' 
 							(fun i -> if i < h.fresh then internal_get h.ar i (*copying old values*)
 						  					else Empty (*default value*)
-						  ) 
+							) 
 		   			in
-							let h = {h with ar = ar'} in
-							(T.allocate elt h.fresh ; internal_set h.ar h.fresh (Mem elt) ; h.fresh <- h.fresh + 1 ; h.elements <- (h.elements+1) ; h)
-						)
+							begin
+								T.allocate elt h.fresh ;
+								internal_set ar' h.fresh (Mem elt) ;
+								{h with ar = ar' ; fresh = h.fresh+1 ; elements = h.elements+1} 
+							end
 					else
-						(
-						(T.allocate elt h.fresh ; internal_set h.ar h.fresh (Mem elt) ; h.fresh <- h.fresh + 1 ; h.elements <- (h.elements+1) ; h)
-						)
+						begin
+							T.allocate elt h.fresh ; 
+							internal_set h.ar h.fresh (Mem elt) ; 
+							h.fresh <- h.fresh + 1 ; 
+							h.elements <- (h.elements+1) ; 
+							h
+						end
 		with
 			| Invalid_argument msg -> invalid_arg (Printf.sprintf "MemoryManagement.alloc: %d/%d" h.fresh (dimension h))
 					
