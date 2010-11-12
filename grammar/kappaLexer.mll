@@ -45,7 +45,7 @@ rule token = parse
 		| "||" {let pos = position lexbuf in OR pos}
     | "->" {KAPPA_RAR}
 		| "->!" {let pos = position lexbuf in KAPPA_NOPOLY pos}
-		| "$(" {let lab = read_label "" [')'] lexbuf in 
+		| "$" {let lab = read_label "" [' ';'\n';'\t'] lexbuf in 
 						let pos = position lexbuf in 
 							match lab with
 								| "DEL" -> (DELETE pos)
