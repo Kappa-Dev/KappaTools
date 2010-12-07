@@ -195,12 +195,12 @@ let generate_embeddings sg u_i mix comp_injs =
 
 (**[initialize_embeddings state mix_list] *)
 let initialize_embeddings state mix_list =
-	SiteGraph.fold
+	SiteGraph.fold (*BUG when the init graph is empty*)
 	(fun i node_i state ->
 		List.fold_left
 		(fun state mix ->
 			let injs = state.injections in
-			let opt = injs.(Mixture.get_id mix) in (*returns 0 if mix is empty*)
+			let opt = injs.(Mixture.get_id mix) in 
 			let comp_injs =
 				match opt with
 				| None -> Array.create (Mixture.arity mix) None
@@ -210,7 +210,7 @@ let initialize_embeddings state mix_list =
 				generate_embeddings state.graph i mix comp_injs
 			in
 			(* adding variables.(mix_id) = mix to variables array *)
-			state.kappa_variables.(Mixture.get_id mix) <- Some mix;
+			(*state.kappa_variables.(Mixture.get_id mix) <- Some mix; already done!*)
 			injs.(Mixture.get_id mix) <- Some comp_injs;
 			(* adding injections.(mix_id) = injs(mix) to injections array*)
 			{state with graph = sg}
@@ -236,7 +236,6 @@ let build_influence_map rules patterns env =
 					match opt with
 						| None -> () (*empty pattern*)
 						| Some mix ->
-							Debug.tag "Check pattern...";
 							let glueings = Dynamics.enable r mix env in
 							match glueings with
 								| [] -> ()
@@ -563,8 +562,12 @@ let positive_update state r (phi,psi) (side_modifs,pert_intro) counter env = (*p
 		in
 		let comp_injs =
 			match opt with
-			| None -> invalid_arg "State.positive_update"
-			| Some injs -> injs in
+			| None -> (*may happen when initial graph was empty*)
+				let ar = Array.create (Mixture.arity mix) None in
+				state.injections.(var_id) <- (Some ar) ;
+				ar
+			| Some injs -> injs 
+		in
 		let opt =
 			try comp_injs.(cc_id)
 			with
@@ -1095,7 +1098,8 @@ let dump state counter env =
 																					Printf.printf "\tCC[%d] #%d : %s\n" cc_id inj_id
 																						(Injection.to_string injection))
 																		injs)
-												comp_injs))
+												comp_injs)
+					)
 					state.injections;
 				Array.iteri
 					(fun var_id opt ->
