@@ -5,6 +5,11 @@ type t = {control:int ; assoc : (string*(string array * int StringMap.t) option)
 
 let control sign = sign.control
 
+let fold f sign cont = 
+	let cont,_ = Array.fold_left (fun (cont,i) _ -> (f i cont,i+1)) (cont,0) sign.assoc
+	in 
+	cont
+
 let num_of_site site_name sign = 
 	StringMap.find site_name sign.num_of_site 
 	

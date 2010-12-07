@@ -35,7 +35,7 @@ OCAMLCP = $(OCAMLBINPATH)ocamlcp
 OCAMLLEX = $(OCAMLBINPATH)ocamllex
 OCAMLYACC = $(OCAMLBINPATH)ocamlyacc
 OCAMLC = $(OCAMLBINPATH)ocamlc.opt
-OCAMLOPT = $(OCAMLBINPATH)ocamlopt.opt #-g -ccopt -g
+OCAMLOPT = $(OCAMLBINPATH)ocamlopt.opt -g -ccopt -g
 OCAMLDEP = $(OCAMLBINPATH)ocamldep
 CC = gcc
 

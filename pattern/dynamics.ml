@@ -114,40 +114,46 @@ let diff m0 m1 label_opt env =
 			let ag = Mixture.agent_of_id id m1 in
 			let name_id = Mixture.name ag in
 			let inst = ADD(id, name_id)::inst in
-			Mixture.fold_interface
-				(fun site_id (int, lnk) (inst,idmap) ->
-					let def_int = try Some (Environment.state_of_id (Mixture.name ag) site_id 0 env) with Not_found -> None
-					in
-					let inst,idmap =
-						match (def_int, int) with
-						| (None, None) -> (inst,idmap)
-						| (Some i, None) -> (inst,idmap) (*DCDW: default will be assumed*)
-						| (Some i, Some j) -> ((MOD((FRESH id, site_id), j)):: inst,add_map (FRESH id) (site_id,0) idmap)
-						| (None, Some k) -> invalid_arg "Dynamics.diff: adding an agent that is not supposed to have an internal state"
-					in
-					match lnk with
-					| Node.WLD -> invalid_arg "Dynamics.diff: adding an agent that is not fully described (wild card lnk)"
-					| Node.FREE -> (inst,add_map (FRESH id) (site_id,1) idmap)
-					| Node.TYPE _ -> invalid_arg "Dynamics.diff: adding an agent that is not fully described (link type)"
-					| Node.BND ->
-							let opt = Mixture.follow (id, site_id) m1 in
-							match opt with
-							| None -> invalid_arg "Dynamics.diff: adding an agent that is not fully described (semi lnk)"
-							| Some (i,x) ->
-									let bnd_i =
-										if List.mem i added then (FRESH i) else (KEPT i)
-									in
-									if i < id or (i = id && x < site_id) then 
-										let inst = BND((bnd_i, x),(FRESH id, site_id)):: inst
-										and idmap = add_map bnd_i (x,1) (add_map (FRESH id) (site_id,1) idmap)
+			let sign = Environment.get_sig name_id env in
+			let modif_sites = 
+				Signature.fold 
+				(fun site_id idmap -> add_map (FRESH id) (site_id,0) (add_map (FRESH id) (site_id,1) idmap)) 
+				sign idmap 
+			in
+			let inst = 
+				Mixture.fold_interface 
+					(fun site_id (int, lnk) inst ->
+						let def_int = try Some (Environment.state_of_id (Mixture.name ag) site_id 0 env) with Not_found -> None
+						in
+						let inst =
+							match (def_int, int) with
+							| (None, None) -> inst
+							| (Some i, None) -> inst (*DCDW: default will be assumed*)
+							| (Some i, Some j) -> (MOD((FRESH id, site_id), j))::inst
+							| (None, Some k) -> invalid_arg "Dynamics.diff: adding an agent that is not supposed to have an internal state"
+						in
+						match lnk with
+						| Node.WLD -> invalid_arg "Dynamics.diff: adding an agent that is not fully described (wild card lnk)"
+						| Node.FREE -> inst
+						| Node.TYPE _ -> invalid_arg "Dynamics.diff: adding an agent that is not fully described (link type)"
+						| Node.BND ->
+								let opt = Mixture.follow (id, site_id) m1 in
+								match opt with
+								| None -> invalid_arg "Dynamics.diff: adding an agent that is not fully described (semi lnk)"
+								| Some (i,x) ->
+										let bnd_i =
+											if List.mem i added then (FRESH i) else (KEPT i)
 										in
-											(inst,idmap)
-									else 
-										(inst,idmap)
-				)
-				ag (inst,idmap)
-		)
-		(instructions,IdMap.empty) added
+										if i < id or (i = id && x < site_id) then 
+											BND((bnd_i, x),(FRESH id, site_id)):: inst
+										else 
+											inst
+					)
+					ag inst
+			in
+				(inst,modif_sites)
+			)
+			(instructions,IdMap.empty) added
 	in
 	let instructions,modif_sites =
 		List.fold_left
@@ -391,6 +397,7 @@ let rec superpose todo_list lhs rhs map already_done added env =
 let enable r mix env =
 	
 	let unify rhs lhs (root,modif_sites) glueings already_done =
+		Debug.tag (Printf.sprintf "Checking whether %s can be glued to %s" (Mixture.to_kappa false rhs env) (Mixture.to_kappa false lhs env));
 		let root_ag = Mixture.agent_of_id root rhs in
 		let name_id_root = Mixture.name root_ag in
 		let candidates = (*agent id in lhs --all cc-- that have the name name_id_root*)
@@ -480,6 +487,14 @@ let dump r env =
 	Printf.printf "Apply %s\n" (to_kappa r) ;
 	dump_script r.script ;
 	Printf.printf "if pattern %d is matched \n" (Mixture.get_id r.lhs) ;
+	Printf.printf "Modif sites: %s" 
+	(string_of_map 
+		(fun id -> match id with FRESH i | KEPT i -> string_of_int i) 
+		(string_of_set (fun (x,y) -> "("^(string_of_int x)^","^(string_of_int y)^")") Int2Set.fold)
+		IdMap.fold
+		r.modif_sites
+	) ; print_newline () ;
 	match r.refines with
 	| Some lhs_id -> Printf.printf "[refines pattern %d]\n" lhs_id
-	| None -> ()
+	| None -> () 
+	

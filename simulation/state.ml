@@ -116,7 +116,7 @@ let eval_activity rule state counter env =
 			and kin = rule.k_def
 			in
 			(match kin with
-				| Dynamics.CONST f -> f *. (instance_number mix_id state env)
+				| Dynamics.CONST f -> let n = instance_number mix_id state env in if n = 0. then 0. else (f *. n)
 				| Dynamics.VAR k_fun ->
 						let act_of_id id = instance_number id state env
 						
@@ -227,6 +227,7 @@ let build_influence_map rules patterns env =
 	let influence_map = Hashtbl.create (Hashtbl.length rules) in
 	Hashtbl.iter
 	(fun i r -> 
+		Debug.tag (Printf.sprintf "Computing activation for rule %s..." r.kappa) ;
 		match r.refines with
 			| Some _ -> () 
 			| None ->
@@ -235,6 +236,7 @@ let build_influence_map rules patterns env =
 					match opt with
 						| None -> () (*empty pattern*)
 						| Some mix ->
+							Debug.tag "Check pattern...";
 							let glueings = Dynamics.enable r mix env in
 							match glueings with
 								| [] -> ()
@@ -269,7 +271,7 @@ let initialize sg rules kappa_vars alg_vars obs (pert,rule_pert) counter env =
 			in
 				let patterns = 
 					if Mixture.is_empty r.lhs then patterns (*nothing to track if left hand side is empty*)
-					else r.lhs :: patterns
+					else (kappa_var_table.(Mixture.get_id r.lhs) <- Some r.lhs ; r.lhs :: patterns)
 				in
 				(Hashtbl.replace rule_table i r; patterns)
 		)
