@@ -152,6 +152,7 @@ rule token = parse
 		lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = fic} ;
 		try
 	   	KappaParser.line token lexbuf ; close_in d ;
+			Debug.tag fic;
 			Parameter.openInDescriptors := List.tl (!Parameter.openInDescriptors)
  		with 
  			| Syntax_Error msg -> 

@@ -25,6 +25,86 @@ let eval_intf ast_intf =
 		| Ast.EMPTY_INTF -> StringMap.add "_" ([], Ast.FREE, Misc.no_pos) map
 	in (*Adding default existential port*) iter ast_intf StringMap.empty
 
+let eval_node env a link_map node_map node_id = 
+	let ast_intf = a.Ast.ag_intf 
+	and ag_name = a.Ast.ag_nme 
+	and pos_ag = a.Ast.ag_pos
+	in
+	let name_id = 
+		try Environment.num_of_name ag_name env with 
+			| Not_found -> raise (ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared")) 
+	in
+	let sign = Environment.get_sig name_id env in
+	let rec build_intf ast link_map intf bond_list = 
+		match ast with
+			| Ast.PORT_SEP (p,ast') ->
+				begin
+				let int_state_list = p.Ast.port_int
+				and lnk_state = p.Ast.port_lnk
+				and port_id = 
+					try Signature.num_of_site p.Ast.port_nme sign with 
+						Not_found -> raise (ExceptionDefn.Semantics_Error (p.Ast.port_pos,"Site '" ^ p.Ast.port_nme ^ "' is not declared")) 
+				in
+				let link_map,bond_list = 
+					match lnk_state with
+						| Ast.LNK_VALUE (i,pos) -> 
+							begin
+							try 
+								let opt_node = IntMap.find i link_map 
+								in
+								match opt_node with
+									| None -> raise (ExceptionDefn.Semantics_Error (pos,"Edge identifier at site '" ^ p.Ast.port_nme ^ "' is used multiple times"))
+									| Some (node_id',port_id',pos') ->
+										(IntMap.add i None link_map,(node_id,port_id,node_id',port_id')::bond_list)
+							with Not_found -> (IntMap.add i (Some (node_id,port_id,pos)) link_map,bond_list)
+							end
+						| Ast.FREE -> (link_map,bond_list)
+						| _ -> raise (ExceptionDefn.Semantics_Error (p.Ast.port_pos,"Site '" ^ p.Ast.port_nme ^ "' is partially defined"))
+				in
+				match int_state_list with
+					| [] -> build_intf ast' link_map (IntMap.add port_id (None,Node.WLD) intf) bond_list
+					| s::_ -> 
+						let i = try Signature.num_of_internal_state p.Ast.port_nme s sign with
+							Not_found -> raise (ExceptionDefn.Semantics_Error (p.Ast.port_pos,"Internal state of site'" ^ p.Ast.port_nme ^ "' is not defined"))
+						in
+						build_intf ast' link_map (IntMap.add port_id (Some i,Node.WLD) intf) bond_list (*Geekish, adding Node.WLD to be consistent with Node.create*)
+				end
+		| Ast.EMPTY_INTF -> (bond_list,link_map,intf)
+	in
+	
+	let bond_list,link_map,intf = build_intf ast_intf link_map IntMap.empty [] in
+	let node = Node.create ~with_interface:intf name_id env in (*check what one gives to Node.create*) 
+	let node_map = IntMap.add node_id node node_map in
+	List.iter 
+	(fun (ni,pi,nj,pj) ->
+		try 
+		let node_i = IntMap.find ni node_map
+		and node_j = IntMap.find nj node_map
+		in
+		Node.set_ptr (node_j,pj) (Node.Ptr (node_i,pi)) ;
+		Node.set_ptr (node_i,pi) (Node.Ptr (node_j,pj)) 
+		with Not_found -> invalid_arg "Eval.eval_node"
+	) bond_list ; 
+	(node_map,link_map)
+
+let nodes_of_ast env ast_mixture =
+	let rec iter ast_mixture node_map node_id link_map =  
+		match ast_mixture with
+			| Ast.COMMA (a, ast_mix) ->
+					let (node_map,link_map) = eval_node env a link_map node_map node_id in
+						iter ast_mix node_map (node_id+1) link_map
+			| Ast.EMPTY_MIX -> 
+				IntMap.iter 
+				(fun i opt ->
+					match opt with 
+						| None -> () 
+						| Some (_,_,pos) -> raise (ExceptionDefn.Semantics_Error (pos,Printf.sprintf "Edge identifier %d is dangling" i))
+				) link_map ;
+				node_map
+			| _ -> raise (ExceptionDefn.Semantics_Error (Misc.no_pos,"Invalid initial conditions"))
+	in
+	iter ast_mixture IntMap.empty 0 IntMap.empty
+					
 let eval_agent is_pattern env a ctxt =
 	let (ag_name, ast_intf, pos_ag) = ((a.Ast.ag_nme), (a.Ast.ag_intf), (a.Ast.ag_pos)) in
 	let name_id,env = 
@@ -640,18 +720,19 @@ let pert_of_result variables env res =
 		in 
 		(variables, (List.rev lpert), (List.rev lrules), env)
 
+(*Super innefficient because one is computing the mixture first!! Doesn't scale for large species like dna polymere*)
 let init_graph_of_result env res =
 	List.fold_left
 		(fun (sg,env) (n, ast, _) ->
 					let cpt = ref 0
 					and sg = ref sg
-					and m,env = mixture_of_ast None false env ast
+					(*and m,env = mixture_of_ast None false env ast*)
 					in
 					(* Cannot do Mixture.to_nodes env m once for all because of        *)
 					(* references                                                      *)
 					let sg = 
 						(while !cpt < n do
-							sg := Graph.SiteGraph.add_nodes !sg (Mixture.to_nodes env m);
+							sg := Graph.SiteGraph.add_nodes !sg (nodes_of_ast env ast);
 							cpt := !cpt + 1 done;
 						!sg)
 					in

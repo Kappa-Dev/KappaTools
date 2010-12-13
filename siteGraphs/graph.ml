@@ -65,7 +65,7 @@ struct
 		A.iteri
 			(fun i node ->
 						if Node.is_empty node
-						then ()
+						then (Debug.tag "!")
 						else
 							(let (str, c) =
 									Node.to_string with_lift (hsh_lnk, (!fresh)) node env

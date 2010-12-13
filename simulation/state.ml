@@ -227,7 +227,6 @@ let build_influence_map rules patterns env =
 	let influence_map = Hashtbl.create (Hashtbl.length rules) in
 	Hashtbl.iter
 	(fun i r -> 
-		Debug.tag (Printf.sprintf "Computing activation for rule %s..." r.kappa) ;
 		match r.refines with
 			| Some _ -> () 
 			| None ->
@@ -262,6 +261,10 @@ let initialize sg rules kappa_vars alg_vars obs (pert,rule_pert) counter env =
 	and influence_table = Hashtbl.create dim_rule (*influence map*)
 	in
 	
+	let _ = (*adding observables in the kappa table*) 
+		List.iter
+		(fun mix -> kappa_var_table.(Mixture.get_id mix) <- Some mix) kappa_vars
+	in
 	let kappa_variables =
 		(* forming kappa variable list by merging rule (and perturbation) lhs with kappa variables *)
 		List.fold_left
@@ -1048,17 +1051,6 @@ let dump state counter env =
 	then ()
 	else
 		(
-		let dump_size_of_cc mix =
-			let cpt = ref 0 in
-			let (cont:string list ref) = ref [] in
-			while !cpt < Mixture.arity mix do
-				let str = Printf.sprintf "%d" (Mixture.size_of_cc !cpt mix)
-				in
-					cont := str::!cont ;
-					cpt := !cpt+1
-			done ;
-			("("^(String.concat "," !cont)^")")
-		in
 		 	Printf.printf "***[%f] Current state***\n" (Counter.time counter);
 			if SiteGraph.size state.graph > 100 then () else SiteGraph.dump ~with_lift:true state.graph env;
 			Hashtbl.fold
@@ -1068,9 +1060,9 @@ let dump state counter env =
 					with | Not_found -> ""
 				in
 				if Environment.is_rule i env then
-					Printf.printf "\t%s %s @ %f(%f) %s\n" nme (Dynamics.to_kappa r)
+					Printf.printf "\t%s %s @ %f(%f)\n" nme (Dynamics.to_kappa r)
 					(Random_tree.find i state.activity_tree)
-					(eval_activity r state counter env) (dump_size_of_cc r.lhs)
+					(eval_activity r state counter env) 
 				else
 					Printf.printf "\t%s %s [found %d]\n" nme (Dynamics.to_kappa r)
 					(int_of_float (instance_number i state env))

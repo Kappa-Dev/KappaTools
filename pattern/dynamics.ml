@@ -397,7 +397,6 @@ let rec superpose todo_list lhs rhs map already_done added env =
 let enable r mix env =
 	
 	let unify rhs lhs (root,modif_sites) glueings already_done =
-		Debug.tag (Printf.sprintf "Checking whether %s can be glued to %s" (Mixture.to_kappa false rhs env) (Mixture.to_kappa false lhs env));
 		let root_ag = Mixture.agent_of_id root rhs in
 		let name_id_root = Mixture.name root_ag in
 		let candidates = (*agent id in lhs --all cc-- that have the name name_id_root*)

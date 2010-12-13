@@ -32,31 +32,34 @@ let of_node sg root visited env =
 				let todo', spec'=
 					Node.fold_status
 						(fun site_id (_, lnk_state) (todo, spec) ->
-									match lnk_state with
-									| Node.Null -> (todo, spec)
-									| Node.Ptr (node', site_id') ->
-											let id' = Node.get_address node' in
-											if IntMap.mem id' spec.nodes then (todo, spec)
-											else
-												let view = Node.bit_encode node' env in
-												let set =
-													try IntSet.add id' (Int64Map.find view spec.views) with
-													| Not_found -> IntSet.singleton id'
-												in
-												(id':: todo,
-													{ nodes = IntMap.add id' (Node.marshalize node') spec.nodes ;
-														views = Int64Map.add view set spec.views }
-												)
-									| Node.FPtr _ -> invalid_arg "Species.of_node"
+								match lnk_state with
+								| Node.Null -> (todo, spec)
+								| Node.Ptr (node', site_id') ->
+										let id' = Node.get_address node' in
+										if IntMap.mem id' spec.nodes then (todo, spec)
+										else
+											let view = Node.bit_encode node' env in
+											let set =
+												try IntSet.add id' (Int64Map.find view spec.views) with
+												| Not_found -> IntSet.singleton id'
+											in
+											(id':: todo,
+												{ nodes = IntMap.add id' (Node.marshalize node') spec.nodes ;
+													views = Int64Map.add view set spec.views }
+											)
+								| Node.FPtr _ -> invalid_arg "Species.of_node"
 						) node (tl, spec)
 				in
 				iter todo' spec' (IntSet.add id visited)
 	in
 	let view_root = Node.bit_encode root env in
-	iter [Node.get_address root]
+	let spec,visited =
+		iter [Node.get_address root]
 		{ nodes = IntMap.add (Node.get_address root) (Node.marshalize root) IntMap.empty ;
 			views = Int64Map.add view_root (IntSet.singleton (Node.get_address root)) Int64Map.empty ;
-		} IntSet.empty
+		} visited 
+	in
+	(spec,visited)
 
 let iso spec1 spec2 env =
 	let rec reco embedding todo_list checked =
