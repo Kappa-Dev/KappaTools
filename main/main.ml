@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "1.05_071210"
+let version = "1.05_141210"
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
 
@@ -36,6 +36,7 @@ let main =
 				with Sys_error msg -> (*directory does not exists*) 
 					(Printf.eprintf "%s\n" msg ; exit 1)
 			), "Specifies directory name where output file(s) should be stored") ;
+		("--dot-output", Arg.Unit (fun () -> Parameter.dotOutput := true), "Dot format for outputting snapshots") ;
 		("--implicit-signature", Arg.Unit (fun () -> Parameter.implicitSignature := true), "Program will guess agent signatures automatically") ;
 		("--seed", Arg.Int (fun i -> Parameter.seedValue := Some i), "Seed for the random number generator") ;
 		("--compile", Arg.Unit (fun _ -> Parameter.compileModeOn := true), "Display rule compilation as action list") ;
@@ -78,14 +79,14 @@ let main =
 		else () ;
 		let plot = Plot.create !FileName.output
 		in
-		
 		try
 			Run.loop state counter plot env ;
 			print_newline() ;
 			Printf.printf "Simulation ended (eff.: %f)\n" 
 			((float_of_int (Counter.event counter)) /. (float_of_int (Counter.null_event counter + Counter.event counter))) ;
 		with ExceptionDefn.Deadlock ->
-				(Printf.printf "?\nSimulation ended because a deadlock was reached (Activity = %f)\n" ((*Activity.total*) Random_tree.total state.activity_tree))
+			if !Parameter.dumpIfDeadlocked then	Graph.SiteGraph.to_dot state.graph "deadlock.dot" env ;
+			(Printf.printf "?\nSimulation ended because a deadlock was reached (Activity = %f)\n" ((*Activity.total*) Random_tree.total state.activity_tree))
 	with
 	| ExceptionDefn.Semantics_Error (pos, msg) -> 
 		(close_desc () ; Printf.eprintf "***Error (%s) line %d, char %d: %s***\n" (fn pos) (ln pos) (cn pos) msg)

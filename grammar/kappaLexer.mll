@@ -132,9 +132,7 @@ rule token = parse
     | _ as c {return_error lexbuf (Printf.sprintf "invalid use of character %c" c)}
 
   and read_label acc char_list = parse
-    | '\n' {if List.mem '\n' char_list then acc else return_error lexbuf (Printf.sprintf "invalid sequence "^acc)}
-		| '\r' {if List.mem '\r' char_list then acc else return_error lexbuf (Printf.sprintf "invalid sequence "^acc)}
-    | eof {return_error lexbuf (Printf.sprintf "invalid sequence "^acc)}
+    | eof {acc}
     | "\\\n" {incr_line lexbuf ; read_label acc char_list lexbuf}
     | _ as c {if List.mem c char_list then acc else read_label (Printf.sprintf "%s%c" acc c) char_list lexbuf}
 

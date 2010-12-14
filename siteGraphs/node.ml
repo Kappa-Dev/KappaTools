@@ -100,8 +100,6 @@ let to_string with_detail (hsh_lnk,fresh) node env =
 		else
 			(Printf.sprintf "%s(%s)" (Environment.name node.name env) (String.concat "," (List.rev intf_l)),fresh')
 
-
-
 let add_dep phi port_list node =
 	let add lift int_lnk = (fun (x,y) -> if int_lnk = 0 then (LiftSet.add x lift,y) else (x,LiftSet.add y lift))
 	in

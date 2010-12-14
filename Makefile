@@ -2,7 +2,7 @@
 
 ## put here the names of your source files (in the right order)
 SOURCES = main/parameter.ml \
-		dataStructures/largeArray.ml dataStructures/memoryManagement.ml dataStructures/heap.ml  \
+		dataStructures/largeArray.ml dataStructures/memoryManagement.ml dataStructures/longString.ml dataStructures/heap.ml  \
 		dataStructures/misc.ml dataStructures/mapExt.ml dataStructures/valMap.ml dataStructures/mods.ml dataStructures/random_tree.ml \
 		dataStructures/liftSet.ml\
 		Error/debug.ml Error/ExceptionDefn.ml \
@@ -35,7 +35,7 @@ OCAMLCP = $(OCAMLBINPATH)ocamlcp
 OCAMLLEX = $(OCAMLBINPATH)ocamllex
 OCAMLYACC = $(OCAMLBINPATH)ocamlyacc
 OCAMLC = $(OCAMLBINPATH)ocamlc.opt
-OCAMLOPT = $(OCAMLBINPATH)ocamlopt.opt -g -ccopt -g
+OCAMLOPT = $(OCAMLBINPATH)ocamlopt.opt #-g -ccopt -g
 OCAMLDEP = $(OCAMLBINPATH)ocamldep
 CC = gcc
 

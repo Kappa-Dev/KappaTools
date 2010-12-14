@@ -1037,12 +1037,16 @@ let snapshot state counter desc env =
 	try
 		Printf.fprintf desc "# Snapshot [Event: %d, Time: %f]\n" (Counter.event counter) (Counter.time counter) ; 
 		let table = Species.of_graph state.graph env in
-		Hashtbl.iter
-		(fun sign specs ->
-			List.iter
-			(fun (spec,k) -> Printf.fprintf desc "%%init: %d\t%s\n" k (Species.to_string spec env)) specs
-		) table ;
-		Printf.fprintf desc "# End snapshot\n" 
+		if !Parameter.dotOutput then Species.dump desc table env 
+		else
+			begin 
+			Hashtbl.iter
+			(fun sign specs ->
+				List.iter
+				(fun (spec,k) -> Printf.fprintf desc "%%init: %d\t%s\n" k (Species.to_string spec env)) specs
+			) table ;
+			Printf.fprintf desc "# End snapshot\n"
+			end
 	with
 		| Sys_error msg -> ExceptionDefn.warning ("Cannot output snapshot: "^msg) 
 

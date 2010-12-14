@@ -148,7 +148,9 @@ module Counter =
 				and n_e = 
 					match !Parameter.maxEventValue with
 						| None -> 0
-						| Some emax ->
+						| Some emax -> 
+							if emax = 0 then 0 
+							else
 							(event - last_event) * !Parameter.progressBarSize / emax
 				in
 					let n = ref (max n_t n_e) in

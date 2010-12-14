@@ -13,7 +13,7 @@
 
 #### Variables 
 %var: 'on_rate' 1.E-4 # per molecule per second
-%var: 'off_rate' 0.1 # per second 
+%var: 'off_rate' 0. # per second 
 %var: 'mod_rate' 1 # per second 
 %obs: 'AB' A(x!x.B)
 %obs: 'Cuu' C(x1~u?,x2~u?)
@@ -21,5 +21,7 @@
 %obs: 'Cpp' C(x1~p?,x2~p?) 
 
 #### Initial conditions 
-%init: 1000 A,B
-%init: 10000 C
+%init: 10 A,B
+%init: 100 C
+
+%mod: ([E] > 10) do $SNAPSHOT

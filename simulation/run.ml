@@ -4,7 +4,6 @@ open ExceptionDefn
 open Random_tree
 
 let event state counter plot env =
-	
 	(*1. Time advance*)
 	let dt = 
 		let rd = Random.float 1.0 
@@ -30,9 +29,7 @@ let event state counter plot env =
 	(*let t_draw = Profiling.start_chrono () in*)
 	let opt_instance,state = try State.draw_rule state counter env with 
 		| Null_event -> (None,state)
-	in
-
-			
+	in			
 	(*3. Apply rule & negative update*)
 	(*let t_apply = Profiling.start_chrono () in*)
 	let opt_new_state =
@@ -85,7 +82,7 @@ let event state counter plot env =
 	(*Profiling.add_chrono "Pert" Parameter.profiling t_pert ;*) 
 	(state,env)
 					
-let rec loop state counter plot env = 
+let rec loop state counter plot env =
 	if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "[**Event %d (Activity %f)**]" counter.Counter.events (Random_tree.total state.State.activity_tree));
 	if Counter.is_initial counter then
 		begin (*Plotting first measure*)

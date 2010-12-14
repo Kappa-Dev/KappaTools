@@ -1,3 +1,4 @@
+/sw/lib/ocaml
 .
 siteGraphs
 simulation
@@ -7,11 +8,8 @@ grammar
 dataStructures
 Error
 /usr/lib/ocaml
-QA
-QA
 binaries
 Error
-QA
 binaries
 dataStructures
 grammar
@@ -25,7 +23,6 @@ pattern
 simulation
 siteGraphs
 Error
-QA
 binaries
 dataStructures
 grammar
@@ -64,12 +61,3 @@ models/basics
 pattern
 simulation
 siteGraphs
-._d/Error
-._d/dataStructures
-._d/grammar
-._d/main
-._d/pattern
-._d/simulation
-._d/siteGraphs
-._ncdi/grammar
-._ncdi/pattern

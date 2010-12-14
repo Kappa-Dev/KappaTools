@@ -28,29 +28,31 @@ let eval_abort_pert just_applied pert state counter env =
 let apply_effect p_id pert state counter env =
 	let snapshot () =
 		if !Parameter.debugModeOn then Debug.tag "Taking a snapshot of current state" ;
-		let filename = ref
+		let filename = 
 			((!Parameter.outputDirName)
 			^(Parameter.dir_sep)
 			^(!Parameter.snapshotFileName)
 			^"_"
 			^(string_of_int (Counter.event counter)
-			^".ka"
 			)) 
 		in
 		let file_exists = ref true in
 		let cpt = ref 1 in
+		let suffix = if !Parameter.dotOutput then ".dot" else ".ka" in
+		let tmp_name = ref (filename^suffix) in
 		while !file_exists do
-			if Sys.file_exists !filename then
+			if Sys.file_exists !tmp_name then
 				begin
-					filename := !filename^"~"^(string_of_int !cpt) ;
+					tmp_name := filename^"~"^(string_of_int !cpt)^suffix ;
 					cpt := !cpt+1 
 				end
 			else
 				file_exists := false
 		done ;
-		let desc = open_out !filename in
+		let desc = open_out !tmp_name
+		in
 		Parameter.openOutDescriptors := desc::(!Parameter.openOutDescriptors) ;
-		State.snapshot state counter desc env ; (*could use a dedicated thread here*)
+		State.snapshot state counter desc env ; (*could use a dedicated thread here*) 
 		close_out desc ;
 		Parameter.openOutDescriptors := List.tl (!Parameter.openOutDescriptors)
 	in

@@ -8,6 +8,7 @@ let debugModeOn = ref false
 let progressBarSymbol = ref '#'
 let progressBarSize = ref 60
 let plotSepChar = ref ' '
+let dumpIfDeadlocked = ref false
 
 (*User definable values*)
 let (maxEventValue:int option ref) = ref None
@@ -17,7 +18,7 @@ let (seedValue:int option ref) = ref None
 let plotModeOn = ref false
 let compileModeOn = ref false
 let implicitSignature = ref false
-
+let dotOutput = ref false
 
 (*Computed values*)
 let (timeIncrementValue:float option ref) = ref None

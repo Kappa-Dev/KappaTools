@@ -21,6 +21,58 @@ let to_string spec env =
 	in
 	String.concat "," (List.rev l)
 
+let to_dot k cpt spec desc env = 
+	let header = 
+		Printf.sprintf 
+		"subgraph cluster%d{\n\t node [style=filled,color=lightblue,shape=Mrecord,];\n\t edge [arrowhead=none];\n\t label = \"#%d\";\n" cpt k in
+		let hp_ls, nodes_ls, bonds_ls =
+			IntMap.fold 
+			(fun i node (hp_ls,nodes_ls, bonds_ls) ->
+				let hp_ls = LongString.concat ~sep:'|' (Printf.sprintf "<n%d> %d" i i) hp_ls
+				and nodes_ls = 
+						let l = 
+							Node.fold_status 
+							(fun site_id status cont -> 
+								if site_id = 0 then (Printf.sprintf "<s%d> %s" site_id (Environment.name (Node.name node) env))::cont
+								else
+								let int_str = 
+									match status with 
+										| (Some i,_) -> "~"^(Environment.state_of_id (Node.name node) site_id i env) 
+										| _ -> "" 
+								in
+								let label = (Environment.site_of_id (Node.name node) site_id env)^int_str in
+								(Printf.sprintf "<s%d> %s" site_id label)::cont
+								) node [] 
+						in
+						LongString.concat (Printf.sprintf "\tnode%d [label = \"{%s}\"];\n" i (String.concat "|" (List.rev l))) nodes_ls
+				and bonds_ls = 
+					let l = 
+							Node.fold_status 
+							(fun site_id status cont -> 
+								match status with 
+									| (_,Node.Ptr (node',j)) -> 
+										let i' = Node.get_address node' in
+										if i<i' || (i=i' && site_id<j) then 
+											(Printf.sprintf "node%d:s%d -> node%d:s%d;" i site_id i' j)::cont
+										else cont
+									| (_,Node.FPtr (n,j)) -> 
+										if i<n || (i=n && site_id<j) then 
+											(Printf.sprintf "node%d:s%d -> node%d:s%d;" i site_id n j)::cont
+										else cont
+									| _ -> cont
+							) node [] 
+					in
+					LongString.concat (String.concat "\n" l) bonds_ls
+				in
+				(hp_ls,nodes_ls,bonds_ls)
+			)
+			spec.nodes (LongString.empty,LongString.empty,LongString.empty)
+		in
+		Printf.fprintf desc "%s" header ;
+		LongString.printf desc nodes_ls ;
+		LongString.printf desc bonds_ls ;
+		Printf.fprintf desc "}\n"
+
 (**[of_node sg root visited env] produces the species anchored at node [root] allocated in the graph [sg] and *)
 (** returns a pair [(spec,visited')] where [visited'=visited U node_id] of [spec]*)
 let of_node sg root visited env =
@@ -53,14 +105,11 @@ let of_node sg root visited env =
 				iter todo' spec' (IntSet.add id visited)
 	in
 	let view_root = Node.bit_encode root env in
-	let spec,visited =
-		iter [Node.get_address root]
-		{ nodes = IntMap.add (Node.get_address root) (Node.marshalize root) IntMap.empty ;
-			views = Int64Map.add view_root (IntSet.singleton (Node.get_address root)) Int64Map.empty ;
-		} visited 
-	in
-	(spec,visited)
-
+	iter [Node.get_address root]
+	{ nodes = IntMap.add (Node.get_address root) (Node.marshalize root) IntMap.empty ;
+		views = Int64Map.add view_root (IntSet.singleton (Node.get_address root)) Int64Map.empty ;
+	} visited 
+	
 let iso spec1 spec2 env =
 	let rec reco embedding todo_list checked =
 		match todo_list with
@@ -142,6 +191,20 @@ let of_graph sg env =
 	in
 	species
 
+let dump desc table env =
+	Printf.fprintf desc "digraph G{\n" ;
+	let _ = 
+		Hashtbl.fold
+		(fun _ specs cpt ->
+					List.iter
+					(fun (spec, k) ->
+								to_dot k cpt spec desc env
+					) specs ;
+					cpt+1
+		) table 0
+	in
+	Printf.fprintf desc "}\n" 
+	
 let dump_table table env =
 	Hashtbl.iter
 		(fun _ specs ->
