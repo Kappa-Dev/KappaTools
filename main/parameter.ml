@@ -29,6 +29,7 @@ let snapshotFileName = ref "snap"
 let dir_sep = match Sys.os_type with
 	| "Unix" | "Cygwin" -> "/"
 	| _ -> "\\" (*Filename.dir_sep*) (* only if ocaml >= 3.11.2 otherwise use "/" *)
+let dumpFileName = "dump.ka"
 
 let (openOutDescriptors:out_channel list ref) = ref []
 let (openInDescriptors:in_channel list ref) = ref []

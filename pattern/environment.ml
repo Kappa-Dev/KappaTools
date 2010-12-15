@@ -152,11 +152,14 @@ let declare_var_kappa ?(from_rule=false) label_pos_opt env =
 	let label,pos = match label_pos_opt with
 		| Some (label,pos) -> (label,pos)
 		| None -> ("%anonymous"^(string_of_int env.fresh_kappa),Misc.no_pos) (*geek*)
+	in 
+	let already_defined = 
+		(try let _ = num_of_kappa label env in true with Not_found -> false)
+		||
+		(try let _ = num_of_alg label env in true with Not_found -> false)
 	in
-		try 
-			let _ = num_of_kappa label env in
-				raise (Semantics_Error (pos, "Label already used"))
-		with Not_found ->
+		if already_defined then raise (Semantics_Error (pos, (Printf.sprintf "Label '%s' already defined" label)))
+		else
 			let np = StringMap.add label env.fresh_kappa env.num_of_kappa
 			and pn = IntMap.add env.fresh_kappa label env.kappa_of_num
 			and fp = env.fresh_kappa+1
@@ -172,10 +175,13 @@ let declare_var_alg label_pos_opt env =
 		| Some (label,pos) -> (label,pos)
 		| None -> invalid_arg "Environment.declare_var_alg"
 	in
-		try 
-			let _ = num_of_alg label env in
-				raise (Semantics_Error (pos, "Label already used"))
-		with Not_found ->
+	let already_defined = 
+		(try let _ = num_of_kappa label env in true with Not_found -> false)
+		||
+		(try let _ = num_of_alg label env in true with Not_found -> false)
+	in
+		if already_defined then raise (Semantics_Error (pos, (Printf.sprintf "Label '%s' already defined" label)))
+		else
 			let np = StringMap.add label env.fresh_alg env.num_of_alg
 			and pn = IntMap.add env.fresh_alg label env.alg_of_num
 			and fp = env.fresh_alg+1

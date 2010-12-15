@@ -62,7 +62,7 @@ let output state time event plot env counter =
 							| Dynamics.CONST v -> v
 							| Dynamics.VAR f -> f inst values time event
 					in 
-						Printf.fprintf d "%c%f" !Parameter.plotSepChar v
+						Printf.fprintf d "%c%E" !Parameter.plotSepChar v
 			) state.observables ;
 			Printf.fprintf d "\n" 
 

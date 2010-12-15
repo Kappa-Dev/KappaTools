@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "1.05_151210"
+let version = "1.05_151210_a"
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
 
@@ -87,11 +87,20 @@ let main =
 		with
 			| ExceptionDefn.UserInterrupted msg -> 
 				begin
-					Printf.eprintf "\n***%s: state dumped (%s)***\n" msg Parameter.dumpFileName ; 
-					let desc = open_out Parameter.dumpFileName in 
-						State.snapshot state counter desc env ;
-						close_out desc ;
-						close_desc() (*closes all other opened descriptors*)
+					flush stdout ; 
+					Printf.eprintf "\n***%s: would you like to record the current state? (y/N)***" msg ; flush stderr ;
+					let user_input = Stream.of_channel stdin in
+					(match Stream.next user_input with
+						| 'y' ->
+							begin 
+								let desc = open_out Parameter.dumpFileName in 
+								State.snapshot state counter desc env ;
+								close_out desc ;
+								Printf.eprintf "Final state dumped (%s)\n" Parameter.dumpFileName
+							end
+						| _ -> ()
+					) ;
+					close_desc() (*closes all other opened descriptors*)
 				end
 			| ExceptionDefn.Deadlock ->
 				if !Parameter.dumpIfDeadlocked then	Graph.SiteGraph.to_dot state.graph "deadlock.dot" env ;

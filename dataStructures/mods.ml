@@ -151,7 +151,7 @@ module Counter =
 						| Some emax -> 
 							if emax = 0 then 0 
 							else
-							(event - last_event) * !Parameter.progressBarSize / emax
+								(event - last_event) * !Parameter.progressBarSize / emax
 				in
 					let n = ref (max n_t n_e) in
 						if !n>0 then set_tick counter (event,time) ;
@@ -166,13 +166,13 @@ module Counter =
 			let dE = compute_dE() in
 				let dT = match dE with None -> compute_dT() | Some _ -> None
 				in
-				{time=init_t ; 
-				events=init_e ; 
-				null_events=0 ; 
-				null_action=0 ;
-				max_time=mx_t ; 
-				max_events=mx_e ;
-				last_tick=(init_e,init_t);
+				{time = init_t ; 
+				events = init_e ; 
+				null_events = 0 ; 
+				null_action = 0 ;
+				max_time = mx_t ; 
+				max_events = mx_e ;
+				last_tick = (init_e,init_t);
 				dE = dE ;
 				dT = dT ;
 				init_time = init_t ;
