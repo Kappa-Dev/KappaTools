@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "1.05_141210"
+let version = "1.05_151210"
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
 
@@ -84,9 +84,18 @@ let main =
 			print_newline() ;
 			Printf.printf "Simulation ended (eff.: %f)\n" 
 			((float_of_int (Counter.event counter)) /. (float_of_int (Counter.null_event counter + Counter.event counter))) ;
-		with ExceptionDefn.Deadlock ->
-			if !Parameter.dumpIfDeadlocked then	Graph.SiteGraph.to_dot state.graph "deadlock.dot" env ;
-			(Printf.printf "?\nSimulation ended because a deadlock was reached (Activity = %f)\n" ((*Activity.total*) Random_tree.total state.activity_tree))
+		with
+			| ExceptionDefn.UserInterrupted msg -> 
+				begin
+					Printf.eprintf "\n***%s: state dumped (%s)***\n" msg Parameter.dumpFileName ; 
+					let desc = open_out Parameter.dumpFileName in 
+						State.snapshot state counter desc env ;
+						close_out desc ;
+						close_desc() (*closes all other opened descriptors*)
+				end
+			| ExceptionDefn.Deadlock ->
+				if !Parameter.dumpIfDeadlocked then	Graph.SiteGraph.to_dot state.graph "deadlock.dot" env ;
+				(Printf.printf "?\nSimulation ended because a deadlock was reached (Activity = %f)\n" ((*Activity.total*) Random_tree.total state.activity_tree))
 	with
 	| ExceptionDefn.Semantics_Error (pos, msg) -> 
 		(close_desc () ; Printf.eprintf "***Error (%s) line %d, char %d: %s***\n" (fn pos) (ln pos) (cn pos) msg)
