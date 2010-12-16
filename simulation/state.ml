@@ -1072,43 +1072,41 @@ let dump state counter env =
 					(int_of_float (instance_number i state env))
 			) state.rules ();
 			print_newline ();
-			if SiteGraph.size state.graph > 100 then ()
-			else
-				begin
-				Array.iteri
-					(fun mix_id opt ->
-								match opt with
-								| None -> ()
-								| Some comp_injs ->
-										(Printf.printf "Var[%d]: '%s' %s has %d instances\n" mix_id
-												(Environment.kappa_of_num mix_id env)
-												(Mixture.to_kappa false (kappa_of_id mix_id state) env)
-												(int_of_float (instance_number mix_id state env));
-											Array.iteri
-												(fun cc_id injs_opt ->
-															match injs_opt with
-															| None -> Printf.printf "\tCC[%d] : na\n" cc_id
-															| Some injs ->
-																	InjectionHeap.iteri
-																		(fun inj_id injection ->
-																					Printf.printf "\tCC[%d] #%d : %s\n" cc_id inj_id
-																						(Injection.to_string injection))
-																		injs)
-												comp_injs)
-					)
-					state.injections;
-				Array.iteri
-					(fun var_id opt ->
-								match opt with
-								| None ->
-										Printf.printf "x[%d]: '%s' na\n" var_id
-											(Environment.alg_of_num var_id env)
-								| Some (v, x) ->
-										Printf.printf "x[%d]: '%s' %f\n" var_id
-											(Environment.alg_of_num var_id env)
-											(value state var_id counter env))
-					state.alg_variables;
-			end ;
+			Array.iteri
+			(fun mix_id opt ->
+					match opt with
+					| None -> ()
+					| Some comp_injs ->
+							(Printf.printf "Var[%d]: '%s' %s has %d instances\n" mix_id
+									(Environment.kappa_of_num mix_id env)
+									(Mixture.to_kappa false (kappa_of_id mix_id state) env)
+									(int_of_float (instance_number mix_id state env));
+									if SiteGraph.size state.graph > 100 then ()
+									else
+										Array.iteri
+										(fun cc_id injs_opt ->
+													match injs_opt with
+													| None -> Printf.printf "\tCC[%d] : na\n" cc_id
+													| Some injs ->
+															InjectionHeap.iteri
+																(fun inj_id injection ->
+																			Printf.printf "\tCC[%d] #%d : %s\n" cc_id inj_id
+																				(Injection.to_string injection))
+																injs
+										)	comp_injs
+							)	
+		 	) state.injections ;
+			Array.iteri
+			(fun var_id opt ->
+					match opt with
+					| None ->
+							Printf.printf "x[%d]: '%s' na\n" var_id
+								(Environment.alg_of_num var_id env)
+					| Some (v, x) ->
+							Printf.printf "x[%d]: '%s' %f\n" var_id
+								(Environment.alg_of_num var_id env)
+								(value state var_id counter env))
+			state.alg_variables;
 			IntMap.fold
 			(fun i pert _ ->
 				Printf.printf "pert[%d]: %s\n" i (Environment.pert_of_num i env)
