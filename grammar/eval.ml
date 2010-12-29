@@ -253,52 +253,66 @@ let rec partial_eval_alg env ast =
 			dep, lbl)
 	in
 	match ast with
-	| INFINITY pos -> ((fun _ _ _ _ -> infinity), true, DepSet.empty, "inf")
-	| FLOAT (f, pos) ->
-			((fun _ _ _ _ -> f), true, DepSet.empty, (Printf.sprintf "%f" f))
-	| OBS_VAR (lab, pos) -> (*maybe a kappa expr or an algebraic expression*)
-			(try
-				let i = Environment.num_of_kappa lab env
-				in
-				if Environment.is_rule i env
-				then
-					raise
-						(ExceptionDefn.Semantics_Error (pos,
-								lab ^ " is not a variable identifier"))
-				else
-					((fun f _ _ _ -> f i), false,
-						(DepSet.singleton (Mods.KAPPA i)), ("'" ^ (lab ^ "'")))
-			with
-			| (*shifting obs_id because 0 is reserved for time dependencies*)
-			Not_found -> (* lab is the label of an algebraic expression *)
-					(try
-						let i = Environment.num_of_alg lab env
-						in
-						((fun _ v _ _ -> v i), false,
-							(DepSet.singleton (Mods.ALG i)), ("'" ^ (lab ^ "'")))
-					with
-					| Not_found ->
-							raise
-								(ExceptionDefn.Semantics_Error (pos,
-										lab ^ " is not declared"))))
-	| TIME_VAR pos ->
-			((fun _ _ t _ -> t), false, (DepSet.singleton Mods.TIME), "t")
-	| EVENT_VAR pos ->
-			((fun _ _ _ e -> float_of_int e), false,
-				(DepSet.singleton Mods.EVENT), "e")
-	| DIV (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> x /. y) "/"
-	| SUM (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> x +. y) "+"
-	| MULT (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> x *. y) "*"
-	| MINUS (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> x -. y) "-"
-	| POW (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> x ** y) "^"
-	| MODULO (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> float_of_int ((int_of_float x) mod (int_of_float y))) " modulo "
-	| COSINUS (ast, pos) -> un_op ast pos cos "cos"
-	| TAN (ast,pos) -> un_op ast pos tan "tan"
-	| SINUS (ast, pos) -> un_op ast pos sin "sin"
-	| EXP (ast, pos) -> un_op ast pos exp "e^"
-	| SQRT (ast, pos) -> un_op ast pos sqrt "sqrt"
-	| ABS (ast, pos) -> un_op ast pos (fun x -> float_of_int (abs (int_of_float x))) "abs"
-	| LOG (ast, pos) -> un_op ast pos log "log"
+		| EMAX pos -> 
+			let v =
+				match !Parameter.maxEventValue with
+					| None -> (ExceptionDefn.warning ~with_pos:pos "[emax] constant is evaluated to infinity" ; infinity)
+					| Some n -> (float_of_int n)
+			in
+			((fun _ _ _ _ -> v), true, DepSet.empty, "e_max")
+		| TMAX pos -> 
+			let v =
+				match !Parameter.maxTimeValue with
+					| None -> (ExceptionDefn.warning ~with_pos:pos "[tmax] constant is evaluated to infinity" ; infinity)
+					| Some t -> t
+			in
+			((fun _ _ _ _ -> v), true, DepSet.empty, "t_max") 
+		| INFINITY pos -> ((fun _ _ _ _ -> infinity), true, DepSet.empty, "inf")
+		| FLOAT (f, pos) ->
+				((fun _ _ _ _ -> f), true, DepSet.empty, (Printf.sprintf "%f" f))
+		| OBS_VAR (lab, pos) -> (*maybe a kappa expr or an algebraic expression*)
+				(try
+					let i = Environment.num_of_kappa lab env
+					in
+					if Environment.is_rule i env
+					then
+						raise
+							(ExceptionDefn.Semantics_Error (pos,
+									lab ^ " is not a variable identifier"))
+					else
+						((fun f _ _ _ -> f i), false,
+							(DepSet.singleton (Mods.KAPPA i)), ("'" ^ (lab ^ "'")))
+				with
+				| (*shifting obs_id because 0 is reserved for time dependencies*)
+				Not_found -> (* lab is the label of an algebraic expression *)
+						(try
+							let i = Environment.num_of_alg lab env
+							in
+							((fun _ v _ _ -> v i), false,
+								(DepSet.singleton (Mods.ALG i)), ("'" ^ (lab ^ "'")))
+						with
+						| Not_found ->
+								raise
+									(ExceptionDefn.Semantics_Error (pos,
+											lab ^ " is not declared"))))
+		| TIME_VAR pos ->
+				((fun _ _ t _ -> t), false, (DepSet.singleton Mods.TIME), "t")
+		| EVENT_VAR pos ->
+				((fun _ _ _ e -> float_of_int e), false,
+					(DepSet.singleton Mods.EVENT), "e")
+		| DIV (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> x /. y) "/"
+		| SUM (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> x +. y) "+"
+		| MULT (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> x *. y) "*"
+		| MINUS (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> x -. y) "-"
+		| POW (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> x ** y) "^"
+		| MODULO (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> float_of_int ((int_of_float x) mod (int_of_float y))) " modulo "
+		| COSINUS (ast, pos) -> un_op ast pos cos "cos"
+		| TAN (ast,pos) -> un_op ast pos tan "tan"
+		| SINUS (ast, pos) -> un_op ast pos sin "sin"
+		| EXP (ast, pos) -> un_op ast pos exp "e^"
+		| SQRT (ast, pos) -> un_op ast pos sqrt "sqrt"
+		| ABS (ast, pos) -> un_op ast pos (fun x -> float_of_int (abs (int_of_float x))) "abs"
+		| LOG (ast, pos) -> un_op ast pos log "log"
 
 let rec partial_eval_bool env ast =
 	let bin_op_bool ast ast' pos op op_str =

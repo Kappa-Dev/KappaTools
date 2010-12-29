@@ -1043,7 +1043,11 @@ let snapshot state counter desc env =
 			Hashtbl.iter
 			(fun sign specs ->
 				List.iter
-				(fun (spec,k) -> Printf.fprintf desc "%%init: %d\t%s\n" k (Species.to_string spec env)) specs
+				(fun (spec,k) -> 
+					Printf.fprintf desc "%%init: %d \\\n" k ;
+					Species.print desc spec env ;
+					Printf.fprintf desc "\n"
+				) specs
 			) table ;
 			Printf.fprintf desc "# End snapshot\n"
 			end

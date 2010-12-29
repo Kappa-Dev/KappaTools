@@ -6,7 +6,7 @@
 %token AT OP_PAR CL_PAR COMMA DOT PLUS KAPPA_RAR KAPPA_LRAR KAPPA_LNK ARROW PIPE
 %token <Misc.position> PLUS MULT MINUS LOG AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE SET DO SIGNAL UNTIL TRUE FALSE SNAPSHOT REF OBS
 %token <Misc.position> KAPPA_WLD KAPPA_SEMI SIGNATURE INFINITY TIME EVENT INIT LET DIV PLOT SINUS COSINUS TAN SQRT EXPONENT POW ABS MODULO STOP
-%token <Misc.position> KAPPA_NOPOLY
+%token <Misc.position> KAPPA_NOPOLY EMAX TMAX
 %token <int*Misc.position> INT 
 %token <string*Misc.position> ID LABEL KAPPA_MRK 
 %token <int> DOT_RADIUS PLUS_RADIUS 
@@ -186,6 +186,10 @@ constant:
 	{let f,pos = $1 in Ast.FLOAT (f,pos)}
 | INT 
 	{let i,pos = $1 in Ast.FLOAT (float_of_int i,pos)}
+| EMAX
+	{let pos = $1 in Ast.EMAX pos}
+| TMAX
+	{let pos = $1 in Ast.TMAX pos}
 ;
 
 variable:

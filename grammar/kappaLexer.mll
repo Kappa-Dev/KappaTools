@@ -72,6 +72,8 @@ rule token = parse
 								| "false" -> FALSE pos
 								| "not" -> NOT pos
 								| "pi" -> FLOAT (3.14159265,pos)
+								| "emax" -> EMAX pos
+								| "tmax" -> TMAX pos
 								| _ as s -> return_error lexbuf ("Symbol \""^s^"\" is not defined")
 						}  
 		| '|' {PIPE}

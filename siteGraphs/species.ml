@@ -21,6 +21,20 @@ let to_string spec env =
 	in
 	String.concat "," (List.rev l)
 
+let print desc spec env = 
+	let hsh_lnk = Hashtbl.create 0
+	and mx = IntMap.size spec.nodes in
+	let _ =
+		IntMap.fold
+		(fun id node (fresh,cpt) ->
+					let (str, fresh) = Node.to_string false (hsh_lnk, fresh) node env in
+					Printf.fprintf desc "%s" str ;
+					if cpt = (mx-1) then () else Printf.fprintf desc "," ;
+					(fresh,cpt+1)
+		) spec.nodes (0,0) 
+	in
+	()
+
 let to_dot k cpt spec desc env = 
 	let header = 
 		Printf.sprintf 

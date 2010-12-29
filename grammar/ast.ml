@@ -18,6 +18,8 @@ type alg_expr =
 	| EVENT_VAR of position
 	| OBS_VAR of (string * position)
 	| FLOAT of float * position
+	| TMAX of position
+	| EMAX of position
 	| INFINITY of position
 
 type bool_expr =

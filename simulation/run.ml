@@ -83,7 +83,8 @@ let event state counter plot env =
 	(state,env)
 					
 let rec loop state counter plot env =
-	if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "[**Event %d (Activity %f)**]" counter.Counter.events (Random_tree.total state.State.activity_tree));
+	if !Parameter.debugModeOn then 
+		Debug.tag (Printf.sprintf "[**Event %d (Activity %f)**]" counter.Counter.events (Random_tree.total state.State.activity_tree));
 	if Counter.is_initial counter then
 		begin (*Plotting first measure*)
 			Counter.tick counter counter.Counter.time counter.Counter.events ;
