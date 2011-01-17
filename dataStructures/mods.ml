@@ -34,7 +34,9 @@ module Injection =
 		let size phi = Hashtbl.length phi.map
 		let find i phi = Hashtbl.find phi.map i
 		let empty n (mix_id,cc_id) = {map = Hashtbl.create n ; address = None ; coordinate = (mix_id,cc_id)}
-		let flush phi (var_id,cc_id) = {phi with address = None ; coordinate = (var_id,cc_id)}
+		let flush phi (var_id,cc_id) = 
+			{phi with address = None ; coordinate = (var_id,cc_id)}
+		
 		
 		let compare phi psi = 
 			try
@@ -55,7 +57,9 @@ module Injection =
 			phi.map cod
 		
 		let to_string phi = 
-			Misc.string_of_map string_of_int string_of_int Hashtbl.fold phi.map 
+			Tools.string_of_map string_of_int string_of_int Hashtbl.fold phi.map 
+			
+		let copy phi = fold (fun i j phi' -> add i j phi') phi {map = Hashtbl.create (size phi) ; address = None ; coordinate = get_coordinate phi}
 	end
 
 module Activity:(ValMap.ValMap with type content = float) = 

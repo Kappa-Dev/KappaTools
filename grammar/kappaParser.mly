@@ -1,49 +1,53 @@
-%{  
-
+%{
 %}
 
 %token EOF NEWLINE
-%token AT OP_PAR CL_PAR COMMA DOT PLUS KAPPA_RAR KAPPA_LRAR KAPPA_LNK ARROW PIPE
-%token <Misc.position> PLUS MULT MINUS LOG AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE SET DO SIGNAL UNTIL TRUE FALSE SNAPSHOT REF OBS
-%token <Misc.position> KAPPA_WLD KAPPA_SEMI SIGNATURE INFINITY TIME EVENT INIT LET DIV PLOT SINUS COSINUS TAN SQRT EXPONENT POW ABS MODULO STOP
-%token <Misc.position> KAPPA_NOPOLY EMAX TMAX
-%token <int*Misc.position> INT 
-%token <string*Misc.position> ID LABEL KAPPA_MRK 
+%token AT OP_PAR CL_PAR COMMA DOT KAPPA_RAR KAPPA_LNK PIPE
+%token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE SET DO UNTIL TRUE FALSE SNAPSHOT REF OBS
+%token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INFINITY TIME EVENT INIT LET DIV PLOT SINUS COSINUS TAN SQRT EXPONENT POW ABS MODULO STOP
+%token <Tools.pos> KAPPA_NOPOLY EMAX TMAX
+%token <int*Tools.pos> INT 
+%token <string*Tools.pos> ID LABEL KAPPA_MRK 
 %token <int> DOT_RADIUS PLUS_RADIUS 
-%token <float*Misc.position> FLOAT 
-
-%left COMMA PLUS_RADIUS 
-%left DOT_RADIUS
+%token <float*Tools.pos> FLOAT 
 
 %left MINUS PLUS 
 %left MULT DIV 
 %left MODULO
 %right POW 
-%left SQRT EXPONENT SINUS COSINUS ABS TAN
+%nonassoc LOG SQRT EXPONENT SINUS COSINUS ABS TAN
 
 %left OR
 %left AND
-%right NOT
+%nonassoc NOT
 
-%start line
-%type <unit> line 
+%start start_rule
+%type <unit> start_rule 
 
 %% /*Grammar rules*/
 
-line:
+newline:
+| NEWLINE start_rule
+	{$2}
+| EOF
+	{()}
+;
+
+start_rule:
 | newline
   {$1}
 | rule_expression newline
 	{let rule_label,r = $1 in Ast.result := {!Ast.result with Ast.rules = (rule_label,r)::!Ast.result.Ast.rules} ; $2}
 | instruction newline 
-	{let inst = $1 in
+	{
+		let inst = $1 in
 		begin 
 			match inst with
 				| Ast.SIG (ag,pos) -> 
 						(Ast.result:={!Ast.result with 
 						Ast.signatures=(ag,pos)::!Ast.result.Ast.signatures}
 						)
-				| Ast.INIT (n,mix,pos) -> 
+				| Ast.INIT (n,mix,pos) ->  
 					(Ast.result := {!Ast.result with 
 					Ast.init=(n,mix,pos)::!Ast.result.Ast.init})
 				| Ast.DECLARE var ->
@@ -58,16 +62,10 @@ line:
 					(Ast.result := {!Ast.result with Ast.observables = expr::!Ast.result.Ast.observables})
 				| Ast.PERT (pre,effect,pos,opt) ->
 					(Ast.result := {!Ast.result with Ast.perturbations = (pre,effect,pos,opt)::!Ast.result.Ast.perturbations})
-		end ; $2
+		end ; $2 
 	}
-| error {raise (ExceptionDefn.Syntax_Error "Syntax error")}
-;
-
-newline:
-| NEWLINE line
-	{$2}
-| EOF
-	{()}
+| error 
+	{raise (ExceptionDefn.Syntax_Error "Syntax error")}
 ;
 
 instruction:
@@ -169,7 +167,7 @@ rule_expression:
 		($1,{Ast.lhs=$2; Ast.arrow=$3; Ast.rhs=$4; Ast.k_def=k2; Ast.k_un=k1})
 	}
 | rule_label mixture arrow mixture 
-	{($1,{Ast.lhs=$2; Ast.arrow=$3; Ast.rhs=$4; Ast.k_def=(Ast.FLOAT (1.0,Misc.no_pos)); Ast.k_un=None})}
+	{($1,{Ast.lhs=$2; Ast.arrow=$3; Ast.rhs=$4; Ast.k_def=(Ast.FLOAT (1.0,Tools.no_pos)); Ast.k_un=None})}
 ;
 
 arrow:
@@ -232,6 +230,8 @@ alg_expr:
 	{Ast.ABS ($2,$1)}
 | SQRT alg_expr 
 	{Ast.SQRT ($2,$1)}
+| LOG alg_expr
+	{Ast.LOG ($2,$1)}
 ;
 
 rate:
@@ -245,22 +245,22 @@ multiple_mixture:
 | alg_expr non_empty_mixture 
 	{($1,$2)}
 | non_empty_mixture 
-	{(Ast.FLOAT (1.,Misc.no_pos),$1)}
+	{(Ast.FLOAT (1.,Tools.no_pos),$1)}
 ;
 
 non_empty_mixture:
 | OP_PAR non_empty_mixture CL_PAR
 	{$2}
-| agent_expression COMMA non_empty_mixture 
-	{Ast.COMMA ($1,$3)}
-| agent_expression DOT non_empty_mixture 
-	{Ast.DOT (-1,$1,$3)}
-| agent_expression DOT_RADIUS non_empty_mixture 
-	{Ast.DOT ($2,$1,$3)}
-| agent_expression PLUS non_empty_mixture 
-	{Ast.PLUS (-1,$1,$3)}
-| agent_expression PLUS_RADIUS non_empty_mixture 
-	{Ast.PLUS ($2,$1,$3)}
+| non_empty_mixture COMMA agent_expression 
+	{Ast.COMMA ($3,$1)}
+| non_empty_mixture DOT agent_expression 
+	{Ast.DOT (-1,$3,$1)}
+| non_empty_mixture DOT_RADIUS agent_expression  
+	{Ast.DOT ($2,$3,$1)}
+| non_empty_mixture PLUS agent_expression  
+	{Ast.PLUS (-1,$3,$1)}
+| non_empty_mixture PLUS_RADIUS agent_expression 
+	{Ast.PLUS ($2,$3,$1)}
 | agent_expression 
 	{Ast.COMMA($1,Ast.EMPTY_MIX)}
 ;
@@ -280,8 +280,8 @@ interface_expression:
 ;
 
 ne_interface_expression:
-| port_expression COMMA ne_interface_expression 
-	{Ast.PORT_SEP($1,$3)}
+| ne_interface_expression COMMA port_expression
+	{Ast.PORT_SEP($3,$1)}
 | port_expression  
 	{Ast.PORT_SEP($1,Ast.EMPTY_INTF)}
 ;
@@ -313,3 +313,5 @@ link_state:
 | KAPPA_LNK error 
 	{raise (ExceptionDefn.Syntax_Error "Invalid link state")}
 ;
+
+%%

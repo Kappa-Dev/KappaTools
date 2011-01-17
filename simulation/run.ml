@@ -1,5 +1,5 @@
 open Mods
-open Misc
+open Tools
 open ExceptionDefn
 open Random_tree
 
@@ -64,8 +64,9 @@ let event state counter plot env =
 	let env,state,pert_ids' = 
 		match opt_new_state with
 			| Some ((env,state,side_effect,phi,psi,pert_ids),r_id) -> 
+				let phi' = Array.init (Array.length phi) (fun i -> match phi.(i) with Some inj -> Some (Injection.copy inj) | None -> None) in (*Not optimal but avoids bug caused by reusing embedding when a rule is activating oneself*)
 				let env,state,pert_ids' = 
-					State.positive_update state (State.rule_of_id r_id state) (phi,psi) (side_effect,Int2Set.empty) counter env
+					State.positive_update state (State.rule_of_id r_id state) (phi',psi) (side_effect,Int2Set.empty) counter env
 				in
 					(env,state,IntSet.union pert_ids pert_ids')
 			| None ->

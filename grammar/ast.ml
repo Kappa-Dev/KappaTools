@@ -1,81 +1,79 @@
-open Misc
-
 type alg_expr = 
-		MULT of alg_expr * alg_expr * position
-	| SUM of alg_expr * alg_expr * position
-	| DIV of alg_expr * alg_expr * position
-	| MINUS of alg_expr * alg_expr * position
-	| POW of alg_expr * alg_expr * position
-	| MODULO of alg_expr * alg_expr * position
-	| LOG of alg_expr * position
-	| SQRT of alg_expr * position
-	| EXP of alg_expr * position
-	| SINUS of alg_expr * position
-	| COSINUS of alg_expr * position
-	| TAN of alg_expr * position
-	| ABS of alg_expr * position
-	| TIME_VAR of position
-	| EVENT_VAR of position
-	| OBS_VAR of (string * position)
-	| FLOAT of float * position
-	| TMAX of position
-	| EMAX of position
-	| INFINITY of position
+		MULT of alg_expr * alg_expr * Tools.pos
+	| SUM of alg_expr * alg_expr * Tools.pos
+	| DIV of alg_expr * alg_expr * Tools.pos
+	| MINUS of alg_expr * alg_expr * Tools.pos
+	| POW of alg_expr * alg_expr * Tools.pos
+	| MODULO of alg_expr * alg_expr * Tools.pos
+	| LOG of alg_expr * Tools.pos
+	| SQRT of alg_expr * Tools.pos
+	| EXP of alg_expr * Tools.pos
+	| SINUS of alg_expr * Tools.pos
+	| COSINUS of alg_expr * Tools.pos
+	| TAN of alg_expr * Tools.pos
+	| ABS of alg_expr * Tools.pos
+	| TIME_VAR of Tools.pos
+	| EVENT_VAR of Tools.pos
+	| OBS_VAR of (string * Tools.pos)
+	| FLOAT of float * Tools.pos
+	| TMAX of Tools.pos
+	| EMAX of Tools.pos
+	| INFINITY of Tools.pos
 
 type bool_expr =
-	| TRUE of position
-	| FALSE of position
-	| AND of bool_expr * bool_expr * position
-	| OR of bool_expr * bool_expr * position
-	| GREATER of alg_expr * alg_expr * position
-	| SMALLER of alg_expr * alg_expr * position
-	| EQUAL of alg_expr * alg_expr * position
-	| NOT of bool_expr * position
+	| TRUE of Tools.pos
+	| FALSE of Tools.pos
+	| AND of bool_expr * bool_expr * Tools.pos
+	| OR of bool_expr * bool_expr * Tools.pos
+	| GREATER of alg_expr * alg_expr * Tools.pos
+	| SMALLER of alg_expr * alg_expr * Tools.pos
+	| EQUAL of alg_expr * alg_expr * Tools.pos
+	| NOT of bool_expr * Tools.pos
 
 type mixture = 
 	| COMMA of agent * mixture 
 	| DOT of int * agent * mixture 
 	| PLUS of int * agent * mixture 
 	| EMPTY_MIX
-and agent = {ag_nme:string ; ag_intf:interface ; ag_pos:position}
+and agent = {ag_nme:string ; ag_intf:interface ; ag_pos:Tools.pos}
 and interface = PORT_SEP of port * interface | EMPTY_INTF
-and port = {port_nme:string ; port_int: internal ; port_lnk : link ; port_pos : position}
+and port = {port_nme:string ; port_int: internal ; port_lnk : link ; port_pos : Tools.pos}
 and internal = string list
 and link = 
-	| LNK_VALUE of (int * position)
+	| LNK_VALUE of (int * Tools.pos)
 	| FREE 
-	| LNK_ANY of position 
-	| LNK_SOME of position
-	| LNK_TYPE of ((string * position) * (string * position))
+	| LNK_ANY of Tools.pos 
+	| LNK_SOME of Tools.pos
+	| LNK_TYPE of ((string * Tools.pos) * (string * Tools.pos))
 
 type rule = {lhs: mixture ; arrow:arrow ; rhs:mixture; k_def:alg_expr ; k_un:alg_expr option}
-and arrow = RAR | RAR_NOPOLY of position
-type rule_label = {lbl_nme:(string * position) option ; lbl_ref:(string * position) option}
+and arrow = RAR | RAR_NOPOLY of Tools.pos
+type rule_label = {lbl_nme:(string * Tools.pos) option ; lbl_ref:(string * Tools.pos) option}
 
-type perturbation = bool_expr * modif_expr * position * bool_expr option
+type perturbation = bool_expr * modif_expr * Tools.pos * bool_expr option
 and modif_expr = 
-	| INTRO of (alg_expr * mixture * position) 
-	| DELETE of (alg_expr * mixture * position) 
-	| UPDATE of (string * position * alg_expr * position) (*TODO: pause*)
-	| STOP of position
-	| SNAPSHOT of position (*maybe later of mixture too*)
+	| INTRO of (alg_expr * mixture * Tools.pos) 
+	| DELETE of (alg_expr * mixture * Tools.pos) 
+	| UPDATE of (string * Tools.pos * alg_expr * Tools.pos) (*TODO: pause*)
+	| STOP of Tools.pos
+	| SNAPSHOT of Tools.pos (*maybe later of mixture too*)
 
 type instruction = 
-	| SIG of agent * position 
-	| INIT of int * mixture * position
+	| SIG of agent * Tools.pos 
+	| INIT of int * mixture * Tools.pos
 	| DECLARE of variable
 	| OBS of variable  (*for backward compatibility*)
 	| PLOT of alg_expr
 	| PERT of perturbation
 and variable =
-	| VAR_KAPPA of (mixture * (string * position))
-	| VAR_ALG of (alg_expr * (string * position))
+	| VAR_KAPPA of (mixture * (string * Tools.pos))
+	| VAR_ALG of (alg_expr * (string * Tools.pos))
 
 type compil = {variables : variable list; (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
-							 signatures : (agent * position) list ; (*agent signature declaration*)
+							 signatures : (agent * Tools.pos) list ; (*agent signature declaration*)
 							 rules : (rule_label * rule) list ; (*rules (possibly named)*)
 							 observables : alg_expr list ; (*list of patterns to plot*) 
-							 init : (int * mixture * position) list ; (*initial graph declaration*)
+							 init : (int * mixture * Tools.pos) list ; (*initial graph declaration*)
 							 perturbations : perturbation list
 							}
 

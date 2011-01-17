@@ -1,7 +1,7 @@
 open Mods
 open Mixture
 open Dynamics
-open Misc
+open Tools
 open Ast
 
 type context =
@@ -9,7 +9,7 @@ type context =
 	}
 
 and link =
-	| Closed | Semi of int * int * position
+	| Closed | Semi of int * int * pos
 
 let eval_intf ast_intf =
 	let rec iter ast_intf map =
@@ -22,7 +22,7 @@ let eval_intf ast_intf =
 					raise (ExceptionDefn.Semantics_Error (p.Ast.port_pos,"Site '" ^ p.Ast.port_nme ^ "' is used multiple times"))
 				else	
 					iter ast_interface (StringMap.add p.Ast.port_nme (int_state_list, lnk_state, (p.Ast.port_pos)) map)
-		| Ast.EMPTY_INTF -> StringMap.add "_" ([], Ast.FREE, Misc.no_pos) map
+		| Ast.EMPTY_INTF -> StringMap.add "_" ([], Ast.FREE, no_pos) map
 	in (*Adding default existential port*) iter ast_intf StringMap.empty
 
 let eval_node env a link_map node_map node_id = 
@@ -101,7 +101,7 @@ let nodes_of_ast env ast_mixture =
 						| Some (_,_,pos) -> raise (ExceptionDefn.Semantics_Error (pos,Printf.sprintf "Edge identifier %d is dangling" i))
 				) link_map ;
 				node_map
-			| _ -> raise (ExceptionDefn.Semantics_Error (Misc.no_pos,"Invalid initial conditions"))
+			| _ -> raise (ExceptionDefn.Semantics_Error (no_pos,"Invalid initial conditions"))
 	in
 	iter ast_mixture IntMap.empty 0 IntMap.empty
 					
@@ -416,7 +416,7 @@ let mixture_of_ast mix_id_opt is_pattern env ast_mix =
 							in raise (ExceptionDefn.Semantics_Error (pos, msg))
 		)
 		ctxt.pairing;
-		let mix = Mixture.enum_alternate_anchors mix in (mix,env)
+		let mix = Mixture.enum_alternate_anchors mix in (mix,env) (*Modifies mix as a side effect*)
 	end
 
 let signature_of_ast s env =

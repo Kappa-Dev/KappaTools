@@ -191,7 +191,7 @@ struct
 						else
 							(let (str, c) =
 									Node.to_string with_lift (hsh_lnk, (!fresh)) node env
-								in (fresh := c; print_string str; print_newline ())))
+								in (fresh := c; print_string ("#"^str); print_newline ())))
 			sg
 
 end

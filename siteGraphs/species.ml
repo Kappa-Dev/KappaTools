@@ -225,7 +225,7 @@ let dump_table table env =
 					List.iter
 						(fun (spec, k) ->
 									Printf.printf "%d instances of species: %s\n" k (to_string spec env);
-									Printf.printf "with signature %s\n" (Misc.string_of_map Int64.to_string (fun _ -> "") Int64Map.fold spec.views) ;
+									Printf.printf "with signature %s\n" (Tools.string_of_map Int64.to_string (fun _ -> "") Int64Map.fold spec.views) ;
 									Printf.printf "******\n"
 						) specs
 		) table

@@ -1,6 +1,6 @@
 open Graph
 open Mods
-open Misc
+open Tools
 open Mixture
 open ExceptionDefn
 
@@ -27,7 +27,7 @@ let component ?(check_additional_edges=true) ?(already_done=Int2Set.empty) embed
 		match queue with
 			| [] -> (part_embedding,port_map)
 			| (a_i,n_j)::tl ->
-				if Int2Set.mem (a_i,n_j) already_done then raise False (*to avoid adding twice the same embedding*)
+				if Int2Set.mem (a_i,n_j) already_done then (Debug.tag "here" ; raise False) (*to avoid adding twice the same embedding*)
 				else
 					let node_j = try SiteGraph.node_of_id sg n_j with Not_found -> invalid_arg "Matching.component: not a valid node address" 
 					and ag_i = try Mixture.agent_of_id a_i mix with Not_found -> invalid_arg "Matching.component: not a valid agent identifier"

@@ -35,6 +35,7 @@ let id = (['a'-'z' 'A'-'Z' '0'-'9'] ['a'-'z' 'A'-'Z' '0'-'9' '_' '-']*)
 let internal_state = '~' (['0'-'9' 'a'-'z' 'A'-'Z']+)
 let dot_radius = '.' '{' (['0'-'9']+) '}'
 let plus_radius = '+' '{' (['0'-'9']+) '}'
+let pert = '$' id
 
 rule token = parse
     | "\\\n" {incr_line lexbuf ; token lexbuf}
@@ -45,15 +46,14 @@ rule token = parse
 		| "||" {let pos = position lexbuf in OR pos}
     | "->" {KAPPA_RAR}
 		| "->!" {let pos = position lexbuf in KAPPA_NOPOLY pos}
-		| "$" {let lab = read_label "" [' ';'\n';'\t'] lexbuf in 
-						let pos = position lexbuf in 
-							match lab with
-								| "DEL" -> (DELETE pos)
-								| "ADD" -> (INTRO pos)
-								| "SNAPSHOT" -> (SNAPSHOT pos) 
-								| "STOP" -> (STOP pos) 
-								| _ as s -> return_error lexbuf ("Perturbation effect \""^s^"\" is not defined")
-					 }  
+		| pert as s {let pos = position lexbuf in
+									match s with  
+						 			| "$DEL" -> (DELETE pos)
+									| "$ADD" -> (INTRO pos)
+									| "$SNAPSHOT" -> (SNAPSHOT pos) 
+									| "$STOP" -> (STOP pos) 
+									| s -> return_error lexbuf ("Perturbation effect \""^s^"\" is not defined")
+					 			}  
 		| '[' {let lab = read_label "" [']'] lexbuf in 
 						let pos = position lexbuf in 
 							match lab with
@@ -151,8 +151,8 @@ rule token = parse
 		let lexbuf = Lexing.from_channel d in
 		lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = fic} ;
 		try
-	   	KappaParser.line token lexbuf ; close_in d ;
-			Debug.tag fic;
+			Debug.tag (Printf.sprintf "Parsing %s..." fic) ;
+	   	KappaParser.start_rule token lexbuf ; Debug.tag "done" ; close_in d ;
 			Parameter.openInDescriptors := List.tl (!Parameter.openInDescriptors)
  		with 
  			| Syntax_Error msg -> 
@@ -160,4 +160,5 @@ rule token = parse
 				Parameter.openInDescriptors := List.tl (!Parameter.openInDescriptors) ; 
 				return_error lexbuf msg
 				) 
+			| exn -> (Printexc.print_backtrace stderr ; raise exn)
 }

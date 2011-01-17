@@ -15,6 +15,7 @@ module type GenArray =
 		val fill: 'a t -> int -> int -> 'a -> unit
 		val of_list: 'a list -> 'a t
 		val iter: ('a -> unit) -> 'a t -> unit
+		val blit: 'a t -> int -> 'a t -> int -> int -> unit 
 	end)
 
 module GenArray =
@@ -189,8 +190,6 @@ module GenArray =
 				in
 				aux 0 start
 		
-		let blit x = failwith "Big_array.blit is not implemented"
-		
 		let of_list l =
 			match l with [] -> Unary [||]
 			|	t:: q ->
@@ -237,6 +236,22 @@ module GenArray =
 		let iteri = geni Array.iteri Array.iteri (fun _ -> ()) (fun _ -> ())
 		let mapi = geni Array.mapi Array.mapi (fun x -> Unary x) (fun x -> Binary x)
 		
+		let blit a1 ofs1 a2 ofs2 len =
+			if len < 0 || ofs1 < 0 || ofs1 > length a1 - len
+             || ofs2 < 0 || ofs2 > length a2 - len
+  		then invalid_arg "Array.blit"
+  		else 
+				if ofs1 < ofs2 then
+			    (* Top-down copy *)
+			    for i = len - 1 downto 0 do
+			      set a2 (ofs2 + i) (get a1 (ofs1 + i))
+			    done
+			  else
+			    (* Bottom-up copy *)
+			    for i = 0 to len - 1 do
+			      set a2 (ofs2 + i) (get a1 (ofs1 + i))
+			    done
+							
 		let fold_left f init a =
 			match a
 			with Unary a -> Array.fold_left f init a

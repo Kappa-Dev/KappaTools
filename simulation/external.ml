@@ -1,6 +1,6 @@
 open Dynamics
 open State
-open Misc
+open Tools
 open ExceptionDefn
 open Graph
 open Mods
@@ -28,13 +28,7 @@ let eval_abort_pert just_applied pert state counter env =
 let apply_effect p_id pert state counter env =
 	let snapshot () =
 		if !Parameter.debugModeOn then Debug.tag "Taking a snapshot of current state" ;
-		let filename = 
-			((!Parameter.outputDirName)
-			^(Parameter.dir_sep)
-			^(!Parameter.snapshotFileName)
-			^"_"
-			^(string_of_int (Counter.event counter)
-			)) 
+		let filename = !Parameter.snapshotFileName^"_"^(string_of_int (Counter.event counter)) 
 		in
 		let file_exists = ref true in
 		let cpt = ref 1 in
@@ -145,7 +139,7 @@ let apply_effect p_id pert state counter env =
 			| STOP ->
 				(if !Parameter.debugModeOn then Debug.tag "Interrupting simulation now!" ;
 				snapshot () ;
-				raise (ExceptionDefn.UserInterrupted (Printf.sprintf "STOP instruction was satisfied at event %d" (Counter.event counter)))
+				raise (ExceptionDefn.StopReached (Printf.sprintf "STOP instruction was satisfied at event %d" (Counter.event counter)))
 				)
 				
 

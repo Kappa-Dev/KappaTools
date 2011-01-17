@@ -1,4 +1,5 @@
-type position = string*int*int
+type pos = string*int*int
+
 let ln (_,i,_) = i
 let cn (_,_,j) = j
 let fn (n,_,_) = n
@@ -14,9 +15,11 @@ let string_of_set f fold set =
     Printf.sprintf "{%s}" (String.concat "," l)
 
 
-let string_of_map f1 f2 fold map = 
+let string_of_map ?(swap=false) f1 f2 fold map = 
   let l = 
-    fold (fun i j cont -> ((f1 i)^"->"^(f2 j))::cont) map [] 
+    fold (fun i j cont -> 
+			if swap then ((f2 j)^"->"^(f1 i))::cont
+			else ((f1 i)^"->"^(f2 j))::cont) map [] 
   in
     Printf.sprintf "[%s]" (String.concat "," l)
 

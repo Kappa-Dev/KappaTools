@@ -26,10 +26,20 @@ let (timeIncrementValue:float option ref) = ref None
 (*Name convention*)
 let outputDirName = ref (Sys.getcwd ())
 let snapshotFileName = ref "snap"
-let dir_sep = match Sys.os_type with
-	| "Unix" | "Cygwin" -> "/"
-	| _ -> "\\" (*Filename.dir_sep*) (* only if ocaml >= 3.11.2 otherwise use "/" *)
-let dumpFileName = "dump.ka"
+let dir_sep = Filename.dir_sep (* only if ocaml >= 3.11.2 otherwise use "/" *)
+let dumpFileName = ref "dump.ka"
+let influenceFileName = ref ""
+let outputDataName = ref "data.out"
+let inputKappaFileNames:(string list ref) = ref [] 
+
+let setOutputName () = 
+	let set name = 
+		if !name <> "" then name := Filename.concat !outputDirName !name
+	in
+	set snapshotFileName ;
+	set dumpFileName ;
+	set influenceFileName ;
+	set outputDataName 
 
 let (openOutDescriptors:out_channel list ref) = ref []
 let (openInDescriptors:in_channel list ref) = ref []

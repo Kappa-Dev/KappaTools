@@ -3,7 +3,7 @@
 ## put here the names of your source files (in the right order)
 SOURCES = main/parameter.ml \
 		dataStructures/largeArray.ml dataStructures/memoryManagement.ml dataStructures/longString.ml dataStructures/heap.ml  \
-		dataStructures/misc.ml dataStructures/mapExt.ml dataStructures/valMap.ml dataStructures/mods.ml dataStructures/random_tree.ml \
+		dataStructures/tools.ml dataStructures/mapExt.ml dataStructures/valMap.ml dataStructures/mods.ml dataStructures/random_tree.ml \
 		dataStructures/liftSet.ml\
 		Error/debug.ml Error/ExceptionDefn.ml \
 		grammar/ast.ml grammar/kappaParser.mly grammar/kappaLexer.mll \
@@ -13,7 +13,7 @@ SOURCES = main/parameter.ml \
 		siteGraphs/graph.ml siteGraphs/species.ml pattern/matching.ml pattern/dynamics.ml \
 		grammar/eval.mli simulation/state.ml simulation/external.ml grammar/eval.ml  \
 		simulation/plot.ml simulation/b3.ml simulation/run.ml\
-		main/fileName.ml main/main.ml 
+		main/main.ml 
 
 ## the name of the resulting executable
 RESULT  = KaSim
@@ -29,12 +29,12 @@ all: nc
 ##uncomment the line below and set value below according to the location of your ocaml compilers 
 ##(usually /usr/bin/ under linux and /sw/bin under MAC OS X)
 
-OCAMLBINPATH = /sw/bin/
+OCAMLBINPATH = /opt/local/bin/
 
 OCAMLCP = $(OCAMLBINPATH)ocamlcp
 OCAMLLEX = $(OCAMLBINPATH)ocamllex
-OCAMLYACC = $(OCAMLBINPATH)ocamlyacc
-OCAMLC = $(OCAMLBINPATH)ocamlc.opt
+OCAMLYACC = $(OCAMLBINPATH)menhir
+OCAMLC = $(OCAMLBINPATH)ocamlc.opt 
 OCAMLOPT = $(OCAMLBINPATH)ocamlopt.opt #-g -ccopt -g
 OCAMLDEP = $(OCAMLBINPATH)ocamldep
 CC = gcc

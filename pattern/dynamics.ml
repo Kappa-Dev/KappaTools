@@ -1,5 +1,5 @@
 open Mods
-open Misc
+open Tools
 open ExceptionDefn
 open Graph
 
@@ -56,7 +56,7 @@ let diff m0 m1 label_opt env =
 			IdMap.add id (Int2Set.add site_type set) map
 	in
 	let side_effect = ref false in
-	let label = match label_opt with Some (_,pos) -> (Misc.string_of_pos pos) | None -> "" in
+	let label = match label_opt with Some (_,pos) -> (string_of_pos pos) | None -> "" in
 	let id_preserving ag1 ag2 = (*check whether ag2 can be the residual of ag1 for (same name, same sites)*)
 		if not (Mixture.name ag1 = Mixture.name ag2) then false
 		else
@@ -436,13 +436,8 @@ let enable r mix env =
 										| Some (i,j) -> 
 											if Int2Set.mem (i,j) already_done then (glueings,already_done) 
 											else
-												begin
-													if !Parameter.debugModeOn then Debug.tag 
-													(Printf.sprintf "%s can be glued to var[%d] by %s" 
-													r.kappa (Mixture.get_id mix) (Misc.string_of_map string_of_int string_of_int IntMap.fold map)) ;
-													let already_done = IntMap.fold (fun i j set -> Int2Set.add (i,j) set) map already_done in
-													(map::glueings,already_done)
-												end 
+												let already_done = IntMap.fold (fun i j set -> Int2Set.add (i,j) set) map already_done in
+												(map::glueings,already_done) 
 								end
 							| None -> (glueings,already_done)
 				else (glueings,already_done)

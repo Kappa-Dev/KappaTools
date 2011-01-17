@@ -1,5 +1,5 @@
 open Mods
-open Misc
+open Tools
 open ExceptionDefn
 
 type t = (int*int*view,Int2Set.t) Hashtbl.t

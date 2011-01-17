@@ -1,7 +1,7 @@
 open Mods
 open ExceptionDefn
 open Ast
-open Misc
+open Tools
 
 type agent = {name:int ; interface : (int option * Node.lnk_t) IntMap.t}
 type covering = {span: (int*int) Int2Map.t ; internal: (int*int) Int2Map.t} 
@@ -89,30 +89,6 @@ let size_of_cc cc_id mix =
 		mix.size_of_cc.(cc_id)
 	with
 		| Invalid_argument msg -> invalid_arg ("Mixture.size_of_cc "^msg)
-
-let to_nodes env mix =
-	try
-		let agent_to_node agent =
-			Node.create ~with_interface:agent.interface agent.name env 
-		in
-		let nodes = 
-			IntMap.fold 
-			(fun i ag_pat map -> 
-				IntMap.add i (agent_to_node ag_pat) map
-			) mix.agents IntMap.empty
-		in 
-		Int2Map.iter 
-		(fun (a,i) (b,j) ->
-			if a<b or (a=b && i<j) then  
-				let node_a = try IntMap.find a nodes with Not_found -> invalid_arg "Mixture.to_nodes 1"
-				and node_b = try IntMap.find b nodes with Not_found -> invalid_arg "Mixture.to_nodes 2"
-				in
-					Node.set_ptr (node_a,i) (Node.Ptr (node_b,j)) ;
-					Node.set_ptr (node_b,j) (Node.Ptr (node_a,i))
-		) 
-		mix.graph ;
-		nodes
-	with Not_found -> invalid_arg "Mixture.to_nodes: not found"
 	
 let compose id agent mixture new_edges cstr = 
 	let graph,site_num = 
@@ -312,7 +288,7 @@ let dump_span mix =
 			(fun root_id cov ->
 					Printf.printf "SPTR[%d]: " root_id;
 					let str =
-						Misc.string_of_map 
+						string_of_map 
 						(fun (i,j) -> Printf.sprintf "(%d,%d)" i j) 
 						(fun (i,j) -> Printf.sprintf "(%d,%d)" i j) 
 						Int2Map.fold cov.span

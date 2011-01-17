@@ -85,8 +85,8 @@ let to_string with_detail (hsh_lnk,fresh) node env =
 								let (m,c) = Injection.get_coordinate inj in
 								Printf.sprintf "(%s,%s,%s)" (string_of_int m) (string_of_int c) s_a 
 						in
-							let lift_int = Misc.string_of_set string_of_lift LiftSet.fold lifts_int
-							and lift_lnk = Misc.string_of_set string_of_lift LiftSet.fold lifts_lnk
+							let lift_int = Tools.string_of_set string_of_lift LiftSet.fold lifts_int
+							and lift_lnk = Tools.string_of_set string_of_lift LiftSet.fold lifts_lnk
 							in
 								if with_detail then
 									((Printf.sprintf "%s%s%s%s%s" s_i s_int lift_int s_lnk lift_lnk)::cont,fresh)
@@ -152,7 +152,7 @@ let bit_encode node env =
 					| Some i -> 
 						if i>n then invalid_arg "Node.bit_encode"
 						else
-							let offset = Misc.bit_rep_size n in
+							let offset = Tools.bit_rep_size n in
 							let bit_rep = Int64.shift_left bit_rep offset in
 							(tot_offset := !tot_offset + offset ;
 							Int64.logor bit_rep (Int64.of_int i))
@@ -162,7 +162,7 @@ let bit_encode node env =
 					| Null -> (tot_offset := !tot_offset + 1 ; Int64.shift_left bit_rep 1)
 		) node Int64.zero
 	in
-	let offset = Misc.bit_rep_size (Environment.name_number env) in
+	let offset = Tools.bit_rep_size (Environment.name_number env) in
 	tot_offset := !tot_offset + offset ; 
 	if !tot_offset > 63 then invalid_arg "Node.bit_encode: Cannot encode view in one word"
 	else 

@@ -151,7 +151,7 @@ let declare_sig sign pos env =
 let declare_var_kappa ?(from_rule=false) label_pos_opt env =
 	let label,pos = match label_pos_opt with
 		| Some (label,pos) -> (label,pos)
-		| None -> ("%anonymous"^(string_of_int env.fresh_kappa),Misc.no_pos) (*geek*)
+		| None -> ("%anonymous"^(string_of_int env.fresh_kappa),Tools.no_pos) (*geek*)
 	in 
 	let already_defined = 
 		(try let _ = num_of_kappa label env in true with Not_found -> false)
