@@ -30,20 +30,36 @@ let eval_node env a link_map node_map node_id =
 	and ag_name = a.Ast.ag_nme 
 	and pos_ag = a.Ast.ag_pos
 	in
-	let name_id = 
-		try Environment.num_of_name ag_name env with 
-			| Not_found -> raise (ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared")) 
+	Debug.tag (Printf.sprintf "Node %d is of type %s" node_id ag_name) ;
+	let env,name_id = 
+		try (env,Environment.num_of_name ag_name env) with 
+			| Not_found -> 
+				if !Parameter.implicitSignature then (Environment.declare_name ag_name pos_ag env)
+				else raise (ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared")) 
 	in
-	let sign = Environment.get_sig name_id env in
-	let rec build_intf ast link_map intf bond_list = 
+	let env,sign = 
+		try (env,Environment.get_sig name_id env) with 
+			| Not_found -> 
+				if !Parameter.implicitSignature then 
+					let sign = Signature.create name_id (StringMap.add "_" ([], Ast.FREE, no_pos) StringMap.empty) in (Environment.declare_sig sign pos_ag env,sign)
+				else raise (ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared"))
+	in
+	
+	(*Begin sub function*)
+	let rec build_intf ast link_map intf bond_list sign = 
 		match ast with
 			| Ast.PORT_SEP (p,ast') ->
 				begin
 				let int_state_list = p.Ast.port_int
 				and lnk_state = p.Ast.port_lnk
-				and port_id = 
-					try Signature.num_of_site p.Ast.port_nme sign with 
-						Not_found -> raise (ExceptionDefn.Semantics_Error (p.Ast.port_pos,"Site '" ^ p.Ast.port_nme ^ "' is not declared")) 
+				and port_id,sign = 
+					try (Signature.num_of_site p.Ast.port_nme sign,sign) with 
+						Not_found -> 
+							if !Parameter.implicitSignature then
+								let sign = Signature.add_site p.Ast.port_nme sign in
+								(Signature.num_of_site p.Ast.port_nme sign,sign)
+							else
+								raise (ExceptionDefn.Semantics_Error (p.Ast.port_pos,"Site '" ^ p.Ast.port_nme ^ "' is not declared")) 
 				in
 				let link_map,bond_list = 
 					match lnk_state with
@@ -62,17 +78,24 @@ let eval_node env a link_map node_map node_id =
 						| _ -> raise (ExceptionDefn.Semantics_Error (p.Ast.port_pos,"Site '" ^ p.Ast.port_nme ^ "' is partially defined"))
 				in
 				match int_state_list with
-					| [] -> build_intf ast' link_map (IntMap.add port_id (None,Node.WLD) intf) bond_list
+					| [] -> build_intf ast' link_map (IntMap.add port_id (None,Node.WLD) intf) bond_list sign
 					| s::_ -> 
-						let i = try Signature.num_of_internal_state p.Ast.port_nme s sign with
-							Not_found -> raise (ExceptionDefn.Semantics_Error (p.Ast.port_pos,"Internal state of site'" ^ p.Ast.port_nme ^ "' is not defined"))
+						let i,sign = 
+							try (Signature.num_of_internal_state p.Ast.port_nme s sign,sign) with 
+								| Not_found -> 
+									if !Parameter.implicitSignature then
+										let sign,i = Signature.add_internal_state s port_id sign in
+										(i,sign)	
+									else 
+										raise (ExceptionDefn.Semantics_Error (p.Ast.port_pos,"Internal state of site'" ^ p.Ast.port_nme ^ "' is not defined"))
 						in
-						build_intf ast' link_map (IntMap.add port_id (Some i,Node.WLD) intf) bond_list (*Geekish, adding Node.WLD to be consistent with Node.create*)
+						build_intf ast' link_map (IntMap.add port_id (Some i,Node.WLD) intf) bond_list sign (*Geekish, adding Node.WLD to be consistent with Node.create*)
 				end
-		| Ast.EMPTY_INTF -> (bond_list,link_map,intf)
+		| Ast.EMPTY_INTF -> let env = if !Parameter.implicitSignature then Environment.declare_sig sign pos_ag env else env in (bond_list,link_map,intf,env)
 	in
+	(*end sub function*)
 	
-	let bond_list,link_map,intf = build_intf ast_intf link_map IntMap.empty [] in
+	let (bond_list,link_map,intf,env) = build_intf ast_intf link_map IntMap.empty [] sign in
 	let node = Node.create ~with_interface:intf name_id env in (*check what one gives to Node.create*) 
 	let node_map = IntMap.add node_id node node_map in
 	List.iter 
@@ -85,14 +108,14 @@ let eval_node env a link_map node_map node_id =
 		Node.set_ptr (node_i,pi) (Node.Ptr (node_j,pj)) 
 		with Not_found -> invalid_arg "Eval.eval_node"
 	) bond_list ; 
-	(node_map,link_map)
+	(node_map,link_map,env)
 
 let nodes_of_ast env ast_mixture =
-	let rec iter ast_mixture node_map node_id link_map =  
+	let rec iter ast_mixture node_map node_id link_map env =  
 		match ast_mixture with
 			| Ast.COMMA (a, ast_mix) ->
-					let (node_map,link_map) = eval_node env a link_map node_map node_id in
-						iter ast_mix node_map (node_id+1) link_map
+					let (node_map,link_map,env) = eval_node env a link_map node_map node_id in
+						iter ast_mix node_map (node_id+1) link_map env
 			| Ast.EMPTY_MIX -> 
 				IntMap.iter 
 				(fun i opt ->
@@ -100,50 +123,37 @@ let nodes_of_ast env ast_mixture =
 						| None -> () 
 						| Some (_,_,pos) -> raise (ExceptionDefn.Semantics_Error (pos,Printf.sprintf "Edge identifier %d is dangling" i))
 				) link_map ;
-				node_map
+				(node_map,env)
 			| _ -> raise (ExceptionDefn.Semantics_Error (no_pos,"Invalid initial conditions"))
 	in
-	iter ast_mixture IntMap.empty 0 IntMap.empty
+	iter ast_mixture IntMap.empty 0 IntMap.empty env
 					
 let eval_agent is_pattern env a ctxt =
 	let (ag_name, ast_intf, pos_ag) = ((a.Ast.ag_nme), (a.Ast.ag_intf), (a.Ast.ag_pos)) in
-	let name_id,env = 
-		try (Environment.num_of_name ag_name env,env) with 
-		| Not_found -> 
-				if !Parameter.implicitSignature then 
-					let env,id = Environment.declare_name ag_name pos_ag env in 
-					(id,env)
-				else 
-					raise (ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared"))
+	let name_id = 
+		try Environment.num_of_name ag_name env with 
+		| Not_found -> raise (ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared"))
 	in
 	let sign_opt =
 		try Some (Environment.get_sig name_id env) with Not_found -> None in
-	let sign,env =
+	let sign =
 		match sign_opt with
-		| Some s -> (s,env)
-		| None ->
-			if !Parameter.implicitSignature then
-				let sign = Signature.create name_id StringMap.empty in (sign,Environment.declare_sig sign pos_ag env)
-			else
-				raise	(ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared")) 
+		| Some s -> s
+		| None ->	raise	(ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared")) 
 	in
 	let port_map = eval_intf ast_intf in
 	let (interface, ctxt, sign) =
 		StringMap.fold
 			(fun site_name (int_state_list, lnk_state, pos_site) (interface, ctxt, sign)->
 				
-				let site_id,sign =
-					try (Signature.num_of_site site_name sign,sign)
+				let site_id =
+					try Signature.num_of_site site_name sign
 					with
 					| Not_found ->
-						if !Parameter.implicitSignature then
-							let sign = Signature.add_site site_name sign in
-							(Signature.num_of_site site_name sign,sign)
-						else
-							let msg =
-								"Eval.eval_agent: site '" ^	(site_name ^ ("' is not defined for agent '" ^ ag_name ^"'"))
-							in 
-							raise (ExceptionDefn.Semantics_Error (pos_site, msg))
+						let msg =
+							"Eval.eval_agent: site '" ^	(site_name ^ ("' is not defined for agent '" ^ ag_name ^"'"))
+						in 
+						raise (ExceptionDefn.Semantics_Error (pos_site, msg))
 				in
 				let int_s,sign =
 					match int_state_list with
@@ -161,71 +171,73 @@ let eval_agent is_pattern env a ctxt =
 									(Some i,sign)	 
 								else raise exn
 				in
-				
-				match lnk_state with
-				| Ast.LNK_VALUE (n, pos) ->
-						let lnk =
-							(try Some (IntMap.find n ctxt.pairing)
-							with | Not_found -> None)
-						in
-						(match lnk with
-							| Some (Semi (b, j, _)) ->
-									((IntMap.add site_id (int_s, Node.BND) interface),
-										{ctxt	with
-											pairing = IntMap.add n Closed ctxt.pairing;
-											new_edges =
-												Int2Map.add ((ctxt.curr_id), site_id) (b, j)
-													ctxt.new_edges;
-										},sign)
-							| Some Closed ->
-									let msg =
-										"edge identifier " ^
-										((string_of_int n) ^ " is used too many times")
-									in raise (ExceptionDefn.Semantics_Error (pos, msg))
-							| None ->
-									((IntMap.add site_id (int_s, Node.BND) interface),
-										{
-											(ctxt)
-											with
-											pairing =
-												IntMap.add n (Semi (ctxt.curr_id, site_id, pos))
-													ctxt.pairing;
-										},sign)
-					)
-				| Ast.LNK_SOME pos ->
-						if is_pattern
-						then ((IntMap.add site_id (int_s, Node.BND) interface), ctxt,sign)
-						else
-							(let msg = "illegal use of '_' in concrete graph definition"
-								in raise (ExceptionDefn.Semantics_Error (pos, msg)))
-				| Ast.LNK_ANY pos ->
-						if is_pattern
-						then ((IntMap.add site_id (int_s, Node.WLD) interface), ctxt, sign)
-						else
-							(let msg =
-									"illegal use of wildcard '?' in concrete graph definition"
-								in raise (ExceptionDefn.Semantics_Error (pos, msg)))
-				| Ast.FREE ->
-						((IntMap.add site_id (int_s, Node.FREE) interface), ctxt, sign)
-				| Ast.LNK_TYPE ((ste_nm, pos_ste), (ag_nm, pos_ag)) ->
-						if is_pattern then
-							(let site_num =
-									try Environment.id_of_site ag_nm ste_nm env
-									with
-									| Not_found -> raise (ExceptionDefn.Semantics_Error (pos_ste, "binding type is not compatible with agent's signature"))
-								in
-								let ag_num = 
-									try Environment.num_of_name ag_nm env with
-										| Not_found -> raise
-												(ExceptionDefn.Semantics_Error (pos_ste,
-														"Illegal binding type, agent "^ag_nm^" is not delcared"))
-								in
-								((IntMap.add site_id (int_s, Node.TYPE (site_num, ag_num)) interface),ctxt, sign)
+				let interface,ctx = 
+					match lnk_state with
+					| Ast.LNK_VALUE (n, pos) ->
+							let lnk =
+								(try Some (IntMap.find n ctxt.pairing)
+								with | Not_found -> None)
+							in
+							(match lnk with
+								| Some (Semi (b, j, _)) ->
+										((IntMap.add site_id (int_s, Node.BND) interface),
+											{ctxt	with
+												pairing = IntMap.add n Closed ctxt.pairing;
+												new_edges =
+													Int2Map.add ((ctxt.curr_id), site_id) (b, j)
+														ctxt.new_edges;
+											})
+								| Some Closed ->
+										let msg =
+											"edge identifier " ^
+											((string_of_int n) ^ " is used too many times")
+										in raise (ExceptionDefn.Semantics_Error (pos, msg))
+								| None ->
+										((IntMap.add site_id (int_s, Node.BND) interface),
+											{
+												(ctxt)
+												with
+												pairing =
+													IntMap.add n (Semi (ctxt.curr_id, site_id, pos))
+														ctxt.pairing;
+											})
 						)
-						else
-							(let msg =
-									"illegal use of binding type in concrete graph definition"
-								in raise (ExceptionDefn.Semantics_Error (pos_ste, msg)))
+					| Ast.LNK_SOME pos ->
+							if is_pattern
+							then ((IntMap.add site_id (int_s, Node.BND) interface), ctxt)
+							else
+								(let msg = "illegal use of '_' in concrete graph definition"
+									in raise (ExceptionDefn.Semantics_Error (pos, msg)))
+					| Ast.LNK_ANY pos ->
+							if is_pattern
+							then ((IntMap.add site_id (int_s, Node.WLD) interface), ctxt)
+							else
+								(let msg =
+										"illegal use of wildcard '?' in concrete graph definition"
+									in raise (ExceptionDefn.Semantics_Error (pos, msg)))
+					| Ast.FREE ->
+							((IntMap.add site_id (int_s, Node.FREE) interface), ctxt)
+					| Ast.LNK_TYPE ((ste_nm, pos_ste), (ag_nm, pos_ag)) ->
+							if is_pattern then
+								(let site_num =
+										try Environment.id_of_site ag_nm ste_nm env
+										with
+										| Not_found -> raise (ExceptionDefn.Semantics_Error (pos_ste, "binding type is not compatible with agent's signature"))
+									in
+									let ag_num = 
+										try Environment.num_of_name ag_nm env with
+											| Not_found -> raise
+													(ExceptionDefn.Semantics_Error (pos_ste,
+															"Illegal binding type, agent "^ag_nm^" is not delcared"))
+									in
+									((IntMap.add site_id (int_s, Node.TYPE (site_num, ag_num)) interface),ctxt)
+							)
+							else
+								(let msg =
+										"illegal use of binding type in concrete graph definition"
+									in raise (ExceptionDefn.Semantics_Error (pos_ste, msg)))
+					in
+					(interface,ctx,sign)
 			)
 			port_map (IntMap.empty, ctxt, sign)
 	in 
@@ -738,19 +750,19 @@ let pert_of_result variables env res =
 let init_graph_of_result env res =
 	List.fold_left
 		(fun (sg,env) (n, ast, _) ->
-					let cpt = ref 0
-					and sg = ref sg
-					(*and m,env = mixture_of_ast None false env ast*)
-					in
-					(* Cannot do Mixture.to_nodes env m once for all because of        *)
-					(* references                                                      *)
-					let sg = 
-						(while !cpt < n do
-							sg := Graph.SiteGraph.add_nodes !sg (nodes_of_ast env ast);
-							cpt := !cpt + 1 done;
-						!sg)
-					in
-						(sg,env)
+			let cpt = ref 0
+			and sg = ref sg
+			and env = ref env
+			in
+			(* Cannot do Mixture.to_nodes env m once for all because of        *)
+			(* references                                                      *)
+			while !cpt < n do
+				let nodes,env' = nodes_of_ast !env ast in
+				env := env' ;
+				sg := Graph.SiteGraph.add_nodes !sg nodes;
+				cpt := !cpt + 1 
+			done;
+			(!sg,!env)
 		)
 		(Graph.SiteGraph.init !Parameter.defaultGraphSize,env) res.Ast.init
 	

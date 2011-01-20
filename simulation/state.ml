@@ -199,7 +199,7 @@ let initialize_embeddings state mix_list =
 		List.fold_left
 		(fun state mix ->
 			let injs = state.injections in
-			let opt = injs.(Mixture.get_id mix) in 
+			let opt = try injs.(Mixture.get_id mix) with exn -> (print_string ("caught: "^(Printexc.to_string exn)) ; raise exn) in 
 			let comp_injs =
 				match opt with
 				| None -> Array.create (Mixture.arity mix) None

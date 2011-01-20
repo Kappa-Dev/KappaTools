@@ -66,7 +66,7 @@ let main =
     let _ = Sys.set_signal Sys.sigint (Sys.Signal_handle sigint_handle) in
     
 		Parameter.setOutputName() ;
-	
+		Printexc.record_backtrace !Parameter.debugModeOn ; (*Possible backtrace*)
 		
 		(*let _ = Printexc.record_backtrace !Parameter.debugModeOn in*) 
 		let result =
@@ -127,7 +127,7 @@ let main =
 	with
 	| ExceptionDefn.Semantics_Error (pos, msg) -> 
 		(close_desc () ; Printf.eprintf "***Error (%s) line %d, char %d: %s***\n" (fn pos) (ln pos) (cn pos) msg)
-	| Invalid_argument msg -> (close_desc (); Printf.eprintf "\n***Runtime error %s***\n" msg)
+	| Invalid_argument msg -> (close_desc (); let s = Printexc.get_backtrace() in Printf.eprintf "\n***Runtime error %s***\n%s\n" msg s)
 	| ExceptionDefn.UserInterrupted msg -> (Printf.eprintf "\n***Interrupted by user: %s***\n" msg ; close_desc())
 	| ExceptionDefn.StopReached msg -> (Printf.eprintf "\n***%s***\n" msg ; close_desc())
 	| Sys_error msg -> (close_desc (); Printf.eprintf "%s\n" msg)

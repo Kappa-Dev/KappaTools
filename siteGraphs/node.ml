@@ -226,7 +226,7 @@ let create ?with_interface name_id env =
 (*the list port_list with (0,i) if i is int-tested or (1,i) if i is lnk-tested *)
 let test (n,i) (int,lnk) port_list = 
 	let intf_n = interface n in
-		let (state,link) = intf_n.(i).status in
+		let (state,link) = try intf_n.(i).status with exn -> (Debug.tag (Printf.sprintf "Node %d has no site %d" (name n) i) ; raise exn) in
 			let b,port_list = 
 				match int with
 					| None -> (true,port_list) (*None in pattern is compatible with anything in the node*)
