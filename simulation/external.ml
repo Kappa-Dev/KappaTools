@@ -132,7 +132,7 @@ let apply_effect p_id pert state counter env =
 				if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Updating rate of rule '%s'" (Environment.rule_of_num r_id env)) ;
 				let r = State.rule_of_id r_id state in
 					Hashtbl.replace state.rules r_id {r with k_def = v} ;
-					State.update_activity state r_id counter env ;		
+					State.update_activity state (-1) r_id counter env ;		
 					let env,pert_ids = State.update_dep state (RULE r_id) IntSet.empty counter env in
 					(env,state ,pert_ids)
 			| SNAPSHOT -> (snapshot () ; (env, state ,IntSet.empty))
@@ -162,6 +162,7 @@ let rec try_perturbate state pert_ids counter env =
 								let state = 
 									if eval_abort_pert true pert state counter env then 
 										(if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "***Aborting pert[%d]***" pert_id) ;
+										
 										{state with perturbations = IntMap.remove pert_id state.perturbations} )
 									else state
 								in

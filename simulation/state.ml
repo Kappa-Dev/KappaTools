@@ -16,7 +16,8 @@ type implicit_state =
 		observables : obs list; 
 		influence_map : (int, (int IntMap.t list) IntMap.t) Hashtbl.t ;
 		mutable activity_tree : Random_tree.tree; 
-		wake_up : Precondition.t
+		wake_up : Precondition.t ;
+		flux : (int,float IntMap.t) Hashtbl.t ;
 	}
 and component_injections =
 	(InjectionHeap.t option) array
@@ -38,19 +39,28 @@ let alg_of_id id state =
 		| Some var_f -> var_f
 	with | Invalid_argument msg -> invalid_arg ("State.kappa_of_id: " ^ msg)
 
+let update_flux state id1 id2 w = 
+	let flux = state.flux in
+	let map = try Hashtbl.find flux id1 with Not_found -> IntMap.empty
+	in
+	let w' = try IntMap.find id2 map with Not_found -> 0.0
+	in
+	Hashtbl.replace flux id1 (IntMap.add id2 (w+.w') map)
+	
 (**[instance_number mix_id state] returns the number of instances of mixture [mix_id] in implicit state [state]*)
 let instance_number mix_id state env =
 	if Environment.is_empty_lhs mix_id env then 1. 
 	else
-	match state.injections.(mix_id) with
-	| None -> 0.
-	| Some component_injections ->
-			Array.fold_left
-				(fun act opt ->
-							match opt with
-							| Some injs -> act *. (float_of_int (InjectionHeap.size injs))
-							| None -> 0.)
-				1. component_injections
+		match state.injections.(mix_id) with
+		| None -> 0.
+		| Some component_injections ->
+				Array.fold_left
+					(fun act opt ->
+								match opt with
+								| Some injs -> act *. (float_of_int (InjectionHeap.size injs))
+								| None -> 0.
+					)
+					1. component_injections
 
 (**[instances_of_square mix_id state] returns the list of full and valid embeddings (given as maps) of [mix_id] in [state]*)
 let instances_of_square mix_id state =
@@ -131,35 +141,48 @@ let eval_activity rule state counter env =
 
 let pert_of_id state id = IntMap.find id state.perturbations
 
-let update_activity state var_id counter env =
+let update_activity state cause var_id counter env =
 	if not (Environment.is_rule var_id env) then ()
 	else
-	let rule = rule_of_id var_id state in
-	let alpha = eval_activity rule state counter env
-	in
-	try
-		Random_tree.add var_id alpha state.activity_tree ;
-	with Invalid_argument msg -> invalid_arg ("State.update_activity: "^msg)
+		let rule = rule_of_id var_id state in
+		let alpha = eval_activity rule state counter env in
+		if !Parameter.fluxModeOn && cause > 0 then
+			begin
+				try
+					let alpha_old = Random_tree.find var_id state.activity_tree in
+					Random_tree.add var_id alpha state.activity_tree ;
+					let w = (alpha -. alpha_old) in
+					update_flux state cause var_id w		
+				with Invalid_argument msg -> invalid_arg ("State.update_activity: "^msg)
+			end
+		else
+			Random_tree.add var_id alpha state.activity_tree 
 
 (* compute complete embedding of mix into sg at given root --for           *)
 (* initialization phase                                                    *)
-let generate_embeddings sg u_i mix comp_injs =
+let generate_embeddings sg u_i mix comp_injs already_done =
+	
 	let node_i =
 		try SiteGraph.node_of_id sg u_i
 		with
 		| Invalid_argument msg ->
 				invalid_arg ("Matching.generate_embeddings: " ^ msg) in
 	let name = Node.name node_i and mix_id = Mixture.get_id mix in
-	let rec iter cc_id sg comp_injs =
+	
+	let rec iter cc_id sg comp_injs already_done =
 		if cc_id = (Mixture.arity mix)
-		then (sg, comp_injs)
+		then (sg, comp_injs, already_done)
 		else
+			
+			let used = try Int2Map.find (Mixture.get_id mix,cc_id) already_done with Not_found -> IntSet.empty in
+			if IntSet.mem u_i used then (sg,comp_injs,already_done)
+			else
 			(let id_opt = (*pick one representative for cc_id*)
 					try Some (IntSet.choose (Mixture.ids_of_name (name, cc_id) mix))
 					with | Not_found -> None
 				in
 				match id_opt with
-				| None -> iter (cc_id + 1) sg comp_injs
+				| None -> iter (cc_id + 1) sg comp_injs already_done
 				| Some id_root ->
 						let opt_inj =
 							Matching.component
@@ -167,54 +190,64 @@ let generate_embeddings sg u_i mix comp_injs =
 								(sg, u_i) mix
 						in
 						(match opt_inj with
-							| None -> iter (cc_id + 1) sg comp_injs
-							| (*no match for cc_id rooted at u_i*)
-							Some (injection, port_map) ->
+							| None -> iter (cc_id + 1) sg comp_injs already_done
+							| Some (injection, port_map) ->
 							(* port_map: u_i -> [(p_k,0/1);...] if port k of node i is   *)
 							(* int/lnk-tested by map                                     *)
-									let opt =
-										(try comp_injs.(cc_id)
-										with
-										| Invalid_argument msg ->
-												invalid_arg ("State.generate_embeddings: " ^ msg)) in
-									let cc_id_injections =
-										(match opt with
-											| Some injections -> injections
-											| None ->
-													InjectionHeap.create
-														!Parameter.defaultInjectionHeapSize) in
-									let cc_id_injections =
-										InjectionHeap.alloc injection cc_id_injections
-									in
-									(comp_injs.(cc_id) <- Some cc_id_injections;
-										let sg =
-											SiteGraph.add_lift sg injection port_map
-										in iter (cc_id + 1) sg comp_injs)))
-	in iter 0 sg comp_injs
+								let cod = try Injection.codomain injection used with Injection.Clashing -> invalid_arg "State.generate_embeddings: Rigidity invariant violation"
+								in
+								let already_done = Int2Map.add (mix_id,cc_id) cod already_done in
+								let opt =
+									(try comp_injs.(cc_id)
+									with
+									| Invalid_argument msg ->
+											invalid_arg ("State.generate_embeddings: " ^ msg)) in
+								let cc_id_injections =
+									(match opt with
+										| Some injections -> injections
+										| None ->
+												InjectionHeap.create
+													!Parameter.defaultInjectionHeapSize) in
+								let cc_id_injections =
+									InjectionHeap.alloc injection cc_id_injections
+								in
+								(comp_injs.(cc_id) <- Some cc_id_injections;
+									let sg =
+										SiteGraph.add_lift sg injection port_map
+									in 
+									iter (cc_id + 1) sg comp_injs already_done
+								)
+						)
+			)
+	in 
+	iter 0 sg comp_injs already_done
 
-(**[initialize_embeddings state mix_list] *)
+(**[initialize_embeddings state mix_list] *) (*mix list is the list of kappa observables one wishes to track during simulation*)
 let initialize_embeddings state mix_list =
-	SiteGraph.fold 
-	(fun i node_i state ->
-		List.fold_left
-		(fun state mix ->
-			let injs = state.injections in
-			let opt = try injs.(Mixture.get_id mix) with exn -> (print_string ("caught: "^(Printexc.to_string exn)) ; raise exn) in 
-			let comp_injs =
-				match opt with
-				| None -> Array.create (Mixture.arity mix) None
-				| Some comp_injs -> comp_injs in
-			(* complement the embeddings of mix in sg using node i  as anchor for matching *)
-			let (sg, comp_injs) =
-				generate_embeddings state.graph i mix comp_injs
-			in
-				(* adding injections.(mix_id) = injs(mix) to injections array*)
-				injs.(Mixture.get_id mix) <- Some comp_injs;
-				{state with graph = sg}
+	let state,_ = 
+		SiteGraph.fold 
+		(fun i node_i (state,already_done) ->
+			List.fold_left
+			(fun (state,already_done) mix ->
+				let injs = state.injections in
+				let opt = try injs.(Mixture.get_id mix) with exn -> (print_string ("caught: "^(Printexc.to_string exn)) ; raise exn) in 
+				let comp_injs =
+					match opt with
+					| None -> Array.create (Mixture.arity mix) None
+					| Some comp_injs -> comp_injs in
+				(* complement the embeddings of mix in sg using node i  as anchor for matching *)
+				let (sg, comp_injs, already_done) =
+					generate_embeddings state.graph i mix comp_injs already_done
+				in
+					(* adding injections.(mix_id) = injs(mix) to injections array*)
+					injs.(Mixture.get_id mix) <- Some comp_injs;
+					({state with graph = sg},already_done)
+			)
+			(state,already_done) mix_list
 		)
-		state mix_list
-	)
-	state.graph state
+		state.graph (state,Int2Map.empty)
+	in
+	state
 
 let build_influence_map rules patterns env =
 	let add_influence im i j glueings = 
@@ -242,10 +275,11 @@ let build_influence_map rules patterns env =
 	influence_map
 
 let dot_of_influence_map desc state env =
-	Printf.fprintf desc "digraph G{ node [shape=box, style=filled, fillcolor=white]; \n " ;
+	Printf.fprintf desc "digraph G{ node [shape=box, style=filled, fillcolor=lightskyblue]; \n " ;
 	Hashtbl.iter
 	(fun r_id rule ->
-		Printf.fprintf desc "\"%d:%s\";\n" r_id (Dynamics.to_kappa rule)
+		let opt = if rule.Dynamics.is_pert then "[shape=invhouse,fillcolor=lightsalmon]" else "" in 
+		Printf.fprintf desc "\"%d:%s\" %s;\n" r_id (Dynamics.to_kappa rule) opt
 	) state.rules ;
 	Array.iteri
 	(fun mix_id mix_opt ->
@@ -253,7 +287,7 @@ let dot_of_influence_map desc state env =
 		else
 			match mix_opt with
 				| None -> ()
-				| Some mix -> Printf.fprintf desc "\"%d:%s\" [shape=ellipse,fillcolor=lightgrey] ;\n" mix_id (Mixture.to_kappa false mix env)
+				| Some mix -> Printf.fprintf desc "\"%d:%s\" [shape=ellipse,fillcolor=palegreen3] ;\n" mix_id (Mixture.to_kappa false mix env)
 	) state.kappa_variables ;
 	Hashtbl.iter 
 	(fun r_id act_map ->
@@ -351,6 +385,7 @@ let initialize sg rules kappa_vars alg_vars obs (pert,rule_pert) counter env =
 			activity_tree = Random_tree.create dim_pure_rule ; (*put only true rules in the activity tree*)
 			influence_map = influence_table ;
 			wake_up = wake_up_table;
+			flux = if !Parameter.fluxModeOn then Hashtbl.create 5 else Hashtbl.create 0 
 		}
 	in
 	
@@ -481,7 +516,7 @@ let draw_rule state counter env =
 		((Some (r, embedding)), state)
 	with | Not_found -> raise Deadlock
 
-let wake_up state modif_type modifs wake_up_map =
+let wake_up state modif_type modifs wake_up_map env =
 	Int2Set.iter
 		(fun (node_id, site_id) ->
 					let opt =
@@ -508,7 +543,8 @@ let wake_up state modif_type modifs wake_up_map =
 										Hashtbl.replace wake_up_map node_id
 											(Int2Set.union old_candidates new_candidates)
 								| 1 -> (*link state modification*)
-										let is_free = not (Node.is_bound (node, site_id)) in
+										let is_free = try not (Node.is_bound (node, site_id)) with Invalid_argument msg -> invalid_arg (Printf.sprintf "State.wake_up : no site %d in agent %s" site_id (Environment.name (Node.name node) env))
+										in
 										let new_candidates =
 											if is_free
 											then
@@ -557,7 +593,7 @@ let rec update_dep state dep_in pert_ids counter env =
 			end;
 			(env,depset,pert_ids)
 		| Mods.RULE r_id ->
-			(update_activity state r_id counter env; 
+			(update_activity state (-1) r_id counter env; 
 			let depset = Environment.get_dependencies (Mods.RULE r_id) env
 			in
 			if !Parameter.debugModeOn then if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Rule %d is changed, updating %s" r_id (string_of_set Mods.string_of_dep DepSet.fold depset)) ;
@@ -628,7 +664,6 @@ let positive_update state r (phi,psi) (side_modifs,pert_intro) counter env = (*p
 			| None -> Injection.empty (Mixture.size_of_cc cc_id mix) (var_id,cc_id)
 		in			
 		let opt_emb = Matching.component ~already_done:root_node_set reuse_embedding root (state.graph, node_id) mix in 
-		(*BUG: even if Matching.component failed, phi might have been modified as a side effect of the procedure, pb is that phi might also be the last embedding used for applying the rule*)
 		match opt_emb	with
 		| None ->
 				(if !Parameter.debugModeOn then Debug.tag "No new embedding was found";
@@ -643,7 +678,7 @@ let positive_update state r (phi,psi) (side_modifs,pert_intro) counter env = (*p
 				let state = {state with graph = graph}
 				in
 				begin
-					update_activity state var_id counter env;
+					update_activity state r.r_id var_id counter env;
 					let env,pert_ids = 
 						update_dep state (Mods.KAPPA var_id) pert_ids counter env
 					in
@@ -713,8 +748,8 @@ let positive_update state r (phi,psi) (side_modifs,pert_intro) counter env = (*p
 	(*Handling side effects*)
 	let wu_map = Hashtbl.create !Parameter.defaultExtArraySize
 	in
-		wake_up state 1 side_modifs wu_map;
-		wake_up state 2 pert_intro wu_map ;
+		wake_up state 1 side_modifs wu_map env;
+		wake_up state 2 pert_intro wu_map env;
 		let (env,state, pert_ids, _) =
 		Hashtbl.fold
 		(fun node_id candidates (env,state, pert_ids, already_done_map) ->
@@ -748,7 +783,8 @@ let positive_update state r (phi,psi) (side_modifs,pert_intro) counter env = (*p
 	
 
 (* Negative update *)
-let negative_upd state (u, i) int_lnk counter env =
+let negative_upd state cause (u,i) int_lnk counter env =
+	
 	if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Negative update as indicated by %s#%d site %d" 
 	(Environment.name (Node.name u) env) (Node.get_address u) i);
 		
@@ -795,7 +831,8 @@ let negative_upd state (u, i) int_lnk counter env =
 							Injection.fold
 							(fun i j _ ->
 								let a_i = Mixture.agent_of_id i mix
-								and u_j =	SiteGraph.node_of_id state.graph j
+								and u_j =	try SiteGraph.node_of_id state.graph j with 
+									| exn -> invalid_arg (Printf.sprintf "State.negative_update: Node #%d is no longer in the graph and injection %d%s of mixture %s was pointing on it!" j inj_id (Injection.to_string phi) (Mixture.to_kappa false mix env))
 								in
 								Mixture.fold_interface
 								(fun site_id (int_opt, lnk_opt) _ ->
@@ -803,19 +840,20 @@ let negative_upd state (u, i) int_lnk counter env =
 										match int_opt with
 										| None -> ()
 										| Some _ ->
-												let (lifts, _) = Node.get_lifts u_j site_id
+												let (lifts, _) = Node.get_lifts u_j site_id 
 												in
 												LiftSet.remove lifts phi
 									in
 									match lnk_opt with
 									| Node.WLD -> ()
 									| Node.BND | Node.TYPE _ |	Node.FREE ->
-										let (_, lifts) = Node.get_lifts u_j	site_id
+										let (_, lifts) = try Node.get_lifts u_j	site_id with exn -> invalid_arg ("State.negative_update: "^(Printexc.to_string exn))
 										in
 										LiftSet.remove lifts phi
 									) a_i ()
 								) phi () ;
-								InjectionHeap.remove inj_id injs_cc_id
+								let _ = InjectionHeap.remove inj_id injs_cc_id in
+								if !Parameter.fluxModeOn then update_activity state cause mix_id counter env ;
 						end
 						in
 						(* comp_injs.(cc_id) <- Some injs_cc_id; *)
@@ -826,35 +864,36 @@ let negative_upd state (u, i) int_lnk counter env =
 					liftset (env,pert_ids) 
 	in
 	(*end sub function*)
-	let (liftset_int, liftset_lnk) = Node.get_lifts u i
+	let (liftset_int, liftset_lnk) = try Node.get_lifts u i with exn -> failwith "oops"
 	in
 	let env,pert_ids = 
 		match int_lnk with
 			| 0 -> remove_injs state liftset_int IntSet.empty env
 			| 1 -> remove_injs state liftset_lnk IntSet.empty env
-			| _ -> 
+			| _ -> (*removing both dependencies*) 
 				(let env,pert_ids = remove_injs state liftset_lnk IntSet.empty env in 
 					remove_injs state liftset_int pert_ids env)
 	in
 	(env,pert_ids)
 
 (* bind allow for looping bond *)
-let bind state (u, i) (v, j) modifs pert_ids counter env =
+let bind state cause (u, i) (v, j) modifs pert_ids counter env =
 	let intf_u = Node.interface u and intf_v = Node.interface v in
 	(* no side effect *)
-	let (int_u_i, ptr_u_i) = intf_u.(i).Node.status
+	let (int_u_i, ptr_u_i) = try intf_u.(i).Node.status with Invalid_argument msg -> invalid_arg (Printf.sprintf "State.bind: agent %s has no site %d" (Environment.name (Node.name u) env) i)
+	and (int_v_j, ptr_v_j) = try intf_v.(j).Node.status with Invalid_argument msg -> invalid_arg (Printf.sprintf "State.bind: agent %s has no site %d" (Environment.name (Node.name v) env) j)
+	in
 	
-	and (int_v_j, ptr_v_j) = intf_v.(j).Node.status in
 	let env,modifs,pert_ids = (*checking for side effects*)
 		match ptr_u_i with
 		| Node.FPtr _ -> invalid_arg "State.bind"
 		| Node.Null ->
-			(*if !Parameter.causalMode then Grid.add (Grid.LW (Node.get_address u,i)) Grid.Free (Grid.Bound (Node.get_address v,j)) ;*)
+			(*if !Parameter.fluxMode then Grid.add (Grid.LW (Node.get_address u,i)) Grid.Free (Grid.Bound (Node.get_address v,j)) ;*)
 			(env,modifs,pert_ids)
 		| Node.Ptr (u', i') ->
 				begin
 					Node.set_ptr (u', i') Node.Null;
-					let env,pert_ids = negative_upd state (u', i') 1 counter env in
+					let env,pert_ids = negative_upd state cause (u', i') 1 counter env in
 					try (env,Int2Set.add ((Node.get_address u'), i') modifs, pert_ids)	
 					with  Not_found -> invalid_arg "State.bind: Not_found"
 				end 
@@ -867,21 +906,21 @@ let bind state (u, i) (v, j) modifs pert_ids counter env =
 		| Node.Ptr (v', j') ->
 			begin
 				Node.set_ptr (v', j') Node.Null;
-				let env,pert_ids' = negative_upd state (v', j') 1 counter env in
+				let env,pert_ids' = negative_upd state cause (v', j') 1 counter env in
 				try 
 					(env,Int2Set.add ((Node.get_address v'), j') modifs, IntSet.union pert_ids pert_ids')
 				with Not_found -> invalid_arg "State.bind: not found"
 			end
 	in
 	intf_u.(i) <-	{ (intf_u.(i)) with Node.status = (int_u_i, Node.Ptr (v, j)) };
-	let env,pert_ids' = negative_upd state (u, i) 1 counter env in
+	let env,pert_ids' = negative_upd state cause (u, i) 1 counter env in
 	let pert_ids = IntSet.union pert_ids pert_ids' in 
 	intf_v.(j) <- { (intf_v.(j)) with Node.status = (int_v_j, Node.Ptr (u, i)) };
-	let env,pert_ids' = negative_upd state (v, j) 1 counter env in
+	let env,pert_ids' = negative_upd state cause (v, j) 1 counter env in
 	let pert_ids = IntSet.union pert_ids pert_ids' in
 	(env,modifs,pert_ids)
 
-let break state (u, i) modifs pert_ids counter env =
+let break state cause (u, i) modifs pert_ids counter env =
 	let intf_u = Node.interface u and warn = 0 in
 	let (int_u_i, ptr_u_i) = intf_u.(i).Node.status
 	in
@@ -893,16 +932,16 @@ let break state (u, i) modifs pert_ids counter env =
 			in
 			(intf_u.(i) <-
 				{ (intf_u.(i)) with Node.status = (int_u_i, Node.Null); };
-				let env,pert_ids = negative_upd state (u, i) 1 counter env in
+				let env,pert_ids = negative_upd state cause (u, i) 1 counter env in
 				intf_v.(j) <-
 				{ (intf_v.(j)) with Node.status = (int_v_j, Node.Null); };
-				let env,pert_ids' = negative_upd state (v, j) 1 counter env in
+				let env,pert_ids' = negative_upd state cause (v, j) 1 counter env in
 				let pert_ids = IntSet.union pert_ids pert_ids' in
 				(warn,env,(Int2Set.add ((Node.get_address v), j) modifs),pert_ids)
 			)
 	| Node.Null -> ((warn + 1),env, modifs,pert_ids)
 
-let modify state (u, i) s pert_ids counter env =
+let modify state cause (u, i) s pert_ids counter env =
 	let intf_u = Node.interface u and warn = 0 in
 	let (int_u_i, lnk_u_i) = intf_u.(i).Node.status
 	in
@@ -913,7 +952,7 @@ let modify state (u, i) s pert_ids counter env =
 				let warn = if s = j then warn + 1 else warn
 				in
 				(* if s=j then null event *)
-				let env,pert_ids = if s <> j then negative_upd state (u, i) 0 counter env else (env,pert_ids) in
+				let env,pert_ids = (*if s <> j then*) negative_upd state cause (u, i) 0 counter env (*else (env,pert_ids)*) in (*BUG correction 11/2/2011*)
 				(warn,env,pert_ids)
 			)
 	| None ->
@@ -921,10 +960,10 @@ let modify state (u, i) s pert_ids counter env =
 				("State.modify: node " ^
 					((Environment.name (Node.name u) env)^" has no internal state to modify"))
 
-let delete state u modifs pert_ids counter env =
+let delete state cause u modifs pert_ids counter env =
 	Node.fold_status
 	(fun i (_, lnk) (env,modifs,pert_ids) ->
-		let env,pert_ids' = negative_upd state (u, i) 2 counter env in
+		let env,pert_ids' = negative_upd state cause (u, i) 2 counter env in
 		let pert_ids = IntSet.union pert_ids pert_ids' in
 			(* delete injection pointed by both lnk and int-lifts *)
 			match lnk with
@@ -932,7 +971,7 @@ let delete state u modifs pert_ids counter env =
 			| Node.Null -> (env,modifs,pert_ids)
 			| Node.Ptr (v, j) ->
 					Node.set_ptr (v, j) Node.Null;
-					let env,pert_ids' = negative_upd state (v, j) 1 counter env in
+					let env,pert_ids' = negative_upd state cause (v, j) 1 counter env in
 					let pert_ids = IntSet.union pert_ids pert_ids' in
 					(env,Int2Set.add ((Node.get_address v), j) modifs,pert_ids)
 	)
@@ -967,8 +1006,8 @@ let apply state r embedding counter env =
 										~interrupt_with: (IntSet.singleton id') state.graph id
 										radius
 								in if IntMap.mem id' dmap then () else raise Null_event)
-		)
-			r.constraints in
+		) r.constraints 
+	in
 	let app state embedding fresh_map (id, i) =
 		try
 			match id with
@@ -987,14 +1026,14 @@ let apply state r embedding counter env =
 					try	(SiteGraph.node_of_id state.graph (Injection.find j psi),i) with Not_found -> invalid_arg "State.apply: Not a valid embedding"
 				end
 		with 
-			| Not_found -> invalid_arg "State.apply: Incomplete embedding 1" 
+			| Not_found -> invalid_arg (Printf.sprintf "State.apply: Incomplete embedding when applying rule %s on [%s -> %d]" r.kappa (match id with FRESH j -> (Printf.sprintf "F(%d)" j) | KEPT j -> string_of_int j) i)  
 	in
 	let rec edit state script phi psi side_effects pert_ids env =
 		(* phi: embedding, psi: fresh map *)
 		let sg = state.graph
 		in
 		match script with
-		| [] -> (env,state, side_effects, phi, psi, pert_ids)
+		| [] -> (env,state, (side_effects:Int2Set.t), phi, psi, pert_ids)
 		| action :: script' ->
 				begin
 					match action with
@@ -1005,18 +1044,18 @@ let apply state r embedding counter env =
 								in ((u, i), (v, j)) 
 							in
 							let env,side_effects,pert_ids =
-								bind state (u, i) (v, j) side_effects pert_ids counter env
+								bind state r.r_id (u, i) (v, j) side_effects pert_ids counter env
 							in
 							edit state script' phi psi side_effects pert_ids env
 					| FREE p ->
 							let x = app state phi psi p in
-							let (warn, env, side_effects,pert_ids) = break state x side_effects pert_ids counter env
+							let (warn, env, side_effects,pert_ids) = break state r.r_id x side_effects pert_ids counter env
 							in
 							if warn > 0 then Counter.inc_null_action counter ;
 							edit state script' phi psi side_effects pert_ids env
 					| MOD (p, i) ->
 							let x = app state phi psi p in
-							let warn,env, pert_ids = modify state x i pert_ids counter env
+							let warn,env, pert_ids = modify state r.r_id x i pert_ids counter env
 							in
 							if warn > 0 then Counter.inc_null_action counter ; 
 							edit state script' phi psi side_effects pert_ids env
@@ -1036,7 +1075,7 @@ let apply state r embedding counter env =
 								(try Injection.find i inj	with Not_found ->	invalid_arg "State.apply: incomplete embedding 3") 
 							in
 								let node_i = SiteGraph.node_of_id sg phi_i in
-								let env,side_effects,pert_ids = delete state node_i side_effects pert_ids counter env
+								let env,side_effects,pert_ids = delete state r.r_id node_i side_effects pert_ids counter env
 								in
 								SiteGraph.remove sg phi_i;
 								edit state script' phi psi side_effects pert_ids env
@@ -1044,7 +1083,7 @@ let apply state r embedding counter env =
 							let node = Node.create name env in
 							let sg = SiteGraph.add sg node in
 							(* sg might be different address than sg if max array size  *)
-							(* was reached                                               *)
+							(* was reached                                              *)
 							let j =
 								(try SiteGraph.( & ) node
 								with
@@ -1054,6 +1093,11 @@ let apply state r embedding counter env =
 				end
 	in
 	edit state r.script embedding IntMap.empty Int2Set.empty IntSet.empty env
+	
+	(*let (_,_,side_effects, phi, psi, _) as res = edit state r.script embedding IntMap.empty Int2Set.empty IntSet.empty env in 
+	if !Parameter.fluxModeOn then Cflow.update state.graph r side_effects phi psi env counter ; 
+	res
+	*)
 
 
 let snapshot state counter desc env =
@@ -1082,8 +1126,8 @@ let dump state counter env =
 	then ()
 	else
 		(
-		 	Printf.printf "#***[%f] Current state***\n" (Counter.time counter);
-			if SiteGraph.size state.graph > 100 then () else SiteGraph.dump ~with_lift:true state.graph env;
+			Printf.printf "#***[%f] Current state***\n" (Counter.time counter);
+			if SiteGraph.size state.graph > 1000 then () else SiteGraph.dump ~with_lift:true state.graph env;
 			Hashtbl.fold
 			(fun i r _ ->
 				let nme =
@@ -1108,7 +1152,7 @@ let dump state counter env =
 									(Environment.kappa_of_num mix_id env)
 									(Mixture.to_kappa false (kappa_of_id mix_id state) env)
 									(int_of_float (instance_number mix_id state env));
-									if SiteGraph.size state.graph > 100 then ()
+									if SiteGraph.size state.graph > 1000 then ()
 									else
 										Array.iteri
 										(fun cc_id injs_opt ->
@@ -1141,3 +1185,49 @@ let dump state counter env =
 			state.perturbations ();
 			Printf.printf "#**********\n"
 	)
+
+let dot_of_flux desc state  env =
+	
+	let print_flux flux pos =
+		let m_pos,m_neg = 
+			Hashtbl.fold
+			(fun _ pos_map (m_pos,m_neg) ->
+				IntMap.fold (fun _ n (m_p,m_n) -> if n<0. then (m_p,max (-1. *. n) m_n) else (max n m_p,m_n)) pos_map (m_pos,m_neg)
+			) flux (0.,0.)
+		in
+		let mult_p = 10. /. m_pos
+		and mult_n = 10. /. m_neg
+		in
+		Hashtbl.iter
+		(fun r_id map ->
+			let str1 = try Environment.rule_of_num r_id env with Not_found -> Dynamics.to_kappa (rule_of_id r_id state)
+			in
+			IntMap.iter
+			(fun r_id' n ->
+				let color,arrowhead,d,edge = 
+					if n<0. then 
+						let v = (-1.*.n)*. mult_n in 
+						if v >= 0.1 then ("red3","tee",v,"filled") 
+						else ("red3","tee",0.1,"dotted")
+					else 
+						if n>0. then
+							let v = n*.mult_p in
+							if v >= 0.1 then ("green3","normal",v,"filled") 
+							else ("green3","normal",0.1,"dotted")
+						else
+							("white","normal",0.,"dotted")
+				in 
+				let str2 = try Environment.rule_of_num r_id' env with Not_found -> Dynamics.to_kappa (rule_of_id r_id' state) in
+				Printf.fprintf desc "\"%s\" -> \"%s\" [penwidth=%f,weight=%d,tooltip=\"%.3f\",color=%s,arrowhead=%s];\n" str1 str2 d (int_of_float d) n color arrowhead
+			) map 
+		) flux 
+	in
+	Printf.fprintf desc "digraph G{ label=\"Flux map\" ; labelloc=\"t\" ; node [shape=box,style=filled,fillcolor=lightskyblue]\n" ;
+	Hashtbl.iter
+	(fun r_id rule ->
+		let r_nme = try Environment.rule_of_num r_id env with Not_found -> (*rule is anonymous*) Dynamics.to_kappa (rule_of_id r_id state) in
+		Printf.fprintf desc "\"%s\" ;\n" r_nme 
+	) state.rules ;
+	print_flux state.flux true;
+	Printf.fprintf desc "}\n" ;
+	close_out desc

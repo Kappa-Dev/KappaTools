@@ -54,3 +54,14 @@ let replace_space str =
 	String.iter (fun c -> if c=' ' then String.set str !cpt '_' ; cpt := !cpt+1) str ;
 	str
 
+let read_input () = 
+	let rec parse acc input =
+		match Stream.next input with
+			| '\n' -> acc
+			| c -> parse (Printf.sprintf "%s%c" acc c) input
+	in
+	try
+		let user_input = Stream.of_channel stdin in
+		parse "" user_input
+	with
+		| Stream.Failure -> invalid_arg "Tools.Read_input: cannot read stream"

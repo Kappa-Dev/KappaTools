@@ -24,5 +24,4 @@
 %init: 1000 A,B
 
 #### Perturbation
-%mod: [T] > 25 do $ADD 10000 C
-%obs: 'A' A(x)
+%mod: [E] > 1000 do $ADD 1000 C

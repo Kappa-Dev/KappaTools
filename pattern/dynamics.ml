@@ -29,7 +29,8 @@ type rule = {
 	r_id : int ;
 	added : IntSet.t;
 	side_effect : bool ;
-	modif_sites : Int2Set.t IdMap.t 
+	modif_sites : Int2Set.t IdMap.t ;
+	is_pert : bool
 }
 
 type perturbation = {precondition: boolean_variable ; effect : modification ; abort : boolean_variable option ; flag : string}
@@ -48,7 +49,7 @@ let string_of_pert pert env =
 		| UPDATE (r_id,_) -> Printf.sprintf "UPDATE rule[%d]" r_id
 		| SNAPSHOT -> "SNAPSHOT"
 		| STOP -> "STOP"
-
+		
 let diff m0 m1 label_opt env =
 	let add_map id site_type map =
 		let set = try IdMap.find id map with Not_found -> Int2Set.empty
@@ -85,18 +86,20 @@ let diff m0 m1 label_opt env =
 	let prefix, deleted, add_index =
 		IntMap.fold
 			(fun id ag0 (prefix, deleted, ind) ->
+				if deleted = [] then
 						try
 							let ag1 = IntMap.find id (Mixture.agents m1) in
 							if id_preserving ag0 ag1 then (id:: prefix, deleted, ind)
-							else (prefix, id:: deleted, id)
+							else (prefix, id:: deleted, if id<ind then id else ind)
 						with Not_found -> (prefix, id:: deleted, ind) (*id is bigger than the max id in m1 so id is deleted*)
+				else (prefix,id::deleted,ind)
 			)
 			(Mixture.agents m0) ([],[], IntMap.size (Mixture.agents m0))
 	in
 	let added =
 		IntMap.fold
 			(fun id ag1 added ->
-						if id < add_index then added else id:: added
+				if id < add_index then added else (id:: added)
 			)	(Mixture.agents m1) []
 	in
 	let balance = (List.length deleted, List.length prefix, List.length added)
@@ -108,12 +111,20 @@ let diff m0 m1 label_opt env =
 			)
 			[] deleted
 	in
+	let instructions = (*adding creation instructions*) 
+		List.fold_left
+			(fun instructions id ->
+				let ag = Mixture.agent_of_id id m1 in
+				let name_id = Mixture.name ag in
+				ADD(id, name_id)::instructions
+			)
+			instructions added
+	in
 	let instructions,modif_sites = (*adding connections of new agents if partner has a lower id*)
 		List.fold_left
 		(fun (inst,idmap) id ->
 			let ag = Mixture.agent_of_id id m1 in
 			let name_id = Mixture.name ag in
-			let inst = ADD(id, name_id)::inst in
 			let sign = Environment.get_sig name_id env in
 			let modif_sites = 
 				Signature.fold 
@@ -198,7 +209,13 @@ let diff m0 m1 label_opt env =
 												begin
 													match opt with
 													| Some (id', site_id') -> (*generating a FREE instruction only for the smallest port*)
-															let idmap = add_map (KEPT id) (site_id,1) (add_map (KEPT id') (site_id',1) idmap)
+															let kept = try let _ = (Mixture.agent_of_id id' m1) in true with Not_found -> false
+															in
+															let idmap = 
+																if kept then 
+																	add_map (KEPT id) (site_id,1) (add_map (KEPT id') (site_id',1) idmap) (*bug if id' is deleted by the rule should not be added to modif_sites*)
+																else
+																	add_map (KEPT id) (site_id,1) idmap
 															and inst =
 																if id'< id or (id'= id && site_id'< site_id) then (FREE ((KEPT id), site_id)):: inst
 																else inst
@@ -397,7 +414,7 @@ let rec superpose todo_list lhs rhs map already_done added env =
 let enable r mix env =
 	
 	let unify rhs lhs (root,modif_sites) glueings already_done =
-		let root_ag = Mixture.agent_of_id root rhs in
+		let root_ag = try Mixture.agent_of_id root rhs with Not_found -> invalid_arg (Printf.sprintf "Dynamics.enable: agent %d not found in %s" root (Mixture.to_kappa true rhs env)) in
 		let name_id_root = Mixture.name root_ag in
 		let candidates = (*agent id in lhs --all cc-- that have the name name_id_root*)
 			let cpt = ref 0
@@ -444,21 +461,23 @@ let enable r mix env =
 			) candidates (glueings,already_done)
 	in
 	(*end sub function unify*)
-	
-	let idmap = r.modif_sites in
-	let glueings,_ = 
-		IdMap.fold
-		(fun id set (glueings,already_done) -> 
-			match id with
-				| FRESH i | KEPT i -> unify r.rhs mix (i,set) glueings already_done
-		) idmap ([],Int2Set.empty)
-	in
-	glueings
-	
+	begin
+		let idmap = r.modif_sites in
+		let glueings,_ = 
+			IdMap.fold
+			(fun id set (glueings,already_done) -> 
+				match id with
+					| FRESH i | KEPT i -> unify r.rhs mix (i,set) glueings already_done
+			) idmap ([],Int2Set.empty)
+		in
+		glueings
+	end
 
 let to_kappa r = r.kappa
 
 let dump r env =
+	let name = try Environment.rule_of_num r.r_id env with Not_found -> r.kappa in
+	Debug.tag (Printf.sprintf "****Rule %s****" name ); 
 	let dump_script script =
 		let id_of_port (id, s) =
 			match id with

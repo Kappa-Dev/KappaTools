@@ -22,6 +22,6 @@
 
 #### Initial conditions 
 %init: 1000 A,B
-%init: 2000 C
+%init: 10000 C
 
-%mod: ([E] = [emax]) do $SNAPSHOT
+## %mod: ([E] = [emax]) do $SNAPSHOT

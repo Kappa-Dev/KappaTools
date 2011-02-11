@@ -3,7 +3,7 @@
 
 %token EOF NEWLINE
 %token AT OP_PAR CL_PAR COMMA DOT KAPPA_RAR KAPPA_LNK PIPE
-%token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE SET DO UNTIL TRUE FALSE SNAPSHOT REF OBS
+%token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE SET DO UNTIL TRUE FALSE SNAPSHOT REF OBS 
 %token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INFINITY TIME EVENT INIT LET DIV PLOT SINUS COSINUS TAN SQRT EXPONENT POW ABS MODULO STOP
 %token <Tools.pos> KAPPA_NOPOLY EMAX TMAX
 %token <int*Tools.pos> INT 
@@ -122,6 +122,7 @@ bool_expr:
 | FALSE
 	{Ast.FALSE $1}
 ;
+
 
 modif_expr:
 | OP_PAR modif_expr CL_PAR  
@@ -251,6 +252,16 @@ multiple_mixture:
 non_empty_mixture:
 | OP_PAR non_empty_mixture CL_PAR
 	{$2}
+| agent_expression COMMA non_empty_mixture  
+	{Ast.COMMA ($1,$3)}
+| agent_expression 
+	{Ast.COMMA($1,Ast.EMPTY_MIX)}
+;
+
+/*
+non_empty_mixture:
+| OP_PAR non_empty_mixture CL_PAR
+	{$2}
 | non_empty_mixture COMMA agent_expression 
 	{Ast.COMMA ($3,$1)}
 | non_empty_mixture DOT agent_expression 
@@ -264,6 +275,7 @@ non_empty_mixture:
 | agent_expression 
 	{Ast.COMMA($1,Ast.EMPTY_MIX)}
 ;
+*/
 
 agent_expression:
 | ID OP_PAR interface_expression CL_PAR 
@@ -280,11 +292,19 @@ interface_expression:
 ;
 
 ne_interface_expression:
+| port_expression COMMA ne_interface_expression 
+	{Ast.PORT_SEP($1,$3)}
+| port_expression  
+	{Ast.PORT_SEP($1,Ast.EMPTY_INTF)}
+;
+
+
+/*ne_interface_expression:
 | ne_interface_expression COMMA port_expression
 	{Ast.PORT_SEP($3,$1)}
 | port_expression  
 	{Ast.PORT_SEP($1,Ast.EMPTY_INTF)}
-;
+;*/
 
 port_expression:
 | ID internal_state link_state 

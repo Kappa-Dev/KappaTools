@@ -9,6 +9,7 @@ let progressBarSymbol = ref '#'
 let progressBarSize = ref 60
 let plotSepChar = ref ' '
 let dumpIfDeadlocked = ref false
+let backtrace = ref false
 
 (*User definable values*)
 let (maxEventValue:int option ref) = ref None
@@ -19,6 +20,7 @@ let plotModeOn = ref false
 let compileModeOn = ref false
 let implicitSignature = ref false
 let dotOutput = ref false
+let fluxModeOn = ref false
 
 (*Computed values*)
 let (timeIncrementValue:float option ref) = ref None
@@ -29,6 +31,7 @@ let snapshotFileName = ref "snap"
 let dir_sep = Filename.dir_sep (* only if ocaml >= 3.11.2 otherwise use "/" *)
 let dumpFileName = ref "dump.ka"
 let influenceFileName = ref ""
+let fluxFileName = ref ""
 let outputDataName = ref "data.out"
 let inputKappaFileNames:(string list ref) = ref [] 
 
@@ -39,7 +42,25 @@ let setOutputName () =
 	set snapshotFileName ;
 	set dumpFileName ;
 	set influenceFileName ;
+	set fluxFileName ;
 	set outputDataName 
+
+let checkFileExists () =
+	let check file =  
+		if !fluxModeOn then
+			if Sys.file_exists file then 
+				begin
+					Printf.printf "File '%s' already exists do you want to erase (y/N)? " file ; flush stdout ;
+					let answer = Tools.read_input () in
+					if answer="y" then () else exit 1
+				end
+			else ()
+		else ()
+	in
+	check !influenceFileName ;
+	check !fluxFileName ;
+	let points = match !pointNumberValue with None -> false | Some _ -> true in
+	if points then check !outputDataName
 
 let (openOutDescriptors:out_channel list ref) = ref []
 let (openInDescriptors:in_channel list ref) = ref []

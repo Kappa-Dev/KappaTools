@@ -8,3 +8,16 @@ dataStructures
 Error
 binaries
 /opt/local/lib/ocaml
+Error
+binaries
+dataStructures
+grammar
+main
+man
+models
+models/basics
+models/large
+models/perturbations
+pattern
+simulation
+siteGraphs

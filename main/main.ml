@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "1.05_170111"
+let version = "1.06_070211"
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
 
@@ -36,18 +36,14 @@ let main =
 				with Sys_error msg -> (*directory does not exists*) 
 					(Printf.eprintf "%s\n" msg ; exit 1)
 			), "Specifies directory name where output file(s) should be stored") ;
-		("-im", Arg.String (fun file -> 
-			if Sys.file_exists file then 
-				begin
-					Printf.printf "File '%s' already exists do you want to erase (y/N)? " file ; flush stdout ;
-					Scanf.scanf "%s" (fun answer -> if answer="y" then Parameter.influenceFileName:=file else exit 1)
-				end
-			else Parameter.influenceFileName:=file ), "file name for data output") ;
-		("--dot-output", Arg.Unit (fun () -> Parameter.dotOutput := true), "Dot format for outputting snapshots") ;
+		("-im", Arg.String (fun file -> Parameter.influenceFileName:=file), "produces the influence map of the model") ;
+		("-flux", Arg.String (fun file -> Parameter.fluxFileName:=file ; Parameter.fluxModeOn := true), "will measure activation/inhibition fluxes during the simulation") ;
+		("--dot-output", Arg.Unit (fun () -> Parameter.dotOutput := true), "(no argument required) Dot format for outputting snapshots") ;
 		("--implicit-signature", Arg.Unit (fun () -> Parameter.implicitSignature := true), "Program will guess agent signatures automatically") ;
 		("--seed", Arg.Int (fun i -> Parameter.seedValue := Some i), "Seed for the random number generator") ;
 		("--compile", Arg.Unit (fun _ -> Parameter.compileModeOn := true), "Display rule compilation as action list") ;
-		("--debug", Arg.Unit (fun () -> Parameter.debugModeOn:= true), "Enable debug mode")
+		("--debug", Arg.Unit (fun () -> Parameter.debugModeOn:= true), "Enable debug mode") ;
+		("--backtrace", Arg.Unit (fun () -> Parameter.backtrace:= true), "Backtracing exceptions") ;
 		]
 	in
 	(*Gc.set { (Gc.get()) with Gc.space_overhead = 500 (*default 80*) } ;*)
@@ -66,7 +62,8 @@ let main =
     let _ = Sys.set_signal Sys.sigint (Sys.Signal_handle sigint_handle) in
     
 		Parameter.setOutputName() ;
-		Printexc.record_backtrace !Parameter.debugModeOn ; (*Possible backtrace*)
+		Parameter.checkFileExists() ;
+		Printexc.record_backtrace !Parameter.backtrace ; (*Possible backtrace*)
 		
 		(*let _ = Printexc.record_backtrace !Parameter.debugModeOn in*) 
 		let result =
@@ -102,14 +99,24 @@ let main =
 			print_newline() ;
 			Printf.printf "Simulation ended (eff.: %f)\n" 
 			((float_of_int (Counter.event counter)) /. (float_of_int (Counter.null_event counter + Counter.event counter))) ;
+			if !Parameter.fluxModeOn then 
+				let d = open_out "flux.dot" in
+				State.dot_of_flux d state env ;
+				close_out d 
+			else () ;
 		with
+			| Invalid_argument msg -> 
+				begin
+					(*if !Parameter.debugModeOn then (Debug.tag "State dumped! (dump.ka)" ; let desc = open_out "dump.ka" in State.snapshot state counter desc env ; close_out desc) ; *)
+					let s = Printexc.get_backtrace() in Printf.eprintf "\n***Runtime error %s***\n%s\n" msg s ;
+					exit 1
+				end
 			| ExceptionDefn.UserInterrupted msg -> 
 				begin
 					flush stdout ; 
 					Printf.eprintf "\n***%s: would you like to record the current state? (y/N)***" msg ; flush stderr ;
-					let user_input = Stream.of_channel stdin in
-					(match Stream.next user_input with
-						| 'y' ->
+					(match Tools.read_input () with
+						| "y" | "yes"  ->
 							begin 
 								let desc = open_out !Parameter.dumpFileName in 
 								State.snapshot state counter desc env ;
@@ -127,7 +134,7 @@ let main =
 	with
 	| ExceptionDefn.Semantics_Error (pos, msg) -> 
 		(close_desc () ; Printf.eprintf "***Error (%s) line %d, char %d: %s***\n" (fn pos) (ln pos) (cn pos) msg)
-	| Invalid_argument msg -> (close_desc (); let s = Printexc.get_backtrace() in Printf.eprintf "\n***Runtime error %s***\n%s\n" msg s)
+	| Invalid_argument msg ->	(close_desc (); let s = Printexc.get_backtrace() in Printf.eprintf "\n***Runtime error %s***\n%s\n" msg s)
 	| ExceptionDefn.UserInterrupted msg -> (Printf.eprintf "\n***Interrupted by user: %s***\n" msg ; close_desc())
 	| ExceptionDefn.StopReached msg -> (Printf.eprintf "\n***%s***\n" msg ; close_desc())
 	| Sys_error msg -> (close_desc (); Printf.eprintf "%s\n" msg)

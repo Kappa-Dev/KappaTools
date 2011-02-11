@@ -30,7 +30,6 @@ let eval_node env a link_map node_map node_id =
 	and ag_name = a.Ast.ag_nme 
 	and pos_ag = a.Ast.ag_pos
 	in
-	Debug.tag (Printf.sprintf "Node %d is of type %s" node_id ag_name) ;
 	let env,name_id = 
 		try (env,Environment.num_of_name ag_name env) with 
 			| Not_found -> 
@@ -96,7 +95,7 @@ let eval_node env a link_map node_map node_id =
 	(*end sub function*)
 	
 	let (bond_list,link_map,intf,env) = build_intf ast_intf link_map IntMap.empty [] sign in
-	let node = Node.create ~with_interface:intf name_id env in (*check what one gives to Node.create*) 
+	let node = Node.create ~with_interface:intf name_id env in  
 	let node_map = IntMap.add node_id node node_map in
 	List.iter 
 	(fun (ni,pi,nj,pj) ->
@@ -500,7 +499,8 @@ let rule_of_ast env (ast_rule_label, ast_rule) = (*TODO take into account no_pol
 			Dynamics.r_id = r_id;
 			Dynamics.added = List.fold_left (fun set i -> IntSet.add i set) IntSet.empty added ;
 			Dynamics.side_effect = side_effect ; 
-			Dynamics.modif_sites = modif_sites
+			Dynamics.modif_sites = modif_sites ;
+			Dynamics.is_pert = false
 		})
 
 let variables_of_result env res =
@@ -667,7 +667,8 @@ let pert_of_result variables env res =
 								Dynamics.r_id = r_id;
 								Dynamics.added = List.fold_left (fun set i -> IntSet.add i set) IntSet.empty added ;
 								Dynamics.side_effect = side_effect ; 
-								Dynamics.modif_sites = modif_sites
+								Dynamics.modif_sites = modif_sites ;
+								Dynamics.is_pert = true
 							}
 							in
 							(env,rule_opt)
@@ -704,7 +705,8 @@ let pert_of_result variables env res =
 								Dynamics.r_id = r_id;
 								Dynamics.added = List.fold_left (fun set i -> IntSet.add i set) IntSet.empty added ;
 								Dynamics.side_effect = side_effect ; 
-								Dynamics.modif_sites = modif_sites
+								Dynamics.modif_sites = modif_sites ;
+								Dynamics.is_pert = true
 							}
 							in
 							(env,rule_opt)

@@ -7,7 +7,7 @@ open ExceptionDefn
 type lnk_t = WLD | BND | FREE | TYPE of (int*int) 
 type port_status = (int option * ptr) (*internal state,link state*)
 and port = {status:port_status ; mutable dep : (LiftSet.t * LiftSet.t)} (*dep : (lifts for int,lifts for lnk)*)
-and t = {name:int ; interface : port array ; mutable address : int option ; mutable species_id : int option}
+and t = {name:int ; interface : port array ; mutable address : int option }
 and ptr = Null | Ptr of (t * int) | FPtr of (int * int)
 and node = t (*just alias for Node.t*)
 
@@ -16,8 +16,9 @@ let interface node = node.interface
 let set_address node i = node.address <- Some i
 let get_address node = match node.address with None -> raise Not_found | Some addr -> addr
 let is_empty node = (node.name = -1)
+
 let get_lifts u i = 
-	let port_i = try u.interface.(i) with Invalid_argument msg -> invalid_arg ("Node.get_lifts: "^msg)
+	let port_i = try u.interface.(i) with Invalid_argument msg -> invalid_arg (Printf.sprintf "Node.get_lifts: node %d has no site %d" (name u) i)
 	in
 		port_i.dep
 
@@ -127,10 +128,12 @@ let marshalize node =
 					intf
 		) node (Array.copy node.interface)
 	in
-		{node with address = Some (get_address node) ; species_id = None ; interface = f_intf}
+		{node with address = Some (get_address node) ; interface = f_intf}
 		
-let is_bound ?with_type (n,i) = 
-	match n.interface.(i).status with
+let is_bound ?with_type (n,i) =
+	let intf = n.interface.(i).status 
+	in
+	match intf with
 		| (_,FPtr _) -> invalid_arg "Node.is_bound"
 		| (_,Null) -> false
 		| (_,Ptr (u,j)) -> 
@@ -204,7 +207,7 @@ let create ?with_interface name_id env =
 						{status = (def_int,Null) ; dep = (LiftSet.create !Parameter.defaultLiftSetSize,LiftSet.create !Parameter.defaultLiftSetSize)}
 				)
 			in 
-				let u = {name = name_id ; interface = intf ; address = None ; species_id = None} in
+				let u = {name = name_id ; interface = intf ; address = None } in
 					match with_interface with
 						| None -> u
 						| Some m ->
