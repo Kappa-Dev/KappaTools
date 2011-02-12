@@ -11,7 +11,7 @@ SOURCES = \
 		siteGraphs/node.ml pattern/mixture.mli  \
 		pattern/mixture.ml pattern/precondition.ml pattern/precondition.mli \
 		siteGraphs/graph.ml siteGraphs/species.ml pattern/matching.ml pattern/dynamics.ml \
-		grammar/eval.mli simulation/cflow.ml simulation/state.ml simulation/external.ml grammar/eval.ml  \
+		grammar/eval.mli simulation/state.ml simulation/external.ml grammar/eval.ml  \
 		simulation/plot.ml simulation/b3.ml simulation/run.ml\
 		main/main.ml 
 
@@ -28,11 +28,11 @@ all: nc
 ##uncomment the line below and set value below according to the location of your ocaml compilers 
 ##(usually /usr/bin/ under linux and /sw/bin under MAC OS X)
 
-OCAMLBINPATH = /opt/local/bin/
+OCAMLBINPATH = /usr/bin/
 
 OCAMLCP = $(OCAMLBINPATH)ocamlcp
 OCAMLLEX = $(OCAMLBINPATH)ocamllex
-OCAMLYACC = $(OCAMLBINPATH)menhir
+OCAMLYACC = $(OCAMLBINPATH)ocamlyacc
 OCAMLC = $(OCAMLBINPATH)ocamlc.opt 
 OCAMLOPT = $(OCAMLBINPATH)ocamlopt.opt #-g -ccopt -g
 OCAMLDEP = $(OCAMLBINPATH)ocamldep
