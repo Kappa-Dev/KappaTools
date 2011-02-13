@@ -4,6 +4,10 @@ type agent
 type t
 type constraints = PREVIOUSLY_DISCONNECTED of int*int | PREVIOUSLY_CONNECTED of int*int
 
+
+val set_root_of_cc : t -> t
+val root_of_cc : t -> int -> int option
+
 (**[constraints mix] returns the map [id -> constr] if agent [id] in [mix] has some contextual constraints*)
 val constraints : t -> constraints Mods.IntMap.t
 

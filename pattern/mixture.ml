@@ -15,7 +15,8 @@ type t = {
 	component_of_id : int array option ; (*id -> cc_id starting at 0*)
 	arity : int option (*number of connected components*) ;
 	mix_id : int option ;
-	size_of_cc : int array 
+	size_of_cc : int array ;
+	root_of_cc : int array 
 	}
 and constraints = PREVIOUSLY_DISCONNECTED of int*int | PREVIOUSLY_CONNECTED of int*int (*(id,radius)*)
 
@@ -56,6 +57,20 @@ let component_of_id id mix =
 			end
 		| None -> invalid_arg "Mixture.component_of_id: component_of_id not computed"
 
+let set_root_of_cc mix = 
+	match mix.component_of_id with
+				| None -> invalid_arg "Mixture.set_root_of_cc"
+				| Some ar -> 
+					let root_of_cc = Array.create (arity mix) (-1) in 
+					Array.iteri (fun a_i cc_i -> if root_of_cc.(cc_i) < a_i then root_of_cc.(cc_i) <- a_i) ar ;
+					{mix with root_of_cc = root_of_cc}
+
+let root_of_cc mix cc_id =
+	try
+		Some (mix.root_of_cc.(cc_id)) 
+	with
+		| _ -> None
+			
 let agent_of_id i mix = IntMap.find i mix.agents
 let name ag = ag.name
 let agents mix = mix.agents
@@ -81,7 +96,8 @@ let empty id_opt = {
 	component_of_id = None ;
 	arity = None ;
 	mix_id = id_opt ;
-	size_of_cc = Array.create 0 0
+	size_of_cc = Array.create 0 0 ;
+	root_of_cc = Array.create 0 0
 	} 
 
 let size_of_cc cc_id mix = 

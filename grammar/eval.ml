@@ -427,7 +427,9 @@ let mixture_of_ast mix_id_opt is_pattern env ast_mix =
 							in raise (ExceptionDefn.Semantics_Error (pos, msg))
 		)
 		ctxt.pairing;
-		let mix = Mixture.enum_alternate_anchors mix in (mix,env) (*Modifies mix as a side effect*)
+		let mix = Mixture.enum_alternate_anchors mix in 
+		let mix = Mixture.set_root_of_cc mix in
+			(mix,env) (*Modifies mix as a side effect*)
 	end
 
 let signature_of_ast s env =

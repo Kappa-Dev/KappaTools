@@ -24,4 +24,4 @@
 %init: 1000 A,B
 %init: 10000 C
 
-## %mod: ([E] = [emax]) do $SNAPSHOT
+%mod: ([E] = [emax]) do $SNAPSHOT

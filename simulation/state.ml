@@ -160,29 +160,18 @@ let update_activity state cause var_id counter env =
 
 (* compute complete embedding of mix into sg at given root --for           *)
 (* initialization phase                                                    *)
-let generate_embeddings sg u_i mix comp_injs already_done =
+let generate_embeddings sg u_i mix comp_injs =
+	let mix_id = Mixture.get_id mix in
 	
-	let node_i =
-		try SiteGraph.node_of_id sg u_i
-		with
-		| Invalid_argument msg ->
-				invalid_arg ("Matching.generate_embeddings: " ^ msg) in
-	let name = Node.name node_i and mix_id = Mixture.get_id mix in
-	
-	let rec iter cc_id sg comp_injs already_done =
+	let rec iter cc_id sg comp_injs  =
 		if cc_id = (Mixture.arity mix)
-		then (sg, comp_injs, already_done)
+		then (sg, comp_injs)
 		else
-			
-			let used = try Int2Map.find (Mixture.get_id mix,cc_id) already_done with Not_found -> IntSet.empty in
-			if IntSet.mem u_i used then (sg,comp_injs,already_done)
-			else
-			(let id_opt = (*pick one representative for cc_id*)
-					try Some (IntSet.choose (Mixture.ids_of_name (name, cc_id) mix))
-					with | Not_found -> None
-				in
+			(
+			let id_opt = Mixture.root_of_cc mix cc_id 
+			in
 				match id_opt with
-				| None -> iter (cc_id + 1) sg comp_injs already_done
+				| None -> iter (cc_id + 1) sg comp_injs
 				| Some id_root ->
 						let opt_inj =
 							Matching.component
@@ -190,13 +179,10 @@ let generate_embeddings sg u_i mix comp_injs already_done =
 								(sg, u_i) mix
 						in
 						(match opt_inj with
-							| None -> iter (cc_id + 1) sg comp_injs already_done
+							| None -> iter (cc_id + 1) sg comp_injs 
 							| Some (injection, port_map) ->
 							(* port_map: u_i -> [(p_k,0/1);...] if port k of node i is   *)
 							(* int/lnk-tested by map                                     *)
-								let cod = try Injection.codomain injection used with Injection.Clashing -> invalid_arg "State.generate_embeddings: Rigidity invariant violation"
-								in
-								let already_done = Int2Map.add (mix_id,cc_id) cod already_done in
 								let opt =
 									(try comp_injs.(cc_id)
 									with
@@ -215,20 +201,20 @@ let generate_embeddings sg u_i mix comp_injs already_done =
 									let sg =
 										SiteGraph.add_lift sg injection port_map
 									in 
-									iter (cc_id + 1) sg comp_injs already_done
+									iter (cc_id + 1) sg comp_injs 
 								)
 						)
 			)
 	in 
-	iter 0 sg comp_injs already_done
+	iter 0 sg comp_injs 
 
 (**[initialize_embeddings state mix_list] *) (*mix list is the list of kappa observables one wishes to track during simulation*)
 let initialize_embeddings state mix_list =
-	let state,_ = 
+	let state = 
 		SiteGraph.fold 
-		(fun i node_i (state,already_done) ->
+		(fun i node_i state ->
 			List.fold_left
-			(fun (state,already_done) mix ->
+			(fun state mix ->
 				let injs = state.injections in
 				let opt = try injs.(Mixture.get_id mix) with exn -> (print_string ("caught: "^(Printexc.to_string exn)) ; raise exn) in 
 				let comp_injs =
@@ -236,16 +222,15 @@ let initialize_embeddings state mix_list =
 					| None -> Array.create (Mixture.arity mix) None
 					| Some comp_injs -> comp_injs in
 				(* complement the embeddings of mix in sg using node i  as anchor for matching *)
-				let (sg, comp_injs, already_done) =
-					generate_embeddings state.graph i mix comp_injs already_done
+				let (sg, comp_injs) =	generate_embeddings state.graph i mix comp_injs
 				in
 					(* adding injections.(mix_id) = injs(mix) to injections array*)
 					injs.(Mixture.get_id mix) <- Some comp_injs;
-					({state with graph = sg},already_done)
+					{state with graph = sg}
 			)
-			(state,already_done) mix_list
+			state mix_list
 		)
-		state.graph (state,Int2Map.empty)
+		state.graph state
 	in
 	state
 
