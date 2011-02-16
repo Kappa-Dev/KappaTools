@@ -24,4 +24,4 @@
 %init: 1000 A,B
 
 #### Perturbation
-%mod: [E] > 1000 do $ADD 1000 C
+%mod: [E] > 1000 do $SNAPSHOT

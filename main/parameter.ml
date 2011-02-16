@@ -28,7 +28,7 @@ let (timeIncrementValue:float option ref) = ref None
 (*Name convention*)
 let outputDirName = ref (Sys.getcwd ())
 let snapshotFileName = ref "snap"
-let dir_sep = Filename.dir_sep (* only if ocaml >= 3.11.2 otherwise use "/" *)
+
 let dumpFileName = ref "dump.ka"
 let influenceFileName = ref ""
 let fluxFileName = ref ""

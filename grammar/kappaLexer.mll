@@ -160,5 +160,4 @@ rule token = parse
 				Parameter.openInDescriptors := List.tl (!Parameter.openInDescriptors) ; 
 				return_error lexbuf msg
 				) 
-			| exn -> (Printexc.print_backtrace stderr ; raise exn)
 }

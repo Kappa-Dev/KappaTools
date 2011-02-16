@@ -17,8 +17,8 @@ type t = {
 	rule_of_num : string IntMap.t ;
 	
 	fresh_alg : int ;
-	num_of_alg : int StringMap.t ;
-	alg_of_num : string IntMap.t ;
+	num_of_alg : (int*float option) StringMap.t ;
+	alg_of_num : (string*float option) IntMap.t ;
 	
 	fresh_pert : int ;
 	num_of_pert : int StringMap.t ;
@@ -170,7 +170,7 @@ let declare_var_kappa ?(from_rule=false) label_pos_opt env =
 					kappa_of_num = pn ; 
 					fresh_kappa = fp},fp-1)
 
-let declare_var_alg label_pos_opt env =
+let declare_var_alg label_pos_opt const env =
 	let label,pos = match label_pos_opt with
 		| Some (label,pos) -> (label,pos)
 		| None -> invalid_arg "Environment.declare_var_alg"
@@ -182,8 +182,8 @@ let declare_var_alg label_pos_opt env =
 	in
 		if already_defined then raise (Semantics_Error (pos, (Printf.sprintf "Label '%s' already defined" label)))
 		else
-			let np = StringMap.add label env.fresh_alg env.num_of_alg
-			and pn = IntMap.add env.fresh_alg label env.alg_of_num
+			let np = StringMap.add label (env.fresh_alg,const) env.num_of_alg
+			and pn = IntMap.add env.fresh_alg (label,const) env.alg_of_num
 			and fp = env.fresh_alg+1
 			in
 				({env with 

@@ -297,10 +297,14 @@ let rec partial_eval_alg env ast =
 				| (*shifting obs_id because 0 is reserved for time dependencies*)
 				Not_found -> (* lab is the label of an algebraic expression *)
 						(try
-							let i = Environment.num_of_alg lab env
+							let i,const = Environment.num_of_alg lab env
 							in
-							((fun _ v _ _ -> v i), false,
-								(DepSet.singleton (Mods.ALG i)), ("'" ^ (lab ^ "'")))
+							let v,is_const,dep =
+								match const with
+									| Some c -> ((fun _ _ _ _ -> c),true,DepSet.empty)
+									| None -> ((fun _ v _ _ -> v i),false,DepSet.singleton (Mods.ALG i))
+							in
+							(v,is_const,dep,("'" ^ (lab ^ "'")))
 						with
 						| Not_found ->
 								raise
@@ -517,13 +521,17 @@ let variables_of_result env res =
 							let mix,env = mixture_of_ast (Some id) is_pattern env ast
 							in (env, (mix :: mixtures), vars)
 					| Ast.VAR_ALG (ast, label_pos) ->
-							let (env, var_id) =
-								Environment.declare_var_alg (Some label_pos) env in
 							let (f, is_const, dep, lbl) = partial_eval_alg env ast in
+							let (env, var_id) =
+								if is_const then
+									Environment.declare_var_alg (Some label_pos) (Some ((f (fun _ -> 0.0) (fun i -> 0.0) 0.0 0))) env 
+								else
+									Environment.declare_var_alg (Some label_pos) None env (*cannot evaluate variable yet*)
+							in
 							let v =
-								if is_const
-								then Dynamics.CONST (f (fun i -> 0.0) (fun i -> 0.0) 0.0 0)
-								else Dynamics.VAR f
+								if is_const then Dynamics.CONST (f (fun _ -> 0.0) (fun i -> 0.0) 0.0 0)
+								else 
+									Dynamics.VAR f
 							in (env, mixtures, ((v, dep, var_id) :: vars)))
 		(env, [], []) res.Ast.variables
 
@@ -753,20 +761,24 @@ let pert_of_result variables env res =
 (*Super innefficient because one is computing the mixture first!! Doesn't scale for large species like dna polymere*)
 let init_graph_of_result env res =
 	List.fold_left
-		(fun (sg,env) (n, ast, _) ->
+		(fun (sg,env) (alg, ast, pos) ->
 			let cpt = ref 0
 			and sg = ref sg
 			and env = ref env
+			and (v, is_const, dep, lbl) = partial_eval_alg env alg
 			in
-			(* Cannot do Mixture.to_nodes env m once for all because of        *)
-			(* references                                                      *)
-			while !cpt < n do
-				let nodes,env' = nodes_of_ast !env ast in
-				env := env' ;
-				sg := Graph.SiteGraph.add_nodes !sg nodes;
-				cpt := !cpt + 1 
-			done;
-			(!sg,!env)
+			if not is_const then raise (ExceptionDefn.Semantics_Error (pos, Printf.sprintf "%s is not a constant, cannot initialize graph." lbl))
+			else
+				let n = int_of_float (v (fun _ -> 0.0) (fun _ -> 0.0) 0.0 0) in
+				(* Cannot do Mixture.to_nodes env m once for all because of        *)
+				(* references                                                      *)
+				while !cpt < n do
+					let nodes,env' = nodes_of_ast !env ast in
+					env := env' ;
+					sg := Graph.SiteGraph.add_nodes !sg nodes;
+					cpt := !cpt + 1 
+				done;
+				(!sg,!env)
 		)
 		(Graph.SiteGraph.init !Parameter.defaultGraphSize,env) res.Ast.init
 	
@@ -776,11 +788,12 @@ let initialize result =
 	let counter =	Counter.create 0.0 0 !Parameter.maxTimeValue !Parameter.maxEventValue in
 	Debug.tag "\t agent signatures" ;
 	let env = environment_of_result result in
+	Debug.tag "\t variable declarations";
+	let (env, kappa_vars, alg_vars) = variables_of_result env result in
+	
 	Debug.tag "Parsing initial conditions...";
 	let sg,env = init_graph_of_result env result
 	in
-	Debug.tag "\t variable declarations";
-	let (env, kappa_vars, alg_vars) = variables_of_result env result in
 	Debug.tag "\t rules";
 	let (env, rules) = rules_of_result env result in
 	Debug.tag "\t plot instructions";

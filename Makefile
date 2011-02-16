@@ -28,7 +28,7 @@ all: nc
 ##uncomment the line below and set value below according to the location of your ocaml compilers 
 ##(usually /usr/bin/ under linux and /sw/bin under MAC OS X)
 
-OCAMLBINPATH = /usr/bin/
+#OCAMLBINPATH = /sw/bin/
 
 OCAMLCP = $(OCAMLBINPATH)ocamlcp
 OCAMLLEX = $(OCAMLBINPATH)ocamllex

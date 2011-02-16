@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "1.06_130211"
+let version = "1.06_160211"
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
 
@@ -63,7 +63,7 @@ let main =
     
 		Parameter.setOutputName() ;
 		Parameter.checkFileExists() ;
-		Printexc.record_backtrace !Parameter.backtrace ; (*Possible backtrace*)
+		(*Printexc.record_backtrace !Parameter.backtrace ; (*Possible backtrace*)*)
 		
 		(*let _ = Printexc.record_backtrace !Parameter.debugModeOn in*) 
 		let result =
@@ -108,7 +108,7 @@ let main =
 			| Invalid_argument msg -> 
 				begin
 					(*if !Parameter.debugModeOn then (Debug.tag "State dumped! (dump.ka)" ; let desc = open_out "dump.ka" in State.snapshot state counter desc env ; close_out desc) ; *)
-					let s = Printexc.get_backtrace() in Printf.eprintf "\n***Runtime error %s***\n%s\n" msg s ;
+				  let s = (* Printexc.get_backtrace() *) "" in Printf.eprintf "\n***Runtime error %s***\n%s\n" msg s ;
 					exit 1
 				end
 			| ExceptionDefn.UserInterrupted msg -> 
@@ -134,7 +134,7 @@ let main =
 	with
 	| ExceptionDefn.Semantics_Error (pos, msg) -> 
 		(close_desc () ; Printf.eprintf "***Error (%s) line %d, char %d: %s***\n" (fn pos) (ln pos) (cn pos) msg)
-	| Invalid_argument msg ->	(close_desc (); let s = Printexc.get_backtrace() in Printf.eprintf "\n***Runtime error %s***\n%s\n" msg s)
+	| Invalid_argument msg ->	(close_desc (); let s = "" (*Printexc.get_backtrace()*) in Printf.eprintf "\n***Runtime error %s***\n%s\n" msg s)
 	| ExceptionDefn.UserInterrupted msg -> (Printf.eprintf "\n***Interrupted by user: %s***\n" msg ; close_desc())
 	| ExceptionDefn.StopReached msg -> (Printf.eprintf "\n***%s***\n" msg ; close_desc())
 	| Sys_error msg -> (close_desc (); Printf.eprintf "%s\n" msg)

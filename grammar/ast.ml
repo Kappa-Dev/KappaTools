@@ -60,7 +60,7 @@ and modif_expr =
 
 type instruction = 
 	| SIG of agent * Tools.pos 
-	| INIT of int * mixture * Tools.pos
+	| INIT of alg_expr * mixture * Tools.pos
 	| DECLARE of variable
 	| OBS of variable  (*for backward compatibility*)
 	| PLOT of alg_expr
@@ -73,7 +73,7 @@ type compil = {variables : variable list; (*pattern declaration for reusing as v
 							 signatures : (agent * Tools.pos) list ; (*agent signature declaration*)
 							 rules : (rule_label * rule) list ; (*rules (possibly named)*)
 							 observables : alg_expr list ; (*list of patterns to plot*) 
-							 init : (int * mixture * Tools.pos) list ; (*initial graph declaration*)
+							 init : (alg_expr * mixture * Tools.pos) list ; (*initial graph declaration*)
 							 perturbations : perturbation list
 							}
 

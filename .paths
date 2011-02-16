@@ -22,4 +22,12 @@ models/perturbations
 pattern
 simulation
 siteGraphs
-models/debugging
+._d/Error
+._d/dataStructures
+._d/grammar
+._d/main
+._d/pattern
+._d/simulation
+._d/siteGraphs
+._ncdi/grammar
+._ncdi/pattern

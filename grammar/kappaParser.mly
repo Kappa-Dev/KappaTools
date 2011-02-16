@@ -76,7 +76,7 @@ instruction:
 | INIT multiple non_empty_mixture 
 	{Ast.INIT ($2,$3,$1)}
 | INIT error
- {raise (ExceptionDefn.Syntax_Error "Malformed initial condition, I was expecting something of the form '%init: n kappa_expression'")}
+ {raise (ExceptionDefn.Syntax_Error "Malformed initial condition, I was expecting something of the form '%init: n or 'v' kappa_expression' where n is a value or 'v' is a constant")}
 | LET variable_declaration 
 	{Ast.DECLARE $2}
 | OBS variable_declaration
@@ -142,8 +142,9 @@ modif_expr:
 ;
 
 multiple:
-/*empty*/ {1}
-| INT {let int,_=$1 in int}
+/*empty*/ {Ast.FLOAT (1.0,Tools.no_pos)}
+| INT {let int,pos=$1 in Ast.FLOAT (float_of_int int,pos) }
+| LABEL {Ast.OBS_VAR $1}
 ;
 
 rule_label: 

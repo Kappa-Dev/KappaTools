@@ -1157,10 +1157,10 @@ let dump state counter env =
 					match opt with
 					| None ->
 							Printf.printf "#x[%d]: '%s' na\n" var_id
-								(Environment.alg_of_num var_id env)
+								((fun (s,_) -> s) (Environment.alg_of_num var_id env))
 					| Some (v, x) ->
 							Printf.printf "#x[%d]: '%s' %f\n" var_id
-								(Environment.alg_of_num var_id env)
+								((fun (s,_) -> s) (Environment.alg_of_num var_id env))
 								(value state var_id counter env))
 			state.alg_variables;
 			IntMap.fold
