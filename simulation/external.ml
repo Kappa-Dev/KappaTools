@@ -45,8 +45,9 @@ let apply_effect p_id pert state counter env =
 		done ;
 		let desc = open_out !tmp_name
 		in
+		let hr = !Parameter.snapshotHighres in
 		Parameter.openOutDescriptors := desc::(!Parameter.openOutDescriptors) ;
-		State.snapshot state counter desc env ; (*could use a dedicated thread here*) 
+		State.snapshot state counter desc hr env ; (*could use a dedicated thread here*) 
 		close_out desc ;
 		Parameter.openOutDescriptors := List.tl (!Parameter.openOutDescriptors)
 	in

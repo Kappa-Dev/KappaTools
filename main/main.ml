@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "1.06_160211"
+let version = "1.06_180211"
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
 
@@ -119,7 +119,7 @@ let main =
 						| "y" | "yes"  ->
 							begin 
 								let desc = open_out !Parameter.dumpFileName in 
-								State.snapshot state counter desc env ;
+								State.snapshot state counter desc !Parameter.snapshotHighres env ;
 								Parameter.debugModeOn:=true ; State.dump state counter env ;
 								close_out desc ;
 								Printf.eprintf "Final state dumped (%s)\n" !Parameter.dumpFileName

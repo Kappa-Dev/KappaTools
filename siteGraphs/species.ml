@@ -35,6 +35,61 @@ let print desc spec env =
 	in
 	()
 
+let to_dot hr palette k cpt spec desc env = 
+	let rand_rgb () = 
+		(fun (r,g,b) -> (string_of_float r^","^string_of_float g^","^string_of_float b)) 
+		((Random.float 0.5)+.0.5,(Random.float 0.5)+.0.5, (Random.float 0.5)+.0.5)
+	in
+	let get_color lbl = 
+		let rgb = try Hashtbl.find palette lbl with Not_found -> rand_rgb()
+		in
+			Hashtbl.replace palette lbl rgb ; rgb
+	in
+		
+	Printf.fprintf desc "subgraph cluster%d{\n" cpt ;
+	Printf.fprintf desc "\tcounter%d [label = \"%d instance(s)\", shape=none];\n" cpt k ;
+	let bonds = 
+		IntMap.fold
+		(fun i node bonds ->
+			let label = 
+				if hr then ((fun (s,_)->s) (Node.to_string false ((Hashtbl.create 1),0) node env))
+				else (Environment.name (Node.name node) env)
+			in
+			Printf.fprintf desc "\tnode%d_%d [label = \"%s\", color = \"%s\", style=filled];\n" cpt i label (get_color label)  ; 
+			Printf.fprintf desc "\tnode%d_%d -> counter%d [style=invis];\n" cpt i cpt ; 
+			Node.fold_status 
+			(fun site_id status cont -> 
+				match status with
+					| (int_opt,Node.FPtr (j,k)) -> 
+						if j < i then cont
+						else
+							let node' = try IntMap.find j spec.nodes with Not_found -> invalid_arg "Species.to_dot: Node not found"
+							in
+							let int_opt'= Node.internal_state (node',k) in
+							let nme node_name site_id int_opt =
+								match int_opt with
+									| Some int -> 
+										let str = Environment.state_of_id node_name site_id int env 
+										in
+										let n = Environment.site_of_id node_name site_id env in
+										(n^"~"^str)
+									| None -> Environment.site_of_id node_name site_id env
+							in
+							(i,nme (Node.name node) site_id int_opt,j,nme (Node.name node') k int_opt')::cont
+						| _ -> cont
+			) node bonds
+		) spec.nodes []
+	in
+	List.iter
+	(fun (i,s_i,j,s_j) ->
+		if hr then
+			Printf.fprintf desc "\t node%d_%d -> node%d_%d [taillabel=\"%s\", headlabel=\"%s\", dir=none];\n" cpt i cpt j s_i s_j
+		else
+			Printf.fprintf desc "\t node%d_%d -> node%d_%d [dir=none];\n" cpt i cpt j 
+	) bonds ;
+	Printf.fprintf desc "}\n" 
+
+(*
 let to_dot k cpt spec desc env = 
 	let header = 
 		Printf.sprintf 
@@ -86,6 +141,7 @@ let to_dot k cpt spec desc env =
 		LongString.printf desc nodes_ls ;
 		LongString.printf desc bonds_ls ;
 		Printf.fprintf desc "}\n"
+*)
 
 (**[of_node sg root visited env] produces the species anchored at node [root] allocated in the graph [sg] and *)
 (** returns a pair [(spec,visited')] where [visited'=visited U node_id] of [spec]*)
@@ -205,14 +261,16 @@ let of_graph sg env =
 	in
 	species
 
-let dump desc table env =
+let dump desc table hr env =
+	let palette = Hashtbl.create 10 in
+	
 	Printf.fprintf desc "digraph G{\n" ;
 	let _ = 
 		Hashtbl.fold
 		(fun _ specs cpt ->
 					List.iter
 					(fun (spec, k) ->
-								to_dot k cpt spec desc env
+								to_dot hr palette k cpt spec desc env
 					) specs ;
 					cpt+1
 		) table 0

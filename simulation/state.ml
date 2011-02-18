@@ -19,7 +19,7 @@ type implicit_state =
 		wake_up : Precondition.t ;
 		flux : (int,float IntMap.t) Hashtbl.t ;
 	}
-and component_injections =
+and component_injections = 
 	(InjectionHeap.t option) array
 and obs = { label : string; expr : Dynamics.variable }
 
@@ -1085,11 +1085,11 @@ let apply state r embedding counter env =
 	*)
 
 
-let snapshot state counter desc env =
+let snapshot state counter desc hr env =
 	try
 		Printf.fprintf desc "# Snapshot [Event: %d, Time: %f]\n" (Counter.event counter) (Counter.time counter) ; 
 		let table = Species.of_graph state.graph env in
-		if !Parameter.dotOutput then Species.dump desc table env 
+		if !Parameter.dotOutput then Species.dump desc table hr env 
 		else
 			begin 
 			Hashtbl.iter

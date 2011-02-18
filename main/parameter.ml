@@ -21,6 +21,7 @@ let compileModeOn = ref false
 let implicitSignature = ref false
 let dotOutput = ref false
 let fluxModeOn = ref false
+let snapshotHighres = ref true
 
 (*Computed values*)
 let (timeIncrementValue:float option ref) = ref None
