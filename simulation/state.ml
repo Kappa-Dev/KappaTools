@@ -499,7 +499,8 @@ let draw_rule state counter env =
 		let embedding = select_injection state r.lhs
 		in 
 		((Some (r, embedding)), state)
-	with | Not_found -> raise Deadlock
+	with 
+		| Not_found -> (None,state)
 
 let wake_up state modif_type modifs wake_up_map env =
 	Int2Set.iter

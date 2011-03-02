@@ -110,7 +110,8 @@ module Counter =
 		let dE c = c.dE
 		let last_tick c = c.last_tick
 		let set_tick c (i,x) = c.last_tick <- (i,x)
-		let dT c = c.dT
+		
+		let last_increment c = let _,t = c.last_tick in (c.time -. t) 
 		
 		let compute_dT () = 
 			match !Parameter.pointNumberValue with

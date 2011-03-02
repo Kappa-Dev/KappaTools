@@ -9,11 +9,26 @@ let event state counter plot env =
 		let rd = Random.float 1.0 
 		and activity = (*Activity.total*) Random_tree.total state.State.activity_tree 
 		in
-			-. (log rd /. activity) 
+			let dt = -. (log rd /. activity) in 
+			if dt = infinity then 
+				let depset = Environment.get_dependencies Mods.TIME env in
+				DepSet.fold
+				(fun dep dt ->
+					match dep with
+						| Mods.PERT p_id ->
+							begin
+								let pert_opt = try Some (IntMap.find p_id state.State.perturbations) with Not_found -> None
+								in
+								match pert_opt with
+									| None -> dt
+									| Some pert -> (match Mods.Counter.dT counter with Some dt -> dt | None -> Mods.Counter.last_increment counter) (*find_dt state pert counter env*) (*recherche dicho. pour connaitre la bonne valeur de t?*)
+							end
+						| _ -> dt
+				) depset infinity
+			else dt 
 	in 
-	if dt = infinity then raise Deadlock ; (*not so good, should check here that no more perturbation applies*)
+	if dt = infinity then raise Deadlock ; 
 	
-	(*let t_plot = Profiling.start_chrono () in*)
 	Plot.fill state counter plot env dt ; 
 	Counter.inc_time counter dt ;
 	
