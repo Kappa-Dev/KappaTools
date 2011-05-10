@@ -127,32 +127,42 @@ let nodes_of_ast env ast_mixture =
 	in
 	iter ast_mixture IntMap.empty 0 IntMap.empty env
 					
-let eval_agent is_pattern env a ctxt =
+let eval_agent is_pattern tolerate_new_state env a ctxt =
 	let (ag_name, ast_intf, pos_ag) = ((a.Ast.ag_nme), (a.Ast.ag_intf), (a.Ast.ag_pos)) in
-	let name_id = 
-		try Environment.num_of_name ag_name env with 
-		| Not_found -> raise (ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared"))
+	let env,name_id = 
+		try (env,Environment.num_of_name ag_name env) with 
+		| Not_found -> 
+				if !Parameter.implicitSignature then (Environment.declare_name ag_name pos_ag env)
+				else raise (ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared"))
 	in
 	let sign_opt =
 		try Some (Environment.get_sig name_id env) with Not_found -> None in
-	let sign =
+	let env,sign =
 		match sign_opt with
-		| Some s -> s
-		| None ->	raise	(ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared")) 
+		| Some s -> (env,s)
+		| None ->
+			if !Parameter.implicitSignature then 
+				let sign = Signature.create name_id (StringMap.add "_" ([], Ast.FREE, no_pos) StringMap.empty) in (Environment.declare_sig sign pos_ag env,sign)
+			else 	
+				raise	(ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared")) 
 	in
 	let port_map = eval_intf ast_intf in
 	let (interface, ctxt, sign) =
 		StringMap.fold
 			(fun site_name (int_state_list, lnk_state, pos_site) (interface, ctxt, sign)->
 				
-				let site_id =
-					try Signature.num_of_site site_name sign
+				let site_id,sign =
+					try (Signature.num_of_site site_name sign,sign)
 					with
 					| Not_found ->
-						let msg =
-							"Eval.eval_agent: site '" ^	(site_name ^ ("' is not defined for agent '" ^ ag_name ^"'"))
-						in 
-						raise (ExceptionDefn.Semantics_Error (pos_site, msg))
+							if !Parameter.implicitSignature then
+								let sign = Signature.add_site site_name sign in
+								(Signature.num_of_site site_name sign,sign)
+							else
+							let msg =
+								"Eval.eval_agent: site '" ^	(site_name ^ ("' is not defined for agent '" ^ ag_name ^"'"))
+							in 
+							raise (ExceptionDefn.Semantics_Error (pos_site, msg))
 				in
 				let int_s,sign =
 					match int_state_list with
@@ -165,9 +175,10 @@ let eval_agent is_pattern env a ctxt =
 							(Some i,sign)
 						with
 							| exn -> 
-								if !Parameter.implicitSignature then
+								if tolerate_new_state then (
 									let sign,i = Signature.add_internal_state h site_id sign in
-									(Some i,sign)	 
+									ExceptionDefn.warning ~with_pos:pos_site (Printf.sprintf "internal state '%s' of site '%s' is added to implicit signature of agent '%s'" h site_name ag_name) ;  
+									(Some i,sign))
 								else raise exn
 				in
 				let interface,ctx = 
@@ -370,11 +381,11 @@ let rec partial_eval_bool env ast =
 		| EQUAL (ast, ast', pos) ->
 				bin_op_alg ast ast' pos (fun v v' -> v = v') "="
 
-let mixture_of_ast mix_id_opt is_pattern env ast_mix =
+let mixture_of_ast ?(tolerate_new_state=false) mix_id_opt is_pattern env ast_mix =
 	let rec eval_mixture env ast_mix ctxt mixture =
 		match ast_mix with
 		| Ast.COMMA (a, ast_mix) ->
-				let (ctxt, agent, env) = eval_agent is_pattern env a ctxt in
+				let (ctxt, agent, env) = eval_agent is_pattern tolerate_new_state env a ctxt in
 				let id = ctxt.curr_id and new_edges = ctxt.new_edges in
 				let (ctxt, mixture, env) =
 					eval_mixture env ast_mix
@@ -387,7 +398,7 @@ let mixture_of_ast mix_id_opt is_pattern env ast_mix =
 				in (ctxt, (Mixture.compose id agent mixture new_edges None), env)
 		| Ast.EMPTY_MIX -> (ctxt, mixture, env)
 		| Ast.DOT (radius, ast_ag, ast_mix) ->
-				let (ctxt, agent, env) = eval_agent is_pattern env ast_ag ctxt in
+				let (ctxt, agent, env) = eval_agent is_pattern tolerate_new_state env ast_ag ctxt in
 				let id = ctxt.curr_id and new_edges = ctxt.new_edges
 				
 				and cstr =
@@ -402,7 +413,7 @@ let mixture_of_ast mix_id_opt is_pattern env ast_mix =
 						} mixture
 				in (ctxt, (Mixture.compose id agent mixture new_edges cstr), env)
 		| Ast.PLUS (radius, ast_ag, ast_mix) ->
-				let (ctxt, agent, env) = eval_agent is_pattern env ast_ag ctxt in
+				let (ctxt, agent, env) = eval_agent is_pattern tolerate_new_state env ast_ag ctxt in
 				let id = ctxt.curr_id and new_edges = ctxt.new_edges
 				and cstr =
 					Some (Mixture.PREVIOUSLY_DISCONNECTED (radius, ctxt.curr_id + 1)) in
@@ -443,7 +454,7 @@ let signature_of_ast s env =
 	let env,name_id = Environment.declare_name name pos env in
 	(Signature.create name_id intf_map,env)
 
-let rule_of_ast env (ast_rule_label, ast_rule) = (*TODO take into account no_poly*)
+let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take into account no_poly*)
 	let (env, lhs_id) =
 		Environment.declare_var_kappa ~from_rule:true ast_rule_label.lbl_nme env in
 	(* reserving an id for rule's lhs in the pattern table *)
@@ -468,7 +479,7 @@ let rule_of_ast env (ast_rule_label, ast_rule) = (*TODO take into account no_pol
 	
 	and lhs,env = mixture_of_ast (Some lhs_id) true env ast_rule.lhs
 	in 
-	let rhs,env = mixture_of_ast None true env ast_rule.rhs in
+	let rhs,env = mixture_of_ast ~tolerate_new_state:tolerate_new_state None true env ast_rule.rhs in
 	let (script, balance,added,modif_sites,side_effect) = Dynamics.diff lhs rhs ast_rule_label.lbl_nme env
 	
 	and kappa_lhs = Mixture.to_kappa false lhs env
@@ -535,11 +546,11 @@ let variables_of_result env res =
 							in (env, mixtures, ((v, dep, var_id) :: vars)))
 		(env, [], []) res.Ast.variables
 
-let rules_of_result env res =
+let rules_of_result env res tolerate_new_state =
 	let (env, l) =
 		List.fold_left
 			(fun (env, cont) (ast_rule_label, ast_rule) ->
-						let (env, r) = rule_of_ast env (ast_rule_label, ast_rule)
+						let (env, r) = rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state
 						in (env, (r :: cont)))
 			(env, []) res.Ast.rules
 	in (env, (List.rev l))
@@ -783,26 +794,31 @@ let init_graph_of_result env res =
 		(Graph.SiteGraph.init !Parameter.defaultGraphSize,env) res.Ast.init
 	
 let initialize result =
-	Debug.tag "Compiling..." ;
+	Debug.tag "+Compiling..." ;
 
 	let counter =	Counter.create 0.0 0 !Parameter.maxTimeValue !Parameter.maxEventValue in
-	Debug.tag "\t agent signatures" ;
+	Debug.tag "\t -agent signatures" ;
 	let env = environment_of_result result in
-	Debug.tag "\t variable declarations";
-	let (env, kappa_vars, alg_vars) = variables_of_result env result in
 	
-	Debug.tag "Parsing initial conditions...";
+	Debug.tag "\t -initial conditions";
 	let sg,env = init_graph_of_result env result
 	in
-	Debug.tag "\t rules";
-	let (env, rules) = rules_of_result env result in
-	Debug.tag "\t plot instructions";
+	
+	let tolerate_new_state = !Parameter.implicitSignature in
+	Parameter.implicitSignature := false ;
+		
+	Debug.tag "\t -variable declarations";
+	let (env, kappa_vars, alg_vars) = variables_of_result env result in
+	
+	Debug.tag "\t -rules";
+	let (env, rules) = rules_of_result env result tolerate_new_state in
+	Debug.tag "\t -observables";
 	let observables = obs_of_result env result in
-	Debug.tag "\t perturbations" ;
+	Debug.tag "\t -perturbations" ;
 	let (kappa_vars, pert, rule_pert, env) = pert_of_result kappa_vars env result
 	in
-	Debug.tag "Done";
-	Debug.tag "Building initial simulation state...";
+	Debug.tag "\t Done";
+	Debug.tag "+Building initial simulation state...";
 	let (state, env) =
 		State.initialize sg rules kappa_vars alg_vars observables (pert,rule_pert) counter env
 	in 
