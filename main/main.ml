@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "1.06_020311"
+let version = "1.07_100511"
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
 
@@ -38,6 +38,7 @@ let main =
 			), "Specifies directory name where output file(s) should be stored") ;
 		("-im", Arg.String (fun file -> Parameter.influenceFileName:=file), "produces the influence map of the model") ;
 		("-flux", Arg.String (fun file -> Parameter.fluxFileName:=file ; Parameter.fluxModeOn := true), "will measure activation/inhibition fluxes during the simulation") ;
+		("-cflow", Arg.Unit (fun _ -> Parameter.causalModeOn:=true), "Causality analysis mode") ;
 		("--dot-output", Arg.Unit (fun () -> Parameter.dotOutput := true), "(no argument required) Dot format for outputting snapshots") ;
 		("--implicit-signature", Arg.Unit (fun () -> Parameter.implicitSignature := true), "Program will guess agent signatures automatically") ;
 		("--seed", Arg.Int (fun i -> Parameter.seedValue := Some i), "Seed for the random number generator") ;
@@ -63,7 +64,7 @@ let main =
     
 		Parameter.setOutputName() ;
 		Parameter.checkFileExists() ;
-		(*Printexc.record_backtrace !Parameter.backtrace ; (*Possible backtrace*)*)
+		Printexc.record_backtrace !Parameter.backtrace ; (*Possible backtrace*)
 		
 		(*let _ = Printexc.record_backtrace !Parameter.debugModeOn in*) 
 		let result =
@@ -93,9 +94,13 @@ let main =
 		if !Parameter.compileModeOn then (Hashtbl.iter (fun i r -> Dynamics.dump r env) state.State.rules ; exit 0)
 		else () ;
 		let plot = Plot.create !Parameter.outputDataName
+		and grid = 
+			if !Parameter.causalModeOn then 
+				let grid = Causal.empty_grid() in Causal.init state grid
+			else Hashtbl.create 0
 		in
 		try
-			Run.loop state counter plot env ;
+			Run.loop state grid counter plot env ;
 			print_newline() ;
 			Printf.printf "Simulation ended (eff.: %f)\n" 
 			((float_of_int (Counter.event counter)) /. (float_of_int (Counter.null_event counter + Counter.event counter))) ;

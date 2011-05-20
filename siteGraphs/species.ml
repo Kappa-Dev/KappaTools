@@ -268,11 +268,13 @@ let dump desc table hr env =
 	let _ = 
 		Hashtbl.fold
 		(fun _ specs cpt ->
-					List.iter
-					(fun (spec, k) ->
-								to_dot hr palette k cpt spec desc env
-					) specs ;
-					cpt+1
+				let c = ref cpt in
+				List.iter
+				(fun (spec, k) ->
+					to_dot hr palette k !c spec desc env ;
+					c := !c + 1
+				) specs ;
+				!c+1
 		) table 0
 	in
 	Printf.fprintf desc "}\n" 

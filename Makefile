@@ -12,7 +12,7 @@ SOURCES = \
 		pattern/mixture.ml pattern/precondition.ml pattern/precondition.mli \
 		siteGraphs/graph.ml siteGraphs/species.ml pattern/matching.ml pattern/dynamics.ml \
 		grammar/eval.mli simulation/state.ml simulation/external.ml grammar/eval.ml  \
-		simulation/plot.ml simulation/b3.ml simulation/run.ml\
+		cflow/causal.ml simulation/plot.ml simulation/b3.ml simulation/run.ml\
 		main/main.ml 
 
 ## the name of the resulting executable
@@ -22,7 +22,7 @@ RESULT  = KaSim
 ANNOTATE = no
 
 ## make target (see manual) : byte-code, debug-code, native-code, ...
-all: nc
+all: debug-code
 
 ##if ocamlopt.opt is not in your path, 
 ##uncomment the line below and set value below according to the location of your ocaml compilers 
@@ -34,7 +34,7 @@ OCAMLCP = $(OCAMLBINPATH)ocamlcp
 OCAMLLEX = $(OCAMLBINPATH)ocamllex
 OCAMLYACC = $(OCAMLBINPATH)ocamlyacc
 OCAMLC = $(OCAMLBINPATH)ocamlc.opt 
-OCAMLOPT = $(OCAMLBINPATH)ocamlopt.opt #-g -ccopt -g
+OCAMLOPT = $(OCAMLBINPATH)ocamlopt.opt -g -ccopt -g
 OCAMLDEP = $(OCAMLBINPATH)ocamldep
 CC = gcc
 

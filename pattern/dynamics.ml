@@ -6,7 +6,7 @@ open Graph
 type variable = CONST of float | VAR of ((int -> float) -> (int -> float) -> float -> int -> float)
 and action =
 		BND of (port * port)
-	| FREE of port
+	| FREE of (port * bool) (*FREE(p,b) b=true if FREE is side-effect free*)
 	| MOD of (port * int)
 	| DEL of int
 	| ADD of (int * int) (*(id in mixture, name_id)*)
@@ -14,6 +14,7 @@ and port = id * int
 and id = FRESH of int | KEPT of int (*binding or modifying a port that has been added or kept from the lhs*)
 
 module IdMap = MapExt.Make (struct type t = id let compare = compare end)
+module Id2Map = MapExt.Make (struct type t = id*int let compare = compare end)
 
 type rule = {
 	k_def : variable ; (*standard kinetic constant*)
@@ -29,10 +30,90 @@ type rule = {
 	r_id : int ;
 	added : IntSet.t;
 	side_effect : bool ;
-	modif_sites : Int2Set.t IdMap.t ;
+	modif_sites : Int2Set.t IdMap.t ;  
+	pre_causal : int Id2Map.t ; (* INTERNAL_TESTED (8) | INTERNAL_MODIF (4) | LINK_TESTED (2) | LINK_MODIF (1) *)
 	is_pert : bool
 }
 
+let _INTERNAL_TESTED = 8
+let _INTERNAL_MODIF = 4
+let _LINK_TESTED = 2
+let _LINK_MODIF = 1
+
+
+let compute_causal lhs rhs script env = 
+	let causal_map = (*adding tests for all sites mentionned in the left hand side --including existential site*) 
+		IntMap.fold 
+		(fun id ag causal_map ->
+			Mixture.fold_interface 
+			(fun site_id (int,lnk) causal_map ->
+				let c =
+					match int with
+						| Some i -> _INTERNAL_TESTED
+						| None -> 0
+				in
+				let c = 
+					match lnk with
+						| Node.WLD -> c
+						| _ -> (c lor _LINK_TESTED)
+				in
+				Id2Map.add (KEPT id,site_id) c causal_map
+			)
+			ag causal_map
+		) 
+		(Mixture.agents lhs) Id2Map.empty
+	in
+	let add_causal p c map =
+		let c' = try Id2Map.find p map with Not_found -> 0
+		in
+		Id2Map.add p (c lor c') map
+	in
+	List.fold_left
+	(fun causal_map action ->
+		match action with
+			| BND (p1, p2) -> add_causal p2 _LINK_MODIF (add_causal p1 _LINK_MODIF causal_map)  
+			| FREE (p1,side_effect_free) -> 
+				if side_effect_free then 
+					begin
+						match p1 with
+							| (KEPT id, site_id) ->
+								begin 
+									match Mixture.follow (id,site_id) lhs with
+										| Some (id',site_id') -> let p2 = (KEPT id',site_id') in add_causal p2 _LINK_MODIF (add_causal p1 _LINK_MODIF causal_map)
+										| None -> invalid_arg "Dynamics.Compute_causal"
+								end 
+							| (FRESH id, site_id) -> invalid_arg "Dynamics.Compute_causal"
+					end
+				else 
+					add_causal p1 _LINK_MODIF causal_map
+			| MOD (p,i) -> add_causal p _INTERNAL_MODIF causal_map
+			| DEL ag_id -> 
+				Mixture.fold_interface 
+				(fun site_id (int,lnk) causal_map ->
+					let causal_map = 
+						match int with Some _ -> add_causal (KEPT ag_id,site_id) _INTERNAL_MODIF causal_map | None -> causal_map
+					in
+					add_causal (KEPT ag_id,site_id) _LINK_MODIF causal_map
+				)
+				(Mixture.agent_of_id ag_id lhs) causal_map
+			| ADD (ag_id,name_id) -> (*Interface might be partial!*)
+				let sign = Environment.get_sig name_id env in
+				let arity = Signature.arity sign in
+				let site_id = ref 0 in
+				let p_causal = ref causal_map in
+				while !site_id < arity do
+					p_causal :=  
+						begin
+							match Environment.default_state name_id !site_id env with
+								| None -> !p_causal
+								| Some i -> add_causal (FRESH ag_id,!site_id) _INTERNAL_MODIF !p_causal
+						end ;
+					p_causal := add_causal (FRESH ag_id,!site_id) _LINK_MODIF !p_causal ;
+					site_id := !site_id + 1 ;
+				done ;
+				!p_causal
+	) causal_map script 
+	
 type perturbation = {precondition: boolean_variable ; effect : modification ; abort : boolean_variable option ; flag : string}
 and modification = 
 	INTRO of variable * Mixture.t 
@@ -128,7 +209,8 @@ let diff m0 m1 label_opt env =
 			let sign = Environment.get_sig name_id env in
 			let modif_sites = 
 				Signature.fold 
-				(fun site_id idmap -> add_map (FRESH id) (site_id,0) (add_map (FRESH id) (site_id,1) idmap)) 
+				(fun site_id idmap -> add_map (FRESH id) (site_id,0) (add_map (FRESH id) (site_id,1) idmap)
+				) 
 				sign idmap 
 			in
 			let inst = 
@@ -217,12 +299,12 @@ let diff m0 m1 label_opt env =
 																else
 																	add_map (KEPT id) (site_id,1) idmap
 															and inst =
-																if id'< id or (id'= id && site_id'< site_id) then (FREE ((KEPT id), site_id)):: inst
+																if id'< id or (id'= id && site_id'< site_id) then (FREE (((KEPT id), site_id),true)):: inst
 																else inst
 															in
 															(inst,idmap)
 													| None -> (*breaking a semi link so generate a FREE instruction*)
-															let inst = (FREE ((KEPT id), site_id)):: inst
+															let inst = (FREE (((KEPT id), site_id),false)):: inst
 															and idmap = add_map (KEPT id) (site_id,1) idmap
 															in
 															side_effect := true ;
@@ -305,7 +387,7 @@ let diff m0 m1 label_opt env =
 																label (Environment.name (Mixture.name ag) env) site
 														)
 												in
-												let inst = (FREE ((KEPT id), site_id))::inst
+												let inst = (FREE ((KEPT id, site_id),false))::inst
 												and idmap = add_map (KEPT id) (site_id,1) idmap
 												in
 												(side_effect := true ;
@@ -477,7 +559,15 @@ let to_kappa r = r.kappa
 
 let dump r env =
 	let name = try Environment.rule_of_num r.r_id env with Not_found -> r.kappa in
-	Debug.tag (Printf.sprintf "****Rule %s****" name ); 
+	Debug.tag (Printf.sprintf "****Rule '%s' [%s]****" name r.kappa);
+	IntMap.iter 
+	(fun id ag -> 
+		Mixture.fold_interface 
+		(fun site_id _ _ -> 
+			let c = Id2Map.find (KEPT id,site_id) r.pre_causal in
+			Printf.printf "#%d.%d=%d\n" id site_id c
+		) ag ()
+	) (Mixture.agents r.lhs) ;
 	let dump_script script =
 		let id_of_port (id, s) =
 			match id with
@@ -488,7 +578,7 @@ let dump r env =
 			(fun action ->
 						match action with
 						| BND (p, p') -> Printf.printf "BND (#%s,#%s)\n" (id_of_port p) (id_of_port p')
-						| FREE p -> Printf.printf "FREE #%s\n" (id_of_port p)
+						| FREE (p,b) -> if b then Printf.printf "FREE #%s\n" (id_of_port p) else Printf.printf "FREE* #%s\n" (id_of_port p)
 						| MOD (p, i) -> Printf.printf "SET #%s to state %d\n" (id_of_port p) i
 						| DEL i -> Printf.printf "DEL #%d\n" i
 						| ADD (i, name) ->

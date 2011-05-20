@@ -21,7 +21,7 @@
 %obs: 'Cpp' C(x1~p?,x2~p?) 
 
 #### Initial conditions 
-%init: 1000 A,B
+%init: 1000 A,B,C
 
 #### Perturbation
 %mod: [E] > 1000 do $SNAPSHOT

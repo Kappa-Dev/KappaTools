@@ -48,7 +48,7 @@ struct
 	
 	let init size = A.create size
 	
-	let node_of_id = try A.get with | exn -> raise Not_found
+	let node_of_id sg i = try A.get sg i with _ -> raise Not_found
 	
 	let add sg node =
 		try
@@ -65,7 +65,7 @@ struct
 	let neighborhood ?(interrupt_with = IntSet.empty) sg id radius =
 		let address node =
 			try ( & ) node
-			with | Not_found -> invalid_arg "SG.neighborhood: not allocated" in
+			with | Not_found -> invalid_arg "Graph.neighborhood: not allocated" in
 		let add_min id d map =
 			if IntMap.mem id map
 			then (true, map)
@@ -76,7 +76,7 @@ struct
 			Node.fold_status
 				(fun _ (_, lnk) (d_map, to_do) ->
 							match lnk with
-							| Node.FPtr _ -> invalid_arg "SG.neighborhood"
+							| Node.FPtr _ -> invalid_arg "Graph.neighborhood"
 							| Node.Null -> (d_map, to_do)
 							| Node.Ptr (node', _) ->
 									let id' = address node' in
@@ -94,7 +94,7 @@ struct
 						(try IntMap.find addr dist_map
 						with
 						| Not_found ->
-								invalid_arg "SG.neighborhood: invariant violation")
+								invalid_arg "Graph.neighborhood: invariant violation")
 					in
 					if (radius >= 0) && ((depth + 1) > radius)
 					then iter to_do dist_map

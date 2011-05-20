@@ -16,7 +16,7 @@
 %var: 'V' 1
 
 
-%var: 'on_rate' 1.E-4/'V' # per molecule per second
+%var: 'on_rate' 1.E+0/'V' # per molecule per second
 %var: 'off_rate' 0.1 # per second 
 %var: 'mod_rate' 1 # per second 
 %obs: 'AB' A(x!x.B)
@@ -25,9 +25,9 @@
 %obs: 'Cpp' C(x1~p?,x2~p?) 
 
 
-%var: 'n_a' 100 * 'V' 
-%var: 'n_b' 100 * 'V'
-%var: 'n_c' 100 * 'V'
+%var: 'n_a' 5 * 'V' 
+%var: 'n_b' 5 * 'V'
+%var: 'n_c' 5 * 'V'
 
 
 #### Initial conditions 

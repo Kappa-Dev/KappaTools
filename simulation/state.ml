@@ -863,38 +863,36 @@ let negative_upd state cause (u,i) int_lnk counter env =
 	(env,pert_ids)
 
 (* bind allow for looping bond *)
-let bind state cause (u, i) (v, j) modifs pert_ids counter env =
+let bind state cause (u, i) (v, j) side_effects pert_ids counter env =
 	let intf_u = Node.interface u and intf_v = Node.interface v in
 	(* no side effect *)
 	let (int_u_i, ptr_u_i) = try intf_u.(i).Node.status with Invalid_argument msg -> invalid_arg (Printf.sprintf "State.bind: agent %s has no site %d" (Environment.name (Node.name u) env) i)
 	and (int_v_j, ptr_v_j) = try intf_v.(j).Node.status with Invalid_argument msg -> invalid_arg (Printf.sprintf "State.bind: agent %s has no site %d" (Environment.name (Node.name v) env) j)
 	in
 	
-	let env,modifs,pert_ids = (*checking for side effects*)
+	let env,side_effects,pert_ids = (*checking for side effects*)
 		match ptr_u_i with
 		| Node.FPtr _ -> invalid_arg "State.bind"
-		| Node.Null ->
-			(*if !Parameter.fluxMode then Grid.add (Grid.LW (Node.get_address u,i)) Grid.Free (Grid.Bound (Node.get_address v,j)) ;*)
-			(env,modifs,pert_ids)
+		| Node.Null -> (env,side_effects,pert_ids)
 		| Node.Ptr (u', i') ->
 				begin
 					Node.set_ptr (u', i') Node.Null;
 					let env,pert_ids = negative_upd state cause (u', i') 1 counter env in
-					try (env,Int2Set.add ((Node.get_address u'), i') modifs, pert_ids)	
+					try (env,Int2Set.add ((Node.get_address u'), i') side_effects, pert_ids)	
 					with  Not_found -> invalid_arg "State.bind: Not_found"
 				end 
 	in
 	(* when node is not allocated *)
-	let env,modifs,pert_ids =
+	let env,side_effects,pert_ids =
 		match ptr_v_j with
 		| Node.FPtr _ -> invalid_arg "State.bind"
-		| Node.Null -> (env,modifs,pert_ids)
+		| Node.Null -> (env,side_effects,pert_ids)
 		| Node.Ptr (v', j') ->
 			begin
 				Node.set_ptr (v', j') Node.Null;
 				let env,pert_ids' = negative_upd state cause (v', j') 1 counter env in
 				try 
-					(env,Int2Set.add ((Node.get_address v'), j') modifs, IntSet.union pert_ids pert_ids')
+					(env,Int2Set.add ((Node.get_address v'), j') side_effects, IntSet.union pert_ids pert_ids')
 				with Not_found -> invalid_arg "State.bind: not found"
 			end
 	in
@@ -904,9 +902,9 @@ let bind state cause (u, i) (v, j) modifs pert_ids counter env =
 	intf_v.(j) <- { (intf_v.(j)) with Node.status = (int_v_j, Node.Ptr (u, i)) };
 	let env,pert_ids' = negative_upd state cause (v, j) 1 counter env in
 	let pert_ids = IntSet.union pert_ids pert_ids' in
-	(env,modifs,pert_ids)
+	(env,side_effects,pert_ids)
 
-let break state cause (u, i) modifs pert_ids counter env =
+let break state cause (u, i) side_effects pert_ids counter env side_effect_free =
 	let intf_u = Node.interface u and warn = 0 in
 	let (int_u_i, ptr_u_i) = intf_u.(i).Node.status
 	in
@@ -923,9 +921,12 @@ let break state cause (u, i) modifs pert_ids counter env =
 				{ (intf_v.(j)) with Node.status = (int_v_j, Node.Null); };
 				let env,pert_ids' = negative_upd state cause (v, j) 1 counter env in
 				let pert_ids = IntSet.union pert_ids pert_ids' in
-				(warn,env,(Int2Set.add ((Node.get_address v), j) modifs),pert_ids)
+				if side_effect_free then
+					(warn,env,side_effects,pert_ids)
+				else
+					(warn,env,(Int2Set.add ((Node.get_address v), j) side_effects),pert_ids)
 			)
-	| Node.Null -> ((warn + 1),env, modifs,pert_ids)
+	| Node.Null -> ((warn + 1),env, side_effects,pert_ids)
 
 let modify state cause (u, i) s pert_ids counter env =
 	let intf_u = Node.interface u and warn = 0 in
@@ -938,7 +939,7 @@ let modify state cause (u, i) s pert_ids counter env =
 				let warn = if s = j then warn + 1 else warn
 				in
 				(* if s=j then null event *)
-				let env,pert_ids = (*if s <> j then*) negative_upd state cause (u, i) 0 counter env (*else (env,pert_ids)*) in (*BUG correction 11/2/2011*)
+				let env,pert_ids = (*if s <> j then*) negative_upd state cause (u, i) 0 counter env in 
 				(warn,env,pert_ids)
 			)
 	| None ->
@@ -946,22 +947,22 @@ let modify state cause (u, i) s pert_ids counter env =
 				("State.modify: node " ^
 					((Environment.name (Node.name u) env)^" has no internal state to modify"))
 
-let delete state cause u modifs pert_ids counter env =
+let delete state cause u side_effects pert_ids counter env =
 	Node.fold_status
-	(fun i (_, lnk) (env,modifs,pert_ids) ->
+	(fun i (_, lnk) (env,side_effects,pert_ids) ->
 		let env,pert_ids' = negative_upd state cause (u, i) 2 counter env in
 		let pert_ids = IntSet.union pert_ids pert_ids' in
 			(* delete injection pointed by both lnk and int-lifts *)
 			match lnk with
 			| Node.FPtr _ -> invalid_arg "State.delete"
-			| Node.Null -> (env,modifs,pert_ids)
+			| Node.Null -> (env,side_effects,pert_ids)
 			| Node.Ptr (v, j) ->
 					Node.set_ptr (v, j) Node.Null;
 					let env,pert_ids' = negative_upd state cause (v, j) 1 counter env in
 					let pert_ids = IntSet.union pert_ids pert_ids' in
-					(env,Int2Set.add ((Node.get_address v), j) modifs,pert_ids)
+					(env,Int2Set.add ((Node.get_address v), j) side_effects,pert_ids)
 	)
-	u (env,modifs,pert_ids)
+	u (env,side_effects,pert_ids)
 
 let apply state r embedding counter env =
 	let mix = r.lhs in
@@ -1033,9 +1034,9 @@ let apply state r embedding counter env =
 								bind state r.r_id (u, i) (v, j) side_effects pert_ids counter env
 							in
 							edit state script' phi psi side_effects pert_ids env
-					| FREE p ->
+					| FREE (p,side_effect_free) ->
 							let x = app state phi psi p in
-							let (warn, env, side_effects,pert_ids) = break state r.r_id x side_effects pert_ids counter env
+							let (warn, env, side_effects,pert_ids) = break state r.r_id x side_effects pert_ids counter env side_effect_free
 							in
 							if warn > 0 then Counter.inc_null_action counter ;
 							edit state script' phi psi side_effects pert_ids env
@@ -1079,11 +1080,6 @@ let apply state r embedding counter env =
 				end
 	in
 	edit state r.script embedding IntMap.empty Int2Set.empty IntSet.empty env
-	
-	(*let (_,_,side_effects, phi, psi, _) as res = edit state r.script embedding IntMap.empty Int2Set.empty IntSet.empty env in 
-	if !Parameter.fluxModeOn then Cflow.update state.graph r side_effects phi psi env counter ; 
-	res
-	*)
 
 
 let snapshot state counter desc hr env =
