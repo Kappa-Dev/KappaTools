@@ -119,4 +119,4 @@ let to_string sign =
 			) assoc ;
 			String.concat "," (List.rev !cont)
 	in
-		Printf.sprintf "%d(%s)"	sign.control (str_of_assoc sign.assoc)
+		Printf.sprintf "(%s)"	(str_of_assoc sign.assoc)
