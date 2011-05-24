@@ -799,17 +799,16 @@ let initialize result =
 	let counter =	Counter.create 0.0 0 !Parameter.maxTimeValue !Parameter.maxEventValue in
 	Debug.tag "\t -agent signatures" ;
 	let env = environment_of_result result in
-	
+	Debug.tag "\t -variable declarations";
+	let (env, kappa_vars, alg_vars) = variables_of_result env result in
+
 	Debug.tag "\t -initial conditions";
 	let sg,env = init_graph_of_result env result
 	in
 	
 	let tolerate_new_state = !Parameter.implicitSignature in
 	Parameter.implicitSignature := false ;
-		
-	Debug.tag "\t -variable declarations";
-	let (env, kappa_vars, alg_vars) = variables_of_result env result in
-	
+			
 	Debug.tag "\t -rules";
 	let (env, rules) = rules_of_result env result tolerate_new_state in
 	Debug.tag "\t -observables";
