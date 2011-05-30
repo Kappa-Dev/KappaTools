@@ -291,7 +291,8 @@ let diff m0 m1 label_opt env =
 												begin
 													match opt with
 													| Some (id', site_id') -> (*generating a FREE instruction only for the smallest port*)
-															let kept = try let _ = (Mixture.agent_of_id id' m1) in true with Not_found -> false
+															let kept = List.exists (fun id -> id=id') prefix 
+																(*try let _ = (Mixture.agent_of_id id' m1) in true with Not_found -> false*)
 															in
 															let idmap = 
 																if kept then 
@@ -352,7 +353,10 @@ let diff m0 m1 label_opt env =
 																in
 																if id1'< id or (id1'= id && i1'< site_id) then
 																	let inst = BND((KEPT id, site_id), (KEPT id1', i1')):: inst
-																	and idmap = add_map (KEPT id) (site_id,1) (add_map (KEPT id1') (i1',1) (add_map (KEPT id1) (i1,1) idmap))
+																	and idmap = (*it might be that id1 is not preserved by the reaction!*)
+																		if List.exists (fun id -> id=id1) prefix then add_map (KEPT id1) (i1,1) idmap else idmap
+																	in
+																	let idmap = add_map (KEPT id) (site_id,1) (add_map (KEPT id1') (i1',1) idmap)
 																	in
 																		(inst,idmap)
 																else (inst,idmap)
@@ -549,7 +553,8 @@ let enable r mix env =
 			IdMap.fold
 			(fun id set (glueings,already_done) -> 
 				match id with
-					| FRESH i | KEPT i -> unify r.rhs mix (i,set) glueings already_done
+					| FRESH i -> Debug.tag (Printf.sprintf "%s FRESH %d" r.kappa i) ; unify r.rhs mix (i,set) glueings already_done
+					| KEPT i -> Debug.tag (Printf.sprintf "%s KEPT %d" r.kappa i) ; unify r.rhs mix (i,set) glueings already_done
 			) idmap ([],Int2Set.empty)
 		in
 		glueings
@@ -583,7 +588,7 @@ let dump r env =
 						| DEL i -> Printf.printf "DEL #%d\n" i
 						| ADD (i, name) ->
 								let sign = Environment.get_sig name env in
-								Printf.printf "ADD %s with identifier #%d\n" (Signature.to_string sign) ((fun (deleted, kept, _) -> deleted + kept + i) r.balance)
+								Printf.printf "ADD %s%s with identifier #%d\n" (Environment.name name env) (Signature.to_string sign) ((fun (deleted, kept, _) -> deleted + kept + i) r.balance)
 			)
 			script
 	in

@@ -815,7 +815,7 @@ let initialize result =
 	
 	let tolerate_new_state = !Parameter.implicitSignature in
 	Parameter.implicitSignature := false ;
-		
+
 	Debug.tag "\t -rules";
 	let (env, rules) = rules_of_result env result tolerate_new_state in
 	Debug.tag "\t -observables";
