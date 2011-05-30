@@ -3,11 +3,8 @@ open Mods
 open State
 open Random_tree
 
-<<<<<<< HEAD
-let version = "1.07_100511"
-=======
-let version = "1.06_240511"
->>>>>>> 6f1a64a6a28224d1b53f1a67120adfd659fdce5e
+let version = "1.07_300511"
+
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
 
