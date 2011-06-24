@@ -113,8 +113,7 @@ let apply_effect p_id pert state counter env =
 									if !Parameter.debugModeOn then Debug.tag "Clashing instance detected: building matrix";
 									let matrix = State.instances_of_square mix_id state in
 										match matrix with
-											| (embedding,_)::_ -> (*not super efficient but should not happen if components to delete are connected...*)
-												Some [| Some (IntMap.fold (fun i j inj -> Injection.add i j inj) embedding (Injection.empty (IntMap.size embedding) (0,0)))|]
+											| (embedding,_)::_ -> Some embedding 
 											| [] -> None
 						in
 							match opt with

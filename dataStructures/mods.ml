@@ -29,6 +29,8 @@ module Injection =
 		let get_address phi = match phi.address with Some a -> a | None -> raise Not_found
 		let get_coordinate phi = phi.coordinate 
 		
+		let is_trashed phi = match phi.address with Some (-1) -> true | _ -> false
+		
 		let add i j phi = Hashtbl.replace phi.map i j ; phi
 		let mem i phi = Hashtbl.mem phi.map i 
 		let size phi = Hashtbl.length phi.map
@@ -36,7 +38,6 @@ module Injection =
 		let empty n (mix_id,cc_id) = {map = Hashtbl.create n ; address = None ; coordinate = (mix_id,cc_id)}
 		let flush phi (var_id,cc_id) = 
 			{phi with address = None ; coordinate = (var_id,cc_id)}
-		
 		
 		let compare phi psi = 
 			try
@@ -51,10 +52,10 @@ module Injection =
 		let fold f phi cont = Hashtbl.fold f phi.map cont
 
 		exception Clashing
-		let codomain phi cod = 
+		let codomain phi (inj,cod) = 
 			Hashtbl.fold 
-			(fun i j set -> if IntSet.mem j set then raise Clashing else IntSet.add j set) 
-			phi.map cod
+			(fun i j (map,set) -> if IntSet.mem j set then raise Clashing else (IntMap.add i j map,IntSet.add j set)) 
+			phi.map (inj,cod)
 		
 		let to_string phi = 
 			Tools.string_of_map string_of_int string_of_int Hashtbl.fold phi.map 

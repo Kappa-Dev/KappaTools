@@ -775,7 +775,6 @@ let pert_of_result variables env res =
 		in 
 		(variables, (List.rev lpert), (List.rev lrules), env)
 
-(*Super innefficient because one is computing the mixture first!! Doesn't scale for large species like dna polymere*)
 let init_graph_of_result env res =
 	List.fold_left
 		(fun (sg,env) (alg, ast, pos) ->
@@ -786,7 +785,7 @@ let init_graph_of_result env res =
 			in
 			if not is_const then raise (ExceptionDefn.Semantics_Error (pos, Printf.sprintf "%s is not a constant, cannot initialize graph." lbl))
 			else
-				let n = int_of_float (v (fun _ -> 0.0) (fun _ -> 0.0) 0.0 0) in
+				let n = match !Parameter.rescale with None -> int_of_float (v (fun _ -> 0.0) (fun _ -> 0.0) 0.0 0) | Some i -> min i (int_of_float (v (fun _ -> 0.0) (fun _ -> 0.0) 0.0 0)) in
 				(* Cannot do Mixture.to_nodes env m once for all because of        *)
 				(* references                                                      *)
 				while !cpt < n do
@@ -799,10 +798,9 @@ let init_graph_of_result env res =
 		)
 		(Graph.SiteGraph.init !Parameter.defaultGraphSize,env) res.Ast.init
 	
-let initialize result =
+let initialize result counter =
 	Debug.tag "+Compiling..." ;
 
-	let counter =	Counter.create 0.0 0 !Parameter.maxTimeValue !Parameter.maxEventValue in
 	Debug.tag "\t -agent signatures" ;
 	let env = environment_of_result result in
 	
@@ -828,4 +826,4 @@ let initialize result =
 	let (state, env) =
 		State.initialize sg rules kappa_vars alg_vars observables (pert,rule_pert) counter env
 	in 
-	(Debug.tag "Done"; (env, state, counter))
+	(Debug.tag "Done"; (env, state))

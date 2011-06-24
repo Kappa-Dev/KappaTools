@@ -58,14 +58,7 @@ let event state grid counter plot env =
 					(Printf.sprintf "Applying '%s' with embedding:" 
 						(try Environment.rule_of_num r.Dynamics.r_id env with Not_found -> r.Dynamics.kappa)
 					); 
-					Array.iteri 
-					(fun i inj_opt ->
-						match inj_opt with
-							| Some inj -> 
-								if !Parameter.debugModeOn then Debug.tag 
-								(Printf.sprintf "[%d,%d,%d]: %s" (Mixture.get_id r.Dynamics.lhs) i (Injection.get_address inj) (Injection.to_string inj))
-							| None -> invalid_arg "Run.event"
-					) embedding 
+					Debug.tag (Printf.sprintf "%s" (string_of_map string_of_int string_of_int IntMap.fold embedding)) 
 				end
 				else () ;
 				(********************************************)
@@ -80,13 +73,12 @@ let event state grid counter plot env =
 		match opt_new_state with
 			| Some ((env,state,side_effect,phi,psi,pert_ids),r_id) ->
 				let r = State.rule_of_id r_id state in
-				let phi' = Array.init (Array.length phi) (fun i -> match phi.(i) with Some inj -> Some (Injection.copy inj) | None -> None) in (*Not optimal but avoids bug caused by reusing embedding when a rule is activating oneself*)
 				let env,state,pert_ids' = 
-					State.positive_update state r (phi',psi) (side_effect,Int2Set.empty) counter env
+					State.positive_update state r (phi,psi) (side_effect,Int2Set.empty) counter env
 				in
 					let grid = 
 						if !Parameter.causalModeOn then
-							Causal.record r.Dynamics.lhs (Some (r.Dynamics.pre_causal,side_effect,psi,false,r.Dynamics.r_id)) phi' state counter false grid env
+							Causal.record r.Dynamics.lhs (Some (r.Dynamics.pre_causal,side_effect,psi,false,r.Dynamics.r_id)) phi state counter false grid env
 						else grid
 					in
 					(env,state,IntSet.union pert_ids pert_ids',grid)

@@ -36,7 +36,7 @@ module Make(C:Content) =
 		}
    	
 	
-	let bury h value = h.cemetery <- value::h.cemetery
+	let bury h value = C.allocate value (-1) ; h.cemetery <- value::h.cemetery
 	
 	let get = GenArray.get
 	let set = GenArray.set

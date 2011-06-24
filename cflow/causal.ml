@@ -144,16 +144,7 @@ let record mix opt_rule embedding state counter locked grid env =
 			| KEPT j ->
 				let im_j =
 					begin
-						let cc_j = Mixture.component_of_id j mix in
-						let opt =
-							try embedding.(cc_j) with Invalid_argument msg -> invalid_arg ("Causal.record: " ^ msg) 
-						in
-						let inj =
-							match opt with
-							| Some emb -> emb
-							| None -> invalid_arg "Causal.record"
-						in
-						try	(Injection.find j inj) with Not_found -> invalid_arg "Causal.record: Not a valid embedding"
+						try	(IntMap.find j embedding) with Not_found -> invalid_arg "Causal.record: Not a valid embedding"
 					end
 				in (im_j,grid)
 		with 

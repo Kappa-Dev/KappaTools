@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "1.07_240611"
+let version = "1.07_250611"
 
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
@@ -37,15 +37,18 @@ let main =
 				with Sys_error msg -> (*directory does not exists*) 
 					(Printf.eprintf "%s\n" msg ; exit 1)
 			), "Specifies directory name where output file(s) should be stored") ;
+		("-load-sim", Arg.String (fun file -> Parameter.marshalizedInFile := file) , "load simulation package instead of kappa files") ; 
+		("-make-sim", Arg.String (fun file -> Parameter.marshalizedOutFile := file) , "save kappa files as a simulation package") ; 
 		("-im", Arg.String (fun file -> Parameter.influenceFileName:=file), "produces the influence map of the model") ;
 		("-flux", Arg.String (fun file -> Parameter.fluxFileName:=file ; Parameter.fluxModeOn := true), "will measure activation/inhibition fluxes during the simulation") ;
-		("-cflow", Arg.Unit (fun _ -> Parameter.causalModeOn:=true), "Causality analysis mode") ;
+		("--cflow", Arg.Unit (fun _ -> Parameter.causalModeOn:=true), "Causality analysis mode") ;
 		("--dot-output", Arg.Unit (fun () -> Parameter.dotOutput := true), "(no argument required) Dot format for outputting snapshots") ;
 		("--implicit-signature", Arg.Unit (fun () -> Parameter.implicitSignature := true), "Program will guess agent signatures automatically") ;
-		("--seed", Arg.Int (fun i -> Parameter.seedValue := Some i), "Seed for the random number generator") ;
+		("-seed", Arg.Int (fun i -> Parameter.seedValue := Some i), "Seed for the random number generator") ;
 		("--compile", Arg.Unit (fun _ -> Parameter.compileModeOn := true), "Display rule compilation as action list") ;
 		("--debug", Arg.Unit (fun () -> Parameter.debugModeOn:= true), "Enable debug mode") ;
 		("--backtrace", Arg.Unit (fun () -> Parameter.backtrace:= true), "Backtracing exceptions") ;
+		("-rescale-to", Arg.Int (fun i -> Parameter.rescale:=Some i), "Rescale initial concentration to given number for quick testing purpose") ; 
 		]
 	in
 	(*Gc.set { (Gc.get()) with Gc.space_overhead = 500 (*default 80*) } ;*)
@@ -54,7 +57,7 @@ let main =
 		
 		let abort =
 			match !Parameter.inputKappaFileNames with
-			| [] -> true
+			| [] -> if !Parameter.marshalizedInFile = "" then true else false
 			| _ -> false
 		in
 		if abort then (prerr_string usage_msg ; exit 1) ;
@@ -78,14 +81,44 @@ let main =
 			| Some seed -> Random.init seed
 			| None ->
 					begin
-						Printf.printf "Self seeding...\n" ;
+						Printf.printf "+Self seeding...\n" ;
 						Random.self_init() ;
 						let i = Random.bits () in
 						Random.init i ;
-						Printf.printf "Initialized random number generator with seed %d\n" i
+						Printf.printf "+Initialized random number generator with seed %d\n" i
 					end
 		in
-		let (env, state, counter) = Eval.initialize result in
+		
+		let counter =	Counter.create 0.0 0 !Parameter.maxTimeValue !Parameter.maxEventValue in
+		
+		let (env, state) = 
+			match !Parameter.marshalizedInFile with
+				| "" -> Eval.initialize result counter
+				| marshalized_file ->
+					try
+						let d = open_in_bin marshalized_file in 
+						begin
+							if !Parameter.inputKappaFileNames <> [] then Printf.printf "+ Loading simulation package %s (kappa files are ignored)...\n" marshalized_file 
+							else Printf.printf "+Loading simulation package %s...\n" marshalized_file ;
+							let env,state = (Marshal.from_channel d : Environment.t * State.implicit_state) in
+							Pervasives.close_in d ;
+							Printf.printf "Done\n" ;
+							(env,state) 
+						end
+					with
+						| exn -> (Debug.tag "!Simulation package seems to have been created with a different version of KaSim, aborting..." ; exit 1) 
+		in
+		
+		let (_:unit) = 
+			match !Parameter.marshalizedOutFile with
+				| "" -> ()
+				| file -> 
+					let d = open_out_bin file in
+					begin
+						Marshal.to_channel d (env,state) [Marshal.Closures] ;
+						close_out d
+					end
+		in
 		if !Parameter.influenceFileName <> ""  then 
 			begin
 				let desc = open_out !Parameter.influenceFileName in
@@ -106,9 +139,11 @@ let main =
 			Printf.printf "Simulation ended (eff.: %f)\n" 
 			((float_of_int (Counter.event counter)) /. (float_of_int (Counter.null_event counter + Counter.event counter))) ;
 			if !Parameter.fluxModeOn then 
-				let d = open_out "flux.dot" in
-				State.dot_of_flux d state env ;
-				close_out d 
+				begin
+					let d = open_out "flux.dot" in
+					State.dot_of_flux d state env ;
+					close_out d
+				end 
 			else () ;
 		with
 			| Invalid_argument msg -> 

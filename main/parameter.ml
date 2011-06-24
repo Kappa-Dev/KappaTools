@@ -10,6 +10,7 @@ let progressBarSize = ref 60
 let plotSepChar = ref ' '
 let dumpIfDeadlocked = ref false
 let backtrace = ref false
+let (rescale:int option ref) = ref None
 
 (*User definable values*)
 let (maxEventValue:int option ref) = ref None
@@ -36,6 +37,8 @@ let influenceFileName = ref ""
 let fluxFileName = ref ""
 let outputDataName = ref "data.out"
 let inputKappaFileNames:(string list ref) = ref [] 
+let marshalizedInFile = ref "" 
+let marshalizedOutFile = ref ""
 
 let setOutputName () = 
 	let set name = 
@@ -45,22 +48,25 @@ let setOutputName () =
 	set dumpFileName ;
 	set influenceFileName ;
 	set fluxFileName ;
+	set marshalizedOutFile ; 
 	set outputDataName 
 
 let checkFileExists () =
 	let check file =  
-		if !fluxModeOn then
-			if Sys.file_exists file then 
-				begin
-					Printf.printf "File '%s' already exists do you want to erase (y/N)? " file ; flush stdout ;
-					let answer = Tools.read_input () in
-					if answer="y" then () else exit 1
-				end
-			else ()
-		else ()
+		match file with
+			| "" -> ()
+			| file -> 
+				if Sys.file_exists file then 
+					begin
+						Printf.printf "File '%s' already exists do you want to erase (y/N)? " file ; flush stdout ;
+						let answer = Tools.read_input () in
+						if answer="y" then () else exit 1
+					end
+				else ()
 	in
 	check !influenceFileName ;
 	check !fluxFileName ;
+	check !marshalizedOutFile ; 
 	let points = match !pointNumberValue with None -> false | Some _ -> true in
 	if points then check !outputDataName
 

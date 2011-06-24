@@ -19,8 +19,7 @@ type implicit_state =
 		wake_up : Precondition.t ;
 		flux : (int,float IntMap.t) Hashtbl.t ;
 	}
-and component_injections = 
-	(InjectionHeap.t option) array
+and component_injections = (InjectionHeap.t option) array
 and obs = { label : string; expr : Dynamics.variable }
 
 let kappa_of_id id state =
@@ -428,10 +427,9 @@ let initialize sg rules kappa_vars alg_vars obs (pert,rule_pert) counter env =
 (* Returns an array {|inj0;...;inj_k|] where arity(r)=k containing one     *)
 (* random injection per connected component of lhs(r)                      *)
 let select_injection state mix =
-	if Mixture.is_empty mix then Array.create 0 None
+	if Mixture.is_empty mix then IntMap.empty 
 	else
 	let mix_id = Mixture.get_id mix in
-	let arity = Mixture.arity mix in
 	let opt =
 		try state.injections.(mix_id)
 		with
@@ -444,25 +442,25 @@ let select_injection state mix =
 					((string_of_int mix_id) ^
 						" has no instance but a positive activity"))
 	| Some comp_injs ->
-			let embedding = Array.create arity None in
-			(* let embedding = get_array arity in *)
-			let _ =
+			let _,embedding,_ =
 				Array.fold_left
-					(fun (i, total_cod) injheap_opt ->
+					(fun (i, total_inj, total_cod) injheap_opt ->
 								match injheap_opt with
 								| None -> invalid_arg "State.select_injection"
 								| Some injheap ->
 										(try
 											let inj = InjectionHeap.random injheap in
-											let total_cod =
-												try Injection.codomain inj total_cod
+											let total_inj,total_cod =
+												try Injection.codomain inj (total_inj,total_cod)
 												with | Injection.Clashing -> raise Null_event
-											in (embedding.(i) <- Some inj; ((i + 1), total_cod))
+											in 
+											(i + 1, total_inj,total_cod)
 										with
 										| Invalid_argument msg ->
 												invalid_arg ("State.select_injection: " ^ msg)))
-					(0, IntSet.empty) comp_injs
-			in embedding
+					(0, IntMap.empty, IntSet.empty) comp_injs
+			in 
+			embedding
 
 (* Draw a rule at random in the state according to its activity *)
 let draw_rule state counter env =
@@ -612,7 +610,7 @@ let enabled r state =
 	let r_id = Mixture.get_id r.lhs in 
 	try Hashtbl.find state.influence_map r_id with Not_found -> IntMap.empty
 	
-let positive_update state r (phi,psi) (side_modifs,pert_intro) counter env = (*pert_intro is temporary*)
+let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) counter env = (*pert_intro is temporary*)
 	(*let t_upd = Profiling.start_chrono () in*)
 	
 	(* sub function find_new_inj *)
@@ -691,20 +689,15 @@ let positive_update state r (phi,psi) (side_modifs,pert_intro) counter env = (*p
 						let node_id = 
 							if IntSet.mem root_rhs r.added then 
 								(try IntMap.find root_rhs psi with Not_found -> invalid_arg "State.positive_update 1")
-							else						
-								let cc_id = Mixture.component_of_id root_rhs r.lhs in
-								let opt = phi.(cc_id) in
-								match opt with
-									| None -> invalid_arg "State.positive_update 2"
-									| Some inj ->
-										try 
-										Injection.find root_rhs inj 
-										with 
-											| Not_found -> 
-												(if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "I was looking for the image of agent %d by embedding %s" 
-												root_rhs (Injection.to_string inj)) ;
-												if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Glueing was %s" (string_of_map string_of_int string_of_int IntMap.fold glue)) ; 
-												invalid_arg "State.positive_update 3")
+							else	
+								try					
+									IntMap.find root_rhs phi 
+								with 
+									| Not_found -> 
+										(if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "I was looking for the image of agent %d by embedding %s" 
+										root_rhs (Tools.string_of_map string_of_int string_of_int IntMap.fold phi)) ;
+										if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Glueing was %s" (string_of_map string_of_int string_of_int IntMap.fold glue)) ; 
+										invalid_arg "State.positive_update 3")
 						in
 						let mix =
 							let opt =
@@ -781,6 +774,8 @@ let negative_upd state cause (u,i) int_lnk counter env =
 		in
 		LiftSet.fold
 			(fun phi (env,pert_ids) ->
+				if Injection.is_trashed phi then (LiftSet.remove liftset phi ; (env,pert_ids)) 
+				else
 				let (mix_id, cc_id, inj_id) =
 					let (m,c) = Injection.get_coordinate phi
 					and i = try Injection.get_address phi with Not_found -> invalid_arg "State.negative_update"
@@ -965,7 +960,6 @@ let delete state cause u side_effects pert_ids counter env =
 	u (env,side_effects,pert_ids)
 
 let apply state r embedding counter env =
-	let mix = r.lhs in
 	let (_ : unit) =
 		IntMap.iter
 		(fun id constr ->
@@ -999,19 +993,7 @@ let apply state r embedding counter env =
 		try
 			match id with
 			| FRESH j -> (SiteGraph.node_of_id state.graph (IntMap.find j fresh_map), i)
-			| KEPT j ->
-				begin
-					let cc_j = Mixture.component_of_id j mix in
-					let psi_opt =
-						try embedding.(cc_j) with Invalid_argument msg -> invalid_arg ("State.apply: " ^ msg) 
-					in
-					let psi =
-						match psi_opt with
-						| Some emb -> emb
-						| None -> invalid_arg "State.apply"
-					in
-					try	(SiteGraph.node_of_id state.graph (Injection.find j psi),i) with Not_found -> invalid_arg "State.apply: Not a valid embedding"
-				end
+			| KEPT j -> (SiteGraph.node_of_id state.graph (IntMap.find j embedding), i) 
 		with 
 			| Not_found -> invalid_arg (Printf.sprintf "State.apply: Incomplete embedding when applying rule %s on [%s -> %d]" r.kappa (match id with FRESH j -> (Printf.sprintf "F(%d)" j) | KEPT j -> string_of_int j) i)  
 	in
@@ -1048,18 +1030,7 @@ let apply state r embedding counter env =
 							edit state script' phi psi side_effects pert_ids env
 					| DEL i ->
 							let phi_i =
-								let cc_i = Mixture.component_of_id i mix in
-								let inj_opt =
-									(try phi.(cc_i)
-									with
-									| Invalid_argument msg ->
-											invalid_arg ("State.apply: " ^ msg)) in
-								let inj =
-									(match inj_opt with
-										| Some inj -> inj
-										| None -> invalid_arg "State.apply: no injection")
-								in
-								(try Injection.find i inj	with Not_found ->	invalid_arg "State.apply: incomplete embedding 3") 
+								(try IntMap.find i phi	with Not_found ->	invalid_arg "State.apply: incomplete embedding 3") 
 							in
 								let node_i = SiteGraph.node_of_id sg phi_i in
 								let env,side_effects,pert_ids = delete state r.r_id node_i side_effects pert_ids counter env

@@ -553,8 +553,7 @@ let enable r mix env =
 			IdMap.fold
 			(fun id set (glueings,already_done) -> 
 				match id with
-					| FRESH i -> Debug.tag (Printf.sprintf "%s FRESH %d" r.kappa i) ; unify r.rhs mix (i,set) glueings already_done
-					| KEPT i -> Debug.tag (Printf.sprintf "%s KEPT %d" r.kappa i) ; unify r.rhs mix (i,set) glueings already_done
+					| FRESH i | KEPT i -> unify r.rhs mix (i,set) glueings already_done
 			) idmap ([],Int2Set.empty)
 		in
 		glueings
