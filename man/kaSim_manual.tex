@@ -7,9 +7,12 @@
 \usepackage{amssymb}
 \usepackage{epstopdf}
 \DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
-\usepackage{mystyle}
+
+%\usepackage{mystyle}
+
 \usepackage[T1]{fontenc}
 \usepackage{ textcomp }
+
 
 %% LaTeX - Article customise
 
@@ -27,21 +30,21 @@
 
 % These packages are all incorporated in the memoir class to one degree or another...
 
-%%% SECTION TITLE APPEARANCE
-\usepackage{sectsty}
-\allsectionsfont{\sffamily\mdseries\upshape} % (See the fntguide.pdf for font help)
-% (This matches ConTeXt defaults)
-
-%%% ToC APPEARANCE
-\usepackage[nottoc,notlof,notlot]{tocbibind} % Put the bibliography in the ToC
-
-\setlength{\headheight}{39pt} %to remove warnings
-
-\usepackage{fancyhdr} %to insert logo on the left head of each page
-\pagestyle{fancy}
-%\begin{titlepage}
-\rhead{\includegraphics[width=35mm]{KaSim-logo.png}}
-%\end{titlepage}
+%%%% SECTION TITLE APPEARANCE
+%\usepackage{sectsty}
+%\allsectionsfont{\sffamily\mdseries\upshape} % (See the fntguide.pdf for font help)
+%% (This matches ConTeXt defaults)
+%
+%%%% ToC APPEARANCE
+%\usepackage[nottoc,notlof,notlot]{tocbibind} % Put the bibliography in the ToC
+%
+%\setlength{\headheight}{39pt} %to remove warnings
+%
+%\usepackage{fancyhdr} %to insert logo on the left head of each page
+%\pagestyle{fancy}
+%%\begin{titlepage}
+%\rhead{\includegraphics[width=35mm]{KaSim-logo.png}}
+%%\end{titlepage}
 
 \def\KaSim{\textsf{KaSim}}
 \def\sep{\hbox{-}}
@@ -52,6 +55,25 @@
 \makeindex
 
 %% END Article customise
+
+%%%% added by Vincent to compensate for the lack of mystyle.sty
+\frenchspacing
+\def\rar{\rightarrow}
+\def\ka{\kappa}
+\def\ga{\gamma}
+\def\bs{\backslash}
+\def\noi{\noindent}
+\def\ie{ie }
+\def\via{via}
+\def\set#1{\{#1\}}
+\def\ITE#1{\begin{itemize}#1\end{itemize}}
+\def\ENU#1{\begin{enumerate}#1\end{enumerate}}
+\def\mit#1{{\mathit #1}}
+\def\Real{\mathbb R}
+\def\Nat{\mathbb N}
+%%%%
+
+
 \title{KaSim reference manual v1.06}
 \author{\url{KappaLanguage.org}}
 
@@ -70,12 +92,18 @@
 \begin{center}\includegraphics[width=11cm]{KaSim-logo.png}\end{center}
 
 \section{Preamble}
-This manual contains a description of the usage of \KaSim. Although it contains a brief description of Kappa, it is \emph{not} intended as a Kappa tutorial. Therefore, in the following of this manual some familiarity with Kappa is assumed and we let the reader refer to \url{http://KappaLanguage.org} for further explanations.  
+This manual describes the usage of \KaSim, the latest implementation of Kappa, one member of the growing family of rule-based languages. Rule-based modelling has attracted recent attention in developing biological models that are concise, comprehensible, and easily extensible. 
+Although this manual contains a self-contained description of Kappa, it is \emph{not} intended as a tutorial on rule-based modeling.%%Therefore, in the following of this manual some familiarity with Kappa is assumed and 
+%
+\footnote{For an idea of how Kappa is used in a modeling context, the reader might find the following short note useful \href{http://www.pps.jussieu.fr/~danos/pdf/eov.pdf}{Agile modelling of cellular signalling (SOS'08)}. A longer article, expounding on the causal aspects of modeling, is also available: \href{http://www.pps.jussieu.fr/~danos/pdf/ka-fix.pdf}{Rule-based modelling of cellular signalling (CONCUR'07)}, See also this tutorial: \href{http://www.pps.jussieu.fr/~danos/pdf/mytdg.pdf}{Modelling epigenetic information maintenance: a Kappa tutorial (CAV'09)}. 
+}%Further explanations, resources and tools can be found there: \url{http://KappaLanguage.org}. 
+
+
 
 \section{The \KaSim~engine}
-\KaSim~is an open source stochastic simulator of rule-based models~\cite{DanLan04,Dan_etal07a,Fae_etal05} written in the $\ka$-calculus. Basically \KaSim~takes one or several \hyperref[chap:kappa]{kappa files} as input and generates stochastic trajectories of various observables. \KaSim~implements Danos and Krivine's network free simulation algorithm~\cite{Dan_etal07b} that adapts Gillespie's algorithm~\cite{Gil76,Gil77}  for rule-based models. 
+\KaSim~is an open source stochastic simulator of rule-based models~\cite{DanLan04,Dan_etal07a,Fae_etal05} written in the $\ka$-calculus. Basically \KaSim~takes one or several \hyperref[chap:kappa]{kappa files} as input and generates stochastic trajectories of various observables. \KaSim~implements Danos and Krivine's simulation algorithm~\cite{Dan_etal07b} which adapts Gillespie's algorithm~\cite{Gil76,Gil77} to rule-based models. 
 
-A \emph{simulation event}\index{event} corresponds to the application of a rewriting rule, contained in the kappa file, to the current graph\index{graph} (also called a \emph{mixture}\index{mixture}). The rule is selected according to its \emph{activity}\index{activity}, \ie the number of instances it has in the current mixture\index{mixture}, multiplied by its kinetic rate\index{kinetic rate}, and applied one of its possible instance in the graph. It results in a new graph together with an updated activity\index{activity} for all rules (see Fig.~\ref{fig:event-loop}).
+A \emph{simulation event}\index{event} corresponds to the application of a rewriting rule, contained in the kappa file, to the current graph\index{graph} (also called a \emph{mixture}\index{mixture}). The rule is selected according to its \emph{activity}\index{activity}, \ie the number of instances it has in the current mixture\index{mixture}, multiplied by its kinetic rate\index{kinetic rate}, and applied to one of its possible instances in the graph. It results in a new graph together with an updated activity\index{activity} for all rules (see Fig.~\ref{fig:event-loop}). Importantly, the cost of a simulation event is independent of the size of the graph it is applied to~\cite{Dan_etal07b}. 
 
 \begin{figure}[htbp]
 \begin{center}
@@ -85,7 +113,7 @@ A \emph{simulation event}\index{event} corresponds to the application of a rewri
 \end{center}
 \end{figure}
 
-Importantly, the cost of such an event is independent of the size of the graph it is applied to~\cite{Dan_etal07b}. Note that \KaSim~is not equipped with a curve visualization tool. However, the outputted data are in text format and usable with any standard plotting software such as \href{http://www.gnuplot.info/}{GnuPlot}.
+Note that \KaSim~is not equipped with a curve visualization tool. However, data outputs are given in a text format that is readily usable by any standard plotting software such as \href{http://www.gnuplot.info/}{gnuplot}.
 
 \section{Support}
 \ITE{
@@ -116,11 +144,13 @@ From a terminal window, \KaSim~can be invoked by typing
 \ITE{
 \item[\$] \ttt{KaSim -i file\_1 ... -i file\_n [option] }
 }
-where \ttt{file\_i} are the input kappa files containing the rules, initial conditions and observable see Chapter~\ref{chap:kappa} below. Tables~\ref{tab:options} and \ref{tab:add-options} summarize all the options that can be given to the simulator. Basically one should specify an upper bound either in bio time (arbitrary time unit), or number of events. Note that bio-time is computed using Gillespie's formula for time advance (see Fig.~\ref{fig:event-loop}) and should not be confused with CPU-time (it's not even proportional). In doubt we recommend using a bound in number of events since the cost of one event application is bounded (in CPU time) by a constant, so the simulation time of $n$ events is roughly $k$ times faster than a simulation of $k*n$ events.
+where \ttt{file\_i} are the input kappa files containing the rules, initial conditions and observables, see Chapter~\ref{chap:kappa} below. Tables~\ref{tab:options} and \ref{tab:add-options} summarize all the options that can be given to the simulator. Basically, one specifies an upper bound either in bio time (arbitrary time unit), or in number of events. Note that bio-time is computed using Gillespie's formula for time advance (see Fig.~\ref{fig:event-loop}) and should not be confused with CPU-time (it's not even proportional). In doubt, we recommend using a bound in number of events since the cost of one event application is bounded (in CPU time) by a constant, so the simulation time of $n$ events is roughly $k$ times faster than a simulation of $k*n$ events.
 
 \section{Main options}
 
-Table~\ref{tab:options} summarizes the main options that are accessible through the command line. Note that the option \ttt{-p} specifies the number of points that one wishes to have in the final curve. The interval at which these points will be taken is then computed using the simulation limit defined by the user using option \ttt{-t} or \ttt{-e}. For instance requiring a simulation of 100 points during 10 time units will result in a simulation where measures will be taken every 0.1 time units. The results of the options \ttt{-im} and \ttt{-flux} is given Chapter~\ref{chap:advanced}. 
+Table~\ref{tab:options} summarizes the main options that are accessible through the command line. Note that the option \ttt{-p} specifies the number of points that one wishes to have in the final plot. The interval at which these points will be taken is then computed using the simulation limit defined by the user using option \ttt{-t} or \ttt{-e}. For instance requiring a simulation of 100 points during 10 time units will result in a simulation where observables are recorded every 0.1 time units, while requiring 100 points for 1000 events will result in observable being written every 10 events (be careful that the event density, \ie the number of events per time unit, might vary during a simulation, and thus the two sampling methods can lead to very different repartitions of the moments at which observables are recorded even if they sepecify the same number of observations). 
+
+The results of the options \ttt{-im} and \ttt{-flux} is explained Chapter~\ref{chap:advanced}. 
 
 \begin{table}[htdp]
 \caption{Command line: main options}
@@ -169,7 +199,7 @@ will generate a file \ttt{model.out} containing the trajectories of the observab
 \ITE{
 \item[\$] \ttt{KaSim -i init.ka -i rules.ka -i obs.ka -i mod.ka -t 1.5 -p 1000}  
 }
-will generate a file \ttt{data.out} (default name) containing 1000 data points of a simulation of 1.5 seconds (arbitrary time units) of the model. Note that the input kappa file is splited in 4 files containing, for instance, the initial conditions, \ttt{init.ka}, the rule set, \ttt{rules.ka}, the observables, \ttt{obs.ka}, and the perturbations, \ttt{pert.ka} (refer to Chapter~\ref{chap:kappa} for details). The order in which the files are given does not matter.
+will generate a file \ttt{data.out} (default name) containing 1000 data points of a simulation of 1.5 seconds (arbitrary time units) of the model. Note that the input kappa file is split in 4 files containing, for instance, the initial conditions, \ttt{init.ka}, the rule set, \ttt{rules.ka}, the observables, \ttt{obs.ka}, and the perturbations, \ttt{pert.ka} (refer to Chapter~\ref{chap:kappa} for details). The order in which the files are given does not matter.
 
 \subsection{The activation and flux maps}
 
@@ -270,13 +300,13 @@ or
 Both these rule will cause \KaSim~to raise a warning at rule compile time.
 
 \subsection{Kinetic rates}\label{sec:kinetics}
-Rules are equipped with a \emph{kinetic rate}\index{kinetic rate}, denoted by $\ga$ above. For \KaSim, this number should correspond to the \emph{stochastic rate constant}\index{kinetic rate!stochastic rate constant} at which the corresponding reaction should be applied. We let the reader refer to \url{http://www.KappaLanguage.org} for a more complete tutorial on kinetic rates, but basically $\ga$ corresponds to the \emph{deterministic rate constant}\index{kinetic rate!deterministic rate constant} $k$ of the reaction corrected by the volume $V$ in which the model is considered. 
+Rules are equipped with a \emph{kinetic rate}\index{kinetic rate}, denoted by $\ga$ above. For \KaSim, this number should correspond to the \emph{stochastic rate constant}\index{kinetic rate!stochastic rate constant} at which the corresponding reaction should be applied. We    refer the reader to \url{http://www.KappaLanguage.org} for a more complete tutorial on kinetic rates, but basically $\ga$ corresponds to the \emph{deterministic rate constant}\index{kinetic rate!deterministic rate constant} $k$ of the reaction corrected by the volume $V$ in which the model is considered. 
 
 We often want to express $\gamma$ in "per molecule" rather than "per mol". This only changes the numerical value, not the dimension (both are numbers of molecules): 
 \begin{equation}\label{stochrate}
 \gamma = \dfrac{k}{({\cal A}\; V)^{(a-1)}} \qquad [\mathit{molecule}^{-1} \mathit{s}^{-1}],
 \end{equation}
-where ${\cal A}= 6.022\cdot 10^{23}$ is Avogadro's number, $k$ in molar units $\mathit{M}^{-1}\mathit{s}^{-1}$ and $a>0$ is the arity of the rule (\ie 2 for a bimolecular rule)
+where ${\cal A}= 6.022\cdot 10^{23}$ is Avogadro's number, $k$ in molar units $\mathit{M}^{-1}\mathit{s}^{-1}$ and $a\geq0$ is the arity of the rule (\ie 2 for a bimolecular rule)
 
 \begin{itemize}
 \item
@@ -555,7 +585,7 @@ The influence map is statically computed and does not depend on kinetic rates no
 \begin{figure}[htbp] %  figure placement: here, top, bottom, or page
    \centering
    \includegraphics[width=19cm]{abc-im.png} 
-   \caption{The influence map of the \ttt{abc.ka} model defined Chapter~\ref{chap:abc}. Note that observable \ttt{C(x1\int u?,x2\int u?)} is not activated by any other rule. This implies that it's number of occurrence will never increase during a simulation. Edge labels denote embeddings with the convention that $[i\rar j]$ denotes the embedding of agent number $i$ of the origin's rhs, into agent $j$ of the target's lhs.}
+   \caption{The influence map of the \ttt{abc.ka} model defined Chapter~\ref{chap:abc}. Note that observable \ttt{C(x1\int u?,x2\int u?)} is not activated by any other rule. This implies that its number of occurrences does not change during a simulation. Edge labels denote embeddings with the convention that $[i\rar j]$ denotes the embedding of agent number $i$ of the origin's rhs, into agent $j$ of the target's lhs.}
    \label{fig:abc-im}
 \end{figure}
 
