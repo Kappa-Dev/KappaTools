@@ -71,10 +71,13 @@
 \def\mit#1{{\mathit #1}}
 \def\Real{\mathbb R}
 \def\Nat{\mathbb N}
+\def\dd{-\hspace{0.001cm}-}
+
 %%%%
+\def\version{v1.07}
 
 
-\title{KaSim reference manual v1.06}
+\title{KaSim reference manual \version}
 \author{\url{KappaLanguage.org}}
 
 %\date{}                                           % Activate to display a given date or no date
@@ -148,7 +151,7 @@ where \ttt{file\_i} are the input kappa files containing the rules, initial cond
 
 \section{Main options}
 
-Table~\ref{tab:options} summarizes the main options that are accessible through the command line. Note that the option \ttt{-p} specifies the number of points that one wishes to have in the final plot. The interval at which these points will be taken is then computed using the simulation limit defined by the user using option \ttt{-t} or \ttt{-e}. For instance requiring a simulation of 100 points during 10 time units will result in a simulation where observables are recorded every 0.1 time units, while requiring 100 points for 1000 events will result in observable being written every 10 events (be careful that the event density, \ie the number of events per time unit, might vary during a simulation, and thus the two sampling methods can lead to very different repartitions of the moments at which observables are recorded even if they sepecify the same number of observations). 
+Table~\ref{tab:options} summarizes the main options that are accessible through the command line. Options that expects an argument are preceded by a single dash, options that do not need any argument start with a double dash. Note that the option \ttt{-p} specifies the number of points that one wishes to have in the final plot. The interval at which these points will be taken is then computed using the simulation limit defined by the user using option \ttt{-t} or \ttt{-e}. For instance requiring a simulation of 100 points during 10 time units will result in a simulation where observables are recorded every 0.1 time units, while requiring 100 points for 1000 events will result in observable being written every 10 events (be careful that the event density, \ie the number of events per time unit, might vary during a simulation, and thus the two sampling methods can lead to very different repartitions of the moments at which observables are recorded even if they sepecify the same number of observations). 
 
 The results of the options \ttt{-im} and \ttt{-flux} is explained Chapter~\ref{chap:advanced}. 
 
@@ -163,8 +166,6 @@ Argument & Description \\ \hline
 \ttt{-p $n$} & Produces a data file\index{data file} (default: \ttt{data.out}) with $n\geq 0$ data points\\
 \ttt{-o} \textit{file} & Set the name of data file to \textit{file}\\ 
 \ttt{-d} \textit{dir} & Output any produced file to the directory \textit{dir}\\
-\ttt{-im} \textit{file} & Produces a dot format file of the decorated influence map of the model\\
-\ttt{-flux} \textit{file} & Produces a dot format file of the activation/inhibition flux \\ & measured during the simulation \\
 \hline
 \end{tabular}
 \end{center}
@@ -181,9 +182,15 @@ Table~\ref{tab:add-options} summarizes the advanced options that are accessible 
 \begin{tabular}{|l|l|}
 \hline 
 Argument & Description \\ \hline
-\ttt{-\,-seed $n$} & Seeds the pseudo-random number generator $n>0$ \\
-\ttt{-\,-implicit-signature} & Automatically deduce agent signatures (see Chapter~\ref{chap:advanced})\\
-\ttt{-\,-dot-format} & Produces dot format files for snapshots (instead of kappa files)\\
+\ttt{\small -seed $n$} &\small Seeds the pseudo-random number generator $n>0$ \\
+\ttt{\small \dd implicit-signature} &\small Automatically deduce agent signatures (see Chapter~\ref{chap:advanced})\\
+\ttt{\small \dd dot-format} &\small Produces dot format files for snapshots (instead of kappa files)\\
+\ttt{\small -im} \textit{file} &\small Produces a dot format file of the decorated influence map \\
+\ttt{\small -flux} \textit{file} &\small Produces a dot format file of the activation/inhibition flux \\ & measured during the simulation \\
+\ttt{\small -make-sim} \textit{sim\_file} &\small makes a simulation package out of the input kappa files \\
+\ttt{\small -load-sim} \textit{sim\_file} &\small use simulation package \textit{sim\_file} as input\\
+
+
 \hline
 \end{tabular}
 \end{center}
@@ -611,6 +618,18 @@ The resulting \emph{flux map} is a graph where a positive edge between rules $r$
    \caption{Flux map of the \ttt{abc.ka} model, taken from t=0 to t=20 time units. Note that the rules \ttt{ab.c} and \ttt{mod x1} are the biggest contributors to activity update in the simulated interval. }
    \label{fig:flux}
 \end{figure}
+
+\section{Simulation packages}
+
+The simulation algorithm that is implemented in \KaSim~requires an initialization phase whose complexity is proportional to $R*G$ where $R$ is the cardinal of the rule set and $G$ the size of the initial mixture\index{mixture}. Thus for large systems, initialization may take a while. Whenever a user wishes to run several simulations of the \emph{same} kappa model, it is possible to skip this initialization phase by creating a \emph{simulation package}\index{simulation package}. For instance:
+\ttt{\ITE{
+\item [] KaSim -i abc.ka -t $n$ -make-sim abc.kasim
+}}
+will generate a standard simulation of the \ttt{abc.ka} model, but in addition, will create the simulation package \ttt{abc.kasim} (.kasim extension is not mendatory). This package is a binary file, \ie not human readable, that can be used as input of a new simulation using the command:
+\ttt{\ITE{
+\item [] KaSim -load-sim abc.kasim -t $k$ 
+}}
+Note that this simulation is now run for $k$ time units instead of $n$. Importantly, simulation packages can only be given as input to the \emph{same} \KaSim~that produced it. As a consequence, recompiling the code, or obtaining different binaries, will cause the simulation package to become useless.
 
 
 \bibliographystyle{plain}
