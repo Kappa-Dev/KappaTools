@@ -4,11 +4,11 @@ KaSim is a stochastic simulator for rule-based models written in Kappa.
 
 <img src="http://www.pps.jussieu.fr/~jkrivine/homepage/Research_files/droppedImage.jpg" alt="KaSim logo" title="Stochastic Kappa Simulator" align="right" />
 
-Manual is available on the man/ directory of the sources.
+A manual is available in the man/ directory.
 
 ## Installation
 
-To install you need ocaml native compiler. To check whether you have it, type 
+To install you need the ocaml native compiler. To check whether you have it, type 
 
 `ocamlopt -version` 
 
