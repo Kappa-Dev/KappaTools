@@ -48,11 +48,12 @@
 \def\int{\hbox{\texttt{\~}}}
 \def\tcb#1{\textcolor{blue}{\ttt{#1}}}
 \def\ttt#1{\texttt{#1}}
+\def\dd{-\hspace{0,001cm}-}
 
 \makeindex
 
 %% END Article customise
-\title{KaSim reference manual v1.06}
+\title{KaSim reference manual v1.07}
 \author{\url{KappaLanguage.org}}
 
 %\date{}                                           % Activate to display a given date or no date
@@ -120,7 +121,7 @@ where \ttt{file\_i} are the input kappa files containing the rules, initial cond
 
 \section{Main options}
 
-Table~\ref{tab:options} summarizes the main options that are accessible through the command line. Note that the option \ttt{-p} specifies the number of points that one wishes to have in the final curve. The interval at which these points will be taken is then computed using the simulation limit defined by the user using option \ttt{-t} or \ttt{-e}. For instance requiring a simulation of 100 points during 10 time units will result in a simulation where measures will be taken every 0.1 time units. The results of the options \ttt{-im} and \ttt{-flux} is given Chapter~\ref{chap:advanced}. 
+Table~\ref{tab:options} summarizes the main options that are accessible through the command line. Options that require an argument are invoked with a single dash, like \ttt{-e}, while options that require no argument are invoked with a double dash, like \ttt{\dd dot-format}. Note that the option \ttt{-p} specifies the number of points that one wishes to have in the final curve. The interval at which these points will be taken is then computed using the simulation limit defined by the user using option \ttt{-t} or \ttt{-e}. For instance requiring a simulation of 100 points during 10 time units will result in a simulation where measures will be taken every 0.1 time units. The results of the options \ttt{-im} and \ttt{-flux} is given Chapter~\ref{chap:advanced}. 
 
 \begin{table}[htdp]
 \caption{Command line: main options}
@@ -151,9 +152,15 @@ Table~\ref{tab:add-options} summarizes the advanced options that are accessible 
 \begin{tabular}{|l|l|}
 \hline 
 Argument & Description \\ \hline
-\ttt{-\,-seed $n$} & Seeds the pseudo-random number generator $n>0$ \\
-\ttt{-\,-implicit-signature} & Automatically deduce agent signatures (see Chapter~\ref{chap:advanced})\\
-\ttt{-\,-dot-format} & Produces dot format files for snapshots (instead of kappa files)\\
+\ttt{-seed $n$} & \small Seeds the pseudo-random number generator $n>0$ \\
+\ttt{-make-sim} \textit{bin\_file} & \small Creates simulation package named \textit{bin\_file} containing \\ 
+& \small initialization data of the kappa files used as input (-i arguments).\\
+\ttt{-load-sim} \textit{bin\_file} & \small Use simulation package \textit{bin\_file} as input for the simulation. \\
+& \small Additional kappa files given as input are ignored. Note that \\
+& \small the simulation package \index{simulation package} should be used with the same \\
+& \small version of KaSim (same platform) that was used to create it.\\
+\ttt{\dd implicit-signature} & \small Automatically deduce agent signatures (see Chapter~\ref{chap:advanced})\\
+\ttt{\dd dot-format} & \small Produces dot format files for snapshots (instead of kappa files)\\
 \hline
 \end{tabular}
 \end{center}
@@ -581,6 +588,19 @@ The resulting \emph{flux map} is a graph where a positive edge between rules $r$
    \caption{Flux map of the \ttt{abc.ka} model, taken from t=0 to t=20 time units. Note that the rules \ttt{ab.c} and \ttt{mod x1} are the biggest contributors to activity update in the simulated interval. }
    \label{fig:flux}
 \end{figure}
+
+\section{Simulation packages}
+For large models that take a significant amount of time to initialize, it is possible to generate \emph{simulation packages}. These monolithic files are not human readable and contain all the data that \KaSim~needs to generate simulations. These files can be pretty large but take little time to load.
+
+The command:
+\ttt{\ITE{
+\item [] KaSim -i abc.ka -make-sim abc.kasim -e 0
+}}
+will ask \KaSim~to generate a simulation package\index{simulation package} for the \texttt{abc} model without running a simulation (no computation event are required here). Now the command:
+\ttt{\ITE{
+\item [] KaSim -load-sim abc.kasim -e 10000
+}}
+will run the simulation package for 10,000 cycles. Note that the simulation package \ttt{abc.kasim} is only valid with the same version of \KaSim~that was used to generate it in the previous state. Note also that the option \ttt{-load-sim} will cause \KaSim~to ignore all other kappa files given as input. It is not possible to use 2 simulations packages at the same time (only the last one will be considered).
 
 
 \bibliographystyle{plain}
