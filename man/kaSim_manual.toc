@@ -1,0 +1,35 @@
+\contentsline {chapter}{\numberline {1}Introduction}{5}{chapter.1}
+\contentsline {section}{\numberline {1.1}Preamble}{5}{section.1.1}
+\contentsline {section}{\numberline {1.2}The \textsf {KaSim}\nobreakspace {}engine}{5}{section.1.2}
+\contentsline {section}{\numberline {1.3}Support}{6}{section.1.3}
+\contentsline {chapter}{\numberline {2}Installation}{7}{chapter.2}
+\contentsline {section}{\numberline {2.1}Obtaining the sources}{7}{section.2.1}
+\contentsline {section}{\numberline {2.2}Compilation}{7}{section.2.2}
+\contentsline {chapter}{\numberline {3}The command line}{9}{chapter.3}
+\contentsline {section}{\numberline {3.1}General usage}{9}{section.3.1}
+\contentsline {section}{\numberline {3.2}Main options}{9}{section.3.2}
+\contentsline {section}{\numberline {3.3}Advanced options}{10}{section.3.3}
+\contentsline {subsection}{\numberline {3.3.1}The activation and flux maps}{11}{subsection.3.3.1}
+\contentsline {chapter}{\numberline {4}The kappa file}{13}{chapter.4}
+\contentsline {section}{\numberline {4.1}General remarks}{13}{section.4.1}
+\contentsline {section}{\numberline {4.2}Agent signature}{13}{section.4.2}
+\contentsline {section}{\numberline {4.3}Rules}{14}{section.4.3}
+\contentsline {subsection}{\numberline {4.3.1}A simple rule}{14}{subsection.4.3.1}
+\contentsline {subsection}{\numberline {4.3.2}Adding and deleting agents}{15}{subsection.4.3.2}
+\contentsline {subsection}{\numberline {4.3.3}Side effects}{15}{subsection.4.3.3}
+\contentsline {subsection}{\numberline {4.3.4}Kinetic rates}{16}{subsection.4.3.4}
+\contentsline {section}{\numberline {4.4}Variables}{17}{section.4.4}
+\contentsline {section}{\numberline {4.5}Initial conditions}{18}{section.4.5}
+\contentsline {chapter}{\numberline {5}A simple model}{19}{chapter.5}
+\contentsline {section}{\numberline {5.1}ABC.ka}{19}{section.5.1}
+\contentsline {section}{\numberline {5.2}Some runs}{20}{section.5.2}
+\contentsline {chapter}{\numberline {6}Advanced concepts}{23}{chapter.6}
+\contentsline {section}{\numberline {6.1}Perturbation language}{23}{section.6.1}
+\contentsline {subsection}{\numberline {6.1.1}Syntax}{23}{subsection.6.1.1}
+\contentsline {subsection}{\numberline {6.1.2}Example 1: introducing new agents during the simulation}{24}{subsection.6.1.2}
+\contentsline {subsection}{\numberline {6.1.3}Example 2: Defining a new initial state}{25}{subsection.6.1.3}
+\contentsline {section}{\numberline {6.2}Link type}{26}{section.6.2}
+\contentsline {section}{\numberline {6.3}Implicit signature}{26}{section.6.3}
+\contentsline {section}{\numberline {6.4}Influence map}{27}{section.6.4}
+\contentsline {section}{\numberline {6.5}Flux map}{27}{section.6.5}
+\contentsline {section}{\numberline {6.6}Simulation packages}{29}{section.6.6}
