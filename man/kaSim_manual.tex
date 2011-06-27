@@ -84,7 +84,7 @@
 \begin{document}
 \maketitle
 
-\begin{center}\includegraphics[width=80mm]{wip.jpg}
+\begin{center}\includegraphics[width=80mm]{img/wip.jpg}
 \vspace{3cm}
 \\This document is work in progress...
 \end{center}
@@ -92,7 +92,7 @@
 \tableofcontents
 
 \chapter{Introduction}
-\begin{center}\includegraphics[width=11cm]{KaSim-logo.png}\end{center}
+\begin{center}\includegraphics[width=11cm]{img/KaSim-logo.png}\end{center}
 
 \section{Preamble}
 This manual describes the usage of \KaSim, the latest implementation of Kappa, one member of the growing family of rule-based languages. Rule-based modelling has attracted recent attention in developing biological models that are concise, comprehensible, and easily extensible. 
@@ -110,7 +110,7 @@ A \emph{simulation event}\index{event} corresponds to the application of a rewri
 
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=14cm]{event-loop.png}
+\includegraphics[width=14cm]{img/event-loop.png}
 \caption{The event loop}
 \label{fig:event-loop}
 \end{center}
@@ -467,7 +467,7 @@ Plotting the content of the \ttt{abc.out} file one notices that nothing of signi
 which produces the data points whose rendering is given Fig.~\ref{fig:abc}.
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=12cm]{plot-abc.png}
+\includegraphics[width=12cm]{img/plot-abc.png}
 \caption{Simulation of the ABC model: population of unmodified \ttt{C}s (observable \ttt{Cuu} in red) drops rapidly and is replaced, in a first step by simply modified \ttt{C}s (observable \ttt{Cpu} in blue) which are in turn replaced by doubly modified \ttt{C}s (observable \ttt{Cpp} in red). Note that the population of \ttt{AB} complexes (observable \ttt{AB} in black) stabilizes slightly below 400 individuals after about 20s.}
 \label{fig:abc}
 \end{center}
@@ -544,7 +544,7 @@ Running again a simulation (a bit longer) by entering in the command line:
 one obtains the curve given Fig.~\ref{fig:abc2}
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=10cm]{plot-abc2.png}
+\includegraphics[width=10cm]{img/plot-abc2.png}
 \caption{Simulation of the ABC model with a perturbation: for t<25s, only \ttt{`a.b'} and \ttt{`a..b'} rules may apply. This enables the concentration of \ttt{`AB'} complexes to go to steady state, before introducing fresh \ttt{C}s at t=25s.}
 \label{fig:abc2}
 \end{center}
@@ -591,7 +591,7 @@ The influence map is statically computed and does not depend on kinetic rates no
 
 \begin{figure}[htbp] %  figure placement: here, top, bottom, or page
    \centering
-   \includegraphics[width=19cm]{abc-im.png} 
+   \includegraphics[width=19cm]{img/abc-im.png} 
    \caption{The influence map of the \ttt{abc.ka} model defined Chapter~\ref{chap:abc}. Note that observable \ttt{C(x1\int u?,x2\int u?)} is not activated by any other rule. This implies that its number of occurrences does not change during a simulation. Edge labels denote embeddings with the convention that $[i\rar j]$ denotes the embedding of agent number $i$ of the origin's rhs, into agent $j$ of the target's lhs.}
    \label{fig:abc-im}
 \end{figure}
@@ -600,7 +600,7 @@ More formally, consider the rules $r:L\rar R$ and $s:L'\rar R'$. One wishes to k
 
 \begin{figure}[htbp] %  figure placement: here, top, bottom, or page
    \centering
-   \includegraphics[width=10cm]{im.png} 
+   \includegraphics[width=10cm]{img/im.png} 
    \caption{Computation of the influence of the top rule on the rule below: the right hand side of the first rules embeds in a common term with the left hand side of the second rule. It results that the first rule has a positive influence on the second.}
    \label{fig:im}
 \end{figure}
@@ -614,7 +614,7 @@ The resulting \emph{flux map} is a graph where a positive edge between rules $r$
 
 \begin{figure}[htbp] %  figure placement: here, top, bottom, or page
    \centering
-   \includegraphics[width=7cm]{flux.pdf} 
+   \includegraphics[width=7cm]{img/flux.pdf} 
    \caption{Flux map of the \ttt{abc.ka} model, taken from t=0 to t=20 time units. Note that the rules \ttt{ab.c} and \ttt{mod x1} are the biggest contributors to activity update in the simulated interval. }
    \label{fig:flux}
 \end{figure}
