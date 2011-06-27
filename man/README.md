@@ -1,0 +1,1 @@
+This directory contains the KaSim reference manual documenting the language, the installation etc.
