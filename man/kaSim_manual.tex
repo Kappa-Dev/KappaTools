@@ -1,4 +1,5 @@
 \documentclass[11pt]{book}
+\frenchspacing
 \usepackage{geometry}                % See geometry.pdf to learn the layout options. There are lots.
 %\geometry{letterpaper}                   % ... or a4paper or a5paper or ... 
 %\geometry{landscape}                % Activate for for rotated page geometry
@@ -184,7 +185,7 @@ Table~\ref{tab:add-options} summarizes the advanced options that are accessible 
 Argument & Description \\ \hline
 \ttt{\small -seed $n$} &\small Seeds the pseudo-random number generator $n>0$ \\
 \ttt{\small \dd implicit-signature} &\small Automatically deduce agent signatures (see Chapter~\ref{chap:advanced})\\
-\ttt{\small \dd dot-format} &\small Produces dot format files for snapshots (instead of kappa files)\\
+\ttt{\small \dd dot-output} &\small Produces dot format files for snapshots (instead of kappa files)\\
 \ttt{\small -im} \textit{file} &\small Produces a dot format file of the decorated influence map \\
 \ttt{\small -flux} \textit{file} &\small Produces a dot format file of the activation/inhibition flux \\ & measured during the simulation \\
 \ttt{\small -make-sim} \textit{sim\_file} &\small makes a simulation package out of the input kappa files \\
@@ -206,7 +207,7 @@ will generate a file \ttt{model.out} containing the trajectories of the observab
 \ITE{
 \item[\$] \ttt{KaSim -i init.ka -i rules.ka -i obs.ka -i mod.ka -t 1.5 -p 1000}  
 }
-will generate a file \ttt{data.out} (default name) containing 1000 data points of a simulation of 1.5 seconds (arbitrary time units) of the model. Note that the input kappa file is split in 4 files containing, for instance, the initial conditions, \ttt{init.ka}, the rule set, \ttt{rules.ka}, the observables, \ttt{obs.ka}, and the perturbations, \ttt{pert.ka} (refer to Chapter~\ref{chap:kappa} for details). The order in which the files are given does not matter.
+will generate a file \ttt{data.out} (default name) containing 1000 data points of a simulation of 1.5 seconds (arbitrary time units) of the model. Note that the input kappa file is split in 4 files containing, for instance, the initial conditions, \ttt{init.ka}, the rule set, \ttt{rules.ka}, the observables, \ttt{obs.ka}, and the perturbations, \ttt{pert.ka} (see Chapter~\ref{chap:kappa} for details). The order in which the files are given does not matter.
 
 \subsection{The activation and flux maps}
 
@@ -306,15 +307,32 @@ or
 %%
 Both these rule will cause \KaSim~to raise a warning at rule compile time.
 
-\subsection{Kinetic rates}\label{sec:kinetics}
-Rules are equipped with a \emph{kinetic rate}\index{kinetic rate}, denoted by $\ga$ above. For \KaSim, this number should correspond to the \emph{stochastic rate constant}\index{kinetic rate!stochastic rate constant} at which the corresponding reaction should be applied. We    refer the reader to \url{http://www.KappaLanguage.org} for a more complete tutorial on kinetic rates, but basically $\ga$ corresponds to the \emph{deterministic rate constant}\index{kinetic rate!deterministic rate constant} $k$ of the reaction corrected by the volume $V$ in which the model is considered. 
+\subsection{Rates}\label{sec:kinetics}
+Rules are equipped with a \emph{kinetic rate}\index{kinetic rate}, denoted by $\ga$ above. This number called the \emph{individual-based or stochastic rate constant}\index{kinetic rate!stochastic rate constant}, is the rate at which the corresponding rule is applied per instance of the rule. Its dimension is the inverse of a time $[T^{-1}]$.
 
-We often want to express $\gamma$ in "per molecule" rather than "per mol". This only changes the numerical value, not the dimension (both are numbers of molecules): 
+The stochastic rate is related to the \emph{concentration-based rate constant}\index{kinetic rate!deterministic rate constant} $k$ of the rule of interest by the following relation:
+%corrected by the volume $V$ in which the model is considered. 
+%
+%%We often want to express $\ga$ in ``per molecule'' rather than ``per mole''. 
+%%This only changes the numerical value, not the dimension (both are numbers of molecules): 
+%
+%%The relation between both rate constant is:
 \begin{equation}\label{stochrate}
-\gamma = \dfrac{k}{({\cal A}\; V)^{(a-1)}} \qquad [\mathit{molecule}^{-1} \mathit{s}^{-1}],
+k = \ga{({\cal A}\; V)^{(a-1)}} %\qquad [\mathit{molecule}^{-1} \mathit{s}^{-1}],
 \end{equation}
-where ${\cal A}= 6.022\cdot 10^{23}$ is Avogadro's number, $k$ in molar units $\mathit{M}^{-1}\mathit{s}^{-1}$ and $a\geq0$ is the arity of the rule (\ie 2 for a bimolecular rule)
+where 
+$V$ is the volume where the model is considered,
+${\cal A}= 6.022\cdot 10^{23}$ is Avogadro's number, %number of $H$ atoms needed to make up for a gram of $H$, 
+$a\geq0$ is the arity of the rule (\ie 2 for a bimolecular rule).
 
+In a modeling context, the constant $k$ is typically expressed using \emph{molars} $M:=\mit{moles}\,l^{-1}$ (or variants thereof such
+as $\mu M$, $nM$), and seconds or minutes. If we choose molars and seconds, $k$'s unit is $\mathit{M}^{1-a}\mathit{s}^{-1}$, as 
+follows from the relation above.
+
+Concentration-based rates are usually favored for measurements and/or deterministic models, so it is useful to know how to convert them into
+individual-based ones used by KaSim. 
+%We refer the reader to \url{http://www.KappaLanguage.org} for a tutorial on kinetic rates. 
+Here are typical volumes used in modeling:
 \begin{itemize}
 \item
 Mammalian cell: $V=2.25\; 10^{-12}l$  ($1l=10^{-3}m^3$), and ${\cal A}V=1.35\; 10^{12}$. 
@@ -325,25 +343,33 @@ Yeast cell (haploid): $V=4\; 10^{-14}l$, and ${\cal A}V=2.4\; 10^{10}$.
 
 A concentration of $1M$ in a yeast cell volume corresponds to $2.4\; 10^{10}$ molecules; $1nM\approx 24$ molecules per cell. The volume is doubled in a diploid cell.
 \item
-E.\@coli cell: $V=10^{-15}l$, and ${\cal A}V=10^{8}$. 
+E.\@ Coli cell: $V=10^{-15}l$, and ${\cal A}V=10^{8}$. 
 
 A concentration of $1M$ in a yeast cell volume corresponds to $10^{8}$ molecules; $10nM\approx 1$ molecule per cell.
 \end{itemize}
 
-The following table lists a few ballpark figures for deterministic rate constants and their stochastic counterparts in a mammalian cell volume:
+The table below lists typical ranges for deterministic rate constants and 
+their stochastic counterparts assuming a mammalian cell volume.
 
 \begin{table}[htbp]
 \centering
 \begin{tabular}{@{} lllr @{} }
 \toprule
-process & $k$ & $\gamma$ & stoch. dimension\\
+process & $k$ & $\gamma$ %& stoch. dimension
+\\
 \midrule
-general binding & $10^{7}-10^{9}$ & $10^{-5}-10^{-3}$ & $molecule^{-1} s^{-1}$\\
-general unbinding &  $10^{-3} - 10^{-1}$ & $10^{-3}-10^{-1}$ & $s^{-1}$\\
-dephosphorylation & 1 & 1 & $s^{-1}$\\
-phosphorylation & 0.1 & 0.1 & $s^{-1}$\\
-receptor dimerization & $2\; 10^{6}$ & $1.6 \;10^{-6}$ & $molecule^{-1} s^{-1}$\\
-receptor dissociation & $1.6\; 10^{-1}$ & $1.6\; 10^{-1}$ & $s^{-1}$\\
+general binding & $10^{7}-10^{9}$ & $10^{-5}-10^{-3}$ %& $s^{-1}$ %$molecule^{-1} s^{-1}$
+\\
+general unbinding &  $10^{-3} - 10^{-1}$ & $10^{-3}-10^{-1}$ %& $s^{-1}$
+\\
+dephosphorylation & 1 & 1 %& $s^{-1}$
+\\
+phosphorylation & 0.1 & 0.1 %& $s^{-1}$
+\\
+receptor dimerization & $2\; 10^{6}$ & $1.6 \;10^{-6}$ %& $s^{-1}$%$molecule^{-1} s^{-1}$
+\\
+receptor dissociation & $1.6\; 10^{-1}$ & $1.6\; 10^{-1}$ %& $s^{-1}$
+\\
 \bottomrule
 \end{tabular}
 \end{table}
