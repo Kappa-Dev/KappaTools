@@ -75,7 +75,7 @@
 \def\dd{-\hspace{0.001cm}-}
 
 %%%%
-\def\version{v1.07}
+\def\version{v1.08}
 
 
 \title{KaSim reference manual \version}
@@ -587,16 +587,23 @@ one obtains the curve given in Fig.~\ref{fig:abc2}
 In the previous example, we let the system evolve for some time without its main reactant \ttt{C} in order to let other reactants go to a less arbitrary initial state. One may object that this way of proceeding is CPU-time consuming if one has to do this at each simulation. An alternative is to use the \ttt{\$SNAPSHOT} primitive that allows a user to export a snapshot of the mixture at a given time point as a new (piece of) kappa file.
 For instance, the declaration:
 \ttt{\ITE{
-\item[] \%mod:  [T]>25 do \$SNAPSHOT 
+\item[] \%mod:  [T]>25 do \$SNAPSHOT \textquotedbl prefix\textquotedbl
 }}
-will ask \KaSim~to export the mixture after 25 time units of simulation. The exported file will be named \ttt{snap\_$n$.ka} where $n$ is the event number at which the snapshot was taken. Note that if the name already exists a counter will be appended at the end of the file to prevent overwriting.
+
+will ask \KaSim~to export the mixture after 25 time units of simulation. The exported file will be named \ttt{prefix\_$n$.ka} where $n$ is the event number at which the snapshot was taken. Note that one may omit to define a prefix and simply type:
+\ttt{\ITE{
+\item[] \%mod:  [T]>25 do \$SNAPSHOT
+}}
+in which case the default prefix \ttt{snap} will be used for naming snapshots.
+
+Note that if the name already exists a counter will be appended at the end of the file to prevent overwriting.
 We can now replace the perturbation of the previous example by the above one and let the system run for 26 time units. The simulation will produce a readable file that one may now use as new initial condition that can be used as input of \KaSim~using \ttt{-i} argument.
 
 Note that snapshots can be performed multiple times, for instance every 1000 events, using the declaration:
 \ttt{\ITE{
-\item[] \%mod:  ([mod] [E] 1000)=0 do \$SNAPSHOT until [false] 
+\item[] \%mod:  ([mod] [E] 1000)=0 do \$SNAPSHOT \textquotedbl abc\textquotedbl~until [false] 
 }}
-which results in \KaSim~producing a snapshot every 1000 events until the simulation ends. The perturbation \ttt{\$STOP} will terminate the simulation whenever its precondition is satisfied and produce a snapshot of the last mixture.
+which results in \KaSim~producing a snapshot every 1000 events until the simulation ends. The perturbation \ttt{\$STOP \"final\_state\"} will terminate the simulation whenever its precondition is satisfied and produce a snapshot of the last mixture.
 
 \section{Link type}
 

@@ -11,11 +11,18 @@ exception StopReached of string
 exception Syntax_Error of string
 exception Semantics_Error of Tools.pos * string
 
-let warning ?with_pos msg = 
-	let _ = 
-		match with_pos with
-			| Some pos -> prerr_string ((Tools.string_of_pos pos)^" ")
-			| None -> ()
-	in
-		prerr_string ("WARNING: "^msg^"\n") ; flush stderr
+let warning_buffer:string list ref = ref []
 
+let warning ?with_pos msg = 
+	let str = 
+		match with_pos with
+			| Some pos -> (Tools.string_of_pos pos)^" "
+			| None -> ""
+	in
+		warning_buffer := ("WARNING: "^str^msg^"\n")::!warning_buffer
+
+let flush_warning () = 
+	prerr_string "\n";
+	let l = List.rev !warning_buffer in
+	List.iter (fun s -> prerr_string s) l ;
+	flush stderr

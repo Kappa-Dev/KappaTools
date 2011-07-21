@@ -3,13 +3,15 @@
 
 %token EOF NEWLINE
 %token AT OP_PAR CL_PAR COMMA DOT KAPPA_RAR KAPPA_LNK PIPE
-%token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE SET DO UNTIL TRUE FALSE SNAPSHOT REF OBS 
-%token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INFINITY TIME EVENT INIT LET DIV PLOT SINUS COSINUS TAN SQRT EXPONENT POW ABS MODULO STOP
+%token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE SET DO UNTIL TRUE FALSE REF OBS 
+%token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INFINITY TIME EVENT INIT LET DIV PLOT SINUS COSINUS TAN SQRT EXPONENT POW ABS MODULO 
 %token <Tools.pos> KAPPA_NOPOLY EMAX TMAX
 %token <int*Tools.pos> INT 
 %token <string*Tools.pos> ID LABEL KAPPA_MRK 
 %token <int> DOT_RADIUS PLUS_RADIUS 
 %token <float*Tools.pos> FLOAT 
+%token <string*Tools.pos> FILENAME
+%token <Tools.pos> STOP SNAPSHOT
 
 %left MINUS PLUS 
 %left MULT DIV 
@@ -135,11 +137,15 @@ modif_expr:
 	{let (alg,mix) = $2 in Ast.DELETE (alg,mix,$1)}
 | LABEL SET alg_expr 
 	{let lab,pos_lab = $1 in Ast.UPDATE (lab,pos_lab,$3,$2)}
-| SNAPSHOT 
-	{Ast.SNAPSHOT $1}
-| STOP 
-	{Ast.STOP $1}
+| SNAPSHOT snapshot_label
+	{Ast.SNAPSHOT ($2,$1)}
+| STOP snapshot_label
+	{Ast.STOP ($2,$1)}
 ;
+
+snapshot_label:
+/*empty*/ {None}
+| FILENAME {Some $1}
 
 multiple:
 /*empty*/ {Ast.FLOAT (1.0,Tools.no_pos)}
@@ -169,7 +175,9 @@ rule_expression:
 		($1,{Ast.lhs=$2; Ast.arrow=$3; Ast.rhs=$4; Ast.k_def=k2; Ast.k_un=k1})
 	}
 | rule_label mixture arrow mixture 
-	{($1,{Ast.lhs=$2; Ast.arrow=$3; Ast.rhs=$4; Ast.k_def=(Ast.FLOAT (1.0,Tools.no_pos)); Ast.k_un=None})}
+	{let rlbl = $1 in 
+	let nme,pos = match rlbl.Ast.lbl_nme with Some (nme,pos) -> (nme,pos) | None -> raise (ExceptionDefn.Syntax_Error "Malformed rule") in 
+	ExceptionDefn.warning ~with_pos:pos (Printf.sprintf "Rule '%s' has no kinetics. Default rate of 1.0 is assumed." nme) ; ($1,{Ast.lhs=$2; Ast.arrow=$3; Ast.rhs=$4; Ast.k_def=(Ast.FLOAT (1.0,Tools.no_pos)); Ast.k_un=None})}
 ;
 
 arrow:

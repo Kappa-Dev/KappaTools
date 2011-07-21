@@ -119,8 +119,8 @@ and modification =
 	INTRO of variable * Mixture.t 
 	| DELETE of variable * Mixture.t 
 	| UPDATE of int * variable 
-	| SNAPSHOT (*TODO of Mixture.t list*)
-	| STOP 
+	| SNAPSHOT of string option
+	| STOP of string option
 and boolean_variable = BCONST of bool | BVAR of ((int -> float) -> (int -> float) -> float -> int -> bool)
 
 let string_of_pert pert env =
@@ -128,8 +128,8 @@ let string_of_pert pert env =
 		| INTRO (_,mix) -> Printf.sprintf "INTRO %s" (Mixture.to_kappa false mix env)
 		| DELETE (_,mix) -> Printf.sprintf "DELETE %s" (Mixture.to_kappa false mix env)
 		| UPDATE (r_id,_) -> Printf.sprintf "UPDATE rule[%d]" r_id
-		| SNAPSHOT -> "SNAPSHOT"
-		| STOP -> "STOP"
+		| SNAPSHOT opt -> (match opt with None -> "SNAPSHOT" | Some s -> "SNAPSHOT("^s^")") 
+		| STOP opt -> (match opt with None -> "STOP" | Some s -> "STOP("^s^")")
 		
 let diff m0 m1 label_opt env =
 	let add_map id site_type map =
@@ -325,24 +325,31 @@ let diff m0 m1 label_opt env =
 													else
 														match (opt, opt') with
 														| (None, Some (id1', i1')) -> (*sub-case: semi-link -> connected*)
-																if id1' < id or (id1'= id && i1'< site_id) then
-																	begin
-																		let site = Environment.site_of_id (Mixture.name ag) site_id env in
-																		let _ =
-																			warning
-																				(Printf.sprintf
-																						"%s link state of site '%s' of agent '%s' is changed although it is a semi-link in the left hand side"
-																						label site (Environment.name (Mixture.name ag) env)
-																				)
-																		in
-																		let inst = BND((KEPT id, site_id), (KEPT id1', i1')):: inst
-																		and idmap = add_map (KEPT id) (site_id,1) (add_map (KEPT id1') (i1',1) idmap)
-																		in
-																			side_effect := true ;
-																			(inst,idmap)
-																	end
-																else (inst,idmap)
+															(*warning*)
+															let site = Environment.site_of_id (Mixture.name ag) site_id env in
+															let _ =
+																		warning
+																			(Printf.sprintf
+																					"%s link state of site '%s' of agent '%s' is changed although it is a semi-link in the left hand side"
+																					label site (Environment.name (Mixture.name ag) env)
+																			)
+															in
+															(*modified sites*)
+															let id'' = if List.exists (fun id -> id=id1') prefix then (KEPT id1') else (FRESH id1')
+															in
+															let idmap' = add_map (KEPT id) (site_id,1) (add_map id'' (i1',1) idmap) in
+															(*instruction*)
+															if id1' < id or (id1'= id && i1'< site_id) then (*generating an instruction only for one of both sites*)
+																begin
+																	let inst = BND((KEPT id, site_id), (id'',i1')):: inst
+																	in
+																		side_effect := true ;
+																		(inst,idmap')
+																end
+															else (inst,idmap')
+															
 														| (Some (id1, i1), Some (id1', i1')) -> (*sub-case: connected -> connected*)
+																(*warning*)
 																let site = Environment.site_of_id (Mixture.name ag) site_id env in
 																let _ =
 																	warning
@@ -351,15 +358,20 @@ let diff m0 m1 label_opt env =
 																				label site (Environment.name (Mixture.name ag) env)
 																		)
 																in
+																(*modifed sites*)
+																(*it might be that id1 is not preserved by the reaction!*)
+																let idmap = if List.exists (fun id -> id=id1) prefix then add_map (KEPT id1) (i1,1) idmap else idmap
+																in
+																(*now id1' might be created by the reaction*)
+																let id1'' = if List.exists (fun id -> id=id1') prefix then (KEPT id1') else (FRESH id1') in
+																let idmap' = add_map id1'' (i1',1) idmap in
+																(*instruction*)
 																if id1'< id or (id1'= id && i1'< site_id) then
-																	let inst = BND((KEPT id, site_id), (KEPT id1', i1')):: inst
-																	and idmap = (*it might be that id1 is not preserved by the reaction!*)
-																		if List.exists (fun id -> id=id1) prefix then add_map (KEPT id1) (i1,1) idmap else idmap
+																	let inst = BND((KEPT id, site_id), (id1'', i1')):: inst
 																	in
-																	let idmap = add_map (KEPT id) (site_id,1) (add_map (KEPT id1') (i1',1) idmap)
-																	in
-																		(inst,idmap)
-																else (inst,idmap)
+																		(inst,idmap')
+																else 
+																	(inst,idmap')
 														| (Some (id1, i1), None) -> 
 															(*sub-case: connected -> semi-link*) invalid_arg "Dynamics.diff: rhs has partial link state"
 														| (None, None) -> (*sub-case: semi-link -> semi-link*) 
@@ -370,13 +382,18 @@ let diff m0 m1 label_opt env =
 													let opt' = Mixture.follow (id, site_id) m1 in
 													match opt' with
 													| None -> (*sub-case: free -> semi-link*) invalid_arg "Dynamics.diff: rhs creates a semi-link"
-													| Some (id', i') -> (*sub-case: free -> connected*) 
+													| Some (id', i') -> (*sub-case: free -> connected*)
+														(*no warning*)
+														(*modif sites*)
+														let id'' = if List.exists (fun id -> id=id') prefix then KEPT id' else FRESH id' in
+														let idmap' = add_map (KEPT id) (site_id,1) (add_map id'' (i',1) idmap) 
+														in
 														if (id'< id) or (id'= id && i'< site_id) then 
-															let inst = BND((KEPT id, site_id), (KEPT id', i')):: inst 
-															and idmap = add_map (KEPT id) (site_id,1) (add_map (KEPT id') (i',1) idmap)
+															let inst = BND((KEPT id, site_id), (id'', i')):: inst 
 															in
-															(inst,idmap)
-														else (inst,idmap)
+															(inst,idmap')
+														else 
+															(inst,idmap')
 												end
 										| (Node.FREE, Node.FREE) | (Node.WLD, Node.WLD) -> (*free -> free or wildcard -> wildcard*) (inst,idmap)
 										| (Node.TYPE (sid,nme),Node.TYPE(sid',nme')) -> 
@@ -402,21 +419,25 @@ let diff m0 m1 label_opt env =
 													match opt' with
 													| None -> invalid_arg "Dynamics.diff: rhs turns a wildcard into a semi link"
 													| Some (id', i') ->
-															if (id'< id) or (id'= id && i'< site_id) then
-																let site = Environment.site_of_id (Mixture.name ag) site_id env in
-																let _ =
+														(*warning*)
+														let site = Environment.site_of_id (Mixture.name ag) site_id env in
+														let _ =
 																	warning
 																		(Printf.sprintf
 																				"%s site '%s' of agent '%s' is bound in the right hand side although it is unspecified in the left hand side"
 																				label site (Environment.name (Mixture.name ag) env)
 																		)
-																in
-																let inst = BND((KEPT id, site_id), (KEPT id', i')):: inst
-																and idmap = add_map (KEPT id) (site_id,1) (add_map (KEPT id') (i',1) idmap)
-																in
-																(side_effect:= true;
-																(inst,idmap))
-															else (inst,idmap)
+														in
+														(*modif sites*)
+														let id'' = if List.exists (fun id -> id=id') prefix then KEPT id' else FRESH id' in
+														let idmap' = add_map (KEPT id) (site_id,1) (add_map id'' (i',1) idmap) in
+														(*instruction*)
+														if (id'< id) or (id'= id && i'< site_id) then
+															let inst = BND((KEPT id, site_id), (id'', i')):: inst
+															in
+															(side_effect:= true;
+															(inst,idmap'))
+														else (inst,idmap')
 												end
 										| (_,_) -> (*connected,free -> wildcard*) invalid_arg "Dynamics.diff: rhs creates a wildcard"
 							)

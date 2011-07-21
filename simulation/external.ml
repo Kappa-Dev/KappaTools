@@ -26,9 +26,12 @@ let eval_abort_pert just_applied pert state counter env =
 				b_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter)
 
 let apply_effect p_id pert state counter env =
-	let snapshot () =
+	let snapshot opt =
 		if !Parameter.debugModeOn then Debug.tag "Taking a snapshot of current state" ;
-		let filename = !Parameter.snapshotFileName^"_"^(string_of_int (Counter.event counter)) 
+		let filename = 
+			match opt with 
+				| None -> !Parameter.snapshotFileName^"_"^(string_of_int (Counter.event counter)) 
+				| Some s -> s^"_"^(string_of_int (Counter.event counter))
 		in
 		let file_exists = ref true in
 		let cpt = ref 1 in
@@ -135,10 +138,10 @@ let apply_effect p_id pert state counter env =
 					State.update_activity state (-1) r_id counter env ;		
 					let env,pert_ids = State.update_dep state (RULE r_id) IntSet.empty counter env in
 					(env,state ,pert_ids)
-			| SNAPSHOT -> (snapshot () ; (env, state ,IntSet.empty))
-			| STOP ->
+			| SNAPSHOT opt -> (snapshot opt ; (env, state ,IntSet.empty))
+			| STOP opt ->
 				(if !Parameter.debugModeOn then Debug.tag "Interrupting simulation now!" ;
-				snapshot () ;
+				snapshot opt ;
 				raise (ExceptionDefn.StopReached (Printf.sprintf "STOP instruction was satisfied at event %d" (Counter.event counter)))
 				)
 				

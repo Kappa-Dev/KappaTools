@@ -76,6 +76,7 @@ rule token = parse
 								| "tmax" -> TMAX pos
 								| _ as s -> return_error lexbuf ("Symbol \""^s^"\" is not defined")
 						}  
+		| '\"' {let filename = read_label "" ['\"'] lexbuf in let pos = position lexbuf in FILENAME (filename,pos)}
 		| '|' {PIPE}
     | '\n' {incr_line lexbuf ; NEWLINE}
 		| '\r' {incr_line lexbuf ; NEWLINE}

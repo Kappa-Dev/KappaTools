@@ -55,8 +55,8 @@ and modif_expr =
 	| INTRO of (alg_expr * mixture * Tools.pos) 
 	| DELETE of (alg_expr * mixture * Tools.pos) 
 	| UPDATE of (string * Tools.pos * alg_expr * Tools.pos) (*TODO: pause*)
-	| STOP of Tools.pos
-	| SNAPSHOT of Tools.pos (*maybe later of mixture too*)
+	| STOP of ((string * Tools.pos) option * Tools.pos)
+	| SNAPSHOT of ((string * Tools.pos) option * Tools.pos) (*maybe later of mixture too*)
 
 type instruction = 
 	| SIG of agent * Tools.pos 

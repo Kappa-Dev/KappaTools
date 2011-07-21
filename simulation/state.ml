@@ -249,10 +249,13 @@ let build_influence_map rules patterns env =
 					match opt with
 						| None -> () (*empty pattern*)
 						| Some mix ->
+							if !Parameter.debugModeOn then 
+								(Printf.printf "%s -+-> %s?\n" (Dynamics.to_kappa r) (Mixture.to_kappa false mix env) ; flush stdout) ;
 							let glueings = Dynamics.enable r mix env in (*glueings: [phi_0;...;phi_n] partial embeddings list*)
 							match glueings with
-								| [] -> ()
+								| [] -> if !Parameter.debugModeOn then (Printf.printf "No\n") ; ()
 								| _ ->
+									if !Parameter.debugModeOn then (Printf.printf "Yes\n") ; 
 							 		add_influence influence_map i j glueings	
 				) patterns
 	) rules ;

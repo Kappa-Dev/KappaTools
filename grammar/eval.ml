@@ -623,12 +623,22 @@ let effects_of_modif variables env ast =
 				Printf.sprintf "set rate of rule '%s' to %s"
 					(Environment.rule_of_num i env) str
 			in (variables, (Dynamics.UPDATE (i, v)), str, env)
-	| SNAPSHOT pos -> (*when specializing snapshots to particular mixtures, add variables below*)
+	| SNAPSHOT (opt,pos) -> (*when specializing snapshots to particular mixtures, add variables below*)
 		let str = "snapshot state" in
-		(variables, Dynamics.SNAPSHOT, str, env)
-	| STOP pos ->
+		let opt_name = 
+			match opt with
+			| None -> None
+			| Some (nme,pos) -> Some nme
+		in
+		(variables, Dynamics.SNAPSHOT opt_name, str, env)
+	| STOP (opt,pos) ->
 		let str = "interrupt simulation" in
-		(variables, Dynamics.STOP, str, env)
+		let opt_name = 
+			match opt with
+			| None -> None
+			| Some (nme,pos) -> Some nme
+		in
+		(variables, Dynamics.STOP opt_name, str, env)
 
 let pert_of_result variables env res =
 	let (variables, lpert, lrules, env) =
@@ -738,7 +748,7 @@ let pert_of_result variables env res =
 							in
 							(env,rule_opt)
 						end
-					| Dynamics.UPDATE _ | Dynamics.SNAPSHOT | Dynamics.STOP -> 
+					| Dynamics.UPDATE _ | Dynamics.SNAPSHOT _ | Dynamics.STOP _ -> 
 						let env =
 							DepSet.fold
 							(fun dep env -> Environment.add_dependencies dep (Mods.PERT p_id) env
