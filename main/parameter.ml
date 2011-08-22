@@ -11,6 +11,7 @@ let plotSepChar = ref ' '
 let dumpIfDeadlocked = ref false
 let backtrace = ref false
 let (rescale:int option ref) = ref None
+let eclipseMode = ref false
 
 (*User definable values*)
 let (maxEventValue:int option ref) = ref None
@@ -58,7 +59,7 @@ let checkFileExists () =
 			| file -> 
 				if Sys.file_exists file then 
 					begin
-						Printf.printf "File '%s' already exists do you want to erase (y/N)? " file ; flush stdout ;
+						Printf.printf "File '%s' already exists do you want to erase (y/N)? \n" file ; flush stdout ;
 						let answer = Tools.read_input () in
 						if answer="y" then () else exit 1
 					end
