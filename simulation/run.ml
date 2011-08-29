@@ -34,8 +34,7 @@ let event state grid counter plot env =
 	
 	(*updating activity of rule whose rate depends on time or event number*)
 	let env,pert_ids = State.update_dep state Mods.EVENT IntSet.empty counter env in
-	let env,pert_ids' = State.update_dep state Mods.TIME IntSet.empty counter env in
-	let pert_ids = IntSet.union pert_ids' pert_ids in
+	let env,pert_ids = State.update_dep state Mods.TIME pert_ids counter env in
 	
 	State.dump state counter env ;
 	
@@ -72,6 +71,7 @@ let event state grid counter plot env =
 	let env,state,pert_ids',grid = 
 		match opt_new_state with
 			| Some ((env,state,side_effect,phi,psi,pert_ids),r_id) ->
+				
 				let r = State.rule_of_id r_id state in
 				let env,state,pert_ids' = 
 					State.positive_update state r (phi,psi) (side_effect,Int2Set.empty) counter env

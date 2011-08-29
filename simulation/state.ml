@@ -566,6 +566,7 @@ let wake_up state modif_type modifs wake_up_map env =
 											(Int2Set.union old_candidates new_candidates)))
 		modifs
 
+(*Note: update_dep is recursive but the first call should always be with dep_in = (KAPPA mix_id) or EVENT or TIME*)
 let rec update_dep state dep_in pert_ids counter env =
 	let env,depset,pert_ids = 
 		match dep_in with
@@ -599,6 +600,7 @@ let rec update_dep state dep_in pert_ids counter env =
 			let depset =
 				Environment.get_dependencies (Mods.KAPPA i) env
 			in
+			if !Parameter.debugModeOn then if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Observable %d is changed, updating %s" i (string_of_set Mods.string_of_dep DepSet.fold depset)) ;
 				(env,depset,pert_ids)
 		| Mods.EVENT | Mods.TIME -> 
 			let depset = Environment.get_dependencies dep_in env in
@@ -843,12 +845,12 @@ let negative_upd state cause (u,i) int_lnk counter env =
 						(* comp_injs.(cc_id) <- Some injs_cc_id; *)
 						(* not necessary because comp_injs.(cc_id) has been    *)
 						(* modified by side effect                             *)
-						update_dep state (RULE mix_id) pert_ids counter env
+						update_dep state (KAPPA mix_id) pert_ids counter env (*TODO: use influence map for this?*)
 					)
 					liftset (env,pert_ids) 
 	in
 	(*end sub function*)
-	let (liftset_int, liftset_lnk) = try Node.get_lifts u i with exn -> failwith "oops"
+	let (liftset_int, liftset_lnk) = try Node.get_lifts u i with exn -> failwith "State.negative_udpate"
 	in
 	let env,pert_ids = 
 		match int_lnk with

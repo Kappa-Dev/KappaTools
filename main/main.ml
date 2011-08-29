@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "1.08_220811"
+let version = "1.08_290811"
 
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
@@ -21,13 +21,7 @@ let main =
 			"Number of total simulation events, including null events (negative value for unbounded simulation)");
 		("-t", Arg.Float(fun t -> Parameter.maxTimeValue := Some t ; Parameter.maxEventValue := None), "Max time of simulation (arbitrary time unit)");
 		("-p", Arg.Int (fun i -> Parameter.plotModeOn := true ; Parameter.pointNumberValue:= Some i), "Number of points in plot");
-		("-o", Arg.String (fun s -> 
-			if Sys.file_exists s then 
-				begin
-					Printf.printf "File '%s' already exists do you want to erase (y/N)? " s ; flush stdout ;
-					Scanf.scanf "%s" (fun answer -> if answer="y" then Parameter.outputDataName:=s else exit 1)
-				end
-			else Parameter.outputDataName:=s ), "file name for data output") ;
+		("-o", Arg.String (fun s -> Parameter.outputDataName:=s ), "file name for data output") ;
 		("-d", 
 		Arg.String 
 			(fun s -> 
