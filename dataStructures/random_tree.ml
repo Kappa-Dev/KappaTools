@@ -164,7 +164,7 @@ module Random_tree =
 		let add i w t =
 			let i = mask t i in
 			let w = 
-				if w = infinity then( t.inf_list <- IntSet.add i t.inf_list ; 0.)
+				if w = infinity then (t.inf_list <- IntSet.add i t.inf_list ; 0.)
 				else (t.inf_list <- IntSet.remove i t.inf_list ; w)
 			in 
 			let total = t.total -. t.weight_of_nodes.(i) +. w in

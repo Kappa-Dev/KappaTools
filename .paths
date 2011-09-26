@@ -1,3 +1,5 @@
+cflow
+/opt/local/lib/ocaml
 /usr/lib/ocaml
 .
 siteGraphs
@@ -7,10 +9,3 @@ main
 grammar
 dataStructures
 Error
-/opt/local/lib/ocaml
-Error
-dataStructures
-grammar
-main
-man
-models/debug

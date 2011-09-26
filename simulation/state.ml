@@ -484,6 +484,10 @@ let draw_rule state counter env =
 			try eval_activity r state counter env
 			with | Not_found -> invalid_arg "State.draw_rule"
 		in
+		
+		(*correction: issue #40*)
+		if alpha = 0. then Random_tree.add lhs_id alpha state.activity_tree ;
+
 		let (_:unit) =
 			if alpha = infinity then ()
 			else
@@ -492,9 +496,7 @@ let draw_rule state counter env =
 				let rd = Random.float 1.0
 				in
 				if rd > (alpha /. alpha')
-				then
-					(Random_tree.add lhs_id alpha state.activity_tree; (*correcting over approximation of activity*)
-					raise Null_event)
+				then raise Null_event
 				else ()
 		in
 		let embedding = select_injection state r.lhs
