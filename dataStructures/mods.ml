@@ -84,6 +84,7 @@ module Counter =
 			mutable time:float ; 
 			mutable events:int ; 
 			mutable null_events:int ; 
+			mutable cons_null_events:int;
 			mutable null_action:int ;
 			mutable last_tick : (int * float) ;
 			mutable initialized : bool ;
@@ -104,6 +105,7 @@ module Counter =
 		let inc_time c dt = c.time <- (c.time +. dt)
 		let inc_events c =c.events <- (c.events + 1) 
 		let inc_null_events c = c.null_events <- (c.null_events + 1) 
+		let inc_consecutive_null_events c = (c.cons_null_events <- c.cons_null_events + 1)
 		let inc_null_action c = c.null_action <- (c.null_action + 1)
 		let check_time c = match c.max_time with None -> true | Some max -> c.time < max
 		let check_events c = match c.max_events with None -> true | Some max -> c.events < max
@@ -176,6 +178,7 @@ module Counter =
 				{time = init_t ; 
 				events = init_e ; 
 				null_events = 0 ; 
+				cons_null_events = 0;
 				null_action = 0 ;
 				max_time = mx_t ; 
 				max_events = mx_e ;

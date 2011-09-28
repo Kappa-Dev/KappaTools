@@ -44,7 +44,7 @@ rule token = parse
 		| ":=" {let pos = position lexbuf in SET pos}
 		| "&&" {let pos = position lexbuf in AND pos}
 		| "||" {let pos = position lexbuf in OR pos}
-    | "->" {KAPPA_RAR}
+    | "->" {let pos = position lexbuf in KAPPA_RAR pos}
 		| "->!" {let pos = position lexbuf in KAPPA_NOPOLY pos}
 		| pert as s {let pos = position lexbuf in
 									match s with  

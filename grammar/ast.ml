@@ -47,7 +47,7 @@ and link =
 	| LNK_TYPE of ((string * Tools.pos) * (string * Tools.pos))
 
 type rule = {lhs: mixture ; arrow:arrow ; rhs:mixture; k_def:alg_expr ; k_un:alg_expr option}
-and arrow = RAR | RAR_NOPOLY of Tools.pos
+and arrow = RAR of Tools.pos | RAR_NOPOLY of Tools.pos
 type rule_label = {lbl_nme:(string * Tools.pos) option ; lbl_ref:(string * Tools.pos) option}
 
 type perturbation = bool_expr * modif_expr * Tools.pos * bool_expr option

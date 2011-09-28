@@ -72,6 +72,7 @@ let event state grid counter plot env =
 		match opt_new_state with
 			| Some ((env,state,side_effect,phi,psi,pert_ids),r_id) ->
 				
+				counter.Counter.cons_null_events <- 0 ; (*resetting consecutive null event counter since a real rule was applied*)  
 				let r = State.rule_of_id r_id state in
 				let env,state,pert_ids' = 
 					State.positive_update state r (phi,psi) (side_effect,Int2Set.empty) counter env
@@ -86,6 +87,7 @@ let event state grid counter plot env =
 				begin
 					if !Parameter.debugModeOn then Debug.tag "Null (clash or doesn't satisfy constraints)"; 
 					Counter.inc_null_events counter ; 
+					Counter.inc_consecutive_null_events counter ;
 					(env,state,IntSet.empty,grid)
 				end
 	in

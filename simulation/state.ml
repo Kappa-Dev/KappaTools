@@ -496,10 +496,20 @@ let draw_rule state counter env =
 				let rd = Random.float 1.0
 				in
 				if rd > (alpha /. alpha')
-				then raise Null_event
+				then raise Null_event (*null event because of over approximation of activity*)
 				else ()
 		in
-		let embedding = select_injection state r.lhs
+		let embedding = try select_injection state r.lhs with 
+			| Null_event -> (*null event because of clashing instance*)
+				if counter.Counter.cons_null_events > 2 then 
+					begin
+						(if !Parameter.debugModeOn then Debug.tag "Max consecutive clashes reached, I am giving up square approximation at this step" else ()) ;
+						let embeddings = instances_of_square lhs_id state in
+						match embeddings with
+							| (embedding,_)::_ -> embedding (*should draw uniformly here...*)
+							| [] -> (Random_tree.add lhs_id 0.0 state.activity_tree  ; raise Null_event)
+					end
+				else raise Null_event
 		in 
 		((Some (r, embedding)), state)
 	with 

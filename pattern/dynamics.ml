@@ -139,8 +139,9 @@ let diff m0 m1 label_opt env =
 	in
 	let side_effect = ref false in
 	let label = match label_opt with Some (_,pos) -> (string_of_pos pos) | None -> "" in
-	let id_preserving ag1 ag2 = (*check whether ag2 can be the residual of ag1 for (same name, same sites)*)
-		if not (Mixture.name ag1 = Mixture.name ag2) then false
+	let id_preserving ag1 ag2 = (*check whether ag2 can be the residual of ag1 for (same name)*)
+		Mixture.name ag1 = Mixture.name ag2
+		(*if not (Mixture.name ag1 = Mixture.name ag2) then false
 		else
 			let intf2 = Mixture.interface ag2
 			and intf1 = Mixture.interface ag1
@@ -162,7 +163,7 @@ let diff m0 m1 label_opt env =
 									label (Environment.name (Mixture.name ag1) env)
 							)
 					in
-					false
+					false*)
 	in
 	let prefix, deleted, add_index =
 		IntMap.fold
@@ -253,7 +254,11 @@ let diff m0 m1 label_opt env =
 			(fun (inst,idmap) id -> (*adding link and internal state modifications for agents conserved by the rule*)
 						let ag, ag' = (Mixture.agent_of_id id m0, Mixture.agent_of_id id m1) in
 						let interface' = Mixture.interface ag' in
-						Mixture.fold_interface
+						(*folding on ag's interface: problem when a site is not mentionned at all in ag but is used in ag' --ie modif with no test*)
+						let sign = Environment.get_sig (Mixture.name ag) env in
+						let interface = Mixture.interface ag in
+						let interface = Signature.fold (fun site_id interface -> if IntMap.mem site_id interface then interface else IntMap.add site_id (None,Node.WLD) interface) sign interface in
+						IntMap.fold
 							(fun site_id (int_state, lnk_state) (inst,idmap) ->
 										let int_state', lnk_state' =
 											try IntMap.find site_id interface' with
@@ -441,7 +446,7 @@ let diff m0 m1 label_opt env =
 												end
 										| (_,_) -> (*connected,free -> wildcard*) invalid_arg "Dynamics.diff: rhs creates a wildcard"
 							)
-							ag (inst,idmap)
+							interface (inst,idmap)
 			)
 			(instructions,modif_sites) prefix
 	in
