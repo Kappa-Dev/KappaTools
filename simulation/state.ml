@@ -507,9 +507,9 @@ let draw_rule state counter env =
 						let embeddings = instances_of_square lhs_id state in
 						match embeddings with
 							| (embedding,_)::_ -> embedding (*should draw uniformly here...*)
-							| [] -> (Random_tree.add lhs_id 0.0 state.activity_tree  ; raise Null_event)
+							| [] -> (Random_tree.add lhs_id 0.0 state.activity_tree ; if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Rule [%d]'s activity was corrected to 0.0" lhs_id) ; raise Null_event)
 					end
-				else raise Null_event
+				else (if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Rule [%d] is clashing" lhs_id) ; raise Null_event)
 		in 
 		((Some (r, embedding)), state)
 	with 
