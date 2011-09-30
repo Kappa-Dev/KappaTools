@@ -262,8 +262,7 @@ let diff m0 m1 label_opt env =
 							(fun site_id (int_state, lnk_state) (inst,idmap) ->
 										let int_state', lnk_state' =
 											try IntMap.find site_id interface' with
-											| Not_found -> (*site is not mentioned in the right hand side*)
-													invalid_arg "Dynamics.diff: invariant violation"
+											| Not_found -> (None,Node.WLD) (*site is not mentioned in the right hand side*)
 										in
 										let inst,idmap =
 											match (int_state, int_state') with
