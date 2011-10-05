@@ -32,8 +32,6 @@ type bool_expr =
 
 type mixture = 
 	| COMMA of agent * mixture 
-	| DOT of int * agent * mixture 
-	| PLUS of int * agent * mixture 
 	| EMPTY_MIX
 and agent = {ag_nme:string ; ag_intf:interface ; ag_pos:Tools.pos}
 and interface = PORT_SEP of port * interface | EMPTY_INTF

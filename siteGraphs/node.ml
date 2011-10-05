@@ -7,7 +7,8 @@ open ExceptionDefn
 type lnk_t = WLD | BND | FREE | TYPE of (int*int) 
 type port_status = (int option * ptr) (*internal state,link state*)
 and port = {status:port_status ; mutable dep : (LiftSet.t * LiftSet.t)} (*dep : (lifts for int,lifts for lnk)*)
-and t = {name:int ; interface : port array ; mutable address : int option }
+and t = {name:int ; interface : port array ; mutable address : int option ; mutable prob_connect : IntSet.t IntMap.t option} 
+(*prob_connect: mix_id -> {u | v....u and v,u are the image of the roots of connected components of mix_id} *)
 and ptr = Null | Ptr of (t * int) | FPtr of (int * int)
 and node = t (*just alias for Node.t*)
 
@@ -78,13 +79,8 @@ let to_string with_detail (hsh_lnk,fresh) node env =
 					in
 						let string_of_lift = 
 							fun inj -> 
-								let s_a =
-									match (try Some (Injection.get_address inj) with Not_found -> None) with
-										| Some a -> string_of_int a
-										| None -> "na"
-								in 
 								let (m,c) = Injection.get_coordinate inj in
-								Printf.sprintf "(%s,%s,%s)" (string_of_int m) (string_of_int c) s_a 
+								Printf.sprintf "(%s,%s)" (string_of_int m) (string_of_int c)  
 						in
 							let lift_int = Tools.string_of_set string_of_lift LiftSet.fold lifts_int
 							and lift_lnk = Tools.string_of_set string_of_lift LiftSet.fold lifts_lnk
@@ -207,7 +203,7 @@ let create ?with_interface name_id env =
 						{status = (def_int,Null) ; dep = (LiftSet.create !Parameter.defaultLiftSetSize,LiftSet.create !Parameter.defaultLiftSetSize)}
 				)
 			in 
-				let u = {name = name_id ; interface = intf ; address = None } in
+				let u = {name = name_id ; interface = intf ; address = None ; prob_connect = None} in
 					match with_interface with
 						| None -> u
 						| Some m ->
@@ -224,6 +220,22 @@ let create ?with_interface name_id env =
 		| Invalid_argument str -> (invalid_arg ("Node.create: "^str))
 		| Not_found -> (invalid_arg "Node.create: not found")
 
+
+(*Non local properties management*)
+let prob_connect node mix_id = match node.prob_connect with None -> IntSet.empty | Some map -> (try IntMap.find mix_id map with Not_found -> IntSet.empty) 
+
+let unconnect node mix_id node_id = 
+	match node.prob_connect with
+		| None -> invalid_arg "Node.unconnect: Invariant violation 1"
+		| Some map -> 
+			begin
+				try 
+					let set = IntMap.find mix_id map in 
+					let set = if IntSet.mem node_id set then IntSet.remove node_id set else invalid_arg "Node.unconnect: Invariant violation 2"
+					in
+					node.prob_connect <- Some (IntMap.add mix_id set map)
+				with Not_found -> invalid_arg "Node.unconnect: Invariant violation 3"
+			end
 
 (*Tests whether status of port i of node n is compatible with (int,lnk) raises False if not otherwise returns completes*)
 (*the list port_list with (0,i) if i is int-tested or (1,i) if i is lnk-tested *)

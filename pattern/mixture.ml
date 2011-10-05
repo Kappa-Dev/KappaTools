@@ -10,7 +10,6 @@ type t = {
 	site_number : int ;
 	graph : (int*int) Int2Map.t ;
 	enum_cov : (int,covering) Hashtbl.t option;
-	reject_upon_matching : constraints IntMap.t ;
 	ids_of_name : IntSet.t Int2Map.t ; (*(nm,cc_id) -> id if agent(id) has name nm in con. comp. cc_id*)
 	component_of_id : int array option ; (*id -> cc_id starting at 0*)
 	arity : int option (*number of connected components*) ;
@@ -18,9 +17,6 @@ type t = {
 	size_of_cc : int array ;
 	root_of_cc : int array 
 	}
-and constraints = PREVIOUSLY_DISCONNECTED of int*int | PREVIOUSLY_CONNECTED of int*int (*(id,radius)*)
-
-let constraints m = m.reject_upon_matching
 
 let interface ag = ag.interface
 
@@ -91,7 +87,6 @@ let empty id_opt = {
 	site_number = 0 ; 
 	graph = Int2Map.empty ;
 	enum_cov = None ;
-	reject_upon_matching = IntMap.empty ;
 	ids_of_name = Int2Map.empty ;
 	component_of_id = None ;
 	arity = None ;
@@ -106,7 +101,7 @@ let size_of_cc cc_id mix =
 	with
 		| Invalid_argument msg -> invalid_arg ("Mixture.size_of_cc "^msg)
 	
-let compose id agent mixture new_edges cstr = 
+let compose id agent mixture new_edges = 
 	let graph,site_num = 
 		Int2Map.fold 
 		(fun (a,i) (b,j) (graph,site_num) -> 
@@ -117,17 +112,11 @@ let compose id agent mixture new_edges cstr =
 		) 
 		new_edges (mixture.graph,mixture.site_number)
 	in
-		let reject = 
-			match cstr with
-				| None -> mixture.reject_upon_matching
-				| Some c -> IntMap.add id c mixture.reject_upon_matching
-		in
-			{mixture with
-			graph = graph ;
-			site_number = site_num ;
-			agents = IntMap.add id agent mixture.agents ; 
-			reject_upon_matching = reject
-			}
+	{mixture with
+	graph = graph ;
+	site_number = site_num ;
+	agents = IntMap.add id agent mixture.agents ; 
+	}
 
 let follow_in_spanning_tree root_ag (i,site_id) mix =
 	let span = try (span root_ag mix) with 

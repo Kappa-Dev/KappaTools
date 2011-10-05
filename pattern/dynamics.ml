@@ -23,7 +23,6 @@ type rule = {
 	script : action list ;
 	balance : (int * int * int) ;	(*#deleted,#preserved,#removed*)
 	kappa: string ;
-	constraints: Mixture.constraints IntMap.t ;
 	lhs : Mixture.t ;
 	rhs : Mixture.t ;
 	refines: int option ; (*mixture id that is refined by lhs*)

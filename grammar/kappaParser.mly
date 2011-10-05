@@ -245,7 +245,7 @@ alg_expr:
 ;
 
 rate:
-| alg_expr PIPE alg_expr 
+| alg_expr OP_PAR alg_expr CL_PAR 
 	{($1,Some $3)}
 | alg_expr 
 	{($1,None)}

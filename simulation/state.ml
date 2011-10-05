@@ -12,7 +12,7 @@ type implicit_state =
 		rules : (int, rule) Hashtbl.t; 
 		perturbations : perturbation IntMap.t;
 		kappa_variables : (Mixture.t option) array;
-		alg_variables : ((Dynamics.variable * float) option) array;
+		alg_variables : (Dynamics.variable option) array;
 		observables : obs list; 
 		influence_map : (int, (int IntMap.t list) IntMap.t) Hashtbl.t ;
 		mutable activity_tree : Random_tree.tree; 
@@ -104,7 +104,7 @@ let rec value state var_id counter env =
 	match var_opt with
 	| None ->
 			invalid_arg (Printf.sprintf "v[%d] is not a valid variable" var_id)
-	| Some (var, _) ->
+	| Some var ->
 			(match var with
 				| Dynamics.CONST f -> f
 				| Dynamics.VAR v_fun ->
@@ -145,6 +145,7 @@ let update_activity state cause var_id counter env =
 	else
 		let rule = rule_of_id var_id state in
 		let alpha = eval_activity rule state counter env in
+		
 		if !Parameter.fluxModeOn && cause > 0 then
 			begin
 				try
@@ -155,6 +156,7 @@ let update_activity state cause var_id counter env =
 				with Invalid_argument msg -> invalid_arg ("State.update_activity: "^msg)
 			end
 		else
+			
 			Random_tree.add var_id alpha state.activity_tree 
 
 (* compute complete embedding of mix into sg at given root --for           *)
@@ -192,7 +194,7 @@ let generate_embeddings sg u_i mix comp_injs =
 										| Some injections -> injections
 										| None ->
 												InjectionHeap.create
-													!Parameter.defaultInjectionHeapSize) in
+													!Parameter.defaultHeapSize) in
 								let cc_id_injections =
 									InjectionHeap.alloc injection cc_id_injections
 								in
@@ -392,7 +394,7 @@ let initialize sg rules kappa_vars alg_vars obs (pert,rule_pert) counter env =
 									Environment.add_dependencies dep (Mods.ALG var_id) env
 						)
 						deps env
-				in (state.alg_variables.(var_id) <- Some (v, 0.0); env)
+				in (state.alg_variables.(var_id) <- Some v; env)
 			with
 			| Invalid_argument msg ->
 					invalid_arg ("State.initialize: " ^ msg)
@@ -655,7 +657,7 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 		let cc_id_injections =
 			match opt with
 			| Some injections -> injections
-			| None ->	InjectionHeap.create !Parameter.defaultInjectionHeapSize 
+			| None ->	InjectionHeap.create !Parameter.defaultHeapSize 
 		in
 		let reuse_embedding =
 			match InjectionHeap.next_alloc cc_id_injections with
@@ -794,8 +796,8 @@ let negative_upd state cause (u,i) int_lnk counter env =
 				if Injection.is_trashed phi then (LiftSet.remove liftset phi ; (env,pert_ids)) 
 				else
 				let (mix_id, cc_id, inj_id) =
+					let i = Injection.get_address phi in
 					let (m,c) = Injection.get_coordinate phi
-					and i = try Injection.get_address phi with Not_found -> invalid_arg "State.negative_update"
 					in
 					(m,c,i)
 				in
@@ -830,7 +832,7 @@ let negative_upd state cause (u,i) int_lnk counter env =
 							(fun i j _ ->
 								let a_i = Mixture.agent_of_id i mix
 								and u_j =	try SiteGraph.node_of_id state.graph j with 
-									| exn -> invalid_arg (Printf.sprintf "State.negative_update: Node #%d is no longer in the graph and injection %d%s of mixture %s was pointing on it!" j inj_id (Injection.to_string phi) (Mixture.to_kappa false mix env))
+									| exn -> invalid_arg (Printf.sprintf "State.negative_update: Node #%d is no longer in the graph and injection %s of mixture %s was pointing on it!" j (Injection.to_string phi) (Mixture.to_kappa false mix env))
 								in
 								Mixture.fold_interface
 								(fun site_id (int_opt, lnk_opt) _ ->
@@ -977,35 +979,7 @@ let delete state cause u side_effects pert_ids counter env =
 	u (env,side_effects,pert_ids)
 
 let apply state r embedding counter env =
-	let (_ : unit) =
-		IntMap.iter
-		(fun id constr ->
-					(if !Parameter.debugModeOn then Debug.tag "Checking constraints";
-						match constr with
-						| Mixture.PREVIOUSLY_DISCONNECTED (radius, id') ->
-								let dmap =
-									SiteGraph.neighborhood
-										~interrupt_with: (IntSet.singleton id') state.graph id
-										radius
-								in
-								if IntMap.mem id' dmap
-								then raise Null_event
-								else
-									if !Parameter.debugModeOn then Debug.tag
-										(let radius =
-												if radius = (- 1) then "inf" else string_of_int radius
-											in
-											Printf.sprintf
-												"%d and %d are not connected in radius %s (ok)" id
-												id' radius)
-						| Mixture.PREVIOUSLY_CONNECTED (radius, id') ->
-								let dmap =
-									SiteGraph.neighborhood
-										~interrupt_with: (IntSet.singleton id') state.graph id
-										radius
-								in if IntMap.mem id' dmap then () else raise Null_event)
-		) r.constraints 
-	in
+	
 	let app state embedding fresh_map (id, i) =
 		try
 			match id with
@@ -1130,8 +1104,8 @@ let dump state counter env =
 													| None -> Printf.printf "#\tCC[%d] : na\n" cc_id
 													| Some injs ->
 															InjectionHeap.iteri
-																(fun inj_id injection ->
-																			Printf.printf "#\tCC[%d] #%d : %s\n" cc_id inj_id
+																(fun ad injection ->
+																			Printf.printf "#\tCC[%d]#%d: %s \n" cc_id ad
 																				(Injection.to_string injection))
 																injs
 										)	comp_injs
@@ -1143,8 +1117,8 @@ let dump state counter env =
 					| None ->
 							Printf.printf "#x[%d]: '%s' na\n" var_id
 								((fun (s,_) -> s) (Environment.alg_of_num var_id env))
-					| Some (v, x) ->
-							Printf.printf "#x[%d]: '%s' %f\n" var_id
+					| Some v ->
+							Printf.printf "#x[%d]: '%s' %f \n" var_id 
 								((fun (s,_) -> s) (Environment.alg_of_num var_id env))
 								(value state var_id counter env))
 			state.alg_variables;

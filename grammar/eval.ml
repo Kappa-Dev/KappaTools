@@ -123,7 +123,6 @@ let nodes_of_ast env ast_mixture =
 						| Some (_,_,pos) -> raise (ExceptionDefn.Semantics_Error (pos,Printf.sprintf "Edge identifier %d is dangling" i))
 				) link_map ;
 				(node_map,env)
-			| _ -> raise (ExceptionDefn.Semantics_Error (no_pos,"Invalid initial conditions"))
 	in
 	iter ast_mixture IntMap.empty 0 IntMap.empty env
 					
@@ -395,37 +394,8 @@ let mixture_of_ast ?(tolerate_new_state=false) mix_id_opt is_pattern env ast_mix
 							curr_id = ctxt.curr_id + 1;
 							new_edges = Int2Map.empty;
 						} mixture
-				in (ctxt, (Mixture.compose id agent mixture new_edges None), env)
+				in (ctxt, (Mixture.compose id agent mixture new_edges), env)
 		| Ast.EMPTY_MIX -> (ctxt, mixture, env)
-		| Ast.DOT (radius, ast_ag, ast_mix) ->
-				let (ctxt, agent, env) = eval_agent is_pattern tolerate_new_state env ast_ag ctxt in
-				let id = ctxt.curr_id and new_edges = ctxt.new_edges
-				
-				and cstr =
-					Some (Mixture.PREVIOUSLY_CONNECTED (radius, ctxt.curr_id + 1)) in
-				let (ctxt, mixture, env) =
-					eval_mixture env ast_mix
-						{
-							(ctxt)
-							with
-							curr_id = ctxt.curr_id + 1;
-							new_edges = Int2Map.empty;
-						} mixture
-				in (ctxt, (Mixture.compose id agent mixture new_edges cstr), env)
-		| Ast.PLUS (radius, ast_ag, ast_mix) ->
-				let (ctxt, agent, env) = eval_agent is_pattern tolerate_new_state env ast_ag ctxt in
-				let id = ctxt.curr_id and new_edges = ctxt.new_edges
-				and cstr =
-					Some (Mixture.PREVIOUSLY_DISCONNECTED (radius, ctxt.curr_id + 1)) in
-				let (ctxt, mixture, env) =
-					eval_mixture env ast_mix
-						{
-							(ctxt)
-							with
-							curr_id = ctxt.curr_id + 1;
-							new_edges = Int2Map.empty;
-						} mixture
-				in (ctxt, (Mixture.compose id agent mixture new_edges cstr), env) 
 	in
 	
 	let ctxt = { pairing = IntMap.empty; curr_id = 0; new_edges = Int2Map.empty; } in
@@ -510,7 +480,6 @@ let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take 
 			Dynamics.script = script;
 			Dynamics.kappa = kappa_lhs ^ ("->" ^ kappa_rhs);
 			Dynamics.balance = balance;
-			Dynamics.constraints = Mixture.constraints lhs;
 			Dynamics.refines = ref_id;
 			Dynamics.lhs = lhs;
 			Dynamics.rhs = rhs;
@@ -694,7 +663,6 @@ let pert_of_result variables env res =
 								Dynamics.script = script ;
 								Dynamics.kappa = kappa_lhs ^ ("->" ^ kappa_rhs);
 								Dynamics.balance = balance;
-								Dynamics.constraints = Mixture.constraints lhs;
 								Dynamics.refines = None;
 								Dynamics.lhs = lhs;
 								Dynamics.rhs = rhs;
@@ -734,7 +702,6 @@ let pert_of_result variables env res =
 								Dynamics.script = script ;
 								Dynamics.kappa = kappa_lhs ^ ("->" ^ kappa_rhs);
 								Dynamics.balance = balance;
-								Dynamics.constraints = Mixture.constraints lhs;
 								Dynamics.refines = None;
 								Dynamics.lhs = lhs;
 								Dynamics.rhs = rhs;

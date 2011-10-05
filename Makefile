@@ -12,7 +12,7 @@ SOURCES = \
 		pattern/mixture.ml pattern/precondition.ml pattern/precondition.mli \
 		siteGraphs/graph.ml siteGraphs/species.ml pattern/matching.ml pattern/dynamics.ml \
 		grammar/eval.mli simulation/state.ml simulation/external.ml grammar/eval.ml  \
-		cflow/causal.ml simulation/plot.ml simulation/b3.ml simulation/run.ml\
+		cflow/causal.ml simulation/plot.ml simulation/run.ml\
 		main/main.ml 
 
 ## the name of the resulting executable

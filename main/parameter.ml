@@ -2,7 +2,7 @@
 let defaultExtArraySize = ref 5
 let defaultGraphSize = ref 5
 let defaultLiftSetSize = ref 5
-let defaultInjectionHeapSize = ref 5
+let defaultHeapSize = ref 5
 let defaultLogSize = ref 10
 let debugModeOn = ref false
 let progressBarSymbol = ref '#'
