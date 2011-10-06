@@ -30,6 +30,7 @@ sig
 	val ( & ) : Node.t -> int
 	val neighborhood :?interrupt_with: Mods.IntSet.t -> t -> int -> int -> int Mods.IntMap.t
 	val add_lift : t -> Injection.t -> ((int * int) list) Mods.IntMap.t -> t
+	val add_prob_connect : t -> Mods.InjProduct.t -> t
 	val marshalize : t -> Node.t Mods.IntMap.t
 	val size : t -> int
 	val to_dot : ?with_heap:bool -> t -> string -> Environment.t -> unit
@@ -118,7 +119,14 @@ struct
 							in A.set sg u_i (Node.add_dep phi port_list node_i))
 				port_map;
 			sg)
-	
+			
+	let add_prob_connect sg inj_prod =
+		Mods.InjProduct.fold_left (fun sg (a_i,u_i) ->
+			let u = try node_of_id sg u_i with Not_found -> invalid_arg "Graph.add_prob_connect" in
+			Node.add_nl_lift inj_prod u ; sg  
+		) sg inj_prod
+		
+		
 	let marshalize sg =
 		fold
 			(fun id node map ->

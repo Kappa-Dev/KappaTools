@@ -116,7 +116,7 @@ let apply_effect p_id pert state counter env =
 									if !Parameter.debugModeOn then Debug.tag "Clashing instance detected: building matrix";
 									let matrix = State.instances_of_square mix_id state in
 										match matrix with
-											| (embedding,_)::_ -> Some embedding 
+											| (embedding,_,_)::_ -> Some embedding 
 											| [] -> None
 						in
 							match opt with

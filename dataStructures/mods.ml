@@ -20,9 +20,51 @@ let string_of_dep = function
 	| ABORT i -> "ABORT("^(string_of_int i)^")"
 
 module StringIntMap = MapExt.Make (struct type t = (string * int) let compare = compare end)
+
+module InjProduct =
+	struct
+		type t = {roots : (int*int) array ; mutable address : int option ; coordinate : int}
+		
+		let allocate phi addr = phi.address <- Some addr 
+			
+		let get_address phi = match phi.address with Some a -> a | None -> raise Not_found
+		let get_coordinate phi = phi.coordinate 
+		
+		let add cc_id (a_i,u_i) phi = try phi.roots.(cc_id) <- (a_i,u_i) with Invalid_argument msg -> invalid_arg ("InjProduct.add: "^msg)
+		
+		let is_trashed phi = match phi.address with Some (-1) -> true | _ -> false
+		
+		let size phi = Array.length phi.roots
+		
+		let find i phi = try phi.roots.(i) with Invalid_argument _ -> raise Not_found
+		
+		let empty n mix_id = {roots = Array.create n (-1,-1) ; address = None ; coordinate = mix_id}
+		
+		let flush phi (var_id,cc_id) = 
+			{phi with address = None ; coordinate = var_id}
+		
+		let compare phi psi = 
+			try
+				let a = get_address phi
+				and a'= get_address psi
+				and m = get_coordinate phi
+				and m' = get_coordinate psi
+				in
+					compare (m,a) (m',a') 
+			with Not_found -> invalid_arg "Injection.compare"
+		
+		let fold_left f cont phi = Array.fold_left f cont phi.roots
+		
+		let to_string phi = Tools.string_of_array (fun (x,y) -> (string_of_int x)^"->"^(string_of_int y)) phi.roots 
+			
+	end
+	
 module Injection = 
 	struct
 		type t = {map : (int,int) Hashtbl.t ; mutable address : int option ; coordinate : (int*int)}
+		
+		exception Found of (int*int)
+		let root_image phi = try (Hashtbl.iter (fun i j -> raise (Found (i,j))) phi.map ; None) with Found (i,j) -> Some (i,j)
 		
 		let set_address addr phi = phi.address <- Some addr 
 			

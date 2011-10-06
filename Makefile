@@ -8,7 +8,7 @@ SOURCES = \
 		Error/debug.ml Error/ExceptionDefn.ml \
 		grammar/ast.ml grammar/kappaParser.mly grammar/kappaLexer.mll \
 		pattern/signature.ml pattern/environment.ml \
-		siteGraphs/node.ml pattern/mixture.mli  \
+		simulation/nonLocal.ml siteGraphs/node.ml pattern/mixture.mli  \
 		pattern/mixture.ml pattern/precondition.ml pattern/precondition.mli \
 		siteGraphs/graph.ml siteGraphs/species.ml pattern/matching.ml pattern/dynamics.ml \
 		grammar/eval.mli simulation/state.ml simulation/external.ml grammar/eval.ml  \

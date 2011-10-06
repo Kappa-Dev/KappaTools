@@ -16,6 +16,9 @@ type t = {
 	num_of_rule : int StringMap.t ;
 	rule_of_num : string IntMap.t ;
 	
+	num_of_unary_rule : int StringMap.t ;
+	unary_rule_of_num : string IntMap.t ;
+	
 	fresh_alg : int ;
 	num_of_alg : (int*float option) StringMap.t ;
 	alg_of_num : (string*float option) IntMap.t ;
@@ -38,9 +41,11 @@ let empty =
 	num_of_kappa = StringMap.empty ; 
 	kappa_of_num = IntMap.empty ;
 	num_of_rule = StringMap.empty ;
+	num_of_unary_rule = StringMap.empty ;
 	num_of_alg = StringMap.empty ;
 	alg_of_num = IntMap.empty ;
 	rule_of_num = IntMap.empty ;
+	unary_rule_of_num = IntMap.empty ; 
 	fresh_kappa = 0 ; 
 	fresh_alg = 0 ;
 	fresh_pert = 0 ;
@@ -63,6 +68,11 @@ let num_of_kappa lab env = StringMap.find lab env.num_of_kappa
 let kappa_of_num i env =  IntMap.find i env.kappa_of_num 
 let num_of_rule lab env = StringMap.find lab env.num_of_rule
 let rule_of_num i env =  IntMap.find i env.rule_of_num
+
+let num_of_unary_rule lab env = StringMap.find lab env.num_of_unary_rule
+let unary_rule_of_num i env =  IntMap.find i env.unary_rule_of_num
+
+
 let pert_of_num i env = IntMap.find i env.pert_of_num
 let num_of_pert lab env = StringMap.find lab env.num_of_pert
 let is_rule i env = IntSet.mem i env.rule_indices
@@ -123,6 +133,17 @@ let declare_rule rule_lbl id env =
 				and rn = IntMap.add id r_nme env.rule_of_num
 				in
 					{env with num_of_rule = nr ; rule_of_num = rn}
+
+let declare_unary_rule rule_lbl id env =
+	match rule_lbl with
+		| None -> env
+		| Some (r_nme,pos) ->
+			if StringMap.mem r_nme env.num_of_unary_rule then raise (Semantics_Error (pos, ("Rule name "^r_nme^" is already used")))
+			else
+				let nr = StringMap.add r_nme id env.num_of_unary_rule
+				and rn = IntMap.add id r_nme env.unary_rule_of_num
+				in
+					{env with num_of_unary_rule = nr ; unary_rule_of_num = rn}
 
 let id_of_site agent_name site_name env =
 	let n = StringMap.find agent_name env.num_of_name in

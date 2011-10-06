@@ -6,9 +6,11 @@ open Graph
 open ValMap
 open Random_tree
 
+
 type implicit_state =
 	{ graph : SiteGraph.t;
 	 	injections : (component_injections option) array;
+		nl_injections : (NonLocal.inj_hp option) array ;
 		rules : (int, rule) Hashtbl.t; 
 		perturbations : perturbation IntMap.t;
 		kappa_variables : (Mixture.t option) array;
@@ -61,7 +63,7 @@ let instance_number mix_id state env =
 					)
 					1. component_injections
 
-(**[instances_of_square mix_id state] returns the list of full and valid embeddings (given as maps) of [mix_id] in [state]*)
+(**[instances_of_square mix_id state] returns [(inj_0,codom_0,prod_0);...] the list of full and valid embeddings inj_i, their codomains codom_j and the explicit product prod_i=[phi_cc0;phi_cc1;...]*)
 let instances_of_square mix_id state =
 	let extend (inj, codom) phi =
 		try
@@ -70,7 +72,8 @@ let instances_of_square mix_id state =
 					(fun i j (inj, codom) ->
 								if IntSet.mem j codom
 								then raise False
-								else ((IntMap.add i j inj), (IntSet.add j codom)))
+								else ((IntMap.add i j inj), (IntSet.add j codom))
+					)
 					phi (inj, codom))
 		with | False -> None
 	in
@@ -83,7 +86,7 @@ let instances_of_square mix_id state =
 							| None -> invalid_arg "External.apply_effect"
 							| Some injhp ->
 									List.fold_left
-										(fun cont (part_inj, part_codom) ->
+										(fun cont (part_inj, part_codom, part_injs) ->
 													let ext_injhp =
 														InjectionHeap.fold
 															(fun _ phi cont' ->
@@ -92,11 +95,11 @@ let instances_of_square mix_id state =
 																		match opt with
 																		| None -> cont'
 																		| Some (ext_inj, ext_codom) ->
-																				(ext_inj, ext_codom) :: cont')
+																				(ext_inj, ext_codom, phi::part_injs) :: cont')
 															injhp []
 													in ext_injhp @ cont)
 										[] m)
-				[ (IntMap.empty, IntSet.empty) ] comp_injs
+				[ (IntMap.empty, IntSet.empty, []) ] comp_injs
 
 let rec value state var_id counter env =
 	let var_opt = try Some (alg_of_id var_id state) with | Not_found -> None
@@ -233,7 +236,43 @@ let initialize_embeddings state mix_list =
 		)
 		state.graph state
 	in
-	state
+	state	
+
+let connex map set = true (*TODO*)
+
+let initialize_non_local_embeddings state env = 
+	Array.fold_left 
+	(fun (state,mix_id) comp_inj ->
+		match comp_inj with
+			| None -> (state,mix_id+1)
+			| Some inj_hp_opt_array ->
+				if not (IntMap.mem mix_id env.Environment.unary_rule_of_num) then (state,mix_id+1) (*rule has no unary version*)
+				else
+					let mix = kappa_of_id mix_id state in
+					let prods = instances_of_square mix_id state in
+					let state = 
+						List.fold_left 
+						(fun state (phi_i,codom_i,prod_i) -> 
+							if not (connex phi_i codom_i) then state
+							else 
+								(*one should add prod_i as a legal nl embedding for mix_id*)
+								(*and update prob_connect fields for each root node*)
+								let inj_prod_hp_opt = state.nl_injections.(mix_id) in
+								let inj_prod_hp = 
+									match inj_prod_hp_opt with
+									| None -> NonLocal.InjProdHeap.create !Parameter.defaultHeapSize 
+									| Some inj_prod_hp -> inj_prod_hp
+								in
+								let inj_prod_hp,inj_prod = NonLocal.add (Mixture.arity mix) mix_id prod_i inj_prod_hp
+								in
+								let graph = SiteGraph.add_prob_connect state.graph inj_prod in
+								state.nl_injections.(mix_id) <- Some inj_prod_hp ;
+								{state with graph = graph} 
+						) state prods
+					in
+					(state,mix_id+1)
+	) (state,0) state.injections
+
 
 let build_influence_map rules patterns env =
 	let add_influence im i j glueings = 
@@ -345,6 +384,7 @@ let initialize sg rules kappa_vars alg_vars obs (pert,rule_pert) counter env =
 		{
 			graph = sg;
 			injections = injection_table ;
+			nl_injections = Array.make dim_rule None ; (*this table is too big, one should restrict to unary rules only*)
 			rules = rule_table ;
 			perturbations =
 				begin
@@ -508,7 +548,7 @@ let draw_rule state counter env =
 						(if !Parameter.debugModeOn then Debug.tag "Max consecutive clashes reached, I am giving up square approximation at this step" else ()) ;
 						let embeddings = instances_of_square lhs_id state in
 						match embeddings with
-							| (embedding,_)::_ -> embedding (*should draw uniformly here...*)
+							| (embedding,_,_)::_ -> embedding (*should draw uniformly here...*)
 							| [] -> (Random_tree.add lhs_id 0.0 state.activity_tree ; if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Rule [%d]'s activity was corrected to 0.0" lhs_id) ; raise Null_event)
 					end
 				else (if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Rule [%d] is clashing" lhs_id) ; raise Null_event)

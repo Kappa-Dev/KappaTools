@@ -436,18 +436,19 @@ let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take 
 		then ((CONST (k (fun i -> 0.0) (fun i -> 0.0) 0.0 0)), dep)
 		else ((VAR k), dep)
 	
-	and (k_alt, dep_alt) =
+	and (env,k_alt, dep_alt) =
 		match ast_rule.k_un with
-		| None -> (None, DepSet.empty)
+		| None -> (env,None, DepSet.empty)
 		| Some ast ->
+				let env = Environment.declare_unary_rule ast_rule_label.lbl_nme lhs_id env in
 				let (rate, const, dep, _) = partial_eval_alg env ast
 				in
 				if const
 				then
-					((Some (CONST (rate (fun i -> 0.0) (fun i -> 0.0) 0.0 0))), dep)
-				else ((Some (VAR rate)), dep)
-	
-	and lhs,env = mixture_of_ast (Some lhs_id) true env ast_rule.lhs
+					(env,(Some (CONST (rate (fun i -> 0.0) (fun i -> 0.0) 0.0 0))), dep)
+				else (env,(Some (VAR rate)), dep)
+	in
+	let lhs,env = mixture_of_ast (Some lhs_id) true env ast_rule.lhs
 	in 
 	let rhs,env = mixture_of_ast ~tolerate_new_state:tolerate_new_state None true env ast_rule.rhs in
 	let (script, balance,added,modif_sites,side_effect) = Dynamics.diff lhs rhs ast_rule_label.lbl_nme env
