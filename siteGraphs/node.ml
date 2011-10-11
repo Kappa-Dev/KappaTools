@@ -4,10 +4,10 @@ open ExceptionDefn
 (**node: (name,array[site_name,internal_state,link])*)
 (**ptr(i,a) pointer to a node and a site at offset i*)
 
-type lnk_t = WLD | BND | FREE | TYPE of (int*int) 
+type lnk_t = WLD | BND | FREE | TYPE of (int*int) (*(site_id,nme)*)
 type port_status = (int option * ptr) (*internal state,link state*)
 and port = {status:port_status ; mutable dep : (LiftSet.t * LiftSet.t)} (*dep : (lifts for int,lifts for lnk)*)
-and t = {name:int ; interface : port array ; mutable address : int option ; mutable prob_connect : NonLocal.InjProdSet.t} 
+and t = {name:int ; interface : port array ; mutable address : int option ; mutable prob_connect : InjProdSet.t} 
 (*prob_connect: mix_id -> {u | v....u and v,u are the image of the roots of connected components of mix_id} *)
 and ptr = Null | Ptr of (t * int) | FPtr of (int * int)
 and node = t (*just alias for Node.t*)
@@ -38,7 +38,9 @@ let fold_interface f node cont =
 		Array.iteri (fun site_id port -> cont := f site_id port !cont) (interface node) ;
 		!cont
 	
-let to_string with_detail (hsh_lnk,fresh) node env = 
+let to_string with_detail (hsh_lnk,fresh) node env =
+	let inj_prod_set = node.prob_connect in
+	let inj_prod_str = Tools.string_of_set (fun injprod -> let mix_id = InjProduct.get_coordinate injprod in Printf.sprintf "ip(%d,%d)" mix_id (InjProduct.get_address injprod)) InjProdSet.fold inj_prod_set in 
 	let intf_l,fresh' = 
 		fold_interface
 		(fun i port (cont,fresh) ->
@@ -93,9 +95,9 @@ let to_string with_detail (hsh_lnk,fresh) node env =
 	in
 		let s_addr = try string_of_int (get_address node) with Not_found -> "na" in
 		if with_detail then
-			(Printf.sprintf "%s_%s:[%s]" (Environment.name node.name env) s_addr (String.concat "," (List.rev intf_l)),fresh')
+			(Printf.sprintf "%s_%s:[%s]-->%s" (Environment.name node.name env) s_addr (String.concat "," (List.rev intf_l))  inj_prod_str,fresh')
 		else
-			(Printf.sprintf "%s(%s)" (Environment.name node.name env) (String.concat "," (List.rev intf_l)),fresh')
+			(Printf.sprintf "%s(%s)" (Environment.name node.name env) (String.concat "," (List.rev intf_l)),fresh') 
 
 let add_dep phi port_list node =
 	let add lift int_lnk = (fun (x,y) -> if int_lnk = 0 then (LiftSet.add x lift,y) else (x,LiftSet.add y lift))
@@ -107,7 +109,8 @@ let add_dep phi port_list node =
 		) port_list ;
 	node
 
-let add_nl_lift inj_prod node = node.prob_connect <- (NonLocal.InjProdSet.add inj_prod node.prob_connect) 	
+let add_nl_lift inj_prod node = node.prob_connect <- (InjProdSet.add inj_prod node.prob_connect) 	
+let rm_nl_lift inj_prod node = node.prob_connect <- (InjProdSet.remove inj_prod node.prob_connect)
 
 let iteri f node  = Array.iteri f (interface node) 
 
@@ -205,7 +208,7 @@ let create ?with_interface name_id env =
 						{status = (def_int,Null) ; dep = (LiftSet.create !Parameter.defaultLiftSetSize,LiftSet.create !Parameter.defaultLiftSetSize)}
 				)
 			in 
-				let u = {name = name_id ; interface = intf ; address = None ; prob_connect = NonLocal.InjProdSet.empty} in
+				let u = {name = name_id ; interface = intf ; address = None ; prob_connect = InjProdSet.empty} in
 					match with_interface with
 						| None -> u
 						| Some m ->
@@ -253,7 +256,5 @@ let follow (u,i) =
 				| Ptr (v,j) -> Some (v,j)
 				| _ -> None
 
-
-	
 module NodeHeap = MemoryManagement.Make (struct type t = node let allocate node i = node.address <- (Some i) end)
 

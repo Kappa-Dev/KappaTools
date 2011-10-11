@@ -103,6 +103,7 @@ let component ?(check_additional_edges=true) ?(already_done=Int2Set.empty) embed
 		with False -> None
 
 (*Given id_agent -> id_node as partial embedding, returns a complete embedding of mix in sg*)
-let complete_embedding embedding (id_agent,mix) (id_node,sg) = 
+let complete_embedding (id_agent,mix) (id_node,sg) = 
+	let embedding = Injection.empty (IntMap.size (Mixture.agents mix)) (Mixture.get_id mix,0) in
 	component ~check_additional_edges:false embedding id_agent (sg,id_node) mix
 				

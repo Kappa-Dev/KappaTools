@@ -42,7 +42,7 @@ let event state grid counter plot env =
 	if !Parameter.debugModeOn then Debug.tag "Drawing a rule...";
 	(*let t_draw = Profiling.start_chrono () in*)
 	let opt_instance,state = try State.draw_rule state counter env with 
-		| Null_event -> (None,state)
+		| Null_event _ -> (None,state)
 	in			
 	(*3. Apply rule & negative update*)
 	(*let t_apply = Profiling.start_chrono () in*)
@@ -61,7 +61,7 @@ let event state grid counter plot env =
 				end
 				else () ;
 				(********************************************)
-				try Some (State.apply state r embedding counter env,r.Dynamics.r_id) with Null_event -> None
+				try Some (State.apply state r embedding counter env,r.Dynamics.r_id) with Null_event _ -> None
 	
 	in
 	

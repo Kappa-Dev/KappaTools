@@ -20,6 +20,7 @@ end
 module type SG =
 sig
 	type t
+	exception Is_connex
 	val fold : (int -> Node.t -> 'a -> 'a) -> t -> 'a -> 'a
 	val init : int -> t
 	val node_of_id : t -> int -> Node.t
@@ -28,7 +29,7 @@ sig
 	val dump : ?with_lift: bool -> t -> Environment.t -> unit
 	val remove : t -> int -> unit
 	val ( & ) : Node.t -> int
-	val neighborhood :?interrupt_with: Mods.IntSet.t -> t -> int -> int -> int Mods.IntMap.t
+	val neighborhood :?interrupt_with: Mods.IntSet.t -> ?check_connex: Mods.IntSet.t -> t -> int -> int -> int Mods.IntMap.t
 	val add_lift : t -> Injection.t -> ((int * int) list) Mods.IntMap.t -> t
 	val add_prob_connect : t -> Mods.InjProduct.t -> t
 	val marshalize : t -> Node.t Mods.IntMap.t
@@ -63,7 +64,9 @@ struct
 	
 	let ( & ) node = Node.get_address node
 	
-	let neighborhood ?(interrupt_with = IntSet.empty) sg id radius =
+	exception Is_connex
+	
+	let neighborhood ?(interrupt_with = IntSet.empty) ?check_connex sg id radius =
 		let address node =
 			try ( & ) node
 			with | Not_found -> invalid_arg "Graph.neighborhood: not allocated" in
@@ -87,10 +90,15 @@ struct
 									then (d_map, to_do)
 									else (d_map, (id' :: to_do)))
 				node (d_map, to_do) in
-		let rec iter to_do dist_map =
+		let rec iter check_connex connex_set to_do dist_map =
 			match to_do with
 			| [] -> dist_map
 			| addr :: to_do ->
+					let connex_set = 
+						if not check_connex then connex_set 
+						else 
+							let connex_set = IntSet.remove addr connex_set in if IntSet.is_empty connex_set then raise Is_connex else connex_set 
+					in
 					let depth =
 						(try IntMap.find addr dist_map
 						with
@@ -98,17 +106,16 @@ struct
 								invalid_arg "Graph.neighborhood: invariant violation")
 					in
 					if (radius >= 0) && ((depth + 1) > radius)
-					then iter to_do dist_map
+					then iter check_connex connex_set to_do dist_map
 					else
 						(let (dist_map', to_do') =
 								mark_next addr (depth + 1) dist_map to_do
 							in
-							if
-							IntSet.exists (fun id -> IntMap.mem id dist_map')
-								interrupt_with
-							then dist_map'
-							else iter to_do' dist_map')
-		in iter [ id ] (IntMap.add id 0 IntMap.empty)
+							if IntSet.exists (fun id -> IntMap.mem id dist_map')	interrupt_with then dist_map'
+							else iter check_connex connex_set to_do' dist_map')
+		in 
+		let connex,set_connex = match check_connex with None -> (false,IntSet.empty) | Some set -> (true,set) in
+		iter connex set_connex [ id ] (IntMap.add id 0 IntMap.empty)
 	
 	let add_lift sg phi port_map =
 		(IntMap.iter
@@ -121,7 +128,8 @@ struct
 			sg)
 			
 	let add_prob_connect sg inj_prod =
-		Mods.InjProduct.fold_left (fun sg (a_i,u_i) ->
+		Mods.InjProduct.fold_left (fun sg inj ->
+			let u_i = match Injection.root_image inj with None -> invalid_arg "Graph.add_prob_connect" | Some (_,i) -> i in
 			let u = try node_of_id sg u_i with Not_found -> invalid_arg "Graph.add_prob_connect" in
 			Node.add_nl_lift inj_prod u ; sg  
 		) sg inj_prod

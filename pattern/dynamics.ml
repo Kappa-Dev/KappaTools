@@ -13,6 +13,9 @@ and action =
 and port = id * int
 and id = FRESH of int | KEPT of int (*binding or modifying a port that has been added or kept from the lhs*)
 
+type bnd_type = Link of (int*int*int*int) | Break of (int*int*int*int) | Semi of int*int
+module BndTypeSet = Set.Make(struct type t=bnd_type let compare = compare end) 
+
 module IdMap = MapExt.Make (struct type t = id let compare = compare end)
 module Id2Map = MapExt.Make (struct type t = id*int let compare = compare end)
 
@@ -31,7 +34,8 @@ type rule = {
 	side_effect : bool ;
 	modif_sites : Int2Set.t IdMap.t ;  
 	pre_causal : int Id2Map.t ; (* INTERNAL_TESTED (8) | INTERNAL_MODIF (4) | LINK_TESTED (2) | LINK_MODIF (1) *)
-	is_pert : bool
+	is_pert : bool ;
+	path_impact : BndTypeSet.t
 }
 
 let _INTERNAL_TESTED = 8
@@ -140,29 +144,6 @@ let diff m0 m1 label_opt env =
 	let label = match label_opt with Some (_,pos) -> (string_of_pos pos) | None -> "" in
 	let id_preserving ag1 ag2 = (*check whether ag2 can be the residual of ag1 for (same name)*)
 		Mixture.name ag1 = Mixture.name ag2
-		(*if not (Mixture.name ag1 = Mixture.name ag2) then false
-		else
-			let intf2 = Mixture.interface ag2
-			and intf1 = Mixture.interface ag1
-			in
-			try
-				Mixture.fold_interface
-					(fun site_id _ b -> if IntMap.mem site_id intf2 then b else raise False)
-					ag1
-					(Mixture.fold_interface
-							(fun site_id _ b -> if IntMap.mem site_id intf1 then b else raise False)
-							ag2
-							true
-					)
-			with False ->
-					let _ =
-						warning
-							(Printf.sprintf
-									"%s agent '%s' is deleted by rule because its interface is not compatible with right hand side"
-									label (Environment.name (Mixture.name ag1) env)
-							)
-					in
-					false*)
 	in
 	let prefix, deleted, add_index =
 		IntMap.fold
@@ -177,20 +158,71 @@ let diff m0 m1 label_opt env =
 			)
 			(Mixture.agents m0) ([],[], IntMap.size (Mixture.agents m0))
 	in
-	let added =
+	let kept = List.fold_left (fun set i -> IntSet.add i set) IntSet.empty prefix in
+	let kept i = IntSet.mem i kept in
+	let name_of i = if kept i then Mixture.name (Mixture.agent_of_id i m0) else Mixture.name (Mixture.agent_of_id i m1) in
+	let connected_in_rhs i j = 
+		try ((Mixture.component_of_id i m1) = (Mixture.component_of_id j m1)) with Not_found -> false
+	in
+	let connected_in_lhs i j = 
+		try ((Mixture.component_of_id i m0) = (Mixture.component_of_id j m0)) with Not_found -> false
+	in
+	let add_impact id id' bnd_type set = 
+	match bnd_type with
+		| Link (i,s,j,t) -> if connected_in_lhs id id' then set else BndTypeSet.add bnd_type (BndTypeSet.add (Link(j,t,i,s)) set)
+		| Break (i,s,j,t) -> if connected_in_rhs id id' then set else BndTypeSet.add bnd_type (BndTypeSet.add (Break(j,t,i,s)) set)
+		| Semi _ -> BndTypeSet.add bnd_type set
+	in
+
+	let added,path_impact =
 		IntMap.fold
-			(fun id ag1 added ->
-				if id < add_index then added else (id:: added)
-			)	(Mixture.agents m1) []
+			(fun id ag1 (added,bnd_type_set) ->
+				if id < add_index then (added,bnd_type_set) 
+				else
+					let name = Mixture.name ag1 in
+					let set = 
+						Mixture.fold_interface 
+						(fun site_id (_,lnk) bnd_type_set ->
+							match lnk with
+								| Node.BND -> 
+									begin
+										match Mixture.follow (id,site_id) m1 with 
+											| None -> invalid_arg "Dynamics.diff" 
+											| Some (id',site_id') -> let name' = Mixture.name (Mixture.agent_of_id id' m1) in add_impact id id' (Link (name,site_id,name',site_id')) bnd_type_set
+									end
+								| _ -> bnd_type_set 
+						) ag1 bnd_type_set 
+					in
+					(id:: added,set)
+			)	(Mixture.agents m1) ([],BndTypeSet.empty)
 	in
 	let balance = (List.length deleted, List.length prefix, List.length added)
-	and instructions = (*adding deletion instructions*)
+	and instructions,path_impact = (*adding deletion instructions*)
 		List.fold_left
-			(fun inst id ->
-				side_effect := true ;
-				(DEL id):: inst
+			(fun (inst,path_impact) id ->
+				let ag = Mixture.agent_of_id id m0 in
+				let name = Mixture.name ag in
+				let sign = Environment.get_sig (Mixture.name ag) env in
+				let interface = Mixture.interface ag in
+				let interface = Signature.fold (fun site_id interface -> if IntMap.mem site_id interface then interface else IntMap.add site_id (None,Node.WLD) interface) sign interface in
+				let path_impact = 
+						IntMap.fold
+						(fun site_id (_, lnk_state) path_impact ->
+							match lnk_state with
+								| Node.BND -> 
+									(side_effect := true ; 
+									match Mixture.follow (id,site_id) m0 with 
+										| None -> invalid_arg "Dynamics.diff" 
+										| Some (id',site_id') -> let name' = name_of id' in add_impact id id' (Break (name,site_id,name',site_id')) path_impact
+									)
+								| Node.TYPE (site_id',name') -> (side_effect := true ; add_impact id (-1) (Break (name,site_id,name',site_id')) path_impact)
+								| Node.WLD -> (side_effect := true ; add_impact (-1) (-1) (Semi (name,site_id)) path_impact)
+								| _ -> path_impact
+						) interface path_impact
+				in
+				((DEL id):: inst,path_impact)
 			)
-			[] deleted
+			([],path_impact) deleted
 	in
 	let instructions = (*adding creation instructions*) 
 		List.fold_left
@@ -248,17 +280,18 @@ let diff m0 m1 label_opt env =
 			)
 			(instructions,IdMap.empty) added
 	in
-	let instructions,modif_sites =
+	let instructions,modif_sites,path_impact =
 		List.fold_left
-			(fun (inst,idmap) id -> (*adding link and internal state modifications for agents conserved by the rule*)
+			(fun (inst,idmap,path_impact) id -> (*adding link and internal state modifications for agents conserved by the rule*)
 						let ag, ag' = (Mixture.agent_of_id id m0, Mixture.agent_of_id id m1) in
+						let name = Mixture.name ag in
 						let interface' = Mixture.interface ag' in
 						(*folding on ag's interface: problem when a site is not mentionned at all in ag but is used in ag' --ie modif with no test*)
 						let sign = Environment.get_sig (Mixture.name ag) env in
 						let interface = Mixture.interface ag in
 						let interface = Signature.fold (fun site_id interface -> if IntMap.mem site_id interface then interface else IntMap.add site_id (None,Node.WLD) interface) sign interface in
 						IntMap.fold
-							(fun site_id (int_state, lnk_state) (inst,idmap) ->
+							(fun site_id (int_state, lnk_state) (inst,idmap,path_impact) ->
 										let int_state', lnk_state' =
 											try IntMap.find site_id interface' with
 											| Not_found -> (None,Node.WLD) (*site is not mentioned in the right hand side*)
@@ -297,6 +330,10 @@ let diff m0 m1 label_opt env =
 															let kept = List.exists (fun id -> id=id') prefix 
 																(*try let _ = (Mixture.agent_of_id id' m1) in true with Not_found -> false*)
 															in
+															let path_impact = 
+																let name' = name_of id' in 
+																add_impact id id' (Break (name,site_id,name',site_id')) path_impact
+															in
 															let idmap = 
 																if kept then 
 																	add_map (KEPT id) (site_id,1) (add_map (KEPT id') (site_id',1) idmap) (*bug if id' is deleted by the rule should not be added to modif_sites*)
@@ -306,8 +343,9 @@ let diff m0 m1 label_opt env =
 																if id'< id or (id'= id && site_id'< site_id) then (FREE (((KEPT id), site_id),true)):: inst
 																else inst
 															in
-															(inst,idmap)
+															(inst,idmap,path_impact)
 													| None -> (*breaking a semi link so generate a FREE instruction*)
+															let path_impact = add_impact (-1) (-1) (Semi (name,site_id)) path_impact in
 															let inst = (FREE (((KEPT id), site_id),false)):: inst
 															and idmap = add_map (KEPT id) (site_id,1) idmap
 															in
@@ -319,16 +357,18 @@ let diff m0 m1 label_opt env =
 																		label (Environment.site_of_id (Mixture.name ag) site_id env)
 																)
 															in
-															(inst,idmap)
+															(inst,idmap,path_impact)
 												end
 										| (Node.BND, Node.BND) | (Node.TYPE _, Node.BND) -> (*connected -> connected*)
 												begin
 													let opt, opt' = (Mixture.follow (id, site_id) m0, Mixture.follow (id, site_id) m1) in
-													if opt = opt' then (inst,idmap) (*no change to be made*)
+													if opt = opt' then (inst,idmap,path_impact) (*no change to be made*)
 													else
 														match (opt, opt') with
 														| (None, Some (id1', i1')) -> (*sub-case: semi-link -> connected*)
 															(*warning*)
+															let path_impact = add_impact (-1) (-1) (Semi (name,site_id)) path_impact in
+															let path_impact = add_impact id id1' (Link (name,site_id,name_of id1',i1')) path_impact in
 															let site = Environment.site_of_id (Mixture.name ag) site_id env in
 															let _ =
 																		warning
@@ -347,12 +387,15 @@ let diff m0 m1 label_opt env =
 																	let inst = BND((KEPT id, site_id), (id'',i1')):: inst
 																	in
 																		side_effect := true ;
-																		(inst,idmap')
+																		(inst,idmap',path_impact)
 																end
-															else (inst,idmap')
+															else (inst,idmap',path_impact)
 															
 														| (Some (id1, i1), Some (id1', i1')) -> (*sub-case: connected -> connected*)
 																(*warning*)
+																let path_impact = add_impact id id1 (Break (name,site_id,name_of id1,i1)) path_impact in
+																let path_impact = add_impact id id1' (Link (name,site_id,name_of id1',i1')) path_impact in
+															
 																let site = Environment.site_of_id (Mixture.name ag) site_id env in
 																let _ =
 																	warning
@@ -372,13 +415,13 @@ let diff m0 m1 label_opt env =
 																if id1'< id or (id1'= id && i1'< site_id) then
 																	let inst = BND((KEPT id, site_id), (id1'', i1')):: inst
 																	in
-																		(inst,idmap')
+																		(inst,idmap',path_impact)
 																else 
-																	(inst,idmap')
+																	(inst,idmap',path_impact)
 														| (Some (id1, i1), None) -> 
 															(*sub-case: connected -> semi-link*) invalid_arg "Dynamics.diff: rhs has partial link state"
 														| (None, None) -> (*sub-case: semi-link -> semi-link*) 
-															(inst,idmap) (*nothing to be done*)
+															(inst,idmap,path_impact) (*nothing to be done*)
 												end
 										| (Node.FREE, Node.BND) -> (*free -> connected*)
 												begin
@@ -386,6 +429,9 @@ let diff m0 m1 label_opt env =
 													match opt' with
 													| None -> (*sub-case: free -> semi-link*) invalid_arg "Dynamics.diff: rhs creates a semi-link"
 													| Some (id', i') -> (*sub-case: free -> connected*)
+														
+														let path_impact = add_impact id id' (Link (name,site_id,name_of id',i')) path_impact in
+															
 														(*no warning*)
 														(*modif sites*)
 														let id'' = if List.exists (fun id -> id=id') prefix then KEPT id' else FRESH id' in
@@ -394,13 +440,13 @@ let diff m0 m1 label_opt env =
 														if (id'< id) or (id'= id && i'< site_id) then 
 															let inst = BND((KEPT id, site_id), (id'', i')):: inst 
 															in
-															(inst,idmap')
+															(inst,idmap',path_impact)
 														else 
-															(inst,idmap')
+															(inst,idmap',path_impact)
 												end
-										| (Node.FREE, Node.FREE) | (Node.WLD, Node.WLD) -> (*free -> free or wildcard -> wildcard*) (inst,idmap)
+										| (Node.FREE, Node.FREE) | (Node.WLD, Node.WLD) -> (*free -> free or wildcard -> wildcard*) (inst,idmap,path_impact)
 										| (Node.TYPE (sid,nme),Node.TYPE(sid',nme')) -> 
-											if sid=sid' && nme=nme' then (inst,idmap)
+											if sid=sid' && nme=nme' then (inst,idmap,path_impact)
 											else invalid_arg "Dynamics.diff: rhs modifies a link type"
 										| (Node.WLD, Node.FREE) ->  (*wildcard -> free*)
 												let site = Environment.site_of_id (Mixture.name ag) site_id env in
@@ -415,13 +461,16 @@ let diff m0 m1 label_opt env =
 												and idmap = add_map (KEPT id) (site_id,1) idmap
 												in
 												(side_effect := true ;
-												(inst,idmap))
+												let path_impact = add_impact id (-1) (Semi (name,site_id)) path_impact in
+												(inst,idmap,path_impact))
 										| (Node.WLD, Node.BND) ->  (*wildcard -> connected*)
 												let opt' = Mixture.follow (id, site_id) m1 in
 												begin
 													match opt' with
 													| None -> invalid_arg "Dynamics.diff: rhs turns a wildcard into a semi link"
 													| Some (id', i') ->
+														let path_impact = add_impact id (-1) (Semi (name,site_id)) path_impact in
+														let path_impact = add_impact id id' (Link (name,site_id,name_of id',i')) path_impact in
 														(*warning*)
 														let site = Environment.site_of_id (Mixture.name ag) site_id env in
 														let _ =
@@ -439,16 +488,16 @@ let diff m0 m1 label_opt env =
 															let inst = BND((KEPT id, site_id), (id'', i')):: inst
 															in
 															(side_effect:= true;
-															(inst,idmap'))
-														else (inst,idmap')
+															(inst,idmap',path_impact))
+														else (inst,idmap',path_impact)
 												end
 										| (_,_) -> (*connected,free -> wildcard*) invalid_arg "Dynamics.diff: rhs creates a wildcard"
 							)
-							interface (inst,idmap)
+							interface (inst,idmap,path_impact)
 			)
-			(instructions,modif_sites) prefix
+			(instructions,modif_sites,path_impact) prefix
 	in
-	(List.rev instructions, balance, added, modif_sites,!side_effect)
+	(List.rev instructions, balance, added, modif_sites,!side_effect,path_impact)
 
 let rec superpose todo_list lhs rhs map already_done added env =
 	match todo_list with
@@ -625,7 +674,10 @@ let dump r env =
 		IdMap.fold
 		r.modif_sites
 	) ; print_newline () ;
-	match r.refines with
-	| Some lhs_id -> Printf.printf "[refines pattern %d]\n" lhs_id
-	| None -> () 
-	
+	BndTypeSet.iter
+	(fun bnd_type -> 
+		match bnd_type with
+			| Link (n,s,n',s') -> Printf.printf "%s.%s---%s.%s\n" (Environment.name n env) (Environment.site_of_id n s env) (Environment.site_of_id n' s' env) (Environment.name n' env)
+			| Break (n,s,n',s') -> Printf.printf "%s.%s-x-%s.%s\n" (Environment.name n env) (Environment.site_of_id n s env) (Environment.site_of_id n' s' env) (Environment.name n' env)
+			| Semi (n,s) -> Printf.printf "%s.%s-x-?\n" (Environment.name n env) (Environment.site_of_id n s env)
+	) r.path_impact

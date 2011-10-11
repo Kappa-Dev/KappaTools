@@ -22,6 +22,10 @@ val name : agent -> int
 val empty : int option -> t
 val is_empty : t -> bool
 
+(**Whether mixture's cc's should be embedded in a connected graph*)
+val unary : t -> bool
+val set_unary : t -> t
+
 val size_of_cc : int -> t -> int
 
 val get_id : t -> int

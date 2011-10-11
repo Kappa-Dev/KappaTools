@@ -81,7 +81,7 @@ let apply_effect p_id pert state counter env =
 					and envr = ref env 
 					in
 						while !n > 0 do (*FIXME: highly unefficient to compute new injection at each loop*)
-							let embedding = State.select_injection state r.lhs in (*empty embedding, cannot raise null-event*)
+							let embedding = State.select_injection (infinity,0.) state r.lhs counter env in (*empty embedding, cannot raise null-event*)
 							let (env, state, side_effects, phi, psi, pert_ids_neg) = State.apply !st r embedding counter env in
 							let env,state,pert_ids_pos = State.positive_update state r (phi,psi) (side_effects,Int2Set.empty) counter env
 							in
@@ -110,9 +110,9 @@ let apply_effect p_id pert state counter env =
 				in
 					while !cpt<x do
 						let opt = 
-							try Some (State.select_injection state mix) with 
+							try Some (State.select_injection (infinity,0.) state mix counter env) with 
 								| Not_found -> None (*Not found is raised if there is no more injection to draw in instances of mix*)
-								| Null_event -> 
+								| Null_event _ -> 
 									if !Parameter.debugModeOn then Debug.tag "Clashing instance detected: building matrix";
 									let matrix = State.instances_of_square mix_id state in
 										match matrix with

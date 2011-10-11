@@ -8,7 +8,7 @@ sig
 	val copy: tree -> tree
 	val copy_in: tree -> tree -> tree
 	val add: int -> float -> tree -> unit
-	val random: tree -> int
+	val random: tree -> int * float
 	val update_structure: tree -> tree
 	val find : int -> tree -> float
 end
@@ -174,7 +174,7 @@ module Random_tree =
 			t.total <- total
 		
 		let random t =
-			try unmask t (IntSet.choose t.inf_list) 
+			try (unmask t (IntSet.choose t.inf_list),infinity) 
 			with Not_found ->
 				let t = update_structure t in
 				let a = t.weight_of_subtrees.(1) in
@@ -184,7 +184,7 @@ module Random_tree =
 					let r = Random.float a in
 					let rec find i r =
 						let node = t.weight_of_nodes.(i) in
-						if r < node then i
+						if r < node then (i,node)
 						else if 2 * i > t.size then raise Not_found
 						else
 							let r'= r -.node in
@@ -196,7 +196,7 @@ module Random_tree =
 							if rson > t.size then raise Not_found
 							else find rson (r'-.left)
 					in
-					let rep = find 1 r in
-					unmask t rep
+					let rep,w = find 1 r in
+					(unmask t rep,w)
 		
 	end: Random_tree)

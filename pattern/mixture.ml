@@ -12,10 +12,11 @@ type t = {
 	enum_cov : (int,covering) Hashtbl.t option;
 	ids_of_name : IntSet.t Int2Map.t ; (*(nm,cc_id) -> id if agent(id) has name nm in con. comp. cc_id*)
 	component_of_id : int array option ; (*id -> cc_id starting at 0*)
-	arity : int option (*number of connected components*) ;
+	arity : int option (*number of explicitly connected components*) ;
 	mix_id : int option ;
 	size_of_cc : int array ;
-	root_of_cc : int array 
+	root_of_cc : int array ;
+	unary : bool
 	}
 
 let interface ag = ag.interface
@@ -92,8 +93,12 @@ let empty id_opt = {
 	arity = None ;
 	mix_id = id_opt ;
 	size_of_cc = Array.create 0 0 ;
-	root_of_cc = Array.create 0 0
+	root_of_cc = Array.create 0 0 ;
+	unary = false
 	} 
+
+let unary mix = mix.unary
+let set_unary mix = {mix with unary = true}
 
 let size_of_cc cc_id mix = 
 	try
