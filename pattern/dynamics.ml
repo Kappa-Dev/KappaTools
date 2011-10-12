@@ -35,7 +35,9 @@ type rule = {
 	modif_sites : Int2Set.t IdMap.t ;  
 	pre_causal : int Id2Map.t ; (* INTERNAL_TESTED (8) | INTERNAL_MODIF (4) | LINK_TESTED (2) | LINK_MODIF (1) *)
 	is_pert : bool ;
-	path_impact : BndTypeSet.t
+	path_impact : BndTypeSet.t;
+	positive_species_impact : bool ;
+	negative_species_impact : bool 
 }
 
 let _INTERNAL_TESTED = 8

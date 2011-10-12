@@ -177,7 +177,7 @@ rule_expression:
 | rule_label mixture arrow mixture 
 	{let pos = match $3 with (Ast.RAR pos | Ast.RAR_NOPOLY pos) -> pos in 
 		ExceptionDefn.warning ~with_pos:pos "Rule has no kinetics. Default rate of 0.0 is assumed." ; 
-		($1,{Ast.lhs=$2; Ast.arrow=$3; Ast.rhs=$4; Ast.k_def=(Ast.FLOAT (1.0,Tools.no_pos)); Ast.k_un=None})}
+		($1,{Ast.lhs=$2; Ast.arrow=$3; Ast.rhs=$4; Ast.k_def=(Ast.FLOAT (0.0,Tools.no_pos)); Ast.k_un=None})}
 ;
 
 arrow:

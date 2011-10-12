@@ -20,9 +20,12 @@ type implicit_state =
 		mutable activity_tree : Random_tree.tree; 
 		wake_up : Precondition.t ;
 		flux : (int,float IntMap.t) Hashtbl.t ;
+		mutable silenced : IntSet.t (*Set of rule ids such that eval-activity was overestimated and whose activity was manually set to a lower value*) 
 	}
 and component_injections = (InjectionHeap.t option) array
 and obs = { label : string; expr : Dynamics.variable }
+
+let silence rule_id state = state.silenced <- (IntSet.add rule_id state.silenced)
 
 let kappa_of_id id state =
 	try
@@ -467,7 +470,8 @@ let initialize sg rules kappa_vars alg_vars obs (pert,rule_pert) counter env =
 			activity_tree = Random_tree.create dim_pure_rule ; (*put only true rules in the activity tree*)
 			influence_map = influence_table ;
 			wake_up = wake_up_table;
-			flux = if !Parameter.fluxModeOn then Hashtbl.create 5 else Hashtbl.create 0 
+			flux = if !Parameter.fluxModeOn then Hashtbl.create 5 else Hashtbl.create 0 ;
+			silenced = IntSet.empty
 		}
 	in
 	
@@ -677,13 +681,18 @@ let draw_rule state counter env =
 		in
 		let embedding = try select_injection (a2,a1) state r.lhs counter env with 
 			| Null_event 1 | Null_event 2 as exn -> (*null event because of clashing instance of a binary rule*)
-				if counter.Counter.cons_null_events > 2 then 
+				if counter.Counter.cons_null_events > 1 then 
 					begin
 						(if !Parameter.debugModeOn then Debug.tag "Max consecutive clashes reached, I am giving up square approximation at this step" else ()) ;
 						let _ = Counter.reset_consecutive_null_event counter in
 						let embeddings = instances_of_square ~disjoint:true rule_id state in
 						let alpha,_ = eval_activity ~using:(List.length embeddings) r state counter env in 
-						(Random_tree.add rule_id alpha state.activity_tree ; if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Rule [%d]'s activity was corrected to %f" rule_id alpha) ; raise (Null_event 3))
+						begin
+							Random_tree.add rule_id alpha state.activity_tree ;
+							silence rule_id state ; (*rule activity will be underestimated if not awaken when a rule creates more cc's*)
+							if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Rule [%d]'s activity was corrected to %f" rule_id alpha) ;
+							raise (Null_event 3)
+						end
 					end
 				else (if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Rule [%d] is clashing" rule_id) ; raise exn )
 		in 
@@ -1094,6 +1103,19 @@ let bind state cause (u, i) (v, j) side_effects pert_ids counter env =
 	(env,side_effects,pert_ids)
 
 let break state cause (u, i) side_effects pert_ids counter env side_effect_free =
+	(*creating more cc's may wake up silenced rules*)
+	if IntSet.is_empty state.silenced then (if !Parameter.debugModeOn then Debug.tag "No silenced rule, skipping")
+	else
+			begin
+			let r = rule_of_id cause state in
+			if r.positive_species_impact then 
+				IntSet.fold
+				 (fun r_id _ ->
+					if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Updating silenced rule %d" r_id) ; 
+					update_activity state cause r_id counter env
+					 ) state.silenced () 
+			else (if !Parameter.debugModeOn then Debug.tag "Rule cannot increase species number") 
+		end ;
 	let intf_u = Node.interface u and warn = 0 in
 	let (int_u_i, ptr_u_i) = intf_u.(i).Node.status
 	in

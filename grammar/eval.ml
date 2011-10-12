@@ -473,6 +473,9 @@ let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take 
 			(fun dep env -> Environment.add_dependencies dep (RULE r_id) env)
 			(DepSet.union dep dep_alt) env
 	in
+	let pos_cc_impact = BndTypeSet.exists (fun bnd_type -> match bnd_type with Dynamics.Break _ | Dynamics.Semi  _ -> true | _ -> false) path_impact
+	and neg_cc_impact = BndTypeSet.exists (fun bnd_type -> match bnd_type with Dynamics.Link _ -> true | _ -> false) path_impact
+	in
 	let pre_causal = Dynamics.compute_causal lhs rhs script env in
 	(env,
 		{
@@ -491,7 +494,9 @@ let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take 
 			Dynamics.modif_sites = modif_sites ;
 			Dynamics.is_pert = false ;
 			Dynamics.pre_causal = pre_causal ;
-			Dynamics.path_impact = path_impact
+			Dynamics.path_impact = path_impact ;
+			Dynamics.negative_species_impact = neg_cc_impact ;
+			Dynamics.positive_species_impact = pos_cc_impact 
 		})
 
 let variables_of_result env res =
@@ -675,7 +680,9 @@ let pert_of_result variables env res =
 								Dynamics.modif_sites = modif_sites ;
 								Dynamics.is_pert = true ;
 								Dynamics.pre_causal = pre_causal ;
-								Dynamics.path_impact = path_impact
+								Dynamics.path_impact = path_impact ;
+								Dynamics.positive_species_impact = false ;
+								Dynamics.negative_species_impact = false 
 							}
 							in
 							(env,rule_opt)
@@ -715,7 +722,9 @@ let pert_of_result variables env res =
 								Dynamics.modif_sites = modif_sites ;
 								Dynamics.pre_causal = pre_causal ;
 								Dynamics.is_pert = true ;
-								Dynamics.path_impact = path_impact
+								Dynamics.path_impact = path_impact ;
+								Dynamics.positive_species_impact = false ;
+								Dynamics.negative_species_impact = false 
 							}
 							in
 							(env,rule_opt)

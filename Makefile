@@ -28,7 +28,7 @@ all: native-code
 ##uncomment the line below and set value below according to the location of your ocaml compilers 
 ##(usually /usr/bin/ under linux and /sw/bin under MAC OS X)
 
-#OCAMLBINPATH = 
+#OCAMLBINPATH = /usr/bin/
 
 OCAMLCP = $(OCAMLBINPATH)ocamlcp
 OCAMLLEX = $(OCAMLBINPATH)ocamllex
