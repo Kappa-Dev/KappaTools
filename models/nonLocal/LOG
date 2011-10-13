@@ -1,0 +1,843 @@
+Parsing abc.ka...
+done
++Self seeding...
++Initialized random number generator with seed 516878249
++Compiling...
+	 -agent signatures
+	 -variable declarations
+	 -initial conditions
+	 -rules
+	 -observables
+	 -perturbations
+	 Done
++Building initial simulation state...
+	 * Initializing injections...
+	 * Initializing variables...
+	 * Initializing wake up map for side effects...
+	 * Initializing activity tree...
+	 * Computing influence map...
+A(c!a.C)->A(c) -+-> A(b!a.B,c)?
+Yes
+A(c!a.C)->A(c) -+-> A(b,c!a.C)?
+No
+A(c!a.C)->A(c) -+-> B(a,c!b.C)?
+No
+A(c!a.C)->A(c) -+-> A(b,c)?
+Yes
+A(c!a.C)->A(c) -+-> B(a,c)?
+No
+A(c!a.C)->A(c) -+-> C(a,b)?
+No
+A(c!a.C)->A(c) -+-> A(b!0),B(a!0,c!1),C(b!1)?
+No
+A(c!a.C)->A(c) -+-> A(b!0,c!1),B(a!0,c!2),C(a!1,b!2)?
+No
+A(c!a.C)->A(c) -+-> A(b),B(a)?
+No
+A(c!a.C)->A(c) -+-> A(c),C(a)?
+Yes
+A(c!a.C)->A(c) -+-> B(c),C(b)?
+No
+A(c!a.C)->A(c) -+-> A(b!a.B)?
+No
+A(c!a.C)->A(c) -+-> A(c!a.C)?
+No
+A(c!a.C)->A(c) -+-> B(c!b.C)?
+No
+B(c!b.C)->B(c) -+-> A(b!a.B,c)?
+No
+B(c!b.C)->B(c) -+-> A(b,c!a.C)?
+No
+B(c!b.C)->B(c) -+-> B(a,c!b.C)?
+No
+B(c!b.C)->B(c) -+-> A(b,c)?
+No
+B(c!b.C)->B(c) -+-> B(a,c)?
+Yes
+B(c!b.C)->B(c) -+-> C(a,b)?
+No
+B(c!b.C)->B(c) -+-> A(b!0),B(a!0,c!1),C(b!1)?
+No
+B(c!b.C)->B(c) -+-> A(b!0,c!1),B(a!0,c!2),C(a!1,b!2)?
+No
+B(c!b.C)->B(c) -+-> A(b),B(a)?
+No
+B(c!b.C)->B(c) -+-> A(c),C(a)?
+No
+B(c!b.C)->B(c) -+-> B(c),C(b)?
+Yes
+B(c!b.C)->B(c) -+-> A(b!a.B)?
+No
+B(c!b.C)->B(c) -+-> A(c!a.C)?
+No
+B(c!b.C)->B(c) -+-> B(c!b.C)?
+No
+A(b),B(a)->A(b!0),B(a!0) -+-> A(b!a.B,c)?
+Yes
+A(b),B(a)->A(b!0),B(a!0) -+-> A(b,c!a.C)?
+No
+A(b),B(a)->A(b!0),B(a!0) -+-> B(a,c!b.C)?
+No
+A(b),B(a)->A(b!0),B(a!0) -+-> A(b,c)?
+No
+A(b),B(a)->A(b!0),B(a!0) -+-> B(a,c)?
+No
+A(b),B(a)->A(b!0),B(a!0) -+-> C(a,b)?
+No
+A(b),B(a)->A(b!0),B(a!0) -+-> A(b!0),B(a!0,c!1),C(b!1)?
+Yes
+A(b),B(a)->A(b!0),B(a!0) -+-> A(b!0,c!1),B(a!0,c!2),C(a!1,b!2)?
+Yes
+A(b),B(a)->A(b!0),B(a!0) -+-> A(b),B(a)?
+No
+A(b),B(a)->A(b!0),B(a!0) -+-> A(c),C(a)?
+No
+A(b),B(a)->A(b!0),B(a!0) -+-> B(c),C(b)?
+No
+A(b),B(a)->A(b!0),B(a!0) -+-> A(b!a.B)?
+Yes
+A(b),B(a)->A(b!0),B(a!0) -+-> A(c!a.C)?
+No
+A(b),B(a)->A(b!0),B(a!0) -+-> B(c!b.C)?
+No
+A(c),C(a)->A(c!0),C(a!0) -+-> A(b!a.B,c)?
+No
+A(c),C(a)->A(c!0),C(a!0) -+-> A(b,c!a.C)?
+Yes
+A(c),C(a)->A(c!0),C(a!0) -+-> B(a,c!b.C)?
+No
+A(c),C(a)->A(c!0),C(a!0) -+-> A(b,c)?
+No
+A(c),C(a)->A(c!0),C(a!0) -+-> B(a,c)?
+No
+A(c),C(a)->A(c!0),C(a!0) -+-> C(a,b)?
+No
+A(c),C(a)->A(c!0),C(a!0) -+-> A(b!0),B(a!0,c!1),C(b!1)?
+No
+A(c),C(a)->A(c!0),C(a!0) -+-> A(b!0,c!1),B(a!0,c!2),C(a!1,b!2)?
+Yes
+A(c),C(a)->A(c!0),C(a!0) -+-> A(b),B(a)?
+No
+A(c),C(a)->A(c!0),C(a!0) -+-> A(c),C(a)?
+No
+A(c),C(a)->A(c!0),C(a!0) -+-> B(c),C(b)?
+No
+A(c),C(a)->A(c!0),C(a!0) -+-> A(b!a.B)?
+No
+A(c),C(a)->A(c!0),C(a!0) -+-> A(c!a.C)?
+Yes
+A(c),C(a)->A(c!0),C(a!0) -+-> B(c!b.C)?
+No
+B(c),C(b)->B(c!0),C(b!0) -+-> A(b!a.B,c)?
+No
+B(c),C(b)->B(c!0),C(b!0) -+-> A(b,c!a.C)?
+No
+B(c),C(b)->B(c!0),C(b!0) -+-> B(a,c!b.C)?
+Yes
+B(c),C(b)->B(c!0),C(b!0) -+-> A(b,c)?
+No
+B(c),C(b)->B(c!0),C(b!0) -+-> B(a,c)?
+No
+B(c),C(b)->B(c!0),C(b!0) -+-> C(a,b)?
+No
+B(c),C(b)->B(c!0),C(b!0) -+-> A(b!0),B(a!0,c!1),C(b!1)?
+Yes
+B(c),C(b)->B(c!0),C(b!0) -+-> A(b!0,c!1),B(a!0,c!2),C(a!1,b!2)?
+Yes
+B(c),C(b)->B(c!0),C(b!0) -+-> A(b),B(a)?
+No
+B(c),C(b)->B(c!0),C(b!0) -+-> A(c),C(a)?
+No
+B(c),C(b)->B(c!0),C(b!0) -+-> B(c),C(b)?
+No
+B(c),C(b)->B(c!0),C(b!0) -+-> A(b!a.B)?
+No
+B(c),C(b)->B(c!0),C(b!0) -+-> A(c!a.C)?
+No
+B(c),C(b)->B(c!0),C(b!0) -+-> B(c!b.C)?
+Yes
+A(b!a.B)->A(b) -+-> A(b!a.B,c)?
+No
+A(b!a.B)->A(b) -+-> A(b,c!a.C)?
+Yes
+A(b!a.B)->A(b) -+-> B(a,c!b.C)?
+No
+A(b!a.B)->A(b) -+-> A(b,c)?
+Yes
+A(b!a.B)->A(b) -+-> B(a,c)?
+No
+A(b!a.B)->A(b) -+-> C(a,b)?
+No
+A(b!a.B)->A(b) -+-> A(b!0),B(a!0,c!1),C(b!1)?
+No
+A(b!a.B)->A(b) -+-> A(b!0,c!1),B(a!0,c!2),C(a!1,b!2)?
+No
+A(b!a.B)->A(b) -+-> A(b),B(a)?
+Yes
+A(b!a.B)->A(b) -+-> A(c),C(a)?
+No
+A(b!a.B)->A(b) -+-> B(c),C(b)?
+No
+A(b!a.B)->A(b) -+-> A(b!a.B)?
+No
+A(b!a.B)->A(b) -+-> A(c!a.C)?
+No
+A(b!a.B)->A(b) -+-> B(c!b.C)?
+No
+Done
+[**Event 0 (Activity 0.100200)**]
+____________________________________________________________
+#***[2.395322] Current state***
+#0:A_0:[_{}{(11,0),(9,0),(6,0),(0,0)},b{}!0{(11,0),(6,0),(0,0)},c{}{(9,0),(0,0)}]-->{ip(9,0)}
+#1:B_1:[_{}{(13,0),(6,0)},a{}!0{(6,0)},c{}!1{(13,0),(6,0)}]-->{}
+#2:C_2:[_{}{(9,1),(6,0)},a{}{(9,1)},b{}!1{(6,0)}]-->{ip(9,0)}
+#	'a..c' A(c!a.C)->A(c) @ 0.000000[upd:0.000000(0.000000)]
+#	'b..c' B(c!b.C)->B(c) @ 0.000100[upd:0.000100(0.000000)]
+#	'a.b' A(b),B(a)->A(b!0),B(a!0) @ 0.000000[upd:0.000000(0.000000)]
+#	'a.c' A(c),C(a)->A(c!0),C(a!0) @ 0.100000[upd:0.100000(0.000000)]
+#	'b.c' B(c),C(b)->B(c!0),C(b!0) @ 0.000000[upd:0.000000(0.000000)]
+#	'a..b' A(b!a.B)->A(b) @ 0.000100[upd:0.000100(0.000000)]
+
+#Var[0]: 'ab' A(b!a.B,c) has 1 instances
+#	CC[0]#0: [0->0] 
+#Var[1]: 'ac' A(b,c!a.C) has 0 instances
+#	CC[0] : na
+#Var[2]: 'bc' B(a,c!b.C) has 0 instances
+#	CC[0] : na
+#Var[3]: 'a' A(b,c) has 0 instances
+#	CC[0] : na
+#Var[4]: 'b' B(a,c) has 0 instances
+#	CC[0] : na
+#Var[5]: 'c' C(a,b) has 0 instances
+#	CC[0] : na
+#Var[6]: 'tri+' A(b!0),B(a!0,c!1),C(b!1) has 1 instances
+#	CC[0]#0: [2->2,1->1,0->0] 
+#Var[7]: 'closed' A(b!0,c!1),B(a!0,c!2),C(a!1,b!2) has 0 instances
+#	CC[0] : na
+#Var[8]: 'a.b' A(b),B(a) has 0 instances
+#	CC[0] : na
+#	CC[1] : na
+#Unary[9]: 'a.c' A(c),C(a) has 1 unary instances
+#	 ip#0: [|0:[0->0];1:[1->2]|] 
+#Var[9]: 'a.c' A(c),C(a) has 1 instances
+#	CC[0]#0: [0->0] 
+#	CC[1]#0: [1->2] 
+#Var[10]: 'b.c' B(c),C(b) has 0 instances
+#	CC[0] : na
+#	CC[1] : na
+#Var[11]: 'a..b' A(b!a.B) has 1 instances
+#	CC[0]#0: [0->0] 
+#Var[12]: 'a..c' A(c!a.C) has 0 instances
+#	CC[0] : na
+#Var[13]: 'b..c' B(c!b.C) has 1 instances
+#	CC[0]#0: [0->1] 
+#x[0]: 'k1' 0.000000 
+#x[1]: 'k2' 0.100000 
+#x[2]: 'k_off' 0.000100 
+#x[3]: 'n' 1.000000 
+#x[4]: 'mono' 0.000000 
+#x[5]: 'bi' 1.000000 
+#**********
+Drawing a rule...
+Clashing because selected instance of binary rule has a connex codomain
+Rule [9] is clashing
+Null (clash or doesn't satisfy constraints)
+Should now try perturbations {}
+[**Event 1 (Activity 0.100200)**]
+#######***[45.198259] Current state***
+#0:A_0:[_{}{(11,0),(9,0),(6,0),(0,0)},b{}!0{(11,0),(6,0),(0,0)},c{}{(9,0),(0,0)}]-->{ip(9,0)}
+#1:B_1:[_{}{(13,0),(6,0)},a{}!0{(6,0)},c{}!1{(13,0),(6,0)}]-->{}
+#2:C_2:[_{}{(9,1),(6,0)},a{}{(9,1)},b{}!1{(6,0)}]-->{ip(9,0)}
+#	'a..c' A(c!a.C)->A(c) @ 0.000000[upd:0.000000(0.000000)]
+#	'b..c' B(c!b.C)->B(c) @ 0.000100[upd:0.000100(0.000000)]
+#	'a.b' A(b),B(a)->A(b!0),B(a!0) @ 0.000000[upd:0.000000(0.000000)]
+#	'a.c' A(c),C(a)->A(c!0),C(a!0) @ 0.100000[upd:0.100000(0.000000)]
+#	'b.c' B(c),C(b)->B(c!0),C(b!0) @ 0.000000[upd:0.000000(0.000000)]
+#	'a..b' A(b!a.B)->A(b) @ 0.000100[upd:0.000100(0.000000)]
+
+#Var[0]: 'ab' A(b!a.B,c) has 1 instances
+#	CC[0]#0: [0->0] 
+#Var[1]: 'ac' A(b,c!a.C) has 0 instances
+#	CC[0] : na
+#Var[2]: 'bc' B(a,c!b.C) has 0 instances
+#	CC[0] : na
+#Var[3]: 'a' A(b,c) has 0 instances
+#	CC[0] : na
+#Var[4]: 'b' B(a,c) has 0 instances
+#	CC[0] : na
+#Var[5]: 'c' C(a,b) has 0 instances
+#	CC[0] : na
+#Var[6]: 'tri+' A(b!0),B(a!0,c!1),C(b!1) has 1 instances
+#	CC[0]#0: [2->2,1->1,0->0] 
+#Var[7]: 'closed' A(b!0,c!1),B(a!0,c!2),C(a!1,b!2) has 0 instances
+#	CC[0] : na
+#Var[8]: 'a.b' A(b),B(a) has 0 instances
+#	CC[0] : na
+#	CC[1] : na
+#Unary[9]: 'a.c' A(c),C(a) has 1 unary instances
+#	 ip#0: [|0:[0->0];1:[1->2]|] 
+#Var[9]: 'a.c' A(c),C(a) has 1 instances
+#	CC[0]#0: [0->0] 
+#	CC[1]#0: [1->2] 
+#Var[10]: 'b.c' B(c),C(b) has 0 instances
+#	CC[0] : na
+#	CC[1] : na
+#Var[11]: 'a..b' A(b!a.B) has 1 instances
+#	CC[0]#0: [0->0] 
+#Var[12]: 'a..c' A(c!a.C) has 0 instances
+#	CC[0] : na
+#Var[13]: 'b..c' B(c!b.C) has 1 instances
+#	CC[0]#0: [0->1] 
+#x[0]: 'k1' 0.000000 
+#x[1]: 'k2' 0.100000 
+#x[2]: 'k_off' 0.000100 
+#x[3]: 'n' 1.000000 
+#x[4]: 'mono' 0.000000 
+#x[5]: 'bi' 1.000000 
+#**********
+Drawing a rule...
+Clashing because selected instance of binary rule has a connex codomain
+Rule [9] is clashing
+Null (clash or doesn't satisfy constraints)
+Should now try perturbations {}
+[**Event 2 (Activity 0.100200)**]
+#######***[46.870870] Current state***
+#0:A_0:[_{}{(11,0),(9,0),(6,0),(0,0)},b{}!0{(11,0),(6,0),(0,0)},c{}{(9,0),(0,0)}]-->{ip(9,0)}
+#1:B_1:[_{}{(13,0),(6,0)},a{}!0{(6,0)},c{}!1{(13,0),(6,0)}]-->{}
+#2:C_2:[_{}{(9,1),(6,0)},a{}{(9,1)},b{}!1{(6,0)}]-->{ip(9,0)}
+#	'a..c' A(c!a.C)->A(c) @ 0.000000[upd:0.000000(0.000000)]
+#	'b..c' B(c!b.C)->B(c) @ 0.000100[upd:0.000100(0.000000)]
+#	'a.b' A(b),B(a)->A(b!0),B(a!0) @ 0.000000[upd:0.000000(0.000000)]
+#	'a.c' A(c),C(a)->A(c!0),C(a!0) @ 0.100000[upd:0.100000(0.000000)]
+#	'b.c' B(c),C(b)->B(c!0),C(b!0) @ 0.000000[upd:0.000000(0.000000)]
+#	'a..b' A(b!a.B)->A(b) @ 0.000100[upd:0.000100(0.000000)]
+
+#Var[0]: 'ab' A(b!a.B,c) has 1 instances
+#	CC[0]#0: [0->0] 
+#Var[1]: 'ac' A(b,c!a.C) has 0 instances
+#	CC[0] : na
+#Var[2]: 'bc' B(a,c!b.C) has 0 instances
+#	CC[0] : na
+#Var[3]: 'a' A(b,c) has 0 instances
+#	CC[0] : na
+#Var[4]: 'b' B(a,c) has 0 instances
+#	CC[0] : na
+#Var[5]: 'c' C(a,b) has 0 instances
+#	CC[0] : na
+#Var[6]: 'tri+' A(b!0),B(a!0,c!1),C(b!1) has 1 instances
+#	CC[0]#0: [2->2,1->1,0->0] 
+#Var[7]: 'closed' A(b!0,c!1),B(a!0,c!2),C(a!1,b!2) has 0 instances
+#	CC[0] : na
+#Var[8]: 'a.b' A(b),B(a) has 0 instances
+#	CC[0] : na
+#	CC[1] : na
+#Unary[9]: 'a.c' A(c),C(a) has 1 unary instances
+#	 ip#0: [|0:[0->0];1:[1->2]|] 
+#Var[9]: 'a.c' A(c),C(a) has 1 instances
+#	CC[0]#0: [0->0] 
+#	CC[1]#0: [1->2] 
+#Var[10]: 'b.c' B(c),C(b) has 0 instances
+#	CC[0] : na
+#	CC[1] : na
+#Var[11]: 'a..b' A(b!a.B) has 1 instances
+#	CC[0]#0: [0->0] 
+#Var[12]: 'a..c' A(c!a.C) has 0 instances
+#	CC[0] : na
+#Var[13]: 'b..c' B(c!b.C) has 1 instances
+#	CC[0]#0: [0->1] 
+#x[0]: 'k1' 0.000000 
+#x[1]: 'k2' 0.100000 
+#x[2]: 'k_off' 0.000100 
+#x[3]: 'n' 1.000000 
+#x[4]: 'mono' 0.000000 
+#x[5]: 'bi' 1.000000 
+#**********
+Drawing a rule...
+Clashing because selected instance of binary rule has a connex codomain
+Max consecutive clashes reached, I am giving up square approximation at this step
+Rule [9]'s activity was corrected to 0.000000
+Null (clash or doesn't satisfy constraints)
+Should now try perturbations {}
+[**Event 3 (Activity 0.000200)**]
+#######***[3809.783771] Current state***
+#0:A_0:[_{}{(11,0),(9,0),(6,0),(0,0)},b{}!0{(11,0),(6,0),(0,0)},c{}{(9,0),(0,0)}]-->{ip(9,0)}
+#1:B_1:[_{}{(13,0),(6,0)},a{}!0{(6,0)},c{}!1{(13,0),(6,0)}]-->{}
+#2:C_2:[_{}{(9,1),(6,0)},a{}{(9,1)},b{}!1{(6,0)}]-->{ip(9,0)}
+#	'a..c' A(c!a.C)->A(c) @ 0.000000[upd:0.000000(0.000000)]
+#	'b..c' B(c!b.C)->B(c) @ 0.000100[upd:0.000100(0.000000)]
+#	'a.b' A(b),B(a)->A(b!0),B(a!0) @ 0.000000[upd:0.000000(0.000000)]
+#	'a.c' A(c),C(a)->A(c!0),C(a!0) @ 0.000000[upd:0.100000(0.000000)]
+#	'b.c' B(c),C(b)->B(c!0),C(b!0) @ 0.000000[upd:0.000000(0.000000)]
+#	'a..b' A(b!a.B)->A(b) @ 0.000100[upd:0.000100(0.000000)]
+
+#Var[0]: 'ab' A(b!a.B,c) has 1 instances
+#	CC[0]#0: [0->0] 
+#Var[1]: 'ac' A(b,c!a.C) has 0 instances
+#	CC[0] : na
+#Var[2]: 'bc' B(a,c!b.C) has 0 instances
+#	CC[0] : na
+#Var[3]: 'a' A(b,c) has 0 instances
+#	CC[0] : na
+#Var[4]: 'b' B(a,c) has 0 instances
+#	CC[0] : na
+#Var[5]: 'c' C(a,b) has 0 instances
+#	CC[0] : na
+#Var[6]: 'tri+' A(b!0),B(a!0,c!1),C(b!1) has 1 instances
+#	CC[0]#0: [2->2,1->1,0->0] 
+#Var[7]: 'closed' A(b!0,c!1),B(a!0,c!2),C(a!1,b!2) has 0 instances
+#	CC[0] : na
+#Var[8]: 'a.b' A(b),B(a) has 0 instances
+#	CC[0] : na
+#	CC[1] : na
+#Unary[9]: 'a.c' A(c),C(a) has 1 unary instances
+#	 ip#0: [|0:[0->0];1:[1->2]|] 
+#Var[9]: 'a.c' A(c),C(a) has 1 instances
+#	CC[0]#0: [0->0] 
+#	CC[1]#0: [1->2] 
+#Var[10]: 'b.c' B(c),C(b) has 0 instances
+#	CC[0] : na
+#	CC[1] : na
+#Var[11]: 'a..b' A(b!a.B) has 1 instances
+#	CC[0]#0: [0->0] 
+#Var[12]: 'a..c' A(c!a.C) has 0 instances
+#	CC[0] : na
+#Var[13]: 'b..c' B(c!b.C) has 1 instances
+#	CC[0]#0: [0->1] 
+#x[0]: 'k1' 0.000000 
+#x[1]: 'k2' 0.100000 
+#x[2]: 'k_off' 0.000100 
+#x[3]: 'n' 1.000000 
+#x[4]: 'mono' 0.000000 
+#x[5]: 'bi' 1.000000 
+#**********
+Drawing a rule...
+Applying 'a..b' with embedding:
+[0->0]
+Updating silenced rule 9
+Negative update as indicated by A#0 site 1
+Observable 0 is changed, updating {ALG(5)}
+Variable 5 is changed, updating {}
+Observable 6 is changed, updating {}
+Observable 11 is changed, updating {}
+Negative update as indicated by B#1 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 0
+No new embedding was found
+Influence map tells me I should look for new injections of var[3]
+Trying to embed Var[3] using root 0 at node 0
+New embedding: [0->0]
+Observable 3 is changed, updating {ALG(4)}
+Variable 4 is changed, updating {}
+Influence map tells me I should look for new injections of var[8]
+Trying to embed Var[8] using root 0 at node 0
+New embedding: [0->0]
+Observable 8 is changed, updating {}
+Side effect on node 1 forces me to look for new embedding...
+Trying to embed Var[2] using root 0 at node 1
+New embedding: [0->1]
+Observable 2 is changed, updating {ALG(5)}
+Variable 5 is changed, updating {}
+Trying to embed Var[4] using root 0 at node 1
+No new embedding was found
+Trying to embed Var[8] using root 1 at node 1
+New embedding: [1->1]
+Observable 8 is changed, updating {}
+Should now try perturbations {}
+[**Event 4 (Activity 0.200200)**]
+#######***[3810.687526] Current state***
+#0:A_0:[_{}{(9,0),(8,0),(3,0)},b{}{(8,0),(3,0)},c{}{(9,0),(3,0)}]-->{ip(9,0)}
+#1:B_1:[_{}{(13,0),(8,1),(2,0)},a{}{(8,1),(2,0)},c{}!0{(13,0),(2,0)}]-->{}
+#2:C_2:[_{}{(9,1)},a{}{(9,1)},b{}!0{}]-->{ip(9,0)}
+#	'a..c' A(c!a.C)->A(c) @ 0.000000[upd:0.000000(0.000000)]
+#	'b..c' B(c!b.C)->B(c) @ 0.000100[upd:0.000100(0.000000)]
+#	'a.b' A(b),B(a)->A(b!0),B(a!0) @ 0.100000[upd:0.100000(0.000000)]
+#	'a.c' A(c),C(a)->A(c!0),C(a!0) @ 0.100000[upd:0.100000(0.000000)]
+#	'b.c' B(c),C(b)->B(c!0),C(b!0) @ 0.000000[upd:0.000000(0.000000)]
+#	'a..b' A(b!a.B)->A(b) @ 0.000100[upd:0.000000(0.000000)]
+
+#Var[0]: 'ab' A(b!a.B,c) has 0 instances
+#Var[1]: 'ac' A(b,c!a.C) has 0 instances
+#	CC[0] : na
+#Var[2]: 'bc' B(a,c!b.C) has 1 instances
+#	CC[0]#0: [0->1] 
+#Var[3]: 'a' A(b,c) has 1 instances
+#	CC[0]#0: [0->0] 
+#Var[4]: 'b' B(a,c) has 0 instances
+#	CC[0] : na
+#Var[5]: 'c' C(a,b) has 0 instances
+#	CC[0] : na
+#Var[6]: 'tri+' A(b!0),B(a!0,c!1),C(b!1) has 0 instances
+#Var[7]: 'closed' A(b!0,c!1),B(a!0,c!2),C(a!1,b!2) has 0 instances
+#	CC[0] : na
+#Var[8]: 'a.b' A(b),B(a) has 1 instances
+#	CC[0]#0: [0->0] 
+#	CC[1]#0: [1->1] 
+#Unary[9]: 'a.c' A(c),C(a) has 1 unary instances
+#	 ip#0: [|0:[0->0];1:[1->2]|] 
+#Var[9]: 'a.c' A(c),C(a) has 1 instances
+#	CC[0]#0: [0->0] 
+#	CC[1]#0: [1->2] 
+#Var[10]: 'b.c' B(c),C(b) has 0 instances
+#	CC[0] : na
+#	CC[1] : na
+#Var[11]: 'a..b' A(b!a.B) has 0 instances
+#Var[12]: 'a..c' A(c!a.C) has 0 instances
+#	CC[0] : na
+#Var[13]: 'b..c' B(c!b.C) has 1 instances
+#	CC[0]#0: [0->1] 
+#x[0]: 'k1' 0.000000 
+#x[1]: 'k2' 0.100000 
+#x[2]: 'k_off' 0.000100 
+#x[3]: 'n' 1.000000 
+#x[4]: 'mono' 1.000000 
+#x[5]: 'bi' 1.000000 
+#**********
+Drawing a rule...
+Applying 'a.b' with embedding:
+[1->1,0->0]
+Negative update as indicated by B#1 site 1
+Observable 2 is changed, updating {ALG(5)}
+Variable 5 is changed, updating {}
+Observable 8 is changed, updating {}
+Negative update as indicated by A#0 site 1
+Observable 3 is changed, updating {ALG(4)}
+Variable 4 is changed, updating {}
+Observable 8 is changed, updating {}
+Influence map tells me I should look for new injections of var[0]
+Trying to embed Var[0] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Observable 0 is changed, updating {ALG(5)}
+Variable 5 is changed, updating {}
+Influence map tells me I should look for new injections of var[6]
+Trying to embed Var[6] using root 0 at node 0
+reusing injection: [2->2,1->1,0->0]
+New embedding: [2->2,1->1,0->0]
+Observable 6 is changed, updating {}
+Influence map tells me I should look for new injections of var[7]
+Trying to embed Var[7] using root 0 at node 0
+No new embedding was found
+Influence map tells me I should look for new injections of var[11]
+Trying to embed Var[11] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Observable 11 is changed, updating {}
+Should now try perturbations {}
+[**Event 5 (Activity 0.200200)**]
+#######***[3819.834934] Current state***
+#0:A_0:[_{}{(11,0),(9,0),(6,0),(0,0)},b{}!0{(11,0),(6,0),(0,0)},c{}{(9,0),(0,0)}]-->{ip(9,0)}
+#1:B_1:[_{}{(13,0),(6,0)},a{}!0{(6,0)},c{}!1{(13,0),(6,0)}]-->{}
+#2:C_2:[_{}{(9,1),(6,0)},a{}{(9,1)},b{}!1{(6,0)}]-->{ip(9,0)}
+#	'a..c' A(c!a.C)->A(c) @ 0.000000[upd:0.000000(0.000000)]
+#	'b..c' B(c!b.C)->B(c) @ 0.000100[upd:0.000100(0.000000)]
+#	'a.b' A(b),B(a)->A(b!0),B(a!0) @ 0.100000[upd:0.000000(0.000000)]
+#	'a.c' A(c),C(a)->A(c!0),C(a!0) @ 0.100000[upd:0.100000(0.000000)]
+#	'b.c' B(c),C(b)->B(c!0),C(b!0) @ 0.000000[upd:0.000000(0.000000)]
+#	'a..b' A(b!a.B)->A(b) @ 0.000100[upd:0.000100(0.000000)]
+
+#Var[0]: 'ab' A(b!a.B,c) has 1 instances
+#	CC[0]#0: [0->0] 
+#Var[1]: 'ac' A(b,c!a.C) has 0 instances
+#	CC[0] : na
+#Var[2]: 'bc' B(a,c!b.C) has 0 instances
+#Var[3]: 'a' A(b,c) has 0 instances
+#Var[4]: 'b' B(a,c) has 0 instances
+#	CC[0] : na
+#Var[5]: 'c' C(a,b) has 0 instances
+#	CC[0] : na
+#Var[6]: 'tri+' A(b!0),B(a!0,c!1),C(b!1) has 1 instances
+#	CC[0]#0: [2->2,1->1,0->0] 
+#Var[7]: 'closed' A(b!0,c!1),B(a!0,c!2),C(a!1,b!2) has 0 instances
+#	CC[0] : na
+#Var[8]: 'a.b' A(b),B(a) has 0 instances
+#Unary[9]: 'a.c' A(c),C(a) has 1 unary instances
+#	 ip#0: [|0:[0->0];1:[1->2]|] 
+#Var[9]: 'a.c' A(c),C(a) has 1 instances
+#	CC[0]#0: [0->0] 
+#	CC[1]#0: [1->2] 
+#Var[10]: 'b.c' B(c),C(b) has 0 instances
+#	CC[0] : na
+#	CC[1] : na
+#Var[11]: 'a..b' A(b!a.B) has 1 instances
+#	CC[0]#0: [0->0] 
+#Var[12]: 'a..c' A(c!a.C) has 0 instances
+#	CC[0] : na
+#Var[13]: 'b..c' B(c!b.C) has 1 instances
+#	CC[0]#0: [0->1] 
+#x[0]: 'k1' 0.000000 
+#x[1]: 'k2' 0.100000 
+#x[2]: 'k_off' 0.000100 
+#x[3]: 'n' 1.000000 
+#x[4]: 'mono' 0.000000 
+#x[5]: 'bi' 1.000000 
+#**********
+Drawing a rule...
+Clashing because selected instance of binary rule has a connex codomain
+Rule [9] is clashing
+Null (clash or doesn't satisfy constraints)
+Should now try perturbations {}
+[**Event 6 (Activity 0.200200)**]
+#######***[3832.144061] Current state***
+#0:A_0:[_{}{(11,0),(9,0),(6,0),(0,0)},b{}!0{(11,0),(6,0),(0,0)},c{}{(9,0),(0,0)}]-->{ip(9,0)}
+#1:B_1:[_{}{(13,0),(6,0)},a{}!0{(6,0)},c{}!1{(13,0),(6,0)}]-->{}
+#2:C_2:[_{}{(9,1),(6,0)},a{}{(9,1)},b{}!1{(6,0)}]-->{ip(9,0)}
+#	'a..c' A(c!a.C)->A(c) @ 0.000000[upd:0.000000(0.000000)]
+#	'b..c' B(c!b.C)->B(c) @ 0.000100[upd:0.000100(0.000000)]
+#	'a.b' A(b),B(a)->A(b!0),B(a!0) @ 0.100000[upd:0.000000(0.000000)]
+#	'a.c' A(c),C(a)->A(c!0),C(a!0) @ 0.100000[upd:0.100000(0.000000)]
+#	'b.c' B(c),C(b)->B(c!0),C(b!0) @ 0.000000[upd:0.000000(0.000000)]
+#	'a..b' A(b!a.B)->A(b) @ 0.000100[upd:0.000100(0.000000)]
+
+#Var[0]: 'ab' A(b!a.B,c) has 1 instances
+#	CC[0]#0: [0->0] 
+#Var[1]: 'ac' A(b,c!a.C) has 0 instances
+#	CC[0] : na
+#Var[2]: 'bc' B(a,c!b.C) has 0 instances
+#Var[3]: 'a' A(b,c) has 0 instances
+#Var[4]: 'b' B(a,c) has 0 instances
+#	CC[0] : na
+#Var[5]: 'c' C(a,b) has 0 instances
+#	CC[0] : na
+#Var[6]: 'tri+' A(b!0),B(a!0,c!1),C(b!1) has 1 instances
+#	CC[0]#0: [2->2,1->1,0->0] 
+#Var[7]: 'closed' A(b!0,c!1),B(a!0,c!2),C(a!1,b!2) has 0 instances
+#	CC[0] : na
+#Var[8]: 'a.b' A(b),B(a) has 0 instances
+#Unary[9]: 'a.c' A(c),C(a) has 1 unary instances
+#	 ip#0: [|0:[0->0];1:[1->2]|] 
+#Var[9]: 'a.c' A(c),C(a) has 1 instances
+#	CC[0]#0: [0->0] 
+#	CC[1]#0: [1->2] 
+#Var[10]: 'b.c' B(c),C(b) has 0 instances
+#	CC[0] : na
+#	CC[1] : na
+#Var[11]: 'a..b' A(b!a.B) has 1 instances
+#	CC[0]#0: [0->0] 
+#Var[12]: 'a..c' A(c!a.C) has 0 instances
+#	CC[0] : na
+#Var[13]: 'b..c' B(c!b.C) has 1 instances
+#	CC[0]#0: [0->1] 
+#x[0]: 'k1' 0.000000 
+#x[1]: 'k2' 0.100000 
+#x[2]: 'k_off' 0.000100 
+#x[3]: 'n' 1.000000 
+#x[4]: 'mono' 0.000000 
+#x[5]: 'bi' 1.000000 
+#**********
+Drawing a rule...
+Clashing in order to correct for overestimation of activity of rule 8
+Null (clash or doesn't satisfy constraints)
+Should now try perturbations {}
+[**Event 7 (Activity 0.100200)**]
+#######***[3863.463929] Current state***
+#0:A_0:[_{}{(11,0),(9,0),(6,0),(0,0)},b{}!0{(11,0),(6,0),(0,0)},c{}{(9,0),(0,0)}]-->{ip(9,0)}
+#1:B_1:[_{}{(13,0),(6,0)},a{}!0{(6,0)},c{}!1{(13,0),(6,0)}]-->{}
+#2:C_2:[_{}{(9,1),(6,0)},a{}{(9,1)},b{}!1{(6,0)}]-->{ip(9,0)}
+#	'a..c' A(c!a.C)->A(c) @ 0.000000[upd:0.000000(0.000000)]
+#	'b..c' B(c!b.C)->B(c) @ 0.000100[upd:0.000100(0.000000)]
+#	'a.b' A(b),B(a)->A(b!0),B(a!0) @ 0.000000[upd:0.000000(0.000000)]
+#	'a.c' A(c),C(a)->A(c!0),C(a!0) @ 0.100000[upd:0.100000(0.000000)]
+#	'b.c' B(c),C(b)->B(c!0),C(b!0) @ 0.000000[upd:0.000000(0.000000)]
+#	'a..b' A(b!a.B)->A(b) @ 0.000100[upd:0.000100(0.000000)]
+
+#Var[0]: 'ab' A(b!a.B,c) has 1 instances
+#	CC[0]#0: [0->0] 
+#Var[1]: 'ac' A(b,c!a.C) has 0 instances
+#	CC[0] : na
+#Var[2]: 'bc' B(a,c!b.C) has 0 instances
+#Var[3]: 'a' A(b,c) has 0 instances
+#Var[4]: 'b' B(a,c) has 0 instances
+#	CC[0] : na
+#Var[5]: 'c' C(a,b) has 0 instances
+#	CC[0] : na
+#Var[6]: 'tri+' A(b!0),B(a!0,c!1),C(b!1) has 1 instances
+#	CC[0]#0: [2->2,1->1,0->0] 
+#Var[7]: 'closed' A(b!0,c!1),B(a!0,c!2),C(a!1,b!2) has 0 instances
+#	CC[0] : na
+#Var[8]: 'a.b' A(b),B(a) has 0 instances
+#Unary[9]: 'a.c' A(c),C(a) has 1 unary instances
+#	 ip#0: [|0:[0->0];1:[1->2]|] 
+#Var[9]: 'a.c' A(c),C(a) has 1 instances
+#	CC[0]#0: [0->0] 
+#	CC[1]#0: [1->2] 
+#Var[10]: 'b.c' B(c),C(b) has 0 instances
+#	CC[0] : na
+#	CC[1] : na
+#Var[11]: 'a..b' A(b!a.B) has 1 instances
+#	CC[0]#0: [0->0] 
+#Var[12]: 'a..c' A(c!a.C) has 0 instances
+#	CC[0] : na
+#Var[13]: 'b..c' B(c!b.C) has 1 instances
+#	CC[0]#0: [0->1] 
+#x[0]: 'k1' 0.000000 
+#x[1]: 'k2' 0.100000 
+#x[2]: 'k_off' 0.000100 
+#x[3]: 'n' 1.000000 
+#x[4]: 'mono' 0.000000 
+#x[5]: 'bi' 1.000000 
+#**********
+Drawing a rule...
+Clashing because selected instance of binary rule has a connex codomain
+Max consecutive clashes reached, I am giving up square approximation at this step
+Rule [9]'s activity was corrected to 0.000000
+Null (clash or doesn't satisfy constraints)
+Should now try perturbations {}
+[**Event 8 (Activity 0.000200)**]
+#######***[3957.341867] Current state***
+#0:A_0:[_{}{(11,0),(9,0),(6,0),(0,0)},b{}!0{(11,0),(6,0),(0,0)},c{}{(9,0),(0,0)}]-->{ip(9,0)}
+#1:B_1:[_{}{(13,0),(6,0)},a{}!0{(6,0)},c{}!1{(13,0),(6,0)}]-->{}
+#2:C_2:[_{}{(9,1),(6,0)},a{}{(9,1)},b{}!1{(6,0)}]-->{ip(9,0)}
+#	'a..c' A(c!a.C)->A(c) @ 0.000000[upd:0.000000(0.000000)]
+#	'b..c' B(c!b.C)->B(c) @ 0.000100[upd:0.000100(0.000000)]
+#	'a.b' A(b),B(a)->A(b!0),B(a!0) @ 0.000000[upd:0.000000(0.000000)]
+#	'a.c' A(c),C(a)->A(c!0),C(a!0) @ 0.000000[upd:0.100000(0.000000)]
+#	'b.c' B(c),C(b)->B(c!0),C(b!0) @ 0.000000[upd:0.000000(0.000000)]
+#	'a..b' A(b!a.B)->A(b) @ 0.000100[upd:0.000100(0.000000)]
+
+#Var[0]: 'ab' A(b!a.B,c) has 1 instances
+#	CC[0]#0: [0->0] 
+#Var[1]: 'ac' A(b,c!a.C) has 0 instances
+#	CC[0] : na
+#Var[2]: 'bc' B(a,c!b.C) has 0 instances
+#Var[3]: 'a' A(b,c) has 0 instances
+#Var[4]: 'b' B(a,c) has 0 instances
+#	CC[0] : na
+#Var[5]: 'c' C(a,b) has 0 instances
+#	CC[0] : na
+#Var[6]: 'tri+' A(b!0),B(a!0,c!1),C(b!1) has 1 instances
+#	CC[0]#0: [2->2,1->1,0->0] 
+#Var[7]: 'closed' A(b!0,c!1),B(a!0,c!2),C(a!1,b!2) has 0 instances
+#	CC[0] : na
+#Var[8]: 'a.b' A(b),B(a) has 0 instances
+#Unary[9]: 'a.c' A(c),C(a) has 1 unary instances
+#	 ip#0: [|0:[0->0];1:[1->2]|] 
+#Var[9]: 'a.c' A(c),C(a) has 1 instances
+#	CC[0]#0: [0->0] 
+#	CC[1]#0: [1->2] 
+#Var[10]: 'b.c' B(c),C(b) has 0 instances
+#	CC[0] : na
+#	CC[1] : na
+#Var[11]: 'a..b' A(b!a.B) has 1 instances
+#	CC[0]#0: [0->0] 
+#Var[12]: 'a..c' A(c!a.C) has 0 instances
+#	CC[0] : na
+#Var[13]: 'b..c' B(c!b.C) has 1 instances
+#	CC[0]#0: [0->1] 
+#x[0]: 'k1' 0.000000 
+#x[1]: 'k2' 0.100000 
+#x[2]: 'k_off' 0.000100 
+#x[3]: 'n' 1.000000 
+#x[4]: 'mono' 0.000000 
+#x[5]: 'bi' 1.000000 
+#**********
+Drawing a rule...
+Applying 'a..b' with embedding:
+[0->0]
+Updating silenced rule 9
+Negative update as indicated by A#0 site 1
+Observable 0 is changed, updating {ALG(5)}
+Variable 5 is changed, updating {}
+Observable 6 is changed, updating {}
+Observable 11 is changed, updating {}
+Negative update as indicated by B#1 site 1
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 0
+No new embedding was found
+Influence map tells me I should look for new injections of var[3]
+Trying to embed Var[3] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Observable 3 is changed, updating {ALG(4)}
+Variable 4 is changed, updating {}
+Influence map tells me I should look for new injections of var[8]
+Trying to embed Var[8] using root 0 at node 0
+reusing injection: [0->0]
+New embedding: [0->0]
+Observable 8 is changed, updating {}
+Side effect on node 1 forces me to look for new embedding...
+Trying to embed Var[2] using root 0 at node 1
+reusing injection: [0->1]
+New embedding: [0->1]
+Observable 2 is changed, updating {ALG(5)}
+Variable 5 is changed, updating {}
+Trying to embed Var[4] using root 0 at node 1
+No new embedding was found
+Trying to embed Var[8] using root 1 at node 1
+reusing injection: [1->1]
+New embedding: [1->1]
+Observable 8 is changed, updating {}
+Should now try perturbations {}
+[**Event 9 (Activity 0.200200)**]
+#######***[3964.699860] Current state***
+#0:A_0:[_{}{(9,0),(8,0),(3,0)},b{}{(8,0),(3,0)},c{}{(9,0),(3,0)}]-->{ip(9,0)}
+#1:B_1:[_{}{(13,0),(8,1),(2,0)},a{}{(8,1),(2,0)},c{}!0{(13,0),(2,0)}]-->{}
+#2:C_2:[_{}{(9,1)},a{}{(9,1)},b{}!0{}]-->{ip(9,0)}
+#	'a..c' A(c!a.C)->A(c) @ 0.000000[upd:0.000000(0.000000)]
+#	'b..c' B(c!b.C)->B(c) @ 0.000100[upd:0.000100(0.000000)]
+#	'a.b' A(b),B(a)->A(b!0),B(a!0) @ 0.100000[upd:0.100000(0.000000)]
+#	'a.c' A(c),C(a)->A(c!0),C(a!0) @ 0.100000[upd:0.100000(0.000000)]
+#	'b.c' B(c),C(b)->B(c!0),C(b!0) @ 0.000000[upd:0.000000(0.000000)]
+#	'a..b' A(b!a.B)->A(b) @ 0.000100[upd:0.000000(0.000000)]
+
+#Var[0]: 'ab' A(b!a.B,c) has 0 instances
+#Var[1]: 'ac' A(b,c!a.C) has 0 instances
+#	CC[0] : na
+#Var[2]: 'bc' B(a,c!b.C) has 1 instances
+#	CC[0]#0: [0->1] 
+#Var[3]: 'a' A(b,c) has 1 instances
+#	CC[0]#0: [0->0] 
+#Var[4]: 'b' B(a,c) has 0 instances
+#	CC[0] : na
+#Var[5]: 'c' C(a,b) has 0 instances
+#	CC[0] : na
+#Var[6]: 'tri+' A(b!0),B(a!0,c!1),C(b!1) has 0 instances
+#Var[7]: 'closed' A(b!0,c!1),B(a!0,c!2),C(a!1,b!2) has 0 instances
+#	CC[0] : na
+#Var[8]: 'a.b' A(b),B(a) has 1 instances
+#	CC[0]#0: [0->0] 
+#	CC[1]#0: [1->1] 
+#Unary[9]: 'a.c' A(c),C(a) has 1 unary instances
+#	 ip#0: [|0:[0->0];1:[1->2]|] 
+#Var[9]: 'a.c' A(c),C(a) has 1 instances
+#	CC[0]#0: [0->0] 
+#	CC[1]#0: [1->2] 
+#Var[10]: 'b.c' B(c),C(b) has 0 instances
+#	CC[0] : na
+#	CC[1] : na
+#Var[11]: 'a..b' A(b!a.B) has 0 instances
+#Var[12]: 'a..c' A(c!a.C) has 0 instances
+#	CC[0] : na
+#Var[13]: 'b..c' B(c!b.C) has 1 instances
+#	CC[0]#0: [0->1] 
+#x[0]: 'k1' 0.000000 
+#x[1]: 'k2' 0.100000 
+#x[2]: 'k_off' 0.000100 
+#x[3]: 'n' 1.000000 
+#x[4]: 'mono' 1.000000 
+#x[5]: 'bi' 1.000000 
+#**********
+Drawing a rule...
+Applying 'a.c' with embedding:
+[1->2,0->0]
+Negative update as indicated by C#2 site 1
+Observable 9 is changed, updating {}
+Negative update as indicated by A#0 site 2
+Observable 3 is changed, updating {ALG(4)}
+Variable 4 is changed, updating {}
+Observable 9 is changed, updating {}
+Influence map tells me I should look for new injections of var[1]
+Trying to embed Var[1] using root 0 at node 0
+New embedding: [0->0]
+Observable 1 is changed, updating {ALG(5)}
+Variable 5 is changed, updating {}
+Influence map tells me I should look for new injections of var[7]
+Trying to embed Var[7] using root 0 at node 0
+No new embedding was found
+Influence map tells me I should look for new injections of var[12]
+Trying to embed Var[12] using root 0 at node 0
+New embedding: [0->0]
+Observable 12 is changed, updating {}
+Should now try perturbations {}
+[**Event 10 (Activity 0.200300)**]
+######
+Simulation ended (eff.: 0.625000)
