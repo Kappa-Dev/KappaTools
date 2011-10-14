@@ -43,12 +43,11 @@ let alg_of_id id state =
 		| Some var_f -> var_f
 	with | Invalid_argument msg -> invalid_arg ("State.kappa_of_id: " ^ msg)
 
-let connex set state = 
-	try 
-		let _ = SiteGraph.neighborhood ~check_connex:set state.graph (IntSet.choose set) (-1) 
-		in 
-		false
-	with SiteGraph.Is_connex -> true
+(*should use one representative of each cc of mixture in [set] in order to be more efficient*)
+let connex ?(d_map = IntMap.empty) set with_full_components state = 
+	let (is_connex,d_map,component,remaining_roots) = SiteGraph.neighborhood ~check_connex:set ~complete:with_full_components ~d_map:d_map state.graph (IntSet.choose set) (-1) 
+	in 
+	(is_connex,d_map,component,remaining_roots)
 
 
 let update_flux state id1 id2 w = 
@@ -133,7 +132,8 @@ let instances_of_square ?(disjoint=false) mix_id state =
 				(fun set inj -> match Injection.root_image inj with None -> invalid_arg "State.instances_of_square" | Some (_,u_i) -> IntSet.add u_i set
 				) IntSet.empty inj_list 
 			in
-			if connex roots state then cont else (embedding,codomain,inj_list)::cont
+			let (is_connex,_,_,_) = connex roots false state in
+			if is_connex  then cont else (embedding,codomain,inj_list)::cont
 		) [] embeddings 
 
 let rec value state var_id counter env =
@@ -280,7 +280,8 @@ let initialize_non_local_embeddings state =
 					let state = 
 						List.fold_left 
 						(fun state (phi_i,codom_i,prod_i) -> 
-							if not (connex codom_i state) then state
+							let (is_connex,_,_,_) = connex codom_i false state in
+							if is_connex then state
 							else 
 								(*one should add prod_i as a legal nl embedding for mix_id*)
 								(*and update prob_connect fields for each root node*)
@@ -547,24 +548,31 @@ let clean_injprod injprod state counter env =
 	let hp = InjProdHeap.remove injprod_id inj_prod_hp in (*removing injection product from the heap*)
 	state.nl_injections.(mix_id) <- (Some hp) ;
 	update_activity state (-1) mix_id counter env 
-	
+
+type embedding_t = DISJOINT of embedding_info | CONNEX of embedding_info | AMBIGUOUS of embedding_info
+and embedding_info = {map: int IntMap.t ; roots : IntSet.t ; components : IntSet.t IntMap.t option; depth_map : int IntMap.t option}	
+
+let empty_embedding = CONNEX {map=IntMap.empty ; roots = IntSet.empty ; components = None ; depth_map = None}
+let map_of embedding = match embedding with CONNEX e | DISJOINT e | AMBIGUOUS e -> e.map 
+				
 (**returns either valid embedding or raises Null_event if injection is no longer valid --function also cleans inj_hp and nodes as a side effect*)
-let check_validity injprod state counter env =
+let check_validity injprod with_full_components state counter env =
 	try
-		let embedding,codomain = 
+		let embedding,roots = 
 			InjProduct.fold_left
-			(fun (embedding,codomain) inj_i ->
+			(fun (embedding,roots) inj_i ->
 				if Injection.is_trashed inj_i then (*injection product is no longer valid because one of its element is trashed*) 
 					(if !Parameter.debugModeOn then Debug.tag "Clashing because one of the component of injection product is no longer valid" ;
 					raise (Null_event 3))
 				else
 				(*injection product might be invalid because co-domains are no longer connected*)
 					let map = Injection.fold (fun i j map -> IntMap.add i j map) inj_i embedding in
-					let codomain = match (Injection.root_image inj_i) with None -> invalid_arg "State.check_validity" | Some (_,u_i) -> IntSet.add u_i codomain in
-					(map,codomain)
+					let roots = match (Injection.root_image inj_i) with None -> invalid_arg "State.check_validity" | Some (_,u_i) -> IntSet.add u_i roots in
+					(map,roots)
 			) (IntMap.empty,IntSet.empty) injprod
 		in
-		if connex codomain state then embedding
+		let (is_connex,d_map,components,_) = connex roots with_full_components state in
+		if is_connex then {map = embedding ; components = Some (IntMap.add 0 components IntMap.empty) ; depth_map = Some d_map ; roots = roots}
 		else 
 			(if !Parameter.debugModeOn then Debug.tag "Clashing because injection product's codomain is no longer connex" ;
 			raise (Null_event 0))
@@ -575,10 +583,8 @@ let check_validity injprod state counter env =
 				raise (Null_event i)
 			end
 	
-(* Returns an array {|inj0;...;inj_k|] where arity(r)=k containing one     *)
-(* random injection per connected component of lhs(r)                      *)
 let select_injection (a2,a1) state mix counter env =
-	if Mixture.is_empty mix then IntMap.empty 
+	if Mixture.is_empty mix then empty_embedding 
 	else
 	let mix_id = Mixture.get_id mix in
 		
@@ -597,7 +603,8 @@ let select_injection (a2,a1) state mix counter env =
 		| Some prod_inj_hp ->
 			(try
 				let injprod = InjProdHeap.random prod_inj_hp in (*injprod is an array of size #cc(mix_id) and injprod.(i):Injection.t a partial injection of cc(i)*)
-				check_validity injprod state counter env (*returns either valid embedding or raises Null_event if injection is no longer valid --function also cleans inj_hp and nodes as a side effect*)
+				let embedding = check_validity injprod false state counter env in (*returns either valid embedding or raises Null_event if injection is no longer valid --function also cleans inj_hp and nodes as a side effect*)
+				(CONNEX embedding)
 			with
 			| Invalid_argument msg -> invalid_arg ("State.select_injection: "^msg)
 			)
@@ -639,10 +646,25 @@ let select_injection (a2,a1) state mix counter env =
 						(0, IntMap.empty, IntSet.empty, IntSet.empty) comp_injs
 				in
 				if clash_if_unary then
-					if connex roots state then (if !Parameter.debugModeOn then Debug.tag "Clashing because selected instance of binary rule has a connex codomain" ; raise (Null_event 1))
-				else () ;
-				embedding
+					(
+						let rem_roots = ref roots in
+						let comp_id = ref 0 in
+						let component_map = ref IntMap.empty in 
+						let depth_map = ref IntMap.empty in
+						while not (IntSet.is_empty !rem_roots) do 
+							let (_,d_map,components,remaining_roots) = connex ~d_map:!depth_map !rem_roots true (*compute cc until the end*) state in
+							if not ((IntSet.cardinal remaining_roots) = (IntSet.cardinal !rem_roots) - 1) then
+								(if !Parameter.debugModeOn then Debug.tag "Clashing because selected instance of n-nary rule is not totally disjoint" ; raise (Null_event 1)) ;
+							component_map := IntMap.add !comp_id components !component_map ;
+							rem_roots := remaining_roots ; 
+							comp_id := !comp_id + 1;
+							depth_map := d_map
+						done ;
+					 	(DISJOINT {map=embedding; depth_map=Some !depth_map; roots = roots ; components = Some !component_map})
+					)
+				else (AMBIGUOUS {map=embedding;depth_map=None ; roots = roots ; components = None})
 	in
+	
 	if not (Mixture.unary mix) then select_binary false 
 	else
 		let x = Random.float (a1 +. a2) in
@@ -676,10 +698,12 @@ let draw_rule state counter env =
 				if rd > (alpha /. alpha')
 				then 
 					(if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Clashing in order to correct for overestimation of activity of rule %d" rule_id);
+					Random_tree.add rule_id alpha state.activity_tree ;
 					raise (Null_event 3)) (*null event because of over approximation of activity*)
 				else ()
 		in
-		let embedding = try select_injection (a2,a1) state r.lhs counter env with 
+		let embedding_type = 
+			try select_injection (a2,a1) state r.lhs counter env with 
 			| Null_event 1 | Null_event 2 as exn -> (*null event because of clashing instance of a binary rule*)
 				if counter.Counter.cons_null_events > 1 then 
 					begin
@@ -695,8 +719,8 @@ let draw_rule state counter env =
 						end
 					end
 				else (if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Rule [%d] is clashing" rule_id) ; raise exn )
-		in 
-		((Some (r, embedding)), state)
+		in
+		((Some (r, embedding_type)), state)
 	with 
 		| Not_found -> (None,state)
 
@@ -1104,18 +1128,7 @@ let bind state cause (u, i) (v, j) side_effects pert_ids counter env =
 
 let break state cause (u, i) side_effects pert_ids counter env side_effect_free =
 	(*creating more cc's may wake up silenced rules*)
-	if IntSet.is_empty state.silenced then (if !Parameter.debugModeOn then Debug.tag "No silenced rule, skipping")
-	else
-			begin
-			let r = rule_of_id cause state in
-			if r.positive_species_impact then 
-				IntSet.fold
-				 (fun r_id _ ->
-					if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Updating silenced rule %d" r_id) ; 
-					update_activity state cause r_id counter env
-					 ) state.silenced () 
-			else (if !Parameter.debugModeOn then Debug.tag "Rule cannot increase species number") 
-		end ;
+	
 	let intf_u = Node.interface u and warn = 0 in
 	let (int_u_i, ptr_u_i) = intf_u.(i).Node.status
 	in
@@ -1175,7 +1188,32 @@ let delete state cause u side_effects pert_ids counter env =
 	)
 	u (env,side_effects,pert_ids)
 
-let apply state r embedding counter env =
+let apply state r embedding_t counter env =
+	
+	(*If rule is potentially breaking up some connected component*)
+	if IntSet.is_empty state.silenced then (if !Parameter.debugModeOn then Debug.tag "No silenced rule, skipping")
+	else
+		begin
+		if r.positive_species_impact then 
+			IntSet.fold
+			 (fun id _ ->
+				if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Updating silenced rule %d" id) ; 
+				update_activity state r.r_id id counter env ;
+				state.silenced <- IntSet.remove id state.silenced ;
+				) state.silenced () 
+		else (if !Parameter.debugModeOn then Debug.tag "Rule cannot decrease connectedness no need to update silenced rules") 
+		end ;
+		
+	(*If rule is potentially merging two connected components*)
+	begin
+		if r.negative_species_impact then
+			match embedding_t with
+				| CONNEX _ -> Debug.tag "Rule cannot increase connectedness because unary instance was selected"
+				| DISJOINT e -> (*connected components has already been computed for each roots*)
+				| AMBIGUOUS e -> (*one needs to compute connected components*)
+		else (if !Parameter.debugModeOn then Debug.tag "Rule cannot increase connectedness no need to update non local rules") 
+	end ;
+		
 	
 	let app state embedding fresh_map (id, i) =
 		try
@@ -1238,7 +1276,7 @@ let apply state r embedding counter env =
 							edit {state with graph = sg} script' phi	(IntMap.add i j psi) side_effects pert_ids env
 				end
 	in
-	edit state r.script embedding IntMap.empty Int2Set.empty IntSet.empty env
+	edit state r.script (map_of embedding_t) IntMap.empty Int2Set.empty IntSet.empty env
 
 
 let snapshot state counter desc hr env =

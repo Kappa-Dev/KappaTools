@@ -171,7 +171,7 @@ module Random_tree =
 			let _ = t.weight_of_nodes.(i) <- w
 			and _ = declare_unbalanced i t
 			in
-			t.total <- total
+			t.total <- (max 0.0 total)
 		
 		let random t =
 			try (unmask t (IntSet.choose t.inf_list),infinity) 

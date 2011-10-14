@@ -29,7 +29,7 @@ sig
 	val dump : ?with_lift: bool -> t -> Environment.t -> unit
 	val remove : t -> int -> unit
 	val ( & ) : Node.t -> int
-	val neighborhood :?interrupt_with: Mods.IntSet.t -> ?check_connex: Mods.IntSet.t -> t -> int -> int -> int Mods.IntMap.t
+	val neighborhood :?interrupt_with: Mods.IntSet.t -> ?check_connex: Mods.IntSet.t -> ?complete:bool -> ?d_map:int IntMap.t-> t -> int -> int -> (bool * int Mods.IntMap.t * IntSet.t * IntSet.t)
 	val add_lift : t -> Injection.t -> ((int * int) list) Mods.IntMap.t -> t
 	val add_prob_connect : t -> Mods.InjProduct.t -> t
 	val marshalize : t -> Node.t Mods.IntMap.t
@@ -66,7 +66,7 @@ struct
 	
 	exception Is_connex
 	
-	let neighborhood ?(interrupt_with = IntSet.empty) ?check_connex sg id radius =
+	let neighborhood ?(interrupt_with = IntSet.empty) ?check_connex ?(complete = false) ?(d_map = IntMap.empty) sg id radius =
 		let address node =
 			try ( & ) node
 			with | Not_found -> invalid_arg "Graph.neighborhood: not allocated" in
@@ -90,14 +90,19 @@ struct
 									then (d_map, to_do)
 									else (d_map, (id' :: to_do)))
 				node (d_map, to_do) in
-		let rec iter check_connex connex_set to_do dist_map =
+		let rec iter check_connex remaining_roots to_do dist_map component is_connex =
 			match to_do with
-			| [] -> dist_map
+			| [] -> (is_connex,dist_map,component,remaining_roots) 
 			| addr :: to_do ->
-					let connex_set = 
-						if not check_connex then connex_set 
+					let component = IntSet.add addr component in
+					let remaining_roots,is_connex = 
+						if not check_connex then (remaining_roots,is_connex) 
 						else 
-							let connex_set = IntSet.remove addr connex_set in if IntSet.is_empty connex_set then raise Is_connex else connex_set 
+							let set = IntSet.remove addr remaining_roots in
+							let is_connex = IntSet.is_empty set in
+							if complete then
+								(set,is_connex)
+							else raise Is_connex
 					in
 					let depth =
 						(try IntMap.find addr dist_map
@@ -106,16 +111,18 @@ struct
 								invalid_arg "Graph.neighborhood: invariant violation")
 					in
 					if (radius >= 0) && ((depth + 1) > radius)
-					then iter check_connex connex_set to_do dist_map
+					then iter check_connex remaining_roots to_do dist_map component is_connex
 					else
 						(let (dist_map', to_do') =
 								mark_next addr (depth + 1) dist_map to_do
 							in
-							if IntSet.exists (fun id -> IntMap.mem id dist_map')	interrupt_with then dist_map'
-							else iter check_connex connex_set to_do' dist_map')
+							if IntSet.exists (fun id -> IntMap.mem id dist_map')	interrupt_with then (is_connex,dist_map',component,remaining_roots)
+							else iter check_connex remaining_roots to_do' dist_map' component is_connex)
 		in 
-		let connex,set_connex = match check_connex with None -> (false,IntSet.empty) | Some set -> (true,set) in
-		iter connex set_connex [ id ] (IntMap.add id 0 IntMap.empty)
+		let check_connex,roots = match check_connex with None -> (false,IntSet.empty) | Some set -> (true,set) in
+		
+		try iter check_connex roots [ id ] (IntMap.add id 0 d_map) IntSet.empty false with Is_connex -> (true,IntMap.empty,IntSet.empty,IntSet.empty)
+			
 	
 	let add_lift sg phi port_map =
 		(IntMap.iter

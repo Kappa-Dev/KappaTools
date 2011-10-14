@@ -4,7 +4,7 @@
 
 %var: 'k1' 0.0
 %var: 'k2' 1.0E-1
-%var: 'k_off' 1.0E-4
+%var: 'k_off' 0.0
 
 'a.b' A(b),B(a) -> A(b!1),B(a!1) @ 'k2'('k1')
 'a.c' A(c),C(a) -> A(c!1),C(a!1) @ 'k2'('k1')
@@ -17,7 +17,7 @@
 %var: 'n' 1
 
 %init: 'n' A(b!1),B(a!1,c!2),C(b!2)
-#%init: 'n' A,B,C
+%init: 'n' A,B,C
 
 %var: 'ab' A(b!a.B,c)
 %var: 'ac' A(c!a.C,b)

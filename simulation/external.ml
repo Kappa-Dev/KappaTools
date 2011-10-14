@@ -81,8 +81,8 @@ let apply_effect p_id pert state counter env =
 					and envr = ref env 
 					in
 						while !n > 0 do (*FIXME: highly unefficient to compute new injection at each loop*)
-							let embedding = State.select_injection (infinity,0.) state r.lhs counter env in (*empty embedding, cannot raise null-event*)
-							let (env, state, side_effects, phi, psi, pert_ids_neg) = State.apply !st r embedding counter env in
+							let embedding_t = State.select_injection (infinity,0.) state r.lhs counter env in (*empty embedding, cannot raise null-event*)
+							let (env, state, side_effects, phi, psi, pert_ids_neg) = State.apply !st r embedding_t counter env in
 							let env,state,pert_ids_pos = State.positive_update state r (phi,psi) (side_effects,Int2Set.empty) counter env
 							in
 							if !n = (int_of_float x) then pert_ids := IntSet.union !pert_ids (IntSet.union pert_ids_neg pert_ids_pos) ; (*only the first time*)
@@ -116,13 +116,13 @@ let apply_effect p_id pert state counter env =
 									if !Parameter.debugModeOn then Debug.tag "Clashing instance detected: building matrix";
 									let matrix = State.instances_of_square mix_id state in
 										match matrix with
-											| (embedding,_,_)::_ -> Some embedding 
+											| (embedding,_,_)::_ -> Some (CONNEX {map=embedding; roots = IntSet.empty ; components = None ; depth_map = None}) 
 											| [] -> None
 						in
 							match opt with
 								| None -> (if !Parameter.debugModeOn then Debug.tag "No more non clashing instances were found!" ; cpt:=x)
-								| Some embedding ->
-									let (env, state, side_effects, phi, psi, pert_ids_neg) = State.apply state r embedding counter env in
+								| Some embedding_t ->
+									let (env, state, side_effects, phi, psi, pert_ids_neg) = State.apply state r embedding_t counter env in
 									let env,state,pert_ids_pos = State.positive_update state r (phi,psi) (side_effects,Int2Set.empty) counter env
 									in
 									if !cpt=0 then pert_ids := IntSet.union !pert_ids (IntSet.union pert_ids_neg pert_ids_pos) ; (*only the first time*)

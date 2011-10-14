@@ -9,6 +9,7 @@ let event state grid counter plot env =
 		let rd = Random.float 1.0 
 		and activity = (*Activity.total*) Random_tree.total state.State.activity_tree 
 		in
+		if activity < 0. then invalid_arg "Activity invariant violation" ;
 			let dt = -. (log rd /. activity) in 
 			if dt = infinity then 
 				let depset = Environment.get_dependencies Mods.TIME env in
@@ -49,19 +50,21 @@ let event state grid counter plot env =
 	let opt_new_state =
 		match opt_instance with
 			| None -> None
-			| Some (r,embedding) ->
+			| Some (r,embedding_t) ->
 				(**********************************************)
 				if !Parameter.debugModeOn then 
 				begin
+					let version,embedding = match embedding_t with State.DISJOINT emb -> ("binary",emb.State.map) | State.CONNEX emb -> ("unary",emb.State.map) | State.AMBIGUOUS emb -> ("ambig.",emb.State.map)
+					in 
 					Debug.tag
-					(Printf.sprintf "Applying '%s' with embedding:" 
+					(Printf.sprintf "Applying %s version of '%s' with embedding:" version 
 						(try Environment.rule_of_num r.Dynamics.r_id env with Not_found -> r.Dynamics.kappa)
 					); 
 					Debug.tag (Printf.sprintf "%s" (string_of_map string_of_int string_of_int IntMap.fold embedding)) 
 				end
 				else () ;
 				(********************************************)
-				try Some (State.apply state r embedding counter env,r.Dynamics.r_id) with Null_event _ -> None
+				try Some (State.apply state r embedding_t counter env,r.Dynamics.r_id) with Null_event _ -> None
 	
 	in
 	
