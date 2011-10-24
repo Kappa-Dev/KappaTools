@@ -3,6 +3,7 @@ exception StringFound of string
 exception MapFound of (int Mods.IntMap.t)
 exception False
 exception True
+exception Break
 exception Null_event of int (* 0:unary rule with binary instance 0:binary rule with unary instance 2:clashing instance 3:overapproximation clash  *)
 exception Deadlock
 exception UserInterrupted of string

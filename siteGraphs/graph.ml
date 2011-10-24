@@ -29,7 +29,14 @@ sig
 	val dump : ?with_lift: bool -> t -> Environment.t -> unit
 	val remove : t -> int -> unit
 	val ( & ) : Node.t -> int
-	val neighborhood :?interrupt_with: Mods.IntSet.t -> ?check_connex: Mods.IntSet.t -> ?complete:bool -> ?d_map:int IntMap.t-> t -> int -> int -> (bool * int Mods.IntMap.t * IntSet.t * IntSet.t)
+	val neighborhood :
+			?interrupt_with: Mods.IntSet.t -> 
+			?check_connex: Mods.IntSet.t -> 
+			?complete:bool -> 
+			?d_map:int IntMap.t -> 
+			?filter_elements:Environment.t -> 
+			t -> int -> int -> (bool * int Mods.IntMap.t * IntSet.t * IntSet.t)
+	
 	val add_lift : t -> Injection.t -> ((int * int) list) Mods.IntMap.t -> t
 	val add_prob_connect : t -> Mods.InjProduct.t -> t
 	val marshalize : t -> Node.t Mods.IntMap.t
@@ -66,7 +73,8 @@ struct
 	
 	exception Is_connex
 	
-	let neighborhood ?(interrupt_with = IntSet.empty) ?check_connex ?(complete = false) ?(d_map = IntMap.empty) sg id radius =
+	let neighborhood ?(interrupt_with = IntSet.empty) ?check_connex ?(complete = false) ?(d_map = IntMap.empty) ?filter_elements sg id radius =
+		print_newline();
 		let address node =
 			try ( & ) node
 			with | Not_found -> invalid_arg "Graph.neighborhood: not allocated" in
@@ -89,18 +97,28 @@ struct
 									if visited
 									then (d_map, to_do)
 									else (d_map, (id' :: to_do)))
-				node (d_map, to_do) in
+				node (d_map, to_do) 
+		in
+		
 		let rec iter check_connex remaining_roots to_do dist_map component is_connex =
 			match to_do with
 			| [] -> (is_connex,dist_map,component,remaining_roots) 
-			| addr :: to_do ->
-					let component = IntSet.add addr component in
+			| addr :: to_do -> (*adding addr to cc -only if addr is the root of a nl injection if filtering is enabled*)
+					let component = 
+						match filter_elements with 
+							| None -> IntSet.add addr component 
+							| Some env -> 
+								let n = node_of_id sg addr 
+								in 
+								if Environment.is_nl_root (Node.name n) env then IntSet.add addr component else component
+					in
+					(*checking connectivity of remaining_roots*)
 					let remaining_roots,is_connex = 
 						if not check_connex then (remaining_roots,is_connex) 
 						else 
 							let set = IntSet.remove addr remaining_roots in
 							let is_connex = IntSet.is_empty set in
-							if complete then
+							if complete || (not is_connex) then
 								(set,is_connex)
 							else raise Is_connex
 					in

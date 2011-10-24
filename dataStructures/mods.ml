@@ -79,6 +79,13 @@ module InjProduct =
 		
 		let is_trashed injprod = match injprod.address with Some (-1) -> true | _ -> false
 		
+		exception False
+		
+		let is_complete injprod = 
+			try 
+				(Array.iteri (fun i inj_i -> let a,_ = Injection.get_coordinate inj_i in if a<0 then raise False else ()) injprod.elements ; true)
+			with False -> false
+			
 		let size injprod = Array.length injprod.elements
 		
 		let find i injprod = try injprod.elements.(i) with Invalid_argument _ -> raise Not_found

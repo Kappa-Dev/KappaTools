@@ -30,6 +30,8 @@ type t = {
 	
 	rule_indices : IntSet.t ;
 	empty_lhs : IntSet.t ;
+	
+	nl_elements : Int2Set.t IntMap.t (*ag_nme -> {(r_id,cc_id),...}*)
 	(*log : Log.t*)
 }
 
@@ -54,8 +56,21 @@ let empty =
 	rule_of_pert = IntMap.empty ;
 	rule_indices = IntSet.empty ;
 	dependencies = DepMap.empty ;
-	empty_lhs = IntSet.empty
+	empty_lhs = IntSet.empty ;
+	nl_elements = IntMap.empty
 }
+
+(**in order to declare that mix_id -which is the lhs of a unary rule- is expecting an agent named [ag_nme] with a site named [ste_nme] as the root of component [cc_id] of the injection*)
+let declare_nl_element mix_id cc_id ag_nme env =
+	let coordSet = try IntMap.find ag_nme env.nl_elements with Not_found -> Int2Set.empty in
+	let coordSet' = Int2Set.add (mix_id,cc_id) coordSet in
+	let nl_elements' = IntMap.add ag_nme coordSet' env.nl_elements in
+	{env with nl_elements = nl_elements'}
+
+(**Returns a map [ste_map] s.t (ste_map site_name)={(rule_ID,cc_id)_0,...,}_i the set of unary rule ids which have (ag_nme,ste_nme) as root for injection cc_id*)
+let get_nl_coord ag_nme env = IntMap.find ag_nme env.nl_elements
+let is_nl_root ag_nme env = IntMap.mem ag_nme env.nl_elements
+let is_nl_rule r_id env = IntMap.mem r_id env.unary_rule_of_num
 
 let next_pert_id env = env.fresh_pert
 let declare_empty_lhs id env = {env with empty_lhs = IntSet.add id env.empty_lhs}

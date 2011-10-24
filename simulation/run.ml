@@ -64,7 +64,7 @@ let event state grid counter plot env =
 				end
 				else () ;
 				(********************************************)
-				try Some (State.apply state r embedding_t counter env,r.Dynamics.r_id) with Null_event _ -> None
+				try Some (State.apply state r embedding_t counter env,r) with Null_event _ -> None
 	
 	in
 	
@@ -73,16 +73,54 @@ let event state grid counter plot env =
 	
 	let env,state,pert_ids',grid = 
 		match opt_new_state with
-			| Some ((env,state,side_effect,phi,psi,pert_ids),r_id) ->
+			| Some ((env,state,side_effect,embedding_t,psi,pert_ids),r) ->
 				
 				counter.Counter.cons_null_events <- 0 ; (*resetting consecutive null event counter since a real rule was applied*)  
-				let r = State.rule_of_id r_id state in
+				
+				(*Local positive update TODO: adding intra detection*)
 				let env,state,pert_ids' = 
-					State.positive_update state r (phi,psi) (side_effect,Int2Set.empty) counter env
+					State.positive_update state r (State.map_of embedding_t,psi) (side_effect,Int2Set.empty) counter env
 				in
+				
+				(*Non local positive update --Should move all this into State.nl_positive update*)
+				let _ (*should collect new state here*) =
+					(*If rule is potentially breaking up some connected component*)
+					begin
+						match r.Dynamics.cc_impact with 
+							| None -> (if !Parameter.debugModeOn then Debug.tag "Rule cannot decrease connectedness no need to update silenced rules") 
+							| Some _ -> (*should be more precise here*)
+								if IntSet.is_empty state.State.silenced then (if !Parameter.debugModeOn then Debug.tag "No silenced rule, skipping")
+								else
+					 				IntSet.fold
+									(fun id _ ->
+									if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Updating silenced rule %d" id) ; 
+									State.update_activity state r.Dynamics.r_id id counter env ;
+									state.State.silenced <- IntSet.remove id state.State.silenced ;
+									) state.State.silenced () 
+					end ;
+						
+					(*If rule is potentially merging two connected components*)
+					begin
+						match r.Dynamics.cc_impact with
+							| None -> 
+								(if !Parameter.debugModeOn then 
+									Debug.tag "No possible side effect update of unary rules because applied rule cannot increase connectedness"
+								)
+							| Some (connect_map,_,_) ->
+								begin
+									match embedding_t with
+										| State.CONNEX _ -> 
+											(if !Parameter.debugModeOn then Debug.tag "No possible side effect update of unary rules because a unary instance was applied")
+										| State.DISJOINT e | State.AMBIGUOUS e -> 
+											State.nl_positive_update r e state counter env (*one may need to compute connected components if they are not present in e, as in the AMBIGUOUS case*)
+								end
+					end 
+				in
+				(****************END POSITIVE UPDATE*****************)
+				
 					let grid = 
 						if !Parameter.causalModeOn then
-							Causal.record r.Dynamics.lhs (Some (r.Dynamics.pre_causal,side_effect,psi,false,r.Dynamics.r_id)) phi state counter false grid env
+							Causal.record r.Dynamics.lhs (Some (r.Dynamics.pre_causal,side_effect,psi,false,r.Dynamics.r_id)) (State.map_of embedding_t) state counter false grid env
 						else grid
 					in
 					(env,state,IntSet.union pert_ids pert_ids',grid)

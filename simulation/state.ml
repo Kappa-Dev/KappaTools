@@ -44,8 +44,13 @@ let alg_of_id id state =
 	with | Invalid_argument msg -> invalid_arg ("State.kappa_of_id: " ^ msg)
 
 (*should use one representative of each cc of mixture in [set] in order to be more efficient*)
-let connex ?(d_map = IntMap.empty) set with_full_components state = 
-	let (is_connex,d_map,component,remaining_roots) = SiteGraph.neighborhood ~check_connex:set ~complete:with_full_components ~d_map:d_map state.graph (IntSet.choose set) (-1) 
+let connex ?(d_map = IntMap.empty) ?(filter = false) ?start_with set with_full_components state env =  
+	let start_root = match start_with with Some r -> r | None -> IntSet.choose set in
+	let (is_connex,d_map,component,remaining_roots) = 
+		(*if filter then
+			SiteGraph.neighborhood ~check_connex:set ~complete:with_full_components ~d_map:d_map ~filter_elements:env state.graph start_root (-1) 
+		else*)
+			SiteGraph.neighborhood ~check_connex:set ~complete:with_full_components ~d_map:d_map state.graph start_root (-1) 
 	in 
 	(is_connex,d_map,component,remaining_roots)
 
@@ -83,7 +88,7 @@ let nl_instance_number mix_id state env =
 
 
 (**[instances_of_square mix_id state] returns [(inj_0,codom_0,prod_0);...] the list of full and valid embeddings inj_i, their codomains codom_j and the explicit product prod_i=[phi_cc0;phi_cc1;...]*)
-let instances_of_square ?(disjoint=false) mix_id state =
+let instances_of_square ?(disjoint=false) mix_id state env =
 	let extend (inj, codom) phi =
 		try
 			Some
@@ -107,20 +112,21 @@ let instances_of_square ?(disjoint=false) mix_id state =
 								| None -> raise Not_found (*this cc injection is missing*)
 								| Some injhp ->
 										List.fold_left
-											(fun cont (part_inj, part_codom, part_injs) ->
-														let ext_injhp =
-															InjectionHeap.fold
-																(fun _ phi cont' ->
-																			let opt = extend (part_inj, part_codom) phi
-																			in
-																			match opt with
-																			| None -> cont'
-																			| Some (ext_inj, ext_codom) ->
-																					(ext_inj, ext_codom, phi::part_injs) :: cont')
-																injhp []
-														in ext_injhp @ cont)
-											[] m)
-					[ (IntMap.empty, IntSet.empty, []) ] comp_injs
+										(fun cont (part_inj, part_codom, part_injs) ->
+													let ext_injhp =
+														InjectionHeap.fold
+															(fun _ phi cont' ->
+																		let opt = extend (part_inj, part_codom) phi
+																		in
+																		match opt with
+																		| None -> cont'
+																		| Some (ext_inj, ext_codom) ->
+																				(ext_inj, ext_codom, phi::part_injs) :: cont')
+															injhp []
+													in 
+													ext_injhp @ cont
+										) [] m
+					)	[ (IntMap.empty, IntSet.empty, []) ] comp_injs
 		with Not_found -> []
 	in
 	if not disjoint then embeddings
@@ -132,7 +138,7 @@ let instances_of_square ?(disjoint=false) mix_id state =
 				(fun set inj -> match Injection.root_image inj with None -> invalid_arg "State.instances_of_square" | Some (_,u_i) -> IntSet.add u_i set
 				) IntSet.empty inj_list 
 			in
-			let (is_connex,_,_,_) = connex roots false state in
+			let (is_connex,_,_,_) = connex roots false state env in
 			if is_connex  then cont else (embedding,codomain,inj_list)::cont
 		) [] embeddings 
 
@@ -266,7 +272,7 @@ let generate_embeddings sg u_i mix comp_injs =
 	in 
 	iter 0 sg comp_injs 
 
-let initialize_non_local_embeddings state = 
+let initialize_non_local_embeddings state env = 
 	let state,_ = 
 	Array.fold_left 
 	(fun (state,mix_id) comp_inj ->
@@ -276,12 +282,12 @@ let initialize_non_local_embeddings state =
 				let mix = kappa_of_id mix_id state in
 				if not (Mixture.unary mix) then (state,mix_id+1) (*rule has no unary version*)
 				else
-					let prods = instances_of_square mix_id state in
+					let prods = instances_of_square mix_id state env in
 					let state = 
 						List.fold_left 
 						(fun state (phi_i,codom_i,prod_i) -> 
-							let (is_connex,_,_,_) = connex codom_i false state in
-							if is_connex then state
+							let (is_connex,_,_,_) = connex codom_i false state env in
+							if not is_connex then state
 							else 
 								(*one should add prod_i as a legal nl embedding for mix_id*)
 								(*and update prob_connect fields for each root node*)
@@ -305,7 +311,7 @@ let initialize_non_local_embeddings state =
 
 
 (**[initialize_embeddings state mix_list] *) (*mix list is the list of kappa observables one wishes to track during simulation*)
-let initialize_embeddings state mix_list =
+let initialize_embeddings state mix_list env =
 	let state = 
 		SiteGraph.fold 
 		(fun i node_i state ->
@@ -328,7 +334,7 @@ let initialize_embeddings state mix_list =
 		)
 		state.graph state
 	in
-	initialize_non_local_embeddings state 	
+	initialize_non_local_embeddings state env 	
 
 
 let build_influence_map rules patterns env =
@@ -478,7 +484,7 @@ let initialize sg rules kappa_vars alg_vars obs (pert,rule_pert) counter env =
 	
 	if !Parameter.debugModeOn then Debug.tag "\t * Initializing injections...";
 	let state = (*initializing injections*)
-		initialize_embeddings state_init kappa_variables
+		initialize_embeddings state_init kappa_variables env
 	in
 	
 	if !Parameter.debugModeOn then Debug.tag "\t * Initializing variables...";
@@ -571,7 +577,7 @@ let check_validity injprod with_full_components state counter env =
 					(map,roots)
 			) (IntMap.empty,IntSet.empty) injprod
 		in
-		let (is_connex,d_map,components,_) = connex roots with_full_components state in
+		let (is_connex,d_map,components,_) = connex roots with_full_components state env in
 		if is_connex then {map = embedding ; components = Some (IntMap.add 0 components IntMap.empty) ; depth_map = Some d_map ; roots = roots}
 		else 
 			(if !Parameter.debugModeOn then Debug.tag "Clashing because injection product's codomain is no longer connex" ;
@@ -645,23 +651,24 @@ let select_injection (a2,a1) state mix counter env =
 													invalid_arg ("State.select_injection: " ^ msg)))
 						(0, IntMap.empty, IntSet.empty, IntSet.empty) comp_injs
 				in
+				let rec build_component_map roots depth_map component_map = 
+					if IntSet.is_empty roots then (depth_map,component_map)
+					else
+						let root = IntSet.choose roots in
+						let (_,d_map,components,remaining_roots) = connex ~d_map:depth_map ~filter:true ~start_with:root roots true state env 
+						in
+						if not ((IntSet.cardinal remaining_roots) = (IntSet.cardinal roots) - 1) then
+							(if !Parameter.debugModeOn then Debug.tag "Clashing because selected instance of n-nary rule is not totally disjoint" ; 
+							raise (Null_event 1)
+							)
+						else () ;
+						let component_map = IntMap.add root components component_map
+						in
+						build_component_map remaining_roots d_map component_map
+				in
 				if clash_if_unary then
-					(
-						let rem_roots = ref roots in
-						let comp_id = ref 0 in
-						let component_map = ref IntMap.empty in 
-						let depth_map = ref IntMap.empty in
-						while not (IntSet.is_empty !rem_roots) do 
-							let (_,d_map,components,remaining_roots) = connex ~d_map:!depth_map !rem_roots true (*compute cc until the end*) state in
-							if not ((IntSet.cardinal remaining_roots) = (IntSet.cardinal !rem_roots) - 1) then
-								(if !Parameter.debugModeOn then Debug.tag "Clashing because selected instance of n-nary rule is not totally disjoint" ; raise (Null_event 1)) ;
-							component_map := IntMap.add !comp_id components !component_map ;
-							rem_roots := remaining_roots ; 
-							comp_id := !comp_id + 1;
-							depth_map := d_map
-						done ;
-					 	(DISJOINT {map=embedding; depth_map=Some !depth_map; roots = roots ; components = Some !component_map})
-					)
+					let (d_map,comp_map) = build_component_map roots IntMap.empty IntMap.empty in
+					(DISJOINT {map=embedding; depth_map=Some d_map; roots = roots ; components = Some comp_map})
 				else (AMBIGUOUS {map=embedding;depth_map=None ; roots = roots ; components = None})
 	in
 	
@@ -676,6 +683,7 @@ let draw_rule state counter env =
 	try
 		(*selects rule_id with a proba that respects activity*)
 		let rule_id,alpha' = Random_tree.random state.activity_tree in
+		let _ = if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Picked rule [%d] at random." rule_id) in
 		let r =
 			try rule_of_id rule_id state
 			with | Not_found -> invalid_arg "State.draw_rule" 
@@ -709,7 +717,7 @@ let draw_rule state counter env =
 					begin
 						(if !Parameter.debugModeOn then Debug.tag "Max consecutive clashes reached, I am giving up square approximation at this step" else ()) ;
 						let _ = Counter.reset_consecutive_null_event counter in
-						let embeddings = instances_of_square ~disjoint:true rule_id state in
+						let embeddings = instances_of_square ~disjoint:true rule_id state env in
 						let alpha,_ = eval_activity ~using:(List.length embeddings) r state counter env in 
 						begin
 							Random_tree.add rule_id alpha state.activity_tree ;
@@ -835,6 +843,112 @@ let rec update_dep state dep_in pert_ids counter env =
 let enabled r state = 
 	let r_id = Mixture.get_id r.lhs in 
 	try Hashtbl.find state.influence_map r_id with Not_found -> IntMap.empty
+
+(**updating non local mixtures after application of a linking rule using embedding [embedding_info]*)
+let nl_positive_update r embedding_info state counter env =
+	if !Parameter.debugModeOn then Debug.tag "Looking for side effect update of non local rules..." ;
+	let use_components,components = 
+		match embedding_info.components with
+			| Some map -> (true,map)
+			| None -> (false,IntMap.empty) (*connected components were not computed during rule application*)
+	in
+	(*case one tries to gather intra redexes in each components -- nb this may lead to false intras but that will be rejected upon rule application*)
+	let tmp_extend part_inj inj =
+		let _,cc_id = Injection.get_coordinate inj in
+		if IntMap.mem cc_id part_inj then failwith "Invariant violation"
+		else
+		IntMap.add cc_id inj part_inj
+	in
+	let state = 
+		if use_components then
+			(*reusing components that were computed to check that the rule was indeed binary*)
+			let con_map = match r.cc_impact with None -> invalid_arg "State.nl_pos_upd: cc_impact is not initialized"  | Some (map,_,_) -> map in
+			
+			let extensions,found = (*r_id -> cc_id -> part_inj_list*)
+				IntMap.fold 
+				(fun eq cc_set (extensions,found) ->
+					if !Parameter.debugModeOn then
+						Debug.tag (Printf.sprintf "CCs %s are merged by the rule and CC[%d] is the representative" (string_of_set string_of_int IntSet.fold cc_set) eq) ;
+					IntSet.fold 
+					(fun cc_i (extensions,found) ->
+						let root = 
+							match Mixture.root_of_cc r.lhs cc_i with Some r -> IntMap.find r embedding_info.map | None -> invalid_arg "State.nl_positive_update" 
+						in
+						let _ = 
+							if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Exploring into image of CC[%d] computed during rule %d application" cc_i r.r_id)
+			 			in
+						let component_i = 
+							try IntMap.find root components with Not_found -> invalid_arg "nl_pos_upd"
+						in
+						if !Parameter.debugModeOn then Debug.tag (Tools.string_of_set string_of_int IntSet.fold component_i) ;
+						let opt = NonLocal.search_elements state.graph component_i extensions env
+						in
+						match opt with
+							| Some ext -> (ext,found+1)
+							| None -> (extensions,found) (*no partial intra was found in cc_i *)
+					) cc_set (extensions,found) 
+				) con_map (IntMap.empty,0)
+			in
+			if found < 2 then 
+				(if !Parameter.debugModeOn then Debug.tag "Potential new intras are not shared between merged cc and cannot be new, skipping"; state)
+			else
+				let state =
+					IntMap.fold 
+					(fun r_id cc_map state ->
+						if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Trying to find intra(s) for rule [%d]" r_id) ;
+						
+						let lhs = kappa_of_id r_id state in
+						try
+							let intras_for_r_id,cc = 
+								IntMap.fold
+								(fun cc_id injs_list (new_intras,cpt) ->
+									if cpt <> cc_id then raise Break
+									else
+										let new_intras = 
+											List.fold_left
+											(fun cont part_prod_inj ->
+												let l = 
+													List.fold_left 
+													(fun cont inj ->
+														(tmp_extend part_prod_inj inj)::cont
+													) cont injs_list
+												in
+												l@cont
+											) [] new_intras
+										in
+										(new_intras,cpt+1)
+								) cc_map ([IntMap.empty],0)
+							in
+							
+							if cc <> Mixture.arity lhs then 
+								(if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "One CC of rule [%d] has no candidate for intra, aborting" r_id); state)
+							else
+								List.fold_left  (*nl_injections : (InjProdHeap.t option) array*)
+								(fun state injprod_map -> 
+									let injprod_hp = match state.nl_injections.(r_id) with
+										| Some hp -> hp
+										| None -> InjProdHeap.create !Parameter.defaultHeapSize 
+									in
+									let ip = match InjProdHeap.next_alloc injprod_hp with None -> InjProduct.create (Mixture.arity lhs) r_id | Some ip -> ip
+									in
+									let ip = IntMap.fold (fun cc_id inj injprod -> InjProduct.add cc_id inj injprod ; injprod) injprod_map ip
+									in
+									let injprod_hp = InjProdHeap.alloc ip injprod_hp in
+									state.nl_injections.(r_id) <- Some injprod_hp ;
+									update_activity state r.r_id r_id counter env ;
+									state
+								) state intras_for_r_id
+					with 
+					| Break -> (if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "One CC of rule [%d] has no candidate for intra, aborting" r_id); state)
+					) extensions state
+					in
+					state
+				
+		(*case where components were not computed because r is ambiguous, one should then compute connected components of cc's that were merged by r*)
+		else
+			state (*TODO*)
+	in
+	()
 	
 let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) counter env = (*pert_intro is temporary*)
 	(*let t_upd = Profiling.start_chrono () in*)
@@ -988,7 +1102,7 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 	
 
 (* Negative update *)
-let negative_upd state cause (u,i) int_lnk counter env =
+let negative_upd state cause (u,i) int_lnk counter env = 
 	
 	if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Negative update as indicated by %s#%d site %d" 
 	(Environment.name (Node.name u) env) (Node.get_address u) i);
@@ -1189,32 +1303,7 @@ let delete state cause u side_effects pert_ids counter env =
 	u (env,side_effects,pert_ids)
 
 let apply state r embedding_t counter env =
-	
-	(*If rule is potentially breaking up some connected component*)
-	if IntSet.is_empty state.silenced then (if !Parameter.debugModeOn then Debug.tag "No silenced rule, skipping")
-	else
-		begin
-		if r.positive_species_impact then 
-			IntSet.fold
-			 (fun id _ ->
-				if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Updating silenced rule %d" id) ; 
-				update_activity state r.r_id id counter env ;
-				state.silenced <- IntSet.remove id state.silenced ;
-				) state.silenced () 
-		else (if !Parameter.debugModeOn then Debug.tag "Rule cannot decrease connectedness no need to update silenced rules") 
-		end ;
 		
-	(*If rule is potentially merging two connected components*)
-	begin
-		if r.negative_species_impact then
-			match embedding_t with
-				| CONNEX _ -> Debug.tag "Rule cannot increase connectedness because unary instance was selected"
-				| DISJOINT e -> (*connected components has already been computed for each roots*)
-				| AMBIGUOUS e -> (*one needs to compute connected components*)
-		else (if !Parameter.debugModeOn then Debug.tag "Rule cannot increase connectedness no need to update non local rules") 
-	end ;
-		
-	
 	let app state embedding fresh_map (id, i) =
 		try
 			match id with
@@ -1223,12 +1312,13 @@ let apply state r embedding_t counter env =
 		with 
 			| Not_found -> invalid_arg (Printf.sprintf "State.apply: Incomplete embedding when applying rule %s on [%s -> %d]" r.kappa (match id with FRESH j -> (Printf.sprintf "F(%d)" j) | KEPT j -> string_of_int j) i)  
 	in
-	let rec edit state script phi psi side_effects pert_ids env =
+	let rec edit state script psi side_effects pert_ids env =
 		(* phi: embedding, psi: fresh map *)
 		let sg = state.graph
+		and phi = map_of embedding_t
 		in
 		match script with
-		| [] -> (env,state, (side_effects:Int2Set.t), phi, psi, pert_ids)
+		| [] -> (env,state, (side_effects:Int2Set.t), embedding_t, psi, pert_ids)
 		| action :: script' ->
 				begin
 					match action with
@@ -1241,19 +1331,19 @@ let apply state r embedding_t counter env =
 							let env,side_effects,pert_ids =
 								bind state r.r_id (u, i) (v, j) side_effects pert_ids counter env
 							in
-							edit state script' phi psi side_effects pert_ids env
+							edit state script' psi side_effects pert_ids env
 					| FREE (p,side_effect_free) ->
 							let x = app state phi psi p in
 							let (warn, env, side_effects,pert_ids) = break state r.r_id x side_effects pert_ids counter env side_effect_free
 							in
 							if warn > 0 then Counter.inc_null_action counter ;
-							edit state script' phi psi side_effects pert_ids env
+							edit state script' psi side_effects pert_ids env
 					| MOD (p, i) ->
 							let x = app state phi psi p in
 							let warn,env, pert_ids = modify state r.r_id x i pert_ids counter env
 							in
 							if warn > 0 then Counter.inc_null_action counter ; 
-							edit state script' phi psi side_effects pert_ids env
+							edit state script' psi side_effects pert_ids env
 					| DEL i ->
 							let phi_i =
 								(try IntMap.find i phi	with Not_found ->	invalid_arg "State.apply: incomplete embedding 3") 
@@ -1262,7 +1352,7 @@ let apply state r embedding_t counter env =
 								let env,side_effects,pert_ids = delete state r.r_id node_i side_effects pert_ids counter env
 								in
 								SiteGraph.remove sg phi_i;
-								edit state script' phi psi side_effects pert_ids env
+								edit state script' psi side_effects pert_ids env
 					| ADD (i, name) ->
 							let node = Node.create name env in
 							let sg = SiteGraph.add sg node in
@@ -1273,10 +1363,10 @@ let apply state r embedding_t counter env =
 								with
 								| Not_found -> invalid_arg "State.apply: not allocated") 
 							in
-							edit {state with graph = sg} script' phi	(IntMap.add i j psi) side_effects pert_ids env
+							edit {state with graph = sg} script' (IntMap.add i j psi) side_effects pert_ids env
 				end
 	in
-	edit state r.script (map_of embedding_t) IntMap.empty Int2Set.empty IntSet.empty env
+	edit state r.script IntMap.empty Int2Set.empty IntSet.empty env
 
 
 let snapshot state counter desc hr env =

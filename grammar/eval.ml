@@ -452,7 +452,7 @@ let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take 
 	in 
 	let lhs = match k_alt with None -> lhs | Some _ -> Mixture.set_unary lhs in
 	let rhs,env = mixture_of_ast ~tolerate_new_state:tolerate_new_state None true env ast_rule.rhs in
-	let (script, balance,added,modif_sites,side_effect,path_impact) = Dynamics.diff lhs rhs ast_rule_label.lbl_nme env
+	let (script, balance,added,modif_sites,side_effect) = Dynamics.diff lhs rhs ast_rule_label.lbl_nme env
 	
 	and kappa_lhs = Mixture.to_kappa false lhs env
 	
@@ -473,10 +473,96 @@ let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take 
 			(fun dep env -> Environment.add_dependencies dep (RULE r_id) env)
 			(DepSet.union dep dep_alt) env
 	in
-	let pos_cc_impact = BndTypeSet.exists (fun bnd_type -> match bnd_type with Dynamics.Break _ | Dynamics.Semi  _ -> true | _ -> false) path_impact
-	and neg_cc_impact = BndTypeSet.exists (fun bnd_type -> match bnd_type with Dynamics.Link _ -> true | _ -> false) path_impact
-	in
 	let pre_causal = Dynamics.compute_causal lhs rhs script env in
+	let connect_impact,disconnect_impact,side_eff_impact =
+		List.fold_left 
+		(fun (con_map,dis_map,side_eff) action ->
+			match action with
+				| Dynamics.BND ((KEPT id,s),(KEPT id',s')) -> (*binding with a fresh agent doesn't impact connectedness*)
+					let cc_id = Mixture.component_of_id id lhs
+					and cc_id' = Mixture.component_of_id id' lhs
+					in
+					if cc_id = cc_id' then (con_map,dis_map,side_eff) (*rule binds two ports that were already part of the same cc*)
+					else 
+						let eq_id = try IntMap.find cc_id con_map with Not_found -> cc_id
+						and eq_id'= try IntMap.find cc_id' con_map with Not_found -> cc_id'
+						in
+						let min_eq,max_eq = (min eq_id eq_id',max eq_id eq_id') in
+						let con_map = IntMap.add cc_id min_eq con_map in
+						let con_map = IntMap.add cc_id' min_eq con_map in
+						let con_map = IntMap.add max_eq min_eq con_map in
+						(con_map,dis_map,side_eff)
+				| Dynamics.FREE ((KEPT id,s),side_effect_free) ->
+					if side_effect_free then
+						begin
+						let id' = match Mixture.follow (id,s) lhs with None -> invalid_arg "Eval.build_cc_impact: Free action should be side effect free" | Some (id',s') -> id' in
+						let is_deleted = not (IntMap.mem id' (Mixture.agents rhs)) in
+						if is_deleted then (con_map,dis_map,side_eff) (*will deal with this case in the deletion action*)
+						else
+							let cc_id = Mixture.component_of_id id rhs
+							and cc_id' = Mixture.component_of_id id' rhs
+							in
+							if cc_id = cc_id' then (con_map,dis_map,side_eff) (*rule breaks two ports that are still connected in the rhs*)
+							else 
+								let class1 = try IntMap.find cc_id dis_map with Not_found -> IntSet.empty
+								and class2 =  try IntMap.find cc_id' dis_map with Not_found -> IntSet.empty
+								in
+								let dis_map = IntMap.add cc_id (IntSet.add cc_id' class1) dis_map in
+								let dis_map = IntMap.add cc_id' (IntSet.add cc_id class2) dis_map in
+								(con_map,dis_map,side_eff)
+						end
+					else (*semi link deletion*)
+						let set = try IntMap.find id side_eff with Not_found -> IntSet.empty in
+						let side_eff = IntMap.add id (IntSet.add s set) side_eff in
+						(con_map,dis_map,side_eff)
+				| Dynamics.DEL id -> 
+					let ag = Mixture.agent_of_id id lhs in
+					let sign = Environment.get_sig (Mixture.name ag) env in
+					let set = try IntMap.find id (side_eff:IntSet.t IntMap.t) with Not_found -> IntSet.empty in
+					let set = 
+						Signature.fold 
+						(fun site_id set -> 
+							if site_id = 0 then set 
+							else
+								let opt = Mixture.follow (id,site_id) lhs in
+								match opt with
+									| None ->
+										begin 
+										try 
+											let _,lnk = IntMap.find site_id (Mixture.interface (Mixture.agent_of_id id lhs)) in 
+											match lnk with 
+												| Node.BND | Node.TYPE _ -> IntSet.add site_id set (*semi link deletion*) 
+												| _ -> set
+										with
+											| Not_found -> IntSet.add site_id set (*deletion of site that was not mentionned so possible side_effect*)
+										end
+									| Some _ -> IntSet.add site_id set (*link deletion because deleted agent was connected in the lhs*)
+						) sign set
+					in 
+						(con_map,dis_map,IntMap.add id set side_eff)
+				| _ -> (con_map,dis_map,side_eff)
+		) (IntMap.empty,IntMap.empty,IntMap.empty) script
+	in
+	let connect_impact = 
+		IntMap.fold 
+		(fun cc_id eq_id map -> let set = try IntMap.find eq_id map with Not_found -> IntSet.empty in IntMap.add eq_id (IntSet.add cc_id set) map
+		) connect_impact IntMap.empty 
+	in
+	let env = 
+		match k_alt with 
+			| None -> env
+			| Some _ -> (*rule has a unary version*)
+				let ptr_env = ref env in
+				let cc_id = ref 0 in
+				while !cc_id < (Mixture.arity lhs) do
+					let ag_root = 
+						let id = match Mixture.root_of_cc lhs !cc_id with None -> invalid_arg "Eval.rule_of_ast" | Some i -> i in
+						Mixture.agent_of_id id lhs
+					in
+					ptr_env:= Environment.declare_nl_element (Mixture.get_id lhs) !cc_id (Mixture.name ag_root) env ;
+					cc_id:=!cc_id+1 
+				done ; !ptr_env
+	in
 	(env,
 		{
 			Dynamics.k_def = k_def;
@@ -494,9 +580,7 @@ let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take 
 			Dynamics.modif_sites = modif_sites ;
 			Dynamics.is_pert = false ;
 			Dynamics.pre_causal = pre_causal ;
-			Dynamics.path_impact = path_impact ;
-			Dynamics.negative_species_impact = neg_cc_impact ;
-			Dynamics.positive_species_impact = pos_cc_impact 
+			Dynamics.cc_impact = Some (connect_impact,disconnect_impact,side_eff_impact)  
 		})
 
 let variables_of_result env res =
@@ -650,7 +734,7 @@ let pert_of_result variables env res =
 							let lhs = Mixture.empty (Some id)
 							and rhs = mix 
 							in
-							let (script,balance,added,modif_sites,side_effect,path_impact) = Dynamics.diff lhs rhs (Some (str_pert,pos)) env
+							let (script,balance,added,modif_sites,side_effect) = Dynamics.diff lhs rhs (Some (str_pert,pos)) env
 							and kappa_lhs = ""
 							and kappa_rhs = Mixture.to_kappa false rhs env in
 							let r_id = Mixture.get_id lhs in
@@ -680,9 +764,7 @@ let pert_of_result variables env res =
 								Dynamics.modif_sites = modif_sites ;
 								Dynamics.is_pert = true ;
 								Dynamics.pre_causal = pre_causal ;
-								Dynamics.path_impact = path_impact ;
-								Dynamics.positive_species_impact = false ;
-								Dynamics.negative_species_impact = false 
+								Dynamics.cc_impact = None 
 							}
 							in
 							(env,rule_opt)
@@ -692,7 +774,7 @@ let pert_of_result variables env res =
 							let lhs = mix
 							and rhs = Mixture.empty None
 							in
-							let (script,balance,added,modif_sites,side_effect,path_impact) = Dynamics.diff lhs rhs (Some (str_pert,pos)) env
+							let (script,balance,added,modif_sites,side_effect) = Dynamics.diff lhs rhs (Some (str_pert,pos)) env
 							and kappa_lhs = Mixture.to_kappa false lhs env
 							and kappa_rhs = "" in
 							let r_id = Mixture.get_id lhs in
@@ -722,9 +804,7 @@ let pert_of_result variables env res =
 								Dynamics.modif_sites = modif_sites ;
 								Dynamics.pre_causal = pre_causal ;
 								Dynamics.is_pert = true ;
-								Dynamics.path_impact = path_impact ;
-								Dynamics.positive_species_impact = false ;
-								Dynamics.negative_species_impact = false 
+								Dynamics.cc_impact = None ;
 							}
 							in
 							(env,rule_opt)
