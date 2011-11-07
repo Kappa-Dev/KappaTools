@@ -34,11 +34,10 @@ sig
 			?check_connex: Mods.IntSet.t -> 
 			?complete:bool -> 
 			?d_map:int IntMap.t -> 
-			?filter_elements:Environment.t -> 
+			?filter_elements: (Node.t -> bool) ->  
 			t -> int -> int -> (bool * int Mods.IntMap.t * IntSet.t * IntSet.t)
 	
-	val add_lift : t -> Injection.t -> ((int * int) list) Mods.IntMap.t -> t
-	val add_prob_connect : t -> Mods.InjProduct.t -> t
+	val add_lift : t -> Injection.t -> ((int * int) list) Mods.IntMap.t -> Environment.t -> t
 	val marshalize : t -> Node.t Mods.IntMap.t
 	val size : t -> int
 	val to_dot : ?with_heap:bool -> t -> string -> Environment.t -> unit
@@ -74,7 +73,6 @@ struct
 	exception Is_connex
 	
 	let neighborhood ?(interrupt_with = IntSet.empty) ?check_connex ?(complete = false) ?(d_map = IntMap.empty) ?filter_elements sg id radius =
-		print_newline();
 		let address node =
 			try ( & ) node
 			with | Not_found -> invalid_arg "Graph.neighborhood: not allocated" in
@@ -107,10 +105,10 @@ struct
 					let component = 
 						match filter_elements with 
 							| None -> IntSet.add addr component 
-							| Some env -> 
+							| Some predicate_over_node -> 
 								let n = node_of_id sg addr 
 								in 
-								if Environment.is_nl_root (Node.name n) env then IntSet.add addr component else component
+								if (predicate_over_node n) then IntSet.add addr component else component
 					in
 					(*checking connectivity of remaining_roots*)
 					let remaining_roots,is_connex = 
@@ -142,23 +140,16 @@ struct
 		try iter check_connex roots [ id ] (IntMap.add id 0 d_map) IntSet.empty false with Is_connex -> (true,IntMap.empty,IntSet.empty,IntSet.empty)
 			
 	
-	let add_lift sg phi port_map =
+	let add_lift sg phi port_map env =
 		(IntMap.iter
 				(fun u_i port_list ->
 							let node_i =
 								try node_of_id sg u_i
 								with | Not_found -> invalid_arg "Graph.add_lift"
-							in A.set sg u_i (Node.add_dep phi port_list node_i))
+							in A.set sg u_i (Node.add_dep phi port_list node_i env))
 				port_map;
 			sg)
-			
-	let add_prob_connect sg inj_prod =
-		Mods.InjProduct.fold_left (fun sg inj ->
-			let u_i = match Injection.root_image inj with None -> invalid_arg "Graph.add_prob_connect" | Some (_,i) -> i in
-			let u = try node_of_id sg u_i with Not_found -> invalid_arg "Graph.add_prob_connect" in
-			Node.add_nl_lift inj_prod u ; sg  
-		) sg inj_prod
-		
+					
 		
 	let marshalize sg =
 		fold

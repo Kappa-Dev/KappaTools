@@ -559,7 +559,7 @@ let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take 
 						let id = match Mixture.root_of_cc lhs !cc_id with None -> invalid_arg "Eval.rule_of_ast" | Some i -> i in
 						Mixture.agent_of_id id lhs
 					in
-					ptr_env:= Environment.declare_nl_element (Mixture.get_id lhs) !cc_id (Mixture.name ag_root) env ;
+					ptr_env:= Environment.declare_nl_element (Mixture.get_id lhs) !cc_id (Mixture.name ag_root) !ptr_env ;
 					cc_id:=!cc_id+1 
 				done ; !ptr_env
 	in
@@ -870,7 +870,7 @@ let init_graph_of_result env res =
 		(Graph.SiteGraph.init !Parameter.defaultGraphSize,env) res.Ast.init
 	
 let initialize result counter =
-	Debug.tag "+Compiling..." ;
+	Debug.tag "+ Compiling..." ;
 
 	Debug.tag "\t -agent signatures" ;
 	let env = environment_of_result result in
@@ -887,13 +887,16 @@ let initialize result counter =
 
 	Debug.tag "\t -rules";
 	let (env, rules) = rules_of_result env result tolerate_new_state in
+	
 	Debug.tag "\t -observables";
 	let observables = obs_of_result env result in
 	Debug.tag "\t -perturbations" ;
 	let (kappa_vars, pert, rule_pert, env) = pert_of_result kappa_vars env result
 	in
 	Debug.tag "\t Done";
-	Debug.tag "+Building initial simulation state...";
+	Debug.tag "+ Analyzing non local patterns..." ;
+	let env = Environment.init_roots_of_nl_rules env in
+	Debug.tag "+ Building initial simulation state...";
 	let (state, env) =
 		State.initialize sg rules kappa_vars alg_vars observables (pert,rule_pert) counter env
 	in 

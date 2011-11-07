@@ -29,7 +29,7 @@ let string_of_array f ar =
 		"[|"^(String.concat ";" (List.rev !l))^"|]"
 		
 let string_of_list f l =
-	String.concat ";" (List.map f l)
+	"["^(String.concat ";" (List.map f l))^"]"
 	
 let pow x n =
 	let rec aux x n acc =

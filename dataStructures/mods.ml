@@ -62,21 +62,32 @@ module Injection =
 		
 		let to_string phi = 
 			Tools.string_of_map string_of_int string_of_int Hashtbl.fold phi.map 
-			
+		
+		let string_of_coord phi = 
+			let a = get_address phi and (m,c) = get_coordinate phi 
+			in 
+			Printf.sprintf "(%d,%d,%d)" m c a
+		
 		let copy phi = fold (fun i j phi' -> add i j phi') phi {map = Hashtbl.create (size phi) ; address = None ; coordinate = get_coordinate phi}
 	end
 
 module InjProduct =
 	struct
-		type t = {elements : Injection.t array ; mutable address : int option ; coordinate : int}
+		type t = {elements : Injection.t array ; mutable address : int option ; coordinate : int ; signature : int array}
+		type key = int array
 		
 		let allocate phi addr = phi.address <- Some addr 
 			
 		let get_address phi = match phi.address with Some a -> a | None -> raise Not_found
 		let get_coordinate phi = phi.coordinate 
 		
-		let add cc_id inj injprod = try injprod.elements.(cc_id) <- inj with Invalid_argument msg -> invalid_arg ("InjProduct.add: "^msg)
-		
+		let add cc_id inj injprod = 
+			try 
+				injprod.elements.(cc_id) <- inj ;
+				let root = (function Some (_,u) -> u | None -> invalid_arg "InjProduct.add") (Injection.root_image inj) in
+				injprod.signature.(cc_id) <- root
+			with Invalid_argument msg -> invalid_arg ("InjProduct.add: "^msg)
+				
 		let is_trashed injprod = match injprod.address with Some (-1) -> true | _ -> false
 		
 		exception False
@@ -90,7 +101,20 @@ module InjProduct =
 		
 		let find i injprod = try injprod.elements.(i) with Invalid_argument _ -> raise Not_found
 		
-		let create n mix_id = {elements = Array.create n (Injection.empty 0 (-1,-1)) ; address = None ; coordinate = mix_id}
+		let create n mix_id = {elements = Array.create n (Injection.empty 0 (-1,-1)) ; address = None ; coordinate = mix_id ; signature = Array.create n (-1)}
+		
+		let equal phi psi =
+			try 
+				if (Array.length phi.signature) <> (Array.length psi.signature) then false
+				else
+					(
+					Array.iteri (fun cc_id u -> if u <> psi.signature.(cc_id) then raise False ) phi.signature ;
+					true
+					) 
+			with 
+				| False -> false
+		
+		let get_key phi = phi.signature
 		
 		let compare phi psi = 
 			try
@@ -124,7 +148,7 @@ module InjectionHeap =
 		let get_address inj = Injection.get_address inj 
 	end)
 	
-module InjProdHeap = Heap.Make(InjProduct) 
+module InjProdHeap = SafeHeap.Make(InjProduct) 
 
 module InjProdSet = Set.Make(InjProduct)
 

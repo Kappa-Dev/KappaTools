@@ -83,7 +83,7 @@ let apply_effect p_id pert state counter env =
 						while !n > 0 do (*FIXME: highly unefficient to compute new injection at each loop*)
 							let embedding_t = State.select_injection (infinity,0.) state r.lhs counter env in (*empty embedding, cannot raise null-event*)
 							let (env, state, side_effects, embedding_t, psi, pert_ids_neg) = State.apply !st r embedding_t counter env in
-							let env,state,pert_ids_pos = State.positive_update state r (State.map_of embedding_t,psi) (side_effects,Int2Set.empty) counter env
+							let env,state,pert_ids_pos,new_injs = State.positive_update state r (State.map_of embedding_t,psi) (side_effects,Int2Set.empty) counter env
 							in
 							if !n = (int_of_float x) then pert_ids := IntSet.union !pert_ids (IntSet.union pert_ids_neg pert_ids_pos) ; (*only the first time*)
 							st := state ;
@@ -123,7 +123,7 @@ let apply_effect p_id pert state counter env =
 								| None -> (if !Parameter.debugModeOn then Debug.tag "No more non clashing instances were found!" ; cpt:=x)
 								| Some embedding_t ->
 									let (env, state, side_effects, phi, psi, pert_ids_neg) = State.apply state r embedding_t counter env in
-									let env,state,pert_ids_pos = State.positive_update state r (State.map_of phi,psi) (side_effects,Int2Set.empty) counter env
+									let env,state,pert_ids_pos,new_injs = State.positive_update state r (State.map_of phi,psi) (side_effects,Int2Set.empty) counter env
 									in
 									if !cpt=0 then pert_ids := IntSet.union !pert_ids (IntSet.union pert_ids_neg pert_ids_pos) ; (*only the first time*)
 									st := state ;

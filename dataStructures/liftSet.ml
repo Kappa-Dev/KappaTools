@@ -13,3 +13,11 @@ let remove ls inj = ls.injs <- InjSet.remove inj ls.injs
 let create s = {injs = InjSet.empty}
 
 let flush ls = ls.injs <- InjSet.empty 
+
+let empty () = {injs = InjSet.empty}
+
+let exists pred ls =
+	try
+		fold (fun inj b -> if pred inj then raise ExceptionDefn.True else b) ls false
+	with 
+		| ExceptionDefn.True -> true

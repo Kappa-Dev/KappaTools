@@ -40,7 +40,7 @@ let event state grid counter plot env =
 	State.dump state counter env ;
 	
 	(*2. Draw rule*)
-	if !Parameter.debugModeOn then Debug.tag "Drawing a rule...";
+	if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Drawing a rule... (activity=%f) " (Random_tree.total state.State.activity_tree));
 	(*let t_draw = Profiling.start_chrono () in*)
 	let opt_instance,state = try State.draw_rule state counter env with 
 		| Null_event _ -> (None,state)
@@ -77,45 +77,27 @@ let event state grid counter plot env =
 				
 				counter.Counter.cons_null_events <- 0 ; (*resetting consecutive null event counter since a real rule was applied*)  
 				
-				(*Local positive update TODO: adding intra detection*)
-				let env,state,pert_ids' = 
+				(*Local positive update: adding new partial injection*)
+				let env,state,pert_ids',new_injs = 
 					State.positive_update state r (State.map_of embedding_t,psi) (side_effect,Int2Set.empty) counter env
 				in
+				if !Parameter.debugModeOn then
+				(
+					Debug.tag (Printf.sprintf 
+					"Should check intra extensions of embeddings in %s" 
+					(Tools.string_of_list 
+						(fun phi -> 
+							let a = Injection.get_address phi 
+							and (mix_id,cc_id) = Injection.get_coordinate phi 
+							in 
+							Printf.sprintf "(%d,%d,%d)" mix_id cc_id a)
+						new_injs
+					))
+				);
 				
-				(*Non local positive update --Should move all this into State.nl_positive update*)
-				let _ (*should collect new state here*) =
-					(*If rule is potentially breaking up some connected component*)
-					begin
-						match r.Dynamics.cc_impact with 
-							| None -> (if !Parameter.debugModeOn then Debug.tag "Rule cannot decrease connectedness no need to update silenced rules") 
-							| Some _ -> (*should be more precise here*)
-								if IntSet.is_empty state.State.silenced then (if !Parameter.debugModeOn then Debug.tag "No silenced rule, skipping")
-								else
-					 				IntSet.fold
-									(fun id _ ->
-									if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Updating silenced rule %d" id) ; 
-									State.update_activity state r.Dynamics.r_id id counter env ;
-									state.State.silenced <- IntSet.remove id state.State.silenced ;
-									) state.State.silenced () 
-					end ;
-						
-					(*If rule is potentially merging two connected components*)
-					begin
-						match r.Dynamics.cc_impact with
-							| None -> 
-								(if !Parameter.debugModeOn then 
-									Debug.tag "No possible side effect update of unary rules because applied rule cannot increase connectedness"
-								)
-							| Some (connect_map,_,_) ->
-								begin
-									match embedding_t with
-										| State.CONNEX _ -> 
-											(if !Parameter.debugModeOn then Debug.tag "No possible side effect update of unary rules because a unary instance was applied")
-										| State.DISJOINT e | State.AMBIGUOUS e -> 
-											State.nl_positive_update r e state counter env (*one may need to compute connected components if they are not present in e, as in the AMBIGUOUS case*)
-								end
-					end 
-				in
+				(*Non local positive update: adding new possible intras*)
+				let state = State.intra_positive_update r embedding_t new_injs state counter env in
+				
 				(****************END POSITIVE UPDATE*****************)
 				
 					let grid = 

@@ -13,7 +13,7 @@ let add arity mix_id inj_list inj_prod_hp =
 		let (_,cc_id) = Injection.get_coordinate inj in
 		InjProduct.add cc_id inj inj_prod
 	) inj_list ;
-	(InjProdHeap.alloc inj_prod inj_prod_hp,inj_prod)
+	(InjProdHeap.alloc ~check:true inj_prod inj_prod_hp,inj_prod) (*check might not be necessary here since this function is called during the init phase*)
 	
 let remove inj_prod h = 
 	let i = try InjProduct.get_address inj_prod with Not_found -> invalid_arg "NonLocal.remove" in
@@ -25,19 +25,15 @@ let search_elements graph component extensions env =
 		(fun u_id (extensions,modified) ->
 			let u = try SiteGraph.node_of_id graph u_id with Not_found -> invalid_arg "NonLocal.search_elements"
 			in
-			Printf.printf "Entering component at node[%d]\n" u_id ;
-			let _,lifts = Node.get_lifts u 0 in
-			
+			let _,lifts = Node.get_lifts u 0 in 
 			LiftSet.fold
 			(fun inj (extensions,modified) ->
 				if Injection.is_trashed inj then invalid_arg "NonLocal.search_elements: injection should not be already invalid..."
 				else
 					let (mix_id,cc_id) = Injection.get_coordinate inj in
-					Printf.printf "Found a lift pointing to inj[%d,%d]\n" mix_id cc_id ;
-			
-					if not (Environment.is_nl_rule mix_id env) then (Debug.tag "But this is not a unary rule..." ; (extensions,modified))
+					
+					if not (Environment.is_nl_rule mix_id env) then (extensions,modified)
 					else
-						let _ = Debug.tag "Adding this injection as a candidate for a new intra" in
 						let inj_map = try IntMap.find mix_id extensions with Not_found -> IntMap.empty in
 						let inj_list = try IntMap.find cc_id inj_map with Not_found -> [] in
 						let inj_map' = IntMap.add cc_id (inj::inj_list) inj_map in
@@ -47,3 +43,8 @@ let search_elements graph component extensions env =
 	in
 	if modified then (Some ext)
 	else None
+	
+			
+			
+			
+			

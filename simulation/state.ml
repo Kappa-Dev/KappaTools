@@ -47,9 +47,11 @@ let alg_of_id id state =
 let connex ?(d_map = IntMap.empty) ?(filter = false) ?start_with set with_full_components state env =  
 	let start_root = match start_with with Some r -> r | None -> IntSet.choose set in
 	let (is_connex,d_map,component,remaining_roots) = 
-		(*if filter then
-			SiteGraph.neighborhood ~check_connex:set ~complete:with_full_components ~d_map:d_map ~filter_elements:env state.graph start_root (-1) 
-		else*)
+		if filter then
+			let predicate env = fun node -> Environment.is_nl_root (Node.name node) env
+			in  
+			SiteGraph.neighborhood ~check_connex:set ~complete:with_full_components ~d_map:d_map ~filter_elements:(predicate env) state.graph start_root (-1) 
+		else
 			SiteGraph.neighborhood ~check_connex:set ~complete:with_full_components ~d_map:d_map state.graph start_root (-1) 
 	in 
 	(is_connex,d_map,component,remaining_roots)
@@ -63,6 +65,17 @@ let update_flux state id1 id2 w =
 	in
 	Hashtbl.replace flux id1 (IntMap.add id2 (w+.w') map)
 	
+let is_complete mix_id state =
+	match state.injections.(mix_id) with
+		| None -> false
+		| Some comp_injs ->
+			Array.fold_left 
+			(fun is_complete opt -> 
+				match opt with 
+					| Some injs -> ((InjectionHeap.size injs) <> 0) && is_complete
+					| None -> false
+			) true comp_injs
+
 (**[instance_number mix_id state] returns the number of instances of mixture [mix_id] in implicit state [state]*)
 let instance_number mix_id state env =
 	if Environment.is_empty_lhs mix_id env then 1. 
@@ -224,7 +237,7 @@ let update_activity state cause var_id counter env =
 
 (* compute complete embedding of mix into sg at given root --for           *)
 (* initialization phase                                                    *)
-let generate_embeddings sg u_i mix comp_injs =
+let generate_embeddings sg u_i mix comp_injs env =
 	let mix_id = Mixture.get_id mix in
 	
 	let rec iter cc_id sg comp_injs  =
@@ -263,7 +276,7 @@ let generate_embeddings sg u_i mix comp_injs =
 								in
 								(comp_injs.(cc_id) <- Some cc_id_injections;
 									let sg =
-										SiteGraph.add_lift sg injection port_map
+										SiteGraph.add_lift sg injection port_map env
 									in 
 									iter (cc_id + 1) sg comp_injs 
 								)
@@ -290,7 +303,6 @@ let initialize_non_local_embeddings state env =
 							if not is_connex then state
 							else 
 								(*one should add prod_i as a legal nl embedding for mix_id*)
-								(*and update prob_connect fields for each root node*)
 								let inj_prod_hp_opt = try state.nl_injections.(mix_id) with Invalid_argument msg -> invalid_arg ("Initialize_nl_emb: "^msg) in
 								let inj_prod_hp = 
 									match inj_prod_hp_opt with
@@ -299,9 +311,8 @@ let initialize_non_local_embeddings state env =
 								in
 								let inj_prod_hp,inj_prod = NonLocal.add (Mixture.arity mix) mix_id prod_i inj_prod_hp
 								in
-								let graph = SiteGraph.add_prob_connect state.graph inj_prod in
 								state.nl_injections.(mix_id) <- Some inj_prod_hp ;
-								{state with graph = graph} 
+								state  
 						) state prods
 					in
 					(state,mix_id+1)
@@ -324,7 +335,7 @@ let initialize_embeddings state mix_list env =
 					| None -> Array.create (Mixture.arity mix) None
 					| Some comp_injs -> comp_injs in
 				(* complement the embeddings of mix in sg using node i  as anchor for matching *)
-				let (sg, comp_injs) =	generate_embeddings state.graph i mix comp_injs
+				let (sg, comp_injs) =	generate_embeddings state.graph i mix comp_injs env
 				in
 					(* adding injections.(mix_id) = injs(mix) to injections array*)
 					injs.(Mixture.get_id mix) <- Some comp_injs;
@@ -543,14 +554,6 @@ let clean_injprod injprod state counter env =
 			| None -> invalid_arg "State.clean_injprod" 
 			| Some h -> h
 	in 
-	let _ = (*removing nl_lifts pointing to injprod*)
-		InjProduct.fold_left 
-		(fun _ inj_i -> 
-			let u = match Injection.root_image inj_i with None -> invalid_arg "State.clean_injprod" | Some (_,u_i) -> (try SiteGraph.node_of_id state.graph u_i with Not_found -> invalid_arg "State.clean_injprod")
-			in
-			Node.rm_nl_lift injprod u
-		) () injprod
-	in
 	let hp = InjProdHeap.remove injprod_id inj_prod_hp in (*removing injection product from the heap*)
 	state.nl_injections.(mix_id) <- (Some hp) ;
 	update_activity state (-1) mix_id counter env 
@@ -578,7 +581,11 @@ let check_validity injprod with_full_components state counter env =
 			) (IntMap.empty,IntSet.empty) injprod
 		in
 		let (is_connex,d_map,components,_) = connex roots with_full_components state env in
-		if is_connex then {map = embedding ; components = Some (IntMap.add 0 components IntMap.empty) ; depth_map = Some d_map ; roots = roots}
+		if is_connex then 
+			(
+			clean_injprod injprod state counter env ; (*removing non local injection because it will be applied*)
+			{map = embedding ; components = Some (IntMap.add 0 components IntMap.empty) ; depth_map = Some d_map ; roots = roots}
+			)
 		else 
 			(if !Parameter.debugModeOn then Debug.tag "Clashing because injection product's codomain is no longer connex" ;
 			raise (Null_event 0))
@@ -655,6 +662,7 @@ let select_injection (a2,a1) state mix counter env =
 					if IntSet.is_empty roots then (depth_map,component_map)
 					else
 						let root = IntSet.choose roots in
+						(*components will contain only node that can be the root of a non local rule because filter is enabled *)
 						let (_,d_map,components,remaining_roots) = connex ~d_map:depth_map ~filter:true ~start_with:root roots true state env 
 						in
 						if not ((IntSet.cardinal remaining_roots) = (IntSet.cardinal roots) - 1) then
@@ -844,6 +852,11 @@ let enabled r state =
 	let r_id = Mixture.get_id r.lhs in 
 	try Hashtbl.find state.influence_map r_id with Not_found -> IntMap.empty
 
+
+(**************************************************WIP*********************************************)
+(**************************************************WIP*********************************************)
+(**************************************************WIP*********************************************)
+
 (**updating non local mixtures after application of a linking rule using embedding [embedding_info]*)
 let nl_positive_update r embedding_info state counter env =
 	if !Parameter.debugModeOn then Debug.tag "Looking for side effect update of non local rules..." ;
@@ -857,7 +870,7 @@ let nl_positive_update r embedding_info state counter env =
 		let _,cc_id = Injection.get_coordinate inj in
 		if IntMap.mem cc_id part_inj then failwith "Invariant violation"
 		else
-		IntMap.add cc_id inj part_inj
+			IntMap.add cc_id inj part_inj
 	in
 	let state = 
 		if use_components then
@@ -892,7 +905,7 @@ let nl_positive_update r embedding_info state counter env =
 			if found < 2 then 
 				(if !Parameter.debugModeOn then Debug.tag "Potential new intras are not shared between merged cc and cannot be new, skipping"; state)
 			else
-				let state =
+				let state = (*build new intras for each rule that have candidates*)
 					IntMap.fold 
 					(fun r_id cc_map state ->
 						if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Trying to find intra(s) for rule [%d]" r_id) ;
@@ -902,7 +915,7 @@ let nl_positive_update r embedding_info state counter env =
 							let intras_for_r_id,cc = 
 								IntMap.fold
 								(fun cc_id injs_list (new_intras,cpt) ->
-									if cpt <> cc_id then raise Break
+									if cpt <> cc_id then raise (Break cc_id)
 									else
 										let new_intras = 
 											List.fold_left
@@ -933,13 +946,17 @@ let nl_positive_update r embedding_info state counter env =
 									in
 									let ip = IntMap.fold (fun cc_id inj injprod -> InjProduct.add cc_id inj injprod ; injprod) injprod_map ip
 									in
-									let injprod_hp = InjProdHeap.alloc ip injprod_hp in
-									state.nl_injections.(r_id) <- Some injprod_hp ;
-									update_activity state r.r_id r_id counter env ;
-									state
+									try
+										let injprod_hp = InjProdHeap.alloc ~check:true ip injprod_hp in
+										state.nl_injections.(r_id) <- Some injprod_hp ;
+										update_activity state r.r_id r_id counter env ;
+										state
+									with
+										| InjProdHeap.Is_present -> state
 								) state intras_for_r_id
 					with 
-					| Break -> (if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "One CC of rule [%d] has no candidate for intra, aborting" r_id); state)
+					| Break cc_id ->
+						 (if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "CC[%d] of rule [%d] has no candidate for intra, aborting" cc_id r_id); state)
 					) extensions state
 					in
 					state
@@ -948,13 +965,166 @@ let nl_positive_update r embedding_info state counter env =
 		else
 			state (*TODO*)
 	in
-	()
+	state
+(**************************************************WIP*********************************************)
+(**************************************************WIP*********************************************)
+(**************************************************WIP*********************************************)
+
+
+(**************************************************WIP*********************************************)
+(**************************************************WIP*********************************************)
+(**************************************************WIP*********************************************)
+let rec complete_injections new_injs state added counter env = 
+	match new_injs with 
+		| [] -> state
+		| injection::tl ->
+			let (mix_id,cc_id) = Injection.get_coordinate injection in (*mix_id is the id of a non local lhs by invariant*)
+			
+			(*one should look into cc(root_injection) whether some nodes have a lift to (mix_id,cc_id') with cc_id <> cc_id'*)
+			let (a_0,u_0) = match Injection.root_image injection with None -> invalid_arg "NonLocal.complete_injections" | Some p -> p
+			in
+			(*if activity of mix_id is null then there can be no intra*)
+			if not (is_complete mix_id state) then complete_injections tl state added counter env
+			else
+				
+				(***NOT EFFICIENT BECAUSE LIFTSET WILL BE TRAVERSED ONCE MORE, neighborhood FUNCTION SHOULD DO THIS***)
+				let predicate = 
+					fun node -> 
+						let _,liftset = Node.get_lifts node 0 in
+						LiftSet.exists (fun inj -> let (mix_id',cc_id') = Injection.get_coordinate inj in (mix_id' = mix_id) && (cc_id <> cc_id') ) liftset
+				in   
+				let (_,d_map,components,_) = SiteGraph.neighborhood ~filter_elements:predicate state.graph u_0 (-1) in
+				
+				(*components contains nodes whose name is the root of at least one complemetary injection*)
+				let candidate_map = 
+					IntSet.fold 
+					(fun u_i map -> 
+						let node = SiteGraph.node_of_id state.graph u_i in
+						let _,lifts = Node.get_lifts node 0 in
+						LiftSet.fold 
+						(fun inj map -> 
+							let mix_id',cc_id' = Injection.get_coordinate inj in
+							if (mix_id' = mix_id) && (cc_id' <> cc_id) then
+								let l_part_inj = try IntMap.find cc_id' map with Not_found -> [] in
+								IntMap.add cc_id' (inj::l_part_inj) map
+							else map
+						) lifts map
+					) components IntMap.empty
+				in 
+				if !Parameter.debugModeOn then
+					begin
+						Printf.printf "Trying to extend (%d,%d) : %s with:\n" mix_id cc_id (Injection.to_string injection) ;
+						IntMap.iter 
+						(fun cc_id' inj_list -> 
+							Printf.printf "(%d,%d):%s\n" mix_id cc_id' 
+							(Tools.string_of_list Injection.string_of_coord inj_list)
+						) candidate_map 
+					end ;
+				if IntMap.size candidate_map < (Mixture.arity (kappa_of_id mix_id state)) - 1 then complete_injections tl state added counter env
+				else
+					let new_intras = 
+						IntMap.fold 
+						(fun cc_id ext_injs new_intras ->
+							
+							List.fold_left 
+							(fun cont inj_map ->
+								let ext_cont = 
+									List.fold_left 
+									(fun cont inj_cc ->
+										(IntMap.add cc_id inj_cc inj_map)::cont
+									) [] ext_injs
+								in
+								ext_cont @ cont
+							) [] new_intras
+							
+						) candidate_map [IntMap.add cc_id injection IntMap.empty]
+					in
+					if !Parameter.debugModeOn then
+						List.iter (fun injmap -> Debug.tag ("new_intras: "^(string_of_map string_of_int Injection.string_of_coord IntMap.fold injmap))) new_intras ;
+					
+					let injprod_hp = match state.nl_injections.(mix_id) with None -> InjProdHeap.create !Parameter.defaultHeapSize | Some hp -> hp in
+					let mix = kappa_of_id mix_id state in
+					let injprod_hp = 
+						List.fold_left
+						(fun injprod_hp intra_map ->
+							if IntMap.size intra_map < (Mixture.arity mix) then injprod_hp (*intra is not complete*)
+							else
+								let injprod = match InjProdHeap.next_alloc injprod_hp with None -> InjProduct.create (Mixture.arity mix) mix_id | Some ip -> ip 
+								in
+								let injprod,new_roots = 
+									IntMap.fold 
+									(fun cc_id inj (injprod,new_roots) ->
+										let root = (function Some (_,j) -> j | None -> invalid_arg "") (Injection.root_image inj) in
+										InjProduct.add cc_id inj injprod ;
+										(injprod, IntMap.add cc_id root new_roots)
+									) intra_map (injprod,IntMap.empty)
+								in
+								try
+								let injprod_hp = InjProdHeap.alloc ~check:true injprod injprod_hp in
+									injprod_hp
+								with InjProdHeap.Is_present -> 
+									if !Parameter.debugModeOn then Debug.tag "Intra already added, skipping" ;
+									injprod_hp 
+						) injprod_hp new_intras
+					in
+					state.nl_injections.(mix_id) <- Some injprod_hp ;
+					update_activity state (-1) mix_id counter env ;
+					complete_injections tl state added counter env
+				
+(**************************************************WIP*********************************************)
+(**************************************************WIP*********************************************)
+(**************************************************WIP*********************************************)
+	
+	
+let intra_positive_update r embedding_t new_injs state counter env = 
+	(*Step 1 : For each new embedding phi, adding all new intras of the form <phi,psi> *)
+	let state = complete_injections new_injs state [] counter env in
+	
+	(*Step 2 : Non local positive update *)
+	let state =
+		(*If rule is potentially breaking up some connected component this should wake up silenced rules*)
+		begin
+			match r.Dynamics.cc_impact with 
+				| None -> (if !Parameter.debugModeOn then Debug.tag "Rule cannot decrease connectedness no need to update silenced rules") 
+				| Some _ -> (*should be more precise here*)
+					if IntSet.is_empty state.silenced then (if !Parameter.debugModeOn then Debug.tag "No silenced rule, skipping")
+					else
+		 				IntSet.fold
+						(fun id _ ->
+						if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Updating silenced rule %d" id) ; 
+						update_activity state r.Dynamics.r_id id counter env ;
+						state.silenced <- IntSet.remove id state.silenced ;
+						) state.silenced () 
+		end ;
+			
+		(*If rule is potentially merging two connected components this should trigger a positive update of non local rules*)
+		begin
+			match r.Dynamics.cc_impact with
+				| None -> 
+					(if !Parameter.debugModeOn then 
+						Debug.tag "No possible side effect update of unary rules because applied rule cannot increase connectedness" ;
+					state
+					)
+				| Some (connect_map,_,_) ->
+					begin
+						match embedding_t with
+							| CONNEX _ -> 
+								(if !Parameter.debugModeOn then 
+									Debug.tag "No possible side effect update of unary rules because a unary instance was applied"; 
+								state
+								)
+							| DISJOINT e | AMBIGUOUS e -> 
+								nl_positive_update r e state counter env (*one may need to compute connected components if they are not present in e, as in the AMBIGUOUS case*)
+					end
+		end 
+	in
+	state			
 	
 let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) counter env = (*pert_intro is temporary*)
 	(*let t_upd = Profiling.start_chrono () in*)
 	
 	(* sub function find_new_inj *)
-	let find_new_inj state var_id mix cc_id node_id root pert_ids already_done_map env =
+	let find_new_inj state var_id mix cc_id node_id root pert_ids already_done_map new_injs env =
 		if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Trying to embed Var[%d] using root %d at node %d" var_id root node_id);
 		let root_node_set =	try IntMap.find var_id already_done_map
 			with Not_found -> Int2Set.empty in
@@ -991,13 +1161,13 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 		match opt_emb	with
 		| None ->
 				(if !Parameter.debugModeOn then Debug.tag "No new embedding was found";
-				(env,state, pert_ids, already_done_map)
+				(env,state, pert_ids, already_done_map, new_injs)
 				)
 		| Some (embedding, port_map) ->
 				if !Parameter.debugModeOn then Debug.tag	(Printf.sprintf "New embedding: %s" (Injection.to_string embedding)) ;
 				let cc_id_injections = InjectionHeap.alloc embedding cc_id_injections in
 				comp_injs.(cc_id) <- Some cc_id_injections ;
-				let graph =	SiteGraph.add_lift state.graph embedding port_map
+				let graph =	SiteGraph.add_lift state.graph embedding port_map env
 				in
 				let state = {state with graph = graph}
 				in
@@ -1009,18 +1179,19 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 					(*Printf.printf "done (%d,%d) for var[%d]\n" root node_id var_id ;*) 
 					let already_done_map' = IntMap.add var_id	(Int2Set.add (root, node_id) root_node_set) already_done_map 
 					in
-					(env,state, pert_ids, already_done_map')
+					let new_injs' = if Environment.is_nl_rule var_id env then embedding::new_injs else new_injs in 
+					(env,state, pert_ids, already_done_map',new_injs')
 				end
 	in
 	(* end of sub function find_new_inj definition *)
 	
 	let vars_to_wake_up = enabled r state in
-	let env,state,pert_ids,already_done_map =
+	let env,state,pert_ids,already_done_map,new_injs =
 		IntMap.fold 
-		(fun var_id map_list (env, state,pert_ids,already_done_map) ->
+		(fun var_id map_list (env, state,pert_ids,already_done_map,new_injs) ->
 			if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Influence map tells me I should look for new injections of var[%d]" var_id) ;
 			List.fold_left 
-			(fun (env,state,pert_ids,already_done_map) glue ->
+			(fun (env,state,pert_ids,already_done_map, new_injs) glue ->
 				let opt = IntMap.root glue in
 				match opt with
 					| None -> invalid_arg "State.positive_update"
@@ -1052,31 +1223,31 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 						in
 						let cc_id = Mixture.component_of_id root_mix mix in
 						(*already_done_map is empty because glueings are guaranteed to be different by construction*)
-						let env,state,pert_ids,already_done_map = 
-							find_new_inj state var_id mix cc_id node_id root_mix pert_ids already_done_map env
+						let env,state,pert_ids,already_done_map,new_injs = 
+							find_new_inj state var_id mix cc_id node_id root_mix pert_ids already_done_map new_injs env
 						in
-						(env,state, pert_ids, already_done_map)
-			) (env,state, pert_ids, already_done_map) map_list
-		) vars_to_wake_up (env, state, IntSet.empty, IntMap.empty)  
+						(env,state, pert_ids, already_done_map, new_injs)
+			) (env,state, pert_ids, already_done_map, new_injs) map_list
+		) vars_to_wake_up (env, state, IntSet.empty, IntMap.empty,[])  
 	in
 	
 	if not r.Dynamics.side_effect then 
 		((*Profiling.add_chrono "Upd+" Parameter.profiling t_upd ;*)			
-		(env,state,pert_ids))
+		(env,state,pert_ids,new_injs))
 	else
 	(*Handling side effects*)
 	let wu_map = Hashtbl.create !Parameter.defaultExtArraySize
 	in
 		wake_up state 1 side_modifs wu_map env;
 		wake_up state 2 pert_intro wu_map env;
-		let (env,state, pert_ids, _) =
+		let (env,state, pert_ids,_,new_injs) =
 		Hashtbl.fold
-		(fun node_id candidates (env,state, pert_ids, already_done_map) ->
+		(fun node_id candidates (env,state, pert_ids, already_done_map,new_injs) ->
 			if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Side effect on node %d forces me to look for new embedding..." node_id);
 			let node = SiteGraph.node_of_id state.graph node_id
 			in
 			Int2Set.fold
-			(fun (var_id, cc_id) (env, state, pert_ids, already_done_map) ->
+			(fun (var_id, cc_id) (env, state, pert_ids, already_done_map, new_injs) ->
 				let mix =
 					let opt =
 						try state.kappa_variables.(var_id)
@@ -1092,13 +1263,13 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 					Mixture.ids_of_name ((Node.name node), cc_id) mix
 				in
 					IntSet.fold 
-					(fun root (env,state, pert_ids, already_done_map) ->
-						find_new_inj state var_id mix cc_id node_id root pert_ids already_done_map env
-					) possible_roots (env,state, pert_ids, already_done_map)
-			) candidates (env, state, pert_ids, already_done_map)
-	)	wu_map (env, state, pert_ids, already_done_map)
+					(fun root (env,state, pert_ids, already_done_map, new_injs) ->
+						find_new_inj state var_id mix cc_id node_id root pert_ids already_done_map new_injs env
+					) possible_roots (env,state, pert_ids, already_done_map, new_injs)
+			) candidates (env, state, pert_ids, already_done_map, new_injs)
+	)	wu_map (env, state, pert_ids, already_done_map, new_injs)
 	in
-	(env,state,pert_ids)
+	(env,state,pert_ids, new_injs)
 	
 
 (* Negative update *)
@@ -1412,7 +1583,6 @@ let dump state counter env =
 					Printf.printf "#\t%s %s [found %d]\n" nme (Dynamics.to_kappa r)
 					(int_of_float (instance_number i state env))
 			) state.rules ();
-			print_newline ();
 			Array.iteri
 			(fun mix_id opt ->
 					let injprod_hp_opt = try state.nl_injections.(mix_id) with Invalid_argument _ -> None in
