@@ -16,3 +16,4 @@ cflow
 Error
 /usr/lib/ocaml
 models/nonLocal
+models/nonLocal/out

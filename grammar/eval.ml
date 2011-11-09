@@ -552,7 +552,7 @@ let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take 
 		match k_alt with 
 			| None -> env
 			| Some _ -> (*rule has a unary version*)
-				let ptr_env = ref env in
+				let ptr_env = ref {env with Environment.has_intra=true} in
 				let cc_id = ref 0 in
 				while !cc_id < (Mixture.arity lhs) do
 					let ag_root = 

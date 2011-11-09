@@ -45,6 +45,7 @@ let event state grid counter plot env =
 	let opt_instance,state = try State.draw_rule state counter env with 
 		| Null_event _ -> (None,state)
 	in			
+	
 	(*3. Apply rule & negative update*)
 	(*let t_apply = Profiling.start_chrono () in*)
 	let opt_new_state =
@@ -96,7 +97,8 @@ let event state grid counter plot env =
 				);
 				
 				(*Non local positive update: adding new possible intras*)
-				let state = State.intra_positive_update r embedding_t new_injs state counter env in
+				let state = if env.Environment.has_intra then State.intra_positive_update r embedding_t new_injs state counter env else state 
+				in
 				
 				(****************END POSITIVE UPDATE*****************)
 				
