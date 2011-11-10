@@ -82,22 +82,9 @@ let event state grid counter plot env =
 				let env,state,pert_ids',new_injs = 
 					State.positive_update state r (State.map_of embedding_t,psi) (side_effect,Int2Set.empty) counter env
 				in
-				if !Parameter.debugModeOn then
-				(
-					Debug.tag (Printf.sprintf 
-					"Should check intra extensions of embeddings in %s" 
-					(Tools.string_of_list 
-						(fun phi -> 
-							let a = Injection.get_address phi 
-							and (mix_id,cc_id) = Injection.get_coordinate phi 
-							in 
-							Printf.sprintf "(%d,%d,%d)" mix_id cc_id a)
-						new_injs
-					))
-				);
 				
 				(*Non local positive update: adding new possible intras*)
-				let state = if env.Environment.has_intra then State.intra_positive_update r embedding_t new_injs state counter env else state 
+				let state = if env.Environment.has_intra then NonLocal.positive_update r embedding_t new_injs state counter env else state 
 				in
 				
 				(****************END POSITIVE UPDATE*****************)

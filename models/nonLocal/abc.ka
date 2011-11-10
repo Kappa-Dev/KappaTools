@@ -2,7 +2,7 @@
 %agent: B(a,c)
 %agent: C(b,a)
 
-%var: 'k1' 1.0
+%var: 'k1' [inf]
 %var: 'k2' 1.0
 %var: 'k_off' 0.1
 
@@ -14,7 +14,7 @@
 'a..c' A(c!a.C) -> A(c) @ 'k_off'
 'b..c' B(c!b.C) -> B(c) @ 'k_off'
 
-%var: 'n' 10
+%var: 'n' 100000
 
 %init: 'n' A,B,C
 

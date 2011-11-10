@@ -34,4 +34,4 @@
 %init: 'n_a' A,B
 %init: 'n_c' C
 
-%mod: ([E] = [emax]) do $SNAPSHOT 
+#%mod: ([E] = [emax]) do $SNAPSHOT 

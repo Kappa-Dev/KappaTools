@@ -31,7 +31,7 @@ let apply_effect p_id pert state counter env =
 		let filename = 
 			match opt with 
 				| None -> !Parameter.snapshotFileName^"_"^(string_of_int (Counter.event counter)) 
-				| Some s -> s^"_"^(string_of_int (Counter.event counter))
+				| Some s -> (Filename.concat !Parameter.outputDirName s)^"_"^(string_of_int (Counter.event counter))
 		in
 		let file_exists = ref true in
 		let cpt = ref 1 in

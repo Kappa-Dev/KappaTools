@@ -474,6 +474,7 @@ let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take 
 			(DepSet.union dep dep_alt) env
 	in
 	let pre_causal = Dynamics.compute_causal lhs rhs script env in
+	
 	let connect_impact,disconnect_impact,side_eff_impact =
 		List.fold_left 
 		(fun (con_map,dis_map,side_eff) action ->
@@ -897,7 +898,16 @@ let initialize result counter =
 	Debug.tag "+ Analyzing non local patterns..." ;
 	let env = Environment.init_roots_of_nl_rules env in
 	Debug.tag "+ Building initial simulation state...";
+	Debug.tag "\t -Counting initial local patterns..." ;
 	let (state, env) =
-		State.initialize sg rules kappa_vars alg_vars observables (pert,rule_pert) counter env
-	in 
-	(Debug.tag "Done"; (env, state))
+	State.initialize sg rules kappa_vars alg_vars observables (pert,rule_pert) counter env
+	in
+	let state =  
+		if env.Environment.has_intra then
+			begin
+				Debug.tag "\t -Counting initial non local patterns..." ;
+				NonLocal.initialize_embeddings state counter env
+			end
+		else state
+	in
+	(Debug.tag "\t Done"; (env, state))
