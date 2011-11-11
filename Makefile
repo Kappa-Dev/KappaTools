@@ -10,7 +10,7 @@ SOURCES = \
 		siteGraphs/node.ml pattern/mixture.mli  \
 		pattern/mixture.ml pattern/precondition.ml pattern/precondition.mli \
 		siteGraphs/graph.ml siteGraphs/species.ml pattern/matching.ml pattern/dynamics.ml \
-		grammar/eval.mli simulation/nonLocal.ml simulation/state.ml simulation/external.ml grammar/eval.ml  \
+		grammar/eval.mli  simulation/state.ml simulation/external.ml simulation/nonLocal.ml grammar/eval.ml  \
 		cflow/causal.ml simulation/plot.ml simulation/run.ml\
 		main/main.ml 
 
@@ -33,7 +33,7 @@ OCAMLCP = $(OCAMLBINPATH)ocamlcp
 OCAMLLEX = $(OCAMLBINPATH)ocamllex
 OCAMLYACC = $(OCAMLBINPATH)ocamlyacc
 OCAMLC = $(OCAMLBINPATH)ocamlc.opt 
-OCAMLOPT = $(OCAMLBINPATH)ocamlopt.opt #-g -ccopt -g
+OCAMLOPT = $(OCAMLBINPATH)ocamlopt.opt #-g -ccopt -g -ccopt -pg
 OCAMLDEP = $(OCAMLBINPATH)ocamldep
 CC = gcc
 

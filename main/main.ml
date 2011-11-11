@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "2.0-091111_unstable"
+let version = "2.0-111111_unstable"
 
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
@@ -63,7 +63,7 @@ let main =
     
 		Parameter.setOutputName() ;
 		Parameter.checkFileExists() ;
-		Printexc.record_backtrace !Parameter.backtrace ; (*Possible backtrace*)
+		(*Printexc.record_backtrace !Parameter.backtrace ; (*Possible backtrace*)*)
 		
 		(*let _ = Printexc.record_backtrace !Parameter.debugModeOn in*) 
 		let result =
