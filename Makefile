@@ -21,7 +21,7 @@ RESULT  = KaSim
 ANNOTATE = no
 
 ## make target (see manual) : byte-code, debug-code, native-code, ...
-all: native-code
+all: debug-code
 
 ##if ocamlopt.opt is not in your path, 
 ##uncomment the line below and set value below according to the location of your ocaml compilers 

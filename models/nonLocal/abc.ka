@@ -14,7 +14,7 @@
 'a..c' A(c!a.C) -> A(c) @ 'k_off'
 'b..c' B(c!b.C) -> B(c) @ 'k_off'
 
-%var: 'n' 100000
+%var: 'n' 10000
 
 %init: 'n' A,B,C
 
@@ -26,10 +26,9 @@
 %var: 'b' B(a,c)
 %var: 'c' C(b,a)
 
-
 %obs: 'mono' 'a' + 'b' + 'c'
 %obs: 'bi' 'ab' + 'ac' + 'bc'
 %obs: 'tri+' A(b!1),B(a!1,c!2),C(b!2)
 %obs: 'closed' A(c!0,b!1),B(a!1,c!2),C(b!2,a!0)
 
-%mod: [E] = ([emax] - 1) do $SNAPSHOT "abc_final" 
+#%mod: [E] = ([emax] - 1) do $SNAPSHOT "abc_final" 
