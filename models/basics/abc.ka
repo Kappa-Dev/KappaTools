@@ -25,9 +25,9 @@
 %obs: 'Cpp' C(x1~p?,x2~p?) 
 
 
-%var: 'n_a' 2 * 'V' 
-%var: 'n_b' 2 * 'V'
-%var: 'n_c' 2 * 'V'
+%var: 'n_a' 20000 * 'V' 
+%var: 'n_b' 20000 * 'V'
+%var: 'n_c' 20000 * 'V'
 
 
 #### Initial conditions 
