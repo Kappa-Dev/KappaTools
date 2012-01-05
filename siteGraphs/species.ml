@@ -89,59 +89,6 @@ let to_dot hr palette k cpt spec desc env =
 	) bonds ;
 	Printf.fprintf desc "}\n" 
 
-(*
-let to_dot k cpt spec desc env = 
-	let header = 
-		Printf.sprintf 
-		"subgraph cluster%d{\n\t node [style=filled,color=lightblue,shape=Mrecord,];\n\t edge [arrowhead=none];\n\t label = \"#%d\";\n" cpt k in
-		let hp_ls, nodes_ls, bonds_ls =
-			IntMap.fold 
-			(fun i node (hp_ls,nodes_ls, bonds_ls) ->
-				let hp_ls = LongString.concat ~sep:'|' (Printf.sprintf "<n%d> %d" i i) hp_ls
-				and nodes_ls = 
-						let l = 
-							Node.fold_status 
-							(fun site_id status cont -> 
-								if site_id = 0 then (Printf.sprintf "<s%d> %s" site_id (Environment.name (Node.name node) env))::cont
-								else
-								let int_str = 
-									match status with 
-										| (Some i,_) -> "~"^(Environment.state_of_id (Node.name node) site_id i env) 
-										| _ -> "" 
-								in
-								let label = (Environment.site_of_id (Node.name node) site_id env)^int_str in
-								(Printf.sprintf "<s%d> %s" site_id label)::cont
-								) node [] 
-						in
-						LongString.concat (Printf.sprintf "\tnode%d [label = \"{%s}\"];\n" i (String.concat "|" (List.rev l))) nodes_ls
-				and bonds_ls = 
-					let l = 
-							Node.fold_status 
-							(fun site_id status cont -> 
-								match status with 
-									| (_,Node.Ptr (node',j)) -> 
-										let i' = Node.get_address node' in
-										if i<i' || (i=i' && site_id<j) then 
-											(Printf.sprintf "node%d:s%d -> node%d:s%d;" i site_id i' j)::cont
-										else cont
-									| (_,Node.FPtr (n,j)) -> 
-										if i<n || (i=n && site_id<j) then 
-											(Printf.sprintf "node%d:s%d -> node%d:s%d;" i site_id n j)::cont
-										else cont
-									| _ -> cont
-							) node [] 
-					in
-					LongString.concat (String.concat "\n" l) bonds_ls
-				in
-				(hp_ls,nodes_ls,bonds_ls)
-			)
-			spec.nodes (LongString.empty,LongString.empty,LongString.empty)
-		in
-		Printf.fprintf desc "%s" header ;
-		LongString.printf desc nodes_ls ;
-		LongString.printf desc bonds_ls ;
-		Printf.fprintf desc "}\n"
-*)
 
 (**[of_node sg root visited env] produces the species anchored at node [root] allocated in the graph [sg] and *)
 (** returns a pair [(spec,visited')] where [visited'=visited U node_id] of [spec]*)
@@ -181,7 +128,18 @@ let of_node sg root visited env =
 	} visited 
 	
 let iso spec1 spec2 env =
-	let rec reco embedding todo_list checked =
+	
+	let check i i' assoc = 
+		let i_opt = try Some (IntMap.find i assoc) with Not_found -> None
+		and i_opt' = try Some (IntMap.find i' assoc) with Not_found -> None
+		in
+		match (i_opt,i_opt') with
+			| (Some j,Some j') -> (if (j=i') && (j'=i) then false else raise False)
+			| (None,None) -> true
+			| _ -> raise False
+	in
+	
+	let rec reco embedding todo_list assoc =
 		match todo_list with
 		| [] -> embedding
 		| (id, id'):: tl ->
@@ -190,26 +148,26 @@ let iso spec1 spec2 env =
 				in
 				if not (Node.name node = Node.name node') then raise False
 				else
-					let todo, checked =
+					let todo,assoc =
 						Node.fold_status
-							(fun site_id (int, lnk) (todo_list, checked) ->
-										let int' = Node.internal_state (node', site_id)
-										and lnk' = Node.link_state (node', site_id)
-										in
-										if not (int'= int) then raise False
-										else
-											match (lnk, lnk') with
-											| (Node.Null , Node.Null) -> (todo_list, checked)
-											| (Node.FPtr (i, j), Node.FPtr (i', j')) ->
-													if not (j = j') then raise False
-													else
-													if Int2Set.mem (i, i') checked then (todo_list, checked)
-													else
-														((i, i'):: todo_list, Int2Set.add (i, i') checked)
-											| _ -> raise False
-							) node (tl, checked)
+							(fun site_id (int, lnk) (todo_list,assoc) ->
+									let int' = Node.internal_state (node', site_id)
+									and lnk' = Node.link_state (node', site_id)
+									in
+									if not (int'= int) then raise False
+									else
+										match (lnk, lnk') with
+										| (Node.Null , Node.Null) -> (todo_list,assoc)
+										| (Node.FPtr (i, j), Node.FPtr (i', j')) ->
+												if not (j = j') then raise False
+												else
+													let is_new = check i i' assoc	in
+													if is_new then ((i,i')::todo_list,IntMap.add i i' (IntMap.add i' i assoc))
+													else (todo_list,assoc)
+										| _ -> raise False
+							) node (tl,assoc)
 					in
-					reco (IntMap.add id id' embedding) todo checked
+					reco (IntMap.add id id' embedding) todo assoc
 	in
 	
 	try
@@ -220,14 +178,15 @@ let iso spec1 spec2 env =
 				let id = IntSet.choose ids in (*cannot fail*)
 				let ids' = try Int64Map.find view spec2.views with Not_found -> raise False
 				in
-				IntSet.iter
+				(IntSet.iter
 					(fun id' ->
-								try
-									let _ = reco IntMap.empty [(id, id')] Int2Set.empty
-									in
-									raise True
-								with False -> ()
-					) ids' ; false
+						try
+							let _ = reco IntMap.empty [(id, id')] (IntMap.add id id' (IntMap.add id' id IntMap.empty))
+							in
+								raise True
+						with False -> ()
+					) ids' ; 
+				false)
 	with
 	| True -> true
 
@@ -240,17 +199,19 @@ let of_graph sg env =
 							let spec, visited = of_node sg node visited env in
 							let sign =
 								List.fast_sort
-									compare
-									(Int64Map.fold
-											(fun view _ cont ->
-														view:: cont
-											) spec.views [])
+								compare
+								(Int64Map.fold
+										(fun view _ cont ->
+													view::cont
+										) spec.views []
+								)
 							in
 							let specs = try Hashtbl.find species sign with Not_found -> [] in
 							let specs, already_there =
 								List.fold_left
 									(fun (cont, b) (spec', n) ->
-												if iso spec spec' env then ((spec', n + 1):: cont, true)
+												if iso spec spec' env then 
+													((spec', n + 1):: cont, true)
 												else ((spec', n):: cont, b)
 									) ([], false) specs
 							in

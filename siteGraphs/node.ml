@@ -4,10 +4,11 @@ open ExceptionDefn
 (**node: (name,array[site_name,internal_state,link])*)
 (**ptr(i,a) pointer to a node and a site at offset i*)
 
-type lnk_t = WLD | BND | FREE | TYPE of (int*int) 
+type lnk_t = WLD | BND | FREE | TYPE of (int*int) (*(site_id,nme)*)
 type port_status = (int option * ptr) (*internal state,link state*)
 and port = {status:port_status ; mutable dep : (LiftSet.t * LiftSet.t)} (*dep : (lifts for int,lifts for lnk)*)
-and t = {name:int ; interface : port array ; mutable address : int option }
+and t = {name:int ; interface : port array ; mutable address : int option} 
+(*prob_connect: mix_id -> {u | v....u and v,u are the image of the roots of connected components of mix_id} *)
 and ptr = Null | Ptr of (t * int) | FPtr of (int * int)
 and node = t (*just alias for Node.t*)
 
@@ -20,8 +21,9 @@ let is_empty node = (node.name = -1)
 let get_lifts u i = 
 	let port_i = try u.interface.(i) with Invalid_argument msg -> invalid_arg (Printf.sprintf "Node.get_lifts: node %d has no site %d" (name u) i)
 	in
-		port_i.dep
-
+	port_i.dep 
+	
+	
 let fold_status f node cont = 
 	let cont = ref cont in
 		Array.iteri (fun site_id port -> cont := f site_id port.status !cont) (interface node) ;
@@ -37,7 +39,7 @@ let fold_interface f node cont =
 		Array.iteri (fun site_id port -> cont := f site_id port !cont) (interface node) ;
 		!cont
 	
-let to_string with_detail (hsh_lnk,fresh) node env = 
+let to_string with_detail (hsh_lnk,fresh) node env =
 	let intf_l,fresh' = 
 		fold_interface
 		(fun i port (cont,fresh) ->
@@ -78,13 +80,8 @@ let to_string with_detail (hsh_lnk,fresh) node env =
 					in
 						let string_of_lift = 
 							fun inj -> 
-								let s_a =
-									match (try Some (Injection.get_address inj) with Not_found -> None) with
-										| Some a -> string_of_int a
-										| None -> "na"
-								in 
 								let (m,c) = Injection.get_coordinate inj in
-								Printf.sprintf "(%s,%s,%s)" (string_of_int m) (string_of_int c) s_a 
+								Printf.sprintf "(%s,%s)" (string_of_int m) (string_of_int c)  
 						in
 							let lift_int = Tools.string_of_set string_of_lift LiftSet.fold lifts_int
 							and lift_lnk = Tools.string_of_set string_of_lift LiftSet.fold lifts_lnk
@@ -97,20 +94,22 @@ let to_string with_detail (hsh_lnk,fresh) node env =
 	in
 		let s_addr = try string_of_int (get_address node) with Not_found -> "na" in
 		if with_detail then
-			(Printf.sprintf "%s_%s:[%s]" (Environment.name node.name env) s_addr (String.concat "," (List.rev intf_l)),fresh')
+			(Printf.sprintf "%s_%s:[%s]" (Environment.name node.name env) s_addr (String.concat "," (List.rev intf_l)) ,fresh')
 		else
-			(Printf.sprintf "%s(%s)" (Environment.name node.name env) (String.concat "," (List.rev intf_l)),fresh')
+			(Printf.sprintf "%s(%s)" (Environment.name node.name env) (String.concat "," (List.rev intf_l)),fresh') 
 
-let add_dep phi port_list node =
+let add_dep phi port_list node env =
 	let add lift int_lnk = (fun (x,y) -> if int_lnk = 0 then (LiftSet.add x lift,y) else (x,LiftSet.add y lift))
 	in
-		List.iter
-		(fun (int_lnk,p_k) -> 
-			let port_k = node.interface.(p_k) in 
-			let dep = add phi int_lnk port_k.dep in node.interface.(p_k).dep <- dep
-		) port_list ;
+	List.iter
+	(fun (int_lnk,p_k) ->
+		let port_k = node.interface.(p_k) 
+		in 
+		let dep = add phi int_lnk port_k.dep in node.interface.(p_k).dep <- dep
+	) port_list ;
 	node
-		
+
+
 let iteri f node  = Array.iteri f (interface node) 
 
 let marshalize node =
@@ -207,7 +206,7 @@ let create ?with_interface name_id env =
 						{status = (def_int,Null) ; dep = (LiftSet.create !Parameter.defaultLiftSetSize,LiftSet.create !Parameter.defaultLiftSetSize)}
 				)
 			in 
-				let u = {name = name_id ; interface = intf ; address = None } in
+				let u = {name = name_id ; interface = intf ; address = None} in
 					match with_interface with
 						| None -> u
 						| Some m ->
@@ -223,7 +222,6 @@ let create ?with_interface name_id env =
 	with
 		| Invalid_argument str -> (invalid_arg ("Node.create: "^str))
 		| Not_found -> (invalid_arg "Node.create: not found")
-
 
 (*Tests whether status of port i of node n is compatible with (int,lnk) raises False if not otherwise returns completes*)
 (*the list port_list with (0,i) if i is int-tested or (1,i) if i is lnk-tested *)
@@ -256,7 +254,5 @@ let follow (u,i) =
 				| Ptr (v,j) -> Some (v,j)
 				| _ -> None
 
-
-	
 module NodeHeap = MemoryManagement.Make (struct type t = node let allocate node i = node.address <- (Some i) end)
 

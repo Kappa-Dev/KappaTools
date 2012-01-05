@@ -2,14 +2,9 @@
 
 type agent
 type t
-type constraints = PREVIOUSLY_DISCONNECTED of int*int | PREVIOUSLY_CONNECTED of int*int
-
 
 val set_root_of_cc : t -> t
 val root_of_cc : t -> int -> int option
-
-(**[constraints mix] returns the map [id -> constr] if agent [id] in [mix] has some contextual constraints*)
-val constraints : t -> constraints Mods.IntMap.t
 
 (**[ids_of_name name mix] returns all agent id's in mixture [mix] whose name is equal to [name] *)
 val ids_of_name : int*int -> t -> Mods.IntSet.t
@@ -26,6 +21,10 @@ val name : agent -> int
 (**The empty mixture*)
 val empty : int option -> t
 val is_empty : t -> bool
+
+(**Whether mixture's cc's should be embedded in a connected graph*)
+val unary : t -> bool
+val set_unary : t -> t
 
 val size_of_cc : int -> t -> int
 
@@ -51,7 +50,7 @@ val site_defined : int -> agent -> bool -> Environment.t -> (int option * Node.l
 
 (**[compose i ag mix edg cstr_opt] add agent [ag] with identifier [i] to mixture [mix] with edges [edg] represented as a map (id,j)->(k,l) where k is an agent identifier and j,l are site indices*)
 (**[cstr_opt] is used to add [constraints] to construct a mixture that requires some side checks upon matching*)
-val compose : int -> agent -> t -> (int*int) Mods.Int2Map.t -> constraints option -> t
+val compose : int -> agent -> t -> (int*int) Mods.Int2Map.t -> t
 
 (**[follow_in_spanning_tree (root_ag,root_site) (id,i) mix] *)
 val follow_in_spanning_tree : int -> (int*int) -> t -> (int*int) option

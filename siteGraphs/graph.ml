@@ -20,6 +20,7 @@ end
 module type SG =
 sig
 	type t
+	exception Is_connex
 	val fold : (int -> Node.t -> 'a -> 'a) -> t -> 'a -> 'a
 	val init : int -> t
 	val node_of_id : t -> int -> Node.t
@@ -28,8 +29,15 @@ sig
 	val dump : ?with_lift: bool -> t -> Environment.t -> unit
 	val remove : t -> int -> unit
 	val ( & ) : Node.t -> int
-	val neighborhood :?interrupt_with: Mods.IntSet.t -> t -> int -> int -> int Mods.IntMap.t
-	val add_lift : t -> Injection.t -> ((int * int) list) Mods.IntMap.t -> t
+	val neighborhood :
+			?interrupt_with: Mods.IntSet.t -> 
+			?check_connex: Mods.IntSet.t -> 
+			?complete:bool -> 
+			?d_map:int IntMap.t -> 
+			?filter_elements: (Node.t -> bool) ->  
+			t -> int -> int -> (bool * int Mods.IntMap.t * IntSet.t * IntSet.t)
+	
+	val add_lift : t -> Injection.t -> ((int * int) list) Mods.IntMap.t -> Environment.t -> t
 	val marshalize : t -> Node.t Mods.IntMap.t
 	val size : t -> int
 	val to_dot : ?with_heap:bool -> t -> string -> Environment.t -> unit
@@ -62,7 +70,9 @@ struct
 	
 	let ( & ) node = Node.get_address node
 	
-	let neighborhood ?(interrupt_with = IntSet.empty) sg id radius =
+	exception Is_connex
+	
+	let neighborhood ?(interrupt_with = IntSet.empty) ?check_connex ?(complete = false) ?(d_map = IntMap.empty) ?filter_elements sg id radius =
 		let address node =
 			try ( & ) node
 			with | Not_found -> invalid_arg "Graph.neighborhood: not allocated" in
@@ -85,11 +95,31 @@ struct
 									if visited
 									then (d_map, to_do)
 									else (d_map, (id' :: to_do)))
-				node (d_map, to_do) in
-		let rec iter to_do dist_map =
+				node (d_map, to_do) 
+		in
+		
+		let rec iter check_connex remaining_roots to_do dist_map component is_connex =
 			match to_do with
-			| [] -> dist_map
-			| addr :: to_do ->
+			| [] -> (is_connex,dist_map,component,remaining_roots) 
+			| addr :: to_do -> (*adding addr to cc -only if addr is the root of a nl injection if filtering is enabled*)
+					let component = 
+						match filter_elements with 
+							| None -> IntSet.add addr component 
+							| Some predicate_over_node -> 
+								let n = node_of_id sg addr 
+								in 
+								if (predicate_over_node n) then IntSet.add addr component else component
+					in
+					(*checking connectivity of remaining_roots*)
+					let remaining_roots,is_connex = 
+						if not check_connex then (remaining_roots,is_connex) 
+						else 
+							let set = IntSet.remove addr remaining_roots in
+							let is_connex = IntSet.is_empty set in
+							if complete || (not is_connex) then
+								(set,is_connex)
+							else raise Is_connex
+					in
 					let depth =
 						(try IntMap.find addr dist_map
 						with
@@ -97,28 +127,30 @@ struct
 								invalid_arg "Graph.neighborhood: invariant violation")
 					in
 					if (radius >= 0) && ((depth + 1) > radius)
-					then iter to_do dist_map
+					then iter check_connex remaining_roots to_do dist_map component is_connex
 					else
 						(let (dist_map', to_do') =
 								mark_next addr (depth + 1) dist_map to_do
 							in
-							if
-							IntSet.exists (fun id -> IntMap.mem id dist_map')
-								interrupt_with
-							then dist_map'
-							else iter to_do' dist_map')
-		in iter [ id ] (IntMap.add id 0 IntMap.empty)
+							if IntSet.exists (fun id -> IntMap.mem id dist_map')	interrupt_with then (is_connex,dist_map',component,remaining_roots)
+							else iter check_connex remaining_roots to_do' dist_map' component is_connex)
+		in 
+		let check_connex,roots = match check_connex with None -> (false,IntSet.empty) | Some set -> (true,set) in
+		
+		try iter check_connex roots [ id ] (IntMap.add id 0 d_map) IntSet.empty false with Is_connex -> (true,IntMap.empty,IntSet.empty,IntSet.empty)
+			
 	
-	let add_lift sg phi port_map =
+	let add_lift sg phi port_map env =
 		(IntMap.iter
 				(fun u_i port_list ->
 							let node_i =
 								try node_of_id sg u_i
 								with | Not_found -> invalid_arg "Graph.add_lift"
-							in A.set sg u_i (Node.add_dep phi port_list node_i))
+							in A.set sg u_i (Node.add_dep phi port_list node_i env))
 				port_map;
 			sg)
-	
+					
+		
 	let marshalize sg =
 		fold
 			(fun id node map ->
