@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "2.0-050112"
+let version = "2.0-090112"
 
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
@@ -49,7 +49,7 @@ let main =
 	in
 	try
 		Arg.parse options (fun _ -> Arg.usage options usage_msg ; exit 1) usage_msg ;
-		
+		if not !Parameter.plotModeOn then ExceptionDefn.warning "No data points are required, use -p option for plotting data.";
 		let abort =
 			match !Parameter.inputKappaFileNames with
 			| [] -> if !Parameter.marshalizedInFile = "" then true else false

@@ -5,7 +5,6 @@ simulation
 pattern
 models
 models/tdg
-models/basics
 man
 man/img
 man/bib
@@ -15,6 +14,4 @@ dataStructures
 cflow
 Error
 /usr/lib/ocaml
-models/nonLocal
 models/nonLocal/out
-models/nonLocal
