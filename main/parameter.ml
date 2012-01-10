@@ -43,7 +43,7 @@ let marshalizedOutFile = ref ""
 
 let setOutputName () = 
 	let set name = 
-		if !name <> "" then (name := Filename.concat !outputDirName !name ; Printf.printf "%s\n" !name)
+		if !name <> "" then name := Filename.concat !outputDirName !name 
 	in
 	set snapshotFileName ;
 	set dumpFileName ;

@@ -222,7 +222,7 @@ let update_activity state cause var_id counter env =
 	else
 		let rule = rule_of_id var_id state in
 		let a2,a1 = eval_activity rule state counter env in
-		let alpha = a2 +. a1 in (*a1 is zero if rule has ambiguous molarity*)
+		let alpha = a2 +. a1 in (*a1 is zero if rule doesn't have ambiguous molarity*)
 		
 		if !Parameter.fluxModeOn && cause > 0 then
 			begin
@@ -832,25 +832,9 @@ let rec update_dep state dep_in pert_ids counter env =
 let enabled r state = 
 	let r_id = Mixture.get_id r.lhs in 
 	try Hashtbl.find state.influence_map r_id with Not_found -> IntMap.empty
-
-
-(**************************************************WIP*********************************************)
-(**************************************************WIP*********************************************)
-(**************************************************WIP*********************************************)
-
-(**************************************************WIP*********************************************)
-(**************************************************WIP*********************************************)
-(**************************************************WIP*********************************************)
-
-
-(**************************************************WIP*********************************************)
-(**************************************************WIP*********************************************)
-(**************************************************WIP*********************************************)
-
 	
 
 let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) counter env = (*pert_intro is temporary*)
-	(*let t_upd = Profiling.start_chrono () in*)
 	
 	(* sub function find_new_inj *)
 	let find_new_inj state var_id mix cc_id node_id root pert_ids already_done_map new_injs env =
@@ -960,11 +944,10 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 		) vars_to_wake_up (env, state, IntSet.empty, IntMap.empty,[])  
 	in
 	
-	if not r.Dynamics.side_effect then 
-		((*Profiling.add_chrono "Upd+" Parameter.profiling t_upd ;*)			
-		(env,state,pert_ids,new_injs))
-	else
-	(*Handling side effects*)
+	if not r.Dynamics.side_effect then (env,state,pert_ids,new_injs)
+	
+	else	(*Handling side effects*)
+	
 	let wu_map = Hashtbl.create !Parameter.defaultExtArraySize
 	in
 		wake_up state 1 side_modifs wu_map env;
