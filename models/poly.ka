@@ -2,9 +2,8 @@
 %agent: B(a,c)
 %agent: C(b,a)
 ##
-%var: 'V' 1
 %var: 'k1' [inf]
-%var: 'k2' 1.0E-4/'V'
+%var: 'k2' 1.0
 %var: 'k_off' 0.1
 ##
 'a.b' A(b),B(a) -> A(b!1),B(a!1) @ 'k2'('k1')
@@ -19,4 +18,4 @@
 ##
 %init: 'n' A,B,C
 ##
-%mod: [E] = 10000 do $STOP 
+%mod: [E] = [emax] do $STOP  

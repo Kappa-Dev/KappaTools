@@ -440,7 +440,7 @@ let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take 
 		match ast_rule.k_un with
 		| None -> (env,None, DepSet.empty)
 		| Some ast ->
-				let env = Environment.declare_unary_rule ast_rule_label.lbl_nme lhs_id env in
+				let env = Environment.declare_unary_rule (Some (Environment.kappa_of_num lhs_id env,Tools.no_pos)) (*ast_rule_label.lbl_nme*) lhs_id env in
 				let (rate, const, dep, _) = partial_eval_alg env ast
 				in
 				if const
@@ -550,7 +550,7 @@ let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take 
 		) connect_impact IntMap.empty 
 	in
 	let env = 
-		match k_alt with 
+		(match k_alt with 
 			| None -> env
 			| Some _ -> (*rule has a unary version*)
 				let ptr_env = ref {env with Environment.has_intra=true} in
@@ -560,9 +560,10 @@ let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take 
 						let id = match Mixture.root_of_cc lhs !cc_id with None -> invalid_arg "Eval.rule_of_ast" | Some i -> i in
 						Mixture.agent_of_id id lhs
 					in
-					ptr_env:= Environment.declare_nl_element (Mixture.get_id lhs) !cc_id (Mixture.name ag_root) !ptr_env ;
-					cc_id:=!cc_id+1 
-				done ; !ptr_env
+					let env' = Environment.declare_nl_element (Mixture.get_id lhs) !cc_id (Mixture.name ag_root) !ptr_env in
+					ptr_env := env' ;
+					cc_id := !cc_id+1 ;
+				done ; !ptr_env)
 	in
 	(env,
 		{

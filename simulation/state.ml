@@ -528,18 +528,27 @@ let map_of embedding = match embedding with CONNEX e | DISJOINT e | AMBIGUOUS e 
 (**returns either valid embedding or raises Null_event if injection is no longer valid --function also cleans inj_hp and nodes as a side effect*)
 let check_validity injprod with_full_components state counter env =
 	try
-		let embedding,roots = 
+		let embedding,roots,_ = 
 			InjProduct.fold_left
-			(fun (embedding,roots) inj_i ->
+			(fun (embedding,roots,codom) inj_i ->
 				if Injection.is_trashed inj_i then (*injection product is no longer valid because one of its element is trashed*) 
 					(if !Parameter.debugModeOn then Debug.tag "Clashing because one of the component of injection product is no longer valid" ;
 					raise (Null_event 3))
 				else
 				(*injection product might be invalid because co-domains are no longer connected*)
-					let map = Injection.fold (fun i j map -> IntMap.add i j map) inj_i embedding in
+					let map,codom = 
+						Injection.fold 
+						(fun i j (map,codom) -> 
+							let map = IntMap.add i j map
+							and codom = 
+								if IntSet.mem j codom then raise (Null_event 2) (*clashing instance*) 
+								else IntSet.add j codom
+							in
+							(map,codom)
+						) inj_i (embedding,codom) in
 					let roots = match (Injection.root_image inj_i) with None -> invalid_arg "State.check_validity" | Some (_,u_i) -> IntSet.add u_i roots in
-					(map,roots)
-			) (IntMap.empty,IntSet.empty) injprod
+					(map,roots,codom)
+			) (IntMap.empty,IntSet.empty,IntSet.empty) injprod
 		in
 		let (is_connex,d_map,components,_) = connex roots with_full_components state env in
 		if is_connex then 

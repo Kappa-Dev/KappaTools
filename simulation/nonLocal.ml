@@ -72,7 +72,7 @@ let update_intra_in_components r embedding_info state counter env =
 				let opt = search_elements state.graph component_i extensions env
 				in
 				match opt with
-					| Some ext -> (ext,found+1)
+					| Some ext -> (ext,found+1) 
 					| None -> (extensions,found) (*no partial intra was found in cc_i *)
 			) cc_set (extensions,found) 
 		) con_map (IntMap.empty,0)
@@ -180,10 +180,11 @@ let rec update_rooted_intras new_injs state counter env =
 							(Tools.string_of_list Injection.string_of_coord inj_list)
 						) candidate_map 
 					end ;
-				if IntMap.size candidate_map < (Mixture.arity (kappa_of_id mix_id state)) - 1 then update_rooted_intras tl state counter env
+				if IntMap.size candidate_map < (Mixture.arity (kappa_of_id mix_id state)) - 1 then 
+					update_rooted_intras tl state counter env
 				else
 					let new_intras = 
-						IntMap.fold 
+						IntMap.fold (*folding on candidate map*)
 						(fun cc_id ext_injs new_intras ->
 							
 							List.fold_left 
@@ -199,6 +200,7 @@ let rec update_rooted_intras new_injs state counter env =
 							
 						) candidate_map [IntMap.add cc_id injection IntMap.empty]
 					in
+										
 					if !Parameter.debugModeOn then
 						List.iter (fun injmap -> Debug.tag ("new_intras: "^(string_of_map string_of_int Injection.string_of_coord IntMap.fold injmap))) new_intras ;
 					
@@ -219,6 +221,18 @@ let rec update_rooted_intras new_injs state counter env =
 										(injprod, IntMap.add cc_id root new_roots)
 									) intra_map (injprod,IntMap.empty)
 								in
+								let opt = 
+									try 
+										Some (
+											InjProduct.fold_left 
+											(fun cod inj -> 
+												let _,cod' = Injection.codomain inj (IntMap.empty,cod) in cod'
+											) IntSet.empty injprod
+											) 
+									with Injection.Clashing -> None
+								in
+								if opt = None then injprod_hp 
+								else
 								try
 								let injprod_hp = InjProdHeap.alloc ~check:true injprod injprod_hp in
 									injprod_hp

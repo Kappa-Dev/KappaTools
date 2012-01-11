@@ -20,7 +20,7 @@ let _RULE = 1
 let _INIT = 2
 let _PERTURBATION = 3	
 
-type attribute = (*{ar: atom GenArray.t ; buffer_size : int ; }*) atom list
+type attribute = atom list
 
 type grid = (int*int*int,attribute) Hashtbl.t  
 
@@ -55,11 +55,28 @@ let last_event attribute =
 		| [] -> None
 		| a::_ -> (Some a.eid)
 
+let rec find_opposite atom attribute = 
+	match attribute with
+		| [] -> raise Not_found
+		| a::att -> 
+			if a.causal_impact = 1 (*a is a pure test*) then find_opposite atom att
+			else 
+				if a.before = atom.after then a
+				else raise Not_found
+
 (*adds atom a to attribute att. Collapses last atom if if bears the same id as a --in the case of a non atomic action*)
 let push (a:atom) (att:atom list) = 
 	match att with
-		| [] -> [a]
-		| a'::att' -> if a'.eid = a.eid then a::att' else a::att
+		| [] -> ([a],None)
+		| a'::att' -> 
+			if a'.eid = a.eid then (a::att',None) (*if rule has multiple effect on the same attribute, only the last one is recorded*) 
+			else
+				begin
+					if a.causal_impact = 1 then (a::att,None) (*atom is a pure test, no need to compress loop locally*) 
+					else
+						let opt = try Some (find_opposite a att) with Not_found -> None in 
+						(a::att,opt)
+				end 
 
 let add (node_id,site_id) c state grid event_number kind locked =
  
@@ -83,7 +100,7 @@ let add (node_id,site_id) c state grid event_number kind locked =
 				(*else 
 					before att*)
 			in
-			let att = push {before = before att ; after = after ; locked = locked ; causal_impact = impact 1 c ; kind = kind ; eid = event_number} att
+			let att,opt_opposite = push {before = before att ; after = after ; locked = locked ; causal_impact = impact 1 c ; kind = kind ; eid = event_number} att
 			in
 			grid_add (node_id,site_id,1) att grid
 		else
@@ -105,7 +122,7 @@ let add (node_id,site_id) c state grid event_number kind locked =
 					| None -> UNDEF
 			(*else before att*)
 		in
-		let att = push {before = before att ; after = after ; locked = locked ; causal_impact = impact 0 c ; kind = kind ; eid = event_number} att
+		let att,opt_opposite = push {before = before att ; after = after ; locked = locked ; causal_impact = impact 0 c ; kind = kind ; eid = event_number} att
 		in
 		grid_add (node_id,site_id,0) att grid
 	else 
@@ -131,13 +148,15 @@ let record mix opt_rule embedding state counter locked grid env =
 									let att = grid_find (node_id,site_id,0) grid in
 									let atom = {before = UNDEF ; after = INT i ; locked = false ; causal_impact = impact 0 _INTERNAL_MODIF ; kind = 1 ; eid = Counter.event counter}
 									in
-									grid_add (node_id,site_id,0) (push atom att) grid
+									let att,opt_opposite = push atom att in
+									grid_add (node_id,site_id,0) att grid
 								| None -> grid
 						in
 						let att = grid_find (node_id,site_id,1) grid in
 						let atom = {before = UNDEF ; after = FREE ; locked = false ; causal_impact = impact 1 _LINK_MODIF ; kind = 1 ; eid = Counter.event counter}
 						in
-						grid_add (node_id,site_id,1) (push atom att) grid
+						let att,opt_opposite = push atom att in
+						grid_add (node_id,site_id,1) att grid
 					) node grid
 				in
 				(im_j,grid)
@@ -226,7 +245,7 @@ let string_of_atom atom =
 	let imp_str = match atom.causal_impact with 1 -> "o" | 2 -> "x" | 3 -> "%" | _ -> invalid_arg "Causal.string_of_atom" in
 	Printf.sprintf "(%s%s%s)_%d" (string_of_atom_state atom.before) imp_str (string_of_atom_state atom.after) atom.eid
 
-	
+		
 let dump grid state env =
 	Hashtbl.fold 
 	(fun (n_id,s_id,q) att _ ->
