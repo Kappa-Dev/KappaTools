@@ -6,7 +6,6 @@ open Graph
 open ValMap
 open Random_tree
 
-
 type implicit_state =
 	{ graph : SiteGraph.t;
 	 	injections : (component_injections option) array;
@@ -827,7 +826,7 @@ let rec update_dep state dep_in pert_ids counter env =
 			let depset =
 				Environment.get_dependencies (Mods.KAPPA i) env
 			in
-			if !Parameter.debugModeOn then if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Observable %d is changed, updating %s" i (string_of_set Mods.string_of_dep DepSet.fold depset)) ;
+			if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Observable %d is changed, updating %s" i (string_of_set Mods.string_of_dep DepSet.fold depset)) ;
 				(env,depset,pert_ids)
 		| Mods.EVENT | Mods.TIME -> 
 			let depset = Environment.get_dependencies dep_in env in

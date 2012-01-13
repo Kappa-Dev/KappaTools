@@ -23,10 +23,12 @@ let compatible_info (int_state,lnk_state) ag i =
 (*returns (Some component_injection) if mix anchored at id_agent has an injection in sg at root id_node*)
 (*NOTE: can be used to store (id_agent,id_node) as a representant of the whole component injection, in which case checking additional edges is not necessary*)
 let component ?(check_additional_edges=true) ?(already_done=Int2Set.empty) embedding id_agent (sg,id_node) mix = 
-	let rec reco queue part_embedding port_map  =
+	let rec reco queue part_embedding port_map =
 		match queue with
 			| [] -> (part_embedding,port_map)
 			| (a_i,n_j)::tl ->
+				if IntMap.mem n_j port_map then raise False (*Partial embedding would not be injective on nodes*)
+				else
 				if Int2Set.mem (a_i,n_j) already_done then raise False (*to avoid adding twice the same embedding*)
 				else
 					let node_j = try SiteGraph.node_of_id sg n_j with Not_found -> invalid_arg "Matching.component: not a valid node address" 

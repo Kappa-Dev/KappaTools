@@ -32,7 +32,7 @@ let update_intra_in_components r embedding_info state counter env =
 				let _,lifts = Node.get_lifts u 0 in 
 				LiftSet.fold
 				(fun inj (extensions,modified) ->
-					if Injection.is_trashed inj then invalid_arg "NonLocal.search_elements: injection should not be already invalid..."
+					if Injection.is_trashed inj then (extensions,modified) (*injection should not be already invalid...*)
 					else
 						let (mix_id,cc_id) = Injection.get_coordinate inj in
 						
