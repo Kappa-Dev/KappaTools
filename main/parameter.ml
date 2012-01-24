@@ -35,7 +35,7 @@ let snapshotFileName = ref "snap"
 
 let dumpFileName = ref "dump.ka"
 let influenceFileName = ref ""
-let fluxFileName = ref ""
+let fluxFileName = ref "flux.dot"
 let outputDataName = ref "data.out"
 let inputKappaFileNames:(string list ref) = ref [] 
 let marshalizedInFile = ref "" 
