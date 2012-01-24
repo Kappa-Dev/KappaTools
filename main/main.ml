@@ -136,7 +136,7 @@ let main =
 			((float_of_int (Counter.event counter)) /. (float_of_int (Counter.null_event counter + Counter.event counter))) ;
 			if !Parameter.fluxModeOn then 
 				begin
-					let d = open_out "flux.dot" in
+					let d = open_out !Parameter.fluxFileName in
 					State.dot_of_flux d state env ;
 					close_out d
 				end 
