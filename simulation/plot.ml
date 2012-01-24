@@ -99,7 +99,7 @@ let fill state counter plot env time_increment =
 								if !n = 0 then ()
 								else
 									begin
-										while !n > 0 do
+										while (!n > 0) && (Counter.check_output_time counter !output_time) do
 											output_time := !output_time +. dT ;
 											Counter.tick counter !output_time counter.Counter.events ;
 											output state !output_time counter.Counter.events plot env counter ;
