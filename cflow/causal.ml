@@ -5,24 +5,20 @@ open State
 open LargeArray
 
 type atom_state = FREE | BND of int*int | INT of int | UNDEF
+type event_kind = OBS of int | RULE of int | INIT | PERT of int
 
 type atom = 
 	{before:atom_state ; (*attribute state before the event*)
 	after:atom_state; (*attribute state after the event*) 
 	locked:bool ; (*whether this node can be removed by compression*)
 	causal_impact : int ; (*(1) tested (2) modified, (3) tested + modified*) 
-	kind:int ; (*nature of the node --observable (0), rule application (1), initial condition (2), perturbation (3)--*)
+	kind:event_kind ; (*nature of the node --observable, rule application , initial condition , perturbation --*)
 	eid:int (*event identifier*)
 	}
 
-let _OBSERVABLE = 0
-let _RULE = 1
-let _INIT = 2
-let _PERTURBATION = 3	
-
 type attribute = atom list
 
-type grid = (int*int*int,attribute) Hashtbl.t  
+type grid = {flow: (int*int*int,attribute) Hashtbl.t ; }  (*(n_i,s_i,q_i) -> att_i with n_i: node_id, s_i: site_id, q_i: link (1) or internal state (0) *)
 
 let empty_grid () = Hashtbl.create !Parameter.defaultExtArraySize
 
@@ -132,7 +128,7 @@ let add (node_id,site_id) c state grid event_number kind locked =
 (*NB no internal state modif as side effect*)
 let record mix opt_rule embedding state counter locked grid env = 
 	
-	let im state embedding fresh_map id grid =
+	let im state embedding fresh_map id grid kind =
 		try
 			match id with
 			| FRESH j ->  
@@ -146,14 +142,14 @@ let record mix opt_rule embedding state counter locked grid env =
 							match int_opt with
 								| Some i -> 
 									let att = grid_find (node_id,site_id,0) grid in
-									let atom = {before = UNDEF ; after = INT i ; locked = false ; causal_impact = impact 0 _INTERNAL_MODIF ; kind = 1 ; eid = Counter.event counter}
+									let atom = {before = UNDEF ; after = INT i ; locked = false ; causal_impact = impact 0 _INTERNAL_MODIF ; kind = kind ; eid = Counter.event counter}
 									in
 									let att,opt_opposite = push atom att in
 									grid_add (node_id,site_id,0) att grid
 								| None -> grid
 						in
 						let att = grid_find (node_id,site_id,1) grid in
-						let atom = {before = UNDEF ; after = FREE ; locked = false ; causal_impact = impact 1 _LINK_MODIF ; kind = 1 ; eid = Counter.event counter}
+						let atom = {before = UNDEF ; after = FREE ; locked = false ; causal_impact = impact 1 _LINK_MODIF ; kind = kind ; eid = Counter.event counter}
 						in
 						let att,opt_opposite = push atom att in
 						grid_add (node_id,site_id,1) att grid
@@ -169,15 +165,16 @@ let record mix opt_rule embedding state counter locked grid env =
 		with 
 			| Not_found -> invalid_arg "Causal.record: incomplete embedding"  
 	in
+	
 	let grid = (*if mix is the lhs of a rule*) 
 		match opt_rule with
 			| Some (pre_causal,side_effects,psi,is_pert,r_id) ->
 				(*adding side-effect free modifications and tests*)
-				let kind = if is_pert then _PERTURBATION else _RULE in
+				let kind = if is_pert then (PERT r_id) else (RULE r_id) in
 				let grid = 
 					Id2Map.fold
 					(fun (id,site_id) c grid ->
-						let node_id,grid = im state embedding psi id grid in
+						let node_id,grid = im state embedding psi id grid kind in
 						add (node_id,site_id) c state grid (Counter.event counter) kind locked 
 					) pre_causal grid
 				in
@@ -185,19 +182,20 @@ let record mix opt_rule embedding state counter locked grid env =
 				Int2Set.fold 
 				(fun (node_id,site_id) grid -> add (node_id,site_id) _LINK_MODIF state grid (Counter.event counter) kind locked) 
 				side_effects grid
-			| None -> (*event is an observable occurrence*) 
+			| None -> (*event is an observable occurrence*)
+				let kind = OBS (Mixture.get_id mix) in
 				IntMap.fold
 				(fun id ag grid ->
-					let node_id,grid = im state embedding IntMap.empty (Dynamics.KEPT id) grid in
+					let node_id,grid = im state embedding IntMap.empty (Dynamics.KEPT id) grid kind in
 					Mixture.fold_interface
 					(fun site_id (int,lnk) grid ->
 						let grid = 
 							match int with
-								| Some i -> add (node_id,site_id) _INTERNAL_TESTED state grid (Counter.event counter) _OBSERVABLE true
+								| Some i -> add (node_id,site_id) _INTERNAL_TESTED state grid (Counter.event counter) kind true
 								| None -> grid
 						in
 						match lnk with
-							| Node.BND | Node.FREE | Node.TYPE _ -> add (node_id,site_id) _LINK_TESTED state grid (Counter.event counter) _OBSERVABLE true
+							| Node.BND | Node.FREE | Node.TYPE _ -> add (node_id,site_id) _LINK_TESTED state grid (Counter.event counter) kind true
 							| Node.WLD -> grid
 					)
 					ag grid
@@ -216,18 +214,18 @@ let init state grid =
 				match int with 
 					| None -> grid
 					| Some i -> 
-						let atom = {before = UNDEF ; after = INT i ; locked = true ; causal_impact = impact 0 _INTERNAL_MODIF ; kind = 2 ; eid = 0}
+						let atom = {before = UNDEF ; after = INT i ; locked = true ; causal_impact = impact 0 _INTERNAL_MODIF ; kind = INIT ; eid = 0}
 						in
 						grid_add (node_id,site_id,0) [atom] grid 
 			in
 			match lnk with
 				| Node.Ptr (node',site_id') -> 
 					let node_id' = try Node.get_address node' with Not_found -> invalid_arg "Causal.init" in
-					let atom = {before = UNDEF ; after = BND (node_id',site_id') ; locked = true ; causal_impact = impact 1 _LINK_MODIF ; kind = 2 ; eid = 0}
+					let atom = {before = UNDEF ; after = BND (node_id',site_id') ; locked = true ; causal_impact = impact 1 _LINK_MODIF ; kind = INIT ; eid = 0}
 					in
 						grid_add (node_id,site_id,1) [atom] grid 
 				| Node.Null -> 
-					let atom = {before = UNDEF ; after = FREE ; locked = true ; causal_impact = impact 1 _LINK_MODIF ; kind = 2 ; eid = 0}
+					let atom = {before = UNDEF ; after = FREE ; locked = true ; causal_impact = impact 1 _LINK_MODIF ; kind = INIT ; eid = 0}
 					in
 						grid_add (node_id,site_id,1) [atom] grid
 			  | _ -> invalid_arg "Causal.init"
@@ -237,8 +235,8 @@ let init state grid =
 let string_of_atom atom = 
 	let string_of_atom_state state =
 		match state with
-			| FREE -> "F"
-			| BND (i,j) -> Printf.sprintf "B[%d,%d]" i j
+			| FREE -> "..."
+			| BND (i,j) -> Printf.sprintf "(%d,%d)" i j
 			| INT i -> Printf.sprintf "%d" i
 			| UNDEF -> "N"
 	in
