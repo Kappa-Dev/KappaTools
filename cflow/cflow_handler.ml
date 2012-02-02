@@ -28,3 +28,13 @@ module type Cflow_handler =
   end
 
 
+module Cflow_handler = 
+  (
+    struct 
+      type parameter = unit 
+      type error = unit list
+      type handler = unit 
+      type 'a with_handler = parameter -> handler -> error -> 'a 
+	  
+    end:Cflow_handler
+  )
