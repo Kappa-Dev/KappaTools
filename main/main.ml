@@ -126,7 +126,7 @@ let main =
 		and grid = 
 			if !Parameter.causalModeOn then 
 				let grid = Causal.empty_grid() in Causal.init state grid
-			else Hashtbl.create 0
+			else Causal.empty_grid()
 		in
 		ExceptionDefn.flush_warning () ; 
 		try

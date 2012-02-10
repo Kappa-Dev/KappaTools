@@ -12,20 +12,20 @@ type atom =
 	after:atom_state; (*attribute state after the event*) 
 	locked:bool ; (*whether this node can be removed by compression*)
 	causal_impact : int ; (*(1) tested (2) modified, (3) tested + modified*) 
-	kind:event_kind ; (*nature of the node --observable, rule application , initial condition , perturbation --*)
-	eid:int (*event identifier*)
+	eid:int (*event identifier*) ;
+	label:event_kind
 	}
 
-type attribute = atom list
+type attribute = atom list (*vertical sequence of atoms*)
+	
+type grid = {flow: (int*int*int,attribute) Hashtbl.t}  (*(n_i,s_i,q_i) -> att_i with n_i: node_id, s_i: site_id, q_i: link (1) or internal state (0) *)
 
-type grid = {flow: (int*int*int,attribute) Hashtbl.t ; }  (*(n_i,s_i,q_i) -> att_i with n_i: node_id, s_i: site_id, q_i: link (1) or internal state (0) *)
+let empty_grid () = {flow = Hashtbl.create !Parameter.defaultExtArraySize }
 
-let empty_grid () = Hashtbl.create !Parameter.defaultExtArraySize
-
-let grid_find (node_id,site_id,quark) grid = Hashtbl.find grid (node_id,site_id,quark)
+let grid_find (node_id,site_id,quark) grid = Hashtbl.find grid.flow (node_id,site_id,quark)
 
 let grid_add (node_id,site_id,quark) attribute grid = 
-	Hashtbl.replace grid (node_id,site_id,quark) attribute ;
+	Hashtbl.replace grid.flow (node_id,site_id,quark) attribute ;
 	grid
 		
 let is i c = (i land c = i)
@@ -96,7 +96,7 @@ let add (node_id,site_id) c state grid event_number kind locked =
 				(*else 
 					before att*)
 			in
-			let att,opt_opposite = push {before = before att ; after = after ; locked = locked ; causal_impact = impact 1 c ; kind = kind ; eid = event_number} att
+			let att,opt_opposite = push {before = before att ; after = after ; locked = locked ; causal_impact = impact 1 c ; eid = event_number ; label = kind} att
 			in
 			grid_add (node_id,site_id,1) att grid
 		else
@@ -118,7 +118,7 @@ let add (node_id,site_id) c state grid event_number kind locked =
 					| None -> UNDEF
 			(*else before att*)
 		in
-		let att,opt_opposite = push {before = before att ; after = after ; locked = locked ; causal_impact = impact 0 c ; kind = kind ; eid = event_number} att
+		let att,opt_opposite = push {before = before att ; after = after ; locked = locked ; causal_impact = impact 0 c ; eid = event_number ; label = kind} att
 		in
 		grid_add (node_id,site_id,0) att grid
 	else 
@@ -128,28 +128,28 @@ let add (node_id,site_id) c state grid event_number kind locked =
 (*NB no internal state modif as side effect*)
 let record mix opt_rule embedding state counter locked grid env = 
 	
-	let im state embedding fresh_map id grid kind =
+	let im state embedding fresh_map id grid =
 		try
 			match id with
 			| FRESH j ->  
 				let im_j = (IntMap.find j fresh_map) in
 				let node = SiteGraph.node_of_id state.graph im_j in
 				let node_id = Node.name node in
-				let grid = 
+				let grid =  (*adding attributes for new site*)
 					Node.fold_status (fun site_id _ grid ->
 						let int_opt = Environment.default_state node_id site_id env in
 						let grid = 
 							match int_opt with
 								| Some i -> 
 									let att = grid_find (node_id,site_id,0) grid in
-									let atom = {before = UNDEF ; after = INT i ; locked = false ; causal_impact = impact 0 _INTERNAL_MODIF ; kind = kind ; eid = Counter.event counter}
+									let atom = {before = UNDEF ; after = INT i ; locked = false ; causal_impact = impact 0 _INTERNAL_MODIF ; eid = Counter.event counter ; label = INIT}
 									in
 									let att,opt_opposite = push atom att in
 									grid_add (node_id,site_id,0) att grid
 								| None -> grid
 						in
-						let att = grid_find (node_id,site_id,1) grid in
-						let atom = {before = UNDEF ; after = FREE ; locked = false ; causal_impact = impact 1 _LINK_MODIF ; kind = kind ; eid = Counter.event counter}
+						let att = grid_find (node_id,site_id,1) grid in (*link state has to be modified because node is fresh*)
+						let atom = {before = UNDEF ; after = FREE ; locked = false ; causal_impact = impact 1 _LINK_MODIF ; eid = Counter.event counter ; label = INIT}
 						in
 						let att,opt_opposite = push atom att in
 						grid_add (node_id,site_id,1) att grid
@@ -161,7 +161,8 @@ let record mix opt_rule embedding state counter locked grid env =
 					begin
 						try	(IntMap.find j embedding) with Not_found -> invalid_arg "Causal.record: Not a valid embedding"
 					end
-				in (im_j,grid)
+				in 
+				(im_j,grid)
 		with 
 			| Not_found -> invalid_arg "Causal.record: incomplete embedding"  
 	in
@@ -174,7 +175,7 @@ let record mix opt_rule embedding state counter locked grid env =
 				let grid = 
 					Id2Map.fold
 					(fun (id,site_id) c grid ->
-						let node_id,grid = im state embedding psi id grid kind in
+						let node_id,grid = im state embedding psi id grid in
 						add (node_id,site_id) c state grid (Counter.event counter) kind locked 
 					) pre_causal grid
 				in
@@ -186,7 +187,7 @@ let record mix opt_rule embedding state counter locked grid env =
 				let kind = OBS (Mixture.get_id mix) in
 				IntMap.fold
 				(fun id ag grid ->
-					let node_id,grid = im state embedding IntMap.empty (Dynamics.KEPT id) grid kind in
+					let node_id,grid = im state embedding IntMap.empty (Dynamics.KEPT id) grid in
 					Mixture.fold_interface
 					(fun site_id (int,lnk) grid ->
 						let grid = 
@@ -214,23 +215,24 @@ let init state grid =
 				match int with 
 					| None -> grid
 					| Some i -> 
-						let atom = {before = UNDEF ; after = INT i ; locked = true ; causal_impact = impact 0 _INTERNAL_MODIF ; kind = INIT ; eid = 0}
+						let atom = {before = UNDEF ; after = INT i ; locked = true ; causal_impact = impact 0 _INTERNAL_MODIF ; eid = 0 ; label = INIT}
 						in
 						grid_add (node_id,site_id,0) [atom] grid 
 			in
 			match lnk with
 				| Node.Ptr (node',site_id') -> 
 					let node_id' = try Node.get_address node' with Not_found -> invalid_arg "Causal.init" in
-					let atom = {before = UNDEF ; after = BND (node_id',site_id') ; locked = true ; causal_impact = impact 1 _LINK_MODIF ; kind = INIT ; eid = 0}
+					let atom = {before = UNDEF ; after = BND (node_id',site_id') ; locked = true ; causal_impact = impact 1 _LINK_MODIF ; eid = 0 ;label = INIT}
 					in
 						grid_add (node_id,site_id,1) [atom] grid 
 				| Node.Null -> 
-					let atom = {before = UNDEF ; after = FREE ; locked = true ; causal_impact = impact 1 _LINK_MODIF ; kind = INIT ; eid = 0}
+					let atom = {before = UNDEF ; after = FREE ; locked = true ; causal_impact = impact 1 _LINK_MODIF ; eid = 0 ; label = INIT}
 					in
 						grid_add (node_id,site_id,1) [atom] grid
 			  | _ -> invalid_arg "Causal.init"
 		) node grid
 	)	state.graph grid
+
 
 let string_of_atom atom = 
 	let string_of_atom_state state =
@@ -257,5 +259,5 @@ let dump grid state env =
 		LongString.printf stdout att_ls ;
 		Printf.printf "\n"
 	) 
-	grid ()
+	grid.flow ()
 	
