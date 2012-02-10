@@ -123,14 +123,15 @@ let main =
 		if !Parameter.compileModeOn then (Hashtbl.iter (fun i r -> Dynamics.dump r env) state.State.rules ; exit 0)
 		else () ;
 		let plot = Plot.create !Parameter.outputDataName
-		and grid = 
+		and grid,event_list = 
 			if !Parameter.causalModeOn then 
+
 				let grid = Causal.empty_grid() in Causal.init state grid
 			else Causal.empty_grid()
 		in
 		ExceptionDefn.flush_warning () ; 
 		try
-			Run.loop state grid counter plot env ;
+			Run.loop state grid event_list counter plot env ;
 			print_newline() ;
 			Printf.printf "Simulation ended (eff.: %f)\n" 
 			((float_of_int (Counter.event counter)) /. (float_of_int (Counter.null_event counter + Counter.event counter))) ;
