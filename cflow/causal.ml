@@ -17,24 +17,38 @@ type atom =
 	}
 type attribute = atom list (*vertical sequence of atoms*)
 type grid = {flow: (int*int*int,attribute) Hashtbl.t}  (*(n_i,s_i,q_i) -> att_i with n_i: node_id, s_i: site_id, q_i: link (1) or internal state (0) *)
-type config = {events: event_kind IntMap.t ; prec_1: IntSet.t IntMap.t ; prec_n : IntSet.t IntMap.t ; conflict : IntSet.t IntMap.t ; top : int}
+type config = {events: atom IntMap.t ; prec_1: IntSet.t IntMap.t ; prec_n : IntSet.t IntMap.t ; conflict : IntSet.t IntMap.t ; top : int}
 
-let add_config interleaving_id (interleaving_id',event_kind)  config = 
-	let events = IntMap.add interleaving_id' event_kind config.events
+let add_pred eid atom config = 
+	let events = IntMap.add atom.eid atom config.events
 	in
-	let pred_set = try IntMap.find interleaving_id config.prec_1 with Not_found -> IntSet.empty in
-	let prec_1 = IntMap.add interleaving_id (IntSet.add interleaving_id' pred_set) config.prec_1 in
+	let pred_set = try IntMap.find eid config.prec_1 with Not_found -> IntSet.empty in
+	let prec_1 = IntMap.add eid (IntSet.add atom.eid pred_set) config.prec_1 in
 	{config with prec_1 = prec_1}
 
-let rec parse_attribute pred_id attribute config = 
+(*
+let add_conflict eid atom config =
+	let events = IntMap.add atom.eid atom config.events in
+	let cflct_set = try IntMap.find eid config.conflict with Not_found -> IntSet.empty in
+	let cflct = IntMap.add eid (IntSet.add atom.eid cflct_set) config.conflict in
+	{config with conflict = cflct}
+
+
+let rec parse_attribute last_modif last_tested attribute config = 
 	match attribute with
 		| [] -> config
 		| atom::att -> 
 			begin
 				if (is _LINK_MODIF atom.causal_impact) || (is _INTERNAL_MODIF atom.causal_impact) then 
-					let config = add_config pred_id (atom.eid,atom.kind) config in
+					let config = 
+						List.fold_left (fun config pred_id -> add_pred pred_id atom config) config last_tested 
+					in
+					parse_attribute atom.eid [] att config
+				else (*test atom*)
+					let config = add_conflict last_modif (atom.eid,atom.kind) config in
+					parse_attribute last_modif atom.eid::last_tested att config
 			end
-
+*)
 
 
 let empty_grid () = {flow = Hashtbl.create !Parameter.defaultExtArraySize }
