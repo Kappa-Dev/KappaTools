@@ -19,6 +19,8 @@ type attribute = atom list (*vertical sequence of atoms*)
 type grid = {flow: (int*int*int,attribute) Hashtbl.t}  (*(n_i,s_i,q_i) -> att_i with n_i: node_id, s_i: site_id, q_i: link (1) or internal state (0) *)
 type config = {events: event_kind IntMap.t ; prec_1: IntSet.t IntMap.t ; prec_n : IntSet.t IntMap.t ; conflict : IntSet.t IntMap.t ; top : int}
 
+let is i c = (i land c = i)
+
 let add_config interleaving_id (interleaving_id',event_kind)  config = 
 	let events = IntMap.add interleaving_id' event_kind config.events
 	in
@@ -26,13 +28,17 @@ let add_config interleaving_id (interleaving_id',event_kind)  config =
 	let prec_1 = IntMap.add interleaving_id (IntSet.add interleaving_id' pred_set) config.prec_1 in
 	{config with prec_1 = prec_1}
 
-let rec parse_attribute pred_id attribute config = 
+let rec parse_attribute pred_id attribute (config:config) = 
 	match attribute with
 		| [] -> config
 		| atom::att -> 
 			begin
 				if (is _LINK_MODIF atom.causal_impact) || (is _INTERNAL_MODIF atom.causal_impact) then 
 					let config = add_config pred_id (atom.eid,atom.kind) config in
+                                        config
+                                else
+                                  config
+
 			end
 
 
@@ -45,7 +51,6 @@ let grid_add (node_id,site_id,quark) attribute grid =
 	Hashtbl.replace grid.flow (node_id,site_id,quark) attribute ;
 	grid
 		
-let is i c = (i land c = i)
 
 let impact q c = 
 	if q = 1 (*link*) 
