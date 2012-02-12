@@ -4,7 +4,6 @@ open Graph
 open State
 open LargeArray
 
-
 type atom_state = FREE | BND of int*int | INT of int | UNDEF
 type event_kind = OBS of int | RULE of int | INIT | PERT of int
 type atom = 
@@ -15,6 +14,7 @@ type atom =
 	eid:int (*event identifier*) ;
 	kind:event_kind
 	}
+
 type attribute = atom list (*vertical sequence of atoms*)
 type grid = {flow: (int*int*int,attribute) Hashtbl.t}  (*(n_i,s_i,q_i) -> att_i with n_i: node_id, s_i: site_id, q_i: link (1) or internal state (0) *)
 type config = {events: atom IntMap.t ; prec_1: IntSet.t IntMap.t ; prec_n : IntSet.t IntMap.t ; conflict : IntSet.t IntMap.t ; top : int}
@@ -24,16 +24,16 @@ let add_pred eid atom config =
 	in
 	let pred_set = try IntMap.find eid config.prec_1 with Not_found -> IntSet.empty in
 	let prec_1 = IntMap.add eid (IntSet.add atom.eid pred_set) config.prec_1 in
-	{config with prec_1 = prec_1}
+	{config with prec_1 = prec_1 ; events = events}
 
-(*
+
 let add_conflict eid atom config =
 	let events = IntMap.add atom.eid atom config.events in
 	let cflct_set = try IntMap.find eid config.conflict with Not_found -> IntSet.empty in
 	let cflct = IntMap.add eid (IntSet.add atom.eid cflct_set) config.conflict in
-	{config with conflict = cflct}
+	{config with conflict = cflct ; events = events}
 
-
+(*
 let rec parse_attribute last_modif last_tested attribute config = 
 	match attribute with
 		| [] -> config

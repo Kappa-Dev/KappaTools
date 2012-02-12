@@ -125,8 +125,8 @@ let main =
 		let plot = Plot.create !Parameter.outputDataName
 		and grid,event_list = 
 			if !Parameter.causalModeOn then 
-				let grid = Causal.empty_grid() in Causal.init state grid
-			else Causal.empty_grid()
+				let grid = Causal.empty_grid() in (Causal.init state grid,[])
+			else (Causal.empty_grid(),[])
 		in
 		ExceptionDefn.flush_warning () ; 
 		try
