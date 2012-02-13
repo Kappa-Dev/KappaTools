@@ -17,39 +17,10 @@ type atom =
 
 type attribute = atom list (*vertical sequence of atoms*)
 type grid = {flow: (int*int*int,attribute) Hashtbl.t}  (*(n_i,s_i,q_i) -> att_i with n_i: node_id, s_i: site_id, q_i: link (1) or internal state (0) *)
-type config = {events: atom IntMap.t ; prec_1: IntSet.t IntMap.t ; prec_n : IntSet.t IntMap.t ; conflict : IntSet.t IntMap.t ; top : int}
+type config = {events: atom IntMap.t ; prec_1: IntSet.t IntMap.t ; prec_n : IntSet.t IntMap.t ; conflict : IntSet.t IntMap.t ; top : IntSet.t}
 
-let add_pred eid atom config = 
-	let events = IntMap.add atom.eid atom config.events
-	in
-	let pred_set = try IntMap.find eid config.prec_1 with Not_found -> IntSet.empty in
-	let prec_1 = IntMap.add eid (IntSet.add atom.eid pred_set) config.prec_1 in
-	{config with prec_1 = prec_1 ; events = events}
-
-
-let add_conflict eid atom config =
-	let events = IntMap.add atom.eid atom config.events in
-	let cflct_set = try IntMap.find eid config.conflict with Not_found -> IntSet.empty in
-	let cflct = IntMap.add eid (IntSet.add atom.eid cflct_set) config.conflict in
-	{config with conflict = cflct ; events = events}
-
-(*
-let rec parse_attribute last_modif last_tested attribute config = 
-	match attribute with
-		| [] -> config
-		| atom::att -> 
-			begin
-				if (is _LINK_MODIF atom.causal_impact) || (is _INTERNAL_MODIF atom.causal_impact) then 
-					let config = 
-						List.fold_left (fun config pred_id -> add_pred pred_id atom config) config last_tested 
-					in
-					parse_attribute atom.eid [] att config
-				else (*test atom*)
-					let config = add_conflict last_modif (atom.eid,atom.kind) config in
-					parse_attribute last_modif atom.eid::last_tested att config
-			end
-*)
-
+let empty_config = {events=IntMap.empty ; conflict = IntMap.empty ; prec_1 = IntMap.empty ; prec_n = IntMap.empty ; top = IntSet.empty}
+let is i c = (i land c = i)
 
 let empty_grid () = {flow = Hashtbl.create !Parameter.defaultExtArraySize }
 
@@ -59,8 +30,6 @@ let grid_add (node_id,site_id,quark) attribute grid =
 	Hashtbl.replace grid.flow (node_id,site_id,quark) attribute ;
 	grid
 		
-let is i c = (i land c = i)
-
 let impact q c = 
 	if q = 1 (*link*) 
 	then 
@@ -264,6 +233,55 @@ let init state grid =
 		) node grid
 	)	state.graph grid
 
+let add_pred eid atom config = 
+	let events = IntMap.add atom.eid atom config.events
+	in
+	let pred_set = try IntMap.find eid config.prec_1 with Not_found -> IntSet.empty in
+	let prec_1 = IntMap.add eid (IntSet.add atom.eid pred_set) config.prec_1 in
+	{config with prec_1 = prec_1 ; events = events}
+
+
+let add_conflict eid atom config =
+	let events = IntMap.add atom.eid atom config.events in
+	let cflct_set = try IntMap.find eid config.conflict with Not_found -> IntSet.empty in
+	let cflct = IntMap.add eid (IntSet.add atom.eid cflct_set) config.conflict in
+	{config with conflict = cflct ; events = events}
+
+let rec parse_attribute last_modif last_tested attribute config = 
+	match attribute with
+		| [] -> config
+		| atom::att -> 
+			begin
+				if (is _LINK_MODIF atom.causal_impact) || (is _INTERNAL_MODIF atom.causal_impact) then 
+					let config = 
+						List.fold_left (fun config pred_id -> add_pred pred_id atom config) config last_tested 
+					in
+					parse_attribute atom.eid [] att config
+				else (*test atom*)
+					let config = add_conflict last_modif atom config in
+					parse_attribute last_modif (atom.eid::last_tested) att config
+			end
+
+let cut attribute_ids grid =
+	let rec build_config attribute_ids cfg =
+		match attribute_ids with
+			| [] -> cfg
+			| (node_i,site_i,type_i)::tl ->
+				let attribute = try grid_find (node_i,site_i,type_i) grid with Not_found -> invalid_arg "Causal.cut"
+				in
+				let cfg =
+					match attribute with
+						| [] -> cfg
+						| atom::att -> 
+							let events = IntMap.add atom.eid atom cfg.events 
+							and top = IntSet.add atom.eid cfg.top
+							in 
+							parse_attribute atom.eid [] att {cfg with events = events ; top = top} 
+				in
+				build_config tl cfg
+	in
+	build_config attribute_ids empty_config
+
 
 let string_of_atom atom = 
 	let string_of_atom_state state =
@@ -275,8 +293,8 @@ let string_of_atom atom =
 	in
 	let imp_str = match atom.causal_impact with 1 -> "o" | 2 -> "x" | 3 -> "%" | _ -> invalid_arg "Causal.string_of_atom" in
 	Printf.sprintf "(%s%s%s)_%d" (string_of_atom_state atom.before) imp_str (string_of_atom_state atom.after) atom.eid
-
 		
+				
 let dump grid state env =
 	Hashtbl.fold 
 	(fun (n_id,s_id,q) att _ ->

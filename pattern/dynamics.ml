@@ -568,8 +568,8 @@ let enable r mix env =
 		glueings
 	end
 
-let to_kappa r = r.kappa
-
+let to_kappa r env = try Environment.rule_of_num r.r_id env with Not_found -> r.kappa
+	
 let dump r env =
 	let name = try Environment.rule_of_num r.r_id env with Not_found -> r.kappa in
 	Debug.tag (Printf.sprintf "****Rule '%s' [%s]****" name r.kappa);
@@ -600,7 +600,7 @@ let dump r env =
 			)
 			script
 	in
-	Printf.printf "Apply %s\n" (to_kappa r) ;
+	Printf.printf "Apply %s\n" (to_kappa r env) ;
 	dump_script r.script ;
 	Printf.printf "if pattern %d is matched \n" (Mixture.get_id r.lhs) ;
 	Printf.printf "Modif sites: %s" 

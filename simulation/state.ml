@@ -325,7 +325,7 @@ let build_influence_map rules patterns env =
 						| None -> () (*empty pattern*)
 						| Some mix ->
 							if !Parameter.debugModeOn then 
-								(Printf.printf "%s -+-> %s?\n" (Dynamics.to_kappa r) (Mixture.to_kappa false mix env) ; flush stdout) ;
+								(Printf.printf "%s -+-> %s?\n" (Dynamics.to_kappa r env) (Mixture.to_kappa false mix env) ; flush stdout) ;
 							let glueings = Dynamics.enable r mix env in (*glueings: [phi_0;...;phi_n] partial embeddings list*)
 							match glueings with
 								| [] -> if !Parameter.debugModeOn then (Printf.printf "No\n") ; ()
@@ -341,7 +341,7 @@ let dot_of_influence_map desc state env =
 	Hashtbl.iter
 	(fun r_id rule ->
 		let opt = if rule.Dynamics.is_pert then "[shape=invhouse,fillcolor=lightsalmon]" else "" in 
-		Printf.fprintf desc "\"%d:%s\" %s;\n" r_id (Dynamics.to_kappa rule) opt
+		Printf.fprintf desc "\"%d:%s\" %s;\n" r_id (Dynamics.to_kappa rule env) opt
 	) state.rules ;
 	Array.iteri
 	(fun mix_id mix_opt ->
@@ -354,13 +354,13 @@ let dot_of_influence_map desc state env =
 	Hashtbl.iter 
 	(fun r_id act_map ->
 		let rule = rule_of_id r_id state in
-		let n_label = Dynamics.to_kappa rule in
+		let n_label = Dynamics.to_kappa rule env in
 		IntMap.iter
 		(fun mix_id glueings ->
 			let n_label' = 
 				if Environment.is_rule mix_id env then
 					let rule'=rule_of_id mix_id state in
-					Dynamics.to_kappa rule'
+					Dynamics.to_kappa rule' env
 				else
 					let mix = kappa_of_id mix_id state in 
 					Mixture.to_kappa false mix env
@@ -1296,11 +1296,11 @@ let dump state counter env =
 				in
 				let a2,a1  = eval_activity r state counter env in
 				if Environment.is_rule i env then
-					Printf.printf "#\t%s %s @ %f[upd:%f(%f)]\n" nme (Dynamics.to_kappa r)
+					Printf.printf "#\t%s %s @ %f[upd:%f(%f)]\n" nme (Dynamics.to_kappa r env)
 					(Random_tree.find i state.activity_tree)
 					a2 a1 
 				else
-					Printf.printf "#\t%s %s [found %d]\n" nme (Dynamics.to_kappa r)
+					Printf.printf "#\t%s %s [found %d]\n" nme (Dynamics.to_kappa r env)
 					(int_of_float (instance_number i state env))
 			) state.rules ();
 			Array.iteri
@@ -1377,7 +1377,7 @@ let dot_of_flux desc state  env =
 		in
 		Hashtbl.iter
 		(fun r_id map ->
-			let str1 = try Environment.rule_of_num r_id env with Not_found -> Dynamics.to_kappa (rule_of_id r_id state)
+			let str1 = try Environment.rule_of_num r_id env with Not_found -> Dynamics.to_kappa (rule_of_id r_id state) env
 			in
 			IntMap.iter
 			(fun r_id' n ->
@@ -1394,7 +1394,7 @@ let dot_of_flux desc state  env =
 						else
 							("white","normal",0.,"dotted")
 				in 
-				let str2 = try Environment.rule_of_num r_id' env with Not_found -> Dynamics.to_kappa (rule_of_id r_id' state) in
+				let str2 = try Environment.rule_of_num r_id' env with Not_found -> Dynamics.to_kappa (rule_of_id r_id' state) env in
 				Printf.fprintf desc "\"%s\" -> \"%s\" [penwidth=%f,weight=%d,tooltip=\"%.3f\",color=%s,arrowhead=%s];\n" str1 str2 d (int_of_float d) n color arrowhead
 			) map 
 		) flux 
@@ -1402,7 +1402,7 @@ let dot_of_flux desc state  env =
 	Printf.fprintf desc "digraph G{ label=\"Flux map\" ; labelloc=\"t\" ; node [shape=box,style=filled,fillcolor=lightskyblue]\n" ;
 	Hashtbl.iter
 	(fun r_id rule ->
-		let r_nme = try Environment.rule_of_num r_id env with Not_found -> (*rule is anonymous*) Dynamics.to_kappa (rule_of_id r_id state) in
+		let r_nme = try Environment.rule_of_num r_id env with Not_found -> (*rule is anonymous*) Dynamics.to_kappa (rule_of_id r_id state) env in
 		Printf.fprintf desc "\"%s\" ;\n" r_nme 
 	) state.rules ;
 	print_flux state.flux true;
