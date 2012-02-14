@@ -283,6 +283,129 @@ let cut attribute_ids grid =
 	build_config attribute_ids empty_config
 
 
+(*
+let dot_of_config ?(story=true) ?(limit=false) fic (net,nb,time) = 
+  if limit && (net.Network.fresh_id > !Data.network_display_limit)
+  then 
+    let d = open_out fic in
+    let _ = fprintf d "digraph G{\n label=\"This story is too big to be displayed\"}" in
+    let _ = close_out d in () 
+  else
+    
+    let label e = 
+      match Rule.flag e.r with
+	  None -> if e.kind = 0 then e.label else (e.r.Rule.input)
+	| Some flg -> (flg)
+    in
+    let sort_events_by_depth events =
+      let dp = IntMap.empty in
+	EventArray.fold (fun id e dp -> 
+			   let l = try IntMap.find e.s_depth dp with Not_found -> [] in
+			     IntMap.add e.s_depth ((id,e)::l) dp
+			) events dp
+    in
+    let d = open_out fic 
+    and dp = sort_events_by_depth net.events
+    in
+      try
+	fprintf d "digraph G{\n" ;
+	if story then
+	  let time_str = if nb = 1 then "once at" else sprintf "%d times after an average of" nb in 
+	    fprintf d "label=\"Observed %s %.4ft.u (from %s)\"\n" time_str time (!Data.fic) 
+	else
+	  fprintf d "label=\"Configuration observed at %.4ft.u (from %s)\"\n" time (!Data.fic) ;
+	let weight_map = 
+	  IntMap.fold (fun depth l map ->
+			 let fontcolor = if depth>9 then "white" else "black" in
+			   fprintf d "{";
+			   (*fprintf d "rank=same;\n";*)
+			   fprintf d 
+			     "node[fontcolor=\"%s\",color=\"black\",style=\"filled\"];\n" 
+			     fontcolor;
+			   let map =
+			     List.fold_right
+			       (fun (id,e) map ->
+				  let fillcolor,shape = 
+				    match e.kind with
+					0 -> ("lightblue","invhouse")
+				      | 1 -> (Palette.grey 3,"invhouse")
+				      | _ -> ("red","ellipse") 
+				  in
+				  let lab = label e in
+				    fprintf d "\"[%s]_%d\" [shape=%s,fontsize=10,fillcolor=%s];\n" 
+				      lab id shape fillcolor ;
+				    let set = try IntMap.find id net.s_preds with Not_found -> IntSet.empty in
+				      IntSet.fold (fun id' map -> 
+						     try (
+						       let e' = event_of_id id' net in
+						       let weight = depth - e'.s_depth in 
+							 (*negative value to have an increasing map*)
+						       let cont = try IntMap.find weight map with Not_found -> [] in
+							 IntMap.add weight ((id',id)::cont) map) 
+						     with _ -> 
+						       (print_string "BUG_HTML.ml";print_int id;print_string "->";print_int id';print_newline ();map)
+						  ) set map
+			       ) l map
+			   in
+			     fprintf d "}\n" ;
+			     map
+		      ) dp IntMap.empty
+	in
+	let preds_star = (*IntMap.fold*) 
+	  EventArray.fold (fun i e preds_star -> 
+			     let set = 
+			       match (preds_closure net (IntSet.singleton i) IntSet.empty)
+			       with 
+				   Some set -> set
+				 | None -> Error.runtime (None,None,None) "HTML.dot_of_network: closure returned no causal past"
+			     in
+			       IntMap.add i set preds_star
+			  ) net.events IntMap.empty 
+	in
+	let _ = 
+	  IntMap.iter (fun w l ->
+			 List.iter (fun (i,j) ->
+				      let preds_j = try IntMap.find j net.s_preds with Not_found -> IntSet.empty in
+				      let keep = if not !Data.closure then true else 
+					try
+					  IntSet.fold (fun k keep -> 
+							 if k=i then keep 
+							 else
+							   let set_k = 
+							     try IntMap.find k preds_star 
+							     with Not_found -> IntSet.empty in
+							     if IntSet.mem i set_k then raise False
+							     else keep
+						      ) preds_j true
+					with False -> false
+				      in
+					if keep then
+					  let style,shape = ("filled","right")
+					  in
+					    fprintf d  "\"[%s]_%d\"->\"[%s]_%d\" [style=%s,dir=%s]\n" 
+					      (label (event_of_id i net)) i (label (event_of_id j net)) j style shape 
+				   ) l
+		      ) weight_map 
+	in
+	let _ =
+	  IntMap.iter (fun j w_preds_j  -> 
+			 IntSet.iter (fun i ->
+					let preds_j = try IntMap.find j preds_star with Not_found -> IntSet.empty in
+					  if IntSet.mem i preds_j then ()
+					  else 
+					    let style,shape = ("dotted","right")
+					    in
+					      fprintf d  "\"[%s]_%d\"->\"[%s]_%d\" [style=%s,dir=%s]\n" 
+						(label (event_of_id i net)) i (label (event_of_id j net)) j style shape 
+				     ) w_preds_j 
+		      ) net.w_preds 
+	in
+	  fprintf d "}\n" ;
+	  close_out d
+      with
+	  exn -> (close_out d; raise exn)
+*)
+
 let string_of_atom atom = 
 	let string_of_atom_state state =
 		match state with
