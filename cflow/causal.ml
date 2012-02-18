@@ -17,9 +17,9 @@ type atom =
 
 type attribute = atom list (*vertical sequence of atoms*)
 type grid = {flow: (int*int*int,attribute) Hashtbl.t}  (*(n_i,s_i,q_i) -> att_i with n_i: node_id, s_i: site_id, q_i: link (1) or internal state (0) *)
-type config = {events: atom IntMap.t ; prec_1: IntSet.t IntMap.t ; prec_n : IntSet.t IntMap.t ; conflict : IntSet.t IntMap.t ; top : IntSet.t}
+type config = {events: atom IntMap.t ; prec_1: IntSet.t IntMap.t ; depth_map : int IntMap.t ; conflict : IntSet.t IntMap.t ; top : IntSet.t}
 
-let empty_config = {events=IntMap.empty ; conflict = IntMap.empty ; prec_1 = IntMap.empty ; prec_n = IntMap.empty ; top = IntSet.empty}
+let empty_config = {events=IntMap.empty ; conflict = IntMap.empty ; prec_1 = IntMap.empty ; depth_map = IntMap.empty ; top = IntSet.empty}
 let is i c = (i land c = i)
 
 let empty_grid () = {flow = Hashtbl.create !Parameter.defaultExtArraySize }
@@ -282,28 +282,26 @@ let cut attribute_ids grid =
 	in
 	build_config attribute_ids empty_config
 
-
 (*
-let dot_of_config ?(story=true) ?(limit=false) fic (net,nb,time) = 
-  if limit && (net.Network.fresh_id > !Data.network_display_limit)
-  then 
-    let d = open_out fic in
-    let _ = fprintf d "digraph G{\n label=\"This story is too big to be displayed\"}" in
-    let _ = close_out d in () 
-  else
+let dot_of_config fic config counter state env = 
     
-    let label e = 
-      match Rule.flag e.r with
-	  None -> if e.kind = 0 then e.label else (e.r.Rule.input)
-	| Some flg -> (flg)
-    in
-    let sort_events_by_depth events =
-      let dp = IntMap.empty in
-	EventArray.fold (fun id e dp -> 
-			   let l = try IntMap.find e.s_depth dp with Not_found -> [] in
-			     IntMap.add e.s_depth ((id,e)::l) dp
-			) events dp
-    in
+	let label e = 
+		match e.kind with
+			| OBS mix_id -> Environment.kappa_of_num mix_id env
+			| PERT p_id -> Environment.pert_of_num p_id env
+			| RULE r_id -> Dynamics.to_kappa (State.rule_of_id r_id state) env
+			| INIT -> invalid_arg "Not a valid event"
+	in
+	
+	let sort_events_by_depth events =
+  let dp = IntMap.empty in
+		IntMap.fold 
+		(fun id e dp -> 
+			let l = try IntMap.find e.depth dp with Not_found -> [] in
+			IntMap.add e.s_depth ((id,e)::l) dp
+		) events dp
+  in
+	
     let d = open_out fic 
     and dp = sort_events_by_depth net.events
     in

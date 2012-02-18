@@ -167,7 +167,10 @@ let main =
 				end
 			| ExceptionDefn.Deadlock ->
 				if !Parameter.dumpIfDeadlocked then	Graph.SiteGraph.to_dot state.graph "deadlock.dot" env ;
-				(Printf.printf "?\nSimulation ended because a deadlock was reached (Activity = %f)\n" ((*Activity.total*) Random_tree.total state.activity_tree))
+				(Printf.printf "?\nA deadlock was reached after %d events and %fs (Activity = %f)\n"
+				(Counter.event counter)
+				(Counter.time counter) 
+				(Random_tree.total state.activity_tree))
 	with
 	| ExceptionDefn.Semantics_Error (pos, msg) -> 
 		(close_desc () ; Printf.eprintf "***Error (%s) line %d, char %d: %s***\n" (fn pos) (ln pos) (cn pos) msg)
