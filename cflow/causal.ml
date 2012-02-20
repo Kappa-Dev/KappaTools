@@ -17,7 +17,7 @@ type atom =
 
 type attribute = atom list (*vertical sequence of atoms*)
 type grid = {flow: (int*int*int,attribute) Hashtbl.t}  (*(n_i,s_i,q_i) -> att_i with n_i: node_id, s_i: site_id, q_i: link (1) or internal state (0) *)
-type config = {events: atom IntMap.t ; prec_1: IntSet.t IntMap.t ; depth_map : int IntMap.t ; conflict : IntSet.t IntMap.t ; top : IntSet.t}
+type config = {events: event_kind IntMap.t ; prec_1: IntSet.t IntMap.t ; depth_map : int IntMap.t ; conflict : IntSet.t IntMap.t ; top : IntSet.t}
 
 let empty_config = {events=IntMap.empty ; conflict = IntMap.empty ; prec_1 = IntMap.empty ; depth_map = IntMap.empty ; top = IntSet.empty}
 let is i c = (i land c = i)
@@ -233,33 +233,48 @@ let init state grid =
 		) node grid
 	)	state.graph grid
 
-let add_pred eid atom config = 
-	let events = IntMap.add atom.eid atom config.events
+let add_pred eid atom config depth = 
+	let events = IntMap.add atom.eid atom.kind config.events
 	in
 	let pred_set = try IntMap.find eid config.prec_1 with Not_found -> IntSet.empty in
 	let prec_1 = IntMap.add eid (IntSet.add atom.eid pred_set) config.prec_1 in
-	{config with prec_1 = prec_1 ; events = events}
+	let depth_map = 
+		let d = try IntMap.find atom.eid config.depth_map with Not_found -> 0 in
+		IntMap.add atom.eid (max depth d) config.depth_map
+	in
+	let depth_map = 
+		let d = try IntMap.find eid depth_map with Not_found -> 0 in
+		IntMap.add atom.eid (max (depth+1) d) depth_map 
+	in 
+	{config with prec_1 = prec_1 ; events = events ; depth_map = depth_map}
 
-
-let add_conflict eid atom config =
-	let events = IntMap.add atom.eid atom config.events in
+let add_conflict eid atom config depth =
+	let events = IntMap.add atom.eid atom.kind config.events in
 	let cflct_set = try IntMap.find eid config.conflict with Not_found -> IntSet.empty in
 	let cflct = IntMap.add eid (IntSet.add atom.eid cflct_set) config.conflict in
-	{config with conflict = cflct ; events = events}
+	let depth_map = 
+		let d = try IntMap.find atom.eid config.depth_map with Not_found -> 0 in
+		IntMap.add atom.eid (max depth d) config.depth_map
+	in
+	let depth_map = 
+		let d = try IntMap.find eid depth_map with Not_found -> 0 in
+		IntMap.add atom.eid (max (depth+1) d) depth_map 
+	in 
+	{config with conflict = cflct ; events = events ; depth_map = depth_map}
 
-let rec parse_attribute last_modif last_tested attribute config = 
+let rec parse_attribute depth last_modif last_tested attribute config = 
 	match attribute with
 		| [] -> config
 		| atom::att -> 
 			begin
 				if (is _LINK_MODIF atom.causal_impact) || (is _INTERNAL_MODIF atom.causal_impact) then 
 					let config = 
-						List.fold_left (fun config pred_id -> add_pred pred_id atom config) config last_tested 
+						List.fold_left (fun config pred_id -> add_pred pred_id atom config depth) config last_tested 
 					in
-					parse_attribute atom.eid [] att config
+					parse_attribute (depth+1) atom.eid [] att config 
 				else (*test atom*)
-					let config = add_conflict last_modif atom config in
-					parse_attribute last_modif (atom.eid::last_tested) att config
+					let config = add_conflict last_modif atom config depth in
+					parse_attribute depth last_modif (atom.eid::last_tested) att config
 			end
 
 let cut attribute_ids grid =
@@ -273,17 +288,17 @@ let cut attribute_ids grid =
 					match attribute with
 						| [] -> cfg
 						| atom::att -> 
-							let events = IntMap.add atom.eid atom cfg.events 
+							let events = IntMap.add atom.eid atom.kind cfg.events 
 							and top = IntSet.add atom.eid cfg.top
 							in 
-							parse_attribute atom.eid [] att {cfg with events = events ; top = top} 
+							parse_attribute 0 atom.eid [] att {cfg with events = events ; top = top} 
 				in
 				build_config tl cfg
 	in
 	build_config attribute_ids empty_config
 
 (*
-let dot_of_config fic config counter state env = 
+let dot_of_config fic title config counter state env = 
     
 	let label e = 
 		match e.kind with
@@ -293,27 +308,21 @@ let dot_of_config fic config counter state env =
 			| INIT -> invalid_arg "Not a valid event"
 	in
 	
-	let sort_events_by_depth events =
-  let dp = IntMap.empty in
+	let dp = 
 		IntMap.fold 
-		(fun id e dp -> 
-			let l = try IntMap.find e.depth dp with Not_found -> [] in
-			IntMap.add e.s_depth ((id,e)::l) dp
-		) events dp
+		(fun eid depth dp -> 
+			let l = try IntMap.find depth dp with Not_found -> [] in
+			IntMap.add depth (eid::l) dp
+		) config.depth_map IntMap.empty
   in
-	
-    let d = open_out fic 
-    and dp = sort_events_by_depth net.events
-    in
-      try
+	let d = open_out fic in
+  try
 	fprintf d "digraph G{\n" ;
-	if story then
-	  let time_str = if nb = 1 then "once at" else sprintf "%d times after an average of" nb in 
-	    fprintf d "label=\"Observed %s %.4ft.u (from %s)\"\n" time_str time (!Data.fic) 
-	else
-	  fprintf d "label=\"Configuration observed at %.4ft.u (from %s)\"\n" time (!Data.fic) ;
+	fprintf d title ;
+	
 	let weight_map = 
-	  IntMap.fold (fun depth l map ->
+	  IntMap.fold 
+		(fun depth l map ->
 			 let fontcolor = if depth>9 then "white" else "black" in
 			   fprintf d "{";
 			   (*fprintf d "rank=same;\n";*)
@@ -325,7 +334,7 @@ let dot_of_config fic config counter state env =
 			       (fun (id,e) map ->
 				  let fillcolor,shape = 
 				    match e.kind with
-					0 -> ("lightblue","invhouse")
+								0 -> ("lightblue","invhouse")
 				      | 1 -> (Palette.grey 3,"invhouse")
 				      | _ -> ("red","ellipse") 
 				  in
@@ -341,7 +350,7 @@ let dot_of_config fic config counter state env =
 						       let cont = try IntMap.find weight map with Not_found -> [] in
 							 IntMap.add weight ((id',id)::cont) map) 
 						     with _ -> 
-						       (print_string "BUG_HTML.ml";print_int id;print_string "->";print_int id';print_newline ();map)
+						       (print_string "Causal:";print_int id;print_string "->";print_int id';print_newline ();map)
 						  ) set map
 			       ) l map
 			   in
@@ -349,6 +358,8 @@ let dot_of_config fic config counter state env =
 			     map
 		      ) dp IntMap.empty
 	in
+	
+	
 	let preds_star = (*IntMap.fold*) 
 	  EventArray.fold (fun i e preds_star -> 
 			     let set = 
