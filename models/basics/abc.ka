@@ -13,7 +13,7 @@
 'mod x2' A(x,c!1),C(x1~p,x2~u!1) -> A(x,c),C(x1~p,x2~p) @ 'mod_rate' #A modifies x2 
 
 #### Variables 
-%var: 'V' 10
+%var: 'V' 1
 
 
 %var: 'on_rate' 1.E+0/'V' # per molecule per second
@@ -25,13 +25,13 @@
 %obs: 'Cpp' C(x1~p?,x2~p?) 
 
 
-%var: 'n_a' 50 * 'V' 
-%var: 'n_b' 50 * 'V'
-%var: 'n_c' 50 * 'V'
+%var: 'n_a' 20000 * 'V' 
+%var: 'n_b' 20000 * 'V'
+%var: 'n_c' 20000 * 'V'
 
 
 #### Initial conditions 
 %init: 'n_a' A,B
 %init: 'n_c' C
 
-%mod: ([E] = [emax]) do $SNAPSHOT 
+#%mod: ([E] = [emax]) do $SNAPSHOT 
