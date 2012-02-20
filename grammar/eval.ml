@@ -123,7 +123,6 @@ let nodes_of_ast env ast_mixture =
 						| Some (_,_,pos) -> raise (ExceptionDefn.Semantics_Error (pos,Printf.sprintf "Edge identifier %d is dangling" i))
 				) link_map ;
 				(node_map,env)
-			| _ -> raise (ExceptionDefn.Semantics_Error (no_pos,"Invalid initial conditions"))
 	in
 	iter ast_mixture IntMap.empty 0 IntMap.empty env
 					
@@ -395,37 +394,8 @@ let mixture_of_ast ?(tolerate_new_state=false) mix_id_opt is_pattern env ast_mix
 							curr_id = ctxt.curr_id + 1;
 							new_edges = Int2Map.empty;
 						} mixture
-				in (ctxt, (Mixture.compose id agent mixture new_edges None), env)
+				in (ctxt, (Mixture.compose id agent mixture new_edges), env)
 		| Ast.EMPTY_MIX -> (ctxt, mixture, env)
-		| Ast.DOT (radius, ast_ag, ast_mix) ->
-				let (ctxt, agent, env) = eval_agent is_pattern tolerate_new_state env ast_ag ctxt in
-				let id = ctxt.curr_id and new_edges = ctxt.new_edges
-				
-				and cstr =
-					Some (Mixture.PREVIOUSLY_CONNECTED (radius, ctxt.curr_id + 1)) in
-				let (ctxt, mixture, env) =
-					eval_mixture env ast_mix
-						{
-							(ctxt)
-							with
-							curr_id = ctxt.curr_id + 1;
-							new_edges = Int2Map.empty;
-						} mixture
-				in (ctxt, (Mixture.compose id agent mixture new_edges cstr), env)
-		| Ast.PLUS (radius, ast_ag, ast_mix) ->
-				let (ctxt, agent, env) = eval_agent is_pattern tolerate_new_state env ast_ag ctxt in
-				let id = ctxt.curr_id and new_edges = ctxt.new_edges
-				and cstr =
-					Some (Mixture.PREVIOUSLY_DISCONNECTED (radius, ctxt.curr_id + 1)) in
-				let (ctxt, mixture, env) =
-					eval_mixture env ast_mix
-						{
-							(ctxt)
-							with
-							curr_id = ctxt.curr_id + 1;
-							new_edges = Int2Map.empty;
-						} mixture
-				in (ctxt, (Mixture.compose id agent mixture new_edges cstr), env) 
 	in
 	
 	let ctxt = { pairing = IntMap.empty; curr_id = 0; new_edges = Int2Map.empty; } in
@@ -466,19 +436,21 @@ let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take 
 		then ((CONST (k (fun i -> 0.0) (fun i -> 0.0) 0.0 0)), dep)
 		else ((VAR k), dep)
 	
-	and (k_alt, dep_alt) =
+	and (env,k_alt, dep_alt) =
 		match ast_rule.k_un with
-		| None -> (None, DepSet.empty)
+		| None -> (env,None, DepSet.empty)
 		| Some ast ->
+				let env = Environment.declare_unary_rule (Some (Environment.kappa_of_num lhs_id env,Tools.no_pos)) (*ast_rule_label.lbl_nme*) lhs_id env in
 				let (rate, const, dep, _) = partial_eval_alg env ast
 				in
 				if const
 				then
-					((Some (CONST (rate (fun i -> 0.0) (fun i -> 0.0) 0.0 0))), dep)
-				else ((Some (VAR rate)), dep)
-	
-	and lhs,env = mixture_of_ast (Some lhs_id) true env ast_rule.lhs
+					(env,(Some (CONST (rate (fun i -> 0.0) (fun i -> 0.0) 0.0 0))), dep)
+				else (env,(Some (VAR rate)), dep)
+	in
+	let lhs,env = mixture_of_ast (Some lhs_id) true env ast_rule.lhs
 	in 
+	let lhs = match k_alt with None -> lhs | Some _ -> Mixture.set_unary lhs in
 	let rhs,env = mixture_of_ast ~tolerate_new_state:tolerate_new_state None true env ast_rule.rhs in
 	let (script, balance,added,modif_sites,side_effect) = Dynamics.diff lhs rhs ast_rule_label.lbl_nme env
 	
@@ -502,6 +474,97 @@ let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take 
 			(DepSet.union dep dep_alt) env
 	in
 	let pre_causal = Dynamics.compute_causal lhs rhs script env in
+	
+	let connect_impact,disconnect_impact,side_eff_impact =
+		List.fold_left 
+		(fun (con_map,dis_map,side_eff) action ->
+			match action with
+				| Dynamics.BND ((KEPT id,s),(KEPT id',s')) -> (*binding with a fresh agent doesn't impact connectedness*)
+					let cc_id = Mixture.component_of_id id lhs
+					and cc_id' = Mixture.component_of_id id' lhs
+					in
+					if cc_id = cc_id' then (con_map,dis_map,side_eff) (*rule binds two ports that were already part of the same cc*)
+					else 
+						let eq_id = try IntMap.find cc_id con_map with Not_found -> cc_id
+						and eq_id'= try IntMap.find cc_id' con_map with Not_found -> cc_id'
+						in
+						let min_eq,max_eq = (min eq_id eq_id',max eq_id eq_id') in
+						let con_map = IntMap.add cc_id min_eq con_map in
+						let con_map = IntMap.add cc_id' min_eq con_map in
+						let con_map = IntMap.add max_eq min_eq con_map in
+						(con_map,dis_map,side_eff)
+				| Dynamics.FREE ((KEPT id,s),side_effect_free) ->
+					if side_effect_free then
+						begin
+						let id' = match Mixture.follow (id,s) lhs with None -> invalid_arg "Eval.build_cc_impact: Free action should be side effect free" | Some (id',s') -> id' in
+						let is_deleted = not (IntMap.mem id' (Mixture.agents rhs)) in
+						if is_deleted then (con_map,dis_map,side_eff) (*will deal with this case in the deletion action*)
+						else
+							let cc_id = Mixture.component_of_id id rhs
+							and cc_id' = Mixture.component_of_id id' rhs
+							in
+							if cc_id = cc_id' then (con_map,dis_map,side_eff) (*rule breaks two ports that are still connected in the rhs*)
+							else 
+								let class1 = try IntMap.find cc_id dis_map with Not_found -> IntSet.empty
+								and class2 =  try IntMap.find cc_id' dis_map with Not_found -> IntSet.empty
+								in
+								let dis_map = IntMap.add cc_id (IntSet.add cc_id' class1) dis_map in
+								let dis_map = IntMap.add cc_id' (IntSet.add cc_id class2) dis_map in
+								(con_map,dis_map,side_eff)
+						end
+					else (*semi link deletion*)
+						let set = try IntMap.find id side_eff with Not_found -> IntSet.empty in
+						let side_eff = IntMap.add id (IntSet.add s set) side_eff in
+						(con_map,dis_map,side_eff)
+				| Dynamics.DEL id -> 
+					let ag = Mixture.agent_of_id id lhs in
+					let sign = Environment.get_sig (Mixture.name ag) env in
+					let set = try IntMap.find id (side_eff:IntSet.t IntMap.t) with Not_found -> IntSet.empty in
+					let set = 
+						Signature.fold 
+						(fun site_id set -> 
+							if site_id = 0 then set 
+							else
+								let opt = Mixture.follow (id,site_id) lhs in
+								match opt with
+									| None ->
+										begin 
+										try 
+											let _,lnk = IntMap.find site_id (Mixture.interface (Mixture.agent_of_id id lhs)) in 
+											match lnk with 
+												| Node.BND | Node.TYPE _ -> IntSet.add site_id set (*semi link deletion*) 
+												| _ -> set
+										with
+											| Not_found -> IntSet.add site_id set (*deletion of site that was not mentionned so possible side_effect*)
+										end
+									| Some _ -> IntSet.add site_id set (*link deletion because deleted agent was connected in the lhs*)
+						) sign set
+					in 
+						(con_map,dis_map,IntMap.add id set side_eff)
+				| _ -> (con_map,dis_map,side_eff)
+		) (IntMap.empty,IntMap.empty,IntMap.empty) script
+	in
+	let connect_impact = 
+		IntMap.fold 
+		(fun cc_id eq_id map -> let set = try IntMap.find eq_id map with Not_found -> IntSet.empty in IntMap.add eq_id (IntSet.add cc_id set) map
+		) connect_impact IntMap.empty 
+	in
+	let env = 
+		(match k_alt with 
+			| None -> env
+			| Some _ -> (*rule has a unary version*)
+				let ptr_env = ref {env with Environment.has_intra=true} in
+				let cc_id = ref 0 in
+				while !cc_id < (Mixture.arity lhs) do
+					let ag_root = 
+						let id = match Mixture.root_of_cc lhs !cc_id with None -> invalid_arg "Eval.rule_of_ast" | Some i -> i in
+						Mixture.agent_of_id id lhs
+					in
+					let env' = Environment.declare_nl_element (Mixture.get_id lhs) !cc_id (Mixture.name ag_root) !ptr_env in
+					ptr_env := env' ;
+					cc_id := !cc_id+1 ;
+				done ; !ptr_env)
+	in
 	(env,
 		{
 			Dynamics.k_def = k_def;
@@ -510,7 +573,6 @@ let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take 
 			Dynamics.script = script;
 			Dynamics.kappa = kappa_lhs ^ ("->" ^ kappa_rhs);
 			Dynamics.balance = balance;
-			Dynamics.constraints = Mixture.constraints lhs;
 			Dynamics.refines = ref_id;
 			Dynamics.lhs = lhs;
 			Dynamics.rhs = rhs;
@@ -519,7 +581,8 @@ let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take 
 			Dynamics.side_effect = side_effect ; 
 			Dynamics.modif_sites = modif_sites ;
 			Dynamics.is_pert = false ;
-			Dynamics.pre_causal = pre_causal
+			Dynamics.pre_causal = pre_causal ;
+			Dynamics.cc_impact = Some (connect_impact,disconnect_impact,side_eff_impact)  
 		})
 
 let variables_of_result env res =
@@ -694,7 +757,6 @@ let pert_of_result variables env res =
 								Dynamics.script = script ;
 								Dynamics.kappa = kappa_lhs ^ ("->" ^ kappa_rhs);
 								Dynamics.balance = balance;
-								Dynamics.constraints = Mixture.constraints lhs;
 								Dynamics.refines = None;
 								Dynamics.lhs = lhs;
 								Dynamics.rhs = rhs;
@@ -703,7 +765,8 @@ let pert_of_result variables env res =
 								Dynamics.side_effect = side_effect ; 
 								Dynamics.modif_sites = modif_sites ;
 								Dynamics.is_pert = true ;
-								Dynamics.pre_causal = pre_causal
+								Dynamics.pre_causal = pre_causal ;
+								Dynamics.cc_impact = None 
 							}
 							in
 							(env,rule_opt)
@@ -734,7 +797,6 @@ let pert_of_result variables env res =
 								Dynamics.script = script ;
 								Dynamics.kappa = kappa_lhs ^ ("->" ^ kappa_rhs);
 								Dynamics.balance = balance;
-								Dynamics.constraints = Mixture.constraints lhs;
 								Dynamics.refines = None;
 								Dynamics.lhs = lhs;
 								Dynamics.rhs = rhs;
@@ -743,7 +805,8 @@ let pert_of_result variables env res =
 								Dynamics.side_effect = side_effect ; 
 								Dynamics.modif_sites = modif_sites ;
 								Dynamics.pre_causal = pre_causal ;
-								Dynamics.is_pert = true
+								Dynamics.is_pert = true ;
+								Dynamics.cc_impact = None ;
 							}
 							in
 							(env,rule_opt)
@@ -809,7 +872,7 @@ let init_graph_of_result env res =
 		(Graph.SiteGraph.init !Parameter.defaultGraphSize,env) res.Ast.init
 	
 let initialize result counter =
-	Debug.tag "+Compiling..." ;
+	Debug.tag "+ Compiling..." ;
 
 	Debug.tag "\t -agent signatures" ;
 	let env = environment_of_result result in
@@ -826,14 +889,26 @@ let initialize result counter =
 
 	Debug.tag "\t -rules";
 	let (env, rules) = rules_of_result env result tolerate_new_state in
+	
 	Debug.tag "\t -observables";
 	let observables = obs_of_result env result in
 	Debug.tag "\t -perturbations" ;
 	let (kappa_vars, pert, rule_pert, env) = pert_of_result kappa_vars env result
 	in
 	Debug.tag "\t Done";
-	Debug.tag "+Building initial simulation state...";
+	Debug.tag "+ Analyzing non local patterns..." ;
+	let env = Environment.init_roots_of_nl_rules env in
+	Debug.tag "+ Building initial simulation state...";
+	Debug.tag "\t -Counting initial local patterns..." ;
 	let (state, env) =
-		State.initialize sg rules kappa_vars alg_vars observables (pert,rule_pert) counter env
-	in 
-	(Debug.tag "Done"; (env, state))
+	State.initialize sg rules kappa_vars alg_vars observables (pert,rule_pert) counter env
+	in
+	let state =  
+		if env.Environment.has_intra then
+			begin
+				Debug.tag "\t -Counting initial non local patterns..." ;
+				NonLocal.initialize_embeddings state counter env
+			end
+		else state
+	in
+	(Debug.tag "\t Done"; (env, state))

@@ -24,6 +24,9 @@ module Injection =
 	struct
 		type t = {map : (int,int) Hashtbl.t ; mutable address : int option ; coordinate : (int*int)}
 		
+		exception Found of (int*int)
+		let root_image phi = try (Hashtbl.iter (fun i j -> raise (Found (i,j))) phi.map ; None) with Found (i,j) -> Some (i,j)
+		
 		let set_address addr phi = phi.address <- Some addr 
 			
 		let get_address phi = match phi.address with Some a -> a | None -> raise Not_found
@@ -59,16 +62,83 @@ module Injection =
 		
 		let to_string phi = 
 			Tools.string_of_map string_of_int string_of_int Hashtbl.fold phi.map 
-			
+		
+		let string_of_coord phi = 
+			let a = get_address phi and (m,c) = get_coordinate phi 
+			in 
+			Printf.sprintf "(%d,%d,%d)" m c a
+		
 		let copy phi = fold (fun i j phi' -> add i j phi') phi {map = Hashtbl.create (size phi) ; address = None ; coordinate = get_coordinate phi}
 	end
 
-module Activity:(ValMap.ValMap with type content = float) = 
+module InjProduct =
+	struct
+		type t = {elements : Injection.t array ; mutable address : int option ; coordinate : int ; signature : int array}
+		type key = int array
+		
+		let allocate phi addr = phi.address <- Some addr 
+			
+		let get_address phi = match phi.address with Some a -> a | None -> raise Not_found
+		let get_coordinate phi = phi.coordinate 
+		
+		let add cc_id inj injprod = 
+			try 
+				injprod.elements.(cc_id) <- inj ;
+				let root = (function Some (_,u) -> u | None -> invalid_arg "InjProduct.add") (Injection.root_image inj) in
+				injprod.signature.(cc_id) <- root
+			with Invalid_argument msg -> invalid_arg ("InjProduct.add: "^msg)
+				
+		let is_trashed injprod = match injprod.address with Some (-1) -> true | _ -> false
+		
+		exception False
+		
+		let is_complete injprod = 
+			try 
+				(Array.iteri (fun i inj_i -> let a,_ = Injection.get_coordinate inj_i in if a<0 then raise False else ()) injprod.elements ; true)
+			with False -> false
+			
+		let size injprod = Array.length injprod.elements
+		
+		let find i injprod = try injprod.elements.(i) with Invalid_argument _ -> raise Not_found
+		
+		let create n mix_id = {elements = Array.create n (Injection.empty 0 (-1,-1)) ; address = None ; coordinate = mix_id ; signature = Array.create n (-1)}
+		
+		let equal phi psi =
+			try 
+				if (Array.length phi.signature) <> (Array.length psi.signature) then false
+				else
+					(
+					Array.iteri (fun cc_id u -> if u <> psi.signature.(cc_id) then raise False ) phi.signature ;
+					true
+					) 
+			with 
+				| False -> false
+		
+		let get_key phi = phi.signature
+		
+		let compare phi psi = 
+			try
+				let a = get_address phi
+				and a'= get_address psi
+				and m = get_coordinate phi
+				and m' = get_coordinate psi
+				in
+					compare (m,a) (m',a') 
+			with Not_found -> invalid_arg "Injection.compare"
+		
+		let fold_left f cont phi = Array.fold_left f cont phi.elements
+		
+		let to_string phi = Tools.string_of_array Injection.to_string phi.elements 
+			
+	end
+	
+(*module Activity:(ValMap.ValMap with type content = float) = 
 	ValMap.Make 
 	(struct 
 		type t = float (*mix_id -> rule_activity*) 
 		let to_f = fun alpha -> alpha
 	end)
+*)
 
 module InjectionHeap = 
 	Heap.Make 
@@ -77,6 +147,10 @@ module InjectionHeap =
 		let allocate = fun inj i -> Injection.set_address i inj  
 		let get_address inj = Injection.get_address inj 
 	end)
+	
+module InjProdHeap = SafeHeap.Make(InjProduct) 
+
+module InjProdSet = Set.Make(InjProduct)
 
 module Counter = 
 	struct
@@ -96,6 +170,7 @@ module Counter =
 			dE : int option ;
 			dT : float option 
 			}
+
 		let inc_tick c = c.ticks <- c.ticks + 1
 		let time c = c.time
 		let event c = c.events
@@ -107,7 +182,9 @@ module Counter =
 		let inc_null_events c = c.null_events <- (c.null_events + 1) 
 		let inc_consecutive_null_events c = (c.cons_null_events <- c.cons_null_events + 1)
 		let inc_null_action c = c.null_action <- (c.null_action + 1)
+		let	reset_consecutive_null_event c = c.cons_null_events <- 0 
 		let check_time c = match c.max_time with None -> true | Some max -> c.time < max
+		let check_output_time c ot = match c.max_time with None -> true | Some max -> ot < max
 		let check_events c = match c.max_events with None -> true | Some max -> c.events < max
 		let dT c = c.dT
 		let dE c = c.dE
@@ -192,3 +269,4 @@ module Counter =
 				}
 		
 	end
+	

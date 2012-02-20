@@ -2,7 +2,7 @@
 let defaultExtArraySize = ref 5
 let defaultGraphSize = ref 5
 let defaultLiftSetSize = ref 5
-let defaultInjectionHeapSize = ref 5
+let defaultHeapSize = ref 5
 let defaultLogSize = ref 10
 let debugModeOn = ref false
 let progressBarSymbol = ref '#'
@@ -35,7 +35,7 @@ let snapshotFileName = ref "snap"
 
 let dumpFileName = ref "dump.ka"
 let influenceFileName = ref ""
-let fluxFileName = ref ""
+let fluxFileName = ref "flux.dot"
 let outputDataName = ref "data.out"
 let inputKappaFileNames:(string list ref) = ref [] 
 let marshalizedInFile = ref "" 
@@ -43,7 +43,7 @@ let marshalizedOutFile = ref ""
 
 let setOutputName () = 
 	let set name = 
-		if !name <> "" then name := Filename.concat !outputDirName !name
+		if !name <> "" then name := Filename.concat !outputDirName !name 
 	in
 	set snapshotFileName ;
 	set dumpFileName ;

@@ -16,6 +16,9 @@ type t = {
 	num_of_rule : int StringMap.t ;
 	rule_of_num : string IntMap.t ;
 	
+	num_of_unary_rule : int StringMap.t ;
+	unary_rule_of_num : string IntMap.t ;
+	
 	fresh_alg : int ;
 	num_of_alg : (int*float option) StringMap.t ;
 	alg_of_num : (string*float option) IntMap.t ;
@@ -27,6 +30,10 @@ type t = {
 	
 	rule_indices : IntSet.t ;
 	empty_lhs : IntSet.t ;
+	
+	nl_elements : Int2Set.t IntMap.t ; (*ag_nme -> {(r_id,cc_id),...}*)
+	root_of_nl_rule : int Int2Map.t ;
+	has_intra : bool
 	(*log : Log.t*)
 }
 
@@ -38,9 +45,11 @@ let empty =
 	num_of_kappa = StringMap.empty ; 
 	kappa_of_num = IntMap.empty ;
 	num_of_rule = StringMap.empty ;
+	num_of_unary_rule = StringMap.empty ;
 	num_of_alg = StringMap.empty ;
 	alg_of_num = IntMap.empty ;
 	rule_of_num = IntMap.empty ;
+	unary_rule_of_num = IntMap.empty ; 
 	fresh_kappa = 0 ; 
 	fresh_alg = 0 ;
 	fresh_pert = 0 ;
@@ -49,8 +58,39 @@ let empty =
 	rule_of_pert = IntMap.empty ;
 	rule_indices = IntSet.empty ;
 	dependencies = DepMap.empty ;
-	empty_lhs = IntSet.empty
+	empty_lhs = IntSet.empty ;
+	nl_elements = IntMap.empty ;
+	root_of_nl_rule = Int2Map.empty ;
+	has_intra = false 
+
 }
+
+(**in order to declare that mix_id -which is the lhs of a unary rule- is expecting an agent named [ag_nme] with a site named [ste_nme] as the root of component [cc_id] of the injection*)
+let declare_nl_element mix_id cc_id ag_nme env =
+	let coordSet = try IntMap.find ag_nme env.nl_elements with Not_found -> Int2Set.empty in
+	let coordSet' = Int2Set.add (mix_id,cc_id) coordSet in
+	let nl_elements' = IntMap.add ag_nme coordSet' env.nl_elements in
+	{env with nl_elements = nl_elements'}
+	
+let init_roots_of_nl_rules env =
+	let map =  
+		IntMap.fold 
+		(fun ag_nme coordSet map -> 
+			Int2Set.fold 
+			(fun (r_id,cc_id) map -> 
+				Int2Map.add (r_id,cc_id) ag_nme map
+			) coordSet map
+		) env.nl_elements Int2Map.empty
+	in
+	{env with root_of_nl_rule = map}
+
+(*for given rule id, and cc_id returns the name of the root agent used for injecting cc_id*)	
+let root_of_nl_rule r_id cc_id env = try Some (Int2Map.find (r_id,cc_id) env.root_of_nl_rule) with Not_found -> None 
+
+let get_nl_coord ag_nme env = IntMap.find ag_nme env.nl_elements
+let is_nl_root ag_nme env = IntMap.mem ag_nme env.nl_elements
+
+let is_nl_rule r_id env = IntMap.mem r_id env.unary_rule_of_num
 
 let next_pert_id env = env.fresh_pert
 let declare_empty_lhs id env = {env with empty_lhs = IntSet.add id env.empty_lhs}
@@ -63,6 +103,11 @@ let num_of_kappa lab env = StringMap.find lab env.num_of_kappa
 let kappa_of_num i env =  IntMap.find i env.kappa_of_num 
 let num_of_rule lab env = StringMap.find lab env.num_of_rule
 let rule_of_num i env =  IntMap.find i env.rule_of_num
+
+let num_of_unary_rule lab env = StringMap.find lab env.num_of_unary_rule
+let unary_rule_of_num i env =  IntMap.find i env.unary_rule_of_num
+
+
 let pert_of_num i env = IntMap.find i env.pert_of_num
 let num_of_pert lab env = StringMap.find lab env.num_of_pert
 let is_rule i env = IntSet.mem i env.rule_indices
@@ -123,6 +168,17 @@ let declare_rule rule_lbl id env =
 				and rn = IntMap.add id r_nme env.rule_of_num
 				in
 					{env with num_of_rule = nr ; rule_of_num = rn}
+
+let declare_unary_rule rule_lbl id env =
+	match rule_lbl with
+		| None -> env
+		| Some (r_nme,pos) ->
+			if StringMap.mem r_nme env.num_of_unary_rule then raise (Semantics_Error (pos, ("Rule name "^r_nme^" is already used")))
+			else
+				let nr = StringMap.add r_nme id env.num_of_unary_rule
+				and rn = IntMap.add id r_nme env.unary_rule_of_num
+				in
+					{env with num_of_unary_rule = nr ; unary_rule_of_num = rn}
 
 let id_of_site agent_name site_name env =
 	let n = StringMap.find agent_name env.num_of_name in

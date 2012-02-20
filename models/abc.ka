@@ -1,8 +1,9 @@
+####### TEMPLATE MODEL AS DESCRIBED IN THE MANUAL#############
+
 #### Signatures 
 %agent: A(x,c) # Declaration of agent A 
 %agent: B(x) # Declaration of B 
 %agent: C(x1~u~p,x2~u~p) # Declaration of C with 2 modifiable sites
-%agent: D()
 
 #### Rules 
 'a.b' A(x),B(x) -> A(x!1),B(x!1) @ 'on_rate' #A binds B 
@@ -13,10 +14,7 @@
 'mod x2' A(x,c!1),C(x1~p,x2~u!1) -> A(x,c),C(x1~p,x2~p) @ 'mod_rate' #A modifies x2 
 
 #### Variables 
-%var: 'V' 1
-
-
-%var: 'on_rate' 1.E+0/'V' # per molecule per second
+%var: 'on_rate' 1.0E-4 # per molecule per second
 %var: 'off_rate' 0.1 # per second 
 %var: 'mod_rate' 1 # per second 
 %obs: 'AB' A(x!x.B)
@@ -24,14 +22,10 @@
 %obs: 'Cpu' C(x1~p?,x2~u?) 
 %obs: 'Cpp' C(x1~p?,x2~p?) 
 
-
-%var: 'n_a' 20000 * 'V' 
-%var: 'n_b' 20000 * 'V'
-%var: 'n_c' 20000 * 'V'
+%var: 'n_ab' 1000
+%var: 'n_c' 10000
 
 
 #### Initial conditions 
-%init: 'n_a' A,B
+%init: 'n_ab' A,B
 %init: 'n_c' C
-
-#%mod: ([E] = [emax]) do $SNAPSHOT 

@@ -13,6 +13,8 @@ and action =
 and port = id * int
 and id = FRESH of int | KEPT of int (*binding or modifying a port that has been added or kept from the lhs*)
 
+module ActionSet = Set.Make(struct type t=action let compare = compare end) 
+
 module IdMap = MapExt.Make (struct type t = id let compare = compare end)
 module Id2Map = MapExt.Make (struct type t = id*int let compare = compare end)
 
@@ -23,7 +25,6 @@ type rule = {
 	script : action list ;
 	balance : (int * int * int) ;	(*#deleted,#preserved,#removed*)
 	kappa: string ;
-	constraints: Mixture.constraints IntMap.t ;
 	lhs : Mixture.t ;
 	rhs : Mixture.t ;
 	refines: int option ; (*mixture id that is refined by lhs*)
@@ -32,8 +33,13 @@ type rule = {
 	side_effect : bool ;
 	modif_sites : Int2Set.t IdMap.t ;  
 	pre_causal : int Id2Map.t ; (* INTERNAL_TESTED (8) | INTERNAL_MODIF (4) | LINK_TESTED (2) | LINK_MODIF (1) *)
-	is_pert : bool
-}
+	is_pert : bool ;
+	cc_impact : (IntSet.t IntMap.t * IntSet.t IntMap.t * IntSet.t IntMap.t) option 
+	}
+	(*connect: cc_i(lhs) -> {cc_j(lhs),...} if cc_i and cc_j are connected by rule application*)
+	(*disconnect: cc_i(rhs) -> {cc_j(rhs),...} if cc_i and cc_j are disconnected by rule application*)
+	(*side_effect: ag_i -> {site_j,...} if one should check at runtime the id of the agent connected to (ag_i,site_j) and build its cc after rule application*)
+
 
 let _INTERNAL_TESTED = 8
 let _INTERNAL_MODIF = 4
@@ -130,6 +136,7 @@ let string_of_pert pert env =
 		| UPDATE (r_id,_) -> Printf.sprintf "UPDATE rule[%d]" r_id
 		| SNAPSHOT opt -> (match opt with None -> "SNAPSHOT" | Some s -> "SNAPSHOT("^s^")") 
 		| STOP opt -> (match opt with None -> "STOP" | Some s -> "STOP("^s^")")
+
 		
 let diff m0 m1 label_opt env =
 	let add_map id site_type map =
@@ -141,29 +148,6 @@ let diff m0 m1 label_opt env =
 	let label = match label_opt with Some (_,pos) -> (string_of_pos pos) | None -> "" in
 	let id_preserving ag1 ag2 = (*check whether ag2 can be the residual of ag1 for (same name)*)
 		Mixture.name ag1 = Mixture.name ag2
-		(*if not (Mixture.name ag1 = Mixture.name ag2) then false
-		else
-			let intf2 = Mixture.interface ag2
-			and intf1 = Mixture.interface ag1
-			in
-			try
-				Mixture.fold_interface
-					(fun site_id _ b -> if IntMap.mem site_id intf2 then b else raise False)
-					ag1
-					(Mixture.fold_interface
-							(fun site_id _ b -> if IntMap.mem site_id intf1 then b else raise False)
-							ag2
-							true
-					)
-			with False ->
-					let _ =
-						warning
-							(Printf.sprintf
-									"%s agent '%s' is deleted by rule because its interface is not compatible with right hand side"
-									label (Environment.name (Mixture.name ag1) env)
-							)
-					in
-					false*)
 	in
 	let prefix, deleted, add_index =
 		IntMap.fold
@@ -584,8 +568,8 @@ let enable r mix env =
 		glueings
 	end
 
-let to_kappa r = r.kappa
-
+let to_kappa r env = try Environment.rule_of_num r.r_id env with Not_found -> r.kappa
+	
 let dump r env =
 	let name = try Environment.rule_of_num r.r_id env with Not_found -> r.kappa in
 	Debug.tag (Printf.sprintf "****Rule '%s' [%s]****" name r.kappa);
@@ -616,7 +600,7 @@ let dump r env =
 			)
 			script
 	in
-	Printf.printf "Apply %s\n" (to_kappa r) ;
+	Printf.printf "Apply %s\n" (to_kappa r env) ;
 	dump_script r.script ;
 	Printf.printf "if pattern %d is matched \n" (Mixture.get_id r.lhs) ;
 	Printf.printf "Modif sites: %s" 
@@ -625,8 +609,13 @@ let dump r env =
 		(string_of_set (fun (x,y) -> "("^(string_of_int x)^","^(string_of_int y)^")") Int2Set.fold)
 		IdMap.fold
 		r.modif_sites
-	) ; print_newline () ;
-	match r.refines with
-	| Some lhs_id -> Printf.printf "[refines pattern %d]\n" lhs_id
-	| None -> () 
-	
+	) ;
+	print_newline() ;
+	match r.cc_impact with
+		| None -> Printf.printf "No CC impact\n"
+		| Some (con,dis,se) ->
+			IntMap.iter (fun cc_i cc_set -> Printf.printf "CC[%d] and CCs %s in the left hand side will merge\n" cc_i (Tools.string_of_set string_of_int IntSet.fold cc_set)) con ;
+			IntMap.iter (fun cc_i cc_set -> Printf.printf "CC[%d] and CCs %s in the rhs are freshly disconnected  \n" cc_i (Tools.string_of_set string_of_int IntSet.fold cc_set)) dis ;
+			IntMap.iter (fun id site_id_set -> Printf.printf "agent #%d might have side effect disconnection on sites %s\n" id (Tools.string_of_set string_of_int IntSet.fold site_id_set)) se 
+			
+			

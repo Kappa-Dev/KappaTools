@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "1.08.1_300911"
+let version = "2.01-080212"
 
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
@@ -43,13 +43,13 @@ let main =
 		("--compile", Arg.Unit (fun _ -> Parameter.compileModeOn := true), "Display rule compilation as action list") ;
 		("--debug", Arg.Unit (fun () -> Parameter.debugModeOn:= true), "Enable debug mode") ;
 		("--backtrace", Arg.Unit (fun () -> Parameter.backtrace:= true), "Backtracing exceptions") ;
+		("--glutony", Arg.Unit (fun () -> Gc.set { (Gc.get()) with Gc.space_overhead = 500 (*default 80*) } ;), "Lower gc activity for a faster but memory intensive simulation") ;
 		("-rescale-to", Arg.Int (fun i -> Parameter.rescale:=Some i), "Rescale initial concentration to given number for quick testing purpose") ; 
 		]
 	in
-	(*Gc.set { (Gc.get()) with Gc.space_overhead = 500 (*default 80*) } ;*)
 	try
 		Arg.parse options (fun _ -> Arg.usage options usage_msg ; exit 1) usage_msg ;
-		
+		if not !Parameter.plotModeOn then ExceptionDefn.warning "No data points are required, use -p option for plotting data.";
 		let abort =
 			match !Parameter.inputKappaFileNames with
 			| [] -> if !Parameter.marshalizedInFile = "" then true else false
@@ -63,7 +63,7 @@ let main =
     
 		Parameter.setOutputName() ;
 		Parameter.checkFileExists() ;
-		Printexc.record_backtrace !Parameter.backtrace ; (*Possible backtrace*)
+		(*Printexc.record_backtrace !Parameter.backtrace ; (*Possible backtrace*)*)
 		
 		(*let _ = Printexc.record_backtrace !Parameter.debugModeOn in*) 
 		let result =
@@ -123,20 +123,20 @@ let main =
 		if !Parameter.compileModeOn then (Hashtbl.iter (fun i r -> Dynamics.dump r env) state.State.rules ; exit 0)
 		else () ;
 		let plot = Plot.create !Parameter.outputDataName
-		and grid = 
+		and grid,event_list = 
 			if !Parameter.causalModeOn then 
-				let grid = Causal.empty_grid() in Causal.init state grid
-			else Hashtbl.create 0
+				let grid = Causal.empty_grid() in (Causal.init state grid,[])
+			else (Causal.empty_grid(),[])
 		in
 		ExceptionDefn.flush_warning () ; 
 		try
-			Run.loop state grid counter plot env ;
+			Run.loop state grid event_list counter plot env ;
 			print_newline() ;
 			Printf.printf "Simulation ended (eff.: %f)\n" 
 			((float_of_int (Counter.event counter)) /. (float_of_int (Counter.null_event counter + Counter.event counter))) ;
 			if !Parameter.fluxModeOn then 
 				begin
-					let d = open_out "flux.dot" in
+					let d = open_out !Parameter.fluxFileName in
 					State.dot_of_flux d state env ;
 					close_out d
 				end 
@@ -167,7 +167,10 @@ let main =
 				end
 			| ExceptionDefn.Deadlock ->
 				if !Parameter.dumpIfDeadlocked then	Graph.SiteGraph.to_dot state.graph "deadlock.dot" env ;
-				(Printf.printf "?\nSimulation ended because a deadlock was reached (Activity = %f)\n" ((*Activity.total*) Random_tree.total state.activity_tree))
+				(Printf.printf "?\nA deadlock was reached after %d events and %fs (Activity = %f)\n"
+				(Counter.event counter)
+				(Counter.time counter) 
+				(Random_tree.total state.activity_tree))
 	with
 	| ExceptionDefn.Semantics_Error (pos, msg) -> 
 		(close_desc () ; Printf.eprintf "***Error (%s) line %d, char %d: %s***\n" (fn pos) (ln pos) (cn pos) msg)

@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 29/08/2011
+  * Last modification: 19/10/2011
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -21,70 +21,10 @@
 type assign_result = Fail | Success | Ignored  
 
 
-module type Blackboard = 
-sig 
-  module H:Cflow_handler.Cflow_handler
 
-  (** blackboard matrix *)
-  type case_info
-  type case_value 
-  type case_address  
-
-  
-  
-  (** blackboard predicates*)
-
-  type predicate_index
-  type predicate_info
-
-  (** propagation request *)
-
-  type instruction 
-
-  (** blackboard*)
-
-  type pre_blackboard  (*blackboard during its construction*)
-  type blackboard      (*blackboard, once finalized*)
-
-  val set: ((case_address * case_value option) -> blackboard  -> H.error * blackboard) H.with_handler 
-  val get: (case_address -> blackboard -> H.error * case_value option) H.with_handler 
-
-
-  (** stack *)
-  type stack
-
-  val record_modif: ((case_address * case_value option) -> stack -> H.error * stack) H.with_handler
-  val branch: (blackboard -> stack -> H.error *blackboard * stack) H.with_handler 
-  val reset: (stack -> H.error * stack * (case_address * case_value option) list) H.with_handler 
- 
-  (** initialisation*)
-  val init:  (H.error * pre_blackboard) H.with_handler 
-  val add_case: (case_address -> pre_blackboard -> H.error * pre_blackboard) H.with_handler 
-  val finalize: (pre_blackboard -> H.error * blackboard) H.with_handler 
-
-  (** heuristics *)
- 
-  val next_choice: (blackboard -> H.error * instruction list) H.with_handler 
-  val propagation_heuristic: (blackboard -> instruction  -> instruction list -> H.error * instruction list) H.with_handler 
-  val apply_instruction: (blackboard -> instruction -> instruction list -> (H.error * (case_address*case_value) list * instruction list)) H.with_handler 
-
-
-  (** output result*)
-  type result 
-
-  (** iteration*)
-  val is_maximal_solution: (blackboard -> H.error * bool) H.with_handler 
-
-  (** exporting result*)
-  val translate_blackboard: (blackboard -> H.error * result) H.with_handler 
-
-  (**pretty printing*)
-  val print_blackboard:(blackboard -> H.error) H.with_handler 
-  
-end
 
 module Solver = 
-  functor (B:Blackboard) -> 
+  functor (B:Blackboard.Blackboard) -> 
     struct 
       let combine_output o1 o2 = 
 	match o2
