@@ -3,6 +3,7 @@ open Dynamics
 open Graph
 open State
 open LargeArray
+open Printf
 
 type atom_state = FREE | BND of int*int | INT of int | UNDEF
 type event_kind = OBS of int | RULE of int | INIT | PERT of int
@@ -243,7 +244,7 @@ let add_pred eid atom config depth =
 		IntMap.add atom.eid (max depth d) config.depth_map
 	in
 	let depth_map = 
-		let d = try IntMap.find eid depth_map with Not_found -> 0 in
+		let d = try IntMap.find eid depth_map with Not_found -> 1 in
 		IntMap.add atom.eid (max (depth+1) d) depth_map 
 	in 
 	{config with prec_1 = prec_1 ; events = events ; depth_map = depth_map}
@@ -257,7 +258,7 @@ let add_conflict eid atom config depth =
 		IntMap.add atom.eid (max depth d) config.depth_map
 	in
 	let depth_map = 
-		let d = try IntMap.find eid depth_map with Not_found -> 0 in
+		let d = try IntMap.find eid depth_map with Not_found -> 1 in
 		IntMap.add atom.eid (max (depth+1) d) depth_map 
 	in 
 	{config with conflict = cflct ; events = events ; depth_map = depth_map}
@@ -297,123 +298,139 @@ let cut attribute_ids grid =
 	in
 	build_config attribute_ids empty_config
 
-(*
-let dot_of_config fic title config counter state env = 
+let dot_of_config fic config state env = 
     
 	let label e = 
-		match e.kind with
+		match e with
 			| OBS mix_id -> Environment.kappa_of_num mix_id env
 			| PERT p_id -> Environment.pert_of_num p_id env
 			| RULE r_id -> Dynamics.to_kappa (State.rule_of_id r_id state) env
-			| INIT -> invalid_arg "Not a valid event"
+			| INIT -> "intro"
 	in
 	
-	let dp = 
+	let dp =  (*depth -> event_id list*)
 		IntMap.fold 
 		(fun eid depth dp -> 
 			let l = try IntMap.find depth dp with Not_found -> [] in
 			IntMap.add depth (eid::l) dp
 		) config.depth_map IntMap.empty
   in
+	
+	(*let max_depth = IntMap.size dp in*)
+	
 	let d = open_out fic in
   try
 	fprintf d "digraph G{\n" ;
-	fprintf d title ;
 	
 	let weight_map = 
 	  IntMap.fold 
 		(fun depth l map ->
 			 let fontcolor = if depth>9 then "white" else "black" in
-			   fprintf d "{";
-			   (*fprintf d "rank=same;\n";*)
-			   fprintf d 
-			     "node[fontcolor=\"%s\",color=\"black\",style=\"filled\"];\n" 
-			     fontcolor;
-			   let map =
-			     List.fold_right
-			       (fun (id,e) map ->
-				  let fillcolor,shape = 
-				    match e.kind with
-								0 -> ("lightblue","invhouse")
-				      | 1 -> (Palette.grey 3,"invhouse")
-				      | _ -> ("red","ellipse") 
-				  in
-				  let lab = label e in
-				    fprintf d "\"[%s]_%d\" [shape=%s,fontsize=10,fillcolor=%s];\n" 
-				      lab id shape fillcolor ;
-				    let set = try IntMap.find id net.s_preds with Not_found -> IntSet.empty in
-				      IntSet.fold (fun id' map -> 
-						     try (
-						       let e' = event_of_id id' net in
-						       let weight = depth - e'.s_depth in 
-							 (*negative value to have an increasing map*)
-						       let cont = try IntMap.find weight map with Not_found -> [] in
-							 IntMap.add weight ((id',id)::cont) map) 
-						     with _ -> 
-						       (print_string "Causal:";print_int id;print_string "->";print_int id';print_newline ();map)
-						  ) set map
-			       ) l map
-			   in
+			  (*fprintf d "{";*)
+			  (*fprintf d "rank=same;\n";*)
+			  fprintf d 
+			  "node[fontcolor=\"%s\",color=\"black\",style=\"filled\"];\n" 
+			   fontcolor;
+			 let map = 
+					List.fold_right
+			  	(fun eid map ->
+						let kind = IntMap.find eid config.events in
+						let fillcolor,shape = 
+							match kind with
+								(INIT | PERT _) -> ("lightblue","invhouse")
+				      | RULE _ -> (Palette.grey 3,"invhouse")
+				      | OBS _ -> ("red","ellipse") 
+				  	in
+					  let lab = label kind in
+					    fprintf d "\"[%s]_%d\" [shape=%s,fontsize=10,fillcolor=%s];\n" 
+					      lab eid shape fillcolor ;
+					    let set = try IntMap.find eid config.prec_1 with Not_found -> IntSet.empty in
+					      IntSet.fold (fun eid' map -> 
+							     try (
+							      (*let e' = try IntMap.find eid' config.events with Not_found -> invalid_arg "Causal.dot_of_config" in*)
+							      let weight = depth - (try IntMap.find eid' config.depth_map with Not_found -> invalid_arg "Causal.dot_of_config: not found") in 
+								 		(*negative value to have an increasing map*)
+							      let cont = try IntMap.find weight map with Not_found -> [] in
+										IntMap.add weight ((eid',eid)::cont) map) 
+							     with _ -> 
+							       (print_string "Causal:";print_int eid;print_string "->";print_int eid';print_newline ();map)
+							  ) set map
+				       ) l map
+				   in
 			     fprintf d "}\n" ;
 			     map
 		      ) dp IntMap.empty
 	in
 	
-	
-	let preds_star = (*IntMap.fold*) 
-	  EventArray.fold (fun i e preds_star -> 
-			     let set = 
-			       match (preds_closure net (IntSet.singleton i) IntSet.empty)
-			       with 
-				   Some set -> set
-				 | None -> Error.runtime (None,None,None) "HTML.dot_of_network: closure returned no causal past"
+	let rec prec_closure config todo closure =
+		if IntSet.is_empty todo then closure
+		else
+			let eid = IntSet.choose todo in
+			let todo' = IntSet.remove eid todo in
+			let prec = try IntMap.find eid config.prec_1 with Not_found -> IntSet.empty
+			in
+			prec_closure config (IntSet.union todo' prec) (IntSet.union prec closure)
+	in
+	 
+	let prec_star = 
+	  IntMap.fold 
+		(fun eid kind prec_star -> 
+			     let set = prec_closure config (IntSet.singleton eid) IntSet.empty
 			     in
-			       IntMap.add i set preds_star
-			  ) net.events IntMap.empty 
+			       IntMap.add eid set prec_star
+			  ) config.events IntMap.empty 
 	in
 	let _ = 
-	  IntMap.iter (fun w l ->
+	  IntMap.iter 
+		(fun w l ->
 			 List.iter (fun (i,j) ->
-				      let preds_j = try IntMap.find j net.s_preds with Not_found -> IntSet.empty in
-				      let keep = if not !Data.closure then true else 
+				let e_j = try IntMap.find j config.events with Not_found -> invalid_arg "Causal.dot_of_config 1" 
+				and e_i = try IntMap.find i config.events with Not_found -> invalid_arg "Causal.dot_of_config 2" 
+				in
+	      let prec_j = try IntMap.find j config.prec_1 with Not_found -> IntSet.empty in
+	      let keep = (*set keep to true if one should not minimize edges in configuration*) 
 					try
-					  IntSet.fold (fun k keep -> 
-							 if k=i then keep 
-							 else
-							   let set_k = 
-							     try IntMap.find k preds_star 
-							     with Not_found -> IntSet.empty in
-							     if IntSet.mem i set_k then raise False
-							     else keep
-						      ) preds_j true
-					with False -> false
-				      in
-					if keep then
-					  let style,shape = ("filled","right")
-					  in
-					    fprintf d  "\"[%s]_%d\"->\"[%s]_%d\" [style=%s,dir=%s]\n" 
-					      (label (event_of_id i net)) i (label (event_of_id j net)) j style shape 
-				   ) l
-		      ) weight_map 
+				  IntSet.fold 
+					(fun k keep -> 
+						if k=i then keep 
+						else
+					   let set_k = 
+					     try IntMap.find k prec_star 
+					     with Not_found -> IntSet.empty in
+					     if IntSet.mem i set_k then raise ExceptionDefn.False
+					     else keep
+		      ) prec_j true
+					with ExceptionDefn.False -> false
+	      in
+				if keep then
+				  let style,shape = ("filled","right")
+				  in
+				    fprintf d  "\"[%s]_%d\"->\"[%s]_%d\" [style=%s,dir=%s]\n" 
+				      (label e_i) i (label e_j) j style shape 
+			   ) l
+		) weight_map 
 	in
 	let _ =
-	  IntMap.iter (fun j w_preds_j  -> 
-			 IntSet.iter (fun i ->
-					let preds_j = try IntMap.find j preds_star with Not_found -> IntSet.empty in
+	  IntMap.iter 
+		(fun j w_preds_j  ->
+			let e_j = try IntMap.find j config.events with Not_found -> invalid_arg "Causal.dot_of_config 3" in
+			 IntSet.iter 
+			 (fun i ->
+					let e_i = try IntMap.find i config.events with Not_found -> invalid_arg "Causal.dot_of_config 4" in
+					let preds_j = try IntMap.find j prec_star with Not_found -> IntSet.empty in
 					  if IntSet.mem i preds_j then ()
 					  else 
 					    let style,shape = ("dotted","right")
 					    in
 					      fprintf d  "\"[%s]_%d\"->\"[%s]_%d\" [style=%s,dir=%s]\n" 
-						(label (event_of_id i net)) i (label (event_of_id j net)) j style shape 
-				     ) w_preds_j 
-		      ) net.w_preds 
+						(label e_i) i (label e_j) j style shape 
+				) w_preds_j 
+		 ) config.conflict 
 	in
 	  fprintf d "}\n" ;
 	  close_out d
       with
 	  exn -> (close_out d; raise exn)
-*)
 
 let string_of_atom atom = 
 	let string_of_atom_state state =
@@ -427,6 +444,12 @@ let string_of_atom atom =
 	Printf.sprintf "(%s%s%s)_%d" (string_of_atom_state atom.before) imp_str (string_of_atom_state atom.after) atom.eid
 		
 				
+let dump grid state env = 
+	let ids = Hashtbl.fold (fun key _ l -> key::l) grid.flow [] in
+	let config = cut ids grid in 
+	dot_of_config "cflow.dot" config state env
+
+(*	
 let dump grid state env =
 	Hashtbl.fold 
 	(fun (n_id,s_id,q) att _ ->
@@ -441,4 +464,4 @@ let dump grid state env =
 		Printf.printf "\n"
 	) 
 	grid.flow ()
-	
+*)	
