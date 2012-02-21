@@ -283,20 +283,22 @@ let cut attribute_ids grid =
 	build_config attribute_ids empty_config
 
 
-(*
-let dot_of_config ?(story=true) ?(limit=false) fic (net,nb,time) = 
-  if limit && (net.Network.fresh_id > !Data.network_display_limit)
+let dot_of_config config env state counter = 
+  (*if limit && (net.Network.fresh_id > !Data.network_display_limit)
   then 
     let d = open_out fic in
     let _ = fprintf d "digraph G{\n label=\"This story is too big to be displayed\"}" in
     let _ = close_out d in () 
   else
-    
-    let label e = 
-      match Rule.flag e.r with
-	  None -> if e.kind = 0 then e.label else (e.r.Rule.input)
-	| Some flg -> (flg)
-    in
+    *)
+	let label e = 
+		match e.event_kind with 
+			| RULE r_id -> Dynamics.to_kappa (Environment.rule_of_num r_id env) env
+			| OBS mix_id -> Environment.kappa_of_num mix_id env 
+			| PERT p_id -> Environment.pert_of_num p_id env
+			| INIT -> invalid_arg "Invalid event"
+	in
+	
     let sort_events_by_depth events =
       let dp = IntMap.empty in
 	EventArray.fold (fun id e dp -> 
@@ -404,7 +406,7 @@ let dot_of_config ?(story=true) ?(limit=false) fic (net,nb,time) =
 	  close_out d
       with
 	  exn -> (close_out d; raise exn)
-*)
+
 
 let string_of_atom atom = 
 	let string_of_atom_state state =
