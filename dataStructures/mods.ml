@@ -270,3 +270,26 @@ module Counter =
 		
 	end
 	
+module Palette:
+	sig
+	  type t
+	  type color = (float*float*float)
+	  val find : int -> t -> color
+	  val add : int -> color -> t -> t
+	  val mem : int -> t -> bool
+	  val empty : t
+	  val new_color : unit -> color
+	  val grey : int -> string
+	  val string_of_color : color -> string
+	end =
+	struct
+	  type color = (float*float*float)
+	  type t = color IntMap.t
+	  let find = IntMap.find
+	  let add = IntMap.add
+	  let mem = IntMap.mem
+	  let empty = IntMap.empty
+	  let new_color () = Random.float 1.0,Random.float 1.0,Random.float 1.0
+	  let grey d = if d > 16 then "black" else ("gray"^(string_of_int (100-6*d)))
+	  let string_of_color (r,g,b) = String.concat "," (List.map string_of_float [r;g;b])
+	end

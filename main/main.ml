@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "2.01-080212"
+let version = "2.01-200212"
 
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
@@ -167,7 +167,10 @@ let main =
 				end
 			| ExceptionDefn.Deadlock ->
 				if !Parameter.dumpIfDeadlocked then	Graph.SiteGraph.to_dot state.graph "deadlock.dot" env ;
-				(Printf.printf "?\nSimulation ended because a deadlock was reached (Activity = %f)\n" ((*Activity.total*) Random_tree.total state.activity_tree))
+				(Printf.printf "?\nA deadlock was reached after %d events and %fs (Activity = %f)\n"
+				(Counter.event counter)
+				(Counter.time counter) 
+				(Random_tree.total state.activity_tree))
 	with
 	| ExceptionDefn.Semantics_Error (pos, msg) -> 
 		(close_desc () ; Printf.eprintf "***Error (%s) line %d, char %d: %s***\n" (fn pos) (ln pos) (cn pos) msg)
