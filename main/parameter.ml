@@ -59,7 +59,7 @@ let checkFileExists () =
 			| file -> 
 				if Sys.file_exists file then 
 					begin
-						Printf.printf "File '%s' already exists do you want to erase (y/N)? \n" file ; flush stdout ;
+						Printf.fprintf stderr "File '%s' already exists do you want to erase (y/N)? \n" file ; flush stderr ;
 						let answer = Tools.read_input () in
 						if answer="y" then () else exit 1
 					end
