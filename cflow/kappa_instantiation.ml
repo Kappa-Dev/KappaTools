@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 18/10/2011
+  * Last modification: 23/02/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -23,7 +23,7 @@ let compose f g = (fun x -> f (g x))
 
 module type Cflow_signature =
 sig
-  type agent_name
+  type agent_name  
   type site_name 
   type agent_id 
   type agent 
@@ -32,8 +32,22 @@ sig
   type binding_type 
   type binding_state
   type kappa_sig 
-  type test
-  type action  
+  type test = 
+    | Is_Here of agent
+    | Has_Internal of site * internal_state 
+    | Is_Free of site 
+    | Is_Bound of site
+    | Has_Binding_type of site * binding_type 
+    | Is_Bound_to of site * site 
+
+  type action = 
+    | Create of agent * (site_name * internal_state option) list 
+    | Mod_internal of site * internal_state 
+    | Bind of site * site 
+    | Unbind of site * site  
+    | Free of site 
+    | Remove of agent 
+
   type event 
   type kappa_rule 
   type embedding
@@ -447,10 +461,6 @@ module Cflow_linker =
 		   Remove(agent)::list_actions,
 		   List.fold_left 
 		     (fun list site -> 
-			let _ = print_string "SIDE\n" in 
-			let  _ = print_int lhs_id in 
-			let _ = print_string "." in 
-			let _ = print_int site in 
 			let state = get_binding_state_of_site fake_id  site lhs event fresh in 
 			  begin 
 			    match state with 
@@ -495,11 +505,13 @@ module Cflow_linker =
     let _ = 
       if debug_mode 
       then 
+        let _ = Printf.fprintf log "Story encoding: \n" in 
 	let _ = List.iter (print_test log env " ") (tests_of_refined_event refined_event) in 
 	let actions = actions_of_refined_event refined_event in 
 	let _ = List.iter (print_action log env " ") (fst actions) in 
 	let _ = List.iter (print_side_effects log env " ") (snd actions) in 
-	  () 
+	let _ = Printf.fprintf log "***\n"  in 
+        () 
     in 
       ()
 

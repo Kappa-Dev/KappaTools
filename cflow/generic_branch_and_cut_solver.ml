@@ -6,10 +6,10 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   * 
   * KaSim
-  * Jean Krivine, Université Paris Dederot, CNRS 
+  * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 19/10/2011
+  * Last modification: 22/02/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -42,28 +42,47 @@ module Solver =
 	in
 	 error,blackboard,stack 
 
+      let overwrite parameter handler error address blackboard stack former_value new_value =  
+        let error,blackboard = B.set parameter handler error (address,new_value) blackboard in 
+	let error,stack = B.record_modif parameter handler error (address,None) stack in 
+        error,stack,blackboard 
+        
       let rec deal_with_assignments parameter handler error list blackboard stack output = 
 	match list
 	with 
 	  | [] -> error,blackboard,stack,output
 	  | (address,case_value)::tail -> 
-	      let error,former_value = B.get parameter handler error address blackboard in 
-		match former_value 
-		with 
-		  | None ->
-		      begin
-			let error,blackboard = B.set parameter handler error (address,Some case_value) blackboard in 
-			let error,stack = B.record_modif parameter handler error (address,None) stack in 
-			  deal_with_assignments parameter handler error tail blackboard stack Success 
-		      end 
-		  | Some x when x=case_value -> 
-		      begin
-			deal_with_assignments parameter handler error tail blackboard stack output 
-		      end
-		  | _ -> 
-		      begin 
-			error,blackboard,stack,Fail 
-		      end 
+	    let error,former_value = B.get parameter handler error address blackboard in 
+	    match former_value 
+	    with 
+	      | None ->
+		begin
+		  let error,stack,blackboard = overwrite parameter handler error address blackboard stack (Some case_value) former_value 
+                  in 
+		  deal_with_assignments parameter handler error tail blackboard stack Success
+		end 
+	      | Some x when x=case_value -> 
+		begin
+		  deal_with_assignments parameter handler error tail blackboard stack output 
+		end
+              | Some x -> 
+                begin
+                  if B.strictly_more_refined case_value x
+                  then 
+                    begin
+		      let error,stack,blackboard = overwrite parameter handler error address blackboard stack (Some case_value) former_value 
+                      in 
+		      deal_with_assignments parameter handler error tail blackboard stack Success
+		    end 
+                  else
+                    begin
+                      error,blackboard,stack,Fail
+                    end 
+                end 
+	      | _ -> 
+		begin 
+		  error,blackboard,stack,Fail 
+		end 
 
       let rec propagate parameter handler error list blackboard stack = 
 	match list 
