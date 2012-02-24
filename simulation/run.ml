@@ -129,7 +129,7 @@ let rec loop state grid event_list counter plot env =
 			  begin
 			    Causal.dump grid state env ;
 			    let refined_event_list = Compression_main.weak_compression env event_list 
-          in ()	    
+          in ()
 			  end;
 
 		  Plot.fill state counter plot env 0.0; (*Plotting last measures*)

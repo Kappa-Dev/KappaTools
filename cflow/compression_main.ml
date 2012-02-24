@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 19/10/2011
-  * Last modification: 19/10/2011
+  * Last modification: 23/02/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -27,4 +27,22 @@ let weak_compression env event_list =
     then 
       List.iter (Kappa_instantiation.Cflow_linker.print_refined_event stdout (Kappa_instantiation.Cflow_linker.import_env env)) refined_event_list  
   in 
-    () 
+  let parameter = () in 
+  let handler = () in 
+  let error = [] in 
+  let error,blackboard = Blackboard.Blackboard.init parameter handler error   in
+  let error,blackboard = 
+    List.fold_left 
+      (fun (error,blackboard) refined_event  -> 
+        Blackboard.Blackboard.add_event parameter handler error refined_event blackboard)
+      (error,blackboard)
+      refined_event_list
+  in 
+  let error = 
+    if debug_mode 
+    then 
+      Blackboard.Blackboard.print_preblackboard parameter handler error stdout blackboard 
+    else 
+      error 
+  in 
+  () 

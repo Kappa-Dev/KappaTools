@@ -86,7 +86,7 @@ val predicates_of_action: (pre_blackboard -> K.action -> H.error_channel * pre_b
 
   (**pretty printing*)
   val print_blackboard:(blackboard -> H.error_channel) H.with_handler 
-  
+  val print_preblackboard: (out_channel -> pre_blackboard -> H.error_channel) H.with_handler  
 end
 
 module Blackboard = 
@@ -108,7 +108,15 @@ module Blackboard =
        | Bound_site of K.agent_id * K.site_name
        | Internal_state of K.agent_id * K.site_name 
        | Fictitious of int 
-	 
+
+     let print_predicate_info log x = 
+       match x 
+       with 
+         | Here i -> Printf.fprintf log "Agent_Here %i \n" i
+         | Bound_site (i,s) -> Printf.fprintf log "Binding_state (%i,%i) \n" i s 
+         | Internal_state (i,s) -> Printf.fprintf log "Internal_state (%i,%i) \n" i s 
+         | Fictitious (int) -> Printf.fprintf log "Fictitious %i \n" int 
+    
      type case_address = 
 	     {
 	       column_id:predicate_id; 
@@ -127,6 +135,32 @@ module Blackboard =
        | Bound_to_type of K.agent_id * K.site_name
        | Defined
        | Unknown 
+
+     let print_case_value log x = 
+       match x 
+       with 
+         | Point_to event_id -> 
+           Printf.fprintf log "Point_to %i \n" event_id 
+         | Counter int ->  
+           Printf.fprintf log "Counter %i \n" int
+         | Internal_state_is internal_state -> 
+           Printf.fprintf log "%i \n" internal_state  
+         | Undefined -> 
+           Printf.fprintf log "Undefined\n"
+         | Present ->
+           Printf.fprintf log "Present\n"
+         | Free -> 
+           Printf.fprintf log "Free\n" 
+         | Bound -> 
+           Printf.fprintf log "Bound\n" 
+         | Bound_to (id,agent,site) ->
+           Printf.fprintf log "Bound(%i,%i@%i)\n" id agent site
+         | Bound_to_type (agent,site)-> 
+           Printf.fprintf log "Bound(%i@%i)\n" agent site 
+         | Defined -> 
+           Printf.fprintf log "Defined\n" 
+         | Unknown -> 
+           Printf.fprintf log "Unknown\n" 
 
      let strictly_more_refined x y = 
        match y  
@@ -249,19 +283,43 @@ module Blackboard =
 
      type pre_blackboard = 
 	 {
-           pre_events_by_column: (event_id*case_value*(case_value*case_value) list) array;
+           pre_events_by_column: (case_value*(case_value*case_value) list) array;
 	   pre_nevents: event_id;
 	   pre_ncolumn: predicate_id;
 	   pre_column_map: predicate_id PredicateMap.t;
-	   pre_columns_of_eid: predicate_id list array;
+	   pre_column_map_inv: predicate_info array;
+           pre_columns_of_eid: predicate_id list array;
 	   pre_row_short_id_map : event_short_id EidMap.t array;
 	   pre_previous_binding: PredicateIdSet.t array;
 	   predicate_id_list_of_predicate_id: PredicateSet.t array;
          } 
 
-           
+     let print_preblackboard parameter handler error log blackboard = 
+       let _ = Printf.fprintf log "**\nPREBLACKBOARD\n**\n" in 
+       let _ = 
+         Array.iteri 
+           (fun id (value,list) ->
+             let predicate_info = Array.get blackboard.pre_column_map_inv id in  
+             let _ = print_predicate_info log predicate_info  in
+             let _ = Printf.fprintf log "%i\n" id in 
+             let _ = print_case_value log value in 
+             let _ = 
+               List.iter 
+                 (fun (test,action) -> 
+                   let _ = Printf.fprintf log "TEST:   " in
+                   let _ = print_case_value log test in 
+                   let _ = Printf.fprintf log "ACTION: " in 
+                   let _ = print_case_value log action in 
+                   ())
+                 list
+             in 
+             let _ = Printf.fprintf log "---\n" in 
+             ())
+           blackboard.pre_events_by_column 
+       in 
+       let _ = Printf.fprintf log "**\n" in 
+       error 
 
- (*blackboard during its construction*)
   
 
 
@@ -289,6 +347,7 @@ module Blackboard =
      and 
          allocate parameter handler error blackboard predicate ag_id = 
        let map = blackboard.pre_column_map in 
+       let map_inv = blackboard.pre_column_map_inv in 
        try 
          let eid = PredicateMap.find predicate map in
          error,blackboard,eid
@@ -296,12 +355,19 @@ module Blackboard =
            Not_found -> 
              let eid'= blackboard.pre_ncolumn + 1 in 
              let map' = PredicateMap.add predicate eid' map in 
+             let _  = Array.set map_inv eid' predicate in 
+             let map_inv' = map_inv in 
              let error,blackboard = 
                bind 
                  parameter 
                  handler 
                  error 
-                 {blackboard with pre_ncolumn = eid' ; pre_column_map = map'}
+                 {blackboard 
+                  with 
+                    pre_ncolumn = eid' ; 
+                    pre_column_map = map' ;
+                    pre_column_map_inv = map_inv' 
+                 }
                  predicate
                  ag_id 
              in 
@@ -399,14 +465,15 @@ module Blackboard =
   let init parameter handler error = 
     error, 
     {
-      pre_events_by_column = Array.make 0 (0,Undefined,[]) ; 
+      pre_events_by_column = Array.make 2010 (Undefined,[]) ; 
       pre_nevents = 0 ;
       pre_ncolumn = 0 ;
       pre_column_map = PredicateMap.empty ; 
-      pre_columns_of_eid = Array.make 0 [] ;
-      pre_row_short_id_map = Array.make 0 (EidMap.empty);
-      pre_previous_binding = Array.make 0 (PredicateIdSet.empty) ; 
-      predicate_id_list_of_predicate_id = Array.make 0 (PredicateSet.empty) ;
+      pre_column_map_inv = Array.make 2010 (Fictitious 0) ; 
+      pre_columns_of_eid = Array.make 2010 [] ;
+      pre_row_short_id_map = Array.make 2010 (EidMap.empty);
+      pre_previous_binding = Array.make 2010 (PredicateIdSet.empty) ; 
+      predicate_id_list_of_predicate_id = Array.make 2010 (PredicateSet.empty) ;
     }
 
   let allocate parameter handler error event pre_blackboard = 
@@ -415,10 +482,61 @@ module Blackboard =
   let add_event parameter handler error event blackboard = 
     let neid  = blackboard.pre_nevents+1 in 
     let test_list = K.tests_of_refined_event event in 
-    let action_list = K.actions_of_refined_event event in 
+    let action_list,_ = K.actions_of_refined_event event in 
+    let build_map list map = 
+      List.fold_left 
+        (fun map (id,value) -> PredicateIdMap.add id value map)
+        map 
+        list 
+    in 
+    let error,blackboard,test_map = 
+      List.fold_left 
+        (fun (error,blackboard,map) test -> 
+          let error,blackboard,test_list = predicates_of_test parameter handler error blackboard test in
+          error,blackboard,build_map test_list map)
+        (error,blackboard,PredicateIdMap.empty)
+        test_list in 
+    let error,blackboard,action_map = 
+      List.fold_left 
+        (fun (error,blackboard,map) action -> 
+          let error,blackboard,action_list = predicates_of_action parameter handler error blackboard action in 
+          error,blackboard,build_map action_list map)
+        (error,blackboard,PredicateIdMap.empty)
+        action_list in 
+    let g x = 
+      match x 
+      with 
+        | None -> Undefined
+        | Some x -> x
+    in 
+    let merged_map = 
+      PredicateIdMap.merge 
+        (fun _ test action -> Some(g test,g action))
+        test_map
+        action_map 
+    in 
+    let pre_events_by_column = 
+      PredicateIdMap.fold 
+        (fun id (test,action) map -> 
+          begin 
+            let value,list = 
+              Array.get map id  
+            in 
+            let value' = 
+              match action
+              with 
+                | Undefined -> value
+                | x -> x
+            in 
+            let _ = Array.set map id (value',(test,action)::list)
+            in map
+          end)
+        merged_map
+        blackboard.pre_events_by_column 
+    in 
     let blackboard = 
       { blackboard with 
-        (*pre_events_by_column = Array.make 0 (0,Undefined,[]) ;*) 
+        pre_events_by_column = pre_events_by_column; 
         pre_nevents = neid+1; 
        (* pre_row_short_id_map = Array.make 0 (EidMap.empty);
         pre_previous_binding = Array.make 0 (PredicateIdSet.empty) ; 

@@ -21,10 +21,10 @@
 
 module type Cflow_handler = 
   sig
-    type parameter (*a struct which contains parameterizable options*)
-    type error_channel     (*a list which contains the errors so far*)
+    type parameter = unit (*a struct which contains parameterizable options*)  
     type error 
-    type handler   (*handler to interpret abstract values*)
+    type error_channel = error list    (*a list which contains the errors so far*)
+    type handler = unit    (*handler to interpret abstract values*)
     type 'a with_handler = parameter -> handler -> error_channel -> 'a
 
     val string_of_exn: exn -> string option  

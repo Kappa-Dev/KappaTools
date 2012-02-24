@@ -24,11 +24,11 @@ let compose f g = (fun x -> f (g x))
 module type Cflow_signature =
 sig
   type agent_name  
-  type site_name 
-  type agent_id 
+  type site_name = int 
+  type agent_id = int 
   type agent 
   type site 
-  type internal_state 
+  type internal_state = int 
   type binding_type 
   type binding_state
   type kappa_sig 
