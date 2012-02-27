@@ -1,9 +1,0 @@
-##
-'a.b' A(b),B(a) -> A(b!1),B(a!1) @ 'ga_on'('k1')
-'a.c' A(c),C(a) -> A(c!1),C(a!1) @ 'ga_on'('k1')
-'b.c' B(c),C(b) -> B(c!1),C(b!1) @ 'ga_on'('k1')
-##
-'a..b' A(b!a.B) -> A(b) @ 'k_off'
-'a..c' A(c!a.C) -> A(c) @ 'k_off'
-'b..c' B(c!b.C) -> B(c) @ 'k_off'
-

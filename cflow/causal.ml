@@ -233,33 +233,33 @@ let init state grid =
 		) node grid
 	)	state.graph grid
 
-let add_pred eid atom config depth = 
+let add_pred eid atom config = 
 	let events = IntMap.add atom.eid atom.kind config.events
 	in
 	let pred_set = try IntMap.find eid config.prec_1 with Not_found -> IntSet.empty in
 	let prec_1 = IntMap.add eid (IntSet.add atom.eid pred_set) config.prec_1 in
 	{config with prec_1 = prec_1 ; events = events}
 
-let add_conflict eid atom config depth =
+let add_conflict eid atom config =
 	let events = IntMap.add atom.eid atom.kind config.events in
 	let cflct_set = try IntMap.find eid config.conflict with Not_found -> IntSet.empty in
 	let cflct = IntMap.add eid (IntSet.add atom.eid cflct_set) config.conflict in
 	{config with conflict = cflct ; events = events }
 
-let rec parse_attribute depth last_modif last_tested attribute config = 
+let rec parse_attribute last_modif last_tested attribute config = 
 	match attribute with
 		| [] -> config
 		| atom::att -> 
 			begin
 				if (is _LINK_MODIF atom.causal_impact) || (is _INTERNAL_MODIF atom.causal_impact) then 
 					let config = 
-						List.fold_left (fun config pred_id -> add_pred pred_id atom config depth) config (last_modif::last_tested) 
+						List.fold_left (fun config pred_id -> add_pred pred_id atom config) config (last_modif::last_tested) 
 					in
 					let config = {config with events = IntMap.add atom.eid atom.kind config.events} in
-					parse_attribute (depth+1) atom.eid [] att config 
+					parse_attribute atom.eid [] att config 
 				else (*test atom*)
-					let config = add_conflict last_modif atom config depth in
-					parse_attribute depth last_modif (atom.eid::last_tested) att config
+					let config = add_conflict last_modif atom config in
+					parse_attribute last_modif (atom.eid::last_tested) att config
 			end
 
 let cut attribute_ids grid =
@@ -276,7 +276,7 @@ let cut attribute_ids grid =
 							let events = IntMap.add atom.eid atom.kind cfg.events 
 							and top = IntSet.add atom.eid cfg.top
 							in 
-							parse_attribute 0 atom.eid [] att {cfg with events = events ; top = top} 
+							parse_attribute atom.eid [] att {cfg with events = events ; top = top} 
 				in
 				build_config tl cfg
 	in
@@ -468,7 +468,7 @@ let dump grid state env =
 			(fun eid' ->
 				if eid' = 0 then () 
 				else
-					fprintf d "node_%d -> node_%d [style=dotted] \n" eid eid'
+					fprintf d "node_%d -> node_%d [style=dotted] \n" eid' eid
 			) pred_set
 	) config.conflict ;
 	fprintf d "}\n"
