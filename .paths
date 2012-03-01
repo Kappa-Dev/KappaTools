@@ -15,3 +15,5 @@ cflow
 Error
 /usr/lib/ocaml
 models/nonLocal/out
+models/perso
+models/perso/ambimol

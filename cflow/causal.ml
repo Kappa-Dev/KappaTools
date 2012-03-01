@@ -18,9 +18,9 @@ type atom =
 
 type attribute = atom list (*vertical sequence of atoms*)
 type grid = {flow: (int*int*int,attribute) Hashtbl.t}  (*(n_i,s_i,q_i) -> att_i with n_i: node_id, s_i: site_id, q_i: link (1) or internal state (0) *)
-type config = {events: event_kind IntMap.t ; prec_1: IntSet.t IntMap.t ; depth_map : int IntMap.t ; conflict : IntSet.t IntMap.t ; top : IntSet.t}
+type config = {events: event_kind IntMap.t ; prec_1: IntSet.t IntMap.t ; conflict : IntSet.t IntMap.t ; top : IntSet.t}
 
-let empty_config = {events=IntMap.empty ; conflict = IntMap.empty ; prec_1 = IntMap.empty ; depth_map = IntMap.empty ; top = IntSet.empty}
+let empty_config = {events=IntMap.empty ; conflict = IntMap.empty ; prec_1 = IntMap.empty ; top = IntSet.empty}
 let is i c = (i land c = i)
 
 let empty_grid () = {flow = Hashtbl.create !Parameter.defaultExtArraySize }
@@ -94,8 +94,7 @@ let add (node_id,site_id) c state grid event_number kind locked =
 							end
 						| None -> UNDEF
 							
-				(*else 
-					before att*)
+				(*else before att*)
 			in
 			let att,opt_opposite = push {before = before att ; after = after ; locked = locked ; causal_impact = impact 1 c ; eid = event_number ; kind = kind} att
 			in
@@ -234,48 +233,33 @@ let init state grid =
 		) node grid
 	)	state.graph grid
 
-let add_pred eid atom config depth = 
+let add_pred eid atom config = 
 	let events = IntMap.add atom.eid atom.kind config.events
 	in
 	let pred_set = try IntMap.find eid config.prec_1 with Not_found -> IntSet.empty in
 	let prec_1 = IntMap.add eid (IntSet.add atom.eid pred_set) config.prec_1 in
-	let depth_map = 
-		let d = try IntMap.find atom.eid config.depth_map with Not_found -> 0 in
-		IntMap.add atom.eid (max depth d) config.depth_map
-	in
-	let depth_map = 
-		let d = try IntMap.find eid depth_map with Not_found -> 1 in
-		IntMap.add atom.eid (max (depth+1) d) depth_map 
-	in 
-	{config with prec_1 = prec_1 ; events = events ; depth_map = depth_map}
+	{config with prec_1 = prec_1 ; events = events}
 
-let add_conflict eid atom config depth =
+let add_conflict eid atom config =
 	let events = IntMap.add atom.eid atom.kind config.events in
 	let cflct_set = try IntMap.find eid config.conflict with Not_found -> IntSet.empty in
 	let cflct = IntMap.add eid (IntSet.add atom.eid cflct_set) config.conflict in
-	let depth_map = 
-		let d = try IntMap.find atom.eid config.depth_map with Not_found -> 0 in
-		IntMap.add atom.eid (max depth d) config.depth_map
-	in
-	let depth_map = 
-		let d = try IntMap.find eid depth_map with Not_found -> 1 in
-		IntMap.add atom.eid (max (depth+1) d) depth_map 
-	in 
-	{config with conflict = cflct ; events = events ; depth_map = depth_map}
+	{config with conflict = cflct ; events = events }
 
-let rec parse_attribute depth last_modif last_tested attribute config = 
+let rec parse_attribute last_modif last_tested attribute config = 
 	match attribute with
 		| [] -> config
 		| atom::att -> 
 			begin
 				if (is _LINK_MODIF atom.causal_impact) || (is _INTERNAL_MODIF atom.causal_impact) then 
 					let config = 
-						List.fold_left (fun config pred_id -> add_pred pred_id atom config depth) config last_tested 
+						List.fold_left (fun config pred_id -> add_pred pred_id atom config) config (last_modif::last_tested) 
 					in
-					parse_attribute (depth+1) atom.eid [] att config 
+					let config = {config with events = IntMap.add atom.eid atom.kind config.events} in
+					parse_attribute atom.eid [] att config 
 				else (*test atom*)
-					let config = add_conflict last_modif atom config depth in
-					parse_attribute depth last_modif (atom.eid::last_tested) att config
+					let config = add_conflict last_modif atom config in
+					parse_attribute last_modif (atom.eid::last_tested) att config
 			end
 
 let cut attribute_ids grid =
@@ -292,12 +276,13 @@ let cut attribute_ids grid =
 							let events = IntMap.add atom.eid atom.kind cfg.events 
 							and top = IntSet.add atom.eid cfg.top
 							in 
-							parse_attribute 0 atom.eid [] att {cfg with events = events ; top = top} 
+							parse_attribute atom.eid [] att {cfg with events = events ; top = top} 
 				in
 				build_config tl cfg
 	in
 	build_config attribute_ids empty_config
 
+(*
 let dot_of_config fic config state env = 
     
 	let label e = 
@@ -324,7 +309,9 @@ let dot_of_config fic config state env =
 	
 	let weight_map = 
 	  IntMap.fold 
-		(fun depth l map ->
+		(fun eid kind map ->
+			let depth = try IntMap.find eid config.depth_map with Not_found -> 0
+			in
 			 let fontcolor = if depth>9 then "white" else "black" in
 			  (*fprintf d "{";*)
 			  (*fprintf d "rank=same;\n";*)
@@ -359,7 +346,7 @@ let dot_of_config fic config state env =
 				   in
 			     fprintf d "}\n" ;
 			     map
-		      ) dp IntMap.empty
+	) config.events IntMap.empty
 	in
 	
 	let rec prec_closure config todo closure =
@@ -431,6 +418,7 @@ let dot_of_config fic config state env =
 	  close_out d
       with
 	  exn -> (close_out d; raise exn)
+*)
 
 let string_of_atom atom = 
 	let string_of_atom_state state =
@@ -447,8 +435,45 @@ let string_of_atom atom =
 let dump grid state env = 
 	let ids = Hashtbl.fold (fun key _ l -> key::l) grid.flow [] in
 	let config = cut ids grid in 
-	dot_of_config "cflow.dot" config state env
-
+	let label e = 
+		match e with
+			| OBS mix_id -> Environment.kappa_of_num mix_id env
+			| PERT p_id -> Environment.pert_of_num p_id env
+			| RULE r_id -> Dynamics.to_kappa (State.rule_of_id r_id state) env
+			| INIT -> "intro"
+	in
+	let d = open_out "cflow.dot" in
+	fprintf d "digraph G{\n" ;
+	IntMap.iter
+	(fun eid kind ->
+		if eid = 0 then () else 
+		fprintf d "node_%d [label=\"%s\"]\n" eid (label kind) 
+	) config.events ;
+	IntMap.iter
+	(fun eid pred_set ->
+		if eid = 0 then () 
+		else 
+			IntSet.iter
+			(fun eid' ->
+				if eid' = 0 then () 
+				else
+					fprintf d "node_%d -> node_%d\n" eid' eid
+			) pred_set
+	) config.prec_1 ;
+	IntMap.iter
+	(fun eid pred_set ->
+		if eid = 0 then () 
+		else
+			IntSet.iter
+			(fun eid' ->
+				if eid' = 0 then () 
+				else
+					fprintf d "node_%d -> node_%d [style=dotted] \n" eid' eid
+			) pred_set
+	) config.conflict ;
+	fprintf d "}\n"
+	
+	
 (*	
 let dump grid state env =
 	Hashtbl.fold 
