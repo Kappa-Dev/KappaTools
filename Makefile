@@ -3,7 +3,7 @@
 ## put here the names of your source files (in the right order)
 SOURCES = \
 		dataStructures/largeArray.ml dataStructures/memoryManagement.ml dataStructures/longString.ml dataStructures/heap.ml dataStructures/safeHeap.ml \
-		dataStructures/tools.ml main/parameter.ml dataStructures/mapExt.ml dataStructures/valMap.ml dataStructures/mods.ml dataStructures/random_tree.ml \
+		dataStructures/tools.ml main/parameter.ml dataStructures/mapExt.ml dataStructures/valMap.ml dataStructures/dynamicArray.ml dataStructures/mods.ml dataStructures/random_tree.ml \
 		Error/debug.ml Error/ExceptionDefn.ml dataStructures/liftSet.ml \
 		grammar/ast.ml grammar/kappaParser.mly grammar/kappaLexer.mll \
 		pattern/signature.ml pattern/environment.ml \
