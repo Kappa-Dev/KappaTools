@@ -154,7 +154,8 @@ module DynArray =
               default = t
             }
       let iter f a = G.iter f !(a.array)
-      
+      let iteri f a = G.iteri f !(a.array)
+
       let blit a1 ofs1 a2 ofs2 len =
 	if len < 0 || ofs1 < 0 || ofs1 > length a1 - len
           || ofs2 < 0 || ofs2 > length a2 - len

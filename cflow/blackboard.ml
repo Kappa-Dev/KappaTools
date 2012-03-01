@@ -20,6 +20,7 @@
 
 module type Blackboard = 
 sig 
+  module A:LargeArray.GenArray
   module H:Cflow_handler.Cflow_handler
   module K:Kappa_instantiation.Cflow_signature
 
@@ -93,6 +94,7 @@ module Blackboard =
   (struct 
      module H = Cflow_handler.Cflow_handler
      module K = Kappa_instantiation.Cflow_linker 
+     module A = Mods.DynArray
 
      (** blackboard matrix*) 
 
@@ -273,6 +275,7 @@ module Blackboard =
      (** maps and sets *)
      module PredicateMap = Map.Make (struct type t = predicate_info let compare = compare end)
      module PredicateSet = Set.Make (struct type t = predicate_info let compare = compare end)
+     module CaseValueSet = Set.Make (struct type t = case_value let compare = compare end)
      module PredicateIdSet = Set.Make (struct type t = predicate_id let compare = compare end)
      module PredicateIdMap = Map.Make (struct type t = predicate_id let compare = compare end)
      module EidMap = Map.Make (struct type t = event_id let compare = compare end)
@@ -283,23 +286,23 @@ module Blackboard =
 
      type pre_blackboard = 
 	 {
-           pre_events_by_column: (case_value*(case_value*case_value) list) array;
+           pre_events_by_column: (case_value*(case_value*case_value) list) A.t;
 	   pre_nevents: event_id;
 	   pre_ncolumn: predicate_id;
 	   pre_column_map: predicate_id PredicateMap.t;
-	   pre_column_map_inv: predicate_info array;
-           pre_columns_of_eid: predicate_id list array;
-	   pre_row_short_id_map : event_short_id EidMap.t array;
-	   pre_previous_binding: PredicateIdSet.t array;
-	   predicate_id_list_of_predicate_id: PredicateSet.t array;
+	   pre_column_map_inv: predicate_info A.t;
+           pre_columns_of_eid: predicate_id list A.t;
+	   pre_row_short_id_map : event_short_id EidMap.t A.t;
+	   predicate_id_list_related_to_predicate_id: PredicateSet.t A.t;
+           history_of_case_values_to_predicate_id: CaseValueSet.t A.t;
          } 
 
      let print_preblackboard parameter handler error log blackboard = 
        let _ = Printf.fprintf log "**\nPREBLACKBOARD\n**\n" in 
        let _ = 
-         Array.iteri 
+         A.iteri 
            (fun id (value,list) ->
-             let predicate_info = Array.get blackboard.pre_column_map_inv id in  
+             let predicate_info = A.get blackboard.pre_column_map_inv id in  
              let _ = print_predicate_info log predicate_info  in
              let _ = Printf.fprintf log "%i\n" id in 
              let _ = print_case_value log value in 
@@ -331,7 +334,7 @@ module Blackboard =
        in 
        let old_set = 
          try 
-           Array.get blackboard.predicate_id_list_of_predicate_id eid
+           A.get blackboard.predicate_id_list_related_to_predicate_id eid
          with 
              Not_found -> 
                PredicateSet.empty
@@ -340,7 +343,7 @@ module Blackboard =
          PredicateSet.add predicate old_set 
        in 
          try 
-           let _ = Array.set blackboard.predicate_id_list_of_predicate_id eid new_set in 
+           let _ = A.set blackboard.predicate_id_list_related_to_predicate_id eid new_set in 
            error,blackboard 
          with 
              Not_found -> raise Exit 
@@ -355,7 +358,7 @@ module Blackboard =
            Not_found -> 
              let eid'= blackboard.pre_ncolumn + 1 in 
              let map' = PredicateMap.add predicate eid' map in 
-             let _  = Array.set map_inv eid' predicate in 
+             let _  = A.set map_inv eid' predicate in 
              let map_inv' = map_inv in 
              let error,blackboard = 
                bind 
@@ -378,7 +381,7 @@ module Blackboard =
          allocate parameter handler error blackboard (Here agent_id) agent_id in 
        let set = 
          try 
-           Array.get blackboard.predicate_id_list_of_predicate_id predicate_id
+           A.get blackboard.predicate_id_list_related_to_predicate_id predicate_id
          with 
              _ -> raise Exit
        in 
@@ -465,15 +468,15 @@ module Blackboard =
   let init parameter handler error = 
     error, 
     {
-      pre_events_by_column = Array.make 2010 (Undefined,[]) ; 
+      pre_events_by_column = A.make 1 (Undefined,[]) ; 
       pre_nevents = 0 ;
       pre_ncolumn = 0 ;
       pre_column_map = PredicateMap.empty ; 
-      pre_column_map_inv = Array.make 2010 (Fictitious 0) ; 
-      pre_columns_of_eid = Array.make 2010 [] ;
-      pre_row_short_id_map = Array.make 2010 (EidMap.empty);
-      pre_previous_binding = Array.make 2010 (PredicateIdSet.empty) ; 
-      predicate_id_list_of_predicate_id = Array.make 2010 (PredicateSet.empty) ;
+      pre_column_map_inv = A.make 1 (Fictitious 0) ; 
+      pre_columns_of_eid = A.make 1 [] ;
+      pre_row_short_id_map = A.make 1 (EidMap.empty);
+      history_of_case_values_to_predicate_id = A.make 1 CaseValueSet.empty;
+      predicate_id_list_related_to_predicate_id = A.make 1 PredicateSet.empty ;
     }
 
   let allocate parameter handler error event pre_blackboard = 
@@ -489,6 +492,10 @@ module Blackboard =
         map 
         list 
     in 
+    let fadd pid p map = 
+      let old = A.get map pid in 
+      A.set map pid (CaseValueSet.add p old) 
+    in 
     let error,blackboard,test_map = 
       List.fold_left 
         (fun (error,blackboard,map) test -> 
@@ -500,7 +507,13 @@ module Blackboard =
       List.fold_left 
         (fun (error,blackboard,map) action -> 
           let error,blackboard,action_list = predicates_of_action parameter handler error blackboard action in 
-          error,blackboard,build_map action_list map)
+          let _ = 
+            List.iter 
+              (fun (pid,p) -> 
+                fadd pid p blackboard.history_of_case_values_to_predicate_id)
+              action_list 
+          in
+              error,blackboard,build_map action_list map)
         (error,blackboard,PredicateIdMap.empty)
         action_list in 
     let g x = 
@@ -520,7 +533,7 @@ module Blackboard =
         (fun id (test,action) map -> 
           begin 
             let value,list = 
-              Array.get map id  
+              A.get map id  
             in 
             let value' = 
               match action
@@ -528,20 +541,18 @@ module Blackboard =
                 | Undefined -> value
                 | x -> x
             in 
-            let _ = Array.set map id (value',(test,action)::list)
+            let _ = A.set map id (value',(test,action)::list)
             in map
           end)
         merged_map
         blackboard.pre_events_by_column 
     in 
     let blackboard = 
-      { blackboard with 
-        pre_events_by_column = pre_events_by_column; 
-        pre_nevents = neid+1; 
-       (* pre_row_short_id_map = Array.make 0 (EidMap.empty);
-        pre_previous_binding = Array.make 0 (PredicateIdSet.empty) ; 
-        predicate_id_list_of_predicate_id = Array.make 0 (PredicateSet.empty) ;
-       *) }
+      { 
+        blackboard with 
+          pre_events_by_column = pre_events_by_column; 
+          pre_nevents = neid+1; 
+      }
     in 
     error,blackboard 
 

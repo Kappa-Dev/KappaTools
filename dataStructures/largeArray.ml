@@ -15,6 +15,7 @@ module type GenArray =
 		val fill: 'a t -> int -> int -> 'a -> unit
 		val of_list: 'a list -> 'a t
 		val iter: ('a -> unit) -> 'a t -> unit
+                val iteri: (int -> 'a -> unit) -> 'a t -> unit
 		val blit: 'a t -> int -> 'a t -> int -> int -> unit 
 	end)
 
@@ -213,7 +214,21 @@ module GenArray =
 				Unary a -> Array.iter f a
 			|	Binary a ->
 					Array.iter (Array.iter f) a
-		let map =
+
+                let iteri f a = 
+                  match a 
+                  with 
+                    | Unary a -> Array.iteri f a 
+                    | Binary a -> 
+                      let g k k' = k*max_array_size1+k' in 
+                      Array.iteri 
+                        (fun k a -> 
+		          Array.iteri 
+                            (fun k' a -> f (g k k') a)
+                            a)
+                        a
+                        
+                let map =
 			gen
 				Array.map
 				Array.map
@@ -233,7 +248,7 @@ module GenArray =
 												a)
 								b)
 		
-		let iteri = geni Array.iteri Array.iteri (fun _ -> ()) (fun _ -> ())
+	(*	let iteri = geni Array.iteri Array.iteri (fun _ -> ()) (fun _ -> ())*)
 		let mapi = geni Array.mapi Array.mapi (fun x -> Unary x) (fun x -> Binary x)
 		
 		let blit a1 ofs1 a2 ofs2 len =
