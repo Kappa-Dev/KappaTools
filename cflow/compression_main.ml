@@ -20,12 +20,12 @@
 
 let debug_mode = true 
 
-let weak_compression env event_list =  
-  let refined_event_list = List.map (Kappa_instantiation.Cflow_linker.refine_event (Kappa_instantiation.Cflow_linker.import_env env)) (List.rev event_list) in 
+let weak_compression env step_list =  
+  let refined_event_list = List.map (Kappa_instantiation.Cflow_linker.refine_step (Kappa_instantiation.Cflow_linker.import_env env)) (List.rev step_list) in 
   let _ = 
     if debug_mode 
     then 
-      List.iter (Kappa_instantiation.Cflow_linker.print_refined_event stdout (Kappa_instantiation.Cflow_linker.import_env env)) refined_event_list  
+      List.iter (Kappa_instantiation.Cflow_linker.print_refined_step stdout (Kappa_instantiation.Cflow_linker.import_env env)) refined_event_list  
   in 
   let parameter = () in 
   let handler = () in 
@@ -34,7 +34,7 @@ let weak_compression env event_list =
   let error,blackboard = 
     List.fold_left 
       (fun (error,blackboard) refined_event  -> 
-        Blackboard.Blackboard.add_event parameter handler error refined_event blackboard)
+        Blackboard.Blackboard.add_step parameter handler error refined_event blackboard)
       (error,blackboard)
       refined_event_list
   in 

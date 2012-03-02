@@ -92,7 +92,9 @@ let event state grid event_list counter plot env =
 					let grid,event_list = 
 						if !Parameter.causalModeOn then
 							Causal.record r.Dynamics.lhs (Some (r.Dynamics.pre_causal,side_effect,psi,false,r.Dynamics.r_id)) (State.map_of embedding_t) state counter false grid env,
-Kappa_instantiation.Cflow_linker.store_event (Kappa_instantiation.Cflow_linker.import_event (r,phi,psi)) event_list 
+Kappa_instantiation.Cflow_linker.store_event 
+  (Kappa_instantiation.Cflow_linker.import_event (r,phi,psi))
+  event_list 
 						else grid,event_list 
 					in
 					(env,state,IntSet.union pert_ids pert_ids',grid,event_list)

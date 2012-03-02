@@ -48,7 +48,7 @@ sig
 
   val predicates_of_test: (pre_blackboard -> K.test -> H.error_channel * pre_blackboard * (predicate_id*case_value) list) H.with_handler 
      
-val predicates_of_action: (pre_blackboard -> K.action -> H.error_channel * pre_blackboard * (predicate_id*case_value) list) H.with_handler  
+  val predicates_of_action: (pre_blackboard -> K.action -> H.error_channel * pre_blackboard * (predicate_id*case_value) list) H.with_handler  
 
 
   val set: ((case_address * case_value option) -> blackboard  -> H.error_channel * blackboard) H.with_handler 
@@ -65,13 +65,12 @@ val predicates_of_action: (pre_blackboard -> K.action -> H.error_channel * pre_b
  
   (** initialisation*)
   val init:  (H.error_channel * pre_blackboard) H.with_handler 
-  val add_event: (Kappa_instantiation.Cflow_linker.refined_event -> pre_blackboard -> H.error_channel * pre_blackboard) H.with_handler
-  val add_case: (case_address -> pre_blackboard -> H.error_channel * pre_blackboard) H.with_handler 
+  val add_step: (Kappa_instantiation.Cflow_linker.refined_step -> pre_blackboard -> H.error_channel * pre_blackboard) H.with_handler
   val finalize: (pre_blackboard -> H.error_channel * blackboard) H.with_handler 
 
+
   (** heuristics *)
- 
-  val next_choice: (blackboard -> H.error_channel * instruction list) H.with_handler 
+   val next_choice: (blackboard -> H.error_channel * instruction list) H.with_handler 
   val propagation_heuristic: (blackboard -> instruction  -> instruction list -> H.error_channel * instruction list) H.with_handler 
   val apply_instruction: (blackboard -> instruction -> instruction list -> (H.error_channel * (case_address*case_value) list * instruction list)) H.with_handler 
 
@@ -98,8 +97,8 @@ module Blackboard =
 
      (** blackboard matrix*) 
 
-     type event_id = int 
-     type event_short_id = int 
+     type step_id = int 
+     type step_short_id = int 
 
      (** blackboard predicates*)
 
@@ -122,11 +121,11 @@ module Blackboard =
      type case_address = 
 	     {
 	       column_id:predicate_id; 
-	       row_id:   event_id;
+	       row_id:   step_id;
 	     }
 	       
      type case_value = 
-       | Point_to of event_id 
+       | Point_to of step_id 
        | Counter of int 
        | Internal_state_is of K.internal_state
        | Undefined 
@@ -141,8 +140,8 @@ module Blackboard =
      let print_case_value log x = 
        match x 
        with 
-         | Point_to event_id -> 
-           Printf.fprintf log "Point_to %i \n" event_id 
+         | Point_to step_id -> 
+           Printf.fprintf log "Point_to %i \n" step_id 
          | Counter int ->  
            Printf.fprintf log "Counter %i \n" int
          | Internal_state_is internal_state -> 
@@ -230,15 +229,15 @@ module Blackboard =
 
      type case_info_static  = 
 	 {
-	   row_short_id: event_short_id;
+	   row_short_id: step_short_id;
 	   state_before: case_value;
            state_after: case_value
 	 }
 
      type case_info_dynamic = 
          {
-           pointer_previous: event_short_id;
-           pointer_next: event_short_id;
+           pointer_previous: step_short_id;
+           pointer_next: step_short_id;
          }
           
      type case_info = 
@@ -276,9 +275,9 @@ module Blackboard =
      module PredicateMap = Map.Make (struct type t = predicate_info let compare = compare end)
      module PredicateSet = Set.Make (struct type t = predicate_info let compare = compare end)
      module CaseValueSet = Set.Make (struct type t = case_value let compare = compare end)
-     module PredicateIdSet = Set.Make (struct type t = predicate_id let compare = compare end)
-     module PredicateIdMap = Map.Make (struct type t = predicate_id let compare = compare end)
-     module EidMap = Map.Make (struct type t = event_id let compare = compare end)
+     module PredicatsidSet = Set.Make (struct type t = predicate_id let compare = compare end)
+     module PredicatsidMap = Map.Make (struct type t = predicate_id let compare = compare end)
+     module SidMap = Map.Make (struct type t = step_id let compare = compare end)
        
     
      (** blackboard*)
@@ -286,25 +285,30 @@ module Blackboard =
 
      type pre_blackboard = 
 	 {
-           pre_events_by_column: (case_value*(case_value*case_value) list) A.t;
-	   pre_nevents: event_id;
+           pre_steps_by_column: (case_value*(case_value*case_value) list) A.t;
+	   pre_nsteps: step_id;
 	   pre_ncolumn: predicate_id;
 	   pre_column_map: predicate_id PredicateMap.t;
 	   pre_column_map_inv: predicate_info A.t;
-           pre_columns_of_eid: predicate_id list A.t;
-	   pre_row_short_id_map : event_short_id EidMap.t A.t;
+           pre_columns_of_sid: predicate_id list A.t;
+	   pre_row_short_id_map : step_short_id SidMap.t A.t;
 	   predicate_id_list_related_to_predicate_id: PredicateSet.t A.t;
            history_of_case_values_to_predicate_id: CaseValueSet.t A.t;
          } 
 
+     let print_predicate_id log blackboard i = 
+         let predicate_info = A.get blackboard.pre_column_map_inv i in  
+         let _ = Printf.fprintf log "Predicate: %i " i in 
+         let _ = print_predicate_info log predicate_info in 
+         ()
+  
      let print_preblackboard parameter handler error log blackboard = 
        let _ = Printf.fprintf log "**\nPREBLACKBOARD\n**\n" in 
+       let _ = Printf.fprintf log "*\n steps by column\n*\n" in 
        let _ = 
          A.iteri 
            (fun id (value,list) ->
-             let predicate_info = A.get blackboard.pre_column_map_inv id in  
-             let _ = print_predicate_info log predicate_info  in
-             let _ = Printf.fprintf log "%i\n" id in 
+             let _ = print_predicate_id log blackboard id  in
              let _ = print_case_value log value in 
              let _ = 
                List.iter 
@@ -318,7 +322,37 @@ module Blackboard =
              in 
              let _ = Printf.fprintf log "---\n" in 
              ())
-           blackboard.pre_events_by_column 
+           blackboard.pre_steps_by_column 
+       in 
+       let _ = Printf.fprintf log "*\n predicate_id related to the predicate \n*\n" in 
+       let _ = 
+         A.iteri 
+           (fun i s -> 
+             let _ = print_predicate_id log blackboard i in 
+             let _ = 
+               PredicateSet.iter
+                 (fun s -> print_predicate_info log s)
+                 s
+             in 
+             let _ = Printf.fprintf log "---\n" in 
+             ()
+           )
+           blackboard.predicate_id_list_related_to_predicate_id 
+       in 
+       let _ = Printf.fprintf log "*\n past values of a predicate \n*\n" in 
+       let _ = 
+         A.iteri 
+           (fun i s -> 
+             let _ = print_predicate_id log blackboard i in 
+             let _ = 
+               CaseValueSet.iter 
+                 (fun s -> print_case_value log s)
+                 s
+             in 
+             let _ = Printf.fprintf log "---\n" in 
+             ()
+           )
+           blackboard.history_of_case_values_to_predicate_id 
        in 
        let _ = Printf.fprintf log "**\n" in 
        error 
@@ -329,12 +363,12 @@ module Blackboard =
      type blackboard = pre_blackboard 
 
      let rec bind parameter handler error blackboard predicate ag_id =
-       let error,blackboard,eid = 
+       let error,blackboard,sid = 
          allocate parameter handler error blackboard (Here ag_id) ag_id
        in 
        let old_set = 
          try 
-           A.get blackboard.predicate_id_list_related_to_predicate_id eid
+           A.get blackboard.predicate_id_list_related_to_predicate_id sid
          with 
              Not_found -> 
                PredicateSet.empty
@@ -343,7 +377,7 @@ module Blackboard =
          PredicateSet.add predicate old_set 
        in 
          try 
-           let _ = A.set blackboard.predicate_id_list_related_to_predicate_id eid new_set in 
+           let _ = A.set blackboard.predicate_id_list_related_to_predicate_id sid new_set in 
            error,blackboard 
          with 
              Not_found -> raise Exit 
@@ -352,13 +386,13 @@ module Blackboard =
        let map = blackboard.pre_column_map in 
        let map_inv = blackboard.pre_column_map_inv in 
        try 
-         let eid = PredicateMap.find predicate map in
-         error,blackboard,eid
+         let sid = PredicateMap.find predicate map in
+         error,blackboard,sid
        with 
            Not_found -> 
-             let eid'= blackboard.pre_ncolumn + 1 in 
-             let map' = PredicateMap.add predicate eid' map in 
-             let _  = A.set map_inv eid' predicate in 
+             let sid'= blackboard.pre_ncolumn + 1 in 
+             let map' = PredicateMap.add predicate sid' map in 
+             let _  = A.set map_inv sid' predicate in 
              let map_inv' = map_inv in 
              let error,blackboard = 
                bind 
@@ -367,14 +401,14 @@ module Blackboard =
                  error 
                  {blackboard 
                   with 
-                    pre_ncolumn = eid' ; 
+                    pre_ncolumn = sid' ; 
                     pre_column_map = map' ;
                     pre_column_map_inv = map_inv' 
                  }
                  predicate
                  ag_id 
              in 
-               error,blackboard,eid' 
+               error,blackboard,sid' 
                  
      let free_agent parameter handler error blackboard agent_id = 
        let error,blackboard,predicate_id = 
@@ -468,27 +502,27 @@ module Blackboard =
   let init parameter handler error = 
     error, 
     {
-      pre_events_by_column = A.make 1 (Undefined,[]) ; 
-      pre_nevents = 0 ;
+      pre_steps_by_column = A.make 1 (Undefined,[]) ; 
+      pre_nsteps = 0 ;
       pre_ncolumn = 0 ;
       pre_column_map = PredicateMap.empty ; 
       pre_column_map_inv = A.make 1 (Fictitious 0) ; 
-      pre_columns_of_eid = A.make 1 [] ;
-      pre_row_short_id_map = A.make 1 (EidMap.empty);
+      pre_columns_of_sid = A.make 1 [] ;
+      pre_row_short_id_map = A.make 1 (SidMap.empty);
       history_of_case_values_to_predicate_id = A.make 1 CaseValueSet.empty;
       predicate_id_list_related_to_predicate_id = A.make 1 PredicateSet.empty ;
     }
 
-  let allocate parameter handler error event pre_blackboard = 
+  let allocate parameter handler error step pre_blackboard = 
     error,pre_blackboard
  
-  let add_event parameter handler error event blackboard = 
-    let neid  = blackboard.pre_nevents+1 in 
-    let test_list = K.tests_of_refined_event event in 
-    let action_list,_ = K.actions_of_refined_event event in 
+  let add_step parameter handler error step blackboard = 
+    let nsid  = blackboard.pre_nsteps+1 in 
+    let test_list = K.tests_of_refined_step step in 
+    let action_list,_ = K.actions_of_refined_step step in 
     let build_map list map = 
       List.fold_left 
-        (fun map (id,value) -> PredicateIdMap.add id value map)
+        (fun map (id,value) -> PredicatsidMap.add id value map)
         map 
         list 
     in 
@@ -501,7 +535,7 @@ module Blackboard =
         (fun (error,blackboard,map) test -> 
           let error,blackboard,test_list = predicates_of_test parameter handler error blackboard test in
           error,blackboard,build_map test_list map)
-        (error,blackboard,PredicateIdMap.empty)
+        (error,blackboard,PredicatsidMap.empty)
         test_list in 
     let error,blackboard,action_map = 
       List.fold_left 
@@ -514,7 +548,7 @@ module Blackboard =
               action_list 
           in
               error,blackboard,build_map action_list map)
-        (error,blackboard,PredicateIdMap.empty)
+        (error,blackboard,PredicatsidMap.empty)
         action_list in 
     let g x = 
       match x 
@@ -523,13 +557,13 @@ module Blackboard =
         | Some x -> x
     in 
     let merged_map = 
-      PredicateIdMap.merge 
+      PredicatsidMap.merge 
         (fun _ test action -> Some(g test,g action))
         test_map
         action_map 
     in 
-    let pre_events_by_column = 
-      PredicateIdMap.fold 
+    let pre_steps_by_column = 
+      PredicatsidMap.fold 
         (fun id (test,action) map -> 
           begin 
             let value,list = 
@@ -545,13 +579,13 @@ module Blackboard =
             in map
           end)
         merged_map
-        blackboard.pre_events_by_column 
+        blackboard.pre_steps_by_column 
     in 
     let blackboard = 
       { 
         blackboard with 
-          pre_events_by_column = pre_events_by_column; 
-          pre_nevents = neid+1; 
+          pre_steps_by_column = pre_steps_by_column; 
+          pre_nsteps = nsid+1; 
       }
     in 
     error,blackboard 

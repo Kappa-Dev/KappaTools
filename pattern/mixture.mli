@@ -6,6 +6,9 @@ type t
 val set_root_of_cc : t -> t
 val root_of_cc : t -> int -> int option
 
+(* links structure *) 
+val graph: t -> (int*int) Mods.Int2Map.t 
+
 (**[ids_of_name name mix] returns all agent id's in mixture [mix] whose name is equal to [name] *)
 val ids_of_name : int*int -> t -> Mods.IntSet.t
 

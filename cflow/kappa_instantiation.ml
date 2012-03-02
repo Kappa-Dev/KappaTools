@@ -49,10 +49,13 @@ sig
     | Remove of agent 
 
   type event 
+  type init 
+  type step 
   type kappa_rule 
   type embedding
   type fresh_map 
-  type refined_event
+  type refined_event 
+  type refined_step
 
   val agent_id_of_agent: agent -> agent_id 
   val agent_name_of_agent: agent -> agent_name
@@ -71,16 +74,17 @@ sig
   val fresh_map_of_event: event -> fresh_map
   val tests_of_event: event -> test list 
   val actions_of_event: event -> kappa_sig -> action list * (site*binding_state) list 
-  val refine_event: kappa_sig -> event -> refined_event
-  val event_of_refined_event: refined_event -> event
+  val refine_step: kappa_sig -> step -> refined_step
+  val step_of_refined_step: refined_step -> step
   val rule_of_refined_event: refined_event -> kappa_rule
-  val tests_of_refined_event: refined_event -> test list 
-  val actions_of_refined_event: refined_event -> action list * (site*binding_state) list 
-  val print_refined_event: out_channel -> kappa_sig -> refined_event -> unit 
+  val tests_of_refined_step: refined_step -> test list 
+  val actions_of_refined_step: refined_step -> action list * (site*binding_state) list 
+  val print_refined_step: out_channel -> kappa_sig -> refined_step -> unit 
 
   val import_event:  Dynamics.rule * int Mods.IntMap.t * int Mods.IntMap.t -> event 
   val import_env: Environment.t -> kappa_sig 
-  val store_event: event -> event list -> event list 
+  val store_event: event -> step list -> step list 
+  val store_init : Graph.SiteGraph.t -> step list -> step list 
 end 
 
 
@@ -104,8 +108,10 @@ module Cflow_linker =
 
   type fresh_map = int Mods.IntMap.t 
 
-  type event = kappa_rule * embedding * fresh_map
+  type init = int * (int * (int option * Node.ptr)) list
 
+  type event = kappa_rule * embedding * fresh_map
+   
   type kappa_sig = Environment.t 
 
   type internal_state  = int 
@@ -135,9 +141,15 @@ module Cflow_linker =
     | Free of site 
     | Remove of agent 
 
-  type refined_event = 
-      event * test list * (action list * ((site * binding_state) list))
- 
+  type ('a,'b) choice = 
+    | Event of 'a 
+    | Init of 'b 
+
+  type refined_event = event * test list * (action list * ((site * binding_state) list))
+  type refined_init = init * action list
+  type step = (event,init) choice 
+  type refined_step = (refined_event,refined_init) choice 
+
   let map_sites f map x = 
      let sign = 
       try 
@@ -163,11 +175,9 @@ module Cflow_linker =
   
   let fresh_map_of_event (_,_,x) = x 
   
-  let event_of_event x = x 
-  
   let embedding_of_event (_,x,_) = x 
   
-  let rule_of_event (x,_,_) = x 
+  let rule_of_event (x,_,_) = x
 
   let agent_id_of_agent = fst 
   
@@ -404,7 +414,64 @@ module Cflow_linker =
 	       ag list
 	)
 	(Mixture.agents lhs) []
-	
+
+  let create_init state event_list = 
+    	Graph.SiteGraph.fold
+	  (fun node_id node list  ->
+            let interface = 
+		Node.fold_status
+		  (fun site_id (int,lnk) list -> 
+                    (site_id,(int,lnk))::list)
+                  node 
+	          []
+            in 
+            (Init (node_id,interface))::list)
+          state 
+          event_list 
+
+  let actions_of_init init kappa_sig = 
+    let list = [] in 
+    let list = 
+      Mods.IntMap.fold 
+        (fun agent_id ag list -> 
+	  let agent_name = Mixture.name ag in 
+	  let agent = build_agent agent_id agent_name in 
+	  let interface = get_default_state kappa_sig agent_name in 
+	  let list = 
+            List.fold_left 
+              (fun list (site_id,int) -> 
+                if site_id = 0 
+	        then list
+	        else 
+		  let site = build_site agent site_id in 
+		  let list = 
+		    match int 
+                    with 
+		      | Some i -> Mod_internal(site,i)::list
+		      | None -> list
+		  in 
+	          list 
+              )
+              ((Create(agent,interface))::list)
+              interface 
+          in list)
+        (Mixture.agents init)
+        []
+    in
+    Mods.Int2Map.fold 
+      (fun (ag_id1,site_id1) (ag_id2,site_id2) list -> 
+        let agent_name1 = Mixture.name (Mixture.agent_of_id ag_id1 init) in
+        let agent_name2 = Mixture.name (Mixture.agent_of_id ag_id2 init) in 
+        let agent1 = build_agent ag_id1 agent_name1 in 
+        let agent2 = build_agent ag_id2 agent_name2 in 
+        let site1 = build_site agent1 site_id1 in 
+        let site2 = build_site agent2 site_id2 in 
+        let site1,site2 = order_site site1 site2 in 
+        Bind(site1,site2)::list
+      )
+      (Mixture.graph init)
+      list       
+
   let actions_of_event event kappa_sig = 
     let rule = rule_of_event event in 
     let lhs = rule.Dynamics.lhs in 
@@ -483,11 +550,21 @@ module Cflow_linker =
 	(rule_of_event event).Dynamics.script 
     in List.rev a,b
 
-  let refine_event env event = (event,tests_of_event event,actions_of_event event env)
+      
 
-  let event_of_refined_event (x,_,_) = x
-  let tests_of_refined_event (_,x,_) = x
-  let actions_of_refined_event (_,_,x) = x 
+  let refine_event env event = (event,tests_of_event event,actions_of_event event env)
+    
+  let event_of_refined_event (a,_,_) = a
+
+  let refine_init env init = (init,[])
+
+  let init_of_refined_init = fst 
+
+  let tests_of_refined_init _ = []
+  let tests_of_refined_event (_,y,_) =  y
+  let actions_of_refined_event (_,_,y) = y
+  let actions_of_refined_init (_,x) = x,[]
+
   let rule_of_refined_event x = (compose rule_of_event event_of_refined_event) x 
 
   let print_side_effects log env prefix (site,state) = 
@@ -515,9 +592,36 @@ module Cflow_linker =
     in 
       ()
 
+  let print_refined_init log env refined_init = ()
+  
+  let gen f1 f2 step = 
+    match step
+    with 
+      | Event a -> f1 a 
+      | Init a -> f2 a 
+
+  let genbis f1 f2 = 
+    gen (fun a -> Event (f1 a)) (fun a -> Init (f2 a))      
+  
+  let print_refined_step log env = 
+    gen (print_refined_event log env) (print_refined_init log env) 
+
+  let tests_of_refined_step =
+    gen tests_of_refined_event tests_of_refined_init 
+      
+  let refine_step env = 
+    genbis (refine_event env) (refine_init env)
+  
+  let step_of_refined_step = 
+    genbis event_of_refined_event init_of_refined_init 
+
+  let actions_of_refined_step = 
+    gen actions_of_refined_event actions_of_refined_init 
+  
   let import_event x = x 
   let import_env x = x
-  let store_event event event_list = event::event_list    
-	
+  let store_event event step_list = (Event event)::step_list    
+  let store_init init step_list = create_init init step_list  
+ 	
 end:Cflow_signature)
 

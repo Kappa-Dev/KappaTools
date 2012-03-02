@@ -19,6 +19,8 @@ type t = {
 	unary : bool
 	}
 
+let graph m = m.graph 
+
 let interface ag = ag.interface
 
 let is_empty m = (IntMap.size m.agents) = 0	

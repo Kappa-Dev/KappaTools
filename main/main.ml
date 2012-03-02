@@ -125,7 +125,12 @@ let main =
 		let plot = Plot.create !Parameter.outputDataName
 		and grid,event_list = 
 			if !Parameter.causalModeOn then 
-				let grid = Causal.empty_grid() in (Causal.init state grid,[])
+				let grid = Causal.empty_grid() in 
+                                let event_list = [] in 
+                                (
+                                  Causal.init state grid,
+(*                                  Kappa_instantiation.Cflow_linker.init_event_list state*) event_list
+                                )
 			else (Causal.empty_grid(),[])
 		in
 		ExceptionDefn.flush_warning () ; 
