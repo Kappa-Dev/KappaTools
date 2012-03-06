@@ -8,8 +8,7 @@ open Printf
 type atom_state = FREE | BND of int*int | INT of int | UNDEF
 type event_kind = OBS of int | RULE of int | INIT | PERT of int
 type atom = 
-	{before:atom_state ; (*attribute state before the event*)
-	after:atom_state; (*attribute state after the event*) 
+	{ 
 	causal_impact : int ; (*(1) tested (2) modified, (3) tested + modified*) 
 	eid:int (*event identifier*) ;
 	kind:event_kind
@@ -41,11 +40,6 @@ let impact q c =
 		else 
 			if (is _INTERNAL_MODIF c) then 2 else 1
 
-let before attribute = 
-	match attribute with
-		| atom::_ -> atom.after
-		| [] -> UNDEF 
-
 let last_event attribute = 
 	match attribute with
 		| [] -> None
@@ -61,28 +55,13 @@ let push (a:atom) (att:atom list) =
 				a::att
 				 
 
-let add (node_id,site_id) c state grid event_number kind =
+let add (node_id,site_id) c grid event_number kind =
  
 	(*adding a link modification*)
 	let grid = 
 		if (is _LINK_TESTED c) || (is _LINK_MODIF c) then
 			let att = try grid_find (node_id,site_id,1) grid with Not_found -> [] in
-			let after = 
-				(*if is _LINK_MODIF c then*)
-					let opt_node = try Some (SiteGraph.node_of_id state.graph node_id) with Not_found -> None (*node deleted*) in
-					match opt_node with
-						| Some node ->
-							begin
-								match Node.link_state (node,site_id) with
-									| Node.Ptr (node',site_id') -> BND (Node.get_address node',site_id') 
-									| Node.FPtr _ -> invalid_arg "Causal.add"
-									| Node.Null -> FREE
-							end
-						| None -> UNDEF
-							
-				(*else before att*)
-			in
-			let att = push {before = before att ; after = after ; causal_impact = impact 1 c ; eid = event_number ; kind = kind} att
+			let att = push {causal_impact = impact 1 c ; eid = event_number ; kind = kind} att
 			in
 			grid_add (node_id,site_id,1) att grid
 		else
@@ -91,20 +70,7 @@ let add (node_id,site_id) c state grid event_number kind =
 	if (is _INTERNAL_TESTED c) || (is _INTERNAL_MODIF c) then
 		(*adding an internal state modification*)
 		let att = try grid_find (node_id,site_id,0) grid with Not_found -> [] in
-		let after = 
-			(*if is _INTERNAL_MODIF c then*)
-				let opt_node = try Some (SiteGraph.node_of_id state.graph node_id) with Not_found -> None in
-				match opt_node with
-					| Some node ->
-						begin
-							match Node.internal_state (node,site_id) with
-								| Some i -> INT i 
-								| None -> invalid_arg "Causal.add"
-						end
-					| None -> UNDEF
-			(*else before att*)
-		in
-		let att = push {before = before att ; after = after ; causal_impact = impact 0 c ; eid = event_number ; kind = kind} att
+		let att = push {causal_impact = impact 0 c ; eid = event_number ; kind = kind} att
 		in
 		grid_add (node_id,site_id,0) att grid
 	else 
@@ -112,45 +78,12 @@ let add (node_id,site_id) c state grid event_number kind =
 		
 (**side_effect Int2Set.t: pairs (agents,ports) that have been freed as a side effect --via a DEL or a FREE action*)
 (*NB no internal state modif as side effect*)
-let record mix opt_rule embedding state counter grid env = 
+let record mix opt_rule embedding event_number grid env = 
 	
-	let im state embedding fresh_map id grid =
-		try
-			match id with
-			| FRESH j ->  
-				let im_j = (IntMap.find j fresh_map) in
-				let node = SiteGraph.node_of_id state.graph im_j in
-				let node_id = Node.name node in
-				let grid =  (*adding attributes for new site*)
-					Node.fold_status (fun site_id _ grid ->
-						let int_opt = Environment.default_state node_id site_id env in
-						let grid = 
-							match int_opt with
-								| Some i -> 
-									let att = grid_find (node_id,site_id,0) grid in
-									let atom = {before = UNDEF ; after = INT i ; causal_impact = impact 0 _INTERNAL_MODIF ; eid = Counter.event counter ; kind = INIT}
-									in
-									let att = push atom att in
-									grid_add (node_id,site_id,0) att grid
-								| None -> grid
-						in
-						let att = grid_find (node_id,site_id,1) grid in (*link state has to be modified because node is fresh*)
-						let atom = {before = UNDEF ; after = FREE ; causal_impact = impact 1 _LINK_MODIF ; eid = Counter.event counter ; kind = INIT}
-						in
-						let att = push atom att in
-						grid_add (node_id,site_id,1) att grid
-					) node grid
-				in
-				(im_j,grid)
-			| KEPT j ->
-				let im_j =
-					begin
-						try	(IntMap.find j embedding) with Not_found -> invalid_arg "Causal.record: Not a valid embedding"
-					end
-				in 
-				(im_j,grid)
-		with 
-			| Not_found -> invalid_arg "Causal.record: incomplete embedding"  
+	let im embedding fresh_map id =
+		match id with
+			| FRESH j -> IntMap.find j fresh_map
+			| KEPT j -> IntMap.find j embedding
 	in
 	
 	let grid = (*if mix is the lhs of a rule*) 
@@ -161,28 +94,28 @@ let record mix opt_rule embedding state counter grid env =
 				let grid = 
 					Id2Map.fold
 					(fun (id,site_id) c grid ->
-						let node_id,grid = im state embedding psi id grid in
-						add (node_id,site_id) c state grid (Counter.event counter) kind 
+						let node_id = im embedding psi id in
+						add (node_id,site_id) c grid event_number kind 
 					) pre_causal grid
 				in
 				(*adding side effects modifications*)
 				Int2Set.fold 
-				(fun (node_id,site_id) grid -> add (node_id,site_id) _LINK_MODIF state grid (Counter.event counter) kind) 
+				(fun (node_id,site_id) grid -> add (node_id,site_id) _LINK_MODIF grid event_number kind) 
 				side_effects grid
 			| None -> (*event is an observable occurrence*)
 				let kind = OBS (Mixture.get_id mix) in
 				IntMap.fold
 				(fun id ag grid ->
-					let node_id,grid = im state embedding IntMap.empty (Dynamics.KEPT id) grid in
+					let node_id = im embedding IntMap.empty (Dynamics.KEPT id) in
 					Mixture.fold_interface
 					(fun site_id (int,lnk) grid ->
 						let grid = 
 							match int with
-								| Some i -> add (node_id,site_id) _INTERNAL_TESTED state grid (Counter.event counter) kind
+								| Some i -> add (node_id,site_id) _INTERNAL_TESTED grid event_number kind
 								| None -> grid
 						in
 						match lnk with
-							| Node.BND | Node.FREE | Node.TYPE _ -> add (node_id,site_id) _LINK_TESTED state grid (Counter.event counter) kind 
+							| Node.BND | Node.FREE | Node.TYPE _ -> add (node_id,site_id) _LINK_TESTED grid event_number kind 
 							| Node.WLD -> grid
 					)
 					ag grid
@@ -191,7 +124,7 @@ let record mix opt_rule embedding state counter grid env =
 	in
 	grid
 
-
+(*
 let init state grid = 
 	SiteGraph.fold
 	(fun node_id node grid ->
@@ -218,6 +151,7 @@ let init state grid =
 			  | _ -> invalid_arg "Causal.init"
 		) node grid
 	)	state.graph grid
+*)
 
 let add_pred eid atom config = 
 	let events = IntMap.add atom.eid atom.kind config.events
@@ -280,15 +214,8 @@ let cut attribute_ids grid =
 	build_config attribute_ids empty_config
 
 let string_of_atom atom = 
-	let string_of_atom_state state =
-		match state with
-			| FREE -> "..."
-			| BND (i,j) -> Printf.sprintf "(%d,%d)" i j
-			| INT i -> Printf.sprintf "%d" i
-			| UNDEF -> "N"
-	in
 	let imp_str = match atom.causal_impact with 1 -> "o" | 2 -> "x" | 3 -> "%" | _ -> invalid_arg "Causal.string_of_atom" in
-	Printf.sprintf "(%s%s%s)_%d" (string_of_atom_state atom.before) imp_str (string_of_atom_state atom.after) atom.eid
+	Printf.sprintf "%s_%d" imp_str atom.eid
 		
 				
 let dot_of_grid grid state env = 
