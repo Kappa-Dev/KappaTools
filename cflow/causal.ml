@@ -52,28 +52,15 @@ let last_event attribute =
 		| [] -> None
 		| a::_ -> (Some a.eid)
 
-let rec find_opposite atom attribute = 
-	match attribute with
-		| [] -> raise Not_found
-		| a::att -> 
-			if a.causal_impact = 1 (*a is a pure test*) then find_opposite atom att
-			else 
-				if a.before = atom.after then a
-				else raise Not_found
-
 (*adds atom a to attribute att. Collapses last atom if if bears the same id as a --in the case of a non atomic action*)
 let push (a:atom) (att:atom list) = 
 	match att with
-		| [] -> ([a],None)
+		| [] -> [a]
 		| a'::att' -> 
-			if a'.eid = a.eid then (a::att',None) (*if rule has multiple effect on the same attribute, only the last one is recorded*) 
+			if a'.eid = a.eid then a::att' (*if rule has multiple effect on the same attribute, only the last one is recorded*) 
 			else
-				begin
-					if a.causal_impact = 1 then (a::att,None) (*atom is a pure test, no need to compress loop locally*) 
-					else
-						let opt = try Some (find_opposite a att) with Not_found -> None in 
-						(a::att,opt)
-				end 
+				a::att
+				 
 
 let add (node_id,site_id) c state grid event_number kind locked =
  
@@ -96,7 +83,7 @@ let add (node_id,site_id) c state grid event_number kind locked =
 							
 				(*else before att*)
 			in
-			let att,opt_opposite = push {before = before att ; after = after ; locked = locked ; causal_impact = impact 1 c ; eid = event_number ; kind = kind} att
+			let att = push {before = before att ; after = after ; locked = locked ; causal_impact = impact 1 c ; eid = event_number ; kind = kind} att
 			in
 			grid_add (node_id,site_id,1) att grid
 		else
@@ -118,7 +105,7 @@ let add (node_id,site_id) c state grid event_number kind locked =
 					| None -> UNDEF
 			(*else before att*)
 		in
-		let att,opt_opposite = push {before = before att ; after = after ; locked = locked ; causal_impact = impact 0 c ; eid = event_number ; kind = kind} att
+		let att = push {before = before att ; after = after ; locked = locked ; causal_impact = impact 0 c ; eid = event_number ; kind = kind} att
 		in
 		grid_add (node_id,site_id,0) att grid
 	else 
@@ -144,14 +131,14 @@ let record mix opt_rule embedding state counter locked grid env =
 									let att = grid_find (node_id,site_id,0) grid in
 									let atom = {before = UNDEF ; after = INT i ; locked = false ; causal_impact = impact 0 _INTERNAL_MODIF ; eid = Counter.event counter ; kind = INIT}
 									in
-									let att,opt_opposite = push atom att in
+									let att = push atom att in
 									grid_add (node_id,site_id,0) att grid
 								| None -> grid
 						in
 						let att = grid_find (node_id,site_id,1) grid in (*link state has to be modified because node is fresh*)
 						let atom = {before = UNDEF ; after = FREE ; locked = false ; causal_impact = impact 1 _LINK_MODIF ; eid = Counter.event counter ; kind = INIT}
 						in
-						let att,opt_opposite = push atom att in
+						let att = push atom att in
 						grid_add (node_id,site_id,1) att grid
 					) node grid
 				in
@@ -251,14 +238,22 @@ let rec parse_attribute last_modif last_tested attribute config =
 		| [] -> config
 		| atom::att -> 
 			begin
-				if (is _LINK_MODIF atom.causal_impact) || (is _INTERNAL_MODIF atom.causal_impact) then 
+				let config = {config with events = IntMap.add atom.eid atom.kind config.events} in
+				(*atom has a modification*)
+				if (atom.causal_impact = 2) || (atom.causal_impact = 3) then 
 					let config = 
-						List.fold_left (fun config pred_id -> add_pred pred_id atom config) config (last_modif::last_tested) 
+						List.fold_left (fun config pred_id -> add_pred pred_id atom config) config last_tested 
 					in
-					let config = {config with events = IntMap.add atom.eid atom.kind config.events} in
-					parse_attribute atom.eid [] att config 
-				else (*test atom*)
-					let config = add_conflict last_modif atom config in
+					let tested = if (atom.causal_impact = 1) || (atom.causal_impact = 3) then [atom.eid] else []
+					in
+					parse_attribute (Some atom.eid) tested att config 
+				else 
+					(* atom is a pure test*) 
+					let config = 
+						match last_modif with 
+							| None -> config
+							| Some eid -> add_conflict eid atom config (*adding conflict with last modification*) 
+					in
 					parse_attribute last_modif (atom.eid::last_tested) att config
 			end
 
@@ -276,77 +271,36 @@ let cut attribute_ids grid =
 							let events = IntMap.add atom.eid atom.kind cfg.events 
 							and top = IntSet.add atom.eid cfg.top
 							in 
-							parse_attribute atom.eid [] att {cfg with events = events ; top = top} 
+							let tested = if (atom.causal_impact = 1) || (atom.causal_impact = 3) then [atom.eid] else []
+							and modif =  if (atom.causal_impact = 2) || (atom.causal_impact = 3) then Some atom.eid else None 
+							in
+							parse_attribute modif tested att {cfg with events = events ; top = top} 
 				in
 				build_config tl cfg
 	in
 	build_config attribute_ids empty_config
 
-(*
-let dot_of_config fic config state env = 
-    
+let string_of_atom atom = 
+	let string_of_atom_state state =
+		match state with
+			| FREE -> "..."
+			| BND (i,j) -> Printf.sprintf "(%d,%d)" i j
+			| INT i -> Printf.sprintf "%d" i
+			| UNDEF -> "N"
+	in
+	let imp_str = match atom.causal_impact with 1 -> "o" | 2 -> "x" | 3 -> "%" | _ -> invalid_arg "Causal.string_of_atom" in
+	Printf.sprintf "(%s%s%s)_%d" (string_of_atom_state atom.before) imp_str (string_of_atom_state atom.after) atom.eid
+		
+				
+let dot_of_grid grid state env = 
+	let ids = Hashtbl.fold (fun key _ l -> key::l) grid.flow [] in
+	let config = cut ids grid in 
 	let label e = 
 		match e with
 			| OBS mix_id -> Environment.kappa_of_num mix_id env
 			| PERT p_id -> Environment.pert_of_num p_id env
 			| RULE r_id -> Dynamics.to_kappa (State.rule_of_id r_id state) env
 			| INIT -> "intro"
-	in
-	
-	let dp =  (*depth -> event_id list*)
-		IntMap.fold 
-		(fun eid depth dp -> 
-			let l = try IntMap.find depth dp with Not_found -> [] in
-			IntMap.add depth (eid::l) dp
-		) config.depth_map IntMap.empty
-  in
-	
-	(*let max_depth = IntMap.size dp in*)
-	
-	let d = open_out fic in
-  try
-	fprintf d "digraph G{\n" ;
-	
-	let weight_map = 
-	  IntMap.fold 
-		(fun eid kind map ->
-			let depth = try IntMap.find eid config.depth_map with Not_found -> 0
-			in
-			 let fontcolor = if depth>9 then "white" else "black" in
-			  (*fprintf d "{";*)
-			  (*fprintf d "rank=same;\n";*)
-			  fprintf d 
-			  "node[fontcolor=\"%s\",color=\"black\",style=\"filled\"];\n" 
-			   fontcolor;
-			 let map = 
-					List.fold_right
-			  	(fun eid map ->
-						let kind = IntMap.find eid config.events in
-						let fillcolor,shape = 
-							match kind with
-								(INIT | PERT _) -> ("lightblue","invhouse")
-				      | RULE _ -> (Palette.grey 3,"invhouse")
-				      | OBS _ -> ("red","ellipse") 
-				  	in
-					  let lab = label kind in
-					    fprintf d "\"[%s]_%d\" [shape=%s,fontsize=10,fillcolor=%s];\n" 
-					      lab eid shape fillcolor ;
-					    let set = try IntMap.find eid config.prec_1 with Not_found -> IntSet.empty in
-					      IntSet.fold (fun eid' map -> 
-							     try (
-							      (*let e' = try IntMap.find eid' config.events with Not_found -> invalid_arg "Causal.dot_of_config" in*)
-							      let weight = depth - (try IntMap.find eid' config.depth_map with Not_found -> invalid_arg "Causal.dot_of_config: not found") in 
-								 		(*negative value to have an increasing map*)
-							      let cont = try IntMap.find weight map with Not_found -> [] in
-										IntMap.add weight ((eid',eid)::cont) map) 
-							     with _ -> 
-							       (print_string "Causal:";print_int eid;print_string "->";print_int eid';print_newline ();map)
-							  ) set map
-				       ) l map
-				   in
-			     fprintf d "}\n" ;
-			     map
-	) config.events IntMap.empty
 	in
 	
 	let rec prec_closure config todo closure =
@@ -362,93 +316,53 @@ let dot_of_config fic config state env =
 	let prec_star = 
 	  IntMap.fold 
 		(fun eid kind prec_star -> 
-			     let set = prec_closure config (IntSet.singleton eid) IntSet.empty
-			     in
-			       IntMap.add eid set prec_star
-			  ) config.events IntMap.empty 
+	     let set = prec_closure config (IntSet.singleton eid) IntSet.empty
+	     in
+	       IntMap.add eid set prec_star
+		) config.events IntMap.empty 
 	in
-	let _ = 
-	  IntMap.iter 
-		(fun w l ->
-			 List.iter (fun (i,j) ->
-				let e_j = try IntMap.find j config.events with Not_found -> invalid_arg "Causal.dot_of_config 1" 
-				and e_i = try IntMap.find i config.events with Not_found -> invalid_arg "Causal.dot_of_config 2" 
-				in
-	      let prec_j = try IntMap.find j config.prec_1 with Not_found -> IntSet.empty in
-	      let keep = (*set keep to true if one should not minimize edges in configuration*) 
-					try
-				  IntSet.fold 
-					(fun k keep -> 
-						if k=i then keep 
-						else
-					   let set_k = 
-					     try IntMap.find k prec_star 
-					     with Not_found -> IntSet.empty in
-					     if IntSet.mem i set_k then raise ExceptionDefn.False
-					     else keep
-		      ) prec_j true
-					with ExceptionDefn.False -> false
-	      in
-				if keep then
-				  let style,shape = ("filled","right")
-				  in
-				    fprintf d  "\"[%s]_%d\"->\"[%s]_%d\" [style=%s,dir=%s]\n" 
-				      (label e_i) i (label e_j) j style shape 
-			   ) l
-		) weight_map 
+	
+	let depth_of_event =
+		IntMap.fold 
+		(fun eid prec_eids emap ->
+			let d = 
+				IntSet.fold 
+				(fun eid' d ->
+					let d' = try IntMap.find eid' emap with Not_found -> 0
+					in
+					max (d'+1) d
+				) prec_eids 0
+			in
+			IntMap.add eid d emap 
+		) config.prec_1 IntMap.empty
 	in
-	let _ =
-	  IntMap.iter 
-		(fun j w_preds_j  ->
-			let e_j = try IntMap.find j config.events with Not_found -> invalid_arg "Causal.dot_of_config 3" in
-			 IntSet.iter 
-			 (fun i ->
-					let e_i = try IntMap.find i config.events with Not_found -> invalid_arg "Causal.dot_of_config 4" in
-					let preds_j = try IntMap.find j prec_star with Not_found -> IntSet.empty in
-					  if IntSet.mem i preds_j then ()
-					  else 
-					    let style,shape = ("dotted","right")
-					    in
-					      fprintf d  "\"[%s]_%d\"->\"[%s]_%d\" [style=%s,dir=%s]\n" 
-						(label e_i) i (label e_j) j style shape 
-				) w_preds_j 
-		 ) config.conflict 
+	let sorted_events = 
+		IntMap.fold 
+		(fun eid d dmap ->
+			let set = try IntMap.find d dmap with Not_found -> IntSet.empty
+			in
+			IntMap.add d (IntSet.add eid set) dmap
+		) depth_of_event IntMap.empty
 	in
-	  fprintf d "}\n" ;
-	  close_out d
-      with
-	  exn -> (close_out d; raise exn)
-*)
-
-let string_of_atom atom = 
-	let string_of_atom_state state =
-		match state with
-			| FREE -> "..."
-			| BND (i,j) -> Printf.sprintf "(%d,%d)" i j
-			| INT i -> Printf.sprintf "%d" i
-			| UNDEF -> "N"
-	in
-	let imp_str = match atom.causal_impact with 1 -> "o" | 2 -> "x" | 3 -> "%" | _ -> invalid_arg "Causal.string_of_atom" in
-	Printf.sprintf "(%s%s%s)_%d" (string_of_atom_state atom.before) imp_str (string_of_atom_state atom.after) atom.eid
-		
-				
-let dump grid state env = 
-	let ids = Hashtbl.fold (fun key _ l -> key::l) grid.flow [] in
-	let config = cut ids grid in 
-	let label e = 
-		match e with
-			| OBS mix_id -> Environment.kappa_of_num mix_id env
-			| PERT p_id -> Environment.pert_of_num p_id env
-			| RULE r_id -> Dynamics.to_kappa (State.rule_of_id r_id state) env
-			| INIT -> "intro"
-	in
-	let d = open_out "cflow.dot" in
-	fprintf d "digraph G{\n" ;
+	let desc = open_out "cflow.dot" in
+	Parameter.add_out_desc desc ;
+	fprintf desc "digraph G{\n ranksep=.5 ; \n" ;
 	IntMap.iter
-	(fun eid kind ->
-		if eid = 0 then () else 
-		fprintf d "node_%d [label=\"%s\"]\n" eid (label kind) 
-	) config.events ;
+	(fun d eids_at_d ->
+		fprintf desc "{ rank = same ; \"%d\" [shape=plaintext] ; " d ;
+		IntSet.iter 
+		(fun eid ->
+			let kind = IntMap.find eid config.events in
+			if eid = 0 then () else 
+			fprintf desc "node_%d [label=\"%s\"] ;\n" eid (label kind)
+		) eids_at_d ;
+		fprintf desc "}\n" ;
+	) sorted_events ;
+	let cpt = ref 1 in
+	while !cpt < (IntMap.size sorted_events) do
+		if !cpt+1 <= IntMap.size sorted_events then (fprintf desc "\"%d\" -> \"%d\" [style=\"invis\"]; \n" !cpt (!cpt+1)) ;
+		cpt := !cpt + 1
+	done ; 
 	IntMap.iter
 	(fun eid pred_set ->
 		if eid = 0 then () 
@@ -457,25 +371,25 @@ let dump grid state env =
 			(fun eid' ->
 				if eid' = 0 then () 
 				else
-					fprintf d "node_%d -> node_%d\n" eid' eid
+					fprintf desc "node_%d -> node_%d\n" eid' eid
 			) pred_set
 	) config.prec_1 ;
 	IntMap.iter
-	(fun eid pred_set ->
+	(fun eid cflct_set ->
 		if eid = 0 then () 
 		else
+			let prec = try IntMap.find eid prec_star with Not_found -> IntSet.empty in
 			IntSet.iter
 			(fun eid' ->
-				if eid' = 0 then () 
+				if (eid' = 0) || (IntSet.mem eid' prec) then () 
 				else
-					fprintf d "node_%d -> node_%d [style=dotted] \n" eid' eid
-			) pred_set
+					fprintf desc "node_%d -> node_%d [style=dotted, arrowhead = tee] \n" eid eid'
+			) cflct_set
 	) config.conflict ;
-	fprintf d "}\n"
+	fprintf desc "}\n" 
 	
-	
-(*	
-let dump grid state env =
+let dump grid state env = 
+	let d = open_out "grid.txt" in
 	Hashtbl.fold 
 	(fun (n_id,s_id,q) att _ ->
 		let q_name = "#"^(string_of_int n_id)^"."^(string_of_int s_id)^(if q=0 then "~" else "!") in
@@ -484,9 +398,9 @@ let dump grid state env =
 			(fun atom ls -> LongString.concat (string_of_atom atom) ls) 
 			att LongString.empty
 		in
-		Printf.printf "%s:" q_name ; 
-		LongString.printf stdout att_ls ;
-		Printf.printf "\n"
-	) 
-	grid.flow ()
-*)	
+		Printf.fprintf d "%s:" q_name ; 
+		LongString.printf d att_ls ;
+		Printf.fprintf d "\n"
+	) grid.flow () ;
+	close_out d
+	
