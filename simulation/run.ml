@@ -91,7 +91,7 @@ let event state grid event_list counter plot env =
 				let phi = State.map_of embedding_t in 
 					let grid,event_list = 
 						if !Parameter.causalModeOn then
-							Causal.record r.Dynamics.lhs (Some (r.Dynamics.pre_causal,side_effect,psi,false,r.Dynamics.r_id)) (State.map_of embedding_t) state counter false grid env,
+							Causal.record r.Dynamics.lhs (Some (r.Dynamics.pre_causal,side_effect,psi,false,r.Dynamics.r_id)) phi state counter grid env,
 Kappa_instantiation.Cflow_linker.store_event 
   (Kappa_instantiation.Cflow_linker.import_event (r,phi,psi))
   event_list 
@@ -129,7 +129,7 @@ let rec loop state grid event_list counter plot env =
 		begin
 			if !Parameter.causalModeOn then 
 			  begin
-			    Causal.dump grid state env ;
+			    Causal.dot_of_grid grid state env ;
 			    let refined_event_list = Compression_main.weak_compression env event_list 
           in ()
 			  end;
