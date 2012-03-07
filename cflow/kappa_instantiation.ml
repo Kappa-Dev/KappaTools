@@ -30,8 +30,18 @@ sig
   type site 
   type internal_state = int 
   type binding_type 
-  type binding_state
+  type binding_state = 
+    | ANY 
+    | FREE 
+    | BOUND 
+    | BOUND_TYPE of binding_type 
+    | BOUND_to of site 
+
   type kappa_sig 
+  type ('a,'b,'c) choice = 
+    | Event of 'a
+    | Init of 'b
+    | Obs of 'c 
   type test = 
     | Is_Here of agent
     | Has_Internal of site * internal_state 
@@ -51,6 +61,7 @@ sig
 
   type event 
   type init 
+  type obs 
   type step 
   type kappa_rule 
   type embedding
@@ -58,6 +69,7 @@ sig
   type refined_event 
   type refined_step
 
+  val type_of_refined_step: refined_step -> (unit,unit,unit) choice 
   val agent_of_binding_type: binding_type -> agent_name 
   val site_of_binding_type: binding_type -> site_name
   val agent_id_of_agent: agent -> agent_id 
@@ -86,6 +98,7 @@ sig
   val import_env: Environment.t -> kappa_sig 
   val store_event: event -> step list -> step list 
   val store_init : State.implicit_state -> step list -> step list 
+    
 end 
 
 
@@ -109,10 +122,12 @@ module Cflow_linker =
 
   type fresh_map = int Mods.IntMap.t 
 
-  type init = agent * (site_name * (int option * Node.ptr)) list
 
+  type init = agent * (site_name * (int option * Node.ptr)) list
   type event = kappa_rule * embedding * fresh_map
-   
+  type obs = init 
+
+
   type kappa_sig = Environment.t 
 
   type internal_state  = int 
@@ -143,15 +158,26 @@ module Cflow_linker =
     | Free of site 
     | Remove of agent 
 
-  type ('a,'b) choice = 
+  type ('a,'b,'c) choice = 
     | Event of 'a 
-    | Init of 'b 
+    | Init of 'b
+    | Obs of 'c  
+
+ 
 
   type refined_event = event * test list * (action list * ((site * binding_state) list))
   type refined_init = init * action list
-  type step = (event,init) choice 
-  type refined_step = (refined_event,refined_init) choice 
+  type refined_obs = unit 
 
+  type step = (event,init,obs) choice 
+  type refined_step = (refined_event,refined_init,refined_obs) choice 
+
+  let type_of_refined_step c = 
+    match c 
+    with 
+      | Event _ -> Event ()
+      | Init _ -> Init () 
+      | Obs _ -> Obs () 
   let site_of_binding_type = snd
   let agent_of_binding_type = fst
   let map_sites f map x = 
@@ -453,48 +479,6 @@ module Cflow_linker =
         list list_sites 
     in 
     list 
-
-(*    let list =  
-      List.fold_left 
-        (fun list (site_id,(int,lnk)) -> 
-	  let agent_name = Mixture.name ag in 
-	  let agent = build_agent agent_id agent_name in 
-	  let interface = get_default_state kappa_sig agent_name in 
-	  let list = 
-            List.fold_left 
-              (fun list (site_id,int) -> 
-                if site_id = 0 
-	        then list
-	        else 
-		  let site = build_site agent site_id in 
-		  let list = 
-		    match int 
-                    with 
-		      | Some i -> Mod_internal(site,i)::list
-		      | None -> list
-		  in 
-	          list 
-              )
-              ((Create(agent,interface))::list)
-              interface 
-          in list)
-        (Mixture.agents init)
-        []
-    in
-    Mods.Int2Map.fold 
-      (fun (ag_id1,site_id1) (ag_id2,site_id2) list -> 
-        let agent_name1 = Mixture.name (Mixture.agent_of_id ag_id1 init) in
-        let agent_name2 = Mixture.name (Mixture.agent_of_id ag_id2 init) in 
-        let agent1 = build_agent ag_id1 agent_name1 in 
-        let agent2 = build_agent ag_id2 agent_name2 in 
-        let site1 = build_site agent1 site_id1 in 
-        let site2 = build_site agent2 site_id2 in 
-        let site1,site2 = order_site site1 site2 in 
-        Bind(site1,site2)::list
-      )
-      (Mixture.graph init)
-      list       
-*)
 
   let actions_of_event event kappa_sig = 
     let rule = rule_of_event event in 
