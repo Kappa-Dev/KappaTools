@@ -205,7 +205,6 @@ let record mix opt_rule embedding state counter locked grid env =
 	in
 	grid
 
-
 let init state grid = 
 	SiteGraph.fold
 	(fun node_id node grid ->

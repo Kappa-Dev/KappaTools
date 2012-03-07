@@ -23,7 +23,7 @@ let compose f g = (fun x -> f (g x))
 
 module type Cflow_signature =
 sig
-  type agent_name  
+  type agent_name = int
   type site_name = int 
   type agent_id = int 
   type agent 
@@ -44,6 +44,7 @@ sig
     | Create of agent * (site_name * internal_state option) list 
     | Mod_internal of site * internal_state 
     | Bind of site * site 
+    | Bind_to of site * site 
     | Unbind of site * site  
     | Free of site 
     | Remove of agent 
@@ -57,6 +58,8 @@ sig
   type refined_event 
   type refined_step
 
+  val agent_of_binding_type: binding_type -> agent_name 
+  val site_of_binding_type: binding_type -> site_name
   val agent_id_of_agent: agent -> agent_id 
   val agent_name_of_agent: agent -> agent_name
   val agent_of_site: site -> agent 
@@ -72,8 +75,6 @@ sig
   val rule_of_event: event -> kappa_rule 
   val embedding_of_event: event -> embedding
   val fresh_map_of_event: event -> fresh_map
-  val tests_of_event: event -> test list 
-  val actions_of_event: event -> kappa_sig -> action list * (site*binding_state) list 
   val refine_step: kappa_sig -> step -> refined_step
   val step_of_refined_step: refined_step -> step
   val rule_of_refined_event: refined_event -> kappa_rule
@@ -84,7 +85,7 @@ sig
   val import_event:  Dynamics.rule * int Mods.IntMap.t * int Mods.IntMap.t -> event 
   val import_env: Environment.t -> kappa_sig 
   val store_event: event -> step list -> step list 
-  val store_init : Graph.SiteGraph.t -> step list -> step list 
+  val store_init : State.implicit_state -> step list -> step list 
 end 
 
 
@@ -108,7 +109,7 @@ module Cflow_linker =
 
   type fresh_map = int Mods.IntMap.t 
 
-  type init = int * (int * (int option * Node.ptr)) list
+  type init = agent * (site_name * (int option * Node.ptr)) list
 
   type event = kappa_rule * embedding * fresh_map
    
@@ -137,6 +138,7 @@ module Cflow_linker =
     | Create of agent * (site_name * internal_state option) list 
     | Mod_internal of site * internal_state 
     | Bind of site * site 
+    | Bind_to of site * site 
     | Unbind of site * site  
     | Free of site 
     | Remove of agent 
@@ -150,6 +152,8 @@ module Cflow_linker =
   type step = (event,init) choice 
   type refined_step = (refined_event,refined_init) choice 
 
+  let site_of_binding_type = snd
+  let agent_of_binding_type = fst
   let map_sites f map x = 
      let sign = 
       try 
@@ -358,8 +362,6 @@ module Cflow_linker =
     with
       | -1 -> site2,site1
       | _ -> site1,site2
-
-  
 	
  
   let add_asso i j map = Mods.IntMap.add i j map 
@@ -414,9 +416,10 @@ module Cflow_linker =
 	       ag list
 	)
 	(Mixture.agents lhs) []
+  let agent_of_node n = build_agent (Node.get_address n) (Node.name n) 
 
   let create_init state event_list = 
-    	Graph.SiteGraph.fold
+    Graph.SiteGraph.fold
 	  (fun node_id node list  ->
             let interface = 
 		Node.fold_status
@@ -425,15 +428,35 @@ module Cflow_linker =
                   node 
 	          []
             in 
-            (Init (node_id,interface))::list)
-          state 
+            let agent = build_agent node_id (Node.name node) in 
+            (Init (agent,interface))::list)
+          state.State.graph 
           event_list 
 
-  let actions_of_init init kappa_sig = 
-    let list = [] in 
+  let actions_of_init (init:init) kappa_sig  = 
+    let agent,list_sites = init in 
+    let list = [Create(agent,List.map (fun (x,(y,z)) -> (x,y)) list_sites)] in 
     let list = 
-      Mods.IntMap.fold 
-        (fun agent_id ag list -> 
+      List.fold_left 
+        (fun list (x,(y,z)) -> 
+          match z 
+          with 
+            | Node.Null -> 
+              Free(build_site agent x)::list
+            | Node.Ptr (node,site) -> 
+              let agent2 = agent_of_node node in 
+              let site1 = build_site agent x in 
+              let site2 = build_site agent2 site in 
+                Bind_to(site1,site2)::list
+            | Node.FPtr _ -> raise (invalid_arg "actionS_of_init")
+        )
+        list list_sites 
+    in 
+    list 
+
+(*    let list =  
+      List.fold_left 
+        (fun list (site_id,(int,lnk)) -> 
 	  let agent_name = Mixture.name ag in 
 	  let agent = build_agent agent_id agent_name in 
 	  let interface = get_default_state kappa_sig agent_name in 
@@ -471,6 +494,7 @@ module Cflow_linker =
       )
       (Mixture.graph init)
       list       
+*)
 
   let actions_of_event event kappa_sig = 
     let rule = rule_of_event event in 
@@ -556,7 +580,7 @@ module Cflow_linker =
     
   let event_of_refined_event (a,_,_) = a
 
-  let refine_init env init = (init,[])
+  let refine_init env init = (init,actions_of_init init env)
 
   let init_of_refined_init = fst 
 
@@ -609,8 +633,8 @@ module Cflow_linker =
   let tests_of_refined_step =
     gen tests_of_refined_event tests_of_refined_init 
       
-  let refine_step env = 
-    genbis (refine_event env) (refine_init env)
+  let refine_step env (x:step) = 
+    genbis (refine_event env) (refine_init env) x
   
   let step_of_refined_step = 
     genbis event_of_refined_event init_of_refined_init 
