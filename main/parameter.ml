@@ -75,5 +75,8 @@ let checkFileExists () =
 let (openOutDescriptors:out_channel list ref) = ref []
 let (openInDescriptors:in_channel list ref) = ref []
 
+let add_out_desc d = openOutDescriptors := d::!openOutDescriptors  
+let add_in_desc d = openInDescriptors := d::!openInDescriptors  
+
 (*Profiling*)
 (*let profiling:Profiling.t = Profiling.create 10*) 

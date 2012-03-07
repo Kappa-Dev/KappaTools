@@ -571,14 +571,15 @@ let enable r mix env =
 let to_kappa r env = try Environment.rule_of_num r.r_id env with Not_found -> r.kappa
 	
 let dump r env =
+	
 	let name = try Environment.rule_of_num r.r_id env with Not_found -> r.kappa in
-	Debug.tag (Printf.sprintf "****Rule '%s' [%s]****" name r.kappa);
+	Printf.fprintf stderr "****Rule '%s' [%s]****" name r.kappa ;
 	IntMap.iter 
 	(fun id ag -> 
 		Mixture.fold_interface 
 		(fun site_id _ _ -> 
 			let c = Id2Map.find (KEPT id,site_id) r.pre_causal in
-			Printf.printf "#%d.%d=%d\n" id site_id c
+			Printf.fprintf stderr "#%d.%d=%d\n" id site_id c
 		) ag ()
 	) (Mixture.agents r.lhs) ;
 	let dump_script script =
@@ -590,32 +591,32 @@ let dump r env =
 		List.iter
 			(fun action ->
 						match action with
-						| BND (p, p') -> Printf.printf "BND (#%s,#%s)\n" (id_of_port p) (id_of_port p')
-						| FREE (p,b) -> if b then Printf.printf "FREE #%s\n" (id_of_port p) else Printf.printf "FREE* #%s\n" (id_of_port p)
-						| MOD (p, i) -> Printf.printf "SET #%s to state %d\n" (id_of_port p) i
-						| DEL i -> Printf.printf "DEL #%d\n" i
+						| BND (p, p') -> Printf.fprintf stderr "BND (#%s,#%s)\n" (id_of_port p) (id_of_port p')
+						| FREE (p,b) -> if b then Printf.fprintf stderr "FREE #%s\n" (id_of_port p) else Printf.fprintf stderr "FREE* #%s\n" (id_of_port p)
+						| MOD (p, i) -> Printf.fprintf stderr "SET #%s to state %d\n" (id_of_port p) i
+						| DEL i -> Printf.fprintf stderr "DEL #%d\n" i
 						| ADD (i, name) ->
 								let sign = Environment.get_sig name env in
-								Printf.printf "ADD %s%s with identifier #%d\n" (Environment.name name env) (Signature.to_string sign) ((fun (deleted, kept, _) -> deleted + kept + i) r.balance)
+								Printf.fprintf stderr "ADD %s%s with identifier #%d\n" (Environment.name name env) (Signature.to_string sign) ((fun (deleted, kept, _) -> deleted + kept + i) r.balance)
 			)
 			script
 	in
-	Printf.printf "Apply %s\n" (to_kappa r env) ;
+	Printf.fprintf stderr "Apply %s\n" (to_kappa r env) ;
 	dump_script r.script ;
-	Printf.printf "if pattern %d is matched \n" (Mixture.get_id r.lhs) ;
-	Printf.printf "Modif sites: %s" 
+	Printf.fprintf stderr "if pattern %d is matched \n" (Mixture.get_id r.lhs) ;
+	Printf.fprintf stderr "Modif sites: %s" 
 	(string_of_map 
 		(fun id -> match id with FRESH i | KEPT i -> string_of_int i) 
 		(string_of_set (fun (x,y) -> "("^(string_of_int x)^","^(string_of_int y)^")") Int2Set.fold)
 		IdMap.fold
 		r.modif_sites
 	) ;
-	print_newline() ;
+	Printf.fprintf stderr "\n";
 	match r.cc_impact with
-		| None -> Printf.printf "No CC impact\n"
+		| None -> Printf.fprintf stderr "No CC impact\n"
 		| Some (con,dis,se) ->
-			IntMap.iter (fun cc_i cc_set -> Printf.printf "CC[%d] and CCs %s in the left hand side will merge\n" cc_i (Tools.string_of_set string_of_int IntSet.fold cc_set)) con ;
-			IntMap.iter (fun cc_i cc_set -> Printf.printf "CC[%d] and CCs %s in the rhs are freshly disconnected  \n" cc_i (Tools.string_of_set string_of_int IntSet.fold cc_set)) dis ;
-			IntMap.iter (fun id site_id_set -> Printf.printf "agent #%d might have side effect disconnection on sites %s\n" id (Tools.string_of_set string_of_int IntSet.fold site_id_set)) se 
+			IntMap.iter (fun cc_i cc_set -> Printf.fprintf stderr "CC[%d] and CCs %s in the left hand side will merge\n" cc_i (Tools.string_of_set string_of_int IntSet.fold cc_set)) con ;
+			IntMap.iter (fun cc_i cc_set -> Printf.fprintf stderr "CC[%d] and CCs %s in the rhs are freshly disconnected  \n" cc_i (Tools.string_of_set string_of_int IntSet.fold cc_set)) dis ;
+			IntMap.iter (fun id site_id_set -> Printf.fprintf stderr "agent #%d might have side effect disconnection on sites %s\n" id (Tools.string_of_set string_of_int IntSet.fold site_id_set)) se 
 			
 			
