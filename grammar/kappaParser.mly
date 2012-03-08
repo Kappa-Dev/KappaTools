@@ -3,7 +3,7 @@
 
 %token EOF NEWLINE
 %token AT OP_PAR CL_PAR COMMA DOT KAPPA_LNK PIPE
-%token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE SET DO UNTIL TRUE FALSE REF OBS KAPPA_RAR
+%token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE SET DO UNTIL TRUE FALSE REF OBS KAPPA_RAR TRACK
 %token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INFINITY TIME EVENT INIT LET DIV PLOT SINUS COSINUS TAN SQRT EXPONENT POW ABS MODULO 
 %token <Tools.pos> KAPPA_NOPOLY EMAX TMAX
 %token <int*Tools.pos> INT 
@@ -91,6 +91,7 @@ instruction:
 	{Ast.PERT ($2,$4,$1,None)}
 | PERT bool_expr DO modif_expr UNTIL bool_expr
 	{Ast.PERT ($2,$4,$1,Some $6)}
+;
 
 variable_declaration:
 | LABEL non_empty_mixture {Ast.VAR_KAPPA ($2,$1)}
@@ -132,15 +133,18 @@ modif_expr:
 | INTRO multiple_mixture 
 	{let (alg,mix) = $2 in Ast.INTRO (alg,mix,$1)}
 | INTRO error
-	{raise (ExceptionDefn.Syntax_Error "Malformed perturbation instruction, I was expecting '$(ADD) alg_expression kappa_expression'")}
+	{raise (ExceptionDefn.Syntax_Error "Malformed perturbation instruction, I was expecting '$ADD alg_expression kappa_expression'")}
 | DELETE multiple_mixture 
 	{let (alg,mix) = $2 in Ast.DELETE (alg,mix,$1)}
+| DELETE error
+	{raise (ExceptionDefn.Syntax_Error "Malformed perturbation instruction, I was expecting '$DEL alg_expression kappa_expression'")}
 | LABEL SET alg_expr 
 	{let lab,pos_lab = $1 in Ast.UPDATE (lab,pos_lab,$3,$2)}
 | SNAPSHOT snapshot_label
 	{Ast.SNAPSHOT ($2,$1)}
 | STOP snapshot_label
 	{Ast.STOP ($2,$1)}
+| TRACK LABEL {let lab,pos_lab = $2 in Ast.CFLOW (lab,pos_lab,$1)}
 ;
 
 snapshot_label:
@@ -158,8 +162,6 @@ rule_label:
 	{{Ast.lbl_nme = None ; Ast.lbl_ref = None}}
 | LABEL 
 	{let lab,pos = $1 in {Ast.lbl_nme=Some (lab,pos) ; Ast.lbl_ref = None}}
-| REF LABEL OP_PAR LABEL CL_PAR
-	{let ref,pos = $2 and lab,pos' = $4 in {Ast.lbl_nme=Some (lab,pos') ; Ast.lbl_ref = Some (ref,pos)}}
 ;
 
 mixture:

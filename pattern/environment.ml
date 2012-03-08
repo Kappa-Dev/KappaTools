@@ -33,7 +33,10 @@ type t = {
 	
 	nl_elements : Int2Set.t IntMap.t ; (*ag_nme -> {(r_id,cc_id),...}*)
 	root_of_nl_rule : int Int2Map.t ;
-	has_intra : bool
+	has_intra : bool ;
+	
+	active_cflows : int ;
+	track : IntSet.t
 	(*log : Log.t*)
 }
 
@@ -61,9 +64,17 @@ let empty =
 	empty_lhs = IntSet.empty ;
 	nl_elements = IntMap.empty ;
 	root_of_nl_rule = Int2Map.empty ;
-	has_intra = false 
-
+	has_intra = false ;
+  active_cflows = 0 ;
+	track = IntSet.empty
 }
+
+let inc_active_cflows env = {env with active_cflows = env.active_cflows + 1}
+let dec_active_cflows env = {env with active_cflows = env.active_cflows - 1}
+let active_cflows env = env.active_cflows
+let track id env = {env with track = IntSet.add id env.track}
+let untrack id env = {env with track = IntSet.remove id env.track}
+let is_tracked id env = IntSet.mem id env.track
 
 (**in order to declare that mix_id -which is the lhs of a unary rule- is expecting an agent named [ag_nme] with a site named [ste_nme] as the root of component [cc_id] of the injection*)
 let declare_nl_element mix_id cc_id ag_nme env =
