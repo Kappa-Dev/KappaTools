@@ -139,6 +139,11 @@ let apply_effect p_id pert state counter env =
 					let env,pert_ids = State.update_dep state (RULE r_id) IntSet.empty counter env in
 					(env,state ,pert_ids)
 			| SNAPSHOT opt -> (snapshot opt ; (env, state ,IntSet.empty))
+			| CFLOW id -> 
+				Parameter.causalModeOn := true ; 
+				let env = Environment.inc_active_cflows env in 
+				let env = Environment.track id env in
+				(env, state, IntSet.empty)
 			| STOP opt ->
 				(if !Parameter.debugModeOn then Debug.tag "Interrupting simulation now!" ;
 				snapshot opt ;
@@ -162,12 +167,13 @@ let rec try_perturbate state pert_ids counter env =
 								if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "\n*************Applying perturbation %d***************" pert_id) ; 
 								let env,state,pert_ids = apply_effect pert_id pert state counter env in
 								if !Parameter.debugModeOn then Debug.tag "************End perturbation*************" ;
-								let state = 
+								let state,env = 
 									if eval_abort_pert true pert state counter env then 
 										(if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "***Aborting pert[%d]***" pert_id) ;
-										
-										{state with perturbations = IntMap.remove pert_id state.perturbations} )
-									else state
+										let env = Environment.dec_active_cflows env in
+										if Environment.active_cflows env = 0 then Parameter.causalModeOn := false ;
+										({state with perturbations = IntMap.remove pert_id state.perturbations},env) )
+									else (state,env)
 								in
 								(state,pert_ids,env)
 							end

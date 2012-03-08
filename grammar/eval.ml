@@ -702,6 +702,12 @@ let effects_of_modif variables env ast =
 			| Some (nme,pos) -> Some nme
 		in
 		(variables, Dynamics.STOP opt_name, str, env)
+	| CFLOW (lab,pos_lab,pos_pert) ->
+		let id = try Environment.num_of_rule lab env with Not_found -> try Environment.num_of_kappa lab env with Not_found ->
+			raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label " ^ lab ^ " is not declared"))
+		in
+		let str = Printf.sprintf "Causality analysis of %s" lab in
+		(variables, Dynamics.CFLOW id, str, env)
 
 let pert_of_result variables env res =
 	let (variables, lpert, lrules, env) =
@@ -811,7 +817,7 @@ let pert_of_result variables env res =
 							in
 							(env,rule_opt)
 						end
-					| Dynamics.UPDATE _ | Dynamics.SNAPSHOT _ | Dynamics.STOP _ -> 
+					| Dynamics.UPDATE _ | Dynamics.SNAPSHOT _ | Dynamics.STOP _ | Dynamics.CFLOW _ -> 
 						let env =
 							DepSet.fold
 							(fun dep env -> Environment.add_dependencies dep (Mods.PERT p_id) env
