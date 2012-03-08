@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 06/09/2011
-  * Last modification: 06/03/2012
+  * Last modification: 08/03/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -159,7 +159,7 @@ module Blackboard =
          | K.FREE -> Free
          | K.BOUND -> Bound
          | K.BOUND_TYPE bt -> Bound_to_type (K.agent_name_of_binding_type bt,K.site_name_of_binding_type bt)
-         | K.BOUND_to s -> raise Exit 
+         | K.BOUND_to s -> raise (invalid_arg "case_value_of_binding_state")
 
      let print_known log t x = 
        match t
@@ -411,7 +411,7 @@ module Blackboard =
          let _ = A.set blackboard.predicate_id_list_related_to_predicate_id sid new_set in 
          error,blackboard 
        with 
-           Not_found -> raise Exit 
+           Not_found -> raise (invalid_arg "bind")
      and 
          allocate parameter handler error blackboard predicate  = 
        let ag_id = agent_id_of_predicate predicate in 
@@ -458,7 +458,7 @@ module Blackboard =
          try 
            A.get blackboard.predicate_id_list_related_to_predicate_id predicate_id
          with 
-             _ -> raise Exit
+             _ -> raise (invalid_arg "free_agent")
        in 
        let map = 
          PredicateidSet.fold 
@@ -622,8 +622,8 @@ module Blackboard =
     {
       pre_fictitious_list = [] ; 
       pre_steps_by_column = A.make 1 (Undefined,[]) ; 
-      pre_nsteps = 0 ;
-      pre_ncolumn = 0 ;
+      pre_nsteps = -1 ;
+      pre_ncolumn = -1 ;
       pre_column_map = PredicateMap.empty ; 
       pre_column_map_inv = A.make 1 (Fictitious 0) ; 
       pre_kind_of_rules = A.make 1 (Side_effect_of (-1,[])) ;
@@ -643,7 +643,7 @@ module Blackboard =
     error,{blackboard with pre_nsteps = nsid} 
  
   let add_fictitious_action error site test action predicate_id blackboard = 
-    let nsid = blackboard.pre_nsteps + 1 in 
+    let nsid = blackboard.pre_nsteps in 
     let map = blackboard.pre_steps_by_column in 
     let value,list = 
       A.get map predicate_id  
@@ -656,24 +656,22 @@ module Blackboard =
     in
     let _ = A.set map predicate_id (value',(nsid,test,action)::list)
     in 
-    error,{blackboard with pre_nsteps = nsid}
+    error,blackboard
 
-  let side_effect predicate_id predicate_target_id s site = 
+  let side_effect predicate_target_id s site = 
     match s 
     with 
       | Point_to _ | Counter _ | Internal_state_is _ | Undefined 
       | Present | Bound | Bound_to_type _ | Defined | Unknown -> 
-        raise Exit 
+         raise (invalid_arg "side_effect")
       | Free -> 
-        [predicate_id,(Counter 0,Counter 1);
-         predicate_target_id,(Free,Unknown)]
+        [predicate_target_id,(Free,Unknown)]
       | Bound_to (pid,_,_,_) -> 
-        [predicate_id,(Counter 0,Counter 1);
-         predicate_target_id,(s,Free);
+        [predicate_target_id,(s,Unknown);
          pid,(Bound_to (predicate_target_id,K.agent_id_of_site site,K.agent_name_of_site site,K.site_name_of_site site),Free)]
           
     
-  let potential_target error parameter handler blackboard predicate_id site binding_state =
+  let potential_target error parameter handler blackboard site binding_state =
     let agent_id = K.agent_id_of_site site in 
     let site_name = K.site_name_of_site site in 
     let error,balckboard,predicate_target_id = 
@@ -687,7 +685,7 @@ module Blackboard =
         (fun s list -> 
           if more_refined s bt
           then 
-            (side_effect predicate_id predicate_target_id s site)::list 
+            (side_effect predicate_target_id s site)::list 
           else 
             list
       )
@@ -699,7 +697,7 @@ module Blackboard =
   let add_step parameter handler error step blackboard = 
     let test_list = K.tests_of_refined_step step in 
     let action_list,side_effect = K.actions_of_refined_step step in
-    let action_list = List.rev action_list in 
+    let action_list = (*List.rev*) action_list in 
     let fictitious_local_list = [] in 
     let fictitious_list = blackboard.pre_fictitious_list in 
     let build_map list map = 
@@ -708,41 +706,89 @@ module Blackboard =
         map 
         list 
     in 
+    let add_state pid (test,action) map = 
+      let test',action' = 
+        try 
+          PredicateidMap.find pid map  
+        with 
+          | Not_found -> Unknown,Unknown 
+      in 
+      let test = 
+        if strictly_more_refined test test' 
+        then 
+          test
+        else 
+          test'
+      in 
+      let action = 
+        if strictly_more_refined action action' 
+        then 
+          action
+        else 
+          action'
+      in 
+      let map = PredicateidMap.add pid (test,action) map in 
+      map 
+    in 
     let fadd pid p map = 
       let old = A.get map pid in 
       A.set map pid (CaseValueSet.add p old) 
     in 
-    let error,blackboard,fictitious_list,fictitious_local_list = 
+    let error,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effets = 
       List.fold_left 
-        (fun (error,blackboard,fictitious_list,fictitious_local_list) ((site:K.site),(binding_state:K.binding_state)) -> 
+        (fun (error,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effets) (site,(binding_state)) -> 
           begin
-            let nsid = blackboard.pre_nsteps + 1 in 
-            let predicate_info = Fictitious nsid in 
-            let error,blackboard,predicate_id = allocate parameter handler error blackboard predicate_info  in 
-            let error,blackboard = init_fictitious_action error predicate_id  blackboard in 
-            let error,blackboard,potential_target = potential_target error parameter handler blackboard predicate_id site binding_state in 
-            let error,blackboard = 
-              List.fold_left 
-                (                  
-                  List.fold_left
-                    (fun (error,blackboard) (predicate_id,(test,action)) -> 
-                      add_fictitious_action 
-                        error 
-                        site 
-                        test 
-                        action
-                        predicate_id 
-                        blackboard)
-                )
-                (error,blackboard)
-                potential_target
-            in 
-            error,
-            blackboard,
-            (predicate_id::fictitious_list),
-            (predicate_id::fictitious_local_list)
+            let error,blackboard,potential_target = potential_target error parameter handler blackboard site binding_state in 
+            match 
+              potential_target 
+            with 
+              | [l]  ->  (* TO DO *) 
+                begin
+                  let list = 
+                    List.fold_left 
+                      (fun list t -> t::l)
+                      unambiguous_side_effets
+                      l 
+                  in 
+                  error,
+                  blackboard,
+                  (fictitious_list),
+                  (fictitious_local_list),
+                  list 
+                end
+              | _ -> 
+                begin 
+                    let nsid = blackboard.pre_nsteps + 1 in 
+                    let predicate_info = Fictitious nsid in 
+                    let error,blackboard,predicate_id = allocate parameter handler error blackboard predicate_info  in 
+                    let error,blackboard = init_fictitious_action error predicate_id  blackboard in
+                    let error,blackboard = 
+                      List.fold_left 
+                        (fun (error,blackboard) list -> 
+                          let blackboard = {blackboard with pre_nsteps = blackboard.pre_nsteps+1} in 
+                          List.fold_left
+                            (fun (error,blackboard) (predicate_id,(test,action)) -> 
+                              add_fictitious_action 
+                                error 
+                                site 
+                                test 
+                                action
+                                predicate_id 
+                                blackboard)
+                            (error,blackboard) 
+                            ((predicate_id,(Counter 0,Counter 1))::list)
+                        )
+                        (error,blackboard)
+                        potential_target
+                    in 
+                  error,
+                  blackboard,
+                  (predicate_id::fictitious_list),
+                  (predicate_id::fictitious_local_list),
+                  unambiguous_side_effets
+                end
           end)
-        (error,blackboard,fictitious_list,fictitious_local_list)
+        (error,blackboard,fictitious_list,fictitious_local_list,[])
         side_effect 
     in 
     let error,blackboard,test_map = 
@@ -756,15 +802,9 @@ module Blackboard =
       List.fold_left 
         (fun (error,blackboard,action_map,test_map) action -> 
           let error,blackboard,action_list,test_list = predicates_of_action parameter handler error blackboard action in 
-          let _ = 
-            List.iter 
-              (fun (pid,p) -> 
-                fadd pid p blackboard.history_of_case_values_to_predicate_id)
-              action_list 
-          in
-              error,blackboard,build_map action_list action_map,build_map test_list test_map)
+          error,blackboard,build_map action_list action_map,build_map test_list test_map)
         (error,blackboard,PredicateidMap.empty,test_map)
-        action_list in 
+        (List.rev action_list) in 
     let g x = 
       match x 
       with 
@@ -781,7 +821,13 @@ module Blackboard =
       List.fold_left 
         (fun map pid -> PredicateidMap.add pid (Counter 1,Undefined) map)
         merged_map
-        fictitious_list 
+        fictitious_local_list 
+    in 
+    let merged_map = 
+      List.fold_left 
+        (fun map (pid,(test,action)) -> add_state pid (test,action) map)
+        merged_map
+        unambiguous_side_effets
     in 
     let nsid = blackboard.pre_nsteps + 1 in 
     let pre_steps_by_column = 
@@ -794,9 +840,11 @@ module Blackboard =
             let value' = 
               match action
               with 
-                | Undefined -> value
+                | Unknown -> value
                 | x -> x
             in
+            let _ = 
+              fadd id value' blackboard.history_of_case_values_to_predicate_id in 
             let _ = A.set map id (value',(nsid,test,action)::list)
             in map
           end)

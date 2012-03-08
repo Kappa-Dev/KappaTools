@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 23/02/2012
+  * Last modification: 08/03/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -450,7 +450,10 @@ module Cflow_linker =
             let interface = 
 		Node.fold_status
 		  (fun site_id (int,lnk) list -> 
-                    (site_id,(int,lnk))::list)
+                    if site_id = 0 
+                    then list 
+                    else 
+                      (site_id,(int,lnk))::list)
                   node 
 	          []
             in 
@@ -508,16 +511,23 @@ module Cflow_linker =
 		 let agent_name = name_of_agent lhs_id event fresh in
 		 let agent = build_agent agent_id agent_name in 
 		 let site = build_site agent site_name in 
-		   (
-		     Free (site)::list_actions,
-		     (if bool 
-		      then side_sites 
-		      else 
-			let state = get_binding_state_of_site lhs_id site_name lhs event fresh in 
-			  (site,state)::side_sites
-		     ),
-		     fresh
-		   )
+		 let list_actions = (Free site)::list_actions in 
+                 let state = get_binding_state_of_site lhs_id site_name lhs event fresh in 
+                 if bool 
+		 then 
+                   match state 
+                   with 
+                     | BOUND_to site  -> 
+                       (Free site)::list_actions,
+                       side_sites,
+                       fresh
+                     | _ -> raise (invalid_arg "actions_of_event") 
+		 else 
+		   let state = get_binding_state_of_site lhs_id site_name lhs event fresh in 
+		   list_actions,
+                   (site,state)::side_sites,
+                   fresh
+		     
 	     | Dynamics.MOD((lhs_id,site),internal) -> 
 		 let agent_id = apply_embedding_on_action event lhs_id in 
 		 let agent_name = name_of_agent lhs_id event fresh in 
@@ -556,7 +566,7 @@ module Cflow_linker =
 		   list_actions',side_sites,fresh')
 	([],[],Mods.IntMap.empty)
 	(rule_of_event event).Dynamics.script 
-    in List.rev a,b
+    in a,b
 
       
 
