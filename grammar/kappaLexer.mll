@@ -59,6 +59,8 @@ rule token = parse
 						let pos = position lexbuf in 
 							match lab with
 								| "E" -> EVENT pos
+								| "E+" -> PROD_EVENT pos
+								| "E-" -> NULL_EVENT pos
 								| "T" -> TIME pos
 								| "log" -> LOG pos
 								| "sin" -> SINUS pos

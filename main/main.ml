@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "2.01-240212"
+let version = "2.1-090312"
 
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
@@ -35,7 +35,7 @@ let main =
 		("-make-sim", Arg.String (fun file -> Parameter.marshalizedOutFile := file) , "save kappa files as a simulation package") ; 
 		("-im", Arg.String (fun file -> Parameter.influenceFileName:=file), "produces the influence map of the model") ;
 		("-flux", Arg.String (fun file -> Parameter.fluxFileName:=file ; Parameter.fluxModeOn := true), "will measure activation/inhibition fluxes during the simulation") ;
-		("--cflow", Arg.Unit (fun _ -> Parameter.causalModeOn:=true), "Causality analysis mode") ;
+		("--cflow", Arg.Unit (fun _ -> Parameter.causalModeOn:=true), "[deprecated] Causality analysis mode") ;
 		("--dot-output", Arg.Unit (fun () -> Parameter.dotOutput := true), "(no argument required) Dot format for outputting snapshots") ;
 		("--implicit-signature", Arg.Unit (fun () -> Parameter.implicitSignature := true), "Program will guess agent signatures automatically") ;
 		("-seed", Arg.Int (fun i -> Parameter.seedValue := Some i), "Seed for the random number generator") ;
@@ -124,7 +124,7 @@ let main =
 		else () ;
 		let plot = Plot.create !Parameter.outputDataName
 		and grid,event_list = 
-			if !Parameter.causalModeOn then 
+			if Environment.tracking_enabled env then 
 				let grid = Causal.empty_grid() in 
                                 let event_list = [] in 
                                 (

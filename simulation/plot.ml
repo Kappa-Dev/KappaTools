@@ -40,7 +40,7 @@ let output state time event plot env counter =
 					begin
 						if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "\t *Creating data file...") ; 
 						let d = open_out plot.file in
-							Printf.fprintf d "# time%cE" !Parameter.plotSepChar ;
+							Printf.fprintf d "# time" ;
 							List.iter
 							(fun obs ->
 								Printf.fprintf d "%c%s" !Parameter.plotSepChar obs.label 
@@ -51,7 +51,7 @@ let output state time event plot env counter =
 					end
 				| Some d -> d
 		in
-			Printf.fprintf d "%c%E%c%d" !Parameter.plotSepChar time !Parameter.plotSepChar event;
+			Printf.fprintf d "%c%E" !Parameter.plotSepChar time ;
 			List.iter
 			(fun obs ->
 				let inst = fun v_i -> State.instance_number v_i state env
@@ -60,7 +60,7 @@ let output state time event plot env counter =
 					let v = 
 						match obs.expr with
 							| Dynamics.CONST v -> v
-							| Dynamics.VAR f -> f inst values time event
+							| Dynamics.VAR f -> f inst values time event (Counter.null_event counter)
 					in 
 						Printf.fprintf d "%c%E" !Parameter.plotSepChar v
 			) state.observables ;

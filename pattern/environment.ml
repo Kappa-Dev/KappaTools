@@ -35,6 +35,7 @@ type t = {
 	root_of_nl_rule : int Int2Map.t ;
 	has_intra : bool ;
 	
+	tracking_enabled : bool ;
 	active_cflows : int ;
 	track : IntSet.t
 	(*log : Log.t*)
@@ -65,10 +66,12 @@ let empty =
 	nl_elements = IntMap.empty ;
 	root_of_nl_rule = Int2Map.empty ;
 	has_intra = false ;
+	tracking_enabled = false ;
   active_cflows = 0 ;
 	track = IntSet.empty
 }
 
+let tracking_enabled env = env.tracking_enabled
 let inc_active_cflows env = {env with active_cflows = env.active_cflows + 1}
 let dec_active_cflows env = {env with active_cflows = env.active_cflows - 1}
 let active_cflows env = env.active_cflows

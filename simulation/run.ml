@@ -34,8 +34,8 @@ let event state grid event_list counter plot env =
 	Counter.inc_time counter dt ;
 	
 	(*updating activity of rule whose rate depends on time or event number*)
-	let env,pert_ids = State.update_dep state Mods.EVENT IntSet.empty counter env in
-	let env,pert_ids = State.update_dep state Mods.TIME pert_ids counter env in
+	(*let env,pert_ids = State.update_dep state Mods.EVENT IntSet.empty counter env in*)
+	let env,pert_ids_time = State.update_dep state Mods.TIME IntSet.empty counter env in
 	
 	State.dump state counter env ;
 	
@@ -47,7 +47,6 @@ let event state grid event_list counter plot env =
 	in			
 	
 	(*3. Apply rule & negative update*)
-	(*let t_apply = Profiling.start_chrono () in*)
 	let opt_new_state =
 		match opt_instance with
 			| None -> None
@@ -70,13 +69,16 @@ let event state grid event_list counter plot env =
 	in
 	
 	(*4. Positive update*)
-	Counter.inc_events counter ;
 	
-	let env,state,pert_ids',grid,event_list = 
+	let env,state,pert_ids,grid,event_list = 
 		match opt_new_state with
-			| Some ((env,state,side_effect,embedding_t,psi,pert_ids),r) ->
-				
+			| Some ((env,state,side_effect,embedding_t,psi,pert_ids_rule),r) ->
+
+				Counter.inc_events counter ;
 				counter.Counter.cons_null_events <- 0 ; (*resetting consecutive null event counter since a real rule was applied*)  
+				let env,pert_ids = State.update_dep state Mods.EVENT (IntSet.union pert_ids_rule pert_ids_time) counter env in
+				
+				
 				
 				(*Local positive update: adding new partial injection*)
 				let env,state,pert_ids',new_injs = 
@@ -90,17 +92,17 @@ let event state grid event_list counter plot env =
 				(****************END POSITIVE UPDATE*****************)
 				let phi = State.map_of embedding_t in
 				
-				let event_to_record = (r,side_effect,phi,psi,Counter.event counter) in
+				(*let event_to_record = (r,side_effect,phi,psi,Counter.event counter) in*)
 				 
 				let grid,event_list = 
-						if !Parameter.causalModeOn then
-							Causal.record r.Dynamics.lhs (Some (r.Dynamics.pre_causal,side_effect,psi,false,r.Dynamics.r_id)) phi (Counter.event counter) grid env,
-Kappa_instantiation.Cflow_linker.store_event 
-  (Kappa_instantiation.Cflow_linker.import_event (r,phi,psi))
-  event_list 
-						else grid,event_list 
-					in
-					(env,state,IntSet.union pert_ids pert_ids',grid,event_list)
+					if !Parameter.causalModeOn then
+						begin
+							(Causal.record r.Dynamics.lhs (Some (r.Dynamics.pre_causal,side_effect,psi,false,r.Dynamics.r_id)) phi (Counter.event counter) grid env,
+							Kappa_instantiation.Cflow_linker.store_event (Kappa_instantiation.Cflow_linker.import_event (r,phi,psi)) event_list)
+						end
+					else (grid,event_list) 
+				in
+				(env,state,IntSet.union pert_ids pert_ids',grid,event_list)
 			| None ->
 				begin
 					if !Parameter.debugModeOn then Debug.tag "Null (clash or doesn't satisfy constraints)"; 
@@ -111,33 +113,42 @@ Kappa_instantiation.Cflow_linker.store_event
 	in
 	
 	(*Applying perturbation if any*)
-	let state,env = External.try_perturbate state (IntSet.union pert_ids pert_ids') counter env 
+	(*Printf.printf "Applying %s perturbations \n" (Tools.string_of_set string_of_int IntSet.fold pert_ids) ;*)
+	let state,env = External.try_perturbate state pert_ids counter env 
 	in
-	(*Profiling.add_chrono "Pert" Parameter.profiling t_pert ;*) 
 	(state,grid,event_list,env)
 					
-let rec loop state grid event_list counter plot env =
-	if !Parameter.debugModeOn then 
-		Debug.tag (Printf.sprintf "[**Event %d (Activity %f)**]" counter.Counter.events (Random_tree.total state.State.activity_tree));
-	if Counter.is_initial counter then
-		begin (*Plotting first measure*)
-			Counter.tick counter counter.Counter.time counter.Counter.events ;
-			Plot.output state counter.Counter.time counter.Counter.events plot env counter
-		end ;
-	if (Counter.check_time counter) && (Counter.check_events counter) then
-		let state,grid,event_list,env = event state grid event_list counter plot env 
-		in
-		loop state grid event_list counter plot env
-	else
-		begin
-			if !Parameter.causalModeOn then 
-			  begin
-			    Causal.dot_of_grid grid state env ;
-			    let refined_event_list = Compression_main.weak_compression env event_list 
-          in ()
-			  end;
-
-		  Plot.fill state counter plot env 0.0; (*Plotting last measures*)
-		  Plot.flush_ticks counter ;
-		  Plot.close plot
-		end			
+let loop state grid event_list counter plot env =
+	(*Before entering the loop*)
+	
+	Counter.tick counter counter.Counter.time counter.Counter.events ;
+	Plot.output state counter.Counter.time counter.Counter.events plot env counter ;
+	
+	(*Checking whether some perturbation should be applied before starting the event loop*)
+	let env,pert_ids = State.update_dep state Mods.EVENT IntSet.empty counter env in
+	let env,pert_ids = State.update_dep state Mods.TIME pert_ids counter env in
+	let state,env = External.try_perturbate state pert_ids counter env 
+	in
+	
+	let rec iter state grid event_list counter plot env =
+		if !Parameter.debugModeOn then 
+			Debug.tag (Printf.sprintf "[**Event %d (Activity %f)**]" counter.Counter.events (Random_tree.total state.State.activity_tree));
+		if (Counter.check_time counter) && (Counter.check_events counter) then
+			let state,grid,event_list,env = event state grid event_list counter plot env 
+			in
+			iter state grid event_list counter plot env
+		else (*exiting the loop*)
+			begin
+				if Environment.tracking_enabled env then
+				  begin
+				    Causal.dot_of_grid grid state env ;
+				    let refined_event_list = Compression_main.weak_compression env event_list 
+	          in ()
+				  end;
+	
+			  Plot.fill state counter plot env 0.0; (*Plotting last measures*)
+			  Plot.flush_ticks counter ;
+			  Plot.close plot
+			end
+	in
+	iter state grid event_list counter plot env

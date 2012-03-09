@@ -25,6 +25,8 @@ let empty_grid () = {flow = Hashtbl.create !Parameter.defaultExtArraySize }
 
 let grid_find (node_id,site_id,quark) grid = Hashtbl.find grid.flow (node_id,site_id,quark)
 
+let is_empty_grid grid = (Hashtbl.length grid.flow = 0)
+
 let grid_add (node_id,site_id,quark) attribute grid = 
 	Hashtbl.replace grid.flow (node_id,site_id,quark) attribute ;
 	grid
@@ -142,7 +144,10 @@ let rec parse_attribute last_modif last_tested attribute config =
 		| [] -> config
 		| atom::att -> 
 			begin
-				let config = {config with events = IntMap.add atom.eid atom.kind config.events} in
+				let events = IntMap.add atom.eid atom.kind config.events
+				and prec_1 = let preds = try IntMap.find atom.eid config.prec_1 with Not_found -> IntSet.empty in IntMap.add atom.eid preds config.prec_1
+				in
+				let config = {config with events =  events ; prec_1 = prec_1} in
 				(*atom has a modification*)
 				if (atom.causal_impact = 2) || (atom.causal_impact = 3) then 
 					let config = 
@@ -255,9 +260,9 @@ let dot_of_grid grid state env =
 		) eids_at_d ;
 		fprintf desc "}\n" ;
 	) sorted_events ;
-	let cpt = ref 1 in
+	let cpt = ref 0 in
 	while !cpt < (IntMap.size sorted_events) do
-		if !cpt+1 <= IntMap.size sorted_events then (fprintf desc "\"%d\" -> \"%d\" [style=\"invis\"]; \n" !cpt (!cpt+1)) ;
+		if !cpt+1 < IntMap.size sorted_events then (fprintf desc "\"%d\" -> \"%d\" [style=\"invis\"]; \n" !cpt (!cpt+1)) ;
 		cpt := !cpt + 1
 	done ; 
 	IntMap.iter

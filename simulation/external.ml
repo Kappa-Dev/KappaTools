@@ -13,7 +13,7 @@ let eval_pre_pert pert state counter env =
 			let act_of_id = (fun id -> (instance_number id state env)) (*act_of_id:functional argument*)
 			and v_of_id = (fun id -> State.value state id counter env)
 			in
-				b_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter)
+				b_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter)
 
 let eval_abort_pert just_applied pert state counter env = 
 	match pert.abort with
@@ -23,7 +23,7 @@ let eval_abort_pert just_applied pert state counter env =
 			let act_of_id = (fun id -> (instance_number id state env)) (*act_of_id:functional argument*)
 			and v_of_id = (fun id -> State.value state id counter env)
 			in
-				b_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter)
+				b_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter)
 
 let apply_effect p_id pert state counter env =
 	let snapshot opt =
@@ -31,7 +31,7 @@ let apply_effect p_id pert state counter env =
 		let filename = 
 			match opt with 
 				| None -> !Parameter.snapshotFileName^"_"^(string_of_int (Counter.event counter)) 
-				| Some s -> (Filename.concat !Parameter.outputDirName s)^"_"^(string_of_int (Counter.event counter))
+				| Some s -> (Filename.concat !Parameter.outputDirName s)^"_"^(string_of_int (Counter.event counter)^"_"^(string_of_int (Counter.null_event counter)))
 		in
 		let file_exists = ref true in
 		let cpt = ref 1 in
@@ -60,7 +60,7 @@ let apply_effect p_id pert state counter env =
 	let eval_var v =
 		match v with
 			| CONST f -> f
-			| VAR v_fun -> v_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter)
+			| VAR v_fun -> v_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter)
 	in
 		match pert.effect with
 			| INTRO (v,mix) -> 
@@ -140,8 +140,9 @@ let apply_effect p_id pert state counter env =
 					(env,state ,pert_ids)
 			| SNAPSHOT opt -> (snapshot opt ; (env, state ,IntSet.empty))
 			| CFLOW id -> 
+				if !Parameter.debugModeOn then Debug.tag "Tracking causality" ;
 				Parameter.causalModeOn := true ; 
-				let env = Environment.inc_active_cflows env in 
+				let env = if Environment.is_tracked id env then env else Environment.inc_active_cflows env in 
 				let env = Environment.track id env in
 				(env, state, IntSet.empty)
 			| STOP opt ->
@@ -170,14 +171,27 @@ let rec try_perturbate state pert_ids counter env =
 								let state,env = 
 									if eval_abort_pert true pert state counter env then 
 										(if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "***Aborting pert[%d]***" pert_id) ;
-										let env = Environment.dec_active_cflows env in
-										if Environment.active_cflows env = 0 then Parameter.causalModeOn := false ;
+										let env = 
+											match pert.effect with
+												| CFLOW _ ->
+													begin
+														let env = Environment.dec_active_cflows env in
+														if Environment.active_cflows env = 0 then Parameter.causalModeOn := false ;
+														env
+													end
+												| _ -> env
+										in
 										({state with perturbations = IntMap.remove pert_id state.perturbations},env) )
-									else (state,env)
+									else
+										begin
+											if !Parameter.debugModeOn then Debug.tag "************Maintaining perturbation*************" ; 
+											(state,env)
+										end
 								in
 								(state,pert_ids,env)
 							end
-						else (state,pert_ids,env)
+						else
+							(state,pert_ids,env)
 					in				
 					if eval_abort_pert false pert state counter env then
 						(if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "***Aborting pert[%d]***" pert_id) ;
