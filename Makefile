@@ -11,7 +11,7 @@ SOURCES = \
 		pattern/mixture.ml pattern/precondition.ml pattern/precondition.mli \
 		siteGraphs/graph.ml siteGraphs/species.ml pattern/matching.ml pattern/dynamics.ml \
 		grammar/eval.mli  simulation/state.ml simulation/external.ml simulation/nonLocal.ml grammar/eval.ml  \
-		cflow/kappa_instantiation.ml cflow/cflow_handler.ml cflow/propagation_heuristics.ml cflow/blackboard.ml cflow/generic_branch_and_cut_solver.ml cflow/compression_main.ml cflow/causal.ml simulation/plot.ml simulation/run.ml \
+		cflow/kappa_instantiation.ml cflow/cflow_handler.ml cflow/propagation_heuristics.ml cflow/blackboard_generation.ml cflow/blackboard.ml cflow/generic_branch_and_cut_solver.ml cflow/compression_main.ml cflow/causal.ml simulation/plot.ml simulation/run.ml \
 		main/main.ml 
 
 ## the name of the resulting executable

@@ -35,18 +35,18 @@ let weak_compression env step_list =
   let parameter = () in 
   let handler = () in 
   let error = [] in 
-  let error,blackboard = Blackboard.Blackboard.init parameter handler error   in
+  let error,blackboard = Blackboard_generation.Preblackboard.init parameter handler error   in
   let error,blackboard = 
     List.fold_left 
       (fun (error,blackboard) refined_event  -> 
-        Blackboard.Blackboard.add_step parameter handler error refined_event blackboard)
+        Blackboard_generation.Preblackboard.add_step parameter handler error refined_event blackboard)
       (error,blackboard)
       refined_event_list
   in 
   let error = 
     if debug_mode 
     then 
-      Blackboard.Blackboard.print_preblackboard parameter handler error stderr blackboard 
+      Blackboard_generation.Preblackboard.print_preblackboard parameter handler error stderr blackboard 
     else 
       error 
   in 

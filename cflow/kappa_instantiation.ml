@@ -54,7 +54,7 @@ sig
     | Create of agent * (site_name * internal_state option) list 
     | Mod_internal of site * internal_state 
     | Bind of site * site 
-    | Bind_to of site * site 
+    | Bind_to of site * site (*used when initial agents are bound*)
     | Unbind of site * site  
     | Free of site 
     | Remove of agent 
@@ -125,7 +125,7 @@ module Cflow_linker =
 
   type init = agent * (site_name * (int option * Node.ptr)) list
   type event = kappa_rule * embedding * fresh_map
-  type obs = init 
+  type obs = unit 
 
 
   type kappa_sig = Environment.t 
@@ -246,12 +246,12 @@ module Cflow_linker =
   let print_test log env prefix test = 
     match test with 
       | Is_Here agent -> Printf.fprintf log "%sIs_Here(%s)\n" prefix (string_of_agent env agent)
-      | Has_Internal (site,int) -> Printf.fprintf log "%sInternal(%s~%s)\n" prefix (string_of_site env site) (string_of_internal_state env int)
-      | Is_Free site -> Printf.fprintf log "%sFree(%s)\n" prefix (string_of_site env site)
-      | Is_Bound site -> Printf.fprintf log "%sBound(%s)\n" prefix (string_of_site env site)
+      | Has_Internal (site,int) -> Printf.fprintf log "%sHas_Internal(%s~%s)\n" prefix (string_of_site env site) (string_of_internal_state env int)
+      | Is_Free site -> Printf.fprintf log "%sIs_Free(%s)\n" prefix (string_of_site env site)
+      | Is_Bound site -> Printf.fprintf log "%sIs_Bound(%s)\n" prefix (string_of_site env site)
       | Has_Binding_type (site,btype) -> Printf.fprintf log "%sBtype(%s,%s)\n" prefix (string_of_site env site) (string_of_btype env btype)
-      | Is_Bound_to (site1,site2) -> Printf.fprintf log "%sBound(%s,%s)\n" prefix (string_of_site env site1) (string_of_site env site2)
-
+      | Is_Bound_to (site1,site2) -> Printf.fprintf log "%sIs_Bound(%s,%s)\n" prefix (string_of_site env site1) (string_of_site env site2)
+     
   let print_action log env prefix action =
     match action with 
       | Create (agent,list) -> 
@@ -273,7 +273,7 @@ module Cflow_linker =
 	  let _ = Printf.fprintf log "])\n" in
 	    ()
       | Mod_internal (site,int) -> Printf.fprintf log "%sMod(%s~%s)\n" prefix (string_of_site env site) (string_of_internal_state env int)
-      | Bind (site1,site2) -> Printf.fprintf log "%sBind(%s,%s)\n" prefix (string_of_site env site1) (string_of_site env site2)
+      | Bind (site1,site2) | Bind_to (site1,site2) -> Printf.fprintf log "%sBind(%s,%s)\n" prefix (string_of_site env site1) (string_of_site env site2)
       | Unbind (site1,site2)  -> Printf.fprintf log "%sUnBind(%s,%s)\n" prefix (string_of_site env site1) (string_of_site env site2)
       | Free site ->  Printf.fprintf log "%sFree(%s)\n" prefix (string_of_site env site)
       | Remove agent -> Printf.fprintf log "%sRemove(%s)\n" prefix (string_of_agent env agent)
@@ -572,17 +572,22 @@ module Cflow_linker =
 
   let refine_event env event = (event,tests_of_event event,actions_of_event event env)
     
+  let refine_obs env obs = () 
+
+  let obs_of_refined_obs () = () 
+
   let event_of_refined_event (a,_,_) = a
 
   let refine_init env init = (init,actions_of_init init env)
 
   let init_of_refined_init = fst 
 
+  let tests_of_refined_obs _ = []
   let tests_of_refined_init _ = []
   let tests_of_refined_event (_,y,_) =  y
   let actions_of_refined_event (_,_,y) = y
   let actions_of_refined_init (_,x) = x,[]
-
+  let actions_of_refined_obs () = [],[]
   let rule_of_refined_event x = (compose rule_of_event event_of_refined_event) x 
 
   let print_side_effects log env prefix (site,state) = 
@@ -593,6 +598,8 @@ module Cflow_linker =
       (string_of_site env site)
       (string_of_binding_state env state)
       
+  let print_refined_obs log env refined_obs = () 
+
   let print_refined_event log env refined_event = 
     let _ = Printf.fprintf log "***Refined event:***\n" in 
     let _ = Printf.fprintf log "* Kappa_rule \n" in 
@@ -612,29 +619,30 @@ module Cflow_linker =
 
   let print_refined_init log env refined_init = ()
   
-  let gen f1 f2 step = 
+  let gen f1 f2 f3 step = 
     match step
     with 
       | Event a -> f1 a 
-      | Init a -> f2 a 
+      | Init a -> f2 a
+      | Obs a -> f3 a 
 
-  let genbis f1 f2 = 
-    gen (fun a -> Event (f1 a)) (fun a -> Init (f2 a))      
+  let genbis f1 f2 f3 = 
+    gen (fun a -> Event (f1 a)) (fun a -> Init (f2 a)) (fun a -> Obs (f3 a))     
   
   let print_refined_step log env = 
-    gen (print_refined_event log env) (print_refined_init log env) 
+    gen (print_refined_event log env) (print_refined_init log env) (print_refined_obs log env) 
 
   let tests_of_refined_step =
-    gen tests_of_refined_event tests_of_refined_init 
+    gen tests_of_refined_event tests_of_refined_init tests_of_refined_obs
       
   let refine_step env (x:step) = 
-    genbis (refine_event env) (refine_init env) x
+    genbis (refine_event env) (refine_init env) (refine_obs env) x
   
   let step_of_refined_step = 
-    genbis event_of_refined_event init_of_refined_init 
+    genbis event_of_refined_event init_of_refined_init obs_of_refined_obs 
 
   let actions_of_refined_step = 
-    gen actions_of_refined_event actions_of_refined_init 
+    gen actions_of_refined_event actions_of_refined_init actions_of_refined_obs 
   
   let import_event x = x 
   let import_env x = x
