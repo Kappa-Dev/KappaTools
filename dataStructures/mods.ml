@@ -243,7 +243,7 @@ module Counter =
 					let n = ref (max n_t n_e) in
 						if !n>0 then set_tick counter (event,time) ;
 						while !n > 0 do
-							Printf.printf "%c" !Parameter.progressBarSymbol ;
+							Printf.printf "%c" (if !Parameter.causalModeOn then 'C' else !Parameter.progressBarSymbol) ;
 							if !Parameter.eclipseMode then print_newline() ;
 							inc_tick counter ;
 							n:=!n-1 

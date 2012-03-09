@@ -14,6 +14,8 @@ type alg_expr =
 	| ABS of alg_expr * Tools.pos
 	| TIME_VAR of Tools.pos
 	| EVENT_VAR of Tools.pos
+	| NULL_EVENT_VAR of Tools.pos
+	| PROD_EVENT_VAR of Tools.pos
 	| OBS_VAR of (string * Tools.pos)
 	| FLOAT of float * Tools.pos
 	| TMAX of Tools.pos
