@@ -96,10 +96,17 @@ let event state grid event_list counter plot env =
 				 
 				let grid,event_list = 
 					if !Parameter.causalModeOn then
-						begin
-							(Causal.record ~decorate_with:obs_from_rule_app r side_effect (phi,psi) (Counter.event counter) grid env, (*to be removed*)
-							Kappa_instantiation.Cflow_linker.store_event (Kappa_instantiation.Cflow_linker.import_event (r,phi,psi)) event_list)
-						end
+					  begin
+                                            let event_list = Kappa_instantiation.Cflow_linker.store_event (Kappa_instantiation.Cflow_linker.import_event (r,phi,psi)) event_list in 
+                                            let event_list = 
+                                              List.fold_left 
+                                                (fun event_list obs -> 
+                                                    Kappa_instantiation.Cflow_linker.store_obs event_list)
+                                                event_list obs_from_rule_app
+                                            in 
+					    (Causal.record ~decorate_with:obs_from_rule_app r side_effect (phi,psi) (Counter.event counter) grid env, (*to be removed*)
+					     event_list)
+					  end
 					else (grid,event_list) 
 				in
 				(env,state,IntSet.union pert_ids pert_ids',grid,event_list)

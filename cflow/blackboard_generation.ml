@@ -18,15 +18,6 @@
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
-
-module type Cflow_handler = 
-  sig
-    type parameter (*a struct which contains parameterizable options*)
-    type error     (*a list which contains the error so far*)
-    type handler   (*handler to interpret abstract values*)
-    type 'a with_handler = parameter -> handler -> error -> 'a 
-  end
-
 module type PreBlackboard = 
 sig 
   module H:Cflow_handler.Cflow_handler
@@ -40,7 +31,7 @@ sig
   type predicate_value 
  
   type pre_blackboard  (*blackboard during its construction*)
-
+ 
   val undefined: predicate_value 
   val strictly_more_refined: predicate_value -> predicate_value -> bool 
 
@@ -50,6 +41,14 @@ sig
 
   (**pretty printing*)
   val print_preblackboard: (out_channel -> pre_blackboard -> H.error_channel) H.with_handler  
+
+  (**interface*)
+  val n_events: (pre_blackboard -> H.error_channel * int) H.with_handler 
+  val n_predicates: (pre_blackboard -> H.error_channel * int) H.with_handler 
+  val n_events_per_predicate: (pre_blackboard -> predicate_id -> H.error_channel * int) H.with_handler 
+  val event_list_of_predicate: (pre_blackboard -> predicate_id -> H.error_channel * (int * int * predicate_value * predicate_value ) list) H.with_handler 
+  val mandatory_events: (pre_blackboard -> H.error_channel * ((int list) list)) H.with_handler 
+
 end
 
 module Preblackboard = 
@@ -105,7 +104,7 @@ module Preblackboard =
      type pre_blackboard = 
 	 {
            pre_fictitious_list: predicate_id list ; (** list of wire for mutual exclusions, the state must be undefined at the end of the trace *) 
-           pre_steps_by_column: (predicate_value * (step_id * predicate_value * predicate_value) list) A.t; (** maps each wire to the last known value and the list of step (step id,test,action)*)
+           pre_steps_by_column: (step_short_id * (step_id * step_short_id * predicate_value * predicate_value) list) A.t; (** maps each wire to the last known value and the list of step (step id,test,action)*)
            pre_kind_of_event: rule_type A.t; (** maps each event id to the kind of event *)
 	   pre_nsteps: step_id; (**id of the last event *)
 	   pre_ncolumn: predicate_id; (**id of the last wire *)
@@ -166,13 +165,14 @@ maps each wire to the set of its previous states, this summarize the potential s
        let _ = Printf.fprintf log "*\n steps by column\n*\n" in 
        let _ = 
          A.iteri 
-           (fun id (value,list) ->
+           (fun id (nevents,list) ->
              let _ = print_predicate_id log blackboard id  in
-             let _ = print_predicate_value log value in 
+             let _ = Printf.fprintf log "nevents: %i \n" nevents in 
              let _ = 
                List.iter 
-                 (fun (eid,test,action) -> 
+                 (fun (eid,seid,test,action) -> 
                    let _ = Printf.fprintf log "Event id: %i \n" eid in 
+                   let _ = Printf.fprintf log "Short id: %i \n" seid in 
                    let _ = print_known log test "TEST:   " in
                    let _ = print_predicate_value log test in 
                    let _ = print_known log action "ACTION: " in 
@@ -184,7 +184,7 @@ maps each wire to the set of its previous states, this summarize the potential s
              ())
            blackboard.pre_steps_by_column 
        in 
-       let _ = Printf.fprintf log "*\n predicate_id related to the predicate \n*\n" in 
+       let _ = Printf.fprintf log "*\nPredicate_id related to the predicate \n*\n" in 
        let _ = 
          A.iteri 
            (fun i s -> 
@@ -199,7 +199,7 @@ maps each wire to the set of its previous states, this summarize the potential s
            )
            blackboard.predicate_id_list_related_to_predicate_id 
        in 
-       let _ = Printf.fprintf log "*\n past values of a predicate \n*\n" in 
+       let _ = Printf.fprintf log "*\nPast values of a predicate \n*\n" in 
        let _ = 
          A.iteri 
            (fun i s -> 
@@ -259,17 +259,10 @@ maps each wire to the set of its previous states, this summarize the potential s
        then error,y
        else 
          let error_list,error = 
-              H.create_error parameter handler error (Some "blackbord.ml") None (Some "conj") (Some "174") (Some "Try to compare incompare site states") Exit
+              H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "conj") (Some "269") (Some "Try to compare incomparable site states") Exit
          in 
-         H.raise_error 
-           parameter 
-           handler 
-           error_list 
-           stderr 
-           error 
-           x 
+         H.raise_error parameter handler error_list stderr error x 
       
-
      (** predicate id allocation *)
 
      (** if a wire concerns an agent, which one it is *)
@@ -299,7 +292,10 @@ maps each wire to the set of its previous states, this summarize the potential s
          let _ = A.set blackboard.predicate_id_list_related_to_predicate_id sid new_set in 
          error,blackboard 
        with 
-           Not_found -> raise (invalid_arg "bind")
+           Not_found ->
+             let error_list,error = 
+               H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "bind") (Some "297") (Some "Out of bound access") (failwith "bind") in 
+         H.raise_error parameter handler error_list stderr error blackboard 
      and 
          allocate parameter handler error blackboard predicate  = 
        let ag_id = agent_id_of_predicate predicate in 
@@ -315,12 +311,12 @@ maps each wire to the set of its previous states, this summarize the potential s
              let _  = A.set map_inv sid' predicate in 
              let map_inv' = map_inv in 
              let blackboard = 
-                {blackboard 
-                      with 
-                        pre_ncolumn = sid' ; 
-                        pre_column_map = map' ;
-                        pre_column_map_inv = map_inv' 
-                     }
+               {blackboard 
+                with 
+                  pre_ncolumn = sid' ; 
+                  pre_column_map = map' ;
+                  pre_column_map_inv = map_inv' 
+               }
              in 
              let error,blackboard = 
                match ag_id 
@@ -328,40 +324,34 @@ maps each wire to the set of its previous states, this summarize the potential s
                  | None -> 
                    error, blackboard 
                  | Some ag_id -> 
-                   bind 
-                     parameter 
-                     handler 
-                     error 
-                     blackboard 
-                     predicate
-                     sid'
-                     ag_id 
+                   bind parameter handler error blackboard predicate sid' ag_id 
              in 
                error,blackboard,sid' 
                  
      let free_agent parameter handler error blackboard agent_id = 
        let error,blackboard,predicate_id = 
          allocate parameter handler error blackboard (Here agent_id)  in 
-       let set = 
+       let error,set = 
          try 
-           A.get blackboard.predicate_id_list_related_to_predicate_id predicate_id
+           error,A.get blackboard.predicate_id_list_related_to_predicate_id predicate_id
          with 
-             _ -> raise (invalid_arg "free_agent")
+           | _ -> 
+               let error_list,error = 
+               H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "free_agent") (Some "240") (Some "Try to free an unexisting agent") (failwith "free_agent") in 
+               H.raise_error parameter handler error_list stderr error PredicateidSet.empty 
        in 
        let map = 
          PredicateidSet.fold 
            (fun predicate_id map -> 
              let predicate = A.get blackboard.pre_column_map_inv predicate_id in 
-             PredicateMap.remove 
-               predicate 
-               map)
+             PredicateMap.remove predicate map
+           )
            set 
            blackboard.pre_column_map
        in 
        error,{blackboard with pre_column_map = map}
-
      
-     let predicates_of_action (parameter:H.parameter) handler (error:H.error_channel) blackboard action = 
+     let predicates_of_action parameter handler error blackboard action = 
        match action with 
          | K.Create (ag,interface) -> 
            let ag_id = K.agent_id_of_agent ag in
@@ -380,7 +370,6 @@ maps each wire to the set of its previous states, this summarize the potential s
                      blackboard,
                      (predicate_id,Internal_state_is x)::list1,
                      (predicate_id,Undefined)::list2
-                     
              )
              (error,blackboard,[predicate_id,Present],[predicate_id,Undefined])
              interface
@@ -494,7 +483,7 @@ maps each wire to the set of its previous states, this summarize the potential s
     error, 
     {
       pre_fictitious_list = [] ; 
-      pre_steps_by_column = A.make 1 (Undefined,[]) ; 
+      pre_steps_by_column = A.make 1 (0,[]) ; 
       pre_nsteps = -1 ;
       pre_ncolumn = -1 ;
       pre_column_map = PredicateMap.empty ; 
@@ -508,46 +497,43 @@ maps each wire to the set of its previous states, this summarize the potential s
     let nsid = blackboard.pre_nsteps+1 in 
     let test = Undefined in 
     let action = Counter 0 in
-    let _ = A.set blackboard.pre_steps_by_column predicate_id (test,[nsid,test,action])  in 
+    let _ = A.set blackboard.pre_steps_by_column predicate_id (1,[nsid,0,test,action])  in 
     error,{blackboard with pre_nsteps = nsid} 
  
   let add_fictitious_action error site test action predicate_id blackboard = 
     let nsid = blackboard.pre_nsteps in 
     let map = blackboard.pre_steps_by_column in 
-    let value,list = 
-      A.get map predicate_id  
-    in 
-    let value' = 
-      match action
-      with 
-        | Unknown -> value
-        | x -> x
-    in
-    let _ = A.set map predicate_id (value',(nsid,test,action)::list)
-    in 
+    let value,list = A.get map predicate_id in 
+    let value' = value+1 in
+    let _ = A.set map predicate_id (value',(nsid,value,test,action)::list) in 
     error,blackboard
 
-  let side_effect predicate_target_id s site = 
+  let side_effect parameter handler error predicate_target_id s site = 
     match s 
     with 
       | Point_to _ | Counter _ | Internal_state_is _ | Undefined 
       | Present | Bound | Bound_to_type _ | Unknown -> 
-         raise (invalid_arg "side_effect")
-      | Free -> 
-        [predicate_target_id,(Free,Unknown)]
+        let error,error_list = 
+            H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "side_effects") (Some "517") (Some "Illegal state for a side-effects") (failwith "Blackboard_generation.side_effect") in 
+        H.raise_error parameter handler error stderr error_list []
+       | Free -> 
+         error,[predicate_target_id,(Free,Unknown)]
       | Bound_to (pid,_,_,_) -> 
-        [predicate_target_id,(s,Unknown);
+        error,[predicate_target_id,(s,Unknown);
          pid,(Bound_to (predicate_target_id,K.agent_id_of_site site,K.agent_name_of_site site,K.site_name_of_site site),Free)]
           
 
-  let predicate_value_of_binding_state x = 
+  let predicate_value_of_binding_state parameter handler error x = 
        match x 
        with 
-         | K.ANY -> Unknown 
-         | K.FREE -> Free
-         | K.BOUND -> Bound
-         | K.BOUND_TYPE bt -> Bound_to_type (K.agent_name_of_binding_type bt,K.site_name_of_binding_type bt)
-         | K.BOUND_to s -> raise (invalid_arg "predicate_value_of_binding_state")
+         | K.ANY -> error,Unknown 
+         | K.FREE -> error,Free
+         | K.BOUND -> error,Bound
+         | K.BOUND_TYPE bt -> error,Bound_to_type (K.agent_name_of_binding_type bt,K.site_name_of_binding_type bt)
+         | K.BOUND_to s -> 
+            let error_list,error = 
+               H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "predicate_value_of_binding_state") (Some "535") (Some "Illegal binding state in predicate_value_of_binding_state") (failwith "predicate_value_of_binding_state") in 
+            H.raise_error parameter handler error_list stderr error Unknown 
     
   let potential_target error parameter handler blackboard site binding_state =
     let agent_id = K.agent_id_of_site site in 
@@ -557,25 +543,26 @@ maps each wire to the set of its previous states, this summarize the potential s
     let former_states = 
         A.get blackboard.history_of_predicate_values_to_predicate_id predicate_target_id
     in 
-    let bt = predicate_value_of_binding_state binding_state in 
-    let list = 
+    let error,bt = predicate_value_of_binding_state parameter handler error binding_state in 
+    let error,list = 
       CaseValueSet.fold 
-        (fun s list -> 
+        (fun s (error,list) -> 
           if more_refined s bt
           then 
-            (side_effect predicate_target_id s site)::list 
+            let error,l=side_effect parameter handler error predicate_target_id s site in 
+            error,l::list 
           else 
-            list
+            error,list
       )
         former_states
-        []
+        (error,[])
     in 
     error,blackboard,list 
 
   let add_step parameter handler error step blackboard = 
     let test_list = K.tests_of_refined_step step in 
     let action_list,side_effect = K.actions_of_refined_step step in
-    let action_list = (*List.rev*) action_list in 
+    let action_list = action_list in 
     let fictitious_local_list = [] in 
     let fictitious_list = blackboard.pre_fictitious_list in 
     let build_map list map = 
@@ -609,8 +596,14 @@ maps each wire to the set of its previous states, this summarize the potential s
       map 
     in 
     let fadd pid p map = 
-      let old = A.get map pid in 
-      A.set map pid (CaseValueSet.add p old) 
+      match p 
+      with 
+        | Point_to _ | Counter _ | Internal_state_is _ | Undefined 
+        | Present | Bound | Bound_to_type _ | Unknown -> 
+          ()
+        | _ -> 
+          let old = A.get map pid in 
+          A.set map pid (CaseValueSet.add p old) 
     in 
     let error,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effets = 
       List.fold_left 
@@ -620,7 +613,7 @@ maps each wire to the set of its previous states, this summarize the potential s
             match 
               potential_target 
             with 
-              | [l]  ->  (* TO DO *) 
+              | [l]  ->  
                 begin
                   let list = 
                     List.fold_left 
@@ -646,13 +639,7 @@ maps each wire to the set of its previous states, this summarize the potential s
                           let blackboard = {blackboard with pre_nsteps = blackboard.pre_nsteps+1} in 
                           List.fold_left
                             (fun (error,blackboard) (predicate_id,(test,action)) -> 
-                              add_fictitious_action 
-                                error 
-                                site 
-                                test 
-                                action
-                                predicate_id 
-                                blackboard)
+                              add_fictitious_action error site test action predicate_id blackboard)
                             (error,blackboard) 
                             ((predicate_id,(Counter 0,Counter 1))::list)
                         )
@@ -712,24 +699,15 @@ maps each wire to the set of its previous states, this summarize the potential s
       PredicateidMap.fold 
         (fun id (test,action) map -> 
           begin 
-            let value,list = 
-              A.get map id  
-            in 
-            let value' = 
-              match action
-              with 
-                | Unknown -> value
-                | x -> x
-            in
-            let _ = 
-              fadd id value' blackboard.history_of_predicate_values_to_predicate_id in 
-            let _ = A.set map id (value',(nsid,test,action)::list)
+            let value,list = A.get map id in 
+            let value' = value + 1 in 
+            let _ = fadd id action blackboard.history_of_predicate_values_to_predicate_id in 
+            let _ = A.set map id (value',(nsid,value,test,action)::list)
             in map
           end)
         merged_map
         blackboard.pre_steps_by_column 
     in 
-    
     let _ = A.set blackboard.pre_kind_of_event nsid (type_of_step (K.type_of_refined_step step)) in 
     let blackboard = 
       if fictitious_local_list = []
@@ -749,31 +727,35 @@ maps each wire to the set of its previous states, this summarize the potential s
     in 
     error,blackboard 
 
-  let add_case parameter handler error case_address pre_blackboard = error,pre_blackboard 
+  (**interface*)
+  let n_predicates parameter handler error blackboard = 
+    error,blackboard.pre_ncolumn+1
+  
+  let event_list_of_predicate parameter handler error blackboard predicate_id = 
+      try 
+        error,snd (A.get blackboard.pre_steps_by_column predicate_id) 
+      with 
+        | _ -> 
+          let error_list,error = H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "event_list_of_predicate") (Some "739") (Some "Unknown predicate id") (failwith "event_list_of_predicate") in 
+          H.raise_error parameter handler error_list stderr error []
+            
+  let n_events_per_predicate parameter handler error blackboard predicate_id = 
+    try 
+      error,fst (A.get blackboard.pre_steps_by_column predicate_id) 
+    with 
+      | _ -> 
+        let error_list,error = H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "n_events_per_predicate") (Some "747") (Some "Unknown predicate id") (failwith "n_events_per_predicate") in 
+            H.raise_error parameter handler error_list stderr error 0
 
-  let finalize parameter handler error pre_blackboard = error,pre_blackboard 
+  let n_events parameter handler error blackboard = 
 
-  (** heuristics *)
- 
-  let next_choice parameter handler error blackboard = error,[]
-    
-  let propagation_heuristic parameter handler error blackboard instruction instruction_list = error,instruction_list 
+    error,blackboard.pre_nsteps+1 
 
-  let apply_instruction parameter handler error blackboard instruction instruction_list = error,[],instruction_list 
+  let mandatory_events parameter handler error blackboard = 
+    error,[]
 
-  (** output result*)
-  type result = ()
 
-  (** iteration*)
-  let is_maximal_solution parameter handler error blackboard = error,false 
-
-  (** exporting result*)
-  let translate_blackboard parameter handler error blackboard = error,()
-
-  (**pretty printing*)
-  let print_blackboard paramter handler error blackboard = error
-
-   end:PreBlackboard)
+end:PreBlackboard)
 
 
       
