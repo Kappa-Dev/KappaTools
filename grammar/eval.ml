@@ -710,7 +710,7 @@ let effects_of_modif variables env ast =
 		(variables, Dynamics.STOP opt_name, str, env)
 	| CFLOW (lab,pos_lab,pos_pert) ->
 		let id = try Environment.num_of_rule lab env with Not_found -> try Environment.num_of_kappa lab env with Not_found ->
-			raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label " ^ lab ^ " is not declared"))
+			raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
 		in
 		let str = Printf.sprintf "Causality analysis of %s" lab in
 		(variables, Dynamics.CFLOW id, str, env)
@@ -823,7 +823,13 @@ let pert_of_result variables env res =
 							in
 							(env,rule_opt)
 						end
-					| Dynamics.CFLOW _ ->
+					| Dynamics.CFLOW obs_id ->
+						begin
+						if Environment.is_rule obs_id env then ()
+						else
+							try let _ = Environment.kappa_of_num obs_id env in () with
+								| Not_found -> raise (ExceptionDefn.Semantics_Error (pos, "Cannot track an bbservable which is neither a kappa expression nor a rule")) 
+						end ;
 						let env = {env with Environment.tracking_enabled = true} in
 						let env =
 							DepSet.fold
