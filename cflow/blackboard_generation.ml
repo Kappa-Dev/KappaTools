@@ -33,6 +33,7 @@ sig
   type pre_blackboard  (*blackboard during its construction*)
  
   val undefined: predicate_value 
+  val unknown: predicate_value 
   val strictly_more_refined: predicate_value -> predicate_value -> bool 
 
   (** generation*)
@@ -94,6 +95,8 @@ module Preblackboard =
        | Unknown (**  for agent presence, internal states, binding states (partial information *) 
 
      let undefined = Undefined 
+     let unknown = Unknown 
+
      (** maps and sets *)
      module PredicateMap = Map.Make (struct type t = predicate_info let compare = compare end)
      module PredicateSet = Set.Make (struct type t = predicate_info let compare = compare end)

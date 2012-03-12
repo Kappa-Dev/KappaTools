@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 06/09/2011
-  * Last modification: 08/03/2012
+  * Last modification: 12/03/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -34,21 +34,25 @@ sig
   (** blackboard*)
 
   type blackboard      (*blackboard, once finalized*)
+ (* type stack *)
+  type assign_result
 
-  val set: ((case_address * case_value option) -> blackboard  -> PB.H.error_channel * blackboard) PB.H.with_handler 
-  val get: (case_address -> blackboard -> PB.H.error_channel * case_value option) PB.H.with_handler 
+  val set: (case_address -> case_value -> blackboard  -> PB.H.error_channel * blackboard) PB.H.with_handler 
+  val get: (case_address -> blackboard -> PB.H.error_channel * case_value) PB.H.with_handler 
+  val overwrite: (case_address -> case_value -> blackboard -> PB.H.error_channel * blackboard) PB.H.with_handler  
+  val refine: (case_address -> case_value -> blackboard -> PB.H.error_channel * blackboard * assign_result) PB.H.with_handler  
+    
 
-  val strictly_more_refined: case_value -> case_value -> bool
+(*  val strictly_more_refined: case_value -> case_value -> bool*)
 
-  (** stack *)
-  type stack
 
-  val record_modif: ((case_address * case_value option) -> stack -> PB.H.error_channel * stack) PB.H.with_handler
-  val branch: (blackboard -> stack -> PB.H.error_channel *blackboard * stack) PB.H.with_handler 
-  val reset: (stack -> PB.H.error_channel * stack * (case_address * case_value option) list) PB.H.with_handler 
- 
+(*  val record_modif: ((case_address * case_value option) -> stack -> PB.H.error_channel * stack) PB.H.with_handler*)
+
+  val branch: (blackboard -> PB.H.error_channel *blackboard) PB.H.with_handler 
+  val reset: (blackboard -> PB.H.error_channel * blackboard ) PB.H.with_handler 
+
   (** initialisation*)
-  val finalize: (PB.pre_blackboard -> PB.H.error_channel * blackboard) PB.H.with_handler 
+  val import: (PB.pre_blackboard -> PB.H.error_channel * blackboard) PB.H.with_handler 
 
 
   (** heuristics *)
@@ -61,7 +65,7 @@ sig
   type result 
 
   (** iteration*)
-  val is_maximal_solution: (blackboard -> PB.H.error_channel * bool) PB.H.with_handler 
+ val is_maximal_solution: (blackboard -> PB.H.error_channel * bool) PB.H.with_handler 
 
   (** exporting result*)
   val translate_blackboard: (blackboard -> PB.H.error_channel * result) PB.H.with_handler 
@@ -75,6 +79,8 @@ module Blackboard =
     module PB = Blackboard_generation.Preblackboard 
      (** blackboard matrix*) 
 
+    type assign_result = Fail | Success | Ignore 
+        
      type step_id = int 
      type step_short_id = int 
 
@@ -156,20 +162,44 @@ module Blackboard =
 	 
      type blackboard = PB.pre_blackboard 
 
-     let set parameter handler error (case_address,case_value_opt) blackboard = error,blackboard 
+     let set parameter handler error case_address case_value blackboard = error,blackboard 
  
-     let get parameter handler error case_address blackboard = error,None 
+     let get parameter handler error case_address blackboard = error,PB.unknown  
 
   (** stack *)
-     type stack = (case_address*case_value option) list 
+     type stack = (case_address*case_value) list 
+   
+     let record_modif parameter handler error case_address case_value blackboard = error,blackboard
+       
+     let refine parameter handler error case_address case_value blackboard = 
+       let error,old = get parameter handler error case_address blackboard in 
+       if case_value = old 
+       then 
+         error,blackboard,Ignore
+       else 
+       if strictly_more_refined case_value old 
+       then 
+         let error,blackboard = set parameter handler error case_address case_value blackboard in 
+         let error,blackboard = record_modif parameter handler error case_address old blackboard in 
+         error,blackboard,Success
+       else 
+         error,blackboard,Fail 
+
+     let overwrite parameter handler error case_address case_value blackboard = 
+       let error,old = get parameter handler error case_address blackboard in 
+       if case_value = old 
+       then 
+         error,blackboard
+       else
+         let error,blackboard = set parameter handler error case_address case_value blackboard in 
+         let error,blackboard = record_modif parameter handler error case_address old blackboard in 
+         error,blackboard 
          
-     let record_modif parameter handler error info stack = error,info::stack
+     let branch parameter handler error blackboard = error,blackboard
        
-     let branch parameter handler error blackboard stack = error,blackboard,[]
-       
-     let reset parameter handler error stack = error,[],stack 
+     let reset parameter handler error blackboard = error,blackboard 
  
-     let finalize parameter handler error pre_blackboard = error,pre_blackboard 
+     let import parameter handler error pre_blackboard = error,pre_blackboard 
 
   (** heuristics *)
        
@@ -178,15 +208,16 @@ module Blackboard =
      let propagation_heuristic parameter handler error blackboard instruction instruction_list = error,instruction_list 
        
      let apply_instruction parameter handler error blackboard instruction instruction_list = error,[],instruction_list 
-       
+ 
   (** output result*)
      type result = ()
          
   (** iteration*)
      let is_maximal_solution parameter handler error blackboard = error,false 
-       
+ 
   (** exporting result*)
-     let translate_blackboard parameter handler error blackboard = error,()
+       
+   let translate_blackboard parameter handler error blackboard = error,()
        
   (**pretty printing*)
      let print_blackboard paramter handler error blackboard = error
