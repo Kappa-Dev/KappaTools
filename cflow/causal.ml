@@ -80,7 +80,11 @@ let add (node_id,site_id) c grid event_number kind =
 		
 (**side_effect Int2Set.t: pairs (agents,ports) that have been freed as a side effect --via a DEL or a FREE action*)
 (*NB no internal state modif as side effect*)
-let record mix opt_rule embedding event_number grid env = 
+let record ?(decorate_with=[]) rule side_effects (embedding,fresh_map) event_number grid env = 
+	
+	let pre_causal = rule.Dynamics.pre_causal
+	and r_id = rule.Dynamics.r_id
+	in
 	
 	let im embedding fresh_map id =
 		match id with
@@ -88,41 +92,19 @@ let record mix opt_rule embedding event_number grid env =
 			| KEPT j -> IntMap.find j embedding
 	in
 	
-	let grid = (*if mix is the lhs of a rule*) 
-		match opt_rule with
-			| Some (pre_causal,side_effects,psi,is_pert,r_id) ->
-				(*adding side-effect free modifications and tests*)
-				let kind = if is_pert then (PERT r_id) else (RULE r_id) in
-				let grid = 
-					Id2Map.fold
-					(fun (id,site_id) c grid ->
-						let node_id = im embedding psi id in
-						add (node_id,site_id) c grid event_number kind 
-					) pre_causal grid
-				in
-				(*adding side effects modifications*)
-				Int2Set.fold 
-				(fun (node_id,site_id) grid -> add (node_id,site_id) _LINK_MODIF grid event_number kind) 
-				side_effects grid
-			| None -> (*event is an observable occurrence*)
-				let kind = OBS (Mixture.get_id mix) in
-				IntMap.fold
-				(fun id ag grid ->
-					let node_id = im embedding IntMap.empty (Dynamics.KEPT id) in
-					Mixture.fold_interface
-					(fun site_id (int,lnk) grid ->
-						let grid = 
-							match int with
-								| Some i -> add (node_id,site_id) _INTERNAL_TESTED grid event_number kind
-								| None -> grid
-						in
-						match lnk with
-							| Node.BND | Node.FREE | Node.TYPE _ -> add (node_id,site_id) _LINK_TESTED grid event_number kind 
-							| Node.WLD -> grid
-					)
-					ag grid
-				)
-				(Mixture.agents mix) grid
+	let grid =  
+		(*adding side-effect free modifications and tests*)
+		let grid = 
+			Id2Map.fold
+			(fun (id,site_id) c grid ->
+				let node_id = im embedding fresh_map id in
+				add (node_id,site_id) c grid event_number (RULE r_id) 
+			) pre_causal grid
+		in
+		(*adding side effects modifications*)
+		Int2Set.fold 
+		(fun (node_id,site_id) grid -> add (node_id,site_id) _LINK_MODIF grid event_number (RULE r_id)) 
+		side_effects grid
 	in
 	grid
 

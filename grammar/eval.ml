@@ -823,13 +823,7 @@ let pert_of_result variables env res =
 							in
 							(env,rule_opt)
 						end
-					| Dynamics.CFLOW obs_id ->
-						begin
-						if Environment.is_rule obs_id env then ()
-						else
-							try let _ = Environment.kappa_of_num obs_id env in () with
-								| Not_found -> raise (ExceptionDefn.Semantics_Error (pos, "Cannot track an bbservable which is neither a kappa expression nor a rule")) 
-						end ;
+					| Dynamics.CFLOW _ ->
 						let env = {env with Environment.tracking_enabled = true} in
 						let env =
 							DepSet.fold

@@ -81,7 +81,7 @@ let event state grid event_list counter plot env =
 				
 				
 				(*Local positive update: adding new partial injection*)
-				let env,state,pert_ids',new_injs = 
+				let env,state,pert_ids',new_injs,obs_from_rule_app = 
 					State.positive_update state r (State.map_of embedding_t,psi) (side_effect,Int2Set.empty) counter env
 				in
 				
@@ -97,7 +97,7 @@ let event state grid event_list counter plot env =
 				let grid,event_list = 
 					if !Parameter.causalModeOn then
 						begin
-							(Causal.record r.Dynamics.lhs (Some (r.Dynamics.pre_causal,side_effect,psi,false,r.Dynamics.r_id)) phi (Counter.event counter) grid env, (*to be removed*)
+							(Causal.record ~decorate_with:obs_from_rule_app r side_effect (phi,psi) (Counter.event counter) grid env, (*to be removed*)
 							Kappa_instantiation.Cflow_linker.store_event (Kappa_instantiation.Cflow_linker.import_event (r,phi,psi)) event_list)
 						end
 					else (grid,event_list) 
@@ -114,7 +114,7 @@ let event state grid event_list counter plot env =
 	
 	(*Applying perturbation if any*)
 	(*Printf.printf "Applying %s perturbations \n" (Tools.string_of_set string_of_int IntSet.fold pert_ids) ;*)
-	let state,env = External.try_perturbate state pert_ids counter env 
+	let state,env,obs_from_perturbation = External.try_perturbate state pert_ids counter env (*shoudl add obs_from_pert in the causal flow at some point...*)
 	in
 	(state,grid,event_list,env)
 					
@@ -127,7 +127,7 @@ let loop state grid event_list counter plot env =
 	(*Checking whether some perturbation should be applied before starting the event loop*)
 	let env,pert_ids = State.update_dep state Mods.EVENT IntSet.empty counter env in
 	let env,pert_ids = State.update_dep state Mods.TIME pert_ids counter env in
-	let state,env = External.try_perturbate state pert_ids counter env 
+	let state,env,_ = External.try_perturbate state pert_ids counter env 
 	in
 	
 	let rec iter state grid event_list counter plot env =

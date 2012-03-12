@@ -731,67 +731,58 @@ let draw_rule state counter env =
 		| Not_found -> (None,state)
 
 let wake_up state modif_type modifs wake_up_map env =
-	Int2Set.iter
-		(fun (node_id, site_id) ->
-					let opt =
-						try Some (SiteGraph.node_of_id state.graph node_id)
-						with | exn -> None
+	Int2Set.fold
+	(fun (node_id, site_id) wake_up_map ->
+			let opt =
+				try Some (SiteGraph.node_of_id state.graph node_id)
+				with | exn -> None
+			in
+			match opt with
+			| None -> wake_up_map
+			| Some node ->
+					let old_candidates =
+						(try IntMap.find node_id wake_up_map
+						with | Not_found -> Int2Set.empty)
 					in
-					match opt with
-					| None -> ()
-					| Some node ->
-							let old_candidates =
-								(try Hashtbl.find wake_up_map node_id
-								with | Not_found -> Int2Set.empty)
-							in
-							(* {(mix_id,cc_id),...} *)
-							(match modif_type with
-								| 0 -> (*internal state modif*)
-										let new_candidates =
-											Precondition.find_all (Node.name node) site_id
-												(Node.internal_state (node, site_id)) None false
-												state.wake_up
-										in
-										(* adding pairs (mix_id,cc_id) to the potential new    *)
-										(* matches to be tried at anchor node_id               *)
-										Hashtbl.replace wake_up_map node_id
-											(Int2Set.union old_candidates new_candidates)
-								| 1 -> (*link state modification*)
-										let is_free = try not (Node.is_bound (node, site_id)) with Invalid_argument msg -> invalid_arg (Printf.sprintf "State.wake_up : no site %d in agent %s" site_id (Environment.name (Node.name node) env))
-										in
-										let new_candidates =
-											if is_free
-											then
-												Precondition.find_all (Node.name node) site_id None
-													None is_free state.wake_up
-											else
-												(let link_opt =
-														match Node.follow (node, site_id) with
-														| None -> invalid_arg "State.wake_up"
-														| Some (node', site_id') ->
-																Some (Node.name node', site_id')
-													in
-													Precondition.find_all (Node.name node) site_id
-														None link_opt is_free state.wake_up)
-										in
-										Hashtbl.replace wake_up_map node_id
-											(Int2Set.union old_candidates new_candidates)
-								| _ -> (*intro*)
-										let is_free = not (Node.is_bound (node, site_id)) in
-										let new_candidates =
-											let link_opt =
-												(match Node.follow (node, site_id) with
-													| None -> None
-													| Some (node', site_id') ->
-															Some (Node.name node', site_id'))
+					(* {(mix_id,cc_id),...} *)
+					(match modif_type with
+						| 0 -> (*internal state modif*)
+								let new_candidates =
+									Precondition.find_all (Node.name node) site_id (Node.internal_state (node, site_id)) None false	state.wake_up
+								in
+								(* adding pairs (mix_id,cc_id) to the potential new    *)
+								(* matches to be tried at anchor node_id               *)
+								IntMap.add node_id (Int2Set.union old_candidates new_candidates) wake_up_map
+						| 1 -> (*link state modification*)
+								let is_free = try not (Node.is_bound (node, site_id)) with Invalid_argument msg -> invalid_arg (Printf.sprintf "State.wake_up : no site %d in agent %s" site_id (Environment.name (Node.name node) env))
+								in
+								let new_candidates =
+									if is_free
+									then
+										Precondition.find_all (Node.name node) site_id None	None is_free state.wake_up
+									else
+										(let link_opt =
+												match Node.follow (node, site_id) with
+												| None -> invalid_arg "State.wake_up"
+												| Some (node', site_id') ->	Some (Node.name node', site_id')
 											in
-											Precondition.find_all (Node.name node) site_id
-												(Node.internal_state (node, site_id)) link_opt
-												is_free state.wake_up
-										in
-										Hashtbl.replace wake_up_map node_id
-											(Int2Set.union old_candidates new_candidates)))
-		modifs
+											Precondition.find_all (Node.name node) site_id None link_opt is_free state.wake_up)
+								in
+								IntMap.add node_id (Int2Set.union old_candidates new_candidates) wake_up_map 
+						| _ -> (*intro*)
+								let is_free = not (Node.is_bound (node, site_id)) in
+								let new_candidates =
+									let link_opt =
+										(match Node.follow (node, site_id) with
+											| None -> None
+											| Some (node', site_id') ->
+													Some (Node.name node', site_id'))
+									in
+									Precondition.find_all (Node.name node) site_id (Node.internal_state (node, site_id)) link_opt	is_free state.wake_up
+								in
+								IntMap.add node_id (Int2Set.union old_candidates new_candidates) wake_up_map
+				)
+		)	modifs wake_up_map
 
 (*Note: update_dep is recursive but the first call should always be with dep_in = (KAPPA mix_id) or EVENT or TIME*)
 let rec update_dep state dep_in pert_ids counter env =
@@ -846,7 +837,7 @@ let enabled r state =
 let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) counter env = (*pert_intro is temporary*)
 	
 	(* sub function find_new_inj *)
-	let find_new_inj state var_id mix cc_id node_id root pert_ids already_done_map new_injs env =
+	let find_new_inj state var_id mix cc_id node_id root pert_ids already_done_map new_injs tracked env =
 		if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Trying to embed Var[%d] using root %d at node %d" var_id root node_id);
 		let root_node_set =	try IntMap.find var_id already_done_map
 			with Not_found -> Int2Set.empty in
@@ -883,7 +874,7 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 		match opt_emb	with
 		| None ->
 				(if !Parameter.debugModeOn then Debug.tag "No new embedding was found";
-				(env,state, pert_ids, already_done_map, new_injs)
+				(env,state, pert_ids, already_done_map, new_injs,tracked)
 				)
 		| Some (embedding, port_map) ->
 				if !Parameter.debugModeOn then Debug.tag	(Printf.sprintf "New embedding: %s" (Injection.to_string embedding)) ;
@@ -894,6 +885,9 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 				let state = {state with graph = graph}
 				in
 				begin
+					(*a new embedding was found for var_id*)
+					let tracked = if Environment.is_tracked var_id env then var_id::tracked else tracked
+					in
 					update_activity state r.r_id var_id counter env;
 					let env,pert_ids = 
 						update_dep state (Mods.KAPPA var_id) pert_ids counter env
@@ -902,18 +896,18 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 					let already_done_map' = IntMap.add var_id	(Int2Set.add (root, node_id) root_node_set) already_done_map 
 					in
 					let new_injs' = if Environment.is_nl_rule var_id env then embedding::new_injs else new_injs in 
-					(env,state, pert_ids, already_done_map',new_injs')
+					(env,state, pert_ids, already_done_map',new_injs',tracked)
 				end
 	in
 	(* end of sub function find_new_inj definition *)
 	
 	let vars_to_wake_up = enabled r state in
-	let env,state,pert_ids,already_done_map,new_injs =
+	let env,state,pert_ids,already_done_map,new_injs,tracked =
 		IntMap.fold 
-		(fun var_id map_list (env, state,pert_ids,already_done_map,new_injs) ->
+		(fun var_id map_list (env, state,pert_ids,already_done_map,new_injs,tracked) ->
 			if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Influence map tells me I should look for new injections of var[%d]" var_id) ;
 			List.fold_left 
-			(fun (env,state,pert_ids,already_done_map, new_injs) glue ->
+			(fun (env,state,pert_ids,already_done_map, new_injs,tracked) glue ->
 				let opt = IntMap.root glue in
 				match opt with
 					| None -> invalid_arg "State.positive_update"
@@ -945,30 +939,30 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 						in
 						let cc_id = Mixture.component_of_id root_mix mix in
 						(*already_done_map is empty because glueings are guaranteed to be different by construction*)
-						let env,state,pert_ids,already_done_map,new_injs = 
-							find_new_inj state var_id mix cc_id node_id root_mix pert_ids already_done_map new_injs env
+						let env,state,pert_ids,already_done_map,new_injs,tracked = 
+							find_new_inj state var_id mix cc_id node_id root_mix pert_ids already_done_map new_injs tracked env
 						in
-						(env,state, pert_ids, already_done_map, new_injs)
-			) (env,state, pert_ids, already_done_map, new_injs) map_list
-		) vars_to_wake_up (env, state, IntSet.empty, IntMap.empty,[])  
+						(env,state, pert_ids, already_done_map, new_injs,tracked)
+			) (env,state, pert_ids, already_done_map, new_injs,tracked) map_list
+		) vars_to_wake_up (env, state, IntSet.empty, IntMap.empty,[],[])  
 	in
 	
-	if not r.Dynamics.side_effect then (env,state,pert_ids,new_injs)
+	if not r.Dynamics.side_effect then (env,state,pert_ids,new_injs,tracked)
 	
 	else	(*Handling side effects*)
 	
-	let wu_map = Hashtbl.create !Parameter.defaultExtArraySize
+	let wu_map = IntMap.empty
 	in
-		wake_up state 1 side_modifs wu_map env;
-		wake_up state 2 pert_intro wu_map env;
-		let (env,state, pert_ids,_,new_injs) =
-		Hashtbl.fold
-		(fun node_id candidates (env,state, pert_ids, already_done_map,new_injs) ->
+		let wu_map = wake_up state 1 side_modifs wu_map env in
+		let wu_map = wake_up state 2 pert_intro wu_map env in
+		let (env,state, pert_ids,_,new_injs,tracked) =
+		IntMap.fold
+		(fun node_id candidates (env,state, pert_ids, already_done_map,new_injs,tracked) ->
 			if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Side effect on node %d forces me to look for new embedding..." node_id);
 			let node = SiteGraph.node_of_id state.graph node_id
 			in
 			Int2Set.fold
-			(fun (var_id, cc_id) (env, state, pert_ids, already_done_map, new_injs) ->
+			(fun (var_id, cc_id) (env, state, pert_ids, already_done_map, new_injs,tracked) ->
 				let mix =
 					let opt =
 						try state.kappa_variables.(var_id)
@@ -984,13 +978,13 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 					Mixture.ids_of_name ((Node.name node), cc_id) mix
 				in
 					IntSet.fold 
-					(fun root (env,state, pert_ids, already_done_map, new_injs) ->
-						find_new_inj state var_id mix cc_id node_id root pert_ids already_done_map new_injs env
-					) possible_roots (env,state, pert_ids, already_done_map, new_injs)
-			) candidates (env, state, pert_ids, already_done_map, new_injs)
-	)	wu_map (env, state, pert_ids, already_done_map, new_injs)
+					(fun root (env,state, pert_ids, already_done_map, new_injs,tracked) ->
+						find_new_inj state var_id mix cc_id node_id root pert_ids already_done_map new_injs tracked env
+					) possible_roots (env,state, pert_ids, already_done_map, new_injs, tracked)
+			) candidates (env, state, pert_ids, already_done_map, new_injs, tracked)
+	)	wu_map (env, state, pert_ids, already_done_map, new_injs,tracked)
 	in
-	(env,state,pert_ids, new_injs)
+	(env,state,pert_ids, new_injs,tracked)
 	
 
 (* Negative update *)
