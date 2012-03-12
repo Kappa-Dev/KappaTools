@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 09/03/2012
+  * Last modification: 12/03/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -216,6 +216,17 @@ maps each wire to the set of its previous states, this summarize the potential s
            )
            blackboard.history_of_predicate_values_to_predicate_id 
        in 
+       let _ = Printf.fprintf log "*\nObservables \n*\n" in
+       let _ = 
+         List.iter 
+           (fun l -> 
+             let _ = List.iter (Printf.fprintf log "%i,") l in 
+             let _ = Printf.fprintf log "\n" in 
+             () 
+           )
+           blackboard.pre_observable_list 
+       in 
+           
        let _ = Printf.fprintf log "**\n" in 
        error 
 
@@ -503,7 +514,7 @@ maps each wire to the set of its previous states, this summarize the potential s
     let _ = A.set blackboard.pre_steps_by_column predicate_id (1,[nsid,0,test,action])  in 
     error,{blackboard with pre_nsteps = nsid} 
  
-  let add_fictitious_action error site test action predicate_id blackboard = 
+  let add_fictitious_action error test action predicate_id blackboard = 
     let nsid = blackboard.pre_nsteps in 
     let map = blackboard.pre_steps_by_column in 
     let value,list = A.get map predicate_id in 
@@ -642,7 +653,7 @@ maps each wire to the set of its previous states, this summarize the potential s
                           let blackboard = {blackboard with pre_nsteps = blackboard.pre_nsteps+1} in 
                           List.fold_left
                             (fun (error,blackboard) (predicate_id,(test,action)) -> 
-                              add_fictitious_action error site test action predicate_id blackboard)
+                              add_fictitious_action error test action predicate_id blackboard)
                             (error,blackboard) 
                             ((predicate_id,(Counter 0,Counter 1))::list)
                         )
@@ -712,27 +723,51 @@ maps each wire to the set of its previous states, this summarize the potential s
         blackboard.pre_steps_by_column 
     in 
     let _ = A.set blackboard.pre_kind_of_event nsid (type_of_step (K.type_of_refined_step step)) in 
-    let blackboard = 
-      if fictitious_local_list = []
+    let observable_list = 
+      if K.is_obs_of_refined_step step 
       then 
-        { 
-          blackboard with 
-            pre_steps_by_column = pre_steps_by_column; 
-            pre_nsteps = nsid;
-        }
-      else 
-        { 
-          blackboard with 
-            pre_fictitious_list = fictitious_list ; 
-            pre_steps_by_column = pre_steps_by_column; 
-            pre_nsteps = nsid;
-        }
+        [nsid]::blackboard.pre_observable_list 
+      else
+        blackboard.pre_observable_list 
+    in 
+    let blackboard = 
+      { 
+        blackboard with 
+          pre_fictitious_list = fictitious_list ; 
+          pre_steps_by_column = pre_steps_by_column; 
+          pre_nsteps = nsid;
+          pre_observable_list = observable_list; 
+      }
     in 
     error,blackboard 
 
   let finalize parameter handler error blackboard = 
-    error,blackboard 
-
+    let l = blackboard.pre_fictitious_list in 
+      match l 
+      with 
+        | [] -> error,blackboard 
+        | _ -> 
+          let nsid = blackboard.pre_nsteps + 1 in 
+          let observable_list = 
+            List.map (fun x -> nsid::x) blackboard.pre_observable_list 
+          in 
+          let blackboard = 
+            {
+              blackboard 
+             with 
+               pre_nsteps = nsid ;
+               pre_observable_list = observable_list
+            }
+          in 
+          let error,blackboard = 
+            List.fold_left
+              (fun (error,blackboard) predicate_id ->             
+                add_fictitious_action error Undefined Unknown predicate_id blackboard)
+              (error,blackboard)
+              l
+          in 
+          error,blackboard
+            
   (**interface*)
   let n_predicates parameter handler error blackboard = 
     error,blackboard.pre_ncolumn+1

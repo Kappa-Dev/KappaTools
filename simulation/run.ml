@@ -100,9 +100,8 @@ let event state grid event_list counter plot env =
                                             let event_list = Kappa_instantiation.Cflow_linker.store_event (Kappa_instantiation.Cflow_linker.import_event (r,phi,psi)) event_list in 
                                             let event_list = 
                                               List.fold_left 
-                                                (fun event_list obs -> 
+                                                (fun event_list (obs,phi) -> 
                                                   let lhs = State.kappa_of_id obs state in 
-                                                  let phi = Mods.IntMap.empty in (* TO DO *)
                                                     Kappa_instantiation.Cflow_linker.store_obs (obs,lhs,phi) event_list)
                                                 event_list obs_from_rule_app
                                             in 

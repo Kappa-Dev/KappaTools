@@ -53,7 +53,9 @@ let weak_compression env step_list =
       (error,blackboard)
       refined_event_list
   in 
-    let _ = 
+  let error,blackboard = 
+    Blackboard_generation.Preblackboard.finalize parameter handler error blackboard in 
+  let _ = 
     if debug_mode 
     then 
       Printf.fprintf stderr "\nPretty printing the grid\n"
