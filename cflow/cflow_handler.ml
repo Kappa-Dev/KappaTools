@@ -84,8 +84,8 @@ module Cflow_handler =
         let _ = f "message: " "\n" error.error_message in
         let _ = f "function: " "\n" error.caml_function in 
         let _ = f "module: " "\n" error.caml_module in 
-        let _ = f "error " "has been raised\n" (string_of_exn error.exn) in 
-        flush log 
+        let _ = f "error " "has been raised\n%!" (string_of_exn error.exn) in 
+        () 
 
 
       let raise_error parameter handler error_list log error def = 

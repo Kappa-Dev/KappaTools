@@ -98,7 +98,7 @@ sig
   val import_env: Environment.t -> kappa_sig 
   val store_event: event -> step list -> step list 
   val store_init : State.implicit_state -> step list -> step list 
-    
+  val store_obs : step list -> step list 
 end 
 
 
@@ -648,6 +648,6 @@ module Cflow_linker =
   let import_env x = x
   let store_event event step_list = (Event event)::step_list    
   let store_init init step_list = create_init init step_list  
- 	
+  let store_obs step_list = step_list 
 end:Cflow_signature)
 

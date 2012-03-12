@@ -24,7 +24,7 @@ let weak_compression env step_list =
   let _ = 
     if debug_mode 
     then 
-      Printf.fprintf stderr "Refining event" 
+      Printf.fprintf stderr "\nRefining event\n" 
   in 
   let refined_event_list = List.map (Kappa_instantiation.Cflow_linker.refine_step (Kappa_instantiation.Cflow_linker.import_env env)) (List.rev step_list) in 
   let _ = 
@@ -35,7 +35,17 @@ let weak_compression env step_list =
   let parameter = () in 
   let handler = () in 
   let error = [] in 
+  let _ = 
+    if debug_mode 
+    then 
+      Printf.fprintf stderr "\nDealing with initial states\n" 
+  in 
   let error,blackboard = Blackboard_generation.Preblackboard.init parameter handler error   in
+  let _ = 
+    if debug_mode 
+    then 
+      Printf.fprintf stderr "\nDealing with steps\n" 
+  in 
   let error,blackboard = 
     List.fold_left 
       (fun (error,blackboard) refined_event  -> 
@@ -43,11 +53,21 @@ let weak_compression env step_list =
       (error,blackboard)
       refined_event_list
   in 
+    let _ = 
+    if debug_mode 
+    then 
+      Printf.fprintf stderr "\nPretty printing the grid\n"
+  in 
   let error = 
     if debug_mode 
     then 
       Blackboard_generation.Preblackboard.print_preblackboard parameter handler error stderr blackboard 
     else 
       error 
+  in 
+  let _ = 
+    List.iter 
+      (Blackboard_generation.Preblackboard.H.dump_error parameter handler error stderr)
+      error
   in 
   () 
