@@ -886,7 +886,7 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 				in
 				begin
 					(*a new embedding was found for var_id*)
-					let tracked = if Environment.is_tracked var_id env then var_id::tracked else tracked
+					let tracked = if Environment.is_tracked var_id env then (var_id,Injection.to_map embedding)::tracked else tracked
 					in
 					update_activity state r.r_id var_id counter env;
 					let env,pert_ids = 
@@ -904,7 +904,7 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 	let vars_to_wake_up = enabled r state in
 	let env,state,pert_ids,already_done_map,new_injs,tracked =
 		IntMap.fold 
-		(fun var_id map_list (env, state,pert_ids,already_done_map,new_injs,tracked) ->
+		(fun var_id map_list (env, state,pert_ids,already_done_map,new_injs, tracked) ->
 			if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Influence map tells me I should look for new injections of var[%d]" var_id) ;
 			List.fold_left 
 			(fun (env,state,pert_ids,already_done_map, new_injs,tracked) glue ->
