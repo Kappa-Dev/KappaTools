@@ -35,9 +35,10 @@ sig
   val undefined: predicate_value 
   val strictly_more_refined: predicate_value -> predicate_value -> bool 
 
-  (** initialisation*)
+  (** generation*)
   val init:  (H.error_channel * pre_blackboard) H.with_handler 
   val add_step: (Kappa_instantiation.Cflow_linker.refined_step -> pre_blackboard -> H.error_channel * pre_blackboard) H.with_handler
+  val finalize: (pre_blackboard -> H.error_channel * pre_blackboard) H.with_handler 
 
   (**pretty printing*)
   val print_preblackboard: (out_channel -> pre_blackboard -> H.error_channel) H.with_handler  
@@ -48,7 +49,7 @@ sig
   val n_events_per_predicate: (pre_blackboard -> predicate_id -> H.error_channel * int) H.with_handler 
   val event_list_of_predicate: (pre_blackboard -> predicate_id -> H.error_channel * (int * int * predicate_value * predicate_value ) list) H.with_handler 
   val mandatory_events: (pre_blackboard -> H.error_channel * ((int list) list)) H.with_handler 
-
+ 
 end
 
 module Preblackboard = 
@@ -113,6 +114,7 @@ module Preblackboard =
 	   predicate_id_list_related_to_predicate_id: PredicateidSet.t A.t; (** maps each wire id for the presence of an agent to the set of wires for its attibute (useful, when an agent get removed, all its attributes get undefined *)
            history_of_predicate_values_to_predicate_id: CaseValueSet.t A.t; (** 
 maps each wire to the set of its previous states, this summarize the potential state of a site that is freed, so as to overapproximate the set of potential side effects*)
+           pre_observable_list: step_id list list 
            } 
 
 
@@ -491,6 +493,7 @@ maps each wire to the set of its previous states, this summarize the potential s
       pre_kind_of_event = A.make 1 (Side_effect_of (-1,[])) ;
       history_of_predicate_values_to_predicate_id = A.make 1 CaseValueSet.empty;
       predicate_id_list_related_to_predicate_id = A.make 1 PredicateidSet.empty ;
+      pre_observable_list = [];
     }
     
   let init_fictitious_action error predicate_id blackboard = 
@@ -725,6 +728,9 @@ maps each wire to the set of its previous states, this summarize the potential s
             pre_nsteps = nsid;
         }
     in 
+    error,blackboard 
+
+  let finalize parameter handler error blackboard = 
     error,blackboard 
 
   (**interface*)

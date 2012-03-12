@@ -61,11 +61,11 @@ sig
 
   type event 
   type init 
-  type obs 
-  type step 
-  type kappa_rule 
   type embedding
   type fresh_map 
+  type obs  
+  type step 
+  type kappa_rule 
   type refined_event 
   type refined_step
 
@@ -98,7 +98,7 @@ sig
   val import_env: Environment.t -> kappa_sig 
   val store_event: event -> step list -> step list 
   val store_init : State.implicit_state -> step list -> step list 
-  val store_obs : step list -> step list 
+  val store_obs :  int * Mixture.t * int Mods.IntMap.t -> step list -> step list 
 end 
 
 
@@ -125,7 +125,7 @@ module Cflow_linker =
 
   type init = agent * (site_name * (int option * Node.ptr)) list
   type event = kappa_rule * embedding * fresh_map
-  type obs = unit 
+  type obs = int * Mixture.t * embedding 
 
 
   type kappa_sig = Environment.t 
@@ -167,7 +167,7 @@ module Cflow_linker =
 
   type refined_event = event * test list * (action list * ((site * binding_state) list))
   type refined_init = init * action list
-  type refined_obs = unit 
+  type refined_obs =  obs * test list 
 
   type step = (event,init,obs) choice 
   type refined_step = (refined_event,refined_init,refined_obs) choice 
@@ -572,9 +572,9 @@ module Cflow_linker =
 
   let refine_event env event = (event,tests_of_event event,actions_of_event event env)
     
-  let refine_obs env obs = () 
+  let refine_obs env obs = obs,[] 
 
-  let obs_of_refined_obs () = () 
+  let obs_of_refined_obs = fst 
 
   let event_of_refined_event (a,_,_) = a
 
@@ -587,7 +587,7 @@ module Cflow_linker =
   let tests_of_refined_event (_,y,_) =  y
   let actions_of_refined_event (_,_,y) = y
   let actions_of_refined_init (_,x) = x,[]
-  let actions_of_refined_obs () = [],[]
+  let actions_of_refined_obs _ = [],[]
   let rule_of_refined_event x = (compose rule_of_event event_of_refined_event) x 
 
   let print_side_effects log env prefix (site,state) = 
@@ -648,6 +648,6 @@ module Cflow_linker =
   let import_env x = x
   let store_event event step_list = (Event event)::step_list    
   let store_init init step_list = create_init init step_list  
-  let store_obs step_list = step_list 
+  let store_obs (i,a,x) step_list = step_list 
 end:Cflow_signature)
 

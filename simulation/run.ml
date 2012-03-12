@@ -101,7 +101,9 @@ let event state grid event_list counter plot env =
                                             let event_list = 
                                               List.fold_left 
                                                 (fun event_list obs -> 
-                                                    Kappa_instantiation.Cflow_linker.store_obs event_list)
+                                                  let lhs = State.kappa_of_id obs state in 
+                                                  let phi = Mods.IntMap.empty in (* TO DO *)
+                                                    Kappa_instantiation.Cflow_linker.store_obs (obs,lhs,phi) event_list)
                                                 event_list obs_from_rule_app
                                             in 
 					    (Causal.record ~decorate_with:obs_from_rule_app r side_effect (phi,psi) (Counter.event counter) grid env, (*to be removed*)
