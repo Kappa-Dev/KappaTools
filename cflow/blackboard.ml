@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 06/09/2011
-  * Last modification: 12/03/2012
+  * Last modification: 13/03/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -26,40 +26,21 @@ sig
   type case_info
   type case_value 
   type case_address  
- 
-  (** propagation request *)
-
-  type instruction 
 
   (** blackboard*)
 
   type blackboard      (*blackboard, once finalized*)
- (* type stack *)
   type assign_result
 
   val set: (case_address -> case_value -> blackboard  -> PB.H.error_channel * blackboard) PB.H.with_handler 
   val get: (case_address -> blackboard -> PB.H.error_channel * case_value) PB.H.with_handler 
   val overwrite: (case_address -> case_value -> blackboard -> PB.H.error_channel * blackboard) PB.H.with_handler  
   val refine: (case_address -> case_value -> blackboard -> PB.H.error_channel * blackboard * assign_result) PB.H.with_handler  
-    
-
-(*  val strictly_more_refined: case_value -> case_value -> bool*)
-
-
-(*  val record_modif: ((case_address * case_value option) -> stack -> PB.H.error_channel * stack) PB.H.with_handler*)
-
   val branch: (blackboard -> PB.H.error_channel *blackboard) PB.H.with_handler 
   val reset_last_branching: (blackboard -> PB.H.error_channel * blackboard ) PB.H.with_handler 
   val reset_init: (blackboard -> PB.H.error_channel * blackboard) PB.H.with_handler 
   (** initialisation*)
   val import: (PB.pre_blackboard -> PB.H.error_channel * blackboard) PB.H.with_handler 
-
-
-  (** heuristics *)
-  val next_choice: (blackboard -> PB.H.error_channel * instruction list) PB.H.with_handler 
-  val propagation_heuristic: (blackboard -> instruction  -> instruction list -> PB.H.error_channel * instruction list) PB.H.with_handler 
-  val apply_instruction: (blackboard -> instruction -> instruction list -> (PB.H.error_channel * (case_address*case_value) list * instruction list)) PB.H.with_handler 
-
 
   (** output result*)
   type result 
@@ -81,7 +62,7 @@ module Blackboard =
 
     type assign_result = Fail | Success | Ignore 
         
-    type step_id = int 
+    type step_id = PB.step_id 
     type step_short_id = int 
         
     type event_case_address = 
@@ -89,6 +70,12 @@ module Blackboard =
 	  column_id:PB.predicate_id; 
 	  row_id: step_short_id;
 	}
+
+    let build_event_case_address pid seid = 
+      {
+        column_id = pid ;
+        row_id = seid 
+      }
 	  
     type case_address = 
       | N_unresolved_events_in_column of int 
@@ -382,6 +369,10 @@ module Blackboard =
          (PB.A.get blackboard.blackboard case_address.column_id)
          case_address.row_id 
 
+     let set_case parameter handler error case_address case_value blackboard = 
+       let _ = PB.A.set (PB.A.get blackboard.blackboard case_address.column_id) case_address.row_id case_value in 
+       error,blackboard 
+
      let set parameter handler error case_address case_value blackboard = 
        match 
          case_address 
@@ -404,11 +395,13 @@ module Blackboard =
                 match case_value
                 with 
                   | Pointer int2 -> 
-                    (*let _ = PB.A.set blackboard.weigth_of_predicate_id int int2 in *) (* TO DO *)
+                    let error,old = get_case parameter handler error case_address blackboard in 
+                    let case_value = {old with dynamic = {old.dynamic with pointer_next = int2}} in 
+                    let error,blackboard = set_case parameter handler error case_address case_value blackboard in 
                     error,blackboard 
                   | _ -> 
                     let error_list,error = 
-                   PB.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "398") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
+                   PB.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "423") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
                  in 
                  PB.H.raise_error parameter handler error_list stderr error blackboard 
               end 
@@ -417,11 +410,13 @@ module Blackboard =
              match case_value
              with 
                | State state -> 
-                    (*let _ = PB.A.set blackboard.weigth_of_predicate_id int int2 in *) (* TO DO *)
+                 let error,old = get_case parameter handler error case_address blackboard in 
+                 let case_value = {old with dynamic = {old.dynamic with state_after = state}} in 
+                 let error,blackboard = set_case parameter handler error case_address case_value blackboard in 
                  error,blackboard 
                | _ -> 
                  let error_list,error = 
-                   PB.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "398") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
+                   PB.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "438") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
                  in 
                  PB.H.raise_error parameter handler error_list stderr error blackboard 
            end 
@@ -435,11 +430,13 @@ module Blackboard =
                 match case_value
                 with 
                   | Pointer int2 -> 
-                    (*let _ = PB.A.set blackboard.weigth_of_predicate_id int int2 in *) (* TO DO *)
+                    let error,old = get_case parameter handler error case_address blackboard in 
+                    let case_value = {old with dynamic = {old.dynamic with pointer_previous = int2}} in 
+                    let error,blackboard = set_case parameter handler error case_address case_value blackboard in 
                     error,blackboard 
                   | _ -> 
                     let error_list,error = 
-                   PB.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "398") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
+                   PB.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "458") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
                  in 
                  PB.H.raise_error parameter handler error_list stderr error blackboard 
               end 
@@ -448,11 +445,10 @@ module Blackboard =
              match case_value
              with 
                | Counter int -> 
-                    (*let _ = PB.A.set blackboard.weigth_of_predicate_id int int2 in *) (* TO DO *)
-                 error,blackboard 
+                 error,{blackboard with n_unresolved_events = int}
                | _ -> 
                  let error_list,error = 
-                   PB.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "398") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
+                   PB.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "470") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
                  in 
                  PB.H.raise_error parameter handler error_list stderr error blackboard 
            end 
@@ -474,7 +470,7 @@ module Blackboard =
            if is_null_pointer pointer 
            then 
               let error_list,error = 
-                PB.H.create_error parameter handler error (Some "blackboard.ml") None (Some "get") (Some "404") (Some "Value before an unexisting element requested ") (failwith "Value before an unexisting element requested")  
+                PB.H.create_error parameter handler error (Some "blackboard.ml") None (Some "get") (Some "492") (Some "Value before an unexisting element requested ") (failwith "Value before an unexisting element requested")  
               in 
               PB.H.raise_error parameter handler error_list stderr error (State PB.undefined)
            else 
@@ -519,20 +515,37 @@ module Blackboard =
 
 
          
-     let branch parameter handler error blackboard = error,blackboard
+     let branch parameter handler error blackboard = 
+       error,
+       {
+         blackboard 
+        with 
+          stack = blackboard.current_stack::blackboard.stack ; 
+          current_stack = []
+       }
        
-     let reset_last_branching parameter handler error blackboard = error,blackboard 
-     let reset_init parameter handler error blackboard = error,blackboard 
+     let reset_last_branching parameter handler error blackboard = 
+       let stack = blackboard.current_stack in 
+       let error,blackboard = 
+         List.fold_left 
+           (fun (error,blackboard) (case_address,case_value) -> 
+             set parameter handler error case_address case_value blackboard)
+           (error,blackboard)
+           stack 
+       in 
+       match blackboard.stack 
+       with 
+         | [] -> error,{blackboard with current_stack = []}
+         | t::q -> error,{blackboard with current_stack = t ; stack = q }
+
+     let reset_init parameter handler error blackboard = 
+       let rec aux (error,blackboard) = 
+         match blackboard.current_stack 
+         with 
+           | []   -> error,blackboard 
+           | _  -> aux (reset_last_branching parameter handler error blackboard)
+       in aux (error,blackboard) 
     
-  (** heuristics *)
-     type instruction = unit 
-     
-     let next_choice parameter handler error blackboard = error,[]
-       
-     let propagation_heuristic parameter handler error blackboard instruction instruction_list = error,instruction_list 
-       
-     let apply_instruction parameter handler error blackboard instruction instruction_list = error,[],instruction_list 
- 
   (** output result*)
      type result = ()
          

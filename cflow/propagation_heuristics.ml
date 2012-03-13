@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 05/09/2011
-  * Last modification: 05/09/2011
+  * Last modification: 13/03/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -18,105 +18,35 @@
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
-module type Blackboard = 
+module type Blackboard_with_heuristic = 
   sig
-    module H:Cflow_handler.Cflow_handler
-     
+    module B:Blackboard.Blackboard 
+
+    type instruction 
+      
+     (** heuristics *)
+    val next_choice: (B.blackboard -> B.PB.H.error_channel * instruction list) B.PB.H.with_handler 
+    val propagation_heuristic: (B.blackboard -> instruction  -> instruction list -> B.PB.H.error_channel * instruction list * instruction list) B.PB.H.with_handler 
+    val apply_instruction: (B.blackboard -> instruction -> instruction list -> (B.PB.H.error_channel * (B.case_address*B.case_value) list * instruction list)) B.PB.H.with_handler 
   end 
 
-type agent 
-type site 
+module Propagation_heuristic = 
+  (struct 
 
-type event = int 
-type short_event = int 
-type wire 
+    module B=Blackboard.Blackboard 
 
-module EventMap = MapExt.Make (struct type t = event let compare = compare end)
-type case_address =  wire * short_event
+    type instruction = 
+      | Keep_event of int (*B.PB.step_id*)
+(*      | Discard_event of B.PB.step_id 
+      | Propagate_up of case_address * case_value 
+      | Propagate_down of case_address * case_value 
+      | Decrease_counter of case_address 
+*)        
+    let next_choice parameter handler error blackboard = error,[]
+    let propagation_heuristic parameter handler error blackboard instruction list = 
+      error,[],list
+    let apply_instruction parameter handler error blackboard instruction instruction_list = 
+      error,[],instruction_list 
+        
 
-type wire_type = 
-  | Here of agent 
-  | Internal_state of agent * site 
-  | Bound_or_not of agent * site 
-  | Bound_to of agent * site 
-
-type case_info = 
-    { 
-      wire_type: wire_type ; 
-      event_before: event option ; 
-      event_after: event option ;
-      short_event_after : short_event option ;
-      short_event_before : short_event option ;
-    }
-
-type case_value = 
-  | Counter of int 
-  | Internat_state of string 
-  | Undefined 
-  | Present
-  | Free 
-  | Bound 
-  | Bound_to of wire * agent * site
-  | Bound_to_type of agent * site
-  | Defined
-
-let is_equal pattern state = pattern = state 
-let is_compatible pattern state = 
-  match pattern
-  with 
-    | Undefined -> state=Undefined
-    | Defined -> not (state=Undefined)
-    | Bound_to_type (ag,site) -> 
-	begin
-	  match state 
-	  with 
-	    | Bound_to (_,ag',site') -> ag=ag' & site=site' 
-	    | _ -> false
-	end 
-    | Bound -> 
-	begin
-	  match state
-	  with 
-	    | Bound_to (_) -> true
-	    | _ -> false 
-	end 
-    | _ -> is_equal pattern state
-
-let is_compatible pattern state = 
-  match pattern
-  with 
-    | Undefined -> state=Undefined
-    | Defined -> not (state=Undefined)
-    | Bound_to_type (ag,site) -> 
-	begin
-	  match state 
-	  with 
-	    | Bound_to (_,ag',site') -> ag=ag' & site=site' 
-	    | _ -> false
-	end 
-    | Bound -> 
-	begin
-	  match state
-	  with 
-	    | Bound_to (_) -> true
-	    | _ -> false 
-	end 
-    | _ -> is_equal pattern state
-
-type instruction = 
-  | Keep_event of event
-  | Discard_event of event 
-  | Propagate_up of case_address * case_value 
-  | Propagate_down of case_address * case_value 
-  | Decrease_counter of case_address 
-
-type blackboard = 
-    {
-      matrix: case_value array array; 
-      event_to_quark_list: case_address list array;
-      quark_to_mod_list: (case_value*case_value)  EventMap.t array;
-      unsolved_events:int;
-      unsolved_events_list:event list;
-
-      
-    }
+  end:Blackboard_with_heuristic)

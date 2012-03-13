@@ -24,6 +24,8 @@ sig
   module K:Kappa_instantiation.Cflow_signature
   module A:LargeArray.GenArray
 
+  type step_id = int 
+
   (** blackboard predicates*)
 
   type predicate_id = int
