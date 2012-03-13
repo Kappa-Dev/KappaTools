@@ -148,7 +148,7 @@ let loop state grid event_list counter plot env =
 			begin
 				if Environment.tracking_enabled env then
 				  begin
-				    Causal.dot_of_grid grid state env ;
+				    Causal.dot_of_grid !Parameter.cflowFileName grid state env ;
 				    let refined_event_list = Compression_main.weak_compression env event_list 
 	          in ()
 				  end;

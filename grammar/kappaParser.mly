@@ -1,7 +1,7 @@
 %{
 %}
 
-%token EOF NEWLINE
+%token EOF NEWLINE IN
 %token AT OP_PAR CL_PAR COMMA DOT KAPPA_LNK PIPE
 %token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE SET DO UNTIL TRUE FALSE REF OBS KAPPA_RAR TRACK CPUTIME
 %token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INFINITY TIME EVENT NULL_EVENT PROD_EVENT INIT LET DIV PLOT SINUS COSINUS TAN SQRT EXPONENT POW ABS MODULO 
@@ -140,16 +140,16 @@ modif_expr:
 	{raise (ExceptionDefn.Syntax_Error "Malformed perturbation instruction, I was expecting '$DEL alg_expression kappa_expression'")}
 | LABEL SET alg_expr 
 	{let lab,pos_lab = $1 in Ast.UPDATE (lab,pos_lab,$3,$2)}
-| SNAPSHOT snapshot_label
+| SNAPSHOT fic_label
 	{Ast.SNAPSHOT ($2,$1)}
-| STOP snapshot_label
+| STOP fic_label
 	{Ast.STOP ($2,$1)}
-| TRACK LABEL {let lab,pos_lab = $2 in Ast.CFLOW (lab,pos_lab,$1)}
+| TRACK LABEL fic_label {let lab,pos_lab = $2 in Ast.CFLOW (lab,pos_lab,$1,$3)}
 ;
 
-snapshot_label:
+fic_label:
 /*empty*/ {None}
-| FILENAME {Some $1}
+| IN FILENAME {Some $2}
 
 multiple:
 /*empty*/ {Ast.FLOAT (1.0,Tools.no_pos)}
@@ -274,25 +274,6 @@ non_empty_mixture:
 | agent_expression 
 	{Ast.COMMA($1,Ast.EMPTY_MIX)}
 ;
-
-/*
-non_empty_mixture:
-| OP_PAR non_empty_mixture CL_PAR
-	{$2}
-| non_empty_mixture COMMA agent_expression 
-	{Ast.COMMA ($3,$1)}
-| non_empty_mixture DOT agent_expression 
-	{Ast.DOT (-1,$3,$1)}
-| non_empty_mixture DOT_RADIUS agent_expression  
-	{Ast.DOT ($2,$3,$1)}
-| non_empty_mixture PLUS agent_expression  
-	{Ast.PLUS (-1,$3,$1)}
-| non_empty_mixture PLUS_RADIUS agent_expression 
-	{Ast.PLUS ($2,$3,$1)}
-| agent_expression 
-	{Ast.COMMA($1,Ast.EMPTY_MIX)}
-;
-*/
 
 agent_expression:
 | ID OP_PAR interface_expression CL_PAR 

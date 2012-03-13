@@ -143,11 +143,11 @@ let apply_effect p_id pert state counter env =
 					let env,pert_ids = State.update_dep state (RULE r_id) IntSet.empty counter env in
 					(env,state ,pert_ids,[])
 			| SNAPSHOT opt -> (snapshot opt ; (env, state ,IntSet.empty,[]))
-			| CFLOW id -> 
+			| CFLOW (id,fic_name_opt) -> 
 				if !Parameter.debugModeOn then Debug.tag "Tracking causality" ;
 				Parameter.causalModeOn := true ; 
 				let env = if Environment.is_tracked id env then env else Environment.inc_active_cflows env in 
-				let env = Environment.track id env in
+				let env = Environment.track id fic_name_opt env in
 				(env, state, IntSet.empty,[])
 			| STOP opt ->
 				(if !Parameter.debugModeOn then Debug.tag "Interrupting simulation now!" ;

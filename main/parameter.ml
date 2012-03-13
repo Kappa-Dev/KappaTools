@@ -38,6 +38,7 @@ let outputDirName = ref (Sys.getcwd ())
 let snapshotFileName = ref "snap"
 
 let dumpFileName = ref "dump.ka"
+let cflowFileName = ref "cflow.dot"
 let influenceFileName = ref ""
 let fluxFileName = ref "flux.dot"
 let outputDataName = ref "data.out"

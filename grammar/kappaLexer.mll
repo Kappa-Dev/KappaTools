@@ -41,6 +41,7 @@ rule token = parse
     | "\\\n" {incr_line lexbuf ; token lexbuf}
 		| "do" {let pos = position lexbuf in DO pos}
 		| "until" {let pos = position lexbuf in UNTIL pos}
+		| "in" {IN}
 		| ":=" {let pos = position lexbuf in SET pos}
 		| "&&" {let pos = position lexbuf in AND pos}
 		| "||" {let pos = position lexbuf in OR pos}

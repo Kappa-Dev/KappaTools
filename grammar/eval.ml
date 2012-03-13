@@ -709,12 +709,12 @@ let effects_of_modif variables env ast =
 			| Some (nme,pos) -> Some nme
 		in
 		(variables, Dynamics.STOP opt_name, str, env)
-	| CFLOW (lab,pos_lab,pos_pert) ->
+	| CFLOW (lab,pos_lab,pos_pert,opt_fic_name) ->
 		let id = try Environment.num_of_rule lab env with Not_found -> try Environment.num_of_kappa lab env with Not_found ->
 			raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
 		in
 		let str = Printf.sprintf "Causality analysis of %s" lab in
-		(variables, Dynamics.CFLOW id, str, env)
+		(variables, Dynamics.CFLOW (id,opt_fic_name), str, env)
 
 let pert_of_result variables env res =
 	let (variables, lpert, lrules, env) =

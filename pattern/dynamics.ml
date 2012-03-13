@@ -130,7 +130,7 @@ and modification =
 	| UPDATE of int * variable 
 	| SNAPSHOT of string option
 	| STOP of string option
-	| CFLOW of int
+	| CFLOW of int * (string * Tools.pos) option
 and boolean_variable = BCONST of bool | BVAR of ((int -> float) -> (int -> float) -> float -> int -> int -> float -> bool)
 
 let string_of_pert pert env =
@@ -140,7 +140,7 @@ let string_of_pert pert env =
 		| UPDATE (r_id,_) -> Printf.sprintf "UPDATE rule[%d]" r_id
 		| SNAPSHOT opt -> (match opt with None -> "SNAPSHOT" | Some s -> "SNAPSHOT("^s^")") 
 		| STOP opt -> (match opt with None -> "STOP" | Some s -> "STOP("^s^")")
-		| CFLOW id -> let nme = try Environment.rule_of_num id env with Not_found -> Environment.kappa_of_num id env in ("CFLOW "^nme)
+		| CFLOW (id,_) -> let nme = try Environment.rule_of_num id env with Not_found -> Environment.kappa_of_num id env in ("CFLOW "^nme)
 
 		
 let diff m0 m1 label_opt env =
