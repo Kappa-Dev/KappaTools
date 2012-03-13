@@ -40,7 +40,7 @@ let weak_compression env step_list =
     then 
       Printf.fprintf stderr "\nDealing with initial states\n" 
   in 
-  let error,blackboard = Blackboard.Blackboard.PB.init parameter handler error   in
+  let error,blackboard = Blackboard_generation.Preblackboard.init parameter handler error   in
   let _ = 
     if debug_mode 
     then 
@@ -49,13 +49,11 @@ let weak_compression env step_list =
   let error,blackboard = 
     List.fold_left 
       (fun (error,blackboard) refined_event  -> 
-        Blackboard.Blackboard.PB.add_step parameter handler error refined_event blackboard)
+        Blackboard_generation.Preblackboard.add_step parameter handler error refined_event blackboard)
       (error,blackboard)
       refined_event_list
   in 
-  let error,preblackboard = 
-    Blackboard.Blackboard.PB.finalize parameter handler error blackboard in 
- (* let _ = 
+    let _ = 
     if debug_mode 
     then 
       Printf.fprintf stderr "\nPretty printing the grid\n"
@@ -63,26 +61,13 @@ let weak_compression env step_list =
   let error = 
     if debug_mode 
     then 
-      Blackboard.Blackboard.PB.print_preblackboard parameter handler error stderr preblackboard 
+      Blackboard_generation.Preblackboard.print_preblackboard parameter handler error stderr blackboard 
     else 
       error 
-  in*) 
-  let error,blackboard = Blackboard.Blackboard.import parameter handler error preblackboard in 
-  let _ = 
-    if debug_mode 
-    then 
-      Printf.fprintf stderr "\nPretty printing the grid\n"
   in 
-  let error = 
-    if debug_mode 
-    then 
-      Blackboard.Blackboard.print_blackboard parameter handler error stderr blackboard 
-    else 
-      error 
-  in  
   let _ = 
     List.iter 
-      (Blackboard.Blackboard.PB.H.dump_error parameter handler error stderr)
+      (Blackboard_generation.Preblackboard.H.dump_error parameter handler error stderr)
       error
   in 
   () 

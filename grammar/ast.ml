@@ -20,6 +20,7 @@ type alg_expr =
 	| FLOAT of float * Tools.pos
 	| TMAX of Tools.pos
 	| EMAX of Tools.pos
+	| CPUTIME of Tools.pos
 	| INFINITY of Tools.pos
 
 type bool_expr =

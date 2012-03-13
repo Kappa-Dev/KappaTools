@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "2.1-090312"
+let version = "3.0-130312"
 
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
@@ -133,6 +133,7 @@ let main =
 			else (Causal.empty_grid(),[])
 		in
 		ExceptionDefn.flush_warning () ; 
+		Parameter.initSimTime () ; 
 		try
 			Run.loop state grid event_list counter plot env ;
 			print_newline() ;

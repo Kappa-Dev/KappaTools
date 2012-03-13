@@ -10,13 +10,14 @@ type event_kind = OBS of int | RULE of int | INIT | PERT of int
 type atom = 
 	{ 
 	causal_impact : int ; (*(1) tested (2) modified, (3) tested + modified*) 
-	eid:int (*event identifier*) ;
-	kind:event_kind
+	eid:int ; (*event identifier*)
+	kind:event_kind ;
+	observation: string list
 	}
 
 type attribute = atom list (*vertical sequence of atoms*)
 type grid = {flow: (int*int*int,attribute) Hashtbl.t}  (*(n_i,s_i,q_i) -> att_i with n_i: node_id, s_i: site_id, q_i: link (1) or internal state (0) *)
-type config = {events: event_kind IntMap.t ; prec_1: IntSet.t IntMap.t ; conflict : IntSet.t IntMap.t ; top : IntSet.t}
+type config = {events: atom IntMap.t ; prec_1: IntSet.t IntMap.t ; conflict : IntSet.t IntMap.t ; top : IntSet.t}
 
 let empty_config = {events=IntMap.empty ; conflict = IntMap.empty ; prec_1 = IntMap.empty ; top = IntSet.empty}
 let is i c = (i land c = i)
@@ -57,13 +58,13 @@ let push (a:atom) (att:atom list) =
 				a::att
 				 
 
-let add (node_id,site_id) c grid event_number kind =
+let add (node_id,site_id) c grid event_number kind obs =
  
 	(*adding a link modification*)
 	let grid = 
 		if (is _LINK_TESTED c) || (is _LINK_MODIF c) then
 			let att = try grid_find (node_id,site_id,1) grid with Not_found -> [] in
-			let att = push {causal_impact = impact 1 c ; eid = event_number ; kind = kind} att
+			let att = push {causal_impact = impact 1 c ; eid = event_number ; kind = kind ; observation = obs} att
 			in
 			grid_add (node_id,site_id,1) att grid
 		else
@@ -72,7 +73,7 @@ let add (node_id,site_id) c grid event_number kind =
 	if (is _INTERNAL_TESTED c) || (is _INTERNAL_MODIF c) then
 		(*adding an internal state modification*)
 		let att = try grid_find (node_id,site_id,0) grid with Not_found -> [] in
-		let att = push {causal_impact = impact 0 c ; eid = event_number ; kind = kind} att
+		let att = push {causal_impact = impact 0 c ; eid = event_number ; kind = kind ; observation = obs} att
 		in
 		grid_add (node_id,site_id,0) att grid
 	else 
@@ -80,10 +81,11 @@ let add (node_id,site_id) c grid event_number kind =
 		
 (**side_effect Int2Set.t: pairs (agents,ports) that have been freed as a side effect --via a DEL or a FREE action*)
 (*NB no internal state modif as side effect*)
-let record ?(decorate_with=[]) rule side_effects (embedding,fresh_map) event_number grid env = 
+let record ?decorate_with rule side_effects (embedding,fresh_map) event_number grid env = 
 	
 	let pre_causal = rule.Dynamics.pre_causal
 	and r_id = rule.Dynamics.r_id
+	and obs = match decorate_with with None -> [] | Some l -> (List.map (fun (id,_) -> Environment.kappa_of_num id env) l)
 	in
 	
 	let im embedding fresh_map id =
@@ -98,25 +100,25 @@ let record ?(decorate_with=[]) rule side_effects (embedding,fresh_map) event_num
 			Id2Map.fold
 			(fun (id,site_id) c grid ->
 				let node_id = im embedding fresh_map id in
-				add (node_id,site_id) c grid event_number (RULE r_id) 
+				add (node_id,site_id) c grid event_number (RULE r_id) obs 
 			) pre_causal grid
 		in
 		(*adding side effects modifications*)
 		Int2Set.fold 
-		(fun (node_id,site_id) grid -> add (node_id,site_id) _LINK_MODIF grid event_number (RULE r_id)) 
+		(fun (node_id,site_id) grid -> add (node_id,site_id) _LINK_MODIF grid event_number (RULE r_id) obs) 
 		side_effects grid
 	in
 	grid
 
 let add_pred eid atom config = 
-	let events = IntMap.add atom.eid atom.kind config.events
+	let events = IntMap.add atom.eid atom config.events
 	in
 	let pred_set = try IntMap.find eid config.prec_1 with Not_found -> IntSet.empty in
 	let prec_1 = IntMap.add eid (IntSet.add atom.eid pred_set) config.prec_1 in
 	{config with prec_1 = prec_1 ; events = events}
 
 let add_conflict eid atom config =
-	let events = IntMap.add atom.eid atom.kind config.events in
+	let events = IntMap.add atom.eid atom config.events in
 	let cflct_set = try IntMap.find eid config.conflict with Not_found -> IntSet.empty in
 	let cflct = IntMap.add eid (IntSet.add atom.eid cflct_set) config.conflict in
 	{config with conflict = cflct ; events = events }
@@ -126,7 +128,7 @@ let rec parse_attribute last_modif last_tested attribute config =
 		| [] -> config
 		| atom::att -> 
 			begin
-				let events = IntMap.add atom.eid atom.kind config.events
+				let events = IntMap.add atom.eid atom config.events
 				and prec_1 = let preds = try IntMap.find atom.eid config.prec_1 with Not_found -> IntSet.empty in IntMap.add atom.eid preds config.prec_1
 				in
 				let config = {config with events =  events ; prec_1 = prec_1} in
@@ -159,7 +161,7 @@ let cut attribute_ids grid =
 					match attribute with
 						| [] -> cfg
 						| atom::att -> 
-							let events = IntMap.add atom.eid atom.kind cfg.events 
+							let events = IntMap.add atom.eid atom cfg.events 
 							and top = IntSet.add atom.eid cfg.top
 							in 
 							let tested = if (atom.causal_impact = 1) || (atom.causal_impact = 3) then [atom.eid] else []
@@ -236,9 +238,10 @@ let dot_of_grid grid state env =
 		fprintf desc "{ rank = same ; \"%d\" [shape=plaintext] ; " d ;
 		IntSet.iter 
 		(fun eid ->
-			let kind = IntMap.find eid config.events in
-			if eid = 0 then () else 
-			fprintf desc "node_%d [label=\"%s\"] ;\n" eid (label kind)
+			let atom = IntMap.find eid config.events in
+			if eid = 0 then () else
+			fprintf desc "node_%d [label=\"%s\", shape=invhouse, style=filled, fillcolor = lightblue] ;\n" eid (label atom.kind) ; 
+			List.iter (fun obs -> fprintf desc "obs_%d [label =\"%s\", style=filled, fillcolor=red] ;\n node_%d -> obs_%d [arrowhead=vee];\n" eid obs eid eid) atom.observation ; 
 		) eids_at_d ;
 		fprintf desc "}\n" ;
 	) sorted_events ;

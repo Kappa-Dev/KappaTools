@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 12/03/2012
+  * Last modification: 09/03/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -26,23 +26,20 @@ sig
 
   (** blackboard predicates*)
 
-  type predicate_id = int
+  type predicate_id
   type predicate_info
   type predicate_value 
  
   type pre_blackboard  (*blackboard during its construction*)
  
   val undefined: predicate_value 
-  val unknown: predicate_value 
   val strictly_more_refined: predicate_value -> predicate_value -> bool 
 
-  (** generation*)
+  (** initialisation*)
   val init:  (H.error_channel * pre_blackboard) H.with_handler 
   val add_step: (Kappa_instantiation.Cflow_linker.refined_step -> pre_blackboard -> H.error_channel * pre_blackboard) H.with_handler
-  val finalize: (pre_blackboard -> H.error_channel * pre_blackboard) H.with_handler 
 
   (**pretty printing*)
-  val print_predicate_value: out_channel -> predicate_value -> unit 
   val print_preblackboard: (out_channel -> pre_blackboard -> H.error_channel) H.with_handler  
 
   (**interface*)
@@ -51,7 +48,7 @@ sig
   val n_events_per_predicate: (pre_blackboard -> predicate_id -> H.error_channel * int) H.with_handler 
   val event_list_of_predicate: (pre_blackboard -> predicate_id -> H.error_channel * (int * int * predicate_value * predicate_value ) list) H.with_handler 
   val mandatory_events: (pre_blackboard -> H.error_channel * ((int list) list)) H.with_handler 
- 
+
 end
 
 module Preblackboard = 
@@ -96,8 +93,6 @@ module Preblackboard =
        | Unknown (**  for agent presence, internal states, binding states (partial information *) 
 
      let undefined = Undefined 
-     let unknown = Unknown 
-
      (** maps and sets *)
      module PredicateMap = Map.Make (struct type t = predicate_info let compare = compare end)
      module PredicateSet = Set.Make (struct type t = predicate_info let compare = compare end)
@@ -118,7 +113,6 @@ module Preblackboard =
 	   predicate_id_list_related_to_predicate_id: PredicateidSet.t A.t; (** maps each wire id for the presence of an agent to the set of wires for its attibute (useful, when an agent get removed, all its attributes get undefined *)
            history_of_predicate_values_to_predicate_id: CaseValueSet.t A.t; (** 
 maps each wire to the set of its previous states, this summarize the potential state of a site that is freed, so as to overapproximate the set of potential side effects*)
-           pre_observable_list: step_id list list 
            } 
 
 
@@ -141,23 +135,23 @@ maps each wire to the set of its previous states, this summarize the potential s
        match x 
        with 
          | Point_to step_id -> 
-           Printf.fprintf log "Point_to %i" step_id 
+           Printf.fprintf log "Point_to %i \n" step_id 
          | Counter int ->  
-           Printf.fprintf log "Counter %i" int
+           Printf.fprintf log "Counter %i \n" int
          | Internal_state_is internal_state -> 
-           Printf.fprintf log "%i" internal_state  
+           Printf.fprintf log "%i \n" internal_state  
          | Undefined -> 
-           Printf.fprintf log "Undefined"
+           Printf.fprintf log "Undefined\n"
          | Present ->
-           Printf.fprintf log "Present"
+           Printf.fprintf log "Present\n"
          | Free -> 
-           Printf.fprintf log "Free" 
+           Printf.fprintf log "Free\n" 
          | Bound -> 
-           Printf.fprintf log "Bound" 
+           Printf.fprintf log "Bound\n" 
          | Bound_to (id,agent_id,agent_name,site) ->
-           Printf.fprintf log "Bound(%i,%i(%i)@%i)" id agent_id agent_name site
+           Printf.fprintf log "Bound(%i,%i(%i)@%i)\n" id agent_id agent_name site
          | Bound_to_type (agent,site)-> 
-           Printf.fprintf log "Bound(%i@%i)" agent site 
+           Printf.fprintf log "Bound(%i@%i)\n" agent site 
          | Unknown -> ()
 
      let print_predicate_id log blackboard i = 
@@ -181,10 +175,8 @@ maps each wire to the set of its previous states, this summarize the potential s
                    let _ = Printf.fprintf log "Short id: %i \n" seid in 
                    let _ = print_known log test "TEST:   " in
                    let _ = print_predicate_value log test in 
-                   let _ = Printf.fprintf log "\n" in 
                    let _ = print_known log action "ACTION: " in 
                    let _ = print_predicate_value log action in 
-                   let _ = Printf.fprintf log "\n" in 
                    ())
                  (List.rev list)
              in 
@@ -222,17 +214,6 @@ maps each wire to the set of its previous states, this summarize the potential s
            )
            blackboard.history_of_predicate_values_to_predicate_id 
        in 
-       let _ = Printf.fprintf log "*\nObservables \n*\n" in
-       let _ = 
-         List.iter 
-           (fun l -> 
-             let _ = List.iter (Printf.fprintf log "%i,") l in 
-             let _ = Printf.fprintf log "\n" in 
-             () 
-           )
-           blackboard.pre_observable_list 
-       in 
-           
        let _ = Printf.fprintf log "**\n" in 
        error 
 
@@ -510,7 +491,6 @@ maps each wire to the set of its previous states, this summarize the potential s
       pre_kind_of_event = A.make 1 (Side_effect_of (-1,[])) ;
       history_of_predicate_values_to_predicate_id = A.make 1 CaseValueSet.empty;
       predicate_id_list_related_to_predicate_id = A.make 1 PredicateidSet.empty ;
-      pre_observable_list = [];
     }
     
   let init_fictitious_action error predicate_id blackboard = 
@@ -520,7 +500,7 @@ maps each wire to the set of its previous states, this summarize the potential s
     let _ = A.set blackboard.pre_steps_by_column predicate_id (1,[nsid,0,test,action])  in 
     error,{blackboard with pre_nsteps = nsid} 
  
-  let add_fictitious_action error test action predicate_id blackboard = 
+  let add_fictitious_action error site test action predicate_id blackboard = 
     let nsid = blackboard.pre_nsteps in 
     let map = blackboard.pre_steps_by_column in 
     let value,list = A.get map predicate_id in 
@@ -659,7 +639,7 @@ maps each wire to the set of its previous states, this summarize the potential s
                           let blackboard = {blackboard with pre_nsteps = blackboard.pre_nsteps+1} in 
                           List.fold_left
                             (fun (error,blackboard) (predicate_id,(test,action)) -> 
-                              add_fictitious_action error test action predicate_id blackboard)
+                              add_fictitious_action error site test action predicate_id blackboard)
                             (error,blackboard) 
                             ((predicate_id,(Counter 0,Counter 1))::list)
                         )
@@ -729,51 +709,24 @@ maps each wire to the set of its previous states, this summarize the potential s
         blackboard.pre_steps_by_column 
     in 
     let _ = A.set blackboard.pre_kind_of_event nsid (type_of_step (K.type_of_refined_step step)) in 
-    let observable_list = 
-      if K.is_obs_of_refined_step step 
-      then 
-        [nsid]::blackboard.pre_observable_list 
-      else
-        blackboard.pre_observable_list 
-    in 
     let blackboard = 
-      { 
-        blackboard with 
-          pre_fictitious_list = fictitious_list ; 
-          pre_steps_by_column = pre_steps_by_column; 
-          pre_nsteps = nsid;
-          pre_observable_list = observable_list; 
-      }
+      if fictitious_local_list = []
+      then 
+        { 
+          blackboard with 
+            pre_steps_by_column = pre_steps_by_column; 
+            pre_nsteps = nsid;
+        }
+      else 
+        { 
+          blackboard with 
+            pre_fictitious_list = fictitious_list ; 
+            pre_steps_by_column = pre_steps_by_column; 
+            pre_nsteps = nsid;
+        }
     in 
     error,blackboard 
 
-  let finalize parameter handler error blackboard = 
-    let l = blackboard.pre_fictitious_list in 
-      match l 
-      with 
-        | [] -> error,blackboard 
-        | _ -> 
-          let nsid = blackboard.pre_nsteps + 1 in 
-          let observable_list = 
-            List.map (fun x -> nsid::x) blackboard.pre_observable_list 
-          in 
-          let blackboard = 
-            {
-              blackboard 
-             with 
-               pre_nsteps = nsid ;
-               pre_observable_list = observable_list
-            }
-          in 
-          let error,blackboard = 
-            List.fold_left
-              (fun (error,blackboard) predicate_id ->             
-                add_fictitious_action error Undefined Unknown predicate_id blackboard)
-              (error,blackboard)
-              l
-          in 
-          error,blackboard
-            
   (**interface*)
   let n_predicates parameter handler error blackboard = 
     error,blackboard.pre_ncolumn+1

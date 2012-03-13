@@ -62,6 +62,7 @@ rule token = parse
 								| "E+" -> PROD_EVENT pos
 								| "E-" -> NULL_EVENT pos
 								| "T" -> TIME pos
+								| "Tsim" -> CPUTIME pos
 								| "log" -> LOG pos
 								| "sin" -> SINUS pos
 								| "cos" -> COSINUS pos

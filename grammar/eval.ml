@@ -261,8 +261,9 @@ let rec partial_eval_alg env ast =
 		let (f1, const1, dep1, lbl1) = partial_eval_alg env ast
 		
 		and (f2, const2, dep2, lbl2) = partial_eval_alg env ast' in
-		let part_eval inst values t e e_null =
-			let v1 = f1 inst values t e e_null and v2 = f2 inst values t e e_null in op v1 v2 in
+		let part_eval inst values t e e_null cpu_t =
+			let v1 = f1 inst values t e e_null cpu_t and v2 = f2 inst values t e e_null cpu_t in op v1 v2 
+		in
 		let lbl = Printf.sprintf "(%s%s%s)" lbl1 op_str lbl2
 		in (part_eval, (const1 && const2), (DepSet.union dep1 dep2), lbl)
 	
@@ -270,7 +271,7 @@ let rec partial_eval_alg env ast =
 		let (f, const, dep, lbl) = partial_eval_alg env ast in
 		let lbl = Printf.sprintf "%s(%s)" op_str lbl
 		in
-		((fun inst values t e e_null -> let v = f inst values t e e_null in op v), const,
+		((fun inst values t e e_null cpu_t -> let v = f inst values t e e_null cpu_t in op v), const,
 			dep, lbl)
 	in
 	match ast with
@@ -280,17 +281,18 @@ let rec partial_eval_alg env ast =
 					| None -> (ExceptionDefn.warning ~with_pos:pos "[emax] constant is evaluated to infinity" ; infinity)
 					| Some n -> (float_of_int n)
 			in
-			((fun _ _ _ _ _ -> v), true, DepSet.empty, "e_max")
+			((fun _ _ _ _ _ _ -> v), true, DepSet.empty, "e_max")
 		| TMAX pos -> 
 			let v =
 				match !Parameter.maxTimeValue with
 					| None -> (ExceptionDefn.warning ~with_pos:pos "[tmax] constant is evaluated to infinity" ; infinity)
 					| Some t -> t
 			in
-			((fun _ _ _ _ _ -> v), true, DepSet.empty, "t_max") 
-		| INFINITY pos -> ((fun _ _ _ _ _ -> infinity), true, DepSet.empty, "inf")
+			((fun _ _ _ _ _ _ -> v), true, DepSet.empty, "t_max") 
+		| INFINITY pos -> ((fun _ _ _ _ _ _ -> infinity), true, DepSet.empty, "inf")
 		| FLOAT (f, pos) ->
-				((fun _ _ _ _ _ -> f), true, DepSet.empty, (Printf.sprintf "%f" f))
+				((fun _ _ _ _ _ _ -> f), true, DepSet.empty, (Printf.sprintf "%f" f))
+		| CPUTIME pos -> 	((fun _ _ _ _ _ cpu_t -> cpu_t -. !Parameter.cpuTime), false, (DepSet.singleton Mods.EVENT), "t_sim")
 		| OBS_VAR (lab, pos) -> (*maybe a kappa expr or an algebraic expression*)
 				(try
 					let i = Environment.num_of_kappa lab env
@@ -301,7 +303,7 @@ let rec partial_eval_alg env ast =
 							(ExceptionDefn.Semantics_Error (pos,
 									lab ^ " is not a variable identifier"))
 					else
-						((fun f _ _ _ _ -> f i), false,
+						((fun f _ _ _ _ _ -> f i), false,
 							(DepSet.singleton (Mods.KAPPA i)), ("'" ^ (lab ^ "'")))
 				with
 				| (*shifting obs_id because 0 is reserved for time dependencies*)
@@ -311,8 +313,8 @@ let rec partial_eval_alg env ast =
 							in
 							let v,is_const,dep =
 								match const with
-									| Some c -> ((fun _ _ _ _ _ -> c),true,DepSet.empty)
-									| None -> ((fun _ v _ _ _ -> v i),false,DepSet.singleton (Mods.ALG i))
+									| Some c -> ((fun _ _ _ _ _ _ -> c),true,DepSet.empty)
+									| None -> ((fun _ v _ _ _ _ -> v i),false,DepSet.singleton (Mods.ALG i))
 							in
 							(v,is_const,dep,("'" ^ (lab ^ "'")))
 						with
@@ -321,15 +323,15 @@ let rec partial_eval_alg env ast =
 									(ExceptionDefn.Semantics_Error (pos,
 											lab ^ " is not declared"))))
 		| TIME_VAR pos ->
-				((fun _ _ t _ _ -> t), false, (DepSet.singleton Mods.TIME), "t")
+				((fun _ _ t _ _ _ -> t), false, (DepSet.singleton Mods.TIME), "t")
 		| EVENT_VAR pos ->
-				((fun _ _ _ e ne -> float_of_int (e+ne)), false,
+				((fun _ _ _ e ne _ -> float_of_int (e+ne)), false,
 					(DepSet.singleton Mods.EVENT), "e")
 		| NULL_EVENT_VAR pos ->
-			((fun _ _ _ _ ne -> float_of_int ne), false,
+			((fun _ _ _ _ ne _ -> float_of_int ne), false,
 					(DepSet.singleton Mods.EVENT), "null_e")
 		| PROD_EVENT_VAR pos ->
-			((fun _ _ _ e _ -> float_of_int e), false,
+			((fun _ _ _ e _ _ -> float_of_int e), false,
 					(DepSet.singleton Mods.EVENT), "prod_e")			
 		| DIV (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> x /. y) "/"
 		| SUM (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> x +. y) "+"
@@ -350,8 +352,8 @@ let rec partial_eval_bool env ast =
 		let (f1, const1, dep1, lbl1) = partial_eval_bool env ast
 		
 		and (f2, const2, dep2, lbl2) = partial_eval_bool env ast' in
-		let part_eval inst values t e e_null =
-			let b1 = f1 inst values t e e_null and b2 = f2 inst values t e e_null in op b1 b2 in
+		let part_eval inst values t e e_null cpu_t =
+			let b1 = f1 inst values t e e_null cpu_t and b2 = f2 inst values t e e_null cpu_t in op b1 b2 in
 		let lbl = Printf.sprintf "(%s %s %s)" lbl1 op_str lbl2
 		in (part_eval, (const1 && const2), (DepSet.union dep1 dep2), lbl)
 	
@@ -359,8 +361,8 @@ let rec partial_eval_bool env ast =
 		let (f1, const1, dep1, lbl1) = partial_eval_alg env ast
 		
 	and (f2, const2, dep2, lbl2) = partial_eval_alg env ast' in
-		let part_eval inst values t e e_null =
-			let v1 = f1 inst values t e e_null and v2 = f2 inst values t e e_null in op v1 v2 in
+		let part_eval inst values t e e_null cpu_t =
+			let v1 = f1 inst values t e e_null cpu_t and v2 = f2 inst values t e e_null cpu_t in op v1 v2 in
 		let lbl = Printf.sprintf "(%s%s%s)" lbl1 op_str lbl2
 		in (part_eval, (const1 && const2), (DepSet.union dep1 dep2), lbl)
 	
@@ -368,12 +370,12 @@ let rec partial_eval_bool env ast =
 		let (f, const, dep, lbl) = partial_eval_bool env ast in
 		let lbl = Printf.sprintf "%s(%s)" op_str lbl
 		in
-		((fun inst values t e e_null -> let b = f inst values t e e_null in op b), const,
+		((fun inst values t e e_null cpu_t -> let b = f inst values t e e_null cpu_t in op b), const,
 			dep, lbl)
 	in
 	match ast with
-		| TRUE pos -> ((fun _ _ _ _ _ -> true), true, DepSet.singleton Mods.EVENT, "true")
-		| FALSE pos -> ((fun _ _ _ _ _ -> false), true, DepSet.empty, "false")	
+		| TRUE pos -> ((fun _ _ _ _ _ _ -> true), true, DepSet.singleton Mods.EVENT, "true")
+		| FALSE pos -> ((fun _ _ _ _ _ _ -> false), true, DepSet.empty, "false")	
 		| AND (ast, ast', pos) ->
 				bin_op_bool ast ast' pos (fun b b' -> b && b') "and"
 		| OR (ast, ast', pos) ->
@@ -439,7 +441,7 @@ let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take 
 		let (k, const, dep, _) = partial_eval_alg env ast_rule.k_def
 		in
 		if const
-		then ((CONST (k (fun i -> 0.0) (fun i -> 0.0) 0.0 0 0)), dep)
+		then ((CONST (k (fun i -> 0.0) (fun i -> 0.0) 0.0 0 0 0.)), dep)
 		else ((VAR k), dep)
 	
 	and (env,k_alt, dep_alt) =
@@ -451,7 +453,7 @@ let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take 
 				in
 				if const
 				then
-					(env,(Some (CONST (rate (fun i -> 0.0) (fun i -> 0.0) 0.0 0 0))), dep)
+					(env,(Some (CONST (rate (fun i -> 0.0) (fun i -> 0.0) 0.0 0 0 0.))), dep)
 				else (env,(Some (VAR rate)), dep)
 	in
 	let lhs,env = mixture_of_ast (Some lhs_id) true env ast_rule.lhs
@@ -606,12 +608,12 @@ let variables_of_result env res =
 							let (f, is_const, dep, lbl) = partial_eval_alg env ast in
 							let (env, var_id) =
 								if is_const then
-									Environment.declare_var_alg (Some label_pos) (Some ((f (fun _ -> 0.0) (fun i -> 0.0) 0.0 0 0))) env 
+									Environment.declare_var_alg (Some label_pos) (Some ((f (fun _ -> 0.0) (fun i -> 0.0) 0.0 0 0 0.))) env 
 								else
 									Environment.declare_var_alg (Some label_pos) None env (*cannot evaluate variable yet*)
 							in
 							let v =
-								if is_const then Dynamics.CONST (f (fun _ -> 0.0) (fun i -> 0.0) 0.0 0 0)
+								if is_const then Dynamics.CONST (f (fun _ -> 0.0) (fun i -> 0.0) 0.0 0 0 0.)
 								else 
 									Dynamics.VAR f
 							in (env, mixtures, ((v, dep, var_id) :: vars)))
@@ -641,7 +643,6 @@ let obs_of_result env res =
 				in (dep, is_constant, obs, label) :: cont
 	)
 	[] res.observables
-	
 
 let effects_of_modif variables env ast =
 	match ast with
@@ -655,7 +656,7 @@ let effects_of_modif variables env ast =
 			let m,env = mixture_of_ast None false env ast_mix in
 			let v =
 				if is_constant
-				then Dynamics.CONST (x (fun _ -> 0.0) (fun i -> 0.0) 0.0 0 0)
+				then Dynamics.CONST (close_var x) 
 				else Dynamics.VAR x in
 			let str =
 				Printf.sprintf "introduce %s * %s" str (Mixture.to_kappa false m env)
@@ -669,7 +670,7 @@ let effects_of_modif variables env ast =
 			let m,env = mixture_of_ast (Some id) true env ast_mix in
 			let v =
 				if is_constant
-				then Dynamics.CONST (x (fun _ -> 0.0) (fun i -> 0.0) 0.0 0 0)
+				then Dynamics.CONST (close_var x)
 				else Dynamics.VAR x in
 			let str =
 				Printf.sprintf "remove %s * %s" str (Mixture.to_kappa false m env)
@@ -686,7 +687,7 @@ let effects_of_modif variables env ast =
 			and (x, is_constant, dep, str) = partial_eval_alg env alg_expr in
 			let v =
 				if is_constant
-				then Dynamics.CONST (x (fun _ -> 0.0) (fun i -> 0.0) 0.0 0 0)
+				then Dynamics.CONST (close_var x)
 				else Dynamics.VAR x in
 			let str =
 				Printf.sprintf "set rate of rule '%s' to %s"
@@ -724,7 +725,7 @@ let pert_of_result variables env res =
 					effects_of_modif variables env modif_expr in
 				let bv =
 					if is_constant
-					then Dynamics.BCONST (x (fun _ -> 0.0) (fun _ -> 0.0) 0.0 0 0)
+					then Dynamics.BCONST (close_var x)
 					else Dynamics.BVAR x in
 				let str_pert,opt_abort =
 					match opt_post with
@@ -732,7 +733,7 @@ let pert_of_result variables env res =
 					| Some bool_expr -> 
 						let (x, is_constant, dep, str_abort) = partial_eval_bool env bool_expr in
 						let bv = 
-							if is_constant then Dynamics.BCONST (x (fun _ -> 0.0) (fun _ -> 0.0) 0.0 0 0)
+							if is_constant then Dynamics.BCONST (close_var x)
 							else Dynamics.BVAR x 
 						in
 						(Printf.sprintf "whenever %s, %s until %s" str_pre str_eff str_abort,Some (bv,dep,str_abort)) 
@@ -831,6 +832,11 @@ let pert_of_result variables env res =
 							)
 							dep env
 						in 
+						let _ =
+							match opt_abort with
+								| Some _ -> ()
+								| None -> ExceptionDefn.warning ~with_pos:pos "Causality mode is enabled at a single event, \"until\" condition is probably missing." 
+						in
 						(env,None) 
 					| Dynamics.UPDATE _ | Dynamics.SNAPSHOT _ | Dynamics.STOP _ -> 
 						let env =
@@ -879,7 +885,7 @@ let init_graph_of_result env res =
 			in
 			if not is_const then raise (ExceptionDefn.Semantics_Error (pos, Printf.sprintf "%s is not a constant, cannot initialize graph." lbl))
 			else
-				let n = match !Parameter.rescale with None -> int_of_float (v (fun _ -> 0.0) (fun _ -> 0.0) 0.0 0 0) | Some i -> min i (int_of_float (v (fun _ -> 0.0) (fun _ -> 0.0) 0.0 0 0)) in
+				let n = match !Parameter.rescale with None -> int_of_float (close_var v) | Some i -> min i (int_of_float (close_var v)) in
 				(* Cannot do Mixture.to_nodes env m once for all because of        *)
 				(* references                                                      *)
 				while !cpt < n do
