@@ -26,7 +26,7 @@ sig
 
   (** blackboard predicates*)
 
-  type predicate_id
+  type predicate_id = int
   type predicate_info
   type predicate_value 
  
@@ -42,6 +42,7 @@ sig
   val finalize: (pre_blackboard -> H.error_channel * pre_blackboard) H.with_handler 
 
   (**pretty printing*)
+  val print_predicate_value: out_channel -> predicate_value -> unit 
   val print_preblackboard: (out_channel -> pre_blackboard -> H.error_channel) H.with_handler  
 
   (**interface*)
@@ -140,23 +141,23 @@ maps each wire to the set of its previous states, this summarize the potential s
        match x 
        with 
          | Point_to step_id -> 
-           Printf.fprintf log "Point_to %i \n" step_id 
+           Printf.fprintf log "Point_to %i" step_id 
          | Counter int ->  
-           Printf.fprintf log "Counter %i \n" int
+           Printf.fprintf log "Counter %i" int
          | Internal_state_is internal_state -> 
-           Printf.fprintf log "%i \n" internal_state  
+           Printf.fprintf log "%i" internal_state  
          | Undefined -> 
-           Printf.fprintf log "Undefined\n"
+           Printf.fprintf log "Undefined"
          | Present ->
-           Printf.fprintf log "Present\n"
+           Printf.fprintf log "Present"
          | Free -> 
-           Printf.fprintf log "Free\n" 
+           Printf.fprintf log "Free" 
          | Bound -> 
-           Printf.fprintf log "Bound\n" 
+           Printf.fprintf log "Bound" 
          | Bound_to (id,agent_id,agent_name,site) ->
-           Printf.fprintf log "Bound(%i,%i(%i)@%i)\n" id agent_id agent_name site
+           Printf.fprintf log "Bound(%i,%i(%i)@%i)" id agent_id agent_name site
          | Bound_to_type (agent,site)-> 
-           Printf.fprintf log "Bound(%i@%i)\n" agent site 
+           Printf.fprintf log "Bound(%i@%i)" agent site 
          | Unknown -> ()
 
      let print_predicate_id log blackboard i = 
@@ -180,8 +181,10 @@ maps each wire to the set of its previous states, this summarize the potential s
                    let _ = Printf.fprintf log "Short id: %i \n" seid in 
                    let _ = print_known log test "TEST:   " in
                    let _ = print_predicate_value log test in 
+                   let _ = Printf.fprintf log "\n" in 
                    let _ = print_known log action "ACTION: " in 
                    let _ = print_predicate_value log action in 
+                   let _ = Printf.fprintf log "\n" in 
                    ())
                  (List.rev list)
              in 

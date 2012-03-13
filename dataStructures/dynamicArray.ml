@@ -39,7 +39,7 @@ module DynArray =
 
       let expand t = 
         let n = length t in 
-        let n' = n*2 in 
+        let n' = max (n+1) (n*2) in 
         let array' = G.create n' t.default in 
         let _ = G.blit !(t.array) 0 array' 0 n in 
         let _ = t.array:=array' in 
