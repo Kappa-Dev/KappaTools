@@ -61,11 +61,11 @@ sig
 
   type event 
   type init 
-  type obs 
-  type step 
-  type kappa_rule 
   type embedding
   type fresh_map 
+  type obs  
+  type step 
+  type kappa_rule 
   type refined_event 
   type refined_step
 
@@ -92,13 +92,16 @@ sig
   val rule_of_refined_event: refined_event -> kappa_rule
   val tests_of_refined_step: refined_step -> test list 
   val actions_of_refined_step: refined_step -> action list * (site*binding_state) list 
+  val is_obs_of_refined_step: refined_step -> bool 
+
   val print_refined_step: out_channel -> kappa_sig -> refined_step -> unit 
 
   val import_event:  Dynamics.rule * int Mods.IntMap.t * int Mods.IntMap.t -> event 
   val import_env: Environment.t -> kappa_sig 
   val store_event: event -> step list -> step list 
   val store_init : State.implicit_state -> step list -> step list 
-  val store_obs : step list -> step list 
+  val store_obs :  int * Mixture.t * int Mods.IntMap.t -> step list -> step list 
+
 end 
 
 
@@ -118,14 +121,14 @@ module Cflow_linker =
 
   type kappa_rule = Dynamics.rule
 
-  type embedding = int Mods.IntMap.t 
+  type embedding = agent_id Mods.IntMap.t 
 
   type fresh_map = int Mods.IntMap.t 
 
 
   type init = agent * (site_name * (int option * Node.ptr)) list
   type event = kappa_rule * embedding * fresh_map
-  type obs = unit 
+  type obs = int * Mixture.t * embedding 
 
 
   type kappa_sig = Environment.t 
@@ -167,7 +170,7 @@ module Cflow_linker =
 
   type refined_event = event * test list * (action list * ((site * binding_state) list))
   type refined_init = init * action list
-  type refined_obs = unit 
+  type refined_obs =  obs * test list 
 
   type step = (event,init,obs) choice 
   type refined_step = (refined_event,refined_init,refined_obs) choice 
@@ -282,14 +285,12 @@ module Cflow_linker =
   let lhs_of_rule rule = rule.Dynamics.lhs 
   let lhs_of_event = compose lhs_of_rule rule_of_event
     
-  let get_agent agent_id event fresh_map = 
+  let get_agent agent_id lhs fresh_map = 
     let i,map = 
       match agent_id 
       with 
 	| Dynamics.KEPT i -> 
-	    i,
-	    (let lhs = lhs_of_event event in 
-	       Mixture.agents lhs)
+	    i,Mixture.agents lhs
 	| Dynamics.FRESH i -> 
 	    i,fresh_map 
     in 
@@ -313,13 +314,16 @@ module Cflow_linker =
 
   let build_agent a b = (a,b)
 
- let apply_fun f event id = 
-    let embedding = f event in 
+  let apply_map id phi = 
     try 
-      Mods.IntMap.find id embedding 
+      Mods.IntMap.find id phi 
     with 
-	Not_found -> failwith "Kappa_instantiation.ml/apply_fun/93"
-
+      | Not_found -> 
+        failwith "Kappa_instantiation.ml/apply_embedding/321"
+ 
+  let apply_fun f event id = 
+    apply_map id (f event)
+     
   let apply_embedding = apply_fun embedding_of_event 
   let apply_fresh_map = apply_fun fresh_map_of_event 
 
@@ -329,8 +333,7 @@ module Cflow_linker =
       | Dynamics.KEPT i -> apply_embedding event i 
       | Dynamics.FRESH i -> apply_fresh_map event i 
 
-
-  let get_binding_state_of_site agent_id site_name mixture event fresh_map =
+  let get_binding_state_of_site agent_id site_name mixture embedding fresh_map =
     match agent_id 
     with 
       | Dynamics.KEPT(id) ->
@@ -340,15 +343,15 @@ module Cflow_linker =
 	    with 
 	      | Some (ag,site) -> 
 		  let fake_id = Dynamics.KEPT ag in 
-		  let agent_id = apply_embedding event ag in 
-		  let kappa_agent = get_agent fake_id event fresh_map in 
+		  let agent_id = apply_map ag embedding in 
+		  let kappa_agent = get_agent fake_id mixture fresh_map in 
 		  let agent_name = Mixture.name kappa_agent in 
 		  let agent =  build_agent agent_id agent_name in 
 		  let site = build_site agent site in 
 		    BOUND_to (site)
 	      | None -> 
 		  begin 
-		    let agent = get_agent agent_id event fresh_map in 
+		    let agent = get_agent agent_id mixture fresh_map in 
 		      try 
 			let interface = Mixture.interface agent in 
 			  match snd (Mods.IntMap.find site_name interface)
@@ -399,9 +402,9 @@ module Cflow_linker =
     else
       list
 
-  let refine_bound_state site list list' fake_id lhs event = 
+  let refine_bound_state site list list' fake_id lhs embedding = 
     let site_id = site_name_of_site site in 
-    let state = get_binding_state_of_site fake_id site_id lhs event (Mods.IntMap.empty) in 
+    let state = get_binding_state_of_site fake_id site_id lhs embedding (Mods.IntMap.empty) in 
       begin
 	match state 
 	with 
@@ -410,13 +413,11 @@ module Cflow_linker =
 	  | _ -> list'
       end
 
-  let tests_of_event event  = 
-    let rule = rule_of_event event in 
-    let lhs = rule.Dynamics.lhs in 
-      Mods.IntMap.fold 
+  let tests_of_lhs lhs embedding =
+    Mods.IntMap.fold 
 	(fun lhs_id ag list -> 
 	   let fake_id = Dynamics.KEPT lhs_id in 
-	   let agent_id = apply_embedding event lhs_id in 
+	   let agent_id = apply_map lhs_id embedding in 
 	   let agent_name = Mixture.name ag in 
 	   let agent = build_agent agent_id agent_name in 
 	     Mixture.fold_interface 
@@ -437,11 +438,20 @@ module Cflow_linker =
 			| Node.BND -> Is_Bound(site)::list 
 			| Node.TYPE(agent_name,site_name) -> Has_Binding_type(site,(agent_name,site_name))::list
 		    in 
-		      refine_bound_state site list list' fake_id lhs event 
+		      refine_bound_state site list list' fake_id lhs embedding 
 	       )
 	       ag list
 	)
 	(Mixture.agents lhs) []
+
+  let tests_of_event event = 
+    let rule = rule_of_event event in 
+    let lhs = rule.Dynamics.lhs in 
+    let embedding = embedding_of_event event in 
+    tests_of_lhs lhs embedding 
+      
+  let tests_of_obs = tests_of_lhs 
+
   let agent_of_node n = build_agent (Node.get_address n) (Node.name n) 
 
   let create_init state event_list = 
@@ -485,7 +495,8 @@ module Cflow_linker =
 
   let actions_of_event event kappa_sig = 
     let rule = rule_of_event event in 
-    let lhs = rule.Dynamics.lhs in 
+    let lhs = rule.Dynamics.lhs in
+    let embedding = embedding_of_event event in 
     let a,b,_ = 
       List.fold_left
 	(fun (list_actions,side_sites,fresh) action -> 
@@ -493,11 +504,11 @@ module Cflow_linker =
 	   with 
 	     | Dynamics.BND((lhs_id1,site1),(lhs_id2,site2)) ->
 		 let agent_id1 = apply_embedding_on_action event lhs_id1 in 
-		 let agent_name1 = name_of_agent lhs_id1 event fresh in 
+		 let agent_name1 = name_of_agent lhs_id1 lhs fresh in 
 		 let agent1 = build_agent agent_id1 agent_name1 in
 		 let site1 = build_site agent1 site1 in 
 		 let agent_id2 = apply_embedding_on_action event lhs_id2 in 
-		 let agent_name2 = name_of_agent lhs_id2 event fresh in 
+		 let agent_name2 = name_of_agent lhs_id2 lhs fresh in 
 		 let agent2 = build_agent agent_id2 agent_name2 in
 		 let site2 = build_site agent2 site2 in 
 		 let site1,site2 = order_site site1 site2 in 
@@ -508,11 +519,11 @@ module Cflow_linker =
 		   )
 	     | Dynamics.FREE((lhs_id,site_name),bool) ->
 		 let agent_id = apply_embedding_on_action event lhs_id in 
-		 let agent_name = name_of_agent lhs_id event fresh in
+		 let agent_name = name_of_agent lhs_id lhs fresh in
 		 let agent = build_agent agent_id agent_name in 
 		 let site = build_site agent site_name in 
 		 let list_actions = (Free site)::list_actions in 
-                 let state = get_binding_state_of_site lhs_id site_name lhs event fresh in 
+                 let state = get_binding_state_of_site lhs_id site_name lhs embedding fresh in 
                  if bool 
 		 then 
                    match state 
@@ -523,14 +534,14 @@ module Cflow_linker =
                        fresh
                      | _ -> raise (invalid_arg "actions_of_event") 
 		 else 
-		   let state = get_binding_state_of_site lhs_id site_name lhs event fresh in 
+		   let state = get_binding_state_of_site lhs_id site_name lhs embedding fresh in 
 		   list_actions,
                    (site,state)::side_sites,
                    fresh
 		     
 	     | Dynamics.MOD((lhs_id,site),internal) -> 
 		 let agent_id = apply_embedding_on_action event lhs_id in 
-		 let agent_name = name_of_agent lhs_id event fresh in 
+		 let agent_name = name_of_agent lhs_id lhs fresh in 
 		 let agent = build_agent agent_id agent_name in 
 		 let site = build_site agent site in 
 		   Mod_internal(site,internal)::list_actions,
@@ -540,13 +551,13 @@ module Cflow_linker =
 	     | Dynamics.DEL(lhs_id) -> 
 		 let fake_id = Dynamics.KEPT lhs_id in 
 		 let agent_id = apply_embedding event lhs_id in 
-		 let agent_name = name_of_agent fake_id event fresh in 
+		 let agent_name = name_of_agent fake_id lhs fresh in 
 		 let agent = build_agent agent_id agent_name in 
 		 let interface = get_binding_sites kappa_sig agent_name in 
 		   Remove(agent)::list_actions,
 		   List.fold_left 
 		     (fun list site -> 
-			let state = get_binding_state_of_site fake_id  site lhs event fresh in 
+			let state = get_binding_state_of_site fake_id  site lhs embedding fresh in 
 			  begin 
 			    match state with 
 			      | FREE | BOUND_to _ -> list 
@@ -572,9 +583,11 @@ module Cflow_linker =
 
   let refine_event env event = (event,tests_of_event event,actions_of_event event env)
     
-  let refine_obs env obs = () 
+  let refine_obs env obs = 
+    let _,lhs,embedding = obs in 
+    obs,tests_of_obs lhs embedding 
 
-  let obs_of_refined_obs () = () 
+  let obs_of_refined_obs = fst 
 
   let event_of_refined_event (a,_,_) = a
 
@@ -582,12 +595,16 @@ module Cflow_linker =
 
   let init_of_refined_init = fst 
 
-  let tests_of_refined_obs _ = []
+  let tests_of_obs (i,mixture,phi) = 
+    tests_of_lhs mixture phi 
+
+  let tests_of_refined_obs = snd 
+
   let tests_of_refined_init _ = []
   let tests_of_refined_event (_,y,_) =  y
   let actions_of_refined_event (_,_,y) = y
   let actions_of_refined_init (_,x) = x,[]
-  let actions_of_refined_obs () = [],[]
+  let actions_of_refined_obs _ = [],[]
   let rule_of_refined_event x = (compose rule_of_event event_of_refined_event) x 
 
   let print_side_effects log env prefix (site,state) = 
@@ -634,6 +651,12 @@ module Cflow_linker =
 
   let tests_of_refined_step =
     gen tests_of_refined_event tests_of_refined_init tests_of_refined_obs
+
+  let is_obs_of_refined_step x = 
+    match x 
+    with 
+      | Obs _ -> true
+      | _ -> false
       
   let refine_step env (x:step) = 
     genbis (refine_event env) (refine_init env) (refine_obs env) x
@@ -648,6 +671,6 @@ module Cflow_linker =
   let import_env x = x
   let store_event event step_list = (Event event)::step_list    
   let store_init init step_list = create_init init step_list  
-  let store_obs step_list = step_list 
+  let store_obs (i,a,x) step_list = Obs(i,a,x)::step_list 
 end:Cflow_signature)
 

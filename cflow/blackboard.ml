@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 06/09/2011
-  * Last modification: 08/03/2012
+  * Last modification: 12/03/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -34,25 +34,29 @@ sig
   (** blackboard*)
 
   type blackboard      (*blackboard, once finalized*)
+ (* type stack *)
+  type assign_result
 
-  val set: ((case_address * case_value option) -> blackboard  -> PB.H.error_channel * blackboard) PB.H.with_handler 
-  val get: (case_address -> blackboard -> PB.H.error_channel * case_value option) PB.H.with_handler 
+  val set: (case_address -> case_value -> blackboard  -> PB.H.error_channel * blackboard) PB.H.with_handler 
+  val get: (case_address -> blackboard -> PB.H.error_channel * case_value) PB.H.with_handler 
+  val overwrite: (case_address -> case_value -> blackboard -> PB.H.error_channel * blackboard) PB.H.with_handler  
+  val refine: (case_address -> case_value -> blackboard -> PB.H.error_channel * blackboard * assign_result) PB.H.with_handler  
+    
 
-  val strictly_more_refined: case_value -> case_value -> bool
+(*  val strictly_more_refined: case_value -> case_value -> bool*)
 
-  (** stack *)
-  type stack
 
-  val record_modif: ((case_address * case_value option) -> stack -> PB.H.error_channel * stack) PB.H.with_handler
-  val branch: (blackboard -> stack -> PB.H.error_channel *blackboard * stack) PB.H.with_handler 
-  val reset: (stack -> PB.H.error_channel * stack * (case_address * case_value option) list) PB.H.with_handler 
- 
+(*  val record_modif: ((case_address * case_value option) -> stack -> PB.H.error_channel * stack) PB.H.with_handler*)
+
+  val branch: (blackboard -> PB.H.error_channel *blackboard) PB.H.with_handler 
+  val reset_last_branching: (blackboard -> PB.H.error_channel * blackboard ) PB.H.with_handler 
+  val reset_init: (blackboard -> PB.H.error_channel * blackboard) PB.H.with_handler 
   (** initialisation*)
-  val finalize: (PB.pre_blackboard -> PB.H.error_channel * blackboard) PB.H.with_handler 
+  val import: (PB.pre_blackboard -> PB.H.error_channel * blackboard) PB.H.with_handler 
 
 
   (** heuristics *)
-   val next_choice: (blackboard -> PB.H.error_channel * instruction list) PB.H.with_handler 
+  val next_choice: (blackboard -> PB.H.error_channel * instruction list) PB.H.with_handler 
   val propagation_heuristic: (blackboard -> instruction  -> instruction list -> PB.H.error_channel * instruction list) PB.H.with_handler 
   val apply_instruction: (blackboard -> instruction -> instruction list -> (PB.H.error_channel * (case_address*case_value) list * instruction list)) PB.H.with_handler 
 
@@ -67,7 +71,7 @@ sig
   val translate_blackboard: (blackboard -> PB.H.error_channel * result) PB.H.with_handler 
 
   (**pretty printing*)
-  val print_blackboard:(blackboard -> PB.H.error_channel) PB.H.with_handler 
+  val print_blackboard:(out_channel -> blackboard -> PB.H.error_channel) PB.H.with_handler 
 end
 
 module Blackboard = 
@@ -75,122 +79,471 @@ module Blackboard =
     module PB = Blackboard_generation.Preblackboard 
      (** blackboard matrix*) 
 
-     type step_id = int 
-     type step_short_id = int 
-
-     type case_address = 
-	     {
-	       column_id:PB.predicate_id; 
-	       row_id: step_id;
-	     }
-	       
-     type case_value = PB.predicate_value 
-
-     let strictly_more_refined = PB.strictly_more_refined 
-
-     let more_refined x y = x=y or strictly_more_refined x y 
-
-     let conj parameter handler error x y = 
-       if x=y or strictly_more_refined x y
-       then error,x 
-       else if strictly_more_refined y x  
-       then error,y
-       else 
-         let error_list,error = 
-              PB.H.create_error parameter handler error (Some "blackbord.ml") None (Some "conj") (Some "174") (Some "Try to compare incompare site states") Exit
-         in 
-         PB.H.raise_error 
-           parameter 
-           handler 
-           error_list 
-           stderr 
-           error 
-           x 
-         
-     type case_info_static  = 
-	 {
-	   row_short_id: step_short_id;
-	   state_before: case_value;
-           state_after: case_value
-	 }
-
-     type case_info_dynamic = 
-         {
-           pointer_previous: step_short_id;
-           pointer_next: step_short_id;
-         }
+    type assign_result = Fail | Success | Ignore 
+        
+    type step_id = int 
+    type step_short_id = int 
+        
+    type event_case_address = 
+	{
+	  column_id:PB.predicate_id; 
+	  row_id: step_short_id;
+	}
+	  
+    type case_address = 
+      | N_unresolved_events_in_column of int 
+      | Pointer_to_next of event_case_address 
+      | Value_after of event_case_address 
+      | Value_before of event_case_address 
+      | Pointer_to_previous of event_case_address
+      | N_unresolved_events 
           
-     type case_info = 
+    type case_value = 
+      | State of PB.predicate_value 
+      | Counter of int 
+      | Pointer of step_short_id 
+      | Boolean of bool option 
+          
+    type assignment = (case_address * case_value) 
+        
+    let g p string parameter handler error x y = 
+      match 
+        x,y 
+      with 
+        | State x,State y -> error,p x y 
+        | _,_  ->  
+          let error_list,error = PB.H.create_error parameter handler error (Some "blackboard.ml") None (Some string) (Some "112") (Some "Counters and/or Pointers should not be compared") (failwith "strictly_more_refined") in 
+          PB.H.raise_error parameter handler error_list stderr error false
+            
+    let strictly_more_refined = g PB.strictly_more_refined "strictly_more_refined"
+      
+    type case_info_static  = 
+	{
+	  row_short_id: step_short_id;
+          event_id: step_id; 
+	  test: PB.predicate_value;
+          action: PB.predicate_value
+	}
+          
+    type case_info_dynamic = 
+        {
+          pointer_previous: step_short_id;
+          pointer_next: step_short_id;
+          state_after: PB.predicate_value;
+           selected: bool option;
+        }
+          
+    type case_info = 
+        {
+          static: case_info_static;
+          dynamic: case_info_dynamic
+        }
+          
+    let null_pointer = -1 
+    let is_null_pointer x = x=(-1)
+      
+    let dummy_case_info_static = 
+      {
+	row_short_id = null_pointer ;
+        event_id = null_pointer ;
+	test = PB.unknown ;
+	action = PB.unknown ;
+      }
+        
+    let dummy_case_info_dynamic = 
+      { 
+        pointer_previous = null_pointer ;
+        pointer_next = null_pointer ;
+        state_after = PB.unknown ;  
+        selected = None ;  
+      }
+        
+    let correct_pointer seid size = 
+      if seid<0 or seid>=size then null_pointer else seid 
+        
+    let init_info_dynamic seid size= 
+      { 
+        pointer_previous = correct_pointer (seid-1) size ;
+        pointer_next = correct_pointer (seid+1) size ;
+        state_after = PB.unknown ; 
+        selected = None ;
+      }
+        
+    let init_info_static p_id seid (_,eid,test,action) = 
+      {
+	row_short_id = seid ;
+        event_id = eid ;
+	test = test ;
+	action = action ;
+      }
+        
+    let dummy_case_info = 
+      {
+        static = dummy_case_info_static ;
+        dynamic = dummy_case_info_dynamic
+      }
+        
+     let init_info p_id seid size triple = 
+       {
+         static = init_info_static p_id seid triple ;
+         dynamic = init_info_dynamic seid size
+       }
+         
+     (** blackboard *)
+     type stack = assignment list 
+     type blackboard = 
          {
-           static: case_info_static;
-           dynamic: case_info_dynamic
+           current_stack: stack ; 
+           stack: stack list ;
+           blackboard: case_info PB.A.t PB.A.t ;
+           selected_events: bool option PB.A.t ;
+           weigth_of_predicate_id: int PB.A.t ; 
+           used_predicate_id: bool PB.A.t ;  
+           n_unresolved_events: int ;
          }
-       
-     let null_pointer = -1 
 
-     let dummy_case_info_static = 
-       {
-	 row_short_id = null_pointer ;
-	 state_before = PB.undefined ;
-	 state_after = PB.undefined
-       }
-     
-     let dummy_case_info_dynamic = 
-       { 
-         pointer_previous = null_pointer;
-         pointer_next = null_pointer
-       }
+     let get_pointer_next case = case.dynamic.pointer_next 
 
-     let dummy_case_info = 
-       {
-         static = dummy_case_info_static ;
-         dynamic = dummy_case_info_dynamic
-       }
+   (**pretty printing*)
+     let print_known_case log pref inf suf case =
+        let _ = Printf.fprintf log "%stest:" pref in  
+        let _ = PB.print_predicate_value log case.static.test in 
+        let _ = Printf.fprintf log "/eid:%i/action:" case.static.event_id in 
+        let _ = PB.print_predicate_value log case.static.action in 
+        let _ = Printf.fprintf log "%s" inf in 
+        let _ = PB.print_predicate_value log case.dynamic.state_after in 
+        let _ = Printf.fprintf log "%s" suf in 
+        () 
+
+     let print_case log case =
+       let status = case.dynamic.selected in 
+       match status 
+       with 
+         | Some false -> ()
+         | Some true -> 
+           print_known_case log "" " " " " case 
+         | None -> 
+           print_known_case log "?(" ") " " " case 
+
+     let print_event_case_address log event_case_address = 
+       Printf.fprintf log "event %i, predicate %i" event_case_address.row_id event_case_address.column_id 
+
+     let print_address log address = 
+       match address 
+       with 
+         | N_unresolved_events_in_column i -> 
+           let _ = Printf.fprintf log "Nombre d'événements non résolus sur le predicat %i" i in 
+           ()
+         | Pointer_to_next i -> 
+           let _ = Printf.fprintf log "Prochain événement agissant sur "  in 
+           let _ = print_event_case_address log i in 
+           ()
+         | Value_after i -> 
+           let _ = Printf.fprintf log "Valeur après "  in 
+           let _ = print_event_case_address log i in 
+           ()
+         | Value_before i -> 
+           let _ = Printf.fprintf log "Valeur avant "  in 
+           let _ = print_event_case_address log i in 
+           ()
+         | Pointer_to_previous i -> 
+           let _ = Printf.fprintf log "Evenement précésent agissant sur " in 
+           let _ = print_event_case_address log i in 
+           ()
+         | N_unresolved_events -> 
+           let _ = Printf.fprintf log "Nombre d'événements non résolu" in 
+           () 
+  
+     let print_value log value = 
+       match value 
+       with 
+         | State pb -> PB.print_predicate_value log pb 
+         | Counter i | Pointer i -> Printf.fprintf log "%i" i 
+         | Boolean bool -> 
+           Printf.fprintf log "%s"
+             (match bool 
+              with 
+                | None -> "?" 
+                | Some true -> "Yes"
+                | Some false -> "No")
+
+     let print_assignment log (address,value)  = 
+       let _ = print_address log address in 
+       let _ = print_value log value in 
+       () 
+
+     let print_blackboard parameter handler error log blackboard = 
+       let _ = Printf.fprintf log "**\nBLACKBOARD\n**\n" in 
+       let _ = Printf.fprintf log "*wires:*\n" in 
+       let _ = 
+         PB.A.iteri 
+           (fun i array -> 
+             let _ = Printf.fprintf log "%i" i in 
+             if PB.A.get blackboard.used_predicate_id i 
+             then 
+               let _ = Printf.fprintf log "*wires %i: " i in
+               let rec aux j = 
+                 let case = PB.A.get array j in 
+                 let _ = print_case log case in 
+                 let j = get_pointer_next case in 
+                 if j=null_pointer 
+                 then 
+                   let _ = Printf.fprintf log "\n" in ()
+                 else 
+                   aux j
+               in 
+               aux 0 
+             else 
+               ())
+           blackboard.blackboard 
+       in 
+       let _ = Printf.fprintf log "*stacks*\n" in 
+       let _ = 
+         List.iter 
+           (fun stack -> 
+             let _ = List.iter (print_assignment log) stack in 
+             let _ = Printf.fprintf log "\n" in 
+             ())
+           blackboard.stack 
+       in 
+       let _ = Printf.fprintf log "*selected_events*\n" in 
+       let _ = 
+         PB.A.iteri 
+           (fun i bool -> 
+             match bool 
+             with 
+               | None -> ()
+               | Some b -> 
+                 Printf.fprintf log "  Event:%i (%s)\n" i (if b then "KEPT" else "REMOVED"))
+           blackboard.selected_events
+       in 
+       let _ = Printf.fprintf log "*weight of predicate_id*\n" in 
+       let _ = 
+         PB.A.iteri 
+           (fun i j -> 
+             Printf.fprintf log " %i:%i\n" i j 
+           )
+           blackboard. weigth_of_predicate_id 
+       in 
+       let _ = Printf.fprintf log "**\n" in 
+       error
+             
+
 
      (** propagation request *)
 
-     type instruction = unit
 
-
-     (** blackboard*)
-	 
-     type blackboard = PB.pre_blackboard 
-
-     let set parameter handler error (case_address,case_value_opt) blackboard = error,blackboard 
- 
-     let get parameter handler error case_address blackboard = error,None 
-
-  (** stack *)
-     type stack = (case_address*case_value option) list 
          
-     let record_modif parameter handler error info stack = error,info::stack
-       
-     let branch parameter handler error blackboard stack = error,blackboard,[]
-       
-     let reset parameter handler error stack = error,[],stack 
- 
-     let finalize parameter handler error pre_blackboard = error,pre_blackboard 
+     let empty_stack = []
 
-  (** heuristics *)
+     let import parameter handler error pre_blackboard = 
+       let error,n_predicates = PB.n_predicates parameter handler error pre_blackboard in  
+       let error,n_events = PB.n_events parameter handler error pre_blackboard in 
+       let stack = [] in 
+       let current_stack = empty_stack in
+       let blackboard = PB.A.make n_events (PB.A.make 1 dummy_case_info) in
+       let weigth_of_predicate_id = PB.A.make n_events 0 in 
+       let error = 
+         let rec aux1 p_id error = 
+           if p_id < 0 
+           then error
+           else 
+             let error,size = PB.n_events_per_predicate parameter handler error pre_blackboard p_id in 
+             let _ = PB.A.set weigth_of_predicate_id p_id size in 
+             let error,list = PB.event_list_of_predicate parameter handler error pre_blackboard p_id in 
+             let array = PB.A.make size dummy_case_info in 
+             let _ = PB.A.set blackboard p_id array in 
+             let rec aux2 seid l = 
+               match l 
+               with 
+                 | [] -> () 
+                 | triple::q -> 
+                   let info = init_info p_id seid size triple in 
+                   let _ = PB.A.set array seid info in 
+                   aux2 (seid-1) q 
+             in 
+             let _ = aux2 (size-1) list in 
+             aux1 (p_id-1) error 
+         in aux1 (n_events-1) error 
+       in 
+       error,
+       {
+           current_stack=current_stack; 
+           stack=stack;
+           blackboard=blackboard;
+           selected_events= PB.A.make n_events None; 
+           weigth_of_predicate_id= weigth_of_predicate_id; 
+           used_predicate_id = PB.A.make n_predicates true; 
+           n_unresolved_events = n_events ; 
+         }
+
+     let get_case parameter handler error case_address blackboard = 
+       error,PB.A.get 
+         (PB.A.get blackboard.blackboard case_address.column_id)
+         case_address.row_id 
+
+     let set parameter handler error case_address case_value blackboard = 
+       match 
+         case_address 
+       with 
+         | N_unresolved_events_in_column int -> 
+           begin 
+             match case_value
+             with 
+               | Counter int2 -> 
+                 let _ = PB.A.set blackboard.weigth_of_predicate_id int int2 in 
+                 error,blackboard 
+               | _ -> 
+                 let error_list,error = 
+                   PB.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "398") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
+                 in 
+                 PB.H.raise_error parameter handler error_list stderr error blackboard 
+           end 
+         | Pointer_to_next case_address -> 
+              begin 
+                match case_value
+                with 
+                  | Pointer int2 -> 
+                    (*let _ = PB.A.set blackboard.weigth_of_predicate_id int int2 in *) (* TO DO *)
+                    error,blackboard 
+                  | _ -> 
+                    let error_list,error = 
+                   PB.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "398") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
+                 in 
+                 PB.H.raise_error parameter handler error_list stderr error blackboard 
+              end 
+         | Value_after case_address -> 
+           begin 
+             match case_value
+             with 
+               | State state -> 
+                    (*let _ = PB.A.set blackboard.weigth_of_predicate_id int int2 in *) (* TO DO *)
+                 error,blackboard 
+               | _ -> 
+                 let error_list,error = 
+                   PB.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "398") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
+                 in 
+                 PB.H.raise_error parameter handler error_list stderr error blackboard 
+           end 
+         | Value_before case_address -> 
+           let error_list,error = 
+             PB.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "430") (Some "Blackboard.set should not be called with value_before") (failwith "Incompatible address in function Blackboard.set")
+           in 
+           PB.H.raise_error parameter handler error_list stderr error blackboard 
+         | Pointer_to_previous case_address -> 
+               begin 
+                match case_value
+                with 
+                  | Pointer int2 -> 
+                    (*let _ = PB.A.set blackboard.weigth_of_predicate_id int int2 in *) (* TO DO *)
+                    error,blackboard 
+                  | _ -> 
+                    let error_list,error = 
+                   PB.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "398") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
+                 in 
+                 PB.H.raise_error parameter handler error_list stderr error blackboard 
+              end 
+         | N_unresolved_events -> 
+           begin 
+             match case_value
+             with 
+               | Counter int -> 
+                    (*let _ = PB.A.set blackboard.weigth_of_predicate_id int int2 in *) (* TO DO *)
+                 error,blackboard 
+               | _ -> 
+                 let error_list,error = 
+                   PB.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "398") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
+                 in 
+                 PB.H.raise_error parameter handler error_list stderr error blackboard 
+           end 
+             
+     let rec get parameter handler error case_address blackboard = 
+       match 
+         case_address 
+       with 
+         | N_unresolved_events_in_column int -> error,Counter (PB.A.get blackboard.weigth_of_predicate_id int)
+         | Pointer_to_next case_address -> 
+           let error,case = get_case parameter handler error case_address blackboard in 
+           error,Pointer case.dynamic.pointer_next 
+         | Value_after case_address -> 
+           let error,case = get_case parameter handler error case_address blackboard in 
+           error,Pointer case.dynamic.pointer_next 
+         | Value_before case_address -> 
+           let error,case = get_case parameter handler error case_address blackboard in 
+           let pointer = case.dynamic.pointer_previous in 
+           if is_null_pointer pointer 
+           then 
+              let error_list,error = 
+                PB.H.create_error parameter handler error (Some "blackboard.ml") None (Some "get") (Some "404") (Some "Value before an unexisting element requested ") (failwith "Value before an unexisting element requested")  
+              in 
+              PB.H.raise_error parameter handler error_list stderr error (State PB.undefined)
+           else 
+             get parameter handler error (Value_after {case_address with row_id = pointer}) blackboard 
+         | Pointer_to_previous case_address -> 
+           let error,case = get_case parameter handler error case_address blackboard in 
+           error,Pointer case.dynamic.pointer_previous 
+         | N_unresolved_events -> error,Counter blackboard.n_unresolved_events
+
+
+   
+     let record_modif parameter handler error case_address case_value blackboard = 
+       error,
+       {blackboard
+        with current_stack = (case_address,case_value)::blackboard.current_stack}
        
+     let refine parameter handler error case_address case_value blackboard = 
+       let error,old = get parameter handler error case_address blackboard in 
+       if case_value = old 
+       then 
+         error,blackboard,Ignore
+       else
+         let error,bool = strictly_more_refined parameter handler error case_value old 
+         in 
+         if bool 
+         then 
+           let error,blackboard = set parameter handler error case_address case_value blackboard in 
+           let error,blackboard = record_modif parameter handler error case_address old blackboard in 
+           error,blackboard,Success
+         else 
+           error,blackboard,Fail 
+
+     let overwrite parameter handler error case_address case_value blackboard = 
+       let error,old = get parameter handler error case_address blackboard in 
+       if case_value = old 
+       then 
+         error,blackboard
+       else
+         let error,blackboard = set parameter handler error case_address case_value blackboard in 
+         let error,blackboard = record_modif parameter handler error case_address old blackboard in 
+         error,blackboard 
+
+
+         
+     let branch parameter handler error blackboard = error,blackboard
+       
+     let reset_last_branching parameter handler error blackboard = error,blackboard 
+     let reset_init parameter handler error blackboard = error,blackboard 
+    
+  (** heuristics *)
+     type instruction = unit 
+     
      let next_choice parameter handler error blackboard = error,[]
        
      let propagation_heuristic parameter handler error blackboard instruction instruction_list = error,instruction_list 
        
      let apply_instruction parameter handler error blackboard instruction instruction_list = error,[],instruction_list 
-       
+ 
   (** output result*)
      type result = ()
          
   (** iteration*)
      let is_maximal_solution parameter handler error blackboard = error,false 
-       
+ 
   (** exporting result*)
-     let translate_blackboard parameter handler error blackboard = error,()
        
-  (**pretty printing*)
-     let print_blackboard paramter handler error blackboard = error
-
+   let translate_blackboard parameter handler error blackboard = error,()
+       
+  
    end:Blackboard)
 
 

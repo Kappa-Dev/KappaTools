@@ -32,27 +32,20 @@ module Solver =
 	  | Ignored -> o1
 	  | _ -> o2  
 
-      let reset parameter handler error blackboard stack = 
-	let error,stack,list = B.reset parameter handler error stack in 
-	let error,blackboard = 
-	  List.fold_left 
-	    (fun (error,blackboard)  assignment -> B.set parameter handler error assignment blackboard)
-	    (error,blackboard) 
-	    list
-	in
-	 error,blackboard,stack 
+(*      let reset parameter handler error blackboard = 
+	let error,blackboard = B.reset parameter handler error in *)
 
-      let overwrite parameter handler error address blackboard stack former_value new_value =  
+      (*let overwrite parameter handler error address blackboard stack former_value new_value =  
         let error,blackboard = B.set parameter handler error (address,new_value) blackboard in 
 	let error,stack = B.record_modif parameter handler error (address,None) stack in 
-        error,stack,blackboard 
+        error,stack,blackboard *)
         
-      let rec deal_with_assignments parameter handler error list blackboard stack output = 
+(*      let rec deal_with_assignments parameter handler error list blackboard stack output = 
 	match list
 	with 
-	  | [] -> error,blackboard,stack,output
+	  | [] -> error,blackboard,output
 	  | (address,case_value)::tail -> 
-	    let error,former_value = B.get parameter handler error address blackboard in 
+	    let error,blackboard,output' = B.refineget parameter handler error address blackboard in 
 	    match former_value 
 	    with 
 	      | None ->
@@ -82,14 +75,14 @@ module Solver =
 	      | _ -> 
 		begin 
 		  error,blackboard,stack,Fail 
-		end 
+	end *)
 
-      let rec propagate parameter handler error list blackboard stack = 
+(*      let rec propagate parameter handler error list blackboard stack = 
 	match list 
 	with 
 	  | []  -> error,blackboard,true
 	  | head::tail -> 
-	      let error,assignment_list,list = B.apply_instruction parameter handler error blackboard head tail in 
+	      let error,blackboard, = B.apply_instruction parameter handler error blackboard head tail in 
 	      let error,blackboard,stack,output = deal_with_assignments parameter handler error assignment_list blackboard stack Ignored in 
 		match output 
 		with 
@@ -129,6 +122,6 @@ module Solver =
 	  else
 	    let error,list = B.next_choice parameter handler error blackboard in 
 	      branch_over_assumption_list parameter handler error list blackboard stack  
-		
+*)		
     end 
       
