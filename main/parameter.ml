@@ -30,6 +30,9 @@ let causalModeOn = ref false
 (*Computed values*)
 let (timeIncrementValue:float option ref) = ref None
 
+let cpuTime = ref 0.0
+let initSimTime () = cpuTime := Sys.time ()  
+
 (*Name convention*)
 let outputDirName = ref (Sys.getcwd ())
 let snapshotFileName = ref "snap"

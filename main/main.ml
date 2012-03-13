@@ -133,6 +133,7 @@ let main =
 			else (Causal.empty_grid(),[])
 		in
 		ExceptionDefn.flush_warning () ; 
+		Parameter.initSimTime () ; 
 		try
 			Run.loop state grid event_list counter plot env ;
 			print_newline() ;

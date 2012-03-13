@@ -3,7 +3,7 @@ open Tools
 open ExceptionDefn
 open Graph
 
-type variable = CONST of float | VAR of ((int -> float) -> (int -> float) -> float -> int -> int -> float)
+type variable = CONST of float | VAR of ((int -> float) -> (int -> float) -> float -> int -> int -> float -> float)
 and action =
 		BND of (port * port)
 	| FREE of (port * bool) (*FREE(p,b) b=true if FREE is side-effect free*)
@@ -128,7 +128,7 @@ and modification =
 	| SNAPSHOT of string option
 	| STOP of string option
 	| CFLOW of int
-and boolean_variable = BCONST of bool | BVAR of ((int -> float) -> (int -> float) -> float -> int -> int -> bool)
+and boolean_variable = BCONST of bool | BVAR of ((int -> float) -> (int -> float) -> float -> int -> int -> float -> bool)
 
 let string_of_pert pert env =
 	match pert.effect with

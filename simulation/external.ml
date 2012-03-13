@@ -13,7 +13,7 @@ let eval_pre_pert pert state counter env =
 			let act_of_id = (fun id -> (instance_number id state env)) (*act_of_id:functional argument*)
 			and v_of_id = (fun id -> State.value state id counter env)
 			in
-				b_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter)
+				b_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time())
 
 let eval_abort_pert just_applied pert state counter env = 
 	match pert.abort with
@@ -23,7 +23,7 @@ let eval_abort_pert just_applied pert state counter env =
 			let act_of_id = (fun id -> (instance_number id state env)) (*act_of_id:functional argument*)
 			and v_of_id = (fun id -> State.value state id counter env)
 			in
-				b_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter)
+				b_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time())
 
 let apply_effect p_id pert state counter env =
 	let snapshot opt =
@@ -60,7 +60,7 @@ let apply_effect p_id pert state counter env =
 	let eval_var v =
 		match v with
 			| CONST f -> f
-			| VAR v_fun -> v_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter)
+			| VAR v_fun -> v_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time())
 	in
 		match pert.effect with
 			| INTRO (v,mix) -> 

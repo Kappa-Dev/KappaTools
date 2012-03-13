@@ -60,7 +60,7 @@ let output state time event plot env counter =
 					let v = 
 						match obs.expr with
 							| Dynamics.CONST v -> v
-							| Dynamics.VAR f -> f inst values time event (Counter.null_event counter)
+							| Dynamics.VAR f -> f inst values time event (Counter.null_event counter) (Sys.time())
 					in 
 						Printf.fprintf d "%c%E" !Parameter.plotSepChar v
 			) state.observables ;

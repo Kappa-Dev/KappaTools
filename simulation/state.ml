@@ -170,7 +170,7 @@ let rec value state var_id counter env =
 						and v_of_var id = value state id counter env
 						in
 						v_fun act_of_id v_of_var (Counter.time counter)
-							(Counter.event counter) (Counter.null_event counter)
+							(Counter.event counter) (Counter.null_event counter) (Sys.time())
 			)
 
 (**[eval_activity rule state] returns the evaluation of the overestimated activity of rule [rule] in implicit state [state]*)
@@ -187,7 +187,7 @@ let eval_activity ?using rule state counter env =
 					and v_of_var id = value state id counter env in
 					let k =
 						k_fun act_of_id v_of_var (Counter.time counter)
-							(Counter.event counter) (Counter.null_event counter)
+							(Counter.event counter) (Counter.null_event counter) (Sys.time())
 					in
 					let n = (match using with None -> instance_number mix_id state env | Some x -> float_of_int x) in
 					if n = 0. then 0. else 
@@ -206,7 +206,7 @@ let eval_activity ?using rule state counter env =
 							let act_of_id id = nl_instance_number id state env
 							and v_of_var id = value state id counter env 
 							in
-							let k =	k_fun act_of_id v_of_var (Counter.time counter) (Counter.event counter) (Counter.null_event counter)
+							let k =	k_fun act_of_id v_of_var (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time())
 							in
 							let n = nl_instance_number mix_id state env in
 							if n = 0. then 0. else 
@@ -440,7 +440,7 @@ let initialize sg rules kappa_vars alg_vars obs (pert,rule_pert) counter env =
 								if const
 								then
 									{
-										expr = CONST (plot_v (fun i -> 0.0) (fun i -> 0.0) 0.0 0 0);
+										expr = CONST (plot_v (fun i -> 0.0) (fun i -> 0.0) 0.0 0 0 0.);
 										label = replace_space lbl;
 									} :: cont
 								else { expr = VAR plot_v; label = replace_space lbl; } :: cont)
@@ -886,7 +886,7 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 				in
 				begin
 					(*a new embedding was found for var_id*)
-					let tracked = if Environment.is_tracked var_id env then var_id::tracked else tracked
+					let tracked = if Environment.is_tracked var_id env then (var_id,Injection.to_map embedding)::tracked else tracked
 					in
 					update_activity state r.r_id var_id counter env;
 					let env,pert_ids = 
@@ -904,7 +904,7 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 	let vars_to_wake_up = enabled r state in
 	let env,state,pert_ids,already_done_map,new_injs,tracked =
 		IntMap.fold 
-		(fun var_id map_list (env, state,pert_ids,already_done_map,new_injs,tracked) ->
+		(fun var_id map_list (env, state,pert_ids,already_done_map,new_injs, tracked) ->
 			if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Influence map tells me I should look for new injections of var[%d]" var_id) ;
 			List.fold_left 
 			(fun (env,state,pert_ids,already_done_map, new_injs,tracked) glue ->
