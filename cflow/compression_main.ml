@@ -55,7 +55,7 @@ let weak_compression env step_list =
   in 
   let error,preblackboard = 
     Blackboard.Blackboard.PB.finalize parameter handler error blackboard in 
- (* let _ = 
+  let _ = 
     if debug_mode 
     then 
       Printf.fprintf stderr "\nPretty printing the grid\n"
@@ -66,7 +66,7 @@ let weak_compression env step_list =
       Blackboard.Blackboard.PB.print_preblackboard parameter handler error stderr preblackboard 
     else 
       error 
-  in*) 
+  in
   let error,blackboard = Blackboard.Blackboard.import parameter handler error preblackboard in 
   let _ = 
     if debug_mode 

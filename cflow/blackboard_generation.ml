@@ -34,9 +34,16 @@ sig
   type predicate_value 
  
   type pre_blackboard  (*blackboard during its construction*)
+
+  val conj: (predicate_value -> predicate_value -> H.error_channel * predicate_value) H.with_handler
+  val disjunction: (predicate_value -> predicate_value -> H.error_channel * predicate_value) H.with_handler  
  
+  val defined: predicate_value
   val undefined: predicate_value 
-  val unknown: predicate_value 
+  val unknown: predicate_value
+  val is_unknown: predicate_value -> bool 
+  val is_undefined: predicate_value -> bool 
+  val more_refined: predicate_value -> predicate_value -> bool 
   val strictly_more_refined: predicate_value -> predicate_value -> bool 
 
   (** generation*)
@@ -86,9 +93,9 @@ module Preblackboard =
        | Fictitious of int (**to handle with ambiguous site effects *)
 
      type predicate_value = 
-       | Point_to of step_id (** pointer to another event in the same wire*)
-       | Counter of int      (** for encoding mutual exclusion for side-effects *)
+       | Counter of int 
        | Internal_state_is of K.internal_state
+       | Defined   (** the wire does exist, but we do not know what the value is *)
        | Undefined (** the wire does not exist yet *)
        | Present   (** for agent presence *)
        | Free      (** for binding sites *)
@@ -98,8 +105,11 @@ module Preblackboard =
        | Bound_to_type of K.agent_name * K.site_name (** for binding sites (partial information *)
        | Unknown (**  for agent presence, internal states, binding states (partial information *) 
 
+     let defined = Defined 
      let undefined = Undefined 
      let unknown = Unknown 
+     let is_unknown x = x=Unknown 
+     let is_undefined x = x=Undefined 
 
      (** maps and sets *)
      module PredicateMap = Map.Make (struct type t = predicate_info let compare = compare end)
@@ -143,10 +153,12 @@ maps each wire to the set of its previous states, this summarize the potential s
      let print_predicate_value log x = 
        match x 
        with 
-         | Point_to step_id -> 
-           Printf.fprintf log "Point_to %i" step_id 
+(*         | Point_to step_id -> 
+           Printf.fprintf log "Point_to %i" step_id *)
          | Counter int ->  
            Printf.fprintf log "Counter %i" int
+         | Defined -> 
+           Printf.fprintf log "Defined" 
          | Internal_state_is internal_state -> 
            Printf.fprintf log "%i" internal_state  
          | Undefined -> 
@@ -248,7 +260,6 @@ maps each wire to the set of its previous states, this summarize the potential s
          | Internal_state_is _ 
          | Present 
          | Free 
-         | Point_to _ 
          | Bound_to (_) -> false
          | Bound_to_type (ag,s) -> 
            begin 
@@ -264,6 +275,13 @@ maps each wire to the set of its previous states, this summarize the potential s
                | Bound_to _ | Bound_to_type _ -> true
                | _ -> false
            end
+         | Defined -> 
+           begin
+             match x 
+             with
+               | Unknown | Defined | Undefined -> false
+               | _ -> true
+           end 
          | Unknown -> 
            begin
              match x
@@ -272,18 +290,31 @@ maps each wire to the set of its previous states, this summarize the potential s
                | _ -> true 
            end
 
-     let more_refined x y = x=y or strictly_more_refined x y 
+     let more_refined x y = x=y or strictly_more_refined x y
 
      let conj parameter handler error x y = 
-       if x=y or strictly_more_refined x y
-       then error,x 
-       else if strictly_more_refined y x  
-       then error,y
+       if more_refined x y then error,x 
        else 
-         let error_list,error = 
-              H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "conj") (Some "269") (Some "Try to compare incomparable site states") Exit
-         in 
-         H.raise_error parameter handler error_list stderr error x 
+         if strictly_more_refined y x then error,y 
+         else 
+           let error_list,error = H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "conj") (Some "287") (Some "Arguments have no greatest lower bound") (failwith "Arguments have no greatest lower bound")  in 
+           H.raise_error parameter handler error_list stderr error Undefined  
+           
+             
+     let disjunction parameter handler error x y = 
+       error,
+       if x=y then x 
+       else 
+         match x,y
+         with
+           | Unknown,_ | _,Unknown | Undefined,_ | _,Undefined -> Unknown 
+           | Defined,_ | _,Defined -> Defined
+           | Counter _,_ | _,Counter _ | Free,_ | _,Free | Present,_ | _,Present | Internal_state_is _,_ |_,Internal_state_is _ -> Defined 
+           | Bound,_ | _,Bound -> Bound 
+           | Bound_to_type (a,b), Bound_to (_,_,c,d)
+           | Bound_to (_,_,a,b),Bound_to (_,_,c,d)
+           | Bound_to (_,_,a,b),Bound_to_type (c,d) when a=c && b=d -> Bound_to_type(a,b)  
+           | _ -> Bound 
       
      (** predicate id allocation *)
 
@@ -534,7 +565,7 @@ maps each wire to the set of its previous states, this summarize the potential s
   let side_effect parameter handler error predicate_target_id s site = 
     match s 
     with 
-      | Point_to _ | Counter _ | Internal_state_is _ | Undefined 
+      | Defined | Counter _ | Internal_state_is _ | Undefined 
       | Present | Bound | Bound_to_type _ | Unknown -> 
         let error,error_list = 
             H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "side_effects") (Some "517") (Some "Illegal state for a side-effects") (failwith "Blackboard_generation.side_effect") in 
@@ -621,8 +652,8 @@ maps each wire to the set of its previous states, this summarize the potential s
     let fadd pid p map = 
       match p 
       with 
-        | Point_to _ | Counter _ | Internal_state_is _ | Undefined 
-        | Present | Bound | Bound_to_type _ | Unknown -> 
+        | Counter _ | Internal_state_is _ | Undefined 
+        | Defined | Present | Bound | Bound_to_type _ | Unknown -> 
           ()
         | _ -> 
           let old = A.get map pid in 

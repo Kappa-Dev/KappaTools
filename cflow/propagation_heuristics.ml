@@ -60,7 +60,7 @@ module Propagation_heuristic =
               then error,None 
               else 
                 let error,exist = 
-                  B.exist parameter handler error blackboard p_id i 
+                  B.exist parameter handler error blackboard (B.build_event_case_address p_id i) 
                 in 
                 match exist 
                 with 
@@ -99,8 +99,64 @@ module Propagation_heuristic =
       in 
       error,list
 
-    let propagate_up parameter handler error blackboard x instruction_list propagate_list = 
-      error,blackboard,instruction_list,propagate_list,B.Success 
+    let propagate_up parameter handler error blackboard (case_address,case_value) instruction_list propagate_list = 
+      let error,bool = B.exist parameter handler error blackboard case_address in 
+      match bool 
+      with 
+        | Some false -> 
+          (* the case has been removed from the blackboard, nothing to be done *)
+          error,
+          blackboard,
+          instruction_list,
+          propagate_list,
+          B.Success 
+        | Some true ->
+          (* we know that the pair (test/action) has been executed *)
+          let error,(seid,eid,test,action) = B.get_static parameter handler error blackboard case_address in 
+          if B.PB.is_unknown action 
+          then 
+            (* no action, we keep on propagating with the conjonction of the test of the value *)
+            let error,new_value = B.PB.conj parameter handler error test case_value in 
+            error,
+            blackboard,
+            (Refine_value_before(case_address,new_value))::instruction_list,
+            propagate_list,
+            B.Success 
+          else 
+            if B.PB.more_refined action case_value 
+            then
+              if B.PB.is_undefined test 
+              then (*the wire has just be created, nothing to be done *)
+                error,
+                blackboard,
+                instruction_list,
+                propagate_list,
+                B.Success
+              else (*we know that the wire was defined before*)
+                error,
+                blackboard,
+                (Refine_value_before(case_address,B.PB.defined))::instruction_list,
+                propagate_list,
+                B.Success
+            else (*The event has to be discarded which is absurd *)
+              error,
+              blackboard,
+              [],
+              [],
+              B.Fail 
+        | None -> 
+          (* we do not know whether the pair (test/action) has been executed *)
+          let error,(seid,eid,test,action) = B.get_static parameter handler error blackboard case_address in 
+          if B.PB.more_refined action case_value 
+          then 
+            let error,new_value = B.PB.disjunction parameter handler error test case_value in 
+            error,
+            blackboard,
+            (Refine_value_before(case_address,new_value))::instruction_list,
+            propagate_list,
+            B.Success
+          else (*The event has to be discarded *)
+            error,blackboard,(Discard_event(eid)::instruction_list),propagate_list,B.Success 
 
     let propagate_down parameter handler error blackboard x instruction_list propagate_list = 
       error,blackboard,instruction_list,propagate_list,B.Success 
