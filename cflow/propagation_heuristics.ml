@@ -22,31 +22,121 @@ module type Blackboard_with_heuristic =
   sig
     module B:Blackboard.Blackboard 
 
-    type instruction 
+    type update_order 
+    type propagation_check 
       
      (** heuristics *)
-    val next_choice: (B.blackboard -> B.PB.H.error_channel * instruction list) B.PB.H.with_handler 
-    val propagation_heuristic: (B.blackboard -> instruction  -> instruction list -> B.PB.H.error_channel * instruction list * instruction list) B.PB.H.with_handler 
-    val apply_instruction: (B.blackboard -> instruction -> instruction list -> (B.PB.H.error_channel * (B.case_address*B.case_value) list * instruction list)) B.PB.H.with_handler 
+    val next_choice: (B.blackboard -> B.PB.H.error_channel * update_order list) B.PB.H.with_handler 
+    val apply_instruction: (B.blackboard -> update_order -> update_order list -> propagation_check list -> B.PB.H.error_channel * B.blackboard * update_order list * propagation_check list * B.assign_result) B.PB.H.with_handler 
+
+    val propagate: (B.blackboard -> propagation_check -> update_order list -> propagation_check list 
+                    -> B.PB.H.error_channel * B.blackboard * update_order list * propagation_check list * B.assign_result) B.PB.H.with_handler
   end 
 
 module Propagation_heuristic = 
   (struct 
 
-    module B=Blackboard.Blackboard 
+    module B=(Blackboard.Blackboard:Blackboard.Blackboard) 
 
-    type instruction = 
-      | Keep_event of int (*B.PB.step_id*)
-(*      | Discard_event of B.PB.step_id 
-      | Propagate_up of case_address * case_value 
-      | Propagate_down of case_address * case_value 
-      | Decrease_counter of case_address 
-*)        
-    let next_choice parameter handler error blackboard = error,[]
-    let propagation_heuristic parameter handler error blackboard instruction list = 
-      error,[],list
-    let apply_instruction parameter handler error blackboard instruction instruction_list = 
-      error,[],instruction_list 
-        
+    type update_order = 
+      | Keep_event of B.PB.step_id
+      | Discard_event of B.PB.step_id 
+      | Refine_value_after of B.event_case_address * B.PB.predicate_value 
+      | Refine_value_before of B.event_case_address * B.PB.predicate_value 
+
+    type propagation_check = 
+      | Propagate_up of (B.event_case_address * B.PB.predicate_value)
+      | Propagate_down of (B.event_case_address * B.PB.predicate_value)
+
+    let get_last_unresolved_event parameter handler error blackboard p_id = 
+      let k = B.get_last_linked_event blackboard p_id in 
+      match k 
+      with 
+        | None -> error,k 
+        | Some i -> 
+          begin
+            let rec aux i error = 
+              if i<0 
+              then error,None 
+              else 
+                let error,exist = 
+                  B.exist parameter handler error blackboard p_id i 
+                in 
+                match exist 
+                with 
+                  | None | Some true -> error,Some i 
+                  | Some false -> aux (i-1) error 
+
+            in 
+            aux i error 
+          end 
+          
+    let next_choice parameter handler error (blackboard:B.blackboard) = 
+      let n_p_id = B.get_npredicate_id blackboard in 
+      let list  = 
+        if n_p_id = 0 
+        then 
+          []
+        else 
+          let rec aux step best_grade best_predicate = 
+            if step=n_p_id 
+            then 
+              best_predicate 
+            else 
+              let grade = B.get_n_unresolved_events_of_pid blackboard n_p_id in 
+              if grade < best_grade 
+              then 
+                aux (step+1) grade step 
+              else 
+                aux (step+1) best_grade best_predicate 
+          in 
+          let p_id = aux 1 (B.get_n_unresolved_events_of_pid blackboard 0) 0 in 
+          let error,event_id = get_last_unresolved_event parameter handler error blackboard p_id in 
+          match event_id 
+          with 
+            | None -> []
+            | Some event_id -> [Discard_event event_id;Keep_event event_id]
+      in 
+      error,list
+
+    let propagate_up parameter handler error blackboard x instruction_list propagate_list = 
+      error,blackboard,instruction_list,propagate_list,B.Success 
+
+    let propagate_down parameter handler error blackboard x instruction_list propagate_list = 
+      error,blackboard,instruction_list,propagate_list,B.Success 
+
+    let propagate parameter handler error blackboard check instruction_list propagate_list = 
+      match check 
+      with 
+        | Propagate_up x -> propagate_up parameter handler error blackboard x instruction_list propagate_list
+        | Propagate_down x -> propagate_down parameter handler error blackboard x instruction_list propagate_list
+
+    let keep_case parameter handler error blackboard case instruction_list propagate_list = 
+      error,blackboard,instruction_list,propagate_list,B.Success 
+
+    let discard_case parameter handler error blackboard case instruction_list propagate_list = 
+      error,blackboard,instruction_list,propagate_list,B.Success 
+
+    let keep_event parameter handler error blackboard step_id instruction_list propagate_list = 
+      error,blackboard,instruction_list,propagate_list,B.Success
+
+    let discard_event parameter handler error blackboard step_id instruction_list propagate_list = 
+      error,blackboard,instruction_list,propagate_list,B.Success
+
+    let refine_value_after parameter handler error blackboard address value instruction_list propagate_list =
+          error,blackboard,instruction_list,propagate_list,B.Success
+
+    let refine_value_before parameter handler error blackboard address value instruction_list propagate_list =
+          error,blackboard,instruction_list,propagate_list,B.Success
+
+
+
+    let apply_instruction parameter handler error blackboard instruction instruction_list propagate_list = 
+        match instruction 
+        with 
+          | Keep_event step_id -> keep_event parameter handler error blackboard step_id instruction_list propagate_list 
+          | Discard_event step_id -> discard_event parameter handler error blackboard step_id instruction_list propagate_list 
+          | Refine_value_after (address,value) -> refine_value_after parameter handler error blackboard address value instruction_list propagate_list 
+          | Refine_value_before (address,value) -> refine_value_before parameter handler error blackboard address value instruction_list propagate_list 
 
   end:Blackboard_with_heuristic)

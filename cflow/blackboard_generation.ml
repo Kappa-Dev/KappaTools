@@ -25,6 +25,7 @@ sig
   module A:LargeArray.GenArray
 
   type step_id = int 
+  type step_short_id = int 
 
   (** blackboard predicates*)
 

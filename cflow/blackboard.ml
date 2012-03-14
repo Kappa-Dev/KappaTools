@@ -23,6 +23,7 @@ sig
   module PB:Blackboard_generation.PreBlackboard 
 
   (** blackboard matrix *)
+  type event_case_address 
   type case_info
   type case_value 
   type case_address  
@@ -30,7 +31,16 @@ sig
   (** blackboard*)
 
   type blackboard      (*blackboard, once finalized*)
-  type assign_result
+  type assign_result = Fail | Success | Ignore 
+        
+
+  val get_npredicate_id: blackboard -> int 
+  val get_n_unresolved_events_of_pid: blackboard -> PB.predicate_id -> int 
+  val get_first_linked_event: blackboard -> PB.predicate_id -> int option 
+  val get_last_linked_event: blackboard -> PB.predicate_id -> int option 
+(*  val get_first_unresolved_event: blackboard -> PB.predicate_id -> int option
+  val get_last_unresolved_event: blackboard -> PB.predicate_id -> int option *)
+  val exist: (blackboard -> PB.predicate_id -> PB.step_short_id -> PB.H.error_channel * bool option) PB.H.with_handler   
 
   val set: (case_address -> case_value -> blackboard  -> PB.H.error_channel * blackboard) PB.H.with_handler 
   val get: (case_address -> blackboard -> PB.H.error_channel * case_value) PB.H.with_handler 
@@ -63,12 +73,12 @@ module Blackboard =
     type assign_result = Fail | Success | Ignore 
         
     type step_id = PB.step_id 
-    type step_short_id = int 
+    type step_short_id = PB.step_short_id 
         
     type event_case_address = 
 	{
 	  column_id:PB.predicate_id; 
-	  row_id: step_short_id;
+	  row_id: PB.step_short_id;
 	}
 
     let build_event_case_address pid seid = 
@@ -84,7 +94,10 @@ module Blackboard =
       | Value_before of event_case_address 
       | Pointer_to_previous of event_case_address
       | N_unresolved_events 
-          
+      | Exist of event_case_address 
+(*      | Last_seid of int 
+      | First_seid of int *)
+
     type case_value = 
       | State of PB.predicate_value 
       | Counter of int 
@@ -180,6 +193,7 @@ module Blackboard =
      type stack = assignment list 
      type blackboard = 
          {
+           n_predicate_id: int ;
            current_stack: stack ; 
            stack: stack list ;
            blackboard: case_info PB.A.t PB.A.t ;
@@ -187,10 +201,28 @@ module Blackboard =
            weigth_of_predicate_id: int PB.A.t ; 
            used_predicate_id: bool PB.A.t ;  
            n_unresolved_events: int ;
+     (*      first_linked_event_of_predicate_id: int PB.A.t;*)
+           last_linked_event_of_predicate_id: int PB.A.t;
          }
 
+     let get_npredicate_id blackboard = blackboard.n_predicate_id 
+     let get_n_unresolved_events_of_pid blackboard pid = PB.A.get blackboard.weigth_of_predicate_id pid 
      let get_pointer_next case = case.dynamic.pointer_next 
+     let get_first_linked_event blackboard pid = 
+       if pid <0 or pid >= blackboard.n_predicate_id 
+       then 
+         None 
+       else 
+         Some 0 
+     let get_last_linked_event blackboard pid = 
+       if pid<0 or pid >= blackboard.n_predicate_id 
+       then 
+         None 
+       else 
+         Some 
+           (PB.A.get blackboard.last_linked_event_of_predicate_id pid) 
 
+    
    (**pretty printing*)
      let print_known_case log pref inf suf case =
         let _ = Printf.fprintf log "%stest:" pref in  
@@ -329,13 +361,16 @@ module Blackboard =
        let stack = [] in 
        let current_stack = empty_stack in
        let blackboard = PB.A.make n_events (PB.A.make 1 dummy_case_info) in
-       let weigth_of_predicate_id = PB.A.make n_events 0 in 
+       let weigth_of_predicate_id = PB.A.make n_predicates 0 in 
+       let first_linked_event_of_predicate_id = PB.A.make n_predicates 0 in 
+       let last_linked_event_of_predicate_id = PB.A.make n_predicates 0 in 
        let error = 
          let rec aux1 p_id error = 
            if p_id < 0 
            then error
            else 
              let error,size = PB.n_events_per_predicate parameter handler error pre_blackboard p_id in 
+             let _ = PB.A.set last_linked_event_of_predicate_id p_id size in 
              let _ = PB.A.set weigth_of_predicate_id p_id size in 
              let error,list = PB.event_list_of_predicate parameter handler error pre_blackboard p_id in 
              let array = PB.A.make size dummy_case_info in 
@@ -355,19 +390,27 @@ module Blackboard =
        in 
        error,
        {
-           current_stack=current_stack; 
-           stack=stack;
-           blackboard=blackboard;
-           selected_events= PB.A.make n_events None; 
-           weigth_of_predicate_id= weigth_of_predicate_id; 
-           used_predicate_id = PB.A.make n_predicates true; 
-           n_unresolved_events = n_events ; 
-         }
-
+ (*        first_linked_event_of_predicate_id = first_linked_event_of_predicate_id ;*)
+         last_linked_event_of_predicate_id = last_linked_event_of_predicate_id ;
+         n_predicate_id = n_predicates; 
+         current_stack=current_stack; 
+         stack=stack;
+         blackboard=blackboard;
+         selected_events= PB.A.make n_events None; 
+         weigth_of_predicate_id= weigth_of_predicate_id; 
+         used_predicate_id = PB.A.make n_predicates true; 
+         n_unresolved_events = n_events ; 
+       }
+         
      let get_case parameter handler error case_address blackboard = 
        error,PB.A.get 
          (PB.A.get blackboard.blackboard case_address.column_id)
          case_address.row_id 
+
+     let exist parameter handler error blackboard pid seid = 
+       let case_address = {row_id = seid ; column_id = pid} in 
+       let error,info = get_case parameter handler error case_address blackboard in 
+       error,info.dynamic.selected
 
      let set_case parameter handler error case_address case_value blackboard = 
        let _ = PB.A.set (PB.A.get blackboard.blackboard case_address.column_id) case_address.row_id case_value in 
