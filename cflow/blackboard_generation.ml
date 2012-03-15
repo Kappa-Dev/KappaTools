@@ -44,6 +44,7 @@ sig
   val is_unknown: predicate_value -> bool 
   val is_undefined: predicate_value -> bool 
   val more_refined: predicate_value -> predicate_value -> bool 
+  val compatible: predicate_value -> predicate_value -> bool 
   val strictly_more_refined: predicate_value -> predicate_value -> bool 
 
   (** generation*)
@@ -299,7 +300,9 @@ maps each wire to the set of its previous states, this summarize the potential s
          else 
            let error_list,error = H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "conj") (Some "287") (Some "Arguments have no greatest lower bound") (failwith "Arguments have no greatest lower bound")  in 
            H.raise_error parameter handler error_list stderr error Undefined  
-           
+
+     let compatible x y = 
+       x=y or more_refined x y or more_refined x y
              
      let disjunction parameter handler error x y = 
        error,
@@ -536,7 +539,7 @@ maps each wire to the set of its previous states, this summarize the potential s
     error, 
     {
       pre_fictitious_list = [] ; 
-      pre_steps_by_column = A.make 1 (0,[]) ; 
+      pre_steps_by_column = A.make 1 (1,[]) ; 
       pre_nsteps = -1 ;
       pre_ncolumn = -1 ;
       pre_column_map = PredicateMap.empty ; 
@@ -551,7 +554,7 @@ maps each wire to the set of its previous states, this summarize the potential s
     let nsid = blackboard.pre_nsteps+1 in 
     let test = Undefined in 
     let action = Counter 0 in
-    let _ = A.set blackboard.pre_steps_by_column predicate_id (1,[nsid,0,test,action])  in 
+    let _ = A.set blackboard.pre_steps_by_column predicate_id (2,[nsid,1,test,action])  in 
     error,{blackboard with pre_nsteps = nsid} 
  
   let add_fictitious_action error test action predicate_id blackboard = 
