@@ -26,6 +26,7 @@ module type Blackboard_with_heuristic =
     type propagation_check 
       
      (** heuristics *)
+    val forced_events: (B.blackboard -> B.PB.H.error_channel * update_order list list) B.PB.H.with_handler 
     val next_choice: (B.blackboard -> B.PB.H.error_channel * update_order list) B.PB.H.with_handler 
     val apply_instruction: (B.blackboard -> update_order -> update_order list -> propagation_check list -> B.PB.H.error_channel * B.blackboard * update_order list * propagation_check list * B.assign_result) B.PB.H.with_handler 
 
@@ -48,6 +49,10 @@ module Propagation_heuristic =
       | Propagate_up of B.event_case_address
       | Propagate_down of B.event_case_address
 
+    let forced_events parameter handler error blackboard = 
+      let list = B.forced_events blackboard in 
+      error,List.map (List.map (fun x -> Keep_event x)) list
+      
     let get_last_unresolved_event parameter handler error blackboard p_id = 
       let k = B.get_last_linked_event blackboard p_id in 
       match k 
@@ -60,7 +65,7 @@ module Propagation_heuristic =
               then error,None 
               else 
                 let error,exist = 
-                  B.exist parameter handler error blackboard (B.build_event_case_address p_id (B.build_pointer i))
+                  B.exist_case  parameter handler error blackboard (B.build_event_case_address p_id (B.build_pointer i))
                 in 
                 match exist 
                 with 
@@ -101,7 +106,7 @@ module Propagation_heuristic =
 
     let propagate_down parameter handler error blackboard event_case_address instruction_list propagate_list = 
         begin 
-          let error,bool = B.exist parameter handler error blackboard event_case_address in 
+          let error,bool = B.exist_case parameter handler error blackboard event_case_address in 
           match bool 
           with 
             | Some false -> 
@@ -114,7 +119,7 @@ module Propagation_heuristic =
             | Some true | None ->
               (* we know that the pair (test/action) has been executed *)
                let error,next_event_case_address = B.follow_pointer_down parameter handler error blackboard event_case_address in 
-               let error,bool2 = B.exist parameter handler error blackboard next_event_case_address in 
+               let error,bool2 = B.exist_case parameter handler error blackboard next_event_case_address in 
                match bool2 
                with 
                  | Some false -> 
@@ -274,7 +279,7 @@ module Propagation_heuristic =
 
     let propagate_up parameter handler error blackboard event_case_address instruction_list propagate_list = 
       begin 
-        let error,bool = B.exist parameter handler error blackboard event_case_address in 
+        let error,bool = B.exist_case parameter handler error blackboard event_case_address in 
         match bool 
         with 
           | Some false -> 
@@ -416,25 +421,153 @@ module Propagation_heuristic =
         | Propagate_up x -> propagate_up parameter handler error blackboard x instruction_list propagate_list
         | Propagate_down x -> propagate_down parameter handler error blackboard x instruction_list propagate_list
 
-    let keep_case parameter handler error blackboard case instruction_list propagate_list = 
-      error,blackboard,instruction_list,propagate_list,B.Success 
+    let discard_case parameter handler case (error,blackboard,instruction_list,propagate_list) = 
+      let error,pointer_next = B.follow_pointer_down parameter handler error blackboard case in 
+      let error,pointer_previous = B.follow_pointer_up parameter handler error blackboard case in 
+      (** we remove the case *)
+      let error,blackboard,result = 
+        B.refine 
+          parameter 
+          handler 
+          error 
+          (B.exist case) 
+          (B.boolean (Some false)) 
+          blackboard 
+      in 
+      match result 
+      with 
+        | B.Fail -> (error,blackboard,[],[]),B.Fail 
+        | B.Ignore -> (error,blackboard,instruction_list,propagate_list),B.Ignore 
+        | B.Success -> 
+          begin 
+            let error,blackboard = B.dec parameter handler error (B.n_unresolved_events_in_column case) blackboard in 
+            (** we plug pointer next of the previous event *)
+            let error,blackboard = 
+              B.overwrite
+                parameter 
+                handler
+                error 
+                (B.pointer_to_next pointer_previous)
+                (B.pointer pointer_next)
+                blackboard 
+            in 
+      (** we plug pointer previous of the next event *)
+            let error,blackboard = 
+              B.overwrite 
+                parameter 
+                handler 
+                error 
+                (B.pointer_to_previous pointer_next)
+                (B.pointer pointer_previous)
+                blackboard 
+            in 
+            let propagate_list = 
+              (Propagate_up pointer_next)::(Propagate_down pointer_previous)::propagate_list 
+            in 
+            (error,blackboard,instruction_list,propagate_list),B.Success 
+          end 
 
-    let discard_case parameter handler error blackboard case instruction_list propagate_list = 
-      error,blackboard,instruction_list,propagate_list,B.Success 
+    let keep_case parameter handler case (error,blackboard,instruction_list,propagate_list) = 
+      (** we keep the case *)
+      let error,blackboard,result = 
+        B.refine 
+          parameter 
+          handler 
+          error 
+          (B.exist case) 
+          (B.boolean (Some true)) 
+          blackboard 
+      in 
+      match result 
+      with 
+        | B.Fail -> (error,blackboard,[],[]),B.Fail 
+        | B.Ignore -> (error,blackboard,instruction_list,propagate_list),B.Ignore 
+        | B.Success -> 
+          begin 
+            let error,blackboard = B.dec parameter handler error (B.n_unresolved_events_in_column case) blackboard in 
+            let propagate_list = 
+              (Propagate_up case)::(Propagate_down case)::propagate_list 
+            in 
+            (error,blackboard,instruction_list,propagate_list),B.Success 
+          end 
+
 
     let keep_event parameter handler error blackboard step_id instruction_list propagate_list = 
-      error,blackboard,instruction_list,propagate_list,B.Success
+      let error,blackboard,success = 
+        B.refine parameter handler error 
+          (B.is_exist_event step_id)
+          (B.boolean (Some true)) 
+          blackboard
+      in 
+      let error,blackboard = B.dec parameter handler error (B.n_unresolved_events) blackboard  in 
+      let error,list = B.case_list_of_eid parameter handler error blackboard step_id in 
+      let rec aux l x success = 
+        match l 
+        with 
+          | [] -> x,success 
+          | t::q ->
+            begin 
+              let y,success2 = keep_case parameter handler t x in 
+              match 
+                success2 
+              with 
+                | B.Ignore -> aux q y success 
+                | B.Success -> aux q y success2
+                | B.Fail -> y,success2 
+            end 
+      in 
+      let (error,blackboard,instruction_list,propagate_list),success = aux list (error,blackboard,instruction_list,propagate_list) B.Ignore in 
+      error,blackboard,instruction_list,propagate_list,success 
 
     let discard_event parameter handler error blackboard step_id instruction_list propagate_list = 
-      error,blackboard,instruction_list,propagate_list,B.Success
+      let error,blackboard,success = 
+        B.refine parameter handler error 
+          (B.is_exist_event step_id)
+          (B.boolean (Some false)) 
+          blackboard
+      in 
+          match success 
+          with 
+            | B.Fail -> error,blackboard,[],[],success
+            | B.Ignore -> error,blackboard,instruction_list,propagate_list,success
+            | B.Success -> 
+              begin
+                let error,blackboard = B.dec parameter handler error (B.n_unresolved_events) blackboard  in 
+                let error,list = B.case_list_of_eid parameter handler error blackboard step_id in 
+                let rec aux l x success = 
+                  match l 
+                  with 
+                    | [] -> x,success 
+                    | t::q ->
+                      begin 
+                        let y,success2 = discard_case parameter handler t x in 
+                        match 
+                          success2 
+                        with 
+                          | B.Ignore -> aux q y success 
+                          | B.Success -> aux q y success2
+                          | B.Fail -> y,success2 
+                      end 
+                in 
+                let (error,blackboard,instruction_list,propagate_list),success = aux list (error,blackboard,instruction_list,propagate_list) B.Ignore in 
+                error,blackboard,instruction_list,propagate_list,success 
+              end 
 
     let refine_value_after parameter handler error blackboard address value instruction_list propagate_list =
+      let case_address = B.value_after address in 
+      let state = B.state value in 
+      let error,blackboard,result = B.refine parameter handler error case_address state blackboard in 
+      match result 
+      with 
+        | B.Ignore -> error,blackboard,instruction_list,propagate_list,result 
+        | B.Fail -> error,blackboard,[],[],result 
+        | B.Success -> 
+          let propagate_list = propagate_list in 
           error,blackboard,instruction_list,propagate_list,B.Success
 
     let refine_value_before parameter handler error blackboard address value instruction_list propagate_list =
-          error,blackboard,instruction_list,propagate_list,B.Success
-
-
+      let error,pointer_previous = B.follow_pointer_up parameter handler error blackboard address in 
+      refine_value_after parameter handler error blackboard pointer_previous value instruction_list propagate_list 
 
     let apply_instruction parameter handler error blackboard instruction instruction_list propagate_list = 
         match instruction 
