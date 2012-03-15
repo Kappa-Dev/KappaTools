@@ -60,7 +60,7 @@ module Propagation_heuristic =
               then error,None 
               else 
                 let error,exist = 
-                  B.exist parameter handler error blackboard (B.build_event_case_address p_id i) 
+                  B.exist parameter handler error blackboard (B.build_event_case_address p_id (B.build_pointer i))
                 in 
                 match exist 
                 with 
@@ -100,10 +100,10 @@ module Propagation_heuristic =
       error,list
 
     let propagate_down parameter handler error blackboard event_case_address instruction_list propagate_list = 
-      if B.out_of_bound blackboard event_case_address 
+(*      if B.out_of_bound blackboard event_case_address 
       then 
         error,blackboard,instruction_list,propagate_list,B.Success
-      else 
+      else *)
         begin 
           let error,bool = B.exist parameter handler error blackboard event_case_address in 
           match bool 
@@ -256,10 +256,10 @@ module Propagation_heuristic =
         end
           
     let propagate_up parameter handler error blackboard event_case_address instruction_list propagate_list = 
-      if B.out_of_bound blackboard event_case_address 
+(*      if B.out_of_bound blackboard event_case_address 
       then 
         error,blackboard,instruction_list,propagate_list,B.Success
-      else 
+      else *)
         begin 
           let error,bool = B.exist parameter handler error blackboard event_case_address in 
           match bool 
