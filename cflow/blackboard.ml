@@ -32,7 +32,14 @@ sig
   (** blackboard*)
 
   type blackboard      (*blackboard, once finalized*)
-  type assign_result = Fail | Success | Ignore 
+  type assign_result (*= Fail | Success | Ignore *)
+
+  val is_failed: assign_result -> bool
+  val is_succeeded: assign_result -> bool
+  val is_ignored: assign_result -> bool 
+  val success: assign_result
+  val ignore: assign_result
+  val fail: assign_result 
 
   val build_pointer: PB.step_short_id -> pointer 
   val is_before_blackboard: pointer -> bool 
@@ -71,6 +78,8 @@ sig
 
   (**pretty printing*)
   val print_blackboard:(out_channel -> blackboard -> PB.H.error_channel) PB.H.with_handler 
+  val print_event_case_address:out_channel -> event_case_address -> unit 
+  val print_stack: out_channel -> blackboard -> unit
 
   val exist: event_case_address -> case_address 
   val boolean: bool option -> case_value 
@@ -93,6 +102,29 @@ module Blackboard =
 
     type assign_result = Fail | Success | Ignore 
     type pointer = PB.step_short_id 
+
+    let success = Success
+    let ignore = Ignore
+    let fail = Fail 
+
+    let is_ignored x = 
+      match x 
+      with 
+        | Ignore -> true
+        | _ -> false
+
+    let is_failed x = 
+      match x 
+      with 
+        | Fail -> true
+        | _ -> false     
+
+
+    let is_succeeded x = 
+      match x 
+      with 
+        | Success -> true
+        | _ -> false
 
     let null_pointer = -1 (*Null_pointer*) 
     let is_null_pointer x = x=null_pointer 
@@ -140,6 +172,37 @@ module Blackboard =
       | Pointer of pointer 
       | Boolean of bool option 
 
+    let print_case_value x = 
+      match x 
+      with 
+        | State x -> let _ = Printf.fprintf stderr "State! " in 
+                     let _ = PB.print_predicate_value stderr x in 
+                     let _ = Printf.fprintf stderr "\n" in 
+                     () 
+        | Counter i -> Printf.fprintf stderr "Counter %i\n" i
+        | Pointer i -> Printf.fprintf stderr "Pointer %i\n" i 
+        | Boolean b -> Printf.fprintf stderr "Boolean %s\n" (match b with None -> "?" | Some true -> "true" | _ -> "false")
+ 
+    let print_case_address x = 
+      match x
+      with 
+       | N_unresolved_events_in_column i -> Printf.fprintf stderr "n_unresolved_events_in_pred %i" i 
+       | Pointer_to_next e -> 
+         let _ = Printf.fprintf stderr "Pointer" in 
+         ()
+      | Value_after e -> 
+        let _ = Printf.fprintf stderr "Value_after" in 
+        () 
+      | Value_before e -> 
+        let _ = Printf.fprintf stderr "Value_before" in 
+        () 
+      | Pointer_to_previous e -> 
+        let _ = Printf.fprintf stderr "Pointer_before" in 
+        () 
+      | N_unresolved_events -> Printf.fprintf stderr "Unresolved_events" 
+      | Exist e -> Printf.fprintf stderr "Exist" 
+      | Keep_event i -> Printf.fprintf stderr "Keep %i" i
+
     let state predicate_value = State predicate_value 
     let counter i = Counter i 
     let pointer p = Pointer p.row_short_event_id  
@@ -148,16 +211,19 @@ module Blackboard =
     let case_address_of_case_event_address event_address = 
       Value_after (event_address)
           
+   
     let predicate_value_of_case_value parameter handler error case_value = 
       match case_value 
       with 
         | State x -> error,x 
         | _ ->    
+          let _ = print_case_value case_value in 
           let error_list,error = PB.H.create_error parameter handler error (Some "blackboard.ml") None (Some "predicate_value_of_case_value") (Some "120") (Some "wrong kinf of case_value in predicate_value_of_case_value") (failwith "predicate_value_of_case_value") in 
           PB.H.raise_error parameter handler error_list stderr error PB.unknown 
         
 
     type assignment = (case_address * case_value) 
+       
         
     let bool_strictly_more_refined x y = 
       match x,y 
@@ -230,7 +296,7 @@ module Blackboard =
         selected = None ;
       }
         
-    let init_info_static p_id seid (_,eid,test,action) = 
+    let init_info_static p_id seid (eid,_,test,action) = 
       {
 	row_short_id = seid ;
         event_id = eid ;
@@ -238,7 +304,7 @@ module Blackboard =
 	action = action ;
       }
         
-    let get_eid_of_triple (_,x,_,_) = x
+    let get_eid_of_triple (x,_,_,_) = x
     let dummy_case_info = 
       {
         static = dummy_case_info_static ;
@@ -361,7 +427,7 @@ module Blackboard =
 
      let print_event_case_address log event_case_address = 
        let _ = print_pointer log event_case_address.row_short_event_id in 
-       Printf.fprintf log "event %i, predicate %i" event_case_address.column_predicate_id 
+       Printf.fprintf log "predicate %i" event_case_address.column_predicate_id 
 
      let print_address log address = 
        match address 
@@ -401,7 +467,7 @@ module Blackboard =
        match value 
        with 
          | State pb -> PB.print_predicate_value log pb 
-         | Counter i -> Printf.fprintf log "%i" i 
+         | Counter i -> Printf.fprintf log "Counter %i" i 
          | Pointer i -> print_pointer log i 
          | Boolean bool -> 
            Printf.fprintf log "%s"
@@ -447,6 +513,8 @@ module Blackboard =
        in 
        let error = !err in 
        let _ = Printf.fprintf log "*stacks*\n" in 
+       let _ = List.iter (print_assignment log) blackboard.current_stack in 
+       let _ = Printf.fprintf log "\n" in 
        let _ = 
          List.iter 
            (fun stack -> 
@@ -719,7 +787,7 @@ module Blackboard =
            error,Pointer case.dynamic.pointer_next 
          | Value_after case_address -> 
            let error,case = get_case parameter handler error case_address blackboard in 
-           error,Pointer case.dynamic.pointer_next 
+           error,State case.dynamic.state_after 
          | Value_before case_address -> 
            let error,case = get_case parameter handler error case_address blackboard in 
            let pointer = case.dynamic.pointer_previous in 
@@ -739,25 +807,35 @@ module Blackboard =
 
    
      let record_modif parameter handler error case_address case_value blackboard = 
+       let _ = Printf.fprintf stderr "RECORD\n" in 
        error,
        {blackboard
         with current_stack = (case_address,case_value)::blackboard.current_stack}
        
      let refine parameter handler error case_address case_value blackboard = 
+       let _ = Printf.fprintf stderr "REFINE\n " in 
+       let _ = print_address stderr case_address in 
+       let _ = print_case_value case_value in 
+       let _ = Printf.fprintf stderr "\n" in 
        let error,old = get parameter handler error case_address blackboard in 
        if case_value = old 
        then 
          error,blackboard,Ignore
        else
-         let error,bool = strictly_more_refined parameter handler error case_value old 
-         in 
+         let error,bool = strictly_more_refined parameter handler error old case_value in 
          if bool 
          then 
-           let error,blackboard = set parameter handler error case_address case_value blackboard in 
-           let error,blackboard = record_modif parameter handler error case_address old blackboard in 
-           error,blackboard,Success
+           error,blackboard,Ignore 
          else 
-           error,blackboard,Fail 
+           let error,bool = strictly_more_refined parameter handler error case_value old 
+           in 
+           if bool 
+           then 
+             let error,blackboard = set parameter handler error case_address case_value blackboard in 
+             let error,blackboard = record_modif parameter handler error case_address old blackboard in 
+             error,blackboard,Success
+           else 
+             error,blackboard,Fail 
 
      let overwrite parameter handler error case_address case_value blackboard = 
        let error,old = get parameter handler error case_address blackboard in 
@@ -818,13 +896,32 @@ module Blackboard =
      type result = ()
          
   (** iteration*)
-     let is_maximal_solution parameter handler error blackboard = error,false 
+     let is_maximal_solution parameter handler error blackboard = 
+       error,blackboard.n_unresolved_events = 0 
+
  
   (** exporting result*)
        
    let translate_blackboard parameter handler error blackboard = error,()
        
-  
+(*   let print_assignement log (a,v) = 
+     let _ = print_case_address a in 
+     let _ = print_case_value v in 
+     () *)
+
+   let print_stack log blackboard = 
+     let stack = blackboard.current_stack in 
+     let _ = Printf.fprintf log "Current_stack_level %i " (List.length stack) in 
+     let _ = List.iter (print_assignment log) stack  in 
+     List.iter 
+         (fun x -> 
+           let _ = Printf.fprintf log "Other level %i "  (List.length x) in 
+           List.iter (print_assignment log) x)
+         blackboard.stack 
+     
+       
+ 
+ 
    end:Blackboard)
 
 

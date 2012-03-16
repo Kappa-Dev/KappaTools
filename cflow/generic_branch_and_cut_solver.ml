@@ -18,110 +18,87 @@
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
-type assign_result = Fail | Success | Ignored  
-
-
-
 
 module Solver = 
-  functor (B:Blackboard.Blackboard) -> 
-    struct 
-      let combine_output o1 o2 = 
-	match o2
-	with 
-	  | Ignored -> o1
-	  | _ -> o2  
-
-(*      let reset parameter handler error blackboard = 
-	let error,blackboard = B.reset parameter handler error in *)
-
-      (*let overwrite parameter handler error address blackboard stack former_value new_value =  
-        let error,blackboard = B.set parameter handler error (address,new_value) blackboard in 
-	let error,stack = B.record_modif parameter handler error (address,None) stack in 
-        error,stack,blackboard *)
-        
-(*      let rec deal_with_assignments parameter handler error list blackboard stack output = 
-	match list
-	with 
-	  | [] -> error,blackboard,output
-	  | (address,case_value)::tail -> 
-	    let error,blackboard,output' = B.refineget parameter handler error address blackboard in 
-	    match former_value 
-	    with 
-	      | None ->
-		begin
-		  let error,stack,blackboard = overwrite parameter handler error address blackboard stack (Some case_value) former_value 
-                  in 
-		  deal_with_assignments parameter handler error tail blackboard stack Success
-		end 
-	      | Some x when x=case_value -> 
-		begin
-		  deal_with_assignments parameter handler error tail blackboard stack output 
-		end
-              | Some x -> 
-                begin
-                  if B.strictly_more_refined case_value x
-                  then 
-                    begin
-		      let error,stack,blackboard = overwrite parameter handler error address blackboard stack (Some case_value) former_value 
-                      in 
-		      deal_with_assignments parameter handler error tail blackboard stack Success
-		    end 
-                  else
-                    begin
-                      error,blackboard,stack,Fail
-                    end 
-                end 
-	      | _ -> 
-		begin 
-		  error,blackboard,stack,Fail 
-	end *)
-
-(*      let rec propagate parameter handler error list blackboard stack = 
-	match list 
-	with 
-	  | []  -> error,blackboard,true
-	  | head::tail -> 
-	      let error,blackboard, = B.apply_instruction parameter handler error blackboard head tail in 
-	      let error,blackboard,stack,output = deal_with_assignments parameter handler error assignment_list blackboard stack Ignored in 
-		match output 
-		with 
-		  | Fail -> error,blackboard,false
-		  | Success -> 
-		      let error,list = B.propagation_heuristic parameter handler error blackboard head tail in 			
-			propagate parameter handler error list blackboard stack 
-		  | Ignored -> 
-		      propagate parameter handler error tail blackboard stack 
-		  
-      let rec branch_over_assumption_list parameter handler error list blackboard stack = 
-	match list 
-	with 
-	  | [] -> error,blackboard,false 
-	  | head::tail -> 
-	      begin
-		let fail error blackboard stack tail = 
-		  let error,blackboard,stack = reset parameter handler error blackboard stack in 
-		    branch_over_assumption_list parameter handler error tail blackboard stack 
-		in 
-		let error,blackboard,stack = B.branch parameter handler error blackboard stack in 
-		let error,blackboard,bool = propagate parameter handler error [head] blackboard stack in
-		  if bool 
-		  then 
-		    let error,blackboard,bool = iter parameter handler error blackboard stack in 
-		      if bool 
-		      then error,blackboard,bool
-		      else fail error blackboard stack tail 
-		  else fail error blackboard stack tail 
-	      end
-		
-      and iter parameter handler error blackboard stack = 
-	let error,bool = B.is_maximal_solution parameter handler error blackboard in 
-	  if bool 
-	  then 
-	    error,blackboard,bool
-	  else
-	    let error,list = B.next_choice parameter handler error blackboard in 
-	      branch_over_assumption_list parameter handler error list blackboard stack  
-*)		
-    end 
+struct 
+  module PH= Propagation_heuristics.Propagation_heuristic 
+(*Blackboard_with_heuristic*)
+    
+  let combine_output o1 o2 = 
+    if PH.B.is_ignored o2 then o1 else o2 
       
+  let rec propagate parameter handler error instruction_list propagate_list blackboard = 
+    let _ = Printf.fprintf stderr "PROPAGATE\n" in 
+    let _ = Printf.fprintf stderr "SIZE %i %i \n" (List.length instruction_list) (List.length propagate_list) in 
+    match instruction_list 
+    with 
+      | t::q ->
+        begin 
+          let error,blackboard,instruction_list,propagate_list,assign_result = PH.apply_instruction parameter handler error blackboard t q propagate_list in 
+          if PH.B.is_failed assign_result 
+          then 
+            error,blackboard,assign_result 
+          else 
+            propagate parameter handler error instruction_list propagate_list blackboard
+        end
+      | [] -> 
+        begin
+          match propagate_list 
+          with 
+            | t::q -> 
+              let error,blackboard,instruction_list,propagate_list,assign_result = PH.propagate parameter handler error blackboard t instruction_list q in 
+                    if PH.B.is_failed assign_result 
+                    then 
+                      error,blackboard,assign_result 
+                    else 
+                      propagate parameter handler error instruction_list propagate_list blackboard
+            | [] -> error,blackboard,PH.B.success
+        end 
+          
+	  
+  let rec branch_over_assumption_list parameter handler error list blackboard = 
+    match list 
+    with 
+	  | [] -> error,blackboard,PH.B.fail
+	  | head::tail -> 
+	    begin
+	      let error,blackboard = PH.B.branch parameter handler error blackboard in
+              let _ = Printf.fprintf stderr "BRANCH\n" in 
+              let _ = PH.B.print_blackboard parameter handler error stderr blackboard in 
+	        let error,blackboard,output = propagate parameter handler error [head] [] blackboard in
+	      if PH.B.is_failed output 
+              then 
+                let _ = Printf.fprintf stderr "FAIL\n" in 
+                let error,blackboard = PH.B.reset_last_branching parameter handler error blackboard in 
+                branch_over_assumption_list parameter handler error tail blackboard 
+              else 
+                let error,blackboard,output = iter parameter handler error blackboard in 
+                if PH.B.is_failed output 
+                then 
+                  let error,blackboard = PH.B.reset_last_branching parameter handler error blackboard in 
+                  branch_over_assumption_list parameter handler error tail blackboard 
+                else 
+                  error,blackboard,output 
+	    end
+	      
+  and iter parameter handler error blackboard = 
+    let _ = Printf.fprintf stderr "ITER\n" in 
+    let error,bool = PH.B.is_maximal_solution parameter handler error blackboard in
+    if bool 
+    then 
+      error,blackboard,PH.B.success 
+    else
+      let error,list = PH.next_choice parameter handler error blackboard in
+      branch_over_assumption_list parameter handler error list blackboard 
+    
+  let compress parameter handler error blackboard list =
+    let error,blackboard = PH.B.branch parameter handler error blackboard in 
+    let error,blackboard,output = 
+      propagate parameter handler error list [] blackboard 
+    in 
+    let _ = Printf.fprintf stderr "AFTER OBSERVABLE\n" in 
+    let _ = PH.B.print_blackboard parameter handler error stderr blackboard in 
+    iter parameter handler error blackboard 
+
+end 
+  

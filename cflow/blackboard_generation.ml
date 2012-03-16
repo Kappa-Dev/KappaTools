@@ -836,8 +836,7 @@ maps each wire to the set of its previous states, this summarize the potential s
     error,blackboard.pre_nsteps+1 
 
   let mandatory_events parameter handler error blackboard = 
-    error,[]
-
+    error,blackboard.pre_observable_list 
 
 end:PreBlackboard)
 
