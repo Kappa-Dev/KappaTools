@@ -302,7 +302,7 @@ maps each wire to the set of its previous states, this summarize the potential s
            H.raise_error parameter handler error_list stderr error Undefined  
 
      let compatible x y = 
-       x=y or more_refined x y or more_refined x y
+       x=y or more_refined x y or more_refined y x
              
      let disjunction parameter handler error x y = 
        error,

@@ -423,7 +423,7 @@ module Blackboard =
            print_known_case log "?(" ") " " " case 
 
      let print_pointer log seid = 
-       Printf.fprintf log "event %i" seid
+       Printf.fprintf log "event sid %i" seid
 
      let print_event_case_address log event_case_address = 
        let _ = print_pointer log event_case_address.row_short_event_id in 
@@ -807,16 +807,11 @@ module Blackboard =
 
    
      let record_modif parameter handler error case_address case_value blackboard = 
-       let _ = Printf.fprintf stderr "RECORD\n" in 
        error,
        {blackboard
         with current_stack = (case_address,case_value)::blackboard.current_stack}
        
      let refine parameter handler error case_address case_value blackboard = 
-       let _ = Printf.fprintf stderr "REFINE\n " in 
-       let _ = print_address stderr case_address in 
-       let _ = print_case_value case_value in 
-       let _ = Printf.fprintf stderr "\n" in 
        let error,old = get parameter handler error case_address blackboard in 
        if case_value = old 
        then 

@@ -28,8 +28,6 @@ struct
     if PH.B.is_ignored o2 then o1 else o2 
       
   let rec propagate parameter handler error instruction_list propagate_list blackboard = 
-    let _ = Printf.fprintf stderr "PROPAGATE\n" in 
-    let _ = Printf.fprintf stderr "SIZE %i %i \n" (List.length instruction_list) (List.length propagate_list) in 
     match instruction_list 
     with 
       | t::q ->
@@ -63,9 +61,7 @@ struct
 	  | head::tail -> 
 	    begin
 	      let error,blackboard = PH.B.branch parameter handler error blackboard in
-              let _ = Printf.fprintf stderr "BRANCH\n" in 
-              let _ = PH.B.print_blackboard parameter handler error stderr blackboard in 
-	        let error,blackboard,output = propagate parameter handler error [head] [] blackboard in
+	      let error,blackboard,output = propagate parameter handler error [head] [] blackboard in
 	      if PH.B.is_failed output 
               then 
                 let _ = Printf.fprintf stderr "FAIL\n" in 
@@ -96,8 +92,6 @@ struct
     let error,blackboard,output = 
       propagate parameter handler error list [] blackboard 
     in 
-    let _ = Printf.fprintf stderr "AFTER OBSERVABLE\n" in 
-    let _ = PH.B.print_blackboard parameter handler error stderr blackboard in 
     iter parameter handler error blackboard 
 
 end 
