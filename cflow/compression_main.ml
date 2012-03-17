@@ -84,9 +84,9 @@ let weak_compression env state step_list =
   in  
   let error,list = S.PH.forced_events parameter handler error blackboard in 
   let _ = Printf.fprintf stderr "%i" (List.length list) in 
-  let error = 
+  let error,_ = 
     List.fold_left 
-      (fun error list -> 
+      (fun (error,counter) list -> 
         let _ = Printf.fprintf stderr "COMPRESS" in 
         let error,blackboard,output = 
           S.compress parameter handler error blackboard  list 
@@ -98,21 +98,20 @@ let weak_compression env state step_list =
             let _ =
               if S.PH.B.is_failed output 
               then 
-                let _ = Printf.fprintf stderr "Fail" in error 
+                let _ = Printf.fprintf stderr "Fail_to_compress" in  error
               else 
+                let _ = Printf.fprintf stderr "Succeed_to_compress" in 
                 let error,list = S.PH.B.translate_blackboard parameter handler error blackboard in 
                 let grid = S.PH.B.PB.K.build_grid list env in 
                 let _ = Causal.dump grid state env in 
-                let _ = Causal.dot_of_grid "essai" grid state env in 
-               (* let _ = S.PH.B.print_blackboard parameter handler error stderr blackboard in 
-                let _ = Printf.fprintf stderr "*********************\n" in 
-               *) let error,blackboard = S.PH.B.reset_init parameter handler error blackboard in 
+                let _ = Causal.dot_of_grid ((string_of_int counter)^"_"^(!Parameter.cflowFileName)) grid state env in 
+                let error,blackboard = S.PH.B.reset_init parameter handler error blackboard in 
                 error
-            in error 
+            in  error
           else 
             error
-        in error) 
-      error list 
+        in error,counter+1)
+      (error,1) list 
   in 
   let _ = 
     List.iter 
