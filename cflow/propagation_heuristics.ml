@@ -502,12 +502,12 @@ module Propagation_heuristic =
                          if debug_mode 
                          then 
                            let _ = Printf.fprintf stderr "\nPropagate_up  (case 1):\n" in 
-                           let _ = Printf.fprintf stderr "The event is kept, there is no action \n " in 
-                           let _ = Printf.fprintf stderr "next event Action: " in 
+                           let _ = Printf.fprintf stderr "The event before is kept, there is no action \n " in 
+                           let _ = Printf.fprintf stderr "before event Action: " in 
                            let _ = B.PB.print_predicate_value stderr action in 
                            let _ = Printf.fprintf stderr "\nWire_state: " in 
                            let _ = B.PB.print_predicate_value stderr predicate_value in 
-                           let _ = Printf.fprintf stderr "\nRefine before the event with the state " in 
+                           let _ = Printf.fprintf stderr "\nRefine before the event (before) with the state " in 
                            let _ = B.PB.print_predicate_value stderr new_value in 
                            let _ = Printf.fprintf stderr "\n" in 
                            let _ = Printf.fprintf stderr "***\n" in 
@@ -523,8 +523,8 @@ module Propagation_heuristic =
                          if debug_mode 
                          then 
                            let _ = Printf.fprintf stderr "\nPropagate_up  (case 2):\n" in 
-                           let _ = Printf.fprintf stderr "The event is kept, there is no action \n " in 
-                           let _ = Printf.fprintf stderr "next event Action: " in 
+                           let _ = Printf.fprintf stderr "The event before is kept, there is no action \n " in 
+                           let _ = Printf.fprintf stderr "before event Action: " in 
                            let _ = B.PB.print_predicate_value stderr action in 
                            let _ = Printf.fprintf stderr "\nWire_state: " in 
                            let _ = B.PB.print_predicate_value stderr predicate_value in 
@@ -547,8 +547,8 @@ module Propagation_heuristic =
                          if debug_mode 
                          then 
                            let _ = Printf.fprintf stderr "\nPropagate_up  (case 3):\n" in 
-                           let _ = Printf.fprintf stderr "The event is kept, there is an action, but no test \n " in 
-                           let _ = Printf.fprintf stderr "next event Action: " in 
+                           let _ = Printf.fprintf stderr "The event before is kept, there is an action, but no test \n " in 
+                           let _ = Printf.fprintf stderr "before event Action: " in 
                            let _ = B.PB.print_predicate_value stderr action in 
                            let _ = Printf.fprintf stderr "\nWire_state: " in 
                            let _ = B.PB.print_predicate_value stderr predicate_value in 
@@ -570,14 +570,14 @@ module Propagation_heuristic =
                           if debug_mode 
                           then 
                             let _ = Printf.fprintf stderr "\nPropagate_up  (case 4):\n" in 
-                            let _ = Printf.fprintf stderr "The event is kept, there is an action and a test \n " in 
-                            let _ = Printf.fprintf stderr "next event Test: " in 
+                            let _ = Printf.fprintf stderr "The event before is kept, there is an action and a test \n " in 
+                            let _ = Printf.fprintf stderr "before event Test: " in 
                             let _ = B.PB.print_predicate_value stderr test in 
-                           let _ = Printf.fprintf stderr "\nnext event Action: " in 
+                           let _ = Printf.fprintf stderr "\nbefore event Action: " in 
                            let _ = B.PB.print_predicate_value stderr action in 
                            let _ = Printf.fprintf stderr "\nWire_state: " in 
                            let _ = B.PB.print_predicate_value stderr predicate_value in 
-                           let _ = Printf.fprintf stderr "\nRefine before the event with the state " in 
+                           let _ = Printf.fprintf stderr "\nRefine before the event (before) with the state " in 
                            let _ = B.PB.print_predicate_value stderr state in 
                            let _ = Printf.fprintf stderr "\n" in 
                            let _ = Printf.fprintf stderr "***\n" in 
@@ -595,10 +595,10 @@ module Propagation_heuristic =
                           if debug_mode 
                           then 
                             let _ = Printf.fprintf stderr "\nPropagate_up  (case 5):\n" in 
-                            let _ = Printf.fprintf stderr "The event is kept, there is an action and a test \n " in 
-                            let _ = Printf.fprintf stderr "next event Test: " in 
+                            let _ = Printf.fprintf stderr "The event before is kept, there is an action and a test \n " in 
+                            let _ = Printf.fprintf stderr "before event Test: " in 
                             let _ = B.PB.print_predicate_value stderr test in 
-                            let _ = Printf.fprintf stderr "\nnext event Action: " in 
+                            let _ = Printf.fprintf stderr "\nbefore event Action: " in 
                             let _ = B.PB.print_predicate_value stderr action in 
                             let _ = Printf.fprintf stderr "\nWire_state: " in 
                             let _ = B.PB.print_predicate_value stderr predicate_value in 
@@ -617,8 +617,8 @@ module Propagation_heuristic =
                           if debug_mode 
                           then 
                             let _ = Printf.fprintf stderr "\nPropagate_up  (case 6):\n" in 
-                            let _ = Printf.fprintf stderr "The event is kept, there is an action \n " in 
-                            let _ = Printf.fprintf stderr "\nnext event Action: " in 
+                            let _ = Printf.fprintf stderr "The event before is kept, there is an action \n " in 
+                            let _ = Printf.fprintf stderr "\nbefore event Action: " in 
                             let _ = B.PB.print_predicate_value stderr action in 
                             let _ = Printf.fprintf stderr "\nWire_state: " in 
                             let _ = B.PB.print_predicate_value stderr predicate_value in 
@@ -646,27 +646,68 @@ module Propagation_heuristic =
                     with 
                       | true -> 
                         begin
-                          error,
-                          blackboard,
-                          (Refine_value_before(event_case_address,predicate_value))::instruction_list,
-                          propagate_list,
-                          B.success 
+                           let _ = 
+                             if debug_mode 
+                             then 
+                               let _ = Printf.fprintf stderr "\nPropagate_up  (case 7):\n" in 
+                               let _ = Printf.fprintf stderr "we do not know if the event before is kept,  there is neither a  test, nor  action \n " in 
+                               let _ = Printf.fprintf stderr "Wire_state: " in 
+                               let _ = B.PB.print_predicate_value stderr predicate_value in 
+                               let _ = Printf.fprintf stderr "\nRefine before the event (before) with the state " in 
+                               let _ = B.PB.print_predicate_value stderr predicate_value in 
+                               let _ = Printf.fprintf stderr "\n" in 
+                               let _ = Printf.fprintf stderr "***\n" in 
+                               ()
+                           in 
+                           error,
+                           blackboard,
+                           (Refine_value_before(event_case_address,predicate_value))::instruction_list,
+                           propagate_list,
+                           B.success 
                         end 
                       | false -> 
                         begin 
                           if B.PB.compatible test predicate_value 
-                          then 
+                          then
+                            let _ = 
+                             if debug_mode 
+                             then 
+                               let _ = Printf.fprintf stderr "\nPropagate_up  (case 8):\n" in 
+                               let _ = Printf.fprintf stderr "we do not know if the event is kept, there is a  test, but no action \n " in
+                               let _ = Printf.fprintf stderr "before event Test: " in 
+                               let _ = B.PB.print_predicate_value stderr test in 
+                               let _ = Printf.fprintf stderr "\nWire_state: " in 
+                               let _ = B.PB.print_predicate_value stderr predicate_value in 
+                               let _ = Printf.fprintf stderr "\nRefine before the event (before) with the state " in 
+                               let _ = B.PB.print_predicate_value stderr predicate_value in 
+                               let _ = Printf.fprintf stderr "\n" in 
+                               let _ = Printf.fprintf stderr "***\n" in 
+                               ()
+                            in 
                             error,
                             blackboard,
                             (Refine_value_before(event_case_address,predicate_value))::instruction_list,
                             propagate_list,
                             B.success 
                           else 
-                            error,
-                            blackboard,
-                            (Discard_event(eid))::instruction_list,
-                            propagate_list,
-                            B.success 
+                             let _ = 
+                               if debug_mode 
+                               then 
+                                 let _ = Printf.fprintf stderr "\nPropagate_up  (case 9):\n" in 
+                                 let _ = Printf.fprintf stderr "we do not know if the event before is kept, there is a  test, but no action \n " in
+                                 let _ = Printf.fprintf stderr "before event Test: " in 
+                                 let _ = B.PB.print_predicate_value stderr test in 
+                                 let _ = Printf.fprintf stderr "\nWire_state: " in 
+                                 let _ = B.PB.print_predicate_value stderr predicate_value in 
+                                 let _ = Printf.fprintf stderr "\nEvent before (%i) is discarded \n " eid in 
+                                 let _ = Printf.fprintf stderr "***\n" in 
+                                 ()
+                             in 
+                             error,
+                             blackboard,
+                             (Discard_event(eid))::instruction_list,
+                             propagate_list,
+                             B.success 
                         end 
                   end 
                 | false -> 
@@ -685,10 +726,24 @@ module Propagation_heuristic =
                           with 
                             | true -> 
                               begin
-                                let error,new_predicate_value = B.PB.disjunction parameter handler error test predicate_value in 
+                                let _ = 
+                                  if debug_mode 
+                                  then 
+                                    let _ = Printf.fprintf stderr "\nPropagate_up  (case 10):\n" in 
+                                    let _ = Printf.fprintf stderr "we do not know if the event before is kept, there is an action, but no test \n " in
+                                    let _ = Printf.fprintf stderr "before event Action: " in 
+                                    let _ = B.PB.print_predicate_value stderr action in 
+                                    let _ = Printf.fprintf stderr "\nWire_state: " in 
+                                    let _ = B.PB.print_predicate_value stderr predicate_value in 
+                                    let _ = Printf.fprintf stderr "\nRefine before the event (before) with the state " in 
+                                    let _ = B.PB.print_predicate_value stderr predicate_value in 
+                                    let _ = Printf.fprintf stderr "\n" in 
+                                    let _ = Printf.fprintf stderr "***\n" in 
+                                 ()
+                                in 
                                 error,
                                 blackboard,
-                                (Refine_value_before(event_case_address,new_predicate_value))::instruction_list,
+                                (Refine_value_before(event_case_address,predicate_value))::instruction_list,
                                 propagate_list,
                                 B.success
                               end 
@@ -701,12 +756,45 @@ module Propagation_heuristic =
                                     then 
                                       let error,new_test = B.PB.conj parameter handler error test preview_predicate_value in 
                                       let error,new_predicate_value = B.PB.disjunction parameter handler error new_test predicate_value in 
+                                      let _ = 
+                                            if debug_mode 
+                                            then 
+                                              let _ = Printf.fprintf stderr "\nPropagate_up  (case 11):\n" in 
+                                              let _ = Printf.fprintf stderr "we do not know if the event before is kept, there is an action and a test \n " in
+                                              let _ = Printf.fprintf stderr "before event Test:" in 
+                                              let _ = B.PB.print_predicate_value stderr test in 
+                                              let _ = Printf.fprintf stderr "\nbefore event Action: " in 
+                                              let _ = B.PB.print_predicate_value stderr action in 
+                                              let _ = Printf.fprintf stderr "\nWire_state: " in 
+                                              let _ = B.PB.print_predicate_value stderr predicate_value in 
+                                              let _ = Printf.fprintf stderr "\nRefine before the event (before) with the state " in 
+                                              let _ = B.PB.print_predicate_value stderr new_predicate_value in 
+                                              let _ = Printf.fprintf stderr "\n" in 
+                                              let _ = Printf.fprintf stderr "***\n" in 
+                                              ()
+                                          in
                                       error,
                                       blackboard,
                                       (Refine_value_before(event_case_address,new_predicate_value))::instruction_list,
                                          propagate_list,
                                       B.success
                                     else
+                                      let _ = 
+                                        if debug_mode 
+                                        then 
+                                          let _ = Printf.fprintf stderr "\nPropagate_up  (case 12):\n" in 
+                                          let _ = Printf.fprintf stderr "we do not know if the event before is kept, there is an action and a test \n " in
+                                          let _ = Printf.fprintf stderr "before event Test:" in 
+                                          let _ = B.PB.print_predicate_value stderr test in 
+                                          let _ = Printf.fprintf stderr "\nbefore event Action: " in 
+                                          let _ = B.PB.print_predicate_value stderr action in 
+                                          let _ = Printf.fprintf stderr "\nWire_state: " in 
+                                          let _ = B.PB.print_predicate_value stderr predicate_value in 
+                                          let _ = Printf.fprintf stderr "\nDiscard the event before (%i)" eid in 
+                                          let _ = Printf.fprintf stderr "\n" in 
+                                          let _ = Printf.fprintf stderr "***\n" in 
+                                          ()
+                                      in
                                       error,
                                       blackboard,
                                       (Discard_event(eid))::instruction_list,
@@ -715,14 +803,45 @@ module Propagation_heuristic =
                                   end 
                                 else 
                                   let error,prev' = B.PB.disjunction parameter handler error predicate_value test in 
+                                  let _ = 
+                                    if debug_mode 
+                                    then 
+                                      let _ = Printf.fprintf stderr "\nPropagate_up  (case 13):\n" in 
+                                      let _ = Printf.fprintf stderr "we do not know if the event before is kept, there is an action and a test \n " in
+                                      let _ = Printf.fprintf stderr "before event Test:" in 
+                                      let _ = B.PB.print_predicate_value stderr test in 
+                                      let _ = Printf.fprintf stderr "\nbefore event Action: " in 
+                                      let _ = B.PB.print_predicate_value stderr action in 
+                                      let _ = Printf.fprintf stderr "\nWire_state: " in 
+                                      let _ = B.PB.print_predicate_value stderr predicate_value in 
+                                      let _ = Printf.fprintf stderr "\nRefine before the event (before) with the state " in 
+                                      let _ = B.PB.print_predicate_value stderr prev' in 
+                                      let _ = Printf.fprintf stderr "\n" in 
+                                      let _ = Printf.fprintf stderr "***\n" in 
+                                      ()
+                                  in
                                   error,
                                   blackboard,
                                   (Refine_value_before(event_case_address,prev'))::instruction_list,
                                   propagate_list,
                                   B.success 
-                                 end 
+                              end 
                         end 
                       else 
+                        let _ = 
+                          if debug_mode 
+                          then 
+                            let _ = Printf.fprintf stderr "\nPropagate_up  (case 14):\n" in 
+                            let _ = Printf.fprintf stderr "we do not know if the event before is kept, there is an action and maybe a test \n " in
+                            let _ = Printf.fprintf stderr "\nbefore event Action: " in 
+                            let _ = B.PB.print_predicate_value stderr action in 
+                            let _ = Printf.fprintf stderr "\nWire_state: " in 
+                            let _ = B.PB.print_predicate_value stderr predicate_value in 
+                            let _ = Printf.fprintf stderr "\nDiscard the event before (%i)" eid in 
+                            let _ = Printf.fprintf stderr "\n" in 
+                            let _ = Printf.fprintf stderr "***\n" in 
+                            ()
+                        in
                         error,
                         blackboard,
                         Discard_event(eid)::instruction_list,
@@ -731,12 +850,43 @@ module Propagation_heuristic =
                     else 
                       if B.PB.more_refined action predicate_value 
                       then 
+                        let _ = 
+                          if debug_mode 
+                          then 
+                            let _ = Printf.fprintf stderr "\nPropagate_up  (case 15):\n" in 
+                            let _ = Printf.fprintf stderr "we do not know if the event before is kept, there is an action and a test \n " in
+                            let _ = Printf.fprintf stderr "before event Test:" in 
+                            let _ = B.PB.print_predicate_value stderr test in 
+                            let _ = Printf.fprintf stderr "\nbefore event Action: " in 
+                            let _ = B.PB.print_predicate_value stderr action in 
+                            let _ = Printf.fprintf stderr "\nWire_state: " in 
+                            let _ = B.PB.print_predicate_value stderr predicate_value in 
+                            let _ = Printf.fprintf stderr "\nSelect the event before (%i)" eid in 
+                            let _ = Printf.fprintf stderr "\n" in 
+                            let _ = Printf.fprintf stderr "***\n" in 
+                            ()
+                        in
                         error,
                         blackboard,
                         (Keep_event(eid))::instruction_list,
                         propagate_list,
                         B.success
                       else 
+                        let _ = 
+                          if debug_mode 
+                          then 
+                            let _ = Printf.fprintf stderr "\nPropagate_up  (case 16):\n" in 
+                            let _ = Printf.fprintf stderr "we do not know if the event before is kept, there is an action and a test \n " in
+                            let _ = Printf.fprintf stderr "before event Test:" in 
+                            let _ = B.PB.print_predicate_value stderr test in 
+                            let _ = Printf.fprintf stderr "\nbefore event Action: " in 
+                            let _ = B.PB.print_predicate_value stderr action in 
+                            let _ = Printf.fprintf stderr "\nWire_state: " in 
+                            let _ = B.PB.print_predicate_value stderr predicate_value in 
+                            let _ = Printf.fprintf stderr "\nCut\n" in 
+                            let _ = Printf.fprintf stderr "***\n" in 
+                            ()
+                        in
                         error,
                         blackboard,
                         [],
