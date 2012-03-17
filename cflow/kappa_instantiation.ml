@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 08/03/2012
+  * Last modification: 17/03/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -18,7 +18,7 @@
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
-let debug_mode = true 
+let debug_mode = false
 let compose f g = (fun x -> f (g x))
 
 module type Cflow_signature =

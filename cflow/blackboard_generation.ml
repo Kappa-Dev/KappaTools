@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 12/03/2012
+  * Last modification: 17/03/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   

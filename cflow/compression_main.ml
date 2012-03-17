@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 19/10/2011
-  * Last modification: 23/02/2012
+  * Last modification: 17/03/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -20,7 +20,7 @@
 
 module S = Generic_branch_and_cut_solver.Solver 
 
-let debug_mode = true 
+let debug_mode = false
 
 let weak_compression env state step_list =  
   let _ = 

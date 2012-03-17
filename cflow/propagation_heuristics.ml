@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 05/09/2011
-  * Last modification: 13/03/2012
+  * Last modification: 17/03/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -112,7 +112,6 @@ module Propagation_heuristic =
                 aux (step+1) best_grade best_predicate 
           in 
           let p_id = aux 1 (B.get_n_unresolved_events_of_pid blackboard 0) 0 in 
-          let _ = Printf.fprintf stderr "NEXT %i\n" p_id in 
           let error,event_id = get_last_unresolved_event parameter handler error blackboard p_id 
           in 
           match event_id 
