@@ -22,7 +22,7 @@ module S = Generic_branch_and_cut_solver.Solver
 
 let debug_mode = true 
 
-let weak_compression env step_list =  
+let weak_compression env state step_list =  
   let _ = 
     if debug_mode 
     then 
@@ -100,8 +100,13 @@ let weak_compression env step_list =
               then 
                 let _ = Printf.fprintf stderr "Fail" in error 
               else 
-                let _ = S.PH.B.print_blackboard parameter handler error stderr blackboard in 
+                let error,list = S.PH.B.translate_blackboard parameter handler error blackboard in 
+                let grid = S.PH.B.PB.K.build_grid list env in 
+                let _ = Causal.dump grid state env in 
+                let _ = Causal.dot_of_grid "essai" grid state env in 
+               (* let _ = S.PH.B.print_blackboard parameter handler error stderr blackboard in 
                 let _ = Printf.fprintf stderr "*********************\n" in 
+               *) let error,blackboard = S.PH.B.reset_init parameter handler error blackboard in 
                 error
             in error 
           else 

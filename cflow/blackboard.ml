@@ -68,7 +68,9 @@ sig
   val import: (PB.pre_blackboard -> PB.H.error_channel * blackboard) PB.H.with_handler 
 
   (** output result*)
-  type result 
+  type side_effects = unit
+  type result = (PB.K.refined_step*side_effects list) list 
+     
 
   (** iteration*)
   val is_maximal_solution: (blackboard -> PB.H.error_channel * bool) PB.H.with_handler 
@@ -93,6 +95,7 @@ sig
   val n_unresolved_events: case_address 
   val n_unresolved_events_in_column: event_case_address -> case_address 
   val forced_events: blackboard -> PB.step_id list list 
+  val side_effect_of_event: blackboard -> PB.step_id -> (int*int) list
 end
 
 module Blackboard = 
@@ -331,6 +334,8 @@ module Blackboard =
      type stack = assignment list 
      type blackboard = 
          {
+           event: PB.K.refined_step PB.A.t;
+           pre_column_map_inv: PB.predicate_info PB.A.t; (** maps each wire id to its wire label *)
            forced_events: int list list;
            n_predicate_id: int ;
            n_eid:int;
@@ -344,10 +349,11 @@ module Blackboard =
            n_unresolved_events: int ;
            last_linked_event_of_predicate_id: int PB.A.t;
            event_case_list: event_case_address list PB.A.t;
-           
+           side_effect_of_event: (int*int) list PB.A.t;
          }
 
      let forced_events blackboard = blackboard.forced_events 
+     let side_effect_of_event blackboard i = PB.A.get blackboard.side_effect_of_event i 
 
      let case_list_of_eid parameter handler error blackboard eid = 
        try 
@@ -632,8 +638,13 @@ module Blackboard =
          in aux1 (n_predicates-1) error 
        in 
        let error,forced_events = PB.mandatory_events parameter handler error pre_blackboard in 
+       let error,event = PB.get_pre_event parameter handler error pre_blackboard in 
+       let error,side_effects = PB.get_side_effect parameter handler error pre_blackboard in 
        error,
        {
+         event = event ;
+         side_effect_of_event = side_effects ; 
+         pre_column_map_inv = PB.get_pre_column_map_inv pre_blackboard; 
          forced_events = forced_events;
          n_eid = n_events;
          n_seid = n_seid;
@@ -888,7 +899,8 @@ module Blackboard =
        in aux (error,blackboard) 
     
   (** output result*)
-     type result = ()
+     type side_effects = unit  
+     type result = (PB.K.refined_step*side_effects list) list 
          
   (** iteration*)
      let is_maximal_solution parameter handler error blackboard = 
@@ -897,13 +909,30 @@ module Blackboard =
  
   (** exporting result*)
        
-   let translate_blackboard parameter handler error blackboard = error,()
+   let translate_blackboard parameter handler error blackboard = 
+     let array = blackboard.selected_events in 
+     let step_array = blackboard.event in 
+     let size = PB.A.length array in
+     let rec aux k sides list = 
+       if k=size 
+       then (List.rev list) 
+       else 
+         let bool = PB.A.get array k in 
+         match bool 
+         with 
+           | None -> aux (k+1) sides list (*to do raise an exception*)
+           | Some false -> aux (k+1) sides list
+           | Some true -> 
+             begin
+               let step = 
+                 PB.A.get step_array k 
+               in 
+               aux (k+1) sides ((step,[])::list) 
+             end
+     in 
+     let list = aux 0 () [] in 
+     error,list 
        
-(*   let print_assignement log (a,v) = 
-     let _ = print_case_address a in 
-     let _ = print_case_value v in 
-     () *)
-
    let print_stack log blackboard = 
      let stack = blackboard.current_stack in 
      let _ = Printf.fprintf log "Current_stack_level %i " (List.length stack) in 

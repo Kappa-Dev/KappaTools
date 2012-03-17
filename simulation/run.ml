@@ -97,7 +97,7 @@ let event state grid event_list counter plot env =
 				let grid,event_list = 
 					if !Parameter.causalModeOn then
 					  begin
-                                            let event_list = Kappa_instantiation.Cflow_linker.store_event (Kappa_instantiation.Cflow_linker.import_event (r,phi,psi)) event_list in 
+                                            let event_list = Kappa_instantiation.Cflow_linker.store_event (Kappa_instantiation.Cflow_linker.import_event ((r,phi,psi),(obs_from_rule_app,r,Counter.event counter))) event_list in 
                                             let event_list = 
                                               List.fold_left 
                                                 (fun event_list (obs,phi) -> 
@@ -150,8 +150,9 @@ let loop state grid event_list counter plot env =
 				if Environment.tracking_enabled env then
 				  begin
 				    Causal.dot_of_grid !Parameter.cflowFileName grid state env ;
-				    let refined_event_list = Compression_main.weak_compression env event_list 
-	          in ()
+				    let refined_event_list = Compression_main.weak_compression env state event_list 
+	                            in
+                                    ()
 				  end;
 	
 			  Plot.fill state counter plot env 0.0; (*Plotting last measures*)
