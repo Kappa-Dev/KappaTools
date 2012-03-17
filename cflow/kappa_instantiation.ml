@@ -652,21 +652,23 @@ module Cflow_linker =
 
   let print_refined_init log env refined_init = ()
   
-  let gen f1 f2 f3 step = 
+  let gen f1 f2 f3 f4 step = 
     match step
     with 
       | Event a -> f1 a 
       | Init a -> f2 a
       | Obs a -> f3 a 
+      | Dummy  -> f4 ()
 
-  let genbis f1 f2 f3 = 
-    gen (fun a -> Event (f1 a)) (fun a -> Init (f2 a)) (fun a -> Obs (f3 a))     
+  let genbis f1 f2 f3  = 
+    gen (fun a -> Event (f1 a)) (fun a -> Init (f2 a)) (fun a -> Obs (f3 a))     (fun a -> Dummy)
   
   let print_refined_step log env = 
-    gen (print_refined_event log env) (print_refined_init log env) (print_refined_obs log env) 
+    gen (print_refined_event log env) (print_refined_init log env) (print_refined_obs log env) (fun _  -> ())
 
   let tests_of_refined_step =
-    gen tests_of_refined_event tests_of_refined_init tests_of_refined_obs
+    gen tests_of_refined_event tests_of_refined_init tests_of_refined_obs 
+(fun _ -> [])
 
   let is_obs_of_refined_step x = 
     match x 
@@ -681,8 +683,8 @@ module Cflow_linker =
     genbis event_of_refined_event init_of_refined_init obs_of_refined_obs 
 
   let actions_of_refined_step = 
-    gen actions_of_refined_event actions_of_refined_init actions_of_refined_obs 
-  
+    gen actions_of_refined_event actions_of_refined_init actions_of_refined_obs (fun _ -> [],[])
+
   let import_event x = x 
   let import_env x = x
   let store_event (event:event) (step_list:step list) = 
@@ -691,8 +693,6 @@ module Cflow_linker =
   let store_obs (i,a,x) step_list = Obs(i,a,x)::step_list 
 
   let build_grid list env = 
-    let _ = Printf.fprintf stderr "BUILD_GRID:\n" in 
-    let _ = Printf.fprintf stderr "%i" (List.length list) in 
     let grid = Causal.empty_grid () in 
     let grid,_ = 
       List.fold_left 

@@ -51,6 +51,13 @@ module Propagation_heuristic =
       | Propagate_up of B.event_case_address
       | Propagate_down of B.event_case_address
 
+    let print_output log x = 
+      if B.is_failed x
+      then Printf.fprintf log "FAILED"
+      else if B.is_ignored x 
+      then Printf.fprintf log "IGNORED" 
+      else Printf.fprintf log "SUCCESS" 
+
     let forced_events parameter handler error blackboard = 
       let list = B.forced_events blackboard in 
       error,List.map (List.map (fun x -> Keep_event x)) list
@@ -105,7 +112,6 @@ module Propagation_heuristic =
                 aux (step+1) best_grade best_predicate 
           in 
           let p_id = aux 1 (B.get_n_unresolved_events_of_pid blackboard 0) 0 in 
-(**)          
           let _ = Printf.fprintf stderr "NEXT %i\n" p_id in 
           let error,event_id = get_last_unresolved_event parameter handler error blackboard p_id 
           in 
@@ -174,9 +180,10 @@ module Propagation_heuristic =
                       begin 
                         if B.PB.compatible predicate_value test  
                         then 
+                          let error,conj = B.PB.conj parameter handler error test predicate_value in 
                           error,
                           blackboard,
-                          (Refine_value_after(next_event_case_address,predicate_value))::instruction_list,
+                          (Refine_value_before(next_event_case_address,conj))::(Refine_value_after(next_event_case_address,conj))::instruction_list,
                           propagate_list,
                           B.success
                         else 
@@ -340,12 +347,24 @@ module Propagation_heuristic =
                     propagate_list,
                     B.success
                   else (*we know that the wire was defined before*)
-                    let error,state = B.PB.conj parameter handler error test B.PB.defined in 
-                    error,
-                    blackboard,
-                    (Refine_value_before(event_case_address,state)::instruction_list),
-                    propagate_list,
-                    B.success
+                    if B.PB.compatible test B.PB.defined 
+                    then 
+                      begin 
+                        let error,state = B.PB.conj parameter handler error test B.PB.defined in 
+                        error,
+                        blackboard,
+                        (Refine_value_before(event_case_address,state)::instruction_list),
+                        propagate_list,
+                        B.success
+                      end
+                    else 
+                      begin 
+                        error,
+                        blackboard,
+                        [],
+                        [],
+                        B.fail
+                      end
                 else (*The event has to be discarded which is absurd *)
                   error,
                   blackboard,
@@ -398,59 +417,65 @@ module Propagation_heuristic =
                     let error,preview_predicate_value = B.predicate_value_of_case_value parameter handler error preview_case_value in 
                     if B.PB.compatible preview_predicate_value predicate_value 
                     then 
-                        if B.PB.more_refined action predicate_value 
-                        then 
-                           begin 
-                             match 
-                               B.PB.is_unknown test 
-                             with 
-                               | true -> 
-                                 begin
-                                   let error,new_predicate_value = B.PB.disjunction parameter handler error test predicate_value in 
-                                   error,
-                                   blackboard,
-                                   (Refine_value_before(event_case_address,new_predicate_value))::instruction_list,
-                                   propagate_list,
-                                   B.success
+                      if B.PB.more_refined action predicate_value 
+                      then 
+                        begin 
+                          match 
+                            B.PB.is_unknown test 
+                          with 
+                            | true -> 
+                              begin
+                                let error,new_predicate_value = B.PB.disjunction parameter handler error test predicate_value in 
+                                error,
+                                blackboard,
+                                (Refine_value_before(event_case_address,new_predicate_value))::instruction_list,
+                                propagate_list,
+                                B.success
+                              end 
+                            | false -> 
+                              begin 
+                                if B.PB.compatible test predicate_value 
+                                then 
+                                  begin 
+                                    if B.PB.compatible test preview_predicate_value 
+                                    then 
+                                      let error,new_test = B.PB.conj parameter handler error test preview_predicate_value in 
+                                      let error,new_predicate_value = B.PB.disjunction parameter handler error new_test predicate_value in 
+                                      error,
+                                      blackboard,
+                                      (Refine_value_before(event_case_address,new_predicate_value))::instruction_list,
+                                         propagate_list,
+                                      B.success
+                                    else
+                                      error,
+                                      blackboard,
+                                      (Discard_event(eid))::instruction_list,
+                                      propagate_list,
+                                      B.success 
+                                  end 
+                                else 
+                                  let error,prev' = B.PB.disjunction parameter handler error predicate_value test in 
+                                  error,
+                                  blackboard,
+                                  (Refine_value_before(event_case_address,prev'))::instruction_list,
+                                  propagate_list,
+                                  B.success 
                                  end 
-                               | false -> 
-                                 begin 
-                                   if B.PB.compatible test predicate_value 
-                                   then 
-                                     let error,new_test = B.PB.conj parameter handler error test preview_predicate_value in 
-                                     let error,new_predicate_value = B.PB.disjunction parameter handler error new_test predicate_value in 
-                                     error,
-                                     blackboard,
-                                     (Refine_value_before(event_case_address,new_predicate_value))::instruction_list,
-                                     propagate_list,
-                                     B.success 
-                                   else 
-                                     error,
-                                     blackboard,
-                                     (Keep_event(eid))::instruction_list,
-                                     propagate_list,
-                                     B.success 
-                                 end 
-                           end 
-(*           error,
-                          blackboard,
-                          (Refine_value_before(event_case_address,new_predicate_value))::instruction_list,
-                          propagate_list,
-                          B.success *)
-                        else 
-                          error,
-                          blackboard,
-                          Discard_event(eid)::instruction_list,
-                          propagate_list,
-                          B.success 
+                        end 
+                      else 
+                        error,
+                        blackboard,
+                        Discard_event(eid)::instruction_list,
+                        propagate_list,
+                        B.success 
                     else 
                       if B.PB.more_refined action predicate_value 
                       then 
-                          error,
-                          blackboard,
-                          (Keep_event(eid))::instruction_list,
-                          propagate_list,
-                          B.success
+                        error,
+                        blackboard,
+                        (Keep_event(eid))::instruction_list,
+                        propagate_list,
+                        B.success
                       else 
                         error,
                         blackboard,
@@ -464,7 +489,9 @@ module Propagation_heuristic =
     let propagate parameter handler error blackboard check instruction_list propagate_list = 
       match check 
       with 
-        | Propagate_up x -> propagate_up parameter handler error blackboard x instruction_list propagate_list
+        | Propagate_up x -> 
+
+          propagate_up parameter handler error blackboard x instruction_list propagate_list
         | Propagate_down x -> propagate_down parameter handler error blackboard x instruction_list propagate_list
 
     let discard_case parameter handler case (error,blackboard,instruction_list,propagate_list) = 
@@ -603,6 +630,7 @@ module Propagation_heuristic =
                 error,blackboard,instruction_list,propagate_list,success 
               end 
 
+
     let refine_value_after parameter handler error blackboard address value instruction_list propagate_list =
       let case_address = B.value_after address in 
       let state = B.state value in 
@@ -624,7 +652,9 @@ module Propagation_heuristic =
     let apply_instruction parameter handler error blackboard instruction instruction_list propagate_list = 
         match instruction 
         with 
-          | Keep_event step_id -> keep_event parameter handler error blackboard step_id instruction_list propagate_list 
+          | Keep_event step_id -> 
+            let error,blackboard,ins,prop,output = keep_event parameter handler error blackboard step_id instruction_list propagate_list in 
+            error,blackboard,ins,prop,output 
           | Discard_event step_id -> discard_event parameter handler error blackboard step_id instruction_list propagate_list 
           | Refine_value_after (address,value) -> refine_value_after parameter handler error blackboard address value instruction_list propagate_list 
           | Refine_value_before (address,value) -> refine_value_before parameter handler error blackboard address value instruction_list propagate_list 

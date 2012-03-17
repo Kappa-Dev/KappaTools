@@ -64,7 +64,6 @@ struct
 	      let error,blackboard,output = propagate parameter handler error [head] [] blackboard in
 	      if PH.B.is_failed output 
               then 
-                let _ = Printf.fprintf stderr "FAIL\n" in 
                 let error,blackboard = PH.B.reset_last_branching parameter handler error blackboard in 
                 branch_over_assumption_list parameter handler error tail blackboard 
               else 
@@ -78,7 +77,6 @@ struct
 	    end
 	      
   and iter parameter handler error blackboard = 
-    let _ = Printf.fprintf stderr "ITER\n" in 
     let error,bool = PH.B.is_maximal_solution parameter handler error blackboard in
     if bool 
     then 
