@@ -711,21 +711,13 @@ module Cflow_linker =
                 let obs_from_rule_app,r,counter = get_causal a in 
                 let phi = embedding_of_event a in 
                 let psi = fresh_map_of_event a in 
-                let _ = Printf.fprintf stderr "EVENT\n" in 
                 Causal.record ~decorate_with:obs_from_rule_app r side_effect (phi,psi) counter grid env,Mods.Int2Set.empty 
               end
             | Init b -> 
-              begin 
-                let _ = Printf.fprintf stderr "INIT\n" in 
                 grid,side_effect
-              end
             | Obs c  -> 
-              begin 
-                let _ = Printf.fprintf stderr "OBS\n" in 
                 grid,side_effect
-              end 
             | Dummy -> 
-              let _ = Printf.fprintf stderr "DUMMY\n" in 
               let d = [] in 
               grid,
               List.fold_left 

@@ -18,6 +18,8 @@
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
+let debug_mode = false
+
 module type Blackboard_with_heuristic = 
   sig
     module B:Blackboard.Blackboard 
@@ -161,14 +163,31 @@ module Propagation_heuristic =
                   with 
                     | true,true -> 
                       begin
-                        error,
-                        blackboard,
-                        (Refine_value_after(next_event_case_address,predicate_value))::instruction_list,
-                        propagate_list,
-                        B.success 
+                        let _ = 
+                          if debug_mode 
+                          then 
+                            let _ = Printf.fprintf stderr "Propagate_down:\n" in 
+                            let _ = Printf.fprintf stderr "next event is kept but has no test and no action(event %i,pid %i)\n" in
+                            let _ = Printf.fprintf stderr "Value is propagater" in 
+                            let _ = Printf.fprintf stderr "***\n" in 
+                            ()
+                        in error,
+                            blackboard,
+                            (Refine_value_after(next_event_case_address,predicate_value))::instruction_list,
+                            propagate_list,
+                            B.success 
                       end 
                     | true,false -> 
                       begin 
+                        let _ = 
+                          if debug_mode 
+                          then 
+                            let _ = Printf.fprintf stderr "Propagate_down:\n" in 
+                            let _ = Printf.fprintf stderr "next event is kept, no test, but an action \n" in
+                            let _ = Printf.fprintf stderr "Nothing to be done\n" in 
+                            let _ = Printf.fprintf stderr "***\n" in 
+                            () 
+                        in 
                         error,
                         blackboard,
                         instruction_list,
@@ -180,6 +199,15 @@ module Propagation_heuristic =
                         if B.PB.compatible predicate_value test  
                         then 
                           let error,conj = B.PB.conj parameter handler error test predicate_value in 
+                          let _ = 
+                          if debug_mode 
+                          then 
+                            let _ = Printf.fprintf stderr "Propagate_down:\n" in 
+                            let _ = Printf.fprintf stderr "next event is kept, a test but no action \n" in
+                            let _ = Printf.fprintf stderr "Nothing to be done\n" in 
+                            let _ = Printf.fprintf stderr "***\n" in 
+                            () 
+                        in 
                           error,
                           blackboard,
                           (Refine_value_before(next_event_case_address,conj))::(Refine_value_after(next_event_case_address,conj))::instruction_list,
