@@ -415,6 +415,9 @@ module Propagation_heuristic =
                             (*********************************************************)
                           if not (B.PB.compatible next_action predicate_value) 
                           then (* the action is not compatible with the value *)
+                            let error,computed_next_predicate_value = 
+                              B.PB.disjunction parameter handler error predicate_value next_action 
+                             in 
                             let _ = 
                               if debug_mode 
                               then 
@@ -424,17 +427,19 @@ module Propagation_heuristic =
                                 let _ = B.PB.print_predicate_value stderr next_action in 
                                 let _ = Printf.fprintf stderr "\nWire_state: " in 
                                 let _ = B.PB.print_predicate_value stderr predicate_value in 
-                                let _ = Printf.fprintf stderr "\nWe have to keep the next event (%i) \n" next_eid in 
+                                let _ = Printf.fprintf stderr "\nThe value " in 
+                                let _ = B.PB.print_predicate_value stderr computed_next_predicate_value in 
+                                let _ = Printf.fprintf stderr " is propagated after the next event\n" in 
                                 let _ = Printf.fprintf stderr "***\n" in 
                                 () 
                             in 
-                              (* we do not know whether the event is played or not *)
-                              (* there is an action in the next event *)
-                              (* the action is compatible with the value *)
-                              (* we have to select the next event *)
+                            (* we do not know whether the event is played or not *)
+                            (* there is an action in the next event *)
+                            (* the action is compatible with the value *)
+                            (* we propagate the join of the value and the action after the next event*)
                             error,
                             blackboard,
-                            (Keep_event(next_eid)::instruction_list),
+                            (Refine_value_after(next_event_case_address,computed_next_predicate_value))::instruction_list,
                             propagate_list,
                             B.success 
                           else 
