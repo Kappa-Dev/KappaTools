@@ -34,7 +34,7 @@ let weak_compression env state step_list =
   in 
   let refined_event_list = List.map (Kappa_instantiation.Cflow_linker.refine_step (Kappa_instantiation.Cflow_linker.import_env env)) (List.rev step_list) in 
   let _ = 
-    if debug_mode 
+    if debug_mode
     then 
       List.iter (Kappa_instantiation.Cflow_linker.print_refined_step stderr (Kappa_instantiation.Cflow_linker.import_env env)) refined_event_list  
   in 
@@ -89,6 +89,11 @@ let weak_compression env state step_list =
   let error,list = S.PH.forced_events parameter handler error blackboard in 
   let n_stories = List.length list in 
   let _ = Debug.tag ("\t - story computation ("^(string_of_int n_stories)^")") in 
+  let tick = 
+    if n_stories > 0 
+    then Mods.tick_stories n_stories (false,0,0) 
+    else (false,0,0)
+  in 
   let error,_,_ = 
     List.fold_left 
       (fun (error,counter,tick) list -> 
@@ -129,7 +134,7 @@ let weak_compression env state step_list =
         in 
         let tick = Mods.tick_stories n_stories tick in 
         error,counter+1,tick)
-      (error,1,(false,0,1)) list 
+      (error,1,tick) list 
   in 
   let _ = 
     List.iter 

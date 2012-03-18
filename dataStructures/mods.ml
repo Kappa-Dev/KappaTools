@@ -239,7 +239,9 @@ module Counter =
 						| Some emax -> 
 							if emax = 0 then 0 
 							else
-								(event - last_event) * !Parameter.progressBarSize / emax
+							  let nplus = (event * !Parameter.progressBarSize) / emax in 
+                                                          let nminus = (last_event * !Parameter.progressBarSize) / emax in 
+                                                          nplus-nminus 
 				in
 					let n = ref (max n_t n_e) in
 						if !n>0 then set_tick counter (event,time) ;
@@ -311,7 +313,9 @@ module Palette:
 	      done ;
 	      print_newline() ; 
 	  in
-	  let n = (counter - last) * !Parameter.progressBarSize / n_stories in 
+	  let nc = (counter * !Parameter.progressBarSize) / n_stories in 
+          let nl = (last * !Parameter.progressBarSize) / n_stories in 
+          let n = nc - nl in 
           let rec aux n = 
             if n<=0 then () 
             else 

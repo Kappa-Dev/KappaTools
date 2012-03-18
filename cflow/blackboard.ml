@@ -18,6 +18,8 @@
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
+let debug_mode = false 
+
 module type Blackboard = 
 sig 
   module PB:Blackboard_generation.PreBlackboard 
@@ -826,11 +828,31 @@ module Blackboard =
        let error,old = get parameter handler error case_address blackboard in 
        if case_value = old 
        then 
+           let _ = 
+             if debug_mode 
+             then 
+               let _ = Printf.fprintf stderr "\n***\nREFINE_VALUE\nValue before: " in 
+               let _ = print_case_value old in 
+               let _ = Printf.fprintf stderr "\nNew value: " in 
+              let _ = print_case_value case_value in 
+               let _ = Printf.fprintf stderr "\nIGNORED***\n" in 
+            () 
+           in 
          error,blackboard,Ignore
        else
          let error,bool = strictly_more_refined parameter handler error old case_value in 
          if bool 
          then 
+            let _ = 
+             if debug_mode 
+             then 
+               let _ = Printf.fprintf stderr "\n***\nREFINE_VALUE\nValue before: " in 
+               let _ = print_case_value old in 
+               let _ = Printf.fprintf stderr "\nNew value: " in 
+              let _ = print_case_value case_value in 
+               let _ = Printf.fprintf stderr "\nIGNORED***\n" in 
+            () 
+           in 
            error,blackboard,Ignore 
          else 
            let error,bool = strictly_more_refined parameter handler error case_value old 
@@ -839,8 +861,28 @@ module Blackboard =
            then 
              let error,blackboard = set parameter handler error case_address case_value blackboard in 
              let error,blackboard = record_modif parameter handler error case_address old blackboard in 
+              let _ = 
+             if debug_mode 
+             then 
+               let _ = Printf.fprintf stderr "\n***\nREFINE_VALUE\nValue before: " in 
+               let _ = print_case_value old in 
+               let _ = Printf.fprintf stderr "\nNew value: " in 
+               let _ = print_case_value case_value in 
+               let _ = Printf.fprintf stderr "\nSUCCESS***\n" in 
+            () 
+           in 
              error,blackboard,Success
            else 
+             let _ = 
+               if debug_mode 
+               then 
+                 let _ = Printf.fprintf stderr "\n***\nREFINE_VALUE\nValue before: " in 
+                 let _ = print_case_value old in 
+                 let _ = Printf.fprintf stderr "\nNew value: " in 
+                 let _ = print_case_value case_value in 
+                 let _ = Printf.fprintf stderr "\nFAIL***\n" in 
+                 () 
+             in 
              error,blackboard,Fail 
 
      let overwrite parameter handler error case_address case_value blackboard = 
@@ -877,6 +919,11 @@ module Blackboard =
        }
        
      let reset_last_branching parameter handler error blackboard = 
+       let _ = 
+         if debug_mode 
+         then 
+           Printf.fprintf stderr "*******\n* Cut *\n*******" 
+       in 
        let stack = blackboard.current_stack in 
        let error,blackboard = 
          List.fold_left 

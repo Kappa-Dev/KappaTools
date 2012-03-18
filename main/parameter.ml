@@ -26,6 +26,7 @@ let dotOutput = ref false
 let fluxModeOn = ref false
 let snapshotHighres = ref true
 let causalModeOn = ref false
+let weakcompressionModeOn = ref false 
 
 (*Computed values*)
 let (timeIncrementValue:float option ref) = ref None
