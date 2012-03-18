@@ -146,8 +146,13 @@ let loop state grid event_list counter plot env =
 			in
 			iter state grid event_list counter plot env
 		else (*exiting the loop*)
-			begin
-				if Environment.tracking_enabled env then
+		  begin
+                    let _ = 
+		      Plot.fill state counter plot env 0.0; (*Plotting last measures*)
+		      Plot.flush_ticks counter ;
+		      Plot.close plot
+	            in 
+                    if Environment.tracking_enabled env then
 				  begin
 				    Causal.dot_of_grid !Parameter.cflowFileName grid state env ;
 				    let refined_event_list = Compression_main.weak_compression env state event_list 
@@ -155,9 +160,7 @@ let loop state grid event_list counter plot env =
                                     ()
 				  end;
 	
-			  Plot.fill state counter plot env 0.0; (*Plotting last measures*)
-			  Plot.flush_ticks counter ;
-			  Plot.close plot
+			 
 			end
 	in
 	iter state grid event_list counter plot env

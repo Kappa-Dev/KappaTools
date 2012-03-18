@@ -23,6 +23,10 @@ module S = Generic_branch_and_cut_solver.Solver
 let debug_mode = false
 
 let weak_compression env state step_list =  
+  let _ = print_newline () in 
+  let _ = print_newline () in 
+  let _ = Debug.tag "+ Story compression" in 
+  let _ = Debug.tag "\t - blackboard generation" in 
   let _ = 
     if debug_mode 
     then 
@@ -83,10 +87,11 @@ let weak_compression env state step_list =
       error 
   in  
   let error,list = S.PH.forced_events parameter handler error blackboard in 
-  let _ = Printf.fprintf stderr "%i" (List.length list) in 
-  let error,_ = 
+  let n_stories = List.length list in 
+  let _ = Debug.tag ("\t - story computation ("^(string_of_int n_stories)^")") in 
+  let error,_,_ = 
     List.fold_left 
-      (fun (error,counter) list -> 
+      (fun (error,counter,tick) list -> 
         let _ = 
           if debug_mode 
           then 
@@ -122,8 +127,9 @@ let weak_compression env state step_list =
             let error,blackboard = S.PH.B.reset_init parameter handler error blackboard in 
             error
         in 
-            error,counter+1)
-      (error,1) list 
+        let tick = Mods.tick_stories n_stories tick in 
+        error,counter+1,tick)
+      (error,1,(false,0,1)) list 
   in 
   let _ = 
     List.iter 
