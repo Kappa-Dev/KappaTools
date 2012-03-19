@@ -1001,6 +1001,7 @@ module Blackboard =
 
    
    let useless_predicate_id parameter handler error blackboard list = 
+     let list_obs = list in 
      let n_events = blackboard.n_eid in  
      let n_pid = blackboard.n_predicate_id in 
      let p_id_array = PB.A.make n_pid false in  
@@ -1035,7 +1036,8 @@ module Blackboard =
                          let error,case = get_case parameter handler error event_case_address blackboard in 
                          let pointer = case.dynamic.pointer_previous in 
                          let _ = PB.A.set p_id_array predicate_id true in 
-                         if is_null_pointer pointer  or PB.is_unknown case.static.action or is_fictitious_obs blackboard eid 
+                         if is_null_pointer pointer   or 
+                                                        (PB.is_unknown case.static.action && not (List.mem eid list_obs)) 
                          then 
                            q 
                          else 
@@ -1088,7 +1090,7 @@ module Blackboard =
                let case = PB.A.get array j in
                let eid = case.static.event_id in 
                let bool = 
-                 if is_null_pointer eid or PB.is_unknown case.static.action or is_fictitious_obs blackboard eid 
+                 if is_null_pointer eid or (PB.is_unknown case.static.action && not (List.mem eid obs_list))
                  then 
                    true
                  else 
