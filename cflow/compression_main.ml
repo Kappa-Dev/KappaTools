@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 19/10/2011
-  * Last modification: 17/03/2012
+  * Last modification: 19/03/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -80,7 +80,7 @@ let weak_compression env state step_list =
       Printf.fprintf stderr "\nPretty printing the grid\n"
   in 
   let error = 
-    if debug_mode 
+    if debug_mode
     then 
       S.PH.B.print_blackboard parameter handler error stderr blackboard 
     else 
@@ -96,14 +96,14 @@ let weak_compression env state step_list =
   in 
   let error,_,_ = 
     List.fold_left 
-      (fun (error,counter,tick) list -> 
+      (fun (error,counter,tick) (list_order,list_eid) -> 
         let _ = 
           if debug_mode 
           then 
-            Printf.fprintf stderr "COMPRESS" 
+            Printf.fprintf stderr "COMPRESS %i" (List.length list_eid) 
         in 
         let error,blackboard,output = 
-          S.compress parameter handler error blackboard  list 
+          S.compress parameter handler error blackboard  list_order list_eid 
         in 
         let error = 
           if debug_mode 

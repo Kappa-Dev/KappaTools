@@ -274,7 +274,8 @@ let dot_of_grid fic grid state env =
 					fprintf desc "node_%d -> node_%d [style=dotted, arrowhead = tee] \n" eid eid'
 			) cflct_set
 	) config.conflict ;
-	fprintf desc "}\n" 
+	fprintf desc "}\n" ;
+        close_out desc 
 	
 let dump grid state env = 
 	let d = open_out "grid.txt" in

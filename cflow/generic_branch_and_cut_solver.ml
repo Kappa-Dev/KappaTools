@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 22/02/2012
+  * Last modification: 19/03/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -57,7 +57,8 @@ struct
   let rec branch_over_assumption_list parameter handler error list blackboard = 
     match list 
     with 
-	  | [] -> error,blackboard,PH.B.fail
+	  | [] -> 
+            error,blackboard,PH.B.fail
 	  | head::tail -> 
 	    begin
 	      let error,blackboard = PH.B.branch parameter handler error blackboard in
@@ -85,10 +86,11 @@ struct
       let error,list = PH.next_choice parameter handler error blackboard in
       branch_over_assumption_list parameter handler error list blackboard 
     
-  let compress parameter handler error blackboard list =
+  let compress parameter handler error blackboard list_order list_eid =
     let error,blackboard = PH.B.branch parameter handler error blackboard in 
+    let error,blackboard = PH.B.cut parameter handler error blackboard list_eid  in 
     let error,blackboard,output = 
-      propagate parameter handler error list [] blackboard 
+      propagate parameter handler error list_order [] blackboard 
     in 
     iter parameter handler error blackboard 
 

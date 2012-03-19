@@ -29,7 +29,7 @@ module type Blackboard_with_heuristic =
     
   
      (** heuristics *)
-    val forced_events: (B.blackboard -> B.PB.H.error_channel * update_order list list) B.PB.H.with_handler 
+    val forced_events: (B.blackboard -> B.PB.H.error_channel * (update_order list * B.PB.step_id list) list) B.PB.H.with_handler 
     val next_choice: (B.blackboard -> B.PB.H.error_channel * update_order list) B.PB.H.with_handler 
     val apply_instruction: (B.blackboard -> update_order -> update_order list -> propagation_check list -> B.PB.H.error_channel * B.blackboard * update_order list * propagation_check list * B.assign_result) B.PB.H.with_handler 
 
@@ -62,7 +62,7 @@ module Propagation_heuristic =
 
     let forced_events parameter handler error blackboard = 
       let list = B.forced_events blackboard in 
-      error,List.map (List.map (fun x -> Keep_event x)) list
+      error,List.map (fun l -> List.map (fun x -> Keep_event x) l,l) list 
       
     let get_last_unresolved_event parameter handler error blackboard p_id = 
       let k = B.get_last_linked_event blackboard p_id in 

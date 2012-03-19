@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 17/03/2012
+  * Last modification: 19/03/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -64,6 +64,7 @@ sig
   val mandatory_events: (pre_blackboard -> H.error_channel * ((int list) list)) H.with_handler 
   val get_pre_event: (pre_blackboard -> H.error_channel * K.refined_step A.t) H.with_handler 
   val get_side_effect: (pre_blackboard -> H.error_channel * ((int*int) list) A.t) H.with_handler 
+  val get_fictitious_observable: (pre_blackboard -> H.error_channel * int option) H.with_handler 
 end
 
 module Preblackboard = 
@@ -136,7 +137,8 @@ module Preblackboard =
            history_of_predicate_values_to_predicate_id: CaseValueSet.t A.t; (** 
 maps each wire to the set of its previous states, this summarize the potential state of a site that is freed, so as to overapproximate the set of potential side effects*)
            pre_observable_list: step_id list list ;
-             pre_side_effect_of_event: (int*int) list A.t;
+           pre_side_effect_of_event: (int*int) list A.t;
+           pre_fictitious_observable: step_id option; (*id of the step that closes all the side-effect mutex *)
            } 
 
          
@@ -568,6 +570,7 @@ maps each wire to the set of its previous states, this summarize the potential s
       history_of_predicate_values_to_predicate_id = A.make 1 CaseValueSet.empty;
       predicate_id_list_related_to_predicate_id = A.make 1 PredicateidSet.empty ;
       pre_observable_list = [];
+      pre_fictitious_observable = None ;
     }
     
   let pre_column_map_inv b = b.pre_column_map_inv 
@@ -848,7 +851,8 @@ maps each wire to the set of its previous states, this summarize the potential s
               blackboard 
              with 
                pre_nsteps = nsid ;
-               pre_observable_list = observable_list
+               pre_observable_list = observable_list ;
+               pre_fictitious_observable = Some nsid ;
             }
           in 
           let error,blackboard = 
@@ -881,11 +885,13 @@ maps each wire to the set of its previous states, this summarize the potential s
             H.raise_error parameter handler error_list stderr error 0
 
   let n_events parameter handler error blackboard = 
-
     error,blackboard.pre_nsteps+1 
 
   let mandatory_events parameter handler error blackboard = 
     error,blackboard.pre_observable_list 
+
+  let get_fictitious_observable parameter handler error blackboard = 
+    error,blackboard.pre_fictitious_observable
 
   let get_side_effect parameter handler error blackboard = 
     error,blackboard.pre_side_effect_of_event

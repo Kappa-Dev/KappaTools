@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 06/09/2011
-  * Last modification: 13/03/2012
+  * Last modification: 19/03/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -98,6 +98,8 @@ sig
   val n_unresolved_events_in_column: event_case_address -> case_address 
   val forced_events: blackboard -> PB.step_id list list 
   val side_effect_of_event: blackboard -> PB.step_id -> (int*int) list
+  val cut_predicate_id: (blackboard -> PB.predicate_id -> PB.H.error_channel *   blackboard) PB.H.with_handler 
+  val cut: (blackboard -> PB.step_id list -> PB.H.error_channel * blackboard) PB.H.with_handler 
 end
 
 module Blackboard = 
@@ -352,6 +354,7 @@ module Blackboard =
            last_linked_event_of_predicate_id: int PB.A.t;
            event_case_list: event_case_address list PB.A.t;
            side_effect_of_event: (int*int) list PB.A.t;
+           fictitious_observable: PB.step_id option;
          }
 
      let forced_events blackboard = blackboard.forced_events 
@@ -542,6 +545,8 @@ module Blackboard =
                  Printf.fprintf log "  Event:%i (%s)\n" i (if b then "KEPT" else "REMOVED"))
            blackboard.selected_events
        in 
+       let _ = Printf.fprintf log "*unsolved_events*\n" in 
+       let _ = Printf.fprintf log " %i\n" blackboard.n_unresolved_events in 
        let _ = Printf.fprintf log "*weight of predicate_id*\n" in 
        let _ = 
          PB.A.iteri 
@@ -574,8 +579,6 @@ module Blackboard =
        let blackboard = PB.A.make n_predicates (PB.A.make 1 dummy_case_info) in
        let weigth_of_predicate_id = PB.A.make n_predicates 0 in 
        let last_linked_event_of_predicate_id = PB.A.make n_predicates 0 in 
-(*       let state_before_blackboard = PB.A.make n_predicates init_case_info in 
-       let state_after_blackboard = PB.A.make n_predicates dummy_case_info in *)
        let error = 
          let rec aux1 p_id error = 
            if p_id < 0 
@@ -642,6 +645,7 @@ module Blackboard =
        let error,forced_events = PB.mandatory_events parameter handler error pre_blackboard in 
        let error,event = PB.get_pre_event parameter handler error pre_blackboard in 
        let error,side_effects = PB.get_side_effect parameter handler error pre_blackboard in 
+       let error,fictitious_obs = PB.get_fictitious_observable parameter handler error pre_blackboard in 
        error,
        {
          event = event ;
@@ -660,6 +664,7 @@ module Blackboard =
          weigth_of_predicate_id= weigth_of_predicate_id; 
          used_predicate_id = PB.A.make n_predicates true; 
          n_unresolved_events = n_events ; 
+         fictitious_observable = fictitious_obs ;
        }
          
    
@@ -900,9 +905,13 @@ module Blackboard =
        match old 
        with 
          | Counter k -> 
-           let error,blackboard = set parameter handler error case_address (Counter (k-1)) blackboard in 
-           let error,blackboard = record_modif parameter handler error case_address old blackboard in 
-           error,blackboard 
+           if k=0 
+           then 
+             error,blackboard 
+           else 
+             let error,blackboard = set parameter handler error case_address (Counter (k-1)) blackboard in 
+             let error,blackboard = record_modif parameter handler error case_address old blackboard in 
+             error,blackboard 
          | _ ->    
            let error_list,error = 
                 PB.H.create_error parameter handler error (Some "blackboard.ml") None (Some "dec") (Some "775") (Some "Wrong type of case value") (failwith "Wrong type of case value")  
@@ -983,16 +992,146 @@ module Blackboard =
    let print_stack log blackboard = 
      let stack = blackboard.current_stack in 
      let _ = Printf.fprintf log "Current_stack_level %i " (List.length stack) in 
-     let _ = List.iter (print_assignment log) stack  in 
+     let _ = List.iter (fun i -> print_assignment log i ;Printf.fprintf log "\n") stack  in 
      List.iter 
          (fun x -> 
            let _ = Printf.fprintf log "Other level %i "  (List.length x) in 
            List.iter (print_assignment log) x)
          blackboard.stack 
-     
+  
+   let is_fictitious_obs blackboard eid = 
+     Some eid = blackboard.fictitious_observable
+
+   
+   let useless_predicate_id parameter handler error blackboard list = 
+     let n_events = blackboard.n_eid in  
+     let n_pid = blackboard.n_predicate_id in 
+     let p_id_array = PB.A.make n_pid false in  
+     let event_array = PB.A.make n_events false in
+     let rec aux error event_list =  
+       match event_list 
+       with 
+         | [] -> error
+         | eid::q -> 
+           begin 
+             let bool = 
+               try 
+                 PB.A.get event_array eid 
+               with 
+                 | _ -> false 
+             in 
+             if 
+               bool 
+             then 
+               aux error q 
+             else 
+               begin 
+                 let _ = PB.A.set event_array eid true in 
+                 if is_fictitious_obs blackboard eid then 
+                   aux error q 
+                 else 
+                   let list = PB.A.get blackboard.event_case_list eid in 
+                   let q = 
+                     List.fold_left
+                       (fun q event_case_address ->
+                         let predicate_id = event_case_address.column_predicate_id in 
+                         let error,case = get_case parameter handler error event_case_address blackboard in 
+                         let pointer = case.dynamic.pointer_previous in 
+                         let _ = PB.A.set p_id_array predicate_id true in 
+                         if is_null_pointer pointer 
+                         then 
+                           q 
+                         else 
+                           let prev_event_case_address = 
+                             {event_case_address with row_short_event_id = pointer}
+                           in 
+                           let error,prev_case = get_case parameter handler error prev_event_case_address blackboard in 
+                           let prev_eid = prev_case.static.event_id in 
+                           if is_null_pointer prev_eid 
+                           then q 
+                           else 
+                             prev_eid::q)
+                       q 
+                       list 
+                 in 
+                   aux error q 
+               end 
+           end
+     in 
+     let error = aux error list in 
+     let rep = ref [] in 
+     let rep2 = ref [] in 
+     let _ = 
+       PB.A.iteri 
+         (fun i bool -> 
+           if bool then (rep2:=i::(!rep2)) 
+           else rep:=i::(!rep))
+         p_id_array 
+     in 
+     error,!rep,!rep2
        
- 
- 
+   let cut_predicate_id parameter handler error blackboard p_id = 
+     overwrite parameter handler error (N_unresolved_events_in_column p_id) (Counter 0) blackboard 
+       
+   let cut_event_id parameter handler error blackboard n_event = 
+     overwrite parameter handler error N_unresolved_events (Counter n_event) blackboard 
+     
+   let count_event_of_p_id_list parameter handler error blackboard obs list = 
+     let n_events = blackboard.n_eid in  
+     let event_array = PB.A.make n_events false in
+     let _ = List.iter (fun i -> PB.A.set event_array i true) obs in 
+     let res = List.length obs in 
+     List.fold_left  
+       (fun (error,counter) p_id -> 
+         let array = PB.A.get blackboard.blackboard p_id in 
+         let error,counter = 
+           if PB.A.get blackboard.used_predicate_id p_id 
+           then 
+             let rec aux j res error = 
+               let case = PB.A.get array j in
+               let eid = case.static.event_id in 
+               let bool = 
+                 if is_null_pointer eid  
+                 then 
+                   true
+                 else 
+                   try 
+                     PB.A.get event_array case.static.event_id 
+                   with 
+                     | _ -> false 
+               in 
+               let res' = 
+                 if bool 
+                 then res
+                 else 
+                   let _ = PB.A.set event_array case.static.event_id true 
+                   in res+1 
+               in 
+               let j' = get_pointer_next case in 
+               if j=j' then error,res'
+               else aux j' res' error 
+             in 
+             let error,counter = aux pointer_before_blackboard counter error in 
+             error,counter
+           else 
+             error,counter
+         in error,counter)
+       (error,res) list 
+
+   let cut parameter handler error blackboard list = 
+     let error,p_id_list_to_cut,p_id_list_to_keep  = useless_predicate_id parameter handler error blackboard list in 
+     let error,int = count_event_of_p_id_list parameter handler error blackboard list p_id_list_to_keep in 
+     let error,blackboard = cut_event_id parameter handler error blackboard int in 
+     let error,blackboard = 
+       List.fold_left 
+         (fun (error,blackboard) p_id -> 
+           cut_predicate_id parameter handler error blackboard p_id)
+         (error,blackboard)
+         p_id_list_to_cut 
+     in 
+     error,blackboard 
+
+  
    end:Blackboard)
 
 
