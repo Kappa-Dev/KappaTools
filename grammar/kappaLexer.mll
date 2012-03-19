@@ -41,12 +41,10 @@ rule token = parse
     | "\\\n" {incr_line lexbuf ; token lexbuf}
 		| "do" {let pos = position lexbuf in DO pos}
 		| "until" {let pos = position lexbuf in UNTIL pos}
-		| "in" {IN}
 		| ":=" {let pos = position lexbuf in SET pos}
 		| "&&" {let pos = position lexbuf in AND pos}
 		| "||" {let pos = position lexbuf in OR pos}
     | "->" {let pos = position lexbuf in KAPPA_RAR pos}
-		| "->!" {let pos = position lexbuf in KAPPA_NOPOLY pos}
 		| pert as s {let pos = position lexbuf in
 									match s with  
 						 			| "$DEL" -> (DELETE pos)
@@ -82,7 +80,6 @@ rule token = parse
 								| _ as s -> return_error lexbuf ("Symbol \""^s^"\" is not defined")
 						}  
 		| '\"' {let filename = read_label "" ['\"'] lexbuf in let pos = position lexbuf in FILENAME (filename,pos)}
-		| '|' {PIPE}
     | '\n' {incr_line lexbuf ; NEWLINE}
 		| '\r' {incr_line lexbuf ; NEWLINE}
     | '#' {comment lexbuf}
@@ -113,6 +110,7 @@ rule token = parse
 								| "mod" -> (PERT pos)
 								| "ref" -> (REF pos)
 								| "obs" -> (OBS pos)
+								| "set" -> (CONFIG pos)
 								| _ as s -> return_error lexbuf ("Instruction \""^s^"\" not recognized")
 					 } 
 		| dot_radius as s { let i = String.index s '{' in 

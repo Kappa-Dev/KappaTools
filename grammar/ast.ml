@@ -48,7 +48,7 @@ and link =
 	| LNK_TYPE of ((string * Tools.pos) * (string * Tools.pos))
 
 type rule = {lhs: mixture ; arrow:arrow ; rhs:mixture; k_def:alg_expr ; k_un:alg_expr option}
-and arrow = RAR of Tools.pos | RAR_NOPOLY of Tools.pos
+and arrow = RAR of Tools.pos 
 type rule_label = {lbl_nme:(string * Tools.pos) option ; lbl_ref:(string * Tools.pos) option}
 
 type perturbation = bool_expr * modif_expr * Tools.pos * bool_expr option
@@ -60,6 +60,8 @@ and modif_expr =
 	| SNAPSHOT of ((string * Tools.pos) option * Tools.pos) (*maybe later of mixture too*)
 	| CFLOW of (string * Tools.pos * Tools.pos * (string * Tools.pos) option) 
 
+type configuration = string * Tools.pos * string * Tools.pos
+
 type instruction = 
 	| SIG of agent * Tools.pos 
 	| INIT of alg_expr * mixture * Tools.pos
@@ -67,6 +69,7 @@ type instruction =
 	| OBS of variable  (*for backward compatibility*)
 	| PLOT of alg_expr
 	| PERT of perturbation
+	| CONFIG of configuration
 and variable =
 	| VAR_KAPPA of (mixture * (string * Tools.pos))
 	| VAR_ALG of (alg_expr * (string * Tools.pos))
@@ -76,11 +79,12 @@ type compil = {variables : variable list; (*pattern declaration for reusing as v
 							 rules : (rule_label * rule) list ; (*rules (possibly named)*)
 							 observables : alg_expr list ; (*list of patterns to plot*) 
 							 init : (alg_expr * mixture * Tools.pos) list ; (*initial graph declaration*)
-							 perturbations : perturbation list
+							 perturbations : perturbation list ;
+							 configurations : configuration list
 							}
 
-let result:compil ref = ref {variables=[] ; signatures=[] ; rules=[] ; init = [] ; observables = [] ; perturbations = []} 
-let init_compil = fun _ -> result := {variables=[] ; signatures=[] ; rules=[] ; init = [] ; observables = [] ; perturbations = []}
+let result:compil ref = ref {variables=[] ; signatures=[] ; rules=[] ; init = [] ; observables = [] ; perturbations = [] ; configurations = []} 
+let init_compil = fun _ -> result := {variables=[] ; signatures=[] ; rules=[] ; init = [] ; observables = [] ; perturbations = [] ; configurations = []}
 
 (*
 let reverse res = 
