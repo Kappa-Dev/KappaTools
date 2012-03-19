@@ -148,4 +148,3 @@ module Make =
 
 end:BinomialTree with type key=O.t))
 
-
