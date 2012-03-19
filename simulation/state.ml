@@ -711,7 +711,7 @@ let draw_rule state counter env =
 		let embedding_type = 
 			try select_injection (a2,a1) state r.lhs counter env with 
 			| Null_event 1 | Null_event 2 as exn -> (*null event because of clashing instance of a binary rule*)
-				if counter.Counter.cons_null_events > 1 then 
+				if counter.Counter.cons_null_events > !Parameter.maxConsecutiveClash then 
 					begin
 						(if !Parameter.debugModeOn then Debug.tag "Max consecutive clashes reached, I am giving up square approximation at this step" else ()) ;
 						let _ = Counter.reset_consecutive_null_event counter in

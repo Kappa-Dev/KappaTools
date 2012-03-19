@@ -709,12 +709,12 @@ let effects_of_modif variables env ast =
 			| Some (nme,pos) -> Some nme
 		in
 		(variables, Dynamics.STOP opt_name, str, env)
-	| CFLOW (lab,pos_lab,pos_pert,opt_fic_name) ->
+	| CFLOW (lab,pos_lab,pos_pert) ->
 		let id = try Environment.num_of_rule lab env with Not_found -> try Environment.num_of_kappa lab env with Not_found ->
 			raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
 		in
 		let str = Printf.sprintf "Causality analysis of %s" lab in
-		(variables, Dynamics.CFLOW (id,opt_fic_name), str, env)
+		(variables, Dynamics.CFLOW id, str, env)
 
 let pert_of_result variables env res =
 	let (variables, lpert, lrules, env) =
@@ -898,8 +898,63 @@ let init_graph_of_result env res =
 		)
 		(Graph.SiteGraph.init !Parameter.defaultGraphSize,env) res.Ast.init
 	
+let configurations_of_result result =
+	List.iter 
+	(fun (param,pos_p,value,pos_v) ->
+		match param with
+			| "compressionMode" -> 
+				begin
+					match value with 
+						| "strong" -> (ExceptionDefn.warning ~with_pos:pos_v "Strong compression is not implemented yet" ; Parameter.weakcompressionModeOn := true)
+						| "weak" -> Parameter.weakcompressionModeOn := true
+						| "none" -> Parameter.weakcompressionModeOn := false
+						| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Unkown value %s for compression mode" error))
+				end
+			| "cflowFileName"	-> Parameter.cflowFileName := value			
+			| "progressBarSize" -> 
+				(try let n = int_of_string value in Parameter.progressBarSize := n 
+				with _ -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Value %s should be an integer" value))
+				)
+			| "progressBarSymbol" -> 
+				(try let c = String.unsafe_get value 0 in Parameter.progressBarSymbol := c 
+				with _ -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Value %s should be a character" value))
+				)
+			| "dumpIfDeadlocked" -> 
+				begin
+					match value with 
+						| "true" -> Parameter.dumpIfDeadlocked := true 
+						| "false" -> Parameter.dumpIfDeadlocked := false 
+						| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Value %s should be either \"true\" or \"false\"" error))
+				end
+			| "plotSepChar" -> 
+				(try let c = String.unsafe_get value 0 in Parameter.plotSepChar := c 
+				with _ -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Value %s should be a character" value))
+				)
+			| "maxConsecutiveClash" ->
+				(try let n = int_of_string value in Parameter.maxConsecutiveClash := n 
+				with _ -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Value %s should be an integer" value))
+				) 
+			| "dotSnapshots" -> 
+				begin
+					match value with 
+						| "true" -> Parameter.dotOutput := true 
+						| "false" -> Parameter.dotOutput := false 
+						| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Value %s should be either \"true\" or \"false\"" error))
+				end
+			| "colorDot" ->
+				begin
+					match value with 
+						| "true" -> Parameter.useColor := true 
+						| "false" -> Parameter.useColor := false 
+						| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Value %s should be either \"true\" or \"false\"" error))
+				end
+			| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Unkown parameter %s" error))		  
+	) result.configurations 
+	
 let initialize result counter =
 	Debug.tag "+ Compiling..." ;
+	Debug.tag "\t -simulation parameters" ;
+	let _ = configurations_of_result result in
 
 	Debug.tag "\t -agent signatures" ;
 	let env = environment_of_result result in

@@ -10,9 +10,11 @@ let progressBarSymbol = ref '#'
 let progressBarSize = ref 60
 let plotSepChar = ref ' '
 let dumpIfDeadlocked = ref false
+let maxConsecutiveClash = ref 2
 let backtrace = ref false
 let (rescale:int option ref) = ref None
 let eclipseMode = ref false
+let useColor = ref true
 
 (*User definable values*)
 let (maxEventValue:int option ref) = ref None

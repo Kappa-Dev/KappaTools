@@ -58,7 +58,7 @@ and modif_expr =
 	| UPDATE of (string * Tools.pos * alg_expr * Tools.pos) (*TODO: pause*)
 	| STOP of ((string * Tools.pos) option * Tools.pos)
 	| SNAPSHOT of ((string * Tools.pos) option * Tools.pos) (*maybe later of mixture too*)
-	| CFLOW of (string * Tools.pos * Tools.pos * (string * Tools.pos) option) 
+	| CFLOW of (string * Tools.pos * Tools.pos) 
 
 type configuration = string * Tools.pos * string * Tools.pos
 

@@ -41,6 +41,8 @@ let to_dot hr palette k cpt spec desc env =
 		((Random.float 0.5)+.0.5,(Random.float 0.5)+.0.5, (Random.float 0.5)+.0.5)
 	in
 	let get_color lbl = 
+		if not !Parameter.useColor then "white"
+		else
 		let rgb = try Hashtbl.find palette lbl with Not_found -> rand_rgb()
 		in
 			Hashtbl.replace palette lbl rgb ; rgb
@@ -51,9 +53,7 @@ let to_dot hr palette k cpt spec desc env =
 	let bonds = 
 		IntMap.fold
 		(fun i node bonds ->
-			let label = 
-				if hr then ((fun (s,_)->s) (Node.to_string false ((Hashtbl.create 1),0) node env))
-				else (Environment.name (Node.name node) env)
+			let label = (Environment.name (Node.name node) env)
 			in
 			Printf.fprintf desc "\tnode%d_%d [label = \"%s\", color = \"%s\", style=filled];\n" cpt i label (get_color label)  ; 
 			Printf.fprintf desc "\tnode%d_%d -> counter%d [style=invis];\n" cpt i cpt ; 

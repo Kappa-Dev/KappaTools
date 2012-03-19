@@ -42,7 +42,7 @@ let main =
 		("--compile", Arg.Unit (fun _ -> Parameter.compileModeOn := true), "Display rule compilation as action list") ;
 		("--debug", Arg.Unit (fun () -> Parameter.debugModeOn:= true), "Enable debug mode") ;
 		("--backtrace", Arg.Unit (fun () -> Parameter.backtrace:= true), "Backtracing exceptions") ;
-		("--glutony", Arg.Unit (fun () -> Gc.set { (Gc.get()) with Gc.space_overhead = 500 (*default 80*) } ;), "Lower gc activity for a faster but memory intensive simulation") ;
+		("--gluttony", Arg.Unit (fun () -> Gc.set { (Gc.get()) with Gc.space_overhead = 500 (*default 80*) } ;), "Lower gc activity for a faster but memory intensive simulation") ;
 		("-rescale-to", Arg.Int (fun i -> Parameter.rescale:=Some i), "Rescale initial concentration to given number for quick testing purpose") ; 
                 ("--weak-compression", Arg.Unit (fun () -> Parameter.weakcompressionModeOn:= true), "Enable weak compression") ;
 	]
@@ -172,7 +172,10 @@ let main =
 					close_desc() (*closes all other opened descriptors*)
 				end
 			| ExceptionDefn.Deadlock ->
-				if !Parameter.dumpIfDeadlocked then	Graph.SiteGraph.to_dot state.graph "deadlock.dot" env ;
+				if !Parameter.dumpIfDeadlocked then	
+					let desc = if !Parameter.dotOutput then open_out "deadlock.dot" else open_out "deadlock.ka" in
+					State.snapshot state counter desc true env
+				else () ;
 				(Printf.printf "?\nA deadlock was reached after %d events and %fs (Activity = %f)\n"
 				(Counter.event counter)
 				(Counter.time counter) 
