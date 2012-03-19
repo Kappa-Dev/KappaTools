@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 17/03/2012
+  * Last modification: 19/03/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -109,7 +109,7 @@ sig
   val store_event: event -> step list -> step list 
   val store_init : State.implicit_state -> step list -> step list 
   val store_obs :  int * Mixture.t * int Mods.IntMap.t -> step list -> step list 
-  val build_grid: (refined_step * unit list) list -> Environment.t -> Causal.grid 
+  val build_grid: refined_step list -> Environment.t -> Causal.grid 
 end 
 
 
@@ -696,7 +696,7 @@ module Cflow_linker =
     let grid = Causal.empty_grid () in 
     let grid,_ = 
       List.fold_left 
-        (fun (grid,side_effect) (k,_) ->
+        (fun (grid,side_effect) k ->
           match k 
           with 
             | Event (a,_,_) -> 

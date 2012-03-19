@@ -88,11 +88,12 @@ struct
     
   let compress parameter handler error blackboard list_order list_eid =
     let error,blackboard = PH.B.branch parameter handler error blackboard in 
-    let error,blackboard = PH.B.cut parameter handler error blackboard list_eid  in 
+    let error,blackboard,result_wo_compression = PH.B.cut parameter handler error blackboard list_eid  in 
     let error,blackboard,output = 
       propagate parameter handler error list_order [] blackboard 
     in 
-    iter parameter handler error blackboard 
-
+    let error,blackboard,output = iter parameter handler error blackboard 
+    in 
+    error,blackboard,output,result_wo_compression
 end 
   
