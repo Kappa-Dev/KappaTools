@@ -126,10 +126,13 @@ let weak_compression env state step_list =
           then error
           else 
             let error,list = S.PH.B.translate_blackboard parameter handler error blackboard in 
-            let grid = S.PH.B.PB.K.build_grid list env in 
-            let _ = Causal.dot_of_grid ((string_of_int counter)^"_"^(Parameter.with_weak_compression)^"_"^(!Parameter.cflowFileName)) grid state env in 
+            let grid = S.PH.B.PB.K.build_grid list env in
+						let filename_comp = (Filename.chop_suffix !Parameter.cflowFileName ".dot") ^"_"^(string_of_int counter)^"weak_comp"^".dot"
+						and filename =  (Filename.chop_suffix !Parameter.cflowFileName ".dot")^"_"^(string_of_int counter)^".dot"
+						in
+            let _ = Causal.dot_of_grid filename_comp grid state env in 
             let grid = S.PH.B.PB.K.build_grid result_wo_compression env in 
-            let _ = Causal.dot_of_grid ((string_of_int counter)^"_"^(Parameter.without_compression)^"_"^(!Parameter.cflowFileName)) grid state env in 
+            let _ = Causal.dot_of_grid filename grid state env in 
             let error,blackboard = S.PH.B.reset_init parameter handler error blackboard in 
             error
         in 

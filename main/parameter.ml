@@ -59,7 +59,8 @@ let setOutputName () =
 	set dumpFileName ;
 	set influenceFileName ;
 	set fluxFileName ;
-	set marshalizedOutFile ; 
+	set marshalizedOutFile ;
+	set cflowFileName ; 
 	set outputDataName 
 
 let checkFileExists () =
