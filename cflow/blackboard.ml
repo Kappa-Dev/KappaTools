@@ -1036,8 +1036,13 @@ module Blackboard =
                          let error,case = get_case parameter handler error event_case_address blackboard in 
                          let pointer = case.dynamic.pointer_previous in 
                          let _ = PB.A.set p_id_array predicate_id true in 
-                         if is_null_pointer pointer   or 
-                                                        (PB.is_unknown case.static.action && not (List.mem eid list_obs)) 
+                      (* *)   if is_null_pointer pointer   or 
+                                                        (PB.is_unknown case.static.action && not (List.mem eid list_obs)) (* *)
+
+                                                        (* if it cuts too much, replace the previous if with the next one *)
+
+ (* if is_null_pointer pointer *)
+                       
                          then 
                            q 
                          else 
@@ -1090,7 +1095,7 @@ module Blackboard =
                let case = PB.A.get array j in
                let eid = case.static.event_id in 
                let bool = 
-                 if is_null_pointer eid or (PB.is_unknown case.static.action && not (List.mem eid obs_list))
+                 if is_null_pointer eid 
                  then 
                    true
                  else 
