@@ -162,12 +162,13 @@ let cut attribute_ids grid =
 						| [] -> cfg
 						| atom::att -> 
 							let events = IntMap.add atom.eid atom cfg.events 
-							and top = IntSet.add atom.eid cfg.top
+						        and prec_1 = let preds = try IntMap.find atom.eid cfg.prec_1 with Not_found -> IntSet.empty in IntMap.add atom.eid preds cfg.prec_1
+	                                                and top = IntSet.add atom.eid cfg.top
 							in 
 							let tested = if (atom.causal_impact = 1) || (atom.causal_impact = 3) then [atom.eid] else []
 							and modif =  if (atom.causal_impact = 2) || (atom.causal_impact = 3) then Some atom.eid else None 
 							in
-							parse_attribute modif tested att {cfg with events = events ; top = top} 
+							parse_attribute modif tested att {cfg with prec_1 = prec_1 ; events = events ; top = top} 
 				in
 				build_config tl cfg
 	in
@@ -273,7 +274,8 @@ let dot_of_grid fic grid state env =
 					fprintf desc "node_%d -> node_%d [style=dotted, arrowhead = tee] \n" eid eid'
 			) cflct_set
 	) config.conflict ;
-	fprintf desc "}\n" 
+	fprintf desc "}\n" ;
+        close_out desc 
 	
 let dump grid state env = 
 	let d = open_out "grid.txt" in

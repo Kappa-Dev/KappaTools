@@ -239,7 +239,9 @@ module Counter =
 						| Some emax -> 
 							if emax = 0 then 0 
 							else
-								(event - last_event) * !Parameter.progressBarSize / emax
+							  let nplus = (event * !Parameter.progressBarSize) / emax in 
+                                                          let nminus = (last_event * !Parameter.progressBarSize) / emax in 
+                                                          nplus-nminus 
 				in
 					let n = ref (max n_t n_e) in
 						if !n>0 then set_tick counter (event,time) ;
@@ -250,7 +252,9 @@ module Counter =
 							n:=!n-1 
 						done ;
 						flush stdout
-														
+	                                          
+	 
+              
 		let create init_t init_e mx_t mx_e = 
 			let dE = compute_dE() in
 				let dT = match dE with None -> compute_dT() | Some _ -> None
@@ -296,3 +300,32 @@ module Palette:
 	  let grey d = if d > 16 then "black" else ("gray"^(string_of_int (100-6*d)))
 	  let string_of_color (r,g,b) = String.concat "," (List.map string_of_float [r;g;b])
 	end
+
+
+	let tick_stories n_stories (init,last,counter) =
+	  let _ = 
+	    if not init then
+	      let c = ref !Parameter.progressBarSize in
+	      let _ = print_newline () in 
+              while !c > 0 do
+		print_string "_" ;
+		c:=!c-1
+	      done ;
+	      print_newline() ; 
+	  in
+	  let nc = (counter * !Parameter.progressBarSize) / n_stories in 
+          let nl = (last * !Parameter.progressBarSize) / n_stories in 
+          let n = nc - nl in 
+          let rec aux n = 
+            if n<=0 then () 
+            else 
+              let _ = Printf.printf "%c" (!Parameter.progressBarSymbol) in 
+              let _ = 
+                if !Parameter.eclipseMode then print_newline() ;
+			    in 
+              aux (n-1)
+          in 
+          let _ = aux n in 
+	  let _ =  flush stdout in  
+          (true,counter,counter+1)
+            

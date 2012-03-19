@@ -97,13 +97,19 @@ let event state grid event_list counter plot env =
 				let grid,event_list = 
 					if !Parameter.causalModeOn then
 					  begin
-                                            let event_list = Kappa_instantiation.Cflow_linker.store_event (Kappa_instantiation.Cflow_linker.import_event (r,phi,psi)) event_list in 
                                             let event_list = 
-                                              List.fold_left 
-                                                (fun event_list (obs,phi) -> 
-                                                  let lhs = State.kappa_of_id obs state in 
-                                                    Kappa_instantiation.Cflow_linker.store_obs (obs,lhs,phi) event_list)
-                                                event_list obs_from_rule_app
+                                              if !Parameter.weakcompressionModeOn
+                                              then 
+                                                let event_list = Kappa_instantiation.Cflow_linker.store_event (Kappa_instantiation.Cflow_linker.import_event ((r,phi,psi),(obs_from_rule_app,r,Counter.event counter))) event_list in 
+                                                let event_list = 
+                                                  List.fold_left 
+                                                    (fun event_list (obs,phi) -> 
+                                                      let lhs = State.kappa_of_id obs state in 
+                                                      Kappa_instantiation.Cflow_linker.store_obs (obs,lhs,phi) event_list)
+                                                    event_list obs_from_rule_app
+                                                in event_list
+                                              else 
+                                                event_list
                                             in 
 					    (Causal.record ~decorate_with:obs_from_rule_app r side_effect (phi,psi) (Counter.event counter) grid env, (*to be removed*)
 					     event_list)
@@ -146,17 +152,23 @@ let loop state grid event_list counter plot env =
 			in
 			iter state grid event_list counter plot env
 		else (*exiting the loop*)
-			begin
-				if Environment.tracking_enabled env then
+		  begin
+                    let _ = 
+		      Plot.fill state counter plot env 0.0; (*Plotting last measures*)
+		      Plot.flush_ticks counter ;
+		      Plot.close plot
+	            in 
+                    if Environment.tracking_enabled env then
 				  begin
 				    Causal.dot_of_grid !Parameter.cflowFileName grid state env ;
-				    let refined_event_list = Compression_main.weak_compression env event_list 
-	          in ()
+				    let _ = 
+                                      if !Parameter.weakcompressionModeOn
+                                      then Compression_main.weak_compression env state event_list 
+	                            in
+                                    ()
 				  end;
 	
-			  Plot.fill state counter plot env 0.0; (*Plotting last measures*)
-			  Plot.flush_ticks counter ;
-			  Plot.close plot
+			 
 			end
 	in
 	iter state grid event_list counter plot env

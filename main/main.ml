@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "3.0-130312"
+let version = "3.0-190312"
 
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
@@ -44,7 +44,8 @@ let main =
 		("--backtrace", Arg.Unit (fun () -> Parameter.backtrace:= true), "Backtracing exceptions") ;
 		("--glutony", Arg.Unit (fun () -> Gc.set { (Gc.get()) with Gc.space_overhead = 500 (*default 80*) } ;), "Lower gc activity for a faster but memory intensive simulation") ;
 		("-rescale-to", Arg.Int (fun i -> Parameter.rescale:=Some i), "Rescale initial concentration to given number for quick testing purpose") ; 
-		]
+                ("--weak-compression", Arg.Unit (fun () -> Parameter.weakcompressionModeOn:= true), "Enable weak compression") ;
+	]
 	in
 	try
 		Arg.parse options (fun _ -> Arg.usage options usage_msg ; exit 1) usage_msg ;

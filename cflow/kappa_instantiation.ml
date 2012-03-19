@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 08/03/2012
+  * Last modification: 17/03/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -18,7 +18,7 @@
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
-let debug_mode = true 
+let debug_mode = false
 let compose f g = (fun x -> f (g x))
 
 module type Cflow_signature =
@@ -38,10 +38,13 @@ sig
     | BOUND_to of site 
 
   type kappa_sig 
-  type ('a,'b,'c) choice = 
-    | Event of 'a
+  
+  type ('a,'b,'c(*,'d*)) choice = 
+    | Event of 'a 
     | Init of 'b
-    | Obs of 'c 
+    | Obs of 'c  
+    | Dummy (*of 'd *)
+  
   type test = 
     | Is_Here of agent
     | Has_Internal of site * internal_state 
@@ -68,7 +71,12 @@ sig
   type kappa_rule 
   type refined_event 
   type refined_step
-
+  type obs_from_rule_app = (int * int Mods.IntMap.t) list 
+  type r = Dynamics.rule 
+  type counter = int 
+  type rule_info = obs_from_rule_app * r * counter
+                   
+  val dummy_refined_step: refined_step
   val type_of_refined_step: refined_step -> (unit,unit,unit) choice 
   val agent_of_binding_type: binding_type -> agent_name 
   val site_of_binding_type: binding_type -> site_name
@@ -96,12 +104,12 @@ sig
 
   val print_refined_step: out_channel -> kappa_sig -> refined_step -> unit 
 
-  val import_event:  Dynamics.rule * int Mods.IntMap.t * int Mods.IntMap.t -> event 
+  val import_event:  (Dynamics.rule * int Mods.IntMap.t * int Mods.IntMap.t) * rule_info -> event 
   val import_env: Environment.t -> kappa_sig 
   val store_event: event -> step list -> step list 
   val store_init : State.implicit_state -> step list -> step list 
   val store_obs :  int * Mixture.t * int Mods.IntMap.t -> step list -> step list 
-
+  val build_grid: (refined_step * unit list) list -> Environment.t -> Causal.grid 
 end 
 
 
@@ -124,11 +132,15 @@ module Cflow_linker =
   type embedding = agent_id Mods.IntMap.t 
 
   type fresh_map = int Mods.IntMap.t 
-
-
+  type obs_from_rule_app = (int * int Mods.IntMap.t) list 
+  type r = Dynamics.rule 
+  type counter = int  
+  type rule_info = (obs_from_rule_app * r  * counter) 
   type init = agent * (site_name * (int option * Node.ptr)) list
-  type event = kappa_rule * embedding * fresh_map
+  type event = (kappa_rule * embedding * fresh_map) * (rule_info)
   type obs = int * Mixture.t * embedding 
+      
+  let get_causal (_,d) = d 
 
 
   type kappa_sig = Environment.t 
@@ -165,22 +177,25 @@ module Cflow_linker =
     | Event of 'a 
     | Init of 'b
     | Obs of 'c  
-
- 
+    | Dummy   
 
   type refined_event = event * test list * (action list * ((site * binding_state) list))
   type refined_init = init * action list
   type refined_obs =  obs * test list 
 
+  type side_effects = (int*int) list 
   type step = (event,init,obs) choice 
   type refined_step = (refined_event,refined_init,refined_obs) choice 
 
+  let dummy_refined_step = Dummy 
   let type_of_refined_step c = 
     match c 
     with 
       | Event _ -> Event ()
       | Init _ -> Init () 
       | Obs _ -> Obs () 
+      | Dummy -> Dummy 
+
   let site_of_binding_type = snd
   let agent_of_binding_type = fst
   let map_sites f map x = 
@@ -206,11 +221,11 @@ module Cflow_linker =
       (fun k sign -> (k,Signature.default_num_value k sign))
 
   
-  let fresh_map_of_event (_,_,x) = x 
+  let fresh_map_of_event ((_,_,x),_) = x 
   
-  let embedding_of_event (_,x,_) = x 
+  let embedding_of_event ((_,x,_),_) = x 
   
-  let rule_of_event (x,_,_) = x
+  let rule_of_event ((x,_,_),_) = x
 
   let agent_id_of_agent = fst 
   
@@ -446,6 +461,7 @@ module Cflow_linker =
 
   let tests_of_event event = 
     let rule = rule_of_event event in 
+(*    let event = short_of event in *)
     let lhs = rule.Dynamics.lhs in 
     let embedding = embedding_of_event event in 
     tests_of_lhs lhs embedding 
@@ -576,7 +592,7 @@ module Cflow_linker =
 		 let fresh' = add_asso rhs_id kappa_agent fresh in 
 		   list_actions',side_sites,fresh')
 	([],[],Mods.IntMap.empty)
-	(rule_of_event event).Dynamics.script 
+	rule.Dynamics.script 
     in a,b
 
       
@@ -636,21 +652,23 @@ module Cflow_linker =
 
   let print_refined_init log env refined_init = ()
   
-  let gen f1 f2 f3 step = 
+  let gen f1 f2 f3 f4 step = 
     match step
     with 
       | Event a -> f1 a 
       | Init a -> f2 a
       | Obs a -> f3 a 
+      | Dummy  -> f4 ()
 
-  let genbis f1 f2 f3 = 
-    gen (fun a -> Event (f1 a)) (fun a -> Init (f2 a)) (fun a -> Obs (f3 a))     
+  let genbis f1 f2 f3  = 
+    gen (fun a -> Event (f1 a)) (fun a -> Init (f2 a)) (fun a -> Obs (f3 a))     (fun a -> Dummy)
   
   let print_refined_step log env = 
-    gen (print_refined_event log env) (print_refined_init log env) (print_refined_obs log env) 
+    gen (print_refined_event log env) (print_refined_init log env) (print_refined_obs log env) (fun _  -> ())
 
   let tests_of_refined_step =
-    gen tests_of_refined_event tests_of_refined_init tests_of_refined_obs
+    gen tests_of_refined_event tests_of_refined_init tests_of_refined_obs 
+(fun _ -> [])
 
   let is_obs_of_refined_step x = 
     match x 
@@ -665,12 +683,48 @@ module Cflow_linker =
     genbis event_of_refined_event init_of_refined_init obs_of_refined_obs 
 
   let actions_of_refined_step = 
-    gen actions_of_refined_event actions_of_refined_init actions_of_refined_obs 
-  
+    gen actions_of_refined_event actions_of_refined_init actions_of_refined_obs (fun _ -> [],[])
+
   let import_event x = x 
   let import_env x = x
-  let store_event event step_list = (Event event)::step_list    
+  let store_event (event:event) (step_list:step list) = 
+    (Event event)::step_list    
   let store_init init step_list = create_init init step_list  
   let store_obs (i,a,x) step_list = Obs(i,a,x)::step_list 
+
+  let build_grid list env = 
+    let grid = Causal.empty_grid () in 
+    let grid,_ = 
+      List.fold_left 
+        (fun (grid,side_effect) (k,_) ->
+          match k 
+          with 
+            | Event (a,_,_) -> 
+              begin 
+                let d = [] in 
+                let side_effect =
+                  List.fold_left
+                    (fun set i -> Mods.Int2Set.add i set)
+                    side_effect 
+                    d 
+                in 
+                let obs_from_rule_app,r,counter = get_causal a in 
+                let phi = embedding_of_event a in 
+                let psi = fresh_map_of_event a in 
+                Causal.record ~decorate_with:obs_from_rule_app r side_effect (phi,psi) counter grid env,Mods.Int2Set.empty 
+              end
+            | Init b -> 
+                grid,side_effect
+            | Obs c  -> 
+                grid,side_effect
+            | Dummy -> 
+              let d = [] in 
+              grid,
+              List.fold_left 
+                (fun side_effect x -> Mods.Int2Set.add x side_effect)
+                side_effect d 
+        ) 
+        (grid,Mods.Int2Set.empty) list 
+    in grid 
 end:Cflow_signature)
 
