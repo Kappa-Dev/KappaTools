@@ -70,10 +70,8 @@ sig
   val import: (PB.pre_blackboard -> PB.H.error_channel * blackboard) PB.H.with_handler 
 
   (** output result*)
-  type side_effects = unit
-  type result = (PB.K.refined_step*side_effects list) list 
+  type result = PB.K.refined_step list 
      
-
   (** iteration*)
   val is_maximal_solution: (blackboard -> PB.H.error_channel * bool) PB.H.with_handler 
 
@@ -99,7 +97,7 @@ sig
   val forced_events: blackboard -> PB.step_id list list 
   val side_effect_of_event: blackboard -> PB.step_id -> (int*int) list
   val cut_predicate_id: (blackboard -> PB.predicate_id -> PB.H.error_channel *   blackboard) PB.H.with_handler 
-  val cut: (blackboard -> PB.step_id list -> PB.H.error_channel * blackboard) PB.H.with_handler 
+  val cut: (blackboard -> PB.step_id list -> PB.H.error_channel * blackboard * result ) PB.H.with_handler 
 end
 
 module Blackboard = 
@@ -955,8 +953,7 @@ module Blackboard =
        in aux (error,blackboard) 
     
   (** output result*)
-     type side_effects = unit  
-     type result = (PB.K.refined_step*side_effects list) list 
+     type result = PB.K.refined_step list 
          
   (** iteration*)
      let is_maximal_solution parameter handler error blackboard = 
@@ -969,24 +966,24 @@ module Blackboard =
      let array = blackboard.selected_events in 
      let step_array = blackboard.event in 
      let size = PB.A.length array in
-     let rec aux k sides list = 
+     let rec aux k list = 
        if k=size 
        then (List.rev list) 
        else 
          let bool = PB.A.get array k in 
          match bool 
          with 
-           | None -> aux (k+1) sides list (*to do raise an exception*)
-           | Some false -> aux (k+1) sides list
+           | None -> aux (k+1) list (*to do raise an exception*)
+           | Some false -> aux (k+1) list
            | Some true -> 
              begin
                let step = 
                  PB.A.get step_array k 
                in 
-               aux (k+1) sides ((step,[])::list) 
+               aux (k+1) (step::list) 
              end
      in 
-     let list = aux 0 () [] in 
+     let list = aux 0 [] in 
      error,list 
        
    let print_stack log blackboard = 
@@ -1076,18 +1073,18 @@ module Blackboard =
    let cut_event_id parameter handler error blackboard n_event = 
      overwrite parameter handler error N_unresolved_events (Counter n_event) blackboard 
      
-   let count_event_of_p_id_list parameter handler error blackboard obs list = 
+   let count_event_of_p_id_list parameter handler error blackboard obs_list list_p_id = 
      let n_events = blackboard.n_eid in  
      let event_array = PB.A.make n_events false in
-     let _ = List.iter (fun i -> PB.A.set event_array i true) obs in 
-     let res = List.length obs in 
+     let _ = List.iter (fun i -> PB.A.set event_array i true) obs_list in 
+     let res = List.length obs_list in 
      List.fold_left  
-       (fun (error,counter) p_id -> 
+       (fun (error,counter,list) p_id -> 
          let array = PB.A.get blackboard.blackboard p_id in 
-         let error,counter = 
+         let error,counter,list = 
            if PB.A.get blackboard.used_predicate_id p_id 
            then 
-             let rec aux j res error = 
+             let rec aux j res list error = 
                let case = PB.A.get array j in
                let eid = case.static.event_id in 
                let bool = 
@@ -1100,27 +1097,28 @@ module Blackboard =
                    with 
                      | _ -> false 
                in 
-               let res' = 
+               let res',list' = 
                  if bool 
-                 then res
+                 then res,list
                  else 
                    let _ = PB.A.set event_array case.static.event_id true 
-                   in res+1 
+                   in res+1,case.static.event_id::list  
                in 
                let j' = get_pointer_next case in 
-               if j=j' then error,res'
-               else aux j' res' error 
+               if j=j' then error,res',list'
+               else aux j' res' list' error 
              in 
-             let error,counter = aux pointer_before_blackboard counter error in 
-             error,counter
+             let error,counter,list = aux pointer_before_blackboard counter list error in 
+             error,counter,list
            else 
-             error,counter
-         in error,counter)
-       (error,res) list 
+             error,counter,list
+         in error,counter,list)
+       (error,res,obs_list) list_p_id  
 
    let cut parameter handler error blackboard list = 
      let error,p_id_list_to_cut,p_id_list_to_keep  = useless_predicate_id parameter handler error blackboard list in 
-     let error,int = count_event_of_p_id_list parameter handler error blackboard list p_id_list_to_keep in 
+     let error,int,event_list = count_event_of_p_id_list parameter handler error blackboard list p_id_list_to_keep in
+     let event_list = List.sort compare  event_list in 
      let error,blackboard = cut_event_id parameter handler error blackboard int in 
      let error,blackboard = 
        List.fold_left 
@@ -1129,7 +1127,8 @@ module Blackboard =
          (error,blackboard)
          p_id_list_to_cut 
      in 
-     error,blackboard 
+     error,blackboard,
+     List.rev_map (PB.A.get blackboard.event) (List.rev event_list) 
 
   
    end:Blackboard)
