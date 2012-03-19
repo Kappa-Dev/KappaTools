@@ -35,7 +35,6 @@ let main =
 		("-make-sim", Arg.String (fun file -> Parameter.marshalizedOutFile := file) , "save kappa files as a simulation package") ; 
 		("-im", Arg.String (fun file -> Parameter.influenceFileName:=file), "produces the influence map of the model") ;
 		("-flux", Arg.String (fun file -> Parameter.fluxFileName:=file ; Parameter.fluxModeOn := true), "will measure activation/inhibition fluxes during the simulation") ;
-		("--dot-output", Arg.Unit (fun () -> Parameter.dotOutput := true), "(no argument required) Dot format for outputting snapshots") ;
 		("--implicit-signature", Arg.Unit (fun () -> Parameter.implicitSignature := true), "Program will guess agent signatures automatically") ;
 		("-seed", Arg.Int (fun i -> Parameter.seedValue := Some i), "Seed for the random number generator") ;
 		("--eclipse", Arg.Unit (fun () -> Parameter.eclipseMode:= true), "enable this flag for running KaSim behind eclipse plugin") ;
@@ -44,8 +43,7 @@ let main =
 		("--backtrace", Arg.Unit (fun () -> Parameter.backtrace:= true), "Backtracing exceptions") ;
 		("--gluttony", Arg.Unit (fun () -> Gc.set { (Gc.get()) with Gc.space_overhead = 500 (*default 80*) } ;), "Lower gc activity for a faster but memory intensive simulation") ;
 		("-rescale-to", Arg.Int (fun i -> Parameter.rescale:=Some i), "Rescale initial concentration to given number for quick testing purpose") ; 
-                ("--weak-compression", Arg.Unit (fun () -> Parameter.weakcompressionModeOn:= true), "Enable weak compression") ;
-	]
+  ]
 	in
 	try
 		Arg.parse options (fun _ -> Arg.usage options usage_msg ; exit 1) usage_msg ;

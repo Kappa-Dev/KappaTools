@@ -75,7 +75,7 @@
 \def\dd{-\hspace{0.001cm}-}
 
 %%%%
-\def\version{v2.0}
+\def\version{v3}
 
 
 \title{KaSim reference manual \version}
@@ -191,12 +191,11 @@ Table~\ref{tab:add-options} summarizes the advanced options that are accessible 
 Argument & Description \\ \hline
 \ttt{\small -seed $n$} &\small Seeds the pseudo-random number generator $n>0$ \\
 \ttt{\small \dd implicit-signature} &\small Automatically deduce agent signatures (see Chapter~\ref{chap:advanced})\\
-\ttt{\small \dd dot-output} &\small Produces dot format files for snapshots (instead of kappa files)\\
 \ttt{\small -im} \textit{file} &\small Produces a dot format file of the decorated influence map \\
 \ttt{\small -flux} \textit{file} &\small Produces a dot format file of the activation/inhibition flux \\ & measured during the simulation \\
 \ttt{\small -make-sim} \textit{sim\_file} &\small makes a simulation package out of the input kappa files \\
 \ttt{\small -load-sim} \textit{sim\_file} &\small use simulation package \textit{sim\_file} as input\\
-\ttt{\small \dd glutony} &\small simulation mode that is memory intensive \\ &\small but that speeds up simulation time\\
+\ttt{\small \dd gluttony} &\small simulation mode that is memory intensive \\ &\small but that speeds up simulation time\\
 
 \hline
 \end{tabular}
@@ -215,14 +214,14 @@ will generate a file \ttt{model.out} containing the trajectories of the observab
 }
 will generate a file \ttt{data.out} (default name) containing 1000 data points of a simulation of 1.5 seconds (arbitrary time units) of the model. Note that the input kappa file is split in 4 files containing, for instance, the initial conditions, \ttt{init.ka}, the rule set, \ttt{rules.ka}, the observables, \ttt{obs.ka}, and the perturbations, \ttt{pert.ka} (see Chapter~\ref{chap:kappa} for details). The order in which the files are given does not matter.
 
-\subsection{The activation and flux maps}
+\section*{The activation and flux maps}
 
-The command line options \ttt{-im} and \ttt{-flux} allows modelers to generate additional information about the statics and the dynamics of the model that is being considered.
+The command line options \ttt{-im} and \ttt{-flux} allows modelers to generate additional information about the statics and the dynamics of the model that is being considered (see Chapter~\ref{chap:advanced}).
 
 \chapter{The kappa file}\label{chap:kappa}
 
 \section{General remarks}
-The \emph{Kappa File}\index{kappa file} (KF) is the formal representation of your model. We use KF to denote the union of the files that are given as input to \KaSim~(argument \ttt{-i}). Each line of the KF is interpreted by \KaSim~as a \emph{declaration}\index{declaration}. If the line is ended by the escape character '\ttt{$\bs$}' the continuation of the declaration is parsed onto the next line. Declarations can be of 4 types: \emph{signatures} (Sec.~\ref{sec:sig}), \emph{rules}\index{rule} (Sec.~\ref{sec:rules}), \emph{variables}\index{variable} (Sec.~\ref{sec:var}), \emph{initial conditions}\index{initial condition} (Sec.~\ref{sec:init}) and \emph{perturbations}\index{perturbation} (Sec.~\ref{sec:mod}). The KF's structure is quite flexible and can be divided in any number of sub-files in which the order of declarations does not matter (to the exception of variable declarations, see Section~\ref{sec:var} for details). Comments\index{comments} can be used by inserting the marker \ttt{\#} that tells \KaSim~to ignore the rest of the line. 
+The \emph{Kappa File}\index{kappa file} (KF) is the formal representation of your model. We use KF to denote the union of the files that are given as input to \KaSim~(argument \ttt{-i}). Each line of the KF is interpreted by \KaSim~as a \emph{declaration}\index{declaration}. If the line is ended by the escape character '\ttt{$\bs$}' the continuation of the declaration is parsed onto the next line. Declarations can be of 5 types: \emph{signatures} (Sec.~\ref{sec:sig}), \emph{rules}\index{rule} (Sec.~\ref{sec:rules}), \emph{variables}\index{variable} (Sec.~\ref{sec:var}), \emph{initial conditions}\index{initial condition} (Sec.~\ref{sec:init}), \emph{perturbations}\index{perturbation} (Sec.~\ref{sec:mod}) and \emph{parameter configurations} (Sec.~\ref{sec:param}). The KF's structure is quite flexible and can be divided in any number of sub-files in which the order of declarations does not matter (to the exception of variable declarations, see Section~\ref{sec:var} for details). Comments\index{comments} can be used by inserting the marker \ttt{\#} that tells \KaSim~to ignore the rest of the line. 
 
 \section{Agent signature}\label{sec:sig}
 %
@@ -391,7 +390,7 @@ This sort of ambiguity should be resolved, if possible, by refining the ambiguou
 \item[]\ttt{`unary AB' A(x,c!1),C(a!1,b!2),B(y,c!2)$\rar \dots$ @ $k_1$}
 \end{itemize}
 
-There are however systems where even enumerating unary cases becomes impossible. As an alternative one should use the kappa notation for ambiguous rules: 
+There are however systems where even enumerating unary cases becomes impossible. As an alternative, one should use the kappa notation for ambiguous rules: 
 \ITE{
 \item[] \ttt{`my rule'} {\it kappa\_expression} $\rar$ {\it kappa\_expression} \ttt{@} $\ga_2(k_1)$  
 }
@@ -442,7 +441,7 @@ In the KF it is also possible to declare \emph{variables}\index{variable} by a l
 \ITE{
 \item[] \ttt{\%var: `var\_name'} (\textit{variable\_expression} or \textit{kappa\_expression})
 }
-where \ttt{var\_name} can be any string and \textit{variable\_expression} is any algebraic expression on variable names (other than \ttt{var\_name})  using predefined operators summarized in Table~\ref{tab:operators}.
+where \ttt{var\_name} can be any string and \textit{variable\_expression} is any algebraic expression\index{algebraic expression} on variable names (other than \ttt{var\_name})  using predefined operators summarized in Table~\ref{tab:operators}.
 
 \begin{table}[htbp]
 \centering
@@ -450,17 +449,24 @@ where \ttt{var\_name} can be any string and \textit{variable\_expression} is any
 \toprule
 Symbol & Interpretation \\
 \midrule
-\ttt{[E]} & the number of simulation events\index{event} since the beginning of the simulation\\
+\ttt{[E]} & the total number of simulation events\index{event}\\
+& since the beginning of the simulation \\
+\ttt{[E+]} & the total number of productive events\index{event} \\
+\ttt{[E-]} & the total number of null events\index{event}\\
+\ttt{[emax]} & the max (productive) event limit as set by the option \ttt{-e}. \\ &Note that if unset \ttt{emax}$=\infty$\\
 \ttt{[T]} & the bio-time of the simulation \\
-\ttt{`v'} & the value of variable {\ttt `v'} \\
-\ttt{[}f\texttt{]} & the intuitive mathematical function or constant \\ &associated to $f\in\set{\hbox{\ttt{log,sin,cos,tan,sqrt,pi}}}$ \\
+\ttt{[Tsim]} & the cpu-time since the beginning of the simulation \\
+\ttt{[tmax]} & the max (bio)-time limit as set by the option \ttt{-t}. \\ &Note that if unset \ttt{tmax}$=\infty$\\
+
+\ttt{`v'} & the value of variable {\ttt `v'} (declared using the \ttt{\%var:} statement) \\
+\ttt{[}$f$\texttt{]} & the intuitive mathematical function or constant \\ &associated to $f\in\set{\hbox{\ttt{log,sin,cos,tan,sqrt,pi}}}$ \\
 \ttt{[inf]} & symbol for $\infty$ \\
-\ttt{[mod]} & the \emph{modulo} operator \\
+\ttt{[mod]} & the \emph{modulo} operator (infix notation)\\
 \ttt{[exp]} & the exponentiation operation $x\mapsto e^x$ \\
-\ttt{[int]} & the integer part $x\in\Real\mapsto |x|\in\Nat^+$ \\
-\ttt{+,-,*,/,\^} & the corresponding mathematical operators\\
+\ttt{[int]} & the floor function $x\in\Real\mapsto \lfloor x\rfloor\in\Nat^+$ \\
+\ttt{+,-,*,/,\^} & the corresponding mathematical operators (infix notation)\\
 \bottomrule
-\end{tabular}\caption{Symbol usable in variable expressions.}
+\end{tabular}\caption{Symbol usable in algebraic expressions\index{algebraic expression}.}
 \label{tab:operators}
 \end{table}
 %%
@@ -472,7 +478,7 @@ Symbol & Interpretation \\
 }
 define 2 variables, the first one tracking the number of embeddings of \ttt{A(x!1),A(x!1)} in the graph over time, while the second divides this value by 2: the number of automorphisms in \ttt{A(x!1),A(x!1)}. The declaration of a variable acts as a binder in the rest of the KF. Hence variables that are used in the expression of another variable must be declared beforehand. 
 \vskip 0.25cm
-\noi It is also possible to use algebraic expressions as kinetic rates\index{kinetic rate} as in
+\noi It is also possible to use algebraic expressions\index{algebraic expression} as kinetic rates\index{kinetic rate} as in
 \ITE{
 \item[] \ttt{\%var: `k\_on' 1.0E-6 \# per molecule per second}
 \item[] \ttt{'ab' A(x),A(x) -> A(x!1),A(x!1) @ `k\_on'/2}
@@ -577,27 +583,44 @@ where \textit{boolean\_expression} and \textit{effect} are defined by the gramma
 \begin{table}[htbp]
   \centering
   \begin{tabular}{@{} lcl @{}}
-    \textit{boolean\_expression} &::=& \textit{algebraic\_expression} \tcb{rel} \textit{algebraic\_expression} \\
+    \textit{boolean\_expression} &::=& \textit{algebraic\_expression}\index{boolean expression} \tcb{rel} \textit{algebraic\_expression} \\
     && | (\textit{boolean\_expression} \tcb{||} \textit{boolean\_expression}) \\
     && | (\textit{boolean\_expression} \tcb{\&\&} \textit{boolean\_expression}) \\
     && | \tcb{[not]} \textit{boolean\_expression} \\
     && | \tcb{[true]} | \tcb{[false]} \\\\
     \textit{effect} &::=& \tcb{\$ADD} \textit{algebraic\_expression agent\_expression} \\
     && | \tcb{\$DEL} \textit{algebraic\_expression agent\_expression} \\
-    && | \tcb{\$SNAPSHOT} | \tcb{\$STOP} \\ && | \tcb{`rule\_name' :=} \textit{algebraic\_expression} \\\\
+    && | \tcb{\$SNAPSHOT} | \tcb{\$STOP} \\ && | \tcb{`rule\_name' :=} \textit{algebraic\_expression} \\
+    && | \tcb{\$TRACK} \textit{observable} \\\\
+    \textit{observable} &::=& \tcb{`rule\_name'} | \tcb{`var\_name'} \\\\
     \textit{end\_expression} &::=& $\varepsilon$ | \tcb{until} \textit{boolean\_expression}
     \end{tabular}
-  \caption{Perturbation expressions. The operator \ttt{rel} can be any binary relation in $\set{<,=,>}$ }
+  \caption{Perturbation expressions. The operator \ttt{rel} can be any usual binary relation in $\set{<,=,>}$ and algebraic expressions are built using table~\ref{tab:operators}.}
   \label{tab:pert}
 \end{table}
 %%
+\subsection*{Precondition}
 Basically, the \textit{precondition}\index{precondition} determines when the perturbation will be triggered, for instance a user writes
 \ITE{
 \item[] \ttt{\%mod: ([T]>10) \&\& (`v1'/`v2') > 1 do $\dots$}
 }
-to indicate she wishes to trigger a perturbation whenever the simulation time has passed 10 time units and the ratio of variables \ttt{v1} over \ttt{v2} is above 1.
+to indicate she wishes to trigger a perturbation whenever the simulation time has passed 10 time units and the ratio of variables \ttt{v1} over \ttt{v2} is above 1. Note that the perturbations are by default "one shot" interventions in the simulation. Once the precondition is satisfied, the perturbation is applied and discarded, unless a persistent perturbation is used using the \ttt{until} keyword (see below). 
 
-The \textit{effect} of a perturbation can be of 4 kinds: adding (\ttt{\$ADD} instruction) or deleting (\ttt{\$DEL} instruction) agents from the mixture, recording the current state of the mixture (\ttt{\$SNAPSHOT} instruction), interrupting the simulation and saving the last mixture (\ttt{\$STOP} instruction) or setting the kinetic rate\index{kinetic rate} of a particular rule to a given value. 
+\subsection*{Effect}
+
+The \textit{effect} of a perturbation can be divided in two kinds: the perturbations that modify the mixture, and those that simply give modelers an additional insight of what is going on in the simulation.
+
+In the first kind one may add (\ttt{\$ADD} instruction), delete (\ttt{\$DEL} instruction) agents from the mixture or modify the kinetic rate\index{kinetic rate} of a particular rule. In the later category one may record the current state of the mixture (\ttt{\$SNAPSHOT} instruction), interrupt the simulation in order to save the current state (\ttt{\$STOP} instruction) or decide to trigger some causality analysis on some particular observable of interest (\ttt{\$TRACK} instruction)\index{causality analysis}.
+
+\subsection*{Persistent perturbation}
+The \textit{end\_expression} serves to specify whether the perturbation should be applied only once ("one shot" perturbation) or at every future events until a condition is reached (persistent perturbation). For instance:
+\ttt{\ITE{
+\item[] \%mod: ([T] [mod] 100)=0 do \$DEL  [inf] C until [T]>1000
+}}
+will delete every \ttt{C} from the mixture every 100 t.u until the simulation clock has passed 1000 t.u. If no \ttt{until} keyword is positioned, the perturbation will be discarded after its first application.
+
+
+\subsection{Modifying the mixture during a simulation}
 
 Continuing with the ABC model, the perturbation effect: 
 \ttt{\ITE{
@@ -607,19 +630,13 @@ will add $n\geq 0$ instances of \ttt{C} with \ttt{x1} already in state \ttt{p} (
 \ttt{\ITE{
 \item[] \$DEL  [inf] B(x!\_)
 }}
-will remove \emph{all} \ttt{B}s connected to someone from the mixture. Eventually, the effect:
+will remove \emph{all} \ttt{B}s connected to someone from the mixture. Now, the effect:
 \ttt{\ITE{
 \item[] `rule\_name' :=  [inf]
 }}
-will set the kinetic rate of a declared rule named \ttt{`rule\_name'} to $\infty$.  
+will set the kinetic rate of a declared rule named \ttt{`rule\_name'} to $\infty$.
 
-The \textit{end\_expression} serves to specify whether the perturbation should be applied only once ("one shot" perturbation) or at every future events until a condition is reached (persistent perturbation). For instance:
-\ttt{\ITE{
-\item[] \%mod: ([T] [mod] 100)=0 do \$DEL  [inf] C until [T]>1000
-}}
-will delete every \ttt{C} from the mixture every 100 t.u until the simulation clock has passed 1000 t.u. If no \ttt{until} keyword is positioned, the perturbation will be discarded after its first application.
-
-\subsection{Example 1: introducing new agents during the simulation}
+\subsection*{Example}
 There are various ways one can use perturbations to study more deeply a given kappa model. A basic illustration is the use of a simple perturbation to let a system equilibrate before starting a real simulation. For instance, as can be seen from the curve given in Fig.~\ref{fig:abc}, the number of AB complexes is arbitrarily set to 0 in the initial state (all \ttt{A}s are disconnected from \ttt{B}s in the initial mixture). In order to avoid this, one can modify the kappa file the following way: we set the initial concentration of \ttt{C} to 0 by deleting line 22. Now we introduce \ttt{C}s after 25 t.u by perturbation:
 \ttt{\ITE{
 \item[] \%mod:  [T]>25 do \$ADD 10000 C 
@@ -639,28 +656,33 @@ one obtains the curve given in Fig.~\ref{fig:abc2}
 \end{center}
 \end{figure}
 
-\subsection{Example 2: Defining a new initial state}
+\subsection{Snapshots}
 
 In the previous example, we let the system evolve for some time without its main reactant \ttt{C} in order to let other reactants go to a less arbitrary initial state. One may object that this way of proceeding is CPU-time consuming if one has to do this at each simulation. An alternative is to use the \ttt{\$SNAPSHOT} primitive that allows a user to export a snapshot of the mixture at a given time point as a new (piece of) kappa file.
 For instance, the declaration:
 \ttt{\ITE{
-\item[] \%mod:  [T]>25 do \$SNAPSHOT \textquotedbl prefix\textquotedbl
+\item[] \%mod:  [E-]/[E]>0.9 do \$SNAPSHOT \textquotedbl prefix\textquotedbl
 }}
 
-will ask \KaSim~to export the mixture after 25 time units of simulation. The exported file will be named \ttt{prefix\_$n$.ka} where $n$ is the event number at which the snapshot was taken. Note that one may omit to define a prefix and simply type:
+will ask \KaSim~to export the mixture the first time the ration of null events over productive ones will reach 0.9. The exported file will be named \ttt{prefix\_$n$.ka} where $n$ is the event number at which the snapshot was taken. Note that one may omit to define a prefix and simply type:
 \ttt{\ITE{
-\item[] \%mod:  [T]>25 do \$SNAPSHOT
+\item[] \%mod:  [E-]/[E]>0.9 do \$SNAPSHOT
 }}
 in which case the default prefix \ttt{snap} will be used for naming snapshots.
 
 Note that if the name already exists a counter will be appended at the end of the file to prevent overwriting.
-We can now replace the perturbation of the previous example by the above one and let the system run for 26 time units. The simulation will produce a readable file that one may now use as new initial condition that can be used as input of \KaSim~using \ttt{-i} argument.
-
 Note that snapshots can be performed multiple times, for instance every 1000 events, using the declaration:
 \ttt{\ITE{
-\item[] \%mod:  ([E] [mod] 1000)=0 do \$SNAPSHOT \textquotedbl abc\textquotedbl~until [false] 
+\item[] \%mod:  ([E+] [mod] 1000)=0 do \$SNAPSHOT \textquotedbl abc\textquotedbl~until [false] 
 }}
-which results in \KaSim~producing a snapshot every 1000 events until the simulation ends. The perturbation \ttt{\$STOP \"final\_state\"} will terminate the simulation whenever its precondition is satisfied and produce a snapshot of the last mixture.
+which results in \KaSim~producing a snapshot every 1000 (productive) events until the simulation ends. The perturbation \ttt{\$STOP "final\_state"} will terminate the simulation whenever its precondition is satisfied and produce a snapshot of the last mixture. Note that instead of producing kappa files, one may use snapshot perturbations to produce an image of the mixture in the dot format using the parameter \ttt{"dotSnapshots"} (see Section~\ref{sec:param}).
+
+\subsection{Causality analysis}\index{causality analysis}
+Causality analysis are always triggered by a perturbation of the form:
+\ITE{
+\item[] \ttt{\%mod:}  \textit{start\_condition} \ttt{do \$TRACK }\textit{observable} \ttt{until} \textit{end\_condition} 
+}
+where \textit{start\_condition} and \textit{end\_condition} specify respectively when causality analysis should start and finish (remember that in the absence of \ttt{until} construct, causality analysis will only be performed during one computation event!). 
 
 \section{Link type}
 
@@ -727,6 +749,33 @@ will generate a standard simulation of the \ttt{abc.ka} model, but in addition, 
 }}
 Note that this simulation is now run for $k$ time units instead of $n$. Importantly, simulation packages can only be given as input to the \emph{same} \KaSim~that produced it. As a consequence, recompiling the code, or obtaining different binaries, will cause the simulation package to become useless.
 
+\section{Simulation parameters configuration}\label{sec:param}
+In the KF (usually in a dedicated file) one may use expressions of the form:
+\[
+\hbox{\ttt{\%set: "}\textit{parameter\_name}\ttt{" := "}\textit{parameter\_value}\ttt{"}}
+\]
+where tunable parameters are described table~\ref{tab:parameters}.
+%%
+\begin{table}[ht]
+\begin{tabular}{l|l|lll}
+parameter & possible values & description \\
+\hline &\\
+\textit{Causality analysis}&\\
+\ttt{"compressionMode"} & \ttt{"none", "strong", "weak"} & \small type of compression \\
+\ttt{"cflowFileName"} & \ttt{"cflow.dot"} or any string & \small file name for causal flows\\ & \\
+\textit{Pretty printing}&\\
+\ttt{"plotSepChar"} & \ttt{" "} or any character & \small separation character for plots\\
+\ttt{"dotSnapshots"} & \ttt{"false", "true"} & \small generate dot snapshots\\
+\ttt{"colorDot"} &  \ttt{"false", "true"} & \small use colors in dot format files\\
+\ttt{"progressBarSymbol"} & \ttt{"\#"} or any character & \small symbol for the progress bar\\
+\ttt{"progressBarSize"} & \ttt{"60"} or any integer & \small length of the progress bar\\ &&\\
+\textit{Simulation options} &\\
+\ttt{"dumpIfDeadlocked"} & \ttt{"false","true} & \small Snapshot when simulation \\&&\small is stalled\\
+\ttt{"maxConsecutiveClash"} & \ttt{"2"} or any integer & \small number of consecutive clashes \\ && \small before giving up \\ && \small square approximation\\
+
+\end{tabular}\caption{User defined parameters. Default values are given first in the possible values column.}\label{tab:parameters}
+\end{table}
+%%
 
 \bibliographystyle{plain}
 \bibliography{fmb} 
