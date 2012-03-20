@@ -290,7 +290,8 @@ In a word, from a rule of the form $a_1,\dots,a_n\rar b_1,\dots,b_k$, with $a_i$
 \item[] \ttt{`deleting A' A(x!1),A(z!1)} $\rar$ \ttt{A(x) @ $\ga$} 
 }
 which will remove the \ttt{A} agent in the mixture that will match the second occurrence of \ttt{A} in this rule.
-\subsection{Side effects}
+
+\subsection{Side effects}\label{sec:side-effect}
 
 It may happen that the application of a rule has some \emph{side effects}\index{side effect} on agents that are not mentioned explicitly in the rule. Consider for instance the previous rule:
 \ITE{
@@ -610,7 +611,7 @@ to indicate she wishes to trigger a perturbation whenever the simulation time ha
 
 The \textit{effect} of a perturbation can be divided in two kinds: the perturbations that modify the mixture, and those that simply give modelers an additional insight of what is going on in the simulation.
 
-In the first kind one may add (\ttt{\$ADD} instruction), delete (\ttt{\$DEL} instruction) agents from the mixture or modify the kinetic rate\index{kinetic rate} of a particular rule. In the later category one may record the current state of the mixture (\ttt{\$SNAPSHOT} instruction), interrupt the simulation in order to save the current state (\ttt{\$STOP} instruction) or decide to trigger some causality analysis on some particular observable of interest (\ttt{\$TRACK} instruction)\index{causality analysis}.
+In the first kind one may add (\ttt{\$ADD} instruction), delete (\ttt{\$DEL} instruction) agents from the mixture or modify the kinetic rate\index{kinetic rate} of a particular rule. In the second category one may record the current state of the mixture (\ttt{\$SNAPSHOT} instruction), interrupt the simulation in order to save the current state (\ttt{\$STOP} instruction) or decide to trigger some causality analysis on some particular observable of interest (\ttt{\$TRACK} instruction)\index{causality analysis}.
 
 \subsection*{Persistent perturbation}
 The \textit{end\_expression} serves to specify whether the perturbation should be applied only once ("one shot" perturbation) or at every future events until a condition is reached (persistent perturbation). For instance:
@@ -682,7 +683,21 @@ Causality analysis are always triggered by a perturbation of the form:
 \ITE{
 \item[] \ttt{\%mod:}  \textit{start\_condition} \ttt{do \$TRACK }\textit{observable} \ttt{until} \textit{end\_condition} 
 }
-where \textit{start\_condition} and \textit{end\_condition} specify respectively when causality analysis should start and finish (remember that in the absence of \ttt{until} construct, causality analysis will only be performed during one computation event!). 
+where \textit{start\_condition} and \textit{end\_condition} specify respectively when causality analysis should start and finish (remember that in the absence of \ttt{until} construct, causality analysis will only be performed during one computation event!). The \emph{observable} is either a rule's name \ttt{'r'} or a variable name \ttt{'v'} pointing to a kappa expression. For instance, in the ABC model, the declaration:
+\ttt{\ITE{
+\item[] \%mod:  [E=0] do \$TRACK 'Cpp' until [false] 
+}}
+is asking~\KaSim~to track the appearance of the observable \ttt{'Cpp'} since the beginning of the simulation, and display the causal explanation of every new occurrence of \ttt{'Cpp'}, until the end of the simulation. The explanation, that we call \emph{causal flow}\index{causal flow}, is a set of rule application ordered by causality and displayed as a graph using dot format. In this graph, an edge \ttt{r}$\longrightarrow$ \ttt{r'} between two rule applications $\ttt{r}$ and $\ttt{r'}$ indicates that the first rule application has used, in the simulation, some sites that were modified by the application of the former. We show Fig.~\ref{fig:cflow} an example of such causal flow.
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=5cm]{img/cflow.png}
+\caption{Causal flow for the observable \ttt{'Cpp'} of the ABC model. Plain arrows represent causal dependency, dotted arrows show asymmetric conflict between rule occurrences. Here the \ttt{'ab.c'} rule has to occur before the \ttt{'a.b'} rule. Red observable indicate that the last rule allowed one to observe a new instance of \ttt{'Cpp'}.}
+\label{fig:cflow}
+\end{center}
+\end{figure}
+
+Note that causal flow can show or hide more causal dependencies using various compression techniques that can be enabled as a simulation parameter (see Section~\ref{sec:param}). 
 
 \section{Link type}
 
@@ -705,7 +720,7 @@ The influence map of a model is an object that may help modelers checking the co
 \item [] KaSim -i abc.ka -im map.dot -e 0
 }}
 \noi This will generate the so called \emph{influence map}\index{influence map} of the \ttt{abc.ka} file (the option \ttt{-e 0} specifies that no simulation should be run).
-The influence map is statically computed and does not depend on kinetic rates nor initial conditions. It describes how rule may potentially influence each other during a simulation. \KaSim~will produce a dot format file containing the influence relation over all rules and observables of the model. The produced graph visualized using a circular rendering\footnote{One may use for instance the \ttt{circo} program that is part of the \textit{graphviz} suite.} is given in Figure~\ref{fig:abc-im}. Observables are represented as circular nodes\footnote{Observable can be viewed as identity rules for computing influence.} and rules as rectangular nodes. Edges are decorated with the list of embeddings (separated by a semi-colon) allowing rules's right hand sides to be mapped to left hand sides.
+The influence map is statically computed and does not depend on kinetic rates nor initial conditions. It describes how rules \emph{with no side effect}\index{side effect} may potentially influence each other during a simulation. \KaSim~will produce a dot format file containing the influence relation over all rules and observables of the model. The produced graph visualized using a circular rendering\footnote{One may use for instance the \ttt{circo} program that is part of the \textit{graphviz} suite.} is given in Figure~\ref{fig:abc-im}. Observables are represented as circular nodes\footnote{Observable can be viewed as identity rules for computing influence.} and rules as rectangular nodes. Edges are decorated with the list of embeddings (separated by a semi-colon) allowing rules's right hand sides to be mapped to left hand sides. Note that the influence map will not display relations between rules that are induced by side effects (see Section~\ref{sec:side-effect}).
 
 \begin{figure}[htbp] %  figure placement: here, top, bottom, or page
    \centering
