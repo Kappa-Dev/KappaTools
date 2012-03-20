@@ -39,11 +39,11 @@ sig
 
   type kappa_sig 
   
-  type ('a,'b,'c(*,'d*)) choice = 
+  type ('a,'b,'c) choice = 
     | Event of 'a 
     | Init of 'b
     | Obs of 'c  
-    | Dummy (*of 'd *)
+    | Dummy 
   
   type test = 
     | Is_Here of agent
@@ -68,14 +68,17 @@ sig
   type fresh_map 
   type obs  
   type step 
+  type side_effect 
+  type kasim_side_effect = Mods.Int2Set.t 
   type kappa_rule 
   type refined_event 
   type refined_step
   type obs_from_rule_app = (int * int Mods.IntMap.t) list 
   type r = Dynamics.rule 
   type counter = int 
-  type rule_info = obs_from_rule_app * r * counter
+  type rule_info = obs_from_rule_app * r * counter * kasim_side_effect
                    
+  val empty_side_effect: side_effect
   val dummy_refined_step: refined_step
   val type_of_refined_step: refined_step -> (unit,unit,unit) choice 
   val agent_of_binding_type: binding_type -> agent_name 
@@ -109,7 +112,9 @@ sig
   val store_event: event -> step list -> step list 
   val store_init : State.implicit_state -> step list -> step list 
   val store_obs :  int * Mixture.t * int Mods.IntMap.t -> step list -> step list 
-  val build_grid: refined_step list -> Environment.t -> Causal.grid 
+  val build_grid: (refined_step*side_effect) list -> bool ->  Environment.t -> Causal.grid 
+  val print_side_effect: out_channel -> side_effect -> unit
+  val side_effect_of_list: (int*int) list -> side_effect 
 end 
 
 
@@ -130,12 +135,13 @@ module Cflow_linker =
   type kappa_rule = Dynamics.rule
 
   type embedding = agent_id Mods.IntMap.t 
-
+  type side_effect = (agent_id*int) list 
+  type kasim_side_effect = Mods.Int2Set.t 
   type fresh_map = int Mods.IntMap.t 
   type obs_from_rule_app = (int * int Mods.IntMap.t) list 
   type r = Dynamics.rule 
   type counter = int  
-  type rule_info = (obs_from_rule_app * r  * counter) 
+  type rule_info = (obs_from_rule_app * r  * counter * kasim_side_effect) 
   type init = agent * (site_name * (int option * Node.ptr)) list
   type event = (kappa_rule * embedding * fresh_map) * (rule_info)
   type obs = int * Mixture.t * embedding 
@@ -188,6 +194,7 @@ module Cflow_linker =
   type refined_step = (refined_event,refined_init,refined_obs) choice 
 
   let dummy_refined_step = Dummy 
+  let empty_side_effect = []
   let type_of_refined_step c = 
     match c 
     with 
@@ -692,39 +699,51 @@ module Cflow_linker =
   let store_init init step_list = create_init init step_list  
   let store_obs (i,a,x) step_list = Obs(i,a,x)::step_list 
 
-  let build_grid list env = 
+  let build_grid list bool env  = 
+    let empty_set = Mods.Int2Set.empty in 
     let grid = Causal.empty_grid () in 
     let grid,_ = 
       List.fold_left 
-        (fun (grid,side_effect) k ->
-          match k 
+        (fun (grid,side_effect) (k,(side:side_effect)) ->
+          match (k:refined_step) 
           with 
             | Event (a,_,_) -> 
               begin 
-                let d = [] in 
+                let obs_from_rule_app,r,counter,kappa_side = get_causal a in 
                 let side_effect =
-                  List.fold_left
-                    (fun set i -> Mods.Int2Set.add i set)
-                    side_effect 
-                    d 
+                  if bool 
+                  then 
+                    kappa_side 
+                  else 
+                    List.fold_left
+                      (fun set i -> Mods.Int2Set.add i set)
+                      side_effect 
+                      side 
                 in 
-                let obs_from_rule_app,r,counter = get_causal a in 
-                let phi = embedding_of_event a in 
-                let psi = fresh_map_of_event a in 
-                Causal.record ~decorate_with:obs_from_rule_app r side_effect (phi,psi) counter grid env,Mods.Int2Set.empty 
+               let phi = embedding_of_event a in 
+               let psi = fresh_map_of_event a in 
+               Causal.record ~decorate_with:obs_from_rule_app r side_effect (phi,psi) counter grid env,
+               Mods.Int2Set.empty 
               end
             | Init b -> 
                 grid,side_effect
             | Obs c  -> 
                 grid,side_effect
             | Dummy -> 
-              let d = [] in 
               grid,
-              List.fold_left 
-                (fun side_effect x -> Mods.Int2Set.add x side_effect)
-                side_effect d 
+              if bool 
+              then 
+                empty_set 
+              else 
+                List.fold_left 
+                  (fun side_effect x -> Mods.Int2Set.add x side_effect)
+                  side_effect side
         ) 
         (grid,Mods.Int2Set.empty) list 
     in grid 
+
+  let print_side_effect log l = 
+    List.iter (fun (a,b) -> Printf.fprintf log "(%i,%i)," a b) l 
+  let side_effect_of_list l = l 
 end:Cflow_signature)
 

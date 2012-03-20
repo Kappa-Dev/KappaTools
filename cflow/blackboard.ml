@@ -70,7 +70,7 @@ sig
   val import: (PB.pre_blackboard -> PB.H.error_channel * blackboard) PB.H.with_handler 
 
   (** output result*)
-  type result = PB.K.refined_step list 
+  type result = (PB.K.refined_step * PB.K.side_effect) list 
      
   (** iteration*)
   val is_maximal_solution: (blackboard -> PB.H.error_channel * bool) PB.H.with_handler 
@@ -95,7 +95,7 @@ sig
   val n_unresolved_events: case_address 
   val n_unresolved_events_in_column: event_case_address -> case_address 
   val forced_events: blackboard -> PB.step_id list list 
-  val side_effect_of_event: blackboard -> PB.step_id -> (int*int) list
+  val side_effect_of_event: blackboard -> PB.step_id -> PB.K.side_effect
   val cut_predicate_id: (blackboard -> PB.predicate_id -> PB.H.error_channel *   blackboard) PB.H.with_handler 
   val cut: (blackboard -> PB.step_id list -> PB.H.error_channel * blackboard * result ) PB.H.with_handler 
 end
@@ -351,7 +351,7 @@ module Blackboard =
            n_unresolved_events: int ;
            last_linked_event_of_predicate_id: int PB.A.t;
            event_case_list: event_case_address list PB.A.t;
-           side_effect_of_event: (int*int) list PB.A.t;
+           side_effect_of_event: PB.K.side_effect PB.A.t;
            fictitious_observable: PB.step_id option;
          }
 
@@ -953,7 +953,7 @@ module Blackboard =
        in aux (error,blackboard) 
     
   (** output result*)
-     type result = PB.K.refined_step list 
+     type result = (PB.K.refined_step * PB.K.side_effect) list  
          
   (** iteration*)
      let is_maximal_solution parameter handler error blackboard = 
@@ -965,6 +965,7 @@ module Blackboard =
    let translate_blackboard parameter handler error blackboard = 
      let array = blackboard.selected_events in 
      let step_array = blackboard.event in 
+     let side_array = blackboard.side_effect_of_event in 
      let size = PB.A.length array in
      let rec aux k list = 
        if k=size 
@@ -973,14 +974,17 @@ module Blackboard =
          let bool = PB.A.get array k in 
          match bool 
          with 
-           | None -> aux (k+1) list (*to do raise an exception*)
+           | None -> aux (k+1) list 
            | Some false -> aux (k+1) list
            | Some true -> 
              begin
                let step = 
                  PB.A.get step_array k 
                in 
-               aux (k+1) (step::list) 
+               let side = 
+                 PB.A.get side_array k 
+               in 
+               aux (k+1) ((step,side)::list) 
              end
      in 
      let list = aux 0 [] in 
@@ -1036,13 +1040,7 @@ module Blackboard =
                          let error,case = get_case parameter handler error event_case_address blackboard in 
                          let pointer = case.dynamic.pointer_previous in 
                          let _ = PB.A.set p_id_array predicate_id true in 
-                      (*    if is_null_pointer pointer   or 
-                                                        (PB.is_unknown case.static.action && not (List.mem eid list_obs))   *)
-
-                         (* if it cuts too much, replace the previous if with the next one *)
-                         
                          if is_null_pointer pointer 
-                       
                          then 
                            q 
                          else 
@@ -1135,7 +1133,7 @@ module Blackboard =
          p_id_list_to_cut 
      in 
      error,blackboard,
-     List.rev_map (PB.A.get blackboard.event) (List.rev event_list) 
+     List.rev_map (fun k -> PB.A.get blackboard.event k,PB.K.empty_side_effect) (List.rev event_list) 
 
   
    end:Blackboard)

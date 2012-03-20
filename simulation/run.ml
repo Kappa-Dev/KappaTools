@@ -100,7 +100,7 @@ let event state grid event_list counter plot env =
             let event_list = 
               if !Parameter.weakcompressionModeOn
               then 
-                let event_list = Kappa_instantiation.Cflow_linker.store_event (Kappa_instantiation.Cflow_linker.import_event ((r,phi,psi),(obs_from_rule_app,r,Counter.event counter))) event_list in 
+                let event_list = Kappa_instantiation.Cflow_linker.store_event (Kappa_instantiation.Cflow_linker.import_event ((r,phi,psi),(obs_from_rule_app,r,Counter.event counter,side_effect))) event_list in 
                 let event_list = 
                   List.fold_left 
                     (fun event_list (obs,phi) -> 

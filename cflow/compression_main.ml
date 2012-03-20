@@ -67,7 +67,7 @@ let weak_compression env state step_list =
       Printf.fprintf stderr "\nPretty printing the grid\n"
   in 
   let error = 
-    if debug_mode 
+    if debug_mode
     then 
       S.PH.B.PB.print_preblackboard parameter handler error stderr preblackboard 
     else 
@@ -126,12 +126,12 @@ let weak_compression env state step_list =
           then error
           else 
             let error,list = S.PH.B.translate_blackboard parameter handler error blackboard in 
-            let grid = S.PH.B.PB.K.build_grid list env in
+            let grid = S.PH.B.PB.K.build_grid list false env in
 						let filename_comp = (Filename.chop_suffix !Parameter.cflowFileName ".dot") ^"_"^(string_of_int counter)^"weak_comp"^".dot"
 						and filename =  (Filename.chop_suffix !Parameter.cflowFileName ".dot")^"_"^(string_of_int counter)^".dot"
 						in
             let _ = Causal.dot_of_grid filename_comp grid state env in 
-            let grid = S.PH.B.PB.K.build_grid result_wo_compression env in 
+            let grid = S.PH.B.PB.K.build_grid result_wo_compression true env in 
             let _ = Causal.dot_of_grid filename grid state env in 
             let error,blackboard = S.PH.B.reset_init parameter handler error blackboard in 
             error

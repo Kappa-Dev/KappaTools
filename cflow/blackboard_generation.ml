@@ -63,7 +63,7 @@ sig
   val event_list_of_predicate: (pre_blackboard -> predicate_id -> H.error_channel * (int * int * predicate_value * predicate_value ) list) H.with_handler 
   val mandatory_events: (pre_blackboard -> H.error_channel * ((int list) list)) H.with_handler 
   val get_pre_event: (pre_blackboard -> H.error_channel * K.refined_step A.t) H.with_handler 
-  val get_side_effect: (pre_blackboard -> H.error_channel * ((int*int) list) A.t) H.with_handler 
+  val get_side_effect: (pre_blackboard -> H.error_channel * K.side_effect A.t) H.with_handler 
   val get_fictitious_observable: (pre_blackboard -> H.error_channel * int option) H.with_handler 
 end
 
@@ -122,7 +122,7 @@ module Preblackboard =
      module PredicateidSet = Set.Make (struct type t = predicate_id let compare = compare end)
      module PredicateidMap = Map.Make (struct type t = predicate_id let compare = compare end)
      module SidMap = Map.Make (struct type t = step_id let compare = compare end)
-      
+           
      type pre_blackboard = 
 	 {
            pre_fictitious_list: predicate_id list ; (** list of wire for mutual exclusions, the state must be undefined at the end of the trace *) 
@@ -137,8 +137,10 @@ module Preblackboard =
            history_of_predicate_values_to_predicate_id: CaseValueSet.t A.t; (** 
 maps each wire to the set of its previous states, this summarize the potential state of a site that is freed, so as to overapproximate the set of potential side effects*)
            pre_observable_list: step_id list list ;
-           pre_side_effect_of_event: (int*int) list A.t;
-           pre_fictitious_observable: step_id option; (*id of the step that closes all the side-effect mutex *)
+           pre_side_effect_of_event: K.side_effect A.t;
+           pre_fictitious_observable: step_id option; (*id of the step that clos
+es all the side-effect mutex *)
+
            } 
 
          
@@ -219,8 +221,8 @@ maps each wire to the set of its previous states, this summarize the potential s
        let _ = Printf.fprintf log "*\nSide effects \n*\n" in 
        let _ = A.iteri 
          (fun i list -> 
-             let _ = Printf.fprintf log "event %i: " i in
-             let _ = List.iter (fun (a,b) -> Printf.fprintf log "(%i,%i)," a b) list  in 
+             let _ = Printf.fprintf log "event %i:\n " i in
+             let _ = K.print_side_effect log list in 
              let _ = Printf.fprintf log "\n" in 
              ()
          )
@@ -558,7 +560,7 @@ maps each wire to the set of its previous states, this summarize the potential s
   let init parameter handler error = 
     error, 
     {
-      pre_side_effect_of_event = A.make 1 [];
+      pre_side_effect_of_event = A.make 1 K.empty_side_effect;
       pre_event = A.make 1 K.dummy_refined_step;
       pre_fictitious_list = [] ; 
       pre_steps_by_column = A.make 1 (1,[]) ; 
@@ -730,6 +732,8 @@ maps each wire to the set of its previous states, this summarize the potential s
                               []
                               list 
                           in 
+                          let side_effect = K.side_effect_of_list 
+                            side_effect in 
                           let _ = A.set blackboard.pre_side_effect_of_event 
                             blackboard.pre_nsteps
                             side_effect in
@@ -801,7 +805,7 @@ maps each wire to the set of its previous states, this summarize the potential s
         unambiguous_side_effets 
     in 
     let nsid = blackboard.pre_nsteps + 1 in 
-    let _ = A.set blackboard.pre_side_effect_of_event nsid side_effect in
+    let _ = A.set blackboard.pre_side_effect_of_event nsid (K.side_effect_of_list side_effect) in
     let _ = A.set pre_event nsid step in 
     let pre_steps_by_column = 
       PredicateidMap.fold 
