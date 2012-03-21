@@ -47,7 +47,7 @@ and link =
 	| LNK_SOME of Tools.pos
 	| LNK_TYPE of ((string * Tools.pos) * (string * Tools.pos))
 
-type rule = {lhs: mixture ; arrow:arrow ; rhs:mixture; k_def:alg_expr ; k_un:alg_expr option}
+type rule = {rule_pos: Tools.pos ; lhs: mixture ; arrow:arrow ; rhs:mixture; k_def:alg_expr ; k_un:alg_expr option}
 and arrow = RAR of Tools.pos 
 type rule_label = {lbl_nme:(string * Tools.pos) option ; lbl_ref:(string * Tools.pos) option}
 

@@ -81,7 +81,7 @@ rule token = parse
 						}  
 		| '\"' {let filename = read_label "" ['\"'] lexbuf in let pos = position lexbuf in FILENAME (filename,pos)}
     | '\n' {incr_line lexbuf ; NEWLINE}
-		| '\r' {incr_line lexbuf ; NEWLINE}
+		| '\r' {token lexbuf ; NEWLINE}
     | '#' {comment lexbuf}
     | integer as n {let pos = position lexbuf in INT(int_of_string n,pos)}
     | real as f {let pos = position lexbuf in FLOAT(float_of_string f,pos)}

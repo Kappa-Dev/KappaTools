@@ -143,7 +143,7 @@ let string_of_pert pert env =
 		| CFLOW id -> let nme = try Environment.rule_of_num id env with Not_found -> Environment.kappa_of_num id env in ("CFLOW "^nme)
 
 		
-let diff m0 m1 label_opt env =
+let diff pos m0 m1 label_opt env =
 	let add_map id site_type map =
 		let set = try IdMap.find id map with Not_found -> Int2Set.empty
 		in
@@ -151,6 +151,7 @@ let diff m0 m1 label_opt env =
 	in
 	let side_effect = ref false in
 	let label = match label_opt with Some (_,pos) -> (string_of_pos pos) | None -> "" in
+	let compile_error pos msg = raise (ExceptionDefn.Semantics_Error (pos,msg)) in
 	let id_preserving ag1 ag2 = (*check whether ag2 can be the residual of ag1 for (same name)*)
 		Mixture.name ag1 = Mixture.name ag2
 	in
@@ -213,16 +214,16 @@ let diff m0 m1 label_opt env =
 							| (None, None) -> inst
 							| (Some i, None) -> inst (*DCDW: default will be assumed*)
 							| (Some i, Some j) -> (MOD((FRESH id, site_id), j))::inst
-							| (None, Some k) -> invalid_arg "Dynamics.diff: adding an agent that is not supposed to have an internal state"
+							| (None, Some k) -> compile_error pos "This rule is adding an agent that is not supposed to have an internal state"
 						in
 						match lnk with
-						| Node.WLD -> invalid_arg "Dynamics.diff: adding an agent that is not fully described (wild card lnk)"
+						| Node.WLD -> compile_error pos "This rule is adding an agent that is not fully described (wild card link)"
 						| Node.FREE -> inst
-						| Node.TYPE _ -> invalid_arg "Dynamics.diff: adding an agent that is not fully described (link type)"
+						| Node.TYPE _ -> compile_error pos "This rule is adding an agent that is not fully described (link type)"
 						| Node.BND ->
 								let opt = Mixture.follow (id, site_id) m1 in
 								match opt with
-								| None -> invalid_arg "Dynamics.diff: adding an agent that is not fully described (semi lnk)"
+								| None -> compile_error pos "This rule is adding an agent that is not fully described (semi-lnk)"
 								| Some (i,x) ->
 										let bnd_i =
 											if List.mem i added then (FRESH i) else (KEPT i)
@@ -242,6 +243,7 @@ let diff m0 m1 label_opt env =
 		List.fold_left
 			(fun (inst,idmap) id -> (*adding link and internal state modifications for agents conserved by the rule*)
 						let ag, ag' = (Mixture.agent_of_id id m0, Mixture.agent_of_id id m1) in
+						let ag_name = Environment.name (Mixture.name ag) env in
 						let interface' = Mixture.interface ag' in
 						(*folding on ag's interface: problem when a site is not mentionned at all in ag but is used in ag' --ie modif with no test*)
 						let sign = Environment.get_sig (Mixture.name ag) env in
@@ -249,6 +251,7 @@ let diff m0 m1 label_opt env =
 						let interface = Signature.fold (fun site_id interface -> if IntMap.mem site_id interface then interface else IntMap.add site_id (None,Node.WLD) interface) sign interface in
 						IntMap.fold
 							(fun site_id (int_state, lnk_state) (inst,idmap) ->
+										let site_name = Environment.site_of_id (Mixture.name ag) site_id env in 
 										let int_state', lnk_state' =
 											try IntMap.find site_id interface' with
 											| Not_found -> (None,Node.WLD) (*site is not mentioned in the right hand side*)
@@ -262,7 +265,9 @@ let diff m0 m1 label_opt env =
 													and idmap = add_map (KEPT id) (site_id,0) idmap
 													in
 														(inst,idmap)
-											| (Some _, None) -> invalid_arg "Dynamics.diff: agent not instanciated on the right"
+											| (Some _, None) -> 
+												compile_error pos 
+												(Printf.sprintf "The internal state of agent '%s', site '%s' on the right hand side is underspecified" ag_name site_name)
 											| (None, Some j) ->
 													let site = Environment.site_of_id (Mixture.name ag) site_id env in
 													let _ =
@@ -366,7 +371,10 @@ let diff m0 m1 label_opt env =
 																else 
 																	(inst,idmap')
 														| (Some (id1, i1), None) -> 
-															(*sub-case: connected -> semi-link*) invalid_arg "Dynamics.diff: rhs has partial link state"
+															(*sub-case: connected -> semi-link*) 
+															compile_error pos 
+															(Printf.sprintf "The link status of agent '%s', site '%s' on the right hand side is underspecified"
+															ag_name site_name)
 														| (None, None) -> (*sub-case: semi-link -> semi-link*) 
 															(inst,idmap) (*nothing to be done*)
 												end
@@ -374,7 +382,10 @@ let diff m0 m1 label_opt env =
 												begin
 													let opt' = Mixture.follow (id, site_id) m1 in
 													match opt' with
-													| None -> (*sub-case: free -> semi-link*) invalid_arg "Dynamics.diff: rhs creates a semi-link"
+													| None -> (*sub-case: free -> semi-link*) 
+													compile_error pos 
+													(Printf.sprintf "The link status of agent '%s', site '%s' on the right hand side is inconsistent"
+													ag_name site_name)
 													| Some (id', i') -> (*sub-case: free -> connected*)
 														(*no warning*)
 														(*modif sites*)
@@ -391,7 +402,9 @@ let diff m0 m1 label_opt env =
 										| (Node.FREE, Node.FREE) | (Node.WLD, Node.WLD) -> (*free -> free or wildcard -> wildcard*) (inst,idmap)
 										| (Node.TYPE (sid,nme),Node.TYPE(sid',nme')) -> 
 											if sid=sid' && nme=nme' then (inst,idmap)
-											else invalid_arg "Dynamics.diff: rhs modifies a link type"
+											else compile_error pos 
+											(Printf.sprintf "The link status of agent '%s', site '%s' on the right hand side is inconsistent" 
+											ag_name site_name)
 										| (Node.WLD, Node.FREE) ->  (*wildcard -> free*)
 												let site = Environment.site_of_id (Mixture.name ag) site_id env in
 												let _ =
@@ -410,7 +423,8 @@ let diff m0 m1 label_opt env =
 												let opt' = Mixture.follow (id, site_id) m1 in
 												begin
 													match opt' with
-													| None -> invalid_arg "Dynamics.diff: rhs turns a wildcard into a semi link"
+													| None -> compile_error pos 
+													(Printf.sprintf "The link status of agent '%s', site '%s' on the right hand side is inconsistent" ag_name site_name)
 													| Some (id', i') ->
 														(*warning*)
 														let site = Environment.site_of_id (Mixture.name ag) site_id env in
@@ -432,7 +446,9 @@ let diff m0 m1 label_opt env =
 															(inst,idmap'))
 														else (inst,idmap')
 												end
-										| (_,_) -> (*connected,free -> wildcard*) invalid_arg "Dynamics.diff: rhs creates a wildcard"
+										| (_,_) -> (*connected,free -> wildcard*) 
+										compile_error pos 
+										(Printf.sprintf "The link status of agent '%s', site '%s' on the right hand side is underspecified" ag_name site_name)
 							)
 							interface (inst,idmap)
 			)

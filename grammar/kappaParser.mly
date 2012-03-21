@@ -176,13 +176,14 @@ mixture:
 
 rule_expression:
 | rule_label mixture arrow mixture AT rate 
-	{let (k2,k1) = $6 in 
-		($1,{Ast.lhs=$2; Ast.arrow=$3; Ast.rhs=$4; Ast.k_def=k2; Ast.k_un=k1})
+	{ let pos = match $3 with Ast.RAR pos -> pos in
+		let (k2,k1) = $6 in 
+		($1,{Ast.rule_pos = pos ; Ast.lhs=$2; Ast.arrow=$3; Ast.rhs=$4; Ast.k_def=k2; Ast.k_un=k1})
 	}
 | rule_label mixture arrow mixture 
 	{let pos = match $3 with Ast.RAR pos -> pos in 
 		ExceptionDefn.warning ~with_pos:pos "Rule has no kinetics. Default rate of 0.0 is assumed." ; 
-		($1,{Ast.lhs=$2; Ast.arrow=$3; Ast.rhs=$4; Ast.k_def=(Ast.FLOAT (0.0,Tools.no_pos)); Ast.k_un=None})}
+		($1,{Ast.rule_pos = pos ; Ast.lhs=$2; Ast.arrow=$3; Ast.rhs=$4; Ast.k_def=(Ast.FLOAT (0.0,Tools.no_pos)); Ast.k_un=None})}
 ;
 
 arrow:
