@@ -34,6 +34,7 @@ module type BinomialTree =
       val insert : key -> t -> t
       val remove_max : t -> t 
       val iteri: (int -> key -> unit) -> t -> unit
+      val is_empty: t -> bool 
     end
 
 module Make = 
@@ -57,6 +58,8 @@ module Make =
           current_size=0;
           array= Array.make (i+1) None
         }
+
+      let is_empty t = t.current_size = 0 
 
       let get_max t = 
         try 

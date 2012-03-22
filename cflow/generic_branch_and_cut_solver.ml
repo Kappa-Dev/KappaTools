@@ -94,6 +94,6 @@ struct
     in 
     let error,blackboard,output = iter parameter handler error blackboard 
     in 
-    error,blackboard,output,result_wo_compression
+    error,blackboard,output,result_wo_compression 
 end 
   

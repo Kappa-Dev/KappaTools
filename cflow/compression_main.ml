@@ -128,7 +128,7 @@ let weak_compression env state step_list =
                   then 
                     Printf.fprintf parameter.S.PH.B.PB.H.out_channel  "COMPRESS %i" (List.length list_eid) 
                 in 
-                let error,blackboard,output,result_wo_compression = 
+                let error,blackboard,output,result_wo_compression  = 
                   S.compress parameter handler error blackboard  list_order list_eid 
                 in 
                 let error = 

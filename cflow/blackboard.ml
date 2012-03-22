@@ -1006,7 +1006,6 @@ module Blackboard =
 
    
    let useless_predicate_id parameter handler error blackboard list = 
-     let list_obs = list in 
      let n_events = blackboard.n_eid in  
      let n_pid = blackboard.n_predicate_id in 
      let p_id_array = PB.A.make n_pid false in  
@@ -1038,22 +1037,32 @@ module Blackboard =
                      List.fold_left
                        (fun q event_case_address ->
                          let predicate_id = event_case_address.column_predicate_id in 
+                         let _ = PB.A.set p_id_array predicate_id true in 
                          let error,case = get_case parameter handler error event_case_address blackboard in 
                          let pointer = case.dynamic.pointer_previous in 
-                         let _ = PB.A.set p_id_array predicate_id true in 
-                         if is_null_pointer pointer 
-                         then 
-                           q 
-                         else 
-                           let prev_event_case_address = 
-                             {event_case_address with row_short_event_id = pointer}
-                           in 
-                           let error,prev_case = get_case parameter handler error prev_event_case_address blackboard in 
-                           let prev_eid = prev_case.static.event_id in 
-                           if is_null_pointer prev_eid 
-                           then q 
-                           else 
-                             prev_eid::q)
+                         let eid = 
+                            let rec scan_down pointer =
+                              let prev_event_case_address = 
+                                {event_case_address with row_short_event_id = pointer}
+                              in 
+                              let error,prev_case = get_case parameter handler error prev_event_case_address blackboard in 
+                              let prev_eid = prev_case.static.event_id in 
+                              if is_null_pointer prev_eid 
+                              then None 
+                              else 
+                                if PB.is_unknown prev_case.static.action 
+                                then 
+                                  let pointer = prev_case.dynamic.pointer_previous in 
+                                  scan_down pointer 
+                                else Some prev_eid 
+                            in 
+                            scan_down pointer 
+                         in 
+                         match 
+                           eid 
+                         with 
+                           | None -> q 
+                           | Some prev_eid -> prev_eid::q)
                        q 
                        list 
                  in 
@@ -1071,7 +1080,17 @@ module Blackboard =
            else rep:=i::(!rep))
          p_id_array 
      in 
-     error,!rep,!rep2
+     let rep3 = ref [] in 
+     let _ = 
+       PB.A.iteri 
+         (fun i value -> 
+           if value 
+           then rep3:=(i:PB.step_id)::(!rep3)
+         )
+         event_array 
+     in 
+     let rep3 = List.rev_map (fun k -> PB.A.get blackboard.event k,PB.K.empty_side_effect) (!rep3) in 
+     error,!rep,!rep2,rep3
        
    let cut_predicate_id parameter handler error blackboard p_id = 
      overwrite parameter handler error (N_unresolved_events_in_column p_id) (Counter 0) blackboard 
@@ -1121,22 +1140,29 @@ module Blackboard =
          in error,counter,list)
        (error,res,obs_list) list_p_id  
 
+
    let cut parameter handler error blackboard list = 
-     let error,p_id_list_to_cut,p_id_list_to_keep  = useless_predicate_id parameter handler error blackboard list in 
-     let error,int,event_list = count_event_of_p_id_list parameter handler error blackboard list p_id_list_to_keep in
-     let event_list = List.sort compare  event_list in 
-     let error,blackboard = cut_event_id parameter handler error blackboard int in 
-     let error,blackboard = 
-       List.fold_left 
-         (fun (error,blackboard) p_id -> 
-           cut_predicate_id parameter handler error blackboard p_id)
-         (error,blackboard)
-         p_id_list_to_cut 
-     in 
-     error,blackboard,
-     List.rev_map (fun k -> PB.A.get blackboard.event k,PB.K.empty_side_effect) (List.rev event_list) 
+     let error,p_id_list_to_cut,p_id_list_to_keep,cut_causal_flow  = useless_predicate_id parameter handler error blackboard list in 
+     if parameter.PB.H.compression_mode.Parameter.weak_compression = false && parameter.PB.H.compression_mode.Parameter.strong_compression = false 
+     then 
+       error,blackboard,cut_causal_flow 
+     else 
+       let error,int,event_list = count_event_of_p_id_list parameter handler error blackboard list p_id_list_to_keep in
+       let event_list = List.sort compare  event_list in 
+       let error,blackboard = cut_event_id parameter handler error blackboard int in 
+       let error,blackboard = 
+         List.fold_left 
+           (fun (error,blackboard) p_id -> 
+             cut_predicate_id parameter handler error blackboard p_id)
+           (error,blackboard)
+           p_id_list_to_cut 
+       in 
+       error,blackboard,cut_causal_flow 
 
   
+
+  
+
    end:Blackboard)
 
 
