@@ -3,7 +3,7 @@ open Tools
 open ExceptionDefn
 open Random_tree
 
-let event state grid event_list counter plot env =
+let event state (*grid*) event_list counter plot env =
 	(*1. Time advance*)
 	let dt = 
 		let rd = Random.float 1.0 
@@ -70,7 +70,7 @@ let event state grid event_list counter plot env =
 	
 	(*4. Positive update*)
 	
-	let env,state,pert_ids,grid,event_list = 
+	let env,state,pert_ids,(*grid,*)event_list = 
 		match opt_new_state with
 			| Some ((env,state,side_effect,embedding_t,psi,pert_ids_rule),r) ->
 
@@ -94,35 +94,30 @@ let event state grid event_list counter plot env =
 				
 				(*let event_to_record = (r,side_effect,phi,psi,Counter.event counter) in*)
 				 
-				let grid,event_list = 
-					if !Parameter.causalModeOn then
+				let (*grid,*)event_list = 
+					if !Parameter.causalModeOn or !Parameter.weakcompressionModeOn 
+                                        then
 					  begin
-            let event_list = 
-              if !Parameter.weakcompressionModeOn
-              then 
-                let event_list = Kappa_instantiation.Cflow_linker.store_event (Kappa_instantiation.Cflow_linker.import_event ((r,phi,psi),(obs_from_rule_app,r,Counter.event counter,side_effect))) event_list in 
-                let event_list = 
-                  List.fold_left 
-                    (fun event_list (obs,phi) -> 
-                      let lhs = State.kappa_of_id obs state in 
-                      Kappa_instantiation.Cflow_linker.store_obs (obs,lhs,phi) event_list)
-                    event_list obs_from_rule_app
-                in event_list
-              else 
-                event_list
-            in 
-					    (Causal.record ~decorate_with:obs_from_rule_app r side_effect (phi,psi) (Counter.event counter) grid env, (*to be removed*)
-					     event_list)
+                                            let event_list = Kappa_instantiation.Cflow_linker.store_event (Kappa_instantiation.Cflow_linker.import_event ((r,phi,psi),(obs_from_rule_app,r,Counter.event counter,side_effect))) event_list in 
+                                            let event_list = 
+                                              List.fold_left 
+                                                (fun event_list (obs,phi) -> 
+                                                  let lhs = State.kappa_of_id obs state in 
+                                                  Kappa_instantiation.Cflow_linker.store_obs (obs,lhs,phi) event_list)
+                                                event_list obs_from_rule_app
+                                            in 
+					 (*   (Causal.record ~decorate_with:obs_from_rule_app r side_effect (phi,psi) (Counter.event counter) grid env, (*to be removed*)*)
+					     event_list
 					  end
-					else (grid,event_list) 
+					else event_list
 				in
-				(env,state,IntSet.union pert_ids pert_ids',grid,event_list)
+				(env,state,IntSet.union pert_ids pert_ids',(*grid,*)event_list)
 			| None ->
 				begin
 					if !Parameter.debugModeOn then Debug.tag "Null (clash or doesn't satisfy constraints)"; 
 					Counter.inc_null_events counter ; 
 					Counter.inc_consecutive_null_events counter ;
-					(env,state,IntSet.empty,grid,event_list)
+					(env,state,IntSet.empty,(*grid,*)event_list)
 				end
 	in
 	
@@ -130,7 +125,7 @@ let event state grid event_list counter plot env =
 	(*Printf.printf "Applying %s perturbations \n" (Tools.string_of_set string_of_int IntSet.fold pert_ids) ;*)
 	let state,env,obs_from_perturbation = External.try_perturbate state pert_ids counter env (*shoudl add obs_from_pert in the causal flow at some point...*)
 	in
-	(state,grid,event_list,env)
+	(state(*,grid*),event_list,env)
 					
 let loop state grid event_list counter plot env =
 	(*Before entering the loop*)
@@ -144,13 +139,13 @@ let loop state grid event_list counter plot env =
 	let state,env,_ = External.try_perturbate state pert_ids counter env 
 	in
 	
-	let rec iter state grid event_list counter plot env =
+	let rec iter state (*grid*) event_list counter plot env =
 		if !Parameter.debugModeOn then 
 			Debug.tag (Printf.sprintf "[**Event %d (Activity %f)**]" counter.Counter.events (Random_tree.total state.State.activity_tree));
 		if (Counter.check_time counter) && (Counter.check_events counter) then
-			let state,grid,event_list,env = event state grid event_list counter plot env 
+			let state(*,grid*),event_list,env = event state (*grid*) event_list counter plot env 
 			in
-			iter state grid event_list counter plot env
+			iter state (*grid*) event_list counter plot env
 		else (*exiting the loop*)
 		  begin
       	let _ = 
@@ -162,10 +157,11 @@ let loop state grid event_list counter plot env =
 					begin
 				    (*Causal.dot_of_grid !Parameter.cflowFileName grid state env ;*)
 				    let _ = 
-            	if !Parameter.weakcompressionModeOn then Compression_main.weak_compression env state event_list 
-	          in
-            ()
-				  end
-			end
+            	if !Parameter.weakcompressionModeOn or !Parameter.causalModeOn 
+                then Compression_main.weak_compression env state event_list 
+	                            in
+                                    ()
+				        end
+		  end
 	in
-	iter state grid event_list counter plot env
+	iter state (*grid*) event_list counter plot env

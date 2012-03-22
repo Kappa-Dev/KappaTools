@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 19/03/2012
+  * Last modification: 21/03/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -53,8 +53,8 @@ sig
   val finalize: (pre_blackboard -> H.error_channel * pre_blackboard) H.with_handler 
 
   (**pretty printing*)
-  val print_predicate_value: out_channel -> predicate_value -> unit 
-  val print_preblackboard: (out_channel -> pre_blackboard -> H.error_channel) H.with_handler  
+  val print_predicate_value: out_channel ->  predicate_value -> unit 
+  val print_preblackboard: (pre_blackboard -> H.error_channel) H.with_handler  
 
   (**interface*)
   val n_events: (pre_blackboard -> H.error_channel * int) H.with_handler 
@@ -192,7 +192,8 @@ es all the side-effect mutex *)
          let _ = print_predicate_info log predicate_info in 
          ()
   
-     let print_preblackboard parameter handler error log blackboard = 
+     let print_preblackboard parameter handler error blackboard = 
+       let log = parameter.H.out_channel in 
        let _ = Printf.fprintf log "**\nPREBLACKBOARD\n**\n" in 
        let _ = Printf.fprintf log "*\n steps by column\n*\n" in 
        let _ = 
@@ -319,8 +320,8 @@ es all the side-effect mutex *)
        else 
          if strictly_more_refined y x then error,y 
          else 
-           let error_list,error = H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "conj") (Some "287") (Some "Arguments have no greatest lower bound") (failwith "Arguments have no greatest lower bound")  in 
-           H.raise_error parameter handler error_list stderr error Undefined  
+           let error_list,error = H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "conj") (Some "323") (Some "Arguments have no greatest lower bound") (failwith "Arguments have no greatest lower bound")  in 
+           H.raise_error parameter handler error_list error Undefined  
 
      let compatible x y = 
        x=y or more_refined x y or more_refined y x
@@ -371,8 +372,8 @@ es all the side-effect mutex *)
        with 
            Not_found ->
              let error_list,error = 
-               H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "bind") (Some "297") (Some "Out of bound access") (failwith "bind") in 
-         H.raise_error parameter handler error_list stderr error blackboard 
+               H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "bind") (Some "375") (Some "Out of bound access") (failwith "bind") in 
+         H.raise_error parameter handler error_list error blackboard 
      and 
          allocate parameter handler error blackboard predicate  = 
        let ag_id = agent_id_of_predicate predicate in 
@@ -414,8 +415,8 @@ es all the side-effect mutex *)
          with 
            | _ -> 
                let error_list,error = 
-               H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "free_agent") (Some "240") (Some "Try to free an unexisting agent") (failwith "free_agent") in 
-               H.raise_error parameter handler error_list stderr error PredicateidSet.empty 
+               H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "free_agent") (Some "418") (Some "Try to free an unexisting agent") (failwith "free_agent") in 
+               H.raise_error parameter handler error_list error PredicateidSet.empty 
        in 
        let map = 
          PredicateidSet.fold 
@@ -598,8 +599,8 @@ es all the side-effect mutex *)
       | Defined | Counter _ | Internal_state_is _ | Undefined 
       | Present | Bound | Bound_to_type _ | Unknown -> 
         let error,error_list = 
-            H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "side_effects") (Some "517") (Some "Illegal state for a side-effects") (failwith "Blackboard_generation.side_effect") in 
-        H.raise_error parameter handler error stderr error_list []
+            H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "side_effects") (Some "602") (Some "Illegal state for a side-effects") (failwith "Blackboard_generation.side_effect") in 
+        H.raise_error parameter handler error error_list []
        | Free -> 
          error,[predicate_target_id,None,(Free,Unknown)]
       | Bound_to (pid,ag,_,sname) -> 
@@ -616,8 +617,8 @@ es all the side-effect mutex *)
          | K.BOUND_TYPE bt -> error,Bound_to_type (K.agent_name_of_binding_type bt,K.site_name_of_binding_type bt)
          | K.BOUND_to s -> 
             let error_list,error = 
-               H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "predicate_value_of_binding_state") (Some "535") (Some "Illegal binding state in predicate_value_of_binding_state") (failwith "predicate_value_of_binding_state") in 
-            H.raise_error parameter handler error_list stderr error Unknown 
+               H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "predicate_value_of_binding_state") (Some "620") (Some "Illegal binding state in predicate_value_of_binding_state") (failwith "predicate_value_of_binding_state") in 
+            H.raise_error parameter handler error_list error Unknown 
     
   let potential_target error parameter handler blackboard site binding_state =
     let agent_id = K.agent_id_of_site site in 
@@ -877,16 +878,16 @@ es all the side-effect mutex *)
         error,snd (A.get blackboard.pre_steps_by_column predicate_id) 
       with 
         | _ -> 
-          let error_list,error = H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "event_list_of_predicate") (Some "739") (Some "Unknown predicate id") (failwith "event_list_of_predicate") in 
-          H.raise_error parameter handler error_list stderr error []
+          let error_list,error = H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "event_list_of_predicate") (Some "881") (Some "Unknown predicate id") (failwith "event_list_of_predicate") in 
+          H.raise_error parameter handler error_list error []
             
   let n_events_per_predicate parameter handler error blackboard predicate_id = 
     try 
       error,fst (A.get blackboard.pre_steps_by_column predicate_id) 
     with 
       | _ -> 
-        let error_list,error = H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "n_events_per_predicate") (Some "747") (Some "Unknown predicate id") (failwith "n_events_per_predicate") in 
-            H.raise_error parameter handler error_list stderr error 0
+        let error_list,error = H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "n_events_per_predicate") (Some "889") (Some "Unknown predicate id") (failwith "n_events_per_predicate") in 
+            H.raise_error parameter handler error_list error 0
 
   let n_events parameter handler error blackboard = 
     error,blackboard.pre_nsteps+1 

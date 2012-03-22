@@ -90,3 +90,20 @@ let add_in_desc d = openInDescriptors := d::!openInDescriptors
 
 (*Profiling*)
 (*let profiling:Profiling.t = Profiling.create 10*) 
+type compression_mode = 
+    { 
+      causal_trace:bool;
+      weak_compression:bool;
+      strong_compression:bool
+    }
+      
+let get_compression_mode () = 
+  {
+    causal_trace=(!causalModeOn);
+    weak_compression=(!weakcompressionModeOn);
+    strong_compression=false;
+  }
+
+let get_causal_trace x = x.causal_trace
+let get_weak_compression x = x.weak_compression
+let get_strong_compression x = x.strong_compression

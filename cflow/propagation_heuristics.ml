@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 05/09/2011
-  * Last modification: 17/03/2012
+  * Last modification: 21/03/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -150,8 +150,8 @@ module Propagation_heuristic =
                       (* The blackboard is inconsistent: *)
                       (* Pointers should not point to removed events.*)
                     let error,unit = 
-                      let error_list,error = B.PB.H.create_error parameter handler error (Some "propagation_heuristic.ml") None (Some "propagate_down") (Some "123") (Some "inconsistent pointers in blackboard") (failwith "inconsistent pointers in blackboard") in 
-                      B.PB.H.raise_error parameter handler error_list stderr error () 
+                      let error_list,error = B.PB.H.create_error parameter handler error (Some "propagation_heuristic.ml") None (Some "propagate_down") (Some "154") (Some "inconsistent pointers in blackboard") (failwith "inconsistent pointers in blackboard") in 
+                      B.PB.H.raise_error parameter handler error_list error () 
                     in 
                     error,
                     blackboard,
