@@ -93,7 +93,7 @@ instruction:
 	{Ast.PERT ($2,$4,$1,None)}
 | PERT bool_expr DO modif_expr UNTIL bool_expr
 	{Ast.PERT ($2,$4,$1,Some $6)}
-| CONFIG FILENAME SET FILENAME {let param_name,pos_p = $2 and value,pos_v = $4 in Ast.CONFIG (param_name,pos_p,value,pos_v)} 
+| CONFIG FILENAME FILENAME {let param_name,pos_p = $2 and value,pos_v = $3 in Ast.CONFIG (param_name,pos_p,value,pos_v)} 
 ;
 
 variable_declaration:

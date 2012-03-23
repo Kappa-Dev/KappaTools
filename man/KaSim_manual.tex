@@ -427,9 +427,7 @@ Notice at lines 10-12 the use of binary/unary notation for rules. As a result bi
 
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=6cm]{img/mono.pdf}
-\includegraphics[width=6cm]{img/dimers.pdf}\\
-\includegraphics[width=7cm]{img/poly.pdf}
+\includegraphics[width=10cm]{img/poly.pdf}
 \caption{Final mixture obtained after 10,000 events of simulation of the \ttt{poly.ka} model. The infinite rate for cycle closure allows one to obtain a large number of triangles.}
 \label{fig:species}
 \end{center}
@@ -767,7 +765,7 @@ Note that this simulation is now run for $k$ time units instead of $n$. Importan
 \section{Simulation parameters configuration}\label{sec:param}
 In the KF (usually in a dedicated file) one may use expressions of the form:
 \[
-\hbox{\ttt{\%set: "}\textit{parameter\_name}\ttt{" := "}\textit{parameter\_value}\ttt{"}}
+\hbox{\ttt{\%set: "}\textit{parameter\_name}\ttt{" "}\textit{parameter\_value}\ttt{"}}
 \]
 where tunable parameters are described table~\ref{tab:parameters}.
 %%

@@ -1361,36 +1361,18 @@ let dump state counter env =
 let dot_of_flux desc state  env =
 	
 	let print_flux flux pos =
-		let m_pos,m_neg = 
-			Hashtbl.fold
-			(fun _ pos_map (m_pos,m_neg) ->
-				IntMap.fold (fun _ n (m_p,m_n) -> if n<0. then (m_p,max (-1. *. n) m_n) else (max n m_p,m_n)) pos_map (m_pos,m_neg)
-			) flux (0.,0.)
-		in
-		let mult_p = 10. /. m_pos
-		and mult_n = 10. /. m_neg
-		in
 		Hashtbl.iter
 		(fun r_id map ->
 			let str1 = try Environment.rule_of_num r_id env with Not_found -> Dynamics.to_kappa (rule_of_id r_id state) env
 			in
 			IntMap.iter
 			(fun r_id' n ->
-				let color,arrowhead,d,edge = 
-					if n<0. then 
-						let v = (-1.*.n)*. mult_n in 
-						if v >= 0.1 then ("red3","tee",v,"filled") 
-						else ("red3","tee",0.1,"dotted")
-					else 
-						if n>0. then
-							let v = n*.mult_p in
-							if v >= 0.1 then ("green3","normal",v,"filled") 
-							else ("green3","normal",0.1,"dotted")
-						else
-							("white","normal",0.,"dotted")
+				let color,arrowhead,edge = 
+					if n<0. then ("red3","tee","filled") 
+					else ("green3","normal","filled") 
 				in 
 				let str2 = try Environment.rule_of_num r_id' env with Not_found -> Dynamics.to_kappa (rule_of_id r_id' state) env in
-				Printf.fprintf desc "\"%s\" -> \"%s\" [penwidth=%f,weight=%d,tooltip=\"%.3f\",color=%s,arrowhead=%s];\n" str1 str2 d (int_of_float d) n color arrowhead
+				Printf.fprintf desc "\"%s\" -> \"%s\" [weight=%d,label=\"%.3f\",color=%s,arrowhead=%s];\n" str1 str2 (int_of_float (n *. n)) n color arrowhead
 			) map 
 		) flux 
 	in
