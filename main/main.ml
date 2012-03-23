@@ -127,7 +127,7 @@ let main =
                                 let event_list = [] in 
                                 (
                                 grid,
-                                Kappa_instantiation.Cflow_linker.store_init state event_list
+                                Compression_main.S.PH.B.PB.K.store_init state event_list
                                 )
 			else (Causal.empty_grid(),[])
 		in

@@ -23,6 +23,8 @@ let compose f g = (fun x -> f (g x))
 
 module type Cflow_signature =
 sig
+  module H:Cflow_handler.Cflow_handler 
+
   type agent_name = int
   type site_name = int 
   type agent_id = int 
@@ -37,8 +39,6 @@ sig
     | BOUND_TYPE of binding_type 
     | BOUND_to of site 
 
-  type kappa_sig 
-  
   type ('a,'b,'c) choice = 
     | Event of 'a 
     | Init of 'b
@@ -93,26 +93,25 @@ sig
   val site_name_of_binding_type: binding_type -> site_name 
   val build_agent: agent_id -> agent_name -> agent 
   val build_site: agent -> site_name -> site 
-  val get_binding_sites: kappa_sig -> agent_name -> site_name list 
-  val get_default_state: kappa_sig -> agent_name -> (site_name*internal_state option) list 
+  val get_binding_sites: H.handler -> agent_name -> site_name list 
+  val get_default_state: H.handler -> agent_name -> (site_name*internal_state option) list 
   val rule_of_event: event -> kappa_rule 
   val embedding_of_event: event -> embedding
   val fresh_map_of_event: event -> fresh_map
-  val refine_step: kappa_sig -> step -> refined_step
+  val refine_step: H.handler -> step -> refined_step
   val step_of_refined_step: refined_step -> step
   val rule_of_refined_event: refined_event -> kappa_rule
   val tests_of_refined_step: refined_step -> test list 
   val actions_of_refined_step: refined_step -> action list * (site*binding_state) list 
   val is_obs_of_refined_step: refined_step -> bool 
 
-  val print_refined_step: out_channel -> kappa_sig -> refined_step -> unit 
+  val print_refined_step: H.parameter -> H.handler -> refined_step -> unit 
 
   val import_event:  (Dynamics.rule * int Mods.IntMap.t * int Mods.IntMap.t) * rule_info -> event 
-  val import_env: Environment.t -> kappa_sig 
   val store_event: event -> step list -> step list 
   val store_init : State.implicit_state -> step list -> step list 
   val store_obs :  int * Mixture.t * int Mods.IntMap.t -> step list -> step list 
-  val build_grid: (refined_step*side_effect) list -> bool ->  Environment.t -> Causal.grid 
+  val build_grid: (refined_step*side_effect) list -> bool -> H.handler -> Causal.grid 
   val print_side_effect: out_channel -> side_effect -> unit
   val side_effect_of_list: (int*int) list -> side_effect 
 end 
@@ -121,6 +120,7 @@ end
 
 module Cflow_linker = 
 (struct 
+  module H = Cflow_handler.Cflow_handler 
 
   type agent_name = int
 
@@ -148,8 +148,6 @@ module Cflow_linker =
       
   let get_causal (_,d) = d 
 
-
-  type kappa_sig = Environment.t 
 
   type internal_state  = int 
 
@@ -219,14 +217,15 @@ module Cflow_linker =
        else aux (k-1) ((f k sign)::list)
      in aux (Signature.arity sign -1) []
 
-  let get_binding_sites = 
+  let get_binding_sites handler = 
     map_sites 
       (fun k _ -> k)
+      handler.H.env
 
-  let get_default_state = 
+  let get_default_state handler = 
     map_sites 
       (fun k sign -> (k,Signature.default_num_value k sign))
-
+      handler.H.env
   
   let fresh_map_of_event ((_,_,x),_) = x 
   
@@ -495,7 +494,7 @@ module Cflow_linker =
           state.State.graph 
           event_list 
 
-  let actions_of_init (init:init) kappa_sig  = 
+  let actions_of_init (init:init) handler  = 
     let agent,list_sites = init in 
     let list = [Create(agent,List.map (fun (x,(y,z)) -> (x,y)) list_sites)] in 
     let list = 
@@ -516,7 +515,7 @@ module Cflow_linker =
     in 
     list 
 
-  let actions_of_event event kappa_sig = 
+  let actions_of_event event handler = 
     let rule = rule_of_event event in 
     let lhs = rule.Dynamics.lhs in
     let embedding = embedding_of_event event in 
@@ -576,7 +575,7 @@ module Cflow_linker =
 		 let agent_id = apply_embedding event lhs_id in 
 		 let agent_name = name_of_agent fake_id lhs fresh in 
 		 let agent = build_agent agent_id agent_name in 
-		 let interface = get_binding_sites kappa_sig agent_name in 
+		 let interface = get_binding_sites handler agent_name in 
 		   Remove(agent)::list_actions,
 		   List.fold_left 
 		     (fun list site -> 
@@ -592,7 +591,7 @@ module Cflow_linker =
 		
 	     | Dynamics.ADD(rhs_id,agent_name) -> 
 		 let agent_id = apply_embedding_on_action event (Dynamics.FRESH rhs_id) in 
-		 let interface = get_default_state kappa_sig agent_name in 
+		 let interface = get_default_state handler agent_name in 
 		 let agent = build_agent agent_id agent_name in 
 		 let kappa_agent = build_kappa_agent agent_name interface in 
 		 let list_actions' = Create(agent,interface)::list_actions in 
@@ -670,7 +669,9 @@ module Cflow_linker =
   let genbis f1 f2 f3  = 
     gen (fun a -> Event (f1 a)) (fun a -> Init (f2 a)) (fun a -> Obs (f3 a))     (fun a -> Dummy)
   
-  let print_refined_step log env = 
+  let print_refined_step parameter handler = 
+    let log = parameter.H.out_channel in 
+    let env = handler.H.env in 
     gen (print_refined_event log env) (print_refined_init log env) (print_refined_obs log env) (fun _  -> ())
 
   let tests_of_refined_step =
@@ -699,7 +700,8 @@ module Cflow_linker =
   let store_init init step_list = create_init init step_list  
   let store_obs (i,a,x) step_list = Obs(i,a,x)::step_list 
 
-  let build_grid list bool env  = 
+  let build_grid list bool handler = 
+    let env = handler.H.env in 
     let empty_set = Mods.Int2Set.empty in 
     let grid = Causal.empty_grid () in 
     let grid,_ = 

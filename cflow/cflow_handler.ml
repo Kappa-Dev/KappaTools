@@ -29,8 +29,12 @@ module type Cflow_handler =
           } (*a struct which contains parameterizable options*)  
     type error 
     type error_channel = error list    (*a list which contains the errors so far*)
-    type handler = unit    (*handler to interpret abstract values*)
-    type 'a with_handler = parameter -> handler -> error_channel -> 'a
+    type handler =   (*handler to interpret abstract values*)
+          {
+            state: State.implicit_state ;
+            env: Environment.t ;
+          }
+     type 'a with_handler = parameter -> handler -> error_channel -> 'a
 
     val build_parameter: unit -> parameter 
     val string_of_exn: exn -> string option  
@@ -69,7 +73,12 @@ module Cflow_handler =
           }
 
       type error_channel = error list
-      type handler = unit 
+      type handler = 
+          {
+            state: State.implicit_state ;
+            env: Environment.t ;
+          }
+
       type 'a with_handler = parameter -> handler -> error_channel -> 'a 
 	  
       let create_error parameter handler error file modu fun_name line message exn =

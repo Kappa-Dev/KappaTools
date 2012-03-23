@@ -29,12 +29,12 @@ module type Blackboard_with_heuristic =
     
   
      (** heuristics *)
-    val forced_events: (B.blackboard -> B.PB.H.error_channel * (update_order list * B.PB.step_id list) list) B.PB.H.with_handler 
-    val next_choice: (B.blackboard -> B.PB.H.error_channel * update_order list) B.PB.H.with_handler 
-    val apply_instruction: (B.blackboard -> update_order -> update_order list -> propagation_check list -> B.PB.H.error_channel * B.blackboard * update_order list * propagation_check list * B.assign_result) B.PB.H.with_handler 
+    val forced_events: (B.blackboard -> B.PB.K.H.error_channel * (update_order list * B.PB.step_id list) list) B.PB.K.H.with_handler 
+    val next_choice: (B.blackboard -> B.PB.K.H.error_channel * update_order list) B.PB.K.H.with_handler 
+    val apply_instruction: (B.blackboard -> update_order -> update_order list -> propagation_check list -> B.PB.K.H.error_channel * B.blackboard * update_order list * propagation_check list * B.assign_result) B.PB.K.H.with_handler 
 
     val propagate: (B.blackboard -> propagation_check -> update_order list -> propagation_check list 
-                    -> B.PB.H.error_channel * B.blackboard * update_order list * propagation_check list * B.assign_result) B.PB.H.with_handler
+                    -> B.PB.K.H.error_channel * B.blackboard * update_order list * propagation_check list * B.assign_result) B.PB.K.H.with_handler
    
   end 
 
@@ -150,8 +150,8 @@ module Propagation_heuristic =
                       (* The blackboard is inconsistent: *)
                       (* Pointers should not point to removed events.*)
                     let error,unit = 
-                      let error_list,error = B.PB.H.create_error parameter handler error (Some "propagation_heuristic.ml") None (Some "propagate_down") (Some "154") (Some "inconsistent pointers in blackboard") (failwith "inconsistent pointers in blackboard") in 
-                      B.PB.H.raise_error parameter handler error_list error () 
+                      let error_list,error = B.PB.K.H.create_error parameter handler error (Some "propagation_heuristic.ml") None (Some "propagate_down") (Some "154") (Some "inconsistent pointers in blackboard") (failwith "inconsistent pointers in blackboard") in 
+                      B.PB.K.H.raise_error parameter handler error_list error () 
                     in 
                     error,
                     blackboard,
