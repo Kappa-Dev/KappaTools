@@ -61,7 +61,7 @@ let weak_compression env state step_list =
           Printf.fprintf parameter.S.PH.B.PB.K.H.out_channel  "\nRefining event\n" 
       in 
       let refined_event_list = 
-        List.map (S.PH.B.PB.K.refine_step handler) (List.rev step_list) in       
+        List.rev_map (S.PH.B.PB.K.refine_step handler) step_list in       
       let _ = 
         if debug_mode
         then 

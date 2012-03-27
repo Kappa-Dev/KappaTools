@@ -496,7 +496,7 @@ module Cflow_linker =
 
   let actions_of_init (init:init) handler  = 
     let agent,list_sites = init in 
-    let list = [Create(agent,List.map (fun (x,(y,z)) -> (x,y)) list_sites)] in 
+    let list = [Create(agent,List.rev_map (fun (x,(y,z)) -> (x,y)) (List.rev list_sites))] in 
     let list = 
       List.fold_left 
         (fun list (x,(y,z)) -> 
