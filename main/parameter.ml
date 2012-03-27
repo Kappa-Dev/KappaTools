@@ -15,6 +15,7 @@ let backtrace = ref false
 let (rescale:int option ref) = ref None
 let eclipseMode = ref false
 let useColor = ref true
+let cache_size = ref (None:int option) 
 
 (*User definable values*)
 let (maxEventValue:int option ref) = ref None
@@ -105,5 +106,7 @@ let get_compression_mode () =
   }
 
 let get_causal_trace x = x.causal_trace
+let get_causal_trace_only x = not (x.weak_compression or x.strong_compression)
 let get_weak_compression x = x.weak_compression
 let get_strong_compression x = x.strong_compression
+let get_cache_size x = !cache_size 

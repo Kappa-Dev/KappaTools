@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 21/03/2012
+  * Last modification: 27/03/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -23,6 +23,7 @@ module type Cflow_handler =
   sig
     type parameter  = 
           { 
+            cache_size : int option ;
             compression_mode : Parameter.compression_mode ;
             out_channel_err : out_channel ;
             out_channel : out_channel 
@@ -50,6 +51,7 @@ module Cflow_handler =
     struct 
       type parameter = 
           { 
+            cache_size : int option ;
             compression_mode : Parameter.compression_mode ;
             out_channel_err : out_channel ;
             out_channel : out_channel 
@@ -59,7 +61,8 @@ module Cflow_handler =
         {
           out_channel = stderr ; 
           out_channel_err = stderr ; 
-          compression_mode = Parameter.get_compression_mode () 
+          compression_mode = Parameter.get_compression_mode () ; 
+          cache_size = Parameter.get_cache_size () ;
         }
 
       type error = 
