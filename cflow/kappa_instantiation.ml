@@ -705,14 +705,14 @@ module Cflow_linker =
     let env = handler.H.env in 
     let empty_set = Mods.Int2Set.empty in 
     let grid = Causal.empty_grid () in 
-    let grid,_ = 
+    let grid,_,_ = 
       List.fold_left 
-        (fun (grid,side_effect) (k,(side:side_effect)) ->
+        (fun (grid,side_effect,counter) (k,(side:side_effect)) ->
           match (k:refined_step) 
           with 
             | Event (a,_,_) -> 
               begin 
-                let obs_from_rule_app,r,counter,kappa_side = get_causal a in 
+                let obs_from_rule_app,r,_,kappa_side = get_causal a in 
                 let side_effect =
                   if bool 
                   then 
@@ -726,23 +726,24 @@ module Cflow_linker =
                let phi = embedding_of_event a in 
                let psi = fresh_map_of_event a in 
                Causal.record ~decorate_with:obs_from_rule_app r side_effect (phi,psi) counter grid env,
-               Mods.Int2Set.empty 
+               Mods.Int2Set.empty,counter+1 
               end
             | Init b -> 
-                grid,side_effect
+                grid,side_effect,counter
             | Obs c  -> 
-                grid,side_effect
+                Causal.record_obs c counter grid env,side_effect,counter+1
             | Dummy -> 
               grid,
-              if bool 
+              (if bool 
               then 
                 empty_set 
               else 
-                List.fold_left 
+                (List.fold_left 
                   (fun side_effect x -> Mods.Int2Set.add x side_effect)
-                  side_effect side
+                  side_effect side)),
+              counter 
         ) 
-        (grid,Mods.Int2Set.empty) list 
+        (grid,Mods.Int2Set.empty,1) list 
     in grid 
 
   let print_side_effect log l = 

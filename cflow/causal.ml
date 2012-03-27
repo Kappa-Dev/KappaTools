@@ -12,7 +12,7 @@ type atom =
 	causal_impact : int ; (*(1) tested (2) modified, (3) tested + modified*) 
 	eid:int ; (*event identifier*)
 	kind:event_kind ;
-	observation: string list
+(*	observation: string list*)
 	}
 
 type attribute = atom list (*vertical sequence of atoms*)
@@ -64,7 +64,7 @@ let add (node_id,site_id) c grid event_number kind obs =
 	let grid = 
 		if (is _LINK_TESTED c) || (is _LINK_MODIF c) then
 			let att = try grid_find (node_id,site_id,1) grid with Not_found -> [] in
-			let att = push {causal_impact = impact 1 c ; eid = event_number ; kind = kind ; observation = obs} att
+			let att = push {causal_impact = impact 1 c ; eid = event_number ; kind = kind (*; observation = obs*)} att
 			in
 			grid_add (node_id,site_id,1) att grid
 		else
@@ -73,7 +73,7 @@ let add (node_id,site_id) c grid event_number kind obs =
 	if (is _INTERNAL_TESTED c) || (is _INTERNAL_MODIF c) then
 		(*adding an internal state modification*)
 		let att = try grid_find (node_id,site_id,0) grid with Not_found -> [] in
-		let att = push {causal_impact = impact 0 c ; eid = event_number ; kind = kind ; observation = obs} att
+		let att = push {causal_impact = impact 0 c ; eid = event_number ; kind = kind (*; observation = obs*)} att
 		in
 		grid_add (node_id,site_id,0) att grid
 	else 
@@ -109,6 +109,23 @@ let record ?decorate_with rule side_effects (embedding,fresh_map) event_number g
 		side_effects grid
 	in
 	grid
+
+let record_obs ((r_id,state,embedding),test) event_number grid env = 
+  let im embedding id = IntMap.find id embedding in
+  
+    (*adding tests*)
+  let grid = 
+    Mods.IntMap.fold 
+      (fun  id agent grid ->
+	let node_id = im embedding id in
+ 	let agent_name = Mixture.name agent in 
+	Mixture.fold_interface 
+	  (fun site_id c  grid  -> 
+	    add (node_id,site_id) 8 (* HACK, TO DO CLEANER *) grid event_number (OBS r_id) [])
+          agent grid)
+      (Mixture.agents state) grid
+  in
+  grid
 
 let add_pred eid atom config = 
 	let events = IntMap.add atom.eid atom config.events
@@ -241,8 +258,11 @@ let dot_of_grid fic grid state env =
 		(fun eid ->
 			let atom = IntMap.find eid config.events in
 			if eid = 0 then () else
-			fprintf desc "node_%d [label=\"%s\", shape=invhouse, style=filled, fillcolor = lightblue] ;\n" eid (label atom.kind) ; 
-			List.iter (fun obs -> fprintf desc "obs_%d [label =\"%s\", style=filled, fillcolor=red] ;\n node_%d -> obs_%d [arrowhead=vee];\n" eid obs eid eid) atom.observation ; 
+			match atom.kind 
+                        with 
+                          | RULE _  -> fprintf desc "node_%d [label=\"%s\", shape=invhouse, style=filled, fillcolor = lightblue] ;\n" eid (label atom.kind) 
+                          | OBS _  ->  fprintf desc "node_%d [label =\"%s\", style=filled, fillcolor=red] ;\n" eid (label atom.kind) 
+	(*		List.iter (fun obs -> fprintf desc "obs_%d [label =\"%s\", style=filled, fillcolor=red] ;\n node_%d -> obs_%d [arrowhead=vee];\n" eid obs eid eid) atom.observation ;*) 
 		) eids_at_d ;
 		fprintf desc "}\n" ;
 	) sorted_events ;
