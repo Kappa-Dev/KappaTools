@@ -85,7 +85,7 @@ let record ?decorate_with rule side_effects (embedding,fresh_map) event_number g
 	
 	let pre_causal = rule.Dynamics.pre_causal
 	and r_id = rule.Dynamics.r_id
-	and obs = match decorate_with with None -> [] | Some l -> (List.map (fun (id,_) -> Environment.kappa_of_num id env) l)
+	and obs = match decorate_with with None -> [] | Some l -> (List.rev_map (fun (id,_) -> Environment.kappa_of_num id env) (List.rev l))
 	in
 	
 	let im embedding fresh_map id =
@@ -283,9 +283,9 @@ let dump grid state env =
 	(fun (n_id,s_id,q) att _ ->
 		let q_name = "#"^(string_of_int n_id)^"."^(string_of_int s_id)^(if q=0 then "~" else "!") in
 		let att_ls =
-			List.fold_right
-			(fun atom ls -> LongString.concat (string_of_atom atom) ls) 
-			att LongString.empty
+			List.fold_left
+			(fun ls atom -> LongString.concat (string_of_atom atom) ls) 
+			LongString.empty (List.rev att)
 		in
 		Printf.fprintf d "%s:" q_name ; 
 		LongString.printf d att_ls ;

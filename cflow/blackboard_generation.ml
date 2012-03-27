@@ -871,7 +871,7 @@ es all the side-effect mutex *)
         | _ -> 
           let nsid = blackboard.pre_nsteps + 1 in 
           let observable_list = 
-            List.map (fun x -> nsid::x) blackboard.pre_observable_list 
+            List.rev_map (fun x -> nsid::x) (List.rev blackboard.pre_observable_list) 
           in 
           let blackboard = 
             {
