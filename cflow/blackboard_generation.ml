@@ -391,7 +391,7 @@ es all the side-effect mutex *)
              let map' = PredicateMap.add predicate sid' map in 
              let _  = A.set map_inv sid' predicate in 
              let map_inv' = map_inv in 
-             let _ = A.set  blackboard. history_of_predicate_values_to_predicate_id sid' (C.create parameter.K.H.cache_size) in 
+             let _ = A.set blackboard.history_of_predicate_values_to_predicate_id sid' (C.create parameter.K.H.cache_size) in 
              let blackboard = 
                {blackboard 
                 with 
