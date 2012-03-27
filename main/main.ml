@@ -61,7 +61,7 @@ let main =
     
 		Parameter.setOutputName() ;
 		Parameter.checkFileExists() ;
-		(*Printexc.record_backtrace !Parameter.backtrace ; (*Possible backtrace*)*)
+		Printexc.record_backtrace !Parameter.backtrace ; (*Possible backtrace*)
 		
 		(*let _ = Printexc.record_backtrace !Parameter.debugModeOn in*) 
 		let result =
@@ -170,10 +170,6 @@ let main =
 					close_desc() (*closes all other opened descriptors*)
 				end
 			| ExceptionDefn.Deadlock ->
-				if !Parameter.dumpIfDeadlocked then	
-					let desc = if !Parameter.dotOutput then open_out "deadlock.dot" else open_out "deadlock.ka" in
-					State.snapshot state counter desc true env
-				else () ;
 				(Printf.printf "?\nA deadlock was reached after %d events and %fs (Activity = %f)\n"
 				(Counter.event counter)
 				(Counter.time counter) 
