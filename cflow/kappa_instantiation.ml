@@ -114,6 +114,7 @@ sig
   val build_grid: (refined_step*side_effect) list -> bool -> H.handler -> Causal.grid 
   val print_side_effect: out_channel -> side_effect -> unit
   val side_effect_of_list: (int*int) list -> side_effect 
+  val no_obs_found: step list -> bool 
 end 
 
 
@@ -747,5 +748,13 @@ module Cflow_linker =
   let print_side_effect log l = 
     List.iter (fun (a,b) -> Printf.fprintf log "(%i,%i)," a b) l 
   let side_effect_of_list l = l 
+
+  let rec no_obs_found l = 
+    match l 
+    with 
+      | Obs(_)::_ -> false
+      | _::q -> no_obs_found q
+      | [] -> true 
+
 end:Cflow_signature)
 
