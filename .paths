@@ -15,3 +15,4 @@ cflow
 Error
 /usr/lib/ocaml
 models/out
+models/dna

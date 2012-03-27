@@ -97,7 +97,9 @@ let of_node sg root visited env =
 		match todo with
 		| [] -> (spec, visited)
 		| id:: tl ->
-				let node = try SiteGraph.node_of_id sg id with Not_found -> invalid_arg "Species.of_node: Not found" in
+				let node = 
+					try SiteGraph.node_of_id sg id with 
+						| Not_found -> invalid_arg (Printf.sprintf "Species.of_node: Node %d is no longer in the graph" id) in
 				let todo', spec'=
 					Node.fold_status
 						(fun site_id (_, lnk_state) (todo, spec) ->

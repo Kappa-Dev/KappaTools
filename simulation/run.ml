@@ -28,8 +28,14 @@ let event state (*grid*) event_list counter plot env =
 				) depset infinity
 			else dt 
 	in 
-	if dt = infinity then raise Deadlock ; 
-	
+	if dt = infinity then 
+		begin
+			if !Parameter.dumpIfDeadlocked then	
+				let desc = if !Parameter.dotOutput then open_out "deadlock.dot" else open_out "deadlock.ka" in
+				State.snapshot state counter desc true env
+			else () ;
+			raise Deadlock
+		end ; 
 	Plot.fill state counter plot env dt ; 
 	Counter.inc_time counter dt ;
 	
