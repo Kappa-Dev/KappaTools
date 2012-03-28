@@ -107,7 +107,7 @@ Although this manual contains a self-contained description of Kappa, it is \emph
 \section{The \KaSim~engine}
 \KaSim~is an open source stochastic simulator of rule-based models~\cite{DanLan04,Dan_etal07a,Fae_etal05} written in the $\ka$-calculus. Basically \KaSim~takes one or several \hyperref[chap:kappa]{kappa files} as input and generates stochastic trajectories of various observables. \KaSim~implements Danos and Krivine's simulation algorithm~\cite{Dan_etal07b} which adapts Gillespie's algorithm~\cite{Gil76,Gil77} to rule-based models. 
 
-A \emph{simulation event}\index{event} corresponds to the application of a rewriting rule, contained in the kappa files, to the current graph\index{graph} (also called a \emph{mixture}\index{mixture}). The rule is selected according to its \emph{activity}\index{activity}, \ie the number of instances it has in the current mixture\index{mixture}, multiplied by its kinetic rate\index{kinetic rate}, and applied to one of its possible instances in the graph. It results in a new graph together with an updated activity\index{activity} for all rules (see Fig.~\ref{fig:event-loop}). Importantly, the cost of a simulation event is independent of the size of the graph it is applied to~\cite{Dan_etal07b}. 
+A \emph{simulation event}\index{event} corresponds to the application of a rewriting rule, contained in the kappa files, to the current graph\index{graph} (also called a \emph{mixture}\index{mixture}). The rule is selected according to its \emph{activity}\index{activity}, \ie the number of instances it has in the current mixture\index{mixture}, multiplied by its kinetic rate\index{kinetic rate}, and applied to one of its possible instances in the graph. It results in a new graph together with an updated activity\index{activity} for all rules (see Fig.~\ref{fig:event-loop}). Importantly, the cost of a simulation event is bounded by a constant that is independent of the size of the graph it is applied to~\cite{Dan_etal07b}. 
 
 \begin{figure}[htbp]
 \begin{center}
@@ -117,14 +117,14 @@ A \emph{simulation event}\index{event} corresponds to the application of a rewri
 \end{center}
 \end{figure}
 
-Note that \KaSim~is not equipped with a curve visualization tool. However, data outputs are given in a text format that is readily usable by any standard plotting software such as \href{http://www.gnuplot.info/}{gnuplot}.
+Note that \KaSim~is not equipped with a curve visualization tool. However, data outputs are given in a text format that can be displayed using any standard plotting software such as \href{http://www.gnuplot.info/}{gnuplot}.
 
 \section{Support}
 \ITE{
 \item[-] Kappa language tutorials and downloads: \url{http://kappalanguage.org}
 \item[-] Bug reports should be posted on github: \url{https://github.com/jkrivine/KaSim/issues}
 \item[-] Questions and answers on the kappa-user mailing list: \url{http://groups.google.com/group/kappa-users}
-\item[-] Want to contribute to the project? \ttt{jkrivine} at \ttt{pps} dot \ttt{jussieu} dot \ttt{fr}
+\item[-] Want to contribute to the project? \ttt{jean.krivine@pps.univ-paris-diderot.fr}
 }
 
 \chapter{Installation}\label{chap:install}
@@ -133,10 +133,10 @@ Note that \KaSim~is not equipped with a curve visualization tool. However, data 
 The easiest way to use \KaSim~is to use pre-compiled versions available at \url{https://github.com/jkrivine/KaSim/downloads}. Download the version that corresponds to your operating system (Windows, Linux or Mac OSX) and rename the downloaded file into \KaSim. Note that on Mac OSX or linux it might be necessary to give executable permissions to \KaSim. This can be done using the shell command:  
 \ttt{chmod u+x KaSim}. 
 
-To test whether your program does work, simply type \ttt{./KaSim \dd version} on a terminal, from the directory that contains the binaries. If the version is displayed it means that the binaries are indeed compatible with your OS. Otherwise, check that you gave the executable permissions to \KaSim~(see above). Otherwise you may need to compile \KaSim~from the sources (see next Section).
+To test whether your program does work, simply type \ttt{./KaSim \dd version} on a terminal, from the directory that contains the binaries. If the version is displayed it means that the binaries are indeed compatible with your OS. Otherwise you may need to compile \KaSim~from the sources (see next Section).
 
 \section{Obtaining the sources}
-To obtain \KaSim~you can either use pre-compiled binaries (see previous section) or compile the sources for your architecture. To do so, download the source code from \url{https://github.com/jkrivine/KaSim} and make sure you have a recent ocaml compiler installed. From a terminal window type \ttt{ocamlopt.opt -v}. If nothing appears then you need to install Ocaml Native compiler that can be downloaded from \url{http://caml.inria.fr/download.en.html}. 
+To obtain \KaSim~you can either use pre-compiled binaries (see previous section) or compile the sources for your architecture. To do so, download the source code from \url{https://github.com/jkrivine/KaSim} and make sure you have a recent ocaml compiler installed (\KaSim~requires Ocaml 3.12 to compile). From a terminal window type \ttt{ocamlopt.opt -v}. If nothing appears then you need to install Ocaml Native compiler that can be downloaded from \url{http://caml.inria.fr/download.en.html}. 
 
 \section{Compilation}
 Once Ocaml is safely installed, untar \KaSim~archive and compile following these few steps:
@@ -789,6 +789,31 @@ parameter & possible values & description \\
 \end{tabular}\caption{User defined parameters. Default values are given first in the possible values column.}\label{tab:parameters}
 \end{table}
 %%
+
+\chapter{Frequently asked questions}
+\section*{Simulation hangs after a while}
+If the progress bar seems stalled, it does not necessarily mean that the simulation is blocked. In particular when a simulation is triggered with a \emph{time} limit (\ttt{-t} option of the command line) it might only indicate that the bio clock is stalled while computation events still occur. Recall that the average (bio) time one has to wait in order to apply a rule is $1/A$ where $A$ is the sum of all the rule activities (which is equal to the number of instances that a rule has times its kinetic rate). Whenever the number of occurrences of a rule grows too fast (if new agents are created during the simulation for instance), or if the kinetic rate of a rule is defined by a function that grows rapidly,  the average time increment might tend to 0, and if it remains so for a while it will block the progress bar whose progress is proportional to the bio time advance. 
+
+In order to make sure that \KaSim~is not incorrectly blocked you may wish to plot the event clock against time clock using the observable \ttt{\%obs: 'events' [E]} or run the simulation using an event limit (\ttt{-e} option of the command line) instead of a time limit.
+
+\section*{Perturbation is never triggered or triggered too late}
+Make sure that perturbation's precondition can be satisfied by \KaSim. In particular use inequalities rather than equalities, especially when the precondition is depending on time. Also some perturbations require to be persistent to observe their effect. In this case make sure you used the \ttt{do ... until} construction.  
+
+\section*{What do null events mean, why do I have any?}
+
+Null events is a way for \KaSim~to compensate for some over approximation it is doing, in order deal with large simulations more efficiently. They do not impact significantly the performances of the simulator. The ratio $r$ of null event over productive ones (that you can track using the observable \ttt{\%obs: 'r'  [E-]/[E+]} should tend to 0 when models have a lot of agents.
+
+\section*{No data points are generated}
+Make sure you have \ttt{\%obs} or \ttt{\%plot} instructions in your KF. Also make sure to use the \ttt{-p} option in the command line to tell KaSim how many points you wish to have on your curves. 
+
+\section*{Too many instances of an observable}
+The value of a kappa expression $E$  is equal to the number of embeddings it has in the current mixture $M$. Embeddings are maps from agents in $E$  to agents in $M$. If $E$ has symmetries then every permutation of $E$ will be counted as a new embedding. For instance let $E=$\ttt{A(x!1),A(x!1)} and let $M=$\ttt{A(x!1,y\int p),A(x!1,y\int u)}. \KaSim~will count two instances of $E$ in $M$: the one mapping the first \ttt{A} of $E$ to the first \ttt{A} of $M$ and the one mapping the first \ttt{A} of $E$ to the second \ttt{A} of $M$.
+ 
+\section*{The computed influence map is incorrect, it misses some activation or has to much of them}
+
+
+
+\section*{Value \ttt{nan} in the data file at the end of the simulation}
 
 \bibliographystyle{plain}
 \bibliography{fmb} 
