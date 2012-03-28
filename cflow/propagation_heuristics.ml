@@ -62,7 +62,7 @@ module Propagation_heuristic =
 
     let forced_events parameter handler error blackboard = 
       let list = B.forced_events blackboard in 
-      error,List.map (fun l -> List.map (fun x -> Keep_event x) l,l) list 
+      error,List.rev_map (fun l -> List.rev_map (fun x -> Keep_event x) (List.rev l),l) (List.rev list) 
       
     let get_last_unresolved_event parameter handler error blackboard p_id = 
       let k = B.get_last_linked_event blackboard p_id in 

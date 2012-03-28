@@ -108,6 +108,7 @@ let event state (*grid*) event_list counter plot env =
                                             let event_list = 
                                               List.fold_left 
                                                 (fun event_list (obs,phi) -> 
+                                                  
                                                   let lhs = State.kappa_of_id obs state in 
                                                   Compression_main.S.PH.B.PB.K.store_obs (obs,lhs,phi) event_list)
                                                 event_list obs_from_rule_app

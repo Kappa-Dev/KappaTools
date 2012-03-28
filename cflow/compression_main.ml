@@ -21,7 +21,7 @@
 module S = Generic_branch_and_cut_solver.Solver 
 
 
-
+let log_step = false
 let debug_mode = false
 
 
@@ -47,121 +47,132 @@ let weak_compression env state step_list =
     begin 
       let _ = print_newline () in 
       let _ = print_newline () in 
-      let _ = 
-        if (weak_compression_on or strong_compression_on)
-        then 
-          let _ = Debug.tag "+ Story compression" in ()
-        else 
-          let _ = Debug.tag "+ Causal traces" in ()
-      in 
-      let _ = Debug.tag "\t - blackboard generation" in 
-      let _ = 
-        if debug_mode 
-        then 
-          Printf.fprintf parameter.S.PH.B.PB.K.H.out_channel  "\nRefining event\n" 
-      in 
-      let refined_event_list = 
-        List.rev_map (S.PH.B.PB.K.refine_step handler) step_list in       
-      let _ = 
-        if debug_mode
-        then 
-          List.iter 
-            (S.PH.B.PB.K.print_refined_step parameter handler) 
-            refined_event_list  
-      in 
-      let error = [] in 
-      let _ = 
-        if debug_mode 
-        then 
-          Printf.fprintf parameter.S.PH.B.PB.K.H.out_channel  "\nDealing with initial states\n" 
-      in 
-      let error,blackboard = S.PH.B.PB.init parameter handler error   in
-      let _ = 
-        if debug_mode 
-        then 
-          Printf.fprintf parameter.S.PH.B.PB.K.H.out_channel  "\nDealing with steps\n" 
-      in 
-      let error,blackboard = 
-        List.fold_left 
-          (fun (error,blackboard) refined_event  -> 
-            S.PH.B.PB.add_step parameter handler error refined_event blackboard)
-          (error,blackboard)
-          refined_event_list
-      in 
-      let error,preblackboard = 
-        S.PH.B.PB.finalize parameter handler error blackboard 
-      in 
-      let _ = 
-        if debug_mode 
-        then 
-          Printf.fprintf parameter.S.PH.B.PB.K.H.out_channel  "\nPretty printing the grid\n"
-      in 
-      let error = 
-        if debug_mode
-        then 
-          S.PH.B.PB.print_preblackboard parameter handler error preblackboard 
-        else 
+      if S.PH.B.PB.K.no_obs_found step_list 
+      then 
+        let _ = Debug.tag "+ No story found" in () 
+      else 
+        begin 
+          let _ = 
+            if (weak_compression_on or strong_compression_on)
+            then 
+              let _ = Debug.tag "+ Story compression" in ()
+            else 
+              let _ = Debug.tag "+ Causal traces" in ()
+          in 
+          let _ = Debug.tag "\t - blackboard generation" in 
+          let _ = 
+            if log_step
+            then 
+              Debug.tag "\t\t * refining events" 
+          in 
+          let refined_event_list = 
+            List.rev_map (S.PH.B.PB.K.refine_step handler) step_list in       
+          let _ = 
+            if debug_mode
+            then 
+              let _ = 
+                List.iter 
+                  (S.PH.B.PB.K.print_refined_step parameter handler) 
+                  refined_event_list  
+              in flush parameter.S.PH.B.PB.K.H.out_channel
+          in 
+          let error = [] in 
+          let _ = 
+            if log_step 
+            then 
+              Debug.tag "\t\t * dealing with initial states" 
+          in 
+          let error,blackboard = S.PH.B.PB.init parameter handler error   in
+          let _ = 
+            if log_step
+            then 
+              Debug.tag "\t\t * dealing with steps" 
+          in 
+          let error,blackboard = 
+            List.fold_left 
+              (fun (error,blackboard) refined_event  -> 
+                S.PH.B.PB.add_step parameter handler error refined_event blackboard)
+              (error,blackboard)
+              refined_event_list
+          in 
+          let error,preblackboard = 
+            S.PH.B.PB.finalize parameter handler error blackboard 
+          in 
+          let _ = 
+            if log_step 
+            then 
+              Debug.tag "\t\t * pretty printing the grid" 
+          in 
+          let error = 
+            if debug_mode
+            then 
+              let _ = 
+                S.PH.B.PB.print_preblackboard parameter handler error preblackboard 
+              in 
+              let _ = flush parameter.S.PH.B.PB.K.H.out_channel in 
               error 
-      in
-      let error,blackboard = S.PH.B.import parameter handler error preblackboard in 
-      let _ = 
-        if debug_mode 
-        then 
-          Printf.fprintf parameter.S.PH.B.PB.K.H.out_channel  "\nPretty printing the grid\n"
-      in 
-      let error = 
-        if debug_mode
-        then 
-          S.PH.B.print_blackboard parameter handler error blackboard 
-        else 
-          error 
-      in  
-      let error,list = S.PH.forced_events parameter handler error blackboard in 
-      let n_stories = List.length list in 
-      let _ = 
-        if strong_compression_on or weak_compression_on 
-        then 
-          Debug.tag ("\t - story computation ("^(string_of_int n_stories)^")") 
-        else 
-          Debug.tag ("\t - cut ("^(string_of_int n_stories)^")")
-      in 
-      let tick = 
-        if n_stories > 0 
-        then Mods.tick_stories n_stories (false,0,0) 
-        else (false,0,0)
-      in 
-      let error,_,_ = 
-        List.fold_left 
-          (fun (error,counter,tick) (list_order,list_eid) -> 
-            let _ = 
-              if debug_mode 
-              then 
-                Printf.fprintf parameter.S.PH.B.PB.K.H.out_channel  "COMPRESS %i" (List.length list_eid) 
-            in 
-            let error,blackboard,output,result_wo_compression  = 
-              S.compress parameter handler error blackboard  list_order list_eid 
-            in 
-            let error = 
-              if debug_mode 
-                  then 
-                let _ = Printf.fprintf parameter.S.PH.B.PB.K.H.out_channel  "*****\nRESULT:\n*****\n" in 
-                let _ =
-                  if S.PH.B.is_failed output 
-                  then 
-                    let _ = Printf.fprintf parameter.S.PH.B.PB.K.H.out_channel  "Fail_to_compress" in  error
-                  else 
-                    let _ = Printf.fprintf parameter.S.PH.B.PB.K.H.out_channel  "Succeed_to_compress" in 
-                        error
-                in 
-                error 
-              else 
-                error
-            in 
-            let error = 
-              if S.PH.B.is_failed output 
-              then error
-              else
+            else 
+              error 
+          in
+          let error,blackboard = S.PH.B.import parameter handler error preblackboard in 
+          let _ = 
+            if log_step  
+            then 
+              Debug.tag "\t\t * pretty printing the grid" 
+          in 
+          let error = 
+            if debug_mode
+            then 
+              S.PH.B.print_blackboard parameter handler error blackboard 
+            else 
+              error 
+          in  
+          let error,list = S.PH.forced_events parameter handler error blackboard in 
+          let n_stories = List.length list in 
+          let _ = 
+            if strong_compression_on or weak_compression_on 
+            then 
+              Debug.tag ("\t - story computation ("^(string_of_int n_stories)^")") 
+            else 
+              Debug.tag ("\t - cut ("^(string_of_int n_stories)^")")
+          in 
+          let tick = 
+            if n_stories > 0 
+            then Mods.tick_stories n_stories (false,0,0) 
+            else (false,0,0)
+          in 
+          let error,_,_ = 
+            List.fold_left 
+              (fun (error,counter,tick) (list_order,list_eid) -> 
                 let _ = 
+                  if debug_mode
+                  then 
+                    Debug.tag ("\t\t * compress "^(string_of_int (List.length list_eid)))
+                in 
+                let error,blackboard,output,result_wo_compression  = 
+                  S.compress parameter handler error blackboard  list_order list_eid 
+                in 
+                let error = 
+                  if debug_mode
+                  then 
+                    let _ =  Debug.tag "\t\t * result"  in 
+                    let _ =
+                      if S.PH.B.is_failed output 
+                      then 
+                        let _ = Printf.fprintf parameter.S.PH.B.PB.K.H.out_channel  "Fail_to_compress" in  error
+                      else 
+                        let _ = Printf.fprintf parameter.S.PH.B.PB.K.H.out_channel  "Succeed_to_compress" in 
+                        error
+                    in 
+                    error 
+                  else 
+                    error
+                in 
+                let error = 
+                  if S.PH.B.is_failed output 
+                  then error
+                  else
+                    let _ = 
                       if weak_compression_on
                       then 
                         let error,list = S.PH.B.translate_blackboard parameter handler error blackboard in 
@@ -169,28 +180,28 @@ let weak_compression env state step_list =
 		        let filename_comp = (Filename.chop_suffix !Parameter.cflowFileName ".dot") ^"_"^(string_of_int counter)^"weak_comp"^".dot" in 
                         let _ = Causal.dot_of_grid filename_comp grid state env in 
                         () 
+                    in 
+                    let _ = 
+                      if causal_trace_on  
+                      then 
+                        let filename =  (Filename.chop_suffix !Parameter.cflowFileName ".dot")^"_"^(string_of_int counter)^".dot"
+		        in
+                        let grid = S.PH.B.PB.K.build_grid result_wo_compression true handler in 
+                        let _ = Causal.dot_of_grid filename grid state env in
+                        ()
+                    in 
+                    let error,blackboard = S.PH.B.reset_init parameter handler error blackboard in 
+                    error
                 in 
-                let _ = 
-                  if causal_trace_on  
-                  then 
-                    let filename =  (Filename.chop_suffix !Parameter.cflowFileName ".dot")^"_"^(string_of_int counter)^".dot"
-		    in
-                    let grid = S.PH.B.PB.K.build_grid result_wo_compression true handler in 
-                    let _ = Causal.dot_of_grid filename grid state env in
-                    ()
-                in 
-                let error,blackboard = S.PH.B.reset_init parameter handler error blackboard in 
-                error
-            in 
-            let tick = Mods.tick_stories n_stories tick in 
-            error,counter+1,tick)
-          (error,1,tick) list 
-      in 
-      let _ = 
-        List.iter 
-          (S.PH.B.PB.K.H.dump_error parameter handler error)
-          error
-      in 
-      ()
+                let tick = Mods.tick_stories n_stories tick in 
+                error,counter+1,tick)
+              (error,1,tick) list 
+          in 
+          let _ = 
+            List.iter 
+              (S.PH.B.PB.K.H.dump_error parameter handler error)
+              error
+          in 
+          ()
+        end 
     end 
-      

@@ -22,7 +22,7 @@ module type PreBlackboard =
 sig 
   module K:Kappa_instantiation.Cflow_signature
   module A:LargeArray.GenArray
-
+ 
   type step_id = int 
   type step_short_id = int 
 
@@ -32,6 +32,9 @@ sig
   type predicate_info
   type predicate_value 
  
+  module C:(Cache.Cache with type O.t = predicate_value)  
+
+
   type pre_blackboard  (*blackboard during its construction*)
 
   val conj: (predicate_value -> predicate_value -> K.H.error_channel * predicate_value) K.H.with_handler
@@ -73,7 +76,7 @@ module Preblackboard =
      module H = Cflow_handler.Cflow_handler
      module K = Kappa_instantiation.Cflow_linker 
      module A = Mods.DynArray
-
+    
      (** blackboard matrix*) 
 
      type step_id = int       (** global id of an event *)
@@ -108,6 +111,9 @@ module Preblackboard =
        | Bound_to_type of K.agent_name * K.site_name (** for binding sites (partial information *)
        | Unknown (**  for agent presence, internal states, binding states (partial information *) 
 
+     module C = (Cache.Cache(struct type t = predicate_value let compare = compare end):Cache.Cache with type O.t = predicate_value) 
+
+
      let defined = Defined 
      let undefined = Undefined 
      let unknown = Unknown 
@@ -133,7 +139,7 @@ module Preblackboard =
 	   pre_column_map: predicate_id PredicateMap.t; (** maps each wire label to its wire id *)
 	   pre_column_map_inv: predicate_info A.t; (** maps each wire id to its wire label *)
 	   predicate_id_list_related_to_predicate_id: PredicateidSet.t A.t; (** maps each wire id for the presence of an agent to the set of wires for its attibute (useful, when an agent get removed, all its attributes get undefined *)
-           history_of_predicate_values_to_predicate_id: CaseValueSet.t A.t; (** 
+           history_of_predicate_values_to_predicate_id: C.t A.t; (** 
 maps each wire to the set of its previous states, this summarize the potential state of a site that is freed, so as to overapproximate the set of potential side effects*)
            pre_observable_list: step_id list list ;
            pre_side_effect_of_event: K.side_effect A.t;
@@ -163,8 +169,6 @@ es all the side-effect mutex *)
      let print_predicate_value log x = 
        match x 
        with 
-(*         | Point_to step_id -> 
-           Printf.fprintf log "Point_to %i" step_id *)
          | Counter int ->  
            Printf.fprintf log "Counter %i" int
          | Defined -> 
@@ -250,7 +254,7 @@ es all the side-effect mutex *)
            (fun i s -> 
              let _ = print_predicate_id log blackboard i in 
              let _ = 
-               CaseValueSet.iter 
+               C.iter 
                  (fun s -> print_predicate_value log s)
                  s
              in 
@@ -382,11 +386,12 @@ es all the side-effect mutex *)
          let sid = PredicateMap.find predicate map in
          error,blackboard,sid
        with 
-           Not_found -> 
+         | Not_found -> 
              let sid'= blackboard.pre_ncolumn + 1 in 
              let map' = PredicateMap.add predicate sid' map in 
              let _  = A.set map_inv sid' predicate in 
              let map_inv' = map_inv in 
+             let _ = A.set blackboard.history_of_predicate_values_to_predicate_id sid' (C.create parameter.K.H.cache_size) in 
              let blackboard = 
                {blackboard 
                 with 
@@ -569,8 +574,8 @@ es all the side-effect mutex *)
       pre_column_map = PredicateMap.empty ; 
       pre_column_map_inv = A.make 1 (Fictitious 0) ; 
       pre_kind_of_event = A.make 1 (Side_effect_of (-1,[])) ;
-      history_of_predicate_values_to_predicate_id = A.make 1 CaseValueSet.empty;
-      predicate_id_list_related_to_predicate_id = A.make 1 PredicateidSet.empty ;
+      history_of_predicate_values_to_predicate_id = A.make 1 (C.create None);
+      predicate_id_list_related_to_predicate_id = A.make 1 PredicateidSet.empty;
       pre_observable_list = [];
       pre_fictitious_observable = None ;
     }
@@ -627,22 +632,40 @@ es all the side-effect mutex *)
     let former_states = 
         A.get blackboard.history_of_predicate_values_to_predicate_id predicate_target_id
     in 
-    let error,bt = predicate_value_of_binding_state parameter handler error binding_state in 
-    let error,list = 
-      CaseValueSet.fold 
-        (fun s (error,list) -> 
-          if more_refined s bt
-          then 
-            let error,l=side_effect parameter handler error predicate_target_id s site in 
-            error,l::list 
-          else 
+    if Parameter.get_causal_trace_only parameter.K.H.compression_mode 
+    then 
+      begin 
+        let s = C.last former_states in 
+        match s with 
+          | None -> error,blackboard,[]
+          | Some s -> 
+            let error,bt = predicate_value_of_binding_state parameter handler error binding_state in
+            if more_refined s bt 
+            then 
+              let error,l=side_effect parameter handler error predicate_target_id s site in 
+              error,blackboard,[l]
+           else 
+              error,blackboard,[]
+      end
+    else 
+      begin 
+        let error,bt = predicate_value_of_binding_state parameter handler error binding_state in 
+        let error,list = 
+          C.fold 
+            (fun s (error,list) -> 
+              if more_refined s bt
+              then 
+                let error,l=side_effect parameter handler error predicate_target_id s site in 
+                error,l::list 
+              else 
             error,list
-      )
-        former_states
-        (error,[])
-    in 
-    error,blackboard,list 
-
+            )
+            former_states
+            (error,[])
+        in 
+        error,blackboard,list 
+      end 
+        
   let add_step parameter handler error step blackboard = 
     let pre_event = blackboard.pre_event in 
     let test_list = K.tests_of_refined_step step in 
@@ -688,7 +711,7 @@ es all the side-effect mutex *)
           ()
         | _ -> 
           let old = A.get map pid in 
-          A.set map pid (CaseValueSet.add p old) 
+          A.set map pid (C.add p old) 
     in 
     let error,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effets = 
       List.fold_left 
@@ -848,7 +871,7 @@ es all the side-effect mutex *)
         | _ -> 
           let nsid = blackboard.pre_nsteps + 1 in 
           let observable_list = 
-            List.map (fun x -> nsid::x) blackboard.pre_observable_list 
+            List.rev_map (fun x -> nsid::x) (List.rev blackboard.pre_observable_list) 
           in 
           let blackboard = 
             {
