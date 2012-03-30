@@ -25,7 +25,7 @@ and component_injections = (InjectionHeap.t option) array
 and obs = { label : string; expr : Dynamics.variable }
 
 let silence rule_id state = state.silenced <- (IntSet.add rule_id state.silenced)
-
+	
 let kappa_of_id id state =
 	try
 		match state.kappa_variables.(id) with
@@ -85,7 +85,7 @@ let instance_number mix_id state env =
 				Array.fold_left
 					(fun act opt ->
 								match opt with
-								| Some injs -> act *. (float_of_int (InjectionHeap.size injs))
+								| Some injs -> let n = InjectionHeap.size injs in if n=0 then 0. else act *. (float_of_int n)
 								| None -> 0.
 					)
 					1. component_injections
@@ -553,7 +553,7 @@ let check_validity injprod with_full_components state counter env =
 		let (is_connex,d_map,components,_) = connex roots with_full_components state env in
 		if is_connex then 
 			(
-			clean_injprod injprod state counter env ; (*removing non local injection because it will be applied*)
+			(*clean_injprod injprod state counter env ; (*removing non local injection because it will be applied*) *)
 			{map = embedding ; components = Some (IntMap.add 0 components IntMap.empty) ; depth_map = Some d_map ; roots = roots}
 			)
 		else 

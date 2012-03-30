@@ -16,3 +16,5 @@ Error
 /usr/lib/ocaml
 models/out
 models/dna
+models/dna
+models/nonlocal

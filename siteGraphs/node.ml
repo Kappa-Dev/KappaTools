@@ -39,6 +39,28 @@ let fold_interface f node cont =
 		Array.iteri (fun site_id port -> cont := f site_id port !cont) (interface node) ;
 		!cont
 	
+let label node env =
+	let str_intf = 
+		fold_interface
+		(fun i port cont ->
+				let s_i = Environment.site_of_id node.name i env in
+				if (s_i = "_") then cont
+				else
+					let (int_state,_) = port.status
+					in 
+					match int_state with 
+						| None -> cont 
+						| Some x -> 
+							let s_int = ("~"^(Environment.state_of_id node.name i x env))
+							in
+							(Printf.sprintf "%s%s" s_i s_int)::cont
+		) node [] 
+	in
+	match str_intf with
+		| [] -> Environment.name node.name env
+		| _ -> Printf.sprintf "%s(%s)" (Environment.name node.name env) (String.concat "," (List.rev str_intf)) 
+
+	
 let to_string with_detail (hsh_lnk,fresh) node env =
 	let intf_l,fresh' = 
 		fold_interface
