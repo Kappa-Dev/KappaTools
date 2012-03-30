@@ -170,7 +170,7 @@ let main =
 					close_desc() (*closes all other opened descriptors*)
 				end
 			| ExceptionDefn.Deadlock ->
-				(Printf.printf "?\nA deadlock was reached after %d events and %fs (Activity = %f)\n"
+				(Printf.printf "?\nA deadlock was reached after %d events and %Es (Activity = %.5f)\n"
 				(Counter.event counter)
 				(Counter.time counter) 
 				(Random_tree.total state.activity_tree))

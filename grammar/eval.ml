@@ -141,7 +141,8 @@ let eval_agent is_pattern tolerate_new_state env a ctxt =
 		| Some s -> (env,s)
 		| None ->
 			if !Parameter.implicitSignature then 
-				let sign = Signature.create name_id (StringMap.add "_" ([], Ast.FREE, no_pos) StringMap.empty) in (Environment.declare_sig sign pos_ag env,sign)
+				let sign = Signature.create name_id (StringMap.add "_" ([], Ast.FREE, no_pos) StringMap.empty) in 
+				(Environment.declare_sig sign pos_ag env,sign)
 			else 	
 				raise	(ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared")) 
 	in

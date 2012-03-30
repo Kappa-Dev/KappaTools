@@ -11,7 +11,7 @@ let event state (*grid*) event_list counter plot env =
 		in
 		if activity < 0. then invalid_arg "Activity invariant violation" ;
 			let dt = -. (log rd /. activity) in 
-			if dt = infinity then 
+			if dt = infinity or activity <= 0. then
 				let depset = Environment.get_dependencies Mods.TIME env in
 				DepSet.fold
 				(fun dep dt ->
@@ -124,6 +124,8 @@ let event state (*grid*) event_list counter plot env =
 					if !Parameter.debugModeOn then Debug.tag "Null (clash or doesn't satisfy constraints)"; 
 					Counter.inc_null_events counter ; 
 					Counter.inc_consecutive_null_events counter ;
+					if counter.Counter.cons_null_events > !Parameter.maxConsecutiveClash then raise Deadlock (*Not satisfactory since activity should be 0*)
+					else 
 					(env,state,IntSet.empty,(*grid,*)event_list)
 				end
 	in
