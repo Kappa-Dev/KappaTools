@@ -59,6 +59,7 @@ and modif_expr =
 	| STOP of ((string * Tools.pos) option * Tools.pos)
 	| SNAPSHOT of ((string * Tools.pos) option * Tools.pos) (*maybe later of mixture too*)
 	| CFLOW of (string * Tools.pos * Tools.pos) 
+	| FLUX of (string * Tools.pos) option * Tools.pos
 
 type configuration = string * Tools.pos * string * Tools.pos
 

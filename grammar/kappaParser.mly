@@ -5,7 +5,7 @@
 %token AT OP_PAR CL_PAR COMMA DOT KAPPA_LNK 
 %token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE SET DO UNTIL TRUE FALSE REF OBS KAPPA_RAR TRACK CPUTIME CONFIG
 %token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INFINITY TIME EVENT NULL_EVENT PROD_EVENT INIT LET DIV PLOT SINUS COSINUS TAN SQRT EXPONENT POW ABS MODULO 
-%token <Tools.pos> EMAX TMAX
+%token <Tools.pos> EMAX TMAX FLUX
 %token <int*Tools.pos> INT 
 %token <string*Tools.pos> ID LABEL KAPPA_MRK 
 %token <int> DOT_RADIUS PLUS_RADIUS 
@@ -148,6 +148,7 @@ modif_expr:
 | STOP fic_label
 	{Ast.STOP ($2,$1)}
 | TRACK LABEL {let lab,pos_lab = $2 in Ast.CFLOW (lab,pos_lab,$1)}
+| FLUX fic_label {Ast.FLUX ($2,$1)}
 ;
 
 fic_label:

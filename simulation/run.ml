@@ -124,8 +124,8 @@ let event state (*grid*) event_list counter plot env =
 					if !Parameter.debugModeOn then Debug.tag "Null (clash or doesn't satisfy constraints)"; 
 					Counter.inc_null_events counter ; 
 					Counter.inc_consecutive_null_events counter ;
-					if counter.Counter.cons_null_events > !Parameter.maxConsecutiveClash then raise Deadlock (*Not satisfactory since activity should be 0*)
-					else 
+					(*if counter.Counter.cons_null_events > !Parameter.maxConsecutiveClash then raise Deadlock (*Not satisfactory since activity should be 0*)
+					else*) 
 					(env,state,IntSet.empty,(*grid,*)event_list)
 				end
 	in
