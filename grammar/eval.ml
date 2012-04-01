@@ -839,7 +839,7 @@ let pert_of_result variables env res =
 								| None -> ExceptionDefn.warning ~with_pos:pos "Causality mode is enabled at a single event, \"until\" condition is probably missing." 
 						in
 						(env,None) 
-					| Dynamics.UPDATE _ | Dynamics.SNAPSHOT _ | Dynamics.STOP _ -> 
+					| Dynamics.UPDATE _ | Dynamics.SNAPSHOT _ | Dynamics.STOP _ | Dynamics.FLUX _ -> 
 						let env =
 							DepSet.fold
 							(fun dep env -> Environment.add_dependencies dep (Mods.PERT p_id) env
