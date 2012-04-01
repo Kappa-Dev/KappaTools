@@ -40,6 +40,8 @@ let pert = '$' id
 rule token = parse
     | "\\\n" {incr_line lexbuf ; token lexbuf}
 		| "do" {let pos = position lexbuf in DO pos}
+		| "enable" {let pos = position lexbuf in ENABLE pos}
+		| "disable" {let pos = position lexbuf in DISABLE pos}
 		| "until" {let pos = position lexbuf in UNTIL pos}
 		| ":=" {let pos = position lexbuf in SET pos}
 		| "&&" {let pos = position lexbuf in AND pos}
@@ -51,8 +53,8 @@ rule token = parse
 									| "$ADD" -> (INTRO pos)
 									| "$SNAPSHOT" -> (SNAPSHOT pos) 
 									| "$STOP" -> (STOP pos) 
-									| "$TRACK" -> (TRACK pos)
 									| "$FLUX" -> (FLUX pos)
+									| "$TRACK" -> (TRACK pos)
 									| s -> return_error lexbuf ("Perturbation effect \""^s^"\" is not defined")
 					 			}  
 		| '[' {let lab = read_label "" [']'] lexbuf in 
@@ -82,7 +84,7 @@ rule token = parse
 						}  
 		| '\"' {let filename = read_label "" ['\"'] lexbuf in let pos = position lexbuf in FILENAME (filename,pos)}
     | '\n' {incr_line lexbuf ; NEWLINE}
-		| '\r' {token lexbuf ; NEWLINE}
+		| '\r' {NEWLINE}
     | '#' {comment lexbuf}
     | integer as n {let pos = position lexbuf in INT(int_of_string n,pos)}
     | real as f {let pos = position lexbuf in FLOAT(float_of_string f,pos)}

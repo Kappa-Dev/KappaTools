@@ -149,11 +149,39 @@ let apply_effect p_id pert state counter env =
 				let env = if Environment.is_tracked id env then env else Environment.inc_active_cflows env in 
 				let env = Environment.track id env in
 				(env, state, IntSet.empty,[])
+			| CFLOWOFF id ->
+				begin
+					let env = Environment.dec_active_cflows env in
+					let env = Environment.untrack id env in
+					if Environment.active_cflows env = 0 then Parameter.causalModeOn := false ;
+					(env,state,IntSet.empty,[])
+				end
+			| FLUXOFF opt ->
+				begin
+					let desc = match opt with None -> open_out !Parameter.fluxFileName | Some nme -> open_out nme in
+					Parameter.add_out_desc desc ;
+					State.dot_of_flux desc state env ;
+					close_out desc ;
+					Parameter.openOutDescriptors := List.tl (!Parameter.openOutDescriptors) ;
+					Parameter.fluxModeOn := false ;
+					(env,state,IntSet.empty,[])
+				end
 			| STOP opt ->
 				(if !Parameter.debugModeOn then Debug.tag "Interrupting simulation now!" ;
 				snapshot opt ;
 				raise (ExceptionDefn.StopReached (Printf.sprintf "STOP instruction was satisfied at event %d" (Counter.event counter)))
 				)
+			| FLUX opt ->
+				begin
+					if !Parameter.fluxModeOn then ExceptionDefn.warning "Flux modes are overlapping" ;
+					Parameter.fluxModeOn := true ;
+					begin
+						match opt with
+							| None -> Parameter.fluxFileName := "flux"^"_"^(string_of_int (Counter.event counter))^".dot"
+							| Some _ -> () 
+					end ;
+					(env, state, IntSet.empty,[])
+				end
 				
 
 let rec try_perturbate state pert_ids counter env = 
@@ -175,16 +203,6 @@ let rec try_perturbate state pert_ids counter env =
 								let state,env = 
 									if eval_abort_pert true pert state counter env then 
 										(if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "***Aborting pert[%d]***" pert_id) ;
-										let env = 
-											match pert.effect with
-												| CFLOW _ ->
-													begin
-														let env = Environment.dec_active_cflows env in
-														if Environment.active_cflows env = 0 then Parameter.causalModeOn := false ;
-														env
-													end
-												| _ -> env
-										in
 										({state with perturbations = IntMap.remove pert_id state.perturbations},env) )
 									else
 										begin

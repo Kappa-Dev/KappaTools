@@ -714,8 +714,30 @@ let effects_of_modif variables env ast =
 		let id = try Environment.num_of_rule lab env with Not_found -> try Environment.num_of_kappa lab env with Not_found ->
 			raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
 		in
-		let str = Printf.sprintf "Causality analysis of %s" lab in
+		let str = Printf.sprintf "Enable causality analysis of %s" lab in
 		(variables, Dynamics.CFLOW id, str, env)
+	| CFLOWOFF (lab,pos_lab,pos_pert) ->
+		let id = try Environment.num_of_rule lab env with Not_found -> try Environment.num_of_kappa lab env with Not_found ->
+			raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
+		in
+		let str = Printf.sprintf "Disable causality analysis of %s" lab in
+		(variables, Dynamics.CFLOWOFF id, str, env)
+	| FLUX (lab,pos) ->
+		let nme =
+			match lab with
+				| None -> None
+				| Some (nme,_) -> Some nme
+		in
+		let str = "Activate flux tracking" in
+		(variables,Dynamics.FLUX nme, str, env)
+	| FLUXOFF (lab,pos) ->
+		let nme =
+			match lab with
+				| None -> None
+				| Some (nme,_) -> Some nme
+		in
+		let str = "Disable flux tracking" in
+		(variables,Dynamics.FLUXOFF nme, str, env)
 
 let pert_of_result variables env res =
 	let (variables, lpert, lrules, env) =
@@ -833,13 +855,8 @@ let pert_of_result variables env res =
 							)
 							dep env
 						in 
-						let _ =
-							match opt_abort with
-								| Some _ -> ()
-								| None -> ExceptionDefn.warning ~with_pos:pos "Causality mode is enabled at a single event, \"until\" condition is probably missing." 
-						in
 						(env,None) 
-					| Dynamics.UPDATE _ | Dynamics.SNAPSHOT _ | Dynamics.STOP _ | Dynamics.FLUX _ -> 
+					| Dynamics.UPDATE _ | Dynamics.SNAPSHOT _ | Dynamics.STOP _ | Dynamics.FLUX _ | Dynamics.FLUXOFF _ | Dynamics.CFLOWOFF _ -> 
 						let env =
 							DepSet.fold
 							(fun dep env -> Environment.add_dependencies dep (Mods.PERT p_id) env

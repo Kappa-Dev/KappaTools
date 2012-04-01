@@ -5,7 +5,7 @@
 %token AT OP_PAR CL_PAR COMMA DOT KAPPA_LNK 
 %token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE SET DO UNTIL TRUE FALSE REF OBS KAPPA_RAR TRACK CPUTIME CONFIG
 %token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INFINITY TIME EVENT NULL_EVENT PROD_EVENT INIT LET DIV PLOT SINUS COSINUS TAN SQRT EXPONENT POW ABS MODULO 
-%token <Tools.pos> EMAX TMAX FLUX
+%token <Tools.pos> EMAX TMAX FLUX ENABLE DISABLE
 %token <int*Tools.pos> INT 
 %token <string*Tools.pos> ID LABEL KAPPA_MRK 
 %token <int> DOT_RADIUS PLUS_RADIUS 
@@ -94,6 +94,24 @@ instruction:
 | PERT bool_expr DO modif_expr UNTIL bool_expr
 	{Ast.PERT ($2,$4,$1,Some $6)}
 | CONFIG FILENAME FILENAME {let param_name,pos_p = $2 and value,pos_v = $3 in Ast.CONFIG (param_name,pos_p,value,pos_v)} 
+| PERT bool_expr ENABLE measure_expr
+	{match $4 with 
+		| Ast.CFLOW _ -> Ast.PERT ($2,$4,$1,None) 
+		| Ast.FLUX _ -> Ast.PERT ($2,$4,$1,None)
+		| _ -> raise (ExceptionDefn.Semantics_Error ($1,"Invalid measurment activation. I was expecting $CFLOW or $FLUX"))
+	}
+| PERT bool_expr DISABLE measure_expr	
+	{match $4 with 
+		| Ast.CFLOW x -> Ast.PERT ($2,Ast.CFLOWOFF x,$1,None) 
+		| Ast.FLUX (x,y) -> Ast.PERT ($2,Ast.FLUXOFF (x,y),$1,None)
+		| _ -> raise (ExceptionDefn.Semantics_Error ($1,"Invalid measurment deactivation. I was expecting $CFLOW or $FLUX"))
+	}
+;
+
+measure_expr:
+| OP_PAR measure_expr CL_PAR {$2}
+| TRACK LABEL {let lab,pos_lab = $2 in Ast.CFLOW (lab,pos_lab,$1)}
+| FLUX fic_label {Ast.FLUX ($2,$1)}
 ;
 
 variable_declaration:
@@ -147,8 +165,7 @@ modif_expr:
 	{Ast.SNAPSHOT ($2,$1)}
 | STOP fic_label
 	{Ast.STOP ($2,$1)}
-| TRACK LABEL {let lab,pos_lab = $2 in Ast.CFLOW (lab,pos_lab,$1)}
-| FLUX fic_label {Ast.FLUX ($2,$1)}
+
 ;
 
 fic_label:

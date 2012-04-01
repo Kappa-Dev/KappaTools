@@ -132,6 +132,8 @@ and modification =
 	| STOP of string option
 	| CFLOW of int 
 	| FLUX of string option
+	| FLUXOFF of string option
+	| CFLOWOFF of int
 and boolean_variable = BCONST of bool | BVAR of ((int -> float) -> (int -> float) -> float -> int -> int -> float -> bool)
 
 let string_of_pert pert env =

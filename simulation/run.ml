@@ -148,13 +148,13 @@ let loop state grid event_list counter plot env =
 	let state,env,_ = External.try_perturbate state pert_ids counter env 
 	in
 	
-	let rec iter state (*grid*) event_list counter plot env =
+	let rec iter state event_list counter plot env =
 		if !Parameter.debugModeOn then 
 			Debug.tag (Printf.sprintf "[**Event %d (Activity %f)**]" counter.Counter.events (Random_tree.total state.State.activity_tree));
 		if (Counter.check_time counter) && (Counter.check_events counter) then
-			let state(*,grid*),event_list,env = event state (*grid*) event_list counter plot env 
+			let state,event_list,env = event state event_list counter plot env 
 			in
-			iter state (*grid*) event_list counter plot env
+			iter state event_list counter plot env
 		else (*exiting the loop*)
 		  begin
       	let _ = 
@@ -164,13 +164,12 @@ let loop state grid event_list counter plot env =
       	in 
         if Environment.tracking_enabled env then
 					begin
-				    (*Causal.dot_of_grid !Parameter.cflowFileName grid state env ;*)
 				    let _ = 
             	if !Parameter.weakcompressionModeOn or !Parameter.causalModeOn 
                 then Compression_main.weak_compression env state event_list 
-	                            in
-                                    ()
-				        end
+	          in
+            ()
+				  end
 		  end
 	in
-	iter state (*grid*) event_list counter plot env
+	iter state event_list counter plot env
