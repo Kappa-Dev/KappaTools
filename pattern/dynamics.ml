@@ -144,7 +144,9 @@ let string_of_pert pert env =
 		| SNAPSHOT opt -> (match opt with None -> "SNAPSHOT" | Some s -> "SNAPSHOT("^s^")") 
 		| STOP opt -> (match opt with None -> "STOP" | Some s -> "STOP("^s^")")
 		| FLUX opt -> (match opt with None -> "FLUX" | Some s -> "FLUX("^s^")")
+		| FLUXOFF opt -> (match opt with None -> "FLUX" | Some s -> "FLUX_OFF("^s^")")
 		| CFLOW id -> let nme = try Environment.rule_of_num id env with Not_found -> Environment.kappa_of_num id env in ("CFLOW "^nme)
+		| CFLOWOFF id -> let nme = try Environment.rule_of_num id env with Not_found -> Environment.kappa_of_num id env in ("CFLOWOFF "^nme)
 
 		
 let diff pos m0 m1 label_opt env =

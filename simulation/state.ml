@@ -25,7 +25,10 @@ and component_injections = (InjectionHeap.t option) array
 and obs = { label : string; expr : Dynamics.variable }
 
 let silence rule_id state = state.silenced <- (IntSet.add rule_id state.silenced)
-	
+
+let set_variable id v state = 
+	try state.alg_variables.(id) <- Some v with Invalid_argument msg -> invalid_arg ("State.set_variable: "^msg)
+			
 let kappa_of_id id state =
 	try
 		match state.kappa_variables.(id) with
@@ -793,7 +796,7 @@ let rec update_dep state dep_in pert_ids counter env =
 				Environment.get_dependencies (Mods.ALG v_id) env
 			in
 			begin
-				if !Parameter.debugModeOn then 
+				if !Parameter.debugModeOn then
 					Debug.tag 
 					(Printf.sprintf "Variable %d is changed, updating %s" v_id (string_of_set Mods.string_of_dep DepSet.fold depset)) 
 			end;

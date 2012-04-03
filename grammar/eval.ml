@@ -314,7 +314,7 @@ let rec partial_eval_alg env ast =
 							in
 							let v,is_const,dep =
 								match const with
-									| Some c -> ((fun _ _ _ _ _ _ -> c),true,DepSet.empty)
+									| Some c -> ((fun _ _ _ _ _ _ -> c),true,DepSet.singleton (Mods.ALG i))
 									| None -> ((fun _ v _ _ _ _ -> v i),false,DepSet.singleton (Mods.ALG i))
 							in
 							(v,is_const,dep,("'" ^ (lab ^ "'")))
@@ -479,7 +479,9 @@ let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take 
 	let env = if Mixture.is_empty lhs then Environment.declare_empty_lhs r_id env else env in
 	let env =
 		DepSet.fold
-			(fun dep env -> Environment.add_dependencies dep (RULE r_id) env)
+			(fun dep env ->
+				(*Printf.printf "rule %d depends on %s\n" r_id (Mods.string_of_dep dep) ; *)
+				Environment.add_dependencies dep (RULE r_id) env)
 			(DepSet.union dep dep_alt) env
 	in
 	let pre_causal = Dynamics.compute_causal lhs rhs script env in
@@ -677,22 +679,25 @@ let effects_of_modif variables env ast =
 				Printf.sprintf "remove %s * %s" str (Mixture.to_kappa false m env)
 			in ((m :: variables), (Dynamics.DELETE (v, m)), str, env)
 	| UPDATE (nme, pos_rule, alg_expr, pos_pert) ->
-			let i =
-				(try Environment.num_of_rule nme env
+			let i,is_rule =
+				(try (Environment.num_of_rule nme env,true)
 				with
 				| Not_found ->
-						raise
-							(ExceptionDefn.Semantics_Error (pos_rule,
-									"Rule " ^ (nme ^ " is not declared"))))
-			
+					try
+						let (i,_) = Environment.num_of_alg nme env in (i,false)
+					with Not_found -> raise (ExceptionDefn.Semantics_Error (pos_rule,"Variable " ^ (nme ^ " is neither a constant nor a rule")))
+				)
 			and (x, is_constant, dep, str) = partial_eval_alg env alg_expr in
 			let v =
 				if is_constant
 				then Dynamics.CONST (close_var x)
 				else Dynamics.VAR x in
 			let str =
-				Printf.sprintf "set rate of rule '%s' to %s"
-					(Environment.rule_of_num i env) str
+				if is_rule then
+					Printf.sprintf "set rate of rule '%s' to %s" (Environment.rule_of_num i env) str
+				else
+					let v_str,_ = Environment.alg_of_num i env in
+				Printf.sprintf "set variable '%s' to %s" v_str str
 			in (variables, (Dynamics.UPDATE (i, v)), str, env)
 	| SNAPSHOT (opt,pos) -> (*when specializing snapshots to particular mixtures, add variables below*)
 		let str = "snapshot state" in

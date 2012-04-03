@@ -39,7 +39,7 @@ let pert = '$' id
 
 rule token = parse
     | "\\\n" {incr_line lexbuf ; token lexbuf}
-		| "do" {let pos = position lexbuf in DO pos}
+		| "apply" {let pos = position lexbuf in DO pos}
 		| "enable" {let pos = position lexbuf in ENABLE pos}
 		| "disable" {let pos = position lexbuf in DISABLE pos}
 		| "until" {let pos = position lexbuf in UNTIL pos}

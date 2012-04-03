@@ -135,13 +135,27 @@ let apply_effect p_id pert state counter env =
 									tracked := tracked'@(!tracked)
 					done ;
 					(!envr,!st,!pert_ids,!tracked)
-			| UPDATE (r_id,v) -> 
-				if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Updating rate of rule '%s'" (Environment.rule_of_num r_id env)) ;
-				let r = State.rule_of_id r_id state in
-					Hashtbl.replace state.rules r_id {r with k_def = v} ;
-					State.update_activity state (-1) r_id counter env ;		
-					let env,pert_ids = State.update_dep state (RULE r_id) IntSet.empty counter env in
-					(env,state ,pert_ids,[])
+			| UPDATE (id,v) -> 
+				let _ =
+					if !Parameter.debugModeOn then 
+						(if Environment.is_rule id env then 
+							Debug.tag (Printf.sprintf "Updating rate of rule '%s'" (Environment.rule_of_num id env)) 
+						else Debug.tag (Printf.sprintf "Updating variable '%s'" ((fun (x,_)->x) (Environment.alg_of_num id env)) ))
+				in
+				if Environment.is_rule id env then
+					begin
+						let r = State.rule_of_id id state in
+							Hashtbl.replace state.rules id {r with k_def = v} ;
+							State.update_activity state (-1) id counter env ;		
+							let env,pert_ids = State.update_dep state (RULE id) IntSet.empty counter env in
+							(env,state ,pert_ids,[])
+					end
+				else (*updating a variable*)
+					begin
+						State.set_variable id v state ;
+						let env,pert_ids = State.update_dep state (ALG id) IntSet.empty counter env in
+						(env,state,pert_ids,[]) 
+					end
 			| SNAPSHOT opt -> (snapshot opt ; (env, state ,IntSet.empty,[]))
 			| CFLOW id -> 
 				if !Parameter.debugModeOn then Debug.tag "Tracking causality" ;
