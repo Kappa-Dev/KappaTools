@@ -312,10 +312,10 @@ let rec partial_eval_alg env ast =
 						(try
 							let i,const = Environment.num_of_alg lab env
 							in
-							let v,is_const,dep =
-								match const with
+							let v,is_const,dep = ((fun _ v _ _ _ _ -> v i),false,DepSet.singleton (Mods.ALG i))
+								(*match const with
 									| Some c -> ((fun _ _ _ _ _ _ -> c),true,DepSet.singleton (Mods.ALG i))
-									| None -> ((fun _ v _ _ _ _ -> v i),false,DepSet.singleton (Mods.ALG i))
+									| None -> ((fun _ v _ _ _ _ -> v i),false,DepSet.singleton (Mods.ALG i))*)
 							in
 							(v,is_const,dep,("'" ^ (lab ^ "'")))
 						with
@@ -906,9 +906,10 @@ let init_graph_of_result env res =
 			and env = ref env
 			and (v, is_const, dep, lbl) = partial_eval_alg env alg
 			in
+			(*
 			if not is_const then raise (ExceptionDefn.Semantics_Error (pos, Printf.sprintf "%s is not a constant, cannot initialize graph." lbl))
-			else
-				let n = match !Parameter.rescale with None -> int_of_float (close_var v) | Some i -> min i (int_of_float (close_var v)) in
+			else*)
+			let n = match !Parameter.rescale with None -> int_of_float (close_var v) | Some i -> min i (int_of_float (close_var v)) in
 				(* Cannot do Mixture.to_nodes env m once for all because of        *)
 				(* references                                                      *)
 				while !cpt < n do

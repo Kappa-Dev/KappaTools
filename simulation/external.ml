@@ -192,7 +192,7 @@ let apply_effect p_id pert state counter env =
 					begin
 						match opt with
 							| None -> Parameter.fluxFileName := "flux"^"_"^(string_of_int (Counter.event counter))^".dot"
-							| Some _ -> () 
+							| Some nme -> Parameter.fluxFileName := nme
 					end ;
 					(env, state, IntSet.empty,[])
 				end
