@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "3.0-040412"
+let version = "3.0-060412"
 
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
@@ -33,8 +33,6 @@ let main =
 			), "Specifies directory name where output file(s) should be stored") ;
 		("-load-sim", Arg.String (fun file -> Parameter.marshalizedInFile := file) , "load simulation package instead of kappa files") ; 
 		("-make-sim", Arg.String (fun file -> Parameter.marshalizedOutFile := file) , "save kappa files as a simulation package") ; 
-		("-im", Arg.String (fun file -> Parameter.influenceFileName:=file), "produces the influence map of the model") ;
-		("-flux", Arg.String (fun file -> Parameter.fluxFileName:=file ; Parameter.fluxModeOn := true), "will measure activation/inhibition fluxes during the simulation") ;
 		("--implicit-signature", Arg.Unit (fun () -> Parameter.implicitSignature := true), "Program will guess agent signatures automatically") ;
 		("-seed", Arg.Int (fun i -> Parameter.seedValue := Some i), "Seed for the random number generator") ;
 		("--eclipse", Arg.Unit (fun () -> Parameter.eclipseMode:= true), "enable this flag for running KaSim behind eclipse plugin") ;

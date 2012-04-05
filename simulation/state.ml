@@ -25,9 +25,6 @@ and component_injections = (InjectionHeap.t option) array
 and obs = { label : string; expr : Dynamics.variable }
 
 let silence rule_id state = state.silenced <- (IntSet.add rule_id state.silenced)
-
-let set_variable id v state = 
-	try state.alg_variables.(id) <- Some v with Invalid_argument msg -> invalid_arg ("State.set_variable: "^msg)
 			
 let kappa_of_id id state =
 	try
@@ -175,6 +172,11 @@ let rec value state var_id counter env =
 						v_fun act_of_id v_of_var (Counter.time counter)
 							(Counter.event counter) (Counter.null_event counter) (Sys.time())
 			)
+
+(*missing recomputation of dependencies*)
+let set_variable id v state =
+	try state.alg_variables.(id) <- Some v with Invalid_argument msg -> invalid_arg ("State.set_variable: "^msg)
+
 
 (**[eval_activity rule state] returns the evaluation of the overestimated activity of rule [rule] in implicit state [state]*)
 let eval_activity ?using rule state counter env =
@@ -1370,12 +1372,14 @@ let dot_of_flux desc state  env =
 			in
 			IntMap.iter
 			(fun r_id' n ->
+				if n=0. then () 
+				else
 				let color,arrowhead,edge = 
 					if n<0. then ("red3","tee","filled") 
 					else ("green3","normal","filled") 
 				in 
 				let str2 = try Environment.rule_of_num r_id' env with Not_found -> Dynamics.to_kappa (rule_of_id r_id' state) env in
-				Printf.fprintf desc "\"%s\" -> \"%s\" [weight=%d,label=\"%.3f\",color=%s,arrowhead=%s];\n" str1 str2 (int_of_float (n *. n)) n color arrowhead
+				Printf.fprintf desc "\"%s\" -> \"%s\" [weight=%d,label=\"%.3f\",color=%s,arrowhead=%s];\n" str1 str2 (abs (int_of_float n)) n color arrowhead
 			) map 
 		) flux 
 	in

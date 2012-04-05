@@ -154,6 +154,7 @@ let apply_effect p_id pert state counter env =
 					begin
 						State.set_variable id v state ;
 						let env,pert_ids = State.update_dep state (ALG id) IntSet.empty counter env in
+						Debug.tag "done";
 						(env,state,pert_ids,[]) 
 					end
 			| SNAPSHOT opt -> (snapshot opt ; (env, state ,IntSet.empty,[]))

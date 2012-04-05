@@ -39,11 +39,9 @@ let pert = '$' id
 
 rule token = parse
     | "\\\n" {incr_line lexbuf ; token lexbuf}
-		| "apply" {let pos = position lexbuf in DO pos}
-		| "enable" {let pos = position lexbuf in ENABLE pos}
-		| "disable" {let pos = position lexbuf in DISABLE pos}
+		| "do" {let pos = position lexbuf in DO pos}
+		| "set" {let pos = position lexbuf in SET pos}
 		| "until" {let pos = position lexbuf in UNTIL pos}
-		| ":=" {let pos = position lexbuf in SET pos}
 		| "&&" {let pos = position lexbuf in AND pos}
 		| "||" {let pos = position lexbuf in OR pos}
     | "->" {let pos = position lexbuf in KAPPA_RAR pos}
@@ -55,6 +53,7 @@ rule token = parse
 									| "$STOP" -> (STOP pos) 
 									| "$FLUX" -> (FLUX pos)
 									| "$TRACK" -> (TRACK pos)
+									| "$UPDATE" -> (ASSIGN pos)
 									| s -> return_error lexbuf ("Perturbation effect \""^s^"\" is not defined")
 					 			}  
 		| '[' {let lab = read_label "" [']'] lexbuf in 
@@ -78,8 +77,8 @@ rule token = parse
 								| "false" -> FALSE pos
 								| "not" -> NOT pos
 								| "pi" -> FLOAT (3.14159265,pos)
-								| "emax" -> EMAX pos
-								| "tmax" -> TMAX pos
+								| "Emax" -> EMAX pos
+								| "Tmax" -> TMAX pos
 								| _ as s -> return_error lexbuf ("Symbol \""^s^"\" is not defined")
 						}  
 		| '\"' {let filename = read_label "" ['\"'] lexbuf in let pos = position lexbuf in FILENAME (filename,pos)}
@@ -111,9 +110,8 @@ rule token = parse
 								| "var" -> (LET pos)
 								| "plot" -> (PLOT pos)
 								| "mod" -> (PERT pos)
-								| "ref" -> (REF pos)
 								| "obs" -> (OBS pos)
-								| "set" -> (CONFIG pos)
+								| "def" -> (CONFIG pos)
 								| _ as s -> return_error lexbuf ("Instruction \""^s^"\" not recognized")
 					 } 
 		| dot_radius as s { let i = String.index s '{' in 
