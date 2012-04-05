@@ -257,7 +257,7 @@ let eval_agent is_pattern tolerate_new_state env a ctxt =
 
 (* returns partial evaluation of rate expression and a boolean that is set *)
 (* to true if partial evaluation is a constant function                    *)
-let rec partial_eval_alg env ast =
+let rec partial_eval_alg ?(reduce_const=false) env ast =
 	let bin_op ast ast' pos op op_str =
 		let (f1, const1, dep1, lbl1) = partial_eval_alg env ast
 		
@@ -312,10 +312,12 @@ let rec partial_eval_alg env ast =
 						(try
 							let i,const = Environment.num_of_alg lab env
 							in
-							let v,is_const,dep = ((fun _ v _ _ _ _ -> v i),false,DepSet.singleton (Mods.ALG i))
-								(*match const with
-									| Some c -> ((fun _ _ _ _ _ _ -> c),true,DepSet.singleton (Mods.ALG i))
-									| None -> ((fun _ v _ _ _ _ -> v i),false,DepSet.singleton (Mods.ALG i))*)
+							let v,is_const,dep =
+								match const with
+									| Some c -> 
+										if reduce_const then ((fun _ _ _ _ _ _ -> c),true,DepSet.singleton (Mods.ALG i))
+										else ((fun _ v _ _ _ _ -> v i),false,DepSet.singleton (Mods.ALG i))
+									| None -> ((fun _ v _ _ _ _ -> v i),false,DepSet.singleton (Mods.ALG i))
 							in
 							(v,is_const,dep,("'" ^ (lab ^ "'")))
 						with
@@ -904,7 +906,7 @@ let init_graph_of_result env res =
 			let cpt = ref 0
 			and sg = ref sg
 			and env = ref env
-			and (v, is_const, dep, lbl) = partial_eval_alg env alg
+			and (v, is_const, dep, lbl) = partial_eval_alg ~reduce_const:true env alg
 			in
 			(*
 			if not is_const then raise (ExceptionDefn.Semantics_Error (pos, Printf.sprintf "%s is not a constant, cannot initialize graph." lbl))

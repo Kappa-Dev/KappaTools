@@ -5,7 +5,7 @@ open Random_tree
 
 let event state (*grid*) event_list counter plot env =
 	(*1. Time advance*)
-	let dt = 
+	let dt,activity = 
 		let rd = Random.float 1.0 
 		and activity = (*Activity.total*) Random_tree.total state.State.activity_tree 
 		in
@@ -14,21 +14,22 @@ let event state (*grid*) event_list counter plot env =
 			if dt = infinity or activity <= 0. then
 				let depset = Environment.get_dependencies Mods.TIME env in
 				DepSet.fold
-				(fun dep dt ->
+				(fun dep (dt,activity) ->
 					match dep with
 						| Mods.PERT p_id ->
 							begin
 								let pert_opt = try Some (IntMap.find p_id state.State.perturbations) with Not_found -> None
 								in
 								match pert_opt with
-									| None -> dt
-									| Some pert -> (match Mods.Counter.dT counter with Some dt -> dt | None -> Mods.Counter.last_increment counter) (*find_dt state pert counter env*) (*recherche dicho. pour connaitre la bonne valeur de t?*)
+									| None -> (dt,activity)
+									| Some pert -> 
+										(match Mods.Counter.dT counter with Some dt -> (dt,activity) | None -> (Mods.Counter.last_increment counter,activity)) (*find_dt state pert counter env*) (*recherche dicho. pour connaitre la bonne valeur de t?*)
 							end
-						| _ -> dt
-				) depset infinity
-			else dt 
+						| _ -> (dt,activity)
+				) depset (infinity,0.)
+			else (dt,activity) 
 	in 
-	if dt = infinity then 
+	if dt = infinity || activity = 0. then 
 		begin
 			if !Parameter.dumpIfDeadlocked then	
 				let desc = if !Parameter.dotOutput then open_out "deadlock.dot" else open_out "deadlock.ka" in
@@ -124,7 +125,8 @@ let event state (*grid*) event_list counter plot env =
 					if !Parameter.debugModeOn then Debug.tag "Null (clash or doesn't satisfy constraints)"; 
 					Counter.inc_null_events counter ; 
 					Counter.inc_consecutive_null_events counter ;
-					(*if counter.Counter.cons_null_events > !Parameter.maxConsecutiveClash then raise Deadlock (*Not satisfactory since activity should be 0*)
+					(*if counter.Counter.cons_null_events > !Parameter.maxConsecutiveClash then 
+						raise Deadlock
 					else*) 
 					(env,state,IntSet.empty,(*grid,*)event_list)
 				end

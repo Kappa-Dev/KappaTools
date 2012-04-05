@@ -572,12 +572,15 @@ We will use this model as a running example for the next chapter, in order to il
 
 \section{Perturbation language}\label{sec:mod}
 
-\subsection{Syntax} 
-It is possible to use variables\index{variable} of the model as precondition for triggering a \emph{perturbation}\index{perturbation} of the simulation. For instance one may want to interrupt the simulation whenever a certain amount of observable has been reached, introduce a signal at some time interval etc. To do so, one declares a perturbation with a line:
+It is possible to use variables\index{variable} of the model as precondition for triggering a \emph{perturbation}\index{perturbation} of the simulation. A perturbation may be either \emph{"one shot"}\index{"one shot" perturbation} in which case it is applied only once and is then discarded, or \emph{permanent}\index{permanent perturbation} in which case the perturbation will have an effect on the remaining of the simulation.
+
+\subsection{"One shot" perturbation}
+
+ With a "one shot"  perturbation\index{"one shot" perturbation} one may  introduce or delete new agents in the system, or change the value on any variable. To do so, one declares a perturbation with a line:
 \ITE{
-\item[] \ttt{\%mod:} \textit{boolean\_expression} \ttt{do} \textit{effect} \textit{end\_expression}
+\item[] \ttt{\%mod:} \textit{boolean\_expression} \ttt{apply} \textit{effect} \textit{end\_expression}
 }
-where \textit{boolean\_expression} and \textit{effect} are defined by the grammar given in Table~\ref{tab:pert}.
+where \textit{boolean\_expression} and \textit{effect} are defined by the grammar given  Table~\ref{tab:pert}.
 %%
 \begin{table}[htbp]
   \centering
@@ -589,37 +592,28 @@ where \textit{boolean\_expression} and \textit{effect} are defined by the gramma
     && | \tcb{[true]} | \tcb{[false]} \\\\
     \textit{effect} &::=& \tcb{\$ADD} \textit{algebraic\_expression agent\_expression} \\
     && | \tcb{\$DEL} \textit{algebraic\_expression agent\_expression} \\
-    && | \tcb{\$SNAPSHOT} | \tcb{\$STOP} \\ && | \tcb{`rule\_name' :=} \textit{algebraic\_expression} \\
-    && | \tcb{\$TRACK} \textit{observable} \\\\
-    \textit{observable} &::=& \tcb{`rule\_name'} | \tcb{`var\_name'} \\\\
+    && | \tcb{\$SNAPSHOT} | \tcb{\$STOP} \\ && | \tcb{`var\_name' :=} \textit{algebraic\_expression} \\
     \textit{end\_expression} &::=& $\varepsilon$ | \tcb{until} \textit{boolean\_expression}
     \end{tabular}
   \caption{Perturbation expressions. The operator \ttt{rel} can be any usual binary relation in $\set{<,=,>}$ and algebraic expressions are built using table~\ref{tab:operators}.}
   \label{tab:pert}
 \end{table}
 %%
-\subsection*{Precondition}
-Basically, the \textit{precondition}\index{precondition} determines when the perturbation will be triggered, for instance a user writes
+The \textit{precondition}\index{precondition} determines when the perturbation will be triggered, for instance a user writes
 \ITE{
-\item[] \ttt{\%mod: ([T]>10) \&\& (`v1'/`v2') > 1 do $\dots$}
+\item[] \ttt{\%mod: ([T]>10) \&\& (`v1'/`v2') > 1 apply $\dots$}
 }
 to indicate she wishes to trigger a perturbation whenever the simulation time has passed 10 time units and the ratio of variables \ttt{v1} over \ttt{v2} is above 1. Note that the perturbations are by default "one shot" interventions in the simulation. Once the precondition is satisfied, the perturbation is applied and discarded, unless a persistent perturbation is used using the \ttt{until} keyword (see below). 
 
-\subsection*{Effect}
+The \emph{effect} of a perturbation can be either to add new agents to the mixture, delete some agents from the mixture, take a snapshot of the mixture in order to observe it or re-use it as a new initial state. Eventually one may update the value of a named variable (see examples of application below).  
 
-The \textit{effect} of a perturbation can be divided in two kinds: the perturbations that modify the mixture, and those that simply give modelers an additional insight of what is going on in the simulation.
-
-In the first kind one may add (\ttt{\$ADD} instruction), delete (\ttt{\$DEL} instruction) agents from the mixture or modify the kinetic rate\index{kinetic rate} of a particular rule. In the second category one may record the current state of the mixture (\ttt{\$SNAPSHOT} instruction), interrupt the simulation in order to save the current state (\ttt{\$STOP} instruction) or decide to trigger some causality analysis on some particular observable of interest (\ttt{\$TRACK} instruction)\index{causality analysis}.
-
-\subsection*{Persistent perturbation}
-The \textit{end\_expression} serves to specify whether the perturbation should be applied only once ("one shot" perturbation) or at every future events until a condition is reached (persistent perturbation). For instance:
+The \textit{end\_expression} enables modelers to re-apply the one shot perturbation at every furture events and until a condition is reached. For instance:
 \ttt{\ITE{
-\item[] \%mod: ([T] [mod] 100)=0 do \$DEL  [inf] C until [T]>1000
+\item[] \%mod: ([T] [mod] 100)=0 apply \$DEL  [inf] C until [T]>1000
 }}
 will delete every \ttt{C} from the mixture every 100 t.u until the simulation clock has passed 1000 t.u. If no \ttt{until} keyword is positioned, the perturbation will be discarded after its first application.
 
-
-\subsection{Modifying the mixture during a simulation}
+\subsection*{Example -- adding or deleting agents during a simulation}
 
 Continuing with the ABC model, the perturbation effect: 
 \ttt{\ITE{
@@ -629,16 +623,11 @@ will add $n\geq 0$ instances of \ttt{C} with \ttt{x1} already in state \ttt{p} (
 \ttt{\ITE{
 \item[] \$DEL  [inf] B(x!\_)
 }}
-will remove \emph{all} \ttt{B}s connected to someone from the mixture. Now, the effect:
-\ttt{\ITE{
-\item[] `rule\_name' :=  [inf]
-}}
-will set the kinetic rate of a declared rule named \ttt{`rule\_name'} to $\infty$.
+will remove \emph{all} \ttt{B}s connected to some agent from the mixture. 
 
-\subsection*{Example}
 There are various ways one can use perturbations to study more deeply a given kappa model. A basic illustration is the use of a simple perturbation to let a system equilibrate before starting a real simulation. For instance, as can be seen from the curve given in Fig.~\ref{fig:abc}, the number of AB complexes is arbitrarily set to 0 in the initial state (all \ttt{A}s are disconnected from \ttt{B}s in the initial mixture). In order to avoid this, one can modify the kappa file the following way: we set the initial concentration of \ttt{C} to 0 by deleting line 22. Now we introduce \ttt{C}s after 25 t.u by perturbation:
 \ttt{\ITE{
-\item[] \%mod:  [T]>25 do \$ADD 10000 C 
+\item[] \%mod:  [T]>25 apply \$ADD 10000 C 
 }}
 The modified kappa file is available in the source repository, in the \ttt{model/} directory (file \ttt{abc-pert.ka}). 
 Running again a simulation (a bit longer) by entering in the command line:
@@ -655,33 +644,46 @@ one obtains the curve given in Fig.~\ref{fig:abc2}
 \end{center}
 \end{figure}
 
-\subsection{Snapshots}
+\subsection*{Example -- using snapshots to define a new initial state} 
 
 In the previous example, we let the system evolve for some time without its main reactant \ttt{C} in order to let other reactants go to a less arbitrary initial state. One may object that this way of proceeding is CPU-time consuming if one has to do this at each simulation. An alternative is to use the \ttt{\$SNAPSHOT} primitive that allows a user to export a snapshot of the mixture at a given time point as a new (piece of) kappa file.
 For instance, the declaration:
 \ttt{\ITE{
-\item[] \%mod:  [E-]/[E]>0.9 do \$SNAPSHOT \textquotedbl prefix\textquotedbl
+\item[] \%mod:  [E-]/[E]>0.9 apply \$SNAPSHOT \textquotedbl prefix\textquotedbl
 }}
 
 will ask \KaSim~to export the mixture the first time the ration of null events over productive ones will reach 0.9. The exported file will be named \ttt{prefix\_$n$.ka} where $n$ is the event number at which the snapshot was taken. Note that one may omit to define a prefix and simply type:
 \ttt{\ITE{
-\item[] \%mod:  [E-]/[E]>0.9 do \$SNAPSHOT
+\item[] \%mod:  [E-]/[E]>0.9 apply \$SNAPSHOT
 }}
 in which case the default prefix \ttt{snap} will be used for naming snapshots.
 
 Note that if the name already exists a counter will be appended at the end of the file to prevent overwriting.
 Note that snapshots can be performed multiple times, for instance every 1000 events, using the declaration:
 \ttt{\ITE{
-\item[] \%mod:  ([E+] [mod] 1000)=0 do \$SNAPSHOT \textquotedbl abc\textquotedbl~until [false] 
+\item[] \%mod:  ([E+] [mod] 1000)=0 apply \$SNAPSHOT \textquotedbl abc\textquotedbl~until [false] 
 }}
 which results in \KaSim~producing a snapshot every 1000 (productive) events until the simulation ends. The perturbation \ttt{\$STOP "final\_state"} will terminate the simulation whenever its precondition is satisfied and produce a snapshot of the last mixture. Note that instead of producing kappa files, one may use snapshot perturbations to produce an image of the mixture in the dot format using the parameter \ttt{"dotSnapshots"} (see Section~\ref{sec:param}).
 
-\subsection{Causality analysis}\index{causality analysis}
-Causality analysis are always triggered by a perturbation of the form:
+\subsection*{Example -- redefining a kinetic rate}
+The effect:
+\ttt{\ITE{
+\item[] `var' := \textit{expression} 
+}}
+allows the modeler to update the value of the existing variable \ttt{`var'}. For instance, in the ABC model, adding the perturbation:
+\ttt{\ITE{
+\item[] \%mod: [T]>25 apply `on\_rate' := \textit{expression} 
+}}
+
+\subsection{Permanent perturbations}
+Permanent perturbations\index{permanent perturbation} are triggered with the following instruction:
 \ITE{
-\item[] \ttt{\%mod:}  \textit{start\_condition} \ttt{do \$TRACK }\textit{observable} \ttt{until} \textit{end\_condition} 
-}
-where \textit{start\_condition} and \textit{end\_condition} specify respectively when causality analysis should start and finish (remember that in the absence of \ttt{until} construct, causality analysis will only be performed during one computation event!). The \emph{observable} is either a rule's name \ttt{'r'} or a variable name \ttt{'v'} pointing to a kappa expression. For instance, in the ABC model, the declaration:
+\item[] \ttt{\%mod:}  \textit{start\_condition} \ttt{enable} \textit{permanent\_effect} 
+} or
+\ITE{
+\item[] \ttt{\%mod:}  \textit{start\_condition} \ttt{disable} \textit{permanent\_effect} 
+} 
+where \textit{start\_condition} specify  when causality perturbation should be applied. The \emph{permanent\_effect} is either :
 \ttt{\ITE{
 \item[] \%mod:  [E=0] do \$TRACK 'Cpp' until [false] 
 }}
