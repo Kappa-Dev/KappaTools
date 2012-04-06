@@ -142,19 +142,19 @@ let apply_effect p_id pert state counter env =
 							Debug.tag (Printf.sprintf "Updating rate of rule '%s'" (Environment.rule_of_num id env)) 
 						else Debug.tag (Printf.sprintf "Updating variable '%s'" ((fun (x,_)->x) (Environment.alg_of_num id env)) ))
 				in
+				let value = State.value state ~var:v (-1) counter env in (*Change here if one wants to have address passing style of assignation*)
 				if Environment.is_rule id env then
 					begin
 						let r = State.rule_of_id id state in
-							Hashtbl.replace state.rules id {r with k_def = v} ;
-							State.update_activity state (-1) id counter env ;		
+							Hashtbl.replace state.rules id {r with k_def = Dynamics.CONST value} ;
+							State.update_activity state p_id id counter env ;		
 							let env,pert_ids = State.update_dep state (RULE id) IntSet.empty counter env in
 							(env,state ,pert_ids,[])
 					end
 				else (*updating a variable*)
 					begin
-						State.set_variable id v state ;
+						State.set_variable id value state ;
 						let env,pert_ids = State.update_dep state (ALG id) IntSet.empty counter env in
-						Debug.tag "done";
 						(env,state,pert_ids,[]) 
 					end
 			| SNAPSHOT opt -> (snapshot opt ; (env, state ,IntSet.empty,[]))

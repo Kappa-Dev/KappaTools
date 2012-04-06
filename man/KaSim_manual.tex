@@ -569,11 +569,11 @@ It is possible to use variables\index{variable} of the model as precondition for
 
 \subsection{"One shot" perturbation}
 
- With a "one shot"  perturbation\index{perturbation ! "one shot" perturbation} one may  introduce or delete new agents in the system, or change the value on any variable. To do so, one declares a perturbation with a line:
+ With a "one shot"  perturbation\index{perturbation ! "one shot" perturbation} one may  introduce or delete new agents in the system, or require a snapshot of the current mixture in order to visualize or reuse it for further simulaiton. These perturbations are obtained using the declaration \index{declaration}:
 \ITE{
 \item[] \ttt{\%mod:} \textit{boolean\_expression} \ttt{do} \textit{effect} \textit{end\_expression}
 }
-where \textit{boolean\_expression} and \textit{effect}\index{effect} are defined by the grammar given  Table~\ref{tab:pert}.
+where \textit{boolean\_expression}, \textit{effect}\index{effect} and \textit{end\_expression} are defined by the grammar given  Table~\ref{tab:pert}.
 %%
 \begin{table}[htbp]
   \centering
@@ -592,9 +592,9 @@ where \textit{boolean\_expression} and \textit{effect}\index{effect} are defined
   \label{tab:pert}
 \end{table}
 %%
-The \textit{precondition}\index{precondition} determines when the perturbation will be triggered, for instance a user writes
+The boolean expression is used as a \textit{precondition}\index{precondition} that determines when the perturbation will be triggered, for instance a user writes
 \ITE{
-\item[] \ttt{\%mod: ([T]>10) \&\& (\textquotesingle v1\textquotesingle /\textquotesingle v2\textquotesingle ) > 1 do $\dots$}
+\item[] \ttt{\%mod: ([T]>10) \&\& (\var{v1} /\var{v2}) > 1 do $\dots$}
 }
 to indicate she wishes to trigger a perturbation whenever the simulation time has passed 10 time units and the ratio of variables \ttt{v1} over \ttt{v2} is above 1. Note that the perturbations are by default "one shot" interventions in the simulation. Once the precondition is satisfied, the perturbation is applied and discarded. It is possible to ask the perturbation to be re-enabled several times using using the \ttt{until} keyword (see below), in this case, note that the precondition will be tested again.
 
@@ -645,7 +645,7 @@ For instance, the declaration:
 \item[] \%mod:  [E-]/[E]>0.9 do \$SNAPSHOT \textquotedbl prefix\textquotedbl
 }}
 
-will ask \KaSim~to export the mixture the first time the ration of null events over productive ones will reach 0.9. The exported file will be named \ttt{prefix\_$n$.ka} where $n$ is the event number at which the snapshot was taken. Note that one may omit to define a prefix and simply type:
+will ask \KaSim~to export the mixture the first time the percentage of null events reaches 90\%. The exported file will be named \ttt{prefix\_$n$.ka} where $n$ is the event number at which the snapshot was taken. Note that one may omit to define a prefix and simply type:
 \ttt{\ITE{
 \item[] \%mod:  [E-]/[E]>0.9 do \$SNAPSHOT
 }}
@@ -702,14 +702,14 @@ Note that causal flow\index{causality} can show or hide more causal dependencies
 
 \subsection*{Example -- Flux maps}
 
-\begin{figure}[ht] %  figure placement: here, top, bottom, or page
+\begin{figure}[h] %  figure placement: here, top, bottom, or page
    \centering
    \includegraphics[width=6cm]{img/flux.pdf} 
    \caption{Flux map of the \ttt{abc.ka} model, taken from t=0 to t=20 time units. The \ttt{A} releasing rules \ttt{a..b} and \ttt{mod x2} are contributing very little to the activity of \ttt{a.c} which is a sign of an excess of free \ttt{A}s in the system at this time interval.}
    \label{fig:flux}
 \end{figure}
 %%
-The \emph{flux map}\index{flux map} is a powerful observation that tracks, on the fly, the influence that rule applications have on each others. Contrary to the influence map, it is dynamically generated and tracks effective impacts (positive or negative) a every rule application. The flux map can be computed using declarations of the form:
+The \emph{flux map}\index{flux map} is a powerful observation that tracks, on the fly, the influence that rule applications have on each others. It is dynamically generated and tracks effective impacts (positive or negative) a every rule application. The flux map can be computed using declarations of the form:
 \ttt{\ITE{
 \item [] \%mod: [true] set \$FLUX "flux.dot" [true]
 \item [] \%mod: [T]>20 set \$FLUX "flux.dot" [false]
@@ -725,9 +725,9 @@ Any variable between simple quotes can be updated during a simulation using a de
 }}
 This perturbation will be applied whenever the observable \ttt{\var{Cpp}} will become greater than 500. Its effect will be to set the on rate of all binding rules to 0. Note that according to the grammar given Table~\ref{tab:perm}, one may use any algebraic expression expression as the new value of the variable. For instance:
 \ttt{\ITE{
-\item [] \%mod: \var{Cpp}~> 500 set \$UPDATE \var{k\_on} 1/[T]
+\item [] \%mod: \var{Cpp}~> 500 set \$UPDATE \var{k\_on} \var{k\_on}/100
 }}
-\noi will cause the on rate of all rules to decrease over time. Note that it is possible to override the kinetic rate of a specific rule. Still in our ABC example, the declaration:
+\noi will cause the on rate of all rules to decrease a hunderd fold. Note that it is possible to override the kinetic rate of a specific rule:  in our ABC example, the declaration\index{declaration}:
 \ttt{\ITE{
 \item [] \%mod: \var{Cpp}~> 500 set \$UPDATE \var{a.b} [inf]
 }}
@@ -825,19 +825,19 @@ Make sure that perturbation\textquotesingle s precondition can be satisfied by \
 
 \section*{What do null events mean, why do I have any?}
 
-Null events is a way for \KaSim~to compensate for some over approximation it is doing, in order deal with large simulations more efficiently. They do not impact significantly the performances of the simulator. The ratio $r$ of null event over productive ones (that you can track using the observable \ttt{\%obs: \textquotesingle r\textquotesingle   [E-]/[E+]} should tend to 0 when models have a lot of agents.
+Null events\index{null event} is a way for \KaSim~to compensate for some over approximation it is doing, in order deal with large simulations more efficiently. They do not impact significantly the performances of the simulator. The ratio $r$ of null event over productive ones (that you can track using the observable \ttt{\%obs: \textquotesingle r\textquotesingle   [E-]/[E+]} should tend to 0 when models have a lot of agents.
 
 \section*{No data points are generated}
 Make sure you have \ttt{\%obs} or \ttt{\%plot} instructions in your KF. Also make sure to use the \ttt{-p} option in the command line to tell KaSim how many points you wish to have on your curves. 
 
 \section*{Too many instances of an observable}
-The value of a kappa expression $E$  is equal to the number of embeddings it has in the current mixture $M$. Embeddings are maps from agents in $E$  to agents in $M$. If $E$ has symmetries then every permutation of $E$ will be counted as a new embedding. For instance let $E=$\ttt{A(x!1),A(x!1)} and let $M=$\ttt{A(x!1,y\int p),A(x!1,y\int u)}. \KaSim~will count two instances of $E$ in $M$: the one mapping the first \ttt{A} of $E$ to the first \ttt{A} of $M$ and the one mapping the first \ttt{A} of $E$ to the second \ttt{A} of $M$.
+The value of a kappa expression $E$  is equal to the number of embeddings\index{embedding} it has in the current mixture $M$. Embeddings are maps from agents in $E$  to agents in $M$. If $E$ has symmetries then every permutation of $E$ will be counted as a new embedding. For instance let $E=$\ttt{A(x!1),A(x!1)} and let $M=$\ttt{A(x!1,y\int p),A(x!1,y\int u)}. \KaSim~will count two instances of $E$ in $M$: the one mapping the first \ttt{A} of $E$ to the first \ttt{A} of $M$ and the one mapping the first \ttt{A} of $E$ to the second \ttt{A} of $M$.
  
 \section*{The computed influence map is incorrect, it misses some activation or has to much of them}
-
-
+The influence map\index{influence map} contains relations that are computed on side effect free rules only. It is likely that a missing activation is due to a side effect that is not taken into account. If the influence map shows an activation between rule $r$ and $s$ that is never possible, just remember that activation computation implies that \emph{there exists} a context in which applying rule $r$ will create a new instance of rule $s$. It does not mean that \emph{all} applications of $r$ will do so.
 
 \section*{Value \ttt{nan} in the data file at the end of the simulation}
+The value \ttt{nan} means "Not a Number". It is generated when a plotted variable is infinite. Make sure this variable is not divided by zero at some point.
 
 \bibliographystyle{plain}
 \bibliography{fmb} 

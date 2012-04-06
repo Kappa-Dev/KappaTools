@@ -155,8 +155,8 @@ let instances_of_square ?(disjoint=false) mix_id state env =
 			if is_connex  then cont else (embedding,codomain,inj_list)::cont
 		) [] embeddings 
 
-let rec value state var_id counter env =
-	let var_opt = try Some (alg_of_id var_id state) with | Not_found -> None
+let rec value state ?var var_id counter env =
+	let var_opt = match var with Some v -> Some v | None -> (try Some (alg_of_id var_id state) with | Not_found -> None)
 	in
 	match var_opt with
 	| None ->
@@ -175,7 +175,7 @@ let rec value state var_id counter env =
 
 (*missing recomputation of dependencies*)
 let set_variable id v state =
-	try state.alg_variables.(id) <- Some v with Invalid_argument msg -> invalid_arg ("State.set_variable: "^msg)
+	try state.alg_variables.(id) <- Some (Dynamics.CONST v) with Invalid_argument msg -> invalid_arg ("State.set_variable: "^msg)
 
 
 (**[eval_activity rule state] returns the evaluation of the overestimated activity of rule [rule] in implicit state [state]*)
