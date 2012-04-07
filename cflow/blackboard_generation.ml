@@ -133,7 +133,7 @@ module Preblackboard =
            pre_fictitious_list: predicate_id list ; (** list of wire for mutual exclusions, the state must be undefined at the end of the trace *) 
            pre_steps_by_column: (step_short_id * (step_id * step_short_id * predicate_value * predicate_value) list) A.t; (** maps each wire to the last known value and the list of step (step id,test,action)*)
            pre_kind_of_event: rule_type A.t; (** maps each event id to the kind of event *)
-           pre_event: K.refined_step A.t; (** maps esau event to the step *)
+           pre_event: K.refined_step A.t; (** maps each event to the step *)
 	   pre_nsteps: step_id; (**id of the last event *)
 	   pre_ncolumn: predicate_id; (**id of the last wire *)
 	   pre_column_map: predicate_id PredicateMap.t; (** maps each wire label to its wire id *)
@@ -922,6 +922,9 @@ es all the side-effect mutex *)
 
   let get_side_effect parameter handler error blackboard = 
     error,blackboard.pre_side_effect_of_event
+
+
+    
 end:PreBlackboard)
 
 

@@ -47,12 +47,15 @@ sig
   val is_before_blackboard: pointer -> bool 
   val get_npredicate_id: blackboard -> int 
   val get_n_unresolved_events_of_pid: blackboard -> PB.predicate_id -> int 
+  val get_n_unresolved_events: blackboard -> int 
   val get_first_linked_event: blackboard -> PB.predicate_id -> int option 
   val get_last_linked_event: blackboard -> PB.predicate_id -> int option 
+  val get_stack_depth: blackboard -> int 
   val case_address_of_case_event_address : event_case_address -> case_address 
   val predicate_value_of_case_value: (case_value -> PB.K.H.error_channel * PB.predicate_value) PB.K.H.with_handler 
   val follow_pointer_up: (blackboard -> event_case_address -> PB.K.H.error_channel * event_case_address) PB.K.H.with_handler 
   val follow_pointer_down: (blackboard -> event_case_address -> PB.K.H.error_channel * event_case_address) PB.K.H.with_handler 
+  val is_boundary: (blackboard -> event_case_address -> PB.K.H.error_channel * bool) PB.K.H.with_handler  
 
   val build_event_case_address: PB.predicate_id -> pointer -> event_case_address  
   val exist_case: (blackboard -> event_case_address -> PB.K.H.error_channel * bool option) PB.K.H.with_handler   
@@ -96,8 +99,8 @@ sig
   val n_unresolved_events_in_column: event_case_address -> case_address 
   val forced_events: blackboard -> PB.step_id list list 
   val side_effect_of_event: blackboard -> PB.step_id -> PB.K.side_effect
-  val cut_predicate_id: (blackboard -> PB.predicate_id -> PB.K.H.error_channel *   blackboard) PB.K.H.with_handler 
-  val cut: (blackboard -> PB.step_id list -> PB.K.H.error_channel * blackboard * result ) PB.K.H.with_handler 
+(*  val cut_predicate_id: (blackboard -> PB.predicate_id -> PB.K.H.error_channel *   blackboard) PB.K.H.with_handler *)
+  val cut: (blackboard -> PB.step_id list -> PB.K.H.error_channel * blackboard * result * PB.step_id list) PB.K.H.with_handler 
 end
 
 module Blackboard = 
@@ -135,7 +138,6 @@ module Blackboard =
     let is_null_pointer x = x=null_pointer 
     let pointer_before_blackboard = 0 
     let is_before_blackboard x = x=0 (*Before_blackboard*)
-
     let build_pointer i = i 
 
     type event_case_address = 
@@ -145,12 +147,17 @@ module Blackboard =
 
 	}
 
+    let is_boundary parameter handler error blackboard event_address = 
+      error,is_before_blackboard event_address.row_short_event_id 
+   
+
     let build_event_case_address pid seid = 
       {
         column_predicate_id = pid ;
         row_short_event_id = seid 
       }
-	  
+
+	
     type case_address = 
       | N_unresolved_events_in_column of int 
       | Pointer_to_next of event_case_address 
@@ -177,36 +184,36 @@ module Blackboard =
       | Pointer of pointer 
       | Boolean of bool option 
 
-    let print_case_value x = 
+    let print_case_value parameter x = 
       match x 
       with 
-        | State x -> let _ = Printf.fprintf stderr "State! " in 
-                     let _ = PB.print_predicate_value stderr x in 
-                     let _ = Printf.fprintf stderr "\n" in 
+        | State x -> let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "State! " in 
+                     let _ = PB.print_predicate_value parameter.PB.K.H.out_channel_err x in 
+                     let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\n" in 
                      () 
-        | Counter i -> Printf.fprintf stderr "Counter %i\n" i
-        | Pointer i -> Printf.fprintf stderr "Pointer %i\n" i 
-        | Boolean b -> Printf.fprintf stderr "Boolean %s\n" (match b with None -> "?" | Some true -> "true" | _ -> "false")
+        | Counter i -> Printf.fprintf parameter.PB.K.H.out_channel_err "Counter %i\n" i
+        | Pointer i -> Printf.fprintf parameter.PB.K.H.out_channel_err "Pointer %i\n" i 
+        | Boolean b -> Printf.fprintf parameter.PB.K.H.out_channel_err "Boolean %s\n" (match b with None -> "?" | Some true -> "true" | _ -> "false")
  
-    let print_case_address x = 
+    let print_case_address parameter x = 
       match x
       with 
-       | N_unresolved_events_in_column i -> Printf.fprintf stderr "n_unresolved_events_in_pred %i" i 
+       | N_unresolved_events_in_column i -> Printf.fprintf parameter.PB.K.H.out_channel_err "n_unresolved_events_in_pred %i" i 
        | Pointer_to_next e -> 
-         let _ = Printf.fprintf stderr "Pointer" in 
+         let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "Pointer" in 
          ()
       | Value_after e -> 
-        let _ = Printf.fprintf stderr "Value_after" in 
+        let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "Value_after" in 
         () 
       | Value_before e -> 
-        let _ = Printf.fprintf stderr "Value_before" in 
+        let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "Value_before" in 
         () 
       | Pointer_to_previous e -> 
-        let _ = Printf.fprintf stderr "Pointer_before" in 
+        let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "Pointer_before" in 
         () 
-      | N_unresolved_events -> Printf.fprintf stderr "Unresolved_events" 
-      | Exist e -> Printf.fprintf stderr "Exist" 
-      | Keep_event i -> Printf.fprintf stderr "Keep %i" i
+      | N_unresolved_events -> Printf.fprintf parameter.PB.K.H.out_channel_err "Unresolved_events" 
+      | Exist e -> Printf.fprintf parameter.PB.K.H.out_channel_err "Exist" 
+      | Keep_event i -> Printf.fprintf parameter.PB.K.H.out_channel_err "Keep %i" i
 
     let state predicate_value = State predicate_value 
     let counter i = Counter i 
@@ -222,13 +229,14 @@ module Blackboard =
       with 
         | State x -> error,x 
         | _ ->    
-          let _ = print_case_value case_value in 
+          let _ = print_case_value parameter case_value in 
           let error_list,error = PB.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "predicate_value_of_case_value") (Some "226") (Some "wrong kinf of case_value in predicate_value_of_case_value") (failwith "predicate_value_of_case_value") in 
           PB.K.H.raise_error parameter handler error_list error PB.unknown 
         
 
     type assignment = (case_address * case_value) 
-       
+        
+        
         
     let bool_strictly_more_refined x y = 
       match x,y 
@@ -354,6 +362,7 @@ module Blackboard =
            side_effect_of_event: PB.K.side_effect PB.A.t;
            fictitious_observable: PB.step_id option;
          }
+     let get_stack_depth blackboard = List.length blackboard.stack 
 
      let forced_events blackboard = blackboard.forced_events 
      let side_effect_of_event blackboard i = PB.A.get blackboard.side_effect_of_event i 
@@ -385,6 +394,7 @@ module Blackboard =
 
      let get_npredicate_id blackboard = blackboard.n_predicate_id 
      let get_n_unresolved_events_of_pid blackboard pid = PB.A.get blackboard.weigth_of_predicate_id pid 
+     let get_n_unresolved_events blackboard = blackboard.n_unresolved_events 
      let get_pointer_next case = case.dynamic.pointer_next 
      
      let follow_pointer_down parameter handler error blackboard address = 
@@ -835,11 +845,11 @@ module Blackboard =
            let _ = 
              if debug_mode 
              then 
-               let _ = Printf.fprintf stderr "\n***\nREFINE_VALUE\nValue before: " in 
-               let _ = print_case_value old in 
-               let _ = Printf.fprintf stderr "\nNew value: " in 
-              let _ = print_case_value case_value in 
-               let _ = Printf.fprintf stderr "\nIGNORED***\n" in 
+               let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\n***\nREFINE_VALUE\nValue before: " in 
+               let _ = print_case_value parameter old in 
+               let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\nNew value: " in 
+              let _ = print_case_value parameter case_value in 
+               let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\nIGNORED***\n" in 
             () 
            in 
          error,blackboard,Ignore
@@ -850,11 +860,11 @@ module Blackboard =
             let _ = 
              if debug_mode 
              then 
-               let _ = Printf.fprintf stderr "\n***\nREFINE_VALUE\nValue before: " in 
-               let _ = print_case_value old in 
-               let _ = Printf.fprintf stderr "\nNew value: " in 
-              let _ = print_case_value case_value in 
-               let _ = Printf.fprintf stderr "\nIGNORED***\n" in 
+               let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\n***\nREFINE_VALUE\nValue before: " in 
+               let _ = print_case_value parameter old in 
+               let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\nNew value: " in 
+              let _ = print_case_value parameter case_value in 
+               let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\nIGNORED***\n" in 
             () 
            in 
            error,blackboard,Ignore 
@@ -868,11 +878,11 @@ module Blackboard =
               let _ = 
              if debug_mode 
              then 
-               let _ = Printf.fprintf stderr "\n***\nREFINE_VALUE\nValue before: " in 
-               let _ = print_case_value old in 
-               let _ = Printf.fprintf stderr "\nNew value: " in 
-               let _ = print_case_value case_value in 
-               let _ = Printf.fprintf stderr "\nSUCCESS***\n" in 
+               let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\n***\nREFINE_VALUE\nValue before: " in 
+               let _ = print_case_value parameter old in 
+               let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\nNew value: " in 
+               let _ = print_case_value parameter case_value in 
+               let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\nSUCCESS***\n" in 
             () 
            in 
              error,blackboard,Success
@@ -880,11 +890,11 @@ module Blackboard =
              let _ = 
                if debug_mode 
                then 
-                 let _ = Printf.fprintf stderr "\n***\nREFINE_VALUE\nValue before: " in 
-                 let _ = print_case_value old in 
-                 let _ = Printf.fprintf stderr "\nNew value: " in 
-                 let _ = print_case_value case_value in 
-                 let _ = Printf.fprintf stderr "\nFAIL***\n" in 
+                 let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\n***\nREFINE_VALUE\nValue before: " in 
+                 let _ = print_case_value parameter old in 
+                 let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\nNew value: " in 
+                 let _ = print_case_value parameter case_value in 
+                 let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\nFAIL***\n" in 
                  () 
              in 
              error,blackboard,Fail 
@@ -930,7 +940,7 @@ module Blackboard =
        let _ = 
          if debug_mode 
          then 
-           Printf.fprintf stderr "*******\n* Cut *\n*******" 
+           Printf.fprintf parameter.PB.K.H.out_channel_err "*******\n* Cut *\n*******" 
        in 
        let stack = blackboard.current_stack in 
        let error,blackboard = 
@@ -1008,97 +1018,99 @@ module Blackboard =
    let useless_predicate_id parameter handler error blackboard list = 
      let n_events = blackboard.n_eid in  
      let n_pid = blackboard.n_predicate_id in 
-     let p_id_array = PB.A.make n_pid false in  
      let event_array = PB.A.make n_events false in
+     let _ = 
+       List.iter 
+         (fun i -> 
+           PB.A.set event_array i true 
+         ) 
+         list 
+     in 
      let rec aux error event_list =  
        match event_list 
        with 
          | [] -> error
          | eid::q -> 
            begin 
-             let bool = 
-               try 
-                 PB.A.get event_array eid 
-               with 
-                 | _ -> false 
-             in 
-             if 
-               bool 
+             if is_fictitious_obs blackboard eid 
              then 
-               aux error q 
+               aux error q  
              else 
-               begin 
-                 let _ = PB.A.set event_array eid true in 
-                 if is_fictitious_obs blackboard eid then 
-                   aux error q 
-                 else 
-                   let list = PB.A.get blackboard.event_case_list eid in 
-                   let q = 
-                     List.fold_left
-                       (fun q event_case_address ->
-                         let predicate_id = event_case_address.column_predicate_id in 
-                         let _ = PB.A.set p_id_array predicate_id true in 
-                         let error,case = get_case parameter handler error event_case_address blackboard in 
-                         let pointer = case.dynamic.pointer_previous in 
-                         let eid = 
-                            let rec scan_down pointer =
-                              let prev_event_case_address = 
-                                {event_case_address with row_short_event_id = pointer}
-                              in 
-                              let error,prev_case = get_case parameter handler error prev_event_case_address blackboard in 
-                              let prev_eid = prev_case.static.event_id in 
-                              if is_null_pointer prev_eid 
-                              then None 
-                              else 
-                                if PB.is_unknown prev_case.static.action 
-                                then 
-                                  let pointer = prev_case.dynamic.pointer_previous in 
-                                  scan_down pointer 
-                                else Some prev_eid 
-                            in 
-                            scan_down pointer 
+               let list = PB.A.get blackboard.event_case_list eid in 
+               let q = 
+                 List.fold_left
+                   (fun q event_case_address ->
+                     let predicate_id = event_case_address.column_predicate_id in 
+                     let error,case = get_case parameter handler error event_case_address blackboard in 
+                     let pointer = case.dynamic.pointer_previous in 
+                     let eid = 
+                       let rec scan_down pointer =
+                         let prev_event_case_address = 
+                           {event_case_address with row_short_event_id = pointer}
                          in 
-                         match 
-                           eid 
-                         with 
-                           | None -> q 
-                           | Some prev_eid -> prev_eid::q)
-                       q 
-                       list 
-                 in 
-                   aux error q 
-               end 
-           end
+                         let error,prev_case = get_case parameter handler error prev_event_case_address blackboard in 
+                         let prev_eid = prev_case.static.event_id in 
+                         if is_null_pointer prev_eid 
+                         then None 
+                         else 
+                           if PB.is_unknown prev_case.static.action 
+                           then 
+                             let pointer = prev_case.dynamic.pointer_previous in 
+                             scan_down pointer 
+                           else Some prev_eid 
+                       in 
+                       scan_down pointer 
+                     in 
+                     match 
+                       eid 
+                     with 
+                       | None -> q 
+                       | Some prev_eid -> 
+                         let bool = 
+                           try 
+                             PB.A.get event_array prev_eid 
+                           with 
+                             | _ -> false 
+                         in 
+                         let q = 
+                           if 
+                             bool 
+                           then 
+                             q
+                           else 
+                             let _ = PB.A.set event_array prev_eid true in 
+                             prev_eid::q
+                         in q)
+                   q 
+                   list 
+               in 
+               aux error q 
+           end 
      in 
      let error = aux error list in 
-     let rep = ref [] in 
-     let rep2 = ref [] in 
-     let _ = 
-       PB.A.iteri 
-         (fun i bool -> 
-           if bool then (rep2:=i::(!rep2)) 
-           else rep:=i::(!rep))
-         p_id_array 
-     in 
-     let rep3 = ref [] in 
+     let event_to_keep = ref [] in 
+     let event_to_remove = ref [] in 
      let _ = 
        PB.A.iteri 
          (fun i value -> 
            if value 
-           then rep3:=(i:PB.step_id)::(!rep3)
+           then 
+             event_to_keep:=i::(!event_to_keep)
+           else 
+             event_to_remove:=i::(!event_to_remove)
          )
          event_array 
      in 
-     let rep3 = List.rev_map (fun k -> PB.A.get blackboard.event k,PB.K.empty_side_effect) (!rep3) in 
-     error,!rep,!rep2,rep3
+     let rep  = List.rev_map (fun k -> PB.A.get blackboard.event k,PB.K.empty_side_effect) (!event_to_keep) in
+     error,rep,!event_to_remove 
        
-   let cut_predicate_id parameter handler error blackboard p_id = 
-     overwrite parameter handler error (N_unresolved_events_in_column p_id) (Counter 0) blackboard 
+(*   let cut_predicate_id parameter handler error blackboard p_id = 
+     overwrite parameter handler error (N_unresolved_events_in_column p_id) (Counter 0) blackboard *)
        
-   let cut_event_id parameter handler error blackboard n_event = 
-     overwrite parameter handler error N_unresolved_events (Counter n_event) blackboard 
+(*   let cut_event_id parameter handler error blackboard n_event = 
+     overwrite parameter handler error N_unresolved_events (Counter n_event) blackboard *)
      
-   let count_event_of_p_id_list parameter handler error blackboard obs_list list_p_id = 
+(*   let count_event_of_p_id_list parameter handler error blackboard obs_list list_p_id = 
      let n_events = blackboard.n_eid in  
      let event_array = PB.A.make n_events false in
      let _ = List.iter (fun i -> PB.A.set event_array i true) obs_list in 
@@ -1138,15 +1150,20 @@ module Blackboard =
            else 
              error,counter,list
          in error,counter,list)
-       (error,res,obs_list) list_p_id  
+       (error,res,obs_list) list_p_id  *)
 
 
    let cut parameter handler error blackboard list = 
-     let error,p_id_list_to_cut,p_id_list_to_keep,cut_causal_flow  = useless_predicate_id parameter handler error blackboard list in 
+     let error,cut_causal_flow,events_to_remove  = useless_predicate_id parameter handler error blackboard list in 
+     error,blackboard,cut_causal_flow,events_to_remove 
+
+
+(*
      if parameter.PB.K.H.compression_mode.Parameter.weak_compression = false && parameter.PB.K.H.compression_mode.Parameter.strong_compression = false 
      then 
-       error,blackboard,cut_causal_flow 
+       error,blackboard,cut_causal_flow,[]
      else 
+       error,blackboard,cut_caus
        let error,int,event_list = count_event_of_p_id_list parameter handler error blackboard list p_id_list_to_keep in
        let event_list = List.sort compare  event_list in 
        let error,blackboard = cut_event_id parameter handler error blackboard int in 
@@ -1160,7 +1177,7 @@ module Blackboard =
        error,blackboard,cut_causal_flow 
 
   
-
+*)
   
 
    end:Blackboard)

@@ -15,7 +15,7 @@ let backtrace = ref false
 let (rescale:int option ref) = ref None
 let eclipseMode = ref false
 let useColor = ref true
-let cache_size = ref (None:int option) 
+let cache_size = ref (Some 1) (*(None:int option) *)
 
 (*User definable values*)
 let (maxEventValue:int option ref) = ref None
@@ -28,8 +28,8 @@ let implicitSignature = ref false
 let dotOutput = ref false
 let fluxModeOn = ref false
 let snapshotHighres = ref true
-let causalModeOn = ref false
-let weakcompressionModeOn = ref false 
+let causalModeOn = ref true
+let weakcompressionModeOn = ref true 
 
 (*Computed values*)
 let (timeIncrementValue:float option ref) = ref None
@@ -105,7 +105,7 @@ let get_compression_mode () =
     strong_compression=false;
   }
 
-let get_causal_trace x = x.causal_trace
+let get_causal_trace x = x.causal_trace 
 let get_causal_trace_only x = not (x.weak_compression or x.strong_compression)
 let get_weak_compression x = x.weak_compression
 let get_strong_compression x = x.strong_compression
