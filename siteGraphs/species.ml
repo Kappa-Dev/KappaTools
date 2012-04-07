@@ -53,7 +53,7 @@ let to_dot hr palette k cpt spec desc env =
 	let bonds = 
 		IntMap.fold
 		(fun i node bonds ->
-			let label = (Environment.name (Node.name node) env)
+			let label = Node.label node env
 			in
 			Printf.fprintf desc "\tnode%d_%d [label = \"%s\", color = \"%s\", style=filled];\n" cpt i label (get_color label)  ; 
 			Printf.fprintf desc "\tnode%d_%d -> counter%d [style=invis];\n" cpt i cpt ; 

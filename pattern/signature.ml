@@ -97,10 +97,11 @@ let create ag_name intf_map =
 								in
 									Some (ar_site,map_site)
 				in 
+					let cpt,cpt' = if site_name = "_" then (0,cpt) else (cpt,cpt+1) in (*making sure that "_" gets assigned to 0*)
 					assoc.(cpt) <- (site_name,ar_opt) ;
-					(cpt+1,StringMap.add site_name cpt num_of_site_name)
+					(cpt',StringMap.add site_name cpt num_of_site_name)
 			)
-			intf_map (0,StringMap.empty)
+			intf_map (1,StringMap.empty)
 		in
 			 {control = ag_name ; assoc = assoc ; num_of_site = num_of_site}
 

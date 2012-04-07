@@ -141,7 +141,8 @@ let eval_agent is_pattern tolerate_new_state env a ctxt =
 		| Some s -> (env,s)
 		| None ->
 			if !Parameter.implicitSignature then 
-				let sign = Signature.create name_id (StringMap.add "_" ([], Ast.FREE, no_pos) StringMap.empty) in (Environment.declare_sig sign pos_ag env,sign)
+				let sign = Signature.create name_id (StringMap.add "_" ([], Ast.FREE, no_pos) StringMap.empty) in 
+				(Environment.declare_sig sign pos_ag env,sign)
 			else 	
 				raise	(ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared")) 
 	in
@@ -256,7 +257,7 @@ let eval_agent is_pattern tolerate_new_state env a ctxt =
 
 (* returns partial evaluation of rate expression and a boolean that is set *)
 (* to true if partial evaluation is a constant function                    *)
-let rec partial_eval_alg env ast =
+let rec partial_eval_alg ?(reduce_const=false) env ast =
 	let bin_op ast ast' pos op op_str =
 		let (f1, const1, dep1, lbl1) = partial_eval_alg env ast
 		
@@ -313,7 +314,9 @@ let rec partial_eval_alg env ast =
 							in
 							let v,is_const,dep =
 								match const with
-									| Some c -> ((fun _ _ _ _ _ _ -> c),true,DepSet.empty)
+									| Some c -> 
+										if reduce_const then ((fun _ _ _ _ _ _ -> c),true,DepSet.singleton (Mods.ALG i))
+										else ((fun _ v _ _ _ _ -> v i),false,DepSet.singleton (Mods.ALG i))
 									| None -> ((fun _ v _ _ _ _ -> v i),false,DepSet.singleton (Mods.ALG i))
 							in
 							(v,is_const,dep,("'" ^ (lab ^ "'")))
@@ -478,7 +481,9 @@ let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take 
 	let env = if Mixture.is_empty lhs then Environment.declare_empty_lhs r_id env else env in
 	let env =
 		DepSet.fold
-			(fun dep env -> Environment.add_dependencies dep (RULE r_id) env)
+			(fun dep env ->
+				(*Printf.printf "rule %d depends on %s\n" r_id (Mods.string_of_dep dep) ; *)
+				Environment.add_dependencies dep (RULE r_id) env)
 			(DepSet.union dep dep_alt) env
 	in
 	let pre_causal = Dynamics.compute_causal lhs rhs script env in
@@ -676,22 +681,25 @@ let effects_of_modif variables env ast =
 				Printf.sprintf "remove %s * %s" str (Mixture.to_kappa false m env)
 			in ((m :: variables), (Dynamics.DELETE (v, m)), str, env)
 	| UPDATE (nme, pos_rule, alg_expr, pos_pert) ->
-			let i =
-				(try Environment.num_of_rule nme env
+			let i,is_rule =
+				(try (Environment.num_of_rule nme env,true)
 				with
 				| Not_found ->
-						raise
-							(ExceptionDefn.Semantics_Error (pos_rule,
-									"Rule " ^ (nme ^ " is not declared"))))
-			
+					try
+						let (i,_) = Environment.num_of_alg nme env in (i,false)
+					with Not_found -> raise (ExceptionDefn.Semantics_Error (pos_rule,"Variable " ^ (nme ^ " is neither a constant nor a rule")))
+				)
 			and (x, is_constant, dep, str) = partial_eval_alg env alg_expr in
 			let v =
 				if is_constant
 				then Dynamics.CONST (close_var x)
 				else Dynamics.VAR x in
 			let str =
-				Printf.sprintf "set rate of rule '%s' to %s"
-					(Environment.rule_of_num i env) str
+				if is_rule then
+					Printf.sprintf "set rate of rule '%s' to %s" (Environment.rule_of_num i env) str
+				else
+					let v_str,_ = Environment.alg_of_num i env in
+				Printf.sprintf "set variable '%s' to %s" v_str str
 			in (variables, (Dynamics.UPDATE (i, v)), str, env)
 	| SNAPSHOT (opt,pos) -> (*when specializing snapshots to particular mixtures, add variables below*)
 		let str = "snapshot state" in
@@ -713,8 +721,30 @@ let effects_of_modif variables env ast =
 		let id = try Environment.num_of_rule lab env with Not_found -> try Environment.num_of_kappa lab env with Not_found ->
 			raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
 		in
-		let str = Printf.sprintf "Causality analysis of %s" lab in
+		let str = Printf.sprintf "Enable causality analysis of %s" lab in
 		(variables, Dynamics.CFLOW id, str, env)
+	| CFLOWOFF (lab,pos_lab,pos_pert) ->
+		let id = try Environment.num_of_rule lab env with Not_found -> try Environment.num_of_kappa lab env with Not_found ->
+			raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
+		in
+		let str = Printf.sprintf "Disable causality analysis of %s" lab in
+		(variables, Dynamics.CFLOWOFF id, str, env)
+	| FLUX (lab,pos) ->
+		let nme =
+			match lab with
+				| None -> None
+				| Some (nme,_) -> Some nme
+		in
+		let str = "Activate flux tracking" in
+		(variables,Dynamics.FLUX nme, str, env)
+	| FLUXOFF (lab,pos) ->
+		let nme =
+			match lab with
+				| None -> None
+				| Some (nme,_) -> Some nme
+		in
+		let str = "Disable flux tracking" in
+		(variables,Dynamics.FLUXOFF nme, str, env)
 
 let pert_of_result variables env res =
 	let (variables, lpert, lrules, env) =
@@ -832,13 +862,8 @@ let pert_of_result variables env res =
 							)
 							dep env
 						in 
-						let _ =
-							match opt_abort with
-								| Some _ -> ()
-								| None -> ExceptionDefn.warning ~with_pos:pos "Causality mode is enabled at a single event, \"until\" condition is probably missing." 
-						in
 						(env,None) 
-					| Dynamics.UPDATE _ | Dynamics.SNAPSHOT _ | Dynamics.STOP _ -> 
+					| Dynamics.UPDATE _ | Dynamics.SNAPSHOT _ | Dynamics.STOP _ | Dynamics.FLUX _ | Dynamics.FLUXOFF _ | Dynamics.CFLOWOFF _ -> 
 						let env =
 							DepSet.fold
 							(fun dep env -> Environment.add_dependencies dep (Mods.PERT p_id) env
@@ -881,11 +906,12 @@ let init_graph_of_result env res =
 			let cpt = ref 0
 			and sg = ref sg
 			and env = ref env
-			and (v, is_const, dep, lbl) = partial_eval_alg env alg
+			and (v, is_const, dep, lbl) = partial_eval_alg ~reduce_const:true env alg
 			in
+			(*
 			if not is_const then raise (ExceptionDefn.Semantics_Error (pos, Printf.sprintf "%s is not a constant, cannot initialize graph." lbl))
-			else
-				let n = match !Parameter.rescale with None -> int_of_float (close_var v) | Some i -> min i (int_of_float (close_var v)) in
+			else*)
+			let n = match !Parameter.rescale with None -> int_of_float (close_var v) | Some i -> min i (int_of_float (close_var v)) in
 				(* Cannot do Mixture.to_nodes env m once for all because of        *)
 				(* references                                                      *)
 				while !cpt < n do
@@ -948,6 +974,14 @@ let configurations_of_result result =
 						| "false" -> Parameter.useColor := false 
 						| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Value %s should be either \"true\" or \"false\"" error))
 				end
+			| "dumpInfluenceMap" ->
+				begin
+					match value with 
+						| "true" -> if !Parameter.influenceFileName = "" then Parameter.influenceFileName := "im.dot" 
+						| "false" -> Parameter.influenceFileName := "" 
+						| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Value %s should be either \"true\" or \"false\"" error))
+				end
+			| "InfluenceMapFileName" -> Parameter.influenceFileName := value	
 			| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Unkown parameter %s" error))		  
 	) result.configurations 
 	

@@ -135,13 +135,28 @@ let apply_effect p_id pert state counter env =
 									tracked := tracked'@(!tracked)
 					done ;
 					(!envr,!st,!pert_ids,!tracked)
-			| UPDATE (r_id,v) -> 
-				if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Updating rate of rule '%s'" (Environment.rule_of_num r_id env)) ;
-				let r = State.rule_of_id r_id state in
-					Hashtbl.replace state.rules r_id {r with k_def = v} ;
-					State.update_activity state (-1) r_id counter env ;		
-					let env,pert_ids = State.update_dep state (RULE r_id) IntSet.empty counter env in
-					(env,state ,pert_ids,[])
+			| UPDATE (id,v) -> 
+				let _ =
+					if !Parameter.debugModeOn then 
+						(if Environment.is_rule id env then 
+							Debug.tag (Printf.sprintf "Updating rate of rule '%s'" (Environment.rule_of_num id env)) 
+						else Debug.tag (Printf.sprintf "Updating variable '%s'" ((fun (x,_)->x) (Environment.alg_of_num id env)) ))
+				in
+				let value = State.value state ~var:v (-1) counter env in (*Change here if one wants to have address passing style of assignation*)
+				if Environment.is_rule id env then
+					begin
+						let r = State.rule_of_id id state in
+							Hashtbl.replace state.rules id {r with k_def = Dynamics.CONST value} ;
+							State.update_activity state p_id id counter env ;		
+							let env,pert_ids = State.update_dep state (RULE id) IntSet.empty counter env in
+							(env,state ,pert_ids,[])
+					end
+				else (*updating a variable*)
+					begin
+						State.set_variable id value state ;
+						let env,pert_ids = State.update_dep state (ALG id) IntSet.empty counter env in
+						(env,state,pert_ids,[]) 
+					end
 			| SNAPSHOT opt -> (snapshot opt ; (env, state ,IntSet.empty,[]))
 			| CFLOW id -> 
 				if !Parameter.debugModeOn then Debug.tag "Tracking causality" ;
@@ -149,11 +164,39 @@ let apply_effect p_id pert state counter env =
 				let env = if Environment.is_tracked id env then env else Environment.inc_active_cflows env in 
 				let env = Environment.track id env in
 				(env, state, IntSet.empty,[])
+			| CFLOWOFF id ->
+				begin
+					let env = Environment.dec_active_cflows env in
+					let env = Environment.untrack id env in
+					if Environment.active_cflows env = 0 then Parameter.causalModeOn := false ;
+					(env,state,IntSet.empty,[])
+				end
+			| FLUXOFF opt ->
+				begin
+					let desc = match opt with None -> open_out !Parameter.fluxFileName | Some nme -> open_out nme in
+					Parameter.add_out_desc desc ;
+					State.dot_of_flux desc state env ;
+					close_out desc ;
+					Parameter.openOutDescriptors := List.tl (!Parameter.openOutDescriptors) ;
+					Parameter.fluxModeOn := false ;
+					(env,state,IntSet.empty,[])
+				end
 			| STOP opt ->
 				(if !Parameter.debugModeOn then Debug.tag "Interrupting simulation now!" ;
 				snapshot opt ;
 				raise (ExceptionDefn.StopReached (Printf.sprintf "STOP instruction was satisfied at event %d" (Counter.event counter)))
 				)
+			| FLUX opt ->
+				begin
+					if !Parameter.fluxModeOn then ExceptionDefn.warning "Flux modes are overlapping" ;
+					Parameter.fluxModeOn := true ;
+					begin
+						match opt with
+							| None -> Parameter.fluxFileName := "flux"^"_"^(string_of_int (Counter.event counter))^".dot"
+							| Some nme -> Parameter.fluxFileName := nme
+					end ;
+					(env, state, IntSet.empty,[])
+				end
 				
 
 let rec try_perturbate state pert_ids counter env = 
@@ -175,16 +218,6 @@ let rec try_perturbate state pert_ids counter env =
 								let state,env = 
 									if eval_abort_pert true pert state counter env then 
 										(if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "***Aborting pert[%d]***" pert_id) ;
-										let env = 
-											match pert.effect with
-												| CFLOW _ ->
-													begin
-														let env = Environment.dec_active_cflows env in
-														if Environment.active_cflows env = 0 then Parameter.causalModeOn := false ;
-														env
-													end
-												| _ -> env
-										in
 										({state with perturbations = IntMap.remove pert_id state.perturbations},env) )
 									else
 										begin

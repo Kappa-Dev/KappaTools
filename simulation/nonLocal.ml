@@ -27,16 +27,21 @@ let update_intra_in_components r embedding_info state counter env =
 		let ext,modified = 
 			IntSet.fold
 			(fun u_id (extensions,modified) ->
+				if !Parameter.debugModeOn then (Printf.printf "looking for a piece of intra on lifts of node %d\n" u_id) ;
 				let u = try SiteGraph.node_of_id graph u_id with Not_found -> invalid_arg "NonLocal.search_elements"
 				in
-				let _,lifts = Node.get_lifts u 0 in 
+				let _,lifts = Node.get_lifts u 0 in (*BUG here site 0 is not always "_"*)
 				LiftSet.fold
 				(fun inj (extensions,modified) ->
 					if Injection.is_trashed inj then (extensions,modified) (*injection should not be already invalid...*)
 					else
 						let (mix_id,cc_id) = Injection.get_coordinate inj in
 						
-						if not (Environment.is_nl_rule mix_id env) then (extensions,modified)
+						if not (Environment.is_nl_rule mix_id env) then 
+							begin
+								if !Parameter.debugModeOn then Printf.printf "a lift points to rule %d but it is a local one\n" mix_id ;
+								(extensions,modified)
+							end
 						else
 							let inj_map = try IntMap.find mix_id extensions with Not_found -> IntMap.empty in
 							let inj_list = try IntMap.find cc_id inj_map with Not_found -> [] in

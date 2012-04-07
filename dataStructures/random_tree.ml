@@ -21,7 +21,7 @@ module Random_tree =
 			mutable new_mask : int ;
 			mutable inf_list : IntSet.t ;
 			size: int;
-			mutable total: float ;
+		(*	mutable total: float ; *)
 			weight_of_nodes: float array ;
 			weight_of_subtrees: float array ;
 			unbalanced_events_by_layer: int list array ;
@@ -40,8 +40,6 @@ module Random_tree =
 			         
 		let unmask t m = try Hashtbl.find t.unmask m with Not_found -> invalid_arg "Random_tree: incoherent hash"
 		
-		let total t = if IntSet.is_empty t.inf_list then t.total else infinity
-		
 		let find i t = let i = mask t i in t.weight_of_nodes.(i)
 		
 		let copy t = {
@@ -49,7 +47,7 @@ module Random_tree =
 			unmask = Hashtbl.copy t.unmask ;
 			new_mask = t.new_mask ;
 			size = t.size;
-			total = t.total ;
+		(*	total = t.total ;*)
 			weight_of_nodes = Array.copy t.weight_of_nodes ;
 			weight_of_subtrees = Array.copy t.weight_of_subtrees ;
 			layer = Array.copy t.layer;
@@ -132,7 +130,7 @@ module Random_tree =
 			let unbalanced_events_by_layer = Array.create (layer.(n) + 1) [] in
 			let unbalanced_events = Array.create (n + 1) false in
 			{ size = n;
-				total = 0.;
+			(*	total = 0.;*)
 				new_mask = 1 ;
 				mask = Hashtbl.create (n+1) ;
 				unmask = Hashtbl.create (n+1) ;
@@ -167,11 +165,11 @@ module Random_tree =
 				if w = infinity then (t.inf_list <- IntSet.add i t.inf_list ; 0.)
 				else (t.inf_list <- IntSet.remove i t.inf_list ; w)
 			in 
-			let total = t.total -. t.weight_of_nodes.(i) +. w in
+		(*	let total = t.total -. t.weight_of_nodes.(i) +. w in*)
 			let _ = t.weight_of_nodes.(i) <- w
 			and _ = declare_unbalanced i t
 			in
-			t.total <- (max 0.0 total)
+			() (*t.total <- (max 0.0 total) (*not satisfactory*)*)
 		
 		let random t =
 			try (unmask t (IntSet.choose t.inf_list),infinity) 
@@ -199,4 +197,14 @@ module Random_tree =
 					let rep,w = find 1 r in
 					(unmask t rep,w)
 		
+                let total t = 
+                  if IntSet.is_empty t.inf_list 
+                  then 
+                    begin 
+                      let t = update_structure t in 
+                      t.weight_of_subtrees.(1)
+                    end 
+                  else 
+                    infinity
+
 	end: Random_tree)

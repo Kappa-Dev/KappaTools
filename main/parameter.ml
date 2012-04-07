@@ -10,7 +10,7 @@ let progressBarSymbol = ref '#'
 let progressBarSize = ref 60
 let plotSepChar = ref ' '
 let dumpIfDeadlocked = ref false
-let maxConsecutiveClash = ref 2
+let maxConsecutiveClash = ref 10
 let backtrace = ref false
 let (rescale:int option ref) = ref None
 let eclipseMode = ref false
@@ -89,8 +89,6 @@ let (openInDescriptors:in_channel list ref) = ref []
 let add_out_desc d = openOutDescriptors := d::!openOutDescriptors  
 let add_in_desc d = openInDescriptors := d::!openInDescriptors  
 
-(*Profiling*)
-(*let profiling:Profiling.t = Profiling.create 10*) 
 type compression_mode = 
     { 
       causal_trace:bool;

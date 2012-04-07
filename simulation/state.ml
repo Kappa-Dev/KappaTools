@@ -25,7 +25,7 @@ and component_injections = (InjectionHeap.t option) array
 and obs = { label : string; expr : Dynamics.variable }
 
 let silence rule_id state = state.silenced <- (IntSet.add rule_id state.silenced)
-
+			
 let kappa_of_id id state =
 	try
 		match state.kappa_variables.(id) with
@@ -85,7 +85,7 @@ let instance_number mix_id state env =
 				Array.fold_left
 					(fun act opt ->
 								match opt with
-								| Some injs -> act *. (float_of_int (InjectionHeap.size injs))
+								| Some injs -> let n = InjectionHeap.size injs in if n=0 then 0. else act *. (float_of_int n)
 								| None -> 0.
 					)
 					1. component_injections
@@ -155,8 +155,8 @@ let instances_of_square ?(disjoint=false) mix_id state env =
 			if is_connex  then cont else (embedding,codomain,inj_list)::cont
 		) [] embeddings 
 
-let rec value state var_id counter env =
-	let var_opt = try Some (alg_of_id var_id state) with | Not_found -> None
+let rec value state ?var var_id counter env =
+	let var_opt = match var with Some v -> Some v | None -> (try Some (alg_of_id var_id state) with | Not_found -> None)
 	in
 	match var_opt with
 	| None ->
@@ -172,6 +172,11 @@ let rec value state var_id counter env =
 						v_fun act_of_id v_of_var (Counter.time counter)
 							(Counter.event counter) (Counter.null_event counter) (Sys.time())
 			)
+
+(*missing recomputation of dependencies*)
+let set_variable id v state =
+	try state.alg_variables.(id) <- Some (Dynamics.CONST v) with Invalid_argument msg -> invalid_arg ("State.set_variable: "^msg)
+
 
 (**[eval_activity rule state] returns the evaluation of the overestimated activity of rule [rule] in implicit state [state]*)
 let eval_activity ?using rule state counter env =
@@ -553,7 +558,7 @@ let check_validity injprod with_full_components state counter env =
 		let (is_connex,d_map,components,_) = connex roots with_full_components state env in
 		if is_connex then 
 			(
-			clean_injprod injprod state counter env ; (*removing non local injection because it will be applied*)
+			(*clean_injprod injprod state counter env ; (*removing non local injection because it will be applied*) *)
 			{map = embedding ; components = Some (IntMap.add 0 components IntMap.empty) ; depth_map = Some d_map ; roots = roots}
 			)
 		else 
@@ -793,7 +798,7 @@ let rec update_dep state dep_in pert_ids counter env =
 				Environment.get_dependencies (Mods.ALG v_id) env
 			in
 			begin
-				if !Parameter.debugModeOn then 
+				if !Parameter.debugModeOn then
 					Debug.tag 
 					(Printf.sprintf "Variable %d is changed, updating %s" v_id (string_of_set Mods.string_of_dep DepSet.fold depset)) 
 			end;
@@ -1367,12 +1372,14 @@ let dot_of_flux desc state  env =
 			in
 			IntMap.iter
 			(fun r_id' n ->
+				if n=0. then () 
+				else
 				let color,arrowhead,edge = 
 					if n<0. then ("red3","tee","filled") 
 					else ("green3","normal","filled") 
 				in 
 				let str2 = try Environment.rule_of_num r_id' env with Not_found -> Dynamics.to_kappa (rule_of_id r_id' state) env in
-				Printf.fprintf desc "\"%s\" -> \"%s\" [weight=%d,label=\"%.3f\",color=%s,arrowhead=%s];\n" str1 str2 (int_of_float (n *. n)) n color arrowhead
+				Printf.fprintf desc "\"%s\" -> \"%s\" [weight=%d,label=\"%.3f\",color=%s,arrowhead=%s];\n" str1 str2 (abs (int_of_float n)) n color arrowhead
 			) map 
 		) flux 
 	in

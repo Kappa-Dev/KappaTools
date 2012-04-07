@@ -3,9 +3,9 @@
 
 %token EOF NEWLINE 
 %token AT OP_PAR CL_PAR COMMA DOT KAPPA_LNK 
-%token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE SET DO UNTIL TRUE FALSE REF OBS KAPPA_RAR TRACK CPUTIME CONFIG
+%token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE SET DO UNTIL TRUE FALSE OBS KAPPA_RAR TRACK CPUTIME CONFIG
 %token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INFINITY TIME EVENT NULL_EVENT PROD_EVENT INIT LET DIV PLOT SINUS COSINUS TAN SQRT EXPONENT POW ABS MODULO 
-%token <Tools.pos> EMAX TMAX
+%token <Tools.pos> EMAX TMAX FLUX ENABLE DISABLE ASSIGN
 %token <int*Tools.pos> INT 
 %token <string*Tools.pos> ID LABEL KAPPA_MRK 
 %token <int> DOT_RADIUS PLUS_RADIUS 
@@ -89,11 +89,29 @@ instruction:
 	{Ast.PLOT $2}
 | PLOT error 
 	{raise (ExceptionDefn.Syntax_Error "Malformed plot instruction, I was expecting an algebraic expression of variables")}
-| PERT bool_expr DO modif_expr 
+| PERT bool_expr DO one_shot_effect 
 	{Ast.PERT ($2,$4,$1,None)}
-| PERT bool_expr DO modif_expr UNTIL bool_expr
+| PERT bool_expr DO one_shot_effect UNTIL bool_expr
 	{Ast.PERT ($2,$4,$1,Some $6)}
-| CONFIG FILENAME FILENAME {let param_name,pos_p = $2 and value,pos_v = $3 in Ast.CONFIG (param_name,pos_p,value,pos_v)} 
+| CONFIG FILENAME FILENAME 
+	{let param_name,pos_p = $2 and value,pos_v = $3 in Ast.CONFIG (param_name,pos_p,value,pos_v)} 
+| PERT bool_expr SET perm_effect
+	{Ast.PERT ($2,$4,$1,None)}
+;
+
+perm_effect:
+| OP_PAR perm_effect CL_PAR {$2}
+| ASSIGN LABEL alg_expr 
+	{let lab,pos_lab = $2 in Ast.UPDATE (lab,pos_lab,$3,$1)}
+| TRACK LABEL boolean 
+	{let ast = if $3 then (fun x -> Ast.CFLOW x) else (fun x -> Ast.CFLOWOFF x) in let lab,pos_lab = $2 in ast (lab,pos_lab,$1)}
+| FLUX fic_label boolean 
+	{let ast = if $3 then (fun (x,y) -> Ast.FLUX (x,y)) else (fun (x,y) -> Ast.FLUXOFF (x,y)) in ast ($2,$1)}
+;
+
+boolean:
+| TRUE {true}
+| FALSE {false}
 ;
 
 variable_declaration:
@@ -130,8 +148,8 @@ bool_expr:
 ;
 
 
-modif_expr:
-| OP_PAR modif_expr CL_PAR  
+one_shot_effect:
+| OP_PAR one_shot_effect CL_PAR  
 	{$2}
 | INTRO multiple_mixture 
 	{let (alg,mix) = $2 in Ast.INTRO (alg,mix,$1)}
@@ -141,13 +159,11 @@ modif_expr:
 	{let (alg,mix) = $2 in Ast.DELETE (alg,mix,$1)}
 | DELETE error
 	{raise (ExceptionDefn.Syntax_Error "Malformed perturbation instruction, I was expecting '$DEL alg_expression kappa_expression'")}
-| LABEL SET alg_expr 
-	{let lab,pos_lab = $1 in Ast.UPDATE (lab,pos_lab,$3,$2)}
 | SNAPSHOT fic_label
 	{Ast.SNAPSHOT ($2,$1)}
 | STOP fic_label
 	{Ast.STOP ($2,$1)}
-| TRACK LABEL {let lab,pos_lab = $2 in Ast.CFLOW (lab,pos_lab,$1)}
+
 ;
 
 fic_label:
