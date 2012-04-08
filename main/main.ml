@@ -72,11 +72,11 @@ let main =
 			| Some seed -> Random.init seed
 			| None ->
 					begin
-						Printf.printf "+Self seeding...\n" ;
+						Printf.printf "+ Self seeding...\n" ;
 						Random.self_init() ;
 						let i = Random.bits () in
 						Random.init i ;
-						Printf.printf "+Initialized random number generator with seed %d\n" i
+						Printf.printf "+ Initialized random number generator with seed %d\n" i
 					end
 		in
 		

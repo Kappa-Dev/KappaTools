@@ -135,6 +135,7 @@ struct
 							if IntSet.exists (fun id -> IntMap.mem id dist_map')	interrupt_with then (is_connex,dist_map',component,remaining_roots)
 							else iter check_connex remaining_roots to_do' dist_map' component is_connex)
 		in 
+		
 		let check_connex,roots = match check_connex with None -> (false,IntSet.empty) | Some set -> (true,set) in
 		
 		try iter check_connex roots [ id ] (IntMap.add id 0 d_map) IntSet.empty false with Is_connex -> (true,IntMap.empty,IntSet.empty,IntSet.empty)
