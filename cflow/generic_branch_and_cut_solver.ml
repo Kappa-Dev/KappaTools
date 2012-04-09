@@ -69,14 +69,7 @@ struct
     match list 
     with 
 	  | [] ->
-             let n = (PH.B.get_n_unresolved_events blackboard) in 
-             let _ =
-               if n mod 10000 = 0 then 
-                 let _ = Printf.fprintf parameter.PH.B.PB.K.H.out_channel_err "Fail %i \n" (PH.B.get_n_unresolved_events blackboard) in 
-                 let _ = flush parameter.PH.B.PB.K.H.out_channel_err
-                 in ()
-             in 
-                 error,blackboard,PH.B.fail
+            error,blackboard,PH.B.fail
 	  | head::tail -> 
 	    begin
 	      let error,blackboard = PH.B.branch parameter handler error blackboard in
@@ -90,7 +83,6 @@ struct
                 if PH.B.is_failed output 
                 then 
                   let error,blackboard = PH.B.reset_last_branching parameter handler error blackboard in 
-                  let _ = Printf.fprintf parameter.PH.B.PB.K.H.out_channel_err "FAIL\n" in 
                   branch_over_assumption_list parameter handler error tail blackboard 
                 else 
                   error,blackboard,output 
