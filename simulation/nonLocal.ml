@@ -71,7 +71,15 @@ let update_intra_in_components r embedding_info state counter env =
 					if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Exploring into image of CC[%d] computed during rule %d application" cc_i r.r_id)
 	 			in
 				let component_i = 
-					try IntMap.find root components with Not_found -> invalid_arg "nl_pos_upd"
+					try IntMap.find root components with 
+						| Not_found -> 
+							(Debug.tag 
+							(Printf.sprintf "root %d (= phi(%d)) not found in %s" root (match Mixture.root_of_cc r.lhs cc_i with Some r -> r)
+								(Tools.string_of_map string_of_int (Tools.string_of_set string_of_int IntSet.fold) 
+								IntMap.fold 
+								components
+								)
+							); invalid_arg "nl_pos_upd")
 				in
 				if !Parameter.debugModeOn then Debug.tag (Tools.string_of_set string_of_int IntSet.fold component_i) ;
 				let opt = search_elements state.graph component_i extensions env

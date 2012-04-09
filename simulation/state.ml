@@ -144,11 +144,17 @@ let instances_of_square ?(disjoint=false) mix_id state env =
 	(*let embeddings = List.fold_left (fun cont l -> l@cont) [] embeddings in *)
 	if not disjoint then embeddings
 	else
+		let mix = kappa_of_id mix_id state in
 		List.fold_left 
 		(fun cont (embedding,codomain,inj_list) ->
 			let roots = 
 				List.fold_left 
-				(fun set inj -> match Injection.root_image inj with None -> invalid_arg "State.instances_of_square" | Some (_,u_i) -> IntSet.add u_i set
+				(fun set inj -> 
+					let _,cc_id = Injection.get_coordinate inj in 
+					let u_i = match Mixture.root_of_cc mix cc_id with None -> invalid_arg "State.instances_of_square" | Some a_i -> Injection.find a_i inj
+					in
+					IntSet.add u_i set
+					(*match Injection.root_image inj with None -> invalid_arg "State.instances_of_square" | Some (_,u_i) -> IntSet.add u_i set*)
 				) IntSet.empty inj_list 
 			in
 			let (is_connex,_,_,_) = connex roots false state env in
@@ -551,14 +557,19 @@ let check_validity injprod with_full_components state counter env =
 							in
 							(map,codom)
 						) inj_i (embedding,codom) in
-					let roots = match (Injection.root_image inj_i) with None -> invalid_arg "State.check_validity" | Some (_,u_i) -> IntSet.add u_i roots in
+					let roots =
+						let mix_id,cc_id = Injection.get_coordinate inj_i in
+						let mix = kappa_of_id mix_id state in
+						let u_i = match Mixture.root_of_cc mix cc_id with None -> invalid_arg "State.check_validity" | Some a_i -> Injection.find a_i inj_i in
+						IntSet.add u_i roots
+						(*match (Injection.root_image inj_i) with None -> invalid_arg "State.check_validity" | Some (_,u_i) -> IntSet.add u_i roots in*)
+					in
 					(map,roots,codom)
 			) (IntMap.empty,IntSet.empty,IntSet.empty) injprod
 		in
 		let (is_connex,d_map,components,_) = connex roots with_full_components state env in
 		if is_connex then 
 			(
-			(*clean_injprod injprod state counter env ; (*removing non local injection because it will be applied*) *)
 			{map = embedding ; components = Some (IntMap.add 0 components IntMap.empty) ; depth_map = Some d_map ; roots = roots}
 			)
 		else 
@@ -619,7 +630,14 @@ let select_injection (a2,a1) state mix counter env =
 									| Some injheap ->
 											(try
 												let inj = InjectionHeap.random injheap in
-												let roots = match Injection.root_image inj with None -> invalid_arg "State.select_binary" | Some (_,u_i) -> IntSet.add u_i roots in
+												let roots = 
+													let mix_id,cc_id = Injection.get_coordinate inj in
+													let mix = kappa_of_id mix_id state in
+													let u_i = match Mixture.root_of_cc mix cc_id with None -> invalid_arg "State.select_binary" | Some a_i -> Injection.find a_i inj 
+													in
+													IntSet.add u_i roots
+												in
+													(*match Injection.root_image inj with None -> invalid_arg "State.select_binary" | Some (_,u_i) -> IntSet.add u_i roots in*)
 												let total_inj,total_cod =
 													try Injection.codomain inj (total_inj,total_cod)
 													with 
