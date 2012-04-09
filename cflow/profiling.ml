@@ -25,13 +25,12 @@ module type StoryStats =
 
     val inc_removed_events: log_info -> log_info 
     val inc_selected_events: log_info -> log_info 
-    val dec_removed_events: log_info -> log_info 
-    val dec_selected_events: log_info -> log_info
 
-    val set_cut_events: log_info -> int -> log_info 
-    val set_n_kasim_events: log_info -> int -> log_info 
-    val set_n_init_events: log_info -> int -> log_info 
-    val set_n_side_events: log_info -> int -> log_info  
+    val inc_cut_events: log_info -> log_info 
+    val inc_n_kasim_events: log_info -> log_info 
+    val inc_n_init_events: log_info -> log_info 
+    val inc_n_side_events: log_info -> log_info 
+    val inc_n_obs_events: log_info -> log_info 
     val inc_stack: log_info -> log_info 
     val inc_branch: log_info -> log_info 
     val inc_cut: log_info -> log_info 
@@ -47,31 +46,40 @@ module type StoryStats =
     val ellapsed_global_time: log_info -> float
     val ellapsed_time: log_info -> float
     val init_log_info: unit -> log_info 
-
+      
+    val tick: log_info -> bool * log_info 
 
   end
 
 module StoryStats =
      (struct 
+       type stack_head = 
+           { 
+             current_branch : int ;
+             selected_events: int ;
+             remaining_events: int ;
+             removed_events: int ;
+             stack_size: int ;
+           }
+
        type log_info = 
            {
+             last_tick:float;
              global_start_time:float;
              story_start_time:float;
              propagation: int array;
              branch: int;
              cut: int; 
-             current_branch: int; 
              kasim_events: int;
              init_events: int;
+             obs_events: int;
              fictitious_events: int;
-             selected_events: int;
-             remaining_events: int;
-             removed_events: int;
              cut_events: int;
-             stack: int list;
-             stack_size: int;
+             stack: stack_head list ;
+             current_stack: stack_head ;
            }
              
+
      
        let propagation_labels = 
          [|
@@ -125,23 +133,28 @@ module StoryStats =
          { 
            global_start_time = time ;
            story_start_time = time ;
+           last_tick = time ;
            propagation = Array.make propagation_cases 0 ;
            branch = 0 ;
            cut = 0 ;
-           current_branch = 0 ; 
            kasim_events = 0 ;
            init_events = 0 ;
+           obs_events = 0 ;
            fictitious_events = 0 ;
-           selected_events = 0 ;
-           remaining_events = 0 ;
-           removed_events = 0 ;
+           current_stack = 
+             {
+               current_branch = 0 ;
+               selected_events = 0 ;
+               remaining_events = 0 ;
+               removed_events = 0 ;
+               stack_size = 0 
+             } ;
+           stack = [] ;
            cut_events = 0 ;
-           stack= [0] ;
-           stack_size = 0 ;
          }
 
        let dump_short_log log log_info = 
-         let _ = Printf.fprintf log "Remaining events: %i ; Stack size: %i ; Total branch: %i ; Total cut: %i ; Current depth: %i \n " log_info.remaining_events log_info.stack_size log_info.branch log_info.cut log_info.current_branch in 
+         let _ = Printf.fprintf log "Remaining events: %i ; Stack size: %i ; Total branch: %i ; Total cut: %i ; Current depth: %i \n " log_info.current_stack.remaining_events log_info.current_stack.stack_size log_info.branch log_info.cut log_info.current_stack.current_branch in 
          flush log
 
            
@@ -189,77 +202,99 @@ module StoryStats =
              { 
                log 
                with 
+                 current_stack = t ;
                  stack = q ;
                  cut = log.cut + 1;
-                 stack_size = log.stack_size - t ;
-                 current_branch = log.current_branch - 1 ; 
-            }
+             }
 
        let inc_stack log =
-         match 
-           log.stack 
-         with 
-           | [] -> log
-           | t::q -> 
-             {
-               log 
-              with 
-                stack = (t+1)::q ;
-                stack_size = log.stack_size + 1 ;
-             }
+         {
+           log 
+          with 
+            current_stack =
+             {log.current_stack with stack_size = log.current_stack.stack_size + 1 }
+         }
          
        let inc_branch log = 
          {
            log 
           with 
-            stack = 0::log.stack ;
-            branch = log.branch + 1
-         }
+            stack = log.current_stack::log.stack ;
+            branch = log.branch + 1;
+            current_stack = 
+             {log.current_stack 
+              with current_branch = log.current_stack.current_branch + 1}}
            
-       let set_n_kasim_events log i = 
-         { log with kasim_events = i}
+       let inc_n_kasim_events log = 
+         let old = log.kasim_events in 
+         { log with kasim_events = old + 1}
 
-       let set_n_side_events log i = 
-         { log with fictitious_events = i}
+       let inc_n_obs_events log = 
+         let old = log.obs_events in 
+         { log with obs_events = old + 1}
+           
+       let inc_n_side_events log = 
+         let old = log.fictitious_events in 
+         { log with fictitious_events = old+1}
 
-       let set_n_init_events log i = 
-         { log with init_events = i}
+       let inc_n_init_events log = 
+         let old = log.init_events in 
+         { log with init_events = old + 1}
 
-       let set_cut_events log i = 
-         { log with cut_events = i}
-
-       let dec_selected_events log = 
-         { log with selected_events = log.selected_events - 1}
-
-       let dec_removed_events log = 
-         { log with removed_events = log.removed_events - 1}
+       let inc_cut_events log = 
+         { log with cut_events = log.cut_events + 1}
 
        let inc_selected_events log = 
-         { log with selected_events = log.selected_events + 1}
+          { log 
+           with current_stack = 
+             {log.current_stack 
+              with selected_events = 
+                 log.current_stack.selected_events + 1
+             }
+         }
 
        let inc_removed_events log = 
-         { log with removed_events = log.removed_events + 1}
+         { log 
+           with current_stack = 
+             {log.current_stack 
+              with removed_events = 
+                 log.current_stack.removed_events + 1
+             }
+         }
 
            
        let dump_complete_log log log_info = 
+         let _ = Printf.fprintf log "/*\n" in 
          let _ = Printf.fprintf log "Story profiling\n" in 
          let _ = Printf.fprintf log "Ellapsed_time:     %f\n" (ellapsed_time log_info) in 
          let _ = Printf.fprintf log "KaSim events:      %i\n" log_info.kasim_events in 
          let _ = Printf.fprintf log "Init events:       %i\n" log_info.init_events in 
+         let _ = Printf.fprintf log "Obs events:        %i\n" log_info.obs_events in 
          let _ = Printf.fprintf log "Fictitious events: %i\n" log_info.fictitious_events in 
-         let _ = Printf.fprintf log "Selected events:   %i\n" log_info.selected_events in 
+         let _ = Printf.fprintf log "Cut events:        %i\n" log_info.cut_events in 
+         let _ = Printf.fprintf log "Selected events:   %i\n" log_info.current_stack.selected_events in 
+         let _ = Printf.fprintf log "Removed events:    %i\n" log_info.current_stack.removed_events in 
          let _ = Printf.fprintf log "***\nPropagation Hits:\n" in 
          let rec aux k = 
            if k>=propagation_cases 
            then () 
            else 
              let _ = 
-               Printf.fprintf log "   %s%i\n" propagation_labels.(k) log_info.propagation.(k)
+               Printf.fprintf log "   %s %i\n" propagation_labels.(k) log_info.propagation.(k)
              in aux (k+1)
          in 
          let _ = aux 1 in 
+         let _ = Printf.fprintf log "*/ \n" in 
          flush log
 
+       let tick log_info = 
+         let time = Sys.time () in 
+         if time-.log_info.last_tick > 10.
+         then 
+           true,{log_info with last_tick = time}
+         else
+           false,log_info
+               
 
       end:StoryStats)
            

@@ -118,21 +118,21 @@ let main =
 			end ;  
 		if !Parameter.compileModeOn then (Hashtbl.iter (fun i r -> Dynamics.dump r env) state.State.rules ; exit 0)
 		else () ;
+                let profiling = Compression_main.S.PH.B.PB.K.P.init_log_info () in 
 		let plot = Plot.create !Parameter.outputDataName
-		and grid,event_list = 
+		and grid,profiling,event_list = 
 			if Environment.tracking_enabled env then 
 				let grid = Causal.empty_grid() in 
                                 let event_list = [] in 
-                                (
-                                grid,
-                                Compression_main.S.PH.B.PB.K.store_init state event_list
-                                )
-			else (Causal.empty_grid(),[])
+                                let profiling,event_list = 
+                                Compression_main.S.PH.B.PB.K.store_init profiling state event_list in 
+                                grid,profiling,event_list
+                        else (Causal.empty_grid(),profiling,[])
 		in
 		ExceptionDefn.flush_warning () ; 
 		Parameter.initSimTime () ; 
 		try
-			Run.loop state grid event_list counter plot env ;
+			Run.loop state grid profiling event_list counter plot env ;
 			print_newline() ;
 			Printf.printf "Simulation ended (eff.: %f)\n" 
 			((float_of_int (Counter.event counter)) /. (float_of_int (Counter.null_event counter + Counter.event counter))) ;

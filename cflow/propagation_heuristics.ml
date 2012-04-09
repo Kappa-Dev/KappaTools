@@ -187,6 +187,11 @@ module Propagation_heuristic =
                             (* next event is selected *)
                             (* no test, no action in next event *)
                             (* we propagate the value after the next event*)
+                          let blackboard = 
+                            B.set_profiling_info  
+                              (B.PB.K.P.add_propagation_case_down 1) 
+                              blackboard 
+                          in 
                           error,
                           blackboard,
                           (Refine_value_after(next_event_case_address,predicate_value))::instruction_list,
@@ -207,6 +212,11 @@ module Propagation_heuristic =
                             (* next event is selected *)
                             (* no test, but an action in next event *)
                             (* nothing to propagate downward*)
+                           let blackboard = 
+                            B.set_profiling_info  
+                              (B.PB.K.P.add_propagation_case_down 2) 
+                              blackboard 
+                          in 
                           error,
                           blackboard,
                           instruction_list,
@@ -238,6 +248,11 @@ module Propagation_heuristic =
                               (* no action, but a test in next event *)
                               (* the test is compatible with the value *)
                               (* we propagate the meet of the test and the value before and after the next event *)
+                            let blackboard = 
+                              B.set_profiling_info  
+                                (B.PB.K.P.add_propagation_case_down 3) 
+                                blackboard 
+                            in 
                             error,
                             blackboard,
                             (Refine_value_before(next_event_case_address,conj))::(Refine_value_after(next_event_case_address,conj))::instruction_list,
@@ -256,6 +271,11 @@ module Propagation_heuristic =
                                 let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "\nCut\n" in 
                                 let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                                 () 
+                            in 
+                            let blackboard = 
+                              B.set_profiling_info  
+                                (B.PB.K.P.add_propagation_case_down 4) 
+                                blackboard 
                             in 
                               (* next event is selected *)
                               (* no action, but a test in next event *)
@@ -289,6 +309,11 @@ module Propagation_heuristic =
                                 let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                                 () 
                             in 
+                            let blackboard = 
+                               B.set_profiling_info  
+                                 (B.PB.K.P.add_propagation_case_down 5) 
+                                 blackboard 
+                            in 
                               (* next event is selected *)
                               (* an action and a test in next event *)
                               (* the test is compatible with the value *)
@@ -314,6 +339,11 @@ module Propagation_heuristic =
                                 let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "\nCut\n" in 
                                 let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                                 () 
+                            in 
+                            let blackboard = 
+                              B.set_profiling_info  
+                                (B.PB.K.P.add_propagation_case_down 6) 
+                                blackboard 
                             in 
                               (* next event is selected *)
                               (* an action and a test in next event *)
@@ -349,6 +379,11 @@ module Propagation_heuristic =
                                     let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                                     () 
                                 in 
+                                let blackboard = 
+                                  B.set_profiling_info  
+                                    (B.PB.K.P.add_propagation_case_down 7) 
+                                    blackboard 
+                                in 
                                   (* we do not know whether the event is played or not *)
                                   (*there is no test in the next event *)
                                   (* there is no action in the next event *)
@@ -378,6 +413,11 @@ module Propagation_heuristic =
                                       let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                                       () 
                                   in 
+                                  let blackboard = 
+                                    B.set_profiling_info  
+                                      (B.PB.K.P.add_propagation_case_down 8) 
+                                      blackboard 
+                                  in 
                                     (* we do not know whether the event is played or not *)
                                     (* there is a test in the next event *)
                                     (* there is no action in the next event *)
@@ -401,6 +441,11 @@ module Propagation_heuristic =
                                       let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "\nWe discard the next event (%i) \n" next_eid in 
                                       let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                                       () 
+                                  in 
+                                  let blackboard = 
+                                    B.set_profiling_info  
+                                      (B.PB.K.P.add_propagation_case_down 9) 
+                                      blackboard 
                                   in 
                                     (* we do not know whether the event is played or not *)
                                     (* there is a test in the next event *)
@@ -439,6 +484,11 @@ module Propagation_heuristic =
                                 let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                                 () 
                             in 
+                            let blackboard = 
+                              B.set_profiling_info  
+                                (B.PB.K.P.add_propagation_case_down 10) 
+                                blackboard 
+                            in 
                             (* we do not know whether the event is played or not *)
                             (* there is an action in the next event *)
                             (* the action is compatible with the value *)
@@ -472,6 +522,11 @@ module Propagation_heuristic =
                                         let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                                         () 
                                     in 
+                                    let blackboard = 
+                                      B.set_profiling_info  
+                                        (B.PB.K.P.add_propagation_case_down 11) 
+                                        blackboard 
+                                    in 
                                       (* we do not know whether the event is played or not *)
                                       (* there is no test in the next event *)
                                       (* there is an action in the next event *)
@@ -504,6 +559,11 @@ module Propagation_heuristic =
                                           let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                                           () 
                                       in 
+                                      let blackboard = 
+                                        B.set_profiling_info  
+                                          (B.PB.K.P.add_propagation_case_down 12) 
+                                          blackboard 
+                                      in 
                                         (* we do not know whether the event is played or not *)
                                         (* there is a test in the next event *)
                                         (* there is an action in the next event *)
@@ -531,7 +591,12 @@ module Propagation_heuristic =
                                           let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                                           () 
                                       in
-                                        (* we do not know whether the event is played or not *)
+                                      let blackboard = 
+                                        B.set_profiling_info  
+                                          (B.PB.K.P.add_propagation_case_down 13) 
+                                          blackboard 
+                                      in 
+                                      (* we do not know whether the event is played or not *)
                                         (* there is a test in the next event *)
                                         (* there is an action in the next event *)
                                         (* the test is not compatible with the value *)
@@ -554,7 +619,7 @@ module Propagation_heuristic =
         bool 
       with 
         | Some false -> 
-          error,false 
+          error,false,blackboard 
         | Some true ->
           begin 
             let error,(seid,eid,test,action) = B.get_static parameter handler error blackboard event_case_address in   
@@ -572,23 +637,35 @@ module Propagation_heuristic =
                    in 
                    if bool 
                    then 
-                     let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "SELECTED_by_LAST_CHANCE 1" in 
-                     let _ = flush parameter.B.PB.K.H.out_channel_err in 
-                     error,true 
+                      let blackboard = 
+                            B.set_profiling_info  
+                              (B.PB.K.P.add_look_up_case 1) 
+                              blackboard 
+                      in 
+                      let _ = flush parameter.B.PB.K.H.out_channel_err in 
+                      error,true,blackboard 
                    else 
                      last_chance_up  parameter handler error blackboard predicate_value preview_event_case_address 
                  else 
-                   let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "SELECTED_by_LAST_CHANCE 2" in 
-                   error,true 
+                   let blackboard = 
+                     B.set_profiling_info 
+                       (B.PB.K.P.add_look_up_case 2)
+                       blackboard 
+                   in 
+                   error,true,blackboard
               end 
             else 
               begin 
                 if B.PB.more_refined action predicate_value 
                 then 
-                  error,false 
+                  error,false,blackboard 
                 else 
-                  let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "SELECTED_by_LAST_CHANCE 3" in 
-                  error,true 
+                   let blackboard = 
+                     B.set_profiling_info 
+                       (B.PB.K.P.add_look_up_case 3)
+                       blackboard 
+                   in 
+                  error,true,blackboard
               end 
           end 
         | None ->  
@@ -596,7 +673,7 @@ module Propagation_heuristic =
               let error,(seid,eid,test,action) = B.get_static parameter handler error blackboard event_case_address in   
               if B.PB.more_refined action predicate_value 
               then 
-                error,false 
+                error,false,blackboard 
               else 
                 begin 
                   let error,preview_event_case_address = B.follow_pointer_up parameter handler error blackboard event_case_address in 
@@ -605,11 +682,14 @@ module Propagation_heuristic =
                   let error,preview_predicate_value = B.predicate_value_of_case_value parameter handler error preview_case_value in 
                   if B.PB.compatible preview_predicate_value predicate_value 
                   then 
-                    let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "LAST 2\n" in 
-                    last_chance_up  parameter handler error blackboard predicate_value preview_event_case_address 
+                      last_chance_up  parameter handler error blackboard predicate_value preview_event_case_address 
                   else 
-                    let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "SELECTED_by_LAST_CHANCE 4\n" in 
-                   error,true 
+                     let blackboard = 
+                     B.set_profiling_info 
+                       (B.PB.K.P.add_look_up_case 4)
+                       blackboard 
+                   in 
+                   error,true,blackboard 
                 end 
             end 
 
@@ -654,6 +734,11 @@ module Propagation_heuristic =
                         let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                         ()
                     in 
+                    let blackboard = 
+                      B.set_profiling_info 
+                        (B.PB.K.P.add_propagation_case_up 1)
+                        blackboard 
+                    in 
                     error,
                     blackboard,
                     (Refine_value_before(event_case_address,new_value))::instruction_list,
@@ -672,6 +757,11 @@ module Propagation_heuristic =
                         let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "\nCut\n" in 
                         let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                         ()
+                    in 
+                    let blackboard = 
+                      B.set_profiling_info 
+                        (B.PB.K.P.add_propagation_case_up 2)
+                        blackboard 
                     in 
                     error,
                     blackboard,
@@ -699,7 +789,11 @@ module Propagation_heuristic =
                         let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                         ()
                     in 
-                    
+                    let blackboard = 
+                      B.set_profiling_info 
+                        (B.PB.K.P.add_propagation_case_up 3)
+                        blackboard 
+                    in 
                     error,
                     blackboard,
                     instruction_list,
@@ -727,6 +821,11 @@ module Propagation_heuristic =
                             let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                             ()
                         in 
+                        let blackboard = 
+                          B.set_profiling_info 
+                            (B.PB.K.P.add_propagation_case_up 4)
+                            blackboard 
+                        in 
                         error,
                         blackboard,
                         (Refine_value_before(event_case_address,state)::instruction_list),
@@ -750,6 +849,11 @@ module Propagation_heuristic =
                             let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                             ()
                         in 
+                        let blackboard = 
+                          B.set_profiling_info 
+                            (B.PB.K.P.add_propagation_case_up 5)
+                            blackboard 
+                        in 
                         error,
                         blackboard,
                         [],
@@ -769,6 +873,11 @@ module Propagation_heuristic =
                       let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "\nCut\n" in 
                       let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                       ()
+                  in 
+                  let blackboard = 
+                    B.set_profiling_info 
+                      (B.PB.K.P.add_propagation_case_up 6)
+                      blackboard 
                   in 
                   error,
                   blackboard,
@@ -805,6 +914,11 @@ module Propagation_heuristic =
                               let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                               ()
                           in 
+                          let blackboard = 
+                            B.set_profiling_info 
+                              (B.PB.K.P.add_propagation_case_up 7)
+                              blackboard 
+                          in 
                           error,
                           blackboard,
                           (Refine_value_before(event_case_address,predicate_value))::instruction_list,
@@ -830,6 +944,11 @@ module Propagation_heuristic =
                                 let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                                 ()
                             in 
+                            let blackboard = 
+                              B.set_profiling_info 
+                                (B.PB.K.P.add_propagation_case_up 8)
+                                blackboard 
+                            in 
                             error,
                             blackboard,
                             (Refine_value_before(event_case_address,predicate_value))::instruction_list,
@@ -849,6 +968,11 @@ module Propagation_heuristic =
                                 let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                                 ()
                             in 
+                            let blackboard = 
+                              B.set_profiling_info 
+                                (B.PB.K.P.add_propagation_case_up 9)
+                                blackboard 
+                            in 
                             error,
                             blackboard,
                             (Discard_event(eid))::instruction_list,
@@ -867,7 +991,7 @@ module Propagation_heuristic =
                       if B.PB.more_refined action predicate_value 
                       then 
                         begin 
-                          let error,bool = last_chance_up parameter handler error blackboard predicate_value preview_event_case_address
+                          let error,bool,blackboard = last_chance_up parameter handler error blackboard predicate_value preview_event_case_address
                           in 
                           if bool 
                           then 
@@ -886,11 +1010,16 @@ module Propagation_heuristic =
                                         let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                                         ()
                                     in 
-                                    error,
-                                    blackboard,
-                                    (Keep_event(eid))::instruction_list,
-                                    propagate_list,
-                                    B.success
+                                let blackboard = 
+                                  B.set_profiling_info 
+                                    (B.PB.K.P.add_propagation_case_up 10)
+                                    blackboard 
+                                in 
+                                error,
+                                blackboard,
+                                (Keep_event(eid))::instruction_list,
+                                propagate_list,
+                                B.success
                             end 
                           else 
                             begin 
@@ -914,6 +1043,11 @@ module Propagation_heuristic =
                                         let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "\n" in 
                                         let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                                         ()
+                                    in 
+                                    let blackboard = 
+                                      B.set_profiling_info 
+                                        (B.PB.K.P.add_propagation_case_up 11)
+                                        blackboard 
                                     in 
                                     error,
                                     blackboard,
@@ -947,6 +1081,11 @@ module Propagation_heuristic =
                                               let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                                               ()
                                           in
+                                          let blackboard = 
+                                             B.set_profiling_info 
+                                               (B.PB.K.P.add_propagation_case_up 12)
+                                               blackboard 
+                                           in 
                                           error,
                                           blackboard,
                                           (Refine_value_before(event_case_address,new_predicate_value))::instruction_list,
@@ -969,6 +1108,11 @@ module Propagation_heuristic =
                                               let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                                               ()
                                           in
+                                          let blackboard = 
+                                            B.set_profiling_info 
+                                              (B.PB.K.P.add_propagation_case_up 13)
+                                              blackboard 
+                    in 
                                           error,
                                           blackboard,
                                           (Discard_event(eid))::instruction_list,
@@ -994,11 +1138,16 @@ module Propagation_heuristic =
                                           let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                                           ()
                                       in
-                                      error,
-                                      blackboard,
-                                      (Refine_value_before(event_case_address,prev'))::instruction_list,
-                                      propagate_list,
-                                      B.success 
+                                       let blackboard = 
+                                         B.set_profiling_info 
+                                           (B.PB.K.P.add_propagation_case_up 14)
+                                           blackboard 
+                                       in 
+                                       error,
+                                       blackboard,
+                                       (Refine_value_before(event_case_address,prev'))::instruction_list,
+                                       propagate_list,
+                                       B.success 
                                   end 
                             end 
                         end 
@@ -1017,6 +1166,11 @@ module Propagation_heuristic =
                               let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                               ()
                           in
+                          let blackboard = 
+                            B.set_profiling_info 
+                              (B.PB.K.P.add_propagation_case_up 15)
+                              blackboard 
+                          in 
                           error,
                           blackboard,
                           Discard_event(eid)::instruction_list,
@@ -1041,6 +1195,11 @@ module Propagation_heuristic =
                               let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                               ()
                           in
+                          let blackboard = 
+                             B.set_profiling_info 
+                               (B.PB.K.P.add_propagation_case_up 16)
+                               blackboard 
+                          in 
                           error,
                           blackboard,
                           (Keep_event(eid))::instruction_list,
@@ -1062,6 +1221,11 @@ module Propagation_heuristic =
                               let _ = Printf.fprintf parameter.B.PB.K.H.out_channel_err "***\n" in 
                               ()
                           in
+                          let blackboard = 
+                            B.set_profiling_info 
+                              (B.PB.K.P.add_propagation_case_up 17)
+                              blackboard 
+                          in 
                           error,
                           blackboard,
                           [],
@@ -1200,28 +1364,36 @@ module Propagation_heuristic =
           (B.boolean (Some true)) 
           blackboard
       in 
-      let error,blackboard = B.dec parameter handler error (B.n_unresolved_events) blackboard  in 
-      let error,list = B.case_list_of_eid parameter handler error blackboard step_id in 
-      let rec aux l x success = 
-        match l 
-        with 
-          | [] -> x,success 
-          | t::q ->
-            begin 
-              let y,success2 = keep_case parameter handler t x in 
-              if B.is_ignored success2 
-              then 
+      if B.is_failed success 
+      then 
+        error,blackboard,[],[],success
+      else if B.is_ignored success
+      then 
+        error,blackboard,instruction_list,propagate_list,success
+      else 
+        let blackboard = B.set_profiling_info (B.PB.K.P.inc_selected_events) blackboard in 
+        let error,blackboard = B.dec parameter handler error (B.n_unresolved_events) blackboard  in 
+        let error,list = B.case_list_of_eid parameter handler error blackboard step_id in 
+        let rec aux l x success = 
+          match l 
+          with 
+            | [] -> x,success 
+            | t::q ->
+              begin 
+                let y,success2 = keep_case parameter handler t x in 
+                if B.is_ignored success2 
+                then 
                 aux q y success
-              else if B.is_succeeded success2 
-              then aux q y success2 
+                else if B.is_succeeded success2 
+                then aux q y success2 
               else 
-                y,success2 
+                  y,success2 
             end 
-      in 
-      let (error,blackboard,instruction_list,propagate_list),success = aux list (error,blackboard,instruction_list,propagate_list) B.ignore in 
-      error,blackboard,instruction_list,propagate_list,success 
-
-    let gen_event f_case parameter handler error blackboard step_id instruction_list propagate_list = 
+        in 
+        let (error,blackboard,instruction_list,propagate_list),success = aux list (error,blackboard,instruction_list,propagate_list) B.ignore in 
+        error,blackboard,instruction_list,propagate_list,success 
+          
+    let gen_event f_case g parameter handler error blackboard step_id instruction_list propagate_list = 
       let error,blackboard,success = 
         B.refine parameter handler error 
           (B.is_exist_event step_id)
@@ -1236,6 +1408,7 @@ module Propagation_heuristic =
             error,blackboard,instruction_list,propagate_list,success
           else 
             begin
+              let blackboard = B.set_profiling_info g blackboard in 
               let error,blackboard = B.dec parameter handler error (B.n_unresolved_events) blackboard  in 
               let error,list = B.case_list_of_eid parameter handler error blackboard step_id in 
               let rec aux l x success = 
@@ -1256,8 +1429,8 @@ module Propagation_heuristic =
                 error,blackboard,instruction_list,propagate_list,success 
               end 
 
-    let cut_event = gen_event cut_case 
-    let discard_event = gen_event discard_case 
+    let cut_event = gen_event cut_case B.PB.K.P.inc_cut_events
+    let discard_event = gen_event discard_case B.PB.K.P.inc_removed_events  
 
     let refine_value_after parameter handler error blackboard address value instruction_list propagate_list =
       let case_address = B.value_after address in 

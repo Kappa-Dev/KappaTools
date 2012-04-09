@@ -196,7 +196,7 @@ let string_of_atom atom =
 	Printf.sprintf "%s_%d" imp_str atom.eid
 		
 				
-let dot_of_grid fic grid state env = 
+let dot_of_grid profiling fic grid state env = 
 	let ids = Hashtbl.fold (fun key _ l -> key::l) grid.flow [] in
 	let config = cut ids grid in 
 	let label e = 
@@ -249,6 +249,7 @@ let dot_of_grid fic grid state env =
 		) depth_of_event IntMap.empty
 	in
 	let desc = open_out fic in
+        let _ = profiling desc in 
 	Parameter.add_out_desc desc ;
 	fprintf desc "digraph G{\n ranksep=.5 ; \n" ;
 	IntMap.iter

@@ -18,6 +18,7 @@
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
+let log_steps = false 
 
 module Solver = 
 struct 
@@ -27,34 +28,14 @@ struct
   let combine_output o1 o2 = 
     if PH.B.is_ignored o2 then o1 else o2 
       
-  let p n = 
-    if n mod 10000 = 0 
-    then true
-    else if n<10000 && n mod 1000 = 0 
-    then true
-    else if n<1000 && n mod 100 = 0 
-    then true 
-    else if n<100 && n mod 10 = 0 
-    then true 
-    else if n<10 then true 
-    else false 
-
-  let tmp = ref true 
-
-  let p n = 
-    let bool = p n in 
-    if (!tmp) = bool 
-    then 
-      false 
-    else 
-      let _ = tmp:=bool in 
-      bool 
-
-let rec propagate parameter handler error instruction_list propagate_list blackboard = 
+ 
+  let rec propagate parameter handler error instruction_list propagate_list blackboard = 
     let n = (PH.B.get_n_unresolved_events blackboard) in 
-    let _ =
-      if p n then 
-        let _ = Printf.fprintf parameter.PH.B.PB.K.H.out_channel_err "Propagate %i %i %i %i \n" (List.length instruction_list) (List.length propagate_list) (PH.B.get_n_unresolved_events blackboard) (PH.B.get_stack_depth blackboard) in 
+    let bool,blackboard  = PH.B.tick blackboard in 
+    let _ = 
+      if bool 
+      then 
+        let _ = PH.B.print_complete_log parameter.PH.B.PB.K.H.out_channel blackboard in 
         let _ = flush parameter.PH.B.PB.K.H.out_channel_err
         in () 
     in 
@@ -133,8 +114,6 @@ let rec propagate parameter handler error instruction_list propagate_list blackb
     
   let compress parameter handler error blackboard list_order list_eid =
     let error,blackboard = PH.B.branch parameter handler error blackboard in 
-    let _ = Printf.fprintf parameter.PH.B.PB.K.H.out_channel_err "Trying to Cut\n" in 
-    let _ = flush parameter.PH.B.PB.K.H.out_channel_err in 
     let error,blackboard,result_wo_compression,events_to_remove  = PH.B.cut parameter handler error blackboard list_eid  in 
     let result_wo_compression = 
       if 
@@ -146,23 +125,36 @@ let rec propagate parameter handler error instruction_list propagate_list blackb
     in 
     let error,forbidden_events = PH.forbidden_events parameter handler error events_to_remove in 
     let _ = 
-      Printf.fprintf parameter.PH.B.PB.K.H.out_channel_err "Start cutting\n" in 
-    let _ = 
-      flush parameter.PH.B.PB.K.H.out_channel_err
+      if log_steps 
+      then 
+        let _ = Printf.fprintf parameter.PH.B.PB.K.H.out_channel_err "Start cutting\n" in 
+        let _ = 
+          flush parameter.PH.B.PB.K.H.out_channel_err
+        in 
+        ()
     in 
     let error,blackboard,output = 
       propagate parameter handler error forbidden_events [] blackboard  
     in 
-    let _ = Printf.fprintf parameter.PH.B.PB.K.H.out_channel_err "After Causal Cut  %i \n" (PH.B.get_n_unresolved_events blackboard) in 
     let _ = 
-      flush parameter.PH.B.PB.K.H.out_channel 
+      if log_steps 
+      then 
+        let _ = Printf.fprintf parameter.PH.B.PB.K.H.out_channel_err "After Causal Cut  %i \n" (PH.B.get_n_unresolved_events blackboard) in 
+        let _ = 
+          flush parameter.PH.B.PB.K.H.out_channel 
+        in 
+        ()
     in 
     let error,blackboard,output = 
       propagate parameter handler error list_order [] blackboard 
     in 
-    let _ = Printf.fprintf parameter.PH.B.PB.K.H.out_channel_err "After observable propagation  %i \n" (PH.B.get_n_unresolved_events blackboard) in 
     let _ = 
-      flush parameter.PH.B.PB.K.H.out_channel 
+      if log_steps 
+      then 
+        let _ = Printf.fprintf parameter.PH.B.PB.K.H.out_channel_err "After observable propagation  %i \n" (PH.B.get_n_unresolved_events blackboard) in 
+        let _ = 
+          flush parameter.PH.B.PB.K.H.out_channel 
+        in ()
     in 
     let error,blackboard,output = iter parameter handler error blackboard 
     in 

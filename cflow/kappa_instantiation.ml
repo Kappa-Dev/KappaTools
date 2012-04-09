@@ -24,6 +24,7 @@ let compose f g = (fun x -> f (g x))
 module type Cflow_signature =
 sig
   module H:Cflow_handler.Cflow_handler 
+  module P:Profiling.StoryStats 
 
   type agent_name = int
   type site_name = int 
@@ -108,9 +109,9 @@ sig
   val print_refined_step: H.parameter -> H.handler -> refined_step -> unit 
 
   val import_event:  (Dynamics.rule * int Mods.IntMap.t * int Mods.IntMap.t) * rule_info -> event 
-  val store_event: event -> step list -> step list 
-  val store_init : State.implicit_state -> step list -> step list 
-  val store_obs :  int * Mixture.t * int Mods.IntMap.t -> step list -> step list 
+  val store_event: P.log_info -> event -> step list -> P.log_info * step list 
+  val store_init : P.log_info -> State.implicit_state -> step list -> P.log_info * step list 
+  val store_obs :  P.log_info -> int * Mixture.t * int Mods.IntMap.t -> step list -> P.log_info * step list 
   val build_grid: (refined_step*side_effect) list -> bool -> H.handler -> Causal.grid 
   val print_side_effect: out_channel -> side_effect -> unit
   val side_effect_of_list: (int*int) list -> side_effect 
@@ -122,6 +123,7 @@ end
 module Cflow_linker = 
 (struct 
   module H = Cflow_handler.Cflow_handler 
+  module P = Profiling.StoryStats 
 
   type agent_name = int
 
@@ -477,9 +479,9 @@ module Cflow_linker =
 
   let agent_of_node n = build_agent (Node.get_address n) (Node.name n) 
 
-  let create_init state event_list = 
+  let create_init state log_info event_list = 
     Graph.SiteGraph.fold
-	  (fun node_id node list  ->
+	  (fun node_id node (log_info,list)  ->
             let interface = 
 		Node.fold_status
 		  (fun site_id (int,lnk) list -> 
@@ -491,9 +493,10 @@ module Cflow_linker =
 	          []
             in 
             let agent = build_agent node_id (Node.name node) in 
-            (Init (agent,interface))::list)
+            let log_info = P.inc_n_init_events log_info in 
+            (log_info,(Init (agent,interface))::list))
           state.State.graph 
-          event_list 
+          (log_info,event_list) 
 
   let actions_of_init (init:init) handler  = 
     let agent,list_sites = init in 
@@ -696,10 +699,12 @@ module Cflow_linker =
 
   let import_event x = x 
   let import_env x = x
-  let store_event (event:event) (step_list:step list) = 
-    (Event event)::step_list    
-  let store_init init step_list = create_init init step_list  
-  let store_obs (i,a,x) step_list = Obs(i,a,x)::step_list 
+  let store_event log_info (event:event) (step_list:step list) = 
+    P.inc_n_kasim_events log_info,(Event event)::step_list    
+  let store_init log_info init step_list = 
+    create_init init log_info step_list  
+  let store_obs log_info (i,a,x) step_list = 
+    P.inc_n_obs_events log_info,Obs(i,a,x)::step_list 
 
   let build_grid list bool handler = 
     let env = handler.H.env in 

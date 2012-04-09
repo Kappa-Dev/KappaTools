@@ -21,12 +21,12 @@
 module S = Generic_branch_and_cut_solver.Solver 
 
 
-let log_step = true
+let log_step = true 
 let debug_mode = false
 
 
 
-let weak_compression env state step_list =  
+let weak_compression env state log_info step_list =  
   let parameter = S.PH.B.PB.K.H.build_parameter () in 
   let mode = parameter.S.PH.B.PB.K.H.compression_mode in 
   let causal_trace_on = Parameter.get_causal_trace mode in 
@@ -38,6 +38,8 @@ let weak_compression env state step_list =
       S.PH.B.PB.K.H.state = state 
     }
   in 
+  let _ = print_newline () in 
+  let _ = print_newline () in 
   if (not causal_trace_on)
     && (not weak_compression_on)  
     && (not strong_compression_on)
@@ -45,8 +47,6 @@ let weak_compression env state step_list =
     ()
   else
     begin 
-      let _ = print_newline () in 
-      let _ = print_newline () in 
       if S.PH.B.PB.K.no_obs_found step_list 
       then 
         let _ = Debug.tag "+ No story found" in () 
@@ -77,12 +77,7 @@ let weak_compression env state step_list =
               in flush parameter.S.PH.B.PB.K.H.out_channel
           in 
           let error = [] in 
-          let _ = 
-            if log_step 
-            then 
-              Debug.tag "\t\t * dealing with initial states" 
-          in 
-          let error,blackboard = S.PH.B.PB.init parameter handler error   in
+          let error,blackboard = S.PH.B.PB.init parameter handler error log_info  in
           let _ = 
             if log_step
             then 
@@ -178,7 +173,7 @@ let weak_compression env state step_list =
                         let error,list = S.PH.B.translate_blackboard parameter handler error blackboard in 
                         let grid = S.PH.B.PB.K.build_grid list false handler in
 		        let filename_comp = (Filename.chop_suffix !Parameter.cflowFileName ".dot") ^"_"^(string_of_int counter)^"weak_comp"^".dot" in 
-                        let _ = Causal.dot_of_grid filename_comp grid state env in
+                        let _ = Causal.dot_of_grid (fun log -> S.PH.B.print_complete_log log blackboard) filename_comp grid state env in
                         () 
                     in 
                     let _ = 
@@ -189,7 +184,7 @@ let weak_compression env state step_list =
                           let filename =  (Filename.chop_suffix !Parameter.cflowFileName ".dot")^"_"^(string_of_int counter)^".dot"
 		          in
                           let grid = S.PH.B.PB.K.build_grid result_wo_compression true handler in 
-                          let _ = Causal.dot_of_grid filename grid state env in
+                          let _ = Causal.dot_of_grid (fun _ -> ()) filename grid state env in
                           ()
                     in 
                     let error,blackboard = S.PH.B.reset_init parameter handler error blackboard in 

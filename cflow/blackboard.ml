@@ -73,7 +73,7 @@ sig
   val import: (PB.pre_blackboard -> PB.K.H.error_channel * blackboard) PB.K.H.with_handler 
 
   (** output result*)
-  type result = (PB.K.refined_step * PB.K.side_effect) list 
+  type result = (PB.K.refined_step * PB.K.side_effect) list  
      
   (** iteration*)
   val is_maximal_solution: (blackboard -> PB.K.H.error_channel * bool) PB.K.H.with_handler 
@@ -85,6 +85,11 @@ sig
   val print_blackboard:(blackboard -> PB.K.H.error_channel) PB.K.H.with_handler 
   val print_event_case_address:out_channel -> event_case_address -> unit 
   val print_stack: out_channel -> blackboard -> unit
+
+  val print_complete_log: out_channel -> blackboard -> unit 
+  val print_short_log: out_channel -> blackboard -> unit 
+  val get_profiling_info: blackboard -> PB.K.P.log_info 
+  val set_profiling_info: (PB.K.P.log_info -> PB.K.P.log_info) -> blackboard -> blackboard 
 
   val exist: event_case_address -> case_address 
   val boolean: bool option -> case_value 
@@ -101,6 +106,8 @@ sig
   val side_effect_of_event: blackboard -> PB.step_id -> PB.K.side_effect
 (*  val cut_predicate_id: (blackboard -> PB.predicate_id -> PB.K.H.error_channel *   blackboard) PB.K.H.with_handler *)
   val cut: (blackboard -> PB.step_id list -> PB.K.H.error_channel * blackboard * result * PB.step_id list) PB.K.H.with_handler 
+
+  val tick: blackboard -> bool * blackboard 
 end
 
 module Blackboard = 
@@ -344,6 +351,7 @@ module Blackboard =
      type stack = assignment list 
      type blackboard = 
          {
+           profiling: PB.K.P.log_info; 
            event: PB.K.refined_step PB.A.t;
            pre_column_map_inv: PB.predicate_info PB.A.t; (** maps each wire id to its wire label *)
            forced_events: int list list;
@@ -362,6 +370,22 @@ module Blackboard =
            side_effect_of_event: PB.K.side_effect PB.A.t;
            fictitious_observable: PB.step_id option;
          }
+           
+     let get_profiling_info b = b.profiling 
+
+     let set_profiling_info f b = 
+       {b with profiling = f b.profiling}
+
+     let print_complete_log log blackboard = 
+       PB.K.P.dump_complete_log log (get_profiling_info blackboard)
+
+     let print_short_log log blackboard = 
+       PB.K.P.dump_short_log log (get_profiling_info blackboard)
+
+     let tick blackboard = 
+       let bool,profiling_info = PB.K.P.tick (get_profiling_info blackboard) in 
+       bool,{blackboard with profiling = profiling_info}
+   
      let get_stack_depth blackboard = List.length blackboard.stack 
 
      let forced_events blackboard = blackboard.forced_events 
@@ -657,6 +681,7 @@ module Blackboard =
        let error,fictitious_obs = PB.get_fictitious_observable parameter handler error pre_blackboard in 
        error,
        {
+         profiling = PB.get_profiling pre_blackboard ; 
          event = event ;
          side_effect_of_event = side_effects ; 
          pre_column_map_inv = PB.get_pre_column_map_inv pre_blackboard; 
@@ -950,10 +975,12 @@ module Blackboard =
            (error,blackboard)
            stack 
        in 
+       let blackboard = set_profiling_info PB.K.P.inc_cut blackboard in 
        match blackboard.stack 
        with 
          | [] -> error,{blackboard with current_stack = []}
-         | t::q -> error,{blackboard with current_stack = t ; stack = q }
+         | t::q -> 
+             error,{blackboard with current_stack = t ; stack = q }
 
      let reset_init parameter handler error blackboard = 
        let rec aux (error,blackboard) = 
@@ -961,7 +988,10 @@ module Blackboard =
          with 
            | []   -> error,blackboard 
            | _  -> aux (reset_last_branching parameter handler error blackboard)
-       in aux (error,blackboard) 
+       in 
+       let error,blackboard = aux (error,blackboard) in 
+       let blackboard = set_profiling_info PB.K.P.reset_log blackboard in 
+       error,blackboard 
     
   (** output result*)
      type result = (PB.K.refined_step * PB.K.side_effect) list  
@@ -1017,7 +1047,6 @@ module Blackboard =
    
    let useless_predicate_id parameter handler error blackboard list = 
      let n_events = blackboard.n_eid in  
-     let n_pid = blackboard.n_predicate_id in 
      let event_array = PB.A.make n_events false in
      let _ = 
        List.iter 
@@ -1040,7 +1069,6 @@ module Blackboard =
                let q = 
                  List.fold_left
                    (fun q event_case_address ->
-                     let predicate_id = event_case_address.column_predicate_id in 
                      let error,case = get_case parameter handler error event_case_address blackboard in 
                      let pointer = case.dynamic.pointer_previous in 
                      let eid = 
@@ -1157,28 +1185,6 @@ module Blackboard =
      let error,cut_causal_flow,events_to_remove  = useless_predicate_id parameter handler error blackboard list in 
      error,blackboard,cut_causal_flow,events_to_remove 
 
-
-(*
-     if parameter.PB.K.H.compression_mode.Parameter.weak_compression = false && parameter.PB.K.H.compression_mode.Parameter.strong_compression = false 
-     then 
-       error,blackboard,cut_causal_flow,[]
-     else 
-       error,blackboard,cut_caus
-       let error,int,event_list = count_event_of_p_id_list parameter handler error blackboard list p_id_list_to_keep in
-       let event_list = List.sort compare  event_list in 
-       let error,blackboard = cut_event_id parameter handler error blackboard int in 
-       let error,blackboard = 
-         List.fold_left 
-           (fun (error,blackboard) p_id -> 
-             cut_predicate_id parameter handler error blackboard p_id)
-           (error,blackboard)
-           p_id_list_to_cut 
-       in 
-       error,blackboard,cut_causal_flow 
-
-  
-*)
-  
 
    end:Blackboard)
 

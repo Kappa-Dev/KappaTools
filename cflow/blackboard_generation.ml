@@ -50,7 +50,7 @@ sig
   val strictly_more_refined: predicate_value -> predicate_value -> bool 
   val get_pre_column_map_inv: pre_blackboard -> predicate_info A.t
   (** generation*)
-  val init:  (K.H.error_channel * pre_blackboard) K.H.with_handler 
+  val init:  (K.P.log_info -> K.H.error_channel * pre_blackboard) K.H.with_handler 
   val add_step: (K.refined_step -> pre_blackboard -> K.H.error_channel * pre_blackboard) K.H.with_handler
   val finalize: (pre_blackboard -> K.H.error_channel * pre_blackboard) K.H.with_handler 
 
@@ -67,6 +67,10 @@ sig
   val get_pre_event: (pre_blackboard -> K.H.error_channel * K.refined_step A.t) K.H.with_handler 
   val get_side_effect: (pre_blackboard -> K.H.error_channel * K.side_effect A.t) K.H.with_handler 
   val get_fictitious_observable: (pre_blackboard -> K.H.error_channel * int option) K.H.with_handler 
+  val get_profiling: pre_blackboard -> K.P.log_info 
+
+  val profiling: (K.P.log_info -> K.P.log_info) -> pre_blackboard -> pre_blackboard
+
 end
 
 module Preblackboard = 
@@ -76,7 +80,7 @@ module Preblackboard =
      module H = Cflow_handler.Cflow_handler
      module K = Kappa_instantiation.Cflow_linker 
      module A = Mods.DynArray
-    
+
      (** blackboard matrix*) 
 
      type step_id = int       (** global id of an event *)
@@ -140,21 +144,22 @@ module Preblackboard =
 	   pre_column_map_inv: predicate_info A.t; (** maps each wire id to its wire label *)
 	   predicate_id_list_related_to_predicate_id: PredicateidSet.t A.t; (** maps each wire id for the presence of an agent to the set of wires for its attibute (useful, when an agent get removed, all its attributes get undefined *)
            history_of_predicate_values_to_predicate_id: C.t A.t; (** 
-maps each wire to the set of its previous states, this summarize the potential state of a site that is freed, so as to overapproximate the set of potential side effects*)
+                                                                     maps each wire to the set of its previous states, this summarize the potential state of a site that is freed, so as to overapproximate the set of potential side effects*)
            pre_observable_list: step_id list list ;
            pre_side_effect_of_event: K.side_effect A.t;
-           pre_fictitious_observable: step_id option; (*id of the step that clos
-es all the side-effect mutex *)
-
+           pre_fictitious_observable: step_id option; (*id of the step that closes all the side-effect mutex *) 
+           pre_profiling: K.P.log_info; (* profiling information *)
            } 
 
+         let get_profiling x = x.pre_profiling 
          
          let get_pre_column_map_inv x = x.pre_column_map_inv 
          let get_pre_event parameter handler error x = error,x.pre_event 
-     (** pretty printing *)
-     let print_predicate_info log x = 
-       match x 
-       with 
+           
+         (** pretty printing *)
+         let print_predicate_info log x = 
+           match x 
+           with 
          | Here i -> Printf.fprintf log "Agent_Here %i \n" i
          | Bound_site (i,s) -> Printf.fprintf log "Binding_state (%i,%i) \n" i s 
          | Internal_state (i,s) -> Printf.fprintf log "Internal_state (%i,%i) \n" i s 
@@ -562,9 +567,10 @@ es all the side-effect mutex *)
       | K.Obs _ -> Observable
         
   (** initialisation*)
-  let init parameter handler error = 
+  let init parameter handler error log_info = 
     error, 
     {
+      pre_profiling = log_info  ;
       pre_side_effect_of_event = A.make 1 K.empty_side_effect;
       pre_event = A.make 1 K.dummy_refined_step;
       pre_fictitious_list = [] ; 
@@ -580,10 +586,14 @@ es all the side-effect mutex *)
       pre_fictitious_observable = None ;
     }
     
+  let profiling f blackboard = 
+    {blackboard with pre_profiling = f blackboard.pre_profiling}
+
   let pre_column_map_inv b = b.pre_column_map_inv 
 
   let init_fictitious_action error predicate_id blackboard = 
     let nsid = blackboard.pre_nsteps+1 in 
+    let blackboard = profiling K.P.inc_n_side_events blackboard in 
     let test = Undefined in 
     let action = Counter 0 in
     let _ = A.set blackboard.pre_steps_by_column predicate_id (2,[nsid,1,test,action])  in 
@@ -745,6 +755,8 @@ es all the side-effect mutex *)
                       List.fold_left 
                         (fun (error,blackboard) list -> 
                           let blackboard = {blackboard with pre_nsteps = blackboard.pre_nsteps+1} in 
+                          let blackboard = profiling K.P.inc_n_side_events blackboard in 
+  
                           let side_effect = 
                             List.fold_left 
                               (fun list (_,a,_) -> 
@@ -870,6 +882,7 @@ es all the side-effect mutex *)
         | [] -> error,blackboard 
         | _ -> 
           let nsid = blackboard.pre_nsteps + 1 in 
+          let blackboard = profiling K.P.inc_n_side_events blackboard in 
           let observable_list = 
             List.rev_map (fun x -> nsid::x) (List.rev blackboard.pre_observable_list) 
           in 

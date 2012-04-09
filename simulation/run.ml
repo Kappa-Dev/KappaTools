@@ -3,7 +3,7 @@ open Tools
 open ExceptionDefn
 open Random_tree
 
-let event state (*grid*) event_list counter plot env =
+let event state (*grid*) story_profiling event_list counter plot env =
 	(*1. Time advance*)
 	let dt,activity = 
 		let rd = Random.float 1.0 
@@ -77,7 +77,7 @@ let event state (*grid*) event_list counter plot env =
 	
 	(*4. Positive update*)
 	
-	let env,state,pert_ids,(*grid,*)event_list = 
+	let env,state,pert_ids,story_profiling,(*grid,*)event_list = 
 		match opt_new_state with
 			| Some ((env,state,side_effect,embedding_t,psi,pert_ids_rule),r) ->
 
@@ -101,25 +101,26 @@ let event state (*grid*) event_list counter plot env =
 				
 				(*let event_to_record = (r,side_effect,phi,psi,Counter.event counter) in*)
 				 
-				let (*grid,*)event_list = 
+				let (*grid,*)story_profiling,event_list = 
 					if !Parameter.causalModeOn or !Parameter.weakcompressionModeOn 
 	        then
 					  begin
-                                            let event_list = Compression_main.S.PH.B.PB.K.store_event (Compression_main.S.PH.B.PB.K.import_event ((r,phi,psi),(obs_from_rule_app,r,Counter.event counter,side_effect))) event_list in 
-                                            let event_list = 
+                                            let story_profiling,event_list = Compression_main.S.PH.B.PB.K.store_event story_profiling (Compression_main.S.PH.B.PB.K.import_event ((r,phi,psi),(obs_from_rule_app,r,Counter.event counter,side_effect))) event_list in 
+                                            let story_profiling,event_list = 
                                               List.fold_left 
-                                                (fun event_list (obs,phi) -> 
+                                                (fun (story_profiling,event_list) (obs,phi) -> 
                                                   
                                                   let lhs = State.kappa_of_id obs state in 
-                                                  Compression_main.S.PH.B.PB.K.store_obs (obs,lhs,phi) event_list)
-                                                event_list obs_from_rule_app
+                                                  Compression_main.S.PH.B.PB.K.store_obs story_profiling (obs,lhs,phi) event_list)
+                                                (story_profiling,event_list) 
+                                                obs_from_rule_app
                                             in 
 					 (*   (Causal.record ~decorate_with:obs_from_rule_app r side_effect (phi,psi) (Counter.event counter) grid env, (*to be removed*)*)
-					     event_list
+					     story_profiling,event_list
 					  end
-					else event_list
+					else story_profiling,event_list
 				in
-				(env,state,IntSet.union pert_ids pert_ids',event_list)
+				(env,state,IntSet.union pert_ids pert_ids',story_profiling,event_list)
 			| None ->
 				begin
 					if !Parameter.debugModeOn then Debug.tag "Null (clash or doesn't satisfy constraints)"; 
@@ -128,7 +129,7 @@ let event state (*grid*) event_list counter plot env =
 					(*if counter.Counter.cons_null_events > !Parameter.maxConsecutiveClash then 
 						raise Deadlock
 					else*) 
-					(env,state,IntSet.empty,(*grid,*)event_list)
+					(env,state,IntSet.empty,story_profiling,(*grid,*)event_list)
 				end
 	in
 	
@@ -136,9 +137,9 @@ let event state (*grid*) event_list counter plot env =
 	(*Printf.printf "Applying %s perturbations \n" (Tools.string_of_set string_of_int IntSet.fold pert_ids) ;*)
 	let state,env,obs_from_perturbation = External.try_perturbate state pert_ids counter env (*shoudl add obs_from_pert in the causal flow at some point...*)
 	in
-	(state(*,grid*),event_list,env)
+	(state,story_profiling(*,grid*),event_list,env)
 					
-let loop state grid event_list counter plot env =
+let loop state grid story_profiling event_list counter plot env =
 	(*Before entering the loop*)
 	
 	Counter.tick counter counter.Counter.time counter.Counter.events ;
@@ -150,13 +151,13 @@ let loop state grid event_list counter plot env =
 	let state,env,_ = External.try_perturbate state pert_ids counter env 
 	in
 	
-	let rec iter state event_list counter plot env =
+	let rec iter state story_profiling event_list counter plot env =
 		if !Parameter.debugModeOn then 
 			Debug.tag (Printf.sprintf "[**Event %d (Activity %f)**]" counter.Counter.events (Random_tree.total state.State.activity_tree));
 		if (Counter.check_time counter) && (Counter.check_events counter) then
-			let state,event_list,env = event state event_list counter plot env 
+			let state,story_profiling,event_list,env = event state story_profiling event_list counter plot env 
 			in
-			iter state event_list counter plot env
+			iter state story_profiling event_list counter plot env
 		else (*exiting the loop*)
 		  begin
       	let _ = 
@@ -168,10 +169,10 @@ let loop state grid event_list counter plot env =
 					begin
 				    let _ = 
             	if !Parameter.weakcompressionModeOn or !Parameter.causalModeOn 
-                then Compression_main.weak_compression env state event_list 
+                then Compression_main.weak_compression env state story_profiling event_list 
 	          in
             ()
 				  end
 		  end
 	in
-	iter state event_list counter plot env
+	iter state story_profiling event_list counter plot env
