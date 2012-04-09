@@ -274,6 +274,9 @@ module StoryStats =
          let _ = Printf.fprintf log "Cut events:        %i\n" log_info.cut_events in 
          let _ = Printf.fprintf log "Selected events:   %i\n" log_info.current_stack.selected_events in 
          let _ = Printf.fprintf log "Removed events:    %i\n" log_info.current_stack.removed_events in 
+         let _ = Printf.fprintf log "Remaining events:  %i\n" (log_info.kasim_events + log_info.obs_events + log_info.init_events +log_info.fictitious_events - log_info.cut_events - log_info.current_stack.selected_events - log_info.current_stack.removed_events) in 
+         let _ = Printf.fprintf log "Exploration depth: %i\n" log_info.current_stack.current_branch in 
+         let _ = Printf.fprintf log "Cuts:              %i\n" log_info.cut in 
          let _ = Printf.fprintf log "***\nPropagation Hits:\n" in 
          let rec aux k = 
            if k>=propagation_cases 
@@ -289,7 +292,7 @@ module StoryStats =
 
        let tick log_info = 
          let time = Sys.time () in 
-         if time-.log_info.last_tick > 10.
+         if time-.log_info.last_tick > 600.
          then 
            true,{log_info with last_tick = time}
          else
