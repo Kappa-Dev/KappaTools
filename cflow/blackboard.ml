@@ -953,6 +953,7 @@ module Blackboard =
               PB.K.H.raise_error parameter handler error_list error blackboard 
          
      let branch parameter handler error blackboard = 
+       let blackboard = set_profiling_info PB.K.P.inc_branch blackboard in 
        error,
        {
          blackboard 

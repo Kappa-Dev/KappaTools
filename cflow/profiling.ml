@@ -31,7 +31,6 @@ module type StoryStats =
     val inc_n_init_events: log_info -> log_info 
     val inc_n_side_events: log_info -> log_info 
     val inc_n_obs_events: log_info -> log_info 
-    val inc_stack: log_info -> log_info 
     val inc_branch: log_info -> log_info 
     val inc_cut: log_info -> log_info 
     val reset_log: log_info -> log_info 
@@ -207,14 +206,6 @@ module StoryStats =
                  cut = log.cut + 1;
              }
 
-       let inc_stack log =
-         {
-           log 
-          with 
-            current_stack =
-             {log.current_stack with stack_size = log.current_stack.stack_size + 1 }
-         }
-         
        let inc_branch log = 
          {
            log 
