@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 05/09/2011
-  * Last modification: 10/04/2012
+  * Last modification: 11/04/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -1292,13 +1292,13 @@ module Propagation_heuristic =
         end 
 
     let look_down parameter handler error blackboard propagate_list case =
-       let error,bool = B.exist_case parameter handler error blackboard case in 
+(*       let error,bool = B.exist_case parameter handler error blackboard case in 
        match 
          bool 
        with 
          | Some false ->    let blackboard = B.set_profiling_info (B.PB.K.P.add_look_down_case 4) blackboard in
            error,blackboard,propagate_list 
-         | _ -> 
+         | _ -> *)
            begin 
              let error,(_,_,_,action) = B.get_static parameter handler error blackboard case in
              if B.PB.is_unknown action 

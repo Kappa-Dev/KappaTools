@@ -9,12 +9,12 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 21/03/2012
+  * Last modification: 11/04/2012
   * * 
-  * Some parameters references can be tuned thanks to command-line options
+  * Some parameter references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
   *  
-  * Copyright 2011 Institut National de Recherche en Informatique et   
+  * Copyright 2011,2012 Institut National de Recherche en Informatique et   
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
