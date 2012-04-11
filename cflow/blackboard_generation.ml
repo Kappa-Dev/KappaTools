@@ -125,6 +125,7 @@ module Preblackboard =
          | Bound_to (_,_,ag,site) -> [p;Bound_to_type (ag,site);Bound;Defined]
          | Bound_to_type _ -> [p;Bound;Defined]
          | Defined | Undefined -> [p]
+         | Unknown -> []
 
      let defined = Defined 
      let undefined = Undefined 
