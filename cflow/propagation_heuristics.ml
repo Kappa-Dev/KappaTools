@@ -20,6 +20,7 @@
 
 let debug_mode = false 
 let look_up_for_better_cut = true 
+let look_down_for_better_cut = true 
 
 module type Blackboard_with_heuristic = 
   sig
@@ -693,6 +694,12 @@ module Propagation_heuristic =
                 end 
             end 
 
+    let last_chance_up = 
+      if look_up_for_better_cut
+      then last_chance_up
+      else (fun _ _ error blackboard _ _ -> error,false,blackboard)
+
+        
     let propagate_up parameter handler error blackboard event_case_address instruction_list propagate_list = 
       begin 
         let error,bool = B.exist_case parameter handler error blackboard event_case_address in 
@@ -1284,6 +1291,68 @@ module Propagation_heuristic =
           (error,blackboard,instruction_list,propagate_list),result 
         end 
 
+    let look_down parameter handler error blackboard propagate_list case =
+       let error,bool = B.exist_case parameter handler error blackboard case in 
+       match 
+         bool 
+       with 
+         | Some false ->    let blackboard = B.set_profiling_info (B.PB.K.P.add_look_down_case 4) blackboard in
+           error,blackboard,propagate_list 
+         | _ -> 
+           begin 
+             let error,(_,_,_,action) = B.get_static parameter handler error blackboard case in
+             if B.PB.is_unknown action 
+             then 
+               error,blackboard,propagate_list 
+             else 
+               let list_values = B.PB.weakening action in 
+               begin
+                 let propagate_list,blackboard = 
+                   List.fold_left 
+                     (fun (propagate_list,blackboard) value -> 
+                       let rec aux case bool = 
+                         let ca = B.case_address_of_case_event_address case in 
+                         let error,case_value = B.get parameter handler error ca blackboard in 
+                         let error,predicate_value = B.predicate_value_of_case_value parameter handler error case_value in 
+                         if B.PB.more_refined predicate_value value 
+                         then 
+                           let error,pointer_next = B.follow_pointer_down parameter handler error blackboard case in 
+                           let blackboard = B.set_profiling_info (B.PB.K.P.add_look_down_case 1) blackboard in 
+                           (Propagate_up pointer_next)::propagate_list,blackboard
+                         else 
+                           let error,next_case = B.follow_pointer_down parameter handler error blackboard case in 
+                           let error,exist = B.exist_case parameter handler error blackboard next_case in 
+                           match exist 
+                           with 
+                             | Some true -> 
+                               let blackboard = B.set_profiling_info (B.PB.K.P.add_look_down_case 2) blackboard in 
+                               propagate_list,blackboard
+                             | Some false -> aux next_case bool 
+                           | None -> 
+                             let error,(_,_,_,next_action) = B.get_static parameter handler error blackboard next_case in
+                             if B.PB.more_refined next_action value 
+                             then 
+                               if bool 
+                               then 
+                                 let blackboard = B.set_profiling_info (B.PB.K.P.add_look_down_case 3) blackboard in 
+                                 propagate_list,blackboard
+                               else 
+                                 aux next_case true 
+                             else
+                               aux next_case bool
+                       in 
+                       aux case false)
+                     (propagate_list,blackboard) 
+                     list_values 
+                 in error,blackboard,propagate_list 
+               end 
+           end 
+
+    let look_down = 
+      if look_down_for_better_cut 
+      then look_down 
+      else (fun _ _ error blackboard list _ -> error,blackboard,list)
+
     let discard_case parameter handler case (error,blackboard,instruction_list,propagate_list) = 
       let error,pointer_next = B.follow_pointer_down parameter handler error blackboard case in 
       let error,pointer_previous = B.follow_pointer_up parameter handler error blackboard case in 
@@ -1326,6 +1395,9 @@ module Propagation_heuristic =
           in 
           let propagate_list = 
             (Propagate_up pointer_next)::(Propagate_down pointer_previous)::propagate_list 
+          in 
+          let error,blackboard,propagate_list = 
+            look_down parameter handler error blackboard propagate_list case 
           in 
           (error,blackboard,instruction_list,propagate_list),result 
         end 

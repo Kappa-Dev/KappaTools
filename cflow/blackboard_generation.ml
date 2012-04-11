@@ -37,6 +37,7 @@ sig
 
   type pre_blackboard  (*blackboard during its construction*)
 
+  val weakening: predicate_value -> predicate_value list 
   val conj: (predicate_value -> predicate_value -> K.H.error_channel * predicate_value) K.H.with_handler
   val disjunction: (predicate_value -> predicate_value -> K.H.error_channel * predicate_value) K.H.with_handler  
  
@@ -70,7 +71,7 @@ sig
   val get_profiling: pre_blackboard -> K.P.log_info 
 
   val profiling: (K.P.log_info -> K.P.log_info) -> pre_blackboard -> pre_blackboard
-
+  val cut: (pre_blackboard -> K.H.error_channel * pre_blackboard) K.H.with_handler 
 end
 
 module Preblackboard = 
@@ -117,6 +118,13 @@ module Preblackboard =
 
      module C = (Cache.Cache(struct type t = predicate_value let compare = compare end):Cache.Cache with type O.t = predicate_value) 
 
+     let weakening p = 
+       match p 
+       with 
+         | Counter _ | Internal_state_is _ | Present | Free | Bound  -> [p;Defined]
+         | Bound_to (_,_,ag,site) -> [p;Bound_to_type (ag,site);Bound;Defined]
+         | Bound_to_type _ -> [p;Bound;Defined]
+         | Defined | Undefined -> [p]
 
      let defined = Defined 
      let undefined = Undefined 
@@ -149,6 +157,10 @@ module Preblackboard =
            pre_side_effect_of_event: K.side_effect A.t;
            pre_fictitious_observable: step_id option; (*id of the step that closes all the side-effect mutex *) 
            pre_profiling: K.P.log_info; (* profiling information *)
+           pre_predicate_ids_to_keep: bool A.t ;
+           pre_predicate_renaming: int A.t ;
+           pre_event_ids_to_keep: bool A.t ; 
+           pre_event_renaming: int A.t ;
            } 
 
          let get_profiling x = x.pre_profiling 
@@ -570,6 +582,10 @@ module Preblackboard =
   let init parameter handler error log_info = 
     error, 
     {
+      pre_predicate_ids_to_keep = A.make 1 false; 
+      pre_predicate_renaming = A.make 1 1; 
+      pre_event_ids_to_keep = A.make 1 false; 
+      pre_event_renaming = A.make 1 1;
       pre_profiling = log_info  ;
       pre_side_effect_of_event = A.make 1 K.empty_side_effect;
       pre_event = A.make 1 K.dummy_refined_step;
@@ -936,7 +952,44 @@ module Preblackboard =
   let get_side_effect parameter handler error blackboard = 
     error,blackboard.pre_side_effect_of_event
 
+  let rename n t = 
+    let t' = A.create n 0 in 
+    let rec aux k m = 
+      if m=n 
+      then ()
+      else 
+        if A.get t k 
+        then 
+          let m = m + 1 in 
+          let _ = A.set t' m k in 
+          aux (k+1) m 
+        else 
+          aux (k+1) m
+    in 
+    let _ = aux 0 0 
+    in t' 
 
+  let cut parameter handler error blackboard = 
+    let eid = blackboard.pre_nsteps in 
+    let n_pid = blackboard.pre_ncolumn in 
+    let rec aux k (nstep,npred) = 
+      if k = 0 
+      then 
+        (nstep,npred)
+      else 
+        begin 
+          let _ = () in 
+          aux (k-1) (nstep,npred)
+        end 
+    in 
+    let nstep',npred' = aux eid (0,0) in 
+    let rename_event = rename nstep' blackboard.pre_event_ids_to_keep in 
+    let rename_pid = rename npred' blackboard.pre_predicate_ids_to_keep in 
+    error,{blackboard 
+     with pre_predicate_renaming = rename_pid ;
+          pre_event_renaming = rename_event ; 
+    }
+    
     
 end:PreBlackboard)
 
