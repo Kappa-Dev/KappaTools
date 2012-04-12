@@ -298,8 +298,8 @@ let diff pos m0 m1 label_opt env =
 															let kept = List.exists (fun id -> id=id') prefix 
 																(*try let _ = (Mixture.agent_of_id id' m1) in true with Not_found -> false*)
 															in
-															let still_bound = 
-																if not kept then false
+															let apply_anyway = (*generate the FREE instruction without testing whether a FREE instruction will be generated for (id',site_id')*)
+																if not kept then true 
 																else
 																	match Mixture.follow (id',site_id') m1 with
 																		| None -> false
@@ -312,7 +312,7 @@ let diff pos m0 m1 label_opt env =
 																	add_map (KEPT id) (site_id,1) idmap
 															and inst =
 																(*generating only one FREE instruction when id'<=id or when (id',site_id') is still bound in rhs*)
-																if still_bound or id'< id or (id'= id && site_id'< site_id) then (FREE (((KEPT id), site_id),true)):: inst
+																if apply_anyway or id'< id or (id'= id && site_id'< site_id) then (FREE (((KEPT id), site_id),true)):: inst
 																else inst
 															in
 															(inst,idmap)
@@ -468,7 +468,19 @@ let diff pos m0 m1 label_opt env =
 			)
 			(instructions,modif_sites) prefix
 	in
-	(List.rev instructions, balance, added, modif_sites,!side_effect)
+	let sort inst inst' =
+		let weight i = 
+			match i with
+				| ADD _ -> 0 (*adding new agents has biggest priority*)
+				| DEL _ -> 4 (*deleting agents last to minimize side effects*)
+ 				| MOD _ -> 1 (*whatev*)
+				| BND _ -> 3 (*freeing links before creating new ones*)
+				| FREE _ -> 2
+		in
+		compare (weight inst) (weight inst')
+	in
+	((List.fast_sort sort instructions),balance,added,modif_sites,!side_effect) 
+	(*List.rev instructions, balance, added, modif_sites,!side_effect*)
 
 let rec superpose todo_list lhs rhs map already_done added env =
 	match todo_list with
