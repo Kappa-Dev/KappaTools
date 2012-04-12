@@ -298,13 +298,21 @@ let diff pos m0 m1 label_opt env =
 															let kept = List.exists (fun id -> id=id') prefix 
 																(*try let _ = (Mixture.agent_of_id id' m1) in true with Not_found -> false*)
 															in
+															let still_bound = 
+																if not kept then false
+																else
+																	match Mixture.follow (id',site_id') m1 with
+																		| None -> false
+																		| Some _ -> true
+															in
 															let idmap = 
 																if kept then 
-																	add_map (KEPT id) (site_id,1) (add_map (KEPT id') (site_id',1) idmap) (*bug if id' is deleted by the rule should not be added to modif_sites*)
+																	add_map (KEPT id) (site_id,1) (add_map (KEPT id') (site_id',1) idmap) 
 																else
 																	add_map (KEPT id) (site_id,1) idmap
 															and inst =
-																if id'< id or (id'= id && site_id'< site_id) then (FREE (((KEPT id), site_id),true)):: inst
+																(*generating only one FREE instruction when id'<=id or when (id',site_id') is still bound in rhs*)
+																if still_bound or id'< id or (id'= id && site_id'< site_id) then (FREE (((KEPT id), site_id),true)):: inst
 																else inst
 															in
 															(inst,idmap)

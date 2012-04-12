@@ -74,7 +74,7 @@ let update_intra_in_components r embedding_info state counter env =
 					try IntMap.find root components with 
 						| Not_found -> 
 							(Debug.tag 
-							(Printf.sprintf "root %d (= phi(%d)) not found in %s" root (match Mixture.root_of_cc r.lhs cc_i with Some r -> r)
+							(Printf.sprintf "root %d (= phi(%d)) not found in %s" root (match Mixture.root_of_cc r.lhs cc_i with Some r -> r | None -> -1)
 								(Tools.string_of_map string_of_int (Tools.string_of_set string_of_int IntSet.fold) 
 								IntMap.fold 
 								components
