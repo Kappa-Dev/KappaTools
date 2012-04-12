@@ -1353,6 +1353,26 @@ module Propagation_heuristic =
       then look_down 
       else (fun _ _ error blackboard list _ -> error,blackboard,list)
 
+        
+    let refine_value_after parameter handler error blackboard address value instruction_list propagate_list =
+      let case_address = B.value_after address in 
+      let state = B.state value in 
+      let error,blackboard,result = B.refine parameter handler error case_address state blackboard in 
+      if B.is_ignored result 
+      then 
+        error,blackboard,instruction_list,propagate_list,result 
+      else if B.is_failed result 
+      then 
+        error,blackboard,[],[],result 
+      else 
+        let propagate_list = (Propagate_up address)::(Propagate_down address)::propagate_list in 
+        error,blackboard,instruction_list,propagate_list,result 
+          
+    let refine_value_before parameter handler error blackboard address value instruction_list propagate_list =
+      let error,pointer_previous = B.follow_pointer_up parameter handler error blackboard address in 
+      refine_value_after parameter handler error blackboard pointer_previous value instruction_list propagate_list 
+        
+
     let discard_case parameter handler case (error,blackboard,instruction_list,propagate_list) = 
       let error,pointer_next = B.follow_pointer_down parameter handler error blackboard case in 
       let error,pointer_previous = B.follow_pointer_up parameter handler error blackboard case in 
@@ -1372,34 +1392,55 @@ module Propagation_heuristic =
       then (error,blackboard,instruction_list,propagate_list),result 
       else 
         begin 
-          let error,blackboard = B.dec parameter handler error (B.n_unresolved_events_in_column case) blackboard in 
-            (** we plug pointer next of the previous event *)
-          let error,blackboard = 
-            B.overwrite
-              parameter 
-              handler
-              error 
-              (B.pointer_to_next pointer_previous)
-              (B.pointer pointer_next)
-              blackboard 
-          in 
-            (** we plug pointer previous of the next event *)
-          let error,blackboard = 
-            B.overwrite 
-              parameter 
-              handler 
-              error 
-              (B.pointer_to_previous pointer_next)
-              (B.pointer pointer_previous)
-              blackboard 
-          in 
-          let propagate_list = 
-            (Propagate_up pointer_next)::(Propagate_down pointer_previous)::propagate_list 
-          in 
-          let error,blackboard,propagate_list = 
-            look_down parameter handler error blackboard propagate_list case 
-          in 
-          (error,blackboard,instruction_list,propagate_list),result 
+           let ca = B.case_address_of_case_event_address case in 
+           let error,case_value = B.get parameter handler error ca blackboard in 
+           let error,predicate_value = B.predicate_value_of_case_value parameter handler error case_value in 
+           let preview_case_address = B.case_address_of_case_event_address pointer_previous in 
+           let error,preview_case_value = B.get parameter handler error preview_case_address blackboard in 
+           let error,preview_predicate_value = B.predicate_value_of_case_value parameter handler error preview_case_value in 
+           if B.PB.compatible preview_predicate_value predicate_value 
+           then 
+             begin 
+               let error,new_value = B.PB.conj parameter handler error predicate_value preview_predicate_value in 
+               let error,blackboard,instruction_list,propagation_list,result' = refine_value_after parameter handler error blackboard pointer_previous new_value instruction_list propagate_list in 
+               if B.is_failed result' 
+               then (error,blackboard,[],[]),result'
+               else 
+                 let error,blackboard = B.dec parameter handler error (B.n_unresolved_events_in_column case) blackboard in 
+               (** we plug pointer next of the previous event *)
+                 let error,blackboard = 
+                   B.overwrite
+                     parameter 
+                     handler
+                     error 
+                     (B.pointer_to_next pointer_previous)
+                     (B.pointer pointer_next)
+                     blackboard 
+                 in 
+               (** we plug pointer previous of the next event *)
+                 let error,blackboard = 
+                   B.overwrite 
+                     parameter 
+                     handler 
+                     error 
+                     (B.pointer_to_previous pointer_next)
+                     (B.pointer pointer_previous)
+                     blackboard 
+                 in 
+                 let propagate_list = 
+                   (Propagate_up pointer_next)::(Propagate_down pointer_previous)::propagate_list 
+                 in 
+                 let error,blackboard,propagate_list = 
+                   look_down parameter handler error blackboard propagate_list case 
+                 in 
+                 (error,blackboard,instruction_list,propagate_list),result 
+             end
+           else 
+             (error,
+             blackboard,
+             [],
+             []),
+             B.fail
         end 
           
     let keep_case parameter handler case (error,blackboard,instruction_list,propagate_list) = 
@@ -1503,24 +1544,6 @@ module Propagation_heuristic =
 
     let cut_event = gen_event cut_case B.PB.K.P.inc_cut_events
     let discard_event = gen_event discard_case B.PB.K.P.inc_removed_events  
-
-    let refine_value_after parameter handler error blackboard address value instruction_list propagate_list =
-      let case_address = B.value_after address in 
-      let state = B.state value in 
-      let error,blackboard,result = B.refine parameter handler error case_address state blackboard in 
-      if B.is_ignored result 
-      then 
-        error,blackboard,instruction_list,propagate_list,result 
-      else if B.is_failed result 
-      then 
-        error,blackboard,[],[],result 
-      else 
-        let propagate_list = (Propagate_up address)::(Propagate_down address)::propagate_list in 
-        error,blackboard,instruction_list,propagate_list,result 
-          
-    let refine_value_before parameter handler error blackboard address value instruction_list propagate_list =
-      let error,pointer_previous = B.follow_pointer_up parameter handler error blackboard address in 
-      refine_value_after parameter handler error blackboard pointer_previous value instruction_list propagate_list 
 
     let apply_instruction parameter handler error blackboard instruction instruction_list propagate_list = 
         match instruction 
