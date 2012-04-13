@@ -1,0 +1,10 @@
+C(a~u) -> @0
+C(a~p) -> @10 
+-> C() @10
+ 
+%init: 1000 C(a~u) 
+
+%agent: C(a~u~p)
+
+
+%mod: [true] do $TRACK 'C' until [false]
