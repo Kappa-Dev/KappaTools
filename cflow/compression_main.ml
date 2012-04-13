@@ -22,7 +22,7 @@ module S = Generic_branch_and_cut_solver.Solver
 
 
 let log_step = true
-let debug_mode = false 
+let debug_mode = false
 
 
 

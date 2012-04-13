@@ -821,7 +821,7 @@ module Preblackboard =
           let error,blackboard,action_list,test_list = predicates_of_action parameter handler error blackboard action in 
           error,blackboard,build_map action_list action_map,build_map test_list test_map)
         (error,blackboard,PredicateidMap.empty,test_map)
-        (List.rev action_list) in 
+        ((*List.rev*) action_list) in 
     let g x = 
       match x 
       with 

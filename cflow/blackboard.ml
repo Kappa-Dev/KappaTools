@@ -18,7 +18,7 @@
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
-let debug_mode = false 
+let debug_mode = false
 
 module type Blackboard = 
 sig 
@@ -43,6 +43,7 @@ sig
   val ignore: assign_result
   val fail: assign_result 
 
+  val predicate_id_of_case_address: event_case_address -> PB.predicate_id 
   val build_pointer: PB.step_short_id -> pointer 
   val is_before_blackboard: pointer -> bool 
   val get_npredicate_id: blackboard -> int 
@@ -83,8 +84,8 @@ sig
 
   (**pretty printing*)
   val print_blackboard:(blackboard -> PB.K.H.error_channel) PB.K.H.with_handler 
-  val print_event_case_address:out_channel -> event_case_address -> unit 
-  val print_stack: out_channel -> blackboard -> unit
+  val print_event_case_address:(blackboard ->  event_case_address -> PB.K.H.error_channel) PB.K.H.with_handler 
+  val print_stack: (blackboard -> PB.K.H.error_channel) PB.K.H.with_handler 
 
   val print_complete_log: out_channel -> blackboard -> unit 
   val print_short_log: out_channel -> blackboard -> unit 
@@ -154,6 +155,8 @@ module Blackboard =
 
 	}
 
+    let predicate_id_of_case_address x = x.column_predicate_id 
+
     let is_boundary parameter handler error blackboard event_address = 
       error,is_before_blackboard event_address.row_short_event_id 
    
@@ -202,25 +205,14 @@ module Blackboard =
         | Pointer i -> Printf.fprintf parameter.PB.K.H.out_channel_err "Pointer %i\n" i 
         | Boolean b -> Printf.fprintf parameter.PB.K.H.out_channel_err "Boolean %s\n" (match b with None -> "?" | Some true -> "true" | _ -> "false")
  
-    let print_case_address parameter x = 
-      match x
-      with 
-       | N_unresolved_events_in_column i -> Printf.fprintf parameter.PB.K.H.out_channel_err "n_unresolved_events_in_pred %i" i 
-       | Pointer_to_next e -> 
-         let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "Pointer" in 
-         ()
-      | Value_after e -> 
-        let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "Value_after" in 
-        () 
-      | Value_before e -> 
-        let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "Value_before" in 
-        () 
-      | Pointer_to_previous e -> 
-        let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "Pointer_before" in 
-        () 
-      | N_unresolved_events -> Printf.fprintf parameter.PB.K.H.out_channel_err "Unresolved_events" 
-      | Exist e -> Printf.fprintf parameter.PB.K.H.out_channel_err "Exist" 
-      | Keep_event i -> Printf.fprintf parameter.PB.K.H.out_channel_err "Keep %i" i
+    let print_pointer log seid = 
+       Printf.fprintf log " event seid %i " seid
+
+(*    let print_event_case_address log event_case_address = 
+      let _ = print_pointer log event_case_address.row_short_event_id in 
+       Printf.fprintf log "predicate %i \n" event_case_address.column_predicate_id*) 
+         
+   
 
     let state predicate_value = State predicate_value 
     let counter i = Counter i 
@@ -416,6 +408,39 @@ module Blackboard =
        let static = case.static in 
        error,(static.row_short_id,static.event_id,static.test,static.action)
 
+     let print_event_case_address parameter handler error blackboard case = 
+       let error,(_,eid,_,_) = get_static parameter handler error blackboard case in 
+      let _ = Printf.fprintf parameter.PB.K.H.out_channel "Event: %i, Predicate: %i\n" eid (predicate_id_of_case_address case) in 
+      error
+
+     let print_case_address parameter handler error blackboard x = 
+      match x
+      with 
+       | N_unresolved_events_in_column i -> 
+         let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "n_unresolved_events_in_pred %i \n" i in 
+         error 
+       | Pointer_to_next e -> 
+         let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "Pointer" in 
+         print_event_case_address parameter handler error blackboard e  
+       | Value_after e -> 
+        let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "Value_after  " in   
+        print_event_case_address parameter handler error blackboard e 
+      | Value_before e -> 
+        let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "Value_before " in 
+        print_event_case_address parameter handler error blackboard e 
+      | Pointer_to_previous e -> 
+        let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "Pointer_before " in 
+        print_event_case_address parameter handler error blackboard e 
+      | N_unresolved_events -> 
+        let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "Unresolved_events" in 
+        error 
+      | Exist e -> 
+        let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "Exist " in 
+        print_event_case_address parameter handler error blackboard e 
+      | Keep_event i -> 
+        let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "Keep %i" i in 
+        error 
+      
      let get_npredicate_id blackboard = blackboard.n_predicate_id 
      let get_n_unresolved_events_of_pid blackboard pid = PB.A.get blackboard.weigth_of_predicate_id pid 
      let get_n_unresolved_events blackboard = blackboard.n_unresolved_events 
@@ -465,46 +490,40 @@ module Blackboard =
          | None -> 
            print_known_case log "?(" ") " " " case 
 
-     let print_pointer log seid = 
-       Printf.fprintf log "event sid %i" seid
-
-     let print_event_case_address log event_case_address = 
-       let _ = print_pointer log event_case_address.row_short_event_id in 
-       Printf.fprintf log "predicate %i" event_case_address.column_predicate_id 
-
-     let print_address log address = 
+     let print_address parameter handler error blackboard address = 
+       let log = parameter.PB.K.H.out_channel_err in 
        match address 
        with 
          | Keep_event i -> 
            let _ = Printf.fprintf log "Is the event %i selected ? " i in 
-           () 
+           error
          | Exist i -> 
            let _ = Printf.fprintf log "Is the case " in 
-           let _ = print_event_case_address  log i in 
+           let _ = print_event_case_address parameter handler error blackboard i in 
            let _ = Printf.fprintf log "selected ? " in 
-           () 
+           error 
          | N_unresolved_events_in_column i -> 
            let _ = Printf.fprintf log "Number of unresolved events for the predicate %i" i in 
-           ()
+           error
          | Pointer_to_next i -> 
            let _ = Printf.fprintf log "Prochain événement agissant sur "  in 
-           let _ = print_event_case_address log i in 
-           ()
+           let _ = print_event_case_address parameter handler error blackboard i in 
+           error
          | Value_after i -> 
            let _ = Printf.fprintf log "Valeur après "  in 
-           let _ = print_event_case_address log i in 
-           ()
+           let _ = print_event_case_address parameter handler error blackboard i in 
+           error
          | Value_before i -> 
            let _ = Printf.fprintf log "Valeur avant "  in 
-           let _ = print_event_case_address log i in 
-           ()
+           let _ = print_event_case_address parameter handler error blackboard i in 
+           error
          | Pointer_to_previous i -> 
            let _ = Printf.fprintf log "Evenement précésent agissant sur " in 
-           let _ = print_event_case_address log i in 
-           ()
+           let _ = print_event_case_address parameter handler error blackboard i in 
+           error
          | N_unresolved_events -> 
            let _ = Printf.fprintf log "Nombre d'événements non résolu" in 
-           () 
+           error
   
      let print_value log value = 
        match value 
@@ -520,13 +539,13 @@ module Blackboard =
                 | Some true -> "Yes"
                 | Some false -> "No")
 
-     let print_assignment log (address,value)  = 
-       let _ = print_address log address in 
-       let _ = print_value log value in 
-       () 
+     let print_assignment parameter handler error blackboard (address,value)  = 
+       let error  = print_address parameter handler error blackboard address in 
+       let _ = print_value parameter.PB.K.H.out_channel_err value in 
+       error 
 
      let print_blackboard parameter handler error blackboard = 
-       let log = parameter.PB.K.H.out_channel in  
+       let log = parameter.PB.K.H.out_channel_err in  
        let _ = Printf.fprintf log "**\nBLACKBOARD\n**\n" in 
        let _ = Printf.fprintf log "%i wires, %i events\n" blackboard.n_predicate_id blackboard.n_eid in 
        let _ = Printf.fprintf log "*wires:*\n" in 
@@ -557,15 +576,15 @@ module Blackboard =
        in 
        let error = !err in 
        let _ = Printf.fprintf log "*stacks*\n" in 
-       let _ = List.iter (print_assignment log) blackboard.current_stack in 
+       let error = List.fold_left (fun error -> print_assignment parameter handler error blackboard) error (List.rev blackboard.current_stack) in 
        let _ = Printf.fprintf log "\n" in 
        let _ = 
-         List.iter 
-           (fun stack -> 
-             let _ = List.iter (print_assignment log) stack in 
+         List.fold_left 
+           (fun error stack -> 
+             let error = List.fold_left (fun error -> print_assignment parameter handler error blackboard) error stack in 
              let _ = Printf.fprintf log "\n" in 
-             ())
-           blackboard.stack 
+             error)
+           error blackboard.stack 
        in 
        let _ = Printf.fprintf log "*selected_events*\n" in 
        let _ = 
@@ -857,6 +876,8 @@ module Blackboard =
          | N_unresolved_events -> error,Counter blackboard.n_unresolved_events
 
 
+
+           
    
      let record_modif parameter handler error case_address case_value blackboard = 
        error,
@@ -867,30 +888,36 @@ module Blackboard =
        let error,old = get parameter handler error case_address blackboard in 
        if case_value = old 
        then 
-           let _ = 
+           let error = 
              if debug_mode 
              then 
                let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\n***\nREFINE_VALUE\nValue before: " in 
+               let error = print_case_address parameter handler error blackboard case_address in 
                let _ = print_case_value parameter old in 
                let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\nNew value: " in 
               let _ = print_case_value parameter case_value in 
                let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\nIGNORED***\n" in 
-            () 
+               error
+             else 
+               error
            in 
          error,blackboard,Ignore
        else
          let error,bool = strictly_more_refined parameter handler error old case_value in 
          if bool 
          then 
-            let _ = 
+            let error = 
              if debug_mode 
              then 
                let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\n***\nREFINE_VALUE\nValue before: " in 
+               let error = print_case_address parameter handler error blackboard case_address in 
                let _ = print_case_value parameter old in 
                let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\nNew value: " in 
-              let _ = print_case_value parameter case_value in 
+               let _ = print_case_value parameter case_value in 
                let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\nIGNORED***\n" in 
-            () 
+               error
+             else
+               error 
            in 
            error,blackboard,Ignore 
          else 
@@ -900,27 +927,33 @@ module Blackboard =
            then 
              let error,blackboard = set parameter handler error case_address case_value blackboard in 
              let error,blackboard = record_modif parameter handler error case_address old blackboard in 
-              let _ = 
-             if debug_mode 
-             then 
-               let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\n***\nREFINE_VALUE\nValue before: " in 
-               let _ = print_case_value parameter old in 
-               let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\nNew value: " in 
-               let _ = print_case_value parameter case_value in 
-               let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\nSUCCESS***\n" in 
-            () 
-           in 
-             error,blackboard,Success
-           else 
-             let _ = 
+             let error = 
                if debug_mode 
                then 
                  let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\n***\nREFINE_VALUE\nValue before: " in 
+                 let error = print_case_address parameter handler error blackboard case_address in 
+                 let _ = print_case_value parameter old in 
+                 let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\nNew value: " in 
+                 let _ = print_case_value parameter case_value in 
+                 let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\nSUCCESS***\n" in 
+                 error 
+               else 
+                 error 
+           in 
+             error,blackboard,Success
+           else 
+             let error = 
+               if debug_mode 
+               then 
+                 let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\n***\nREFINE_VALUE\nValue before: " in 
+                 let error = print_case_address parameter handler error blackboard case_address in 
                  let _ = print_case_value parameter old in 
                  let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\nNew value: " in 
                  let _ = print_case_value parameter case_value in 
                  let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "\nFAIL***\n" in 
-                 () 
+                 error
+               else 
+                 error 
              in 
              error,blackboard,Fail 
 
@@ -953,6 +986,15 @@ module Blackboard =
               PB.K.H.raise_error parameter handler error_list error blackboard 
          
      let branch parameter handler error blackboard = 
+       let error = 
+         if debug_mode 
+         then 
+           let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "*******\n * BRANCH *\n*******" in 
+           let error = print_blackboard parameter handler error blackboard in 
+           error
+         else 
+           error
+       in 
        let blackboard = set_profiling_info PB.K.P.inc_branch blackboard in 
        error,
        {
@@ -963,10 +1005,14 @@ module Blackboard =
        }
        
      let reset_last_branching parameter handler error blackboard = 
-       let _ = 
+       let error = 
          if debug_mode 
          then 
-           Printf.fprintf parameter.PB.K.H.out_channel_err "*******\n* Cut *\n*******" 
+           let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "*******\n* Cut *\n*******" in 
+           let error = print_blackboard parameter handler error blackboard in 
+           error
+         else 
+           error
        in 
        let stack = blackboard.current_stack in 
        let error,blackboard = 
@@ -976,7 +1022,16 @@ module Blackboard =
            (error,blackboard)
            stack 
        in 
-       let blackboard = set_profiling_info PB.K.P.inc_cut blackboard in 
+       let error = 
+         if debug_mode 
+         then 
+           let _ = Printf.fprintf parameter.PB.K.H.out_channel_err "*******\n* After_Cut *\n*******" in 
+           let error = print_blackboard parameter handler error blackboard in 
+           error
+         else
+           error 
+       in 
+        let blackboard = set_profiling_info PB.K.P.inc_cut blackboard in 
        match blackboard.stack 
        with 
          | [] -> error,{blackboard with current_stack = []}
@@ -1032,15 +1087,16 @@ module Blackboard =
      let list = aux 0 [] in 
      error,list 
        
-   let print_stack log blackboard = 
+   let print_stack parameter handler error blackboard = 
      let stack = blackboard.current_stack in 
+     let log = parameter.PB.K.H.out_channel_err in 
      let _ = Printf.fprintf log "Current_stack_level %i " (List.length stack) in 
-     let _ = List.iter (fun i -> print_assignment log i ;Printf.fprintf log "\n") stack  in 
-     List.iter 
-         (fun x -> 
+     let error = List.fold_left (fun error i -> let error = print_assignment parameter handler error blackboard i in let _ = Printf.fprintf log "\n" in error ) error (List.rev stack)  in 
+     List.fold_left
+         (fun error x -> 
            let _ = Printf.fprintf log "Other level %i "  (List.length x) in 
-           List.iter (print_assignment log) x)
-         blackboard.stack 
+           List.fold_left (fun error -> print_assignment parameter handler error blackboard) error (List.rev x))
+         error (List.rev blackboard.stack)
   
    let is_fictitious_obs blackboard eid = 
      Some eid = blackboard.fictitious_observable

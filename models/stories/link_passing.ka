@@ -1,3 +1,4 @@
+# -seed 67487189
 A(x),K(x) -> A(x!1),K(x!1) @2
 A(x!1),K(x!1) -> A(x),K(x) @1 
 A(x!1,y),K(x!1) -> A(x,y!1),K(x!1) @2
@@ -9,8 +10,8 @@ A(z!1,y),K(x!1) -> A(z,y!1),K(x!1) @1
 'GOAL' A(z!_) -> A(z!_) @1
 
 
-%init: 10 A(x,y,z)
-%init: 2 K(x)
+%init: 1 A(x,y,z)
+%init: 1 K(x)
 
 
 %agent: A(x,y,z)
