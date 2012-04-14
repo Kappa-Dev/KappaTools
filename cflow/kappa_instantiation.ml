@@ -517,7 +517,7 @@ module Cflow_linker =
         )
         list list_sites 
     in 
-    list 
+    List.rev list 
 
   let actions_of_event event handler = 
     let rule = rule_of_event event in 
