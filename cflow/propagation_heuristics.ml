@@ -1509,7 +1509,7 @@ module Propagation_heuristic =
             let error,preview_predicate_value = B.predicate_value_of_case_value parameter handler error preview_case_value in 
             let error,(seid,eid,test,action) = B.get_static parameter handler error blackboard case in
             if B.PB.compatible test preview_predicate_value && 
-              (B.PB.compatible action  predicate_value or B.is_unknown action)
+              B.PB.compatible action  predicate_value 
             then 
               begin 
                 
