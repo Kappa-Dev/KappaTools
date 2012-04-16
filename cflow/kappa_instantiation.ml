@@ -116,6 +116,8 @@ sig
   val print_side_effect: out_channel -> side_effect -> unit
   val side_effect_of_list: (int*int) list -> side_effect 
   val no_obs_found: step list -> bool 
+
+  val get_kasim_side_effects: refined_step -> kasim_side_effect 
 end 
 
 
@@ -190,9 +192,17 @@ module Cflow_linker =
   type refined_init = init * action list
   type refined_obs =  obs * test list 
 
+          
+
   type side_effects = (int*int) list 
   type step = (event,init,obs) choice 
   type refined_step = (refined_event,refined_init,refined_obs) choice 
+
+  let get_kasim_side_effects a = 
+    match a 
+    with 
+      | Event ((_,(_,_,_,a)),_,_) -> a
+      | _ -> Mods.Int2Set.empty 
 
   let dummy_refined_step = Dummy 
   let empty_side_effect = []

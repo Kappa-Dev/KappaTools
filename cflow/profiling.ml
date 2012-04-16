@@ -10,7 +10,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 09/04/2012
-  * Last modification: 10/04/2012
+  * Last modification: 16/04/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -42,6 +42,7 @@ module type StoryStats =
     val add_look_down_case: int -> log_info -> log_info
 
     val set_time: log_info -> log_info 
+    val set_global_cut: int -> log_info -> log_info 
     val ellapsed_global_time: log_info -> float
     val ellapsed_time: log_info -> float
     val init_log_info: unit -> log_info 
@@ -68,6 +69,7 @@ module StoryStats =
              story_start_time:float;
              propagation: int array;
              branch: int;
+             global_cut: int; 
              cut: int; 
              kasim_events: int;
              init_events: int;
@@ -136,6 +138,7 @@ module StoryStats =
            propagation = Array.make propagation_cases 0 ;
            branch = 0 ;
            cut = 0 ;
+           global_cut = 0 ; 
            kasim_events = 0 ;
            init_events = 0 ;
            obs_events = 0 ;
@@ -257,17 +260,18 @@ module StoryStats =
        let dump_complete_log log log_info = 
          let _ = Printf.fprintf log "/*\n" in 
          let _ = Printf.fprintf log "Story profiling\n" in 
-         let _ = Printf.fprintf log "Ellapsed_time:     %f\n" (ellapsed_time log_info) in 
-         let _ = Printf.fprintf log "KaSim events:      %i\n" log_info.kasim_events in 
-         let _ = Printf.fprintf log "Init events:       %i\n" log_info.init_events in 
-         let _ = Printf.fprintf log "Obs events:        %i\n" log_info.obs_events in 
-         let _ = Printf.fprintf log "Fictitious events: %i\n" log_info.fictitious_events in 
-         let _ = Printf.fprintf log "Cut events:        %i\n" log_info.cut_events in 
-         let _ = Printf.fprintf log "Selected events:   %i\n" log_info.current_stack.selected_events in 
-         let _ = Printf.fprintf log "Removed events:    %i\n" log_info.current_stack.removed_events in 
-         let _ = Printf.fprintf log "Remaining events:  %i\n" (log_info.kasim_events + log_info.obs_events + log_info.init_events +log_info.fictitious_events - log_info.cut_events - log_info.current_stack.selected_events - log_info.current_stack.removed_events) in 
-         let _ = Printf.fprintf log "Exploration depth: %i\n" log_info.current_stack.current_branch in 
-         let _ = Printf.fprintf log "Cuts:              %i\n" log_info.cut in 
+         let _ = Printf.fprintf log "Ellapsed_time:               %f\n" (ellapsed_time log_info) in 
+         let _ = Printf.fprintf log "KaSim events:                %i\n" log_info.kasim_events in 
+         let _ = Printf.fprintf log "Init events:                 %i\n" log_info.init_events in 
+         let _ = Printf.fprintf log "Obs events:                  %i\n" log_info.obs_events in 
+         let _ = Printf.fprintf log "Fictitious events:           %i\n" log_info.fictitious_events in 
+         let _ = Printf.fprintf log "Cut events (globally):       %i \n" log_info.global_cut in 
+         let _ = Printf.fprintf log "Cut events (for this story): %i\n" log_info.cut_events in 
+         let _ = Printf.fprintf log "Selected events:             %i\n" log_info.current_stack.selected_events in 
+         let _ = Printf.fprintf log "Removed events:              %i\n" log_info.current_stack.removed_events in 
+         let _ = Printf.fprintf log "Remaining events:            %i\n" (log_info.kasim_events + log_info.obs_events + log_info.init_events +log_info.fictitious_events - log_info.cut_events - log_info.current_stack.selected_events - log_info.current_stack.removed_events - log_info.global_cut) in 
+         let _ = Printf.fprintf log "Exploration depth:           %i\n" log_info.current_stack.current_branch in 
+         let _ = Printf.fprintf log "Exploration cuts:            %i\n" log_info.cut in 
          let _ = Printf.fprintf log "***\nPropagation Hits:\n" in 
          let rec aux k = 
            if k>=propagation_cases 
@@ -288,7 +292,9 @@ module StoryStats =
            true,{log_info with last_tick = time}
          else
            false,log_info
-               
+
+       let set_global_cut n log_info = 
+         {log_info with global_cut = n}
 
       end:StoryStats)
            
