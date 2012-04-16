@@ -612,8 +612,8 @@ module Cflow_linker =
 		 let fresh' = add_asso rhs_id kappa_agent fresh in 
 		   list_actions',side_sites,fresh')
 	([],[],Mods.IntMap.empty)
-	(List.rev rule.Dynamics.script)
-    in a,b
+	rule.Dynamics.script
+    in List.rev a,b
 
       
 
