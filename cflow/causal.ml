@@ -259,10 +259,10 @@ let dot_of_grid profiling fic grid state env =
 		(fun eid ->
 			let atom = IntMap.find eid config.events in
 			if eid = 0 then () else
-			match atom.kind 
-                        with 
-                          | RULE _  -> fprintf desc "node_%d [label=\"%s\", shape=invhouse, style=filled, fillcolor = lightblue] ;\n" eid (label atom.kind) 
-                          | OBS _  ->  fprintf desc "node_%d [label =\"%s\", style=filled, fillcolor=red] ;\n" eid (label atom.kind) 
+			match atom.kind  with 
+      	| RULE _  -> fprintf desc "node_%d [label=\"%s\", shape=invhouse, style=filled, fillcolor = lightblue] ;\n" eid (label atom.kind) 
+        | OBS _  ->  fprintf desc "node_%d [label =\"%s\", style=filled, fillcolor=red] ;\n" eid (label atom.kind) 
+				| _ -> invalid_arg "Event type not handled"
 	(*		List.iter (fun obs -> fprintf desc "obs_%d [label =\"%s\", style=filled, fillcolor=red] ;\n node_%d -> obs_%d [arrowhead=vee];\n" eid obs eid eid) atom.observation ;*) 
 		) eids_at_d ;
 		fprintf desc "}\n" ;
