@@ -94,14 +94,7 @@ struct
     then 
       error,blackboard,PH.B.success 
     else
-       let n = (PH.B.get_n_unresolved_events blackboard) in 
-       let _ =
-         if n mod 10000 = 0 then 
-           let _ = Printf.fprintf parameter.PH.B.PB.Po.K.H.out_channel_err "Branch %i \n" (PH.B.get_n_unresolved_events blackboard) in 
-           let _ = flush parameter.PH.B.PB.Po.K.H.out_channel_err
-           in () 
-       in 
-       let error,list = PH.next_choice parameter handler error blackboard in
+      let error,list = PH.next_choice parameter handler error blackboard in
       branch_over_assumption_list parameter handler error list blackboard 
     
   let compress parameter handler error blackboard list_order list_eid =
