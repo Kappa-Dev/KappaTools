@@ -26,6 +26,7 @@ module type Cflow_handler =
             cache_size : int option ;
             compression_mode : Parameter.compression_mode ;
             out_channel_err : out_channel ;
+            out_channel_profiling : out_channel ;
             out_channel : out_channel 
           } (*a struct which contains parameterizable options*)  
     type error 
@@ -54,13 +55,16 @@ module Cflow_handler =
             cache_size : int option ;
             compression_mode : Parameter.compression_mode ;
             out_channel_err : out_channel ;
+            out_channel_profiling: out_channel ;
             out_channel : out_channel 
           }
 
       let build_parameter () = 
+        let channel = open_out !Parameter.profilingName in 
         {
           out_channel = stderr ; 
           out_channel_err = stderr ; 
+          out_channel_profiling = channel ;
           compression_mode = Parameter.get_compression_mode () ; 
           cache_size = Parameter.get_cache_size () ;
         }

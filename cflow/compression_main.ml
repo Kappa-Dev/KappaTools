@@ -75,21 +75,29 @@ let weak_compression env state log_info step_list =
                   refined_event_list  
               in flush parameter.S.PH.B.PB.Po.K.H.out_channel
           in 
-          let _ = 
-            if log_step
+          let refined_event_list_cut,int = 
+            if Parameter.do_global_cut 
             then 
-              Debug.tag "\t\t * cutting concurrent events" 
-          in 
-          let refined_event_list_before_cut = refined_event_list in 
-          let refined_event_list_cut,int = S.PH.B.PB.Po.cut refined_event_list in 
-          let _ = 
-            if debug_mode
-            then 
-              let _ = 
-                List.iter 
-                  (S.PH.B.PB.Po.K.print_refined_step parameter handler) 
-                  refined_event_list_cut  
-              in flush parameter.S.PH.B.PB.Po.K.H.out_channel_err
+              begin 
+                let _ = 
+                  if log_step
+                  then 
+                    Debug.tag "\t\t * cutting concurrent events" 
+                in 
+                let refined_event_list_cut,int = S.PH.B.PB.Po.cut refined_event_list  in 
+                let _ = 
+                  if debug_mode
+                  then 
+                    let _ = 
+                      List.iter 
+                        (S.PH.B.PB.Po.K.print_refined_step parameter handler) 
+                        refined_event_list_cut  
+                    in flush parameter.S.PH.B.PB.Po.K.H.out_channel_err
+                in 
+                refined_event_list_cut,int 
+              end
+            else 
+              refined_event_list,0 
           in 
           let error = [] in 
           let error,blackboard = S.PH.B.PB.init parameter handler error log_info  in
@@ -189,7 +197,9 @@ let weak_compression env state log_info step_list =
                         let error,list = S.PH.B.translate_blackboard parameter handler error blackboard in 
                         let grid = S.PH.B.PB.Po.K.build_grid list false handler in
 		        let filename_comp = (Filename.chop_suffix !Parameter.cflowFileName ".dot") ^"_"^(string_of_int counter)^"weak_comp"^".dot" in 
-                        let _ = Causal.dot_of_grid (fun log -> S.PH.B.print_complete_log log blackboard) filename_comp grid state env in
+                        let _ = Causal.dot_of_grid (fun log -> 
+                          let _ = S.PH.B.print_complete_log log blackboard in 
+                          let _ = S.PH.B.print_complete_log parameter.S.PH.B.PB.Po.K.H.out_channel_profiling blackboard in ()) filename_comp grid state env in
                         () 
                     in 
                     let _ = 
@@ -210,6 +220,7 @@ let weak_compression env state log_info step_list =
                 error,counter+1,tick)
               (error,1,tick) list 
           in 
+          let _ = close_out parameter.S.PH.B.PB.Po.K.H.out_channel_profiling in 
           let _ = 
             List.iter 
               (S.PH.B.PB.Po.K.H.dump_error parameter handler error)

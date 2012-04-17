@@ -35,8 +35,8 @@ struct
     let _ = 
       if bool 
       then 
-        let _ = PH.B.print_complete_log parameter.PH.B.PB.Po.K.H.out_channel blackboard in 
-        let _ = flush parameter.PH.B.PB.Po.K.H.out_channel_err
+        let _ = PH.B.print_complete_log parameter.PH.B.PB.Po.K.H.out_channel_profiling blackboard in 
+        let _ = flush parameter.PH.B.PB.Po.K.H.out_channel_profiling
         in () 
     in 
     match instruction_list 

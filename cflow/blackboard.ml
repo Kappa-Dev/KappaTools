@@ -9,12 +9,12 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 06/09/2011
-  * Last modification: 10/04/2012
+  * Last modification: 17/04/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
   *  
-  * Copyright 2011 Institut National de Recherche en Informatique et   
+  * Copyright 2011,2012 Institut National de Recherche en Informatique et   
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
@@ -1104,91 +1104,104 @@ module Blackboard =
    
    let useless_predicate_id parameter handler error blackboard list = 
      let n_events = blackboard.n_eid in  
-     let event_array = PB.A.make n_events false in
-     let _ = 
-       List.iter 
-         (fun i -> 
-           PB.A.set event_array i true 
-         ) 
-         list 
-     in 
-     let rec aux error event_list =  
-       match event_list 
-       with 
-         | [] -> error
-         | eid::q -> 
-           begin 
-             if is_fictitious_obs blackboard eid 
-             then 
-               aux error q  
-             else 
-               let list = PB.A.get blackboard.event_case_list eid in 
-               let q = 
-                 List.fold_left
-                   (fun q event_case_address ->
-                     let error,case = get_case parameter handler error event_case_address blackboard in 
-                     let pointer = case.dynamic.pointer_previous in 
-                     let eid = 
-                       let rec scan_down pointer =
-                         let prev_event_case_address = 
-                           {event_case_address with row_short_event_id = pointer}
+     if Parameter.do_local_cut 
+     then 
+       begin 
+         let event_array = PB.A.make n_events false in
+         let _ = 
+           List.iter 
+             (fun i -> 
+               PB.A.set event_array i true 
+             ) 
+             list 
+         in 
+         let rec aux error event_list =  
+           match event_list 
+           with 
+             | [] -> error
+             | eid::q -> 
+               begin 
+                 if is_fictitious_obs blackboard eid 
+                 then 
+                   aux error q  
+                 else 
+                   let list = PB.A.get blackboard.event_case_list eid in 
+                   let q = 
+                     List.fold_left
+                       (fun q event_case_address ->
+                         let error,case = get_case parameter handler error event_case_address blackboard in 
+                         let pointer = case.dynamic.pointer_previous in 
+                         let eid = 
+                           let rec scan_down pointer =
+                             let prev_event_case_address = 
+                               {event_case_address with row_short_event_id = pointer}
+                             in 
+                             let error,prev_case = get_case parameter handler error prev_event_case_address blackboard in 
+                             let prev_eid = prev_case.static.event_id in 
+                             if is_null_pointer prev_eid 
+                             then None 
+                             else 
+                               if PB.is_unknown prev_case.static.action 
+                               then 
+                                 let pointer = prev_case.dynamic.pointer_previous in 
+                                 scan_down pointer 
+                               else Some prev_eid 
+                           in 
+                           scan_down pointer 
                          in 
-                         let error,prev_case = get_case parameter handler error prev_event_case_address blackboard in 
-                         let prev_eid = prev_case.static.event_id in 
-                         if is_null_pointer prev_eid 
-                         then None 
-                         else 
-                           if PB.is_unknown prev_case.static.action 
-                           then 
-                             let pointer = prev_case.dynamic.pointer_previous in 
-                             scan_down pointer 
-                           else Some prev_eid 
-                       in 
-                       scan_down pointer 
-                     in 
-                     match 
-                       eid 
-                     with 
-                       | None -> q 
-                       | Some prev_eid -> 
-                         let bool = 
-                           try 
-                             PB.A.get event_array prev_eid 
-                           with 
-                             | _ -> false 
-                         in 
-                         let q = 
-                           if 
-                             bool 
-                           then 
-                             q
-                           else 
-                             let _ = PB.A.set event_array prev_eid true in 
-                             prev_eid::q
-                         in q)
-                   q 
-                   list 
-               in 
-               aux error q 
-           end 
-     in 
-     let error = aux error list in 
-     let event_to_keep = ref [] in 
-     let event_to_remove = ref [] in 
-     let _ = 
-       PB.A.iteri 
-         (fun i value -> 
-           if value 
-           then 
-             event_to_keep:=i::(!event_to_keep)
-           else 
-             event_to_remove:=i::(!event_to_remove)
-         )
-         event_array 
-     in 
-     let rep  = List.rev_map (fun k -> PB.A.get blackboard.event k,PB.Po.K.empty_side_effect) (!event_to_keep) in
-     error,rep,!event_to_remove 
-       
+                         match 
+                           eid 
+                         with 
+                           | None -> q 
+                           | Some prev_eid -> 
+                             let bool = 
+                               try 
+                                 PB.A.get event_array prev_eid 
+                               with 
+                                 | _ -> false 
+                             in 
+                             let q = 
+                               if 
+                                 bool 
+                               then 
+                                 q
+                               else 
+                                 let _ = PB.A.set event_array prev_eid true in 
+                                 prev_eid::q
+                             in q)
+                       q 
+                       list 
+                   in 
+                   aux error q 
+               end 
+         in 
+         let error = aux error list in 
+         let event_to_keep = ref [] in 
+         let event_to_remove = ref [] in 
+         let _ = 
+           PB.A.iteri 
+             (fun i value -> 
+               if value 
+               then 
+                 event_to_keep:=i::(!event_to_keep)
+               else 
+                 event_to_remove:=i::(!event_to_remove)
+             )
+             event_array 
+         in 
+         let rep  = List.rev_map (fun k -> PB.A.get blackboard.event k,PB.Po.K.empty_side_effect) (!event_to_keep) in
+         error,rep,!event_to_remove 
+       end
+     else
+       let event_to_keep = 
+         let rec aux k list = 
+           if k<0 then list 
+           else aux (k-1) (k::list)
+         in 
+         aux (n_events-1) [] in 
+       let rep  = List.rev_map (fun k -> PB.A.get blackboard.event k,PB.Po.K.empty_side_effect) event_to_keep in
+         error,rep,[]
+
    let cut parameter handler error blackboard list = 
      let error,cut_causal_flow,events_to_remove  = useless_predicate_id parameter handler error blackboard list in 
      error,blackboard,cut_causal_flow,events_to_remove 
