@@ -68,6 +68,7 @@ sig
   val get_pre_event: (pre_blackboard -> Po.K.H.error_channel * Po.K.refined_step A.t) Po.K.H.with_handler 
   val get_side_effect: (pre_blackboard -> Po.K.H.error_channel * Po.K.side_effect A.t) Po.K.H.with_handler 
   val get_fictitious_observable: (pre_blackboard -> Po.K.H.error_channel * int option) Po.K.H.with_handler 
+
   val get_profiling: pre_blackboard -> Po.K.P.log_info 
 
   val profiling: (Po.K.P.log_info -> Po.K.P.log_info) -> pre_blackboard -> pre_blackboard
@@ -157,10 +158,6 @@ module Preblackboard =
            pre_side_effect_of_event: Po.K.side_effect A.t;
            pre_fictitious_observable: step_id option; (*id of the step that closes all the side-effect mutex *) 
            pre_profiling: Po.K.P.log_info; (* profiling information *)
-           pre_predicate_ids_to_keep: bool A.t ;
-           pre_predicate_renaming: int A.t ;
-           pre_event_ids_to_keep: bool A.t ; 
-           pre_event_renaming: int A.t ;
            } 
 
          let get_profiling x = x.pre_profiling 
@@ -582,10 +579,6 @@ module Preblackboard =
   let init parameter handler error log_info = 
     error, 
     {
-      pre_predicate_ids_to_keep = A.make 1 false; 
-      pre_predicate_renaming = A.make 1 1; 
-      pre_event_ids_to_keep = A.make 1 false; 
-      pre_event_renaming = A.make 1 1;
       pre_profiling = log_info  ;
       pre_side_effect_of_event = A.make 1 Po.K.empty_side_effect;
       pre_event = A.make 1 Po.K.dummy_refined_step;
@@ -739,9 +732,9 @@ module Preblackboard =
           let old = A.get map pid in 
           A.set map pid (C.add p old) 
     in 
-    let error,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effets = 
+    let error,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effects = 
       List.fold_left 
-        (fun (error,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effets) (site,(binding_state)) -> 
+        (fun (error,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effects) (site,(binding_state)) -> 
           begin
             let error,blackboard,potential_target = potential_target error parameter handler blackboard site binding_state in 
             match 
@@ -752,7 +745,7 @@ module Preblackboard =
                   let list = 
                     List.fold_left 
                       (fun list t -> t::l)
-                      unambiguous_side_effets
+                      unambiguous_side_effects
                       l 
                   in 
                   error,
@@ -801,7 +794,7 @@ module Preblackboard =
                   blackboard,
                   (predicate_id::fictitious_list),
                   (predicate_id::fictitious_local_list),
-                  unambiguous_side_effets
+                  unambiguous_side_effects
                 end
           end)
         (error,blackboard,fictitious_list,fictitious_local_list,[])
@@ -843,7 +836,7 @@ module Preblackboard =
       List.fold_left 
         (fun map (pid,_,(test,action)) -> add_state pid (test,action) map)
         merged_map
-        unambiguous_side_effets
+        unambiguous_side_effects
     in 
     let side_effect = 
       List.fold_left 
@@ -853,7 +846,7 @@ module Preblackboard =
             | None -> list
             | Some a -> a::list)
         []
-        unambiguous_side_effets 
+        unambiguous_side_effects 
     in 
     let nsid = blackboard.pre_nsteps + 1 in 
     let _ = A.set blackboard.pre_side_effect_of_event nsid (Po.K.side_effect_of_list side_effect) in
@@ -951,24 +944,7 @@ module Preblackboard =
 
   let get_side_effect parameter handler error blackboard = 
     error,blackboard.pre_side_effect_of_event
-
-  let rename n t = 
-    let t' = A.create n 0 in 
-    let rec aux k m = 
-      if m=n 
-      then ()
-      else 
-        if A.get t k 
-        then 
-          let m = m + 1 in 
-          let _ = A.set t' m k in 
-          aux (k+1) m 
-        else 
-          aux (k+1) m
-    in 
-    let _ = aux 0 0 
-    in t' 
-    
+      
 end:PreBlackboard)
 
 

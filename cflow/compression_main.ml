@@ -24,6 +24,13 @@ module S = Generic_branch_and_cut_solver.Solver
 let log_step = true
 let debug_mode = false
 
+let th_of_int n = 
+  match n mod 10  
+  with 
+    | 1 -> (string_of_int n)^"st"
+    | 2 -> (string_of_int n)^"nd"
+    | 3 -> (string_of_int n)^"rd"
+    | _ -> (string_of_int n)^"th"
 
 let weak_compression env state log_info step_list =  
   let parameter = S.PH.B.PB.Po.K.H.build_parameter () in 
@@ -199,6 +206,7 @@ let weak_compression env state log_info step_list =
 		        let filename_comp = (Filename.chop_suffix !Parameter.cflowFileName ".dot") ^"_"^(string_of_int counter)^"weak_comp"^".dot" in 
                         let _ = Causal.dot_of_grid (fun log -> 
                           let _ = S.PH.B.print_complete_log log blackboard in 
+                          let _ = Printf.fprintf parameter.S.PH.B.PB.Po.K.H.out_channel_profiling "\nCompression of the %s story:\n\n" (th_of_int counter) in 
                           let _ = S.PH.B.print_complete_log parameter.S.PH.B.PB.Po.K.H.out_channel_profiling blackboard in ()) filename_comp grid state env in
                         () 
                     in 
