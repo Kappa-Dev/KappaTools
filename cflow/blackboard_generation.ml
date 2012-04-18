@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 16/04/2012
+  * Last modification: 18/04/2012
   * * 
   * Some parameter references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -21,7 +21,7 @@
 module type PreBlackboard = 
 sig 
   module A:LargeArray.GenArray
-  module Po:Po_cut.Po_cut 
+  module CI:Pseudo_inverse.Cut_pseudo_inverse 
 
   type step_id = int 
   type step_short_id = int 
@@ -38,8 +38,8 @@ sig
   type pre_blackboard  (*blackboard during its construction*)
 
   val weakening: predicate_value -> predicate_value list 
-  val conj: (predicate_value -> predicate_value -> Po.K.H.error_channel * predicate_value) Po.K.H.with_handler
-  val disjunction: (predicate_value -> predicate_value -> Po.K.H.error_channel * predicate_value) Po.K.H.with_handler  
+  val conj: (predicate_value -> predicate_value -> CI.Po.K.H.error_channel * predicate_value) CI.Po.K.H.with_handler
+  val disjunction: (predicate_value -> predicate_value -> CI.Po.K.H.error_channel * predicate_value) CI.Po.K.H.with_handler  
  
   val defined: predicate_value
   val undefined: predicate_value 
@@ -51,27 +51,27 @@ sig
   val strictly_more_refined: predicate_value -> predicate_value -> bool 
   val get_pre_column_map_inv: pre_blackboard -> predicate_info A.t
   (** generation*)
-  val init:  (Po.K.P.log_info -> Po.K.H.error_channel * pre_blackboard) Po.K.H.with_handler 
-  val add_step: (Po.K.refined_step -> pre_blackboard -> Po.K.H.error_channel * pre_blackboard) Po.K.H.with_handler
-  val finalize: (pre_blackboard -> Po.K.H.error_channel * pre_blackboard) Po.K.H.with_handler 
+  val init:  (CI.Po.K.P.log_info -> CI.Po.K.H.error_channel * pre_blackboard) CI.Po.K.H.with_handler 
+  val add_step: (CI.Po.K.refined_step -> pre_blackboard -> CI.Po.K.H.error_channel * pre_blackboard) CI.Po.K.H.with_handler
+  val finalize: (pre_blackboard -> CI.Po.K.H.error_channel * pre_blackboard) CI.Po.K.H.with_handler 
 
   (**pretty printing*)
   val print_predicate_value: out_channel ->  predicate_value -> unit 
-  val print_preblackboard: (pre_blackboard -> Po.K.H.error_channel) Po.K.H.with_handler  
+  val print_preblackboard: (pre_blackboard -> CI.Po.K.H.error_channel) CI.Po.K.H.with_handler  
 
   (**interface*)
-  val n_events: (pre_blackboard -> Po.K.H.error_channel * int) Po.K.H.with_handler 
-  val n_predicates: (pre_blackboard -> Po.K.H.error_channel * int) Po.K.H.with_handler 
-  val n_events_per_predicate: (pre_blackboard -> predicate_id -> Po.K.H.error_channel * int) Po.K.H.with_handler 
-  val event_list_of_predicate: (pre_blackboard -> predicate_id -> Po.K.H.error_channel * (int * int * predicate_value * predicate_value ) list) Po.K.H.with_handler 
-  val mandatory_events: (pre_blackboard -> Po.K.H.error_channel * ((int list) list)) Po.K.H.with_handler 
-  val get_pre_event: (pre_blackboard -> Po.K.H.error_channel * Po.K.refined_step A.t) Po.K.H.with_handler 
-  val get_side_effect: (pre_blackboard -> Po.K.H.error_channel * Po.K.side_effect A.t) Po.K.H.with_handler 
-  val get_fictitious_observable: (pre_blackboard -> Po.K.H.error_channel * int option) Po.K.H.with_handler 
+  val n_events: (pre_blackboard -> CI.Po.K.H.error_channel * int) CI.Po.K.H.with_handler 
+  val n_predicates: (pre_blackboard -> CI.Po.K.H.error_channel * int) CI.Po.K.H.with_handler 
+  val n_events_per_predicate: (pre_blackboard -> predicate_id -> CI.Po.K.H.error_channel * int) CI.Po.K.H.with_handler 
+  val event_list_of_predicate: (pre_blackboard -> predicate_id -> CI.Po.K.H.error_channel * (int * int * predicate_value * predicate_value ) list) CI.Po.K.H.with_handler 
+  val mandatory_events: (pre_blackboard -> CI.Po.K.H.error_channel * ((int list) list)) CI.Po.K.H.with_handler 
+  val get_pre_event: (pre_blackboard -> CI.Po.K.H.error_channel * CI.Po.K.refined_step A.t) CI.Po.K.H.with_handler 
+  val get_side_effect: (pre_blackboard -> CI.Po.K.H.error_channel * CI.Po.K.side_effect A.t) CI.Po.K.H.with_handler 
+  val get_fictitious_observable: (pre_blackboard -> CI.Po.K.H.error_channel * int option) CI.Po.K.H.with_handler 
 
-  val get_profiling: pre_blackboard -> Po.K.P.log_info 
+  val get_profiling: pre_blackboard -> CI.Po.K.P.log_info 
 
-  val profiling: (Po.K.P.log_info -> Po.K.P.log_info) -> pre_blackboard -> pre_blackboard
+  val profiling: (CI.Po.K.P.log_info -> CI.Po.K.P.log_info) -> pre_blackboard -> pre_blackboard
 end
 
 module Preblackboard = 
@@ -80,7 +80,7 @@ module Preblackboard =
      (** Useful modules *)
      module H = Cflow_handler.Cflow_handler
      module A = Mods.DynArray
-     module Po = Po_cut.Po_cut
+     module CI = Pseudo_inverse.Pseudo_inv
 
      (** blackboard matrix*) 
 
@@ -94,26 +94,26 @@ module Preblackboard =
        | Init 
        | Observable
        | Rule 
-       | Side_effect_of of (step_id * (Po.K.agent_id * Po.K.site_name) list)
+       | Side_effect_of of (step_id * (CI.Po.K.agent_id * CI.Po.K.site_name) list)
      
      type predicate_id = int (** wire identifiers *)
      type predicate_info = (** wire labels *)
-       | Here of Po.K.agent_id  
-       | Bound_site of Po.K.agent_id * Po.K.site_name
-       | Internal_state of Po.K.agent_id * Po.K.site_name 
+       | Here of CI.Po.K.agent_id  
+       | Bound_site of CI.Po.K.agent_id * CI.Po.K.site_name
+       | Internal_state of CI.Po.K.agent_id * CI.Po.K.site_name 
        | Fictitious of int (**to handle with ambiguous site effects *)
 
      type predicate_value = 
        | Counter of int 
-       | Internal_state_is of Po.K.internal_state
+       | Internal_state_is of CI.Po.K.internal_state
        | Defined   (** the wire does exist, but we do not know what the value is *)
        | Undefined (** the wire does not exist yet *)
        | Present   (** for agent presence *)
        | Free      (** for binding sites *)
        | Bound     (** for binding sites (partial information) *)
-       | Bound_to of predicate_id * Po.K.agent_id * Po.K.agent_name * Po.K.site_name
+       | Bound_to of predicate_id * CI.Po.K.agent_id * CI.Po.K.agent_name * CI.Po.K.site_name
            (** for bindinf sites (complete information) *)
-       | Bound_to_type of Po.K.agent_name * Po.K.site_name (** for binding sites (partial information *)
+       | Bound_to_type of CI.Po.K.agent_name * CI.Po.K.site_name (** for binding sites (partial information *)
        | Unknown (**  for agent presence, internal states, binding states (partial information *) 
 
      module C = (Cache.Cache(struct type t = predicate_value let compare = compare end):Cache.Cache with type O.t = predicate_value) 
@@ -146,7 +146,7 @@ module Preblackboard =
            pre_fictitious_list: predicate_id list ; (** list of wire for mutual exclusions, the state must be undefined at the end of the trace *) 
            pre_steps_by_column: (step_short_id * (step_id * step_short_id * predicate_value * predicate_value) list) A.t; (** maps each wire to the last known value and the list of step (step id,test,action)*)
            pre_kind_of_event: rule_type A.t; (** maps each event id to the kind of event *)
-           pre_event: Po.K.refined_step A.t; (** maps each event to the step *)
+           pre_event: CI.Po.K.refined_step A.t; (** maps each event to the step *)
 	   pre_nsteps: step_id; (**id of the last event *)
 	   pre_ncolumn: predicate_id; (**id of the last wire *)
 	   pre_column_map: predicate_id PredicateMap.t; (** maps each wire label to its wire id *)
@@ -155,9 +155,9 @@ module Preblackboard =
            history_of_predicate_values_to_predicate_id: C.t A.t; (** 
                                                                      maps each wire to the set of its previous states, this summarize the potential state of a site that is freed, so as to overapproximate the set of potential side effects*)
            pre_observable_list: step_id list list ;
-           pre_side_effect_of_event: Po.K.side_effect A.t;
+           pre_side_effect_of_event: CI.Po.K.side_effect A.t;
            pre_fictitious_observable: step_id option; (*id of the step that closes all the side-effect mutex *) 
-           pre_profiling: Po.K.P.log_info; (* profiling information *)
+           pre_profiling: CI.Po.K.P.log_info; (* profiling information *)
            } 
 
          let get_profiling x = x.pre_profiling 
@@ -210,7 +210,7 @@ module Preblackboard =
          ()
   
      let print_preblackboard parameter handler error blackboard = 
-       let log = parameter.Po.K.H.out_channel in 
+       let log = parameter.CI.Po.K.H.out_channel in 
        let _ = Printf.fprintf log "**\nPREBLACKBOARD\n**\n" in 
        let _ = Printf.fprintf log "*\n steps by column\n*\n" in 
        let _ = 
@@ -240,7 +240,7 @@ module Preblackboard =
        let _ = A.iteri 
          (fun i list -> 
              let _ = Printf.fprintf log "event %i:\n " i in
-             let _ = Po.K.print_side_effect log list in 
+             let _ = CI.Po.K.print_side_effect log list in 
              let _ = Printf.fprintf log "\n" in 
              ()
          )
@@ -337,8 +337,8 @@ module Preblackboard =
        else 
          if strictly_more_refined y x then error,y 
          else 
-           let error_list,error = Po.K.H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "conj") (Some "323") (Some "Arguments have no greatest lower bound") (failwith "Arguments have no greatest lower bound")  in 
-           Po.K.H.raise_error parameter handler error_list error Undefined  
+           let error_list,error = CI.Po.K.H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "conj") (Some "323") (Some "Arguments have no greatest lower bound") (failwith "Arguments have no greatest lower bound")  in 
+           CI.Po.K.H.raise_error parameter handler error_list error Undefined  
 
      let compatible x y = 
        x=y or more_refined x y or more_refined y x
@@ -389,8 +389,8 @@ module Preblackboard =
        with 
            Not_found ->
              let error_list,error = 
-               Po.K.H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "bind") (Some "375") (Some "Out of bound access") (failwith "bind") in 
-         Po.K.H.raise_error parameter handler error_list error blackboard 
+               CI.Po.K.H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "bind") (Some "375") (Some "Out of bound access") (failwith "bind") in 
+         CI.Po.K.H.raise_error parameter handler error_list error blackboard 
      and 
          allocate parameter handler error blackboard predicate  = 
        let ag_id = agent_id_of_predicate predicate in 
@@ -405,7 +405,7 @@ module Preblackboard =
              let map' = PredicateMap.add predicate sid' map in 
              let _  = A.set map_inv sid' predicate in 
              let map_inv' = map_inv in 
-             let _ = A.set blackboard.history_of_predicate_values_to_predicate_id sid' (C.create parameter.Po.K.H.cache_size) in 
+             let _ = A.set blackboard.history_of_predicate_values_to_predicate_id sid' (C.create parameter.CI.Po.K.H.cache_size) in 
              let blackboard = 
                {blackboard 
                 with 
@@ -433,8 +433,8 @@ module Preblackboard =
          with 
            | _ -> 
                let error_list,error = 
-               Po.K.H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "free_agent") (Some "418") (Some "Try to free an unexisting agent") (failwith "free_agent") in 
-               Po.K.H.raise_error parameter handler error_list error PredicateidSet.empty 
+               CI.Po.K.H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "free_agent") (Some "418") (Some "Try to free an unexisting agent") (failwith "free_agent") in 
+               CI.Po.K.H.raise_error parameter handler error_list error PredicateidSet.empty 
        in 
        let map = 
          PredicateidSet.fold 
@@ -449,8 +449,8 @@ module Preblackboard =
      
      let predicates_of_action parameter handler error blackboard action = 
        match action with 
-         | Po.K.Create (ag,interface) -> 
-           let ag_id = Po.K.agent_id_of_agent ag in
+         | CI.Po.K.Create (ag,interface) -> 
+           let ag_id = CI.Po.K.agent_id_of_agent ag in
            let error,blackboard,predicate_id = allocate parameter handler error blackboard (Here ag_id) in   
            List.fold_left 
              (fun (error,blackboard,list1,list2) (s_id,opt) -> 
@@ -469,46 +469,46 @@ module Preblackboard =
              )
              (error,blackboard,[predicate_id,Present],[predicate_id,Undefined])
              interface
-         | Po.K.Mod_internal (site,int)  -> 
-           let error,blackboard,predicate_id = allocate parameter handler error blackboard (Internal_state (Po.K.agent_id_of_site site,Po.K.site_name_of_site site)) in 
+         | CI.Po.K.Mod_internal (site,int)  -> 
+           let error,blackboard,predicate_id = allocate parameter handler error blackboard (Internal_state (CI.Po.K.agent_id_of_site site,CI.Po.K.site_name_of_site site)) in 
            error,blackboard,[predicate_id,Internal_state_is int],[]
-         | Po.K.Bind_to (s1,s2) -> 
-           let ag_id1 = Po.K.agent_id_of_site s1 in 
-           let ag_id2 = Po.K.agent_id_of_site s2 in 
-           let agent_name2 = Po.K.agent_name_of_site s2 in 
-           let site_id1 = Po.K.site_name_of_site s1 in 
-           let site_id2 = Po.K.site_name_of_site s2 in 
+         | CI.Po.K.Bind_to (s1,s2) -> 
+           let ag_id1 = CI.Po.K.agent_id_of_site s1 in 
+           let ag_id2 = CI.Po.K.agent_id_of_site s2 in 
+           let agent_name2 = CI.Po.K.agent_name_of_site s2 in 
+           let site_id1 = CI.Po.K.site_name_of_site s1 in 
+           let site_id2 = CI.Po.K.site_name_of_site s2 in 
            let error,blackboard,predicate_id1 = allocate parameter handler error blackboard (Bound_site (ag_id1,site_id1)) in 
            let error,blackboard,predicate_id2 = allocate parameter handler error blackboard (Bound_site (ag_id2,site_id2)) in 
            error,blackboard,
            [predicate_id1,Bound_to (predicate_id2,ag_id2,agent_name2,site_id2)],[]
-         | Po.K.Bind (s1,s2) -> 
-           let ag_id1 = Po.K.agent_id_of_site s1 in 
-           let ag_id2 = Po.K.agent_id_of_site s2 in 
-           let agent_name1 = Po.K.agent_name_of_site s1 in 
-           let agent_name2 = Po.K.agent_name_of_site s2 in 
-           let site_id1 = Po.K.site_name_of_site s1 in 
-           let site_id2 = Po.K.site_name_of_site s2 in 
+         | CI.Po.K.Bind (s1,s2) -> 
+           let ag_id1 = CI.Po.K.agent_id_of_site s1 in 
+           let ag_id2 = CI.Po.K.agent_id_of_site s2 in 
+           let agent_name1 = CI.Po.K.agent_name_of_site s1 in 
+           let agent_name2 = CI.Po.K.agent_name_of_site s2 in 
+           let site_id1 = CI.Po.K.site_name_of_site s1 in 
+           let site_id2 = CI.Po.K.site_name_of_site s2 in 
            let error,blackboard,predicate_id1 = allocate parameter handler error blackboard (Bound_site (ag_id1,site_id1)) in 
            let error,blackboard,predicate_id2 = allocate parameter handler error blackboard (Bound_site (ag_id2,site_id2)) in 
            error,blackboard,
            [predicate_id1,Bound_to (predicate_id2,ag_id2,agent_name2,site_id2);
             predicate_id2,Bound_to (predicate_id1,ag_id1,agent_name1,site_id1)],[]
-         | Po.K.Unbind (s1,s2) ->
-           let ag_id1 = Po.K.agent_id_of_site s1 in 
-           let ag_id2 = Po.K.agent_id_of_site s2 in 
-           let site_id1 = Po.K.site_name_of_site s1 in 
-           let site_id2 = Po.K.site_name_of_site s2 in 
+         | CI.Po.K.Unbind (s1,s2) ->
+           let ag_id1 = CI.Po.K.agent_id_of_site s1 in 
+           let ag_id2 = CI.Po.K.agent_id_of_site s2 in 
+           let site_id1 = CI.Po.K.site_name_of_site s1 in 
+           let site_id2 = CI.Po.K.site_name_of_site s2 in 
            let error,blackboard,predicate_id1 = allocate parameter handler error blackboard (Bound_site (ag_id1,site_id1)) in 
            let error,blackboard,predicate_id2 = allocate parameter handler error blackboard (Bound_site (ag_id2,site_id2)) in 
            error,blackboard,[predicate_id1,Free;predicate_id2,Free],[]
-         | Po.K.Free s -> 
-           let ag_id = Po.K.agent_id_of_site s in 
-           let site_id = Po.K.site_name_of_site s in 
+         | CI.Po.K.Free s -> 
+           let ag_id = CI.Po.K.agent_id_of_site s in 
+           let site_id = CI.Po.K.site_name_of_site s in 
            let error,blackboard,predicate_id = allocate parameter handler error blackboard (Bound_site (ag_id,site_id)) in     
            error,blackboard,[predicate_id,Free],[]
-         | Po.K.Remove ag -> 
-           let ag_id = Po.K.agent_id_of_agent ag in 
+         | CI.Po.K.Remove ag -> 
+           let ag_id = CI.Po.K.agent_id_of_agent ag in 
            let error,blackboard,predicate_id = allocate parameter handler error blackboard (Here ag_id) in 
            let error,blackboard = free_agent parameter handler error blackboard ag_id in 
            let set = 
@@ -528,41 +528,41 @@ module Preblackboard =
      let predicates_of_test  parameter handler error blackboard test = 
        match test
        with 
-         | Po.K.Is_Here (agent) ->
-           let ag_id = Po.K.agent_id_of_agent agent in 
+         | CI.Po.K.Is_Here (agent) ->
+           let ag_id = CI.Po.K.agent_id_of_agent agent in 
            let error,blackboard,predicate_id = allocate parameter handler error blackboard (Here ag_id) in 
            error,blackboard,[predicate_id,Present]
-         | Po.K.Has_Internal(site,int) -> 
-           let error,blackboard,predicate_id = allocate parameter handler error blackboard (Internal_state (Po.K.agent_id_of_site site,Po.K.site_name_of_site site)) in 
+         | CI.Po.K.Has_Internal(site,int) -> 
+           let error,blackboard,predicate_id = allocate parameter handler error blackboard (Internal_state (CI.Po.K.agent_id_of_site site,CI.Po.K.site_name_of_site site)) in 
            error,blackboard,[predicate_id,Internal_state_is int]
-         | Po.K.Is_Free s -> 
-           let ag_id = Po.K.agent_id_of_site s in 
-           let site_id = Po.K.site_name_of_site s in 
+         | CI.Po.K.Is_Free s -> 
+           let ag_id = CI.Po.K.agent_id_of_site s in 
+           let site_id = CI.Po.K.site_name_of_site s in 
            let error,blackboard,predicate_id = allocate parameter handler error blackboard (Bound_site (ag_id,site_id)) in     
            error,blackboard,[predicate_id,Free]
-         | Po.K.Is_Bound_to  (s1,s2) -> 
-           let ag_id1 = Po.K.agent_id_of_site s1 in 
-           let ag_id2 = Po.K.agent_id_of_site s2 in 
-           let agent_name1 = Po.K.agent_name_of_site s1 in 
-           let agent_name2 = Po.K.agent_name_of_site s2 in 
-           let site_id1 = Po.K.site_name_of_site s1 in 
-           let site_id2 = Po.K.site_name_of_site s2 in 
+         | CI.Po.K.Is_Bound_to  (s1,s2) -> 
+           let ag_id1 = CI.Po.K.agent_id_of_site s1 in 
+           let ag_id2 = CI.Po.K.agent_id_of_site s2 in 
+           let agent_name1 = CI.Po.K.agent_name_of_site s1 in 
+           let agent_name2 = CI.Po.K.agent_name_of_site s2 in 
+           let site_id1 = CI.Po.K.site_name_of_site s1 in 
+           let site_id2 = CI.Po.K.site_name_of_site s2 in 
            let error,blackboard,predicate_id1 = allocate parameter handler error blackboard (Bound_site (ag_id1,site_id1)) in 
            let error,blackboard,predicate_id2 = allocate parameter handler error blackboard (Bound_site (ag_id2,site_id2)) in 
            error,blackboard,
            [predicate_id1,Bound_to (predicate_id2,ag_id2,agent_name2,site_id2);
             predicate_id2,Bound_to (predicate_id1,ag_id1,agent_name1,site_id1)]
-         | Po.K.Is_Bound s -> 
-           let ag_id = Po.K.agent_id_of_site s in 
-           let site_id = Po.K.site_name_of_site s in 
+         | CI.Po.K.Is_Bound s -> 
+           let ag_id = CI.Po.K.agent_id_of_site s in 
+           let site_id = CI.Po.K.site_name_of_site s in 
            let error,blackboard,predicate_id = allocate parameter handler error blackboard (Bound_site (ag_id,site_id)) in 
            error,blackboard,
            [predicate_id,Bound]   
-         | Po.K.Has_Binding_type (s,btype) ->
-           let ag_id = Po.K.agent_id_of_site s in 
-           let site_id = Po.K.site_name_of_site s in
-           let agent_name = Po.K.agent_of_binding_type btype in 
-           let site_name = Po.K.site_of_binding_type btype in 
+         | CI.Po.K.Has_Binding_type (s,btype) ->
+           let ag_id = CI.Po.K.agent_id_of_site s in 
+           let site_id = CI.Po.K.site_name_of_site s in
+           let agent_name = CI.Po.K.agent_of_binding_type btype in 
+           let site_name = CI.Po.K.site_of_binding_type btype in 
            let error,blackboard,predicate_id = allocate parameter handler error blackboard (Bound_site (ag_id,site_id)) in 
            error,blackboard,
            [predicate_id,Bound_to_type (agent_name,site_name)]
@@ -570,18 +570,18 @@ module Preblackboard =
   let type_of_step x = 
     match x 
     with 
-      | Po.K.Dummy -> Dummy 
-      | Po.K.Init _ -> Init 
-      | Po.K.Event _ -> Rule 
-      | Po.K.Obs _ -> Observable
+      | CI.Po.K.Dummy -> Dummy 
+      | CI.Po.K.Init _ -> Init 
+      | CI.Po.K.Event _ -> Rule 
+      | CI.Po.K.Obs _ -> Observable
         
   (** initialisation*)
   let init parameter handler error log_info = 
     error, 
     {
       pre_profiling = log_info  ;
-      pre_side_effect_of_event = A.make 1 Po.K.empty_side_effect;
-      pre_event = A.make 1 Po.K.dummy_refined_step;
+      pre_side_effect_of_event = A.make 1 CI.Po.K.empty_side_effect;
+      pre_event = A.make 1 CI.Po.K.dummy_refined_step;
       pre_fictitious_list = [] ; 
       pre_steps_by_column = A.make 1 (1,[]) ; 
       pre_nsteps = -1 ;
@@ -602,7 +602,7 @@ module Preblackboard =
 
   let init_fictitious_action error predicate_id blackboard = 
     let nsid = blackboard.pre_nsteps+1 in 
-    let blackboard = profiling Po.K.P.inc_n_side_events blackboard in 
+    let blackboard = profiling CI.Po.K.P.inc_n_side_events blackboard in 
     let test = Undefined in 
     let action = Counter 0 in
     let _ = A.set blackboard.pre_steps_by_column predicate_id (2,[nsid,1,test,action])  in 
@@ -622,36 +622,36 @@ module Preblackboard =
       | Defined | Counter _ | Internal_state_is _ | Undefined 
       | Present | Bound | Bound_to_type _ | Unknown -> 
         let error,error_list = 
-            Po.K.H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "side_effects") (Some "602") (Some "Illegal state for a side-effects") (failwith "Blackboard_generation.side_effect") in 
-        Po.K.H.raise_error parameter handler error error_list []
+            CI.Po.K.H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "side_effects") (Some "602") (Some "Illegal state for a side-effects") (failwith "Blackboard_generation.side_effect") in 
+        CI.Po.K.H.raise_error parameter handler error error_list []
        | Free -> 
          error,[predicate_target_id,None,(Free,Unknown)]
       | Bound_to (pid,ag,_,sname) -> 
         error,[predicate_target_id,None,(s,Unknown);
-         pid,Some (ag,sname),(Bound_to (predicate_target_id,Po.K.agent_id_of_site site,Po.K.agent_name_of_site site,Po.K.site_name_of_site site),Free)]
+         pid,Some (ag,sname),(Bound_to (predicate_target_id,CI.Po.K.agent_id_of_site site,CI.Po.K.agent_name_of_site site,CI.Po.K.site_name_of_site site),Free)]
           
 
   let predicate_value_of_binding_state parameter handler error x = 
        match x 
        with 
-         | Po.K.ANY -> error,Unknown 
-         | Po.K.FREE -> error,Free
-         | Po.K.BOUND -> error,Bound
-         | Po.K.BOUND_TYPE bt -> error,Bound_to_type (Po.K.agent_name_of_binding_type bt,Po.K.site_name_of_binding_type bt)
-         | Po.K.BOUND_to s -> 
+         | CI.Po.K.ANY -> error,Unknown 
+         | CI.Po.K.FREE -> error,Free
+         | CI.Po.K.BOUND -> error,Bound
+         | CI.Po.K.BOUND_TYPE bt -> error,Bound_to_type (CI.Po.K.agent_name_of_binding_type bt,CI.Po.K.site_name_of_binding_type bt)
+         | CI.Po.K.BOUND_to s -> 
             let error_list,error = 
-               Po.K.H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "predicate_value_of_binding_state") (Some "620") (Some "Illegal binding state in predicate_value_of_binding_state") (failwith "predicate_value_of_binding_state") in 
-            Po.K.H.raise_error parameter handler error_list error Unknown 
+               CI.Po.K.H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "predicate_value_of_binding_state") (Some "620") (Some "Illegal binding state in predicate_value_of_binding_state") (failwith "predicate_value_of_binding_state") in 
+            CI.Po.K.H.raise_error parameter handler error_list error Unknown 
     
   let potential_target error parameter handler blackboard site binding_state =
-    let agent_id = Po.K.agent_id_of_site site in 
-    let site_name = Po.K.site_name_of_site site in 
+    let agent_id = CI.Po.K.agent_id_of_site site in 
+    let site_name = CI.Po.K.site_name_of_site site in 
     let error,balckboard,predicate_target_id = 
        allocate parameter handler error blackboard (Bound_site (agent_id,site_name))  in 
     let former_states = 
         A.get blackboard.history_of_predicate_values_to_predicate_id predicate_target_id
     in 
-    if Parameter.get_causal_trace_only parameter.Po.K.H.compression_mode 
+    if Parameter.get_causal_trace_only parameter.CI.Po.K.H.compression_mode 
     then 
       begin 
         let s = C.last former_states in 
@@ -687,8 +687,8 @@ module Preblackboard =
         
   let add_step parameter handler error step blackboard = 
     let pre_event = blackboard.pre_event in 
-    let test_list = Po.K.tests_of_refined_step step in 
-    let action_list,side_effect = Po.K.actions_of_refined_step step in
+    let test_list = CI.Po.K.tests_of_refined_step step in 
+    let action_list,side_effect = CI.Po.K.actions_of_refined_step step in
     let action_list = action_list in 
     let fictitious_local_list = [] in 
     let fictitious_list = blackboard.pre_fictitious_list in 
@@ -764,7 +764,7 @@ module Preblackboard =
                       List.fold_left 
                         (fun (error,blackboard) list -> 
                           let blackboard = {blackboard with pre_nsteps = blackboard.pre_nsteps+1} in 
-                          let blackboard = profiling Po.K.P.inc_n_side_events blackboard in 
+                          let blackboard = profiling CI.Po.K.P.inc_n_side_events blackboard in 
   
                           let side_effect = 
                             List.fold_left 
@@ -776,7 +776,7 @@ module Preblackboard =
                               []
                               list 
                           in 
-                          let side_effect = Po.K.side_effect_of_list 
+                          let side_effect = CI.Po.K.side_effect_of_list 
                             side_effect in 
                           let _ = A.set blackboard.pre_side_effect_of_event 
                             blackboard.pre_nsteps
@@ -849,7 +849,7 @@ module Preblackboard =
         unambiguous_side_effects 
     in 
     let nsid = blackboard.pre_nsteps + 1 in 
-    let _ = A.set blackboard.pre_side_effect_of_event nsid (Po.K.side_effect_of_list side_effect) in
+    let _ = A.set blackboard.pre_side_effect_of_event nsid (CI.Po.K.side_effect_of_list side_effect) in
     let _ = A.set pre_event nsid step in 
     let pre_steps_by_column = 
       PredicateidMap.fold 
@@ -864,9 +864,9 @@ module Preblackboard =
         merged_map
         blackboard.pre_steps_by_column 
     in 
-    let _ = A.set blackboard.pre_kind_of_event nsid (type_of_step (Po.K.type_of_refined_step step)) in 
+    let _ = A.set blackboard.pre_kind_of_event nsid (type_of_step (CI.Po.K.type_of_refined_step step)) in 
     let observable_list = 
-      if Po.K.is_obs_of_refined_step step 
+      if CI.Po.K.is_obs_of_refined_step step 
       then 
         [nsid]::blackboard.pre_observable_list 
       else
@@ -891,7 +891,7 @@ module Preblackboard =
         | [] -> error,blackboard 
         | _ -> 
           let nsid = blackboard.pre_nsteps + 1 in 
-          let blackboard = profiling Po.K.P.inc_n_side_events blackboard in 
+          let blackboard = profiling CI.Po.K.P.inc_n_side_events blackboard in 
           let observable_list = 
             List.rev_map (fun x -> nsid::x) (List.rev blackboard.pre_observable_list) 
           in 
@@ -922,16 +922,16 @@ module Preblackboard =
         error,snd (A.get blackboard.pre_steps_by_column predicate_id) 
       with 
         | _ -> 
-          let error_list,error = Po.K.H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "event_list_of_predicate") (Some "881") (Some "Unknown predicate id") (failwith "event_list_of_predicate") in 
-          Po.K.H.raise_error parameter handler error_list error []
+          let error_list,error = CI.Po.K.H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "event_list_of_predicate") (Some "881") (Some "Unknown predicate id") (failwith "event_list_of_predicate") in 
+          CI.Po.K.H.raise_error parameter handler error_list error []
             
   let n_events_per_predicate parameter handler error blackboard predicate_id = 
     try 
       error,fst (A.get blackboard.pre_steps_by_column predicate_id) 
     with 
       | _ -> 
-        let error_list,error = Po.K.H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "n_events_per_predicate") (Some "889") (Some "Unknown predicate id") (failwith "n_events_per_predicate") in 
-            Po.K.H.raise_error parameter handler error_list error 0
+        let error_list,error = CI.Po.K.H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "n_events_per_predicate") (Some "889") (Some "Unknown predicate id") (failwith "n_events_per_predicate") in 
+            CI.Po.K.H.raise_error parameter handler error_list error 0
 
   let n_events parameter handler error blackboard = 
     error,blackboard.pre_nsteps+1 

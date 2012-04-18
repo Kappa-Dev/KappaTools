@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 06/09/2011
-  * Last modification: 17/04/2012
+  * Last modification: 18/04/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -53,44 +53,44 @@ sig
   val get_last_linked_event: blackboard -> PB.predicate_id -> int option 
   val get_stack_depth: blackboard -> int 
   val case_address_of_case_event_address : event_case_address -> case_address 
-  val predicate_value_of_case_value: (case_value -> PB.Po.K.H.error_channel * PB.predicate_value) PB.Po.K.H.with_handler 
-  val follow_pointer_up: (blackboard -> event_case_address -> PB.Po.K.H.error_channel * event_case_address) PB.Po.K.H.with_handler 
-  val follow_pointer_down: (blackboard -> event_case_address -> PB.Po.K.H.error_channel * event_case_address) PB.Po.K.H.with_handler 
-  val is_boundary: (blackboard -> event_case_address -> PB.Po.K.H.error_channel * bool) PB.Po.K.H.with_handler  
+  val predicate_value_of_case_value: (case_value -> PB.CI.Po.K.H.error_channel * PB.predicate_value) PB.CI.Po.K.H.with_handler 
+  val follow_pointer_up: (blackboard -> event_case_address -> PB.CI.Po.K.H.error_channel * event_case_address) PB.CI.Po.K.H.with_handler 
+  val follow_pointer_down: (blackboard -> event_case_address -> PB.CI.Po.K.H.error_channel * event_case_address) PB.CI.Po.K.H.with_handler 
+  val is_boundary: (blackboard -> event_case_address -> PB.CI.Po.K.H.error_channel * bool) PB.CI.Po.K.H.with_handler  
 
   val build_event_case_address: PB.predicate_id -> pointer -> event_case_address  
-  val exist_case: (blackboard -> event_case_address -> PB.Po.K.H.error_channel * bool option) PB.Po.K.H.with_handler   
-  val get_static: (blackboard -> event_case_address -> PB.Po.K.H.error_channel * (PB.step_short_id * PB.step_id * PB.predicate_value * PB.predicate_value)) PB.Po.K.H.with_handler 
+  val exist_case: (blackboard -> event_case_address -> PB.CI.Po.K.H.error_channel * bool option) PB.CI.Po.K.H.with_handler   
+  val get_static: (blackboard -> event_case_address -> PB.CI.Po.K.H.error_channel * (PB.step_short_id * PB.step_id * PB.predicate_value * PB.predicate_value)) PB.CI.Po.K.H.with_handler 
             
-  val set: (case_address -> case_value -> blackboard  -> PB.Po.K.H.error_channel * blackboard) PB.Po.K.H.with_handler 
-  val get: (case_address -> blackboard -> PB.Po.K.H.error_channel * case_value) PB.Po.K.H.with_handler 
-  val dec: (case_address -> blackboard -> PB.Po.K.H.error_channel * blackboard) PB.Po.K.H.with_handler
-  val overwrite: (case_address -> case_value -> blackboard -> PB.Po.K.H.error_channel * blackboard) PB.Po.K.H.with_handler  
-  val refine: (case_address -> case_value -> blackboard -> PB.Po.K.H.error_channel * blackboard * assign_result) PB.Po.K.H.with_handler  
-  val branch: (blackboard -> PB.Po.K.H.error_channel *blackboard) PB.Po.K.H.with_handler 
-  val reset_last_branching: (blackboard -> PB.Po.K.H.error_channel * blackboard ) PB.Po.K.H.with_handler 
-  val reset_init: (blackboard -> PB.Po.K.H.error_channel * blackboard) PB.Po.K.H.with_handler 
+  val set: (case_address -> case_value -> blackboard  -> PB.CI.Po.K.H.error_channel * blackboard) PB.CI.Po.K.H.with_handler 
+  val get: (case_address -> blackboard -> PB.CI.Po.K.H.error_channel * case_value) PB.CI.Po.K.H.with_handler 
+  val dec: (case_address -> blackboard -> PB.CI.Po.K.H.error_channel * blackboard) PB.CI.Po.K.H.with_handler
+  val overwrite: (case_address -> case_value -> blackboard -> PB.CI.Po.K.H.error_channel * blackboard) PB.CI.Po.K.H.with_handler  
+  val refine: (case_address -> case_value -> blackboard -> PB.CI.Po.K.H.error_channel * blackboard * assign_result) PB.CI.Po.K.H.with_handler  
+  val branch: (blackboard -> PB.CI.Po.K.H.error_channel *blackboard) PB.CI.Po.K.H.with_handler 
+  val reset_last_branching: (blackboard -> PB.CI.Po.K.H.error_channel * blackboard ) PB.CI.Po.K.H.with_handler 
+  val reset_init: (blackboard -> PB.CI.Po.K.H.error_channel * blackboard) PB.CI.Po.K.H.with_handler 
   (** initialisation*)
-  val import: (PB.pre_blackboard -> PB.Po.K.H.error_channel * blackboard) PB.Po.K.H.with_handler 
+  val import: (PB.pre_blackboard -> PB.CI.Po.K.H.error_channel * blackboard) PB.CI.Po.K.H.with_handler 
 
   (** output result*)
-  type result = (PB.Po.K.refined_step * PB.Po.K.side_effect) list  
+  type result = (PB.CI.Po.K.refined_step * PB.CI.Po.K.side_effect) list  
      
   (** iteration*)
-  val is_maximal_solution: (blackboard -> PB.Po.K.H.error_channel * bool) PB.Po.K.H.with_handler 
+  val is_maximal_solution: (blackboard -> PB.CI.Po.K.H.error_channel * bool) PB.CI.Po.K.H.with_handler 
 
   (** exporting result*)
-  val translate_blackboard: (blackboard -> PB.Po.K.H.error_channel * result) PB.Po.K.H.with_handler 
+  val translate_blackboard: (blackboard -> PB.CI.Po.K.H.error_channel * result) PB.CI.Po.K.H.with_handler 
 
   (**pretty printing*)
-  val print_blackboard:(blackboard -> PB.Po.K.H.error_channel) PB.Po.K.H.with_handler 
-  val print_event_case_address:(blackboard ->  event_case_address -> PB.Po.K.H.error_channel) PB.Po.K.H.with_handler 
-  val print_stack: (blackboard -> PB.Po.K.H.error_channel) PB.Po.K.H.with_handler 
+  val print_blackboard:(blackboard -> PB.CI.Po.K.H.error_channel) PB.CI.Po.K.H.with_handler 
+  val print_event_case_address:(blackboard ->  event_case_address -> PB.CI.Po.K.H.error_channel) PB.CI.Po.K.H.with_handler 
+  val print_stack: (blackboard -> PB.CI.Po.K.H.error_channel) PB.CI.Po.K.H.with_handler 
 
   val print_complete_log: out_channel -> blackboard -> unit 
   val print_short_log: out_channel -> blackboard -> unit 
-  val get_profiling_info: blackboard -> PB.Po.K.P.log_info 
-  val set_profiling_info: (PB.Po.K.P.log_info -> PB.Po.K.P.log_info) -> blackboard -> blackboard 
+  val get_profiling_info: blackboard -> PB.CI.Po.K.P.log_info 
+  val set_profiling_info: (PB.CI.Po.K.P.log_info -> PB.CI.Po.K.P.log_info) -> blackboard -> blackboard 
 
   val exist: event_case_address -> case_address 
   val boolean: bool option -> case_value 
@@ -98,15 +98,15 @@ sig
   val pointer_to_next: event_case_address -> case_address 
   val pointer: event_case_address -> case_value 
   val value_after: event_case_address -> case_address 
-  val case_list_of_eid: (blackboard -> PB.step_id -> PB.Po.K.H.error_channel * event_case_address list) PB.Po.K.H.with_handler 
+  val case_list_of_eid: (blackboard -> PB.step_id -> PB.CI.Po.K.H.error_channel * event_case_address list) PB.CI.Po.K.H.with_handler 
   val state: PB.predicate_value -> case_value 
   val is_exist_event: PB.step_id -> case_address 
   val n_unresolved_events: case_address 
   val n_unresolved_events_in_column: event_case_address -> case_address 
   val forced_events: blackboard -> PB.step_id list list 
-  val side_effect_of_event: blackboard -> PB.step_id -> PB.Po.K.side_effect
-(*  val cut_predicate_id: (blackboard -> PB.predicate_id -> PB.Po.K.H.error_channel *   blackboard) PB.Po.K.H.with_handler *)
-  val cut: (blackboard -> PB.step_id list -> PB.Po.K.H.error_channel * blackboard * result * PB.step_id list) PB.Po.K.H.with_handler 
+  val side_effect_of_event: blackboard -> PB.step_id -> PB.CI.Po.K.side_effect
+(*  val cut_predicate_id: (blackboard -> PB.predicate_id -> PB.CI.Po.K.H.error_channel *   blackboard) PB.CI.Po.K.H.with_handler *)
+  val cut: (blackboard -> PB.step_id list -> PB.CI.Po.K.H.error_channel * blackboard * result * PB.step_id list) PB.CI.Po.K.H.with_handler 
 
   val tick: blackboard -> bool * blackboard 
 end
@@ -197,13 +197,13 @@ module Blackboard =
     let print_case_value parameter x = 
       match x 
       with 
-        | State x -> let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel_err "State! " in 
-                     let _ = PB.print_predicate_value parameter.PB.Po.K.H.out_channel_err x in 
-                     let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel_err "\n" in 
+        | State x -> let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "State! " in 
+                     let _ = PB.print_predicate_value parameter.PB.CI.Po.K.H.out_channel_err x in 
+                     let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "\n" in 
                      () 
-        | Counter i -> Printf.fprintf parameter.PB.Po.K.H.out_channel_err "Counter %i\n" i
-        | Pointer i -> Printf.fprintf parameter.PB.Po.K.H.out_channel_err "Pointer %i\n" i 
-        | Boolean b -> Printf.fprintf parameter.PB.Po.K.H.out_channel_err "Boolean %s\n" (match b with None -> "?" | Some true -> "true" | _ -> "false")
+        | Counter i -> Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Counter %i\n" i
+        | Pointer i -> Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Pointer %i\n" i 
+        | Boolean b -> Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Boolean %s\n" (match b with None -> "?" | Some true -> "true" | _ -> "false")
  
     let print_pointer log seid = 
        Printf.fprintf log " event seid %i " seid
@@ -229,8 +229,8 @@ module Blackboard =
         | State x -> error,x 
         | _ ->    
           let _ = print_case_value parameter case_value in 
-          let error_list,error = PB.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "predicate_value_of_case_value") (Some "226") (Some "wrong kinf of case_value in predicate_value_of_case_value") (failwith "predicate_value_of_case_value") in 
-          PB.Po.K.H.raise_error parameter handler error_list error PB.unknown 
+          let error_list,error = PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "predicate_value_of_case_value") (Some "226") (Some "wrong kinf of case_value in predicate_value_of_case_value") (failwith "predicate_value_of_case_value") in 
+          PB.CI.Po.K.H.raise_error parameter handler error_list error PB.unknown 
         
 
     type assignment = (case_address * case_value) 
@@ -250,8 +250,8 @@ module Blackboard =
         | State x,State y -> error,p x y 
         | Boolean x,Boolean y -> error,p2 x y
         | _,_  ->  
-          let error_list,error = PB.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some string) (Some "246") (Some "Counters and/or Pointers should not be compared") (failwith "strictly_more_refined") in 
-          PB.Po.K.H.raise_error parameter handler error_list error false
+          let error_list,error = PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some string) (Some "246") (Some "Counters and/or Pointers should not be compared") (failwith "strictly_more_refined") in 
+          PB.CI.Po.K.H.raise_error parameter handler error_list error false
             
     let strictly_more_refined = g PB.strictly_more_refined bool_strictly_more_refined "strictly_more_refined"
       
@@ -343,8 +343,8 @@ module Blackboard =
      type stack = assignment list 
      type blackboard = 
          {
-           profiling: PB.Po.K.P.log_info; 
-           event: PB.Po.K.refined_step PB.A.t;
+           profiling: PB.CI.Po.K.P.log_info; 
+           event: PB.CI.Po.K.refined_step PB.A.t;
            pre_column_map_inv: PB.predicate_info PB.A.t; (** maps each wire id to its wire label *)
            forced_events: int list list;
            n_predicate_id: int ;
@@ -359,7 +359,7 @@ module Blackboard =
            n_unresolved_events: int ;
            last_linked_event_of_predicate_id: int PB.A.t;
            event_case_list: event_case_address list PB.A.t;
-           side_effect_of_event: PB.Po.K.side_effect PB.A.t;
+           side_effect_of_event: PB.CI.Po.K.side_effect PB.A.t;
            fictitious_observable: PB.step_id option;
          }
            
@@ -369,13 +369,13 @@ module Blackboard =
        {b with profiling = f b.profiling}
 
      let print_complete_log log blackboard = 
-       PB.Po.K.P.dump_complete_log log (get_profiling_info blackboard)
+       PB.CI.Po.K.P.dump_complete_log log (get_profiling_info blackboard)
 
      let print_short_log log blackboard = 
-       PB.Po.K.P.dump_short_log log (get_profiling_info blackboard)
+       PB.CI.Po.K.P.dump_short_log log (get_profiling_info blackboard)
 
      let tick blackboard = 
-       let bool,profiling_info = PB.Po.K.P.tick (get_profiling_info blackboard) in 
+       let bool,profiling_info = PB.CI.Po.K.P.tick (get_profiling_info blackboard) in 
        bool,{blackboard with profiling = profiling_info}
    
      let get_stack_depth blackboard = List.length blackboard.stack 
@@ -388,9 +388,9 @@ module Blackboard =
          error,PB.A.get blackboard.event_case_list eid 
        with 
          | _ -> 
-           let error_list,error = PB.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "case_list_of_eid") (Some "366") (Some "Out of bound") (failwith "Dereferencing null pointer")
+           let error_list,error = PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "case_list_of_eid") (Some "366") (Some "Out of bound") (failwith "Dereferencing null pointer")
            in 
-           PB.Po.K.H.raise_error parameter handler error_list error [] 
+           PB.CI.Po.K.H.raise_error parameter handler error_list error [] 
 
      let get_case parameter handler error case_address blackboard = 
        try 
@@ -399,9 +399,9 @@ module Blackboard =
              (case_address.row_short_event_id) 
        with 
          | _ -> 
-           let error_list,error = PB.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "get_case") (Some "377") (Some "Dereferencing null pointer") (failwith "Dereferencing null pointer")
+           let error_list,error = PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "get_case") (Some "377") (Some "Dereferencing null pointer") (failwith "Dereferencing null pointer")
            in 
-           PB.Po.K.H.raise_error parameter handler error_list error dummy_case_info 
+           PB.CI.Po.K.H.raise_error parameter handler error_list error dummy_case_info 
 
      let get_static parameter handler error blackboard address = 
        let error,case = get_case parameter handler error address blackboard in 
@@ -410,35 +410,35 @@ module Blackboard =
 
      let print_event_case_address parameter handler error blackboard case = 
        let error,(_,eid,_,_) = get_static parameter handler error blackboard case in 
-      let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel "Event: %i, Predicate: %i\n" eid (predicate_id_of_case_address case) in 
+      let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel "Event: %i, Predicate: %i\n" eid (predicate_id_of_case_address case) in 
       error
 
      let print_case_address parameter handler error blackboard x = 
       match x
       with 
        | N_unresolved_events_in_column i -> 
-         let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel_err "n_unresolved_events_in_pred %i \n" i in 
+         let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "n_unresolved_events_in_pred %i \n" i in 
          error 
        | Pointer_to_next e -> 
-         let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel_err "Pointer" in 
+         let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Pointer" in 
          print_event_case_address parameter handler error blackboard e  
        | Value_after e -> 
-        let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel_err "Value_after  " in   
+        let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Value_after  " in   
         print_event_case_address parameter handler error blackboard e 
       | Value_before e -> 
-        let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel_err "Value_before " in 
+        let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Value_before " in 
         print_event_case_address parameter handler error blackboard e 
       | Pointer_to_previous e -> 
-        let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel_err "Pointer_before " in 
+        let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Pointer_before " in 
         print_event_case_address parameter handler error blackboard e 
       | N_unresolved_events -> 
-        let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel_err "Unresolved_events" in 
+        let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Unresolved_events" in 
         error 
       | Exist e -> 
-        let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel_err "Exist " in 
+        let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Exist " in 
         print_event_case_address parameter handler error blackboard e 
       | Keep_event i -> 
-        let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel_err "Keep %i" i in 
+        let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Keep %i" i in 
         error 
       
      let get_npredicate_id blackboard = blackboard.n_predicate_id 
@@ -491,7 +491,7 @@ module Blackboard =
            print_known_case log "?(" ") " " " case 
 
      let print_address parameter handler error blackboard address = 
-       let log = parameter.PB.Po.K.H.out_channel_err in 
+       let log = parameter.PB.CI.Po.K.H.out_channel_err in 
        match address 
        with 
          | Keep_event i -> 
@@ -541,11 +541,11 @@ module Blackboard =
 
      let print_assignment parameter handler error blackboard (address,value)  = 
        let error  = print_address parameter handler error blackboard address in 
-       let _ = print_value parameter.PB.Po.K.H.out_channel_err value in 
+       let _ = print_value parameter.PB.CI.Po.K.H.out_channel_err value in 
        error 
 
      let print_blackboard parameter handler error blackboard = 
-       let log = parameter.PB.Po.K.H.out_channel_err in  
+       let log = parameter.PB.CI.Po.K.H.out_channel_err in  
        let _ = Printf.fprintf log "**\nBLACKBOARD\n**\n" in 
        let _ = Printf.fprintf log "%i wires, %i events\n" blackboard.n_predicate_id blackboard.n_eid in 
        let _ = Printf.fprintf log "*wires:*\n" in 
@@ -626,7 +626,7 @@ module Blackboard =
        let error,n_events = PB.n_events parameter handler error pre_blackboard in 
        let stack = [] in 
        let current_stack = empty_stack in
-       let  event_case_list = PB.A.make n_events [] in 
+       let event_case_list = PB.A.make n_events [] in 
        let n_seid = PB.A.make n_predicates 0 in 
        let blackboard = PB.A.make n_predicates (PB.A.make 1 dummy_case_info) in
        let weigth_of_predicate_id = PB.A.make n_predicates 0 in 
@@ -731,9 +731,9 @@ module Blackboard =
          in error,blackboard 
        with 
          | _ -> 
-           let error_list,error = PB.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set_case") (Some "680") (Some "Dereferencing null pointer") (failwith "Dereferencing null pointer")
+           let error_list,error = PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set_case") (Some "680") (Some "Dereferencing null pointer") (failwith "Dereferencing null pointer")
            in 
-           PB.Po.K.H.raise_error parameter handler error_list error blackboard
+           PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard
 
 
      let set parameter handler error case_address case_value blackboard = 
@@ -749,9 +749,9 @@ module Blackboard =
                  error,blackboard 
                | _ -> 
                  let error_list,error = 
-                   PB.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "698") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
+                   PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "698") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
                  in 
-                 PB.Po.K.H.raise_error parameter handler error_list error blackboard 
+                 PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard 
            end 
          | Pointer_to_next case_address -> 
               begin 
@@ -764,9 +764,9 @@ module Blackboard =
                     error,blackboard 
                   | _ -> 
                     let error_list,error = 
-                   PB.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "713") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
+                   PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "713") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
                  in 
-                 PB.Po.K.H.raise_error parameter handler error_list error blackboard 
+                 PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard 
               end 
          | Value_after case_address -> 
            begin 
@@ -779,15 +779,15 @@ module Blackboard =
                  error,blackboard 
                | _ -> 
                  let error_list,error = 
-                   PB.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "728") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
+                   PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "728") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
                  in 
-                 PB.Po.K.H.raise_error parameter handler error_list error blackboard 
+                 PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard 
            end 
          | Value_before case_address -> 
            let error_list,error = 
-             PB.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "734") (Some "Blackboard.set should not be called with value_before") (failwith "Incompatible address in function Blackboard.set")
+             PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "734") (Some "Blackboard.set should not be called with value_before") (failwith "Incompatible address in function Blackboard.set")
            in 
-           PB.Po.K.H.raise_error parameter handler error_list error blackboard 
+           PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard 
          | Pointer_to_previous case_address -> 
                begin 
                 match case_value
@@ -799,9 +799,9 @@ module Blackboard =
                     error,blackboard 
                   | _ -> 
                     let error_list,error = 
-                   PB.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "748") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
+                   PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "748") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
                  in 
-                 PB.Po.K.H.raise_error parameter handler error_list error blackboard 
+                 PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard 
               end 
          | N_unresolved_events -> 
            begin 
@@ -811,9 +811,9 @@ module Blackboard =
                  error,{blackboard with n_unresolved_events = int}
                | _ -> 
                  let error_list,error = 
-                   PB.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "760") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
+                   PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "760") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
                  in 
-                 PB.Po.K.H.raise_error parameter handler error_list error blackboard 
+                 PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard 
            end 
          | Keep_event step_id -> 
            begin 
@@ -824,9 +824,9 @@ module Blackboard =
                  error,blackboard 
                | _ -> 
                  let error_list,error = 
-                   PB.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "773") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
+                   PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "773") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
                  in 
-                 PB.Po.K.H.raise_error parameter handler error_list error blackboard 
+                 PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard 
            end 
          | Exist case_address -> 
            begin 
@@ -839,9 +839,9 @@ module Blackboard =
                  error,blackboard 
                | _ -> 
                  let error_list,error = 
-                   PB.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "788") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
+                   PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "788") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
                  in 
-                 PB.Po.K.H.raise_error parameter handler error_list error blackboard 
+                 PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard 
            end 
              
      let rec get parameter handler error case_address blackboard = 
@@ -865,9 +865,9 @@ module Blackboard =
            if is_null_pointer pointer 
            then 
               let error_list,error = 
-                PB.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "get") (Some "814") (Some "Value before an unexisting element requested ") (failwith "Value before an unexisting element requested")  
+                PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "get") (Some "814") (Some "Value before an unexisting element requested ") (failwith "Value before an unexisting element requested")  
               in 
-              PB.Po.K.H.raise_error parameter handler error_list error (State PB.undefined)
+              PB.CI.Po.K.H.raise_error parameter handler error_list error (State PB.undefined)
            else 
              get parameter handler error (Value_after {case_address with row_short_event_id = pointer}) blackboard 
          | Pointer_to_previous case_address -> 
@@ -891,12 +891,12 @@ module Blackboard =
            let error = 
              if debug_mode 
              then 
-               let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel_err "\n***\nREFINE_VALUE\nValue before: " in 
+               let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "\n***\nREFINE_VALUE\nValue before: " in 
                let error = print_case_address parameter handler error blackboard case_address in 
                let _ = print_case_value parameter old in 
-               let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel_err "\nNew value: " in 
+               let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "\nNew value: " in 
               let _ = print_case_value parameter case_value in 
-               let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel_err "\nIGNORED***\n" in 
+               let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "\nIGNORED***\n" in 
                error
              else 
                error
@@ -909,12 +909,12 @@ module Blackboard =
             let error = 
              if debug_mode 
              then 
-               let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel_err "\n***\nREFINE_VALUE\nValue before: " in 
+               let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "\n***\nREFINE_VALUE\nValue before: " in 
                let error = print_case_address parameter handler error blackboard case_address in 
                let _ = print_case_value parameter old in 
-               let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel_err "\nNew value: " in 
+               let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "\nNew value: " in 
                let _ = print_case_value parameter case_value in 
-               let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel_err "\nIGNORED***\n" in 
+               let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "\nIGNORED***\n" in 
                error
              else
                error 
@@ -930,12 +930,12 @@ module Blackboard =
              let error = 
                if debug_mode 
                then 
-                 let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel_err "\n***\nREFINE_VALUE\nValue before: " in 
+                 let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "\n***\nREFINE_VALUE\nValue before: " in 
                  let error = print_case_address parameter handler error blackboard case_address in 
                  let _ = print_case_value parameter old in 
-                 let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel_err "\nNew value: " in 
+                 let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "\nNew value: " in 
                  let _ = print_case_value parameter case_value in 
-                 let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel_err "\nSUCCESS***\n" in 
+                 let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "\nSUCCESS***\n" in 
                  error 
                else 
                  error 
@@ -945,12 +945,12 @@ module Blackboard =
              let error = 
                if debug_mode 
                then 
-                 let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel_err "\n***\nREFINE_VALUE\nValue before: " in 
+                 let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "\n***\nREFINE_VALUE\nValue before: " in 
                  let error = print_case_address parameter handler error blackboard case_address in 
                  let _ = print_case_value parameter old in 
-                 let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel_err "\nNew value: " in 
+                 let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "\nNew value: " in 
                  let _ = print_case_value parameter case_value in 
-                 let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel_err "\nFAIL***\n" in 
+                 let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "\nFAIL***\n" in 
                  error
                else 
                  error 
@@ -981,21 +981,21 @@ module Blackboard =
              error,blackboard 
          | _ ->    
            let error_list,error = 
-                PB.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "dec") (Some "916") (Some "Wrong type of case value") (failwith "Wrong type of case value")  
+                PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "dec") (Some "916") (Some "Wrong type of case value") (failwith "Wrong type of case value")  
               in 
-              PB.Po.K.H.raise_error parameter handler error_list error blackboard 
+              PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard 
          
      let branch parameter handler error blackboard = 
        let error = 
          if debug_mode 
          then 
-           let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel_err "*******\n * BRANCH *\n*******" in 
+           let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "*******\n * BRANCH *\n*******" in 
            let error = print_blackboard parameter handler error blackboard in 
            error
          else 
            error
        in 
-       let blackboard = set_profiling_info PB.Po.K.P.inc_branch blackboard in 
+       let blackboard = set_profiling_info PB.CI.Po.K.P.inc_branch blackboard in 
        error,
        {
          blackboard 
@@ -1008,7 +1008,7 @@ module Blackboard =
        let error = 
          if debug_mode 
          then 
-           let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel_err "*******\n* Cut *\n*******" in 
+           let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "*******\n* Cut *\n*******" in 
            let error = print_blackboard parameter handler error blackboard in 
            error
          else 
@@ -1025,13 +1025,13 @@ module Blackboard =
        let error = 
          if debug_mode 
          then 
-           let _ = Printf.fprintf parameter.PB.Po.K.H.out_channel_err "*******\n* After_Cut *\n*******" in 
+           let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "*******\n* After_Cut *\n*******" in 
            let error = print_blackboard parameter handler error blackboard in 
            error
          else
            error 
        in 
-        let blackboard = set_profiling_info PB.Po.K.P.inc_cut blackboard in 
+        let blackboard = set_profiling_info PB.CI.Po.K.P.inc_cut blackboard in 
        match blackboard.stack 
        with 
          | [] -> error,{blackboard with current_stack = []}
@@ -1046,11 +1046,11 @@ module Blackboard =
            | _  -> aux (reset_last_branching parameter handler error blackboard)
        in 
        let error,blackboard = aux (error,blackboard) in 
-       let blackboard = set_profiling_info PB.Po.K.P.reset_log blackboard in 
+       let blackboard = set_profiling_info PB.CI.Po.K.P.reset_log blackboard in 
        error,blackboard 
     
   (** output result*)
-     type result = (PB.Po.K.refined_step * PB.Po.K.side_effect) list  
+     type result = (PB.CI.Po.K.refined_step * PB.CI.Po.K.side_effect) list  
          
   (** iteration*)
      let is_maximal_solution parameter handler error blackboard = 
@@ -1089,7 +1089,7 @@ module Blackboard =
        
    let print_stack parameter handler error blackboard = 
      let stack = blackboard.current_stack in 
-     let log = parameter.PB.Po.K.H.out_channel_err in 
+     let log = parameter.PB.CI.Po.K.H.out_channel_err in 
      let _ = Printf.fprintf log "Current_stack_level %i " (List.length stack) in 
      let error = List.fold_left (fun error i -> let error = print_assignment parameter handler error blackboard i in let _ = Printf.fprintf log "\n" in error ) error (List.rev stack)  in 
      List.fold_left
@@ -1189,7 +1189,7 @@ module Blackboard =
              )
              event_array 
          in 
-         let rep  = List.rev_map (fun k -> PB.A.get blackboard.event k,PB.Po.K.empty_side_effect) (!event_to_keep) in
+         let rep  = List.rev_map (fun k -> PB.A.get blackboard.event k,PB.CI.Po.K.empty_side_effect) (!event_to_keep) in
          error,rep,!event_to_remove 
        end
      else
@@ -1199,7 +1199,7 @@ module Blackboard =
            else aux (k-1) (k::list)
          in 
          aux (n_events-1) [] in 
-       let rep  = List.rev_map (fun k -> PB.A.get blackboard.event k,PB.Po.K.empty_side_effect) event_to_keep in
+       let rep  = List.rev_map (fun k -> PB.A.get blackboard.event k,PB.CI.Po.K.empty_side_effect) event_to_keep in
          error,rep,[]
 
    let cut parameter handler error blackboard list = 

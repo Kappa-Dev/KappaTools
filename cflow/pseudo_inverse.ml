@@ -1,4 +1,4 @@
- (**
+(**
    * pseudo_inverse.ml 
    *
    * Cut pseudo inverse events: a module for KaSim 
@@ -28,7 +28,7 @@
      val cut: (Po.K.refined_step list -> Po.K.H.error_channel * Po.K.refined_step list * int) Po.K.H.with_handler 
    end
 
- module Po_cut = 
+ module Pseudo_inv = 
    (struct 
 
      module Po=Po_cut.Po_cut 
@@ -38,6 +38,14 @@
        | Here of Po.K.agent_id  
        | Bound_site of Po.K.agent_id * Po.K.site_name
        | Internal_state of Po.K.agent_id * Po.K.site_name 
+
+     let string_of_predicate_info pi = 
+       match 
+         pi 
+       with 
+         | Here ag -> "Here "^(string_of_int ag)
+         | Bound_site (ag,s) -> "Bound_state "^(string_of_int ag)^" "^(string_of_int s)
+         | Internal_state (ag,s) -> "Internal_state "^(string_of_int ag)^" "^(string_of_int s)
            
      module PredicateMap = Map.Make (struct type t = predicate_info let compare = compare end) 
 
@@ -50,15 +58,107 @@
        | Free      (** for binding sites *)
        | Bound_to of Po.K.agent_id * Po.K.agent_name * Po.K.site_name   (** for binding sites *)
            
+     let string_of_predicate_value pi = 
+       match 
+         pi 
+       with
+         | Internal_state_is s -> (string_of_int s)
+         | Undefined -> "#Undef" 
+         | Present -> "#Here"
+         | Free -> "#Free" 
+         | Bound_to (ag,ag_name,s) -> 
+           "Bound_to "^(string_of_int ag)^" "^(string_of_int ag_name)^" "^(string_of_int s)
+     
      type pseudo_inv_blackboard = 
       {
-        pseudo_steps_by_column: (step_id * predicate_value * bool) list PredicateMap.t ;
-        pseudo_nsteps: step_id ; 
-        pseudo_predicates_of_event: predicate_info  list A.t ;
-        pseudo_is_remove_action: bool A.t ;
-        pseudo_event: (Po.K.refined_step) option A.t; 
-        pseudo_predicate_id_list_related_to_predicate_id: (predicate_info list) PredicateMap.t ; 
+        steps_by_column: (step_id * predicate_value * bool) list PredicateMap.t ;
+        nsteps: step_id ; 
+        predicates_of_event: predicate_info  list A.t ;
+        is_remove_action: bool A.t ;
+        modified_predicates_of_event: int A.t ;
+        event: (Po.K.refined_step) option A.t; 
+        predicate_id_list_related_to_predicate_id: (predicate_info list) PredicateMap.t ; 
       }
+
+     let init_blackboard n = 
+       {
+         steps_by_column = PredicateMap.empty ; 
+         nsteps = -1 ; 
+         predicates_of_event = A.create  n [] ;
+         is_remove_action = A.create n false ;
+         modified_predicates_of_event = A.create n 0 ; 
+         event = A.create n None ; 
+         predicate_id_list_related_to_predicate_id = PredicateMap.empty ; 
+      }
+       
+
+     let print_blackboard parameter handler error blackboard = 
+       let _ = Printf.fprintf parameter.Po.K.H.out_channel_err "Blackboard for removing pseudo inverse element\n" in 
+       let _ = Printf.fprintf parameter.Po.K.H.out_channel_err "n_events: %i\n" blackboard.nsteps in 
+       let _ = Printf.fprintf parameter.Po.K.H.out_channel_err "Steps_by_column:\n" in 
+       let _ = 
+         PredicateMap.iter 
+           (fun pred list -> 
+             let _ = 
+               Printf.fprintf parameter.Po.K.H.out_channel_err "%s: " (string_of_predicate_info pred)
+             in 
+             let _ = 
+               List.iter 
+                 (fun (eid,value,bool) -> 
+                   Printf.fprintf parameter.Po.K.H.out_channel_err "(%i,%s%s)," eid (string_of_predicate_value value) (if bool then "(Mod)" else ""))
+                 list 
+             in 
+             Printf.fprintf parameter.Po.K.H.out_channel_err "\n")
+           blackboard.steps_by_column 
+       in 
+       let _ = Printf.fprintf parameter.Po.K.H.out_channel_err "Events:\n" in 
+       let rec aux k = 
+         if k=blackboard.nsteps 
+         then ()
+         else 
+           let event = 
+             try 
+               A.get blackboard.event k 
+             with _ -> 
+               let _ = Printf.fprintf stderr "ERREUR %i 123\n" k in 
+               raise Exit 
+           in 
+           let _ = 
+             match 
+               event 
+             with 
+               | None -> () 
+               | Some event -> 
+                 begin 
+                   try 
+                     let _ = Printf.fprintf parameter.Po.K.H.out_channel_err "Event %i\n" k in 
+                     let _ = Po.K.print_refined_step parameter handler event in 
+                     let _ = Printf.fprintf parameter.Po.K.H.out_channel_err "Predicates: " in 
+                     let list = A.get blackboard.predicates_of_event k in 
+                     let _ = List.iter (fun pid -> Printf.fprintf parameter.Po.K.H.out_channel_err "%s," (string_of_predicate_info pid)) list in 
+                     let _ = Printf.fprintf parameter.Po.K.H.out_channel_err "\n" in 
+                     let bool = A.get blackboard.is_remove_action k in 
+                     let _ = 
+                       if bool 
+                       then 
+                         Printf.fprintf parameter.Po.K.H.out_channel_err "contain a deletion\n" in 
+                     let int = A.get blackboard.modified_predicates_of_event k in 
+                     let _ = Printf.fprintf parameter.Po.K.H.out_channel_err "%i modified predicates \n " int in
+                     ()
+                   with _ -> () 
+                 end 
+           in 
+           aux (k+1)
+       in 
+       let _ = aux 0 in 
+       () 
+           
+     let p b = 
+       let _ = 
+         if b then Printf.fprintf stderr "TRUE\n" 
+         else Printf.fprintf stderr "FALSE\n" 
+       in 
+       b 
 
      let predicates_of_action parameter handler error blackboard action = 
        match action with 
@@ -125,7 +225,7 @@
              try 
                PredicateMap.find
                  predicate_id 
-                 blackboard.pseudo_predicate_id_list_related_to_predicate_id
+                 blackboard.predicate_id_list_related_to_predicate_id
              with 
                | Not_found -> [] 
            in 
@@ -139,25 +239,144 @@
            list,[],true
 
      let no_remove parameter handler error blackboard eid = 
-       try 
-         A.get blackboard.pseudo_is_remove_action eid 
+       not (A.get blackboard.is_remove_action eid)
+       
+     let same_length parameter handler error blackboard eid1 eid2 = 
+       (A.get blackboard.modified_predicates_of_event eid1)
+         =
+       (A.get blackboard.modified_predicates_of_event eid2)
+       
+     let clean t column blackboard = 
+       match column 
        with 
-         | Not_found -> false 
+         | [] -> column,blackboard 
+         | head::tail -> 
+           let rec aux list bool = 
+             match list 
+             with 
+               | (eid,_,false)::q ->
+                 begin
+                   if eid = -1 
+                   then 
+                     list,bool
+                   else 
+                     match 
+                       A.get blackboard.event eid 
+                     with 
+                       | None -> aux q true
+                       | _ -> list,bool
+                 end
+               | _ -> list,bool 
+           in 
+           let list,bool = aux tail false in 
+           if bool 
+           then 
+             let column = head::list in 
+             let blackboard = 
+               {
+                 blackboard 
+                with 
+                  steps_by_column = 
+                   PredicateMap.add t column  blackboard.steps_by_column  }
+             in column,blackboard 
+           else
+             column,blackboard 
 
-     let n_actions list = 
-       let rec aux l k = 
+     let check parameter handler error blackboard = 
+       let eid = blackboard.nsteps in 
+       let predicate_list = A.get blackboard.predicates_of_event eid in 
+       let rec scan predicate_list = 
+         match 
+           predicate_list 
+         with 
+           | [] -> error,None,blackboard,[] 
+           | t::q -> 
+           begin
+             let column = 
+               try 
+                 PredicateMap.find t blackboard.steps_by_column 
+               with 
+                 | Not_found -> []
+             in 
+             let column,blackboard = clean t column blackboard in 
+             match 
+               column 
+             with 
+               | (a,_,false)::_ -> scan q 
+               | (a,x,true)::(b,_,true)::(_,y,_)::_ -> 
+                 if a=eid && x=y
+                 then 
+                   error,Some (a,b),blackboard,q
+                 else 
+                   error,None,blackboard,q
+               | _ -> error,None,blackboard,q
+           end
+       in 
+       let error,candidates,blackboard,q = scan predicate_list in 
+       match 
+         candidates 
+       with
+         | None -> error,None 
+         | Some (eida,eidb) -> 
+           if 
+             no_remove parameter handler error blackboard eidb
+             && same_length parameter handler error blackboard eida eidb
+             && 
+               List.for_all 
+               (fun pid -> 
+                 let column = 
+                   try 
+                     PredicateMap.find pid  blackboard.steps_by_column  
+                   with 
+                     | Not_found -> []
+                 in 
+                 let column,blackboard = clean pid column blackboard in 
+                 match 
+                   column 
+                 with 
+                   | (a,_,false)::_ -> true
+                   | (a,x,true)::(b,_,true)::(_,y,_)::_ -> 
+                     if a=eida && b=eidb && x=y
+                     then true
+                     else false 
+                   | _ -> false)
+               q
+           then error,Some (eida,eidb)
+           else error,None
+
+     let pop parameter handler error blackboard eid = 
+       let predicate_list = A.get blackboard.predicates_of_event eid in 
+       let rec aux l error blackboard = 
          match l 
          with 
-           | [] -> k 
-           | (_,_,true)::q ->  aux q (k+1)
-           | (_,_,false)::q -> aux q k 
-       in aux list 0 
-               
-     let same_length parameter handler error blackboard eid1 eid2 = 
-       n_actions eid1 = n_actions eid2 
+           | [] -> error,blackboard
+           | pid::tail -> 
+             let list = 
+               try 
+                 PredicateMap.find pid blackboard.steps_by_column 
+               with 
+                 | Not_found -> raise Exit
+             in 
+             begin 
+               let list = 
+                 match 
+                   list
+                 with 
+                   | (a,_,_)::q when a = eid -> q
+                   | _ -> list
+               in 
+               aux tail error 
+                 {blackboard 
+                  with 
+                    steps_by_column = 
+                     PredicateMap.add pid list blackboard.steps_by_column
+                 }
+             end
+       in 
+       let error,blackboard = aux predicate_list error blackboard in 
+       let _ = A.set blackboard.event eid None in 
+       error,blackboard 
 
-     let check pid eid1 eid2 blackboard = true 
-       
      let predicates_of_test parameter handler error blackboard test = 
        match test
        with 
@@ -176,8 +395,6 @@
          | Po.K.Is_Bound_to  (s1,s2) -> 
            let ag_id1 = Po.K.agent_id_of_site s1 in 
            let ag_id2 = Po.K.agent_id_of_site s2 in 
-           let agent_name1 = Po.K.agent_name_of_site s1 in 
-           let agent_name2 = Po.K.agent_name_of_site s2 in 
            let site_id1 = Po.K.site_name_of_site s1 in 
            let site_id2 = Po.K.site_name_of_site s2 in 
            let predicate_id1 = Bound_site (ag_id1,site_id1) in 
@@ -191,17 +408,16 @@
          | Po.K.Has_Binding_type (s,btype) ->
            let ag_id = Po.K.agent_id_of_site s in 
            let site_id = Po.K.site_name_of_site s in
-           let agent_name = Po.K.agent_of_binding_type btype in 
-           let site_name = Po.K.site_of_binding_type btype in 
            let predicate_id = Bound_site (ag_id,site_id) in 
            [predicate_id]
 
   
 
   let add_step parameter handler error step blackboard = 
-    let pre_event = blackboard.pseudo_event in 
+    let pre_event = blackboard.event in 
     let test_list = Po.K.tests_of_refined_step step in 
-    let action_list,side_effect = Po.K.actions_of_refined_step step in
+    let action_list,_ = Po.K.actions_of_refined_step step in
+    let side_effect = Po.K.get_kasim_side_effects (step) in 
     let build_map list map = 
       List.fold_left 
         (fun map (id,value) -> PredicateMap.add id value map)
@@ -231,7 +447,7 @@
       let map = PredicateMap.add pid (test,action) map in 
       map 
     in 
-    let unambiguous_side_effects = [] in (* TO DO *)
+    let unambiguous_side_effects = side_effect in 
       
     let test_map = 
       List.fold_left 
@@ -260,33 +476,24 @@
         action_map 
     in 
     let merged_map = 
-      List.fold_left 
-        (fun map (pid,_,(test,action)) -> 
-          add_state pid ((test:bool),action) map)
-        merged_map
+      Mods.Int2Set.fold 
+        (fun (a,b)  map  -> 
+          let pid = Bound_site(a,b) in 
+          add_state pid (false,Some Free) map)
         unambiguous_side_effects
+        merged_map 
     in 
-    let side_effect = 
-      List.fold_left 
-        (fun list (_,a,_) -> 
-          match a 
-          with 
-            | None -> list
-            | Some a -> a::list)
-        []
-        unambiguous_side_effects 
-    in 
-    let nsid = blackboard.pseudo_nsteps + 1 in 
-    let _ = A.set blackboard.pseudo_event nsid (Some step) in 
-    let pre_steps_by_column,list  = 
+    let nsid = blackboard.nsteps + 1 in 
+    let _ = A.set blackboard.event nsid (Some step) in 
+    let n_modifications,pre_steps_by_column,list  = 
       PredicateMap.fold 
-        (fun id (test,action) (map,list) -> 
+        (fun id (test,action) (n_modifications,map,list) -> 
           begin 
             let old_list = 
               try 
                 PredicateMap.find id map 
               with 
-                | Not_found -> [] 
+                | Not_found -> [-1,Undefined,false] 
             in 
             let old_value = 
               match 
@@ -301,35 +508,71 @@
                 | None -> old_value 
                 | Some i -> i 
             in 
-            let bool_action = 
+            let n_modifications,bool_action = 
               match action
               with 
-                | None -> false
-                | Some _ -> true 
+                | None -> n_modifications,false
+                | Some _ -> (n_modifications+1),true 
             in 
-            (PredicateMap.add id ((nsid,new_value,bool_action)::old_list) map,
-             (id,new_value)::list)
+            n_modifications,
+            PredicateMap.add id ((nsid,new_value,bool_action)::old_list) map,
+            (id,new_value)::list
           end)
         merged_map
-        (blackboard.pseudo_steps_by_column,[])
+        (0,blackboard.steps_by_column,[])
     in 
-    let pseudo_is_remove_action = 
+    let _ = 
       if is_remove_action 
       then 
-        let _ = A.set blackboard.pseudo_is_remove_action nsid true in () 
+        let _ = A.set blackboard.is_remove_action nsid true in () 
     in 
-    let pseudo_predicates_of_event = A.set blackboard.pseudo_predicates_of_event nsid (List.rev_map fst (List.rev list)) in 
+    let _ = A.set blackboard.predicates_of_event nsid (List.rev_map fst (List.rev list)) in 
+    let _ = A.set blackboard.modified_predicates_of_event nsid n_modifications in 
     let blackboard = 
       { 
         blackboard with 
-          pseudo_event = pre_event ;
-          pseudo_steps_by_column = pre_steps_by_column; 
-          pseudo_nsteps = nsid;
+          event = pre_event ;
+          steps_by_column = pre_steps_by_column; 
+          nsteps = nsid;
       }
     in 
     error,blackboard
 
-  let cut parameter handler error list = error,list,0 
- 
+      
+
+  let cut parameter handler error list = 
+    let n = List.length list in 
+    let blackboard = init_blackboard n in 
+    let error,blackboard,n_cut = 
+      List.fold_left 
+        (fun (error,blackboard,n_cut) step ->  
+          let error,blackboard = add_step parameter handler error step blackboard in 
+          let error,to_pop = check parameter handler error blackboard in 
+          match 
+            to_pop 
+          with 
+            | None -> error,blackboard,n_cut 
+            | Some (e1,e2) -> 
+              let error,blackboard = pop parameter handler error blackboard e1 in 
+              let error,blackboard = pop parameter handler error blackboard e2 in 
+              (error,blackboard,n_cut+2) )
+        (error,blackboard,0)
+        list 
+    in 
+    let list = 
+      let rec aux k list = 
+        if k=(-1) 
+        then list
+        else 
+          match A.get blackboard.event k 
+          with 
+            | Some a -> 
+              aux (k-1) (a::list)
+            | None -> aux (k-1) list
+      in aux (blackboard.nsteps) [] 
+    in 
+    error,list,n_cut 
+    
+
     
     end:Cut_pseudo_inverse)

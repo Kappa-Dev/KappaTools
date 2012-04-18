@@ -10,7 +10,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 09/04/2012
-  * Last modification: 16/04/2012
+  * Last modification: 18/04/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -43,6 +43,7 @@ module type StoryStats =
 
     val set_time: log_info -> log_info 
     val set_global_cut: int -> log_info -> log_info 
+    val set_pseudo_inv: int -> log_info -> log_info 
     val ellapsed_global_time: log_info -> float
     val ellapsed_time: log_info -> float
     val init_log_info: unit -> log_info 
@@ -70,6 +71,7 @@ module StoryStats =
              propagation: int array;
              branch: int;
              global_cut: int; 
+             pseudo_inv_cut: int;
              cut: int; 
              kasim_events: int;
              init_events: int;
@@ -139,6 +141,7 @@ module StoryStats =
            branch = 0 ;
            cut = 0 ;
            global_cut = 0 ; 
+           pseudo_inv_cut = 0 ;
            kasim_events = 0 ;
            init_events = 0 ;
            obs_events = 0 ;
@@ -265,11 +268,12 @@ module StoryStats =
          let _ = Printf.fprintf log "Init events:                 %i\n" log_info.init_events in 
          let _ = Printf.fprintf log "Obs events:                  %i\n" log_info.obs_events in 
          let _ = Printf.fprintf log "Fictitious events:           %i\n" log_info.fictitious_events in 
-         let _ = Printf.fprintf log "Cut events (globally):       %i \n" log_info.global_cut in 
+         let _ = Printf.fprintf log "Cut events (globally):       %i\n" log_info.global_cut in 
+         let _ = Printf.fprintf log "Pseudo-inverse events:       %i\n" log_info.pseudo_inv_cut in 
          let _ = Printf.fprintf log "Cut events (for this story): %i\n" log_info.cut_events in 
          let _ = Printf.fprintf log "Selected events:             %i\n" log_info.current_stack.selected_events in 
          let _ = Printf.fprintf log "Removed events:              %i\n" log_info.current_stack.removed_events in 
-         let _ = Printf.fprintf log "Remaining events:            %i\n" (log_info.kasim_events + log_info.obs_events + log_info.init_events +log_info.fictitious_events - log_info.cut_events - log_info.current_stack.selected_events - log_info.current_stack.removed_events - log_info.global_cut) in 
+         let _ = Printf.fprintf log "Remaining events:            %i\n" (log_info.kasim_events + log_info.obs_events + log_info.init_events +log_info.fictitious_events - log_info.cut_events - log_info.current_stack.selected_events - log_info.current_stack.removed_events - log_info.global_cut - log_info.pseudo_inv_cut) in 
          let _ = Printf.fprintf log "Exploration depth:           %i\n" log_info.current_stack.current_branch in 
          let _ = Printf.fprintf log "Exploration cuts:            %i\n" log_info.cut in 
          let _ = Printf.fprintf log "***\nPropagation Hits:\n" in 
@@ -296,5 +300,8 @@ module StoryStats =
        let set_global_cut n log_info = 
          {log_info with global_cut = n}
 
+       let set_pseudo_inv n log_info = 
+         {log_info with pseudo_inv_cut = n}
+           
       end:StoryStats)
            

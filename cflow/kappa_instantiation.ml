@@ -480,7 +480,6 @@ module Cflow_linker =
 
   let tests_of_event event = 
     let rule = rule_of_event event in 
-(*    let event = short_of event in *)
     let lhs = rule.Dynamics.lhs in 
     let embedding = embedding_of_event event in 
     tests_of_lhs lhs embedding 

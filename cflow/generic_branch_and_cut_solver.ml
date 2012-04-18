@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 16/04/2012
+  * Last modification: 18/04/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -30,13 +30,12 @@ struct
       
  
   let rec propagate parameter handler error instruction_list propagate_list blackboard = 
-    let n = (PH.B.get_n_unresolved_events blackboard) in 
     let bool,blackboard  = PH.B.tick blackboard in 
     let _ = 
       if bool 
       then 
-        let _ = PH.B.print_complete_log parameter.PH.B.PB.Po.K.H.out_channel_profiling blackboard in 
-        let _ = flush parameter.PH.B.PB.Po.K.H.out_channel_profiling
+        let _ = PH.B.print_complete_log parameter.PH.B.PB.CI.Po.K.H.out_channel_profiling blackboard in 
+        let _ = flush parameter.PH.B.PB.CI.Po.K.H.out_channel_profiling
         in () 
     in 
     match instruction_list 
@@ -102,7 +101,7 @@ struct
     let error,blackboard,result_wo_compression,events_to_remove  = PH.B.cut parameter handler error blackboard list_eid  in 
     let result_wo_compression = 
       if 
-        Parameter.get_causal_trace parameter.PH.B.PB.Po.K.H.compression_mode 
+        Parameter.get_causal_trace parameter.PH.B.PB.CI.Po.K.H.compression_mode 
       then 
         Some result_wo_compression 
       else 
@@ -112,9 +111,9 @@ struct
     let _ = 
       if log_steps 
       then 
-        let _ = Printf.fprintf parameter.PH.B.PB.Po.K.H.out_channel_err "Start cutting\n" in 
+        let _ = Printf.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err "Start cutting\n" in 
         let _ = 
-          flush parameter.PH.B.PB.Po.K.H.out_channel_err
+          flush parameter.PH.B.PB.CI.Po.K.H.out_channel_err
         in 
         ()
     in 
@@ -124,9 +123,9 @@ struct
     let _ = 
       if log_steps 
       then 
-        let _ = Printf.fprintf parameter.PH.B.PB.Po.K.H.out_channel_err "After Causal Cut  %i \n" (PH.B.get_n_unresolved_events blackboard) in 
+        let _ = Printf.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err "After Causal Cut  %i \n" (PH.B.get_n_unresolved_events blackboard) in 
         let _ = 
-          flush parameter.PH.B.PB.Po.K.H.out_channel 
+          flush parameter.PH.B.PB.CI.Po.K.H.out_channel 
         in 
         ()
     in 
@@ -136,9 +135,9 @@ struct
     let _ = 
       if log_steps 
       then 
-        let _ = Printf.fprintf parameter.PH.B.PB.Po.K.H.out_channel_err "After observable propagation  %i \n" (PH.B.get_n_unresolved_events blackboard) in 
+        let _ = Printf.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err "After observable propagation  %i \n" (PH.B.get_n_unresolved_events blackboard) in 
         let _ = 
-          flush parameter.PH.B.PB.Po.K.H.out_channel 
+          flush parameter.PH.B.PB.CI.Po.K.H.out_channel 
         in ()
     in 
     let error,blackboard,output = iter parameter handler error blackboard 

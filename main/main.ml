@@ -118,14 +118,14 @@ let main =
 			end ;  
 		if !Parameter.compileModeOn then (Hashtbl.iter (fun i r -> Dynamics.dump r env) state.State.rules ; exit 0)
 		else () ;
-                let profiling = Compression_main.S.PH.B.PB.Po.K.P.init_log_info () in 
+                let profiling = Compression_main.S.PH.B.PB.CI.Po.K.P.init_log_info () in 
 		let plot = Plot.create !Parameter.outputDataName
 		and grid,profiling,event_list = 
 			if Environment.tracking_enabled env then 
 				let grid = Causal.empty_grid() in 
                                 let event_list = [] in 
                                 let profiling,event_list = 
-                                Compression_main.S.PH.B.PB.Po.K.store_init profiling state event_list in 
+                                Compression_main.S.PH.B.PB.CI.Po.K.store_init profiling state event_list in 
                                 grid,profiling,event_list
                         else (Causal.empty_grid(),profiling,[])
 		in

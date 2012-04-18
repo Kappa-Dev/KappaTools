@@ -105,13 +105,13 @@ let event state (*grid*) story_profiling event_list counter plot env =
 					if !Parameter.causalModeOn or !Parameter.weakcompressionModeOn 
 	        then
 					  begin
-                                            let story_profiling,event_list = Compression_main.S.PH.B.PB.Po.K.store_event story_profiling (Compression_main.S.PH.B.PB.Po.K.import_event ((r,phi,psi),(obs_from_rule_app,r,Counter.event counter,side_effect))) event_list in 
+                                            let story_profiling,event_list = Compression_main.S.PH.B.PB.CI.Po.K.store_event story_profiling (Compression_main.S.PH.B.PB.CI.Po.K.import_event ((r,phi,psi),(obs_from_rule_app,r,Counter.event counter,side_effect))) event_list in 
                                             let story_profiling,event_list = 
                                               List.fold_left 
                                                 (fun (story_profiling,event_list) (obs,phi) -> 
                                                   
                                                   let lhs = State.kappa_of_id obs state in 
-                                                  Compression_main.S.PH.B.PB.Po.K.store_obs story_profiling (obs,lhs,phi) event_list)
+                                                  Compression_main.S.PH.B.PB.CI.Po.K.store_obs story_profiling (obs,lhs,phi) event_list)
                                                 (story_profiling,event_list) 
                                                 obs_from_rule_app
                                             in 
