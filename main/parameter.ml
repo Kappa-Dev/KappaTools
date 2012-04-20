@@ -19,7 +19,7 @@ let useColor = ref true
 (* expert option for stories *)
   (** Memory **)
   (* Number of potential states that are put in the cache per binding site, so as to handler with side effects in stories. None -> Unlimited cache *) 
-  let cache_size = ref (Some 1) (*(None:int option) *)
+  let cache_size = ref (None:int option) 
 
   (** Precomputation **)
   (* Cut concurrent events (for all observables) before generating the blackboard *)

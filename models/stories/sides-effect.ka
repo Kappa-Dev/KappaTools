@@ -1,10 +1,15 @@
-C(a~u) -> @0
-C(a~p) -> @10 
--> C() @10
- 
-%init: 1000 C(a~u) 
+ B(a),C(a~u) -> B(a!1),C(a~p!1) @ 1 
+'D' B(a!1),C(a~p!1) -> @2 
+A(b) -> @ 1
+ C(a!_) -> C(a) @2
+ -> A(a!1,b),B(a!1) @10
+ -> C(a~p) @10
 
-%agent: C(a~u~p)
+%init: 10 A(a!1,b),B(a!1)
+%init: 10 C(a~u!1),C(a~p!1)
 
+%mod: [true] set $TRACK 'D' [true]
 
-%mod: [true] do $TRACK 'C' until [false]
+%agent: A(a,b,c)
+%agent: B(a,b,c)
+%agent: C(a~p~u,b,c)
