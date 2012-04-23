@@ -118,7 +118,7 @@ let record_obs ((r_id,state,embedding),test) event_number grid env =
     Mods.IntMap.fold 
       (fun  id agent grid ->
 	let node_id = im embedding id in
- 	let agent_name = Mixture.name agent in 
+ (*	let agent_name = Mixture.name agent in *)
 	Mixture.fold_interface 
 	  (fun site_id c  grid  -> 
 	    add (node_id,site_id) 8 (* HACK, TO DO CLEANER *) grid event_number (OBS r_id) [])
@@ -197,6 +197,7 @@ let string_of_atom atom =
 		
 				
 let dot_of_grid profiling fic grid state env = 
+  let t = Sys.time () in 
 	let ids = Hashtbl.fold (fun key _ l -> key::l) grid.flow [] in
 	let config = cut ids grid in 
 	let label e = 
@@ -296,6 +297,7 @@ let dot_of_grid profiling fic grid state env =
 			) cflct_set
 	) config.conflict ;
 	fprintf desc "}\n" ;
+        fprintf desc "/*\n Dot generation time: %f\n*/" (Sys.time () -. t) ; 
         close_out desc 
 	
 let dump grid state env = 

@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 18/04/2012
+  * Last modification: 23/04/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -19,6 +19,14 @@
   * under the terms of the GNU Library General Public License *)
 
 let log_steps = false
+
+module type Solver = 
+  (sig 
+    module PH:Propagation_heuristics.Blackboard_with_heuristic
+
+    val compress: (PH.B.blackboard -> PH.update_order list -> PH.B.PB.step_id list -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.blackboard * PH.B.assign_result * PH.B.result option) PH.B.PB.CI.Po.K.H.with_handler
+   end)
+
 
 module Solver = 
 struct 

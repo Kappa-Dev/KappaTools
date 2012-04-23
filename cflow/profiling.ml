@@ -44,6 +44,10 @@ module type StoryStats =
     val set_time: log_info -> log_info 
     val set_global_cut: int -> log_info -> log_info 
     val set_pseudo_inv: int -> log_info -> log_info 
+    val set_start_compression: log_info -> log_info 
+    val set_grid_generation: log_info -> log_info 
+    val set_canonicalisation: log_info -> log_info 
+    val set_story_compression: log_info -> log_info 
     val ellapsed_global_time: log_info -> float
     val ellapsed_time: log_info -> float
     val init_log_info: unit -> log_info 
@@ -68,6 +72,10 @@ module StoryStats =
              last_tick:float;
              global_start_time:float;
              story_start_time:float;
+             step_start_time: float;
+             grid_time: float;
+             story_compression_time:float;
+             canonicalization_time: float;
              propagation: int array;
              branch: int;
              global_cut: int; 
@@ -136,6 +144,10 @@ module StoryStats =
          { 
            global_start_time = time ;
            story_start_time = time ;
+           step_start_time = time ; 
+           grid_time = 0.;
+           story_compression_time = 0. ;
+           canonicalization_time = 0. ; 
            last_tick = time ;
            propagation = Array.make propagation_cases 0 ;
            branch = 0 ;
@@ -170,6 +182,10 @@ module StoryStats =
          {log 
            with 
              story_start_time = time ; 
+             step_start_time = time ;
+             grid_time = 0.;
+             story_compression_time = 0. ;
+           canonicalization_time = 0. ; 
          }
 
        let propagate_up i = i 
@@ -186,8 +202,30 @@ module StoryStats =
          time -. log.global_start_time 
 
        let set_time log = 
-         { log with story_start_time = Sys.time ()}
+         { log with story_start_time = Sys.time () ; step_start_time = Sys.time ()}
 
+       let set_start_compression = set_time  
+
+       let set_story_compression log = 
+         let t = Sys.time () in 
+         let st = log.step_start_time in 
+         { log with story_compression_time = t -. st ;
+                    step_start_time = t}
+
+       let set_grid_generation log = 
+         let t = Sys.time () in 
+         let st = log.step_start_time in 
+         { log with grid_time = t -. st ;
+           step_start_time = t}
+
+       let set_canonicalisation log =
+         let t = Sys.time () in 
+         let st = log.step_start_time in 
+         { log with canonicalization_time = t -. st ;
+                    step_start_time = t}
+           
+           
+           
        let add_case i log = 
          let t = log.propagation in 
          let _ = t.(i)<-t.(i)+1 in 
@@ -264,6 +302,9 @@ module StoryStats =
          let _ = Printf.fprintf log "/*\n" in 
          let _ = Printf.fprintf log "Story profiling\n" in 
          let _ = Printf.fprintf log "Ellapsed_time:               %f\n" (ellapsed_time log_info) in 
+         let _ = Printf.fprintf log "Compression time:            %f\n" (log_info.story_compression_time) in 
+         let _ = Printf.fprintf log "Grid generation time:        %f\n" (log_info.grid_time) in 
+         let _ = Printf.fprintf log "Canonicalization time:       %f\n" (log_info.canonicalization_time) in 
          let _ = Printf.fprintf log "KaSim events:                %i\n" log_info.kasim_events in 
          let _ = Printf.fprintf log "Init events:                 %i\n" log_info.init_events in 
          let _ = Printf.fprintf log "Obs events:                  %i\n" log_info.obs_events in 
