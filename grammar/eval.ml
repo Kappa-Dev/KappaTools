@@ -257,7 +257,7 @@ let eval_agent is_pattern tolerate_new_state env a ctxt =
 
 (* returns partial evaluation of rate expression and a boolean that is set *)
 (* to true if partial evaluation is a constant function                    *)
-let rec partial_eval_alg ?(reduce_const=false) env ast =
+let rec partial_eval_alg ?(reduce_const=true) env ast =
 	let bin_op ast ast' pos op op_str =
 		let (f1, const1, dep1, lbl1) = partial_eval_alg env ast
 		
@@ -911,7 +911,10 @@ let init_graph_of_result env res =
 			(*
 			if not is_const then raise (ExceptionDefn.Semantics_Error (pos, Printf.sprintf "%s is not a constant, cannot initialize graph." lbl))
 			else*)
-			let n = match !Parameter.rescale with None -> int_of_float (close_var v) | Some i -> min i (int_of_float (close_var v)) in
+			let n = match !Parameter.rescale with 
+				| None -> int_of_float (close_var v) 
+				| Some i -> min i (int_of_float (close_var v)) 
+			in
 				(* Cannot do Mixture.to_nodes env m once for all because of        *)
 				(* references                                                      *)
 				while !cpt < n do
