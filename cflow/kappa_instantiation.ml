@@ -480,7 +480,6 @@ module Cflow_linker =
 
   let tests_of_event event = 
     let rule = rule_of_event event in 
-(*    let event = short_of event in *)
     let lhs = rule.Dynamics.lhs in 
     let embedding = embedding_of_event event in 
     tests_of_lhs lhs embedding 
@@ -612,8 +611,8 @@ module Cflow_linker =
 		 let fresh' = add_asso rhs_id kappa_agent fresh in 
 		   list_actions',side_sites,fresh')
 	([],[],Mods.IntMap.empty)
-	(List.rev rule.Dynamics.script)
-    in a,b
+	rule.Dynamics.script
+    in List.rev a,b
 
       
 

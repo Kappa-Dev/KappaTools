@@ -15,7 +15,29 @@ let backtrace = ref false
 let (rescale:int option ref) = ref None
 let eclipseMode = ref false
 let useColor = ref true
-let cache_size = ref (Some 1) (*(None:int option) *)
+
+(* expert option for stories *)
+  (** Memory **)
+  (* Number of potential states that are put in the cache per binding site, so as to handler with side effects in stories. None -> Unlimited cache *) 
+  let cache_size = ref (None:int option) 
+
+  (** Precomputation **)
+  (* Cut concurrent events (for all observables) before generating the blackboard *)
+  let do_global_cut = true 
+
+  (* Cut pseudo-inverse events *) 
+  let cut_pseudo_inverse_event = true 
+    
+  (* Cut concurrent events (for the current observale) before generating the blackboard *)
+  let do_local_cut = true 
+
+   
+  (** Propagation heuristics **)
+  (* Whenever we do not know whether an event has to be selected or, not, check whether this is not the last one that can parform a requested action *)
+  let look_up_for_better_cut = true 
+  
+  (* Whenever an event is removed, checked whether there is not only one left to perform a required action *)   
+  let look_down_for_better_cut = true 
 
 (*User definable values*)
 let (maxEventValue:int option ref) = ref None
@@ -43,6 +65,7 @@ let snapshotFileName = ref "snap"
 
 let dumpFileName = ref "dump.ka"
 let cflowFileName = ref "cflow.dot" 
+let profilingName = ref "profiling.txt" 
 let with_weak_compression = "weakly_compressed"
 let without_compression = "without_compression" 
 let influenceFileName = ref ""
