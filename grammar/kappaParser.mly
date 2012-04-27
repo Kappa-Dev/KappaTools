@@ -2,8 +2,8 @@
 %}
 
 %token EOF NEWLINE 
-%token AT OP_PAR CL_PAR COMMA DOT KAPPA_LNK 
-%token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE SET DO UNTIL TRUE FALSE OBS KAPPA_RAR TRACK CPUTIME CONFIG
+%token AT OP_PAR CL_PAR OP_BRA CL_BRA COMMA DOT KAPPA_LNK 
+%token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE SET DO UNTIL TRUE FALSE OBS KAPPA_RAR TRACK CPUTIME CONFIG COUNTER
 %token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INFINITY TIME EVENT NULL_EVENT PROD_EVENT INIT LET DIV PLOT SINUS COSINUS TAN SQRT EXPONENT POW ABS MODULO 
 %token <Tools.pos> EMAX TMAX FLUX ENABLE DISABLE ASSIGN
 %token <int*Tools.pos> INT 
@@ -49,6 +49,7 @@ start_rule:
 						(Ast.result:={!Ast.result with 
 						Ast.signatures=(ag,pos)::!Ast.result.Ast.signatures}
 						)
+				| Ast.PARTICLE (pos,(nme,pos_nme)) -> Ast.result := {!Ast.result with Ast.particles = (nme,pos_nme)::!Ast.result.Ast.particles}
 				| Ast.INIT (n,mix,pos) ->  
 					(Ast.result := {!Ast.result with 
 					Ast.init=(n,mix,pos)::!Ast.result.Ast.init})
@@ -77,6 +78,10 @@ instruction:
 	{(Ast.SIG ($2,$1))}
 | SIGNATURE error
 	{raise (ExceptionDefn.Syntax_Error "Malformed agent signature, I was expecting something of the form '%agent: A(x,y~u~v,z)'")}
+| COUNTER ID 
+	{Ast.PARTICLE ($1,$2)}
+| COUNTER error
+	{raise (ExceptionDefn.Syntax_Error "Malformed counter declaration, I was expecting something of the form '%counter: A'")}	
 | INIT multiple non_empty_mixture 
 	{Ast.INIT ($2,$3,$1)}
 | INIT error

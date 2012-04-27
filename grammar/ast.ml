@@ -66,7 +66,8 @@ and modif_expr =
 type configuration = string * Tools.pos * string * Tools.pos
 
 type instruction = 
-	| SIG of agent * Tools.pos 
+	| SIG of agent * Tools.pos
+	| PARTICLE of Tools.pos * (string * Tools.pos) 
 	| INIT of alg_expr * mixture * Tools.pos
 	| DECLARE of variable
 	| OBS of variable  (*for backward compatibility*)
@@ -83,11 +84,12 @@ type compil = {variables : variable list; (*pattern declaration for reusing as v
 							 observables : alg_expr list ; (*list of patterns to plot*) 
 							 init : (alg_expr * mixture * Tools.pos) list ; (*initial graph declaration*)
 							 perturbations : perturbation list ;
-							 configurations : configuration list
+							 configurations : configuration list ;
+							 particles : (string * Tools.pos) list 
 							}
 
-let result:compil ref = ref {variables=[] ; signatures=[] ; rules=[] ; init = [] ; observables = [] ; perturbations = [] ; configurations = []} 
-let init_compil = fun _ -> result := {variables=[] ; signatures=[] ; rules=[] ; init = [] ; observables = [] ; perturbations = [] ; configurations = []}
+let result:compil ref = ref {variables=[] ; signatures=[] ; rules=[] ; init = [] ; observables = [] ; perturbations = [] ; configurations = [] ; particles = []} 
+let init_compil = fun _ -> result := {variables=[] ; signatures=[] ; rules=[] ; init = [] ; observables = [] ; perturbations = [] ; configurations = [] ; particles = []}
 
 (*
 let reverse res = 
