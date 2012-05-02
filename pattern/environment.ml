@@ -7,6 +7,10 @@ type t = {
 	num_of_kappa : int StringMap.t ; 
 	kappa_of_num : string IntMap.t ;
 	
+	particle_of_num : string IntMap.t ; 
+	num_of_particle : int StringMap.t ;
+	fresh_particle : int ;
+			
 	fresh_name : int ;
 	num_of_name : int StringMap.t ;
 	name_of_num : string IntMap.t ;
@@ -57,6 +61,10 @@ let empty =
 	fresh_kappa = 0 ; 
 	fresh_alg = 0 ;
 	fresh_pert = 0 ;
+	particle_of_num = IntMap.empty ; 
+	num_of_particle = StringMap.empty ;
+	fresh_particle = 0 ;
+	
 	num_of_pert = StringMap.empty ;
 	pert_of_num = IntMap.empty ;
 	rule_of_pert = IntMap.empty ;
@@ -218,6 +226,18 @@ let declare_sig sign pos env =
 		raise (Semantics_Error (pos, "Signature already defined"))
 	else
 		{env with signatures = IntMap.add (Signature.control sign) sign env.signatures}
+
+let declare_particle name pos env = 
+	if StringMap.mem name env.num_of_particle && not !Parameter.implicitSignature then
+		raise (Semantics_Error (pos, Printf.sprintf "Counter %s already defined" name))
+	else
+		let new_id = env.fresh_particle in
+		{env with 
+			particle_of_num = IntMap.add new_id name env.particle_of_num ; 
+			num_of_particle = StringMap.add name new_id env.num_of_particle ;
+			fresh_particle = env.fresh_particle + 1
+		}
+
 	
 let declare_var_kappa ?(from_rule=false) label_pos_opt env =
 	let label,pos = match label_pos_opt with

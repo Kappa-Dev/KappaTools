@@ -66,16 +66,19 @@ and modif_expr =
 type configuration = string * Tools.pos * string * Tools.pos
 
 type instruction = 
-	| SIG of agent * Tools.pos 
+	| SIG of agent * Tools.pos
 	| INIT of alg_expr * mixture * Tools.pos
 	| DECLARE of variable
 	| OBS of variable  (*for backward compatibility*)
 	| PLOT of alg_expr
 	| PERT of perturbation
 	| CONFIG of configuration
-and variable =
+and variable = 
 	| VAR_KAPPA of (mixture * (string * Tools.pos))
 	| VAR_ALG of (alg_expr * (string * Tools.pos))
+	| VAR_COUNTER of ((string * Tools.pos) * alg_expr * (string * Tools.pos)) 
+	
+(*VAR_COUNTER (c_name,c_pos) ,c_init_val,(var_name,var_pos)*)
 
 type compil = {variables : variable list; (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
 							 signatures : (agent * Tools.pos) list ; (*agent signature declaration*)
@@ -83,8 +86,8 @@ type compil = {variables : variable list; (*pattern declaration for reusing as v
 							 observables : alg_expr list ; (*list of patterns to plot*) 
 							 init : (alg_expr * mixture * Tools.pos) list ; (*initial graph declaration*)
 							 perturbations : perturbation list ;
-							 configurations : configuration list
-							}
+							 configurations : configuration list ;
+							 }
 
 let result:compil ref = ref {variables=[] ; signatures=[] ; rules=[] ; init = [] ; observables = [] ; perturbations = [] ; configurations = []} 
 let init_compil = fun _ -> result := {variables=[] ; signatures=[] ; rules=[] ; init = [] ; observables = [] ; perturbations = [] ; configurations = []}

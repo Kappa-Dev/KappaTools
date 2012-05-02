@@ -39,6 +39,7 @@ let pert = '$' id
 
 rule token = parse
     | "\\\n" {incr_line lexbuf ; token lexbuf}
+		| ":=" {let pos = position lexbuf in INITIALIZE pos}
 		| "do" {let pos = position lexbuf in DO pos}
 		| "set" {let pos = position lexbuf in SET pos}
 		| "until" {let pos = position lexbuf in UNTIL pos}
@@ -93,6 +94,8 @@ rule token = parse
     | ',' {COMMA}
     | '(' {OP_PAR}
     | ')' {CL_PAR}
+		| '{' {OP_BRA}
+		| '}' {CL_BRA}
 		| '.' {DOT}
 		| '+' {let pos = position lexbuf in PLUS pos}
 		| '*' {let pos = position lexbuf in MULT pos}

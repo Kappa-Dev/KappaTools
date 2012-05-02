@@ -2,10 +2,10 @@
 %}
 
 %token EOF NEWLINE 
-%token AT OP_PAR CL_PAR COMMA DOT KAPPA_LNK 
-%token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE SET DO UNTIL TRUE FALSE OBS KAPPA_RAR TRACK CPUTIME CONFIG
+%token AT OP_PAR CL_PAR OP_BRA CL_BRA COMMA DOT KAPPA_LNK 
+%token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE SET DO UNTIL TRUE FALSE OBS KAPPA_RAR TRACK CPUTIME CONFIG COUNTER
 %token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INFINITY TIME EVENT NULL_EVENT PROD_EVENT INIT LET DIV PLOT SINUS COSINUS TAN SQRT EXPONENT POW ABS MODULO 
-%token <Tools.pos> EMAX TMAX FLUX ENABLE DISABLE ASSIGN
+%token <Tools.pos> EMAX TMAX FLUX ENABLE DISABLE ASSIGN INITIALIZE
 %token <int*Tools.pos> INT 
 %token <string*Tools.pos> ID LABEL KAPPA_MRK 
 %token <int> DOT_RADIUS PLUS_RADIUS 
@@ -117,6 +117,7 @@ boolean:
 variable_declaration:
 | LABEL non_empty_mixture {Ast.VAR_KAPPA ($2,$1)}
 | LABEL alg_expr {Ast.VAR_ALG ($2,$1)}
+| LABEL counter_expr {let nme,alg = $2 in Ast.VAR_COUNTER (nme,alg,$1)}
 | LABEL error 
 	{let str,pos = $1 in
 		raise 
@@ -124,6 +125,10 @@ variable_declaration:
 		(Printf.sprintf "Variable '%s' should be either a pure kappa expression or an algebraic expression on variables" str)
 		) 
 	}
+;
+
+counter_expr:
+| ID INITIALIZE alg_expr {($1,$3)}
 ;
 
 bool_expr:
