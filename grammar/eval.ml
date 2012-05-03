@@ -434,7 +434,11 @@ let signature_of_ast s env =
 	let intf_map = eval_intf ast_intf in 
 	let env,name_id = Environment.declare_name name pos env in
 	(Signature.create name_id intf_map,env)
-
+	
+let token_of_ast abs_tk env = 
+	let (name, pos) = abs_tk in
+	Environment.declare_token name pos env
+	
 let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take into account no_poly*)
 	let (env, lhs_id) =
 		Environment.declare_var_kappa ~from_rule:true ast_rule_label.lbl_nme env in
@@ -467,7 +471,10 @@ let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take 
 	
 	and kappa_lhs = Mixture.to_kappa false lhs env
 	
-	and kappa_rhs = Mixture.to_kappa false rhs env in
+	and kappa_rhs = Mixture.to_kappa false rhs env
+	and add_token = List.map (fun (nme,pos) -> try Environment.num_of_token nme env with Not_found -> raise (ExceptionDefn.Semantics_Error (pos,"Token "^nme^" is undefined"))) ast_rule.add_token
+	and rm_token = List.map (fun (nme,pos) -> try Environment.num_of_token nme env with Not_found -> raise (ExceptionDefn.Semantics_Error (pos,"Token "^nme^" is undefined"))) ast_rule.rm_token
+	in
 	let ref_id =
 		match ast_rule_label.lbl_ref with
 		| None -> None
@@ -580,6 +587,8 @@ let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take 
 	in
 	(env,
 		{
+			Dynamics.add_token = add_token ;
+			Dynamics.rm_token = rm_token ;
 			Dynamics.k_def = k_def;
 			Dynamics.k_alt = k_alt;
 			Dynamics.over_sampling = None;
@@ -634,12 +643,16 @@ let rules_of_result env res tolerate_new_state =
 	in (env, (List.rev l))
 
 let environment_of_result res =
-	List.fold_left
+	let env = 
+		List.fold_left
 		(fun env (sign, pos) ->
 			let sign,env = signature_of_ast sign env in
 				Environment.declare_sig sign pos env
 		)
 		Environment.empty res.Ast.signatures
+	in
+	List.fold_left (fun env (tk, pos) -> token_of_ast (tk,pos) env) env res.Ast.tokens
+
 
 let obs_of_result env res =
 	List.fold_left

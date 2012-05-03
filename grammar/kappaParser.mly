@@ -2,10 +2,10 @@
 %}
 
 %token EOF NEWLINE 
-%token AT OP_PAR CL_PAR OP_BRA CL_BRA COMMA DOT KAPPA_LNK 
-%token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE SET DO UNTIL TRUE FALSE OBS KAPPA_RAR TRACK CPUTIME CONFIG COUNTER
+%token AT OP_PAR CL_PAR OP_BRA CL_BRA COMMA DOT KAPPA_LNK PIPE
+%token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE SET DO UNTIL TRUE FALSE OBS KAPPA_RAR TRACK CPUTIME CONFIG
 %token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INFINITY TIME EVENT NULL_EVENT PROD_EVENT INIT LET DIV PLOT SINUS COSINUS TAN SQRT EXPONENT POW ABS MODULO 
-%token <Tools.pos> EMAX TMAX FLUX ENABLE DISABLE ASSIGN
+%token <Tools.pos> EMAX TMAX FLUX ENABLE DISABLE ASSIGN TOKEN
 %token <int*Tools.pos> INT 
 %token <string*Tools.pos> ID LABEL KAPPA_MRK 
 %token <int> DOT_RADIUS PLUS_RADIUS 
@@ -49,7 +49,10 @@ start_rule:
 						(Ast.result:={!Ast.result with 
 						Ast.signatures=(ag,pos)::!Ast.result.Ast.signatures}
 						)
-				| Ast.PARTICLE (pos,(nme,pos_nme)) -> Ast.result := {!Ast.result with Ast.particles = (nme,pos_nme)::!Ast.result.Ast.particles}
+				| Ast.TOKEN (str,pos) -> 
+						(Ast.result:={!Ast.result with 
+						Ast.tokens=(str,pos)::!Ast.result.Ast.tokens}
+						)
 				| Ast.INIT (n,mix,pos) ->  
 					(Ast.result := {!Ast.result with 
 					Ast.init=(n,mix,pos)::!Ast.result.Ast.init})
@@ -75,13 +78,11 @@ start_rule:
 
 instruction:
 | SIGNATURE agent_expression  
-	{(Ast.SIG ($2,$1))}
+	{Ast.SIG ($2,$1)}
+| TOKEN ID
+	{let str,pos = $2 in Ast.TOKEN (str,pos)}
 | SIGNATURE error
 	{raise (ExceptionDefn.Syntax_Error "Malformed agent signature, I was expecting something of the form '%agent: A(x,y~u~v,z)'")}
-| COUNTER ID 
-	{Ast.PARTICLE ($1,$2)}
-| COUNTER error
-	{raise (ExceptionDefn.Syntax_Error "Malformed counter declaration, I was expecting something of the form '%counter: A'")}	
 | INIT multiple non_empty_mixture 
 	{Ast.INIT ($2,$3,$1)}
 | INIT error
@@ -188,6 +189,24 @@ rule_label:
 	{let lab,pos = $1 in {Ast.lbl_nme=Some (lab,pos) ; Ast.lbl_ref = None}}
 ;
 
+lhs_rhs:
+mixture token_expr {($1,$2)}
+;
+
+token_expr:
+/*empty*/ {[]}
+| PIPE sum_token {$2} 
+;
+
+sum_token:
+| OP_PAR sum_token CL_PAR 
+	{$2} 
+| alg_expr ID 
+	{[($1,$2)]}
+| alg_expr ID PLUS sum_token 
+	{let l = $3 in ($1,$2)::l}
+;
+
 mixture:
 /*empty*/ 
 	{Ast.EMPTY_MIX}
@@ -196,15 +215,17 @@ mixture:
 ;
 
 rule_expression:
-| rule_label mixture arrow mixture AT rate 
+| rule_label lhs_rhs arrow lhs_rhs AT rate 
 	{ let pos = match $3 with Ast.RAR pos -> pos in
-		let (k2,k1) = $6 in 
-		($1,{Ast.rule_pos = pos ; Ast.lhs=$2; Ast.arrow=$3; Ast.rhs=$4; Ast.k_def=k2; Ast.k_un=k1})
+		let (k2,k1) = $6 in
+		let lhs,token_l = $2 and rhs,token_r = $4 in 
+		($1,{Ast.rule_pos = pos ; Ast.lhs=lhs; Ast.rm_token = token_l ; Ast.arrow=$3; Ast.rhs=rhs; Ast.add_token = token_r; Ast.k_def=k2; Ast.k_un=k1})
 	}
-| rule_label mixture arrow mixture 
-	{let pos = match $3 with Ast.RAR pos -> pos in 
+| rule_label lhs_rhs arrow lhs_rhs 
+	{let pos = match $3 with Ast.RAR pos -> pos in
+	let lhs,token_l = $2 and rhs,token_r = $4 in 
 		ExceptionDefn.warning ~with_pos:pos "Rule has no kinetics. Default rate of 0.0 is assumed." ; 
-		($1,{Ast.rule_pos = pos ; Ast.lhs=$2; Ast.arrow=$3; Ast.rhs=$4; Ast.k_def=(Ast.FLOAT (0.0,Tools.no_pos)); Ast.k_un=None})}
+		($1,{Ast.rule_pos = pos ; Ast.lhs=lhs; Ast.rm_token = token_l; Ast.arrow=$3; Ast.rhs=rhs; Ast.add_token = token_r; Ast.k_def=(Ast.FLOAT (0.0,Tools.no_pos)); Ast.k_un=None})}
 ;
 
 arrow:

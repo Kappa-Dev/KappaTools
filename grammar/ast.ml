@@ -47,7 +47,7 @@ and link =
 	| LNK_SOME of Tools.pos
 	| LNK_TYPE of ((string * Tools.pos) * (string * Tools.pos))
 
-type rule = {rule_pos: Tools.pos ; lhs: mixture ; arrow:arrow ; rhs:mixture; k_def:alg_expr ; k_un:alg_expr option}
+type rule = {rule_pos: Tools.pos ; lhs: mixture ; rm_token: (string * Tools.pos) list ; arrow:arrow ; rhs:mixture; add_token: (string * Tools.pos) list ; k_def:alg_expr ; k_un:alg_expr option}
 and arrow = RAR of Tools.pos 
 type rule_label = {lbl_nme:(string * Tools.pos) option ; lbl_ref:(string * Tools.pos) option}
 
@@ -67,14 +67,14 @@ type configuration = string * Tools.pos * string * Tools.pos
 
 type instruction = 
 	| SIG of agent * Tools.pos
-	| PARTICLE of Tools.pos * (string * Tools.pos) 
+	| TOKEN of string * Tools.pos
 	| INIT of alg_expr * mixture * Tools.pos
 	| DECLARE of variable
 	| OBS of variable  (*for backward compatibility*)
 	| PLOT of alg_expr
 	| PERT of perturbation
 	| CONFIG of configuration
-and variable =
+and variable = 
 	| VAR_KAPPA of (mixture * (string * Tools.pos))
 	| VAR_ALG of (alg_expr * (string * Tools.pos))
 
@@ -85,11 +85,10 @@ type compil = {variables : variable list; (*pattern declaration for reusing as v
 							 init : (alg_expr * mixture * Tools.pos) list ; (*initial graph declaration*)
 							 perturbations : perturbation list ;
 							 configurations : configuration list ;
-							 particles : (string * Tools.pos) list 
-							}
-
-let result:compil ref = ref {variables=[] ; signatures=[] ; rules=[] ; init = [] ; observables = [] ; perturbations = [] ; configurations = [] ; particles = []} 
-let init_compil = fun _ -> result := {variables=[] ; signatures=[] ; rules=[] ; init = [] ; observables = [] ; perturbations = [] ; configurations = [] ; particles = []}
+							 tokens :  (string * Tools.pos) list
+							 }
+let result:compil ref = ref {variables=[] ; signatures=[] ; rules=[] ; init = [] ; observables = [] ; perturbations = [] ; configurations = [] ; tokens = []} 
+let init_compil = fun _ -> result := {variables=[] ; signatures=[] ; rules=[] ; init = [] ; observables = [] ; perturbations = [] ; configurations = [] ; tokens = []}
 
 (*
 let reverse res = 
