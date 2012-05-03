@@ -807,6 +807,7 @@ let pert_of_result variables env res =
 							let pre_causal = Dynamics.compute_causal lhs rhs script env in
 							let rule_opt = Some
 							{
+								(*TODO*)Dynamics.rm_token = [] ; Dynamics.add_token = [] ; 
 								Dynamics.k_def = Dynamics.CONST 0.0;
 								Dynamics.k_alt = None;
 								Dynamics.over_sampling = None;
@@ -846,7 +847,8 @@ let pert_of_result variables env res =
 							in 
 							let pre_causal = Dynamics.compute_causal lhs rhs script env in
 							let rule_opt = Some
-							{
+							{ (*TODO*) Dynamics.rm_token = [] ; Dynamics.add_token = [] ; 
+								
 								Dynamics.k_def = Dynamics.CONST 0.0;
 								Dynamics.k_alt = None;
 								Dynamics.over_sampling = None;

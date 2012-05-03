@@ -198,14 +198,24 @@ token_expr:
 | PIPE sum_token {$2} 
 ;
 
-sum_token:
+/*sum_token:
 | OP_PAR sum_token CL_PAR 
 	{$2} 
 | alg_expr ID 
 	{[($1,$2)]}
 | alg_expr ID PLUS sum_token 
 	{let l = $3 in ($1,$2)::l}
+;*/
+
+sum_token:
+| OP_PAR sum_token CL_PAR 
+	{$2} 
+| ID 
+	{[$1]}
+| ID PLUS sum_token 
+	{let l = $3 in $1::l}
 ;
+
 
 mixture:
 /*empty*/ 
