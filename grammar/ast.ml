@@ -88,8 +88,7 @@ type compil = {variables : variable list; (*pattern declaration for reusing as v
 							 perturbations : perturbation list ;
 							 configurations : configuration list ;
 							 }
-
-let result:compil ref = ref {variables=[] ; signatures=[] ; rules=[] ; init = [] ; observables = [] ; perturbations = [] ; configurations = []} 
+let result:compil ref = ref {variables=[] ; signatures=[] ; rules=[] ; init = [] ; observables = [] ; perturbations = [] ; configurations = [] } 
 let init_compil = fun _ -> result := {variables=[] ; signatures=[] ; rules=[] ; init = [] ; observables = [] ; perturbations = [] ; configurations = []}
 
 (*

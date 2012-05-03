@@ -115,6 +115,7 @@ rule token = parse
 								| "mod" -> (PERT pos)
 								| "obs" -> (OBS pos)
 								| "def" -> (CONFIG pos)
+								| "counter" -> (COUNTER pos)
 								| _ as s -> return_error lexbuf ("Instruction \""^s^"\" not recognized")
 					 } 
 		| dot_radius as s { let i = String.index s '{' in 
