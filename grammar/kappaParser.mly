@@ -200,13 +200,11 @@ token_expr:
 sum_token:
 | OP_PAR sum_token CL_PAR 
 	{$2} 
-| alg_expr ID 
-	{[($1,$2)]}
-| alg_expr ID PLUS sum_token 
-	{let l = $4 in ($1,$2)::l}
+| ID 
+	{[$1]}
+| ID PLUS sum_token 
+	{let l = $3 in $1::l}
 ;
-
-
 
 mixture:
 /*empty*/ 
