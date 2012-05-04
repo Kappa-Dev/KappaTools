@@ -7,6 +7,10 @@ type t = {
 	num_of_kappa : int StringMap.t ; 
 	kappa_of_num : string IntMap.t ;
 	
+	token_of_num : string IntMap.t ; 
+	num_of_token : int StringMap.t ;
+	fresh_token : int ;
+			
 	fresh_name : int ;
 	num_of_name : int StringMap.t ;
 	name_of_num : string IntMap.t ;
@@ -57,6 +61,10 @@ let empty =
 	fresh_kappa = 0 ; 
 	fresh_alg = 0 ;
 	fresh_pert = 0 ;
+	token_of_num = IntMap.empty ; 
+	num_of_token = StringMap.empty ;
+	fresh_token = 0 ;
+	
 	num_of_pert = StringMap.empty ;
 	pert_of_num = IntMap.empty ;
 	rule_of_pert = IntMap.empty ;
@@ -218,6 +226,21 @@ let declare_sig sign pos env =
 		raise (Semantics_Error (pos, "Signature already defined"))
 	else
 		{env with signatures = IntMap.add (Signature.control sign) sign env.signatures}
+
+let declare_token name pos env = 
+	if StringMap.mem name env.num_of_token && not !Parameter.implicitSignature then
+		raise (Semantics_Error (pos, Printf.sprintf "Token %s already defined" name))
+	else
+		let new_id = env.fresh_token in
+		{env with 
+			token_of_num = IntMap.add new_id name env.token_of_num ; 
+			num_of_token = StringMap.add name new_id env.num_of_token ;
+			fresh_token = env.fresh_token + 1
+		}
+
+let num_of_token = fun str env -> StringMap.find str env.num_of_token
+let token_of_num = fun id env -> IntMap.find id env.token_of_num
+
 	
 let declare_var_kappa ?(from_rule=false) label_pos_opt env =
 	let label,pos = match label_pos_opt with

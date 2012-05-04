@@ -257,7 +257,7 @@ let eval_agent is_pattern tolerate_new_state env a ctxt =
 
 (* returns partial evaluation of rate expression and a boolean that is set *)
 (* to true if partial evaluation is a constant function                    *)
-let rec partial_eval_alg ?(reduce_const=false) env ast =
+let rec partial_eval_alg ?(reduce_const=true) env ast =
 	let bin_op ast ast' pos op op_str =
 		let (f1, const1, dep1, lbl1) = partial_eval_alg env ast
 		
@@ -434,7 +434,11 @@ let signature_of_ast s env =
 	let intf_map = eval_intf ast_intf in 
 	let env,name_id = Environment.declare_name name pos env in
 	(Signature.create name_id intf_map,env)
-
+	
+let token_of_ast abs_tk env = 
+	let (name, pos) = abs_tk in
+	Environment.declare_token name pos env
+	
 let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take into account no_poly*)
 	let (env, lhs_id) =
 		Environment.declare_var_kappa ~from_rule:true ast_rule_label.lbl_nme env in
@@ -467,7 +471,27 @@ let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take 
 	
 	and kappa_lhs = Mixture.to_kappa false lhs env
 	
-	and kappa_rhs = Mixture.to_kappa false rhs env in
+	and kappa_rhs = Mixture.to_kappa false rhs env
+	in
+	let tokenify l = 
+		List.map 
+		(fun (alg_expr,(nme,pos)) ->
+			let id =  
+				try Environment.num_of_token nme env 
+				with Not_found -> raise (ExceptionDefn.Semantics_Error (pos,"Token "^nme^" is undefined"))
+			in
+			let (f, is_const, _ , _) = partial_eval_alg env alg_expr (*dependencies are not important here since variable is evaluated only when rule is applied*) 
+			in
+			let v = 
+  			if is_const then CONST (f (fun i -> 0.0) (fun i -> 0.0) 0.0 0 0 0.)
+  			else VAR f
+			in
+			(v,id)
+		) l
+	in
+	let add_token = tokenify ast_rule.add_token 
+	and rm_token = tokenify ast_rule.add_token
+	in
 	let ref_id =
 		match ast_rule_label.lbl_ref with
 		| None -> None
@@ -580,6 +604,8 @@ let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take 
 	in
 	(env,
 		{
+			Dynamics.add_token = add_token ;
+			Dynamics.rm_token = rm_token ;
 			Dynamics.k_def = k_def;
 			Dynamics.k_alt = k_alt;
 			Dynamics.over_sampling = None;
@@ -634,12 +660,16 @@ let rules_of_result env res tolerate_new_state =
 	in (env, (List.rev l))
 
 let environment_of_result res =
-	List.fold_left
+	let env = 
+		List.fold_left
 		(fun env (sign, pos) ->
 			let sign,env = signature_of_ast sign env in
 				Environment.declare_sig sign pos env
 		)
 		Environment.empty res.Ast.signatures
+	in
+	List.fold_left (fun env (tk, pos) -> token_of_ast (tk,pos) env) env res.Ast.tokens
+
 
 let obs_of_result env res =
 	List.fold_left
@@ -794,6 +824,7 @@ let pert_of_result variables env res =
 							let pre_causal = Dynamics.compute_causal lhs rhs script env in
 							let rule_opt = Some
 							{
+								(*TODO*)Dynamics.rm_token = [] ; Dynamics.add_token = [] ; 
 								Dynamics.k_def = Dynamics.CONST 0.0;
 								Dynamics.k_alt = None;
 								Dynamics.over_sampling = None;
@@ -833,7 +864,8 @@ let pert_of_result variables env res =
 							in 
 							let pre_causal = Dynamics.compute_causal lhs rhs script env in
 							let rule_opt = Some
-							{
+							{ (*TODO*) Dynamics.rm_token = [] ; Dynamics.add_token = [] ; 
+								
 								Dynamics.k_def = Dynamics.CONST 0.0;
 								Dynamics.k_alt = None;
 								Dynamics.over_sampling = None;
@@ -901,28 +933,48 @@ let pert_of_result variables env res =
 		(variables, (List.rev lpert), (List.rev lrules), env)
 
 let init_graph_of_result env res =
+	let n = (env.Environment.fresh_token - 1) in 
+	let token_vector = Array.init n (fun i -> 0.) in
+	let sg,env = 
 	List.fold_left
-		(fun (sg,env) (alg, ast, pos) ->
-			let cpt = ref 0
-			and sg = ref sg
-			and env = ref env
-			and (v, is_const, dep, lbl) = partial_eval_alg ~reduce_const:true env alg
-			in
-			(*
-			if not is_const then raise (ExceptionDefn.Semantics_Error (pos, Printf.sprintf "%s is not a constant, cannot initialize graph." lbl))
-			else*)
-			let n = match !Parameter.rescale with None -> int_of_float (close_var v) | Some i -> min i (int_of_float (close_var v)) in
-				(* Cannot do Mixture.to_nodes env m once for all because of        *)
-				(* references                                                      *)
-				while !cpt < n do
-					let nodes,env' = nodes_of_ast !env ast in
-					env := env' ;
-					sg := Graph.SiteGraph.add_nodes !sg nodes;
-					cpt := !cpt + 1 
-				done;
-				(!sg,!env)
-		)
-		(Graph.SiteGraph.init !Parameter.defaultGraphSize,env) res.Ast.init
+		(fun (sg,env) init_t ->
+			match init_t with
+				| INIT_MIX (alg, ast, pos) ->
+					begin
+      			let cpt = ref 0
+      			and sg = ref sg
+      			and env = ref env
+      			and (v, is_const, dep, lbl) = partial_eval_alg ~reduce_const:true env alg
+      			in
+      			if not is_const then raise (ExceptionDefn.Semantics_Error (pos, Printf.sprintf "%s is not a constant, cannot initialize graph." lbl))
+      			else
+      			let n = match !Parameter.rescale with 
+      				| None -> int_of_float (close_var v) 
+      				| Some i -> min i (int_of_float (close_var v)) 
+      			in
+      				(* Cannot do Mixture.to_nodes env m once for all because of        *)
+      				(* references                                                      *)
+      				while !cpt < n do
+      					let nodes,env' = nodes_of_ast !env ast in
+      					env := env' ;
+      					sg := Graph.SiteGraph.add_nodes !sg nodes;
+      					cpt := !cpt + 1 
+      				done;
+      				(!sg,!env)
+					end
+				| INIT_TOK (alg, tk_nme, pos) ->
+					let (v, is_const, _, lbl) = partial_eval_alg ~reduce_const:true env alg
+    			in
+    			if not is_const then raise (ExceptionDefn.Semantics_Error (pos, Printf.sprintf "%s is not a constant, cannot initialize token value." lbl))
+    			else
+    			let x = close_var v in
+    			let tok_id = try Environment.num_of_token tk_nme env with Not_found -> raise (ExceptionDefn.Semantics_Error (pos, Printf.sprintf "token %s is undeclared" tk_nme))
+					in
+					token_vector.(tok_id) <- x ;
+					(sg,env)
+		)	(Graph.SiteGraph.init !Parameter.defaultGraphSize,env) res.Ast.init
+	in
+	(sg,token_vector,env)
 	
 let configurations_of_result result =
 	List.iter 
@@ -997,7 +1049,7 @@ let initialize result counter =
 	let (env, kappa_vars, alg_vars) = variables_of_result env result in
 	
 	Debug.tag "\t -initial conditions";
-	let sg,env = init_graph_of_result env result
+	let sg,token_vector,env = init_graph_of_result env result
 	in
 	
 	let tolerate_new_state = !Parameter.implicitSignature in
@@ -1017,7 +1069,7 @@ let initialize result counter =
 	Debug.tag "+ Building initial simulation state...";
 	Debug.tag "\t -Counting initial local patterns..." ;
 	let (state, env) =
-	State.initialize sg rules kappa_vars alg_vars observables (pert,rule_pert) counter env
+	State.initialize sg token_vector rules kappa_vars alg_vars observables (pert,rule_pert) counter env
 	in
 	let state =  
 		if env.Environment.has_intra then

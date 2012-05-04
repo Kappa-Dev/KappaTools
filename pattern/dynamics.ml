@@ -37,7 +37,9 @@ type rule = {
 	modif_sites : Int2Set.t IdMap.t ;  
 	pre_causal : int Id2Map.t ; (* INTERNAL_TESTED (8) | INTERNAL_MODIF (4) | LINK_TESTED (2) | LINK_MODIF (1) *)
 	is_pert : bool ;
-	cc_impact : (IntSet.t IntMap.t * IntSet.t IntMap.t * IntSet.t IntMap.t) option 
+	cc_impact : (IntSet.t IntMap.t * IntSet.t IntMap.t * IntSet.t IntMap.t) option ;
+	add_token : (variable * int) list ;
+	rm_token : (variable * int) list
 	}
 	(*connect: cc_i(lhs) -> {cc_j(lhs),...} if cc_i and cc_j are connected by rule application*)
 	(*disconnect: cc_i(rhs) -> {cc_j(rhs),...} if cc_i and cc_j are disconnected by rule application*)
