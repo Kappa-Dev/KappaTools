@@ -13,6 +13,7 @@ type implicit_state =
 		rules : (int, rule) Hashtbl.t; 
 		perturbations : perturbation IntMap.t;
 		kappa_variables : (Mixture.t option) array;
+		token_vector : float array ; 
 		alg_variables : (Dynamics.variable option) array;
 		observables : obs list; 
 		influence_map : (int, (int IntMap.t list) IntMap.t) Hashtbl.t ;
@@ -391,7 +392,7 @@ let dot_of_influence_map desc state env =
 	) state.influence_map ;
 	Printf.fprintf desc "}\n"
 
-let initialize sg rules kappa_vars alg_vars obs (pert,rule_pert) counter env =
+let initialize sg token_vector rules kappa_vars alg_vars obs (pert,rule_pert) counter env =
 	let dim_pure_rule = (List.length rules)
 	in
 	let dim_rule = dim_pure_rule + (List.length rule_pert) 
@@ -444,6 +445,7 @@ let initialize sg rules kappa_vars alg_vars obs (pert,rule_pert) counter env =
 				end ;
 			kappa_variables = kappa_var_table;
 			alg_variables = alg_table;
+			token_vector = token_vector ; 
 			observables =
 				begin
 					List.fold_left

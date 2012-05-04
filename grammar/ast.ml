@@ -47,7 +47,17 @@ and link =
 	| LNK_SOME of Tools.pos
 	| LNK_TYPE of ((string * Tools.pos) * (string * Tools.pos))
 
-type rule = {rule_pos: Tools.pos ; lhs: mixture ; rm_token: (string * Tools.pos) list ; arrow:arrow ; rhs:mixture; add_token: (string * Tools.pos) list ; k_def:alg_expr ; k_un:alg_expr option}
+type rule = {
+	rule_pos: Tools.pos ; 
+	lhs: mixture ; 
+	rm_token: (alg_expr * (string * Tools.pos)) list ; 
+	arrow:arrow ; 
+	rhs:mixture; 
+	add_token: (alg_expr * (string * Tools.pos)) list ; 
+	k_def:alg_expr ; 
+	k_un:alg_expr option
+	}
+	
 and arrow = RAR of Tools.pos 
 type rule_label = {lbl_nme:(string * Tools.pos) option ; lbl_ref:(string * Tools.pos) option}
 
@@ -68,12 +78,15 @@ type configuration = string * Tools.pos * string * Tools.pos
 type instruction = 
 	| SIG of agent * Tools.pos
 	| TOKEN of string * Tools.pos
-	| INIT of alg_expr * mixture * Tools.pos
+	| INIT of init_t
 	| DECLARE of variable
 	| OBS of variable  (*for backward compatibility*)
 	| PLOT of alg_expr
 	| PERT of perturbation
 	| CONFIG of configuration
+and init_t = 
+	| INIT_MIX of alg_expr * mixture * Tools.pos
+	| INIT_TOK of alg_expr * string * Tools.pos
 and variable = 
 	| VAR_KAPPA of (mixture * (string * Tools.pos))
 	| VAR_ALG of (alg_expr * (string * Tools.pos))
@@ -82,7 +95,7 @@ type compil = {variables : variable list; (*pattern declaration for reusing as v
 							 signatures : (agent * Tools.pos) list ; (*agent signature declaration*)
 							 rules : (rule_label * rule) list ; (*rules (possibly named)*)
 							 observables : alg_expr list ; (*list of patterns to plot*) 
-							 init : (alg_expr * mixture * Tools.pos) list ; (*initial graph declaration*)
+							 init : init_t list ; (*initial graph declaration*)
 							 perturbations : perturbation list ;
 							 configurations : configuration list ;
 							 tokens :  (string * Tools.pos) list

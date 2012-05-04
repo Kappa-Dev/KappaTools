@@ -45,6 +45,7 @@ rule token = parse
 		| "&&" {let pos = position lexbuf in AND pos}
 		| "||" {let pos = position lexbuf in OR pos}
     | "->" {let pos = position lexbuf in KAPPA_RAR pos}
+		| ":=" {let pos = position lexbuf in INITIALIZE pos}
 		| pert as s {let pos = position lexbuf in
 									match s with  
 						 			| "$DEL" -> (DELETE pos)

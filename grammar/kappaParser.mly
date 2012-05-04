@@ -5,7 +5,7 @@
 %token AT OP_PAR CL_PAR OP_BRA CL_BRA COMMA DOT KAPPA_LNK PIPE
 %token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE SET DO UNTIL TRUE FALSE OBS KAPPA_RAR TRACK CPUTIME CONFIG
 %token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INFINITY TIME EVENT NULL_EVENT PROD_EVENT INIT LET DIV PLOT SINUS COSINUS TAN SQRT EXPONENT POW ABS MODULO 
-%token <Tools.pos> EMAX TMAX FLUX ENABLE DISABLE ASSIGN TOKEN
+%token <Tools.pos> EMAX TMAX FLUX ENABLE DISABLE ASSIGN TOKEN INITIALIZE
 %token <int*Tools.pos> INT 
 %token <string*Tools.pos> ID LABEL KAPPA_MRK 
 %token <int> DOT_RADIUS PLUS_RADIUS 
@@ -53,9 +53,7 @@ start_rule:
 						(Ast.result:={!Ast.result with 
 						Ast.tokens=(str,pos)::!Ast.result.Ast.tokens}
 						)
-				| Ast.INIT (n,mix,pos) ->  
-					(Ast.result := {!Ast.result with 
-					Ast.init=(n,mix,pos)::!Ast.result.Ast.init})
+				| Ast.INIT init_t -> (Ast.result := {!Ast.result with Ast.init=init_t::!Ast.result.Ast.init})
 				| Ast.DECLARE var ->
 					(Ast.result := {!Ast.result with Ast.variables = var::!Ast.result.Ast.variables})
 				| Ast.OBS var -> (*for backward compatibility, shortcut for %var + %plot*)
@@ -84,7 +82,8 @@ instruction:
 | SIGNATURE error
 	{raise (ExceptionDefn.Syntax_Error "Malformed agent signature, I was expecting something of the form '%agent: A(x,y~u~v,z)'")}
 | INIT multiple non_empty_mixture 
-	{Ast.INIT ($2,$3,$1)}
+	{Ast.INIT (Ast.INIT_MIX ($2,$3,$1))}
+| INIT ID INITIALIZE multiple {let str,_ = $2 in Ast.INIT (Ast.INIT_TOK ($4,str,$1))}
 | INIT error
  {raise (ExceptionDefn.Syntax_Error "Malformed initial condition, I was expecting something of the form '%init: n or 'v' kappa_expression' where n is a value or 'v' is a constant")}
 | LET variable_declaration 
@@ -204,8 +203,10 @@ sum_token:
 | alg_expr ID 
 	{[($1,$2)]}
 | alg_expr ID PLUS sum_token 
-	{let l = $3 in ($1,$2)::l}
+	{let l = $4 in ($1,$2)::l}
 ;
+
+
 
 mixture:
 /*empty*/ 
