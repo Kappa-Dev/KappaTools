@@ -933,7 +933,7 @@ let pert_of_result variables env res =
 		(variables, (List.rev lpert), (List.rev lrules), env)
 
 let init_graph_of_result env res =
-	let n = (env.Environment.fresh_token - 1) in 
+	let n = env.Environment.fresh_token in 
 	let token_vector = Array.init n (fun i -> 0.) in
 	let sg,env = 
 	List.fold_left
