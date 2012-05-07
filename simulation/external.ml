@@ -12,8 +12,9 @@ let eval_pre_pert pert state counter env =
 		| BVAR b_fun -> 
 			let act_of_id = (fun id -> (instance_number id state env)) (*act_of_id:functional argument*)
 			and v_of_id = (fun id -> State.value state id counter env)
+			and v_of_token id = try state.token_vector.(id) with _ -> failwith "External.eval_pre: Invalid token id"
 			in
-				b_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time())
+				b_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time()) v_of_token
 
 let eval_abort_pert just_applied pert state counter env = 
 	match pert.abort with
@@ -22,8 +23,9 @@ let eval_abort_pert just_applied pert state counter env =
 		| Some (BVAR b_fun) -> 
 			let act_of_id = (fun id -> (instance_number id state env)) (*act_of_id:functional argument*)
 			and v_of_id = (fun id -> State.value state id counter env)
+			and v_of_token id = try state.token_vector.(id) with _ -> failwith "External.eval_abort: Invalid token id"
 			in
-				b_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time())
+				b_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time()) v_of_token
 
 let apply_effect p_id pert state counter env =
 	let snapshot opt =
@@ -56,11 +58,12 @@ let apply_effect p_id pert state counter env =
 	in
 	let act_of_id = (fun id -> (instance_number id state env))  (*act_of_id:functional argument*) 
 	and v_of_id = (fun id -> State.value state id counter env)
+	and v_of_token id = try state.token_vector.(id) with _ -> failwith "External.apply_effect: Invalid token id"
 	in
 	let eval_var v =
 		match v with
 			| CONST f -> f
-			| VAR v_fun -> v_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time())
+			| VAR v_fun -> v_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time()) v_of_token
 	in
 		match pert.effect with
 			| INTRO (v,mix) -> 
@@ -157,6 +160,13 @@ let apply_effect p_id pert state counter env =
 						let env,pert_ids = State.update_dep state (ALG id) IntSet.empty counter env in
 						(env,state,pert_ids,[]) 
 					end
+			| RESET (tk_id,v) -> 
+				begin
+					let value = State.value state ~var:v (-1) counter env in
+					state.token_vector.(tk_id) <- value ;
+					let env,pert_ids = State.update_dep state (TOK tk_id) IntSet.empty counter env in
+					(env,state,pert_ids,[])
+				end
 			| SNAPSHOT opt -> (snapshot opt ; (env, state ,IntSet.empty,[]))
 			| CFLOW id -> 
 				if !Parameter.debugModeOn then Debug.tag "Tracking causality" ;

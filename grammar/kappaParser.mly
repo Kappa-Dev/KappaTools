@@ -49,7 +49,7 @@ start_rule:
 						(Ast.result:={!Ast.result with 
 						Ast.signatures=(ag,pos)::!Ast.result.Ast.signatures}
 						)
-				| Ast.TOKEN (str,pos) -> 
+				| Ast.TOKENSIG (str,pos) -> 
 						(Ast.result:={!Ast.result with 
 						Ast.tokens=(str,pos)::!Ast.result.Ast.tokens}
 						)
@@ -59,7 +59,8 @@ start_rule:
 				| Ast.OBS var -> (*for backward compatibility, shortcut for %var + %plot*)
 					let expr =
 						match var with
-							| Ast.VAR_KAPPA (_,(label, pos)) | Ast.VAR_ALG (_,(label, pos)) -> Ast.OBS_VAR (label, pos)
+							| Ast.VAR_KAPPA (_,(label, pos)) -> Ast.OBS_VAR (Ast.K (label,pos))  
+							| Ast.VAR_ALG (_,(label, pos)) -> Ast.OBS_VAR (Ast.A (label, pos))
 					in					 
 					(Ast.result := {!Ast.result with Ast.variables = var::!Ast.result.Ast.variables ; Ast.observables = expr::!Ast.result.Ast.observables})
 				| Ast.PLOT expr ->
@@ -78,7 +79,7 @@ instruction:
 | SIGNATURE agent_expression  
 	{Ast.SIG ($2,$1)}
 | TOKEN ID
-	{let str,pos = $2 in Ast.TOKEN (str,pos)}
+	{let str,pos = $2 in Ast.TOKENSIG (str,pos)}
 | SIGNATURE error
 	{raise (ExceptionDefn.Syntax_Error "Malformed agent signature, I was expecting something of the form '%agent: A(x,y~u~v,z)'")}
 | INIT multiple non_empty_mixture 
@@ -100,7 +101,7 @@ instruction:
 	{Ast.PERT ($2,$4,$1,Some $6)}
 | CONFIG FILENAME FILENAME 
 	{let param_name,pos_p = $2 and value,pos_v = $3 in Ast.CONFIG (param_name,pos_p,value,pos_v)} 
-| PERT bool_expr SET perm_effect
+| PERT bool_expr DO perm_effect
 	{Ast.PERT ($2,$4,$1,None)}
 ;
 
@@ -108,6 +109,8 @@ perm_effect:
 | OP_PAR perm_effect CL_PAR {$2}
 | ASSIGN LABEL alg_expr 
 	{let lab,pos_lab = $2 in Ast.UPDATE (lab,pos_lab,$3,$1)}
+| ASSIGN ID alg_expr
+	{let lab,pos_lab = $2 in Ast.UPDATE_TOK (lab,pos_lab,$3,$1)}
 | TRACK LABEL boolean 
 	{let ast = if $3 then (fun x -> Ast.CFLOW x) else (fun x -> Ast.CFLOWOFF x) in let lab,pos_lab = $2 in ast (lab,pos_lab,$1)}
 | FLUX fic_label boolean 
@@ -168,7 +171,8 @@ one_shot_effect:
 	{Ast.SNAPSHOT ($2,$1)}
 | STOP fic_label
 	{Ast.STOP ($2,$1)}
-
+| ID INITIALIZE alg_expr
+	{let str,pos = $1 in Ast.RESET (str,$3,pos)}
 ;
 
 fic_label:
@@ -176,9 +180,8 @@ fic_label:
 | FILENAME {Some $1}
 
 multiple:
-/*empty*/ {Ast.FLOAT (1.0,Tools.no_pos)}
 | INT {let int,pos=$1 in Ast.FLOAT (float_of_int int,pos) }
-| LABEL {Ast.OBS_VAR $1}
+| LABEL {Ast.OBS_VAR (Ast.A $1)}
 ;
 
 rule_label: 
@@ -194,7 +197,7 @@ mixture token_expr {($1,$2)}
 
 token_expr:
 /*empty*/ {[]}
-| PIPE sum_token {$2} 
+| OP_BRA sum_token CL_BRA {$2} 
 ;
 
 sum_token:
@@ -247,8 +250,10 @@ constant:
 ;
 
 variable:
+| ID
+	{Ast.OBS_VAR (Ast.T $1)}
 | LABEL 
-	{Ast.OBS_VAR $1}
+	{Ast.OBS_VAR (Ast.A $1)}
 | TIME
 	{Ast.TIME_VAR $1}
 | EVENT
@@ -302,7 +307,7 @@ rate:
 ;
 
 multiple_mixture:
-| alg_expr non_empty_mixture 
+| alg_expr non_empty_mixture /*conflict here because ID (blah) could be token non_empty mixture or mixture...*/
 	{($1,$2)}
 | non_empty_mixture 
 	{(Ast.FLOAT (1.,Tools.no_pos),$1)}
@@ -320,8 +325,8 @@ non_empty_mixture:
 agent_expression:
 | ID OP_PAR interface_expression CL_PAR 
 	{let (id,pos) = $1 in {Ast.ag_nme=id; Ast.ag_intf=$3; Ast.ag_pos=pos}}
-| ID 
-	{let (id,pos) = $1 in {Ast.ag_nme=id;Ast.ag_intf=Ast.EMPTY_INTF;Ast.ag_pos=pos}}
+/*| ID 
+	{let (id,pos) = $1 in {Ast.ag_nme=id;Ast.ag_intf=Ast.EMPTY_INTF;Ast.ag_pos=pos}}*/
 ;
 
 interface_expression:
@@ -338,13 +343,6 @@ ne_interface_expression:
 	{Ast.PORT_SEP($1,Ast.EMPTY_INTF)}
 ;
 
-
-/*ne_interface_expression:
-| ne_interface_expression COMMA port_expression
-	{Ast.PORT_SEP($3,$1)}
-| port_expression  
-	{Ast.PORT_SEP($1,Ast.EMPTY_INTF)}
-;*/
 
 port_expression:
 | ID internal_state link_state 

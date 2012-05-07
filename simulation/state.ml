@@ -173,11 +173,11 @@ let rec value state ?var var_id counter env =
 				| Dynamics.CONST f -> f
 				| Dynamics.VAR v_fun ->
 						let act_of_id id = instance_number id state env
-						
 						and v_of_var id = value state id counter env
+						and v_of_token id = try state.token_vector.(id) with _ -> failwith "State.value: Invalid token id"
 						in
 						v_fun act_of_id v_of_var (Counter.time counter)
-							(Counter.event counter) (Counter.null_event counter) (Sys.time())
+							(Counter.event counter) (Counter.null_event counter) (Sys.time()) v_of_token
 			)
 
 (*missing recomputation of dependencies*)
@@ -195,11 +195,12 @@ let eval_activity ?using rule state counter env =
 			| Dynamics.CONST f -> let n = (match using with None -> instance_number mix_id state env | Some x -> float_of_int x) in if n = 0. then 0. else (f *. n) 
 			| Dynamics.VAR k_fun ->
 					let act_of_id id = instance_number id state env
-					
-					and v_of_var id = value state id counter env in
+					and v_of_var id = value state id counter env 
+					and v_of_token id = try state.token_vector.(id) with _ -> failwith "State.value: Invalid token id"
+					in
 					let k =
 						k_fun act_of_id v_of_var (Counter.time counter)
-							(Counter.event counter) (Counter.null_event counter) (Sys.time())
+							(Counter.event counter) (Counter.null_event counter) (Sys.time()) v_of_token
 					in
 					let n = (match using with None -> instance_number mix_id state env | Some x -> float_of_int x) in
 					if n = 0. then 0. else 
@@ -217,8 +218,9 @@ let eval_activity ?using rule state counter env =
 						| Dynamics.VAR k_fun ->
 							let act_of_id id = nl_instance_number id state env
 							and v_of_var id = value state id counter env 
+							and v_of_token id = try state.token_vector.(id) with _ -> failwith "State.value: Invalid token id"
 							in
-							let k =	k_fun act_of_id v_of_var (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time())
+							let k =	k_fun act_of_id v_of_var (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time()) v_of_token 
 							in
 							let n = nl_instance_number mix_id state env in
 							if n = 0. then 0. else 
@@ -813,41 +815,51 @@ let wake_up state modif_type modifs wake_up_map env =
 let rec update_dep state dep_in pert_ids counter env =
 	let env,depset,pert_ids = 
 		match dep_in with
-		| Mods.ALG v_id -> (*variable v_id is changed*)
-			let depset =
-				Environment.get_dependencies (Mods.ALG v_id) env
-			in
-			begin
-				if !Parameter.debugModeOn then
-					Debug.tag 
-					(Printf.sprintf "Variable %d is changed, updating %s" v_id (string_of_set Mods.string_of_dep DepSet.fold depset)) 
-			end;
-			(env,depset,pert_ids)
-		| Mods.RULE r_id ->
-			(update_activity state (-1) r_id counter env; 
-			let depset = Environment.get_dependencies (Mods.RULE r_id) env
-			in
-			if !Parameter.debugModeOn then if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Rule %d is changed, updating %s" r_id (string_of_set Mods.string_of_dep DepSet.fold depset)) ;
-			(env,depset,pert_ids)
-			)
-		| Mods.PERT p_id -> 
-			if IntMap.mem p_id state.perturbations then (*pertubation p_id is still alive and should be tried*)
-				(env,DepSet.empty,IntSet.add p_id pert_ids)
-			else (*pertubation p_id is removed and should be discarded from dependencies*)
-				(Environment.remove_dependencies dep_in (Mods.PERT p_id) env,DepSet.empty,pert_ids)
-		| Mods.ABORT p_id ->
-			if IntMap.mem p_id state.perturbations then (env,DepSet.empty,IntSet.add p_id pert_ids)
-			else 
-				(Environment.remove_dependencies dep_in (Mods.PERT p_id) env,DepSet.empty,pert_ids)
-		| Mods.KAPPA i -> (*No need to update kappa observable, it will be updated if plotted*) 
-			let depset =
-				Environment.get_dependencies (Mods.KAPPA i) env
-			in
-			if !Parameter.debugModeOn && not (DepSet.is_empty depset) then Debug.tag (Printf.sprintf "Observable %d is changed, updating %s" i (string_of_set Mods.string_of_dep DepSet.fold depset)) ;
+			| Mods.TOK t_id -> (*token counter is changed*)
+				let depset = 
+					Environment.get_dependencies (Mods.TOK t_id) env
+				in
+				begin
+					if !Parameter.debugModeOn then
+						Debug.tag 
+						(Printf.sprintf "Token %d is changed, updating %s" t_id (string_of_set Mods.string_of_dep DepSet.fold depset)) 
+				end;
 				(env,depset,pert_ids)
-		| Mods.EVENT | Mods.TIME -> 
-			let depset = Environment.get_dependencies dep_in env in
+			| Mods.ALG v_id -> (*variable v_id is changed*)
+				let depset =
+					Environment.get_dependencies (Mods.ALG v_id) env
+				in
+				begin
+					if !Parameter.debugModeOn then
+						Debug.tag 
+						(Printf.sprintf "Variable %d is changed, updating %s" v_id (string_of_set Mods.string_of_dep DepSet.fold depset)) 
+				end;
 				(env,depset,pert_ids)
+			| Mods.RULE r_id ->
+				(update_activity state (-1) r_id counter env; 
+				let depset = Environment.get_dependencies (Mods.RULE r_id) env
+				in
+				if !Parameter.debugModeOn then if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Rule %d is changed, updating %s" r_id (string_of_set Mods.string_of_dep DepSet.fold depset)) ;
+				(env,depset,pert_ids)
+				)
+			| Mods.PERT p_id -> 
+				if IntMap.mem p_id state.perturbations then (*pertubation p_id is still alive and should be tried*)
+					(env,DepSet.empty,IntSet.add p_id pert_ids)
+				else (*pertubation p_id is removed and should be discarded from dependencies*)
+					(Environment.remove_dependencies dep_in (Mods.PERT p_id) env,DepSet.empty,pert_ids)
+			| Mods.ABORT p_id ->
+				if IntMap.mem p_id state.perturbations then (env,DepSet.empty,IntSet.add p_id pert_ids)
+				else 
+					(Environment.remove_dependencies dep_in (Mods.PERT p_id) env,DepSet.empty,pert_ids)
+			| Mods.KAPPA i -> (*No need to update kappa observable, it will be updated if plotted*) 
+				let depset =
+					Environment.get_dependencies (Mods.KAPPA i) env
+				in
+				if !Parameter.debugModeOn && not (DepSet.is_empty depset) then Debug.tag (Printf.sprintf "Observable %d is changed, updating %s" i (string_of_set Mods.string_of_dep DepSet.fold depset)) ;
+					(env,depset,pert_ids)
+			| Mods.EVENT | Mods.TIME -> 
+				let depset = Environment.get_dependencies dep_in env in
+					(env,depset,pert_ids)
 	in
 		DepSet.fold
 		(fun dep (env,pert_ids) -> update_dep state dep pert_ids counter env
@@ -971,6 +983,35 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 			) (env,state, pert_ids, already_done_map, new_injs,tracked) map_list
 		) vars_to_wake_up (env, state, IntSet.empty, IntMap.empty,[],[])  
 	in
+	
+	(*updating tokens if rule is hybrid*)
+	
+	let env,pert_ids =
+		List.fold_left
+		(fun (env,pert_ids) (v,t_id) ->
+			let value = value state ~var:v (-1) counter env in
+			try
+				if !Parameter.debugModeOn then
+					(Debug.tag (Printf.sprintf "adding %f to token %d" value t_id)) ;
+				state.token_vector.(t_id) <- state.token_vector.(t_id) +. value ;
+				update_dep state (Mods.TOK t_id) pert_ids counter env
+			with Invalid_argument _ -> failwith "State.positive_update: invalid token id"  
+		) (env,pert_ids) r.Dynamics.add_token 
+	in
+	let env,pert_ids = 
+		List.fold_left
+		(fun (env,pert_ids) (v,t_id) ->
+			let value = value state ~var:v (-1) counter env in
+			try
+				if !Parameter.debugModeOn then
+					(Debug.tag (Printf.sprintf "removing %f to token %d" value t_id)) ;
+				
+				state.token_vector.(t_id) <- state.token_vector.(t_id) -. value ;
+				update_dep state (Mods.TOK t_id) pert_ids counter env
+			with Invalid_argument _ -> failwith "State.positive_update: invalid token id"  
+		) (env,pert_ids) r.Dynamics.rm_token
+	in
+	
 	
 	if not r.Dynamics.side_effect then (env,state,pert_ids,new_injs,tracked)
 	

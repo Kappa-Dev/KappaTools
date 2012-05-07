@@ -16,12 +16,13 @@ type alg_expr =
 	| EVENT_VAR of Tools.pos
 	| NULL_EVENT_VAR of Tools.pos
 	| PROD_EVENT_VAR of Tools.pos
-	| OBS_VAR of (string * Tools.pos)
+	| OBS_VAR of var_t 
 	| FLOAT of float * Tools.pos
 	| TMAX of Tools.pos
 	| EMAX of Tools.pos
 	| CPUTIME of Tools.pos
 	| INFINITY of Tools.pos
+and var_t = K of (string * Tools.pos) | A of (string * Tools.pos) | T of (string * Tools.pos)
 
 type bool_expr =
 	| TRUE of Tools.pos
@@ -65,9 +66,11 @@ type perturbation = bool_expr * modif_expr * Tools.pos * bool_expr option
 and modif_expr = 
 	| INTRO of (alg_expr * mixture * Tools.pos) 
 	| DELETE of (alg_expr * mixture * Tools.pos) 
-	| UPDATE of (string * Tools.pos * alg_expr * Tools.pos) (*TODO: pause*)
+ 	| UPDATE of (string * Tools.pos * alg_expr * Tools.pos) (*TODO: pause*)
+	| UPDATE_TOK of (string * Tools.pos * alg_expr * Tools.pos) (*TODO: pause*)
 	| STOP of ((string * Tools.pos) option * Tools.pos)
 	| SNAPSHOT of ((string * Tools.pos) option * Tools.pos) (*maybe later of mixture too*)
+	| RESET of (string * alg_expr * Tools.pos)
 	| CFLOW of (string * Tools.pos * Tools.pos) 
 	| CFLOWOFF of (string * Tools.pos * Tools.pos)
 	| FLUX of (string * Tools.pos) option * Tools.pos
@@ -77,7 +80,7 @@ type configuration = string * Tools.pos * string * Tools.pos
 
 type instruction = 
 	| SIG of agent * Tools.pos
-	| TOKEN of string * Tools.pos
+	| TOKENSIG of string * Tools.pos
 	| INIT of init_t
 	| DECLARE of variable
 	| OBS of variable  (*for backward compatibility*)
@@ -90,7 +93,7 @@ and init_t =
 and variable = 
 	| VAR_KAPPA of (mixture * (string * Tools.pos))
 	| VAR_ALG of (alg_expr * (string * Tools.pos))
-
+	
 type compil = {variables : variable list; (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
 							 signatures : (agent * Tools.pos) list ; (*agent signature declaration*)
 							 rules : (rule_label * rule) list ; (*rules (possibly named)*)

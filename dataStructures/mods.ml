@@ -8,7 +8,7 @@ module Int3Set = Set.Make (struct type t = int*int*int let compare = compare end
 
 module DynArray = DynamicArray.DynArray(LargeArray.GenArray)
 
-type dep_type = ALG of int | KAPPA of int | EVENT | TIME | RULE of int | PERT of int | ABORT of int
+type dep_type = ALG of int | KAPPA of int | TOK of int | EVENT | TIME | RULE of int | PERT of int | ABORT of int
 module DepMap = Map.Make (struct type t = dep_type let compare = compare end) 
 module DepSet = Set.Make (struct type t = dep_type let compare = compare end) 
 
