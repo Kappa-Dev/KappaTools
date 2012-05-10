@@ -2,10 +2,10 @@
 %}
 
 %token EOF NEWLINE 
-%token AT OP_PAR CL_PAR OP_BRA CL_BRA COMMA DOT KAPPA_LNK PIPE
+%token AT OP_PAR CL_PAR OP_BRA CL_BRA COMMA DOT KAPPA_LNK PIPE TYPE_TOK LAR
 %token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE SET DO UNTIL TRUE FALSE OBS KAPPA_RAR TRACK CPUTIME CONFIG
 %token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INFINITY TIME EVENT NULL_EVENT PROD_EVENT INIT LET DIV PLOT SINUS COSINUS TAN SQRT EXPONENT POW ABS MODULO 
-%token <Tools.pos> EMAX TMAX FLUX ENABLE DISABLE ASSIGN TOKEN INITIALIZE
+%token <Tools.pos> EMAX TMAX FLUX ENABLE DISABLE ASSIGN TOKEN 
 %token <int*Tools.pos> INT 
 %token <string*Tools.pos> ID LABEL KAPPA_MRK 
 %token <int> DOT_RADIUS PLUS_RADIUS 
@@ -84,7 +84,7 @@ instruction:
 	{raise (ExceptionDefn.Syntax_Error "Malformed agent signature, I was expecting something of the form '%agent: A(x,y~u~v,z)'")}
 | INIT multiple non_empty_mixture 
 	{Ast.INIT (Ast.INIT_MIX ($2,$3,$1))}
-| INIT ID INITIALIZE multiple {let str,_ = $2 in Ast.INIT (Ast.INIT_TOK ($4,str,$1))}
+| INIT ID LAR multiple {let str,_ = $2 in Ast.INIT (Ast.INIT_TOK ($4,str,$1))}
 | INIT error
  {raise (ExceptionDefn.Syntax_Error "Malformed initial condition, I was expecting something of the form '%init: n or 'v' kappa_expression' where n is a value or 'v' is a constant")}
 | LET variable_declaration 
@@ -109,8 +109,8 @@ perm_effect:
 | OP_PAR perm_effect CL_PAR {$2}
 | ASSIGN LABEL alg_expr 
 	{let lab,pos_lab = $2 in Ast.UPDATE (lab,pos_lab,$3,$1)}
-| ASSIGN ID alg_expr
-	{let lab,pos_lab = $2 in Ast.UPDATE_TOK (lab,pos_lab,$3,$1)}
+| ID LAR alg_expr
+	{let lab,pos_lab = $1 in Ast.UPDATE_TOK (lab,pos_lab,$3,pos_lab)}
 | TRACK LABEL boolean 
 	{let ast = if $3 then (fun x -> Ast.CFLOW x) else (fun x -> Ast.CFLOWOFF x) in let lab,pos_lab = $2 in ast (lab,pos_lab,$1)}
 | FLUX fic_label boolean 
@@ -202,10 +202,10 @@ token_expr:
 sum_token:
 | OP_PAR sum_token CL_PAR 
 	{$2} 
-| alg_expr ID 
-	{[($1,$2)]}
-| alg_expr ID PLUS sum_token 
-	{let l = $4 in ($1,$2)::l}
+| alg_expr TYPE_TOK ID 
+	{[($1,$3)]}
+| alg_expr TYPE_TOK ID PLUS sum_token 
+	{let l = $5 in ($1,$3)::l}
 
 mixture:
 /*empty*/ 

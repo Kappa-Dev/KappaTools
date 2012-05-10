@@ -45,7 +45,7 @@ rule token = parse
 		| "&&" {let pos = position lexbuf in AND pos}
 		| "||" {let pos = position lexbuf in OR pos}
     | "->" {let pos = position lexbuf in KAPPA_RAR pos}
-		| ":=" {let pos = position lexbuf in INITIALIZE pos}
+		| "<-" {LAR}
 		| pert as s {let pos = position lexbuf in
 									match s with  
 						 			| "$DEL" -> (DELETE pos)
@@ -82,6 +82,7 @@ rule token = parse
 								| "Tmax" -> TMAX pos
 								| _ as s -> return_error lexbuf ("Symbol \""^s^"\" is not defined")
 						}  
+		| ':' {TYPE_TOK}
 		| '\"' {let filename = read_label "" ['\"'] lexbuf in let pos = position lexbuf in FILENAME (filename,pos)}
     | '\n' {incr_line lexbuf ; NEWLINE}
 		| '\r' {NEWLINE}
