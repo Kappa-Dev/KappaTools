@@ -59,8 +59,8 @@ start_rule:
 				| Ast.OBS var -> (*for backward compatibility, shortcut for %var + %plot*)
 					let expr =
 						match var with
-							| Ast.VAR_KAPPA (_,(label, pos)) -> Ast.OBS_VAR (Ast.K (label,pos))  
-							| Ast.VAR_ALG (_,(label, pos)) -> Ast.OBS_VAR (Ast.A (label, pos))
+							| Ast.VAR_KAPPA (_,(label, pos)) -> Ast.OBS_VAR (label,pos,2)  
+							| Ast.VAR_ALG (_,(label, pos)) -> Ast.OBS_VAR (label, pos, 1)
 					in					 
 					(Ast.result := {!Ast.result with Ast.variables = var::!Ast.result.Ast.variables ; Ast.observables = expr::!Ast.result.Ast.observables})
 				| Ast.PLOT expr ->
@@ -179,7 +179,7 @@ fic_label:
 
 multiple:
 | INT {let int,pos=$1 in Ast.FLOAT (float_of_int int,pos) }
-| LABEL {Ast.OBS_VAR (Ast.A $1)}
+| LABEL {let str,pos = $1 in Ast.OBS_VAR (str,pos,0)}
 ;
 
 rule_label: 
@@ -250,9 +250,9 @@ constant:
 
 variable:
 | ID
-	{Ast.OBS_VAR (Ast.T $1)}
+	{let str,pos = $1 in Ast.OBS_VAR (str,pos,4)}
 | LABEL 
-	{Ast.OBS_VAR (Ast.A $1)}
+	{let str,pos = $1 in Ast.OBS_VAR (str,pos,0)}
 | TIME
 	{Ast.TIME_VAR $1}
 | EVENT

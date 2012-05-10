@@ -294,36 +294,39 @@ let rec partial_eval_alg ?(reduce_const=true) env ast =
 		| FLOAT (f, pos) ->
 				((fun _ _ _ _ _ _ _-> f), true, DepSet.empty, (Printf.sprintf "%f" f))
 		| CPUTIME pos -> 	((fun _ _ _ _ _ cpu_t _-> cpu_t -. !Parameter.cpuTime), false, (DepSet.singleton Mods.EVENT), "t_sim")
-		| OBS_VAR var_type ->
+		| OBS_VAR (lab,pos,i) ->
 			begin 
-			match var_type with
-				| K (lab, pos) -> (*maybe a kappa expr or an algebraic expression*)
-					let i = Environment.num_of_kappa lab env
-					in
-					if Environment.is_rule i env
-					then
-						raise
-							(ExceptionDefn.Semantics_Error (pos,
-									lab ^ " is not a variable identifier"))
-					else
-						((fun f _ _ _ _ _ _-> f i), false,
-							(DepSet.singleton (Mods.KAPPA i)), ("'" ^ (lab ^ "'")))
-				| A (lab,pos) -> (* lab is the label of an algebraic expression *)
-					let i,const = 
+			match i with
+				| 0 | 1 | 2 -> (*maybe a kappa expr or an algebraic expression*)
+					begin
+						try
+						let i = Environment.num_of_kappa lab env
+						in
+						if Environment.is_rule i env
+						then
+							raise
+								(ExceptionDefn.Semantics_Error (pos,
+										lab ^ " is not a variable identifier"))
+						else
+							((fun f _ _ _ _ _ _-> f i), false,
+								(DepSet.singleton (Mods.KAPPA i)), ("'" ^ (lab ^ "'")))
+					with Not_found ->
+						let i,const = 
 						try Environment.num_of_alg lab env with 
-							| Not_found -> raise (ExceptionDefn.Semantics_Error (pos,lab ^ " is not declared"))
-					in
-					let v,is_const,dep =
-						match const with
-							| Some c -> 
-								if reduce_const then ((fun _ _ _ _ _ _ _-> c),true,DepSet.singleton (Mods.ALG i))
-								else ((fun _ v _ _ _ _ _-> v i),false,DepSet.singleton (Mods.ALG i))
-							| None -> ((fun _ v _ _ _ _ _-> v i),false,DepSet.singleton (Mods.ALG i))
-					in
-					(v,is_const,dep,("'" ^ (lab ^ "'")))
-				| T (lab,pos) -> (*lab is the label of a token expression *)
+							| Not_found -> raise (ExceptionDefn.Semantics_Error (pos,lab ^ " is not a declared variable"))
+						in
+						let v,is_const,dep =
+							match const with
+								| Some c -> 
+									if reduce_const then ((fun _ _ _ _ _ _ _-> c),true,DepSet.singleton (Mods.ALG i))
+									else ((fun _ v _ _ _ _ _-> v i),false,DepSet.singleton (Mods.ALG i))
+								| None -> ((fun _ v _ _ _ _ _-> v i),false,DepSet.singleton (Mods.ALG i))
+						in
+						(v,is_const,dep,("'" ^ (lab ^ "'")))
+				end
+				| _ -> (*lab is the label of a token expression *)
 					let i = 
-						try Environment.num_of_token lab env with Not_found -> raise (ExceptionDefn.Semantics_Error (pos,lab ^ " is not declared"))
+						try Environment.num_of_token lab env with Not_found -> raise (ExceptionDefn.Semantics_Error (pos,lab ^ " is not a declared token"))
 					in
 					let v,is_const,dep =
 						((fun _ _ _ _ _ _ tk -> tk i),false,DepSet.singleton (Mods.TOK i))

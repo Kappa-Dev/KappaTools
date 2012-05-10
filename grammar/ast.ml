@@ -16,13 +16,12 @@ type alg_expr =
 	| EVENT_VAR of Tools.pos
 	| NULL_EVENT_VAR of Tools.pos
 	| PROD_EVENT_VAR of Tools.pos
-	| OBS_VAR of var_t 
+	| OBS_VAR of (string * Tools.pos * int) (*0 pointer to var, 1 alg, 2 kappa, 3 token*) 
 	| FLOAT of float * Tools.pos
 	| TMAX of Tools.pos
 	| EMAX of Tools.pos
 	| CPUTIME of Tools.pos
 	| INFINITY of Tools.pos
-and var_t = K of (string * Tools.pos) | A of (string * Tools.pos) | T of (string * Tools.pos)
 
 type bool_expr =
 	| TRUE of Tools.pos
