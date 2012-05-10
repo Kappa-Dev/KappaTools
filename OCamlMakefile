@@ -386,8 +386,8 @@ export CPPFLAGS_WIN32
 
 INCFLAGS :=
 
-SHELL := /bin/sh
-
+#SHELL := /bin/bash
+#PATH = /usr/bin:/usr/sbin:/opt/local/bin:/opt/local/sbin:/bin
 
 MLDEPDIR := ._d
 BCDIDIR  := ._bcdi

@@ -715,19 +715,6 @@ let effects_of_modif variables env ast =
 			let str =
 				Printf.sprintf "remove %s * %s" str (Mixture.to_kappa false m env)
 			in ((m :: variables), (Dynamics.DELETE (v, m)), str, env)
-	| RESET (tk_name, alg_expr, pos) ->
-			let i = try Environment.num_of_token tk_name env with 
-				| Not_found -> raise (ExceptionDefn.Semantics_Error (pos,"Token " ^ (tk_name ^ " is not defined")))
-			in
-			let (x, is_constant, _, str) = partial_eval_alg env alg_expr in
-			let v =
-				if is_constant
-				then Dynamics.CONST (close_var x)
-				else Dynamics.VAR x in
-			let str =
-				Printf.sprintf "set token %s to %s" tk_name str
-			in 
-			(variables, (Dynamics.RESET (i,v)), str, env)
 	| UPDATE (nme, pos_rule, alg_expr, pos_pert) ->
 			let i,is_rule =
 				(try (Environment.num_of_rule nme env,true)
@@ -749,6 +736,20 @@ let effects_of_modif variables env ast =
 					let v_str,_ = Environment.alg_of_num i env in
 				Printf.sprintf "set variable '%s' to %s" v_str str
 			in (variables, (Dynamics.UPDATE (i, v)), str, env)
+	| UPDATE_TOK (tk_nme,tk_pos,alg_expr,instr_pos) ->
+		let tk_id = 
+			try Environment.num_of_token tk_nme env with 
+				| Not_found -> raise (ExceptionDefn.Semantics_Error (tk_pos,"Token " ^ (tk_nme ^ " is not defined")))
+		in
+		let (x, is_constant, dep, str) = partial_eval_alg env alg_expr in
+		let v =
+				if is_constant
+				then Dynamics.CONST (close_var x)
+				else Dynamics.VAR x 
+		in
+		let str = Printf.sprintf "set token '%s' to value %s" tk_nme str
+		in 
+		(variables, (Dynamics.UPDATE_TOK (tk_id, v)), str, env)
 	| SNAPSHOT (opt,pos) -> (*when specializing snapshots to particular mixtures, add variables below*)
 		let str = "snapshot state" in
 		let opt_name = 
@@ -913,7 +914,7 @@ let pert_of_result variables env res =
 							dep env
 						in 
 						(env,None) 
-					| Dynamics.UPDATE _ | Dynamics.RESET _ | Dynamics.SNAPSHOT _ | Dynamics.STOP _ | Dynamics.FLUX _ | Dynamics.FLUXOFF _ | Dynamics.CFLOWOFF _ -> 
+					| Dynamics.UPDATE _ | Dynamics.UPDATE_TOK _ | Dynamics.SNAPSHOT _ | Dynamics.STOP _ | Dynamics.FLUX _ | Dynamics.FLUXOFF _ | Dynamics.CFLOWOFF _ -> 
 						let env =
 							DepSet.fold
 							(fun dep env -> Environment.add_dependencies dep (Mods.PERT p_id) env

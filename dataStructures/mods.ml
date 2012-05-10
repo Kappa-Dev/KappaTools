@@ -13,6 +13,7 @@ module DepMap = Map.Make (struct type t = dep_type let compare = compare end)
 module DepSet = Set.Make (struct type t = dep_type let compare = compare end) 
 
 let string_of_dep = function
+	| TOK i -> "TOK("^(string_of_int i)^")"
 	| ALG i -> "ALG("^(string_of_int i)^")"
 	| KAPPA i -> "KAPPA("^(string_of_int i)^")"
 	| EVENT -> "EVENT"

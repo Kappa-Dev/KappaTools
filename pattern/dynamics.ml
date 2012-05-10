@@ -130,7 +130,7 @@ and modification =
 	INTRO of variable * Mixture.t 
 	| DELETE of variable * Mixture.t 
 	| UPDATE of int * variable
-	| RESET of int * variable 
+	| UPDATE_TOK of int * variable 
 	| SNAPSHOT of string option
 	| STOP of string option
 	| CFLOW of int 
@@ -144,6 +144,7 @@ let string_of_pert pert env =
 		| INTRO (_,mix) -> Printf.sprintf "INTRO %s" (Mixture.to_kappa false mix env)
 		| DELETE (_,mix) -> Printf.sprintf "DELETE %s" (Mixture.to_kappa false mix env)
 		| UPDATE (r_id,_) -> Printf.sprintf "UPDATE rule[%d]" r_id
+		| UPDATE_TOK (t_id,_) -> Printf.sprintf "UPDATE token %s" (Environment.token_of_num t_id env)
 		| SNAPSHOT opt -> (match opt with None -> "SNAPSHOT" | Some s -> "SNAPSHOT("^s^")") 
 		| STOP opt -> (match opt with None -> "STOP" | Some s -> "STOP("^s^")")
 		| FLUX opt -> (match opt with None -> "FLUX" | Some s -> "FLUX("^s^")")

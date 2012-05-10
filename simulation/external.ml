@@ -160,13 +160,19 @@ let apply_effect p_id pert state counter env =
 						let env,pert_ids = State.update_dep state (ALG id) IntSet.empty counter env in
 						(env,state,pert_ids,[]) 
 					end
-			| RESET (tk_id,v) -> 
-				begin
-					let value = State.value state ~var:v (-1) counter env in
-					state.token_vector.(tk_id) <- value ;
-					let env,pert_ids = State.update_dep state (TOK tk_id) IntSet.empty counter env in
-					(env,state,pert_ids,[])
-				end
+			| UPDATE_TOK (tk_id,v) -> 
+				let _ =
+					if !Parameter.debugModeOn then 
+						(Debug.tag (Printf.sprintf "Updating token '%s'" (Environment.token_of_num tk_id env)))
+				in
+				let value = State.value state ~var:v (-1) counter env in (*Change here if one wants to have address passing style of assignation*)
+					begin
+						try
+							state.State.token_vector.(tk_id) <- value ;
+							let env,pert_ids = State.update_dep state (TOK tk_id) IntSet.empty counter env in
+							(env,state,pert_ids,[]) 
+						with Invalid_argument _ -> failwith "External.apply_effect: invalid token id"
+					end
 			| SNAPSHOT opt -> (snapshot opt ; (env, state ,IntSet.empty,[]))
 			| CFLOW id -> 
 				if !Parameter.debugModeOn then Debug.tag "Tracking causality" ;

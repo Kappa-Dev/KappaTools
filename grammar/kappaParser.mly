@@ -171,8 +171,6 @@ one_shot_effect:
 	{Ast.SNAPSHOT ($2,$1)}
 | STOP fic_label
 	{Ast.STOP ($2,$1)}
-| ID INITIALIZE alg_expr
-	{let str,pos = $1 in Ast.RESET (str,$3,pos)}
 ;
 
 fic_label:
@@ -197,7 +195,8 @@ mixture token_expr {($1,$2)}
 
 token_expr:
 /*empty*/ {[]}
-| OP_BRA sum_token CL_BRA {$2} 
+| PIPE sum_token {$2} 
+| PIPE error {raise (ExceptionDefn.Syntax_Error "Malformed token expression, I was expecting a_0 t_0 + ... + a_n t_n, where t_i are tokens and a_i any algebraic formula")}
 ;
 
 sum_token:
