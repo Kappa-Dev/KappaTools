@@ -395,7 +395,7 @@ let dot_of_influence_map desc state env =
 	Printf.fprintf desc "}\n"
 
 let initialize sg token_vector rules kappa_vars alg_vars obs (pert,rule_pert) counter env =
-	let dim_pure_rule = (List.length rules)
+	let dim_pure_rule = max (List.length rules) 1
 	in
 	let dim_rule = dim_pure_rule + (List.length rule_pert) 
 	and dim_kappa = (List.length kappa_vars) + 1

@@ -101,7 +101,7 @@ instruction:
 	{Ast.PERT ($2,$4,$1,Some $6)}
 | CONFIG FILENAME FILENAME 
 	{let param_name,pos_p = $2 and value,pos_v = $3 in Ast.CONFIG (param_name,pos_p,value,pos_v)} 
-| PERT bool_expr DO perm_effect
+| PERT bool_expr SET perm_effect
 	{Ast.PERT ($2,$4,$1,None)}
 ;
 
