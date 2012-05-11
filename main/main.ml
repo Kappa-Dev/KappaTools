@@ -118,7 +118,7 @@ let main =
 			end ;  
 		if !Parameter.compileModeOn then (Hashtbl.iter (fun i r -> Dynamics.dump r env) state.State.rules ; exit 0)
 		else () ;
-                let profiling = Compression_main.D.S.PH.B.PB.CI.Po.K.P.init_log_info () in 
+    let profiling = Compression_main.D.S.PH.B.PB.CI.Po.K.P.init_log_info () in 
 		let plot = Plot.create !Parameter.outputDataName
 		and grid,profiling,event_list = 
 			if Environment.tracking_enabled env then 

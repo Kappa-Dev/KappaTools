@@ -16,7 +16,8 @@ type alg_expr =
 	| EVENT_VAR of Tools.pos
 	| NULL_EVENT_VAR of Tools.pos
 	| PROD_EVENT_VAR of Tools.pos
-	| OBS_VAR of (string * Tools.pos * int) (*0 pointer to var, 1 alg, 2 kappa, 3 token*) 
+	| OBS_VAR of (string * Tools.pos) 
+	| TOKEN_ID of (string * Tools.pos) 
 	| FLOAT of float * Tools.pos
 	| TMAX of Tools.pos
 	| EMAX of Tools.pos

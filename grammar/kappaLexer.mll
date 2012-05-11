@@ -31,10 +31,8 @@ let integer = (['0'-'9']+)
 let real = 
   (((['0'-'9'] | ['0'-'9']+ '.' ['0'-'9']*) | (['0'-'9']* '.' ['0'-'9']+)) ((['e' 'E'] ['+' '-'] ['0'-'9']+) | (['e' 'E'] ['0'-'9']+))) 
   | ((['0'-'9']+ '.' ['0'-'9']*) | (['0'-'9']* '.' ['0'-'9']+))   
-let id = (['a'-'z' 'A'-'Z' '0'-'9'] ['a'-'z' 'A'-'Z' '0'-'9' '_' '-']*)
+let id = (['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '0'-'9' '_' '-' '+']*)
 let internal_state = '~' (['0'-'9' 'a'-'z' 'A'-'Z']+)
-let dot_radius = '.' '{' (['0'-'9']+) '}'
-let plus_radius = '+' '{' (['0'-'9']+) '}'
 let pert = '$' id
 
 rule token = parse
@@ -95,8 +93,6 @@ rule token = parse
     | ',' {COMMA}
     | '(' {OP_PAR}
     | ')' {CL_PAR}
-		| '{' {OP_BRA}
-		| '}' {CL_BRA}
 		| '|' {PIPE}
 		| '.' {DOT}
 		| '+' {let pos = position lexbuf in PLUS pos}
@@ -120,19 +116,7 @@ rule token = parse
 								| "token" -> (TOKEN pos)
 								| _ as s -> return_error lexbuf ("Instruction \""^s^"\" not recognized")
 					 } 
-		| dot_radius as s { let i = String.index s '{' in 
-													let j = String.index s '}' in 
-														let r = String.sub s (i+1) (j-i-1) in 
-															try DOT_RADIUS (int_of_string r) with 
-																| Failure _ -> return_error lexbuf (Printf.sprintf "Invalid radius")
-										   }
-		| plus_radius as s {let i = String.index s '{' in 
-													let j = String.index s '}' in 
-														let r = String.sub s (i+1) (j-i-1) in 
-															try PLUS_RADIUS (int_of_string r) with 
-																| Failure _ -> return_error lexbuf (Printf.sprintf "Invalid radius")
-										   }
-    | '!' {KAPPA_LNK}
+		| '!' {KAPPA_LNK}
     | internal_state as s {let i = String.index s '~' in 
 			                     	 let r = String.sub s (i+1) (String.length s-i-1) in
 																let pos = position lexbuf in 
