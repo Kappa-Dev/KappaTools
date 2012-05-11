@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "3.0-270412"
+let version = "3.0-100512"
 
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
@@ -118,7 +118,7 @@ let main =
 			end ;  
 		if !Parameter.compileModeOn then (Hashtbl.iter (fun i r -> Dynamics.dump r env) state.State.rules ; exit 0)
 		else () ;
-                let profiling = Compression_main.D.S.PH.B.PB.CI.Po.K.P.init_log_info () in 
+    let profiling = Compression_main.D.S.PH.B.PB.CI.Po.K.P.init_log_info () in 
 		let plot = Plot.create !Parameter.outputDataName
 		and grid,profiling,event_list = 
 			if Environment.tracking_enabled env then 

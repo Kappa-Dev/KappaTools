@@ -27,5 +27,5 @@
 
 
 #### Initial conditions 
-%init: 'n_ab' A,B
-%init: 'n_c' C
+%init: 'n_ab' A(),B()
+%init: 'n_c' C()

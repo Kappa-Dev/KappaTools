@@ -3,7 +3,7 @@ open Tools
 open ExceptionDefn
 open Graph
 
-type variable = CONST of float | VAR of ((int -> float) -> (int -> float) -> float -> int -> int -> float -> float)
+type variable = CONST of float | VAR of ((int -> float) -> (int -> float) -> float -> int -> int -> float -> (int -> float) -> float)
 and action =
 		BND of (port * port)
 	| FREE of (port * bool) (*FREE(p,b) b=true if FREE is side-effect free*)
@@ -14,7 +14,7 @@ and port = id * int
 and id = FRESH of int | KEPT of int (*binding or modifying a port that has been added or kept from the lhs*)
 
 (*Whenever v denotes a constant "variable" there is no need to keep it unevaluated, we use dummy arguments to reduce it*)
-let close_var v = v (fun _ -> 0.0) (fun i -> 0.0) 0.0 0 0 0.
+let close_var v = v (fun _ -> 0.0) (fun i -> 0.0) 0.0 0 0 0. (fun i -> 0.0)
 
 module ActionSet = Set.Make(struct type t=action let compare = compare end) 
 
@@ -129,20 +129,22 @@ type perturbation = {precondition: boolean_variable ; effect : modification ; ab
 and modification = 
 	INTRO of variable * Mixture.t 
 	| DELETE of variable * Mixture.t 
-	| UPDATE of int * variable 
+	| UPDATE of int * variable
+	| UPDATE_TOK of int * variable 
 	| SNAPSHOT of string option
 	| STOP of string option
 	| CFLOW of int 
 	| FLUX of string option
 	| FLUXOFF of string option
 	| CFLOWOFF of int
-and boolean_variable = BCONST of bool | BVAR of ((int -> float) -> (int -> float) -> float -> int -> int -> float -> bool)
+and boolean_variable = BCONST of bool | BVAR of ((int -> float) -> (int -> float) -> float -> int -> int -> float -> (int -> float) -> bool)
 
 let string_of_pert pert env =
 	match pert.effect with
 		| INTRO (_,mix) -> Printf.sprintf "INTRO %s" (Mixture.to_kappa false mix env)
 		| DELETE (_,mix) -> Printf.sprintf "DELETE %s" (Mixture.to_kappa false mix env)
 		| UPDATE (r_id,_) -> Printf.sprintf "UPDATE rule[%d]" r_id
+		| UPDATE_TOK (t_id,_) -> Printf.sprintf "UPDATE token %s" (Environment.token_of_num t_id env)
 		| SNAPSHOT opt -> (match opt with None -> "SNAPSHOT" | Some s -> "SNAPSHOT("^s^")") 
 		| STOP opt -> (match opt with None -> "STOP" | Some s -> "STOP("^s^")")
 		| FLUX opt -> (match opt with None -> "FLUX" | Some s -> "FLUX("^s^")")
