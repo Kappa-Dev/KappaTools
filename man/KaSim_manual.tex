@@ -411,7 +411,7 @@ which will tell \KaSim~to apply the above rule with a rate $\ga_2$ for binary in
 \item \#\#
 \item \%var: \var{n}~  1000
 \item \#\#
-\item \%init: \var{n}~  A,B,C
+\item \%init: \var{n}~  A(),B(),C()
 \item \%mod: [E] > 10000 do \$STOP 
 \end{enumerate}
 }
@@ -496,10 +496,10 @@ The initial mixture\index{mixture} to which rules in the KF will be applied are 
 where \textit{mult} is either a positive integer or a variable name pointing to a constant expression (ie. not a $\kappa$ expression). This will add to the initial state of the model \textit{mult} copies of the graph described by the kappa expression. Again the DCDW convention\index{don\textquotesingle t care don\textquotesingle t write} allows us not to write the complete interface of added agents (the remaining sites will be completed according to the agent\textquotesingle s signature). For instance:
 \ITE{
 \item[] \ttt{\%var: \textquotesingle n\textquotesingle  1000}
-\item[] \ttt{\%init: \textquotesingle n\textquotesingle  (A,A(y\int p)) }
+\item[] \ttt{\%init: \textquotesingle n\textquotesingle  (A(),A(y\int p)) }
 }
 will add 1000 instances of \ttt{A} in its default state \ttt{A(x,y\int u,z\int 0)} and 1000 instances of \ttt{A} in state \ttt{A(x,y\int p,z\int 0)}.
-Note that \ttt{A} is equivalent to writing \ttt{A()}. As any other do, \ttt{\%init} can be used multiple times, and agents will add up to the initial state.
+As any other do, \ttt{\%init} can be used multiple times, and agents will add up to the initial state.
 
 \chapter{A simple model}\label{chap:abc}
 
@@ -528,8 +528,8 @@ We describe below the content of a simple Kappa model and give examples of some 
 \item \%obs: \textquotesingle Cpu\textquotesingle  C(x1\int p,x2\int u)
 \item \%obs: \textquotesingle Cpp\textquotesingle  C(x1\int p,x2\int p)
 \item \tcb{\#\#\#\# Initial conditions}
-\item \%init: 1000 A,B
-\item \%init: 10000 C
+\item \%init: 1000 A(),B()
+\item \%init: 10000 C()
 }
 }}
 %
