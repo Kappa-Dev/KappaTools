@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "3.0-100512"
+let version = "3.0-110512"
 
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
@@ -57,8 +57,6 @@ let main =
     in
     let _ = Sys.set_signal Sys.sigint (Sys.Signal_handle sigint_handle) in
     
-		Parameter.setOutputName() ;
-		Parameter.checkFileExists() ;
 		Printexc.record_backtrace !Parameter.backtrace ; (*Possible backtrace*)
 		
 		(*let _ = Printexc.record_backtrace !Parameter.debugModeOn in*) 
@@ -67,6 +65,8 @@ let main =
 			List.iter (fun fic -> let _ = KappaLexer.compile fic in ()) !Parameter.inputKappaFileNames ;
 			!Ast.result
 		in
+				
+		
 		let (_: unit) =
 			match !Parameter.seedValue with
 			| Some seed -> Random.init seed
@@ -99,6 +99,10 @@ let main =
 					with
 						| exn -> (Debug.tag "!Simulation package seems to have been created with a different version of KaSim, aborting..." ; exit 1) 
 		in
+		
+		Parameter.setOutputName() ; (*changin output names if -d option was used*)
+		Parameter.checkFileExists() ;
+
 		
 		let (_:unit) = 
 			match !Parameter.marshalizedOutFile with
