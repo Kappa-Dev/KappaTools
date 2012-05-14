@@ -9,7 +9,7 @@ exception Deadlock
 exception UserInterrupted of string
 exception StopReached of string
 
-exception Syntax_Error of string
+exception Syntax_Error of (Tools.pos option) * string
 exception Semantics_Error of Tools.pos * string
 
 let warning_buffer:string list ref = ref []

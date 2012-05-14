@@ -13,13 +13,21 @@
    let pos = lexbuf.lex_curr_p in
      lexbuf.lex_curr_p <- {pos with pos_lnum = pos.pos_lnum+1 ; pos_bol = pos.pos_cnum}
 
- let return_error lexbuf msg = 
-	let pos = lexbuf.lex_curr_p in
-		let line = pos.pos_lnum in
-			let loc = Printf.sprintf "line %d, character %d:" line (pos.pos_cnum - pos.pos_bol) in
-			let full_msg = Printf.sprintf "Error (%s) %s %s" pos.pos_fname loc msg 
-			in
-				Printf.eprintf "%s\n" full_msg ; exit 1 
+ let return_error opt_pos lexbuf msg = 
+	let fn,lnum,cnum = 
+		match opt_pos with 
+			| Some (fn,ln,cn) -> (fn,ln,cn) 
+			| None -> 
+				let pos = lexbuf.lex_curr_p in
+				let line = pos.pos_lnum in
+				let cn = pos.pos_cnum - pos.pos_bol
+				in
+				(pos.pos_fname,line,cn)
+	in
+	let loc = Printf.sprintf "line %d, character %d:" lnum cnum in
+	let full_msg = Printf.sprintf "Error (%s) %s %s" fn loc msg 
+	in
+	Printf.eprintf "%s\n" full_msg ; exit 1 
 			
  let position lexbuf = 
 	let pos = lexbuf.lex_curr_p in
@@ -53,7 +61,8 @@ rule token = parse
 									| "$STOP" -> (STOP pos) 
 									| "$FLUX" -> (FLUX pos)
 									| "$TRACK" -> (TRACK pos)
-									| s -> return_error lexbuf ("Perturbation effect \""^s^"\" is not defined")
+									| "$UPDATE" -> (ASSIGN2 pos)
+									| s -> return_error None lexbuf ("Perturbation effect \""^s^"\" is not defined")
 					 			}  
 		| '[' {let lab = read_label "" [']'] lexbuf in 
 						let pos = position lexbuf in 
@@ -78,7 +87,7 @@ rule token = parse
 								| "pi" -> FLOAT (3.14159265,pos)
 								| "Emax" -> EMAX pos
 								| "Tmax" -> TMAX pos
-								| _ as s -> return_error lexbuf ("Symbol \""^s^"\" is not defined")
+								| _ as s -> return_error None lexbuf ("Symbol \""^s^"\" is not defined")
 						}  
 		| ':' {TYPE_TOK}
 		| '\"' {let filename = read_label "" ['\"'] lexbuf in let pos = position lexbuf in FILENAME (filename,pos)}
@@ -93,7 +102,7 @@ rule token = parse
     | ',' {COMMA}
     | '(' {OP_PAR}
     | ')' {CL_PAR}
-		| '|' {PIPE}
+		| '|' {let pos = position lexbuf in PIPE pos}
 		| '.' {DOT}
 		| '+' {let pos = position lexbuf in PLUS pos}
 		| '*' {let pos = position lexbuf in MULT pos}
@@ -114,9 +123,9 @@ rule token = parse
 								| "obs" -> (OBS pos)
 								| "def" -> (CONFIG pos)
 								| "token" -> (TOKEN pos)
-								| _ as s -> return_error lexbuf ("Instruction \""^s^"\" not recognized")
+								| _ as s -> return_error None lexbuf ("Instruction \""^s^"\" not recognized")
 					 } 
-		| '!' {KAPPA_LNK}
+		| '!' {let pos = position lexbuf in KAPPA_LNK pos}
     | internal_state as s {let i = String.index s '~' in 
 			                     	 let r = String.sub s (i+1) (String.length s-i-1) in
 																let pos = position lexbuf in 
@@ -126,7 +135,7 @@ rule token = parse
     | '_' {let pos = position lexbuf in (KAPPA_SEMI pos)}
     | blank  {token lexbuf}
     | eof {reach_eof lexbuf; EOF}
-    | _ as c {return_error lexbuf (Printf.sprintf "invalid use of character %c" c)}
+    | _ as c {return_error None lexbuf (Printf.sprintf "invalid use of character %c" c)}
 
   and read_label acc char_list = parse
     | eof {acc}
@@ -150,9 +159,9 @@ rule token = parse
 	   	KappaParser.start_rule token lexbuf ; Debug.tag "done" ; close_in d ;
 			Parameter.openInDescriptors := List.tl (!Parameter.openInDescriptors)
  		with 
- 			| Syntax_Error msg -> 
-				(close_in d ; 
+ 			| Syntax_Error (opt_pos,msg) -> 
+				(close_in d ;
 				Parameter.openInDescriptors := List.tl (!Parameter.openInDescriptors) ; 
-				return_error lexbuf msg
+				return_error opt_pos lexbuf msg
 				) 
 }
