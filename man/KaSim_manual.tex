@@ -1,15 +1,12 @@
 \documentclass[11pt]{book}
 \frenchspacing
 \usepackage{geometry}                % See geometry.pdf to learn the layout options. There are lots.
-%\geometry{letterpaper}                   % ... or a4paper or a5paper or ... 
-%\geometry{landscape}                % Activate for for rotated page geometry
-%\usepackage[parfill]{parskip}    % Activate to begin paragraphs with an empty line rather than an indent
+
+\usepackage[parfill]{parskip}    % Activate to begin paragraphs with an empty line rather than an indent
 \usepackage{graphicx}
 \usepackage{amssymb}
 \usepackage{epstopdf}
 \DeclareGraphicsRule{.tif}{png}{.png}{ 'convert #1 ' dirname #1' /' basename #1 .tif' .png}
-
-%\usepackage{mystyle}
 
 \usepackage[T1]{fontenc}
 \usepackage{ textcomp }
@@ -20,27 +17,13 @@
 %%% PACKAGES
 \usepackage{booktabs} % for much better looking tables
 \usepackage{array} % for better arrays (eg matrices) in maths
-%\usepackage{paralist} % very flexible & customisable lists (eg. enumerate/itemize, etc.)
 \usepackage{verbatim} % adds environment for commenting out blocks of text & for better verbatim
-%\usepackage{subfigure} % make it possible to include more than one captioned figure/table in a single float
 \usepackage{amsmath}
 
 \usepackage{hyperref}
 \usepackage{makeidx}
 \usepackage{color}
 
-% These packages are all incorporated in the memoir class to one degree or another...
-
-%%%% SECTION TITLE APPEARANCE
-%\usepackage{sectsty}
-%\allsectionsfont{\sffamily\mdseries\upshape} % (See the fntguide.pdf for font help)
-%% (This matches ConTeXt defaults)
-%
-%%%% ToC APPEARANCE
-%\usepackage[nottoc,notlof,notlot]{tocbibind} % Put the bibliography in the ToC
-%
-%\setlength{\headheight}{39pt} %to remove warnings
-%
 \usepackage{fancyhdr} %to insert logo on the left head of each page
 \pagestyle{fancy}
 \begin{titlepage}
@@ -346,7 +329,7 @@ When applied, the above rule will consume one atp token and produce one adp toke
 where each $a_i,a_i'$ is an arbitrary algebraic expression\index{algebraic expression} (see Table~\ref{tab:alg}) and each $t_i,t_i'$ is a declared token. In the above hybrid rule, calling $n_i,n_i'$  the evaluation of $a_i$ and $a_i'$, the concentration of token $t_i$ will decrease from $n_i$ and the concentration of token $t_i'$ will increase from $n_i'$. Importantly the activity\index{activity} of a hybrid rule will, by default, not take into account the concentration of the tokens in mentions. As we will see in the next section, it is however possible to make its rate explicitly depend on the concentrations of the tokens.
 
 \subsection{Rates}\label{sec:kinetics}
-As said earlier, $\ka$ rules are equipped with one or two \emph{kinetic rate(s)}\index{kinetic rate}. A rate is a real number called the \emph{individual-based or stochastic rate constant}\index{kinetic rate!stochastic rate constant}, it is the rate at which the corresponding rule is applied per instance of the rule. Its dimension is the inverse of a time $[T^{-1}]$.
+As said earlier, $\ka$ rules are equipped with one or two \emph{kinetic rate(s)}\index{kinetic rate}. A rate is a real number, or an algebraic expression evaluated as such, called the \emph{individual-based or stochastic rate constant}\index{kinetic rate!stochastic rate constant}, it is the rate at which the corresponding rule is applied per instance of the rule. Its dimension is the inverse of a time $[T^{-1}]$.
 
 The stochastic rate is related to the \emph{concentration-based rate constant}\index{kinetic rate!deterministic rate constant} $k$ of the rule of interest by the following relation:
 %corrected by the volume $V$ in which the model is considered. 
@@ -473,11 +456,26 @@ In the KF it is also possible to declare \emph{variables}\index{variable} by a l
 }
 where \ttt{var\_name} can be any string and \textit{algebraic\_expression} in Table~\ref{tab:alg}.
 
+%%
+\begin{table}[htbp]
+  \centering
+  \begin{tabular}{@{} lcl @{}}
+    \textit{algebraic\_expression} & ::= & \tcb{$x\in\Real$} $\mid$ \tcb{variable} \\
+     &  & $\mid$ \textit{algebraic\_expression} \tcb{binary\_op} \textit{algebraic\_expression}\\
+     &  & $\mid$ \tcb{unary\_op} \tcb{(}\textit{algebraic\_expression}\tcb{)} \\ 
+    \end{tabular}
+  \caption{Algebraic expressions. Available symbols for variable, constants and operators are given Table~\ref{tab:operators}.}
+  \label{tab:alg}
+\end{table}
+%%
+
+
+
 \begin{table}[htbp]
 \centering
 \begin{tabular}{@{} l|l @{} }
 \toprule
-Symbol & Interpretation \\
+Variable & Interpretation \\
 \midrule
 \ttt{[E]} & the total number of simulation events\index{event}\\
 & since the beginning of the simulation \\
@@ -488,9 +486,13 @@ Symbol & Interpretation \\
 \ttt{[Tsim]} & the cpu-time since the beginning of the simulation \\
 \ttt{[Tmax]} & the max (bio)-time limit as set by the option \ttt{-t}. \\ &Note that if unset \ttt{Tmax}$=\infty$\\
 
-\ttt{\textquotesingle v\textquotesingle } & the value of variable {\ttt \textquotesingle v\textquotesingle } (declared using the \ttt{\%var:} statement) \\
+\ttt{\textquotesingle v\textquotesingle } & the value of variable \ttt{\textquotesingle v\textquotesingle} (declared using the \ttt{\%var:} statement) \\
+\ttt{|t|} & the concentration of token \ttt{t}\\
+\ttt{[inf]} & symbol for $\infty$ \\\\
+\toprule
+Operator & Interpretation \\
+\midrule
 \ttt{[}$f$\texttt{]} & the intuitive mathematical function or constant \\ &associated to $f\in\set{\hbox{\ttt{log,sin,cos,tan,sqrt,pi}}}$ \\
-\ttt{[inf]} & symbol for $\infty$ \\
 \ttt{[mod]} & the \emph{modulo} operator (infix notation)\\
 \ttt{[exp]} & the exponentiation operation $x\mapsto e^x$ \\
 \ttt{[int]} & the floor function $x\in\Real\mapsto \lfloor x\rfloor\in\Nat^+$ \\
@@ -524,19 +526,25 @@ One may use the shortcut:
 }
 to declare a variable and at the same time require it to be outputted in the data file\index{data file}. 
 
-\section{Initial conditions}\label{sec:init}
+\section{Initial conditions}\label{sec:init}\index{initial conditions}
 
 The initial mixture\index{mixture} to which rules in the KF will be applied are declared as
 \ITE{
 \item[] \ttt{\%init: } \textit{mult} \textit{kappa\_expression}
 }
-%%
-where \textit{mult} is either a positive integer or a variable name pointing to a constant expression (ie. not a $\kappa$ expression). This will add to the initial state of the model \textit{mult} copies of the graph described by the kappa expression. Again the DCDW convention\index{don\textquotesingle t care don\textquotesingle t write} allows us not to write the complete interface of added agents (the remaining sites will be completed according to the agent\textquotesingle s signature). For instance:
+or
 \ITE{
-\item[] \ttt{\%var: \textquotesingle n\textquotesingle  1000}
-\item[] \ttt{\%init: \textquotesingle n\textquotesingle  (A(),A(y\int p)) }
+\item[] \ttt{\%init: }  \textit{token} \ttt{<-} \textit{mult}
 }
-will add 1000 instances of \ttt{A} in its default state \ttt{A(x,y\int u,z\int 0)} and 1000 instances of \ttt{A} in state \ttt{A(x,y\int p,z\int 0)}.
+
+%%
+where \textit{mult} is either a positive integer or a variable name pointing to a constant expression. This will add to the initial state of the model \textit{mult} copies of the graph described by the kappa expression. Again the DCDW convention\index{don't care don't write} allows us not to write the complete interface of added agents (the remaining sites will be completed according to the agent's signature). For instance:
+\ITE{
+\item[] \ttt{\%var: \textquotesingle n\textquotesingle~1000}
+\item[] \ttt{\%init: \textquotesingle n\textquotesingle~(A(),A(y\int p))}
+\item[] \ttt{\%init: ca2+ <- 0.39 \#mM}
+}
+will add 1000 instances of \ttt{A} in its default state \ttt{A(x,y\int u,z\int 0)}, 1000 instances of \ttt{A} in state \ttt{A(x,y\int p,z\int 0)} and a concentration of 0.39 mM of calcium ions. Recall that the concentration of calcium can be observed during simulation through the variable \ttt{|ca2+|}.
 As any other do, \ttt{\%init} can be used multiple times, and agents will add up to the initial state.
 
 \chapter{A simple model}\label{chap:abc}
@@ -623,6 +631,7 @@ where \textit{boolean\_expression}, \textit{effect}\index{effect} and \textit{en
     && | \tcb{[true]} | \tcb{[false]} \\\\
     \textit{effect} &::=& \tcb{\$ADD} \textit{algebraic\_expression agent\_expression} \\
     && | \tcb{\$DEL} \textit{algebraic\_expression agent\_expression} \\
+    && | \tcb{t <-} \textit{algebraic\_expression} \\
     && | \tcb{\$SNAPSHOT} | \tcb{\$STOP} \\\\
     \textit{end\_expression} &::=& $\varepsilon$ | \tcb{until} \textit{boolean\_expression}
     \end{tabular}
@@ -696,6 +705,14 @@ Note that snapshots can be performed multiple times, for instance every 1000 eve
 }}
 which results in \KaSim~producing a snapshot every 1000 (productive) events until the simulation ends. The perturbation \ttt{\$STOP "final\_state"} will terminate the simulation whenever its precondition is satisfied and produce a snapshot of the last mixture. Note that instead of producing kappa files, one may use snapshot perturbations to produce an image of the mixture in the dot format using the parameter \ttt{"dotSnapshots"} (see Section~\ref{sec:param}).
 
+\subsection*{Example -- changing the value of a token}
+The concentration of any token can be reset on the fly using a perturbation. For instance the declaration:
+\ttt{\ITE{
+\item [] \%mod: |a| < 100 do a <- |a|*2 until [false] 
+}}
+will double the concentration of token \ttt{a} each time it gets below 100.
+
+
 \subsection{Permanent perturbations}
 Permanent perturbations\index{perturbation ! permanent perturbation} are triggered with the following instruction:
 \ITE{
@@ -711,7 +728,7 @@ Permanent effects are defined Table~\ref{tab:perm}.
     && | \tcb{\$UPDATE \var{var\_name}} \textit{algebraic\_expression} \\\\
 \textit{boolean} &::=& \tcb{[true]} | \tcb{[false]}
 \end{tabular}
-  \caption{Permanent effects\index{effect ! permanent}. Algebraic expressions\index{algebraic expression} are formed using the functions and constants given Table~\ref{tab:operators}}
+  \caption{Permanent effects\index{effect ! permanent}. Algebraic expressions\index{algebraic expression} are built using the grammar given Table~\ref{tab:alg}}
   \label{tab:perm}
 \end{table}
 

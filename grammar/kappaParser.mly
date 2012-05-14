@@ -111,8 +111,6 @@ perm_effect:
 	let lab,pos_lab = $1 in Ast.UPDATE (lab,pos_lab,$3,$2)}
 | ASSIGN2 LABEL alg_expr /*updating the rate of a rule*/
 	{let lab,pos_lab = $2 in Ast.UPDATE (lab,pos_lab,$3,$1)}
-| ID LAR alg_expr /*updating the value of a token*/
-	{let lab,pos_lab = $1 in Ast.UPDATE_TOK (lab,pos_lab,$3,pos_lab)}
 | TRACK LABEL boolean 
 	{let ast = if $3 then (fun x -> Ast.CFLOW x) else (fun x -> Ast.CFLOWOFF x) in let lab,pos_lab = $2 in ast (lab,pos_lab,$1)}
 | FLUX fic_label boolean 
@@ -169,6 +167,8 @@ one_shot_effect:
 	{let (alg,mix) = $2 in Ast.DELETE (alg,mix,$1)}
 | DELETE error
 	{raise (ExceptionDefn.Syntax_Error (Some $1,"Malformed perturbation instruction, I was expecting '$DEL alg_expression kappa_expression'"))}
+| ID LAR alg_expr /*updating the value of a token*/
+	{let lab,pos_lab = $1 in Ast.UPDATE_TOK (lab,pos_lab,$3,pos_lab)}
 | SNAPSHOT fic_label
 	{Ast.SNAPSHOT ($2,$1)}
 | STOP fic_label
