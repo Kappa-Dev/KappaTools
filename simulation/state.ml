@@ -928,19 +928,32 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 							try
 								let m = kappa_of_id var_id state in	
 								let cpt = ref 0 in
-								let map = ref (Injection.to_map embedding) in
+								let map,cod = (fun (x,y) -> (ref x,ref y)) (Injection.to_map embedding) in
 								while !cpt < (Mixture.arity m) do
 									if !cpt = cc_id then ()
 									else 
 										begin
-											let embedding' = 
+											let embedding',codomain' = 
 												match comp_injs.(!cpt) with
 													| None -> raise (ExceptionDefn.Break 0)
-													| Some hp -> InjectionHeap.find 0 hp (*if heap is not empty, key 0 has to have an injection*)
+													| Some hp -> 
+														let s = InjectionHeap.size hp in
+														if s = 0 then raise (Break 0)
+														else
+															let rec find_compatible cpt =
+																if cpt < 0 then raise (Break 1)
+																else
+																let inj = InjectionHeap.find cpt hp
+																in
+																if (Injection.is_trashed inj) then failwith "Incorrect heap size"
+																else
+																	try
+																		Injection.fold (fun i j (map,cod) -> (IntMap.add i j map, if IntSet.mem j cod then raise (Break 1) else IntSet.add j cod)) inj (!map,!cod)
+																	with Break _ -> find_compatible (cpt-1)
+															in
+															find_compatible (s-1)
 											in
-											if Injection.is_trashed embedding' then raise (ExceptionDefn.Break 0)
-											else 
-												map := Injection.fold (fun i j map -> IntMap.add i j map) embedding' !map ;
+												map := embedding' ; cod := codomain' ;
 										end ;
 									cpt := !cpt+1 ;
 								done ;
@@ -948,7 +961,8 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 									Debug.tag (Printf.sprintf "Observable %d was found with embedding %s" var_id (Tools.string_of_map string_of_int string_of_int IntMap.fold !map)) ;
 								(var_id,!map)::tracked
 							with 
-								| Break _ -> (if !Parameter.debugModeOn then Debug.tag "Incomplete" ; tracked)
+								| Break 0 -> (if !Parameter.debugModeOn then Debug.tag "Incomplete embedding, no observable recorded" ; tracked)
+								| Break 1 -> (if !Parameter.debugModeOn then Debug.tag "Cannot complete embedding, clashing instances" ; tracked)
 					else tracked
 					in
 					update_activity state r.r_id var_id counter env;

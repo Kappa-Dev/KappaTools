@@ -328,7 +328,7 @@ or
 %%
 Both these rule will cause \KaSim~to raise a warning at rule compilation time.
 
-\subsection{Hybrid rules}\label{sec:kinetics}
+\subsection{Hybrid rules}\label{sec:hybrid}
 
 Using KaSim hybrid rules, one may declare that an action has effects on the concentration of some particles of the system. For instance a rule may consume atp, calcium ions etc. It would be a waste of memory and time to use discrete agents to represent such particles. Instead one may declare tokens using declarations\index{declaration} of the form:
 \ITE{
@@ -343,7 +343,7 @@ When applied, the above rule will consume one atp token and produce one adp toke
 \ITE{
 \item[] \ttt{\textit{lhs} | a$_1$:t$_1$ + ... + a$_n$:t$_n$ $\rar$ \textit{rhs} | a$_1'$:t$_1'$ + ... + a$_k'$:t$_k'$} 
 }
-where each $a_i,a_i'$ is an arbitrary algebraic expression (see Table~\ref{tab:alg}) and each $t_i,t_i'$ is a declared token. In the above hybrid rule, calling $n_i,n_i'$  the evaluation of $a_i$ and $a_i'$, the concentration of token $t_i$ will decrease from $n_i$ and the concentration of token $t_i'$ will increase from $n_i'$. Importantly the activity\index{activity} of a hybrid rule will, by default, not take into account the concentration of the tokens in mentions. As we will see in the next section, it is however possible to make its rate explicitely depend on the concentrations of the tokens.
+where each $a_i,a_i'$ is an arbitrary algebraic expression\index{algebraic expression} (see Table~\ref{tab:alg}) and each $t_i,t_i'$ is a declared token. In the above hybrid rule, calling $n_i,n_i'$  the evaluation of $a_i$ and $a_i'$, the concentration of token $t_i$ will decrease from $n_i$ and the concentration of token $t_i'$ will increase from $n_i'$. Importantly the activity\index{activity} of a hybrid rule will, by default, not take into account the concentration of the tokens in mentions. As we will see in the next section, it is however possible to make its rate explicitly depend on the concentrations of the tokens.
 
 \subsection{Rates}\label{sec:kinetics}
 As said earlier, $\ka$ rules are equipped with one or two \emph{kinetic rate(s)}\index{kinetic rate}. A rate is a real number called the \emph{individual-based or stochastic rate constant}\index{kinetic rate!stochastic rate constant}, it is the rate at which the corresponding rule is applied per instance of the rule. Its dimension is the inverse of a time $[T^{-1}]$.

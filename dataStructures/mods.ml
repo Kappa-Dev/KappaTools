@@ -35,7 +35,7 @@ module Injection =
 		let get_address phi = match phi.address with Some a -> a | None -> raise Not_found
 		let get_coordinate phi = phi.coordinate 
 		
-		let to_map phi = Hashtbl.fold (fun i j map -> IntMap.add i j map) phi.map IntMap.empty
+		let to_map phi = Hashtbl.fold (fun i j (map,cod) -> (IntMap.add i j map,IntSet.add j cod)) phi.map (IntMap.empty,IntSet.empty)
 		let is_trashed phi = match phi.address with Some (-1) -> true | _ -> false
 		
 		let add i j phi = Hashtbl.replace phi.map i j ; phi
