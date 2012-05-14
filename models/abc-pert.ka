@@ -27,8 +27,8 @@
 
 
 #### Initial conditions 
-%init: 'n_ab' A,B
-%init: 'n_c' C
+%init: 'n_ab' A(),B()
+%init: 'n_c' C()
 
 %mod: [T]>25 do $ADD 10000 C()
 

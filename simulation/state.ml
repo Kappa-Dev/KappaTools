@@ -924,7 +924,7 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 				begin
 					(*a new embedding was found for var_id*)
 					let tracked = 
-						if Environment.is_tracked var_id env then
+						if Environment.is_tracked var_id env then (*completing the embedding if incomplete*)
 							try
 								let m = kappa_of_id var_id state in	
 								let cpt = ref 0 in
@@ -938,7 +938,9 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 													| None -> raise (ExceptionDefn.Break 0)
 													| Some hp -> InjectionHeap.find 0 hp (*if heap is not empty, key 0 has to have an injection*)
 											in
-											map := Injection.fold (fun i j map -> IntMap.add i j map) embedding' !map ;
+											if Injection.is_trashed embedding' then raise (ExceptionDefn.Break 0)
+											else 
+												map := Injection.fold (fun i j map -> IntMap.add i j map) embedding' !map ;
 										end ;
 									cpt := !cpt+1 ;
 								done ;
