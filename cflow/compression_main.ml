@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 19/10/2011
-  * Last modification: 18/04/2012
+  * Last modification: 25/04/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -236,7 +236,9 @@ let weak_compression env state log_info step_list =
                         let grid = D.S.PH.B.PB.CI.Po.K.build_grid list false handler in
                         let blackboard = D.S.PH.B.set_profiling_info (D.S.PH.B.PB.CI.Po.K.P.set_grid_generation) blackboard in 
                         let error,dag = D.graph_of_grid parameter handler error grid in 
+                        (*let _ = D.print_graph parameter handler error dag in *)
 		        let error,canonic = D.canonicalize parameter handler error dag in 
+                        (*let _ = D.print_canonical_form parameter handler error canonic in *)
                         let blackboard = D.S.PH.B.set_profiling_info (D.S.PH.B.PB.CI.Po.K.P.set_canonicalisation) blackboard in 
                         let filename_comp = (Filename.chop_suffix !Parameter.cflowFileName ".dot") ^"_"^(string_of_int counter)^"weak_comp"^".dot" in 
                         let _ = 

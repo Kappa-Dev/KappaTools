@@ -10,7 +10,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 22/03/2012
-  * Last modification: 24/04/2012
+  * Last modification: 25/04/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -267,7 +267,36 @@ module Dag =
           with 
             | _ -> "" 
         in 
-        let rec visit i map fresh_pos = 
+        let print_to_beat to_beat= 
+          let _ = Printf.fprintf stderr "TO BEAT :" in 
+          let _ = 
+            match 
+              to_beat 
+            with 
+              | None -> Printf.fprintf stderr "NONE  " 
+              | Some l -> List.iter (print_elt stderr) l
+          in 
+          Printf.fprintf stderr "\n" 
+        in 
+        let rec pop (candidate:key list) (to_beat:key list option) = 
+          match 
+            candidate,to_beat
+          with 
+            | [],_ | _,None -> 
+              Some to_beat  (* candidate is a prefix of to_beat, we output the suffix *) 
+            | t::q, Some [] -> 
+              None (* the candidate is worse *)
+            | t::q,Some (tr::qr) -> 
+              let cmp = compare_elt t tr in 
+              if cmp < 0 
+              then 
+                Some None (* the candidate is better *)
+              else if cmp = 0 then 
+                pop q (Some qr) (* we do not know, we look further *) 
+              else 
+                None (* the candidate is worse *)
+        in 
+        let rec visit (i:int) (map:int Mods.IntMap.t) (fresh_pos:int) (to_beat:key list option) = 
           let pos = 
             try 
               Some (Mods.IntMap.find i map)
@@ -277,70 +306,146 @@ module Dag =
           match 
             pos 
           with 
-            | Some i -> [Former i],map,fresh_pos
-            | None -> 
+            | Some i -> (* the node has already been seen, we put a pointer *)
+              begin (*0*)
+                match 
+                  pop [Former i] to_beat
+                with 
+                  | None ->  (* to beat is better, we cut the construction *) 
+                    None 
+                  | Some to_beat -> (* to beat may be improved, we go on *) 
+                    Some ([Former i],map,fresh_pos,to_beat)
+              end (*0*)
+            | None -> (* the node is seen for the first time *)
               let map = Mods.IntMap.add i fresh_pos map in 
               let fresh_pos = fresh_pos + 1 in 
-              let sibbling1 = 
-                try 
-                  A.get graph.pred i 
+              begin (*0*)
+                match 
+                  pop [Fresh (label i)] to_beat
                 with 
-                  | Not_found -> []
-              in 
-              let sibbling2 = 
-                try 
-                  A.get graph.conflict_pred i 
-                with 
-                  | Not_found -> []
-              in 
-              let rec best_sibbling m f candidates not_best record = 
-                match candidates 
-                with 
-                  | [] -> not_best,record 
-                  | t::q -> 
-                    let encoding,map,fresh =
-                      visit t m f
-                    in 
-                    let better,best = 
-                      begin 
-                      match record 
-                      with 
-                        | None -> true,None
-                        | Some (best,best_encoding,_,_) -> 
-                          (compare encoding best_encoding <0),Some best
-                      end 
-                    in 
-                    if better 
-                    then 
-                      best_sibbling m f q (match best with None -> not_best | Some best -> best::not_best) (Some(t,encoding,map,fresh))
-                    else 
-                      best_sibbling m f q (t::not_best) record 
-              in 
-              let rec aux m f l sol = 
-                let not_best,record = 
-                  best_sibbling m f l [] None
-                in 
-                match record 
-                with 
-                  | None -> map,fresh_pos,sol  
-                  | Some (_,best,map,fresh_pos) -> 
-                    aux map fresh_pos not_best (concat sol best)
-              in 
-              let list = [Fresh (label i)] in 
-              let map,fresh_pos,list = aux 
-                map 
-                fresh_pos 
-                sibbling1 
-                list in 
-              let list = concat list [Stop] in 
-              let map,fresh_pos,list = aux map fresh_pos sibbling2 list in
-              let list = concat list [Stop] in 
-              list,map,fresh_pos  
+                  | None -> None 
+                  | Some (to_beat:key list option) -> 
+                    begin (*1*) 
+                      let sibbling1 = 
+                        try 
+                          A.get graph.pred i 
+                        with 
+                          | Not_found -> []
+                      in 
+                      let sibbling2 = 
+                        try 
+                          A.get graph.conflict_pred i 
+                        with 
+                          | Not_found -> []
+                      in 
+                      let rec best_sibbling (m:int Mods.IntMap.t) (f:int) (candidates:int list) (not_best:int list) (to_beat:key list option) (record: (int * (key list * int Mods.IntMap.t * int * key list option)) option) = 
+                        match candidates 
+                        with 
+                          | [] -> 
+                            begin (*2*)
+                              match 
+                                record 
+                              with 
+                                | None -> None 
+                                | Some record -> Some (not_best,record)
+                            end (*2*) 
+                          | t::q -> 
+                            let rep =  visit t m f to_beat in 
+                            begin (*2*)
+                              match 
+                                rep
+                              with 
+                                | None -> best_sibbling m f q not_best to_beat record 
+                                | Some ((encoding:key list),map,fresh,residue) -> 
+                                  begin (*3*)
+                                    let (to_beat_after:key list option) = 
+                                      match 
+                                        residue
+                                      with 
+                                        | None ->
+                                          Some encoding
+                                        | _ -> 
+                                          to_beat 
+                                    in 
+                                    let (not_best:int list) = 
+                                      match 
+                                        record
+                                      with 
+                                        | None -> not_best
+                                        | Some (best,_) -> best::not_best
+                                    in 
+                                    best_sibbling 
+                                      m 
+                                      f 
+                                      q 
+                                      not_best 
+                                      to_beat_after 
+                                      (Some (t,(encoding,map,fresh,residue))) 
+                                  end (*3*)
+                            end (*2*)
+                      in 
+                      let rec aux m f l sol to_beat = 
+                        match 
+                          l
+                        with 
+                          | [] -> Some (m,f,sol,to_beat)
+                          | _ -> 
+                            begin (*2*)
+                              match 
+                                best_sibbling m f l [] to_beat None  
+                              with 
+                                | None -> None 
+                                | Some (not_best,record) -> 
+                                  let (_,(best,map,fresh_pos,to_beat_after)) = record  in 
+                                    aux map fresh_pos not_best (concat sol best) to_beat_after
+                            end (*2*)
+                      in 
+                      let list = [Fresh (label i)] in 
+                      begin (*2*)
+                        match 
+                          aux map fresh_pos sibbling1 list to_beat 
+                        with 
+                          | None -> None 
+                          | Some (map,fresh_pos,list,to_beat) -> 
+                            begin (*3*)
+                              match 
+                                pop [Stop] to_beat
+                              with 
+                                | None -> None 
+                                | Some to_beat -> 
+                                  begin (*4*)
+                                    let list = concat list [Stop] in 
+                                    begin (*5*)
+                                      match 
+                                        aux map fresh_pos sibbling2 list to_beat 
+                                      with 
+                                        | None -> None 
+                                        | Some (map,fresh_pos,list,to_beat) -> 
+                                          begin (*6*)
+                                            match 
+                                              pop [Stop] to_beat
+                                            with 
+                                              | None -> None 
+                                              | Some to_beat -> 
+                                                let list = concat list [Stop] in 
+                                                Some (list,map,fresh_pos,to_beat)  
+                                          end (*6*)
+                                    end (*5*)
+                                  end (*4*)
+                            end (*3*)
+                      end (*2*)
+                    end (*1*)
+              end (*0*)
         in 
-        let rep,_,_= visit graph.root asso 0  
-        in error,rep
+        match 
+          visit graph.root asso 0 None 
+        with 
+          | Some (rep,_,_,_) -> error,rep
+          | None -> error,[]
      
       let dot_of_graph parameter handler error graph = error  
 
+        
+        
         
     end:Dag)

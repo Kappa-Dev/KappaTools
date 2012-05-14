@@ -59,7 +59,6 @@ let push (a:atom) (att:atom list) =
 				 
 
 let add (node_id,site_id) c grid event_number kind obs =
- 
 	(*adding a link modification*)
 	let grid = 
 		if (is _LINK_TESTED c) || (is _LINK_MODIF c) then
@@ -121,7 +120,7 @@ let record_obs ((r_id,state,embedding),test) event_number grid env =
  (*	let agent_name = Mixture.name agent in *)
 	Mixture.fold_interface 
 	  (fun site_id c  grid  -> 
-	    add (node_id,site_id) 8 (* HACK, TO DO CLEANER *) grid event_number (OBS r_id) [])
+	    add (node_id,site_id) (2 lor 8) (* HACK, TO DO CLEANER *) grid event_number (OBS r_id) [])
           agent grid)
       (Mixture.agents state) grid
   in
