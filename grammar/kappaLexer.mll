@@ -44,6 +44,7 @@ rule token = parse
 		| "||" {let pos = position lexbuf in OR pos}
     | "->" {let pos = position lexbuf in KAPPA_RAR pos}
 		| "<-" {LAR}
+		| ":=" {let pos = position lexbuf in ASSIGN pos}
 		| pert as s {let pos = position lexbuf in
 									match s with  
 						 			| "$DEL" -> (DELETE pos)
@@ -52,7 +53,6 @@ rule token = parse
 									| "$STOP" -> (STOP pos) 
 									| "$FLUX" -> (FLUX pos)
 									| "$TRACK" -> (TRACK pos)
-									| "$UPDATE" -> (ASSIGN pos)
 									| s -> return_error lexbuf ("Perturbation effect \""^s^"\" is not defined")
 					 			}  
 		| '[' {let lab = read_label "" [']'] lexbuf in 

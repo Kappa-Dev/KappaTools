@@ -105,18 +105,18 @@ let event state (*grid*) story_profiling event_list counter plot env =
 					if !Parameter.causalModeOn or !Parameter.weakcompressionModeOn 
 	        then
 					  begin
-                                            let story_profiling,event_list = Compression_main.D.S.PH.B.PB.CI.Po.K.store_event story_profiling (Compression_main.D.S.PH.B.PB.CI.Po.K.import_event ((r,phi,psi),(obs_from_rule_app,r,Counter.event counter,side_effect))) event_list in 
-                                            let story_profiling,event_list = 
-                                              List.fold_left 
-                                                (fun (story_profiling,event_list) (obs,phi) -> 
-                                                  
-                                                  let lhs = State.kappa_of_id obs state in 
-                                                  Compression_main.D.S.PH.B.PB.CI.Po.K.store_obs story_profiling (obs,lhs,phi) event_list)
-                                                (story_profiling,event_list) 
-                                                obs_from_rule_app
-                                            in 
-					 (*   (Causal.record ~decorate_with:obs_from_rule_app r side_effect (phi,psi) (Counter.event counter) grid env, (*to be removed*)*)
-					     story_profiling,event_list
+              let story_profiling,event_list = 
+								Compression_main.D.S.PH.B.PB.CI.Po.K.store_event story_profiling (Compression_main.D.S.PH.B.PB.CI.Po.K.import_event ((r,phi,psi),(obs_from_rule_app,r,Counter.event counter,side_effect))) event_list in 
+              let story_profiling,event_list = 
+                List.fold_left 
+                  (fun (story_profiling,event_list) (obs,phi) -> 
+                    
+                    let lhs = State.kappa_of_id obs state in 
+                    Compression_main.D.S.PH.B.PB.CI.Po.K.store_obs story_profiling (obs,lhs,phi) event_list)
+                  (story_profiling,event_list) 
+                  obs_from_rule_app
+              in 
+					 		story_profiling,event_list
 					  end
 					else story_profiling,event_list
 				in
@@ -125,11 +125,8 @@ let event state (*grid*) story_profiling event_list counter plot env =
 				begin
 					if !Parameter.debugModeOn then Debug.tag "Null (clash or doesn't satisfy constraints)"; 
 					Counter.inc_null_events counter ; 
-					Counter.inc_consecutive_null_events counter ;
-					(*if counter.Counter.cons_null_events > !Parameter.maxConsecutiveClash then 
-						raise Deadlock
-					else*) 
-					(env,state,IntSet.empty,story_profiling,(*grid,*)event_list)
+					Counter.inc_consecutive_null_events counter ; 
+					(env,state,IntSet.empty,story_profiling,event_list)
 				end
 	in
 	

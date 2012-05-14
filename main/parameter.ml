@@ -60,7 +60,7 @@ let cpuTime = ref 0.0
 let initSimTime () = cpuTime := Sys.time ()  
 
 (*Name convention*)
-let outputDirName = ref (Sys.getcwd ())
+let outputDirName = ref ""
 let snapshotFileName = ref "snap"
 
 let dumpFileName = ref "dump.ka"
@@ -75,17 +75,28 @@ let inputKappaFileNames:(string list ref) = ref []
 let marshalizedInFile = ref "" 
 let marshalizedOutFile = ref ""
 
-let setOutputName () = 
-	let set name = 
-		if !name <> "" then name := Filename.concat !outputDirName !name 
+
+let set name ext_opt = 
+	if !name = "" then ()
+	else
+	let fname = Filename.concat !outputDirName !name in
+	let fname = 
+		match ext_opt with
+			| None -> fname
+			| Some ext -> 
+				let basename = try Filename.chop_extension fname with Invalid_argument _ -> fname in
+				(basename^"."^ext)
 	in
-	set snapshotFileName ;
-	set dumpFileName ;
-	set influenceFileName ;
-	set fluxFileName ;
-	set marshalizedOutFile ;
-	set cflowFileName ; 
-	set outputDataName 
+	name:=fname
+
+let setOutputName () = 
+	set snapshotFileName (Some "dot");
+	set dumpFileName (Some "ka");
+	set influenceFileName (Some "dot") ;
+	set fluxFileName (Some "dot") ;
+	set marshalizedOutFile None;
+	set cflowFileName (Some "dot") ; 
+	set outputDataName None
 
 let checkFileExists () =
 	let check file =  
@@ -104,7 +115,7 @@ let checkFileExists () =
 	check !fluxFileName ;
 	check !marshalizedOutFile ; 
 	let points = match !pointNumberValue with None -> false | Some _ -> true in
-	if points then check !outputDataName
+	if points then check !outputDataName 
 
 let (openOutDescriptors:out_channel list ref) = ref []
 let (openInDescriptors:in_channel list ref) = ref []

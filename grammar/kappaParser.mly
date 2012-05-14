@@ -106,9 +106,9 @@ instruction:
 
 perm_effect:
 | OP_PAR perm_effect CL_PAR {$2}
-| ASSIGN LABEL alg_expr 
-	{let lab,pos_lab = $2 in Ast.UPDATE (lab,pos_lab,$3,$1)}
-| ID LAR alg_expr
+| LABEL ASSIGN alg_expr /*updating the rate of a rule*/
+	{let lab,pos_lab = $1 in Ast.UPDATE (lab,pos_lab,$3,$2)}
+| ID LAR alg_expr /*updating the value of a token*/
 	{let lab,pos_lab = $1 in Ast.UPDATE_TOK (lab,pos_lab,$3,pos_lab)}
 | TRACK LABEL boolean 
 	{let ast = if $3 then (fun x -> Ast.CFLOW x) else (fun x -> Ast.CFLOWOFF x) in let lab,pos_lab = $2 in ast (lab,pos_lab,$1)}

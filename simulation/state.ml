@@ -923,7 +923,31 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 				in
 				begin
 					(*a new embedding was found for var_id*)
-					let tracked = if Environment.is_tracked var_id env then (var_id,Injection.to_map embedding)::tracked else tracked
+					let tracked = 
+						if Environment.is_tracked var_id env then
+							try
+								let m = kappa_of_id var_id state in	
+								let cpt = ref 0 in
+								let map = ref (Injection.to_map embedding) in
+								while !cpt < (Mixture.arity m) do
+									if !cpt = cc_id then ()
+									else 
+										begin
+											let embedding' = 
+												match comp_injs.(!cpt) with
+													| None -> raise (ExceptionDefn.Break 0)
+													| Some hp -> InjectionHeap.find 0 hp (*if heap is not empty, key 0 has to have an injection*)
+											in
+											map := Injection.fold (fun i j map -> IntMap.add i j map) embedding' !map ;
+										end ;
+									cpt := !cpt+1 ;
+								done ;
+								if !Parameter.debugModeOn then
+									Debug.tag (Printf.sprintf "Observable %d was found with embedding %s" var_id (Tools.string_of_map string_of_int string_of_int IntMap.fold !map)) ;
+								(var_id,!map)::tracked
+							with 
+								| Break _ -> (if !Parameter.debugModeOn then Debug.tag "Incomplete" ; tracked)
+					else tracked
 					in
 					update_activity state r.r_id var_id counter env;
 					let env,pert_ids = 

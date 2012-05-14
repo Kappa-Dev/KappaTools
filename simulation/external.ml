@@ -206,11 +206,12 @@ let apply_effect p_id pert state counter env =
 				begin
 					if !Parameter.fluxModeOn then ExceptionDefn.warning "Flux modes are overlapping" ;
 					Parameter.fluxModeOn := true ;
-					begin
-						match opt with
-							| None -> Parameter.fluxFileName := "flux"^"_"^(string_of_int (Counter.event counter))^".dot"
-							| Some nme -> Parameter.fluxFileName := nme
-					end ;
+					let _ = 
+  					match opt with
+  						| None -> Parameter.fluxFileName := "flux"^"_"^(string_of_int (Counter.event counter))
+  						| Some nme -> Parameter.fluxFileName := nme 
+					in
+					Parameter.set Parameter.fluxFileName (Some "dot");
 					(env, state, IntSet.empty,[])
 				end
 				

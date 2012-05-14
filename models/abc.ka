@@ -29,3 +29,10 @@
 #### Initial conditions 
 %init: 'n_ab' A(),B()
 %init: 'n_c' C()
+
+%def: "dumpInfluenceMap" "true"
+%def: "InfluenceMapFileName" "Model_IM"
+%def: "dotSnapshots" "true"
+%def: "colorDot" "true"
+%mod: [true] set $FLUX "Model_FL" [true]
+%mod: [T] > 0 do $SNAPSHOT "Model_SNAPSHOT"
