@@ -31,7 +31,7 @@ all: native-code
 
 OCAMLCP = $(OCAMLBINPATH)ocamlcp
 OCAMLLEX = $(OCAMLBINPATH)ocamllex
-OCAMLYACC = $(OCAMLBINPATH)menhir
+OCAMLYACC = $(OCAMLBINPATH)ocamlyacc
 OCAMLC = $(OCAMLBINPATH)ocamlc.opt 
 OCAMLOPT = $(OCAMLBINPATH)ocamlopt.opt #-g -ccopt -g -ccopt -pg
 OCAMLDEP = $(OCAMLBINPATH)ocamldep
