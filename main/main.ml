@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "3.0-140512a"
+let version = "3.0-160512"
 
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
@@ -102,7 +102,6 @@ let main =
 		
 		Parameter.setOutputName() ; (*changin output names if -d option was used*)
 		Parameter.checkFileExists() ;
-
 		
 		let (_:unit) = 
 			match !Parameter.marshalizedOutFile with

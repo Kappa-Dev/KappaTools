@@ -1051,7 +1051,7 @@ let configurations_of_result result =
 						| "false" -> Parameter.influenceFileName := "" 
 						| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Value %s should be either \"true\" or \"false\"" error))
 				end
-			| "InfluenceMapFileName" -> Parameter.influenceFileName := value 
+			| "influenceMapFileName" -> Parameter.influenceFileName := value 
 			| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Unkown parameter %s" error))		  
 	) result.configurations 
 	

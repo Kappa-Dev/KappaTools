@@ -486,7 +486,7 @@ let diff pos m0 m1 label_opt env =
 	((List.fast_sort sort instructions),balance,added,modif_sites,!side_effect) 
 	(*List.rev instructions, balance, added, modif_sites,!side_effect*)
 
-let rec superpose todo_list lhs rhs map already_done added env =
+let rec superpose todo_list lhs rhs map already_done added codomain env =
 	match todo_list with
 		| [] -> map
 		| (lhs_id,rhs_id)::tl ->
@@ -555,7 +555,9 @@ let rec superpose todo_list lhs rhs map already_done added env =
 												| _ -> raise False
 					) lhs_ag (tl,already_done)
 				in
-					superpose todo_list lhs rhs (IntMap.add lhs_id rhs_id map) already_done added env
+				if IntSet.mem rhs_id codomain then raise False
+				else
+					superpose todo_list lhs rhs (IntMap.add lhs_id rhs_id map) already_done added (IntSet.add rhs_id codomain) env
 
 let enable r mix env =
 	
@@ -588,7 +590,7 @@ let enable r mix env =
 						| None -> false
 				) modif_sites
 				then 
-					let opt = try Some (superpose [(lhs_ag_id,root)] lhs rhs IntMap.empty Int2Set.empty r.added env) with False -> None 
+					let opt = try Some (superpose [(lhs_ag_id,root)] lhs rhs IntMap.empty Int2Set.empty r.added IntSet.empty env) with False -> None 
 					in
 						match opt with
 							| Some map -> (*map: id_mix -> id_rule*)
