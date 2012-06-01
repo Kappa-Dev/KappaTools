@@ -555,8 +555,6 @@ let rec superpose todo_list lhs rhs map already_done added codomain env =
 												| _ -> raise False
 					) lhs_ag (tl,already_done)
 				in
-				if IntSet.mem rhs_id codomain then raise False
-				else
 					superpose todo_list lhs rhs (IntMap.add lhs_id rhs_id map) already_done added (IntSet.add rhs_id codomain) env
 
 let enable r mix env =
