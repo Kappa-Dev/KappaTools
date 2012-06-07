@@ -678,7 +678,7 @@ let environment_of_result res =
 let obs_of_result env res =
 	List.fold_left
 	(fun cont alg_expr ->
-				let (obs, is_constant, dep, label) = partial_eval_alg env alg_expr
+				let (obs, is_constant, dep, label) = partial_eval_alg ~reduce_const:false env alg_expr (*Not reducing const, because $UPDATE might change it later*)
 				in (dep, is_constant, obs, label) :: cont
 	)
 	[] res.observables
