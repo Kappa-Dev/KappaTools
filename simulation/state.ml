@@ -6,6 +6,7 @@ open Graph
 open ValMap
 open Random_tree
 
+
 type implicit_state =
 	{ graph : SiteGraph.t;
 	 	injections : (component_injections option) array;
@@ -24,6 +25,7 @@ type implicit_state =
 	}
 and component_injections = (InjectionHeap.t option) array
 and obs = { label : string; expr : Dynamics.variable }
+
 
 let silence rule_id state = state.silenced <- (IntSet.add rule_id state.silenced)
 			

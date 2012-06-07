@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 06/09/2011
-  * Last modification: 18/04/2012
+  * Last modification: 07/06/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -103,7 +103,7 @@ sig
   val is_exist_event: PB.step_id -> case_address 
   val n_unresolved_events: case_address 
   val n_unresolved_events_in_column: event_case_address -> case_address 
-  val forced_events: blackboard -> PB.step_id list list 
+  val forced_events: blackboard -> (PB.step_id list * unit Mods.simulation_info option) list 
   val side_effect_of_event: blackboard -> PB.step_id -> PB.CI.Po.K.side_effect
 (*  val cut_predicate_id: (blackboard -> PB.predicate_id -> PB.CI.Po.K.H.error_channel *   blackboard) PB.CI.Po.K.H.with_handler *)
   val cut: (blackboard -> PB.step_id list -> PB.CI.Po.K.H.error_channel * blackboard * result * PB.step_id list) PB.CI.Po.K.H.with_handler 
@@ -197,10 +197,13 @@ module Blackboard =
     let print_case_value parameter x = 
       match x 
       with 
-        | State x -> let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "State! " in 
-                     let _ = PB.print_predicate_value parameter.PB.CI.Po.K.H.out_channel_err x in 
-                     let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "\n" in 
-                     () 
+        | State x -> 
+          begin 
+            let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "State! " in 
+            let _ = PB.print_predicate_value parameter.PB.CI.Po.K.H.out_channel_err x in 
+            let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "\n" in 
+            () 
+          end
         | Counter i -> Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Counter %i\n" i
         | Pointer i -> Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Pointer %i\n" i 
         | Boolean b -> Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Boolean %s\n" (match b with None -> "?" | Some true -> "true" | _ -> "false")
@@ -346,7 +349,7 @@ module Blackboard =
            profiling: PB.CI.Po.K.P.log_info; 
            event: PB.CI.Po.K.refined_step PB.A.t;
            pre_column_map_inv: PB.predicate_info PB.A.t; (** maps each wire id to its wire label *)
-           forced_events: int list list;
+           forced_events: (int list * unit Mods.simulation_info option) list;
            n_predicate_id: int ;
            n_eid:int;
            n_seid: int PB.A.t;

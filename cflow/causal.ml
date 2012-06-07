@@ -109,7 +109,7 @@ let record ?decorate_with rule side_effects (embedding,fresh_map) event_number g
 	in
 	grid
 
-let record_obs ((r_id,state,embedding),test) event_number grid env = 
+let record_obs ((r_id,state,embedding,_),test) event_number grid env = 
   let im embedding id = IntMap.find id embedding in
   
     (*adding tests*)
@@ -249,9 +249,9 @@ let dot_of_grid profiling fic grid state env =
 		) depth_of_event IntMap.empty
 	in
 	let desc = open_out fic in
+        let _ = Parameter.add_out_desc desc in 
         let _ = profiling desc in 
-	Parameter.add_out_desc desc ;
-	fprintf desc "digraph G{\n ranksep=.5 ; \n" ;
+     	fprintf desc "digraph G{\n ranksep=.5 ; \n" ;
 	IntMap.iter
 	(fun d eids_at_d ->
 		fprintf desc "{ rank = same ; \"%d\" [shape=plaintext] ; " d ;

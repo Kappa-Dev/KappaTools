@@ -34,6 +34,9 @@ module type Dag =
       
     val print_canonical_form: (canonical_form -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler
     val print_graph: (graph -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler 
+     
+    val hash_list: ((canonical_form * 'a) list -> S.PH.B.PB.CI.Po.K.H.error_channel * (((canonical_form * 'a list) list))) S.PH.B.PB.CI.Po.K.H.with_handler 
+
   end 
 
 
@@ -259,6 +262,7 @@ module Dag =
         in 
         aux list2 (List.rev list1)
 
+
       let canonicalize parameter handler error graph = 
         let asso = Mods.IntMap.empty in 
         let label i = 
@@ -355,7 +359,7 @@ module Dag =
                               match 
                                 rep
                               with 
-                                | None -> best_sibbling m f q not_best to_beat record 
+                                | None -> best_sibbling m f q (t::not_best) to_beat record 
                                 | Some ((encoding:key list),map,fresh,residue) -> 
                                   begin (*3*)
                                     let (to_beat_after:key list option) = 
@@ -445,7 +449,27 @@ module Dag =
      
       let dot_of_graph parameter handler error graph = error  
 
-        
-        
-        
+      let sort l = 
+        let compare (a,_) (b,_) = compare a b in 
+        List.sort compare l 
+
+      let hash_list parameter handler error list = 
+        let list = sort list in 
+        let rec visit elements_to_store stored_elements last_element last_element_occurrences = 
+          match elements_to_store,last_element 
+          with 
+            | ((t:canonical_form),asso)::q,Some old when compare t old = 0 ->
+              visit q stored_elements last_element (asso::last_element_occurrences)
+            | (t,asso)::q,Some a ->  
+              visit q ((a,List.rev last_element_occurrences)::stored_elements) (Some t) [asso]
+            | (t,asso)::q,None -> 
+              visit q stored_elements (Some t) [asso]
+            | [],None -> 
+              []
+            | [],Some a -> 
+              List.rev ((a,List.rev last_element_occurrences)::stored_elements)
+        in
+        let list = visit list [] None [] in 
+        error,list 
+              
     end:Dag)

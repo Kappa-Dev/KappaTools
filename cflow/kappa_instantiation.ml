@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 10/04/2012
+  * Last modification: 07/06/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -105,13 +105,14 @@ sig
   val tests_of_refined_step: refined_step -> test list 
   val actions_of_refined_step: refined_step -> action list * (site*binding_state) list 
   val is_obs_of_refined_step: refined_step -> bool 
+  val simulation_info_of_refined_step: refined_step -> unit Mods.simulation_info option 
 
   val print_refined_step: H.parameter -> H.handler -> refined_step -> unit 
 
   val import_event:  (Dynamics.rule * int Mods.IntMap.t * int Mods.IntMap.t) * rule_info -> event 
   val store_event: P.log_info -> event -> step list -> P.log_info * step list 
   val store_init : P.log_info -> State.implicit_state -> step list -> P.log_info * step list 
-  val store_obs :  P.log_info -> int * Mixture.t * int Mods.IntMap.t -> step list -> P.log_info * step list 
+  val store_obs :  P.log_info -> int * Mixture.t * int Mods.IntMap.t * unit Mods.simulation_info -> step list -> P.log_info * step list 
   val build_grid: (refined_step*side_effect) list -> bool -> H.handler -> Causal.grid 
   val print_side_effect: out_channel -> side_effect -> unit
   val side_effect_of_list: (int*int) list -> side_effect 
@@ -149,7 +150,7 @@ module Cflow_linker =
   type rule_info = (obs_from_rule_app * r  * counter * kasim_side_effect) 
   type init = agent * (site_name * (int option * Node.ptr)) list
   type event = (kappa_rule * embedding * fresh_map) * (rule_info)
-  type obs = int * Mixture.t * embedding 
+  type obs = int * Mixture.t * embedding * unit Mods.simulation_info 
       
   let get_causal (_,d) = d 
 
@@ -619,7 +620,7 @@ module Cflow_linker =
   let refine_event env event = (event,tests_of_event event,actions_of_event event env)
     
   let refine_obs env obs = 
-    let _,lhs,embedding = obs in 
+    let _,lhs,embedding,info = obs in 
     obs,tests_of_obs lhs embedding 
 
   let obs_of_refined_obs = fst 
@@ -696,6 +697,12 @@ module Cflow_linker =
     with 
       | Obs _ -> true
       | _ -> false
+
+  let simulation_info_of_refined_step x = 
+    match x
+    with 
+      | Obs ((_,_,_,info),_) -> Some info
+      | _ -> None 
       
   let refine_step env (x:step) = 
     genbis (refine_event env) (refine_init env) (refine_obs env) x
@@ -712,8 +719,8 @@ module Cflow_linker =
     P.inc_n_kasim_events log_info,(Event event)::step_list    
   let store_init log_info init step_list = 
     create_init init log_info step_list  
-  let store_obs log_info (i,a,x) step_list = 
-    P.inc_n_obs_events log_info,Obs(i,a,x)::step_list 
+  let store_obs log_info (i,a,x,c) step_list = 
+    P.inc_n_obs_events log_info,Obs(i,a,x,c)::step_list 
 
   let build_grid list bool handler = 
     let env = handler.H.env in 
