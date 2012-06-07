@@ -173,7 +173,7 @@ Table~\ref{tab:add-options} summarizes the advanced options that are accessible 
 \hline 
 Argument & Description \\ \hline
 \ttt{\small -seed $n$} &\small Seeds the pseudo-random number generator $n>0$ \\
-\ttt{\small \dd implicit-signature} &\small Automatically deduce agent signatures (see Chapter~\ref{chap:advanced})\\
+\ttt{\small \dd implicit-signature} &\small Automatically deduce agent signature\index{agent signature}s (see Chapter~\ref{chap:advanced})\\
 \ttt{\small -make-sim} \textit{sim\_file} &\small makes a simulation package out of the input kappa files \\
 \ttt{\small -load-sim} \textit{sim\_file} &\small use simulation package \textit{sim\_file} as input\\
 \ttt{\small \dd gluttony} &\small simulation mode that is memory intensive \\ &\small but that speeds up simulation time\\
@@ -198,13 +198,13 @@ will generate a file \ttt{data.out} (default name) containing 1000 data points o
 \chapter{The kappa file}\label{chap:kappa}
 
 \section{General remarks}
-The \emph{Kappa File}\index{kappa file} (KF) is the formal representation of your model. We use KF to denote the union of the files that are given as input to \KaSim~(argument \ttt{-i}). Each line of the KF is interpreted by \KaSim~as a \emph{declaration}\index{declaration}. If the line is ended by the escape character~\textquotesingle \ttt{$\bs$}\textquotesingle ~the continuation of the declaration is parsed onto the next line. Declarations can be: agent and token \emph{signatures} (Sec.~\ref{sec:sig}), \emph{rules}\index{rule} (Sec.~\ref{sec:rules}), \emph{variables}\index{variable} (Sec.~\ref{sec:var}), \emph{initial conditions}\index{initial condition} (Sec.~\ref{sec:init}), \emph{perturbations}\index{perturbation} (Sec.~\ref{sec:mod}) and \emph{parameter configurations} (Sec.~\ref{sec:param}). The KF\textquotesingle s structure is quite flexible and can be divided in any number of sub-files in which the order of declarations does not matter (to the exception of variable declarations, see Section~\ref{sec:var} for details). Comments\index{comments} can be used by inserting the marker \ttt{\#} that tells \KaSim~to ignore the rest of the line. 
+The \emph{Kappa File}\index{kappa file} (KF) is the formal representation of your model. We use KF\index{kappa file} to denote the union of the files that are given as input to \KaSim~(argument \ttt{-i}). Each line of the KF\index{kappa file} is interpreted by \KaSim~as a \emph{declaration}\index{declaration}. If the line is ended by the escape character~\textquotesingle \ttt{$\bs$}\textquotesingle ~the continuation of the declaration\index{declaration} is parsed onto the next line. Declarations can be: agent and token \emph{signatures} (Sec.~\ref{sec:sig}), \emph{rules}\index{rule} (Sec.~\ref{sec:rules}), \emph{variables}\index{variable} (Sec.~\ref{sec:var}), \emph{initial conditions}\index{initial condition} (Sec.~\ref{sec:init}), \emph{perturbations}\index{perturbation} (Sec.~\ref{sec:mod}) and \emph{parameter configurations} (Sec.~\ref{sec:param}). The KF\index{kappa file}'s structure is quite flexible and can be divided in any number of sub-files in which the order of declaration\index{declaration}s does not matter (to the exception of variable declaration\index{declaration}s, see Section~\ref{sec:var} for details). Comments\index{comments} can be used by inserting the marker \ttt{\#} that tells \KaSim~to ignore the rest of the line. 
 
-\section{Agent and token signatures}\label{sec:sig}
+\section{Agent and token signature\index{agent signature}s}\label{sec:sig}
 %
 In Kappa there are two entities that can be used for representing biological elements: \imp{agents} and \imp{tokens}.  Agents are used to represent complex molecules that may bind to other molecules on specific sites. Tokens are used to represent atomic particles such as calcium ions, atp etc. Tokens cannot bind to each others, they can only appear or disappear. In a given model, agents always have a discrete number of instances while tokens may have a continuous concentration.
 
-In order to use agents or tokens in a model, one needs to declare them first. \emph{Agent signatures}\index{agent signature} constitute a form of typing information about the agents that are used in the model. It contains information about the name and number of interaction sites the agent has, and about their possible internal states. A signature is declared in the KF by the following line:
+In order to use agents or tokens in a model, one needs to declare them first. \emph{Agent signatures}\index{agent signature} constitute a form of typing information about the agents that are used in the model. It contains information about the name and number of interaction sites the agent has, and about their possible internal states. A signature\index{agent signature} is declared in the KF\index{kappa file} by the following line:
 \ITE{
 \item[] \ttt{\%agent: } \textit{signature\_expression}
 }
@@ -217,7 +217,7 @@ according to the grammar given in Table~\ref{tab:sig}.
     \textit{sig} & ::= & \tcb{Id}~\textit{internal\_state\_list}\tcb{,}\ \textit{sig} $\mid\varepsilon$ \\ 
     \textit{internal\_state\_list} & ::= & \tcb{\int Id}~\textit{internal\_state\_list} $\mid\varepsilon$
     \end{tabular}
-  \caption{Agent signature expression: terminal symbol are denoted in (blue) typed font. Symbol \ttt{Id} can be any string generated by regular expression $[a\sep z\ A\sep Z][a\sep z\ A \sep Z\ 0\sep 9\ \_ \ -\ +]^*$. Terminal symbol $\varepsilon$ stands for the empty symbol.}
+  \caption{Agent signature\index{agent signature} expression: terminal symbol are denoted in (blue) typed font. Symbol \ttt{Id} can be any string generated by regular expression $[a\sep z\ A\sep Z][a\sep z\ A \sep Z\ 0\sep 9\ \_ \ -\ +]^*$. Terminal symbol $\varepsilon$ stands for the empty symbol.}
   \label{tab:sig}
 \end{table}
 %%
@@ -227,20 +227,20 @@ For instance the line:
 }
 will declare an agent \ttt{A} with 3 \emph{(interaction) sites} \ttt{x,y} and \ttt{z} with the site \ttt{y} possessing two \emph{internal states}\index{internal state} \ttt{u} and \ttt{p} (for instance for the unphosphorylated and phosphorylated forms of \ttt{y}) and the site \ttt{z} having possibly 3 states respectively 0, 1 and 2. Note that internal states\index{internal state} values are treated as untyped symbols by \KaSim, so choosing a character or an integer as internal state is purely matter of convention. 
 
-Token signatures are declared using a statement of the form:
+Token signature\index{agent signature}s are declared using a statement of the form:
 \ITE{
 \item[] \ttt{\%token: ca+ \# Signature of calcium token} 
 }
 
 \section{Rules}\label{sec:rules}
 
-Once agents are declared, one may add to the KF the rules\index{rule} that describe their dynamics through time. A \imp{pure rule} looks like: 
+Once agents are declared, one may add to the KF\index{kappa file} the rules\index{rule} that describe their dynamics through time. A \imp{pure rule} looks like: 
 \ITE{
 \item[] \ttt{\textquotesingle my rule\textquotesingle } {\it kappa\_expression} $\rar$ {\it kappa\_expression} \ttt{@} {\it rate}  
 }
 where \ttt{\textquotesingle my rule\textquotesingle } can be any name that will refer to the subsequent rule that can be decomposed into a \emph{left hand side}\index{left hand side} (LHS) and a \emph{right hand side}\index{right hand side} (RHS) kappa expressions\index{kappa expressions} together with a \emph{kinetic rate expression} \index{kinetic rate}. Kappa and rate expressions are generated by the grammar given in Table~\ref{tab:patterns}.
 
-If pure rules induce reactions between agents, it is possible to mix agents and tokens in \imp{hyrbid rules} which look like:
+If pure rules induce reactions between agents, it is possible to mix agents and tokens in \imp{hybrid rules} which look like:
  \ITE{
 \item[] {\it kappa\_expression} | {\it token\_expression} $\rar$ {\it kappa\_expression}  | {\it token\_expression}\ttt{@} {\it rate}  
 }
@@ -261,32 +261,32 @@ Token expressions are generated by the grammar given Table~\ref{tab:patterns}.
     \textit{rate\_expression} &::=& \textit{algebraic\_expression} \\
 &&| \textit{algebraic\_expression} \tcb{(}\textit{algebraic\_expression}\tcb{)} 
     \end{tabular}
-  \caption{Kappa expressions: algebraic expressions are given Table~\ref{tab:alg}, but can be replaced for now as any real number.}
+  \caption{Kappa expressions: algebraic expressions\index{algebraic expression} are given Table~\ref{tab:alg}, but can be replaced for now as any real number.}
   \label{tab:patterns}
 \end{table}
 %%
 \subsection{Pure rules}\index{pure rule}
 
 \subsubsection*{A simple rule}
-With the signature of \ttt{A} defined in the previous section, the line
+With the signature\index{agent signature} of \ttt{A} defined in the previous section, the line
 \ITE{
 \item[] \ttt{\textquotesingle A dimerization\textquotesingle~  A(x),A(y\int p)} $\rar$ \ttt{A(x!1),A(y\int p!1) @ $\ga$} 
 }
 denotes a dimerization rule between two instances of agent \ttt{A} provided the second is phosphorylated (say that is here the meaning of \ttt{p}) on site \ttt{y}. Note that the bond between both \ttt{A}s is denoted by the identifier \ttt{!1} which uses an arbitrary integer (\ttt{!0} would denote the same bond. In Kappa, a bond may connect exactly 2 sites so any occurrence of a bond identifier \ttt{!}$n$ has to be paired with exactly one other sibling in the expression. Note also the fact that site \ttt{z} of \ttt{A} is not mentioned in the expression which means that it has no influence on the triggering of this rule. This is the \emph{don't care don't write convention} (DCDW) \index{don't care don't write} that plays a key role in resisting combinatorial explosion when writing models.
 
 \subsubsection*{Adding and deleting agents}
-Sticking with \ttt{A}'s signature, the rule
+Sticking with \ttt{A}'s signature\index{agent signature}, the rule
 \ITE{
 \item[] \ttt{\var{budding A}~A(z)} $\rar$ \ttt{A(z!1),A(x!1) @ $\ga$ } 
 }
-indicates that an agent \ttt{A} free on site \ttt{z}, no matter what its internal state is, may beget a new copy of \ttt{A} bound to it \via site \ttt{x}. Note that in the RHS, agent \ttt{A}' s interface is not completely described. Following the DCDW convention\index{don' t care don' t write}, \KaSim~will then assume that the sites that are not mentioned are created in the \emph{default state}\index{default state}, \ie they appear free of any bond and their internal state (if any) is the first of the list shown in the signature (here state \ttt{u} for \ttt{y} and \ttt{0} for \ttt{z}).
+indicates that an agent \ttt{A} free on site \ttt{z}, no matter what its internal state is, may beget a new copy of \ttt{A} bound to it \via site \ttt{x}. Note that in the RHS, agent \ttt{A}' s interface is not completely described. Following the DCDW convention\index{don't care don't write}, \KaSim~will then assume that the sites that are not mentioned are created in the \emph{default state}\index{default state}, \ie they appear free of any bond and their internal state (if any) is the first of the list shown in the signature\index{agent signature} (here state \ttt{u} for \ttt{y} and \ttt{0} for \ttt{z}).
 
 Importantly, \KaSim~respects the \emph{longest prefix convention}\index{longest prefix convention} to determine which agent in the RHS stems from an agent in the LHS. 
 In a word, from a rule of the form $a_1,\dots,a_n\rar b_1,\dots,b_k$, with $a_i$s and $b_j$s being agents, one computes the biggest indices $i\leq n$ such that the agents $a_1,\dots,a_i$ are pairwise consistent with $b_1,\dots,b_i$, \ie the $a_j$s and $b_j$s have the same name and the same number of sites. In which case we say that the for all $j\leq i$, $a_j$ is \emph{preserved} by the transition and for all $j>i$, $a_j$ is \emph{deleted} by the transition and $b_j$ is \emph{created} by the transition. This convention allows us to write a deletion rule as:
 \ITE{
 \item[] \ttt{\textquotesingle deleting A\textquotesingle  A(x!1),A(z!1)} $\rar$ \ttt{A(x) @ $\ga$} 
 }
-which will remove the \ttt{A} agent in the mixture that will match the second occurrence of \ttt{A} in this rule.
+which will remove the \ttt{A} agent in the mixture\index{mixture} that will match the second occurrence of \ttt{A} in this rule.
 
 \subsubsection*{Side effects}\label{sec:side-effect}
 
@@ -329,7 +329,7 @@ When applied, the above rule will consume one atp token and produce one adp toke
 where each $a_i,a_i'$ is an arbitrary algebraic expression\index{algebraic expression} (see Table~\ref{tab:alg}) and each $t_i,t_i'$ is a declared token. In the above hybrid rule, calling $n_i,n_i'$  the evaluation of $a_i$ and $a_i'$, the concentration of token $t_i$ will decrease from $n_i$ and the concentration of token $t_i'$ will increase from $n_i'$. Importantly the activity\index{activity} of a hybrid rule will, by default, not take into account the concentration of the tokens in mentions. As we will see in the next section, it is however possible to make its rate explicitly depend on the concentrations of the tokens.
 
 \subsection{Rates}\label{sec:kinetics}
-As said earlier, $\ka$ rules are equipped with one or two \emph{kinetic rate(s)}\index{kinetic rate}. A rate is a real number, or an algebraic expression evaluated as such, called the \emph{individual-based or stochastic rate constant}\index{kinetic rate!stochastic rate constant}, it is the rate at which the corresponding rule is applied per instance of the rule. Its dimension is the inverse of a time $[T^{-1}]$.
+As said earlier, $\ka$ rules are equipped with one or two \emph{kinetic rate(s)}\index{kinetic rate}. A rate is a real number, or an algebraic expression\index{algebraic expression} evaluated as such, called the \emph{individual-based or stochastic rate constant}\index{kinetic rate!stochastic rate constant}, it is the rate at which the corresponding rule is applied per instance of the rule. Its dimension is the inverse of a time $[T^{-1}]$.
 
 The stochastic rate is related to the \emph{concentration-based rate constant}\index{kinetic rate!deterministic rate constant} $k$ of the rule of interest by the following relation:
 %corrected by the volume $V$ in which the model is considered. 
@@ -437,12 +437,12 @@ which will tell \KaSim~to apply the above rule with a rate $\ga_2$ for binary in
 \end{enumerate}
 }
 
-Notice at lines 10-12 the use of binary/unary notation for rules. As a result binding between between freely floating agents will occur at rate \ttt{\textquotesingle k2\textquotesingle } while binding between agents that are part of the same complex will occur at rate \ttt{\textquotesingle k1\textquotesingle }. Line 21 contains a \emph{perturbation} that requires \KaSim~to stop the simulation after 10,000 events and output the list of molecular species present in the final mixture (see Section~\ref{sec:mod}) and that we give Figure~\ref{fig:species}.
+Notice at lines 10-12 the use of binary/unary notation for rules. As a result binding between between freely floating agents will occur at rate \ttt{\textquotesingle k2\textquotesingle } while binding between agents that are part of the same complex will occur at rate \ttt{\textquotesingle k1\textquotesingle }. Line 21 contains a \emph{perturbation} that requires \KaSim~to stop the simulation after 10,000 events and output the list of molecular species present in the final mixture\index{mixture} (see Section~\ref{sec:mod}) and that we give Figure~\ref{fig:species}.
 
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[width=10cm]{img/poly.pdf}
-\caption{Final mixture obtained after 10,000 events of simulation of the \ttt{poly.ka} model. The infinite rate for cycle closure allows one to obtain a large number of triangles.}
+\caption{Final mixture\index{mixture} obtained after 10,000 events of simulation of the \ttt{poly.ka} model. The infinite rate for cycle closure allows one to obtain a large number of triangles.}
 \label{fig:species}
 \end{center}
 \end{figure}
@@ -450,7 +450,7 @@ Notice at lines 10-12 the use of binary/unary notation for rules. As a result bi
 
 \section{Variables}\label{sec:var}
 
-In the KF it is also possible to declare \emph{variables}\index{variable} by a line of the form
+In the KF\index{kappa file} it is also possible to declare \emph{variables}\index{variable} by a line of the form
 \ITE{
 \item[] \ttt{\%var: \var{var\_name}~} (\textit{algebraic\_expression} or \textit{kappa\_expression})
 }
@@ -480,7 +480,7 @@ Variable & Interpretation \\
 \ttt{[E]} & the total number of simulation events\index{event}\\
 & since the beginning of the simulation \\
 \ttt{[E+]} & the total number of productive events\index{event} \\
-\ttt{[E-]} & the total number of null events\index{event}\\
+\ttt{[E-]} & the total number of null events\index{null event}\\
 \ttt{[Emax]} & the max (productive) event limit as set by the option \ttt{-e}. \\ &Note that if unset \ttt{Emax}$=\infty$\\
 \ttt{[T]} & the bio-time of the simulation \\
 \ttt{[Tsim]} & the cpu-time since the beginning of the simulation \\
@@ -503,12 +503,12 @@ Operator & Interpretation \\
 \end{table}
 %%
 %%
-\noi For instance the declarations
+\noi For instance the declaration\index{declaration}s
 \ITE{
 \item[] \ttt{\%var: \var{homodimer}~A(x!1),A(x!1)}
 \item[] \ttt{\%var: \var{aa}~\var{homodimer}/2}
 }
-define 2 variables, the first one tracking the number of embeddings of \ttt{A(x!1),A(x!1)} in the graph over time, while the second divides this value by 2: the number of automorphisms in \ttt{A(x!1),A(x!1)}. The do of a variable acts as a binder in the rest of the KF. Hence variables that are used in the expression of another variable must be declared beforehand. 
+define 2 variables, the first one tracking the number of embeddings of \ttt{A(x!1),A(x!1)} in the graph over time, while the second divides this value by 2: the number of automorphisms in \ttt{A(x!1),A(x!1)}. The do of a variable acts as a binder in the rest of the KF\index{kappa file}. Hence variables that are used in the expression of another variable must be declared beforehand. 
 \vskip 0.25cm
 \noi It is also possible to use algebraic expressions\index{algebraic expression} as kinetic rates\index{kinetic rate} as in
 \ITE{
@@ -526,9 +526,9 @@ One may use the shortcut:
 }
 to declare a variable and at the same time require it to be outputted in the data file\index{data file}. 
 
-\section{Initial conditions}\label{sec:init}\index{initial conditions}
+\section{Initial conditions}\label{sec:init}\index{initial condition}
 
-The initial mixture\index{mixture} to which rules in the KF will be applied are declared as
+The initial mixture\index{mixture} to which rules in the KF\index{kappa file} will be applied are declared as
 \ITE{
 \item[] \ttt{\%init: } \textit{mult} \textit{kappa\_expression}
 }
@@ -538,7 +538,7 @@ or
 }
 
 %%
-where \textit{mult} is either a positive integer or a variable name pointing to a constant expression. This will add to the initial state of the model \textit{mult} copies of the graph described by the kappa expression. Again the DCDW convention\index{don't care don't write} allows us not to write the complete interface of added agents (the remaining sites will be completed according to the agent's signature). For instance:
+where \textit{mult} is either a positive integer or a variable name pointing to a constant expression. This will add to the initial state of the model \textit{mult} copies of the graph described by the kappa expression. Again the DCDW convention\index{don't care don't write} allows us not to write the complete interface of added agents (the remaining sites will be completed according to the agent's signature\index{agent signature}). For instance:
 \ITE{
 \item[] \ttt{\%var: \textquotesingle n\textquotesingle~1000}
 \item[] \ttt{\%init: \textquotesingle n\textquotesingle~(A(),A(y\int p))}
@@ -580,7 +580,7 @@ We describe below the content of a simple Kappa model and give examples of some 
 }}
 %
 
-Line 1-4 of this KF contains signature declarations\index{signature}\index{declaration}. Agents of type \ttt{C} have 2 sites \ttt{x1} and \ttt{x2} whose internal state may be \ttt{u}(nphosphorylated) or \ttt{p}(hosphorylated). Recall that the default state of these sites is \ttt{u} (the first one). Line 8, rule \ttt{\textquotesingle ab.c\textquotesingle } binds an \ttt{A} connected to someone on site \ttt{x} (link type \ttt{!\_}) to a \ttt{C}. Note that the only rule that binds an agent to \ttt{x} of \ttt{A} is \ttt{\textquotesingle a.b\textquotesingle } at line 6. Hence the use of \ttt{!\_} is a commodity and the rule could be replaced by 
+Line 1-4 of this KF\index{kappa file} contains signature\index{agent signature} declarations\index{signature}\index{declaration}. Agents of type \ttt{C} have 2 sites \ttt{x1} and \ttt{x2} whose internal state may be \ttt{u}(nphosphorylated) or \ttt{p}(hosphorylated). Recall that the default state of these sites is \ttt{u} (the first one). Line 8, rule \ttt{\textquotesingle ab.c\textquotesingle } binds an \ttt{A} connected to someone on site \ttt{x} (link type \ttt{!\_}) to a \ttt{C}. Note that the only rule that binds an agent to \ttt{x} of \ttt{A} is \ttt{\textquotesingle a.b\textquotesingle } at line 6. Hence the use of \ttt{!\_} is a commodity and the rule could be replaced by 
 \ITE{
 \item[]\ttt{\textquotesingle alt\_ab.c\textquotesingle  A(x!1,c),B(x!1),C(x1\int u) $\rar\dots$}
 }
@@ -615,7 +615,7 @@ It is possible to use variables\index{variable} of the model as precondition for
 
 \subsection{"One shot" perturbation}
 
- With a "one shot"  perturbation\index{perturbation ! "one shot" perturbation} one may  introduce or delete new agents in the system, or require a snapshot of the current mixture in order to visualize or reuse it for further simulaiton. These perturbations are obtained using the declaration \index{declaration}:
+ With a "one shot"  perturbation\index{perturbation ! "one shot" perturbation} one may  introduce or delete new agents in the system, or require a snapshot of the current mixture\index{mixture} in order to visualize or reuse it for further simulaiton. These perturbations are obtained using the declaration \index{declaration}:
 \ITE{
 \item[] \ttt{\%mod:} \textit{boolean\_expression} \ttt{do} \textit{effect} \textit{end\_expression}
 }
@@ -635,7 +635,7 @@ where \textit{boolean\_expression}, \textit{effect}\index{effect} and \textit{en
     && | \tcb{\$SNAPSHOT} | \tcb{\$STOP} \\\\
     \textit{end\_expression} &::=& $\varepsilon$ | \tcb{until} \textit{boolean\_expression}
     \end{tabular}
-  \caption{Perturbation expressions. The operator \ttt{rel} can be any usual binary relation in $\set{<,=,>}$ and algebraic expressions are built using table~\ref{tab:operators}.}
+  \caption{Perturbation expressions. The operator \ttt{rel} can be any usual binary relation in $\set{<,=,>}$ and algebraic expressions\index{algebraic expression} are built using table~\ref{tab:operators}.}
   \label{tab:pert}
 \end{table}
 %%
@@ -645,13 +645,13 @@ The boolean expression is used as a \textit{precondition}\index{precondition} th
 }
 to indicate she wishes to trigger a perturbation whenever the simulation time has passed 10 time units and the ratio of variables \ttt{v1} over \ttt{v2} is above 1. Note that the perturbations are by default "one shot" interventions in the simulation. Once the precondition is satisfied, the perturbation is applied and discarded. It is possible to ask the perturbation to be re-enabled several times using using the \ttt{until} keyword (see below), in this case, note that the precondition will be tested again.
 
-One shot \emph{effects}\index{effect} are triggered using instructions starting with the \ttt{\$} symbol. One may add new agents to the mixture (\ttt{\$ADD}), delete some agents from the mixture (\ttt{\$DEL}), take a snapshot of the mixture in order to observe it or re-use it as a new initial state (\ttt{\$SNAPSHOT} or \ttt{\$STOP}).
+One shot \emph{effects}\index{effect} are triggered using instructions starting with the \ttt{\$} symbol. One may add new agents to the mixture\index{mixture} (\ttt{\$ADD}), delete some agents from the mixture\index{mixture} (\ttt{\$DEL}), take a snapshot of the mixture\index{mixture} in order to observe it or re-use it as a new initial state (\ttt{\$SNAPSHOT} or \ttt{\$STOP}).
 
 As said, the \textit{end\_expression} enables modelers to re-apply the one shot perturbation at every furture events and until a condition is reached. For instance:
 \ttt{\ITE{
 \item[] \%mod: ([E+] [mod] 100)=0 do \$DEL  [inf] C until [T]>1000
 }}
-will delete every \ttt{C} from the mixture every 100 (productive) events until the simulation clock has passed 1000 t.u. If no \ttt{until} keyword is positioned, the perturbation will be discarded after its first application.
+will delete every \ttt{C} from the mixture\index{mixture} every 100 (productive) events until the simulation clock has passed 1000 t.u. If no \ttt{until} keyword is positioned, the perturbation will be discarded after its first application.
 
 \subsection*{Example -- adding or deleting agents during a simulation}
 
@@ -663,9 +663,9 @@ will add $n\geq 0$ instances of \ttt{C} with \ttt{x1} already in state \ttt{p} (
 \ttt{\ITE{
 \item[] \$DEL  [inf] B(x!\_)
 }}
-will remove \emph{all} \ttt{B}s connected to some agent from the mixture. 
+will remove \emph{all} \ttt{B}s connected to some agent from the mixture\index{mixture}. 
 
-There are various ways one can use perturbations to study more deeply a given kappa model. A basic illustration is the use of a simple perturbation to let a system equilibrate before starting a real simulation. For instance, as can be seen from the curve given in Fig.~\ref{fig:abc}, the number of AB complexes is arbitrarily set to 0 in the initial state (all \ttt{A}s are disconnected from \ttt{B}s in the initial mixture). In order to avoid this, one can modify the kappa file the following way: we set the initial concentration of \ttt{C} to 0 by deleting line 22. Now we introduce \ttt{C}s after 25 t.u by perturbation:
+There are various ways one can use perturbations to study more deeply a given kappa model. A basic illustration is the use of a simple perturbation to let a system equilibrate before starting a real simulation. For instance, as can be seen from the curve given in Fig.~\ref{fig:abc}, the number of AB complexes is arbitrarily set to 0 in the initial state (all \ttt{A}s are disconnected from \ttt{B}s in the initial mixture\index{mixture}). In order to avoid this, one can modify the kappa file the following way: we set the initial concentration of \ttt{C} to 0 by deleting line 22. Now we introduce \ttt{C}s after 25 t.u by perturbation:
 \ttt{\ITE{
 \item[] \%mod:  [T]>25 do \$ADD 10000 C 
 }}
@@ -686,27 +686,27 @@ one obtains the curve given in Fig.~\ref{fig:abc2}
 
 \subsection*{Example -- using snapshots to define a new initial state} 
 
-In the previous example, we let the system evolve for some time without its main reactant \ttt{C} in order to let other reactants go to a less arbitrary initial state. One may object that this way of proceeding is CPU-time consuming if one has to do this at each simulation. An alternative is to use the \ttt{\$SNAPSHOT} primitive that allows a user to export a snapshot of the mixture at a given time point as a new (piece of) kappa file.
-For instance, the declaration:
+In the previous example, we let the system evolve for some time without its main reactant \ttt{C} in order to let other reactants go to a less arbitrary initial state. One may object that this way of proceeding is CPU-time consuming if one has to do this at each simulation. An alternative is to use the \ttt{\$SNAPSHOT} primitive that allows a user to export a snapshot of the mixture\index{mixture} at a given time point as a new (piece of) kappa file.
+For instance, the declaration\index{declaration}:
 \ttt{\ITE{
 \item[] \%mod:  [E-]/[E]>0.9 do \$SNAPSHOT \textquotedbl prefix\textquotedbl
 }}
 
-will ask \KaSim~to export the mixture the first time the percentage of null events reaches 90\%. The exported file will be named \ttt{prefix\_$n$.ka} where $n$ is the event number at which the snapshot was taken. Note that one may omit to define a prefix and simply type:
+will ask \KaSim~to export the mixture\index{mixture} the first time the percentage of null events reaches 90\%. The exported file will be named \ttt{prefix\_$n$.ka} where $n$ is the event number at which the snapshot was taken. Note that one may omit to define a prefix and simply type:
 \ttt{\ITE{
 \item[] \%mod:  [E-]/[E]>0.9 do \$SNAPSHOT
 }}
 in which case the default prefix \ttt{snap} will be used for naming snapshots.
 
 Note that if the name already exists a counter will be appended at the end of the file to prevent overwriting.
-Note that snapshots can be performed multiple times, for instance every 1000 events, using the declaration:
+Note that snapshots can be performed multiple times, for instance every 1000 events, using the declaration\index{declaration}:
 \ttt{\ITE{
 \item[] \%mod:  ([E+] [mod] 1000)=0 do \$SNAPSHOT \textquotedbl abc\textquotedbl~until [false] 
 }}
-which results in \KaSim~producing a snapshot every 1000 (productive) events until the simulation ends. The perturbation \ttt{\$STOP "final\_state"} will terminate the simulation whenever its precondition is satisfied and produce a snapshot of the last mixture. Note that instead of producing kappa files, one may use snapshot perturbations to produce an image of the mixture in the dot format using the parameter \ttt{"dotSnapshots"} (see Section~\ref{sec:param}).
+which results in \KaSim~producing a snapshot every 1000 (productive) events until the simulation ends. The perturbation \ttt{\$STOP "final\_state"} will terminate the simulation whenever its precondition is satisfied and produce a snapshot of the last mixture\index{mixture}. Note that instead of producing kappa files, one may use snapshot perturbations to produce an image of the mixture\index{mixture} in the dot format using the parameter \ttt{"dotSnapshots"} (see Section~\ref{sec:param}).
 
 \subsection*{Example -- changing the value of a token}
-The concentration of any token can be reset on the fly using a perturbation. For instance the declaration:
+The concentration of any token can be reset on the fly using a perturbation. For instance the declaration\index{declaration}:
 \ttt{\ITE{
 \item [] \%mod: |a| < 100 do a <- |a|*2 until [false] 
 }}
@@ -748,7 +748,7 @@ In our ABC example, adding the instruction:
 \end{center}
 \end{figure}
 
-Note that causal flow\index{causality} can show or hide more causal dependencies using various compression techniques that can be enabled as a simulation parameter (see Section~\ref{sec:param}). Causality analysis of the observable \ttt{Cpp} can be turned off at any time using a declaration of the form:
+Note that causal flow\index{causality} can show or hide more causal dependencies using various compression techniques that can be enabled as a simulation parameter (see Section~\ref{sec:param}). Causality analysis of the observable \ttt{Cpp} can be turned off at any time using a declaration\index{declaration} of the form:
 \ttt{\ITE{
 \item[] \%mod:  [T]>25 set \$TRACK \textquotesingle Cpp\textquotesingle  [false]  
 }}
@@ -764,21 +764,21 @@ Note that causal flow\index{causality} can show or hide more causal dependencies
    \label{fig:flux}
 \end{figure}
 %%
-The \emph{flux map}\index{flux map} is a powerful observation that tracks, on the fly, the influence that rule applications have on each others. It is dynamically generated and tracks effective impacts (positive or negative) a every rule application. The flux map can be computed using declarations of the form:
+The \emph{flux map}\index{flux map} is a powerful observation that tracks, on the fly, the influence that rule applications have on each others. It is dynamically generated and tracks effective impacts (positive or negative) a every rule application. The flux map can be computed using declaration\index{declaration}s of the form:
 \ttt{\ITE{
 \item [] \%mod: [true] set \$FLUX "flux.dot" [true]
 \item [] \%mod: [T]>20 set \$FLUX "flux.dot" [false]
 }}
-The resulting \emph{flux map} is a graph where a positive edge between rules $r$ and $s$ (in green) indicates an overall positive contribution of $r$ over $s$. Said otherwise, the sum of $r$ applications increased the activity\index{activity} of $s$. Conversely, a negative edge (in red) will indicate that $r$ had an overall negative impact on the activity\index{activity} of $s$. Note that visualization software permitting the importance of the flux between two rules can be observed by looking at the label on the edges that indicate the overall activity transfer (positive or negative) between the rules. The above declaration produce a flux map that is shown Fig.~\ref{fig:flux}. Note that flux may vary during time, therefore the time or event limit of the simulation is of importance and will likely change the aspect of the produced map.
+The resulting \emph{flux map} is a graph where a positive edge between rules $r$ and $s$ (in green) indicates an overall positive contribution of $r$ over $s$. Said otherwise, the sum of $r$ applications increased the activity\index{activity} of $s$. Conversely, a negative edge (in red) will indicate that $r$ had an overall negative impact on the activity\index{activity} of $s$. Note that visualization software permitting the importance of the flux between two rules can be observed by looking at the label on the edges that indicate the overall activity transfer (positive or negative) between the rules. The above declaration\index{declaration} produce a flux map that is shown Fig.~\ref{fig:flux}. Note that flux may vary during time, therefore the time or event limit of the simulation is of importance and will likely change the aspect of the produced map.
 
 
 \subsection*{Example -- updating kinetic rates on the fly}
 
-Any variable between simple quotes can be updated during a simulation using a declaration of the form:
+Any variable between simple quotes can be updated during a simulation using a declaration\index{declaration} of the form:
 \ttt{\ITE{
 \item [] \%mod: \var{Cpp}~> 500 set \$UPDATE \var{k\_on} 0.0
 }}
-This perturbation will be applied whenever the observable \ttt{\var{Cpp}} will become greater than 500. Its effect will be to set the on rate of all binding rules to 0. Note that according to the grammar given Table~\ref{tab:perm}, one may use any algebraic expression expression as the new value of the variable. For instance:
+This perturbation will be applied whenever the observable \ttt{\var{Cpp}} will become greater than 500. Its effect will be to set the on rate of all binding rules to 0. Note that according to the grammar given Table~\ref{tab:perm}, one may use any algebraic expression\index{algebraic expression} as the new value of the variable. For instance:
 \ttt{\ITE{
 \item [] \%mod: \var{Cpp}~> 500 set \$UPDATE \var{k\_on} \var{k\_on}/100
 }}
@@ -802,7 +802,7 @@ will count the number of \ttt{A}s whose site \ttt{x} is connected to a site \ttt
 
 
 \section{Implicit signature}
-\KaSim~permits users in a hurry to avoid writing agent signatures explicitly using the option \ttt{-\,-implicit-signature} of the command line. The signature is then deduced using information gathered in the KF. Note that it is not recommended to use the DCDW convention for introduced agents in conjunction with the \ttt{-\,-implicit-signature} option unless the default state of all sites is mentioned in the \ttt{\%init} declarations or in the rules that create agents. 
+\KaSim~permits users in a hurry to avoid writing agent signatures explicitly using the option \ttt{-\,-implicit-signature} of the command line. The signature is then deduced using information gathered in the KF\index{kappa file}. Note that it is not recommended to use the DCDW convention for introduced agents in conjunction with the \ttt{-\,-implicit-signature} option unless the default state of all sites is mentioned in the \ttt{\%init} declaration\index{declaration}s or in the rules that create agents. 
 
 \section{Simulation packages}
 
@@ -818,7 +818,7 @@ Note that this simulation is now run for $k$ time units instead of $n$. Importan
 
 \section{Simulation parameters configuration}\label{sec:param}
 
-In the KF (usually in a dedicated file) one may use expressions of the form:
+In the KF\index{kappa file} (usually in a dedicated file) one may use expressions of the form:
 \[
 \hbox{\ttt{\%def: "}\textit{parameter\_name}\ttt{" "}\textit{parameter\_value}\ttt{"}}
 \]
@@ -883,15 +883,15 @@ Make sure that perturbation\textquotesingle s precondition can be satisfied by \
 Null events\index{null event} is a way for \KaSim~to compensate for some over approximation it is doing, in order deal with large simulations more efficiently. They do not impact significantly the performances of the simulator. The ratio $r$ of null event over productive ones (that you can track using the observable \ttt{\%obs: \textquotesingle r\textquotesingle   [E-]/[E+]} should tend to 0 when models have a lot of agents.
 
 \section*{No data points are generated}
-Make sure you have \ttt{\%obs} or \ttt{\%plot} instructions in your KF. Also make sure to use the \ttt{-p} option in the command line to tell KaSim how many points you wish to have on your curves. 
+Make sure you have \ttt{\%obs} or \ttt{\%plot} instructions in your KF\index{kappa file}. Also make sure to use the \ttt{-p} option in the command line to tell KaSim how many points you wish to have on your curves. 
 
 \section*{Too many instances of an observable}
-The value of a kappa expression $E$  is equal to the number of embeddings\index{embedding} it has in the current mixture $M$. Embeddings are maps from agents in $E$  to agents in $M$. If $E$ has symmetries then every permutation of $E$ will be counted as a new embedding. For instance let $E=$\ttt{A(x!1),A(x!1)} and let $M=$\ttt{A(x!1,y\int p),A(x!1,y\int u)}. \KaSim~will count two instances of $E$ in $M$: the one mapping the first \ttt{A} of $E$ to the first \ttt{A} of $M$ and the one mapping the first \ttt{A} of $E$ to the second \ttt{A} of $M$.
+The value of a kappa expression $E$  is equal to the number of embeddings\index{embedding} it has in the current mixture\index{mixture} $M$. Embeddings are maps from agents in $E$  to agents in $M$. If $E$ has symmetries then every permutation of $E$ will be counted as a new embedding. For instance let $E=$\ttt{A(x!1),A(x!1)} and let $M=$\ttt{A(x!1,y\int p),A(x!1,y\int u)}. \KaSim~will count two instances of $E$ in $M$: the one mapping the first \ttt{A} of $E$ to the first \ttt{A} of $M$ and the one mapping the first \ttt{A} of $E$ to the second \ttt{A} of $M$.
  
 \section*{The computed influence map is incorrect, it misses some activation or has to much of them}
 The influence map\index{influence map} contains relations that are computed on side effect free rules only. It is likely that a missing activation is due to a side effect that is not taken into account. If the influence map shows an activation between rule $r$ and $s$ that is never possible, just remember that activation computation implies that \emph{there exists} a context in which applying rule $r$ will create a new instance of rule $s$. It does not mean that \emph{all} applications of $r$ will do so.
 
-\section*{Value \ttt{nan} in the data file at the end of the simulation}
+\section*{Value \ttt{nan} in the data file\index{data file} at the end of the simulation}
 The value \ttt{nan} means "Not a Number". It is generated when a plotted variable is infinite. Make sure this variable is not divided by zero at some point.
 
 \bibliographystyle{plain}
