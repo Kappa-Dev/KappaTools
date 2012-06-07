@@ -330,3 +330,20 @@ module Palette:
 	  let _ =  flush stdout in  
           (true,counter,counter+1)
             
+type 'a simulation_info = (* type of data to be given with obersables for story compression (such as date when the obs is triggered*)
+    {
+      story_id: int ; 
+      story_time: float ;
+      story_event: int ;
+      profiling_info: 'a; 
+    }
+
+let update_profiling_info a info = 
+  { 
+    story_id = info.story_id ;
+    story_time = info.story_time ;
+    story_event = info.story_event ;
+    profiling_info = a}
+
+let dump_simulation_info log info = 
+  Printf.fprintf log "Story: %i\nTime: %f\nEvent: %i\n" info.story_id info.story_time info.story_event 

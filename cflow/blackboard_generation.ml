@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 18/04/2012
+  * Last modification: 07/06/2012
   * * 
   * Some parameter references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -64,7 +64,7 @@ sig
   val n_predicates: (pre_blackboard -> CI.Po.K.H.error_channel * int) CI.Po.K.H.with_handler 
   val n_events_per_predicate: (pre_blackboard -> predicate_id -> CI.Po.K.H.error_channel * int) CI.Po.K.H.with_handler 
   val event_list_of_predicate: (pre_blackboard -> predicate_id -> CI.Po.K.H.error_channel * (int * int * predicate_value * predicate_value ) list) CI.Po.K.H.with_handler 
-  val mandatory_events: (pre_blackboard -> CI.Po.K.H.error_channel * ((int list) list)) CI.Po.K.H.with_handler 
+  val mandatory_events: (pre_blackboard -> CI.Po.K.H.error_channel * ((int list * unit Mods.simulation_info option) list)) CI.Po.K.H.with_handler 
   val get_pre_event: (pre_blackboard -> CI.Po.K.H.error_channel * CI.Po.K.refined_step A.t) CI.Po.K.H.with_handler 
   val get_side_effect: (pre_blackboard -> CI.Po.K.H.error_channel * CI.Po.K.side_effect A.t) CI.Po.K.H.with_handler 
   val get_fictitious_observable: (pre_blackboard -> CI.Po.K.H.error_channel * int option) CI.Po.K.H.with_handler 
@@ -154,7 +154,7 @@ module Preblackboard =
 	   predicate_id_list_related_to_predicate_id: PredicateidSet.t A.t; (** maps each wire id for the presence of an agent to the set of wires for its attibute (useful, when an agent get removed, all its attributes get undefined *)
            history_of_predicate_values_to_predicate_id: C.t A.t; (** 
                                                                      maps each wire to the set of its previous states, this summarize the potential state of a site that is freed, so as to overapproximate the set of potential side effects*)
-           pre_observable_list: step_id list list ;
+           pre_observable_list: (step_id list * unit Mods.simulation_info option) list ;
            pre_side_effect_of_event: CI.Po.K.side_effect A.t;
            pre_fictitious_observable: step_id option; (*id of the step that closes all the side-effect mutex *) 
            pre_profiling: CI.Po.K.P.log_info; (* profiling information *)
@@ -280,7 +280,7 @@ module Preblackboard =
        let _ = Printf.fprintf log "*\nObservables \n*\n" in
        let _ = 
          List.iter 
-           (fun l -> 
+           (fun (l,_) -> 
              let _ = List.iter (Printf.fprintf log "%i,") l in 
              let _ = Printf.fprintf log "\n" in 
              () 
@@ -868,7 +868,7 @@ module Preblackboard =
     let observable_list = 
       if CI.Po.K.is_obs_of_refined_step step 
       then 
-        [nsid]::blackboard.pre_observable_list 
+        ([nsid],CI.Po.K.simulation_info_of_refined_step step)::blackboard.pre_observable_list 
       else
         blackboard.pre_observable_list 
     in 
@@ -893,7 +893,7 @@ module Preblackboard =
           let nsid = blackboard.pre_nsteps + 1 in 
           let blackboard = profiling CI.Po.K.P.inc_n_side_events blackboard in 
           let observable_list = 
-            List.rev_map (fun x -> nsid::x) (List.rev blackboard.pre_observable_list) 
+            List.rev_map (fun (x,info) -> (nsid::x,info)) (List.rev blackboard.pre_observable_list) 
           in 
           let blackboard = 
             {

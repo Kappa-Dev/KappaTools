@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 19/10/2011
-  * Last modification: 25/04/2012
+  * Last modification: 07/06/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -19,8 +19,6 @@
   * under the terms of the GNU Library General Public License *)
 
 module D = Dag.Dag 
-(* = Generic_branch_and_cut_solver.Solver *)
-
 
 let log_step = true
 let debug_mode = false
@@ -51,12 +49,12 @@ let weak_compression env state log_info step_list =
     && (not weak_compression_on)  
     && (not strong_compression_on)
   then 
-    ()
+    []
   else
     begin 
       if D.S.PH.B.PB.CI.Po.K.no_obs_found step_list 
       then 
-        let _ = Debug.tag "+ No story found" in () 
+        let _ = Debug.tag "+ No story found" in []
       else 
         begin 
           let _ = 
@@ -194,9 +192,9 @@ let weak_compression env state log_info step_list =
             then Mods.tick_stories n_stories (false,0,0) 
             else (false,0,0)
           in 
-          let error,_,_ = 
+          let error,_,_,_,story_array = 
             List.fold_left 
-              (fun (error,counter,tick) (list_order,list_eid) -> 
+              (fun (error,counter,tick,blackboard,story_array) (list_order,list_eid,info) -> 
                 let _ = 
                   if debug_mode
                   then 
@@ -225,47 +223,82 @@ let weak_compression env state log_info step_list =
                   else 
                     error
                 in 
-                let error = 
+                let error,story_array = 
                   if D.S.PH.B.is_failed output 
-                  then error
+                  then error,story_array
                   else
-                    let _ = 
-                      if weak_compression_on
-                      then 
-                        let error,list = D.S.PH.B.translate_blackboard parameter handler error blackboard in 
-                        let grid = D.S.PH.B.PB.CI.Po.K.build_grid list false handler in
-                        let blackboard = D.S.PH.B.set_profiling_info (D.S.PH.B.PB.CI.Po.K.P.set_grid_generation) blackboard in 
-                        let error,dag = D.graph_of_grid parameter handler error grid in 
-                        (*let _ = D.print_graph parameter handler error dag in *)
-		        let error,canonic = D.canonicalize parameter handler error dag in 
-                        (*let _ = D.print_canonical_form parameter handler error canonic in *)
-                        let blackboard = D.S.PH.B.set_profiling_info (D.S.PH.B.PB.CI.Po.K.P.set_canonicalisation) blackboard in 
-                        let filename_comp = (Filename.chop_suffix !Parameter.cflowFileName ".dot") ^"_"^(string_of_int counter)^"weak_comp"^".dot" in 
-                        let _ = 
-                          Causal.dot_of_grid 
-                            (fun log -> 
-                              let _ = D.S.PH.B.print_complete_log log blackboard in 
-                              let _ = Printf.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_profiling "\nCompression of the %s story:\n\n" (th_of_int counter) in 
-                              let _ = D.S.PH.B.print_complete_log parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_profiling blackboard in ()) filename_comp grid state env in
-                        () 
-                    in 
-                    let _ = 
-                      match result_wo_compression 
-                      with 
-                        | None -> () 
-                        | Some result_wo_compression -> 
-                          let filename =  (Filename.chop_suffix !Parameter.cflowFileName ".dot")^"_"^(string_of_int counter)^".dot"
-		          in
-                          let grid = D.S.PH.B.PB.CI.Po.K.build_grid result_wo_compression true handler in 
-                          let _ = Causal.dot_of_grid (fun _ -> ()) filename grid state env in
-                          ()
-                    in 
-                    let error,blackboard = D.S.PH.B.reset_init parameter handler error blackboard in 
-                    error
+                    if weak_compression_on
+                    then 
+                      let error,list = D.S.PH.B.translate_blackboard parameter handler error blackboard in 
+                      let grid = D.S.PH.B.PB.CI.Po.K.build_grid list false handler in
+                      let blackboard = D.S.PH.B.set_profiling_info (D.S.PH.B.PB.CI.Po.K.P.set_grid_generation) blackboard in 
+                      let error,dag = D.graph_of_grid parameter handler error grid in 
+                      let error,canonic = D.canonicalize parameter handler error dag in 
+                      let blackboard = D.S.PH.B.set_profiling_info (D.S.PH.B.PB.CI.Po.K.P.set_canonicalisation) blackboard in 
+                      let info = 
+                        match info 
+                        with 
+                          | None -> None 
+                          | Some info -> 
+                            let info = 
+                              {info with Mods.story_id = counter }
+                            in 
+                            let info = Mods.update_profiling_info (D.S.PH.B.get_profiling_info blackboard) info 
+                            in 
+                            Some info 
+                      in 
+                      error,(canonic,(grid,tick,info))::story_array 
+                    else 
+                      error,story_array
                 in 
+                let _ = 
+                  match result_wo_compression 
+                  with 
+                    | None -> () 
+                    | Some result_wo_compression -> 
+                      let filename =  (Filename.chop_suffix !Parameter.cflowFileName ".dot")^"_"^(string_of_int counter)^".dot"
+		      in
+                      let grid = D.S.PH.B.PB.CI.Po.K.build_grid result_wo_compression true handler in 
+                      let _ = Causal.dot_of_grid (fun _ -> ()) filename grid state env in
+                      ()
+                in 
+                let error,blackboard = D.S.PH.B.reset_init parameter handler error blackboard in 
                 let tick = Mods.tick_stories n_stories tick in 
-                error,counter+1,tick)
-              (error,1,tick) list 
+                error,counter+1,tick,blackboard,story_array)
+              (error,1,tick,blackboard,[]) (List.rev list) 
+          in 
+          let error,story_array = D.hash_list parameter handler error (List.rev story_array) in 
+          let _ = 
+            List.fold_left 
+              (fun counter (canonic,list) -> 
+                match list 
+                with 
+                  | [] -> counter 
+                  |(grid,_,simulation_info)::_ -> 
+                    let filename_comp = (Filename.chop_suffix !Parameter.cflowFileName ".dot") ^"_"^(string_of_int counter)^"weak_comp"^".dot" in 
+                    let _ = 
+                      Causal.dot_of_grid 
+                        (fun log -> 
+                          List.iter 
+                            (fun (grid,_,simulation_info) -> 
+                              match simulation_info 
+                              with 
+                                | None -> ()
+                                | Some simulation_info -> 
+                                  let log_info = simulation_info.Mods.profiling_info in 
+                                  let blackboard = D.S.PH.B.set_profiling_info (fun _ -> log_info) blackboard in  
+                                  let _ = Printf.fprintf log "/*\n" in 
+                                  let _ = Mods.dump_simulation_info log simulation_info in 
+                                  let _ = Printf.fprintf log "\*\n" in 
+                                  let _ = D.S.PH.B.print_complete_log log blackboard in 
+                                  let _ = Printf.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_profiling "\nCompression of the %s story:\n\n" (th_of_int counter) in 
+                                  let _ = D.S.PH.B.print_complete_log parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_profiling blackboard in 
+                                  ())
+                            list 
+                        )
+                    filename_comp grid state env in
+                counter+1)
+              1 story_array 
           in 
           let _ = close_out parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_profiling in 
           let _ = 
@@ -273,6 +306,6 @@ let weak_compression env state log_info step_list =
               (D.S.PH.B.PB.CI.Po.K.H.dump_error parameter handler error)
               error
           in 
-          ()
+          story_array
         end 
     end 
