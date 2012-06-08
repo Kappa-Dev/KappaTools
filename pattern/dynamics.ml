@@ -490,6 +490,7 @@ let rec superpose todo_list lhs rhs map already_done added codomain env =
 	match todo_list with
 		| [] -> map
 		| (lhs_id,rhs_id)::tl ->
+			let map = IntMap.add lhs_id rhs_id map in (*attempt to map lhs_id to rhs_id*)
 			let lhs_ag = Mixture.agent_of_id lhs_id lhs
 			and rhs_ag = Mixture.agent_of_id rhs_id rhs 
 			in
@@ -555,7 +556,7 @@ let rec superpose todo_list lhs rhs map already_done added codomain env =
 												| _ -> raise False
 					) lhs_ag (tl,already_done)
 				in
-					superpose todo_list lhs rhs (IntMap.add lhs_id rhs_id map) already_done added (IntSet.add rhs_id codomain) env
+					superpose todo_list lhs rhs map (*IntMap.add lhs_id rhs_id map*) already_done added (IntSet.add rhs_id codomain) env
 
 let enable r mix env =
 	
@@ -599,8 +600,18 @@ let enable r mix env =
 										| Some (i,j) -> 
 											if Int2Set.mem (i,j) already_done then (glueings,already_done) 
 											else
-												let already_done = IntMap.fold (fun i j set -> Int2Set.add (i,j) set) map already_done in
-												(map::glueings,already_done) 
+												try
+												let already_done,_ = 
+													IntMap.fold 
+													(fun i j (set,comap) -> 
+														let opt = try Some (IntMap.find j comap) with Not_found -> None in 
+  													match opt with
+  														| None -> (Int2Set.add (i,j) set, IntMap.add j i comap)
+  														| Some i' -> if i=i' then (Int2Set.add (i,j) set,comap) else (if !Parameter.debugModeOn then Debug.tag "Glueing is not injective, discarding" ; raise False) 
+													) map (already_done,IntMap.empty) 
+												in
+													(map::glueings,already_done)
+												with False -> (glueings,already_done) 
 								end
 							| None -> (glueings,already_done)
 				else (glueings,already_done)

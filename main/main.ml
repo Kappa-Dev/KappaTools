@@ -65,8 +65,7 @@ let main =
 			List.iter (fun fic -> let _ = KappaLexer.compile fic in ()) !Parameter.inputKappaFileNames ;
 			!Ast.result
 		in
-				
-		
+						
 		let (_: unit) =
 			match !Parameter.seedValue with
 			| Some seed -> Random.init seed
