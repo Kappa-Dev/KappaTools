@@ -56,11 +56,27 @@ type rule = {
 	rhs:mixture; 
 	add_token: (alg_expr * (string * Tools.pos)) list ; 
 	k_def:alg_expr ; 
-	k_un:alg_expr option
+	k_un:alg_expr option ;
+	k_op: alg_expr option ; (*rate for backward rule*)
 	}
 	
-and arrow = RAR of Tools.pos 
+and arrow = RAR of Tools.pos | LRAR of Tools.pos
 type rule_label = {lbl_nme:(string * Tools.pos) option ; lbl_ref:(string * Tools.pos) option}
+
+let flip (rule_label,rule) = 
+	let lbl = match rule_label.lbl_nme with None -> None | Some (str,pos) -> Some (str^"_op",pos)
+	and rule = 
+		{rule with 
+			lhs = rule.rhs ; 
+			rhs = rule.lhs ; 
+			add_token = rule.rm_token ; 
+			rm_token = rule.add_token ; 
+			k_def = (match rule.k_op with None -> (FLOAT (0.,Tools.no_pos)) | Some k -> k) ;
+			k_op = None
+			}
+	in 
+	({rule_label with lbl_nme=lbl},rule)
+		
 
 type perturbation = bool_expr * modif_expr * Tools.pos * bool_expr option
 and modif_expr = 

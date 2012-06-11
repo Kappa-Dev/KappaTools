@@ -443,7 +443,8 @@ let token_of_ast abs_tk env =
 	let (name, pos) = abs_tk in
 	Environment.declare_token name pos env
 	
-let rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state = (*TODO take into account no_poly*)
+let rule_of_ast ?(backwards=false) env (ast_rule_label, ast_rule) tolerate_new_state = 
+	let ast_rule_label,ast_rule = if backwards then Ast.flip (ast_rule_label, ast_rule) else (ast_rule_label, ast_rule) in
 	let (env, lhs_id) =
 		Environment.declare_var_kappa ~from_rule:true ast_rule_label.lbl_nme env in
 	(* reserving an id for rule's lhs in the pattern table *)
@@ -658,8 +659,15 @@ let rules_of_result env res tolerate_new_state =
 	let (env, l) =
 		List.fold_left
 			(fun (env, cont) (ast_rule_label, ast_rule) ->
-						let (env, r) = rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state
-						in (env, (r :: cont)))
+					let (env, r) = rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state
+					in
+					match ast_rule.Ast.k_op with
+						| None -> (env,r::cont)
+						| Some k -> 
+							let (env,back_r) = rule_of_ast ~backwards:true env (ast_rule_label, ast_rule) tolerate_new_state
+							in
+							(env,back_r::(r::cont))
+			)
 			(env, []) res.Ast.rules
 	in (env, (List.rev l))
 
