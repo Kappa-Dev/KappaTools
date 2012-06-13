@@ -5,7 +5,7 @@
 %token AT OP_PAR CL_PAR COMMA DOT TYPE_TOK LAR
 %token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE DO UNTIL TRUE FALSE OBS KAPPA_RAR TRACK CPUTIME CONFIG REPEAT
 %token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INFINITY TIME EVENT NULL_EVENT PROD_EVENT INIT LET DIV PLOT SINUS COSINUS TAN SQRT EXPONENT POW ABS MODULO 
-%token <Tools.pos> EMAX TMAX FLUX ASSIGN ASSIGN2 TOKEN KAPPA_LNK PIPE 
+%token <Tools.pos> EMAX TMAX FLUX ASSIGN ASSIGN2 TOKEN KAPPA_LNK PIPE KAPPA_LRAR
 %token <int*Tools.pos> INT 
 %token <string*Tools.pos> ID LABEL KAPPA_MRK  
 %token <float*Tools.pos> FLOAT 
@@ -231,21 +231,28 @@ mixture:
 
 rule_expression:
 | rule_label lhs_rhs arrow lhs_rhs AT rate 
-	{ let pos = match $3 with Ast.RAR pos -> pos in
-		let (k2,k1) = $6 in
+	{ let pos = match $3 with Ast.RAR pos | Ast.LRAR pos -> pos in
+		let (k2,k1,kback) = $6 in
+		let _ =
+			match (kback,$3) with
+				| (None,Ast.LRAR pos) | (Some _,Ast.RAR pos) -> raise (ExceptionDefn.Syntax_Error (Some pos,"Malformed bi-directional rule expression"))
+				| _ -> ()
+		in
 		let lhs,token_l = $2 and rhs,token_r = $4 in 
-		($1,{Ast.rule_pos = pos ; Ast.lhs=lhs; Ast.rm_token = token_l ; Ast.arrow=$3; Ast.rhs=rhs; Ast.add_token = token_r; Ast.k_def=k2; Ast.k_un=k1})
+		($1,{Ast.rule_pos = pos ; Ast.lhs=lhs; Ast.rm_token = token_l ; Ast.arrow=$3; Ast.rhs=rhs; Ast.add_token = token_r; Ast.k_def=k2; Ast.k_un=k1; Ast.k_op=kback})
 	}
 | rule_label lhs_rhs arrow lhs_rhs 
-	{let pos = match $3 with Ast.RAR pos -> pos in
+	{let pos = match $3 with Ast.RAR pos | Ast.LRAR pos -> pos in
 	let lhs,token_l = $2 and rhs,token_r = $4 in 
 		ExceptionDefn.warning ~with_pos:pos "Rule has no kinetics. Default rate of 0.0 is assumed." ; 
-		($1,{Ast.rule_pos = pos ; Ast.lhs=lhs; Ast.rm_token = token_l; Ast.arrow=$3; Ast.rhs=rhs; Ast.add_token = token_r; Ast.k_def=(Ast.FLOAT (0.0,Tools.no_pos)); Ast.k_un=None})}
+		($1,{Ast.rule_pos = pos ; Ast.lhs=lhs; Ast.rm_token = token_l; Ast.arrow=$3; Ast.rhs=rhs; Ast.add_token = token_r; Ast.k_def=(Ast.FLOAT (0.0,Tools.no_pos)); Ast.k_un=None ;Ast.k_op=None})}
 ;
 
 arrow:
 | KAPPA_RAR 
 	{Ast.RAR $1}
+| KAPPA_LRAR
+	{Ast.LRAR $1}
 ;
 
 constant:
@@ -315,9 +322,11 @@ alg_expr:
 
 rate:
 | alg_expr OP_PAR alg_expr CL_PAR 
-	{($1,Some $3)}
+	{($1,Some $3,None)}
 | alg_expr 
-	{($1,None)}
+	{($1,None,None)}
+| alg_expr COMMA alg_expr 
+	{($1,None,Some $3)}
 ;
 
 multiple_mixture:
