@@ -3,7 +3,7 @@
 
 %token EOF NEWLINE 
 %token AT OP_PAR CL_PAR COMMA DOT TYPE_TOK LAR
-%token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE SET DO UNTIL TRUE FALSE OBS KAPPA_RAR TRACK CPUTIME CONFIG
+%token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE DO UNTIL TRUE FALSE OBS KAPPA_RAR TRACK CPUTIME CONFIG REPEAT
 %token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INFINITY TIME EVENT NULL_EVENT PROD_EVENT INIT LET DIV PLOT SINUS COSINUS TAN SQRT EXPONENT POW ABS MODULO 
 %token <Tools.pos> EMAX TMAX FLUX ASSIGN ASSIGN2 TOKEN KAPPA_LNK PIPE 
 %token <int*Tools.pos> INT 
@@ -94,18 +94,33 @@ instruction:
 	{Ast.PLOT $2}
 | PLOT error 
 	{raise (ExceptionDefn.Syntax_Error (Some $1,"Malformed plot instruction, I was expecting an algebraic expression of variables"))}
-| PERT bool_expr DO one_shot_effect 
-	{Ast.PERT ($2,$4,$1,None)}
-| PERT bool_expr DO one_shot_effect UNTIL bool_expr
-	{Ast.PERT ($2,$4,$1,Some $6)}
+| PERT perturbation_declaration {let (bool_expr,mod_expr,pos) = $2 in Ast.PERT (bool_expr,mod_expr,pos,None)}
+| PERT REPEAT perturbation_declaration UNTIL bool_expr 
+	{let (bool_expr,mod_expr,pos) = $3 in 
+	 let _ = 
+		match mod_expr with 
+			| (Ast.CFLOW _ | Ast.CFLOWOFF _ | Ast.FLUX _ | Ast.FLUXOFF _) -> (ExceptionDefn.warning ~with_pos:$1 "Perturbation need not be applied repeatedly") 
+			| _ -> () 
+	 in
+		Ast.PERT (bool_expr,mod_expr,pos,Some $5)}
 | CONFIG FILENAME FILENAME 
 	{let param_name,pos_p = $2 and value,pos_v = $3 in Ast.CONFIG (param_name,pos_p,value,pos_v)} 
-| PERT bool_expr SET perm_effect
+
+/*| PERT bool_expr DO one_shot_effect 
 	{Ast.PERT ($2,$4,$1,None)}
+| PERT bool_expr DO one_shot_effect UNTIL bool_expr
+	{Ast.PERT ($2,$4,$1,Some $6)}*/
+/*| PERT bool_expr SET perm_effect
+	{Ast.PERT ($2,$4,$1,None)}*/
 ;
 
-perm_effect:
-| OP_PAR perm_effect CL_PAR {$2}
+perturbation_declaration:
+| OP_PAR perturbation_declaration CL_PAR {$2}
+| bool_expr DO effect {($1,$3,$2)}
+;
+
+effect:
+| OP_PAR effect CL_PAR {$2}
 | LABEL ASSIGN alg_expr /*updating the rate of a rule -backward compatibility*/
 	{let _ = ExceptionDefn.warning ~with_pos:$2 "Deprecated syntax, use $UPDATE perturbation instead of the ':=' assignment (see Manual)" in 
 	let lab,pos_lab = $1 in Ast.UPDATE (lab,pos_lab,$3,$2)}
@@ -115,7 +130,22 @@ perm_effect:
 	{let ast = if $3 then (fun x -> Ast.CFLOW x) else (fun x -> Ast.CFLOWOFF x) in let lab,pos_lab = $2 in ast (lab,pos_lab,$1)}
 | FLUX fic_label boolean 
 	{let ast = if $3 then (fun (x,y) -> Ast.FLUX (x,y)) else (fun (x,y) -> Ast.FLUXOFF (x,y)) in ast ($2,$1)}
+| INTRO multiple_mixture 
+	{let (alg,mix) = $2 in Ast.INTRO (alg,mix,$1)}
+| INTRO error
+	{raise (ExceptionDefn.Syntax_Error (Some $1, "Malformed perturbation instruction, I was expecting '$ADD alg_expression kappa_expression'"))}
+| DELETE multiple_mixture 
+	{let (alg,mix) = $2 in Ast.DELETE (alg,mix,$1)}
+| DELETE error
+	{raise (ExceptionDefn.Syntax_Error (Some $1,"Malformed perturbation instruction, I was expecting '$DEL alg_expression kappa_expression'"))}
+| ID LAR alg_expr /*updating the value of a token*/
+	{let lab,pos_lab = $1 in Ast.UPDATE_TOK (lab,pos_lab,$3,pos_lab)}
+| SNAPSHOT fic_label
+	{Ast.SNAPSHOT ($2,$1)}
+| STOP fic_label
+	{Ast.STOP ($2,$1)}
 ;
+
 
 boolean:
 | TRUE {true}
@@ -153,26 +183,6 @@ bool_expr:
 	{Ast.TRUE $1}
 | FALSE
 	{Ast.FALSE $1}
-;
-
-
-one_shot_effect:
-| OP_PAR one_shot_effect CL_PAR  
-	{$2}
-| INTRO multiple_mixture 
-	{let (alg,mix) = $2 in Ast.INTRO (alg,mix,$1)}
-| INTRO error
-	{raise (ExceptionDefn.Syntax_Error (Some $1, "Malformed perturbation instruction, I was expecting '$ADD alg_expression kappa_expression'"))}
-| DELETE multiple_mixture 
-	{let (alg,mix) = $2 in Ast.DELETE (alg,mix,$1)}
-| DELETE error
-	{raise (ExceptionDefn.Syntax_Error (Some $1,"Malformed perturbation instruction, I was expecting '$DEL alg_expression kappa_expression'"))}
-| ID LAR alg_expr /*updating the value of a token*/
-	{let lab,pos_lab = $1 in Ast.UPDATE_TOK (lab,pos_lab,$3,pos_lab)}
-| SNAPSHOT fic_label
-	{Ast.SNAPSHOT ($2,$1)}
-| STOP fic_label
-	{Ast.STOP ($2,$1)}
 ;
 
 fic_label:

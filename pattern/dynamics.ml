@@ -48,7 +48,7 @@ type rule = {
 
 let _INTERNAL_TESTED = 8
 let _INTERNAL_MODIF = 4
-let _LINK_TESTED = 2
+let _LINK_TESTED = 2 
 let _LINK_MODIF = 1
 
 
