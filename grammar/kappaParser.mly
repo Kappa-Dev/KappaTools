@@ -3,7 +3,7 @@
 
 %token EOF NEWLINE 
 %token AT OP_PAR CL_PAR COMMA DOT TYPE_TOK LAR
-%token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE DO UNTIL TRUE FALSE OBS KAPPA_RAR TRACK CPUTIME CONFIG REPEAT
+%token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE DO SET UNTIL TRUE FALSE OBS KAPPA_RAR TRACK CPUTIME CONFIG REPEAT
 %token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INFINITY TIME EVENT NULL_EVENT PROD_EVENT INIT LET DIV PLOT SINUS COSINUS TAN SQRT EXPONENT POW ABS MODULO 
 %token <Tools.pos> EMAX TMAX FLUX ASSIGN ASSIGN2 TOKEN KAPPA_LNK PIPE KAPPA_LRAR
 %token <int*Tools.pos> INT 
@@ -106,17 +106,14 @@ instruction:
 | CONFIG FILENAME FILENAME 
 	{let param_name,pos_p = $2 and value,pos_v = $3 in Ast.CONFIG (param_name,pos_p,value,pos_v)} 
 
-/*| PERT bool_expr DO one_shot_effect 
-	{Ast.PERT ($2,$4,$1,None)}
-| PERT bool_expr DO one_shot_effect UNTIL bool_expr
-	{Ast.PERT ($2,$4,$1,Some $6)}*/
-/*| PERT bool_expr SET perm_effect
-	{Ast.PERT ($2,$4,$1,None)}*/
+| PERT bool_expr DO effect UNTIL bool_expr /*for backward compatibility*/
+	{ExceptionDefn.warning ~with_pos:$1 "Deprecated perturbation syntax: use the 'repeat ... until' construction" ; Ast.PERT ($2,$4,$1,Some $6)}
 ;
 
 perturbation_declaration:
 | OP_PAR perturbation_declaration CL_PAR {$2}
 | bool_expr DO effect {($1,$3,$2)}
+| bool_expr SET effect {ExceptionDefn.warning ~with_pos:$2 "Deprecated perturbation syntax: 'set' keyword is replaced by 'do'" ; ($1,$3,$2)}
 ;
 
 effect:

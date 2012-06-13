@@ -34,7 +34,3 @@
       	([E+] [mod] 1000 = 0) do $ADD 100 C() \
       until [T]>25
 
-%mod: repeat \
-      [T] > 20 do $FLUX [true] \
-      until [false]
-
