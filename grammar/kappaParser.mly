@@ -113,7 +113,7 @@ instruction:
 perturbation_declaration:
 | OP_PAR perturbation_declaration CL_PAR {$2}
 | bool_expr DO effect {($1,$3,$2)}
-| bool_expr SET effect {ExceptionDefn.warning ~with_pos:$2 "Deprecated perturbation syntax: 'set' keyword is replaced by 'do'" ; ($1,$3,$2)}
+| bool_expr SET effect {ExceptionDefn.warning ~with_pos:$2 "Deprecated perturbation syntax: 'set' keyword is replaced by 'do'" ; ($1,$3,$2)} /*For backward compatibility*/
 ;
 
 effect:

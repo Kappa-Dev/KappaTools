@@ -93,7 +93,7 @@ Although this manual contains a self-contained description of Kappa, it is \emph
 
 
 \section{The \KaSim~engine}
-\KaSim~is an open source stochastic simulator of rule-based models~\cite{DanLan04,Dan_etal07a,Fae_etal05} written in the $\ka$-calculus. Basically \KaSim~takes one or several \hyperref[chap:kappa]{kappa files} as input and generates stochastic trajectories of various observables. \KaSim~implements Danos and Krivine's simulation algorithm~\cite{Dan_etal07b} which adapts Gillespie's algorithm~\cite{Gil76,Gil77} to rule-based models. 
+\KaSim~is an open source stochastic simulator of rule-based models~\cite{DanLan04,Dan_etal07a,Fae_etal05} written in Kappa. Basically \KaSim~takes one or several \hyperref[chap:kappa]{kappa files} as input and generates stochastic trajectories of various observables. \KaSim~implements Danos and Krivine's simulation algorithm~\cite{Dan_etal07b} which adapts Gillespie's algorithm~\cite{Gil76,Gil77} to rule-based models. 
 
 A \emph{simulation event}\index{event} corresponds to the application of a rewriting rule, contained in the kappa files, to the current graph\index{graph} (also called a \emph{mixture}\index{mixture}). The rule is selected according to its \emph{activity}\index{activity}, \ie the number of instances it has in the current mixture\index{mixture}, multiplied by its kinetic rate\index{kinetic rate}, and applied to one of its possible instances in the graph. It results in a new graph together with an updated activity\index{activity} for all rules (see Fig.~\ref{fig:event-loop}). Importantly, the cost of a simulation event is bounded by a constant that is independent of the size of the graph it is applied to~\cite{Dan_etal07b}. 
 
@@ -146,7 +146,7 @@ where \ttt{file\_i} are the input kappa files containing the rules, initial cond
 
 \section{Main options}
 
-Table~\ref{tab:options} summarizes the main options that are accessible through the command line. Options that expects an argument are preceded by a single dash, options that do not need any argument start with a double dash. Note that the option \ttt{-p} specifies the number of points that one wishes to have in the final plot. The interval at which these points will be taken is then computed using the simulation limit defined by the user using option \ttt{-t} or \ttt{-e}. For instance requiring a simulation of 100 points during 10 time units will result in a simulation where observables are recorded every 0.1 time units, while requiring 100 points for 1000 events will result in observable being written every 10 events (be careful that the event density, \ie the number of events per time unit, might vary during a simulation, and thus the two sampling methods can lead to very different repartitions of the moments at which observables are recorded even if they sepecify the same number of observations). 
+Table~\ref{tab:options} summarizes the main options that are accessible through the command line. Options that expects an argument are preceded by a single dash, options that do not need any argument start with a double dash. Note that the option \ttt{-p} specifies the number of points that one wishes to have in the final plot. The interval at which these points will be taken is then computed using the simulation limit defined by the user using option \ttt{-t} or \ttt{-e}. For instance requiring a simulation of 100 points during 10 time units will result in a simulation where observables are recorded every 0.1 time units, while requiring 100 points for 1000 events will result in observable being written every 10 events (be careful that the event density, \ie the number of events per time unit, might vary during a simulation, and thus the two sampling methods can lead to very different repartitions of the moments at which observables are recorded even if they specify the same number of observations). 
 
 \begin{table}[htdp]
 \caption{Command line: main options}
@@ -224,6 +224,7 @@ according to the grammar given Table~\ref{tab:sig} where terminal symbol are den
   \label{tab:sig}
 \end{table}
 %%
+
 For instance the line:
 \ITE{
 \item[] \ttt{\%agent: A(x,y\int u\int p,z\int 0\int 1\int 2) \# Signature of agent A} 
@@ -282,7 +283,7 @@ With the signature\index{agent signature} of \ttt{A} defined in the previous sec
 \ITE{
 \item[] \ttt{\textquotesingle A dimerization\textquotesingle~  A(x),A(y\int p)} $\rar$ \ttt{A(x!1),A(y\int p!1) @ $\ga$} 
 }
-denotes a dimerization rule between two instances of agent \ttt{A} provided the second is phosphorylated (say that is here the meaning of \ttt{p}) on site \ttt{y}. Note that the bond between both \ttt{A}s is denoted by the identifier \ttt{!1} which uses an arbitrary integer (\ttt{!0} would denote the same bond. In Kappa, a bond may connect exactly 2 sites so any occurrence of a bond identifier \ttt{!}$n$ has to be paired with exactly one other sibling in the expression. Note also the fact that site \ttt{z} of \ttt{A} is not mentioned in the expression which means that it has no influence on the triggering of this rule. This is the \emph{don't care don't write convention} (DCDW) \index{don't care don't write} that plays a key role in resisting combinatorial explosion when writing models.
+denotes a dimerization rule between two instances of agent \ttt{A} provided the second is phosphorylated (say that is here the meaning of \ttt{p}) on site \ttt{y}. Note that the bond between both \ttt{A}s is denoted by the identifier \ttt{!1} which uses an arbitrary integer (\ttt{!0} would denote the same bond). In Kappa, a bond may connect exactly 2 sites so any occurrence of a bond identifier \ttt{!}$n$ has to be paired with exactly one other sibling in the expression. Note also the fact that site \ttt{z} of \ttt{A} is not mentioned in the expression which means that it has no influence on the triggering of this rule. This is the \emph{don't care don't write convention} (DCDW) \index{don't care don't write} that plays a key role in resisting combinatorial explosion when writing models.
 
 \subsubsection*{Adding and deleting agents}
 Sticking with \ttt{A}'s signature\index{agent signature}, the rule
@@ -332,14 +333,15 @@ One may then use these tokens in conjunction with a classical rule using the hyb
 \ITE{
 \item[] \ttt{\var{hybrid rule}~ S(x\int u!1),K(y!1)\ |\ 1:atp $\rar$ S(x\int p),K(y)\ |\ 1:adp\ @ \var{k}} 
 }
-When applied, the above rule will consume one atp token and produce one adp token. Note that as specified by the grammar given Table~\ref{tab:patterns}, the number of consumed (and produced) tokens can be given by a sum of the form:
+When applied, the above rule will consume one \ttt{atp} token and produce one \ttt{adp} token. Note that as specified by the grammar given Table~\ref{tab:patterns}, the number of consumed (and produced) tokens can be given by a sum of the form:
 \ITE{
-\item[] \ttt{\textit{lhs} | a$_1$:t$_1$ + ... + a$_n$:t$_n$ $\rar$ \textit{rhs} | a$_1'$:t$_1'$ + ... + a$_k'$:t$_k'$} 
+\item[] \ttt{\textit{lhs} | a$_1$:t$_1$ + ... + a$_n$:t$_n$ $\rar$ \textit{rhs} | a$_1'$:t$_1'$ + ... + a$_k'$:t$_k'$ @ r} 
 }
-where each $a_i,a_i'$ is an arbitrary algebraic expression\index{algebraic expression} (see Table~\ref{tab:alg}) and each $t_i,t_i'$ is a declared token. In the above hybrid rule, calling $n_i,n_i'$  the evaluation of $a_i$ and $a_i'$, the concentration of token $t_i$ will decrease from $n_i$ and the concentration of token $t_i'$ will increase from $n_i'$. Importantly the activity\index{activity} of a hybrid rule will, by default, not take into account the concentration of the tokens in mentions. As we will see in the next section, it is however possible to make its rate explicitly depend on the concentrations of the tokens.
+where each $a_i,a_i'$ is an arbitrary algebraic expression\index{algebraic expression} (see Table~\ref{tab:alg}) and each $t_i,t_i'$ is a declared token. In the above hybrid rule, calling $n_i,n_i'$  the evaluation of $a_i$ and $a_i'$, the concentration of token $t_i$ will decrease from $n_i$ and the concentration of token $t_i'$ will increase from $n_i'$. Importantly the activity\index{activity} of a hybrid rule like the above one is still 
+defined by $\ttt{|\textit{lhs}|*r}$, where $\ttt{|\textit{lhs}|}$ is the number of embeddings of the lhs of the rule in the mixture, and does not take into account the concentration of the tokens it mentions. As we will see in the next section, it is however possible to make its rate explicitly depend on the concentrations of the tokens using a \imp{variable} rate.
 
 \subsection{Rates}\label{sec:kinetics}
-As said earlier, $\ka$ rules are equipped with one or two \emph{kinetic rate(s)}\index{kinetic rate}. A rate is a real number, or an algebraic expression\index{algebraic expression} evaluated as such, called the \emph{individual-based or stochastic rate constant}\index{kinetic rate!stochastic rate constant}, it is the rate at which the corresponding rule is applied per instance of the rule. Its dimension is the inverse of a time $[T^{-1}]$.
+As said earlier, Kappa rules are equipped with one or two \emph{kinetic rate(s)}\index{kinetic rate}. A rate is a real number, or an algebraic expression\index{algebraic expression} evaluated as such, called the \emph{individual-based or stochastic rate constant}\index{kinetic rate!stochastic rate constant}, it is the rate at which the corresponding rule is applied per instance of the rule. Its dimension is the inverse of a time $[T^{-1}]$.
 
 The stochastic rate is related to the \emph{concentration-based rate constant}\index{kinetic rate!deterministic rate constant} $k$ of the rule of interest by the following relation:
 %corrected by the volume $V$ in which the model is considered. 
@@ -408,7 +410,7 @@ receptor dissociation & $1.6\; 10^{-1}$ & $1.6\; 10^{-1}$ %& $s^{-1}$
 
 \subsection{Ambiguous molecularity}\label{sec:ambiguous}
 
-It is considered malpractice to use a $\ka$-rule of the form \ttt{A(x),B(y)$\rar \dots$ @ $\ga$} in a model where this rule could be applied in a context where \ttt{A} and \ttt{B} are sometimes already connected and sometimes disconnected. Indeed, this would lead to an inconsistency in the definition of the kinetic rate $\ga$ which should have a volume dependency in the former case and no volume dependency in the latter (see Section~\ref{sec:kinetics}). 
+It is considered malpractice to use a Kappa rule of the form \ttt{A(x),B(y)$\rar \dots$ @ $\ga$} in a model where this rule could be applied in a context where \ttt{A} and \ttt{B} are sometimes already connected and sometimes disconnected. Indeed, this would lead to an inconsistency in the definition of the kinetic rate $\ga$ which should have a volume dependency in the former case and no volume dependency in the latter (see Section~\ref{sec:kinetics}). 
 
 This sort of ambiguity should be resolved, if possible, by refining the ambiguous rule into cases that are either exclusively unary or binary. Each refinement having a kinetic rate that is consistent with its molecularity. Note that in practice, for models with a large number of agents, it is sufficient to assume that the rule \ttt{A(x),B(y)$\rar \dots$ @ $\ga$} will have only binary instances. In this case it suffices to consider the approximate model:
 \begin{itemize}
@@ -445,10 +447,11 @@ which will tell \KaSim~to apply the above rule with a rate $\ga_2$ for binary in
 \item \#\#
 \item \%init: \var{n}~  A(),B(),C()
 \item \%mod: [E] > 10000 do \$STOP 
+\item \%def: \var{\var{dotSnapshots}} \var{\var{true}}
 \end{enumerate}
 }
 
-Notice at lines 10-12 the use of binary/unary notation for rules. As a result binding between between freely floating agents will occur at rate \ttt{\textquotesingle k2\textquotesingle } while binding between agents that are part of the same complex will occur at rate \ttt{\textquotesingle k1\textquotesingle }. Line 21 contains a \emph{perturbation} that requires \KaSim~to stop the simulation after 10,000 events and output the list of molecular species present in the final mixture\index{mixture} (see Section~\ref{sec:mod}) and that we give Figure~\ref{fig:species}.
+Notice at lines 10-12 the use of binary/unary notation for rules. As a result binding between between freely floating agents will occur at rate \ttt{\textquotesingle k2\textquotesingle } while binding between agents that are part of the same complex will occur at rate \ttt{\textquotesingle k1\textquotesingle }. Line 21 contains a \emph{perturbation} that requires \KaSim~to stop the simulation after 10,000 events and output the list of molecular species present in the final mixture\index{mixture} as a dot file (see Section~\ref{sec:mod}) and that we give Figure~\ref{fig:species}.
 
 \begin{figure}[htbp]
 \begin{center}
@@ -465,7 +468,7 @@ In the KF\index{kappa file} it is also possible to declare \emph{variables}\inde
 \ITE{
 \item[] \ttt{\%var: \var{var\_name}~} (\textit{algebraic\_expression} or \textit{kappa\_expression})
 }
-where \ttt{var\_name} can be any string and \textit{algebraic\_expression} in Table~\ref{tab:alg} (available symbols for variable, constants and operators are given Table~\ref{tab:operators}).
+where \ttt{var\_name} can be any string and \textit{algebraic\_expression} are defined Table~\ref{tab:alg} (available symbols for variable, constants and operators are given Table~\ref{tab:operators}).
 
 %%
 \begin{table}[htbp]
@@ -487,7 +490,7 @@ where \ttt{var\_name} can be any string and \textit{algebraic\_expression} in Ta
 \caption{Symbol usable in algebraic expressions\index{algebraic expression}}
 \begin{tabular}{@{} l|l @{} }
 \toprule
-Variable & Interpretation \\
+\ttt{\tcb{variable}} & Interpretation \\
 \midrule
 \ttt{[E]} & the total number of simulation events\index{event}\\
 & since the beginning of the simulation \\
@@ -498,11 +501,11 @@ Variable & Interpretation \\
 \ttt{[Tsim]} & the cpu-time since the beginning of the simulation \\
 \ttt{[Tmax]} & the max (bio)-time limit as set by the option \ttt{-t}. \\ &Note that if unset \ttt{Tmax}$=\infty$\\
 
-\ttt{\textquotesingle v\textquotesingle } & the value of variable \ttt{\textquotesingle v\textquotesingle} (declared using the \ttt{\%var:} statement) \\
+\ttt{\var{v}} & the value of variable \ttt{\var{v}} (declared using the \ttt{\%var:} statement) \\
 \ttt{|t|} & the concentration of token \ttt{t}\\
 \ttt{[inf]} & symbol for $\infty$ \\\\
 \toprule
-Operator & Interpretation \\
+\ttt{\tcb{unary/binary\_op}} & Interpretation \\
 \midrule
 \ttt{[}$f$\texttt{]} & the intuitive mathematical function or constant \\ &associated to $f\in\set{\hbox{\ttt{log,sin,cos,tan,sqrt,pi}}}$ \\
 \ttt{[mod]} & the \emph{modulo} operator (infix notation)\\
@@ -514,13 +517,13 @@ Operator & Interpretation \\
 \label{tab:operators}
 \end{table}
 %%
-%%
+
 \noi For instance the declaration\index{declaration}s
 \ITE{
 \item[] \ttt{\%var: \var{homodimer}~A(x!1),A(x!1)}
 \item[] \ttt{\%var: \var{aa}~\var{homodimer}/2}
 }
-define 2 variables, the first one tracking the number of embeddings of \ttt{A(x!1),A(x!1)} in the graph over time, while the second divides this value by 2: the number of automorphisms in \ttt{A(x!1),A(x!1)}. The do of a variable acts as a binder in the rest of the KF\index{kappa file}. Hence variables that are used in the expression of another variable must be declared beforehand. 
+define 2 variables, the first one tracking the number of embeddings of \ttt{A(x!1),A(x!1)} in the graph over time, while the second divides this value by 2: the number of automorphisms in \ttt{A(x!1),A(x!1)}. Note that variables that are used in the expression of another variable must be declared beforehand. 
 \vskip 0.25cm
 \noi It is also possible to use algebraic expressions\index{algebraic expression} as kinetic rates\index{kinetic rate} as in
 \ITE{
@@ -556,8 +559,8 @@ where \textit{mult} is either a positive integer or a variable name pointing to 
 \item[] \ttt{\%init: \textquotesingle n\textquotesingle~(A(),A(y\int p))}
 \item[] \ttt{\%init: ca2+ <- 0.39 \#mM}
 }
-will add 1000 instances of \ttt{A} in its default state \ttt{A(x,y\int u,z\int 0)}, 1000 instances of \ttt{A} in state \ttt{A(x,y\int p,z\int 0)} and a concentration of 0.39 mM of calcium ions. Recall that the concentration of calcium can be observed during simulation through the variable \ttt{|ca2+|}.
-As any other do, \ttt{\%init} can be used multiple times, and agents will add up to the initial state.
+will add 1000 instances of \ttt{A} in its default state \ttt{A(x,y\int u,z\int 0)}, 1000 instances of \ttt{A} in state \ttt{A(x,y\int p,z\int 0)} and a concentration of 0.39 mM of calcium ions. Recall that the concentration of calcium can be observed during simulation using \ttt{|ca2+|}.
+As any other declaration\index{declaration}, \ttt{\%init} can be used multiple times, and agents will add up to the initial state.
 
 \chapter{A simple model}\label{chap:abc}
 
@@ -639,10 +642,10 @@ where \textit{boolean\_expression} and \textit{effect}\index{effect} are defined
   \centering
   \caption{Perturbation expressions}
   \begin{tabular}{@{} lcl @{}}
-  	\textit{perturbation\_expression} &::=& \textit{perturbation} \\
-	&& | \tcb{\ttt{repeat}} \textit{perturbation} \tcb{\ttt{until}} \textit{boolean\_expression} \\\\ 
+  	\textit{perturbation\_expression} &::=& \tcb{\ttt{\%mod:}} \textit{perturbation} \\
+	&& | \tcb{\ttt{\%mod:}} \tcb{\ttt{repeat}} \textit{perturbation} \tcb{\ttt{until}} \textit{boolean\_expression} \\\\ 
     
-    \textit{perturbation} &::=& \tcb{\ttt{\%mod:}} \textit{boolean\_expression} \tcb{\ttt{do}} \textit{effect} \\\\
+    \textit{perturbation} &::=& \textit{boolean\_expression} \tcb{\ttt{do}} \textit{effect} \\\\
     \textit{boolean\_expression} &::=& \textit{algebraic\_expression}\index{boolean expression} \tcb{rel} \textit{algebraic\_expression} \\
     && | (\textit{boolean\_expression} \tcb{||} \textit{boolean\_expression}) \\
     && | (\textit{boolean\_expression} \tcb{\&\&} \textit{boolean\_expression}) \\
@@ -680,9 +683,9 @@ will add $n\geq 0$ instances of \ttt{C} with \ttt{x1} already in state \ttt{p} (
 }}
 will remove \emph{all} \ttt{B}s connected to some agent from the mixture\index{mixture}. 
 
-There are various ways one can use perturbations to study more deeply a given kappa model. A basic illustration is the use of a simple perturbation to let a system equilibrate before starting a real simulation. For instance, as can be seen from the curve given in Fig.~\ref{fig:abc}, the number of AB complexes is arbitrarily set to 0 in the initial state (all \ttt{A}s are disconnected from \ttt{B}s in the initial mixture\index{mixture}). In order to avoid this, one can modify the kappa file the following way: we set the initial concentration of \ttt{C} to 0 by deleting line 22. Now we introduce \ttt{C}s after 25 t.u by perturbation:
+There are various ways one can use perturbations to study more deeply a given kappa model. A basic illustration is the use of a simple perturbation to let a system equilibrate before starting a real simulation. For instance, as can be seen from the curve given in Fig.~\ref{fig:abc}, the number of AB complexes is arbitrarily set to 0 in the initial state (all \ttt{A}s are disconnected from \ttt{B}s in the initial mixture\index{mixture}). In order to avoid this, one can modify the kappa file the following way: we set the initial concentration of \ttt{C} to 0 by deleting line 22. Now we introduce \ttt{C}s after 25 t.u using the perturbation:
 \ttt{\ITE{
-\item[] \%mod:  [T]>25 do \$ADD 10000 C 
+\item[] \%mod:  [T]>25 do \$ADD 10000 C() 
 }}
 The modified kappa file is available in the source repository, in the \ttt{model/} directory (file \ttt{abc-pert.ka}). 
 Running again a simulation (a bit longer) by entering in the command line:
@@ -690,7 +693,8 @@ Running again a simulation (a bit longer) by entering in the command line:
 \ITE{
 \item[\$] KaSim -i ABC-pert.ka -e 100000 -t 300 -o abc2.out
 }}
-one obtains the curve given in Fig.~\ref{fig:abc2}
+one obtains the curve given in Fig.~\ref{fig:abc2}. 
+
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[width=10cm]{img/plot-abc2.png}
@@ -733,7 +737,7 @@ In our ABC example, adding the instruction:
 \ttt{\ITE{
 \item[] \%mod:  [true] do \$TRACK \var{Cpp} [true]  
 }}
-\noi will asking~\KaSim~to turn on causality analysis\index{causality} for the observable \ttt{\textquotesingle Cpp\textquotesingle } since the beginning of the simulation, and display the causal explanation of every new occurrence of \ttt{\textquotesingle Cpp\textquotesingle }, until the end of the simulation. The explanation, that we call \emph{causal flow}\index{causal flow}, is a set of rule application ordered by causality and displayed as a graph using dot format. In this graph, an edge \ttt{r}$\longrightarrow$ \ttt{r\textquotesingle } between two rule applications $\ttt{r}$ and $\ttt{\textquotesingle r\textquotesingle }$ indicates that the first rule application has used, in the simulation, some sites that were modified by the application of the former. We show Fig.~\ref{fig:cflow} an example of such causal flow.
+\noi will asking~\KaSim~to turn on causality analysis\index{causality} for the observable \ttt{\textquotesingle Cpp\textquotesingle } since the beginning of the simulation, and display the causal explanation of every new occurrence of \ttt{\textquotesingle Cpp\textquotesingle }, until the end of the simulation. The explanation, that we call a \emph{causal flow}\index{causal flow}, is a set of rule application ordered by causality and displayed as a graph using dot format. In this graph, an edge \ttt{r}$\longrightarrow$ \ttt{r\textquotesingle } between two rule applications $\ttt{r}$ and $\ttt{\textquotesingle r\textquotesingle }$ indicates that the first rule application has used, in the simulation, some sites that were modified by the application of the former. We show Fig.~\ref{fig:cflow} an example of such causal flow.
 
 \begin{figure}[htbp]
 \begin{center}
@@ -764,7 +768,7 @@ The \emph{flux map}\index{flux map} is a powerful observation that tracks, on th
 \item [] \%mod: [true] do \$FLUX "flux.dot" [true]
 \item [] \%mod: [T]>20 do \$FLUX "flux.dot" [false]
 }}
-The resulting \emph{flux map} is a graph where a positive edge between rules $r$ and $s$ (in green) indicates an overall positive contribution of $r$ over $s$. Said otherwise, the sum of $r$ applications increased the activity\index{activity} of $s$. Conversely, a negative edge (in red) will indicate that $r$ had an overall negative impact on the activity\index{activity} of $s$. Note that visualization software permitting the importance of the flux between two rules can be observed by looking at the label on the edges that indicate the overall activity transfer (positive or negative) between the rules. The above declaration\index{declaration} produce a flux map that is shown Fig.~\ref{fig:flux}. Note that flux may vary during time, therefore the time or event limit of the simulation is of importance and will likely change the aspect of the produced map.
+The resulting \emph{flux map} is a graph where a positive edge between rules $r$ and $s$ (in green) indicates an overall positive contribution of $r$ over $s$. Said otherwise, the sum of $r$ applications increased the activity\index{activity} of $s$. Conversely, a negative edge (in red) will indicate that $r$ had an overall negative impact on the activity\index{activity} of $s$. Note that the importance of the flux between two rules can be observed by looking at the label on the edges that indicate the overall activity transfer (positive or negative) between the rules. The above declaration\index{declaration} produce a flux map that is shown Fig.~\ref{fig:flux}. Note that flux may vary during time, therefore the time or event limit of the simulation is of importance and will likely change the aspect of the produced map.
 
 
 \subsection{Updating kinetic rates on the fly}
@@ -773,7 +777,7 @@ Any variable between simple quotes can be updated during a simulation using a de
 \ttt{\ITE{
 \item [] \%mod: \var{Cpp}~> 500 do \$UPDATE \var{k\_on} 0.0
 }}
-This perturbation will be applied whenever the observable \ttt{\var{Cpp}} will become greater than 500. Its effect will be to set the on rate of all binding rules to 0. Note that according to the grammar given Table~\ref{tab:perm}, one may use any algebraic expression\index{algebraic expression} as the new value of the variable. For instance:
+This perturbation will be applied whenever the observable \ttt{\var{Cpp}} will become greater than 500. Its effect will be to set the on rate of all binding rules to 0. Note that according to the grammar given Table~\ref{tab:pert}, one may use any algebraic expression\index{algebraic expression} as the new value of the variable. For instance:
 \ttt{\ITE{
 \item [] \%mod: \var{Cpp}~> 500 do \$UPDATE \var{k\_on} \var{k\_on}/100
 }}
@@ -857,7 +861,7 @@ Unlike the flux map, the influence map is \emph{statically} computed and does no
    \label{fig:abc-im}
 \end{figure}
 
-More formally, consider the rules $r:L\rar R$ and $s:L'\rar R'$. One wishes to know whether it is possible that the application of rule $r$ over a graph $G$ creates a new instance of rule $s$. To do so, \KaSim~will try to generate a $\ka$-term $T$ containing a match for $R$ and $L'$ that overlap on some sites that are modified by $r$ (see Figure~\ref{fig:im} for illustration).
+More formally, consider the rules $r:L\rar R$ and $s:L'\rar R'$. One wishes to know whether it is possible that the application of rule $r$ over a graph $G$ creates a new instance of rule $s$. To do so, \KaSim~will try to generate a term $T$ containing a match for $R$ and $L'$ that overlap on some sites that are modified by $r$ (see Figure~\ref{fig:im} for illustration).
 
 \begin{figure}[htbp] %  figure placement: here, top, bottom, or page
    \centering
@@ -868,7 +872,7 @@ More formally, consider the rules $r:L\rar R$ and $s:L'\rar R'$. One wishes to k
 
 \chapter{Frequently asked questions}
 \section*{Simulation hangs after a while}
-If the progress bar seems stalled, it does not necessarily mean that the simulation is blocked. In particular when a simulation is triggered with a \emph{time} limit (\ttt{-t} option of the command line) it might only indicate that the bio clock is stalled while computation events still occur. Recall that the average (bio) time one has to wait in order to apply a rule is $1/A$ where $A$ is the sum of all the rule activities (which is equal to the number of instances that a rule has times its kinetic rate). Whenever the number of occurrences of a rule grows too fast (if new agents are created during the simulation for instance), or if the kinetic rate of a rule is defined by a function that grows rapidly,  the average time increment might tend to 0, and if it remains so for a while it will block the progress bar whose progress is proportional to the bio time advance. 
+If the progress bar seems stalled, it does not necessarily mean that the simulation is blocked. In particular when a simulation is triggered with a \emph{time} limit (\ttt{-t} option of the command line) it might only indicate that the bio clock is stalled while computation events still occur. Recall that the average (bio) time one has to wait in order to apply a rule is $1/A$, where $A$ is the sum of all the rule activities (which is equal to the number of instances that a rule has, times its kinetic rate). Whenever the number of occurrences of a rule grows too fast (if new agents are created during the simulation for instance), or if the kinetic rate of a rule is defined by a function that grows rapidly, the average time increment might tend to 0 and if it remains so for a while, it will block the progress bar whose advance is proportional to the bio time \ttt{[T]}. 
 
 In order to make sure that \KaSim~is not incorrectly blocked you may wish to plot the event clock against time clock using the observable \ttt{\%obs: \textquotesingle events\textquotesingle  [E]} or run the simulation using an event limit (\ttt{-e} option of the command line) instead of a time limit.
 
@@ -886,7 +890,7 @@ Make sure you have \ttt{\%obs} or \ttt{\%plot} instructions in your KF\index{kap
 The value of a kappa expression $E$  is equal to the number of embeddings\index{embedding} it has in the current mixture\index{mixture} $M$. Embeddings are maps from agents in $E$  to agents in $M$. If $E$ has symmetries then every permutation of $E$ will be counted as a new embedding. For instance let $E=$\ttt{A(x!1),A(x!1)} and let $M=$\ttt{A(x!1,y\int p),A(x!1,y\int u)}. \KaSim~will count two instances of $E$ in $M$: the one mapping the first \ttt{A} of $E$ to the first \ttt{A} of $M$ and the one mapping the first \ttt{A} of $E$ to the second \ttt{A} of $M$.
  
 \section*{The computed influence map is incorrect, it misses some activation or has to much of them}
-The influence map\index{influence map} contains relations that are computed on side effect free rules only. It is likely that a missing activation is due to a side effect that is not taken into account. If the influence map shows an activation between rule $r$ and $s$ that is never possible, just remember that activation computation implies that \emph{there exists} a context in which applying rule $r$ will create a new instance of rule $s$. It does not mean that \emph{all} applications of $r$ will do so.
+The influence map\index{influence map} contains relations that are computed on side effect free rules only. It is likely that a missing activation is due to a side effect that is not taken into account. If the influence map shows an activation between rule $r$ and $s$ that is never possible with a given model, just remember that activation computation implies that \emph{there exists} a context in which applying rule $r$ will create a new instance of rule $s$. This context might simply never be realized with the given rules or initial conditions.
 
 \section*{Value \ttt{nan} in the data file\index{data file} at the end of the simulation}
 The value \ttt{nan} means "Not a Number". It is generated when a plotted variable is infinite. Make sure this variable is not divided by zero at some point.

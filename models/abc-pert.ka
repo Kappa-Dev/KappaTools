@@ -30,7 +30,7 @@
 %init: 'n_ab' A(),B()
 %init: 'n_c' C()
 
-%mod: repeat \
-      	([E+] [mod] 1000 = 0) do $ADD 100 C() \
-      until [T]>25
+#%mod: repeat \
+#      	([E+] [mod] 1000 = 0) do $ADD 100 C() \
+#      until [T]>25
 
