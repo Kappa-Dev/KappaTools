@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 19/10/2011
-  * Last modification: 07/06/2012
+  * Last modification: 14/06/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -205,8 +205,7 @@ let weak_compression env state log_info step_list =
                 let error,blackboard,output,result_wo_compression  = 
                   D.S.compress parameter handler error blackboard list_order list_eid 
                 in 
-                let blackboard = D.S.PH.B.set_profiling_info (D.S.PH.B.PB.CI.Po.K.P.set_story_compression) blackboard in 
-        
+                let blackboard = D.S.PH.B.set_profiling_info (D.S.PH.B.PB.CI.Po.K.P.set_story_research_time) blackboard in 
                 let error = 
                   if debug_mode
                   then 
@@ -243,9 +242,9 @@ let weak_compression env state log_info step_list =
                             let info = 
                               {info with Mods.story_id = counter }
                             in 
-                            let info = Mods.update_profiling_info (D.S.PH.B.get_profiling_info blackboard) info 
+                            let info = Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy (D.S.PH.B.get_profiling_info blackboard)) info 
                             in 
-                            Some info 
+                            Some info
                       in 
                       error,(canonic,(grid,tick,info))::story_array 
                     else 

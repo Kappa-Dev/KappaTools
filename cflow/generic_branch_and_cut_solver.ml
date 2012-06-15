@@ -128,6 +128,8 @@ struct
     let error,blackboard,output = 
       propagate parameter handler error forbidden_events [] blackboard  
     in 
+    let blackboard = PH.B.set_profiling_info PH.B.PB.CI.Po.K.P.set_concurrent_event_deletion_time blackboard in 
+    let blackboard = PH.B.set_profiling_info PH.B.PB.CI.Po.K.P.set_step_time blackboard in 
     let _ = 
       if log_steps 
       then 
