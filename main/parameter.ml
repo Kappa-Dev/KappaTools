@@ -50,8 +50,10 @@ let implicitSignature = ref false
 let dotOutput = ref false
 let fluxModeOn = ref false
 let snapshotHighres = ref true
+
 let causalModeOn = ref false
-let weakcompressionModeOn = ref false 
+let weakCompression = ref false 
+let mazCompression = ref false 
 
 (*Computed values*)
 let (timeIncrementValue:float option ref) = ref None
@@ -132,13 +134,13 @@ type compression_mode =
       
 let get_compression_mode () = 
   {
-    causal_trace=(!causalModeOn);
-    weak_compression=(!weakcompressionModeOn);
+    causal_trace=(!mazCompression);
+    weak_compression=(!weakCompression);
     strong_compression=false;
   }
 
 let get_causal_trace x = x.causal_trace 
-let get_causal_trace_only x = not (x.weak_compression or x.strong_compression)
+let get_causal_trace_only x = not (x.weak_compression || x.strong_compression)
 let get_weak_compression x = x.weak_compression
 let get_strong_compression x = x.strong_compression
 let get_cache_size x = !cache_size 

@@ -23,15 +23,29 @@
 %obs: 'Cpp' C(x1~p?,x2~p?) 
 
 %var: 'n_ab' 1000
-%var: 'n_c' 10000
+%var: 'n_c' 1000
 
 
 #### Initial conditions 
 %init: 'n_ab' A(),B()
 %init: 'n_c' C()
 
-%def: "dumpInfluenceMap" "true"
-%def: "influenceMapFileName" "Model_IM"
-%def: "dotSnapshots" "true"
-%def: "colorDot" "true"
-%mod: [T] > 10 do $SNAPSHOT "Model_SNAPSHOT"
+#%def: "dumpInfluenceMap" "true"
+#%def: "influenceMapFileName" "Model_IM"
+#%def: "dotSnapshots" "true"
+#%def: "colorDot" "true"
+
+
+#%mod: [T] > 1 do $SNAPSHOT "Model_SNAPSHOT"
+
+%var: 'x' 0
+%var: 'freeA' A(x)
+%var: 'pAfree' 'freeA'/'n_ab'
+
+%mod: 'pAfree'<0.7 do $TRACK 'Cpp' [true]
+%mod: 'pAfree'<0.7 do $UPDATE 'x' 'Cpp'
+%mod: ('pAfree'<0.7 && ('Cpp'-'x' > 99)) do $TRACK 'Cpp' [false]
+
+
+%def: "displayCompression" "weak"
+#%mod: [true] do $FLUX "flux_map"

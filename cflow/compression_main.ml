@@ -201,9 +201,8 @@ let weak_compression env state log_info step_list =
                     Debug.tag ("\t\t * compress "^(string_of_int (List.length list_eid)))
                 in 
                 let blackboard = D.S.PH.B.set_profiling_info (D.S.PH.B.PB.CI.Po.K.P.set_start_compression) blackboard in 
-        
-                let error,blackboard,output,result_wo_compression,list,log_info   = 
-                  D.S.compress parameter handler error blackboard  list_order list_eid 
+                let error,blackboard,output,result_wo_compression  = 
+                  D.S.compress parameter handler error blackboard list_order list_eid 
                 in 
                 let log_info = D.S.PH.B.PB.CI.Po.K.P.set_story_research_time log_info in 
                 let error = 
@@ -252,16 +251,18 @@ let weak_compression env state log_info step_list =
                       else 
                         error,story_array
                 in 
-                let _ = 
-                  match result_wo_compression 
-                  with 
-                    | None -> () 
-                    | Some result_wo_compression -> 
-                      let filename =  (Filename.chop_suffix !Parameter.cflowFileName ".dot")^"_"^(string_of_int counter)^".dot"
-		      in
-                      let grid = D.S.PH.B.PB.CI.Po.K.build_grid result_wo_compression true handler in 
-                      let _ = Causal.dot_of_grid (fun _ -> ()) filename grid state env in
-                      ()
+                let _ = (*production des dotfiles des histoires avant compression*)
+									if !Parameter.mazCompression then 
+                    match result_wo_compression 
+                    with 
+                      | None -> () 
+                      | Some result_wo_compression -> 
+                        let filename =  (Filename.chop_suffix !Parameter.cflowFileName ".dot")^"_"^(string_of_int counter)^".dot"
+  		      						in
+                        let grid = D.S.PH.B.PB.CI.Po.K.build_grid result_wo_compression true handler in 
+                        let _ = Causal.dot_of_grid (fun _ -> ()) filename grid state env in
+                        ()
+									else ()
                 in 
                 let error,blackboard = D.S.PH.B.reset_init parameter handler error blackboard in 
                 let tick = Mods.tick_stories n_stories tick in 
@@ -290,7 +291,7 @@ let weak_compression env state log_info step_list =
                                   let blackboard = D.S.PH.B.set_profiling_info (fun _ -> log_info) blackboard in  
                                   let _ = Printf.fprintf log "/*\n" in 
                                   let _ = Mods.dump_simulation_info log simulation_info in 
-                                  let _ = Printf.fprintf log "\*\n" in 
+                                  let _ = Printf.fprintf log "/*\n" in 
                                   let _ = D.S.PH.B.print_complete_log log blackboard in 
                                   let _ = Printf.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_profiling "\nCompression of the %s story:\n\n" (th_of_int counter) in 
                                   let _ = D.S.PH.B.print_complete_log parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_profiling blackboard in 

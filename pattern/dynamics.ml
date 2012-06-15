@@ -129,7 +129,8 @@ type perturbation = {precondition: boolean_variable ; effect : modification ; ab
 and modification = 
 	INTRO of variable * Mixture.t 
 	| DELETE of variable * Mixture.t 
-	| UPDATE of int * variable
+	| UPDATE_RULE of int * variable
+	| UPDATE_VAR of int * variable
 	| UPDATE_TOK of int * variable 
 	| SNAPSHOT of string option
 	| STOP of string option
@@ -143,7 +144,8 @@ let string_of_pert pert env =
 	match pert.effect with
 		| INTRO (_,mix) -> Printf.sprintf "INTRO %s" (Mixture.to_kappa false mix env)
 		| DELETE (_,mix) -> Printf.sprintf "DELETE %s" (Mixture.to_kappa false mix env)
-		| UPDATE (r_id,_) -> Printf.sprintf "UPDATE rule[%d]" r_id
+		| UPDATE_RULE (r_id,_) -> Printf.sprintf "UPDATE rule[%d]" r_id
+		| UPDATE_VAR (v_id,_) -> Printf.sprintf "UPDATE var[%d]" v_id
 		| UPDATE_TOK (t_id,_) -> Printf.sprintf "UPDATE token %s" (Environment.token_of_num t_id env)
 		| SNAPSHOT opt -> (match opt with None -> "SNAPSHOT" | Some s -> "SNAPSHOT("^s^")") 
 		| STOP opt -> (match opt with None -> "STOP" | Some s -> "STOP("^s^")")

@@ -138,28 +138,27 @@ let apply_effect p_id pert state counter env =
 									tracked := tracked'@(!tracked)
 					done ;
 					(!envr,!st,!pert_ids,!tracked)
-			| UPDATE (id,v) -> 
+			| UPDATE_RULE (id,v) -> 
 				let _ =
 					if !Parameter.debugModeOn then 
-						(if Environment.is_rule id env then 
-							Debug.tag (Printf.sprintf "Updating rate of rule '%s'" (Environment.rule_of_num id env)) 
-						else Debug.tag (Printf.sprintf "Updating variable '%s'" ((fun (x,_)->x) (Environment.alg_of_num id env)) ))
+						(Debug.tag (Printf.sprintf "Updating rate of rule '%s'" (Environment.rule_of_num id env)) 
+						)
 				in
 				let value = State.value state ~var:v (-1) counter env in (*Change here if one wants to have address passing style of assignation*)
-				if Environment.is_rule id env then
-					begin
-						let r = State.rule_of_id id state in
-							Hashtbl.replace state.rules id {r with k_def = Dynamics.CONST value} ;
-							State.update_activity state p_id id counter env ;		
-							let env,pert_ids = State.update_dep state (RULE id) IntSet.empty counter env in
-							(env,state ,pert_ids,[])
-					end
-				else (*updating a variable*)
-					begin
-						State.set_variable id value state ;
-						let env,pert_ids = State.update_dep state (ALG id) IntSet.empty counter env in
-						(env,state,pert_ids,[]) 
-					end
+				let r = State.rule_of_id id state in
+  			Hashtbl.replace state.rules id {r with k_def = Dynamics.CONST value} ;
+  			State.update_activity state p_id id counter env ;		
+  			let env,pert_ids = State.update_dep state (RULE id) IntSet.empty counter env in
+  			(env,state ,pert_ids,[])
+			| UPDATE_VAR (id,v) ->
+				let _ =
+					if !Parameter.debugModeOn then 
+						(Debug.tag (Printf.sprintf "Updating variable '%s'" ((fun (x,_)->x) (Environment.alg_of_num id env)) ))
+				in
+				let value = State.value state ~var:v (-1) counter env in (*Change here if one wants to have address passing style of assignation*)
+				State.set_variable id value state ;
+				let env,pert_ids = State.update_dep state (ALG id) IntSet.empty counter env in
+				(env,state,pert_ids,[]) 
 			| UPDATE_TOK (tk_id,v) -> 
 				let _ =
 					if !Parameter.debugModeOn then 
