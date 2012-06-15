@@ -27,6 +27,8 @@ module type StoryStats =
     val inc_selected_events: log_info -> log_info 
 
     val inc_cut_events: log_info -> log_info 
+    val inc_k_cut_events: int -> log_info -> log_info 
+    val reset_cut_events: log_info -> log_info 
     val inc_n_kasim_events: log_info -> log_info 
     val inc_n_init_events: log_info -> log_info 
     val inc_n_side_events: log_info -> log_info 
@@ -306,6 +308,12 @@ module StoryStats =
 
        let inc_cut_events log = 
          { log with cut_events = log.cut_events + 1}
+
+       let inc_k_cut_events k log = 
+         { log with cut_events = log.cut_events + k}
+
+       let reset_cut_events log = 
+         { log with cut_events = 0}
 
        let inc_selected_events log = 
           { log 

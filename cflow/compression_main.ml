@@ -202,10 +202,10 @@ let weak_compression env state log_info step_list =
                 in 
                 let blackboard = D.S.PH.B.set_profiling_info (D.S.PH.B.PB.CI.Po.K.P.set_start_compression) blackboard in 
         
-                let error,blackboard,output,result_wo_compression  = 
+                let error,blackboard,output,result_wo_compression,list,log_info   = 
                   D.S.compress parameter handler error blackboard  list_order list_eid 
                 in 
-                let blackboard = D.S.PH.B.set_profiling_info (D.S.PH.B.PB.CI.Po.K.P.set_story_research_time) blackboard in 
+                let log_info = D.S.PH.B.PB.CI.Po.K.P.set_story_research_time log_info in 
                 let error = 
                   if debug_mode
                   then 
@@ -223,32 +223,34 @@ let weak_compression env state log_info step_list =
                     error
                 in 
                 let error,story_array = 
-                  if D.S.PH.B.is_failed output 
-                  then error,story_array
-                  else
-                    if weak_compression_on
-                    then 
-                      let error,list = D.S.PH.B.translate_blackboard parameter handler error blackboard in 
-                      let grid = D.S.PH.B.PB.CI.Po.K.build_grid list false handler in
-                      let blackboard = D.S.PH.B.set_profiling_info (D.S.PH.B.PB.CI.Po.K.P.set_grid_generation) blackboard in 
-                      let error,dag = D.graph_of_grid parameter handler error grid in 
-                      let error,canonic = D.canonicalize parameter handler error dag in 
-                      let blackboard = D.S.PH.B.set_profiling_info (D.S.PH.B.PB.CI.Po.K.P.set_canonicalisation) blackboard in 
-                      let info = 
-                        match info 
-                        with 
-                          | None -> None 
-                          | Some info -> 
-                            let info = 
-                              {info with Mods.story_id = counter }
-                            in 
-                            let info = Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy (D.S.PH.B.get_profiling_info blackboard)) info 
-                            in 
-                            Some info
-                      in 
-                      error,(canonic,(grid,tick,info))::story_array 
-                    else 
+                  match 
+                    list
+                  with 
+                    | None -> 
                       error,story_array
+                    | Some list -> 
+                      if weak_compression_on
+                      then 
+                        let grid = D.S.PH.B.PB.CI.Po.K.build_grid list false handler in
+                        let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
+                        let error,dag = D.graph_of_grid parameter handler error grid in 
+                        let error,canonic = D.canonicalize parameter handler error dag in 
+                        let log_info = D.S.PH.B.PB.CI.Po.K.P.set_canonicalisation log_info in 
+                        let info = 
+                          match info 
+                          with 
+                            | None -> None 
+                            | Some info -> 
+                              let info = 
+                                {info with Mods.story_id = counter }
+                              in 
+                              let info = Mods.update_profiling_info log_info  info 
+                              in 
+                              Some info
+                        in 
+                        error,(canonic,(grid,tick,info))::story_array 
+                      else 
+                        error,story_array
                 in 
                 let _ = 
                   match result_wo_compression 
