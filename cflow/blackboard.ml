@@ -1207,6 +1207,8 @@ module Blackboard =
 
    let cut parameter handler error blackboard list = 
      let error,cut_causal_flow,events_to_remove  = useless_predicate_id parameter handler error blackboard list in 
+     let blackboard = set_profiling_info (PB.CI.Po.K.P.set_concurrent_event_detection_time) blackboard in 
+     let blackboard = set_profiling_info (PB.CI.Po.K.P.set_step_time) blackboard in 
      error,blackboard,cut_causal_flow,events_to_remove 
 
 
