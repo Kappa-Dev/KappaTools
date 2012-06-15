@@ -201,7 +201,7 @@ let weak_compression env state log_info step_list =
                     Debug.tag ("\t\t * compress "^(string_of_int (List.length list_eid)))
                 in 
                 let blackboard = D.S.PH.B.set_profiling_info (D.S.PH.B.PB.CI.Po.K.P.set_start_compression) blackboard in 
-                let error,blackboard,output,result_wo_compression  = 
+                let error,blackboard,output,result_wo_compression,list,log_info  = 
                   D.S.compress parameter handler error blackboard list_order list_eid 
                 in 
                 let log_info = D.S.PH.B.PB.CI.Po.K.P.set_story_research_time log_info in 
