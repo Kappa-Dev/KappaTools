@@ -66,8 +66,8 @@ start_rule:
 					(Ast.result := {!Ast.result with Ast.observables = expr::!Ast.result.Ast.observables})
 				| Ast.PERT (pre,effect,pos,opt) ->
 					(Ast.result := {!Ast.result with Ast.perturbations = (pre,effect,pos,opt)::!Ast.result.Ast.perturbations})
-				| Ast.CONFIG (param_name,pos_p,value,pos_v) ->
-					(Ast.result := {!Ast.result with Ast.configurations = (param_name,pos_p,value,pos_v)::!Ast.result.Ast.configurations})
+				| Ast.CONFIG (param_name,pos_p,value_list) ->
+					(Ast.result := {!Ast.result with Ast.configurations = (param_name,pos_p,value_list)::!Ast.result.Ast.configurations})
 		end ; $2 
 	}
 | error 
@@ -103,11 +103,17 @@ instruction:
 			| _ -> () 
 	 in
 		Ast.PERT (bool_expr,mod_expr,pos,Some $5)}
-| CONFIG FILENAME FILENAME 
-	{let param_name,pos_p = $2 and value,pos_v = $3 in Ast.CONFIG (param_name,pos_p,value,pos_v)} 
-
+| CONFIG FILENAME value_list 
+	{let param_name,pos_p = $2 and value_list = $3 in Ast.CONFIG (param_name,pos_p,value_list)} 
 | PERT bool_expr DO effect UNTIL bool_expr /*for backward compatibility*/
 	{ExceptionDefn.warning ~with_pos:$1 "Deprecated perturbation syntax: use the 'repeat ... until' construction" ; Ast.PERT ($2,$4,$1,Some $6)}
+;
+
+value_list: 
+| FILENAME 
+	{[$1]}
+| FILENAME value_list 
+	{$1::$2}
 ;
 
 perturbation_declaration:

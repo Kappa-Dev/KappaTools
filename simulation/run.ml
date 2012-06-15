@@ -102,25 +102,26 @@ let event state (*grid*) story_profiling event_list counter plot env =
 				(*let event_to_record = (r,side_effect,phi,psi,Counter.event counter) in*)
 				 
 				let (*grid,*)story_profiling,event_list = 
-					if !Parameter.causalModeOn or !Parameter.weakcompressionModeOn 
+					if !Parameter.causalModeOn || !Parameter.weakCompression || !Parameter.mazCompression 
 	        then
 					  begin
-                                            let simulation_info = 
-                                              {Mods.story_id=  0 ;
-                                               Mods.story_time= counter.Mods.Counter.time ;
-                                               Mods.story_event= counter.Mods.Counter.events ;
-                                               Mods.profiling_info = ()}
-                                            in 
+              let simulation_info = 
+                {Mods.story_id=  0 ;
+                 Mods.story_time= counter.Mods.Counter.time ;
+                 Mods.story_event= counter.Mods.Counter.events ;
+                 Mods.profiling_info = ()}
+              in 
               let story_profiling,event_list = 
-		Compression_main.D.S.PH.B.PB.CI.Po.K.store_event story_profiling (Compression_main.D.S.PH.B.PB.CI.Po.K.import_event ((r,phi,psi),(obs_from_rule_app,r,Counter.event counter,side_effect))) event_list in 
+								Compression_main.D.S.PH.B.PB.CI.Po.K.store_event story_profiling (Compression_main.D.S.PH.B.PB.CI.Po.K.import_event ((r,phi,psi),(obs_from_rule_app,r,Counter.event counter,side_effect))) event_list 
+							in 
               let story_profiling,event_list = 
                 List.fold_left 
-                  (fun (story_profiling,event_list) (obs,phi) -> 
-                    
-                    let lhs = State.kappa_of_id obs state in 
-                    Compression_main.D.S.PH.B.PB.CI.Po.K.store_obs story_profiling (obs,lhs,phi,simulation_info) event_list)
-                  (story_profiling,event_list) 
-                  obs_from_rule_app
+                (fun (story_profiling,event_list) (obs,phi) -> 
+                  
+                  let lhs = State.kappa_of_id obs state in 
+                  Compression_main.D.S.PH.B.PB.CI.Po.K.store_obs story_profiling (obs,lhs,phi,simulation_info) event_list)
+                (story_profiling,event_list) 
+                obs_from_rule_app
               in 
 					 		story_profiling,event_list
 					  end
@@ -170,12 +171,12 @@ let loop state grid story_profiling event_list counter plot env =
       	in 
         if Environment.tracking_enabled env then
 					begin
-				          let story_list  = 
-            	                            if !Parameter.weakcompressionModeOn or !Parameter.causalModeOn 
-                                            then Compression_main.weak_compression env state story_profiling event_list 
-                                            else []
+	          let story_list  = (*story_list:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_time: float ; story_event: int}*)
+            	if !Parameter.weakCompression || !Parameter.causalModeOn 
+              then Compression_main.weak_compression env state story_profiling event_list 
+              else []
 	          in
-                                    ()
+            ()
 				  end
 		  end
 	in

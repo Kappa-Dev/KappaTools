@@ -65,3 +65,15 @@ let read_input () =
 		parse "" user_input
 	with
 		| Stream.Failure -> invalid_arg "Tools.Read_input: cannot read stream"
+
+let list_of_string str = 
+	let stream = Stream.of_string str in
+	let rec parse stream acc cont = 
+		try
+  		match Stream.next stream with
+  			| ' ' | '\t' -> parse stream "" (acc::cont)
+				| '\n' -> (acc::cont)
+  			| c -> parse stream  (Printf.sprintf "%s%c" acc c ) cont
+		with Stream.Failure -> (acc::cont)
+	in
+	parse stream "" []

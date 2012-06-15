@@ -742,7 +742,9 @@ let effects_of_modif variables env ast =
 				else
 					let v_str,_ = Environment.alg_of_num i env in
 				Printf.sprintf "set variable '%s' to %s" v_str str
-			in (variables, (Dynamics.UPDATE (i, v)), str, env)
+			in 
+			if is_rule then (variables, (Dynamics.UPDATE_RULE (i, v)), str, env)
+			else (variables, (Dynamics.UPDATE_VAR (i, v)), str, env)
 	| UPDATE_TOK (tk_nme,tk_pos,alg_expr,instr_pos) ->
 		let tk_id = 
 			try Environment.num_of_token tk_nme env with 
@@ -921,7 +923,7 @@ let pert_of_result variables env res =
 							dep env
 						in 
 						(env,None) 
-					| Dynamics.UPDATE _ | Dynamics.UPDATE_TOK _ | Dynamics.SNAPSHOT _ | Dynamics.STOP _ | Dynamics.FLUX _ | Dynamics.FLUXOFF _ | Dynamics.CFLOWOFF _ -> 
+					| Dynamics.UPDATE_RULE _ |Dynamics.UPDATE_VAR _ | Dynamics.UPDATE_TOK _ | Dynamics.SNAPSHOT _ | Dynamics.STOP _ | Dynamics.FLUX _ | Dynamics.FLUXOFF _ | Dynamics.CFLOWOFF _ -> 
 						let env =
 							DepSet.fold
 							(fun dep env -> Environment.add_dependencies dep (Mods.PERT p_id) env
@@ -1003,63 +1005,91 @@ let init_graph_of_result env res =
 	(sg,token_vector,env)
 	
 let configurations_of_result result =
+	let set_value pos_p param value_list f ass = 
+  	try 
+			let v,pos = List.hd value_list in
+  		ass := f (v,pos) 
+  	with _ -> ExceptionDefn.warning ~with_pos:pos_p (Printf.sprintf "Empty value for parameter %s" param)
+	in
 	List.iter 
-	(fun (param,pos_p,value,pos_v) ->
+	(fun (param,pos_p,value_list) ->
 		match param with
-			| "compressionMode" -> 
+			| "displayCompression" -> 
 				begin
-					match value with 
-						| "strong" -> (ExceptionDefn.warning ~with_pos:pos_v "Strong compression is not implemented yet" ; Parameter.weakcompressionModeOn := true)
-						| "weak" -> Parameter.weakcompressionModeOn := true
-						| "none" -> Parameter.weakcompressionModeOn := false
-						| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Unkown value %s for compression mode" error))
+					let rec parse l = 
+						match l with
+							| ("strong",pos_v)::tl -> (ExceptionDefn.warning ~with_pos:pos_v "Strong compression is not implemented yet" ; parse tl)
+							| ("weak",_)::tl -> (Parameter.weakCompression := true ; parse tl)
+							| ("none",_)::tl -> (Parameter.mazCompression := true ; parse tl)
+							| [] -> ()
+							| (error,pos)::tl -> raise (ExceptionDefn.Semantics_Error (pos,Printf.sprintf "Unkown value %s for compression mode" error))
+					in
+					parse value_list
 				end
-			| "cflowFileName"	-> Parameter.cflowFileName := value			
+			| "cflowFileName"	-> set_value pos_p param value_list (fun (v,pos) -> v) Parameter.cflowFileName 
 			| "progressBarSize" -> 
-				(try let n = int_of_string value in Parameter.progressBarSize := n 
-				with _ -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Value %s should be an integer" value))
-				)
+				set_value pos_p param value_list 
+				(fun (v,p) -> 
+					try int_of_string v
+					with _ -> raise (ExceptionDefn.Semantics_Error (p,Printf.sprintf "Value %s should be an integer" v))
+				) Parameter.progressBarSize 
+				
 			| "progressBarSymbol" -> 
-				(try let c = String.unsafe_get value 0 in Parameter.progressBarSymbol := c 
-				with _ -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Value %s should be a character" value))
-				)
+				set_value pos_p param value_list 
+				(fun (v,p) -> 
+					try
+					String.unsafe_get v 0 
+					with _ -> raise (ExceptionDefn.Semantics_Error (p,Printf.sprintf "Value %s should be a character" v))
+				) Parameter.progressBarSymbol 
+
 			| "dumpIfDeadlocked" -> 
-				begin
+				set_value pos_p param value_list
+				(fun (value,pos_v) ->	
 					match value with 
-						| "true" -> Parameter.dumpIfDeadlocked := true 
-						| "false" -> Parameter.dumpIfDeadlocked := false 
-						| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Value %s should be either \"true\" or \"false\"" error))
-				end
+						| "true" -> true 
+						| "false" -> false 
+						| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_v,Printf.sprintf "Value %s should be either \"true\" or \"false\"" error))
+				) Parameter.dumpIfDeadlocked
 			| "plotSepChar" -> 
-				(try let c = String.unsafe_get value 0 in Parameter.plotSepChar := c 
-				with _ -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Value %s should be a character" value))
-				)
+				set_value pos_p param value_list
+				(fun (v,p) ->
+				try 
+					String.unsafe_get v 0  
+				with _ -> raise (ExceptionDefn.Semantics_Error (p,Printf.sprintf "Value %s should be a character" v))
+				) Parameter.plotSepChar
 			| "maxConsecutiveClash" ->
-				(try let n = int_of_string value in Parameter.maxConsecutiveClash := n 
-				with _ -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Value %s should be an integer" value))
-				) 
+				set_value pos_p param value_list 
+				(fun (v,p) -> 
+					try int_of_string v
+					with _ -> raise (ExceptionDefn.Semantics_Error (p,Printf.sprintf "Value %s should be an integer" v))
+				) Parameter.maxConsecutiveClash 
+				 
 			| "dotSnapshots" -> 
-				begin
+				set_value pos_p param value_list
+				(fun (value,pos_v) ->	
 					match value with 
-						| "true" -> Parameter.dotOutput := true 
-						| "false" -> Parameter.dotOutput := false 
-						| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Value %s should be either \"true\" or \"false\"" error))
-				end
+						| "true" -> true 
+						| "false" -> false 
+						| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_v,Printf.sprintf "Value %s should be either \"true\" or \"false\"" error))
+				) Parameter.dotOutput
 			| "colorDot" ->
-				begin
+				set_value pos_p param value_list
+				(fun (value,pos_v) ->	
 					match value with 
-						| "true" -> Parameter.useColor := true 
-						| "false" -> Parameter.useColor := false 
-						| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Value %s should be either \"true\" or \"false\"" error))
-				end
+						| "true" -> true 
+						| "false" -> false 
+						| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_v,Printf.sprintf "Value %s should be either \"true\" or \"false\"" error))
+				) Parameter.useColor
 			| "dumpInfluenceMap" ->
-				begin
-					match value with 
-						| "true" -> if !Parameter.influenceFileName = "" then Parameter.influenceFileName := "im.dot" 
-						| "false" -> Parameter.influenceFileName := "" 
-						| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Value %s should be either \"true\" or \"false\"" error))
-				end
-			| "influenceMapFileName" -> Parameter.influenceFileName := value 
+				set_value pos_p param value_list
+				(fun (v,p) -> 
+					match v with 
+						| "true" -> if !Parameter.influenceFileName = "" then "im.dot" else !Parameter.influenceFileName
+						| "false" -> "" 
+						| _ as error -> raise (ExceptionDefn.Semantics_Error (p,Printf.sprintf "Value %s should be either \"true\" or \"false\"" error))
+				) Parameter.influenceFileName
+			| "influenceMapFileName" -> 
+				set_value pos_p param value_list (fun (v,p) -> v) Parameter.influenceFileName  
 			| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Unkown parameter %s" error))		  
 	) result.configurations 
 	

@@ -91,7 +91,7 @@ and modif_expr =
 	| FLUX of (string * Tools.pos) option * Tools.pos
 	| FLUXOFF of (string * Tools.pos) option * Tools.pos
 
-type configuration = string * Tools.pos * string * Tools.pos
+type configuration = string * Tools.pos * ((string * Tools.pos) list)
 
 type instruction = 
 	| SIG of agent * Tools.pos
