@@ -125,7 +125,7 @@ let compute_causal lhs rhs script env =
 				!p_causal
 	) causal_map script 
 	
-type perturbation = {precondition: boolean_variable ; effect : modification ; abort : boolean_variable option ; flag : string}
+type perturbation = {precondition: boolean_variable ; effect : (rule option * modification) list ; abort : boolean_variable option ; flag : string}
 and modification = 
 	INTRO of variable * Mixture.t 
 	| DELETE of variable * Mixture.t 
@@ -141,7 +141,8 @@ and modification =
 and boolean_variable = BCONST of bool | BVAR of ((int -> float) -> (int -> float) -> float -> int -> int -> float -> (int -> float) -> bool)
 
 let string_of_pert pert env =
-	match pert.effect with
+	let string_of_effect effect =
+		match effect with
 		| INTRO (_,mix) -> Printf.sprintf "INTRO %s" (Mixture.to_kappa false mix env)
 		| DELETE (_,mix) -> Printf.sprintf "DELETE %s" (Mixture.to_kappa false mix env)
 		| UPDATE_RULE (r_id,_) -> Printf.sprintf "UPDATE rule[%d]" r_id
@@ -153,7 +154,8 @@ let string_of_pert pert env =
 		| FLUXOFF opt -> (match opt with None -> "FLUX" | Some s -> "FLUX_OFF("^s^")")
 		| CFLOW id -> let nme = try Environment.rule_of_num id env with Not_found -> Environment.kappa_of_num id env in ("CFLOW "^nme)
 		| CFLOWOFF id -> let nme = try Environment.rule_of_num id env with Not_found -> Environment.kappa_of_num id env in ("CFLOWOFF "^nme)
-
+	in
+	Tools.string_of_list (fun (_,eff) -> string_of_effect eff) pert.effect
 		
 let diff pos m0 m1 label_opt env =
 	let add_map id site_type map =

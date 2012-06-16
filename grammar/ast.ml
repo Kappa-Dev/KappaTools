@@ -78,7 +78,7 @@ let flip (rule_label,rule) =
 	({rule_label with lbl_nme=lbl},rule)
 		
 
-type perturbation = bool_expr * modif_expr * Tools.pos * bool_expr option
+type perturbation = bool_expr * (modif_expr list) * Tools.pos * bool_expr option
 and modif_expr = 
 	| INTRO of (alg_expr * mixture * Tools.pos) 
 	| DELETE of (alg_expr * mixture * Tools.pos) 

@@ -1,7 +1,7 @@
 %{
 %}
 
-%token EOF NEWLINE 
+%token EOF NEWLINE SEMICOLON
 %token AT OP_PAR CL_PAR COMMA DOT TYPE_TOK LAR
 %token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL NOT PERT INTRO DELETE DO SET UNTIL TRUE FALSE OBS KAPPA_RAR TRACK CPUTIME CONFIG REPEAT
 %token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INFINITY TIME EVENT NULL_EVENT PROD_EVENT INIT LET DIV PLOT SINUS COSINUS TAN SQRT EXPONENT POW ABS MODULO 
@@ -94,19 +94,22 @@ instruction:
 	{Ast.PLOT $2}
 | PLOT error 
 	{raise (ExceptionDefn.Syntax_Error (Some $1,"Malformed plot instruction, I was expecting an algebraic expression of variables"))}
-| PERT perturbation_declaration {let (bool_expr,mod_expr,pos) = $2 in Ast.PERT (bool_expr,mod_expr,pos,None)}
+| PERT perturbation_declaration {let (bool_expr,mod_expr_list,pos) = $2 in Ast.PERT (bool_expr,mod_expr_list,pos,None)}
 | PERT REPEAT perturbation_declaration UNTIL bool_expr 
-	{let (bool_expr,mod_expr,pos) = $3 in 
-	 let _ = 
-		match mod_expr with 
-			| (Ast.CFLOW _ | Ast.CFLOWOFF _ | Ast.FLUX _ | Ast.FLUXOFF _) -> (ExceptionDefn.warning ~with_pos:$1 "Perturbation need not be applied repeatedly") 
-			| _ -> () 
-	 in
-		Ast.PERT (bool_expr,mod_expr,pos,Some $5)}
+	{let (bool_expr,mod_expr_list,pos) = $3 in 
+	 if List.exists 
+		(fun effect -> 
+			match effect with 
+				| (Ast.CFLOW _ | Ast.CFLOWOFF _ | Ast.FLUX _ | Ast.FLUXOFF _) -> true 
+				| _ -> false
+		) mod_expr_list
+	 then (ExceptionDefn.warning ~with_pos:$1 "Perturbation need not be applied repeatedly") ;
+	Ast.PERT (bool_expr,mod_expr_list,pos,Some $5)}
 | CONFIG FILENAME value_list 
 	{let param_name,pos_p = $2 and value_list = $3 in Ast.CONFIG (param_name,pos_p,value_list)} 
-| PERT bool_expr DO effect UNTIL bool_expr /*for backward compatibility*/
-	{ExceptionDefn.warning ~with_pos:$1 "Deprecated perturbation syntax: use the 'repeat ... until' construction" ; Ast.PERT ($2,$4,$1,Some $6)}
+| PERT bool_expr DO effect_list UNTIL bool_expr /*for backward compatibility*/
+	{ExceptionDefn.warning ~with_pos:$1 "Deprecated perturbation syntax: use the 'repeat ... until' construction" ; 
+	Ast.PERT ($2,$4,$1,Some $6)}
 ;
 
 value_list: 
@@ -118,12 +121,17 @@ value_list:
 
 perturbation_declaration:
 | OP_PAR perturbation_declaration CL_PAR {$2}
-| bool_expr DO effect {($1,$3,$2)}
-| bool_expr SET effect {ExceptionDefn.warning ~with_pos:$2 "Deprecated perturbation syntax: 'set' keyword is replaced by 'do'" ; ($1,$3,$2)} /*For backward compatibility*/
+| bool_expr DO effect_list {($1,$3,$2)}
+| bool_expr SET effect_list {ExceptionDefn.warning ~with_pos:$2 "Deprecated perturbation syntax: 'set' keyword is replaced by 'do'" ; ($1,$3,$2)} /*For backward compatibility*/
+;
+
+effect_list:
+| OP_PAR effect_list CL_PAR {$2}
+| effect {[$1]}
+| effect SEMICOLON effect_list {$1::$3}
 ;
 
 effect:
-| OP_PAR effect CL_PAR {$2}
 | LABEL ASSIGN alg_expr /*updating the rate of a rule -backward compatibility*/
 	{let _ = ExceptionDefn.warning ~with_pos:$2 "Deprecated syntax, use $UPDATE perturbation instead of the ':=' assignment (see Manual)" in 
 	let lab,pos_lab = $1 in Ast.UPDATE (lab,pos_lab,$3,$2)}

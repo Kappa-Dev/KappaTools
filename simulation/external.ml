@@ -27,12 +27,155 @@ let eval_abort_pert just_applied pert state counter env =
 			in
 				b_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time()) v_of_token
 
+let trigger_effect state env pert_ids tracked pert p_id eff eval_var snapshot counter =
+		match eff with
+			| (Some r,INTRO (v,mix)) -> 
+				let x = eval_var v in
+				if x = infinity then 
+					let p_str = pert.flag in 
+						invalid_arg ("Perturbation "^p_str^" would introduce an infinite number of agents, aborting...")
+				else
+					if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Introducing %d instances of %s" (int_of_float x) (Mixture.to_kappa false mix env)) ;
+					let n = ref (int_of_float x)
+					and st = ref state
+					and pert_ids = ref pert_ids
+					and envr = ref env 
+					and tracked = ref tracked
+					in
+						while !n > 0 do (*FIXME: highly unefficient to compute new injection at each loop*)
+							let embedding_t = State.select_injection (infinity,0.) state r.lhs counter env in (*empty embedding, cannot raise null-event*)
+							let (env, state, side_effects, embedding_t, psi, pert_ids_neg) = State.apply !st r embedding_t counter env in
+							let env,state,pert_ids_pos,new_injs,tracked' = State.positive_update state r (State.map_of embedding_t,psi) (side_effects,Int2Set.empty) counter env
+							in
+							if !n = (int_of_float x) then pert_ids := IntSet.union !pert_ids (IntSet.union pert_ids_neg pert_ids_pos) ; (*only the first time*)
+							st := state ;
+							envr := env ;
+							n := !n-1 ;
+							tracked := tracked'@(!tracked)
+						done ;
+						(!envr,!st,!pert_ids,!tracked)
+			| (Some r,DELETE (v,mix)) ->
+				let mix_id = Mixture.get_id mix in
+				let instance_num = State.instance_number mix_id state env in
+				let x = 
+					let t = eval_var v in
+					if t=infinity then int_of_float instance_num else int_of_float (min t instance_num) 
+				in
+				let cpt = ref 0 
+				and st = ref state
+				and pert_ids = ref pert_ids
+				and envr = ref env
+				and tracked = ref tracked
+				in
+					while !cpt<x do
+						let opt = 
+							try Some (State.select_injection (infinity,0.) state mix counter env) with 
+								| Not_found -> None (*Not found is raised if there is no more injection to draw in instances of mix*)
+								| Null_event _ -> 
+									if !Parameter.debugModeOn then Debug.tag "Clashing instance detected: building matrix";
+									let matrix = State.instances_of_square mix_id state env in
+										match matrix with
+											| (embedding,_,_)::_ -> Some (CONNEX {map=embedding; roots = IntSet.empty ; components = None ; depth_map = None}) 
+											| [] -> None
+						in
+							match opt with
+								| None -> (if !Parameter.debugModeOn then Debug.tag "No more non clashing instances were found!" ; cpt:=x)
+								| Some embedding_t ->
+									let (env, state, side_effects, phi, psi, pert_ids_neg) = State.apply state r embedding_t counter env in
+									let env,state,pert_ids_pos,new_injs,tracked' = State.positive_update state r (State.map_of phi,psi) (side_effects,Int2Set.empty) counter env
+									in
+									if !cpt=0 then pert_ids := IntSet.union !pert_ids (IntSet.union pert_ids_neg pert_ids_pos) ; (*only the first time*)
+									st := state ;
+									cpt := !cpt+1 ;
+									envr := env ;
+									tracked := tracked'@(!tracked)
+					done ;
+					(!envr,!st,!pert_ids,!tracked)
+			| (None,UPDATE_RULE (id,v)) -> 
+				let _ =
+					if !Parameter.debugModeOn then 
+						(Debug.tag (Printf.sprintf "Updating rate of rule '%s'" (Environment.rule_of_num id env)) 
+						)
+				in
+				let value = State.value state ~var:v (-1) counter env in (*Change here if one wants to have address passing style of assignation*)
+				let r = State.rule_of_id id state in
+  			Hashtbl.replace state.rules id {r with k_def = Dynamics.CONST value} ;
+  			State.update_activity state p_id id counter env ;		
+  			let env,pert_ids = State.update_dep state (RULE id) pert_ids counter env in
+  			(env,state ,pert_ids,tracked)
+			| (None,UPDATE_VAR (id,v)) ->
+				let _ =
+					if !Parameter.debugModeOn then 
+						(Debug.tag (Printf.sprintf "Updating variable '%s'" ((fun (x,_)->x) (Environment.alg_of_num id env)) ))
+				in
+				let value = State.value state ~var:v (-1) counter env in (*Change here if one wants to have address passing style of assignation*)
+				State.set_variable id value state ;
+				let env,pert_ids = State.update_dep state (ALG id) pert_ids counter env in
+				(env,state,pert_ids,tracked) 
+			| (None,UPDATE_TOK (tk_id,v)) -> 
+				let _ =
+					if !Parameter.debugModeOn then 
+						(Debug.tag (Printf.sprintf "Updating token '%s'" (Environment.token_of_num tk_id env)))
+				in
+				let value = State.value state ~var:v (-1) counter env in (*Change here if one wants to have address passing style of assignation*)
+					begin
+						try
+							state.State.token_vector.(tk_id) <- value ;
+							let env,pert_ids = State.update_dep state (TOK tk_id) pert_ids counter env in
+							(env,state,pert_ids,tracked) 
+						with Invalid_argument _ -> failwith "External.apply_effect: invalid token id"
+					end
+			| (None,SNAPSHOT opt) -> (snapshot opt ; (env, state ,pert_ids,tracked))
+			| (None,CFLOW id) -> 
+				if !Parameter.debugModeOn then Debug.tag "Tracking causality" ;
+				Parameter.causalModeOn := true ; 
+				let env = if Environment.is_tracked id env then env else Environment.inc_active_cflows env in 
+				let env = Environment.track id env in
+				(env, state, pert_ids,tracked)
+			| (None,CFLOWOFF id) ->
+				begin
+					let env = Environment.dec_active_cflows env in
+					let env = Environment.untrack id env in
+					if Environment.active_cflows env = 0 then Parameter.causalModeOn := false ;
+					(env,state,pert_ids,tracked)
+				end
+			| (None,FLUXOFF opt) ->
+				begin
+					let desc = match opt with None -> open_out !Parameter.fluxFileName | Some nme -> open_out nme in
+					Parameter.add_out_desc desc ;
+					State.dot_of_flux desc state env ;
+					close_out desc ;
+					Parameter.openOutDescriptors := List.tl (!Parameter.openOutDescriptors) ;
+					Parameter.fluxModeOn := false ;
+					(env,state,pert_ids,tracked)
+				end
+			| (None,STOP opt) ->
+				(if !Parameter.debugModeOn then Debug.tag "Interrupting simulation now!" ;
+				snapshot opt ;
+				raise (ExceptionDefn.StopReached (Printf.sprintf "STOP instruction was satisfied at event %d" (Counter.event counter)))
+				)
+			| (None,FLUX opt) ->
+				begin
+					if !Parameter.fluxModeOn then ExceptionDefn.warning "Flux modes are overlapping" ;
+					Parameter.fluxModeOn := true ;
+					let _ = 
+  					match opt with
+  						| None -> Parameter.fluxFileName := "flux"^"_"^(string_of_int (Counter.event counter))
+  						| Some nme -> Parameter.fluxFileName := nme 
+					in
+					Parameter.set Parameter.fluxFileName (Some "dot");
+					(env, state, pert_ids,tracked)
+				end
+			| _ -> invalid_arg "External.trigger_effect"
+
+
+
 let apply_effect p_id pert state counter env =
 	let snapshot opt =
 		if !Parameter.debugModeOn then Debug.tag "Taking a snapshot of current state" ;
 		let filename = 
 			match opt with 
-				| None -> !Parameter.snapshotFileName^"_"^(string_of_int (Counter.event counter)) 
+				| None -> (Filename.chop_extension (!Parameter.snapshotFileName))^"_"^(string_of_int (Counter.event counter)) 
 				| Some s -> (Filename.concat !Parameter.outputDirName s)^"_"^(string_of_int (Counter.event counter)^"_"^(string_of_int (Counter.null_event counter)))
 		in
 		let file_exists = ref true in
@@ -65,155 +208,10 @@ let apply_effect p_id pert state counter env =
 			| CONST f -> f
 			| VAR v_fun -> v_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time()) v_of_token
 	in
-		match pert.effect with
-			| INTRO (v,mix) -> 
-				let x = eval_var v in
-				if x = infinity then 
-					let p_str = pert.flag in 
-						invalid_arg ("Perturbation "^p_str^" would introduce an infinite number of agents, aborting...")
-				else
-					if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Introducing %d instances of %s" (int_of_float x) (Mixture.to_kappa false mix env)) ;
-					let r = 
-						match Environment.rule_of_pert p_id env with 
-							| None -> invalid_arg "External.apply_effect"
-							| Some r_id -> try State.rule_of_id r_id state with Not_found -> invalid_arg "External.apply_effect"
-					in
-					let n = ref (int_of_float x)
-					and st = ref state
-					and pert_ids = ref IntSet.empty
-					and envr = ref env 
-					and tracked = ref []
-					in
-						while !n > 0 do (*FIXME: highly unefficient to compute new injection at each loop*)
-							let embedding_t = State.select_injection (infinity,0.) state r.lhs counter env in (*empty embedding, cannot raise null-event*)
-							let (env, state, side_effects, embedding_t, psi, pert_ids_neg) = State.apply !st r embedding_t counter env in
-							let env,state,pert_ids_pos,new_injs,tracked' = State.positive_update state r (State.map_of embedding_t,psi) (side_effects,Int2Set.empty) counter env
-							in
-							if !n = (int_of_float x) then pert_ids := IntSet.union !pert_ids (IntSet.union pert_ids_neg pert_ids_pos) ; (*only the first time*)
-							st := state ;
-							envr := env ;
-							n := !n-1 ;
-							tracked := tracked'@(!tracked)
-						done ;
-						(!envr,!st,!pert_ids,!tracked)
-			| DELETE (v,mix) ->
-				let mix_id = Mixture.get_id mix in
-				let instance_num = State.instance_number mix_id state env in
-				let r = 
-					match Environment.rule_of_pert p_id env with 
-						| None -> invalid_arg "External.apply_effect"
-						| Some r_id -> try State.rule_of_id r_id state with Not_found -> invalid_arg "External.apply_effect"
-				in
-				let x = 
-					let t = eval_var v in
-					if t=infinity then int_of_float instance_num else int_of_float (min t instance_num) 
-				in
-				let cpt = ref 0 
-				and st = ref state
-				and pert_ids = ref IntSet.empty
-				and envr = ref env
-				and tracked = ref []
-				in
-					while !cpt<x do
-						let opt = 
-							try Some (State.select_injection (infinity,0.) state mix counter env) with 
-								| Not_found -> None (*Not found is raised if there is no more injection to draw in instances of mix*)
-								| Null_event _ -> 
-									if !Parameter.debugModeOn then Debug.tag "Clashing instance detected: building matrix";
-									let matrix = State.instances_of_square mix_id state env in
-										match matrix with
-											| (embedding,_,_)::_ -> Some (CONNEX {map=embedding; roots = IntSet.empty ; components = None ; depth_map = None}) 
-											| [] -> None
-						in
-							match opt with
-								| None -> (if !Parameter.debugModeOn then Debug.tag "No more non clashing instances were found!" ; cpt:=x)
-								| Some embedding_t ->
-									let (env, state, side_effects, phi, psi, pert_ids_neg) = State.apply state r embedding_t counter env in
-									let env,state,pert_ids_pos,new_injs,tracked' = State.positive_update state r (State.map_of phi,psi) (side_effects,Int2Set.empty) counter env
-									in
-									if !cpt=0 then pert_ids := IntSet.union !pert_ids (IntSet.union pert_ids_neg pert_ids_pos) ; (*only the first time*)
-									st := state ;
-									cpt := !cpt+1 ;
-									envr := env ;
-									tracked := tracked'@(!tracked)
-					done ;
-					(!envr,!st,!pert_ids,!tracked)
-			| UPDATE_RULE (id,v) -> 
-				let _ =
-					if !Parameter.debugModeOn then 
-						(Debug.tag (Printf.sprintf "Updating rate of rule '%s'" (Environment.rule_of_num id env)) 
-						)
-				in
-				let value = State.value state ~var:v (-1) counter env in (*Change here if one wants to have address passing style of assignation*)
-				let r = State.rule_of_id id state in
-  			Hashtbl.replace state.rules id {r with k_def = Dynamics.CONST value} ;
-  			State.update_activity state p_id id counter env ;		
-  			let env,pert_ids = State.update_dep state (RULE id) IntSet.empty counter env in
-  			(env,state ,pert_ids,[])
-			| UPDATE_VAR (id,v) ->
-				let _ =
-					if !Parameter.debugModeOn then 
-						(Debug.tag (Printf.sprintf "Updating variable '%s'" ((fun (x,_)->x) (Environment.alg_of_num id env)) ))
-				in
-				let value = State.value state ~var:v (-1) counter env in (*Change here if one wants to have address passing style of assignation*)
-				State.set_variable id value state ;
-				let env,pert_ids = State.update_dep state (ALG id) IntSet.empty counter env in
-				(env,state,pert_ids,[]) 
-			| UPDATE_TOK (tk_id,v) -> 
-				let _ =
-					if !Parameter.debugModeOn then 
-						(Debug.tag (Printf.sprintf "Updating token '%s'" (Environment.token_of_num tk_id env)))
-				in
-				let value = State.value state ~var:v (-1) counter env in (*Change here if one wants to have address passing style of assignation*)
-					begin
-						try
-							state.State.token_vector.(tk_id) <- value ;
-							let env,pert_ids = State.update_dep state (TOK tk_id) IntSet.empty counter env in
-							(env,state,pert_ids,[]) 
-						with Invalid_argument _ -> failwith "External.apply_effect: invalid token id"
-					end
-			| SNAPSHOT opt -> (snapshot opt ; (env, state ,IntSet.empty,[]))
-			| CFLOW id -> 
-				if !Parameter.debugModeOn then Debug.tag "Tracking causality" ;
-				Parameter.causalModeOn := true ; 
-				let env = if Environment.is_tracked id env then env else Environment.inc_active_cflows env in 
-				let env = Environment.track id env in
-				(env, state, IntSet.empty,[])
-			| CFLOWOFF id ->
-				begin
-					let env = Environment.dec_active_cflows env in
-					let env = Environment.untrack id env in
-					if Environment.active_cflows env = 0 then Parameter.causalModeOn := false ;
-					(env,state,IntSet.empty,[])
-				end
-			| FLUXOFF opt ->
-				begin
-					let desc = match opt with None -> open_out !Parameter.fluxFileName | Some nme -> open_out nme in
-					Parameter.add_out_desc desc ;
-					State.dot_of_flux desc state env ;
-					close_out desc ;
-					Parameter.openOutDescriptors := List.tl (!Parameter.openOutDescriptors) ;
-					Parameter.fluxModeOn := false ;
-					(env,state,IntSet.empty,[])
-				end
-			| STOP opt ->
-				(if !Parameter.debugModeOn then Debug.tag "Interrupting simulation now!" ;
-				snapshot opt ;
-				raise (ExceptionDefn.StopReached (Printf.sprintf "STOP instruction was satisfied at event %d" (Counter.event counter)))
-				)
-			| FLUX opt ->
-				begin
-					if !Parameter.fluxModeOn then ExceptionDefn.warning "Flux modes are overlapping" ;
-					Parameter.fluxModeOn := true ;
-					let _ = 
-  					match opt with
-  						| None -> Parameter.fluxFileName := "flux"^"_"^(string_of_int (Counter.event counter))
-  						| Some nme -> Parameter.fluxFileName := nme 
-					in
-					Parameter.set Parameter.fluxFileName (Some "dot");
-					(env, state, IntSet.empty,[])
-				end
-				
+	List.fold_left 
+	(fun (env, state, pert_ids,tracked) effect -> trigger_effect state env pert_ids tracked pert p_id effect eval_var snapshot counter ) 
+	(env,state,IntSet.empty,[]) pert.effect
+					
 
 let rec try_perturbate state pert_ids counter env = 
 	let state,env,pert_ids',tracked = 

@@ -92,6 +92,7 @@ rule token = parse
 								| _ as s -> return_error None lexbuf ("Symbol \""^s^"\" is not defined")
 						}  
 		| ':' {TYPE_TOK}
+		| ';' {SEMICOLON}
 		| '\"' {let filename = read_label "" ['\"'] lexbuf in let pos = position lexbuf in FILENAME (filename,pos)}
     | '\n' {incr_line lexbuf ; NEWLINE}
 		| '\r' {NEWLINE}

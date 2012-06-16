@@ -30,7 +30,7 @@ type t = {
 	fresh_pert : int ;
 	num_of_pert : int StringMap.t ;
 	pert_of_num : string IntMap.t ;
-	rule_of_pert : int IntMap.t ;
+	(*rule_of_pert : IntSet.t IntMap.t ;*)
 	
 	rule_indices : IntSet.t ;
 	empty_lhs : IntSet.t ;
@@ -67,7 +67,7 @@ let empty =
 	
 	num_of_pert = StringMap.empty ;
 	pert_of_num = IntMap.empty ;
-	rule_of_pert = IntMap.empty ;
+	(*rule_of_pert = IntMap.empty ;*)
 	rule_indices = IntSet.empty ;
 	dependencies = DepMap.empty ;
 	empty_lhs = IntSet.empty ;
@@ -136,8 +136,8 @@ let num_of_pert lab env = StringMap.find lab env.num_of_pert
 let is_rule i env = IntSet.mem i env.rule_indices
 let num_of_alg s env = StringMap.find s env.num_of_alg
 let	alg_of_num i env = IntMap.find i env.alg_of_num
-let bind_pert_rule pid rid env = {env with rule_of_pert = IntMap.add pid rid env.rule_of_pert}
-let rule_of_pert pid env = try Some (IntMap.find pid env.rule_of_pert) with Not_found -> None 
+(*let bind_pert_rule pid rid env = {env with rule_of_pert = IntMap.add pid rid env.rule_of_pert}*)
+(*let rule_of_pert pid env = try Some (IntMap.find pid env.rule_of_pert) with Not_found -> None *)
 
 let declare_pert (lab,pos) env = 
 	let opt = try Some (num_of_pert lab env) with Not_found -> None in
