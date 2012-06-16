@@ -464,7 +464,7 @@ Notice at lines 10-12 the use of binary/unary notation for rules. As a result bi
 
 \section{Variables}\label{sec:var}
 
-In the KF\index{kappa file} it is also possible to declare \emph{variables}\index{variable} by a line of the form
+In the KF\index{kappa file} it is also possible to declare \emph{variables}\index{variable} with the declaration:
 \ITE{
 \item[] \ttt{\%var: \var{var\_name}~} (\textit{algebraic\_expression} or \textit{kappa\_expression})
 }
@@ -645,13 +645,14 @@ where \textit{boolean\_expression} and \textit{effect}\index{effect} are defined
   	\textit{perturbation\_expression} &::=& \tcb{\ttt{\%mod:}} \textit{perturbation} \\
 	&& | \tcb{\ttt{\%mod:}} \tcb{\ttt{repeat}} \textit{perturbation} \tcb{\ttt{until}} \textit{boolean\_expression} \\\\ 
     
-    \textit{perturbation} &::=& \textit{boolean\_expression} \tcb{\ttt{do}} \textit{effect} \\\\
+    \textit{perturbation} &::=& \textit{boolean\_expression} \tcb{\ttt{do}} \textit{effect\_list} \\\\
     \textit{boolean\_expression} &::=& \textit{algebraic\_expression}\index{boolean expression} \tcb{rel} \textit{algebraic\_expression} \\
     && | (\textit{boolean\_expression} \tcb{||} \textit{boolean\_expression}) \\
     && | (\textit{boolean\_expression} \tcb{\&\&} \textit{boolean\_expression}) \\
     && | \tcb{[not]} \textit{boolean\_expression} \\
     && | \tcb{[true]} | \tcb{[false]} \\\\
-    \textit{effect} &::=& \tcb{\$ADD} \textit{algebraic\_expression agent\_expression} \\
+    \textit{effect\_list} &::=& \textit{effect} \tcb{\ttt {;}} \textit{effect\_list} | \textit{effect} \\\\
+\textit{effect} &::=& \tcb{\$ADD} \textit{algebraic\_expression agent\_expression} \\
     && | \tcb{\$DEL} \textit{algebraic\_expression agent\_expression} \\
     && | \tcb{t <-} \textit{algebraic\_expression} \\
     && | \tcb{\$SNAPSHOT} \textit{opt\_filename}\\ 
@@ -829,7 +830,8 @@ where tunable parameters are described table~\ref{tab:parameters} (default value
 parameter & possible values & description \\
 \hline &\\
 \textit{Causality analysis}&\\
-\ttt{"compressionMode"} & \ttt{"none", "strong", "weak"} & \small type of compression \\
+\ttt{"displayCompression"} & any combination of \\
+&  \ttt{"none", "strong", "weak"} & \small type of compression \\
 \ttt{"cflowFileName"} & \ttt{"cflow.dot"}, any string & \small file name for causal flows\\ & \\
 \textit{Pretty printing}&\\
 \ttt{"plotSepChar"} & \ttt{" "} or any character & \small separation character for plots\\
