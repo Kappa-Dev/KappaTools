@@ -42,10 +42,9 @@
 %var: 'freeA' A(x)
 %var: 'pAfree' 'freeA'/'n_ab'
 
-%mod: 'pAfree'<0.7 do $TRACK 'Cpp' [true]
-%mod: 'pAfree'<0.7 do $UPDATE 'x' 'Cpp'
-%mod: ('pAfree'<0.7 && ('Cpp'-'x' > 99)) do $TRACK 'Cpp' [false]
+%mod: 'pAfree'<0.7 do ($TRACK 'Cpp' [true]; $UPDATE 'x' 'Cpp') 
+%mod: (('x'>0) && ('Cpp'-'x' > 99)) do $TRACK 'Cpp' [false]
 
 
-%def: "displayCompression" "weak"
+%def: "displayCompression" "weak" 
 #%mod: [true] do $FLUX "flux_map"

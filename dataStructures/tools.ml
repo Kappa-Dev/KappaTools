@@ -14,7 +14,6 @@ let string_of_set f fold set =
   in
     Printf.sprintf "{%s}" (String.concat "," l)
 
-
 let string_of_map ?(swap=false) f1 f2 fold map = 
   let l = 
     fold (fun i j cont -> 
