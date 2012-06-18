@@ -131,43 +131,16 @@ let weak_compression env state log_info step_list =
             else 
               refined_event_list_cut,0 
           in 
-          let error,blackboard = D.S.PH.B.PB.init parameter handler error log_info  in
-          let _ = 
-            if log_step
-            then 
-              Debug.tag "\t\t * dealing with steps" 
-          in 
-          let error,blackboard = 
-            List.fold_left 
-              (fun (error,blackboard) refined_event  -> 
-                D.S.PH.B.PB.add_step parameter handler error refined_event blackboard)
-              (error,blackboard)
-              refined_event_list_without_pseudo_inverse
-          in 
-          let error,preblackboard = 
-            D.S.PH.B.PB.finalize parameter handler error blackboard 
-          in 
+          let error,log_info,blackboard = D.S.PH.B.import parameter handler error log_info refined_event_list_without_pseudo_inverse in 
           let _ = 
             if log_step 
             then 
-              Debug.tag "\t\t * converting into the blackboard" 
+              Debug.tag "\t\t * blackboard generation" 
           in 
-          let error = 
-            if debug_mode
-            then 
-              let _ = 
-                D.S.PH.B.PB.print_preblackboard parameter handler error preblackboard 
-              in 
-              let _ = flush parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err in 
-              error 
-            else 
-              error 
-          in
-          let error,blackboard = D.S.PH.B.import parameter handler error preblackboard in 
-          let blackboard = D.S.PH.B.set_profiling_info (D.S.PH.B.PB.CI.Po.K.P.set_global_cut int) blackboard in 
-          let blackboard = D.S.PH.B.set_profiling_info (D.S.PH.B.PB.CI.Po.K.P.set_pseudo_inv int_pseudo_inverse) blackboard in 
+          let log_info = D.S.PH.B.PB.CI.Po.K.P.set_global_cut int log_info in 
+          let log_info = D.S.PH.B.PB.CI.Po.K.P.set_pseudo_inv int_pseudo_inverse log_info in 
           let _ = 
-            if log_step  
+            if debug_mode && log_step  
             then 
               Debug.tag "\t\t * pretty printing the grid" 
           in 
@@ -200,10 +173,10 @@ let weak_compression env state log_info step_list =
                   then 
                     Debug.tag ("\t\t * compress "^(string_of_int (List.length list_eid)))
                 in 
-                let blackboard = D.S.PH.B.set_profiling_info (D.S.PH.B.PB.CI.Po.K.P.set_start_compression) blackboard in 
-                let error,blackboard,output,result_wo_compression,list,log_info  = 
-                  D.S.compress parameter handler error blackboard list_order list_eid 
-                in 
+                let log_info = D.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
+                let error,log_info,blackboard,output,result_wo_compression,list = 
+                  D.S.compress parameter handler error log_info blackboard list_order list_eid 
+                in
                 let log_info = D.S.PH.B.PB.CI.Po.K.P.set_story_research_time log_info in 
                 let error = 
                   if debug_mode
@@ -243,7 +216,7 @@ let weak_compression env state log_info step_list =
                               let info = 
                                 {info with Mods.story_id = counter }
                               in 
-                              let info = Mods.update_profiling_info log_info  info 
+                              let info = Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy log_info)  info 
                               in 
                               Some info
                         in 
@@ -252,7 +225,7 @@ let weak_compression env state log_info step_list =
                         error,story_array
                 in 
                 let _ = (*production des dotfiles des histoires avant compression*)
-									if !Parameter.mazCompression then 
+		  if !Parameter.mazCompression then 
                     match result_wo_compression 
                     with 
                       | None -> () 
@@ -264,7 +237,7 @@ let weak_compression env state log_info step_list =
                         ()
 									else ()
                 in 
-                let error,blackboard = D.S.PH.B.reset_init parameter handler error blackboard in 
+                let error,log_info,blackboard = D.S.PH.B.reset_init parameter handler error log_info blackboard in 
                 let tick = Mods.tick_stories n_stories tick in 
                 error,counter+1,tick,blackboard,story_array)
               (error,1,tick,blackboard,[]) (List.rev list) 
@@ -288,13 +261,12 @@ let weak_compression env state log_info step_list =
                                 | None -> ()
                                 | Some simulation_info -> 
                                   let log_info = simulation_info.Mods.profiling_info in 
-                                  let blackboard = D.S.PH.B.set_profiling_info (fun _ -> log_info) blackboard in  
                                   let _ = Printf.fprintf log "/*\n" in 
                                   let _ = Mods.dump_simulation_info log simulation_info in 
                                   let _ = Printf.fprintf log "/*\n" in 
-                                  let _ = D.S.PH.B.print_complete_log log blackboard in 
+                                  let _ = D.S.PH.B.PB.CI.Po.K.P.dump_complete_log log log_info in 
                                   let _ = Printf.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_profiling "\nCompression of the %s story:\n\n" (th_of_int counter) in 
-                                  let _ = D.S.PH.B.print_complete_log parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_profiling blackboard in 
+                                  let _ = D.S.PH.B.PB.CI.Po.K.P.dump_complete_log parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_profiling log_info in 
                                   ())
                             list 
                         )

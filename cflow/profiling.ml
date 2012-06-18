@@ -229,17 +229,27 @@ module StoryStats =
        let set_story_research_time log = 
          let t = Sys.time () in 
          let st = log.step_start_time in 
-         { log with story_research_time = t -. st }
+         { log 
+           with 
+             story_research_time = t -. st ; 
+             step_start_time = t }
            
        let set_concurrent_event_detection_time log = 
          let t = Sys.time () in 
          let st = log.step_start_time in 
-         {log with concurrent_event_detection_time = t -. st}
+         {log 
+          with 
+            concurrent_event_detection_time = t -. st ; 
+            step_start_time = t }
 
        let set_concurrent_event_deletion_time log = 
          let t = Sys.time () in 
          let st = log.step_start_time in 
-         {log with concurrent_event_deletion_time = t -. st}
+         {log 
+          with 
+            concurrent_event_deletion_time = t -. st ; 
+            step_start_time = t 
+         }
 
 
        let set_grid_generation log = 
