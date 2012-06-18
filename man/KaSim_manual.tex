@@ -545,15 +545,15 @@ to declare a variable and at the same time require it to be outputted in the dat
 
 The initial mixture\index{mixture} to which rules in the KF\index{kappa file} will be applied are declared as
 \ITE{
-\item[] \ttt{\%init: } \textit{mult} \textit{kappa\_expression}
+\item[] \ttt{\%init: } \textit{algebraic\_expression} \textit{kappa\_expression}
 }
 or
 \ITE{
-\item[] \ttt{\%init: }  \textit{token} \ttt{<-} \textit{mult}
+\item[] \ttt{\%init: }  \textit{token} \ttt{<-} \textit{algebraic\_expression}
 }
 
 %%
-where \textit{mult} is either a positive integer or a variable name pointing to a constant expression. This will add to the initial state of the model \textit{mult} copies of the graph described by the kappa expression. Again the DCDW convention\index{don't care don't write} allows us not to write the complete interface of added agents (the remaining sites will be completed according to the agent's signature\index{agent signature}). For instance:
+where \textit{algebraic\_expression} is evaluated before initialization of the simulation (hence all token and kappa expression values in the expression are evaluated to 0). This will add to the initial state of the model \textit{mult} copies of the graph described by the kappa expression. Again the DCDW convention\index{don't care don't write} allows us not to write the complete interface of added agents (the remaining sites will be completed according to the agent's signature\index{agent signature}). For instance:
 \ITE{
 \item[] \ttt{\%var: \textquotesingle n\textquotesingle~1000}
 \item[] \ttt{\%init: \textquotesingle n\textquotesingle~(A(),A(y\int p))}

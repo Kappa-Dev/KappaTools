@@ -450,18 +450,19 @@ let initialize sg token_vector rules kappa_vars alg_vars obs (pert,rule_pert) co
 			kappa_variables = kappa_var_table;
 			alg_variables = alg_table;
 			token_vector = token_vector ; 
-			observables =
+			observables = 
 				begin
 					List.fold_left
-					(fun cont (dep, const, plot_v, lbl) ->
-								if const
-								then
+					(fun cont (plot_v, const, opt_v, dep, lbl) ->
+								let expr = 
+									if const then (match opt_v with Some v -> CONST v | None -> invalid_arg "State.initialize") 
+									else (VAR plot_v)
+								in
 									{
-										expr = CONST (close_var plot_v) ;
+										expr = expr ;
 										label = replace_space lbl;
 									} :: cont
-								else { expr = VAR plot_v; label = replace_space lbl; } :: cont)
-					[] obs
+					)	[] obs
 				end ;
 			activity_tree = Random_tree.create dim_pure_rule ; (*put only true rules in the activity tree*)
 			influence_map = influence_table ;
