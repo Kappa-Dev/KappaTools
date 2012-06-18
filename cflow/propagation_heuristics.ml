@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 05/09/2011
-  * Last modification: 07/06/2012
+  * Last modification: 19/06/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -34,10 +34,9 @@ module type Blackboard_with_heuristic =
     val forced_events: (B.blackboard -> B.PB.CI.Po.K.H.error_channel * (update_order list * B.PB.step_id list * unit Mods.simulation_info option) list) B.PB.CI.Po.K.H.with_handler 
     val forbidden_events: (B.PB.step_id list -> B.PB.CI.Po.K.H.error_channel * update_order list) B.PB.CI.Po.K.H.with_handler 
     val next_choice: (B.blackboard -> B.PB.CI.Po.K.H.error_channel * update_order list) B.PB.CI.Po.K.H.with_handler 
-    val apply_instruction: (B.blackboard -> update_order -> update_order list -> propagation_check list -> B.PB.CI.Po.K.H.error_channel * B.blackboard * update_order list * propagation_check list * B.assign_result) B.PB.CI.Po.K.H.with_handler 
+    val apply_instruction: (B.PB.CI.Po.K.P.log_info -> B.blackboard -> update_order -> update_order list -> propagation_check list -> B.PB.CI.Po.K.H.error_channel * B.PB.CI.Po.K.P.log_info * B.blackboard * update_order list * propagation_check list * B.assign_result) B.PB.CI.Po.K.H.with_handler 
 
-    val propagate: (B.blackboard -> propagation_check -> update_order list -> propagation_check list 
-                    -> B.PB.CI.Po.K.H.error_channel * B.blackboard * update_order list * propagation_check list * B.assign_result) B.PB.CI.Po.K.H.with_handler
+    val propagate: (B.PB.CI.Po.K.P.log_info ->B.blackboard -> propagation_check -> update_order list -> propagation_check list -> B.PB.CI.Po.K.H.error_channel * B.PB.CI.Po.K.P.log_info * B.blackboard * update_order list * propagation_check list * B.assign_result) B.PB.CI.Po.K.H.with_handler
    
   end 
 
@@ -142,7 +141,7 @@ module Propagation_heuristic =
       error 
                  
 
-    let propagate_down parameter handler error blackboard event_case_address instruction_list propagate_list = 
+    let propagate_down parameter handler error log_info blackboard event_case_address instruction_list propagate_list = 
       begin 
         let error,bool = B.exist_case parameter handler error blackboard event_case_address in 
         match bool 
@@ -150,6 +149,7 @@ module Propagation_heuristic =
           | Some false -> 
               (* the case has been removed from the blackboard, nothing to be done *)
             error,
+            log_info,
             blackboard,
             instruction_list,
             propagate_list,
@@ -173,6 +173,7 @@ module Propagation_heuristic =
                       B.PB.CI.Po.K.H.raise_error parameter handler error_list error () 
                     in 
                     error,
+                    log_info,
                     blackboard,
                     instruction_list,
                     propagate_list,
@@ -201,12 +202,9 @@ module Propagation_heuristic =
                             (* next event is selected *)
                             (* no test, no action in next event *)
                             (* we propagate the value after the next event*)
-                          let blackboard = 
-                            B.set_profiling_info  
-                              (B.PB.CI.Po.K.P.add_propagation_case_down 1) 
-                              blackboard 
-                          in 
+                          let log_info = B.PB.CI.Po.K.P.add_propagation_case_down 1 log_info in 
                           error,
+                          log_info,
                           blackboard,
                           (Refine_value_after(next_event_case_address,predicate_value))::instruction_list,
                           propagate_list,
@@ -227,12 +225,9 @@ module Propagation_heuristic =
                             (* next event is selected *)
                             (* no test, but an action in next event *)
                             (* nothing to propagate downward*)
-                           let blackboard = 
-                            B.set_profiling_info  
-                              (B.PB.CI.Po.K.P.add_propagation_case_down 2) 
-                              blackboard 
-                          in 
+                          let log_info = B.PB.CI.Po.K.P.add_propagation_case_down 2 log_info in 
                           error,
+                          log_info,
                           blackboard,
                           instruction_list,
                           propagate_list,
@@ -264,12 +259,9 @@ module Propagation_heuristic =
                               (* no action, but a test in next event *)
                               (* the test is compatible with the value *)
                               (* we propagate the meet of the test and the value before and after the next event *)
-                            let blackboard = 
-                              B.set_profiling_info  
-                                (B.PB.CI.Po.K.P.add_propagation_case_down 3) 
-                                blackboard 
-                            in 
+                            let log_info = B.PB.CI.Po.K.P.add_propagation_case_down 3 log_info in 
                             error,
+                            log_info, 
                             blackboard,
                             (Refine_value_before(next_event_case_address,conj))::(Refine_value_after(next_event_case_address,conj))::instruction_list,
                             propagate_list,
@@ -289,16 +281,13 @@ module Propagation_heuristic =
                                 let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                 () 
                             in 
-                            let blackboard = 
-                              B.set_profiling_info  
-                                (B.PB.CI.Po.K.P.add_propagation_case_down 4) 
-                                blackboard 
-                            in 
-                              (* next event is selected *)
-                              (* no action, but a test in next event *)
-                              (* the test is not compatible with the value *)
-                              (* we cut the exploration *)
+                            let log_info = B.PB.CI.Po.K.P.add_propagation_case_down 4 log_info in 
+                            (* next event is selected *)
+                            (* no action, but a test in next event *)
+                            (* the test is not compatible with the value *)
+                            (* we cut the exploration *)
                             error,
+                            log_info, 
                             blackboard,
                             [],
                             [],
@@ -327,16 +316,13 @@ module Propagation_heuristic =
                                 let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                 () 
                             in 
-                            let blackboard = 
-                               B.set_profiling_info  
-                                 (B.PB.CI.Po.K.P.add_propagation_case_down 5) 
-                                 blackboard 
-                            in 
-                              (* next event is selected *)
-                              (* an action and a test in next event *)
-                              (* the test is compatible with the value *)
-                              (* we propagate the meet of the test and the value before the next event *)
+                            let log_info = B.PB.CI.Po.K.P.add_propagation_case_down 5 log_info in 
+                            (* next event is selected *)
+                            (* an action and a test in next event *)
+                            (* the test is compatible with the value *)
+                            (* we propagate the meet of the test and the value before the next event *)
                             error,
+                            log_info, 
                             blackboard,
                             (Refine_value_before(next_event_case_address,conj))::instruction_list,
                             propagate_list,
@@ -359,16 +345,13 @@ module Propagation_heuristic =
                                 let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                 () 
                             in 
-                            let blackboard = 
-                              B.set_profiling_info  
-                                (B.PB.CI.Po.K.P.add_propagation_case_down 6) 
-                                blackboard 
-                            in 
-                              (* next event is selected *)
-                              (* an action and a test in next event *)
-                              (* the test is not compatible with the value *)
-                              (* we cut the exploration *) 
+                            let log_info = B.PB.CI.Po.K.P.add_propagation_case_down 6 log_info in 
+                            (* next event is selected *)
+                            (* an action and a test in next event *)
+                            (* the test is not compatible with the value *)
+                            (* we cut the exploration *) 
                             error,
+                            log_info,
                             blackboard,
                             [],
                             [],
@@ -399,16 +382,13 @@ module Propagation_heuristic =
                                     let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                     () 
                                 in 
-                                let blackboard = 
-                                  B.set_profiling_info  
-                                    (B.PB.CI.Po.K.P.add_propagation_case_down 7) 
-                                    blackboard 
-                                in 
-                                  (* we do not know whether the event is played or not *)
-                                  (*there is no test in the next event *)
-                                  (* there is no action in the next event *)
-                                  (* we propagate the value after the next event*)
+                                let log_info = B.PB.CI.Po.K.P.add_propagation_case_down 7 log_info in 
+                                (* we do not know whether the event is played or not *)
+                                (*there is no test in the next event *)
+                                (* there is no action in the next event *)
+                                (* we propagate the value after the next event*)
                                 error,
+                                log_info, 
                                 blackboard,
                                 (Refine_value_after(next_event_case_address,predicate_value))::instruction_list,
                                 propagate_list,
@@ -434,17 +414,14 @@ module Propagation_heuristic =
                                       let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                       () 
                                   in 
-                                  let blackboard = 
-                                    B.set_profiling_info  
-                                      (B.PB.CI.Po.K.P.add_propagation_case_down 8) 
-                                      blackboard 
-                                  in 
-                                    (* we do not know whether the event is played or not *)
-                                    (* there is a test in the next event *)
-                                    (* there is no action in the next event *)
-                                    (* the test is compatible with the value *)
-                                    (* we propagate the value after the next event*)
+                                  let log_info = B.PB.CI.Po.K.P.add_propagation_case_down 8 log_info in 
+                                  (* we do not know whether the event is played or not *)
+                                  (* there is a test in the next event *)
+                                  (* there is no action in the next event *)
+                                  (* the test is compatible with the value *)
+                                  (* we propagate the value after the next event*)
                                   error,
+                                  log_info,
                                   blackboard,
                                   (Refine_value_after(next_event_case_address,predicate_value))::instruction_list,
                                   propagate_list,
@@ -464,17 +441,14 @@ module Propagation_heuristic =
                                       let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                       () 
                                   in 
-                                  let blackboard = 
-                                    B.set_profiling_info  
-                                      (B.PB.CI.Po.K.P.add_propagation_case_down 9) 
-                                      blackboard 
-                                  in 
-                                    (* we do not know whether the event is played or not *)
-                                    (* there is a test in the next event *)
-                                    (* there is no action in the next event *)
-                                    (* the test is not compatible with the value *)
-                                    (* we discard the next event *) 
+                                  let log_info  = B.PB.CI.Po.K.P.add_propagation_case_down 9 log_info in 
+                                  (* we do not know whether the event is played or not *)
+                                  (* there is a test in the next event *)
+                                  (* there is no action in the next event *)
+                                  (* the test is not compatible with the value *)
+                                  (* we discard the next event *) 
                                   error,
+                                  log_info,
                                   blackboard,
                                   (Discard_event(next_eid)::instruction_list),
                                   propagate_list,
@@ -483,9 +457,6 @@ module Propagation_heuristic =
                         end 
                       | false -> 
                         begin (* there is an action in the next event *) 
-                            (*********************************************************)
-                            (** TO DO improve the propagation by looking at the test *)
-                            (*********************************************************)
                           if not (B.PB.compatible next_action predicate_value) 
                           then (* the action is not compatible with the value *)
                             let error,computed_next_predicate_value = 
@@ -507,16 +478,13 @@ module Propagation_heuristic =
                                 let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                 () 
                             in 
-                            let blackboard = 
-                              B.set_profiling_info  
-                                (B.PB.CI.Po.K.P.add_propagation_case_down 10) 
-                                blackboard 
-                            in 
+                            let log_info = B.PB.CI.Po.K.P.add_propagation_case_down 10 log_info in 
                             (* we do not know whether the event is played or not *)
                             (* there is an action in the next event *)
                             (* the action is compatible with the value *)
                             (* we propagate the join of the value and the action after the next event*)
                             error,
+                            log_info,
                             blackboard,
                             (Refine_value_after(next_event_case_address,computed_next_predicate_value))::instruction_list,
                             propagate_list,
@@ -546,17 +514,15 @@ module Propagation_heuristic =
                                         let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                         () 
                                     in 
-                                    let blackboard = 
-                                      B.set_profiling_info  
-                                        (B.PB.CI.Po.K.P.add_propagation_case_down 11) 
-                                        blackboard 
-                                    in 
-                                      (* we do not know whether the event is played or not *)
-                                      (* there is no test in the next event *)
-                                      (* there is an action in the next event *)
-                                      (* the action is compatible with the value *)
-                                      (* we propagate the join of the value and the action after the next event*)
+                                    let log_info = 
+                                      B.PB.CI.Po.K.P.add_propagation_case_down 11 log_info in 
+                                    (* we do not know whether the event is played or not *)
+                                    (* there is no test in the next event *)
+                                    (* there is an action in the next event *)
+                                    (* the action is compatible with the value *)
+                                    (* we propagate the join of the value and the action after the next event*)
                                     error,
+                                    log_info,
                                     blackboard,
                                     (Refine_value_after(next_event_case_address,computed_next_predicate_value))::instruction_list,
                                     propagate_list,
@@ -584,18 +550,16 @@ module Propagation_heuristic =
                                           let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                           () 
                                       in 
-                                      let blackboard = 
-                                        B.set_profiling_info  
-                                          (B.PB.CI.Po.K.P.add_propagation_case_down 12) 
-                                          blackboard 
-                                      in 
-                                        (* we do not know whether the event is played or not *)
-                                        (* there is a test in the next event *)
-                                        (* there is an action in the next event *)
-                                        (* the test is compatible with the value *)
-                                        (* the action is compatible with the value *)
-                                        (* we propagate the join of the value and the action after the next event*)
+                                      let log_info = 
+                                        B.PB.CI.Po.K.P.add_propagation_case_down 12 log_info in 
+                                      (* we do not know whether the event is played or not *)
+                                      (* there is a test in the next event *)
+                                      (* there is an action in the next event *)
+                                      (* the test is compatible with the value *)
+                                      (* the action is compatible with the value *)
+                                      (* we propagate the join of the value and the action after the next event*)
                                       error,
+                                      log_info, 
                                       blackboard,
                                       (Refine_value_after(next_event_case_address,computed_next_predicate_value))::instruction_list,
                                       propagate_list,
@@ -617,17 +581,14 @@ module Propagation_heuristic =
                                           let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                           () 
                                       in
-                                      let blackboard = 
-                                        B.set_profiling_info  
-                                          (B.PB.CI.Po.K.P.add_propagation_case_down 13) 
-                                          blackboard 
-                                      in 
+                                      let log_info = B.PB.CI.Po.K.P.add_propagation_case_down 13 log_info in 
                                       (* we do not know whether the event is played or not *)
-                                        (* there is a test in the next event *)
-                                        (* there is an action in the next event *)
-                                        (* the test is not compatible with the value *)
-                                        (* we discard the next event *)
+                                      (* there is a test in the next event *)
+                                      (* there is an action in the next event *)
+                                      (* the test is not compatible with the value *)
+                                      (* we discard the next event *)
                                       error,
+                                      log_info,
                                       blackboard,
                                       (Discard_event(next_eid)::instruction_list),
                                       propagate_list,
@@ -639,13 +600,13 @@ module Propagation_heuristic =
             end 
       end
         
-    let rec last_chance_up parameter handler error blackboard predicate_value event_case_address = 
+    let rec last_chance_up parameter handler error log_info blackboard predicate_value event_case_address = 
       let error,bool = B.exist_case parameter handler error blackboard event_case_address in 
       match 
         bool 
       with 
         | Some false -> 
-          error,false,blackboard 
+          error,false,log_info,blackboard 
         | Some true ->
           begin 
             let error,(seid,eid,test,action) = B.get_static parameter handler error blackboard event_case_address in   
@@ -663,35 +624,23 @@ module Propagation_heuristic =
                    in 
                    if bool 
                    then 
-                      let blackboard = 
-                            B.set_profiling_info  
-                              (B.PB.CI.Po.K.P.add_look_up_case 1) 
-                              blackboard 
-                      in 
+                      let log_info = B.PB.CI.Po.K.P.add_look_up_case 1 log_info in 
                       let _ = flush parameter.B.PB.CI.Po.K.H.out_channel_err in 
-                      error,true,blackboard 
+                      error,true,log_info,blackboard 
                    else 
-                     last_chance_up  parameter handler error blackboard predicate_value preview_event_case_address 
+                     last_chance_up  parameter handler error log_info blackboard predicate_value preview_event_case_address 
                  else 
-                   let blackboard = 
-                     B.set_profiling_info 
-                       (B.PB.CI.Po.K.P.add_look_up_case 2)
-                       blackboard 
-                   in 
-                   error,true,blackboard
+                   let log_info = B.PB.CI.Po.K.P.add_look_up_case 2 log_info in 
+                   error,true,log_info,blackboard
               end 
             else 
               begin 
                 if B.PB.more_refined action predicate_value 
                 then 
-                  error,false,blackboard 
+                  error,false,log_info,blackboard 
                 else 
-                   let blackboard = 
-                     B.set_profiling_info 
-                       (B.PB.CI.Po.K.P.add_look_up_case 3)
-                       blackboard 
-                   in 
-                  error,true,blackboard
+                   let log_info = B.PB.CI.Po.K.P.add_look_up_case 3 log_info in 
+                   error,true,log_info,blackboard
               end 
           end 
         | None ->  
@@ -699,7 +648,7 @@ module Propagation_heuristic =
               let error,(seid,eid,test,action) = B.get_static parameter handler error blackboard event_case_address in   
               if B.PB.more_refined action predicate_value 
               then 
-                error,false,blackboard 
+                error,false,log_info,blackboard 
               else 
                 begin 
                   let error,preview_event_case_address = B.follow_pointer_up parameter handler error blackboard event_case_address in 
@@ -708,24 +657,20 @@ module Propagation_heuristic =
                   let error,preview_predicate_value = B.predicate_value_of_case_value parameter handler error preview_case_value in 
                   if B.PB.compatible preview_predicate_value predicate_value 
                   then 
-                      last_chance_up  parameter handler error blackboard predicate_value preview_event_case_address 
+                      last_chance_up  parameter handler error log_info blackboard predicate_value preview_event_case_address 
                   else 
-                     let blackboard = 
-                     B.set_profiling_info 
-                       (B.PB.CI.Po.K.P.add_look_up_case 4)
-                       blackboard 
-                   in 
-                   error,true,blackboard 
+                    let log_info = B.PB.CI.Po.K.P.add_look_up_case 4 log_info in 
+                    error,true,log_info,blackboard 
                 end 
             end 
 
     let last_chance_up = 
       if look_up_for_better_cut
       then last_chance_up
-      else (fun _ _ error blackboard _ _ -> error,false,blackboard)
+      else (fun _ _ error log_info blackboard _ _ -> error,false,log_info,blackboard)
 
         
-    let propagate_up parameter handler error blackboard event_case_address instruction_list propagate_list = 
+    let propagate_up parameter handler error log_info blackboard event_case_address instruction_list propagate_list = 
       begin 
         let error,bool = B.exist_case parameter handler error blackboard event_case_address in 
         match bool 
@@ -733,6 +678,7 @@ module Propagation_heuristic =
           | Some false -> 
             (* the case has been removed from the blackboard, nothing to be done *)
             error,
+            log_info,
             blackboard,
             instruction_list,
             propagate_list,
@@ -767,12 +713,9 @@ module Propagation_heuristic =
                         let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                         ()
                     in 
-                    let blackboard = 
-                      B.set_profiling_info 
-                        (B.PB.CI.Po.K.P.add_propagation_case_up 1)
-                        blackboard 
-                    in 
+                    let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 1 log_info in 
                     error,
+                    log_info,
                     blackboard,
                     (Refine_value_before(event_case_address,new_value))::instruction_list,
                     propagate_list,
@@ -792,12 +735,9 @@ module Propagation_heuristic =
                         let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                         ()
                     in 
-                    let blackboard = 
-                      B.set_profiling_info 
-                        (B.PB.CI.Po.K.P.add_propagation_case_up 2)
-                        blackboard 
-                    in 
+                    let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 2 log_info in 
                     error,
+                    log_info, 
                     blackboard,
                     [],
                     [],
@@ -824,12 +764,9 @@ module Propagation_heuristic =
                         let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                         ()
                     in 
-                    let blackboard = 
-                      B.set_profiling_info 
-                        (B.PB.CI.Po.K.P.add_propagation_case_up 3)
-                        blackboard 
-                    in 
+                    let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 3 log_info in 
                     error,
+                    log_info, 
                     blackboard,
                     instruction_list,
                     propagate_list,
@@ -857,12 +794,9 @@ module Propagation_heuristic =
                             let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                             ()
                         in 
-                        let blackboard = 
-                          B.set_profiling_info 
-                            (B.PB.CI.Po.K.P.add_propagation_case_up 4)
-                            blackboard 
-                        in 
+                        let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 4 log_info in 
                         error,
+                        log_info,
                         blackboard,
                         (Refine_value_before(event_case_address,state)::instruction_list),
                         propagate_list,
@@ -886,12 +820,9 @@ module Propagation_heuristic =
                             let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                             ()
                         in 
-                        let blackboard = 
-                          B.set_profiling_info 
-                            (B.PB.CI.Po.K.P.add_propagation_case_up 5)
-                            blackboard 
-                        in 
+                        let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 5 log_info in 
                         error,
+                        log_info,
                         blackboard,
                         [],
                         [],
@@ -912,12 +843,9 @@ module Propagation_heuristic =
                       let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                       ()
                   in 
-                  let blackboard = 
-                    B.set_profiling_info 
-                      (B.PB.CI.Po.K.P.add_propagation_case_up 6)
-                      blackboard 
-                  in 
+                  let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 6 log_info in 
                   error,
+                  log_info,
                   blackboard,
                   [],
                   [],
@@ -953,12 +881,9 @@ module Propagation_heuristic =
                               let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                               ()
                           in 
-                          let blackboard = 
-                            B.set_profiling_info 
-                              (B.PB.CI.Po.K.P.add_propagation_case_up 7)
-                              blackboard 
-                          in 
+                          let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 7 log_info in 
                           error,
+                          log_info,
                           blackboard,
                           (Refine_value_before(event_case_address,predicate_value))::instruction_list,
                           propagate_list,
@@ -984,12 +909,9 @@ module Propagation_heuristic =
                                 let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                 ()
                             in 
-                            let blackboard = 
-                              B.set_profiling_info 
-                                (B.PB.CI.Po.K.P.add_propagation_case_up 8)
-                                blackboard 
-                            in 
+                            let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 8 log_info in 
                             error,
+                            log_info,
                             blackboard,
                             (Refine_value_before(event_case_address,predicate_value))::instruction_list,
                             propagate_list,
@@ -1009,12 +931,9 @@ module Propagation_heuristic =
                                 let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                 ()
                             in 
-                            let blackboard = 
-                              B.set_profiling_info 
-                                (B.PB.CI.Po.K.P.add_propagation_case_up 9)
-                                blackboard 
-                            in 
+                            let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 9 log_info in 
                             error,
+                            log_info,
                             blackboard,
                             (Discard_event(eid))::instruction_list,
                             propagate_list,
@@ -1032,32 +951,29 @@ module Propagation_heuristic =
                       if B.PB.more_refined action predicate_value 
                       then 
                         begin 
-                          let error,bool,blackboard = last_chance_up parameter handler error blackboard predicate_value preview_event_case_address
+                          let error,bool,log_info,blackboard = last_chance_up parameter handler error log_info blackboard predicate_value preview_event_case_address
                           in 
                           if bool 
                           then 
                             begin 
                                 let _ = 
-                                      if debug_mode 
-                                      then 
-                                        let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 10):\n" in 
-                                        let _ = print_event_case_address parameter handler error blackboard  event_case_address in 
-                                        let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "we do not know if the event before is kept, there is an action \n " in
-                                        let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "before event Action: " in 
-                                        let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err action in 
-                                        let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nWire_state: " in 
-                                        let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err predicate_value in 
-                                        let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nThis is the only opportunity to set up the wire, we keep the event" in 
-                                        let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\n" in 
-                                        let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
-                                        ()
-                                    in 
-                                let blackboard = 
-                                  B.set_profiling_info 
-                                    (B.PB.CI.Po.K.P.add_propagation_case_up 10)
-                                    blackboard 
+                                  if debug_mode 
+                                  then 
+                                    let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 10):\n" in 
+                                    let _ = print_event_case_address parameter handler error blackboard  event_case_address in 
+                                    let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "we do not know if the event before is kept, there is an action \n " in
+                                    let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "before event Action: " in 
+                                    let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err action in 
+                                    let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nWire_state: " in 
+                                    let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err predicate_value in 
+                                    let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nThis is the only opportunity to set up the wire, we keep the event" in 
+                                    let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\n" in 
+                                    let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
+                                    ()
                                 in 
+                                let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 10 log_info in 
                                 error,
+                                log_info,
                                 blackboard,
                                 (Keep_event(eid))::instruction_list,
                                 propagate_list,
@@ -1087,12 +1003,9 @@ module Propagation_heuristic =
                                         let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                         ()
                                     in 
-                                    let blackboard = 
-                                      B.set_profiling_info 
-                                        (B.PB.CI.Po.K.P.add_propagation_case_up 11)
-                                        blackboard 
-                                    in 
+                                    let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 11 log_info in 
                                     error,
+                                    log_info,
                                     blackboard,
                                     (Refine_value_before(event_case_address,new_predicate_value))::instruction_list,
                                     propagate_list,
@@ -1125,12 +1038,9 @@ module Propagation_heuristic =
                                               let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                               ()
                                           in
-                                          let blackboard = 
-                                             B.set_profiling_info 
-                                               (B.PB.CI.Po.K.P.add_propagation_case_up 12)
-                                               blackboard 
-                                           in 
+                                          let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 12 log_info in 
                                           error,
+                                          log_info,
                                           blackboard,
                                           (Refine_value_before(event_case_address,new_predicate_value))::instruction_list,
                                           propagate_list,
@@ -1153,12 +1063,9 @@ module Propagation_heuristic =
                                               let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                               ()
                                           in
-                                          let blackboard = 
-                                            B.set_profiling_info 
-                                              (B.PB.CI.Po.K.P.add_propagation_case_up 13)
-                                              blackboard 
-                    in 
+                                          let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 13 log_info in 
                                           error,
+                                          log_info,
                                           blackboard,
                                           (Discard_event(eid))::instruction_list,
                                           propagate_list,
@@ -1184,12 +1091,9 @@ module Propagation_heuristic =
                                           let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                                           ()
                                       in
-                                       let blackboard = 
-                                         B.set_profiling_info 
-                                           (B.PB.CI.Po.K.P.add_propagation_case_up 14)
-                                           blackboard 
-                                       in 
+                                       let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 14 log_info in 
                                        error,
+                                       log_info,
                                        blackboard,
                                        (Refine_value_before(preview_event_case_address,prev'))::instruction_list,
                                        propagate_list,
@@ -1213,12 +1117,9 @@ module Propagation_heuristic =
                               let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                               ()
                           in
-                          let blackboard = 
-                            B.set_profiling_info 
-                              (B.PB.CI.Po.K.P.add_propagation_case_up 15)
-                              blackboard 
-                          in 
+                          let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 15 log_info in 
                           error,
+                          log_info,
                           blackboard,
                           Discard_event(eid)::instruction_list,
                           propagate_list,
@@ -1243,12 +1144,9 @@ module Propagation_heuristic =
                               let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                               ()
                           in
-                          let blackboard = 
-                             B.set_profiling_info 
-                               (B.PB.CI.Po.K.P.add_propagation_case_up 16)
-                               blackboard 
-                          in 
+                          let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 16 log_info in 
                           error,
+                          log_info,
                           blackboard,
                           (Keep_event(eid))::instruction_list,
                           propagate_list,
@@ -1270,12 +1168,9 @@ module Propagation_heuristic =
                               let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
                               ()
                           in
-                          let blackboard = 
-                            B.set_profiling_info 
-                              (B.PB.CI.Po.K.P.add_propagation_case_up 17)
-                              blackboard 
-                          in 
+                          let log_info = B.PB.CI.Po.K.P.add_propagation_case_up 17 log_info in 
                           error,
+                          log_info,
                           blackboard,
                           [],
                           [],
@@ -1284,13 +1179,13 @@ module Propagation_heuristic =
             end 
       end 
 
-    let propagate parameter handler error blackboard check instruction_list propagate_list = 
+    let propagate parameter handler error log_info blackboard check instruction_list propagate_list = 
       match check 
       with 
-        | Propagate_up x -> propagate_up parameter handler error blackboard x instruction_list propagate_list
-        | Propagate_down x -> propagate_down parameter handler error blackboard x instruction_list propagate_list
+        | Propagate_up x -> propagate_up parameter handler error log_info blackboard x instruction_list propagate_list
+        | Propagate_down x -> propagate_down parameter handler error log_info blackboard x instruction_list propagate_list
 
-    let cut_case parameter handler case (error,blackboard,instruction_list,propagate_list) = 
+    let cut_case parameter handler case (error,log_info,blackboard,instruction_list,propagate_list) = 
       let error,pointer_next = B.follow_pointer_down parameter handler error blackboard case in 
       let error,pointer_previous = B.follow_pointer_up parameter handler error blackboard case in 
       (** we remove the case *)
@@ -1304,9 +1199,9 @@ module Propagation_heuristic =
           blackboard 
       in 
       if B.is_failed result 
-      then (error,blackboard,[],[]),result
+      then (error,log_info,blackboard,[],[]),result
       else if B.is_ignored result 
-      then (error,blackboard,instruction_list,propagate_list),result 
+      then (error,log_info,blackboard,instruction_list,propagate_list),result 
       else 
         begin 
           let error,blackboard = B.dec parameter handler error (B.n_unresolved_events_in_column case) blackboard in 
@@ -1330,21 +1225,21 @@ module Propagation_heuristic =
               (B.pointer pointer_previous)
               blackboard 
           in 
-          (error,blackboard,instruction_list,propagate_list),result 
+          (error,log_info,blackboard,instruction_list,propagate_list),result 
         end 
 
-    let look_down parameter handler error blackboard propagate_list case =
+    let look_down parameter handler error log_info blackboard propagate_list case =
       begin 
         let error,(_,_,_,action) = B.get_static parameter handler error blackboard case in
         if B.PB.is_unknown action 
         then 
-          error,blackboard,propagate_list 
+          error,log_info,blackboard,propagate_list 
         else 
           let list_values = B.PB.weakening action in 
           begin
-            let propagate_list,blackboard = 
+            let propagate_list,log_info,blackboard = 
               List.fold_left 
-                (fun (propagate_list,blackboard) value -> 
+                (fun (propagate_list,log_info,blackboard) value -> 
                   let rec aux case bool = 
                     let ca = B.case_address_of_case_event_address case in 
                     let error,case_value = B.get parameter handler error ca blackboard in 
@@ -1352,16 +1247,16 @@ module Propagation_heuristic =
                     if B.PB.more_refined predicate_value value 
                     then 
                       let error,pointer_next = B.follow_pointer_down parameter handler error blackboard case in 
-                      let blackboard = B.set_profiling_info (B.PB.CI.Po.K.P.add_look_down_case 1) blackboard in 
-                      (Propagate_up pointer_next)::propagate_list,blackboard
+                      let log_info = B.PB.CI.Po.K.P.add_look_down_case 1 log_info in 
+                      (Propagate_up pointer_next)::propagate_list,log_info,blackboard
                     else 
                       let error,next_case = B.follow_pointer_down parameter handler error blackboard case in 
                       let error,exist = B.exist_case parameter handler error blackboard next_case in 
                       match exist 
                       with 
                         | Some true -> 
-                          let blackboard = B.set_profiling_info (B.PB.CI.Po.K.P.add_look_down_case 2) blackboard in 
-                          propagate_list,blackboard
+                          let log_info = B.PB.CI.Po.K.P.add_look_down_case 2 log_info in 
+                          propagate_list,log_info,blackboard
                         | Some false -> aux next_case bool 
                         | None -> 
                           let error,(_,_,_,next_action) = B.get_static parameter handler error blackboard next_case in
@@ -1369,46 +1264,46 @@ module Propagation_heuristic =
                           then 
                             if bool 
                             then 
-                              let blackboard = B.set_profiling_info (B.PB.CI.Po.K.P.add_look_down_case 3) blackboard in 
-                              propagate_list,blackboard
+                              let log_info = B.PB.CI.Po.K.P.add_look_down_case 3 log_info in 
+                              propagate_list,log_info,blackboard
                             else 
                               aux next_case true 
                           else
                             aux next_case bool
                   in 
                   aux case false)
-                (propagate_list,blackboard) 
+                (propagate_list,log_info,blackboard) 
                 list_values 
-            in error,blackboard,propagate_list 
+            in error,log_info,blackboard,propagate_list 
           end 
       end 
         
     let look_down = 
       if look_down_for_better_cut 
       then look_down 
-      else (fun _ _ error blackboard list _ -> error,blackboard,list)
+      else (fun _ _ error log_info blackboard list _ -> error,log_info,blackboard,list)
         
         
-    let refine_value_after parameter handler error blackboard address value instruction_list propagate_list =
+    let refine_value_after parameter handler error log_info blackboard address value instruction_list propagate_list =
       let case_address = B.value_after address in 
       let state = B.state value in 
       let error,blackboard,result = B.refine parameter handler error case_address state blackboard in 
       if B.is_ignored result 
       then 
-        error,blackboard,instruction_list,propagate_list,result 
+        error,log_info,blackboard,instruction_list,propagate_list,result 
       else if B.is_failed result 
       then 
-        error,blackboard,[],[],result 
+        error,log_info,blackboard,[],[],result 
       else 
         let propagate_list = (Propagate_up address)::(Propagate_down address)::propagate_list in 
-        error,blackboard,instruction_list,propagate_list,result 
+        error,log_info,blackboard,instruction_list,propagate_list,result 
           
-    let refine_value_before parameter handler error blackboard address value instruction_list propagate_list =
+    let refine_value_before parameter handler error log_info blackboard address value instruction_list propagate_list =
       let error,pointer_previous = B.follow_pointer_up parameter handler error blackboard address in 
-      refine_value_after parameter handler error blackboard pointer_previous value instruction_list propagate_list 
+      refine_value_after parameter handler error log_info blackboard pointer_previous value instruction_list propagate_list 
         
 
-    let discard_case parameter handler case (error,blackboard,instruction_list,propagate_list) = 
+    let discard_case parameter handler case (error,log_info,blackboard,instruction_list,propagate_list) = 
       let error,pointer_next = B.follow_pointer_down parameter handler error blackboard case in 
       let error,pointer_previous = B.follow_pointer_up parameter handler error blackboard case in 
       (** we remove the case *)
@@ -1422,17 +1317,17 @@ module Propagation_heuristic =
           blackboard 
       in 
       if B.is_failed result 
-      then (error,blackboard,[],[]),result
+      then (error,log_info,blackboard,[],[]),result
       else if B.is_ignored result 
-      then (error,blackboard,instruction_list,propagate_list),result 
+      then (error,log_info,blackboard,instruction_list,propagate_list),result 
       else 
         let ca = B.case_address_of_case_event_address case in 
         let error,case_value = B.get parameter handler error ca blackboard in 
         let error,predicate_value = B.predicate_value_of_case_value parameter handler error case_value in 
         begin 
-          let error,blackboard,instruction_list,_,result' = refine_value_after parameter handler error blackboard pointer_previous predicate_value instruction_list propagate_list in 
+          let error,log_info,blackboard,instruction_list,_,result' = refine_value_after parameter handler error log_info blackboard pointer_previous predicate_value instruction_list propagate_list in 
           if B.is_failed result' 
-          then (error,blackboard,[],[]),result'
+          then (error,log_info,blackboard,[],[]),result'
           else 
             let error,blackboard = B.dec parameter handler error (B.n_unresolved_events_in_column case) blackboard in 
             (** we plug pointer next of the previous event *)
@@ -1458,13 +1353,13 @@ module Propagation_heuristic =
             let propagate_list = 
               (Propagate_up pointer_next)::(Propagate_down pointer_previous)::(Propagate_up pointer_previous)::propagate_list 
             in 
-            let error,blackboard,propagate_list = 
-              look_down parameter handler error blackboard propagate_list case 
+            let error,log_info,blackboard,propagate_list = 
+              look_down parameter handler error log_info blackboard propagate_list case 
             in 
-            (error,blackboard,instruction_list,propagate_list),result 
+            (error,log_info,blackboard,instruction_list,propagate_list),result 
         end
           
-    let keep_case parameter handler case (error,blackboard,instruction_list,propagate_list) = 
+    let keep_case parameter handler case (error,log_info,blackboard,instruction_list,propagate_list) = 
       (** we keep the case *)
       let error,blackboard,result = 
         B.refine 
@@ -1477,21 +1372,22 @@ module Propagation_heuristic =
       in 
       if B.is_failed result 
       then 
-        (error,blackboard,[],[]),result
+        (error,log_info,blackboard,[],[]),result
       else if B.is_ignored result 
       then 
-        (error,blackboard,instruction_list,propagate_list),result
+        (error,log_info,blackboard,instruction_list,propagate_list),result
       else 
         begin 
           let error,pointer_previous = B.follow_pointer_up parameter handler error blackboard case in 
           let error,pointer_next = B.follow_pointer_down parameter handler error blackboard case in 
           let error,(seid,eid,test,action) = B.get_static parameter handler error blackboard case in
           begin 
-            let error,blackboard,instruction_list,_,result' = refine_value_before parameter handler error blackboard case (*new_preview_value*) test  instruction_list propagate_list in 
-            let error,blackboard,instruction_list,_,result'' = refine_value_after parameter handler error blackboard case action (*new_value*) instruction_list propagate_list in 
+            let error,log_info,blackboard,instruction_list,_,result' = refine_value_before parameter handler error log_info blackboard case test  instruction_list propagate_list in 
+            let error,log_info,blackboard,instruction_list,_,result'' = refine_value_after parameter handler error log_info blackboard case action instruction_list propagate_list in 
             if B.is_failed result' or B.is_failed result'' 
             then 
               (error,
+               log_info,
                blackboard,
                [],
                []),
@@ -1501,11 +1397,16 @@ module Propagation_heuristic =
               let propagate_list = 
                 (Propagate_up case)::(Propagate_down case)::(Propagate_down pointer_previous)::(Propagate_up pointer_previous)::propagate_list 
               in 
-              (error,blackboard,instruction_list,propagate_list),result 
+              (error,
+               log_info,
+               blackboard,
+               instruction_list,
+               propagate_list),
+              result 
           end 
         end
 
-    let keep_event parameter handler error blackboard step_id instruction_list propagate_list = 
+    let keep_event parameter handler error log_info blackboard step_id instruction_list propagate_list = 
       let error,blackboard,success = 
         B.refine parameter handler error 
           (B.is_exist_event step_id)
@@ -1514,12 +1415,12 @@ module Propagation_heuristic =
       in 
       if B.is_failed success 
       then 
-        error,blackboard,[],[],success
+        error,log_info,blackboard,[],[],success
       else if B.is_ignored success
       then 
-        error,blackboard,instruction_list,propagate_list,success
+        error,log_info,blackboard,instruction_list,propagate_list,success
       else 
-        let blackboard = B.set_profiling_info (B.PB.CI.Po.K.P.inc_selected_events) blackboard in 
+        let log_info = B.PB.CI.Po.K.P.inc_selected_events log_info in 
         let _ = 
           if debug_mode 
           then 
@@ -1544,10 +1445,10 @@ module Propagation_heuristic =
                   y,success2 
             end 
         in 
-        let (error,blackboard,instruction_list,propagate_list),success = aux list (error,blackboard,instruction_list,propagate_list) B.ignore in 
-        error,blackboard,instruction_list,propagate_list,success 
+        let (error,log_info,blackboard,instruction_list,propagate_list),success = aux list (error,log_info,blackboard,instruction_list,propagate_list) B.ignore in 
+        error,log_info,blackboard,instruction_list,propagate_list,success 
           
-    let gen_event f_case g parameter handler error blackboard step_id instruction_list propagate_list = 
+    let gen_event f_case g parameter handler error log_info blackboard step_id instruction_list propagate_list = 
       let error,blackboard,success = 
         B.refine parameter handler error 
           (B.is_exist_event step_id)
@@ -1556,10 +1457,10 @@ module Propagation_heuristic =
       in 
           if B.is_failed success 
           then 
-            error,blackboard,[],[],success
+            error,log_info,blackboard,[],[],success
           else if B.is_ignored success 
           then 
-            error,blackboard,instruction_list,propagate_list,success
+            error,log_info,blackboard,instruction_list,propagate_list,success
           else 
             begin
               let _ = 
@@ -1568,7 +1469,7 @@ module Propagation_heuristic =
                   let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\n***\nWe remove event %i\n***\n" step_id in 
                   ()
               in 
-              let blackboard = B.set_profiling_info g blackboard in 
+              let log_info = g log_info in 
               let error,blackboard = B.dec parameter handler error (B.n_unresolved_events) blackboard  in 
               let error,list = B.case_list_of_eid parameter handler error blackboard step_id in 
               let rec aux l x success = 
@@ -1585,23 +1486,22 @@ module Propagation_heuristic =
                         else y,success2 
                       end 
               in 
-              let (error,blackboard,instruction_list,propagate_list),success = aux list (error,blackboard,instruction_list,propagate_list) B.ignore in 
-                error,blackboard,instruction_list,propagate_list,success 
+              let (error,log_info,blackboard,instruction_list,propagate_list),success = aux list (error,log_info,blackboard,instruction_list,propagate_list) B.ignore in 
+                error,log_info,blackboard,instruction_list,propagate_list,success 
               end 
 
     let cut_event = gen_event cut_case B.PB.CI.Po.K.P.inc_cut_events
     let discard_event = gen_event discard_case B.PB.CI.Po.K.P.inc_removed_events  
 
-    let apply_instruction parameter handler error blackboard instruction instruction_list propagate_list = 
+    let apply_instruction parameter handler error log_info blackboard instruction instruction_list propagate_list = 
         match instruction 
         with 
           | Keep_event step_id -> 
-            let error,blackboard,ins,prop,output = keep_event parameter handler error blackboard step_id instruction_list propagate_list in 
-            error,blackboard,ins,prop,output 
-          | Cut_event step_id -> cut_event parameter handler error blackboard step_id instruction_list propagate_list 
-          | Discard_event step_id -> discard_event parameter handler error blackboard step_id instruction_list propagate_list 
-          | Refine_value_after (address,value) -> refine_value_after parameter handler error blackboard address value instruction_list propagate_list 
-          | Refine_value_before (address,value) -> refine_value_before parameter handler error blackboard address value instruction_list propagate_list 
+            keep_event parameter handler error log_info blackboard step_id instruction_list propagate_list 
+          | Cut_event step_id -> cut_event parameter handler error log_info blackboard step_id instruction_list propagate_list 
+          | Discard_event step_id -> discard_event parameter handler error log_info blackboard step_id instruction_list propagate_list 
+          | Refine_value_after (address,value) -> refine_value_after parameter handler error log_info blackboard address value instruction_list propagate_list 
+          | Refine_value_before (address,value) -> refine_value_before parameter handler error log_info blackboard address value instruction_list propagate_list 
 
     let keep x = Keep_event x
   end:Blackboard_with_heuristic)

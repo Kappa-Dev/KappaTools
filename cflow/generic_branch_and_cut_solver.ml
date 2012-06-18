@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 23/04/2012
+  * Last modification: 18/06/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -24,7 +24,7 @@ module type Solver =
   (sig 
     module PH:Propagation_heuristics.Blackboard_with_heuristic
 
-    val compress: (PH.B.blackboard -> PH.update_order list -> PH.B.PB.step_id list -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.blackboard * PH.B.assign_result * PH.B.result option * PH.B.result option * PH.B.PB.CI.Po.K.P.log_info) PH.B.PB.CI.Po.K.H.with_handler
+    val compress: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.update_order list -> PH.B.PB.step_id list -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard * PH.B.assign_result * PH.B.result option * PH.B.result option) PH.B.PB.CI.Po.K.H.with_handler
    end)
 
 
@@ -36,13 +36,12 @@ struct
   let combine_output o1 o2 = 
     if PH.B.is_ignored o2 then o1 else o2 
       
- 
-  let rec propagate parameter handler error instruction_list propagate_list blackboard = 
-    let bool,blackboard  = PH.B.tick blackboard in 
+  let rec propagate parameter handler error log_info instruction_list propagate_list blackboard = 
+    let bool,log_info = PH.B.tick log_info in 
     let _ = 
       if bool 
       then 
-        let _ = PH.B.print_complete_log parameter.PH.B.PB.CI.Po.K.H.out_channel_profiling blackboard in 
+        let _ = PH.B.PB.CI.Po.K.P.dump_complete_log parameter.PH.B.PB.CI.Po.K.H.out_channel_profiling log_info in 
         let _ = flush parameter.PH.B.PB.CI.Po.K.H.out_channel_profiling
         in () 
     in 
@@ -50,66 +49,67 @@ struct
     with 
       | t::q ->
         begin 
-          let error,blackboard,instruction_list,propagate_list,assign_result = PH.apply_instruction parameter handler error blackboard t q propagate_list in 
+          let error,log_info,blackboard,instruction_list,propagate_list,assign_result = PH.apply_instruction parameter handler error log_info blackboard t q propagate_list in 
           if PH.B.is_failed assign_result 
           then 
-            error,blackboard,assign_result 
+            error,log_info,blackboard,assign_result 
           else 
-            propagate parameter handler error instruction_list propagate_list blackboard
+            propagate parameter handler error log_info instruction_list propagate_list blackboard
         end
       | [] -> 
         begin
           match propagate_list 
           with 
             | t::q -> 
-              let error,blackboard,instruction_list,propagate_list,assign_result = PH.propagate parameter handler error blackboard t instruction_list q in 
+              let error,log_info,blackboard,instruction_list,propagate_list,assign_result = PH.propagate parameter handler error log_info blackboard t instruction_list q in 
                     if PH.B.is_failed assign_result 
                     then 
-                      error,blackboard,assign_result 
+                      error,log_info,blackboard,assign_result 
                     else 
-                      propagate parameter handler error instruction_list propagate_list blackboard
-            | [] -> error,blackboard,PH.B.success
+                      propagate parameter handler error log_info instruction_list propagate_list blackboard
+            | [] -> error,log_info,blackboard,PH.B.success
         end 
           
 	  
-  let rec branch_over_assumption_list parameter handler error list blackboard = 
+  let rec branch_over_assumption_list parameter handler error log_info list blackboard = 
     match list 
     with 
 	  | [] ->
-            error,blackboard,PH.B.fail
+            error,log_info,blackboard,PH.B.fail
 	  | head::tail -> 
 	    begin
-	      let error,blackboard = PH.B.branch parameter handler error blackboard in
-	      let error,blackboard,output = propagate parameter handler error [head] [] blackboard in
+	      let error,log_info,blackboard = PH.B.branch parameter handler error log_info blackboard in
+	      let error,log_info,blackboard,output = propagate parameter handler error log_info [head] [] blackboard in
 	      if PH.B.is_failed output 
               then 
-                let error,blackboard = PH.B.reset_last_branching parameter handler error blackboard in 
-                branch_over_assumption_list parameter handler error tail blackboard 
+                let error,log_info,blackboard = PH.B.reset_last_branching parameter handler error log_info blackboard in 
+                branch_over_assumption_list parameter handler error log_info tail blackboard 
               else 
-                let error,blackboard,output = iter parameter handler error blackboard in 
+                let error,log_info,blackboard,output = iter parameter handler error log_info blackboard in 
                 if PH.B.is_failed output 
                 then 
-                  let error,blackboard = PH.B.reset_last_branching parameter handler error blackboard in 
-                  branch_over_assumption_list parameter handler error tail blackboard 
+                  let error,log_info,blackboard = PH.B.reset_last_branching parameter handler error log_info blackboard in 
+                  branch_over_assumption_list parameter handler error log_info tail blackboard 
                 else 
-                  error,blackboard,output 
+                  error,log_info,blackboard,output 
 	    end
 	      
-  and iter parameter handler error blackboard = 
+  and iter parameter handler error log_info blackboard = 
     let error,bool = PH.B.is_maximal_solution parameter handler error blackboard in
     if bool 
     then 
-      error,blackboard,PH.B.success 
+      error,log_info,blackboard,PH.B.success 
     else
       let error,list = PH.next_choice parameter handler error blackboard in
-      branch_over_assumption_list parameter handler error list blackboard 
+      branch_over_assumption_list parameter handler error log_info list blackboard 
     
-  let compress parameter handler error blackboard list_order list_eid =
-    let error,blackboard = PH.B.branch parameter handler error blackboard in 
-    let error,blackboard,result_wo_compression,events_to_remove  = PH.B.cut parameter handler error blackboard list_eid  in 
-    let save_blackboard = blackboard in 
-    let error,blackboard,list_order,list_eid = 
-      if false 
+  let compress parameter handler error log_info blackboard list_order list_eid =
+    let error,log_info,blackboard = PH.B.branch parameter handler error log_info blackboard in 
+    let error,log_info,blackboard,result_wo_compression,events_to_remove  = PH.B.cut parameter handler error log_info blackboard list_eid  in 
+     let save_blackboard = blackboard in 
+     let bool = false in (* if true cut the current blackboard, otherwise wuild a new one *)
+     let error,log_info,blackboard,list_order,list_eid = 
+      if bool 
       then 
         let error,forbidden_events = PH.forbidden_events parameter handler error events_to_remove in 
         let _ = 
@@ -121,84 +121,68 @@ struct
             in 
             ()
         in 
-        let error,blackboard,output = 
-          propagate parameter handler error forbidden_events [] blackboard  
+        let error,log_info,blackboard,output = 
+          propagate parameter handler error log_info forbidden_events [] blackboard  
         in 
-        error,blackboard,list_order,list_eid 
+        error,log_info,blackboard,list_order,list_eid 
       else 
-        let blackboard = PH.B.set_profiling_info PH.B.PB.CI.Po.K.P.reset_cut_events blackboard in 
-        let log_info = PH.B.PB.CI.Po.K.P.copy (PH.B.get_profiling_info blackboard) in 
-        let error,preblackboard = PH.B.PB.init parameter handler error log_info  in
-        let error,preblackboard = 
-          List.fold_left 
-            (fun (error,preblackboard) (refined_event,_)  -> 
-              PH.B.PB.add_step parameter handler error refined_event preblackboard)
-            (error,preblackboard)
-            result_wo_compression 
-        in 
-        let error,preblackboard = 
-          PH.B.PB.finalize parameter handler error preblackboard 
-        in 
-        let error,blackboard = PH.B.import parameter handler error preblackboard in 
+        let error,log_info,blackboard = PH.B.import parameter handler error log_info (List.rev_map fst (List.rev result_wo_compression)) in 
         let error,list = PH.forced_events parameter handler error blackboard in 
-        let blackboard = 
-          PH.B.set_profiling_info 
-            (PH.B.PB.CI.Po.K.P.inc_k_cut_events (List.length events_to_remove)) 
-            blackboard 
-        in 
+        let log_info = PH.B.PB.CI.Po.K.P.inc_k_cut_events (List.length events_to_remove) log_info in 
         match list 
         with 
-          | (list_order,list_eid,info)::q -> error,blackboard,list_order,list_eid
-          | _ -> error,blackboard,[],[]  
-    in 
-    let result_wo_compression = 
-      if 
-        Parameter.get_causal_trace parameter.PH.B.PB.CI.Po.K.H.compression_mode 
-      then 
-        Some result_wo_compression 
-      else 
-        None 
-    in 
-    let blackboard = PH.B.set_profiling_info PH.B.PB.CI.Po.K.P.set_concurrent_event_deletion_time blackboard in 
-    let blackboard = PH.B.set_profiling_info PH.B.PB.CI.Po.K.P.set_step_time blackboard in 
-    let _ = 
-      if log_steps 
-      then 
-        let _ = Printf.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err "After Causal Cut  %i \n" (PH.B.get_n_unresolved_events blackboard) in 
-        let _ = 
-          flush parameter.PH.B.PB.CI.Po.K.H.out_channel 
-        in 
-        ()
-    in 
-    let error,blackboard,output = 
-      propagate parameter handler error list_order [] blackboard 
-    in 
-    let _ = 
-      if log_steps 
-      then 
-        let _ = Printf.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err "After observable propagation  %i \n" (PH.B.get_n_unresolved_events blackboard) in 
-        let _ = 
-          flush parameter.PH.B.PB.CI.Po.K.H.out_channel 
-        in ()
-    in 
-    let error,blackboard,output = iter parameter handler error blackboard 
-    in 
-    let profiling_info = PH.B.PB.CI.Po.K.P.copy (PH.B.get_profiling_info blackboard) in 
-    let error,list = 
-         if PH.B.is_failed output 
-         then error,None 
-         else 
-           let error,list = 
-             PH.B.translate_blackboard parameter handler error blackboard 
-           in 
-           error,Some list 
-    in 
-    let error,blackboard = PH.B.reset_init parameter handler error blackboard in 
-(*    let save_blackboard = 
-      PH.B.set_profiling_info 
-        (fun _ -> PH.B.get_profiling_info blackboard)
-        save_blackboard  
-    in *)
-    error,save_blackboard,output,result_wo_compression,list,profiling_info 
+          | (list_order,list_eid,info)::q -> error,log_info,blackboard,list_order,list_eid
+          | _ -> error,log_info,blackboard,[],[]  
+     in 
+     let result_wo_compression = 
+       if 
+         Parameter.get_causal_trace parameter.PH.B.PB.CI.Po.K.H.compression_mode 
+       then 
+         Some result_wo_compression 
+       else 
+         None 
+     in 
+     let log_info = PH.B.PB.CI.Po.K.P.set_concurrent_event_deletion_time log_info in 
+     let log_info = PH.B.PB.CI.Po.K.P.set_step_time log_info in 
+     let _ = 
+       if log_steps 
+       then 
+         let _ = Printf.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err "After Causal Cut  %i \n" (PH.B.get_n_unresolved_events blackboard) in 
+         let _ = 
+           flush parameter.PH.B.PB.CI.Po.K.H.out_channel 
+         in 
+         ()
+     in 
+     let error,log_info,blackboard,output = 
+       propagate parameter handler error log_info list_order [] blackboard 
+     in 
+     let _ = 
+       if log_steps 
+       then 
+         let _ = Printf.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err "After observable propagation  %i \n" (PH.B.get_n_unresolved_events blackboard) in 
+         let _ = 
+           flush parameter.PH.B.PB.CI.Po.K.H.out_channel 
+         in ()
+     in 
+     let error,log_info,blackboard,output = iter parameter handler error log_info blackboard 
+     in 
+     let log_info' = PH.B.PB.CI.Po.K.P.copy log_info in 
+     let error,list = 
+       if PH.B.is_failed output 
+       then error,None 
+       else 
+         let error,list = 
+           PH.B.translate_blackboard parameter handler error blackboard 
+         in 
+         error,Some list 
+     in 
+     let error,log_info,blackboard = 
+       if bool 
+       then 
+        PH.B.reset_init parameter handler error log_info' blackboard 
+       else
+         error,log_info,blackboard 
+     in 
+     error,log_info,save_blackboard,output,result_wo_compression,list 
 end 
   
