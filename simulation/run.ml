@@ -98,30 +98,40 @@ let event state (*grid*) story_profiling event_list counter plot env =
 				let phi = State.map_of embedding_t in
 				 
 				let story_profiling,event_list = 
-					if !Parameter.causalModeOn (*|| !Parameter.weakCompression || !Parameter.mazCompression *)
-	        then
+					if !Parameter.weakCompression || !Parameter.mazCompression 
+	                                then
 					  begin
-              let simulation_info = 
-                {Mods.story_id=  0 ;
-                 Mods.story_time= counter.Mods.Counter.time ;
-                 Mods.story_event= counter.Mods.Counter.events ;
-                 Mods.profiling_info = ()}
-              in 
-              let story_profiling,event_list = 
-								Compression_main.D.S.PH.B.PB.CI.Po.K.store_event story_profiling (Compression_main.D.S.PH.B.PB.CI.Po.K.import_event ((r,phi,psi),(obs_from_rule_app,r,Counter.event counter,side_effect))) event_list 
-							in 
-              let story_profiling,event_list = 
-                List.fold_left 
-                (fun (story_profiling,event_list) (obs,phi) -> 
-                  
-                  let lhs = State.kappa_of_id obs state in 
-                  Compression_main.D.S.PH.B.PB.CI.Po.K.store_obs story_profiling (obs,lhs,phi,simulation_info) event_list)
-                (story_profiling,event_list) 
-                obs_from_rule_app
-              in 
-					 		(story_profiling,event_list)
-					  end
-					else (story_profiling,event_list)
+                                            
+                                            let story_profiling,event_list = 
+					      Compression_main.D.S.PH.B.PB.CI.Po.K.store_event story_profiling (Compression_main.D.S.PH.B.PB.CI.Po.K.import_event ((r,phi,psi),(obs_from_rule_app,r,Counter.event counter,side_effect))) event_list 
+	                                    in 
+                                            story_profiling,event_list 
+                                          end
+                                        else
+                                          story_profiling,event_list
+                                in 
+                                let story_profiling,event_list =
+                                  if !Parameter.causalModeOn
+                                  then 
+                                    begin 
+                                      let simulation_info = 
+                                        {Mods.story_id=  0 ;
+                                         Mods.story_time= counter.Mods.Counter.time ;
+                                         Mods.story_event= counter.Mods.Counter.events ;
+                                         Mods.profiling_info = ()}
+                                      in 
+                                      let story_profiling,event_list = 
+                                        List.fold_left 
+                                          (fun (story_profiling,event_list) (obs,phi) -> 
+                                            
+                                            let lhs = State.kappa_of_id obs state in 
+                                            Compression_main.D.S.PH.B.PB.CI.Po.K.store_obs story_profiling (obs,lhs,phi,simulation_info) event_list)
+                                          (story_profiling,event_list) 
+                                          obs_from_rule_app
+                                      in 
+				      (story_profiling,event_list)
+				    end
+				  else (story_profiling,event_list)
 				in
 				(env,state,IntSet.union pert_ids pert_ids',story_profiling,event_list)
 			| None ->
