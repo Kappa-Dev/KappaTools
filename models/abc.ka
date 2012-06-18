@@ -35,16 +35,15 @@
 #%def: "dotSnapshots" "true"
 #%def: "colorDot" "true"
 
-
 #%mod: [T] > 1 do $SNAPSHOT "Model_SNAPSHOT"
 
 %var: 'x' 0
 %var: 'freeA' A(x)
 %var: 'pAfree' 'freeA'/'n_ab'
 
-%mod: 'pAfree'<0.7 do ($TRACK 'Cpp' [true]; $UPDATE 'x' 'Cpp') 
+%mod: 'pAfree'<0.6 do ($TRACK 'Cpp' [true]; $UPDATE 'x' 'Cpp') 
 %mod: (('x'>0) && ('Cpp'-'x' > 99)) do $TRACK 'Cpp' [false]
 
 
-%def: "displayCompression" "weak" 
+%def: "displayCompression" "weak" "none"
 #%mod: [true] do $FLUX "flux_map"
