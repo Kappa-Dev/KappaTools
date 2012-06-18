@@ -55,6 +55,7 @@ rule token = parse
 		| "->" {let pos = position lexbuf in KAPPA_RAR pos}
 		| "<-" {LAR}
 		| ":=" {let pos = position lexbuf in ASSIGN pos}
+		| "<>" {let pos = position lexbuf in DIFF pos}
 		| pert as s {let pos = position lexbuf in
 									match s with  
 						 			| "$DEL" -> (DELETE pos)
@@ -85,7 +86,6 @@ rule token = parse
 								| "inf" -> INFINITY pos
 								| "true" -> TRUE pos
 								| "false" -> FALSE pos
-								| "not" -> NOT pos
 								| "pi" -> FLOAT (3.14159265,pos)
 								| "Emax" -> EMAX pos
 								| "Tmax" -> TMAX pos

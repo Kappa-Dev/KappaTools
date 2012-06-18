@@ -32,7 +32,7 @@ type bool_expr =
 	| GREATER of alg_expr * alg_expr * Tools.pos
 	| SMALLER of alg_expr * alg_expr * Tools.pos
 	| EQUAL of alg_expr * alg_expr * Tools.pos
-	| NOT of bool_expr * Tools.pos
+	| DIFF of alg_expr * alg_expr * Tools.pos
 
 type mixture = 
 	| COMMA of agent * mixture 

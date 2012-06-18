@@ -814,7 +814,7 @@ let wake_up state modif_type modifs wake_up_map env =
 		)	modifs wake_up_map
 
 (*Note: update_dep is recursive but the first call should always be with dep_in = (KAPPA mix_id) or EVENT or TIME*)
-let rec update_dep state dep_in pert_ids counter env =
+let rec update_dep state cause dep_in pert_ids counter env =
 	let env,depset,pert_ids = 
 		match dep_in with
 			| Mods.TOK t_id -> (*token counter is changed*)
@@ -838,7 +838,7 @@ let rec update_dep state dep_in pert_ids counter env =
 				end;
 				(env,depset,pert_ids)
 			| Mods.RULE r_id ->
-				(update_activity state (-1) r_id counter env; 
+				(update_activity state cause r_id counter env; 
 				let depset = Environment.get_dependencies (Mods.RULE r_id) env
 				in
 				if !Parameter.debugModeOn then if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Rule %d is changed, updating %s" r_id (string_of_set Mods.string_of_dep DepSet.fold depset)) ;
@@ -864,7 +864,7 @@ let rec update_dep state dep_in pert_ids counter env =
 					(env,depset,pert_ids)
 	in
 		DepSet.fold
-		(fun dep (env,pert_ids) -> update_dep state dep pert_ids counter env
+		(fun dep (env,pert_ids) -> update_dep state cause dep pert_ids counter env
 		) 
 		depset (env,pert_ids)
 
@@ -968,8 +968,8 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 					else tracked
 					in
 					update_activity state r.r_id var_id counter env;
-					let env,pert_ids = 
-						update_dep state (Mods.KAPPA var_id) pert_ids counter env
+					let env,pert_ids = (*updating rule activities that depend --transitively-- on var_id*)
+						update_dep state r.r_id (Mods.KAPPA var_id) pert_ids counter env
 					in
 					(*Printf.printf "done (%d,%d) for var[%d]\n" root node_id var_id ;*) 
 					let already_done_map' = IntMap.add var_id	(Int2Set.add (root, node_id) root_node_set) already_done_map 
@@ -1036,7 +1036,8 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 				if !Parameter.debugModeOn then
 					(Debug.tag (Printf.sprintf "adding %f to token %d" value t_id)) ;
 				state.token_vector.(t_id) <- state.token_vector.(t_id) +. value ;
-				update_dep state (Mods.TOK t_id) pert_ids counter env
+				(*updating rule activities that depend on |t_id|*)
+				update_dep state r.r_id (Mods.TOK t_id) pert_ids counter env
 			with Invalid_argument _ -> failwith "State.positive_update: invalid token id"  
 		) (env,pert_ids) r.Dynamics.add_token 
 	in
@@ -1049,7 +1050,7 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 					(Debug.tag (Printf.sprintf "removing %f to token %d" value t_id)) ;
 				
 				state.token_vector.(t_id) <- state.token_vector.(t_id) -. value ;
-				update_dep state (Mods.TOK t_id) pert_ids counter env
+				update_dep state r.r_id (Mods.TOK t_id) pert_ids counter env
 			with Invalid_argument _ -> failwith "State.positive_update: invalid token id"  
 		) (env,pert_ids) r.Dynamics.rm_token
 	in
@@ -1174,7 +1175,7 @@ let negative_upd state cause (u,i) int_lnk counter env =
 						(* comp_injs.(cc_id) <- Some injs_cc_id; *)
 						(* not necessary because comp_injs.(cc_id) has been    *)
 						(* modified by side effect                             *)
-						update_dep state (KAPPA mix_id) pert_ids counter env (*TODO: use influence map for this?*)
+						update_dep state cause (KAPPA mix_id) pert_ids counter env (*TODO: use influence map for this?*)
 					)
 					liftset (env,pert_ids) 
 	in

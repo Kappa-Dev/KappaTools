@@ -2,11 +2,11 @@
   * compression_main.ml 
   *
   * Causal flow compression: a module for KaSim 
-  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
+  * Jerome Feret, projet Abstraction, INRIA Paris-Rocquencourt
   * Jean Krivine, Université Paris-Diderot, CNRS 
   * 
   * KaSim
-  * Jean Krivine, Université Paris-Diderot, CNRS 
+  * Jean Krivine, Universite Paris-Diderot, CNRS 
   *  
   * Creation: 19/10/2011
   * Last modification: 14/06/2012

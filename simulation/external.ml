@@ -101,7 +101,7 @@ let trigger_effect state env pert_ids tracked pert p_id eff eval_var snapshot co
 				let r = State.rule_of_id id state in
   			Hashtbl.replace state.rules id {r with k_def = Dynamics.CONST value} ;
   			State.update_activity state p_id id counter env ;		
-  			let env,pert_ids = State.update_dep state (RULE id) pert_ids counter env in
+  			let env,pert_ids = State.update_dep state (-1) (RULE id) pert_ids counter env in
   			(env,state ,pert_ids,tracked)
 			| (None,UPDATE_VAR (id,v)) ->
 				let _ =
@@ -110,7 +110,7 @@ let trigger_effect state env pert_ids tracked pert p_id eff eval_var snapshot co
 				in
 				let value = State.value state ~var:v (-1) counter env in (*Change here if one wants to have address passing style of assignation*)
 				State.set_variable id value state ;
-				let env,pert_ids = State.update_dep state (ALG id) pert_ids counter env in
+				let env,pert_ids = State.update_dep state (-1) (ALG id) pert_ids counter env in
 				(env,state,pert_ids,tracked) 
 			| (None,UPDATE_TOK (tk_id,v)) -> 
 				let _ =
@@ -121,7 +121,7 @@ let trigger_effect state env pert_ids tracked pert p_id eff eval_var snapshot co
 					begin
 						try
 							state.State.token_vector.(tk_id) <- value ;
-							let env,pert_ids = State.update_dep state (TOK tk_id) pert_ids counter env in
+							let env,pert_ids = State.update_dep state (-1) (TOK tk_id) pert_ids counter env in
 							(env,state,pert_ids,tracked) 
 						with Invalid_argument _ -> failwith "External.apply_effect: invalid token id"
 					end

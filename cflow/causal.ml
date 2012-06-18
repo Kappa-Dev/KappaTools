@@ -304,7 +304,7 @@ let dot_of_grid profiling fic grid state env =
 let pretty_print story_list state env =	
 	let _ =
 		List.fold_left 
-		(fun cpt (_,stories) ->
+		(fun cpt (key,stories) ->
 			let av_t,ids,n =
 				List.fold_left 
 				(fun (av_t,ids,n) (_,_,info_opt) -> 
@@ -316,7 +316,7 @@ let pretty_print story_list state env =
 			let grid = match stories with (grid,_,_)::_ -> grid | [] -> invalid_arg "Causal.pretty_print" in
 			let profiling = 
 				(fun desc -> 
-					Printf.fprintf desc "/* Compression of %d causal flows obtained in average at time %f */\n" n av_t ;
+					Printf.fprintf desc "/* Compression of %d causal flows obtained in average at %E t.u */\n" n (av_t/.(float_of_int n)) ;
 					Printf.fprintf desc "/* Compressed causal flows were: %s */\n" (Tools.string_of_list string_of_int ids) ;
 				)
 			in

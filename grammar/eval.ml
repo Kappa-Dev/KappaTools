@@ -372,13 +372,6 @@ let rec partial_eval_bool env ast =
 			let v1 = f1 inst values t e e_null cpu_t tk and v2 = f2 inst values t e e_null cpu_t tk in op v1 v2 in
 		let lbl = Printf.sprintf "(%s%s%s)" lbl1 op_str lbl2
 		in (part_eval, (const1 && const2), (DepSet.union dep1 dep2), lbl)
-	
-	and un_op ast pos op op_str =
-		let (f, const, dep, lbl) = partial_eval_bool env ast in
-		let lbl = Printf.sprintf "%s(%s)" op_str lbl
-		in
-		((fun inst values t e e_null cpu_t tk -> let b = f inst values t e e_null cpu_t tk in op b), const,
-			dep, lbl)
 	in
 	match ast with
 		| TRUE pos -> ((fun _ _ _ _ _ _ _-> true), true, DepSet.singleton Mods.EVENT, "true")
@@ -387,13 +380,14 @@ let rec partial_eval_bool env ast =
 				bin_op_bool ast ast' pos (fun b b' -> b && b') "and"
 		| OR (ast, ast', pos) ->
 				bin_op_bool ast ast' pos (fun b b' -> b || b') "or"
-		| NOT (ast, pos) -> un_op ast pos (fun b -> not b) "not"
 		| GREATER (ast, ast', pos) ->
 				bin_op_alg ast ast' pos (fun v v' -> v > v') ">"
 		| SMALLER (ast, ast', pos) ->
 				bin_op_alg ast ast' pos (fun v v' -> v < v') "<"
 		| EQUAL (ast, ast', pos) ->
 				bin_op_alg ast ast' pos (fun v v' -> v = v') "="
+		| DIFF (ast, ast', pos) ->
+				bin_op_alg ast ast' pos (fun v v' -> v <> v') "<>"
 
 let mixture_of_ast ?(tolerate_new_state=false) mix_id_opt is_pattern env ast_mix =
 	let rec eval_mixture env ast_mix ctxt mixture =
@@ -509,7 +503,7 @@ let rule_of_ast ?(backwards=false) env (ast_rule_label, ast_rule) tolerate_new_s
 	let r_id = Mixture.get_id lhs in
 	let env = if Mixture.is_empty lhs then Environment.declare_empty_lhs r_id env else env in
 	let env =
-		DepSet.fold
+		DepSet.fold (*creating dependencies between variables in the kinetic rate and the activity of the rule*)
 			(fun dep env ->
 				(*Printf.printf "rule %d depends on %s\n" r_id (Mods.string_of_dep dep) ; *)
 				Environment.add_dependencies dep (RULE r_id) env)
