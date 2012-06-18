@@ -85,8 +85,6 @@ let event state (*grid*) story_profiling event_list counter plot env =
 				counter.Counter.cons_null_events <- 0 ; (*resetting consecutive null event counter since a real rule was applied*)  
 				let env,pert_ids = State.update_dep state Mods.EVENT (IntSet.union pert_ids_rule pert_ids_time) counter env in
 				
-				
-				
 				(*Local positive update: adding new partial injection*)
 				let env,state,pert_ids',new_injs,obs_from_rule_app = 
 					State.positive_update state r (State.map_of embedding_t,psi) (side_effect,Int2Set.empty) counter env
@@ -98,11 +96,9 @@ let event state (*grid*) story_profiling event_list counter plot env =
 				
 				(****************END POSITIVE UPDATE*****************)
 				let phi = State.map_of embedding_t in
-				
-				(*let event_to_record = (r,side_effect,phi,psi,Counter.event counter) in*)
 				 
-				let (*grid,*)story_profiling,event_list = 
-					if !Parameter.causalModeOn || !Parameter.weakCompression || !Parameter.mazCompression 
+				let story_profiling,event_list = 
+					if !Parameter.causalModeOn (*|| !Parameter.weakCompression || !Parameter.mazCompression *)
 	        then
 					  begin
               let simulation_info = 
@@ -123,9 +119,9 @@ let event state (*grid*) story_profiling event_list counter plot env =
                 (story_profiling,event_list) 
                 obs_from_rule_app
               in 
-					 		story_profiling,event_list
+					 		(story_profiling,event_list)
 					  end
-					else story_profiling,event_list
+					else (story_profiling,event_list)
 				in
 				(env,state,IntSet.union pert_ids pert_ids',story_profiling,event_list)
 			| None ->
@@ -141,7 +137,7 @@ let event state (*grid*) story_profiling event_list counter plot env =
 	(*Printf.printf "Applying %s perturbations \n" (Tools.string_of_set string_of_int IntSet.fold pert_ids) ;*)
 	let state,env,obs_from_perturbation = External.try_perturbate state pert_ids counter env (*shoudl add obs_from_pert in the causal flow at some point...*)
 	in
-	(state,story_profiling(*,grid*),event_list,env)
+	(state,story_profiling,event_list,env)
 					
 let loop state grid story_profiling event_list counter plot env =
 	(*Before entering the loop*)
@@ -159,7 +155,8 @@ let loop state grid story_profiling event_list counter plot env =
 		if !Parameter.debugModeOn then 
 			Debug.tag (Printf.sprintf "[**Event %d (Activity %f)**]" counter.Counter.events (Random_tree.total state.State.activity_tree));
 		if (Counter.check_time counter) && (Counter.check_events counter) then
-			let state,story_profiling,event_list,env = event state story_profiling event_list counter plot env 
+			let state,story_profiling,event_list,env = 
+				event state story_profiling event_list counter plot env 
 			in
 			iter state story_profiling event_list counter plot env
 		else (*exiting the loop*)
@@ -171,12 +168,12 @@ let loop state grid story_profiling event_list counter plot env =
       	in 
         if Environment.tracking_enabled env then
 					begin
-	          let story_list  = (*story_list:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_time: float ; story_event: int}*)
+	          let story_list  = (*story_list:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_id:int story_time: float ; story_event: int}*)
             	if !Parameter.weakCompression || !Parameter.causalModeOn 
               then Compression_main.weak_compression env state story_profiling event_list 
               else []
 	          in
-            ()
+            Causal.pretty_print story_list state env
 				  end
 		  end
 	in

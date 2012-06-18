@@ -197,7 +197,6 @@ let string_of_atom atom =
 				
 let dot_of_grid profiling fic grid state env = 
   let t = Sys.time () in 
-	let log = (Filename.chop_extension fic)^".log" in 
 	let ids = Hashtbl.fold (fun key _ l -> key::l) grid.flow [] in
 	let config = cut ids grid in 
 	let label e = 
@@ -250,10 +249,9 @@ let dot_of_grid profiling fic grid state env =
 		) depth_of_event IntMap.empty
 	in
 	let desc = open_out fic
-	and desc' = open_out log in
-  let _ = Parameter.add_out_desc desc in 
-  let _ = profiling desc' in
-	let _ = close_out desc' in 
+	in
+	let _ = Parameter.add_out_desc desc in 
+  let _ = profiling desc in
 	fprintf desc "digraph G{\n ranksep=.5 ; \n" ;
 	IntMap.iter
 	(fun d eids_at_d ->
@@ -301,6 +299,33 @@ let dot_of_grid profiling fic grid state env =
 	fprintf desc "}\n" ;
         fprintf desc "/*\n Dot generation time: %f\n*/" (Sys.time () -. t) ; 
         close_out desc 
+
+(*story_list:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_id:int story_time: float ; story_event: int}*)
+let pretty_print story_list state env =	
+	let _ =
+		List.fold_left 
+		(fun cpt (_,stories) ->
+			let av_t,ids,n =
+				List.fold_left 
+				(fun (av_t,ids,n) (_,_,info_opt) -> 
+					match info_opt with
+						| Some info -> (av_t +. info.story_time,info.story_id::ids,n+1)
+						| None -> invalid_arg "Causal.pretty_print"
+				)(0.,[],0) stories 
+			in
+			let grid = match stories with (grid,_,_)::_ -> grid | [] -> invalid_arg "Causal.pretty_print" in
+			let profiling = 
+				(fun desc -> 
+					Printf.fprintf desc "/* Compression of %d causal flows obtained in average at time %f */\n" n av_t ;
+					Printf.fprintf desc "/* Compressed causal flows were: %s */\n" (Tools.string_of_list string_of_int ids) ;
+				)
+			in
+			let fic = (Filename.chop_extension !Parameter.cflowFileName)^(Printf.sprintf "Compressed_%d" cpt)^".dot" in
+				dot_of_grid profiling fic grid state env ;
+			cpt+1
+		) 0 story_list
+	in
+	()
 	
 let dump grid state env = 
 	let d = open_out "grid.txt" in

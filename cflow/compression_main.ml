@@ -242,15 +242,18 @@ let weak_compression env state log_info step_list =
                 error,counter+1,tick,blackboard,story_array)
               (error,1,tick,blackboard,[]) (List.rev list) 
           in 
+					
+					
           let error,story_array = D.hash_list parameter handler error (List.rev story_array) in 
-          let _ = 
+          (*
+					let _ = 
             List.fold_left 
               (fun counter (canonic,list) -> 
                 match list 
                 with 
                   | [] -> counter 
                   |(grid,_,simulation_info)::_ -> 
-                    let filename_comp = (Filename.chop_suffix !Parameter.cflowFileName ".dot") ^"_"^(string_of_int counter)^"weak_comp"^".dot" in 
+                    let filename_comp = (Filename.chop_extension !Parameter.cflowFileName) ^"_"^(string_of_int counter)^"weak_comp"^".dot" in 
                     let _ = 
                       Causal.dot_of_grid 
                         (fun log -> 
@@ -275,6 +278,7 @@ let weak_compression env state log_info step_list =
               1 story_array 
           in 
           let _ = close_out parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_profiling in 
+					*)
           let _ = 
             List.iter 
               (D.S.PH.B.PB.CI.Po.K.H.dump_error parameter handler error)
