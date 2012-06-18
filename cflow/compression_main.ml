@@ -225,7 +225,7 @@ let weak_compression env state log_info step_list =
                         error,story_array
                 in 
                 let _ = (*production des dotfiles des histoires avant compression*)
-		  if !Parameter.mazCompression then 
+		  						if !Parameter.mazCompression then 
                     match result_wo_compression 
                     with 
                       | None -> () 
