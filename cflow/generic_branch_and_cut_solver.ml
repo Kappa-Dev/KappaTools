@@ -105,13 +105,36 @@ struct
     
   let compress parameter handler error log_info blackboard list_order list_eid =
     let error,log_info,blackboard = PH.B.branch parameter handler error log_info blackboard in 
-    let error,log_info,blackboard,result_wo_compression,events_to_remove  = PH.B.cut parameter handler error log_info blackboard list_eid  in 
-     let save_blackboard = blackboard in 
+    let error,log_info,blackboard,events_to_keep = PH.B.cut parameter handler error log_info blackboard list_eid  in 
+    let to_keep = 
+      List.rev_map (fun k -> PH.B.get_event blackboard k) (List.rev events_to_keep) in
+    let result_wo_compression = 
+      List.rev_map (fun k -> (k,PH.B.PB.CI.Po.K.empty_side_effect)) to_keep  in 
+    let save_blackboard = blackboard in 
      let bool = false in (* if true cut the current blackboard, otherwise wuild a new one *)
      let error,log_info,blackboard,list_order,list_eid = 
       if bool 
       then 
-        let error,forbidden_events = PH.forbidden_events parameter handler error events_to_remove in 
+        let events_to_remove = 
+          let n_events = PH.B.get_n_eid blackboard in 
+          let rec aux k list sol = 
+            if k=n_events 
+            then 
+              List.rev sol 
+            else 
+              match 
+                list
+              with 
+                | t::q -> 
+                  if t=k 
+                  then aux (k+1) q sol 
+                  else aux (k+1) list (k::sol)
+                | [] -> 
+                  aux (k+1) list (k::sol)
+          in 
+          aux 0 events_to_keep []
+        in 
+        let error,forbidden_events = PH.forbidden_events parameter handler error events_to_remove in
         let _ = 
           if log_steps 
           then 
@@ -126,9 +149,8 @@ struct
         in 
         error,log_info,blackboard,list_order,list_eid 
       else 
-        let error,log_info,blackboard = PH.B.import parameter handler error log_info (List.rev_map fst (List.rev result_wo_compression)) in 
+        let error,log_info,blackboard = PH.B.import parameter handler error log_info to_keep in 
         let error,list = PH.forced_events parameter handler error blackboard in 
-        let log_info = PH.B.PB.CI.Po.K.P.inc_k_cut_events (List.length events_to_remove) log_info in 
         match list 
         with 
           | (list_order,list_eid,info)::q -> error,log_info,blackboard,list_order,list_eid

@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 06/09/2011
-  * Last modification: 18/06/2012
+  * Last modification: 19/06/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -46,6 +46,8 @@ sig
   val predicate_id_of_case_address: event_case_address -> PB.predicate_id 
   val build_pointer: PB.step_short_id -> pointer 
   val is_before_blackboard: pointer -> bool 
+  val get_event: blackboard -> int -> PB.CI.Po.K.refined_step 
+  val get_n_eid: blackboard -> int 
   val get_npredicate_id: blackboard -> int 
   val get_n_unresolved_events_of_pid: blackboard -> PB.predicate_id -> int 
   val get_n_unresolved_events: blackboard -> int 
@@ -102,7 +104,7 @@ sig
   val forced_events: blackboard -> (PB.step_id list * unit Mods.simulation_info option) list 
   val side_effect_of_event: blackboard -> PB.step_id -> PB.CI.Po.K.side_effect
 (*  val cut_predicate_id: (blackboard -> PB.predicate_id -> PB.CI.Po.K.H.error_channel *   blackboard) PB.CI.Po.K.H.with_handler *)
-  val cut: (PB.CI.Po.K.P.log_info -> blackboard -> PB.step_id list -> PB.CI.Po.K.H.error_channel * PB.CI.Po.K.P.log_info * blackboard * result * PB.step_id list) PB.CI.Po.K.H.with_handler 
+  val cut: (PB.CI.Po.K.P.log_info -> blackboard -> PB.step_id list -> PB.CI.Po.K.H.error_channel * PB.CI.Po.K.P.log_info * blackboard * PB.step_id list) PB.CI.Po.K.H.with_handler 
 
   val tick: PB.CI.Po.K.P.log_info -> bool * PB.CI.Po.K.P.log_info (* to do: move to the module PB.CI.Po.K.P*)
 end
@@ -350,8 +352,9 @@ module Blackboard =
            
      let tick profiling_info = PB.CI.Po.K.P.tick profiling_info 
    
+     let get_event blackboard k = PB.A.get blackboard.event k 
+     let get_n_eid blackboard = blackboard.n_eid 
      let get_stack_depth blackboard = List.length blackboard.stack 
-
      let forced_events blackboard = blackboard.forced_events 
      let side_effect_of_event blackboard i = PB.A.get blackboard.side_effect_of_event i 
 
@@ -1079,27 +1082,30 @@ module Blackboard =
      then 
        begin 
          let event_array = PB.A.make n_events false in
-         let _ = 
-           List.iter 
-             (fun i -> 
-               PB.A.set event_array i true 
-             ) 
+         let kept_events = [] in 
+         let kept_events = 
+           List.fold_left 
+             (fun kept_events i -> 
+               let _ = 
+                 PB.A.set event_array i true 
+               in i::kept_events) 
+             kept_events 
              list 
          in 
-         let rec aux error event_list =  
+         let rec aux error event_list kept_events =  
            match event_list 
            with 
-             | [] -> error
+             | [] -> error,kept_events
              | eid::q -> 
                begin 
                  if is_fictitious_obs blackboard eid 
                  then 
-                   aux error q  
+                   aux error q kept_events  
                  else 
                    let list = PB.A.get blackboard.event_case_list eid in 
-                   let q = 
+                   let q,kept_events = 
                      List.fold_left
-                       (fun q event_case_address ->
+                       (fun (q,kept_events) event_case_address ->
                          let error,case = get_case parameter handler error event_case_address blackboard in 
                          let pointer = case.dynamic.pointer_previous in 
                          let eid = 
@@ -1123,7 +1129,7 @@ module Blackboard =
                          match 
                            eid 
                          with 
-                           | None -> q 
+                           | None -> q,kept_events
                            | Some prev_eid -> 
                              let bool = 
                                try 
@@ -1131,53 +1137,42 @@ module Blackboard =
                                with 
                                  | _ -> false 
                              in 
-                             let q = 
+                             let q,kept_events = 
                                if 
                                  bool 
                                then 
-                                 q
+                                 q,kept_events
                                else 
                                  let _ = PB.A.set event_array prev_eid true in 
-                                 prev_eid::q
-                             in q)
-                       q 
+                                 prev_eid::q,prev_eid::kept_events
+                             in q,kept_events)
+                       (q,kept_events)
                        list 
                    in 
-                   aux error q 
+                   aux error q kept_events 
                end 
          in 
-         let error = aux error list in 
-         let event_to_keep = ref [] in 
-         let event_to_remove = ref [] in 
-         let _ = 
-           PB.A.iteri 
-             (fun i value -> 
-               if value 
-               then 
-                 event_to_keep:=i::(!event_to_keep)
-               else 
-                 event_to_remove:=i::(!event_to_remove)
-             )
-             event_array 
-         in 
-         let rep  = List.rev_map (fun k -> PB.A.get blackboard.event k,PB.CI.Po.K.empty_side_effect) (!event_to_keep) in
-         error,rep,!event_to_remove 
-       end
+         let error,rep = aux error list kept_events in 
+         error,List.sort compare rep,n_events-List.length rep
+       end 
      else
-       let event_to_keep = 
+       let events_to_keep = 
          let rec aux k list = 
            if k<0 then list 
            else aux (k-1) (k::list)
          in 
-         aux (n_events-1) [] in 
-       let rep  = List.rev_map (fun k -> PB.A.get blackboard.event k,PB.CI.Po.K.empty_side_effect) event_to_keep in
-         error,rep,[]
+         aux (n_events-1) [] 
+       in 
+       error,
+       events_to_keep,
+       0 
 
    let cut parameter handler error log_info blackboard list = 
-     let error,cut_causal_flow,events_to_remove  = useless_predicate_id parameter handler error blackboard list in 
+     let error,cut_causal_flow,n_events_removed = useless_predicate_id parameter handler error blackboard list in 
      let log_info = PB.CI.Po.K.P.set_concurrent_event_detection_time log_info in 
      let log_info = PB.CI.Po.K.P.set_step_time log_info in 
-     error,log_info,blackboard,cut_causal_flow,events_to_remove
+     let log_info = PB.CI.Po.K.P.inc_k_cut_events n_events_removed log_info in 
+     error,log_info,blackboard,cut_causal_flow
 
    let import parameter handler error log_info list = 
      let error,preblackboard = PB.init parameter handler error in
