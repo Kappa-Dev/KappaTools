@@ -54,15 +54,15 @@ let weak_compression env state log_info step_list =
     begin 
       if D.S.PH.B.PB.CI.Po.K.no_obs_found step_list 
       then 
-        let _ = Debug.tag "+ No story found" in []
+        let _ = Debug.tag "+ No causal flow found" in []
       else 
         begin 
           let _ = 
             if (weak_compression_on or strong_compression_on)
             then 
-              let _ = Debug.tag "+ Story compression" in ()
+              let _ = Debug.tag "+ Producing causal compressions" in ()
             else 
-              let _ = Debug.tag "+ Causal traces" in ()
+              let _ = Debug.tag "+ Producing causal traces" in ()
           in 
           let _ = Debug.tag "\t - blackboard generation" in 
           let error = [] in 
@@ -156,7 +156,7 @@ let weak_compression env state log_info step_list =
           let _ = 
             if strong_compression_on or weak_compression_on 
             then 
-              Debug.tag ("\t - story computation ("^(string_of_int n_stories)^")") 
+              Debug.tag ("\t - Causal flow computation ("^(string_of_int n_stories)^")") 
             else 
               Debug.tag ("\t - cut ("^(string_of_int n_stories)^")")
           in 

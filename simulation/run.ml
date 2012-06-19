@@ -178,12 +178,12 @@ let loop state grid story_profiling event_list counter plot env =
       	in 
         if Environment.tracking_enabled env then
 					begin
-	          let story_list  = (*story_list:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_id:int story_time: float ; story_event: int}*)
-            	if !Parameter.weakCompression || !Parameter.causalModeOn 
-              then Compression_main.weak_compression env state story_profiling event_list 
+	          let compressed_flows  = (*compressed_flows:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_id:int story_time: float ; story_event: int}*)
+            	if !Parameter.weakCompression || !Parameter.mazCompression 
+              then Compression_main.weak_compression env state story_profiling event_list
               else []
 	          in
-            Causal.pretty_print story_list state env
+            Causal.pretty_print compressed_flows state env
 				  end
 		  end
 	in

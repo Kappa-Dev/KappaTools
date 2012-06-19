@@ -302,6 +302,7 @@ let dot_of_grid profiling fic grid state env =
 
 (*story_list:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_id:int story_time: float ; story_event: int}*)
 let pretty_print story_list state env =	
+	Debug.tag (Printf.sprintf "\n+ Pretty printing %d compressed flow(s)" (List.length story_list));
 	let _ =
 		List.fold_left 
 		(fun cpt (key,stories) ->
