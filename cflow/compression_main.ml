@@ -22,6 +22,7 @@ module D = Dag.Dag
 
 let log_step = true
 let debug_mode = false
+let dump_profiling_info = false
 
 let th_of_int n = 
   match n mod 10  
@@ -194,12 +195,12 @@ let weak_compression env state log_info step_list =
                   else 
                     error
                 in 
-                let error,story_array = 
+                let error,story_array,info = 
                   match 
                     list
                   with 
                     | None -> 
-                      error,story_array
+                      error,story_array,None
                     | Some list -> 
                       if weak_compression_on
                       then 
@@ -220,22 +221,40 @@ let weak_compression env state log_info step_list =
                               in 
                               Some info
                         in 
-                        error,(canonic,(grid,tick,info))::story_array 
+                        error,(canonic,(grid,tick,info))::story_array,info
                       else 
-                        error,story_array
+                        error,story_array,None
                 in 
                 let _ = (*production des dotfiles des histoires avant compression*)
-		  						if !Parameter.mazCompression then 
+		  if !Parameter.mazCompression then 
                     match result_wo_compression 
                     with 
                       | None -> () 
                       | Some result_wo_compression -> 
-                        let filename =  (Filename.chop_suffix !Parameter.cflowFileName ".dot")^"_"^(string_of_int counter)^".dot"
-  		      						in
+                        let filename =  (Filename.chop_suffix !Parameter.cflowFileName ".dot")^"_"^(string_of_int counter)^".dot" in
                         let grid = D.S.PH.B.PB.CI.Po.K.build_grid result_wo_compression true handler in 
-                        let _ = Causal.dot_of_grid (fun _ -> ()) filename grid state env in
+                        let _ = Causal.dot_of_grid 
+                          (if dump_profiling_info 
+                           then 
+                              (fun log ->
+                                match info 
+                                with 
+                                  | None ->
+                                    Printf.fprintf log "/*No compressed flow found \n (is it a consistent trace ?)/*\n" 
+                                  | Some simulation_info -> 
+                                    let log_info = simulation_info.Mods.profiling_info in 
+                                    let _ = Printf.fprintf log "/*\n" in 
+                                    let _ = Mods.dump_simulation_info log simulation_info in 
+                                    let _ = Printf.fprintf log "/*\n" in 
+                                    let _ = D.S.PH.B.PB.CI.Po.K.P.dump_complete_log log log_info in 
+                                    let _ = Printf.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_profiling "\nCompression of the %s story:\n\n" (th_of_int counter) in 
+                                    let _ = D.S.PH.B.PB.CI.Po.K.P.dump_complete_log parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_profiling log_info in 
+                                ())
+                           else (fun _ -> ()))
+                          filename grid state env 
+                        in
                         ()
-									else ()
+			  
                 in 
                 let error,log_info,blackboard = D.S.PH.B.reset_init parameter handler error log_info blackboard in 
                 let tick = Mods.tick_stories n_stories tick in 
