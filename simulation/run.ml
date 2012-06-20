@@ -98,40 +98,36 @@ let event state (*grid*) story_profiling event_list counter plot env =
 				let phi = State.map_of embedding_t in
 				 
 				let story_profiling,event_list = 
-					if !Parameter.weakCompression || !Parameter.mazCompression 
-	                                then
+					if Environment.tracking_enabled env then (*if logging events is required*) 
 					  begin
-                                            
-                                            let story_profiling,event_list = 
-					      Compression_main.D.S.PH.B.PB.CI.Po.K.store_event story_profiling (Compression_main.D.S.PH.B.PB.CI.Po.K.import_event ((r,phi,psi),(obs_from_rule_app,r,Counter.event counter,side_effect))) event_list 
-	                                    in 
-                                            story_profiling,event_list 
-                                          end
-                                        else
-                                          story_profiling,event_list
-                                in 
-                                let story_profiling,event_list =
-                                  if !Parameter.causalModeOn
-                                  then 
-                                    begin 
-                                      let simulation_info = 
-                                        {Mods.story_id=  0 ;
-                                         Mods.story_time= counter.Mods.Counter.time ;
-                                         Mods.story_event= counter.Mods.Counter.events ;
-                                         Mods.profiling_info = ()}
-                                      in 
-                                      let story_profiling,event_list = 
-                                        List.fold_left 
-                                          (fun (story_profiling,event_list) (obs,phi) -> 
-                                            
-                                            let lhs = State.kappa_of_id obs state in 
-                                            Compression_main.D.S.PH.B.PB.CI.Po.K.store_obs story_profiling (obs,lhs,phi,simulation_info) event_list)
-                                          (story_profiling,event_list) 
-                                          obs_from_rule_app
-                                      in 
-				      (story_profiling,event_list)
-				    end
-				  else (story_profiling,event_list)
+            let story_profiling,event_list = 
+					  	Compression_main.D.S.PH.B.PB.CI.Po.K.store_event story_profiling (Compression_main.D.S.PH.B.PB.CI.Po.K.import_event ((r,phi,psi),(obs_from_rule_app,r,Counter.event counter,side_effect))) event_list 
+	          in 
+            (story_profiling,event_list) 
+            end
+          else
+						(story_profiling,event_list)
+        in 
+        let story_profiling,event_list =
+        	if !Parameter.causalModeOn then (*if tracking the observable is required*) 
+          	begin 
+						let simulation_info = 
+			        {Mods.story_id=  0 ;
+			         Mods.story_time= counter.Mods.Counter.time ;
+			         Mods.story_event= counter.Mods.Counter.events ;
+			         Mods.profiling_info = ()}
+			      in 
+			      let story_profiling,event_list = 
+			      	List.fold_left 
+			       	(fun (story_profiling,event_list) (obs,phi) -> 
+			        	let lhs = State.kappa_of_id obs state in 
+			          Compression_main.D.S.PH.B.PB.CI.Po.K.store_obs story_profiling (obs,lhs,phi,simulation_info) event_list
+							)
+							(story_profiling,event_list) obs_from_rule_app
+      			in 
+  					(story_profiling,event_list)
+						end
+					else (story_profiling,event_list)
 				in
 				(env,state,IntSet.union pert_ids pert_ids',story_profiling,event_list)
 			| None ->
@@ -145,8 +141,31 @@ let event state (*grid*) story_profiling event_list counter plot env =
 	
 	(*Applying perturbation if any*)
 	(*Printf.printf "Applying %s perturbations \n" (Tools.string_of_set string_of_int IntSet.fold pert_ids) ;*)
-	let state,env,obs_from_perturbation = External.try_perturbate state pert_ids counter env (*shoudl add obs_from_pert in the causal flow at some point...*)
+	let state,env,obs_from_perturbation,pert_events = External.try_perturbate state pert_ids counter env 
 	in
+	
+	let story_profiling,event_list,cpt = 
+		if Environment.tracking_enabled env then (*if logging events is required*) 
+		begin
+			let story_profiling,event_list,cpt = 
+				List.fold_left 
+				(fun (story_prof,event_list,cpt) (r,phi,psi,side_effects) ->
+					let sp,el =
+						Compression_main.D.S.PH.B.PB.CI.Po.K.store_event story_prof
+						(Compression_main.D.S.PH.B.PB.CI.Po.K.import_event 
+						((r,phi,psi),(obs_from_perturbation,r,cpt+1,side_effects))) event_list (*we are adding several events with the same id in the grid!*)
+					in
+					(sp,el,cpt+1)
+				) (story_profiling,event_list,Counter.event counter) pert_events
+		  in 
+	    (story_profiling,event_list,cpt) 
+	  end
+	  else
+			(story_profiling,event_list,Counter.event counter)
+	in 
+	counter.Counter.perturbation_events <- cpt ;
+	
+	(*Adding perturbation event if any*)
 	(state,story_profiling,event_list,env)
 					
 let loop state grid story_profiling event_list counter plot env =
@@ -158,7 +177,7 @@ let loop state grid story_profiling event_list counter plot env =
 	(*Checking whether some perturbation should be applied before starting the event loop*)
 	let env,pert_ids = State.update_dep state (-1) Mods.EVENT IntSet.empty counter env in
 	let env,pert_ids = State.update_dep state (-1) Mods.TIME pert_ids counter env in
-	let state,env,_ = External.try_perturbate state pert_ids counter env 
+	let state,env,_,_ = External.try_perturbate state pert_ids counter env 
 	in
 	
 	let rec iter state story_profiling event_list counter plot env =
@@ -179,7 +198,7 @@ let loop state grid story_profiling event_list counter plot env =
         if Environment.tracking_enabled env then
 					begin
 	          let compressed_flows  = (*compressed_flows:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_id:int story_time: float ; story_event: int}*)
-            	if !Parameter.weakCompression || !Parameter.mazCompression 
+            	if !Parameter.weakCompression || !Parameter.mazCompression (*if a compression is required*)
               then Compression_main.weak_compression env state story_profiling event_list
               else []
 	          in

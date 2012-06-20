@@ -163,6 +163,7 @@ module Counter =
 			mutable events:int ; 
 			mutable null_events:int ; 
 			mutable cons_null_events:int;
+			mutable perturbation_events:int ;
 			mutable null_action:int ;
 			mutable last_tick : (int * float) ;
 			mutable initialized : bool ;
@@ -264,6 +265,7 @@ module Counter =
 				events = init_e ; 
 				null_events = 0 ; 
 				cons_null_events = 0;
+				perturbation_events = 0;
 				null_action = 0 ;
 				max_time = mx_t ; 
 				max_events = mx_e ;

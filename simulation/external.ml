@@ -27,7 +27,7 @@ let eval_abort_pert just_applied pert state counter env =
 			in
 				b_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time()) v_of_token
 
-let trigger_effect state env pert_ids tracked pert p_id eff eval_var snapshot counter =
+let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var snapshot counter =
 		match eff with
 			| (Some r,INTRO (v,mix)) -> 
 				let x = eval_var v in
@@ -41,19 +41,22 @@ let trigger_effect state env pert_ids tracked pert p_id eff eval_var snapshot co
 					and pert_ids = ref pert_ids
 					and envr = ref env 
 					and tracked = ref tracked
+					and pert_events = ref pert_events
 					in
 						while !n > 0 do (*FIXME: highly unefficient to compute new injection at each loop*)
 							let embedding_t = State.select_injection (infinity,0.) state r.lhs counter env in (*empty embedding, cannot raise null-event*)
 							let (env, state, side_effects, embedding_t, psi, pert_ids_neg) = State.apply !st r embedding_t counter env in
-							let env,state,pert_ids_pos,new_injs,tracked' = State.positive_update state r (State.map_of embedding_t,psi) (side_effects,Int2Set.empty) counter env
+							let phi = State.map_of embedding_t in
+							let env,state,pert_ids_pos,new_injs,tracked' = State.positive_update state r (phi,psi) (side_effects,Int2Set.empty) counter env
 							in
+							pert_events := (r,phi,psi,side_effects)::!pert_events ;
 							if !n = (int_of_float x) then pert_ids := IntSet.union !pert_ids (IntSet.union pert_ids_neg pert_ids_pos) ; (*only the first time*)
 							st := state ;
 							envr := env ;
 							n := !n-1 ;
 							tracked := tracked'@(!tracked)
 						done ;
-						(!envr,!st,!pert_ids,!tracked)
+						(!envr,!st,!pert_ids,!tracked,!pert_events)
 			| (Some r,DELETE (v,mix)) ->
 				let mix_id = Mixture.get_id mix in
 				let instance_num = State.instance_number mix_id state env in
@@ -66,6 +69,7 @@ let trigger_effect state env pert_ids tracked pert p_id eff eval_var snapshot co
 				and pert_ids = ref pert_ids
 				and envr = ref env
 				and tracked = ref tracked
+				and pert_events = ref pert_events
 				in
 					while !cpt<x do
 						let opt = 
@@ -82,15 +86,17 @@ let trigger_effect state env pert_ids tracked pert p_id eff eval_var snapshot co
 								| None -> (if !Parameter.debugModeOn then Debug.tag "No more non clashing instances were found!" ; cpt:=x)
 								| Some embedding_t ->
 									let (env, state, side_effects, phi, psi, pert_ids_neg) = State.apply state r embedding_t counter env in
-									let env,state,pert_ids_pos,new_injs,tracked' = State.positive_update state r (State.map_of phi,psi) (side_effects,Int2Set.empty) counter env
+									let phi = State.map_of phi in
+									let env,state,pert_ids_pos,new_injs,tracked' = State.positive_update state r (phi,psi) (side_effects,Int2Set.empty) counter env
 									in
+									pert_events := (r,phi,psi,side_effects)::!pert_events ;
 									if !cpt=0 then pert_ids := IntSet.union !pert_ids (IntSet.union pert_ids_neg pert_ids_pos) ; (*only the first time*)
 									st := state ;
 									cpt := !cpt+1 ;
 									envr := env ;
 									tracked := tracked'@(!tracked)
 					done ;
-					(!envr,!st,!pert_ids,!tracked)
+					(!envr,!st,!pert_ids,!tracked,!pert_events)
 			| (None,UPDATE_RULE (id,v)) -> 
 				let _ =
 					if !Parameter.debugModeOn then 
@@ -102,7 +108,7 @@ let trigger_effect state env pert_ids tracked pert p_id eff eval_var snapshot co
   			Hashtbl.replace state.rules id {r with k_def = Dynamics.CONST value} ;
   			State.update_activity state p_id id counter env ;		
   			let env,pert_ids = State.update_dep state (-1) (RULE id) pert_ids counter env in
-  			(env,state ,pert_ids,tracked)
+  			(env,state ,pert_ids,tracked,pert_events)
 			| (None,UPDATE_VAR (id,v)) ->
 				let _ =
 					if !Parameter.debugModeOn then 
@@ -111,7 +117,7 @@ let trigger_effect state env pert_ids tracked pert p_id eff eval_var snapshot co
 				let value = State.value state ~var:v (-1) counter env in (*Change here if one wants to have address passing style of assignation*)
 				State.set_variable id value state ;
 				let env,pert_ids = State.update_dep state (-1) (ALG id) pert_ids counter env in
-				(env,state,pert_ids,tracked) 
+				(env,state,pert_ids,tracked,pert_events) 
 			| (None,UPDATE_TOK (tk_id,v)) -> 
 				let _ =
 					if !Parameter.debugModeOn then 
@@ -122,22 +128,22 @@ let trigger_effect state env pert_ids tracked pert p_id eff eval_var snapshot co
 						try
 							state.State.token_vector.(tk_id) <- value ;
 							let env,pert_ids = State.update_dep state (-1) (TOK tk_id) pert_ids counter env in
-							(env,state,pert_ids,tracked) 
+							(env,state,pert_ids,tracked,pert_events) 
 						with Invalid_argument _ -> failwith "External.apply_effect: invalid token id"
 					end
-			| (None,SNAPSHOT opt) -> (snapshot opt ; (env, state ,pert_ids,tracked))
+			| (None,SNAPSHOT opt) -> (snapshot opt ; (env, state ,pert_ids,tracked,pert_events))
 			| (None,CFLOW id) -> 
 				if !Parameter.debugModeOn then Debug.tag "Tracking causality" ;
 				Parameter.causalModeOn := true ; 
 				let env = if Environment.is_tracked id env then env else Environment.inc_active_cflows env in 
 				let env = Environment.track id env in
-				(env, state, pert_ids,tracked)
+				(env, state, pert_ids,tracked,pert_events)
 			| (None,CFLOWOFF id) ->
 				begin
 					let env = Environment.dec_active_cflows env in
 					let env = Environment.untrack id env in
 					if Environment.active_cflows env = 0 then Parameter.causalModeOn := false ;
-					(env,state,pert_ids,tracked)
+					(env,state,pert_ids,tracked,pert_events)
 				end
 			| (None,FLUXOFF opt) ->
 				begin
@@ -147,7 +153,7 @@ let trigger_effect state env pert_ids tracked pert p_id eff eval_var snapshot co
 					close_out desc ;
 					Parameter.openOutDescriptors := List.tl (!Parameter.openOutDescriptors) ;
 					Parameter.fluxModeOn := false ;
-					(env,state,pert_ids,tracked)
+					(env,state,pert_ids,tracked,pert_events)
 				end
 			| (None,STOP opt) ->
 				(if !Parameter.debugModeOn then Debug.tag "Interrupting simulation now!" ;
@@ -164,13 +170,13 @@ let trigger_effect state env pert_ids tracked pert p_id eff eval_var snapshot co
   						| Some nme -> Parameter.fluxFileName := nme 
 					in
 					Parameter.set Parameter.fluxFileName (Some "dot");
-					(env, state, pert_ids,tracked)
+					(env, state, pert_ids,tracked,pert_events)
 				end
 			| _ -> invalid_arg "External.trigger_effect"
 
 
 
-let apply_effect p_id pert state counter env =
+let apply_effect p_id pert tracked pert_events state counter env =
 	let snapshot opt =
 		if !Parameter.debugModeOn then Debug.tag "Taking a snapshot of current state" ;
 		let filename = 
@@ -209,50 +215,56 @@ let apply_effect p_id pert state counter env =
 			| VAR v_fun -> v_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time()) v_of_token
 	in
 	List.fold_left 
-	(fun (env, state, pert_ids,tracked) effect -> trigger_effect state env pert_ids tracked pert p_id effect eval_var snapshot counter ) 
-	(env,state,IntSet.empty,[]) pert.effect
+	(fun (env, state, pert_ids,tracked,pert_events) effect -> 
+		let (env, state, pert_ids,tracked,pert_events) = trigger_effect state env pert_ids tracked pert_events pert p_id effect eval_var snapshot counter in
+		(env, state, pert_ids,tracked,pert_events)
+	) 
+	(env,state,IntSet.empty,tracked,pert_events) pert.effect
 					
 
-let rec try_perturbate state pert_ids counter env = 
-	let state,env,pert_ids',tracked = 
-		IntSet.fold 
-		(fun pert_id (state,env,pert_ids,tracked) ->
-			let opt_pert = try Some (IntMap.find pert_id state.perturbations) with 
-					| Not_found -> None
-			in
-			match opt_pert with
-				| None -> (state,env,pert_ids,[])
-				| Some pert ->
-					let state,pert_ids,tracked,env = 
-						if eval_pre_pert pert state counter env then
-							begin
-								if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "\n*************Applying perturbation %d***************" pert_id) ; 
-								let env,state,pert_ids,tracked = apply_effect pert_id pert state counter env in
-								if !Parameter.debugModeOn then Debug.tag "************End perturbation*************" ;
-								let state,env = 
-									if eval_abort_pert true pert state counter env then 
-										(if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "***Aborting pert[%d]***" pert_id) ;
-										({state with perturbations = IntMap.remove pert_id state.perturbations},env) )
-									else
-										begin
-											if !Parameter.debugModeOn then Debug.tag "************Maintaining perturbation*************" ; 
-											(state,env)
-										end
-								in
-								(state,pert_ids,tracked,env)
-							end
-						else
-							(state,pert_ids,tracked,env)
-					in				
-					if eval_abort_pert false pert state counter env then
-						(if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "***Aborting pert[%d]***" pert_id) ;
-						({state with perturbations = IntMap.remove pert_id state.perturbations},env,IntSet.remove pert_id pert_ids,tracked))
-					else (state,env,pert_ids,tracked)
-		) 
-		pert_ids (state,env,IntSet.empty,[])
-	in
-		if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Should now try perturbations %s" (string_of_set string_of_int IntSet.fold pert_ids')) ;
-		if IntSet.is_empty pert_ids' then (state,env,[])
-		else
-			try_perturbate state pert_ids' counter env (*Chance of looping perturbation if user was not careful*)
+let try_perturbate state pert_ids counter env = 
 	
+	let rec iter state pert_ids tracked pert_events env = 
+		let state,env,pert_ids',tracked,pert_events = 
+			IntSet.fold 
+			(fun pert_id (state,env,pert_ids,tracked,pert_events) ->
+				let opt_pert = try Some (IntMap.find pert_id state.perturbations) with 
+						| Not_found -> None
+				in
+				match opt_pert with
+					| None -> (state,env,pert_ids,tracked,pert_events)
+					| Some pert ->
+						let state,pert_ids,tracked,pert_events,env = 
+							if eval_pre_pert pert state counter env then
+								begin
+									if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "\n*************Applying perturbation %d***************" pert_id) ; 
+									let env,state,pert_ids,tracked,pert_events = apply_effect pert_id pert tracked pert_events state counter env in
+									if !Parameter.debugModeOn then Debug.tag "************End perturbation*************" ;
+									let state,env = 
+										if eval_abort_pert true pert state counter env then 
+											(if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "***Aborting pert[%d]***" pert_id) ;
+											({state with perturbations = IntMap.remove pert_id state.perturbations},env) )
+										else
+											begin
+												if !Parameter.debugModeOn then Debug.tag "************Maintaining perturbation*************" ; 
+												(state,env)
+											end
+									in
+									(state,pert_ids,tracked,pert_events,env)
+								end
+							else
+								(state,pert_ids,tracked,pert_events,env)
+						in				
+						if eval_abort_pert false pert state counter env then
+							(if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "***Aborting pert[%d]***" pert_id) ;
+							({state with perturbations = IntMap.remove pert_id state.perturbations},env,IntSet.remove pert_id pert_ids,tracked,pert_events))
+						else (state,env,pert_ids,tracked,pert_events)
+			) 
+			pert_ids (state,env,IntSet.empty,tracked,pert_events)
+		in
+			if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Should now try perturbations %s" (string_of_set string_of_int IntSet.fold pert_ids')) ;
+			if IntSet.is_empty pert_ids' then (state,env,tracked,pert_events)
+			else
+				iter state pert_ids' tracked pert_events env (*Chance of looping perturbation if user was not careful*)
+  in
+	iter state pert_ids [] [] env 
