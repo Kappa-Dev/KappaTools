@@ -746,7 +746,7 @@ module Cflow_linker =
                 in 
                let phi = embedding_of_event a in 
                let psi = fresh_map_of_event a in 
-               Causal.record ~decorate_with:obs_from_rule_app r side_effect (phi,psi) counter grid env,
+               Causal.record ~decorate_with:obs_from_rule_app r side_effect (phi,psi) counter (*Causal.RULE r.Dynamics.r_id*) grid env,
                Mods.Int2Set.empty,counter+1 
               end
             | Init b -> 

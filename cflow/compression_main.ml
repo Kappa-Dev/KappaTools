@@ -226,14 +226,14 @@ let weak_compression env state log_info step_list =
                         error,story_array,None
                 in 
                 let _ = (*production des dotfiles des histoires avant compression*)
-		  if !Parameter.mazCompression then 
+		 						 if !Parameter.mazCompression then 
                     match result_wo_compression 
                     with 
                       | None -> () 
                       | Some result_wo_compression -> 
                         let filename =  (Filename.chop_suffix !Parameter.cflowFileName ".dot")^"_"^(string_of_int counter)^".dot" in
                         let grid = D.S.PH.B.PB.CI.Po.K.build_grid result_wo_compression true handler in 
-                        let _ = Causal.dot_of_grid 
+												let _ = Causal.dot_of_grid 
                           (if dump_profiling_info 
                            then 
                               (fun log ->
@@ -250,11 +250,9 @@ let weak_compression env state log_info step_list =
                                     let _ = Printf.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_profiling "\nCompression of the %s story:\n\n" (th_of_int counter) in 
                                     let _ = D.S.PH.B.PB.CI.Po.K.P.dump_complete_log parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_profiling log_info in 
                                 ())
-                           else (fun _ -> ()))
-                          filename grid state env 
-                        in
-                        ()
-			  
+                 					else (fun _ -> ())) filename grid state env 
+                				in
+                				() 
                 in 
                 let error,log_info,blackboard = D.S.PH.B.reset_init parameter handler error log_info blackboard in 
                 let tick = Mods.tick_stories n_stories tick in 

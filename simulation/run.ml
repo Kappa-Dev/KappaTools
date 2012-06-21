@@ -77,7 +77,7 @@ let event state (*grid*) story_profiling event_list counter plot env =
 	
 	(*4. Positive update*)
 	
-	let env,state,pert_ids,story_profiling,(*grid,*)event_list = 
+	let env,state,pert_ids,story_profiling,event_list = 
 		match opt_new_state with
 			| Some ((env,state,side_effect,embedding_t,psi,pert_ids_rule),r) ->
 
@@ -95,6 +95,8 @@ let event state (*grid*) story_profiling event_list counter plot env =
 				in
 				
 				(****************END POSITIVE UPDATE*****************)
+				
+				(****************CFLOW PRODUCTION********************)
 				let phi = State.map_of embedding_t in
 				 
 				let story_profiling,event_list = 
@@ -137,6 +139,8 @@ let event state (*grid*) story_profiling event_list counter plot env =
 					Counter.inc_consecutive_null_events counter ; 
 					(env,state,IntSet.empty,story_profiling,event_list)
 				end
+			(**************END CFLOW PRODUCTION********************)
+				
 	in
 	
 	(*Applying perturbation if any*)
@@ -144,6 +148,7 @@ let event state (*grid*) story_profiling event_list counter plot env =
 	let state,env,obs_from_perturbation,pert_events = External.try_perturbate state pert_ids counter env 
 	in
 	
+	(*Adding perturbation event if any*)
 	let story_profiling,event_list,cpt = 
 		if Environment.tracking_enabled env then (*if logging events is required*) 
 		begin
@@ -164,8 +169,6 @@ let event state (*grid*) story_profiling event_list counter plot env =
 			(story_profiling,event_list,Counter.event counter)
 	in 
 	counter.Counter.perturbation_events <- cpt ;
-	
-	(*Adding perturbation event if any*)
 	(state,story_profiling,event_list,env)
 					
 let loop state grid story_profiling event_list counter plot env =

@@ -86,6 +86,7 @@ let record ?decorate_with rule side_effects (embedding,fresh_map) event_number g
 	and r_id = rule.Dynamics.r_id
 	and obs = match decorate_with with None -> [] | Some l -> (List.rev_map (fun (id,_) -> Environment.kappa_of_num id env) (List.rev l))
 	in
+	let kind = RULE r_id in
 	
 	let im embedding fresh_map id =
 		match id with
@@ -99,30 +100,29 @@ let record ?decorate_with rule side_effects (embedding,fresh_map) event_number g
 			Id2Map.fold
 			(fun (id,site_id) c grid ->
 				let node_id = im embedding fresh_map id in
-				add (node_id,site_id) c grid event_number (RULE r_id) obs 
+				add (node_id,site_id) c grid event_number kind obs 
 			) pre_causal grid
 		in
 		(*adding side effects modifications*)
 		Int2Set.fold 
-		(fun (node_id,site_id) grid -> add (node_id,site_id) _LINK_MODIF grid event_number (RULE r_id) obs) 
+		(fun (node_id,site_id) grid -> add (node_id,site_id) _LINK_MODIF grid event_number kind obs) 
 		side_effects grid
 	in
 	grid
 
 let record_obs ((r_id,state,embedding,_),test) event_number grid env = 
   let im embedding id = IntMap.find id embedding in
-  
-    (*adding tests*)
+	  
+  (*adding tests*)
   let grid = 
     Mods.IntMap.fold 
-      (fun  id agent grid ->
-	let node_id = im embedding id in
- (*	let agent_name = Mixture.name agent in *)
-	Mixture.fold_interface 
-	  (fun site_id c  grid  -> 
-	    add (node_id,site_id) (2 lor 8) (* HACK, TO DO CLEANER *) grid event_number (OBS r_id) [])
-          agent grid)
-      (Mixture.agents state) grid
+		(fun id agent grid ->
+			let node_id = im embedding id in
+    	Mixture.fold_interface 
+    	(fun site_id c  grid  -> 
+				add (node_id,site_id) (2 lor 8) (* HACK, TO DO CLEANER *) grid event_number (OBS r_id) []
+			) agent grid
+		) (Mixture.agents state) grid
   in
   grid
 
@@ -194,9 +194,27 @@ let string_of_atom atom =
 	let imp_str = match atom.causal_impact with 1 -> "o" | 2 -> "x" | 3 -> "%" | _ -> invalid_arg "Causal.string_of_atom" in
 	Printf.sprintf "%s_%d" imp_str atom.eid
 		
-				
+let dump grid fic state env = 
+	let d = open_out ((Filename.chop_extension fic)^".txt") in
+	Hashtbl.fold 
+	(fun (n_id,s_id,q) att _ ->
+		let q_name = "#"^(string_of_int n_id)^"."^(string_of_int s_id)^(if q=0 then "~" else "!") in
+		let att_ls =
+			List.fold_left
+			(fun ls atom -> LongString.concat (string_of_atom atom) ls) 
+			LongString.empty (List.rev att)
+		in
+		Printf.fprintf d "%s:" q_name ; 
+		LongString.printf d att_ls ;
+		Printf.fprintf d "\n"
+	) grid.flow () ;
+	close_out d
+	
+
+								
 let dot_of_grid profiling fic grid state env = 
-  let t = Sys.time () in 
+	(*dump grid fic state env ; *)
+	let t = Sys.time () in 
 	let ids = Hashtbl.fold (fun key _ l -> key::l) grid.flow [] in
 	let config = cut ids grid in 
 	let label e = 
@@ -327,20 +345,4 @@ let pretty_print story_list state env =
 		) 0 story_list
 	in
 	()
-	
-let dump grid state env = 
-	let d = open_out "grid.txt" in
-	Hashtbl.fold 
-	(fun (n_id,s_id,q) att _ ->
-		let q_name = "#"^(string_of_int n_id)^"."^(string_of_int s_id)^(if q=0 then "~" else "!") in
-		let att_ls =
-			List.fold_left
-			(fun ls atom -> LongString.concat (string_of_atom atom) ls) 
-			LongString.empty (List.rev att)
-		in
-		Printf.fprintf d "%s:" q_name ; 
-		LongString.printf d att_ls ;
-		Printf.fprintf d "\n"
-	) grid.flow () ;
-	close_out d
 	
