@@ -233,7 +233,7 @@ let weak_compression env state log_info step_list =
                       | Some result_wo_compression -> 
                         let filename =  (Filename.chop_suffix !Parameter.cflowFileName ".dot")^"_"^(string_of_int counter)^".dot" in
                         let grid = D.S.PH.B.PB.CI.Po.K.build_grid result_wo_compression true handler in 
-												let _ = Causal.dot_of_grid 
+			let _ = Causal.dot_of_grid 
                           (if dump_profiling_info 
                            then 
                               (fun log ->

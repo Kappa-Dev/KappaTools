@@ -109,10 +109,10 @@ struct
     let to_keep = 
       List.rev_map (fun k -> PH.B.get_event blackboard k) (List.rev events_to_keep) in
     let result_wo_compression = 
-      List.rev_map (fun k -> (k,PH.B.PB.CI.Po.K.empty_side_effect)) to_keep  in 
+      List.rev_map (fun k -> (k,PH.B.PB.CI.Po.K.empty_side_effect)) (List.rev to_keep)  in 
     let save_blackboard = blackboard in 
-     let bool = false in (* if true cut the current blackboard, otherwise wuild a new one *)
-     let error,log_info,blackboard,list_order,list_eid = 
+    let bool = false in (* if true cut the current blackboard, otherwise wuild a new one *)
+    let error,log_info,blackboard,list_order,list_eid = 
       if bool 
       then 
         let events_to_remove = 
