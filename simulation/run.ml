@@ -111,7 +111,7 @@ let event state (*grid*) story_profiling event_list counter plot env =
 						(story_profiling,event_list)
         in 
         let story_profiling,event_list =
-        	if !Parameter.causalModeOn then (*if tracking the observable is required*) 
+        	if Environment.tracking_enabled env && !Parameter.causalModeOn then (*if tracking the observable is required*) 
           	begin 
 						let simulation_info = 
 			        {Mods.story_id=  0 ;
@@ -129,7 +129,8 @@ let event state (*grid*) story_profiling event_list counter plot env =
       			in 
   					(story_profiling,event_list)
 						end
-					else (story_profiling,event_list)
+					else 
+						(story_profiling,event_list)
 				in
 				(env,state,IntSet.union pert_ids pert_ids',story_profiling,event_list)
 			| None ->
@@ -152,6 +153,7 @@ let event state (*grid*) story_profiling event_list counter plot env =
 	let story_profiling,event_list,cpt = 
 		if Environment.tracking_enabled env then (*if logging events is required*) 
 		begin
+			
 			let story_profiling,event_list,cpt = 
 				List.fold_left 
 				(fun (story_prof,event_list,cpt) (r,phi,psi,side_effects) ->
