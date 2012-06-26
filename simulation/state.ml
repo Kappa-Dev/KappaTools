@@ -874,7 +874,7 @@ let enabled r state =
 	try Hashtbl.find state.influence_map r_id with Not_found -> IntMap.empty
 	
 
-let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) counter env = (*pert_intro is temporary*)
+let positive_update ?(with_tracked=[]) state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) counter env = (*pert_intro is temporary*)
 	
 	(* sub function find_new_inj *)
 	let find_new_inj state var_id mix cc_id node_id root pert_ids already_done_map new_injs tracked env =
@@ -1024,7 +1024,7 @@ let positive_update state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) c
 						in
 						(env,state, pert_ids, already_done_map, new_injs,tracked)
 			) (env,state, pert_ids, already_done_map, new_injs,tracked) map_list
-		) vars_to_wake_up (env, state, IntSet.empty, IntMap.empty,[],[])  
+		) vars_to_wake_up (env, state, IntSet.empty, IntMap.empty,[],with_tracked)  
 	in
 	
 	(*updating tokens if rule is hybrid*)

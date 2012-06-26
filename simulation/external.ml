@@ -47,14 +47,14 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 							let embedding_t = State.select_injection (infinity,0.) state r.lhs counter env in (*empty embedding, cannot raise null-event*)
 							let (env, state, side_effects, embedding_t, psi, pert_ids_neg) = State.apply !st r embedding_t counter env in
 							let phi = State.map_of embedding_t in
-							let env,state,pert_ids_pos,new_injs,tracked' = State.positive_update state r (phi,psi) (side_effects,Int2Set.empty) counter env
+							let env,state,pert_ids_pos,new_injs,tracked' = State.positive_update ~with_tracked:!tracked state r (phi,psi) (side_effects,Int2Set.empty) counter env
 							in
 							pert_events := (r,phi,psi,side_effects)::!pert_events ;
 							if !n = (int_of_float x) then pert_ids := IntSet.union !pert_ids (IntSet.union pert_ids_neg pert_ids_pos) ; (*only the first time*)
 							st := state ;
 							envr := env ;
 							n := !n-1 ;
-							tracked := tracked'@(!tracked)
+							tracked := tracked'
 						done ;
 						(!envr,!st,!pert_ids,!tracked,!pert_events)
 			| (Some r,DELETE (v,mix)) ->
@@ -87,14 +87,14 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 								| Some embedding_t ->
 									let (env, state, side_effects, phi, psi, pert_ids_neg) = State.apply state r embedding_t counter env in
 									let phi = State.map_of phi in
-									let env,state,pert_ids_pos,new_injs,tracked' = State.positive_update state r (phi,psi) (side_effects,Int2Set.empty) counter env
+									let env,state,pert_ids_pos,new_injs,tracked' = State.positive_update ~with_tracked:!tracked state r (phi,psi) (side_effects,Int2Set.empty) counter env
 									in
 									pert_events := (r,phi,psi,side_effects)::!pert_events ;
 									if !cpt=0 then pert_ids := IntSet.union !pert_ids (IntSet.union pert_ids_neg pert_ids_pos) ; (*only the first time*)
 									st := state ;
 									cpt := !cpt+1 ;
 									envr := env ;
-									tracked := tracked'@(!tracked)
+									tracked := tracked'
 					done ;
 					(!envr,!st,!pert_ids,!tracked,!pert_events)
 			| (None,UPDATE_RULE (id,v)) -> 
