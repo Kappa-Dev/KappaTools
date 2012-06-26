@@ -65,7 +65,8 @@ let output state time event plot env counter =
 					in 
 						Printf.fprintf d "%c%E" !Parameter.plotSepChar v
 			) state.observables ;
-			Printf.fprintf d "\n" 
+			Printf.fprintf d "\n" ;
+			flush d
 
 let set_last_point plot p = plot.last_point <- p
 
