@@ -1,0 +1,74 @@
+# Snapshot [Event: 10000, Time: 21.521948]
+digraph G{
+subgraph cluster0{
+	counter0 [label = "519 instance(s)", shape=none];
+	node0_2 [label = "A", color = "0.889934375465,0.828306674288,0.787236084854", style=filled];
+	node0_2 -> counter0 [style=invis];
+}
+subgraph cluster2{
+	counter2 [label = "87 instance(s)", shape=none];
+	node2_0 [label = "A", color = "0.889934375465,0.828306674288,0.787236084854", style=filled];
+	node2_0 -> counter2 [style=invis];
+	node2_8455 [label = "C(x1~p,x2~u)", color = "0.711081040948,0.776066092298,0.654792408451", style=filled];
+	node2_8455 -> counter2 [style=invis];
+	 node2_0 -> node2_8455 [taillabel="c", headlabel="x2~u", dir=none];
+}
+subgraph cluster4{
+	counter4 [label = "614 instance(s)", shape=none];
+	node4_5 [label = "B", color = "0.575289946501,0.748546462036,0.700028616959", style=filled];
+	node4_5 -> counter4 [style=invis];
+}
+subgraph cluster6{
+	counter6 [label = "6856 instance(s)", shape=none];
+	node6_2000 [label = "C(x1~u,x2~u)", color = "0.739424412556,0.994820192263,0.98434815237", style=filled];
+	node6_2000 -> counter6 [style=invis];
+}
+subgraph cluster8{
+	counter8 [label = "1013 instance(s)", shape=none];
+	node8_2003 [label = "C(x1~p,x2~p)", color = "0.763916743452,0.561492552006,0.952907646308", style=filled];
+	node8_2003 -> counter8 [style=invis];
+}
+subgraph cluster10{
+	counter10 [label = "38 instance(s)", shape=none];
+	node10_20 [label = "A", color = "0.889934375465,0.828306674288,0.787236084854", style=filled];
+	node10_20 -> counter10 [style=invis];
+	node10_1841 [label = "B", color = "0.575289946501,0.748546462036,0.700028616959", style=filled];
+	node10_1841 -> counter10 [style=invis];
+	node10_3415 [label = "C(x1~p,x2~u)", color = "0.711081040948,0.776066092298,0.654792408451", style=filled];
+	node10_3415 -> counter10 [style=invis];
+	 node10_20 -> node10_1841 [taillabel="x", headlabel="x", dir=none];
+	 node10_20 -> node10_3415 [taillabel="c", headlabel="x2~u", dir=none];
+}
+subgraph cluster12{
+	counter12 [label = "1869 instance(s)", shape=none];
+	node12_2002 [label = "C(x1~p,x2~u)", color = "0.711081040948,0.776066092298,0.654792408451", style=filled];
+	node12_2002 -> counter12 [style=invis];
+}
+subgraph cluster14{
+	counter14 [label = "8 instance(s)", shape=none];
+	node14_292 [label = "A", color = "0.889934375465,0.828306674288,0.787236084854", style=filled];
+	node14_292 -> counter14 [style=invis];
+	node14_10179 [label = "C(x1~u,x2~u)", color = "0.739424412556,0.994820192263,0.98434815237", style=filled];
+	node14_10179 -> counter14 [style=invis];
+	 node14_292 -> node14_10179 [taillabel="c", headlabel="x1~u", dir=none];
+}
+subgraph cluster16{
+	counter16 [label = "219 instance(s)", shape=none];
+	node16_3 [label = "B", color = "0.575289946501,0.748546462036,0.700028616959", style=filled];
+	node16_3 -> counter16 [style=invis];
+	node16_328 [label = "A", color = "0.889934375465,0.828306674288,0.787236084854", style=filled];
+	node16_328 -> counter16 [style=invis];
+	 node16_3 -> node16_328 [taillabel="x", headlabel="x", dir=none];
+}
+subgraph cluster18{
+	counter18 [label = "129 instance(s)", shape=none];
+	node18_1 [label = "B", color = "0.575289946501,0.748546462036,0.700028616959", style=filled];
+	node18_1 -> counter18 [style=invis];
+	node18_1542 [label = "A", color = "0.889934375465,0.828306674288,0.787236084854", style=filled];
+	node18_1542 -> counter18 [style=invis];
+	node18_6621 [label = "C(x1~u,x2~u)", color = "0.739424412556,0.994820192263,0.98434815237", style=filled];
+	node18_6621 -> counter18 [style=invis];
+	 node18_1542 -> node18_6621 [taillabel="c", headlabel="x1~u", dir=none];
+	 node18_1 -> node18_1542 [taillabel="x", headlabel="x", dir=none];
+}
+}

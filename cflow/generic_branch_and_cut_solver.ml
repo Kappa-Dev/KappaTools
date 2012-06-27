@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 18/06/2012
+  * Last modification: 27/06/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -24,7 +24,18 @@ module type Solver =
   (sig 
     module PH:Propagation_heuristics.Blackboard_with_heuristic
 
-    val compress: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.update_order list -> PH.B.PB.step_id list -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard * PH.B.assign_result * PH.B.result option * PH.B.result option) PH.B.PB.CI.Po.K.H.with_handler
+    val compress: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.update_order list -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard * PH.B.assign_result * PH.B.result option) PH.B.PB.CI.Po.K.H.with_handler
+      
+    val detect_independent_events: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.B.PB.step_id list -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.P.log_info * PH.B.PB.step_id list) PH.B.PB.CI.Po.K.H.with_handler
+
+    val filter: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.B.PB.step_id list -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
+
+    val sub: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.B.PB.CI.Po.K.refined_step list -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
+
+    val clean: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
+
+    val translate: (PH.B.blackboard -> PH.B.PB.step_id list -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.refined_step list * PH.B.result) PH.B.PB.CI.Po.K.H.with_handler 
+
    end)
 
 
@@ -102,109 +113,103 @@ struct
     else
       let error,list = PH.next_choice parameter handler error blackboard in
       branch_over_assumption_list parameter handler error log_info list blackboard 
-    
-  let compress parameter handler error log_info blackboard list_order list_eid =
-    let error,log_info,blackboard = PH.B.branch parameter handler error log_info blackboard in 
+
+  let detect_independent_events parameter handler error log_info blackboard list_eid = 
     let error,log_info,blackboard,events_to_keep = PH.B.cut parameter handler error log_info blackboard list_eid  in 
-    let to_keep = 
-      List.rev_map (fun k -> PH.B.get_event blackboard k) (List.rev events_to_keep) in
-    let result_wo_compression = 
-      List.rev_map (fun k -> (k,PH.B.PB.CI.Po.K.empty_side_effect)) (List.rev to_keep)  in 
-    let save_blackboard = blackboard in 
-    let bool = false in (* if true cut the current blackboard, otherwise wuild a new one *)
-    let error,log_info,blackboard,list_order,list_eid = 
-      if bool 
+    error,log_info,events_to_keep 
+
+  let translate parameter handler error blackboard list =
+    let list = List.rev_map (fun k -> PH.B.get_event blackboard k) (List.rev list) in 
+    let list' = List.rev_map (fun k -> k,PH.B.PB.CI.Po.K.empty_side_effect) (List.rev list) in 
+    error,list,list'
+      
+
+  let clean parameter handler error log_info blackboard = 
+    PH.B.reset_init parameter handler error log_info blackboard 
+
+  let filter parameter handler error log_info blackboard events_to_keep = 
+    let log_info = PH.B.PB.CI.Po.K.P.set_step_time log_info in 
+    let error,log_info,blackboard = PH.B.branch parameter handler error log_info blackboard in
+    let events_to_remove = 
+      let n_events = PH.B.get_n_eid blackboard in 
+      let rec aux k list sol = 
+        if k=n_events 
+        then 
+          List.rev sol 
+        else 
+          match 
+            list
+          with 
+            | t::q -> 
+              if t=k 
+              then aux (k+1) q sol 
+              else aux (k+1) list (k::sol)
+            | [] -> 
+              aux (k+1) list (k::sol)
+      in 
+      aux 0 events_to_keep []
+    in 
+    let error,forbidden_events = PH.forbidden_events parameter handler error events_to_remove in
+    let _ = 
+      if log_steps 
       then 
-        let events_to_remove = 
-          let n_events = PH.B.get_n_eid blackboard in 
-          let rec aux k list sol = 
-            if k=n_events 
-            then 
-              List.rev sol 
-            else 
-              match 
-                list
-              with 
-                | t::q -> 
-                  if t=k 
-                  then aux (k+1) q sol 
-                  else aux (k+1) list (k::sol)
-                | [] -> 
-                  aux (k+1) list (k::sol)
-          in 
-          aux 0 events_to_keep []
-        in 
-        let error,forbidden_events = PH.forbidden_events parameter handler error events_to_remove in
+        let _ = Printf.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err "Start cutting\n" in 
         let _ = 
-          if log_steps 
-          then 
-            let _ = Printf.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err "Start cutting\n" in 
-            let _ = 
-              flush parameter.PH.B.PB.CI.Po.K.H.out_channel_err
+          flush parameter.PH.B.PB.CI.Po.K.H.out_channel_err
             in 
-            ()
+        ()
+    in 
+    let error,log_info,blackboard,output = 
+      propagate parameter handler error log_info forbidden_events [] blackboard  
+    in 
+    let log_info = PH.B.PB.CI.Po.K.P.set_concurrent_event_deletion_time log_info in 
+    let log_info = PH.B.PB.CI.Po.K.P.set_step_time log_info in 
+    error,log_info,blackboard 
+
+  let sub parameter handler error log_info blackboard to_keep = 
+    let log_info = PH.B.PB.CI.Po.K.P.set_step_time log_info in 
+    let error,log_info,blackboard = PH.B.import parameter handler error log_info to_keep in 
+    let log_info = PH.B.PB.CI.Po.K.P.set_concurrent_event_deletion_time log_info in 
+    let log_info = PH.B.PB.CI.Po.K.P.set_step_time log_info in 
+    error,log_info,blackboard 
+    
+  let compress parameter handler error log_info blackboard list_order =
+    let error,log_info,blackboard = PH.B.branch parameter handler error log_info blackboard in 
+    let log_info = PH.B.PB.CI.Po.K.P.set_concurrent_event_deletion_time log_info in 
+    let log_info = PH.B.PB.CI.Po.K.P.set_step_time log_info in 
+    let _ = 
+      if log_steps 
+      then 
+        let _ = Printf.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err "After Causal Cut  %i \n" (PH.B.get_n_unresolved_events blackboard) in 
+        let _ = 
+          flush parameter.PH.B.PB.CI.Po.K.H.out_channel 
         in 
-        let error,log_info,blackboard,output = 
-          propagate parameter handler error log_info forbidden_events [] blackboard  
-        in 
-        error,log_info,blackboard,list_order,list_eid 
+        ()
+    in 
+    let error,log_info,blackboard,output = 
+      propagate parameter handler error log_info list_order [] blackboard 
+    in 
+    let _ = 
+      if log_steps 
+      then 
+        let _ = Printf.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err "After observable propagation  %i \n" (PH.B.get_n_unresolved_events blackboard) in 
+        let _ = 
+          flush parameter.PH.B.PB.CI.Po.K.H.out_channel 
+        in ()
+    in 
+    let error,log_info,blackboard,output = iter parameter handler error log_info blackboard 
+    in 
+    let error,list = 
+      if PH.B.is_failed output 
+      then error,None 
       else 
-        let error,log_info,blackboard = PH.B.import parameter handler error log_info to_keep in 
-        let error,list = PH.forced_events parameter handler error blackboard in 
-        match list 
-        with 
-          | (list_order,list_eid,info)::q -> error,log_info,blackboard,list_order,list_eid
-          | _ -> error,log_info,blackboard,[],[]  
-     in 
-     let result_wo_compression = 
-       if 
-         Parameter.get_causal_trace parameter.PH.B.PB.CI.Po.K.H.compression_mode 
-       then 
-         Some result_wo_compression 
-       else 
-         None 
-     in 
-     let log_info = PH.B.PB.CI.Po.K.P.set_concurrent_event_deletion_time log_info in 
-     let log_info = PH.B.PB.CI.Po.K.P.set_step_time log_info in 
-     let _ = 
-       if log_steps 
-       then 
-         let _ = Printf.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err "After Causal Cut  %i \n" (PH.B.get_n_unresolved_events blackboard) in 
-         let _ = 
-           flush parameter.PH.B.PB.CI.Po.K.H.out_channel 
-         in 
-         ()
-     in 
-     let error,log_info,blackboard,output = 
-       propagate parameter handler error log_info list_order [] blackboard 
-     in 
-     let _ = 
-       if log_steps 
-       then 
-         let _ = Printf.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err "After observable propagation  %i \n" (PH.B.get_n_unresolved_events blackboard) in 
-         let _ = 
-           flush parameter.PH.B.PB.CI.Po.K.H.out_channel 
-         in ()
-     in 
-     let error,log_info,blackboard,output = iter parameter handler error log_info blackboard 
-     in 
-     let log_info' = PH.B.PB.CI.Po.K.P.copy log_info in 
-     let error,list = 
-       if PH.B.is_failed output 
-       then error,None 
-       else 
-         let error,list = 
-           PH.B.translate_blackboard parameter handler error blackboard 
-         in 
-         error,Some list 
-     in 
-     let error,log_info,blackboard = 
-       if bool 
-       then 
-        PH.B.reset_init parameter handler error log_info' blackboard 
-       else
-         error,log_info,blackboard 
-     in 
-     error,log_info,save_blackboard,output,result_wo_compression,list 
+        let error,list = 
+          PH.B.translate_blackboard parameter handler error blackboard 
+        in 
+        error,Some list 
+    in 
+    error,log_info,blackboard,output,list 
+
+
 end 
   

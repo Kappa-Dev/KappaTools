@@ -9,7 +9,7 @@
   * Jean Krivine, Universite Paris-Diderot, CNRS 
   *  
   * Creation: 19/10/2011
-  * Last modification: 14/06/2012
+  * Last modification: 27/06/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -23,6 +23,7 @@ module D = Dag.Dag
 let log_step = true
 let debug_mode = false
 let dump_profiling_info = false
+let in_place = false (* if true blackboards are cut in place (and recovered for the next story), otherwise each time a fresh blackboard is built *)
 
 let th_of_int n = 
   match n mod 10  
@@ -175,9 +176,36 @@ let weak_compression env state log_info step_list =
                     Debug.tag ("\t\t * compress "^(string_of_int (List.length list_eid)))
                 in 
                 let log_info = D.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
-                let error,log_info,blackboard,output,result_wo_compression,list = 
-                  D.S.compress parameter handler error log_info blackboard list_order list_eid 
+                let error,log_info,event_id_list = D.S.detect_independent_events 
+parameter handler error log_info blackboard list_eid in 
+                let error,event_list,result_wo_compression = D.S.translate parameter handler error blackboard event_id_list in 
+                let error,log_info,blackboard_tmp,list_order = 
+                  if in_place 
+                  then 
+                    let error,log_info,blackboard_tmp = D.S.filter parameter handler error log_info blackboard event_id_list in 
+                    error,log_info,blackboard_tmp,list_order
+
+                  else 
+                    let error,log_info,blackboard_tmp = D.S.sub parameter handler error log_info blackboard event_list in 
+                    let error,list = D.S.PH.forced_events parameter handler error blackboard_tmp in 
+                    let list_order = 
+                      match list 
+                      with 
+                        | (list_order,_,_)::q -> list_order 
+                        | _ -> [] 
+                    in 
+                    error,log_info,blackboard_tmp,list_order
+                in 
+                let error,log_info,blackboard_tmp,output,list = 
+                  D.S.compress parameter handler error log_info blackboard_tmp list_order 
                 in
+                let error,log_info,blackboard_tmp = 
+                  if in_place
+                  then 
+                    D.S.clean parameter handler error log_info blackboard_tmp 
+                  else 
+                    error,log_info,blackboard_tmp
+                in 
                 let log_info = D.S.PH.B.PB.CI.Po.K.P.set_story_research_time log_info in 
                 let error = 
                   if debug_mode
@@ -226,76 +254,42 @@ let weak_compression env state log_info step_list =
                         error,story_array,None
                 in 
                 let _ = (*production des dotfiles des histoires avant compression*)
-		 						 if !Parameter.mazCompression then 
-                    match result_wo_compression 
-                    with 
-                      | None -> () 
-                      | Some result_wo_compression -> 
-                        let filename =  (Filename.chop_suffix !Parameter.cflowFileName ".dot")^"_"^(string_of_int counter)^".dot" in
-                        let grid = D.S.PH.B.PB.CI.Po.K.build_grid result_wo_compression true handler in 
-			let _ = Causal.dot_of_grid 
-                          (if dump_profiling_info 
-                           then 
-                              (fun log ->
-                                match info 
-                                with 
-                                  | None ->
-                                    Printf.fprintf log "/*No compressed flow found \n (is it a consistent trace ?)/*\n" 
-                                  | Some simulation_info -> 
-                                    let log_info = simulation_info.Mods.profiling_info in 
-                                    let _ = Printf.fprintf log "/*\n" in 
-                                    let _ = Mods.dump_simulation_info log simulation_info in 
-                                    let _ = Printf.fprintf log "/*\n" in 
-                                    let _ = D.S.PH.B.PB.CI.Po.K.P.dump_complete_log log log_info in 
-                                    let _ = Printf.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_profiling "\nCompression of the %s story:\n\n" (th_of_int counter) in 
-                                    let _ = D.S.PH.B.PB.CI.Po.K.P.dump_complete_log parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_profiling log_info in 
+		  if !Parameter.mazCompression 
+                  then 
+                    let filename =  (Filename.chop_suffix !Parameter.cflowFileName ".dot")^"_"^(string_of_int counter)^".dot" in
+                    let grid = D.S.PH.B.PB.CI.Po.K.build_grid result_wo_compression true handler in 
+		    let _ = Causal.dot_of_grid 
+                      (if dump_profiling_info 
+                       then 
+                          (fun log ->
+                            match info 
+                            with 
+                              | None ->
+                                Printf.fprintf log "/*No compressed flow found \n (is it a consistent trace ?)/*\n" 
+                              | Some simulation_info -> 
+                                let log_info = simulation_info.Mods.profiling_info in 
+                                let _ = Printf.fprintf log "/*\n" in 
+                                let _ = Mods.dump_simulation_info log simulation_info in 
+                                let _ = Printf.fprintf log "/*\n" in 
+                                let _ = D.S.PH.B.PB.CI.Po.K.P.dump_complete_log log log_info in 
+                                let _ = Printf.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_profiling "\nCompression of the %s story:\n\n" (th_of_int counter) in 
+                                let _ = D.S.PH.B.PB.CI.Po.K.P.dump_complete_log parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_profiling log_info in 
                                 ())
-                 					else (fun _ -> ())) filename grid state env 
-                				in
-                				() 
+                       else 
+                          (fun _ -> ())) 
+                      filename 
+                      grid 
+                      state 
+                      env 
+                    in
+                    () 
                 in 
                 let error,log_info,blackboard = D.S.PH.B.reset_init parameter handler error log_info blackboard in 
                 let tick = Mods.tick_stories n_stories tick in 
                 error,counter+1,tick,blackboard,story_array)
               (error,1,tick,blackboard,[]) (List.rev list) 
           in 
-					
-					
-          let error,story_array = D.hash_list parameter handler error (List.rev story_array) in 
-          (*
-					let _ = 
-            List.fold_left 
-              (fun counter (canonic,list) -> 
-                match list 
-                with 
-                  | [] -> counter 
-                  |(grid,_,simulation_info)::_ -> 
-                    let filename_comp = (Filename.chop_extension !Parameter.cflowFileName) ^"_"^(string_of_int counter)^"weak_comp"^".dot" in 
-                    let _ = 
-                      Causal.dot_of_grid 
-                        (fun log -> 
-                          List.iter 
-                            (fun (grid,_,simulation_info) -> 
-                              match simulation_info 
-                              with 
-                                | None -> ()
-                                | Some simulation_info -> 
-                                  let log_info = simulation_info.Mods.profiling_info in 
-                                  let _ = Printf.fprintf log "/*\n" in 
-                                  let _ = Mods.dump_simulation_info log simulation_info in 
-                                  let _ = Printf.fprintf log "/*\n" in 
-                                  let _ = D.S.PH.B.PB.CI.Po.K.P.dump_complete_log log log_info in 
-                                  let _ = Printf.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_profiling "\nCompression of the %s story:\n\n" (th_of_int counter) in 
-                                  let _ = D.S.PH.B.PB.CI.Po.K.P.dump_complete_log parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_profiling log_info in 
-                                  ())
-                            list 
-                        )
-                    filename_comp grid state env in
-                counter+1)
-              1 story_array 
-          in 
-          let _ = close_out parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_profiling in 
-					*)
+	  let error,story_array = D.hash_list parameter handler error (List.rev story_array) in 
           let _ = 
             List.iter 
               (D.S.PH.B.PB.CI.Po.K.H.dump_error parameter handler error)
