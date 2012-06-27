@@ -414,7 +414,7 @@ module Dag =
                           with 
                             | _ -> Fresh (label x)
                         in 
-(*                        let sibbling1 = List.sort (quick_compare g) sibbling1 in *)
+                        let sibbling1 = List.sort (quick_compare g) sibbling1 in
                         match 
                           aux map fresh_pos sibbling1 list to_beat 
                         with 
@@ -435,7 +435,7 @@ module Dag =
                                         with 
                                           | _ -> Fresh (label x)
                                       in 
-(*                                      let sibbling2 = List.sort (quick_compare g) sibbling2 in *)
+                                      let sibbling2 = List.sort (quick_compare g) sibbling2 in 
                                       match 
                                         aux map fresh_pos sibbling2 list to_beat 
                                       with 
