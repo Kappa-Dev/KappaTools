@@ -35,7 +35,7 @@ module type Dag =
     val print_canonical_form: (canonical_form -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler
     val print_graph: (graph -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler 
      
-    val hash_list: ((canonical_form * 'a) list -> S.PH.B.PB.CI.Po.K.H.error_channel * (((canonical_form * 'a list) list))) S.PH.B.PB.CI.Po.K.H.with_handler 
+    val hash_list: ((canonical_form * 'a) list -> S.PH.B.PB.CI.Po.K.H.error_channel * (((canonical_form * 'a * 'a list) list))) S.PH.B.PB.CI.Po.K.H.with_handler 
 
   end 
 
@@ -153,6 +153,8 @@ module Dag =
           | Former _,_ -> -1
           | _,Former _ -> +1
           | Fresh s,Fresh s' -> compare s s'
+
+      let quick_compare g t1 t2 = compare_elt (g t1) (g t2)
 
       let rec aux l1 l2 = 
         match l1,l2 
@@ -332,13 +334,13 @@ module Dag =
                     begin (*1*) 
                       let sibbling1 = 
                         try 
-                          A.get graph.pred i 
+                          A.get graph.pred i
                         with 
                           | Not_found -> []
                       in 
                       let sibbling2 = 
                         try 
-                          A.get graph.conflict_pred i 
+                          A.get graph.conflict_pred i
                         with 
                           | Not_found -> []
                       in 
@@ -406,6 +408,13 @@ module Dag =
                       in 
                       let list = [Fresh (label i)] in 
                       begin (*2*)
+                        let g x = 
+                          try 
+                            Former (Mods.IntMap.find x map)
+                          with 
+                            | _ -> Fresh (label x)
+                        in 
+(*                        let sibbling1 = List.sort (quick_compare g) sibbling1 in *)
                         match 
                           aux map fresh_pos sibbling1 list to_beat 
                         with 
@@ -420,6 +429,13 @@ module Dag =
                                   begin (*4*)
                                     let list = concat list [Stop] in 
                                     begin (*5*)
+                                      let g x = 
+                                        try 
+                                          Former (Mods.IntMap.find x map)
+                                        with 
+                                          | _ -> Fresh (label x)
+                                      in 
+(*                                      let sibbling2 = List.sort (quick_compare g) sibbling2 in *)
                                       match 
                                         aux map fresh_pos sibbling2 list to_beat 
                                       with 
@@ -455,21 +471,22 @@ module Dag =
 
       let hash_list parameter handler error list = 
         let list = sort list in 
-        let rec visit elements_to_store stored_elements last_element last_element_occurrences = 
-          match elements_to_store,last_element 
+        let rec visit elements_to_store stored_elements last_element first_asso last_element_occurrences = 
+          match elements_to_store,last_element,first_asso
           with 
-            | ((t:canonical_form),asso)::q,Some old when compare t old = 0 ->
-              visit q stored_elements last_element (asso::last_element_occurrences)
-            | (t,asso)::q,Some a ->  
-              visit q ((a,List.rev last_element_occurrences)::stored_elements) (Some t) [asso]
-            | (t,asso)::q,None -> 
-              visit q stored_elements (Some t) [asso]
-            | [],None -> 
+            | ((t:canonical_form),asso)::q,Some old,_ when compare t old = 0 ->
+              visit q stored_elements last_element first_asso (asso::last_element_occurrences)
+            | (t,asso)::q,Some a,Some first_asso ->
+              
+              visit q ((a,first_asso,List.rev last_element_occurrences)::stored_elements) (Some t) (Some asso) [asso]
+            | (t,asso)::q,None,None -> 
+              visit q stored_elements (Some t) (Some asso) [asso]
+            | [],None,None -> 
               []
-            | [],Some a -> 
-              List.rev ((a,List.rev last_element_occurrences)::stored_elements)
+            | [],Some a,Some first_asso -> 
+              List.rev ((a,first_asso,List.rev last_element_occurrences)::stored_elements)
         in
-        let list = visit list [] None [] in 
+        let list = visit list [] None None [] in 
         error,list 
               
     end:Dag)
