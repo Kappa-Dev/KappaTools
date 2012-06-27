@@ -35,7 +35,7 @@ module type Dag =
     val print_canonical_form: (canonical_form -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler
     val print_graph: (graph -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler 
      
-    val hash_list: ((canonical_form * 'a) list -> S.PH.B.PB.CI.Po.K.H.error_channel * (((canonical_form * 'a * 'a list) list))) S.PH.B.PB.CI.Po.K.H.with_handler 
+    val hash_list: (('b -> 'b -> int) -> (canonical_form * 'a  * 'b list) list -> S.PH.B.PB.CI.Po.K.H.error_channel * (((canonical_form * 'a  * 'b list) list))) S.PH.B.PB.CI.Po.K.H.with_handler 
 
   end 
 
@@ -168,7 +168,7 @@ module Dag =
               then aux q q' 
             else cmp 
       
-      let compare x y = aux x y 
+      let compare_list x y = aux x y 
 
 
       let graph_of_grid parameter handler error grid = 
@@ -466,27 +466,29 @@ module Dag =
       let dot_of_graph parameter handler error graph = error  
 
       let sort l = 
-        let compare (a,_) (b,_) = compare a b in 
+        let compare (a,_,_) (b,_,_) = compare_list a b in 
         List.sort compare l 
-
-      let hash_list parameter handler error list = 
+          
+      let hash_list parameter handler error cmp list = 
         let list = sort list in 
         let rec visit elements_to_store stored_elements last_element first_asso last_element_occurrences = 
           match elements_to_store,last_element,first_asso
           with 
-            | ((t:canonical_form),asso)::q,Some old,_ when compare t old = 0 ->
-              visit q stored_elements last_element first_asso (asso::last_element_occurrences)
-            | (t,asso)::q,Some a,Some first_asso ->
+            | ((t:canonical_form),asso,list)::q,Some old,_ when compare t old = 0 ->
+              visit q stored_elements last_element first_asso (List.fold_left 
+(fun list a -> a::list) list last_element_occurrences)
+            | (t,asso,list)::q,Some a,Some first_asso ->
               
-              visit q ((a,first_asso,List.rev last_element_occurrences)::stored_elements) (Some t) (Some asso) [asso]
-            | (t,asso)::q,None,None -> 
-              visit q stored_elements (Some t) (Some asso) [asso]
+              visit q ((a,first_asso,List.sort cmp last_element_occurrences)::stored_elements) (Some t) (Some asso) ((*List.rev*) list)
+            | (t,asso,list)::q,None,None -> 
+              visit q stored_elements (Some t) (Some asso) (List.rev list)
             | [],None,None -> 
               []
             | [],Some a,Some first_asso -> 
-              List.rev ((a,first_asso,List.rev last_element_occurrences)::stored_elements)
+              List.rev ((a,first_asso,List.sort cmp last_element_occurrences)::stored_elements)
         in
         let list = visit list [] None None [] in 
         error,list 
-              
+
+      let compare = compare_list 
     end:Dag)

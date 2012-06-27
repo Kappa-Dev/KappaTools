@@ -40,6 +40,7 @@ module type Cflow_handler =
 
     val build_parameter: unit -> parameter 
     val string_of_exn: exn -> string option  
+    val error_init: error_channel 
     val create_error: (string option -> string option -> string option -> string option -> string option -> exn -> error_channel * error) with_handler
     val add_error: (error -> error_channel) with_handler  
     val raise_error:  (error -> 'a -> error_channel * 'a) with_handler  
@@ -88,6 +89,7 @@ module Cflow_handler =
 
       type 'a with_handler = parameter -> handler -> error_channel -> 'a 
 	  
+      let error_init = [] 
       let create_error parameter handler error file modu fun_name line message exn =
         error,
         {
