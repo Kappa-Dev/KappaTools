@@ -9,7 +9,7 @@
    * Jean Krivine, Université Paris Dederot, CNRS 
    *  
    * Creation: 16/04/2012
-   * Last modification: 16/04/2012
+   * Last modification: 28/06/2012
    * * 
    * Some parameter references can be tuned thanks to command-line options
    * other variables has to be set before compilation   
@@ -59,7 +59,7 @@
            let ag_id = K.agent_id_of_agent ag in
              List.fold_left 
                (fun list (s_id,opt) -> 
-                 let list = [Bound_site(ag_id,s_id)] in 
+                 let list = (Bound_site(ag_id,s_id))::list in 
                  match opt 
                  with 
                    | None -> list 
