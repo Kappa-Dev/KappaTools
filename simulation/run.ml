@@ -91,9 +91,14 @@ let event state (*grid*) story_profiling event_list counter plot env =
 				in
 				
 				(*Non local positive update: adding new possible intras*)
-				let state = if env.Environment.has_intra then NonLocal.positive_update r embedding_t new_injs state counter env else state 
+				let state = 
+					if env.Environment.has_intra then 
+						NonLocal.positive_update r embedding_t new_injs state counter env 
+					else state 
 				in
-				
+
+				if !Parameter.safeModeOn then Safe.check_invariants state counter env ; 
+												
 				(****************END POSITIVE UPDATE*****************)
 				
 				(****************CFLOW PRODUCTION********************)
@@ -146,7 +151,8 @@ let event state (*grid*) story_profiling event_list counter plot env =
 	
 	(*Applying perturbation if any*)
 	(*Printf.printf "Applying %s perturbations \n" (Tools.string_of_set string_of_int IntSet.fold pert_ids) ;*)
-	let state,env,obs_from_perturbation,pert_events = External.try_perturbate state pert_ids counter env 
+	let state,env,obs_from_perturbation,pert_events = 
+		External.try_perturbate state pert_ids counter env 
 	in
 	
 	(*Adding perturbation event if any*)

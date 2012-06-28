@@ -31,6 +31,7 @@ let update_intra_in_components r embedding_info state counter env =
 				let u = try SiteGraph.node_of_id graph u_id with Not_found -> invalid_arg "NonLocal.search_elements"
 				in
 				let _,lifts = Node.get_lifts u 0 in (*BUG here site 0 is not always "_"*)
+				(if !Parameter.safeModeOn then let str = Environment.site_of_id (Node.name u) 0 env in if str <> "_" then failwith "Invariant violation in NonLocal.search_element") ;
 				LiftSet.fold
 				(fun inj (extensions,modified) ->
 					if Injection.is_trashed inj then (extensions,modified) (*injection should not be already invalid...*)
@@ -113,7 +114,7 @@ let update_intra_in_components r embedding_info state counter env =
 											(tmp_extend part_prod_inj inj)::cont
 										) cont injs_list
 									in
-									l@cont
+									l (*@cont*)
 								) [] new_intras
 							in
 							(new_intras,cpt+1)
@@ -206,9 +207,9 @@ let rec update_rooted_intras new_injs state counter env =
 									List.fold_left 
 									(fun cont inj_cc ->
 										(IntMap.add cc_id inj_cc inj_map)::cont
-									) [] ext_injs
+									) (*[]*) cont ext_injs
 								in
-								ext_cont @ cont
+								ext_cont (*@ cont*)
 							) [] new_intras
 							
 						) candidate_map [IntMap.add cc_id injection IntMap.empty]

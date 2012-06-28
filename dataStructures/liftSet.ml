@@ -16,6 +16,8 @@ let flush ls = ls.injs <- InjSet.empty
 
 let empty () = {injs = InjSet.empty}
 
+let mem inj ls = InjSet.mem inj ls.injs
+
 let exists pred ls =
 	try
 		fold (fun inj b -> if pred inj then raise ExceptionDefn.True else b) ls false

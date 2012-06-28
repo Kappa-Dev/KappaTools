@@ -15,6 +15,8 @@ let backtrace = ref false
 let (rescale:int option ref) = ref None
 let eclipseMode = ref false
 let useColor = ref true
+let safeModeOn = ref false
+let emacsMode = ref false
 
 (* expert option for stories *)
   (** Memory **)

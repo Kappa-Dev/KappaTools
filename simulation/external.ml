@@ -217,7 +217,6 @@ let apply_effect p_id pert tracked pert_events state counter env =
 	List.fold_left 
 	(fun (env, state, pert_ids,tracked,pert_events) effect -> 
 		let (env, state, pert_ids,tracked,pert_events) = trigger_effect state env pert_ids tracked pert_events pert p_id effect eval_var snapshot counter in
-		Debug.tag "done!";
 		(env, state, pert_ids,tracked,pert_events)
 	) 
 	(env,state,IntSet.empty,tracked,pert_events) pert.effect
