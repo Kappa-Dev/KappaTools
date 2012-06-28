@@ -664,6 +664,11 @@ module Propagation_heuristic =
                 end 
             end 
 
+    let last_chance_up parameter handler error log_info blackboard predicate_value address = 
+      if B.PB.is_unknown predicate_value 
+      then error,false,log_info,blackboard
+      else last_chance_up parameter handler error log_info blackboard predicate_value address 
+
     let last_chance_up = 
       if look_up_for_better_cut
       then last_chance_up
