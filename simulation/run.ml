@@ -97,7 +97,7 @@ let event state (*grid*) story_profiling event_list counter plot env =
 					else state 
 				in
 
-				(*if !Parameter.safeModeOn then Safe.check_invariants state counter env ; *)
+				if !Parameter.safeModeOn then Safe.check_invariants state counter env ; 
 												
 				(****************END POSITIVE UPDATE*****************)
 				
