@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 07/06/2012
+  * Last modification: 28/06/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -305,7 +305,7 @@ module Cflow_linker =
 		     (string_of_site_name env x)
 		     (match y with 
 			| None -> ""
-			| Some y -> "~y")
+			| Some y -> "~"^(string_of_int y))
 		 in true)
 	      false list in
 	  let _ = Printf.fprintf log "])\n" in
@@ -658,7 +658,7 @@ module Cflow_linker =
     let _ = Printf.fprintf log "* Kappa_rule \n" in 
     let _ = Dynamics.dump (rule_of_refined_event refined_event) env in 
     let _ = 
-      if debug_mode 
+      if debug_mode
       then 
         let _ = Printf.fprintf log "Story encoding: \n" in 
 	let _ = List.iter (print_test log env " ") (tests_of_refined_event refined_event) in 
