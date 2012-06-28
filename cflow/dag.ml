@@ -471,23 +471,22 @@ module Dag =
           
       let hash_list parameter handler error cmp list = 
         let list = sort list in 
-        let rec visit elements_to_store stored_elements last_element first_asso last_element_occurrences = 
-          match elements_to_store,last_element,first_asso
+        let rec visit elements_to_store stored_elements last_element last_element_occurrences = 
+          match elements_to_store,last_element
           with 
-            | ((t:canonical_form),asso,list)::q,Some old,_ when compare t old = 0 ->
-              visit q stored_elements last_element first_asso (List.fold_left 
+            | ((t:canonical_form),asso,list)::q,Some (old,_) when compare t old = 0 ->
+              visit q stored_elements last_element (List.fold_left 
 (fun list a -> a::list) list last_element_occurrences)
-            | (t,asso,list)::q,Some a,Some first_asso ->
+            | (t,asso,list)::q,Some (a,first_asso) ->
               
-              visit q ((a,first_asso,List.sort cmp last_element_occurrences)::stored_elements) (Some t) (Some asso) ((*List.rev*) list)
-            | (t,asso,list)::q,None,None -> 
-              visit q stored_elements (Some t) (Some asso) (List.rev list)
-            | [],None,None -> 
-              []
-            | [],Some a,Some first_asso -> 
+              visit q ((a,first_asso,List.sort cmp last_element_occurrences)::stored_elements) (Some (t,asso)) ((*List.rev*) list)
+            | (t,asso,list)::q,None -> 
+              visit q stored_elements (Some (t,asso)) (List.rev list)
+            | [],None -> []
+            | [],Some (a,first_asso) -> 
               List.rev ((a,first_asso,List.sort cmp last_element_occurrences)::stored_elements)
         in
-        let list = visit list [] None None [] in 
+        let list = visit list [] None [] in 
         error,list 
 
       let compare = compare_list 
