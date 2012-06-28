@@ -40,7 +40,8 @@ let output state time event plot env counter =
 					begin
 						if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "\t *Creating data file...") ; 
 						let d = open_out plot.file in
-							Printf.fprintf d "# time" ;
+							if !Parameter.emacsMode then Printf.fprintf d "time"
+							else Printf.fprintf d "# time" ;
 							List.iter
 							(fun obs ->
 								Printf.fprintf d "%c%s" !Parameter.plotSepChar obs.label 
