@@ -113,7 +113,7 @@ let update_intra_in_components r embedding_info state counter env =
 											(tmp_extend part_prod_inj inj)::cont
 										) cont injs_list
 									in
-									l@cont
+									l (*@cont*)
 								) [] new_intras
 							in
 							(new_intras,cpt+1)
@@ -206,9 +206,9 @@ let rec update_rooted_intras new_injs state counter env =
 									List.fold_left 
 									(fun cont inj_cc ->
 										(IntMap.add cc_id inj_cc inj_map)::cont
-									) [] ext_injs
+									) (*[]*) cont ext_injs
 								in
-								ext_cont @ cont
+								ext_cont (*@ cont*)
 							) [] new_intras
 							
 						) candidate_map [IntMap.add cc_id injection IntMap.empty]
