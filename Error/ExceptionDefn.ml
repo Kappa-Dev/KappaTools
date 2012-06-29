@@ -4,7 +4,7 @@ exception MapFound of (int Mods.IntMap.t)
 exception False
 exception True
 exception Break of int
-exception Null_event of int (* 0:unary rule with binary instance 0:binary rule with unary instance 2:clashing instance 3:overapproximation clash  *)
+exception Null_event of int (* 0:unary rule with binary instance 1:binary rule with unary instance 2:clashing instance 3:overapproximation clash 4:invalid injection clash *)
 exception Deadlock
 exception UserInterrupted of string
 exception StopReached of string

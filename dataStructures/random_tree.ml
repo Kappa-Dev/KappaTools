@@ -11,6 +11,7 @@ sig
 	val random: tree -> int * float
 	val update_structure: tree -> tree
 	val find : int -> tree -> float
+	val is_infinite : int -> tree -> bool
 end
 
 module Random_tree =
@@ -21,7 +22,6 @@ module Random_tree =
 			mutable new_mask : int ;
 			mutable inf_list : IntSet.t ;
 			size: int;
-		(*	mutable total: float ; *)
 			weight_of_nodes: float array ;
 			weight_of_subtrees: float array ;
 			unbalanced_events_by_layer: int list array ;
@@ -29,6 +29,7 @@ module Random_tree =
 			layer: int array ;
 			mutable consistent: bool
 		}
+				
 		let mask t i = 
 			try Hashtbl.find t.mask i with 
 				| Not_found -> 
@@ -40,7 +41,11 @@ module Random_tree =
 			         
 		let unmask t m = try Hashtbl.find t.unmask m with Not_found -> invalid_arg "Random_tree: incoherent hash"
 		
-		let find i t = let i = mask t i in t.weight_of_nodes.(i)
+		let is_infinite i t = let i = mask t i in IntSet.mem i t.inf_list
+
+		
+		let find i t = 
+			let i = mask t i in t.weight_of_nodes.(i)
 		
 		let copy t = {
 			mask = Hashtbl.copy t.mask ;

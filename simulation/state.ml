@@ -534,6 +534,12 @@ let clean_injprod injprod state counter env =
 			| Some h -> h
 	in 
 	let hp = InjProdHeap.remove injprod_id inj_prod_hp in (*removing injection product from the heap*)
+	(*let hp = 
+		if (float_of_int (Counter.null_event counter))/. (float_of_int (Counter.event counter)) > 0.8 then
+			InjProdHeap.gc inj_prod_hp (fun c -> InjProduct.is_trashed c) 
+		else hp
+	in*)
+	
 	state.nl_injections.(mix_id) <- (Some hp) ;
 	update_activity state (-1) mix_id counter env 
 
@@ -551,7 +557,7 @@ let check_validity injprod with_full_components state counter env =
 			(fun (embedding,roots,codom) inj_i ->
 				if Injection.is_trashed inj_i then (*injection product is no longer valid because one of its element is trashed*) 
 					(if !Parameter.debugModeOn then Debug.tag "Clashing because one of the component of injection product is no longer valid" ;
-					raise (Null_event 3))
+					raise (Null_event 4))
 				else
 				(*injection product might be invalid because co-domains are no longer connected*)
 					let map,codom = 
@@ -613,6 +619,7 @@ let select_injection (a2,a1) state mix counter env =
   				(CONNEX embedding)
   			with
   			| Invalid_argument msg -> invalid_arg ("State.select_injection: "^msg)
+				(*| Null_event 4 -> let h = InjProdHeap.gc prod_inj_hp (fun injprod -> Mods.InjProduct.is_trashed injprod) in state.nl_injections.(mix_id) <- Some h ; raise (Null_event 4)*)
   			)
   	in
   	
@@ -751,7 +758,7 @@ let draw_rule state counter env =
 							Random_tree.add rule_id alpha state.activity_tree ;
 							silence rule_id state ; (*rule activity will be underestimated if not awaken when a rule creates more cc's*)
 							if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Rule [%d]'s activity was corrected to %f" rule_id alpha) ;
-							raise (Null_event 3)
+							raise exn
 						end
 					end
 				else (if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Rule [%d] is clashing" rule_id) ; raise exn )

@@ -23,9 +23,10 @@
 %obs: 'Cpp' C(x1~p?,x2~p?) 
 
 
-%var: 'n_a' 20
+%var: 'n_a' 1000
 %obs: 'n_b' 'n_a'
-%var: 'n_c' 20
+%var: 'n_c' 10000
+
 
 
 #### Initial conditions 

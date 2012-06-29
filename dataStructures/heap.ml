@@ -74,7 +74,8 @@ module Make(C:Content) =
 					let (_:unit) = bury h v_rm in
 					h.next_address <- last_address ;
 					h 
-		
+	
+	
 	let alloc v h =
 		let i = h.next_address in
 		C.allocate v i ;

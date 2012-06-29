@@ -50,7 +50,7 @@ let event state (*grid*) story_profiling event_list counter plot env =
 	if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Drawing a rule... (activity=%f) " (Random_tree.total state.State.activity_tree));
 	(*let t_draw = Profiling.start_chrono () in*)
 	let opt_instance,state = try State.draw_rule state counter env with 
-		| Null_event _ -> (None,state)
+		| Null_event i -> (Counter.stat_null i counter ; (None,state))
 	in			
 	
 	(*3. Apply rule & negative update*)
