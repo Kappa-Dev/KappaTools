@@ -27,6 +27,7 @@ module type T =
       val random : t -> content (*returns a random element from the heap --constant time*)
       val is_empty : t -> bool (*is size=0*)
       val mem : int -> t -> bool 
+			val gc : t -> (content -> bool) -> t
     end
 
 
@@ -85,7 +86,12 @@ module Make(C:Content) =
 					let (_:unit) = bury h v_rm in
 					h.next_address <- last_address ;
 					h 
-		
+	
+	let gc h f =
+		let collect = ref [] in
+			GenArray.iteri (fun i content -> if f content then collect := i::!collect) ;
+			List.fold_left (fun h i -> remove i h) h !collect
+				
 	exception Is_present
 	
 	let alloc ?(check=false) v h =

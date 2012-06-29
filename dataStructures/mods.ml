@@ -168,6 +168,7 @@ module Counter =
 			mutable last_tick : (int * float) ;
 			mutable initialized : bool ;
 			mutable ticks : int ; 
+			stat_null : int array ; 
 			init_time : float ;
 			init_event : int ;
 			max_time : float option ; 
@@ -255,7 +256,7 @@ module Counter =
 						done ;
 						flush stdout
 	                                          
-	 
+	 	let stat_null i c = try c.stat_null.(i) <- c.stat_null.(i) + 1 with exn -> invalid_arg "Invalid null event identifier"
               
 		let create init_t init_e mx_t mx_e = 
 			let dE = compute_dE() in
@@ -265,6 +266,7 @@ module Counter =
 				events = init_e ; 
 				null_events = 0 ; 
 				cons_null_events = 0;
+				stat_null = Array.init 5 (fun i -> 0) ;
 				perturbation_events = 0;
 				null_action = 0 ;
 				max_time = mx_t ; 

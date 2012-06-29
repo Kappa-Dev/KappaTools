@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "3.0-280612"
+let version = "3.0-290612"
 
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
@@ -138,8 +138,17 @@ let main =
 		try
 			Run.loop state grid profiling event_list counter plot env ;
 			print_newline() ;
-			Printf.printf "Simulation ended (eff.: %f)\n" 
+			Printf.printf "Simulation ended (eff.: %f, detail below)\n" 
 			((float_of_int (Counter.event counter)) /. (float_of_int (Counter.null_event counter + Counter.event counter))) ;
+			Array.iteri (fun i n ->
+				match i with
+					| 0 -> (Printf.printf "\tValid embedding but no longer unary when required: %f\n" ((float_of_int n) /. (float_of_int (Counter.null_event counter))))
+					| 1 -> (Printf.printf "\tValid embedding but not binary when required: %f\n" ((float_of_int n) /. (float_of_int (Counter.null_event counter))))
+					| 2 -> (Printf.printf "\tClashing instance: %f\n" ((float_of_int n) /. (float_of_int (Counter.null_event counter))))
+					| 3 -> (Printf.printf "\tLazy negative update: %f\n" ((float_of_int n) /. (float_of_int (Counter.null_event counter))))
+					| 4 -> (Printf.printf "\tNon local instance no longer valid: %f\n" ((float_of_int n) /. (float_of_int (Counter.null_event counter))))
+					| _ -> print_string "\tna\n"
+			) counter.Counter.stat_null ;
 			if !Parameter.fluxModeOn then 
 				begin
 					let d = open_out !Parameter.fluxFileName in
