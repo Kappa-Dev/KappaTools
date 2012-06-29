@@ -1,0 +1,16 @@
+%def: "compressionMode" "weak"
+
+'C' B(a!_),C(a~u) -> B(a!_),C(a~p) @ 1 
+A(b) -> @ 1
+ C(a!_) -> C(a) @2
+ -> A(a!1,b),B(a!1) @10
+ -> C(a~p) @10
+
+#%init: 0 A(a!1,b),B(a!1)
+%init: 2 C(a~u!1),C(a~p!1)
+
+%mod: [true] set $TRACK 'C' [true]
+
+%agent: A(a,b)
+%agent: B(a)
+%agent: C(a~p~u)
