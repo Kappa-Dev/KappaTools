@@ -1,0 +1,3 @@
+New feature: do strong compression
+Optimisation: optimize case 10 (down) in constraint propagation (scan down the list of event)
+Optimisation: prehash causal flows and only compute the cannonical form in case of collision
