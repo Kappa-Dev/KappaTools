@@ -47,10 +47,14 @@ module Dag =
       module H=S.PH.B.PB.CI.Po.K.H
       module A=Mods.DynArray 
 
+      type label = string
+      type node_kind = OBS | PERT | RULE | INIT | FICTITIOUS
+      type node = node_kind * label 
+
       type graph = 
           { 
             root: int; 
-            labels: string A.t ;
+            labels: node A.t ;
             pred: int list A.t ;
             succ: int list A.t ;
             conflict_pred: int list A.t; 
@@ -60,7 +64,7 @@ module Dag =
       let dummy_graph = 
         {
           root = 0 ;
-          labels = A.make 1 "" ;
+          labels = A.make 1 (FICTITIOUS,"") ;
           pred = A.make 1 [] ;
           succ = A.make 1 [] ;
           conflict_pred = A.make 1 [] ; 
@@ -68,10 +72,9 @@ module Dag =
         }
 
       type edge_kind = Succ | Conflict 
-      type label = string
       type position = int 
       type key = 
-        | Fresh of label
+        | Fresh of node
         | Former of position 
         | Stop
 
@@ -84,7 +87,7 @@ module Dag =
         let _ = Printf.fprintf parameter.H.out_channel "****\ngraph\n****" in 
         let _ = Printf.fprintf parameter.H.out_channel "Root: %i\n" graph.root in 
         let _ = Printf.fprintf parameter.H.out_channel "Labels:\n" in 
-        let _ = A.iteri (Printf.fprintf parameter.H.out_channel "Node %i,Label %s\n") graph.labels in 
+        let _ = A.iteri (fun i (_,j) -> Printf.fprintf parameter.H.out_channel "Node %i,Label %s\n" i j) graph.labels in 
         let _ = Printf.fprintf parameter.H.out_channel "Succ:\n" in 
         let _ = 
           A.iteri 
@@ -128,7 +131,7 @@ module Dag =
         with 
           | Stop -> Printf.fprintf log "STOP\n" 
           | Former i -> Printf.fprintf log "Pointer %i\n" i 
-          | Fresh s -> Printf.fprintf log "Event %s\n" s 
+          | Fresh (_,s) -> Printf.fprintf log "Event %s\n" s 
 
       let print_canonical_form parameter handler error graph = 
         let _ =
@@ -137,12 +140,14 @@ module Dag =
             graph 
         in error 
 
-      let label handler e = 
-	match e with
-	  | Causal.OBS mix_id -> Environment.kappa_of_num mix_id handler.H.env
-	  | Causal.PERT p_id -> Environment.pert_of_num p_id handler.H.env
-	  | Causal.RULE r_id -> Dynamics.to_kappa (State.rule_of_id r_id handler.H.state) handler.H.env
-	  | Causal.INIT -> "intro"
+      let label handler = Causal.label handler.H.env handler.H.state
+      let kind node = 
+        match node 
+        with 
+          | Causal.INIT _ -> INIT
+          | Causal.RULE _ -> RULE
+          | Causal.PERT _ -> PERT
+          | Causal.OBS _ -> OBS
 
       let compare_elt x y = 
         match x,y with 
@@ -175,11 +180,11 @@ module Dag =
         let ids = Hashtbl.fold (fun key _ l -> key::l) grid.Causal.flow [] in
         let label = label handler in 
         let config = Causal.cut ids grid in 
-        let labels = A.make 1 "" in 
+        let labels = A.make 1 (FICTITIOUS,"") in 
         let set =  
           Mods.IntMap.fold
             (fun i atom  -> 
-              let _ = A.set labels i (label atom.Causal.kind) in 
+              let _ = A.set labels i (kind atom.Causal.kind,label atom.Causal.kind) in 
               Mods.IntSet.add i 
             )
             config.Causal.events
@@ -269,9 +274,9 @@ module Dag =
         let asso = Mods.IntMap.empty in 
         let label i = 
           try 
-            A.get graph.labels i 
+            A.get graph.labels i
           with 
-            | _ -> "" 
+            | _ -> FICTITIOUS,"" 
         in 
         let print_to_beat to_beat= 
           let _ = Printf.fprintf stderr "TO BEAT :" in 

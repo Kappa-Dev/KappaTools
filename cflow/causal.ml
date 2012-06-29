@@ -5,8 +5,10 @@ open State
 open LargeArray
 open Printf
 
+let display_intro_step = true
+
 type atom_state = FREE | BND of int*int | INT of int | UNDEF
-type event_kind = OBS of int | RULE of int | INIT | PERT of int
+type event_kind = OBS of int | RULE of int | INIT of int | PERT of int
 type atom = 
 	{ 
 	causal_impact : int ; (*(1) tested (2) modified, (3) tested + modified*) 
@@ -126,6 +128,24 @@ let record_obs ((r_id,state,embedding,_),test) event_number grid env =
   in
   grid
 
+let record_init (((node_id,agent_name),interface),_) event_number grid env = 
+	  
+  (*adding tests*)
+  let grid = 
+    List.fold_left 
+      (fun grid (site_id,_) -> 
+	add (node_id,site_id) (1 lor 4) (* HACK, TO DO CLEANER *) grid event_number (INIT agent_name) []
+      ) grid interface 
+  in
+  grid
+
+let record_init = 
+  if display_intro_step 
+  then 
+    record_init 
+  else 
+    (fun _ _ grid _ -> grid )
+
 let add_pred eid atom config = 
 	let events = IntMap.add atom.eid atom config.events
 	in
@@ -210,21 +230,20 @@ let dump grid fic state env =
 	) grid.flow () ;
 	close_out d
 	
-
+let label env state e = 
+  match e with
+    | OBS mix_id -> Environment.kappa_of_num mix_id env
+    | PERT p_id -> Environment.pert_of_num p_id env
+    | RULE r_id -> Dynamics.to_kappa (State.rule_of_id r_id state) env
+    | INIT agent -> "Intro "^(Environment.name agent env)
+      
 								
 let dot_of_grid profiling fic grid state env = 
 	(*dump grid fic state env ; *)
 	let t = Sys.time () in 
 	let ids = Hashtbl.fold (fun key _ l -> key::l) grid.flow [] in
 	let config = cut ids grid in 
-	let label e = 
-		match e with
-			| OBS mix_id -> Environment.kappa_of_num mix_id env
-			| PERT p_id -> Environment.pert_of_num p_id env
-			| RULE r_id -> Dynamics.to_kappa (State.rule_of_id r_id state) env
-			| INIT -> "intro"
-	in
-	
+	let label = label env state in 
 	let rec prec_closure config todo closure =
 		if IntSet.is_empty todo then closure
 		else
@@ -281,7 +300,8 @@ let dot_of_grid profiling fic grid state env =
 			match atom.kind  with 
       	| RULE _  -> fprintf desc "node_%d [label=\"%s\", shape=invhouse, style=filled, fillcolor = lightblue] ;\n" eid (label atom.kind) 
         | OBS _  ->  fprintf desc "node_%d [label =\"%s\", style=filled, fillcolor=red] ;\n" eid (label atom.kind) 
-				| _ -> invalid_arg "Event type not handled"
+        | INIT _  -> fprintf desc "node_%d [label =\"%s\", style=filled,fillcolor=green] ;\n" eid (label atom.kind)
+	| _ -> invalid_arg "Event type not handled"
 	(*		List.iter (fun obs -> fprintf desc "obs_%d [label =\"%s\", style=filled, fillcolor=red] ;\n node_%d -> obs_%d [arrowhead=vee];\n" eid obs eid eid) atom.observation ;*) 
 		) eids_at_d ;
 		fprintf desc "}\n" ;
