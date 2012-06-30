@@ -1,4 +1,4 @@
-%def: "compressionMode" "weak" 
+%def: "displayCompression" "none" "weak" 
 
 'x++' A(x~u,z~u) -> A(x~p,z~u) @10
 'x--' A(x~p,y~p,z~p) -> A(x~u,y~p,z~p) @10
@@ -8,7 +8,7 @@
 'y--' A(x~u,y~p,z~p) -> A(x~u,y~u,z~p) @10
 'GOAL' A(x~p,y~u,z~p) -> 
 
-%init: 100 A(x~u,y~u,z~u)
+%init: 10000 A(x~u,y~u,z~u)
 
 %agent: A(x~u~p,y~u~p,z~u~p)
 
