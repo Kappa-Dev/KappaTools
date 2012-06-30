@@ -1,8 +1,9 @@
 Command-line:
-KaSim -i abc.ka -seed 924556145 -e 10000 -d expected-output
+KaSim -i observables.ka -seed 924556145 -e 10000 -d expected-output
 
-This is the classical abc model. 
-3 stories are expected.
-1) the first site of C get activated
-2) Both sites of C have been activated by the same A 
-3) Both sites of C have been activated but by different A(s)
+In this example A and B are synchronized. 
+They are either both activated, or both not activated. 
+
+Thus the observable should never be triggered. 
+
+If some causal flows were found nonetheless, it would mean that observables are checked component wise (rectangular observation), but the check that each component is triggered simulataneously is not done. 

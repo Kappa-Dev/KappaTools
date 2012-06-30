@@ -1,4 +1,4 @@
-%def: "compressionMode" "weak"
+%def: "displayCompression" "weak" "none"
 
 A(a~u),B(a~u) -> A(a~p),B(a~p) @1
 A(a~p),B(a~p) -> A(a~u),B(a~u) @1 
