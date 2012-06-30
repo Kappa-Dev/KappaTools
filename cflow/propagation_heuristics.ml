@@ -19,7 +19,7 @@
   * under the terms of the GNU Library General Public License *)
 
 let debug_mode = false
-let look_up_for_better_cut = true 
+let look_up_for_better_cut = true
 let look_down_for_better_cut = true 
 
 module type Blackboard_with_heuristic = 
@@ -1100,7 +1100,7 @@ module Propagation_heuristic =
                                        error,
                                        log_info,
                                        blackboard,
-                                       (Refine_value_before(preview_event_case_address,prev'))::instruction_list,
+                                       (Refine_value_before(event_case_address,prev'))::instruction_list,
                                        propagate_list,
                                        B.success 
                                   end 
@@ -1129,10 +1129,10 @@ module Propagation_heuristic =
                           Discard_event(eid)::instruction_list,
                           propagate_list,
                           B.success 
-                      else 
-                        if B.PB.more_refined action predicate_value 
-                        then 
-                          let _ = 
+                    else 
+                      if B.PB.more_refined action predicate_value 
+                      then 
+                        let _ = 
                             if debug_mode 
                             then 
                               let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPropagate_up  (case 16):\n" in
@@ -1144,6 +1144,8 @@ module Propagation_heuristic =
                               let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err action in 
                               let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nWire_state: " in 
                               let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err predicate_value in 
+                              let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nPrevious wire state: " in 
+                              let _ = B.PB.print_predicate_value parameter.B.PB.CI.Po.K.H.out_channel_err preview_predicate_value in 
                               let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\nSelect the event before (%i)" eid in 
                               let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "\n" in 
                               let _ = Printf.fprintf parameter.B.PB.CI.Po.K.H.out_channel_err "***\n" in 
