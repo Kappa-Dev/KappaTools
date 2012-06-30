@@ -1,0 +1,9 @@
+Command-line:
+KaSim -i link_swapping.ka -seed 924556145 -e 3 -d expected-output
+
+In this model K can connect to A on x. 
+Then the link can be pass from A.x to A.y, and from A.y to A.z. 
+
+There is only one causal flow. 
+
+KaSim will fails if actions are not interpreted in the proper order in cflow/kappa_instantiation.ml 

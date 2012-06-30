@@ -1,15 +1,15 @@
+%def: "displayCompression" "weak" "none"
+
 A(x),A(x) -> A(x!1),A(x!1) @1
 A(y),A(y) -> A(y!1),A(y!1) @1
-'i' A(x!1,y!2),A(x!1,y!2) -> A(x!1,y!2),A(x!2,y!1) @1
+A(x!1,y!2),A(x!1,y!2) -> A(x!1,y!2),A(x!2,y!1) @1
 
 'GOAL' A(x!1),A(y!1) -> 
 
-%init: 2 A(x,y,z)
-%init: 2 K(x)
+%init: 2 A(x,y)
 
 
-%agent: A(x,y,z)
-%agent: K(x)
+%agent: A(x,y)
 
 %mod: [true] set $TRACK 'GOAL' [true]
 
