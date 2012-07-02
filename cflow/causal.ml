@@ -108,7 +108,7 @@ let record ?decorate_with rule side_effects (embedding,fresh_map) event_number g
 		(*adding side effects modifications*)
 		Int2Set.fold 
 		(fun (node_id,site_id) grid -> 
-                  add (node_id,site_id) _LINK_MODIF grid event_number kind obs) 
+                  add (node_id,site_id) (_LINK_TESTED lor _LINK_MODIF) grid event_number kind obs) 
 		side_effects grid
 	in
 	grid
@@ -123,7 +123,7 @@ let record_obs ((r_id,state,embedding,_),test) event_number grid env =
 			let node_id = im embedding id in
     	Mixture.fold_interface 
     	(fun site_id c  grid  -> 
-				add (node_id,site_id) (2 lor 8) (* HACK, TO DO CLEANER *) grid event_number (OBS r_id) []
+				add (node_id,site_id) (_LINK_TESTED lor _INTERNAL_TESTED) (* HACK, TO DO CLEANER *) grid event_number (OBS r_id) []
 			) agent grid
 		) (Mixture.agents state) grid
   in
@@ -135,7 +135,7 @@ let record_init (((node_id,agent_name),interface),_) event_number grid env =
   let grid = 
     List.fold_left 
       (fun grid (site_id,_) -> 
-	add (node_id,site_id) (1 lor 4) (* HACK, TO DO CLEANER *) grid event_number (INIT agent_name) []
+	add (node_id,site_id) (_INTERNAL_MODIF lor _INTERNAL_TESTED lor _LINK_TESTED lor _LINK_MODIF) (* HACK, TO DO CLEANER *) grid event_number (INIT agent_name) []
       ) grid interface 
   in
   grid

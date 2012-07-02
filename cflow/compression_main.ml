@@ -173,7 +173,7 @@ let compress env state log_info step_list =
                 let log_info = D.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
                 let error,log_info,event_id_list = D.S.detect_independent_events parameter handler error log_info blackboard list_eid in 
                 let error,event_list,result_wo_compression = D.S.translate parameter handler error blackboard event_id_list in 
-                let grid = D.S.PH.B.PB.CI.Po.K.build_grid result_wo_compression false handler in
+                let grid = D.S.PH.B.PB.CI.Po.K.build_grid result_wo_compression true handler in
                 let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
                 let error,dag = D.graph_of_grid parameter handler error grid in 
                 let error,canonic = D.canonicalize parameter handler error dag in 
@@ -264,7 +264,7 @@ let compress env state log_info step_list =
                     | Some list -> 
                       if weak_compression_on
                       then 
-                        let grid = D.S.PH.B.PB.CI.Po.K.build_grid list true handler in
+                        let grid = D.S.PH.B.PB.CI.Po.K.build_grid list false handler in
                         let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
                         let error,dag = D.graph_of_grid parameter handler error grid in 
                         let error,canonic = D.canonicalize parameter handler error dag in 
