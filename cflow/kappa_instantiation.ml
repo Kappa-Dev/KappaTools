@@ -670,8 +670,15 @@ module Cflow_linker =
     in 
       ()
 
-  let print_refined_init log env refined_init = ()
-  
+  let print_refined_init log env (refined_init:refined_init) = 
+    let ((agent_name,agent_id),_),actions = refined_init in 
+    let _ = Printf.fprintf log "INIT: Agent %i_%i" agent_id agent_name in
+    if debug_mode 
+    then 
+      let _ = List.iter (print_action log env " ") actions in 
+
+    ()
+      
   let gen f1 f2 f3 f4 step = 
     match step
     with 
