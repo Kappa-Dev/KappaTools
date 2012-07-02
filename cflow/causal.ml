@@ -107,7 +107,8 @@ let record ?decorate_with rule side_effects (embedding,fresh_map) event_number g
 		in
 		(*adding side effects modifications*)
 		Int2Set.fold 
-		(fun (node_id,site_id) grid -> add (node_id,site_id) _LINK_MODIF grid event_number kind obs) 
+		(fun (node_id,site_id) grid -> 
+                  add (node_id,site_id) _LINK_MODIF grid event_number kind obs) 
 		side_effects grid
 	in
 	grid

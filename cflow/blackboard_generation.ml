@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 18/06/2012
+  * Last modification: 02/07/2012
   * * 
   * Some parameter references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -838,42 +838,49 @@ module Preblackboard =
                []
                unambiguous_side_effects 
            in 
-           let nsid = blackboard.pre_nsteps + 1 in 
-           let _ = A.set blackboard.pre_side_effect_of_event nsid (CI.Po.K.side_effect_of_list side_effect) in
-           let _ = A.set pre_event nsid step in 
-           let pre_steps_by_column = 
-             PredicateidMap.fold 
-               (fun id (test,action) map -> 
-                 begin 
-                   let value,list = A.get map id in 
-                   let value' = value + 1 in 
-                   let _ = fadd id action blackboard.history_of_predicate_values_to_predicate_id in 
-                   let _ = A.set map id (value',(nsid,value,test,action)::list)
+           if side_effect = []
+             && PredicateidMap.is_empty  merged_map 
+           then 
+             error,log_info,blackboard 
+           else 
+             begin 
+               let nsid = blackboard.pre_nsteps + 1 in 
+               let _ = A.set blackboard.pre_side_effect_of_event nsid (CI.Po.K.side_effect_of_list side_effect) in
+               let _ = A.set pre_event nsid step in 
+               let pre_steps_by_column = 
+                 PredicateidMap.fold 
+                   (fun id (test,action) map -> 
+                     begin 
+                       let value,list = A.get map id in 
+                       let value' = value + 1 in 
+                       let _ = fadd id action blackboard.history_of_predicate_values_to_predicate_id in 
+                       let _ = A.set map id (value',(nsid,value,test,action)::list)
                    in map
-                 end)
-               merged_map
-               blackboard.pre_steps_by_column 
-           in 
-           let _ = A.set blackboard.pre_kind_of_event nsid (type_of_step (CI.Po.K.type_of_refined_step step)) in 
-           let observable_list = 
-             if CI.Po.K.is_obs_of_refined_step step 
-             then 
-               ([nsid],CI.Po.K.simulation_info_of_refined_step step)::blackboard.pre_observable_list 
-             else
-               blackboard.pre_observable_list 
-           in 
-           let blackboard = 
-             { 
-               blackboard with 
-                 pre_event = pre_event ;
-                 pre_fictitious_list = fictitious_list ; 
-                 pre_steps_by_column = pre_steps_by_column; 
-                 pre_nsteps = nsid;
-                 pre_observable_list = observable_list; 
-             }
-           in 
-           error,log_info,blackboard 
-             
+                     end)
+                   merged_map
+                   blackboard.pre_steps_by_column 
+               in 
+               let _ = A.set blackboard.pre_kind_of_event nsid (type_of_step (CI.Po.K.type_of_refined_step step)) in 
+               let observable_list = 
+                 if CI.Po.K.is_obs_of_refined_step step 
+                 then 
+                   ([nsid],CI.Po.K.simulation_info_of_refined_step step)::blackboard.pre_observable_list 
+                 else
+                   blackboard.pre_observable_list 
+               in 
+               let blackboard = 
+                 { 
+                   blackboard with 
+                     pre_event = pre_event ;
+                     pre_fictitious_list = fictitious_list ; 
+                     pre_steps_by_column = pre_steps_by_column; 
+                     pre_nsteps = nsid;
+                     pre_observable_list = observable_list; 
+                 }
+               in 
+               error,log_info,blackboard 
+             end 
+
          let finalize parameter handler error log_info blackboard = 
            let l = blackboard.pre_fictitious_list in 
            match l 
