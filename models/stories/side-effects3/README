@@ -1,0 +1,3 @@
+Command-line:
+KaSim -i side-effects.ka -seed 924556145 -e 10000 -d expected-output
+
