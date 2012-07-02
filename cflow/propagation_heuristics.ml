@@ -19,8 +19,8 @@
   * under the terms of the GNU Library General Public License *)
 
 let debug_mode = false
-let look_up_for_better_cut = true
-let look_down_for_better_cut = true 
+let look_up_for_better_cut = Parameter.look_up_for_better_cut
+let look_down_for_better_cut = Parameter.look_down_for_better_cut
 
 module type Blackboard_with_heuristic = 
   sig

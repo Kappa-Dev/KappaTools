@@ -25,13 +25,13 @@ let emacsMode = ref false
 
   (** Precomputation **)
   (* Cut concurrent events (for all observables) before generating the blackboard *)
-  let do_global_cut = true 
+  let do_global_cut = true
 
   (* Cut pseudo-inverse events *) 
-  let cut_pseudo_inverse_event = true 
+  let cut_pseudo_inverse_event = true
     
   (* Cut concurrent events (for the current observale) before generating the blackboard *)
-  let do_local_cut = true 
+  let do_local_cut = true
 
    
   (** Propagation heuristics **)

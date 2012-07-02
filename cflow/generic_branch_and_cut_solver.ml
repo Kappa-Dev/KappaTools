@@ -119,8 +119,8 @@ struct
     error,log_info,events_to_keep 
 
   let translate parameter handler error blackboard list =
-    let list = List.rev_map (fun k -> PH.B.get_event blackboard k) (List.rev list) in 
-    let list' = List.rev_map (fun k -> k,PH.B.PB.CI.Po.K.empty_side_effect) (List.rev list) in 
+    let list' = List.rev_map (fun k -> PH.B.get_event blackboard k,PH.B.side_effect_of_event blackboard k) (List.rev list) in 
+    let list = List.rev_map fst (List.rev list') in 
     error,list,list'
       
 

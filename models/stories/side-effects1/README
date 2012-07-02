@@ -1,5 +1,5 @@
 Command-line:
-KaSim -i abc.ka -seed 924556145 -e 10000 -d expected-output
+KaSim -i sides-effect.ka -seed 924556145 -e 10000 -d expected-output
 
 This is the classical abc model. 
 3 stories are expected.
