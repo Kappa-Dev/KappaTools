@@ -224,7 +224,7 @@ let of_graph sg env =
 	in
 	species
 
-let dump desc table hr env =
+let dump desc table hr token_vector env =
 	let palette = Hashtbl.create 10 in
 	
 	Printf.fprintf desc "digraph G{\n" ;
@@ -240,6 +240,11 @@ let dump desc table hr env =
 				!c+1
 		) table 0
 	in
+	Array.iteri
+	(fun tk_id v ->
+		let tk = Environment.token_of_num tk_id env in
+		Printf.fprintf desc "token_%d [label = \"%s (%E)\" , shape=none]" tk_id tk v
+	) token_vector ;
 	Printf.fprintf desc "}\n" 
 	
 let dump_table table env =

@@ -1376,7 +1376,7 @@ let snapshot state counter desc hr env =
 	try
 		Printf.fprintf desc "# Snapshot [Event: %d, Time: %f]\n" (Counter.event counter) (Counter.time counter) ; 
 		let table = Species.of_graph state.graph env in
-		if !Parameter.dotOutput then Species.dump desc table hr env 
+		if !Parameter.dotOutput then Species.dump desc table hr state.token_vector env 
 		else
 			begin 
 			Hashtbl.iter
@@ -1388,6 +1388,11 @@ let snapshot state counter desc hr env =
 					Printf.fprintf desc "\n"
 				) specs
 			) table ;
+			Array.iteri
+			(fun tk_id v ->
+				let tk = Environment.token_of_num tk_id env in
+				Printf.fprintf desc "%%init: %s <- %E \n" tk v ;
+			) state.token_vector ;
 			Printf.fprintf desc "# End snapshot\n"
 			end
 	with

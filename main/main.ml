@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "3.0-290612"
+let version = "3.0-020712"
 
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
@@ -55,7 +55,7 @@ let main =
 		in
 		if abort then (prerr_string usage_msg ; exit 1) ;
 		let sigint_handle = fun _ ->
-     raise (ExceptionDefn.UserInterrupted "abort signal received")
+     raise (ExceptionDefn.UserInterrupted (fun t -> fun e -> Printf.sprintf "Abort signal received after %E t.u (%d events)" t e))
     in
     let _ = Sys.set_signal Sys.sigint (Sys.Signal_handle sigint_handle) in
     
@@ -163,13 +163,15 @@ let main =
 				  let s = (* Printexc.get_backtrace() *) "" in Printf.eprintf "\n***Runtime error %s***\n%s\n" msg s ;
 					exit 1
 				end
-			| ExceptionDefn.UserInterrupted msg -> 
+			| ExceptionDefn.UserInterrupted f -> 
 				begin
 					flush stdout ; 
+					let msg = f (Counter.time counter) (Counter.event counter) in
 					Printf.eprintf "\n***%s: would you like to record the current state? (y/N)***\n" msg ; flush stderr ;
 					(match String.lowercase (Tools.read_input ()) with
 						| "y" | "yes" ->
 							begin 
+								Parameter.dotOutput := false ;
 								let desc = open_out !Parameter.dumpFileName in 
 								State.snapshot state counter desc !Parameter.snapshotHighres env ;
 								Parameter.debugModeOn:=true ; State.dump state counter env ;
@@ -189,6 +191,8 @@ let main =
 	| ExceptionDefn.Semantics_Error (pos, msg) -> 
 		(close_desc () ; Printf.eprintf "***Error (%s) line %d, char %d: %s***\n" (fn pos) (ln pos) (cn pos) msg)
 	| Invalid_argument msg ->	(close_desc (); let s = "" (*Printexc.get_backtrace()*) in Printf.eprintf "\n***Runtime error %s***\n%s\n" msg s)
-	| ExceptionDefn.UserInterrupted msg -> (Printf.eprintf "\n***Interrupted by user: %s***\n" msg ; close_desc())
+	| ExceptionDefn.UserInterrupted f -> 
+		let msg = f 0. 0 in 
+		(Printf.eprintf "\n***Interrupted by user: %s***\n" msg ; close_desc())
 	| ExceptionDefn.StopReached msg -> (Printf.eprintf "\n***%s***\n" msg ; close_desc())
 	| Sys_error msg -> (close_desc (); Printf.eprintf "%s\n" msg)

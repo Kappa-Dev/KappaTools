@@ -1085,6 +1085,14 @@ let configurations_of_result result =
 						| _ as error -> raise (ExceptionDefn.Semantics_Error (p,Printf.sprintf "Value %s should be either \"true\" or \"false\"" error))
 				) Parameter.influenceFileName
 			| "influenceMapFileName" -> set_value pos_p param value_list (fun (v,p) -> v) Parameter.influenceFileName  
+			| "showIntroEvents" -> 
+				set_value pos_p param value_list 
+				(fun (v,p) -> match v with 
+					| "true" -> true 
+					| "false" -> false
+					| _ as error -> raise (ExceptionDefn.Semantics_Error (p,Printf.sprintf "Value %s should be either \"true\" or \"false\"" error))
+				) 
+				Parameter.showIntroEvents
 			| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Unkown parameter %s" error))		  
 	) result.configurations 
 	
