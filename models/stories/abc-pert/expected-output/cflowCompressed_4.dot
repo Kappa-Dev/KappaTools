@@ -2,21 +2,21 @@
 /* Compressed causal flows were: [10] */
 digraph G{
  ranksep=.5 ; 
-{ rank = same ; "0" [shape=plaintext] ; node_1 [label ="Intro B", style=filled,fillcolor=green] ;
-node_2 [label ="Intro B", style=filled,fillcolor=green] ;
-node_3 [label ="Intro A", style=filled,fillcolor=green] ;
-node_4 [label ="Intro A", style=filled,fillcolor=green] ;
-node_5 [label ="Intro B", style=filled,fillcolor=green] ;
-node_6 [label ="Intro B", style=filled,fillcolor=green] ;
-node_7 [label ="Intro A", style=filled,fillcolor=green] ;
-node_8 [label ="Intro A", style=filled,fillcolor=green] ;
-node_9 [label ="Intro A", style=filled,fillcolor=green] ;
-node_10 [label ="Intro B", style=filled,fillcolor=green] ;
-node_11 [label ="Intro B", style=filled,fillcolor=green] ;
-node_12 [label ="Intro A", style=filled,fillcolor=green] ;
-node_13 [label ="Intro A", style=filled,fillcolor=green] ;
-node_14 [label ="Intro B", style=filled,fillcolor=green] ;
-node_15 [label ="Intro B", style=filled,fillcolor=green] ;
+{ rank = same ; "0" [shape=plaintext] ; node_1 [label ="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_2 [label ="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_3 [label ="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_4 [label ="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_5 [label ="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_6 [label ="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_7 [label ="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_8 [label ="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_9 [label ="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_10 [label ="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_11 [label ="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_12 [label ="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_13 [label ="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_14 [label ="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_15 [label ="Intro B", shape=house, style=filled, fillcolor=green] ;
 node_23 [label="pert_0", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_24 [label="pert_0", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_25 [label="pert_0", shape=invhouse, style=filled, fillcolor = lightblue] ;
@@ -449,5 +449,5 @@ node_122 -> node_106 [style=dotted, arrowhead = tee]
 node_122 -> node_113 [style=dotted, arrowhead = tee] 
 }
 /*
- Dot generation time: 0.012001
+ Dot generation time: 0.004000
 */

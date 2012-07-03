@@ -2,10 +2,10 @@
 /* Compressed causal flows were: [10;8;6;4;3;2;1] */
 digraph G{
  ranksep=.5 ; 
-{ rank = same ; "0" [shape=plaintext] ; node_1 [label ="Intro A", style=filled,fillcolor=green] ;
-node_2 [label ="Intro B", style=filled,fillcolor=green] ;
-node_3 [label ="Intro C", style=filled,fillcolor=green] ;
-node_4 [label ="Intro C", style=filled,fillcolor=green] ;
+{ rank = same ; "0" [shape=plaintext] ; node_1 [label ="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_2 [label ="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_3 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_4 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
 }
 { rank = same ; "1" [shape=plaintext] ; node_5 [label="C(a!_)->C(a)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_6 [label="A(b)->", shape=invhouse, style=filled, fillcolor = lightblue] ;

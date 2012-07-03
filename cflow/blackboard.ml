@@ -1107,45 +1107,48 @@ module Blackboard =
                      List.fold_left
                        (fun (q,kept_events) event_case_address ->
                          let error,case = get_case parameter handler error event_case_address blackboard in 
-                         let pointer = case.dynamic.pointer_previous in 
-                         let eid = 
-                           let rec scan_down pointer =
-                             let prev_event_case_address = 
-                               {event_case_address with row_short_event_id = pointer}
-                             in 
-                             let error,prev_case = get_case parameter handler error prev_event_case_address blackboard in 
-                             let prev_eid = prev_case.static.event_id in 
-                             if is_null_pointer prev_eid 
-                             then None 
+                         if PB.is_undefined case.static.test 
+                         then q,kept_events
+                         else 
+                           let pointer = case.dynamic.pointer_previous in 
+                           let eid = 
+                             let rec scan_down pointer =
+                               let prev_event_case_address = 
+                                 {event_case_address with row_short_event_id = pointer}
+                               in 
+                               let error,prev_case = get_case parameter handler error prev_event_case_address blackboard in 
+                               let prev_eid = prev_case.static.event_id in 
+                               if is_null_pointer prev_eid                      
+                               then None 
                              else 
-                               if PB.is_unknown prev_case.static.action 
-                               then 
-                                 let pointer = prev_case.dynamic.pointer_previous in 
-                                 scan_down pointer 
-                               else Some prev_eid 
-                           in 
-                           scan_down pointer 
-                         in 
-                         match 
-                           eid 
-                         with 
-                           | None -> q,kept_events
-                           | Some prev_eid -> 
-                             let bool = 
-                               try 
-                                 PB.A.get event_array prev_eid 
-                               with 
-                                 | _ -> false 
+                                 if PB.is_unknown prev_case.static.action 
+                                 then 
+                                   let pointer = prev_case.dynamic.pointer_previous in 
+                                   scan_down pointer 
+                                 else Some prev_eid 
                              in 
-                             let q,kept_events = 
-                               if 
-                                 bool 
-                               then 
-                                 q,kept_events
-                               else 
-                                 let _ = PB.A.set event_array prev_eid true in 
-                                 prev_eid::q,prev_eid::kept_events
-                             in q,kept_events)
+                           scan_down pointer 
+                           in 
+                           match 
+                             eid 
+                           with 
+                             | None -> q,kept_events
+                             | Some prev_eid -> 
+                               let bool = 
+                                 try 
+                                   PB.A.get event_array prev_eid 
+                                 with 
+                                   | _ -> false 
+                               in 
+                               let q,kept_events = 
+                                 if 
+                                   bool 
+                                 then 
+                                   q,kept_events
+                                 else 
+                                   let _ = PB.A.set event_array prev_eid true in 
+                                   prev_eid::q,prev_eid::kept_events
+                               in q,kept_events)
                        (q,kept_events)
                        list 
                    in 
@@ -1166,7 +1169,7 @@ module Blackboard =
        error,
        events_to_keep,
        0 
-
+         
    let cut parameter handler error log_info blackboard list = 
      let error,cut_causal_flow,n_events_removed = useless_predicate_id parameter handler error blackboard list in 
      let log_info = PB.CI.Po.K.P.set_concurrent_event_detection_time log_info in 

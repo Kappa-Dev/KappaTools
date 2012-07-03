@@ -105,6 +105,7 @@ sig
   val tests_of_refined_step: refined_step -> test list 
   val actions_of_refined_step: refined_step -> action list * (site*binding_state) list 
   val is_obs_of_refined_step: refined_step -> bool 
+  val is_init_of_refined_step: refined_step -> bool 
   val simulation_info_of_refined_step: refined_step -> unit Mods.simulation_info option 
 
   val print_refined_step: H.parameter -> H.handler -> refined_step -> unit 
@@ -703,6 +704,12 @@ module Cflow_linker =
     match x 
     with 
       | Obs _ -> true
+      | _ -> false
+
+  let is_init_of_refined_step x = 
+    match x 
+    with 
+      | Init _ -> true
       | _ -> false
 
   let simulation_info_of_refined_step x = 

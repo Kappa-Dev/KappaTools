@@ -1,4 +1,5 @@
 %def: "displayCompression" "weak" "none"
+%def: "showIntroEvents" "true"
 
 A(x),A(x) -> A(x!1),A(x!1) @1
 A(y),A(y) -> A(y!1),A(y!1) @1

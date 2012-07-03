@@ -626,7 +626,7 @@ module Propagation_heuristic =
                    then 
                       let log_info = B.PB.CI.Po.K.P.add_look_up_case 1 log_info in 
                       let _ = flush parameter.B.PB.CI.Po.K.H.out_channel_err in 
-                      error,true,log_info,blackboard 
+                      error,not (B.PB.is_undefined predicate_value),log_info,blackboard 
                    else 
                      last_chance_up  parameter handler error log_info blackboard predicate_value preview_event_case_address 
                  else 

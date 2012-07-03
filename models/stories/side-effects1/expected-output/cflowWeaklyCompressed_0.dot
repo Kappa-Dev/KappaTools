@@ -2,8 +2,8 @@
 /* Compressed causal flows were: [11;10;9;8;7;6;5;4;3;2;1] */
 digraph G{
  ranksep=.5 ; 
-{ rank = same ; "0" [shape=plaintext] ; node_1 [label ="Intro C", style=filled,fillcolor=green] ;
-node_2 [label ="Intro C", style=filled,fillcolor=green] ;
+{ rank = same ; "0" [shape=plaintext] ; node_1 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_2 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
 node_4 [label="->A(a!0,b),B(a!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "1" [shape=plaintext] ; node_3 [label="C(a!_)->C(a)", shape=invhouse, style=filled, fillcolor = lightblue] ;
