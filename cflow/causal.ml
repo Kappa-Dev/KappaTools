@@ -301,7 +301,8 @@ let dot_of_grid profiling fic grid state env =
 			match atom.kind  with 
       	| RULE _  -> fprintf desc "node_%d [label=\"%s\", shape=invhouse, style=filled, fillcolor = lightblue] ;\n" eid (label atom.kind) 
         | OBS _  ->  fprintf desc "node_%d [label =\"%s\", style=filled, fillcolor=red] ;\n" eid (label atom.kind) 
-        | INIT _  -> fprintf desc "node_%d [label =\"%s\", style=filled,fillcolor=green] ;\n" eid (label atom.kind)
+        | INIT _  ->
+					if !Parameter.showIntroEvents then fprintf desc "node_%d [label =\"%s\", shape=house ;style=filled,fillcolor=green] ;\n" eid (label atom.kind)
 	| _ -> invalid_arg "Event type not handled"
 	(*		List.iter (fun obs -> fprintf desc "obs_%d [label =\"%s\", style=filled, fillcolor=red] ;\n node_%d -> obs_%d [arrowhead=vee];\n" eid obs eid eid) atom.observation ;*) 
 		) eids_at_d ;
@@ -320,7 +321,13 @@ let dot_of_grid profiling fic grid state env =
 			(fun eid' ->
 				if eid' = 0 then () 
 				else
-					fprintf desc "node_%d -> node_%d\n" eid' eid
+					if !Parameter.showIntroEvents then
+						fprintf desc "node_%d -> node_%d\n" eid' eid
+					else
+						let atom = IntMap.find eid' config.events in
+						match atom.kind with
+							| INIT _ -> ()
+							| _ -> fprintf desc "node_%d -> node_%d\n" eid' eid
 			) pred_set
 	) config.prec_1 ;
 	IntMap.iter

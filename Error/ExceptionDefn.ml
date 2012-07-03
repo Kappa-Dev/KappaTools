@@ -6,7 +6,7 @@ exception True
 exception Break of int
 exception Null_event of int (* 0:unary rule with binary instance 1:binary rule with unary instance 2:clashing instance 3:overapproximation clash 4:invalid injection clash *)
 exception Deadlock
-exception UserInterrupted of string
+exception UserInterrupted of (float -> int -> string)
 exception StopReached of string
 
 exception Syntax_Error of (Tools.pos option) * string

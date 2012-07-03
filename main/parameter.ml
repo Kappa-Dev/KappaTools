@@ -56,6 +56,7 @@ let snapshotHighres = ref true
 let causalModeOn = ref false
 let weakCompression = ref false 
 let mazCompression = ref false 
+let showIntroEvents = ref false
 
 (*Computed values*)
 let (timeIncrementValue:float option ref) = ref None

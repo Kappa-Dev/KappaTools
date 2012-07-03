@@ -61,10 +61,10 @@
 \def\dd{-\hspace{0.001cm}-}
 \def\imp#1{\emph{#1}\index{#1}}
 %%%%
-\def\version{v3}
+\def\version{3}
 
 
-\title{KaSim reference manual \version}
+\title{KaSim\version~reference manual}
 \author{J\'er\^ome Feret and Jean Krivine\thanks{corresponding author: jean.krivine@pps.univ-paris-diderot.fr} \\\url{KappaLanguage.org}}
 
 %\date{}       
@@ -738,7 +738,7 @@ In our ABC example, adding the instruction:
 \ttt{\ITE{
 \item[] \%mod:  [true] do \$TRACK \var{Cpp} [true]  
 }}
-\noi will asking~\KaSim~to turn on causality analysis\index{causality} for the observable \ttt{\textquotesingle Cpp\textquotesingle } since the beginning of the simulation, and display the causal explanation of every new occurrence of \ttt{\textquotesingle Cpp\textquotesingle }, until the end of the simulation. The explanation, that we call a \emph{causal flow}\index{causal flow}, is a set of rule application ordered by causality and displayed as a graph using dot format. In this graph, an edge \ttt{r}$\longrightarrow$ \ttt{r\textquotesingle } between two rule applications $\ttt{r}$ and $\ttt{\textquotesingle r\textquotesingle }$ indicates that the first rule application has used, in the simulation, some sites that were modified by the application of the former. We show Fig.~\ref{fig:cflow} an example of such causal flow.
+\noi will ask~\KaSim~to turn on causality analysis\index{causality} for the observable \ttt{\textquotesingle Cpp\textquotesingle } since the beginning of the simulation, and display the causal explanation of every new occurrence of \ttt{\textquotesingle Cpp\textquotesingle }, until the end of the simulation. The explanation, that we call a \emph{causal flow}\index{causal flow}, is a set of rule application ordered by causality and displayed as a graph using dot format. In this graph, an edge \ttt{r}$\longrightarrow$ \ttt{r\textquotesingle } between two rule applications $\ttt{r}$ and $\ttt{\textquotesingle r\textquotesingle }$ indicates that the first rule application has used, in the simulation, some sites that were modified by the application of the former. We show Fig.~\ref{fig:cflow} an example of such causal flow.
 
 \begin{figure}[htbp]
 \begin{center}
@@ -753,7 +753,6 @@ Note that causal flow\index{causality} can show or hide more causal dependencies
 \item[] \%mod:  [T]>25 do \$TRACK \var{Cpp} [false]  
 }}
 
-\textcolor{red}{Causal flows are currently in beta testing. This section will be expanded later.}
 
 \subsection{Flux maps}
 
@@ -787,6 +786,23 @@ This perturbation will be applied whenever the observable \ttt{\var{Cpp}} will b
 \item [] \%mod: \var{Cpp}~> 500 do \$UPDATE \var{a.b} [inf]
 }}
 \noi will set the kinetic rate of rule \ttt{\var{a.b}}~to infinity. 
+
+\subsection{Combining several effects in a single perturbation}
+As an example, consider the computation of causal flows between $t=10$ and $t=20$ using the declarations:
+ \ttt{\ITE{
+\item [] \%mod: [T]>10 do \$TRACK \var{Cpp} [true]
+\item [] \%mod: [T]>20 do \$TRACK \var{Cpp} [false]
+}}
+
+The above declaration will ask \KaSim~to analyze each new occurrence of \var{Cpp} in that time interval. If $n$ new instances took place, then \KaSim~will have to compute $n$ causal flows. One may want to bound the number of computed flows to a certain value, say 10. One may do so using the combination of perturbations and variables given below:
+ \ttt{\ITE{
+\item[] \%var: \var{x} 0
+\item[] \%mod: [T]>10 do (\$TRACK \var{Cpp} [true] ; \$UPDATE \var{x} \var{Cpp})
+\item[] \%mod: [T]>20 || (\var{x} > 0 \&\& \var{Cpp} - \var{x} > 9) do \$TRACK \var{Cpp} [false]
+}}
+The first line is a declaration of an $x$ variable that is initially set to 0. Note that the second line is a perturbation that contains two simultaneous effects, the first one triggering causality analysis and the second one updating the value of variable $x$ to the current value of variable \ttt{\var{Cpp}}.
+The last line stops causality analysis whenever time is greater than 20 or when 10 new observables have been found (the difference between the current value of \ttt{\var{Cpp}} and $x$.
+
 
 \section{Link type}
 
@@ -833,6 +849,7 @@ parameter & possible values & description \\
 \ttt{"displayCompression"} & any combination of \\
 &  \ttt{"none", "strong", "weak"} & \small type of compression \\
 \ttt{"cflowFileName"} & \ttt{"cflow.dot"}, any string & \small file name for causal flows\\ & \\
+\ttt{"showIntroEvents"} & \ttt{"false", "true"} & \small show introduction events in causal flows\\ & \\
 \textit{Pretty printing}&\\
 \ttt{"plotSepChar"} & \ttt{" "} or any character & \small separation character for plots\\
 \ttt{"dotSnapshots"} & \ttt{"false", "true"} & \small generate dot snapshots\\
