@@ -65,6 +65,7 @@ rule token = parse
 									| "$FLUX" -> (FLUX pos)
 									| "$TRACK" -> (TRACK pos)
 									| "$UPDATE" -> (ASSIGN2 pos)
+									| "$PRINT" -> (PRINT pos)
 									| s -> return_error None lexbuf ("Perturbation effect \""^s^"\" is not defined")
 					 			}  
 		| '[' {let lab = read_label "" [']'] lexbuf in 

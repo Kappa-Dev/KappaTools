@@ -786,6 +786,21 @@ let effects_of_modif variables env ast_list =
 						in
 						let str = "Disable flux tracking"::str_pert in
 						(variables,(Dynamics.FLUXOFF nme)::effects, str, env)
+					| PRINT (lab,alg,pos) ->
+						let txt,nme =
+							match lab with
+								| None -> ("stdout",None)
+								| Some (nme,_) -> ("nme",Some nme)
+						in
+						let (x, is_constant, opt_v, dep, str) = partial_eval_alg env alg in
+						let v =
+								if is_constant
+								then (match opt_v with Some v -> Dynamics.CONST v | None -> invalid_arg "Eval.effects_of_modif")
+								else Dynamics.VAR x 
+						in
+						let str = (Printf.sprintf "Print %s (%s)" str txt)::str_pert
+						in
+						(variables,Dynamics.PRINT (nme,v)::effects, str, env)
 			in
 			iter variables effects str_pert env tl
 	in
@@ -913,7 +928,7 @@ let pert_of_result variables env res =
 								dep env
 							in 
 							(env,(None,effect)::rule_list) 
-						| Dynamics.UPDATE_RULE _ |Dynamics.UPDATE_VAR _ | Dynamics.UPDATE_TOK _ | Dynamics.SNAPSHOT _ | Dynamics.STOP _ | Dynamics.FLUX _ | Dynamics.FLUXOFF _ | Dynamics.CFLOWOFF _ -> 
+						| Dynamics.UPDATE_RULE _ |Dynamics.UPDATE_VAR _ | Dynamics.UPDATE_TOK _ | Dynamics.SNAPSHOT _ | Dynamics.STOP _ | Dynamics.FLUX _ | Dynamics.FLUXOFF _ | Dynamics.CFLOWOFF _ | Dynamics.PRINT _ -> 
 							let env =
 								DepSet.fold
 								(fun dep env -> Environment.add_dependencies dep (Mods.PERT p_id) env

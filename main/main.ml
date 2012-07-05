@@ -125,7 +125,12 @@ let main =
     let profiling = Compression_main.D.S.PH.B.PB.CI.Po.K.P.init_log_info () in 
 		let plot = Plot.create !Parameter.outputDataName
 		and grid,profiling,event_list = 
-			if Environment.tracking_enabled env then 
+			if Environment.tracking_enabled env then
+				let _ = 
+					if !Parameter.mazCompression || !Parameter.weakCompression then ()
+					else (ExceptionDefn.warning "Causal flow compution is required but no compression is specified, will output flows with no compresion"  ; 
+					Parameter.mazCompression := true)
+				in  
 				let grid = Causal.empty_grid() in 
                                 let event_list = [] in 
                                 let profiling,event_list = 
@@ -146,7 +151,7 @@ let main =
 					| 1 -> (Printf.printf "\tValid embedding but not binary when required: %f\n" ((float_of_int n) /. (float_of_int (Counter.null_event counter))))
 					| 2 -> (Printf.printf "\tClashing instance: %f\n" ((float_of_int n) /. (float_of_int (Counter.null_event counter))))
 					| 3 -> (Printf.printf "\tLazy negative update: %f\n" ((float_of_int n) /. (float_of_int (Counter.null_event counter))))
-					| 4 -> (Printf.printf "\tNon local instance no longer valid: %f\n" ((float_of_int n) /. (float_of_int (Counter.null_event counter))))
+					| 4 -> (Printf.printf "\tLazy negtive update of non local instances: %f\n" ((float_of_int n) /. (float_of_int (Counter.null_event counter))))
 					| _ -> print_string "\tna\n"
 			) counter.Counter.stat_null ;
 			if !Parameter.fluxModeOn then 

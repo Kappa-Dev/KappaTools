@@ -132,6 +132,13 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 						with Invalid_argument _ -> failwith "External.apply_effect: invalid token id"
 					end
 			| (None,SNAPSHOT opt) -> (snapshot opt ; (env, state ,pert_ids,tracked,pert_events))
+			| (None,PRINT (nme,v)) ->
+				let desc = 
+					match nme with Some fic -> open_out fic | None -> stdout
+				in
+				let value = State.value state ~var:v (-1) counter env in
+				Printf.fprintf desc "%E" value ; flush desc ;
+				(env,state,pert_ids,tracked,pert_events)
 			| (None,CFLOW id) -> 
 				if !Parameter.debugModeOn then Debug.tag "Tracking causality" ;
 				Parameter.causalModeOn := true ; 

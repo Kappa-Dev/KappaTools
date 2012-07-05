@@ -86,6 +86,7 @@ and modif_expr =
 	| UPDATE_TOK of (string * Tools.pos * alg_expr * Tools.pos) (*TODO: pause*)
 	| STOP of ((string * Tools.pos) option * Tools.pos)
 	| SNAPSHOT of ((string * Tools.pos) option * Tools.pos) (*maybe later of mixture too*)
+	| PRINT of ((string * Tools.pos) option * alg_expr * Tools.pos)
 	| CFLOW of (string * Tools.pos * Tools.pos) 
 	| CFLOWOFF of (string * Tools.pos * Tools.pos)
 	| FLUX of (string * Tools.pos) option * Tools.pos
