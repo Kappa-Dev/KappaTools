@@ -3,14 +3,17 @@ open Mods
 open State
 open Random_tree
 
-let version = "3.0-020712"
+let version = "3.0-050712"
 
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
 
-let close_desc () =
+let close_desc opt_env =
 	List.iter (fun d -> close_out d) !Parameter.openOutDescriptors ;
-	List.iter (fun d -> close_in d) !Parameter.openInDescriptors
+	List.iter (fun d -> close_in d) !Parameter.openInDescriptors ;
+	match opt_env with
+		| None -> ()
+		| Some env -> Environment.close_desc env
 
 let main =
 	let options = [
@@ -125,7 +128,12 @@ let main =
     let profiling = Compression_main.D.S.PH.B.PB.CI.Po.K.P.init_log_info () in 
 		let plot = Plot.create !Parameter.outputDataName
 		and grid,profiling,event_list = 
-			if Environment.tracking_enabled env then 
+			if Environment.tracking_enabled env then
+				let _ = 
+					if !Parameter.mazCompression || !Parameter.weakCompression then ()
+					else (ExceptionDefn.warning "Causal flow compution is required but no compression is specified, will output flows with no compresion"  ; 
+					Parameter.mazCompression := true)
+				in  
 				let grid = Causal.empty_grid() in 
                                 let event_list = [] in 
                                 let profiling,event_list = 
@@ -146,7 +154,7 @@ let main =
 					| 1 -> (Printf.printf "\tValid embedding but not binary when required: %f\n" ((float_of_int n) /. (float_of_int (Counter.null_event counter))))
 					| 2 -> (Printf.printf "\tClashing instance: %f\n" ((float_of_int n) /. (float_of_int (Counter.null_event counter))))
 					| 3 -> (Printf.printf "\tLazy negative update: %f\n" ((float_of_int n) /. (float_of_int (Counter.null_event counter))))
-					| 4 -> (Printf.printf "\tNon local instance no longer valid: %f\n" ((float_of_int n) /. (float_of_int (Counter.null_event counter))))
+					| 4 -> (Printf.printf "\tLazy negtive update of non local instances: %f\n" ((float_of_int n) /. (float_of_int (Counter.null_event counter))))
 					| _ -> print_string "\tna\n"
 			) counter.Counter.stat_null ;
 			if !Parameter.fluxModeOn then 
@@ -180,7 +188,7 @@ let main =
 							end
 						| _ -> ()
 					) ;
-					close_desc() (*closes all other opened descriptors*)
+					close_desc (Some env) (*closes all other opened descriptors*)
 				end
 			| ExceptionDefn.Deadlock ->
 				(Printf.printf "?\nA deadlock was reached after %d events and %Es (Activity = %.5f)\n"
@@ -189,10 +197,10 @@ let main =
 				(Random_tree.total state.activity_tree))
 	with
 	| ExceptionDefn.Semantics_Error (pos, msg) -> 
-		(close_desc () ; Printf.eprintf "***Error (%s) line %d, char %d: %s***\n" (fn pos) (ln pos) (cn pos) msg)
-	| Invalid_argument msg ->	(close_desc (); let s = "" (*Printexc.get_backtrace()*) in Printf.eprintf "\n***Runtime error %s***\n%s\n" msg s)
+		(close_desc None ; Printf.eprintf "***Error (%s) line %d, char %d: %s***\n" (fn pos) (ln pos) (cn pos) msg)
+	| Invalid_argument msg ->	(close_desc None; let s = "" (*Printexc.get_backtrace()*) in Printf.eprintf "\n***Runtime error %s***\n%s\n" msg s)
 	| ExceptionDefn.UserInterrupted f -> 
 		let msg = f 0. 0 in 
-		(Printf.eprintf "\n***Interrupted by user: %s***\n" msg ; close_desc())
-	| ExceptionDefn.StopReached msg -> (Printf.eprintf "\n***%s***\n" msg ; close_desc())
-	| Sys_error msg -> (close_desc (); Printf.eprintf "%s\n" msg)
+		(Printf.eprintf "\n***Interrupted by user: %s***\n" msg ; close_desc None)
+	| ExceptionDefn.StopReached msg -> (Printf.eprintf "\n***%s***\n" msg ; close_desc None)
+	| Sys_error msg -> (close_desc None; Printf.eprintf "%s\n" msg)

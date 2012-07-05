@@ -42,7 +42,7 @@ let real =
 let id = (['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '0'-'9' '_' '-' '+']*)
 let internal_state = '~' (['0'-'9' 'a'-'z' 'A'-'Z']+)
 let pert = '$' id
-
+	
 rule token = parse
     | "\\\n" {incr_line lexbuf ; token lexbuf}
 		| "do" {let pos = position lexbuf in DO pos}
@@ -65,6 +65,7 @@ rule token = parse
 									| "$FLUX" -> (FLUX pos)
 									| "$TRACK" -> (TRACK pos)
 									| "$UPDATE" -> (ASSIGN2 pos)
+									| "$PRINT" -> (PRINT pos)
 									| s -> return_error None lexbuf ("Perturbation effect \""^s^"\" is not defined")
 					 			}  
 		| '[' {let lab = read_label "" [']'] lexbuf in 

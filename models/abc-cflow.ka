@@ -27,8 +27,15 @@
 %obs: 'n_c' 0
 %var: 'C' C()
 
+%var: 'cflow' [inf]
+
 #### Initial conditions 
 %init: 'n_ab' A(),B()
 %init: 'n_c' C()
 
-%mod: [T]>10 do $ADD 10000 C()
+%mod: [T]>5 do $ADD 10000 C()
+%mod: [T]>10 do ($TRACK 'Cpp' [true] ; $UPDATE 'cflow' 'Cpp')
+%mod: ('Cpp' - 'cflow' = 10) do ($TRACK 'Cpp' [false])
+
+
+%def: "displayCompression" "none" "weak" 

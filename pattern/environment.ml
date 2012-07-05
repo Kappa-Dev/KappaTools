@@ -41,7 +41,9 @@ type t = {
 	
 	tracking_enabled : bool ;
 	active_cflows : int ;
-	track : IntSet.t
+	track : IntSet.t ;
+	
+	desc_table : (string,out_channel) Hashtbl.t
 	(*log : Log.t*)
 }
 
@@ -76,8 +78,17 @@ let empty =
 	has_intra = false ;
 	tracking_enabled = false ;
   active_cflows = 0 ;
-	track = IntSet.empty
+	track = IntSet.empty ;
+	
+	desc_table = Hashtbl.create 2 
 }
+
+let get_desc file env = 
+	try Hashtbl.find env.desc_table file with 
+		| Not_found -> let d = open_out file in (Hashtbl.add env.desc_table file d ; d)
+
+let close_desc env =
+	Hashtbl.iter (fun file d -> close_out d) env.desc_table 
 
 let tracking_enabled env = env.tracking_enabled
 let inc_active_cflows env = {env with active_cflows = env.active_cflows + 1}

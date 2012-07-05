@@ -53,3 +53,5 @@ models/stories/side-effects1/expected-output
 models/stories/side-effects2/expected-output
 models/stories/side-effects3
 models/stories/side-effects3/expected-output
+models/stories/side-effects4
+models/stories/side-effects4/expected-output

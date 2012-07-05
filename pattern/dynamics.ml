@@ -138,11 +138,13 @@ and modification =
 	| FLUX of string option
 	| FLUXOFF of string option
 	| CFLOWOFF of int
+	| PRINT of (string option * Ast.print_expr list)
 and boolean_variable = BCONST of bool | BVAR of ((int -> float) -> (int -> float) -> float -> int -> int -> float -> (int -> float) -> bool)
 
 let string_of_pert pert env =
 	let string_of_effect effect =
 		match effect with
+		| PRINT (nme,_) -> "PRINT" 
 		| INTRO (_,mix) -> Printf.sprintf "INTRO %s" (Mixture.to_kappa false mix env)
 		| DELETE (_,mix) -> Printf.sprintf "DELETE %s" (Mixture.to_kappa false mix env)
 		| UPDATE_RULE (r_id,_) -> Printf.sprintf "UPDATE rule[%d]" r_id

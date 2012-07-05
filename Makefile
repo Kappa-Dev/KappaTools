@@ -10,7 +10,7 @@ SOURCES = \
 		siteGraphs/node.ml pattern/mixture.mli  \
 		pattern/mixture.ml pattern/precondition.ml pattern/precondition.mli \
 		siteGraphs/graph.ml siteGraphs/species.ml pattern/matching.ml pattern/dynamics.ml \
-		grammar/eval.mli  simulation/state.ml simulation/external.ml simulation/nonLocal.ml grammar/eval.ml  \
+		simulation/state.ml simulation/nonLocal.ml grammar/eval.ml simulation/external.ml  \
 		cflow/cflow_handler.ml cflow/profiling.ml cflow/causal.ml  \
 		cflow/kappa_instantiation.ml cflow/po_cut.ml cflow/pseudo_inverse.ml cflow/blackboard_generation.ml cflow/blackboard.ml cflow/propagation_heuristics.ml \
 		cflow/generic_branch_and_cut_solver.ml cflow/dag.ml cflow/compression_main.ml  simulation/plot.ml Error/safe.ml simulation/run.ml \

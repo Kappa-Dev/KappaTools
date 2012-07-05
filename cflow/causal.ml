@@ -341,9 +341,14 @@ let dot_of_grid profiling fic grid state env =
         close_out desc 
 
 (*story_list:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_id:int story_time: float ; story_event: int}*)
-let pretty_print prefix label story_list state env =	
+let pretty_print compression_type label story_list state env =	
   let n = List.length story_list in 
-	Debug.tag (Printf.sprintf "\n+ Pretty printing %d %scompressed flow%s" n label (if n>1 then "s" else ""));
+	let _ = 
+		if compression_type = "" then
+			Debug.tag (Printf.sprintf "\n+ Pretty printing %d flow%s" n (if n>1 then "s" else ""))
+		else 
+			Debug.tag (Printf.sprintf "\n+ Pretty printing %d %scompressed flow%s" n label (if n>1 then "s" else ""))
+	in
 	let _ =
 		List.fold_left 
 		(fun cpt (key,(grid,_),stories) ->
@@ -361,7 +366,7 @@ let pretty_print prefix label story_list state env =
 					Printf.fprintf desc "/* Compressed causal flows were: %s */\n" (Tools.string_of_list string_of_int ids) ;
 				)
 			in
-		        let fic = (Filename.chop_extension (!(Parameter.cflowFileName)))^prefix^(Printf.sprintf "Compressed_%d" cpt)^".dot" in
+		    let fic = (Filename.chop_extension (!(Parameter.cflowFileName)))^compression_type^"_"^(string_of_int cpt)^".dot" in
 				dot_of_grid profiling fic grid state env ;
 			cpt+1
 		) 0 story_list
