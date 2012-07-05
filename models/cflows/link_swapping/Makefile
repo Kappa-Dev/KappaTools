@@ -18,7 +18,7 @@ all: test
 build: $(EXPECTED_OUTPUT_PATH)
 	@sh README 
 
-(EXPECTED_OUTPUT_PATH):
+$(EXPECTED_OUTPUT_PATH):
 	@mkdir $@
 
 $(TMP): 
@@ -74,7 +74,7 @@ $(ERROR_TMP):
 	@cat $(TMP)/*.error > $@
 
 $(ERROR): error_tmp 
-	@if (test -s $<) then (echo ****$(DIR)/$(MODEL)**** > $@ ; echo  >> $@ ; cat $< >> $@) else (touch $@) ; fi 
+	@if (test -s $<) then (echo ****$(DIR)/$(MODEL)**** > $@ ; echo  >> $@ ; cat README >> $@ ; echo >> $@ ; cat $< >> $@) else (touch $@) ; fi 
 
 clean:
 	@rm -rf $(TMP) $(SCRIPT) $(ERROR) $(ERROR_TMP) 
@@ -87,8 +87,8 @@ clean_all:
 	@rm -rf $(EXPECTED_OUTPUT_PATH) 
 
 .phony help:
-	@echo 'make help:               this help'
-	@echo 'make build:              launch KaSim and store the result as a reference'
-	@echo 'make test:              launch KaSim and compare the result with the reference files'
-	@echo 'clean:                   clean everything but the reference files'
-	@echo 'clean-all:               clean everything including the reference files"
+	@echo 'make help:      this help'
+	@echo 'make build:     launch KaSim and store the result as a reference'
+	@echo 'make test:      launch KaSim and compare the result with the reference files'
+	@echo 'clean:          clean everything but the reference files'
+	@echo 'clean_all:      clean everything including the reference files"

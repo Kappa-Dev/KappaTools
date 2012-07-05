@@ -1,0 +1,21 @@
+all:
+	@for i in * ; do (if (file $$i | grep directory ) then (cd $$i ; $(MAKE) ; ) else (echo 0 ; ) ;  fi ; )   ; done 
+	@cat */error > error 
+	@if (test -s error) then (cat error) else (echo "No difference has been found") fi;
+
+build:
+	@for i in * ; do (if (file $$i | grep directory ) then (cd $$i ; $(MAKE) build ; ) else (echo 0 ; ) ;  fi ; )   ; done 
+
+clean: 
+	@for i in * ; do (if (file $$i | grep directory ) then (cd $$i ; $(MAKE) clean ; ) else (echo 0 ; ) ;  fi ; )   ; done 
+
+clean_all: 
+	@for i in * ; do (if (file $$i | grep directory ) then (cd $$i ; $(MAKE) clean_all ; ) else (echo 0 ; ) ;  fi ; )   ; done 
+	@rm -f error 
+
+.phony help:
+	@echo 'make help:      this help'
+	@echo 'make build:     recursively launch KaSim and store the result as a reference'
+	@echo 'make test:      recursively launch KaSim and compare the result with the reference files'
+	@echo 'clean:          recursively clean everything but the reference files'
+	@echo 'clean_all:      recursively clean everything including the reference files'
