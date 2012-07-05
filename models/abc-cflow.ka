@@ -34,7 +34,7 @@
 %init: 'n_c' C()
 
 %mod: [T]>5 do $ADD 10000 C()
-%mod: [T]>10 do ($TRACK 'Cpp' [true] ; $UPDATE 'cflow' 'Cpp' ; $PRINT 'cflow')
-%mod: ('Cpp' - 'cflow' = 10) do ($TRACK 'Cpp' [false] ; $PRINT 'Cpp' - 'cflow')
+%mod: [T]>10 do ($TRACK 'Cpp' [true] ; $UPDATE 'cflow' 'Cpp')
+%mod: ('Cpp' - 'cflow' = 10) do ($TRACK 'Cpp' [false])
 
-#%def: "displayCompression" "none" "weak" 
+%def: "displayCompression" "none" "weak" 

@@ -3,14 +3,17 @@ open Mods
 open State
 open Random_tree
 
-let version = "3.0-020712"
+let version = "3.0-050712"
 
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
 
-let close_desc () =
+let close_desc opt_env =
 	List.iter (fun d -> close_out d) !Parameter.openOutDescriptors ;
-	List.iter (fun d -> close_in d) !Parameter.openInDescriptors
+	List.iter (fun d -> close_in d) !Parameter.openInDescriptors ;
+	match opt_env with
+		| None -> ()
+		| Some env -> Environment.close_desc env
 
 let main =
 	let options = [
@@ -185,7 +188,7 @@ let main =
 							end
 						| _ -> ()
 					) ;
-					close_desc() (*closes all other opened descriptors*)
+					close_desc (Some env) (*closes all other opened descriptors*)
 				end
 			| ExceptionDefn.Deadlock ->
 				(Printf.printf "?\nA deadlock was reached after %d events and %Es (Activity = %.5f)\n"
@@ -194,10 +197,10 @@ let main =
 				(Random_tree.total state.activity_tree))
 	with
 	| ExceptionDefn.Semantics_Error (pos, msg) -> 
-		(close_desc () ; Printf.eprintf "***Error (%s) line %d, char %d: %s***\n" (fn pos) (ln pos) (cn pos) msg)
-	| Invalid_argument msg ->	(close_desc (); let s = "" (*Printexc.get_backtrace()*) in Printf.eprintf "\n***Runtime error %s***\n%s\n" msg s)
+		(close_desc None ; Printf.eprintf "***Error (%s) line %d, char %d: %s***\n" (fn pos) (ln pos) (cn pos) msg)
+	| Invalid_argument msg ->	(close_desc None; let s = "" (*Printexc.get_backtrace()*) in Printf.eprintf "\n***Runtime error %s***\n%s\n" msg s)
 	| ExceptionDefn.UserInterrupted f -> 
 		let msg = f 0. 0 in 
-		(Printf.eprintf "\n***Interrupted by user: %s***\n" msg ; close_desc())
-	| ExceptionDefn.StopReached msg -> (Printf.eprintf "\n***%s***\n" msg ; close_desc())
-	| Sys_error msg -> (close_desc (); Printf.eprintf "%s\n" msg)
+		(Printf.eprintf "\n***Interrupted by user: %s***\n" msg ; close_desc None)
+	| ExceptionDefn.StopReached msg -> (Printf.eprintf "\n***%s***\n" msg ; close_desc None)
+	| Sys_error msg -> (close_desc None; Printf.eprintf "%s\n" msg)

@@ -134,7 +134,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 			| (None,SNAPSHOT opt) -> (snapshot opt ; (env, state ,pert_ids,tracked,pert_events))
 			| (None,PRINT (nme,v)) ->
 				let desc = 
-					match nme with Some fic -> open_out fic | None -> stdout
+					match nme with Some fic -> Environment.get_desc fic env | None -> stdout
 				in
 				let value = State.value state ~var:v (-1) counter env in
 				Printf.fprintf desc "%E" value ; flush desc ;

@@ -154,10 +154,17 @@ effect:
 	{Ast.SNAPSHOT ($2,$1)}
 | STOP fic_label
 	{Ast.STOP ($2,$1)}
-| PRINT fic_label alg_expr
+| PRINT fic_label alg_expr /*TODO: replace alg_expr by print_expr later on*/
 	{Ast.PRINT ($2,$3,$1)}
 ;
 
+/*print_expr:
+/*empty*/ /*{[]}*/
+/*| fic_label {[Ast.Str_pexpr $1]}
+| alg_expr {[Ast.Var_pexpr $1]}
+| fic_label POW print_expr {(Ast.Str_pexpr $1)::$3}
+| alg_expr POW print_expr {(Ast.Var_pexpr $1)::$3}
+;*/
 
 boolean:
 | TRUE {true}

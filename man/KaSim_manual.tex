@@ -10,6 +10,7 @@
 
 \usepackage[T1]{fontenc}
 \usepackage{ textcomp }
+\usepackage{hyperref}
 
 
 %% LaTeX - Article customise
@@ -659,7 +660,8 @@ where \textit{boolean\_expression} and \textit{effect}\index{effect} are defined
     && | \tcb{\$STOP} \textit{opt\_filename}\\
 	&& | \tcb{\$FLUX} \textit{opt\_filename} \textit{boolean} \\
     && | \tcb{\$TRACK \var{var\_name}} \textit{boolean} \\
-    && | \tcb{\$UPDATE \var{var\_name}} \textit{algebraic\_expression} \\\\
+    && | \tcb{\$UPDATE \var{var\_name}} \textit{algebraic\_expression} \\
+    && | \tcb{\$PRINT} \textit{opt\_filename} \textit{algebraic\_expression} \\\\
     \textit{opt\_filename} &::=& \tcb{\var{\var{filename}}} | \tcb{$\varepsilon$} \\\\
 	\textit{boolean} &::=& \tcb{[true]} | \tcb{[false]}
   \end{tabular}
@@ -803,6 +805,12 @@ The above declaration will ask \KaSim~to analyze each new occurrence of \var{Cpp
 The first line is a declaration of an $x$ variable that is initially set to 0. Note that the second line is a perturbation that contains two simultaneous effects, the first one triggering causality analysis and the second one updating the value of variable $x$ to the current value of variable \ttt{\var{Cpp}}.
 The last line stops causality analysis whenever time is greater than 20 or when 10 new observables have been found (the difference between the current value of \ttt{\var{Cpp}} and $x$.
 
+\subsection{Printing values during a simulation}
+The effect \ttt{\$PRINT \textit{filename\_opt} \textit{algebraic\_expression}} enables one to output values during a computation either to standard output, when \textit{filename\_opt} is empty or to a specific file. For instance:
+ \ttt{\ITE{
+\item[] \%mod: |A| < 0 do \$PRINT |A| 
+}}
+will ask \KaSim~to output the value of token \ttt{A} on the standard output, each time its value gets below 0.
 
 \section{Link type}
 

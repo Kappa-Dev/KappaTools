@@ -42,7 +42,7 @@ let real =
 let id = (['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '0'-'9' '_' '-' '+']*)
 let internal_state = '~' (['0'-'9' 'a'-'z' 'A'-'Z']+)
 let pert = '$' id
-
+	
 rule token = parse
     | "\\\n" {incr_line lexbuf ; token lexbuf}
 		| "do" {let pos = position lexbuf in DO pos}
