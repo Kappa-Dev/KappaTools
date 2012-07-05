@@ -86,11 +86,14 @@ and modif_expr =
 	| UPDATE_TOK of (string * Tools.pos * alg_expr * Tools.pos) (*TODO: pause*)
 	| STOP of ((string * Tools.pos) option * Tools.pos)
 	| SNAPSHOT of ((string * Tools.pos) option * Tools.pos) (*maybe later of mixture too*)
-	| PRINT of ((string * Tools.pos) option * alg_expr * Tools.pos)
+	| PRINT of ((string * Tools.pos) option * (print_expr list) * Tools.pos)
 	| CFLOW of (string * Tools.pos * Tools.pos) 
 	| CFLOWOFF of (string * Tools.pos * Tools.pos)
 	| FLUX of (string * Tools.pos) option * Tools.pos
 	| FLUXOFF of (string * Tools.pos) option * Tools.pos
+
+and print_expr = Str_pexpr of (string * Tools.pos) | Alg_pexpr of alg_expr
+
 
 type configuration = string * Tools.pos * ((string * Tools.pos) list)
 

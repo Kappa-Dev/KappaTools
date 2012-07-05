@@ -661,8 +661,10 @@ where \textit{boolean\_expression} and \textit{effect}\index{effect} are defined
 	&& | \tcb{\$FLUX} \textit{opt\_filename} \textit{boolean} \\
     && | \tcb{\$TRACK \var{var\_name}} \textit{boolean} \\
     && | \tcb{\$UPDATE \var{var\_name}} \textit{algebraic\_expression} \\
-    && | \tcb{\$PRINT} \textit{opt\_filename} \textit{algebraic\_expression} \\\\
-    \textit{opt\_filename} &::=& \tcb{\var{\var{filename}}} | \tcb{$\varepsilon$} \\\\
+    && | \tcb{\$PRINT} \textit{opt\_filename} \tcb{<}\textit{print\_expression}\tcb{>} \\\\
+    \textit{print\_expression} &::=& \tcb{$\varepsilon$} | \tcb{"string" . } \textit{print\_expression} \\
+    && | \textit{algebraic\_expression}\tcb{ . } \textit{print\_expression} \\\\
+    \textit{opt\_filename} &::=& \tcb{"filename"} | \tcb{$\varepsilon$} \\\\
 	\textit{boolean} &::=& \tcb{[true]} | \tcb{[false]}
   \end{tabular}
   \label{tab:pert}
@@ -734,7 +736,7 @@ The concentration of any token can be reset on the fly using a perturbation. For
 }}
 will double the concentration of token \ttt{a} each time it gets below 100.
 
-\subsection{Causality analysis}
+\subsection{Causality analysis}\label{sec:cflows}
 
 In our ABC example, adding the instruction:
 \ttt{\ITE{
@@ -806,11 +808,13 @@ The first line is a declaration of an $x$ variable that is initially set to 0. N
 The last line stops causality analysis whenever time is greater than 20 or when 10 new observables have been found (the difference between the current value of \ttt{\var{Cpp}} and $x$.
 
 \subsection{Printing values during a simulation}
-The effect \ttt{\$PRINT \textit{filename\_opt} \textit{algebraic\_expression}} enables one to output values during a computation either to standard output, when \textit{filename\_opt} is empty or to a specific file. For instance:
+The effect \ttt{\$PRINT \textit{filename\_opt} <\textit{print\_expression}>} enables one to output values during a computation either to standard output, when \textit{filename\_opt} is empty or to a specific file. For instance:
  \ttt{\ITE{
-\item[] \%mod: |A| < 0 do \$PRINT |A| 
+\item[] \%mod: repeat \textbackslash
+\item[] |A|<0 do \$PRINT "token.dat" <"Token A is: " . |A| . " at time=". [T]>\textbackslash 
+\item [] until [false]
 }}
-will ask \KaSim~to output the value of token \ttt{A} on the standard output, each time its value gets below 0.
+will ask \KaSim~to output the value of token \ttt{A} in the file "token.dat", each time its value gets below 0.
 
 \section{Link type}
 
@@ -877,7 +881,7 @@ parameter & possible values & description \\
 %%
 
 \subsection{The Influence map}
-The influence map of a model is an object that may help modelers checking the consistency of the rule set they use. It is generated if the modeler has required it using the paramter \ttt{"dumpInfluenceMap"} which will generate the so called \emph{influence map}\index{influence map} of the model.
+The influence map of a model is an object that may help modelers checking the consistency of the rule set they use. It is generated if the modeler has required it using the parameter \ttt{"dumpInfluenceMap"} which will generate the so called \emph{influence map}\index{influence map} of the model.
 
 Unlike the flux map, the influence map is \emph{statically} computed and does not depend on kinetic rates nor initial conditions. It describes how rules \emph{with no side effect}\index{side effect} may potentially influence each other during a simulation. \KaSim~will produce a dot format file containing the influence relation over all rules and observables of the model. The produced graph visualized using a circular rendering\footnote{One may use for instance the \ttt{circo} program that is part of the \textit{graphviz} suite.} is given in Figure~\ref{fig:abc-im}. Observables are represented as circular nodes\footnote{Observable can be viewed as identity rules for computing influence.} and rules as rectangular nodes. Edges are decorated with the list of embeddings (separated by a semi-colon) allowing rules\textquotesingle s right hand sides to be mapped to left hand sides. Note that the influence map will not display relations between rules that are induced by side effects (see Section~\ref{sec:side-effect}).
 
@@ -896,6 +900,23 @@ More formally, consider the rules $r:L\rar R$ and $s:L'\rar R'$. One wishes to k
    \caption{Computation of the influence of the top rule on the rule below: the right hand side of the first rules embeds in a common term with the left hand side of the second rule. It results that the first rule has a positive influence on the second.}
    \label{fig:im}
 \end{figure}
+
+\subsection{Compressing causal flows}
+
+One may ask \KaSim~to extract causal pathways leading to the production of various observables (see Section~\ref{sec:cflows}). There are currently 2 types of causal flows that can be displayed on demand using simulation parameters, either with a \emph{weak} compression or no compression. Causal flows without any compression can be displayed using the command:
+\ttt{\ITE{
+\item [] \%def: "displayCompression" "none" 
+}}
+As a result all causal flows computed by \KaSim~will be displayed in a dot file without any further compression. Note that this will modelers access to a lot of details about the mechanisms of action at stake in the simulation. However most of the time, these details will contain too much information and one may wish to retain only "essential" mechanisms using the command:
+\ttt{\ITE{
+\item [] \%def: "displayCompression" "weak" 
+}}
+Such instruction will tell \KaSim~to remove from the flow computation events which appeared in the history of the observable of interest, but were not strictly necessary for its occurrence. Note that both uncompressed and compressed flows can be displayed using the command:
+\ttt{\ITE{
+\item [] \%def: "displayCompression" "weak"  "none"
+}}
+in which case the headers of the compressed flows will contain the name of their uncompressed versions. Note that \emph{strong} compression, which compresses flows even further is not available yet.
+
 
 \chapter{Frequently asked questions}
 \section*{Simulation hangs after a while}

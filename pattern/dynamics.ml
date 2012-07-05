@@ -138,7 +138,7 @@ and modification =
 	| FLUX of string option
 	| FLUXOFF of string option
 	| CFLOWOFF of int
-	| PRINT of (string option * variable)
+	| PRINT of (string option * Ast.print_expr list)
 and boolean_variable = BCONST of bool | BVAR of ((int -> float) -> (int -> float) -> float -> int -> int -> float -> (int -> float) -> bool)
 
 let string_of_pert pert env =

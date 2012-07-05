@@ -27,6 +27,24 @@ let eval_abort_pert just_applied pert state counter env =
 			in
 				b_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time()) v_of_token
 
+let dump_print_expr desc pexpr state counter env =
+	List.iter
+	(fun ast ->
+		match ast with
+			| Ast.Str_pexpr (str,p) -> Printf.fprintf desc "%s" str 
+			| Ast.Alg_pexpr alg -> 
+				let (x, is_constant, opt_v, dep, str) = Eval.partial_eval_alg env alg in
+				let v =
+						if is_constant
+						then (match opt_v with Some v -> Dynamics.CONST v | None -> invalid_arg "Eval.effects_of_modif")
+						else Dynamics.VAR x 
+				in
+				let n = State.value state ~var:v (-1) counter env in
+				Printf.fprintf desc "%E" n
+	) pexpr ;
+	Printf.fprintf desc "\n"
+
+
 let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var snapshot counter =
 		match eff with
 			| (Some r,INTRO (v,mix)) -> 
@@ -132,12 +150,12 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 						with Invalid_argument _ -> failwith "External.apply_effect: invalid token id"
 					end
 			| (None,SNAPSHOT opt) -> (snapshot opt ; (env, state ,pert_ids,tracked,pert_events))
-			| (None,PRINT (nme,v)) ->
+			| (None,PRINT (nme,pexpr)) ->
 				let desc = 
 					match nme with Some fic -> Environment.get_desc fic env | None -> stdout
 				in
-				let value = State.value state ~var:v (-1) counter env in
-				Printf.fprintf desc "%E" value ; flush desc ;
+				dump_print_expr desc pexpr state counter env ;
+				flush desc ;
 				(env,state,pert_ids,tracked,pert_events)
 			| (None,CFLOW id) -> 
 				if !Parameter.debugModeOn then Debug.tag "Tracking causality" ;

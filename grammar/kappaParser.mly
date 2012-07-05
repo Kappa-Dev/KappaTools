@@ -5,7 +5,7 @@
 %token AT OP_PAR CL_PAR COMMA DOT TYPE_TOK LAR
 %token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL PERT INTRO DELETE DO SET UNTIL TRUE FALSE OBS KAPPA_RAR TRACK CPUTIME CONFIG REPEAT DIFF
 %token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INFINITY TIME EVENT NULL_EVENT PROD_EVENT INIT LET DIV PLOT SINUS COSINUS TAN SQRT EXPONENT POW ABS MODULO 
-%token <Tools.pos> EMAX TMAX FLUX ASSIGN ASSIGN2 TOKEN KAPPA_LNK PIPE KAPPA_LRAR PRINT
+%token <Tools.pos> EMAX TMAX FLUX ASSIGN ASSIGN2 TOKEN KAPPA_LNK PIPE KAPPA_LRAR PRINT CAT
 %token <int*Tools.pos> INT 
 %token <string*Tools.pos> ID LABEL KAPPA_MRK  
 %token <float*Tools.pos> FLOAT 
@@ -154,17 +154,17 @@ effect:
 	{Ast.SNAPSHOT ($2,$1)}
 | STOP fic_label
 	{Ast.STOP ($2,$1)}
-| PRINT fic_label alg_expr /*TODO: replace alg_expr by print_expr later on*/
-	{Ast.PRINT ($2,$3,$1)}
+| PRINT fic_label SMALLER print_expr GREATER 
+	{Ast.PRINT ($2,$4,$1)}
 ;
 
-/*print_expr:
-/*empty*/ /*{[]}*/
-/*| fic_label {[Ast.Str_pexpr $1]}
-| alg_expr {[Ast.Var_pexpr $1]}
-| fic_label POW print_expr {(Ast.Str_pexpr $1)::$3}
-| alg_expr POW print_expr {(Ast.Var_pexpr $1)::$3}
-;*/
+print_expr:
+/*empty*/ {[]}
+| FILENAME {[Ast.Str_pexpr $1]}
+| alg_expr {[Ast.Alg_pexpr $1]}
+| FILENAME DOT print_expr {(Ast.Str_pexpr $1)::$3}
+| alg_expr DOT print_expr {(Ast.Alg_pexpr $1)::$3}
+;
 
 boolean:
 | TRUE {true}

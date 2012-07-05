@@ -786,21 +786,25 @@ let effects_of_modif variables env ast_list =
 						in
 						let str = "Disable flux tracking"::str_pert in
 						(variables,(Dynamics.FLUXOFF nme)::effects, str, env)
-					| PRINT (lab,alg,pos) ->
+					| PRINT (lab,print,pos) ->
 						let txt,nme =
 							match lab with
 								| None -> ("stdout",None)
 								| Some (nme,_) -> ("nme",Some nme)
 						in
-						let (x, is_constant, opt_v, dep, str) = partial_eval_alg env alg in
-						let v =
-								if is_constant
-								then (match opt_v with Some v -> Dynamics.CONST v | None -> invalid_arg "Eval.effects_of_modif")
-								else Dynamics.VAR x 
+						let str_l =
+						List.fold_left
+						(fun cont pexpr ->
+							match pexpr with
+								| Ast.Str_pexpr (str,pos) -> str::cont
+								| Ast.Alg_pexpr alg -> 
+									let (_, _, _, _, str) = partial_eval_alg env alg in
+									str::cont
+						) [] print
 						in
-						let str = (Printf.sprintf "Print %s (%s)" str txt)::str_pert
+						let str = (Printf.sprintf "Print %s (%s)" (Tools.string_of_list (fun i->i) str_l) txt)::str_pert
 						in
-						(variables,Dynamics.PRINT (nme,v)::effects, str, env)
+						(variables,(Dynamics.PRINT (nme,print))::effects, str, env)
 			in
 			iter variables effects str_pert env tl
 	in

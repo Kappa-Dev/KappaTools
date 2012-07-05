@@ -181,7 +181,7 @@ let rec value state ?var var_id counter env =
 						v_fun act_of_id v_of_var (Counter.time counter)
 							(Counter.event counter) (Counter.null_event counter) (Sys.time()) v_of_token
 			)
-
+			
 (*missing recomputation of dependencies*)
 let set_variable id v state =
 	try state.alg_variables.(id) <- Some (Dynamics.CONST v) with Invalid_argument msg -> invalid_arg ("State.set_variable: "^msg)
