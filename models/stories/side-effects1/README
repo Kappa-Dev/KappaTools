@@ -1,3 +1,15 @@
 Command-line:
-KaSim -i sides-effect.ka -seed 924556145 -e 10000 -d expected-output
+KaSim -i side-effects.ka -seed 924556145 -e 10000 -d expected-output
 
+The observable is triggerred when there is a B that is bound and a C that is free and not phosphorilated. 
+
+This requires
+ 1) the introduction of a dimmer AB
+ 2) the separation of two connected Cs. 
+ The unsphorilated C becomes free by side-effects. 
+
+There is only one causal flow. 
+
+In case of erroneous result, 
+check how side-effects are dealt with in the frontend. 
+and how observables are detected. 

@@ -439,11 +439,24 @@ module Preblackboard =
                blackboard.pre_column_map
            in 
            error,{blackboard with pre_column_map = map}
+         
+         let free_agent_if_it_exists parameter handler error blackboard agent_id = 
+           try 
+             let _ = PredicateMap.find (Here agent_id) blackboard.pre_column_map in
+             free_agent parameter handler error blackboard agent_id 
+           with 
+             | _ -> error,blackboard 
              
-         let predicates_of_action parameter handler error blackboard action = 
+         let predicates_of_action parameter handler error blackboard init action = 
            match action with 
              | CI.Po.K.Create (ag,interface) -> 
                let ag_id = CI.Po.K.agent_id_of_agent ag in
+               let error,blackboard = 
+                 if init 
+                 then 
+                   error,blackboard
+                 else 
+                   free_agent_if_it_exists parameter handler error blackboard ag_id in 
                let error,blackboard,predicate_id = allocate parameter handler error blackboard (Here ag_id) in   
                List.fold_left 
                  (fun (error,blackboard,list1,list2) (s_id,opt) -> 
@@ -675,6 +688,7 @@ module Preblackboard =
              end 
                
          let add_step parameter handler error log_info step blackboard = 
+           let init = CI.Po.K.is_init_of_refined_step step in 
            let pre_event = blackboard.pre_event in 
            let test_list = CI.Po.K.tests_of_refined_step step in 
            let action_list,side_effect = CI.Po.K.actions_of_refined_step step in
@@ -800,7 +814,7 @@ module Preblackboard =
            let error,blackboard,action_map,test_map = 
              List.fold_left 
                (fun (error,blackboard,action_map,test_map) action -> 
-                 let error,blackboard,action_list,test_list = predicates_of_action parameter handler error blackboard action in 
+                 let error,blackboard,action_list,test_list = predicates_of_action parameter handler error blackboard init action in 
                  error,blackboard,build_map action_list action_map,build_map test_list test_map)
                (error,blackboard,PredicateidMap.empty,test_map)
                action_list in 

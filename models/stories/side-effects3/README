@@ -1,3 +1,13 @@
 Command-line:
-KaSim -i side-effects.ka -seed 924556145 -e 10000 -d expected-output
+KaSim -i side-effects.ka -seed 924556145 -e 15 -d expected-output
+
+A and B can for dimmer.
+Each time A and B forms a dimmer the state of A is changed from 0 to 1, or from 1 to 0. 
+
+At the beggining A is bound to a specific B, but A has state 0. 
+The observable require A to have state 0 and be associated with the specific B.
+
+Causal flows can be compressed in 
+A and (specific) B unbind, and bind again.  
+
 
