@@ -9,7 +9,7 @@
   * Jean Krivine, Universite Paris-Diderot, CNRS 
   *  
   * Creation: 19/10/2011
-  * Last modification: 02/07/2012
+  * Last modification: 05/07/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -202,127 +202,105 @@ let compress env state log_info step_list =
           let n_stories = List.length causal_story_array in 
           let _ = print_newline () in 
           let _ = print_newline () in 
-          let _ = Debug.tag ("\t - Weak flow compression ("^(string_of_int n_stories)^")") in 
-          let tick = 
-            if n_stories > 0 
-            then Mods.tick_stories n_stories (false,0,0) 
-            else (false,0,0)
-          in 
-          let error,_,_,_,weakly_compressed_story_array = 
-            List.fold_left 
-              (fun (error,counter,tick,blackboard,weakly_compressed_story_array) (_,(grid,(event_id_list,list_order,event_list,info)),list_info) -> 
-                let error,log_info,blackboard_tmp,list_order = 
-                  if in_place 
-                  then 
-                    let error,log_info,blackboard_tmp = D.S.filter parameter handler error log_info blackboard event_id_list in 
-                    error,log_info,blackboard_tmp,list_order
-
-                  else 
-                    let error,log_info,blackboard_tmp = D.S.sub parameter handler error log_info blackboard event_list in 
-                    let error,list = D.S.PH.forced_events parameter handler error blackboard_tmp in 
-                    let list_order = 
-                      match list 
-                      with 
-                        | (list_order,_,_)::q -> list_order 
-                        | _ -> [] 
-                    in 
-                    error,log_info,blackboard_tmp,list_order
+          let error,weakly_compressed_story_array = 
+            if weak_compression_on or strong_compression_on 
+            then 
+              begin 
+                let _ = Debug.tag ("\t - Weak flow compression ("^(string_of_int n_stories)^")") in 
+                let tick = 
+                  if n_stories > 0 
+                  then Mods.tick_stories n_stories (false,0,0) 
+                  else (false,0,0)
                 in 
-                let error,log_info,blackboard_tmp,output,list = 
-                  D.S.compress parameter handler error log_info blackboard_tmp list_order 
-                in
-                let error,log_info,blackboard_tmp = 
-                  if in_place
-                  then 
-                    D.S.clean parameter handler error log_info blackboard_tmp 
-                  else 
-                    error,log_info,blackboard_tmp
-                in 
-                let log_info = D.S.PH.B.PB.CI.Po.K.P.set_story_research_time log_info in 
-                let error = 
-                  if debug_mode
-                  then 
-                    let _ =  Debug.tag "\t\t * result"  in 
-                    let _ =
-                      if D.S.PH.B.is_failed output 
-                      then 
-                        let _ = Printf.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err "Fail_to_compress" in  error
-                      else 
-                        let _ = Printf.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err "Succeed_to_compress" in 
-                        error
-                    in 
-                    error 
-                  else 
-                    error
-                in 
-                let error,weakly_compressed_story_array,info = 
-                  match 
-                    list
-                  with 
-                    | None -> 
-                      error,weakly_compressed_story_array,None
-                    | Some list -> 
-                      if weak_compression_on
-                      then 
-                        let grid = D.S.PH.B.PB.CI.Po.K.build_grid list false handler in
-                        let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
-                        let error,dag = D.graph_of_grid parameter handler error grid in 
-                        let error,canonic = D.canonicalize parameter handler error dag in 
-                        let log_info = D.S.PH.B.PB.CI.Po.K.P.set_canonicalisation log_info in 
-                        let info = 
-                          match info 
-                          with 
-                            | None -> None 
-                            | Some info -> 
-                              let info = 
-                                {info with Mods.story_id = counter }
-                              in 
-                              let info = Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy log_info)  info 
-                              in 
-                              Some info
-                        in 
-                        error,(canonic,(grid,info),list_info)::weakly_compressed_story_array,info
-                      else 
-                        error,weakly_compressed_story_array,None
-                in 
-(*                let _ = (*production des dotfiles des histoires avant compression*)
-		  if !Parameter.mazCompression 
-                  then 
-                    let filename =  (Filename.chop_suffix !Parameter.cflowFileName ".dot")^"_"^(string_of_int counter)^".dot" in
-                    let grid = D.S.PH.B.PB.CI.Po.K.build_grid result_wo_compression true handler in 
-		    let _ = Causal.dot_of_grid 
-                      (if dump_profiling_info 
-                       then 
-                          (fun log ->
-                            match info 
+                let error,_,_,_,weakly_compressed_story_array = 
+                  List.fold_left 
+                    (fun (error,counter,tick,blackboard,weakly_compressed_story_array) (_,(grid,(event_id_list,list_order,event_list,info)),list_info) -> 
+                      let error,log_info,blackboard_tmp,list_order = 
+                        if in_place 
+                        then 
+                          let error,log_info,blackboard_tmp = D.S.filter parameter handler error log_info blackboard event_id_list in 
+                          error,log_info,blackboard_tmp,list_order
+                            
+                        else 
+                          let error,log_info,blackboard_tmp = D.S.sub parameter handler error log_info blackboard event_list in 
+                          let error,list = D.S.PH.forced_events parameter handler error blackboard_tmp in 
+                          let list_order = 
+                            match list 
                             with 
-                              | None ->
-                                Printf.fprintf log "/*No compressed flow found \n (is it a consistent trace ?)/*\n" 
-                              | Some simulation_info -> 
-                                let log_info = simulation_info.Mods.profiling_info in 
-                                let _ = Printf.fprintf log "/*\n" in 
-                                let _ = Mods.dump_simulation_info log simulation_info in 
-                                let _ = Printf.fprintf log "/*\n" in 
-                                let _ = D.S.PH.B.PB.CI.Po.K.P.dump_complete_log log log_info in 
-                                let _ = Printf.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_profiling "\nCompression of the %s story:\n\n" (th_of_int counter) in 
-                                let _ = D.S.PH.B.PB.CI.Po.K.P.dump_complete_log parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_profiling log_info in 
-                                ())
-                       else 
-                          (fun _ -> ())) 
-                      filename 
-                      grid 
-                      state 
-                      env 
-                    in
-                    () 
-                in *)
-                let error,log_info,blackboard = D.S.PH.B.reset_init parameter handler error log_info blackboard in 
-                let tick = Mods.tick_stories n_stories tick in 
-                error,counter+1,tick,blackboard,weakly_compressed_story_array)
-              (error,1,tick,blackboard,[]) 
-              (List.rev causal_story_array)
+                              | (list_order,_,_)::q -> list_order 
+                              | _ -> [] 
+                          in 
+                          error,log_info,blackboard_tmp,list_order
+                      in 
+                      let error,log_info,blackboard_tmp,output,list = 
+                        D.S.compress parameter handler error log_info blackboard_tmp list_order 
+                      in
+                      let error,log_info,blackboard_tmp = 
+                        if in_place
+                        then 
+                          D.S.clean parameter handler error log_info blackboard_tmp 
+                        else 
+                          error,log_info,blackboard_tmp
+                      in 
+                      let log_info = D.S.PH.B.PB.CI.Po.K.P.set_story_research_time log_info in 
+                      let error = 
+                        if debug_mode
+                        then 
+                          let _ =  Debug.tag "\t\t * result"  in 
+                          let _ =
+                            if D.S.PH.B.is_failed output 
+                            then 
+                              let _ = Printf.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err "Fail_to_compress" in  error
+                            else 
+                              let _ = Printf.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err "Succeed_to_compress" in 
+                              error
+                          in 
+                          error 
+                        else 
+                          error
+                      in 
+                      let error,weakly_compressed_story_array,info = 
+                        match 
+                          list
+                      with 
+                        | None -> 
+                          error,weakly_compressed_story_array,None
+                        | Some list -> 
+                          if weak_compression_on
+                          then 
+                            let grid = D.S.PH.B.PB.CI.Po.K.build_grid list false handler in
+                            let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
+                            let error,dag = D.graph_of_grid parameter handler error grid in 
+                            let error,canonic = D.canonicalize parameter handler error dag in 
+                            let log_info = D.S.PH.B.PB.CI.Po.K.P.set_canonicalisation log_info in 
+                            let info = 
+                              match info 
+                              with 
+                                | None -> None 
+                                | Some info -> 
+                                  let info = 
+                                    {info with Mods.story_id = counter }
+                                  in 
+                                  let info = Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy log_info)  info 
+                                  in 
+                                  Some info
+                            in 
+                            error,(canonic,(grid,info),list_info)::weakly_compressed_story_array,info
+                          else 
+                            error,weakly_compressed_story_array,None
+                      in 
+                      let error,log_info,blackboard = D.S.PH.B.reset_init parameter handler error log_info blackboard in 
+                      let tick = Mods.tick_stories n_stories tick in 
+                      error,counter+1,tick,blackboard,weakly_compressed_story_array)
+                    (error,1,tick,blackboard,[]) 
+                    (List.rev causal_story_array)
+                in 
+	        let error,weakly_compressed_story_array = D.hash_list parameter handler error  Mods.compare_profiling_info (List.rev weakly_compressed_story_array) in
+                error,weakly_compressed_story_array 
+              end
+            else 
+              error,[]
           in 
-	  let error,weakly_compressed_story_array = D.hash_list parameter handler error  Mods.compare_profiling_info (List.rev weakly_compressed_story_array) in 
           let _ = 
             List.iter 
               (D.S.PH.B.PB.CI.Po.K.H.dump_error parameter handler error)
