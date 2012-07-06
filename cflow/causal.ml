@@ -127,15 +127,19 @@ let record_obs ((r_id,state,embedding,_),test) event_number grid env =
   in
   grid
 
-let record_init (((node_id,agent_name),interface),_) event_number grid env = 
+let record_init init event_number grid env = 
   if !Parameter.showIntroEvents  
   then 
     (*adding tests*)
+    let (((node_id,agent_name),interface),_) = init in  
+    let causal = Dynamics.compute_causal_init init env in 
     let grid = 
-    List.fold_left 
-      (fun grid (site_id,_) -> 
-	add (node_id,site_id) (_INTERNAL_MODIF lor _INTERNAL_TESTED lor _LINK_TESTED lor _LINK_MODIF) (* HACK, TO DO CLEANER *) grid event_number (INIT agent_name) []
-      ) grid interface 
+    Mods.Int2Map.fold 
+      (fun (node_id,site_id) c grid -> 
+	add 
+          (node_id,site_id) 
+          c (*(_INTERNAL_MODIF lor _INTERNAL_TESTED lor _LINK_TESTED lor _LINK_MODIF) (* HACK, TO DO CLEANER *)*) grid event_number (INIT agent_name) []
+      ) causal grid 
     in
     grid
   else 

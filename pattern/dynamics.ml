@@ -51,7 +51,6 @@ let _INTERNAL_MODIF = 4
 let _LINK_TESTED = 2 
 let _LINK_MODIF = 1
 
-
 let compute_causal lhs rhs script env = 
 	let causal_map = (*adding tests for all sites mentionned in the left hand side --including existential site*) 
 		IntMap.fold 
@@ -123,8 +122,27 @@ let compute_causal lhs rhs script env =
 					site_id := !site_id + 1 ;
 				done ;
 				!p_causal
-	) causal_map script 
-	
+	) causal_map script
+
+let compute_causal_init (((node_id,agent_name),interface),_) env = 
+  List.fold_left  
+    (fun causal_map (site_id,(int,lnk)) ->
+      let c =
+	match int with
+	  | Some i -> _INTERNAL_TESTED lor _INTERNAL_MODIF
+	  | None -> 0
+      in
+      let c = (* I do not know whether the site can bear an internal state *)
+              (* TO DO: improve *)
+(*	match lnk with
+	  | Node.WLD -> c
+	  | _ ->*) (c lor _LINK_TESTED lor _LINK_MODIF)
+      in
+      Mods.Int2Map.add (node_id,site_id) c causal_map
+    )
+    Mods.Int2Map.empty 
+    interface
+
 type perturbation = {precondition: boolean_variable ; effect : (rule option * modification) list ; abort : boolean_variable option ; flag : string}
 and modification = 
 	INTRO of variable * Mixture.t 
