@@ -55,22 +55,29 @@ let compute_causal lhs rhs script env =
 	let causal_map = (*adding tests for all sites mentionned in the left hand side --including existential site*) 
 		IntMap.fold 
 		(fun id ag causal_map ->
-			Mixture.fold_interface 
-			(fun site_id (int,lnk) causal_map ->
-				let c =
-					match int with
-						| Some i -> _INTERNAL_TESTED
-						| None -> 0
-				in
-				let c = 
-					match lnk with
-						| Node.WLD -> c
-						| _ -> (c lor _LINK_TESTED)
-				in
-				Id2Map.add (KEPT id,site_id) c causal_map
-			)
-			ag causal_map
-		) 
+                  let causal_map,bool = 
+		    Mixture.fold_interface 
+			(fun site_id (int,lnk) (causal_map,bool) ->
+			  if site_id <> 0 
+                          then 
+                            let c =
+			      match int with
+				| Some i -> _INTERNAL_TESTED
+				| None -> 0
+			    in
+			    let c = 
+			      match lnk with
+				| Node.WLD -> c
+				      | _ -> (c lor _LINK_TESTED)
+			    in
+			    Id2Map.add (KEPT id,site_id) c causal_map,true
+			  else causal_map,bool)
+		      ag (causal_map,false)
+                  in 
+                  if bool 
+                  then Id2Map.add (KEPT id,0) _LINK_MODIF causal_map
+                  else 
+                    Id2Map.add (KEPT id,0) (_LINK_MODIF lor _LINK_TESTED) causal_map)
 		(Mixture.agents lhs) Id2Map.empty
 	in
 	let add_causal p c map =
@@ -129,18 +136,21 @@ let compute_causal_init (((node_id,agent_name),interface),_) env =
     (fun causal_map (site_id,(int,lnk)) ->
       let c =
 	match int with
-	  | Some i -> _INTERNAL_TESTED lor _INTERNAL_MODIF
+	  | Some i -> (*_INTERNAL_TESTED lor*) _INTERNAL_MODIF
 	  | None -> 0
       in
       let c = (* I do not know whether the site can bear an internal state *)
               (* TO DO: improve *)
 (*	match lnk with
 	  | Node.WLD -> c
-	  | _ ->*) (c lor _LINK_TESTED lor _LINK_MODIF)
+	  | _ ->*) (c (*lor _LINK_TESTED*) lor _LINK_MODIF)
       in
+      if site_id <> 0 
+      then 
       Mods.Int2Map.add (node_id,site_id) c causal_map
+      else causal_map
     )
-    Mods.Int2Map.empty 
+    (Mods.Int2Map.add (node_id,0) _LINK_MODIF Mods.Int2Map.empty)
     interface
 
 type perturbation = {precondition: boolean_variable ; effect : (rule option * modification) list ; abort : boolean_variable option ; flag : string}
