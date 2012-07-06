@@ -156,6 +156,9 @@ let compute_causal_init (((node_id,agent_name),interface),_) env =
     (Mods.Int2Map.add (node_id,0) _LINK_MODIF Mods.Int2Map.empty)
     interface
 
+let compute_causal_obs lhs = 
+  compute_causal lhs lhs [] 
+
 type perturbation = {precondition: boolean_variable ; effect : (rule option * modification) list ; abort : boolean_variable option ; flag : string}
 and modification = 
 	INTRO of variable * Mixture.t 

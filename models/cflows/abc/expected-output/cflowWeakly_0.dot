@@ -40,7 +40,6 @@ node_3 -> node_9
 node_6 -> node_9
 node_7 -> node_9
 node_8 -> node_9
-node_3 -> node_10
 node_6 -> node_10
 node_9 -> node_10
 node_7 -> node_5 [style=dotted, arrowhead = tee] 

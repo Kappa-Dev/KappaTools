@@ -84,7 +84,6 @@ node_19 -> node_20
 node_8 -> node_21
 node_19 -> node_21
 node_20 -> node_21
-node_1 -> node_22
 node_2 -> node_22
 node_21 -> node_22
 }

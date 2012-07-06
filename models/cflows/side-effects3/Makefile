@@ -90,8 +90,8 @@ clean_all:
 
 pdf: $(PDF)
 
-%.pdf: 
-	dot -Tpdf $*.dot -o $@
+%.pdf: %.dot
+	dot -Tpdf $< -o $@
 .phony help:
 	@echo 'make help:      this help'
 	@echo 'make build:     launch KaSim and store the result as a reference'
