@@ -24,6 +24,8 @@ node_2 -> node_6
 node_3 -> node_7
 node_5 -> node_7
 node_6 -> node_7
+node_2 -> node_8
+node_3 -> node_8
 node_7 -> node_8
 }
 /*

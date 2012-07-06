@@ -1,6 +1,8 @@
 MODEL= $(wildcard *.ka)
 DIR=$(shell pwd)
 EXPECTED_OUTPUT_PATH=expected-output
+DOT=$(wildcard */*.dot)
+PDF=$(DOT:.dot=.pdf)
 TMP=tmp
 SCRIPT=script
 ERROR=error 
@@ -86,9 +88,14 @@ clean_all:
 	@make clean
 	@rm -rf $(EXPECTED_OUTPUT_PATH) 
 
+pdf: $(PDF)
+
+%.pdf: 
+	dot -Tpdf $*.dot -o $@
 .phony help:
 	@echo 'make help:      this help'
 	@echo 'make build:     launch KaSim and store the result as a reference'
 	@echo 'make test:      launch KaSim and compare the result with the reference files'
+	@echo 'make pdf:       build all pdf from existing dot files'
 	@echo 'clean:          clean everything but the reference files'
 	@echo 'clean_all:      clean everything including the reference files"

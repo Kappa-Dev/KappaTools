@@ -21,8 +21,10 @@ node_1 -> node_4
 node_2 -> node_4
 node_3 -> node_5
 node_4 -> node_5
+node_1 -> node_6
+node_2 -> node_6
 node_5 -> node_6
 }
 /*
- Dot generation time: 0.000000
+ Dot generation time: 0.004000
 */

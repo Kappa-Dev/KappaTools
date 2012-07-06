@@ -74,10 +74,12 @@ let compute_causal lhs rhs script env =
 			  else causal_map,bool)
 		      ag (causal_map,false)
                   in 
+                  (* we put a TEsT on the existential site only if nothing else is tested *)
                   if bool 
-                  then Id2Map.add (KEPT id,0) _LINK_MODIF causal_map
+                  then 
+                    Id2Map.add (KEPT id,0) 0 causal_map
                   else 
-                    Id2Map.add (KEPT id,0) (_LINK_MODIF lor _LINK_TESTED) causal_map)
+                    Id2Map.add (KEPT id,0) _LINK_TESTED causal_map)
 		(Mixture.agents lhs) Id2Map.empty
 	in
 	let add_causal p c map =
@@ -85,34 +87,35 @@ let compute_causal lhs rhs script env =
 		in
 		Id2Map.add p (c lor c') map
 	in
-	List.fold_left
-	(fun causal_map action ->
+        let causal_map,bool = 
+	  List.fold_left
+	    (fun (causal_map,bool) action ->
 		match action with
-			| BND (p1, p2) -> add_causal p2 _LINK_MODIF (add_causal p1 _LINK_MODIF causal_map)  
+			| BND (p1, p2) -> add_causal p2 _LINK_MODIF (add_causal p1 _LINK_MODIF causal_map),true  
 			| FREE (p1,side_effect_free) -> 
-				if side_effect_free then 
-					begin
-						match p1 with
-							| (KEPT id, site_id) ->
-								begin 
-									match Mixture.follow (id,site_id) lhs with
-										| Some (id',site_id') -> let p2 = (KEPT id',site_id') in add_causal p2 _LINK_MODIF (add_causal p1 _LINK_MODIF causal_map)
-										| None -> invalid_arg "Dynamics.Compute_causal"
-								end 
-							| (FRESH id, site_id) -> invalid_arg "Dynamics.Compute_causal"
-					end
-				else 
-					add_causal p1 _LINK_MODIF causal_map
-			| MOD (p,i) -> add_causal p _INTERNAL_MODIF causal_map
+			  if side_effect_free then 
+			    begin
+			      match p1 with
+				| (KEPT id, site_id) ->
+				  begin 
+				    match Mixture.follow (id,site_id) lhs with
+				      | Some (id',site_id') -> let p2 = (KEPT id',site_id') in add_causal p2 _LINK_MODIF (add_causal p1 _LINK_MODIF causal_map),true
+				      | None -> invalid_arg "Dynamics.Compute_causal"
+				  end 
+				| (FRESH id, site_id) -> invalid_arg "Dynamics.Compute_causal"
+			    end
+			  else 
+			    add_causal p1 _LINK_MODIF causal_map,true
+			| MOD (p,i) -> add_causal p _INTERNAL_MODIF causal_map,true
 			| DEL ag_id -> 
 				Mixture.fold_interface 
-				(fun site_id (int,lnk) causal_map ->
+				(fun site_id (int,lnk) (causal_map,bool) ->
 					let causal_map = 
 						match int with Some _ -> add_causal (KEPT ag_id,site_id) _INTERNAL_MODIF causal_map | None -> causal_map
 					in
-					add_causal (KEPT ag_id,site_id) _LINK_MODIF causal_map
+					add_causal (KEPT ag_id,site_id) _LINK_MODIF causal_map,true
 				)
-				(Mixture.agent_of_id ag_id lhs) causal_map
+				(Mixture.agent_of_id ag_id lhs) (causal_map,bool)
 			| ADD (ag_id,name_id) -> (*Interface might be partial!*)
 				let sign = Environment.get_sig name_id env in
 				let arity = Signature.arity sign in
@@ -123,27 +126,27 @@ let compute_causal lhs rhs script env =
 						begin
 							match Environment.default_state name_id !site_id env with
 								| None -> !p_causal
-								| Some i -> add_causal (FRESH ag_id,!site_id) _INTERNAL_MODIF !p_causal
+								| Some i -> 
+                                                                  add_causal (FRESH ag_id,!site_id) _INTERNAL_MODIF !p_causal
 						end ;
-					p_causal := add_causal (FRESH ag_id,!site_id) _LINK_MODIF !p_causal ;
-					site_id := !site_id + 1 ;
+				  p_causal := add_causal (FRESH ag_id,!site_id) _LINK_MODIF !p_causal ;
+				  site_id := !site_id + 1 ;
 				done ;
-				!p_causal
-	) causal_map script
+				!p_causal,if arity=0 then false else true
+	) (causal_map,false) script
+        in causal_map
 
 let compute_causal_init (((node_id,agent_name),interface),_) env = 
   List.fold_left  
     (fun causal_map (site_id,(int,lnk)) ->
       let c =
 	match int with
-	  | Some i -> (*_INTERNAL_TESTED lor*) _INTERNAL_MODIF
+	  | Some i -> _INTERNAL_MODIF
 	  | None -> 0
       in
       let c = (* I do not know whether the site can bear an internal state *)
               (* TO DO: improve *)
-(*	match lnk with
-	  | Node.WLD -> c
-	  | _ ->*) (c (*lor _LINK_TESTED*) lor _LINK_MODIF)
+        c lor _LINK_MODIF
       in
       if site_id <> 0 
       then 

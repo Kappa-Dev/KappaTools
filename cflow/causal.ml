@@ -119,10 +119,10 @@ let record_obs ((r_id,state,embedding,_),test) event_number grid env =
     Mods.IntMap.fold 
 		(fun id agent grid ->
 			let node_id = im embedding id in
-    	Mixture.fold_interface 
-    	(fun site_id c  grid  -> 
-				add (node_id,site_id) (_LINK_TESTED lor _INTERNAL_TESTED) (* HACK, TO DO CLEANER *) grid event_number (OBS r_id) []
-			) agent grid
+    	                Mixture.fold_interface 
+    	                  (fun site_id c  grid  -> 
+			    add (node_id,site_id) (_LINK_TESTED lor _INTERNAL_TESTED) (* HACK, TO DO CLEANER *) grid event_number (OBS r_id) []
+			  ) agent grid
 		) (Mixture.agents state) grid
   in
   grid
@@ -261,7 +261,6 @@ let dot_of_grid profiling fic grid state env =
 	       IntMap.add eid set prec_star
 		) config.events IntMap.empty 
 	in
-	
 	let depth_of_event =
 		IntMap.fold 
 		(fun eid prec_eids emap ->
@@ -287,7 +286,7 @@ let dot_of_grid profiling fic grid state env =
 	let desc = open_out fic
 	in
 	let _ = Parameter.add_out_desc desc in 
-  let _ = profiling desc in
+        let _ = profiling desc in
 	fprintf desc "digraph G{\n ranksep=.5 ; \n" ;
 	IntMap.iter
 	(fun d eids_at_d ->
