@@ -18,6 +18,8 @@ EXP=$(EXPECTED_DOT:.dot=.ref)
 all: test
 
 build: $(EXPECTED_OUTPUT_PATH)
+	@make clean_all
+	@make $(EXPECTED_OUTPUT_PATH)
 	@sh README 
 
 $(EXPECTED_OUTPUT_PATH):
