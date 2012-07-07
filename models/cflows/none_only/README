@@ -1,0 +1,4 @@
+#Command-line:
+KaSim -i none_only.ka -seed 924556145 -e 10000 -d expected-output
+
+#we check that the computation of causal stories work well when only the none option is used
