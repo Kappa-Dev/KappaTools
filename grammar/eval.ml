@@ -255,6 +255,35 @@ let eval_agent is_pattern tolerate_new_state env a ctxt =
 	in
 		(ctxt, (Mixture.create_agent name_id interface), env)
 
+let cast_op x y op_f op_i =
+	match (x,y) with
+	| (F x, F y) -> F (op_f x y) 
+	| (I x, F y) -> F (op_f (float_of_int x) y)
+	| (F x, I y) -> F (op_f x (float_of_int y))
+	| (I x, I y) -> 
+		begin
+			match op_i with 
+				| None -> F (op_f (float_of_int x) (float_of_int y)) 
+				| Some op_i -> I (op_i x y)
+		end
+let cast_un_op x op_f op_i =
+	match x with
+		| F x -> 
+			begin
+				match op_f with 
+					| Some op_f -> F (op_f x) 
+					| None -> (match op_i with None -> invalid_arg "cast_un" | Some op_i -> I (op_i (int_of_float x)))
+			end
+		| I x -> 
+			match op_i with 
+			| None -> 
+					begin
+						match op_f with
+							| None -> invalid_arg "cast_un_op" 
+							| Some op_f -> F (op_f (float_of_int x)) 
+					end
+			| Some op_i -> I (op_i x) 
+
 (* returns partial evaluation of rate expression and a boolean that is set *)
 (* to true if partial evaluation is a constant function                    *)
 let rec partial_eval_alg env ast =
@@ -280,21 +309,27 @@ let rec partial_eval_alg env ast =
 		| EMAX pos -> 
 			let v =
 				match !Parameter.maxEventValue with
-					| None -> (ExceptionDefn.warning ~with_pos:pos "[emax] constant is evaluated to infinity" ; infinity)
-					| Some n -> (float_of_int n)
+					| None -> (ExceptionDefn.warning ~with_pos:pos "[emax] constant is evaluated to infinity" ; (F infinity))
+					| Some n -> (I n)
 			in
-			((fun _ _ _ _ _ _ _-> v), true, (fun opt -> match opt with Some a -> Some (float_of_int a) | None -> None) !Parameter.maxEventValue, DepSet.empty, "e_max")
+			((fun _ _ _ _ _ _ _-> v), true, 
+			(fun opt -> match opt with Some a -> Some (I a) | None -> Some (F infinity)) 
+			!Parameter.maxEventValue, DepSet.empty, "e_max")
 		| TMAX pos -> 
 			let v =
 				match !Parameter.maxTimeValue with
-					| None -> (ExceptionDefn.warning ~with_pos:pos "[tmax] constant is evaluated to infinity" ; infinity)
-					| Some t -> t
+					| None -> (ExceptionDefn.warning ~with_pos:pos "[tmax] constant is evaluated to infinity" ; (F infinity))
+					| Some t -> (F t)
 			in
-			((fun _ _ _ _ _ _ _-> v), true, !Parameter.maxTimeValue, DepSet.empty, "t_max") 
-		| INFINITY pos -> ((fun _ _ _ _ _ _ _-> infinity), true, Some infinity, DepSet.empty, "inf")
-		| FLOAT (f, pos) -> 
-				((fun _ _ _ _ _ _ _-> f), true, (Some f), DepSet.empty, (Printf.sprintf "%f" f))
-		| CPUTIME pos -> 	((fun _ _ _ _ _ cpu_t _-> cpu_t -. !Parameter.cpuTime), false, Some 0., (DepSet.singleton Mods.EVENT), "t_sim")
+			((fun _ _ _ _ _ _ _-> v), true, 
+			(fun opt -> match opt with Some a -> Some (F a) | None -> Some (F infinity)) !Parameter.maxTimeValue, 
+			DepSet.empty, "t_max") 
+		| INFINITY pos -> ((fun _ _ _ _ _ _ _-> (F infinity)), true, Some (F infinity), DepSet.empty, "inf")
+		| FLOAT (f, pos) -> Debug.tag (string_of_float f); 
+				((fun _ _ _ _ _ _ _-> (F f)), true, (Some (F f)), DepSet.empty, (Printf.sprintf "%f" f))
+		| INT (i ,pos) -> 
+			((fun _ _ _ _ _ _ _-> (I i)), true, (Some (I i)), DepSet.empty, (Printf.sprintf "%d" i))
+		| CPUTIME pos -> 	((fun _ _ _ _ _ cpu_t _-> F (cpu_t -. !Parameter.cpuTime)), false, Some (F 0.), (DepSet.singleton Mods.EVENT), "t_sim")
 		| OBS_VAR (lab,pos) -> 
   			begin 
   				try
@@ -306,7 +341,7 @@ let rec partial_eval_alg env ast =
   						(ExceptionDefn.Semantics_Error (pos,
   								lab ^ " is not a variable identifier"))
   				else
-  					((fun f _ _ _ _ _ _-> f i), false, Some 0., 
+  					((fun f _ _ _ _ _ _-> f i), false, Some (I 0), 
   						(DepSet.singleton (Mods.KAPPA i)), ("'" ^ (lab ^ "'")))
   			with Not_found -> (*lab is the label of an algebraic expression*)
   				let i,opt_v = 
@@ -319,28 +354,35 @@ let rec partial_eval_alg env ast =
   			let i = 
   				try Environment.num_of_token tk_nme env with Not_found -> raise (ExceptionDefn.Semantics_Error (pos,tk_nme ^ " is not a declared token"))
   			in
- 				((fun _ _ _ _ _ _ tk -> tk i),false,Some 0.,DepSet.singleton (Mods.TOK i),("'" ^ (tk_nme ^ "'")))
+ 				((fun _ _ _ _ _ _ tk -> tk i),false,Some (F 0.),DepSet.singleton (Mods.TOK i),("'" ^ (tk_nme ^ "'")))
 		| TIME_VAR pos ->
-				((fun _ _ t _ _ _ _-> t), false, Some 0., (DepSet.singleton Mods.TIME), "t")
+				((fun _ _ t _ _ _ _-> F t), false, Some (F 0.), (DepSet.singleton Mods.TIME), "t")
 		| EVENT_VAR pos ->
-				((fun _ _ _ e ne _ _-> float_of_int (e+ne)), false, Some 0.,(DepSet.singleton Mods.EVENT), "e")
+				((fun _ _ _ e ne _ _-> I (e+ne)), false, Some (I 0),(DepSet.singleton Mods.EVENT), "e")
 		| NULL_EVENT_VAR pos ->
-			((fun _ _ _ _ ne _ _-> float_of_int ne), false, Some 0.,(DepSet.singleton Mods.EVENT), "null_e")
+			((fun _ _ _ _ ne _ _-> I ne), false, Some (I 0),(DepSet.singleton Mods.EVENT), "null_e")
 		| PROD_EVENT_VAR pos ->
-			((fun _ _ _ e _ _ _-> float_of_int e), false,Some 0.,	(DepSet.singleton Mods.EVENT), "prod_e")			
-		| DIV (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> x /. y) "/"
-		| SUM (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> x +. y) "+"
-		| MULT (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> x *. y) "*"
-		| MINUS (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> x -. y) "-"
-		| POW (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> x ** y) "^"
-		| MODULO (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> float_of_int ((int_of_float x) mod (int_of_float y))) " modulo "
-		| COSINUS (ast, pos) -> un_op ast pos cos "cos"
-		| TAN (ast,pos) -> un_op ast pos tan "tan"
-		| SINUS (ast, pos) -> un_op ast pos sin "sin"
-		| EXP (ast, pos) -> un_op ast pos exp "e^"
-		| SQRT (ast, pos) -> un_op ast pos sqrt "sqrt"
-		| ABS (ast, pos) -> un_op ast pos (fun x -> float_of_int (abs (int_of_float x))) "abs"
-		| LOG (ast, pos) -> un_op ast pos log "log"
+			((fun _ _ _ e _ _ _-> I e), false,Some (I 0),	(DepSet.singleton Mods.EVENT), "prod_e")			
+		| DIV (ast, ast', pos) -> 
+			bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> a /. b) None) "/"
+		| SUM (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> a +. b) (Some (fun a b -> a+b))) "+"
+		| MULT (ast, ast', pos) -> bin_op ast ast' pos  (fun x y -> cast_op x y (fun a b -> a *. b) (Some (fun a b -> a*b))) "*"
+		| MINUS (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> a -. b) (Some (fun a b -> a-b))) "-"
+		| POW (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> a ** b) (Some (fun a b -> Tools.pow a b))) "^"
+		| MODULO (ast, ast', pos) -> 
+			bin_op ast ast' pos 
+			(fun x y -> 
+				cast_op x y 
+				(fun a b -> float_of_int ((int_of_float a) mod (int_of_float b))) 
+				(Some (fun a b -> a mod b))
+			) " modulo "
+		| COSINUS (ast, pos) -> un_op ast pos (fun x -> cast_un_op x (Some cos) None) "cos"
+		| TAN (ast,pos) -> un_op ast pos (fun x -> cast_un_op x (Some tan) None) "tan"
+		| SINUS (ast, pos) -> un_op ast pos (fun x -> cast_un_op x (Some sin) None) "sin"
+		| EXP (ast, pos) -> un_op ast pos (fun x -> cast_un_op x (Some exp) None) "e^"
+		| SQRT (ast, pos) -> un_op ast pos (fun x -> cast_un_op x (Some sqrt) None) "sqrt"
+		| ABS (ast, pos) -> un_op ast pos (fun x -> cast_un_op x None (Some abs)) "abs"
+		| LOG (ast, pos) -> un_op ast pos (fun x -> cast_un_op x (Some log) None) "log"
 
 let rec partial_eval_bool env ast =
 	let bin_op_bool ast ast' pos op op_str =
@@ -434,7 +476,9 @@ let rule_of_ast ?(backwards=false) env (ast_rule_label, ast_rule) tolerate_new_s
 	let (k_def, dep) =
 		let (k, const, opt_v, dep, _) = partial_eval_alg env ast_rule.k_def
 		in
-		if const then match opt_v with Some v -> (CONST v, dep) | None -> invalid_arg "Eval.rule_of_ast: Variable is constant but was not evaluated"
+		if const then match opt_v with 
+			| Some v -> (CONST v, dep) 
+			| None -> invalid_arg "Eval.rule_of_ast: Variable is constant but was not evaluated"
 		else ((VAR k), dep)
 	
 	and (env,k_alt, dep_alt) =
@@ -742,56 +786,31 @@ let effects_of_modif variables env ast_list =
 						let str = (Printf.sprintf "set token '%s' to value %s" tk_nme str)::str_pert
 						in 
 						(variables, (Dynamics.UPDATE_TOK (tk_id, v))::effects, str, env)
-					| SNAPSHOT (opt,pos) -> (*when specializing snapshots to particular mixtures, add variables below*)
+					| SNAPSHOT (pexpr,pos) -> (*when specializing snapshots to particular mixtures, add variables below*)
 						let str = ("snapshot state")::str_pert in
-						let opt_name = 
-							match opt with
-							| None -> None
-							| Some (nme,pos) -> Some nme
-						in
-						(variables, (Dynamics.SNAPSHOT opt_name)::effects, str, env)
-					| STOP (opt,pos) ->
+						(variables, (Dynamics.SNAPSHOT pexpr)::effects, str, env)
+					| STOP (pexpr,pos) ->
 						let str = "interrupt simulation"::str_pert in
-						let opt_name = 
-							match opt with
-							| None -> None
-							| Some (nme,pos) -> Some nme
-						in
-						(variables, (Dynamics.STOP opt_name)::effects, str, env)
+						(variables, (Dynamics.STOP pexpr)::effects, str, env)
 					| CFLOW (lab,pos_lab,pos_pert) ->
 						let id = try Environment.num_of_rule lab env with Not_found -> try Environment.num_of_kappa lab env with Not_found ->
 							raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
 						in
-						let str = (Printf.sprintf "Enable causality analysis of %s" lab)::str_pert in
+						let str = (Printf.sprintf "Enable causality analysis")::str_pert in
 						(variables, (Dynamics.CFLOW id)::effects, str, env)
 					| CFLOWOFF (lab,pos_lab,pos_pert) ->
 						let id = try Environment.num_of_rule lab env with Not_found -> try Environment.num_of_kappa lab env with Not_found ->
 							raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
 						in
-						let str = (Printf.sprintf "Disable causality analysis of %s" lab)::str_pert in
+						let str = (Printf.sprintf "Disable causality analysis")::str_pert in
 						(variables, (Dynamics.CFLOWOFF id)::effects, str, env)
-					| FLUX (lab,pos) ->
-						let nme =
-							match lab with
-								| None -> None
-								| Some (nme,_) -> Some nme
-						in
+					| FLUX (pexpr,pos) ->
 						let str = "Activate flux tracking"::str_pert in
-						(variables,(Dynamics.FLUX nme)::effects, str, env)
-					| FLUXOFF (lab,pos) ->
-						let nme =
-							match lab with
-								| None -> None
-								| Some (nme,_) -> Some nme
-						in
+						(variables,(Dynamics.FLUX pexpr)::effects, str, env)
+					| FLUXOFF (pexpr,pos) ->
 						let str = "Disable flux tracking"::str_pert in
-						(variables,(Dynamics.FLUXOFF nme)::effects, str, env)
-					| PRINT (lab,print,pos) ->
-						let txt,nme =
-							match lab with
-								| None -> ("stdout",None)
-								| Some (nme,_) -> ("nme",Some nme)
-						in
+						(variables,(Dynamics.FLUXOFF pexpr)::effects, str, env)
+					| PRINT (pexpr,print,pos) ->
 						let str_l =
 						List.fold_left
 						(fun cont pexpr ->
@@ -802,9 +821,9 @@ let effects_of_modif variables env ast_list =
 									str::cont
 						) [] print
 						in
-						let str = (Printf.sprintf "Print %s (%s)" (Tools.string_of_list (fun i->i) str_l) txt)::str_pert
+						let str = (Printf.sprintf "Print %s" (Tools.string_of_list (fun i->i) str_l))::str_pert
 						in
-						(variables,(Dynamics.PRINT (nme,print))::effects, str, env)
+						(variables,(Dynamics.PRINT (pexpr,print))::effects, str, env)
 			in
 			iter variables effects str_pert env tl
 	in
@@ -862,7 +881,7 @@ let pert_of_result variables env res =
 								let rule = 
 								{
 									(*TODO*)Dynamics.rm_token = [] ; Dynamics.add_token = [] ; 
-									Dynamics.k_def = Dynamics.CONST 0.0;
+									Dynamics.k_def = Dynamics.CONST (F 0.0);
 									Dynamics.k_alt = None;
 									Dynamics.over_sampling = None;
 									Dynamics.script = script ;
@@ -903,7 +922,7 @@ let pert_of_result variables env res =
 								let rule = 
 								{ (*TODO*) Dynamics.rm_token = [] ; Dynamics.add_token = [] ; 
 									
-									Dynamics.k_def = Dynamics.CONST 0.0;
+									Dynamics.k_def = Dynamics.CONST (F 0.0);
 									Dynamics.k_alt = None;
 									Dynamics.over_sampling = None;
 									Dynamics.script = script ;
@@ -990,8 +1009,8 @@ let init_graph_of_result env res =
 								| None -> raise (ExceptionDefn.Semantics_Error (pos, Printf.sprintf "%s is not a constant, cannot initialize graph." lbl))
       			in
       			let n = match !Parameter.rescale with 
-      				| None -> int_of_float value 
-      				| Some i -> min i (int_of_float value) 
+      				| None -> int_of_num value
+      				| Some i -> min i (int_of_num value) 
       			in
       				(* Cannot do Mixture.to_nodes env m once for all because of        *)
       				(* references                                                      *)
@@ -1008,7 +1027,8 @@ let init_graph_of_result env res =
     			in
 					let x = 
 						match opt_v with
-							| Some v -> v
+							| Some (F v) -> v
+							| Some (I v) -> float_of_int v
 							| None -> raise (ExceptionDefn.Semantics_Error (pos, Printf.sprintf "%s is not a constant, cannot initialize token value." lbl))
     			in
     			let tok_id = try Environment.num_of_token tk_nme env with Not_found -> raise (ExceptionDefn.Semantics_Error (pos, Printf.sprintf "token %s is undeclared" tk_nme))

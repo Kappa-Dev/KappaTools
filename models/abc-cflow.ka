@@ -33,9 +33,18 @@
 %init: 'n_ab' A(),B()
 %init: 'n_c' C()
 
+%var: 'counter' 0
+
+#%mod: repeat ([E+] [mod] 1000 = 0) do \
+# ($UPDATE 'counter' ('counter'+1) ; \
+# $SNAPSHOT <"snap".'counter'."_".[E+].".ka">) \
+# until [false]
+
 %mod: [T]>5 do $ADD 10000 C()
 %mod: [T]>10 do ($TRACK 'Cpp' [true] ; $UPDATE 'cflow' 'Cpp')
 %mod: ('Cpp' - 'cflow' = 10) do ($TRACK 'Cpp' [false])
 
 
-%def: "displayCompression" "none" "weak" 
+%def: "displayCompression" "none" 
+%def: "dotSnapshots" "true"
+%def: "showIntroEvents" "true"

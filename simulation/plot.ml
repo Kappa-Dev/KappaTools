@@ -57,14 +57,18 @@ let output state time event plot env counter =
 			(fun obs ->
 				let inst = fun v_i -> State.instance_number v_i state env
 				and values = fun i -> State.value state i {counter with Counter.time = time ; Counter.events = event} env
-				and v_of_token = fun id -> try state.State.token_vector.(id) with _ -> failwith "Plot.output: Invalid token id"
+				and v_of_token id = 
+					let x = try state.State.token_vector.(id) with _ -> failwith "Plot.output: Invalid token id"
+					in F x
 				in
 					let v = 
 						match obs.expr with
 							| Dynamics.CONST v -> v
 							| Dynamics.VAR f -> f inst values time event (Counter.null_event counter) (Sys.time()) v_of_token
 					in 
-						Printf.fprintf d "%c%E" !Parameter.plotSepChar v
+					match v with
+						| I x -> Printf.fprintf d "%c%d" !Parameter.plotSepChar x
+						| F x -> Printf.fprintf d "%c%E" !Parameter.plotSepChar x
 			) state.observables ;
 			Printf.fprintf d "\n" ;
 			flush d

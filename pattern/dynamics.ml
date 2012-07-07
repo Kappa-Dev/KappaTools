@@ -3,7 +3,7 @@ open Tools
 open ExceptionDefn
 open Graph
 
-type variable = CONST of float | VAR of ((int -> float) -> (int -> float) -> float -> int -> int -> float -> (int -> float) -> float)
+type variable = CONST of Mods.num | VAR of ((int -> Mods.num) -> (int -> Mods.num) -> float -> int -> int -> float -> (int -> Mods.num) -> Mods.num)
 and action =
 		BND of (port * port)
 	| FREE of (port * bool) (*FREE(p,b) b=true if FREE is side-effect free*)
@@ -14,7 +14,7 @@ and port = id * int
 and id = FRESH of int | KEPT of int (*binding or modifying a port that has been added or kept from the lhs*)
 
 (*Whenever v denotes a constant "variable" there is no need to keep it unevaluated, we use dummy arguments to reduce it*)
-let close_var v = v (fun _ -> 0.0) (fun i -> 0.0) 0.0 0 0 0. (fun i -> 0.0)
+let close_var v = v (fun _ -> I 0) (fun i -> I 0) 0.0 0 0 0. (fun i -> I 0)
 
 module ActionSet = Set.Make(struct type t=action let compare = compare end) 
 
@@ -166,14 +166,16 @@ and modification =
 	| UPDATE_RULE of int * variable
 	| UPDATE_VAR of int * variable
 	| UPDATE_TOK of int * variable 
-	| SNAPSHOT of string option
-	| STOP of string option
+	| SNAPSHOT of Ast.print_expr list
+	| STOP of Ast.print_expr list
 	| CFLOW of int 
-	| FLUX of string option
-	| FLUXOFF of string option
+	| FLUX of Ast.print_expr list
+	| FLUXOFF of Ast.print_expr list
 	| CFLOWOFF of int
-	| PRINT of (string option * Ast.print_expr list)
-and boolean_variable = BCONST of bool | BVAR of ((int -> float) -> (int -> float) -> float -> int -> int -> float -> (int -> float) -> bool)
+	| PRINT of (Ast.print_expr list * Ast.print_expr list)
+and boolean_variable = 
+	BCONST of bool 
+	| BVAR of ((int -> Mods.num) -> (int -> Mods.num) -> float -> int -> int -> float -> (int -> Mods.num) -> bool)
 
 let string_of_pert pert env =
 	let string_of_effect effect =
@@ -184,10 +186,10 @@ let string_of_pert pert env =
 		| UPDATE_RULE (r_id,_) -> Printf.sprintf "UPDATE rule[%d]" r_id
 		| UPDATE_VAR (v_id,_) -> Printf.sprintf "UPDATE var[%d]" v_id
 		| UPDATE_TOK (t_id,_) -> Printf.sprintf "UPDATE token %s" (Environment.token_of_num t_id env)
-		| SNAPSHOT opt -> (match opt with None -> "SNAPSHOT" | Some s -> "SNAPSHOT("^s^")") 
-		| STOP opt -> (match opt with None -> "STOP" | Some s -> "STOP("^s^")")
-		| FLUX opt -> (match opt with None -> "FLUX" | Some s -> "FLUX("^s^")")
-		| FLUXOFF opt -> (match opt with None -> "FLUX" | Some s -> "FLUX_OFF("^s^")")
+		| SNAPSHOT _ -> "SNAPSHOT"  
+		| STOP _ -> "STOP" 
+		| FLUX _ -> "FLUX" 
+		| FLUXOFF _ -> "FLUXOFF" 
 		| CFLOW id -> let nme = try Environment.rule_of_num id env with Not_found -> Environment.kappa_of_num id env in ("CFLOW "^nme)
 		| CFLOWOFF id -> let nme = try Environment.rule_of_num id env with Not_found -> Environment.kappa_of_num id env in ("CFLOWOFF "^nme)
 	in
