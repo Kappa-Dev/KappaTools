@@ -73,10 +73,10 @@
 \begin{document}
 \maketitle
 
-\begin{center}\includegraphics[width=80mm]{img/wip.jpg}
-\vspace{3cm}
-\\This document is work in progress...
-\end{center}
+%\begin{center}\includegraphics[width=80mm]{img/wip.jpg}
+%\vspace{3cm}
+%\\This document is work in progress...
+%\end{center}
 
 \tableofcontents
 \listoftables
@@ -94,7 +94,7 @@ Although this manual contains a self-contained description of Kappa, it is \emph
 
 
 \section{The \KaSim~engine}
-\KaSim~is an open source stochastic simulator of rule-based models~\cite{DanLan04,Dan_etal07a,Fae_etal05} written in Kappa. Basically \KaSim~takes one or several \hyperref[chap:kappa]{kappa files} as input and generates stochastic trajectories of various observables. \KaSim~implements Danos and Krivine's simulation algorithm~\cite{Dan_etal07b} which adapts Gillespie's algorithm~\cite{Gil76,Gil77} to rule-based models. 
+\KaSim~is an open source stochastic simulator of rule-based models~\cite{DanLan04,Dan_etal07a,Fae_etal05} written in Kappa. Basically \KaSim~takes one or several \hyperref[chap:kappa]{kappa files} as input and generates stochastic trajectories of various observables. \KaSim~implements Danos \textit{et al}'s simulation algorithm~\cite{Dan_etal07b} which adapts Gillespie's algorithm~\cite{Gil76,Gil77} to rule-based models. 
 
 A \emph{simulation event}\index{event} corresponds to the application of a rewriting rule, contained in the kappa files, to the current graph\index{graph} (also called a \emph{mixture}\index{mixture}). The rule is selected according to its \emph{activity}\index{activity}, \ie the number of instances it has in the current mixture\index{mixture}, multiplied by its kinetic rate\index{kinetic rate}, and applied to one of its possible instances in the graph. It results in a new graph together with an updated activity\index{activity} for all rules (see Fig.~\ref{fig:event-loop}). Importantly, the cost of a simulation event is bounded by a constant that is independent of the size of the graph it is applied to~\cite{Dan_etal07b}. 
 
@@ -917,6 +917,16 @@ Such instruction will tell \KaSim~to remove from the flow computation events whi
 }}
 in which case the headers of the compressed flows will contain the name of their uncompressed versions. Note that \emph{strong} compression, which compresses flows even further is not available yet.
 
+\section{Summary}
+We show below a KF containing most declarations introduced until now.
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=12cm]{img/kappaFile.pdf}
+\caption{}
+\label{fig:KF}
+\end{center}
+\end{figure}
 
 \chapter{Frequently asked questions}
 \section*{Simulation hangs after a while}

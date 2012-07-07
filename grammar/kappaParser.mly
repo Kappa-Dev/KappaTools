@@ -9,7 +9,7 @@
 %token <int*Tools.pos> INT 
 %token <string*Tools.pos> ID LABEL KAPPA_MRK  
 %token <float*Tools.pos> FLOAT 
-%token <string*Tools.pos> FILENAME
+%token <string*Tools.pos> STRING
 %token <Tools.pos> STOP SNAPSHOT
 
 %left MINUS PLUS 
@@ -104,7 +104,7 @@ instruction:
 		) mod_expr_list
 	 then (ExceptionDefn.warning ~with_pos:$1 "Perturbation need not be applied repeatedly") ;
 	Ast.PERT (bool_expr,mod_expr_list,pos,Some $5)}
-| CONFIG FILENAME value_list 
+| CONFIG STRING value_list 
 	{let param_name,pos_p = $2 and value_list = $3 in Ast.CONFIG (param_name,pos_p,value_list)} 
 | PERT bool_expr DO effect_list UNTIL bool_expr /*for backward compatibility*/
 	{ExceptionDefn.warning ~with_pos:$1 "Deprecated perturbation syntax: use the 'repeat ... until' construction" ; 
@@ -112,9 +112,9 @@ instruction:
 ;
 
 value_list: 
-| FILENAME 
+| STRING 
 	{[$1]}
-| FILENAME value_list 
+| STRING value_list 
 	{$1::$2}
 ;
 
@@ -138,8 +138,13 @@ effect:
 	{let lab,pos_lab = $2 in Ast.UPDATE (lab,pos_lab,$3,$1)}
 | TRACK LABEL boolean 
 	{let ast = if $3 then (fun x -> Ast.CFLOW x) else (fun x -> Ast.CFLOWOFF x) in let lab,pos_lab = $2 in ast (lab,pos_lab,$1)}
-| FLUX fic_label boolean 
-	{let ast = if $3 then (fun (x,y) -> Ast.FLUX (x,y)) else (fun (x,y) -> Ast.FLUXOFF (x,y)) in ast ($2,$1)}
+| FLUX opt_string boolean 
+	{let ast = if $3 then (fun (x,y) -> Ast.FLUX (x,y)) else (fun (x,y) -> Ast.FLUXOFF (x,y)) in 
+	match $2 with
+		| (None,None) -> ast ([],$1)
+		| (Some file,_) -> ast ([Ast.Str_pexpr file],$1)
+		| (None, Some pexpr) -> ast (pexpr,$1)
+	}
 | INTRO multiple_mixture 
 	{let (alg,mix) = $2 in Ast.INTRO (alg,mix,$1)}
 | INTRO error
@@ -150,19 +155,27 @@ effect:
 	{raise (ExceptionDefn.Syntax_Error (Some $1,"Malformed perturbation instruction, I was expecting '$DEL alg_expression kappa_expression'"))}
 | ID LAR alg_expr /*updating the value of a token*/
 	{let lab,pos_lab = $1 in Ast.UPDATE_TOK (lab,pos_lab,$3,pos_lab)}
-| SNAPSHOT fic_label
-	{Ast.SNAPSHOT ($2,$1)}
-| STOP fic_label
-	{Ast.STOP ($2,$1)}
-| PRINT fic_label SMALLER print_expr GREATER 
-	{Ast.PRINT ($2,$4,$1)}
+| SNAPSHOT opt_string
+	{match $2 with
+		| (None,None) -> Ast.SNAPSHOT ([],$1)
+		| (Some file,_) -> Ast.SNAPSHOT ([Ast.Str_pexpr file],$1)
+		| (None, Some pexpr) -> Ast.SNAPSHOT (pexpr,$1)
+		}
+| STOP opt_string
+	{match $2 with
+		| (None,None) -> Ast.STOP ([],$1)
+		| (Some file,_) -> Ast.STOP ([Ast.Str_pexpr file],$1)
+		| (None, Some pexpr) -> Ast.STOP (pexpr,$1)
+		}
+| PRINT SMALLER print_expr GREATER {Ast.PRINT ([],$3,$1)}
+| PRINT SMALLER print_expr GREATER SMALLER print_expr GREATER {Ast.PRINT ($3,$6,$1)}
 ;
 
 print_expr:
 /*empty*/ {[]}
-| FILENAME {[Ast.Str_pexpr $1]}
+| STRING {[Ast.Str_pexpr $1]}
 | alg_expr {[Ast.Alg_pexpr $1]}
-| FILENAME DOT print_expr {(Ast.Str_pexpr $1)::$3}
+| STRING DOT print_expr {(Ast.Str_pexpr $1)::$3}
 | alg_expr DOT print_expr {(Ast.Alg_pexpr $1)::$3}
 ;
 
@@ -204,12 +217,14 @@ bool_expr:
 	{Ast.FALSE $1}
 ;
 
-fic_label:
-/*empty*/ {None}
-| FILENAME {Some $1}
+opt_string:
+/*empty*/ {None,None}
+| STRING {Some $1,None}
+| SMALLER print_expr GREATER {None, Some $2}
+;
 
 multiple:
-| INT {let int,pos=$1 in Ast.FLOAT (float_of_int int,pos) }
+| INT {let int,pos=$1 in Ast.INT (int,pos) }
 | FLOAT {let x,pos=$1 in Ast.FLOAT (x,pos) }
 | LABEL {let str,pos = $1 in Ast.OBS_VAR (str,pos)}
 ;
@@ -280,7 +295,7 @@ constant:
 | FLOAT
 	{let f,pos = $1 in Ast.FLOAT (f,pos)}
 | INT 
-	{let i,pos = $1 in Ast.FLOAT (float_of_int i,pos)}
+	{let i,pos = $1 in Ast.INT (i,pos)}
 | EMAX
 	{let pos = $1 in Ast.EMAX pos}
 | TMAX

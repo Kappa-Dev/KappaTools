@@ -37,7 +37,7 @@
 let blank = [' ' '\t']
 let integer = (['0'-'9']+)
 let real = 
-  (((['0'-'9'] | ['0'-'9']+ '.' ['0'-'9']*) | (['0'-'9']* '.' ['0'-'9']+)) ((['e' 'E'] ['+' '-'] ['0'-'9']+) | (['e' 'E'] ['0'-'9']+))) 
+  (((['0'-'9']+ | ['0'-'9']+ '.' ['0'-'9']*) | (['0'-'9']* '.' ['0'-'9']+)) ((['e' 'E'] ['+' '-'] ['0'-'9']+) | (['e' 'E'] ['0'-'9']+))) 
   | ((['0'-'9']+ '.' ['0'-'9']*) | (['0'-'9']* '.' ['0'-'9']+))   
 let id = (['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '0'-'9' '_' '-' '+']*)
 let internal_state = '~' (['0'-'9' 'a'-'z' 'A'-'Z']+)
@@ -94,12 +94,12 @@ rule token = parse
 						}  
 		| ':' {TYPE_TOK}
 		| ';' {SEMICOLON}
-		| '\"' {let filename = read_label "" ['\"'] lexbuf in let pos = position lexbuf in FILENAME (filename,pos)}
+		| '\"' {let str = read_label "" ['\"'] lexbuf in let pos = position lexbuf in STRING (str,pos)}
     | '\n' {incr_line lexbuf ; NEWLINE}
 		| '\r' {NEWLINE}
     | '#' {comment lexbuf}
-    | integer as n {let pos = position lexbuf in INT(int_of_string n,pos)}
-    | real as f {let pos = position lexbuf in FLOAT(float_of_string f,pos)}
+    | integer as n {let pos = position lexbuf in INT (int_of_string n,pos)}
+    | real as f {let pos = position lexbuf in FLOAT (float_of_string f,pos)}
     | '\'' {let lab = read_label "" ['\''] lexbuf in let pos = position lexbuf in LABEL(lab,pos)}
     | id as str {let pos = position lexbuf in ID(str,pos)}
     | '@' {AT}

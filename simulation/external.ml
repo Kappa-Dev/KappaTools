@@ -12,7 +12,9 @@ let eval_pre_pert pert state counter env =
 		| BVAR b_fun -> 
 			let act_of_id = (fun id -> (instance_number id state env)) (*act_of_id:functional argument*)
 			and v_of_id = (fun id -> State.value state id counter env)
-			and v_of_token id = try state.token_vector.(id) with _ -> failwith "External.eval_pre: Invalid token id"
+			and v_of_token id = 
+				let x = try state.token_vector.(id) with _ -> failwith "External.eval_pre: Invalid token id"
+				in F x
 			in
 				b_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time()) v_of_token
 
@@ -23,9 +25,32 @@ let eval_abort_pert just_applied pert state counter env =
 		| Some (BVAR b_fun) -> 
 			let act_of_id = (fun id -> (instance_number id state env)) (*act_of_id:functional argument*)
 			and v_of_id = (fun id -> State.value state id counter env)
-			and v_of_token id = try state.token_vector.(id) with _ -> failwith "External.eval_abort: Invalid token id"
+			and v_of_token id = 
+				let x = try state.token_vector.(id) with _ -> failwith "External.eval_abort: Invalid token id"
+				in F x
 			in
 				b_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time()) v_of_token
+
+let eval_pexpr pexpr state counter env =
+	let l =
+		List.fold_left
+		(fun cont ast ->
+			match ast with
+				| Ast.Str_pexpr (str,p) -> str::cont
+				| Ast.Alg_pexpr alg -> 
+					let (x, is_constant, opt_v, dep, str) = Eval.partial_eval_alg env alg in
+					let v =
+							if is_constant
+							then (match opt_v with Some v -> Dynamics.CONST v | None -> invalid_arg "Eval.effects_of_modif")
+							else Dynamics.VAR x 
+					in
+					let n = State.value state ~var:v (-1) counter env in
+					match n with
+						| I x -> (Printf.sprintf "%d" x)::cont
+						| F x -> (Printf.sprintf "%E" x)::cont
+		) [] pexpr
+	in
+	String.concat "" (List.rev l)
 
 let dump_print_expr desc pexpr state counter env =
 	List.iter
@@ -40,7 +65,9 @@ let dump_print_expr desc pexpr state counter env =
 						else Dynamics.VAR x 
 				in
 				let n = State.value state ~var:v (-1) counter env in
-				Printf.fprintf desc "%E" n
+				match n with
+					| I x -> Printf.fprintf desc "%d" x
+					| F x -> Printf.fprintf desc "%E" x
 	) pexpr ;
 	Printf.fprintf desc "\n"
 
@@ -49,12 +76,13 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 		match eff with
 			| (Some r,INTRO (v,mix)) -> 
 				let x = eval_var v in
-				if x = infinity then 
+				if x = F infinity then 
 					let p_str = pert.flag in 
 						invalid_arg ("Perturbation "^p_str^" would introduce an infinite number of agents, aborting...")
 				else
-					if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Introducing %d instances of %s" (int_of_float x) (Mixture.to_kappa false mix env)) ;
-					let n = ref (int_of_float x)
+					if !Parameter.debugModeOn then 
+						Debug.tag (Printf.sprintf "Introducing %d instances of %s" (int_of_num x) (Mixture.to_kappa false mix env)) ;
+					let n = ref (int_of_num x)
 					and st = ref state
 					and pert_ids = ref pert_ids
 					and envr = ref env 
@@ -68,7 +96,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 							let env,state,pert_ids_pos,new_injs,tracked' = State.positive_update ~with_tracked:!tracked state r (phi,psi) (side_effects,Int2Set.empty) counter env
 							in
 							pert_events := (r,phi,psi,side_effects)::!pert_events ;
-							if !n = (int_of_float x) then pert_ids := IntSet.union !pert_ids (IntSet.union pert_ids_neg pert_ids_pos) ; (*only the first time*)
+							if !n = (int_of_num x) then pert_ids := IntSet.union !pert_ids (IntSet.union pert_ids_neg pert_ids_pos) ; (*only the first time*)
 							st := state ;
 							envr := env ;
 							n := !n-1 ;
@@ -80,8 +108,9 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 				let instance_num = State.instance_number mix_id state env in
 				let x = 
 					let t = eval_var v in
-					if t=infinity then int_of_float instance_num else int_of_float (min t instance_num) 
+					if t = (F infinity) then instance_num else (num_min t instance_num) 
 				in
+				let x= int_of_num x in
 				let cpt = ref 0 
 				and st = ref state
 				and pert_ids = ref pert_ids
@@ -89,7 +118,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 				and tracked = ref tracked
 				and pert_events = ref pert_events
 				in
-					while !cpt<x do
+					while !cpt < x do
 						let opt = 
 							try Some (State.select_injection (infinity,0.) state mix counter env) with 
 								| Not_found -> None (*Not found is raised if there is no more injection to draw in instances of mix*)
@@ -144,15 +173,20 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 				let value = State.value state ~var:v (-1) counter env in (*Change here if one wants to have address passing style of assignation*)
 					begin
 						try
-							state.State.token_vector.(tk_id) <- value ;
+							state.State.token_vector.(tk_id) <- (float_of_num value) ;
 							let env,pert_ids = State.update_dep state (-1) (TOK tk_id) pert_ids counter env in
 							(env,state,pert_ids,tracked,pert_events) 
 						with Invalid_argument _ -> failwith "External.apply_effect: invalid token id"
 					end
-			| (None,SNAPSHOT opt) -> (snapshot opt ; (env, state ,pert_ids,tracked,pert_events))
-			| (None,PRINT (nme,pexpr)) ->
+			| (None,SNAPSHOT pexpr) -> 
+				(
+				let str = eval_pexpr pexpr state counter env in
+				snapshot str ; (env, state ,pert_ids,tracked,pert_events)
+				)
+			| (None,PRINT (pexpr_file,pexpr)) ->
+				let str = eval_pexpr pexpr_file state counter env in
 				let desc = 
-					match nme with Some fic -> Environment.get_desc fic env | None -> stdout
+					match str with "" -> stdout | _ -> Environment.get_desc str env
 				in
 				dump_print_expr desc pexpr state counter env ;
 				flush desc ;
@@ -170,9 +204,10 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 					if Environment.active_cflows env = 0 then Parameter.causalModeOn := false ;
 					(env,state,pert_ids,tracked,pert_events)
 				end
-			| (None,FLUXOFF opt) ->
+			| (None,FLUXOFF pexpr) ->
 				begin
-					let desc = match opt with None -> open_out !Parameter.fluxFileName | Some nme -> open_out nme in
+					let str = eval_pexpr pexpr state counter env in
+					let desc = match str with "" -> open_out !Parameter.fluxFileName | _ -> open_out str in
 					Parameter.add_out_desc desc ;
 					State.dot_of_flux desc state env ;
 					close_out desc ;
@@ -180,19 +215,22 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 					Parameter.fluxModeOn := false ;
 					(env,state,pert_ids,tracked,pert_events)
 				end
-			| (None,STOP opt) ->
+			| (None,STOP pexpr) ->
 				(if !Parameter.debugModeOn then Debug.tag "Interrupting simulation now!" ;
-				snapshot opt ;
-				raise (ExceptionDefn.StopReached (Printf.sprintf "STOP instruction was satisfied at event %d" (Counter.event counter)))
+				let str = eval_pexpr pexpr state counter env in
+				snapshot str ;
+				raise (ExceptionDefn.StopReached 
+				(Printf.sprintf "STOP instruction was satisfied at event %d" (Counter.event counter)))
 				)
-			| (None,FLUX opt) ->
+			| (None,FLUX pexpr) ->
 				begin
 					if !Parameter.fluxModeOn then ExceptionDefn.warning "Flux modes are overlapping" ;
 					Parameter.fluxModeOn := true ;
+					let nme = eval_pexpr pexpr state counter env in
 					let _ = 
-  					match opt with
-  						| None -> Parameter.fluxFileName := "flux"^"_"^(string_of_int (Counter.event counter))
-  						| Some nme -> Parameter.fluxFileName := nme 
+  					match nme with
+  						| "" -> Parameter.fluxFileName := "flux"^"_"^(string_of_int (Counter.event counter))
+  						| _ -> Parameter.fluxFileName := nme 
 					in
 					Parameter.set Parameter.fluxFileName (Some "dot");
 					(env, state, pert_ids,tracked,pert_events)
@@ -202,12 +240,12 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 
 
 let apply_effect p_id pert tracked pert_events state counter env =
-	let snapshot opt =
-		if !Parameter.debugModeOn then Debug.tag "Taking a snapshot of current state" ;
+	let snapshot str =
+		if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Taking a snapshot of current state (%s)" str) ;
 		let filename = 
-			match opt with 
-				| None -> (Filename.chop_extension (!Parameter.snapshotFileName))^"_"^(string_of_int (Counter.event counter)) 
-				| Some s -> (Filename.concat !Parameter.outputDirName s)^"_"^(string_of_int (Counter.event counter)^"_"^(string_of_int (Counter.null_event counter)))
+			match str with 
+				| "" -> (Filename.chop_extension (!Parameter.snapshotFileName))^"_"^(string_of_int (Counter.event counter)) 
+				| _ -> (Filename.chop_extension (Filename.concat !Parameter.outputDirName str))
 		in
 		let file_exists = ref true in
 		let cpt = ref 1 in
@@ -232,7 +270,10 @@ let apply_effect p_id pert tracked pert_events state counter env =
 	in
 	let act_of_id = (fun id -> (instance_number id state env))  (*act_of_id:functional argument*) 
 	and v_of_id = (fun id -> State.value state id counter env)
-	and v_of_token id = try state.token_vector.(id) with _ -> failwith "External.apply_effect: Invalid token id"
+	and v_of_token id = 
+		let x = try state.token_vector.(id) with _ -> failwith "External.apply_effect: Invalid token id"
+		in
+		 F x
 	in
 	let eval_var v =
 		match v with
