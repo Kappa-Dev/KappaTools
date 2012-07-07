@@ -85,11 +85,10 @@ node_20 -> node_21
 node_21 -> node_22
 node_16 -> node_23
 node_22 -> node_23
-node_1 -> node_24
 node_2 -> node_24
 node_22 -> node_24
 node_23 -> node_24
 }
 /*
- Dot generation time: 0.004001
+ Dot generation time: 0.000000
 */

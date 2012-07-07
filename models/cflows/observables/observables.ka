@@ -9,7 +9,7 @@ A(a~p),B(a~p) -> A(a~u),B(a~u) @1
 %init: 1 B(a~u)
 
 
-%mod: [true] set $TRACK 'C' [true]
+%mod: [true] do $TRACK 'C' [true]
 
 %agent: A(a~u~p)
 %agent: B(a~u~p)

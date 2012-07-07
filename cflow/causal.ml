@@ -112,30 +112,37 @@ let record ?decorate_with rule side_effects (embedding,fresh_map) event_number g
 	grid
 
 let record_obs ((r_id,state,embedding,_),test) event_number grid env = 
-  let im embedding id = IntMap.find id embedding in
-	  
+  let im embedding id =
+    match id with
+      | FRESH j -> raise (Invalid_argument "Causal.record_obs")
+      | KEPT j -> IntMap.find j embedding
+  in
+  let causal = Dynamics.compute_causal_obs state env in 
   (*adding tests*)
   let grid = 
-    Mods.IntMap.fold 
-		(fun id agent grid ->
-			let node_id = im embedding id in
-    	Mixture.fold_interface 
-    	(fun site_id c  grid  -> 
-				add (node_id,site_id) (_LINK_TESTED lor _INTERNAL_TESTED) (* HACK, TO DO CLEANER *) grid event_number (OBS r_id) []
-			) agent grid
-		) (Mixture.agents state) grid
+    Id2Map.fold 
+      (fun (id,site_id) c grid ->
+	let node_id = im embedding id in
+	add (node_id,site_id) c grid event_number (OBS r_id) []
+      ) 
+      causal  
+      grid
   in
   grid
 
-let record_init (((node_id,agent_name),interface),_) event_number grid env = 
+let record_init init event_number grid env = 
   if !Parameter.showIntroEvents  
   then 
     (*adding tests*)
+    let (((node_id,agent_name),interface),_) = init in  
+    let causal = Dynamics.compute_causal_init init env in 
     let grid = 
-    List.fold_left 
-      (fun grid (site_id,_) -> 
-	add (node_id,site_id) (_INTERNAL_MODIF lor _INTERNAL_TESTED lor _LINK_TESTED lor _LINK_MODIF) (* HACK, TO DO CLEANER *) grid event_number (INIT agent_name) []
-      ) grid interface 
+    Mods.Int2Map.fold 
+      (fun (node_id,site_id) c grid -> 
+	add 
+          (node_id,site_id) 
+          c (*(_INTERNAL_MODIF lor _INTERNAL_TESTED lor _LINK_TESTED lor _LINK_MODIF) (* HACK, TO DO CLEANER *)*) grid event_number (INIT agent_name) []
+      ) causal grid 
     in
     grid
   else 
@@ -257,7 +264,6 @@ let dot_of_grid profiling fic grid state env =
 	       IntMap.add eid set prec_star
 		) config.events IntMap.empty 
 	in
-	
 	let depth_of_event =
 		IntMap.fold 
 		(fun eid prec_eids emap ->
@@ -283,7 +289,7 @@ let dot_of_grid profiling fic grid state env =
 	let desc = open_out fic
 	in
 	let _ = Parameter.add_out_desc desc in 
-  let _ = profiling desc in
+        let _ = profiling desc in
 	fprintf desc "digraph G{\n ranksep=.5 ; \n" ;
 	IntMap.iter
 	(fun d eids_at_d ->
