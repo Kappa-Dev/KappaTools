@@ -325,7 +325,7 @@ let rec partial_eval_alg env ast =
 			(fun opt -> match opt with Some a -> Some (Num.F a) | None -> Some (Num.F infinity)) !Parameter.maxTimeValue, 
 			DepSet.empty, "t_max") 
 		| INFINITY pos -> ((fun _ _ _ _ _ _ _-> (Num.F infinity)), true, Some (Num.F infinity), DepSet.empty, "inf")
-		| FLOAT (f, pos) -> Debug.tag (string_of_float f); 
+		| FLOAT (f, pos) -> 
 				((fun _ _ _ _ _ _ _-> (Num.F f)), true, (Some (Num.F f)), DepSet.empty, (Printf.sprintf "%f" f))
 		| INT (i ,pos) -> 
 			((fun _ _ _ _ _ _ _-> (Num.I i)), true, (Some (Num.I i)), DepSet.empty, (Printf.sprintf "%d" i))
@@ -796,13 +796,13 @@ let effects_of_modif variables env ast_list =
 						let id = try Environment.num_of_rule lab env with Not_found -> try Environment.num_of_kappa lab env with Not_found ->
 							raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
 						in
-						let str = (Printf.sprintf "Enable causality analysis")::str_pert in
+						let str = (Printf.sprintf "Enable causality analysis for observable '%s'" lab)::str_pert in
 						(variables, (Dynamics.CFLOW id)::effects, str, env)
 					| CFLOWOFF (lab,pos_lab,pos_pert) ->
 						let id = try Environment.num_of_rule lab env with Not_found -> try Environment.num_of_kappa lab env with Not_found ->
 							raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
 						in
-						let str = (Printf.sprintf "Disable causality analysis")::str_pert in
+						let str = (Printf.sprintf "Disable causality analysis for observable '%s'" lab)::str_pert in
 						(variables, (Dynamics.CFLOWOFF id)::effects, str, env)
 					| FLUX (pexpr,pos) ->
 						let str = "Activate flux tracking"::str_pert in
