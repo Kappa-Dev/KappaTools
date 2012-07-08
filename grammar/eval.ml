@@ -257,32 +257,32 @@ let eval_agent is_pattern tolerate_new_state env a ctxt =
 
 let cast_op x y op_f op_i =
 	match (x,y) with
-	| (F x, F y) -> F (op_f x y) 
-	| (I x, F y) -> F (op_f (float_of_int x) y)
-	| (F x, I y) -> F (op_f x (float_of_int y))
-	| (I x, I y) -> 
+	| (Num.F x, Num.F y) -> Num.F (op_f x y) 
+	| (Num.I x, Num.F y) -> Num.F (op_f (float_of_int x) y)
+	| (Num.F x, Num.I y) -> Num.F (op_f x (float_of_int y))
+	| (Num.I x, Num.I y) -> 
 		begin
 			match op_i with 
-				| None -> F (op_f (float_of_int x) (float_of_int y)) 
-				| Some op_i -> I (op_i x y)
+				| None -> Num.F (op_f (float_of_int x) (float_of_int y)) 
+				| Some op_i -> Num.I (op_i x y)
 		end
 let cast_un_op x op_f op_i =
 	match x with
-		| F x -> 
+		| Num.F x -> 
 			begin
 				match op_f with 
-					| Some op_f -> F (op_f x) 
-					| None -> (match op_i with None -> invalid_arg "cast_un" | Some op_i -> I (op_i (int_of_float x)))
+					| Some op_f -> Num.F (op_f x) 
+					| None -> (match op_i with None -> invalid_arg "cast_un" | Some op_i -> Num.I (op_i (int_of_float x)))
 			end
-		| I x -> 
+		| Num.I x -> 
 			match op_i with 
 			| None -> 
 					begin
 						match op_f with
 							| None -> invalid_arg "cast_un_op" 
-							| Some op_f -> F (op_f (float_of_int x)) 
+							| Some op_f -> Num.F (op_f (float_of_int x)) 
 					end
-			| Some op_i -> I (op_i x) 
+			| Some op_i -> Num.I (op_i x) 
 
 (* returns partial evaluation of rate expression and a boolean that is set *)
 (* to true if partial evaluation is a constant function                    *)
@@ -309,27 +309,27 @@ let rec partial_eval_alg env ast =
 		| EMAX pos -> 
 			let v =
 				match !Parameter.maxEventValue with
-					| None -> (ExceptionDefn.warning ~with_pos:pos "[emax] constant is evaluated to infinity" ; (F infinity))
-					| Some n -> (I n)
+					| None -> (ExceptionDefn.warning ~with_pos:pos "[emax] constant is evaluated to infinity" ; (Num.F infinity))
+					| Some n -> (Num.I n)
 			in
 			((fun _ _ _ _ _ _ _-> v), true, 
-			(fun opt -> match opt with Some a -> Some (I a) | None -> Some (F infinity)) 
+			(fun opt -> match opt with Some a -> Some (Num.I a) | None -> Some (Num.F infinity)) 
 			!Parameter.maxEventValue, DepSet.empty, "e_max")
 		| TMAX pos -> 
 			let v =
 				match !Parameter.maxTimeValue with
-					| None -> (ExceptionDefn.warning ~with_pos:pos "[tmax] constant is evaluated to infinity" ; (F infinity))
-					| Some t -> (F t)
+					| None -> (ExceptionDefn.warning ~with_pos:pos "[tmax] constant is evaluated to infinity" ; (Num.F infinity))
+					| Some t -> (Num.F t)
 			in
 			((fun _ _ _ _ _ _ _-> v), true, 
-			(fun opt -> match opt with Some a -> Some (F a) | None -> Some (F infinity)) !Parameter.maxTimeValue, 
+			(fun opt -> match opt with Some a -> Some (Num.F a) | None -> Some (Num.F infinity)) !Parameter.maxTimeValue, 
 			DepSet.empty, "t_max") 
-		| INFINITY pos -> ((fun _ _ _ _ _ _ _-> (F infinity)), true, Some (F infinity), DepSet.empty, "inf")
+		| INFINITY pos -> ((fun _ _ _ _ _ _ _-> (Num.F infinity)), true, Some (Num.F infinity), DepSet.empty, "inf")
 		| FLOAT (f, pos) -> Debug.tag (string_of_float f); 
-				((fun _ _ _ _ _ _ _-> (F f)), true, (Some (F f)), DepSet.empty, (Printf.sprintf "%f" f))
+				((fun _ _ _ _ _ _ _-> (Num.F f)), true, (Some (Num.F f)), DepSet.empty, (Printf.sprintf "%f" f))
 		| INT (i ,pos) -> 
-			((fun _ _ _ _ _ _ _-> (I i)), true, (Some (I i)), DepSet.empty, (Printf.sprintf "%d" i))
-		| CPUTIME pos -> 	((fun _ _ _ _ _ cpu_t _-> F (cpu_t -. !Parameter.cpuTime)), false, Some (F 0.), (DepSet.singleton Mods.EVENT), "t_sim")
+			((fun _ _ _ _ _ _ _-> (Num.I i)), true, (Some (Num.I i)), DepSet.empty, (Printf.sprintf "%d" i))
+		| CPUTIME pos -> 	((fun _ _ _ _ _ cpu_t _-> Num.F (cpu_t -. !Parameter.cpuTime)), false, Some (Num.F 0.), (DepSet.singleton Mods.EVENT), "t_sim")
 		| OBS_VAR (lab,pos) -> 
   			begin 
   				try
@@ -341,7 +341,7 @@ let rec partial_eval_alg env ast =
   						(ExceptionDefn.Semantics_Error (pos,
   								lab ^ " is not a variable identifier"))
   				else
-  					((fun f _ _ _ _ _ _-> f i), false, Some (I 0), 
+  					((fun f _ _ _ _ _ _-> f i), false, Some (Num.I 0), 
   						(DepSet.singleton (Mods.KAPPA i)), ("'" ^ (lab ^ "'")))
   			with Not_found -> (*lab is the label of an algebraic expression*)
   				let i,opt_v = 
@@ -354,15 +354,15 @@ let rec partial_eval_alg env ast =
   			let i = 
   				try Environment.num_of_token tk_nme env with Not_found -> raise (ExceptionDefn.Semantics_Error (pos,tk_nme ^ " is not a declared token"))
   			in
- 				((fun _ _ _ _ _ _ tk -> tk i),false,Some (F 0.),DepSet.singleton (Mods.TOK i),("'" ^ (tk_nme ^ "'")))
+ 				((fun _ _ _ _ _ _ tk -> tk i),false,Some (Num.F 0.),DepSet.singleton (Mods.TOK i),("'" ^ (tk_nme ^ "'")))
 		| TIME_VAR pos ->
-				((fun _ _ t _ _ _ _-> F t), false, Some (F 0.), (DepSet.singleton Mods.TIME), "t")
+				((fun _ _ t _ _ _ _-> Num.F t), false, Some (Num.F 0.), (DepSet.singleton Mods.TIME), "t")
 		| EVENT_VAR pos ->
-				((fun _ _ _ e ne _ _-> I (e+ne)), false, Some (I 0),(DepSet.singleton Mods.EVENT), "e")
+				((fun _ _ _ e ne _ _-> Num.I (e+ne)), false, Some (Num.I 0),(DepSet.singleton Mods.EVENT), "e")
 		| NULL_EVENT_VAR pos ->
-			((fun _ _ _ _ ne _ _-> I ne), false, Some (I 0),(DepSet.singleton Mods.EVENT), "null_e")
+			((fun _ _ _ _ ne _ _-> Num.I ne), false, Some (Num.I 0),(DepSet.singleton Mods.EVENT), "null_e")
 		| PROD_EVENT_VAR pos ->
-			((fun _ _ _ e _ _ _-> I e), false,Some (I 0),	(DepSet.singleton Mods.EVENT), "prod_e")			
+			((fun _ _ _ e _ _ _-> Num.I e), false,Some (Num.I 0),	(DepSet.singleton Mods.EVENT), "prod_e")			
 		| DIV (ast, ast', pos) -> 
 			bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> a /. b) None) "/"
 		| SUM (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> a +. b) (Some (fun a b -> a+b))) "+"
@@ -411,13 +411,13 @@ let rec partial_eval_bool env ast =
 		| OR (ast, ast', pos) ->
 				bin_op_bool ast ast' pos (fun b b' -> b || b') "or"
 		| GREATER (ast, ast', pos) ->
-				bin_op_alg ast ast' pos (fun v v' -> v > v') ">"
+				bin_op_alg ast ast' pos (fun v v' -> Num.is_greater v v') ">"
 		| SMALLER (ast, ast', pos) ->
-				bin_op_alg ast ast' pos (fun v v' -> v < v') "<"
+				bin_op_alg ast ast' pos (fun v v' -> Num.is_smaller v v') "<"
 		| EQUAL (ast, ast', pos) ->
-				bin_op_alg ast ast' pos (fun v v' -> v = v') "="
+				bin_op_alg ast ast' pos (fun v v' -> Num.is_equal v v') "="
 		| DIFF (ast, ast', pos) ->
-				bin_op_alg ast ast' pos (fun v v' -> v <> v') "<>"
+				bin_op_alg ast ast' pos (fun v v' -> not (Num.is_equal v v')) "<>"
 
 let mixture_of_ast ?(tolerate_new_state=false) mix_id_opt is_pattern env ast_mix =
 	let rec eval_mixture env ast_mix ctxt mixture =
@@ -881,7 +881,7 @@ let pert_of_result variables env res =
 								let rule = 
 								{
 									(*TODO*)Dynamics.rm_token = [] ; Dynamics.add_token = [] ; 
-									Dynamics.k_def = Dynamics.CONST (F 0.0);
+									Dynamics.k_def = Dynamics.CONST (Num.F 0.0);
 									Dynamics.k_alt = None;
 									Dynamics.over_sampling = None;
 									Dynamics.script = script ;
@@ -922,7 +922,7 @@ let pert_of_result variables env res =
 								let rule = 
 								{ (*TODO*) Dynamics.rm_token = [] ; Dynamics.add_token = [] ; 
 									
-									Dynamics.k_def = Dynamics.CONST (F 0.0);
+									Dynamics.k_def = Dynamics.CONST (Num.F 0.0);
 									Dynamics.k_alt = None;
 									Dynamics.over_sampling = None;
 									Dynamics.script = script ;
@@ -1009,8 +1009,8 @@ let init_graph_of_result env res =
 								| None -> raise (ExceptionDefn.Semantics_Error (pos, Printf.sprintf "%s is not a constant, cannot initialize graph." lbl))
       			in
       			let n = match !Parameter.rescale with 
-      				| None -> int_of_num value
-      				| Some i -> min i (int_of_num value) 
+      				| None -> Num.int_of_num value
+      				| Some i -> min i (Num.int_of_num value) 
       			in
       				(* Cannot do Mixture.to_nodes env m once for all because of        *)
       				(* references                                                      *)
@@ -1027,8 +1027,8 @@ let init_graph_of_result env res =
     			in
 					let x = 
 						match opt_v with
-							| Some (F v) -> v
-							| Some (I v) -> float_of_int v
+							| Some (Num.F v) -> v
+							| Some (Num.I v) -> float_of_int v
 							| None -> raise (ExceptionDefn.Semantics_Error (pos, Printf.sprintf "%s is not a constant, cannot initialize token value." lbl))
     			in
     			let tok_id = try Environment.num_of_token tk_nme env with Not_found -> raise (ExceptionDefn.Semantics_Error (pos, Printf.sprintf "token %s is undeclared" tk_nme))

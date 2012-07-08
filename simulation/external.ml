@@ -14,7 +14,7 @@ let eval_pre_pert pert state counter env =
 			and v_of_id = (fun id -> State.value state id counter env)
 			and v_of_token id = 
 				let x = try state.token_vector.(id) with _ -> failwith "External.eval_pre: Invalid token id"
-				in F x
+				in Num.F x
 			in
 				b_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time()) v_of_token
 
@@ -27,7 +27,7 @@ let eval_abort_pert just_applied pert state counter env =
 			and v_of_id = (fun id -> State.value state id counter env)
 			and v_of_token id = 
 				let x = try state.token_vector.(id) with _ -> failwith "External.eval_abort: Invalid token id"
-				in F x
+				in Num.F x
 			in
 				b_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time()) v_of_token
 
@@ -46,8 +46,8 @@ let eval_pexpr pexpr state counter env =
 					in
 					let n = State.value state ~var:v (-1) counter env in
 					match n with
-						| I x -> (Printf.sprintf "%d" x)::cont
-						| F x -> (Printf.sprintf "%E" x)::cont
+						| Num.I x -> (Printf.sprintf "%d" x)::cont
+						| Num.F x -> (Printf.sprintf "%E" x)::cont
 		) [] pexpr
 	in
 	String.concat "" (List.rev l)
@@ -66,8 +66,8 @@ let dump_print_expr desc pexpr state counter env =
 				in
 				let n = State.value state ~var:v (-1) counter env in
 				match n with
-					| I x -> Printf.fprintf desc "%d" x
-					| F x -> Printf.fprintf desc "%E" x
+					| Num.I x -> Printf.fprintf desc "%d" x
+					| Num.F x -> Printf.fprintf desc "%E" x
 	) pexpr ;
 	Printf.fprintf desc "\n"
 
@@ -76,13 +76,13 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 		match eff with
 			| (Some r,INTRO (v,mix)) -> 
 				let x = eval_var v in
-				if x = F infinity then 
+				if x = Num.F infinity then 
 					let p_str = pert.flag in 
 						invalid_arg ("Perturbation "^p_str^" would introduce an infinite number of agents, aborting...")
 				else
 					if !Parameter.debugModeOn then 
-						Debug.tag (Printf.sprintf "Introducing %d instances of %s" (int_of_num x) (Mixture.to_kappa false mix env)) ;
-					let n = ref (int_of_num x)
+						Debug.tag (Printf.sprintf "Introducing %d instances of %s" (Num.int_of_num x) (Mixture.to_kappa false mix env)) ;
+					let n = ref (Num.int_of_num x)
 					and st = ref state
 					and pert_ids = ref pert_ids
 					and envr = ref env 
@@ -96,7 +96,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 							let env,state,pert_ids_pos,new_injs,tracked' = State.positive_update ~with_tracked:!tracked state r (phi,psi) (side_effects,Int2Set.empty) counter env
 							in
 							pert_events := (r,phi,psi,side_effects)::!pert_events ;
-							if !n = (int_of_num x) then pert_ids := IntSet.union !pert_ids (IntSet.union pert_ids_neg pert_ids_pos) ; (*only the first time*)
+							if !n = (Num.int_of_num x) then pert_ids := IntSet.union !pert_ids (IntSet.union pert_ids_neg pert_ids_pos) ; (*only the first time*)
 							st := state ;
 							envr := env ;
 							n := !n-1 ;
@@ -108,9 +108,9 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 				let instance_num = State.instance_number mix_id state env in
 				let x = 
 					let t = eval_var v in
-					if t = (F infinity) then instance_num else (num_min t instance_num) 
+					if t = (Num.F infinity) then instance_num else (Num.min t instance_num) 
 				in
-				let x= int_of_num x in
+				let x= Num.int_of_num x in
 				let cpt = ref 0 
 				and st = ref state
 				and pert_ids = ref pert_ids
@@ -173,7 +173,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 				let value = State.value state ~var:v (-1) counter env in (*Change here if one wants to have address passing style of assignation*)
 					begin
 						try
-							state.State.token_vector.(tk_id) <- (float_of_num value) ;
+							state.State.token_vector.(tk_id) <- (Num.float_of_num value) ;
 							let env,pert_ids = State.update_dep state (-1) (TOK tk_id) pert_ids counter env in
 							(env,state,pert_ids,tracked,pert_events) 
 						with Invalid_argument _ -> failwith "External.apply_effect: invalid token id"
@@ -273,7 +273,7 @@ let apply_effect p_id pert tracked pert_events state counter env =
 	and v_of_token id = 
 		let x = try state.token_vector.(id) with _ -> failwith "External.apply_effect: Invalid token id"
 		in
-		 F x
+		 Num.F x
 	in
 	let eval_var v =
 		match v with

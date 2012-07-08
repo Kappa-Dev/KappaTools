@@ -24,8 +24,8 @@ type t = {
 	unary_rule_of_num : string IntMap.t ;
 	
 	fresh_alg : int ;
-	num_of_alg : (int*Mods.num option) StringMap.t ;
-	alg_of_num : (string*Mods.num option) IntMap.t ;
+	num_of_alg : (int*Num.t option) StringMap.t ;
+	alg_of_num : (string*Num.t option) IntMap.t ;
 	
 	fresh_pert : int ;
 	num_of_pert : int StringMap.t ;

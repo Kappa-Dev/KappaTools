@@ -11,39 +11,66 @@ module DynArray = DynamicArray.DynArray(LargeArray.GenArray)
 type dep_type = ALG of int | KAPPA of int | TOK of int | EVENT | TIME | RULE of int | PERT of int | ABORT of int
 module DepMap = Map.Make (struct type t = dep_type let compare = compare end) 
 module DepSet = Set.Make (struct type t = dep_type let compare = compare end) 
-type num = I of int | F of float
-
-let num_mult n1 n2 = 
-	match n1,n2 with
-		| (F x, F y) -> F (x *. y)
-		| (I x, I y) -> I (x * y)
-		| (F x, I y) -> F (x *. (float_of_int y))
-		| (I x, F y) -> F ((float_of_int x) *. y)
-
-let num_min n1 n2 =
-	match n1,n2 with
-		| (F x, F y) -> F (min x y) 
-		| (I x, I y) -> I (min x y)
-		| (F x, I y) -> F (min x (float_of_int y))
-		| (I x, F y) -> F (min (float_of_int x) y)
 
 
-let num_add n1 n2 = 
-	match n1,n2 with
-		| (F x, F y) -> F (x +. y)
-		| (I x, I y) -> I (x + y)
-		| (F x, I y) -> F (x +. (float_of_int y))
-		| (I x, F y) -> F ((float_of_int x) +. y)
+module Num =
+	struct
+	
+	type t = I of int | F of float
+		
+	let is_greater n1 n2 =
+		match n1,n2 with
+			| (F x, F y) -> x > y
+			| (I x, I y) -> x > y
+			| (F x, I y) -> x > (float_of_int y)
+			| (I x, F y) -> (float_of_int x) > y
 
-let float_of_num n =
-	match n with
-		| F x -> x
-		| I x -> float_of_int x
+	let is_smaller n1 n2 = 
+		match n1,n2 with
+			| (F x, F y) -> x < y
+			| (I x, I y) -> x < y
+			| (F x, I y) -> x < (float_of_int y)
+			| (I x, F y) -> (float_of_int x) < y
+	
+	let is_equal n1 n2 = 
+		match n1,n2 with
+			| (F x, F y) -> x = y
+			| (I x, I y) -> x = y
+			| _ -> false
+	
+	let mult n1 n2 = 
+		match n1,n2 with
+			| (F x, F y) -> F (x *. y)
+			| (I x, I y) -> I (x * y)
+			| (F x, I y) -> F (x *. (float_of_int y))
+			| (I x, F y) -> F ((float_of_int x) *. y)
+	
+	let min n1 n2 =
+		match n1,n2 with
+			| (F x, F y) -> F (min x y) 
+			| (I x, I y) -> I (min x y)
+			| (F x, I y) -> F (min x (float_of_int y))
+			| (I x, F y) -> F (min (float_of_int x) y)
+	
+	
+	let add n1 n2 = 
+		match n1,n2 with
+			| (F x, F y) -> F (x +. y)
+			| (I x, I y) -> I (x + y)
+			| (F x, I y) -> F (x +. (float_of_int y))
+			| (I x, F y) -> F ((float_of_int x) +. y)
+	
+	let float_of_num n =
+		match n with
+			| F x -> x
+			| I x -> float_of_int x
+	
+	let int_of_num n =
+		match n with
+			| F x -> (int_of_float x)
+			| I x -> x
 
-let int_of_num n =
-	match n with
-		| F x -> (int_of_float x)
-		| I x -> x
+end
 
 
 let string_of_dep = function

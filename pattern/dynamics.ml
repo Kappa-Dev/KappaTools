@@ -3,7 +3,7 @@ open Tools
 open ExceptionDefn
 open Graph
 
-type variable = CONST of Mods.num | VAR of ((int -> Mods.num) -> (int -> Mods.num) -> float -> int -> int -> float -> (int -> Mods.num) -> Mods.num)
+type variable = CONST of Num.t | VAR of ((int -> Num.t) -> (int -> Num.t) -> float -> int -> int -> float -> (int -> Num.t) -> Num.t)
 and action =
 		BND of (port * port)
 	| FREE of (port * bool) (*FREE(p,b) b=true if FREE is side-effect free*)
@@ -14,7 +14,7 @@ and port = id * int
 and id = FRESH of int | KEPT of int (*binding or modifying a port that has been added or kept from the lhs*)
 
 (*Whenever v denotes a constant "variable" there is no need to keep it unevaluated, we use dummy arguments to reduce it*)
-let close_var v = v (fun _ -> I 0) (fun i -> I 0) 0.0 0 0 0. (fun i -> I 0)
+let close_var v = v (fun _ -> Num.I 0) (fun i -> Num.I 0) 0.0 0 0 0. (fun i -> Num.I 0)
 
 module ActionSet = Set.Make(struct type t=action let compare = compare end) 
 
@@ -175,7 +175,7 @@ and modification =
 	| PRINT of (Ast.print_expr list * Ast.print_expr list)
 and boolean_variable = 
 	BCONST of bool 
-	| BVAR of ((int -> Mods.num) -> (int -> Mods.num) -> float -> int -> int -> float -> (int -> Mods.num) -> bool)
+	| BVAR of ((int -> Num.t) -> (int -> Num.t) -> float -> int -> int -> float -> (int -> Num.t) -> bool)
 
 let string_of_pert pert env =
 	let string_of_effect effect =

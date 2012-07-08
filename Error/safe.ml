@@ -31,7 +31,7 @@ let check_invariants state counter env =
   	(fun r_id rule ->
   		let x = Random_tree.find r_id state.activity_tree in
   		let a2,a1 = State.eval_activity rule state counter env in
-			let alpha = float_of_num (num_add a2 a1) in
+			let alpha = Num.float_of_num (Num.add a2 a1) in
   		 	if x < alpha then 
   				if (IntSet.mem r_id state.silenced || Random_tree.is_infinite r_id state.activity_tree) then ()
   				else
