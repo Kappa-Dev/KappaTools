@@ -10,7 +10,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 22/03/2012
-  * Last modification: 25/04/2012
+  * Last modification: 06/07/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -25,17 +25,20 @@ module type Dag =
     module S:Generic_branch_and_cut_solver.Solver
       
     type graph 
+    type prehash
     type canonical_form 
-
+       
     val graph_of_grid: (Causal.grid -> S.PH.B.PB.CI.Po.K.H.error_channel * graph) S.PH.B.PB.CI.Po.K.H.with_handler
     val dot_of_graph: (graph -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler
+    val prehash: (graph -> S.PH.B.PB.CI.Po.K.H.error_channel * prehash) S.PH.B.PB.CI.Po.K.H.with_handler
     val canonicalize: (graph -> S.PH.B.PB.CI.Po.K.H.error_channel * canonical_form) S.PH.B.PB.CI.Po.K.H.with_handler
-    val compare: canonical_form -> canonical_form -> int 
+(*    val compare: compact_representation -> compact_representation -> int *)
       
+    val print_prehash: (prehash -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler
     val print_canonical_form: (canonical_form -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler
     val print_graph: (graph -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler 
      
-    val hash_list: (('b -> 'b -> int) -> (canonical_form * 'a  * 'b list) list -> S.PH.B.PB.CI.Po.K.H.error_channel * (((canonical_form * 'a  * 'b list) list))) S.PH.B.PB.CI.Po.K.H.with_handler 
+    val hash_list: ((prehash * (Causal.grid * graph * canonical_form option * (S.PH.B.PB.step_id list * S.PH.update_order list * S.PH.B.PB.CI.Po.K.refined_step list * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option)* S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list ) list) list -> S.PH.B.PB.CI.Po.K.H.error_channel * (prehash * (Causal.grid * graph * canonical_form option * (S.PH.B.PB.step_id list * S.PH.update_order list * S.PH.B.PB.CI.Po.K.refined_step list * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option)* S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list ) list) list) S.PH.B.PB.CI.Po.K.H.with_handler  
 
   end 
 
@@ -78,10 +81,11 @@ module Dag =
         | Former of position 
         | Stop
 
-      type canonical_form = key list
+      type canonical_form = key list 
+      type prehash = node list 
 
       let dummy_cannonical_form = []
-
+      let dummy_prehash = []
           
       let print_graph parameter handler error graph = 
         let _ = Printf.fprintf parameter.H.out_channel "****\ngraph\n****" in 
@@ -133,12 +137,23 @@ module Dag =
           | Former i -> Printf.fprintf log "Pointer %i\n" i 
           | Fresh (_,s) -> Printf.fprintf log "Event %s\n" s 
 
-      let print_canonical_form parameter handler error graph = 
+      let print_canonical_form parameter handler error dag = 
         let _ =
           List.iter 
             (print_elt parameter.H.out_channel)
-            graph 
-        in error 
+            dag
+        in 
+        let _ = Printf.fprintf parameter.H.out_channel "\n" in 
+        error 
+
+      let print_prehash parameter handler error representation = 
+        let _ = 
+          List.iter 
+            (fun (_,b) -> Printf.fprintf parameter.H.out_channel "%s," b)
+            representation 
+        in 
+        let _ = Printf.fprintf parameter.H.out_channel "\n" in 
+        error 
 
       let label handler = Causal.label handler.H.env handler.H.state
       let kind node = 
@@ -161,7 +176,7 @@ module Dag =
 
       let quick_compare g t1 t2 = compare_elt (g t1) (g t2)
 
-      let rec aux l1 l2 = 
+      let rec aux compare_elt l1 l2 = 
         match l1,l2 
         with 
           | [],[] -> 0 
@@ -170,11 +185,19 @@ module Dag =
           | t::q,t'::q' -> 
             let cmp = compare_elt t t' in 
             if cmp = 0 
-              then aux q q' 
+              then aux compare_elt q q' 
             else cmp 
-      
-      let compare_list x y = aux x y 
 
+      let compare_canonic = aux compare_elt 
+      let compare_canonic_opt x y = 
+        match x,y 
+        with 
+          | None,None -> 0 
+          | None,_ -> -1
+          | _,None -> +1
+          |Some x,Some y -> compare_canonic x y 
+        
+      let compare_prehash = aux compare 
 
       let graph_of_grid parameter handler error grid = 
         let ids = Hashtbl.fold (fun key _ l -> key::l) grid.Causal.flow [] in
@@ -269,7 +292,18 @@ module Dag =
         in 
         aux list2 (List.rev list1)
 
-
+      let prehash parameter handler error graph = 
+        error,
+        List.sort 
+          compare 
+          (let l=ref [] in 
+           let _ = 
+             A.iter 
+               (fun a -> l:=a::(!l))
+               graph.labels 
+           in 
+           !l)
+    
       let canonicalize parameter handler error graph = 
         let asso = Mods.IntMap.empty in 
         let label i = 
@@ -470,29 +504,79 @@ module Dag =
      
       let dot_of_graph parameter handler error graph = error  
 
-      let sort l = 
-        let compare (a,_,_) (b,_,_) = compare_list a b in 
-        List.sort compare l 
+      let sort_outer = 
+        let compare (a,_) (b,_) = compare_prehash a b in 
+        List.sort compare  
+
+      let sort_inner = 
+        let compare (_,_,a,_,_) (_,_,b,_,_) = compare_canonic_opt a b in 
+        List.sort compare 
           
-      let hash_list parameter handler error cmp list = 
-        let list = sort list in 
+      let hash_inner parameter handler error cmp list = 
+        let list = sort_inner list in 
         let rec visit elements_to_store stored_elements last_element last_element_occurrences = 
           match elements_to_store,last_element
           with 
-            | ((t:canonical_form),asso,list)::q,Some (old,_) when compare t old = 0 ->
+            | (grid,graph,t,asso,list)::q,Some (_,_,old,_) when compare t old = 0 ->
               visit q stored_elements last_element (List.fold_left 
 (fun list a -> a::list) list last_element_occurrences)
-            | (t,asso,list)::q,Some (a,first_asso) ->
+            | (_,_,t,asso,list)::q,Some (grid,graph,a,first_asso) ->
               
-              visit q ((a,first_asso,List.sort cmp last_element_occurrences)::stored_elements) (Some (t,asso)) ((*List.rev*) list)
-            | (t,asso,list)::q,None -> 
-              visit q stored_elements (Some (t,asso)) (List.rev list)
+              visit q ((grid,graph,a,first_asso,List.sort cmp last_element_occurrences)::stored_elements) (Some (grid,graph,t,asso)) ((*List.rev*) list)
+            | (grid,graph,t,asso,list)::q,None -> 
+              visit q stored_elements (Some (grid,graph,t,asso)) (List.rev list)
             | [],None -> []
-            | [],Some (a,first_asso) -> 
-              List.rev ((a,first_asso,List.sort cmp last_element_occurrences)::stored_elements)
+            | [],Some (grid,graph,a,first_asso) -> 
+              List.rev ((grid,graph,a,first_asso,List.sort cmp last_element_occurrences)::stored_elements)
         in
         let list = visit list [] None [] in 
         error,list 
 
-      let compare = compare_list 
+      let hash_list parameter handler error list = 
+        let list = sort_outer list in 
+        let rec visit elements_to_store stored_elements last_element last_element_occurrences = 
+          match elements_to_store,last_element
+          with 
+            | ((t:prehash),list)::q,Some old when compare t old = 0 ->
+              visit q stored_elements last_element 
+                (List.fold_left 
+                   (fun list a -> a::list) list last_element_occurrences)
+            | (t,list)::q,Some a ->
+              visit q ((a,last_element_occurrences)::stored_elements) (Some t) list
+            | (t,list)::q,None -> 
+              visit q stored_elements (Some t) (List.rev list)
+            | [],None -> []
+            | [],Some a -> 
+              List.rev ((a,last_element_occurrences)::stored_elements)
+        in
+        let list = visit list [] None [] in 
+        let rec visit2 l error acc = 
+          match l 
+          with 
+            | []   -> error,acc 
+            | (t,list)::q -> 
+              if List.length list = 1 
+              then visit2 q error ((t,list)::acc)
+              else 
+                let error,list' = 
+                  List.fold_left 
+                    (fun (error,list') (grid,graph,dag,a,b) -> 
+                      let error,dag' = 
+                        match dag 
+                        with 
+                          | None -> canonicalize parameter handler error graph 
+                          | Some dag -> error,dag
+                      in 
+                      (error,(grid,graph,Some dag',a,b)::list')
+                    ) (error,[]) list 
+                in 
+                let error,list' = 
+                  hash_inner parameter handler error Mods.compare_profiling_info list' 
+                in 
+                visit2 q error ((t,list')::acc)
+        in 
+        let error,list = visit2 list error [] in 
+        error,list 
+
+        
     end:Dag)

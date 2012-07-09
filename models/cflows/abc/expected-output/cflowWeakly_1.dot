@@ -25,17 +25,17 @@ node_4 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
 "3" -> "4" [style="invis"]; 
 "4" -> "5" [style="invis"]; 
 "5" -> "6" [style="invis"]; 
-node_2 -> node_5
+node_1 -> node_5
 node_3 -> node_5
-node_2 -> node_6
+node_1 -> node_6
 node_4 -> node_6
 node_5 -> node_6
 node_4 -> node_7
 node_6 -> node_7
-node_1 -> node_8
+node_2 -> node_8
 node_4 -> node_8
 node_7 -> node_8
-node_1 -> node_9
+node_2 -> node_9
 node_4 -> node_9
 node_7 -> node_9
 node_8 -> node_9
@@ -43,5 +43,5 @@ node_7 -> node_10
 node_9 -> node_10
 }
 /*
- Dot generation time: 0.004001
+ Dot generation time: 0.000000
 */
