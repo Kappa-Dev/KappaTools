@@ -631,13 +631,13 @@ It is possible to use variables\index{variable} of the model as precondition for
 
 Basic perturbations are obtained using the declaration \index{declaration}:
 \ITE{
-\item[] \ttt{\%mod:} \textit{boolean\_expression} \ttt{do} \textit{effect} 
+\item[] \ttt{\%mod:} \textit{boolean\_expression} \ttt{do} \textit{effect\_list} 
 }
 and may be applied repeatedly using:
 \ITE{
-\item[] \ttt{\%mod:} \ttt{repeat} \textit{boolean\_expression} \ttt{do} \textit{effect} \ttt{until} \textit{boolean\_expression} 
+\item[] \ttt{\%mod:} \ttt{repeat} \textit{boolean\_expression} \ttt{do} \textit{effect\_list} \ttt{until} \textit{boolean\_expression} 
 }
-where \textit{boolean\_expression} and \textit{effect}\index{effect} are defined by the grammar given  Table~\ref{tab:pert} (the operator \ttt{rel} can be any usual binary relation in $\set{<,=,>}$ and algebraic expressions\index{algebraic expression} are defined Table~\ref{tab:alg}).
+where \textit{boolean\_expression} and \textit{effect\_list}\index{effect} are defined by the grammar given  Table~\ref{tab:pert} (the operator \ttt{rel} can be any usual binary relation in $\set{<,=,>}$ and algebraic expressions\index{algebraic expression} are defined Table~\ref{tab:alg}).
 
 \begin{table}[htbp]
   \centering
@@ -907,7 +907,7 @@ One may ask \KaSim~to extract causal pathways leading to the production of vario
 \ttt{\ITE{
 \item [] \%def: "displayCompression" "none" 
 }}
-As a result all causal flows computed by \KaSim~will be displayed in a dot file without any further compression. Note that this will modelers access to a lot of details about the mechanisms of action at stake in the simulation. However most of the time, these details will contain too much information and one may wish to retain only "essential" mechanisms using the command:
+As a result all causal flows computed by \KaSim~will be displayed in a dot file without any further compression. Note that this will give modelers access to a lot of details about the mechanisms of action at stake in the simulation. However most of the time, these details will contain too much information and one may wish to retain only "essential" mechanisms using the command:
 \ttt{\ITE{
 \item [] \%def: "displayCompression" "weak" 
 }}
@@ -939,7 +939,7 @@ Make sure that perturbation\textquotesingle s precondition can be satisfied by \
 
 \section*{What do null events mean, why do I have any?}
 
-Null events\index{null event} is a way for \KaSim~to compensate for some over approximation it is doing, in order deal with large simulations more efficiently. They do not impact significantly the performances of the simulator. The ratio $r$ of null event over productive ones (that you can track using the observable \ttt{\%obs: \textquotesingle r\textquotesingle   [E-]/[E+]} should tend to 0 when models have a lot of agents.
+Null events\index{null event} is a way for \KaSim~to compensate for some over approximation it is doing, in order deal with large simulations more efficiently. They usually do not impact significantly the performances of the simulator, unless the model contains rules using the special notation to deal with ambiguous molecularity (see Section~\ref{sec:ambiguous}). With pure Kappa rules, the ratio $r$ of null event over productive ones (that you can track using the observable \ttt{\%obs: \textquotesingle r\textquotesingle   [E-]/[E+]}) should tend to 0 when models have a lot of agents.
 
 \section*{No data points are generated}
 Make sure you have \ttt{\%obs} or \ttt{\%plot} instructions in your KF\index{kappa file}. Also make sure to use the \ttt{-p} option in the command line to tell KaSim how many points you wish to have on your curves. 
