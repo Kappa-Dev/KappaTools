@@ -1,4 +1,5 @@
 open LargeArray
+(**Heap with no fragmentation and an equality test for content*)
 
 module type Content = 
   sig
@@ -89,7 +90,8 @@ module Make(C:Content) =
 	
 	let gc h f =
 		let collect = ref [] in
-			GenArray.iteri (fun i content -> if f content then collect := i::!collect) ;
+			GenArray.iteri 
+			(fun i content_opt -> match content_opt with None -> () | Some content -> if f content then collect := i::!collect) h.ar ;
 			List.fold_left (fun h i -> remove i h) h !collect
 				
 	exception Is_present
