@@ -1,3 +1,5 @@
 New feature: do strong compression
 Optimisation: optimize case 10 (down) in constraint propagation (scan down the list of event)
-Optimisation: prehash causal flows and only compute the cannonical form in case of collision
+Optimisation: make the branch and cut procedure tail recursive (mode the stack of lists of remaining choice in the blackboard)
+Code cleaning: simplify the data-structure for hashed cflows. 
+
