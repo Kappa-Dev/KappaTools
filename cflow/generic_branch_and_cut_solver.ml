@@ -81,38 +81,73 @@ struct
             | [] -> error,log_info,blackboard,PH.B.success
         end 
           
-	  
-  let rec branch_over_assumption_list parameter handler error log_info list blackboard = 
-    match list 
+  type choices = 
+    {current:PH.update_order list ;
+     stack:PH.update_order list list }
+        
+  let push_choice_list list stack= 
+    {
+      current=list;
+      stack=stack.current::stack.stack
+    }
+
+  let cut_choice_list parameter handler error stack = 
+    match stack.stack 
     with 
-	  | [] ->
-            error,log_info,blackboard,PH.B.fail
-	  | head::tail -> 
-	    begin
-	      let error,log_info,blackboard = PH.B.branch parameter handler error log_info blackboard in
-	      let error,log_info,blackboard,output = propagate parameter handler error log_info [head] [] blackboard in
-	      if PH.B.is_failed output 
-              then 
-                let error,log_info,blackboard = PH.B.reset_last_branching parameter handler error log_info blackboard in 
-                branch_over_assumption_list parameter handler error log_info tail blackboard 
-              else 
-                let error,log_info,blackboard,output = iter parameter handler error log_info blackboard in 
-                if PH.B.is_failed output 
-                then 
-                  let error,log_info,blackboard = PH.B.reset_last_branching parameter handler error log_info blackboard in 
-                  branch_over_assumption_list parameter handler error log_info tail blackboard 
-                else 
-                  error,log_info,blackboard,output 
-	    end
+      | t::q -> error,{current=t;stack=q}
+      | [] -> 
+        let error_list,error = PH.B.PB.CI.Po.K.H.create_error parameter handler error (Some "generic_branch_and_cut_solver.ml") None (Some "cut_choice_list") (Some "99") (Some "Empty choice stack") (failwith "Empty choice stack in cut_choice_list") in 
+        PH.B.PB.CI.Po.K.H.raise_error parameter handler error_list error stack
+
+  let pop_next_choice parameter handler error stack = 
+    match stack.current
+    with 
+      | t::q -> error,(t,{stack with current=q})
+      | [] -> 
+        let error_list,error = PH.B.PB.CI.Po.K.H.create_error parameter handler error (Some "generic_branch_and_cut_solver.ml") None (Some "cut_choice_list") (Some "107") (Some "Empty choice stack") (failwith "Empty choice list in pop_next_choice") in 
+        PH.B.PB.CI.Po.K.H.raise_error parameter handler error_list error (PH.dummy_update_order,stack)
+
+  let no_more_choice stack = 
+    match stack.current
+    with 
+      | [] -> true
+      | _ -> false 
+      
+  let empty_choice_list = 
+    {stack=[];current=[]}
+	  
+  let rec branch_over_assumption_list parameter handler error log_info choice_list blackboard = 
+    if no_more_choice choice_list 
+    then error,log_info,blackboard,PH.B.fail 
+    else 
+      begin
+	let error,log_info,blackboard = PH.B.branch parameter handler error log_info blackboard in
+	let error,(choice,choice_list) = pop_next_choice parameter handler error choice_list in 
+        let error,log_info,blackboard,output = propagate parameter handler error log_info [choice] [] blackboard in
+	if PH.B.is_failed output 
+        then 
+          let error,log_info,blackboard = PH.B.reset_last_branching parameter handler error log_info blackboard in 
+          branch_over_assumption_list parameter handler error log_info choice_list blackboard 
+        else 
+          let error,log_info,blackboard,output = iter parameter handler error log_info blackboard choice_list in 
+          if PH.B.is_failed output 
+          then 
+            let error,log_info,blackboard = PH.B.reset_last_branching parameter handler error log_info blackboard in 
+            let error,choice_list = cut_choice_list parameter handler error choice_list in 
+            branch_over_assumption_list parameter handler error log_info choice_list blackboard 
+          else 
+            error,log_info,blackboard,output 
+      end
 	      
-  and iter parameter handler error log_info blackboard = 
+  and iter parameter handler error log_info blackboard choice_list = 
     let error,bool = PH.B.is_maximal_solution parameter handler error blackboard in
     if bool 
     then 
       error,log_info,blackboard,PH.B.success 
     else
       let error,list = PH.next_choice parameter handler error blackboard in
-      branch_over_assumption_list parameter handler error log_info list blackboard 
+      let choice_list = push_choice_list list choice_list in 
+      branch_over_assumption_list parameter handler error log_info choice_list blackboard 
 
   let detect_independent_events parameter handler error log_info blackboard list_eid = 
     let error,log_info,blackboard,events_to_keep = PH.B.cut parameter handler error log_info blackboard list_eid  in 
@@ -197,7 +232,7 @@ struct
           flush parameter.PH.B.PB.CI.Po.K.H.out_channel 
         in ()
     in 
-    let error,log_info,blackboard,output = iter parameter handler error log_info blackboard 
+    let error,log_info,blackboard,output = iter parameter handler error log_info blackboard empty_choice_list 
     in 
     let error,list = 
       if PH.B.is_failed output 

@@ -29,7 +29,7 @@ module type Blackboard_with_heuristic =
     type update_order 
     type propagation_check 
     
-  
+    val dummy_update_order: update_order
      (** heuristics *)
     val forced_events: (B.blackboard -> B.PB.CI.Po.K.H.error_channel * (update_order list * B.PB.step_id list * unit Mods.simulation_info option) list) B.PB.CI.Po.K.H.with_handler 
     val forbidden_events: (B.PB.step_id list -> B.PB.CI.Po.K.H.error_channel * update_order list) B.PB.CI.Po.K.H.with_handler 
@@ -51,6 +51,9 @@ module Propagation_heuristic =
       | Cut_event of B.PB.step_id 
       | Refine_value_after of B.event_case_address * B.PB.predicate_value 
       | Refine_value_before of B.event_case_address * B.PB.predicate_value 
+      | Skip 
+
+    let dummy_update_order = Skip 
 
     type propagation_check = 
       | Propagate_up of B.event_case_address
@@ -1508,7 +1511,8 @@ module Propagation_heuristic =
           | Cut_event step_id -> cut_event parameter handler error log_info blackboard step_id instruction_list propagate_list 
           | Discard_event step_id -> discard_event parameter handler error log_info blackboard step_id instruction_list propagate_list 
           | Refine_value_after (address,value) -> refine_value_after parameter handler error log_info blackboard address value instruction_list propagate_list 
-          | Refine_value_before (address,value) -> refine_value_before parameter handler error log_info blackboard address value instruction_list propagate_list 
+          | Refine_value_before (address,value) -> refine_value_before parameter handler error log_info blackboard address value instruction_list propagate_list
+          | Skip -> error,log_info,blackboard,instruction_list,propagate_list,B.ignore 
 
     let keep x = Keep_event x
   end:Blackboard_with_heuristic)
