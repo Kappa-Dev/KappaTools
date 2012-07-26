@@ -154,7 +154,7 @@ let main =
 					| 1 -> (Printf.printf "\tValid embedding but not binary when required: %f\n" ((float_of_int n) /. (float_of_int (Counter.null_event counter))))
 					| 2 -> (Printf.printf "\tClashing instance: %f\n" ((float_of_int n) /. (float_of_int (Counter.null_event counter))))
 					| 3 -> (Printf.printf "\tLazy negative update: %f\n" ((float_of_int n) /. (float_of_int (Counter.null_event counter))))
-					| 4 -> (Printf.printf "\tLazy negtive update of non local instances: %f\n" ((float_of_int n) /. (float_of_int (Counter.null_event counter))))
+					| 4 -> (Printf.printf "\tLazy negative update of non local instances: %f\n" ((float_of_int n) /. (float_of_int (Counter.null_event counter))))
 					| _ -> print_string "\tna\n"
 			) counter.Counter.stat_null ;
 			if !Parameter.fluxModeOn then 
