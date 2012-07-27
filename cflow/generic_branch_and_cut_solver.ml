@@ -85,20 +85,6 @@ struct
     {current:PH.update_order list ;
      stack:PH.update_order list list }
         
-  let push_choice_list list stack= 
-    {
-      current=list;
-      stack=stack.current::stack.stack
-    }
-
-  let cut_choice_list parameter handler error stack = 
-    match stack.stack 
-    with 
-      | t::q -> error,{current=t;stack=q}
-      | [] -> 
-        let error_list,error = PH.B.PB.CI.Po.K.H.create_error parameter handler error (Some "generic_branch_and_cut_solver.ml") None (Some "cut_choice_list") (Some "99") (Some "Empty choice stack") (failwith "Empty choice stack in cut_choice_list") in 
-        PH.B.PB.CI.Po.K.H.raise_error parameter handler error_list error stack
-
   let branch_choice_list choice_list = {current = [] ; stack = choice_list.current::choice_list.stack}
   let update_current choice_list list = {choice_list with current = list} 
   let pop_next_choice parameter handler error stack = 
