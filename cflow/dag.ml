@@ -10,7 +10,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 22/03/2012
-  * Last modification: 06/07/2012
+  * Last modification: 27/07/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -82,7 +82,7 @@ module Dag =
         | Stop
 
       type canonical_form = key list 
-      type prehash = node list 
+      type prehash = (node*int) list 
 
       let dummy_cannonical_form = []
       let dummy_prehash = []
@@ -149,7 +149,7 @@ module Dag =
       let print_prehash parameter handler error representation = 
         let _ = 
           List.iter 
-            (fun (_,b) -> Printf.fprintf parameter.H.out_channel "%s," b)
+            (fun ((_,b),i) -> Printf.fprintf parameter.H.out_channel "%s:%i," b i)
             representation 
         in 
         let _ = Printf.fprintf parameter.H.out_channel "\n" in 
@@ -292,17 +292,33 @@ module Dag =
         in 
         aux list2 (List.rev list1)
 
+      let compare_node (a,_) (b,_) = compare a b 
+
+      let smash l = 
+        let rec aux l former weight output = 
+          match l 
+          with 
+            | [] -> List.rev ((former,weight)::output)
+            | (t,wt)::q when t = former -> aux q former (wt+weight) output 
+            | (t,wt)::q -> aux q t wt ((former,weight)::output)
+        in 
+        match l 
+        with 
+          | [] -> []
+          | (t,wt)::q -> aux q t wt [] 
+
       let prehash parameter handler error graph = 
         error,
-        List.sort 
-          compare 
-          (let l=ref [] in 
-           let _ = 
-             A.iter 
-               (fun a -> l:=a::(!l))
-               graph.labels 
-           in 
-           !l)
+        smash 
+          (List.sort 
+             compare_node 
+             (let l=ref [] in 
+              let _ = 
+                A.iter 
+                  (fun a -> l:=(a,1)::(!l))
+                  graph.labels 
+              in 
+              !l))
     
       let canonicalize parameter handler error graph = 
         let asso = Mods.IntMap.empty in 
