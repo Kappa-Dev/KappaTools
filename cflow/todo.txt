@@ -1,5 +1,4 @@
 New feature: do strong compression
-New feature: sort cflows according to the first occurrence
 Optimisation: optimize case 10 (down) in constraint propagation (scan down the list of event)
 
 
