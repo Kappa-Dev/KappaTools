@@ -9,7 +9,7 @@
   * Jean Krivine, Universite Paris-Diderot, CNRS 
   *  
   * Creation: 19/10/2011
-  * Last modification: 05/07/2012
+  * Last modification: 31/07/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -191,15 +191,13 @@ let compress env state log_info step_list =
                       Some info
                 in 
                 let tick = Mods.tick_stories n_stories tick in 
-                let causal_story_array = (prehash,[grid,graph,None,(event_id_list,list_order,event_list,info),[info]])::causal_story_array in 
+                let causal_story_array = (prehash,[grid,graph,None,(event_id_list,list_order,event_list),[info]])::causal_story_array in 
                 error,counter+1,tick,causal_story_array)
               (error,1,tick,[]) 
               (List.rev list) 
           in 
           let error,causal_story_array = 
-            D.hash_list parameter handler error (*Mods.compare_profiling_info*) 
-
-(List.rev causal_story_array) 
+            D.hash_list parameter handler error (List.rev causal_story_array) 
           in 
           let n_stories = 
             List.fold_left 
@@ -223,7 +221,8 @@ let compress env state log_info step_list =
                   List.fold_left 
                     (fun (error,counter,tick,blackboard,weakly_compressed_story_array) (_,a) ->
                       List.fold_left 
-                        (fun (error,counter,tick,blackboard,weakly_compressed_story_array) (_,grid,graph,(event_id_list,list_order,event_list,info),list_info) -> 
+                        (fun (error,counter,tick,blackboard,weakly_compressed_story_array) (_,grid,graph,(event_id_list,list_order,event_list),list_info) -> 
+                          let info = List.hd list_info in 
                           let error,log_info,blackboard_tmp,list_order = 
                             if in_place 
                             then 
@@ -294,7 +293,7 @@ let compress env state log_info step_list =
                                         in 
                                         Some info
                                   in 
-                                  error,(prehash,[grid,graph,None,(event_id_list,list_order,event_list,info),list_info])::weakly_compressed_story_array,info
+                                  error,(prehash,[grid,graph,None,(event_id_list,list_order,event_list),list_info])::weakly_compressed_story_array,info
                                 else 
                                   error,weakly_compressed_story_array,None
                           in 
@@ -322,7 +321,7 @@ let compress env state log_info step_list =
   in 
   let lift bool x = 
     if bool 
-    then Some x 
+    then Some (D.sort_list x)
     else None
   in 
   lift causal_trace_on causal,

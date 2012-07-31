@@ -7,10 +7,10 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   * 
   * KaSim
-  * Jean Krivine, Université Paris Dederot, CNRS 
+  * Jean Krivine, Université Paris Diderot, CNRS 
   *  
   * Creation: 22/03/2012
-  * Last modification: 27/07/2012
+  * Last modification: 31/07/2012
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -38,7 +38,9 @@ module type Dag =
     val print_canonical_form: (canonical_form -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler
     val print_graph: (graph -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler 
      
-    val hash_list: ((prehash * (Causal.grid * graph * canonical_form option * (S.PH.B.PB.step_id list * S.PH.update_order list * S.PH.B.PB.CI.Po.K.refined_step list * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option)* S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list ) list) list -> S.PH.B.PB.CI.Po.K.H.error_channel * (prehash * (Causal.grid * graph * canonical_form option * (S.PH.B.PB.step_id list * S.PH.update_order list * S.PH.B.PB.CI.Po.K.refined_step list * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option)* S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list ) list) list) S.PH.B.PB.CI.Po.K.H.with_handler  
+    val hash_list: ((prehash * (Causal.grid * graph * canonical_form option * (S.PH.B.PB.step_id list * S.PH.update_order list * S.PH.B.PB.CI.Po.K.refined_step list (** S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option*))* S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list ) list) list -> S.PH.B.PB.CI.Po.K.H.error_channel * (prehash * (Causal.grid * graph * canonical_form option * (S.PH.B.PB.step_id list * S.PH.update_order list * S.PH.B.PB.CI.Po.K.refined_step list (** S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option*))* S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list ) list) list) S.PH.B.PB.CI.Po.K.H.with_handler  
+
+    val sort_list: (prehash * (Causal.grid * graph * canonical_form option * (S.PH.B.PB.step_id list * S.PH.update_order list * S.PH.B.PB.CI.Po.K.refined_step list (** S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option*))* S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list ) list) list -> (Causal.grid * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list ) list
 
   end 
 
@@ -593,6 +595,24 @@ module Dag =
         in 
         let error,list = visit2 list error [] in 
         error,list 
+
+      let project_tuple (grid,_,_,_,list) = 
+        List.hd list,grid,list
+
+      let sort_list list = 
+        let flat_list = 
+          List.fold_left
+            (fun list_out (prehash,list) -> 
+              List.fold_left 
+                (fun list_out tuple -> 
+                  (project_tuple tuple)::list_out
+                )
+                list_out list)
+            [] list
+        in 
+        let compare_pair (a,_,_) (c,_,_) = Mods.compare_profiling_info a c in 
+        let flat_list = List.sort compare_pair flat_list in 
+          List.rev_map (fun (a,b,c) -> b,c) (List.rev flat_list)
 
         
     end:Dag)

@@ -349,35 +349,35 @@ let dot_of_grid profiling fic grid state env =
 (*story_list:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_id:int story_time: float ; story_event: int}*)
 let pretty_print compression_type label story_list state env =	
   let n = List.length story_list in 
-	let _ = 
-		if compression_type = "" then
-			Debug.tag (Printf.sprintf "\n+ Pretty printing %d flow%s" n (if n>1 then "s" else ""))
-		else 
-			Debug.tag (Printf.sprintf "\n+ Pretty printing %d %scompressed flow%s" n label (if n>1 then "s" else ""))
+  let _ = 
+    if compression_type = "" 
+    then
+      Debug.tag (Printf.sprintf "\n+ Pretty printing %d flow%s" n (if n>1 then "s" else ""))
+    else 
+      Debug.tag (Printf.sprintf "\n+ Pretty printing %d %scompressed flow%s" n label (if n>1 then "s" else ""))
+  in
+  let _ =
+    List.fold_left 
+      (fun cpt (grid,stories) -> 
+	let av_t,ids,n =
+	  List.fold_left 
+	    (fun (av_t,ids,n) info_opt -> 
+	      match info_opt with
+		| Some info -> 
+                  (av_t +. info.story_time,info.story_id::ids,n+1)
+		| None -> invalid_arg "Causal.pretty_print"
+	    )(0.,[],0) (List.rev stories) 
 	in
-	let _ =
-          List.fold_left 
-            (fun cpt (_,a) -> 
-	      List.fold_left 
-		(fun cpt (grid,_,_,_,stories) ->
-		  let av_t,ids,n =
-		    List.fold_left 
-		      (fun (av_t,ids,n) info_opt -> 
-			match info_opt with
-			  | Some info -> (av_t +. info.story_time,info.story_id::ids,n+1)
-			  | None -> invalid_arg "Causal.pretty_print"
-		      )(0.,[],0) stories 
-		  in
-		  let profiling = 
-		    (fun desc -> 
-		      Printf.fprintf desc "/* Compression of %d causal flows obtained in average at %E t.u */\n" n (av_t/.(float_of_int n)) ;
-		      Printf.fprintf desc "/* Compressed causal flows were: %s */\n" (Tools.string_of_list string_of_int ids) ;
-		    )
-		  in
-		  let fic = (Filename.chop_extension (!(Parameter.cflowFileName)))^compression_type^"_"^(string_of_int cpt)^".dot" in
-		  dot_of_grid profiling fic grid state env ;
-		  cpt+1
-		) cpt a)  0 (List.rev story_list)
+	let profiling = 
+	  (fun desc -> 
+	    Printf.fprintf desc "/* Compression of %d causal flows obtained in average at %E t.u */\n" n (av_t/.(float_of_int n)) ;
+	    Printf.fprintf desc "/* Compressed causal flows were: %s */\n" (Tools.string_of_list string_of_int ids) ;
+	  )
 	in
-	()
-	
+	let fic = (Filename.chop_extension (!(Parameter.cflowFileName)))^compression_type^"_"^(string_of_int cpt)^".dot" in
+	dot_of_grid profiling fic grid state env ;
+	cpt+1
+      ) 0 story_list
+  in
+  ()
+	  

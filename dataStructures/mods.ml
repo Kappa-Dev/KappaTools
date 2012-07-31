@@ -419,4 +419,5 @@ let compare_profiling_info info1 info2 =
     | None,None -> 0
     | None,Some _ -> -1
     | Some _,None -> +1
-    | Some info1,Some info2 -> compare info1.story_id info2.story_id 
+    | Some info1,Some info2 -> 
+      compare info1.story_id info2.story_id 
