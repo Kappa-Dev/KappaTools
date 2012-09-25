@@ -83,18 +83,18 @@ let instance_number mix_id state env =
 	if Environment.is_empty_lhs mix_id env then (Num.I 1) 
 	else
 		match state.injections.(mix_id) with
-		| None -> (Num.I 0)
+		| None -> (Num.F 0.)
 		| Some component_injections ->
 			let act =
 				Array.fold_left
 					(fun act opt ->
 								match opt with
-								| Some injs -> let n = InjectionHeap.size injs in if n=0 then 0 else act * n
-								| None -> 0
+								| Some injs -> let n = InjectionHeap.size injs in if n=0 then 0. else act *. (float_of_int n)
+								| None -> 0.
 					)
-					1 component_injections
+					1. component_injections
 			in
-			(Num.I act)
+			(Num.F act)
 
 (**[nl_instance_number mix_id state] returns the number of instances of non local mixture [mix_id] in implicit state [state]*)
 let nl_instance_number mix_id state env =

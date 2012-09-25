@@ -244,8 +244,18 @@ let apply_effect p_id pert tracked pert_events state counter env =
 		if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Taking a snapshot of current state (%s)" str) ;
 		let filename = 
 			match str with 
-				| "" -> (Filename.chop_extension (!Parameter.snapshotFileName))^"_"^(string_of_int (Counter.event counter)) 
-				| _ -> (Filename.chop_extension (Filename.concat !Parameter.outputDirName str))
+				| "" -> 
+					begin
+						try
+							(Filename.chop_extension (!Parameter.snapshotFileName))^"_"^(string_of_int (Counter.event counter)) 
+						with
+							| Invalid_argument _ -> (!Parameter.snapshotFileName)^"_"^(string_of_int (Counter.event counter))
+					end
+				| _ -> 
+					begin
+						try (Filename.chop_extension (Filename.concat !Parameter.outputDirName str)) 
+						with Invalid_argument _ -> Filename.concat !Parameter.outputDirName str
+					end
 		in
 		let file_exists = ref true in
 		let cpt = ref 1 in
