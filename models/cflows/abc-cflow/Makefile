@@ -42,7 +42,7 @@ test:
 	@make clean_light > /dev/null
 
 launch_script: $(SCRIPT)
-	@sh $<
+	@sh $< 
 
 do_copy: $(EXP)
 do_diff: $(CHECK)
