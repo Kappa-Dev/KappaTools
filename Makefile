@@ -18,6 +18,8 @@ SOURCES = \
 
 ## the name of the resulting executable
 RESULT  = KaSim
+#use this to compile under windows 
+#RESULT = KaSim.exe
 
 ## generate type information (.annot files)
 ANNOTATE = no
