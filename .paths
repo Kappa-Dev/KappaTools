@@ -120,3 +120,4 @@ models/cflows/side-effects4/expected-output
 models/cflows/weak_only
 models/cflows/weak_only/expected-output
 models/debug/LFCI
+models/dna

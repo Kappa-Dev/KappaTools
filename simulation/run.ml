@@ -194,7 +194,7 @@ let loop state grid story_profiling event_list counter plot env =
 	let rec iter state story_profiling event_list counter plot env =
 		if !Parameter.debugModeOn then 
 			Debug.tag (Printf.sprintf "[**Event %d (Activity %f)**]" counter.Counter.events (Random_tree.total state.State.activity_tree));
-		if (Counter.check_time counter) && (Counter.check_events counter) then
+		if (Counter.check_time counter) && (Counter.check_events counter) && not (Counter.stop counter) then
 			let state,story_profiling,event_list,env = 
 				event state story_profiling event_list counter plot env 
 			in

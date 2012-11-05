@@ -242,20 +242,26 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 let apply_effect p_id pert tracked pert_events state counter env =
 	let snapshot str =
 		if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Taking a snapshot of current state (%s)" str) ;
+		let ext = if !Parameter.dotOutput then "dot" else "ka" in
+						
 		let filename = 
 			match str with 
 				| "" -> 
 					begin
-						try
-							(Filename.chop_extension (!Parameter.snapshotFileName))^"_"^(string_of_int (Counter.event counter)) 
-						with
-							| Invalid_argument _ -> (!Parameter.snapshotFileName)^"_"^(string_of_int (Counter.event counter))
+						let name =
+  						if (Filename.check_suffix (!Parameter.snapshotFileName) ext) then Filename.chop_extension (!Parameter.snapshotFileName)
+  						else 
+  							 !Parameter.snapshotFileName
+						in
+						name^"_"^(string_of_int (Counter.event counter))
 					end
 				| _ -> 
-					begin
-						try (Filename.chop_extension (Filename.concat !Parameter.outputDirName str)) 
-						with Invalid_argument _ -> Filename.concat !Parameter.outputDirName str
-					end
+					let name = 
+						if (Filename.check_suffix str ext) then Filename.chop_extension str
+						else 
+							 str
+					in
+					Filename.concat !Parameter.outputDirName name 
 		in
 		let file_exists = ref true in
 		let cpt = ref 1 in
@@ -290,12 +296,19 @@ let apply_effect p_id pert tracked pert_events state counter env =
 			| CONST f -> f
 			| VAR v_fun -> v_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time()) v_of_token
 	in
-	List.fold_left 
-	(fun (env, state, pert_ids,tracked,pert_events) effect -> 
-		let (env, state, pert_ids,tracked,pert_events) = trigger_effect state env pert_ids tracked pert_events pert p_id effect eval_var snapshot counter in
-		(env, state, pert_ids,tracked,pert_events)
-	) 
-	(env,state,IntSet.empty,tracked,pert_events) pert.effect
+	let env, state, pert_ids,tracked,pert_events =
+  	List.fold_left 
+  	(fun (env, state, pert_ids,tracked,pert_events) effect -> 
+  		let (env, state, pert_ids,tracked,pert_events) = 
+  			try
+  				trigger_effect state env pert_ids tracked pert_events pert p_id effect eval_var snapshot counter 
+  			with ExceptionDefn.StopReached msg -> (counter.Counter.stop <- true ; Debug.tag msg ; (env, state, pert_ids,tracked,pert_events))
+  		in
+  		(env, state, pert_ids,tracked,pert_events)
+  	) 
+  	(env,state,IntSet.empty,tracked,pert_events) pert.effect
+	in
+	(env, state, pert_ids,tracked,pert_events)
 					
 
 let try_perturbate state pert_ids counter env = 

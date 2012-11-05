@@ -235,9 +235,11 @@ module Counter =
 			max_time : float option ; 
 			max_events : int option ;
 			dE : int option ;
-			dT : float option 
+			dT : float option ;
+			mutable stop : bool
 			}
 
+		let stop c = c.stop
 		let inc_tick c = c.ticks <- c.ticks + 1
 		let time c = c.time
 		let event c = c.events
@@ -338,7 +340,8 @@ module Counter =
 				init_time = init_t ;
 				init_event = init_e ;
 				initialized = false ;
-				ticks = 0
+				ticks = 0 ;
+				stop = false
 				}
 		
 	end

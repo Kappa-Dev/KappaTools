@@ -88,9 +88,10 @@ let set name ext_opt =
 	let fname = 
 		match ext_opt with
 			| None -> fname
-			| Some ext -> 
-				let basename = try Filename.chop_extension fname with Invalid_argument _ -> fname in
-				(basename^"."^ext)
+			| Some ext ->
+				if (Filename.check_suffix fname ext) then fname 
+				else 
+				(fname^"."^ext)
 	in
 	name:=fname
 
@@ -110,7 +111,7 @@ let checkFileExists () =
 			| file -> 
 				if Sys.file_exists file then 
 					begin
-						Printf.fprintf stderr "File '%s' already exists do you want to erase (y/N)? \n" file ; flush stderr ;
+						Printf.fprintf stderr "File '%s' already exists do you want to erase (y/N)? \n" file ; flush stderr ; 
 						let answer = Tools.read_input () in
 						if answer="y" then () else exit 1
 					end
