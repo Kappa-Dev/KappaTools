@@ -48,6 +48,7 @@ let eval_pexpr pexpr state counter env =
 					match n with
 						| Num.I x -> (Printf.sprintf "%d" x)::cont
 						| Num.F x -> (Printf.sprintf "%E" x)::cont
+						| Num.I64 x -> (Printf.sprintf "%Ld" x)::cont
 		) [] pexpr
 	in
 	String.concat "" (List.rev l)
@@ -68,6 +69,7 @@ let dump_print_expr desc pexpr state counter env =
 				match n with
 					| Num.I x -> Printf.fprintf desc "%d" x
 					| Num.F x -> Printf.fprintf desc "%E" x
+					| Num.I64 x -> Printf.fprintf desc "%Ld" x
 	) pexpr ;
 	Printf.fprintf desc "\n"
 

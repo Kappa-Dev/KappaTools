@@ -69,6 +69,7 @@ let output state time event plot env counter =
 					match v with
 						| Num.I x -> Printf.fprintf d "%c%d" !Parameter.plotSepChar x
 						| Num.F x -> Printf.fprintf d "%c%E" !Parameter.plotSepChar x
+						| Num.I64 x -> Printf.fprintf d "%c%Ld" !Parameter.plotSepChar x
 			) state.observables ;
 			Printf.fprintf d "\n" ;
 			flush d

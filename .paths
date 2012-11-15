@@ -121,3 +121,5 @@ models/cflows/weak_only
 models/cflows/weak_only/expected-output
 models/debug/LFCI
 models/dna
+zarith
+zarith/trunk

@@ -80,29 +80,29 @@ let is_complete mix_id state =
 
 (**[instance_number mix_id state] returns the number of instances of mixture [mix_id] in implicit state [state]*)
 let instance_number mix_id state env =
-	if Environment.is_empty_lhs mix_id env then (Num.I 1) 
+	if Environment.is_empty_lhs mix_id env then (Num.I64 Int64.one) 
 	else
 		match state.injections.(mix_id) with
-		| None -> (Num.F 0.)
+		| None -> (Num.I64 Int64.zero)
 		| Some component_injections ->
 			let act =
 				Array.fold_left
 					(fun act opt ->
 								match opt with
-								| Some injs -> let n = InjectionHeap.size injs in if n=0 then 0. else act *. (float_of_int n)
-								| None -> 0.
+								| Some injs -> let n = InjectionHeap.size injs in if n=0 then Int64.zero else (Int64.mul act (Int64.of_int n))
+								| None -> Int64.zero
 					)
-					1. component_injections
+					Int64.one component_injections
 			in
-			(Num.F act)
+			(Num.I64 act)
 
 (**[nl_instance_number mix_id state] returns the number of instances of non local mixture [mix_id] in implicit state [state]*)
 let nl_instance_number mix_id state env =
-	if Environment.is_empty_lhs mix_id env then 1. 
+	if Environment.is_empty_lhs mix_id env then (Num.I 1) 
 	else
 		match state.nl_injections.(mix_id) with
-		| None -> 0.
-		| Some inj_prod_hp -> float_of_int (InjProdHeap.size inj_prod_hp)
+		| None -> (Num.I 0)
+		| Some inj_prod_hp -> Num.I (InjProdHeap.size inj_prod_hp)
 
 
 (**[instances_of_square mix_id state] returns [(inj_0,codom_0,prod_0);...] the list of full and valid embeddings inj_i, their codomains codom_j and the explicit product prod_i=[phi_cc0;phi_cc1;...]*)
@@ -221,15 +221,15 @@ let eval_activity ?using rule state counter env =
 	(*overestimated activity of unary instances of the rule*)
 	let a_1 =
 		match rule.k_alt with
-			| None -> (Num.F 0.0)
+			| None -> (Num.I 0)
 			| Some x ->
 				begin
 					match x with
 						| Dynamics.CONST f -> 
 							let n = nl_instance_number mix_id state env in 
-							Num.mult f (Num.I (int_of_float n))
+							Num.mult f n
 						| Dynamics.VAR k_fun ->
-							let act_of_id id = let k = nl_instance_number id state env in Num.I (int_of_float k)
+							let act_of_id id = nl_instance_number id state env 
 							and v_of_var id = value state id counter env 
 							and v_of_token id = 
 								let x = try state.token_vector.(id) with _ -> failwith "State.value: Invalid token id"
@@ -238,9 +238,7 @@ let eval_activity ?using rule state counter env =
 							let k =	k_fun act_of_id v_of_var (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time()) v_of_token 
 							in
 							let n = nl_instance_number mix_id state env in
-							if n = 0. then (Num.F 0.) else
-								let n = int_of_float n in
-								Num.mult k (Num.I n)
+							Num.mult k n
 				end
 	in
 	(a_2,a_1)
@@ -1490,6 +1488,10 @@ let dump state counter env =
 								x
 							| Num.F x -> 
 								Printf.printf "#x[%d]: '%s' %E \n" var_id 
+								((fun (s,_) -> s) (Environment.alg_of_num var_id env))
+								x
+							| Num.I64 x -> 
+								Printf.printf "#x[%d]: '%s' %Ld \n" var_id 
 								((fun (s,_) -> s) (Environment.alg_of_num var_id env))
 								x
 			) state.alg_variables;

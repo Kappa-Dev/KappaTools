@@ -255,7 +255,7 @@ let eval_agent is_pattern tolerate_new_state env a ctxt =
 	in
 		(ctxt, (Mixture.create_agent name_id interface), env)
 
-let cast_op x y op_f op_i =
+let cast_op x y op_f op_i op_i64 =
 	match (x,y) with
 	| (Num.F x, Num.F y) -> Num.F (op_f x y) 
 	| (Num.I x, Num.F y) -> Num.F (op_f (float_of_int x) y)
@@ -266,13 +266,45 @@ let cast_op x y op_f op_i =
 				| None -> Num.F (op_f (float_of_int x) (float_of_int y)) 
 				| Some op_i -> Num.I (op_i x y)
 		end
-let cast_un_op x op_f op_i =
+	| (Num.I x, Num.I64 y) -> 
+		begin
+			match op_i64 with 
+				| None -> Num.F (op_f (float_of_int x) (Int64.to_float y)) 
+				| Some op_i64 -> Num.I64 (op_i64 (Int64.of_int x) y)
+		end
+	| (Num.I64 x, Num.I y) -> 
+		begin
+			match op_i64 with 
+				| None -> Num.F (op_f (Int64.to_float x) (float_of_int y)) 
+				| Some op_i64 -> Num.I64 (op_i64 x (Int64.of_int y))
+		end
+	| (Num.I64 x, Num.I64 y) -> 
+		begin
+			match op_i64 with 
+				| None -> Num.F (op_f (Int64.to_float x) (Int64.to_float y)) 
+				| Some op_i64 -> Num.I64 (op_i64 x y)
+		end
+	| (Num.F x, Num.I64 y) -> Num.F (op_f x (Int64.to_float y))
+	| (Num.I64 x, Num.F y) -> Num.F (op_f (Int64.to_float x) y)
+
+let cast_un_op x op_f op_i op_i64 =
 	match x with
 		| Num.F x -> 
 			begin
 				match op_f with 
 					| Some op_f -> Num.F (op_f x) 
 					| None -> (match op_i with None -> invalid_arg "cast_un" | Some op_i -> Num.I (op_i (int_of_float x)))
+			end
+		| Num.I64 x ->
+			begin
+  			match op_i64 with
+  			| None -> 
+  					begin
+  						match op_f with
+  							| None -> invalid_arg "cast_un_op" 
+  							| Some op_f -> Num.F (op_f (Int64.to_float x)) 
+  					end
+  			| Some op_i64 -> Num.I64 (op_i64 x) 
 			end
 		| Num.I x -> 
 			match op_i with 
@@ -364,25 +396,26 @@ let rec partial_eval_alg env ast =
 		| PROD_EVENT_VAR pos ->
 			((fun _ _ _ e _ _ _-> Num.I e), false,Some (Num.I 0),	(DepSet.singleton Mods.EVENT), "prod_e")			
 		| DIV (ast, ast', pos) -> 
-			bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> a /. b) None) "/"
-		| SUM (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> a +. b) (Some (fun a b -> a+b))) "+"
-		| MULT (ast, ast', pos) -> bin_op ast ast' pos  (fun x y -> cast_op x y (fun a b -> a *. b) (Some (fun a b -> a*b))) "*"
-		| MINUS (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> a -. b) (Some (fun a b -> a-b))) "-"
-		| POW (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> a ** b) (Some (fun a b -> Tools.pow a b))) "^"
+			bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> a /. b) None None) "/"
+		| SUM (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> a +. b) (Some (fun a b -> a+b)) (Some (fun a b -> Int64.add a b))) "+"
+		| MULT (ast, ast', pos) -> bin_op ast ast' pos  (fun x y -> cast_op x y (fun a b -> a *. b) (Some (fun a b -> a*b)) (Some (fun a b -> Int64.mul a b))) "*"
+		| MINUS (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> a -. b) (Some (fun a b -> a-b)) (Some (fun a b -> Int64.sub a b))) "-"
+		| POW (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> a ** b) (Some (fun a b -> Tools.pow a b)) (Some (fun a b -> Tools.pow64 a (Int64.to_int b)))) "^"
 		| MODULO (ast, ast', pos) -> 
 			bin_op ast ast' pos 
 			(fun x y -> 
 				cast_op x y 
 				(fun a b -> float_of_int ((int_of_float a) mod (int_of_float b))) 
 				(Some (fun a b -> a mod b))
+				(Some (fun a b -> Int64.rem a b))
 			) " modulo "
-		| COSINUS (ast, pos) -> un_op ast pos (fun x -> cast_un_op x (Some cos) None) "cos"
-		| TAN (ast,pos) -> un_op ast pos (fun x -> cast_un_op x (Some tan) None) "tan"
-		| SINUS (ast, pos) -> un_op ast pos (fun x -> cast_un_op x (Some sin) None) "sin"
-		| EXP (ast, pos) -> un_op ast pos (fun x -> cast_un_op x (Some exp) None) "e^"
-		| SQRT (ast, pos) -> un_op ast pos (fun x -> cast_un_op x (Some sqrt) None) "sqrt"
-		| ABS (ast, pos) -> un_op ast pos (fun x -> cast_un_op x None (Some abs)) "abs"
-		| LOG (ast, pos) -> un_op ast pos (fun x -> cast_un_op x (Some log) None) "log"
+		| COSINUS (ast, pos) -> un_op ast pos (fun x -> cast_un_op x (Some cos) None None) "cos"
+		| TAN (ast,pos) -> un_op ast pos (fun x -> cast_un_op x (Some tan) None None) "tan"
+		| SINUS (ast, pos) -> un_op ast pos (fun x -> cast_un_op x (Some sin) None None) "sin"
+		| EXP (ast, pos) -> un_op ast pos (fun x -> cast_un_op x (Some exp) None None) "e^"
+		| SQRT (ast, pos) -> un_op ast pos (fun x -> cast_un_op x (Some sqrt) None None) "sqrt"
+		| ABS (ast, pos) -> un_op ast pos (fun x -> cast_un_op x None (Some abs) (Some Int64.abs)) "abs"
+		| LOG (ast, pos) -> un_op ast pos (fun x -> cast_un_op x (Some log) None None) "log"
 
 let rec partial_eval_bool env ast =
 	let bin_op_bool ast ast' pos op op_str =
@@ -1029,6 +1062,7 @@ let init_graph_of_result env res =
 						match opt_v with
 							| Some (Num.F v) -> v
 							| Some (Num.I v) -> float_of_int v
+							| Some (Num.I64 v) -> Int64.to_float v
 							| None -> raise (ExceptionDefn.Semantics_Error (pos, Printf.sprintf "%s is not a constant, cannot initialize token value." lbl))
     			in
     			let tok_id = try Environment.num_of_token tk_nme env with Not_found -> raise (ExceptionDefn.Semantics_Error (pos, Printf.sprintf "token %s is undeclared" tk_nme))
