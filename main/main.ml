@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "3.1-0511	12"
+let version = "3.1-191112"
 
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
@@ -17,7 +17,7 @@ let close_desc opt_env =
 
 let main =
 	let options = [
-		("--version", Arg.Unit (fun () -> print_string (version_msg^"\n") ; flush stdout ; exit 0), "display kaSim version");
+		("--version", Arg.Unit (fun () -> print_string (version_msg^"\n") ; flush stdout ; exit 0), "display KaSim version");
 		("-i", Arg.String (fun fic -> Parameter.inputKappaFileNames:= fic:: (!Parameter.inputKappaFileNames)),
 			"name of a kappa file to use as input (can be used multiple times for multiple input files)");
 		("-e", Arg.Int (fun i -> if i < 0 then Parameter.maxEventValue := None else Parameter.maxTimeValue:= None ; Parameter.maxEventValue := Some i) ,

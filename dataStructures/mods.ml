@@ -99,7 +99,19 @@ module Num =
 		match n with
 			| F x -> (int_of_float x)
 			| I x -> x
-			| I64 x -> invalid_arg "Cannot convert a 64 bit integer into a 32 bit one"
+			| I64 x -> Int64.to_int x (*Might exceed thebiggest 32 bits integer*)
+
+	let is_zero n = 
+		match n with
+		| F x -> x = 0.
+		| I64 x -> x = Int64.zero
+		| I x -> x = 0
+
+	let to_string n =
+		match n with
+		| F x -> Printf.sprintf "%E" x
+		| I64 x -> Printf.sprintf "%Ld" x
+		| I x -> Printf.sprintf "%d" x
 
 end
 

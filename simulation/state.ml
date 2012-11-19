@@ -202,7 +202,9 @@ let eval_activity ?using rule state counter env =
  		(match k_def with
 			| Dynamics.CONST f -> 
 				let n = (match using with None -> instance_number mix_id state env | Some x -> Num.I x) in 
-				(Num.mult f n)  
+				if Num.is_zero n then (Num.I 0)
+				else
+					(Num.mult f n)  (*Issue #65*)
 			| Dynamics.VAR k_fun ->
 					let act_of_id id = instance_number id state env
 					and v_of_var id = value state id counter env 
@@ -215,7 +217,10 @@ let eval_activity ?using rule state counter env =
 							(Counter.event counter) (Counter.null_event counter) (Sys.time()) v_of_token
 					in
 					let n = (match using with None -> instance_number mix_id state env | Some x -> Num.I x) in
-					Num.mult k n
+					if Num.is_zero n then (Num.I 0)
+					else
+						Num.mult k n
+						
 		)
 	in
 	(*overestimated activity of unary instances of the rule*)
@@ -238,7 +243,9 @@ let eval_activity ?using rule state counter env =
 							let k =	k_fun act_of_id v_of_var (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time()) v_of_token 
 							in
 							let n = nl_instance_number mix_id state env in
-							Num.mult k n
+							if Num.is_zero n then (Num.I 0)
+							else
+								Num.mult k n 
 				end
 	in
 	(a_2,a_1)
