@@ -17,9 +17,11 @@ SOURCES = \
 		main/main.ml 
 
 ## the name of the resulting executable
-RESULT  = KaSim
-#use this to compile under windows 
-#RESULT = KaSim.exe
+ifdef SystemRoot
+	RESULT = KaSim.exe
+else
+	RESULT = KaSim
+endif
 
 ## generate type information (.annot files)
 ANNOTATE = no
