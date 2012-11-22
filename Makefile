@@ -17,7 +17,7 @@ SOURCES = \
 		main/main.ml 
 
 ## the name of the resulting executable
-ifdef SystemRoot
+ifeq (Windows,$(findstring Windows,$(OS)))
 	RESULT = KaSim.exe
 else
 	RESULT = KaSim
