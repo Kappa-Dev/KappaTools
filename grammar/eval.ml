@@ -1115,9 +1115,9 @@ let configurations_of_result result =
 				set_value pos_p param value_list
 				(fun (value,pos_v) ->	
 					match value with 
-						| "true" -> true 
-						| "false" -> false 
-						| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_v,Printf.sprintf "Value %s should be either \"true\" or \"false\"" error))
+						| "true" | "yes" -> true 
+						| "false" | "no" -> false 
+						| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_v,Printf.sprintf "Value %s should be either \"yes\" or \"no\"" error))
 				) Parameter.dumpIfDeadlocked
 			| "plotSepChar" -> 
 				set_value pos_p param value_list
@@ -1137,33 +1137,33 @@ let configurations_of_result result =
 				set_value pos_p param value_list
 				(fun (value,pos_v) ->	
 					match value with 
-						| "true" -> true 
-						| "false" -> false 
-						| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_v,Printf.sprintf "Value %s should be either \"true\" or \"false\"" error))
+						| "true" | "yes" -> true 
+						| "false" | "no" -> false 
+						| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_v,Printf.sprintf "Value %s should be either \"yes\" or \"no\"" error))
 				) Parameter.dotOutput
 			| "colorDot" ->
 				set_value pos_p param value_list
 				(fun (value,pos_v) ->	
 					match value with 
-						| "true" -> true 
-						| "false" -> false 
-						| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_v,Printf.sprintf "Value %s should be either \"true\" or \"false\"" error))
+						| "true" | "yes" -> true 
+						| "false" | "no" -> false 
+						| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_v,Printf.sprintf "Value %s should be either \"yes\" or \"no\"" error))
 				) Parameter.useColor
 			| "dumpInfluenceMap" ->
 				set_value pos_p param value_list
 				(fun (v,p) -> 
 					match v with 
-						| "true" -> if !Parameter.influenceFileName = "" then "im.dot" else !Parameter.influenceFileName
-						| "false" -> "" 
-						| _ as error -> raise (ExceptionDefn.Semantics_Error (p,Printf.sprintf "Value %s should be either \"true\" or \"false\"" error))
+						| "true" | "yes" -> if !Parameter.influenceFileName = "" then "im.dot" else !Parameter.influenceFileName
+						| "false" | "no" -> "" 
+						| _ as error -> raise (ExceptionDefn.Semantics_Error (p,Printf.sprintf "Value %s should be either \"yes\" or \"no\"" error))
 				) Parameter.influenceFileName
 			| "influenceMapFileName" -> set_value pos_p param value_list (fun (v,p) -> v) Parameter.influenceFileName  
 			| "showIntroEvents" -> 
 				set_value pos_p param value_list 
 				(fun (v,p) -> match v with 
-					| "true" -> true 
-					| "false" -> false
-					| _ as error -> raise (ExceptionDefn.Semantics_Error (p,Printf.sprintf "Value %s should be either \"true\" or \"false\"" error))
+					| "true" | "yes" -> true 
+					| "false" | "no" -> false
+					| _ as error -> raise (ExceptionDefn.Semantics_Error (p,Printf.sprintf "Value %s should be either \"yes\" or \"no\"" error))
 				) 
 				Parameter.showIntroEvents
 			| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Unkown parameter %s" error))		  

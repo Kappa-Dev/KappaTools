@@ -5,7 +5,7 @@
 %token AT OP_PAR CL_PAR COMMA DOT TYPE_TOK LAR
 %token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL PERT INTRO DELETE DO SET UNTIL TRUE FALSE OBS KAPPA_RAR TRACK CPUTIME CONFIG REPEAT DIFF
 %token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INFINITY TIME EVENT NULL_EVENT PROD_EVENT INIT LET DIV PLOT SINUS COSINUS TAN SQRT EXPONENT POW ABS MODULO 
-%token <Tools.pos> EMAX TMAX FLUX ASSIGN ASSIGN2 TOKEN KAPPA_LNK PIPE KAPPA_LRAR PRINT CAT
+%token <Tools.pos> EMAX TMAX FLUX ASSIGN ASSIGN2 TOKEN KAPPA_LNK PIPE KAPPA_LRAR PRINT PRINTF CAT
 %token <int*Tools.pos> INT 
 %token <string*Tools.pos> ID LABEL KAPPA_MRK  
 %token <float*Tools.pos> FLOAT 
@@ -167,8 +167,13 @@ effect:
 		| (Some file,_) -> Ast.STOP ([Ast.Str_pexpr file],$1)
 		| (None, Some pexpr) -> Ast.STOP (pexpr,$1)
 		}
-| PRINT SMALLER print_expr GREATER {Ast.PRINT ([],$3,$1)}
-| PRINT SMALLER print_expr GREATER SMALLER print_expr GREATER {Ast.PRINT ($3,$6,$1)}
+| PRINT SMALLER print_expr GREATER {(Ast.PRINT ([],$3,$1))}
+| PRINTF string_or_pr_expr SMALLER print_expr GREATER 
+	{match $2 with
+		| (None,None) -> Ast.PRINT ([],$4,$1)
+		| (Some file,_) -> Ast.PRINT ([Ast.Str_pexpr file],$4,$1)
+		| (None, Some pexpr) -> Ast.PRINT (pexpr,$4,$1) 
+	}
 ;
 
 print_expr:
@@ -222,6 +227,12 @@ opt_string:
 | STRING {Some $1,None}
 | SMALLER print_expr GREATER {None, Some $2}
 ;
+
+string_or_pr_expr:
+| STRING {Some $1,None}
+| SMALLER print_expr GREATER {None, Some $2}
+;
+
 
 multiple:
 | INT {let int,pos=$1 in Ast.INT (int,pos) }

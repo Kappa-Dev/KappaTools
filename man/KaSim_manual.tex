@@ -661,10 +661,13 @@ where \textit{boolean\_expression} and \textit{effect\_list}\index{effect} are d
 	&& | \tcb{\$FLUX} \textit{opt\_filename} \textit{boolean} \\
     && | \tcb{\$TRACK \var{var\_name}} \textit{boolean} \\
     && | \tcb{\$UPDATE \var{var\_name}} \textit{algebraic\_expression} \\
-    && | \tcb{\$PRINT} \textit{opt\_filename} \tcb{<}\textit{print\_expression}\tcb{>} \\\\
-    \textit{print\_expression} &::=& \tcb{$\varepsilon$} | \tcb{"string" . } \textit{print\_expression} \\
-    && | \textit{algebraic\_expression}\tcb{ . } \textit{print\_expression} \\\\
-    \textit{opt\_filename} &::=& \tcb{"filename"} | \tcb{$\varepsilon$} \\\\
+    && | \tcb{\$PRINT} \tcb{<}\textit{string\_expression}\tcb{>} \\
+    && | \tcb{\$PRINTF} \textit{filename} \tcb{<}\textit{string\_expression}\tcb{>} \\
+    \\
+    \textit{filename} &::=& \tcb{<}\textit{string\_expression}\tcb{>} | \tcb{"filename"} \\
+    \textit{opt\_filename} &::=& \textit{filename} | \tcb{$\varepsilon$} \\\\
+	\textit{string\_expression} &::=& \tcb{$\varepsilon$} | \tcb{"string" . } \textit{string\_expression} \\
+    && | \textit{algebraic\_expression}\tcb{ . } \textit{string\_expression} \\\\
 	\textit{boolean} &::=& \tcb{[true]} | \tcb{[false]}
   \end{tabular}
   \label{tab:pert}
@@ -716,7 +719,7 @@ For instance, the declaration\index{declaration}:
 \item[] \%mod:  [E-]/[E]>0.9 do \$SNAPSHOT \textquotedbl prefix\textquotedbl
 }}
 
-will ask \KaSim~to export the mixture\index{mixture} the first time the percentage of null events reaches 90\%. The exported file will be named \ttt{prefix\_$n$.ka} where $n$ is the event number at which the snapshot was taken. Note that one may omit to define a prefix and simply type:
+will ask \KaSim~to export the mixture\index{mixture} the first time the percentage of null events reaches 90\%. The exported file will be named \ttt{prefix\_$n$.ka} where $n$ is the event number at which the snapshot was taken. One may also use a \textit{string\_expression} to construct any prefix using local variables. Note that one may omit to define a prefix and simply type:
 \ttt{\ITE{
 \item[] \%mod:  [E-]/[E]>0.9 do \$SNAPSHOT
 }}
@@ -808,13 +811,13 @@ The first line is a declaration of an $x$ variable that is initially set to 0. N
 The last line stops causality analysis whenever time is greater than 20 or when 10 new observables have been found (the difference between the current value of \ttt{\var{Cpp}} and $x$.
 
 \subsection{Printing values during a simulation}
-The effect \ttt{\$PRINT \textit{filename\_opt} <\textit{print\_expression}>} enables one to output values during a computation either to standard output, when \textit{filename\_opt} is empty or to a specific file. For instance:
+The effect \ttt{\$PRINT <\textit{string\_expression}>} enables one to output values during a computation to standard output, or to a specific file when using \ttt{\$PRINTF}. For instance:
  \ttt{\ITE{
 \item[] \%mod: repeat \textbackslash
-\item[] |A|<0 do \$PRINT "token.dat" <"Token A is: " . |A| . " at time=". [T]>\textbackslash 
+\item[] |A|<0 do \$PRINTF <"token\_".[E+].".dat" <"Token A is: " . |A| . " at time=". [T]>\textbackslash 
 \item [] until [false]
 }}
-will ask \KaSim~to output the value of token \ttt{A} in the file "token.dat", each time its value gets below 0.
+will ask \KaSim~to output the value of token \ttt{A} in a file "token\_$n$.dat" which changes at each new productive event, each time its value gets below 0.
 
 \section{Link type}
 
@@ -861,18 +864,18 @@ parameter & possible values & description \\
 \ttt{"displayCompression"} & any combination of \\
 &  \ttt{"none", "strong", "weak"} & \small type of compression \\
 \ttt{"cflowFileName"} & \ttt{"cflow.dot"}, any string & \small file name for causal flows\\ & \\
-\ttt{"showIntroEvents"} & \ttt{"false", "true"} & \small show introduction events in causal flows\\ & \\
+\ttt{"showIntroEvents"} & \ttt{"no", "yes"} & \small show introduction events in causal flows\\ & \\
 \textit{Pretty printing}&\\
 \ttt{"plotSepChar"} & \ttt{" "} or any character & \small separation character for plots\\
-\ttt{"dotSnapshots"} & \ttt{"false", "true"} & \small generate dot snapshots\\
-\ttt{"colorDot"} &  \ttt{"false", "true"} & \small use colors in dot format files\\
+\ttt{"dotSnapshots"} & \ttt{"no", "yes"} & \small generate dot snapshots\\
+\ttt{"colorDot"} &  \ttt{"no", "yes"} & \small use colors in dot format files\\
 \ttt{"progressBarSymbol"} & \ttt{"\#"} or any character & \small symbol for the progress bar\\
 \ttt{"progressBarSize"} & \ttt{"60"} or any integer & \small length of the progress bar\\ &&\\
 \textit{Simulation options} &\\
-\ttt{"dumpIfDeadlocked"} & \ttt{"false","true} & \small Snapshot when simulation \\&&\small is stalled\\
+\ttt{"dumpIfDeadlocked"} & \ttt{"no","yes"} & \small Snapshot when simulation \\&&\small is stalled\\
 \ttt{"maxConsecutiveClash"} & \ttt{"2"} or any integer & \small number of consecutive clashes \\ && \small before giving up \\ && \small square approximation\\
 \textit{Miscellaneous} &\\
-\ttt{"dumpInfluenceMap"} & \ttt{"false","true"} & \small Output the influence map \\ &&\small of the model\\
+\ttt{"dumpInfluenceMap"} & \ttt{"no","yes"} & \small Output the influence map \\ &&\small of the model\\
 \ttt{"influenceMapFileName"} & \ttt{"im.dot", any string} & \small file name for the influence map\\
 
 \end{tabular}
@@ -916,17 +919,6 @@ Such instruction will tell \KaSim~to remove from the flow computation events whi
 \item [] \%def: "displayCompression" "weak"  "none"
 }}
 in which case the headers of the compressed flows will contain the name of their uncompressed versions. Note that \emph{strong} compression, which compresses flows even further is not available yet.
-
-\section{Summary}
-We show below a KF containing most declarations introduced until now.
-
-\begin{figure}[htbp]
-\begin{center}
-\includegraphics[width=12cm]{img/kappaFile.pdf}
-\caption{Example of a complex Kappa File}
-\label{fig:KF}
-\end{center}
-\end{figure}
 
 \chapter{Frequently asked questions}
 \section*{Simulation hangs after a while}
