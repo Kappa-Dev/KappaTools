@@ -33,7 +33,7 @@ type rule = {
 	refines: int option ; (*mixture id that is refined by lhs*)
 	r_id : int ;
 	added : IntSet.t;
-	side_effect : bool ;
+	(*side_effect : bool ;*)
 	modif_sites : Int2Set.t IdMap.t ;  
 	pre_causal : int Id2Map.t ; (* INTERNAL_TESTED (8) | INTERNAL_MODIF (4) | LINK_TESTED (2) | LINK_MODIF (1) *)
 	is_pert : bool ;
@@ -201,7 +201,7 @@ let diff pos m0 m1 label_opt env =
 		in
 			IdMap.add id (Int2Set.add site_type set) map
 	in
-	let side_effect = ref false in
+	(*let side_effect = ref false in*)
 	let label = match label_opt with Some (_,pos) -> (string_of_pos pos) | None -> "" in
 	let compile_error pos msg = raise (ExceptionDefn.Semantics_Error (pos,msg)) in
 	let id_preserving ag1 ag2 = (*check whether ag2 can be the residual of ag1 for (same name)*)
@@ -230,7 +230,7 @@ let diff pos m0 m1 label_opt env =
 	and instructions = (*adding deletion instructions*)
 		List.fold_left
 			(fun inst id ->
-				side_effect := true ;
+				(*side_effect := true ;*)
 				(DEL id):: inst
 			)
 			[] deleted
@@ -366,7 +366,7 @@ let diff pos m0 m1 label_opt env =
 															let inst = (FREE (((KEPT id), site_id),false)):: inst
 															and idmap = add_map (KEPT id) (site_id,1) idmap
 															in
-															side_effect := true ;
+															(*side_effect := true ;*)
 															let _ =
 																warning
 																(Printf.sprintf
@@ -401,7 +401,7 @@ let diff pos m0 m1 label_opt env =
 																begin
 																	let inst = BND((KEPT id, site_id), (id'',i1')):: inst
 																	in
-																		side_effect := true ;
+																		(*side_effect := true ;*)
 																		(inst,idmap')
 																end
 															else (inst,idmap')
@@ -477,7 +477,7 @@ let diff pos m0 m1 label_opt env =
 												let inst = (FREE ((KEPT id, site_id),false))::inst
 												and idmap = add_map (KEPT id) (site_id,1) idmap
 												in
-												(side_effect := true ;
+												((*side_effect := true ;*)
 												(inst,idmap))
 										| (Node.WLD, Node.BND) ->  (*wildcard -> connected*)
 												let opt' = Mixture.follow (id, site_id) m1 in
@@ -502,7 +502,7 @@ let diff pos m0 m1 label_opt env =
 														if (id'< id) or (id'= id && i'< site_id) then
 															let inst = BND((KEPT id, site_id), (id'', i')):: inst
 															in
-															(side_effect:= true;
+															((*side_effect:= true;*)
 															(inst,idmap'))
 														else (inst,idmap')
 												end
@@ -525,7 +525,7 @@ let diff pos m0 m1 label_opt env =
 		in
 		compare (weight inst) (weight inst')
 	in
-	((List.fast_sort sort instructions),balance,added,modif_sites,!side_effect) 
+	((List.fast_sort sort instructions),balance,added,modif_sites (*,!side_effect*)) 
 	(*List.rev instructions, balance, added, modif_sites,!side_effect*)
 
 let rec superpose todo_list lhs rhs map already_done added codomain env =

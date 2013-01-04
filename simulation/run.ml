@@ -143,14 +143,14 @@ let event state (*grid*) story_profiling event_list counter plot env =
 					if !Parameter.debugModeOn then Debug.tag "Null (clash or doesn't satisfy constraints)"; 
 					Counter.inc_null_events counter ; 
 					Counter.inc_consecutive_null_events counter ; 
-					(env,state,IntSet.empty,story_profiling,event_list)
+					(env,state,pert_ids_time,story_profiling,event_list)
 				end
 			(**************END CFLOW PRODUCTION********************)
 				
 	in
 	
+	
 	(*Applying perturbation if any*)
-	(*Printf.printf "Applying %s perturbations \n" (Tools.string_of_set string_of_int IntSet.fold pert_ids) ;*)
 	let state,env,obs_from_perturbation,pert_events = 
 		External.try_perturbate state pert_ids counter env 
 	in

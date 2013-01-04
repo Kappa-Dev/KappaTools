@@ -532,7 +532,7 @@ let rule_of_ast ?(backwards=false) env (ast_rule_label, ast_rule) tolerate_new_s
 	in 
 	let lhs = match k_alt with None -> lhs | Some _ -> Mixture.set_unary lhs in
 	let rhs,env = mixture_of_ast ~tolerate_new_state:tolerate_new_state None true env ast_rule.rhs in
-	let (script, balance,added,modif_sites,side_effect) = Dynamics.diff ast_rule.rule_pos lhs rhs ast_rule_label.lbl_nme env
+	let (script, balance,added,modif_sites(*,side_effects*)) = Dynamics.diff ast_rule.rule_pos lhs rhs ast_rule_label.lbl_nme env
 	
 	and kappa_lhs = Mixture.to_kappa false lhs env
 	
@@ -682,7 +682,7 @@ let rule_of_ast ?(backwards=false) env (ast_rule_label, ast_rule) tolerate_new_s
 			Dynamics.rhs = rhs;
 			Dynamics.r_id = r_id;
 			Dynamics.added = List.fold_left (fun set i -> IntSet.add i set) IntSet.empty added ;
-			Dynamics.side_effect = side_effect ; 
+			(*Dynamics.side_effect = side_effect ; *)
 			Dynamics.modif_sites = modif_sites ;
 			Dynamics.is_pert = false ;
 			Dynamics.pre_causal = pre_causal ;
@@ -898,7 +898,7 @@ let pert_of_result variables env res =
 								let lhs = Mixture.empty (Some id)
 								and rhs = mix 
 								in
-								let (script,balance,added,modif_sites,side_effect) = Dynamics.diff pos lhs rhs (Some (str_pert,pos)) env
+								let (script,balance,added,modif_sites(*,side_effect*)) = Dynamics.diff pos lhs rhs (Some (str_pert,pos)) env
 								and kappa_lhs = ""
 								and kappa_rhs = Mixture.to_kappa false rhs env in
 								let r_id = Mixture.get_id lhs in
@@ -925,7 +925,7 @@ let pert_of_result variables env res =
 									Dynamics.rhs = rhs;
 									Dynamics.r_id = r_id;
 									Dynamics.added = List.fold_left (fun set i -> IntSet.add i set) IntSet.empty added ;
-									Dynamics.side_effect = side_effect ; 
+									(*Dynamics.side_effect = side_effect ; *)
 									Dynamics.modif_sites = modif_sites ;
 									Dynamics.is_pert = true ;
 									Dynamics.pre_causal = pre_causal ;
@@ -939,7 +939,7 @@ let pert_of_result variables env res =
 								let lhs = mix
 								and rhs = Mixture.empty None
 								in
-								let (script,balance,added,modif_sites,side_effect) = Dynamics.diff pos lhs rhs (Some (str_pert,pos)) env
+								let (script,balance,added,modif_sites(*,side_effect*)) = Dynamics.diff pos lhs rhs (Some (str_pert,pos)) env
 								and kappa_lhs = Mixture.to_kappa false lhs env
 								and kappa_rhs = "" in
 								let r_id = Mixture.get_id lhs in
@@ -966,7 +966,7 @@ let pert_of_result variables env res =
 									Dynamics.rhs = rhs;
 									Dynamics.r_id = r_id;
 									Dynamics.added = List.fold_left (fun set i -> IntSet.add i set) IntSet.empty added ;
-									Dynamics.side_effect = side_effect ; 
+									(*Dynamics.side_effect = side_effect ; *)
 									Dynamics.modif_sites = modif_sites ;
 									Dynamics.pre_causal = pre_causal ;
 									Dynamics.is_pert = true ;
