@@ -18,6 +18,15 @@ type atom =
 type attribute = atom list (*vertical sequence of atoms*)
 type grid = {flow: (int*int*int,attribute) Hashtbl.t}  (*(n_i,s_i,q_i) -> att_i with n_i: node_id, s_i: site_id, q_i: link (1) or internal state (0) *)
 type config = {events: atom IntMap.t ; prec_1: IntSet.t IntMap.t ; conflict : IntSet.t IntMap.t ; top : IntSet.t}
+type enriched_grid = 
+    { 
+      config:config;
+      ids:(int * int * int) list ;
+      depth:int;
+      prec_star: Mods.IntSet.t Mods.IntMap.t ;
+      depth_of_event: int Mods.IntMap.t ;
+      size:int;
+    }
 
 let empty_config = {events=IntMap.empty ; conflict = IntMap.empty ; prec_1 = IntMap.empty ; top = IntSet.empty}
 let is i c = (i land c = i)
@@ -238,46 +247,63 @@ let label env state e =
     | PERT p_id -> Environment.pert_of_num p_id env
     | RULE r_id -> Dynamics.to_kappa (State.rule_of_id r_id state) env
     | INIT agent -> "Intro "^(Environment.name agent env)
-      
-								
-let dot_of_grid profiling fic grid state env = 
+
+let ids_of_grid grid = Hashtbl.fold (fun key _ l -> key::l) grid.flow []
+let config_of_grid = cut 
+
+let prec_star_of_config config = 
+  let rec prec_closure config todo closure =
+    if IntSet.is_empty todo then closure
+    else
+      let eid = IntSet.choose todo in
+      let todo' = IntSet.remove eid todo in
+      let prec = try IntMap.find eid config.prec_1 with Not_found -> IntSet.empty
+      in
+      prec_closure config (IntSet.union todo' prec) (IntSet.union prec closure)
+  in
+  IntMap.fold 
+    (fun eid kind prec_star -> 
+      let set = prec_closure config (IntSet.singleton eid) IntSet.empty
+      in
+      IntMap.add eid set prec_star
+    ) config.events IntMap.empty 
+
+let depth_and_size_of_event config =
+  IntMap.fold 
+    (fun eid prec_eids (emap,size,depth) ->
+      let d = 
+	IntSet.fold 
+	  (fun eid' d ->
+	    let d' = try IntMap.find eid' emap with Not_found -> 0
+	    in
+	    max (d'+1) d
+	  ) prec_eids 0
+      in
+      IntMap.add eid d emap,size+1,d 
+    ) config.prec_1 (IntMap.empty,0,0)
+
+
+let enrich_grid grid = 
+  let ids = ids_of_grid grid  in 
+  let config = config_of_grid ids grid in 
+  let prec_star = prec_star_of_config config in
+  let depth_of_event,size,depth = depth_and_size_of_event config in  
+  { 
+    config = config ; 
+    ids = ids ;
+    size = size ; 
+    prec_star = prec_star ; 
+    depth = depth ; 
+    depth_of_event = depth_of_event 
+  }
+
+let dot_of_grid profiling fic enriched_grid state env = 
 	(*dump grid fic state env ; *)
 	let t = Sys.time () in 
-	let ids = Hashtbl.fold (fun key _ l -> key::l) grid.flow [] in
-	let config = cut ids grid in 
+        let config = enriched_grid.config in 
+        let prec_star = enriched_grid.prec_star in 
+        let depth_of_event = enriched_grid.depth_of_event in 
 	let label = label env state in 
-	let rec prec_closure config todo closure =
-		if IntSet.is_empty todo then closure
-		else
-			let eid = IntSet.choose todo in
-			let todo' = IntSet.remove eid todo in
-			let prec = try IntMap.find eid config.prec_1 with Not_found -> IntSet.empty
-			in
-			prec_closure config (IntSet.union todo' prec) (IntSet.union prec closure)
-	in
-	 
-	let prec_star = 
-	  IntMap.fold 
-		(fun eid kind prec_star -> 
-	     let set = prec_closure config (IntSet.singleton eid) IntSet.empty
-	     in
-	       IntMap.add eid set prec_star
-		) config.events IntMap.empty 
-	in
-	let depth_of_event =
-		IntMap.fold 
-		(fun eid prec_eids emap ->
-			let d = 
-				IntSet.fold 
-				(fun eid' d ->
-					let d' = try IntMap.find eid' emap with Not_found -> 0
-					in
-					max (d'+1) d
-				) prec_eids 0
-			in
-			IntMap.add eid d emap 
-		) config.prec_1 IntMap.empty
-	in
 	let sorted_events = 
 		IntMap.fold 
 		(fun eid d dmap ->
@@ -356,9 +382,12 @@ let pretty_print compression_type label story_list state env =
     else 
       Debug.tag (Printf.sprintf "\n+ Pretty printing %d %scompressed flow%s" n label (if n>1 then "s" else ""))
   in
+  let story_list = 
+    List.map (fun (x,y) -> enrich_grid x,y) story_list 
+  in 
   let _ =
     List.fold_left 
-      (fun cpt (grid,stories) -> 
+      (fun cpt (enriched_config,stories) -> 
 	let av_t,ids,n =
 	  List.fold_left 
 	    (fun (av_t,ids,n) info_opt -> 
@@ -375,9 +404,34 @@ let pretty_print compression_type label story_list state env =
 	  )
 	in
 	let fic = (Filename.chop_extension (!(Parameter.cflowFileName)))^compression_type^"_"^(string_of_int cpt)^".dot" in
-	dot_of_grid profiling fic grid state env ;
+	dot_of_grid profiling fic enriched_config state env ;
 	cpt+1
       ) 0 story_list
   in
+  let fic = (Filename.chop_extension (!(Parameter.cflowFileName)))^compression_type^"Summary.dat" in 
+  let desc = open_out fic in 
+  let _ = fprintf desc "#id\tE\tT\t\tdepth\tsize\t\n" in 
+  let _ = 
+    List.fold_left 
+      (fun cpt (enriched_config,story) -> 
+        let depth = enriched_config.depth in 
+        let size = enriched_config.size in 
+        let _ = 
+          List.iter 
+            (fun story -> 
+              match story 
+              with 
+                | None -> invalid_arg "Causal.pretty_print"
+                | Some info -> 
+                  let time = info.story_time in 
+                  let event = info.story_event in 
+                  fprintf desc "%i\t%i\t%E\t%i\t%i\t\n" cpt event time depth size
+            )
+            story 
+        in 
+        cpt+1)
+      0 story_list 
+  in 
+  let _ = close_out desc in 
   ()
 	  
