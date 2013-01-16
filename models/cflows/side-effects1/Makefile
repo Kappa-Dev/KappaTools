@@ -8,12 +8,14 @@ SCRIPT=script
 ERROR=error 
 ERROR_TMP=error_tmp 
 
+EXPECTED_DAT= $(wildcard expected-output/*.dat)
 EXPECTED_DOT= $(wildcard expected-output/*.dot) 
+TESTED_DAT= $(wildcard tmp/*.dat)
 TESTED_DOT= $(wildcard tmp/*.dot) 
 TESTED_REF= $(wildcard tmp/*.ref)
-DIFF=$(TESTED_DOT:.dot=.diff) 
-CHECK=$(TESTED_DOT:.dot=.error) $(TESTED_REF:.ref=.error)
-EXP=$(EXPECTED_DOT:.dot=.ref)
+DIFF=$(TESTED_DOT:.dot=.dot.diff) $(TESTED_DAT:.dat=.dat.diff)
+CHECK=$(TESTED_DOT:.dot=.dot.error) $(TESTED_REF:.ref=.error) $(TESTED_DAT:.dat=.dat.error)
+EXP=$(EXPECTED_DOT:.dot=.dot.ref) $(EXPECTED_DAT:.dat=.dat.ref)
 
 all: test
 
@@ -48,13 +50,13 @@ do_copy: $(EXP)
 do_diff: $(CHECK)
 
 
-$(EXPECTED_OUTPUT_PATH)/%.ref: $(EXPECTED_OUTPUT_PATH)/%.dot
+$(EXPECTED_OUTPUT_PATH)/%.ref: $(EXPECTED_OUTPUT_PATH)/%
 	@sed '/generation/d' $< > $@ 
 	@cp $@ $(TMP)/
 	@rm $@
 
 %.ref: 
-	@if (test -s $(EXPECTED_OUTPUT_PATH)/$*.dot) then (sed '\generation\d' $(EXPECTED_OUTPUT_PATH)/$*.dot $@) else (touch $@) fi;                                    
+	@if (test -s $(EXPECTED_OUTPUT_PATH)/$*) then (sed '\generation\d' $(EXPECTED_OUTPUT_PATH)/$*.dot $@) else (touch $@) fi;                                    
 
 %.dot: 
 	@touch $@
@@ -62,13 +64,13 @@ $(EXPECTED_OUTPUT_PATH)/%.ref: $(EXPECTED_OUTPUT_PATH)/%.dot
 %.diff:  %.ref %.new
 	@diff $^  > $@ || exit 0 
 
-%.new: %.dot
+%.new: %
 	@sed '/generation/d' $< > $@
 
 %.error_tmp: %.diff 
 	@if (test -s $*.diff) then (echo $*.dot has changed > $@ ; cat $*.diff >> $@ ; echo >> $@) else (touch $@) fi; 
-	@if (test -s $*.new) then (exit 0) else (echo $*.dot has disappeared > $@ ; echo >> $@) fi; 
-	@if (test -s $*.ref) then (exit 0) else (echo $*.dot is new > $@ ; echo >> $@) fi;
+	@if (test -s $*.new) then (exit 0) else (echo $* has disappeared > $@ ; echo >> $@) fi; 
+	@if (test -s $*.ref) then (exit 0) else (echo $* is new > $@ ; echo >> $@) fi;
 
 %.error: %.error_tmp
 	@if (test -s $<) then (cp $< $@) else touch $@ ; fi 
