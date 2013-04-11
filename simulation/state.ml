@@ -1411,8 +1411,12 @@ let snapshot state counter desc hr env =
 			) table ;
 			Array.iteri
 			(fun tk_id v ->
-				let tk = Environment.token_of_num tk_id env in
-				Printf.fprintf desc "%%init: %s <- %E \n" tk v ;
+				if v = 0. then ()
+				else
+					begin
+						let tk = Environment.token_of_num tk_id env in
+						Printf.fprintf desc "%%init: %s <- %E \n" tk v
+					end
 			) state.token_vector ;
 			Printf.fprintf desc "# End snapshot\n"
 			end

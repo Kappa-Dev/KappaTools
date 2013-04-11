@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "3.2-040113"
+let version = "3.2-110413"
 
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
@@ -70,7 +70,6 @@ let main =
 			List.iter (fun fic -> let _ = KappaLexer.compile fic in ()) !Parameter.inputKappaFileNames ;
 			!Ast.result
 		in
-						
 		let (_: unit) =
 			match !Parameter.seedValue with
 			| Some seed -> Random.init seed
