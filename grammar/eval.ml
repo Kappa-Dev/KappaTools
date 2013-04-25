@@ -1053,7 +1053,13 @@ let pert_of_result variables env res =
 			)
 			(variables, [], [], env) res.perturbations
 		in 
-		(variables, (List.rev lpert), (List.rev lrules), env)
+		(*making sure that perturbations containing a stopping time precondition are tested first*)
+		let lpert = List.rev lpert in
+		let pred = (fun p -> match p.Dynamics.stopping_time with None -> false | Some _ -> true) in
+		let lpert_stopping_time = List.filter pred lpert in
+		let lpert_ineq = List.filter (fun p -> not (pred p)) lpert in
+		let lpert = lpert_stopping_time@lpert_ineq in
+		(variables, lpert, (List.rev lrules), env)
 
 let init_graph_of_result env res =
 	let n = env.Environment.fresh_token in 
