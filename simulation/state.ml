@@ -841,14 +841,13 @@ let wake_up state modif_type modifs wake_up_map env =
 				)
 		)	modifs wake_up_map
 
-(*Note: update_dep is recursive but the first call should always be with dep_in = (KAPPA mix_id) or EVENT or TIME*)
 let update_dep state cause dep_in pert_ids counter env =
 	let rec iter env dep_to_check pert_ids =
 		if DepSet.is_empty dep_to_check then (env,pert_ids) 
 		else
   		let dep_in = DepSet.choose dep_to_check in 
   		match dep_in with
-  			| Mods.TOK t_id -> (*token counter is changed*)
+  			| Mods.TOK t_id -> (*token counter is changed *)
   				let depset = 
   					Environment.get_dependencies (Mods.TOK t_id) env
   				in
@@ -858,7 +857,7 @@ let update_dep state cause dep_in pert_ids counter env =
   						(Printf.sprintf "Token %d is changed, updating %s" t_id (string_of_set Mods.string_of_dep DepSet.fold depset)) 
   				end;
   				iter env (DepSet.union (DepSet.remove dep_in dep_to_check) depset) pert_ids
-  			| Mods.ALG v_id -> (*variable v_id is changed*)
+  			| Mods.ALG v_id -> (*variable v_id is changed -by a perturbation if used as initial dep_in argument*)
   				let depset =
   					Environment.get_dependencies (Mods.ALG v_id) env
   				in
@@ -868,7 +867,7 @@ let update_dep state cause dep_in pert_ids counter env =
   						(Printf.sprintf "Variable %d is changed, updating %s" v_id (string_of_set Mods.string_of_dep DepSet.fold depset)) 
   				end;
   				iter env (DepSet.union (DepSet.remove dep_in dep_to_check) depset) pert_ids
-  			| Mods.RULE r_id ->
+  			| Mods.RULE r_id -> (*rule activity is changed -by a perturbation if used as initial dep_in argument*)
   				(update_activity state cause r_id counter env; 
   				let depset = Environment.get_dependencies (Mods.RULE r_id) env
   				in

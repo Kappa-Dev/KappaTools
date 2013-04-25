@@ -46,11 +46,25 @@ let event state (*grid*) story_profiling event_list counter plot env =
 	
 	State.dump state counter env ;
 	
+	(*Applying time dependant perturbation if any*)
+	let state,env,obs_from_perturbation,pert_events,stopping_time = 
+		External.try_perturbate [] state pert_ids_time counter env 
+	in
+	
+	let restart = 
+		match stopping_time with 
+			| Some t -> (Counter.stat_null 5 counter ; true)
+			| None -> false
+	in
+		
 	(*2. Draw rule*)
 	if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Drawing a rule... (activity=%f) " (Random_tree.total state.State.activity_tree));
 	(*let t_draw = Profiling.start_chrono () in*)
-	let opt_instance,state = try State.draw_rule state counter env with 
-		| Null_event i -> (Counter.stat_null i counter ; (None,state))
+	let opt_instance,state = 
+		if restart then (None,state)
+		else
+			try State.draw_rule state counter env with 
+				| Null_event i -> (Counter.stat_null i counter ; (None,state))
 	in			
 	
 	(*3. Apply rule & negative update*)
@@ -61,7 +75,10 @@ let event state (*grid*) story_profiling event_list counter plot env =
 				(**********************************************)
 				if !Parameter.debugModeOn then 
 				begin
-					let version,embedding = match embedding_t with State.DISJOINT emb -> ("binary",emb.State.map) | State.CONNEX emb -> ("unary",emb.State.map) | State.AMBIGUOUS emb -> ("ambig.",emb.State.map)
+					let version,embedding = match embedding_t with 
+						| State.DISJOINT emb -> ("binary",emb.State.map) 
+						| State.CONNEX emb -> ("unary",emb.State.map) 
+						| State.AMBIGUOUS emb -> ("ambig.",emb.State.map)
 					in 
 					Debug.tag
 					(Printf.sprintf "Applying %s version of '%s' with embedding:" version 
@@ -151,11 +168,11 @@ let event state (*grid*) story_profiling event_list counter plot env =
 	
 	
 	(*Applying perturbation if any*)
-	let state,env,obs_from_perturbation,pert_events = 
-		External.try_perturbate state pert_ids counter env 
+	let state,env,obs_from_perturbation,pert_events,_ = 
+		External.try_perturbate obs_from_perturbation state pert_ids counter env 
 	in
 	
-	(*Adding perturbation event if any*)
+	(*Adding perturbation event to story -if any*)
 	let story_profiling,event_list,cpt = 
 		if Environment.tracking_enabled env then (*if logging events is required*) 
 		begin
@@ -167,18 +184,18 @@ let event state (*grid*) story_profiling event_list counter plot env =
 						Compression_main.D.S.PH.B.PB.CI.Po.K.store_event story_prof
 						(Compression_main.D.S.PH.B.PB.CI.Po.K.import_event 
 						((r,phi,psi),(obs_from_perturbation,r,cpt+1,side_effects))) event_list (*we are adding several events with the same id in the grid!*)
-					in
-					(sp,el,cpt+1)
-				) (story_profiling,event_list,Counter.event counter) pert_events
-		  in 
-	    (story_profiling,event_list,cpt) 
-	  end
-	  else
-			(story_profiling,event_list,Counter.event counter)
-	in 
-	counter.Counter.perturbation_events <- cpt ;
-	(state,story_profiling,event_list,env)
-					
+						in
+						(sp,el,cpt+1)
+					) (story_profiling,event_list,Counter.event counter) pert_events
+			  in 
+		    (story_profiling,event_list,cpt) 
+		  end
+		  else
+				(story_profiling,event_list,Counter.event counter)
+		in 
+		counter.Counter.perturbation_events <- cpt ;
+		(state,story_profiling,event_list,env)
+ 						
 let loop state grid story_profiling event_list counter plot env =
 	(*Before entering the loop*)
 	
@@ -188,7 +205,7 @@ let loop state grid story_profiling event_list counter plot env =
 	(*Checking whether some perturbation should be applied before starting the event loop*)
 	let env,pert_ids = State.update_dep state (-1) Mods.EVENT IntSet.empty counter env in
 	let env,pert_ids = State.update_dep state (-1) Mods.TIME pert_ids counter env in
-	let state,env,_,_ = External.try_perturbate state pert_ids counter env 
+	let state,env,_,_,_ = External.try_perturbate [] state pert_ids counter env 
 	in
 	
 	let rec iter state story_profiling event_list counter plot env =
@@ -227,3 +244,4 @@ let loop state grid story_profiling event_list counter plot env =
 		  end
 	in
 	iter state story_profiling event_list counter plot env
+	

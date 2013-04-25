@@ -3,7 +3,7 @@ open Mods
 open State
 open Random_tree
 
-let version = "3.2-110413"
+let version = "3.3-240413"
 
 let usage_msg = "KaSim "^version^": \n"^"Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
@@ -154,7 +154,8 @@ let main =
 					| 2 -> (Printf.printf "\tClashing instance: %f\n" ((float_of_int n) /. (float_of_int (Counter.null_event counter))))
 					| 3 -> (Printf.printf "\tLazy negative update: %f\n" ((float_of_int n) /. (float_of_int (Counter.null_event counter))))
 					| 4 -> (Printf.printf "\tLazy negative update of non local instances: %f\n" ((float_of_int n) /. (float_of_int (Counter.null_event counter))))
-					| _ -> print_string "\tna\n"
+					| 5 -> (Printf.printf "\tPerturbation interrupting time advance: %f\n" ((float_of_int n) /. (float_of_int (Counter.null_event counter))))
+					|	_ -> print_string "\tna\n"
 			) counter.Counter.stat_null ;
 			if !Parameter.fluxModeOn then 
 				begin

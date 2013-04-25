@@ -419,26 +419,45 @@ let rec partial_eval_alg env ast =
 
 let rec partial_eval_bool env ast =
 	let bin_op_bool ast ast' pos op op_str =
-		let (f1, const1, dep1, lbl1) = partial_eval_bool env ast
+		let (f1, const1, dep1, lbl1, _) = partial_eval_bool env ast
 		
-		and (f2, const2, dep2, lbl2) = partial_eval_bool env ast' in
+		and (f2, const2, dep2, lbl2, _) = partial_eval_bool env ast' in
 		let part_eval inst values t e e_null cpu_t tk =
 			let b1 = f1 inst values t e e_null cpu_t tk and b2 = f2 inst values t e e_null cpu_t tk in op b1 b2 in
 		let lbl = Printf.sprintf "(%s %s %s)" lbl1 op_str lbl2
-		in (part_eval, (const1 && const2), (DepSet.union dep1 dep2), lbl)
+		in (part_eval, (const1 && const2), (DepSet.union dep1 dep2), lbl, None)
 	
 	and bin_op_alg ast ast' pos op op_str =
 		let (f1, const1, _, dep1, lbl1) = partial_eval_alg env ast
-		
-	and (f2, const2, _, dep2, lbl2) = partial_eval_alg env ast' in
+		and (f2, const2, opt_v2, dep2, lbl2) = partial_eval_alg env ast' 
+		in
+		let stopping_time =
+				match op_str with
+				| "=" -> 
+					if DepSet.mem Mods.TIME dep1 then 
+						begin
+							match (lbl1,const2, opt_v2) with
+								| ("t",true, Some num) -> (Some num) 
+								| (_,_,_) -> Some (Mods.Num.I (-1))
+						end
+					else None
+				| _ -> None
+		in 
 		let part_eval inst values t e e_null cpu_t tk =
-			let v1 = f1 inst values t e e_null cpu_t tk and v2 = f2 inst values t e e_null cpu_t tk in op v1 v2 in
+			let v1 = f1 inst values t e e_null cpu_t tk 
+			and v2 = f2 inst values t e e_null cpu_t tk 
+			in
+			(*checking whether boolean expression has a time dependency and is of the form [T]=n*)
+			op v1 v2 
+		in
+		(match stopping_time with Some (Mods.Num.I (-1)) -> raise ExceptionDefn.Unsatisfiable | _ -> () ;
 		let lbl = Printf.sprintf "(%s%s%s)" lbl1 op_str lbl2
-		in (part_eval, (const1 && const2), (DepSet.union dep1 dep2), lbl)
+		in 
+		(part_eval, (const1 && const2), (DepSet.union dep1 dep2), lbl, stopping_time))
 	in
 	match ast with
-		| TRUE pos -> ((fun _ _ _ _ _ _ _-> true), true, DepSet.singleton Mods.EVENT, "true")
-		| FALSE pos -> ((fun _ _ _ _ _ _ _-> false), true, DepSet.empty, "false")	
+		| TRUE pos -> ((fun _ _ _ _ _ _ _-> true), true, DepSet.singleton Mods.EVENT, "true",None)
+		| FALSE pos -> ((fun _ _ _ _ _ _ _-> false), true, DepSet.empty, "false",None)	
 		| AND (ast, ast', pos) ->
 				bin_op_bool ast ast' pos (fun b b' -> b && b') "and"
 		| OR (ast, ast', pos) ->
@@ -866,8 +885,15 @@ let pert_of_result variables env res =
 	let (variables, lpert, lrules, env) =
 		List.fold_left
 			(fun (variables, lpert, lrules, env) (bool_expr, modif_expr_list, pos, opt_post) ->				
-				let (x, is_constant, dep, str_pre) = partial_eval_bool env bool_expr
-				and (variables, effects, str_eff, env) =	effects_of_modif variables env modif_expr_list 
+				let (x, is_constant, dep, str_pre, stopping_time) = 
+					(try partial_eval_bool env bool_expr with 
+						ExceptionDefn.Unsatisfiable -> 
+							raise 
+							(ExceptionDefn.Semantics_Error 
+							(pos,"Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"))
+					)
+				in 
+				let (variables, effects, str_eff, env) =	effects_of_modif variables env modif_expr_list 
 				in
 				let str_eff = String.concat ";" (List.rev str_eff) in
 				let bv =
@@ -878,7 +904,13 @@ let pert_of_result variables env res =
 					match opt_post with
 					| None -> (Printf.sprintf "whenever %s, %s" str_pre str_eff,None)
 					| Some bool_expr -> 
-						let (x, is_constant, dep, str_abort) = partial_eval_bool env bool_expr in
+						let (x, is_constant, dep, str_abort, stopping_time) = 
+							try partial_eval_bool env bool_expr with
+								ExceptionDefn.Unsatisfiable -> 
+									raise 
+									(ExceptionDefn.Semantics_Error 
+									(pos,"Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"))
+						in
 						let bv = 
 							if is_constant then Dynamics.BCONST (close_var x)
 							else Dynamics.BVAR x 
@@ -1012,6 +1044,7 @@ let pert_of_result variables env res =
 						Dynamics.effect = effect_list;
 						Dynamics.abort = opt;
 						Dynamics.flag = str_pert;
+						Dynamics.stopping_time = stopping_time
 					}
 				in
 				let lrules = List.fold_left (fun cont (r_opt,_) -> match r_opt with None -> cont | Some r -> r::cont) lrules effect_list 
