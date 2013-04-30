@@ -316,7 +316,7 @@ let apply_effect p_id pert tracked pert_events state counter env =
 	(env, state, pert_ids,tracked,pert_events)
 					
 
-let try_perturbate tracked state pert_ids counter env = 
+let try_perturbate tracked state pert_ids pert_events counter env = 
 	
 	let rec iter state pert_ids tracked pert_events env = 
 		let state,env,pert_ids',tracked,pert_events,stopping_time = 
@@ -374,4 +374,4 @@ let try_perturbate tracked state pert_ids counter env =
 			else
 				iter state pert_ids' tracked pert_events env (*Chance of looping perturbation if user was not careful*)
   in
-	iter state pert_ids tracked [] env 
+	iter state pert_ids tracked pert_events env 

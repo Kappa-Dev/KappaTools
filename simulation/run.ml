@@ -48,7 +48,7 @@ let event state (*grid*) story_profiling event_list counter plot env =
 	
 	(*Applying time dependant perturbation if any*)
 	let state,env,obs_from_perturbation,pert_events,stopping_time = 
-		External.try_perturbate [] state pert_ids_time counter env 
+		External.try_perturbate [] state pert_ids_time [] counter env 
 	in
 	
 	let restart = 
@@ -169,7 +169,7 @@ let event state (*grid*) story_profiling event_list counter plot env =
 	
 	(*Applying perturbation if any*)
 	let state,env,obs_from_perturbation,pert_events,_ = 
-		External.try_perturbate obs_from_perturbation state pert_ids counter env 
+		External.try_perturbate obs_from_perturbation state pert_ids pert_events counter env 
 	in
 	
 	(*Adding perturbation event to story -if any*)
@@ -205,7 +205,7 @@ let loop state grid story_profiling event_list counter plot env =
 	(*Checking whether some perturbation should be applied before starting the event loop*)
 	let env,pert_ids = State.update_dep state (-1) Mods.EVENT IntSet.empty counter env in
 	let env,pert_ids = State.update_dep state (-1) Mods.TIME pert_ids counter env in
-	let state,env,_,_,_ = External.try_perturbate [] state pert_ids counter env 
+	let state,env,_,_,_ = External.try_perturbate [] state pert_ids [] counter env 
 	in
 	
 	let rec iter state story_profiling event_list counter plot env =
