@@ -143,7 +143,7 @@ let main =
 		ExceptionDefn.flush_warning () ; 
 		Parameter.initSimTime () ; 
 		try
-			Run.loop state grid profiling event_list counter plot env ;
+			Run.loop state profiling event_list counter plot env ;
 			print_newline() ;
 			Printf.printf "Simulation ended (eff.: %f, detail below)\n" 
 			((float_of_int (Counter.event counter)) /. (float_of_int (Counter.null_event counter + Counter.event counter))) ;

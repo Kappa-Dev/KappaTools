@@ -196,7 +196,7 @@ let event state (*grid*) story_profiling event_list counter plot env =
 		counter.Counter.perturbation_events <- cpt ;
 		(state,story_profiling,event_list,env)
  						
-let loop state grid story_profiling event_list counter plot env =
+let loop state story_profiling event_list counter plot env =
 	(*Before entering the loop*)
 	
 	Counter.tick counter counter.Counter.time counter.Counter.events ;

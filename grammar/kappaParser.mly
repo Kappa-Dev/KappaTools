@@ -2,10 +2,10 @@
 %}
 
 %token EOF NEWLINE SEMICOLON
-%token AT OP_PAR CL_PAR COMMA DOT TYPE_TOK LAR
+%token AT OP_PAR CL_PAR COMMA DOT TYPE_TOK LAR OP_CUR CL_CUR 
 %token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL PERT INTRO DELETE DO SET UNTIL TRUE FALSE OBS KAPPA_RAR TRACK CPUTIME CONFIG REPEAT DIFF
 %token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INFINITY TIME EVENT NULL_EVENT PROD_EVENT INIT LET DIV PLOT SINUS COSINUS TAN SQRT EXPONENT POW ABS MODULO 
-%token <Tools.pos> EMAX TMAX FLUX ASSIGN ASSIGN2 TOKEN KAPPA_LNK PIPE KAPPA_LRAR PRINT PRINTF CAT
+%token <Tools.pos> EMAX TMAX FLUX ASSIGN ASSIGN2 TOKEN KAPPA_LNK PIPE KAPPA_LRAR PRINT PRINTF CAT VOLUME
 %token <int*Tools.pos> INT 
 %token <string*Tools.pos> ID LABEL KAPPA_MRK  
 %token <float*Tools.pos> FLOAT 
@@ -51,22 +51,24 @@ start_rule:
 						(Ast.result:={!Ast.result with 
 						Ast.tokens=(str,pos)::!Ast.result.Ast.tokens}
 						)
-				| Ast.INIT init_t -> (Ast.result := {!Ast.result with Ast.init=init_t::!Ast.result.Ast.init})
+				| Ast.VOLSIG (vol_type,vol,vol_param) -> 
+					(Ast.result := {!Ast.result with Ast.volumes=(vol_type,vol,vol_param)::!Ast.result.Ast.volumes})
+				| Ast.INIT (opt_vol,init_t,pos) -> (Ast.result := {!Ast.result with Ast.init=(opt_vol,init_t,pos)::!Ast.result.Ast.init})
 				| Ast.DECLARE var ->
 					(Ast.result := {!Ast.result with Ast.variables = var::!Ast.result.Ast.variables})
 				| Ast.OBS var -> (*for backward compatibility, shortcut for %var + %plot*)
 					let expr =
 						match var with
-							| Ast.VAR_KAPPA (_,(label, pos)) -> Ast.OBS_VAR (label,pos)  
-							| Ast.VAR_ALG (_,(label, pos)) -> Ast.OBS_VAR (label, pos)
+							| Ast.VAR_KAPPA (_,lab) -> Ast.OBS_VAR lab 
+							| Ast.VAR_ALG (_,lab) -> Ast.OBS_VAR lab
 					in					 
 					(Ast.result := {!Ast.result with Ast.variables = var::!Ast.result.Ast.variables ; Ast.observables = expr::!Ast.result.Ast.observables})
 				| Ast.PLOT expr ->
 					(Ast.result := {!Ast.result with Ast.observables = expr::!Ast.result.Ast.observables})
 				| Ast.PERT (pre,effect,pos,opt) ->
 					(Ast.result := {!Ast.result with Ast.perturbations = (pre,effect,pos,opt)::!Ast.result.Ast.perturbations})
-				| Ast.CONFIG (param_name,pos_p,value_list) ->
-					(Ast.result := {!Ast.result with Ast.configurations = (param_name,pos_p,value_list)::!Ast.result.Ast.configurations})
+				| Ast.CONFIG (param_name,value_list) ->
+					(Ast.result := {!Ast.result with Ast.configurations = (param_name,value_list)::!Ast.result.Ast.configurations})
 		end ; $2 
 	}
 | error 
@@ -78,13 +80,16 @@ instruction:
 	{Ast.SIG ($2,$1)}
 | TOKEN ID
 	{let str,pos = $2 in Ast.TOKENSIG (str,pos)}
+| VOLUME ID volume_param 
+	{let vol,param = $3 in Ast.VOLSIG ($2,vol,param)}
 | SIGNATURE error
 	{raise (ExceptionDefn.Syntax_Error (Some $1,"Malformed agent signature, I was expecting something of the form '%agent: A(x,y~u~v,z)'"))}
-| INIT multiple non_empty_mixture 
-	{Ast.INIT (Ast.INIT_MIX ($2,$3,$1))}
-| INIT ID LAR multiple {let str,_ = $2 in Ast.INIT (Ast.INIT_TOK ($4,str,$1))}
+	
+| INIT init_declaration 
+	{let (opt_vol,init) = $2 in Ast.INIT (opt_vol,init,$1)}
 | INIT error
  {let pos = $1 in raise (ExceptionDefn.Syntax_Error (Some pos,"Malformed initial condition"))}
+
 | LET variable_declaration 
 	{Ast.DECLARE $2}
 | OBS variable_declaration
@@ -105,11 +110,29 @@ instruction:
 	 then (ExceptionDefn.warning ~with_pos:$1 "Perturbation need not be applied repeatedly") ;
 	Ast.PERT (bool_expr,mod_expr_list,pos,Some $5)}
 | CONFIG STRING value_list 
-	{let param_name,pos_p = $2 and value_list = $3 in Ast.CONFIG (param_name,pos_p,value_list)} 
+	{Ast.CONFIG ($2,$3)} 
 | PERT bool_expr DO effect_list UNTIL bool_expr /*for backward compatibility*/
 	{ExceptionDefn.warning ~with_pos:$1 "Deprecated perturbation syntax: use the 'repeat ... until' construction" ; 
 	Ast.PERT ($2,$4,$1,Some $6)}
 ;
+
+init_declaration:
+| multiple non_empty_mixture 
+	{(None,Ast.INIT_MIX ($1,$2))}
+| ID LAR multiple {(None,Ast.INIT_TOK ($3,$1))}
+| ID OP_CUR init_declaration CL_CUR {let _,init = $3 in (Some $1,init)}
+;
+
+volume_param:
+| OP_CUR FLOAT CL_CUR opt_param {let f,_ = $2 in (f,$4)}
+| OP_CUR INT CL_CUR opt_param {let n,_ = $2 in (float_of_int n,$4)}
+;
+
+opt_param:
+| /*empty*/ {("passive",Tools.no_pos)}
+| ID {$1}
+
+
 
 value_list: 
 | STRING 
@@ -133,11 +156,11 @@ effect_list:
 effect:
 | LABEL ASSIGN alg_expr /*updating the rate of a rule -backward compatibility*/
 	{let _ = ExceptionDefn.warning ~with_pos:$2 "Deprecated syntax, use $UPDATE perturbation instead of the ':=' assignment (see Manual)" in 
-	let lab,pos_lab = $1 in Ast.UPDATE (lab,pos_lab,$3,$2)}
+	 Ast.UPDATE ($1,$3)}
 | ASSIGN2 LABEL alg_expr /*updating the rate of a rule*/
-	{let lab,pos_lab = $2 in Ast.UPDATE (lab,pos_lab,$3,$1)}
+	{Ast.UPDATE ($2,$3)}
 | TRACK LABEL boolean 
-	{let ast = if $3 then (fun x -> Ast.CFLOW x) else (fun x -> Ast.CFLOWOFF x) in let lab,pos_lab = $2 in ast (lab,pos_lab,$1)}
+	{let ast = if $3 then (fun x -> Ast.CFLOW x) else (fun x -> Ast.CFLOWOFF x) in ast ($2,$1)}
 | FLUX opt_string boolean 
 	{let ast = if $3 then (fun (x,y) -> Ast.FLUX (x,y)) else (fun (x,y) -> Ast.FLUXOFF (x,y)) in 
 	match $2 with
@@ -154,7 +177,7 @@ effect:
 | DELETE error
 	{raise (ExceptionDefn.Syntax_Error (Some $1,"Malformed perturbation instruction, I was expecting '$DEL alg_expression kappa_expression'"))}
 | ID LAR alg_expr /*updating the value of a token*/
-	{let lab,pos_lab = $1 in Ast.UPDATE_TOK (lab,pos_lab,$3,pos_lab)}
+	{Ast.UPDATE_TOK ($1,$3)}
 | SNAPSHOT opt_string
 	{match $2 with
 		| (None,None) -> Ast.SNAPSHOT ([],$1)

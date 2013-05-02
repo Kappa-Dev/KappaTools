@@ -800,7 +800,7 @@ let effects_of_modif variables env ast_list =
 							let str =
 								(Printf.sprintf "remove %s * %s" str (Mixture.to_kappa false m env))::str_pert
 							in ((m :: variables), (Dynamics.DELETE (v, m))::effects, str, env)
-					| UPDATE (nme, pos_rule, alg_expr, pos_pert) ->
+					| UPDATE ((nme, pos_rule), alg_expr) ->
 							let i,is_rule =
 								(try (Environment.num_of_rule nme env,true)
 								with
@@ -824,7 +824,7 @@ let effects_of_modif variables env ast_list =
 							in 
 							if is_rule then (variables, (Dynamics.UPDATE_RULE (i, v))::effects, str, env)
 							else (variables, (Dynamics.UPDATE_VAR (i, v))::effects, str, env)
-					| UPDATE_TOK (tk_nme,tk_pos,alg_expr,instr_pos) ->
+					| UPDATE_TOK ((tk_nme,tk_pos),alg_expr) ->
 						let tk_id = 
 							try Environment.num_of_token tk_nme env with 
 								| Not_found -> raise (ExceptionDefn.Semantics_Error (tk_pos,"Token " ^ (tk_nme ^ " is not defined")))
@@ -844,13 +844,13 @@ let effects_of_modif variables env ast_list =
 					| STOP (pexpr,pos) ->
 						let str = "interrupt simulation"::str_pert in
 						(variables, (Dynamics.STOP pexpr)::effects, str, env)
-					| CFLOW (lab,pos_lab,pos_pert) ->
+					| CFLOW ((lab,pos_lab),pos_pert) ->
 						let id = try Environment.num_of_rule lab env with Not_found -> try Environment.num_of_kappa lab env with Not_found ->
 							raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
 						in
 						let str = (Printf.sprintf "Enable causality analysis for observable '%s'" lab)::str_pert in
 						(variables, (Dynamics.CFLOW id)::effects, str, env)
-					| CFLOWOFF (lab,pos_lab,pos_pert) ->
+					| CFLOWOFF ((lab,pos_lab),pos_pert) ->
 						let id = try Environment.num_of_rule lab env with Not_found -> try Environment.num_of_kappa lab env with Not_found ->
 							raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
 						in
@@ -1066,9 +1066,9 @@ let init_graph_of_result env res =
 	let token_vector = Array.init n (fun i -> 0.) in
 	let sg,env = 
 	List.fold_left
-		(fun (sg,env) init_t ->
+		(fun (sg,env) (opt_vol,init_t,pos) -> (*TODO dealing with volumes*)
 			match init_t with
-				| INIT_MIX (alg, ast, pos) ->
+				| INIT_MIX (alg, ast) ->
 					begin
       			let cpt = ref 0
       			and sg = ref sg
@@ -1094,7 +1094,7 @@ let init_graph_of_result env res =
       				done;
       				(!sg,!env)
 					end
-				| INIT_TOK (alg, tk_nme, pos) ->
+				| INIT_TOK (alg, (tk_nme,pos_tk)) ->
 					let (v, is_const, opt_v, _, lbl) = partial_eval_alg env alg
     			in
 					let x = 
@@ -1102,9 +1102,9 @@ let init_graph_of_result env res =
 							| Some (Num.F v) -> v
 							| Some (Num.I v) -> float_of_int v
 							| Some (Num.I64 v) -> Int64.to_float v
-							| None -> raise (ExceptionDefn.Semantics_Error (pos, Printf.sprintf "%s is not a constant, cannot initialize token value." lbl))
+							| None -> raise (ExceptionDefn.Semantics_Error (pos_tk, Printf.sprintf "%s is not a constant, cannot initialize token value." lbl))
     			in
-    			let tok_id = try Environment.num_of_token tk_nme env with Not_found -> raise (ExceptionDefn.Semantics_Error (pos, Printf.sprintf "token %s is undeclared" tk_nme))
+    			let tok_id = try Environment.num_of_token tk_nme env with Not_found -> raise (ExceptionDefn.Semantics_Error (pos_tk, Printf.sprintf "token %s is undeclared" tk_nme))
 					in
 					token_vector.(tok_id) <- x ;
 					(sg,env)
@@ -1120,7 +1120,7 @@ let configurations_of_result result =
   	with _ -> ExceptionDefn.warning ~with_pos:pos_p (Printf.sprintf "Empty value for parameter %s" param)
 	in
 	List.iter 
-	(fun (param,pos_p,value_list) ->
+	(fun ((param,pos_p),value_list) ->
 		match param with
 			| "displayCompression" -> 
 				begin
