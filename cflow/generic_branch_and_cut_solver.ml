@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 27/07/2012
+  * Last modification: 12/06/2013
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -30,7 +30,7 @@ module type Solver =
 
     val filter: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.B.PB.step_id list -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
 
-    val sub: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.B.PB.CI.Po.K.refined_step list -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
+    val sub: (PH.B.PB.CI.Po.K.P.log_info -> bool -> PH.B.blackboard -> PH.B.PB.CI.Po.K.refined_step list -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
 
     val clean: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
 
@@ -205,9 +205,9 @@ struct
     let log_info = PH.B.PB.CI.Po.K.P.set_step_time log_info in 
     error,log_info,blackboard 
 
-  let sub parameter handler error log_info blackboard to_keep = 
+  let sub parameter handler error log_info bool blackboard to_keep = 
     let log_info = PH.B.PB.CI.Po.K.P.set_step_time log_info in 
-    let error,log_info,blackboard = PH.B.import parameter handler error log_info to_keep in 
+    let error,log_info,blackboard = PH.B.import parameter handler error log_info bool to_keep in 
     let log_info = PH.B.PB.CI.Po.K.P.set_concurrent_event_deletion_time log_info in 
     let log_info = PH.B.PB.CI.Po.K.P.set_step_time log_info in 
     error,log_info,blackboard 

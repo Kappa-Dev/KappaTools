@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 02/07/2012
+  * Last modification: 12/06/2012
   * * 
   * Some parameter references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -17,6 +17,8 @@
   * Copyright 2011,2012 Institut National de Recherche en Informatique et   
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
+
+let debug_mode = false 
 
 module type PreBlackboard = 
 sig 
@@ -53,6 +55,7 @@ sig
   (** generation*)
   val init:  ((*CI.Po.K.P.log_info ->*) CI.Po.K.H.error_channel * pre_blackboard) CI.Po.K.H.with_handler 
   val add_step: (CI.Po.K.P.log_info -> CI.Po.K.refined_step -> pre_blackboard -> CI.Po.K.H.error_channel * CI.Po.K.P.log_info * pre_blackboard) CI.Po.K.H.with_handler
+  val add_step_up_to_iso: (CI.Po.K.P.log_info -> CI.Po.K.refined_step -> pre_blackboard -> CI.Po.K.H.error_channel * CI.Po.K.P.log_info * pre_blackboard) CI.Po.K.H.with_handler
   val finalize: (CI.Po.K.P.log_info -> pre_blackboard -> CI.Po.K.H.error_channel * CI.Po.K.P.log_info * pre_blackboard) CI.Po.K.H.with_handler 
 
   (**pretty printing*)
@@ -135,7 +138,12 @@ module Preblackboard =
      module CaseValueSet = Set.Make (struct type t = predicate_value let compare = compare end)
      module PredicateidSet = Set.Make (struct type t = predicate_id let compare = compare end)
      module PredicateidMap = Map.Make (struct type t = predicate_id let compare = compare end)
-     module SidMap = Map.Make (struct type t = step_id let compare = compare end)
+     module SidMap = Map.Make (struct type t = step_id let compare = compare end
+)
+     module AgentIdMap = Map.Make (struct type t = CI.Po.K.agent_id let compare = compare end)
+     module AgentId2Map = Map.Make (struct type t = CI.Po.K.agent_id*CI.Po.K.agent_id let compare=compare end)
+     module AgentIdSet = Set.Make (struct type t = CI.Po.K.agent_id let compare = compare end)
+     module AgentId2Set = Set.Make (struct type t = CI.Po.K.agent_id*CI.Po.K.agent_id let compare=compare end)
            
      type pre_blackboard = 
 	 {
@@ -149,6 +157,7 @@ module Preblackboard =
 	   pre_column_map_inv: predicate_info A.t; (** maps each wire id to its wire label *)
 	   predicate_id_list_related_to_predicate_id: PredicateidSet.t A.t; (** maps each wire id for the presence of an agent to the set of wires for its attibute (useful, when an agent get removed, all its attributes get undefined *)
            history_of_predicate_values_to_predicate_id: C.t A.t; (* maps each wire to the set of its previous states, this summarize the potential state of a site that is freed, so as to overapproximate the set of potential side effects*)
+           history_of_agent_ids_of_type: (CI.Po.K.agent_id list) A.t; 
            pre_observable_list: (step_id list * unit Mods.simulation_info option) list ;
            pre_side_effect_of_event: CI.Po.K.side_effect A.t;
            pre_fictitious_observable: step_id option; (*id of the step that closes all the side-effect mutex *) 
@@ -205,6 +214,15 @@ module Preblackboard =
          let print_preblackboard parameter handler error blackboard = 
            let log = parameter.CI.Po.K.H.out_channel in 
            let _ = Printf.fprintf log "**\nPREBLACKBOARD\n**\n" in 
+           let _ = Printf.fprintf log "*\n agent types \n*\n" in 
+           let _ = 
+             A.iteri 
+               (fun name -> 
+                 let _ = Printf.fprintf log "\nAgent name: %i \n" name in 
+                 List.iter 
+                   (Printf.fprintf log " id: %i \n"))
+               blackboard.history_of_agent_ids_of_type
+           in 
            let _ = Printf.fprintf log "*\n steps by column\n*\n" in 
            let _ = 
              A.iteri 
@@ -416,6 +434,20 @@ module Preblackboard =
                      bind parameter handler error blackboard predicate sid' ag_id 
                in 
                error,blackboard,sid' 
+
+         let create_agent parameter handler error blackboard agent_name agent_id  = 
+           let old_list = 
+             try 
+               A.get blackboard.history_of_agent_ids_of_type agent_name 
+             with 
+               Not_found -> 
+                 []
+           in 
+           let new_list = agent_id::old_list in 
+           let _ = A.set blackboard.history_of_agent_ids_of_type agent_name new_list in 
+           error,blackboard 
+
+
                  
          let free_agent parameter handler error blackboard agent_id = 
            let error,blackboard,predicate_id = 
@@ -451,6 +483,8 @@ module Preblackboard =
            match action with 
              | CI.Po.K.Create (ag,interface) -> 
                let ag_id = CI.Po.K.agent_id_of_agent ag in
+               let agent_name = CI.Po.K.agent_name_of_agent ag in 
+               let error,blackboard = create_agent parameter handler error blackboard agent_name ag_id in 
                let error,blackboard = 
                  if init 
                  then 
@@ -595,6 +629,7 @@ module Preblackboard =
              pre_column_map_inv = A.make 1 (Fictitious 0) ; 
              pre_kind_of_event = A.make 1 (Side_effect_of (-1,[])) ;
              history_of_predicate_values_to_predicate_id = A.make 1 (C.create None);
+             history_of_agent_ids_of_type = A.make 1 [];
              predicate_id_list_related_to_predicate_id = A.make 1 PredicateidSet.empty;
              pre_observable_list = [];
              pre_fictitious_observable = None ;
@@ -648,7 +683,7 @@ module Preblackboard =
          let potential_target error parameter handler blackboard site binding_state =
            let agent_id = CI.Po.K.agent_id_of_site site in 
            let site_name = CI.Po.K.site_name_of_site site in 
-           let error,balckboard,predicate_target_id = 
+           let error,blackboard,predicate_target_id = 
              allocate parameter handler error blackboard (Bound_site (agent_id,site_name))  in 
            let former_states = 
              A.get blackboard.history_of_predicate_values_to_predicate_id predicate_target_id
@@ -686,13 +721,406 @@ module Preblackboard =
                in 
                error,blackboard,list 
              end 
-               
-         let add_step parameter handler error log_info step blackboard = 
+          
+         type data_structure_strong = 
+           {
+             new_agents: AgentIdSet.t ;
+             old_agents: CI.Po.K.agent_name AgentIdMap.t;
+             old_agents_potential_substitution: CI.Po.K.agent_id list AgentIdMap.t;
+             sure_agents: AgentIdSet.t; 
+             sure_links: AgentId2Set.t;
+             sure_tests: CI.Po.K.test list ;
+             sure_actions: CI.Po.K.action list ; 
+             sure_side_effects: (CI.Po.K.site*CI.Po.K.binding_state) list;
+             other_agents_tests: CI.Po.K.test list AgentIdMap.t ; 
+             other_agents_actions: CI.Po.K.action list AgentIdMap.t ;
+             other_links_tests: CI.Po.K.test list AgentId2Map.t; 
+             other_links_actions: CI.Po.K.action list AgentId2Map.t ;
+             other_agents_side_effects: (CI.Po.K.site*CI.Po.K.binding_state) list AgentIdMap.t ;
+             subs_agents_involved_in_links: AgentIdSet.t
+           }
+
+         let init_data_structure_strong = 
+           {
+             new_agents = AgentIdSet.empty;
+             old_agents = AgentIdMap.empty;
+             old_agents_potential_substitution = AgentIdMap.empty;
+             sure_agents = AgentIdSet.empty; 
+             sure_links = AgentId2Set.empty;
+             sure_tests = [];
+             sure_actions = [];
+             sure_side_effects = [];
+             other_agents_tests = AgentIdMap.empty;
+             other_agents_actions = AgentIdMap.empty;
+             other_links_tests = AgentId2Map.empty;
+             other_links_actions = AgentId2Map.empty;
+             other_agents_side_effects = AgentIdMap.empty;
+             subs_agents_involved_in_links = AgentIdSet.empty;
+           }
+     
+         let print_data_structure handler data =
+           let _ = Printf.fprintf stdout "New agents: \n" in 
+           let _ = 
+             AgentIdSet.iter (Printf.fprintf stdout " %i \n") data.new_agents
+           in 
+           let _ = Printf.fprintf stdout "Old agents: \n" in 
+           let _ = 
+             AgentIdMap.iter (Printf.fprintf stdout " id:%i: type:%i \n") data.old_agents 
+           in 
+           let _ = Printf.fprintf stdout "Old agents implied in links: \n" in 
+           let _ = 
+             AgentIdSet.iter (Printf.fprintf stdout " %i \n") data.subs_agents_involved_in_links 
+           in 
+           let _ = Printf.fprintf stdout "Potential substitution: \n" in 
+           let _ = 
+             AgentIdMap.iter 
+               (fun id l -> 
+                 let _ = 
+                   Printf.fprintf stdout " id:%i\n" id 
+                 in 
+                 List.iter (Printf.fprintf stdout "   %i\n") l)
+               data.old_agents_potential_substitution
+           in 
+           let _ = Printf.fprintf stdout "Sure agents: \n" in 
+           let _ = 
+             AgentIdSet.iter (Printf.fprintf stdout " %i \n") data.sure_agents
+           in 
+           let _ = Printf.fprintf stdout "Sure tests: \n" in 
+           let _ = 
+             List.iter 
+               (CI.Po.K.print_test stdout handler " ")
+               data.sure_tests
+           in 
+           let _ = Printf.fprintf stdout "Tests to be substituted: \n" in 
+           let _ = 
+             AgentIdMap.iter 
+               (fun id l -> 
+                 let _ = Printf.fprintf stdout " %i\n" id in 
+                 let _ = 
+                   List.iter 
+                     (CI.Po.K.print_test stdout handler "  ")
+                     l
+                 in ())
+               data.other_agents_tests
+           in 
+           let _ = 
+             AgentId2Map.iter 
+               (fun (id1,id2) l -> 
+                 let _ = Printf.fprintf stdout " (%i,%i)\n" id1 id2 in 
+                 let _ = 
+                   List.iter 
+                     (CI.Po.K.print_test stdout handler "  ")
+                     l
+                 in ())
+               data.other_links_tests
+           in 
+           let _ = Printf.fprintf stdout "Sure actions: \n" in 
+           let _ = 
+             List.iter 
+               (CI.Po.K.print_action stdout handler " ")
+               data.sure_actions
+           in 
+           let _ = Printf.fprintf stdout "Actions to be substituted: \n" in 
+           let _ = 
+             AgentIdMap.iter 
+               (fun id l -> 
+                 let _ = Printf.fprintf stdout " %i\n" id in 
+                 let _ = 
+                   List.iter 
+                     (CI.Po.K.print_action stdout handler "  ")
+                     l
+                 in ())
+               data.other_agents_actions
+           in 
+           let _ = 
+             AgentId2Map.iter 
+               (fun (id1,id2) l -> 
+                 let _ = Printf.fprintf stdout " (%i,%i)\n" id1 id2 in 
+                 let _ = 
+                   List.iter 
+                     (CI.Po.K.print_action stdout handler "  ")
+                     l
+                 in ())
+               data.other_links_actions
+           in 
+           let _ = Printf.fprintf stdout "Sure side_effects \n" in 
+           let _ = 
+             List.iter
+               (CI.Po.K.print_side stdout handler " ")
+               data.sure_side_effects 
+           in 
+           let _ = Printf.fprintf stdout "Side effect to be substituted: \n" in 
+           let _ = 
+             AgentIdMap.iter 
+               (fun id l -> 
+                 let _ = Printf.fprintf stdout " %i\n" id in 
+                 let _ = 
+                   List.iter 
+                     (CI.Po.K.print_side stdout handler "  ")
+                     l
+                 in ())
+               data.other_agents_side_effects
+           in 
+           () 
+
+
+         let add_sure_test test data_structure = 
+           { 
+             data_structure 
+             with sure_tests = test::data_structure.sure_tests
+           }
+         let add_subs_test test ag_id data_structure = 
+           let old = 
+             try 
+               AgentIdMap.find ag_id data_structure.other_agents_tests
+             with 
+             | Not_found -> []
+           in 
+           {
+             data_structure 
+            with 
+              other_agents_tests = 
+               AgentIdMap.add ag_id (test::old) data_structure.other_agents_tests
+           }
+         let add_subs_test_link test link data_structure = 
+           let a,b=fst link,snd link in 
+           let link = if a < b then link else b,a in 
+           let old = 
+             try 
+               AgentId2Map.find link data_structure.other_links_tests 
+             with 
+             | Not_found -> []
+           in 
+           { 
+             data_structure 
+             with 
+               other_links_tests = 
+               AgentId2Map.add link (test::old) data_structure.other_links_tests
+           }
+         let add_sure_action action data_structure = 
+           { 
+             data_structure 
+             with sure_actions = action::data_structure.sure_actions
+           }
+         let add_subs_action action ag_id data_structure = 
+           let old = 
+             try 
+               AgentIdMap.find ag_id data_structure.other_agents_actions
+             with 
+             | Not_found -> []
+           in 
+           {
+             data_structure 
+            with 
+              other_agents_actions = 
+               AgentIdMap.add ag_id (action::old) data_structure.other_agents_actions
+           }
+         let add_subs_action_link action link data_structure = 
+           let a,b=fst link,snd link in 
+           let link = if a < b then link else b,a in 
+           let old = 
+             try 
+               AgentId2Map.find link data_structure.other_links_actions 
+             with 
+             | Not_found -> []
+           in 
+           { 
+             data_structure 
+             with 
+               other_links_actions = 
+               AgentId2Map.add link (action::old) data_structure.other_links_actions
+           } 
+           
+         let add_sure_side_effect side_effect data_structure = 
+           { 
+             data_structure 
+             with 
+               sure_side_effects = side_effect::data_structure.sure_side_effects
+           }
+
+         let add_subs_side_effect side_effect ag_id data_structure = 
+           let site = fst side_effect in 
+           let agent = CI.Po.K.agent_of_site site in 
+           let agent_id = CI.Po.K.agent_id_of_agent agent in 
+           let old = 
+             try 
+               AgentIdMap.find agent_id data_structure.other_agents_side_effects
+             with 
+             | Not_found -> []
+           in 
+           { 
+             data_structure 
+             with 
+               other_agents_side_effects =  
+               AgentIdMap.add ag_id  (side_effect::old) data_structure.other_agents_side_effects}
+
+
+           
+             
+         let add_step_strong parameter handler error log_info step blackboard = 
            let init = CI.Po.K.is_init_of_refined_step step in 
            let pre_event = blackboard.pre_event in 
            let test_list = CI.Po.K.tests_of_refined_step step in 
            let action_list,side_effect = CI.Po.K.actions_of_refined_step step in
-           let action_list = action_list in 
+           let data_structure = init_data_structure_strong in 
+           let data_structure = 
+             List.fold_left 
+               (fun data_structure action -> 
+                 match 
+                   action
+                 with 
+                 | CI.Po.K.Create(ag,interface) -> 
+                     {data_structure 
+                      with new_agents = AgentIdSet.add (CI.Po.K.agent_id_of_agent ag) data_structure.new_agents}
+                 | _ -> data_structure)
+               data_structure
+               action_list
+           in 
+           let data_structure = 
+             List.fold_left 
+               (fun data_structure test -> 
+                 match 
+                   test
+                 with 
+                 | CI.Po.K.Is_Here (ag) -> 
+                   {data_structure 
+                    with old_agents = AgentIdMap.add (CI.Po.K.agent_id_of_agent ag) (CI.Po.K.agent_name_of_agent ag) data_structure.old_agents}
+                 | _ -> data_structure)
+               data_structure 
+               test_list 
+           in 
+           let data_structure = 
+             { data_structure 
+               with old_agents_potential_substitution = 
+                 AgentIdMap.map 
+                   (A.get blackboard.history_of_agent_ids_of_type)
+                   data_structure.old_agents}
+           in 
+           let data_structure = 
+             { data_structure with sure_agents = data_structure.new_agents }
+           in 
+           let data_structure = 
+             { data_structure with 
+               sure_agents = 
+                 AgentIdMap.fold 
+                   (fun id l sure_agents -> 
+                     match 
+                       l
+                     with 
+                     | [_] -> AgentIdSet.add id sure_agents
+                     | _ -> sure_agents)
+                   data_structure.old_agents_potential_substitution
+                   data_structure.sure_agents}
+           in 
+           let sure_agent x = 
+             AgentIdSet.mem x data_structure.sure_agents 
+           in 
+           let data_structure = 
+             List.fold_left 
+               (fun data_structure test -> 
+                 match test
+                 with 
+                 | CI.Po.K.Is_Here (agent) ->
+                   let ag_id = CI.Po.K.agent_id_of_agent agent in 
+                   if sure_agent ag_id 
+                   then 
+                     add_sure_test test data_structure 
+                   else 
+                     add_subs_test test ag_id data_structure 
+                 | CI.Po.K.Has_Internal(site,_) | CI.Po.K.Is_Free site | CI.Po.K.Is_Bound site | CI.Po.K.Has_Binding_type (site,_) -> 
+                   let agent = CI.Po.K.agent_of_site site in 
+                   let ag_id = CI.Po.K.agent_id_of_agent agent in 
+                   if sure_agent ag_id 
+                   then 
+                     add_sure_test test data_structure 
+                   else 
+                     add_subs_test test ag_id data_structure 
+                 | CI.Po.K.Is_Bound_to  (site1,site2) -> 
+                   let agent1 = CI.Po.K.agent_of_site site1 in 
+                   let ag_id1 = CI.Po.K.agent_id_of_agent agent1 in 
+                   let agent2 = CI.Po.K.agent_of_site site2 in 
+                   let ag_id2 = CI.Po.K.agent_id_of_agent agent2 in 
+                   if sure_agent ag_id1 && sure_agent ag_id2 
+                   then 
+                     add_sure_test test data_structure 
+                   else 
+                     add_subs_test_link test (ag_id1,ag_id2) data_structure 
+               )
+               data_structure 
+               (List.rev test_list)
+           in 
+            let data_structure = 
+             List.fold_left 
+               (fun data_structure action -> 
+                 match action
+                 with 
+                 | CI.Po.K.Create _ -> add_sure_action action data_structure 
+                 | CI.Po.K.Remove agent -> 
+                   let ag_id = CI.Po.K.agent_id_of_agent agent in 
+                   if sure_agent ag_id 
+                   then 
+                     add_sure_action action data_structure
+                   else 
+                     add_subs_action action ag_id data_structure 
+                 | CI.Po.K.Mod_internal (site,_) | CI.Po.K.Free(site)
+                   -> 
+                   let agent = CI.Po.K.agent_of_site site in 
+                   let ag_id = CI.Po.K.agent_id_of_agent agent in 
+                   if sure_agent ag_id 
+                   then 
+                     add_sure_action action data_structure 
+                   else 
+                     add_subs_action action ag_id data_structure 
+                 | CI.Po.K.Bind(site1,site2) | CI.Po.K.Bind_to (site1,site2) | CI.Po.K.Unbind (site1,site2) -> 
+                   let agent1 = CI.Po.K.agent_of_site site1 in 
+                   let ag_id1 = CI.Po.K.agent_id_of_agent agent1 in 
+                   let agent2 = CI.Po.K.agent_of_site site2 in 
+                   let ag_id2 = CI.Po.K.agent_id_of_agent agent2 in 
+                   if sure_agent ag_id1 && sure_agent ag_id2 
+                   then 
+                     add_sure_action action data_structure 
+                   else 
+                     add_subs_action_link action (ag_id1,ag_id2) data_structure 
+               )
+               data_structure 
+               (List.rev action_list)
+           in 
+
+           let data_structure = 
+             List.fold_left 
+               (fun data_structure side_effect -> 
+                 let (site,_) = side_effect in 
+                 let agent = CI.Po.K.agent_of_site site in 
+                 let ag_id = CI.Po.K.agent_id_of_agent agent in 
+                 if sure_agent ag_id 
+                 then 
+                   add_sure_side_effect side_effect data_structure
+                 else 
+                   add_subs_side_effect side_effect ag_id data_structure)
+               data_structure 
+               side_effect
+           in 
+           let data_structure = 
+             {
+               data_structure 
+              with 
+                subs_agents_involved_in_links = 
+                 let f x set = 
+                 AgentId2Map.fold 
+                   (fun (a1,a2) _ set -> AgentIdSet.add a1 (AgentIdSet.add a2 set))
+                   x set 
+                 in 
+                 f 
+                   data_structure.other_links_tests 
+                   (f 
+                      data_structure.other_links_actions 
+                      AgentIdSet.empty)}
+           in 
+           let _ = 
+             if debug_mode 
+             then 
+               print_data_structure handler data_structure 
+           in 
            let fictitious_local_list = [] in 
            let fictitious_list = blackboard.pre_fictitious_list in 
            let build_map list map = 
@@ -895,6 +1323,214 @@ module Preblackboard =
                error,log_info,blackboard 
              end 
 
+       
+         let add_step parameter handler error log_info step blackboard = 
+           let init = CI.Po.K.is_init_of_refined_step step in 
+           let pre_event = blackboard.pre_event in 
+           let test_list = CI.Po.K.tests_of_refined_step step in 
+           let action_list,side_effect = CI.Po.K.actions_of_refined_step step in
+           let fictitious_local_list = [] in 
+           let fictitious_list = blackboard.pre_fictitious_list in 
+           let build_map list map = 
+             List.fold_left 
+               (fun map (id,value) -> PredicateidMap.add id value map)
+               map 
+               list 
+           in 
+           let add_state pid (test,action) map = 
+             let test',action' = 
+               try 
+                 PredicateidMap.find pid map  
+               with 
+                 | Not_found -> Unknown,Unknown 
+             in 
+             let test = 
+               if strictly_more_refined test test' 
+               then 
+                 test
+               else 
+                 test'
+             in 
+             let action = 
+               if strictly_more_refined action action' 
+               then 
+                 action
+               else 
+                 action'
+             in 
+             let map = PredicateidMap.add pid (test,action) map in 
+             map 
+           in 
+           let fadd pid p map = 
+             match p 
+             with 
+               | Counter _ | Internal_state_is _ | Undefined 
+               | Defined | Present | Bound | Bound_to_type _ | Unknown -> 
+                 ()
+               | _ -> 
+                 let old = A.get map pid in 
+                 A.set map pid (C.add p old) 
+           in 
+           let error,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effects = 
+             List.fold_left 
+               (fun (error,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effects) (site,(binding_state)) -> 
+                 begin
+                   let error,blackboard,potential_target = potential_target error parameter handler blackboard site binding_state in 
+                   match 
+                     potential_target 
+                   with 
+                     | [l]  ->  
+                       begin
+                         let list = 
+                           List.fold_left 
+                             (fun list t -> t::l)
+                             unambiguous_side_effects
+                             l 
+                         in 
+                         error,
+                         blackboard,
+                         fictitious_list,
+                         fictitious_local_list,
+                         list 
+                       end
+                     | _ -> 
+                       begin 
+                         let nsid = blackboard.pre_nsteps + 1 in 
+                         let predicate_info = Fictitious nsid in 
+                         let error,blackboard,predicate_id = allocate parameter handler error blackboard predicate_info  in 
+                         let error,log_info,blackboard = init_fictitious_action log_info error predicate_id  blackboard in
+                         let error,log_info,blackboard = 
+                           List.fold_left 
+                             (fun (error,log_info,blackboard) list -> 
+                               let blackboard = {blackboard with pre_nsteps = blackboard.pre_nsteps+1} in 
+                               let log_info = CI.Po.K.P.inc_n_side_events log_info in 
+                               let side_effect = 
+                                 List.fold_left 
+                                   (fun list (_,a,_) -> 
+                                     match a 
+                                     with 
+                                       | None -> list
+                                       | Some a -> a::list)
+                                   []
+                                   list 
+                               in 
+                               let side_effect = CI.Po.K.side_effect_of_list 
+                                 side_effect in 
+                               let _ = A.set blackboard.pre_side_effect_of_event 
+                                 blackboard.pre_nsteps
+                                 side_effect in
+                               let error,blackboard = 
+                                 List.fold_left
+                                   (fun (error,blackboard) (predicate_id,_,(test,action)) -> 
+                                     add_fictitious_action error test action predicate_id blackboard)
+                                   (error,blackboard) 
+                                   ((predicate_id,None,(Counter 0,Counter 1))::list)
+                               in 
+                               error,log_info,blackboard)
+                             (error,log_info,blackboard)
+                             potential_target
+                         in 
+                         error,
+                         blackboard,
+                         (predicate_id::fictitious_list),
+                         (predicate_id::fictitious_local_list),
+                         unambiguous_side_effects
+                       end
+                 end)
+               (error,blackboard,fictitious_list,fictitious_local_list,[])
+               side_effect 
+           in 
+           let error,blackboard,test_map = 
+             List.fold_left 
+               (fun (error,blackboard,map) test -> 
+                 let error,blackboard,test_list = predicates_of_test parameter handler error blackboard test in
+                 error,blackboard,build_map test_list map)
+               (error,blackboard,PredicateidMap.empty)
+               test_list in 
+           let error,blackboard,action_map,test_map = 
+             List.fold_left 
+               (fun (error,blackboard,action_map,test_map) action -> 
+                 let error,blackboard,action_list,test_list = predicates_of_action parameter handler error blackboard init action in 
+                 error,blackboard,build_map action_list action_map,build_map test_list test_map)
+               (error,blackboard,PredicateidMap.empty,test_map)
+               action_list in 
+           let g x = 
+             match x 
+             with 
+               | None -> Unknown
+               | Some x -> x
+           in 
+           let merged_map = 
+             PredicateidMap.merge 
+               (fun _ test action -> Some(g test,g action))
+               test_map
+               action_map 
+           in 
+           let merged_map = 
+             List.fold_left 
+               (fun map pid -> PredicateidMap.add pid (Counter 1,Undefined) map)
+               merged_map
+               fictitious_local_list 
+           in 
+           let merged_map = 
+             List.fold_left 
+               (fun map (pid,_,(test,action)) -> add_state pid (test,action) map)
+               merged_map
+               unambiguous_side_effects
+           in 
+           let side_effect = 
+             List.fold_left 
+               (fun list (_,a,_) -> 
+                 match a 
+                 with 
+                   | None -> list
+                   | Some a -> a::list)
+               []
+               unambiguous_side_effects 
+           in 
+           if side_effect = []
+             && PredicateidMap.is_empty  merged_map 
+           then 
+             error,log_info,blackboard 
+           else 
+             begin 
+               let nsid = blackboard.pre_nsteps + 1 in 
+               let _ = A.set blackboard.pre_side_effect_of_event nsid (CI.Po.K.side_effect_of_list side_effect) in
+               let _ = A.set pre_event nsid step in 
+               let pre_steps_by_column = 
+                 PredicateidMap.fold 
+                   (fun id (test,action) map -> 
+                     begin 
+                       let value,list = A.get map id in 
+                       let value' = value + 1 in 
+                       let _ = fadd id action blackboard.history_of_predicate_values_to_predicate_id in 
+                       let _ = A.set map id (value',(nsid,value,test,action)::list)
+                   in map
+                     end)
+                   merged_map
+                   blackboard.pre_steps_by_column 
+               in 
+               let _ = A.set blackboard.pre_kind_of_event nsid (type_of_step (CI.Po.K.type_of_refined_step step)) in 
+               let observable_list = 
+                 if CI.Po.K.is_obs_of_refined_step step 
+                 then 
+                   ([nsid],CI.Po.K.simulation_info_of_refined_step step)::blackboard.pre_observable_list 
+                 else
+                   blackboard.pre_observable_list 
+               in 
+               let blackboard = 
+                 { 
+                   blackboard with 
+                     pre_event = pre_event ;
+                     pre_fictitious_list = fictitious_list ; 
+                     pre_steps_by_column = pre_steps_by_column; 
+                     pre_nsteps = nsid;
+                     pre_observable_list = observable_list; 
+                 }
+               in 
+               error,log_info,blackboard 
+             end 
+               
          let finalize parameter handler error log_info blackboard = 
            let l = blackboard.pre_fictitious_list in 
            match l 
@@ -923,6 +1559,8 @@ module Preblackboard =
                    l
                in 
                error,log_info,blackboard
+
+         let add_step_up_to_iso = add_step_strong
                  
   (**interface*)
          let n_predicates parameter handler error blackboard = 

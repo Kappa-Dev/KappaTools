@@ -55,6 +55,7 @@ let snapshotHighres = ref true
 
 let causalModeOn = ref false
 let weakCompression = ref false 
+let strongCompression = ref false 
 let mazCompression = ref false 
 let showIntroEvents = ref false
 
@@ -140,7 +141,7 @@ let get_compression_mode () =
   {
     causal_trace=(!mazCompression);
     weak_compression=(!weakCompression);
-    strong_compression=false;
+    strong_compression=(!strongCompression);
   }
 
 let get_causal_trace x = x.causal_trace 

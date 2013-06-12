@@ -1126,7 +1126,7 @@ let configurations_of_result result =
 				begin
 					let rec parse l = 
 						match l with
-							| ("strong",pos_v)::tl -> (ExceptionDefn.warning ~with_pos:pos_v "Strong compression is not implemented yet" ; parse tl)
+							| ("strong",pos_v)::tl -> (Parameter.strongCompression := true ; parse tl)
 							| ("weak",_)::tl -> (Parameter.weakCompression := true ; parse tl)
 							| ("none",_)::tl -> (Parameter.mazCompression := true ; parse tl)
 							| [] -> ()

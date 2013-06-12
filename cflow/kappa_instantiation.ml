@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 28/06/2012
+  * Last modification: 12/06/2013
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -108,7 +108,12 @@ sig
   val is_init_of_refined_step: refined_step -> bool 
   val simulation_info_of_refined_step: refined_step -> unit Mods.simulation_info option 
 
+  val print_test: out_channel -> H.handler -> string -> test -> unit 
+  val print_action: out_channel -> H.handler -> string -> action -> unit 
+  val print_side: out_channel -> H.handler -> string -> (site*binding_state) -> unit
+
   val print_refined_step: H.parameter -> H.handler -> refined_step -> unit 
+
 
   val import_event:  (Dynamics.rule * int Mods.IntMap.t * int Mods.IntMap.t) * rule_info -> event 
   val store_event: P.log_info -> event -> step list -> P.log_info * step list 
@@ -317,6 +322,8 @@ module Cflow_linker =
       | Free site ->  Printf.fprintf log "%sFree(%s)\n" prefix (string_of_site env site)
       | Remove agent -> Printf.fprintf log "%sRemove(%s)\n" prefix (string_of_agent env agent)
 
+  let print_side log env prefix (s,binding_state) = 
+    Printf.fprintf log "%s(%s,%s)\n" prefix (string_of_site env s) (string_of_binding_state env binding_state)
 
   let lhs_of_rule rule = rule.Dynamics.lhs 
   let lhs_of_event = compose lhs_of_rule rule_of_event

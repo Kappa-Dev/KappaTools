@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 06/09/2011
-  * Last modification: 27/06/2012
+  * Last modification: 12/06/2013
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -74,7 +74,7 @@ sig
   val reset_init: (PB.CI.Po.K.P.log_info -> blackboard -> PB.CI.Po.K.H.error_channel * PB.CI.Po.K.P.log_info * blackboard) PB.CI.Po.K.H.with_handler 
 
   (** initialisation*)
-  val import:  (PB.CI.Po.K.P.log_info -> PB.CI.Po.K.refined_step list -> PB.CI.Po.K.H.error_channel * PB.CI.Po.K.P.log_info * blackboard) PB.CI.Po.K.H.with_handler 
+  val import:  (PB.CI.Po.K.P.log_info -> bool -> PB.CI.Po.K.refined_step list -> PB.CI.Po.K.H.error_channel * PB.CI.Po.K.P.log_info * blackboard) PB.CI.Po.K.H.with_handler 
 
 
   (** output result*)
@@ -105,7 +105,6 @@ sig
   val side_effect_of_event: blackboard -> PB.step_id -> PB.CI.Po.K.side_effect
 (*  val cut_predicate_id: (blackboard -> PB.predicate_id -> PB.CI.Po.K.H.error_channel *   blackboard) PB.CI.Po.K.H.with_handler *)
   val cut: (PB.CI.Po.K.P.log_info -> blackboard -> PB.step_id list -> PB.CI.Po.K.H.error_channel * PB.CI.Po.K.P.log_info * blackboard * PB.step_id list) PB.CI.Po.K.H.with_handler 
-
   val tick: PB.CI.Po.K.P.log_info -> bool * PB.CI.Po.K.P.log_info (* to do: move to the module PB.CI.Po.K.P*)
 end
 
@@ -1177,14 +1176,22 @@ module Blackboard =
      let log_info = PB.CI.Po.K.P.inc_k_cut_events n_events_removed log_info in 
      error,log_info,blackboard,cut_causal_flow
 
-   let import parameter handler error log_info list = 
+   let import parameter handler error log_info bool list = 
      let error,preblackboard = PB.init parameter handler error in
      let error,log_info,preblackboard = 
-       List.fold_left 
-         (fun (error,log_info,preblackboard) refined_event  -> 
-           PB.add_step parameter handler error log_info refined_event preblackboard)
-         (error,log_info,preblackboard)
-         list 
+       if bool 
+       then 
+         List.fold_left 
+           (fun (error,log_info,preblackboard) refined_event  -> 
+             PB.add_step_up_to_iso parameter handler error log_info refined_event preblackboard)
+           (error,log_info,preblackboard)
+           list 
+       else 
+         List.fold_left 
+           (fun (error,log_info,preblackboard) refined_event  -> 
+             PB.add_step parameter handler error log_info refined_event preblackboard)
+           (error,log_info,preblackboard)
+           list 
      in 
      let error,log_info,preblackboard = 
        PB.finalize parameter handler error log_info preblackboard 
