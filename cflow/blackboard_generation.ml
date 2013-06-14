@@ -9,16 +9,16 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 12/06/2012
+  * Last modification: 14/06/2013
   * * 
   * Some parameter references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
   *  
-  * Copyright 2011,2012 Institut National de Recherche en Informatique et   
-  * en Automatique.  All rights reserved.  This file is distributed     
+  * Copyright 2011,2012,2013 Institut National de Recherche en Informatique 
+  * et en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
-let debug_mode = false 
+let debug_mode = false
 
 module type PreBlackboard = 
 sig 
@@ -104,6 +104,7 @@ module Preblackboard =
 
      type predicate_value = 
        | Counter of int 
+       | Pointer_to_agent of CI.Po.K.agent_name 
        | Internal_state_is of CI.Po.K.internal_state
        | Defined   (** the wire does exist, but we do not know what the value is *)
        | Undefined (** the wire does not exist yet *)
@@ -120,7 +121,7 @@ module Preblackboard =
      let weakening p = 
        match p 
        with 
-         | Counter _ | Internal_state_is _ | Present | Free | Bound  -> [p;Defined]
+         | Pointer_to_agent _ | Counter _ | Internal_state_is _ | Present | Free | Bound  -> [p;Defined]
          | Bound_to (_,_,ag,site) -> [p;Bound_to_type (ag,site);Bound;Defined]
          | Bound_to_type _ -> [p;Bound;Defined]
          | Defined | Undefined -> [p]
@@ -203,6 +204,8 @@ module Preblackboard =
                Printf.fprintf log "Bound(%i,%i(%i)@%i)" id agent_id agent_name site
              | Bound_to_type (agent,site)-> 
                Printf.fprintf log "Bound(%i@%i)" agent site 
+             | Pointer_to_agent (agent_id) -> 
+               Printf.fprintf log "Pointer(%i)" agent_id 
              | Unknown -> ()
                
          let print_predicate_id log blackboard i = 
@@ -307,6 +310,7 @@ module Preblackboard =
            match y  
            with 
              | Undefined 
+             | Pointer_to_agent _ 
              | Counter _ 
              | Internal_state_is _ 
              | Present 
@@ -656,7 +660,7 @@ module Preblackboard =
          let side_effect parameter handler error predicate_target_id s site = 
            match s 
            with 
-             | Defined | Counter _ | Internal_state_is _ | Undefined 
+             | Defined | Counter _ | Internal_state_is _ | Undefined | Pointer_to_agent _ 
              | Present | Bound | Bound_to_type _ | Unknown -> 
                let error,error_list = 
                  CI.Po.K.H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "side_effects") (Some "602") (Some "Illegal state for a side-effects") (failwith "Blackboard_generation.side_effect") in 
@@ -729,6 +733,7 @@ module Preblackboard =
              old_agents_potential_substitution: CI.Po.K.agent_id list AgentIdMap.t;
              sure_agents: AgentIdSet.t; 
              sure_links: AgentId2Set.t;
+             other_links: AgentId2Set.t;
              sure_tests: CI.Po.K.test list ;
              sure_actions: CI.Po.K.action list ; 
              sure_side_effects: (CI.Po.K.site*CI.Po.K.binding_state) list;
@@ -737,7 +742,10 @@ module Preblackboard =
              other_links_tests: CI.Po.K.test list AgentId2Map.t; 
              other_links_actions: CI.Po.K.action list AgentId2Map.t ;
              other_agents_side_effects: (CI.Po.K.site*CI.Po.K.binding_state) list AgentIdMap.t ;
-             subs_agents_involved_in_links: AgentIdSet.t
+             subs_agents_involved_in_links: AgentIdSet.t;
+             rule_agent_id_mutex: predicate_id AgentIdMap.t;
+             rule_agent_id_subs: predicate_id AgentIdMap.t;
+             mixture_agent_id_mutex: predicate_id AgentIdMap.t
            }
 
          let init_data_structure_strong = 
@@ -747,6 +755,7 @@ module Preblackboard =
              old_agents_potential_substitution = AgentIdMap.empty;
              sure_agents = AgentIdSet.empty; 
              sure_links = AgentId2Set.empty;
+             other_links = AgentId2Set.empty;
              sure_tests = [];
              sure_actions = [];
              sure_side_effects = [];
@@ -756,6 +765,9 @@ module Preblackboard =
              other_links_actions = AgentId2Map.empty;
              other_agents_side_effects = AgentIdMap.empty;
              subs_agents_involved_in_links = AgentIdSet.empty;
+             rule_agent_id_mutex = AgentIdMap.empty;
+             rule_agent_id_subs = AgentIdMap.empty;
+             mixture_agent_id_mutex = AgentIdMap.empty
            }
      
          let print_data_structure handler data =
@@ -885,11 +897,13 @@ module Preblackboard =
          let add_subs_test_link test link data_structure = 
            let a,b=fst link,snd link in 
            let link = if a < b then link else b,a in 
-           let old = 
+           let data_structure,old = 
              try 
-               AgentId2Map.find link data_structure.other_links_tests 
+               data_structure,AgentId2Map.find link data_structure.other_links_tests 
              with 
-             | Not_found -> []
+             | Not_found -> 
+               {data_structure with other_links = AgentId2Set.add link data_structure.other_links},
+               []
            in 
            { 
              data_structure 
@@ -918,11 +932,15 @@ module Preblackboard =
          let add_subs_action_link action link data_structure = 
            let a,b=fst link,snd link in 
            let link = if a < b then link else b,a in 
-           let old = 
+           let data_structure,old = 
              try 
+               data_structure,
                AgentId2Map.find link data_structure.other_links_actions 
              with 
-             | Not_found -> []
+             | Not_found -> 
+               {
+                 data_structure with other_links = AgentId2Set.add link data_structure.other_links},
+               []
            in 
            { 
              data_structure 
@@ -1014,6 +1032,16 @@ module Preblackboard =
            in 
            let sure_agent x = 
              AgentIdSet.mem x data_structure.sure_agents 
+           in 
+           let data_structure = 
+             {
+               data_structure 
+              with 
+                old_agents_potential_substitution = 
+                 AgentIdSet.fold AgentIdMap.remove 
+                   data_structure.sure_agents 
+                   data_structure.old_agents_potential_substitution 
+             }
            in 
            let data_structure = 
              List.fold_left 
@@ -1116,12 +1144,73 @@ module Preblackboard =
                       data_structure.other_links_actions 
                       AgentIdSet.empty)}
            in 
+           let error,log_info,blackboard,rule_agent_id_mutex,rule_agent_id_subs,mixture_agent_id_mutex,fictitious_list,fictitious_local_list,_ = 
+             AgentIdMap.fold
+               (fun x l (error,log_info,blackboard,rule_agent_id_mutex,rule_agent_id_subs,mixture_agent_id_mutex,fictitious_list,fictitious_local_list,set) -> 
+                 let nsid = blackboard.pre_nsteps + 1 in 
+                 let predicate_info = Fictitious nsid in 
+                 let error,blackboard,predicate_id = allocate parameter handler error blackboard predicate_info in 
+                 let error,log_info,blackboard = init_fictitious_action log_info error predicate_id blackboard in 
+                 let rule_agent_id_mutex = AgentIdMap.add x predicate_id rule_agent_id_mutex in 
+                 let fictitious_local_list = predicate_id::fictitious_local_list in
+                 let fictitious_list = predicate_id::fictitious_list in 
+                 let error,log_info,blackboard,rule_agent_id_subs = 
+                   if AgentIdSet.mem x data_structure.subs_agents_involved_in_links 
+                   then 
+                     begin 
+                       let nsid = blackboard.pre_nsteps + 1 in 
+                       let predicate_info = Fictitious nsid in 
+                       let error,blackboard,predicate_id = allocate parameter handler error blackboard predicate_info in 
+                       let error,log_info,blackboard = init_fictitious_action log_info error predicate_id blackboard in 
+                       let rule_agent_id_subs =  AgentIdMap.add x predicate_id rule_agent_id_mutex in 
+                       error,log_info,blackboard,rule_agent_id_subs
+                     end
+                   else
+                     error,log_info,blackboard,rule_agent_id_subs
+                 in 
+                 let error,log_info,blackboard,mixture_agent_id_mutex,set = 
+                   List.fold_left 
+                     (fun (error,log_info,blackboard,mixture_agent_id_mutex,set) id -> 
+                       let set' = AgentIdSet.add id set in 
+                       if set==set'
+                       then 
+                         try 
+                           let _ = AgentIdMap.find id mixture_agent_id_mutex in 
+                           (error,log_info,blackboard,mixture_agent_id_mutex,set)
+                         with
+                           Not_found -> 
+                             begin 
+                               let nsid = blackboard.pre_nsteps + 1 in 
+                               let predicate_info = Fictitious nsid in 
+                               let error,blackboard,predicate_id = allocate parameter handler error blackboard predicate_info in 
+                               let error,log_info,blackboard = init_fictitious_action log_info error predicate_id blackboard in 
+                               let mixture_agent_id_mutex = AgentIdMap.add x predicate_id mixture_agent_id_mutex in 
+                               error,log_info,blackboard,mixture_agent_id_mutex,set
+                             end 
+                       else 
+                         (error,log_info,blackboard,mixture_agent_id_mutex,set'))
+                     (error,log_info,blackboard,mixture_agent_id_mutex,set) l 
+                      in 
+                 (error,log_info,blackboard,rule_agent_id_mutex,rule_agent_id_subs,mixture_agent_id_mutex,fictitious_list,fictitious_local_list,set))
+               data_structure.old_agents_potential_substitution
+               (error,log_info,blackboard,AgentIdMap.empty,AgentIdMap.empty,AgentIdMap.empty,blackboard.pre_fictitious_list,[],AgentIdSet.empty)
+           in 
+           let data_structure = 
+             { 
+               data_structure 
+               with 
+                 rule_agent_id_mutex = rule_agent_id_mutex ;
+                 rule_agent_id_subs = rule_agent_id_subs ; 
+                 mixture_agent_id_mutex = mixture_agent_id_mutex ;
+             }
+           in 
+           let blackboard = {blackboard with pre_fictitious_list = fictitious_list} in 
            let _ = 
              if debug_mode 
              then 
-               print_data_structure handler data_structure 
+               let _ = print_data_structure handler data_structure in
+               ()
            in 
-           let fictitious_local_list = [] in 
            let fictitious_list = blackboard.pre_fictitious_list in 
            let build_map list map = 
              List.fold_left 
@@ -1163,6 +1252,424 @@ module Preblackboard =
                  let old = A.get map pid in 
                  A.set map pid (C.add p old) 
            in 
+           (* deal with substitutable agent in links*)
+           let error,log_info,blackboard = 
+             AgentId2Set.fold 
+               (fun link (error,log_info,blackboard) -> 
+                 let rule_ag_id1,rule_ag_id2=link in 
+                 let subs_1,l_ag_1 = 
+                   try 
+                     true,AgentIdMap.find rule_ag_id1 data_structure.old_agents_potential_substitution
+                   with 
+                     Not_found -> false,[rule_ag_id1]
+                 in 
+                 let subs_2,l_ag_2 = 
+                    try 
+                     true,AgentIdMap.find rule_ag_id2 data_structure.old_agents_potential_substitution
+                   with 
+                     Not_found -> false,[rule_ag_id2]
+                 in 
+                 let test_list = 
+                   try 
+                     AgentId2Map.find link data_structure.other_links_tests 
+                   with 
+                   | Not_found -> []
+                 in 
+                 let action_list = 
+                   try 
+                     AgentId2Map.find link data_structure.other_links_actions 
+                   with 
+                   | Not_found -> []
+                 in 
+                 List.fold_left 
+                   (fun (error,log_info,blackboard) mixture_ag_1 -> 
+                     let test_list = 
+                       if rule_ag_id1=mixture_ag_1 
+                       then 
+                         test_list
+                       else 
+                         List.rev_map (CI.Po.K.subs_agent_in_test rule_ag_id1 mixture_ag_1) (List.rev test_list)
+                     in 
+                     let action_list = 
+                       if rule_ag_id1=mixture_ag_1 
+                       then 
+                         action_list
+                       else 
+                         List.rev_map (CI.Po.K.subs_agent_in_action rule_ag_id1 mixture_ag_1) (List.rev action_list)
+                     in
+                     let mutex_1 = 
+                       if  
+                         subs_1 
+                       then 
+                         try 
+                           Some(AgentIdMap.find mixture_ag_1 data_structure.mixture_agent_id_mutex)
+                         with 
+                         | Not_found -> None
+                       else None 
+                     in 
+                           
+                     List.fold_left 
+                       (fun (error,log_info,blackboard) mixture_ag_2 -> 
+                         let test_list = 
+                           if rule_ag_id2=mixture_ag_2 
+                           then 
+                             test_list
+                           else 
+                             List.rev_map (CI.Po.K.subs_agent_in_test rule_ag_id2 mixture_ag_2) (List.rev test_list)
+                         in 
+                         let action_list = 
+                           if rule_ag_id2=mixture_ag_2
+                           then 
+                             action_list
+                           else 
+                             List.rev_map (CI.Po.K.subs_agent_in_action rule_ag_id2 mixture_ag_2) (List.rev action_list)
+                         in
+                         let mutex_2 = 
+                           if  
+                             subs_2 
+                           then 
+                             try 
+                               Some(AgentIdMap.find mixture_ag_2 data_structure.mixture_agent_id_mutex)
+                             with 
+                             | Not_found -> None
+                           else None 
+                         in 
+                         let error,blackboard,test_map = 
+                           List.fold_left 
+                             (fun (error,blackboard,map) test -> 
+                               let error,blackboard,test_list = predicates_of_test parameter handler error blackboard test in
+                               error,blackboard,build_map test_list map)
+                             (error,blackboard,PredicateidMap.empty)
+                             test_list in 
+                         let error,blackboard,action_map,test_map = 
+                           List.fold_left 
+                             (fun (error,blackboard,action_map,test_map) action -> 
+                               let error,blackboard,action_list,test_list = predicates_of_action parameter handler error blackboard init action in 
+                               error,blackboard,build_map action_list action_map,build_map test_list test_map)
+                             (error,blackboard,PredicateidMap.empty,test_map)
+                             action_list in 
+                         let g x = 
+                           match x 
+                           with 
+                           | None -> Unknown
+                           | Some x -> x
+                         in 
+                         let merged_map = 
+                           PredicateidMap.merge 
+                             (fun _ test action -> Some(g test,g action))
+                             test_map
+                             action_map 
+                         in 
+                         let merged_map = 
+                           match 
+                             mutex_1
+                           with 
+                           | None -> merged_map 
+                           | Some pid -> 
+                             PredicateidMap.add pid (Counter 0,Counter 1) merged_map
+                         in 
+                         let merged_map = 
+                           match 
+                             mutex_2
+                           with 
+                           | None -> merged_map 
+                           | Some pid -> 
+                             PredicateidMap.add pid (Counter 0,Counter 1) merged_map
+                         in 
+                         if PredicateidMap.is_empty  merged_map 
+                         then 
+                           error,log_info,blackboard 
+                         else 
+                           begin 
+                             let nsid = blackboard.pre_nsteps + 1 in 
+                             let _ = A.set pre_event nsid step in 
+                             let pre_steps_by_column = 
+                               PredicateidMap.fold 
+                                 (fun id (test,action) map -> 
+                                   begin 
+                                     let value,list = A.get map id in 
+                                     let value' = value + 1 in 
+                                     let _ = fadd id action blackboard.history_of_predicate_values_to_predicate_id in 
+                                     let _ = A.set map id (value',(nsid,value,test,action)::list)
+                                     in map
+                                   end)
+                                 merged_map
+                                 blackboard.pre_steps_by_column 
+                             in 
+                             (*let _ = A.set blackboard.pre_kind_of_event nsid 
+                               
+(type_of_step (CI.Po.K.type_of_refined_step step)) in *)
+                             let blackboard = 
+                               { 
+                                 blackboard with 
+                                   pre_event = pre_event ;
+                                   pre_steps_by_column = pre_steps_by_column; 
+                                   pre_nsteps = nsid;
+                               }
+                             in 
+                             error,log_info,blackboard 
+                           end)
+                       (error,log_info,blackboard)
+                       l_ag_2)
+                   (error,log_info,blackboard)
+                   (l_ag_1))
+               data_structure.other_links 
+               (error,log_info,blackboard)
+           in 
+           (*** ***)
+           let error,log_info,blackboard = 
+             AgentIdMap.fold 
+               (fun rule_ag_id l (error,log_info,blackboard) -> 
+                 let test_list,action_list,side_effect = 
+                   begin 
+                     try 
+                       AgentIdMap.find rule_ag_id data_structure.other_agents_tests 
+                     with 
+                       Not_found -> []
+                   end ,
+                     begin 
+                       try 
+                         AgentIdMap.find rule_ag_id data_structure.other_agents_actions 
+                       with 
+                         Not_found -> []
+                     end ,
+                       try 
+                         AgentIdMap.find rule_ag_id data_structure.other_agents_side_effects
+                       with 
+                         Not_found -> []
+                 in 
+                 List.fold_left 
+                   (fun (error,log_info,blackboard) mixture_ag_id -> 
+                     let test_list = 
+                       List.rev_map 
+                         (CI.Po.K.subs_agent_in_test rule_ag_id mixture_ag_id)
+                         (List.rev test_list)
+                     in 
+                     let action_list = 
+                       List.rev_map
+                         (CI.Po.K.subs_agent_in_action rule_ag_id mixture_ag_id)
+                         (List.rev action_list)
+                     in 
+                     let side_effect = 
+                       List.rev_map
+                         (CI.Po.K.subs_agent_in_side_effect rule_ag_id mixture_ag_id)
+                         (List.rev side_effect)
+                     in 
+                     let fictitious_local_list = [] in 
+                     let error,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effects = 
+                       List.fold_left 
+                         (fun (error,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effects) (site,(binding_state)) -> 
+                           begin
+                             let error,blackboard,potential_target = potential_target error parameter handler blackboard site binding_state in 
+                             match 
+                               potential_target 
+                             with 
+                             | [l]  ->  
+                               begin
+                                 let list = 
+                                   List.fold_left 
+                                     (fun list t -> t::l)
+                                     unambiguous_side_effects
+                                     l 
+                                 in 
+                                 error,
+                                 blackboard,
+                                 fictitious_list,
+                                 fictitious_local_list,
+                                 list 
+                               end
+                             | _ -> 
+                               begin 
+                                 let nsid = blackboard.pre_nsteps + 1 in 
+                                 let predicate_info = Fictitious nsid in 
+                                 let error,blackboard,predicate_id = allocate parameter handler error blackboard predicate_info  in 
+                                 let error,log_info,blackboard = init_fictitious_action log_info error predicate_id  blackboard in
+                                 let error,log_info,blackboard = 
+                                   List.fold_left 
+                                     (fun (error,log_info,blackboard) list -> 
+                                       let blackboard = {blackboard with pre_nsteps = blackboard.pre_nsteps+1} in 
+                                       let log_info = CI.Po.K.P.inc_n_side_events log_info in 
+                                       let side_effect = 
+                                         List.fold_left 
+                                           (fun list (_,a,_) -> 
+                                             match a 
+                                             with 
+                                             | None -> list
+                                             | Some a -> a::list)
+                                           []
+                                           list 
+                                       in 
+                                       let side_effect = CI.Po.K.side_effect_of_list 
+                                         side_effect in 
+                                       let _ = A.set blackboard.pre_side_effect_of_event 
+                                         blackboard.pre_nsteps
+                                         side_effect in
+                                       let error,blackboard = 
+                                         List.fold_left
+                                           (fun (error,blackboard) (predicate_id,_,(test,action)) -> 
+                                             add_fictitious_action error test action predicate_id blackboard)
+                                           (error,blackboard) 
+                                           ((predicate_id,None,(Counter 0,Counter 1))::list)
+                                       in 
+                                       error,log_info,blackboard)
+                                     (error,log_info,blackboard)
+                                     potential_target
+                                 in 
+                                 error,
+                                 blackboard,
+                                 (predicate_id::fictitious_list),
+                                 (predicate_id::fictitious_local_list),
+                                 unambiguous_side_effects
+                               end
+                           end)
+                         (error,blackboard,fictitious_list,fictitious_local_list,[])
+                         side_effect 
+                     in 
+                     let pid_rule_agent_mutex = 
+                       try 
+                         AgentIdMap.find 
+                           rule_ag_id 
+                           data_structure.rule_agent_id_mutex 
+                       with 
+                         Not_found -> 
+                           let _ = Printf.fprintf stdout "ERROR line 1332: %i \n" rule_ag_id  in raise Exit
+                     in 
+                     let error,blackboard,test_map = 
+                       List.fold_left 
+                         (fun (error,blackboard,map) test -> 
+                           let error,blackboard,test_list = predicates_of_test parameter handler error blackboard test in
+                           error,blackboard,build_map test_list map)
+                         (error,blackboard,PredicateidMap.empty)
+                         test_list in 
+                     let test_map = 
+                       PredicateidMap.add 
+                         pid_rule_agent_mutex 
+                         (Counter 0)
+                         test_map 
+                     in 
+                     let error,blackboard,action_map,test_map = 
+                       List.fold_left 
+                         (fun (error,blackboard,action_map,test_map) action -> 
+                           let error,blackboard,action_list,test_list = predicates_of_action parameter handler error blackboard init action in 
+                           error,blackboard,build_map action_list action_map,build_map test_list test_map)
+                         (error,blackboard,PredicateidMap.empty,test_map)
+                         action_list in 
+                     
+                     let action_map = 
+                       PredicateidMap.add 
+                         pid_rule_agent_mutex 
+                         (Counter 1)
+                         action_map
+                     in 
+                     let action_map = 
+                       try 
+                         let m_id = 
+                           AgentIdMap.find 
+                             rule_ag_id 
+                             data_structure.rule_agent_id_subs 
+                         in 
+                         PredicateidMap.add 
+                           m_id 
+                           (Pointer_to_agent mixture_ag_id)
+                           action_map 
+                       with 
+                       | Not_found -> action_map 
+                     in 
+                      let test_map,action_map = 
+                       try 
+                         let m_id = 
+                           AgentIdMap.find 
+                             mixture_ag_id 
+                             data_structure.mixture_agent_id_mutex 
+                         in 
+                         PredicateidMap.add 
+                           m_id 
+                           (Counter 0)
+                           test_map,
+                         PredicateidMap.add
+                           m_id
+                           (Undefined)
+                           action_map 
+                       with 
+                       | Not_found -> test_map,action_map
+                     in 
+                     let g x = 
+                       match x 
+                       with 
+                       | None -> Unknown
+                       | Some x -> x
+                     in 
+                     let merged_map = 
+                       PredicateidMap.merge 
+                         (fun _ test action -> Some(g test,g action))
+                         test_map
+                         action_map 
+                     in 
+                     let merged_map = 
+                       List.fold_left 
+                         (fun map pid -> PredicateidMap.add pid (Counter 1,Undefined) map)
+                         merged_map
+                         fictitious_local_list 
+                     in 
+                     let merged_map = 
+                       List.fold_left 
+                         (fun map (pid,_,(test,action)) -> add_state pid (test,action) map)
+                         merged_map
+                         unambiguous_side_effects
+                     in 
+                     let side_effect = 
+                       List.fold_left 
+                         (fun list (_,a,_) -> 
+                           match a 
+                           with 
+                           | None -> list
+                           | Some a -> a::list)
+                         []
+                         unambiguous_side_effects 
+                     in 
+                     if side_effect = []
+                     && PredicateidMap.is_empty  merged_map 
+                     then 
+                       error,log_info,blackboard 
+                     else 
+                       begin 
+                         let nsid = blackboard.pre_nsteps + 1 in 
+                         let _ = A.set blackboard.pre_side_effect_of_event nsid (CI.Po.K.side_effect_of_list side_effect) in
+(*                         let _ = A.set pre_event nsid step in *)
+                         let pre_steps_by_column = 
+                           PredicateidMap.fold 
+                             (fun id (test,action) map -> 
+                               begin 
+                                 let value,list = A.get map id in 
+                                 let value' = value + 1 in 
+                                 let _ = fadd id action blackboard.history_of_predicate_values_to_predicate_id in 
+                                 let _ = A.set map id (value',(nsid,value,test,action)::list)
+                                 in map
+                               end)
+                             merged_map
+                             blackboard.pre_steps_by_column 
+                         in 
+(*                         let _ = A.set blackboard.pre_kind_of_event nsid (type_of_step (CI.Po.K.type_of_refined_step step)) in *)
+                         let blackboard = 
+                           { 
+                             blackboard with 
+                               pre_event = pre_event ;
+                               pre_fictitious_list = fictitious_list ; 
+                               pre_steps_by_column = pre_steps_by_column; 
+                               pre_nsteps = nsid;
+                           }
+                         in 
+                         error,log_info,blackboard 
+                       end )
+                   (error,log_info,blackboard) l 
+               ) 
+               data_structure.old_agents_potential_substitution
+               (error,log_info,blackboard)
+
+           in 
+           (** deal with substitutatble links *)
+           (** TODO **)
+           (*** deal with rigid elements ***)
            let error,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effects = 
              List.fold_left 
                (fun (error,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effects) (site,(binding_state)) -> 
@@ -1322,7 +1829,7 @@ module Preblackboard =
                in 
                error,log_info,blackboard 
              end 
-
+               (*** ***)
        
          let add_step parameter handler error log_info step blackboard = 
            let init = CI.Po.K.is_init_of_refined_step step in 
@@ -1414,11 +1921,8 @@ module Preblackboard =
                                    []
                                    list 
                                in 
-                               let side_effect = CI.Po.K.side_effect_of_list 
-                                 side_effect in 
-                               let _ = A.set blackboard.pre_side_effect_of_event 
-                                 blackboard.pre_nsteps
-                                 side_effect in
+                               let side_effect = CI.Po.K.side_effect_of_list side_effect in 
+                               let _ = A.set blackboard.pre_side_effect_of_event blackboard.pre_nsteps side_effect in
                                let error,blackboard = 
                                  List.fold_left
                                    (fun (error,blackboard) (predicate_id,_,(test,action)) -> 
@@ -1558,7 +2062,7 @@ module Preblackboard =
                    (error,blackboard)
                    l
                in 
-               error,log_info,blackboard
+               error,log_info,blackboard 
 
          let add_step_up_to_iso = add_step_strong
                  

@@ -10,13 +10,13 @@
   * Jean Krivine, Université Paris Diderot, CNRS 
   *  
   * Creation: 22/03/2012
-  * Last modification: 31/07/2012
+  * Last modification: 14/06/2013
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
   *  
-  * Copyright 2011,2012 Institut National de Recherche en Informatique et   
-  * en Automatique.  All rights reserved.  This file is distributed     
+  * Copyright 2011,2012,2013 Institut National de Recherche en Informatique 
+  * et en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
 
@@ -330,7 +330,7 @@ module Dag =
           with 
             | _ -> FICTITIOUS,"" 
         in 
-        let print_to_beat to_beat= 
+    (*    let print_to_beat to_beat= 
           let _ = Printf.fprintf stderr "TO BEAT :" in 
           let _ = 
             match 
@@ -340,7 +340,7 @@ module Dag =
               | Some l -> List.iter (print_elt stderr) l
           in 
           Printf.fprintf stderr "\n" 
-        in 
+        in *)
         let rec pop (candidate:key list) (to_beat:key list option) = 
           match 
             candidate,to_beat

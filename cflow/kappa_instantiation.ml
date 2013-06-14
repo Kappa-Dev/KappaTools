@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 12/06/2013
+  * Last modification: 14/06/2013
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -124,6 +124,10 @@ sig
   val side_effect_of_list: (int*int) list -> side_effect 
   val no_obs_found: step list -> bool 
 
+  val subs_agent_in_test: agent_id -> agent_id -> test -> test
+  val subs_agent_in_action: agent_id -> agent_id -> action -> action 
+  val subs_agent_in_side_effect: agent_id -> agent_id -> (site*binding_state) -> (site*binding_state) 
+
   val get_kasim_side_effects: refined_step -> kasim_side_effect 
 end 
 
@@ -189,6 +193,7 @@ module Cflow_linker =
     | Free of site 
     | Remove of agent 
 
+ 
   type ('a,'b,'c) choice = 
     | Event of 'a 
     | Init of 'b
@@ -356,6 +361,45 @@ module Cflow_linker =
   let build_site a b = (a,b)
 
   let build_agent a b = (a,b)
+
+  let subs_agent id1 id2 agent = 
+    if agent_id_of_agent agent = id1 then 
+      build_agent id2 (agent_name_of_agent agent)
+    else 
+      agent
+        
+  let subs_site id1 id2 site = 
+    let agent = agent_of_site site in 
+    let agent' = subs_agent id1 id2 agent in 
+    if agent==agent'
+    then site
+    else 
+      build_site agent' (site_name_of_site site)
+
+  let subs_agent_in_test id1 id2 test = 
+    match 
+      test
+    with 
+    | Is_Here agent -> Is_Here (subs_agent id1 id2 agent)
+    | Has_Internal (site,internal_state) -> Has_Internal (subs_site id1 id2 site,internal_state)
+    | Is_Free site -> Is_Free (subs_site id1 id2 site)
+    | Is_Bound site -> Is_Bound (subs_site id1 id2 site)
+    | Has_Binding_type (site,binding_type) -> Has_Binding_type (subs_site id1 id2 site,binding_type)
+    | Is_Bound_to (site1,site2) -> Is_Bound_to (subs_site id1 id2 site1,subs_site id1 id2 site2)
+
+  let subs_agent_in_action id1 id2 action = 
+    match
+      action
+    with 
+    | Create (agent,list) -> Create(subs_agent id1 id2 agent,list)
+    | Mod_internal (site,i) -> Mod_internal(subs_site id1 id2 site,i)
+    | Bind (s1,s2) -> Bind(subs_site id1 id2 s1,subs_site id1 id2 s2)
+    | Bind_to (s1,s2) -> Bind_to(subs_site id1 id2 s1,subs_site id1 id2 s2)
+    | Unbind (s1,s2) -> Unbind (subs_site id1 id2 s1,subs_site id1 id2 s2)
+    | Free site -> Free (subs_site id1 id2 site)
+    | Remove agent -> Remove (subs_agent id1 id2 agent)
+
+  let subs_agent_in_side_effect id1 id2 (site,bstate) = (subs_site id1 id2 site,bstate)
 
   let apply_map id phi = 
     try 
