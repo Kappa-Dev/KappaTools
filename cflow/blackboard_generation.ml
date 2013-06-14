@@ -770,47 +770,48 @@ module Preblackboard =
              mixture_agent_id_mutex = AgentIdMap.empty
            }
      
-         let print_data_structure handler data =
-           let _ = Printf.fprintf stdout "New agents: \n" in 
+         let print_data_structure parameter handler data =
+           let stderr = parameter.CI.Po.K.H.out_channel_err in 
+           let _ = Printf.fprintf stderr "New agents: \n" in 
            let _ = 
-             AgentIdSet.iter (Printf.fprintf stdout " %i \n") data.new_agents
+             AgentIdSet.iter (Printf.fprintf stderr " %i \n") data.new_agents
            in 
-           let _ = Printf.fprintf stdout "Old agents: \n" in 
+           let _ = Printf.fprintf stderr "Old agents: \n" in 
            let _ = 
-             AgentIdMap.iter (Printf.fprintf stdout " id:%i: type:%i \n") data.old_agents 
+             AgentIdMap.iter (Printf.fprintf stderr " id:%i: type:%i \n") data.old_agents 
            in 
-           let _ = Printf.fprintf stdout "Old agents implied in links: \n" in 
+           let _ = Printf.fprintf stderr "Old agents implied in links: \n" in 
            let _ = 
-             AgentIdSet.iter (Printf.fprintf stdout " %i \n") data.subs_agents_involved_in_links 
+             AgentIdSet.iter (Printf.fprintf stderr " %i \n") data.subs_agents_involved_in_links 
            in 
-           let _ = Printf.fprintf stdout "Potential substitution: \n" in 
+           let _ = Printf.fprintf stderr "Potential substitution: \n" in 
            let _ = 
              AgentIdMap.iter 
                (fun id l -> 
                  let _ = 
-                   Printf.fprintf stdout " id:%i\n" id 
+                   Printf.fprintf stderr " id:%i\n" id 
                  in 
-                 List.iter (Printf.fprintf stdout "   %i\n") l)
+                 List.iter (Printf.fprintf stderr "   %i\n") l)
                data.old_agents_potential_substitution
            in 
-           let _ = Printf.fprintf stdout "Sure agents: \n" in 
+           let _ = Printf.fprintf stderr "Sure agents: \n" in 
            let _ = 
-             AgentIdSet.iter (Printf.fprintf stdout " %i \n") data.sure_agents
+             AgentIdSet.iter (Printf.fprintf stderr " %i \n") data.sure_agents
            in 
-           let _ = Printf.fprintf stdout "Sure tests: \n" in 
+           let _ = Printf.fprintf stderr "Sure tests: \n" in 
            let _ = 
              List.iter 
-               (CI.Po.K.print_test stdout handler " ")
+               (CI.Po.K.print_test stderr handler " ")
                data.sure_tests
            in 
-           let _ = Printf.fprintf stdout "Tests to be substituted: \n" in 
+           let _ = Printf.fprintf stderr "Tests to be substituted: \n" in 
            let _ = 
              AgentIdMap.iter 
                (fun id l -> 
-                 let _ = Printf.fprintf stdout " %i\n" id in 
+                 let _ = Printf.fprintf stderr " %i\n" id in 
                  let _ = 
                    List.iter 
-                     (CI.Po.K.print_test stdout handler "  ")
+                     (CI.Po.K.print_test stderr handler "  ")
                      l
                  in ())
                data.other_agents_tests
@@ -818,28 +819,28 @@ module Preblackboard =
            let _ = 
              AgentId2Map.iter 
                (fun (id1,id2) l -> 
-                 let _ = Printf.fprintf stdout " (%i,%i)\n" id1 id2 in 
+                 let _ = Printf.fprintf stderr " (%i,%i)\n" id1 id2 in 
                  let _ = 
                    List.iter 
-                     (CI.Po.K.print_test stdout handler "  ")
+                     (CI.Po.K.print_test stderr handler "  ")
                      l
                  in ())
                data.other_links_tests
            in 
-           let _ = Printf.fprintf stdout "Sure actions: \n" in 
+           let _ = Printf.fprintf stderr "Sure actions: \n" in 
            let _ = 
              List.iter 
-               (CI.Po.K.print_action stdout handler " ")
+               (CI.Po.K.print_action stderr handler " ")
                data.sure_actions
            in 
-           let _ = Printf.fprintf stdout "Actions to be substituted: \n" in 
+           let _ = Printf.fprintf stderr "Actions to be substituted: \n" in 
            let _ = 
              AgentIdMap.iter 
                (fun id l -> 
-                 let _ = Printf.fprintf stdout " %i\n" id in 
+                 let _ = Printf.fprintf stderr " %i\n" id in 
                  let _ = 
                    List.iter 
-                     (CI.Po.K.print_action stdout handler "  ")
+                     (CI.Po.K.print_action stderr handler "  ")
                      l
                  in ())
                data.other_agents_actions
@@ -847,28 +848,28 @@ module Preblackboard =
            let _ = 
              AgentId2Map.iter 
                (fun (id1,id2) l -> 
-                 let _ = Printf.fprintf stdout " (%i,%i)\n" id1 id2 in 
+                 let _ = Printf.fprintf stderr " (%i,%i)\n" id1 id2 in 
                  let _ = 
                    List.iter 
-                     (CI.Po.K.print_action stdout handler "  ")
+                     (CI.Po.K.print_action stderr handler "  ")
                      l
                  in ())
                data.other_links_actions
            in 
-           let _ = Printf.fprintf stdout "Sure side_effects \n" in 
+           let _ = Printf.fprintf stderr "Sure side_effects \n" in 
            let _ = 
              List.iter
-               (CI.Po.K.print_side stdout handler " ")
+               (CI.Po.K.print_side stderr handler " ")
                data.sure_side_effects 
            in 
-           let _ = Printf.fprintf stdout "Side effect to be substituted: \n" in 
+           let _ = Printf.fprintf stderr "Side effect to be substituted: \n" in 
            let _ = 
              AgentIdMap.iter 
                (fun id l -> 
-                 let _ = Printf.fprintf stdout " %i\n" id in 
+                 let _ = Printf.fprintf stderr " %i\n" id in 
                  let _ = 
                    List.iter 
-                     (CI.Po.K.print_side stdout handler "  ")
+                     (CI.Po.K.print_side stderr handler "  ")
                      l
                  in ())
                data.other_agents_side_effects
@@ -1206,9 +1207,9 @@ module Preblackboard =
            in 
            let blackboard = {blackboard with pre_fictitious_list = fictitious_list} in 
            let _ = 
-             if debug_mode 
+             if debug_mode  
              then 
-               let _ = print_data_structure handler data_structure in
+               let _ = print_data_structure parameter handler data_structure in
                ()
            in 
            let fictitious_list = blackboard.pre_fictitious_list in 
@@ -1416,7 +1417,7 @@ module Preblackboard =
                data_structure.other_links 
                (error,log_info,blackboard)
            in 
-           (*** ***)
+           (*** deal with substitutable agents ***)
            let error,log_info,blackboard = 
              AgentIdMap.fold 
                (fun rule_ag_id l (error,log_info,blackboard) -> 
@@ -1667,9 +1668,12 @@ module Preblackboard =
                (error,log_info,blackboard)
 
            in 
-           (** deal with substitutatble links *)
-           (** TODO **)
            (*** deal with rigid elements ***)
+           let side_effect = data_structure.sure_side_effects in 
+           let action_list = data_structure.sure_actions in 
+           let test_list = data_structure.sure_tests in 
+             
+
            let error,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effects = 
              List.fold_left 
                (fun (error,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effects) (site,(binding_state)) -> 
@@ -2061,6 +2065,11 @@ module Preblackboard =
                      add_fictitious_action error Undefined Unknown predicate_id blackboard)
                    (error,blackboard)
                    l
+               in 
+               let _ = 
+                 if debug_mode 
+                 then 
+                   let _ = print_preblackboard parameter handler error blackboard in () 
                in 
                error,log_info,blackboard 
 
