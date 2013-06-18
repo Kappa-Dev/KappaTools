@@ -120,7 +120,7 @@ let record ?decorate_with rule side_effects (embedding,fresh_map) event_number g
 	in
 	grid
 
-let record_obs ((r_id,state,embedding,_),test) event_number grid env = 
+let record_obs side_effects ((r_id,state,embedding,_),test) event_number grid env = 
   let im embedding id =
     match id with
       | FRESH j -> raise (Invalid_argument "Causal.record_obs")
@@ -136,6 +136,13 @@ let record_obs ((r_id,state,embedding,_),test) event_number grid env =
       ) 
       causal  
       grid
+  in
+  let grid =  
+    (*adding side effects modifications*)
+    Int2Set.fold 
+      (fun (node_id,site_id) grid -> 
+        add (node_id,site_id) (_LINK_TESTED lor _LINK_MODIF) grid event_number (OBS r_id) [])
+      side_effects grid
   in
   grid
 

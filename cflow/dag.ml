@@ -10,7 +10,7 @@
   * Jean Krivine, Université Paris Diderot, CNRS 
   *  
   * Creation: 22/03/2012
-  * Last modification: 14/06/2013
+  * Last modification: 18/06/2013
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -142,19 +142,19 @@ module Dag =
       let print_canonical_form parameter handler error dag = 
         let _ =
           List.iter 
-            (print_elt parameter.H.out_channel)
+            (print_elt parameter.H.out_channel_err)
             dag
         in 
-        let _ = Printf.fprintf parameter.H.out_channel "\n" in 
+        let _ = Printf.fprintf parameter.H.out_channel_err "\n" in 
         error 
 
       let print_prehash parameter handler error representation = 
         let _ = 
           List.iter 
-            (fun ((_,b),i) -> Printf.fprintf parameter.H.out_channel "%s:%i," b i)
+            (fun ((_,b),i) -> Printf.fprintf parameter.H.out_channel_err "%s:%i," b i)
             representation 
         in 
-        let _ = Printf.fprintf parameter.H.out_channel "\n" in 
+        let _ = Printf.fprintf parameter.H.out_channel_err "\n" in 
         error 
 
       let label handler = Causal.label handler.H.env handler.H.state
@@ -208,7 +208,7 @@ module Dag =
         let labels = A.make 1 (FICTITIOUS,"") in 
         let set =  
           Mods.IntMap.fold
-            (fun i atom  -> 
+            (fun i atom  ->
               let _ = A.set labels i (kind atom.Causal.kind,label atom.Causal.kind) in 
               Mods.IntSet.add i 
             )
@@ -317,11 +317,15 @@ module Dag =
              (let l=ref [] in 
               let _ = 
                 A.iter 
-                  (fun a -> l:=(a,1)::(!l))
+                  (fun a -> 
+                    match a 
+                    with
+                    | FICTITIOUS,_ -> ()
+                    | _ ->    l:=(a,1)::(!l))
                   graph.labels 
               in 
               !l))
-    
+
       let canonicalize parameter handler error graph = 
         let asso = Mods.IntMap.empty in 
         let label i = 

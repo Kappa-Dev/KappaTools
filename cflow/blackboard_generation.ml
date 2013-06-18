@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 14/06/2013
+  * Last modification: 18/06/2013
   * * 
   * Some parameter references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -89,11 +89,12 @@ module Preblackboard =
      (** blackboard predicates*)
 
      type rule_type = (** kind of events*)
-       | Dummy 
-       | Init 
-       | Observable
-       | Rule 
-       | Side_effect_of of (step_id * (CI.Po.K.agent_id * CI.Po.K.site_name) list)
+     | Subs 
+     | Dummy 
+     | Init 
+     | Observable
+     | Rule 
+     | Side_effect_of of (step_id * (CI.Po.K.agent_id * CI.Po.K.site_name) list)
      
      type predicate_id = int (** wire identifiers *)
      type predicate_info = (** wire labels *)
@@ -614,10 +615,11 @@ module Preblackboard =
          let type_of_step x = 
            match x 
            with 
-             | CI.Po.K.Dummy -> Dummy 
-             | CI.Po.K.Init _ -> Init 
-             | CI.Po.K.Event _ -> Rule 
-             | CI.Po.K.Obs _ -> Observable
+           | CI.Po.K.Subs _ -> Subs  
+           | CI.Po.K.Dummy -> Dummy 
+           | CI.Po.K.Init _ -> Init 
+           | CI.Po.K.Event _ -> Rule 
+           | CI.Po.K.Obs _ -> Observable
                
   (** initialisation*)
          let init parameter handler error (*log_info*) = 
@@ -1253,170 +1255,7 @@ module Preblackboard =
                  let old = A.get map pid in 
                  A.set map pid (C.add p old) 
            in 
-           (* deal with substitutable agent in links*)
-           let error,log_info,blackboard = 
-             AgentId2Set.fold 
-               (fun link (error,log_info,blackboard) -> 
-                 let rule_ag_id1,rule_ag_id2=link in 
-                 let subs_1,l_ag_1 = 
-                   try 
-                     true,AgentIdMap.find rule_ag_id1 data_structure.old_agents_potential_substitution
-                   with 
-                     Not_found -> false,[rule_ag_id1]
-                 in 
-                 let subs_2,l_ag_2 = 
-                    try 
-                     true,AgentIdMap.find rule_ag_id2 data_structure.old_agents_potential_substitution
-                   with 
-                     Not_found -> false,[rule_ag_id2]
-                 in 
-                 let test_list = 
-                   try 
-                     AgentId2Map.find link data_structure.other_links_tests 
-                   with 
-                   | Not_found -> []
-                 in 
-                 let action_list = 
-                   try 
-                     AgentId2Map.find link data_structure.other_links_actions 
-                   with 
-                   | Not_found -> []
-                 in 
-                 List.fold_left 
-                   (fun (error,log_info,blackboard) mixture_ag_1 -> 
-                     let test_list = 
-                       if rule_ag_id1=mixture_ag_1 
-                       then 
-                         test_list
-                       else 
-                         List.rev_map (CI.Po.K.subs_agent_in_test rule_ag_id1 mixture_ag_1) (List.rev test_list)
-                     in 
-                     let action_list = 
-                       if rule_ag_id1=mixture_ag_1 
-                       then 
-                         action_list
-                       else 
-                         List.rev_map (CI.Po.K.subs_agent_in_action rule_ag_id1 mixture_ag_1) (List.rev action_list)
-                     in
-                     let mutex_1 = 
-                       if  
-                         subs_1 
-                       then 
-                         try 
-                           Some(AgentIdMap.find mixture_ag_1 data_structure.mixture_agent_id_mutex)
-                         with 
-                         | Not_found -> None
-                       else None 
-                     in 
-                           
-                     List.fold_left 
-                       (fun (error,log_info,blackboard) mixture_ag_2 -> 
-                         let test_list = 
-                           if rule_ag_id2=mixture_ag_2 
-                           then 
-                             test_list
-                           else 
-                             List.rev_map (CI.Po.K.subs_agent_in_test rule_ag_id2 mixture_ag_2) (List.rev test_list)
-                         in 
-                         let action_list = 
-                           if rule_ag_id2=mixture_ag_2
-                           then 
-                             action_list
-                           else 
-                             List.rev_map (CI.Po.K.subs_agent_in_action rule_ag_id2 mixture_ag_2) (List.rev action_list)
-                         in
-                         let mutex_2 = 
-                           if  
-                             subs_2 
-                           then 
-                             try 
-                               Some(AgentIdMap.find mixture_ag_2 data_structure.mixture_agent_id_mutex)
-                             with 
-                             | Not_found -> None
-                           else None 
-                         in 
-                         let error,blackboard,test_map = 
-                           List.fold_left 
-                             (fun (error,blackboard,map) test -> 
-                               let error,blackboard,test_list = predicates_of_test parameter handler error blackboard test in
-                               error,blackboard,build_map test_list map)
-                             (error,blackboard,PredicateidMap.empty)
-                             test_list in 
-                         let error,blackboard,action_map,test_map = 
-                           List.fold_left 
-                             (fun (error,blackboard,action_map,test_map) action -> 
-                               let error,blackboard,action_list,test_list = predicates_of_action parameter handler error blackboard init action in 
-                               error,blackboard,build_map action_list action_map,build_map test_list test_map)
-                             (error,blackboard,PredicateidMap.empty,test_map)
-                             action_list in 
-                         let g x = 
-                           match x 
-                           with 
-                           | None -> Unknown
-                           | Some x -> x
-                         in 
-                         let merged_map = 
-                           PredicateidMap.merge 
-                             (fun _ test action -> Some(g test,g action))
-                             test_map
-                             action_map 
-                         in 
-                         let merged_map = 
-                           match 
-                             mutex_1
-                           with 
-                           | None -> merged_map 
-                           | Some pid -> 
-                             PredicateidMap.add pid (Counter 0,Counter 1) merged_map
-                         in 
-                         let merged_map = 
-                           match 
-                             mutex_2
-                           with 
-                           | None -> merged_map 
-                           | Some pid -> 
-                             PredicateidMap.add pid (Counter 0,Counter 1) merged_map
-                         in 
-                         if PredicateidMap.is_empty  merged_map 
-                         then 
-                           error,log_info,blackboard 
-                         else 
-                           begin 
-                             let nsid = blackboard.pre_nsteps + 1 in 
-                             let _ = A.set pre_event nsid step in 
-                             let pre_steps_by_column = 
-                               PredicateidMap.fold 
-                                 (fun id (test,action) map -> 
-                                   begin 
-                                     let value,list = A.get map id in 
-                                     let value' = value + 1 in 
-                                     let _ = fadd id action blackboard.history_of_predicate_values_to_predicate_id in 
-                                     let _ = A.set map id (value',(nsid,value,test,action)::list)
-                                     in map
-                                   end)
-                                 merged_map
-                                 blackboard.pre_steps_by_column 
-                             in 
-                             (*let _ = A.set blackboard.pre_kind_of_event nsid 
-                               
-(type_of_step (CI.Po.K.type_of_refined_step step)) in *)
-                             let blackboard = 
-                               { 
-                                 blackboard with 
-                                   pre_event = pre_event ;
-                                   pre_steps_by_column = pre_steps_by_column; 
-                                   pre_nsteps = nsid;
-                               }
-                             in 
-                             error,log_info,blackboard 
-                           end)
-                       (error,log_info,blackboard)
-                       l_ag_2)
-                   (error,log_info,blackboard)
-                   (l_ag_1))
-               data_structure.other_links 
-               (error,log_info,blackboard)
-           in 
+          
            (*** deal with substitutable agents ***)
            let error,log_info,blackboard = 
              AgentIdMap.fold 
@@ -1441,6 +1280,7 @@ module Preblackboard =
                  in 
                  List.fold_left 
                    (fun (error,log_info,blackboard) mixture_ag_id -> 
+                     let (step:CI.Po.K.refined_step) = CI.Po.K.build_subs_refined_step rule_ag_id mixture_ag_id in 
                      let test_list = 
                        List.rev_map 
                          (CI.Po.K.subs_agent_in_test rule_ag_id mixture_ag_id)
@@ -1635,8 +1475,8 @@ module Preblackboard =
                      else 
                        begin 
                          let nsid = blackboard.pre_nsteps + 1 in 
-                         let _ = A.set blackboard.pre_side_effect_of_event nsid (CI.Po.K.side_effect_of_list side_effect) in
-(*                         let _ = A.set pre_event nsid step in *)
+                         let _ = A.set blackboard.pre_side_effect_of_event nsid  (CI.Po.K.side_effect_of_list side_effect) in
+                         let _ = A.set pre_event nsid step in 
                          let pre_steps_by_column = 
                            PredicateidMap.fold 
                              (fun id (test,action) map -> 
@@ -1650,7 +1490,7 @@ module Preblackboard =
                              merged_map
                              blackboard.pre_steps_by_column 
                          in 
-(*                         let _ = A.set blackboard.pre_kind_of_event nsid (type_of_step (CI.Po.K.type_of_refined_step step)) in *)
+                         let _ = A.set blackboard.pre_kind_of_event nsid (type_of_step (CI.Po.K.type_of_refined_step step)) in 
                          let blackboard = 
                            { 
                              blackboard with 
@@ -1668,6 +1508,172 @@ module Preblackboard =
                (error,log_info,blackboard)
 
            in 
+          
+            (* deal with substitutable agent in links*)
+           let error,log_info,blackboard = 
+             AgentId2Set.fold 
+               (fun link (error,log_info,blackboard) -> 
+                 let rule_ag_id1,rule_ag_id2=link in 
+                 let subs_1,l_ag_1 = 
+                   try 
+                     true,AgentIdMap.find rule_ag_id1 data_structure.old_agents_potential_substitution
+                   with 
+                     Not_found -> false,[rule_ag_id1]
+                 in 
+                 let subs_2,l_ag_2 = 
+                    try 
+                     true,AgentIdMap.find rule_ag_id2 data_structure.old_agents_potential_substitution
+                   with 
+                     Not_found -> false,[rule_ag_id2]
+                 in 
+                 let test_list = 
+                   try 
+                     AgentId2Map.find link data_structure.other_links_tests 
+                   with 
+                   | Not_found -> []
+                 in 
+                 let action_list = 
+                   try 
+                     AgentId2Map.find link data_structure.other_links_actions 
+                   with 
+                   | Not_found -> []
+                 in 
+                 List.fold_left 
+                   (fun (error,log_info,blackboard) mixture_ag_1 -> 
+                     let test_list = 
+                       if rule_ag_id1=mixture_ag_1 
+                       then 
+                         test_list
+                       else 
+                         List.rev_map (CI.Po.K.subs_agent_in_test rule_ag_id1 mixture_ag_1) (List.rev test_list)
+                     in 
+                     let action_list = 
+                       if rule_ag_id1=mixture_ag_1 
+                       then 
+                         action_list
+                       else 
+                         List.rev_map (CI.Po.K.subs_agent_in_action rule_ag_id1 mixture_ag_1) (List.rev action_list)
+                     in
+                     let mutex_1 = 
+                       if  
+                         subs_1 
+                       then 
+                         try 
+                           Some(AgentIdMap.find mixture_ag_1 data_structure.mixture_agent_id_mutex)
+                         with 
+                         | Not_found -> None
+                       else None 
+                     in 
+                           
+                     List.fold_left 
+                       (fun (error,log_info,blackboard) mixture_ag_2 -> 
+                         let test_list = 
+                           if rule_ag_id2=mixture_ag_2 
+                           then 
+                             test_list
+                           else 
+                             List.rev_map (CI.Po.K.subs_agent_in_test rule_ag_id2 mixture_ag_2) (List.rev test_list)
+                         in 
+                         let action_list = 
+                           if rule_ag_id2=mixture_ag_2
+                           then 
+                             action_list
+                           else 
+                             List.rev_map (CI.Po.K.subs_agent_in_action rule_ag_id2 mixture_ag_2) (List.rev action_list)
+                         in
+                         let mutex_2 = 
+                           if  
+                             subs_2 
+                           then 
+                             try 
+                               Some(AgentIdMap.find mixture_ag_2 data_structure.mixture_agent_id_mutex)
+                             with 
+                             | Not_found -> None
+                           else None 
+                         in 
+                         let error,blackboard,test_map = 
+                           List.fold_left 
+                             (fun (error,blackboard,map) test -> 
+                               let error,blackboard,test_list = predicates_of_test parameter handler error blackboard test in
+                               error,blackboard,build_map test_list map)
+                             (error,blackboard,PredicateidMap.empty)
+                             test_list in 
+                         let error,blackboard,action_map,test_map = 
+                           List.fold_left 
+                             (fun (error,blackboard,action_map,test_map) action -> 
+                               let error,blackboard,action_list,test_list = predicates_of_action parameter handler error blackboard init action in 
+                               error,blackboard,build_map action_list action_map,build_map test_list test_map)
+                             (error,blackboard,PredicateidMap.empty,test_map)
+                             action_list in 
+                         let g x = 
+                           match x 
+                           with 
+                           | None -> Unknown
+                           | Some x -> x
+                         in 
+                         let merged_map = 
+                           PredicateidMap.merge 
+                             (fun _ test action -> Some(g test,g action))
+                             test_map
+                             action_map 
+                         in 
+                         let merged_map = 
+                           match 
+                             mutex_1
+                           with 
+                           | None -> merged_map 
+                           | Some pid -> 
+                             PredicateidMap.add pid (Counter 0,Counter 1) merged_map
+                         in 
+                         let merged_map = 
+                           match 
+                             mutex_2
+                           with 
+                           | None -> merged_map 
+                           | Some pid -> 
+                             PredicateidMap.add pid (Counter 0,Counter 1) merged_map
+                         in 
+                         if PredicateidMap.is_empty  merged_map 
+                         then 
+                           error,log_info,blackboard 
+                         else 
+                           begin 
+                             let nsid = blackboard.pre_nsteps + 1 in 
+                             let _ = A.set pre_event nsid step in 
+                             let pre_steps_by_column = 
+                               PredicateidMap.fold 
+                                 (fun id (test,action) map -> 
+                                   begin 
+                                     let value,list = A.get map id in 
+                                     let value' = value + 1 in 
+                                     let _ = fadd id action blackboard.history_of_predicate_values_to_predicate_id in 
+                                     let _ = A.set map id (value',(nsid,value,test,action)::list)
+                                     in map
+                                   end)
+                                 merged_map
+                                 blackboard.pre_steps_by_column 
+                             in 
+                             (*let _ = A.set blackboard.pre_kind_of_event nsid 
+                               
+(type_of_step (CI.Po.K.type_of_refined_step step)) in *)
+                             let blackboard = 
+                               { 
+                                 blackboard with 
+                                   pre_event = pre_event ;
+                                   pre_steps_by_column = pre_steps_by_column; 
+                                   pre_nsteps = nsid;
+                               }
+                             in 
+                             error,log_info,blackboard 
+                           end)
+                       (error,log_info,blackboard)
+                       l_ag_2)
+                   (error,log_info,blackboard)
+                   (l_ag_1))
+               data_structure.other_links 
+               (error,log_info,blackboard)
+           in 
+
            (*** deal with rigid elements ***)
            let side_effect = data_structure.sure_side_effects in 
            let action_list = data_structure.sure_actions in 

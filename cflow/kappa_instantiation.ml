@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 14/06/2013
+  * Last modification: 19/06/2013
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -40,12 +40,14 @@ sig
     | BOUND_TYPE of binding_type 
     | BOUND_to of site 
 
-  type ('a,'b,'c) choice = 
+  type ('a,'b,'c,'d,'e) choice = 
+    | Subs of ('d*'e)
     | Event of 'a 
     | Init of 'b
     | Obs of 'c  
     | Dummy 
-  
+    
+
   type test = 
     | Is_Here of agent
     | Has_Internal of site * internal_state 
@@ -81,7 +83,7 @@ sig
                    
   val empty_side_effect: side_effect
   val dummy_refined_step: refined_step
-  val type_of_refined_step: refined_step -> (unit,unit,unit) choice 
+  val type_of_refined_step: refined_step -> (unit,unit,unit,unit,unit) choice 
   val agent_of_binding_type: binding_type -> agent_name 
   val site_of_binding_type: binding_type -> site_name
   val agent_id_of_agent: agent -> agent_id 
@@ -100,6 +102,7 @@ sig
   val embedding_of_event: event -> embedding
   val fresh_map_of_event: event -> fresh_map
   val refine_step: H.handler -> step -> refined_step
+  val build_subs_refined_step: int -> int -> refined_step 
   val step_of_refined_step: refined_step -> step
   val rule_of_refined_event: refined_event -> kappa_rule
   val tests_of_refined_step: refined_step -> test list 
@@ -194,11 +197,12 @@ module Cflow_linker =
     | Remove of agent 
 
  
-  type ('a,'b,'c) choice = 
-    | Event of 'a 
-    | Init of 'b
-    | Obs of 'c  
-    | Dummy   
+  type ('a,'b,'c,'d,'e) choice = 
+  | Subs of ('d * 'e) 
+  | Event of 'a 
+  | Init of 'b
+  | Obs of 'c  
+  | Dummy   
 
   type refined_event = event * test list * (action list * ((site * binding_state) list))
   type refined_init = init * action list
@@ -207,9 +211,10 @@ module Cflow_linker =
           
 
   type side_effects = (int*int) list 
-  type step = (event,init,obs) choice 
-  type refined_step = (refined_event,refined_init,refined_obs) choice 
+  type step = (event,init,obs,agent_id,agent_id) choice 
+  type refined_step = (refined_event,refined_init,refined_obs,agent_id,agent_id) choice 
 
+  let build_subs_refined_step a b = Subs (a,b)
   let get_kasim_side_effects a = 
     match a 
     with 
@@ -223,6 +228,7 @@ module Cflow_linker =
     with 
       | Event _ -> Event ()
       | Init _ -> Init () 
+      | Subs (_,_) -> Subs ((),())
       | Obs _ -> Obs () 
       | Dummy -> Dummy 
 
@@ -376,6 +382,23 @@ module Cflow_linker =
     else 
       build_site agent' (site_name_of_site site)
 
+  let subs_map_agent f agent = 
+    let agent_id = agent_id_of_agent agent in 
+    try 
+      build_agent (Mods.IntMap.find agent_id f) (agent_name_of_agent agent)
+    with 
+    | Not_found -> agent
+    
+      
+        
+  let subs_map_site f site = 
+    let agent = agent_of_site site in 
+    let agent' = subs_map_agent f agent in 
+    if agent==agent'
+    then site
+    else 
+      build_site agent' (site_name_of_site site)
+
   let subs_agent_in_test id1 id2 test = 
     match 
       test
@@ -386,6 +409,17 @@ module Cflow_linker =
     | Is_Bound site -> Is_Bound (subs_site id1 id2 site)
     | Has_Binding_type (site,binding_type) -> Has_Binding_type (subs_site id1 id2 site,binding_type)
     | Is_Bound_to (site1,site2) -> Is_Bound_to (subs_site id1 id2 site1,subs_site id1 id2 site2)
+
+  let subs_map_agent_in_test f test = 
+    match 
+      test
+    with 
+    | Is_Here agent -> Is_Here (subs_map_agent f agent)
+    | Has_Internal (site,internal_state) -> Has_Internal (subs_map_site f site,internal_state)
+    | Is_Free site -> Is_Free (subs_map_site f site)
+    | Is_Bound site -> Is_Bound (subs_map_site f site)
+    | Has_Binding_type (site,binding_type) -> Has_Binding_type (subs_map_site f site,binding_type)
+    | Is_Bound_to (site1,site2) -> Is_Bound_to (subs_map_site f site1,subs_map_site f site2)
 
   let subs_agent_in_action id1 id2 action = 
     match
@@ -675,9 +709,13 @@ module Cflow_linker =
     let _,lhs,embedding,info = obs in 
     obs,tests_of_obs lhs embedding 
 
+  let refine_subs env a b = (a,b)
+
   let obs_of_refined_obs = fst 
 
   let event_of_refined_event (a,_,_) = a
+
+  let subs_of_refined_subs a b = (a,b)
 
   let refine_init env init = (init,actions_of_init init env)
 
@@ -690,9 +728,11 @@ module Cflow_linker =
 
   let tests_of_refined_init _ = []
   let tests_of_refined_event (_,y,_) =  y
+  let tests_of_refined_subs _ _ = []
   let actions_of_refined_event (_,_,y) = y
   let actions_of_refined_init (_,x) = x,[]
   let actions_of_refined_obs _ = [],[]
+  let actions_of_refined_subs _ _ = [],[]
   let rule_of_refined_event x = (compose rule_of_event event_of_refined_event) x 
 
   let print_side_effects log env prefix (site,state) = 
@@ -704,6 +744,8 @@ module Cflow_linker =
       (string_of_binding_state env state)
       
   let print_refined_obs log env refined_obs = () 
+
+  let print_refined_subs log env a b  = () 
 
   let print_refined_event log env refined_event = 
     let _ = Printf.fprintf log "***Refined event:***\n" in 
@@ -731,24 +773,30 @@ module Cflow_linker =
 
     ()
       
-  let gen f1 f2 f3 f4 step = 
+  let gen f0 f1 f2 f3 f4 step = 
     match step
     with 
-      | Event a -> f1 a 
-      | Init a -> f2 a
-      | Obs a -> f3 a 
-      | Dummy  -> f4 ()
+    | Subs (a,b) -> f0 a b 
+    | Event a -> f1 a 
+    | Init a -> f2 a
+    | Obs a -> f3 a 
+    | Dummy  -> f4 ()
 
-  let genbis f1 f2 f3  = 
-    gen (fun a -> Event (f1 a)) (fun a -> Init (f2 a)) (fun a -> Obs (f3 a))     (fun a -> Dummy)
+  let genbis f0 f1 f2 f3  = 
+    gen 
+      (fun a b -> Subs (f0 a b)) 
+      (fun a -> Event (f1 a)) 
+      (fun a -> Init (f2 a)) 
+      (fun a -> Obs (f3 a))  
+      (fun a -> Dummy)
   
   let print_refined_step parameter handler = 
     let log = parameter.H.out_channel in 
     let env = handler.H.env in 
-    gen (print_refined_event log env) (print_refined_init log env) (print_refined_obs log env) (fun _  -> ())
+    gen (print_refined_subs log env) (print_refined_event log env) (print_refined_init log env) (print_refined_obs log env) (fun _  -> ())
 
   let tests_of_refined_step =
-    gen tests_of_refined_event tests_of_refined_init tests_of_refined_obs 
+    gen tests_of_refined_subs tests_of_refined_event tests_of_refined_init tests_of_refined_obs 
 (fun _ -> [])
 
   let is_obs_of_refined_step x = 
@@ -770,13 +818,13 @@ module Cflow_linker =
       | _ -> None 
       
   let refine_step env (x:step) = 
-    genbis (refine_event env) (refine_init env) (refine_obs env) x
+    genbis (refine_subs env) (refine_event env) (refine_init env) (refine_obs env) x
   
   let step_of_refined_step = 
-    genbis event_of_refined_event init_of_refined_init obs_of_refined_obs 
+    genbis subs_of_refined_subs event_of_refined_event init_of_refined_init obs_of_refined_obs 
 
   let actions_of_refined_step = 
-    gen actions_of_refined_event actions_of_refined_init actions_of_refined_obs (fun _ -> [],[])
+    gen actions_of_refined_subs actions_of_refined_event actions_of_refined_init actions_of_refined_obs (fun _ -> [],[])
 
   let import_event x = x 
   let import_env x = x
@@ -791,9 +839,9 @@ module Cflow_linker =
     let env = handler.H.env in 
     let empty_set = Mods.Int2Set.empty in 
     let grid = Causal.empty_grid () in 
-    let grid,_,_ = 
+    let grid,_,_,_ = 
       List.fold_left 
-        (fun (grid,side_effect,counter) (k,(side:side_effect)) ->
+        (fun (grid,side_effect,counter,subs) (k,(side:side_effect)) ->
           match (k:refined_step) 
           with 
             | Event (a,_,_) -> 
@@ -810,28 +858,65 @@ module Cflow_linker =
                       side 
                 in 
                 let phi = embedding_of_event a in 
-                let psi = fresh_map_of_event a in 
+                let psi = fresh_map_of_event a in
+                let phi = 
+                  Mods.IntMap.map 
+                    (fun y -> 
+                      try 
+                        Mods.IntMap.find y subs 
+                      with 
+                      | Not_found -> y)
+                    phi 
+                in 
                 Causal.record ~decorate_with:obs_from_rule_app r side_effect (phi,psi) counter grid env,
-                Mods.Int2Set.empty,counter+1 
+                Mods.Int2Set.empty,counter+1,Mods.IntMap.empty
               end
             | Init b -> 
-               Causal.record_init b counter grid env,side_effect,counter+1 
+               Causal.record_init b counter grid env,side_effect,counter+1,Mods.IntMap.empty
             | Obs c  -> 
-                Causal.record_obs c counter grid env,side_effect,counter+1
+              let ((r_id,state,embedding,x),test) = c in 
+              let embedding = 
+                Mods.IntMap.map 
+                  (fun y -> 
+                    try 
+                      Mods.IntMap.find y subs 
+                    with 
+                    | Not_found -> y)
+                  embedding 
+              in 
+              let c = ((r_id,state,embedding,x),test) in 
+              let side_effect =
+                if bool 
+                then 
+                  Mods.Int2Set.empty 
+                else 
+                  List.fold_left
+                    (fun set i -> Mods.Int2Set.add i set)
+                    side_effect 
+                    side 
+              in 
+              Causal.record_obs side_effect c counter grid env,side_effect,counter+1,Mods.IntMap.empty
+            | Subs (a,b) -> 
+              grid, 
+              side_effect,
+              counter,
+              Mods.IntMap.add a b subs 
             | Dummy -> 
               grid,
               (if bool 
-              then 
-                empty_set 
-              else 
-                (List.fold_left 
-                  (fun side_effect x -> Mods.Int2Set.add x side_effect)
-                  side_effect side)),
-              counter 
+               then 
+                  empty_set 
+               else 
+                  (
+                    List.fold_left 
+                      (fun side_effect x -> Mods.Int2Set.add x side_effect)
+                      side_effect side)),
+              counter,
+              subs 
         ) 
-        (grid,Mods.Int2Set.empty,1) list 
+        (grid,Mods.Int2Set.empty,1,Mods.IntMap.empty) list 
     in grid 
-
+    
   let print_side_effect log l = 
     List.iter (fun (a,b) -> Printf.fprintf log "(%i,%i)," a b) l 
   let side_effect_of_list l = l 
