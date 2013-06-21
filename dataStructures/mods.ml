@@ -6,6 +6,11 @@ module StringSet = Set.Make (struct type t = string let compare = compare end)
 module Int2Set = Set.Make (struct type t = int*int let compare = compare end)
 module Int3Set = Set.Make (struct type t = int*int*int let compare = compare end)
 
+type level = int 
+let compare_level = compare 
+module LevelMap = Map.Make (struct type t = level let compare = compare_level end)
+let max_level = 1 
+
 module DynArray = DynamicArray.DynArray(LargeArray.GenArray)
 
 type dep_type = ALG of int | KAPPA of int | TOK of int | EVENT | TIME | RULE of int | PERT of int | ABORT of int

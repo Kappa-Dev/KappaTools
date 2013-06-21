@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 18/06/2013
+  * Last modification: 20/06/2013
   * * 
   * Some parameter references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -71,6 +71,7 @@ sig
   val get_pre_event: (pre_blackboard -> CI.Po.K.H.error_channel * CI.Po.K.refined_step A.t) CI.Po.K.H.with_handler 
   val get_side_effect: (pre_blackboard -> CI.Po.K.H.error_channel * CI.Po.K.side_effect A.t) CI.Po.K.H.with_handler 
   val get_fictitious_observable: (pre_blackboard -> CI.Po.K.H.error_channel * int option) CI.Po.K.H.with_handler 
+
 end
 
 module Preblackboard = 
@@ -2113,6 +2114,7 @@ module Preblackboard =
          let get_side_effect parameter handler error blackboard = 
            error,blackboard.pre_side_effect_of_event
              
+
           
           end:PreBlackboard)
            

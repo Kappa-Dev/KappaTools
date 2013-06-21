@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 06/09/2011
-  * Last modification: 12/06/2013
+  * Last modification: 20/06/2013
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -30,7 +30,7 @@ sig
   type case_value 
   type case_address  
   type pointer
-
+ 
   (** blackboard*)
 
   type blackboard      (*blackboard, once finalized*)
@@ -49,7 +49,9 @@ sig
   val get_event: blackboard -> int -> PB.CI.Po.K.refined_step 
   val get_n_eid: blackboard -> int 
   val get_npredicate_id: blackboard -> int 
-  val get_n_unresolved_events_of_pid: blackboard -> PB.predicate_id -> int 
+  val get_n_unresolved_events_of_pid_by_level: blackboard -> PB.predicate_id -> Mods.level -> int 
+     val get_n_unresolved_events_of_pid: blackboard -> PB.predicate_id  -> int 
+    
   val get_n_unresolved_events: blackboard -> int 
   val get_first_linked_event: blackboard -> PB.predicate_id -> int option 
   val get_last_linked_event: blackboard -> PB.predicate_id -> int option 
@@ -99,7 +101,9 @@ sig
   val case_list_of_eid: (blackboard -> PB.step_id -> PB.CI.Po.K.H.error_channel * event_case_address list) PB.CI.Po.K.H.with_handler 
   val state: PB.predicate_value -> case_value 
   val is_exist_event: PB.step_id -> case_address 
+  val n_unresolved_events_at_level: Mods.level -> case_address
   val n_unresolved_events: case_address 
+  val n_unresolved_events_in_column_at_level: event_case_address -> Mods.level -> case_address 
   val n_unresolved_events_in_column: event_case_address -> case_address 
   val forced_events: blackboard -> (PB.step_id list * unit Mods.simulation_info option) list 
   val side_effect_of_event: blackboard -> PB.step_id -> PB.CI.Po.K.side_effect
@@ -116,6 +120,7 @@ module Blackboard =
     type assign_result = Fail | Success | Ignore 
     type pointer = PB.step_short_id 
         
+   
     let success = Success
     let ignore = Ignore
     let fail = Fail 
@@ -163,22 +168,26 @@ module Blackboard =
       }
 	
     type case_address = 
-      | N_unresolved_events_in_column of int 
-      | Pointer_to_next of event_case_address 
-      | Value_after of event_case_address 
-      | Value_before of event_case_address 
-      | Pointer_to_previous of event_case_address
-      | N_unresolved_events 
-      | Exist of event_case_address 
-      | Keep_event of PB.step_id 
-
+    | N_unresolved_events_in_column_at_level of int*int
+    | N_unresolved_events_in_column of int 
+    | Pointer_to_next of event_case_address 
+    | Value_after of event_case_address 
+    | Value_before of event_case_address 
+    | Pointer_to_previous of event_case_address
+    | N_unresolved_events 
+    | N_unresolved_events_at_level of int 
+    | Exist of event_case_address 
+    | Keep_event of PB.step_id 
+        
     let is_exist_event i = Keep_event i 
     let n_unresolved_events_in_column i = N_unresolved_events_in_column (i.column_predicate_id) 
+    let n_unresolved_events_in_column_at_level i j = N_unresolved_events_in_column_at_level ((i.column_predicate_id),j)
     let pointer_to_next e = Pointer_to_next e 
     let value_after e = Value_after e 
     let value_before e = Value_before e 
     let pointer_to_previous e = Pointer_to_previous e 
     let n_unresolved_events = N_unresolved_events 
+    let n_unresolved_events_at_level i = N_unresolved_events_at_level i
     let exist e = Exist e
 
 
@@ -340,9 +349,11 @@ module Blackboard =
            stack: stack list ;
            blackboard: case_info PB.A.t PB.A.t ;
            selected_events: bool option PB.A.t ;
-           weigth_of_predicate_id: int PB.A.t ; 
+           weigth_of_predicate_id: int PB.A.t;
+           weigth_of_predicate_id_by_level: int PB.A.t Mods.LevelMap.t; 
            used_predicate_id: bool PB.A.t ;  
            n_unresolved_events: int ;
+           n_unresolved_events_by_level: int Mods.LevelMap.t; 
            last_linked_event_of_predicate_id: int PB.A.t;
            event_case_list: event_case_address list PB.A.t;
            side_effect_of_event: PB.CI.Po.K.side_effect PB.A.t;
@@ -390,6 +401,9 @@ module Blackboard =
      let print_case_address parameter handler error blackboard x = 
       match x
       with 
+      | N_unresolved_events_in_column_at_level (i,j) -> 
+        let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "n_unresolved_events_in_pred %i %i\n" i j in 
+         error
        | N_unresolved_events_in_column i -> 
          let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "n_unresolved_events_in_pred %i \n" i in 
          error 
@@ -405,6 +419,9 @@ module Blackboard =
       | Pointer_to_previous e -> 
         let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Pointer_before " in 
         print_event_case_address parameter handler error blackboard e 
+      | N_unresolved_events_at_level i -> 
+        let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Unresolved_events_at_level %i" i in 
+        error   
       | N_unresolved_events -> 
         let _ = Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Unresolved_events" in 
         error 
@@ -416,7 +433,18 @@ module Blackboard =
         error 
       
      let get_npredicate_id blackboard = blackboard.n_predicate_id 
-     let get_n_unresolved_events_of_pid blackboard pid = PB.A.get blackboard.weigth_of_predicate_id pid 
+     let get_n_unresolved_events_of_pid_by_level blackboard pid level = 
+       try 
+         PB.A.get 
+           (Mods.LevelMap.find level blackboard.weigth_of_predicate_id_by_level)  
+           pid 
+       with 
+       | Not_found -> 0
+     let get_n_unresolved_events_of_pid blackboard pid = 
+       PB.A.get 
+         blackboard.weigth_of_predicate_id  
+         pid 
+         
      let get_n_unresolved_events blackboard = blackboard.n_unresolved_events 
      let get_pointer_next case = case.dynamic.pointer_next 
      
@@ -476,6 +504,9 @@ module Blackboard =
            let _ = print_event_case_address parameter handler error blackboard i in 
            let _ = Printf.fprintf log "selected ? " in 
            error 
+         | N_unresolved_events_in_column_at_level (i,j) -> 
+           let _ = Printf.fprintf log "Number of unresolved events for the predicate %i at level %i" i j in 
+           error
          | N_unresolved_events_in_column i -> 
            let _ = Printf.fprintf log "Number of unresolved events for the predicate %i" i in 
            error
@@ -497,6 +528,9 @@ module Blackboard =
            error
          | N_unresolved_events -> 
            let _ = Printf.fprintf log "Nombre d'événements non résolu" in 
+           error
+         | N_unresolved_events_at_level i -> 
+           let _ = Printf.fprintf log "Nombre d'événements non résolu at level %i" i in 
            error
   
      let print_value log value = 
@@ -576,20 +610,35 @@ module Blackboard =
        let _ = Printf.fprintf log "*weight of predicate_id*\n" in 
        let _ = 
          PB.A.iteri 
-           (fun i j -> 
-             Printf.fprintf log " %i:%i\n" i j 
+           (Printf.fprintf log " %i:%i\n")
+           blackboard.weigth_of_predicate_id
+       in 
+       let _ = Printf.fprintf log "*weight of predicate_id_by_level*\n" in 
+       let _ = 
+         Mods.LevelMap.iter 
+           (fun l  -> 
+             let _ = Printf.fprintf log " Level:%i\n" l in 
+             PB.A.iteri 
+               (Printf.fprintf log " %i:%i\n")
            )
-           blackboard. weigth_of_predicate_id 
+           blackboard.weigth_of_predicate_id_by_level  
        in 
        let _ = Printf.fprintf log "**\n" in 
+       let _ = flush log in 
        error
 
      (** propagation request *)
 
-     let add_event eid (pid,seid) array = 
+     let add_event eid (pid,seid) array level unsolved = 
        let event_case_address = build_event_case_address pid seid in 
        let old = PB.A.get array eid in 
-       PB.A.set array eid (event_case_address::old)
+       let unsolved = 
+         try 
+           Mods.LevelMap.add level ((Mods.LevelMap.find level unsolved)+1) unsolved 
+         with 
+           Not_found -> Mods.LevelMap.add level 1 unsolved
+       in 
+       PB.A.set array eid (event_case_address::old),unsolved 
 
      let empty_stack = []
 
@@ -600,8 +649,32 @@ module Blackboard =
        let current_stack = empty_stack in
        let event_case_list = PB.A.make n_events [] in 
        let n_seid = PB.A.make n_predicates 0 in 
+       let unsolved_by_level = Mods.LevelMap.empty in 
        let blackboard = PB.A.make n_predicates (PB.A.make 1 dummy_case_info) in
-       let weigth_of_predicate_id = PB.A.make n_predicates 0 in 
+       let weigth_of_predicate_id_by_level = 
+         let rec aux k map = 
+           if k<0 then map 
+           else 
+             aux (k-1) (Mods.LevelMap.add k (PB.A.create 0 0) map)
+         in aux Mods.max_level Mods.LevelMap.empty 
+       in 
+       let inc_depth level p_id = 
+         try 
+           let a = 
+             Mods.LevelMap.find level weigth_of_predicate_id_by_level 
+           in 
+           let old = 
+             try 
+               PB.A.get a p_id
+             with 
+             | Not_found -> 0 
+           in 
+           PB.A.set a  p_id (old+1) 
+         with 
+         | Not_found -> ()
+       in 
+
+       let weigth_of_predicate_id = PB.A.create 0 0 in 
        let last_linked_event_of_predicate_id = PB.A.make n_predicates 0 in 
        let error = 
          let rec aux1 p_id error = 
@@ -658,7 +731,12 @@ module Blackboard =
                  | triple::q -> 
                    let info = init_info p_id seid (size-1) triple in 
                    let eid = get_eid_of_triple triple in 
-                   let _ = add_event eid (p_id,seid) event_case_list in 
+                   let error,events = 
+                     PB.get_pre_event parameter handler error pre_blackboard  in 
+                   let event = PB.A.get events eid in 
+                   let level = PB.CI.Po.K.level_of_event event in 
+                   let _ = inc_depth level p_id in 
+                   let _ = add_event eid (p_id,seid) event_case_list level Mods.LevelMap.empty in 
                    let _ = PB.A.set array seid info in 
                    aux2 (seid-1) q 
              in 
@@ -668,6 +746,29 @@ module Blackboard =
        in 
        let error,forced_events = PB.mandatory_events parameter handler error pre_blackboard in 
        let error,event = PB.get_pre_event parameter handler error pre_blackboard in 
+       let unsolved_by_level = 
+         let rec aux k map = 
+           if k=0 
+           then 
+             map
+           else
+             let event = PB.A.get event k in 
+             let level = PB.CI.Po.K.level_of_event event in 
+             let map = 
+               try 
+                 Mods.LevelMap.add level ((Mods.LevelMap.find level map)+1) map 
+               with 
+               | Not_found ->
+                 Mods.LevelMap.add level 1 map
+             in aux (k-1) map 
+         in aux n_events unsolved_by_level 
+       in 
+       let k = 
+         Mods.LevelMap.fold 
+           (fun _ k l -> k+l)
+           unsolved_by_level 
+           0
+       in 
        let error,side_effects = PB.get_side_effect parameter handler error pre_blackboard in 
        let error,fictitious_obs = PB.get_fictitious_observable parameter handler error pre_blackboard in 
        error,
@@ -686,9 +787,11 @@ module Blackboard =
          stack=stack;
          blackboard=blackboard;
          selected_events= PB.A.make n_events None; 
-         weigth_of_predicate_id= weigth_of_predicate_id; 
+         weigth_of_predicate_id = weigth_of_predicate_id;
+         weigth_of_predicate_id_by_level= weigth_of_predicate_id_by_level; 
          used_predicate_id = PB.A.make n_predicates true; 
          n_unresolved_events = n_events ; 
+         n_unresolved_events_by_level = unsolved_by_level ;
          fictitious_observable = fictitious_obs ;
        }
          
@@ -712,7 +815,33 @@ module Blackboard =
        match 
          case_address 
        with 
-         | N_unresolved_events_in_column int -> 
+          | N_unresolved_events_in_column_at_level (int,level) -> 
+           begin 
+             match case_value
+             with 
+               | Counter int2 -> 
+                 begin 
+                   try 
+                     let a = Mods.LevelMap.find level blackboard.weigth_of_predicate_id_by_level in 
+                     let _ = 
+                       PB.A.set a int int2 in 
+                     error,blackboard 
+                   with 
+                     Not_found -> 
+                       begin
+                         let error_list,error = 
+                           PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "698") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
+                         in 
+                         PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard 
+                       end 
+                 end
+               | _ -> 
+                 let error_list,error = 
+                   PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "698") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
+                 in 
+                 PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard 
+           end 
+       | N_unresolved_events_in_column int -> 
            begin 
              match case_value
              with 
@@ -787,6 +916,20 @@ module Blackboard =
                  in 
                  PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard 
            end 
+         | N_unresolved_events_at_level level  -> 
+           begin 
+             match case_value
+             with 
+               | Counter int -> 
+                 error,{blackboard 
+                        with n_unresolved_events_by_level = 
+                     Mods.LevelMap.add level int blackboard.n_unresolved_events_by_level}
+               | _ -> 
+                 let error_list,error = 
+                   PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "760") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
+                 in 
+                 PB.CI.Po.K.H.raise_error parameter handler error_list error blackboard 
+           end 
          | Keep_event step_id -> 
            begin 
             match case_value
@@ -821,6 +964,15 @@ module Blackboard =
          case_address 
        with 
          | Keep_event step_id -> error,Boolean (PB.A.get blackboard.selected_events step_id) 
+         | N_unresolved_events_in_column_at_level (int,level) -> 
+           let n = 
+             try 
+               let a = Mods.LevelMap.find level blackboard.weigth_of_predicate_id_by_level in
+               PB.A.get a int 
+             with 
+               Not_found -> 0 
+               in 
+               error,Counter n
          | N_unresolved_events_in_column int -> error,Counter (PB.A.get blackboard.weigth_of_predicate_id int)
          | Exist case_address -> 
            let error,case = get_case parameter handler error case_address blackboard in 
@@ -846,7 +998,10 @@ module Blackboard =
            let error,case = get_case parameter handler error case_address blackboard in 
            error,Pointer case.dynamic.pointer_previous 
          | N_unresolved_events -> error,Counter blackboard.n_unresolved_events
-
+         | N_unresolved_events_at_level lvl -> error,
+           Counter(try 
+           Mods.LevelMap.find lvl blackboard.n_unresolved_events_by_level
+             with Not_found -> 0)
 
 
            
@@ -1196,7 +1351,8 @@ module Blackboard =
      let error,log_info,preblackboard = 
        PB.finalize parameter handler error log_info preblackboard 
      in 
-     import parameter handler error log_info preblackboard 
+     let error,log_info,blackboard = import parameter handler error log_info preblackboard in
+     error,log_info,blackboard 
 
    end:Blackboard)
 

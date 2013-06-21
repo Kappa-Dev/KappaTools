@@ -9,7 +9,7 @@
   * Jean Krivine, Universite Paris-Diderot, CNRS 
   *  
   * Creation: 19/10/2011
-  * Last modification: 12/06/2013
+  * Last modification: 20/06/2013
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -69,6 +69,7 @@ let compress env state log_info step_list =
             in 
           let _ = Debug.tag "\t - blackboard generation" in 
           let error = D.S.PH.B.PB.CI.Po.K.H.error_init in 
+          let step_list = D.S.PH.B.PB.CI.Po.K.disambiguate step_list handler in 
           let _ = 
             if log_step
             then 

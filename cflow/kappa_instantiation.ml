@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 19/06/2013
+  * Last modification: 20/06/2013
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -132,6 +132,9 @@ sig
   val subs_agent_in_side_effect: agent_id -> agent_id -> (site*binding_state) -> (site*binding_state) 
 
   val get_kasim_side_effects: refined_step -> kasim_side_effect 
+
+  val level_of_event: refined_step -> Mods.level 
+  val disambiguate: step list -> H.handler -> step list 
 end 
 
 
@@ -167,6 +170,8 @@ module Cflow_linker =
       
   let get_causal (_,d) = d 
 
+  module AgentIdSet = Set.Make (struct type t = agent_id let compare=compare end)
+  module AgentIdMap = Map.Make (struct type t = agent_id let compare=compare end)
 
   type internal_state  = int 
 
@@ -214,6 +219,7 @@ module Cflow_linker =
   type step = (event,init,obs,agent_id,agent_id) choice 
   type refined_step = (refined_event,refined_init,refined_obs,agent_id,agent_id) choice 
 
+ 
   let build_subs_refined_step a b = Subs (a,b)
   let get_kasim_side_effects a = 
     match a 
@@ -752,7 +758,7 @@ module Cflow_linker =
     let _ = Printf.fprintf log "* Kappa_rule \n" in 
     let _ = Dynamics.dump (rule_of_refined_event refined_event) env in 
     let _ = 
-      if debug_mode
+      if true (*debug_mode*)
       then 
         let _ = Printf.fprintf log "Story encoding: \n" in 
 	let _ = List.iter (print_test log env " ") (tests_of_refined_event refined_event) in 
@@ -826,6 +832,7 @@ module Cflow_linker =
   let actions_of_refined_step = 
     gen actions_of_refined_subs actions_of_refined_event actions_of_refined_init actions_of_refined_obs (fun _ -> [],[])
 
+ 
   let import_event x = x 
   let import_env x = x
   let store_event log_info (event:event) (step_list:step list) = 
@@ -928,7 +935,81 @@ module Cflow_linker =
       | _::q -> no_obs_found q
       | [] -> true 
 
+  let level_of_event e = 
+    match e 
+    with 
+    | Init _ | Obs _ | Event _ -> 0 
+    | Dummy | Subs _ -> 1 
 
+  let creation_of_event event handler = 
+    match 
+      event 
+    with 
+    | Event ((_,_,f),_) -> 
+        Mods.IntMap.fold 
+          (fun a b list -> 
+            b::list)
+          f []
+    | Init (agent,_) -> 
+      begin 
+        [agent_id_of_agent agent]
+      end 
+    | _ -> []
 
+  let compose f g = 
+    Mods.IntMap.map 
+      (fun x -> 
+        (try AgentIdMap.find x f
+       with Not_found -> x))
+      g
+
+  let subs_agent_in_event mapping event = 
+    match 
+      event 
+    with 
+    | Event ((a,f,g),b) -> Event ((a,compose mapping f,compose mapping g),b)
+      
+    | Obs (a,b,f,c) -> Obs(a,b,compose mapping f,c)
+    | Init (agent,interface) -> 
+      Init (let agent_id=agent_id_of_agent agent in 
+            let agent_id' = 
+              try 
+                AgentIdMap.find agent_id mapping
+              with 
+              | Not_found -> agent_id 
+            in
+            let agent = 
+              if agent_id==agent_id'
+              then 
+                agent 
+              else 
+                build_agent agent_id' (agent_name_of_agent agent)
+            in 
+            agent,interface)
+    | _ -> event
+ 
+  let disambiguate event_list handler = 
+    let max_id = 0 in 
+    let used = AgentIdSet.empty in 
+    let mapping = AgentIdMap.empty in 
+      (let _,_,_,event_list_rev = 
+         List.fold_left 
+           (fun (max_id,used,mapping,event_list) event -> 
+             let max_id,used,mapping = 
+               List.fold_left 
+                 (fun (max_id,used,mapping) x -> 
+                   if AgentIdSet.mem x used
+                   then
+                      (max_id+1,AgentIdSet.add (max_id+1) used, AgentIdMap.add x (max_id+1) mapping)
+                   else (max x max_id,AgentIdSet.add x used,mapping)
+                 )
+                 (max_id,used,mapping) (creation_of_event event handler )
+             in 
+             let list = (subs_agent_in_event mapping event)::event_list in 
+             max_id,used,mapping,list)
+           (max_id,used,mapping,[]) 
+           (List.rev event_list)
+       in event_list_rev)
+               
 end:Cflow_signature)
 
