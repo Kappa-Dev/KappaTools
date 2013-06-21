@@ -1,0 +1,3 @@
+-> Efficiency: strong compression seems to start from the causal story, not from the weak compression!
+
+-> Soundness: problem with permutations and links. 
