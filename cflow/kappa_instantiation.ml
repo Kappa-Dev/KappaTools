@@ -135,6 +135,7 @@ sig
 
   val level_of_event: refined_step -> Mods.level 
   val disambiguate: step list -> H.handler -> step list 
+  val clean_events: refined_step list -> step list 
 end 
 
 
@@ -749,7 +750,9 @@ module Cflow_linker =
       (string_of_site env site)
       (string_of_binding_state env state)
       
-  let print_refined_obs log env refined_obs = () 
+  let print_refined_obs log env refined_obs = 
+    let _ = Printf.fprintf log "***Refined obs***" 
+    in () 
 
   let print_refined_subs log env a b  = () 
 
@@ -924,6 +927,15 @@ module Cflow_linker =
         (grid,Mods.Int2Set.empty,1,Mods.IntMap.empty) list 
     in grid 
     
+  let clean_events list = 
+    List.fold_left 
+      (fun list a -> 
+        match a
+        with 
+        | Event _ | Init _ | Obs _ -> (step_of_refined_step a)::list
+        | _ -> list)
+      [] (List.rev list ) 
+
   let print_side_effect log l = 
     List.iter (fun (a,b) -> Printf.fprintf log "(%i,%i)," a b) l 
   let side_effect_of_list l = l 
@@ -962,6 +974,7 @@ module Cflow_linker =
         (try AgentIdMap.find x f
        with Not_found -> x))
       g
+
 
   let subs_agent_in_event mapping event = 
     match 

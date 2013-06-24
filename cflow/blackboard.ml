@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 06/09/2011
-  * Last modification: 20/06/2013
+  * Last modification: 23/06/2013
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -762,12 +762,6 @@ module Blackboard =
                  Mods.LevelMap.add level 1 map
              in aux (k-1) map 
          in aux n_events unsolved_by_level 
-       in 
-       let k = 
-         Mods.LevelMap.fold 
-           (fun _ k l -> k+l)
-           unsolved_by_level 
-           0
        in 
        let error,side_effects = PB.get_side_effect parameter handler error pre_blackboard in 
        let error,fictitious_obs = PB.get_fictitious_observable parameter handler error pre_blackboard in 

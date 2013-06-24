@@ -35,6 +35,7 @@ module type Solver =
     val clean: (PH.B.PB.CI.Po.K.P.log_info -> PH.B.blackboard -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.P.log_info * PH.B.blackboard) PH.B.PB.CI.Po.K.H.with_handler
 
     val translate: (PH.B.blackboard -> PH.B.PB.step_id list -> PH.B.PB.CI.Po.K.H.error_channel * PH.B.PB.CI.Po.K.refined_step list * PH.B.result) PH.B.PB.CI.Po.K.H.with_handler 
+    val translate_result: PH.B.result -> PH.B.PB.CI.Po.K.refined_step list 
 
    end)
 
@@ -161,7 +162,9 @@ struct
     let list' = List.rev_map (fun k -> PH.B.get_event blackboard k,PH.B.side_effect_of_event blackboard k) (List.rev list) in 
     let list = List.rev_map fst (List.rev list') in 
     error,list,list'
-      
+    
+  let translate_result result = 
+    List.rev_map fst result 
 
   let clean parameter handler error log_info blackboard = 
     PH.B.reset_init parameter handler error log_info blackboard 

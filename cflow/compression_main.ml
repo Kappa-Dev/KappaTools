@@ -9,7 +9,7 @@
   * Jean Krivine, Universite Paris-Diderot, CNRS 
   *  
   * Creation: 19/10/2011
-  * Last modification: 20/06/2013
+  * Last modification: 23/06/2013
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -192,13 +192,14 @@ let compress env state log_info step_list =
                       Some info
                 in 
                 let tick = Mods.tick_stories n_stories tick in 
-                let causal_story_array = (prehash,[grid,graph,None,(event_id_list,list_order,event_list),[info]])::causal_story_array in 
+                let causal_story_array = (prehash,[grid,graph,None,(event_id_list,list_order,event_list),[],[info]])::causal_story_array in 
                 error,counter+1,tick,causal_story_array)
               (error,1,tick,[]) 
               (List.rev list) 
           in 
           let error,causal_story_array = 
-            D.hash_list parameter handler error (List.rev causal_story_array) 
+            D.hash_list parameter handler error 
+              (List.rev causal_story_array) 
           in 
           let n_stories = 
             List.fold_left 
@@ -222,7 +223,7 @@ let compress env state log_info step_list =
                   List.fold_left 
                     (fun (error,counter,tick,blackboard,weakly_compressed_story_array) (_,a) ->
                       List.fold_left 
-                        (fun (error,counter,tick,blackboard,weakly_compressed_story_array) (_,grid,graph,(event_id_list,list_order,event_list),list_info) -> 
+                        (fun (error,counter,tick,blackboard,weakly_compressed_story_array) (_,grid,graph,(event_id_list,list_order,event_list),step_list,list_info) -> 
                           let info = List.hd list_info in 
                           let error,log_info,blackboard_tmp,list_order = 
                             if in_place 
@@ -244,6 +245,8 @@ let compress env state log_info step_list =
                           let error,log_info,blackboard_tmp,output,list = 
                             D.S.compress parameter handler error log_info blackboard_tmp list_order 
                           in
+
+                      
                           let error,log_info,blackboard_tmp = 
                             if in_place
                             then 
@@ -277,6 +280,8 @@ let compress env state log_info step_list =
                               | Some list -> 
                                 if weak_compression_on
                                 then 
+                                  let weak_event_list = D.S.translate_result list in 
+                                  let weak_event_list = D.S.PH.B.PB.CI.Po.K.clean_events weak_event_list in 
                                   let grid = D.S.PH.B.PB.CI.Po.K.build_grid list false handler in
                                   let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
                                   let error,graph = D.graph_of_grid parameter handler error grid in 
@@ -294,7 +299,7 @@ let compress env state log_info step_list =
                                         in 
                                         Some info
                                   in 
-                                  error,(prehash,[grid,graph,None,(event_id_list,list_order,event_list),list_info])::weakly_compressed_story_array,info
+                                  error,(prehash,[grid,graph,None,(event_id_list,list_order,event_list),weak_event_list,list_info])::weakly_compressed_story_array,info
                                 else 
                                   error,weakly_compressed_story_array,None
                           in 
@@ -333,7 +338,7 @@ let compress env state log_info step_list =
                   List.fold_left 
                     (fun (error,counter,tick,blackboard,strongly_compressed_story_array) (_,a) ->
                       List.fold_left 
-                        (fun (error,counter,tick,blackboard,strongly_compressed_story_array) (_,grid,graph,(event_id_list,list_order,event_list),list_info) -> 
+                        (fun (error,counter,tick,blackboard,strongly_compressed_story_array) (_,grid,graph,(event_id_list,list_order,event_list),step_list,list_info) -> 
                           let info = List.hd list_info in 
                           let error,log_info,blackboard_tmp,list_order = 
                             if in_place 
@@ -351,6 +356,17 @@ let compress env state log_info step_list =
                                   | _ -> [] 
                               in 
                               error,log_info,blackboard_tmp,list_order
+                          in 
+                          let refined_event_list = 
+                            List.rev_map (D.S.PH.B.PB.CI.Po.K.refine_step handler) step_list 
+                          in       
+                          let error,log_info,blackboard_tmp = D.S.PH.B.import parameter handler error log_info true refined_event_list in 
+                          let error,list = D.S.PH.forced_events parameter handler error blackboard_tmp in     
+                          let list_order = 
+                            match list 
+                            with 
+                            | [] -> []
+                            | (list_order,_,_)::q -> list_order
                           in 
                           let error,log_info,blackboard_tmp,output,list = 
                             D.S.compress parameter handler error log_info blackboard_tmp list_order 
@@ -403,7 +419,7 @@ let compress env state log_info step_list =
                                     in 
                                     Some info
                                 in 
-                                error,(prehash,[grid,graph,None,(event_id_list,list_order,event_list),list_info])::strongly_compressed_story_array,info
+                                error,(prehash,[grid,graph,None,(event_id_list,list_order,event_list),[],list_info])::strongly_compressed_story_array,info
                           in 
                           let error,log_info,blackboard = D.S.PH.B.reset_init parameter handler error log_info blackboard in 
                           let tick = Mods.tick_stories n_stories tick in 
