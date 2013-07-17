@@ -1,0 +1,12 @@
+#Command-line:
+timeout 300s KaSim -i create.ka -seed 611463625 -e 5000 -d expected-output || exit 0 
+
+#In this example, each A has three sites which can be activated or not. 
+#A configuration can be seen as the vertice of a cube, put the movement between  these vertices are constrained. 
+
+#The observable can be triggered by activating x, then z. 
+#Or by activating y, then activating x, then activating z, then desactivating x, then deactivating y, then activating x. 
+
+#Both ways are compressed in the same causal flow. 
+
+
