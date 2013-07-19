@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 23/06/2013
+  * Last modification: 19/07/2013
   * * 
   * Some parameter references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -59,6 +59,7 @@ sig
   val finalize: (CI.Po.K.P.log_info -> pre_blackboard -> CI.Po.K.H.error_channel * CI.Po.K.P.log_info * pre_blackboard) CI.Po.K.H.with_handler 
 
   (**pretty printing*)
+  val string_of_predicate_value: predicate_value -> string 
   val print_predicate_value: out_channel ->  predicate_value -> unit 
   val print_preblackboard: (pre_blackboard -> CI.Po.K.H.error_channel) CI.Po.K.H.with_handler  
 
@@ -187,31 +188,31 @@ module Preblackboard =
              | Unknown -> ()
              | _ -> Printf.fprintf log "%s" x
                
-         let print_predicate_value log x = 
-           match x 
+         let string_of_predicate_value x = 
+	   match x 
            with 
-             | Counter int ->  
-               Printf.fprintf log "Counter %i" int
-             | Defined -> 
-               Printf.fprintf log "Defined" 
+             | Counter int -> "Counter "^(string_of_int int)
+             | Defined -> "Defined" 
              | Internal_state_is internal_state -> 
-               Printf.fprintf log "%i" internal_state  
+               (string_of_int internal_state)
              | Undefined -> 
-               Printf.fprintf log "Undefined"
+               "Undefined"
              | Present ->
-               Printf.fprintf log "Present"
+               "Present"
              | Free -> 
-               Printf.fprintf log "Free" 
+               "Free" 
              | Bound -> 
-               Printf.fprintf log "Bound" 
+               "Bound" 
              | Bound_to (id,agent_id,agent_name,site) ->
-               Printf.fprintf log "Bound(%i,%i(%i)@%i)" id agent_id agent_name site
+               "Bound("^(string_of_int id)^","^(string_of_int agent_id)^"("^(string_of_int agent_name)^")@"^(string_of_int site)^")"
              | Bound_to_type (agent,site)-> 
-               Printf.fprintf log "Bound(%i@%i)" agent site 
+               "Bound("^(string_of_int agent)^"@"^(string_of_int site)^")"
              | Pointer_to_agent (agent_id) -> 
-               Printf.fprintf log "Pointer(%i)" agent_id 
-             | Unknown -> ()
-               
+	        "Pointer("^(string_of_int agent_id)^")"
+             | Unknown -> ""
+
+         let print_predicate_value log x = 
+              Printf.fprintf log "%s" (string_of_predicate_value x) 
          let print_predicate_id log blackboard i = 
            let predicate_info = A.get blackboard.pre_column_map_inv i in  
            let _ = Printf.fprintf log "Predicate: %i " i in 

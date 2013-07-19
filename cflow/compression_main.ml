@@ -9,7 +9,7 @@
   * Jean Krivine, Universite Paris-Diderot, CNRS 
   *  
   * Creation: 19/10/2011
-  * Last modification: 23/06/2013
+  * Last modification: 19/07/2013
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -23,7 +23,8 @@ module D = Dag.Dag
 let log_step = true
 let debug_mode = false
 let dump_profiling_info = false
-let in_place = false (* if true blackboards are cut in place (and recovered for the next story), otherwise each time a fresh blackboard is built *)
+let dump_grid_before_weak_compression = false
+let dump_grid_before_strong_compression = false 
 
 let th_of_int n = 
   match n mod 10  
@@ -135,7 +136,7 @@ let compress env state log_info step_list =
             else 
               refined_event_list_cut,0 
           in 
-          let error,log_info,blackboard = D.S.PH.B.import parameter handler error log_info false refined_event_list_without_pseudo_inverse in 
+          let error,log_info,blackboard = D.S.PH.B.import parameter handler error log_info false false refined_event_list_without_pseudo_inverse in 
           let _ = 
             if log_step 
             then 
@@ -226,34 +227,19 @@ let compress env state log_info step_list =
                         (fun (error,counter,tick,blackboard,weakly_compressed_story_array) (_,grid,graph,(event_id_list,list_order,event_list),step_list,list_info) -> 
                           let info = List.hd list_info in 
                           let error,log_info,blackboard_tmp,list_order = 
-                            if in_place 
-                            then 
-                              let error,log_info,blackboard_tmp = D.S.filter parameter handler error log_info blackboard event_id_list in 
-                              error,log_info,blackboard_tmp,list_order
-                                
-                            else 
-                              let error,log_info,blackboard_tmp = D.S.sub parameter handler error log_info false blackboard event_list in 
-                              let error,list = D.S.PH.forced_events parameter handler error blackboard_tmp in 
-                              let list_order = 
-                                match list 
-                                with 
-                                  | (list_order,_,_)::q -> list_order 
-                                  | _ -> [] 
-                              in 
-                              error,log_info,blackboard_tmp,list_order
+                            let error,log_info,blackboard_tmp = D.S.sub parameter handler error log_info false dump_grid_before_weak_compression blackboard event_list in 
+                            let error,list = D.S.PH.forced_events parameter handler error blackboard_tmp in 
+                            let list_order = 
+                              match list 
+                              with 
+                              | (list_order,_,_)::q -> list_order 
+                              | _ -> [] 
+                            in 
+                            error,log_info,blackboard_tmp,list_order
                           in 
                           let error,log_info,blackboard_tmp,output,list = 
                             D.S.compress parameter handler error log_info blackboard_tmp list_order 
                           in
-
-                      
-                          let error,log_info,blackboard_tmp = 
-                            if in_place
-                            then 
-                              D.S.clean parameter handler error log_info blackboard_tmp 
-                            else 
-                              error,log_info,blackboard_tmp
-                          in 
                           let log_info = D.S.PH.B.PB.CI.Po.K.P.set_story_research_time log_info in 
                           let error = 
                             if debug_mode
@@ -340,27 +326,10 @@ let compress env state log_info step_list =
                       List.fold_left 
                         (fun (error,counter,tick,blackboard,strongly_compressed_story_array) (_,grid,graph,(event_id_list,list_order,event_list),step_list,list_info) -> 
                           let info = List.hd list_info in 
-                          let error,log_info,blackboard_tmp,list_order = 
-                            if in_place 
-                            then 
-                              let error,log_info,blackboard_tmp = D.S.filter parameter handler error log_info blackboard event_id_list in 
-                              error,log_info,blackboard_tmp,list_order
-                                
-                            else 
-                              let error,log_info,blackboard_tmp = D.S.sub parameter handler error log_info true blackboard event_list in 
-                              let error,list = D.S.PH.forced_events parameter handler error blackboard_tmp in 
-                              let list_order = 
-                                match list 
-                                with 
-                                  | (list_order,_,_)::q -> list_order 
-                                  | _ -> [] 
-                              in 
-                              error,log_info,blackboard_tmp,list_order
-                          in 
                           let refined_event_list = 
                             List.rev_map (D.S.PH.B.PB.CI.Po.K.refine_step handler) step_list 
                           in       
-                          let error,log_info,blackboard_tmp = D.S.PH.B.import parameter handler error log_info true refined_event_list in 
+                          let error,log_info,blackboard_tmp = D.S.PH.B.import parameter handler error log_info true dump_grid_before_strong_compression refined_event_list in 
                           let error,list = D.S.PH.forced_events parameter handler error blackboard_tmp in     
                           let list_order = 
                             match list 
@@ -371,13 +340,6 @@ let compress env state log_info step_list =
                           let error,log_info,blackboard_tmp,output,list = 
                             D.S.compress parameter handler error log_info blackboard_tmp list_order 
                           in
-                          let error,log_info,blackboard_tmp = 
-                            if in_place
-                            then 
-                              D.S.clean parameter handler error log_info blackboard_tmp 
-                            else 
-                              error,log_info,blackboard_tmp
-                          in 
                           let log_info = D.S.PH.B.PB.CI.Po.K.P.set_story_research_time log_info in 
                           let error = 
                             if debug_mode

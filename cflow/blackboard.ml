@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 06/09/2011
-  * Last modification: 23/06/2013
+  * Last modification: 19/07/2013
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -76,7 +76,7 @@ sig
   val reset_init: (PB.CI.Po.K.P.log_info -> blackboard -> PB.CI.Po.K.H.error_channel * PB.CI.Po.K.P.log_info * blackboard) PB.CI.Po.K.H.with_handler 
 
   (** initialisation*)
-  val import:  (PB.CI.Po.K.P.log_info -> bool -> PB.CI.Po.K.refined_step list -> PB.CI.Po.K.H.error_channel * PB.CI.Po.K.P.log_info * blackboard) PB.CI.Po.K.H.with_handler 
+  val import:  (PB.CI.Po.K.P.log_info -> bool -> bool -> PB.CI.Po.K.refined_step list -> PB.CI.Po.K.H.error_channel * PB.CI.Po.K.P.log_info * blackboard) PB.CI.Po.K.H.with_handler 
 
 
   (** output result*)
@@ -90,6 +90,7 @@ sig
 
   (**pretty printing*)
   val print_blackboard:(blackboard -> PB.CI.Po.K.H.error_channel) PB.CI.Po.K.H.with_handler 
+  val export_blackboard_to_xls: (string -> int -> blackboard -> PB.CI.Po.K.H.error_channel) PB.CI.Po.K.H.with_handler 
   val print_event_case_address:(blackboard ->  event_case_address -> PB.CI.Po.K.H.error_channel) PB.CI.Po.K.H.with_handler 
   val print_stack: (blackboard -> PB.CI.Po.K.H.error_channel) PB.CI.Po.K.H.with_handler 
   val exist: event_case_address -> case_address 
@@ -211,8 +212,9 @@ module Blackboard =
         | Pointer i -> Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Pointer %i\n" i 
         | Boolean b -> Printf.fprintf parameter.PB.CI.Po.K.H.out_channel_err "Boolean %s\n" (match b with None -> "?" | Some true -> "true" | _ -> "false")
  
+    let string_of_pointer seid = "event seid "^(string_of_int seid)
     let print_pointer log seid = 
-       Printf.fprintf log " event seid %i " seid
+       Printf.fprintf log "%s" (string_of_pointer seid)
 
     let state predicate_value = State predicate_value 
     let counter i = Counter i 
@@ -533,6 +535,20 @@ module Blackboard =
            let _ = Printf.fprintf log "Nombre d'événements non résolu at level %i" i in 
            error
   
+    
+     let string_of_value value = 
+        match value 
+        with 
+         | State pb -> PB.string_of_predicate_value pb 
+         | Counter i -> "Counter "^(string_of_int i)
+         | Pointer i -> string_of_pointer i 
+         | Boolean bool -> 
+             (match bool 
+              with 
+                | None -> "?" 
+                | Some true -> "Yes"
+                | Some false -> "No")
+
      let print_value log value = 
        match value 
        with 
@@ -546,6 +562,7 @@ module Blackboard =
                 | None -> "?" 
                 | Some true -> "Yes"
                 | Some false -> "No")
+
 
      let print_assignment parameter handler error blackboard (address,value)  = 
        let error  = print_address parameter handler error blackboard address in 
@@ -626,6 +643,8 @@ module Blackboard =
        let _ = Printf.fprintf log "**\n" in 
        let _ = flush log in 
        error
+
+    
 
      (** propagation request *)
 
@@ -998,6 +1017,47 @@ module Blackboard =
              with Not_found -> 0)
 
 
+ let export_blackboard_to_xls parameter handler error prefix int blackboard = 
+        let file_name = prefix^(string_of_int int)^".xls" in 
+        let desc = open_out file_name in 
+        let rec aux eid error = 
+          if eid>=blackboard.n_eid 
+          then error
+          else 
+            begin 
+              let error,list = case_list_of_eid parameter handler error blackboard eid  in 
+              let rec aux2 f g k l = 
+                 match l 
+                 with 
+                   | [] -> Printf.fprintf desc "\n" 
+                   | t::q when t.column_predicate_id=k -> begin let _ = Printf.fprintf desc "%s;" (f t) in aux2 f g (k+1) q end 
+                   | t::q -> begin let _ = Printf.fprintf desc "%s;" (g t) in aux2 f g (k+1) l end 
+              in 
+              let print_empty t  = "" in 
+              let print_test t = 
+                 let column = PB.A.get blackboard.blackboard t.column_predicate_id in 
+		 let case = PB.A.get column t.row_short_event_id in 
+                 PB.string_of_predicate_value case.static.test 
+              in
+              let print_bar t = "-----------------" in 
+              let print_action t = 
+	          let column = PB.A.get blackboard.blackboard t.column_predicate_id in 
+		  let case = PB.A.get column t.row_short_event_id in 
+		  PB.string_of_predicate_value case.static.action 
+	      in 
+              let _ = Printf.fprintf desc "%i;TEST;" eid in 
+              let _ = aux2 print_test print_empty 0 list in
+              let _ = Printf.fprintf desc "%i;BAR;" eid in 
+              let _ = aux2 print_bar print_bar 0 list in 
+              let _ = Printf.fprintf desc "%i;ACTION;" eid in 
+              let _ = aux2 print_action print_empty 0 list in   
+	      let _ = Printf.fprintf desc "\n" in 
+              aux (eid+1) error
+            end
+        in 
+        let error = aux 0 error in 
+        let _ = close_out desc in 
+        error
            
    
      let record_modif parameter handler error case_address case_value blackboard = 
@@ -1325,7 +1385,9 @@ module Blackboard =
      let log_info = PB.CI.Po.K.P.inc_k_cut_events n_events_removed log_info in 
      error,log_info,blackboard,cut_causal_flow
 
-   let import parameter handler error log_info bool list = 
+   let n = ref 0 
+
+   let import parameter handler error log_info bool to_xls list = 
      let error,preblackboard = PB.init parameter handler error in
      let error,log_info,preblackboard = 
        if bool 
@@ -1346,8 +1408,17 @@ module Blackboard =
        PB.finalize parameter handler error log_info preblackboard 
      in 
      let error,log_info,blackboard = import parameter handler error log_info preblackboard in
+     let error = 
+       if to_xls 
+       then 
+	 export_blackboard_to_xls parameter handler error (if bool then "strong" else "weak") (!n) blackboard 
+       else
+         error
+     in 
+     let _ = n:=(!n)+1 in 
      error,log_info,blackboard 
 
+   
    end:Blackboard)
 
 
