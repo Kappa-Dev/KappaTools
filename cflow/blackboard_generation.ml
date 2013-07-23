@@ -146,7 +146,7 @@ module Preblackboard =
 )
      module AgentIdMap = Map.Make (struct type t = CI.Po.K.agent_id let compare = compare end)
      module AgentId2Map = Map.Make (struct type t = CI.Po.K.agent_id*CI.Po.K.agent_id let compare=compare end)
-     module AgentIdSet = Set.Make (struct type t = CI.Po.K.agent_id let compare = compare end)
+     module AgentIdSet = Set_patched.Make (struct type t = CI.Po.K.agent_id let compare = compare end)
      module AgentId2Set = Set.Make (struct type t = CI.Po.K.agent_id*CI.Po.K.agent_id let compare=compare end)
            
      module SiteIdMap = Map.Make (struct type t = (CI.Po.K.agent_id*CI.Po.K.site_name) let compare=compare end)
@@ -1250,11 +1250,11 @@ module Preblackboard =
                  let error,log_info,blackboard,mixture_agent_id_mutex,set = 
                    List.fold_left 
                      (fun (error,log_info,blackboard,mixture_agent_id_mutex,set) id -> 
-                       let set' = AgentIdSet.add id set in 
-                       if set==set'
+                       let set' = AgentIdSet.add_if_not_mem id set in 
+                       if set == set'
                        then 
                          try 
-                           let _ = AgentIdMap.find id mixture_agent_id_mutex in 
+                           let _ = AgentIdMap.find id mixture_agent_id_mutex in
                            (error,log_info,blackboard,mixture_agent_id_mutex,set)
                          with
                            Not_found -> 
