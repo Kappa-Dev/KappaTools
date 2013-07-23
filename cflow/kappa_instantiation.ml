@@ -131,6 +131,10 @@ sig
   val subs_agent_in_action: agent_id -> agent_id -> action -> action 
   val subs_agent_in_side_effect: agent_id -> agent_id -> (site*binding_state) -> (site*binding_state) 
 
+  val subs_map_agent_in_test: (agent_id -> agent_id) -> test -> test
+  val subs_map_agent_in_action: (agent_id -> agent_id) -> action -> action 
+  val subs_map_agent_in_side_effect: (agent_id -> agent_id) -> (site*binding_state) -> (site*binding_state) 
+
   val get_kasim_side_effects: refined_step -> kasim_side_effect 
 
   val level_of_event: refined_step -> Mods.level 
@@ -392,7 +396,7 @@ module Cflow_linker =
   let subs_map_agent f agent = 
     let agent_id = agent_id_of_agent agent in 
     try 
-      build_agent (Mods.IntMap.find agent_id f) (agent_name_of_agent agent)
+      build_agent (f agent_id) (agent_name_of_agent agent)
     with 
     | Not_found -> agent
     
@@ -440,7 +444,20 @@ module Cflow_linker =
     | Free site -> Free (subs_site id1 id2 site)
     | Remove agent -> Remove (subs_agent id1 id2 agent)
 
+   let subs_map_agent_in_action f action = 
+    match
+      action
+    with 
+    | Create (agent,list) -> Create(subs_map_agent f agent,list)
+    | Mod_internal (site,i) -> Mod_internal(subs_map_site f site,i)
+    | Bind (s1,s2) -> Bind(subs_map_site f s1,subs_map_site f s2)
+    | Bind_to (s1,s2) -> Bind_to(subs_map_site f s1,subs_map_site f s2)
+    | Unbind (s1,s2) -> Unbind (subs_map_site f s1,subs_map_site f s2)
+    | Free site -> Free (subs_map_site f site)
+    | Remove agent -> Remove (subs_map_agent f agent)
+
   let subs_agent_in_side_effect id1 id2 (site,bstate) = (subs_site id1 id2 site,bstate)
+  let subs_map_agent_in_side_effect f (site,bstate) = (subs_map_site f site,bstate)
 
   let apply_map id phi = 
     try 
