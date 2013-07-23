@@ -1017,45 +1017,92 @@ module Blackboard =
              with Not_found -> 0)
 
 
- let export_blackboard_to_xls parameter handler error prefix int blackboard = 
-        let file_name = prefix^(string_of_int int)^".xls" in 
+     let export_blackboard_to_xls parameter handler error prefix int blackboard = 
+        let file_name = prefix^(string_of_int int)^".sxw" in 
         let desc = open_out file_name in 
+        let ncolumns_left = 2 in 
+        let nrows_head = 2 in 
+        let row_of_precondition eid = nrows_head + 3*eid in 
+        let row_of_postcondition eid = 1+(row_of_precondition eid) in 
+        let column_of_pid pid = pid + ncolumns_left in 
+        let _ = Printf.fprintf desc "REM  *****  BASIC  *****\n" in 
+        let colors = PB.A.create blackboard.n_eid None in 
+        let backcolor log color = 
+          match 
+            color 
+          with 
+          | Some color -> 
+            let r,g,b=Color.triple_of_color color in 
+            Printf.fprintf log "C.CellBackColor = RGB(%i,%i,%i)\n" r g b 
+          | _ -> ()
+        in 
+        let getcell log row col = 
+          Printf.fprintf log "C = S.getCellByPosition(%i,%i)\n" col row 
+        in 
+        let print_case log row col color string = 
+          if string <> ""
+          then 
+            let _ = getcell log row col in 
+            let _ = backcolor log color in 
+            let _ = Printf.fprintf log "C.setFormula(\"%s\")\n" string
+            in () 
+        in 
+        let _ = Printf.fprintf desc "Sub Main\n\n" in 
+        let _ = Printf.fprintf desc "S = ThisComponent.Sheets(0)\n" in 
+        let _ = 
+          match forced_events blackboard
+          with 
+          |  [list,_] -> 
+              List.iter 
+                (fun eid -> PB.A.set colors eid (Some Color.Red))
+                list
+          | _ -> ()
+        in 
         let rec aux eid error = 
           if eid>=blackboard.n_eid 
           then error
           else 
             begin 
               let error,list = case_list_of_eid parameter handler error blackboard eid  in 
-              let rec aux2 f g k l = 
+              let row_precondition = row_of_precondition eid in 
+              let row_postcondition = row_of_postcondition eid in 
+              let color = 
+                match 
+                  PB.A.get blackboard.selected_events eid 
+                with 
+                | None -> PB.A.get colors eid
+                | Some true -> Some Color.Red 
+                | Some false -> Some Color.Grey 
+              in 
+              let rec aux2 f g l = 
                  match l 
                  with 
-                   | [] -> Printf.fprintf desc "\n" 
-                   | t::q when t.column_predicate_id=k -> begin let _ = Printf.fprintf desc "%s;" (f t) in aux2 f g (k+1) q end 
-                   | t::q -> begin let _ = Printf.fprintf desc "%s;" (g t) in aux2 f g (k+1) l end 
+                   | [] -> ()
+                   | t::q -> 
+                     let _ = print_case desc row_precondition (column_of_pid t.column_predicate_id) color (f t) in 
+                     let _ = print_case desc row_postcondition (column_of_pid t.column_predicate_id) color (g t) in 
+                     aux2 f g q 
               in 
-              let print_empty t  = "" in 
               let print_test t = 
                  let column = PB.A.get blackboard.blackboard t.column_predicate_id in 
 		 let case = PB.A.get column t.row_short_event_id in 
                  PB.string_of_predicate_value case.static.test 
               in
-              let print_bar t = "-----------------" in 
               let print_action t = 
 	          let column = PB.A.get blackboard.blackboard t.column_predicate_id in 
 		  let case = PB.A.get column t.row_short_event_id in 
 		  PB.string_of_predicate_value case.static.action 
 	      in 
-              let _ = Printf.fprintf desc "%i;TEST;" eid in 
-              let _ = aux2 print_test print_empty 0 list in
-              let _ = Printf.fprintf desc "%i;BAR;" eid in 
-              let _ = aux2 print_bar print_bar 0 list in 
-              let _ = Printf.fprintf desc "%i;ACTION;" eid in 
-              let _ = aux2 print_action print_empty 0 list in   
-	      let _ = Printf.fprintf desc "\n" in 
+              let _ = print_case desc row_precondition 0 color ("Event:"^(string_of_int eid)) in 
+              let _ = print_case desc row_postcondition 0 color ("Event:"^(string_of_int eid)) in 
+              let _ = print_case desc row_precondition 1 color "PRECONDITION" in 
+              let _ = print_case desc row_postcondition 1 color "POSTCONDITION" in 
+              let _ = aux2 print_test print_action list in
               aux (eid+1) error
             end
         in 
         let error = aux 0 error in 
+        let _ = Printf.fprintf  desc "End Sub\n" in 
         let _ = close_out desc in 
         error
            
