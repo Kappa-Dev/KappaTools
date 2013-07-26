@@ -45,7 +45,7 @@ sig
     | Event of 'a 
     | Init of 'b
     | Obs of 'c  
-    | Dummy 
+    | Dummy of string  
     
 
   type test = 
@@ -82,7 +82,7 @@ sig
   type rule_info = obs_from_rule_app * r * counter * kasim_side_effect
                    
   val empty_side_effect: side_effect
-  val dummy_refined_step: refined_step
+  val dummy_refined_step: string -> refined_step
   val type_of_refined_step: refined_step -> (unit,unit,unit,unit,unit) choice 
   val agent_of_binding_type: binding_type -> agent_name 
   val site_of_binding_type: binding_type -> site_name
@@ -140,6 +140,8 @@ sig
   val level_of_event: refined_step -> Mods.level 
   val disambiguate: step list -> H.handler -> step list 
   val clean_events: refined_step list -> step list 
+
+  val print_step: out_channel -> H.handler -> refined_step -> unit
 end 
 
 
@@ -212,7 +214,7 @@ module Cflow_linker =
   | Event of 'a 
   | Init of 'b
   | Obs of 'c  
-  | Dummy   
+  | Dummy  of string 
 
   type refined_event = event * test list * (action list * ((site * binding_state) list))
   type refined_init = init * action list
@@ -232,7 +234,7 @@ module Cflow_linker =
       | Event ((_,(_,_,_,a)),_,_) -> a
       | _ -> Mods.Int2Set.empty 
 
-  let dummy_refined_step = Dummy 
+  let dummy_refined_step x = Dummy x
   let empty_side_effect = []
   let type_of_refined_step c = 
     match c 
@@ -241,7 +243,7 @@ module Cflow_linker =
       | Init _ -> Init () 
       | Subs (_,_) -> Subs ((),())
       | Obs _ -> Obs () 
-      | Dummy -> Dummy 
+      | Dummy x -> Dummy x 
 
   let site_of_binding_type = snd
   let agent_of_binding_type = fst
@@ -308,6 +310,34 @@ module Cflow_linker =
       | BOUND -> "!_"
       | BOUND_TYPE btype -> "!"^(string_of_btype env btype)
       | BOUND_to site -> "!"^(string_of_site env site)
+
+  let print_init log env ((agent,list):init) =
+    let ag = (string_of_agent env agent) in 
+    let _ = Printf.fprintf log "%s(" ag in 
+    let _ = 
+      List.fold_left 
+        (fun bool (s,(i,l)) -> 
+          let _ = 
+            Printf.fprintf log "%s%s%s%s" 
+              (if bool then "," else "")
+              (string_of_int s)
+              (match i with 
+              | None -> ""
+              | Some i -> "~"^(string_of_int i))
+              (match l with 
+              | Node.Null -> ""
+              | Node.Ptr (t,i) -> "!"^(string_of_int t.Node.name)^"."^(string_of_int i)
+              | Node.FPtr (i,j) -> "!T"^(string_of_int i)^"."^(string_of_int j))
+          in true)
+        false (List.rev list)
+    in Printf.fprintf log ")"
+            
+      
+  let print_event log env ((rule,emb,fresh),(rule_info)) = 
+    Printf.fprintf log "%s" rule.Dynamics.kappa 
+
+  let print_obs log env obs = () 
+
 
   let print_test log env prefix test = 
     match test with 
@@ -806,15 +836,15 @@ module Cflow_linker =
     | Event a -> f1 a 
     | Init a -> f2 a
     | Obs a -> f3 a 
-    | Dummy  -> f4 ()
+    | Dummy x  -> f4 x
 
-  let genbis f0 f1 f2 f3  = 
+  let genbis f0 f1 f2 f3 f4  = 
     gen 
       (fun a b -> Subs (f0 a b)) 
       (fun a -> Event (f1 a)) 
       (fun a -> Init (f2 a)) 
       (fun a -> Obs (f3 a))  
-      (fun a -> Dummy)
+      (fun a -> Dummy (f4 a))
   
   let print_refined_step parameter handler = 
     let log = parameter.H.out_channel in 
@@ -843,11 +873,11 @@ module Cflow_linker =
       | Obs ((_,_,_,info),_) -> Some info
       | _ -> None 
       
-  let refine_step env (x:step) = 
-    genbis (refine_subs env) (refine_event env) (refine_init env) (refine_obs env) x
+  let refine_step env  = 
+    genbis (refine_subs env) (refine_event env) (refine_init env) (refine_obs env) (fun x -> x) 
   
   let step_of_refined_step = 
-    genbis subs_of_refined_subs event_of_refined_event init_of_refined_init obs_of_refined_obs 
+    genbis subs_of_refined_subs event_of_refined_event init_of_refined_init obs_of_refined_obs (fun x -> x)
 
   let actions_of_refined_step = 
     gen actions_of_refined_subs actions_of_refined_event actions_of_refined_init actions_of_refined_obs (fun _ -> [],[])
@@ -928,7 +958,7 @@ module Cflow_linker =
               side_effect,
               counter,
               Mods.IntMap.add a b subs 
-            | Dummy -> 
+            | Dummy _ -> 
               grid,
               (if bool 
                then 
@@ -968,7 +998,7 @@ module Cflow_linker =
     match e 
     with 
     | Init _ | Obs _ | Event _ -> 0 
-    | Dummy | Subs _ -> 1 
+    | Dummy _ | Subs _ -> 1 
 
   let creation_of_event event handler = 
     match 
@@ -1040,6 +1070,24 @@ module Cflow_linker =
            (max_id,used,mapping,[]) 
            (List.rev event_list)
        in event_list_rev)
-               
+
+
+  let print_step log handler refined_event = 
+    match 
+      step_of_refined_step refined_event 
+    with 
+    | Subs (a,b) -> 
+      Printf.fprintf log "Subs: %s/%s" (string_of_int b) (string_of_int a)
+    | Event event -> 
+      let _ = Printf.fprintf log "Event: " in 
+      print_event log handler event 
+    | Init init -> 
+      let _ = Printf.fprintf log "Init: " in 
+      print_init log handler init 
+    | Obs obs -> 
+      let _ = Printf.fprintf log "Obs: " in 
+      print_obs log handler obs 
+    | Dummy x -> Printf.fprintf log "Dummy: %s" x
+
 end:Cflow_signature)
 

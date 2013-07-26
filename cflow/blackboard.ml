@@ -1020,7 +1020,7 @@ module Blackboard =
      let export_blackboard_to_xls parameter handler error prefix int blackboard = 
         let file_name = prefix^(string_of_int int)^".sxw" in 
         let desc = open_out file_name in 
-        let ncolumns_left = 2 in 
+        let ncolumns_left = 3 in 
         let nrows_head = 2 in 
         let row_of_precondition eid = nrows_head + 3*eid in 
         let row_of_postcondition eid = 1+(row_of_precondition eid) in 
@@ -1047,6 +1047,14 @@ module Blackboard =
             let _ = Printf.fprintf log "C.setFormula(\"%s\")\n" string
             in () 
         in 
+        let print_case_fun log row col color f = 
+          let _ = getcell log row col in 
+          let _ = backcolor log color in 
+          let _ = Printf.fprintf log "C.setFormula(\""in 
+          let _ = f () in 
+          let _ = Printf.fprintf log "\")\n" in 
+          () 
+        in 
         let _ = Printf.fprintf desc "Sub Main\n\n" in 
         let _ = Printf.fprintf desc "S = ThisComponent.Sheets(0)\n" in 
         let _ = 
@@ -1058,7 +1066,7 @@ module Blackboard =
                 list
           | _ -> ()
         in 
-        let rec aux eid error = 
+        let rec aux eid error stack = 
           if eid>=blackboard.n_eid 
           then error
           else 
@@ -1093,15 +1101,40 @@ module Blackboard =
 		  let case = PB.A.get column t.row_short_event_id in 
 		  PB.string_of_predicate_value case.static.action 
 	      in 
-              let _ = print_case desc row_precondition 0 color ("Event:"^(string_of_int eid)) in 
-              let _ = print_case desc row_postcondition 0 color ("Event:"^(string_of_int eid)) in 
-              let _ = print_case desc row_precondition 1 color "PRECONDITION" in 
-              let _ = print_case desc row_postcondition 1 color "POSTCONDITION" in 
+              let string_eid () = 
+                try 
+                  PB.CI.Po.K.print_step desc handler (PB.A.get blackboard.event eid)
+                with 
+                | Not_found -> Printf.fprintf desc "Event:%s" (string_of_int eid)
+              in
+              let _ = print_case_fun  desc row_precondition 1 color string_eid in 
+              let _ = print_case_fun  desc row_postcondition 1 color string_eid in 
+              let _ = print_case desc row_precondition 2 color "PRECONDITION" in 
+              let _ = print_case desc row_postcondition 2 color "POSTCONDITION" in 
               let _ = aux2 print_test print_action list in
-              aux (eid+1) error
+              let bool = 
+                try 
+                  begin 
+                    match PB.CI.Po.K.type_of_refined_step (PB.A.get blackboard.event eid:PB.CI.Po.K.refined_step)
+                    with 
+                    | PB.CI.Po.K.Event _ | PB.CI.Po.K.Obs _ | PB.CI.Po.K.Init _ -> true
+                    | _ -> false
+                  end
+                with 
+                | Not_found -> false
+              in 
+              let stack = 
+                if bool 
+                then 
+                  let _ = List.iter (fun row -> print_case_fun desc row 0 color string_eid) stack in 
+                  []
+                else 
+                  row_precondition::row_postcondition::stack 
+              in 
+              aux (eid+1) error stack 
             end
         in 
-        let error = aux 0 error in 
+        let error = aux 0 error [] in 
         let _ = Printf.fprintf  desc "End Sub\n" in 
         let _ = close_out desc in 
         error
