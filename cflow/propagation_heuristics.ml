@@ -79,7 +79,7 @@ module Propagation_heuristic =
     let forbidden_events paramter handler error list = 
       error,List.rev_map (fun x -> Cut_event x) (List.rev list)
      
-    let get_last_unresolved_event parameter handler error blackboard p_id level = 
+    let get_last_unresolved_event parameter handler error blackboard p_id level  = 
       let k = B.get_last_linked_event blackboard p_id in 
       match k 
       with 
@@ -98,8 +98,8 @@ module Propagation_heuristic =
                 with 
                   | None -> 
                     let error,(seid,eid,test,action) = B.get_static parameter handler error blackboard event_case_address in 
-                    let event = B.get_event blackboard eid in 
-                    if B.PB.CI.Po.K.level_of_event event = level 
+                    let error,level_of_event = B.level_of_event parameter handler error blackboard eid in 
+                    if level_of_event = level 
                     then 
                       error,Some eid 
                     else 
@@ -113,8 +113,17 @@ module Propagation_heuristic =
       if i=0 then false
       else if j=0 then true 
       else i<j 
+        
+    let to_xls = false
 
     let next_choice parameter handler error (blackboard:B.blackboard) = 
+      let _ = 
+        if to_xls && !Priority.n_story=370
+        then 
+          let _ = B.export_blackboard_to_xls parameter handler error "ESSAI_compression_" (!Priority.n_story) (!Priority.n_branch) blackboard in 
+          let _ = Priority.n_branch:= (!Priority.n_branch)+1 in 
+          ()
+      in 
       let n_p_id = B.get_npredicate_id blackboard in 
       let error,list  = 
         if n_p_id = 0 
@@ -122,7 +131,7 @@ module Propagation_heuristic =
           error,[]
         else 
           let rec try_level level error = 
-            if level > Mods.max_level 
+            if level > (B.PB.CI.Po.K.H.get_priorities parameter).Priority.max_level 
             then error,[]
             else 
               let rec aux step best_grade best_predicate = 
@@ -1360,8 +1369,7 @@ module Propagation_heuristic =
           else 
             let error,blackboard = B.dec parameter handler error (B.n_unresolved_events_in_column case) blackboard in 
             let error,(_,event,_,_) = B.get_static parameter handler error blackboard case in 
-            let event = B.get_event blackboard event in 
-            let level = B.PB.CI.Po.K.level_of_event event in 
+            let error,level = B.level_of_event parameter handler error blackboard event in 
             let error,blackboard = B.dec parameter handler error (B.n_unresolved_events_in_column_at_level  case level) blackboard in 
             (** we plug pointer next of the previous event *)
             let error,blackboard = 
@@ -1427,9 +1435,8 @@ module Propagation_heuristic =
               B.fail
             else 
               let error,blackboard = B.dec parameter handler error (B.n_unresolved_events_in_column case) blackboard in 
-            let event = B.get_event blackboard eid in 
-            let level = B.PB.CI.Po.K.level_of_event event in 
-            let error,blackboard = B.dec parameter handler error (B.n_unresolved_events_in_column_at_level  case level) blackboard in 
+              let error,level = B.level_of_event parameter handler error blackboard eid in 
+              let error,blackboard = B.dec parameter handler error (B.n_unresolved_events_in_column_at_level  case level) blackboard in 
               let propagate_list = 
                 (Propagate_up case)::(Propagate_down case)::(Propagate_down pointer_previous)::(Propagate_up pointer_previous)::propagate_list 
               in 
@@ -1507,8 +1514,7 @@ module Propagation_heuristic =
               in 
               let log_info = g log_info in 
               let error,blackboard = B.dec parameter handler error (B.n_unresolved_events) blackboard  in 
-              let event = B.get_event blackboard step_id in 
-              let level = B.PB.CI.Po.K.level_of_event event in 
+              let error,level = B.level_of_event parameter handler error blackboard step_id in 
               let error,blackboard = B.dec parameter handler error (B.n_unresolved_events_at_level  level) blackboard in 
               let error,list = B.case_list_of_eid parameter handler error blackboard step_id in 
               let rec aux l x success = 

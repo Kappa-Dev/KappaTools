@@ -25,10 +25,10 @@ module type Cflow_signature =
 sig
   module H:Cflow_handler.Cflow_handler 
   module P:Profiling.StoryStats 
-
   type agent_name = int
   type site_name = int 
   type agent_id = int 
+  module AgentIdSet:Set.S with type elt = agent_id
   type agent 
   type site 
   type internal_state = int 
@@ -99,6 +99,7 @@ sig
   val get_binding_sites: H.handler -> agent_name -> site_name list 
   val get_default_state: H.handler -> agent_name -> (site_name*internal_state option) list 
   val rule_of_event: event -> kappa_rule 
+  val btype_of_names : agent_name -> site_name -> binding_type 
   val embedding_of_event: event -> embedding
   val fresh_map_of_event: event -> fresh_map
   val refine_step: H.handler -> step -> refined_step
@@ -137,11 +138,12 @@ sig
 
   val get_kasim_side_effects: refined_step -> kasim_side_effect 
 
-  val level_of_event: refined_step -> Mods.level 
+  val level_of_event: H.parameter -> refined_step -> (agent_id -> bool) -> Priority.level 
   val disambiguate: step list -> H.handler -> step list 
   val clean_events: refined_step list -> step list 
 
   val print_step: out_channel -> H.handler -> refined_step -> unit
+  val agent_id_in_obs: refined_step -> AgentIdSet.t 
 end 
 
 
@@ -152,11 +154,13 @@ module Cflow_linker =
   module P = Profiling.StoryStats 
 
   type agent_name = int
-
+ 
   type site_name = int 
 
   type agent_id = int 
 
+  module AgIdSet = Set.Make (struct type t = agent_id let compare = compare end)
+ 
   type agent = agent_id * agent_name 
 
   type site = agent * site_name 
@@ -226,7 +230,7 @@ module Cflow_linker =
   type step = (event,init,obs,agent_id,agent_id) choice 
   type refined_step = (refined_event,refined_init,refined_obs,agent_id,agent_id) choice 
 
- 
+  let btype_of_names a b = (a,b)
   let build_subs_refined_step a b = Subs (a,b)
   let get_kasim_side_effects a = 
     match a 
@@ -293,7 +297,7 @@ module Cflow_linker =
   
   let site_name_of_binding_type = snd 
     
-  let string_of_agent env agent = (string_of_int (agent_name_of_agent agent))^"_"^(string_of_int (agent_id_of_agent agent))
+  let string_of_agent env agent = (Environment.name (agent_name_of_agent agent) env.H.env)^"_"^(string_of_int (agent_id_of_agent agent))
  
   let string_of_site_name env = string_of_int 
   
@@ -806,7 +810,7 @@ module Cflow_linker =
   let print_refined_event log env refined_event = 
     let _ = Printf.fprintf log "***Refined event:***\n" in 
     let _ = Printf.fprintf log "* Kappa_rule \n" in 
-    let _ = Dynamics.dump (rule_of_refined_event refined_event) env in 
+    let _ = Dynamics.dump (rule_of_refined_event refined_event) env.H.env in 
     let _ = 
       if true (*debug_mode*)
       then 
@@ -848,7 +852,7 @@ module Cflow_linker =
   
   let print_refined_step parameter handler = 
     let log = parameter.H.out_channel in 
-    let env = handler.H.env in 
+    let env = handler in 
     gen (print_refined_subs log env) (print_refined_event log env) (print_refined_init log env) (print_refined_obs log env) (fun _  -> ())
 
   let tests_of_refined_step =
@@ -994,11 +998,37 @@ module Cflow_linker =
       | _::q -> no_obs_found q
       | [] -> true 
 
-  let level_of_event e = 
+ 
+  
+  let level_of_event parameter e set = 
+    let priorities = H.get_priorities parameter in 
     match e 
     with 
-    | Init _ | Obs _ | Event _ -> 0 
-    | Dummy _ | Subs _ -> 1 
+    | Init _ | Obs _ -> priorities.Priority.other_events
+    | Event _ -> 
+      begin 
+        List.fold_left 
+          (fun priority action -> 
+            match 
+              action 
+            with 
+            | Create (ag,_)  -> 
+              let ag_id = agent_id_of_agent ag in 
+              if 
+                set ag_id 
+              then 
+                priority
+              else 
+                Priority.min_level priority priorities.Priority.creation
+            | Remove _ -> Priority.min_level priority priorities.Priority.removal 
+            | Mod_internal _ -> priority 
+            | Free _ -> Priority.min_level priority priorities.Priority.unbinding 
+            | Bind(site1,site2) | Bind_to (site1,site2) | Unbind (site1,site2) -> priority 
+          )
+          priorities.Priority.other_events 
+          (fst (actions_of_refined_step e))
+      end 
+    | Dummy _ | Subs _ -> priorities.Priority.substitution 
 
   let creation_of_event event handler = 
     match 
@@ -1079,7 +1109,6 @@ module Cflow_linker =
     | Subs (a,b) -> 
       Printf.fprintf log "Subs: %s/%s" (string_of_int b) (string_of_int a)
     | Event event -> 
-      let _ = Printf.fprintf log "Event: " in 
       print_event log handler event 
     | Init init -> 
       let _ = Printf.fprintf log "Init: " in 
@@ -1087,7 +1116,23 @@ module Cflow_linker =
     | Obs obs -> 
       let _ = Printf.fprintf log "Obs: " in 
       print_obs log handler obs 
-    | Dummy x -> Printf.fprintf log "Dummy: %s" x
+    | Dummy x -> Printf.fprintf log "%s" x
 
+  let agent_id_in_obs step = 
+    match step 
+    with 
+    | Subs _ | Event _ | Init _ | Dummy _ -> AgentIdSet.empty
+    | Obs (x,_) -> 
+      begin 
+        List.fold_left 
+          (fun l x -> 
+            match x with 
+            | Is_Here x -> 
+              AgentIdSet.add (agent_id_of_agent x) l
+            | _ -> l)
+          AgentIdSet.empty 
+          (tests_of_refined_step step )
+      end
+        
 end:Cflow_signature)
 

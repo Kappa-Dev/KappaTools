@@ -25,6 +25,9 @@ module type Cflow_handler =
           { 
             cache_size : int option ;
             compression_mode : Parameter.compression_mode ;
+            priorities_weak: Priority.priorities ;
+            priorities_strong : Priority.priorities ;
+            priorities: Priority.priorities ; 
             out_channel_err : out_channel ;
             out_channel_profiling : out_channel ;
             out_channel : out_channel 
@@ -45,6 +48,9 @@ module type Cflow_handler =
     val add_error: (error -> error_channel) with_handler  
     val raise_error:  (error -> 'a -> error_channel * 'a) with_handler  
     val dump_error: (error -> unit) with_handler
+    val set_weak: parameter -> parameter 
+    val set_strong: parameter -> parameter 
+    val get_priorities: parameter -> Priority.priorities 
 end
 
 
@@ -55,6 +61,9 @@ module Cflow_handler =
           { 
             cache_size : int option ;
             compression_mode : Parameter.compression_mode ;
+            priorities_weak: Priority.priorities ;
+            priorities_strong : Priority.priorities ;
+            priorities : Priority.priorities ;
             out_channel_err : out_channel ;
             out_channel_profiling: out_channel ;
             out_channel : out_channel 
@@ -63,12 +72,19 @@ module Cflow_handler =
       let build_parameter () = 
         let channel = open_out !Parameter.profilingName in 
         {
+          priorities_weak = Priority.weak ; 
+          priorities_strong = Priority.strong2 ; 
+          priorities = Priority.weak ;
           out_channel = stderr ; 
           out_channel_err = stderr ; 
           out_channel_profiling = channel ;
           compression_mode = Parameter.get_compression_mode () ; 
           cache_size = Parameter.get_cache_size () ;
         }
+
+      let set_weak p = {p with priorities = p.priorities_weak}
+      let set_strong p = {p with priorities = p.priorities_strong}
+
 
       type error = 
           {
@@ -134,5 +150,8 @@ module Cflow_handler =
         else
           let error_list = add_error parameter handler error_list error in 
             error_list,def 
+
+      let get_priorities parameter = parameter.priorities 
+
     end:Cflow_handler
   )

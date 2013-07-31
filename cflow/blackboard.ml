@@ -49,8 +49,8 @@ sig
   val get_event: blackboard -> int -> PB.CI.Po.K.refined_step 
   val get_n_eid: blackboard -> int 
   val get_npredicate_id: blackboard -> int 
-  val get_n_unresolved_events_of_pid_by_level: blackboard -> PB.predicate_id -> Mods.level -> int 
-     val get_n_unresolved_events_of_pid: blackboard -> PB.predicate_id  -> int 
+  val get_n_unresolved_events_of_pid_by_level: blackboard -> PB.predicate_id -> Priority.level -> int 
+  val get_n_unresolved_events_of_pid: blackboard -> PB.predicate_id  -> int 
     
   val get_n_unresolved_events: blackboard -> int 
   val get_first_linked_event: blackboard -> PB.predicate_id -> int option 
@@ -90,7 +90,7 @@ sig
 
   (**pretty printing*)
   val print_blackboard:(blackboard -> PB.CI.Po.K.H.error_channel) PB.CI.Po.K.H.with_handler 
-  val export_blackboard_to_xls: (string -> int -> blackboard -> PB.CI.Po.K.H.error_channel) PB.CI.Po.K.H.with_handler 
+  val export_blackboard_to_xls: (string -> int -> int -> blackboard -> PB.CI.Po.K.H.error_channel) PB.CI.Po.K.H.with_handler 
   val print_event_case_address:(blackboard ->  event_case_address -> PB.CI.Po.K.H.error_channel) PB.CI.Po.K.H.with_handler 
   val print_stack: (blackboard -> PB.CI.Po.K.H.error_channel) PB.CI.Po.K.H.with_handler 
   val exist: event_case_address -> case_address 
@@ -102,15 +102,16 @@ sig
   val case_list_of_eid: (blackboard -> PB.step_id -> PB.CI.Po.K.H.error_channel * event_case_address list) PB.CI.Po.K.H.with_handler 
   val state: PB.predicate_value -> case_value 
   val is_exist_event: PB.step_id -> case_address 
-  val n_unresolved_events_at_level: Mods.level -> case_address
+  val n_unresolved_events_at_level: Priority.level -> case_address
   val n_unresolved_events: case_address 
-  val n_unresolved_events_in_column_at_level: event_case_address -> Mods.level -> case_address 
+  val n_unresolved_events_in_column_at_level: event_case_address -> Priority.level -> case_address 
   val n_unresolved_events_in_column: event_case_address -> case_address 
   val forced_events: blackboard -> (PB.step_id list * unit Mods.simulation_info option) list 
   val side_effect_of_event: blackboard -> PB.step_id -> PB.CI.Po.K.side_effect
 (*  val cut_predicate_id: (blackboard -> PB.predicate_id -> PB.CI.Po.K.H.error_channel *   blackboard) PB.CI.Po.K.H.with_handler *)
   val cut: (PB.CI.Po.K.P.log_info -> blackboard -> PB.step_id list -> PB.CI.Po.K.H.error_channel * PB.CI.Po.K.P.log_info * blackboard * PB.step_id list) PB.CI.Po.K.H.with_handler 
   val tick: PB.CI.Po.K.P.log_info -> bool * PB.CI.Po.K.P.log_info (* to do: move to the module PB.CI.Po.K.P*)
+  val level_of_event: (blackboard -> PB.step_id -> PB.CI.Po.K.H.error_channel * Priority.level) PB.CI.Po.K.H.with_handler 
 end
 
 module Blackboard = 
@@ -352,18 +353,26 @@ module Blackboard =
            blackboard: case_info PB.A.t PB.A.t ;
            selected_events: bool option PB.A.t ;
            weigth_of_predicate_id: int PB.A.t;
-           weigth_of_predicate_id_by_level: int PB.A.t Mods.LevelMap.t; 
+           weigth_of_predicate_id_by_level: int PB.A.t Priority.LevelMap.t; 
            used_predicate_id: bool PB.A.t ;  
            n_unresolved_events: int ;
-           n_unresolved_events_by_level: int Mods.LevelMap.t; 
+           n_unresolved_events_by_level: int Priority.LevelMap.t; 
            last_linked_event_of_predicate_id: int PB.A.t;
            event_case_list: event_case_address list PB.A.t;
            side_effect_of_event: PB.CI.Po.K.side_effect PB.A.t;
            fictitious_observable: PB.step_id option;
+           level_of_event: Priority.level PB.A.t;
          }
            
      let tick profiling_info = PB.CI.Po.K.P.tick profiling_info 
-   
+     let level_of_event parameter handler error blackboard eid = 
+       try 
+         error,PB.A.get blackboard.level_of_event eid 
+       with 
+         Not_found -> 
+           let error_list,error = PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "level_of_event") (Some "373") (Some "Unknown event id") (failwith "Unknown event id")  in 
+           PB.CI.Po.K.H.raise_error parameter handler error_list error Priority.default 
+             
      let get_event blackboard k = PB.A.get blackboard.event k 
      let get_n_eid blackboard = blackboard.n_eid 
      let get_stack_depth blackboard = List.length blackboard.stack 
@@ -438,7 +447,7 @@ module Blackboard =
      let get_n_unresolved_events_of_pid_by_level blackboard pid level = 
        try 
          PB.A.get 
-           (Mods.LevelMap.find level blackboard.weigth_of_predicate_id_by_level)  
+           (Priority.LevelMap.find level blackboard.weigth_of_predicate_id_by_level)  
            pid 
        with 
        | Not_found -> 0
@@ -632,7 +641,7 @@ module Blackboard =
        in 
        let _ = Printf.fprintf log "*weight of predicate_id_by_level*\n" in 
        let _ = 
-         Mods.LevelMap.iter 
+         Priority.LevelMap.iter 
            (fun l  -> 
              let _ = Printf.fprintf log " Level:%i\n" l in 
              PB.A.iteri 
@@ -653,9 +662,9 @@ module Blackboard =
        let old = PB.A.get array eid in 
        let unsolved = 
          try 
-           Mods.LevelMap.add level ((Mods.LevelMap.find level unsolved)+1) unsolved 
+           Priority.LevelMap.add level ((Priority.LevelMap.find level unsolved)+1) unsolved 
          with 
-           Not_found -> Mods.LevelMap.add level 1 unsolved
+           Not_found -> Priority.LevelMap.add level 1 unsolved
        in 
        PB.A.set array eid (event_case_address::old),unsolved 
 
@@ -668,19 +677,19 @@ module Blackboard =
        let current_stack = empty_stack in
        let event_case_list = PB.A.make n_events [] in 
        let n_seid = PB.A.make n_predicates 0 in 
-       let unsolved_by_level = Mods.LevelMap.empty in 
+       let unsolved_by_level = Priority.LevelMap.empty in 
        let blackboard = PB.A.make n_predicates (PB.A.make 1 dummy_case_info) in
        let weigth_of_predicate_id_by_level = 
          let rec aux k map = 
            if k<0 then map 
            else 
-             aux (k-1) (Mods.LevelMap.add k (PB.A.create 0 0) map)
-         in aux Mods.max_level Mods.LevelMap.empty 
+             aux (k-1) (Priority.LevelMap.add k (PB.A.create 0 0) map)
+         in aux (PB.CI.Po.K.H.get_priorities parameter).Priority.max_level Priority.LevelMap.empty 
        in 
        let inc_depth level p_id = 
          try 
            let a = 
-             Mods.LevelMap.find level weigth_of_predicate_id_by_level 
+             Priority.LevelMap.find level weigth_of_predicate_id_by_level 
            in 
            let old = 
              try 
@@ -752,10 +761,9 @@ module Blackboard =
                    let eid = get_eid_of_triple triple in 
                    let error,events = 
                      PB.get_pre_event parameter handler error pre_blackboard  in 
-                   let event = PB.A.get events eid in 
-                   let level = PB.CI.Po.K.level_of_event event in 
+                   let error,level = PB.get_level_of_event parameter handler error pre_blackboard eid in 
                    let _ = inc_depth level p_id in 
-                   let _ = add_event eid (p_id,seid) event_case_list level Mods.LevelMap.empty in 
+                   let _ = add_event eid (p_id,seid) event_case_list level Priority.LevelMap.empty in 
                    let _ = PB.A.set array seid info in 
                    aux2 (seid-1) q 
              in 
@@ -771,14 +779,13 @@ module Blackboard =
            then 
              map
            else
-             let event = PB.A.get event k in 
-             let level = PB.CI.Po.K.level_of_event event in 
+             let error,level = PB.get_level_of_event parameter handler error pre_blackboard k in 
              let map = 
                try 
-                 Mods.LevelMap.add level ((Mods.LevelMap.find level map)+1) map 
+                 Priority.LevelMap.add level ((Priority.LevelMap.find level map)+1) map 
                with 
                | Not_found ->
-                 Mods.LevelMap.add level 1 map
+                 Priority.LevelMap.add level 1 map
              in aux (k-1) map 
          in aux n_events unsolved_by_level 
        in 
@@ -790,6 +797,7 @@ module Blackboard =
          event = event ;
          side_effect_of_event = side_effects ; 
          pre_column_map_inv = PB.get_pre_column_map_inv pre_blackboard; 
+         level_of_event = PB.levels pre_blackboard;
          forced_events = forced_events;
          n_eid = n_events;
          n_seid = n_seid;
@@ -835,7 +843,7 @@ module Blackboard =
                | Counter int2 -> 
                  begin 
                    try 
-                     let a = Mods.LevelMap.find level blackboard.weigth_of_predicate_id_by_level in 
+                     let a = Priority.LevelMap.find level blackboard.weigth_of_predicate_id_by_level in 
                      let _ = 
                        PB.A.set a int int2 in 
                      error,blackboard 
@@ -936,7 +944,7 @@ module Blackboard =
                | Counter int -> 
                  error,{blackboard 
                         with n_unresolved_events_by_level = 
-                     Mods.LevelMap.add level int blackboard.n_unresolved_events_by_level}
+                     Priority.LevelMap.add level int blackboard.n_unresolved_events_by_level}
                | _ -> 
                  let error_list,error = 
                    PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "760") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
@@ -980,7 +988,7 @@ module Blackboard =
          | N_unresolved_events_in_column_at_level (int,level) -> 
            let n = 
              try 
-               let a = Mods.LevelMap.find level blackboard.weigth_of_predicate_id_by_level in
+               let a = Priority.LevelMap.find level blackboard.weigth_of_predicate_id_by_level in
                PB.A.get a int 
              with 
                Not_found -> 0 
@@ -1013,12 +1021,12 @@ module Blackboard =
          | N_unresolved_events -> error,Counter blackboard.n_unresolved_events
          | N_unresolved_events_at_level lvl -> error,
            Counter(try 
-           Mods.LevelMap.find lvl blackboard.n_unresolved_events_by_level
+           Priority.LevelMap.find lvl blackboard.n_unresolved_events_by_level
              with Not_found -> 0)
 
 
-     let export_blackboard_to_xls parameter handler error prefix int blackboard = 
-        let file_name = prefix^(string_of_int int)^".sxw" in 
+     let export_blackboard_to_xls parameter handler error prefix int int2 blackboard = 
+        let file_name = prefix^"_"^(string_of_int int)^"_"^(string_of_int int2)^".sxw" in 
         let desc = open_out file_name in 
         let ncolumns_left = 3 in 
         let nrows_head = 2 in 
@@ -1066,6 +1074,12 @@ module Blackboard =
                 list
           | _ -> ()
         in 
+        let _ = 
+          PB.A.iteri 
+            (fun pid p_info -> 
+              print_case_fun desc 0 (column_of_pid pid) None (fun () -> PB.print_predicate_info desc p_info))
+            blackboard.pre_column_map_inv
+        in 
         let rec aux eid error stack = 
           if eid>=blackboard.n_eid 
           then error
@@ -1074,13 +1088,13 @@ module Blackboard =
               let error,list = case_list_of_eid parameter handler error blackboard eid  in 
               let row_precondition = row_of_precondition eid in 
               let row_postcondition = row_of_postcondition eid in 
-              let color = 
+              let color,maybekept = 
                 match 
                   PB.A.get blackboard.selected_events eid 
                 with 
-                | None -> PB.A.get colors eid
-                | Some true -> Some Color.Red 
-                | Some false -> Some Color.Grey 
+                | None -> PB.A.get colors eid,true
+                | Some true -> Some Color.Red,true
+                | Some false -> Some Color.Grey,false 
               in 
               let rec aux2 f g l = 
                  match l 
@@ -1089,6 +1103,30 @@ module Blackboard =
                    | t::q -> 
                      let _ = print_case desc row_precondition (column_of_pid t.column_predicate_id) color (f t) in 
                      let _ = print_case desc row_postcondition (column_of_pid t.column_predicate_id) color (g t) in 
+                     let error = 
+                       if maybekept 
+                       then 
+                         let error,value_before = 
+                           try 
+                             let error,case_value = get parameter handler error (value_before t) blackboard in 
+                             error,string_of_value case_value 
+                           with 
+                             Not_found -> error,"Undefined"
+                         in 
+                         let _ = print_case desc (row_precondition-1) (column_of_pid t.column_predicate_id) (Some Color.Lightblue) value_before
+                         in 
+                         let error,value_after = 
+                           try 
+                             let error,case_value = get parameter handler error (value_after t) blackboard in 
+                             error,string_of_value case_value 
+                           with 
+                             Not_found -> error,"Undefined"
+                         in 
+                         let _ = print_case desc (row_precondition+1) (column_of_pid t.column_predicate_id) (Some Color.Lightblue) value_after 
+                         in error
+                       else 
+                         error 
+                     in 
                      aux2 f g q 
               in 
               let print_test t = 
@@ -1469,19 +1507,19 @@ module Blackboard =
 
    let import parameter handler error log_info bool to_xls list = 
      let error,preblackboard = PB.init parameter handler error in
-     let error,log_info,preblackboard = 
+     let error,log_info,preblackboard,step_id = 
        if bool 
        then 
          List.fold_left 
-           (fun (error,log_info,preblackboard) refined_event  -> 
-             PB.add_step_up_to_iso parameter handler error log_info refined_event preblackboard)
-           (error,log_info,preblackboard)
+           (fun (error,log_info,preblackboard,int) refined_event  -> 
+             PB.add_step_up_to_iso parameter handler error log_info refined_event preblackboard int)
+           (error,log_info,preblackboard,0)
            list 
        else 
          List.fold_left 
-           (fun (error,log_info,preblackboard) refined_event  -> 
-             PB.add_step parameter handler error log_info refined_event preblackboard)
-           (error,log_info,preblackboard)
+           (fun (error,log_info,preblackboard,int) refined_event  -> 
+             PB.add_step parameter handler error log_info refined_event preblackboard int)
+           (error,log_info,preblackboard,0)
            list 
      in 
      let error,log_info,preblackboard = 
@@ -1491,11 +1529,11 @@ module Blackboard =
      let error = 
        if to_xls 
        then 
-	 export_blackboard_to_xls parameter handler error (if bool then "strong" else "weak") (!n) blackboard 
+	 export_blackboard_to_xls parameter handler error (if bool then "strong" else "weak") (!Priority.n_story) 0 blackboard 
        else
          error
      in 
-     let _ = n:=(!n)+1 in 
+     let _ = Priority.n_story:=(!Priority.n_story)+1 in 
      error,log_info,blackboard 
 
    

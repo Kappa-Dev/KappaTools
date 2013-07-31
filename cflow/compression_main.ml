@@ -24,7 +24,7 @@ let log_step = true
 let debug_mode = false
 let dump_profiling_info = false
 let dump_grid_before_weak_compression = false
-let dump_grid_before_strong_compression = false
+let dump_grid_before_strong_compression = true
 
 
 let th_of_int n = 
@@ -311,7 +311,8 @@ let compress env state log_info step_list =
           in 
           let _ = print_newline () in 
           let _ = print_newline () in 
-          let error,strongly_compressed_story_array = 
+          let parameter = D.S.PH.B.PB.CI.Po.K.H.set_strong parameter in 
+            let error,strongly_compressed_story_array = 
             if strong_compression_on 
             then 
               begin 
