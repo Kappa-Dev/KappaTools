@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 06/09/2011
-  * Last modification: 19/07/2013
+  * Last modification: 01/08/2013
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -1122,7 +1122,7 @@ module Blackboard =
                            with 
                              Not_found -> error,"Undefined"
                          in 
-                         let _ = print_case desc (row_precondition+1) (column_of_pid t.column_predicate_id) (Some Color.Lightblue) value_after 
+                         let _ = print_case desc (row_postcondition+1) (column_of_pid t.column_predicate_id) (Some Color.Lightblue) value_after 
                          in error
                        else 
                          error 

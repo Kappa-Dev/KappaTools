@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 19/07/2013
+  * Last modification: 01/08/2013
   * * 
   * Some parameter references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -874,7 +874,9 @@ module Preblackboard =
              rule_agent_id_mutex: predicate_id AgentIdMap.t;
              rule_agent_id_subs: predicate_id AgentIdMap.t;
              mixture_agent_id_mutex: predicate_id AgentIdMap.t;
-             links_mutex: predicate_id AgentId2Map.t
+             links_mutex: predicate_id AgentId2Map.t;
+             removed_agents: AgentIdSet.t ; 
+             removed_sites_in_other_links: SiteIdSet.t ; 
            }
 
          let init_data_structure_strong = 
@@ -900,6 +902,8 @@ module Preblackboard =
              rule_agent_id_subs = AgentIdMap.empty;
              links_mutex = AgentId2Map.empty;
              mixture_agent_id_mutex = AgentIdMap.empty;
+             removed_agents = AgentIdSet.empty ; 
+             removed_sites_in_other_links = SiteIdSet.empty ;
            }
      
          let print_data_structure parameter handler data =
@@ -1149,6 +1153,9 @@ module Preblackboard =
                       other_links_sites = 
                        SiteIdMap.add site1_id ag2_id
                          (SiteIdMap.add site2_id ag1_id data_structure.other_links_sites)}
+                 | CI.Po.K.Remove agent -> 
+                   {data_structure 
+                    with removed_agents = AgentIdSet.add (CI.Po.K.agent_id_of_agent agent) data_structure.removed_agents}
                  | _ -> data_structure)
                data_structure
                action_list
@@ -1168,7 +1175,25 @@ module Preblackboard =
                     let ag2_id = CI.Po.K.agent_id_of_site site2 in 
                     let site1_id = ag1_id,CI.Po.K.site_name_of_site site1 in 
                     let site2_id = ag2_id,CI.Po.K.site_name_of_site site2 in 
-                   {data_structure
+                    let data_structure = 
+                      if AgentIdSet.mem ag1_id data_structure.removed_agents
+                      then 
+                        {data_structure 
+                         with removed_sites_in_other_links = 
+                            SiteIdSet.add site1_id data_structure.removed_sites_in_other_links}
+                      else
+                        data_structure 
+                    in 
+                    let data_structure = 
+                      if AgentIdSet.mem ag2_id data_structure.removed_agents
+                      then 
+                        {data_structure 
+                         with removed_sites_in_other_links = 
+                            SiteIdSet.add site2_id data_structure.removed_sites_in_other_links}
+                      else
+                        data_structure 
+                    in 
+                    {data_structure
                     with 
                       other_links_sites = 
                        SiteIdMap.add site1_id ag2_id
@@ -1757,6 +1782,24 @@ module Preblackboard =
                          []
                          unambiguous_side_effects 
                      in 
+                     let merged_map = 
+                       PredicateidMap.mapi 
+                         (fun pid (test,action) ->
+                             if action = Undefined 
+                               && 
+                                 begin 
+                                   match A.get blackboard.pre_column_map_inv pid
+                                   with 
+                                   | Bound_site (ag_id,site_id) ->  
+                                     ag_id = mixture_ag_id && (SiteIdSet.mem (rule_ag_id,site_id) data_structure.removed_sites_in_other_links)
+                                   | _ -> false
+                                 end
+                             then 
+                               (test,Unknown)
+                             else 
+                               (test,action))
+                         merged_map 
+                     in
                      if side_effect = []
                      && PredicateidMap.is_empty  merged_map 
                      then 
@@ -1877,6 +1920,25 @@ module Preblackboard =
                                List.fold_left 
                                  (fun (error,blackboard,action_map,test_map) action -> 
                                    let error,blackboard,action_list,test_list = predicates_of_action true parameter handler error blackboard init action in 
+                                   let action_list = 
+                                     List.rev_map
+                                       (fun (pid,x) 
+                                         -> 
+                                           match x with 
+                                           | Free -> 
+                                             begin
+                                               match A.get blackboard.pre_column_map_inv pid
+                                               with 
+                                               | Bound_site (ag_id,site_id) ->  
+                                                 if 
+                                                   (ag_id = mixture_ag_1 && (SiteIdSet.mem (rule_ag_id1,site_id) data_structure.removed_sites_in_other_links))
+                                                 or (ag_id = mixture_ag_2 && (SiteIdSet.mem (rule_ag_id2,site_id) data_structure.removed_sites_in_other_links))
+                                                 then (pid,Undefined)
+                                                 else (pid,x)
+                                             end
+                                           | _ -> (pid,x))
+                                       (List.rev action_list)
+                                   in 
                                    error,blackboard,build_map action_list action_map,build_map test_list test_map)
                                  (error,blackboard,PredicateidMap.empty,test_map)
                                  action_list in 
@@ -1963,7 +2025,8 @@ module Preblackboard =
            let side_effect = data_structure.sure_side_effects in 
            let action_list = data_structure.sure_actions in 
            let test_list = data_structure.sure_tests in 
-             
+           let fictitious_list = blackboard.pre_fictitious_list in 
+          
            let error,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effects = 
              List.fold_left 
                (fun (error,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effects) (site,(binding_state)) -> 

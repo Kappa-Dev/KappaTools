@@ -9,7 +9,7 @@
   * Jean Krivine, Universite Paris-Diderot, CNRS 
   *  
   * Creation: 19/10/2011
-  * Last modification: 19/07/2013
+  * Last modification: 01/08/2013
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -24,7 +24,7 @@ let log_step = true
 let debug_mode = false
 let dump_profiling_info = false
 let dump_grid_before_weak_compression = false
-let dump_grid_before_strong_compression = true
+let dump_grid_before_strong_compression = false
 
 
 let th_of_int n = 

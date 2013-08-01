@@ -114,7 +114,7 @@ module Propagation_heuristic =
       else if j=0 then true 
       else i<j 
         
-    let to_xls = false
+    let to_xls = false 
 
     let next_choice parameter handler error (blackboard:B.blackboard) = 
       let _ = 
