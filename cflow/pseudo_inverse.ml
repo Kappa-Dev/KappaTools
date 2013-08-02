@@ -9,7 +9,7 @@
    * Jean Krivine, Université Paris Dederot, CNRS 
    *  
    * Creation: 17/04/2012
-   * Last modification: 17/04/2012
+   * Last modification: 02/08/2013
    * * 
    * Some parameter references can be tuned thanks to command-line options
    * other variables has to be set before compilation   
@@ -114,7 +114,7 @@
        let _ = Printf.fprintf parameter.Po.K.H.out_channel_err "Events:\n" in 
        let rec aux k = 
          if k=blackboard.nsteps 
-         then ()
+         then error
          else 
            let event = 
              try 
@@ -127,12 +127,12 @@
              match 
                event 
              with 
-               | None -> () 
+               | None -> error
                | Some event -> 
                  begin 
                    try 
                      let _ = Printf.fprintf parameter.Po.K.H.out_channel_err "Event %i\n" k in 
-                     let _ = Po.K.print_refined_step parameter handler event in 
+                     let error  = Po.K.print_refined_step parameter handler error event in 
                      let _ = Printf.fprintf parameter.Po.K.H.out_channel_err "Predicates: " in 
                      let list = A.get blackboard.predicates_of_event k in 
                      let _ = List.iter (fun pid -> Printf.fprintf parameter.Po.K.H.out_channel_err "%s," (string_of_predicate_info pid)) list in 
@@ -144,14 +144,14 @@
                          Printf.fprintf parameter.Po.K.H.out_channel_err "contain a deletion\n" in 
                      let int = A.get blackboard.modified_predicates_of_event k in 
                      let _ = Printf.fprintf parameter.Po.K.H.out_channel_err "%i modified predicates \n " int in
-                     ()
-                   with _ -> () 
+                     error
+                   with _ -> error
                  end 
            in 
            aux (k+1)
        in 
-       let _ = aux 0 in 
-       () 
+       let error = aux 0 in 
+       error 
            
      let p b = 
        let _ = 
@@ -415,8 +415,8 @@
 
   let add_step parameter handler error step blackboard = 
     let pre_event = blackboard.event in 
-    let test_list = Po.K.tests_of_refined_step step in 
-    let action_list,_ = Po.K.actions_of_refined_step step in
+    let error,test_list = Po.K.tests_of_refined_step parameter handler error step in 
+    let error,(action_list,_) = Po.K.actions_of_refined_step parameter handler error step in
     let side_effect = Po.K.get_kasim_side_effects (step) in 
     let build_map list map = 
       List.fold_left 

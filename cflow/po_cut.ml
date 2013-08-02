@@ -9,7 +9,7 @@
    * Jean Krivine, Université Paris Dederot, CNRS 
    *  
    * Creation: 16/04/2012
-   * Last modification: 28/06/2012
+   * Last modification: 02/08/2013
    * * 
    * Some parameter references can be tuned thanks to command-line options
    * other variables has to be set before compilation   
@@ -22,7 +22,7 @@
    sig
      module K:Kappa_instantiation.Cflow_signature
 
-     val cut: K.refined_step list -> K.refined_step list * int  
+     val cut: (K.refined_step list -> K.H.error_channel * (K.refined_step list * int )) K.H.with_handler 
    end
 
  module Po_cut = 
@@ -90,7 +90,7 @@
      let predicates_of_side_effects sides = 
        Mods.Int2Set.fold (fun (ag_id,s_id) list -> Bound_site(ag_id,s_id)::list) sides [] 
 
-     let cut event_list = 
+     let cut parameter handler error event_list = 
        let seen_predicates = PS.empty in 
        let _,event_list,n = 
          List.fold_left 
@@ -122,7 +122,7 @@
                    else 
                      keep2 q 
              in 
-             let action_list = (fst (K.actions_of_refined_step event)) in 
+             let error,(action_list,_) = K.actions_of_refined_step parameter handler error event in 
              let seen =   
                List.fold_left 
                  (fun seen action -> 
@@ -133,13 +133,14 @@
                  )
                  seen action_list
              in 
+             let error,(actions,_) = K.actions_of_refined_step parameter handler error event in  
              if (K.is_obs_of_refined_step event)
-               or (keep (fst (K.actions_of_refined_step event)))
+               or (keep actions)
                or (keep2 (predicates_of_side_effects (K.get_kasim_side_effects event)))
              then 
                begin
                  let kept = event::kept in 
-                 let test_list = K.tests_of_refined_step event in 
+                 let error,tests = K.tests_of_refined_step parameter handler error event in 
                  let seen = 
                    List.fold_left 
                      (fun seen test -> 
@@ -149,7 +150,7 @@
                          (predicates_of_test test)
                      )
                      seen 
-                     test_list 
+                     tests
                  in 
                  (seen,kept,n_cut)
                end 
@@ -159,6 +160,6 @@
            (seen_predicates,[],0) 
            (List.rev event_list) 
        in 
-       event_list,n
+       error,(event_list,n)
         
    end:Po_cut)

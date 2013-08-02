@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 06/09/2011
-  * Last modification: 01/08/2013
+  * Last modification: 02/08/2013
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -684,7 +684,18 @@ module Blackboard =
            if k<0 then map 
            else 
              aux (k-1) (Priority.LevelMap.add k (PB.A.create 0 0) map)
-         in aux (PB.CI.Po.K.H.get_priorities parameter).Priority.max_level Priority.LevelMap.empty 
+         in 
+         let error,priority_max = 
+           match 
+             PB.CI.Po.K.H.get_priorities parameter 
+           with 
+           | Some x -> error,x.Priority.max_level
+           | None -> 
+             let error_list,error = PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "import") (Some "694") (Some "Compression mode has to been selected") (failwith "Compression mode has not been selected") in 
+          PB.CI.Po.K.H.raise_error parameter handler error_list error Priority.zero
+
+         in 
+         aux priority_max Priority.LevelMap.empty
        in 
        let inc_depth level p_id = 
          try 
@@ -1042,26 +1053,37 @@ module Blackboard =
           | Some color -> 
             let r,g,b=Color.triple_of_color color in 
             Printf.fprintf log "C.CellBackColor = RGB(%i,%i,%i)\n" r g b 
-          | _ -> ()
+          | None -> ()
+        in 
+        let textcolor log color  = 
+          match 
+            color 
+          with 
+          | Some color -> 
+            let r,g,b=Color.triple_of_color color in 
+            Printf.fprintf log "C.TextColor = RGB(%i,%i,%i)\n" r g b 
+          | None -> ()
         in 
         let getcell log row col = 
           Printf.fprintf log "C = S.getCellByPosition(%i,%i)\n" col row 
         in 
-        let print_case log row col color string = 
+        let print_case log row col color_font color_back string = 
           if string <> ""
           then 
             let _ = getcell log row col in 
-            let _ = backcolor log color in 
+            let _ = textcolor log color_font in 
+            let _ = backcolor log color_back in 
             let _ = Printf.fprintf log "C.setFormula(\"%s\")\n" string
             in () 
         in 
-        let print_case_fun log row col color f = 
+        let print_case_fun log row col color_font color_back f error = 
           let _ = getcell log row col in 
-          let _ = backcolor log color in 
+          let _ = textcolor log color_font in 
+          let _ = backcolor log color_back in 
           let _ = Printf.fprintf log "C.setFormula(\""in 
-          let _ = f () in 
+          let error = f error in 
           let _ = Printf.fprintf log "\")\n" in 
-          () 
+          error
         in 
         let _ = Printf.fprintf desc "Sub Main\n\n" in 
         let _ = Printf.fprintf desc "S = ThisComponent.Sheets(0)\n" in 
@@ -1077,7 +1099,7 @@ module Blackboard =
         let _ = 
           PB.A.iteri 
             (fun pid p_info -> 
-              print_case_fun desc 0 (column_of_pid pid) None (fun () -> PB.print_predicate_info desc p_info))
+              print_case_fun desc 0 (column_of_pid pid) None None (fun error -> PB.print_predicate_info desc p_info) error)
             blackboard.pre_column_map_inv
         in 
         let rec aux eid error stack = 
@@ -1096,13 +1118,13 @@ module Blackboard =
                 | Some true -> Some Color.Red,true
                 | Some false -> Some Color.Grey,false 
               in 
-              let rec aux2 f g l = 
+              let rec aux2 f g l error = 
                  match l 
                  with 
-                   | [] -> ()
+                   | [] -> error
                    | t::q -> 
-                     let _ = print_case desc row_precondition (column_of_pid t.column_predicate_id) color (f t) in 
-                     let _ = print_case desc row_postcondition (column_of_pid t.column_predicate_id) color (g t) in 
+                     let _ = print_case desc row_precondition (column_of_pid t.column_predicate_id) None color (f t) in 
+                     let _ = print_case desc row_postcondition (column_of_pid t.column_predicate_id) None color (g t) in 
                      let error = 
                        if maybekept 
                        then 
@@ -1113,7 +1135,7 @@ module Blackboard =
                            with 
                              Not_found -> error,"Undefined"
                          in 
-                         let _ = print_case desc (row_precondition-1) (column_of_pid t.column_predicate_id) (Some Color.Lightblue) value_before
+                         let _ = print_case desc (row_precondition-1) (column_of_pid t.column_predicate_id) (Some Color.Lightblue) None value_before
                          in 
                          let error,value_after = 
                            try 
@@ -1122,12 +1144,12 @@ module Blackboard =
                            with 
                              Not_found -> error,"Undefined"
                          in 
-                         let _ = print_case desc (row_postcondition+1) (column_of_pid t.column_predicate_id) (Some Color.Lightblue) value_after 
+                         let _ = print_case desc (row_postcondition+1) (column_of_pid t.column_predicate_id) (Some Color.Lightblue) None value_after 
                          in error
                        else 
                          error 
                      in 
-                     aux2 f g q 
+                     aux2 f g q error
               in 
               let print_test t = 
                  let column = PB.A.get blackboard.blackboard t.column_predicate_id in 
@@ -1139,17 +1161,17 @@ module Blackboard =
 		  let case = PB.A.get column t.row_short_event_id in 
 		  PB.string_of_predicate_value case.static.action 
 	      in 
-              let string_eid () = 
+              let string_eid error = 
                 try 
-                  PB.CI.Po.K.print_step desc handler (PB.A.get blackboard.event eid)
+                  PB.CI.Po.K.print_step parameter handler error (PB.A.get blackboard.event eid)
                 with 
-                | Not_found -> Printf.fprintf desc "Event:%s" (string_of_int eid)
+                | Not_found -> let _ = Printf.fprintf desc "Event:%s" (string_of_int eid) in error 
               in
-              let _ = print_case_fun  desc row_precondition 1 color string_eid in 
-              let _ = print_case_fun  desc row_postcondition 1 color string_eid in 
-              let _ = print_case desc row_precondition 2 color "PRECONDITION" in 
-              let _ = print_case desc row_postcondition 2 color "POSTCONDITION" in 
-              let _ = aux2 print_test print_action list in
+              let error = print_case_fun  desc row_precondition 1 None color string_eid error in 
+              let error = print_case_fun  desc row_postcondition 1 None color string_eid error in 
+              let _  = print_case desc row_precondition 2 None color "PRECONDITION" in 
+              let _ = print_case desc row_postcondition 2 None color "POSTCONDITION" in 
+              let error = aux2 print_test print_action list error in
               let bool = 
                 try 
                   begin 
@@ -1161,13 +1183,13 @@ module Blackboard =
                 with 
                 | Not_found -> false
               in 
-              let stack = 
+              let error,stack = 
                 if bool 
                 then 
-                  let _ = List.iter (fun row -> print_case_fun desc row 0 color string_eid) stack in 
-                  []
+                  let error = List.fold_left (fun error row -> print_case_fun desc row 0 None color string_eid error) error (List.rev stack) in 
+                  error,[]
                 else 
-                  row_precondition::row_postcondition::stack 
+                  error,row_precondition::row_postcondition::stack 
               in 
               aux (eid+1) error stack 
             end

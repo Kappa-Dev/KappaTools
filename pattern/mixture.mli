@@ -3,6 +3,8 @@
 type agent
 type t
 
+val empty_agent: agent 
+
 val set_root_of_cc : t -> t
 val root_of_cc : t -> int -> int option
 

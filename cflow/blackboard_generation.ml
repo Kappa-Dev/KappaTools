@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 01/08/2013
+  * Last modification: 02/08/2013
   * * 
   * Some parameter references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -906,7 +906,7 @@ module Preblackboard =
              removed_sites_in_other_links = SiteIdSet.empty ;
            }
      
-         let print_data_structure parameter handler data =
+         let print_data_structure parameter handler error data =
            let stderr = parameter.CI.Po.K.H.out_channel_err in 
            let _ = Printf.fprintf stderr "New agents: \n" in 
            let _ = 
@@ -938,68 +938,78 @@ module Preblackboard =
              AgentIdSet.iter (Printf.fprintf stderr " %i \n") data.sure_agents
            in 
            let _ = Printf.fprintf stderr "Sure tests: \n" in 
-           let _ = 
-             List.iter 
-               (CI.Po.K.print_test stderr handler " ")
-               data.sure_tests
+           let error = 
+             List.fold_left  
+               (fun error -> CI.Po.K.print_test parameter handler error " ")
+               error 
+               (List.rev data.sure_tests)
            in 
            let _ = Printf.fprintf stderr "Tests to be substituted: \n" in 
-           let _ = 
-             AgentIdMap.iter 
-               (fun id l -> 
+           let error = 
+             AgentIdMap.fold 
+               (fun id l error -> 
                  let _ = Printf.fprintf stderr " %i\n" id in 
-                 let _ = 
-                   List.iter 
-                     (CI.Po.K.print_test stderr handler "  ")
-                     l
-                 in ())
+                 let error = 
+                   List.fold_left 
+                     (fun error -> CI.Po.K.print_test parameter handler error "  ")
+                     error 
+                     (List.rev l)
+                 in error)
                data.other_agents_tests
+               error 
            in 
-           let _ = 
-             AgentId2Map.iter 
-               (fun (id1,id2) l -> 
+           let error = 
+             AgentId2Map.fold 
+               (fun (id1,id2) l error -> 
                  let _ = Printf.fprintf stderr " (%i,%i)\n" id1 id2 in 
-                 let _ = 
-                   List.iter 
-                     (CI.Po.K.print_test stderr handler "  ")
-                     l
-                 in ())
+                 let error = 
+                   List.fold_left 
+                     (fun error -> CI.Po.K.print_test parameter handler error "  ")
+                     error 
+                     (List.rev l)
+                 in error)
                data.other_links_tests
+               error 
            in 
            let _ = Printf.fprintf stderr "Sure actions: \n" in 
-           let _ = 
-             List.iter 
-               (CI.Po.K.print_action stderr handler " ")
-               data.sure_actions
+           let error = 
+             List.fold_left 
+               (fun error -> CI.Po.K.print_action parameter handler error " ")
+               error
+               (List.rev data.sure_actions)
            in 
            let _ = Printf.fprintf stderr "Actions to be substituted: \n" in 
-           let _ = 
-             AgentIdMap.iter 
-               (fun id l -> 
+           let error = 
+             AgentIdMap.fold 
+               (fun id l error -> 
                  let _ = Printf.fprintf stderr " %i\n" id in 
-                 let _ = 
-                   List.iter 
-                     (CI.Po.K.print_action stderr handler "  ")
-                     l
-                 in ())
+                 let error = 
+                   List.fold_left 
+                     (fun error -> CI.Po.K.print_action parameter handler error "  ")
+                     error
+                     (List.rev l)
+                 in error)
                data.other_agents_actions
+               error 
            in 
-           let _ = 
-             AgentId2Map.iter 
-               (fun (id1,id2) l -> 
+           let error = 
+             AgentId2Map.fold
+               (fun (id1,id2) l error -> 
                  let _ = Printf.fprintf stderr " (%i,%i)\n" id1 id2 in 
-                 let _ = 
-                   List.iter 
-                     (CI.Po.K.print_action stderr handler "  ")
-                     l
-                 in ())
+                 let error = 
+                   List.fold_left  
+                     (fun error -> CI.Po.K.print_action parameter handler error  "  ")
+                     error 
+                     (List.rev l)
+                 in error)
                data.other_links_actions
+               error
            in 
            let _ = Printf.fprintf stderr "Sure side_effects \n" in 
-           let _ = 
-             List.iter
+           let error = 
+             List.iter 
                (CI.Po.K.print_side stderr handler " ")
-               data.sure_side_effects 
+               data.sure_side_effects
            in 
            let _ = Printf.fprintf stderr "Side effect to be substituted: \n" in 
            let _ = 
@@ -1128,9 +1138,9 @@ module Preblackboard =
          let add_step_strong parameter handler error log_info step blackboard step_id = 
            let init = CI.Po.K.is_init_of_refined_step step in 
            let pre_event = blackboard.pre_event in 
-           let test_list = CI.Po.K.tests_of_refined_step step in 
-           let l = CI.Po.K.agent_id_in_obs step in
-           let action_list,side_effect = CI.Po.K.actions_of_refined_step step in
+           let error,test_list = CI.Po.K.tests_of_refined_step parameter handler error step in 
+           let error,l = CI.Po.K.agent_id_in_obs parameter handler error step in
+           let error,(action_list,side_effect) = CI.Po.K.actions_of_refined_step parameter handler error step in
            let data_structure = init_data_structure_strong in 
            let data_structure = 
              List.fold_left 
@@ -1524,7 +1534,7 @@ module Preblackboard =
            let _ = 
              if debug_mode 
              then 
-               let _ = print_data_structure parameter handler data_structure in
+               let _ = print_data_structure parameter handler error data_structure in
                ()
            in 
            let fictitious_list = blackboard.pre_fictitious_list in 
@@ -1935,6 +1945,7 @@ module Preblackboard =
                                                  or (ag_id = mixture_ag_2 && (SiteIdSet.mem (rule_ag_id2,site_id) data_structure.removed_sites_in_other_links))
                                                  then (pid,Undefined)
                                                  else (pid,x)
+                                               | _ -> (pid,x)
                                              end
                                            | _ -> (pid,x))
                                        (List.rev action_list)
@@ -2192,8 +2203,8 @@ module Preblackboard =
          let add_step parameter handler error log_info step blackboard step_id = 
            let init = CI.Po.K.is_init_of_refined_step step in 
            let pre_event = blackboard.pre_event in 
-           let test_list = CI.Po.K.tests_of_refined_step step in 
-           let action_list,side_effect = CI.Po.K.actions_of_refined_step step in
+           let error,test_list = CI.Po.K.tests_of_refined_step parameter handler error step in 
+           let error,(action_list,side_effect) = CI.Po.K.actions_of_refined_step parameter handler error step in
            let fictitious_local_list = [] in 
            let fictitious_list = blackboard.pre_fictitious_list in 
            let build_map list map = 
@@ -2421,14 +2432,16 @@ module Preblackboard =
                    (error,blackboard)
                    l
                in 
-               let set = 
+               let error,set = 
                  List.fold_left 
                    (fun set (steps,_) -> 
                      List.fold_left
-                       (fun set eid -> 
+                       (fun (error,set) eid -> 
                          let step = A.get blackboard.pre_event eid in 
-                         CI.Po.K.AgentIdSet.union set (CI.Po.K.agent_id_in_obs step)) set steps)
-                 CI.Po.K.AgentIdSet.empty 
+                         let error,agents_in_obs = CI.Po.K.agent_id_in_obs parameter handler error step in 
+                         error,CI.Po.K.AgentIdSet.union set agents_in_obs)
+                       set steps)
+                 (error,CI.Po.K.AgentIdSet.empty)
                  observable_list 
                in 
                let set x = 
@@ -2436,11 +2449,12 @@ module Preblackboard =
                in 
                let _ = 
                  A.iteri 
-                   (fun i step -> 
+                   (fun i step  -> 
+                     let _,level = CI.Po.K.level_of_event parameter handler error step set in 
                      A.set 
                        blackboard.pre_level_of_event 
                        i 
-                       (CI.Po.K.level_of_event parameter step set)
+                       level
                    )
                    blackboard.pre_event 
                in 

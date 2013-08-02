@@ -56,11 +56,12 @@ let compress env state log_info step_list =
     else
       let _ = print_newline () in 
       begin (* causal compression *)
+        let parameter =  D.S.PH.B.PB.CI.Po.K.H.set_compression_weak parameter in 
         if D.S.PH.B.PB.CI.Po.K.no_obs_found step_list 
         then 
           let _ = Debug.tag "+ No causal flow found" in 
           [],[],[]
-      else 
+        else 
           begin
             let _ = 
               if (weak_compression_on or strong_compression_on)
@@ -78,14 +79,17 @@ let compress env state log_info step_list =
               Debug.tag "\t\t * refining events" 
           in 
           let refined_event_list = 
-            List.rev_map (D.S.PH.B.PB.CI.Po.K.refine_step handler) step_list 
+            List.rev_map 
+              (fun x -> 
+                snd (D.S.PH.B.PB.CI.Po.K.refine_step parameter handler error x))
+              step_list 
           in       
           let _ = 
             if debug_mode
             then 
               let _ = 
                 List.iter 
-                  (D.S.PH.B.PB.CI.Po.K.print_refined_step parameter handler) 
+                  (fun x -> let _ = D.S.PH.B.PB.CI.Po.K.print_refined_step parameter handler error x in ()) 
                   refined_event_list  
               in flush parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel
           in 
@@ -98,13 +102,14 @@ let compress env state log_info step_list =
                   then 
                     Debug.tag "\t\t * cutting concurrent events" 
                 in 
-                let refined_event_list_cut,int = D.S.PH.B.PB.CI.Po.cut refined_event_list  in 
+                let error,(refined_event_list_cut,int) = D.S.PH.B.PB.CI.Po.cut parameter handler error refined_event_list in 
                 let _ = 
                   if debug_mode
                   then 
                     let _ = 
                       List.iter 
-                        (D.S.PH.B.PB.CI.Po.K.print_refined_step parameter handler) 
+                        (fun x -> 
+                          let _ = D.S.PH.B.PB.CI.Po.K.print_refined_step parameter handler error x in ()) 
                         refined_event_list_cut  
                     in flush parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err
                 in 
@@ -128,7 +133,8 @@ let compress env state log_info step_list =
                   then 
                     let _ = 
                       List.iter 
-                        (D.S.PH.B.PB.CI.Po.K.print_refined_step parameter handler) 
+                        (fun x -> 
+                          let _ = D.S.PH.B.PB.CI.Po.K.print_refined_step parameter handler error x in ()) 
                         refined_event_list_without_pseudo_inverse
                     in flush parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err
                 in 
@@ -216,6 +222,7 @@ let compress env state log_info step_list =
             then 
               begin 
                 let _ = Debug.tag ("\t - Weak flow compression ("^(string_of_int n_stories)^")") in 
+                let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_weak parameter in 
                 let tick = 
                   if n_stories > 0 
                   then Mods.tick_stories n_stories (false,0,0) 
@@ -268,7 +275,7 @@ let compress env state log_info step_list =
                                 if weak_compression_on
                                 then 
                                   let weak_event_list = D.S.translate_result list in 
-                                  let weak_event_list = D.S.PH.B.PB.CI.Po.K.clean_events weak_event_list in 
+                                  let error,weak_event_list = D.S.PH.B.PB.CI.Po.K.clean_events parameter handler error weak_event_list in 
                                   let grid = D.S.PH.B.PB.CI.Po.K.build_grid list false handler in
                                   let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
                                   let error,graph = D.graph_of_grid parameter handler error grid in 
@@ -311,11 +318,11 @@ let compress env state log_info step_list =
           in 
           let _ = print_newline () in 
           let _ = print_newline () in 
-          let parameter = D.S.PH.B.PB.CI.Po.K.H.set_strong parameter in 
-            let error,strongly_compressed_story_array = 
+          let error,strongly_compressed_story_array = 
             if strong_compression_on 
             then 
               begin 
+                let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_strong parameter in 
                 let _ = Debug.tag ("\t - Strong flow compression ("^(string_of_int n_stories)^")") in 
                 let tick = 
                   if n_stories > 0 
@@ -329,7 +336,7 @@ let compress env state log_info step_list =
                         (fun (error,counter,tick,blackboard,strongly_compressed_story_array) (_,grid,graph,(event_id_list,list_order,event_list),step_list,list_info) -> 
                           let info = List.hd list_info in 
                           let refined_event_list = 
-                            List.rev_map (D.S.PH.B.PB.CI.Po.K.refine_step handler) step_list 
+                            List.rev_map (fun x -> snd (D.S.PH.B.PB.CI.Po.K.refine_step parameter handler error x)) step_list 
                           in       
                           let error,log_info,blackboard_tmp = D.S.PH.B.import parameter handler error log_info true dump_grid_before_strong_compression refined_event_list in 
                           let error,list = D.S.PH.forced_events parameter handler error blackboard_tmp in     

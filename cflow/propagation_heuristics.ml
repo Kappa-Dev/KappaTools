@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 05/09/2011
-  * Last modification: 20/06/2013
+  * Last modification: 02/08/2013
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -17,6 +17,10 @@
   * Copyright 2011,2012 Institut National de Recherche en Informatique et   
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
+
+let dump_grid_after_branching_weak_compression = false
+let dump_grid_after_branching_strong_compression = false
+
 
 let debug_mode = false
 let look_up_for_better_cut = Parameter.look_up_for_better_cut
@@ -114,15 +118,32 @@ module Propagation_heuristic =
       else if j=0 then true 
       else i<j 
         
-    let to_xls = false 
-
+  
     let next_choice parameter handler error (blackboard:B.blackboard) = 
       let _ = 
-        if to_xls && !Priority.n_story=370
+        if 
+          begin 
+            match 
+              parameter.B.PB.CI.Po.K.H.current_compression_mode 
+            with 
+            | None -> false
+            | Some Parameter.Weak -> dump_grid_after_branching_weak_compression
+            
+            | Some Parameter.Strong -> dump_grid_after_branching_strong_compression
+          end
         then 
           let _ = B.export_blackboard_to_xls parameter handler error "ESSAI_compression_" (!Priority.n_story) (!Priority.n_branch) blackboard in 
           let _ = Priority.n_branch:= (!Priority.n_branch)+1 in 
           ()
+      in 
+      let error,priority_max = 
+           match 
+             B.PB.CI.Po.K.H.get_priorities parameter 
+           with 
+           | Some x -> error,x.Priority.max_level
+           | None -> 
+             let error_list,error = B.PB.CI.Po.K.H.create_error parameter handler error (Some "propagation_heuristic.ml") None (Some "next_choice") (Some "145") (Some "Compression mode has to been selected") (failwith "Compression mode has not been selected") in 
+          B.PB.CI.Po.K.H.raise_error parameter handler error_list error Priority.zero
       in 
       let n_p_id = B.get_npredicate_id blackboard in 
       let error,list  = 
@@ -131,7 +152,7 @@ module Propagation_heuristic =
           error,[]
         else 
           let rec try_level level error = 
-            if level > (B.PB.CI.Po.K.H.get_priorities parameter).Priority.max_level 
+            if level > priority_max  
             then error,[]
             else 
               let rec aux step best_grade best_predicate = 

@@ -25,6 +25,8 @@ let interface ag = ag.interface
 
 let is_empty m = (IntMap.size m.agents) = 0	
 
+let empty_agent = {name = 0 ; interface = IntMap.empty}
+
 let get_id mix =
 	match mix.mix_id with 
 		| None -> invalid_arg "State.get_id: Not found" 
