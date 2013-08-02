@@ -1039,6 +1039,9 @@ module Blackboard =
      let export_blackboard_to_xls parameter handler error prefix int int2 blackboard = 
         let file_name = prefix^"_"^(string_of_int int)^"_"^(string_of_int int2)^".sxw" in 
         let desc = open_out file_name in 
+        let parameter = 
+          {parameter with PB.CI.Po.K.H.out_channel = desc }
+        in 
         let ncolumns_left = 3 in 
         let nrows_head = 2 in 
         let row_of_precondition eid = nrows_head + 3*eid in 
@@ -1061,11 +1064,16 @@ module Blackboard =
           with 
           | Some color -> 
             let r,g,b=Color.triple_of_color color in 
-            Printf.fprintf log "C.TextColor = RGB(%i,%i,%i)\n" r g b 
+            Printf.fprintf log "C.CharColor = RGB(%i,%i,%i)\n" r g b 
           | None -> ()
         in 
         let getcell log row col = 
           Printf.fprintf log "C = S.getCellByPosition(%i,%i)\n" col row 
+        in 
+        let overline_case log row col color = 
+          let _ = Printf.fprintf desc "R=S.Rows(%i)\n" row in 
+          let _ = Printf.fprintf desc "R.TopBorder = withBord\n" in 
+          ()
         in 
         let print_case log row col color_font color_back string = 
           if string <> ""
@@ -1086,6 +1094,11 @@ module Blackboard =
           error
         in 
         let _ = Printf.fprintf desc "Sub Main\n\n" in 
+        let r,g,b = Color.triple_of_color Color.Black in 
+        let _ = Printf.fprintf desc "Dim withBord As New com.sun.star.table.BorderLine\n" in 
+        let _ = Printf.fprintf desc "With withBord withBord.Color = RGB(%i,%i,%i)\n" r g b in 
+        let _ = Printf.fprintf desc "withBord.OuterLineWidth = 60\n" in 
+        let _ = Printf.fprintf desc "End With\n" in 
         let _ = Printf.fprintf desc "S = ThisComponent.Sheets(0)\n" in 
         let _ = 
           match forced_events blackboard
@@ -1123,6 +1136,7 @@ module Blackboard =
                  with 
                    | [] -> error
                    | t::q -> 
+                     let _ = overline_case desc row_postcondition (column_of_pid t.column_predicate_id) None in 
                      let _ = print_case desc row_precondition (column_of_pid t.column_predicate_id) None color (f t) in 
                      let _ = print_case desc row_postcondition (column_of_pid t.column_predicate_id) None color (g t) in 
                      let error = 
@@ -1548,6 +1562,8 @@ module Blackboard =
        PB.finalize parameter handler error log_info preblackboard 
      in 
      let error,log_info,blackboard = import parameter handler error log_info preblackboard in
+     let _ = Priority.n_story:=(!Priority.n_story)+1 in 
+     let _ = Priority.n_branch:=1 in 
      let error = 
        if to_xls 
        then 
@@ -1555,8 +1571,7 @@ module Blackboard =
        else
          error
      in 
-     let _ = Priority.n_story:=(!Priority.n_story)+1 in 
-     error,log_info,blackboard 
+    error,log_info,blackboard 
 
    
    end:Blackboard)
