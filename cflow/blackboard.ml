@@ -76,7 +76,7 @@ sig
   val reset_init: (PB.CI.Po.K.P.log_info -> blackboard -> PB.CI.Po.K.H.error_channel * PB.CI.Po.K.P.log_info * blackboard) PB.CI.Po.K.H.with_handler 
 
   (** initialisation*)
-  val import:  (PB.CI.Po.K.P.log_info -> bool -> PB.CI.Po.K.refined_step list -> PB.CI.Po.K.H.error_channel * PB.CI.Po.K.P.log_info * blackboard) PB.CI.Po.K.H.with_handler 
+  val import:  (PB.CI.Po.K.P.log_info -> PB.CI.Po.K.refined_step list -> PB.CI.Po.K.H.error_channel * PB.CI.Po.K.P.log_info * blackboard) PB.CI.Po.K.H.with_handler 
 
 
   (** output result*)
@@ -1541,15 +1541,15 @@ module Blackboard =
 
    let n = ref 0 
 
-   let import parameter handler error log_info to_xls list = 
+   let import parameter handler error log_info list = 
      let error,preblackboard = PB.init parameter handler error in
-     let error,(log_info,preblackboard,step_id,string) = 
+     let error,(log_info,preblackboard,step_id,string,to_xls) = 
        match 
          parameter.PB.CI.Po.K.H.current_compression_mode 
        with 
        | None ->  
          let error_list,error = PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "import") (Some "1551") (Some "Compression mode has not been set up.") (failwith "Compression mode has not been set up.") in 
-          PB.CI.Po.K.H.raise_error parameter handler error_list error (log_info,preblackboard,0,"None")
+          PB.CI.Po.K.H.raise_error parameter handler error_list error (log_info,preblackboard,0,"None",false)
        | Some Parameter.Strong -> 
          let error,log_info,preblackboard,int = 
            List.fold_left 
@@ -1558,7 +1558,7 @@ module Blackboard =
              (error,log_info,preblackboard,0)
              list 
          in 
-         error,(log_info,preblackboard,int,"strong")
+         error,(log_info,preblackboard,int,Parameter.xlsstrongFileName,Parameter.dump_grid_before_weak_compression)
        | Some Parameter.Weak -> 
          let error,log_info,preblackboard,int = 
          List.fold_left 
@@ -1567,7 +1567,7 @@ module Blackboard =
            (error,log_info,preblackboard,0)
            list 
          in 
-         error,(log_info,preblackboard,int,"weak")
+         error,(log_info,preblackboard,int,Parameter.xlsweakFileName,Parameter.dump_grid_before_strong_compression)
      in 
      let error,log_info,preblackboard = 
        PB.finalize parameter handler error log_info preblackboard 

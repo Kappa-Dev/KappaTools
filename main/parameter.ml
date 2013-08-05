@@ -59,6 +59,14 @@ let strongCompression = ref false
 let mazCompression = ref false 
 let showIntroEvents = ref false
 
+(*XLS output for the grids during compression*)
+let dump_grid_before_weak_compression = false
+let dump_grid_before_strong_compression = false
+let dump_grid_after_branching_during_weak_compression = false
+let dump_grid_after_branching_during_strong_compression = false
+let xlsweakFileName = "grid_weak_compression"
+let xlsstrongFileName = "grid_strong_compression"
+
 (*Computed values*)
 let (timeIncrementValue:float option ref) = ref None
 

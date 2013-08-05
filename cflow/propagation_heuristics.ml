@@ -18,9 +18,6 @@
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
-let dump_grid_after_branching_weak_compression = false
-let dump_grid_after_branching_strong_compression = false
-
 
 let debug_mode = false
 let look_up_for_better_cut = Parameter.look_up_for_better_cut
@@ -120,19 +117,21 @@ module Propagation_heuristic =
         
   
     let next_choice parameter handler error (blackboard:B.blackboard) = 
-      let _ = 
-        if 
+      let bool,string = 
           begin 
             match 
               parameter.B.PB.CI.Po.K.H.current_compression_mode 
             with 
-            | None -> false
-            | Some Parameter.Weak -> dump_grid_after_branching_weak_compression
+            | None -> false,""
+            | Some Parameter.Weak -> Parameter.dump_grid_after_branching_during_weak_compression,Parameter.xlsweakFileName
             
-            | Some Parameter.Strong -> dump_grid_after_branching_strong_compression
+            | Some Parameter.Strong -> Parameter.dump_grid_after_branching_during_strong_compression,Parameter.xlsstrongFileName
           end
+      in 
+      let _ = 
+        if bool
         then 
-          let _ = B.export_blackboard_to_xls parameter handler error "ESSAI_compression_" (!Priority.n_story) (!Priority.n_branch) blackboard in 
+          let _ = B.export_blackboard_to_xls parameter handler error string (!Priority.n_story) (!Priority.n_branch) blackboard in 
           let _ = Priority.n_branch:= (!Priority.n_branch)+1 in 
           ()
       in 

@@ -23,9 +23,6 @@ module D = Dag.Dag
 let log_step = true
 let debug_mode = false
 let dump_profiling_info = false
-let dump_grid_before_weak_compression = false
-let dump_grid_before_strong_compression = false
-
 
 let th_of_int n = 
   match n mod 10  
@@ -143,7 +140,7 @@ let compress env state log_info step_list =
             else 
               refined_event_list_cut,0 
           in 
-          let error,log_info,blackboard = D.S.PH.B.import parameter handler error log_info false refined_event_list_without_pseudo_inverse in 
+          let error,log_info,blackboard = D.S.PH.B.import parameter handler error log_info refined_event_list_without_pseudo_inverse in 
           let _ = 
             if log_step 
             then 
@@ -215,6 +212,7 @@ let compress env state log_info step_list =
               0 
               causal_story_array
           in 
+          let _ = Priority.n_story := 1 in 
           let _ = print_newline () in 
           let _ = print_newline () in 
           let error,weakly_compressed_story_array = 
@@ -235,7 +233,7 @@ let compress env state log_info step_list =
                         (fun (error,counter,tick,blackboard,weakly_compressed_story_array) (_,grid,graph,(event_id_list,list_order,event_list),step_list,list_info) -> 
                           let info = List.hd list_info in 
                           let error,log_info,blackboard_tmp,list_order = 
-                            let error,log_info,blackboard_tmp = D.S.sub parameter handler error log_info dump_grid_before_weak_compression blackboard event_list in 
+                            let error,log_info,blackboard_tmp = D.S.sub parameter handler error log_info blackboard event_list in 
                             let error,list = D.S.PH.forced_events parameter handler error blackboard_tmp in 
                             let list_order = 
                               match list 
@@ -338,7 +336,7 @@ let compress env state log_info step_list =
                           let refined_event_list = 
                             List.rev_map (fun x -> snd (D.S.PH.B.PB.CI.Po.K.refine_step parameter handler error x)) step_list 
                           in       
-                          let error,log_info,blackboard_tmp = D.S.PH.B.import parameter handler error log_info dump_grid_before_strong_compression refined_event_list in 
+                          let error,log_info,blackboard_tmp = D.S.PH.B.import parameter handler error log_info refined_event_list in 
                           let error,list = D.S.PH.forced_events parameter handler error blackboard_tmp in     
                           let list_order = 
                             match list 
