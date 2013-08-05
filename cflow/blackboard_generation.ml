@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris Dederot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 02/08/2013
+  * Last modification: 03/08/2013
   * * 
   * Some parameter references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -2365,7 +2365,7 @@ module Preblackboard =
            if side_effect = []
              && PredicateidMap.is_empty  merged_map 
            then 
-             error,log_info,blackboard,step_id+1 
+             error,log_info,blackboard,step_id+1
            else 
              begin 
                let nsid = blackboard.pre_nsteps + 1 in 
@@ -2402,7 +2402,7 @@ module Preblackboard =
                      pre_observable_list = observable_list; 
                  }
                in 
-               error,log_info,blackboard,step_id+1 
+               error,log_info,blackboard,step_id+1
              end 
                
          let finalize parameter handler error log_info blackboard = 

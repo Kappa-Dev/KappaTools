@@ -9,12 +9,12 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 06/09/2011
-  * Last modification: 02/08/2013
+  * Last modification: 03/08/2013
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
   *  
-  * Copyright 2011,2012 Institut National de Recherche en Informatique et   
+  * Copyright 2011,2012,2013 Institut National de Recherche en Informatique et   
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
@@ -76,7 +76,7 @@ sig
   val reset_init: (PB.CI.Po.K.P.log_info -> blackboard -> PB.CI.Po.K.H.error_channel * PB.CI.Po.K.P.log_info * blackboard) PB.CI.Po.K.H.with_handler 
 
   (** initialisation*)
-  val import:  (PB.CI.Po.K.P.log_info -> bool -> bool -> PB.CI.Po.K.refined_step list -> PB.CI.Po.K.H.error_channel * PB.CI.Po.K.P.log_info * blackboard) PB.CI.Po.K.H.with_handler 
+  val import:  (PB.CI.Po.K.P.log_info -> bool -> PB.CI.Po.K.refined_step list -> PB.CI.Po.K.H.error_channel * PB.CI.Po.K.P.log_info * blackboard) PB.CI.Po.K.H.with_handler 
 
 
   (** output result*)
@@ -1541,22 +1541,33 @@ module Blackboard =
 
    let n = ref 0 
 
-   let import parameter handler error log_info bool to_xls list = 
+   let import parameter handler error log_info to_xls list = 
      let error,preblackboard = PB.init parameter handler error in
-     let error,log_info,preblackboard,step_id = 
-       if bool 
-       then 
-         List.fold_left 
-           (fun (error,log_info,preblackboard,int) refined_event  -> 
-             PB.add_step_up_to_iso parameter handler error log_info refined_event preblackboard int)
-           (error,log_info,preblackboard,0)
-           list 
-       else 
+     let error,(log_info,preblackboard,step_id,string) = 
+       match 
+         parameter.PB.CI.Po.K.H.current_compression_mode 
+       with 
+       | None ->  
+         let error_list,error = PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "import") (Some "1551") (Some "Compression mode has not been set up.") (failwith "Compression mode has not been set up.") in 
+          PB.CI.Po.K.H.raise_error parameter handler error_list error (log_info,preblackboard,0,"None")
+       | Some Parameter.Strong -> 
+         let error,log_info,preblackboard,int = 
+           List.fold_left 
+             (fun (error,log_info,preblackboard,int) refined_event  -> 
+               PB.add_step_up_to_iso parameter handler error log_info refined_event preblackboard int)
+             (error,log_info,preblackboard,0)
+             list 
+         in 
+         error,(log_info,preblackboard,int,"strong")
+       | Some Parameter.Weak -> 
+         let error,log_info,preblackboard,int = 
          List.fold_left 
            (fun (error,log_info,preblackboard,int) refined_event  -> 
              PB.add_step parameter handler error log_info refined_event preblackboard int)
            (error,log_info,preblackboard,0)
            list 
+         in 
+         error,(log_info,preblackboard,int,"weak")
      in 
      let error,log_info,preblackboard = 
        PB.finalize parameter handler error log_info preblackboard 
@@ -1567,7 +1578,7 @@ module Blackboard =
      let error = 
        if to_xls 
        then 
-	 export_blackboard_to_xls parameter handler error (if bool then "strong" else "weak") (!Priority.n_story) 0 blackboard 
+	 export_blackboard_to_xls parameter handler error string (!Priority.n_story) 0 blackboard 
        else
          error
      in 
