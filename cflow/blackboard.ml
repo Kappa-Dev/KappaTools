@@ -1558,7 +1558,7 @@ module Blackboard =
              (error,log_info,preblackboard,0)
              list 
          in 
-         error,(log_info,preblackboard,int,Parameter.xlsstrongFileName,Parameter.dump_grid_before_weak_compression)
+         error,(log_info,preblackboard,int,Parameter.xlsstrongFileName,Parameter.dump_grid_before_strong_compression)
        | Some Parameter.Weak -> 
          let error,log_info,preblackboard,int = 
          List.fold_left 
@@ -1567,7 +1567,7 @@ module Blackboard =
            (error,log_info,preblackboard,0)
            list 
          in 
-         error,(log_info,preblackboard,int,Parameter.xlsweakFileName,Parameter.dump_grid_before_strong_compression)
+         error,(log_info,preblackboard,int,Parameter.xlsweakFileName,Parameter.dump_grid_before_weak_compression)
      in 
      let error,log_info,preblackboard = 
        PB.finalize parameter handler error log_info preblackboard 
