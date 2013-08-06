@@ -1,4 +1,4 @@
 #Command-line:
-timeout 300s KaSim -i weak_only.ka -seed 924556145 -e 100000 -d expected-output || exit 0 
+KaSim -i weak_only.ka -seed 924556145 -e 100000 -d expected-output || exit 0 
 
 #Here we should show only weakly compressed flows. 

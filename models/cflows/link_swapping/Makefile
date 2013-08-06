@@ -83,7 +83,7 @@ $(ERROR): error_tmp
 	@if (test -s $<) then (echo ****$(DIR)/$(MODEL)**** > $@ ; echo  >> $@ ; cat README >> $@ ; echo >> $@ ; cat $< >> $@) else (touch $@) ; fi 
 
 clean:
-	@rm -rf $(TMP) $(SCRIPT) $(ERROR) $(ERROR_TMP) 
+	@rm -rf $(TMP) $(SCRIPT) $(ERROR) $(ERROR_TMP)  \#* *~ *.txt *.sxw
 
 clean_light:
 	@rm -rf $(SCRIPT) $(ERROR_TMP)

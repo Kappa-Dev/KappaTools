@@ -241,7 +241,7 @@ module Cflow_linker =
     with 
       | Event ((_,(_,_,_,a)),_,_) -> a
       | _ -> Mods.Int2Set.empty 
-
+      
   let dummy_refined_step x = Dummy x
   let empty_side_effect = []
   let type_of_refined_step c = 
@@ -843,6 +843,7 @@ module Cflow_linker =
     let _ = Printf.fprintf log "* Kappa_rule \n" in 
     let error,rule = rule_of_refined_event parameter handler error refined_event in 
     let _ = Dynamics.dump rule  handler.H.env in 
+    let _ = Printf.fprintf log "\n" in 
     let error = 
       if true (*debug_mode*)
       then 
@@ -850,7 +851,7 @@ module Cflow_linker =
         let error,tests = tests_of_refined_event parameter handler error refined_event in 
 	let error = List.fold_left (fun error -> print_test parameter handler error " ") error (List.rev tests) in 
 	let error,actions = actions_of_refined_event parameter handler error refined_event in 
-	let error = List.fold_left (fun error -> print_action parameter handler error " ") error (List.rev (fst actions)) in 
+	let error = List.fold_left (fun error -> print_action parameter handler error " ") error (fst actions) in 
 	let error = List.fold_left (fun error -> print_side_effects parameter handler error " ") error (List.rev (snd actions)) in 
 	let _ = Printf.fprintf log "***\n"  in 
         error
@@ -862,12 +863,22 @@ module Cflow_linker =
   let print_refined_init parameter handler error (refined_init:refined_init) = 
     let log = parameter.H.out_channel in 
     let ((agent_name,agent_id),_),actions = refined_init in 
-    let _ = Printf.fprintf log "INIT: Agent %i_%i" agent_id agent_name in
-    if debug_mode 
-    then 
-      List.fold_left  (fun error -> print_action parameter handler error " ") error (List.rev actions)
-    else 
-      error 
+    let _ = Printf.fprintf log "INIT: Agent %i_%i\n" agent_id agent_name in
+    let error = 
+      if true (*debug_mode *)
+      then 
+        let error = 
+          List.fold_left  
+            (fun error -> print_action parameter handler error " ") 
+            error 
+            actions
+        in 
+        let _ = Printf.fprintf log "\n" in 
+        error
+      else 
+        error
+    in 
+    error
       
   let gen f0 f1 f2 f3 f4 (p:H.parameter) h e step = 
     match step
