@@ -259,18 +259,23 @@ let ids_of_grid grid = Hashtbl.fold (fun key _ l -> key::l) grid.flow []
 let config_of_grid = cut 
 
 let prec_star_of_config config = 
-  let rec prec_closure config todo closure =
+  let rec prec_closure config todo already_done closure =
     if IntSet.is_empty todo then closure
     else
       let eid = IntSet.choose todo in
       let todo' = IntSet.remove eid todo in
-      let prec = try IntMap.find eid config.prec_1 with Not_found -> IntSet.empty
-      in
-      prec_closure config (IntSet.union todo' prec) (IntSet.union prec closure)
+      if IntSet.mem eid already_done 
+      then 
+        prec_closure config todo' already_done closure 
+      else 
+        let prec = try IntMap.find eid config.prec_1 with Not_found -> IntSet.empty
+        in
+      prec_closure config (IntSet.union todo' prec) (IntSet.add eid already_done) (IntSet.union prec closure)
   in
   IntMap.fold 
     (fun eid kind prec_star -> 
-      let set = prec_closure config (IntSet.singleton eid) IntSet.empty
+      let _ = Debug.tag (string_of_int eid) in 
+      let set = prec_closure config (IntSet.singleton eid) IntSet.empty IntSet.empty
       in
       IntMap.add eid set prec_star
     ) config.events IntMap.empty 
@@ -291,10 +296,15 @@ let depth_and_size_of_event config =
 
 
 let enrich_grid grid = 
+  let _ = Debug.tag "ENRICH\n" in 
   let ids = ids_of_grid grid  in 
+  let _ = Debug.tag "FOLLOW UP\n" in 
   let config = config_of_grid ids grid in 
+  let _ = Debug.tag "FOLLOW UP\n" in 
   let prec_star = prec_star_of_config config in
+  let _ = Debug.tag "FOLLOW UP\n" in 
   let depth_of_event,size,depth = depth_and_size_of_event config in  
+  let _ = Debug.tag "FOLLOW UP\n" in 
   { 
     config = config ; 
     ids = ids ;
@@ -389,9 +399,11 @@ let pretty_print compression_type label story_list state env =
     else 
       Debug.tag (Printf.sprintf "\n+ Pretty printing %d %scompressed flow%s" n label (if n>1 then "s" else ""))
   in
+  let _ = Debug.tag ("OK\n") in 
   let story_list = 
     List.map (fun (x,y) -> enrich_grid x,y) story_list 
   in 
+  let _ = Debug.tag ("OKK\n") in 
   let _ =
     List.fold_left 
       (fun cpt (enriched_config,stories) -> 
@@ -440,5 +452,7 @@ let pretty_print compression_type label story_list state env =
       0 story_list 
   in 
   let _ = close_out desc in 
+  let _ = Debug.tag  "done" in 
+  let _ = flush stderr in 
   ()
 	  
