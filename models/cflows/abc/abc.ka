@@ -2,6 +2,7 @@
 %def: "displayCompression" "weak" 
 %def: "showIntroEvents" "true"
 %def: "dumpInfluenceMap" "true" 
+
 #### Signatures 
 %agent: A(x,c) # Declaration of agent A 
 %agent: B(x) # Declaration of B 

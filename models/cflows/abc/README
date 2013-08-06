@@ -1,8 +1,9 @@
 #Command-line:
-timeout 300s KaSim -i abc.ka -seed 924556145 -e 10000 -d expected-output || exit 0 
+KaSim -i abc.ka -seed 924556145 -e 10000 -d expected-output || exit 0 
 
 #This is the classical abc model. 
-#3 stories are expected.
+#3 stories are expected, but one is very unlikely.
 #1) the first site of C get activated
-#2) Both sites of C have been activated by the same A 
+#2) Both sites of C have been activated by the same A
+#   It may happen only in case of low population.  
 #3) Both sites of C have been activated but by different A(s)

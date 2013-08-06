@@ -45,6 +45,6 @@
 %mod: ('Cpp' - 'cflow' = 10 ) do ($TRACK 'Cpp' [false])
 
 
-%def: "displayCompression" "none" 
+%def: "displayCompression" "none" "weak"
 %def: "dotSnapshots" "true"
 %def: "showIntroEvents" "true"

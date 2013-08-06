@@ -1,5 +1,5 @@
 #Command-line:
-timeout 300s KaSim -i abc-pert.ka -seed 924556145 -e 100000 -d expected-output || exit 0 
+KaSim -i abc-pert.ka -seed 924556145 -e 100000 -d expected-output || exit 0 
 
 #This is the classical abc model. 
 #Perturbations are used:
