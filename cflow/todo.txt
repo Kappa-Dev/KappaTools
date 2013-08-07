@@ -1,8 +1,3 @@
--> Bugs
-
-Side effects are wrongly handled in cut algorithm. 
-See side_effects2. 
-
 -> Propagation is not optimal. 
 1) Change the lattice of properties by adding (Undefined or X) values for predicates. 
 2) Improve the handling of bound action when only one partner is fixed. 
