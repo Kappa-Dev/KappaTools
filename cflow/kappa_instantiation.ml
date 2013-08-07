@@ -1143,12 +1143,27 @@ module Cflow_linker =
        with Not_found -> x))
       g
 
+  let subs_rule_info mapping (a,b,c,d) = 
+    (a,b,c,
+     Mods.Int2Set.fold 
+       (fun (agent_id,y) -> 
+         Mods.Int2Set.add 
+           ((try 
+               AgentIdMap.find agent_id mapping 
+             with 
+               Not_found -> agent_id),
+            y))
+       d
+       Mods.Int2Set.empty 
+       )
+
 
   let subs_agent_in_event mapping event = 
     match 
       event 
     with 
-    | Event ((a,f,g),b) -> Event ((a,compose mapping f,compose mapping g),b)
+    | Event ((a,f,g),b) -> Event ((a,compose mapping f,compose mapping g),
+                                  subs_rule_info mapping b)
       
     | Obs (a,b,f,c) -> Obs(a,b,compose mapping f,c)
     | Init (agent,interface) -> 
