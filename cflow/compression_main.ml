@@ -215,7 +215,7 @@ let compress env state log_info step_list =
           let _ = Priority.n_story := 1 in 
           let _ = print_newline () in 
           let _ = print_newline () in 
-          let error,weakly_compressed_story_array = 
+          let error,weakly_compression_faillure,weakly_compressed_story_array = 
             if weak_compression_on or strong_compression_on 
             then 
               begin 
@@ -226,11 +226,11 @@ let compress env state log_info step_list =
                   then Mods.tick_stories n_stories (false,0,0) 
                   else (false,0,0)
                 in 
-                let error,_,_,_,weakly_compressed_story_array = 
+                let error,_,_,_,weakly_compressed_story_array,weakly_compression_faillure = 
                   List.fold_left 
-                    (fun (error,counter,tick,blackboard,weakly_compressed_story_array) (_,a) ->
+                    (fun (error,counter,tick,blackboard,weakly_compressed_story_array,weakly_compression_faillure) (_,a) ->
                       List.fold_left 
-                        (fun (error,counter,tick,blackboard,weakly_compressed_story_array) (_,grid,graph,(event_id_list,list_order,event_list),step_list,list_info) -> 
+                        (fun (error,counter,tick,blackboard,weakly_compressed_story_array,weakly_compression_faillure) (_,grid,graph,(event_id_list,list_order,event_list),step_list,list_info) -> 
                           let info = List.hd list_info in 
                           let error,log_info,blackboard_tmp,list_order = 
                             let error,log_info,blackboard_tmp = D.S.sub parameter handler error log_info blackboard event_list in 
@@ -263,12 +263,12 @@ let compress env state log_info step_list =
                             else 
                               error
                           in 
-                          let error,weakly_compressed_story_array,info = 
+                          let error,weakly_compressed_story_array,weakly_compression_faillure,info = 
                             match 
                               list
                             with 
                               | None -> 
-                                error,weakly_compressed_story_array,None
+                                error,weakly_compressed_story_array,weakly_compression_faillure+1,None
                               | Some list -> 
                                 if weak_compression_on
                                 then 
@@ -282,31 +282,31 @@ let compress env state log_info step_list =
                                   let info = 
                                     match info 
                                     with 
-                                      | None -> None 
-                                      | Some info -> 
-                                        let info = 
-                                          {info with Mods.story_id = counter }
-                                        in 
-                                        let info = Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy log_info)  info 
-                                        in 
-                                        Some info
+                                    | None -> None 
+                                    | Some info -> 
+                                      let info = 
+                                        {info with Mods.story_id = counter }
+                                      in 
+                                      let info = Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy log_info)  info 
+                                      in 
+                                      Some info
                                   in 
-                                  error,(prehash,[grid,graph,None,(event_id_list,list_order,event_list),weak_event_list,list_info])::weakly_compressed_story_array,info
+                                  error,(prehash,[grid,graph,None,(event_id_list,list_order,event_list),weak_event_list,list_info])::weakly_compressed_story_array,weakly_compression_faillure,info
                                 else 
-                                  error,weakly_compressed_story_array,None
+                                  error,weakly_compressed_story_array,weakly_compression_faillure,None
                           in 
                           let error,log_info,blackboard = D.S.PH.B.reset_init parameter handler error log_info blackboard in 
                           let tick = Mods.tick_stories n_stories tick in 
-                          error,counter+1,tick,blackboard,weakly_compressed_story_array)
-                        (error,counter,tick,blackboard,weakly_compressed_story_array) a) 
-                    (error,1,tick,blackboard,[]) 
+                          error,counter+1,tick,blackboard,weakly_compressed_story_array,weakly_compression_faillure)
+                        (error,counter,tick,blackboard,weakly_compressed_story_array,weakly_compression_faillure) a) 
+                    (error,1,tick,blackboard,[],0) 
                     (List.rev causal_story_array)
                 in 
 	        let error,weakly_compressed_story_array = D.hash_list parameter handler error   (List.rev weakly_compressed_story_array) in
-                error,weakly_compressed_story_array 
+                error,weakly_compression_faillure,weakly_compressed_story_array 
               end
             else 
-              error,[]
+              error,0,[]
           in 
           let n_stories = 
             List.fold_left 
@@ -316,7 +316,15 @@ let compress env state log_info step_list =
           in 
           let _ = print_newline () in 
           let _ = print_newline () in 
-          let error,strongly_compressed_story_array = 
+          let _ = 
+            match 
+              weakly_compression_faillure 
+            with 
+            | 0 -> ()
+            | 1 -> Debug.tag "\n\t 1 weak compression has failed" 
+            | _ -> Debug.tag ("\n\t "^(string_of_int weakly_compression_faillure)^" weak compressions have failed")
+          in 
+          let error,strong_compression_faillure,strongly_compressed_story_array = 
             if strong_compression_on 
             then 
               begin 
@@ -327,11 +335,11 @@ let compress env state log_info step_list =
                   then Mods.tick_stories n_stories (false,0,0) 
                   else (false,0,0)
                 in 
-                let error,_,_,_,strongly_compressed_story_array = 
+                let error,_,_,_,strong_compression_faillure,strongly_compressed_story_array = 
                   List.fold_left 
-                    (fun (error,counter,tick,blackboard,strongly_compressed_story_array) (_,a) ->
+                    (fun (error,counter,tick,blackboard,strong_compression_faillure,strongly_compressed_story_array) (_,a) ->
                       List.fold_left 
-                        (fun (error,counter,tick,blackboard,strongly_compressed_story_array) (_,grid,graph,(event_id_list,list_order,event_list),step_list,list_info) -> 
+                        (fun (error,counter,tick,blackboard,strong_compression_faillure,strongly_compressed_story_array) (_,grid,graph,(event_id_list,list_order,event_list),step_list,list_info) -> 
                           let info = List.hd list_info in 
                           let refined_event_list = 
                             List.rev_map (fun x -> snd (D.S.PH.B.PB.CI.Po.K.refine_step parameter handler error x)) step_list 
@@ -364,12 +372,12 @@ let compress env state log_info step_list =
                             else 
                               error
                           in 
-                          let error,strongly_compressed_story_array,info = 
+                          let error,strong_compression_faillure,strongly_compressed_story_array,info = 
                             match 
                               list
                             with 
                               | None -> 
-                                error,strongly_compressed_story_array,None
+                                error,strong_compression_faillure+1,strongly_compressed_story_array,None
                               | Some list -> 
                                 let grid = D.S.PH.B.PB.CI.Po.K.build_grid list false handler in
                                 let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
@@ -388,20 +396,28 @@ let compress env state log_info step_list =
                                     in 
                                     Some info
                                 in 
-                                error,(prehash,[grid,graph,None,(event_id_list,list_order,event_list),[],list_info])::strongly_compressed_story_array,info
+                                error,strong_compression_faillure,(prehash,[grid,graph,None,(event_id_list,list_order,event_list),[],list_info])::strongly_compressed_story_array,info
                           in 
                           let error,log_info,blackboard = D.S.PH.B.reset_init parameter handler error log_info blackboard in 
                           let tick = Mods.tick_stories n_stories tick in 
-                          error,counter+1,tick,blackboard,strongly_compressed_story_array)
-                        (error,counter,tick,blackboard,strongly_compressed_story_array) a) 
-                    (error,1,tick,blackboard,[]) 
+                          error,counter+1,tick,blackboard,strong_compression_faillure,strongly_compressed_story_array)
+                        (error,counter,tick,blackboard,strong_compression_faillure,strongly_compressed_story_array) a) 
+                    (error,1,tick,blackboard,0,[]) 
                     (List.rev weakly_compressed_story_array)
                 in 
 	        let error,strongly_compressed_story_array = D.hash_list parameter handler error   (List.rev strongly_compressed_story_array) in
-                error,strongly_compressed_story_array 
+                error,strong_compression_faillure,strongly_compressed_story_array 
               end
             else 
-              error,[]
+              error,0,[]
+          in 
+          let _ = 
+            match 
+              strong_compression_faillure 
+            with 
+            | 0 -> ()
+            | 1 -> Debug.tag "\n\t 1 strong compression has failed" 
+            | _ -> Debug.tag ("\n\t "^(string_of_int weakly_compression_faillure)^" strong compressions have failed")
           in 
             
           let _ = 
