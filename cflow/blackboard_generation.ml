@@ -879,14 +879,18 @@ module Preblackboard =
              sure_links: AgentId2Set.t;
              other_links: AgentId2Set.t;
              sites_in_other_links: SiteIdSet.t;
-             other_links_sites: (CI.Po.K.agent_id) SiteIdMap.t;
+             sites_in_other_action_links: SiteIdSet.t; 
+             other_links_test_sites: (CI.Po.K.agent_id) SiteIdMap.t;
+             other_links_action_sites: (CI.Po.K.agent_id) SiteIdMap.t; 
              sure_tests: CI.Po.K.test list ;
              sure_actions: CI.Po.K.action list ; 
+             create_actions: CI.Po.K.action list ; 
              sure_side_effects: (CI.Po.K.site*CI.Po.K.binding_state) list;
              other_agents_tests: CI.Po.K.test list AgentIdMap.t ; 
              other_agents_actions: CI.Po.K.action list AgentIdMap.t ;
              other_links_tests: CI.Po.K.test list AgentId2Map.t; 
              other_links_actions: CI.Po.K.action list AgentId2Map.t ;
+             other_links_priority: AgentId2Set.t ; 
              other_agents_side_effects: (CI.Po.K.site*CI.Po.K.binding_state) list AgentIdMap.t ;
              subs_agents_involved_in_links: AgentIdSet.t;
              rule_agent_id_mutex: predicate_id AgentIdMap.t;
@@ -905,13 +909,17 @@ module Preblackboard =
              sure_agents = AgentIdSet.empty; 
              sure_links = AgentId2Set.empty;
              other_links = AgentId2Set.empty;
-             other_links_sites = SiteIdMap.empty;
+             other_links_test_sites = SiteIdMap.empty;
+             other_links_action_sites = SiteIdMap.empty; 
              sites_in_other_links = SiteIdSet.empty;
+             sites_in_other_action_links = SiteIdSet.empty;
              sure_tests = [];
              sure_actions = [];
+             create_actions = [];
              sure_side_effects = [];
              other_agents_tests = AgentIdMap.empty;
              other_agents_actions = AgentIdMap.empty;
+             other_links_priority = AgentId2Set.empty ;
              other_links_tests = AgentId2Map.empty;
              other_links_actions = AgentId2Map.empty;
              other_agents_side_effects = AgentIdMap.empty;
@@ -938,9 +946,13 @@ module Preblackboard =
            let _ = 
              AgentIdSet.iter (Printf.fprintf stderr " %i \n") data.subs_agents_involved_in_links 
            in 
-           let _ = Printf.fprintf stderr "Links_map: \n" in 
+           let _ = Printf.fprintf stderr "Tested_links_map: \n" in 
            let _ = 
-             SiteIdMap.iter (fun (a,b) -> Printf.fprintf stderr " %i.%i -> %i \n" a b ) data.other_links_sites in 
+             SiteIdMap.iter (fun (a,b) -> Printf.fprintf stderr " %i.%i -> %i \n" a b ) data.other_links_test_sites in 
+           let _ = Printf.fprintf stderr "Modified_links_map: \n" in 
+           let _ = 
+             SiteIdMap.iter (fun (a,b) -> Printf.fprintf stderr " %i.%i -> %i \n" a b ) data.other_links_action_sites 
+           in 
            let _ = Printf.fprintf stderr "Potential substitution: \n" in 
            let _ = 
              AgentIdMap.iter 
@@ -1044,11 +1056,21 @@ module Preblackboard =
            error
 
 
-         let add_site_in_other_links site data_structure = 
+         let add_site_in_other_test_links site data_structure = 
            { 
              data_structure
              with sites_in_other_links = SiteIdSet.add site data_structure.sites_in_other_links 
            }
+         let add_site_in_other_action_links site data_structure = 
+           let data_structure = add_site_in_other_test_links site data_structure in 
+            { 
+             data_structure
+             with sites_in_other_action_links = SiteIdSet.add site data_structure.sites_in_other_action_links 
+           }
+
+         let mem_site_in_other_action_links site data_structure = 
+           SiteIdSet.mem site data_structure.sites_in_other_action_links 
+
          let add_sure_test test data_structure = 
            { 
              data_structure 
@@ -1091,6 +1113,11 @@ module Preblackboard =
            { 
              data_structure 
              with sure_actions = action::data_structure.sure_actions
+           }
+         let add_create_action action data_structure = 
+           { 
+             data_structure 
+             with create_actions = action::data_structure.create_actions
            }
          let add_subs_action action ag_id data_structure = 
            let old = 
@@ -1178,9 +1205,9 @@ module Preblackboard =
                    let site2_id = ag2_id,CI.Po.K.site_name_of_site site2 in 
                    {data_structure
                     with 
-                      other_links_sites = 
+                      other_links_action_sites = 
                        SiteIdMap.add site1_id ag2_id
-                         (SiteIdMap.add site2_id ag1_id data_structure.other_links_sites)}
+                         (SiteIdMap.add site2_id ag1_id data_structure.other_links_action_sites)}
                  | CI.Po.K.Remove agent -> 
                    {data_structure 
                     with removed_agents = AgentIdSet.add (CI.Po.K.agent_id_of_agent agent) data_structure.removed_agents}
@@ -1223,13 +1250,28 @@ module Preblackboard =
                     in 
                     {data_structure
                     with 
-                      other_links_sites = 
+                      other_links_test_sites = 
                        SiteIdMap.add site1_id ag2_id
-                         (SiteIdMap.add site2_id ag1_id data_structure.other_links_sites)}
+                         (SiteIdMap.add site2_id ag1_id data_structure.other_links_test_sites)}
 
                   | _ -> data_structure)
                data_structure 
                test_list 
+           in
+           let tested_sites = 
+             SiteIdMap.fold 
+               (fun a _ -> SiteIdSet.add a)
+               data_structure.other_links_test_sites 
+               SiteIdSet.empty 
+           in 
+           let mod_sites = 
+             SiteIdMap.fold
+               (fun a _ -> SiteIdSet.add a)
+               data_structure.other_links_action_sites
+               SiteIdSet.empty
+           in 
+           let priority_sites = 
+             SiteIdSet.inter tested_sites mod_sites 
            in 
            let data_structure = 
              { data_structure 
@@ -1282,13 +1324,35 @@ module Preblackboard =
                    let ag_id1 = CI.Po.K.agent_id_of_agent agent1 in 
                    let agent2 = CI.Po.K.agent_of_site site2 in 
                    let ag_id2 = CI.Po.K.agent_id_of_agent agent2 in 
-                   if sure_agent ag_id1 && sure_agent ag_id2 
+                   let site_id1 = CI.Po.K.site_name_of_site site1 in 
+                   let site_id2 = CI.Po.K.site_name_of_site site2 in 
+                   if sure_agent ag_id1 && not (SiteIdSet.mem (ag_id1,site_id1) priority_sites) && sure_agent ag_id2 && not (SiteIdSet.mem (ag_id2,site_id2) priority_sites)
                    then 
                      data_structure 
                    else 
-                     add_site_in_other_links (ag_id1,CI.Po.K.site_name_of_site site1) 
-                          (add_site_in_other_links (ag_id2,CI.Po.K.site_name_of_site site2) 
-                             data_structure ))
+                     let mix_site1 = ag_id1,CI.Po.K.site_name_of_site site1 in
+                     let mix_site2 = ag_id2,CI.Po.K.site_name_of_site site2 in 
+                     let data_structure = 
+                       add_site_in_other_test_links mix_site1 
+                          (add_site_in_other_test_links mix_site2 data_structure )
+                     in
+                     let data_structure = 
+                       if SiteIdSet.mem mix_site1 priority_sites 
+                         or SiteIdSet.mem mix_site2 priority_sites
+                       then 
+                         let ag_id1,ag_id2 = 
+                           if ag_id1<ag_id2 
+                           then ag_id1,ag_id2
+                           else ag_id2,ag_id1
+                         in 
+                         {data_structure 
+                          with 
+                            other_links_priority = 
+                             AgentId2Set.add (ag_id1,ag_id2) data_structure.other_links_priority}
+                       else
+                         data_structure
+                     in 
+                     data_structure)
                data_structure 
                (List.rev test_list)
            in 
@@ -1310,8 +1374,8 @@ module Preblackboard =
                    then 
                      data_structure
                    else 
-                     add_site_in_other_links (ag_id1,CI.Po.K.site_name_of_site site1) 
-                          (add_site_in_other_links (ag_id2,CI.Po.K.site_name_of_site site2) 
+                     add_site_in_other_action_links (ag_id1,CI.Po.K.site_name_of_site site1) 
+                          (add_site_in_other_action_links (ag_id2,CI.Po.K.site_name_of_site site2) 
                              data_structure )
                      
 
@@ -1349,7 +1413,7 @@ module Preblackboard =
                     begin 
                       try 
                         let site_id1 = ag_id,CI.Po.K.site_name_of_site site in 
-                        let ag_id2 = SiteIdMap.find site_id1 data_structure.other_links_sites
+                        let ag_id2 = SiteIdMap.find site_id1 data_structure.other_links_action_sites
                         in 
                         add_subs_test_link test (ag_id,ag_id2) data_structure 
                       with 
@@ -1368,7 +1432,8 @@ module Preblackboard =
                    let site_name2 = CI.Po.K.site_name_of_site site2 in 
                    let weak1 = CI.Po.K.Has_Binding_type (site1,CI.Po.K.btype_of_names ag_name2 site_name2) in 
                    let weak2 = CI.Po.K.Has_Binding_type (site2,CI.Po.K.btype_of_names ag_name1 site_name1) in 
-                   match sure_agent ag_id1,sure_agent ag_id2 
+                   match sure_agent ag_id1 && not (SiteIdSet.mem  (ag_id1,site_name1) priority_sites),
+                     sure_agent ag_id2 && not (SiteIdSet.mem (ag_id2,site_name2) priority_sites)
                    with 
                    | true,true -> add_sure_test test data_structure 
                    | true,false -> 
@@ -1392,7 +1457,7 @@ module Preblackboard =
                (fun data_structure action -> 
                  match action
                  with 
-                 | CI.Po.K.Create _ -> add_sure_action action data_structure 
+                 | CI.Po.K.Create _ -> add_create_action action data_structure 
                  | CI.Po.K.Remove agent -> 
                    let ag_id = CI.Po.K.agent_id_of_agent agent in 
                    if sure_agent ag_id 
@@ -1412,21 +1477,26 @@ module Preblackboard =
                  | CI.Po.K.Free(site) -> 
                    let agent = CI.Po.K.agent_of_site site in 
                    let ag_id = CI.Po.K.agent_id_of_agent agent in 
-                   if sure_agent ag_id 
-                   then 
-                     add_sure_action action data_structure
-                   else 
-                     begin 
-                      try 
-                        let site_id1 = ag_id,CI.Po.K.site_name_of_site site in 
-                        let ag_id2 = SiteIdMap.find site_id1 data_structure.other_links_sites
-                        in 
-                        add_subs_action_link action (ag_id,ag_id2) data_structure 
-                      with 
-                        Not_found -> 
-                         add_subs_action action ag_id data_structure 
-                    end 
-                     
+                   let site_id1 = ag_id,CI.Po.K.site_name_of_site site in 
+                    if mem_site_in_other_action_links site_id1 data_structure 
+                    then 
+                      data_structure
+                    else 
+                      if sure_agent ag_id 
+                      then 
+                        add_sure_action action data_structure
+                      else 
+                        begin 
+                            try 
+                              
+                              let ag_id2 = SiteIdMap.find site_id1 data_structure.other_links_test_sites
+                              in 
+                              add_subs_action_link action (ag_id,ag_id2) data_structure 
+                            with 
+                              Not_found -> 
+                                add_subs_action action ag_id data_structure 
+                          end 
+                          
                  | CI.Po.K.Bind(site1,site2) | CI.Po.K.Bind_to (site1,site2) | CI.Po.K.Unbind (site1,site2) -> 
                    let agent1 = CI.Po.K.agent_of_site site1 in 
                    let ag_id1 = CI.Po.K.agent_id_of_agent agent1 in 
@@ -1594,6 +1664,188 @@ module Preblackboard =
                | _ -> 
                  let old = A.get map pid in 
                  A.set map pid (C.add p old) 
+           in 
+
+
+             (* deal with created agents *) 
+           let error,log_info,blackboard,step_id = 
+             match init_step 
+             with 
+             | None -> error,log_info,blackboard,step_id
+             | Some nsid -> 
+               begin
+                 let nsid = nsid in 
+                 let nsid_void = nsid+1 in 
+                 let nsid_next = nsid+1 in 
+                 let side_effect = [] in 
+                 let action_list = data_structure.create_actions in 
+                 let test_list = [] in 
+                 let fictitious_list = [] in 
+                   
+                 let error,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effects,init_step  = 
+                   List.fold_left 
+                     (fun (error,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effects,init_step) (site,(binding_state)) -> 
+                       begin
+                         let error,blackboard,potential_target = potential_target error parameter handler blackboard site binding_state in 
+                         match 
+                           potential_target 
+                         with 
+                         | [l]  ->  
+                             begin
+                               let list = 
+                                 List.fold_left 
+                                   (fun list t -> t::l)
+                                   unambiguous_side_effects
+                                   l 
+                               in 
+                               error,
+                               blackboard,
+                               fictitious_list,
+                               fictitious_local_list,
+                               list,
+                               init_step 
+                             end
+                         | _ -> 
+                           begin 
+                             let rule_ag_id = CI.Po.K.agent_id_of_agent (CI.Po.K.agent_of_site site) in 
+                             let predicate_info = Mutex (Lock_side_effect (step_id,rule_ag_id,rule_ag_id,CI.Po.K.site_name_of_site site)) in 
+                             let error,blackboard,predicate_id = allocate parameter handler error blackboard predicate_info  in 
+                             let  error,log_info,blackboard,step_id = 
+                               init_fictitious_action log_info error predicate_id  blackboard init_step 
+                             in 
+                             let error,log_info,blackboard = 
+                               List.fold_left 
+                                 (fun (error,log_info,blackboard) list -> 
+                                   let blackboard = {blackboard with pre_nsteps = blackboard.pre_nsteps+1} in 
+                                   let log_info = CI.Po.K.P.inc_n_side_events log_info in 
+                                     let side_effect = 
+                                       List.fold_left 
+                                         (fun list (_,a,_) -> 
+                                           match a 
+                                           with 
+                                           | None -> list
+                                           | Some a -> a::list)
+                                         []
+                                         list 
+                                     in 
+                                     let side_effect = CI.Po.K.side_effect_of_list 
+                                       side_effect in 
+                                     let _ = A.set blackboard.pre_side_effect_of_event 
+                                       blackboard.pre_nsteps
+                                       side_effect in
+                                     let error,blackboard = 
+                                       List.fold_left
+                                         (fun (error,blackboard) (predicate_id,_,(test,action)) -> 
+                                           add_fictitious_action error test action predicate_id blackboard)
+                                         (error,blackboard) 
+                                         ((predicate_id,None,(Counter 0,Counter 1))::list)
+                                     in 
+                                     error,log_info,blackboard)
+                                 (error,log_info,blackboard)
+                                 potential_target
+                             in 
+                             error,
+                             blackboard,
+                             (predicate_id::fictitious_list),
+                             (predicate_id::fictitious_local_list),
+                             unambiguous_side_effects,
+                             init_step
+                           end
+                       end)
+                     (error,blackboard,fictitious_list,fictitious_local_list,[],init_step)
+                     side_effect 
+                 in 
+                 let error,blackboard,test_map = 
+                   List.fold_left 
+                     (fun (error,blackboard,map) test -> 
+                       let error,blackboard,test_list = predicates_of_test parameter handler error blackboard test in
+                       error,blackboard,build_map test_list map)
+                     (error,blackboard,PredicateidMap.empty)
+                     test_list in 
+                 let error,blackboard,action_map,test_map = 
+                   List.fold_left 
+                     (fun (error,blackboard,action_map,test_map) action -> 
+                       let error,blackboard,action_list,test_list = predicates_of_action true parameter handler error blackboard init action in 
+                       error,blackboard,build_map action_list action_map,build_map test_list test_map)
+                     (error,blackboard,PredicateidMap.empty,test_map)
+                     action_list in 
+                 let g x = 
+                   match x 
+                   with 
+                   | None -> Unknown
+                   | Some x -> x
+                 in 
+                 let merged_map = 
+                   PredicateidMap.merge 
+                     (fun _ test action -> Some(g test,g action))
+                     test_map
+                     action_map 
+                 in 
+(*                 let merged_map = 
+                   List.fold_left 
+                     (fun map pid -> PredicateidMap.add pid (Counter 1,Undefined) map)
+                     merged_map
+                     fictitious_local_list 
+                 in *)
+                 let merged_map = 
+                   List.fold_left 
+                     (fun map (pid,_,(test,action)) -> add_state pid (test,action) map)
+                     merged_map
+                     unambiguous_side_effects
+                 in 
+                 let side_effect = 
+                   List.fold_left 
+                     (fun list (_,a,_) -> 
+                       match a 
+                       with 
+                       | None -> list
+                       | Some a -> a::list)
+                     []
+                     unambiguous_side_effects 
+                 in 
+                 if side_effect = []
+                 && PredicateidMap.is_empty merged_map 
+                 then 
+                   error,log_info,blackboard,
+                   nsid_void
+                 else 
+                   begin 
+                       let _ = A.set blackboard.pre_side_effect_of_event nsid (CI.Po.K.side_effect_of_list side_effect) in
+       (*                let _ = A.set pre_event nsid step in *)
+                       let pre_steps_by_column = 
+                         PredicateidMap.fold 
+                           (fun id (test,action) map -> 
+                             begin 
+                               let value,list = A.get map id in 
+                               let value' = value + 1 in 
+                               let _ = fadd id action blackboard.history_of_predicate_values_to_predicate_id in 
+                               let _ = A.set map id (value',(nsid,value,test,action)::list)
+                               in map
+                             end)
+                           merged_map
+                           blackboard.pre_steps_by_column 
+                       in 
+(*                       let _ = A.set blackboard.pre_kind_of_event nsid (type_of_step (CI.Po.K.type_of_refined_step step)) in *)
+                       let observable_list = 
+                         if CI.Po.K.is_obs_of_refined_step step 
+                         then 
+                           ([nsid],CI.Po.K.simulation_info_of_refined_step step)::blackboard.pre_observable_list 
+                         else
+                           blackboard.pre_observable_list 
+                       in 
+                       let blackboard = 
+                         { 
+                           blackboard with 
+                             pre_event = pre_event ;
+                             pre_fictitious_list = fictitious_list ; 
+                             pre_steps_by_column = pre_steps_by_column; 
+                             pre_nsteps = nsid;
+                             pre_observable_list = observable_list; 
+                         }
+                       in 
+                       error,log_info,blackboard,nsid_next 
+                     end 
+               end
            in 
           
            (*** deal with substitutable agents ***)
@@ -1870,8 +2122,8 @@ module Preblackboard =
            in 
           
             (* deal with substitutable agent in links*)
-           let error,log_info,blackboard = 
-             AgentId2Set.fold 
+           let f error log_info blackboard set = 
+              AgentId2Set.fold 
                (fun link (error,log_info,blackboard) -> 
                  let link_mutex = AgentId2Map.find link data_structure.links_mutex in 
                  let rule_ag_id1,rule_ag_id2=link in 
@@ -2046,13 +2298,30 @@ module Preblackboard =
                        l_ag_2)
                    (error,log_info,blackboard)
                    (l_ag_1))
-               data_structure.other_links 
+               set 
                (error,log_info,blackboard)
+           in 
+           let data_structure = 
+             {
+               data_structure 
+              with 
+                other_links = AgentId2Set.diff data_structure.other_links  data_structure.other_links_priority}
+           in 
+           
+           let error,log_info,blackboard = 
+             f error log_info blackboard data_structure.other_links_priority
+           in 
+           let error,log_info,blackboard = 
+             f error log_info blackboard data_structure.other_links
            in 
 
            (*** deal with rigid elements ***)
            let side_effect = data_structure.sure_side_effects in 
-           let action_list = data_structure.sure_actions in 
+           let action_list = 
+             match init_step with 
+               None -> data_structure.create_actions@data_structure.sure_actions 
+             | Some _ -> data_structure.sure_actions 
+           in 
            let test_list = data_structure.sure_tests in 
            let fictitious_list = blackboard.pre_fictitious_list in 
           

@@ -417,7 +417,7 @@ let compress env state log_info step_list =
             with 
             | 0 -> ()
             | 1 -> Debug.tag "\n\t 1 strong compression has failed" 
-            | _ -> Debug.tag ("\n\t "^(string_of_int weakly_compression_faillure)^" strong compressions have failed")
+            | _ -> Debug.tag ("\n\t "^(string_of_int strong_compression_faillure)^" strong compressions have failed")
           in 
             
           let _ = 

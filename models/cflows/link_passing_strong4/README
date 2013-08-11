@@ -1,0 +1,9 @@
+#Command-line:
+KaSim -i link_passing_strong4.ka -seed 924556145 -e 10000 -d expected-output || exit 0 
+
+#In this model K can connect to A on x. 
+#Then the link can be pass from A.x to A.y, and from A.y to A.z. 
+
+#There is only one causal flow. 
+
+#KaSim will fails if actions are not interpreted in the proper order in cflow/kappa_instantiation.ml or if link passing with fixed agents is wrongly handled in strong comprssion.

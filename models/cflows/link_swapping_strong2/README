@@ -1,0 +1,11 @@
+#Command-line:
+KaSim -i link_swapping_strong2.ka -seed 924556145 -e 300 -d expected-output || exit 0 
+
+#In this model 
+#A can turn into C and C can turn into A
+#A and B can form a heterodimmer by connecting their two x(s), and their two y(s) concurrently. 
+#Then, they can swap these links to bind a site x to the site y of the other agent, and vice versa (which triggers the observable).
+
+#There is only one causal flow. 
+
+#KaSim will fails if actions are not interpreted in the proper order in strong compression

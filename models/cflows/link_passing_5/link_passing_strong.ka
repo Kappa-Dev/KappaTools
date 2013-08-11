@@ -1,0 +1,31 @@
+%def: "displayCompression" "weak" "strong" 
+%def: "showIntroEvents" "true" 
+
+A(x)->B(x) @1
+B(x)->C(x) @1 
+C(x)->A(x) @1
+
+A(x!1),B(x!1),C(x) -> A(x),B(x!1),C(x!1) @1
+A(x),E(x!1),C(x!1) -> A(x!1),E(x!1),C(x) @1
+D(x),B(x!1),A(x!1) -> D(x!1),B(x!1),A(x) @1
+A(x),B(x) -> A(x!1),B(x!1) @1
+E(x),C(x) -> E(x!1),C(x!1) @1 
+
+
+'GOAL' C(x!_) -> C(x)  @1 
+'GOAL2' D(x!_) -> D(x) @1
+'GOAL3' A(x!1),E(x!1) -> A(x),E(x) @1
+
+%init: 10 A(x)
+%init: 10 D(x)
+%init: 10 E(x)
+
+%agent: A(x)
+%agent: B(x)
+%agent: C(x)
+%agent: D(x)
+%agent: E(x)
+
+%mod: [true] do $TRACK 'GOAL' [true]
+%mod: [true] do $TRACK 'GOAL2' [true]
+%mod: [true] do $TRACK 'GOAL3' [true]

@@ -1,0 +1,14 @@
+#Command-line:
+KaSim -i link_passing_strong3.ka -seed 611463625 -e 280 -d expected-output || exit 0 
+
+#In this examples, free A can turn into free B, which can turn into free C, which can turn into free A
+#Each agent has a site x
+#E can un/bind C
+#E bound to C can get bound to A
+
+#There is only one strongly compressed story. 
+
+#It may fail when link swapping when all three involved agents except the one that is bound and remain bound can be substituted are not handled properly
+
+
+

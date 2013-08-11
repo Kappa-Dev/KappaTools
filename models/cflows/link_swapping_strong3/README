@@ -1,0 +1,9 @@
+#Command-line:
+KaSim -i link_swapping_strong3.ka -seed 924556145 -e 30 -d expected-output || exit 0 
+
+#In this model As can form a dimmer by connecting their two x(s), and their two y(s) concurrently. 
+#Then, they can swap these links to bind a site x to the site y of the other A, and vice versa (which triggers the observable).
+
+#There is only one causal flow. 
+
+#KaSim will fails if actions are not interpreted in the proper order in strong compression
