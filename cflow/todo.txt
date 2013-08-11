@@ -3,4 +3,5 @@
 2) Improve the handling of bound action when only one partner is fixed. 
 
 
-
+-> Compression may be two permissives. 
+1) We should allow only permutation with a causal ancestor (causal dependence is not checked yet).
