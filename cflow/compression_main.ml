@@ -270,7 +270,7 @@ let compress env state log_info step_list =
                               | None -> 
                                 error,weakly_compressed_story_array,weakly_compression_faillure+1,None
                               | Some list -> 
-                                if weak_compression_on
+                                if weak_compression_on or strong_compression_on 
                                 then 
                                   let weak_event_list = D.S.translate_result list in 
                                   let error,weak_event_list = D.S.PH.B.PB.CI.Po.K.clean_events parameter handler error weak_event_list in 
