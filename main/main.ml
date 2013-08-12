@@ -129,7 +129,7 @@ let main =
 		and grid,profiling,event_list = 
 			if Environment.tracking_enabled env then
 				let _ = 
-					if !Parameter.mazCompression || !Parameter.weakCompression then ()
+					if !Parameter.mazCompression || !Parameter.weakCompression || !Parameter.strongCompression then ()
 					else (ExceptionDefn.warning "Causal flow compution is required but no compression is specified, will output flows with no compresion"  ; 
 					Parameter.mazCompression := true)
 				in  
