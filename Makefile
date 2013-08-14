@@ -16,7 +16,7 @@ SOURCES = \
 		simulation/state.ml simulation/nonLocal.ml grammar/eval.ml simulation/external.ml  \
 		cflow/graph_closure.ml \
 		cflow/priority.ml \
-		cflow/cflow_handler.ml cflow/profiling_.ml cflow/causal.ml  \
+		cflow/cflow_handler.ml cflow/profiling.ml cflow/causal.ml  \
 		cflow/kappa_instantiation.ml cflow/po_cut.ml cflow/pseudo_inverse.ml cflow/blackboard_generation.ml cflow/blackboard.ml cflow/propagation_heuristics.ml \
 		cflow/generic_branch_and_cut_solver.ml cflow/dag.ml cflow/compression_main.ml  simulation/plot.ml Error/safe.ml simulation/run.ml Compartment/vol.ml \
 		main/main.ml 
