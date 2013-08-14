@@ -1,3 +1,4 @@
+OPTIONS? = 
 ## see: http://www.ocaml.info/home/ocaml_sources.html#toc16
 
 ## put here the names of your source files (in the right order)
@@ -13,8 +14,9 @@ SOURCES = \
 		pattern/mixture.ml pattern/precondition.ml pattern/precondition.mli \
 		siteGraphs/graph.ml siteGraphs/species.ml pattern/matching.ml pattern/dynamics.ml \
 		simulation/state.ml simulation/nonLocal.ml grammar/eval.ml simulation/external.ml  \
+		cflow/graph_closure.ml \
 		cflow/priority.ml \
-		cflow/cflow_handler.ml cflow/profiling.ml cflow/causal.ml  \
+		cflow/cflow_handler.ml cflow/profiling_.ml cflow/causal.ml  \
 		cflow/kappa_instantiation.ml cflow/po_cut.ml cflow/pseudo_inverse.ml cflow/blackboard_generation.ml cflow/blackboard.ml cflow/propagation_heuristics.ml \
 		cflow/generic_branch_and_cut_solver.ml cflow/dag.ml cflow/compression_main.ml  simulation/plot.ml Error/safe.ml simulation/run.ml Compartment/vol.ml \
 		main/main.ml 
@@ -41,8 +43,8 @@ all: native-code
 OCAMLCP = $(OCAMLBINPATH)ocamlcp
 OCAMLLEX = $(OCAMLBINPATH)ocamllex
 OCAMLYACC = $(OCAMLBINPATH)ocamlyacc
-OCAMLC = $(OCAMLBINPATH)ocamlc.opt 
-OCAMLOPT = $(OCAMLBINPATH)ocamlopt.opt #-g -ccopt -g -ccopt -pg
+OCAMLC = $(OCAMLBINPATH)ocamlc
+OCAMLOPT = $(OCAMLBINPATH)ocamlopt.opt $(OPTIONS) #-g -ccopt -g -ccopt -pg
 OCAMLDEP = $(OCAMLBINPATH)ocamldep
 CC = gcc
 

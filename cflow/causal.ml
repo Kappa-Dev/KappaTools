@@ -258,7 +258,8 @@ let label env state e =
 let ids_of_grid grid = Hashtbl.fold (fun key _ l -> key::l) grid.flow []
 let config_of_grid = cut 
 
-let prec_star_of_config config = 
+
+(*let prec_star_of_config_old  config = 
   let rec prec_closure config todo already_done closure =
     if IntSet.is_empty todo then closure
     else
@@ -277,8 +278,11 @@ let prec_star_of_config config =
       let set = prec_closure config (IntSet.singleton eid) IntSet.empty IntSet.empty
       in
       IntMap.add eid set prec_star
-    ) config.events IntMap.empty 
+    ) config.events IntMap.empty *)
 
+let prec_star_of_config config = 
+  Graph_closure.closure config.prec_1 
+      
 let depth_and_size_of_event config =
   IntMap.fold 
     (fun eid prec_eids (emap,size,depth) ->
