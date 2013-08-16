@@ -836,8 +836,10 @@ module Preblackboard =
            let former_states = 
              A.get blackboard.history_of_predicate_values_to_predicate_id predicate_target_id
            in 
-           if Parameter.get_causal_trace_only parameter.CI.Po.K.H.compression_mode 
-           then 
+           match 
+             parameter.CI.Po.K.H.current_compression_mode
+           with 
+           | None | Some Parameter.Causal -> 
              begin 
                let s = C.last former_states in 
                match s with 
@@ -851,7 +853,7 @@ module Preblackboard =
                    else 
                      error,blackboard,[]
              end
-           else 
+           | _ -> 
              begin 
                let error,bt = predicate_value_of_binding_state parameter handler error binding_state in 
                let error,list = 

@@ -122,7 +122,7 @@ module Propagation_heuristic =
             match 
               parameter.B.PB.CI.Po.K.H.current_compression_mode 
             with 
-            | None -> false,""
+            | None | Some Parameter.Causal-> false,""
             | Some Parameter.Weak -> Parameter.dump_grid_after_branching_during_weak_compression,Parameter.xlsweakFileName
             
             | Some Parameter.Strong -> Parameter.dump_grid_after_branching_during_strong_compression,Parameter.xlsstrongFileName

@@ -28,6 +28,7 @@ module type Cflow_handler =
             compression_mode : Parameter.compression_mode ;
             priorities_weak: Priority.priorities ;
             priorities_strong : Priority.priorities ;
+            priorities_causal : Priority.priorities ;
             out_channel_err : out_channel ;
             out_channel_profiling : out_channel ;
             out_channel : out_channel 
@@ -65,6 +66,7 @@ module Cflow_handler =
             compression_mode : Parameter.compression_mode ;
             priorities_weak: Priority.priorities ;
             priorities_strong : Priority.priorities ;
+            priorities_causal: Priority.priorities ;
             out_channel_err : out_channel ;
             out_channel_profiling: out_channel ;
             out_channel : out_channel 
@@ -76,6 +78,7 @@ module Cflow_handler =
           current_compression_mode = None ; 
           priorities_weak = Priority.weak ; 
           priorities_strong = Priority.strong2 ; 
+          priorities_causal = Priority.causal ;
           out_channel = stderr ; 
           out_channel_err = stderr ; 
           out_channel_profiling = channel ;
@@ -85,7 +88,7 @@ module Cflow_handler =
 
       let set_compression_weak p = {p with current_compression_mode = Some Parameter.Weak}
       let set_compression_strong p = {p with current_compression_mode = Some Parameter.Strong}
-      let set_compression_none p = {p with current_compression_mode = None}
+      let set_compression_none p = {p with current_compression_mode = Some Parameter.Causal}
 
 
       type error = 
@@ -160,6 +163,6 @@ module Cflow_handler =
         | None -> None 
         | Some Parameter.Weak -> Some parameter.priorities_weak
         | Some Parameter.Strong -> Some parameter.priorities_strong 
-
+        | Some Parameter.Causal -> Some parameter.priorities_causal
     end:Cflow_handler
   )

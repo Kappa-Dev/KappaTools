@@ -53,7 +53,7 @@ let compress env state log_info step_list =
     else
       let _ = print_newline () in 
       begin (* causal compression *)
-        let parameter =  D.S.PH.B.PB.CI.Po.K.H.set_compression_weak parameter in 
+        let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_none parameter in 
         if D.S.PH.B.PB.CI.Po.K.no_obs_found step_list 
         then 
           let _ = Debug.tag "+ No causal flow found" in 
@@ -156,7 +156,8 @@ let compress env state log_info step_list =
           let error = 
             if debug_mode
             then 
-              D.S.PH.B.print_blackboard parameter handler error blackboard 
+              let error = D.S.PH.B.export_blackboard_to_xls parameter handler error "a" 0 0 blackboard in 
+              let error = D.S.PH.B.print_blackboard parameter handler error blackboard in error
             else 
               error 
           in  

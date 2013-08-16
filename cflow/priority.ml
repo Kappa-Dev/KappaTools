@@ -62,6 +62,16 @@ let strong2 =
 
 
 let weak = strong1 
+let causal = 
+  {
+    max_level = 0;
+    creation = 0;
+    unbinding = 0;
+    removal = 0;
+    other_events = 0;
+    substitution = 0;
+    side_effects = 0;
+  }
 
 let n_story = ref 1 
 let n_branch = ref 1 

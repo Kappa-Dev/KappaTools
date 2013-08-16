@@ -40,6 +40,8 @@ module type S =
     val subset: t -> t -> bool
     val iter: (elt -> unit) -> t -> unit
     val fold: (elt -> 'a -> 'a) -> t -> 'a -> 'a
+    val fold_inv: (elt -> 'a -> 'a) -> t -> 'a -> 'a 
+    val iter_inv: (elt -> 'a -> 'a) -> t -> 'a -> 'a 
     val for_all: (elt -> bool) -> t -> bool
     val exists: (elt -> bool) -> t -> bool
     val filter: (elt -> bool) -> t -> t
@@ -50,6 +52,8 @@ module type S =
     val max_elt: t -> elt
     val choose: t -> elt
     val split: elt -> t -> t * bool * t
+    val destruct_min: t -> elt*t
+    val destruct_max: t -> elt*t
   end
 
 module Make(Ord: OrderedType) =
@@ -294,13 +298,22 @@ module Make(Ord: OrderedType) =
             subset (Node (Empty, v1, r1, 0)) r2 && subset l1 t2
 
     let rec iter f = function
-        Empty -> ()
+      | Empty -> ()
       | Node(l, v, r, _) -> iter f l; f v; iter f r
+
+    let rec iter_inv f = function
+      | Empty -> ()
+      | Node(l, v, r, _) -> iter f r; f v; iter f l
 
     let rec fold f s accu =
       match s with
         Empty -> accu
       | Node(l, v, r, _) -> fold f r (f v (fold f l accu))
+        
+    let rec fold_inv f s accu = 
+      match s with 
+        Empty -> accu 
+      | Node(l, v, r, _) -> fold_inv f l (f v (fold f r accu))
 
     let rec for_all p = function
         Empty -> true
@@ -336,5 +349,13 @@ module Make(Ord: OrderedType) =
       elements_aux [] s
 
     let choose = min_elt
+
+    let destruct_gen f  a = 
+      let elt = f a in 
+      elt,remove elt a 
+
+    let destruct = destruct_gen choose
+    let destruct_max = destruct_gen max_elt
+    let destruct_min = destruct_gen min_elt 
 
   end

@@ -1559,7 +1559,7 @@ module Blackboard =
              list 
          in 
          error,(log_info,preblackboard,int,Parameter.xlsstrongFileName,Parameter.dump_grid_before_strong_compression)
-       | Some Parameter.Weak -> 
+       | Some Parameter.Weak | Some Parameter.Causal -> 
          let error,log_info,preblackboard,int = 
          List.fold_left 
            (fun (error,log_info,preblackboard,int) refined_event  -> 

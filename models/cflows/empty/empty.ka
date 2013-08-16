@@ -1,0 +1,17 @@
+%agent: A(x)
+%agent: B(x)
+%agent: C()
+
+%init: 10 B()
+%init: 1 A()
+
+A()->  @1 
+-> A() @1
+B()->  
+A(x),B(x) -> A(x!1),B(x!1) @1
+
+A(x!1),B(x!1) -> A(x!1),B(x!1),C() @1
+
+%obs: 'goal' C()
+%mod: [T]<100 do $TRACK 'goal' [true]
+%def: "displayCompression" "none" "weak" "strong"

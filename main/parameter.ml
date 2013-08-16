@@ -138,7 +138,7 @@ let (openInDescriptors:in_channel list ref) = ref []
 let add_out_desc d = openOutDescriptors := d::!openOutDescriptors  
 let add_in_desc d = openInDescriptors := d::!openInDescriptors  
 
-type current_compression_mode = Weak | Strong 
+type current_compression_mode = Weak | Strong | Causal
 type compression_mode = 
     { 
       causal_trace:bool;
