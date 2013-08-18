@@ -16,7 +16,7 @@ type atom =
 	}
 
 type attribute = atom list (*vertical sequence of atoms*)
-type grid = {flow: (int*int*int,attribute) Hashtbl.t}  (*(n_i,s_i,q_i) -> att_i with n_i: node_id, s_i: site_id, q_i: link (1) or internal state (0) *)
+type grid = {flow: (int*int*int,attribute) Hashtbl.t ; obs: int list}  (*(n_i,s_i,q_i) -> att_i with n_i: node_id, s_i: site_id, q_i: link (1) or internal state (0) *)
 type config = {events: atom IntMap.t ; prec_1: IntSet.t IntMap.t ; conflict : IntSet.t IntMap.t ; top : IntSet.t}
 type enriched_grid = 
     { 
@@ -31,7 +31,9 @@ type enriched_grid =
 let empty_config = {events=IntMap.empty ; conflict = IntMap.empty ; prec_1 = IntMap.empty ; top = IntSet.empty}
 let is i c = (i land c = i)
 
-let empty_grid () = {flow = Hashtbl.create !Parameter.defaultExtArraySize }
+let empty_grid () = {flow = Hashtbl.create !Parameter.defaultExtArraySize ; obs = [] }
+
+let add_obs_eid eid grid = {grid with obs = eid::(grid.obs)}
 
 let grid_find (node_id,site_id,quark) grid = Hashtbl.find grid.flow (node_id,site_id,quark)
 
@@ -95,7 +97,7 @@ let record ?decorate_with rule side_effects (embedding,fresh_map) event_number g
 	and r_id = rule.Dynamics.r_id
 	and obs = match decorate_with with None -> [] | Some l -> (List.rev_map (fun (id,_) -> Environment.kappa_of_num id env) (List.rev l))
 	in
-	let kind = RULE r_id in
+  	let kind = RULE r_id in
 	
 	let im embedding fresh_map id =
 		match id with
@@ -121,6 +123,8 @@ let record ?decorate_with rule side_effects (embedding,fresh_map) event_number g
 	grid
 
 let record_obs side_effects ((r_id,state,embedding,_),test) event_number grid env = 
+  let grid = add_obs_eid event_number grid in 
+
   let im embedding id =
     match id with
       | FRESH j -> raise (Invalid_argument "Causal.record_obs")
@@ -301,7 +305,7 @@ let depth_and_size_of_event config =
 let enrich_grid grid = 
   let ids = ids_of_grid grid  in 
   let config = config_of_grid ids grid in 
-  let prec_star = prec_star_of_config config in
+  let prec_star= prec_star_of_config config in
   let depth_of_event,size,depth = depth_and_size_of_event config in  
   { 
     config = config ; 

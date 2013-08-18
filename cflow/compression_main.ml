@@ -20,6 +20,7 @@
 
 module D = Dag.Dag 
 
+let old_version = true
 let log_step = true
 let debug_mode = false
 let dump_profiling_info = false
@@ -154,7 +155,7 @@ let compress env state log_info step_list =
               Debug.tag "\t\t * pretty printing the grid" 
           in 
           let error = 
-            if debug_mode
+            if debug_mode 
             then 
               let error = D.S.PH.B.export_blackboard_to_xls parameter handler error "a" 0 0 blackboard in 
               let error = D.S.PH.B.print_blackboard parameter handler error blackboard in error
@@ -170,38 +171,91 @@ let compress env state log_info step_list =
             else (false,0,0)
           in 
           let error,_,_,causal_story_array = 
-            List.fold_left 
-              (fun (error,counter,tick,causal_story_array) (list_order,list_eid,info) -> 
-                let _ = 
-                  if debug_mode
-                  then 
+            if old_version
+            then 
+              begin 
+                List.fold_left 
+                  (fun (error,counter,tick,causal_story_array) (list_order,list_eid,info) -> 
+                    let _ = 
+                      if debug_mode
+                      then 
                     Debug.tag ("\t\t * causal compression "^(string_of_int (List.length list_eid)))
-                in 
-                let log_info = D.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
-                let error,log_info,event_id_list = D.S.detect_independent_events parameter handler error log_info blackboard list_eid in 
-                let error,event_list,result_wo_compression = D.S.translate parameter handler error blackboard event_id_list in 
-                let grid = D.S.PH.B.PB.CI.Po.K.build_grid result_wo_compression true handler in
-                let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
-                let error,graph = D.graph_of_grid parameter handler error grid in 
-                let error,prehash = D.prehash parameter handler error graph in 
-                let log_info = D.S.PH.B.PB.CI.Po.K.P.set_canonicalisation log_info in 
-                let info = 
+                    in 
+                    let log_info = D.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
+                    let error,log_info,event_id_list = D.S.detect_independent_events parameter handler error log_info blackboard list_eid in 
+                    let error,event_list,result_wo_compression = D.S.translate parameter handler error blackboard event_id_list in 
+                    let grid = D.S.PH.B.PB.CI.Po.K.build_grid result_wo_compression true handler in
+                    let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
+                    let error,graph = D.graph_of_grid parameter handler error grid in 
+                    let error,prehash = D.prehash parameter handler error graph in 
+                    let log_info = D.S.PH.B.PB.CI.Po.K.P.set_canonicalisation log_info in 
+                    let info = 
                   match info 
                   with 
-                    | None -> None 
-                    | Some info -> 
-                      let info = 
-                        {info with Mods.story_id = counter }
-                      in 
-                      let info = Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy log_info)  info 
-                      in 
-                      Some info
-                in 
-                let tick = Mods.tick_stories n_stories tick in 
-                let causal_story_array = (prehash,[grid,graph,None,(event_id_list,list_order,event_list),[],[info]])::causal_story_array in 
-                error,counter+1,tick,causal_story_array)
-              (error,1,tick,[]) 
-              (List.rev list) 
+                  | None -> None 
+                  | Some info -> 
+                    let info = 
+                      {info with Mods.story_id = counter }
+                    in 
+                    let info = Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy log_info)  info 
+                    in 
+                    Some info
+                    in 
+                    let tick = Mods.tick_stories n_stories tick in 
+                    let causal_story_array = (prehash,[grid,graph,None,(event_id_list,list_order,event_list),[],[info]])::causal_story_array in 
+                    error,counter+1,tick,causal_story_array)
+                  (error,1,tick,[]) 
+                  (List.rev list) 
+              end
+              else 
+               begin 
+                 let _ = 
+                   if debug_mode
+                   then 
+                     Debug.tag ("\t\t * causal compression ")
+                 in 
+                 let log_info = D.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
+                 let grid = D.S.PH.B.PB.CI.Po.K.build_grid 
+                   (List.rev_map (fun x -> (x,D.S.PH.B.PB.CI.Po.K.empty_side_effect)) (List.rev refined_event_list_without_pseudo_inverse)) (*result_wo_compression*) true handler in
+                 let obs = grid.Causal.obs in 
+                 let enriched_grid = Causal.enrich_grid grid in 
+                 List.fold_left 
+                   (fun (error,counter,tick,causal_story_array) eid -> 
+                     let _ = 
+                         if debug_mode
+                         then 
+                           Debug.tag ("\t\t * causal compression ")
+                     in 
+                     let log_info = D.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
+                     let event_id_list = Mods.IntSet.elements (Mods.IntSet.add eid (Mods.IntMap.find eid enriched_grid.Causal.prec_star)) in 
+                     let event_id_list = 
+                       List.rev_map (fun x->x-1) (List.rev event_id_list) in 
+                     let error,event_list,result_wo_compression = D.S.translate parameter handler error blackboard event_id_list in 
+                     let grid = D.S.PH.B.PB.CI.Po.K.build_grid result_wo_compression true handler in
+                     let info = None in 
+                     let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
+                     let error,graph = D.graph_of_grid parameter handler error grid in 
+                     let error,prehash = D.prehash parameter handler error graph in 
+                     let log_info = D.S.PH.B.PB.CI.Po.K.P.set_canonicalisation log_info in 
+                     let info = 
+                         match info 
+                         with 
+                         | None -> None 
+                         | Some info -> 
+                           let info = 
+                             {info with Mods.story_id = counter }
+                           in 
+                           let info = Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy log_info)  info 
+                           in 
+                           Some info
+                     in 
+                     let tick = Mods.tick_stories n_stories tick in 
+                     let causal_story_array = (prehash,[grid,graph,None,([],[],event_list),[],[info]])::causal_story_array in 
+                     error,counter+1,tick,causal_story_array
+                   )
+                   (error,1,tick,[]) 
+                   (List.rev obs)
+               end
           in 
           let error,causal_story_array = 
             D.hash_list parameter handler error 
@@ -214,9 +268,9 @@ let compress env state log_info step_list =
               causal_story_array
           in 
           let _ = Priority.n_story := 1 in 
-          let _ = print_newline () in 
-          let _ = print_newline () in 
-          let error,weakly_compression_faillure,weakly_compressed_story_array = 
+            let _ = print_newline () in 
+            let _ = print_newline () in 
+            let error,weakly_compression_faillure,weakly_compressed_story_array = 
             if weak_compression_on or strong_compression_on 
             then 
               begin 
