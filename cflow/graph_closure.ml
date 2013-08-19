@@ -83,6 +83,11 @@ let closure prec =
       prec 
       0 
   in 
+  let tick = 
+    if max_index > 0 
+    then Mods.tick_stories max_index (false,0,0) 
+    else (false,0,0)
+  in 
   let n_pred = A.create (max_index+1) 0 in 
   let l_succ = A.create (max_index+1) S.empty in 
   let l_pred = A.create (max_index+1) S.empty in 
@@ -120,7 +125,7 @@ let closure prec =
       n_pred 
   in 
   let to_do = !l in 
-  let rec aux to_do = 
+  let rec aux tick to_do = 
     if S.is_empty to_do
     then s_pred_star
     else 
@@ -142,16 +147,17 @@ let closure prec =
         let _ = 
           A.set s_pred_star succ pred_star 
         in 
+        let tick = Mods.tick_stories max_index tick in 
         let to_do = 
           S.fold 
             (remove succ)
             (A.get l_succ succ)
             to_do 
         in 
-        aux to_do 
+        aux tick to_do 
       end 
   in 
-  let t = aux to_do in 
+  let t = aux tick to_do in 
   let m = ref M.empty in 
   let _ = 
     A.iteri 

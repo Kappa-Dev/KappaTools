@@ -29,6 +29,7 @@ module type Dag =
     type canonical_form 
        
     val graph_of_grid: (Causal.grid -> S.PH.B.PB.CI.Po.K.H.error_channel * graph) S.PH.B.PB.CI.Po.K.H.with_handler
+    val graph_of_config: (Causal.config -> S.PH.B.PB.CI.Po.K.H.error_channel * graph) S.PH.B.PB.CI.Po.K.H.with_handler
     val dot_of_graph: (graph -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler
     val prehash: (graph -> S.PH.B.PB.CI.Po.K.H.error_channel * prehash) S.PH.B.PB.CI.Po.K.H.with_handler
     val canonicalize: (graph -> S.PH.B.PB.CI.Po.K.H.error_channel * canonical_form) S.PH.B.PB.CI.Po.K.H.with_handler
@@ -205,6 +206,90 @@ module Dag =
         let ids = Hashtbl.fold (fun key _ l -> key::l) grid.Causal.flow [] in
         let label = label handler in 
         let config = Causal.cut ids grid in 
+        let labels = A.make 1 (FICTITIOUS,"") in 
+        let set =  
+          Mods.IntMap.fold
+            (fun i atom  ->
+              let _ = A.set labels i (kind atom.Causal.kind,label atom.Causal.kind) in 
+              Mods.IntSet.add i 
+            )
+            config.Causal.events
+            Mods.IntSet.empty 
+        in 
+        let add_to_list_array i j a = 
+          try 
+            let old = 
+              try 
+                A.get a i 
+              with 
+                | Not_found -> []
+            in 
+            A.set a i  (j::old) 
+          with 
+            | _ -> A.set a i [j]
+        in 
+        let add i j s p = 
+          let _ = add_to_list_array i j s in 
+          let _ = add_to_list_array j i p in 
+          ()
+        in 
+        let succ  = A.make 1 [] in 
+        let pred = A.make 1 [] in 
+        let root = 
+         Mods.IntMap.fold
+           (fun i s set ->
+             if Mods.IntSet.is_empty s
+             then set 
+             else 
+               let set  = 
+                 Mods.IntSet.fold
+                   (fun j -> 
+                     let _ = add j i succ pred in 
+                   Mods.IntSet.remove j)
+                   s
+                   set
+               in 
+               set)
+           config.Causal.prec_1
+           set 
+        in 
+        let conflict_pred = A.make 1 [] in 
+        let conflict_succ = A.make 1 [] in 
+        let root = 
+          Mods.IntMap.fold
+            (fun i s root ->
+              if Mods.IntSet.is_empty s 
+              then set 
+              else 
+                let root = 
+                  Mods.IntSet.fold 
+                    (fun j -> 
+                      let _ = add j i conflict_succ conflict_pred in 
+                    Mods.IntSet.remove j)
+                    s
+                    root 
+                in 
+                root)
+            config.Causal.conflict 
+            root
+        in 
+        if Mods.IntSet.is_empty root
+        then 
+          error,dummy_graph 
+        else 
+          error,{ 
+            root = Mods.IntSet.min_elt root ;
+            labels = labels ;
+            succ = succ ;
+            pred = pred ;
+            conflict_succ = conflict_succ ;
+            conflict_pred = conflict_pred 
+          }
+
+      let graph_of_config parameter handler error config = 
+ (*       let ids = Hashtbl.fold (fun key _ l -> key::l) grid.Causal.flow [] in*)
+        let label = label handler in 
+(*        let config = Causal.cut ids grid in *)
         let labels = A.make 1 (FICTITIOUS,"") in 
         let set =  
           Mods.IntMap.fold

@@ -165,15 +165,15 @@ let compress env state log_info step_list =
           let error,list = D.S.PH.forced_events parameter handler error blackboard in 
           let n_stories = List.length list in 
           let _ = Debug.tag ("\t - Causal flow computation ("^(string_of_int n_stories)^")") in 
-          let tick = 
-            if n_stories > 0 
-            then Mods.tick_stories n_stories (false,0,0) 
-            else (false,0,0)
-          in 
           let error,_,_,causal_story_array = 
             if old_version
             then 
               begin 
+                let tick = 
+                  if n_stories > 0 
+                  then Mods.tick_stories n_stories (false,0,0) 
+                  else (false,0,0)
+                in 
                 List.fold_left 
                   (fun (error,counter,tick,causal_story_array) (list_order,list_eid,info) -> 
                     let _ = 
@@ -219,6 +219,11 @@ let compress env state log_info step_list =
                    (List.rev_map (fun x -> (x,D.S.PH.B.PB.CI.Po.K.empty_side_effect)) (List.rev refined_event_list_without_pseudo_inverse)) (*result_wo_compression*) true handler in
                  let obs = grid.Causal.obs in 
                  let enriched_grid = Causal.enrich_grid grid in 
+                  let tick = 
+                  if n_stories > 0 
+                  then Mods.tick_stories n_stories (false,0,0) 
+                  else (false,0,0)
+                in 
                  List.fold_left 
                    (fun (error,counter,tick,causal_story_array) eid -> 
                      let _ = 
