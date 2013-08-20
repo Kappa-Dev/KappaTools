@@ -20,7 +20,7 @@
 
 module D = Dag.Dag 
 
-let old_version = true
+let old_version = false
 let log_step = true
 let debug_mode = false
 let dump_profiling_info = false

@@ -379,12 +379,13 @@ let dot_of_grid profiling fic enriched_grid state env =
 	(fun eid cflct_set ->
 		if eid = 0 then () 
 		else
-			let prec = try IntMap.find eid prec_star with Not_found -> IntSet.empty in
-			IntSet.iter
-			(fun eid' ->
-				if (eid' = 0) || (IntSet.mem eid' prec) then () 
-				else
-					fprintf desc "node_%d -> node_%d [style=dotted, arrowhead = tee] \n" eid eid'
+		  let prec = try IntMap.find eid prec_star with Not_found -> IntSet.empty in
+                  let cflct_set = IntSet.diff cflct_set prec in 
+		  IntSet.iter
+		    (fun eid' ->
+		      if (eid' = 0) (*|| (IntSet.mem eid' prec)*) then () 
+		      else
+			fprintf desc "node_%d -> node_%d [style=dotted, arrowhead = tee] \n" eid eid'
 			) cflct_set
 	) config.conflict ;
 	fprintf desc "}\n" ;
