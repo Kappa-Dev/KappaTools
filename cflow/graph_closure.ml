@@ -3,6 +3,7 @@ module S = Mods.IntSet
 module M = Mods.IntMap
 
 let swap f a b = f b a 
+let ignore_fst f = (fun _ -> f) 
 
 let rec compare_succ p l = 
   match l with 
@@ -178,6 +179,16 @@ let closure prec =
       prec 
       0 
   in 
+  let n_edges = 
+   M.fold 
+      (ignore_fst
+        (S.fold 
+          (ignore_fst succ)
+        ))
+      prec 0 
+  in 
+  let _ = Printf.fprintf stderr "Transitive closure (%i nodes, %i edges)\n" max_index n_edges in 
+  let _ = flush stderr in 
   let tick = 
     if max_index > 0 
     then Mods.tick_stories max_index (false,0,0) 
