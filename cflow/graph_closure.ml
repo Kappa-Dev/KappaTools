@@ -223,7 +223,7 @@ let closure prec =
 (*  let to_do = !l in *)
 (* 
   let rec aux tick to_do = *)
-  let tick = 
+  let _ = 
     M.fold 
       (fun succ s_pred  tick              -> 
         begin
@@ -250,13 +250,15 @@ let closure prec =
         end)
       prec tick 
   in 
+  s_pred_star 
+(*
   let m = ref M.empty in 
   let _ = 
     A.iteri 
-      (fun i s -> m:= M.add i (List.fold_left (swap S.add) S.empty s) (!m))
+      (fun i s -> m:= M.add i s (*(List.fold_left (swap S.add) S.empty s)*) (!m))
       s_pred_star
   in 
-  !m
+  !m*)
 
 (*
 let generate_triangle n = 

@@ -23,7 +23,7 @@ type enriched_grid =
       config:config;
       ids:(int * int * int) list ;
       depth:int;
-      prec_star: Mods.IntSet.t Mods.IntMap.t ;
+      prec_star: int list array ; (*decreasing*)
       depth_of_event: int Mods.IntMap.t ;
       size:int;
     }
@@ -379,14 +379,34 @@ let dot_of_grid profiling fic enriched_grid state env =
 	(fun eid cflct_set ->
 		if eid = 0 then () 
 		else
-		  let prec = try IntMap.find eid prec_star with Not_found -> IntSet.empty in
-                  let cflct_set = IntSet.diff cflct_set prec in 
-		  IntSet.iter
-		    (fun eid' ->
-		      if (eid' = 0) (*|| (IntSet.mem eid' prec)*) then () 
-		      else
-			fprintf desc "node_%d -> node_%d [style=dotted, arrowhead = tee] \n" eid eid'
-			) cflct_set
+		  let prec = try prec_star.(eid) with _ -> [] in 
+                  let _ = 
+                    IntSet.fold_inv 
+                      (fun eid' prec -> 
+                        let bool,prec = 
+                          let rec aux prec = 
+                            match 
+                              prec
+                            with 
+                            | []   -> false,prec
+                            | h::t -> 
+                              begin
+                                if h=eid'
+                                then true,t
+                                else if h>eid'
+                                then aux t
+                                else false,prec 
+                              end 
+                          in aux prec 
+                        in 
+                        let _ = 
+                          if bool then () 
+                        else 
+			    fprintf desc "node_%d -> node_%d [style=dotted, arrowhead = tee] \n" eid eid'
+                        in 
+                        prec
+		       ) cflct_set prec 
+                  in () 
 	) config.conflict ;
 	fprintf desc "}\n" ;
         fprintf desc "/*\n Dot generation time: %f\n*/" (Sys.time () -. t) ; 

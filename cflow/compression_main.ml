@@ -20,7 +20,7 @@
 
 module D = Dag.Dag 
 
-let old_version = false
+let old_version = true
 let log_step = true
 let debug_mode = false
 let dump_profiling_info = false
@@ -232,9 +232,9 @@ let compress env state log_info step_list =
                            Debug.tag ("\t\t * causal compression ")
                      in 
                      let log_info = D.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
-                     let event_id_list = Mods.IntSet.elements (Mods.IntSet.add eid (Mods.IntMap.find eid enriched_grid.Causal.prec_star)) in 
+                     let event_id_list_rev = (eid::(enriched_grid.Causal.prec_star.(eid))) in 
                      let event_id_list = 
-                       List.rev_map (fun x->x-1) (List.rev event_id_list) in 
+                       List.rev_map (fun x->x-1) (event_id_list_rev) in 
                      let error,event_list,result_wo_compression = D.S.translate parameter handler error blackboard event_id_list in 
                      let grid = D.S.PH.B.PB.CI.Po.K.build_grid result_wo_compression true handler in
                      let info = None in 
