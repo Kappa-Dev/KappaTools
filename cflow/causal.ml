@@ -303,9 +303,13 @@ let depth_and_size_of_event config =
 
 
 let enrich_grid grid = 
+  let keep_l = List.fold_left (fun a b -> IntSet.add b a) IntSet.empty grid.obs in 
+  let to_keep = 
+    (fun i -> IntSet.mem i keep_l)
+  in 
   let ids = ids_of_grid grid  in 
   let config = config_of_grid ids grid in 
-  let prec_star= prec_star_of_config config in
+  let prec_star= prec_star_of_config config to_keep in
   let depth_of_event,size,depth = depth_and_size_of_event config in  
   { 
     config = config ; 

@@ -20,7 +20,7 @@
 
 module D = Dag.Dag 
 
-let old_version = true
+let old_version = false
 let log_step = true
 let debug_mode = false
 let dump_profiling_info = false
@@ -179,7 +179,7 @@ let compress env state log_info step_list =
                     let _ = 
                       if debug_mode
                       then 
-                    Debug.tag ("\t\t * causal compression "^(string_of_int (List.length list_eid)))
+                        Debug.tag ("\t\t * causal compression "^(string_of_int (List.length list_eid))) 
                     in 
                     let log_info = D.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
                     let error,log_info,event_id_list = D.S.detect_independent_events parameter handler error log_info blackboard list_eid in 
@@ -216,28 +216,29 @@ let compress env state log_info step_list =
                  in 
                  let log_info = D.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
                  let grid = D.S.PH.B.PB.CI.Po.K.build_grid 
-                   (List.rev_map (fun x -> (x,D.S.PH.B.PB.CI.Po.K.empty_side_effect)) (List.rev refined_event_list_without_pseudo_inverse)) (*result_wo_compression*) true handler in
-                 let obs = grid.Causal.obs in 
+                   (List.rev_map (fun x -> (x,D.S.PH.B.PB.CI.Po.K.empty_side_effect)) (List.rev refined_event_list_without_pseudo_inverse)) true handler in
                  let enriched_grid = Causal.enrich_grid grid in 
-                  let tick = 
+                 let tick = 
                   if n_stories > 0 
                   then Mods.tick_stories n_stories (false,0,0) 
                   else (false,0,0)
                 in 
                  List.fold_left 
-                   (fun (error,counter,tick,causal_story_array) eid -> 
+                   (fun (error,counter,tick,causal_story_array) (list_order,list_eid,info) -> 
                      let _ = 
-                         if debug_mode
-                         then 
-                           Debug.tag ("\t\t * causal compression ")
+                      if debug_mode
+                      then 
+                        Debug.tag ("\t\t * causal compression ")
+                     in 
+                     let eid = 
+                       match list_eid with [a] -> a 
+                       | _ -> raise Exit
                      in 
                      let log_info = D.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
-                     let event_id_list_rev = (eid::(enriched_grid.Causal.prec_star.(eid))) in 
-                     let event_id_list = 
-                       List.rev_map (fun x->x-1) (event_id_list_rev) in 
+                     let event_id_list_rev = ((eid+1)::(enriched_grid.Causal.prec_star.(eid+1))) in 
+                     let event_id_list = List.rev_map pred (event_id_list_rev) in 
                      let error,event_list,result_wo_compression = D.S.translate parameter handler error blackboard event_id_list in 
                      let grid = D.S.PH.B.PB.CI.Po.K.build_grid result_wo_compression true handler in
-                     let info = None in 
                      let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
                      let error,graph = D.graph_of_grid parameter handler error grid in 
                      let error,prehash = D.prehash parameter handler error graph in 
@@ -255,11 +256,11 @@ let compress env state log_info step_list =
                            Some info
                      in 
                      let tick = Mods.tick_stories n_stories tick in 
-                     let causal_story_array = (prehash,[grid,graph,None,([],[],event_list),[],[info]])::causal_story_array in 
+                     let causal_story_array = (prehash,[grid,graph,None,(event_id_list,list_order,event_list),[],[info]])::causal_story_array in 
                      error,counter+1,tick,causal_story_array
                    )
                    (error,1,tick,[]) 
-                   (List.rev obs)
+                   (List.rev list)
                end
           in 
           let error,causal_story_array = 

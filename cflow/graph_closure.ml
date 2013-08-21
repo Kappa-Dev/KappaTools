@@ -2,6 +2,29 @@ module A = Array (*LargeArray.GenArray*)
 module S = Mods.IntSet 
 module M = Mods.IntMap
 
+let enable_gc = false
+let stat_trans_closure_for_big_graphs = true
+
+let create_gc = 
+  if enable_gc 
+  then 
+    let create p n clean = 
+      let n_succ = A.create n 0 in 
+      let add n = A.set n_succ n (succ (A.get n_succ n)) in 
+      let sub n = 
+        let x = pred (A.get n_succ n) in 
+        let _ = 
+          if x=0 && not (p n)
+          then 
+            clean x 
+        in 
+        A.set n_succ n x 
+      in add,sub
+    in create 
+  else 
+    let create _ _ _ = (fun _ -> ()),(fun _ -> ())
+    in create 
+
 let swap f a b = f b a 
 let ignore_fst f = (fun _ -> f) 
 
@@ -82,161 +105,56 @@ let compare_bool a b = compare a b < 0
 let diff_list_decreasing =  diff_list (swap compare_bool)
 let merge_list_decreasing = merge_list (swap compare_bool)
       
-let closure_old prec = 
+let closure prec to_keep = 
   let max_index = 
     M.fold 
       (fun i _ -> max i)
       prec 
       0 
   in 
-  let tick = 
-    if max_index > 0 
-    then Mods.tick_stories max_index (false,0,0) 
-    else (false,0,0)
-  in 
-  let n_pred = A.create (max_index+1) 0 in 
-  let l_succ = A.create (max_index+1) S.empty in 
-  let l_pred = A.create (max_index+1) S.empty in 
-  let s_pred_star = A.create (max_index+1) S.empty in 
-  let add (pred:int) (succ:int) = 
-    let _ = A.set l_succ pred (S.add succ (A.get l_succ pred )) in 
-    let _ = A.set n_pred succ (1+(A.get n_pred succ)) in 
-    ()
-  in 
-  let remove pred succ to_do = 
-    let k = (A.get n_pred succ)-1 in 
-    let _ = A.set n_pred succ k in 
-    if k = 0 
+  let _ = 
+    if stat_trans_closure_for_big_graphs && max_index > 300 
     then 
-      S.add succ to_do 
+      let n_edges = 
+        M.fold 
+          (ignore_fst
+             (S.fold 
+                (ignore_fst succ)
+             ))
+          prec 0 
+      in let _ = Debug.tag ("Transitive closure ("^(string_of_int max_index)^" nodes, "^(string_of_int n_edges)^" edges\n") in 
+         let _ = flush stderr in 
+         ()
+    else ()
+  in 
+  let do_tick,tick = 
+    if max_index > 300 
+    then 
+      let tick = Mods.tick_stories max_index (false,0,0) in 
+      let f = Mods.tick_stories max_index in 
+      f,tick 
     else 
-      to_do 
+      (fun x -> x),(false,0,0)
   in 
-  let _ = 
-    M.iter  
-      (fun succ s_pred -> 
-        let l = s_pred in 
-        let _ = A.set l_pred succ l in 
-        S.iter 
-          (fun pred -> add pred succ)
-          s_pred  
-      )
-      prec 
-  in 
-  let l = ref S.empty in 
-  let _  = 
-    A.iteri  
-      (fun i n  -> 
-        if n=0 then l:= S.add i (!l))
-      n_pred 
-  in 
-  let to_do = !l in 
-  let rec aux tick to_do = 
-    if S.is_empty to_do
-    then s_pred_star
-    else 
-      let succ,to_do = S.destruct_min to_do in 
-      begin
-        let pred_star = 
-          let rec aux l accu = 
-            if S.is_empty l 
-            then accu 
-            else 
-              let pred,t = S.destruct_max l in 
-              let new_l = A.get s_pred_star pred in 
-              let l' = S.diff t new_l in 
-              aux l'
-                (S.add pred (S.union new_l accu))
-          in 
-          aux ((A.get l_pred succ)) S.empty
-        in 
-        let _ = 
-          A.set s_pred_star succ pred_star 
-        in 
-        let tick = Mods.tick_stories max_index tick in 
-        let to_do = 
-          S.fold 
-            (remove succ)
-            (A.get l_succ succ)
-            to_do 
-        in 
-        aux tick to_do 
-      end 
-  in 
-  let t = aux tick to_do in 
-  let m = ref M.empty in 
-  let _ = 
-    A.iteri 
-      (fun i s -> m:= M.add i s (*(S.fold_inv S.add s  S.empty)*) (!m))
-      t
-  in 
-  !m
-
-let closure prec = 
-  let max_index = 
-    M.fold 
-      (fun i _ -> max i)
-      prec 
-      0 
-  in 
-  let n_edges = 
-   M.fold 
-      (ignore_fst
-        (S.fold 
-          (ignore_fst succ)
-        ))
-      prec 0 
-  in 
-  let _ = Printf.fprintf stderr "Transitive closure (%i nodes, %i edges)\n" max_index n_edges in 
-  let _ = flush stderr in 
-  let tick = 
-    if max_index > 0 
-    then Mods.tick_stories max_index (false,0,0) 
-    else (false,0,0)
-  in 
-(*  let n_pred = A.create (max_index+1) 0 in *)
-(*  let l_succ = A.create (max_index+1) S.empty in *)
   let l_pred = A.create (max_index+1) S.empty in 
   let s_pred_star = A.create (max_index+1) [] in 
-(*  let add (pred:int) (succ:int) = 
-    let _ = A.set l_succ pred (S.add succ (A.get l_succ pred )) in 
-    let _ = A.set n_pred succ (1+(A.get n_pred succ)) in 
-    ()
-  in*) 
-(*  let remove pred succ to_do = 
-    let k = (A.get n_pred succ)-1 in 
-    let _ = A.set n_pred succ k in 
-    if k = 0 
-    then 
-      S.add succ to_do 
-    else 
-      to_do 
-  in *)
+  let add_succ,remove_succ = 
+    create_gc to_keep (succ max_index) (fun i -> A.set s_pred_star i [])
+  in 
   let _ = 
     M.iter  
       (fun succ s_pred -> 
-        let l = s_pred in 
+        let l = s_pred in           
         let _ = A.set l_pred succ l in 
-     (*   S.iter 
-          (fun pred -> add pred succ)
-          s_pred  *)
-        ()
+        S.iter 
+          (fun pred -> add_succ pred)
+          s_pred 
       )
       prec 
   in
-(*  let l = ref S.empty in 
-  let _  = 
-    A.iteri  
-      (fun i n  -> 
-        if n=0 then l:= S.add i (!l))
-      n_pred 
-  in *)
-(*  let to_do = !l in *)
-(* 
-  let rec aux tick to_do = *)
   let _ = 
     M.fold 
-      (fun succ s_pred  tick              -> 
+      (fun succ s_pred  tick -> 
         begin
           let pred_star = 
             let l_pred = S.fold (fun i j -> i::j) s_pred [] in 
@@ -245,6 +163,7 @@ let closure prec =
               | [] -> accu 
               | pred::t -> 
                 let new_l = A.get s_pred_star pred in 
+                let _ = remove_succ pred in 
                 aux 
                   (diff_list_decreasing t new_l) 
                   (merge_list_decreasing (pred::new_l) accu)
@@ -256,20 +175,12 @@ let closure prec =
           let _ = 
             A.set s_pred_star succ pred_star 
           in 
-          let tick = Mods.tick_stories max_index tick in 
+          let tick = do_tick tick in 
           tick           
         end)
       prec tick 
   in 
   s_pred_star 
-(*
-  let m = ref M.empty in 
-  let _ = 
-    A.iteri 
-      (fun i s -> m:= M.add i s (*(List.fold_left (swap S.add) S.empty s)*) (!m))
-      s_pred_star
-  in 
-  !m*)
 
 (*
 let generate_triangle n = 

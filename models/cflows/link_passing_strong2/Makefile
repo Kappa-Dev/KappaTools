@@ -34,10 +34,14 @@ $(TMP):
 $(SCRIPT): README
 	@sed "s/expected-output/tmp/g" $< > $@
 
+$(TMP)/log.error: $(TMP)/LOG 
+	@grep fail $< > $@ &> /dev/null
+
 test: 
 	@make clean > /dev/null
 	@make $(TMP) > /dev/null
-	@make launch_script 
+	@make launch_script >> $(TMP)/LOG 2>&1
+	@make $(TMP)/log.error 
 	@make do_copy > /dev/null
 	@make do_diff > /dev/null
 	@make error > /dev/null
@@ -59,7 +63,7 @@ $(EXPECTED_OUTPUT_PATH)/%.ref: $(EXPECTED_OUTPUT_PATH)/%
 	@if (test -s $(EXPECTED_OUTPUT_PATH)/$*) then (sed '\generation\d' $(EXPECTED_OUTPUT_PATH)/$*.dot $@) else (touch $@) fi;                                    
 
 %.dot: 
-	@touch $@
+	touch $@
 
 %.diff:  %.ref %.new
 	@diff $^  > $@ || exit 0 
@@ -95,7 +99,7 @@ clean_all:
 pdf: $(PDF)
 
 %.pdf: %.dot
-	dot -Tpdf $< -o $@
+	@dot -Tpdf $< -o $@
 .phony help:
 	@echo 'make help:      this help'
 	@echo 'make build:     launch KaSim and store the result as a reference'

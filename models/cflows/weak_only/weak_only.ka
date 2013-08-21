@@ -37,5 +37,5 @@
 %mod: [T]>20 do ($TRACK 'Cpp' [true] ; $UPDATE 'cflow' 'Cpp')
 %mod: ('Cpp' - 'cflow' > 9 && 'cflow' >0) do $TRACK 'Cpp' [false]
 
-%def: "displayCompression" "weak" 
+%def: "displayCompression" "weak" "none"
 %def: "showIntroEvents" "true"
