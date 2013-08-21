@@ -2,8 +2,9 @@ module A = Array (*LargeArray.GenArray*)
 module S = Mods.IntSet 
 module M = Mods.IntMap
 
-let enable_gc = false
+let enable_gc = true
 let stat_trans_closure_for_big_graphs = true
+let cut_transitive_path = true
 
 let create_gc = 
   if enable_gc 
@@ -122,10 +123,12 @@ let closure prec to_keep =
                 (ignore_fst succ)
              ))
           prec 0 
-      in let _ = Debug.tag ("Transitive closure ("^(string_of_int max_index)^" nodes, "^(string_of_int n_edges)^" edges\n") in 
-         let _ = flush stderr in 
-         ()
-    else ()
+      in 
+      let _ = Debug.tag ("\t\tTransitive closure ("^(string_of_int max_index)^" nodes, "^(string_of_int n_edges)^" edges)") in 
+      let _ = flush stderr in 
+      ()
+    else 
+      ()
   in 
   let do_tick,tick = 
     if max_index > 300 
@@ -136,22 +139,42 @@ let closure prec to_keep =
     else 
       (fun x -> x),(false,0,0)
   in 
-  let l_pred = A.create (max_index+1) S.empty in 
   let s_pred_star = A.create (max_index+1) [] in 
-  let add_succ,remove_succ = 
-    create_gc to_keep (succ max_index) (fun i -> A.set s_pred_star i [])
+  let clean = 
+    if enable_gc 
+    then 
+      let max_succ = A.create (max_index+1) 0 in 
+      let _ = 
+        M.iter
+          (fun succ -> 
+            S.iter 
+              (fun pred -> 
+                A.set max_succ pred (max succ (A.get max_succ pred))))
+          prec
+      in 
+      let is_last_succ_of = A.create (max_index+1) [] in 
+      let add node max_succ = 
+        if not (to_keep node)
+        then 
+          let old_l = A.get is_last_succ_of max_succ in 
+          let l' = node::old_l in 
+          A.set is_last_succ_of max_succ l'
+      in 
+      let _ = 
+        A.iteri 
+          add 
+          max_succ 
+      in 
+      let _ = A.set is_last_succ_of 0 [] in 
+      let gc_when_visit node = 
+        List.iter 
+          (fun k -> A.set s_pred_star k [])
+          (A.get is_last_succ_of node)
+      in 
+      gc_when_visit
+    else  
+      (fun _ -> ())
   in 
-  let _ = 
-    M.iter  
-      (fun succ s_pred -> 
-        let l = s_pred in           
-        let _ = A.set l_pred succ l in 
-        S.iter 
-          (fun pred -> add_succ pred)
-          s_pred 
-      )
-      prec 
-  in
   let _ = 
     M.fold 
       (fun succ s_pred  tick -> 
@@ -163,9 +186,15 @@ let closure prec to_keep =
               | [] -> accu 
               | pred::t -> 
                 let new_l = A.get s_pred_star pred in 
-                let _ = remove_succ pred in 
+                let diff = 
+                  if cut_transitive_path 
+                  then 
+                    diff_list_decreasing t new_l 
+                  else 
+                    t 
+                in 
                 aux 
-                  (diff_list_decreasing t new_l) 
+                  diff
                   (merge_list_decreasing (pred::new_l) accu)
             in 
             aux 
@@ -174,7 +203,8 @@ let closure prec to_keep =
           in 
           let _ = 
             A.set s_pred_star succ pred_star 
-          in 
+          in
+          let _ = clean succ in 
           let tick = do_tick tick in 
           tick           
         end)
@@ -182,8 +212,8 @@ let closure prec to_keep =
   in 
   s_pred_star 
 
-(*
-let generate_triangle n = 
+
+(*let generate_triangle n = 
 let rec aux k set map =       
   if k > n 
   then map 
@@ -198,7 +228,6 @@ in aux 1 S.empty M.empty
 let t = generate_triangle 10000
 let _ = Printf.fprintf stderr "generated\n"
 let _ = flush stderr 
-let _ = closure t
-let _ = Printf.fprintf stderr "OK\n" 
+let _ = closure t (fun x -> x - (x/100)*100 = 0) 
 let _ = flush stderr 
 *)
