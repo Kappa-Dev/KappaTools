@@ -218,6 +218,11 @@ let compress env state log_info step_list =
                  let grid = D.S.PH.B.PB.CI.Po.K.build_grid 
                    (List.rev_map (fun x -> (x,D.S.PH.B.PB.CI.Po.K.empty_side_effect)) (List.rev refined_event_list_without_pseudo_inverse)) true handler in
                  let enriched_grid = Causal.enrich_grid grid in 
+                 let _ = 
+                   if (*true*) false 
+                   then 
+                     Causal.print_stat parameter handler enriched_grid 
+                 in 
                  let tick = 
                   if n_stories > 0 
                   then Mods.tick_stories n_stories (false,0,0) 
@@ -237,11 +242,16 @@ let compress env state log_info step_list =
                      let log_info = D.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
                      let event_id_list_rev = ((eid+1)::(enriched_grid.Causal.prec_star.(eid+1))) in 
                      let event_id_list = List.rev_map pred (event_id_list_rev) in 
+(*                     let config = Causal.subconfig enriched_grid.Causal.config (List.rev event_id_list_rev) in *)
+
                      let error,event_list,result_wo_compression = D.S.translate parameter handler error blackboard event_id_list in 
                      let grid = D.S.PH.B.PB.CI.Po.K.build_grid result_wo_compression true handler in
                      let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
                      let error,graph = D.graph_of_grid parameter handler error grid in 
-                     let error,prehash = D.prehash parameter handler error graph in 
+      (*               let error,graph(*2*) = D.graph_of_config parameter handler error config in *)
+                     (*let _ = D.print_graph parameter handler error graph in 
+                     let _ = D.print_graph parameter handler error graph2 in *)
+               let error,prehash = D.prehash parameter handler error graph in 
                      let log_info = D.S.PH.B.PB.CI.Po.K.P.set_canonicalisation log_info in 
                      let info = 
                          match info 

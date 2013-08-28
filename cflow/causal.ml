@@ -33,6 +33,55 @@ let is i c = (i land c = i)
 
 let empty_grid () = {flow = Hashtbl.create !Parameter.defaultExtArraySize ; obs = [] }
 
+
+
+let build_subs l = 
+  snd 
+    (  List.fold_left 
+         (fun (n,map) a -> 
+           let n=n+1 in 
+           (n,IntMap.add a n map))
+         (0,IntMap.empty) 
+         l)
+
+let submap subs l m default = 
+  List.fold_left 
+    (fun m' a -> 
+      let new_a = IntMap.find a subs in 
+      IntMap.add new_a (
+      try 
+        IntMap.find a m
+      with 
+      | Not_found -> 
+        begin 
+          match default with None -> raise Not_found | Some a -> a
+        end 
+     ) m')
+    IntMap.empty l 
+
+let subset subs l s = 
+  List.fold_left 
+    (fun s' a -> if IntSet.mem a s then IntSet.add (IntMap.find a subs) s' else s')
+    IntSet.empty l 
+
+let subconfig_with_subs subs config l = 
+  {events = submap subs l config.events None ;
+   prec_1 = submap subs l config.prec_1 (Some IntSet.empty);
+   conflict = submap subs l config.conflict (Some IntSet.empty);
+   top = subset subs l config.top}
+let subenriched_grid_with_subs subs  grid l = 
+  let depth_of_event = submap subs  l grid.depth_of_event (Some 0) in 
+  let depth = IntMap.fold (fun _ -> max) depth_of_event 0 in 
+  {grid with 
+    config = subconfig_with_subs subs  grid.config l ;
+    depth_of_event = depth_of_event ;
+    depth = depth ;
+      size = List.length l ;
+  }
+
+let subconfig config l = subconfig_with_subs (build_subs l) config l 
+let subenriched_grid grid l = subenriched_grid_with_subs (build_subs l) grid l
+
 let add_obs_eid eid grid = {grid with obs = eid::(grid.obs)}
 
 let grid_find (node_id,site_id,quark) grid = Hashtbl.find grid.flow (node_id,site_id,quark)
@@ -479,3 +528,20 @@ let pretty_print compression_type label story_list state env =
   let _ = close_out desc in 
   ()
 	  
+let print_stat parameter handler enriched_grid = 
+  let size = Array.length enriched_grid.prec_star  in 
+  let rec aux k n_step longest_story n_nonempty length_sum length_square_sum = 
+    if k>=size 
+    then (n_step,longest_story,n_nonempty,length_sum,length_square_sum)
+    else 
+      let cc = List.length (Array.get enriched_grid.prec_star k) in
+      aux 
+        (k+1) 
+        (n_step+1)
+        (max longest_story cc)
+        (if cc>0 then n_nonempty+1 else n_nonempty)
+        (length_sum+cc)
+        (length_square_sum+cc*cc)
+  in 
+  let n_step,longest_story,n_nonempty,length_sum,length_square_sum = aux 0 0 0 0 0 0 in 
+  Printf.fprintf stderr "Stats:\n number of step   : %i \n number of stories: %i \n longest story    : %i \n average length   : %f \n geometric mean   : %f \n\n"   n_step n_nonempty longest_story ((float_of_int length_sum)/.(float_of_int n_nonempty)) (sqrt ((float_of_int length_square_sum)/.(float_of_int n_nonempty)))
