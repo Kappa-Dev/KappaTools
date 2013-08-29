@@ -544,4 +544,12 @@ let print_stat parameter handler enriched_grid =
         (length_square_sum+cc*cc)
   in 
   let n_step,longest_story,n_nonempty,length_sum,length_square_sum = aux 0 0 0 0 0 0 in 
-  Printf.fprintf stderr "Stats:\n number of step   : %i \n number of stories: %i \n longest story    : %i \n average length   : %f \n geometric mean   : %f \n\n"   n_step n_nonempty longest_story ((float_of_int length_sum)/.(float_of_int n_nonempty)) (sqrt ((float_of_int length_square_sum)/.(float_of_int n_nonempty)))
+  let _ = Debug.tag "" in 
+  let _ = Debug.tag "Stats:" in 
+  let _ = Debug.tag (" number of step   : "^(string_of_int n_step)) in 
+  let _ = Debug.tag (" number of stories: "^(string_of_int n_nonempty)) in 
+  let _ = Debug.tag (" longest story    : "^(string_of_int longest_story)) in 
+  let _ = Debug.tag (" average length   : "^(string_of_float ((float_of_int length_sum)/.(float_of_int n_nonempty)))) in 
+  let _ = Debug.tag (" geometric mean   : "^(string_of_float (sqrt ((float_of_int length_square_sum)/.(float_of_int n_nonempty))))) in 
+  let _ = Debug.tag "" in 
+  ()
