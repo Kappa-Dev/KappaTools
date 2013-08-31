@@ -1,0 +1,6 @@
+#Command-line:
+KaSim -i binding_type.ka -seed 924556145 -e 10000 -d expected-output || exit 0 
+
+#In this model, intermediary steps test binding types. 
+
+#KaSim will fails if binding types are translated in a wrong way. 
