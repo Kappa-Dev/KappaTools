@@ -549,7 +549,7 @@ module Cflow_linker =
 			    | Node.WLD -> ANY
 			    | Node.FREE -> FREE
 			    | Node.BND -> BOUND
-			    | Node.TYPE(agent_name,site_name) -> BOUND_TYPE(agent_name,site_name)
+			    | Node.TYPE(site_name,agent_name) -> BOUND_TYPE(agent_name,site_name)
 		      with 
 			  Not_found -> ANY
 		  end 
@@ -626,7 +626,7 @@ module Cflow_linker =
 		   | Node.WLD -> list 
 		   | Node.FREE -> Is_Free(site)::list 
 		   | Node.BND -> Is_Bound(site)::list 
-		   | Node.TYPE(agent_name,site_name) -> Has_Binding_type(site,(agent_name,site_name))::list
+		   | Node.TYPE(site_name,agent_name) -> Has_Binding_type(site,(agent_name,site_name))::list
 		 in 
 		 refine_bound_state parameter handler error site list list' fake_id lhs embedding 
 	     )

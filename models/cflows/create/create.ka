@@ -1,4 +1,4 @@
-%def: "displayCompression" "weak" "strong" 
+%def: "displayCompression" "weak" "strong" "none" 
 %def: "showIntroEvents" "true" 
 
 A(x),A(y) -> A(x!1),A(y!1) @0.001
