@@ -33,6 +33,8 @@ let emacsMode = ref false
   (* Cut concurrent events (for the current observale) before generating the blackboard *)
   let do_local_cut = true
 
+  (* Cut separable components *)
+  let do_detect_separable_components = true
    
   (** Propagation heuristics **)
   (* Whenever we do not know whether an event has to be selected or, not, check whether this is not the last one that can parform a requested action *)

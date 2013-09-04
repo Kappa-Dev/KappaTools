@@ -33,6 +33,8 @@ let th_of_int n =
     | 3 -> (string_of_int n)^"rd"
     | _ -> (string_of_int n)^"th"
 
+let dummy_weak = false,[]
+
 let compress env state log_info step_list =  
   let parameter = D.S.PH.B.PB.CI.Po.K.H.build_parameter () in 
   let mode = parameter.D.S.PH.B.PB.CI.Po.K.H.compression_mode in 
@@ -131,17 +133,27 @@ let compress env state log_info step_list =
                   then 
                     let _ = 
                       List.iter 
-                        (fun x -> 
-                          let _ = D.S.PH.B.PB.CI.Po.K.print_refined_step parameter handler error x in ()) 
+                        (fun (x,(bool,l)) -> 
+                          let _ = D.S.PH.B.PB.CI.Po.K.print_refined_step parameter handler error x in 
+                          let _ = 
+                            if bool 
+                            then 
+                              let _ = Printf.fprintf stderr "Weak event \n" in
+                              let _ = List.iter (Printf.fprintf stderr "%i ") l in 
+                              let _ = Printf.fprintf stderr "\n" in 
+                              ()
+                            
+                          in 
+                          ()) 
                         refined_event_list_without_pseudo_inverse
                     in flush parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err
                 in 
                 refined_event_list_without_pseudo_inverse,int_pseudo_inverse 
               end
             else 
-              refined_event_list_cut,0 
+              List.rev_map (fun x -> x,dummy_weak) (List.rev refined_event_list_cut),0 
           in 
-          let error,log_info,blackboard = D.S.PH.B.import parameter handler error log_info refined_event_list_without_pseudo_inverse in 
+          let error,log_info,blackboard = D.S.PH.B.import parameter handler error log_info (List.rev_map fst (List.rev refined_event_list_without_pseudo_inverse)) in 
           let _ = 
             if log_step 
             then 
@@ -164,8 +176,7 @@ let compress env state log_info step_list =
           in  
           let error,list = D.S.PH.forced_events parameter handler error blackboard in 
           let n_stories = List.length list in 
-          let _ = Debug.tag ("\t - Causal flow computation ("^(string_of_int n_stories)^")") in 
-          let error,_,_,causal_story_array = 
+          let _ = Debug.tag ("\t - Causal flow computation ("^(string_of_int n_stories)^")") in           let error,_,_,causal_story_array = 
             if old_version
             then 
               begin 
@@ -184,7 +195,7 @@ let compress env state log_info step_list =
                     let log_info = D.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
                     let error,log_info,event_id_list = D.S.detect_independent_events parameter handler error log_info blackboard list_eid in 
                     let error,event_list,result_wo_compression = D.S.translate parameter handler error blackboard event_id_list in 
-                    let grid = D.S.PH.B.PB.CI.Po.K.build_grid result_wo_compression true handler in
+                    let grid = D.S.PH.B.PB.CI.Po.K.build_grid (List.rev_map (fun (x,y) -> x,y,dummy_weak) (List.rev result_wo_compression)) true handler in
                     let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
                     let error,graph = D.graph_of_grid parameter handler error grid in 
                     let error,prehash = D.prehash parameter handler error graph in 
@@ -215,11 +226,17 @@ let compress env state log_info step_list =
                      Debug.tag ("\t\t * causal compression ")
                  in 
                  let log_info = D.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
-                 let grid = D.S.PH.B.PB.CI.Po.K.build_grid 
-                   (List.rev_map (fun x -> (x,D.S.PH.B.PB.CI.Po.K.empty_side_effect)) (List.rev refined_event_list_without_pseudo_inverse)) true handler in
+                 let refined_list = 
+                   if Parameter.do_detect_separable_components 
+                   then 
+                     (List.rev_map (fun (x,bool) -> (x,D.S.PH.B.PB.CI.Po.K.empty_side_effect,bool)) (List.rev refined_event_list_without_pseudo_inverse))
+                   else 
+                     (List.rev_map (fun (x,_) -> (x,D.S.PH.B.PB.CI.Po.K.empty_side_effect,dummy_weak)) (List.rev refined_event_list_without_pseudo_inverse))
+                 in 
+                 let grid = D.S.PH.B.PB.CI.Po.K.build_grid refined_list true handler in
                  let enriched_grid = Causal.enrich_grid grid in 
                  let _ = 
-                   if (*true*) false 
+                   if true (*false *)
                    then 
                      Causal.print_stat parameter handler enriched_grid 
                  in 
@@ -243,15 +260,14 @@ let compress env state log_info step_list =
                      let event_id_list_rev = ((eid+1)::(enriched_grid.Causal.prec_star.(eid+1))) in 
                      let event_id_list = List.rev_map pred (event_id_list_rev) in 
 (*                     let config = Causal.subconfig enriched_grid.Causal.config (List.rev event_id_list_rev) in *)
-
                      let error,event_list,result_wo_compression = D.S.translate parameter handler error blackboard event_id_list in 
-                     let grid = D.S.PH.B.PB.CI.Po.K.build_grid result_wo_compression true handler in
+                     let grid = D.S.PH.B.PB.CI.Po.K.build_grid (List.rev_map (fun (x,y) -> (x,y,(false,[]))) (List.rev result_wo_compression)) true handler in
                      let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
                      let error,graph = D.graph_of_grid parameter handler error grid in 
       (*               let error,graph(*2*) = D.graph_of_config parameter handler error config in *)
                      (*let _ = D.print_graph parameter handler error graph in 
                      let _ = D.print_graph parameter handler error graph2 in *)
-               let error,prehash = D.prehash parameter handler error graph in 
+                     let error,prehash = D.prehash parameter handler error graph in 
                      let log_info = D.S.PH.B.PB.CI.Po.K.P.set_canonicalisation log_info in 
                      let info = 
                          match info 
@@ -345,7 +361,7 @@ let compress env state log_info step_list =
                                 then 
                                   let weak_event_list = D.S.translate_result list in 
                                   let error,weak_event_list = D.S.PH.B.PB.CI.Po.K.clean_events parameter handler error weak_event_list in 
-                                  let grid = D.S.PH.B.PB.CI.Po.K.build_grid list false handler in
+                                  let grid = D.S.PH.B.PB.CI.Po.K.build_grid (List.rev_map (fun (x,y) -> x,y,dummy_weak) (List.rev list)) false handler in
                                   let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
                                   let error,graph = D.graph_of_grid parameter handler error grid in 
                                   let error,prehash = D.prehash parameter handler error graph in 
@@ -450,7 +466,7 @@ let compress env state log_info step_list =
                               | None -> 
                                 error,strong_compression_faillure+1,strongly_compressed_story_array,None
                               | Some list -> 
-                                let grid = D.S.PH.B.PB.CI.Po.K.build_grid list false handler in
+                                let grid = D.S.PH.B.PB.CI.Po.K.build_grid (List.rev_map (fun (x,y) -> (x,y,dummy_weak)) (List.rev list)) false handler in
                                 let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
                                 let error,graph = D.graph_of_grid parameter handler error grid in 
                                 let error,prehash = D.prehash parameter handler error graph in 

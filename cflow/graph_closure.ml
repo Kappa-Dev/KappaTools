@@ -5,6 +5,7 @@ module M = Mods.IntMap
 let enable_gc = true
 let stat_trans_closure_for_big_graphs = true
 let cut_transitive_path = true
+let detect_separable_components = Parameter.do_detect_separable_components 
 
 let create_gc = 
   if enable_gc 
@@ -89,6 +90,17 @@ let merge_list p a b =
       | h::t,h'::t' -> aux a t' (h'::accu)
   in aux a b []
 
+let is_sublist p a b = 
+  let rec aux a b = 
+    match a,b 
+    with 
+    | l,[] -> false 
+    | [],l -> true 
+    | h::t,h'::t' when h=h' -> aux t t' 
+    | h::t,h'::t' when p h h' -> false 
+    | h::t,h'::t' -> aux a t' 
+  in aux a b 
+
 let insert_elt p e = merge_list p [e]
   
 let diff_list p a b = 
@@ -105,8 +117,11 @@ let diff_list p a b =
 let compare_bool a b = compare a b < 0 
 let diff_list_decreasing =  diff_list (swap compare_bool)
 let merge_list_decreasing = merge_list (swap compare_bool)
+(*let is_sublist_decreasing = is_sublist (swap compare_bool)*)
+
+(* TO DO: deal with created agents in the optimization *) 
       
-let closure prec to_keep = 
+let closure prec to_keep weak_events init  = 
   let max_index = 
     M.fold 
       (fun i _ -> max i)
@@ -139,70 +154,158 @@ let closure prec to_keep =
     else 
       (fun x -> x),(false,0,0)
   in 
-  let s_pred_star = A.create (max_index+1) [] in 
-  let clean = 
-    if enable_gc 
+  let s_pred_star = A.create (max_index+1) ([],0) in 
+  let clean,max_succ,set_succ,redirect,subs  = 
+    if enable_gc or detect_separable_components 
     then 
-      let max_succ = A.create (max_index+1) 0 in 
-      let _ = 
-        M.iter
-          (fun succ -> 
-            S.iter 
-              (fun pred -> 
-                A.set max_succ pred (max succ (A.get max_succ pred))))
-          prec
-      in 
-      let is_last_succ_of = A.create (max_index+1) [] in 
-      let add node max_succ = 
-        if not (to_keep node)
-        then 
-          let old_l = A.get is_last_succ_of max_succ in 
-          let l' = node::old_l in 
-          A.set is_last_succ_of max_succ l'
-      in 
-      let _ = 
-        A.iteri 
-          add 
-          max_succ 
-      in 
-      let _ = A.set is_last_succ_of 0 [] in 
-      let gc_when_visit node = 
-        List.iter 
-          (fun k -> A.set s_pred_star k [])
-          (A.get is_last_succ_of node)
-      in 
-      gc_when_visit
+      begin 
+        let max_succ = A.create (max_index+1) 0 in 
+        let set_succ = A.create (max_index+1) S.empty in 
+        let redirect_tab = A.create (max_index+1) None in 
+        let redirect i j = 
+          A.set redirect_tab i (Some j) in 
+        let subs i = 
+          match 
+            A.get redirect_tab i 
+          with 
+            None -> [i]
+          | Some j -> j 
+        in 
+        let _ = 
+          M.iter
+            (fun succ -> 
+              S.iter 
+                (fun pred -> 
+                  let _ = A.set max_succ pred (max succ (A.get max_succ pred)) in 
+                  let _ = A.set set_succ pred (S.add succ (A.get set_succ pred)) in  ()))
+            prec
+        in 
+        
+        let is_last_succ_of = A.create (max_index+1) [] in 
+        
+        let add node max_succ = 
+          if not (to_keep node)
+          then 
+            let old_l = A.get is_last_succ_of max_succ in 
+            let l' = node::old_l in 
+            A.set is_last_succ_of max_succ l'
+        in 
+        let _ = 
+          A.iteri 
+            add 
+            max_succ 
+        in 
+        let _ = A.set is_last_succ_of 0 [] in 
+        let gc_when_visit node = 
+          List.iter 
+            (fun k -> A.set s_pred_star k ([],0))
+            (A.get is_last_succ_of node)
+        in 
+        let gc_when_visit = 
+          if enable_gc 
+          then gc_when_visit 
+          else (fun _ -> ())
+        in 
+        let set_succ,redirect,subs = 
+          if detect_separable_components 
+          then 
+            (fun i -> A.get set_succ i),
+            redirect,
+            subs
+          else 
+            (fun _ -> S.empty),
+            (fun _ _ -> ()),
+            (fun i -> [i])
+        in 
+        gc_when_visit,
+        (fun i -> A.get max_succ i),
+        set_succ,
+        redirect,
+        subs
+      end 
     else  
-      (fun _ -> ())
+      (fun _ -> ()),
+      (fun _ -> (max_index+1)),
+      (fun _ -> S.empty),
+      (fun _ _ -> ()),(fun i -> [i])
   in 
   let _ = 
     M.fold 
       (fun succ s_pred  tick -> 
         begin
-          let pred_star = 
+          let pred_star,max_out = 
             let l_pred = S.fold (fun i j -> i::j) s_pred [] in 
-            let rec aux (l:int list) (accu:int list) = 
-              match l with 
-              | [] -> accu 
-              | pred::t -> 
-                let new_l = A.get s_pred_star pred in 
-                let diff = 
-                  if cut_transitive_path 
-                  then 
-                    diff_list_decreasing t new_l 
-                  else 
-                    t 
-                in 
-                aux 
-                  diff
-                  (merge_list_decreasing (pred::new_l) accu)
-            in 
-            aux 
-              l_pred 
-              []
+            let rec aux (l:int list) (accu:int list) max_out = 
+                match l with 
+                | [] -> accu,max_out
+                | pred::t ->
+                  let l_pred  = subs pred 
+                  in 
+                  match 
+                    l_pred 
+                  with 
+                    [x] when x=pred 
+                      -> 
+                        begin 
+                          let new_l,max_out' = A.get s_pred_star pred in 
+                          let diff = 
+                            if cut_transitive_path 
+                            then 
+                              diff_list_decreasing t new_l 
+                            else 
+                              t 
+                          in 
+                          aux 
+                            diff
+                            (merge_list_decreasing (pred::new_l) accu)
+                            (max max_out max_out')
+                        end 
+                  | _ -> 
+                    begin
+                      let l_pred = 
+                        List.sort (fun a b -> compare b a) l_pred 
+                      in 
+                      aux 
+                        t 
+                        (merge_list_decreasing 
+                           (List.sort (fun a b -> compare b a) l_pred)  
+                           accu
+                        )
+                        max_out
+                             end 
+                      
+              in 
+              aux 
+                l_pred 
+                []
+                0 
           in 
           let _ = 
-            A.set s_pred_star succ pred_star 
+            if (try (max_out <= succ && weak_events succ ) with _ -> false)
+             && 
+                begin 
+                  let s = 
+                    List.fold_left 
+                      (fun s' elt -> if S.is_empty (M.find elt prec) then s' 
+                        else S.union (set_succ elt) s')
+                      S.empty pred_star 
+                  in
+                  let l = List.rev (S.elements s) in 
+                  let b = diff_list_decreasing l (succ::pred_star) in 
+(*(*                  let b =*) is_sublist_decreasing l (succ::pred_star) (*in*)*)
+(*                  diff_list_decreasing l (succ::pred_star)  
+                  in *)
+                  List.for_all (fun a -> to_keep a) b 
+                end 
+            then 
+              let init_succ = init succ in 
+              let _ = redirect succ init_succ in 
+              match init_succ 
+              with [x] when x=succ -> () 
+              | _ -> 
+                A.set s_pred_star succ (init_succ,0)
+            else 
+              A.set s_pred_star succ (pred_star,max (max_succ succ) max_out)
           in
           let _ = clean succ in 
           let tick = do_tick tick in 

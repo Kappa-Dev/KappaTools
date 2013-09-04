@@ -1,0 +1,21 @@
+####### TEMPLATE MODEL AS DESCRIBED IN THE MANUAL#############
+%def: "displayCompression" "weak" "none"
+%def: "showIntroEvents" "true"
+%def: "dumpInfluenceMap" "true" 
+
+#### Signatures 
+%agent: A(x) # Declaration of agent A 
+%agent: B(x) # Declaration of B 
+
+#### Rules 
+'a.b' A(x),B(x) -> A(x!1),B(x!1) @ 1
+'B-' B(x!_) -> @ 1 
+'B+' -> B(x)  @1 
+
+#### Initial conditions 
+%init: 1000 B()
+%init: 1 A()
+
+%mod: [true] do $TRACK 'B-' [true]
+
+

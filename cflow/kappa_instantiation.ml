@@ -127,7 +127,7 @@ sig
   val store_event: P.log_info -> event -> step list -> P.log_info * step list 
   val store_init : P.log_info -> State.implicit_state -> step list -> P.log_info * step list 
   val store_obs :  P.log_info -> int * Mixture.t * int Mods.IntMap.t * unit Mods.simulation_info -> step list -> P.log_info * step list 
-  val build_grid: (refined_step * side_effect)  list -> bool -> H.handler -> Causal.grid 
+  val build_grid: (refined_step * side_effect * (bool * int list))  list -> bool -> H.handler -> Causal.grid 
   val print_side_effect: out_channel -> side_effect -> unit
   val side_effect_of_list: (int*int) list -> side_effect 
   val no_obs_found: step list -> bool 
@@ -975,7 +975,7 @@ module Cflow_linker =
     let grid = Causal.empty_grid () in 
     let grid,_,_,_ = 
       List.fold_left 
-        (fun (grid,side_effect,counter,subs) (k,(side:side_effect)) ->
+        (fun (grid,side_effect,counter,subs) (k,(side:side_effect),is_weak) ->
           match (k:refined_step) 
           with 
             | Event (a,_,_) -> 
@@ -1002,11 +1002,11 @@ module Cflow_linker =
                       | Not_found -> y)
                     phi 
                 in 
-                Causal.record ~decorate_with:obs_from_rule_app r side_effect (phi,psi) counter grid env,
+                Causal.record ~decorate_with:obs_from_rule_app r side_effect (phi,psi) is_weak counter grid env,
                 Mods.Int2Set.empty,counter+1,Mods.IntMap.empty
               end
             | Init b -> 
-               Causal.record_init b counter grid env,side_effect,counter+1,Mods.IntMap.empty
+               Causal.record_init b is_weak counter grid env,side_effect,counter+1,Mods.IntMap.empty
             | Obs c  -> 
               let ((r_id,state,embedding,x),test) = c in 
               let embedding = 
@@ -1029,7 +1029,7 @@ module Cflow_linker =
                     side_effect 
                     side 
               in 
-              Causal.record_obs side_effect c counter grid env,side_effect,counter+1,Mods.IntMap.empty
+              Causal.record_obs side_effect c is_weak counter grid env,side_effect,counter+1,Mods.IntMap.empty
             | Subs (a,b) -> 
               grid, 
               side_effect,

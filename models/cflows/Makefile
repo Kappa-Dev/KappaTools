@@ -1,16 +1,16 @@
 all:
-	@for i in * ; do (if (file $$i | grep directory ) then (cd $$i ; $(MAKE) ; ) else (echo 0 ; ) ;  fi ; )   ; done 
+	@for i in * ; do (if (file $$i | grep directory ) then (cd $$i ; $(MAKE) ; ) else (echo 0 > /dev/null ; ) ;  fi ; )   ; done 
 	@cat */error > error 
 	@if (test -s error) then (cat error) else (echo "No difference has been found") fi;
 
 build:
-	@for i in * ; do (if (file $$i | grep directory ) then (cd $$i ; $(MAKE) build ; ) else (echo 0 ; ) ;  fi ; )   ; done 
+	@for i in * ; do (if (file $$i | grep directory ) then (cd $$i ; $(MAKE) build ; ) else (echo 0 > /dev/null ; ) ;  fi ; )   ; done 
 
 clean: 
-	@for i in * ; do (if (file $$i | grep directory ) then (cd $$i ; $(MAKE) clean ; ) else (echo 0 ; ) ;  fi ; )   ; done 
+	@for i in * ; do (if (file $$i | grep directory ) then (cd $$i ; $(MAKE) clean ; ) else (echo 0 > /dev/null ; ) ;  fi ; )   ; done 
 
 clean_all: 
-	@for i in * ; do (if (file $$i | grep directory ) then (cd $$i ; $(MAKE) clean_all ; ) else (echo 0 ; ) ;  fi ; )   ; done 
+	@for i in * ; do (if (file $$i | grep directory ) then (cd $$i ; $(MAKE) clean_all ; ) else (echo 0 > /dev/null ; ) ;  fi ; )   ; done 
 	@rm -f error 
 
 .phony help:

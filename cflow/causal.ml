@@ -16,7 +16,12 @@ type atom =
 	}
 
 type attribute = atom list (*vertical sequence of atoms*)
-type grid = {flow: (int*int*int,attribute) Hashtbl.t ; obs: int list}  (*(n_i,s_i,q_i) -> att_i with n_i: node_id, s_i: site_id, q_i: link (1) or internal state (0) *)
+type grid = 
+  {
+    flow: (int*int*int,attribute) Hashtbl.t ;  (*(n_i,s_i,q_i) -> att_i with n_i: node_id, s_i: site_id, q_i: link (1) or internal state (0) *)
+    obs: int list ; 
+    weak_list: (int*(int list)) list ; 
+  } 
 type config = {events: atom IntMap.t ; prec_1: IntSet.t IntMap.t ; conflict : IntSet.t IntMap.t ; top : IntSet.t}
 type enriched_grid = 
     { 
@@ -31,7 +36,11 @@ type enriched_grid =
 let empty_config = {events=IntMap.empty ; conflict = IntMap.empty ; prec_1 = IntMap.empty ; top = IntSet.empty}
 let is i c = (i land c = i)
 
-let empty_grid () = {flow = Hashtbl.create !Parameter.defaultExtArraySize ; obs = [] }
+let empty_grid () = 
+{
+  flow = Hashtbl.create !Parameter.defaultExtArraySize ; 
+  obs = [] ; 
+  weak_list = []}
 
 
 
@@ -140,7 +149,14 @@ let add (node_id,site_id) c grid event_number kind obs =
 		
 (**side_effect Int2Set.t: pairs (agents,ports) that have been freed as a side effect --via a DEL or a FREE action*)
 (*NB no internal state modif as side effect*)
-let record ?decorate_with rule side_effects (embedding,fresh_map) event_number grid env = 
+let store_is_weak (is_weak,list) eid grid = 
+  if is_weak 
+  then 
+    {grid 
+     with weak_list = (eid,list)::(grid.weak_list)}
+  else 
+    grid 
+let record ?decorate_with rule side_effects (embedding,fresh_map) is_weak event_number grid env = 
 	
 	let pre_causal = rule.Dynamics.pre_causal
 	and r_id = rule.Dynamics.r_id
@@ -153,7 +169,8 @@ let record ?decorate_with rule side_effects (embedding,fresh_map) event_number g
 			| FRESH j -> IntMap.find j fresh_map
 			| KEPT j -> IntMap.find j embedding
 	in
-	
+        let grid = store_is_weak is_weak event_number grid in 
+	  
 	let grid =  
 		(*adding side-effect free modifications and tests*)
 		let grid = 
@@ -171,9 +188,9 @@ let record ?decorate_with rule side_effects (embedding,fresh_map) event_number g
 	in
 	grid
 
-let record_obs side_effects ((r_id,state,embedding,_),test) event_number grid env = 
+let record_obs side_effects ((r_id,state,embedding,_),test) is_weak event_number grid env = 
   let grid = add_obs_eid event_number grid in 
-
+  let grid = store_is_weak is_weak event_number grid in 
   let im embedding id =
     match id with
       | FRESH j -> raise (Invalid_argument "Causal.record_obs")
@@ -199,12 +216,13 @@ let record_obs side_effects ((r_id,state,embedding,_),test) event_number grid en
   in
   grid
 
-let record_init init event_number grid env = 
+let record_init init is_weak event_number grid env = 
   if !Parameter.showIntroEvents  
   then 
     (*adding tests*)
     let (((node_id,agent_name),interface),_) = init in  
     let causal = Dynamics.compute_causal_init init env in 
+    let grid = store_is_weak is_weak event_number grid in 
     let grid = 
     Mods.Int2Map.fold 
       (fun (node_id,site_id) c grid -> 
@@ -333,9 +351,10 @@ let config_of_grid = cut
       IntMap.add eid set prec_star
     ) config.events IntMap.empty *)
 
-let prec_star_of_config config = 
-  Graph_closure.closure config.prec_1 
-      
+let prec_star_of_config config to_keep weak_events init = 
+  let a = Graph_closure.closure config.prec_1 to_keep  weak_events init in 
+  Graph_closure.A.map fst a 
+
 let depth_and_size_of_event config =
   IntMap.fold 
     (fun eid prec_eids (emap,size,depth) ->
@@ -358,7 +377,29 @@ let enrich_grid grid =
   in 
   let ids = ids_of_grid grid  in 
   let config = config_of_grid ids grid in 
-  let prec_star= prec_star_of_config config to_keep in
+  let max_key = List.fold_left (fun e (a,_) -> max e a) 0 grid.weak_list  in 
+  let tbl = Graph_closure.A.create (max_key+1) [] in 
+  let _ = 
+    List.iter 
+      (fun (i,j) -> Graph_closure.A.set tbl i j)
+      grid.weak_list 
+  in 
+  let weak_fun i = 
+    try 
+      match 
+        Graph_closure.A.get tbl i 
+      with 
+      | [] -> false
+      | _ -> true
+    with Not_found -> false 
+  in 
+  let init_fun i = 
+    try 
+      Graph_closure.A.get tbl i 
+    with 
+      Not_found -> [i]
+  in 
+  let prec_star= prec_star_of_config config to_keep weak_fun init_fun in
   let depth_of_event,size,depth = depth_and_size_of_event config in  
   { 
     config = config ; 
