@@ -258,7 +258,7 @@ let closure prec to_keep weak_events init  =
                           aux 
                             diff
                             (merge_list_decreasing (pred::new_l) accu)
-                            (max max_out max_out')
+                            (if new_l=[] then max_out else max max_out max_out')
                         end 
                   | _ -> 
                     begin
