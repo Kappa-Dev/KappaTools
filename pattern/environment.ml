@@ -11,10 +11,6 @@ type t = {
 	num_of_token : int StringMap.t ;
 	fresh_token : int ;
 	
-	volume_of_num : string IntMap.t ;
-	num_of_volume : int StringMap.t ;
-	fresh_volume : int ;		
-	
 	fresh_name : int ;
 	num_of_name : int StringMap.t ;
 	name_of_num : string IntMap.t ;
@@ -71,10 +67,6 @@ let empty =
 	num_of_token = StringMap.empty ;
 	fresh_token = 0 ;
 	
-	volume_of_num = IntMap.empty ; 
-	num_of_volume = StringMap.empty ;
-	fresh_volume = 1 ; (*volume 0 is restricted for Top*)
-
 	num_of_pert = StringMap.empty ;
 	pert_of_num = IntMap.empty ;
 	(*rule_of_pert = IntMap.empty ;*)
@@ -90,22 +82,6 @@ let empty =
 	
 	desc_table = Hashtbl.create 2 
 }
-
-let volume_of_num id env = IntMap.find id env.volume_of_num 
-let num_of_volume str env = StringMap.find str env.num_of_volume 
-
-let declare_volume (lab,pos) env =  
-	let opt = try Some (num_of_volume lab env) with Not_found -> None in
-		match opt with
-			| Some i -> (ExceptionDefn.warning ~with_pos:pos ("Volume '"^lab^"' is defined twice, ignoring additional occurence") ; (env,i)) 
-			| None ->
-				let i,env = (env.fresh_volume,{env with fresh_volume = env.fresh_volume+1})
-				in 
-					({env with
-						volume_of_num = IntMap.add i lab env.volume_of_num ;
-						num_of_volume = StringMap.add lab i env.num_of_volume
-					},i)
-
 
 let get_desc file env = 
 	try Hashtbl.find env.desc_table file with 

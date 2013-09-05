@@ -18,7 +18,7 @@ SOURCES = \
 		cflow/priority.ml \
 		cflow/cflow_handler.ml cflow/profiling.ml cflow/causal.ml  \
 		cflow/kappa_instantiation.ml cflow/po_cut.ml cflow/pseudo_inverse.ml cflow/blackboard_generation.ml cflow/blackboard.ml cflow/propagation_heuristics.ml \
-		cflow/generic_branch_and_cut_solver.ml cflow/dag.ml cflow/dag2.ml cflow/compression_main.ml  simulation/plot.ml Error/safe.ml simulation/run.ml Compartment/vol.ml \
+		cflow/generic_branch_and_cut_solver.ml cflow/dag.ml cflow/dag2.ml cflow/compression_main.ml  simulation/plot.ml Error/safe.ml simulation/run.ml \
 		main/main.ml 
 
 ## the name of the resulting executable

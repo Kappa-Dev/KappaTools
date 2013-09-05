@@ -80,8 +80,6 @@ instruction:
 	{Ast.SIG ($2,$1)}
 | TOKEN ID
 	{let str,pos = $2 in Ast.TOKENSIG (str,pos)}
-| VOLUME ID volume_param 
-	{let vol,param = $3 in Ast.VOLSIG ($2,vol,param)}
 | SIGNATURE error
 	{raise (ExceptionDefn.Syntax_Error (Some $1,"Malformed agent signature, I was expecting something of the form '%agent: A(x,y~u~v,z)'"))}
 	
@@ -122,17 +120,6 @@ init_declaration:
 | ID LAR multiple {(None,Ast.INIT_TOK ($3,$1))}
 | ID OP_CUR init_declaration CL_CUR {let _,init = $3 in (Some $1,init)}
 ;
-
-volume_param:
-| OP_CUR FLOAT CL_CUR opt_param {let f,_ = $2 in (f,$4)}
-| OP_CUR INT CL_CUR opt_param {let n,_ = $2 in (float_of_int n,$4)}
-;
-
-opt_param:
-| /*empty*/ {("passive",Tools.no_pos)}
-| ID {$1}
-
-
 
 value_list: 
 | STRING 
