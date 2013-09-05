@@ -229,6 +229,20 @@ let closure prec to_keep weak_events init  =
       (fun _ -> S.empty),
       (fun _ _ -> ()),(fun i -> [i])
   in 
+  let is_init x = 
+    S.is_empty (M.find x prec) 
+  in 
+  let is_like_init x = 
+    match 
+      subs x 
+    with 
+    | [y] -> not (x=y)
+    | _ -> true 
+  in 
+  let does_not_count x = 
+    to_keep x or is_like_init x or is_init x  
+  in 
+    
   let _ = 
     M.fold 
       (fun succ s_pred  tick -> 
@@ -248,6 +262,11 @@ let closure prec to_keep weak_events init  =
                       -> 
                         begin 
                           let new_l,max_out' = A.get s_pred_star pred in 
+                          let max_out' = 
+                            if does_not_count pred 
+                            then 0 
+                            else max_out' 
+                          in 
                           let diff = 
                             if cut_transitive_path 
                             then 
@@ -268,7 +287,7 @@ let closure prec to_keep weak_events init  =
                       aux 
                         t 
                         (merge_list_decreasing 
-                           (List.sort (fun a b -> compare b a) l_pred)  
+                           l_pred  
                            accu
                         )
                         max_out
@@ -281,12 +300,12 @@ let closure prec to_keep weak_events init  =
                 0 
           in 
           let _ = 
-            if (try (max_out <= succ && weak_events succ ) with _ -> false)
+            if (try ((does_not_count max_out or max_out <= succ) && weak_events succ ) with _ -> false)
              && 
                 begin 
                   let s = 
                     List.fold_left 
-                      (fun s' elt -> if S.is_empty (M.find elt prec) then s' 
+                      (fun s' elt -> if does_not_count elt then s' 
                         else S.union (set_succ elt) s')
                       S.empty pred_star 
                   in
@@ -295,10 +314,10 @@ let closure prec to_keep weak_events init  =
 (*(*                  let b =*) is_sublist_decreasing l (succ::pred_star) (*in*)*)
 (*                  diff_list_decreasing l (succ::pred_star)  
                   in *)
-                  List.for_all (fun a -> to_keep a) b 
+                  List.for_all (fun a -> does_not_count a) b 
                 end 
             then 
-              let init_succ = init succ in 
+              let init_succ = List.sort (fun a b -> compare b a) (init succ) in 
               let _ = redirect succ init_succ in 
               match init_succ 
               with [x] when x=succ -> () 

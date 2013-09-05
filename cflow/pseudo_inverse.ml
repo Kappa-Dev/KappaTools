@@ -514,17 +514,17 @@
      in 
      let nsid = blackboard.nsteps + 1 in 
      let eid_init_list,is_strong_action = 
-       try 
        if is_strong_action 
        then [],true
        else 
          Mods.IntSet.elements 
            (List.fold_left 
               (fun set pid -> 
-                let eid = get_init_event pid  in 
-                Mods.IntSet.add eid set)
+                try 
+                  let eid = get_init_event pid  in 
+                  Mods.IntSet.add eid set
+                with Not_found -> set)
               Mods.IntSet.empty pid_list ),is_strong_action
-       with Not_found -> [],true 
      in 
      let _ = A.set blackboard.event nsid (Some step) in 
      let n_modifications,pre_steps_by_column,init_state,init_event,list  = 
