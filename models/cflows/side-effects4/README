@@ -3,7 +3,7 @@ timeout 300s KaSim -i side-effects.ka  -e 25 -seed 253329392 -d expected-output 
 
 
 #A and B can for dimmer.
-#A can release is link. 
+#A can release its link. 
 
 #After a given time, releasing a link can produce a C. 
 

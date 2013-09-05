@@ -240,7 +240,7 @@ let closure prec to_keep weak_events init  =
     | _ -> true 
   in 
   let does_not_count x = 
-    to_keep x or is_like_init x or is_init x  
+    (*to_keep x or*) is_like_init x or is_init x  
   in 
     
   let _ = 
@@ -263,7 +263,7 @@ let closure prec to_keep weak_events init  =
                         begin 
                           let new_l,max_out' = A.get s_pred_star pred in 
                           let max_out' = 
-                            if does_not_count pred 
+                            if does_not_count pred or to_keep pred 
                             then 0 
                             else max_out' 
                           in 
@@ -300,12 +300,12 @@ let closure prec to_keep weak_events init  =
                 0 
           in 
           let _ = 
-            if (try ((does_not_count max_out or max_out <= succ) && weak_events succ ) with _ -> false)
+            if (try ((does_not_count max_out or to_keep max_out or max_out <= succ) && weak_events succ ) with _ -> false)
              && 
                 begin 
                   let s = 
                     List.fold_left 
-                      (fun s' elt -> if does_not_count elt then s' 
+                      (fun s' elt -> if does_not_count elt or (to_keep elt && elt<=succ) then s' 
                         else S.union (set_succ elt) s')
                       S.empty pred_star 
                   in
@@ -314,7 +314,7 @@ let closure prec to_keep weak_events init  =
 (*(*                  let b =*) is_sublist_decreasing l (succ::pred_star) (*in*)*)
 (*                  diff_list_decreasing l (succ::pred_star)  
                   in *)
-                  List.for_all (fun a -> does_not_count a) b 
+                  List.for_all (fun a -> does_not_count a or (to_keep a && a<=succ)) b 
                 end 
             then 
               let init_succ = List.sort (fun a b -> compare b a) (init succ) in 
