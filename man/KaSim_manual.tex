@@ -296,7 +296,7 @@ indicates that an agent \ttt{A} free on site \ttt{z}, no matter what its interna
 Importantly, \KaSim~respects the \emph{longest prefix convention}\index{longest prefix convention} to determine which agent in the RHS stems from an agent in the LHS. 
 In a word, from a rule of the form $a_1,\dots,a_n\rar b_1,\dots,b_k$, with $a_i$s and $b_j$s being agents, one computes the biggest indices $i\leq n$ such that the agents $a_1,\dots,a_i$ are pairwise consistent with $b_1,\dots,b_i$, \ie the $a_j$s and $b_j$s have the same name and the same number of sites. In which case we say that the for all $j\leq i$, $a_j$ is \emph{preserved} by the transition and for all $j>i$, $a_j$ is \emph{deleted} by the transition and $b_j$ is \emph{created} by the transition. This convention allows us to write a deletion rule as:
 \ITE{
-\item[] \ttt{\textquotesingle deleting A\textquotesingle  A(x!1),A(z!1)} $\rar$ \ttt{A(x) @ $\ga$} 
+\item[] \ttt{\textquotesingle deleting A\textquotesingle\  A(x!1),A(z!1)} $\rar$ \ttt{A(x) @ $\ga$} 
 }
 which will remove the \ttt{A} agent in the mixture\index{mixture} that will match the second occurrence of \ttt{A} in this rule.
 
@@ -332,9 +332,9 @@ Using KaSim \imp{hybrid rules}, one may declare that an action has effects on th
 }
 One may then use these tokens in conjunction with a classical rule using the hybrid format:
 \ITE{
-\item[] \ttt{\var{hybrid rule}~ S(x\int u!1),K(y!1)\ |\ 1:atp $\rar$ S(x\int p),K(y)\ |\ 1:adp\ @ \var{k}} 
+\item[] \ttt{\var{hybrid rule}~ S(x\int u!1),K(y!1)\ |\ 0.1:atp $\rar$ S(x\int p),K(y)\ |\ 0.1:adp\ @ \var{k}} 
 }
-When applied, the above rule will consume one \ttt{atp} token and produce one \ttt{adp} token. Note that as specified by the grammar given Table~\ref{tab:patterns}, the number of consumed (and produced) tokens can be given by a sum of the form:
+When applied, the above rule will consume 0.1 \ttt{atp} token and produce 0.1 \ttt{adp} token. Note that as specified by the grammar given Table~\ref{tab:patterns}, the number of consumed (and produced) tokens can be given by a sum of the form:
 \ITE{
 \item[] \ttt{\textit{lhs} | a$_1$:t$_1$ + ... + a$_n$:t$_n$ $\rar$ \textit{rhs} | a$_1'$:t$_1'$ + ... + a$_k'$:t$_k'$ @ r} 
 }
@@ -423,7 +423,7 @@ There are however systems where even enumerating unary cases becomes impossible.
 \ITE{
 \item[] \ttt{\textquotesingle my rule\textquotesingle } {\it kappa\_expression} $\rar$ {\it kappa\_expression} \ttt{@} $\ga_2(k_1)$  
 }
-which will tell \KaSim~to apply the above rule with a rate $\ga_2$ for binary instances and a rate $k_1$ for unary instances. The obtained model will behave exactly as a model in which the ambiguous rule has been replaced by unambiguous refinements. However the usage of such rule might \emph{slowdown simulation in a significant manner} depending on various parameters (such as the presence of large polymers in the model). We give below an example of a model utilizing binary/unary rates for rules\footnote{This model is available in the source repository \ttt{model/poly.ka}.}.
+which will tell \KaSim~to apply the above rule with a rate $\ga_2$ for binary instances and a rate $k_1$ for unary instances. The obtained model will behave exactly as a model in which the ambiguous rule has been replaced by unambiguous refinements. However the usage of such rule might \emph{slowdown simulation in a significant manner} depending on various parameters (such as the presence of large polymers in the model). We give below an example of a model utilizing binary/unary rates for rules\footnote{This model is available in the source repository \ttt{models/poly.ka}.}.
 
 {\tt\footnotesize
 \begin{enumerate}
@@ -679,6 +679,13 @@ The boolean expression is used as a \textit{precondition}\index{precondition} th
 }
 to indicate she wishes to trigger a perturbation whenever the simulation time has passed 10 time units and the ratio of variables \ttt{v1} over \ttt{v2} is above 1. Recall that the perturbations are "one shot" interventions on the simulation. Possible interventions are described in the following sections using examples.
 
+\textbf{Note on time dependent preconditions:}
+\\Consider a perturbation of the form:
+\ITE{
+\item[] \ttt{\%mod: {\it f}(t)={\it x} do $\dots$}
+}
+where $f(t)$ is an algebraic expression dependent on time and $x$ an arbitrary algebraic expression. Having in mind the simulation algorithm implemented by \KaSim, at the beginning of an event loop, both $f(t)$ and $x$ will be evaluated. It is very unlikely (in general is a probability equal to 0) that both values coincide. Currently \KaSim~is not equipped with a solver able to detect that in the past of the current state, there was a $t$ that made the precondition hold, unless the equation is trivial to solve. Therefore the only time dependent precondition with an equality test that is allowed in \KaSim~has to be of the form $\mathtt{[T]=}n$ with $n\in\Nat$.
+ 
 \subsection{Adding or deleting agents during a simulation}
 
 Continuing with the ABC model, the perturbation effect\index{effect}: 
@@ -925,9 +932,6 @@ in which case the headers of the compressed flows will contain the name of their
 If the progress bar seems stalled, it does not necessarily mean that the simulation is blocked. In particular when a simulation is triggered with a \emph{time} limit (\ttt{-t} option of the command line) it might only indicate that the bio clock is stalled while computation events still occur. Recall that the average (bio) time one has to wait in order to apply a rule is $1/A$, where $A$ is the sum of all the rule activities (which is equal to the number of instances that a rule has, times its kinetic rate). Whenever the number of occurrences of a rule grows too fast (if new agents are created during the simulation for instance), or if the kinetic rate of a rule is defined by a function that grows rapidly, the average time increment might tend to 0 and if it remains so for a while, it will block the progress bar whose advance is proportional to the bio time \ttt{[T]}. 
 
 In order to make sure that \KaSim~is not incorrectly blocked you may wish to plot the event clock against time clock using the observable \ttt{\%obs: \textquotesingle events\textquotesingle  [E]} or run the simulation using an event limit (\ttt{-e} option of the command line) instead of a time limit.
-
-\section*{Perturbation is never triggered or triggered too late}
-Make sure that perturbation\textquotesingle s precondition can be satisfied by \KaSim. In particular use inequalities rather than equalities, especially when the precondition is depending on time. Also some perturbations require to be persistent to observe their effect. In this case make sure you used the \ttt{do ... until} construction.  
 
 \section*{What do null events mean, why do I have any?}
 
