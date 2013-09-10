@@ -43,6 +43,8 @@ let emacsMode = ref false
   (* Whenever an event is removed, checked whether there is not only one left to perform a required action *)   
   let look_down_for_better_cut = true 
 
+  let log_number_of_causal_flows = true 
+
 (*User definable values*)
 let (maxEventValue:int option ref) = ref None
 let (maxTimeValue:float option ref) = ref None

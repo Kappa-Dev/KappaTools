@@ -234,7 +234,7 @@ let loop state story_profiling event_list counter plot env =
 	            match x with 
 	              | None -> ()
 	              | Some flows -> 
-	                Causal.pretty_print prefix label flows state env
+	                Causal.pretty_print Graph_closure.config_std prefix label flows state env
 	          in 
 	          let _ = g "" "" causal in 
 	          let _ = g "Weakly" "weakly " weak in 

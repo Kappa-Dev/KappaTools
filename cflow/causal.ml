@@ -19,10 +19,18 @@ type attribute = atom list (*vertical sequence of atoms*)
 type grid = 
   {
     flow: (int*int*int,attribute) Hashtbl.t ;  (*(n_i,s_i,q_i) -> att_i with n_i: node_id, s_i: site_id, q_i: link (1) or internal state (0) *)
+    pid_to_init: (int*int*int,int) Hashtbl.t ;
     obs: int list ; 
-    weak_list: (int*(int list)) list ; 
+    weak_list: int list ; 
+    init_tbl: (int,Mods.IntSet.t) Hashtbl.t;(*decreasing*)
+    init_to_eidmax: (int,int) Hashtbl.t;
   } 
-type config = {events: atom IntMap.t ; prec_1: IntSet.t IntMap.t ; conflict : IntSet.t IntMap.t ; top : IntSet.t}
+type config = 
+  {
+    events: atom IntMap.t ; 
+    prec_1: IntSet.t IntMap.t ; 
+    conflict : IntSet.t IntMap.t ; 
+    top : IntSet.t}
 type enriched_grid = 
     { 
       config:config;
@@ -39,8 +47,12 @@ let is i c = (i land c = i)
 let empty_grid () = 
 {
   flow = Hashtbl.create !Parameter.defaultExtArraySize ; 
+  pid_to_init = Hashtbl.create !Parameter.defaultExtArraySize ; 
   obs = [] ; 
-  weak_list = []}
+  weak_list = [];
+  init_tbl = Hashtbl.create !Parameter.defaultExtArraySize ; 
+  init_to_eidmax = Hashtbl.create !Parameter.defaultExtArraySize 
+}
 
 
 
@@ -67,6 +79,18 @@ let submap subs l m default =
         end 
      ) m')
     IntMap.empty l 
+
+let add_init_pid eid pid grid = 
+  let eid_init = Hashtbl.find grid.pid_to_init pid in 
+  let old = 
+    try
+      Hashtbl.find grid.init_tbl eid 
+    with 
+      Not_found -> Mods.IntSet.empty
+  in 
+  let _ = Hashtbl.replace grid.init_tbl eid (Mods.IntSet.add eid_init old) in 
+  let _ = Hashtbl.replace grid.init_to_eidmax eid_init eid in 
+  grid 
 
 let subset subs l s = 
   List.fold_left 
@@ -97,9 +121,15 @@ let grid_find (node_id,site_id,quark) grid = Hashtbl.find grid.flow (node_id,sit
 
 let is_empty_grid grid = (Hashtbl.length grid.flow = 0)
 
-let grid_add (node_id,site_id,quark) attribute grid = 
-	Hashtbl.replace grid.flow (node_id,site_id,quark) attribute ;
-	grid
+let grid_add quark eid (attribute:attribute) grid = 
+  let _ = 
+    try 
+      let _ = Hashtbl.find grid.flow quark in ()
+    with 
+    | _ -> Hashtbl.add grid.pid_to_init quark eid  
+  in 
+  Hashtbl.replace grid.flow quark attribute ;
+  grid
 		
 let impact q c = 
 	if q = 1 (*link*) 
@@ -128,34 +158,49 @@ let push (a:atom) (att:atom list) =
 				 
 
 let add (node_id,site_id) c grid event_number kind obs =
+  (* make  this function more compact *)
 	(*adding a link modification*)
 	let grid = 
 		if (is _LINK_TESTED c) || (is _LINK_MODIF c) then
 			let att = try grid_find (node_id,site_id,1) grid with Not_found -> [] in
 			let att = push {causal_impact = impact 1 c ; eid = event_number ; kind = kind (*; observation = obs*)} att
 			in
-			grid_add (node_id,site_id,1) att grid
+                        let grid = 
+			  grid_add (node_id,site_id,1) event_number att grid
+                        in 
+                        let grid = 
+                          add_init_pid event_number (node_id,site_id,1) grid 
+                        in 
+                        grid
 		else
 			grid 
 	in
 	if (is _INTERNAL_TESTED c) || (is _INTERNAL_MODIF c) then
-		(*adding an internal state modification*)
-		let att = try grid_find (node_id,site_id,0) grid with Not_found -> [] in
-		let att = push {causal_impact = impact 0 c ; eid = event_number ; kind = kind (*; observation = obs*)} att
-		in
-		grid_add (node_id,site_id,0) att grid
+	    (*adding an internal state modification*)
+	  let att = try grid_find (node_id,site_id,0) grid with Not_found -> [] in
+	  let att = push {causal_impact = impact 0 c ; eid = event_number ; kind = kind (*; observation = obs*)} att
+	  in
+          let grid = 
+	    grid_add (node_id,site_id,0) event_number att grid
+          in 
+           let grid = 
+            add_init_pid event_number (node_id,site_id,0) grid 
+          in 
+          grid 
 	else 
-		grid
-		
+	  grid
+
+          
 (**side_effect Int2Set.t: pairs (agents,ports) that have been freed as a side effect --via a DEL or a FREE action*)
 (*NB no internal state modif as side effect*)
-let store_is_weak (is_weak,list) eid grid = 
+let store_is_weak is_weak eid grid = 
   if is_weak 
   then 
     {grid 
-     with weak_list = (eid,list)::(grid.weak_list)}
+     with weak_list = eid::(grid.weak_list)}
   else 
     grid 
+
 let record ?decorate_with rule side_effects (embedding,fresh_map) is_weak event_number grid env = 
 	
 	let pre_causal = rule.Dynamics.pre_causal
@@ -170,7 +215,6 @@ let record ?decorate_with rule side_effects (embedding,fresh_map) is_weak event_
 			| KEPT j -> IntMap.find j embedding
 	in
         let grid = store_is_weak is_weak event_number grid in 
-	  
 	let grid =  
 		(*adding side-effect free modifications and tests*)
 		let grid = 
@@ -351,8 +395,8 @@ let config_of_grid = cut
       IntMap.add eid set prec_star
     ) config.events IntMap.empty *)
 
-let prec_star_of_config config to_keep weak_events init = 
-  let a = Graph_closure.closure config.prec_1 to_keep  weak_events init in 
+let prec_star_of_config config_closure config to_keep init_to_eidmax weak_events init = 
+  let a = Graph_closure.closure config_closure config.prec_1 to_keep  init_to_eidmax weak_events init in 
   Graph_closure.A.map fst a 
 
 let depth_and_size_of_event config =
@@ -370,36 +414,38 @@ let depth_and_size_of_event config =
     ) config.prec_1 (IntMap.empty,0,0)
 
 
-let enrich_grid grid = 
+let enrich_grid config_closure grid  = 
   let keep_l = List.fold_left (fun a b -> IntSet.add b a) IntSet.empty grid.obs in 
   let to_keep = 
     (fun i -> IntSet.mem i keep_l)
   in 
   let ids = ids_of_grid grid  in 
   let config = config_of_grid ids grid in 
-  let max_key = List.fold_left (fun e (a,_) -> max e a) 0 grid.weak_list  in 
-  let tbl = Graph_closure.A.create (max_key+1) [] in 
+  let max_key = List.fold_left max 0 grid.weak_list  in 
+  let tbl = Graph_closure.A.create (max_key+1) false in 
   let _ = 
     List.iter 
-      (fun (i,j) -> Graph_closure.A.set tbl i j)
+      (fun i -> Graph_closure.A.set tbl i true)
       grid.weak_list 
   in 
   let weak_fun i = 
     try 
-      match 
-        Graph_closure.A.get tbl i 
-      with 
-      | [] -> false
-      | _ -> true
-    with Not_found -> false 
+      Graph_closure.A.get tbl i 
+    with _ -> false 
   in 
   let init_fun i = 
     try 
-      Graph_closure.A.get tbl i 
+      List.rev (Mods.IntSet.elements (Mods.IntSet.remove i (Hashtbl.find grid.init_tbl i)))
     with 
-      Not_found -> [i]
+      _ -> []
   in 
-  let prec_star= prec_star_of_config config to_keep weak_fun init_fun in
+  let init_to_eid_max i = 
+    try 
+      Hashtbl.find grid.init_to_eidmax i
+    with 
+      Not_found -> 0 
+  in 
+  let prec_star= prec_star_of_config config_closure config to_keep init_to_eid_max weak_fun init_fun in
   let depth_of_event,size,depth = depth_and_size_of_event config in  
   { 
     config = config ; 
@@ -494,7 +540,7 @@ let dot_of_grid profiling fic enriched_grid state env =
                           in aux prec 
                         in 
                         let _ = 
-                          if bool then () 
+                          if bool then ()
                         else 
 			    fprintf desc "node_%d -> node_%d [style=dotted, arrowhead = tee] \n" eid eid'
                         in 
@@ -507,7 +553,7 @@ let dot_of_grid profiling fic enriched_grid state env =
         close_out desc 
 
 (*story_list:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_id:int story_time: float ; story_event: int}*)
-let pretty_print compression_type label story_list state env =	
+let pretty_print config_closure compression_type label story_list state env =	
   let n = List.length story_list in 
   let _ = 
     if compression_type = "" 
@@ -517,7 +563,7 @@ let pretty_print compression_type label story_list state env =
       Debug.tag (Printf.sprintf "\n+ Pretty printing %d %scompressed flow%s" n label (if n>1 then "s" else ""))
   in
   let story_list = 
-    List.map (fun (x,y) -> enrich_grid x,y) story_list 
+    List.map (fun (x,y) -> enrich_grid config_closure x,y) story_list 
   in 
   let _ =
     List.fold_left 

@@ -9,13 +9,13 @@
    * Jean Krivine, Université Paris Dederot, CNRS 
    *  
    * Creation: 17/04/2012
-   * Last modification: 02/08/2013
+   * Last modification: 10/09/2013
    * * 
    * Some parameter references can be tuned thanks to command-line options
    * other variables has to be set before compilation   
    *  
-   * Copyright 2011,2012 Institut National de Recherche en Informatique et   
-   * en Automatique.  All rights reserved.  This file is distributed     
+   * Copyright 2011,2012, 2013 Institut National de Recherche en Informatique 
+   * et en Automatique.  All rights reserved.  This file is distributed     
    * under the terms of the GNU Library General Public License *)
 
 
@@ -25,8 +25,7 @@
      module Po:Po_cut.Po_cut 
      module A:LargeArray.GenArray 
 
-     val cut: (Po.K.refined_step list -> Po.K.H.error_channel * 
-((Po.K.refined_step*(bool * (int list))) list) * int ) Po.K.H.with_handler 
+     val cut: (Po.K.refined_step list -> Po.K.H.error_channel * ((Po.K.refined_step*bool) list) * int) Po.K.H.with_handler 
    end
 
  module Pseudo_inv = 
@@ -74,19 +73,17 @@
        {
          steps_by_column: (step_id * predicate_value * bool) list PredicateMap.t ;
          init_state: predicate_value PredicateMap.t ; 
-         init_event: step_id PredicateMap.t ;
          nsteps: step_id ; 
          predicates_of_event: predicate_info  list A.t ;
          is_remove_action: bool A.t ;
-         weak_actions: (step_id*(step_id list)) list;
+         weak_actions: step_id list;
          modified_predicates_of_event: int A.t ;
-         event: (Po.K.refined_step) option A.t; 
+         event: (Po.K.refined_step (** step_id list*)) option A.t; 
          predicate_id_list_related_to_predicate_id: (predicate_info list) PredicateMap.t ; 
        }
 
       let init_blackboard n = 
         {
-          init_event = PredicateMap.empty ;
           init_state = PredicateMap.empty ; 
           weak_actions= []; 
           steps_by_column = PredicateMap.empty ; 
@@ -189,10 +186,10 @@
                 ([predicate_id,Present],[predicate_id])
                 interface
             in 
-            list1,list2,false
+            list1,list2,false,true
           | Po.K.Mod_internal (site,int)  -> 
             let predicate_id = Internal_state (Po.K.agent_id_of_site site,Po.K.site_name_of_site site) in 
-            [predicate_id,Internal_state_is int],[],false
+            [predicate_id,Internal_state_is int],[],false,false
           | Po.K.Bind_to (s1,s2) -> 
             let ag_id1 = Po.K.agent_id_of_site s1 in 
             let ag_id2 = Po.K.agent_id_of_site s2 in 
@@ -200,7 +197,7 @@
             let site_id1 = Po.K.site_name_of_site s1 in 
             let site_id2 = Po.K.site_name_of_site s2 in 
             let predicate_id1 = Bound_site (ag_id1,site_id1) in 
-            [predicate_id1,Bound_to (ag_id2,agent_name2,site_id2)],[],false
+            [predicate_id1,Bound_to (ag_id2,agent_name2,site_id2)],[],false,false
           | Po.K.Bind (s1,s2) -> 
             let ag_id1 = Po.K.agent_id_of_site s1 in 
             let ag_id2 = Po.K.agent_id_of_site s2 in 
@@ -211,7 +208,7 @@
             let predicate_id1 = Bound_site (ag_id1,site_id1) in 
             let predicate_id2 = Bound_site (ag_id2,site_id2) in 
             [predicate_id1,Bound_to (ag_id2,agent_name2,site_id2);
-             predicate_id2,Bound_to (ag_id1,agent_name1,site_id1)],[],false
+             predicate_id2,Bound_to (ag_id1,agent_name1,site_id1)],[],false,false
           | Po.K.Unbind (s1,s2) ->
             let ag_id1 = Po.K.agent_id_of_site s1 in 
             let ag_id2 = Po.K.agent_id_of_site s2 in 
@@ -219,12 +216,12 @@
             let site_id2 = Po.K.site_name_of_site s2 in 
             let predicate_id1 = Bound_site (ag_id1,site_id1) in 
             let predicate_id2 = Bound_site (ag_id2,site_id2) in 
-            [predicate_id1,Free;predicate_id2,Free],[],false
+            [predicate_id1,Free;predicate_id2,Free],[],false,false
           | Po.K.Free s -> 
             let ag_id = Po.K.agent_id_of_site s in 
             let site_id = Po.K.site_name_of_site s in 
             let predicate_id = Bound_site (ag_id,site_id) in     
-            [predicate_id,Free],[],false
+            [predicate_id,Free],[],false,false
           | Po.K.Remove ag -> 
             let ag_id = Po.K.agent_id_of_agent ag in 
             let predicate_id = Here ag_id in 
@@ -243,7 +240,7 @@
                 ([predicate_id,Undefined])
                 set 
             in   
-            list,[],true
+            list,[],true,false
 
       let no_remove parameter handler error blackboard eid = 
         not (A.get blackboard.is_remove_action eid)
@@ -424,9 +421,6 @@
      let get_init_state pid = 
        PredicateMap.find pid blackboard.init_state 
      in 
-     let get_init_event pid = 
-       PredicateMap.find pid blackboard.init_event
-     in 
      let pre_event = blackboard.event in 
      let error,test_list = Po.K.tests_of_refined_step parameter handler error step in 
      let error,(action_list,_) = Po.K.actions_of_refined_step parameter handler error step in
@@ -469,12 +463,12 @@
            build_map_test test_list map)
          PredicateMap.empty
          test_list in 
-     let error,blackboard,action_map,test_map,is_remove_action = 
+     let error,blackboard,action_map,test_map,is_remove_action,is_create_action = 
        List.fold_left 
-         (fun (error,blackboard,action_map,test_map,bool) action -> 
-           let action_list,test_list,bool' = predicates_of_action parameter handler error blackboard action in 
-           error,blackboard,build_map action_list action_map,build_map_test test_list test_map,bool or bool')
-         (error,blackboard,PredicateMap.empty,test_map,false)
+         (fun (error,blackboard,action_map,test_map,bool,bool_creation) action -> 
+           let action_list,test_list,bool',bool_creation' = predicates_of_action parameter handler error blackboard action in 
+           error,blackboard,build_map action_list action_map,build_map_test test_list test_map,bool or bool',bool_creation or bool_creation')
+         (error,blackboard,PredicateMap.empty,test_map,false,false)
          (action_list) in 
      let merged_map = 
        PredicateMap.merge 
@@ -498,55 +492,45 @@
      in 
      let is_strong_action,pid_list = 
        PredicateMap.fold
-         (fun pid (_,action) (bool,list) -> 
-           bool or
+         (fun pid (test,action) (bool,list) -> 
+           bool 
+           (*or (test=(Some Undefined)) *)
+           or
              (match action
               with 
                 None -> false
-              | Some action -> 
+              | Some action ->
                 try not ((get_init_state pid = action) or action = Undefined)
                 with Not_found -> false),
-         match action 
-         with 
-         | None | Some Undefined -> list 
-         | _ -> pid::list)
+             match action 
+             with 
+             | None | Some Undefined -> list 
+             | _ -> pid::list)
          merged_map (false,[])
      in 
-     let nsid = blackboard.nsteps + 1 in 
-     let eid_init_list,is_strong_action = 
-       if is_strong_action 
-       then [],true
-       else 
-         Mods.IntSet.elements 
-           (List.fold_left 
-              (fun set pid -> 
-                try 
-                  let eid = get_init_event pid  in 
-                  Mods.IntSet.add eid set
-                with Not_found -> set)
-              Mods.IntSet.empty pid_list ),is_strong_action
+     let is_strong_action = 
+       if is_create_action then true 
+       else is_strong_action
      in 
+     let nsid = blackboard.nsteps + 1 in 
      let _ = A.set blackboard.event nsid (Some step) in 
-     let n_modifications,pre_steps_by_column,init_state,init_event,list  = 
+     let n_modifications,pre_steps_by_column,init_state,list  = 
        PredicateMap.fold 
-         (fun id (test,action) (n_modifications,map,init_state,init_event,list) -> 
+         (fun id (test,action) (n_modifications,map,init_state,(*init_event,*)list) -> 
            begin 
-             let init_state,init_event =
+             let init_state =
                match 
                  action
                with 
-               | None -> init_state,init_event 
+               | None -> init_state
                | Some action -> 
                    begin 
                      try 
                        let _ = PredicateMap.find id init_state in 
-                       init_state,
-                       init_event
+                       init_state
                      with 
                        Not_found -> 
-                         PredicateMap.add id action init_state,
-                         PredicateMap.add id (nsid+1) init_event 
-                           
+                         PredicateMap.add id action init_state
                    end
              in 
              let old_list = 
@@ -577,11 +561,10 @@
              n_modifications,
              PredicateMap.add id ((nsid,new_value,bool_action)::old_list) map,
              init_state,
-             init_event,
              (id,new_value)::list
            end)
          merged_map
-         (0,blackboard.steps_by_column,blackboard.init_state,blackboard.init_event,[])
+         (0,blackboard.steps_by_column,blackboard.init_state,[])
      in 
     let _ = 
       if is_remove_action 
@@ -595,13 +578,12 @@
       then 
         blackboard 
       else 
-        {blackboard with weak_actions = (nsid,eid_init_list)::blackboard.weak_actions}
+        {blackboard with weak_actions = nsid::blackboard.weak_actions}
     in 
     let blackboard = 
       { 
         blackboard with 
           init_state = init_state ;
-          init_event = init_event ;
           event = pre_event ;
           steps_by_column = pre_steps_by_column; 
           nsteps = nsid;
@@ -635,16 +617,16 @@
         if k=(-1) 
         then list
         else 
-          let list_weak,bool,list_init = 
+          let list_weak,bool = 
             match list_weak 
             with 
-              (t,list_init)::q -> if t=k then q,true,list_init else list_weak,false,[]
-            | [] -> [],false,[]
+              t::q -> if t=k then q,true else list_weak,false
+            | [] -> [],false
           in 
           match A.get blackboard.event k 
           with 
             | Some a -> 
-              aux (k-1) ((a,(bool,list_init))::list) list_weak 
+              aux (k-1) ((a,bool)::list) list_weak 
             | None -> aux (k-1) list list_weak
       in aux (blackboard.nsteps) [] blackboard.weak_actions
     in 

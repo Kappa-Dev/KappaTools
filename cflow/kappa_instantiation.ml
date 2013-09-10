@@ -9,13 +9,13 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 02/08/2013
+  * Last modification: 10/09/2013
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
   *  
-  * Copyright 2011 Institut National de Recherche en Informatique et   
-  * en Automatique.  All rights reserved.  This file is distributed     
+  * Copyright 2011,2012,2013 Institut National de Recherche en Informatique 
+  * et en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
 let debug_mode = false
@@ -127,7 +127,7 @@ sig
   val store_event: P.log_info -> event -> step list -> P.log_info * step list 
   val store_init : P.log_info -> State.implicit_state -> step list -> P.log_info * step list 
   val store_obs :  P.log_info -> int * Mixture.t * int Mods.IntMap.t * unit Mods.simulation_info -> step list -> P.log_info * step list 
-  val build_grid: (refined_step * side_effect * (bool * int list))  list -> bool -> H.handler -> Causal.grid 
+  val build_grid: (refined_step * side_effect * bool)  list -> bool -> H.handler -> Causal.grid 
   val print_side_effect: out_channel -> side_effect -> unit
   val side_effect_of_list: (int*int) list -> side_effect 
   val no_obs_found: step list -> bool 
@@ -845,39 +845,27 @@ module Cflow_linker =
     let _ = Dynamics.dump rule  handler.H.env in 
     let _ = Printf.fprintf log "\n" in 
     let error = 
-      if true (*debug_mode*)
-      then 
-        let _ = Printf.fprintf log "Story encoding: \n" in 
-        let error,tests = tests_of_refined_event parameter handler error refined_event in 
-	let error = List.fold_left (fun error -> print_test parameter handler error " ") error (List.rev tests) in 
-	let error,actions = actions_of_refined_event parameter handler error refined_event in 
-	let error = List.fold_left (fun error -> print_action parameter handler error " ") error (fst actions) in 
-	let error = List.fold_left (fun error -> print_side_effects parameter handler error " ") error (List.rev (snd actions)) in 
-	let _ = Printf.fprintf log "***\n"  in 
-        error
-      else
-        error
-    in 
+      let _ = Printf.fprintf log "Story encoding: \n" in 
+      let error,tests = tests_of_refined_event parameter handler error refined_event in 
+      let error = List.fold_left (fun error -> print_test parameter handler error " ") error (List.rev tests) in 
+      let error,actions = actions_of_refined_event parameter handler error refined_event in 
+      let error = List.fold_left (fun error -> print_action parameter handler error " ") error (fst actions) in 
+      let error = List.fold_left (fun error -> print_side_effects parameter handler error " ") error (List.rev (snd actions)) in 
+      let _ = Printf.fprintf log "***\n"  in 
       error
+    in 
+    error
 
   let print_refined_init parameter handler error (refined_init:refined_init) = 
     let log = parameter.H.out_channel in 
     let ((agent_name,agent_id),_),actions = refined_init in 
     let _ = Printf.fprintf log "INIT: Agent %i_%i\n" agent_id agent_name in
     let error = 
-      if true (*debug_mode *)
-      then 
-        let error = 
-          List.fold_left  
-            (fun error -> print_action parameter handler error " ") 
-            error 
-            actions
-        in 
-        let _ = Printf.fprintf log "\n" in 
-        error
-      else 
-        error
-    in 
+      List.fold_left  
+        (fun error -> print_action parameter handler error " ") 
+        error 
+        actions in 
+    let _ = Printf.fprintf log "\n" in 
     error
       
   let gen f0 f1 f2 f3 f4 (p:H.parameter) h e step = 
