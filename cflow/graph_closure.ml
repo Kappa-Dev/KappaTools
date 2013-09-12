@@ -23,6 +23,7 @@ module M = Mods.IntMap
 
 type config = 
   { 
+    do_tick: bool ;
     enable_gc: bool ; 
     cut_transitive_path: bool ; 
     detect_separable_components: bool ;
@@ -32,6 +33,7 @@ type config =
 
 let config_init = 
   {
+   do_tick = true;
     enable_gc=true;
     cut_transitive_path=true ;
     detect_separable_components=true ;
@@ -39,8 +41,12 @@ let config_init =
       max_index=300;
   }
 
+let config_intermediary = 
+  { config_init with do_tick = false}
+    
 let config_std = 
   {
+    do_tick = false;
     enable_gc = false ;
     cut_transitive_path = false ;
     detect_separable_components = false;
@@ -141,7 +147,7 @@ let diff_list_decreasing =  diff_list (swap compare_bool)
 let merge_list_decreasing = merge_list (swap compare_bool)
 (*let is_sublist_decreasing = is_sublist (swap compare_bool)*)
 
-let closure config prec is_obs init_to_eidmax weak_events init  = 
+let closure config prec is_obs init_to_eidmax weak_events init = 
   let max_index = 
     M.fold 
       (fun i _ -> max i)
@@ -178,7 +184,7 @@ let closure config prec is_obs init_to_eidmax weak_events init  =
       ()
   in 
   let do_tick,tick = 
-    if max_index > 300 
+    if max_index > 300 && config.do_tick 
     then 
       let tick = Mods.tick_stories max_index (false,0,0) in 
       let f = Mods.tick_stories max_index in 
@@ -187,12 +193,15 @@ let closure config prec is_obs init_to_eidmax weak_events init  =
       (fun x -> x),(false,0,0)
   in 
   let s_pred_star = A.create (max_index+1) ([],0) in 
-  let clean,max_succ,set_succ,redirect,cut_event = 
+  let clean,max_succ,set_succ,redirect,cut_event,is_final = 
     if config.enable_gc or config.detect_separable_components 
     then 
       begin 
         let max_succ = A.create (max_index+1) 0 in 
         let set_succ = A.create (max_index+1) S.empty in 
+        let is_final x = 
+          S.is_empty (A.get set_succ x) 
+        in 
         let redirect_tab = A.create (max_index+1) false in 
         let redirect i = 
           A.set redirect_tab i true in 
@@ -233,29 +242,34 @@ let closure config prec is_obs init_to_eidmax weak_events init  =
           then gc_when_visit 
           else (fun _ -> ())
         in 
-        let set_succ,redirect,subs = 
+        let set_succ,redirect,subs,is_final = 
           if config.detect_separable_components 
           then 
             (fun i -> A.get set_succ i),
             redirect,
-            subs
+            subs,
+            is_final
           else 
             (fun _ -> S.empty),
             (fun _  -> ()),
+            (fun i -> false),
             (fun i -> false)
         in 
         gc_when_visit,
         (fun i -> A.get max_succ i),
         set_succ,
         redirect,
-        subs
+        subs,
+        is_final
       end 
     else  
       (fun _ -> ()),
       (fun _ -> (max_index+1)),
       (fun _ -> S.empty),
       (fun _  -> ()),
-      (fun i -> false)
+      (fun _ -> false),
+      (fun _ -> false)
+
   in 
   let is_like_init = cut_event 
   in 
@@ -267,63 +281,103 @@ let closure config prec is_obs init_to_eidmax weak_events init  =
     M.fold 
       (fun succ s_pred  tick -> 
         begin
+          let rec aux (l:int list) (accu:int list) max_out = 
+            match l with 
+            | [] -> accu,max_out
+            | pred::t ->
+              if 
+                    cut_event pred
+              then 
+                aux t accu max_out 
+              else 
+                begin 
+                  let new_l,max_out' = A.get s_pred_star pred in 
+                  let max_out' = 
+                    if does_not_count pred  or is_obs pred
+                    then 0 
+                    else max_out' 
+                  in 
+                  let diff = 
+                    if config.cut_transitive_path 
+                    then 
+                      diff_list_decreasing t new_l 
+                    else 
+                      t 
+                  in 
+                  aux 
+                    diff
+                    (merge_list_decreasing (pred::new_l) accu)
+                    (if new_l=[] then max_out else max max_out max_out')
+                    end 
+          in
           let pred_star,max_out = 
             let l_pred = S.fold (fun i j -> i::j) s_pred [] in 
             let l_pred = merge_list_decreasing l_pred (init succ) in
-            let rec aux (l:int list) (accu:int list) max_out = 
-                match l with 
-                | [] -> accu,max_out
-                | pred::t ->
-                  if 
-                    cut_event pred
-                  then 
-                    aux t accu max_out 
-                  else 
-                    begin 
-                      let new_l,max_out' = A.get s_pred_star pred in 
-                      let max_out' = 
-                        if does_not_count pred  or is_obs pred
-                        then 0 
-                        else max_out' 
-                      in 
-                      let diff = 
-                        if config.cut_transitive_path 
-                        then 
-                          diff_list_decreasing t new_l 
-                        else 
-                          t 
-                      in 
-                      aux 
-                        diff
-                        (merge_list_decreasing (pred::new_l) accu)
-                        (if new_l=[] then max_out else max max_out max_out')
-                    end 
-              in 
+            
+            let s,max_out = A.get s_pred_star succ in 
             aux 
               l_pred 
-              []
-              0 
+              s
+              max_out 
           in 
           let _ = 
-            if (*(try ((does_not_count max_out or is_obs max_out or max_out <= succ) && weak_events succ ) with _ -> false)
-              && *)
-              weak_events succ && 
-              not (is_obs succ )
+            if (does_not_count max_out or max_out <= succ or is_final max_out)
+              &&
+                weak_events succ 
               && 
-                begin 
-                  let s = 
-                    List.fold_left 
-                      (fun s' elt -> 
-                        if does_not_count elt or (is_obs elt && elt<=succ) or elt=succ then s' 
-                        else S.union (set_succ elt) s')
-                      S.empty pred_star 
-                  in
-                  let l = List.rev (S.elements s) in 
-                  let b = diff_list_decreasing l (succ::pred_star) in 
-                  List.for_all 
-                    (fun a -> does_not_count a or (is_obs a && a<=succ) or a=succ) 
-                    b 
-                end 
+                not (is_obs succ )
+              && 
+                let bool,list = 
+                  begin 
+                    let s = 
+                      List.fold_left 
+                        (fun s' elt -> 
+                          if does_not_count elt or (is_obs elt && elt<=succ) or elt=succ then s' 
+                          else S.union (set_succ elt) s')
+                        S.empty pred_star 
+                    in
+                    let l = List.rev (S.elements s) in 
+                    let b = diff_list_decreasing l (succ::pred_star) in 
+                    let rec aux2 list accu = 
+                      match list 
+                      with [] -> true,accu  
+                      | h::t -> 
+                        if does_not_count h 
+                          or (is_obs h && h<=succ) 
+                          or h=succ 
+                        then 
+                          aux2 t accu 
+                        else if is_final h
+                        then 
+                          aux2 t (h::accu)
+                            
+                        else 
+                          false,[]
+                    in 
+                    aux2 b []
+                  end 
+                in 
+                let _ = 
+                  if bool 
+                  then 
+                    let set_tmp = A.get s_pred_star succ in 
+                    let _ = A.set s_pred_star succ (pred_star,(max (max_succ succ) max_out)) in 
+                    let _ = 
+                      List.iter 
+                        (fun h -> 
+                          let s_pred = M.find h prec in 
+                          let l_pred = S.fold (fun i j -> i::j) s_pred [] in 
+                          let l_pred = merge_list_decreasing l_pred (init h) in
+                        
+                          let s,max_out = A.get s_pred_star succ in 
+                          let pred_star,max_out = aux l_pred s max_out in 
+                          let _ = A.set s_pred_star h (pred_star,max_out) in 
+                          ())
+                        list 
+                    in 
+                    let _ = A.set s_pred_star succ set_tmp in 
+                    () 
+                in bool 
             then 
               let _ = redirect succ  in 
               () 

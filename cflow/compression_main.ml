@@ -217,7 +217,7 @@ let compress env state log_info step_list =
                   (error,1,tick,[]) 
                   (List.rev list) 
               end
-              else 
+            else 
                begin 
                  let _ = 
                    if debug_mode
@@ -258,8 +258,32 @@ let compress env state log_info step_list =
                      let log_info = D.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
                      let event_id_list_rev = ((eid+1)::(enriched_grid.Causal.prec_star.(eid+1))) in 
                      let event_id_list = List.rev_map pred (event_id_list_rev) in 
-(*                     let config = Causal.subconfig enriched_grid.Causal.config (List.rev event_id_list_rev) in *)
+                     (*let config = Causal.subconfig enriched_grid.Causal.config (List.rev event_id_list_rev) in *)
                      let error,event_list,result_wo_compression = D.S.translate parameter handler error blackboard event_id_list in 
+                     let result_wo_compression = List.rev_map fst (List.rev result_wo_compression) in 
+                     let error,refined_event_list_without_pseudo_inverse,int_pseudo_inverse  = D.S.PH.B.PB.CI.cut parameter handler error result_wo_compression   in 
+                     let error,log_info,blackboard = D.S.PH.B.import parameter handler error log_info (List.rev_map (fun (x,_)->x) (List.rev refined_event_list_without_pseudo_inverse)) in 
+                     let error,list = D.S.PH.forced_events parameter handler error blackboard in 
+                     let list_order,list_eid,info = 
+                       match list with [a,b,c] -> a,b,c
+                       | _ -> raise Exit 
+                     in 
+                     let eid = 
+                       match list_eid with [a] -> a 
+                       | _ -> raise Exit 
+                     in 
+                     let refined_list = 
+                       if Parameter.do_detect_separable_components 
+                       then 
+                         (List.rev_map (fun (x,bool) -> (x,D.S.PH.B.PB.CI.Po.K.empty_side_effect,bool)) (List.rev refined_event_list_without_pseudo_inverse))
+                       else 
+                         (List.rev_map (fun (x,_) -> (x,D.S.PH.B.PB.CI.Po.K.empty_side_effect,dummy_weak)) (List.rev refined_event_list_without_pseudo_inverse))
+                      in 
+                      let grid = D.S.PH.B.PB.CI.Po.K.build_grid refined_list true handler in
+                      let enriched_grid = Causal.enrich_grid Graph_closure.config_intermediary grid in 
+                      let event_id_list_rev = ((eid+1)::(enriched_grid.Causal.prec_star.(eid+1))) in 
+                      let event_id_list = List.rev_map pred (event_id_list_rev) in 
+                      let error,event_list,result_wo_compression = D.S.translate parameter handler error blackboard event_id_list in 
                      let grid = D.S.PH.B.PB.CI.Po.K.build_grid (List.rev_map (fun (x,y) -> x,y,dummy_weak) (List.rev result_wo_compression)) true handler in
                      let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
                      let error,graph = D.graph_of_grid parameter handler error grid in 

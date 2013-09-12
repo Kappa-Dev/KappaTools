@@ -414,7 +414,7 @@ let depth_and_size_of_event config =
     ) config.prec_1 (IntMap.empty,0,0)
 
 
-let enrich_grid config_closure grid  = 
+let enrich_grid config_closure grid = 
   let keep_l = List.fold_left (fun a b -> IntSet.add b a) IntSet.empty grid.obs in 
   let to_keep = 
     (fun i -> IntSet.mem i keep_l)
