@@ -65,7 +65,7 @@
 \def\version{3}
 
 
-\title{KaSim\version~reference manual\\ \small (release 3.3)}
+\title{KaSim\version~reference manual\\ \small (release 3.4)}
 \author{J\'er\^ome Feret and Jean Krivine\thanks{corresponding author: jean.krivine@pps.univ-paris-diderot.fr} \\\url{KappaLanguage.org}}
 
 \date{}       
@@ -538,7 +538,7 @@ define 2 variables, the first one tracking the number of embeddings of \ttt{A(x!
 }
 One may use the shortcut: 
 \ITE{
-\item[] \ttt{\%obs: \textquotesingle var\_name\textquotesingle  } \textit{variable\_expression}
+\item[] \ttt{\%obs: \textquotesingle var\_name\textquotesingle  } \textit{algebraic\_expression} or \textit{kappa\_expression}
 }
 to declare a variable and at the same time require it to be outputted in the data file\index{data file}. 
 
@@ -684,7 +684,12 @@ to indicate she wishes to trigger a perturbation whenever the simulation time ha
 \ITE{
 \item[] \ttt{\%mod: {\it f}(t)={\it x} do $\dots$}
 }
-where $f(t)$ is an algebraic expression dependent on time and $x$ an arbitrary algebraic expression. Having in mind the simulation algorithm implemented by \KaSim, at the beginning of an event loop, both $f(t)$ and $x$ will be evaluated. It is very unlikely (in general is a probability equal to 0) that both values coincide. Currently \KaSim~is not equipped with a solver able to detect that in the past of the current state, there was a $t$ that made the precondition hold, unless the equation is trivial to solve. Therefore the only time dependent precondition with an equality test that is allowed in \KaSim~has to be of the form $\mathtt{[T]=}n$ with $n\in\Nat$.
+where $f(t)$ is an algebraic expression dependent on time and $x$ an arbitrary algebraic expression. Having in mind the simulation algorithm implemented by \KaSim, at the beginning of an event loop, both $f(t)$ and $x$ will be evaluated. It is very unlikely (in general with a probability equal to 0) that both values coincide. Currently \KaSim~is not equipped with a solver able to detect that in the past of the current state, there was a $t$ that made the precondition hold, unless the equation is trivial to solve. Therefore the only time dependent precondition with an equality test that is allowed in \KaSim~has to be of the form $\mathtt{[T]=}n$ with $n\in\Nat$. For instance:
+\ITE{
+\item[] \ttt{\%mod: [T]=10 do \$STOP}
+}
+will interrupt the simulation after exactly 10 time units.
+
  
 \subsection{Adding or deleting agents during a simulation}
 
@@ -700,7 +705,7 @@ will remove \emph{all} \ttt{B}s connected to some agent from the mixture\index{m
 
 There are various ways one can use perturbations to study more deeply a given kappa model. A basic illustration is the use of a simple perturbation to let a system equilibrate before starting a real simulation. For instance, as can be seen from the curve given in Fig.~\ref{fig:abc}, the number of AB complexes is arbitrarily set to 0 in the initial state (all \ttt{A}s are disconnected from \ttt{B}s in the initial mixture\index{mixture}). In order to avoid this, one can modify the kappa file the following way: we set the initial concentration of \ttt{C} to 0 by deleting line 22. Now we introduce \ttt{C}s after 25 t.u using the perturbation:
 \ttt{\ITE{
-\item[] \%mod:  [T]>25 do \$ADD 10000 C() 
+\item[] \%mod:  [T]=25 do \$ADD 10000 C() 
 }}
 The modified kappa file is available in the source repository, in the \ttt{model/} directory (file \ttt{abc-pert.ka}). 
 Running again a simulation (a bit longer) by entering in the command line:
@@ -762,11 +767,22 @@ In our ABC example, adding the instruction:
 \end{center}
 \end{figure}
 
-Note that causal flow\index{causality} can show or hide more causal dependencies using various compression techniques that can be enabled as a simulation parameter (see Section~\ref{sec:param}). Causality analysis of the observable \ttt{Cpp} can be turned off at any time using a declaration\index{declaration} of the form:
+Causality analysis of the observable \ttt{Cpp} can be turned off at any time using a declaration\index{declaration} of the form:
 \ttt{\ITE{
 \item[] \%mod:  [T]>25 do \$TRACK \var{Cpp} [false]  
 }}
 
+Each time \KaSim~detects a new occurrence of the observable that is being tracked, it will dump it's causal past as a graph using the dot format (see Fig.~\ref{fig:cflow} above). The name of the file in which the causal flow is stored can be set using the \texttt{\%def} instruction (see Section~\ref{sec:param}). 
+
+\subsubsection*{Compressing causal flows.}
+
+In general pure causal flows\index{causal flow} will contain a lot of information that modelers may not wish to consider. Indeed in classical flows, causality (represented by an edge between to rule applications in the graph) is purely local. Therefore a sequence $a\rar b \rar c$ only implies that an instance of rule $a$ caused an instance of rule $b$ which in turn created an instance of the observable $c$. However it does not imply that $a$ was "necessary" for $c$ to occur (for instance $c$ might have been possible before $a$ but not after, and $b$ would be simply re-enabling $c$). It is possible to tell \KaSim~to retain only events that are more strongly related to the observable using two compression techniques (see Ref.~\cite{Dan_etal12} for formal details). Intuitively, in a \emph{weakly} compressed causal\index{weak compression} flow one has the additional property that if an event $e$ is a (possibly indirect) cause of the observable, then preventing $e$ from occurring would have prevented the rest of the causal flow to occur (\ie it is not possible to reconstruct a computation trace containing the observable with the events that remain in the causal flow). A \emph{strongly} compressed causal flow enjoys the same property with an additional level of compression obtained by considering different instances of the same rule to be indistinguishable\index{strong compression}. Note that causal flow compressions may be memory and computation demanding. For large systems it may be safer to start with weak compressions only. 
+
+The type of compression can be set using the \texttt{\%def} instruction (see Section~\ref{sec:param}). For instance:
+\ttt{\ITE{
+\item [] \%def: "displayCompression" "none" "weak" "strong"
+}}
+will ask \KaSim~to output 3 versions of each computed causal flow, with all possible degrees of compressions. Each causal flow is outputted into a file \texttt{[filename][Type]\_$n$.dot} where \texttt{filename} is the default name for causal flows which can be redefined using the parameter \texttt{cflowFileName}, \texttt{Type} is the type of compression (either nothing or \texttt{Strongly}, or \texttt{Weakly}) and $n$ is the identifier of the causal flow. For each compression type a summary file, named \texttt{[filename][Type]Summary.dat}, is also produced. It allows to map each compressed causal flow to the identifier of its uncompressed version (row \texttt{\#id}), together with the production time $T$ and event number $E$ at which the observable was produced. It also contains information about the size of the causal flow.
 
 \subsection{Flux maps}
 
@@ -911,22 +927,6 @@ More formally, consider the rules $r:L\rar R$ and $s:L'\rar R'$. One wishes to k
    \label{fig:im}
 \end{figure}
 
-\subsection{Compressing causal flows}
-
-One may ask \KaSim~to extract causal pathways leading to the production of various observables (see Section~\ref{sec:cflows}). There are currently 2 types of causal flows that can be displayed on demand using simulation parameters, either with a \emph{weak} compression or no compression. Causal flows without any compression can be displayed using the command:
-\ttt{\ITE{
-\item [] \%def: "displayCompression" "none" 
-}}
-As a result all causal flows computed by \KaSim~will be displayed in a dot file without any further compression. Note that this will give modelers access to a lot of details about the mechanisms of action at stake in the simulation. However most of the time, these details will contain too much information and one may wish to retain only "essential" mechanisms using the command:
-\ttt{\ITE{
-\item [] \%def: "displayCompression" "weak" 
-}}
-Such instruction will tell \KaSim~to remove from the flow computation events which appeared in the history of the observable of interest, but were not strictly necessary for its occurrence. Note that both uncompressed and compressed flows can be displayed using the command:
-\ttt{\ITE{
-\item [] \%def: "displayCompression" "weak"  "none"
-}}
-in which case the headers of the compressed flows will contain the name of their uncompressed versions. Note that \emph{strong} compression, which compresses flows even further is not available yet.
-
 \chapter{Frequently asked questions}
 \section*{Simulation hangs after a while}
 If the progress bar seems stalled, it does not necessarily mean that the simulation is blocked. In particular when a simulation is triggered with a \emph{time} limit (\ttt{-t} option of the command line) it might only indicate that the bio clock is stalled while computation events still occur. Recall that the average (bio) time one has to wait in order to apply a rule is $1/A$, where $A$ is the sum of all the rule activities (which is equal to the number of instances that a rule has, times its kinetic rate). Whenever the number of occurrences of a rule grows too fast (if new agents are created during the simulation for instance), or if the kinetic rate of a rule is defined by a function that grows rapidly, the average time increment might tend to 0 and if it remains so for a while, it will block the progress bar whose advance is proportional to the bio time \ttt{[T]}. 
@@ -950,7 +950,7 @@ The influence map\index{influence map} contains relations that are computed on s
 The value \ttt{nan} means "Not a Number". It is generated when a plotted variable is infinite. Make sure this variable is not divided by zero at some point.
 
 \bibliographystyle{plain}
-\bibliography{fmb} 
+\bibliography{fmb,concur} 
 
 \printindex
 
