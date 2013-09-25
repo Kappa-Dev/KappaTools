@@ -261,8 +261,8 @@ let record_obs side_effects ((r_id,state,embedding,_),test) is_weak event_number
   grid
 
 let record_init init is_weak event_number grid env = 
-  if !Parameter.showIntroEvents  
-  then 
+(*  if !Parameter.showIntroEvents  
+  then *)
     (*adding tests*)
     let (((node_id,agent_name),interface),_) = init in  
     let causal = Dynamics.compute_causal_init init env in 
@@ -276,8 +276,8 @@ let record_init init is_weak event_number grid env =
       ) causal grid 
     in
     grid
-  else 
-    grid 
+(*  else 
+    grid *)
 
 let add_pred eid atom config = 
 	let events = IntMap.add atom.eid atom config.events
@@ -487,7 +487,7 @@ let dot_of_grid profiling fic enriched_grid state env =
       	| RULE _  -> fprintf desc "node_%d [label=\"%s\", shape=invhouse, style=filled, fillcolor = lightblue] ;\n" eid (label atom.kind) 
         | OBS _  ->  fprintf desc "node_%d [label =\"%s\", style=filled, fillcolor=red] ;\n" eid (label atom.kind) 
         | INIT _  ->
-					(*if !Parameter.showIntroEvents then*) fprintf desc "node_%d [label =\"%s\", shape=house, style=filled, fillcolor=green] ;\n" eid (label atom.kind)
+	    if !Parameter.showIntroEvents then fprintf desc "node_%d [label =\"%s\", shape=house, style=filled, fillcolor=green] ;\n" eid (label atom.kind)
 	| _ -> invalid_arg "Event type not handled"
 	(*		List.iter (fun obs -> fprintf desc "obs_%d [label =\"%s\", style=filled, fillcolor=red] ;\n node_%d -> obs_%d [arrowhead=vee];\n" eid obs eid eid) atom.observation ;*) 
 		) eids_at_d ;
@@ -506,13 +506,13 @@ let dot_of_grid profiling fic enriched_grid state env =
 			(fun eid' ->
 				if eid' = 0 then () 
 				else
-					(*if !Parameter.showIntroEvents then*)
+					if !Parameter.showIntroEvents then
 						fprintf desc "node_%d -> node_%d\n" eid' eid
-(*					else
+					else
 						let atom = IntMap.find eid' config.events in
 						match atom.kind with
 							| INIT _ -> ()
-							| _ -> fprintf desc "node_%d -> node_%d\n" eid' eid*)
+							| _ -> fprintf desc "node_%d -> node_%d\n" eid' eid
 			) pred_set
 	) config.prec_1 ;
 	IntMap.iter
@@ -634,7 +634,7 @@ let print_stat parameter handler enriched_grid =
   let _ = Debug.tag "" in 
   let _ = Debug.tag "Stats:" in 
   let _ = Debug.tag (" number of step   : "^(string_of_int n_step)) in 
-  let _ = Debug.tag (" number of stories: "^(string_of_int n_nonempty)) in 
+(*  let _ = Debug.tag (" number of stories: "^(string_of_int n_nonempty)) in *)
   let _ = Debug.tag (" longest story    : "^(string_of_int longest_story)) in 
   let _ = Debug.tag (" average length   : "^(string_of_float ((float_of_int length_sum)/.(float_of_int n_nonempty)))) in 
   let _ = Debug.tag (" geometric mean   : "^(string_of_float (sqrt ((float_of_int length_square_sum)/.(float_of_int n_nonempty))))) in 
