@@ -119,7 +119,7 @@ let compress env state log_info step_list =
               refined_event_list,0 
           in 
           let refined_event_list_without_pseudo_inverse,int_pseudo_inverse = 
-            if Parameter.cut_pseudo_inverse_event
+            if Parameter.cut_pseudo_inverse_event &&  (weak_compression_on or strong_compression_on)
             then 
               begin 
                 let _ = 
@@ -233,7 +233,14 @@ let compress env state log_info step_list =
                      (List.rev_map (fun (x,_) -> (x,D.S.PH.B.PB.CI.Po.K.empty_side_effect,dummy_weak)) (List.rev refined_event_list_without_pseudo_inverse))
                  in 
                  let grid = D.S.PH.B.PB.CI.Po.K.build_grid refined_list true handler in
-                 let enriched_grid = Causal.enrich_grid Graph_closure.config_init grid in 
+                 let config_init = 
+                   if weak_compression_on or strong_compression_on 
+                   then 
+                     Graph_closure.config_init
+                   else 
+                     Graph_closure.config_std 
+                 in 
+                 let enriched_grid = Causal.enrich_grid config_init grid in 
                  let _ = 
                    if Parameter.log_number_of_causal_flows
                    then 
