@@ -45,6 +45,7 @@
 %mod: [T]>10 && ('Cpp' - 'cflow' = 10) do ($TRACK 'Cpp' [false])
 
 
-%def: "displayCompression" "none" "weak" 
+%def: "cflowFileName" "abc-flow"
+%def: "displayCompression" "none" "weak" "strong"
 %def: "dotSnapshots" "true"
 %def: "showIntroEvents" "true"
