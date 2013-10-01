@@ -212,3 +212,4 @@ models/cflows/weak_only
 pattern
 simulation
 siteGraphs
+bin/Nightly build
