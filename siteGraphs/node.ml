@@ -162,35 +162,42 @@ let is_bound ?with_type (n,i) =
 				| Some (site_id,nme) -> (name u = nme) && (j = site_id)
 				| None -> true
 
+exception TooBig
+
 let bit_encode node env =
-	let tot_offset = ref 0 in
-	let sign = Environment.get_sig (name node) env in
-	let max_val = fun site_id -> Signature.internal_states_number site_id sign in
-	let bit_rep = 
-		fold_status
-		(fun site_id (int,lnk) bit_rep ->
-			let n = max_val site_id in 
-			let bit_rep = 
-				match int with
-					| None -> if n = 0 then bit_rep else invalid_arg "Node.bit_encode" 
-					| Some i -> 
-						if i>n then invalid_arg "Node.bit_encode"
-						else
-							let offset = Tools.bit_rep_size n in
-							let bit_rep = Int64.shift_left bit_rep offset in
-							(tot_offset := !tot_offset + offset ;
-							Int64.logor bit_rep (Int64.of_int i))
-			in
-			match lnk with
-					|	FPtr _ | Ptr _ -> let bit_rep = (Int64.shift_left bit_rep 1) in (tot_offset := !tot_offset + 1 ; (Int64.shift_left bit_rep 1))
-					| Null -> (tot_offset := !tot_offset + 1 ; Int64.shift_left bit_rep 1)
-		) node Int64.zero
-	in
-	let offset = Tools.bit_rep_size (Environment.name_number env) in
-	tot_offset := !tot_offset + offset ; 
-	if !tot_offset > 63 then invalid_arg "Node.bit_encode: Cannot encode view in one word"
-	else 
-		Int64.logor (Int64.shift_left bit_rep offset) (Int64.of_int (name node)) 
+	try
+  	let tot_offset = ref 0 in
+  	let sign = Environment.get_sig (name node) env in
+  	let max_val = fun site_id -> Signature.internal_states_number site_id sign in
+  	let bit_rep = 
+  		fold_status
+  		(fun site_id (int,lnk) bit_rep ->
+  			let n = max_val site_id in 
+  			let bit_rep = 
+  				match int with
+  					| None -> if n = 0 then bit_rep else invalid_arg "Node.bit_encode" 
+  					| Some i -> 
+  						if i>n then invalid_arg "Node.bit_encode"
+  						else
+  							let offset = Tools.bit_rep_size n in
+  							let bit_rep = Int64.shift_left bit_rep offset in
+  							(tot_offset := !tot_offset + offset ;
+  							if !tot_offset > 63 then raise TooBig
+  							else
+  								Int64.logor bit_rep (Int64.of_int i))
+  			in
+  			match lnk with
+  					|	FPtr _ | Ptr _ -> let bit_rep = (Int64.shift_left bit_rep 1) in (tot_offset := !tot_offset + 1 ; (Int64.shift_left bit_rep 1))
+  					| Null -> (tot_offset := !tot_offset + 1 ; Int64.shift_left bit_rep 1)
+  		) node Int64.zero
+  	in
+  	let offset = Tools.bit_rep_size (Environment.name_number env) in
+  	tot_offset := !tot_offset + offset ;
+  	if !tot_offset > 63 then raise TooBig
+  	else 
+  		Int64.logor (Int64.shift_left bit_rep offset) (Int64.of_int (name node)) 
+	with TooBig ->
+		Int64.of_int (name node) (*If the interface is too big, retaining only the name of the agent as a view*)
 	
 let internal_state (n,i) = 
 	match n.interface.(i).status with
