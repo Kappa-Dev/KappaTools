@@ -157,10 +157,10 @@ let declare_pert (lab,pos) env =
 			| None ->
 				let i,env = (env.fresh_pert,{env with fresh_pert = env.fresh_pert+1})
 				in
-					({env with
-						pert_of_num = IntMap.add i lab env.pert_of_num ;
-						num_of_pert = StringMap.add lab i env.num_of_pert
-					},i)
+				({env with
+					pert_of_num = IntMap.add i lab env.pert_of_num ;
+					num_of_pert = StringMap.add lab i env.num_of_pert
+				},i)
 
 let declare_name nme pos env = 
 	let opt = try Some (num_of_name nme env) with Not_found -> None in

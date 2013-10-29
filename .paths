@@ -213,3 +213,4 @@ pattern
 simulation
 siteGraphs
 bin/Nightly build
+models/debug
