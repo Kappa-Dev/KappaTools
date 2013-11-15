@@ -41,7 +41,7 @@ module GenArray =
 			if n > max_array_size2 then invalid_arg "GenArray: array too large"
 			else
 				let m =
-					let p, q = euclideen n max_array_size1 in
+					let p, q = euclideen n max_array_size1 in 
 					let l = Array.create max_array_size1 a in
 					let m = Array.create (if q = 0 then p else p + 1) l in
 					let rec aux k =
@@ -64,27 +64,27 @@ module GenArray =
 				Unary a -> Array.length a
 			|	Binary a ->
 					let p = Array.length a in
-					let q = Array.length (Array.get a (p - 1)) in
+					let q = Array.length (Array.unsafe_get a (p - 1)) in
 					(p - 1) * max_array_size1 + q
 		
 		let size = length
 		
-		let get2 a p q = Array.get (Array.get a p) q
+		let get2 a p q = Array.unsafe_get (Array.unsafe_get a p) q
 		
 		let get a i =
 			match a
 			with
-				Unary a -> Array.get a i
+				Unary a -> Array.unsafe_get a i
 			|	Binary a ->
 					let p, q = euclideen i max_array_size1 in
 					get2 a p q
 		
-		let set2 a p q j = Array.set (Array.get a p) q j
+		let set2 a p q j = Array.unsafe_set (Array.unsafe_get a p) q j
 		
 		let set a i j =
 			match a
 			with
-				Unary a -> Array.set a i j
+				Unary a -> Array.unsafe_set a i j
 			|	Binary a ->
 					let p, q = euclideen i max_array_size1 in
 					set2 a p q j
