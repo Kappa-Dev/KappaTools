@@ -14,6 +14,8 @@ type alg_expr =
 	| COSINUS of alg_expr * Tools.pos
 	| TAN of alg_expr * Tools.pos
 	| ABS of alg_expr * Tools.pos
+	| MAX of alg_expr * alg_expr * Tools.pos
+	| MIN of alg_expr * alg_expr * Tools.pos
 	| TIME_VAR of Tools.pos
 	| EVENT_VAR of Tools.pos
 	| NULL_EVENT_VAR of Tools.pos

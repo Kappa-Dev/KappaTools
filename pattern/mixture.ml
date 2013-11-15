@@ -9,7 +9,7 @@ type t = {
 	agents:agent IntMap.t ; 
 	site_number : int ;
 	graph : (int*int) Int2Map.t ;
-	enum_cov : (int,covering) Hashtbl.t option;
+	enum_cov : (int,covering) Hashtbl.t option ;
 	ids_of_name : IntSet.t Int2Map.t ; (*(nm,cc_id) -> id if agent(id) has name nm in con. comp. cc_id*)
 	component_of_id : int array option ; (*id -> cc_id starting at 0*)
 	arity : int option (*number of explicitly connected components*) ;

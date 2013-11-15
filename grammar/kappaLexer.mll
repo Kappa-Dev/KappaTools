@@ -89,6 +89,8 @@ rule token = parse
 								| "true" -> TRUE pos
 								| "false" -> FALSE pos
 								| "pi" -> FLOAT (3.14159265,pos)
+								| "max" -> MAX pos
+								| "min" -> MIN pos
 								| "Emax" -> EMAX pos
 								| "Tmax" -> TMAX pos
 								| _ as s -> return_error None lexbuf ("Symbol \""^s^"\" is not defined")

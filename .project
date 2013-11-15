@@ -6,12 +6,12 @@
 	</projects>
 	<buildSpec>
 		<buildCommand>
-				<name>Ocaml.ocamlMakefileBuilder</name>
-						<arguments>
-								</arguments>
-									</buildCommand>
-									</buildSpec>
-									<natures>
-										<nature>ocaml.ocamlnatureMakefile</nature>
-										</natures>
+			<name>Ocaml.ocamlMakefileBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>ocaml.ocamlnatureMakefile</nature>
+	</natures>
 </projectDescription>

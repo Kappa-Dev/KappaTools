@@ -400,7 +400,12 @@ let rec partial_eval_alg env ast =
 		| SUM (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> a +. b) (Some (fun a b -> a+b)) (Some (fun a b -> Int64.add a b))) "+"
 		| MULT (ast, ast', pos) -> bin_op ast ast' pos  (fun x y -> cast_op x y (fun a b -> a *. b) (Some (fun a b -> a*b)) (Some (fun a b -> Int64.mul a b))) "*"
 		| MINUS (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> a -. b) (Some (fun a b -> a-b)) (Some (fun a b -> Int64.sub a b))) "-"
-		| POW (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> a ** b) (Some (fun a b -> Tools.pow a b)) (Some (fun a b -> Tools.pow64 a (Int64.to_int b)))) "^"
+		| POW (ast, ast', pos) -> 
+			bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> a ** b) (Some (fun a b -> Tools.pow a b)) (Some (fun a b -> Tools.pow64 a (Int64.to_int b)))) "^"
+		| MAX (ast, ast', pos) -> 
+			bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> max a b) (Some (fun a b -> max a b)) (Some (fun a b -> max a b))) "max" 
+		| MIN (ast,ast',pos) ->
+			bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> min a b) (Some (fun a b -> min a b)) (Some (fun a b -> min a b))) "min"
 		| MODULO (ast, ast', pos) -> 
 			bin_op ast ast' pos 
 			(fun x y -> 
