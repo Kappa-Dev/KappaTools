@@ -9,7 +9,7 @@
   * Jean Krivine, Universite Paris-Diderot, CNRS 
   *  
   * Creation: 19/10/2011
-  * Last modification: 10/09/2013
+  * Last modification: 21/11/2013
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -268,7 +268,14 @@ let compress env state log_info step_list =
                      (*let config = Causal.subconfig enriched_grid.Causal.config (List.rev event_id_list_rev) in *)
                      let error,event_list,result_wo_compression = D.S.translate parameter handler error blackboard event_id_list in 
                      let result_wo_compression = List.rev_map fst (List.rev result_wo_compression) in 
-                     let error,refined_event_list_without_pseudo_inverse,int_pseudo_inverse  = D.S.PH.B.PB.CI.cut parameter handler error result_wo_compression   in 
+                     let error,refined_event_list_without_pseudo_inverse,int_pseudo_inverse  = 
+                       if weak_compression_on or strong_compression_on
+                       then 
+                         D.S.PH.B.PB.CI.cut parameter handler error result_wo_compression   
+                       else 
+                         D.S.PH.B.PB.CI.do_not_cut parameter handler error result_wo_compression 
+                     in 
+                   
                      let error,log_info,blackboard = D.S.PH.B.import parameter handler error log_info (List.rev_map (fun (x,_)->x) (List.rev refined_event_list_without_pseudo_inverse)) in 
                      let error,list = D.S.PH.forced_events parameter handler error blackboard in 
                      let list_order,list_eid,info = 
@@ -286,6 +293,13 @@ let compress env state log_info step_list =
                        else 
                          (List.rev_map (fun (x,_) -> (x,D.S.PH.B.PB.CI.Po.K.empty_side_effect,dummy_weak)) (List.rev refined_event_list_without_pseudo_inverse))
                       in 
+                   (*  let refined_list = 
+                       if weak_compression_on or strong_compression_on 
+                       then 
+                         refined_list 
+                       else 
+                         (List.rev_map (fun x -> x,D.S.PH.B.PB.CI.Po.K.empty_side_effect,dummy_weak) (result_wo_compression))
+                     in *)
                       let grid = D.S.PH.B.PB.CI.Po.K.build_grid refined_list true handler in
                       let enriched_grid = Causal.enrich_grid Graph_closure.config_intermediary grid in 
                       let event_id_list_rev = ((eid+1)::(enriched_grid.Causal.prec_star.(eid+1))) in 

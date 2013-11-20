@@ -9,7 +9,7 @@
    * Jean Krivine, Université Paris Dederot, CNRS 
    *  
    * Creation: 17/04/2012
-   * Last modification: 10/09/2013
+   * Last modification: 21/11/2013
    * * 
    * Some parameter references can be tuned thanks to command-line options
    * other variables has to be set before compilation   
@@ -26,6 +26,7 @@
      module A:LargeArray.GenArray 
 
      val cut: (Po.K.refined_step list -> Po.K.H.error_channel * ((Po.K.refined_step*bool) list) * int) Po.K.H.with_handler 
+     val do_not_cut: (Po.K.refined_step list -> Po.K.H.error_channel * ((Po.K.refined_step*bool) list) * int) Po.K.H.with_handler 
    end
 
  module Pseudo_inv = 
@@ -348,6 +349,8 @@
             then error,Some (eida,eidb)
             else error,None
 
+(*      let check _ _ error _ = error,None *)
+
       let pop parameter handler error blackboard eid = 
         let predicate_list = A.get blackboard.predicates_of_event eid in 
         let rec aux l error blackboard = 
@@ -632,6 +635,34 @@
     in 
     error,list,n_cut
     
-
-    
+  let do_not_cut parameter handler error list = 
+    let n = List.length list in 
+    let blackboard = init_blackboard n in 
+    let error,blackboard,n_cut = 
+      List.fold_left 
+        (fun (error,blackboard,n_cut) step ->  
+          let error,blackboard = add_step parameter handler error step blackboard in 
+          error,blackboard,n_cut)
+        (error,blackboard,0)
+        list 
+    in 
+    let list = 
+      let rec aux k list list_weak = 
+        if k=(-1) 
+        then list
+        else 
+          let list_weak,bool = 
+            match list_weak 
+            with 
+              t::q -> if t=k then q,true else list_weak,false
+            | [] -> [],false
+          in 
+          match A.get blackboard.event k 
+          with 
+            | Some a -> 
+              aux (k-1) ((a,bool)::list) list_weak 
+            | None -> aux (k-1) list list_weak
+      in aux (blackboard.nsteps) [] blackboard.weak_actions
+    in 
+    error,list,n_cut
     end:Cut_pseudo_inverse)
