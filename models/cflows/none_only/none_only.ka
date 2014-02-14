@@ -23,7 +23,7 @@
 %obs: 'Cpu' C(x1~p?,x2~u?) 
 %obs: 'Cpp' C(x1~p?,x2~p?) 
 
-%var: 'n_ab' 1000 
+%var: 'n_ab' 10 
 %obs: 'n_c' 0
 %var: 'C' C()
 

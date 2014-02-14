@@ -1,5 +1,5 @@
 ####### TEMPLATE MODEL AS DESCRIBED IN THE MANUAL#############
-%def: "displayCompression" "weak" 
+%def: "displayCompression" "none" "weak" 
 %def: "showIntroEvents" "true"
 
 #### Signatures 
