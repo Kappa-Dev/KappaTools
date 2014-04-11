@@ -166,7 +166,7 @@ exception TooBig
 
 let bit_encode node env =
 	try
-  	let tot_offset = ref 0 in
+  	let tot_offset = ref 0 in 
   	let sign = Environment.get_sig (name node) env in
   	let max_val = fun site_id -> Signature.internal_states_number site_id sign in
   	let bit_rep = 

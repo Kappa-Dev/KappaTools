@@ -1,5 +1,4 @@
 /opt/local/bin
-/usr/lib/ocaml
 /opt/local/lib/ocaml
 .
 siteGraphs
@@ -142,3 +141,5 @@ simulation
 siteGraphs
 bin/Nightly build
 models/debug
+models/cflows/pseudo_inverse
+models/radius

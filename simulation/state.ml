@@ -52,9 +52,9 @@ let connex ?(d_map = IntMap.empty) ?(filter = false) ?start_with set with_full_c
 		if filter then
 			let predicate env = fun node -> Environment.is_nl_root (Node.name node) env
 			in  
-			SiteGraph.neighborhood ~check_connex:set ~complete:with_full_components ~d_map:d_map ~filter_elements:(predicate env) state.graph start_root (-1) 
+			SiteGraph.neighborhood ~check_connex:set ~complete:with_full_components ~d_map:d_map ~filter_elements:(predicate env) state.graph start_root !Parameter.radius 
 		else
-			SiteGraph.neighborhood ~check_connex:set ~complete:with_full_components ~d_map:d_map state.graph start_root (-1) 
+			SiteGraph.neighborhood ~check_connex:set ~complete:with_full_components ~d_map:d_map state.graph start_root !Parameter.radius 
 	in 
 	(is_connex,d_map,component,remaining_roots)
 	
@@ -232,7 +232,8 @@ let eval_activity ?using rule state counter env =
 					match x with
 						| Dynamics.CONST f -> 
 							let n = nl_instance_number mix_id state env in 
-							Num.mult f n
+							if Mods.Num.is_zero n then (Num.I 0) (*whatever the rate is, if 0 instance then 0 activity*)
+							else Num.mult f n
 						| Dynamics.VAR k_fun ->
 							let act_of_id id = nl_instance_number id state env 
 							and v_of_var id = value state id counter env 

@@ -72,14 +72,24 @@ struct
 	
 	exception Is_connex
 	
-	let neighborhood ?(interrupt_with = IntSet.empty) ?check_connex ?(complete = false) ?(d_map = IntMap.empty) ?filter_elements sg id radius =
+	let neighborhood 
+			?(interrupt_with = IntSet.empty) (**[interrrupt_with set] Interrupts function call if neighborhood of node [id] contains an identifier in the specified set*) 
+			?check_connex (**[check_connex=set option] if [Some set] then will additionally check whether the cc of node [id] is connected to a node id in [set] *)
+			?(complete = false) (**if [complete=false] then the construction of the cc will stop whenever [check_connex] has been verified -if asked for*)
+			?(d_map = IntMap.empty) 
+			?filter_elements 
+			sg 
+			id 
+			radius 
+		=
 		let address node =
 			try ( & ) node
 			with | Not_found -> invalid_arg "Graph.neighborhood: not allocated" in
 		let add_min id d map =
 			if IntMap.mem id map
 			then (true, map)
-			else (false, (IntMap.add id d map)) in
+			else (false, (IntMap.add id d map)) 
+		in
 		let mark_next addr depth d_map to_do =
 			let node = node_of_id sg addr
 			in
@@ -126,7 +136,7 @@ struct
 						| Not_found ->
 								invalid_arg "Graph.neighborhood: invariant violation")
 					in
-					if (radius >= 0) && ((depth + 1) > radius)
+					if (radius >= 0) && ((depth + 1) > radius) (*do not try to mark next if depth is too big*)
 					then iter check_connex remaining_roots to_do dist_map component is_connex
 					else
 						(let (dist_map', to_do') =
