@@ -72,6 +72,7 @@ struct
 	
 	exception Is_connex
 	
+	(*Should re-implement this function*)
 	let neighborhood 
 			?(interrupt_with = IntSet.empty) (**[interrrupt_with set] Interrupts function call if neighborhood of node [id] contains an identifier in the specified set*) 
 			?check_connex (**[check_connex=set option] if [Some set] then will additionally check whether the cc of node [id] is connected to a node id in [set] *)
@@ -86,9 +87,9 @@ struct
 			try ( & ) node
 			with | Not_found -> invalid_arg "Graph.neighborhood: not allocated" in
 		let add_min id d map =
-			if IntMap.mem id map
-			then (true, map)
-			else (false, (IntMap.add id d map)) 
+			let d,b = try (min d (IntMap.find id map),true) with Not_found -> (d,false) in
+			let map = IntMap.add id d map in	
+			(b, map) 
 		in
 		let mark_next addr depth d_map to_do =
 			let node = node_of_id sg addr
