@@ -95,7 +95,7 @@ rule token = parse
 								| "Tmax" -> TMAX pos
 								| _ as s -> return_error None lexbuf ("Symbol \""^s^"\" is not defined")
 						}  
-		| ':' {TYPE_TOK}
+		| ':' {TYPE}
 		| ';' {SEMICOLON}
 		| '\"' {let str = read_label "" ['\"'] lexbuf in let pos = position lexbuf in STRING (str,pos)}
     | '\n' {incr_line lexbuf ; NEWLINE}
@@ -132,7 +132,6 @@ rule token = parse
 								| "obs" -> (OBS pos)
 								| "def" -> (CONFIG pos)
 								| "token" -> (TOKEN pos)
-								| "volume" -> (VOLUME pos)
 								| _ as s -> return_error None lexbuf ("Instruction \""^s^"\" not recognized")
 					 } 
 		| '!' {let pos = position lexbuf in KAPPA_LNK pos}

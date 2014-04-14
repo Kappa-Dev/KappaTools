@@ -2,17 +2,17 @@
 %}
 
 %token EOF NEWLINE SEMICOLON
-%token AT OP_PAR CL_PAR COMMA DOT TYPE_TOK LAR OP_CUR CL_CUR 
+%token AT OP_PAR CL_PAR COMMA DOT TYPE LAR OP_CUR CL_CUR 
 %token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL PERT INTRO DELETE DO SET UNTIL TRUE FALSE OBS KAPPA_RAR TRACK CPUTIME CONFIG REPEAT DIFF
 %token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INFINITY TIME EVENT NULL_EVENT PROD_EVENT INIT LET DIV PLOT SINUS COSINUS TAN SQRT EXPONENT POW ABS MODULO 
-%token <Tools.pos> EMAX TMAX FLUX ASSIGN ASSIGN2 TOKEN KAPPA_LNK PIPE KAPPA_LRAR PRINT PRINTF CAT VOLUME MAX MIN
+%token <Tools.pos> EMAX TMAX FLUX ASSIGN ASSIGN2 TOKEN KAPPA_LNK PIPE KAPPA_LRAR PRINT PRINTF MAX MIN
 %token <int*Tools.pos> INT 
 %token <string*Tools.pos> ID LABEL KAPPA_MRK  
 %token <float*Tools.pos> FLOAT 
 %token <string*Tools.pos> STRING
 %token <Tools.pos> STOP SNAPSHOT
 
-%left MINUS PLUS 
+%left MINUS PLUS MIN MAX 
 %left MULT DIV 
 %left MODULO
 %right POW 
@@ -272,9 +272,9 @@ token_expr:
 sum_token:
 | OP_PAR sum_token CL_PAR 
 	{$2} 
-| alg_expr TYPE_TOK ID 
+| alg_expr TYPE ID 
 	{[($1,$3)]}
-| alg_expr TYPE_TOK ID PLUS sum_token 
+| alg_expr TYPE ID PLUS sum_token 
 	{let l = $5 in ($1,$3)::l}
 
 mixture:
@@ -300,7 +300,15 @@ rule_expression:
 	{let pos = match $3 with Ast.RAR pos | Ast.LRAR pos -> pos in
 	let lhs,token_l = $2 and rhs,token_r = $4 in 
 		ExceptionDefn.warning ~with_pos:pos "Rule has no kinetics. Default rate of 0.0 is assumed." ; 
-		($1,{Ast.rule_pos = pos ; Ast.lhs=lhs; Ast.rm_token = token_l; Ast.arrow=$3; Ast.rhs=rhs; Ast.add_token = token_r; Ast.k_def=(Ast.FLOAT (0.0,Tools.no_pos)); Ast.k_un=None ;Ast.k_op=None})}
+		($1,{Ast.rule_pos = pos ;
+		     Ast.lhs = lhs; 
+				 Ast.rm_token = token_l; 
+				 Ast.arrow=$3; 
+				 Ast.rhs=rhs; 
+				 Ast.add_token = token_r; 
+				 Ast.k_def=(Ast.FLOAT (0.0,Tools.no_pos),None); 
+				 Ast.k_un=None ;
+				 Ast.k_op=None})}
 ;
 
 arrow:
@@ -380,12 +388,17 @@ alg_expr:
 ;
 
 rate:
-| alg_expr OP_PAR alg_expr CL_PAR 
+| alg_with_radius OP_PAR alg_with_radius CL_PAR 
 	{($1,Some $3,None)}
 | alg_expr 
-	{($1,None,None)}
+	{(($1,None),None,None)}
 | alg_expr COMMA alg_expr 
-	{($1,None,Some $3)}
+	{(($1,None),None,Some $3)}
+;
+
+alg_with_radius:
+| alg_expr {($1,None)}
+| alg_expr TYPE alg_expr {($1,Some $3)}
 ;
 
 multiple_mixture:

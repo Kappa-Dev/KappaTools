@@ -95,7 +95,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 					and pert_events = ref pert_events
 					in
 						while !n > 0 do (*FIXME: highly unefficient to compute new injection at each loop*)
-							let embedding_t = State.select_injection (infinity,0.) state r.lhs counter env in (*empty embedding, cannot raise null-event*)
+							let embedding_t = State.select_injection (infinity,None) (0.,None) state r.lhs counter env in (*empty embedding, cannot raise null-event*)
 							let (env, state, side_effects, embedding_t, psi, pert_ids_neg) = State.apply !st r embedding_t counter env in
 							let phi = State.map_of embedding_t in
 							let env,state,pert_ids_pos,new_injs,tracked' = State.positive_update ~with_tracked:!tracked state r (phi,psi) (side_effects,Int2Set.empty) counter env
@@ -125,11 +125,11 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 				in
 					while !cpt < x do
 						let opt = 
-							try Some (State.select_injection (infinity,0.) state mix counter env) with 
+							try Some (State.select_injection (infinity,None) (0.,None) state mix counter env) with 
 								| Not_found -> None (*Not found is raised if there is no more injection to draw in instances of mix*)
 								| Null_event _ -> 
 									if !Parameter.debugModeOn then Debug.tag "Clashing instance detected: building matrix";
-									let matrix = State.instances_of_square mix_id state env in
+									let matrix = State.instances_of_square mix_id (-1) state env in
 										match matrix with
 											| (embedding,_,_)::_ -> Some (CONNEX {map=embedding; roots = IntSet.empty ; components = None ; depth_map = None}) 
 											| [] -> None
@@ -157,7 +157,8 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 				in
 				let value = State.value state ~var:v (-1) counter env in (*Change here if one wants to have address passing style of assignation*)
 				let r = State.rule_of_id id state in
-  			Hashtbl.replace state.rules id {r with k_def = Dynamics.CONST value} ;
+				let _,def_radius = r.Dynamics.k_def in 
+  			Hashtbl.replace state.rules id {r with k_def = (Dynamics.CONST value,def_radius)} ;
   			State.update_activity state p_id id counter env ;		
   			let env,pert_ids = State.update_dep state (-1) (RULE id) pert_ids counter env in
   			(env,state ,pert_ids,tracked,pert_events)

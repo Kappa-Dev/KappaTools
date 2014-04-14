@@ -22,8 +22,8 @@ module IdMap = MapExt.Make (struct type t = id let compare = compare end)
 module Id2Map = MapExt.Make (struct type t = id*int let compare = compare end)
 
 type rule = {
-	k_def : variable ; (*standard kinetic constant*)
-	k_alt : variable option ; (*Possible unary kinetic rate*)
+	k_def : variable * variable option; (*standard kinetic constant*)
+	k_alt : variable option * variable option; (*Possible unary kinetic rate*)
 	over_sampling : float option ; (*Boosted kinetic rate for Bologna technique*)
 	script : action list ;
 	balance : (int * int * int) ;	(*#deleted,#preserved,#removed*)
@@ -281,7 +281,7 @@ let diff pos m0 m1 label_opt env =
 										let bnd_i =
 											if List.mem i added then (FRESH i) else (KEPT i)
 										in
-										if i < id or (i = id && x < site_id) then 
+										if i < id || (i = id && x < site_id) then 
 											BND((bnd_i, x),(FRESH id, site_id)):: inst
 										else 
 											inst
@@ -359,7 +359,7 @@ let diff pos m0 m1 label_opt env =
 																	add_map (KEPT id) (site_id,1) idmap
 															and inst =
 																(*generating only one FREE instruction when id'<=id or when (id',site_id') is still bound in rhs*)
-																if apply_anyway or id'< id or (id'= id && site_id'< site_id) then (FREE (((KEPT id), site_id),true)):: inst
+																if apply_anyway || id'< id || (id'= id && site_id'< site_id) then (FREE (((KEPT id), site_id),true)):: inst
 																else inst
 															in
 															(inst,idmap)
@@ -398,7 +398,7 @@ let diff pos m0 m1 label_opt env =
 															in
 															let idmap' = add_map (KEPT id) (site_id,1) (add_map id'' (i1',1) idmap) in
 															(*instruction*)
-															if id1' < id or (id1'= id && i1'< site_id) then (*generating an instruction only for one of both sites*)
+															if id1' < id || (id1'= id && i1'< site_id) then (*generating an instruction only for one of both sites*)
 																begin
 																	let inst = BND((KEPT id, site_id), (id'',i1')):: inst
 																	in
@@ -425,7 +425,7 @@ let diff pos m0 m1 label_opt env =
 																let id1'' = if List.exists (fun id -> id=id1') prefix then (KEPT id1') else (FRESH id1') in
 																let idmap' = add_map id1'' (i1',1) idmap in
 																(*instruction*)
-																if id1'< id or (id1'= id && i1'< site_id) then
+																if id1'< id || (id1'= id && i1'< site_id) then
 																	let inst = BND((KEPT id, site_id), (id1'', i1')):: inst
 																	in
 																		(inst,idmap')
@@ -453,7 +453,7 @@ let diff pos m0 m1 label_opt env =
 														let id'' = if List.exists (fun id -> id=id') prefix then KEPT id' else FRESH id' in
 														let idmap' = add_map (KEPT id) (site_id,1) (add_map id'' (i',1) idmap) 
 														in
-														if (id'< id) or (id'= id && i'< site_id) then 
+														if (id'< id) || (id'= id && i'< site_id) then 
 															let inst = BND((KEPT id, site_id), (id'', i')):: inst 
 															in
 															(inst,idmap')
@@ -500,7 +500,7 @@ let diff pos m0 m1 label_opt env =
 														let id'' = if List.exists (fun id -> id=id') prefix then KEPT id' else FRESH id' in
 														let idmap' = add_map (KEPT id) (site_id,1) (add_map id'' (i',1) idmap) in
 														(*instruction*)
-														if (id'< id) or (id'= id && i'< site_id) then
+														if (id'< id) || (id'= id && i'< site_id) then
 															let inst = BND((KEPT id, site_id), (id'', i')):: inst
 															in
 															((*side_effect:= true;*)

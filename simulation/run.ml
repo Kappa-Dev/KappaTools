@@ -11,7 +11,7 @@ let event state (*grid*) story_profiling event_list counter plot env =
 		in
 		if activity < 0. then invalid_arg "Activity invariant violation" ;
 			let dt = -. (log rd /. activity) in 
-			if dt = infinity or activity <= 0. then
+			if dt = infinity || activity <= 0. then
 				let depset = Environment.get_dependencies Mods.TIME env in
 				DepSet.fold
 				(fun dep (dt,activity) ->
