@@ -22,7 +22,7 @@ module IdMap = MapExt.Make (struct type t = id let compare = compare end)
 module Id2Map = MapExt.Make (struct type t = id*int let compare = compare end)
 
 type rule = {
-	k_def : variable * variable option; (*standard kinetic constant*)
+	k_def : variable ; (*standard kinetic constant*)
 	k_alt : variable option * variable option; (*Possible unary kinetic rate*)
 	over_sampling : float option ; (*Boosted kinetic rate for Bologna technique*)
 	script : action list ;

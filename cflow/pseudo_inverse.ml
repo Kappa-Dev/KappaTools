@@ -447,7 +447,7 @@
          with 
            | Not_found -> false,None 
        in 
-       let test = test or test' in 
+       let test = test || test' in 
        let action = 
          match action' 
          with 
@@ -470,7 +470,7 @@
        List.fold_left 
          (fun (error,blackboard,action_map,test_map,bool,bool_creation) action -> 
            let action_list,test_list,bool',bool_creation' = predicates_of_action parameter handler error blackboard action in 
-           error,blackboard,build_map action_list action_map,build_map_test test_list test_map,bool or bool',bool_creation or bool_creation')
+           error,blackboard,build_map action_list action_map,build_map_test test_list test_map,bool || bool',bool_creation || bool_creation')
          (error,blackboard,PredicateMap.empty,test_map,false,false)
          (action_list) in 
      let merged_map = 
@@ -498,12 +498,12 @@
          (fun pid (test,action) (bool,list) -> 
            bool 
            (*or (test=(Some Undefined)) *)
-           or
+           ||
              (match action
               with 
                 None -> false
               | Some action ->
-                try not ((get_init_state pid = action) or action = Undefined)
+                try not ((get_init_state pid = action) || action = Undefined)
                 with Not_found -> false),
              match action 
              with 

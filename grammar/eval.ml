@@ -538,17 +538,12 @@ let rule_of_ast ?(backwards=false) env (ast_rule_label, ast_rule) tolerate_new_s
 		Environment.declare_var_kappa ~from_rule:true ast_rule_label.lbl_nme env in
 	(* reserving an id for rule's lhs in the pattern table *)
 	let env = Environment.declare_rule ast_rule_label.lbl_nme lhs_id env in
-	let (k_def, radius_def, dep) =
-		let k_def,radius_opt = ast_rule.k_def in
+	let (k_def, dep) =
+		let k_def = ast_rule.k_def in
 		let k_def,dep = reduce_val k_def env in
-		let radius_def,dep = 
-			match radius_opt with 
-			| None -> (None,dep) 
-			| Some v -> let rad,dep' = (reduce_val v env) in (Some rad,DepSet.union dep dep') 
-		in
-		(k_def,radius_def, dep)
+		(k_def,dep)
 	
-	and (env,k_alt,radius_alt, dep_alt) =
+	and (env,k_alt,radius,dep_alt) =
 		match ast_rule.k_un with
 		| None -> (env,None,None, DepSet.empty)
 		| Some (ast,ast_opt) -> (****TODO HERE treat ast_opt that specifies application radius****)
@@ -701,8 +696,8 @@ let rule_of_ast ?(backwards=false) env (ast_rule_label, ast_rule) tolerate_new_s
 		{
 			Dynamics.add_token = add_token ;
 			Dynamics.rm_token = rm_token ;
-			Dynamics.k_def = (k_def,radius_def) ;
-			Dynamics.k_alt = (k_alt,radius_alt) ;
+			Dynamics.k_def = k_def ;
+			Dynamics.k_alt = (k_alt,radius) ;
 			Dynamics.over_sampling = None;
 			Dynamics.script = script;
 			Dynamics.kappa = kappa_lhs ^ ("->" ^ kappa_rhs);
@@ -957,7 +952,7 @@ let pert_of_result variables env res =
 								let rule = 
 								{
 									(*TODO*)Dynamics.rm_token = [] ; Dynamics.add_token = [] ; 
-									Dynamics.k_def = (Dynamics.CONST (Num.F 0.0),None);
+									Dynamics.k_def = Dynamics.CONST (Num.F 0.0);
 									Dynamics.k_alt = (None,None);
 									Dynamics.over_sampling = None;
 									Dynamics.script = script ;
@@ -998,7 +993,7 @@ let pert_of_result variables env res =
 								let rule = 
 								{ (*TODO*) Dynamics.rm_token = [] ; Dynamics.add_token = [] ; 
 									
-									Dynamics.k_def = (Dynamics.CONST (Num.F 0.0),None);
+									Dynamics.k_def = Dynamics.CONST (Num.F 0.0); 
 									Dynamics.k_alt = (None,None);
 									Dynamics.over_sampling = None;
 									Dynamics.script = script ;

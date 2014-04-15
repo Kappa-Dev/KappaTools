@@ -306,7 +306,7 @@ rule_expression:
 				 Ast.arrow=$3; 
 				 Ast.rhs=rhs; 
 				 Ast.add_token = token_r; 
-				 Ast.k_def=(Ast.FLOAT (0.0,Tools.no_pos),None); 
+				 Ast.k_def=Ast.FLOAT (0.0,Tools.no_pos); 
 				 Ast.k_un=None ;
 				 Ast.k_op=None})}
 ;
@@ -388,12 +388,12 @@ alg_expr:
 ;
 
 rate:
-| alg_with_radius OP_PAR alg_with_radius CL_PAR 
+| alg_expr OP_PAR alg_with_radius CL_PAR 
 	{($1,Some $3,None)}
 | alg_expr 
-	{(($1,None),None,None)}
+	{($1,None,None)}
 | alg_expr COMMA alg_expr 
-	{(($1,None),None,Some $3)}
+	{($1,None,Some $3)}
 ;
 
 alg_with_radius:

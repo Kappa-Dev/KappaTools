@@ -31,8 +31,8 @@ sig
 	val ( & ) : Node.t -> int
 	val neighborhood :
 			?interrupt_with: Mods.IntSet.t -> 
-			?check_connex: Mods.IntSet.t -> 
-			?complete:bool -> 
+			?check_connex: Mods.IntSet.t * Mods.IntSet.t -> 
+			?complete_construction:bool -> 
 			?d_map:int IntMap.t -> 
 			?filter_elements: (Node.t -> bool) ->  
 			t -> int -> int -> (bool * int Mods.IntMap.t * IntSet.t * IntSet.t)
@@ -76,7 +76,7 @@ struct
 	let neighborhood 
 			?(interrupt_with = IntSet.empty) (**[interrrupt_with set] Interrupts function call if neighborhood of node [id] contains an identifier in the specified set*) 
 			?check_connex (**[check_connex=set option] if [Some set] then will additionally check whether the cc of node [id] is connected to a node id in [set] *)
-			?(complete = false) (**if [complete=false] then the construction of the cc will stop whenever [check_connex] has been verified -if asked for*)
+			?(complete_construction = false) (**if [complete=false] then the construction of the cc will stop whenever [check_connex] has been verified -if asked for*)
 			?(d_map = IntMap.empty) 
 			?filter_elements 
 			sg 
@@ -86,70 +86,73 @@ struct
 		let address node =
 			try ( & ) node
 			with | Not_found -> invalid_arg "Graph.neighborhood: not allocated" in
-		let add_min id d map =
-			let d,b = try (min d (IntMap.find id map),true) with Not_found -> (d,false) in
-			let map = IntMap.add id d map in	
-			(b, map) 
+		let add_min codomain id d map =
+			let d = try min (d+1) (IntMap.find id map) with Not_found -> if IntSet.mem id codomain then 0 else d+1 in
+			IntMap.add id d map	 
 		in
-		let mark_next addr depth d_map to_do =
-			let node = node_of_id sg addr
+		let mark_next (root,codomain) depth_of_root d_map to_do complete interrupt_with =
+			let node = node_of_id sg root
 			in
-			Node.fold_status
-				(fun _ (_, lnk) (d_map, to_do) ->
-							match lnk with
-							| Node.FPtr _ -> invalid_arg "Graph.neighborhood"
-							| Node.Null -> (d_map, to_do)
-							| Node.Ptr (node', _) ->
-									let id' = address node' in
-									let (visited, d_map) = add_min id' depth d_map
-									in
-									if visited
-									then (d_map, to_do)
-									else (d_map, (id' :: to_do)))
-				node (d_map, to_do) 
+			let d_map,todo,stop =
+  			Node.fold_status
+  				(fun _ (_, lnk) (d_map, to_do, stop) ->
+  							match lnk with
+  							| Node.FPtr _ -> invalid_arg "Graph.neighborhood"
+  							| Node.Null -> (d_map, to_do, stop)
+  							| Node.Ptr (node', _) ->
+  									let id' = address node' in
+  									let stop = if IntSet.mem id' interrupt_with then true else stop in
+  									let d_map = add_min codomain id' depth_of_root d_map
+  									in
+  									if IntSet.mem id' complete then (d_map, to_do, stop)
+  									else (d_map, (id' :: to_do),stop))
+  				node (d_map, to_do, false)
+			in
+			(d_map,todo,stop,IntSet.add root complete)
 		in
 		
-		let rec iter check_connex remaining_roots to_do dist_map component is_connex =
+		let rec iter check_connex (remaining_roots,codomain) to_do (complete:Mods.IntSet.t) dist_map component is_connex =
 			match to_do with
 			| [] -> (is_connex,dist_map,component,remaining_roots) 
-			| addr :: to_do -> (*adding addr to cc -only if addr is the root of a nl injection if filtering is enabled*)
+			| root :: to_do -> (*adding addr to cc -only if addr is the root of a nl injection if filtering is enabled*)
 					let component = 
-						match filter_elements with 
-							| None -> IntSet.add addr component 
+						match filter_elements with (*if root is not a non-local root then skip*)
+							| None -> IntSet.add root component 
 							| Some predicate_over_node -> 
-								let n = node_of_id sg addr 
+								let n = node_of_id sg root 
 								in 
-								if (predicate_over_node n) then IntSet.add addr component else component
+								if (predicate_over_node n) then IntSet.add root component else component
 					in
 					(*checking connectivity of remaining_roots*)
 					let remaining_roots,is_connex = 
 						if not check_connex then (remaining_roots,is_connex) 
 						else 
-							let set = IntSet.remove addr remaining_roots in
+							let set = IntSet.remove root remaining_roots in
 							let is_connex = IntSet.is_empty set in
-							if complete || (not is_connex) then
+							if complete_construction || (not is_connex) then
 								(set,is_connex)
 							else raise Is_connex
 					in
 					let depth =
-						(try IntMap.find addr dist_map
+						(try IntMap.find root dist_map
 						with
 						| Not_found ->
 								invalid_arg "Graph.neighborhood: invariant violation")
 					in
 					if (radius >= 0) && ((depth + 1) > radius) (*do not try to mark next if depth is too big*)
-					then iter check_connex remaining_roots to_do dist_map component is_connex
+					then iter check_connex (remaining_roots,codomain) to_do complete dist_map component is_connex
 					else
-						(let (dist_map', to_do') =
-								mark_next addr (depth + 1) dist_map to_do
+						(let (dist_map', to_do',stop, complete') =
+								mark_next (root,codomain) depth dist_map to_do complete interrupt_with
 							in
-							if IntSet.exists (fun id -> IntMap.mem id dist_map')	interrupt_with then (is_connex,dist_map',component,remaining_roots)
-							else iter check_connex remaining_roots to_do' dist_map' component is_connex)
+							if stop then (is_connex,dist_map',component,remaining_roots)
+							else 
+								iter check_connex (remaining_roots,codomain) to_do' complete' dist_map' component is_connex)
 		in 
 		
-		let check_connex,roots = match check_connex with None -> (false,IntSet.empty) | Some set -> (true,set) in
+		let check_connex,roots,codomain = match check_connex with None -> (false,IntSet.empty,IntSet.empty) | Some (roots,codomain) -> (true,roots,codomain) in
 		
-		try iter check_connex roots [ id ] (IntMap.add id 0 d_map) IntSet.empty false with Is_connex -> (true,IntMap.empty,IntSet.empty,IntSet.empty)
+		try iter check_connex (roots,codomain) [ id ] IntSet.empty (IntMap.add id 0 d_map) IntSet.empty false with Is_connex -> (true,IntMap.empty,IntSet.empty,IntSet.empty)
 			
 	
 	let add_lift sg phi port_map env =

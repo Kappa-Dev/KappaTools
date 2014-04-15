@@ -157,8 +157,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 				in
 				let value = State.value state ~var:v (-1) counter env in (*Change here if one wants to have address passing style of assignation*)
 				let r = State.rule_of_id id state in
-				let _,def_radius = r.Dynamics.k_def in 
-  			Hashtbl.replace state.rules id {r with k_def = (Dynamics.CONST value,def_radius)} ;
+  			Hashtbl.replace state.rules id {r with k_def = Dynamics.CONST value} ;
   			State.update_activity state p_id id counter env ;		
   			let env,pert_ids = State.update_dep state (-1) (RULE id) pert_ids counter env in
   			(env,state ,pert_ids,tracked,pert_events)

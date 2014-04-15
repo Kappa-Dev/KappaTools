@@ -64,7 +64,7 @@ let compress env state log_info step_list =
         else 
           begin
             let _ = 
-              if (weak_compression_on or strong_compression_on)
+              if (weak_compression_on || strong_compression_on)
             then 
                 let _ = Debug.tag "+ Producing causal compressions" in ()
               else 
@@ -316,7 +316,7 @@ let compress env state log_info step_list =
               error,log_info,[],0,blackboard 
           in 
           let error,log_info,causal_story_array,n_stories,blackboard = 
-            if weak_compression_on or strong_compression_on 
+            if weak_compression_on || strong_compression_on 
             then 
               deal_with error true log_info 
             else
@@ -327,7 +327,7 @@ let compress env state log_info step_list =
           let _ = print_newline () in 
           let _ = print_newline () in 
           let error,weakly_compression_faillure,weakly_compressed_story_array = 
-            if weak_compression_on or strong_compression_on 
+            if weak_compression_on || strong_compression_on 
             then 
               begin 
                 let _ = Debug.tag ("\t - Weak flow compression ("^(string_of_int n_stories)^")") in 
@@ -381,7 +381,7 @@ let compress env state log_info step_list =
                               | None -> 
                                 error,weakly_compressed_story_array,weakly_compression_faillure+1,None
                               | Some list -> 
-                                if weak_compression_on or strong_compression_on 
+                                if weak_compression_on || strong_compression_on 
                                 then 
                                   let weak_event_list = D.S.translate_result list in 
                                   let error,weak_event_list = D.S.PH.B.PB.CI.Po.K.clean_events parameter handler error weak_event_list in 

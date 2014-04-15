@@ -371,7 +371,7 @@ module Preblackboard =
                    | _ -> true 
                end
                  
-         let more_refined x y = x=y or strictly_more_refined x y
+         let more_refined x y = x=y || strictly_more_refined x y
            
          let conj parameter handler error x y = 
            if more_refined x y then error,x 
@@ -382,7 +382,7 @@ module Preblackboard =
                CI.Po.K.H.raise_error parameter handler error_list error Undefined  
                  
          let compatible x y = 
-           x=y or more_refined x y or more_refined y x
+           x=y || more_refined x y || more_refined y x
            
          let disjunction parameter handler error x y = 
            error,
@@ -1340,7 +1340,7 @@ module Preblackboard =
                      in
                      let data_structure = 
                        if SiteIdSet.mem mix_site1 priority_sites 
-                         or SiteIdSet.mem mix_site2 priority_sites
+                         || SiteIdSet.mem mix_site2 priority_sites
                        then 
                          let ag_id1,ag_id2 = 
                            if ag_id1<ag_id2 
@@ -2214,7 +2214,7 @@ module Preblackboard =
                                                | Bound_site (ag_id,site_id) ->  
                                                  if 
                                                    (ag_id = mixture_ag_1 && (SiteIdSet.mem (rule_ag_id1,site_id) data_structure.removed_sites_in_other_links))
-                                                 or (ag_id = mixture_ag_2 && (SiteIdSet.mem (rule_ag_id2,site_id) data_structure.removed_sites_in_other_links))
+                                                 || (ag_id = mixture_ag_2 && (SiteIdSet.mem (rule_ag_id2,site_id) data_structure.removed_sites_in_other_links))
                                                  then (pid,Undefined)
                                                  else (pid,x)
                                                | _ -> (pid,x)

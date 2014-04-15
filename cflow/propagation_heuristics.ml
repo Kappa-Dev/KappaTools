@@ -1445,7 +1445,7 @@ module Propagation_heuristic =
           begin 
             let error,log_info,blackboard,instruction_list,_,result' = refine_value_before parameter handler error log_info blackboard case test  instruction_list propagate_list in 
             let error,log_info,blackboard,instruction_list,_,result'' = refine_value_after parameter handler error log_info blackboard case action instruction_list propagate_list in 
-            if B.is_failed result' or B.is_failed result'' 
+            if B.is_failed result' || B.is_failed result'' 
             then 
               (error,
                log_info,

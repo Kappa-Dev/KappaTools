@@ -468,14 +468,14 @@ module Blackboard =
        error,{address with row_short_event_id = case.dynamic.pointer_previous}
 
      let get_first_linked_event blackboard pid = 
-       if pid <0 or pid >= blackboard.n_predicate_id 
+       if pid <0 || pid >= blackboard.n_predicate_id 
        then 
          None 
        else 
          Some 0 
 
      let get_last_linked_event blackboard pid = 
-       if pid<0 or pid >= blackboard.n_predicate_id 
+       if pid<0 || pid >= blackboard.n_predicate_id 
        then 
          None 
        else 

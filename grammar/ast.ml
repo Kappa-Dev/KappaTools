@@ -60,7 +60,7 @@ type rule = {
 	arrow:arrow ; 
 	rhs:mixture; 
 	add_token: (alg_expr * str_pos) list ; 
-	k_def:alg_expr * (alg_expr option) ; 
+	k_def:alg_expr ; 
 	k_un:(alg_expr * alg_expr option) option ; (*k_1:radius_opt*)
 	k_op: alg_expr option ; (*rate for backward rule*)
 	}
@@ -76,7 +76,7 @@ let flip (rule_label,rule) =
 			rhs = rule.lhs ; 
 			add_token = rule.rm_token ; 
 			rm_token = rule.add_token ; 
-			k_def = (match rule.k_op with None -> (FLOAT (0.,Tools.no_pos),None) | Some k -> (k,None)) ;
+			k_def = (match rule.k_op with None -> FLOAT (0.,Tools.no_pos) | Some k -> k) ;
 			k_op = None
 			}
 	in 

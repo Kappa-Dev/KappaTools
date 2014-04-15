@@ -135,8 +135,8 @@
              in 
              let error,(actions,_) = K.actions_of_refined_step parameter handler error event in  
              if (K.is_obs_of_refined_step event)
-               or (keep actions)
-               or (keep2 (predicates_of_side_effects (K.get_kasim_side_effects event)))
+               || (keep actions)
+               || (keep2 (predicates_of_side_effects (K.get_kasim_side_effects event)))
              then 
                begin
                  let kept = event::kept in 
