@@ -92,7 +92,7 @@ module GenArray =
 		let make = create
 		
 		let init n f =
-			if n < 0 or n > max_array_size2
+			if n < 0 || n > max_array_size2
 			then raise (Invalid_argument ("Big_array.init : "^(string_of_int n)))
 			else
 			if n <= max_array_size1
@@ -161,7 +161,7 @@ module GenArray =
 		
 		let sub a start len =
 			let size = length a in
-			if start < 0 or len < 0 or start + len > size
+			if start < 0 || len < 0 || start + len > size
 			then raise (Invalid_argument "Big_array.sub")
 			else
 			if size = 0
@@ -181,7 +181,7 @@ module GenArray =
 		
 		let fill a start len x =
 			let size = length a in
-			if start < 0 or len < 0 or start + len > size
+			if start < 0 || len < 0 || start + len > size
 			then raise (Invalid_argument "Big_array.fill")
 			else
 				let rec aux k i =

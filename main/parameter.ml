@@ -18,9 +18,6 @@ let useColor = ref true
 let safeModeOn = ref false
 let emacsMode = ref false
 
-(*Temporary option*)
-let radius = ref (-1)
-
 (* expert option for stories *)
   (** Memory **)
   (* Number of potential states that are put in the cache per binding site, so as to handler with side effects in stories. None -> Unlimited cache *) 

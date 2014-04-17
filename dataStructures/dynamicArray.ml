@@ -118,7 +118,7 @@ module DynArray =
 	      
       let sub a start len =
 	let size = length a in
-	if start < 0 or len < 0 or start + len > size
+	if start < 0 || len < 0 || start + len > size
 	then raise (Invalid_argument "Dynamic_array.sub")
 	else
 	  let c = init len (fun x -> get a (x + start)) in
@@ -133,7 +133,7 @@ module DynArray =
 		
       let fill a start len x =
 	let size = length a in
-	if start < 0 or len < 0 or start + len > size
+	if start < 0 || len < 0 || start + len > size
 	then raise (Invalid_argument "Dynamic_array.fill")
 	else
 	  let rec aux k i =

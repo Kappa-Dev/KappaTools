@@ -125,7 +125,7 @@ module Make(Ord: OrderedType) =
     let add_if_not_mem x t0 =
       let rec aux x = function
         | Empty -> Node(Empty, x, Empty, 1)
-        | Node(l, v, r, _) as t ->
+        | Node(l, v, r, _) ->
           let c = Ord.compare x v in
           if c = 0 then t0 else
           if c < 0 then bal (add x l) v r else bal l v (add x r)

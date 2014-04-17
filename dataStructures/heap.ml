@@ -48,7 +48,7 @@ module Make(C:Content) =
 	let dimension h = GenArray.length h.ar (*real length of the array*)
   
 	let create size = 
-     if (size < 0) or (size >= Sys.max_array_length) then invalid_arg "Heap.create" 
+     if (size < 0) || (size >= Sys.max_array_length) then invalid_arg "Heap.create" 
      else 
        {ar = GenArray.create size None ; 
 				next_address = 0 ; 

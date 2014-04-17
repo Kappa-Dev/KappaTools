@@ -157,7 +157,7 @@ let closure config prec is_obs init_to_eidmax weak_events init =
   let is_init x = 
     try 
       let s = M.find x prec in 
-      S.is_empty s or (S.equal s (S.singleton x))
+      S.is_empty s || (S.equal s (S.singleton x))
     with _ -> true 
   in 
   let weak_events = 
@@ -194,7 +194,7 @@ let closure config prec is_obs init_to_eidmax weak_events init =
   in 
   let s_pred_star = A.create (max_index+1) ([],0) in 
   let clean,max_succ,set_succ,redirect,cut_event,is_final = 
-    if config.enable_gc or config.detect_separable_components 
+    if config.enable_gc || config.detect_separable_components 
     then 
       begin 
         let max_succ = A.create (max_index+1) 0 in 
@@ -274,7 +274,7 @@ let closure config prec is_obs init_to_eidmax weak_events init =
   let is_like_init = cut_event 
   in 
   let does_not_count x = 
-    is_like_init x or is_init x  
+    is_like_init x || is_init x  
   in 
     
   let _ = 
@@ -293,7 +293,7 @@ let closure config prec is_obs init_to_eidmax weak_events init =
                 begin 
                   let new_l,max_out' = A.get s_pred_star pred in 
                   let max_out' = 
-                    if does_not_count pred  or is_obs pred
+                    if does_not_count pred  || is_obs pred
                     then 0 
                     else max_out' 
                   in 
@@ -321,7 +321,7 @@ let closure config prec is_obs init_to_eidmax weak_events init =
               max_out 
           in 
           let _ = 
-            if (does_not_count max_out or max_out <= succ or is_final max_out)
+            if (does_not_count max_out || max_out <= succ || is_final max_out)
               &&
                 weak_events succ 
               && 
@@ -332,7 +332,7 @@ let closure config prec is_obs init_to_eidmax weak_events init =
                     let s = 
                       List.fold_left 
                         (fun s' elt -> 
-                          if does_not_count elt or (is_obs elt && elt<=succ) or elt=succ then s' 
+                          if does_not_count elt || (is_obs elt && elt<=succ) || elt=succ then s' 
                           else S.union (set_succ elt) s')
                         S.empty pred_star 
                     in
@@ -343,8 +343,8 @@ let closure config prec is_obs init_to_eidmax weak_events init =
                       with [] -> true,accu  
                       | h::t -> 
                         if does_not_count h 
-                          or (is_obs h && h<=succ) 
-                          or h=succ 
+                          || (is_obs h && h<=succ) 
+                          || h=succ 
                         then 
                           aux2 t accu 
                         else if is_final h
