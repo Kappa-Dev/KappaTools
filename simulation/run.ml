@@ -160,7 +160,8 @@ let event state (*grid*) story_profiling event_list counter plot env =
 					if !Parameter.debugModeOn then Debug.tag "Null (clash or doesn't satisfy constraints)"; 
 					Counter.inc_null_events counter ; 
 					Counter.inc_consecutive_null_events counter ; 
-					(env,state,pert_ids_time,story_profiling,event_list)
+					let env,pert_ids = State.update_dep state (-1) Mods.EVENT pert_ids_time counter env in
+					(env,state,pert_ids,story_profiling,event_list)
 				end
 			(**************END CFLOW PRODUCTION********************)
 				
