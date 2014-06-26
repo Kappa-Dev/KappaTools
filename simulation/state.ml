@@ -1070,7 +1070,7 @@ let positive_update ?(with_tracked=[]) state r ((phi: int IntMap.t),psi) (side_m
 			let value = Num.float_of_num (value state ~var:v (-1) counter env) in
 			try
 				if !Parameter.debugModeOn then
-					(Debug.tag (Printf.sprintf "adding %f to token %d" value t_id)) ;
+					(Debug.tag (Printf.sprintf "adding %f token(s) %d" value t_id)) ;
 				state.token_vector.(t_id) <- state.token_vector.(t_id) +. value ;
 				(*updating rule activities that depend on |t_id|*)
 				update_dep state r.r_id (Mods.TOK t_id) pert_ids counter env
@@ -1083,7 +1083,7 @@ let positive_update ?(with_tracked=[]) state r ((phi: int IntMap.t),psi) (side_m
 			let value = Num.float_of_num (value state ~var:v (-1) counter env) in
 			try
 				if !Parameter.debugModeOn then
-					(Debug.tag (Printf.sprintf "removing %f to token %d" value t_id)) ;
+					(Debug.tag (Printf.sprintf "removing %f token(s) %d" value t_id)) ;
 				
 				state.token_vector.(t_id) <- state.token_vector.(t_id) -. value ;
 				update_dep state r.r_id (Mods.TOK t_id) pert_ids counter env

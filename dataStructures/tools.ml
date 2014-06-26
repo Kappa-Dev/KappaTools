@@ -85,3 +85,12 @@ let list_of_string str =
 		with Stream.Failure -> (acc::cont)
 	in
 	parse stream "" []
+	
+let find_available_name nme ext = 
+	let v = ref 0 in
+	let fic = ref nme in
+	while (Sys.file_exists (!fic^ext)) do
+		fic := (Filename.chop_extension nme)^"~"^(string_of_int !v) ;
+		v := !v+1 ;
+	done;
+	(!fic^ext)
