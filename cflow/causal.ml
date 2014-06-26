@@ -588,7 +588,7 @@ let pretty_print config_closure compression_type label story_list state env =
 	cpt+1
       ) 0 story_list
   in
-  let fic = Tools.find_available_name (!(Parameter.cflowFileName)^compression_type^"Summary") ".dat" in 
+  let fic = Tools.find_available_name ((Filename.chop_extension !(Parameter.cflowFileName))^compression_type^"Summary") ".dat" in 
   let desc = open_out fic in 
   let _ = fprintf desc "#id\tE\tT\t\tdepth\tsize\t\n" in 
   let _ = 
