@@ -3,6 +3,7 @@
 
 KaSim is a stochastic simulator for rule-based models written in Kappa. A pdf of the reference 
 manual is available [here](https://github.com/jkrivine/KaSim/blob/master/man/KaSim_manual.pdf?raw=true);
+
 the latex sources are available in the man/ directory.
 
 ## Installation

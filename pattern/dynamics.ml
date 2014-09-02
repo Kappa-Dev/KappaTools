@@ -603,15 +603,15 @@ let rec superpose todo_list lhs rhs map already_done added codomain env =
 
 let enable r mix env =
 	
-	let unify rhs lhs (root,modif_sites) glueings already_done =
-		let root_ag = try Mixture.agent_of_id root rhs with Not_found -> invalid_arg (Printf.sprintf "Dynamics.enable: agent %d not found in %s" root (Mixture.to_kappa true rhs env)) in
+	let unify pat1 pat2 (root,modif_sites) glueings already_done =
+		let root_ag = try Mixture.agent_of_id root pat1 with Not_found -> invalid_arg (Printf.sprintf "Dynamics.enable: agent %d not found in %s" root (Mixture.to_kappa true pat1 env)) in
 		let name_id_root = Mixture.name root_ag in
 		let candidates = (*agent id in lhs --all cc-- that have the name name_id_root*)
 			let cpt = ref 0
 			and candidates = ref IntSet.empty
 			in
-				while !cpt < Mixture.arity lhs do
-					candidates := IntSet.union !candidates (Mixture.ids_of_name (name_id_root,!cpt) lhs) ;
+				while !cpt < Mixture.arity pat2 do
+					candidates := IntSet.union !candidates (Mixture.ids_of_name (name_id_root,!cpt) pat2) ;
 					cpt := !cpt+1
 				done ;
 				!candidates
@@ -620,7 +620,7 @@ let enable r mix env =
 			(fun lhs_ag_id (glueings,already_done) ->
 				if Int2Set.exists (*checking that lhs contains --ie tests-- a site that is modified by rhs*) 
 				(fun (site_id,t) -> 
-					let ag = Mixture.agent_of_id lhs_ag_id lhs in 
+					let ag = Mixture.agent_of_id lhs_ag_id pat2 in 
 					let opt = Mixture.site_defined site_id ag false env in 
 					match opt with
 						| Some (int,lnk) -> 
@@ -632,7 +632,7 @@ let enable r mix env =
 						| None -> false
 				) modif_sites
 				then 
-					let opt = try Some (superpose [(lhs_ag_id,root)] lhs rhs IntMap.empty Int2Set.empty r.added IntSet.empty env) with False -> None 
+					let opt = try Some (superpose [(lhs_ag_id,root)] pat2 pat1 IntMap.empty Int2Set.empty r.added IntSet.empty env) with False -> None 
 					in
 						match opt with
 							| Some map -> (*map: id_mix -> id_rule*)
