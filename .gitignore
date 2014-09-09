@@ -1,8 +1,9 @@
 *.cm*
 *.o
 *.annot
-KaSim
+KaSim*
 *~
+_build/
 ._d/
 ._ncdi/
 grammar/kappaParser.ml

@@ -1,0 +1,9 @@
+"cflow" : include
+"dataStructures" : include
+"grammar" : include
+"pattern" : include
+"simulation" : include
+"siteGraphs" : include
+"Error" : include
+"main" : include
+true : bin-annot, debug
