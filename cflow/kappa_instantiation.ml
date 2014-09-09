@@ -28,7 +28,7 @@ let compose f g = (fun x -> f (g x))
 module type Cflow_signature =
 sig
   module H:Cflow_handler.Cflow_handler 
-  module P:Profiling.StoryStats 
+  module P:StoryProfiling.StoryStats 
   type agent_name = int
   type site_name = int 
   type agent_id = int 
@@ -155,7 +155,7 @@ end
 module Cflow_linker = 
 (struct 
   module H = Cflow_handler.Cflow_handler 
-  module P = Profiling.StoryStats 
+  module P = StoryProfiling.StoryStats 
 
   type agent_name = int
  

@@ -1,5 +1,5 @@
 (**
-  * profiling.ml
+  * storyProfiling.ml
   *
   * Generate profiling information for stories in KaSim
   * 
