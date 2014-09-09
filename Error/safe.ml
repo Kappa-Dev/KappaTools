@@ -3,26 +3,6 @@ open Random_tree
 open Graph
 open Mods
 
-(*type implicit_state =
-	{ graph : SiteGraph.t;
-	 	injections : (component_injections option) array;
-		nl_injections : (InjProdHeap.t option) array ;
-		rules : (int, rule) Hashtbl.t; 
-		perturbations : perturbation IntMap.t;
-		kappa_variables : (Mixture.t option) array;
-		token_vector : float array ; 
-		alg_variables : (Dynamics.variable option) array;
-		observables : obs list; 
-		influence_map : (int, (int IntMap.t list) IntMap.t) Hashtbl.t ;
-		mutable activity_tree : Random_tree.tree; 
-		wake_up : Precondition.t ;
-		flux : (int,float IntMap.t) Hashtbl.t ;
-		mutable silenced : IntSet.t (*Set of rule ids such that eval-activity was overestimated and whose activity was manually set to a lower value*) 
-	}
-and component_injections = (InjectionHeap.t option) array
-and obs = { label : string; expr : Dynamics.variable }
-*)
-
 exception Invariant_violation of string
 
 type check_options = {rule_act : bool ; lifts : bool ; unary : bool}

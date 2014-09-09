@@ -37,7 +37,7 @@ module type Cflow_handler =
     type error_channel = error list    (*a list which contains the errors so far*)
     type handler =   (*handler to interpret abstract values*)
           {
-            state: State.implicit_state ;
+            state: State.t ;
             env: Environment.t ;
           }
     type 'a with_handler = parameter -> handler -> error_channel -> 'a
@@ -104,7 +104,7 @@ module Cflow_handler =
       type error_channel = error list
       type handler = 
           {
-            state: State.implicit_state ;
+            state: State.t ;
             env: Environment.t ;
           }
 

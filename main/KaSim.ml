@@ -94,7 +94,7 @@ let main =
 						begin
 							if !Parameter.inputKappaFileNames <> [] then Printf.printf "+ Loading simulation package %s (kappa files are ignored)...\n" marshalized_file 
 							else Printf.printf "+Loading simulation package %s...\n" marshalized_file ;
-							let env,state = (Marshal.from_channel d : Environment.t * State.implicit_state) in
+							let env,state = (Marshal.from_channel d : Environment.t * State.t) in
 							Pervasives.close_in d ;
 							Printf.printf "Done\n" ;
 							(env,state) 

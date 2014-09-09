@@ -125,7 +125,7 @@ sig
 
   val import_event:  (Dynamics.rule * int Mods.IntMap.t * int Mods.IntMap.t) * rule_info -> event 
   val store_event: P.log_info -> event -> step list -> P.log_info * step list 
-  val store_init : P.log_info -> State.implicit_state -> step list -> P.log_info * step list 
+  val store_init : P.log_info -> State.t -> step list -> P.log_info * step list 
   val store_obs :  P.log_info -> int * Mixture.t * int Mods.IntMap.t * unit Mods.simulation_info -> step list -> P.log_info * step list 
   val build_grid: (refined_step * side_effect * bool)  list -> bool -> H.handler -> Causal.grid 
   val print_side_effect: out_channel -> side_effect -> unit
