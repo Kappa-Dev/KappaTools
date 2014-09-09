@@ -1,0 +1,10 @@
+*.cm*
+*.o
+*.annot
+KaSim
+*~
+._d/
+._ncdi/
+grammar/kappaParser.ml
+grammar/kappaParser.mli
+grammar/kappaLexer.ml
