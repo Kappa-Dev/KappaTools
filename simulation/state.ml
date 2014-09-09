@@ -6,7 +6,6 @@ open Graph
 open ValMap
 open Random_tree
 
-
 type implicit_state =
     { graph : SiteGraph.t;
       injections : (component_injections option) array;

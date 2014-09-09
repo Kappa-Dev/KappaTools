@@ -3,35 +3,33 @@ open Tools
 open ExceptionDefn
 open Random_tree
 
+(** random exponential selection if finite, next perturbation time if
+infinite ... *)
+let determine_time_advance activity state counter env =
+  let rd = Random.float 1.0 in
+  let dt = -. (log rd /. activity) in
+  if dt <> infinity && activity > 0. then dt
+  else
+    let depset = Environment.get_dependencies Mods.TIME env in
+    DepSet.fold
+      (fun dep dt ->
+       match dep with
+       | Mods.PERT p_id ->
+	  if IntMap.mem p_id state.State.perturbations then
+	    match Mods.Counter.dT counter with
+	    | Some dt -> dt
+	    | None -> Mods.Counter.last_increment counter
+	  else dt
+       | _ -> dt
+      ) depset infinity
+
 let event state (*grid*) story_profiling event_list counter plot env =
   (*1. Time advance*)
-  let dt,activity =
-    let rd = Random.float 1.0
-    and activity = (*Activity.total*) Random_tree.total state.State.activity_tree
-    in
-    if activity < 0. then invalid_arg "Activity invariant violation" ;
-    let dt = -. (log rd /. activity) in
-    if dt = infinity || activity = 0. then
-      let depset = Environment.get_dependencies Mods.TIME env in
-      DepSet.fold
-	(fun dep (dt,activity) ->
-	 match dep with
-	 | Mods.PERT p_id ->
-	    begin
-	      let pert_opt = try Some (IntMap.find p_id state.State.perturbations) with Not_found -> None
-	      in
-	      match pert_opt with
-	      | None -> (dt,activity)
-	      | Some pert ->
-		 (match Mods.Counter.dT counter with
-		    Some dt -> (dt,activity)
-		  | None -> (Mods.Counter.last_increment counter,activity)) (*find_dt state pert counter env*) (*recherche dicho. pour connaitre la bonne valeur de t?*)
-	    end
-	 | _ -> (dt,activity)
-	) depset (infinity,0.)
-    else (dt,activity)
-  in
-  if dt = infinity || activity = 0. then
+  let activity = (*Activity.total*) Random_tree.total state.State.activity_tree in
+  if activity < 0. then invalid_arg "Activity invariant violation" ;
+  let activity = abs_float activity (* -0 must become +0 *) in
+  let dt = determine_time_advance activity state counter env in
+  if dt = infinity || activity <= 0. then
     begin
       if !Parameter.dumpIfDeadlocked then
 	let desc = if !Parameter.dotOutput
@@ -64,6 +62,7 @@ let event state (*grid*) story_profiling event_list counter plot env =
   (*2. Draw rule*)
   if !Parameter.debugModeOn then
     Debug.tag (Printf.sprintf "Drawing a rule... (activity=%f) " (Random_tree.total state.State.activity_tree));
+
   (*let t_draw = Profiling.start_chrono () in*)
   let opt_instance,state =
     if restart then (None,state)
@@ -101,6 +100,14 @@ let event state (*grid*) story_profiling event_list counter plot env =
 
   let env,state,pert_ids,story_profiling,event_list =
     match opt_new_state with
+    | None ->
+       begin
+	 if !Parameter.debugModeOn then Debug.tag "Null (clash or doesn't satisfy constraints)";
+	 Counter.inc_null_events counter ;
+	 Counter.inc_consecutive_null_events counter ;
+	 let env,pert_ids = State.update_dep state (-1) Mods.EVENT pert_ids_time counter env in
+	 (env,state,pert_ids,story_profiling,event_list)
+       end
     | Some ((env,state,side_effect,embedding_t,psi,pert_ids_rule),r) ->
        Counter.inc_events counter ;
        counter.Counter.cons_null_events <- 0 ; (*resetting consecutive null event counter since a real rule was applied*)
@@ -158,14 +165,6 @@ let event state (*grid*) story_profiling event_list counter plot env =
 	   (story_profiling,event_list)
        in
        (env,state,IntSet.union pert_ids pert_ids',story_profiling,event_list)
-    | None ->
-       begin
-	 if !Parameter.debugModeOn then Debug.tag "Null (clash or doesn't satisfy constraints)";
-	 Counter.inc_null_events counter ;
-	 Counter.inc_consecutive_null_events counter ;
-	 let env,pert_ids = State.update_dep state (-1) Mods.EVENT pert_ids_time counter env in
-	 (env,state,pert_ids,story_profiling,event_list)
-       end
   (**************END CFLOW PRODUCTION********************)
   in
 
@@ -199,51 +198,51 @@ let event state (*grid*) story_profiling event_list counter plot env =
   (state,story_profiling,event_list,env)
 
 let loop state story_profiling event_list counter plot env =
-	(*Before entering the loop*)
-	
-	Counter.tick counter counter.Counter.time counter.Counter.events ;
-	Plot.output state counter.Counter.time counter.Counter.events plot env counter ;
-	
-	(*Checking whether some perturbation should be applied before starting the event loop*)
-	let env,pert_ids = State.update_dep state (-1) Mods.EVENT IntSet.empty counter env in
-	let env,pert_ids = State.update_dep state (-1) Mods.TIME pert_ids counter env in
-	let state,env,_,_,_ = External.try_perturbate [] state pert_ids [] counter env 
-	in
-	
-	let rec iter state story_profiling event_list counter plot env =
-		if !Parameter.debugModeOn then 
-			Debug.tag (Printf.sprintf "[**Event %d (Activity %f)**]" counter.Counter.events (Random_tree.total state.State.activity_tree));
-		if (Counter.check_time counter) && (Counter.check_events counter) && not (Counter.stop counter) then
-			let state,story_profiling,event_list,env = 
-				event state story_profiling event_list counter plot env 
-			in
-			iter state story_profiling event_list counter plot env
-		else (*exiting the loop*)
-		  begin
+  (*Before entering the loop*)
+  
+  Counter.tick counter counter.Counter.time counter.Counter.events ;
+  Plot.output state counter.Counter.time counter.Counter.events plot env counter ;
+  
+  (*Checking whether some perturbation should be applied before starting the event loop*)
+  let env,pert_ids = State.update_dep state (-1) Mods.EVENT IntSet.empty counter env in
+  let env,pert_ids = State.update_dep state (-1) Mods.TIME pert_ids counter env in
+  let state,env,_,_,_ = External.try_perturbate [] state pert_ids [] counter env 
+  in
+  
+  let rec iter state story_profiling event_list counter plot env =
+    if !Parameter.debugModeOn then 
+      Debug.tag (Printf.sprintf "[**Event %d (Activity %f)**]" counter.Counter.events (Random_tree.total state.State.activity_tree));
+    if (Counter.check_time counter) && (Counter.check_events counter) && not (Counter.stop counter) then
+      let state,story_profiling,event_list,env = 
+	event state story_profiling event_list counter plot env 
+      in
+      iter state story_profiling event_list counter plot env
+    else (*exiting the loop*)
+      begin
       	let _ = 
-		      Plot.fill state counter plot env 0.0; (*Plotting last measures*)
-		      Plot.flush_ticks counter ;
-		      Plot.close plot
+	  Plot.fill state counter plot env 0.0; (*Plotting last measures*)
+	  Plot.flush_ticks counter ;
+	  Plot.close plot
       	in 
         if Environment.tracking_enabled env then
-					begin
-	          let causal,weak,strong = (*compressed_flows:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_id:int story_time: float ; story_event: int}*)
-        	    if !Parameter.weakCompression || !Parameter.mazCompression || !Parameter.strongCompression (*if a compression is required*)
+	  begin
+	    let causal,weak,strong = (*compressed_flows:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_id:int story_time: float ; story_event: int}*)
+              if !Parameter.weakCompression || !Parameter.mazCompression || !Parameter.strongCompression (*if a compression is required*)
               then Compression_main.compress env state story_profiling event_list
               else None,None,None
-	          in
-	          let g prefix label x = 
-	            match x with 
-	              | None -> ()
-	              | Some flows -> 
-	                Causal.pretty_print Graph_closure.config_std prefix label flows state env
-	          in 
-	          let _ = g "" "" causal in 
-	          let _ = g "Weakly" "weakly " weak in 
-	          let _ = g "Strongly" "strongly " strong in 
-	          ()
-	        end
-		  end
-	in
-	iter state story_profiling event_list counter plot env
-	
+	    in
+	    let g prefix label x = 
+	      match x with 
+	      | None -> ()
+	      | Some flows -> 
+	         Causal.pretty_print Graph_closure.config_std prefix label flows state env
+	    in 
+	    let _ = g "" "" causal in 
+	    let _ = g "Weakly" "weakly " weak in 
+	    let _ = g "Strongly" "strongly " strong in 
+	    ()
+	  end
+      end
+  in
+  iter state story_profiling event_list counter plot env
+       
