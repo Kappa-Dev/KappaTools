@@ -14,7 +14,7 @@ type t =
       perturbations : perturbation IntMap.t;
       kappa_variables : (Mixture.t option) array;
       token_vector : float array ;
-      alg_variables : (Dynamics.variable option) array;
+      alg_variables : (Num.t Dynamics.variable option) array;
       observables : obs list;
       influence_map : (int, (int IntMap.t list) IntMap.t) Hashtbl.t ;
       mutable activity_tree : Random_tree.tree;
@@ -23,7 +23,7 @@ type t =
       mutable silenced : IntSet.t (*Set of rule ids such that eval-activity was overestimated and whose activity was manually set to a lower value*)
     }
 and component_injections = (InjectionHeap.t option) array
-and obs = { label : string; expr : Dynamics.variable }
+and obs = { label : string; expr : Num.t Dynamics.variable }
 
 
 let silence rule_id state = state.silenced <- (IntSet.add rule_id state.silenced)

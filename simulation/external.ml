@@ -11,8 +11,8 @@ let eval_pre_pert pert state counter env =
 		| Some num -> let t = (Mods.Num.float_of_num num) in if t <= (Mods.Counter.time counter) then (Some t,true) else (None,false)
 		| _ -> 
 			match pert.precondition with
-			| BCONST b -> (None,b)
-			| BVAR b_fun -> 
+			| CONST b -> (None,b)
+			| VAR b_fun -> 
 				let act_of_id = (fun id -> (instance_number id state env)) (*act_of_id:functional argument*)
 				and v_of_id = (fun id -> State.value state id counter env)
 				and v_of_token id = 
@@ -24,8 +24,8 @@ let eval_pre_pert pert state counter env =
 let eval_abort_pert just_applied pert state counter env = 
 	match pert.abort with
 		| None -> just_applied
-		| Some (BCONST b) -> b
-		| Some (BVAR b_fun) -> 
+		| Some (CONST b) -> b
+		| Some (VAR b_fun) -> 
 			let act_of_id = (fun id -> (instance_number id state env)) (*act_of_id:functional argument*)
 			and v_of_id = (fun id -> State.value state id counter env)
 			and v_of_token id = 

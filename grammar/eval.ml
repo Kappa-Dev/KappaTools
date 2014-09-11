@@ -904,8 +904,8 @@ let pert_of_result variables env res =
 				let str_eff = String.concat ";" (List.rev str_eff) in
 				let bv =
 					if is_constant
-					then Dynamics.BCONST (close_var x)
-					else Dynamics.BVAR x in
+					then Dynamics.CONST (close_var x)
+					else Dynamics.VAR x in
 				let str_pert,opt_abort =
 					match opt_post with
 					| None -> (Printf.sprintf "whenever %s, %s" str_pre str_eff,None)
@@ -918,8 +918,8 @@ let pert_of_result variables env res =
 									(pos,"Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"))
 						in
 						let bv = 
-							if is_constant then Dynamics.BCONST (close_var x)
-							else Dynamics.BVAR x 
+							if is_constant then Dynamics.CONST (close_var x)
+							else Dynamics.VAR x 
 						in
 						(Printf.sprintf "whenever %s, %s until %s" str_pre str_eff str_abort,Some (bv,dep,str_abort)) 
 				in

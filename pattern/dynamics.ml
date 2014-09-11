@@ -3,8 +3,9 @@ open Tools
 open ExceptionDefn
 open Graph
 
-type variable = CONST of Num.t | VAR of ((int -> Num.t) -> (int -> Num.t) -> float -> int -> int -> float -> (int -> Num.t) -> Num.t)
-and action =
+type 'a variable = CONST of 'a
+		   | VAR of ((int -> Num.t) -> (int -> Num.t) -> float -> int -> int -> float -> (int -> Num.t) -> 'a)
+type action =
 		BND of (port * port)
 	| FREE of (port * bool) (*FREE(p,b) b=true if FREE is side-effect free*)
 	| MOD of (port * int)
@@ -22,8 +23,8 @@ module IdMap = MapExt.Make (struct type t = id let compare = compare end)
 module Id2Map = MapExt.Make (struct type t = id*int let compare = compare end)
 
 type rule = {
-	k_def : variable ; (*standard kinetic constant*)
-	k_alt : variable option * variable option; (*Possible unary kinetic rate*)
+	k_def : Num.t variable ; (*standard kinetic constant*)
+	k_alt : Num.t variable option * Num.t variable option; (*Possible unary kinetic rate*)
 	over_sampling : float option ; (*Boosted kinetic rate for Bologna technique*)
 	script : action list ;
 	balance : (int * int * int) ;	(*#deleted,#preserved,#removed*)
@@ -38,8 +39,8 @@ type rule = {
 	pre_causal : int Id2Map.t ; (* INTERNAL_TESTED (8) | INTERNAL_MODIF (4) | LINK_TESTED (2) | LINK_MODIF (1) *)
 	is_pert : bool ;
 	cc_impact : (IntSet.t IntMap.t * IntSet.t IntMap.t * IntSet.t IntMap.t) option ;
-	add_token : (variable * int) list ;
-	rm_token : (variable * int) list
+	add_token : (Num.t variable * int) list ;
+	rm_token : (Num.t variable * int) list
 	}
 	(*connect: cc_i(lhs) -> {cc_j(lhs),...} if cc_i and cc_j are connected by rule application*)
 	(*disconnect: cc_i(rhs) -> {cc_j(rhs),...} if cc_i and cc_j are disconnected by rule application*)
@@ -160,13 +161,13 @@ let compute_causal_obs lhs =
   compute_causal lhs lhs [] 
 
 type perturbation = 
-	{precondition: boolean_variable ; effect : (rule option * modification) list ; abort : boolean_variable option ; flag : string ; stopping_time : Mods.Num.t option}
+	{precondition: bool variable ; effect : (rule option * modification) list ; abort : bool variable option ; flag : string ; stopping_time : Mods.Num.t option}
 and modification = 
-	INTRO of variable * Mixture.t 
-	| DELETE of variable * Mixture.t 
-	| UPDATE_RULE of int * variable
-	| UPDATE_VAR of int * variable
-	| UPDATE_TOK of int * variable 
+	INTRO of Num.t variable * Mixture.t 
+	| DELETE of Num.t variable * Mixture.t 
+	| UPDATE_RULE of int * Num.t variable
+	| UPDATE_VAR of int * Num.t variable
+	| UPDATE_TOK of int * Num.t variable 
 	| SNAPSHOT of Ast.print_expr list
 	| STOP of Ast.print_expr list
 	| CFLOW of int 
@@ -174,9 +175,6 @@ and modification =
 	| FLUXOFF of Ast.print_expr list
 	| CFLOWOFF of int
 	| PRINT of (Ast.print_expr list * Ast.print_expr list)
-and boolean_variable = 
-	BCONST of bool 
-	| BVAR of ((int -> Num.t) -> (int -> Num.t) -> float -> int -> int -> float -> (int -> Num.t) -> bool)
 
 let string_of_pert pert env =
 	let string_of_effect effect =
