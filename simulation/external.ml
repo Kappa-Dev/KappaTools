@@ -7,32 +7,16 @@ open Mods
 open LargeArray
 
 let eval_pre_pert pert state counter env =
-	match pert.stopping_time with
-		| Some num -> let t = (Mods.Num.float_of_num num) in if t <= (Mods.Counter.time counter) then (Some t,true) else (None,false)
-		| _ -> 
-			match pert.precondition with
-			| CONST b -> (None,b)
-			| VAR b_fun -> 
-				let act_of_id = (fun id -> (instance_number id state env)) (*act_of_id:functional argument*)
-				and v_of_id = (fun id -> State.value state id counter env)
-				and v_of_token id = 
-					let x = try state.token_vector.(id) with _ -> failwith "External.eval_pre: Invalid token id"
-					in Num.F x
-				in
-					(None,b_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time()) v_of_token)
+  match pert.stopping_time with
+  | Some num ->
+     let t = (Mods.Num.float_of_num num) in
+     if t <= (Mods.Counter.time counter) then (Some t,true) else (None,false)
+  | _ -> (None, State.value state counter env pert.precondition)
 
-let eval_abort_pert just_applied pert state counter env = 
-	match pert.abort with
-		| None -> just_applied
-		| Some (CONST b) -> b
-		| Some (VAR b_fun) -> 
-			let act_of_id = (fun id -> (instance_number id state env)) (*act_of_id:functional argument*)
-			and v_of_id = (fun id -> State.value state id counter env)
-			and v_of_token id = 
-				let x = try state.token_vector.(id) with _ -> failwith "External.eval_abort: Invalid token id"
-				in Num.F x
-			in
-				b_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time()) v_of_token
+let eval_abort_pert just_applied pert state counter env =
+  match pert.abort with
+  | None -> just_applied
+  | Some var -> State.value state counter env var
 
 let eval_pexpr pexpr state counter env =
 	let l =
@@ -47,7 +31,7 @@ let eval_pexpr pexpr state counter env =
 							then (match opt_v with Some v -> Dynamics.CONST v | None -> invalid_arg "Eval.effects_of_modif")
 							else Dynamics.VAR x 
 					in
-					let n = State.value state ~var:v (-1) counter env in
+					let n = State.value state counter env v in
 					match n with
 						| Num.I x -> (Printf.sprintf "%d" x)::cont
 						| Num.F x -> (Printf.sprintf "%E" x)::cont
@@ -68,7 +52,7 @@ let dump_print_expr desc pexpr state counter env =
 						then (match opt_v with Some v -> Dynamics.CONST v | None -> invalid_arg "Eval.effects_of_modif")
 						else Dynamics.VAR x 
 				in
-				let n = State.value state ~var:v (-1) counter env in
+				let n = State.value state counter env v in
 				match n with
 					| Num.I x -> Printf.fprintf desc "%d" x
 					| Num.F x -> Printf.fprintf desc "%E" x
@@ -97,7 +81,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 						while !n > 0 do (*FIXME: highly unefficient to compute new injection at each loop*)
 							let embedding_t = State.select_injection (infinity,None) (0.,None) state r.lhs counter env in (*empty embedding, cannot raise null-event*)
 							let (env, state, side_effects, embedding_t, psi, pert_ids_neg) = State.apply !st r embedding_t counter env in
-							let phi = State.map_of embedding_t in
+							let phi = State.Embedding.map_of embedding_t in
 							let env,state,pert_ids_pos,new_injs,tracked' = State.positive_update ~with_tracked:!tracked state r (phi,psi) (side_effects,Int2Set.empty) counter env
 							in
 							pert_events := (r,phi,psi,side_effects)::!pert_events ;
@@ -131,14 +115,15 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 									if !Parameter.debugModeOn then Debug.tag "Clashing instance detected: building matrix";
 									let matrix = State.instances_of_square mix_id (-1) state env in
 										match matrix with
-											| (embedding,_,_)::_ -> Some (CONNEX {map=embedding; roots = IntSet.empty ; components = None ; depth_map = None}) 
+											| (embedding,_,_)::_ -> Some (Embedding.CONNEX
+															{Embedding.map=embedding; Embedding.roots = IntSet.empty ; Embedding.components = None ; Embedding.depth_map = None})
 											| [] -> None
 						in
 							match opt with
 								| None -> (if !Parameter.debugModeOn then Debug.tag "No more non clashing instances were found!" ; cpt:=x)
 								| Some embedding_t ->
 									let (env, state, side_effects, phi, psi, pert_ids_neg) = State.apply state r embedding_t counter env in
-									let phi = State.map_of phi in
+									let phi = State.Embedding.map_of phi in
 									let env,state,pert_ids_pos,new_injs,tracked' = State.positive_update ~with_tracked:!tracked state r (phi,psi) (side_effects,Int2Set.empty) counter env
 									in
 									pert_events := (r,phi,psi,side_effects)::!pert_events ;
@@ -155,9 +140,8 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 						(Debug.tag (Printf.sprintf "Updating rate of rule '%s'" (Environment.rule_of_num id env)) 
 						)
 				in
-				let value = State.value state ~var:v (-1) counter env in (*Change here if one wants to have address passing style of assignation*)
-				let r = State.rule_of_id id state in
-  			Hashtbl.replace state.rules id {r with k_def = Dynamics.CONST value} ;
+				let value = State.value state counter env v in (*Change here if one wants to have address passing style of assignation*)
+				State.update_rule id value state;
   			State.update_activity state p_id id counter env ;		
   			let env,pert_ids = State.update_dep state (-1) (RULE id) pert_ids counter env in
   			(env,state ,pert_ids,tracked,pert_events)
@@ -166,7 +150,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 					if !Parameter.debugModeOn then 
 						(Debug.tag (Printf.sprintf "Updating variable '%s'" ((fun (x,_)->x) (Environment.alg_of_num id env)) ))
 				in
-				let value = State.value state ~var:v (-1) counter env in (*Change here if one wants to have address passing style of assignation*)
+				let value = State.value state counter env v in (*Change here if one wants to have address passing style of assignation*)
 				State.set_variable id value state ;
 				let env,pert_ids = State.update_dep state (-1) (ALG id) pert_ids counter env in
 				(env,state,pert_ids,tracked,pert_events) 
@@ -175,11 +159,11 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 					if !Parameter.debugModeOn then 
 						(Debug.tag (Printf.sprintf "Updating token '%s'" (Environment.token_of_num tk_id env)))
 				in
-				let value = State.value state ~var:v (-1) counter env in (*Change here if one wants to have address passing style of assignation*)
+				let value = State.value state counter env v in (*Change here if one wants to have address passing style of assignation*)
 					begin
 						try
-							state.State.token_vector.(tk_id) <- (Num.float_of_num value) ;
-							let env,pert_ids = State.update_dep state (-1) (TOK tk_id) pert_ids counter env in
+						  update_token tk_id value state;
+						  let env,pert_ids = State.update_dep state (-1) (TOK tk_id) pert_ids counter env in
 							(env,state,pert_ids,tracked,pert_events) 
 						with Invalid_argument _ -> failwith "External.apply_effect: invalid token id"
 					end
@@ -289,24 +273,12 @@ let apply_effect p_id pert tracked pert_events state counter env =
 		close_out desc ;
 		Parameter.openOutDescriptors := List.tl (!Parameter.openOutDescriptors)
 	in
-	let act_of_id = (fun id -> (instance_number id state env))  (*act_of_id:functional argument*) 
-	and v_of_id = (fun id -> State.value state id counter env)
-	and v_of_token id = 
-		let x = try state.token_vector.(id) with _ -> failwith "External.apply_effect: Invalid token id"
-		in
-		 Num.F x
-	in
-	let eval_var v =
-		match v with
-			| CONST f -> f
-			| VAR v_fun -> v_fun act_of_id v_of_id (Counter.time counter) (Counter.event counter) (Counter.null_event counter) (Sys.time()) v_of_token
-	in
 	let env, state, pert_ids,tracked,pert_events =
   	List.fold_left 
   	(fun (env, state, pert_ids,tracked,pert_events) effect -> 
   		let (env, state, pert_ids,tracked,pert_events) = 
   			try
-  				trigger_effect state env pert_ids tracked pert_events pert p_id effect eval_var snapshot counter 
+  				trigger_effect state env pert_ids tracked pert_events pert p_id effect (State.value state counter env) snapshot counter
   			with ExceptionDefn.StopReached msg -> (counter.Counter.stop <- true ; Debug.tag msg ; (env, state, pert_ids,tracked,pert_events))
   		in
   		(env, state, pert_ids,tracked,pert_events)
@@ -322,8 +294,7 @@ let try_perturbate tracked state pert_ids pert_events counter env =
 		let state,env,pert_ids',tracked,pert_events,stopping_time = 
 			IntSet.fold 
 			(fun pert_id (state,env,pert_ids,tracked,pert_events,stopping_time) ->
-				let opt_pert = try Some (IntMap.find pert_id state.perturbations) with 
-						| Not_found -> None
+				let opt_pert = State.maybe_find_perturbation pert_id state
 				in
 				match opt_pert with
 					| None -> (state,env,pert_ids,tracked,pert_events,None)
@@ -344,7 +315,7 @@ let try_perturbate tracked state pert_ids pert_events counter env =
 									let state,env = 
 										if eval_abort_pert true pert state counter env then 
 											(if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "***Aborting pert[%d]***" pert_id) ;
-											({state with perturbations = IntMap.remove pert_id state.perturbations},env) )
+											(State.remove_perturbation pert_id state,env) )
 										else
 											begin
 												if !Parameter.debugModeOn then Debug.tag "************Maintaining perturbation*************" ; 
@@ -362,7 +333,7 @@ let try_perturbate tracked state pert_ids pert_events counter env =
 						
 						if eval_abort_pert false pert state counter env then
 							(if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "***Aborting pert[%d]***" pert_id) ;
-							({state with perturbations = IntMap.remove pert_id state.perturbations},env,IntSet.remove pert_id pert_ids,tracked,pert_events,stopping_time))
+							(State.remove_perturbation pert_id state,env,IntSet.remove pert_id pert_ids,tracked,pert_events,stopping_time))
 						else 
 							(state,env,pert_ids,tracked,pert_events,stopping_time)
 			) 

@@ -1,6 +1,5 @@
 open Tools
 open Mods
-open State
 open Random_tree
 
 let version = "3.5-160514"
@@ -122,7 +121,7 @@ let main =
 				State.dot_of_influence_map desc state env ; 
 				close_out desc 
 			end ;  
-		if !Parameter.compileModeOn then (Hashtbl.iter (fun i r -> Dynamics.dump r env) state.State.rules ; exit 0)
+		if !Parameter.compileModeOn then (State.dump_rules state env; exit 0)
 		else () ;
     let profiling = Compression_main.D.S.PH.B.PB.CI.Po.K.P.init_log_info () in 
 		let plot = Plot.create !Parameter.outputDataName
@@ -194,7 +193,7 @@ let main =
 				(Printf.printf "?\nA deadlock was reached after %d events and %Es (Activity = %.5f)\n"
 				(Counter.event counter)
 				(Counter.time counter) 
-				(Random_tree.total state.activity_tree))
+				(State.total_activity state))
 	with
 	| ExceptionDefn.Semantics_Error (pos, msg) -> 
 		(close_desc None ; Printf.eprintf "***Error (%s) line %d, char %d: %s***\n" (fn pos) (ln pos) (cn pos) msg)

@@ -30,49 +30,24 @@ let next_point counter time_increment =
 			let point = int_of_float ((counter.Counter.time +. time_increment -. counter.Counter.init_time) /. dT) 
 			in
 				point
-		
-let output state time event plot env counter =
-	if not !Parameter.plotModeOn then ()
-	else
-		let d =
-			match plot.desc with
-				| None -> (*first value*)
-					begin
-						if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "\t *Creating data file...") ; 
-						let d = open_out plot.file in
-							if !Parameter.emacsMode then Printf.fprintf d "time"
-							else Printf.fprintf d "# time" ;
-							List.iter
-							(fun obs ->
-								Printf.fprintf d "%c%s" !Parameter.plotSepChar obs.label 
-							) state.observables ;
-							Printf.fprintf d "\n" ;
-							plot.desc <- Some d ;
-							d
-					end
-				| Some d -> d
-		in
-			Printf.fprintf d "%c%E" !Parameter.plotSepChar time ;
-			List.iter
-			(fun obs ->
-				let inst = fun v_i -> State.instance_number v_i state env
-				and values = fun i -> State.value state i {counter with Counter.time = time ; Counter.events = event} env
-				and v_of_token id = 
-					let x = try state.State.token_vector.(id) with _ -> failwith "Plot.output: Invalid token id"
-					in Num.F x
-				in
-					let v = 
-						match obs.expr with
-							| Dynamics.CONST v -> v
-							| Dynamics.VAR f -> f inst values time event (Counter.null_event counter) (Sys.time()) v_of_token
-					in 
-					match v with
-						| Num.I x -> Printf.fprintf d "%c%d" !Parameter.plotSepChar x
-						| Num.F x -> Printf.fprintf d "%c%E" !Parameter.plotSepChar x
-						| Num.I64 x -> Printf.fprintf d "%c%Ld" !Parameter.plotSepChar x
-			) state.observables ;
-			Printf.fprintf d "\n" ;
-			flush d
+
+let output state time plot env counter =
+  if not !Parameter.plotModeOn then ()
+  else
+    let d =
+      match plot.desc with
+      | None -> (*first value*)
+	 begin
+	   if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "\t *Creating data file...") ;
+	   let d = open_out plot.file in
+	   print_observables_header d state;
+	   plot.desc <- Some d ;
+	   d
+	 end
+      | Some d -> d
+    in
+    print_observables_values d time env counter state;
+    flush d
 
 let set_last_point plot p = plot.last_point <- p
 
@@ -89,7 +64,7 @@ let fill state counter plot env time_increment =
 						else
 							if n = 0 then ()
 							else (	
-								output state counter.Counter.time counter.Counter.events plot env counter ;
+								output state counter.Counter.time plot env counter ;
 								set_last_point plot (last+1) ;
 								Counter.tick counter counter.Counter.time counter.Counter.events ; 
 								)
@@ -110,7 +85,7 @@ let fill state counter plot env time_increment =
 										while (!n > 0) && (Counter.check_output_time counter !output_time) do
 											output_time := !output_time +. dT ;
 											Counter.tick counter !output_time counter.Counter.events ;
-											output state !output_time counter.Counter.events plot env counter ;
+											output state !output_time plot env counter ;
 											set_last_point plot (plot.last_point + 1) ;
 											n:=!n-1 ;
 										done ;

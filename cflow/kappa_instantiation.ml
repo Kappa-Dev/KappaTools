@@ -646,7 +646,7 @@ module Cflow_linker =
   let agent_of_node n = build_agent (Node.get_address n) (Node.name n) 
 
   let create_init state log_info event_list = 
-    Graph.SiteGraph.fold
+    State.fold_graph
 	  (fun node_id node (log_info,list)  ->
             let interface = 
 		Node.fold_status
@@ -661,7 +661,7 @@ module Cflow_linker =
             let agent = build_agent node_id (Node.name node) in 
             let log_info = P.inc_n_init_events log_info in 
             (log_info,(Init (agent,interface))::list))
-          state.State.graph 
+          state
           (log_info,event_list) 
 
   let actions_of_init parameter handler error (init:init) = 

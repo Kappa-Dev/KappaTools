@@ -15,17 +15,18 @@ let determine_time_advance activity state counter env =
       (fun dep dt ->
        match dep with
        | Mods.PERT p_id ->
-	  if IntMap.mem p_id state.State.perturbations then
-	    match Mods.Counter.dT counter with
-	    | Some dt -> dt
-	    | None -> Mods.Counter.last_increment counter
-	  else dt
+	  begin match State.maybe_find_perturbation p_id state with
+		| None -> dt
+		| Some _ -> match Mods.Counter.dT counter with
+			    | Some dt -> dt
+			    | None -> Mods.Counter.last_increment counter
+	  end
        | _ -> dt
       ) depset infinity
 
 let event state (*grid*) story_profiling event_list counter plot env =
   (*1. Time advance*)
-  let activity = (*Activity.total*) Random_tree.total state.State.activity_tree in
+  let activity = State.total_activity state in
   if activity < 0. then invalid_arg "Activity invariant violation" ;
   let activity = abs_float activity (* -0 must become +0 *) in
   let dt = determine_time_advance activity state counter env in
@@ -61,7 +62,7 @@ let event state (*grid*) story_profiling event_list counter plot env =
 
   (*2. Draw rule*)
   if !Parameter.debugModeOn then
-    Debug.tag (Printf.sprintf "Drawing a rule... (activity=%f) " (Random_tree.total state.State.activity_tree));
+    Debug.tag (Printf.sprintf "Drawing a rule... (activity=%f) " (State.total_activity state));
 
   (*let t_draw = StoryProfiling.start_chrono () in*)
   let opt_instance,state =
@@ -80,9 +81,9 @@ let event state (*grid*) story_profiling event_list counter plot env =
        if !Parameter.debugModeOn then
 	 begin
 	   let version,embedding = match embedding_t with
-	     | State.DISJOINT emb -> ("binary",emb.State.map)
-	     | State.CONNEX emb -> ("unary",emb.State.map)
-	     | State.AMBIGUOUS emb -> ("ambig.",emb.State.map)
+	     | State.Embedding.DISJOINT emb -> ("binary",emb.State.Embedding.map)
+	     | State.Embedding.CONNEX emb -> ("unary",emb.State.Embedding.map)
+	     | State.Embedding.AMBIGUOUS emb -> ("ambig.",emb.State.Embedding.map)
 	   in
 	   Debug.tag
 	     (Printf.sprintf "Applying %s version of '%s' with embedding:" version
@@ -115,7 +116,7 @@ let event state (*grid*) story_profiling event_list counter plot env =
 
        (*Local positive update: adding new partial injection*)
        let env,state,pert_ids',new_injs,obs_from_rule_app =
-	 State.positive_update state r (State.map_of embedding_t,psi) (side_effect,Int2Set.empty) counter env
+	 State.positive_update state r (State.Embedding.map_of embedding_t,psi) (side_effect,Int2Set.empty) counter env
        in
 
        (*Non local positive update: adding new possible intras*)
@@ -125,11 +126,11 @@ let event state (*grid*) story_profiling event_list counter plot env =
 	 else state
        in
 
-       if !Parameter.safeModeOn then Safe.check_invariants (Safe.check 4) state counter env ;
+       if !Parameter.safeModeOn then State.Safe.check_invariants (State.Safe.check 4) state counter env ;
        (****************END POSITIVE UPDATE*****************)
 
        (****************CFLOW PRODUCTION********************)
-       let phi = State.map_of embedding_t in
+       let phi = State.Embedding.map_of embedding_t in
 
        let story_profiling,event_list =
 	 if Environment.tracking_enabled env then (*if logging events is required*)
@@ -201,7 +202,7 @@ let loop state story_profiling event_list counter plot env =
   (*Before entering the loop*)
   
   Counter.tick counter counter.Counter.time counter.Counter.events ;
-  Plot.output state counter.Counter.time counter.Counter.events plot env counter ;
+  Plot.output state counter.Counter.time plot env counter ;
   
   (*Checking whether some perturbation should be applied before starting the event loop*)
   let env,pert_ids = State.update_dep state (-1) Mods.EVENT IntSet.empty counter env in
@@ -211,7 +212,7 @@ let loop state story_profiling event_list counter plot env =
   
   let rec iter state story_profiling event_list counter plot env =
     if !Parameter.debugModeOn then 
-      Debug.tag (Printf.sprintf "[**Event %d (Activity %f)**]" counter.Counter.events (Random_tree.total state.State.activity_tree));
+      Debug.tag (Printf.sprintf "[**Event %d (Activity %f)**]" counter.Counter.events (State.total_activity state));
     if (Counter.check_time counter) && (Counter.check_events counter) && not (Counter.stop counter) then
       let state,story_profiling,event_list,env = 
 	event state story_profiling event_list counter plot env 
