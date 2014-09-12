@@ -107,11 +107,15 @@ module Num =
 		| I64 x -> x = Int64.zero
 		| I x -> x = 0
 
-	let to_string n =
-		match n with
-		| F x -> Printf.sprintf "%E" x
-		| I64 x -> Printf.sprintf "%Ld" x
-		| I x -> Printf.sprintf "%d" x
+	let print f = function
+	  | F x -> Printf.fprintf f "%E" x
+	  | I64 x -> Printf.fprintf f "%Ld" x
+	  | I x -> Printf.fprintf f "%d" x
+
+	let to_string = function
+	  | F x -> Printf.sprintf "%E" x
+	  | I64 x -> Printf.sprintf "%Ld" x
+	  | I x -> Printf.sprintf "%d" x
 
 end
 
