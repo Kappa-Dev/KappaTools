@@ -224,120 +224,90 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 
 
 let apply_effect p_id pert tracked pert_events state counter env =
-	let snapshot str =
-		if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Taking a snapshot of current state (%s)" str) ;
-		let ext = if !Parameter.dotOutput then "dot" else "ka" in
-						
-		let filename = 
-			match str with 
-				| "" -> 
-					begin
-						let name =
-  						if (Filename.check_suffix (!Parameter.snapshotFileName) ext) then Filename.chop_extension (!Parameter.snapshotFileName)
-  						else 
-  							 !Parameter.snapshotFileName
-						in
-						name^"_"^(string_of_int (Counter.event counter))
-					end
-				| _ -> 
-					let name = 
-						if (Filename.check_suffix str ext) then Filename.chop_extension str
-						else 
-							 str
-					in
-					Filename.concat !Parameter.outputDirName name 
-		in
-		let file_exists = ref true in
-		let cpt = ref 1 in
-		let suffix = if !Parameter.dotOutput then ".dot" else ".ka" in
-		let tmp_name = ref (filename^suffix) in
-		while !file_exists do
-			if Sys.file_exists !tmp_name then
-				begin
-					tmp_name := filename^"~"^(string_of_int !cpt)^suffix ;
-					cpt := !cpt+1 
-				end
-			else
-				file_exists := false
-		done ;
-		let desc = open_out !tmp_name
-		in
-		let hr = !Parameter.snapshotHighres in
-		Parameter.openOutDescriptors := desc::(!Parameter.openOutDescriptors) ;
-		State.snapshot state counter desc hr env ; (*could use a dedicated thread here*) 
-		close_out desc ;
-		Parameter.openOutDescriptors := List.tl (!Parameter.openOutDescriptors)
-	in
-	let env, state, pert_ids,tracked,pert_events =
-  	List.fold_left 
-  	(fun (env, state, pert_ids,tracked,pert_events) effect -> 
-  		let (env, state, pert_ids,tracked,pert_events) = 
-  			try
-  				trigger_effect state env pert_ids tracked pert_events pert p_id effect (State.value state counter env) snapshot counter
-  			with ExceptionDefn.StopReached msg -> (counter.Counter.stop <- true ; Debug.tag msg ; (env, state, pert_ids,tracked,pert_events))
-  		in
-  		(env, state, pert_ids,tracked,pert_events)
-  	) 
-  	(env,state,IntSet.empty,tracked,pert_events) pert.effect
-	in
-	(env, state, pert_ids,tracked,pert_events)
-					
+  let snapshot str =
+    if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Taking a snapshot of current state (%s)" str) ;
+    let ext = if !Parameter.dotOutput then "dot" else "ka" in
+    let filename =
+      if str = ""
+      then !Parameter.snapshotFileName^"_"^(string_of_int (Counter.event counter))
+      else str in
+    let desc = open_out (Tools.find_available_name filename ext) in
+    let hr = !Parameter.snapshotHighres in
+    Parameter.openOutDescriptors := desc::(!Parameter.openOutDescriptors) ;
+    State.snapshot state counter desc hr env ; (*could use a dedicated thread here*)
+    close_out desc ;
+    Parameter.openOutDescriptors := List.tl (!Parameter.openOutDescriptors)
+  in
+  List.fold_left
+    (fun (env, state, pert_ids,tracked,pert_events) effect ->
+     try
+       trigger_effect state env pert_ids tracked pert_events pert p_id effect (State.value state counter env) snapshot counter
+     with ExceptionDefn.StopReached msg ->
+       counter.Counter.stop <- true;
+       Debug.tag msg;
+       (env, state, pert_ids,tracked,pert_events)
+    )
+    (env,state,IntSet.empty,tracked,pert_events) pert.effect
 
 let try_perturbate tracked state pert_ids pert_events counter env = 
 	
-	let rec iter state pert_ids tracked pert_events env = 
-		let state,env,pert_ids',tracked,pert_events,stopping_time = 
-			IntSet.fold 
-			(fun pert_id (state,env,pert_ids,tracked,pert_events,stopping_time) ->
-				let opt_pert = State.maybe_find_perturbation pert_id state
-				in
-				match opt_pert with
-					| None -> (state,env,pert_ids,tracked,pert_events,None)
-					| Some pert ->
-						let state,pert_ids,tracked,pert_events,env,stopping_time' = 
-							let stopping_time',trigger_pert = eval_pre_pert pert state counter env in
-							let _ = match stopping_time' with 
-								| Some t -> 
-									(if !Parameter.debugModeOn then print_string 
-									("Next event time is beyond perturbation time, applying null event and resetting clock to "^(string_of_float t)) ;
-									 counter.Counter.time <- t) 
-								| None -> () in
-							if trigger_pert then
-								begin
-									if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "\n*************Applying perturbation %d***************" pert_id) ; 
-									let env,state,pert_ids,tracked,pert_events = apply_effect pert_id pert tracked pert_events state counter env in
-									if !Parameter.debugModeOn then Debug.tag "************End perturbation*************" ;
-									let state,env = 
-										if eval_abort_pert true pert state counter env then 
-											(if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "***Aborting pert[%d]***" pert_id) ;
-											(State.remove_perturbation pert_id state,env) )
-										else
-											begin
-												if !Parameter.debugModeOn then Debug.tag "************Maintaining perturbation*************" ; 
-												(state,env)
-											end
-									in
-									(state,pert_ids,tracked,pert_events,env,stopping_time')
-								end
-							else
-								(state,pert_ids,tracked,pert_events,env,stopping_time')
-						in
-						
-						let stopping_time = match stopping_time' with Some _ -> stopping_time' | None -> stopping_time
-						in				
-						
-						if eval_abort_pert false pert state counter env then
-							(if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "***Aborting pert[%d]***" pert_id) ;
-							(State.remove_perturbation pert_id state,env,IntSet.remove pert_id pert_ids,tracked,pert_events,stopping_time))
-						else 
-							(state,env,pert_ids,tracked,pert_events,stopping_time)
-			) 
-			pert_ids (state,env,IntSet.empty,tracked,pert_events,None)
-		in
-			if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Should now try perturbations %s" (string_of_set string_of_int IntSet.fold pert_ids')) ;
-			if IntSet.is_empty pert_ids' then 
-				(state,env,tracked,pert_events,stopping_time)
-			else
-				iter state pert_ids' tracked pert_events env (*Chance of looping perturbation if user was not careful*)
+  let rec iter state pert_ids tracked pert_events env = 
+    let state,env,pert_ids',tracked,pert_events,stopping_time = 
+      IntSet.fold
+	(fun pert_id (state,env,pert_ids,tracked,pert_events,stopping_time) ->
+	 let opt_pert = State.maybe_find_perturbation pert_id state
+	 in
+	 match opt_pert with
+	 | None -> (state,env,pert_ids,tracked,pert_events,None)
+	 | Some pert ->
+	    let state,pert_ids,tracked,pert_events,env,stopping_time' = 
+	      let stopping_time',trigger_pert = eval_pre_pert pert state counter env in
+	      let () = match stopping_time' with 
+		| Some t -> 
+		   (if !Parameter.debugModeOn
+		    then print_string 
+			   ("Next event time is beyond perturbation time, applying null event and resetting clock to "^(string_of_float t)) ;
+		    counter.Counter.time <- t) 
+		| None -> () in
+	      if trigger_pert then
+		begin
+		  if !Parameter.debugModeOn then
+		    Debug.tag (Printf.sprintf "\n*************Applying perturbation %d***************" pert_id) ;
+		  let env,state,pert_ids,tracked,pert_events =
+		    apply_effect pert_id pert tracked pert_events state counter env in
+		  if !Parameter.debugModeOn then Debug.tag "************End perturbation*************" ;
+		  let state,env =
+		    if eval_abort_pert true pert state counter env then
+		      (if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "***Aborting pert[%d]***" pert_id) ;
+		       (State.remove_perturbation pert_id state,env) )
+		    else
+		      begin
+			if !Parameter.debugModeOn then Debug.tag "************Maintaining perturbation*************" ; 
+			(state,env)
+		      end
+		  in
+		  (state,pert_ids,tracked,pert_events,env,stopping_time')
+		end
+	      else
+		(state,pert_ids,tracked,pert_events,env,stopping_time')
+	    in
+	    
+	    let stopping_time = match stopping_time' with Some _ -> stopping_time' | None -> stopping_time
+	    in				
+	    
+	    if eval_abort_pert false pert state counter env then
+	      (if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "***Aborting pert[%d]***" pert_id) ;
+	       (State.remove_perturbation pert_id state,env,IntSet.remove pert_id pert_ids,tracked,pert_events,stopping_time))
+	    else 
+	      (state,env,pert_ids,tracked,pert_events,stopping_time)
+	) 
+	pert_ids (state,env,IntSet.empty,tracked,pert_events,None)
+    in
+    if !Parameter.debugModeOn then
+      Debug.tag (Printf.sprintf "Should now try perturbations %s" (string_of_set string_of_int IntSet.fold pert_ids')) ;
+    if IntSet.is_empty pert_ids' then 
+      (state,env,tracked,pert_events,stopping_time)
+    else
+      iter state pert_ids' tracked pert_events env (*Chance of looping perturbation if user was not careful*)
   in
-	iter state pert_ids tracked pert_events env 
+  iter state pert_ids tracked pert_events env 

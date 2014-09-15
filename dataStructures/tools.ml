@@ -86,11 +86,12 @@ let list_of_string str =
 	in
 	parse stream "" []
 	
-let find_available_name nme ext = 
-	let v = ref 0 in
-	let fic = ref nme in
-	while (Sys.file_exists (!fic^ext)) do
-		fic := nme^"~"^(string_of_int !v) ;
-		v := !v+1 ;
-	done;
-	(!fic^ext)
+let find_available_name name ext = 
+  let base =
+    if (Filename.check_suffix name ext)
+    then Filename.chop_extension name
+    else name in
+  let v = ref 0 in
+  let () =
+    while Sys.file_exists (base^(string_of_int !v)^ext) do incr v; done
+  in base^(string_of_int !v)^ext
