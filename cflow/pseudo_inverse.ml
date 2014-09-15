@@ -89,10 +89,10 @@
           weak_actions= []; 
           steps_by_column = PredicateMap.empty ; 
           nsteps = -1 ; 
-          predicates_of_event = A.create  n [] ;
-          is_remove_action = A.create n false ;
+          predicates_of_event = A.make  n [] ;
+          is_remove_action = A.make n false ;
           modified_predicates_of_event = A.create n 0 ; 
-          event = A.create n None ; 
+          event = A.make n None ; 
           predicate_id_list_related_to_predicate_id = PredicateMap.empty ; 
        }
 

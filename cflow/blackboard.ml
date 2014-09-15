@@ -683,7 +683,7 @@ module Blackboard =
          let rec aux k map = 
            if k<0 then map 
            else 
-             aux (k-1) (Priority.LevelMap.add k (PB.A.create 0 0) map)
+             aux (k-1) (Priority.LevelMap.add k (PB.A.make 0 0) map)
          in 
          let error,priority_max = 
            match 
@@ -713,7 +713,7 @@ module Blackboard =
          | Not_found -> ()
        in 
 
-       let weigth_of_predicate_id = PB.A.create 0 0 in 
+       let weigth_of_predicate_id = PB.A.make 0 0 in 
        let last_linked_event_of_predicate_id = PB.A.make n_predicates 0 in 
        let error = 
          let rec aux1 p_id error = 
@@ -1048,7 +1048,7 @@ module Blackboard =
         let row_of_postcondition eid = 1+(row_of_precondition eid) in 
         let column_of_pid pid = pid + ncolumns_left in 
         let _ = Printf.fprintf desc "REM  *****  BASIC  *****\n" in 
-        let colors = PB.A.create blackboard.n_eid None in 
+        let colors = PB.A.make blackboard.n_eid None in 
         let backcolor log color = 
           match 
             color 

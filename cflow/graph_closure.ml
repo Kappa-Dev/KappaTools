@@ -192,17 +192,17 @@ let closure config prec is_obs init_to_eidmax weak_events init =
     else 
       (fun x -> x),(false,0,0)
   in 
-  let s_pred_star = A.create (max_index+1) ([],0) in 
+  let s_pred_star = A.make (max_index+1) ([],0) in 
   let clean,max_succ,set_succ,redirect,cut_event,is_final = 
     if config.enable_gc || config.detect_separable_components 
     then 
       begin 
-        let max_succ = A.create (max_index+1) 0 in 
-        let set_succ = A.create (max_index+1) S.empty in 
+        let max_succ = A.make (max_index+1) 0 in 
+        let set_succ = A.make (max_index+1) S.empty in 
         let is_final x = 
           S.is_empty (A.get set_succ x) 
         in 
-        let redirect_tab = A.create (max_index+1) false in 
+        let redirect_tab = A.make (max_index+1) false in 
         let redirect i = 
           A.set redirect_tab i true in 
         let subs i = 
@@ -218,7 +218,7 @@ let closure config prec is_obs init_to_eidmax weak_events init =
                   let _ = A.set set_succ pred (S.add succ (A.get set_succ pred)) in  ()))
             prec
         in 
-        let is_last_succ_of = A.create (max_index+1) [] in 
+        let is_last_succ_of = A.make (max_index+1) [] in 
         let add node max_succ = 
           if not (is_obs node) && not (is_init node)
           then 

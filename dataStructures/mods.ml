@@ -213,7 +213,7 @@ module InjProduct =
 		
 		let find i injprod = try injprod.elements.(i) with Invalid_argument _ -> raise Not_found
 		
-		let create n mix_id = {elements = Array.create n (Injection.empty 0 (-1,-1)) ; address = None ; coordinate = mix_id ; signature = Array.create n (-1)}
+		let create n mix_id = {elements = Array.make n (Injection.empty 0 (-1,-1)) ; address = None ; coordinate = mix_id ; signature = Array.make n (-1)}
 		
 		let equal phi psi =
 			try 

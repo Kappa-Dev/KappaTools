@@ -49,7 +49,7 @@ module Cache =
         { 
           size=n;
           offset=0;
-          cache= Array.create n None;
+          cache= Array.make n None;
           bag=S.empty;
           last=None;
           }

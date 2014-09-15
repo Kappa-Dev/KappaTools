@@ -122,9 +122,9 @@ module Random_tree =
 			t.consistent <- false
 		
 		let create n =
-			let t_node = Array.create (n + 1) 0. in
-			let t_subtree = Array.create (n + 1) 0. in
-			let layer = Array.create (n + 1) 0 in
+			let t_node = Array.make (n + 1) 0. in
+			let t_subtree = Array.make (n + 1) 0. in
+			let layer = Array.make (n + 1) 0 in
 			let _ =
 				let rec aux k current_layer layer_end =
 					if k > n then ()
@@ -132,8 +132,8 @@ module Random_tree =
 					else (layer.(k) <- current_layer;
 						aux (k + 1) current_layer layer_end)
 				in aux 1 1 1 in
-			let unbalanced_events_by_layer = Array.create (layer.(n) + 1) [] in
-			let unbalanced_events = Array.create (n + 1) false in
+			let unbalanced_events_by_layer = Array.make (layer.(n) + 1) [] in
+			let unbalanced_events = Array.make (n + 1) false in
 			{ size = n;
 			(*	total = 0.;*)
 				new_mask = 1 ;

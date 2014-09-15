@@ -319,7 +319,7 @@ let initialize_embeddings state mix_list counter env =
 			let opt = try injs.(Mixture.get_id mix) with exn -> (print_string ("caught: "^(Printexc.to_string exn)) ; raise exn) in 
 			let comp_injs =
 				match opt with
-				| None -> Array.create (Mixture.arity mix) None
+				| None -> Array.make (Mixture.arity mix) None
 				| Some comp_injs -> comp_injs in
 			(* complement the embeddings of mix in sg using node i  as anchor for matching *)
 			let (sg, comp_injs) =	generate_embeddings state.graph i mix comp_injs env
@@ -946,7 +946,7 @@ let positive_update ?(with_tracked=[]) state r ((phi: int IntMap.t),psi) (side_m
 		let comp_injs =
 			match opt with
 			| None -> (*may happen when initial graph was empty*)
-				let ar = Array.create (Mixture.arity mix) None in
+				let ar = Array.make (Mixture.arity mix) None in
 				state.injections.(var_id) <- (Some ar) ;
 				ar
 			| Some injs -> injs 

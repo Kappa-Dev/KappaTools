@@ -62,7 +62,7 @@ let set_root_of_cc mix =
 	match mix.component_of_id with
 				| None -> invalid_arg "Mixture.set_root_of_cc"
 				| Some ar -> 
-					let root_of_cc = Array.create (arity mix) (-1) in 
+					let root_of_cc = Array.make (arity mix) (-1) in 
 					Array.iteri (fun a_i cc_i -> if root_of_cc.(cc_i) < a_i then root_of_cc.(cc_i) <- a_i) ar ;
 					{mix with root_of_cc = root_of_cc}
 
@@ -96,8 +96,8 @@ let empty id_opt = {
 	component_of_id = None ;
 	arity = None ;
 	mix_id = id_opt ;
-	size_of_cc = Array.create 0 0 ;
-	root_of_cc = Array.create 0 0 ;
+	size_of_cc = Array.make 0 0 ;
+	root_of_cc = Array.make 0 0 ;
 	unary = false
 	} 
 
@@ -258,7 +258,7 @@ let enum_alternate_anchors mix =
 									Int2Map.add (ag.name,cc_id) (IntSet.add id set) ids_of_name 
 							in
 								(ar,IntMap.add id_min cc_id m,fresh,ids_of_name,size_of_cc) 
-				) comp_map (Array.create (IntMap.size comp_map) 0,IntMap.empty,0,Int2Map.empty,IntMap.empty)
+				) comp_map (Array.make (IntMap.size comp_map) 0,IntMap.empty,0,Int2Map.empty,IntMap.empty)
 			in
 			let size_of_cc = Array.init (comp_num) (fun cc_id -> IntMap.find cc_id size_of_cc) in
 				{mix with enum_cov = Some sptrs ; 

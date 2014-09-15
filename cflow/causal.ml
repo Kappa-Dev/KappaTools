@@ -422,7 +422,7 @@ let enrich_grid config_closure grid =
   let ids = ids_of_grid grid  in 
   let config = config_of_grid ids grid in 
   let max_key = List.fold_left max 0 grid.weak_list  in 
-  let tbl = Graph_closure.A.create (max_key+1) false in 
+  let tbl = Graph_closure.A.make (max_key+1) false in 
   let _ = 
     List.iter 
       (fun i -> Graph_closure.A.set tbl i true)

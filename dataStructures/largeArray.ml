@@ -36,25 +36,25 @@ module GenArray =
 		
 		let create n a =
 			if n <= max_array_size1
-			then Unary (Array.create n a)
+			then Unary (Array.make n a)
 			else
 			if n > max_array_size2 then invalid_arg "GenArray: array too large"
 			else
 				let m =
 					let p, q = euclideen n max_array_size1 in 
-					let l = Array.create max_array_size1 a in
-					let m = Array.create (if q = 0 then p else p + 1) l in
+					let l = Array.make max_array_size1 a in
+					let m = Array.make (if q = 0 then p else p + 1) l in
 					let rec aux k =
 						if k = (- 1)
 						then
 							m
 						else
-							(m.(k) <- Array.create max_array_size1 a; aux (k - 1))
+							(m.(k) <- Array.make max_array_size1 a; aux (k - 1))
 					in
 					if q = 0
 					then aux (p - 1)
 					else
-						(m.(p) <- Array.create q a;
+						(m.(p) <- Array.make q a;
 							aux (p - 1))
 				in Binary m
 		
