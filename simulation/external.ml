@@ -137,8 +137,8 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
     in
     let value = State.value state counter env v in (*Change here if one wants to have address passing style of assignation*)
     State.update_rule id value state;
-    State.update_activity state p_id id counter env ;		
-    let env,pert_ids = State.update_dep state (-1) (RULE id) pert_ids counter env in
+    State.update_activity state ~cause:p_id id counter env ;		
+    let env,pert_ids = State.update_dep state (RULE id) pert_ids counter env in
     (env,state ,pert_ids,tracked,pert_events)
   | (None,UPDATE_VAR (id,v)) ->
     let _ =
@@ -147,7 +147,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
     in
     let value = State.value state counter env v in (*Change here if one wants to have address passing style of assignation*)
     State.set_variable id value state ;
-    let env,pert_ids = State.update_dep state (-1) (ALG id) pert_ids counter env in
+    let env,pert_ids = State.update_dep state (ALG id) pert_ids counter env in
     (env,state,pert_ids,tracked,pert_events) 
   | (None,UPDATE_TOK (tk_id,v)) -> 
     let _ =
@@ -158,7 +158,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
     begin
       try
 	update_token tk_id value state;
-	let env,pert_ids = State.update_dep state (-1) (TOK tk_id) pert_ids counter env in
+	let env,pert_ids = State.update_dep state (TOK tk_id) pert_ids counter env in
 	(env,state,pert_ids,tracked,pert_events) 
       with Invalid_argument _ -> failwith "External.apply_effect: invalid token id"
     end

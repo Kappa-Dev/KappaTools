@@ -42,9 +42,9 @@ val set_variable : int -> Num.t -> t -> unit
 val update_rule : int -> Num.t -> t -> unit
 val update_token : int -> Num.t -> t -> unit
 val update_activity :
-  t -> int -> int -> Counter.t -> Environment.t -> unit
+  t -> ?cause:int -> int -> Counter.t -> Environment.t -> unit
 val update_dep :
-  t -> int -> dep_type -> IntSet.t ->
+  t -> ?cause:int -> dep_type -> IntSet.t ->
   Counter.t -> Environment.t -> Environment.t * IntSet.t
 val select_injection :
   float * Num.t Dynamics.variable option -> float * Num.t Dynamics.variable option ->

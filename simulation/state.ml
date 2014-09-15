@@ -230,24 +230,25 @@ let eval_activity ?using rule state counter env =
 
 let pert_of_id state id = IntMap.find id state.perturbations
 
-let update_activity state cause var_id counter env =
+let update_activity state ?cause var_id counter env =
 	if not (Environment.is_rule var_id env) then ()
 	else
 		let rule = rule_of_id var_id state in
 		let a2,a1 = eval_activity rule state counter env in
 		let alpha = Num.float_of_num (Num.add a2 a1) in (*a1 is zero if rule doesn't have ambiguous molarity*)
 		
-		if !Parameter.fluxModeOn && cause > 0 then
-			begin
-				try
-					let alpha_old = Random_tree.find var_id state.activity_tree in
-					Random_tree.add var_id alpha state.activity_tree ;
-					let w = (alpha -. alpha_old) in
-					update_flux state cause var_id w		
-				with Invalid_argument msg -> invalid_arg ("State.update_activity: "^msg)
-			end
-		else
-			Random_tree.add var_id alpha state.activity_tree 
+		match cause with
+		|Some cause when !Parameter.fluxModeOn ->
+		  begin
+		    try
+		      let alpha_old = Random_tree.find var_id state.activity_tree in
+		      Random_tree.add var_id alpha state.activity_tree ;
+		      let w = (alpha -. alpha_old) in
+		      update_flux state cause var_id w		
+		    with Invalid_argument msg -> invalid_arg ("State.update_activity: "^msg)
+		  end
+		| Some _ | None -> 
+			    Random_tree.add var_id alpha state.activity_tree 
 
 let unsilence_rule state rule counter env =
   if IntSet.is_empty state.silenced then (if !Parameter.debugModeOn then Debug.tag "No silenced rule, skipping")
@@ -255,7 +256,7 @@ let unsilence_rule state rule counter env =
     IntSet.fold
       (fun id _ ->
        if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Updating silenced rule %d" id) ; 
-       update_activity state rule.r_id id counter env ;
+       update_activity state ~cause:rule.r_id id counter env ;
        unsilence id state ;
       ) state.silenced ()
 
@@ -548,7 +549,7 @@ let clean_injprod injprod state counter env =
 	in*)
 	
 	state.nl_injections.(mix_id) <- (Some hp) ;
-	update_activity state (-1) mix_id counter env
+	update_activity state mix_id counter env
 
 module Embedding:
 sig
@@ -873,7 +874,7 @@ let wake_up state modif_type modifs wake_up_map env =
 				)
 		)	modifs wake_up_map
 
-let update_dep state cause dep_in pert_ids counter env =
+let update_dep state ?cause dep_in pert_ids counter env =
 	let rec iter env dep_to_check pert_ids =
 		if DepSet.is_empty dep_to_check then (env,pert_ids) 
 		else
@@ -900,10 +901,11 @@ let update_dep state cause dep_in pert_ids counter env =
   				end;
   				iter env (DepSet.union (DepSet.remove dep_in dep_to_check) depset) pert_ids
   			| Mods.RULE r_id -> (*rule activity is changed -by a perturbation if used as initial dep_in argument*)
-  				(update_activity state cause r_id counter env; 
+  				(update_activity state ?cause r_id counter env; 
   				let depset = Environment.get_dependencies (Mods.RULE r_id) env
   				in
-  				if !Parameter.debugModeOn then if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Rule %d is changed, updating %s" r_id (string_of_set Mods.string_of_dep DepSet.fold depset)) ;
+  				if !Parameter.debugModeOn then
+				  Debug.tag (Printf.sprintf "Rule %d is changed, updating %s" r_id (string_of_set Mods.string_of_dep DepSet.fold depset)) ;
   				iter env (DepSet.union (DepSet.remove dep_in dep_to_check) depset) pert_ids
   				)
   			| Mods.PERT p_id -> 
@@ -1026,9 +1028,9 @@ let positive_update ?(with_tracked=[]) state r ((phi: int IntMap.t),psi) (side_m
 								| Break 1 -> (if !Parameter.debugModeOn then Debug.tag "Cannot complete embedding, clashing instances" ; tracked)
 					else tracked
 					in
-					update_activity state r.r_id var_id counter env;
+					update_activity state ~cause:r.r_id var_id counter env;
 					let env,pert_ids = (*updating rule activities that depend --transitively-- on var_id*)
-						update_dep state r.r_id (Mods.KAPPA var_id) pert_ids counter env
+						update_dep state ~cause:r.r_id (Mods.KAPPA var_id) pert_ids counter env
 					in
 					(*Printf.printf "done (%d,%d) for var[%d]\n" root node_id var_id ;*) 
 					let already_done_map' = IntMap.add var_id	(Int2Set.add (root, node_id) root_node_set) already_done_map 
@@ -1096,7 +1098,7 @@ let positive_update ?(with_tracked=[]) state r ((phi: int IntMap.t),psi) (side_m
 					(Debug.tag (Printf.sprintf "adding %f token(s) %d" value t_id)) ;
 				state.token_vector.(t_id) <- state.token_vector.(t_id) +. value ;
 				(*updating rule activities that depend on |t_id|*)
-				update_dep state r.r_id (Mods.TOK t_id) pert_ids counter env
+				update_dep state ~cause:r.r_id (Mods.TOK t_id) pert_ids counter env
 			with Invalid_argument _ -> failwith "State.positive_update: invalid token id"  
 		) (env,pert_ids) r.Dynamics.add_token 
 	in
@@ -1107,9 +1109,9 @@ let positive_update ?(with_tracked=[]) state r ((phi: int IntMap.t),psi) (side_m
 			try
 				if !Parameter.debugModeOn then
 					(Debug.tag (Printf.sprintf "removing %f token(s) %d" value t_id)) ;
-				
+
 				state.token_vector.(t_id) <- state.token_vector.(t_id) -. value ;
-				update_dep state r.r_id (Mods.TOK t_id) pert_ids counter env
+				update_dep state ~cause:r.r_id (Mods.TOK t_id) pert_ids counter env
 			with Invalid_argument _ -> failwith "State.positive_update: invalid token id"  
 		) (env,pert_ids) r.Dynamics.rm_token
 	in
@@ -1229,13 +1231,13 @@ let negative_upd state cause (u,i) int_lnk counter env =
 									) a_i ()
 								) phi () ;
 								let _ = InjectionHeap.remove inj_id injs_cc_id in
-								if !Parameter.fluxModeOn then update_activity state cause mix_id counter env ;
+								if !Parameter.fluxModeOn then update_activity state ~cause mix_id counter env ;
 						end
 						in
 						(* comp_injs.(cc_id) <- Some injs_cc_id; *)
 						(* not necessary because comp_injs.(cc_id) has been    *)
 						(* modified by side effect                             *)
-						update_dep state cause (KAPPA mix_id) pert_ids counter env (*TODO: use influence map for this?*)
+						update_dep state ~cause (KAPPA mix_id) pert_ids counter env (*TODO: use influence map for this?*)
 					)
 					liftset (env,pert_ids) 
 	in

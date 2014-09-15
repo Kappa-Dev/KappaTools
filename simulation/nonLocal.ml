@@ -137,7 +137,7 @@ let update_intra_in_components r embedding_info state counter env =
 						try
 							let injprod_hp = InjProdHeap.alloc ~check:true ip injprod_hp in
 							(get_nl_injections state).(r_id) <- Some injprod_hp ;
-							update_activity state r.r_id r_id counter env ;
+							update_activity state ~cause:r.r_id r_id counter env ;
 							state
 						with
 							| InjProdHeap.Is_present -> state
@@ -256,7 +256,7 @@ let rec update_rooted_intras new_injs state counter env =
 						) injprod_hp new_intras
 					in
 					(get_nl_injections state).(mix_id) <- Some injprod_hp ;
-					update_activity state (-1) mix_id counter env ;
+					update_activity state mix_id counter env ;
 					update_rooted_intras tl state counter env
 
 let initialize_embeddings state counter env = 
