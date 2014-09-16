@@ -31,8 +31,10 @@ let get_nl_injections state = state.nl_injections
 let fold_graph f state init =
   Graph.SiteGraph.fold f state.graph init
 
-let silence rule_id state = state.silenced <- (IntSet.add rule_id state.silenced)
-let unsilence rule_id state = state.silenced <- (IntSet.remove rule_id state.silenced)
+let silence rule_id state =
+  state.silenced <- (IntSet.add rule_id state.silenced)
+let unsilence rule_id state =
+  state.silenced <- (IntSet.remove rule_id state.silenced)
 
 let kappa_of_id id state =
 	try
@@ -875,59 +877,55 @@ let wake_up state modif_type modifs wake_up_map env =
 		)	modifs wake_up_map
 
 let update_dep state ?cause dep_in pert_ids counter env =
-	let rec iter env dep_to_check pert_ids =
-		if DepSet.is_empty dep_to_check then (env,pert_ids) 
-		else
-  		let dep_in = DepSet.choose dep_to_check in 
-  		match dep_in with
-  			| Mods.TOK t_id -> (*token counter is changed *)
-  				let depset = 
-  					Environment.get_dependencies (Mods.TOK t_id) env
-  				in
-  				begin
-  					if !Parameter.debugModeOn then
-  						Debug.tag 
-  						(Printf.sprintf "Token %d is changed, updating %s" t_id (string_of_set Mods.string_of_dep DepSet.fold depset)) 
-  				end;
-  				iter env (DepSet.union (DepSet.remove dep_in dep_to_check) depset) pert_ids
-  			| Mods.ALG v_id -> (*variable v_id is changed -by a perturbation if used as initial dep_in argument*)
-  				let depset =
-  					Environment.get_dependencies (Mods.ALG v_id) env
-  				in
-  				begin
-  					if !Parameter.debugModeOn then
-  						Debug.tag 
-  						(Printf.sprintf "Variable %d is changed, updating %s" v_id (string_of_set Mods.string_of_dep DepSet.fold depset)) 
-  				end;
-  				iter env (DepSet.union (DepSet.remove dep_in dep_to_check) depset) pert_ids
-  			| Mods.RULE r_id -> (*rule activity is changed -by a perturbation if used as initial dep_in argument*)
-  				(update_activity state ?cause r_id counter env; 
-  				let depset = Environment.get_dependencies (Mods.RULE r_id) env
-  				in
-  				if !Parameter.debugModeOn then
-				  Debug.tag (Printf.sprintf "Rule %d is changed, updating %s" r_id (string_of_set Mods.string_of_dep DepSet.fold depset)) ;
-  				iter env (DepSet.union (DepSet.remove dep_in dep_to_check) depset) pert_ids
-  				)
-  			| Mods.PERT p_id -> 
-  				if IntMap.mem p_id state.perturbations then (*pertubation p_id is still alive and should be tried*)
-  					iter env (DepSet.remove dep_in dep_to_check) (IntSet.add p_id pert_ids)
-  				else (*pertubation p_id is removed and should be discarded from dependencies*)
-  					iter (Environment.remove_dependencies dep_in (Mods.PERT p_id) env) (DepSet.remove dep_in dep_to_check) pert_ids
-  			| Mods.ABORT p_id ->
-  				if IntMap.mem p_id state.perturbations then iter env (DepSet.remove dep_in dep_to_check) (IntSet.add p_id pert_ids)
-  				else 
-  					iter (Environment.remove_dependencies dep_in (Mods.PERT p_id) env) (DepSet.remove dep_in dep_to_check) pert_ids
-  			| Mods.KAPPA i -> (*No need to update kappa observable, it will be updated if plotted*) 
-  				let depset =
-  					Environment.get_dependencies (Mods.KAPPA i) env
-  				in
-  				if !Parameter.debugModeOn && not (DepSet.is_empty depset) then Debug.tag (Printf.sprintf "Observable %d is changed, updating %s" i (string_of_set Mods.string_of_dep DepSet.fold depset)) ;
-  					iter env (DepSet.union (DepSet.remove dep_in dep_to_check) depset) pert_ids
-  			| Mods.EVENT | Mods.TIME -> 
-  				let depset = Environment.get_dependencies dep_in env in
-  					iter env (DepSet.union (DepSet.remove dep_in dep_to_check) depset) pert_ids
+  let rec iter env dep_to_check pert_ids =
+    if DepSet.is_empty dep_to_check then (env,pert_ids)
+    else
+      let dep_in = DepSet.choose dep_to_check in
+      let depset = Environment.get_dependencies dep_in env in
+      let dep_str = string_of_set Mods.string_of_dep DepSet.fold depset in
+      let new_to_check =
+	DepSet.union (DepSet.remove dep_in dep_to_check) depset in
+      match dep_in with
+      | Mods.TOK t_id -> (* token counter is changed *)
+	 let () = if !Parameter.debugModeOn then
+		    Debug.tag (Printf.sprintf "Token %d is changed, updating %s"
+					      t_id dep_str) in
+	 iter env new_to_check pert_ids
+      | Mods.ALG v_id ->
+	 (*variable v_id is changed -by a perturbation if used as
+	 initial dep_in argument*)
+	 let () = if !Parameter.debugModeOn then
+		    Debug.tag (Printf.sprintf
+				 "Variable %d is changed, updating %s" v_id dep_str) in
+	 iter env new_to_check pert_ids
+      | Mods.RULE r_id ->
+	 (*rule activity is changed -by a perturbation if used as
+	 initial dep_in argument*)
+	 let () = update_activity state ?cause r_id counter env in
+	 let () = if !Parameter.debugModeOn then
+		    Debug.tag (Printf.sprintf "Rule %d is changed, updating %s"
+					      r_id dep_str) in
+	 iter env new_to_check pert_ids
+      | Mods.PERT p_id ->
+	 if IntMap.mem p_id state.perturbations
+	 then (*pertubation p_id is still alive and should be tried*)
+	   iter env new_to_check (IntSet.add p_id pert_ids)
+	 else (*pertubation p_id is removed and should be discarded from dependencies*)
+	   iter (Environment.remove_dependencies dep_in (Mods.PERT p_id) env) new_to_check pert_ids
+      | Mods.ABORT p_id ->
+	 if IntMap.mem p_id state.perturbations
+	 then iter env new_to_check (IntSet.add p_id pert_ids)
+	 else iter (Environment.remove_dependencies dep_in (Mods.PERT p_id) env) new_to_check pert_ids
+      | Mods.KAPPA i ->
+	 (*No need to update kappa observable, it will be updated if plotted*)
+	 let () = if !Parameter.debugModeOn && not (DepSet.is_empty depset) then
+		    Debug.tag (Printf.sprintf "Observable %d is changed, updating %s"
+					      i dep_str) in
+	 iter env new_to_check pert_ids
+      | Mods.EVENT | Mods.TIME ->
+		      iter env new_to_check pert_ids
   in
-		iter env (DepSet.singleton dep_in) pert_ids
+  iter env (DepSet.singleton dep_in) pert_ids
 
 let enabled r state = 
 	let r_id = Mixture.get_id r.lhs in 

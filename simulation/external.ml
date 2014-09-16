@@ -101,48 +101,61 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
       invalid_arg
 	("Perturbation "^p_str^" would introduce an infinite number of agents, aborting...")
     else
-      if !Parameter.debugModeOn then
-	Debug.tag (Printf.sprintf "Introducing %d instances of %s" (Num.int_of_num x) (Mixture.to_kappa false mix env)) ;
-    apply_n_time x r state env counter pert_ids pert_events tracked
+      let () =
+	if !Parameter.debugModeOn then
+	  Debug.tag
+	    (Printf.sprintf "Introducing %s instances of %s"
+			    (Num.to_string x) (Mixture.to_kappa false mix env))
+      in apply_n_time x r state env counter pert_ids pert_events tracked
   | (Some r,DELETE (v,mix)) ->
      let mix_id = Mixture.get_id r.lhs in
      let instance_num = State.instance_number mix_id state env in
      let x = (Num.min (eval_var v) instance_num) in
      apply_n_time x r state env counter pert_ids pert_events tracked
-  | (None,UPDATE_RULE (id,v)) -> 
-     let _ =
-      if !Parameter.debugModeOn then 
-	(Debug.tag (Printf.sprintf "Updating rate of rule '%s'" (Environment.rule_of_num id env)) 
-	)
-    in
-    let value = State.value state counter env v in (*Change here if one wants to have address passing style of assignation*)
-    State.update_rule id value state;
-    State.update_activity state ~cause:p_id id counter env ;		
-    let env,pert_ids = State.update_dep state (RULE id) pert_ids counter env in
-    (env,state ,pert_ids,tracked,pert_events)
+  | (None,UPDATE_RULE (id,v)) ->
+     let () =
+       if !Parameter.debugModeOn then
+	 Debug.tag
+	   (Printf.sprintf "Updating rate of rule '%s'"
+			   (Environment.rule_of_num id env))
+     in
+     let value = State.value state counter env v in
+     (*Change here if one wants to have address passing style of assignation*)
+     State.update_rule id value state;
+     let env,pert_ids =
+       State.update_dep state ~cause:p_id (RULE id) pert_ids counter env in
+     (env,state ,pert_ids,tracked,pert_events)
   | (None,UPDATE_VAR (id,v)) ->
-    let _ =
-      if !Parameter.debugModeOn then 
-	(Debug.tag (Printf.sprintf "Updating variable '%s'" ((fun (x,_)->x) (Environment.alg_of_num id env)) ))
+     let () =
+       if !Parameter.debugModeOn then
+	 Debug.tag
+	    (Printf.sprintf "Updating variable '%s'"
+			    (fst (Environment.alg_of_num id env)))
     in
-    let value = State.value state counter env v in (*Change here if one wants to have address passing style of assignation*)
-    State.set_variable id value state ;
+    let value =
+      State.value state counter env v in
+    (*Change here if one wants to have address passing style of assignation*)
+    State.set_variable id value state;
     let env,pert_ids = State.update_dep state (ALG id) pert_ids counter env in
-    (env,state,pert_ids,tracked,pert_events) 
-  | (None,UPDATE_TOK (tk_id,v)) -> 
+    (env,state,pert_ids,tracked,pert_events)
+  | (None,UPDATE_TOK (tk_id,v)) ->
     let _ =
-      if !Parameter.debugModeOn then 
-	(Debug.tag (Printf.sprintf "Updating token '%s'" (Environment.token_of_num tk_id env)))
+      if !Parameter.debugModeOn then
+	(Debug.tag (Printf.sprintf "Updating token '%s'"
+				   (Environment.token_of_num tk_id env)))
     in
-    let value = State.value state counter env v in (*Change here if one wants to have address passing style of assignation*)
+    let value = State.value state counter env v in
+    (*Change here if one wants to have address passing style of assignation*)
     begin
       try
 	update_token tk_id value state;
-	let env,pert_ids = State.update_dep state (TOK tk_id) pert_ids counter env in
-	(env,state,pert_ids,tracked,pert_events) 
-      with Invalid_argument _ -> failwith "External.apply_effect: invalid token id"
+	let env,pert_ids =
+	  State.update_dep state (TOK tk_id) pert_ids counter env in
+	(env,state,pert_ids,tracked,pert_events)
+      with Invalid_argument _ ->
+	failwith "External.apply_effect: invalid token id"
     end
-  | (None,SNAPSHOT pexpr) -> 
+  | (None,SNAPSHOT pexpr) ->
     (
       let str = eval_pexpr pexpr state counter env in
       snapshot str ; (env, state ,pert_ids,tracked,pert_events)
