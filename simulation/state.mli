@@ -38,17 +38,17 @@ val fold_graph : (int -> Node.t -> 'a -> 'a) -> t -> 'a -> 'a
 val draw_rule :
   t -> Counter.t -> Environment.t -> (Dynamics.rule * Embedding.t) option * t
 
-val set_variable : int -> Num.t -> t -> unit
-val update_rule : int -> Num.t -> t -> unit
-val update_token : int -> Num.t -> t -> unit
 val update_activity :
   t -> ?cause:int -> int -> Counter.t -> Environment.t -> unit
 val update_dep :
   t -> ?cause:int -> dep_type -> IntSet.t ->
   Counter.t -> Environment.t -> Environment.t * IntSet.t
-val select_injection :
-  float * Num.t Dynamics.variable option -> float * Num.t Dynamics.variable option ->
-  t -> Mixture.t -> Counter.t -> Environment.t -> Embedding.t
+val update_dep_value : t -> Counter.t -> Environment.t ->
+		       Mods.Num.t Dynamics.variable -> Mods.dep_type -> unit
+
+val select_injection : float * Num.t Dynamics.variable option ->
+		       float * Num.t Dynamics.variable option -> t ->
+		       Mixture.t -> Counter.t -> Environment.t -> Embedding.t
 val apply :
   t -> Dynamics.rule -> Embedding.t -> Counter.t -> Environment.t ->
   Environment.t * t * Int2Set.t * Embedding.t * int IntMap.t * IntSet.t

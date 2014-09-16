@@ -119,9 +119,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
 	   (Printf.sprintf "Updating rate of rule '%s'"
 			   (Environment.rule_of_num id env))
      in
-     let value = State.value state counter env v in
-     (*Change here if one wants to have address passing style of assignation*)
-     State.update_rule id value state;
+     State.update_dep_value state counter env v (RULE id);
      let env,pert_ids =
        State.update_dep state ~cause:p_id (RULE id) pert_ids counter env in
      (env,state ,pert_ids,tracked,pert_events)
@@ -129,26 +127,22 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
      let () =
        if !Parameter.debugModeOn then
 	 Debug.tag
-	    (Printf.sprintf "Updating variable '%s'"
-			    (fst (Environment.alg_of_num id env)))
-    in
-    let value =
-      State.value state counter env v in
-    (*Change here if one wants to have address passing style of assignation*)
-    State.set_variable id value state;
-    let env,pert_ids = State.update_dep state (ALG id) pert_ids counter env in
-    (env,state,pert_ids,tracked,pert_events)
+	   (Printf.sprintf "Updating variable '%s'"
+			   (fst (Environment.alg_of_num id env)))
+     in
+     State.update_dep_value state counter env v (ALG id);
+     let env,pert_ids = State.update_dep state (ALG id) pert_ids counter env in
+     (env,state,pert_ids,tracked,pert_events)
   | (None,UPDATE_TOK (tk_id,v)) ->
     let _ =
       if !Parameter.debugModeOn then
 	(Debug.tag (Printf.sprintf "Updating token '%s'"
 				   (Environment.token_of_num tk_id env)))
     in
-    let value = State.value state counter env v in
     (*Change here if one wants to have address passing style of assignation*)
     begin
       try
-	update_token tk_id value state;
+	State.update_dep_value state counter env v (TOK tk_id);
 	let env,pert_ids =
 	  State.update_dep state (TOK tk_id) pert_ids counter env in
 	(env,state,pert_ids,tracked,pert_events)
@@ -162,29 +156,32 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
     )
   | (None,PRINT (pexpr_file,pexpr)) ->
     let str = eval_pexpr pexpr_file state counter env in
-    let desc = 
+    let desc =
       match str with "" -> stdout | _ -> Environment.get_desc str env
     in
     dump_print_expr desc pexpr state counter env ;
     flush desc ;
     (env,state,pert_ids,tracked,pert_events)
-  | (None,CFLOW id) -> 
+  | (None,CFLOW id) ->
     if !Parameter.debugModeOn then Debug.tag "Tracking causality" ;
-    Parameter.causalModeOn := true ; 
-    let env = if Environment.is_tracked id env then env else Environment.inc_active_cflows env in 
+    Parameter.causalModeOn := true;
+    let env =
+      if Environment.is_tracked id env then env
+      else Environment.inc_active_cflows env in
     let env = Environment.track id env in
     (env, state, pert_ids,tracked,pert_events)
   | (None,CFLOWOFF id) ->
     begin
       let env = Environment.dec_active_cflows env in
       let env = Environment.untrack id env in
-      if Environment.active_cflows env = 0 then Parameter.causalModeOn := false ;
+      if Environment.active_cflows env = 0 then Parameter.causalModeOn := false;
       (env,state,pert_ids,tracked,pert_events)
     end
   | (None,FLUXOFF pexpr) ->
     begin
       let str = eval_pexpr pexpr state counter env in
-      let desc = match str with "" -> open_out !Parameter.fluxFileName | _ -> open_out str in
+      let desc =
+	match str with "" -> open_out !Parameter.fluxFileName | _ -> open_out str in
       Parameter.add_out_desc desc ;
       State.dot_of_flux desc state env ;
       close_out desc ;
@@ -196,18 +193,20 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var
     (if !Parameter.debugModeOn then Debug.tag "Interrupting simulation now!" ;
      let str = eval_pexpr pexpr state counter env in
      snapshot str ;
-     raise (ExceptionDefn.StopReached 
-	      (Printf.sprintf "STOP instruction was satisfied at (%d e,%f t.u)" (Counter.event counter) (Counter.time counter)))
+     raise (ExceptionDefn.StopReached
+	      (Printf.sprintf "STOP instruction was satisfied at (%d e,%f t.u)"
+			      (Counter.event counter) (Counter.time counter)))
     )
   | (None,FLUX pexpr) ->
     begin
-      if !Parameter.fluxModeOn then ExceptionDefn.warning "Flux modes are overlapping" ;
+      if !Parameter.fluxModeOn
+      then ExceptionDefn.warning "Flux modes are overlapping" ;
       Parameter.fluxModeOn := true ;
       let nme = eval_pexpr pexpr state counter env in
-      let _ = 
-  	match nme with
-  	| "" -> Parameter.fluxFileName := "flux"^"_"^(string_of_int (Counter.event counter))
-  	| _ -> Parameter.fluxFileName := nme 
+      let _ =
+	match nme with
+	| "" -> Parameter.fluxFileName := "flux"^"_"^(string_of_int (Counter.event counter))
+	| _ -> Parameter.fluxFileName := nme
       in
       Parameter.set Parameter.fluxFileName (Some "dot");
       (env, state, pert_ids,tracked,pert_events)

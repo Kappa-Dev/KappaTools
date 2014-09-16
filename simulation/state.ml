@@ -927,6 +927,14 @@ let update_dep state ?cause dep_in pert_ids counter env =
   in
   iter env (DepSet.singleton dep_in) pert_ids
 
+let update_dep_value state counter env v dep =
+  let value = value state counter env v in
+  match dep with
+  | Mods.TOK t_id -> update_token t_id value state
+  | Mods.ALG v_id -> set_variable v_id value state
+  | Mods.RULE r_id -> update_rule r_id value state
+  | Mods.KAPPA _ | Mods.PERT _ | Mods.ABORT _ | Mods.EVENT | Mods.TIME -> ()
+
 let enabled r state = 
 	let r_id = Mixture.get_id r.lhs in 
 	try Hashtbl.find state.influence_map r_id with Not_found -> IntMap.empty
