@@ -54,58 +54,52 @@ let dump_print_expr desc pexpr state counter env =
 	Printf.fprintf desc "\n"
 
 let apply_n_time x r state env counter pert_ids pert_events tracked =
-  let st = ref state
-  and pert_ids = ref pert_ids
-  and envr = ref env
-  and tracked = ref tracked
-  and pert_events = ref pert_events
-  in
-  begin try
-      Num.iteri
-	(fun n () ->
-	 (*FIXME: highly unefficient to compute new injection at each loop*)
-	 let embedding_t =
-	   try
-	     State.select_injection (infinity,None) (0.,None) state r.lhs counter env
-	   with Null_event _ ->
-		let mix_id = Mixture.get_id r.lhs in
-		if !Parameter.debugModeOn then
-		  Debug.tag "Clashing instance detected: building matrix";
-		match State.instances_of_square mix_id (-1) state env with
-		(*JK: un peu bete de generer la matrice pour ne prendre que la premiere injection*)
-		| (embedding,_,_)::_ -> Embedding.DISJOINT
-					  {Embedding.map=embedding;
-					   Embedding.roots = IntSet.empty ;
-					   Embedding.components = None ;
-					   Embedding.depth_map = None}
-		| [] -> raise Not_found
-	 in (*empty embedding, cannot raise null-event*)
-	 let (env, state, side_effects, embedding_t, psi, pert_ids_neg) =
-	   State.apply !st r embedding_t counter env in
-	 let phi = State.Embedding.map_of embedding_t in
-	 let env,state,pert_ids_pos,new_injs,tracked' =
-	   State.positive_update ~with_tracked:!tracked !st r (phi,psi) (side_effects,Int2Set.empty) counter env
-	 in
-	 pert_events := (r,phi,psi,side_effects)::!pert_events ;
-	 if Num.is_equal n x then
-	   pert_ids := IntSet.union !pert_ids (IntSet.union pert_ids_neg pert_ids_pos);
-	 (*only the first time*)
-	 st := state ;
-	 envr := env ;
-	 tracked := tracked') () x with
-    | Not_found ->
-       if !Parameter.debugModeOn then
-	 Debug.tag "No more non clashing instances were found!"
-  end;
-  (!envr,!st,!pert_ids,!tracked,!pert_events)
+  Num.iteri
+    (fun n (env,state,pert_ids,with_tracked,pert_events as pack) ->
+     try
+       (*FIXME: highly unefficient to compute new injection at each loop*)
+       let embedding_t =
+	 try State.select_injection (infinity,None) (0.,None)
+				    state r.lhs counter env
+	 with Null_event _ ->
+	      let mix_id = Mixture.get_id r.lhs in
+	      if !Parameter.debugModeOn then
+		Debug.tag "Clashing instance detected: building matrix";
+	      match State.instances_of_square mix_id (-1) state env with
+	      (*JK: un peu bete de generer la matrice pour ne prendre que la premiere injection*)
+	      | (embedding,_,_)::_ -> Embedding.DISJOINT
+					{Embedding.map=embedding;
+					 Embedding.roots = IntSet.empty ;
+					 Embedding.components = None ;
+					 Embedding.depth_map = None}
+	      | [] -> raise Not_found
+       in (*empty embedding, cannot raise null-event*)
+       let (env, state, side_effects, embedding_t, psi, pert_ids_neg) =
+	 State.apply state r embedding_t counter env in
+       let phi = State.Embedding.map_of embedding_t in
+       let env,state,pert_ids_pos,new_injs,tracked' =
+	 State.positive_update ~with_tracked state r (phi,psi)
+			       (side_effects,Int2Set.empty) counter env
+       in
+       let pert_ids =
+	 if Num.is_equal n x then (*only the first time*)
+	   IntSet.union pert_ids (IntSet.union pert_ids_neg pert_ids_pos)
+	 else pert_ids in
+       (env,state,pert_ids,tracked',(r,phi,psi,side_effects)::pert_events)
+     with Not_found ->
+       let () = if !Parameter.debugModeOn then
+		  Debug.tag "No more non clashing instances were found!"
+       in pack)
+    (env,state,pert_ids,tracked,pert_events) x
 
 let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var snapshot counter =
   match eff with
   | (Some r,INTRO (v,mix)) ->
-    let x = eval_var v in
+     let x = eval_var v in
     if x = Num.F infinity then
       let p_str = pert.flag in
-      invalid_arg ("Perturbation "^p_str^" would introduce an infinite number of agents, aborting...")
+      invalid_arg
+	("Perturbation "^p_str^" would introduce an infinite number of agents, aborting...")
     else
       if !Parameter.debugModeOn then
 	Debug.tag (Printf.sprintf "Introducing %d instances of %s" (Num.int_of_num x) (Mixture.to_kappa false mix env)) ;
