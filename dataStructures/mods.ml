@@ -14,109 +14,108 @@ module DepSet = Set.Make (struct type t = dep_type let compare = compare end)
 
 
 module Num =
-	struct
-	
-	type t = I of int | F of float | I64 of Int64.t 
-		
-	let is_greater n1 n2 =
-		match n1,n2 with
-			| (F x, F y) -> x > y
-			| (I x, I y) -> x > y
-			| (F x, I y) -> x > (float_of_int y)
-			| (I x, F y) -> (float_of_int x) > y
-			| (I x, I64 y) -> (Int64.of_int x) > y
-			| (I64 x, I64 y) -> x > y
-			| (I64 x, I y) -> (Int64.of_int y) < x
-			| (F x, I64 y) -> x > (Int64.to_float y)
-			| (I64 x, F y) -> y < (Int64.to_float x)
-			
-			 
-	let is_smaller n1 n2 = 
-		match n1,n2 with
-			| (F x, F y) -> x < y
-			| (I x, I y) -> x < y
-			| (F x, I y) -> x < (float_of_int y)
-			| (I x, F y) -> (float_of_int x) < y
-			| (I x, I64 y) -> (Int64.of_int x) < y
-			| (I64 x, I64 y) -> x < y
-			| (I64 x, I y) -> (Int64.of_int y) > x
-			| (F x, I64 y) -> x < (Int64.to_float y)
-			| (I64 x, F y) -> y > (Int64.to_float x)
-	
-	let is_equal n1 n2 = 
-		match n1,n2 with
-			| (F x, F y) -> x = y
-			| (I x, I y) -> x = y
-			| (I64 x, I64 y) -> x=y
-			| (I64 x, I y) -> x = (Int64.of_int y)
-			| (I x, I64 y) -> y = (Int64.of_int x)
-			| _ -> false
-	
-	let mult n1 n2 = 
-		match n1,n2 with
-			| (F x, F y) -> F (x *. y)
-			| (I x, I y) -> I (x * y)
-			| (F x, I y) -> F (x *. (float_of_int y))
-			| (I x, F y) -> F ((float_of_int x) *. y)
-			| (I x, I64 y) -> I64 (Int64.mul (Int64.of_int x) y)
-			| (I64 x, I64 y) -> I64 (Int64.mul x y)
-			| (I64 x, I y) -> I64 (Int64.mul (Int64.of_int y) x)
-			| (F x, I64 y) -> F (x *. (Int64.to_float y))
-			| (I64 x, F y) -> F (y *. (Int64.to_float x))
-	
-	let min n1 n2 =
-		match n1,n2 with
-			| (F x, F y) -> F (min x y) 
-			| (I x, I y) -> I (min x y)
-			| (F x, I y) -> F (min x (float_of_int y))
-			| (I x, F y) -> F (min (float_of_int x) y)
-			| (I x, I64 y) -> I64 (min (Int64.of_int x) y)
-			| (I64 x, I64 y) -> I64 (min x y)
-			| (I64 x, I y) -> I64 (min (Int64.of_int y) x)
-			| (F x, I64 y) -> F (min x (Int64.to_float y))
-			| (I64 x, F y) -> F (min y (Int64.to_float x))
-	
-	
-	let add n1 n2 = 
-		match n1,n2 with
-			| (F x, F y) -> F (x +. y)
-			| (I x, I y) -> I (x + y)
-			| (F x, I y) -> F (x +. (float_of_int y))
-			| (I x, F y) -> F ((float_of_int x) +. y)
-			| (I x, I64 y) -> I64 (Int64.add (Int64.of_int x) y)
-			| (I64 x, I64 y) -> I64 (Int64.add x y)
-			| (I64 x, I y) -> I64 (Int64.add (Int64.of_int y) x)
-			| (F x, I64 y) -> F (x +. (Int64.to_float y))
-			| (I64 x, F y) -> F (y +. (Int64.to_float x))
-	
-	let float_of_num n =
-		match n with
-			| F x -> x
-			| I x -> float_of_int x
-			| I64 x -> Int64.to_float x 
-	
-	let int_of_num n =
-		match n with
-			| F x -> (int_of_float x)
-			| I x -> x
-			| I64 x -> Int64.to_int x (*Might exceed thebiggest 32 bits integer*)
+  struct
+    type t = I of int | F of float | I64 of Int64.t
 
-	let is_zero n = 
-		match n with
-		| F x -> x = 0.
-		| I64 x -> x = Int64.zero
-		| I x -> x = 0
+    let compare n1 n2 =
+      match n1,n2 with
+      | (F x, F y) -> Pervasives.compare x y
+      | (I x, I y) -> Pervasives.compare x y
+      | (F x, I y) -> Pervasives.compare x (float_of_int y)
+      | (I x, F y) -> Pervasives.compare (float_of_int x) y
+      | (I x, I64 y) -> Pervasives.compare (Int64.of_int x) y
+      | (I64 x, I64 y) -> Pervasives.compare x y
+      | (I64 x, I y) -> Pervasives.compare (Int64.of_int y) x
+      | (F x, I64 y) -> Pervasives.compare x (Int64.to_float y)
+      | (I64 x, F y) -> Pervasives.compare y (Int64.to_float x)
 
-	let print f = function
-	  | F x -> Printf.fprintf f "%E" x
-	  | I64 x -> Printf.fprintf f "%Ld" x
-	  | I x -> Printf.fprintf f "%d" x
+    let is_greater n1 n2 = compare n1 n2 > 0
+    let is_smaller n1 n2 = compare n1 n2 < 0
+    let is_equal n1 n2 = compare n1 n2=0
 
-	let to_string = function
-	  | F x -> Printf.sprintf "%E" x
-	  | I64 x -> Printf.sprintf "%Ld" x
-	  | I x -> Printf.sprintf "%d" x
+    let mult n1 n2 =
+      match n1,n2 with
+      | (F x, F y) -> F (x *. y)
+      | (I x, I y) -> I (x * y)
+      | (F x, I y) -> F (x *. (float_of_int y))
+      | (I x, F y) -> F ((float_of_int x) *. y)
+      | (I x, I64 y) -> I64 (Int64.mul (Int64.of_int x) y)
+      | (I64 x, I64 y) -> I64 (Int64.mul x y)
+      | (I64 x, I y) -> I64 (Int64.mul (Int64.of_int y) x)
+      | (F x, I64 y) -> F (x *. (Int64.to_float y))
+      | (I64 x, F y) -> F (y *. (Int64.to_float x))
 
+    let min n1 n2 =
+      match n1,n2 with
+      | (F x, F y) -> F (min x y)
+      | (I x, I y) -> I (min x y)
+      | (F x, I y) -> F (min x (float_of_int y))
+      | (I x, F y) -> F (min (float_of_int x) y)
+      | (I x, I64 y) -> I64 (min (Int64.of_int x) y)
+      | (I64 x, I64 y) -> I64 (min x y)
+      | (I64 x, I y) -> I64 (min (Int64.of_int y) x)
+      | (F x, I64 y) -> F (min x (Int64.to_float y))
+      | (I64 x, F y) -> F (min y (Int64.to_float x))
+
+    let add n1 n2 =
+      match n1,n2 with
+      | (F x, F y) -> F (x +. y)
+      | (I x, I y) -> I (x + y)
+      | (F x, I y) -> F (x +. (float_of_int y))
+      | (I x, F y) -> F ((float_of_int x) +. y)
+      | (I x, I64 y) -> I64 (Int64.add (Int64.of_int x) y)
+      | (I64 x, I64 y) -> I64 (Int64.add x y)
+      | (I64 x, I y) -> I64 (Int64.add (Int64.of_int y) x)
+      | (F x, I64 y) -> F (x +. (Int64.to_float y))
+      | (I64 x, F y) -> F (y +. (Int64.to_float x))
+
+    let succ = function
+      | F x -> F (x +. 1.)
+      | I x -> I (succ x)
+      | I64 x -> I64 (Int64.succ x)
+
+    let pred = function
+      | F x -> F (x -. 1.)
+      | I x -> I (pred x)
+      | I64 x -> I64 (Int64.pred x)
+
+    let float_of_num n =
+      match n with
+      | F x -> x
+      | I x -> float_of_int x
+      | I64 x -> Int64.to_float x
+
+    let int_of_num n =
+      match n with
+      | F x -> (int_of_float x)
+      | I x -> x
+      | I64 x -> Int64.to_int x (*Might exceed thebiggest 32 bits integer*)
+
+    let is_zero n =
+      match n with
+      | I64 x -> x = Int64.zero
+      | I x -> x = 0
+      | F x -> match classify_float x with
+	       | FP_zero -> true
+	       | FP_normal | FP_subnormal |FP_infinite | FP_nan -> false
+
+    let is_strictly_positive = function
+      | F x -> x > 0.
+      | I x -> x > 0
+      | I64 x -> x > Int64.zero
+
+    let print f = function
+      | F x -> Printf.fprintf f "%E" x
+      | I64 x -> Printf.fprintf f "%Ld" x
+      | I x -> Printf.fprintf f "%d" x
+
+    let to_string = function
+      | F x -> Printf.sprintf "%E" x
+      | I64 x -> Printf.sprintf "%Ld" x
+      | I x -> Printf.sprintf "%d" x
+
+    let rec iteri f x n =
+      if is_strictly_positive n then iteri f (f n x) (pred n) else x
 end
 
 

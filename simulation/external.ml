@@ -53,84 +53,70 @@ let dump_print_expr desc pexpr state counter env =
 	) pexpr ;
 	Printf.fprintf desc "\n"
 
+let apply_n_time x r state env counter pert_ids pert_events tracked =
+  let st = ref state
+  and pert_ids = ref pert_ids
+  and envr = ref env
+  and tracked = ref tracked
+  and pert_events = ref pert_events
+  in
+  begin try
+      Num.iteri
+	(fun n () ->
+	 (*FIXME: highly unefficient to compute new injection at each loop*)
+	 let embedding_t =
+	   try
+	     State.select_injection (infinity,None) (0.,None) state r.lhs counter env
+	   with Null_event _ ->
+		let mix_id = Mixture.get_id r.lhs in
+		if !Parameter.debugModeOn then
+		  Debug.tag "Clashing instance detected: building matrix";
+		match State.instances_of_square mix_id (-1) state env with
+		(*JK: un peu bete de generer la matrice pour ne prendre que la premiere injection*)
+		| (embedding,_,_)::_ -> Embedding.DISJOINT
+					  {Embedding.map=embedding;
+					   Embedding.roots = IntSet.empty ;
+					   Embedding.components = None ;
+					   Embedding.depth_map = None}
+		| [] -> raise Not_found
+	 in (*empty embedding, cannot raise null-event*)
+	 let (env, state, side_effects, embedding_t, psi, pert_ids_neg) =
+	   State.apply !st r embedding_t counter env in
+	 let phi = State.Embedding.map_of embedding_t in
+	 let env,state,pert_ids_pos,new_injs,tracked' =
+	   State.positive_update ~with_tracked:!tracked !st r (phi,psi) (side_effects,Int2Set.empty) counter env
+	 in
+	 pert_events := (r,phi,psi,side_effects)::!pert_events ;
+	 if Num.is_equal n x then
+	   pert_ids := IntSet.union !pert_ids (IntSet.union pert_ids_neg pert_ids_pos);
+	 (*only the first time*)
+	 st := state ;
+	 envr := env ;
+	 tracked := tracked') () x with
+    | Not_found ->
+       if !Parameter.debugModeOn then
+	 Debug.tag "No more non clashing instances were found!"
+  end;
+  (!envr,!st,!pert_ids,!tracked,!pert_events)
 
 let trigger_effect state env pert_ids tracked pert_events pert p_id eff eval_var snapshot counter =
   match eff with
-  | (Some r,INTRO (v,mix)) -> 
+  | (Some r,INTRO (v,mix)) ->
     let x = eval_var v in
-    if x = Num.F infinity then 
-      let p_str = pert.flag in 
+    if x = Num.F infinity then
+      let p_str = pert.flag in
       invalid_arg ("Perturbation "^p_str^" would introduce an infinite number of agents, aborting...")
     else
-      if !Parameter.debugModeOn then 
+      if !Parameter.debugModeOn then
 	Debug.tag (Printf.sprintf "Introducing %d instances of %s" (Num.int_of_num x) (Mixture.to_kappa false mix env)) ;
-    let n = ref (Num.int_of_num x)
-    and st = ref state
-    and pert_ids = ref pert_ids
-    and envr = ref env 
-    and tracked = ref tracked
-    and pert_events = ref pert_events
-    in
-    while !n > 0 do (*FIXME: highly unefficient to compute new injection at each loop*)
-      let embedding_t = State.select_injection (infinity,None) (0.,None) state r.lhs counter env in (*empty embedding, cannot raise null-event*)
-      let (env, state, side_effects, embedding_t, psi, pert_ids_neg) = State.apply !st r embedding_t counter env in
-      let phi = State.Embedding.map_of embedding_t in
-      let env,state,pert_ids_pos,new_injs,tracked' = State.positive_update ~with_tracked:!tracked state r (phi,psi) (side_effects,Int2Set.empty) counter env
-      in
-		    pert_events := (r,phi,psi,side_effects)::!pert_events ;
-      if !n = (Num.int_of_num x) then pert_ids := IntSet.union !pert_ids (IntSet.union pert_ids_neg pert_ids_pos) ; (*only the first time*)
-      st := state ;
-      envr := env ;
-      n := !n-1 ;
-      tracked := tracked'
-    done ;
-    (!envr,!st,!pert_ids,!tracked,!pert_events)
+    apply_n_time x r state env counter pert_ids pert_events tracked
   | (Some r,DELETE (v,mix)) ->
-    let mix_id = Mixture.get_id mix in
-    let instance_num = State.instance_number mix_id state env in
-    let x = 
-      let t = eval_var v in
-      (Num.min t instance_num) 
-    in
-    let x= Num.int_of_num x in
-    let cpt = ref 0 
-    and st = ref state
-    and pert_ids = ref pert_ids
-    and envr = ref env
-    and tracked = ref tracked
-    and pert_events = ref pert_events
-    in
-    while !cpt < x do
-      let opt = 
-	try Some (State.select_injection (infinity,None) (0.,None) state mix counter env) with 
-	| Not_found -> None (*Not found is raised if there is no more injection to draw in instances of mix*)
-	| Null_event _ -> 
-	  if !Parameter.debugModeOn then Debug.tag "Clashing instance detected: building matrix";
-	  let matrix = State.instances_of_square mix_id (-1) state env in
-	  match matrix with
-(*JK: un peu bete de generer la matrice pour ne prendre que la premiere injection*)
-	  | (embedding,_,_)::_ -> Some (Embedding.DISJOINT 
-					  {Embedding.map=embedding; Embedding.roots = IntSet.empty ; Embedding.components = None ; Embedding.depth_map = None})
-	  | [] -> None
-      in
-      match opt with
-      | None -> (if !Parameter.debugModeOn then Debug.tag "No more non clashing instances were found!" ; cpt:=x)
-      | Some embedding_t ->
-	let (env, state, side_effects, phi, psi, pert_ids_neg) = State.apply state r embedding_t counter env in
-	let phi = State.Embedding.map_of phi in
-	let env,state,pert_ids_pos,new_injs,tracked' = 
-	  State.positive_update ~with_tracked:!tracked state r (phi,psi) (side_effects,Int2Set.empty) counter env
-	in
-	pert_events := (r,phi,psi,side_effects)::!pert_events ;
-	if !cpt=0 then pert_ids := IntSet.union !pert_ids (IntSet.union pert_ids_neg pert_ids_pos) ; (*only the first time*)
-	st := state ;
-	cpt := !cpt+1 ;
-	envr := env ;
-	tracked := tracked'
-    done ;
-    (!envr,!st,!pert_ids,!tracked,!pert_events)
+     let mix_id = Mixture.get_id r.lhs in
+     let instance_num = State.instance_number mix_id state env in
+     let x = (Num.min (eval_var v) instance_num) in
+     apply_n_time x r state env counter pert_ids pert_events tracked
   | (None,UPDATE_RULE (id,v)) -> 
-    let _ =
+     let _ =
       if !Parameter.debugModeOn then 
 	(Debug.tag (Printf.sprintf "Updating rate of rule '%s'" (Environment.rule_of_num id env)) 
 	)
