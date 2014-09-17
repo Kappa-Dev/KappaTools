@@ -336,75 +336,81 @@ let initialize_embeddings state mix_list counter env =
 	state.graph state
 
 let build_influence_map rules patterns env =
-	let add_influence im i j glueings = 
-		let map = try Hashtbl.find im i with Not_found -> IntMap.empty in
-		Hashtbl.replace im i (IntMap.add j glueings map)
-	in
-	let influence_map = Hashtbl.create (Hashtbl.length rules) in
-	Hashtbl.iter
-	(fun i r -> 
-		match r.refines with
-			| Some _ -> () 
-			| None ->
-				Array.iteri 
-				(fun j opt ->
-					match opt with
-						| None -> () (*empty pattern*)
-						| Some mix ->
-							if !Parameter.debugModeOn then 
-								(Printf.printf "%s -+-> %s?\n" (Dynamics.to_kappa r env) (Mixture.to_kappa false mix env) ; flush stdout) ;
-							let glueings = Dynamics.enable r mix env in (*glueings: [phi_0;...;phi_n] partial embeddings list*)
-							match glueings with
-								| [] -> if !Parameter.debugModeOn then (Printf.printf "No\n") ; ()
-								| _ ->
-									if !Parameter.debugModeOn then (Printf.printf "Yes\n") ; 
-							 		add_influence influence_map i j glueings	
-				) patterns
-	) rules ;
-	influence_map
+  let add_influence im i j glueings =
+    let map = try Hashtbl.find im i with Not_found -> IntMap.empty in
+    Hashtbl.replace im i (IntMap.add j glueings map)
+  in
+  let influence_map = Hashtbl.create (Hashtbl.length rules) in
+  Hashtbl.iter
+    (fun i r ->
+     match r.refines with
+     | Some _ -> ()
+     | None ->
+	Array.iteri
+	  (fun j opt ->
+	   match opt with
+	   | None -> () (*empty pattern*)
+	   | Some mix ->
+	      Debug.tag_if_debug "%s -+-> %a?" (Dynamics.to_kappa r env)
+				 (Mixture.print false env) mix;
+	      let glueings = Dynamics.enable r mix env in
+	      (*glueings: [phi_0;...;phi_n] partial embeddings list*)
+	      match glueings with
+	      | [] -> Debug.tag_if_debug "No"
+	      | _ ->
+		 Debug.tag_if_debug "Yes";
+		 add_influence influence_map i j glueings) patterns
+    ) rules;
+  influence_map
 
 let dot_of_influence_map desc state env =
-	Printf.fprintf desc "digraph G{ node [shape=box, style=filled, fillcolor=lightskyblue]; \n " ;
-	Hashtbl.iter
-	(fun r_id rule ->
-		let opt = if rule.Dynamics.is_pert then "[shape=invhouse,fillcolor=lightsalmon]" else "" in 
-		Printf.fprintf desc "\"%d:%s\" %s;\n" r_id (Dynamics.to_kappa rule env) opt
-	) state.rules ;
-	Array.iteri
-	(fun mix_id mix_opt ->
-		if Environment.is_rule mix_id env then ()
-		else
-			match mix_opt with
-				| None -> ()
-				| Some mix -> Printf.fprintf desc "\"%d:%s\" [shape=ellipse,fillcolor=palegreen3] ;\n" mix_id (Mixture.to_kappa false mix env)
-	) state.kappa_variables ;
-	Hashtbl.iter 
-	(fun r_id act_map ->
-		let rule = rule_of_id r_id state in
-		let n_label = Dynamics.to_kappa rule env in
-		IntMap.iter
-		(fun mix_id glueings ->
-			let n_label' = 
-				if Environment.is_rule mix_id env then
-					let rule'=rule_of_id mix_id state in
-					Dynamics.to_kappa rule' env
-				else
-					let mix = kappa_of_id mix_id state in 
-					Mixture.to_kappa false mix env
-			in
-			let arrow_label = 
-				let ls = 
-					List.fold_left 
-					(fun label glueing ->
-						LongString.concat ~sep:';' (Tools.string_of_map ~swap:true string_of_int string_of_int IntMap.fold glueing) label
-					) LongString.empty glueings
-				in
-				LongString.to_string ls
-			in
-			Printf.fprintf desc "\"%d:%s\" -> \"%d:%s\" [label=\"%s\"];\n" r_id n_label mix_id n_label' arrow_label 
-		) act_map
-	) state.influence_map ;
-	Printf.fprintf desc "}\n"
+  Printf.fprintf desc "digraph G{ node [shape=box, style=filled, fillcolor=lightskyblue]; \n " ;
+  Hashtbl.iter
+    (fun r_id rule ->
+     let opt = if rule.Dynamics.is_pert
+	       then "[shape=invhouse,fillcolor=lightsalmon]"
+	       else "" in
+     Printf.fprintf desc "\"%d:%s\" %s;\n" r_id (Dynamics.to_kappa rule env) opt
+    ) state.rules ;
+  Array.iteri
+    (fun mix_id mix_opt ->
+     if Environment.is_rule mix_id env then ()
+     else
+       match mix_opt with
+       | None -> ()
+       | Some mix ->
+	  Printf.fprintf desc "\"%d:%a\" [shape=ellipse,fillcolor=palegreen3] ;\n"
+			 mix_id (Mixture.print false env) mix
+    ) state.kappa_variables ;
+  Hashtbl.iter
+    (fun r_id act_map ->
+     let rule = rule_of_id r_id state in
+     let n_label = Dynamics.to_kappa rule env in
+     IntMap.iter
+       (fun mix_id glueings ->
+	let n_label' =
+	  if Environment.is_rule mix_id env then
+	    let rule'=rule_of_id mix_id state in
+	    Dynamics.to_kappa rule' env
+	  else
+	    let mix = kappa_of_id mix_id state in
+	    Mixture.to_kappa false env mix
+	in
+	let arrow_label =
+	  let ls =
+	    List.fold_left
+	      (fun label glueing ->
+	       LongString.concat
+		 ~sep:';'
+		 (Tools.string_of_map ~swap:true string_of_int string_of_int IntMap.fold glueing)
+		 label) LongString.empty glueings
+	  in
+	  LongString.to_string ls
+	in
+	Printf.fprintf desc "\"%d:%s\" -> \"%d:%s\" [label=\"%s\"];\n" r_id n_label mix_id n_label' arrow_label 
+       ) act_map
+    ) state.influence_map ;
+  Printf.fprintf desc "}\n"
 
 let initialize sg token_vector rules kappa_vars alg_vars obs (pert,rule_pert) counter env =
 	let dim_pure_rule = max (List.length rules) 1
@@ -1216,7 +1222,7 @@ let negative_upd state cause (u,i) int_lnk counter env =
 							(fun i j _ ->
 								let a_i = Mixture.agent_of_id i mix
 								and u_j =	try SiteGraph.node_of_id state.graph j with 
-									| exn -> invalid_arg (Printf.sprintf "State.negative_update: Node #%d is no longer in the graph and injection %s of mixture %s was pointing on it!" j (Injection.to_string phi) (Mixture.to_kappa false mix env))
+									| exn -> invalid_arg (Printf.sprintf "State.negative_update: Node #%d is no longer in the graph and injection %s of mixture %s was pointing on it!" j (Injection.to_string phi) (Mixture.to_kappa false env mix))
 								in
 								Mixture.fold_interface
 								(fun site_id (int_opt, lnk_opt) _ ->
@@ -1494,9 +1500,9 @@ let dump state counter env =
 					match injprod_hp_opt with
 						| None -> ()
 						| Some injprod_hp -> 
-							(Printf.printf "#Unary[%d]: '%s' %s has %d unary instances\n" mix_id
+							(Printf.printf "#Unary[%d]: '%s' %a has %d unary instances\n" mix_id
 									(Environment.kappa_of_num mix_id env)
-									(Mixture.to_kappa false (kappa_of_id mix_id state) env)
+									(Mixture.print false env) (kappa_of_id mix_id state)
 									(InjProdHeap.size injprod_hp);
 									if SiteGraph.size state.graph > 1000 then ()
 									else
@@ -1504,14 +1510,14 @@ let dump state counter env =
 										(fun inj_id inj_prod ->
 											Printf.printf "#\t ip#%d: %s \n" inj_id	(InjProduct.to_string inj_prod)
 										) injprod_hp 
-							) 
+							)
 					end ;
 					match opt with
 					| None -> ()
 					| Some comp_injs ->
-							(Printf.printf "#Var[%d]: '%s' %s has %d instances\n" mix_id
+							(Printf.printf "#Var[%d]: '%s' %a has %d instances\n" mix_id
 									(Environment.kappa_of_num mix_id env)
-									(Mixture.to_kappa false (kappa_of_id mix_id state) env)
+									(Mixture.print false env) (kappa_of_id mix_id state)
 									(Num.int_of_num (instance_number mix_id state env));
 									if SiteGraph.size state.graph > 1000 then ()
 									else

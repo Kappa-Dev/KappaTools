@@ -6,7 +6,8 @@ let fn (n,_,_) = n
 
 let no_pos = ("",-1,-1)
 
-let string_of_pos = fun (n,i,j) -> ("(in "^n^") line "^(string_of_int i)^", char "^(string_of_int j)^": ")
+let string_of_pos (n,i,j) =
+  ("(in "^n^") line "^(string_of_int i)^", char "^(string_of_int j)^": ")
 
 let string_of_set f fold set = 
   let l = 
@@ -62,7 +63,7 @@ let replace_space str =
 	String.iter (fun c -> if c=' ' then String.set str !cpt '_' ; cpt := !cpt+1) str ;
 	str
 
-let read_input () = 
+let read_input () =
 	let rec parse acc input =
 		match Stream.next input with
 			| '\n' -> acc
@@ -74,19 +75,19 @@ let read_input () =
 	with
 		| Stream.Failure -> invalid_arg "Tools.Read_input: cannot read stream"
 
-let list_of_string str = 
+let list_of_string str =
 	let stream = Stream.of_string str in
-	let rec parse stream acc cont = 
+	let rec parse stream acc cont =
 		try
-  		match Stream.next stream with
-  			| ' ' | '\t' -> parse stream "" (acc::cont)
+		match Stream.next stream with
+			| ' ' | '\t' -> parse stream "" (acc::cont)
 				| '\n' -> (acc::cont)
-  			| c -> parse stream  (Printf.sprintf "%s%c" acc c ) cont
+			| c -> parse stream  (Printf.sprintf "%s%c" acc c ) cont
 		with Stream.Failure -> (acc::cont)
 	in
 	parse stream "" []
-	
-let find_available_name name ext = 
+
+let find_available_name name ext =
   let base =
     if (Filename.check_suffix name ext)
     then Filename.chop_extension name

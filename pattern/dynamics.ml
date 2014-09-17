@@ -176,24 +176,32 @@ and modification =
 	| CFLOWOFF of int
 	| PRINT of (Ast.print_expr list * Ast.print_expr list)
 
-let string_of_pert pert env =
-	let string_of_effect effect =
-		match effect with
-		| PRINT (nme,_) -> "PRINT" 
-		| INTRO (_,mix) -> Printf.sprintf "INTRO %s" (Mixture.to_kappa false mix env)
-		| DELETE (_,mix) -> Printf.sprintf "DELETE %s" (Mixture.to_kappa false mix env)
-		| UPDATE_RULE (r_id,_) -> Printf.sprintf "UPDATE rule[%d]" r_id
-		| UPDATE_VAR (v_id,_) -> Printf.sprintf "UPDATE var[%d]" v_id
-		| UPDATE_TOK (t_id,_) -> Printf.sprintf "UPDATE token %s" (Environment.token_of_num t_id env)
-		| SNAPSHOT _ -> "SNAPSHOT"  
-		| STOP _ -> "STOP" 
-		| FLUX _ -> "FLUX" 
-		| FLUXOFF _ -> "FLUXOFF" 
-		| CFLOW id -> let nme = try Environment.rule_of_num id env with Not_found -> Environment.kappa_of_num id env in ("CFLOW "^nme)
-		| CFLOWOFF id -> let nme = try Environment.rule_of_num id env with Not_found -> Environment.kappa_of_num id env in ("CFLOWOFF "^nme)
-	in
-	Tools.string_of_list (fun (_,eff) -> string_of_effect eff) pert.effect
-		
+let print_pert env f pert =
+  let string_of_effect f (_, effect) =
+    match effect with
+    | PRINT (nme,_) -> Printf.fprintf f "PRINT"
+    | INTRO (_,mix) -> Printf.fprintf f "INTRO %a" (Mixture.print false env) mix
+    | DELETE (_,mix) ->
+       Printf.fprintf f "DELETE %a" (Mixture.print false env) mix
+    | UPDATE_RULE (r_id,_) -> Printf.fprintf f "UPDATE rule[%d]" r_id
+    | UPDATE_VAR (v_id,_) -> Printf.fprintf f "UPDATE var[%d]" v_id
+    | UPDATE_TOK (t_id,_) ->
+       Printf.fprintf f "UPDATE token %s" (Environment.token_of_num t_id env)
+    | SNAPSHOT _ -> Printf.fprintf f "SNAPSHOT"
+    | STOP _ -> Printf.fprintf f "STOP"
+    | FLUX _ -> Printf.fprintf f "FLUX"
+    | FLUXOFF _ -> Printf.fprintf f "FLUXOFF"
+    | CFLOW id ->
+       let nme = try Environment.rule_of_num id env
+		 with Not_found -> Environment.kappa_of_num id env
+       in Printf.fprintf f "CFLOW %s" nme
+    | CFLOWOFF id ->
+       let nme = try Environment.rule_of_num id env
+		 with Not_found -> Environment.kappa_of_num id env
+       in Printf.fprintf f "CFLOWOFF %s" nme
+  in
+  Pp.list Pp.colon string_of_effect f pert.effect
+
 let diff pos m0 m1 label_opt env =
 	let add_map id site_type map =
 		let set = try IdMap.find id map with Not_found -> Int2Set.empty
@@ -600,76 +608,93 @@ let rec superpose todo_list lhs rhs map already_done added codomain env =
 					superpose todo_list lhs rhs map (*IntMap.add lhs_id rhs_id map*) already_done added (IntSet.add rhs_id codomain) env
 
 let enable r mix env =
-	
-	let unify pat1 pat2 (root,modif_sites) glueings already_done =
-		let root_ag = try Mixture.agent_of_id root pat1 with Not_found -> invalid_arg (Printf.sprintf "Dynamics.enable: agent %d not found in %s" root (Mixture.to_kappa true pat1 env)) in
-		let name_id_root = Mixture.name root_ag in
-		let candidates = (*agent id in lhs --all cc-- that have the name name_id_root*)
-			let cpt = ref 0
-			and candidates = ref IntSet.empty
-			in
-				while !cpt < Mixture.arity pat2 do
-					candidates := IntSet.union !candidates (Mixture.ids_of_name (name_id_root,!cpt) pat2) ;
-					cpt := !cpt+1
-				done ;
-				!candidates
-		in
-			IntSet.fold
-			(fun lhs_ag_id (glueings,already_done) ->
-				if Int2Set.exists (*checking that lhs contains --ie tests-- a site that is modified by rhs*) 
-				(fun (site_id,t) -> 
-					let ag = Mixture.agent_of_id lhs_ag_id pat2 in 
-					let opt = Mixture.site_defined site_id ag false env in 
-					match opt with
-						| Some (int,lnk) -> 
-							begin
-								if t=0 (*int-modified*) then match int with Some _ -> true | None -> false
-								else
-									match lnk with Node.WLD -> false | _ -> true
-							end 
-						| None -> false
-				) modif_sites
-				then 
-					let opt = try Some (superpose [(lhs_ag_id,root)] pat2 pat1 IntMap.empty Int2Set.empty r.added IntSet.empty env) with False -> None 
-					in
-						match opt with
-							| Some map -> (*map: id_mix -> id_rule*)
-								begin
-									let opt = IntMap.root map in
-									match opt with
-										| None -> invalid_arg "Dynamics.enable: empty map"
-										| Some (i,j) -> 
-											if Int2Set.mem (i,j) already_done then (glueings,already_done) 
-											else
-												try
-												let already_done,_ = 
-													IntMap.fold 
-													(fun i j (set,comap) -> 
-														let opt = try Some (IntMap.find j comap) with Not_found -> None in 
-  													match opt with
-  														| None -> (Int2Set.add (i,j) set, IntMap.add j i comap)
-  														| Some i' -> if i=i' then (Int2Set.add (i,j) set,comap) else (if !Parameter.debugModeOn then Debug.tag "Glueing is not injective, discarding" ; raise False) 
-													) map (already_done,IntMap.empty) 
-												in
-													(map::glueings,already_done)
-												with False -> (glueings,already_done) 
-								end
-							| None -> (glueings,already_done)
-				else (glueings,already_done)
-			) candidates (glueings,already_done)
-	in
-	(*end sub function unify*)
-	begin
-		let idmap = r.modif_sites in
-		let glueings,_ = 
-			IdMap.fold
-			(fun id set (glueings,already_done) -> 
-				match id with
-					| FRESH i | KEPT i -> unify r.rhs mix (i,set) glueings already_done
-			) idmap ([],Int2Set.empty)
-		in
-		glueings
-	end
+  let unify pat1 pat2 (root,modif_sites) glueings already_done =
+    let root_ag =
+      try Mixture.agent_of_id root pat1
+      with Not_found ->
+	invalid_arg
+	  (Printf.sprintf "Dynamics.enable: agent %d not found in %s"
+			  root (Mixture.to_kappa true env pat1)) in
+    let name_id_root = Mixture.name root_ag in
+    let candidates = (*agent id in lhs --all cc-- that have the name name_id_root*)
+      let cpt = ref 0
+      and candidates = ref IntSet.empty
+      in
+      while !cpt < Mixture.arity pat2 do
+	candidates := IntSet.union
+			!candidates
+			(Mixture.ids_of_name (name_id_root,!cpt) pat2);
+	cpt := !cpt+1
+      done ;
+      !candidates
+    in
+    IntSet.fold
+      (fun lhs_ag_id (glueings,already_done) ->
+       if Int2Set.exists
+	    (*checking that lhs contains --ie tests-- a site that is modified by rhs*) 
+	    (fun (site_id,t) ->
+	     let ag = Mixture.agent_of_id lhs_ag_id pat2 in
+	     let opt = Mixture.site_defined site_id ag false env in
+	     match opt with
+	     | Some (int,lnk) ->
+		begin
+		  if t=0 (*int-modified*) then
+		    match int with Some _ -> true | None -> false
+		  else
+		    match lnk with Node.WLD -> false | _ -> true
+		end
+	     | None -> false
+	    ) modif_sites
+       then
+	 let opt =
+	   try
+	     Some (superpose [(lhs_ag_id,root)] pat2 pat1 IntMap.empty
+			     Int2Set.empty r.added IntSet.empty env)
+	   with False -> None
+	 in
+	 match opt with
+	 | Some map -> (*map: id_mix -> id_rule*)
+	    begin
+	      let opt = IntMap.root map in
+	      match opt with
+	      | None -> invalid_arg "Dynamics.enable: empty map"
+	      | Some (i,j) ->
+		 if Int2Set.mem (i,j) already_done then (glueings,already_done)
+		 else
+		   try
+		     let already_done,_ =
+		       IntMap.fold
+			 (fun i j (set,comap) ->
+			  let opt = try Some (IntMap.find j comap)
+				    with Not_found -> None in
+			  match opt with
+			  | None ->
+			     (Int2Set.add (i,j) set, IntMap.add j i comap)
+			  | Some i' ->
+			     if i=i' then (Int2Set.add (i,j) set,comap)
+			     else (Debug.tag_if_debug "Glueing is not injective, discarding" ;
+				   raise False)
+			 ) map (already_done,IntMap.empty)
+		     in
+		     (map::glueings,already_done)
+		   with False -> (glueings,already_done)
+	    end
+	 | None -> (glueings,already_done)
+       else (glueings,already_done)
+      ) candidates (glueings,already_done)
+  in
+  (*end sub function unify*)
+  begin
+    let idmap = r.modif_sites in
+    let glueings,_ =
+      IdMap.fold
+	(fun id set (glueings,already_done) ->
+	 match id with
+	 | FRESH i | KEPT i -> unify r.rhs mix (i,set) glueings already_done
+	) idmap ([],Int2Set.empty)
+    in
+    glueings
+  end
 
 let to_kappa r env = try Environment.rule_of_num r.r_id env with Not_found -> r.kappa
 	

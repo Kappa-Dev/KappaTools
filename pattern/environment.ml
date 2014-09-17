@@ -321,4 +321,7 @@ let default_state name_id site_id env =
 		| Not_found -> invalid_arg ("Undeclared agent id\""^(string_of_int name_id)^"\"")
 	in
 		Signature.default_num_value site_id sign
-				
+
+let print_rule env f id = Printf.fprintf f "%s" (rule_of_num id env)
+let print_alg env f id = Printf.fprintf f "%s" (fst (alg_of_num id env))
+let print_token env f id = Printf.fprintf f "%s" (token_of_num id env)

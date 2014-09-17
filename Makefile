@@ -3,7 +3,7 @@ OPTIONS? =
 
 ## put here the names of your source files (in the right order)
 SOURCES = \
-		dataStructures/color.ml \
+		dataStructures/color.ml dataStructures/pp.ml \
 		dataStructures/set_patched.ml \
 		dataStructures/binomialtree.ml dataStructures/largeArray.ml dataStructures/memoryManagement.ml dataStructures/longString.ml dataStructures/heap.ml dataStructures/safeHeap.ml \
 		dataStructures/tools.ml dataStructures/cache.ml main/parameter.ml dataStructures/mapExt.ml dataStructures/valMap.ml dataStructures/dynamicArray.ml dataStructures/mods.ml dataStructures/random_tree.ml \

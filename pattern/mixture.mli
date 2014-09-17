@@ -47,8 +47,9 @@ val interface : agent -> (int option * Node.lnk_t) Mods.IntMap.t
 (**[is_bound (a_i,s_j) mix] returns [true] if site [s_j] of agent [a_i] is bound (or belongs to a semi link) in mixture [mix]*)
 val is_bound : (int*int) -> t -> bool
 
-(**[to_string mix] displays a string representing mixture [mix]*)
-val to_kappa : bool -> t -> Environment.t -> string
+(**[to_kappa with_num env mix] displays a string representing mixture [mix]*)
+val print : bool -> Environment.t -> out_channel -> t -> unit
+val to_kappa : bool -> Environment.t -> t -> string
 
 (**[site_defined site_id mix is_added env]*)
 val site_defined : int -> agent -> bool -> Environment.t -> (int option * Node.lnk_t) option

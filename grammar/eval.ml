@@ -559,9 +559,9 @@ let rule_of_ast ?(backwards=false) env (ast_rule_label, ast_rule) tolerate_new_s
 	let rhs,env = mixture_of_ast ~tolerate_new_state:tolerate_new_state None true env ast_rule.rhs in
 	let (script, balance,added,modif_sites(*,side_effects*)) = Dynamics.diff ast_rule.rule_pos lhs rhs ast_rule_label.lbl_nme env
 	
-	and kappa_lhs = Mixture.to_kappa false lhs env
+	and kappa_lhs = Mixture.to_kappa false env lhs
 	
-	and kappa_rhs = Mixture.to_kappa false rhs env
+	and kappa_rhs = Mixture.to_kappa false env rhs
 	in
 	let tokenify l = 
 		List.map 
@@ -789,7 +789,7 @@ let effects_of_modif variables env ast_list =
 								else Dynamics.VAR x 
 							in
 							let str =
-								(Printf.sprintf "introduce %s * %s" str (Mixture.to_kappa false m env))::str_pert
+								(Printf.sprintf "introduce %s * %s" str (Mixture.to_kappa false env m))::str_pert
 							in (variables, (Dynamics.INTRO (v, m))::effects, str, env)
 					| DELETE (alg_expr, ast_mix, pos) ->
 							let (x, is_constant, opt_v, dep, str) = partial_eval_alg env alg_expr in
@@ -804,7 +804,7 @@ let effects_of_modif variables env ast_list =
 								else Dynamics.VAR x 
 							in
 							let str =
-								(Printf.sprintf "remove %s * %s" str (Mixture.to_kappa false m env))::str_pert
+								(Printf.sprintf "remove %s * %s" str (Mixture.to_kappa false env m))::str_pert
 							in ((m :: variables), (Dynamics.DELETE (v, m))::effects, str, env)
 					| UPDATE ((nme, pos_rule), alg_expr) ->
 							let i,is_rule =
@@ -938,7 +938,7 @@ let pert_of_result variables env res =
 								in
 								let (script,balance,added,modif_sites(*,side_effect*)) = Dynamics.diff pos lhs rhs (Some (str_pert,pos)) env
 								and kappa_lhs = ""
-								and kappa_rhs = Mixture.to_kappa false rhs env in
+								and kappa_rhs = Mixture.to_kappa false env rhs in
 								let r_id = Mixture.get_id lhs in
 								let str_pert = Printf.sprintf "pert_%d%d" p_id cpt in
 								let env = Environment.declare_rule (Some (str_pert,pos)) r_id env in
@@ -978,7 +978,7 @@ let pert_of_result variables env res =
 								and rhs = Mixture.empty None
 								in
 								let (script,balance,added,modif_sites(*,side_effect*)) = Dynamics.diff pos lhs rhs (Some (str_pert,pos)) env
-								and kappa_lhs = Mixture.to_kappa false lhs env
+								and kappa_lhs = Mixture.to_kappa false env lhs
 								and kappa_rhs = "" in
 								let r_id = Mixture.get_id lhs in
 								let str_pert = Printf.sprintf "pert_%d%d" p_id cpt in
