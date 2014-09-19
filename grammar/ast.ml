@@ -1,34 +1,35 @@
+open Mods
+
 type str_pos = string * Tools.pos
 
-type alg_expr = 
-		MULT of alg_expr * alg_expr * Tools.pos
-	| SUM of alg_expr * alg_expr * Tools.pos
-	| DIV of alg_expr * alg_expr * Tools.pos
-	| MINUS of alg_expr * alg_expr * Tools.pos
-	| POW of alg_expr * alg_expr * Tools.pos
-	| MODULO of alg_expr * alg_expr * Tools.pos
-	| LOG of alg_expr * Tools.pos
-	| SQRT of alg_expr * Tools.pos
-	| EXP of alg_expr * Tools.pos
-	| SINUS of alg_expr * Tools.pos
-	| COSINUS of alg_expr * Tools.pos
-	| TAN of alg_expr * Tools.pos
-	| ABS of alg_expr * Tools.pos
-	| UMINUS of alg_expr * Tools.pos
-	| MAX of alg_expr * alg_expr * Tools.pos
-	| MIN of alg_expr * alg_expr * Tools.pos
-	| TIME_VAR of Tools.pos
-	| EVENT_VAR of Tools.pos
-	| NULL_EVENT_VAR of Tools.pos
-	| PROD_EVENT_VAR of Tools.pos
-	| OBS_VAR of str_pos 
-	| TOKEN_ID of str_pos 
-	| FLOAT of float * Tools.pos
-	| INT of int * Tools.pos
-	| TMAX of Tools.pos
-	| EMAX of Tools.pos
-	| CPUTIME of Tools.pos
-	| INFINITY of Tools.pos
+type alg_expr =
+    MULT of alg_expr * alg_expr * Tools.pos
+  | SUM of alg_expr * alg_expr * Tools.pos
+  | DIV of alg_expr * alg_expr * Tools.pos
+  | MINUS of alg_expr * alg_expr * Tools.pos
+  | POW of alg_expr * alg_expr * Tools.pos
+  | MODULO of alg_expr * alg_expr * Tools.pos
+  | LOG of alg_expr * Tools.pos
+  | SQRT of alg_expr * Tools.pos
+  | EXP of alg_expr * Tools.pos
+  | SINUS of alg_expr * Tools.pos
+  | COSINUS of alg_expr * Tools.pos
+  | TAN of alg_expr * Tools.pos
+  | ABS of alg_expr * Tools.pos
+  | UMINUS of alg_expr * Tools.pos
+  | MAX of alg_expr * alg_expr * Tools.pos
+  | MIN of alg_expr * alg_expr * Tools.pos
+  | TIME_VAR of Tools.pos
+  | EVENT_VAR of Tools.pos
+  | NULL_EVENT_VAR of Tools.pos
+  | PROD_EVENT_VAR of Tools.pos
+  | OBS_VAR of str_pos
+  | TOKEN_ID of str_pos
+  | CONST of Num.t * Tools.pos
+  | TMAX of Tools.pos
+  | EMAX of Tools.pos
+  | CPUTIME of Tools.pos
+  | INFINITY of Tools.pos
 
 type bool_expr =
 	| TRUE of Tools.pos
@@ -77,7 +78,9 @@ let flip (rule_label,rule) =
 			rhs = rule.lhs ; 
 			add_token = rule.rm_token ; 
 			rm_token = rule.add_token ; 
-			k_def = (match rule.k_op with None -> FLOAT (0.,Tools.no_pos) | Some k -> k) ;
+			k_def = (match rule.k_op with
+				   None -> CONST (Num.F 0.,Tools.no_pos)
+				 | Some k -> k);
 			k_op = None
 			}
 	in 

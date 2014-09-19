@@ -357,10 +357,9 @@ let rec partial_eval_alg env ast =
 			(fun opt -> match opt with Some a -> Some (Num.F a) | None -> Some (Num.F infinity)) !Parameter.maxTimeValue, 
 			DepSet.empty, "t_max") 
 		| INFINITY pos -> ((fun _ _ _ _ _ _ _-> (Num.F infinity)), true, Some (Num.F infinity), DepSet.empty, "inf")
-		| FLOAT (f, pos) -> 
-				((fun _ _ _ _ _ _ _-> (Num.F f)), true, (Some (Num.F f)), DepSet.empty, (Printf.sprintf "%f" f))
-		| INT (i ,pos) -> 
-			((fun _ _ _ _ _ _ _-> (Num.I i)), true, (Some (Num.I i)), DepSet.empty, (Printf.sprintf "%d" i))
+		| CONST (n, pos) ->
+				((fun _ _ _ _ _ _ _-> n), true, (Some n),
+				 DepSet.empty, Num.to_string n)
 		| CPUTIME pos -> 	((fun _ _ _ _ _ cpu_t _-> Num.F (cpu_t -. !Parameter.cpuTime)), false, Some (Num.F 0.), (DepSet.singleton Mods.EVENT), "t_sim")
 		| OBS_VAR (lab,pos) -> 
   			begin 
@@ -531,7 +530,7 @@ let reduce_val v env =
 	let (k, const, opt_v, dep, _) = partial_eval_alg env v
 	in
 	if const then match opt_v with 
-		| Some v -> (CONST v, dep) 
+		| Some v -> (Dynamics.CONST v, dep)
 		| None -> invalid_arg "Eval.reduce_val: Variable is constant but was not evaluated"
 	else ((VAR k), dep)
 
@@ -575,9 +574,12 @@ let rule_of_ast ?(backwards=false) env (ast_rule_label, ast_rule) tolerate_new_s
 			in
 			let (f, is_const, opt_v, _ , _) = partial_eval_alg env alg_expr (*dependencies are not important here since variable is evaluated only when rule is applied*) 
 			in
-			let v = 
-  			if is_const then (match opt_v with Some v -> CONST v | None ->  invalid_arg "Eval.rule_of_ast: Variable is constant but was not evaluated")
-  			else VAR f
+			let v =
+			if is_const then (match opt_v with
+					    Some v -> Dynamics.CONST v
+					  | None ->
+					     invalid_arg "Eval.rule_of_ast: Variable is constant but was not evaluated")
+			else VAR f
 			in
 			(v,id)
 		) l

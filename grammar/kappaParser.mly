@@ -1,4 +1,5 @@
 %{
+  open Mods
 %}
 
 %token EOF NEWLINE SEMICOLON
@@ -258,8 +259,8 @@ string_or_pr_expr:
 
 
 multiple:
-    | INT {let int,pos=$1 in Ast.INT (int,pos) }
-    | FLOAT {let x,pos=$1 in Ast.FLOAT (x,pos) }
+    | INT {let int,pos=$1 in Ast.CONST (Num.I int,pos) }
+    | FLOAT {let x,pos=$1 in Ast.CONST (Num.F x,pos) }
     | LABEL {let str,pos = $1 in Ast.OBS_VAR (str,pos)}
     ;
 
@@ -321,7 +322,7 @@ rule_expression:
 		       Ast.arrow=$3;
 		       Ast.rhs=rhs;
 		       Ast.add_token = token_r;
-		       Ast.k_def=Ast.FLOAT (0.0,Tools.no_pos);
+		       Ast.k_def=Ast.CONST (Num.F 0.,Tools.no_pos);
 		       Ast.k_un=None;
 		       Ast.k_op=None})}
     ;
@@ -333,8 +334,8 @@ arrow:
 
 constant:
     | INFINITY {Ast.INFINITY $1}
-    | FLOAT {let f,pos = $1 in Ast.FLOAT (f,pos)}
-    | INT {let i,pos = $1 in Ast.INT (i,pos)}
+    | FLOAT {let f,pos = $1 in Ast.CONST (Num.F f,pos)}
+    | INT {let i,pos = $1 in Ast.CONST (Num.I i,pos)}
     | EMAX {let pos = $1 in Ast.EMAX pos}
     | TMAX {let pos = $1 in Ast.TMAX pos}
     | CPUTIME {let pos = $1 in Ast.CPUTIME pos}
@@ -388,7 +389,7 @@ alg_with_radius:
 multiple_mixture:
     | alg_expr non_empty_mixture {($1,$2)}
       /*conflict here because ID (blah) could be token non_empty mixture or mixture...*/
-    | non_empty_mixture {(Ast.FLOAT (1.,Tools.no_pos),$1)}
+    | non_empty_mixture {(Ast.CONST (Num.F 1.,Tools.no_pos),$1)}
     ;
 
 non_empty_mixture:
