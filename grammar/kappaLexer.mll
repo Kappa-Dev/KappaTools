@@ -35,8 +35,8 @@
 }
 
 let blank = [' ' '\t']
-let integer = (['0'-'9']+)
-let real = 
+let integer = '-'? (['0'-'9']+)
+let real = '-'?
   (((['0'-'9']+ | ['0'-'9']+ '.' ['0'-'9']*) | (['0'-'9']* '.' ['0'-'9']+)) ((['e' 'E'] ['+' '-'] ['0'-'9']+) | (['e' 'E'] ['0'-'9']+))) 
   | ((['0'-'9']+ '.' ['0'-'9']*) | (['0'-'9']* '.' ['0'-'9']+))   
 let id = (['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '0'-'9' '_' '-' '+']*)
@@ -98,8 +98,7 @@ rule token = parse
 		| ':' {TYPE}
 		| ';' {SEMICOLON}
 		| '\"' {let str = read_label "" ['\"'] lexbuf in let pos = position lexbuf in STRING (str,pos)}
-    | '\n' {incr_line lexbuf ; NEWLINE}
-		| '\r' {NEWLINE}
+    | '\r'? '\n' {incr_line lexbuf ; NEWLINE}
     | '#' {comment lexbuf}
     | integer as n {let pos = position lexbuf in INT (int_of_string n,pos)}
     | real as f {let pos = position lexbuf in FLOAT (float_of_string f,pos)}
