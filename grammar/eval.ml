@@ -421,6 +421,9 @@ let rec partial_eval_alg env ast =
 		| SQRT (ast, pos) -> un_op ast pos (fun x -> cast_un_op x (Some sqrt) None None) "sqrt"
 		| ABS (ast, pos) -> un_op ast pos (fun x -> cast_un_op x None (Some abs) (Some Int64.abs)) "abs"
 		| LOG (ast, pos) -> un_op ast pos (fun x -> cast_un_op x (Some log) None None) "log"
+		| UMINUS (ast, pos) ->
+		   un_op ast pos
+			 (fun x -> cast_un_op x (Some (~-.)) (Some (~-)) (Some Int64.neg)) "-"
 
 let rec partial_eval_bool env ast =
 	let bin_op_bool ast ast' pos op op_str =

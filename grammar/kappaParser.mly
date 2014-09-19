@@ -17,7 +17,7 @@
 %token <string*Tools.pos> STRING
 %token <Tools.pos> STOP SNAPSHOT
 
-%left MINUS PLUS MIN MAX
+%left MINUS PLUS
 %left MULT DIV
 %left MODULO
 %right POW
@@ -349,18 +349,12 @@ variable:
     | PROD_EVENT {Ast.PROD_EVENT_VAR $1}
     ;
 
-alg_expr:
+small_alg_expr:
     | OP_PAR alg_expr CL_PAR {$2}
     | constant {$1}
     | variable {$1}
-    | alg_expr MULT alg_expr {Ast.MULT ($1,$3,$2)}
-    | alg_expr PLUS alg_expr {Ast.SUM ($1,$3,$2)}
-    | alg_expr DIV alg_expr {Ast.DIV ($1,$3,$2)}
-    | alg_expr MINUS alg_expr {Ast.MINUS ($1,$3,$2)}
-    | alg_expr POW alg_expr {Ast.POW ($1,$3,$2)}
-    | alg_expr MODULO alg_expr {Ast.MODULO ($1,$3,$2)}
-    | MAX alg_expr alg_expr {Ast.MAX ($2,$3,$1)}
-    | MIN alg_expr alg_expr {Ast.MIN ($2,$3,$1)}
+    | MAX small_alg_expr small_alg_expr {Ast.MAX ($2,$3,$1)}
+    | MIN small_alg_expr small_alg_expr {Ast.MIN ($2,$3,$1)}
     | EXPONENT alg_expr {Ast.EXP ($2,$1)}
     | SINUS alg_expr {Ast.SINUS ($2,$1)}
     | COSINUS alg_expr {Ast.COSINUS ($2,$1)}
@@ -369,6 +363,16 @@ alg_expr:
     | SQRT alg_expr {Ast.SQRT ($2,$1)}
     | LOG alg_expr {Ast.LOG ($2,$1)}
     ;
+
+alg_expr:
+    | MINUS alg_expr { Ast.UMINUS ($2,$1) }
+    | small_alg_expr { $1 }
+    | alg_expr MULT alg_expr {Ast.MULT ($1,$3,$2)}
+    | alg_expr PLUS alg_expr {Ast.SUM ($1,$3,$2)}
+    | alg_expr DIV alg_expr {Ast.DIV ($1,$3,$2)}
+    | alg_expr MINUS alg_expr {Ast.MINUS ($1,$3,$2)}
+    | alg_expr POW alg_expr {Ast.POW ($1,$3,$2)}
+    | alg_expr MODULO alg_expr {Ast.MODULO ($1,$3,$2)}
 
 rate:
     | alg_expr OP_PAR alg_with_radius CL_PAR {($1,Some $3,None)}
