@@ -344,18 +344,14 @@ let rec partial_eval_alg env ast =
 					| None -> (ExceptionDefn.warning ~with_pos:pos "[emax] constant is evaluated to infinity" ; (Num.F infinity))
 					| Some n -> (Num.I n)
 			in
-			((fun _ _ _ _ _ _ _-> v), true, 
-			(fun opt -> match opt with Some a -> Some (Num.I a) | None -> Some (Num.F infinity)) 
-			!Parameter.maxEventValue, DepSet.empty, "e_max")
+			((fun _ _ _ _ _ _ _-> v), true, Some v, DepSet.empty, "e_max")
 		| TMAX pos -> 
 			let v =
 				match !Parameter.maxTimeValue with
 					| None -> (ExceptionDefn.warning ~with_pos:pos "[tmax] constant is evaluated to infinity" ; (Num.F infinity))
 					| Some t -> (Num.F t)
 			in
-			((fun _ _ _ _ _ _ _-> v), true, 
-			(fun opt -> match opt with Some a -> Some (Num.F a) | None -> Some (Num.F infinity)) !Parameter.maxTimeValue, 
-			DepSet.empty, "t_max") 
+			((fun _ _ _ _ _ _ _-> v), true, Some v, DepSet.empty, "t_max")
 		| INFINITY pos -> ((fun _ _ _ _ _ _ _-> (Num.F infinity)), true, Some (Num.F infinity), DepSet.empty, "inf")
 		| CONST (n, pos) ->
 				((fun _ _ _ _ _ _ _-> n), true, (Some n),
@@ -381,9 +377,11 @@ let rec partial_eval_alg env ast =
   				in
   				((fun _ v _ _ _ _ _-> v i),false,opt_v,DepSet.singleton (Mods.ALG i),("'" ^ (lab ^ "'")))
   			end
-		| TOKEN_ID (tk_nme,pos) -> 
-  			let i = 
-  				try Environment.num_of_token tk_nme env with Not_found -> raise (ExceptionDefn.Semantics_Error (pos,tk_nme ^ " is not a declared token"))
+		| TOKEN_ID (tk_nme,pos) ->
+			let i =
+				try Environment.num_of_token tk_nme env
+				with Not_found ->
+				  raise (ExceptionDefn.Semantics_Error (pos,tk_nme ^ " is not a declared token"))
   			in
  				((fun _ _ _ _ _ _ tk -> tk i),false,Some (Num.F 0.),DepSet.singleton (Mods.TOK i),("'" ^ (tk_nme ^ "'")))
 		| TIME_VAR pos ->
