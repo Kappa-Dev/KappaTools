@@ -44,7 +44,7 @@ val update_dep :
   t -> ?cause:int -> dep_type -> IntSet.t ->
   Counter.t -> Environment.t -> Environment.t * IntSet.t
 val update_dep_value : t -> Counter.t -> Environment.t ->
-		       Mods.Num.t Dynamics.variable -> Mods.dep_type -> unit
+		       Num.t Dynamics.variable -> Mods.dep_type -> unit
 
 val select_injection : float * Num.t Dynamics.variable option ->
 		       float * Num.t Dynamics.variable option -> t ->

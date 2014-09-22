@@ -226,7 +226,7 @@ let eval_activity ?using rule state counter env =
     | (Some x ,_)->
        let k = value state counter env x in
        let n = nl_instance_number mix_id state env in
-       if Mods.Num.is_zero n then (Num.I 0) else Num.mult k n
+       if Num.is_zero n then (Num.I 0) else Num.mult k n
   in
   (a_2,a_1)
 

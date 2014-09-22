@@ -255,67 +255,6 @@ let eval_agent is_pattern tolerate_new_state env a ctxt =
 	in
 		(ctxt, (Mixture.create_agent name_id interface), env)
 
-let cast_op x y op_f op_i op_i64 =
-	match (x,y) with
-	| (Num.F x, Num.F y) -> Num.F (op_f x y) 
-	| (Num.I x, Num.F y) -> Num.F (op_f (float_of_int x) y)
-	| (Num.F x, Num.I y) -> Num.F (op_f x (float_of_int y))
-	| (Num.I x, Num.I y) -> 
-		begin
-			match op_i with 
-				| None -> Num.F (op_f (float_of_int x) (float_of_int y)) 
-				| Some op_i -> Num.I (op_i x y)
-		end
-	| (Num.I x, Num.I64 y) -> 
-		begin
-			match op_i64 with 
-				| None -> Num.F (op_f (float_of_int x) (Int64.to_float y)) 
-				| Some op_i64 -> Num.I64 (op_i64 (Int64.of_int x) y)
-		end
-	| (Num.I64 x, Num.I y) -> 
-		begin
-			match op_i64 with 
-				| None -> Num.F (op_f (Int64.to_float x) (float_of_int y)) 
-				| Some op_i64 -> Num.I64 (op_i64 x (Int64.of_int y))
-		end
-	| (Num.I64 x, Num.I64 y) -> 
-		begin
-			match op_i64 with 
-				| None -> Num.F (op_f (Int64.to_float x) (Int64.to_float y)) 
-				| Some op_i64 -> Num.I64 (op_i64 x y)
-		end
-	| (Num.F x, Num.I64 y) -> Num.F (op_f x (Int64.to_float y))
-	| (Num.I64 x, Num.F y) -> Num.F (op_f (Int64.to_float x) y)
-
-let cast_un_op x op_f op_i op_i64 =
-	match x with
-		| Num.F x -> 
-			begin
-				match op_f with 
-					| Some op_f -> Num.F (op_f x) 
-					| None -> (match op_i with None -> invalid_arg "cast_un" | Some op_i -> Num.I (op_i (int_of_float x)))
-			end
-		| Num.I64 x ->
-			begin
-  			match op_i64 with
-  			| None -> 
-  					begin
-  						match op_f with
-  							| None -> invalid_arg "cast_un_op" 
-  							| Some op_f -> Num.F (op_f (Int64.to_float x)) 
-  					end
-  			| Some op_i64 -> Num.I64 (op_i64 x) 
-			end
-		| Num.I x -> 
-			match op_i with 
-			| None -> 
-					begin
-						match op_f with
-							| None -> invalid_arg "cast_un_op" 
-							| Some op_f -> Num.F (op_f (float_of_int x)) 
-					end
-			| Some op_i -> Num.I (op_i x) 
-
 (* returns partial evaluation of rate expression and a boolean that is set *)
 (* to true if partial evaluation is a constant function                    *)
 let rec partial_eval_alg env ast =
@@ -391,36 +330,43 @@ let rec partial_eval_alg env ast =
 		| NULL_EVENT_VAR pos ->
 			((fun _ _ _ _ ne _ _-> Num.I ne), false, Some (Num.I 0),(DepSet.singleton Mods.EVENT), "null_e")
 		| PROD_EVENT_VAR pos ->
-			((fun _ _ _ e _ _ _-> Num.I e), false,Some (Num.I 0),	(DepSet.singleton Mods.EVENT), "prod_e")			
-		| DIV (ast, ast', pos) -> 
-			bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> a /. b) None None) "/"
-		| SUM (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> a +. b) (Some (fun a b -> a+b)) (Some (fun a b -> Int64.add a b))) "+"
-		| MULT (ast, ast', pos) -> bin_op ast ast' pos  (fun x y -> cast_op x y (fun a b -> a *. b) (Some (fun a b -> a*b)) (Some (fun a b -> Int64.mul a b))) "*"
-		| MINUS (ast, ast', pos) -> bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> a -. b) (Some (fun a b -> a-b)) (Some (fun a b -> Int64.sub a b))) "-"
-		| POW (ast, ast', pos) -> 
-			bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> a ** b) (Some (fun a b -> Tools.pow a b)) (Some (fun a b -> Tools.pow64 a (Int64.to_int b)))) "^"
-		| MAX (ast, ast', pos) -> 
-			bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> max a b) (Some (fun a b -> max a b)) (Some (fun a b -> max a b))) "max" 
-		| MIN (ast,ast',pos) ->
-			bin_op ast ast' pos (fun x y -> cast_op x y (fun a b -> min a b) (Some (fun a b -> min a b)) (Some (fun a b -> min a b))) "min"
-		| MODULO (ast, ast', pos) -> 
-			bin_op ast ast' pos 
-			(fun x y -> 
-				cast_op x y 
-				(fun a b -> float_of_int ((int_of_float a) mod (int_of_float b))) 
-				(Some (fun a b -> a mod b))
-				(Some (fun a b -> Int64.rem a b))
-			) " modulo "
-		| COSINUS (ast, pos) -> un_op ast pos (fun x -> cast_un_op x (Some cos) None None) "cos"
-		| TAN (ast,pos) -> un_op ast pos (fun x -> cast_un_op x (Some tan) None None) "tan"
-		| SINUS (ast, pos) -> un_op ast pos (fun x -> cast_un_op x (Some sin) None None) "sin"
-		| EXP (ast, pos) -> un_op ast pos (fun x -> cast_un_op x (Some exp) None None) "e^"
-		| SQRT (ast, pos) -> un_op ast pos (fun x -> cast_un_op x (Some sqrt) None None) "sqrt"
-		| ABS (ast, pos) -> un_op ast pos (fun x -> cast_un_op x None (Some abs) (Some Int64.abs)) "abs"
-		| LOG (ast, pos) -> un_op ast pos (fun x -> cast_un_op x (Some log) None None) "log"
-		| UMINUS (ast, pos) ->
-		   un_op ast pos
-			 (fun x -> cast_un_op x (Some (~-.)) (Some (~-)) (Some Int64.neg)) "-"
+			((fun _ _ _ e _ _ _-> Num.I e), false,Some (Num.I 0), (DepSet.singleton Mods.EVENT), "prod_e")
+		| DIV (ast, ast', pos) ->
+		   bin_op ast ast' pos (Num.cast_bin_op ~op_f:(/.)) "/"
+		| SUM (ast, ast', pos) -> bin_op ast ast' pos Num.add "+"
+		| MULT (ast, ast', pos) -> bin_op ast ast' pos  Num.mult "*"
+		| MINUS (ast, ast', pos) -> bin_op ast ast' pos Num.sub "-"
+		| POW (ast, ast', pos) ->
+		   bin_op ast ast' pos (Num.cast_bin_op
+					  ~op_f:( ** ) ~op_i:Tools.pow
+					  ~op_i64:Tools.pow64) "^"
+		| MAX (ast, ast', pos) -> bin_op ast ast' pos Num.max "max"
+		| MIN (ast,ast',pos) -> bin_op ast ast' pos Num.min "min"
+		| MODULO (ast, ast', pos) ->
+		   bin_op ast ast' pos
+			  (Num.cast_bin_op
+			     ~op_f:(fun a b ->
+				    float_of_int
+				      (int_of_float a mod int_of_float b))
+			     ~op_i:(mod)
+			     ~op_i64:Int64.rem
+			  ) " modulo "
+		| COSINUS (ast, pos) ->
+		   un_op ast pos (Num.cast_un_op ~op_f:cos) "cos"
+		| TAN (ast,pos) ->
+		   un_op ast pos (Num.cast_un_op ~op_f:tan) "tan"
+		| SINUS (ast, pos) ->
+		   un_op ast pos (Num.cast_un_op ~op_f:sin) "sin"
+		| EXP (ast, pos) ->
+		   un_op ast pos (Num.cast_un_op ~op_f:exp) "e^"
+		| SQRT (ast, pos) ->
+		   un_op ast pos (Num.cast_un_op ~op_f:sqrt) "sqrt"
+		| ABS (ast, pos) ->
+		   un_op ast pos (Num.cast_un_op
+				    ~op_i:abs ~op_i64:Int64.abs) "abs"
+		| LOG (ast, pos) ->
+		   un_op ast pos (Num.cast_un_op ~op_f:log) "log"
+		| UMINUS (ast, pos) -> un_op ast pos Num.neg "-"
 
 let rec partial_eval_bool env ast =
 	let bin_op_bool ast ast' pos op op_str =
@@ -443,7 +389,7 @@ let rec partial_eval_bool env ast =
 						begin
 							match (lbl1,const2, opt_v2) with
 								| ("t",true, Some num) -> (Some num) 
-								| (_,_,_) -> Some (Mods.Num.I (-1))
+								| (_,_,_) -> Some (Num.I (-1))
 						end
 					else None
 				| _ -> None
@@ -455,7 +401,7 @@ let rec partial_eval_bool env ast =
 			(*checking whether boolean expression has a time dependency and is of the form [T]=n*)
 			op v1 v2 
 		in
-		(match stopping_time with Some (Mods.Num.I (-1)) -> raise ExceptionDefn.Unsatisfiable | _ -> () ;
+		(match stopping_time with Some (Num.I (-1)) -> raise ExceptionDefn.Unsatisfiable | _ -> () ;
 		let lbl = Printf.sprintf "(%s%s%s)" lbl1 op_str lbl2
 		in 
 		(part_eval, (const1 && const2), (DepSet.union dep1 dep2), lbl, stopping_time))

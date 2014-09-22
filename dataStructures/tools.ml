@@ -30,23 +30,22 @@ let string_of_array f ar =
 		
 let string_of_list f l =
 	"["^(String.concat ";" (List.rev_map f (List.rev l)))^"]"
-	
+
 let pow x n =
-	let rec aux x n acc =
-		if n = 0 then acc
-		else
-			aux x (n-1) (x*acc)
-	in
-	aux x n 1
-	
-let pow64 x n = 
-	let rec aux x n acc =
-		if n = 0 then acc
-		else
-			aux x (n-1) (Int64.mul x acc)
-	in
-	aux x n Int64.one
-	
+  let rec aux x n acc =
+    if n = 0 then acc
+    else
+      aux x (pred n) (x*acc)
+  in
+  aux x n 1
+
+let pow64 x n =
+  let rec aux x n acc =
+    if n = Int64.zero then acc
+    else
+      aux x (Int64.pred n) (Int64.mul x acc)
+  in
+  aux x n Int64.one
 
 (*number of bits used to represent n in base 2*)
 let bit_rep_size n = 

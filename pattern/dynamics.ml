@@ -160,9 +160,13 @@ let compute_causal_init (((node_id,agent_name),interface),_) env =
 let compute_causal_obs lhs = 
   compute_causal lhs lhs [] 
 
-type perturbation = 
-	{precondition: bool variable ; effect : (rule option * modification) list ; abort : bool variable option ; flag : string ; stopping_time : Mods.Num.t option}
-and modification = 
+type perturbation =
+    { precondition: bool variable;
+      effect : (rule option * modification) list;
+      abort : bool variable option;
+      flag : string;
+      stopping_time : Num.t option }
+ and modification = 
 	INTRO of Num.t variable * Mixture.t 
 	| DELETE of Num.t variable * Mixture.t 
 	| UPDATE_RULE of int * Num.t variable

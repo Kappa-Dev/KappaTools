@@ -9,7 +9,7 @@ open LargeArray
 let eval_pre_pert pert state counter env =
   match pert.stopping_time with
   | Some num ->
-     let t = (Mods.Num.float_of_num num) in
+     let t = (Num.float_of_num num) in
      if t <= (Mods.Counter.time counter) then (Some t,true) else (None,false)
   | _ -> (None, State.value state counter env pert.precondition)
 
