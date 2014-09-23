@@ -360,7 +360,7 @@ small_alg_expr:
     | SINUS alg_expr {Ast.SINUS ($2,$1)}
     | COSINUS alg_expr {Ast.COSINUS ($2,$1)}
     | TAN alg_expr {Ast.TAN ($2,$1)}
-    | ABS alg_expr {Ast.ABS ($2,$1)}
+    | ABS alg_expr {Ast.INT ($2,$1)}
     | SQRT alg_expr {Ast.SQRT ($2,$1)}
     | LOG alg_expr {Ast.LOG ($2,$1)}
     ;

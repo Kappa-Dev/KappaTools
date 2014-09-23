@@ -361,9 +361,10 @@ let rec partial_eval_alg env ast =
 		   un_op ast pos (Nbr.cast_un_op ~op_f:exp) "e^"
 		| SQRT (ast, pos) ->
 		   un_op ast pos (Nbr.cast_un_op ~op_f:sqrt) "sqrt"
-		| ABS (ast, pos) ->
+		| INT (ast, pos) ->
 		   un_op ast pos (Nbr.cast_un_op
-				    ~op_i:abs ~op_i64:Int64.abs) "abs"
+				    ~op_i:(fun x -> x)
+				    ~op_i64:(fun x -> x)) "abs"
 		| LOG (ast, pos) ->
 		   un_op ast pos (Nbr.cast_un_op ~op_f:log) "log"
 		| UMINUS (ast, pos) -> un_op ast pos Nbr.neg "-"

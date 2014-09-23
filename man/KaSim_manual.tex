@@ -10,8 +10,6 @@
 
 \usepackage[T1]{fontenc}
 \usepackage{ textcomp }
-\usepackage{hyperref}
-
 
 %% LaTeX - Article customise
 
@@ -59,16 +57,17 @@
 \def\mit#1{{\mathit #1}}
 \def\Real{\mathbb R}
 \def\Nat{\mathbb N}
+\def\Z{\mathbb Z}
 \def\dd{-\hspace{0.001cm}-}
 \def\imp#1{\emph{#1}\index{#1}}
 %%%%
 \def\version{3}
 
 
-\title{KaSim\version~reference manual\\ \small (release 3.4)}
+\title{KaSim\version~reference manual\\ \small (release 4-dev)}
 \author{J\'er\^ome Feret and Jean Krivine\thanks{corresponding author: jean.krivine@pps.univ-paris-diderot.fr} \\\url{KappaLanguage.org}}
 
-\date{}       
+\date{}
                                     % Activate to display a given date or no date
 \begin{document}
 \maketitle
@@ -513,7 +512,7 @@ where \ttt{var\_name} can be any string and \textit{algebraic\_expression} are d
 \ttt{[max]} & the \emph{maximum} between two values \\
 \ttt{[min]} & the \emph{minimum} between two values \\
 \ttt{[exp]} & the exponentiation operation $x\mapsto e^x$ \\
-\ttt{[int]} & the floor function $x\in\Real\mapsto \lfloor x\rfloor\in\Nat^+$ \\
+\ttt{[int]} & the floor function $x\in\Real\mapsto \lfloor x\rfloor\in\Z$ \\
 \ttt{+,-,*,/,\^} & the corresponding mathematical operators (infix notation)\\
 \bottomrule
 \end{tabular}
