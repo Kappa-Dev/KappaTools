@@ -25,7 +25,7 @@ type alg_expr =
   | PROD_EVENT_VAR of Tools.pos
   | OBS_VAR of str_pos
   | TOKEN_ID of str_pos
-  | CONST of Num.t * Tools.pos
+  | CONST of Nbr.t * Tools.pos
   | TMAX of Tools.pos
   | EMAX of Tools.pos
   | CPUTIME of Tools.pos
@@ -79,7 +79,7 @@ let flip (rule_label,rule) =
 			add_token = rule.rm_token ; 
 			rm_token = rule.add_token ; 
 			k_def = (match rule.k_op with
-				   None -> CONST (Num.F 0.,Tools.no_pos)
+				   None -> CONST (Nbr.F 0.,Tools.no_pos)
 				 | Some k -> k);
 			k_op = None
 			}

@@ -4,7 +4,7 @@ open ExceptionDefn
 open Graph
 
 type 'a variable = CONST of 'a
-		   | VAR of ((int -> Num.t) -> (int -> Num.t) -> float -> int -> int -> float -> (int -> Num.t) -> 'a)
+		   | VAR of ((int -> Nbr.t) -> (int -> Nbr.t) -> float -> int -> int -> float -> (int -> Nbr.t) -> 'a)
 type action =
 		BND of (port * port)
 	| FREE of (port * bool) (*FREE(p,b) b=true if FREE is side-effect free*)
@@ -15,7 +15,7 @@ and port = id * int
 and id = FRESH of int | KEPT of int (*binding or modifying a port that has been added or kept from the lhs*)
 
 (*Whenever v denotes a constant "variable" there is no need to keep it unevaluated, we use dummy arguments to reduce it*)
-let close_var v = v (fun _ -> Num.I 0) (fun i -> Num.I 0) 0.0 0 0 0. (fun i -> Num.I 0)
+let close_var v = v (fun _ -> Nbr.I 0) (fun i -> Nbr.I 0) 0.0 0 0 0. (fun i -> Nbr.I 0)
 
 module ActionSet = Set.Make(struct type t=action let compare = compare end) 
 
@@ -23,8 +23,8 @@ module IdMap = MapExt.Make (struct type t = id let compare = compare end)
 module Id2Map = MapExt.Make (struct type t = id*int let compare = compare end)
 
 type rule = {
-	k_def : Num.t variable ; (*standard kinetic constant*)
-	k_alt : Num.t variable option * Num.t variable option; (*Possible unary kinetic rate*)
+	k_def : Nbr.t variable ; (*standard kinetic constant*)
+	k_alt : Nbr.t variable option * Nbr.t variable option; (*Possible unary kinetic rate*)
 	over_sampling : float option ; (*Boosted kinetic rate for Bologna technique*)
 	script : action list ;
 	balance : (int * int * int) ;	(*#deleted,#preserved,#removed*)
@@ -39,8 +39,8 @@ type rule = {
 	pre_causal : int Id2Map.t ; (* INTERNAL_TESTED (8) | INTERNAL_MODIF (4) | LINK_TESTED (2) | LINK_MODIF (1) *)
 	is_pert : bool ;
 	cc_impact : (IntSet.t IntMap.t * IntSet.t IntMap.t * IntSet.t IntMap.t) option ;
-	add_token : (Num.t variable * int) list ;
-	rm_token : (Num.t variable * int) list
+	add_token : (Nbr.t variable * int) list ;
+	rm_token : (Nbr.t variable * int) list
 	}
 	(*connect: cc_i(lhs) -> {cc_j(lhs),...} if cc_i and cc_j are connected by rule application*)
 	(*disconnect: cc_i(rhs) -> {cc_j(rhs),...} if cc_i and cc_j are disconnected by rule application*)
@@ -165,13 +165,13 @@ type perturbation =
       effect : (rule option * modification) list;
       abort : bool variable option;
       flag : string;
-      stopping_time : Num.t option }
+      stopping_time : Nbr.t option }
  and modification = 
-	INTRO of Num.t variable * Mixture.t 
-	| DELETE of Num.t variable * Mixture.t 
-	| UPDATE_RULE of int * Num.t variable
-	| UPDATE_VAR of int * Num.t variable
-	| UPDATE_TOK of int * Num.t variable 
+	INTRO of Nbr.t variable * Mixture.t 
+	| DELETE of Nbr.t variable * Mixture.t 
+	| UPDATE_RULE of int * Nbr.t variable
+	| UPDATE_VAR of int * Nbr.t variable
+	| UPDATE_TOK of int * Nbr.t variable 
 	| SNAPSHOT of Ast.print_expr list
 	| STOP of Ast.print_expr list
 	| CFLOW of int 

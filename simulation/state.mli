@@ -28,8 +28,8 @@ val value :
   t -> Counter.t -> ?time:float -> Environment.t ->
   'a Dynamics.variable -> 'a
 
-val instance_number : int -> t -> Environment.t -> Num.t
-val nl_instance_number : int -> t -> Environment.t -> Num.t
+val instance_number : int -> t -> Environment.t -> Nbr.t
+val nl_instance_number : int -> t -> Environment.t -> Nbr.t
 
 val unsilence_rule : t -> Dynamics.rule -> Counter.t -> Environment.t -> unit
 val is_complete : int -> t -> bool
@@ -44,10 +44,10 @@ val update_dep :
   t -> ?cause:int -> dep_type -> IntSet.t ->
   Counter.t -> Environment.t -> Environment.t * IntSet.t
 val update_dep_value : t -> Counter.t -> Environment.t ->
-		       Num.t Dynamics.variable -> Mods.dep_type -> unit
+		       Nbr.t Dynamics.variable -> Mods.dep_type -> unit
 
-val select_injection : float * Num.t Dynamics.variable option ->
-		       float * Num.t Dynamics.variable option -> t ->
+val select_injection : float * Nbr.t Dynamics.variable option ->
+		       float * Nbr.t Dynamics.variable option -> t ->
 		       Mixture.t -> Counter.t -> Environment.t -> Embedding.t
 val apply :
   t -> Dynamics.rule -> Embedding.t -> Counter.t -> Environment.t ->
@@ -64,10 +64,10 @@ val instances_of_square :
 
 val initialize :
   Graph.SiteGraph.t -> float array -> Dynamics.rule list ->
-  Mixture.t list -> (Num.t Dynamics.variable * DepSet.t * int) list ->
-  (((int -> Num.t) ->
-    (int -> Num.t) -> float -> int -> int -> float -> (int -> Num.t) -> Num.t) *
-     bool * Num.t option * 'a * string)
+  Mixture.t list -> (Nbr.t Dynamics.variable * DepSet.t * int) list ->
+  (((int -> Nbr.t) ->
+    (int -> Nbr.t) -> float -> int -> int -> float -> (int -> Nbr.t) -> Nbr.t) *
+     bool * Nbr.t option * 'a * string)
     list ->
   Dynamics.perturbation list * Dynamics.rule list ->
   Counter.t -> Environment.t -> t * Environment.t

@@ -9,7 +9,7 @@ open LargeArray
 let eval_pre_pert pert state counter env =
   match pert.stopping_time with
   | Some num ->
-     let t = (Num.float_of_num num) in
+     let t = (Nbr.float_of_num num) in
      if t <= (Mods.Counter.time counter) then (Some t,true) else (None,false)
   | _ -> (None, State.value state counter env pert.precondition)
 
@@ -32,7 +32,7 @@ let eval_pexpr pexpr state counter env =
 			else Dynamics.VAR x 
 		      in
 		      let n = State.value state counter env v in
-		      (Num.to_string n)::cont
+		      (Nbr.to_string n)::cont
 		  ) [] pexpr
 	in
 	String.concat "" (List.rev l)
@@ -49,12 +49,12 @@ let dump_print_expr desc pexpr state counter env =
 						then (match opt_v with Some v -> Dynamics.CONST v | None -> invalid_arg "Eval.effects_of_modif")
 						else Dynamics.VAR x 
 				in
-				Num.print desc (State.value state counter env v)
+				Nbr.print desc (State.value state counter env v)
 	) pexpr ;
 	Printf.fprintf desc "\n"
 
 let apply_n_time x r state env counter pert_ids pert_events tracked =
-  Num.iteri
+  Nbr.iteri
     (fun n (env,state,pert_ids,with_tracked,pert_events as pack) ->
      try
        (*FIXME: highly unefficient to compute new injection at each loop*)
@@ -82,7 +82,7 @@ let apply_n_time x r state env counter pert_ids pert_events tracked =
 			       (side_effects,Int2Set.empty) counter env
        in
        let pert_ids =
-	 if Num.is_equal n x then (*only the first time*)
+	 if Nbr.is_equal n x then (*only the first time*)
 	   IntSet.union pert_ids (IntSet.union pert_ids_neg pert_ids_pos)
 	 else pert_ids in
        (env,state,pert_ids,tracked',(r,phi,psi,side_effects)::pert_events)
@@ -96,19 +96,19 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
   match eff with
   | (Some r,INTRO (v,mix)) ->
      let x = State.value state counter env v in
-    if x = Num.F infinity then
+    if x = Nbr.F infinity then
       let p_str = pert.flag in
       invalid_arg
 	("Perturbation "^p_str^" would introduce an infinite number of agents, aborting...")
     else
       let () =
 	Debug.tag_if_debug "Introducing %a instances of %a"
-			   Num.print x (Mixture.print false env) mix
+			   Nbr.print x (Mixture.print false env) mix
       in apply_n_time x r state env counter pert_ids pert_events tracked
   | (Some r,DELETE (v,mix)) ->
      let mix_id = Mixture.get_id r.lhs in
      let instance_num = State.instance_number mix_id state env in
-     let x = (Num.min (State.value state counter env v) instance_num) in
+     let x = (Nbr.min (State.value state counter env v) instance_num) in
      apply_n_time x r state env counter pert_ids pert_events tracked
   | (None,UPDATE_RULE (id,v)) ->
      let () =

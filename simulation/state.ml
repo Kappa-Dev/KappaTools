@@ -14,7 +14,7 @@ type t =
       perturbations : perturbation IntMap.t;
       kappa_variables : (Mixture.t option) array;
       token_vector : float array ;
-      alg_variables : (Num.t Dynamics.variable option) array;
+      alg_variables : (Nbr.t Dynamics.variable option) array;
       observables : obs list;
       influence_map : (int, (int IntMap.t list) IntMap.t) Hashtbl.t ;
       mutable activity_tree : Random_tree.tree;
@@ -23,7 +23,7 @@ type t =
       mutable silenced : IntSet.t (*Set of rule ids such that eval-activity was overestimated and whose activity was manually set to a lower value*)
     }
 and component_injections = (InjectionHeap.t option) array
-and obs = { label : string; expr : Num.t Dynamics.variable }
+and obs = { label : string; expr : Nbr.t Dynamics.variable }
 
 let get_graph state = state.graph
 let get_nl_injections state = state.nl_injections
@@ -48,7 +48,7 @@ let update_rule id value state =
   let r = rule_of_id id state in
   Hashtbl.replace state.rules id {r with k_def = Dynamics.CONST value}
 let update_token tk_id value state =
-  state.token_vector.(tk_id) <- (Num.float_of_num value)
+  state.token_vector.(tk_id) <- (Nbr.float_of_num value)
 
 let alg_of_id id state =
 	try
@@ -98,10 +98,10 @@ let is_complete mix_id state =
 
 (**[instance_number mix_id state] returns the number of instances of mixture [mix_id] in implicit state [state]*)
 let instance_number mix_id state env =
-	if Environment.is_empty_lhs mix_id env then (Num.I64 Int64.one) 
+	if Environment.is_empty_lhs mix_id env then (Nbr.I64 Int64.one) 
 	else
 		match state.injections.(mix_id) with
-		| None -> (Num.I64 Int64.zero)
+		| None -> (Nbr.I64 Int64.zero)
 		| Some component_injections ->
 			let act =
 				Array.fold_left
@@ -112,15 +112,15 @@ let instance_number mix_id state env =
 					)
 					Int64.one component_injections
 			in
-			(Num.I64 act)
+			(Nbr.I64 act)
 
 (**[nl_instance_number mix_id state] returns the number of instances of non local mixture [mix_id] in implicit state [state]*)
 let nl_instance_number mix_id state env =
-	if Environment.is_empty_lhs mix_id env then (Num.I 1) 
+	if Environment.is_empty_lhs mix_id env then (Nbr.I 1) 
 	else
 		match state.nl_injections.(mix_id) with
-		| None -> (Num.I 0)
-		| Some inj_prod_hp -> Num.I (InjProdHeap.size inj_prod_hp)
+		| None -> (Nbr.I 0)
+		| Some inj_prod_hp -> Nbr.I (InjProdHeap.size inj_prod_hp)
 
 
 (**[instances_of_square mix_id state] returns [(inj_0,codom_0,prod_0);...] the list of full and valid embeddings inj_i, their codomains codom_j and the explicit product prod_i=[phi_cc0;phi_cc1;...]*)
@@ -196,7 +196,7 @@ let value state counter ?(time=Counter.time counter) env =
 			 with Not_found -> invalid_arg (Printf.sprintf "v[%d] is not a valid variable" i)
 		       in
 		       let v_of_token id =
-			 try Num.F (state.token_vector.(id))
+			 try Nbr.F (state.token_vector.(id))
 			 with _ -> failwith "eval_var_in_state: Invalid token id"
 		       in
 		       f inst values time (Counter.event counter) (Counter.null_event counter)
@@ -216,17 +216,17 @@ let eval_activity ?using rule state counter env =
   let mix_id = Mixture.get_id rule.lhs in
   let a_2 = (*overestimated activity of binary instances of the rule*)
     let k = value state counter env rule.k_def in
-    let n = (match using with None -> instance_number mix_id state env | Some x -> Num.I x) in
-    if Num.is_zero n then (Num.I 0) else Num.mult k n
+    let n = (match using with None -> instance_number mix_id state env | Some x -> Nbr.I x) in
+    if Nbr.is_zero n then (Nbr.I 0) else Nbr.mult k n
   in
   (*overestimated activity of unary instances of the rule*)
   let a_1 =
     match rule.k_alt with
-    | (None,_) -> (Num.I 0)
+    | (None,_) -> (Nbr.I 0)
     | (Some x ,_)->
        let k = value state counter env x in
        let n = nl_instance_number mix_id state env in
-       if Num.is_zero n then (Num.I 0) else Num.mult k n
+       if Nbr.is_zero n then (Nbr.I 0) else Nbr.mult k n
   in
   (a_2,a_1)
 
@@ -237,7 +237,7 @@ let update_activity state ?cause var_id counter env =
 	else
 		let rule = rule_of_id var_id state in
 		let a2,a1 = eval_activity rule state counter env in
-		let alpha = Num.float_of_num (Num.add a2 a1) in (*a1 is zero if rule doesn't have ambiguous molarity*)
+		let alpha = Nbr.float_of_num (Nbr.add a2 a1) in (*a1 is zero if rule doesn't have ambiguous molarity*)
 		
 		match cause with
 		|Some cause when !Parameter.fluxModeOn ->
@@ -530,7 +530,7 @@ let initialize sg token_vector rules kappa_vars alg_vars obs (pert,rule_pert) co
 			if not (Environment.is_rule id env) then act_tree
 			else
 				let a2,a1 = eval_activity rule state counter env in
-				let alpha_rule = Num.float_of_num (Num.add a1 a2) in
+				let alpha_rule = Nbr.float_of_num (Nbr.add a1 a2) in
 				(Random_tree.add id alpha_rule act_tree ; act_tree)
 		)
 			state.rules state.activity_tree	
@@ -653,7 +653,7 @@ let select_injection (a2,radius_def) (a1,radius_alt) state mix counter env =
   							" has no instance but a positive activity"))
   		| Some prod_inj_hp ->
   			(try
-					let radius = match radius_alt with None -> (-1) | Some v -> Num.int_of_num (value state counter env v) in
+					let radius = match radius_alt with None -> (-1) | Some v -> Nbr.int_of_num (value state counter env v) in
   				let injprod = InjProdHeap.random prod_inj_hp in (*injprod is an array of size #cc(mix_id) and injprod.(i):Injection.t a partial injection of cc(i)*)
   				let embedding = check_validity injprod radius false state counter env in (*returns either valid embedding or raises Null_event if injection is no longer valid --function also cleans inj_hp and nodes as a side effect*)
   				(Embedding.CONNEX embedding)
@@ -706,7 +706,7 @@ let select_injection (a2,radius_def) (a1,radius_alt) state mix counter env =
   						(0, IntMap.empty, IntSet.empty, IntSet.empty) comp_injs
   				in
   				
-					let radius = match radius_def with None -> (-1) | Some v -> Num.int_of_num (value state counter env v) in
+					let radius = match radius_def with None -> (-1) | Some v -> Nbr.int_of_num (value state counter env v) in
 					
   				let rec build_component_map (roots,codomain) depth_map component_map = 
   					if IntSet.is_empty roots then (depth_map,component_map) (*no more root to check*)
@@ -781,7 +781,7 @@ let draw_rule state counter env =
 			try eval_activity r state counter env
 			with | Not_found -> invalid_arg "State.draw_rule"
 		in
-		let alpha = Num.float_of_num (Num.add a2 a1) in
+		let alpha = Nbr.float_of_num (Nbr.add a2 a1) in
 		(*correction: issue #40*)
 		if alpha = 0. then Random_tree.add rule_id alpha state.activity_tree ;
 
@@ -803,18 +803,18 @@ let draw_rule state counter env =
 		let embedding_type = 
 			let _,radius = r.k_alt
 			in
-			try select_injection (Num.float_of_num a2,radius) (Num.float_of_num a1,radius) state r.lhs counter env with 
+			try select_injection (Nbr.float_of_num a2,radius) (Nbr.float_of_num a1,radius) state r.lhs counter env with 
 			| Null_event 1 | Null_event 2 as exn -> (*null event because of clashing instance of a binary rule*)
 				if counter.Counter.cons_null_events > !Parameter.maxConsecutiveClash then 
 					begin
 						(if !Parameter.debugModeOn then Debug.tag "Max consecutive clashes reached, I am giving up square approximation at this step" else ()) ;
 						let _ = Counter.reset_consecutive_null_event counter in
 					
-						let radius = match radius with None -> (-1) | Some v -> Num.int_of_num (value state counter env v) in
+						let radius = match radius with None -> (-1) | Some v -> Nbr.int_of_num (value state counter env v) in
   				
 						let embeddings = instances_of_square ~disjoint:true rule_id radius state env in
 						let alpha,_ = eval_activity ~using:(List.length embeddings) r state counter env in 
-						let alpha = Num.float_of_num alpha in
+						let alpha = Nbr.float_of_num alpha in
 						begin
 							Random_tree.add rule_id alpha state.activity_tree ;
 							silence rule_id state ; (*rule activity will be underestimated if not awaken when a rule creates more cc's*)
@@ -1104,7 +1104,7 @@ let positive_update ?(with_tracked=[]) state r ((phi: int IntMap.t),psi) (side_m
 	let env,pert_ids =
 		List.fold_left
 		(fun (env,pert_ids) (v,t_id) ->
-			let value = Num.float_of_num (value state counter env v) in
+			let value = Nbr.float_of_num (value state counter env v) in
 			try
 				if !Parameter.debugModeOn then
 					(Debug.tag (Printf.sprintf "adding %f token(s) %d" value t_id)) ;
@@ -1117,7 +1117,7 @@ let positive_update ?(with_tracked=[]) state r ((phi: int IntMap.t),psi) (side_m
 	let env,pert_ids = 
 		List.fold_left
 		(fun (env,pert_ids) (v,t_id) ->
-			let value = Num.float_of_num (value state counter env v) in
+			let value = Nbr.float_of_num (value state counter env v) in
 			try
 				if !Parameter.debugModeOn then
 					(Debug.tag (Printf.sprintf "removing %f token(s) %d" value t_id)) ;
@@ -1488,10 +1488,10 @@ let dump state counter env =
 				if Environment.is_rule i env then
 					Printf.printf "#rule[%d]: \t%s %s @ %f[upd:%f(%f)]\n" i nme (Dynamics.to_kappa r env)
 					(Random_tree.find i state.activity_tree)
-					(Num.float_of_num a2) (Num.float_of_num a1) 
+					(Nbr.float_of_num a2) (Nbr.float_of_num a1) 
 				else
 					Printf.printf "#\t%s %s [found %d]\n" nme (Dynamics.to_kappa r env)
-					(Num.int_of_num (instance_number i state env))
+					(Nbr.int_of_num (instance_number i state env))
 			) state.rules ();
 			Array.iteri
 			(fun mix_id opt ->
@@ -1518,7 +1518,7 @@ let dump state counter env =
 							(Printf.printf "#Var[%d]: '%s' %a has %d instances\n" mix_id
 									(Environment.kappa_of_num mix_id env)
 									(Mixture.print false env) (kappa_of_id mix_id state)
-									(Num.int_of_num (instance_number mix_id state env));
+									(Nbr.int_of_num (instance_number mix_id state env));
 									if SiteGraph.size state.graph > 1000 then ()
 									else
 										Array.iteri
@@ -1542,15 +1542,15 @@ let dump state counter env =
 								((fun (s,_) -> s) (Environment.alg_of_num var_id env))
 					| Some v ->
 						match value state counter env v with
-							| Num.I x -> 
+							| Nbr.I x -> 
 								Printf.printf "#x[%d]: '%s' %d \n" var_id 
 								((fun (s,_) -> s) (Environment.alg_of_num var_id env))
 								x
-							| Num.F x -> 
+							| Nbr.F x -> 
 								Printf.printf "#x[%d]: '%s' %E \n" var_id 
 								((fun (s,_) -> s) (Environment.alg_of_num var_id env))
 								x
-							| Num.I64 x -> 
+							| Nbr.I64 x -> 
 								Printf.printf "#x[%d]: '%s' %Ld \n" var_id 
 								((fun (s,_) -> s) (Environment.alg_of_num var_id env))
 								x
@@ -1563,7 +1563,7 @@ let dump state counter env =
 					let num = instance_number mix_id state env 
 					and name = Environment.kappa_of_num mix_id env
 					in
-					Printf.printf "kappa[%d] '%s' %s\n" mix_id name (Num.to_string num)
+					Printf.printf "kappa[%d] '%s' %s\n" mix_id name (Nbr.to_string num)
 			) state.kappa_variables ;
 			Array.iteri
 			(fun tk_id v ->
@@ -1621,9 +1621,9 @@ let print_observables_values f time env counter state =
   List.iter
     (fun obs ->
      match value state counter ~time env obs.expr with
-     | Num.I x -> Printf.fprintf f "%c%d" !Parameter.plotSepChar x
-     | Num.F x -> Printf.fprintf f "%c%E" !Parameter.plotSepChar x
-     | Num.I64 x -> Printf.fprintf f "%c%Ld" !Parameter.plotSepChar x
+     | Nbr.I x -> Printf.fprintf f "%c%d" !Parameter.plotSepChar x
+     | Nbr.F x -> Printf.fprintf f "%c%E" !Parameter.plotSepChar x
+     | Nbr.I64 x -> Printf.fprintf f "%c%Ld" !Parameter.plotSepChar x
     ) state.observables ;
   Printf.fprintf f "\n"
 
@@ -1656,7 +1656,7 @@ let check_invariants check_opt state counter env =
     	  (fun r_id rule ->
     	   let x = Random_tree.find r_id state.activity_tree in
     	   let a2,a1 = eval_activity rule state counter env in
-  	   let alpha = Num.float_of_num (Num.add a2 a1) in
+  	   let alpha = Nbr.float_of_num (Nbr.add a2 a1) in
     	   if x < alpha then
     	     if (IntSet.mem r_id state.silenced || Random_tree.is_infinite r_id state.activity_tree) then ()
     	     else

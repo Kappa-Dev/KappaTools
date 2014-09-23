@@ -280,22 +280,22 @@ let rec partial_eval_alg env ast =
 		| EMAX pos -> 
 			let v =
 				match !Parameter.maxEventValue with
-					| None -> (ExceptionDefn.warning ~with_pos:pos "[emax] constant is evaluated to infinity" ; (Num.F infinity))
-					| Some n -> (Num.I n)
+					| None -> (ExceptionDefn.warning ~with_pos:pos "[emax] constant is evaluated to infinity" ; (Nbr.F infinity))
+					| Some n -> (Nbr.I n)
 			in
 			((fun _ _ _ _ _ _ _-> v), true, Some v, DepSet.empty, "e_max")
 		| TMAX pos -> 
 			let v =
 				match !Parameter.maxTimeValue with
-					| None -> (ExceptionDefn.warning ~with_pos:pos "[tmax] constant is evaluated to infinity" ; (Num.F infinity))
-					| Some t -> (Num.F t)
+					| None -> (ExceptionDefn.warning ~with_pos:pos "[tmax] constant is evaluated to infinity" ; (Nbr.F infinity))
+					| Some t -> (Nbr.F t)
 			in
 			((fun _ _ _ _ _ _ _-> v), true, Some v, DepSet.empty, "t_max")
-		| INFINITY pos -> ((fun _ _ _ _ _ _ _-> (Num.F infinity)), true, Some (Num.F infinity), DepSet.empty, "inf")
+		| INFINITY pos -> ((fun _ _ _ _ _ _ _-> (Nbr.F infinity)), true, Some (Nbr.F infinity), DepSet.empty, "inf")
 		| CONST (n, pos) ->
 				((fun _ _ _ _ _ _ _-> n), true, (Some n),
-				 DepSet.empty, Num.to_string n)
-		| CPUTIME pos -> 	((fun _ _ _ _ _ cpu_t _-> Num.F (cpu_t -. !Parameter.cpuTime)), false, Some (Num.F 0.), (DepSet.singleton Mods.EVENT), "t_sim")
+				 DepSet.empty, Nbr.to_string n)
+		| CPUTIME pos -> 	((fun _ _ _ _ _ cpu_t _-> Nbr.F (cpu_t -. !Parameter.cpuTime)), false, Some (Nbr.F 0.), (DepSet.singleton Mods.EVENT), "t_sim")
 		| OBS_VAR (lab,pos) -> 
   			begin 
   				try
@@ -307,7 +307,7 @@ let rec partial_eval_alg env ast =
   						(ExceptionDefn.Semantics_Error (pos,
   								lab ^ " is not a variable identifier"))
   				else
-  					((fun f _ _ _ _ _ _-> f i), false, Some (Num.I 0), 
+  					((fun f _ _ _ _ _ _-> f i), false, Some (Nbr.I 0), 
   						(DepSet.singleton (Mods.KAPPA i)), ("'" ^ (lab ^ "'")))
   			with Not_found -> (*lab is the label of an algebraic expression*)
   				let i,opt_v = 
@@ -322,29 +322,29 @@ let rec partial_eval_alg env ast =
 				with Not_found ->
 				  raise (ExceptionDefn.Semantics_Error (pos,tk_nme ^ " is not a declared token"))
   			in
- 				((fun _ _ _ _ _ _ tk -> tk i),false,Some (Num.F 0.),DepSet.singleton (Mods.TOK i),("'" ^ (tk_nme ^ "'")))
+ 				((fun _ _ _ _ _ _ tk -> tk i),false,Some (Nbr.F 0.),DepSet.singleton (Mods.TOK i),("'" ^ (tk_nme ^ "'")))
 		| TIME_VAR pos ->
-				((fun _ _ t _ _ _ _-> Num.F t), false, Some (Num.F 0.), (DepSet.singleton Mods.TIME), "t")
+				((fun _ _ t _ _ _ _-> Nbr.F t), false, Some (Nbr.F 0.), (DepSet.singleton Mods.TIME), "t")
 		| EVENT_VAR pos ->
-				((fun _ _ _ e ne _ _-> Num.I (e+ne)), false, Some (Num.I 0),(DepSet.singleton Mods.EVENT), "e")
+				((fun _ _ _ e ne _ _-> Nbr.I (e+ne)), false, Some (Nbr.I 0),(DepSet.singleton Mods.EVENT), "e")
 		| NULL_EVENT_VAR pos ->
-			((fun _ _ _ _ ne _ _-> Num.I ne), false, Some (Num.I 0),(DepSet.singleton Mods.EVENT), "null_e")
+			((fun _ _ _ _ ne _ _-> Nbr.I ne), false, Some (Nbr.I 0),(DepSet.singleton Mods.EVENT), "null_e")
 		| PROD_EVENT_VAR pos ->
-			((fun _ _ _ e _ _ _-> Num.I e), false,Some (Num.I 0), (DepSet.singleton Mods.EVENT), "prod_e")
+			((fun _ _ _ e _ _ _-> Nbr.I e), false,Some (Nbr.I 0), (DepSet.singleton Mods.EVENT), "prod_e")
 		| DIV (ast, ast', pos) ->
-		   bin_op ast ast' pos (Num.cast_bin_op ~op_f:(/.)) "/"
-		| SUM (ast, ast', pos) -> bin_op ast ast' pos Num.add "+"
-		| MULT (ast, ast', pos) -> bin_op ast ast' pos  Num.mult "*"
-		| MINUS (ast, ast', pos) -> bin_op ast ast' pos Num.sub "-"
+		   bin_op ast ast' pos (Nbr.cast_bin_op ~op_f:(/.)) "/"
+		| SUM (ast, ast', pos) -> bin_op ast ast' pos Nbr.add "+"
+		| MULT (ast, ast', pos) -> bin_op ast ast' pos  Nbr.mult "*"
+		| MINUS (ast, ast', pos) -> bin_op ast ast' pos Nbr.sub "-"
 		| POW (ast, ast', pos) ->
-		   bin_op ast ast' pos (Num.cast_bin_op
+		   bin_op ast ast' pos (Nbr.cast_bin_op
 					  ~op_f:( ** ) ~op_i:Tools.pow
 					  ~op_i64:Tools.pow64) "^"
-		| MAX (ast, ast', pos) -> bin_op ast ast' pos Num.max "max"
-		| MIN (ast,ast',pos) -> bin_op ast ast' pos Num.min "min"
+		| MAX (ast, ast', pos) -> bin_op ast ast' pos Nbr.max "max"
+		| MIN (ast,ast',pos) -> bin_op ast ast' pos Nbr.min "min"
 		| MODULO (ast, ast', pos) ->
 		   bin_op ast ast' pos
-			  (Num.cast_bin_op
+			  (Nbr.cast_bin_op
 			     ~op_f:(fun a b ->
 				    float_of_int
 				      (int_of_float a mod int_of_float b))
@@ -352,21 +352,21 @@ let rec partial_eval_alg env ast =
 			     ~op_i64:Int64.rem
 			  ) " modulo "
 		| COSINUS (ast, pos) ->
-		   un_op ast pos (Num.cast_un_op ~op_f:cos) "cos"
+		   un_op ast pos (Nbr.cast_un_op ~op_f:cos) "cos"
 		| TAN (ast,pos) ->
-		   un_op ast pos (Num.cast_un_op ~op_f:tan) "tan"
+		   un_op ast pos (Nbr.cast_un_op ~op_f:tan) "tan"
 		| SINUS (ast, pos) ->
-		   un_op ast pos (Num.cast_un_op ~op_f:sin) "sin"
+		   un_op ast pos (Nbr.cast_un_op ~op_f:sin) "sin"
 		| EXP (ast, pos) ->
-		   un_op ast pos (Num.cast_un_op ~op_f:exp) "e^"
+		   un_op ast pos (Nbr.cast_un_op ~op_f:exp) "e^"
 		| SQRT (ast, pos) ->
-		   un_op ast pos (Num.cast_un_op ~op_f:sqrt) "sqrt"
+		   un_op ast pos (Nbr.cast_un_op ~op_f:sqrt) "sqrt"
 		| ABS (ast, pos) ->
-		   un_op ast pos (Num.cast_un_op
+		   un_op ast pos (Nbr.cast_un_op
 				    ~op_i:abs ~op_i64:Int64.abs) "abs"
 		| LOG (ast, pos) ->
-		   un_op ast pos (Num.cast_un_op ~op_f:log) "log"
-		| UMINUS (ast, pos) -> un_op ast pos Num.neg "-"
+		   un_op ast pos (Nbr.cast_un_op ~op_f:log) "log"
+		| UMINUS (ast, pos) -> un_op ast pos Nbr.neg "-"
 
 let rec partial_eval_bool env ast =
 	let bin_op_bool ast ast' pos op op_str =
@@ -389,7 +389,7 @@ let rec partial_eval_bool env ast =
 						begin
 							match (lbl1,const2, opt_v2) with
 								| ("t",true, Some num) -> (Some num) 
-								| (_,_,_) -> Some (Num.I (-1))
+								| (_,_,_) -> Some (Nbr.I (-1))
 						end
 					else None
 				| _ -> None
@@ -401,7 +401,7 @@ let rec partial_eval_bool env ast =
 			(*checking whether boolean expression has a time dependency and is of the form [T]=n*)
 			op v1 v2 
 		in
-		(match stopping_time with Some (Num.I (-1)) -> raise ExceptionDefn.Unsatisfiable | _ -> () ;
+		(match stopping_time with Some (Nbr.I (-1)) -> raise ExceptionDefn.Unsatisfiable | _ -> () ;
 		let lbl = Printf.sprintf "(%s%s%s)" lbl1 op_str lbl2
 		in 
 		(part_eval, (const1 && const2), (DepSet.union dep1 dep2), lbl, stopping_time))
@@ -414,13 +414,13 @@ let rec partial_eval_bool env ast =
 		| OR (ast, ast', pos) ->
 				bin_op_bool ast ast' pos (fun b b' -> b || b') "or"
 		| GREATER (ast, ast', pos) ->
-				bin_op_alg ast ast' pos (fun v v' -> Num.is_greater v v') ">"
+				bin_op_alg ast ast' pos (fun v v' -> Nbr.is_greater v v') ">"
 		| SMALLER (ast, ast', pos) ->
-				bin_op_alg ast ast' pos (fun v v' -> Num.is_smaller v v') "<"
+				bin_op_alg ast ast' pos (fun v v' -> Nbr.is_smaller v v') "<"
 		| EQUAL (ast, ast', pos) ->
-				bin_op_alg ast ast' pos (fun v v' -> Num.is_equal v v') "="
+				bin_op_alg ast ast' pos (fun v v' -> Nbr.is_equal v v') "="
 		| DIFF (ast, ast', pos) ->
-				bin_op_alg ast ast' pos (fun v v' -> not (Num.is_equal v v')) "<>"
+				bin_op_alg ast ast' pos (fun v v' -> not (Nbr.is_equal v v')) "<>"
 
 let mixture_of_ast ?(tolerate_new_state=false) mix_id_opt is_pattern env ast_mix =
 	let rec eval_mixture env ast_mix ctxt mixture =
@@ -901,7 +901,7 @@ let pert_of_result variables env res =
 								let rule = 
 								{
 									(*TODO*)Dynamics.rm_token = [] ; Dynamics.add_token = [] ; 
-									Dynamics.k_def = Dynamics.CONST (Num.F 0.0);
+									Dynamics.k_def = Dynamics.CONST (Nbr.F 0.0);
 									Dynamics.k_alt = (None,None);
 									Dynamics.over_sampling = None;
 									Dynamics.script = script ;
@@ -942,7 +942,7 @@ let pert_of_result variables env res =
 								let rule = 
 								{ (*TODO*) Dynamics.rm_token = [] ; Dynamics.add_token = [] ; 
 									
-									Dynamics.k_def = Dynamics.CONST (Num.F 0.0); 
+									Dynamics.k_def = Dynamics.CONST (Nbr.F 0.0); 
 									Dynamics.k_alt = (None,None);
 									Dynamics.over_sampling = None;
 									Dynamics.script = script ;
@@ -1036,8 +1036,8 @@ let init_graph_of_result env res =
 								| None -> raise (ExceptionDefn.Semantics_Error (pos, Printf.sprintf "%s is not a constant, cannot initialize graph." lbl))
       			in
       			let n = match !Parameter.rescale with 
-      				| None -> Num.int_of_num value
-      				| Some i -> min i (Num.int_of_num value) 
+      				| None -> Nbr.int_of_num value
+      				| Some i -> min i (Nbr.int_of_num value) 
       			in
       				(* Cannot do Mixture.to_nodes env m once for all because of        *)
       				(* references                                                      *)
@@ -1054,9 +1054,9 @@ let init_graph_of_result env res =
     			in
 					let x = 
 						match opt_v with
-							| Some (Num.F v) -> v
-							| Some (Num.I v) -> float_of_int v
-							| Some (Num.I64 v) -> Int64.to_float v
+							| Some (Nbr.F v) -> v
+							| Some (Nbr.I v) -> float_of_int v
+							| Some (Nbr.I64 v) -> Int64.to_float v
 							| None -> raise (ExceptionDefn.Semantics_Error (pos_tk, Printf.sprintf "%s is not a constant, cannot initialize token value." lbl))
     			in
     			let tok_id = try Environment.num_of_token tk_nme env with Not_found -> raise (ExceptionDefn.Semantics_Error (pos_tk, Printf.sprintf "token %s is undeclared" tk_nme))
