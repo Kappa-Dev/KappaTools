@@ -19,39 +19,42 @@ let eval_abort_pert just_applied pert state counter env =
   | Some var -> State.value state counter env var
 
 let eval_pexpr pexpr state counter env =
-	let l =
-		List.fold_left
-		  (fun cont ast ->
-		    match ast with
-		    | Ast.Str_pexpr (str,p) -> str::cont
-		    | Ast.Alg_pexpr alg -> 
-		      let (x, is_constant, opt_v, dep, str) = Eval.partial_eval_alg env alg in
-		      let v =
-			if is_constant
-			then (match opt_v with Some v -> Dynamics.CONST v | None -> invalid_arg "Eval.effects_of_modif")
-			else Dynamics.VAR x 
-		      in
-		      let n = State.value state counter env v in
-		      (Nbr.to_string n)::cont
-		  ) [] pexpr
-	in
-	String.concat "" (List.rev l)
+  let l =
+    List.fold_left
+      (fun cont (ast,pos) ->
+       match ast with
+       | Ast.Str_pexpr str -> str::cont
+       | Ast.Alg_pexpr alg ->
+	  let (x, is_constant, opt_v, dep, str) =
+	    Eval.partial_eval_alg env (alg, pos) in
+	  let v =
+	    if is_constant
+	    then (match opt_v with Some v -> Dynamics.CONST v
+				 | None -> invalid_arg "Eval.effects_of_modif")
+	    else Dynamics.VAR x
+	  in
+	  let n = State.value state counter env v in
+	  (Nbr.to_string n)::cont
+      ) [] pexpr
+  in
+  String.concat "" (List.rev l)
 
 let dump_print_expr desc pexpr state counter env =
-	List.iter
-	(fun ast ->
-		match ast with
-			| Ast.Str_pexpr (str,p) -> Printf.fprintf desc "%s" str 
-			| Ast.Alg_pexpr alg -> 
-				let (x, is_constant, opt_v, dep, str) = Eval.partial_eval_alg env alg in
-				let v =
-						if is_constant
-						then (match opt_v with Some v -> Dynamics.CONST v | None -> invalid_arg "Eval.effects_of_modif")
-						else Dynamics.VAR x 
-				in
-				Nbr.print desc (State.value state counter env v)
-	) pexpr ;
-	Printf.fprintf desc "\n"
+  List.iter
+    (fun (ast,pos) ->
+     match ast with
+     | Ast.Str_pexpr str -> Printf.fprintf desc "%s" str
+     | Ast.Alg_pexpr alg ->
+	let (x, is_constant, opt_v, dep, str) =
+	  Eval.partial_eval_alg env (alg, pos) in
+	let v =
+	  if is_constant
+	  then (match opt_v with Some v -> Dynamics.CONST v | None -> invalid_arg "Eval.effects_of_modif")
+	  else Dynamics.VAR x
+	in
+	Nbr.print desc (State.value state counter env v)
+    ) pexpr ;
+  Printf.fprintf desc "\n"
 
 let apply_n_time x r state env counter pert_ids pert_events tracked =
   Nbr.iteri

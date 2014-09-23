@@ -201,7 +201,28 @@ will generate a file \ttt{data.out} (default name) containing 1000 data points o
 \chapter{The kappa file}\label{chap:kappa}
 
 \section{General remarks}
-The \emph{Kappa File}\index{kappa file} (KF) is the formal representation of your model. We use KF\index{kappa file} to denote the union of the files that are given as input to \KaSim~(argument \ttt{-i}). Each line of the KF\index{kappa file} is interpreted by \KaSim~as a \emph{declaration}\index{declaration}. If the line is ended by the escape character~\textquotesingle \ttt{$\bs$}\textquotesingle ~the continuation of the declaration\index{declaration} is parsed onto the next line. Declarations can be: agent and token \emph{signatures} (Sec.~\ref{sec:sig}), \emph{rules}\index{rule} (Sec.~\ref{sec:rules}), \emph{variables}\index{variable} (Sec.~\ref{sec:var}), \emph{initial conditions}\index{initial condition} (Sec.~\ref{sec:init}), \emph{perturbations}\index{perturbation} (Sec.~\ref{sec:mod}) and \emph{parameter configurations} (Sec.~\ref{sec:param}). The KF\index{kappa file}'s structure is quite flexible and can be divided in any number of sub-files in which the order of declaration\index{declaration}s does not matter (to the exception of variable declaration\index{declaration}s, see Section~\ref{sec:var} for details). Comments\index{comments} can be used by inserting the marker \ttt{\#} that tells \KaSim~to ignore the rest of the line. 
+The \emph{Kappa File}\index{kappa file} (KF) is the formal
+representation of your model. We use KF\index{kappa file} to denote
+the union of the files that are given as input to \KaSim~(argument
+\ttt{-i}). Each line of the KF\index{kappa file} is interpreted by
+\KaSim~as a \emph{declaration}\index{declaration}. If the line is
+ended by the escape character~\textquotesingle
+\ttt{$\bs$}\textquotesingle ~the continuation of the
+declaration\index{declaration} is parsed onto the next
+line. Declarations can be: agent and token \emph{signatures}
+(Sec.~\ref{sec:sig}), \emph{rules}\index{rule} (Sec.~\ref{sec:rules}),
+\emph{variables}\index{variable} (Sec.~\ref{sec:var}), \emph{initial
+  conditions}\index{initial condition} (Sec.~\ref{sec:init}),
+\emph{perturbations}\index{perturbation} (Sec.~\ref{sec:mod}) and
+\emph{parameter configurations} (Sec.~\ref{sec:param}). The
+KF\index{kappa file}'s structure is quite flexible and can be divided
+in any number of sub-files in which the order of
+declaration\index{declaration}s does not matter (to the exception of
+variable declaration\index{declaration}s, see Section~\ref{sec:var}
+for details). Comments\index{comments} can be used by inserting the
+marker \ttt{\#} that tells \KaSim~to ignore the rest of the line. The
+combined use of \ttt{$\bs$} and \ttt{\#} allows to write comments in
+the middle of a declaration\index{declaration}.
 
 \section{Agent and token signature\index{agent signature}s}\label{sec:sig}
 %

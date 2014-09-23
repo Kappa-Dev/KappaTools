@@ -166,19 +166,20 @@ type perturbation =
       abort : bool variable option;
       flag : string;
       stopping_time : Nbr.t option }
- and modification = 
-	INTRO of Nbr.t variable * Mixture.t 
-	| DELETE of Nbr.t variable * Mixture.t 
-	| UPDATE_RULE of int * Nbr.t variable
-	| UPDATE_VAR of int * Nbr.t variable
-	| UPDATE_TOK of int * Nbr.t variable 
-	| SNAPSHOT of Ast.print_expr list
-	| STOP of Ast.print_expr list
-	| CFLOW of int 
-	| FLUX of Ast.print_expr list
-	| FLUXOFF of Ast.print_expr list
-	| CFLOWOFF of int
-	| PRINT of (Ast.print_expr list * Ast.print_expr list)
+ and modification =
+   INTRO of Nbr.t variable * Mixture.t
+   | DELETE of Nbr.t variable * Mixture.t
+   | UPDATE_RULE of int * Nbr.t variable
+   | UPDATE_VAR of int * Nbr.t variable
+   | UPDATE_TOK of int * Nbr.t variable
+   | SNAPSHOT of Ast.print_expr Ast.with_pos list
+   | STOP of Ast.print_expr Ast.with_pos list
+   | CFLOW of int
+   | FLUX of Ast.print_expr Ast.with_pos list
+   | FLUXOFF of Ast.print_expr Ast.with_pos list
+   | CFLOWOFF of int
+   | PRINT of
+       (Ast.print_expr Ast.with_pos list * Ast.print_expr Ast.with_pos list)
 
 let print_pert env f pert =
   let string_of_effect f (_, effect) =

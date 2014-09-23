@@ -1,5 +1,7 @@
 %{
   open Mods
+
+  let add_pos x = (x,(Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()))
 %}
 
 %token EOF NEWLINE SEMICOLON
@@ -67,10 +69,11 @@ start_rule:
 					  Ast.variables = var::!Ast.result.Ast.variables})
 		      | Ast.OBS var ->
 			 (*for backward compatibility, shortcut for %var + %plot*)
-			 let expr =
-			   match var with
-			   | Ast.VAR_KAPPA (_,lab) -> Ast.OBS_VAR lab
-			   | Ast.VAR_ALG (_,lab) -> Ast.OBS_VAR lab
+			 let expr = (
+			   (match var with
+			    | Ast.VAR_KAPPA (_,lab) -> Ast.OBS_VAR (fst lab)
+			    | Ast.VAR_ALG (_,lab) -> Ast.OBS_VAR (fst lab)),
+			   (Lexing.dummy_pos, Lexing.dummy_pos))
 			 in
 			 (Ast.result := {!Ast.result with
 					  Ast.variables = var::!Ast.result.Ast.variables;
@@ -173,7 +176,7 @@ effect:
 		      else (fun (x,y) -> Ast.FLUXOFF (x,y)) in
 	    match $2 with
 	    | (None,None) -> ast ([],$1)
-	    | (Some file,_) -> ast ([Ast.Str_pexpr file],$1)
+	    | (Some file,_) -> ast ([file],$1)
 	    | (None, Some pexpr) -> ast (pexpr,$1)
 	   }
     | INTRO multiple_mixture
@@ -191,30 +194,30 @@ effect:
     | SNAPSHOT opt_string
 	       {match $2 with
 		| (None,None) -> Ast.SNAPSHOT ([],$1)
-		| (Some file,_) -> Ast.SNAPSHOT ([Ast.Str_pexpr file],$1)
+		| (Some file,_) -> Ast.SNAPSHOT ([file],$1)
 		| (None, Some pexpr) -> Ast.SNAPSHOT (pexpr,$1)
 	       }
     | STOP opt_string
 	   {match $2 with
 	    | (None,None) -> Ast.STOP ([],$1)
-	    | (Some file,_) -> Ast.STOP ([Ast.Str_pexpr file],$1)
+	    | (Some file,_) -> Ast.STOP ([file],$1)
 	    | (None, Some pexpr) -> Ast.STOP (pexpr,$1)
 	   }
     | PRINT SMALLER print_expr GREATER {(Ast.PRINT ([],$3,$1))}
     | PRINTF string_or_pr_expr SMALLER print_expr GREATER
 	     {match $2 with
 	      | (None,None) -> Ast.PRINT ([],$4,$1)
-	      | (Some file,_) -> Ast.PRINT ([Ast.Str_pexpr file],$4,$1)
+	      | (Some file,_) -> Ast.PRINT ([file],$4,$1)
 	      | (None, Some pexpr) -> Ast.PRINT (pexpr,$4,$1)
 	     }
     ;
 
 print_expr:
   /*empty*/ {[]}
-    | STRING {[Ast.Str_pexpr $1]}
-    | alg_expr {[Ast.Alg_pexpr $1]}
-    | STRING DOT print_expr {(Ast.Str_pexpr $1)::$3}
-    | alg_expr DOT print_expr {(Ast.Alg_pexpr $1)::$3}
+    | STRING {[add_pos (Ast.Str_pexpr (fst $1))]}
+    | alg_expr {[add_pos (Ast.Alg_pexpr (fst $1))]}
+    | STRING DOT print_expr {(add_pos (Ast.Str_pexpr (fst $1)))::$3}
+    | alg_expr DOT print_expr {(add_pos (Ast.Alg_pexpr (fst $1)))::$3}
     ;
 
 boolean:
@@ -236,32 +239,32 @@ variable_declaration:
 
 bool_expr:
     | OP_PAR bool_expr CL_PAR {$2}
-    | bool_expr AND bool_expr {Ast.AND ($1,$3,$2)}
-    | bool_expr OR bool_expr {Ast.OR ($1,$3,$2)}
-    | alg_expr GREATER alg_expr {Ast.GREATER ($1,$3,$2)}
-    | alg_expr SMALLER alg_expr {Ast.SMALLER ($1,$3,$2)}
-    | alg_expr EQUAL alg_expr {Ast.EQUAL ($1,$3,$2)}
-    | alg_expr DIFF alg_expr {Ast.DIFF ($1,$3,$2)}
-    | TRUE {Ast.TRUE $1}
-    | FALSE {Ast.FALSE $1}
+    | bool_expr AND bool_expr {add_pos (Ast.AND ($1,$3))}
+    | bool_expr OR bool_expr {add_pos (Ast.OR ($1,$3))}
+    | alg_expr GREATER alg_expr {add_pos (Ast.GREATER ($1,$3))}
+    | alg_expr SMALLER alg_expr {add_pos (Ast.SMALLER ($1,$3))}
+    | alg_expr EQUAL alg_expr {add_pos (Ast.EQUAL ($1,$3))}
+    | alg_expr DIFF alg_expr {add_pos (Ast.DIFF ($1,$3))}
+    | TRUE {add_pos Ast.TRUE}
+    | FALSE {add_pos Ast.FALSE}
     ;
 
 opt_string:
   /*empty*/ {None,None}
-    | STRING {Some $1,None}
+    | STRING {Some (add_pos (Ast.Str_pexpr (fst $1))),None}
     | SMALLER print_expr GREATER {None, Some $2}
     ;
 
 string_or_pr_expr:
-    | STRING {Some $1,None}
+    | STRING {Some (add_pos (Ast.Str_pexpr (fst $1))),None}
     | SMALLER print_expr GREATER {None, Some $2}
     ;
 
 
 multiple:
-    | INT {let int,pos=$1 in Ast.CONST (Nbr.I int,pos) }
-    | FLOAT {let x,pos=$1 in Ast.CONST (Nbr.F x,pos) }
-    | LABEL {let str,pos = $1 in Ast.OBS_VAR (str,pos)}
+    | INT {let int,pos=$1 in add_pos (Ast.CONST (Nbr.I int)) }
+    | FLOAT {let x,pos=$1 in add_pos (Ast.CONST (Nbr.F x)) }
+    | LABEL {let str,pos = $1 in add_pos (Ast.OBS_VAR (str)) }
     ;
 
 rule_label:
@@ -322,7 +325,8 @@ rule_expression:
 		       Ast.arrow=$3;
 		       Ast.rhs=rhs;
 		       Ast.add_token = token_r;
-		       Ast.k_def=Ast.CONST (Nbr.F 0.,Tools.no_pos);
+		       Ast.k_def=(Ast.CONST (Nbr.F 0.),
+				  (Lexing.dummy_pos, Lexing.dummy_pos));
 		       Ast.k_un=None;
 		       Ast.k_op=None})}
     ;
@@ -333,47 +337,47 @@ arrow:
     ;
 
 constant:
-    | INFINITY {Ast.INFINITY $1}
-    | FLOAT {let f,pos = $1 in Ast.CONST (Nbr.F f,pos)}
-    | INT {let i,pos = $1 in Ast.CONST (Nbr.I i,pos)}
-    | EMAX {let pos = $1 in Ast.EMAX pos}
-    | TMAX {let pos = $1 in Ast.TMAX pos}
-    | CPUTIME {let pos = $1 in Ast.CPUTIME pos}
+    | INFINITY {add_pos Ast.INFINITY}
+    | FLOAT {let f,pos = $1 in add_pos (Ast.CONST (Nbr.F f))}
+    | INT {let i,pos = $1 in add_pos (Ast.CONST (Nbr.I i))}
+    | EMAX {add_pos Ast.EMAX}
+    | TMAX {add_pos Ast.TMAX}
+    | CPUTIME {add_pos Ast.CPUTIME}
     ;
 
 variable:
-    | PIPE ID PIPE {let str,pos = $2 in Ast.TOKEN_ID (str,pos)}
-    | LABEL {let str,pos = $1 in Ast.OBS_VAR (str,pos)}
-    | TIME {Ast.TIME_VAR $1}
-    | EVENT {Ast.EVENT_VAR $1}
-    | NULL_EVENT {Ast.NULL_EVENT_VAR $1}
-    | PROD_EVENT {Ast.PROD_EVENT_VAR $1}
+    | PIPE ID PIPE {let str,pos = $2 in add_pos (Ast.TOKEN_ID (str))}
+    | LABEL {let str,pos = $1 in add_pos (Ast.OBS_VAR (str))}
+    | TIME {add_pos Ast.TIME_VAR}
+    | EVENT {add_pos Ast.EVENT_VAR}
+    | NULL_EVENT {add_pos Ast.NULL_EVENT_VAR}
+    | PROD_EVENT {add_pos Ast.PROD_EVENT_VAR}
     ;
 
 small_alg_expr:
     | OP_PAR alg_expr CL_PAR {$2}
     | constant {$1}
     | variable {$1}
-    | MAX small_alg_expr small_alg_expr {Ast.MAX ($2,$3,$1)}
-    | MIN small_alg_expr small_alg_expr {Ast.MIN ($2,$3,$1)}
-    | EXPONENT alg_expr {Ast.EXP ($2,$1)}
-    | SINUS alg_expr {Ast.SINUS ($2,$1)}
-    | COSINUS alg_expr {Ast.COSINUS ($2,$1)}
-    | TAN alg_expr {Ast.TAN ($2,$1)}
-    | ABS alg_expr {Ast.INT ($2,$1)}
-    | SQRT alg_expr {Ast.SQRT ($2,$1)}
-    | LOG alg_expr {Ast.LOG ($2,$1)}
+    | MAX small_alg_expr small_alg_expr {add_pos (Ast.MAX ($2,$3))}
+    | MIN small_alg_expr small_alg_expr {add_pos (Ast.MIN ($2,$3))}
+    | EXPONENT alg_expr {add_pos (Ast.EXP ($2))}
+    | SINUS alg_expr {add_pos (Ast.SINUS ($2))}
+    | COSINUS alg_expr {add_pos (Ast.COSINUS ($2))}
+    | TAN alg_expr {add_pos (Ast.TAN ($2))}
+    | ABS alg_expr {add_pos (Ast.INT ($2))}
+    | SQRT alg_expr {add_pos (Ast.SQRT ($2))}
+    | LOG alg_expr {add_pos (Ast.LOG ($2))}
     ;
 
 alg_expr:
-    | MINUS alg_expr { Ast.UMINUS ($2,$1) }
+    | MINUS alg_expr { add_pos (Ast.UMINUS $2) }
     | small_alg_expr { $1 }
-    | alg_expr MULT alg_expr {Ast.MULT ($1,$3,$2)}
-    | alg_expr PLUS alg_expr {Ast.SUM ($1,$3,$2)}
-    | alg_expr DIV alg_expr {Ast.DIV ($1,$3,$2)}
-    | alg_expr MINUS alg_expr {Ast.MINUS ($1,$3,$2)}
-    | alg_expr POW alg_expr {Ast.POW ($1,$3,$2)}
-    | alg_expr MODULO alg_expr {Ast.MODULO ($1,$3,$2)}
+    | alg_expr MULT alg_expr {add_pos (Ast.MULT ($1,$3))}
+    | alg_expr PLUS alg_expr {add_pos (Ast.SUM ($1,$3))}
+    | alg_expr DIV alg_expr {add_pos (Ast.DIV ($1,$3))}
+    | alg_expr MINUS alg_expr {add_pos (Ast.MINUS ($1,$3))}
+    | alg_expr POW alg_expr {add_pos (Ast.POW ($1,$3))}
+    | alg_expr MODULO alg_expr {add_pos (Ast.MODULO ($1,$3))}
 
 rate:
     | alg_expr OP_PAR alg_with_radius CL_PAR {($1,Some $3,None)}
@@ -389,7 +393,8 @@ alg_with_radius:
 multiple_mixture:
     | alg_expr non_empty_mixture {($1,$2)}
       /*conflict here because ID (blah) could be token non_empty mixture or mixture...*/
-    | non_empty_mixture {(Ast.CONST (Nbr.F 1.,Tools.no_pos),$1)}
+    | non_empty_mixture
+	{((Ast.CONST (Nbr.F 1.),(Lexing.dummy_pos,Lexing.dummy_pos)),$1)}
     ;
 
 non_empty_mixture:

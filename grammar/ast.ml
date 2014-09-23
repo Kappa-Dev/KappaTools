@@ -1,45 +1,46 @@
 open Mods
 
+type 'a with_pos = 'a * (Lexing.position * Lexing.position)
 type str_pos = string * Tools.pos
 
 type alg_expr =
-    MULT of alg_expr * alg_expr * Tools.pos
-  | SUM of alg_expr * alg_expr * Tools.pos
-  | DIV of alg_expr * alg_expr * Tools.pos
-  | MINUS of alg_expr * alg_expr * Tools.pos
-  | POW of alg_expr * alg_expr * Tools.pos
-  | MODULO of alg_expr * alg_expr * Tools.pos
-  | LOG of alg_expr * Tools.pos
-  | SQRT of alg_expr * Tools.pos
-  | EXP of alg_expr * Tools.pos
-  | SINUS of alg_expr * Tools.pos
-  | COSINUS of alg_expr * Tools.pos
-  | TAN of alg_expr * Tools.pos
-  | INT of alg_expr * Tools.pos
-  | UMINUS of alg_expr * Tools.pos
-  | MAX of alg_expr * alg_expr * Tools.pos
-  | MIN of alg_expr * alg_expr * Tools.pos
-  | TIME_VAR of Tools.pos
-  | EVENT_VAR of Tools.pos
-  | NULL_EVENT_VAR of Tools.pos
-  | PROD_EVENT_VAR of Tools.pos
-  | OBS_VAR of str_pos
-  | TOKEN_ID of str_pos
-  | CONST of Nbr.t * Tools.pos
-  | TMAX of Tools.pos
-  | EMAX of Tools.pos
-  | CPUTIME of Tools.pos
-  | INFINITY of Tools.pos
+    MULT of alg_expr with_pos * alg_expr with_pos
+  | SUM of alg_expr with_pos * alg_expr with_pos
+  | DIV of alg_expr with_pos * alg_expr with_pos
+  | MINUS of alg_expr with_pos * alg_expr with_pos
+  | POW of alg_expr with_pos * alg_expr with_pos
+  | MODULO of alg_expr with_pos * alg_expr with_pos
+  | MAX of alg_expr with_pos * alg_expr with_pos
+  | MIN of alg_expr with_pos * alg_expr with_pos
+  | LOG of alg_expr with_pos
+  | SQRT of alg_expr with_pos
+  | EXP of alg_expr with_pos
+  | SINUS of alg_expr with_pos
+  | COSINUS of alg_expr with_pos
+  | TAN of alg_expr with_pos
+  | INT of alg_expr with_pos
+  | UMINUS of alg_expr with_pos
+  | TIME_VAR
+  | EVENT_VAR
+  | NULL_EVENT_VAR
+  | PROD_EVENT_VAR
+  | OBS_VAR of string
+  | TOKEN_ID of string
+  | CONST of Nbr.t
+  | TMAX
+  | EMAX
+  | CPUTIME
+  | INFINITY
 
 type bool_expr =
-	| TRUE of Tools.pos
-	| FALSE of Tools.pos
-	| AND of bool_expr * bool_expr * Tools.pos
-	| OR of bool_expr * bool_expr * Tools.pos
-	| GREATER of alg_expr * alg_expr * Tools.pos
-	| SMALLER of alg_expr * alg_expr * Tools.pos
-	| EQUAL of alg_expr * alg_expr * Tools.pos
-	| DIFF of alg_expr * alg_expr * Tools.pos
+  | TRUE
+  | FALSE
+  | AND of bool_expr with_pos * bool_expr with_pos
+  | OR of bool_expr with_pos * bool_expr with_pos
+  | GREATER of alg_expr with_pos * alg_expr with_pos
+  | SMALLER of alg_expr with_pos * alg_expr with_pos
+  | EQUAL of alg_expr with_pos * alg_expr with_pos
+  | DIFF of alg_expr with_pos * alg_expr with_pos
 
 type mixture = 
 	| COMMA of agent * mixture 
@@ -58,13 +59,13 @@ and link =
 type rule = {
 	rule_pos: Tools.pos ; 
 	lhs: mixture ; 
-	rm_token: (alg_expr * str_pos) list ; 
+	rm_token: (alg_expr with_pos * str_pos) list ; 
 	arrow:arrow ; 
 	rhs:mixture; 
-	add_token: (alg_expr * str_pos) list ; 
-	k_def:alg_expr ; 
-	k_un:(alg_expr * alg_expr option) option ; (*k_1:radius_opt*)
-	k_op: alg_expr option ; (*rate for backward rule*)
+	add_token: (alg_expr with_pos * str_pos) list ; 
+	k_def:alg_expr with_pos ; 
+	k_un:(alg_expr with_pos * alg_expr with_pos option) option ; (*k_1:radius_opt*)
+	k_op: alg_expr with_pos option ; (*rate for backward rule*)
 	}
 	
 and arrow = RAR of Tools.pos | LRAR of Tools.pos
@@ -79,7 +80,8 @@ let flip (rule_label,rule) =
 			add_token = rule.rm_token ; 
 			rm_token = rule.add_token ; 
 			k_def = (match rule.k_op with
-				   None -> CONST (Nbr.F 0.,Tools.no_pos)
+				   None -> CONST (Nbr.F 0.),
+					   (Lexing.dummy_pos, Lexing.dummy_pos)
 				 | Some k -> k);
 			k_op = None
 			}
@@ -87,21 +89,24 @@ let flip (rule_label,rule) =
 	({rule_label with lbl_nme=lbl},rule)
 		
 
-type perturbation = bool_expr * (modif_expr list) * Tools.pos * bool_expr option
-and modif_expr = 
-	| INTRO of (alg_expr * mixture * Tools.pos) 
-	| DELETE of (alg_expr * mixture * Tools.pos) 
- 	| UPDATE of (str_pos * alg_expr) (*TODO: pause*)
-	| UPDATE_TOK of (str_pos * alg_expr) (*TODO: pause*)
-	| STOP of (print_expr list * Tools.pos)
-	| SNAPSHOT of (print_expr list * Tools.pos) (*maybe later of mixture too*)
-	| PRINT of ((print_expr list) * (print_expr list) * Tools.pos)
-	| CFLOW of (str_pos * Tools.pos) 
+type print_expr = Str_pexpr of string | Alg_pexpr of alg_expr
+type modif_expr =
+	| INTRO of (alg_expr with_pos * mixture * Tools.pos)
+	| DELETE of (alg_expr with_pos * mixture * Tools.pos)
+	| UPDATE of (str_pos * alg_expr with_pos) (*TODO: pause*)
+	| UPDATE_TOK of (str_pos * alg_expr with_pos) (*TODO: pause*)
+	| STOP of (print_expr with_pos list * Tools.pos)
+	| SNAPSHOT of (print_expr with_pos list * Tools.pos)
+	(*maybe later of mixture too*)
+	| PRINT of ((print_expr with_pos list) * (print_expr with_pos list) * Tools.pos)
+	| CFLOW of (str_pos * Tools.pos)
 	| CFLOWOFF of (str_pos * Tools.pos)
-	| FLUX of print_expr list * Tools.pos
-	| FLUXOFF of print_expr list * Tools.pos
+	| FLUX of print_expr with_pos list * Tools.pos
+	| FLUXOFF of print_expr with_pos list * Tools.pos
+type perturbation =
+    bool_expr with_pos * (modif_expr list) *
+      Tools.pos * bool_expr with_pos option
 
-and print_expr = Str_pexpr of str_pos | Alg_pexpr of alg_expr
 
 
 type configuration = str_pos * (str_pos list)
@@ -113,20 +118,20 @@ type instruction =
 	| INIT of str_pos option * init_t * Tools.pos (*volume, init, position *)
 	| DECLARE of variable
 	| OBS of variable  (*for backward compatibility*)
-	| PLOT of alg_expr
+	| PLOT of alg_expr with_pos
 	| PERT of perturbation
 	| CONFIG of configuration
 and init_t = 
-	| INIT_MIX of  alg_expr * mixture 
-	| INIT_TOK of  alg_expr * str_pos 
+	| INIT_MIX of  alg_expr with_pos * mixture 
+	| INIT_TOK of  alg_expr with_pos * str_pos 
 and variable = 
 	| VAR_KAPPA of mixture * str_pos 
-	| VAR_ALG of alg_expr * str_pos 
+	| VAR_ALG of alg_expr with_pos * str_pos 
 	
 type compil = {variables : variable list; (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
 							 signatures : (agent * Tools.pos) list ; (*agent signature declaration*)
 							 rules : (rule_label * rule) list ; (*rules (possibly named)*)
-							 observables : alg_expr list ; (*list of patterns to plot*) 
+							 observables : alg_expr with_pos list ; (*list of patterns to plot*) 
 							 init : (str_pos option * init_t * Tools.pos) list ; (*initial graph declaration*)
 							 perturbations : perturbation list ;
 							 configurations : configuration list ;

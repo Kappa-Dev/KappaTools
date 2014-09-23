@@ -4,6 +4,10 @@ let ln (_,i,_) = i
 let cn (_,_,j) = j
 let fn (n,_,_) = n
 
+let pos_of_lex_pos pos =
+  (pos.Lexing.pos_fname, pos.Lexing.pos_lnum,
+   pos.Lexing.pos_cnum - pos.Lexing.pos_bol)
+
 let no_pos = ("",-1,-1)
 
 let string_of_pos (n,i,j) =
