@@ -41,6 +41,12 @@ type bool_expr =
   | EQUAL of alg_expr with_pos * alg_expr with_pos
   | DIFF of alg_expr with_pos * alg_expr with_pos
 
+type link =
+  | LNK_VALUE of int * Tools.pos
+  | FREE
+  | LNK_ANY of Tools.pos
+  | LNK_SOME of Tools.pos
+  | LNK_TYPE of str_pos * str_pos
 type mixture = 
 	| COMMA of agent * mixture 
 	| EMPTY_MIX
@@ -48,12 +54,6 @@ and agent = {ag_nme:string ; ag_intf:interface ; ag_pos:Tools.pos}
 and interface = PORT_SEP of port * interface | EMPTY_INTF
 and port = {port_nme:string ; port_int: internal ; port_lnk : link ; port_pos : Tools.pos}
 and internal = string list
-and link = 
-	| LNK_VALUE of (int * Tools.pos)
-	| FREE 
-	| LNK_ANY of Tools.pos 
-	| LNK_SOME of Tools.pos
-	| LNK_TYPE of str_pos * str_pos
 
 type rule = {
 	rule_pos: Tools.pos ; 

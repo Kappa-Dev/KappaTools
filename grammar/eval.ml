@@ -62,19 +62,19 @@ let eval_node env a link_map node_map node_id =
 				in
 				let link_map,bond_list = 
 					match lnk_state with
-						| Ast.LNK_VALUE (i,pos) -> 
-							begin
-							try 
-								let opt_node = IntMap.find i link_map 
-								in
-								match opt_node with
-									| None -> raise (ExceptionDefn.Semantics_Error (pos,"Edge identifier at site '" ^ p.Ast.port_nme ^ "' is used multiple times"))
-									| Some (node_id',port_id',pos') ->
-										(IntMap.add i None link_map,(node_id,port_id,node_id',port_id')::bond_list)
-							with Not_found -> (IntMap.add i (Some (node_id,port_id,pos)) link_map,bond_list)
-							end
-						| Ast.FREE -> (link_map,bond_list)
-						| _ -> raise (ExceptionDefn.Semantics_Error (p.Ast.port_pos,"Site '" ^ p.Ast.port_nme ^ "' is partially defined"))
+					| Ast.LNK_VALUE (i,pos) ->
+					   begin
+					     try
+					       let opt_node = IntMap.find i link_map 
+					       in
+					       match opt_node with
+					       | None -> raise (ExceptionDefn.Semantics_Error (pos,"Edge identifier at site '" ^ p.Ast.port_nme ^ "' is used multiple times"))
+					       | Some (node_id',port_id',pos') ->
+						  (IntMap.add i None link_map,(node_id,port_id,node_id',port_id')::bond_list)
+					     with Not_found -> (IntMap.add i (Some (node_id,port_id,pos)) link_map,bond_list)
+					   end
+					| Ast.FREE -> (link_map,bond_list)
+					| _ -> raise (ExceptionDefn.Semantics_Error (p.Ast.port_pos,"Site '" ^ p.Ast.port_nme ^ "' is partially defined"))
 				in
 				match int_state_list with
 					| [] -> build_intf ast' link_map (IntMap.add port_id (None,Node.WLD) intf) bond_list sign

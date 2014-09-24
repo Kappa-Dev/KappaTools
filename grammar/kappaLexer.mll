@@ -55,13 +55,13 @@ let pert = '$' id
 
 rule token = parse
 	 | '\\' eol {Lexing.new_line lexbuf ; token lexbuf}
-	 | "&&" {let pos = position lexbuf in AND pos}
-	 | "||" {let pos = position lexbuf in OR pos}
+	 | "&&" {AND}
+	 | "||" {OR}
 	 | "<->" {let pos = position lexbuf in KAPPA_LRAR pos}
 	 | "->" {let pos = position lexbuf in KAPPA_RAR pos}
 	 | "<-" {LAR}
 	 | ":=" {let pos = position lexbuf in ASSIGN pos}
-	 | "<>" {let pos = position lexbuf in DIFF pos}
+	 | "<>" {DIFF}
 	 | pert as s {let pos = position lexbuf in
 		      match s with
 		      | "$DEL" -> (DELETE pos)
@@ -78,7 +78,6 @@ rule token = parse
 				      ("Perturbation effect \""^s^"\" is not defined")
 		     }
 	 | '[' {let lab = read_label "" [']'] lexbuf in
-		let pos = position lexbuf in
 		match lab with
 		| "E" -> EVENT
 		| "E+" -> PROD_EVENT
@@ -93,9 +92,9 @@ rule token = parse
 		| "int" -> ABS
 		| "mod" -> MODULO
 		| "sqrt" -> SQRT
-		| "true" -> TRUE pos
-		| "false" -> FALSE pos
-		| "pi" -> FLOAT (3.14159265,pos)
+		| "true" -> TRUE
+		| "false" -> FALSE
+		| "pi" -> FLOAT (3.14159265)
 		| "max" -> MAX
 		| "min" -> MIN
 		| "Emax" -> EMAX
@@ -107,8 +106,8 @@ rule token = parse
 	 | '\"' {let str = read_label "" ['\"'] lexbuf in let pos = position lexbuf in STRING (str,pos)}
 	 | eol {Lexing.new_line lexbuf ; NEWLINE}
 	 | '#' {comment lexbuf}
-	 | integer as n {let pos = position lexbuf in INT (int_of_string n,pos)}
-	 | real as f {let pos = position lexbuf in FLOAT (float_of_string f,pos)}
+	 | integer as n {INT (int_of_string n)}
+	 | real as f {FLOAT (float_of_string f)}
 	 | '\'' {let lab = read_label "" ['\''] lexbuf in let pos = position lexbuf in LABEL(lab,pos)}
 	 | id as str {let pos = position lexbuf in keyword_or_id str pos}
 	 | '@' {AT}
@@ -124,9 +123,9 @@ rule token = parse
 	 | '-' {MINUS}
 	 | '^' {POW}
 	 | '/' {DIV}
-	 | '<' {let pos = position lexbuf in SMALLER pos}
-	 | '>' {let pos = position lexbuf in GREATER pos}
-	 | '=' {let pos = position lexbuf in EQUAL pos}
+	 | '<' {SMALLER}
+	 | '>' {GREATER}
+	 | '=' {EQUAL}
 	 | '%' {let lab = read_label "" [':'] lexbuf in
 		let pos = position lexbuf in
 		match lab with

@@ -8,14 +8,14 @@
 %token AT OP_PAR CL_PAR COMMA DOT TYPE LAR OP_CUR CL_CUR CPUTIME EMAX TMAX
 %token DO SET REPEAT UNTIL LOG PLUS MULT MINUS MAX MIN DIV SINUS COSINUS TAN
 %token POW ABS MODULO SQRT EXPONENT INFINITY TIME EVENT NULL_EVENT PROD_EVENT
-%token <Tools.pos> EQUAL PERT INTRO AND OR GREATER SMALLER
-%token <Tools.pos> DELETE TRUE FALSE OBS KAPPA_RAR TRACK CONFIG DIFF
+%token EQUAL AND OR GREATER SMALLER TRUE FALSE DIFF
+%token <Tools.pos> DELETE INTRO PERT OBS KAPPA_RAR TRACK CONFIG
 %token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INIT LET PLOT
 %token <Tools.pos> FLUX ASSIGN ASSIGN2 TOKEN KAPPA_LNK PIPE KAPPA_LRAR
 %token <Tools.pos> PRINT PRINTF
-%token <int*Tools.pos> INT
+%token <int> INT
 %token <string*Tools.pos> ID LABEL KAPPA_MRK
-%token <float*Tools.pos> FLOAT
+%token <float> FLOAT
 %token <string*Tools.pos> STRING
 %token <Tools.pos> STOP SNAPSHOT
 
@@ -263,8 +263,8 @@ string_or_pr_expr:
 
 
 multiple:
-    | INT {let int,pos=$1 in add_pos (Ast.CONST (Nbr.I int)) }
-    | FLOAT {let x,pos=$1 in add_pos (Ast.CONST (Nbr.F x)) }
+    | INT {add_pos (Ast.CONST (Nbr.I $1)) }
+    | FLOAT {add_pos (Ast.CONST (Nbr.F $1)) }
     | LABEL {let str,pos = $1 in add_pos (Ast.OBS_VAR (str)) }
     ;
 
@@ -339,8 +339,8 @@ arrow:
 
 constant:
     | INFINITY {add_pos (Ast.CONST (Nbr.F infinity))}
-    | FLOAT {let f,pos = $1 in add_pos (Ast.CONST (Nbr.F f))}
-    | INT {let i,pos = $1 in add_pos (Ast.CONST (Nbr.I i))}
+    | FLOAT {add_pos (Ast.CONST (Nbr.F $1))}
+    | INT {add_pos (Ast.CONST (Nbr.I $1))}
     | EMAX {add_pos Ast.EMAX}
     | TMAX {add_pos Ast.TMAX}
     | CPUTIME {add_pos Ast.CPUTIME}
@@ -439,7 +439,7 @@ internal_state:
 
 link_state:
   /*empty*/ {Ast.FREE}
-    | KAPPA_LNK INT {Ast.LNK_VALUE $2}
+    | KAPPA_LNK INT {Ast.LNK_VALUE ($2,Tools.pos_of_lex_pos (Parsing.symbol_start_pos ()))}
     | KAPPA_LNK KAPPA_SEMI {Ast.LNK_SOME $2}
     | KAPPA_LNK ID DOT ID {Ast.LNK_TYPE ($2,$4)}
     | KAPPA_WLD {Ast.LNK_ANY $1}
