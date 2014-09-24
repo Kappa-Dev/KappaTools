@@ -48,7 +48,7 @@ let update_rule id value state =
   let r = rule_of_id id state in
   Hashtbl.replace state.rules id {r with k_def = Dynamics.CONST value}
 let update_token tk_id value state =
-  state.token_vector.(tk_id) <- (Nbr.float_of_num value)
+  state.token_vector.(tk_id) <- (Nbr.to_float value)
 
 let alg_of_id id state =
 	try
@@ -237,7 +237,7 @@ let update_activity state ?cause var_id counter env =
 	else
 		let rule = rule_of_id var_id state in
 		let a2,a1 = eval_activity rule state counter env in
-		let alpha = Nbr.float_of_num (Nbr.add a2 a1) in (*a1 is zero if rule doesn't have ambiguous molarity*)
+		let alpha = Nbr.to_float (Nbr.add a2 a1) in (*a1 is zero if rule doesn't have ambiguous molarity*)
 		
 		match cause with
 		|Some cause when !Parameter.fluxModeOn ->
@@ -530,7 +530,7 @@ let initialize sg token_vector rules kappa_vars alg_vars obs (pert,rule_pert) co
 			if not (Environment.is_rule id env) then act_tree
 			else
 				let a2,a1 = eval_activity rule state counter env in
-				let alpha_rule = Nbr.float_of_num (Nbr.add a1 a2) in
+				let alpha_rule = Nbr.to_float (Nbr.add a1 a2) in
 				(Random_tree.add id alpha_rule act_tree ; act_tree)
 		)
 			state.rules state.activity_tree	
@@ -653,7 +653,7 @@ let select_injection (a2,radius_def) (a1,radius_alt) state mix counter env =
   							" has no instance but a positive activity"))
   		| Some prod_inj_hp ->
   			(try
-					let radius = match radius_alt with None -> (-1) | Some v -> Nbr.int_of_num (value state counter env v) in
+					let radius = match radius_alt with None -> (-1) | Some v -> Nbr.to_int (value state counter env v) in
   				let injprod = InjProdHeap.random prod_inj_hp in (*injprod is an array of size #cc(mix_id) and injprod.(i):Injection.t a partial injection of cc(i)*)
   				let embedding = check_validity injprod radius false state counter env in (*returns either valid embedding or raises Null_event if injection is no longer valid --function also cleans inj_hp and nodes as a side effect*)
   				(Embedding.CONNEX embedding)
@@ -706,7 +706,7 @@ let select_injection (a2,radius_def) (a1,radius_alt) state mix counter env =
   						(0, IntMap.empty, IntSet.empty, IntSet.empty) comp_injs
   				in
   				
-					let radius = match radius_def with None -> (-1) | Some v -> Nbr.int_of_num (value state counter env v) in
+					let radius = match radius_def with None -> (-1) | Some v -> Nbr.to_int (value state counter env v) in
 					
   				let rec build_component_map (roots,codomain) depth_map component_map = 
   					if IntSet.is_empty roots then (depth_map,component_map) (*no more root to check*)
@@ -781,7 +781,7 @@ let draw_rule state counter env =
 			try eval_activity r state counter env
 			with | Not_found -> invalid_arg "State.draw_rule"
 		in
-		let alpha = Nbr.float_of_num (Nbr.add a2 a1) in
+		let alpha = Nbr.to_float (Nbr.add a2 a1) in
 		(*correction: issue #40*)
 		if alpha = 0. then Random_tree.add rule_id alpha state.activity_tree ;
 
@@ -803,18 +803,18 @@ let draw_rule state counter env =
 		let embedding_type = 
 			let _,radius = r.k_alt
 			in
-			try select_injection (Nbr.float_of_num a2,radius) (Nbr.float_of_num a1,radius) state r.lhs counter env with 
+			try select_injection (Nbr.to_float a2,radius) (Nbr.to_float a1,radius) state r.lhs counter env with 
 			| Null_event 1 | Null_event 2 as exn -> (*null event because of clashing instance of a binary rule*)
 				if counter.Counter.cons_null_events > !Parameter.maxConsecutiveClash then 
 					begin
 						(if !Parameter.debugModeOn then Debug.tag "Max consecutive clashes reached, I am giving up square approximation at this step" else ()) ;
 						let _ = Counter.reset_consecutive_null_event counter in
 					
-						let radius = match radius with None -> (-1) | Some v -> Nbr.int_of_num (value state counter env v) in
+						let radius = match radius with None -> (-1) | Some v -> Nbr.to_int (value state counter env v) in
   				
 						let embeddings = instances_of_square ~disjoint:true rule_id radius state env in
 						let alpha,_ = eval_activity ~using:(List.length embeddings) r state counter env in 
-						let alpha = Nbr.float_of_num alpha in
+						let alpha = Nbr.to_float alpha in
 						begin
 							Random_tree.add rule_id alpha state.activity_tree ;
 							silence rule_id state ; (*rule activity will be underestimated if not awaken when a rule creates more cc's*)
@@ -1104,7 +1104,7 @@ let positive_update ?(with_tracked=[]) state r ((phi: int IntMap.t),psi) (side_m
 	let env,pert_ids =
 		List.fold_left
 		(fun (env,pert_ids) (v,t_id) ->
-			let value = Nbr.float_of_num (value state counter env v) in
+			let value = Nbr.to_float (value state counter env v) in
 			try
 				if !Parameter.debugModeOn then
 					(Debug.tag (Printf.sprintf "adding %f token(s) %d" value t_id)) ;
@@ -1117,7 +1117,7 @@ let positive_update ?(with_tracked=[]) state r ((phi: int IntMap.t),psi) (side_m
 	let env,pert_ids = 
 		List.fold_left
 		(fun (env,pert_ids) (v,t_id) ->
-			let value = Nbr.float_of_num (value state counter env v) in
+			let value = Nbr.to_float (value state counter env v) in
 			try
 				if !Parameter.debugModeOn then
 					(Debug.tag (Printf.sprintf "removing %f token(s) %d" value t_id)) ;
@@ -1488,10 +1488,10 @@ let dump state counter env =
 				if Environment.is_rule i env then
 					Printf.printf "#rule[%d]: \t%s %s @ %f[upd:%f(%f)]\n" i nme (Dynamics.to_kappa r env)
 					(Random_tree.find i state.activity_tree)
-					(Nbr.float_of_num a2) (Nbr.float_of_num a1) 
+					(Nbr.to_float a2) (Nbr.to_float a1)
 				else
 					Printf.printf "#\t%s %s [found %d]\n" nme (Dynamics.to_kappa r env)
-					(Nbr.int_of_num (instance_number i state env))
+					(Nbr.to_int (instance_number i state env))
 			) state.rules ();
 			Array.iteri
 			(fun mix_id opt ->
@@ -1518,7 +1518,7 @@ let dump state counter env =
 							(Printf.printf "#Var[%d]: '%s' %a has %d instances\n" mix_id
 									(Environment.kappa_of_num mix_id env)
 									(Mixture.print false env) (kappa_of_id mix_id state)
-									(Nbr.int_of_num (instance_number mix_id state env));
+									(Nbr.to_int (instance_number mix_id state env));
 									if SiteGraph.size state.graph > 1000 then ()
 									else
 										Array.iteri
@@ -1656,7 +1656,7 @@ let check_invariants check_opt state counter env =
     	  (fun r_id rule ->
     	   let x = Random_tree.find r_id state.activity_tree in
     	   let a2,a1 = eval_activity rule state counter env in
-  	   let alpha = Nbr.float_of_num (Nbr.add a2 a1) in
+  	   let alpha = Nbr.to_float (Nbr.add a2 a1) in
     	   if x < alpha then
     	     if (IntSet.mem r_id state.silenced || Random_tree.is_infinite r_id state.activity_tree) then ()
     	     else

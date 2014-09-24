@@ -18,8 +18,8 @@ val max : t -> t -> t
 val succ : t -> t
 val pred : t -> t
 val neg : t -> t
-val float_of_num : t -> float
-val int_of_num : t -> int
+val to_float : t -> float
+val to_int : t -> int
 val is_zero : t -> bool
 val is_strictly_positive : t -> bool
 val print : out_channel -> t -> unit

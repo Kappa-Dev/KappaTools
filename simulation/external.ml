@@ -9,7 +9,7 @@ open LargeArray
 let eval_pre_pert pert state counter env =
   match pert.stopping_time with
   | Some num ->
-     let t = (Nbr.float_of_num num) in
+     let t = (Nbr.to_float num) in
      if t <= (Mods.Counter.time counter) then (Some t,true) else (None,false)
   | _ -> (None, State.value state counter env pert.precondition)
 
@@ -25,7 +25,7 @@ let eval_pexpr pexpr state counter env =
        match ast with
        | Ast.Str_pexpr str -> str::cont
        | Ast.Alg_pexpr alg ->
-	  let (x, is_constant, opt_v, dep, str) =
+	  let (x, is_constant, opt_v, dep) =
 	    Eval.partial_eval_alg env (alg, pos) in
 	  let v =
 	    if is_constant
@@ -45,7 +45,7 @@ let dump_print_expr desc pexpr state counter env =
      match ast with
      | Ast.Str_pexpr str -> Printf.fprintf desc "%s" str
      | Ast.Alg_pexpr alg ->
-	let (x, is_constant, opt_v, dep, str) =
+	let (x, is_constant, opt_v, dep) =
 	  Eval.partial_eval_alg env (alg, pos) in
 	let v =
 	  if is_constant

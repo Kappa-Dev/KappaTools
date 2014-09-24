@@ -80,13 +80,13 @@ let succ n = cast_un_op ~op_f:((+.) 1.) ~op_i:succ ~op_i64:Int64.succ n
 let pred n = cast_un_op ~op_f:((-.) 1.) ~op_i:pred ~op_i64:Int64.pred n
 let neg n = cast_un_op ~op_f:(~-.) ~op_i:(~-) ~op_i64:Int64.neg n
 
-let float_of_num n =
+let to_float n =
   match n with
   | F x -> x
   | I x -> float_of_int x
   | I64 x -> Int64.to_float x
 
-let int_of_num n =
+let to_int n =
   match n with
   | F x -> (int_of_float x)
   | I x -> x

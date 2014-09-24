@@ -258,9 +258,9 @@ let eval_agent is_pattern tolerate_new_state env a ctxt =
 (* returns partial evaluation of rate expression and a boolean that is set *)
 (* to true if partial evaluation is a constant function                    *)
 let rec partial_eval_alg env (ast, (beg_pos,end_pos)) =
-  let bin_op ast ast' op op_str =
-    let (f1, const1, opt_value1, dep1, lbl1) = partial_eval_alg env ast in
-    let (f2, const2, opt_value2, dep2, lbl2) = partial_eval_alg env ast' in
+  let bin_op ast ast' op =
+    let (f1, const1, opt_value1, dep1) = partial_eval_alg env ast in
+    let (f2, const2, opt_value2, dep2) = partial_eval_alg env ast' in
     let part_eval inst values t e e_null cpu_t tk =
       (*evaluation partielle symbolique*)
       let v1 = f1 inst values t e e_null cpu_t tk in
@@ -268,17 +268,14 @@ let rec partial_eval_alg env (ast, (beg_pos,end_pos)) =
     let opt_value' = match opt_value1,opt_value2 with
 	(Some a,Some b) -> Some (op a b)
       | _ -> None in (*evaluation complete si connue*)
-    let lbl = Printf.sprintf "(%s%s%s)" lbl1 op_str lbl2 in
-    (part_eval, (const1 && const2), opt_value', (DepSet.union dep1 dep2), lbl)
+    (part_eval, (const1 && const2), opt_value', (DepSet.union dep1 dep2))
   in
-  let un_op ast op op_str =
-    let (f, const, opt_v, dep, lbl) = partial_eval_alg env ast in
-    let lbl = Printf.sprintf "%s(%s)" op_str lbl
-    in
+  let un_op ast op =
+    let (f, const, opt_v, dep) = partial_eval_alg env ast in
     let opt_v' = match opt_v with Some a -> Some (op a) | None -> None in
     ((fun inst values t e e_null cpu_t tk ->
       let v = f inst values t e e_null cpu_t tk in op v),
-     const, opt_v', dep, lbl)
+     const, opt_v', dep)
   in
   match ast with
   | EMAX ->
@@ -289,7 +286,7 @@ let rec partial_eval_alg env (ast, (beg_pos,end_pos)) =
 				       "[emax] constant is evaluated to infinity";
 		 (Nbr.F infinity)
      in
-     ((fun _ _ _ _ _ _ _-> v), true, Some v, DepSet.empty, "e_max")
+     ((fun _ _ _ _ _ _ _-> v), true, Some v, DepSet.empty)
   | TMAX ->
      let v =
        match !Parameter.maxTimeValue with
@@ -298,14 +295,14 @@ let rec partial_eval_alg env (ast, (beg_pos,end_pos)) =
 				       "[tmax] constant is evaluated to infinity";
 		 (Nbr.F infinity)
      in
-     ((fun _ _ _ _ _ _ _-> v), true, Some v, DepSet.empty, "t_max")
+     ((fun _ _ _ _ _ _ _-> v), true, Some v, DepSet.empty)
   | INFINITY -> ((fun _ _ _ _ _ _ _-> (Nbr.F infinity)), true,
-		 Some (Nbr.F infinity), DepSet.empty, "inf")
+		 Some (Nbr.F infinity), DepSet.empty)
   | CONST n ->
-     ((fun _ _ _ _ _ _ _-> n), true, (Some n), DepSet.empty, Nbr.to_string n)
+     ((fun _ _ _ _ _ _ _-> n), true, (Some n), DepSet.empty)
   | CPUTIME ->
      ((fun _ _ _ _ _ cpu_t _-> Nbr.F (cpu_t -. !Parameter.cpuTime)), false,
-      Some (Nbr.F 0.), (DepSet.singleton Mods.EVENT), "t_sim")
+      Some (Nbr.F 0.), (DepSet.singleton Mods.EVENT))
   | OBS_VAR lab ->
      begin
        try
@@ -317,7 +314,7 @@ let rec partial_eval_alg env (ast, (beg_pos,end_pos)) =
 		    (pos_of_lex_pos beg_pos, lab ^ " is not a variable identifier"))
 	 else
 	   ((fun f _ _ _ _ _ _-> f i), false, Some (Nbr.I 0),
-	    (DepSet.singleton (Mods.KAPPA i)), ("'" ^ (lab ^ "'")))
+	    (DepSet.singleton (Mods.KAPPA i)))
        with Not_found -> (*lab is the label of an algebraic expression*)
 	 let i,opt_v =
 	   try Environment.num_of_alg lab env with
@@ -326,7 +323,7 @@ let rec partial_eval_alg env (ast, (beg_pos,end_pos)) =
 		       (pos_of_lex_pos beg_pos,lab ^ " is not a declared variable"))
 	 in
 	 ((fun _ v _ _ _ _ _-> v i),false,opt_v,
-	  DepSet.singleton (Mods.ALG i),("'" ^ (lab ^ "'")))
+	  DepSet.singleton (Mods.ALG i))
      end
   | TOKEN_ID (tk_nme) ->
      let i =
@@ -336,30 +333,30 @@ let rec partial_eval_alg env (ast, (beg_pos,end_pos)) =
 		  (pos_of_lex_pos beg_pos,tk_nme ^ " is not a declared token"))
      in
      ((fun _ _ _ _ _ _ tk -> tk i),false,Some (Nbr.F 0.),
-      DepSet.singleton (Mods.TOK i),("'" ^ (tk_nme ^ "'")))
+      DepSet.singleton (Mods.TOK i))
   | TIME_VAR ->
      ((fun _ _ t _ _ _ _-> Nbr.F t), false, Some (Nbr.F 0.),
-      (DepSet.singleton Mods.TIME), "t")
+      (DepSet.singleton Mods.TIME))
   | EVENT_VAR ->
      ((fun _ _ _ e ne _ _-> Nbr.I (e+ne)), false, Some (Nbr.I 0),
-      (DepSet.singleton Mods.EVENT), "e")
+      (DepSet.singleton Mods.EVENT))
   | NULL_EVENT_VAR ->
      ((fun _ _ _ _ ne _ _-> Nbr.I ne), false, Some (Nbr.I 0),
-      (DepSet.singleton Mods.EVENT), "null_e")
+      (DepSet.singleton Mods.EVENT))
   | PROD_EVENT_VAR ->
      ((fun _ _ _ e _ _ _-> Nbr.I e), false,Some (Nbr.I 0),
-      (DepSet.singleton Mods.EVENT), "prod_e")
+      (DepSet.singleton Mods.EVENT))
   | DIV (ast, ast') ->
-     bin_op ast ast' (Nbr.cast_bin_op ~op_f:(/.)) "/"
-  | SUM (ast, ast') -> bin_op ast ast' Nbr.add "+"
-  | MULT (ast, ast') -> bin_op ast ast'  Nbr.mult "*"
-  | MINUS (ast, ast') -> bin_op ast ast' Nbr.sub "-"
+     bin_op ast ast' (Nbr.cast_bin_op ~op_f:(/.))
+  | SUM (ast, ast') -> bin_op ast ast' Nbr.add
+  | MULT (ast, ast') -> bin_op ast ast'  Nbr.mult
+  | MINUS (ast, ast') -> bin_op ast ast' Nbr.sub
   | POW (ast, ast') ->
      bin_op ast ast' (Nbr.cast_bin_op
 			~op_f:( ** ) ~op_i:Tools.pow
-			~op_i64:Tools.pow64) "^"
-  | MAX (ast, ast') -> bin_op ast ast' Nbr.max "max"
-  | MIN (ast,ast') -> bin_op ast ast' Nbr.min "min"
+			~op_i64:Tools.pow64)
+  | MAX (ast, ast') -> bin_op ast ast' Nbr.max
+  | MIN (ast,ast') -> bin_op ast ast' Nbr.min
   | MODULO (ast, ast') ->
      bin_op ast ast'
 	    (Nbr.cast_bin_op
@@ -368,42 +365,35 @@ let rec partial_eval_alg env (ast, (beg_pos,end_pos)) =
 			(int_of_float a mod int_of_float b))
 	       ~op_i:(mod)
 	       ~op_i64:Int64.rem
-	    ) " modulo "
-  | COSINUS ast -> un_op ast (Nbr.cast_un_op ~op_f:cos) "cos"
-  | TAN ast -> un_op ast (Nbr.cast_un_op ~op_f:tan) "tan"
-  | SINUS ast -> un_op ast (Nbr.cast_un_op ~op_f:sin) "sin"
-  | EXP ast -> un_op ast (Nbr.cast_un_op ~op_f:exp) "e^"
-  | SQRT ast -> un_op ast (Nbr.cast_un_op ~op_f:sqrt) "sqrt"
+	    )
+  | COSINUS ast -> un_op ast (Nbr.cast_un_op ~op_f:cos)
+  | TAN ast -> un_op ast (Nbr.cast_un_op ~op_f:tan)
+  | SINUS ast -> un_op ast (Nbr.cast_un_op ~op_f:sin)
+  | EXP ast -> un_op ast (Nbr.cast_un_op ~op_f:exp)
+  | SQRT ast -> un_op ast (Nbr.cast_un_op ~op_f:sqrt)
   | INT ast -> un_op ast (Nbr.cast_un_op
 			    ~op_i:(fun x -> x)
-			    ~op_i64:(fun x -> x)) "abs"
-  | LOG ast -> un_op ast (Nbr.cast_un_op ~op_f:log) "log"
-  | UMINUS ast -> un_op ast Nbr.neg "-"
+			    ~op_i64:(fun x -> x))
+  | LOG ast -> un_op ast (Nbr.cast_un_op ~op_f:log)
+  | UMINUS ast -> un_op ast Nbr.neg
 
 let rec partial_eval_bool env (ast,_) =
-  let bin_op_bool ast ast' op op_str =
-    let (f1, const1, dep1, lbl1, _) = partial_eval_bool env ast in
-    let (f2, const2, dep2, lbl2, _) = partial_eval_bool env ast' in
+  let bin_op_bool ast ast' op =
+    let (f1, const1, dep1,_) = partial_eval_bool env ast in
+    let (f2, const2, dep2,_) = partial_eval_bool env ast' in
     let part_eval inst values t e e_null cpu_t tk =
       let b1 = f1 inst values t e e_null cpu_t tk in
       let b2 = f2 inst values t e e_null cpu_t tk in op b1 b2
-    in
-    let lbl = Printf.sprintf "(%s %s %s)" lbl1 op_str lbl2
-    in (part_eval, (const1 && const2), (DepSet.union dep1 dep2), lbl, None)
-  in let bin_op_alg ast ast' op op_str =
-       let (f1, const1, _, dep1, lbl1) = partial_eval_alg env ast in
-       let (f2, const2, opt_v2, dep2, lbl2) = partial_eval_alg env ast' in
+    in (part_eval, (const1 && const2), (DepSet.union dep1 dep2), None)
+  in let bin_op_alg ast ast' op =
+       let (f1, const1, _, dep1) = partial_eval_alg env ast in
+       let (f2, const2, opt_v2, dep2) = partial_eval_alg env ast' in
        let stopping_time =
-	 match op_str with
-	 | "=" ->
-	    if DepSet.mem Mods.TIME dep1 then
-	      begin
-		match (lbl1,const2, opt_v2) with
-		| ("t",true, Some num) -> (Some num)
-		| (_,_,_) -> Some (Nbr.I (-1))
-	      end
-	    else None
-	 | _ -> None
+	 if op == Nbr.is_equal && DepSet.mem Mods.TIME dep1 then
+	   match (const2, opt_v2) with
+	   | (true, Some num) -> (Some num)
+	   | (_,_) -> raise ExceptionDefn.Unsatisfiable
+	 else None
        in
        let part_eval inst values t e e_null cpu_t tk =
 	 let v1 = f1 inst values t e e_null cpu_t tk in
@@ -411,23 +401,19 @@ let rec partial_eval_bool env (ast,_) =
 	 (*checking whether boolean expression has a time dependency and is of the form [T]=n*)
 	 op v1 v2
        in
-       (match stopping_time with
-	| Some (Nbr.I (-1)) -> raise ExceptionDefn.Unsatisfiable
-	| _ -> ();
-	       let lbl = Printf.sprintf "(%s%s%s)" lbl1 op_str lbl2 in
-	       (part_eval, (const1 && const2),
-		(DepSet.union dep1 dep2), lbl, stopping_time))
+       (part_eval, (const1 && const2),
+	(DepSet.union dep1 dep2), stopping_time)
      in
      match ast with
-     | TRUE -> ((fun _ _ _ _ _ _ _-> true), true, DepSet.singleton Mods.EVENT, "true",None)
-     | FALSE -> ((fun _ _ _ _ _ _ _-> false), true, DepSet.empty, "false",None)
-     | AND (ast, ast') -> bin_op_bool ast ast' (&&) "and"
-     | OR (ast, ast') -> bin_op_bool ast ast' (||) "or"
-     | GREATER (ast, ast') -> bin_op_alg ast ast' Nbr.is_greater ">"
-     | SMALLER (ast, ast') -> bin_op_alg ast ast' Nbr.is_smaller "<"
-     | EQUAL (ast, ast') -> bin_op_alg ast ast' Nbr.is_equal "="
+     | TRUE -> ((fun _ _ _ _ _ _ _-> true), true, DepSet.singleton Mods.EVENT,None)
+     | FALSE -> ((fun _ _ _ _ _ _ _-> false), true, DepSet.empty,None)
+     | AND (ast, ast') -> bin_op_bool ast ast' (&&)
+     | OR (ast, ast') -> bin_op_bool ast ast' (||)
+     | GREATER (ast, ast') -> bin_op_alg ast ast' Nbr.is_greater
+     | SMALLER (ast, ast') -> bin_op_alg ast ast' Nbr.is_smaller
+     | EQUAL (ast, ast') -> bin_op_alg ast ast' Nbr.is_equal
      | DIFF (ast, ast') ->
-	bin_op_alg ast ast' (fun v v' -> not (Nbr.is_equal v v')) "<>"
+	bin_op_alg ast ast' (fun v v' -> not (Nbr.is_equal v v'))
 
 let mixture_of_ast ?(tolerate_new_state=false) mix_id_opt is_pattern env ast_mix =
 	let rec eval_mixture env ast_mix ctxt mixture =
@@ -478,7 +464,7 @@ let token_of_ast abs_tk env =
 	Environment.declare_token name pos env
 
 let reduce_val v env = 
-	let (k, const, opt_v, dep, _) = partial_eval_alg env v
+	let (k, const, opt_v, dep) = partial_eval_alg env v
 	in
 	if const then match opt_v with 
 		| Some v -> (Dynamics.CONST v, dep)
@@ -523,7 +509,7 @@ let rule_of_ast ?(backwards=false) env (ast_rule_label, ast_rule) tolerate_new_s
 				try Environment.num_of_token nme env 
 				with Not_found -> raise (ExceptionDefn.Semantics_Error (pos,"Token "^nme^" is undefined"))
 			in
-			let (f, is_const, opt_v, _ , _) = partial_eval_alg env alg_expr (*dependencies are not important here since variable is evaluated only when rule is applied*) 
+			let (f, is_const, opt_v, _ ) = partial_eval_alg env alg_expr (*dependencies are not important here since variable is evaluated only when rule is applied*) 
 			in
 			let v =
 			if is_const then (match opt_v with
@@ -682,7 +668,7 @@ let variables_of_result env res =
 								let mix,env = mixture_of_ast (Some id) is_pattern env ast
 								in (env, (mix :: mixtures), vars)
 						| Ast.VAR_ALG (ast, label_pos) ->
-								let (f, constant, value_opt, dep, lbl) = partial_eval_alg env ast in
+								let (f, constant, value_opt, dep) = partial_eval_alg env ast in
 								let (env, var_id) = Environment.declare_var_alg (Some label_pos) value_opt env 
 								in
 								let v =
@@ -721,360 +707,397 @@ let environment_of_result res =
 
 
 let obs_of_result env res =
-	List.fold_left
-	(fun cont alg_expr ->	
-		let (f, const, opt_v, dep, lbl) = (partial_eval_alg env alg_expr)
-		in
-			(f,const,opt_v,dep,lbl) :: cont
-	)
-	[] res.observables
+  List.fold_left
+    (fun cont alg_expr ->
+     let (f, const, opt_v, dep) = (partial_eval_alg env alg_expr)
+     in
+     (f,const,opt_v,dep,Expr.alg_to_string () (fst alg_expr)) :: cont
+    )
+    [] res.observables
 
 let effects_of_modif variables env ast_list =
-	let rec iter variables effects str_pert env ast_list = 
-		match ast_list with
-			| [] -> (variables,effects,str_pert,env)
-			| ast::tl ->
-				let (variables,effects,str_pert,env) =
-					match ast with
-					| INTRO (alg_expr, ast_mix, pos) ->
-							let (x, is_constant, opt_v, dep, str) = partial_eval_alg env alg_expr in
-							let m,env = mixture_of_ast None false env ast_mix in
-							let v =
-								if is_constant
-								then (match opt_v with Some v -> Dynamics.CONST v | None -> invalid_arg "Eval.effects_of_modif") 
-								else Dynamics.VAR x 
-							in
-							let str =
-								(Printf.sprintf "introduce %s * %s" str (Mixture.to_kappa false env m))::str_pert
-							in (variables, (Dynamics.INTRO (v, m))::effects, str, env)
-					| DELETE (alg_expr, ast_mix, pos) ->
-							let (x, is_constant, opt_v, dep, str) = partial_eval_alg env alg_expr in
-							let nme_pert = Printf.sprintf "pert_%d" (Environment.next_pert_id env) in
-							let (env, id) =
-								Environment.declare_var_kappa (Some (nme_pert,pos)) env 
-							in
-							let m,env = mixture_of_ast (Some id) true env ast_mix in
-							let v =
-								if is_constant
-								then (match opt_v with Some v -> Dynamics.CONST v | None -> invalid_arg "Eval.effects_of_modif")
-								else Dynamics.VAR x 
-							in
-							let str =
-								(Printf.sprintf "remove %s * %s" str (Mixture.to_kappa false env m))::str_pert
-							in ((m :: variables), (Dynamics.DELETE (v, m))::effects, str, env)
-					| UPDATE ((nme, pos_rule), alg_expr) ->
-							let i,is_rule =
-								(try (Environment.num_of_rule nme env,true)
-								with
-								| Not_found ->
-									try
-										let (i,_) = Environment.num_of_alg nme env in (i,false)
-									with Not_found -> raise (ExceptionDefn.Semantics_Error (pos_rule,"Variable " ^ (nme ^ " is neither a constant nor a rule")))
-								)
-							and (x, is_constant, opt_v, dep, str) = partial_eval_alg env alg_expr in
-							let v =
-								if is_constant
-								then (match opt_v with Some v -> Dynamics.CONST v | None -> invalid_arg "Eval.effects_of_modif")
-								else Dynamics.VAR x 
-							in
-							let str =
-								if is_rule then
-									(Printf.sprintf "set rate of rule '%s' to %s" (Environment.rule_of_num i env) str)::str_pert
-								else
-									let v_str,_ = Environment.alg_of_num i env in
-									(Printf.sprintf "set variable '%s' to %s" v_str str)::str_pert
-							in 
-							if is_rule then (variables, (Dynamics.UPDATE_RULE (i, v))::effects, str, env)
-							else (variables, (Dynamics.UPDATE_VAR (i, v))::effects, str, env)
-					| UPDATE_TOK ((tk_nme,tk_pos),alg_expr) ->
-						let tk_id = 
-							try Environment.num_of_token tk_nme env with 
-								| Not_found -> raise (ExceptionDefn.Semantics_Error (tk_pos,"Token " ^ (tk_nme ^ " is not defined")))
-						in
-						let (x, is_constant, opt_v, dep, str) = partial_eval_alg env alg_expr in
-						let v =
-								if is_constant
-								then (match opt_v with Some v -> Dynamics.CONST v | None -> invalid_arg "Eval.effects_of_modif")
-								else Dynamics.VAR x 
-						in
-						let str = (Printf.sprintf "set token '%s' to value %s" tk_nme str)::str_pert
-						in 
-						(variables, (Dynamics.UPDATE_TOK (tk_id, v))::effects, str, env)
-					| SNAPSHOT (pexpr,pos) -> (*when specializing snapshots to particular mixtures, add variables below*)
-						let str = ("snapshot state")::str_pert in
-						(variables, (Dynamics.SNAPSHOT pexpr)::effects, str, env)
-					| STOP (pexpr,pos) ->
-						let str = "interrupt simulation"::str_pert in
-						(variables, (Dynamics.STOP pexpr)::effects, str, env)
-					| CFLOW ((lab,pos_lab),pos_pert) ->
-						let id = try Environment.num_of_rule lab env with Not_found -> try Environment.num_of_kappa lab env with Not_found ->
-							raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
-						in
-						let str = (Printf.sprintf "Enable causality analysis for observable '%s'" lab)::str_pert in
-						(variables, (Dynamics.CFLOW id)::effects, str, env)
-					| CFLOWOFF ((lab,pos_lab),pos_pert) ->
-						let id = try Environment.num_of_rule lab env with Not_found -> try Environment.num_of_kappa lab env with Not_found ->
-							raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
-						in
-						let str = (Printf.sprintf "Disable causality analysis for observable '%s'" lab)::str_pert in
-						(variables, (Dynamics.CFLOWOFF id)::effects, str, env)
-					| FLUX (pexpr,pos) ->
-						let str = "Activate flux tracking"::str_pert in
-						(variables,(Dynamics.FLUX pexpr)::effects, str, env)
-					| FLUXOFF (pexpr,pos) ->
-						let str = "Disable flux tracking"::str_pert in
-						(variables,(Dynamics.FLUXOFF pexpr)::effects, str, env)
-					| PRINT (pexpr,print,pos) ->
-						let str_l =
-						List.fold_left
-						(fun cont (pexpr,pos) ->
-						 match pexpr with
-						 | Ast.Str_pexpr str -> str::cont
-						 | Ast.Alg_pexpr alg ->
-						    let (_, _, _, _, str) =
-						      partial_eval_alg env (alg,pos) in
-						    str::cont
-						) [] print
-						in
-						let str = (Printf.sprintf "Print %s" (Tools.string_of_list (fun i->i) str_l))::str_pert
-						in
-						(variables,(Dynamics.PRINT (pexpr,print))::effects, str, env)
-			in
-			iter variables effects str_pert env tl
-	in
-	iter variables [] [] env ast_list  
+  let rec iter variables effects str_pert env ast_list =
+    match ast_list with
+    | [] -> (variables,effects,str_pert,env)
+    | ast::tl ->
+       let (variables,effects,str_pert,env) =
+	 match ast with
+	 | INTRO (alg_expr, ast_mix, pos) ->
+	    let (x, is_constant, opt_v, dep) = partial_eval_alg env alg_expr in
+	    let m,env = mixture_of_ast None false env ast_mix in
+	    let v =
+	      if is_constant
+	      then (match opt_v with Some v -> Dynamics.CONST v
+				   | None -> invalid_arg "Eval.effects_of_modif")
+	      else Dynamics.VAR x
+	    in
+	    let str =
+	      (Printf.sprintf "introduce %a * %s"
+			      Expr.alg_to_string (fst alg_expr)
+			      (Mixture.to_kappa false env m))::str_pert
+	    in (variables, (Dynamics.INTRO (v, m))::effects, str, env)
+	 | DELETE (alg_expr, ast_mix, pos) ->
+	    let (x, is_constant, opt_v, dep) = partial_eval_alg env alg_expr in
+	    let nme_pert = Printf.sprintf "pert_%d" (Environment.next_pert_id env) in
+	    let (env, id) =
+	      Environment.declare_var_kappa (Some (nme_pert,pos)) env
+	    in
+	    let m,env = mixture_of_ast (Some id) true env ast_mix in
+	    let v =
+	      if is_constant
+	      then (match opt_v with Some v -> Dynamics.CONST v
+				   | None -> invalid_arg "Eval.effects_of_modif")
+	      else Dynamics.VAR x
+	    in
+	    let str =
+	      (Printf.sprintf "remove %a * %s" Expr.alg_to_string (fst alg_expr)
+			      (Mixture.to_kappa false env m))::str_pert
+	    in ((m :: variables), (Dynamics.DELETE (v, m))::effects, str, env)
+	 | UPDATE ((nme, pos_rule), alg_expr) ->
+	    let i,is_rule =
+	      (try (Environment.num_of_rule nme env,true)
+	       with
+	       | Not_found ->
+		  try
+		    let (i,_) = Environment.num_of_alg nme env in (i,false)
+		  with Not_found ->
+		    raise (ExceptionDefn.Semantics_Error
+			     (pos_rule,"Variable " ^ (nme ^ " is neither a constant nor a rule")))
+	      )
+	    and (x, is_constant, opt_v, dep) = partial_eval_alg env alg_expr in
+	    let v =
+	      if is_constant
+	      then (match opt_v with Some v -> Dynamics.CONST v
+				   | None -> invalid_arg "Eval.effects_of_modif")
+	      else Dynamics.VAR x
+	    in
+	    let str =
+	      (if is_rule then
+		 Printf.sprintf "set rate of rule '%s' to %a"
+			       (Environment.rule_of_num i env)
+	       else
+		 Printf.sprintf "set variable '%s' to %a"
+				(fst (Environment.alg_of_num i env)))
+		Expr.alg_to_string (fst alg_expr)::str_pert
+	    in
+	    if is_rule then (variables, (Dynamics.UPDATE_RULE (i, v))::effects, str, env)
+	    else (variables, (Dynamics.UPDATE_VAR (i, v))::effects, str, env)
+	 | UPDATE_TOK ((tk_nme,tk_pos),alg_expr) ->
+	    let tk_id =
+	      try Environment.num_of_token tk_nme env with
+	      | Not_found ->
+		 raise (ExceptionDefn.Semantics_Error
+			  (tk_pos,"Token " ^ (tk_nme ^ " is not defined")))
+	    in
+	    let (x, is_constant, opt_v, dep) = partial_eval_alg env alg_expr in
+	    let v =
+	      if is_constant
+	      then (match opt_v with Some v -> Dynamics.CONST v
+				   | None -> invalid_arg "Eval.effects_of_modif")
+	      else Dynamics.VAR x
+	    in
+	    let str = (Printf.sprintf "set token '%s' to value %a" tk_nme
+				      Expr.alg_to_string (fst alg_expr))::str_pert
+	    in
+	    (variables, (Dynamics.UPDATE_TOK (tk_id, v))::effects, str, env)
+	 | SNAPSHOT (pexpr,pos) ->
+	    (*when specializing snapshots to particular mixtures, add variables below*)
+	    let str = ("snapshot state")::str_pert in
+	    (variables, (Dynamics.SNAPSHOT pexpr)::effects, str, env)
+	 | STOP (pexpr,pos) ->
+	    let str = "interrupt simulation"::str_pert in
+	    (variables, (Dynamics.STOP pexpr)::effects, str, env)
+	 | CFLOW ((lab,pos_lab),pos_pert) ->
+	    let id = try Environment.num_of_rule lab env
+		     with Not_found -> try Environment.num_of_kappa lab env
+				       with Not_found ->
+					 raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
+	    in
+	    let str = (Printf.sprintf "Enable causality analysis for observable '%s'" lab)::str_pert in
+	    (variables, (Dynamics.CFLOW id)::effects, str, env)
+	 | CFLOWOFF ((lab,pos_lab),pos_pert) ->
+	    let id = try Environment.num_of_rule lab env
+		     with Not_found -> try Environment.num_of_kappa lab env
+				       with Not_found ->
+					 raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
+	    in
+	    let str = (Printf.sprintf "Disable causality analysis for observable '%s'" lab)::str_pert in
+	    (variables, (Dynamics.CFLOWOFF id)::effects, str, env)
+	 | FLUX (pexpr,pos) ->
+	    let str = "Activate flux tracking"::str_pert in
+	    (variables,(Dynamics.FLUX pexpr)::effects, str, env)
+	 | FLUXOFF (pexpr,pos) ->
+	    let str = "Disable flux tracking"::str_pert in
+	    (variables,(Dynamics.FLUXOFF pexpr)::effects, str, env)
+	 | PRINT (pexpr,print,pos) ->
+	    let str_l =
+	      List.fold_left
+		(fun cont (pexpr,pos) ->
+		 match pexpr with
+		 | Ast.Str_pexpr str -> str::cont
+		 | Ast.Alg_pexpr alg -> Expr.alg_to_string () alg::cont
+		) [] print
+	    in
+	    let str = (Printf.sprintf "Print %s" (Tools.string_of_list (fun i->i) str_l))::str_pert
+	    in
+	    (variables,(Dynamics.PRINT (pexpr,print))::effects, str, env)
+       in
+       iter variables effects str_pert env tl
+  in
+  iter variables [] [] env ast_list
 
 let pert_of_result variables env res =
-	let (variables, lpert, lrules, env) =
-		List.fold_left
-			(fun (variables, lpert, lrules, env) (bool_expr, modif_expr_list, pos, opt_post) ->				
-				let (x, is_constant, dep, str_pre, stopping_time) = 
-					(try partial_eval_bool env bool_expr with 
-						ExceptionDefn.Unsatisfiable -> 
-							raise 
-							(ExceptionDefn.Semantics_Error 
-							(pos,"Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"))
-					)
-				in 
-				let (variables, effects, str_eff, env) =	effects_of_modif variables env modif_expr_list 
-				in
-				let str_eff = String.concat ";" (List.rev str_eff) in
-				let bv =
-					if is_constant
-					then Dynamics.CONST (close_var x)
-					else Dynamics.VAR x in
-				let str_pert,opt_abort =
-					match opt_post with
-					| None -> (Printf.sprintf "whenever %s, %s" str_pre str_eff,None)
-					| Some bool_expr -> 
-						let (x, is_constant, dep, str_abort, stopping_time) = 
-							try partial_eval_bool env bool_expr with
-								ExceptionDefn.Unsatisfiable -> 
-									raise 
-									(ExceptionDefn.Semantics_Error 
-									(pos,"Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"))
-						in
-						let bv = 
-							if is_constant then Dynamics.CONST (close_var x)
-							else Dynamics.VAR x 
-						in
-						(Printf.sprintf "whenever %s, %s until %s" str_pre str_eff str_abort,Some (bv,dep,str_abort)) 
-				in
-				let env,p_id = Environment.declare_pert (str_pert,pos) env in
-				let env,effect_list,_ =
-					List.fold_left 
-					(fun (env,rule_list,cpt) effect -> 
-						match effect with
-						| Dynamics.INTRO (_,mix) ->
-							begin
-								let (env, id) =
-									Environment.declare_var_kappa (Some (str_pert,pos)) env 
-								in
-								let lhs = Mixture.empty (Some id)
-								and rhs = mix 
-								in
-								let (script,balance,added,modif_sites(*,side_effect*)) = Dynamics.diff pos lhs rhs (Some (str_pert,pos)) env
-								and kappa_lhs = ""
-								and kappa_rhs = Mixture.to_kappa false env rhs in
-								let r_id = Mixture.get_id lhs in
-								let str_pert = Printf.sprintf "pert_%d%d" p_id cpt in
-								let env = Environment.declare_rule (Some (str_pert,pos)) r_id env in
-								let env =
-									DepSet.fold
-									(fun dep env -> Environment.add_dependencies dep (Mods.PERT p_id) env
-									)
-									dep env
-								in 
-								let pre_causal = Dynamics.compute_causal lhs rhs script env in
-								let rule = 
-								{
-									(*TODO*)Dynamics.rm_token = [] ; Dynamics.add_token = [] ; 
-									Dynamics.k_def = Dynamics.CONST (Nbr.F 0.0);
-									Dynamics.k_alt = (None,None);
-									Dynamics.over_sampling = None;
-									Dynamics.script = script ;
-									Dynamics.kappa = kappa_lhs ^ ("->" ^ kappa_rhs);
-									Dynamics.balance = balance;
-									Dynamics.refines = None;
-									Dynamics.lhs = lhs;
-									Dynamics.rhs = rhs;
-									Dynamics.r_id = r_id;
-									Dynamics.added = List.fold_left (fun set i -> IntSet.add i set) IntSet.empty added ;
-									(*Dynamics.side_effect = side_effect ; *)
-									Dynamics.modif_sites = modif_sites ;
-									Dynamics.is_pert = true ;
-									Dynamics.pre_causal = pre_causal ;
-									Dynamics.cc_impact = None 
-								}
-								in
-								(env,(Some rule,effect)::rule_list,cpt+1)
-							end
-						| Dynamics.DELETE (_,mix) ->
-							begin
-								let lhs = mix
-								and rhs = Mixture.empty None
-								in
-								let (script,balance,added,modif_sites(*,side_effect*)) = Dynamics.diff pos lhs rhs (Some (str_pert,pos)) env
-								and kappa_lhs = Mixture.to_kappa false env lhs
-								and kappa_rhs = "" in
-								let r_id = Mixture.get_id lhs in
-								let str_pert = Printf.sprintf "pert_%d%d" p_id cpt in
-								let env = Environment.declare_rule (Some (str_pert,pos)) r_id env in
-								let env =
-									DepSet.fold
-									(fun dep env -> Environment.add_dependencies dep (Mods.PERT p_id) env
-									)
-									dep env
-								in 
-								let pre_causal = Dynamics.compute_causal lhs rhs script env in
-								let rule = 
-								{ (*TODO*) Dynamics.rm_token = [] ; Dynamics.add_token = [] ; 
-									
-									Dynamics.k_def = Dynamics.CONST (Nbr.F 0.0); 
-									Dynamics.k_alt = (None,None);
-									Dynamics.over_sampling = None;
-									Dynamics.script = script ;
-									Dynamics.kappa = kappa_lhs ^ ("->" ^ kappa_rhs);
-									Dynamics.balance = balance;
-									Dynamics.refines = None;
-									Dynamics.lhs = lhs;
-									Dynamics.rhs = rhs;
-									Dynamics.r_id = r_id;
-									Dynamics.added = List.fold_left (fun set i -> IntSet.add i set) IntSet.empty added ;
-									(*Dynamics.side_effect = side_effect ; *)
-									Dynamics.modif_sites = modif_sites ;
-									Dynamics.pre_causal = pre_causal ;
-									Dynamics.is_pert = true ;
-									Dynamics.cc_impact = None ;
-								}
-								in
-								(env,(Some rule,effect)::rule_list,cpt+1)
-							end
-						| Dynamics.CFLOW _ ->
-							let env = {env with Environment.tracking_enabled = true} in
-							let env =
-								DepSet.fold
-								(fun dep env -> Environment.add_dependencies dep (Mods.PERT p_id) env
-								)
-								dep env
-							in 
-							(env,(None,effect)::rule_list,cpt) 
-						| Dynamics.UPDATE_RULE _ |Dynamics.UPDATE_VAR _ | Dynamics.UPDATE_TOK _ | Dynamics.SNAPSHOT _ | Dynamics.STOP _ | Dynamics.FLUX _ | Dynamics.FLUXOFF _ | Dynamics.CFLOWOFF _ | Dynamics.PRINT _ -> 
-							let env =
-								DepSet.fold
-								(fun dep env -> Environment.add_dependencies dep (Mods.PERT p_id) env
-								)
-								dep env
-							in (env,(None,effect)::rule_list,cpt) 
-				) (env,[],0) effects
-				in
-				(*let env = List.fold_left (fun env (r_opt,effect) -> Environment.bind_pert_rule p_id r.r_id env) env effect_list in *)
-				let opt,env =
-					match opt_abort with
-					| None -> (None,env)
-					| Some (bv,dep,str_post) -> 
-						let env =
-							DepSet.fold
-							(fun dep_type env ->
-								Environment.add_dependencies dep_type (Mods.ABORT p_id) env
-							)
-							dep env
-						in
-						(Some bv,env)
-				in
-				let pert = 
-					{ Dynamics.precondition = bv;
-						Dynamics.effect = effect_list;
-						Dynamics.abort = opt;
-						Dynamics.flag = str_pert;
-						Dynamics.stopping_time = stopping_time
-					}
-				in
-				let lrules = List.fold_left (fun cont (r_opt,_) -> match r_opt with None -> cont | Some r -> r::cont) lrules effect_list 
-				in
-				(variables, pert::lpert, lrules, env)
-			)
-			(variables, [], [], env) res.perturbations
-		in 
-		(*making sure that perturbations containing a stopping time precondition are tested first*)
-		let lpert = List.rev lpert in
-		let pred = (fun p -> match p.Dynamics.stopping_time with None -> false | Some _ -> true) in
-		let lpert_stopping_time = List.filter pred lpert in
-		let lpert_ineq = List.filter (fun p -> not (pred p)) lpert in
-		let lpert = lpert_stopping_time@lpert_ineq in
-		(variables, lpert, (List.rev lrules), env)
+  let (variables, lpert, lrules, env) =
+    List.fold_left
+      (fun (variables, lpert, lrules, env)
+	   (pre_expr, modif_expr_list, pos, opt_post) ->
+       let (x, is_constant, dep, stopping_time) =
+	 (try partial_eval_bool env pre_expr with
+	    ExceptionDefn.Unsatisfiable ->
+	    raise
+	      (ExceptionDefn.Semantics_Error
+		 (pos,"Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"))
+	 )
+       in
+       let (variables, effects, str_eff, env) =
+	 effects_of_modif variables env modif_expr_list in
+       let str_eff = String.concat ";" (List.rev str_eff) in
+       let bv =
+	 if is_constant
+	 then Dynamics.CONST (close_var x)
+	 else Dynamics.VAR x in
+       let str_pert,opt_abort =
+	 match opt_post with
+	 | None ->
+	    (Printf.sprintf "whenever %a, %s" Expr.bool_to_string (fst pre_expr)
+			    str_eff,None)
+	 | Some post_expr ->
+	    let (x, is_constant, dep, stopping_time) =
+	      try partial_eval_bool env post_expr with
+		ExceptionDefn.Unsatisfiable ->
+		raise
+		  (ExceptionDefn.Semantics_Error
+		     (pos,"Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"))
+	    in
+	    let bv =
+	      if is_constant then Dynamics.CONST (close_var x)
+	      else Dynamics.VAR x
+	    in
+	    (Printf.sprintf "whenever %a, %s until %a"
+			    Expr.bool_to_string (fst pre_expr) str_eff
+			    Expr.bool_to_string (fst post_expr),Some (bv,dep))
+       in
+       let env,p_id = Environment.declare_pert (str_pert,pos) env in
+       let env,effect_list,_ =
+	 List.fold_left
+	   (fun (env,rule_list,cpt) effect ->
+	    match effect with
+	    | Dynamics.INTRO (_,mix) ->
+	       begin
+		 let (env, id) =
+		   Environment.declare_var_kappa (Some (str_pert,pos)) env
+		 in
+		 let lhs = Mixture.empty (Some id) in
+		 let rhs = mix in
+		 let (script,balance,added,modif_sites(*,side_effect*)) =
+		   Dynamics.diff pos lhs rhs (Some (str_pert,pos)) env in
+		 let kappa_lhs = "" in
+		 let kappa_rhs = Mixture.to_kappa false env rhs in
+		 let r_id = Mixture.get_id lhs in
+		 let str_pert = Printf.sprintf "pert_%d%d" p_id cpt in
+		 let env = Environment.declare_rule (Some (str_pert,pos)) r_id env in
+		 let env =
+		   DepSet.fold
+		     (fun dep env -> Environment.add_dependencies dep (Mods.PERT p_id) env
+		     )
+		     dep env
+		 in
+		 let pre_causal = Dynamics.compute_causal lhs rhs script env in
+		 let rule =
+		   { Dynamics.rm_token = []; Dynamics.add_token = []; (*TODO*)
+		     Dynamics.k_def = Dynamics.CONST (Nbr.F 0.0);
+		     Dynamics.k_alt = (None,None);
+		     Dynamics.over_sampling = None;
+		     Dynamics.script = script ;
+		     Dynamics.kappa = kappa_lhs ^ ("->" ^ kappa_rhs);
+		     Dynamics.balance = balance;
+		     Dynamics.refines = None;
+		     Dynamics.lhs = lhs;
+		     Dynamics.rhs = rhs;
+		     Dynamics.r_id = r_id;
+		     Dynamics.added =
+		       List.fold_left (fun set i -> IntSet.add i set) IntSet.empty added ;
+		     (*Dynamics.side_effect = side_effect ; *)
+		     Dynamics.modif_sites = modif_sites ;
+		     Dynamics.is_pert = true ;
+		     Dynamics.pre_causal = pre_causal ;
+		     Dynamics.cc_impact = None
+		   }
+		 in
+		 (env,(Some rule,effect)::rule_list,cpt+1)
+	       end
+	    | Dynamics.DELETE (_,mix) ->
+	       begin
+		 let lhs = mix
+		 and rhs = Mixture.empty None
+		 in
+		 let (script,balance,added,modif_sites(*,side_effect*)) =
+		   Dynamics.diff pos lhs rhs (Some (str_pert,pos)) env in
+		 let kappa_lhs = Mixture.to_kappa false env lhs in
+		 let kappa_rhs = "" in
+		 let r_id = Mixture.get_id lhs in
+		 let str_pert = Printf.sprintf "pert_%d%d" p_id cpt in
+		 let env =
+		   Environment.declare_rule (Some (str_pert,pos)) r_id env in
+		 let env =
+		   DepSet.fold
+		     (fun dep env -> Environment.add_dependencies dep (Mods.PERT p_id) env
+		     )
+		     dep env
+		 in
+		 let pre_causal = Dynamics.compute_causal lhs rhs script env in
+		 let rule =
+		   { Dynamics.rm_token = [] ; Dynamics.add_token = [] ; (*TODO*)
+		     Dynamics.k_def = Dynamics.CONST (Nbr.F 0.0);
+		     Dynamics.k_alt = (None,None);
+		     Dynamics.over_sampling = None;
+		     Dynamics.script = script;
+		     Dynamics.kappa = kappa_lhs ^ ("->" ^ kappa_rhs);
+		     Dynamics.balance = balance;
+		     Dynamics.refines = None;
+		     Dynamics.lhs = lhs;
+		     Dynamics.rhs = rhs;
+		     Dynamics.r_id = r_id;
+		     Dynamics.added =
+		       List.fold_left (fun set i -> IntSet.add i set) IntSet.empty added;
+		     (*Dynamics.side_effect = side_effect ; *)
+		     Dynamics.modif_sites = modif_sites ;
+		     Dynamics.pre_causal = pre_causal ;
+		     Dynamics.is_pert = true ;
+		     Dynamics.cc_impact = None ;
+		   }
+		 in
+		 (env,(Some rule,effect)::rule_list,cpt+1)
+	       end
+	    | Dynamics.CFLOW _ ->
+	       let env = {env with Environment.tracking_enabled = true} in
+	       let env =
+		 DepSet.fold
+		   (fun dep env -> Environment.add_dependencies dep (Mods.PERT p_id) env
+		   )
+		   dep env
+	       in
+	       (env,(None,effect)::rule_list,cpt)
+	    | Dynamics.UPDATE_RULE _ |Dynamics.UPDATE_VAR _
+	    | Dynamics.UPDATE_TOK _ | Dynamics.SNAPSHOT _ | Dynamics.STOP _
+	    | Dynamics.FLUX _ | Dynamics.FLUXOFF _ | Dynamics.CFLOWOFF _
+	    | Dynamics.PRINT _ ->
+	       let env =
+		 DepSet.fold
+		   (fun dep env -> Environment.add_dependencies dep (Mods.PERT p_id) env
+		   )
+		   dep env
+	       in (env,(None,effect)::rule_list,cpt)
+	   ) (env,[],0) effects
+       in
+       (*let env = List.fold_left (fun env (r_opt,effect) -> Environment.bind_pert_rule p_id r.r_id env) env effect_list in *)
+       let opt,env =
+	 match opt_abort with
+	 | None -> (None,env)
+	 | Some (bv,dep) ->
+	    let env =
+	      DepSet.fold
+		(fun dep_type env ->
+		 Environment.add_dependencies dep_type (Mods.ABORT p_id) env
+		)
+		dep env
+	    in
+	    (Some bv,env)
+       in
+       let pert =
+	 { Dynamics.precondition = bv;
+	   Dynamics.effect = effect_list;
+	   Dynamics.abort = opt;
+	   Dynamics.flag = str_pert;
+	   Dynamics.stopping_time = stopping_time
+	 }
+       in
+       let lrules = List.fold_left (fun cont (r_opt,_) ->
+				    match r_opt with None -> cont
+						   | Some r -> r::cont) lrules effect_list
+       in
+       (variables, pert::lpert, lrules, env)
+      )
+      (variables, [], [], env) res.perturbations
+  in
+  (*making sure that perturbations containing a stopping time precondition are tested first*)
+  let lpert = List.rev lpert in
+  let pred = (fun p -> match p.Dynamics.stopping_time with
+			 None -> false | Some _ -> true) in
+  let lpert_stopping_time = List.filter pred lpert in
+  let lpert_ineq = List.filter (fun p -> not (pred p)) lpert in
+  let lpert = lpert_stopping_time@lpert_ineq in
+  (variables, lpert, (List.rev lrules), env)
 
 let init_graph_of_result env res =
-	let n = env.Environment.fresh_token in 
-	let token_vector = Array.init n (fun i -> 0.) in
-	let sg,env = 
-	List.fold_left
-		(fun (sg,env) (opt_vol,init_t,pos) -> (*TODO dealing with volumes*)
-			match init_t with
-				| INIT_MIX (alg, ast) ->
-					begin
-      			let cpt = ref 0
-      			and sg = ref sg
-      			and env = ref env
-      			and (v, is_const, opt_v, dep, lbl) = partial_eval_alg env alg
-      			in
-						let value = 
-							match opt_v with
-								| Some v -> v
-								| None -> raise (ExceptionDefn.Semantics_Error (pos, Printf.sprintf "%s is not a constant, cannot initialize graph." lbl))
-      			in
-      			let n = match !Parameter.rescale with 
-      				| None -> Nbr.int_of_num value
-      				| Some i -> min i (Nbr.int_of_num value) 
-      			in
-      				(* Cannot do Mixture.to_nodes env m once for all because of        *)
-      				(* references                                                      *)
-      				while !cpt < n do
-      					let nodes,env' = nodes_of_ast !env ast in
-      					env := env' ;
-      					sg := Graph.SiteGraph.add_nodes !sg nodes;
-      					cpt := !cpt + 1 
-      				done;
-      				(!sg,!env)
-					end
-				| INIT_TOK (alg, (tk_nme,pos_tk)) ->
-					let (v, is_const, opt_v, _, lbl) = partial_eval_alg env alg
-    			in
-					let x = 
-						match opt_v with
-							| Some (Nbr.F v) -> v
-							| Some (Nbr.I v) -> float_of_int v
-							| Some (Nbr.I64 v) -> Int64.to_float v
-							| None -> raise (ExceptionDefn.Semantics_Error (pos_tk, Printf.sprintf "%s is not a constant, cannot initialize token value." lbl))
-    			in
-    			let tok_id = try Environment.num_of_token tk_nme env with Not_found -> raise (ExceptionDefn.Semantics_Error (pos_tk, Printf.sprintf "token %s is undeclared" tk_nme))
-					in
-					token_vector.(tok_id) <- x ;
-					(sg,env)
-		)	(Graph.SiteGraph.init !Parameter.defaultGraphSize,env) res.Ast.init
-	in
-	(sg,token_vector,env)
-	
+  let n = env.Environment.fresh_token in
+  let token_vector = Array.init n (fun i -> 0.) in
+  let sg,env =
+    List.fold_left
+      (fun (sg,env) (opt_vol,init_t,pos) -> (*TODO dealing with volumes*)
+       match init_t with
+       | INIT_MIX (alg, ast) ->
+	  begin
+	    let (v, is_const, opt_v, dep) = partial_eval_alg env alg in
+	    let cpt = ref 0 in
+	    let sg = ref sg in
+	    let env = ref env in
+	    let value =
+	      match opt_v with
+	      | Some v -> v
+	      | None -> raise
+			  (ExceptionDefn.Semantics_Error
+			     (pos,
+			      Printf.sprintf "%a is not a constant, cannot initialize graph."
+					     Expr.alg_to_string (fst alg)))
+	    in
+	    let n = match !Parameter.rescale with
+	      | None -> Nbr.to_int value
+	      | Some i -> min i (Nbr.to_int value)
+	    in
+	    (* Cannot do Mixture.to_nodes env m once for all because of *)
+	    (* references                                               *)
+	    while !cpt < n do
+	      let nodes,env' = nodes_of_ast !env ast in
+	      env := env' ;
+	      sg := Graph.SiteGraph.add_nodes !sg nodes;
+	      cpt := !cpt + 1
+	    done;
+	    (!sg,!env)
+	  end
+       | INIT_TOK (alg, (tk_nme,pos_tk)) ->
+	  let (v, is_const, opt_v, _) = partial_eval_alg env alg in
+	  let x =
+	    match opt_v with
+	    | Some n -> Nbr.to_float n
+	    | None ->
+	       raise (ExceptionDefn.Semantics_Error
+			(pos_tk,
+			 Printf.sprintf "%a is not a constant, cannot initialize token value."
+					Expr.alg_to_string (fst alg)))
+	  in
+	  let tok_id =
+	    try Environment.num_of_token tk_nme env
+	    with Not_found ->
+	      raise (ExceptionDefn.Semantics_Error
+		       (pos_tk, Printf.sprintf "token %s is undeclared" tk_nme))
+	  in
+	  token_vector.(tok_id) <- x ;
+	  (sg,env)
+      )	(Graph.SiteGraph.init !Parameter.defaultGraphSize,env) res.Ast.init
+  in
+  (sg,token_vector,env)
+
 let configurations_of_result result =
 	let set_value pos_p param value_list f ass = 
   	try 
