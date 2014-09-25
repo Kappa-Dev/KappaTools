@@ -3,7 +3,6 @@ open Ast
 let rec print_alg f = function
   | EMAX -> Printf.fprintf f "[Emax]"
   | TMAX -> Printf.fprintf f "[Tmax]"
-  | INFINITY -> Printf.fprintf f "[inf]"
   | CONST n -> Nbr.print f n
   | CPUTIME -> Printf.fprintf f "[Tsim]"
   | OBS_VAR lab -> Printf.fprintf f "'%s'" lab
@@ -35,7 +34,6 @@ let rec print_alg f = function
 let rec alg_to_string () = function
   | EMAX -> Printf.sprintf "[Emax]"
   | TMAX -> Printf.sprintf "[Tmax]"
-  | INFINITY -> Printf.sprintf "[inf]"
   | CONST n -> Nbr.to_string n
   | CPUTIME -> Printf.sprintf "[Tsim]"
   | OBS_VAR lab -> Printf.sprintf "'%s'" lab

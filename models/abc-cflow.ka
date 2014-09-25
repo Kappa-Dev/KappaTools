@@ -27,7 +27,7 @@
 %obs: 'n_c' 0
 %var: 'C' C()
 
-%var: 'cflow' [inf]
+%var: 'cflow' INF
 
 #### Initial conditions 
 %init: 'n_ab' A(),B()

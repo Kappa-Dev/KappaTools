@@ -30,7 +30,6 @@ type alg_expr =
   | TMAX
   | EMAX
   | CPUTIME
-  | INFINITY
 
 type bool_expr =
   | TRUE

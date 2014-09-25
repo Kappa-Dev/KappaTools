@@ -5,15 +5,14 @@
 %}
 
 %token EOF NEWLINE SEMICOLON
-%token AT OP_PAR CL_PAR COMMA DOT TYPE LAR OP_CUR CL_CUR
-%token <Tools.pos> LOG PLUS MULT MINUS AND OR GREATER SMALLER EQUAL PERT INTRO
-%token <Tools.pos> DELETE DO SET UNTIL TRUE FALSE OBS KAPPA_RAR TRACK CPUTIME
-%token <Tools.pos> CONFIG REPEAT DIFF
-%token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INFINITY TIME EVENT NULL_EVENT
-%token <Tools.pos> PROD_EVENT INIT LET DIV PLOT SINUS COSINUS TAN SQRT EXPONENT
-%token <Tools.pos> POW ABS MODULO
-%token <Tools.pos> EMAX TMAX FLUX ASSIGN ASSIGN2 TOKEN KAPPA_LNK PIPE KAPPA_LRAR
-%token <Tools.pos> PRINT PRINTF MAX MIN
+%token AT OP_PAR CL_PAR COMMA DOT TYPE LAR OP_CUR CL_CUR CPUTIME EMAX TMAX
+%token DO SET REPEAT UNTIL LOG PLUS MULT MINUS MAX MIN DIV SINUS COSINUS TAN
+%token POW ABS MODULO SQRT EXPONENT INFINITY TIME EVENT NULL_EVENT PROD_EVENT
+%token <Tools.pos> EQUAL PERT INTRO AND OR GREATER SMALLER
+%token <Tools.pos> DELETE TRUE FALSE OBS KAPPA_RAR TRACK CONFIG DIFF
+%token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INIT LET PLOT
+%token <Tools.pos> FLUX ASSIGN ASSIGN2 TOKEN KAPPA_LNK PIPE KAPPA_LRAR
+%token <Tools.pos> PRINT PRINTF
 %token <int*Tools.pos> INT
 %token <string*Tools.pos> ID LABEL KAPPA_MRK
 %token <float*Tools.pos> FLOAT
@@ -112,10 +111,10 @@ instruction:
     | PLOT error {raise (ExceptionDefn.Syntax_Error
 			   (Some $1,"Malformed plot instruction, I was expecting an algebraic expression of variables"))}
     | PERT perturbation_declaration
-	   {let (bool_expr,mod_expr_list,pos) = $2 in
-	    Ast.PERT (bool_expr,mod_expr_list,pos,None)}
+	   {let (bool_expr,mod_expr_list) = $2 in
+	    Ast.PERT (bool_expr,mod_expr_list,$1,None)}
     | PERT REPEAT perturbation_declaration UNTIL bool_expr
-	   {let (bool_expr,mod_expr_list,pos) = $3 in
+	   {let (bool_expr,mod_expr_list) = $3 in
 	    if List.exists
 		 (fun effect ->
 		  match effect with
@@ -124,7 +123,7 @@ instruction:
 		 ) mod_expr_list
 	    then (ExceptionDefn.warning ~with_pos:$1
 					"Perturbation need not be applied repeatedly") ;
-	    Ast.PERT (bool_expr,mod_expr_list,pos,Some $5)}
+	    Ast.PERT (bool_expr,mod_expr_list,$1,Some $5)}
     | CONFIG STRING value_list
 	     {Ast.CONFIG ($2,$3)}
     | PERT bool_expr DO effect_list UNTIL bool_expr
@@ -148,10 +147,12 @@ value_list:
 
 perturbation_declaration:
     | OP_PAR perturbation_declaration CL_PAR {$2}
-    | bool_expr DO effect_list {($1,$3,$2)}
+    | bool_expr DO effect_list {($1,$3)}
     | bool_expr SET effect_list
-		{ExceptionDefn.warning ~with_pos:$2
-				       "Deprecated perturbation syntax: 'set' keyword is replaced by 'do'" ; ($1,$3,$2)} /*For backward compatibility*/
+		{ExceptionDefn.warning
+		   ~with_pos:(Tools.pos_of_lex_pos (Parsing.symbol_start_pos ()))
+		   "Deprecated perturbation syntax: 'set' keyword is replaced by 'do'";
+		 ($1,$3)} /*For backward compatibility*/
     ;
 
 effect_list:
@@ -337,7 +338,7 @@ arrow:
     ;
 
 constant:
-    | INFINITY {add_pos Ast.INFINITY}
+    | INFINITY {add_pos (Ast.CONST (Nbr.F infinity))}
     | FLOAT {let f,pos = $1 in add_pos (Ast.CONST (Nbr.F f))}
     | INT {let i,pos = $1 in add_pos (Ast.CONST (Nbr.I i))}
     | EMAX {add_pos Ast.EMAX}

@@ -28,6 +28,17 @@
  let position lexbuf =
    let pos = lexbuf.lex_curr_p in
    (pos.pos_fname, pos.pos_lnum, pos.pos_cnum - pos.pos_bol)
+
+
+ let keyword_or_id =
+ let keywords = Hashtbl.create 15 in
+ let () = Hashtbl.add keywords "do" DO in
+ let () = Hashtbl.add keywords "set" SET in
+ let () = Hashtbl.add keywords "repeat" REPEAT in
+ let () = Hashtbl.add keywords "until" UNTIL in
+ let () = Hashtbl.add keywords "INF" INFINITY in
+ fun x pos ->
+ try Hashtbl.find keywords x with Not_found -> ID (x,pos)
 }
 
 let eol = '\r'? '\n'
@@ -44,10 +55,6 @@ let pert = '$' id
 
 rule token = parse
 	 | '\\' eol {Lexing.new_line lexbuf ; token lexbuf}
-	 | "do" {let pos = position lexbuf in DO pos}
-	 | "set" {let pos = position lexbuf in SET pos}
-	 | "repeat" {let pos = position lexbuf in REPEAT pos}
-	 | "until" {let pos = position lexbuf in UNTIL pos}
 	 | "&&" {let pos = position lexbuf in AND pos}
 	 | "||" {let pos = position lexbuf in OR pos}
 	 | "<->" {let pos = position lexbuf in KAPPA_LRAR pos}
@@ -73,27 +80,26 @@ rule token = parse
 	 | '[' {let lab = read_label "" [']'] lexbuf in
 		let pos = position lexbuf in
 		match lab with
-		| "E" -> EVENT pos
-		| "E+" -> PROD_EVENT pos
-		| "E-" -> NULL_EVENT pos
-		| "T" -> TIME pos
-		| "Tsim" -> CPUTIME pos
-		| "log" -> LOG pos
-		| "sin" -> SINUS pos
-		| "cos" -> COSINUS pos
-		| "tan" -> TAN pos
-		| "exp" -> EXPONENT pos
-		| "int" -> ABS pos
-		| "mod" -> MODULO pos
-		| "sqrt" -> SQRT pos
-		| "inf" -> INFINITY pos
+		| "E" -> EVENT
+		| "E+" -> PROD_EVENT
+		| "E-" -> NULL_EVENT
+		| "T" -> TIME
+		| "Tsim" -> CPUTIME
+		| "log" -> LOG
+		| "sin" -> SINUS
+		| "cos" -> COSINUS
+		| "tan" -> TAN
+		| "exp" -> EXPONENT
+		| "int" -> ABS
+		| "mod" -> MODULO
+		| "sqrt" -> SQRT
 		| "true" -> TRUE pos
 		| "false" -> FALSE pos
 		| "pi" -> FLOAT (3.14159265,pos)
-		| "max" -> MAX pos
-		| "min" -> MIN pos
-		| "Emax" -> EMAX pos
-		| "Tmax" -> TMAX pos
+		| "max" -> MAX
+		| "min" -> MIN
+		| "Emax" -> EMAX
+		| "Tmax" -> TMAX
 		| _ as s -> return_error None lexbuf ("Symbol \""^s^"\" is not defined")
 	       }
 	 | ':' {TYPE}
@@ -104,7 +110,7 @@ rule token = parse
 	 | integer as n {let pos = position lexbuf in INT (int_of_string n,pos)}
 	 | real as f {let pos = position lexbuf in FLOAT (float_of_string f,pos)}
 	 | '\'' {let lab = read_label "" ['\''] lexbuf in let pos = position lexbuf in LABEL(lab,pos)}
-	 | id as str {let pos = position lexbuf in ID(str,pos)}
+	 | id as str {let pos = position lexbuf in keyword_or_id str pos}
 	 | '@' {AT}
 	 | ',' {COMMA}
 	 | '(' {OP_PAR}
@@ -113,11 +119,11 @@ rule token = parse
 	 | '}' {CL_CUR}
 	 | '|' {let pos = position lexbuf in PIPE pos}
 	 | '.' {DOT}
-	 | '+' {let pos = position lexbuf in PLUS pos}
-	 | '*' {let pos = position lexbuf in MULT pos}
-	 | '-' {let pos = position lexbuf in MINUS pos}
-	 | '^' {let pos = position lexbuf in POW pos}
-	 | '/' {let pos = position lexbuf in DIV pos}
+	 | '+' {PLUS}
+	 | '*' {MULT}
+	 | '-' {MINUS}
+	 | '^' {POW}
+	 | '/' {DIV}
 	 | '<' {let pos = position lexbuf in SMALLER pos}
 	 | '>' {let pos = position lexbuf in GREATER pos}
 	 | '=' {let pos = position lexbuf in EQUAL pos}

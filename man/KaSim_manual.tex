@@ -452,7 +452,7 @@ which will tell \KaSim~to apply the above rule with a rate $\ga_2$ for binary in
 \item \%agent: C(b,a)
 \item \#\#
 \item \%var: \var{V}~  1
-\item \%var: \var{k1}~  [inf]
+\item \%var: \var{k1}~  INF
 \item \%var: \var{k2}~ 1.0E-4/\var{V} 
 \item \%var: \var{k\_off} ~ 0.1
 \item \#\#
@@ -524,7 +524,7 @@ where \ttt{var\_name} can be any string and \textit{algebraic\_expression} are d
 
 \ttt{\var{v}} & the value of variable \ttt{\var{v}} (declared using the \ttt{\%var:} statement) \\
 \ttt{|t|} & the concentration of token \ttt{t}\\
-\ttt{[inf]} & symbol for $\infty$ \\\\
+\ttt{INF} & symbol for $\infty$ \\\\
 \toprule
 \ttt{\tcb{unary/binary\_op}} & Interpretation \\
 \midrule
@@ -721,7 +721,7 @@ Continuing with the ABC model, the perturbation effect\index{effect}:
 }}
 will add $n\geq 0$ instances of \ttt{C} with \ttt{x1} already in state \ttt{p} (and the rest of its interface in the default state as specified line 4 of ABC.ka). Also the perturbation effect\index{effect}:
 \ttt{\ITE{
-\item[] \$DEL  [inf] B(x!\_)
+\item[] \$DEL  INF B(x!\_)
 }}
 will remove \emph{all} \ttt{B}s connected to some agent from the mixture\index{mixture}. 
 
@@ -835,7 +835,7 @@ This perturbation will be applied whenever the observable \ttt{\var{Cpp}} will b
 }}
 \noi will cause the on rate of all rules to decrease a hunderd fold. Note that it is possible to override the kinetic rate of a specific rule:  in our ABC example, the declaration\index{declaration}:
 \ttt{\ITE{
-\item [] \%mod: \var{Cpp}~> 500 do \$UPDATE \var{a.b} [inf]
+\item [] \%mod: \var{Cpp}~> 500 do \$UPDATE \var{a.b} INF
 }}
 \noi will set the kinetic rate of rule \ttt{\var{a.b}}~to infinity. 
 

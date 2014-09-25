@@ -296,8 +296,6 @@ let rec partial_eval_alg env (ast, (beg_pos,end_pos)) =
 		 (Nbr.F infinity)
      in
      ((fun _ _ _ _ _ _ _-> v), true, Some v, DepSet.empty)
-  | INFINITY -> ((fun _ _ _ _ _ _ _-> (Nbr.F infinity)), true,
-		 Some (Nbr.F infinity), DepSet.empty)
   | CONST n ->
      ((fun _ _ _ _ _ _ _-> n), true, (Some n), DepSet.empty)
   | CPUTIME ->
