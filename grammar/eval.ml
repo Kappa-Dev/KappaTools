@@ -638,7 +638,8 @@ let variables_of_result env res =
     (fun (env, mixtures, vars) ((label,(beg_pos,_)),ast) ->
      let (env', mix', f, constant, value_opt, dep) =
        partial_eval_alg env mixtures ast in
-     let (env'', var_id) = Environment.declare_var_alg (Some (label,pos_of_lex_pos beg_pos)) value_opt env'
+     let (env'', var_id) =
+       Environment.declare_var_alg (Some (label,pos_of_lex_pos beg_pos)) value_opt env'
      in
      let v =
        if constant then Dynamics.CONST (close_var f)
@@ -673,7 +674,8 @@ let environment_of_result res =
       )
       Environment.empty res.Ast.signatures
   in
-  List.fold_left (fun env (tk, pos) -> token_of_ast (tk,pos) env) env res.Ast.tokens
+  List.fold_left
+    (fun env (tk, pos) -> token_of_ast (tk,pos) env) env res.Ast.tokens
 
 let obs_of_result env mixs res =
   List.fold_left
@@ -1076,141 +1078,170 @@ let init_graph_of_result env res =
   (sg,token_vector,env)
 
 let configurations_of_result result =
-	let set_value pos_p param value_list f ass = 
-  	try 
-			let v,pos = List.hd value_list in
-  		ass := f (v,pos) 
-  	with _ -> ExceptionDefn.warning ~with_pos:pos_p (Printf.sprintf "Empty value for parameter %s" param)
-	in
-	List.iter 
-	(fun ((param,pos_p),value_list) ->
-		match param with
-			| "displayCompression" -> 
-				begin
-					let rec parse l = 
-						match l with
-							| ("strong",pos_v)::tl -> (Parameter.strongCompression := true ; parse tl)
-							| ("weak",_)::tl -> (Parameter.weakCompression := true ; parse tl)
-							| ("none",_)::tl -> (Parameter.mazCompression := true ; parse tl)
-							| [] -> ()
-							| (error,pos)::tl -> raise (ExceptionDefn.Semantics_Error (pos,Printf.sprintf "Unkown value %s for compression mode" error))
-					in
-					parse value_list
-				end
-			| "cflowFileName"	-> set_value pos_p param value_list (fun (v,pos) -> v) Parameter.cflowFileName 
-			| "progressBarSize" -> 
-				set_value pos_p param value_list 
-				(fun (v,p) -> 
-					try int_of_string v
-					with _ -> raise (ExceptionDefn.Semantics_Error (p,Printf.sprintf "Value %s should be an integer" v))
-				) Parameter.progressBarSize 
-				
-			| "progressBarSymbol" -> 
-				set_value pos_p param value_list 
-				(fun (v,p) -> 
-					try
-					String.unsafe_get v 0 
-					with _ -> raise (ExceptionDefn.Semantics_Error (p,Printf.sprintf "Value %s should be a character" v))
-				) Parameter.progressBarSymbol 
+  let set_value pos_p param value_list f ass =
+    try
+      let v,pos = List.hd value_list in
+      ass := f (v,pos)
+    with _ ->
+      ExceptionDefn.warning
+	~with_pos:pos_p (Printf.sprintf "Empty value for parameter %s" param)
+  in
+  List.iter
+    (fun ((param,pos_p),value_list) ->
+     match param with
+     | "displayCompression" ->
+	begin
+	  let rec parse l =
+	    match l with
+	    | ("strong",pos_v)::tl ->
+	       (Parameter.strongCompression := true ; parse tl)
+	    | ("weak",_)::tl -> (Parameter.weakCompression := true ; parse tl)
+	    | ("none",_)::tl -> (Parameter.mazCompression := true ; parse tl)
+	    | [] -> ()
+	    | (error,pos)::tl ->
+	       raise (ExceptionDefn.Semantics_Error
+			(pos,Printf.sprintf "Unkown value %s for compression mode" error))
+	  in
+	  parse value_list
+	end
+     | "cflowFileName"	->
+	set_value pos_p param value_list fst Parameter.cflowFileName
+     | "progressBarSize" ->
+	set_value pos_p param value_list
+		  (fun (v,p) ->
+		   try int_of_string v
+		   with _ ->
+		     raise (ExceptionDefn.Semantics_Error
+			      (p,Printf.sprintf "Value %s should be an integer" v))
+		  ) Parameter.progressBarSize
 
-			| "dumpIfDeadlocked" -> 
-				set_value pos_p param value_list
-				(fun (value,pos_v) ->	
-					match value with 
-						| "true" | "yes" -> true 
-						| "false" | "no" -> false 
-						| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_v,Printf.sprintf "Value %s should be either \"yes\" or \"no\"" error))
-				) Parameter.dumpIfDeadlocked
-			| "plotSepChar" -> 
-				set_value pos_p param value_list
-				(fun (v,p) ->
-				try 
-					String.unsafe_get v 0  
-				with _ -> raise (ExceptionDefn.Semantics_Error (p,Printf.sprintf "Value %s should be a character" v))
-				) Parameter.plotSepChar
-			| "maxConsecutiveClash" ->
-				set_value pos_p param value_list 
-				(fun (v,p) -> 
-					try int_of_string v
-					with _ -> raise (ExceptionDefn.Semantics_Error (p,Printf.sprintf "Value %s should be an integer" v))
-				) Parameter.maxConsecutiveClash 
-				 
-			| "dotSnapshots" -> 
-				set_value pos_p param value_list
-				(fun (value,pos_v) ->	
-					match value with 
-						| "true" | "yes" -> true 
-						| "false" | "no" -> false 
-						| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_v,Printf.sprintf "Value %s should be either \"yes\" or \"no\"" error))
-				) Parameter.dotOutput
-			| "colorDot" ->
-				set_value pos_p param value_list
-				(fun (value,pos_v) ->	
-					match value with 
-						| "true" | "yes" -> true 
-						| "false" | "no" -> false 
-						| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_v,Printf.sprintf "Value %s should be either \"yes\" or \"no\"" error))
-				) Parameter.useColor
-			| "dumpInfluenceMap" ->
-				set_value pos_p param value_list
-				(fun (v,p) -> 
-					match v with 
-						| "true" | "yes" -> if !Parameter.influenceFileName = "" then "im.dot" else !Parameter.influenceFileName
-						| "false" | "no" -> "" 
-						| _ as error -> raise (ExceptionDefn.Semantics_Error (p,Printf.sprintf "Value %s should be either \"yes\" or \"no\"" error))
-				) Parameter.influenceFileName
-			| "influenceMapFileName" -> set_value pos_p param value_list (fun (v,p) -> v) Parameter.influenceFileName  
-			| "showIntroEvents" -> 
-				set_value pos_p param value_list 
-				(fun (v,p) -> match v with 
-					| "true" | "yes" -> true 
-					| "false" | "no" -> false
-					| _ as error -> raise (ExceptionDefn.Semantics_Error (p,Printf.sprintf "Value %s should be either \"yes\" or \"no\"" error))
-				) 
-				Parameter.showIntroEvents
-			| _ as error -> raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Unkown parameter %s" error))		  
-	) result.configurations 
-	
+     | "progressBarSymbol" ->
+	set_value pos_p param value_list
+		  (fun (v,p) ->
+		   try
+		     String.unsafe_get v 0
+		   with _ ->
+		     raise (ExceptionDefn.Semantics_Error
+			      (p,Printf.sprintf "Value %s should be a character" v))
+		  ) Parameter.progressBarSymbol
+
+     | "dumpIfDeadlocked" ->
+	set_value pos_p param value_list
+		  (fun (value,pos_v) ->
+		   match value with
+		   | "true" | "yes" -> true
+		   | "false" | "no" -> false
+		   | _ as error ->
+		      raise (ExceptionDefn.Semantics_Error
+			       (pos_v,Printf.sprintf "Value %s should be either \"yes\" or \"no\"" error))
+		  ) Parameter.dumpIfDeadlocked
+     | "plotSepChar" ->
+	set_value pos_p param value_list
+		  (fun (v,p) ->
+		   try
+		     String.unsafe_get v 0
+		   with _ ->
+		     raise (ExceptionDefn.Semantics_Error
+			      (p,Printf.sprintf "Value %s should be a character" v))
+		  ) Parameter.plotSepChar
+     | "maxConsecutiveClash" ->
+	set_value pos_p param value_list
+		  (fun (v,p) ->
+		   try int_of_string v
+		   with _ ->
+		     raise (ExceptionDefn.Semantics_Error
+			      (p,Printf.sprintf "Value %s should be an integer" v))
+		  ) Parameter.maxConsecutiveClash
+
+     | "dotSnapshots" ->
+	set_value pos_p param value_list
+		  (fun (value,pos_v) ->
+		   match value with
+		   | "true" | "yes" -> true
+		   | "false" | "no" -> false
+		   | _ as error ->
+		      raise (ExceptionDefn.Semantics_Error
+			       (pos_v,Printf.sprintf "Value %s should be either \"yes\" or \"no\"" error))
+		  ) Parameter.dotOutput
+     | "colorDot" ->
+	set_value pos_p param value_list
+		  (fun (value,pos_v) ->
+		   match value with
+		   | "true" | "yes" -> true
+		   | "false" | "no" -> false
+		   | _ as error ->
+		      raise (ExceptionDefn.Semantics_Error
+			       (pos_v,Printf.sprintf "Value %s should be either \"yes\" or \"no\"" error))
+		  ) Parameter.useColor
+     | "dumpInfluenceMap" ->
+	set_value pos_p param value_list
+		  (fun (v,p) ->
+		   match v with
+		   | "true" | "yes" ->
+			       if !Parameter.influenceFileName = ""
+			       then "im.dot" else !Parameter.influenceFileName
+		   | "false" | "no" -> ""
+		   | _ as error ->
+		      raise (ExceptionDefn.Semantics_Error
+			       (p,Printf.sprintf "Value %s should be either \"yes\" or \"no\"" error))
+		  ) Parameter.influenceFileName
+     | "influenceMapFileName" ->
+	set_value pos_p param value_list fst Parameter.influenceFileName
+     | "showIntroEvents" ->
+	set_value pos_p param value_list
+		  (fun (v,p) -> match v with
+				| "true" | "yes" -> true
+				| "false" | "no" -> false
+				| _ as error ->
+				   raise (ExceptionDefn.Semantics_Error
+					    (p,Printf.sprintf "Value %s should be either \"yes\" or \"no\"" error))
+		  )
+		  Parameter.showIntroEvents
+     | _ as error ->
+	raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Unkown parameter %s" error))
+    ) result.configurations
+
 let initialize result counter =
-	Debug.tag "+ Compiling..." ;
-	Debug.tag "\t -simulation parameters" ;
-	let _ = configurations_of_result result in
+  Debug.tag "+ Compiling..." ;
+  Debug.tag "\t -simulation parameters" ;
+  let _ = configurations_of_result result in
 
-	Debug.tag "\t -agent signatures" ;
-	let env = environment_of_result result in
-	
-	Debug.tag "\t -variable declarations";
-	let (env, kappa_vars, alg_vars) = variables_of_result env result in
-	
-	Debug.tag "\t -initial conditions";
-	let sg,token_vector,env = init_graph_of_result env result
-	in
-	
-	let tolerate_new_state = !Parameter.implicitSignature in
-	Parameter.implicitSignature := false ;
+  Debug.tag "\t -agent signatures" ;
+  let env = environment_of_result result in
 
-	Debug.tag "\t -rules";
-	let (env, kappa_vars, rules) = rules_of_result env kappa_vars result tolerate_new_state in
-	
-	Debug.tag "\t -observables";
-	let env,kappa_vars,observables = obs_of_result env kappa_vars result in
-	Debug.tag "\t -perturbations" ;
-	let (kappa_vars, pert, rule_pert, env) =
-	  pert_of_result kappa_vars env result in
-	Debug.tag "\t Done";
-	Debug.tag "+ Analyzing non local patterns..." ;
-	let env = Environment.init_roots_of_nl_rules env in
-	Debug.tag "+ Building initial simulation state...";
-	Debug.tag "\t -Counting initial local patterns..." ;
-	let (state, env) =
-	State.initialize sg token_vector rules kappa_vars alg_vars observables (pert,rule_pert) counter env
-	in
-	let state =  
-		if env.Environment.has_intra then
-			begin
-				Debug.tag "\t -Counting initial non local patterns..." ;
-				NonLocal.initialize_embeddings state counter env
-			end
-		else state
-	in
-	(Debug.tag "\t Done"; (env, state))
+  Debug.tag "\t -variable declarations";
+  let (env, kappa_vars, alg_vars) = variables_of_result env result in
+
+  Debug.tag "\t -initial conditions";
+  let sg,token_vector,env = init_graph_of_result env result in
+
+  let tolerate_new_state = !Parameter.implicitSignature in
+  Parameter.implicitSignature := false ;
+
+  Debug.tag "\t -rules";
+  let (env, kappa_vars, rules) =
+    rules_of_result env kappa_vars result tolerate_new_state in
+
+  Debug.tag "\t -observables";
+  let env,kappa_vars,observables = obs_of_result env kappa_vars result in
+  Debug.tag "\t -perturbations" ;
+  let (kappa_vars, pert, rule_pert, env) =
+    pert_of_result kappa_vars env result in
+  Debug.tag "\t Done";
+  Debug.tag "+ Analyzing non local patterns..." ;
+  let env = Environment.init_roots_of_nl_rules env in
+  Debug.tag "+ Building initial simulation state...";
+  Debug.tag "\t -Counting initial local patterns..." ;
+  let (state, env) =
+    State.initialize sg token_vector rules kappa_vars
+		     alg_vars observables (pert,rule_pert) counter env
+  in
+  let state =
+    if env.Environment.has_intra then
+      begin
+	Debug.tag "\t -Counting initial non local patterns..." ;
+	NonLocal.initialize_embeddings state counter env
+      end
+    else state
+  in
+  (Debug.tag "\t Done"; (env, state))

@@ -96,23 +96,26 @@ let is_complete mix_id state =
 					| None -> false
 			) true comp_injs
 
-(**[instance_number mix_id state] returns the number of instances of mixture [mix_id] in implicit state [state]*)
+(** [instance_number mix_id state] returns the number of instances of mixture
+    [mix_id] in implicit state [state] *)
 let instance_number mix_id state env =
-	if Environment.is_empty_lhs mix_id env then (Nbr.I64 Int64.one) 
-	else
-		match state.injections.(mix_id) with
-		| None -> (Nbr.I64 Int64.zero)
-		| Some component_injections ->
-			let act =
-				Array.fold_left
-					(fun act opt ->
-								match opt with
-								| Some injs -> let n = InjectionHeap.size injs in if n=0 then Int64.zero else (Int64.mul act (Int64.of_int n))
-								| None -> Int64.zero
-					)
-					Int64.one component_injections
-			in
-			(Nbr.I64 act)
+  if Environment.is_empty_lhs mix_id env then (Nbr.I64 Int64.one)
+  else
+    match state.injections.(mix_id) with
+    | None -> (Nbr.I64 Int64.zero)
+    | Some component_injections ->
+       let act =
+	 Array.fold_left
+	   (fun act opt ->
+	    match opt with
+	    | Some injs ->
+	       let n = InjectionHeap.size injs in
+	       if n=0 then Int64.zero else (Int64.mul act (Int64.of_int n))
+	    | None -> Int64.zero
+	   )
+	   Int64.one component_injections
+       in
+       (Nbr.I64 act)
 
 (**[nl_instance_number mix_id state] returns the number of instances of non local mixture [mix_id] in implicit state [state]*)
 let nl_instance_number mix_id state env =

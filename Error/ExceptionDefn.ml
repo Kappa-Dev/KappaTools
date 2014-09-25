@@ -11,7 +11,7 @@ exception Break of int
 (* 3:overapproximation clash *)
 (* 4:invalid injection clash *)
 (* 5: perturbation interrupting time*)
-exception Null_event of int 
+exception Null_event of int
 exception Deadlock
 exception UserInterrupted of (float -> int -> string)
 exception StopReached of string
@@ -22,16 +22,16 @@ exception Unsatisfiable
 
 let warning_buffer:string list ref = ref []
 
-let warning ?with_pos msg = 
-	let str = 
-		match with_pos with
-			| Some pos -> (Tools.string_of_pos pos)^" "
-			| None -> ""
-	in
-		warning_buffer := ("WARNING: "^str^msg^"\n")::!warning_buffer
+let warning ?with_pos msg =
+  let str =
+    match with_pos with
+    | Some pos -> (Tools.string_of_pos pos)^" "
+    | None -> ""
+  in
+  warning_buffer := ("WARNING: "^str^msg^"\n")::!warning_buffer
 
-let flush_warning () = 
-	prerr_string "\n";
-	let l = List.rev !warning_buffer in
-	List.iter (fun s -> prerr_string s) l ;
-	flush stderr
+let flush_warning () =
+  prerr_string "\n";
+  let l = List.rev !warning_buffer in
+  List.iter (fun s -> prerr_string s) l ;
+  flush stderr
