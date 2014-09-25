@@ -5,8 +5,22 @@ val print_bool :
   (out_channel -> 'a -> unit) -> out_channel -> 'a Ast.bool_expr -> unit
 val bool_to_string :
   (unit -> 'a -> string) -> unit -> 'a Ast.bool_expr -> string
-
 val print_ast_bool :
   out_channel -> Ast.mixture Ast.ast_alg_expr Ast.bool_expr -> unit
 val ast_bool_to_string :
   unit -> Ast.mixture Ast.ast_alg_expr Ast.bool_expr -> string
+
+type alg_expr =
+    BIN_ALG_OP of Term.bin_alg_op * alg_expr Term.with_pos * alg_expr Term.with_pos
+  | UN_ALG_OP of Term.un_alg_op * alg_expr Term.with_pos
+  | STATE_ALG_OP of Term.state_alg_op
+  | ALG_VAR of int
+  | KAPPA_INSTANCE of int
+  | TOKEN_ID of int
+  | CONST of Nbr.t
+
+val compile_alg : Environment.t -> 'a Ast.ast_alg_expr Term.with_pos ->
+		  Environment.t * (int * 'a) list * alg_expr Term.with_pos
+val compile_bool :
+  Environment.t -> 'a Ast.ast_alg_expr Ast.bool_expr Term.with_pos ->
+  Environment.t * (int * 'a) list * alg_expr Ast.bool_expr Term.with_pos

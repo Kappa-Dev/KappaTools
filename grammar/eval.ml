@@ -322,22 +322,10 @@ let rec partial_eval_alg env mixs (ast, (beg_pos,end_pos)) =
   in
   match ast with
   | EMAX ->
-     let v =
-       match !Parameter.maxEventValue with
-       | Some n -> Nbr.I n
-       | None -> ExceptionDefn.warning ~with_pos:(pos_of_lex_pos beg_pos)
-				       "[emax] constant is evaluated to infinity";
-		 (Nbr.F infinity)
-     in
+     let v = Parameter.getMaxEventValue () in
      (env,mixs,(fun _ _ _ _ _ _ _-> v), true, Some v, DepSet.empty)
   | TMAX ->
-     let v =
-       match !Parameter.maxTimeValue with
-       | Some t -> Nbr.F t
-       | None -> ExceptionDefn.warning ~with_pos:(pos_of_lex_pos beg_pos)
-				       "[tmax] constant is evaluated to infinity";
-		 (Nbr.F infinity)
-     in
+     let v = Parameter.getMaxTimeValue () in
      (env,mixs,(fun _ _ _ _ _ _ _-> v), true, Some v, DepSet.empty)
   | CONST n ->
      (env,mixs,(fun _ _ _ _ _ _ _-> n), true, (Some n), DepSet.empty)

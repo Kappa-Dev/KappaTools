@@ -161,4 +161,16 @@ let get_causal_trace x = x.causal_trace
 let get_causal_trace_only x = not (x.weak_compression || x.strong_compression)
 let get_weak_compression x = x.weak_compression
 let get_strong_compression x = x.strong_compression
-let get_cache_size x = !cache_size 
+let get_cache_size x = !cache_size
+
+let getMaxEventValue () =
+  match !maxEventValue with
+  | Some n -> Nbr.I n
+  | None -> Printf.eprintf "[emax] constant is evaluated to infinity";
+	    Nbr.F infinity
+
+let getMaxTimeValue () =
+  match !maxTimeValue with
+  | Some t -> Nbr.F t
+  | None -> Printf.eprintf "[tmax] constant is evaluated to infinity";
+	    Nbr.F infinity
