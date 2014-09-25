@@ -3,23 +3,23 @@ OPTIONS? =
 
 ## put here the names of your source files (in the right order)
 SOURCES = \
-		dataStructures/color.ml dataStructures/pp.ml \
-		dataStructures/num.ml dataStructures/set_patched.ml \
-		dataStructures/binomialtree.ml dataStructures/largeArray.ml dataStructures/memoryManagement.ml dataStructures/longString.ml dataStructures/heap.ml dataStructures/safeHeap.ml \
-		dataStructures/tools.ml dataStructures/cache.ml main/parameter.ml dataStructures/mapExt.ml dataStructures/valMap.ml dataStructures/dynamicArray.ml dataStructures/mods.ml dataStructures/random_tree.ml \
-		Error/debug.ml Error/ExceptionDefn.ml dataStructures/liftSet.ml \
-		grammar/ast.ml grammar/kappaParser.mly grammar/kappaLexer.mll \
-		pattern/signature.ml pattern/environment.ml \
-		siteGraphs/node.ml pattern/mixture.mli  \
-		pattern/mixture.ml pattern/precondition.ml pattern/precondition.mli \
-		siteGraphs/graph.ml siteGraphs/species.ml pattern/matching.ml pattern/dynamics.ml \
-		simulation/state.ml simulation/nonLocal.ml grammar/eval.ml simulation/external.ml  \
-		cflow/graph_closure.ml \
-		cflow/priority.ml \
-		cflow/cflow_handler.ml cflow/storyProfiling.ml cflow/causal.ml  \
-		cflow/kappa_instantiation.ml cflow/po_cut.ml cflow/pseudo_inverse.ml cflow/blackboard_generation.ml cflow/blackboard.ml cflow/propagation_heuristics.ml \
-		cflow/generic_branch_and_cut_solver.ml cflow/dag.ml cflow/dag2.ml cflow/compression_main.ml  simulation/plot.ml simulation/run.ml \
-		main/KaSim.ml
+	dataStructures/color.ml dataStructures/pp.ml \
+	dataStructures/nbr.ml dataStructures/set_patched.ml \
+	dataStructures/binomialtree.ml dataStructures/largeArray.ml dataStructures/memoryManagement.ml dataStructures/longString.ml dataStructures/heap.ml dataStructures/safeHeap.ml \
+	dataStructures/tools.ml dataStructures/cache.ml main/parameter.ml dataStructures/mapExt.ml dataStructures/valMap.ml dataStructures/dynamicArray.ml dataStructures/mods.ml dataStructures/random_tree.ml \
+	Error/debug.ml Error/ExceptionDefn.ml dataStructures/liftSet.ml \
+	grammar/ast.ml grammar/kappaParser.mly grammar/kappaLexer.mll \
+	grammar/expr.ml pattern/signature.ml pattern/environment.ml \
+	siteGraphs/node.ml pattern/mixture.mli  \
+	pattern/mixture.ml pattern/precondition.ml pattern/precondition.mli \
+	siteGraphs/graph.ml siteGraphs/species.ml pattern/matching.ml pattern/dynamics.ml \
+	simulation/state.ml simulation/nonLocal.ml grammar/eval.ml simulation/external.ml  \
+	cflow/graph_closure.ml \
+	cflow/priority.ml \
+	cflow/cflow_handler.ml cflow/storyProfiling.ml cflow/causal.ml  \
+	cflow/kappa_instantiation.ml cflow/po_cut.ml cflow/pseudo_inverse.ml cflow/blackboard_generation.ml cflow/blackboard.ml cflow/propagation_heuristics.ml \
+	cflow/generic_branch_and_cut_solver.ml cflow/dag.ml cflow/dag2.ml cflow/compression_main.ml  simulation/plot.ml simulation/run.ml \
+	main/KaSim.ml
 
 ## the name of the resulting executable
 ifeq (Windows,$(findstring Windows,$(OS)))
