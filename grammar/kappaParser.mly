@@ -343,42 +343,44 @@ constant:
     | INT {add_pos (Ast.CONST (Nbr.I $1))}
     | EMAX {add_pos Ast.EMAX}
     | TMAX {add_pos Ast.TMAX}
-    | CPUTIME {add_pos Ast.CPUTIME}
+    | CPUTIME {add_pos (Ast.STATE_ALG_OP (Term.CPUTIME))}
     ;
 
 variable:
     | PIPE ID PIPE {let str,pos = $2 in add_pos (Ast.TOKEN_ID (str))}
     | LABEL {let str,pos = $1 in add_pos (Ast.OBS_VAR (str))}
-    | TIME {add_pos Ast.TIME_VAR}
-    | EVENT {add_pos Ast.EVENT_VAR}
-    | NULL_EVENT {add_pos Ast.NULL_EVENT_VAR}
-    | PROD_EVENT {add_pos Ast.PROD_EVENT_VAR}
+    | TIME {add_pos (Ast.STATE_ALG_OP (Term.TIME_VAR))}
+    | EVENT {add_pos (Ast.STATE_ALG_OP (Term.EVENT_VAR))}
+    | NULL_EVENT {add_pos (Ast.STATE_ALG_OP (Term.NULL_EVENT_VAR))}
+    | PROD_EVENT {add_pos (Ast.STATE_ALG_OP (Term.PROD_EVENT_VAR))}
     ;
 
 small_alg_expr:
     | OP_PAR alg_expr CL_PAR {$2}
     | constant {$1}
     | variable {$1}
-    | MAX small_alg_expr small_alg_expr {add_pos (Ast.MAX ($2,$3))}
-    | MIN small_alg_expr small_alg_expr {add_pos (Ast.MIN ($2,$3))}
-    | EXPONENT alg_expr {add_pos (Ast.EXP ($2))}
-    | SINUS alg_expr {add_pos (Ast.SINUS ($2))}
-    | COSINUS alg_expr {add_pos (Ast.COSINUS ($2))}
-    | TAN alg_expr {add_pos (Ast.TAN ($2))}
-    | ABS alg_expr {add_pos (Ast.INT ($2))}
-    | SQRT alg_expr {add_pos (Ast.SQRT ($2))}
-    | LOG alg_expr {add_pos (Ast.LOG ($2))}
+    | MAX small_alg_expr small_alg_expr
+	  {add_pos (Ast.BIN_ALG_OP(Term.MAX,$2,$3))}
+    | MIN small_alg_expr small_alg_expr
+	  {add_pos (Ast.BIN_ALG_OP(Term.MIN,$2,$3))}
+    | EXPONENT alg_expr {add_pos (Ast.UN_ALG_OP(Term.EXP,$2))}
+    | SINUS alg_expr {add_pos (Ast.UN_ALG_OP(Term.SINUS,$2))}
+    | COSINUS alg_expr {add_pos (Ast.UN_ALG_OP(Term.COSINUS,$2))}
+    | TAN alg_expr {add_pos (Ast.UN_ALG_OP(Term.TAN,$2))}
+    | ABS alg_expr {add_pos (Ast.UN_ALG_OP(Term.INT,$2))}
+    | SQRT alg_expr {add_pos (Ast.UN_ALG_OP(Term.SQRT,$2))}
+    | LOG alg_expr {add_pos (Ast.UN_ALG_OP(Term.LOG,$2))}
     ;
 
 alg_expr:
-    | MINUS alg_expr { add_pos (Ast.UMINUS $2) }
+    | MINUS alg_expr { add_pos (Ast.UN_ALG_OP(Term.UMINUS,$2)) }
     | small_alg_expr { $1 }
-    | alg_expr MULT alg_expr {add_pos (Ast.MULT ($1,$3))}
-    | alg_expr PLUS alg_expr {add_pos (Ast.SUM ($1,$3))}
-    | alg_expr DIV alg_expr {add_pos (Ast.DIV ($1,$3))}
-    | alg_expr MINUS alg_expr {add_pos (Ast.MINUS ($1,$3))}
-    | alg_expr POW alg_expr {add_pos (Ast.POW ($1,$3))}
-    | alg_expr MODULO alg_expr {add_pos (Ast.MODULO ($1,$3))}
+    | alg_expr MULT alg_expr {add_pos (Ast.BIN_ALG_OP(Term.MULT,$1,$3))}
+    | alg_expr PLUS alg_expr {add_pos (Ast.BIN_ALG_OP(Term.SUM,$1,$3))}
+    | alg_expr DIV alg_expr {add_pos (Ast.BIN_ALG_OP(Term.DIV,$1,$3))}
+    | alg_expr MINUS alg_expr {add_pos (Ast.BIN_ALG_OP(Term.MINUS,$1,$3))}
+    | alg_expr POW alg_expr {add_pos (Ast.BIN_ALG_OP(Term.POW,$1,$3))}
+    | alg_expr MODULO alg_expr {add_pos (Ast.BIN_ALG_OP(Term.MODULO,$1,$3))}
 
 rate:
     | alg_expr OP_PAR alg_with_radius CL_PAR {($1,Some $3,None)}

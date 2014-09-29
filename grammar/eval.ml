@@ -298,7 +298,7 @@ let rec partial_eval_alg env (ast, (beg_pos,end_pos)) =
      ((fun _ _ _ _ _ _ _-> v), true, Some v, DepSet.empty)
   | CONST n ->
      ((fun _ _ _ _ _ _ _-> n), true, (Some n), DepSet.empty)
-  | CPUTIME ->
+  | STATE_ALG_OP (Term.CPUTIME) ->
      ((fun _ _ _ _ _ cpu_t _-> Nbr.F (cpu_t -. !Parameter.cpuTime)), false,
       Some (Nbr.F 0.), (DepSet.singleton Mods.EVENT))
   | OBS_VAR lab ->
@@ -332,48 +332,21 @@ let rec partial_eval_alg env (ast, (beg_pos,end_pos)) =
      in
      ((fun _ _ _ _ _ _ tk -> tk i),false,Some (Nbr.F 0.),
       DepSet.singleton (Mods.TOK i))
-  | TIME_VAR ->
+  | STATE_ALG_OP (Term.TIME_VAR) ->
      ((fun _ _ t _ _ _ _-> Nbr.F t), false, Some (Nbr.F 0.),
       (DepSet.singleton Mods.TIME))
-  | EVENT_VAR ->
+  | STATE_ALG_OP (Term.EVENT_VAR) ->
      ((fun _ _ _ e ne _ _-> Nbr.I (e+ne)), false, Some (Nbr.I 0),
       (DepSet.singleton Mods.EVENT))
-  | NULL_EVENT_VAR ->
+  | STATE_ALG_OP (Term.NULL_EVENT_VAR) ->
      ((fun _ _ _ _ ne _ _-> Nbr.I ne), false, Some (Nbr.I 0),
       (DepSet.singleton Mods.EVENT))
-  | PROD_EVENT_VAR ->
+  | STATE_ALG_OP (Term.PROD_EVENT_VAR) ->
      ((fun _ _ _ e _ _ _-> Nbr.I e), false,Some (Nbr.I 0),
       (DepSet.singleton Mods.EVENT))
-  | DIV (ast, ast') ->
-     bin_op ast ast' (Nbr.cast_bin_op ~op_f:(/.))
-  | SUM (ast, ast') -> bin_op ast ast' Nbr.add
-  | MULT (ast, ast') -> bin_op ast ast'  Nbr.mult
-  | MINUS (ast, ast') -> bin_op ast ast' Nbr.sub
-  | POW (ast, ast') ->
-     bin_op ast ast' (Nbr.cast_bin_op
-			~op_f:( ** ) ~op_i:Tools.pow
-			~op_i64:Tools.pow64)
-  | MAX (ast, ast') -> bin_op ast ast' Nbr.max
-  | MIN (ast,ast') -> bin_op ast ast' Nbr.min
-  | MODULO (ast, ast') ->
-     bin_op ast ast'
-	    (Nbr.cast_bin_op
-	       ~op_f:(fun a b ->
-		      float_of_int
-			(int_of_float a mod int_of_float b))
-	       ~op_i:(mod)
-	       ~op_i64:Int64.rem
-	    )
-  | COSINUS ast -> un_op ast (Nbr.cast_un_op ~op_f:cos)
-  | TAN ast -> un_op ast (Nbr.cast_un_op ~op_f:tan)
-  | SINUS ast -> un_op ast (Nbr.cast_un_op ~op_f:sin)
-  | EXP ast -> un_op ast (Nbr.cast_un_op ~op_f:exp)
-  | SQRT ast -> un_op ast (Nbr.cast_un_op ~op_f:sqrt)
-  | INT ast -> un_op ast (Nbr.cast_un_op
-			    ~op_i:(fun x -> x)
-			    ~op_i64:(fun x -> x))
-  | LOG ast -> un_op ast (Nbr.cast_un_op ~op_f:log)
-  | UMINUS ast -> un_op ast Nbr.neg
+  | BIN_ALG_OP (op,ast, ast') ->
+     bin_op ast ast' (Nbr.of_bin_alg_op op)
+  | UN_ALG_OP (op,ast) -> un_op ast (Nbr.of_un_alg_op op)
 
 let rec partial_eval_bool env (ast,_) =
   let bin_op_bool ast ast' op =
@@ -709,7 +682,7 @@ let obs_of_result env res =
     (fun cont alg_expr ->
      let (f, const, opt_v, dep) = (partial_eval_alg env alg_expr)
      in
-     (f,const,opt_v,dep,Expr.alg_to_string () (fst alg_expr)) :: cont
+     (f,const,opt_v,dep,Expr.ast_alg_to_string () (fst alg_expr)) :: cont
     )
     [] res.observables
 
@@ -731,7 +704,7 @@ let effects_of_modif variables env ast_list =
 	    in
 	    let str =
 	      (Printf.sprintf "introduce %a * %s"
-			      Expr.alg_to_string (fst alg_expr)
+			      Expr.ast_alg_to_string (fst alg_expr)
 			      (Mixture.to_kappa false env m))::str_pert
 	    in (variables, (Dynamics.INTRO (v, m))::effects, str, env)
 	 | DELETE (alg_expr, ast_mix, pos) ->
@@ -748,7 +721,7 @@ let effects_of_modif variables env ast_list =
 	      else Dynamics.VAR x
 	    in
 	    let str =
-	      (Printf.sprintf "remove %a * %s" Expr.alg_to_string (fst alg_expr)
+	      (Printf.sprintf "remove %a * %s" Expr.ast_alg_to_string (fst alg_expr)
 			      (Mixture.to_kappa false env m))::str_pert
 	    in ((m :: variables), (Dynamics.DELETE (v, m))::effects, str, env)
 	 | UPDATE ((nme, pos_rule), alg_expr) ->
@@ -776,7 +749,7 @@ let effects_of_modif variables env ast_list =
 	       else
 		 Printf.sprintf "set variable '%s' to %a"
 				(fst (Environment.alg_of_num i env)))
-		Expr.alg_to_string (fst alg_expr)::str_pert
+		Expr.ast_alg_to_string (fst alg_expr)::str_pert
 	    in
 	    if is_rule then (variables, (Dynamics.UPDATE_RULE (i, v))::effects, str, env)
 	    else (variables, (Dynamics.UPDATE_VAR (i, v))::effects, str, env)
@@ -795,7 +768,7 @@ let effects_of_modif variables env ast_list =
 	      else Dynamics.VAR x
 	    in
 	    let str = (Printf.sprintf "set token '%s' to value %a" tk_nme
-				      Expr.alg_to_string (fst alg_expr))::str_pert
+				      Expr.ast_alg_to_string (fst alg_expr))::str_pert
 	    in
 	    (variables, (Dynamics.UPDATE_TOK (tk_id, v))::effects, str, env)
 	 | SNAPSHOT (pexpr,pos) ->
@@ -833,7 +806,7 @@ let effects_of_modif variables env ast_list =
 		(fun cont (pexpr,pos) ->
 		 match pexpr with
 		 | Ast.Str_pexpr str -> str::cont
-		 | Ast.Alg_pexpr alg -> Expr.alg_to_string () alg::cont
+		 | Ast.Alg_pexpr alg -> Expr.ast_alg_to_string () alg::cont
 		) [] print
 	    in
 	    let str = (Printf.sprintf "Print %s" (Tools.string_of_list (fun i->i) str_l))::str_pert
@@ -867,8 +840,8 @@ let pert_of_result variables env res =
        let str_pert,opt_abort =
 	 match opt_post with
 	 | None ->
-	    (Printf.sprintf "whenever %a, %s" Expr.bool_to_string (fst pre_expr)
-			    str_eff,None)
+	    (Printf.sprintf "whenever %a, %s"
+			    Expr.bool_to_string (fst pre_expr) str_eff,None)
 	 | Some post_expr ->
 	    let (x, is_constant, dep, stopping_time) =
 	      try partial_eval_bool env post_expr with
@@ -883,7 +856,8 @@ let pert_of_result variables env res =
 	    in
 	    (Printf.sprintf "whenever %a, %s until %a"
 			    Expr.bool_to_string (fst pre_expr) str_eff
-			    Expr.bool_to_string (fst post_expr),Some (bv,dep))
+			    Expr.bool_to_string (fst post_expr),
+	     Some (bv,dep))
        in
        let env,p_id = Environment.declare_pert (str_pert,pos) env in
        let env,effect_list,_ =
@@ -1057,7 +1031,7 @@ let init_graph_of_result env res =
 			  (ExceptionDefn.Semantics_Error
 			     (pos,
 			      Printf.sprintf "%a is not a constant, cannot initialize graph."
-					     Expr.alg_to_string (fst alg)))
+					     Expr.ast_alg_to_string (fst alg)))
 	    in
 	    let n = match !Parameter.rescale with
 	      | None -> Nbr.to_int value
@@ -1082,7 +1056,7 @@ let init_graph_of_result env res =
 	       raise (ExceptionDefn.Semantics_Error
 			(pos_tk,
 			 Printf.sprintf "%a is not a constant, cannot initialize token value."
-					Expr.alg_to_string (fst alg)))
+					Expr.ast_alg_to_string (fst alg)))
 	  in
 	  let tok_id =
 	    try Environment.num_of_token tk_nme env
