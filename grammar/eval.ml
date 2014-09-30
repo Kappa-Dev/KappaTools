@@ -387,295 +387,300 @@ let rec partial_eval_bool env (ast,_) =
 	bin_op_alg ast ast' (fun v v' -> not (Nbr.is_equal v v'))
 
 let mixture_of_ast ?(tolerate_new_state=false) mix_id_opt is_pattern env ast_mix =
-	let rec eval_mixture env ast_mix ctxt mixture =
-		match ast_mix with
-		| Ast.COMMA (a, ast_mix) ->
-				let (ctxt, agent, env) = eval_agent is_pattern tolerate_new_state env a ctxt in
-				let id = ctxt.curr_id and new_edges = ctxt.new_edges in
-				let (ctxt, mixture, env) =
-					eval_mixture env ast_mix
-						{
-							(ctxt)
-							with
-							curr_id = ctxt.curr_id + 1;
-							new_edges = Int2Map.empty;
-						} mixture
-				in (ctxt, (Mixture.compose id agent mixture new_edges), env)
-		| Ast.EMPTY_MIX -> (ctxt, mixture, env)
-	in
-	
-	let ctxt = { pairing = IntMap.empty; curr_id = 0; new_edges = Int2Map.empty; } in
-	let (ctxt, mix, env) = eval_mixture env ast_mix ctxt (Mixture.empty mix_id_opt)
-	in
-	begin
-		IntMap.iter (*checking that all edge identifiers are pairwise defined*)
-		(fun n link ->
-					match link with
-					| Closed -> ()
-					| Semi (_, _, pos) ->
-							let msg =
-								"edge identifier " ^ ((string_of_int n) ^ " is not paired")
-							in raise (ExceptionDefn.Semantics_Error (pos, msg))
-		)
-		ctxt.pairing;
-		let mix = Mixture.enum_alternate_anchors mix in 
-		let mix = Mixture.set_root_of_cc mix in
-			(mix,env) (*Modifies mix as a side effect*)
-	end
+  let rec eval_mixture env ast_mix ctxt mixture =
+    match ast_mix with
+    | Ast.COMMA (a, ast_mix) ->
+       let (ctxt, agent, env) = eval_agent is_pattern tolerate_new_state env a ctxt in
+       let id = ctxt.curr_id in let new_edges = ctxt.new_edges in
+       let (ctxt, mixture, env) =
+	 eval_mixture env ast_mix
+		      { ctxt with
+			curr_id = ctxt.curr_id + 1;
+			new_edges = Int2Map.empty;
+		      } mixture
+       in (ctxt, (Mixture.compose id agent mixture new_edges), env)
+    | Ast.EMPTY_MIX -> (ctxt, mixture, env)
+  in
+  let ctxt = { pairing = IntMap.empty; curr_id = 0; new_edges = Int2Map.empty; } in
+  let (ctxt, mix, env) = eval_mixture env ast_mix ctxt (Mixture.empty mix_id_opt)
+  in
+  begin
+    IntMap.iter (*checking that all edge identifiers are pairwise defined*)
+      (fun n link ->
+       match link with
+       | Closed -> ()
+       | Semi (_, _, pos) ->
+	  let msg =
+	    "edge identifier " ^ ((string_of_int n) ^ " is not paired")
+	  in raise (ExceptionDefn.Semantics_Error (pos, msg))
+      )
+      ctxt.pairing;
+    let mix = Mixture.enum_alternate_anchors mix in
+    let mix = Mixture.set_root_of_cc mix in
+    (mix,env) (*Modifies mix as a side effect*)
+  end
 
 let signature_of_ast s env =
-	let (name, ast_intf, pos) =
-		((s.Ast.ag_nme), (s.Ast.ag_intf), (s.Ast.ag_pos)) in
-	let intf_map = eval_intf ast_intf in 
-	let env,name_id = Environment.declare_name name pos env in
-	(Signature.create name_id intf_map,env)
-	
-let token_of_ast abs_tk env = 
-	let (name, pos) = abs_tk in
-	Environment.declare_token name pos env
+  let (name, ast_intf, pos) =
+    ((s.Ast.ag_nme), (s.Ast.ag_intf), (s.Ast.ag_pos)) in
+  let intf_map = eval_intf ast_intf in
+  let env,name_id = Environment.declare_name name pos env in
+  (Signature.create name_id intf_map,env)
 
-let reduce_val v env = 
-	let (k, const, opt_v, dep) = partial_eval_alg env v
-	in
-	if const then match opt_v with 
-		| Some v -> (Dynamics.CONST v, dep)
-		| None -> invalid_arg "Eval.reduce_val: Variable is constant but was not evaluated"
-	else ((VAR k), dep)
+let token_of_ast abs_tk env =
+  let (name, pos) = abs_tk in
+  Environment.declare_token name pos env
 
-let rule_of_ast ?(backwards=false) env (ast_rule_label, ast_rule) tolerate_new_state = 
-	let ast_rule_label,ast_rule = if backwards then Ast.flip (ast_rule_label, ast_rule) else (ast_rule_label, ast_rule) in
-	let (env, lhs_id) =
-		Environment.declare_var_kappa ~from_rule:true ast_rule_label.lbl_nme env in
-	(* reserving an id for rule's lhs in the pattern table *)
-	let env = Environment.declare_rule ast_rule_label.lbl_nme lhs_id env in
-	let (k_def, dep) =
-		let k_def = ast_rule.k_def in
-		let k_def,dep = reduce_val k_def env in
-		(k_def,dep)
-	
-	and (env,k_alt,radius,dep_alt) =
-		match ast_rule.k_un with
-		| None -> (env,None,None, DepSet.empty)
-		| Some (ast,ast_opt) -> (****TODO HERE treat ast_opt that specifies application radius****)
-				let env = Environment.declare_unary_rule (Some (Environment.kappa_of_num lhs_id env,Tools.no_pos)) (*ast_rule_label.lbl_nme*) lhs_id env in
-				let k_alt,dep = reduce_val ast env in
-				let radius_alt,dep = match ast_opt with None -> (None,dep) | Some v -> let rad,dep' = (reduce_val v env) in (Some rad,DepSet.union dep dep')  
-				in
-				(env,Some k_alt,radius_alt,dep)
-	in
-	let lhs,env = mixture_of_ast (Some lhs_id) true env ast_rule.lhs
-	in 
-	let lhs = match k_alt with None -> lhs | Some _ -> Mixture.set_unary lhs in
-	let rhs,env = mixture_of_ast ~tolerate_new_state:tolerate_new_state None true env ast_rule.rhs in
-	let (script, balance,added,modif_sites(*,side_effects*)) = Dynamics.diff ast_rule.rule_pos lhs rhs ast_rule_label.lbl_nme env
-	
-	and kappa_lhs = Mixture.to_kappa false env lhs
-	
-	and kappa_rhs = Mixture.to_kappa false env rhs
-	in
-	let tokenify l = 
-		List.map 
-		(fun (alg_expr,(nme,pos)) ->
-			let id =  
-				try Environment.num_of_token nme env 
-				with Not_found -> raise (ExceptionDefn.Semantics_Error (pos,"Token "^nme^" is undefined"))
-			in
-			let (f, is_const, opt_v, _ ) = partial_eval_alg env alg_expr (*dependencies are not important here since variable is evaluated only when rule is applied*) 
-			in
-			let v =
-			if is_const then (match opt_v with
-					    Some v -> Dynamics.CONST v
-					  | None ->
-					     invalid_arg "Eval.rule_of_ast: Variable is constant but was not evaluated")
-			else VAR f
-			in
-			(v,id)
-		) l
-	in
-	let add_token = tokenify ast_rule.add_token 
-	and rm_token = tokenify ast_rule.rm_token
-	in
-	let ref_id =
-		match ast_rule_label.lbl_ref with
-		| None -> None
-		| Some (ref, pos) ->
-				(try Some (Environment.num_of_kappa ref env)
-				with
-				| Not_found ->
-						raise
-							(ExceptionDefn.Semantics_Error (pos, "undefined label " ^ ref))) in
-	let r_id = Mixture.get_id lhs in
-	let env = if Mixture.is_empty lhs then Environment.declare_empty_lhs r_id env else env in
-	let env =
-		DepSet.fold (*creating dependencies between variables in the kinetic rate and the activity of the rule*)
-			(fun dep env ->
-				(*Printf.printf "rule %d depends on %s\n" r_id (Mods.string_of_dep dep) ; *)
-				Environment.add_dependencies dep (RULE r_id) env)
-			(DepSet.union dep dep_alt) env
-	in
-	let pre_causal = Dynamics.compute_causal lhs rhs script env in
-	
-	let connect_impact,disconnect_impact,side_eff_impact =
-		List.fold_left 
-		(fun (con_map,dis_map,side_eff) action ->
-			match action with
-				| Dynamics.BND ((KEPT id,s),(KEPT id',s')) -> (*binding with a fresh agent doesn't impact connectedness*)
-					let cc_id = Mixture.component_of_id id lhs
-					and cc_id' = Mixture.component_of_id id' lhs
-					in
-					if cc_id = cc_id' then (con_map,dis_map,side_eff) (*rule binds two ports that were already part of the same cc*)
-					else 
-						let eq_id = try IntMap.find cc_id con_map with Not_found -> cc_id
-						and eq_id'= try IntMap.find cc_id' con_map with Not_found -> cc_id'
-						in
-						let min_eq,max_eq = (min eq_id eq_id',max eq_id eq_id') in
-						let con_map = IntMap.add cc_id min_eq con_map in
-						let con_map = IntMap.add cc_id' min_eq con_map in
-						let con_map = IntMap.add max_eq min_eq con_map in
-						(con_map,dis_map,side_eff)
-				| Dynamics.FREE ((KEPT id,s),side_effect_free) ->
-					if side_effect_free then
-						begin
-						let id' = match Mixture.follow (id,s) lhs with None -> invalid_arg "Eval.build_cc_impact: Free action should be side effect free" | Some (id',s') -> id' in
-						let is_deleted = not (IntMap.mem id' (Mixture.agents rhs)) in
-						if is_deleted then (con_map,dis_map,side_eff) (*will deal with this case in the deletion action*)
-						else
-							let cc_id = Mixture.component_of_id id rhs
-							and cc_id' = Mixture.component_of_id id' rhs
-							in
-							if cc_id = cc_id' then (con_map,dis_map,side_eff) (*rule breaks two ports that are still connected in the rhs*)
-							else 
-								let class1 = try IntMap.find cc_id dis_map with Not_found -> IntSet.empty
-								and class2 =  try IntMap.find cc_id' dis_map with Not_found -> IntSet.empty
-								in
-								let dis_map = IntMap.add cc_id (IntSet.add cc_id' class1) dis_map in
-								let dis_map = IntMap.add cc_id' (IntSet.add cc_id class2) dis_map in
-								(con_map,dis_map,side_eff)
-						end
-					else (*semi link deletion*)
-						let set = try IntMap.find id side_eff with Not_found -> IntSet.empty in
-						let side_eff = IntMap.add id (IntSet.add s set) side_eff in
-						(con_map,dis_map,side_eff)
-				| Dynamics.DEL id -> 
-					let ag = Mixture.agent_of_id id lhs in
-					let sign = Environment.get_sig (Mixture.name ag) env in
-					let set = try IntMap.find id (side_eff:IntSet.t IntMap.t) with Not_found -> IntSet.empty in
-					let set = 
-						Signature.fold 
-						(fun site_id set -> 
-							if site_id = 0 then set 
-							else
-								let opt = Mixture.follow (id,site_id) lhs in
-								match opt with
-									| None ->
-										begin 
-										try 
-											let _,lnk = IntMap.find site_id (Mixture.interface (Mixture.agent_of_id id lhs)) in 
-											match lnk with 
-												| Node.BND | Node.TYPE _ -> IntSet.add site_id set (*semi link deletion*) 
-												| _ -> set
-										with
-											| Not_found -> IntSet.add site_id set (*deletion of site that was not mentionned so possible side_effect*)
-										end
-									| Some _ -> IntSet.add site_id set (*link deletion because deleted agent was connected in the lhs*)
-						) sign set
-					in 
-						(con_map,dis_map,IntMap.add id set side_eff)
-				| _ -> (con_map,dis_map,side_eff)
-		) (IntMap.empty,IntMap.empty,IntMap.empty) script
-	in
-	let connect_impact = 
-		IntMap.fold 
-		(fun cc_id eq_id map -> let set = try IntMap.find eq_id map with Not_found -> IntSet.empty in IntMap.add eq_id (IntSet.add cc_id set) map
-		) connect_impact IntMap.empty 
-	in
-	let env = 
-		(match k_alt with 
-			| None -> env
-			| Some _ -> (*rule has a unary version*)
-				let ptr_env = ref {env with Environment.has_intra=true} in
-				let cc_id = ref 0 in
-				while !cc_id < (Mixture.arity lhs) do
-					let ag_root = 
-						let id = match Mixture.root_of_cc lhs !cc_id with None -> invalid_arg "Eval.rule_of_ast" | Some i -> i in
-						Mixture.agent_of_id id lhs
-					in
-					let env' = Environment.declare_nl_element (Mixture.get_id lhs) !cc_id (Mixture.name ag_root) !ptr_env in
-					ptr_env := env' ;
-					cc_id := !cc_id+1 ;
-				done ; !ptr_env)
-	in
-	(env,
-		{
-			Dynamics.add_token = add_token ;
-			Dynamics.rm_token = rm_token ;
-			Dynamics.k_def = k_def ;
-			Dynamics.k_alt = (k_alt,radius) ;
-			Dynamics.over_sampling = None;
-			Dynamics.script = script;
-			Dynamics.kappa = kappa_lhs ^ ("->" ^ kappa_rhs);
-			Dynamics.balance = balance;
-			Dynamics.refines = ref_id;
-			Dynamics.lhs = lhs;
-			Dynamics.rhs = rhs;
-			Dynamics.r_id = r_id;
-			Dynamics.added = List.fold_left (fun set i -> IntSet.add i set) IntSet.empty added ;
-			(*Dynamics.side_effect = side_effect ; *)
-			Dynamics.modif_sites = modif_sites ;
-			Dynamics.is_pert = false ;
-			Dynamics.pre_causal = pre_causal ;
-			Dynamics.cc_impact = Some (connect_impact,disconnect_impact,side_eff_impact)  
-		})
+let reduce_val v env =
+  let (k, const, opt_v, dep) = partial_eval_alg env v
+  in
+  if const then
+    match opt_v with
+    | Some v -> (Dynamics.CONST v, dep)
+    | None -> invalid_arg "Eval.reduce_val: Variable is constant but was not evaluated"
+  else ((VAR k), dep)
+
+let rule_of_ast ?(backwards=false) env (ast_rule_label, ast_rule) tolerate_new_state =
+  let ast_rule_label,ast_rule = if backwards then Ast.flip (ast_rule_label, ast_rule) else (ast_rule_label, ast_rule) in
+  let (env, lhs_id) =
+    Environment.declare_var_kappa ~from_rule:true ast_rule_label.lbl_nme env in
+  (* reserving an id for rule's lhs in the pattern table *)
+  let env = Environment.declare_rule ast_rule_label.lbl_nme lhs_id env in
+  let (k_def, dep) =
+    let k_def = ast_rule.k_def in
+    let k_def,dep = reduce_val k_def env in
+    (k_def,dep)
+  and (env,k_alt,radius,dep_alt) =
+    match ast_rule.k_un with
+    | None -> (env,None,None, DepSet.empty)
+    | Some (ast,ast_opt) -> (****TODO HERE treat ast_opt that specifies application radius****)
+       let env =
+	 Environment.declare_unary_rule (Some (Environment.kappa_of_num lhs_id env,Tools.no_pos)) (*ast_rule_label.lbl_nme*) lhs_id env in
+       let k_alt,dep = reduce_val ast env in
+       let radius_alt,dep = match ast_opt with
+	   None -> (None,dep)
+	 | Some v -> let rad,dep' = (reduce_val v env) in
+		     (Some rad,DepSet.union dep dep')
+       in
+       (env,Some k_alt,radius_alt,dep)
+  in
+  let lhs,env = mixture_of_ast (Some lhs_id) true env ast_rule.lhs
+  in
+  let lhs = match k_alt with None -> lhs | Some _ -> Mixture.set_unary lhs in
+  let rhs,env = mixture_of_ast ~tolerate_new_state None true env ast_rule.rhs in
+  let (script, balance,added,modif_sites(*,side_effects*)) =
+    Dynamics.diff ast_rule.rule_pos lhs rhs ast_rule_label.lbl_nme env
+
+  and kappa_lhs = Mixture.to_kappa false env lhs
+
+  and kappa_rhs = Mixture.to_kappa false env rhs in
+  let tokenify l =
+    List.map
+      (fun (alg_expr,(nme,pos)) ->
+       let id =
+	 try Environment.num_of_token nme env
+	 with Not_found -> raise (ExceptionDefn.Semantics_Error (pos,"Token "^nme^" is undefined"))
+       in
+       let (f, is_const, opt_v, _ ) = partial_eval_alg env alg_expr (*dependencies are not important here since variable is evaluated only when rule is applied*)
+       in
+       let v =
+	 if is_const then (match opt_v with
+			     Some v -> Dynamics.CONST v
+			   | None ->
+			      invalid_arg "Eval.rule_of_ast: Variable is constant but was not evaluated")
+	 else VAR f
+       in
+       (v,id)
+      ) l
+  in
+  let add_token = tokenify ast_rule.add_token
+  and rm_token = tokenify ast_rule.rm_token
+  in
+  let ref_id =
+    match ast_rule_label.lbl_ref with
+    | None -> None
+    | Some (ref, pos) ->
+       (try Some (Environment.num_of_kappa ref env)
+	with
+	| Not_found ->
+	   raise
+	     (ExceptionDefn.Semantics_Error (pos, "undefined label " ^ ref))) in
+  let r_id = Mixture.get_id lhs in
+  let env = if Mixture.is_empty lhs then Environment.declare_empty_lhs r_id env else env in
+  let env =
+    DepSet.fold (*creating dependencies between variables in the kinetic rate and the activity of the rule*)
+      (fun dep env ->
+       (*Printf.printf "rule %d depends on %s\n" r_id (Mods.string_of_dep dep) ; *)
+       Environment.add_dependencies dep (RULE r_id) env)
+      (DepSet.union dep dep_alt) env
+  in
+  let pre_causal = Dynamics.compute_causal lhs rhs script env in
+
+  let connect_impact,disconnect_impact,side_eff_impact =
+    List.fold_left
+      (fun (con_map,dis_map,side_eff) action ->
+       match action with
+       | Dynamics.BND ((KEPT id,s),(KEPT id',s')) -> (*binding with a fresh agent doesn't impact connectedness*)
+	  let cc_id = Mixture.component_of_id id lhs
+	  and cc_id' = Mixture.component_of_id id' lhs
+	  in
+	  if cc_id = cc_id' then (con_map,dis_map,side_eff) (*rule binds two ports that were already part of the same cc*)
+	  else
+	    let eq_id = try IntMap.find cc_id con_map with Not_found -> cc_id
+	    and eq_id'= try IntMap.find cc_id' con_map with Not_found -> cc_id'
+	    in
+	    let min_eq,max_eq = (min eq_id eq_id',max eq_id eq_id') in
+	    let con_map = IntMap.add cc_id min_eq con_map in
+	    let con_map = IntMap.add cc_id' min_eq con_map in
+	    let con_map = IntMap.add max_eq min_eq con_map in
+	    (con_map,dis_map,side_eff)
+       | Dynamics.FREE ((KEPT id,s),side_effect_free) ->
+	  if side_effect_free then
+	    begin
+	      let id' = match Mixture.follow (id,s) lhs with None -> invalid_arg "Eval.build_cc_impact: Free action should be side effect free" | Some (id',s') -> id' in
+	      let is_deleted = not (IntMap.mem id' (Mixture.agents rhs)) in
+	      if is_deleted then (con_map,dis_map,side_eff) (*will deal with this case in the deletion action*)
+	      else
+		let cc_id = Mixture.component_of_id id rhs
+		and cc_id' = Mixture.component_of_id id' rhs
+		in
+		if cc_id = cc_id' then (con_map,dis_map,side_eff) (*rule breaks two ports that are still connected in the rhs*)
+		else
+		  let class1 = try IntMap.find cc_id dis_map with Not_found -> IntSet.empty
+		  and class2 =  try IntMap.find cc_id' dis_map with Not_found -> IntSet.empty
+		  in
+		  let dis_map = IntMap.add cc_id (IntSet.add cc_id' class1) dis_map in
+		  let dis_map = IntMap.add cc_id' (IntSet.add cc_id class2) dis_map in
+		  (con_map,dis_map,side_eff)
+	    end
+	  else (*semi link deletion*)
+	    let set = try IntMap.find id side_eff with Not_found -> IntSet.empty in
+	    let side_eff = IntMap.add id (IntSet.add s set) side_eff in
+	    (con_map,dis_map,side_eff)
+       | Dynamics.DEL id ->
+	  let ag = Mixture.agent_of_id id lhs in
+	  let sign = Environment.get_sig (Mixture.name ag) env in
+	  let set = try IntMap.find id (side_eff:IntSet.t IntMap.t) with Not_found -> IntSet.empty in
+	  let set =
+	    Signature.fold
+	      (fun site_id set ->
+	       if site_id = 0 then set
+	       else
+		 let opt = Mixture.follow (id,site_id) lhs in
+		 match opt with
+		 | None ->
+		    begin
+		      try
+			let _,lnk =
+			  IntMap.find site_id (Mixture.interface (Mixture.agent_of_id id lhs)) in
+			match lnk with
+			| Node.BND | Node.TYPE _ ->
+				      IntSet.add site_id set (*semi link deletion*)
+			| _ -> set
+		      with
+		      | Not_found ->
+			 IntSet.add site_id set (*deletion of site that was not mentionned so possible side_effect*)
+		    end
+		 | Some _ ->
+		    IntSet.add site_id set (*link deletion because deleted agent was connected in the lhs*)
+	      ) sign set
+	  in
+	  (con_map,dis_map,IntMap.add id set side_eff)
+       | _ -> (con_map,dis_map,side_eff)
+      ) (IntMap.empty,IntMap.empty,IntMap.empty) script
+  in
+  let connect_impact =
+    IntMap.fold
+      (fun cc_id eq_id map -> let set = try IntMap.find eq_id map with Not_found -> IntSet.empty in IntMap.add eq_id (IntSet.add cc_id set) map
+      ) connect_impact IntMap.empty
+  in
+  let env =
+    (match k_alt with
+     | None -> env
+     | Some _ -> (*rule has a unary version*)
+	let ptr_env = ref {env with Environment.has_intra=true} in
+	let cc_id = ref 0 in
+	while !cc_id < (Mixture.arity lhs) do
+	  let ag_root =
+	    let id = match Mixture.root_of_cc lhs !cc_id with None -> invalid_arg "Eval.rule_of_ast" | Some i -> i in
+	    Mixture.agent_of_id id lhs
+	  in
+	  let env' = Environment.declare_nl_element (Mixture.get_id lhs) !cc_id (Mixture.name ag_root) !ptr_env in
+	  ptr_env := env' ;
+	  cc_id := !cc_id+1 ;
+	done ; !ptr_env)
+  in
+  (env,
+   {
+     Dynamics.add_token = add_token ;
+     Dynamics.rm_token = rm_token ;
+     Dynamics.k_def = k_def ;
+     Dynamics.k_alt = (k_alt,radius) ;
+     Dynamics.over_sampling = None;
+     Dynamics.script = script;
+     Dynamics.kappa = kappa_lhs ^ ("->" ^ kappa_rhs);
+     Dynamics.balance = balance;
+     Dynamics.refines = ref_id;
+     Dynamics.lhs = lhs;
+     Dynamics.rhs = rhs;
+     Dynamics.r_id = r_id;
+     Dynamics.added = List.fold_left (fun set i -> IntSet.add i set) IntSet.empty added ;
+     (*Dynamics.side_effect = side_effect ; *)
+     Dynamics.modif_sites = modif_sites ;
+     Dynamics.is_pert = false ;
+     Dynamics.pre_causal = pre_causal ;
+     Dynamics.cc_impact = Some (connect_impact,disconnect_impact,side_eff_impact)
+  })
 
 let variables_of_result env res =
-	let is_pattern = true
+  let is_pattern = true
+  in
+  List.fold_left
+    (fun (env, mixtures, vars) var ->
+     match var with
+     | Ast.VAR_KAPPA (ast, label_pos) ->
+	let (env, id) =
+	  Environment.declare_var_kappa (Some label_pos) env in
+	let mix,env = mixture_of_ast (Some id) is_pattern env ast
+	in (env, (mix :: mixtures), vars)
+     | Ast.VAR_ALG (ast, label_pos) ->
+	let (f, constant, value_opt, dep) = partial_eval_alg env ast in
+	let (env, var_id) = Environment.declare_var_alg (Some label_pos) value_opt env
 	in
-	List.fold_left
-		(fun (env, mixtures, vars) var ->
-					match var with
-						| Ast.VAR_KAPPA (ast, label_pos) ->
-								let (env, id) =
-									Environment.declare_var_kappa (Some label_pos) env in
-								let mix,env = mixture_of_ast (Some id) is_pattern env ast
-								in (env, (mix :: mixtures), vars)
-						| Ast.VAR_ALG (ast, label_pos) ->
-								let (f, constant, value_opt, dep) = partial_eval_alg env ast in
-								let (env, var_id) = Environment.declare_var_alg (Some label_pos) value_opt env 
-								in
-								let v =
-									if constant then Dynamics.CONST (close_var f)
-									else 
-										Dynamics.VAR f
-								in (env, mixtures, ((v, dep, var_id) :: vars))
-		)	(env, [], []) res.Ast.variables
+	let v =
+	  if constant then Dynamics.CONST (close_var f)
+	  else
+	    Dynamics.VAR f
+	in (env, mixtures, ((v, dep, var_id) :: vars))
+    )	(env, [], []) res.Ast.variables
 
 let rules_of_result env res tolerate_new_state =
-	let (env, l) =
-		List.fold_left
-			(fun (env, cont) (ast_rule_label, ast_rule) ->
-					let (env, r) = rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state
-					in
-					match ast_rule.Ast.k_op with
-						| None -> (env,r::cont)
-						| Some k -> 
-							let (env,back_r) = rule_of_ast ~backwards:true env (ast_rule_label, ast_rule) tolerate_new_state
-							in
-							(env,back_r::(r::cont))
-			)
-			(env, []) res.Ast.rules
-	in (env, (List.rev l))
+  let (env, l) =
+    List.fold_left
+      (fun (env, cont) (ast_rule_label, ast_rule) ->
+       let (env, r) = rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state
+       in
+       match ast_rule.Ast.k_op with
+       | None -> (env,r::cont)
+       | Some k ->
+	  let (env,back_r) =
+	    rule_of_ast ~backwards:true env (ast_rule_label, ast_rule) tolerate_new_state
+	  in
+	  (env,back_r::(r::cont))
+      )
+      (env, []) res.Ast.rules
+  in (env, (List.rev l))
 
 let environment_of_result res =
-	let env = 
-		List.fold_left
-		(fun env (sign, pos) ->
-			let sign,env = signature_of_ast sign env in
-				Environment.declare_sig sign pos env
-		)
-		Environment.empty res.Ast.signatures
-	in
-	List.fold_left (fun env (tk, pos) -> token_of_ast (tk,pos) env) env res.Ast.tokens
-
+  let env =
+    List.fold_left
+      (fun env (sign, pos) ->
+       let sign,env = signature_of_ast sign env in
+       Environment.declare_sig sign pos env
+      )
+      Environment.empty res.Ast.signatures
+  in
+  List.fold_left (fun env (tk, pos) -> token_of_ast (tk,pos) env) env res.Ast.tokens
 
 let obs_of_result env res =
   List.fold_left
