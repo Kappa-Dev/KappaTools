@@ -34,7 +34,7 @@
 \def\int{\hbox{\texttt{\~}}}
 \def\tcb#1{\textcolor{blue}{\ttt{#1}}}
 \def\ttt#1{\texttt{#1}}
-\def\var#1{\textquotesingle #1\textquotesingle}
+\def\var#1{{\textquotesingle}#1{\textquotesingle}}
 
 \makeindex
 
@@ -65,7 +65,7 @@
 
 
 \title{KaSim\version~reference manual\\ \small (release 4-dev)}
-\author{J\'er\^ome Feret and Jean Krivine\thanks{corresponding author: jean.krivine@pps.univ-paris-diderot.fr} \\\url{KappaLanguage.org}}
+\author{Pierre Boutillier, J\'er\^ome Feret and Jean Krivine\thanks{corresponding author: jean.krivine@pps.univ-paris-diderot.fr} \\\url{KappaLanguage.org}}
 
 \date{}
                                     % Activate to display a given date or no date
@@ -142,7 +142,7 @@ From a terminal window, \KaSim~can be invoked by typing
 \ITE{
 \item[\$] \ttt{KaSim -i file\_1 ... -i file\_n [option] }
 }
-where \ttt{file\_i} are the input kappa files containing the rules, initial conditions and observables, see Chapter~\ref{chap:kappa} below. Tables~\ref{tab:options} and \ref{tab:add-options} summarize all the options that can be given to the simulator. Basically, one specifies an upper bound either in bio time (arbitrary time unit), or in number of events. Note that bio-time is computed using Gillespie\textquotesingle s formula for time advance (see Fig.~\ref{fig:event-loop}) and should not be confused with CPU-time (it\textquotesingle s not even proportional). In doubt, we recommend using a bound in number of events since the cost of one event application is bounded (in CPU time) by a constant, so the simulation time of $n$ events is roughly $k$ times faster than a simulation of $k*n$ events.
+where \ttt{file\_i} are the input kappa files containing the rules, initial conditions and observables, see Chapter~\ref{chap:kappa} below. Tables~\ref{tab:options} and \ref{tab:add-options} summarize all the options that can be given to the simulator. Basically, one specifies an upper bound either in bio time (arbitrary time unit), or in number of events. Note that bio-time is computed using Gillespie{\textquotesingle}s formula for time advance (see Fig.~\ref{fig:event-loop}) and should not be confused with CPU-time (it{\textquotesingle}s not even proportional). In doubt, we recommend using a bound in number of events since the cost of one event application is bounded (in CPU time) by a constant, so the simulation time of $n$ events is roughly $k$ times faster than a simulation of $k*n$ events.
 
 \section{Main options}
 
@@ -206,8 +206,8 @@ representation of your model. We use KF\index{kappa file} to denote
 the union of the files that are given as input to \KaSim~(argument
 \ttt{-i}). Each line of the KF\index{kappa file} is interpreted by
 \KaSim~as a \emph{declaration}\index{declaration}. If the line is
-ended by the escape character~\textquotesingle
-\ttt{$\bs$}\textquotesingle ~the continuation of the
+ended by the escape character~{\textquotesingle}
+\ttt{$\bs$}{\textquotesingle} ~the continuation of the
 declaration\index{declaration} is parsed onto the next
 line. Declarations can be: agent and token \emph{signatures}
 (Sec.~\ref{sec:sig}), \emph{rules}\index{rule} (Sec.~\ref{sec:rules}),
@@ -261,11 +261,11 @@ Token signature\index{agent signature}s are declared using a statement of the fo
 
 Once agents are declared, one may add to the KF\index{kappa file} the rules\index{rule} that describe their dynamics through time. A \imp{pure rule} looks like: 
 \ITE{
-\item[] \ttt{\textquotesingle my rule\textquotesingle } {\it kappa\_expression} $\rar$ {\it kappa\_expression} \ttt{@} {\it rate}  
+\item[] \ttt{{\textquotesingle} my rule{\textquotesingle} } {\it kappa\_expression} $\rar$ {\it kappa\_expression} \ttt{@} {\it rate}  
 }
-where \ttt{\textquotesingle my rule\textquotesingle } can be any name that will refer to the subsequent rule that can be decomposed into a \emph{left hand side}\index{left hand side} (LHS) and a \emph{right hand side}\index{right hand side} (RHS) kappa expressions\index{kappa expressions} together with a \emph{kinetic rate expression} \index{kinetic rate}. One may also declare a \imp{bi-directional rule} using the convention:
+where \ttt{{\textquotesingle}my rule{\textquotesingle}} can be any name that will refer to the subsequent rule that can be decomposed into a \emph{left hand side}\index{left hand side} (LHS) and a \emph{right hand side}\index{right hand side} (RHS) kappa expressions\index{kappa expressions} together with a \emph{kinetic rate expression} \index{kinetic rate}. One may also declare a \imp{bi-directional rule} using the convention:
 \ITE{
-\item[] \ttt{\textquotesingle bi-rule\textquotesingle } {\it kappa\_expression} $\lrar$ {\it kappa\_expression} \ttt{@} {\it rate$^+$,rate$^-$}  
+\item[] \ttt{{\textquotesingle}bi-rule{\textquotesingle}} {\it kappa\_expression} $\lrar$ {\it kappa\_expression} \ttt{@} {\it rate$^+$,rate$^-$}  
 }
 Note that the above declaration\index{declaration} corresponds to writing, in addition of \ttt{\var{my-rule}}, a backward rule named \ttt{\var{my rule\_op}} which swaps left hand side and right hand side, and with rate \textit{rate$^-$}.
 
@@ -302,7 +302,7 @@ Token expressions are generated by the grammar given Table~\ref{tab:patterns} (a
 \subsubsection*{A simple rule}
 With the signature\index{agent signature} of \ttt{A} defined in the previous section, the line
 \ITE{
-\item[] \ttt{\textquotesingle A dimerization\textquotesingle~  A(x),A(y\int p)} $\rar$ \ttt{A(x!1),A(y\int p!1) @ $\ga$} 
+\item[] \ttt{{\textquotesingle}A dimerization\textquotesingle~  A(x),A(y\int p)} $\rar$ \ttt{A(x!1),A(y\int p!1) @ $\ga$} 
 }
 denotes a dimerization rule between two instances of agent \ttt{A} provided the second is phosphorylated (say that is here the meaning of \ttt{p}) on site \ttt{y}. Note that the bond between both \ttt{A}s is denoted by the identifier \ttt{!1} which uses an arbitrary integer (\ttt{!0} would denote the same bond). In Kappa, a bond may connect exactly 2 sites so any occurrence of a bond identifier \ttt{!}$n$ has to be paired with exactly one other sibling in the expression. Note also the fact that site \ttt{z} of \ttt{A} is not mentioned in the expression which means that it has no influence on the triggering of this rule. This is the \emph{don't care don't write convention} (DCDW) \index{don't care don't write} that plays a key role in resisting combinatorial explosion when writing models.
 
@@ -316,7 +316,7 @@ indicates that an agent \ttt{A} free on site \ttt{z}, no matter what its interna
 Importantly, \KaSim~respects the \emph{longest prefix convention}\index{longest prefix convention} to determine which agent in the RHS stems from an agent in the LHS. 
 In a word, from a rule of the form $a_1,\dots,a_n\rar b_1,\dots,b_k$, with $a_i$s and $b_j$s being agents, one computes the biggest indices $i\leq n$ such that the agents $a_1,\dots,a_i$ are pairwise consistent with $b_1,\dots,b_i$, \ie the $a_j$s and $b_j$s have the same name and the same number of sites. In which case we say that the for all $j\leq i$, $a_j$ is \emph{preserved} by the transition and for all $j>i$, $a_j$ is \emph{deleted} by the transition and $b_j$ is \emph{created} by the transition. This convention allows us to write a deletion rule as:
 \ITE{
-\item[] \ttt{\textquotesingle deleting A\textquotesingle\  A(x!1),A(z!1)} $\rar$ \ttt{A(x) @ $\ga$} 
+\item[] \ttt{{\textquotesingle}deleting A\textquotesingle\  A(x!1),A(z!1)} $\rar$ \ttt{A(x) @ $\ga$} 
 }
 which will remove the \ttt{A} agent in the mixture\index{mixture} that will match the second occurrence of \ttt{A} in this rule.
 
@@ -324,7 +324,7 @@ which will remove the \ttt{A} agent in the mixture\index{mixture} that will matc
 
 It may happen that the application of a rule has some \emph{side effects}\index{side effect} on agents that are not mentioned explicitly in the rule. Consider for instance the previous rule:
 \ITE{
-\item[] \ttt{\textquotesingle deleting A\textquotesingle  A(x!1),A(z!1)} $\rar$ \ttt{A(x) @ $\ga$} 
+\item[] \ttt{{\textquotesingle}deleting A{\textquotesingle} A(x!1),A(z!1)} $\rar$ \ttt{A(x) @ $\ga$} 
 }
 The \ttt{A} in the graph that is matched to the second occurrence of \ttt{A} in the LHS will be deleted by the rule. As a consequence all its sites will disappear together with the bonds that were pointing to them. For instance, when applied to the graph 
 \ITE{
@@ -334,11 +334,11 @@ the above rule will result in a new graph $G' =\ttt{A(x!1,y\int p,z\int2),C(t)}$
 
 \emph{Wildcard} symbols for link state \ttt{?} (for bound or not), \ttt{!\_} (for bound to someone), may also induce side effects when they are not preserved in the RHS of a rule, as in
 \ITE{
-\item[] \ttt{\textquotesingle Disconnect A\textquotesingle ~ A(x!\_)} $\rar$ \ttt{A(x) @ $\ga$} 
+\item[] \ttt{{\textquotesingle}Disconnect A{\textquotesingle}~ A(x!\_)} $\rar$ \ttt{A(x) @ $\ga$} 
 }
 or 
 \ITE{
-\item[] \ttt{\textquotesingle Force bind A\textquotesingle  ~ A(x?)} $\rar$ \ttt{A(x!1),C(t!1) @ $\ga$} 
+\item[] \ttt{{\textquotesingle}Force bind A{\textquotesingle} ~ A(x?)} $\rar$ \ttt{A(x!1),C(t!1) @ $\ga$} 
 }
 %%
 Both these rule will cause \KaSim~to raise a warning at rule compilation time.
@@ -367,7 +367,7 @@ As said earlier, Kappa rules are equipped with one or two \emph{kinetic rate(s)}
 The stochastic rate is related to the \emph{concentration-based rate constant}\index{kinetic rate!deterministic rate constant} $k$ of the rule of interest by the following relation:
 %corrected by the volume $V$ in which the model is considered. 
 %
-%%We often want to express $\ga$ in \textquotesingle \textquotesingle per molecule\textquotesingle \textquotesingle  rather than \textquotesingle \textquotesingle per mole\textquotesingle \textquotesingle . 
+%%We often want to express $\ga$ in {\textquotesingle}{\textquotesingle}per molecule{\textquotesingle}{\textquotesingle} rather than {\textquotesingle}{\textquotesingle}per mole{\textquotesingle}{\textquotesingle}. 
 %%This only changes the numerical value, not the dimension (both are numbers of molecules): 
 %
 %%The relation between both rate constant is:
@@ -435,13 +435,13 @@ It is considered malpractice to use a Kappa rule of the form \ttt{A(x),B(y)$\rar
 
 This sort of ambiguity should be resolved, if possible, by refining the ambiguous rule into cases that are either exclusively unary or binary. Each refinement having a kinetic rate that is consistent with its molecularity. Note that in practice, for models with a large number of agents, it is sufficient to assume that the rule \ttt{A(x),B(y)$\rar \dots$ @ $\ga$} will have only binary instances. In this case it suffices to consider the approximate model:
 \begin{itemize}
-\item[]\ttt{\textquotesingle assumed binary AB\textquotesingle ~  A(x),B(y)$\rar \dots$ @ $\ga_2$}
-\item[]\ttt{\textquotesingle unary AB\textquotesingle  ~ A(x,c!1),C(a!1,b!2),B(y,c!2)$\rar \dots$ @ $k_1$}
+\item[]\ttt{{\textquotesingle}assumed binary AB{\textquotesingle}~  A(x),B(y)$\rar \dots$ @ $\ga_2$}
+\item[]\ttt{{\textquotesingle}unary AB{\textquotesingle} ~ A(x,c!1),C(a!1,b!2),B(y,c!2)$\rar \dots$ @ $k_1$}
 \end{itemize}
 
 There are however systems where even enumerating unary cases becomes impossible. As an alternative, one should use the kappa notation for ambiguous rules: 
 \ITE{
-\item[] \ttt{\textquotesingle my rule\textquotesingle } {\it kappa\_expression} $\rar$ {\it kappa\_expression} \ttt{@} $\ga_2(k_1)$  
+\item[] \ttt{{\textquotesingle}my rule{\textquotesingle}} {\it kappa\_expression} $\rar$ {\it kappa\_expression} \ttt{@} $\ga_2(k_1)$  
 }
 which will tell \KaSim~to apply the above rule with a rate $\ga_2$ for binary instances and a rate $k_1$ for unary instances. The obtained model will behave exactly as a model in which the ambiguous rule has been replaced by unambiguous refinements. However the usage of such rule might \emph{slowdown simulation in a significant manner} depending on various parameters (such as the presence of large polymers in the model). We give below an example of a model utilizing binary/unary rates for rules\footnote{This model is available in the source repository \ttt{models/poly.ka}.}.
 
@@ -472,7 +472,7 @@ which will tell \KaSim~to apply the above rule with a rate $\ga_2$ for binary in
 \end{enumerate}
 }
 
-Notice at lines 10-12 the use of binary/unary notation for rules. As a result binding between between freely floating agents will occur at rate \ttt{\textquotesingle k2\textquotesingle } while binding between agents that are part of the same complex will occur at rate \ttt{\textquotesingle k1\textquotesingle }. Line 21 contains a \emph{perturbation} that requires \KaSim~to stop the simulation after 10,000 events and output the list of molecular species present in the final mixture\index{mixture} as a dot file (see Section~\ref{sec:mod}) and that we give Figure~\ref{fig:species}.
+Notice at lines 10-12 the use of binary/unary notation for rules. As a result binding between between freely floating agents will occur at rate \ttt{{\textquotesingle}k2{\textquotesingle}} while binding between agents that are part of the same complex will occur at rate \ttt{{\textquotesingle}k1{\textquotesingle}}. Line 21 contains a \emph{perturbation} that requires \KaSim~to stop the simulation after 10,000 events and output the list of molecular species present in the final mixture\index{mixture} as a dot file (see Section~\ref{sec:mod}) and that we give Figure~\ref{fig:species}.
 
 \begin{figure}[htbp]
 \begin{center}
@@ -487,7 +487,7 @@ Notice at lines 10-12 the use of binary/unary notation for rules. As a result bi
 
 In the KF\index{kappa file} it is also possible to declare \emph{variables}\index{variable} with the declaration:
 \ITE{
-\item[] \ttt{\%var: \var{var\_name}~} (\textit{algebraic\_expression} or \textit{kappa\_expression})
+\item[] \ttt{\%var: \var{var\_name}~} (\textit{algebraic\_expression})
 }
 where \ttt{var\_name} can be any string and \textit{algebraic\_expression} are defined Table~\ref{tab:alg} (available symbols for variable, constants and operators are given Table~\ref{tab:operators}).
 
@@ -498,7 +498,7 @@ where \ttt{var\_name} can be any string and \textit{algebraic\_expression} are d
   \begin{tabular}{@{} lcl @{}}
     \textit{algebraic\_expression} & ::= & \tcb{$x\in\Real$} $\mid$ \tcb{variable} \\
      &  & $\mid$ \textit{algebraic\_expression} \tcb{binary\_op} \textit{algebraic\_expression}\\
-     &  & $\mid$ \tcb{unary\_op} \tcb{(}\textit{algebraic\_expression}\tcb{)} \\ 
+     &  & $\mid$ \tcb{unary\_op} \tcb{(}\textit{algebraic\_expression}\tcb{)} \\
     \end{tabular}
   \label{tab:alg}
 \end{table}
@@ -524,6 +524,7 @@ where \ttt{var\_name} can be any string and \textit{algebraic\_expression} are d
 
 \ttt{\var{v}} & the value of variable \ttt{\var{v}} (declared using the \ttt{\%var:} statement) \\
 \ttt{|t|} & the concentration of token \ttt{t}\\
+\ttt{|\textit{kappa\_expression}|} & number of occurences of the pattern \textit{kappa\_expression}\\
 \ttt{INF} & symbol for $\infty$ \\\\
 \toprule
 \ttt{\tcb{unary/binary\_op}} & Interpretation \\
@@ -543,7 +544,7 @@ where \ttt{var\_name} can be any string and \textit{algebraic\_expression} are d
 
 \noi For instance the declaration\index{declaration}s
 \ITE{
-\item[] \ttt{\%var: \var{homodimer}~A(x!1),A(x!1)}
+\item[] \ttt{\%var: \var{homodimer}~|A(x!1),A(x!1)|}
 \item[] \ttt{\%var: \var{aa}~\var{homodimer}/2}
 }
 define 2 variables, the first one tracking the number of embeddings of \ttt{A(x!1),A(x!1)} in the graph over time, while the second divides this value by 2: the number of automorphisms in \ttt{A(x!1),A(x!1)}. Note that variables that are used in the expression of another variable must be declared beforehand. 
@@ -556,12 +557,11 @@ define 2 variables, the first one tracking the number of embeddings of \ttt{A(x!
 %%
 \KaSim~may output values of variables in the data file\index{data file} (see option \ttt{-p} in Chapter~\ref{chap:cl}) using plot do:
 \ITE{
-\item[] \ttt{\%plot: \textquotesingle var\_name\textquotesingle }
+\item[] \ttt{\%plot: {\textquotesingle}var\_name{\textquotesingle}}
 }
 One may use the shortcut: 
 \ITE{
-\item[] \ttt{\%obs: \textquotesingle var\_name\textquotesingle  } \textit{algebraic\_expression} or \textit{kappa\_expression}
-}
+\item[] \ttt{\%obs: {\textquotesingle}var\_name{\textquotesingle} } \textit{algebraic\_expression}}
 to declare a variable and at the same time require it to be outputted in the data file\index{data file}. 
 
 \section{Initial conditions}\label{sec:init}\index{initial condition}
@@ -578,8 +578,8 @@ or
 %%
 where \textit{algebraic\_expression} is evaluated before initialization of the simulation (hence all token and kappa expression values in the expression are evaluated to 0). This will add to the initial state of the model \textit{mult} copies of the graph described by the kappa expression. Again the DCDW convention\index{don't care don't write} allows us not to write the complete interface of added agents (the remaining sites will be completed according to the agent's signature\index{agent signature}). For instance:
 \ITE{
-\item[] \ttt{\%var: \textquotesingle n\textquotesingle~1000}
-\item[] \ttt{\%init: \textquotesingle n\textquotesingle~(A(),A(y\int p))}
+\item[] \ttt{\%var: {\textquotesingle}n\textquotesingle~1000}
+\item[] \ttt{\%init: {\textquotesingle}n\textquotesingle~(A(),A(y\int p))}
 \item[] \ttt{\%init: ca2+ <- 0.39 \#mM}
 }
 will add 1000 instances of \ttt{A} in its default state \ttt{A(x,y\int u,z\int 0)}, 1000 instances of \ttt{A} in state \ttt{A(x,y\int p,z\int 0)} and a concentration of 0.39 mM of calcium ions. Recall that the concentration of calcium can be observed during simulation using \ttt{|ca2+|}.
@@ -597,20 +597,20 @@ We describe below the content of a simple Kappa model and give examples of some 
 \item \%agent: B(x) \tcb{\# Declaration of B}
 \item \%agent: C(x1\int u\int p,x2\int u\int p) \tcb{\# Declaration of C with 2 modifiable sites}
 \item \tcb{\#\#\#\# Rules}
-\item \textquotesingle a.b\textquotesingle  A(x),B(x) -> A(x!1),B(x!1) @ \textquotesingle on\_rate\textquotesingle  \tcb{\#A binds B} 
-\item \textquotesingle a..b\textquotesingle  A(x!1),B(x!1) -> A(x),B(x) @ \textquotesingle off\_rate\textquotesingle  \tcb{\#AB dissociation} 
-\item \textquotesingle ab.c\textquotesingle  A(x!\_,c),C(x1\int u) ->A(x!\_,c!2),C(x1\int u!2)  @ \textquotesingle on\_rate\textquotesingle  \tcb{\#AB binds C} 
-\item \textquotesingle mod x1\textquotesingle  C(x1\int u!1),A(c!1) ->C(x1\int p),A(c)  @ \textquotesingle mod\_rate\textquotesingle  \tcb{\#ABC modifies x1} 
-\item \textquotesingle a.c\textquotesingle  A(x,c),C(x1\int p,x2\int u) -> A(x,c!1),C(x1\int p,x2\int u!1) @ \textquotesingle on\_rate\textquotesingle  \tcb{\#A binds C on x2}
-\item \textquotesingle mod x2\textquotesingle  A(x,c!1),C(x1\int p,x2\int u!1) -> A(x,c),C(x1\int p,x2\int p) @ \textquotesingle mod\_rate\textquotesingle  \tcb{\#A modifies x2} 
+\item {\textquotesingle}a.b{\textquotesingle} A(x),B(x) -> A(x!1),B(x!1) @ {\textquotesingle}on\_rate{\textquotesingle} \tcb{\#A binds B}
+\item {\textquotesingle}a..b{\textquotesingle} A(x!1),B(x!1) -> A(x),B(x) @ {\textquotesingle}off\_rate{\textquotesingle} \tcb{\#AB dissociation}
+\item {\textquotesingle}ab.c{\textquotesingle} A(x!\_,c),C(x1\int u) -> A(x!\_,c!2),C(x1\int u!2)  @ {\textquotesingle}on\_rate{\textquotesingle} \tcb{\#AB binds C}
+\item {\textquotesingle}mod x1{\textquotesingle} C(x1\int u!1),A(c!1) -> C(x1\int p),A(c)  @ {\textquotesingle}mod\_rate{\textquotesingle} \tcb{\#ABC modifies x1}
+\item {\textquotesingle}a.c{\textquotesingle} A(x,c),C(x1\int p,x2\int u) -> A(x,c!1),C(x1\int p,x2\int u!1) @ {\textquotesingle}on\_rate{\textquotesingle} \tcb{\#A binds C on x2}
+\item {\textquotesingle}mod x2{\textquotesingle} A(x,c!1),C(x1\int p,x2\int u!1) -> A(x,c),C(x1\int p,x2\int p) @ {\textquotesingle}mod\_rate{\textquotesingle} \tcb{\#A modifies x2}
 \item \tcb{\#\#\#\# Variables}
-\item \%var: \textquotesingle on\_rate\textquotesingle  1.0E-4 \tcb{\# per molecule per second}
-\item \%var: \textquotesingle off\_rate\textquotesingle  0.1 \tcb{\# per second}
-\item \%var: \textquotesingle mod\_rate\textquotesingle  1 \tcb{\# per second}
-\item \%obs: \textquotesingle AB\textquotesingle  A(x!x.B)
-\item \%obs: \textquotesingle Cuu\textquotesingle  C(x1\int u,x2\int u)
-\item \%obs: \textquotesingle Cpu\textquotesingle  C(x1\int p,x2\int u)
-\item \%obs: \textquotesingle Cpp\textquotesingle  C(x1\int p,x2\int p)
+\item \%var: {\textquotesingle}on\_rate{\textquotesingle} 1.0E-4 \tcb{\# per molecule per second}
+\item \%var: {\textquotesingle}off\_rate{\textquotesingle} 0.1 \tcb{\# per second}
+\item \%var: {\textquotesingle}mod\_rate{\textquotesingle} 1 \tcb{\# per second}
+\item \%obs: {\textquotesingle}AB{\textquotesingle} |A(x!x.B)|
+\item \%obs: {\textquotesingle}Cuu{\textquotesingle} |C(x1\int u,x2\int u)|
+\item \%obs: {\textquotesingle}Cpu{\textquotesingle} |C(x1\int p,x2\int u)|
+\item \%obs: {\textquotesingle}Cpp{\textquotesingle} |C(x1\int p,x2\int p)|
 \item \tcb{\#\#\#\# Initial conditions}
 \item \%init: 1000 A(),B()
 \item \%init: 10000 C()
@@ -618,7 +618,7 @@ We describe below the content of a simple Kappa model and give examples of some 
 }}
 %
 
-Line 1-4 of this KF\index{kappa file} contains signature\index{agent signature} declarations\index{signature}\index{declaration}. Agents of type \ttt{C} have 2 sites \ttt{x1} and \ttt{x2} whose internal state may be \ttt{u}(nphosphorylated) or \ttt{p}(hosphorylated). Recall that the default state of these sites is \ttt{u} (the first one). Line 8, rule \ttt{\textquotesingle ab.c\textquotesingle } binds an \ttt{A} connected to someone on site \ttt{x} (link type \ttt{!\_}) to a \ttt{C}. Note that the only rule that binds an agent to \ttt{x} of \ttt{A} is \ttt{\textquotesingle a.b\textquotesingle } at line 6. Hence the use of \ttt{!\_} is a commodity and the rule could be replaced by 
+Line 1-4 of this KF\index{kappa file} contains signature\index{agent signature} declarations\index{signature}\index{declaration}. Agents of type \ttt{C} have 2 sites \ttt{x1} and \ttt{x2} whose internal state may be \ttt{u}(nphosphorylated) or \ttt{p}(hosphorylated). Recall that the default state of these sites is \ttt{u} (the first one). Line 8, rule \ttt{{\textquotesingle}ab.c{\textquotesingle}} binds an \ttt{A} connected to someone on site \ttt{x} (link type \ttt{!\_}) to a \ttt{C}. Note that the only rule that binds an agent to \ttt{x} of \ttt{A} is \ttt{{\textquotesingle}a.b{\textquotesingle}} at line 6. Hence the use of \ttt{!\_} is a commodity and the rule could be replaced by 
 \ITE{
 \item[]\ttt{\var{alt\_ab.c} A(x!1,c),B(x!1),C(x1\int u) $\rar\dots$}
 }
@@ -740,7 +740,7 @@ one obtains the curve given in Fig.~\ref{fig:abc2}.
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[width=10cm]{img/plot-abc2.png}
-\caption{Simulation of the ABC model with a perturbation: for t<25s, only \ttt{\textquotesingle a.b\textquotesingle } and \ttt{\textquotesingle a..b\textquotesingle } rules may apply. This enables the concentration of \ttt{\textquotesingle AB\textquotesingle } complexes to go to steady state, before introducing fresh \ttt{C}s at t=25s.}
+\caption{Simulation of the ABC model with a perturbation: for t<25s, only \ttt{{\textquotesingle}a.b{\textquotesingle}} and \ttt{{\textquotesingle}a..b{\textquotesingle}} rules may apply. This enables the concentration of \ttt{{\textquotesingle}AB{\textquotesingle}} complexes to go to steady state, before introducing fresh \ttt{C}s at t=25s.}
 \label{fig:abc2}
 \end{center}
 \end{figure}
@@ -779,12 +779,12 @@ In our ABC example, adding the instruction:
 \ttt{\ITE{
 \item[] \%mod:  [true] do \$TRACK \var{Cpp} [true]  
 }}
-\noi will ask~\KaSim~to turn on causality analysis\index{causality} for the observable \ttt{\textquotesingle Cpp\textquotesingle } since the beginning of the simulation, and display the causal explanation of every new occurrence of \ttt{\textquotesingle Cpp\textquotesingle }, until the end of the simulation. The explanation, that we call a \emph{causal flow}\index{causal flow}, is a set of rule application ordered by causality and displayed as a graph using dot format. In this graph, an edge \ttt{r}$\longrightarrow$ \ttt{r\textquotesingle } between two rule applications $\ttt{r}$ and $\ttt{\textquotesingle r\textquotesingle }$ indicates that the first rule application has used, in the simulation, some sites that were modified by the application of the former. We show Fig.~\ref{fig:cflow} an example of such causal flow.
+\noi will ask~\KaSim~to turn on causality analysis\index{causality} for the observable \ttt{{\textquotesingle}Cpp{\textquotesingle}} since the beginning of the simulation, and display the causal explanation of every new occurrence of \ttt{{\textquotesingle}Cpp{\textquotesingle}}, until the end of the simulation. The explanation, that we call a \emph{causal flow}\index{causal flow}, is a set of rule application ordered by causality and displayed as a graph using dot format. In this graph, an edge \ttt{r}$\longrightarrow$ \ttt{r{\textquotesingle}} between two rule applications $\ttt{r}$ and $\ttt{{\textquotesingle}r{\textquotesingle}}$ indicates that the first rule application has used, in the simulation, some sites that were modified by the application of the former. We show Fig.~\ref{fig:cflow} an example of such causal flow.
 
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[width=5cm]{img/cflow.png}
-\caption{Causal flow for the observable \ttt{\textquotesingle Cpp\textquotesingle } of the ABC model. Plain arrows represent causal dependency, dotted arrows show asymmetric conflict between rule occurrences. Here the \ttt{\textquotesingle ab.c\textquotesingle } rule has to occur before the \ttt{\textquotesingle a.b\textquotesingle } rule. Red observable indicate that the last rule allowed one to observe a new instance of \ttt{\textquotesingle Cpp\textquotesingle }.}
+\caption{Causal flow for the observable \ttt{{\textquotesingle}Cpp{\textquotesingle}} of the ABC model. Plain arrows represent causal dependency, dotted arrows show asymmetric conflict between rule occurrences. Here the \ttt{{\textquotesingle}ab.c{\textquotesingle}} rule has to occur before the \ttt{{\textquotesingle}a.b{\textquotesingle}} rule. Red observable indicate that the last rule allowed one to observe a new instance of \ttt{{\textquotesingle}Cpp{\textquotesingle}}.}
 \label{fig:cflow}
 \end{center}
 \end{figure}
@@ -868,11 +868,11 @@ will ask \KaSim~to output the value of token \ttt{A} in a file "token\_$n$.dat" 
 
 In standard kappa, in order to require a site to be bound for an interaction to occur, one may use the \emph{semi-link}\index{semi-link} construct \ttt{!\_} which does not specify who the partner of the bond is. For instance in the variable:
 \ttt{\ITE{
-\item[] \%var: \var{ab}~A(x!\_),B(y!\_)
+\item[] \%var: \var{ab}~|A(x!\_),B(y!\_)|
 }}
 will count the number of \ttt{A}s and \ttt{B}s connected to someone, including the limit case \ttt{A(x!1),B(y!1)}. It is sometimes convenient to specify the \emph{type}\index{link type} of the semi-link, in order to restrict the choice of the binding partner. For instance the variable:
 \ttt{\ITE{
-\item[] \%var: \var{ab}~A(x!y.B),B(y!x.A)
+\item[] \%var: \var{ab}~|A(x!y.B),B(y!x.A)|
 }}
 will count the number of \ttt{A}s whose site \ttt{x} is connected to a site \ttt{y} of \ttt{B}, plus the number of \ttt{B}s whose site \ttt{y} is connected to a site \ttt{x} of \ttt{A}. Note that this still includes the case \ttt{A(x!1),B(y!1)}.
 
@@ -931,12 +931,12 @@ parameter & possible values & description \\
 \subsection{The Influence map}
 The influence map of a model is an object that may help modelers checking the consistency of the rule set they use. It is generated if the modeler has required it using the parameter \ttt{"dumpInfluenceMap"} which will generate the so called \emph{influence map}\index{influence map} of the model.
 
-Unlike the flux map, the influence map is \emph{statically} computed and does not depend on kinetic rates nor initial conditions. It describes how rules \emph{with no side effect}\index{side effect} may potentially influence each other during a simulation. \KaSim~will produce a dot format file containing the influence relation over all rules and observables of the model. The produced graph visualized using a circular rendering\footnote{One may use for instance the \ttt{circo} program that is part of the \textit{graphviz} suite.} is given in Figure~\ref{fig:abc-im}. Observables are represented as circular nodes\footnote{Observable can be viewed as identity rules for computing influence.} and rules as rectangular nodes. Edges are decorated with the list of embeddings (separated by a semi-colon) allowing rules\textquotesingle s right hand sides to be mapped to left hand sides. Note that the influence map will not display relations between rules that are induced by side effects (see Section~\ref{sec:side-effect}).
+Unlike the flux map, the influence map is \emph{statically} computed and does not depend on kinetic rates nor initial conditions. It describes how rules \emph{with no side effect}\index{side effect} may potentially influence each other during a simulation. \KaSim~will produce a dot format file containing the influence relation over all rules and observables of the model. The produced graph visualized using a circular rendering\footnote{One may use for instance the \ttt{circo} program that is part of the \textit{graphviz} suite.} is given in Figure~\ref{fig:abc-im}. Observables are represented as circular nodes\footnote{Observable can be viewed as identity rules for computing influence.} and rules as rectangular nodes. Edges are decorated with the list of embeddings (separated by a semi-colon) allowing rules{\textquotesingle}s right hand sides to be mapped to left hand sides. Note that the influence map will not display relations between rules that are induced by side effects (see Section~\ref{sec:side-effect}).
 
 \begin{figure}[htbp] %  figure placement: here, top, bottom, or page
    \centering
    \includegraphics[width=15cm]{img/abc-im.png} 
-   \caption{The influence map of the \ttt{abc.ka} model defined in Chapter~\ref{chap:abc}. Note that observable \ttt{C(x1\int u?,x2\int u?)} is not activated by any other rule. This implies that its number of occurrences does not change during a simulation. Edge labels denote embeddings with the convention that $[i\rar j]$ denotes the embedding of agent number $i$ of the origin\textquotesingle s rhs, into agent $j$ of the target\textquotesingle s lhs.}
+   \caption{The influence map of the \ttt{abc.ka} model defined in Chapter~\ref{chap:abc}. Note that observable \ttt{C(x1\int u?,x2\int u?)} is not activated by any other rule. This implies that its number of occurrences does not change during a simulation. Edge labels denote embeddings with the convention that $[i\rar j]$ denotes the embedding of agent number $i$ of the origin{\textquotesingle}s rhs, into agent $j$ of the target{\textquotesingle}s lhs.}
    \label{fig:abc-im}
 \end{figure}
 
@@ -953,11 +953,11 @@ More formally, consider the rules $r:L\rar R$ and $s:L'\rar R'$. One wishes to k
 \section*{Simulation hangs after a while}
 If the progress bar seems stalled, it does not necessarily mean that the simulation is blocked. In particular when a simulation is triggered with a \emph{time} limit (\ttt{-t} option of the command line) it might only indicate that the bio clock is stalled while computation events still occur. Recall that the average (bio) time one has to wait in order to apply a rule is $1/A$, where $A$ is the sum of all the rule activities (which is equal to the number of instances that a rule has, times its kinetic rate). Whenever the number of occurrences of a rule grows too fast (if new agents are created during the simulation for instance), or if the kinetic rate of a rule is defined by a function that grows rapidly, the average time increment might tend to 0 and if it remains so for a while, it will block the progress bar whose advance is proportional to the bio time \ttt{[T]}. 
 
-In order to make sure that \KaSim~is not incorrectly blocked you may wish to plot the event clock against time clock using the observable \ttt{\%obs: \textquotesingle events\textquotesingle  [E]} or run the simulation using an event limit (\ttt{-e} option of the command line) instead of a time limit.
+In order to make sure that \KaSim~is not incorrectly blocked you may wish to plot the event clock against time clock using the observable \ttt{\%obs: {\textquotesingle}events{\textquotesingle} [E]} or run the simulation using an event limit (\ttt{-e} option of the command line) instead of a time limit.
 
 \section*{What do null events mean, why do I have any?}
 
-Null events\index{null event} is a way for \KaSim~to compensate for some over approximation it is doing, in order deal with large simulations more efficiently. They usually do not impact significantly the performances of the simulator, unless the model contains rules using the special notation to deal with ambiguous molecularity (see Section~\ref{sec:ambiguous}). With pure Kappa rules, the ratio $r$ of null event over productive ones (that you can track using the observable \ttt{\%obs: \textquotesingle r\textquotesingle   [E-]/[E+]}) should tend to 0 when models have a lot of agents.
+Null events\index{null event} is a way for \KaSim~to compensate for some over approximation it is doing, in order deal with large simulations more efficiently. They usually do not impact significantly the performances of the simulator, unless the model contains rules using the special notation to deal with ambiguous molecularity (see Section~\ref{sec:ambiguous}). With pure Kappa rules, the ratio $r$ of null event over productive ones (that you can track using the observable \ttt{\%obs: {\textquotesingle}r{\textquotesingle}  [E-]/[E+]}) should tend to 0 when models have a lot of agents.
 
 \section*{No data points are generated}
 Make sure you have \ttt{\%obs} or \ttt{\%plot} instructions in your KF\index{kappa file}. Also make sure to use the \ttt{-p} option in the command line to tell KaSim how many points you wish to have on your curves. 
