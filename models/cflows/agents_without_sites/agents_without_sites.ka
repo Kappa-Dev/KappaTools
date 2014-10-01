@@ -11,7 +11,7 @@ A() -> B() @ 1
 B() -> C() @ 1
 
 
-%obs: 'C' C() 
+%obs: 'C' |C()|
 
 #### Initial conditions 
 %init: 10000 A()

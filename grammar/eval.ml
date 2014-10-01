@@ -12,120 +12,126 @@ and link =
 	| Closed | Semi of int * int * pos
 
 let eval_intf ast_intf =
-	let rec iter ast_intf map =
-		match ast_intf with
-		| Ast.PORT_SEP (p, ast_interface) ->
-				let int_state_list = p.Ast.port_int
-				and lnk_state = p.Ast.port_lnk
-				in
-				if StringMap.mem p.Ast.port_nme map then
-					raise (ExceptionDefn.Semantics_Error (p.Ast.port_pos,"Site '" ^ p.Ast.port_nme ^ "' is used multiple times"))
-				else	
-					iter ast_interface (StringMap.add p.Ast.port_nme (int_state_list, lnk_state, (p.Ast.port_pos)) map)
-		| Ast.EMPTY_INTF -> StringMap.add "_" ([], Ast.FREE, no_pos) map
-	in (*Adding default existential port*) iter ast_intf StringMap.empty
+  let rec iter ast_intf map =
+    match ast_intf with
+    | Ast.PORT_SEP (p, ast_interface) ->
+       let int_state_list = p.Ast.port_int
+       and lnk_state = p.Ast.port_lnk
+       in
+       if StringMap.mem p.Ast.port_nme map then
+	 raise
+	   (ExceptionDefn.Semantics_Error (p.Ast.port_pos,"Site '" ^ p.Ast.port_nme ^ "' is used multiple times"))
+       else
+	 iter ast_interface
+	      (StringMap.add p.Ast.port_nme (int_state_list, lnk_state, (p.Ast.port_pos)) map)
+    | Ast.EMPTY_INTF -> StringMap.add "_" ([], Ast.FREE, no_pos) map
+  in (*Adding default existential port*) iter ast_intf StringMap.empty
 
-let eval_node env a link_map node_map node_id = 
-	let ast_intf = a.Ast.ag_intf 
-	and ag_name = a.Ast.ag_nme 
-	and pos_ag = a.Ast.ag_pos
-	in
-	let env,name_id = 
-		try (env,Environment.num_of_name ag_name env) with 
-			| Not_found -> 
-				if !Parameter.implicitSignature then (Environment.declare_name ag_name pos_ag env)
-				else raise (ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared")) 
-	in
-	let env,sign = 
-		try (env,Environment.get_sig name_id env) with 
-			| Not_found -> 
-				if !Parameter.implicitSignature then 
-					let sign = Signature.create name_id (StringMap.add "_" ([], Ast.FREE, no_pos) StringMap.empty) in (Environment.declare_sig sign pos_ag env,sign)
-				else raise (ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared"))
-	in
-	
-	(*Begin sub function*)
-	let rec build_intf ast link_map intf bond_list sign = 
-		match ast with
-			| Ast.PORT_SEP (p,ast') ->
-				begin
-				let int_state_list = p.Ast.port_int
-				and lnk_state = p.Ast.port_lnk
-				and port_id,sign = 
-					try (Signature.num_of_site p.Ast.port_nme sign,sign) with 
-						Not_found -> 
-							if !Parameter.implicitSignature then
-								let sign = Signature.add_site p.Ast.port_nme sign in
-								(Signature.num_of_site p.Ast.port_nme sign,sign)
-							else
-								raise (ExceptionDefn.Semantics_Error (p.Ast.port_pos,"Site '" ^ p.Ast.port_nme ^ "' is not declared")) 
-				in
-				let link_map,bond_list = 
-					match lnk_state with
-					| Ast.LNK_VALUE (i,pos) ->
-					   begin
-					     try
-					       let opt_node = IntMap.find i link_map 
-					       in
-					       match opt_node with
-					       | None -> raise (ExceptionDefn.Semantics_Error (pos,"Edge identifier at site '" ^ p.Ast.port_nme ^ "' is used multiple times"))
-					       | Some (node_id',port_id',pos') ->
-						  (IntMap.add i None link_map,(node_id,port_id,node_id',port_id')::bond_list)
-					     with Not_found -> (IntMap.add i (Some (node_id,port_id,pos)) link_map,bond_list)
-					   end
-					| Ast.FREE -> (link_map,bond_list)
-					| _ -> raise (ExceptionDefn.Semantics_Error (p.Ast.port_pos,"Site '" ^ p.Ast.port_nme ^ "' is partially defined"))
-				in
-				match int_state_list with
-					| [] -> build_intf ast' link_map (IntMap.add port_id (None,Node.WLD) intf) bond_list sign
-					| s::_ -> 
-						let i,sign = 
-							try (Signature.num_of_internal_state p.Ast.port_nme s sign,sign) with 
-								| Not_found -> 
-									if !Parameter.implicitSignature then
-										let sign,i = Signature.add_internal_state s port_id sign in
-										(i,sign)	
-									else 
-										raise (ExceptionDefn.Semantics_Error (p.Ast.port_pos,"Internal state of site'" ^ p.Ast.port_nme ^ "' is not defined"))
-						in
-						build_intf ast' link_map (IntMap.add port_id (Some i,Node.WLD) intf) bond_list sign (*Geekish, adding Node.WLD to be consistent with Node.create*)
-				end
-		| Ast.EMPTY_INTF -> let env = if !Parameter.implicitSignature then Environment.declare_sig sign pos_ag env else env in (bond_list,link_map,intf,env)
-	in
-	(*end sub function*)
-	
-	let (bond_list,link_map,intf,env) = build_intf ast_intf link_map IntMap.empty [] sign in
-	let node = Node.create ~with_interface:intf name_id env in  
-	let node_map = IntMap.add node_id node node_map in
-	List.iter 
-	(fun (ni,pi,nj,pj) ->
-		try 
-		let node_i = IntMap.find ni node_map
-		and node_j = IntMap.find nj node_map
-		in
-		Node.set_ptr (node_j,pj) (Node.Ptr (node_i,pi)) ;
-		Node.set_ptr (node_i,pi) (Node.Ptr (node_j,pj)) 
-		with Not_found -> invalid_arg "Eval.eval_node"
-	) bond_list ; 
-	(node_map,link_map,env)
+let eval_node env a link_map node_map node_id =
+  let ast_intf = a.Ast.ag_intf in
+  let ag_name = a.Ast.ag_nme in
+  let pos_ag = a.Ast.ag_pos in
+  let env,name_id =
+    try (env,Environment.num_of_name ag_name env) with
+    | Not_found ->
+       if !Parameter.implicitSignature
+       then (Environment.declare_name ag_name pos_ag env)
+       else raise (ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared"))
+  in
+  let env,sign =
+    try (env,Environment.get_sig name_id env) with
+    | Not_found ->
+       if !Parameter.implicitSignature then
+	 let sign =
+	   Signature.create name_id (StringMap.add "_" ([], Ast.FREE, no_pos) StringMap.empty)
+	 in (Environment.declare_sig sign pos_ag env,sign)
+       else raise (ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared"))
+  in
+
+  (*Begin sub function*)
+  let rec build_intf ast link_map intf bond_list sign =
+    match ast with
+    | Ast.PORT_SEP (p,ast') ->
+       begin
+	 let int_state_list = p.Ast.port_int
+	 and lnk_state = p.Ast.port_lnk
+	 and port_id,sign =
+	   try (Signature.num_of_site p.Ast.port_nme sign,sign) with
+	     Not_found ->
+	     if !Parameter.implicitSignature then
+	       let sign = Signature.add_site p.Ast.port_nme sign in
+	       (Signature.num_of_site p.Ast.port_nme sign,sign)
+	     else
+	       raise (ExceptionDefn.Semantics_Error (p.Ast.port_pos,"Site '" ^ p.Ast.port_nme ^ "' is not declared"))
+	 in
+	 let link_map,bond_list =
+	   match lnk_state with
+	   | Ast.LNK_VALUE (i,pos) ->
+	      begin
+		try
+		  let opt_node = IntMap.find i link_map
+		  in
+		  match opt_node with
+		  | None -> raise (ExceptionDefn.Semantics_Error (pos,"Edge identifier at site '" ^ p.Ast.port_nme ^ "' is used multiple times"))
+		  | Some (node_id',port_id',pos') ->
+		     (IntMap.add i None link_map,(node_id,port_id,node_id',port_id')::bond_list)
+		with Not_found -> (IntMap.add i (Some (node_id,port_id,pos)) link_map,bond_list)
+	      end
+	   | Ast.FREE -> (link_map,bond_list)
+	   | _ -> raise (ExceptionDefn.Semantics_Error (p.Ast.port_pos,"Site '" ^ p.Ast.port_nme ^ "' is partially defined"))
+	 in
+	 match int_state_list with
+	 | [] -> build_intf ast' link_map (IntMap.add port_id (None,Node.WLD) intf) bond_list sign
+	 | s::_ ->
+	    let i,sign =
+	      try (Signature.num_of_internal_state p.Ast.port_nme s sign,sign) with
+	      | Not_found ->
+		 if !Parameter.implicitSignature then
+		   let sign,i = Signature.add_internal_state s port_id sign in
+		   (i,sign)
+		 else
+		   raise (ExceptionDefn.Semantics_Error (p.Ast.port_pos,"Internal state of site'" ^ p.Ast.port_nme ^ "' is not defined"))
+	    in
+	    build_intf ast' link_map (IntMap.add port_id (Some i,Node.WLD) intf) bond_list sign (*Geekish, adding Node.WLD to be consistent with Node.create*)
+       end
+    | Ast.EMPTY_INTF -> let env = if !Parameter.implicitSignature then Environment.declare_sig sign pos_ag env else env in (bond_list,link_map,intf,env)
+  in
+  (*end sub function*)
+
+  let (bond_list,link_map,intf,env) =
+    build_intf ast_intf link_map IntMap.empty [] sign in
+  let node = Node.create ~with_interface:intf name_id env in
+  let node_map = IntMap.add node_id node node_map in
+  List.iter
+    (fun (ni,pi,nj,pj) ->
+     try
+       let node_i = IntMap.find ni node_map
+       and node_j = IntMap.find nj node_map
+       in
+       Node.set_ptr (node_j,pj) (Node.Ptr (node_i,pi)) ;
+       Node.set_ptr (node_i,pi) (Node.Ptr (node_j,pj))
+     with Not_found -> invalid_arg "Eval.eval_node"
+    ) bond_list ;
+  (node_map,link_map,env)
 
 let nodes_of_ast env ast_mixture =
-	let rec iter ast_mixture node_map node_id link_map env =  
-		match ast_mixture with
-			| Ast.COMMA (a, ast_mix) ->
-					let (node_map,link_map,env) = eval_node env a link_map node_map node_id in
-						iter ast_mix node_map (node_id+1) link_map env
-			| Ast.EMPTY_MIX -> 
-				IntMap.iter 
-				(fun i opt ->
-					match opt with 
-						| None -> () 
-						| Some (_,_,pos) -> raise (ExceptionDefn.Semantics_Error (pos,Printf.sprintf "Edge identifier %d is dangling" i))
-				) link_map ;
-				(node_map,env)
-	in
-	iter ast_mixture IntMap.empty 0 IntMap.empty env
-					
+  let rec iter ast_mixture node_map node_id link_map env =
+    match ast_mixture with
+    | Ast.COMMA (a, ast_mix) ->
+       let (node_map,link_map,env) = eval_node env a link_map node_map node_id in
+       iter ast_mix node_map (node_id+1) link_map env
+    | Ast.EMPTY_MIX ->
+       IntMap.iter
+	 (fun i opt ->
+	  match opt with
+	  | None -> ()
+	  | Some (_,_,pos) ->
+	     raise (ExceptionDefn.Semantics_Error (pos,Printf.sprintf "Edge identifier %d is dangling" i))
+	 ) link_map ;
+       (node_map,env)
+  in
+  iter ast_mixture IntMap.empty 0 IntMap.empty env
+
 let eval_agent is_pattern tolerate_new_state env a ctxt =
 	let (ag_name, ast_intf, pos_ag) = ((a.Ast.ag_nme), (a.Ast.ag_intf), (a.Ast.ag_pos)) in
 	let env,name_id = 
@@ -255,138 +261,7 @@ let eval_agent is_pattern tolerate_new_state env a ctxt =
 	in
 		(ctxt, (Mixture.create_agent name_id interface), env)
 
-(* returns partial evaluation of rate expression and a boolean that is set *)
-(* to true if partial evaluation is a constant function                    *)
-let rec partial_eval_alg env (ast, (beg_pos,end_pos)) =
-  let bin_op ast ast' op =
-    let (f1, const1, opt_value1, dep1) = partial_eval_alg env ast in
-    let (f2, const2, opt_value2, dep2) = partial_eval_alg env ast' in
-    let part_eval inst values t e e_null cpu_t tk =
-      (*evaluation partielle symbolique*)
-      let v1 = f1 inst values t e e_null cpu_t tk in
-      let v2 = f2 inst values t e e_null cpu_t tk in op v1 v2 in
-    let opt_value' = match opt_value1,opt_value2 with
-	(Some a,Some b) -> Some (op a b)
-      | _ -> None in (*evaluation complete si connue*)
-    (part_eval, (const1 && const2), opt_value', (DepSet.union dep1 dep2))
-  in
-  let un_op ast op =
-    let (f, const, opt_v, dep) = partial_eval_alg env ast in
-    let opt_v' = match opt_v with Some a -> Some (op a) | None -> None in
-    ((fun inst values t e e_null cpu_t tk ->
-      let v = f inst values t e e_null cpu_t tk in op v),
-     const, opt_v', dep)
-  in
-  match ast with
-  | EMAX ->
-     let v =
-       match !Parameter.maxEventValue with
-       | Some n -> Nbr.I n
-       | None -> ExceptionDefn.warning ~with_pos:(pos_of_lex_pos beg_pos)
-				       "[emax] constant is evaluated to infinity";
-		 (Nbr.F infinity)
-     in
-     ((fun _ _ _ _ _ _ _-> v), true, Some v, DepSet.empty)
-  | TMAX ->
-     let v =
-       match !Parameter.maxTimeValue with
-       | Some t -> Nbr.F t
-       | None -> ExceptionDefn.warning ~with_pos:(pos_of_lex_pos beg_pos)
-				       "[tmax] constant is evaluated to infinity";
-		 (Nbr.F infinity)
-     in
-     ((fun _ _ _ _ _ _ _-> v), true, Some v, DepSet.empty)
-  | CONST n ->
-     ((fun _ _ _ _ _ _ _-> n), true, (Some n), DepSet.empty)
-  | STATE_ALG_OP (Term.CPUTIME) ->
-     ((fun _ _ _ _ _ cpu_t _-> Nbr.F (cpu_t -. !Parameter.cpuTime)), false,
-      Some (Nbr.F 0.), (DepSet.singleton Mods.EVENT))
-  | OBS_VAR lab ->
-     begin
-       try
-	 let i = Environment.num_of_kappa lab env
-	 (*lab is the label of a kappa expression*)
-	 in
-	 if Environment.is_rule i env then
-	   raise (ExceptionDefn.Semantics_Error
-		    (pos_of_lex_pos beg_pos, lab ^ " is not a variable identifier"))
-	 else
-	   ((fun f _ _ _ _ _ _-> f i), false, Some (Nbr.I 0),
-	    (DepSet.singleton (Mods.KAPPA i)))
-       with Not_found -> (*lab is the label of an algebraic expression*)
-	 let i,opt_v =
-	   try Environment.num_of_alg lab env with
-	   | Not_found ->
-	      raise (ExceptionDefn.Semantics_Error
-		       (pos_of_lex_pos beg_pos,lab ^ " is not a declared variable"))
-	 in
-	 ((fun _ v _ _ _ _ _-> v i),false,opt_v,
-	  DepSet.singleton (Mods.ALG i))
-     end
-  | TOKEN_ID (tk_nme) ->
-     let i =
-       try Environment.num_of_token tk_nme env
-       with Not_found ->
-	 raise (ExceptionDefn.Semantics_Error
-		  (pos_of_lex_pos beg_pos,tk_nme ^ " is not a declared token"))
-     in
-     ((fun _ _ _ _ _ _ tk -> tk i),false,Some (Nbr.F 0.),
-      DepSet.singleton (Mods.TOK i))
-  | STATE_ALG_OP (Term.TIME_VAR) ->
-     ((fun _ _ t _ _ _ _-> Nbr.F t), false, Some (Nbr.F 0.),
-      (DepSet.singleton Mods.TIME))
-  | STATE_ALG_OP (Term.EVENT_VAR) ->
-     ((fun _ _ _ e ne _ _-> Nbr.I (e+ne)), false, Some (Nbr.I 0),
-      (DepSet.singleton Mods.EVENT))
-  | STATE_ALG_OP (Term.NULL_EVENT_VAR) ->
-     ((fun _ _ _ _ ne _ _-> Nbr.I ne), false, Some (Nbr.I 0),
-      (DepSet.singleton Mods.EVENT))
-  | STATE_ALG_OP (Term.PROD_EVENT_VAR) ->
-     ((fun _ _ _ e _ _ _-> Nbr.I e), false,Some (Nbr.I 0),
-      (DepSet.singleton Mods.EVENT))
-  | BIN_ALG_OP (op,ast, ast') ->
-     bin_op ast ast' (Nbr.of_bin_alg_op op)
-  | UN_ALG_OP (op,ast) -> un_op ast (Nbr.of_un_alg_op op)
-
-let rec partial_eval_bool env (ast,_) =
-  let bin_op_bool ast ast' op =
-    let (f1, const1, dep1,_) = partial_eval_bool env ast in
-    let (f2, const2, dep2,_) = partial_eval_bool env ast' in
-    let part_eval inst values t e e_null cpu_t tk =
-      let b1 = f1 inst values t e e_null cpu_t tk in
-      let b2 = f2 inst values t e e_null cpu_t tk in op b1 b2
-    in (part_eval, (const1 && const2), (DepSet.union dep1 dep2), None)
-  in let bin_op_alg ast ast' op =
-       let (f1, const1, _, dep1) = partial_eval_alg env ast in
-       let (f2, const2, opt_v2, dep2) = partial_eval_alg env ast' in
-       let stopping_time =
-	 if op == Nbr.is_equal && DepSet.mem Mods.TIME dep1 then
-	   match (const2, opt_v2) with
-	   | (true, Some num) -> (Some num)
-	   | (_,_) -> raise ExceptionDefn.Unsatisfiable
-	 else None
-       in
-       let part_eval inst values t e e_null cpu_t tk =
-	 let v1 = f1 inst values t e e_null cpu_t tk in
-	 let v2 = f2 inst values t e e_null cpu_t tk in
-	 (*checking whether boolean expression has a time dependency and is of the form [T]=n*)
-	 op v1 v2
-       in
-       (part_eval, (const1 && const2),
-	(DepSet.union dep1 dep2), stopping_time)
-     in
-     match ast with
-     | TRUE -> ((fun _ _ _ _ _ _ _-> true), true, DepSet.singleton Mods.EVENT,None)
-     | FALSE -> ((fun _ _ _ _ _ _ _-> false), true, DepSet.empty,None)
-     | AND (ast, ast') -> bin_op_bool ast ast' (&&)
-     | OR (ast, ast') -> bin_op_bool ast ast' (||)
-     | GREATER (ast, ast') -> bin_op_alg ast ast' Nbr.is_greater
-     | SMALLER (ast, ast') -> bin_op_alg ast ast' Nbr.is_smaller
-     | EQUAL (ast, ast') -> bin_op_alg ast ast' Nbr.is_equal
-     | DIFF (ast, ast') ->
-	bin_op_alg ast ast' (fun v v' -> not (Nbr.is_equal v v'))
-
-let mixture_of_ast ?(tolerate_new_state=false) mix_id_opt is_pattern env ast_mix =
+let mixture_of_ast ?(tolerate_new_state=false) ?mix_id is_pattern env ast_mix =
   let rec eval_mixture env ast_mix ctxt mixture =
     match ast_mix with
     | Ast.COMMA (a, ast_mix) ->
@@ -402,7 +277,7 @@ let mixture_of_ast ?(tolerate_new_state=false) mix_id_opt is_pattern env ast_mix
     | Ast.EMPTY_MIX -> (ctxt, mixture, env)
   in
   let ctxt = { pairing = IntMap.empty; curr_id = 0; new_edges = Int2Map.empty; } in
-  let (ctxt, mix, env) = eval_mixture env ast_mix ctxt (Mixture.empty mix_id_opt)
+  let (ctxt, mix, env) = eval_mixture env ast_mix ctxt (Mixture.empty mix_id)
   in
   begin
     IntMap.iter (*checking that all edge identifiers are pairwise defined*)
@@ -420,6 +295,135 @@ let mixture_of_ast ?(tolerate_new_state=false) mix_id_opt is_pattern env ast_mix
     (mix,env) (*Modifies mix as a side effect*)
   end
 
+(* returns partial evaluation of rate expression and a boolean that is set *)
+(* to true if partial evaluation is a constant function                    *)
+let rec partial_eval_alg env mixs (ast, (beg_pos,end_pos)) =
+  let bin_op ast ast' op =
+    let (env1, mix1, f1, const1, opt_value1, dep1) =
+      partial_eval_alg env mixs ast in
+    let (env2, mix2, f2, const2, opt_value2, dep2) =
+      partial_eval_alg env1 mix1 ast' in
+    let part_eval inst values t e e_null cpu_t tk =
+      (*evaluation partielle symbolique*)
+      let v1 = f1 inst values t e e_null cpu_t tk in
+      let v2 = f2 inst values t e e_null cpu_t tk in op v1 v2 in
+    let opt_value' = match opt_value1,opt_value2 with
+	(Some a,Some b) -> Some (op a b)
+      | _ -> None in (*evaluation complete si connue*)
+    (env2, mix2, part_eval, (const1 && const2), opt_value',
+     (DepSet.union dep1 dep2))
+  in
+  let un_op ast op =
+    let (env', mix', f, const, opt_v, dep) =
+      partial_eval_alg env mixs ast in
+    let opt_v' = match opt_v with Some a -> Some (op a) | None -> None in
+    (env', mix', (fun inst values t e e_null cpu_t tk ->
+      let v = f inst values t e e_null cpu_t tk in op v),
+     const, opt_v', dep)
+  in
+  match ast with
+  | EMAX ->
+     let v =
+       match !Parameter.maxEventValue with
+       | Some n -> Nbr.I n
+       | None -> ExceptionDefn.warning ~with_pos:(pos_of_lex_pos beg_pos)
+				       "[emax] constant is evaluated to infinity";
+		 (Nbr.F infinity)
+     in
+     (env,mixs,(fun _ _ _ _ _ _ _-> v), true, Some v, DepSet.empty)
+  | TMAX ->
+     let v =
+       match !Parameter.maxTimeValue with
+       | Some t -> Nbr.F t
+       | None -> ExceptionDefn.warning ~with_pos:(pos_of_lex_pos beg_pos)
+				       "[tmax] constant is evaluated to infinity";
+		 (Nbr.F infinity)
+     in
+     (env,mixs,(fun _ _ _ _ _ _ _-> v), true, Some v, DepSet.empty)
+  | CONST n ->
+     (env,mixs,(fun _ _ _ _ _ _ _-> n), true, (Some n), DepSet.empty)
+  | STATE_ALG_OP (Term.CPUTIME) ->
+     (env,mixs,(fun _ _ _ _ _ cpu_t _-> Nbr.F (cpu_t -. !Parameter.cpuTime)), false,
+      Some (Nbr.F 0.), (DepSet.singleton Mods.EVENT))
+  | KAPPA_INSTANCE ast ->
+     let (env', id) =
+       Environment.declare_var_kappa None env in
+     let mix,env'' = mixture_of_ast ~mix_id:id true env' ast in
+     (env'', mix::mixs, (fun f _ _ _ _ _ _-> f id), false, Some (Nbr.I 0),
+      (DepSet.singleton (Mods.KAPPA id)))
+  | OBS_VAR lab ->
+       let i,opt_v =
+	 try Environment.num_of_alg lab env with
+	 | Not_found ->
+	    raise (ExceptionDefn.Semantics_Error
+		     (pos_of_lex_pos beg_pos,lab ^ " is not a declared variable"))
+       in
+       (env,mixs,(fun _ v _ _ _ _ _-> v i),false,opt_v,
+	DepSet.singleton (Mods.ALG i))
+  | TOKEN_ID (tk_nme) ->
+     let i =
+       try Environment.num_of_token tk_nme env
+       with Not_found ->
+	 raise (ExceptionDefn.Semantics_Error
+		  (pos_of_lex_pos beg_pos,tk_nme ^ " is not a declared token"))
+     in
+     (env,mixs,(fun _ _ _ _ _ _ tk -> tk i),false,Some (Nbr.F 0.),
+      DepSet.singleton (Mods.TOK i))
+  | STATE_ALG_OP (Term.TIME_VAR) ->
+     (env,mixs,(fun _ _ t _ _ _ _-> Nbr.F t), false, Some (Nbr.F 0.),
+      (DepSet.singleton Mods.TIME))
+  | STATE_ALG_OP (Term.EVENT_VAR) ->
+     (env,mixs,(fun _ _ _ e ne _ _-> Nbr.I (e+ne)), false, Some (Nbr.I 0),
+      (DepSet.singleton Mods.EVENT))
+  | STATE_ALG_OP (Term.NULL_EVENT_VAR) ->
+     (env,mixs,(fun _ _ _ _ ne _ _-> Nbr.I ne), false, Some (Nbr.I 0),
+      (DepSet.singleton Mods.EVENT))
+  | STATE_ALG_OP (Term.PROD_EVENT_VAR) ->
+     (env,mixs,(fun _ _ _ e _ _ _-> Nbr.I e), false,Some (Nbr.I 0),
+      (DepSet.singleton Mods.EVENT))
+  | BIN_ALG_OP (op,ast, ast') ->
+     bin_op ast ast' (Nbr.of_bin_alg_op op)
+  | UN_ALG_OP (op,ast) -> un_op ast (Nbr.of_un_alg_op op)
+
+let rec partial_eval_bool env mixs (ast,_) =
+  let bin_op_bool ast ast' op =
+    let (env1, mix1, f1, const1, dep1,_) = partial_eval_bool env mixs ast in
+    let (env2, mix2, f2, const2, dep2,_) = partial_eval_bool env1 mix1 ast' in
+    let part_eval inst values t e e_null cpu_t tk =
+      let b1 = f1 inst values t e e_null cpu_t tk in
+      let b2 = f2 inst values t e e_null cpu_t tk in op b1 b2
+    in (env2,mix2,part_eval, (const1 && const2), (DepSet.union dep1 dep2), None)
+  in let bin_op_alg ast ast' op =
+       let (env1,mix1,f1, const1, _, dep1) = partial_eval_alg env mixs ast in
+       let (env2,mix2,f2, const2, opt_v2, dep2) = partial_eval_alg env1 mix1 ast' in
+       let stopping_time =
+	 if op == Nbr.is_equal && DepSet.mem Mods.TIME dep1 then
+	   match (const2, opt_v2) with
+	   | (true, Some num) -> (Some num)
+	   | (_,_) -> raise ExceptionDefn.Unsatisfiable
+	 else None
+       in
+       let part_eval inst values t e e_null cpu_t tk =
+	 let v1 = f1 inst values t e e_null cpu_t tk in
+	 let v2 = f2 inst values t e e_null cpu_t tk in
+	 (*checking whether boolean expression has a time dependency and is of the form [T]=n*)
+	 op v1 v2
+       in
+       (env2,mix2,part_eval, (const1 && const2),
+	(DepSet.union dep1 dep2), stopping_time)
+     in
+     match ast with
+     | TRUE ->
+	(env,mixs,(fun _ _ _ _ _ _ _-> true), true, DepSet.singleton Mods.EVENT,None)
+     | FALSE -> (env,mixs,(fun _ _ _ _ _ _ _-> false), true, DepSet.empty,None)
+     | AND (ast, ast') -> bin_op_bool ast ast' (&&)
+     | OR (ast, ast') -> bin_op_bool ast ast' (||)
+     | GREATER (ast, ast') -> bin_op_alg ast ast' Nbr.is_greater
+     | SMALLER (ast, ast') -> bin_op_alg ast ast' Nbr.is_smaller
+     | EQUAL (ast, ast') -> bin_op_alg ast ast' Nbr.is_equal
+     | DIFF (ast, ast') ->
+	bin_op_alg ast ast' (fun v v' -> not (Nbr.is_equal v v'))
+
 let signature_of_ast s env =
   let (name, ast_intf, pos) =
     ((s.Ast.ag_nme), (s.Ast.ag_intf), (s.Ast.ag_pos)) in
@@ -431,57 +435,55 @@ let token_of_ast abs_tk env =
   let (name, pos) = abs_tk in
   Environment.declare_token name pos env
 
-let reduce_val v env =
-  let (k, const, opt_v, dep) = partial_eval_alg env v
+let reduce_val v env mixs =
+  let (env', mix', k, const, opt_v, dep) = partial_eval_alg env mixs v
   in
   if const then
     match opt_v with
-    | Some v -> (Dynamics.CONST v, dep)
+    | Some v -> (env',mix',Dynamics.CONST v, dep)
     | None -> invalid_arg "Eval.reduce_val: Variable is constant but was not evaluated"
-  else ((VAR k), dep)
+  else (env',mix',(VAR k), dep)
 
-let rule_of_ast ?(backwards=false) env (ast_rule_label, ast_rule) tolerate_new_state =
+let rule_of_ast ?(backwards=false) env mixs (ast_rule_label, ast_rule) tolerate_new_state =
   let ast_rule_label,ast_rule = if backwards then Ast.flip (ast_rule_label, ast_rule) else (ast_rule_label, ast_rule) in
   let (env, lhs_id) =
     Environment.declare_var_kappa ~from_rule:true ast_rule_label.lbl_nme env in
   (* reserving an id for rule's lhs in the pattern table *)
   let env = Environment.declare_rule ast_rule_label.lbl_nme lhs_id env in
-  let (k_def, dep) =
-    let k_def = ast_rule.k_def in
-    let k_def,dep = reduce_val k_def env in
-    (k_def,dep)
-  and (env,k_alt,radius,dep_alt) =
+  let env,mixs',k_def,dep = reduce_val ast_rule.k_def env mixs in
+  let (env,mixs'',k_alt,radius,dep_alt) =
     match ast_rule.k_un with
-    | None -> (env,None,None, DepSet.empty)
+    | None -> (env,mixs',None,None, DepSet.empty)
     | Some (ast,ast_opt) -> (****TODO HERE treat ast_opt that specifies application radius****)
        let env =
 	 Environment.declare_unary_rule (Some (Environment.kappa_of_num lhs_id env,Tools.no_pos)) (*ast_rule_label.lbl_nme*) lhs_id env in
-       let k_alt,dep = reduce_val ast env in
-       let radius_alt,dep = match ast_opt with
-	   None -> (None,dep)
-	 | Some v -> let rad,dep' = (reduce_val v env) in
-		     (Some rad,DepSet.union dep dep')
+       let env,mixs'',k_alt,dep = reduce_val ast env mixs' in
+       let env,mixs''',radius_alt,dep = match ast_opt with
+	   None -> (env,mixs'',None,dep)
+	 | Some v -> let env4,mix4,rad,dep' = reduce_val v env mixs'' in
+		     (env4,mix4,Some rad,DepSet.union dep dep')
        in
-       (env,Some k_alt,radius_alt,dep)
+       (env,mixs''',Some k_alt,radius_alt,dep)
   in
-  let lhs,env = mixture_of_ast (Some lhs_id) true env ast_rule.lhs
+  let lhs,env = mixture_of_ast ~mix_id:lhs_id true env ast_rule.lhs
   in
   let lhs = match k_alt with None -> lhs | Some _ -> Mixture.set_unary lhs in
-  let rhs,env = mixture_of_ast ~tolerate_new_state None true env ast_rule.rhs in
+  let rhs,env = mixture_of_ast ~tolerate_new_state true env ast_rule.rhs in
   let (script, balance,added,modif_sites(*,side_effects*)) =
     Dynamics.diff ast_rule.rule_pos lhs rhs ast_rule_label.lbl_nme env
 
   and kappa_lhs = Mixture.to_kappa false env lhs
 
   and kappa_rhs = Mixture.to_kappa false env rhs in
-  let tokenify l =
-    List.map
-      (fun (alg_expr,(nme,pos)) ->
+  let tokenify env mixs l =
+    List.fold_right
+      (fun (alg_expr,(nme,pos)) (env,mixs,out) ->
        let id =
 	 try Environment.num_of_token nme env
 	 with Not_found -> raise (ExceptionDefn.Semantics_Error (pos,"Token "^nme^" is undefined"))
        in
-       let (f, is_const, opt_v, _ ) = partial_eval_alg env alg_expr (*dependencies are not important here since variable is evaluated only when rule is applied*)
+       let (env', mixs', f, is_const, opt_v, _ ) =
+	 partial_eval_alg env mixs alg_expr (*dependencies are not important here since variable is evaluated only when rule is applied*)
        in
        let v =
 	 if is_const then (match opt_v with
@@ -490,23 +492,22 @@ let rule_of_ast ?(backwards=false) env (ast_rule_label, ast_rule) tolerate_new_s
 			      invalid_arg "Eval.rule_of_ast: Variable is constant but was not evaluated")
 	 else VAR f
        in
-       (v,id)
-      ) l
+       (env',mixs',(v,id)::out)
+      ) l (env,mixs,[])
   in
-  let add_token = tokenify ast_rule.add_token
-  and rm_token = tokenify ast_rule.rm_token
-  in
+  let env12,mixs12,add_token = tokenify env mixs'' ast_rule.add_token in
+  let env21,mixs21,rm_token = tokenify env12 mixs12 ast_rule.rm_token in
   let ref_id =
     match ast_rule_label.lbl_ref with
     | None -> None
     | Some (ref, pos) ->
-       (try Some (Environment.num_of_kappa ref env)
+       (try Some (Environment.num_of_kappa ref env21)
 	with
 	| Not_found ->
 	   raise
 	     (ExceptionDefn.Semantics_Error (pos, "undefined label " ^ ref))) in
   let r_id = Mixture.get_id lhs in
-  let env = if Mixture.is_empty lhs then Environment.declare_empty_lhs r_id env else env in
+  let env = if Mixture.is_empty lhs then Environment.declare_empty_lhs r_id env21 else env21 in
   let env =
     DepSet.fold (*creating dependencies between variables in the kinetic rate and the activity of the rule*)
       (fun dep env ->
@@ -610,7 +611,7 @@ let rule_of_ast ?(backwards=false) env (ast_rule_label, ast_rule) tolerate_new_s
 	  cc_id := !cc_id+1 ;
 	done ; !ptr_env)
   in
-  (env,
+  (env,mixs21,
    {
      Dynamics.add_token = add_token ;
      Dynamics.rm_token = rm_token ;
@@ -633,43 +634,35 @@ let rule_of_ast ?(backwards=false) env (ast_rule_label, ast_rule) tolerate_new_s
   })
 
 let variables_of_result env res =
-  let is_pattern = true
-  in
   List.fold_left
-    (fun (env, mixtures, vars) var ->
-     match var with
-     | Ast.VAR_KAPPA (ast, label_pos) ->
-	let (env, id) =
-	  Environment.declare_var_kappa (Some label_pos) env in
-	let mix,env = mixture_of_ast (Some id) is_pattern env ast
-	in (env, (mix :: mixtures), vars)
-     | Ast.VAR_ALG (ast, label_pos) ->
-	let (f, constant, value_opt, dep) = partial_eval_alg env ast in
-	let (env, var_id) = Environment.declare_var_alg (Some label_pos) value_opt env
-	in
-	let v =
-	  if constant then Dynamics.CONST (close_var f)
-	  else
-	    Dynamics.VAR f
-	in (env, mixtures, ((v, dep, var_id) :: vars))
-    )	(env, [], []) res.Ast.variables
+    (fun (env, mixtures, vars) ((label,(beg_pos,_)),ast) ->
+     let (env', mix', f, constant, value_opt, dep) =
+       partial_eval_alg env mixtures ast in
+     let (env'', var_id) = Environment.declare_var_alg (Some (label,pos_of_lex_pos beg_pos)) value_opt env'
+     in
+     let v =
+       if constant then Dynamics.CONST (close_var f)
+       else Dynamics.VAR f
+     in (env'', mix', ((v, dep, var_id) :: vars))
+    ) (env, [], []) res.Ast.variables
 
-let rules_of_result env res tolerate_new_state =
-  let (env, l) =
+let rules_of_result env mixs res tolerate_new_state =
+  let (env, mixs, l) =
     List.fold_left
-      (fun (env, cont) (ast_rule_label, ast_rule) ->
-       let (env, r) = rule_of_ast env (ast_rule_label, ast_rule) tolerate_new_state
+      (fun (env, mixs, cont) (ast_rule_label, ast_rule) ->
+       let (env, mixs, r) =
+	 rule_of_ast env mixs (ast_rule_label, ast_rule) tolerate_new_state
        in
        match ast_rule.Ast.k_op with
-       | None -> (env,r::cont)
+       | None -> (env,mixs,r::cont)
        | Some k ->
-	  let (env,back_r) =
-	    rule_of_ast ~backwards:true env (ast_rule_label, ast_rule) tolerate_new_state
+	  let (env,mixs,back_r) =
+	    rule_of_ast ~backwards:true env mixs (ast_rule_label, ast_rule) tolerate_new_state
 	  in
-	  (env,back_r::(r::cont))
+	  (env,mixs,back_r::(r::cont))
       )
-      (env, []) res.Ast.rules
-  in (env, (List.rev l))
+      (env, mixs, []) res.Ast.rules
+  in (env, mixs, (List.rev l))
 
 let environment_of_result res =
   let env =
@@ -682,14 +675,14 @@ let environment_of_result res =
   in
   List.fold_left (fun env (tk, pos) -> token_of_ast (tk,pos) env) env res.Ast.tokens
 
-let obs_of_result env res =
+let obs_of_result env mixs res =
   List.fold_left
-    (fun cont alg_expr ->
-     let (f, const, opt_v, dep) = (partial_eval_alg env alg_expr)
+    (fun (env,mix,cont) alg_expr ->
+     let (env',mix',f, const, opt_v, dep) = (partial_eval_alg env mix alg_expr)
      in
-     (f,const,opt_v,dep,Expr.ast_alg_to_string () (fst alg_expr)) :: cont
+     env,mix',(f,const,opt_v,dep,Expr.ast_alg_to_string () (fst alg_expr)) :: cont
     )
-    [] res.observables
+    (env,mixs,[]) res.observables
 
 let effects_of_modif variables env ast_list =
   let rec iter variables effects str_pert env ast_list =
@@ -699,8 +692,9 @@ let effects_of_modif variables env ast_list =
        let (variables,effects,str_pert,env) =
 	 match ast with
 	 | INTRO (alg_expr, ast_mix, pos) ->
-	    let (x, is_constant, opt_v, dep) = partial_eval_alg env alg_expr in
-	    let m,env = mixture_of_ast None false env ast_mix in
+	    let (env', mixs',x, is_constant, opt_v, dep) =
+	      partial_eval_alg env variables alg_expr in
+	    let m,env = mixture_of_ast false env' ast_mix in
 	    let v =
 	      if is_constant
 	      then (match opt_v with Some v -> Dynamics.CONST v
@@ -711,14 +705,15 @@ let effects_of_modif variables env ast_list =
 	      (Printf.sprintf "introduce %a * %s"
 			      Expr.ast_alg_to_string (fst alg_expr)
 			      (Mixture.to_kappa false env m))::str_pert
-	    in (variables, (Dynamics.INTRO (v, m))::effects, str, env)
+	    in (mixs', (Dynamics.INTRO (v, m))::effects, str, env)
 	 | DELETE (alg_expr, ast_mix, pos) ->
-	    let (x, is_constant, opt_v, dep) = partial_eval_alg env alg_expr in
+	    let (env',mixs',x, is_constant, opt_v, dep) =
+	      partial_eval_alg env variables alg_expr in
 	    let nme_pert = Printf.sprintf "pert_%d" (Environment.next_pert_id env) in
 	    let (env, id) =
-	      Environment.declare_var_kappa (Some (nme_pert,pos)) env
+	      Environment.declare_var_kappa (Some (nme_pert,pos)) env'
 	    in
-	    let m,env = mixture_of_ast (Some id) true env ast_mix in
+	    let m,env = mixture_of_ast ~mix_id:id true env ast_mix in
 	    let v =
 	      if is_constant
 	      then (match opt_v with Some v -> Dynamics.CONST v
@@ -728,7 +723,7 @@ let effects_of_modif variables env ast_list =
 	    let str =
 	      (Printf.sprintf "remove %a * %s" Expr.ast_alg_to_string (fst alg_expr)
 			      (Mixture.to_kappa false env m))::str_pert
-	    in ((m :: variables), (Dynamics.DELETE (v, m))::effects, str, env)
+	    in ((m :: mixs'), (Dynamics.DELETE (v, m))::effects, str, env)
 	 | UPDATE ((nme, pos_rule), alg_expr) ->
 	    let i,is_rule =
 	      (try (Environment.num_of_rule nme env,true)
@@ -739,8 +734,9 @@ let effects_of_modif variables env ast_list =
 		  with Not_found ->
 		    raise (ExceptionDefn.Semantics_Error
 			     (pos_rule,"Variable " ^ (nme ^ " is neither a constant nor a rule")))
-	      )
-	    and (x, is_constant, opt_v, dep) = partial_eval_alg env alg_expr in
+	      ) in
+	    let (env', mixs', x, is_constant, opt_v, dep) =
+	      partial_eval_alg env variables alg_expr in
 	    let v =
 	      if is_constant
 	      then (match opt_v with Some v -> Dynamics.CONST v
@@ -750,14 +746,15 @@ let effects_of_modif variables env ast_list =
 	    let str =
 	      (if is_rule then
 		 Printf.sprintf "set rate of rule '%s' to %a"
-			       (Environment.rule_of_num i env)
+				(Environment.rule_of_num i env)
 	       else
 		 Printf.sprintf "set variable '%s' to %a"
 				(fst (Environment.alg_of_num i env)))
 		Expr.ast_alg_to_string (fst alg_expr)::str_pert
 	    in
-	    if is_rule then (variables, (Dynamics.UPDATE_RULE (i, v))::effects, str, env)
-	    else (variables, (Dynamics.UPDATE_VAR (i, v))::effects, str, env)
+	    (mixs',
+	     (if is_rule then Dynamics.UPDATE_RULE (i, v)
+	      else Dynamics.UPDATE_VAR (i, v))::effects, str, env')
 	 | UPDATE_TOK ((tk_nme,tk_pos),alg_expr) ->
 	    let tk_id =
 	      try Environment.num_of_token tk_nme env with
@@ -765,7 +762,8 @@ let effects_of_modif variables env ast_list =
 		 raise (ExceptionDefn.Semantics_Error
 			  (tk_pos,"Token " ^ (tk_nme ^ " is not defined")))
 	    in
-	    let (x, is_constant, opt_v, dep) = partial_eval_alg env alg_expr in
+	    let (env', mixs', x, is_constant, opt_v, dep) =
+	      partial_eval_alg env variables alg_expr in
 	    let v =
 	      if is_constant
 	      then (match opt_v with Some v -> Dynamics.CONST v
@@ -775,7 +773,7 @@ let effects_of_modif variables env ast_list =
 	    let str = (Printf.sprintf "set token '%s' to value %a" tk_nme
 				      Expr.ast_alg_to_string (fst alg_expr))::str_pert
 	    in
-	    (variables, (Dynamics.UPDATE_TOK (tk_id, v))::effects, str, env)
+	    (mixs', (Dynamics.UPDATE_TOK (tk_id, v))::effects, str, env')
 	 | SNAPSHOT (pexpr,pos) ->
 	    (*when specializing snapshots to particular mixtures, add variables below*)
 	    let str = ("snapshot state")::str_pert in
@@ -827,8 +825,8 @@ let pert_of_result variables env res =
     List.fold_left
       (fun (variables, lpert, lrules, env)
 	   (pre_expr, modif_expr_list, pos, opt_post) ->
-       let (x, is_constant, dep, stopping_time) =
-	 (try partial_eval_bool env pre_expr with
+       let (env', variables', x, is_constant, dep, stopping_time) =
+	 (try partial_eval_bool env variables pre_expr with
 	    ExceptionDefn.Unsatisfiable ->
 	    raise
 	      (ExceptionDefn.Semantics_Error
@@ -836,7 +834,7 @@ let pert_of_result variables env res =
 	 )
        in
        let (variables, effects, str_eff, env) =
-	 effects_of_modif variables env modif_expr_list in
+	 effects_of_modif variables' env' modif_expr_list in
        let str_eff = String.concat ";" (List.rev str_eff) in
        let bv =
 	 if is_constant
@@ -848,8 +846,8 @@ let pert_of_result variables env res =
 	    (Printf.sprintf "whenever %a, %s"
 			    Expr.bool_to_string (fst pre_expr) str_eff,None)
 	 | Some post_expr ->
-	    let (x, is_constant, dep, stopping_time) =
-	      try partial_eval_bool env post_expr with
+	    let (env', variables', x, is_constant, dep, stopping_time) =
+	      try partial_eval_bool env variables post_expr with
 		ExceptionDefn.Unsatisfiable ->
 		raise
 		  (ExceptionDefn.Semantics_Error
@@ -864,7 +862,7 @@ let pert_of_result variables env res =
 			    Expr.bool_to_string (fst post_expr),
 	     Some (bv,dep))
        in
-       let env,p_id = Environment.declare_pert (str_pert,pos) env in
+       let env,p_id = Environment.declare_pert (str_pert,pos) env' in
        let env,effect_list,_ =
 	 List.fold_left
 	   (fun (env,rule_list,cpt) effect ->
@@ -1003,7 +1001,7 @@ let pert_of_result variables env res =
 				    match r_opt with None -> cont
 						   | Some r -> r::cont) lrules effect_list
        in
-       (variables, pert::lpert, lrules, env)
+       (variables', pert::lpert, lrules, env)
       )
       (variables, [], [], env) res.perturbations
   in
@@ -1025,14 +1023,15 @@ let init_graph_of_result env res =
        match init_t with
        | INIT_MIX (alg, ast) ->
 	  begin
-	    let (v, is_const, opt_v, dep) = partial_eval_alg env alg in
+	    let (env, mixs, v, is_const, opt_v, dep) =
+	      partial_eval_alg env [] alg in
 	    let cpt = ref 0 in
 	    let sg = ref sg in
 	    let env = ref env in
 	    let value =
-	      match opt_v with
-	      | Some v -> v
-	      | None -> raise
+	      match mixs, opt_v with
+	      | [], Some v -> v
+	      | _, _ -> raise
 			  (ExceptionDefn.Semantics_Error
 			     (pos,
 			      Printf.sprintf "%a is not a constant, cannot initialize graph."
@@ -1053,11 +1052,12 @@ let init_graph_of_result env res =
 	    (!sg,!env)
 	  end
        | INIT_TOK (alg, (tk_nme,pos_tk)) ->
-	  let (v, is_const, opt_v, _) = partial_eval_alg env alg in
+	  let (env, mixs, v, is_const, opt_v, _) =
+	    partial_eval_alg env [] alg in
 	  let x =
-	    match opt_v with
-	    | Some n -> Nbr.to_float n
-	    | None ->
+	    match mixs,opt_v with
+	    | [], Some n -> Nbr.to_float n
+	    | _, _ ->
 	       raise (ExceptionDefn.Semantics_Error
 			(pos_tk,
 			 Printf.sprintf "%a is not a constant, cannot initialize token value."
@@ -1190,13 +1190,13 @@ let initialize result counter =
 	Parameter.implicitSignature := false ;
 
 	Debug.tag "\t -rules";
-	let (env, rules) = rules_of_result env result tolerate_new_state in
+	let (env, kappa_vars, rules) = rules_of_result env kappa_vars result tolerate_new_state in
 	
 	Debug.tag "\t -observables";
-	let observables = obs_of_result env result in
+	let env,kappa_vars,observables = obs_of_result env kappa_vars result in
 	Debug.tag "\t -perturbations" ;
-	let (kappa_vars, pert, rule_pert, env) = pert_of_result kappa_vars env result
-	in
+	let (kappa_vars, pert, rule_pert, env) =
+	  pert_of_result kappa_vars env result in
 	Debug.tag "\t Done";
 	Debug.tag "+ Analyzing non local patterns..." ;
 	let env = Environment.init_roots_of_nl_rules env in

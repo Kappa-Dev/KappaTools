@@ -25,16 +25,22 @@ let eval_pexpr pexpr state counter env =
        match ast with
        | Ast.Str_pexpr str -> str::cont
        | Ast.Alg_pexpr alg ->
-	  let (x, is_constant, opt_v, dep) =
-	    Eval.partial_eval_alg env (alg, pos) in
-	  let v =
-	    if is_constant
-	    then (match opt_v with Some v -> Dynamics.CONST v
-				 | None -> invalid_arg "Eval.effects_of_modif")
-	    else Dynamics.VAR x
-	  in
-	  let n = State.value state counter env v in
-	  (Nbr.to_string n)::cont
+	  let (env', mixs, x, is_constant, opt_v, dep) =
+	    Eval.partial_eval_alg env [] (alg, pos) in
+	  match mixs with
+	  | _ :: _ ->
+	     raise (ExceptionDefn.Semantics_Error
+		      (pos_of_lex_pos (fst pos), "Mixture occurences of are not allowed here.
+						  Please use an auxilary variable."))
+	  | [] ->
+	     let v =
+	       if is_constant
+	       then (match opt_v with Some v -> Dynamics.CONST v
+				    | None -> invalid_arg "Eval.effects_of_modif")
+	       else Dynamics.VAR x
+	     in
+	     let n = State.value state counter env' v in
+	     (Nbr.to_string n)::cont
       ) [] pexpr
   in
   String.concat "" (List.rev l)
@@ -45,14 +51,21 @@ let dump_print_expr desc pexpr state counter env =
      match ast with
      | Ast.Str_pexpr str -> Printf.fprintf desc "%s" str
      | Ast.Alg_pexpr alg ->
-	let (x, is_constant, opt_v, dep) =
-	  Eval.partial_eval_alg env (alg, pos) in
-	let v =
-	  if is_constant
-	  then (match opt_v with Some v -> Dynamics.CONST v | None -> invalid_arg "Eval.effects_of_modif")
-	  else Dynamics.VAR x
-	in
-	Nbr.print desc (State.value state counter env v)
+	let (env', mixs, x, is_constant, opt_v, dep) =
+	  Eval.partial_eval_alg env [] (alg, pos) in
+	match mixs with
+	| _ :: _ ->
+	   raise (ExceptionDefn.Semantics_Error
+		    (pos_of_lex_pos (fst pos), "Mixture occurences of are not allowed here.
+						Please use an auxilary variable."))
+	| [] ->
+	   let v =
+	     if is_constant
+	     then (match opt_v with Some v -> Dynamics.CONST v
+				  | None -> invalid_arg "Eval.effects_of_modif")
+	     else Dynamics.VAR x
+	   in
+	   Nbr.print desc (State.value state counter env' v)
     ) pexpr ;
   Printf.fprintf desc "\n"
 

@@ -89,7 +89,7 @@ let create_agent name intf = {name=name ; interface = intf}
 
 let empty id_opt = {
 	agents = IntMap.empty ;
-	site_number = 0 ; 
+	site_number = 0 ;
 	graph = Int2Map.empty ;
 	enum_cov = None ;
 	ids_of_name = Int2Map.empty ;
@@ -99,7 +99,7 @@ let empty id_opt = {
 	size_of_cc = Array.make 0 0 ;
 	root_of_cc = Array.make 0 0 ;
 	unary = false
-	} 
+	}
 
 let unary mix = mix.unary
 let set_unary mix = {mix with unary = true}

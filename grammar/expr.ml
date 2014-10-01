@@ -5,6 +5,8 @@ let rec print_ast_alg f = function
   | Ast.TMAX -> Printf.fprintf f "[Tmax]"
   | Ast.CONST n -> Nbr.print f n
   | Ast.OBS_VAR lab -> Printf.fprintf f "'%s'" lab
+  | Ast.KAPPA_INSTANCE ast ->
+     Printf.fprintf f "|#no printer for mixture, sorry#|"
   | Ast.TOKEN_ID tk -> Printf.fprintf f "|%s|" tk
   | Ast.STATE_ALG_OP op -> Term.print_state_alg_op f op
   | Ast.BIN_ALG_OP (op, (a,_), (b,_)) ->
@@ -17,6 +19,8 @@ let rec ast_alg_to_string () = function
   | Ast.TMAX -> Printf.sprintf "[Tmax]"
   | Ast.CONST n -> Nbr.to_string n
   | Ast.OBS_VAR lab -> Printf.sprintf "'%s'" lab
+  | Ast.KAPPA_INSTANCE ast ->
+     Printf.sprintf "|#no printer for mixture, sorry#|"
   | Ast.TOKEN_ID tk -> Printf.sprintf "|%s|" tk
   | Ast.STATE_ALG_OP op -> Term.state_alg_op_to_string () op
   | Ast.BIN_ALG_OP (op, (a,_), (b,_)) ->

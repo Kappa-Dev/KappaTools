@@ -2,6 +2,7 @@
   open Mods
 
   let add_pos x = (x,(Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()))
+  let rhs_pos i = (Parsing.rhs_start_pos i, Parsing.rhs_end_pos i)
 %}
 
 %token EOF NEWLINE SEMICOLON
@@ -66,17 +67,12 @@ start_rule:
 		      | Ast.DECLARE var ->
 			 (Ast.result := {!Ast.result with
 					  Ast.variables = var::!Ast.result.Ast.variables})
-		      | Ast.OBS var ->
+		      | Ast.OBS (_,expr as var) ->
 			 (*for backward compatibility, shortcut for %var + %plot*)
-			 let expr = (
-			   (match var with
-			    | Ast.VAR_KAPPA (_,lab) -> Ast.OBS_VAR (fst lab)
-			    | Ast.VAR_ALG (_,lab) -> Ast.OBS_VAR (fst lab)),
-			   (Lexing.dummy_pos, Lexing.dummy_pos))
-			 in
-			 (Ast.result := {!Ast.result with
-					  Ast.variables = var::!Ast.result.Ast.variables;
-					  Ast.observables = expr::!Ast.result.Ast.observables})
+			 (Ast.result :=
+			    {!Ast.result with
+			      Ast.variables = var::!Ast.result.Ast.variables;
+			      Ast.observables = expr::!Ast.result.Ast.observables})
 		      | Ast.PLOT expr ->
 			 (Ast.result := {!Ast.result with
 					  Ast.observables = expr::!Ast.result.Ast.observables})
@@ -227,14 +223,12 @@ boolean:
     ;
 
 variable_declaration:
-    | LABEL non_empty_mixture {Ast.VAR_KAPPA ($2,$1)}
-    | LABEL alg_expr {Ast.VAR_ALG ($2,$1)}
+    | LABEL alg_expr {(((fst $1),rhs_pos 1),$2)}
     | LABEL error
 	    {let str,pos = $1 in
 	     raise
-	       (ExceptionDefn.Syntax_Error (Some pos,
-					    (Printf.sprintf "Variable '%s' should be either a pure kappa expression or an algebraic expression on variables" str))
-	       )
+	       (ExceptionDefn.Syntax_Error
+		  (Some pos, "Illegal definition of variable '"^str^"'"))
 	    }
     ;
 
@@ -348,6 +342,7 @@ constant:
 
 variable:
     | PIPE ID PIPE {let str,pos = $2 in add_pos (Ast.TOKEN_ID (str))}
+    | PIPE non_empty_mixture PIPE { add_pos (Ast.KAPPA_INSTANCE $2) }
     | LABEL {let str,pos = $1 in add_pos (Ast.OBS_VAR (str))}
     | TIME {add_pos (Ast.STATE_ALG_OP (Term.TIME_VAR))}
     | EVENT {add_pos (Ast.STATE_ALG_OP (Term.EVENT_VAR))}

@@ -3,6 +3,23 @@ open Mods
 
 type str_pos = string * Tools.pos
 
+type link =
+  | LNK_VALUE of int * Tools.pos
+  | FREE
+  | LNK_ANY of Tools.pos
+  | LNK_SOME of Tools.pos
+  | LNK_TYPE of str_pos * str_pos
+type internal = string list
+type port = {port_nme:string;
+	     port_int:internal;
+	     port_lnk:link;
+	     port_pos:Tools.pos}
+type interface = PORT_SEP of port * interface | EMPTY_INTF
+type agent = {ag_nme:string ; ag_intf:interface ; ag_pos:Tools.pos}
+type mixture =
+	| COMMA of agent * mixture
+	| EMPTY_MIX
+
 type ast_alg_expr =
     BIN_ALG_OP of
       bin_alg_op * ast_alg_expr with_pos * ast_alg_expr with_pos
@@ -10,6 +27,7 @@ type ast_alg_expr =
   | STATE_ALG_OP of state_alg_op
   | OBS_VAR of string
   | TOKEN_ID of string
+  | KAPPA_INSTANCE of mixture
   | CONST of Nbr.t
   | TMAX
   | EMAX
@@ -23,20 +41,6 @@ type ast_bool_expr =
   | SMALLER of ast_alg_expr with_pos * ast_alg_expr with_pos
   | EQUAL of ast_alg_expr with_pos * ast_alg_expr with_pos
   | DIFF of ast_alg_expr with_pos * ast_alg_expr with_pos
-
-type link =
-  | LNK_VALUE of int * Tools.pos
-  | FREE
-  | LNK_ANY of Tools.pos
-  | LNK_SOME of Tools.pos
-  | LNK_TYPE of str_pos * str_pos
-type mixture = 
-	| COMMA of agent * mixture 
-	| EMPTY_MIX
-and agent = {ag_nme:string ; ag_intf:interface ; ag_pos:Tools.pos}
-and interface = PORT_SEP of port * interface | EMPTY_INTF
-and port = {port_nme:string ; port_int: internal ; port_lnk : link ; port_pos : Tools.pos}
-and internal = string list
 
 type rule = {
   rule_pos: Tools.pos ;
@@ -54,23 +58,24 @@ type rule = {
 and arrow = RAR of Tools.pos | LRAR of Tools.pos
 type rule_label = {lbl_nme:str_pos option ; lbl_ref:str_pos option}
 
-let flip (rule_label,rule) = 
-	let lbl = match rule_label.lbl_nme with None -> None | Some (str,pos) -> Some (str^"_op",pos)
-	and rule = 
-		{rule with 
-			lhs = rule.rhs ; 
-			rhs = rule.lhs ; 
-			add_token = rule.rm_token ; 
-			rm_token = rule.add_token ; 
-			k_def = (match rule.k_op with
-				   None -> CONST (Nbr.F 0.),
-					   (Lexing.dummy_pos, Lexing.dummy_pos)
-				 | Some k -> k);
-			k_op = None
-			}
-	in 
-	({rule_label with lbl_nme=lbl},rule)
-		
+let flip (rule_label,rule) =
+  let lbl = match rule_label.lbl_nme with
+      None -> None
+    | Some (str,pos) -> Some (str^"_op",pos) in
+  let rule =
+    {rule with
+      lhs = rule.rhs ;
+      rhs = rule.lhs ;
+      add_token = rule.rm_token ;
+      rm_token = rule.add_token ;
+      k_def = (match rule.k_op with
+		 None -> CONST (Nbr.F 0.),
+			 (Lexing.dummy_pos, Lexing.dummy_pos)
+	       | Some k -> k);
+      k_op = None
+    }
+  in
+  ({rule_label with lbl_nme=lbl},rule)
 
 type print_expr = Str_pexpr of string | Alg_pexpr of ast_alg_expr
 type modif_expr =
@@ -94,24 +99,23 @@ type perturbation =
 
 type configuration = str_pos * (str_pos list)
 
-type instruction = 
-	| SIG of agent * Tools.pos
-	| TOKENSIG of str_pos
-	| VOLSIG of str_pos * float * str_pos (* type, volume, parameter*)
-	| INIT of str_pos option * init_t * Tools.pos (*volume, init, position *)
-	| DECLARE of variable
-	| OBS of variable  (*for backward compatibility*)
-	| PLOT of ast_alg_expr with_pos
-	| PERT of perturbation
-	| CONFIG of configuration
-and init_t = 
-	| INIT_MIX of  ast_alg_expr with_pos * mixture 
-	| INIT_TOK of  ast_alg_expr with_pos * str_pos 
-and variable = 
-	| VAR_KAPPA of mixture * str_pos 
-	| VAR_ALG of ast_alg_expr with_pos * str_pos 
-	
-type compil = {variables : variable list; (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
+type variable_def = string with_pos * ast_alg_expr with_pos
+type init_t =
+  | INIT_MIX of  ast_alg_expr with_pos * mixture
+  | INIT_TOK of  ast_alg_expr with_pos * str_pos
+
+type instruction =
+  | SIG of agent * Tools.pos
+  | TOKENSIG of str_pos
+  | VOLSIG of str_pos * float * str_pos (* type, volume, parameter*)
+  | INIT of str_pos option * init_t * Tools.pos (*volume, init, position *)
+  | DECLARE of variable_def
+  | OBS of variable_def (*for backward compatibility*)
+  | PLOT of ast_alg_expr with_pos
+  | PERT of perturbation
+  | CONFIG of configuration
+
+type compil = {variables : variable_def list; (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
 	       signatures : (agent * Tools.pos) list ; (*agent signature declaration*)
 	       rules : (rule_label * rule) list ; (*rules (possibly named)*)
 	       observables : ast_alg_expr with_pos list ; (*list of patterns to plot*)
@@ -121,7 +125,7 @@ type compil = {variables : variable list; (*pattern declaration for reusing as v
 	       tokens :  str_pos list ;
 	       volumes : (str_pos * float * str_pos) list
 	      }
-let result:compil ref = ref {variables=[] ; signatures=[] ; rules=[] ; init = [] ; observables = [] ; perturbations = [] ; configurations = [] ; tokens = []; volumes=[]} 
+let result:compil ref = ref {variables=[] ; signatures=[] ; rules=[] ; init = [] ; observables = [] ; perturbations = [] ; configurations = [] ; tokens = []; volumes=[]}
 let init_compil = fun _ -> result := {variables=[] ; signatures=[] ; rules=[] ; init = [] ; observables = [] ; perturbations = [] ; configurations = [] ; tokens = [] ; volumes=[]}
 
 (*

@@ -17,10 +17,10 @@
 %var: 'on_rate' 1.0E-4 # per molecule per second
 %var: 'off_rate' 0.1 # per second 
 %var: 'mod_rate' 1 # per second 
-%obs: 'AB' A(x!x.B)
-%obs: 'Cuu' C(x1~u?,x2~u?)
-%obs: 'Cpu' C(x1~p?,x2~u?) 
-%obs: 'Cpp' C(x1~p?,x2~p?) 
+%obs: 'AB' |A(x!x.B)|
+%obs: 'Cuu' |C(x1~u?,x2~u?)|
+%obs: 'Cpu' |C(x1~p?,x2~u?)|
+%obs: 'Cpp' |C(x1~p?,x2~p?)|
 
 
 %var: 'n_a' 100000	   
