@@ -1,18 +1,18 @@
 <img src="http://www.pps.jussieu.fr/~jkrivine/homepage/Research_files/droppedImage.jpg" alt="KaSim logo" title="Stochastic Kappa Simulator" align="right" />
 # KaSim
 
-KaSim is a stochastic simulator for rule-based models written in Kappa. A pdf of the reference 
-manual is available [here](https://github.com/jkrivine/KaSim/releases);
+KaSim is a stochastic simulator for rule-based models written in Kappa. A pdf of the reference
+manual is available [here](https://github.com/Kappa-Dev/KaSim/releases);
 
 the latex sources are available in the man/ directory.
 
 ## Installation
 
-To install you need the ocaml native compiler. To check whether you have it, type 
+To install you need the ocaml native compiler. To check whether you have it, type
 
-`ocamlopt.opt -version` 
+`ocamlopt.opt -version`
 
-Ocaml native compilers can be downloaded on [INRIA's website](http://caml.inria.fr/). To create kaSim binaries, simply type 
+Ocaml native compilers can be downloaded on [INRIA's website](http://caml.inria.fr/). To create kaSim binaries, simply type
 
 `make`
 
@@ -28,7 +28,7 @@ This will produce a data file of 1000 point (-p option) containing the trajector
 
 Type:
 
-`KaSim --help` 
+`KaSim --help`
 
 for a complete list of options.
 
