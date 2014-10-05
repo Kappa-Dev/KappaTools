@@ -172,14 +172,14 @@ type perturbation =
    | UPDATE_RULE of int * Nbr.t variable
    | UPDATE_VAR of int * Nbr.t variable
    | UPDATE_TOK of int * Nbr.t variable
-   | SNAPSHOT of Ast.print_expr Term.with_pos list
-   | STOP of Ast.print_expr Term.with_pos list
+   | SNAPSHOT of Ast.mixture Ast.print_expr Term.with_pos list
+   | STOP of Ast.mixture Ast.print_expr Term.with_pos list
    | CFLOW of int
-   | FLUX of Ast.print_expr Term.with_pos list
-   | FLUXOFF of Ast.print_expr Term.with_pos list
+   | FLUX of Ast.mixture Ast.print_expr Term.with_pos list
+   | FLUXOFF of Ast.mixture Ast.print_expr Term.with_pos list
    | CFLOWOFF of int
    | PRINT of
-       (Ast.print_expr Term.with_pos list * Ast.print_expr Term.with_pos list)
+       (Ast.mixture Ast.print_expr Term.with_pos list * Ast.mixture Ast.print_expr Term.with_pos list)
 
 let print_pert env f pert =
   let string_of_effect f (_, effect) =
