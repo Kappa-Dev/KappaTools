@@ -1,5 +1,5 @@
 open Term
-open Mods 
+open Mods
 
 type str_pos = string * Tools.pos
 
@@ -20,27 +20,25 @@ type mixture =
 	| COMMA of agent * mixture
 	| EMPTY_MIX
 
-type 'mixture ast_alg_expr =
+type 'mixt ast_alg_expr =
     BIN_ALG_OP of
-      bin_alg_op * 'mixture ast_alg_expr with_pos * 'mixture ast_alg_expr with_pos
-  | UN_ALG_OP of un_alg_op * 'mixture ast_alg_expr with_pos
+      bin_alg_op * 'mixt ast_alg_expr with_pos * 'mixt ast_alg_expr with_pos
+  | UN_ALG_OP of un_alg_op * 'mixt ast_alg_expr with_pos
   | STATE_ALG_OP of state_alg_op
   | OBS_VAR of string
   | TOKEN_ID of string
-  | KAPPA_INSTANCE of 'mixture 
+  | KAPPA_INSTANCE of 'mixt
   | CONST of Nbr.t
   | TMAX
   | EMAX
 
-type 'mixture ast_bool_expr =
+type 'mixt ast_bool_expr =
   | TRUE
   | FALSE
-  | AND of 'mixture ast_bool_expr with_pos * 'mixture ast_bool_expr with_pos
-  | OR of 'mixture ast_bool_expr with_pos * 'mixture ast_bool_expr with_pos
-  | GREATER of 'mixture ast_alg_expr with_pos * 'mixture ast_alg_expr with_pos
-  | SMALLER of 'mixture ast_alg_expr with_pos * 'mixture ast_alg_expr with_pos
-  | EQUAL of 'mixture ast_alg_expr with_pos * 'mixture ast_alg_expr with_pos
-  | DIFF of 'mixture ast_alg_expr with_pos * 'mixture ast_alg_expr with_pos
+  | BOOL_OP of
+      bool_op * 'mixt ast_bool_expr with_pos * 'mixt ast_bool_expr with_pos
+  | COMPARE_OP of
+      compare_op * 'mixt ast_alg_expr with_pos * 'mixt ast_alg_expr with_pos
 
 type rule = {
   rule_pos: Tools.pos ;
@@ -50,7 +48,8 @@ type rule = {
   rhs:mixture;
   add_token: (mixture ast_alg_expr with_pos * str_pos) list ;
   k_def:mixture ast_alg_expr with_pos ;
-  k_un:(mixture ast_alg_expr with_pos * mixture ast_alg_expr with_pos option) option ;
+  k_un:
+    (mixture ast_alg_expr with_pos*mixture ast_alg_expr with_pos option) option;
   (*k_1:radius_opt*)
   k_op: mixture ast_alg_expr with_pos option ; (*rate for backward rule*)
 }
@@ -115,7 +114,7 @@ type 'mixture instruction =
   | PERT of 'mixture perturbation
   | CONFIG of configuration
 
-type ('agent,'mixture,'rule) compil = 
+type ('agent,'mixture,'rule) compil =
   {
     variables : 'mixture variable_def list; (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
     signatures : ('agent * Tools.pos) list ; (*agent signature declaration*)
@@ -127,8 +126,13 @@ type ('agent,'mixture,'rule) compil =
     tokens :  str_pos list ;
     volumes : (str_pos * float * str_pos) list
   }
-let result:(agent,mixture,rule) compil ref = ref {variables=[] ; signatures=[] ; rules=[] ; init = [] ; observables = [] ; perturbations = [] ; configurations = [] ; tokens = []; volumes=[]}
-let init_compil = fun _ -> result := {variables=[] ; signatures=[] ; rules=[] ; init = [] ; observables = [] ; perturbations = [] ; configurations = [] ; tokens = [] ; volumes=[]}
+let result:(agent,mixture,rule) compil ref =
+  ref {variables=[]; signatures=[]; rules=[]; init=[]; observables=[];
+       perturbations=[]; configurations=[]; tokens=[]; volumes=[]}
+let init_compil _ =
+  result :=
+    {variables=[]; signatures=[]; rules=[]; init = []; observables=[];
+     perturbations=[]; configurations=[]; tokens=[]; volumes=[]}
 
 (*
 let reverse res = 

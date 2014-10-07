@@ -4,12 +4,11 @@ open Dynamics
 open Tools
 open Ast
 
-type context =
-	{ pairing : link IntMap.t; curr_id : int; new_edges : (int * int) Int2Map.t
-	}
+type link = Closed | Semi of int * int * pos
 
-and link =
-	| Closed | Semi of int * int * pos
+type context =
+    { pairing : link IntMap.t; curr_id : int;
+      new_edges : (int * int) Int2Map.t }
 
 let eval_intf ast_intf =
   let rec iter ast_intf map =
@@ -416,13 +415,9 @@ let rec partial_eval_bool env mixs (ast,_) =
      | TRUE ->
 	(env,mixs,(fun _ _ _ _ _ _ _-> true), true, DepSet.singleton Mods.EVENT,None)
      | FALSE -> (env,mixs,(fun _ _ _ _ _ _ _-> false), true, DepSet.empty,None)
-     | AND (ast, ast') -> bin_op_bool ast ast' (&&)
-     | OR (ast, ast') -> bin_op_bool ast ast' (||)
-     | GREATER (ast, ast') -> bin_op_alg ast ast' Nbr.is_greater
-     | SMALLER (ast, ast') -> bin_op_alg ast ast' Nbr.is_smaller
-     | EQUAL (ast, ast') -> bin_op_alg ast ast' Nbr.is_equal
-     | DIFF (ast, ast') ->
-	bin_op_alg ast ast' (fun v v' -> not (Nbr.is_equal v v'))
+     | BOOL_OP(Term.AND,ast, ast') -> bin_op_bool ast ast' (&&)
+     | BOOL_OP(Term.OR,ast, ast') -> bin_op_bool ast ast' (||)
+     | COMPARE_OP(op,ast, ast') -> bin_op_alg ast ast' (Nbr.of_compare_op op)
 
 let signature_of_ast s env =
   let (name, ast_intf, pos) =

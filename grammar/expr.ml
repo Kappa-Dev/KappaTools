@@ -1,5 +1,3 @@
-open Ast
-
 let rec print_ast_alg f = function
   | Ast.EMAX -> Printf.fprintf f "[Emax]"
   | Ast.TMAX -> Printf.fprintf f "[Tmax]"
@@ -32,31 +30,19 @@ let rec ast_alg_to_string () = function
 let rec print_bool f = function
   | Ast.TRUE -> Printf.fprintf f "[true]"
   | Ast.FALSE -> Printf .fprintf f "[false]"
-  | Ast.AND ((a,_), (b,_)) ->
-     Printf.fprintf f "(%a && %a)" print_bool a print_bool b
-  | Ast.OR ((a,_), (b,_)) ->
-     Printf.fprintf f "(%a || %a)" print_bool a print_bool b
-  | Ast.GREATER ((a,_), (b,_)) ->
-     Printf.fprintf f "(%a > %a)" print_ast_alg a print_ast_alg b
-  | Ast.SMALLER ((a,_), (b,_)) ->
-     Printf.fprintf f "(%a < %a)" print_ast_alg a print_ast_alg b
-  | Ast.EQUAL ((a,_), (b,_)) ->
-     Printf.fprintf f "(%a = %a)" print_ast_alg a print_ast_alg b
-  | Ast.DIFF ((a,_), (b,_)) ->
-     Printf.fprintf f "(%a != %a)" print_ast_alg a print_ast_alg b
+  | Ast.BOOL_OP (op,(a,_), (b,_)) ->
+     Printf.fprintf f "(%a %a %a)"
+		    print_bool a Term.print_bool_op op print_bool b
+  | Ast.COMPARE_OP (op,(a,_), (b,_)) ->
+     Printf.fprintf f "(%a %a %a)"
+		    print_ast_alg a Term.print_compare_op op print_ast_alg b
 
 let rec bool_to_string () = function
   | Ast.TRUE -> Printf.sprintf "[true]"
   | Ast.FALSE -> Printf .sprintf "[false]"
-  | Ast.AND ((a,_), (b,_)) ->
-     Printf.sprintf "(%a && %a)" bool_to_string a bool_to_string b
-  | Ast.OR ((a,_), (b,_)) ->
-     Printf.sprintf "(%a || %a)" bool_to_string a bool_to_string b
-  | Ast.GREATER ((a,_), (b,_)) ->
-     Printf.sprintf "(%a > %a)" ast_alg_to_string a ast_alg_to_string b
-  | Ast.SMALLER ((a,_), (b,_)) ->
-     Printf.sprintf "(%a < %a)" ast_alg_to_string a ast_alg_to_string b
-  | Ast.EQUAL ((a,_), (b,_)) ->
-     Printf.sprintf "(%a = %a)" ast_alg_to_string a ast_alg_to_string b
-  | Ast.DIFF ((a,_), (b,_)) ->
-     Printf.sprintf "(%a != %a)" ast_alg_to_string a ast_alg_to_string b
+  | Ast.BOOL_OP (op, (a,_), (b,_)) ->
+     Printf.sprintf "(%a %a %a)"
+		    bool_to_string a Term.bool_op_to_string op bool_to_string b
+  | Ast.COMPARE_OP (op, (a,_), (b,_)) ->
+     Printf.sprintf "(%a %a %a)" ast_alg_to_string a
+		    Term.compare_op_to_string op ast_alg_to_string b

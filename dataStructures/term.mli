@@ -4,6 +4,8 @@ type bin_alg_op = MULT | SUM | DIV | MINUS | POW | MODULO | MIN | MAX
 type un_alg_op = LOG | SQRT | EXP | SINUS | COSINUS | TAN | INT | UMINUS
 type state_alg_op = CPUTIME | TIME_VAR | EVENT_VAR | NULL_EVENT_VAR |
 		    PROD_EVENT_VAR
+type bool_op = AND | OR
+type compare_op = GREATER | SMALLER | EQUAL | DIFF
 
 val bin_alg_op_to_string : unit -> bin_alg_op -> string
 val print_bin_alg_op : out_channel -> bin_alg_op -> unit
@@ -11,3 +13,7 @@ val un_alg_op_to_string : unit -> un_alg_op -> string
 val print_un_alg_op : out_channel -> un_alg_op -> unit
 val state_alg_op_to_string : unit -> state_alg_op -> string
 val print_state_alg_op : out_channel -> state_alg_op -> unit
+val bool_op_to_string : unit -> bool_op -> string
+val print_bool_op : out_channel -> bool_op -> unit
+val compare_op_to_string : unit -> compare_op -> string
+val print_compare_op : out_channel -> compare_op -> unit

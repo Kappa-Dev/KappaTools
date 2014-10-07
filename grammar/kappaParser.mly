@@ -234,12 +234,12 @@ variable_declaration:
 
 bool_expr:
     | OP_PAR bool_expr CL_PAR {$2}
-    | bool_expr AND bool_expr {add_pos (Ast.AND ($1,$3))}
-    | bool_expr OR bool_expr {add_pos (Ast.OR ($1,$3))}
-    | alg_expr GREATER alg_expr {add_pos (Ast.GREATER ($1,$3))}
-    | alg_expr SMALLER alg_expr {add_pos (Ast.SMALLER ($1,$3))}
-    | alg_expr EQUAL alg_expr {add_pos (Ast.EQUAL ($1,$3))}
-    | alg_expr DIFF alg_expr {add_pos (Ast.DIFF ($1,$3))}
+    | bool_expr AND bool_expr {add_pos (Ast.BOOL_OP(Term.AND,$1,$3))}
+    | bool_expr OR bool_expr {add_pos (Ast.BOOL_OP(Term.OR,$1,$3))}
+    | alg_expr GREATER alg_expr {add_pos (Ast.COMPARE_OP(Term.GREATER,$1,$3))}
+    | alg_expr SMALLER alg_expr {add_pos (Ast.COMPARE_OP(Term.SMALLER,$1,$3))}
+    | alg_expr EQUAL alg_expr {add_pos (Ast.COMPARE_OP(Term.EQUAL,$1,$3))}
+    | alg_expr DIFF alg_expr {add_pos (Ast.COMPARE_OP(Term.DIFF,$1,$3))}
     | TRUE {add_pos Ast.TRUE}
     | FALSE {add_pos Ast.FALSE}
     ;

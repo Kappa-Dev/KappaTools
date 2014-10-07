@@ -142,3 +142,9 @@ let of_un_alg_op = function
   | Term.INT ->
      fun x -> cast_un_op ~op_i:(fun n -> n) ~op_i64:(fun n -> n) x
   | Term.UMINUS -> neg
+
+let of_compare_op = function
+  | Term.GREATER -> is_greater
+  | Term.SMALLER -> is_smaller
+  | Term.EQUAL -> is_equal
+  | Term.DIFF -> fun v v' -> not (is_equal v v')
