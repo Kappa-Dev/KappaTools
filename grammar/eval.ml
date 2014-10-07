@@ -398,9 +398,9 @@ let rec partial_eval_bool env mixs (ast,_) =
        let (env2,mix2,f2, const2, opt_v2, dep2) = partial_eval_alg env1 mix1 ast' in
        let stopping_time =
 	 if op == Nbr.is_equal && DepSet.mem Mods.TIME dep1 then
-	   match (const2, opt_v2) with
-	   | (true, Some num) -> (Some num)
-	   | (_,_) -> raise ExceptionDefn.Unsatisfiable
+	   match (ast, const2, opt_v2) with
+	   | ((STATE_ALG_OP (Term.TIME_VAR),_), true, Some num) -> (Some num)
+	   | (_,_,_) -> raise ExceptionDefn.Unsatisfiable
 	 else None
        in
        let part_eval inst values t e e_null cpu_t tk =
