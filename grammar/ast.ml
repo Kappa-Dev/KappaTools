@@ -32,13 +32,13 @@ type 'mixt ast_alg_expr =
   | TMAX
   | EMAX
 
-type 'mixt ast_bool_expr =
+type 'a bool_expr =
   | TRUE
   | FALSE
   | BOOL_OP of
-      bool_op * 'mixt ast_bool_expr with_pos * 'mixt ast_bool_expr with_pos
+      bool_op * 'a bool_expr with_pos * 'a bool_expr with_pos
   | COMPARE_OP of
-      compare_op * 'mixt ast_alg_expr with_pos * 'mixt ast_alg_expr with_pos
+      compare_op * 'a with_pos * 'a with_pos
 
 type rule = {
   rule_pos: Tools.pos ;
@@ -91,8 +91,8 @@ type 'mixture modif_expr =
 	| FLUX of 'mixture print_expr with_pos list * Tools.pos
 	| FLUXOFF of 'mixture print_expr with_pos list * Tools.pos
 type 'mixture perturbation =
-    'mixture ast_bool_expr with_pos * ('mixture modif_expr list) *
-      Tools.pos * 'mixture ast_bool_expr with_pos option
+    'mixture ast_alg_expr bool_expr with_pos * ('mixture modif_expr list) *
+      Tools.pos * 'mixture ast_alg_expr bool_expr with_pos option
 
 
 

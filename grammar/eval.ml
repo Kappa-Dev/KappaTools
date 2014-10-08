@@ -841,7 +841,7 @@ let pert_of_result variables env res =
 	 match opt_post with
 	 | None ->
 	    (Printf.sprintf "whenever %a, %s"
-			    Expr.bool_to_string (fst pre_expr) str_eff,None)
+			    Expr.ast_bool_to_string (fst pre_expr) str_eff,None)
 	 | Some post_expr ->
 	    let (env', variables', x, is_constant, dep, stopping_time) =
 	      try partial_eval_bool env variables post_expr with
@@ -855,8 +855,8 @@ let pert_of_result variables env res =
 	      else Dynamics.VAR x
 	    in
 	    (Printf.sprintf "whenever %a, %s until %a"
-			    Expr.bool_to_string (fst pre_expr) str_eff
-			    Expr.bool_to_string (fst post_expr),
+			    Expr.ast_bool_to_string (fst pre_expr) str_eff
+			    Expr.ast_bool_to_string (fst post_expr),
 	     Some (bv,dep))
        in
        let env,p_id = Environment.declare_pert (str_pert,pos) env' in
