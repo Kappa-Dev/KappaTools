@@ -15,7 +15,7 @@ type t = {
 	num_of_name : int StringMap.t ;
 	name_of_num : string IntMap.t ;
 	
-	dependencies :  DepSet.t DepMap.t ; (*ALG i or KAPPA i -> {ALG j, RULE j} = modifying i implies recomputing j --closure is done*)  
+	dependencies :  Term.DepSet.t Term.DepMap.t ; (*ALG i or KAPPA i -> {ALG j, RULE j} = modifying i implies recomputing j --closure is done*)  
 	
 	num_of_rule : int StringMap.t ;
 	rule_of_num : string IntMap.t ;
@@ -71,7 +71,7 @@ let empty =
 	pert_of_num = IntMap.empty ;
 	(*rule_of_pert = IntMap.empty ;*)
 	rule_indices = IntSet.empty ;
-	dependencies = DepMap.empty ;
+	dependencies = Term.DepMap.empty ;
 	empty_lhs = IntSet.empty ;
 	nl_elements = IntMap.empty ;
 	root_of_nl_rule = Int2Map.empty ;
@@ -177,20 +177,21 @@ let declare_name nme pos env =
 
 let name_number env = env.fresh_name
 
-let add_dependencies dep dep' env = 
-	let set = 
-		try DepMap.find dep env.dependencies	with Not_found -> DepSet.empty
-	in
-		{env with dependencies = DepMap.add dep (DepSet.add dep' set) env.dependencies}	 
+let add_dependencies dep dep' env =
+  let set = try Term.DepMap.find dep env.dependencies
+	    with Not_found -> Term.DepSet.empty in
+  {env with dependencies =
+	      Term.DepMap.add dep (Term.DepSet.add dep' set) env.dependencies}
 
-let remove_dependencies dep dep' env = 
-	let set = try DepSet.remove dep' (DepMap.find dep env.dependencies) with Not_found -> DepSet.empty
-	in
-		if DepSet.is_empty set then {env with dependencies = DepMap.remove dep env.dependencies}
-		else
-			{env with dependencies = DepMap.add dep set env.dependencies}
-			
-let get_dependencies dep env = try DepMap.find dep env.dependencies with Not_found -> DepSet.empty
+let remove_dependencies dep dep' env =
+  let set = try Term.DepSet.remove dep' (Term.DepMap.find dep env.dependencies)
+	    with Not_found -> Term.DepSet.empty in
+  if Term.DepSet.is_empty set
+  then {env with dependencies = Term.DepMap.remove dep env.dependencies}
+  else {env with dependencies = Term.DepMap.add dep set env.dependencies}
+
+let get_dependencies dep env =
+  try Term.DepMap.find dep env.dependencies with Not_found -> Term.DepSet.empty
 
 let declare_rule rule_lbl id env =
 	match rule_lbl with

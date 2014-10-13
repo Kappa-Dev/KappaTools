@@ -8,21 +8,6 @@ module Int3Set = Set.Make (struct type t = int*int*int let compare = compare end
 
 module DynArray = DynamicArray.DynArray(LargeArray.GenArray)
 
-type dep_type = ALG of int | KAPPA of int | TOK of int | EVENT |
-		TIME | RULE of int | PERT of int | ABORT of int
-module DepMap = Map.Make (struct type t = dep_type let compare = compare end) 
-module DepSet = Set.Make (struct type t = dep_type let compare = compare end) 
-
-let string_of_dep = function
-	| TOK i -> "TOK("^(string_of_int i)^")"
-	| ALG i -> "ALG("^(string_of_int i)^")"
-	| KAPPA i -> "KAPPA("^(string_of_int i)^")"
-	| EVENT -> "EVENT"
-	| TIME -> "TIME"
-	| RULE i -> "RULE("^(string_of_int i)^")"
-	| PERT i -> "PERT("^(string_of_int i)^")"
-	| ABORT i -> "ABORT("^(string_of_int i)^")"
-
 module StringIntMap = MapExt.Make (struct type t = (string * int) let compare = compare end)
 module Injection = 
 	struct

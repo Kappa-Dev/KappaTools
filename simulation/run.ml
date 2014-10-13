@@ -10,11 +10,11 @@ let determine_time_advance activity state counter env =
   let dt = -. (log rd /. activity) in
   if dt <> infinity && activity > 0. then dt
   else
-    let depset = Environment.get_dependencies Mods.TIME env in
-    DepSet.fold
+    let depset = Environment.get_dependencies Term.TIME env in
+    Term.DepSet.fold
       (fun dep dt ->
        match dep with
-       | Mods.PERT p_id ->
+       | Term.PERT p_id ->
 	  begin match State.maybe_find_perturbation p_id state with
 		| None -> dt
 		| Some _ -> match Mods.Counter.dT counter with
@@ -45,7 +45,7 @@ let event state story_profiling event_list counter plot env =
 
   (*updating activity of rule whose rate depends on time or event number*)
   (*let env,pert_ids = State.update_dep state Mods.EVENT IntSet.empty counter env in*)
-  let env,pert_ids_time = State.update_dep state Mods.TIME IntSet.empty counter env in
+  let env,pert_ids_time = State.update_dep state Term.TIME IntSet.empty counter env in
 
   State.dump state counter env ;
 
@@ -106,13 +106,13 @@ let event state story_profiling event_list counter plot env =
 	 if !Parameter.debugModeOn then Debug.tag "Null (clash or doesn't satisfy constraints)";
 	 Counter.inc_null_events counter ;
 	 Counter.inc_consecutive_null_events counter ;
-	 let env,pert_ids = State.update_dep state Mods.EVENT pert_ids_time counter env in
+	 let env,pert_ids = State.update_dep state Term.EVENT pert_ids_time counter env in
 	 (env,state,pert_ids,story_profiling,event_list)
        end
     | Some ((env,state,side_effect,embedding_t,psi,pert_ids_rule),r) ->
        Counter.inc_events counter ;
        counter.Counter.cons_null_events <- 0 ; (*resetting consecutive null event counter since a real rule was applied*)
-       let env,pert_ids = State.update_dep state Mods.EVENT (IntSet.union pert_ids_rule pert_ids_time) counter env in
+       let env,pert_ids = State.update_dep state Term.EVENT (IntSet.union pert_ids_rule pert_ids_time) counter env in
 
        (*Local positive update: adding new partial injection*)
        let env,state,pert_ids',new_injs,obs_from_rule_app =
@@ -205,8 +205,8 @@ let loop state story_profiling event_list counter plot env =
   Plot.output state counter.Counter.time plot env counter ;
   
   (*Checking whether some perturbation should be applied before starting the event loop*)
-  let env,pert_ids = State.update_dep state Mods.EVENT IntSet.empty counter env in
-  let env,pert_ids = State.update_dep state Mods.TIME pert_ids counter env in
+  let env,pert_ids = State.update_dep state Term.EVENT IntSet.empty counter env in
+  let env,pert_ids = State.update_dep state Term.TIME pert_ids counter env in
   let state,env,_,_,_ = External.try_perturbate [] state pert_ids [] counter env 
   in
   

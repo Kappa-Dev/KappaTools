@@ -298,9 +298,9 @@ let mixture_of_ast ?(tolerate_new_state=false) ?mix_id is_pattern env ast_mix =
 (* to true if partial evaluation is a constant function                    *)
 let rec partial_eval_alg env mixs (ast, (beg_pos,end_pos)) =
   let bin_op ast ast' op =
-    let (env1, mix1, f1, const1, opt_value1, dep1) =
+    let (env1, mix1, f1, const1, opt_value1) =
       partial_eval_alg env mixs ast in
-    let (env2, mix2, f2, const2, opt_value2, dep2) =
+    let (env2, mix2, f2, const2, opt_value2) =
       partial_eval_alg env1 mix1 ast' in
     let part_eval inst values t e e_null cpu_t tk =
       (*evaluation partielle symbolique*)
@@ -309,35 +309,33 @@ let rec partial_eval_alg env mixs (ast, (beg_pos,end_pos)) =
     let opt_value' = match opt_value1,opt_value2 with
 	(Some a,Some b) -> Some (op a b)
       | _ -> None in (*evaluation complete si connue*)
-    (env2, mix2, part_eval, (const1 && const2), opt_value',
-     (DepSet.union dep1 dep2))
+    (env2, mix2, part_eval, (const1 && const2), opt_value')
   in
   let un_op ast op =
-    let (env', mix', f, const, opt_v, dep) =
+    let (env', mix', f, const, opt_v) =
       partial_eval_alg env mixs ast in
     let opt_v' = match opt_v with Some a -> Some (op a) | None -> None in
     (env', mix', (fun inst values t e e_null cpu_t tk ->
       let v = f inst values t e e_null cpu_t tk in op v),
-     const, opt_v', dep)
+     const, opt_v')
   in
   match ast with
   | EMAX ->
      let v = Parameter.getMaxEventValue () in
-     (env,mixs,(fun _ _ _ _ _ _ _-> v), true, Some v, DepSet.empty)
+     (env,mixs,(fun _ _ _ _ _ _ _-> v), true, Some v)
   | TMAX ->
      let v = Parameter.getMaxTimeValue () in
-     (env,mixs,(fun _ _ _ _ _ _ _-> v), true, Some v, DepSet.empty)
+     (env,mixs,(fun _ _ _ _ _ _ _-> v), true, Some v)
   | CONST n ->
-     (env,mixs,(fun _ _ _ _ _ _ _-> n), true, (Some n), DepSet.empty)
+     (env,mixs,(fun _ _ _ _ _ _ _-> n), true, (Some n))
   | STATE_ALG_OP (Term.CPUTIME) ->
      (env,mixs,(fun _ _ _ _ _ cpu_t _-> Nbr.F (cpu_t -. !Parameter.cpuTime)), false,
-      Some (Nbr.F 0.), (DepSet.singleton Mods.EVENT))
+      Some (Nbr.F 0.))
   | KAPPA_INSTANCE ast ->
      let (env', id) =
        Environment.declare_var_kappa None env in
      let mix,env'' = mixture_of_ast ~mix_id:id true env' ast in
-     (env'', mix::mixs, (fun f _ _ _ _ _ _-> f id), false, Some (Nbr.I 0),
-      (DepSet.singleton (Mods.KAPPA id)))
+     (env'', mix::mixs, (fun f _ _ _ _ _ _-> f id), false, Some (Nbr.I 0))
   | OBS_VAR lab ->
        let i,opt_v =
 	 try Environment.num_of_alg lab env with
@@ -345,8 +343,7 @@ let rec partial_eval_alg env mixs (ast, (beg_pos,end_pos)) =
 	    raise (ExceptionDefn.Semantics_Error
 		     (pos_of_lex_pos beg_pos,lab ^ " is not a declared variable"))
        in
-       (env,mixs,(fun _ v _ _ _ _ _-> v i),false,opt_v,
-	DepSet.singleton (Mods.ALG i))
+       (env,mixs,(fun _ v _ _ _ _ _-> v i),false,opt_v)
   | TOKEN_ID (tk_nme) ->
      let i =
        try Environment.num_of_token tk_nme env
@@ -354,55 +351,42 @@ let rec partial_eval_alg env mixs (ast, (beg_pos,end_pos)) =
 	 raise (ExceptionDefn.Semantics_Error
 		  (pos_of_lex_pos beg_pos,tk_nme ^ " is not a declared token"))
      in
-     (env,mixs,(fun _ _ _ _ _ _ tk -> tk i),false,Some (Nbr.F 0.),
-      DepSet.singleton (Mods.TOK i))
+     (env,mixs,(fun _ _ _ _ _ _ tk -> tk i),false,Some (Nbr.F 0.))
   | STATE_ALG_OP (Term.TIME_VAR) ->
-     (env,mixs,(fun _ _ t _ _ _ _-> Nbr.F t), false, Some (Nbr.F 0.),
-      (DepSet.singleton Mods.TIME))
+     (env,mixs,(fun _ _ t _ _ _ _-> Nbr.F t), false, Some (Nbr.F 0.))
   | STATE_ALG_OP (Term.EVENT_VAR) ->
-     (env,mixs,(fun _ _ _ e ne _ _-> Nbr.I (e+ne)), false, Some (Nbr.I 0),
-      (DepSet.singleton Mods.EVENT))
+     (env,mixs,(fun _ _ _ e ne _ _-> Nbr.I (e+ne)), false, Some (Nbr.I 0))
   | STATE_ALG_OP (Term.NULL_EVENT_VAR) ->
-     (env,mixs,(fun _ _ _ _ ne _ _-> Nbr.I ne), false, Some (Nbr.I 0),
-      (DepSet.singleton Mods.EVENT))
+     (env,mixs,(fun _ _ _ _ ne _ _-> Nbr.I ne), false, Some (Nbr.I 0))
   | STATE_ALG_OP (Term.PROD_EVENT_VAR) ->
-     (env,mixs,(fun _ _ _ e _ _ _-> Nbr.I e), false,Some (Nbr.I 0),
-      (DepSet.singleton Mods.EVENT))
+     (env,mixs,(fun _ _ _ e _ _ _-> Nbr.I e), false,Some (Nbr.I 0))
   | BIN_ALG_OP (op,ast, ast') ->
      bin_op ast ast' (Nbr.of_bin_alg_op op)
   | UN_ALG_OP (op,ast) -> un_op ast (Nbr.of_un_alg_op op)
 
 let rec partial_eval_bool env mixs (ast,_) =
   let bin_op_bool ast ast' op =
-    let (env1, mix1, f1, const1, dep1,_) = partial_eval_bool env mixs ast in
-    let (env2, mix2, f2, const2, dep2,_) = partial_eval_bool env1 mix1 ast' in
+    let (env1, mix1, f1, const1) = partial_eval_bool env mixs ast in
+    let (env2, mix2, f2, const2) = partial_eval_bool env1 mix1 ast' in
     let part_eval inst values t e e_null cpu_t tk =
       let b1 = f1 inst values t e e_null cpu_t tk in
       let b2 = f2 inst values t e e_null cpu_t tk in op b1 b2
-    in (env2,mix2,part_eval, (const1 && const2), (DepSet.union dep1 dep2), None)
+    in (env2,mix2,part_eval, (const1 && const2))
   in let bin_op_alg ast ast' op =
-       let (env1,mix1,f1, const1, _, dep1) = partial_eval_alg env mixs ast in
-       let (env2,mix2,f2, const2, opt_v2, dep2) = partial_eval_alg env1 mix1 ast' in
-       let stopping_time =
-	 if op == Nbr.is_equal && DepSet.mem Mods.TIME dep1 then
-	   match (ast, const2, opt_v2) with
-	   | ((STATE_ALG_OP (Term.TIME_VAR),_), true, Some num) -> (Some num)
-	   | (_,_,_) -> raise ExceptionDefn.Unsatisfiable
-	 else None
-       in
+       let (env1,mix1,f1, const1, _) = partial_eval_alg env mixs ast in
+       let (env2,mix2,f2, const2, _) = partial_eval_alg env1 mix1 ast' in
        let part_eval inst values t e e_null cpu_t tk =
 	 let v1 = f1 inst values t e e_null cpu_t tk in
 	 let v2 = f2 inst values t e e_null cpu_t tk in
 	 (*checking whether boolean expression has a time dependency and is of the form [T]=n*)
 	 op v1 v2
        in
-       (env2,mix2,part_eval, (const1 && const2),
-	(DepSet.union dep1 dep2), stopping_time)
+       (env2,mix2,part_eval, (const1 && const2))
      in
      match ast with
      | TRUE ->
-	(env,mixs,(fun _ _ _ _ _ _ _-> true), true, DepSet.singleton Mods.EVENT,None)
-     | FALSE -> (env,mixs,(fun _ _ _ _ _ _ _-> false), true, DepSet.empty,None)
+	(env,mixs,(fun _ _ _ _ _ _ _-> true), true)
+     | FALSE -> (env,mixs,(fun _ _ _ _ _ _ _-> false), true)
      | BOOL_OP(Term.AND,ast, ast') -> bin_op_bool ast ast' (&&)
      | BOOL_OP(Term.OR,ast, ast') -> bin_op_bool ast ast' (||)
      | COMPARE_OP(op,ast, ast') -> bin_op_alg ast ast' (Nbr.of_compare_op op)
@@ -419,13 +403,16 @@ let token_of_ast abs_tk env =
   Environment.declare_token name pos env
 
 let reduce_val v env mixs =
-  let (env', mix', k, const, opt_v, dep) = partial_eval_alg env mixs v
-  in
-  if const then
-    match opt_v with
-    | Some v -> (env',mix',Dynamics.CONST v, dep)
-    | None -> invalid_arg "Eval.reduce_val: Variable is constant but was not evaluated"
-  else (env',mix',(VAR k), dep)
+  let (env', mixs', k, const, opt_v) = partial_eval_alg env mixs v in
+  let (_env',_mix',(alg,_pos)) = Expr.compile_alg env v in
+  let dep = Expr.deps_of_alg_expr alg in
+  (env',mixs',
+   (if const then
+      match opt_v with
+      | Some v -> Dynamics.CONST v
+      | None -> invalid_arg "Eval.reduce_val: Variable is constant but was not evaluated"
+    else (VAR k)),
+   dep)
 
 let rule_of_ast ?(backwards=false) env mixs (ast_rule_label, ast_rule) tolerate_new_state =
   let ast_rule_label,ast_rule = if backwards then Ast.flip (ast_rule_label, ast_rule) else (ast_rule_label, ast_rule) in
@@ -436,7 +423,7 @@ let rule_of_ast ?(backwards=false) env mixs (ast_rule_label, ast_rule) tolerate_
   let env,mixs',k_def,dep = reduce_val ast_rule.k_def env mixs in
   let (env,mixs'',k_alt,radius,dep_alt) =
     match ast_rule.k_un with
-    | None -> (env,mixs',None,None, DepSet.empty)
+    | None -> (env,mixs',None,None, Term.DepSet.empty)
     | Some (ast,ast_opt) -> (****TODO HERE treat ast_opt that specifies application radius****)
        let env =
 	 Environment.declare_unary_rule (Some (Environment.kappa_of_num lhs_id env,Tools.no_pos)) (*ast_rule_label.lbl_nme*) lhs_id env in
@@ -444,7 +431,7 @@ let rule_of_ast ?(backwards=false) env mixs (ast_rule_label, ast_rule) tolerate_
        let env,mixs''',radius_alt,dep = match ast_opt with
 	   None -> (env,mixs'',None,dep)
 	 | Some v -> let env4,mix4,rad,dep' = reduce_val v env mixs'' in
-		     (env4,mix4,Some rad,DepSet.union dep dep')
+		     (env4,mix4,Some rad,Term.DepSet.union dep dep')
        in
        (env,mixs''',Some k_alt,radius_alt,dep)
   in
@@ -465,7 +452,7 @@ let rule_of_ast ?(backwards=false) env mixs (ast_rule_label, ast_rule) tolerate_
 	 try Environment.num_of_token nme env
 	 with Not_found -> raise (ExceptionDefn.Semantics_Error (pos,"Token "^nme^" is undefined"))
        in
-       let (env', mixs', f, is_const, opt_v, _ ) =
+       let (env', mixs', f, is_const, opt_v) =
 	 partial_eval_alg env mixs alg_expr (*dependencies are not important here since variable is evaluated only when rule is applied*)
        in
        let v =
@@ -492,11 +479,11 @@ let rule_of_ast ?(backwards=false) env mixs (ast_rule_label, ast_rule) tolerate_
   let r_id = Mixture.get_id lhs in
   let env = if Mixture.is_empty lhs then Environment.declare_empty_lhs r_id env21 else env21 in
   let env =
-    DepSet.fold (*creating dependencies between variables in the kinetic rate and the activity of the rule*)
+    Term.DepSet.fold (*creating dependencies between variables in the kinetic rate and the activity of the rule*)
       (fun dep env ->
        (*Printf.printf "rule %d depends on %s\n" r_id (Mods.string_of_dep dep) ; *)
-       Environment.add_dependencies dep (RULE r_id) env)
-      (DepSet.union dep dep_alt) env
+       Environment.add_dependencies dep (Term.RULE r_id) env)
+      (Term.DepSet.union dep dep_alt) env
   in
   let pre_causal = Dynamics.compute_causal lhs rhs script env in
 
@@ -619,8 +606,10 @@ let rule_of_ast ?(backwards=false) env mixs (ast_rule_label, ast_rule) tolerate_
 let variables_of_result env res =
   List.fold_left
     (fun (env, mixtures, vars) ((label,(beg_pos,_)),ast) ->
-     let (env', mix', f, constant, value_opt, dep) =
+     let (env', mix', f, constant, value_opt) =
        partial_eval_alg env mixtures ast in
+     let (_env',_mixs',(alg,_pos)) = Expr.compile_alg env ast in
+     let dep = Expr.deps_of_alg_expr alg in
      let (env'', var_id) =
        Environment.declare_var_alg (Some (label,pos_of_lex_pos beg_pos)) value_opt env'
      in
@@ -663,8 +652,9 @@ let environment_of_result res =
 let obs_of_result env mixs res =
   List.fold_left
     (fun (env,mix,cont) alg_expr ->
-     let (env',mix',f, const, opt_v, dep) = (partial_eval_alg env mix alg_expr)
-     in
+     let (env',mix',f, const, opt_v) = partial_eval_alg env mix alg_expr in
+     let (_env',_mixs',(alg,_pos)) = Expr.compile_alg env alg_expr in
+     let dep = Expr.deps_of_alg_expr alg in
      env,mix',(f,const,opt_v,dep,Expr.ast_alg_to_string () (fst alg_expr)) :: cont
     )
     (env,mixs,[]) res.observables
@@ -677,7 +667,7 @@ let effects_of_modif variables env ast_list =
        let (variables,effects,str_pert,env) =
 	 match ast with
 	 | INTRO (alg_expr, ast_mix, pos) ->
-	    let (env', mixs',x, is_constant, opt_v, dep) =
+	    let (env', mixs',x, is_constant, opt_v) =
 	      partial_eval_alg env variables alg_expr in
 	    let m,env = mixture_of_ast false env' ast_mix in
 	    let v =
@@ -692,7 +682,7 @@ let effects_of_modif variables env ast_list =
 			      (Mixture.to_kappa false env m))::str_pert
 	    in (mixs', (Dynamics.INTRO (v, m))::effects, str, env)
 	 | DELETE (alg_expr, ast_mix, pos) ->
-	    let (env',mixs',x, is_constant, opt_v, dep) =
+	    let (env',mixs',x, is_constant, opt_v) =
 	      partial_eval_alg env variables alg_expr in
 	    let nme_pert = Printf.sprintf "pert_%d" (Environment.next_pert_id env) in
 	    let (env, id) =
@@ -720,7 +710,7 @@ let effects_of_modif variables env ast_list =
 		    raise (ExceptionDefn.Semantics_Error
 			     (pos_rule,"Variable " ^ (nme ^ " is neither a constant nor a rule")))
 	      ) in
-	    let (env', mixs', x, is_constant, opt_v, dep) =
+	    let (env', mixs', x, is_constant, opt_v) =
 	      partial_eval_alg env variables alg_expr in
 	    let v =
 	      if is_constant
@@ -747,7 +737,7 @@ let effects_of_modif variables env ast_list =
 		 raise (ExceptionDefn.Semantics_Error
 			  (tk_pos,"Token " ^ (tk_nme ^ " is not defined")))
 	    in
-	    let (env', mixs', x, is_constant, opt_v, dep) =
+	    let (env', mixs', x, is_constant, opt_v) =
 	      partial_eval_alg env variables alg_expr in
 	    let v =
 	      if is_constant
@@ -810,13 +800,14 @@ let pert_of_result variables env res =
     List.fold_left
       (fun (variables, lpert, lrules, env)
 	   (pre_expr, modif_expr_list, pos, opt_post) ->
-       let (env', variables', x, is_constant, dep, stopping_time) =
-	 (try partial_eval_bool env variables pre_expr with
-	    ExceptionDefn.Unsatisfiable ->
-	    raise
-	      (ExceptionDefn.Semantics_Error
-		 (pos,"Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"))
-	 )
+       let (env', variables', x, is_constant) =
+	 partial_eval_bool env variables pre_expr in
+       let (_env',_mixs',(pre,_pos)) = Expr.compile_bool env pre_expr in
+       let (dep, stopping_time) = try Expr.deps_of_bool_expr pre
+		 with ExceptionDefn.Unsatisfiable ->
+		   raise
+		     (ExceptionDefn.Semantics_Error
+			(pos,"Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"))
        in
        let (variables, effects, str_eff, env) =
 	 effects_of_modif variables' env' modif_expr_list in
@@ -831,12 +822,14 @@ let pert_of_result variables env res =
 	    (Printf.sprintf "whenever %a, %s"
 			    Expr.ast_bool_to_string (fst pre_expr) str_eff,None)
 	 | Some post_expr ->
-	    let (env', variables', x, is_constant, dep, stopping_time) =
-	      try partial_eval_bool env variables post_expr with
-		ExceptionDefn.Unsatisfiable ->
-		raise
-		  (ExceptionDefn.Semantics_Error
-		     (pos,"Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"))
+	    let (env', variables', x, is_constant) =
+	      partial_eval_bool env variables post_expr in
+	    let (_env',_mixs',(post,_pos)) = Expr.compile_bool env post_expr in
+	    let (dep,stopping_time) = try Expr.deps_of_bool_expr post with
+			       ExceptionDefn.Unsatisfiable ->
+			       raise
+				 (ExceptionDefn.Semantics_Error
+				    (pos,"Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"))
 	    in
 	    let bv =
 	      if is_constant then Dynamics.CONST (close_var x)
@@ -867,8 +860,8 @@ let pert_of_result variables env res =
 		 let str_pert = Printf.sprintf "pert_%d%d" p_id cpt in
 		 let env = Environment.declare_rule (Some (str_pert,pos)) r_id env in
 		 let env =
-		   DepSet.fold
-		     (fun dep env -> Environment.add_dependencies dep (Mods.PERT p_id) env
+		   Term.DepSet.fold
+		     (fun dep env -> Environment.add_dependencies dep (Term.PERT p_id) env
 		     )
 		     dep env
 		 in
@@ -910,8 +903,8 @@ let pert_of_result variables env res =
 		 let env =
 		   Environment.declare_rule (Some (str_pert,pos)) r_id env in
 		 let env =
-		   DepSet.fold
-		     (fun dep env -> Environment.add_dependencies dep (Mods.PERT p_id) env
+		   Term.DepSet.fold
+		     (fun dep env -> Environment.add_dependencies dep (Term.PERT p_id) env
 		     )
 		     dep env
 		 in
@@ -942,8 +935,8 @@ let pert_of_result variables env res =
 	    | Dynamics.CFLOW _ ->
 	       let env = {env with Environment.tracking_enabled = true} in
 	       let env =
-		 DepSet.fold
-		   (fun dep env -> Environment.add_dependencies dep (Mods.PERT p_id) env
+		 Term.DepSet.fold
+		   (fun dep env -> Environment.add_dependencies dep (Term.PERT p_id) env
 		   )
 		   dep env
 	       in
@@ -953,8 +946,8 @@ let pert_of_result variables env res =
 	    | Dynamics.FLUX _ | Dynamics.FLUXOFF _ | Dynamics.CFLOWOFF _
 	    | Dynamics.PRINT _ ->
 	       let env =
-		 DepSet.fold
-		   (fun dep env -> Environment.add_dependencies dep (Mods.PERT p_id) env
+		 Term.DepSet.fold
+		   (fun dep env -> Environment.add_dependencies dep (Term.PERT p_id) env
 		   )
 		   dep env
 	       in (env,(None,effect)::rule_list,cpt)
@@ -966,9 +959,9 @@ let pert_of_result variables env res =
 	 | None -> (None,env)
 	 | Some (bv,dep) ->
 	    let env =
-	      DepSet.fold
+	      Term.DepSet.fold
 		(fun dep_type env ->
-		 Environment.add_dependencies dep_type (Mods.ABORT p_id) env
+		 Environment.add_dependencies dep_type (Term.ABORT p_id) env
 		)
 		dep env
 	    in
@@ -1008,7 +1001,7 @@ let init_graph_of_result env res =
        match init_t with
        | INIT_MIX (alg, ast) ->
 	  begin
-	    let (env, mixs, v, is_const, opt_v, dep) =
+	    let (env, mixs, v, is_const, opt_v) =
 	      partial_eval_alg env [] alg in
 	    let cpt = ref 0 in
 	    let sg = ref sg in
@@ -1037,7 +1030,7 @@ let init_graph_of_result env res =
 	    (!sg,!env)
 	  end
        | INIT_TOK (alg, (tk_nme,pos_tk)) ->
-	  let (env, mixs, v, is_const, opt_v, _) =
+	  let (env, mixs, v, is_const, opt_v) =
 	    partial_eval_alg env [] alg in
 	  let x =
 	    match mixs,opt_v with

@@ -154,3 +154,38 @@ let compile_bool env bool_pos =
 	   ((if Nbr.of_compare_op op n1 n2 then Ast.TRUE else Ast.FALSE),pos))
        | _, _ -> (env'',mixs'',(Ast.COMPARE_OP (op,a',b'), pos))
   in aux env [] bool_pos
+
+let add_dep el s = Term.DepSet.add el s
+let rec aux_dep s = function
+  | BIN_ALG_OP (op, (a,_), (b,_)) -> aux_dep (aux_dep s a) b
+  | UN_ALG_OP (op, (a,_)) -> aux_dep s a
+  | STATE_ALG_OP op -> add_dep (Term.dep_of_state_alg_op op) s
+  | ALG_VAR i -> add_dep (Term.ALG i) s
+  | KAPPA_INSTANCE i -> add_dep (Term.KAPPA i) s
+  | TOKEN_ID i -> add_dep (Term.TOK i) s
+  | CONST _ -> s
+let deps_of_alg_expr alg = aux_dep Term.DepSet.empty alg
+
+let rec deps_of_bool_expr = function
+    | Ast.TRUE | Ast.FALSE -> Term.DepSet.empty,None
+    | Ast.BOOL_OP (op,(a,_),(b,_)) ->
+       let (s1,st1) = deps_of_bool_expr a in
+       let (s2,st2) = deps_of_bool_expr b in
+       (Term.DepSet.union s1 s2,
+	match op,st1,st2 with
+	| _, None, _ -> st2
+	| _, _, None -> st1
+	| Term.OR, Some n1, Some n2 -> Some (Nbr.min n1 n2)
+	| Term.AND, Some n1, Some n2 ->
+	   if Nbr.is_equal n1 n2 then st1 else raise ExceptionDefn.Unsatisfiable
+       )
+    | Ast.COMPARE_OP (op,(a,_),(b,_)) ->
+       let s = aux_dep (aux_dep Term.DepSet.empty a) b in
+       match op with
+       | Term.EQUAL when Term.DepSet.mem Term.TIME s ->
+	  begin match a,b with
+		| STATE_ALG_OP (Term.TIME_VAR), CONST n
+		| CONST n, STATE_ALG_OP (Term.TIME_VAR) -> (s, Some n)
+		| _, _ -> raise ExceptionDefn.Unsatisfiable
+	  end
+       | _ -> (s, None)

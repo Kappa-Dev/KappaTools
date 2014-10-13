@@ -498,21 +498,21 @@ let initialize sg token_vector rules kappa_vars alg_vars obs (pert,rule_pert) co
 	
 	if !Parameter.debugModeOn then Debug.tag "\t * Initializing variables...";
 	let env =
-		List.fold_left
-		(fun env (v, deps, var_id) ->
-			try
-				let env =
-					DepSet.fold
-						(fun dep env ->
-									Environment.add_dependencies dep (Mods.ALG var_id) env
-						)
-						deps env
-				in (state.alg_variables.(var_id) <- Some v; env)
-			with
-			| Invalid_argument msg ->
-					invalid_arg ("State.initialize: " ^ msg)
-		)
-		env alg_vars
+	  List.fold_left
+	    (fun env (v, deps, var_id) ->
+	     try
+	       let env =
+		 Term.DepSet.fold
+		   (fun dep env ->
+		    Environment.add_dependencies dep (Term.ALG var_id) env
+		   )
+		   deps env
+	       in (state.alg_variables.(var_id) <- Some v; env)
+	     with
+	     | Invalid_argument msg ->
+		invalid_arg ("State.initialize: " ^ msg)
+	    )
+	    env alg_vars
 	in
 	
 	if !Parameter.debugModeOn then Debug.tag	"\t * Initializing wake up map for side effects...";
@@ -887,27 +887,27 @@ let wake_up state modif_type modifs wake_up_map env =
 
 let update_dep state ?cause dep_in pert_ids counter env =
   let rec iter env dep_to_check pert_ids =
-    if DepSet.is_empty dep_to_check then (env,pert_ids)
+    if Term.DepSet.is_empty dep_to_check then (env,pert_ids)
     else
-      let dep_in = DepSet.choose dep_to_check in
+      let dep_in = Term.DepSet.choose dep_to_check in
       let depset = Environment.get_dependencies dep_in env in
-      let dep_str = string_of_set Mods.string_of_dep DepSet.fold depset in
+      let dep_str = string_of_set (Term.dep_to_string ()) Term.DepSet.fold depset in
       let new_to_check =
-	DepSet.union (DepSet.remove dep_in dep_to_check) depset in
+	Term.DepSet.union (Term.DepSet.remove dep_in dep_to_check) depset in
       match dep_in with
-      | Mods.TOK t_id -> (* token counter is changed *)
+      | Term.TOK t_id -> (* token counter is changed *)
 	 let () = if !Parameter.debugModeOn then
 		    Debug.tag (Printf.sprintf "Token %d is changed, updating %s"
 					      t_id dep_str) in
 	 iter env new_to_check pert_ids
-      | Mods.ALG v_id ->
+      | Term.ALG v_id ->
 	 (*variable v_id is changed -by a perturbation if used as
 	 initial dep_in argument*)
 	 let () = if !Parameter.debugModeOn then
 		    Debug.tag (Printf.sprintf
 				 "Variable %d is changed, updating %s" v_id dep_str) in
 	 iter env new_to_check pert_ids
-      | Mods.RULE r_id ->
+      | Term.RULE r_id ->
 	 (*rule activity is changed -by a perturbation if used as
 	 initial dep_in argument*)
 	 let () = update_activity state ?cause r_id counter env in
@@ -915,34 +915,34 @@ let update_dep state ?cause dep_in pert_ids counter env =
 		    Debug.tag (Printf.sprintf "Rule %d is changed, updating %s"
 					      r_id dep_str) in
 	 iter env new_to_check pert_ids
-      | Mods.PERT p_id ->
+      | Term.PERT p_id ->
 	 if IntMap.mem p_id state.perturbations
 	 then (*pertubation p_id is still alive and should be tried*)
 	   iter env new_to_check (IntSet.add p_id pert_ids)
 	 else (*pertubation p_id is removed and should be discarded from dependencies*)
-	   iter (Environment.remove_dependencies dep_in (Mods.PERT p_id) env) new_to_check pert_ids
-      | Mods.ABORT p_id ->
+	   iter (Environment.remove_dependencies dep_in (Term.PERT p_id) env) new_to_check pert_ids
+      | Term.ABORT p_id ->
 	 if IntMap.mem p_id state.perturbations
 	 then iter env new_to_check (IntSet.add p_id pert_ids)
-	 else iter (Environment.remove_dependencies dep_in (Mods.PERT p_id) env) new_to_check pert_ids
-      | Mods.KAPPA i ->
+	 else iter (Environment.remove_dependencies dep_in (Term.PERT p_id) env) new_to_check pert_ids
+      | Term.KAPPA i ->
 	 (*No need to update kappa observable, it will be updated if plotted*)
-	 let () = if !Parameter.debugModeOn && not (DepSet.is_empty depset) then
+	 let () = if !Parameter.debugModeOn && not (Term.DepSet.is_empty depset) then
 		    Debug.tag (Printf.sprintf "Observable %d is changed, updating %s"
 					      i dep_str) in
 	 iter env new_to_check pert_ids
-      | Mods.EVENT | Mods.TIME ->
+      | Term.EVENT | Term.TIME ->
 		      iter env new_to_check pert_ids
   in
-  iter env (DepSet.singleton dep_in) pert_ids
+  iter env (Term.DepSet.singleton dep_in) pert_ids
 
 let update_dep_value state counter env v dep =
   let value = value state counter env v in
   match dep with
-  | Mods.TOK t_id -> update_token t_id value state
-  | Mods.ALG v_id -> set_variable v_id value state
-  | Mods.RULE r_id -> update_rule r_id value state
-  | Mods.KAPPA _ | Mods.PERT _ | Mods.ABORT _ | Mods.EVENT | Mods.TIME -> ()
+  | Term.TOK t_id -> update_token t_id value state
+  | Term.ALG v_id -> set_variable v_id value state
+  | Term.RULE r_id -> update_rule r_id value state
+  | Term.KAPPA _ | Term.PERT _ | Term.ABORT _ | Term.EVENT | Term.TIME -> ()
 
 let enabled r state = 
 	let r_id = Mixture.get_id r.lhs in 
@@ -1045,7 +1045,7 @@ let positive_update ?(with_tracked=[]) state r ((phi: int IntMap.t),psi) (side_m
 					in
 					update_activity state ~cause:r.r_id var_id counter env;
 					let env,pert_ids = (*updating rule activities that depend --transitively-- on var_id*)
-						update_dep state ~cause:r.r_id (Mods.KAPPA var_id) pert_ids counter env
+						update_dep state ~cause:r.r_id (Term.KAPPA var_id) pert_ids counter env
 					in
 					(*Printf.printf "done (%d,%d) for var[%d]\n" root node_id var_id ;*) 
 					let already_done_map' = IntMap.add var_id	(Int2Set.add (root, node_id) root_node_set) already_done_map 
@@ -1113,7 +1113,7 @@ let positive_update ?(with_tracked=[]) state r ((phi: int IntMap.t),psi) (side_m
 					(Debug.tag (Printf.sprintf "adding %f token(s) %d" value t_id)) ;
 				state.token_vector.(t_id) <- state.token_vector.(t_id) +. value ;
 				(*updating rule activities that depend on |t_id|*)
-				update_dep state ~cause:r.r_id (Mods.TOK t_id) pert_ids counter env
+				update_dep state ~cause:r.r_id (Term.TOK t_id) pert_ids counter env
 			with Invalid_argument _ -> failwith "State.positive_update: invalid token id"  
 		) (env,pert_ids) r.Dynamics.add_token 
 	in
@@ -1126,7 +1126,7 @@ let positive_update ?(with_tracked=[]) state r ((phi: int IntMap.t),psi) (side_m
 					(Debug.tag (Printf.sprintf "removing %f token(s) %d" value t_id)) ;
 
 				state.token_vector.(t_id) <- state.token_vector.(t_id) -. value ;
-				update_dep state ~cause:r.r_id (Mods.TOK t_id) pert_ids counter env
+				update_dep state ~cause:r.r_id (Term.TOK t_id) pert_ids counter env
 			with Invalid_argument _ -> failwith "State.positive_update: invalid token id"  
 		) (env,pert_ids) r.Dynamics.rm_token
 	in
@@ -1252,7 +1252,7 @@ let negative_upd state cause (u,i) int_lnk counter env =
 						(* comp_injs.(cc_id) <- Some injs_cc_id; *)
 						(* not necessary because comp_injs.(cc_id) has been    *)
 						(* modified by side effect                             *)
-						update_dep state ~cause (KAPPA mix_id) pert_ids counter env (*TODO: use influence map for this?*)
+						update_dep state ~cause (Term.KAPPA mix_id) pert_ids counter env (*TODO: use influence map for this?*)
 					)
 					liftset (env,pert_ids) 
 	in

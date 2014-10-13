@@ -24,3 +24,5 @@ val compile_alg : Environment.t -> 'a Ast.ast_alg_expr Term.with_pos ->
 val compile_bool :
   Environment.t -> 'a Ast.ast_alg_expr Ast.bool_expr Term.with_pos ->
   Environment.t * (int * 'a) list * alg_expr Ast.bool_expr Term.with_pos
+val deps_of_alg_expr : alg_expr -> Term.DepSet.t
+val deps_of_bool_expr : alg_expr Ast.bool_expr -> (Term.DepSet.t * Nbr.t option)

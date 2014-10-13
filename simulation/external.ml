@@ -25,7 +25,7 @@ let eval_pexpr pexpr state counter env =
        match ast with
        | Ast.Str_pexpr str -> str::cont
        | Ast.Alg_pexpr alg ->
-	  let (env', mixs, x, is_constant, opt_v, dep) =
+	  let (env', mixs, x, is_constant, opt_v) =
 	    Eval.partial_eval_alg env [] (alg, pos) in
 	  match mixs with
 	  | _ :: _ ->
@@ -51,7 +51,7 @@ let dump_print_expr desc pexpr state counter env =
      match ast with
      | Ast.Str_pexpr str -> Printf.fprintf desc "%s" str
      | Ast.Alg_pexpr alg ->
-	let (env', mixs, x, is_constant, opt_v, dep) =
+	let (env', mixs, x, is_constant, opt_v) =
 	  Eval.partial_eval_alg env [] (alg, pos) in
 	match mixs with
 	| _ :: _ ->
@@ -131,17 +131,17 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
        Debug.tag_if_debug "Updating rate of rule '%a'"
 			 (Environment.print_rule env) id
      in
-     State.update_dep_value state counter env v (RULE id);
+     State.update_dep_value state counter env v (Term.RULE id);
      let env,pert_ids =
-       State.update_dep state ~cause:p_id (RULE id) pert_ids counter env in
+       State.update_dep state ~cause:p_id (Term.RULE id) pert_ids counter env in
      (env,state ,pert_ids,tracked,pert_events)
   | (None,UPDATE_VAR (id,v)) ->
      let () =
        Debug.tag_if_debug "Updating variable '%a'"
 			  (Environment.print_alg env) id
      in
-     State.update_dep_value state counter env v (ALG id);
-     let env,pert_ids = State.update_dep state (ALG id) pert_ids counter env in
+     State.update_dep_value state counter env v (Term.ALG id);
+     let env,pert_ids = State.update_dep state (Term.ALG id) pert_ids counter env in
      (env,state,pert_ids,tracked,pert_events)
   | (None,UPDATE_TOK (tk_id,v)) ->
      let _ = Debug.tag_if_debug "Updating token '%a'"
@@ -150,9 +150,9 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
     (*Change here if one wants to have address passing style of assignation*)
     begin
       try
-	State.update_dep_value state counter env v (TOK tk_id);
+	State.update_dep_value state counter env v (Term.TOK tk_id);
 	let env,pert_ids =
-	  State.update_dep state (TOK tk_id) pert_ids counter env in
+	  State.update_dep state (Term.TOK tk_id) pert_ids counter env in
 	(env,state,pert_ids,tracked,pert_events)
       with Invalid_argument _ ->
 	failwith "External.apply_effect: invalid token id"

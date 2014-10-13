@@ -41,10 +41,10 @@ val draw_rule :
 val update_activity :
   t -> ?cause:int -> int -> Counter.t -> Environment.t -> unit
 val update_dep :
-  t -> ?cause:int -> dep_type -> IntSet.t ->
+  t -> ?cause:int -> Term.dep_type -> IntSet.t ->
   Counter.t -> Environment.t -> Environment.t * IntSet.t
 val update_dep_value : t -> Counter.t -> Environment.t ->
-		       Nbr.t Dynamics.variable -> Mods.dep_type -> unit
+		       Nbr.t Dynamics.variable -> Term.dep_type -> unit
 
 val select_injection : float * Nbr.t Dynamics.variable option ->
 		       float * Nbr.t Dynamics.variable option -> t ->
@@ -64,7 +64,7 @@ val instances_of_square :
 
 val initialize :
   Graph.SiteGraph.t -> float array -> Dynamics.rule list ->
-  Mixture.t list -> (Nbr.t Dynamics.variable * DepSet.t * int) list ->
+  Mixture.t list -> (Nbr.t Dynamics.variable * Term.DepSet.t * int) list ->
   (((int -> Nbr.t) ->
     (int -> Nbr.t) -> float -> int -> int -> float -> (int -> Nbr.t) -> Nbr.t) *
      bool * Nbr.t option * 'a * string)
