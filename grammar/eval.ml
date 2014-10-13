@@ -652,10 +652,10 @@ let environment_of_result res =
 let obs_of_result env mixs res =
   List.fold_left
     (fun (env,mix,cont) alg_expr ->
-     let (env',mix',f, const, opt_v) = partial_eval_alg env mix alg_expr in
+     let (env',mixs',f, const, opt_v) = partial_eval_alg env mix alg_expr in
      let (_env',_mixs',(alg,_pos)) = Expr.compile_alg env alg_expr in
      let dep = Expr.deps_of_alg_expr alg in
-     env,mix',(f,const,opt_v,dep,Expr.ast_alg_to_string () (fst alg_expr)) :: cont
+     env',mixs',(f,const,opt_v,dep,Expr.ast_alg_to_string () (fst alg_expr)) :: cont
     )
     (env,mixs,[]) res.observables
 
