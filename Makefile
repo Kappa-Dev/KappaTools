@@ -6,7 +6,7 @@
 	ocamlbuild -classic-display $@
 
 all: KaSim.native
-	rm -f KaSim && ln -s _build/KaSim.native KaSim
+	rm -f KaSim && ln -s _build/main/KaSim.native KaSim
 
 clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch
 	ocamlbuild -clean
