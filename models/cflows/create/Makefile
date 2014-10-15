@@ -65,6 +65,9 @@ $(EXPECTED_OUTPUT_PATH)/%.ref: $(EXPECTED_OUTPUT_PATH)/%
 %.dot: 
 	touch $@
 
+%.dat:
+	touch $@
+
 %.diff:  %.ref %.new
 	@diff $^  > $@ || exit 0 
 
