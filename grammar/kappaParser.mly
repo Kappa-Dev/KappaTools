@@ -281,7 +281,7 @@ token_expr:
 					       "Malformed token expression, I was expecting a_0 t_0 + ... + a_n t_n, where t_i are tokens and a_i any algebraic formula"))}
     ;
 
-      sum_token:
+sum_token:
     | OP_PAR sum_token CL_PAR {$2}
     | alg_expr TYPE ID {[($1,$3)]}
     | alg_expr TYPE ID PLUS sum_token {let l = $5 in ($1,$3)::l}
