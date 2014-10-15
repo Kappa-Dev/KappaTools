@@ -14,7 +14,7 @@ TESTED_DAT= $(wildcard tmp/*.dat)
 TESTED_DOT= $(wildcard tmp/*.dot) 
 TESTED_REF= $(wildcard tmp/*.ref)
 DIFF=$(TESTED_DOT:.dot=.dot.diff) $(TESTED_DAT:.dat=.dat.diff)
-CHECK=$(TESTED_DOT:.dot=.dot.error) $(TESTED_REF:.ref=.error) $(TESTED_DAT:.dat=.dat.error)
+CHECK=$(TESTED_DOT:.dot=.dot.error) $(TESTED_REF:.ref=.error) $(TESTED_DAT:.dat=.dat.error) tmp/log.error 
 EXP=$(EXPECTED_DOT:.dot=.dot.ref) $(EXPECTED_DAT:.dat=.dat.ref)
 
 all: test
@@ -34,14 +34,10 @@ $(TMP):
 $(SCRIPT): README
 	@sed "s/expected-output/tmp/g" $< > $@
 
-$(TMP)/log.error: $(TMP)/LOG 
-	@grep fail $< > $@ &> /dev/null
-
 test: 
 	@make clean > /dev/null
 	@make $(TMP) > /dev/null
-	@make launch_script >> $(TMP)/LOG 2>&1
-	@make $(TMP)/log.error 
+	@make launch_script >> $(TMP)/LOG 2> $(TMP)/log.error 
 	@make do_copy > /dev/null
 	@make do_diff > /dev/null
 	@make error > /dev/null
