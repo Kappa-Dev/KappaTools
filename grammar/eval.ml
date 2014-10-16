@@ -296,6 +296,49 @@ let mixture_of_ast ?(tolerate_new_state=false) ?mix_id is_pattern env ast_mix =
 
 (* returns partial evaluation of rate expression and a boolean that is set *)
 (* to true if partial evaluation is a constant function                    *)
+let rec partial_eval_alg_of_alg env (ast, (beg_pos,end_pos)) =
+  let bin_op ast ast' op =
+    let (f1, const1, opt_value1) = partial_eval_alg_of_alg env ast in
+    let (f2, const2, opt_value2) = partial_eval_alg_of_alg env ast' in
+    let part_eval inst values t e e_null cpu_t tk =
+      (*evaluation partielle symbolique*)
+      let v1 = f1 inst values t e e_null cpu_t tk in
+      let v2 = f2 inst values t e e_null cpu_t tk in op v1 v2 in
+    let opt_value' = match opt_value1,opt_value2 with
+	(Some a,Some b) -> Some (op a b)
+      | _ -> None in (*evaluation complete si connue*)
+    (part_eval, (const1 && const2), opt_value')
+  in
+  let un_op ast op =
+    let (f, const, opt_v) = partial_eval_alg_of_alg env ast in
+    let opt_v' = match opt_v with Some a -> Some (op a) | None -> None in
+    ((fun inst values t e e_null cpu_t tk ->
+      let v = f inst values t e e_null cpu_t tk in op v),
+     const, opt_v')
+  in
+  match ast with
+  | Expr.CONST n -> ((fun _ _ _ _ _ _ _-> n), true, (Some n))
+  | Expr.STATE_ALG_OP (Term.CPUTIME) ->
+     ((fun _ _ _ _ _ cpu_t _-> Nbr.F (cpu_t -. !Parameter.cpuTime)), false,
+      Some (Nbr.F 0.))
+  | Expr.KAPPA_INSTANCE id -> ((fun f _ _ _ _ _ _-> f id), false, Some (Nbr.I 0))
+  | Expr.ALG_VAR i ->
+     let (_,_,c) =
+       partial_eval_alg_of_alg env (snd (fst env.Environment.algs).(i))
+     in ((fun _ v _ _ _ _ _-> v i),false,c)
+  | Expr.TOKEN_ID i -> ((fun _ _ _ _ _ _ tk -> tk i),false,Some (Nbr.F 0.))
+  | Expr.STATE_ALG_OP (Term.TIME_VAR) ->
+     ((fun _ _ t _ _ _ _-> Nbr.F t), false, Some (Nbr.F 0.))
+  | Expr.STATE_ALG_OP (Term.EVENT_VAR) ->
+     ((fun _ _ _ e ne _ _-> Nbr.I (e+ne)), false, Some (Nbr.I 0))
+  | Expr.STATE_ALG_OP (Term.NULL_EVENT_VAR) ->
+     ((fun _ _ _ _ ne _ _-> Nbr.I ne), false, Some (Nbr.I 0))
+  | Expr.STATE_ALG_OP (Term.PROD_EVENT_VAR) ->
+     ((fun _ _ _ e _ _ _-> Nbr.I e), false,Some (Nbr.I 0))
+  | Expr.BIN_ALG_OP (op,ast, ast') ->
+     bin_op ast ast' (Nbr.of_bin_alg_op op)
+  | Expr.UN_ALG_OP (op,ast) -> un_op ast (Nbr.of_un_alg_op op)
+
 let rec partial_eval_alg env mixs (ast, (beg_pos,end_pos)) =
   let bin_op ast ast' op =
     let (env1, mix1, f1, const1, opt_value1) =
@@ -307,7 +350,7 @@ let rec partial_eval_alg env mixs (ast, (beg_pos,end_pos)) =
       let v1 = f1 inst values t e e_null cpu_t tk in
       let v2 = f2 inst values t e e_null cpu_t tk in op v1 v2 in
     let opt_value' = match opt_value1,opt_value2 with
-	(Some a,Some b) -> Some (op a b)
+        (Some a,Some b) -> Some (op a b)
       | _ -> None in (*evaluation complete si connue*)
     (env2, mix2, part_eval, (const1 && const2), opt_value')
   in
@@ -316,7 +359,7 @@ let rec partial_eval_alg env mixs (ast, (beg_pos,end_pos)) =
       partial_eval_alg env mixs ast in
     let opt_v' = match opt_v with Some a -> Some (op a) | None -> None in
     (env', mix', (fun inst values t e e_null cpu_t tk ->
-      let v = f inst values t e e_null cpu_t tk in op v),
+		  let v = f inst values t e e_null cpu_t tk in op v),
      const, opt_v')
   in
   match ast with
@@ -337,19 +380,20 @@ let rec partial_eval_alg env mixs (ast, (beg_pos,end_pos)) =
      let mix,env'' = mixture_of_ast ~mix_id:id true env' ast in
      (env'', mix::mixs, (fun f _ _ _ _ _ _-> f id), false, Some (Nbr.I 0))
   | OBS_VAR lab ->
-       let i,opt_v =
-	 try Environment.num_of_alg lab env with
-	 | Not_found ->
-	    raise (ExceptionDefn.Semantics_Error
-		     (pos_of_lex_pos beg_pos,lab ^ " is not a declared variable"))
-       in
-       (env,mixs,(fun _ v _ _ _ _ _-> v i),false,opt_v)
+     let i =
+         try Environment.num_of_alg lab env with
+         | Not_found ->
+            raise (ExceptionDefn.Semantics_Error
+                     (pos_of_lex_pos beg_pos,lab ^ " is not a declared variable"))
+     in
+     let (_,_,c) = partial_eval_alg_of_alg env (snd (fst env.Environment.algs).(i)) in
+       (env,mixs,(fun _ v _ _ _ _ _-> v i),false,c)
   | TOKEN_ID (tk_nme) ->
      let i =
        try Environment.num_of_token tk_nme env
        with Not_found ->
-	 raise (ExceptionDefn.Semantics_Error
-		  (pos_of_lex_pos beg_pos,tk_nme ^ " is not a declared token"))
+         raise (ExceptionDefn.Semantics_Error
+                  (pos_of_lex_pos beg_pos,tk_nme ^ " is not a declared token"))
      in
      (env,mixs,(fun _ _ _ _ _ _ tk -> tk i),false,Some (Nbr.F 0.))
   | STATE_ALG_OP (Term.TIME_VAR) ->
@@ -401,7 +445,7 @@ let signature_of_ast s env =
 let reduce_val v env mixs =
   let (env', mixs', k, const, opt_v) = partial_eval_alg env mixs v in
   let (_mix',(alg,_pos)) =
-    Expr.compile_alg env.Environment.num_of_alg (snd env.Environment.tokens)
+    Expr.compile_alg (snd env.Environment.algs) (snd env.Environment.tokens)
 		     (env.Environment.fresh_kappa,[]) v in
   let dep = Expr.deps_of_alg_expr alg in
   (env',mixs',
@@ -601,23 +645,33 @@ let rule_of_ast ?(backwards=false) env mixs (ast_rule_label, ast_rule) tolerate_
      Dynamics.cc_impact = Some (connect_impact,disconnect_impact,side_eff_impact)
   })
 
-let variables_of_result env res =
-  List.fold_left
-    (fun (env, mixtures, vars) ((label,(beg_pos,_)),ast) ->
-     let (env', mix', f, constant, value_opt) =
-       partial_eval_alg env mixtures ast in
-     let (_mix',(alg,_pos)) =
-       Expr.compile_alg env.Environment.num_of_alg (snd env.Environment.tokens)
-			(env.Environment.fresh_kappa,[]) ast in
-     let dep = Expr.deps_of_alg_expr alg in
-     let (env'', var_id) =
-       Environment.declare_var_alg (Some (label,pos_of_lex_pos beg_pos)) value_opt env'
-     in
-     let v =
-       if constant then Dynamics.CONST (close_var f)
-       else Dynamics.VAR f
-     in (env'', mix', ((v, dep, var_id) :: vars))
-    ) (env, [], []) res.Ast.variables
+let variables_of_result env (free_id,mixs) alg_a =
+  let (env',compiled_mixs,final_id) =
+    List.fold_left (fun (env,mixs,id) ast ->
+		    (* <awful hack> *)
+		    let open Environment in
+		    let dummy_name = "%anonymous"^string_of_int id in
+		    let env = {env with
+				num_of_kappa = StringMap.add dummy_name id env.num_of_kappa;
+				kappa_of_num = IntMap.add id dummy_name env.kappa_of_num;
+			      } in
+		    (* </awful hack> *)
+		    let mix,env' = mixture_of_ast ~mix_id:id true env ast in
+		    (env',mix::mixs,pred id)) (env,[],pred free_id) mixs
+  in
+  let () = assert (final_id = -1) in
+  let vars =
+    Array.to_list
+      (Array.mapi
+	 (fun var_id ((label,(beg_pos,_)),alg) ->
+	  let (f, constant, value_opt) = partial_eval_alg_of_alg env alg in
+	  let dep = Expr.deps_of_alg_expr (fst alg) in
+	  let v =
+	    if constant then Dynamics.CONST (close_var f)
+	    else Dynamics.VAR f
+	  in (v, dep, var_id)
+	 ) alg_a)
+  in (env',compiled_mixs,vars)
 
 let rules_of_result env mixs res tolerate_new_state =
   let (env, mixs, l) =
@@ -637,14 +691,7 @@ let rules_of_result env mixs res tolerate_new_state =
       (env, mixs, []) res.Ast.rules
   in (env, mixs, (List.rev l))
 
-let environment_of_result res =
-  let tk_l = List.map (fun x -> (x,())) res.Ast.tokens in
-  let tk_a = Array.of_list tk_l in
-  let (tk_map,_) =
-    Array.fold_left
-      (fun (tk_map,i) ((x,_),()) -> (StringMap.add x i tk_map,succ i))
-      (StringMap.empty,0) tk_a in
-  let env = Environment.init (tk_a, tk_map) in
+let environment_of_result env res =
   List.fold_left
     (fun env (sign, pos) ->
      let sign,env = signature_of_ast sign env in
@@ -657,7 +704,7 @@ let obs_of_result env mixs res =
     (fun (env,mix,cont) alg_expr ->
      let (env',mixs',f, const, opt_v) = partial_eval_alg env mix alg_expr in
      let (_mix',(alg,_pos)) =
-       Expr.compile_alg env.Environment.num_of_alg (snd env.Environment.tokens)
+       Expr.compile_alg (snd env.Environment.algs) (snd env.Environment.tokens)
 			(env.Environment.fresh_kappa,[]) alg_expr in
      let dep = Expr.deps_of_alg_expr alg in
      env',mixs',(f,const,opt_v,dep,Expr.ast_alg_to_string () (fst alg_expr)) :: cont
@@ -710,7 +757,7 @@ let effects_of_modif variables env ast_list =
 	       with
 	       | Not_found ->
 		  try
-		    let (i,_) = Environment.num_of_alg nme env in (i,false)
+		     (Environment.num_of_alg nme env, false)
 		  with Not_found ->
 		    raise (ExceptionDefn.Semantics_Error
 			     (pos_rule,"Variable " ^ (nme ^ " is neither a constant nor a rule")))
@@ -808,7 +855,7 @@ let pert_of_result variables env res =
        let (env', variables', x, is_constant) =
 	 partial_eval_bool env variables pre_expr in
        let (_mix',(pre,_pos)) =
-	 Expr.compile_bool env.Environment.num_of_alg (snd env.Environment.tokens)
+	 Expr.compile_bool (snd env.Environment.algs) (snd env.Environment.tokens)
 			   (env.Environment.fresh_kappa,[]) pre_expr in
        let (dep, stopping_time) = try Expr.deps_of_bool_expr pre
 		 with ExceptionDefn.Unsatisfiable ->
@@ -832,7 +879,7 @@ let pert_of_result variables env res =
 	    let (env', variables', x, is_constant) =
 	      partial_eval_bool env variables post_expr in
 	    let (_mix',(post,_pos)) =
-	      Expr.compile_bool env.Environment.num_of_alg (snd env.Environment.tokens)
+	      Expr.compile_bool (snd env.Environment.algs) (snd env.Environment.tokens)
 			       (env.Environment.fresh_kappa,[]) post_expr in
 	    let (dep,stopping_time) = try Expr.deps_of_bool_expr post with
 			       ExceptionDefn.Unsatisfiable ->
@@ -1187,15 +1234,34 @@ let configurations_of_result result =
     ) result.configurations
 
 let initialize result counter =
+  let name_map_of_array a =
+    fst (Array.fold_left
+	   (fun (tk_map,i) ((x,_),_) -> (StringMap.add x i tk_map,succ i))
+	   (StringMap.empty,0) a) in
   Debug.tag "+ Compiling..." ;
   Debug.tag "\t -simulation parameters" ;
   let _ = configurations_of_result result in
 
   Debug.tag "\t -agent signatures" ;
-  let env = environment_of_result result in
+  let tk_l = List.map (fun x -> (x,())) result.Ast.tokens in
+  let tk_a = Array.of_list tk_l in
+  let tk_map = name_map_of_array tk_a in
 
   Debug.tag "\t -variable declarations";
-  let (env, kappa_vars, alg_vars) = variables_of_result env result in
+  let vars_a = Array.of_list result.Ast.variables in
+  let alg_map = name_map_of_array vars_a in
+  let (fresh_kappa,_ as mixs),alg_a =
+    array_fold_left_mapi (fun i mixs (lbl_pos,ast) ->
+			  let (mixs',alg) =
+			    Expr.compile_alg alg_map tk_map
+					     mixs ~max_allowed_var:(pred i) ast
+			  in (mixs',(lbl_pos,alg))) (0,[]) vars_a
+  in
+
+  let env = Environment.init (tk_a, tk_map) (alg_a,alg_map) fresh_kappa in
+
+  let env = environment_of_result env result in
+  let (env, kappa_vars, alg_vars) = variables_of_result env mixs alg_a in
 
   Debug.tag "\t -initial conditions";
   let sg,token_vector,env = init_graph_of_result env result in

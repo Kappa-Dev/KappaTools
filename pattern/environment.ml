@@ -4,12 +4,13 @@ open ExceptionDefn
 type 'a named_declarations = (string Term.with_pos *'a) array * int StringMap.t
 
 type t = {
+  tokens : unit named_declarations;
+  algs : (Expr.alg_expr Term.with_pos) named_declarations;
+
 	signatures : Signature.t IntMap.t;
 	fresh_kappa : int ;
 	num_of_kappa : int StringMap.t ; 
 	kappa_of_num : string IntMap.t ;
-	
-	tokens : unit named_declarations;
 	
 	fresh_name : int ;
 	num_of_name : int StringMap.t ;
@@ -22,10 +23,6 @@ type t = {
 	
 	num_of_unary_rule : int StringMap.t ;
 	unary_rule_of_num : string IntMap.t ;
-	
-	fresh_alg : int ;
-	num_of_alg : (int*Nbr.t option) StringMap.t ;
-	alg_of_num : (string*Nbr.t option) IntMap.t ;
 	
 	fresh_pert : int ;
 	num_of_pert : int StringMap.t ;
@@ -47,7 +44,7 @@ type t = {
 	(*log : Log.t*)
 }
 
-let empty = 
+let empty =
 	{signatures = IntMap.empty ; 
 	fresh_name = 0;
 	num_of_name = StringMap.empty ;
@@ -56,12 +53,10 @@ let empty =
 	kappa_of_num = IntMap.empty ;
 	num_of_rule = StringMap.empty ;
 	num_of_unary_rule = StringMap.empty ;
-	num_of_alg = StringMap.empty ;
-	alg_of_num = IntMap.empty ;
+	algs = ([||], StringMap.empty);
 	rule_of_num = IntMap.empty ;
 	unary_rule_of_num = IntMap.empty ; 
-	fresh_kappa = 0 ; 
-	fresh_alg = 0 ;
+	fresh_kappa = 0 ;
 	fresh_pert = 0 ;
 	tokens = ([||], StringMap.empty);
 	num_of_pert = StringMap.empty ;
@@ -80,8 +75,8 @@ let empty =
 	desc_table = Hashtbl.create 2 
 }
 
-let init tokens =
-  { empty with tokens = tokens }
+let init tokens algs fresh_kappa =
+  { empty with tokens = tokens; algs = algs; fresh_kappa = fresh_kappa }
 
 let get_desc file env = 
 	try Hashtbl.find env.desc_table file with 
@@ -145,8 +140,8 @@ let unary_rule_of_num i env =  IntMap.find i env.unary_rule_of_num
 let pert_of_num i env = IntMap.find i env.pert_of_num
 let num_of_pert lab env = StringMap.find lab env.num_of_pert
 let is_rule i env = IntSet.mem i env.rule_indices
-let num_of_alg s env = StringMap.find s env.num_of_alg
-let	alg_of_num i env = IntMap.find i env.alg_of_num
+let num_of_alg s env = StringMap.find s (snd env.algs)
+let alg_of_num i env = fst (fst env.algs).(i)
 (*let bind_pert_rule pid rid env = {env with rule_of_pert = IntMap.add pid rid env.rule_of_pert}*)
 (*let rule_of_pert pid env = try Some (IntMap.find pid env.rule_of_pert) with Not_found -> None *)
 
@@ -263,28 +258,6 @@ let declare_var_kappa ?(from_rule=false) label_pos_opt env =
 					num_of_kappa = np ; 
 					kappa_of_num = pn ; 
 					fresh_kappa = fp},fp-1)
-
-let declare_var_alg label_pos_opt const env =
-	let label,pos = match label_pos_opt with
-		| Some (label,pos) -> (label,pos)
-		| None -> invalid_arg "Environment.declare_var_alg"
-	in
-	let already_defined = 
-		(try let _ = num_of_kappa label env in true with Not_found -> false)
-		||
-		(try let _ = num_of_alg label env in true with Not_found -> false)
-	in
-		if already_defined then raise (Semantics_Error (pos, (Printf.sprintf "Label '%s' already defined" label)))
-		else
-			let np = StringMap.add label (env.fresh_alg,const) env.num_of_alg
-			and pn = IntMap.add env.fresh_alg (label,const) env.alg_of_num
-			and fp = env.fresh_alg+1
-			in
-				({env with 
-					num_of_alg = np ; 
-					alg_of_num = pn ; 
-					fresh_alg = fp},fp-1)
-
 
 let get_sig agent_id env = 
 	if agent_id = -1 then invalid_arg "Environment.get_sig: Empty agent has no signature"

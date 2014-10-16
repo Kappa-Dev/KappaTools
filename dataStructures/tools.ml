@@ -99,3 +99,11 @@ let find_available_name name ext =
   let () =
     while Sys.file_exists (base^(string_of_int !v)^ext) do incr v; done
   in base^(string_of_int !v)^ext
+
+let array_fold_left_mapi f x a =
+  let y = ref x in
+  let o = Array.init (Array.length a)
+		     (fun i -> let (y',out) = f i !y a.(i) in
+			       let () = y := y' in
+			       out) in
+  (!y,o)

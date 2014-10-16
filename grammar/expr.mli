@@ -28,11 +28,11 @@ type alg_expr =
 
 (** [compile_alg variable_map token_map (fresh_mix_id, mix_list) alg_pos] *)
 val compile_alg :
-  (int * 'b) Mods.StringMap.t -> int Mods.StringMap.t -> ?max_allowed_var:int ->
+  int Mods.StringMap.t -> int Mods.StringMap.t -> ?max_allowed_var:int ->
   int * 'a list -> 'a Ast.ast_alg_expr Term.with_pos ->
   (int * 'a list) * alg_expr Term.with_pos
 val compile_bool :
-  (int * 'b) Mods.StringMap.t -> int Mods.StringMap.t -> int * 'a list ->
+  int Mods.StringMap.t -> int Mods.StringMap.t -> int * 'a list ->
   'a Ast.ast_alg_expr Ast.bool_expr Term.with_pos ->
   (int * 'a list) * alg_expr Ast.bool_expr Term.with_pos
 

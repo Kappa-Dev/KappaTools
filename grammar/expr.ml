@@ -77,7 +77,7 @@ let rec compile_alg var_map tk_map ?max_allowed_var
   | Ast.KAPPA_INSTANCE ast ->
      ((succ fr_mix_id,ast::mix_l), (KAPPA_INSTANCE fr_mix_id,pos))
   | Ast.OBS_VAR lab ->
-     let i,_ =
+     let i =
        try Mods.StringMap.find lab var_map with
        | Not_found ->
 	  raise (ExceptionDefn.Semantics_Error
