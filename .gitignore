@@ -1,7 +1,10 @@
 *.cm*
 *.o
 *.annot
-KaSim*
+KaSim.docdir
+KaSim.native
+KaSim.byte
+KaSim
 *~
 _build/
 ._d/

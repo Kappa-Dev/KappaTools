@@ -1,3 +1,7 @@
+(** Algebraic and boolean term management *)
+
+(** {6 Printers} *)
+
 val print_ast_alg : out_channel -> Ast.mixture Ast.ast_alg_expr -> unit
 val ast_alg_to_string : unit -> Ast.mixture Ast.ast_alg_expr -> string
 
@@ -19,6 +23,8 @@ type alg_expr =
   | KAPPA_INSTANCE of int
   | TOKEN_ID of int
   | CONST of Nbr.t
+
+(** {6 Compilers } *)
 
 (** [compile_alg variable_map token_map (fresh_mix_id, mix_list) alg_pos] *)
 val compile_alg :
