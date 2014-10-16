@@ -398,14 +398,10 @@ let signature_of_ast s env =
   let env,name_id = Environment.declare_name name pos env in
   (Signature.create name_id intf_map,env)
 
-let token_of_ast abs_tk env =
-  let (name, pos) = abs_tk in
-  Environment.declare_token name pos env
-
 let reduce_val v env mixs =
   let (env', mixs', k, const, opt_v) = partial_eval_alg env mixs v in
   let (_mix',(alg,_pos)) =
-    Expr.compile_alg env.Environment.num_of_alg env.Environment.num_of_token
+    Expr.compile_alg env.Environment.num_of_alg (snd env.Environment.tokens)
 		     (env.Environment.fresh_kappa,[]) v in
   let dep = Expr.deps_of_alg_expr alg in
   (env',mixs',
@@ -611,7 +607,7 @@ let variables_of_result env res =
      let (env', mix', f, constant, value_opt) =
        partial_eval_alg env mixtures ast in
      let (_mix',(alg,_pos)) =
-       Expr.compile_alg env.Environment.num_of_alg env.Environment.num_of_token
+       Expr.compile_alg env.Environment.num_of_alg (snd env.Environment.tokens)
 			(env.Environment.fresh_kappa,[]) ast in
      let dep = Expr.deps_of_alg_expr alg in
      let (env'', var_id) =
@@ -642,23 +638,26 @@ let rules_of_result env mixs res tolerate_new_state =
   in (env, mixs, (List.rev l))
 
 let environment_of_result res =
-  let env =
-    List.fold_left
-      (fun env (sign, pos) ->
-       let sign,env = signature_of_ast sign env in
-       Environment.declare_sig sign pos env
-      )
-      Environment.empty res.Ast.signatures
-  in
+  let tk_l = List.map (fun x -> (x,())) res.Ast.tokens in
+  let tk_a = Array.of_list tk_l in
+  let (tk_map,_) =
+    Array.fold_left
+      (fun (tk_map,i) ((x,_),()) -> (StringMap.add x i tk_map,succ i))
+      (StringMap.empty,0) tk_a in
+  let env = Environment.init (tk_a, tk_map) in
   List.fold_left
-    (fun env (tk, pos) -> token_of_ast (tk,pos) env) env res.Ast.tokens
+    (fun env (sign, pos) ->
+     let sign,env = signature_of_ast sign env in
+     Environment.declare_sig sign pos env
+    )
+    env res.Ast.signatures
 
 let obs_of_result env mixs res =
   List.fold_left
     (fun (env,mix,cont) alg_expr ->
      let (env',mixs',f, const, opt_v) = partial_eval_alg env mix alg_expr in
      let (_mix',(alg,_pos)) =
-       Expr.compile_alg env.Environment.num_of_alg env.Environment.num_of_token
+       Expr.compile_alg env.Environment.num_of_alg (snd env.Environment.tokens)
 			(env.Environment.fresh_kappa,[]) alg_expr in
      let dep = Expr.deps_of_alg_expr alg in
      env',mixs',(f,const,opt_v,dep,Expr.ast_alg_to_string () (fst alg_expr)) :: cont
@@ -809,7 +808,7 @@ let pert_of_result variables env res =
        let (env', variables', x, is_constant) =
 	 partial_eval_bool env variables pre_expr in
        let (_mix',(pre,_pos)) =
-	 Expr.compile_bool env.Environment.num_of_alg env.Environment.num_of_token
+	 Expr.compile_bool env.Environment.num_of_alg (snd env.Environment.tokens)
 			   (env.Environment.fresh_kappa,[]) pre_expr in
        let (dep, stopping_time) = try Expr.deps_of_bool_expr pre
 		 with ExceptionDefn.Unsatisfiable ->
@@ -833,7 +832,7 @@ let pert_of_result variables env res =
 	    let (env', variables', x, is_constant) =
 	      partial_eval_bool env variables post_expr in
 	    let (_mix',(post,_pos)) =
-	      Expr.compile_bool env.Environment.num_of_alg env.Environment.num_of_token
+	      Expr.compile_bool env.Environment.num_of_alg (snd env.Environment.tokens)
 			       (env.Environment.fresh_kappa,[]) post_expr in
 	    let (dep,stopping_time) = try Expr.deps_of_bool_expr post with
 			       ExceptionDefn.Unsatisfiable ->
@@ -1003,7 +1002,7 @@ let pert_of_result variables env res =
   (variables, lpert, (List.rev lrules), env)
 
 let init_graph_of_result env res =
-  let n = env.Environment.fresh_token in
+  let n = Array.length (fst env.Environment.tokens) in
   let token_vector = Array.init n (fun i -> 0.) in
   let sg,env =
     List.fold_left

@@ -54,9 +54,9 @@ start_rule:
 			 (Ast.result:={!Ast.result with
 					Ast.signatures=(ag,pos)::!Ast.result.Ast.signatures}
 			 )
-		      | Ast.TOKENSIG (str,pos) ->
+		      | Ast.TOKENSIG (str_pos) ->
 			 (Ast.result:={!Ast.result with
-					Ast.tokens=(str,pos)::!Ast.result.Ast.tokens}
+					Ast.tokens=str_pos::!Ast.result.Ast.tokens}
 			 )
 		      | Ast.VOLSIG (vol_type,vol,vol_param) ->
 			 (Ast.result := {!Ast.result with
@@ -90,7 +90,7 @@ start_rule:
 
 instruction:
     | SIGNATURE agent_expression {Ast.SIG ($2,$1)}
-    | TOKEN ID {let str,pos = $2 in Ast.TOKENSIG (str,pos)}
+    | TOKEN ID {let str,pos = $2 in Ast.TOKENSIG (str,rhs_pos 2)}
     | SIGNATURE error {raise (ExceptionDefn.Syntax_Error
 				(Some $1,"Malformed agent signature, I was expecting something of the form '%agent: A(x,y~u~v,z)'"))}
 

@@ -35,7 +35,8 @@ let main =
 			), "Specifies directory name where output file(s) should be stored") ;
 		("-load-sim", Arg.String (fun file -> Parameter.marshalizedInFile := file) , "load simulation package instead of kappa files") ; 
 		("-make-sim", Arg.String (fun file -> Parameter.marshalizedOutFile := file) , "save kappa files as a simulation package") ; 
-		("--implicit-signature", Arg.Unit (fun () -> Parameter.implicitSignature := true), "Program will guess agent signatures automatically") ;
+		("--implicit-signature", Arg.Unit (fun () -> Printf.eprintf "--implicitSignature is currently unplugged.\n";
+							     Parameter.implicitSignature := true), "Program will guess agent signatures automatically") ;
 		("-seed", Arg.Int (fun i -> Parameter.seedValue := Some i), "Seed for the random number generator") ;
 		("--eclipse", Arg.Unit (fun () -> Parameter.eclipseMode:= true), "enable this flag for running KaSim behind eclipse plugin") ;
 		("--emacs-mode", Arg.Unit (fun () -> Parameter.emacsMode:= true), "enable this flag for running KaSim using emacs-mode") ;

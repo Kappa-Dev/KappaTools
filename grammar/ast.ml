@@ -105,7 +105,7 @@ type 'mixture init_t =
 
 type 'mixture instruction =
   | SIG of agent * Tools.pos
-  | TOKENSIG of str_pos
+  | TOKENSIG of string Term.with_pos
   | VOLSIG of str_pos * float * str_pos (* type, volume, parameter*)
   | INIT of str_pos option * 'mixture init_t * Tools.pos (*volume, init, position *)
   | DECLARE of 'mixture variable_def
@@ -123,7 +123,7 @@ type ('agent,'mixture,'rule) compil =
     init : (str_pos option * 'mixture init_t * Tools.pos) list ; (*initial graph declaration*)
     perturbations : 'mixture perturbation list ;
     configurations : configuration list ;
-    tokens :  str_pos list ;
+    tokens :  string Term.with_pos list ;
     volumes : (str_pos * float * str_pos) list
   }
 let result:(agent,mixture,rule) compil ref =
