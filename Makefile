@@ -2,7 +2,7 @@
 
 .PHONY: all clean temp-clean-for-ignorant-that-clean-must-be-done-before-fetch
 
-%:
+%.native %.byte: $(filter-out _build/,$(wildcard */*.ml*))
 	ocamlbuild -classic-display $@
 
 all: KaSim.native
