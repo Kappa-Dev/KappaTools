@@ -404,7 +404,9 @@ let token_of_ast abs_tk env =
 
 let reduce_val v env mixs =
   let (env', mixs', k, const, opt_v) = partial_eval_alg env mixs v in
-  let (_env',_mix',(alg,_pos)) = Expr.compile_alg env v in
+  let (_mix',(alg,_pos)) =
+    Expr.compile_alg env.Environment.num_of_alg env.Environment.num_of_token
+		     (env.Environment.fresh_kappa,[]) v in
   let dep = Expr.deps_of_alg_expr alg in
   (env',mixs',
    (if const then
@@ -608,7 +610,9 @@ let variables_of_result env res =
     (fun (env, mixtures, vars) ((label,(beg_pos,_)),ast) ->
      let (env', mix', f, constant, value_opt) =
        partial_eval_alg env mixtures ast in
-     let (_env',_mixs',(alg,_pos)) = Expr.compile_alg env ast in
+     let (_mix',(alg,_pos)) =
+       Expr.compile_alg env.Environment.num_of_alg env.Environment.num_of_token
+			(env.Environment.fresh_kappa,[]) ast in
      let dep = Expr.deps_of_alg_expr alg in
      let (env'', var_id) =
        Environment.declare_var_alg (Some (label,pos_of_lex_pos beg_pos)) value_opt env'
@@ -653,7 +657,9 @@ let obs_of_result env mixs res =
   List.fold_left
     (fun (env,mix,cont) alg_expr ->
      let (env',mixs',f, const, opt_v) = partial_eval_alg env mix alg_expr in
-     let (_env',_mixs',(alg,_pos)) = Expr.compile_alg env alg_expr in
+     let (_mix',(alg,_pos)) =
+       Expr.compile_alg env.Environment.num_of_alg env.Environment.num_of_token
+			(env.Environment.fresh_kappa,[]) alg_expr in
      let dep = Expr.deps_of_alg_expr alg in
      env',mixs',(f,const,opt_v,dep,Expr.ast_alg_to_string () (fst alg_expr)) :: cont
     )
@@ -802,7 +808,9 @@ let pert_of_result variables env res =
 	   (pre_expr, modif_expr_list, pos, opt_post) ->
        let (env', variables', x, is_constant) =
 	 partial_eval_bool env variables pre_expr in
-       let (_env',_mixs',(pre,_pos)) = Expr.compile_bool env pre_expr in
+       let (_mix',(pre,_pos)) =
+	 Expr.compile_bool env.Environment.num_of_alg env.Environment.num_of_token
+			   (env.Environment.fresh_kappa,[]) pre_expr in
        let (dep, stopping_time) = try Expr.deps_of_bool_expr pre
 		 with ExceptionDefn.Unsatisfiable ->
 		   raise
@@ -824,7 +832,9 @@ let pert_of_result variables env res =
 	 | Some post_expr ->
 	    let (env', variables', x, is_constant) =
 	      partial_eval_bool env variables post_expr in
-	    let (_env',_mixs',(post,_pos)) = Expr.compile_bool env post_expr in
+	    let (_mix',(post,_pos)) =
+	      Expr.compile_bool env.Environment.num_of_alg env.Environment.num_of_token
+			       (env.Environment.fresh_kappa,[]) post_expr in
 	    let (dep,stopping_time) = try Expr.deps_of_bool_expr post with
 			       ExceptionDefn.Unsatisfiable ->
 			       raise

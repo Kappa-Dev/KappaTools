@@ -62,98 +62,97 @@ type ('a,'b) contractible = NO of 'a
 			  | MAYBE of 'a * Term.bin_alg_op * 'a * 'b
 			  | YES of 'b
 
-let rec aux_compil env mixs (alg,(beg_pos,_ as pos)) =
-  let rec_call env mixs x =
-    match aux_compil env mixs x with
-    | (env', mixs', (ALG_VAR _ | TOKEN_ID _ | UN_ALG_OP _ | STATE_ALG_OP _
-		     | KAPPA_INSTANCE _ as alg,_)) -> (env', mixs', NO alg)
-    | (env',mixs',(CONST n,_)) -> (env',mixs',YES n)
-    | (env',mixs',(BIN_ALG_OP (op, (x,_), (CONST y,_)) as alg,_)) ->
-       (env',mixs',MAYBE(alg,op,x,y))
-    | (env',mixs',(BIN_ALG_OP _ as alg,_)) -> (env',mixs',NO alg)
+let rec compile_alg var_map tk_map ?max_allowed_var
+		    (fr_mix_id,mix_l as mixs) (alg,(beg_pos,_ as pos)) =
+  let rec_call mixs x =
+    match compile_alg var_map tk_map mixs x with
+    | (mixs', (ALG_VAR _ | TOKEN_ID _ | UN_ALG_OP _ | STATE_ALG_OP _
+		     | KAPPA_INSTANCE _ as alg,_)) -> (mixs', NO alg)
+    | (mixs',(CONST n,_)) -> (mixs',YES n)
+    | (mixs',(BIN_ALG_OP (op, (x,_), (CONST y,_)) as alg,_)) ->
+       (mixs',MAYBE(alg,op,x,y))
+    | (mixs',(BIN_ALG_OP _ as alg,_)) -> (mixs',NO alg)
   in
   match alg with
   | Ast.KAPPA_INSTANCE ast ->
-     let (env', id) =
-       Environment.declare_var_kappa None env in
-     (env', (id,ast)::mixs, (KAPPA_INSTANCE id,pos))
+     ((succ fr_mix_id,ast::mix_l), (KAPPA_INSTANCE fr_mix_id,pos))
   | Ast.OBS_VAR lab ->
      let i,_ =
-       try Environment.num_of_alg lab env with
+       try Mods.StringMap.find lab var_map with
        | Not_found ->
 	  raise (ExceptionDefn.Semantics_Error
 		   (Tools.pos_of_lex_pos beg_pos,
 		    lab ^" is not a declared variable"))
-     in (env,mixs,(ALG_VAR i,pos))
+     in
+     let () = match max_allowed_var with
+       | Some j when j < i ->
+	  raise (ExceptionDefn.Semantics_Error
+		   (Tools.pos_of_lex_pos beg_pos,
+		    "Reference to not yet defined '"^lab ^"' is forbidden."))
+       | None | Some _ -> ()
+     in(mixs,(ALG_VAR i,pos))
   | Ast.TOKEN_ID tk_nme ->
      let i =
-       try Environment.num_of_token tk_nme env
+       try Mods.StringMap.find tk_nme tk_map
        with Not_found ->
 	 raise (ExceptionDefn.Semantics_Error
 		  (Tools.pos_of_lex_pos beg_pos,tk_nme ^ " is not a declared token"))
-     in (env,mixs,(TOKEN_ID i,pos))
-  | Ast.STATE_ALG_OP (op) -> (env,mixs,(STATE_ALG_OP (op),pos))
-  | Ast.CONST n -> (env,mixs,(CONST n,pos))
-  | Ast.EMAX -> (env,mixs,(CONST (Parameter.getMaxEventValue ()),pos))
-  | Ast.TMAX ->
-     (env,mixs,(CONST (Parameter.getMaxTimeValue ()),pos))
+     in (mixs,(TOKEN_ID i,pos))
+  | Ast.STATE_ALG_OP (op) -> (mixs,(STATE_ALG_OP (op),pos))
+  | Ast.CONST n -> (mixs,(CONST n,pos))
+  | Ast.EMAX -> (mixs,(CONST (Parameter.getMaxEventValue ()),pos))
+  | Ast.TMAX -> (mixs,(CONST (Parameter.getMaxTimeValue ()),pos))
   | Ast.BIN_ALG_OP (op, (a,pos1), (b,pos2)) ->
-     begin match rec_call env mixs (a,pos1) with
-	   | (env',mixs',YES n1) ->
+     begin match rec_call mixs (a,pos1) with
+	   | (mixs',YES n1) ->
 	      begin
-		match rec_call env' mixs' (b,pos2) with
-		| (env'',mixs'',YES n2) ->
-		   (env'',mixs'',(CONST (Nbr.of_bin_alg_op op n1 n2),pos))
-		| (env'',mixs'',( NO y | MAYBE (y,_,_,_) )) ->
-		   (env'',mixs'',
+		match rec_call mixs' (b,pos2) with
+		| (mixs'',YES n2) ->
+		   (mixs'',(CONST (Nbr.of_bin_alg_op op n1 n2),pos))
+		| (mixs'',( NO y | MAYBE (y,_,_,_) )) ->
+		   (mixs'',
 		    (BIN_ALG_OP (op, (CONST n1,pos1), (y,pos2)),pos))
 	      end
-	   | (env',mixs',( NO x | MAYBE (x,_,_,_) )) ->
-	      match rec_call env' mixs' (b,pos2) with
-	      | (env'',mixs'',YES n2) ->
-		 (env'',mixs'',
-		  (BIN_ALG_OP (op, (x,pos1), (CONST n2,pos2)),pos))
-	      | (env'',mixs'',( NO y | MAYBE (y,_,_,_) )) ->
-		 (env'',mixs'',(BIN_ALG_OP (op, (x,pos1), (y,pos2)),pos))
+	   | (mixs',( NO x | MAYBE (x,_,_,_) )) ->
+	      match rec_call mixs' (b,pos2) with
+	      | (mixs'',YES n2) ->
+		 (mixs'', (BIN_ALG_OP (op, (x,pos1), (CONST n2,pos2)),pos))
+	      | (mixs'',( NO y | MAYBE (y,_,_,_) )) ->
+		 (mixs'',(BIN_ALG_OP (op, (x,pos1), (y,pos2)),pos))
      end
   | Ast.UN_ALG_OP (op,(a,pos1)) ->
-     begin match rec_call env mixs (a,pos1) with
-	   | (env',mixs',YES n) ->
-	      (env',mixs',(CONST (Nbr.of_un_alg_op op n),pos))
-	   | (env',mixs',(NO x | MAYBE (x,_,_,_))) ->
-	      (env',mixs',(UN_ALG_OP (op,(x,pos1)),pos))
+     begin match rec_call mixs (a,pos1) with
+	   | (mixs',YES n) ->
+	      (mixs',(CONST (Nbr.of_un_alg_op op n),pos))
+	   | (mixs',(NO x | MAYBE (x,_,_,_))) ->
+	      (mixs',(UN_ALG_OP (op,(x,pos1)),pos))
      end
 
-let compile_alg env alg_pos =
-  aux_compil env [] alg_pos
-
-let compile_bool env bool_pos =
-  let rec aux env mixs = function
-    | Ast.TRUE,pos -> (env,mixs,(Ast.TRUE,pos))
-    | Ast.FALSE,pos -> (env,mixs,(Ast.FALSE,pos))
-    | Ast.BOOL_OP (op,a,b), pos ->
-       begin match aux env mixs a, op with
-	     | (_,_,(Ast.TRUE,_)), Term.OR -> (env,mixs,(Ast.TRUE,pos))
-	     | (_,_,(Ast.FALSE,_)), Term.AND -> (env,mixs,(Ast.FALSE,pos))
-	     | (_,_,(Ast.TRUE,_)), Term.AND
-	     | (_,_,(Ast.FALSE,_)), Term.OR -> aux env mixs b
-	     | (env',mixs',a' as out1),_ ->
-		match aux env' mixs' b, op with
-		| (_,_,(Ast.TRUE,_)), Term.OR -> (env,mixs,(Ast.TRUE,pos))
-		| (_,_,(Ast.FALSE,_)), Term.AND -> (env,mixs,(Ast.FALSE,pos))
-		| (_,_,(Ast.TRUE,_)), Term.AND
-		| (_,_,(Ast.FALSE,_)), Term.OR -> out1
-		| (env'',mixs'',b'),_ -> (env'',mixs'',(Ast.BOOL_OP (op,a',b'),pos))
-       end
-    | Ast.COMPARE_OP (op,a,b),pos ->
-       let (env',mixs',a') = aux_compil env mixs a in
-       let (env'',mixs'',b') = aux_compil env' mixs' b in
-       match a',b' with
-       | (CONST n1,_), (CONST n2,_) ->
-	  (env'',mixs'',
-	   ((if Nbr.of_compare_op op n1 n2 then Ast.TRUE else Ast.FALSE),pos))
-       | _, _ -> (env'',mixs'',(Ast.COMPARE_OP (op,a',b'), pos))
-  in aux env [] bool_pos
+let rec compile_bool var_map tk_map mixs = function
+  | Ast.TRUE,pos -> (mixs,(Ast.TRUE,pos))
+  | Ast.FALSE,pos -> (mixs,(Ast.FALSE,pos))
+  | Ast.BOOL_OP (op,a,b), pos ->
+     begin match compile_bool var_map tk_map mixs a, op with
+	   | (_,(Ast.TRUE,_)), Term.OR -> (mixs,(Ast.TRUE,pos))
+	   | (_,(Ast.FALSE,_)), Term.AND -> (mixs,(Ast.FALSE,pos))
+	   | (_,(Ast.TRUE,_)), Term.AND
+	   | (_,(Ast.FALSE,_)), Term.OR -> compile_bool var_map tk_map mixs b
+	   | (mixs',a' as out1),_ ->
+	      match compile_bool var_map tk_map mixs' b, op with
+	      | (_,(Ast.TRUE,_)), Term.OR -> (mixs,(Ast.TRUE,pos))
+	      | (_,(Ast.FALSE,_)), Term.AND -> (mixs,(Ast.FALSE,pos))
+	      | (_,(Ast.TRUE,_)), Term.AND
+	      | (_,(Ast.FALSE,_)), Term.OR -> out1
+	      | (mixs'',b'),_ -> (mixs'',(Ast.BOOL_OP (op,a',b'),pos))
+     end
+  | Ast.COMPARE_OP (op,a,b),pos ->
+     let (mixs',a') = compile_alg var_map tk_map mixs a in
+     let (mixs'',b') = compile_alg var_map tk_map mixs' b in
+     match a',b' with
+     | (CONST n1,_), (CONST n2,_) ->
+	(mixs'',
+	 ((if Nbr.of_compare_op op n1 n2 then Ast.TRUE else Ast.FALSE),pos))
+     | _, _ -> (mixs'',(Ast.COMPARE_OP (op,a',b'), pos))
 
 let add_dep el s = Term.DepSet.add el s
 let rec aux_dep s = function
