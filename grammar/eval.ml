@@ -1057,20 +1057,21 @@ let init_graph_of_result env res =
        match init_t with
        | INIT_MIX (alg, ast) ->
 	  begin
-	    let (env, mixs, v, is_const, opt_v) =
-	      partial_eval_alg env [] alg in
+	    let (_,alg') =
+	      Expr.compile_alg (snd env.Environment.algs)
+			       (snd env.Environment.tokens) (0,[]) alg in
+	    let value =
+	      match partial_eval_alg_of_alg env alg' with
+	      | (_, _, Some v) -> v
+	      | _ -> raise
+		       (ExceptionDefn.Semantics_Error
+			  (pos,
+			   Printf.sprintf "%a is not a constant, cannot initialize graph."
+					  Expr.ast_alg_to_string (fst alg)))
+	    in
 	    let cpt = ref 0 in
 	    let sg = ref sg in
 	    let env = ref env in
-	    let value =
-	      match mixs, opt_v with
-	      | [], Some v -> v
-	      | _, _ -> raise
-			  (ExceptionDefn.Semantics_Error
-			     (pos,
-			      Printf.sprintf "%a is not a constant, cannot initialize graph."
-					     Expr.ast_alg_to_string (fst alg)))
-	    in
 	    let n = match !Parameter.rescale with
 	      | None -> Nbr.to_int value
 	      | Some i -> min i (Nbr.to_int value)
@@ -1086,13 +1087,14 @@ let init_graph_of_result env res =
 	    (!sg,!env)
 	  end
        | INIT_TOK (alg, (tk_nme,pos_tk)) ->
-	  let (env, mixs, v, is_const, opt_v) =
-	    partial_eval_alg env [] alg in
-	  let x =
-	    match mixs,opt_v with
-	    | [], Some n -> Nbr.to_float n
-	    | _, _ ->
-	       raise (ExceptionDefn.Semantics_Error
+	  let (_,alg') =
+	    Expr.compile_alg (snd env.Environment.algs)
+			     (snd env.Environment.tokens) (0,[]) alg in
+	  let value =
+	    match partial_eval_alg_of_alg env alg' with
+	    | (_, _, Some v) -> Nbr.to_float v
+	    | _ -> raise
+		     (ExceptionDefn.Semantics_Error
 			(pos_tk,
 			 Printf.sprintf "%a is not a constant, cannot initialize token value."
 					Expr.ast_alg_to_string (fst alg)))
@@ -1103,7 +1105,7 @@ let init_graph_of_result env res =
 	      raise (ExceptionDefn.Semantics_Error
 		       (pos_tk, Printf.sprintf "token %s is undeclared" tk_nme))
 	  in
-	  token_vector.(tok_id) <- x ;
+	  token_vector.(tok_id) <- value;
 	  (sg,env)
       )	(Graph.SiteGraph.init !Parameter.defaultGraphSize,env) res.Ast.init
   in
