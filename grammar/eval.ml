@@ -809,17 +809,25 @@ let effects_of_modif variables env ast_list =
 	    (variables, (Dynamics.STOP pexpr)::effects, str, env)
 	 | CFLOW ((lab,pos_lab),pos_pert) ->
 	    let id = try Environment.num_of_rule lab env
-		     with Not_found -> try Environment.num_of_kappa lab env
-				       with Not_found ->
-					 raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
+		     with Not_found ->
+		       try let var = Environment.num_of_alg lab env in
+			   match (fst env.Environment.algs).(var) with
+			   |(_,(Expr.KAPPA_INSTANCE i,_)) -> i
+			   | _ -> raise Not_found
+		       with Not_found ->
+			 raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
 	    in
 	    let str = (Printf.sprintf "Enable causality analysis for observable '%s'" lab)::str_pert in
 	    (variables, (Dynamics.CFLOW id)::effects, str, env)
 	 | CFLOWOFF ((lab,pos_lab),pos_pert) ->
 	    let id = try Environment.num_of_rule lab env
-		     with Not_found -> try Environment.num_of_kappa lab env
-				       with Not_found ->
-					 raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
+		     with Not_found ->
+			  try let var = Environment.num_of_alg lab env in
+			      match (fst env.Environment.algs).(var) with
+			      |(_,(Expr.KAPPA_INSTANCE i,_)) -> i
+			      | _ -> raise Not_found
+			  with Not_found ->
+			    raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
 	    in
 	    let str = (Printf.sprintf "Disable causality analysis for observable '%s'" lab)::str_pert in
 	    (variables, (Dynamics.CFLOWOFF id)::effects, str, env)
