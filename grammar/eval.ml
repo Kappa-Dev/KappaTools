@@ -1245,7 +1245,11 @@ let configurations_of_result result =
 let initialize result counter =
   let name_map_of_array a =
     fst (Array.fold_left
-	   (fun (tk_map,i) ((x,_),_) -> (StringMap.add x i tk_map,succ i))
+	   (fun (map,i) ((x,(pos,_)),_) ->
+	    if StringMap.mem x map then
+	      raise (ExceptionDefn.Semantics_Error
+		       (Tools.pos_of_lex_pos pos, (Printf.sprintf "Label '%s' already defined" x)))
+	    else StringMap.add x i map,succ i)
 	   (StringMap.empty,0) a) in
   Debug.tag "+ Compiling..." ;
   Debug.tag "\t -simulation parameters" ;
