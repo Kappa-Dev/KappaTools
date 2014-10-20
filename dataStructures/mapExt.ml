@@ -24,6 +24,7 @@ sig
 	val random: 'a t -> key * 'a
 	val size: 'a t -> int
 	val root: 'a t -> (key * 'a) option
+	val max_key : 'a t -> key
 end
 
 module Make(Ord: OrderedType) = struct
@@ -211,4 +212,8 @@ module Make(Ord: OrderedType) = struct
 			in
 			find (Random.int (size m)) m
 	
+	let rec max_key = function
+	  | Empty -> invalid_arg "MapExt.max_key"
+	  | Node (_,k,_,Empty,_,_) -> k
+	  | Node (_,_,_,m,_,_) -> max_key m
 end
