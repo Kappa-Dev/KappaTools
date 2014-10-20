@@ -422,7 +422,6 @@ let rec partial_eval_bool env mixs (ast,_) =
        let part_eval inst values t e e_null cpu_t tk =
 	 let v1 = f1 inst values t e e_null cpu_t tk in
 	 let v2 = f2 inst values t e e_null cpu_t tk in
-	 (*checking whether boolean expression has a time dependency and is of the form [T]=n*)
 	 op v1 v2
        in
        (env2,mix2,part_eval, (const1 && const2))

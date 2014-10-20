@@ -62,9 +62,9 @@ let compare n1 n2 =
   | (I x, F y) -> Pervasives.compare (float_of_int x) y
   | (I x, I64 y) -> Pervasives.compare (Int64.of_int x) y
   | (I64 x, I64 y) -> Pervasives.compare x y
-  | (I64 x, I y) -> Pervasives.compare (Int64.of_int y) x
+  | (I64 x, I y) -> Pervasives.compare x (Int64.of_int y)
   | (F x, I64 y) -> Pervasives.compare x (Int64.to_float y)
-  | (I64 x, F y) -> Pervasives.compare y (Int64.to_float x)
+  | (I64 x, F y) -> Pervasives.compare (Int64.to_float x) y
 
 let is_greater n1 n2 = compare n1 n2 > 0
 let is_smaller n1 n2 = compare n1 n2 < 0
