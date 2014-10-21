@@ -1,5 +1,5 @@
 language: OCaml
 
-install: apt-get install -qq ocaml-nox
+install: sudo apt-get install -qq ocaml-nox
 
 script: make all
