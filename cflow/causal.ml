@@ -562,6 +562,7 @@ let pretty_print config_closure compression_type label story_list state env =
     else 
       Debug.tag (Printf.sprintf "\n+ Pretty printing %d %scompressed flow%s" n label (if n>1 then "s" else ""))
   in
+  let compression_type = if compression_type = "" then "none" else compression_type in 
   let story_list = 
     List.map (fun (x,y) -> enrich_grid config_closure x,y) story_list 
   in 
@@ -583,12 +584,12 @@ let pretty_print config_closure compression_type label story_list state env =
 	    Printf.fprintf desc "/* Compressed causal flows were: %s */\n" (Tools.string_of_list string_of_int ids) ;
 	  )
 	in
-	let fic = Tools.find_available_name ((Filename.chop_extension (!(Parameter.cflowFileName)))^compression_type^"_"^(string_of_int cpt)) ".dot" in
-	dot_of_grid profiling fic enriched_config state env ;
+	let fic = Tools.build_fresh_filename (!(Parameter.cflowFileName)) [compression_type;string_of_int cpt] "dot" in
+        dot_of_grid profiling fic enriched_config state env ;
 	cpt+1
       ) 0 story_list
   in
-  let fic = Tools.find_available_name ((Filename.chop_extension !(Parameter.cflowFileName))^compression_type^"Summary") ".dat" in 
+  let fic = Tools.build_fresh_filename (!(Parameter.cflowFileName)) [compression_type;"Summary"] "dat" in
   let desc = open_out fic in 
   let _ = fprintf desc "#id\tE\tT\t\tdepth\tsize\t\n" in 
   let _ = 

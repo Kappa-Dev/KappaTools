@@ -150,12 +150,12 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
     (*Change here if one wants to have address passing style of assignation*)
     begin
       try
-	State.update_dep_value state counter env v (Term.TOK tk_id);
-	let env,pert_ids =
-	  State.update_dep state (Term.TOK tk_id) pert_ids counter env in
-	(env,state,pert_ids,tracked,pert_events)
+        State.update_dep_value state counter env v (Term.TOK tk_id);
+        let env,pert_ids =
+                State.update_dep state (Term.TOK tk_id) pert_ids counter env in
+                (env,state,pert_ids,tracked,pert_events)
       with Invalid_argument _ ->
-	failwith "External.apply_effect: invalid token id"
+	        failwith "External.apply_effect: invalid token id"
     end
   | (None,SNAPSHOT pexpr) ->
       let str = eval_pexpr pexpr state counter env in
@@ -223,11 +223,9 @@ let apply_effect p_id pert tracked pert_events state counter env =
   let snapshot str =
     Debug.tag_if_debug "Taking a snapshot of current state (%s)" str;
     let ext = if !Parameter.dotOutput then "dot" else "ka" in
-    let filename =
-      if str = ""
-      then !Parameter.snapshotFileName^"_"^(string_of_int (Counter.event counter))
-      else str in
-    let desc = open_out (Tools.find_available_name filename ext) in
+    let str = if str="" then !Parameter.snapshotFileName else str in
+    let filename = Tools.build_fresh_filename str [string_of_int (Counter.event counter)] ext in
+    let desc = open_out filename in
     let hr = !Parameter.snapshotHighres in
     Parameter.openOutDescriptors := desc::(!Parameter.openOutDescriptors) ;
     State.snapshot state counter desc hr env; (*could use a dedicated thread here*)

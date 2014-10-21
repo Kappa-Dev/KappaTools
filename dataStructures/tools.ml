@@ -90,15 +90,6 @@ let list_of_string str =
 	in
 	parse stream "" []
 
-let find_available_name name ext =
-  let base =
-    if (Filename.check_suffix name ext)
-    then Filename.chop_extension name
-    else name in
-  let v = ref 0 in
-  let () =
-    while Sys.file_exists (base^(string_of_int !v)^ext) do incr v; done
-  in base^(string_of_int !v)^ext
 
 let array_fold_left_mapi f x a =
   let y = ref x in
@@ -107,3 +98,20 @@ let array_fold_left_mapi f x a =
 			       let () = y := y' in
 			       out) in
   (!y,o)
+
+let find_available_name name ext =
+  let base = try Filename.chop_extension name with _ -> name in
+  if Sys.file_exists (base^"."^ext) then
+          let v = ref 0 in
+          let () =
+            while Sys.file_exists (base^"~"^(string_of_int !v)^"."^ext) do incr v; done
+          in base^"~"^(string_of_int !v)^"."^ext
+   else
+        (base^"."^ext)
+
+let build_fresh_filename base_name concat_list ext =
+        let tmp_name = 
+                try Filename.chop_extension base_name with _ -> base_name
+        in
+        let base_name = String.concat "_" (tmp_name::concat_list) in
+        find_available_name base_name ext
