@@ -81,7 +81,7 @@ sig
   type refined_event 
   type refined_step
   type obs_from_rule_app = (int * int Mods.IntMap.t) list 
-  type r = Dynamics.rule 
+  type r = Primitives.rule 
   type counter = int 
   type rule_info = obs_from_rule_app * r * counter * kasim_side_effect
                    
@@ -123,7 +123,7 @@ sig
   val print_refined_step: (refined_step -> H.error_channel) H.with_handler 
 
 
-  val import_event:  (Dynamics.rule * int Mods.IntMap.t * int Mods.IntMap.t) * rule_info -> event 
+  val import_event:  (Primitives.rule * int Mods.IntMap.t * int Mods.IntMap.t) * rule_info -> event 
   val store_event: P.log_info -> event -> step list -> P.log_info * step list 
   val store_init : P.log_info -> State.t -> step list -> P.log_info * step list 
   val store_obs :  P.log_info -> int * Mixture.t * int Mods.IntMap.t * unit Mods.simulation_info -> step list -> P.log_info * step list 
@@ -169,14 +169,14 @@ module Cflow_linker =
 
   type site = agent * site_name 
 
-  type kappa_rule = Dynamics.rule
+  type kappa_rule = Primitives.rule
 
   type embedding = agent_id Mods.IntMap.t 
   type side_effect = (agent_id*int) list 
   type kasim_side_effect = Mods.Int2Set.t 
   type fresh_map = int Mods.IntMap.t 
   type obs_from_rule_app = (int * int Mods.IntMap.t) list 
-  type r = Dynamics.rule 
+  type r = Primitives.rule 
   type counter = int  
   type rule_info = (obs_from_rule_app * r  * counter * kasim_side_effect) 
   type init = agent * (site_name * (int option * Node.ptr)) list
@@ -343,7 +343,7 @@ module Cflow_linker =
             
       
   let print_event log env ((rule,emb,fresh),(rule_info)) = 
-    Printf.fprintf log "%s" rule.Dynamics.kappa 
+    Printf.fprintf log "%s" rule.Primitives.kappa 
 
   let print_obs log env obs = () 
 
@@ -390,7 +390,7 @@ module Cflow_linker =
   let print_side log env prefix (s,binding_state) = 
     Printf.fprintf log "%s(%s,%s)\n" prefix (string_of_site env s) (string_of_binding_state env binding_state)
 
-  let lhs_of_rule rule = rule.Dynamics.lhs 
+  let lhs_of_rule rule = rule.Primitives.lhs 
   let lhs_of_event = compose lhs_of_rule rule_of_event
     
   let get_agent parameter handler error agent_id lhs fresh_map = 
@@ -637,7 +637,7 @@ module Cflow_linker =
 
   let tests_of_event parameter handler error event = 
     let rule = rule_of_event event in 
-    let lhs = rule.Dynamics.lhs in 
+    let lhs = rule.Primitives.lhs in 
     let embedding = embedding_of_event event in 
     tests_of_lhs parameter handler error lhs embedding 
       
@@ -687,7 +687,7 @@ module Cflow_linker =
 
   let actions_of_event parameter handler error event = 
     let rule = rule_of_event event in 
-    let lhs = rule.Dynamics.lhs in
+    let lhs = rule.Primitives.lhs in
     let embedding = embedding_of_event event in 
     let a,b,_,error = 
       List.fold_left
@@ -777,7 +777,7 @@ module Cflow_linker =
 		 let fresh' = add_asso rhs_id kappa_agent fresh in 
 		   list_actions',side_sites,fresh',error)
 	([],[],Mods.IntMap.empty,error)
-	rule.Dynamics.script
+	rule.Primitives.script
     in error,(List.rev a,b)
 
       

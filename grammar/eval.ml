@@ -625,24 +625,24 @@ let rule_of_ast ?(backwards=false) env mixs (ast_rule_label, ast_rule) tolerate_
   in
   (env,mixs21,
    {
-     Dynamics.add_token = add_token ;
-     Dynamics.rm_token = rm_token ;
-     Dynamics.k_def = k_def ;
-     Dynamics.k_alt = (k_alt,radius) ;
-     Dynamics.over_sampling = None;
-     Dynamics.script = script;
-     Dynamics.kappa = kappa_lhs ^ ("->" ^ kappa_rhs);
-     Dynamics.balance = balance;
-     Dynamics.refines = ref_id;
-     Dynamics.lhs = lhs;
-     Dynamics.rhs = rhs;
-     Dynamics.r_id = r_id;
-     Dynamics.added = List.fold_left (fun set i -> IntSet.add i set) IntSet.empty added ;
-     (*Dynamics.side_effect = side_effect ; *)
-     Dynamics.modif_sites = modif_sites ;
-     Dynamics.is_pert = false ;
-     Dynamics.pre_causal = pre_causal ;
-     Dynamics.cc_impact = Some (connect_impact,disconnect_impact,side_eff_impact)
+     Primitives.add_token = add_token ;
+     Primitives.rm_token = rm_token ;
+     Primitives.k_def = k_def ;
+     Primitives.k_alt = (k_alt,radius) ;
+     Primitives.over_sampling = None;
+     Primitives.script = script;
+     Primitives.kappa = kappa_lhs ^ ("->" ^ kappa_rhs);
+     Primitives.balance = balance;
+     Primitives.refines = ref_id;
+     Primitives.lhs = lhs;
+     Primitives.rhs = rhs;
+     Primitives.r_id = r_id;
+     Primitives.added = List.fold_left (fun set i -> IntSet.add i set) IntSet.empty added ;
+     (*Primitives.side_effect = side_effect ; *)
+     Primitives.modif_sites = modif_sites ;
+     Primitives.is_pert = false ;
+     Primitives.pre_causal = pre_causal ;
+     Primitives.cc_impact = Some (connect_impact,disconnect_impact,side_eff_impact)
   })
 
 let variables_of_result env (free_id,mixs) alg_a =
@@ -734,7 +734,7 @@ let effects_of_modif variables env ast_list =
 	      (Printf.sprintf "introduce %a * %s"
 			      Expr.ast_alg_to_string (fst alg_expr)
 			      (Mixture.to_kappa false env m))::str_pert
-	    in (mixs', (Dynamics.INTRO (v, m))::effects, str, env)
+	    in (mixs', (Primitives.INTRO (v, m))::effects, str, env)
 	 | DELETE (alg_expr, ast_mix, pos) ->
 	    let (env',mixs',x, is_constant, opt_v) =
 	      partial_eval_alg env variables alg_expr in
@@ -752,7 +752,7 @@ let effects_of_modif variables env ast_list =
 	    let str =
 	      (Printf.sprintf "remove %a * %s" Expr.ast_alg_to_string (fst alg_expr)
 			      (Mixture.to_kappa false env m))::str_pert
-	    in ((m :: mixs'), (Dynamics.DELETE (v, m))::effects, str, env)
+	    in ((m :: mixs'), (Primitives.DELETE (v, m))::effects, str, env)
 	 | UPDATE ((nme, pos_rule), alg_expr) ->
 	    let i,is_rule =
 	      (try (Environment.num_of_rule nme env,true)
@@ -782,8 +782,8 @@ let effects_of_modif variables env ast_list =
 		Expr.ast_alg_to_string (fst alg_expr)::str_pert
 	    in
 	    (mixs',
-	     (if is_rule then Dynamics.UPDATE_RULE (i, v)
-	      else Dynamics.UPDATE_VAR (i, v))::effects, str, env')
+	     (if is_rule then Primitives.UPDATE_RULE (i, v)
+	      else Primitives.UPDATE_VAR (i, v))::effects, str, env')
 	 | UPDATE_TOK ((tk_nme,tk_pos),alg_expr) ->
 	    let tk_id =
 	      try Environment.num_of_token tk_nme env with
@@ -802,14 +802,14 @@ let effects_of_modif variables env ast_list =
 	    let str = (Printf.sprintf "set token '%s' to value %a" tk_nme
 				      Expr.ast_alg_to_string (fst alg_expr))::str_pert
 	    in
-	    (mixs', (Dynamics.UPDATE_TOK (tk_id, v))::effects, str, env')
+	    (mixs', (Primitives.UPDATE_TOK (tk_id, v))::effects, str, env')
 	 | SNAPSHOT (pexpr,pos) ->
 	    (*when specializing snapshots to particular mixtures, add variables below*)
 	    let str = ("snapshot state")::str_pert in
-	    (variables, (Dynamics.SNAPSHOT pexpr)::effects, str, env)
+	    (variables, (Primitives.SNAPSHOT pexpr)::effects, str, env)
 	 | STOP (pexpr,pos) ->
 	    let str = "interrupt simulation"::str_pert in
-	    (variables, (Dynamics.STOP pexpr)::effects, str, env)
+	    (variables, (Primitives.STOP pexpr)::effects, str, env)
 	 | CFLOW ((lab,pos_lab),pos_pert) ->
 	    let id = try Environment.num_of_rule lab env
 		     with Not_found ->
@@ -821,7 +821,7 @@ let effects_of_modif variables env ast_list =
 			 raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
 	    in
 	    let str = (Printf.sprintf "Enable causality analysis for observable '%s'" lab)::str_pert in
-	    (variables, (Dynamics.CFLOW id)::effects, str, env)
+	    (variables, (Primitives.CFLOW id)::effects, str, env)
 	 | CFLOWOFF ((lab,pos_lab),pos_pert) ->
 	    let id = try Environment.num_of_rule lab env
 		     with Not_found ->
@@ -833,13 +833,13 @@ let effects_of_modif variables env ast_list =
 			    raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
 	    in
 	    let str = (Printf.sprintf "Disable causality analysis for observable '%s'" lab)::str_pert in
-	    (variables, (Dynamics.CFLOWOFF id)::effects, str, env)
+	    (variables, (Primitives.CFLOWOFF id)::effects, str, env)
 	 | FLUX (pexpr,pos) ->
 	    let str = "Activate flux tracking"::str_pert in
-	    (variables,(Dynamics.FLUX pexpr)::effects, str, env)
+	    (variables,(Primitives.FLUX pexpr)::effects, str, env)
 	 | FLUXOFF (pexpr,pos) ->
 	    let str = "Disable flux tracking"::str_pert in
-	    (variables,(Dynamics.FLUXOFF pexpr)::effects, str, env)
+	    (variables,(Primitives.FLUXOFF pexpr)::effects, str, env)
 	 | PRINT (pexpr,print,pos) ->
 	    let str_l =
 	      List.fold_left
@@ -851,7 +851,7 @@ let effects_of_modif variables env ast_list =
 	    in
 	    let str = (Printf.sprintf "Print %s" (Tools.string_of_list (fun i->i) str_l))::str_pert
 	    in
-	    (variables,(Dynamics.PRINT (pexpr,print))::effects, str, env)
+	    (variables,(Primitives.PRINT (pexpr,print))::effects, str, env)
        in
        iter variables effects str_pert env tl
   in
@@ -911,7 +911,7 @@ let pert_of_result variables env res =
 	 List.fold_left
 	   (fun (env,rule_list,cpt) effect ->
 	    match effect with
-	    | Dynamics.INTRO (_,mix) ->
+	    | Primitives.INTRO (_,mix) ->
 	       begin
 		 let (env, id) =
 		   Environment.declare_var_kappa (Some (str_pert,pos)) env
@@ -933,29 +933,29 @@ let pert_of_result variables env res =
 		 in
 		 let pre_causal = Dynamics.compute_causal lhs rhs script env in
 		 let rule =
-		   { Dynamics.rm_token = []; Dynamics.add_token = []; (*TODO*)
-		     Dynamics.k_def = Primitives.CONST (Nbr.F 0.0);
-		     Dynamics.k_alt = (None,None);
-		     Dynamics.over_sampling = None;
-		     Dynamics.script = script ;
-		     Dynamics.kappa = kappa_lhs ^ ("->" ^ kappa_rhs);
-		     Dynamics.balance = balance;
-		     Dynamics.refines = None;
-		     Dynamics.lhs = lhs;
-		     Dynamics.rhs = rhs;
-		     Dynamics.r_id = r_id;
-		     Dynamics.added =
+		   { Primitives.rm_token = []; Primitives.add_token = []; (*TODO*)
+		     Primitives.k_def = Primitives.CONST (Nbr.F 0.0);
+		     Primitives.k_alt = (None,None);
+		     Primitives.over_sampling = None;
+		     Primitives.script = script ;
+		     Primitives.kappa = kappa_lhs ^ ("->" ^ kappa_rhs);
+		     Primitives.balance = balance;
+		     Primitives.refines = None;
+		     Primitives.lhs = lhs;
+		     Primitives.rhs = rhs;
+		     Primitives.r_id = r_id;
+		     Primitives.added =
 		       List.fold_left (fun set i -> IntSet.add i set) IntSet.empty added ;
-		     (*Dynamics.side_effect = side_effect ; *)
-		     Dynamics.modif_sites = modif_sites ;
-		     Dynamics.is_pert = true ;
-		     Dynamics.pre_causal = pre_causal ;
-		     Dynamics.cc_impact = None
+		     (*Primitives.side_effect = side_effect ; *)
+		     Primitives.modif_sites = modif_sites ;
+		     Primitives.is_pert = true ;
+		     Primitives.pre_causal = pre_causal ;
+		     Primitives.cc_impact = None
 		   }
 		 in
 		 (env,(Some rule,effect)::rule_list,cpt+1)
 	       end
-	    | Dynamics.DELETE (_,mix) ->
+	    | Primitives.DELETE (_,mix) ->
 	       begin
 		 let lhs = mix
 		 and rhs = Mixture.empty None
@@ -976,29 +976,29 @@ let pert_of_result variables env res =
 		 in
 		 let pre_causal = Dynamics.compute_causal lhs rhs script env in
 		 let rule =
-		   { Dynamics.rm_token = [] ; Dynamics.add_token = [] ; (*TODO*)
-		     Dynamics.k_def = Primitives.CONST (Nbr.F 0.0);
-		     Dynamics.k_alt = (None,None);
-		     Dynamics.over_sampling = None;
-		     Dynamics.script = script;
-		     Dynamics.kappa = kappa_lhs ^ ("->" ^ kappa_rhs);
-		     Dynamics.balance = balance;
-		     Dynamics.refines = None;
-		     Dynamics.lhs = lhs;
-		     Dynamics.rhs = rhs;
-		     Dynamics.r_id = r_id;
-		     Dynamics.added =
+		   { Primitives.rm_token = [] ; Primitives.add_token = [] ; (*TODO*)
+		     Primitives.k_def = Primitives.CONST (Nbr.F 0.0);
+		     Primitives.k_alt = (None,None);
+		     Primitives.over_sampling = None;
+		     Primitives.script = script;
+		     Primitives.kappa = kappa_lhs ^ ("->" ^ kappa_rhs);
+		     Primitives.balance = balance;
+		     Primitives.refines = None;
+		     Primitives.lhs = lhs;
+		     Primitives.rhs = rhs;
+		     Primitives.r_id = r_id;
+		     Primitives.added =
 		       List.fold_left (fun set i -> IntSet.add i set) IntSet.empty added;
-		     (*Dynamics.side_effect = side_effect ; *)
-		     Dynamics.modif_sites = modif_sites ;
-		     Dynamics.pre_causal = pre_causal ;
-		     Dynamics.is_pert = true ;
-		     Dynamics.cc_impact = None ;
+		     (*Primitives.side_effect = side_effect ; *)
+		     Primitives.modif_sites = modif_sites ;
+		     Primitives.pre_causal = pre_causal ;
+		     Primitives.is_pert = true ;
+		     Primitives.cc_impact = None ;
 		   }
 		 in
 		 (env,(Some rule,effect)::rule_list,cpt+1)
 	       end
-	    | Dynamics.CFLOW _ ->
+	    | Primitives.CFLOW _ ->
 	       let env = {env with Environment.tracking_enabled = true} in
 	       let env =
 		 Term.DepSet.fold
@@ -1007,10 +1007,10 @@ let pert_of_result variables env res =
 		   dep env
 	       in
 	       (env,(None,effect)::rule_list,cpt)
-	    | Dynamics.UPDATE_RULE _ |Dynamics.UPDATE_VAR _
-	    | Dynamics.UPDATE_TOK _ | Dynamics.SNAPSHOT _ | Dynamics.STOP _
-	    | Dynamics.FLUX _ | Dynamics.FLUXOFF _ | Dynamics.CFLOWOFF _
-	    | Dynamics.PRINT _ ->
+	    | Primitives.UPDATE_RULE _ |Primitives.UPDATE_VAR _
+	    | Primitives.UPDATE_TOK _ | Primitives.SNAPSHOT _ | Primitives.STOP _
+	    | Primitives.FLUX _ | Primitives.FLUXOFF _ | Primitives.CFLOWOFF _
+	    | Primitives.PRINT _ ->
 	       let env =
 		 Term.DepSet.fold
 		   (fun dep env -> Environment.add_dependencies dep (Term.PERT p_id) env
@@ -1034,11 +1034,11 @@ let pert_of_result variables env res =
 	    (Some bv,env)
        in
        let pert =
-	 { Dynamics.precondition = bv;
-	   Dynamics.effect = effect_list;
-	   Dynamics.abort = opt;
-	   Dynamics.flag = str_pert;
-	   Dynamics.stopping_time = stopping_time
+	 { Primitives.precondition = bv;
+	   Primitives.effect = effect_list;
+	   Primitives.abort = opt;
+	   Primitives.flag = str_pert;
+	   Primitives.stopping_time = stopping_time
 	 }
        in
        let lrules = List.fold_left (fun cont (r_opt,_) ->
@@ -1051,7 +1051,7 @@ let pert_of_result variables env res =
   in
   (*making sure that perturbations containing a stopping time precondition are tested first*)
   let lpert = List.rev lpert in
-  let pred = (fun p -> match p.Dynamics.stopping_time with
+  let pred = (fun p -> match p.Primitives.stopping_time with
 			 None -> false | Some _ -> true) in
   let lpert_stopping_time = List.filter pred lpert in
   let lpert_ineq = List.filter (fun p -> not (pred p)) lpert in

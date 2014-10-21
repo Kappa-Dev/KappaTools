@@ -7,168 +7,102 @@ open Primitives
 (*Whenever v denotes a constant "variable" there is no need to keep it unevaluated, we use dummy arguments to reduce it*)
 let close_var v = v (fun _ -> Nbr.I 0) (fun i -> Nbr.I 0) 0.0 0 0 0. (fun i -> Nbr.I 0)
 
-type rule = {
-  k_def : Nbr.t variable ; (*standard kinetic constant*)
-  k_alt : Nbr.t variable option *
-	    Nbr.t variable option; (*Possible unary kinetic rate*)
-  over_sampling : float option ; (*Boosted kinetic rate for Bologna technique*)
-  script : action list ;
-  balance : (int * int * int) ;	(*#deleted,#preserved,#removed*)
-  kappa: string ;
-  lhs : Mixture.t ;
-  rhs : Mixture.t ;
-  refines: int option ; (*mixture id that is refined by lhs*)
-  r_id : int ;
-  added : IntSet.t;
-  (*side_effect : bool ;*)
-  modif_sites : Int2Set.t IdMap.t ;
-  pre_causal : int PortMap.t ; (* INTERNAL_TESTED (8) | INTERNAL_MODIF (4) | LINK_TESTED (2) | LINK_MODIF (1) *)
-  is_pert: bool ;
-  cc_impact : (IntSet.t IntMap.t * IntSet.t IntMap.t * IntSet.t IntMap.t) option;
-  add_token : (Nbr.t Primitives.variable * int) list ;
-  rm_token : (Nbr.t Primitives.variable * int) list
-}
-(*connect: cc_i(lhs) -> {cc_j(lhs),...} if cc_i and cc_j are connected by rule application*)
-(*disconnect: cc_i(rhs) -> {cc_j(rhs),...} if cc_i and cc_j are disconnected by rule application*)
-(*side_effect: ag_i -> {site_j,...} if one should check at runtime the id of the agent connected to (ag_i,site_j) and build its cc after rule application*)
+let compute_causal lhs rhs script env =
+  let open Primitives.Causality in
+  let causal_map = (*adding tests for all sites mentionned in the left hand side --including existential site*)
+    IntMap.fold
+      (fun id ag causal_map ->
+       let causal_map,bool =
+	 Mixture.fold_interface
+	   (fun site_id (int,lnk) (causal_map,bool) ->
+	    if site_id <> 0 then
+              let c = create (int <> None) (lnk <> Node.WLD) in
+	      PortMap.add (KEPT id,site_id) c causal_map,true
+	    else causal_map,bool)
+	   ag (causal_map,false)
+       in
+       (* we put a TEsT on the existential site only if nothing else is tested *)
+       PortMap.add (KEPT id,0) (create false (not bool)) causal_map)
+      (Mixture.agents lhs) PortMap.empty
+  in
+  let add_causal p f map =
+    let c' = try PortMap.find p map with Not_found -> create false false in
+    PortMap.add p (f c') map
+  in
+  let causal_map,bool =
+    List.fold_left
+      (fun (causal_map,bool) action ->
+       match action with
+       | BND (p1, p2) ->
+	  add_causal p2 add_link_modif (add_causal p1 add_link_modif causal_map),true
+       | FREE (p1,side_effect_free) ->
+	  if side_effect_free then
+	    begin
+	      match p1 with
+	      | (KEPT id, site_id) ->
+		 begin
+		   match Mixture.follow (id,site_id) lhs with
+		   | Some (id',site_id') ->
+		      let p2 = (KEPT id',site_id') in
+		      add_causal p2 add_link_modif
+				 (add_causal p1 add_link_modif causal_map),true
+		   | None -> invalid_arg "Dynamics.Compute_causal"
+		 end
+	      | (FRESH id, site_id) -> invalid_arg "Dynamics.Compute_causal"
+	    end
+	  else
+	    add_causal p1 add_link_modif causal_map,true
+       | MOD (p,i) -> add_causal p add_internal_modif causal_map,true
+       | DEL ag_id ->
+	  Mixture.fold_interface
+	    (fun site_id (int,lnk) (causal_map,bool) ->
+	     let causal_map =
+	       match int with
+		 Some _ -> add_causal (KEPT ag_id,site_id) add_internal_modif causal_map | None -> causal_map
+	     in
+	     add_causal (KEPT ag_id,site_id) add_link_modif causal_map,true
+	    )
+	    (Mixture.agent_of_id ag_id lhs) (causal_map,bool)
+       | ADD (ag_id,name_id) -> (*Interface might be partial!*)
+	  let sign = Environment.get_sig name_id env in
+	  let arity = Signature.arity sign in
+	  let site_id = ref 0 in
+	  let p_causal = ref causal_map in
+	  while !site_id < arity do
+	    p_causal :=
+	      begin
+		match Environment.default_state name_id !site_id env with
+		| None -> !p_causal
+		| Some i ->
+                   add_causal (FRESH ag_id,!site_id) add_internal_modif !p_causal
+	      end ;
+	    p_causal := add_causal (FRESH ag_id,!site_id) add_link_modif !p_causal ;
+	    site_id := !site_id + 1 ;
+	  done ;
+	  !p_causal,if arity=0 then false else true
+      ) (causal_map,false) script
+  in causal_map
 
-
-let _INTERNAL_TESTED = 8
-let _INTERNAL_MODIF = 4
-let _LINK_TESTED = 2 
-let _LINK_MODIF = 1
-
-
-type modification =
-    INTRO of Nbr.t Primitives.variable * Mixture.t
-  | DELETE of Nbr.t Primitives.variable * Mixture.t
-  | UPDATE_RULE of int * Nbr.t Primitives.variable
-  | UPDATE_VAR of int * Nbr.t Primitives.variable
-  | UPDATE_TOK of int * Nbr.t Primitives.variable
-  | SNAPSHOT of Ast.mixture Ast.print_expr Term.with_pos list
-  | STOP of Ast.mixture Ast.print_expr Term.with_pos list
-  | CFLOW of int
-  | FLUX of Ast.mixture Ast.print_expr Term.with_pos list
-  | FLUXOFF of Ast.mixture Ast.print_expr Term.with_pos list
-  | CFLOWOFF of int
-  | PRINT of
-      (Ast.mixture Ast.print_expr Term.with_pos list *
-	 Ast.mixture Ast.print_expr Term.with_pos list)
-
-type perturbation =
-    { precondition: bool Primitives.variable;
-      effect : (rule option * modification) list;
-      abort : bool Primitives.variable option;
-      flag : string;
-      stopping_time : Nbr.t option }
-
-let compute_causal lhs rhs script env = 
-	let causal_map = (*adding tests for all sites mentionned in the left hand side --including existential site*) 
-		IntMap.fold 
-		(fun id ag causal_map ->
-                  let causal_map,bool = 
-		    Mixture.fold_interface 
-			(fun site_id (int,lnk) (causal_map,bool) ->
-			  if site_id <> 0 
-                          then 
-                            let c =
-			      match int with
-				| Some i -> _INTERNAL_TESTED
-				| None -> 0
-			    in
-			    let c = 
-			      match lnk with
-				| Node.WLD -> c
-				      | _ -> (c lor _LINK_TESTED)
-			    in
-			    PortMap.add (KEPT id,site_id) c causal_map,true
-			  else causal_map,bool)
-		      ag (causal_map,false)
-                  in 
-                  (* we put a TEsT on the existential site only if nothing else is tested *)
-                  if bool 
-                  then 
-                    PortMap.add (KEPT id,0) 0 causal_map
-                  else 
-                    PortMap.add (KEPT id,0) _LINK_TESTED causal_map)
-		(Mixture.agents lhs) PortMap.empty
-	in
-	let add_causal p c map =
-		let c' = try PortMap.find p map with Not_found -> 0
-		in
-		PortMap.add p (c lor c') map
-	in
-        let causal_map,bool = 
-	  List.fold_left
-	    (fun (causal_map,bool) action ->
-		match action with
-			| BND (p1, p2) -> add_causal p2 _LINK_MODIF (add_causal p1 _LINK_MODIF causal_map),true  
-			| FREE (p1,side_effect_free) -> 
-			  if side_effect_free then 
-			    begin
-			      match p1 with
-				| (KEPT id, site_id) ->
-				  begin 
-				    match Mixture.follow (id,site_id) lhs with
-				      | Some (id',site_id') -> let p2 = (KEPT id',site_id') in add_causal p2 _LINK_MODIF (add_causal p1 _LINK_MODIF causal_map),true
-				      | None -> invalid_arg "Dynamics.Compute_causal"
-				  end 
-				| (FRESH id, site_id) -> invalid_arg "Dynamics.Compute_causal"
-			    end
-			  else 
-			    add_causal p1 _LINK_MODIF causal_map,true
-			| MOD (p,i) -> add_causal p _INTERNAL_MODIF causal_map,true
-			| DEL ag_id -> 
-				Mixture.fold_interface 
-				(fun site_id (int,lnk) (causal_map,bool) ->
-					let causal_map = 
-						match int with Some _ -> add_causal (KEPT ag_id,site_id) _INTERNAL_MODIF causal_map | None -> causal_map
-					in
-					add_causal (KEPT ag_id,site_id) _LINK_MODIF causal_map,true
-				)
-				(Mixture.agent_of_id ag_id lhs) (causal_map,bool)
-			| ADD (ag_id,name_id) -> (*Interface might be partial!*)
-				let sign = Environment.get_sig name_id env in
-				let arity = Signature.arity sign in
-				let site_id = ref 0 in
-				let p_causal = ref causal_map in
-				while !site_id < arity do
-					p_causal :=  
-						begin
-							match Environment.default_state name_id !site_id env with
-								| None -> !p_causal
-								| Some i -> 
-                                                                  add_causal (FRESH ag_id,!site_id) _INTERNAL_MODIF !p_causal
-						end ;
-				  p_causal := add_causal (FRESH ag_id,!site_id) _LINK_MODIF !p_causal ;
-				  site_id := !site_id + 1 ;
-				done ;
-				!p_causal,if arity=0 then false else true
-	) (causal_map,false) script
-        in causal_map
-
-let compute_causal_init (((node_id,agent_name),interface),_) env = 
-  List.fold_left  
+let compute_causal_init (((node_id,agent_name),interface),_) env =
+  let open Primitives.Causality in
+  List.fold_left
     (fun causal_map (site_id,(int,lnk)) ->
-      let c =
-	match int with
-	  | Some i -> _INTERNAL_MODIF
-	  | None -> 0
-      in
-      let c = (* I do not know whether the site can bear an internal state *)
-              (* TO DO: improve *)
-        c lor _LINK_MODIF
-      in
-      if site_id <> 0 
-      then 
-      Mods.Int2Map.add (node_id,site_id) c causal_map
-      else causal_map
+     let c =
+       (match int with
+	| Some i -> add_internal_modif
+	| None -> fun x -> x) (add_link_modif (create false false))
+     in
+     (* I do not know whether the site can bear an internal state *)
+     (* TO DO: improve *)
+     if site_id <> 0 then
+       Mods.Int2Map.add (node_id,site_id) c causal_map
+     else causal_map
     )
-    (Mods.Int2Map.add (node_id,0) _LINK_MODIF Mods.Int2Map.empty)
+    (Mods.Int2Map.add (node_id,0) (add_link_modif (create false false))
+		      Mods.Int2Map.empty)
     interface
 
-let compute_causal_obs lhs = 
-  compute_causal lhs lhs [] 
+let compute_causal_obs lhs = compute_causal lhs lhs []
 
 let print_pert env f pert =
   let string_of_effect f (_, effect) =
@@ -701,7 +635,8 @@ let dump r env =
 		Mixture.fold_interface 
 		(fun site_id _ _ -> 
 			let c = PortMap.find (KEPT id,site_id) r.pre_causal in
-			Printf.fprintf stderr "#%d.%d=%d\n" id site_id c
+			Printf.fprintf stderr "#%d.%d=%d\n" id site_id
+				       (Primitives.Causality.to_int c)
 		) ag ()
 	) (Mixture.agents r.lhs) ;
 	let dump_script script =

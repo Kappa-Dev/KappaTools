@@ -1,7 +1,7 @@
 open Mods
 open Tools
 open ExceptionDefn
-open Dynamics
+open Primitives
 open Graph
 open ValMap
 open Random_tree
@@ -378,7 +378,7 @@ let dot_of_influence_map desc state env =
   Printf.fprintf desc "digraph G{ node [shape=box, style=filled, fillcolor=lightskyblue]; \n " ;
   Hashtbl.iter
     (fun r_id rule ->
-     let opt = if rule.Dynamics.is_pert
+     let opt = if rule.is_pert
 	       then "[shape=invhouse,fillcolor=lightsalmon]"
 	       else "" in
      Printf.fprintf desc "\"%d:%s\" %s;\n" r_id (Dynamics.to_kappa rule env) opt
@@ -1123,7 +1123,7 @@ let positive_update ?(with_tracked=[]) state r ((phi: int IntMap.t),psi) (side_m
 				(*updating rule activities that depend on |t_id|*)
 				update_dep state ~cause:r.r_id (Term.TOK t_id) pert_ids counter env
 			with Invalid_argument _ -> failwith "State.positive_update: invalid token id"  
-		) (env,pert_ids) r.Dynamics.add_token 
+		) (env,pert_ids) r.add_token
 	in
 	let env,pert_ids = 
 		List.fold_left
@@ -1136,7 +1136,7 @@ let positive_update ?(with_tracked=[]) state r ((phi: int IntMap.t),psi) (side_m
 				state.token_vector.(t_id) <- state.token_vector.(t_id) -. value ;
 				update_dep state ~cause:r.r_id (Term.TOK t_id) pert_ids counter env
 			with Invalid_argument _ -> failwith "State.positive_update: invalid token id"  
-		) (env,pert_ids) r.Dynamics.rm_token
+		) (env,pert_ids) r.rm_token
 	in
 	
 	(*Checking if any side effect needs to be checked*)

@@ -56,7 +56,7 @@ let update_intra_in_components r embedding_info state counter env =
 	in
 	
 	(*reusing components that were computed to check that the rule was indeed binary*)
-	let con_map = match r.Dynamics.cc_impact with None -> invalid_arg "State.nl_pos_upd: cc_impact is not initialized"  | Some (map,_,_) -> map in
+	let con_map = match r.Primitives.cc_impact with None -> invalid_arg "State.nl_pos_upd: cc_impact is not initialized"  | Some (map,_,_) -> map in
 	
 	let extensions,found = (*r_id -> cc_id -> part_inj_list*)
 		IntMap.fold 
@@ -66,16 +66,16 @@ let update_intra_in_components r embedding_info state counter env =
 			IntSet.fold 
 			(fun cc_i (extensions,found) ->
 				let root = 
-					match Mixture.root_of_cc r.lhs cc_i with Some r -> IntMap.find r embedding_info.Embedding.map | None -> invalid_arg "State.nl_positive_update" 
+					match Mixture.root_of_cc r.Primitives.lhs cc_i with Some r -> IntMap.find r embedding_info.Embedding.map | None -> invalid_arg "State.nl_positive_update" 
 				in
 				let _ = 
-					if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Exploring into image of CC[%d] computed during rule %d application" cc_i r.r_id)
+					if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Exploring into image of CC[%d] computed during rule %d application" cc_i r.Primitives.r_id)
 	 			in
 				let component_i = 
 					try IntMap.find root components with 
 						| Not_found -> 
 							(Debug.tag 
-							(Printf.sprintf "root %d (= phi(%d)) not found in %s" root (match Mixture.root_of_cc r.lhs cc_i with Some r -> r | None -> -1)
+							(Printf.sprintf "root %d (= phi(%d)) not found in %s" root (match Mixture.root_of_cc r.Primitives.lhs cc_i with Some r -> r | None -> -1)
 								(Tools.string_of_map string_of_int (Tools.string_of_set string_of_int IntSet.fold) 
 								IntMap.fold 
 								components
@@ -137,7 +137,7 @@ let update_intra_in_components r embedding_info state counter env =
 						try
 							let injprod_hp = InjProdHeap.alloc ~check:true ip injprod_hp in
 							(get_nl_injections state).(r_id) <- Some injprod_hp ;
-							update_activity state ~cause:r.r_id r_id counter env ;
+							update_activity state ~cause:r.Primitives.r_id r_id counter env ;
 							state
 						with
 							| InjProdHeap.Is_present -> state
@@ -286,14 +286,14 @@ let positive_update r embedding_t new_injs state counter env =
 	(*Step 2 : Non local positive update *)
 	(*If rule is potentially breaking up some connected component this should wake up silenced rules*)
 	begin
-		match r.Dynamics.cc_impact with 
+		match r.Primitives.cc_impact with
 			| None -> (if !Parameter.debugModeOn then Debug.tag "Rule cannot decrease connectedness no need to update silenced rules") 
 			| Some _ -> (*should be more precise here*) State.unsilence_rule state r counter env
 	end ;
 		
 	(*If rule is potentially merging two connected components this should trigger a positive update of non local rules*)
 	begin
-		match r.Dynamics.cc_impact with
+		match r.Primitives.cc_impact with
 			| None -> 
 				(if !Parameter.debugModeOn then 
 					Debug.tag "No possible side effect update of unary rules because applied rule cannot increase connectedness" ;

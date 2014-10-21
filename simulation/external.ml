@@ -7,7 +7,7 @@ open Mods
 open LargeArray
 
 let eval_abort_pert just_applied pert state counter env =
-  match pert.abort with
+  match pert.Primitives.abort with
   | None -> just_applied
   | Some var -> State.value state counter env var
 
@@ -69,9 +69,9 @@ let apply_n_time x r state env counter pert_ids pert_events tracked =
        (*FIXME: highly unefficient to compute new injection at each loop*)
        let embedding_t =
 	 try State.select_injection (infinity,None) (0.,None)
-				    state r.lhs counter env
+				    state r.Primitives.lhs counter env
 	 with Null_event _ ->
-	      let mix_id = Mixture.get_id r.lhs in
+	      let mix_id = Mixture.get_id r.Primitives.lhs in
 	      if !Parameter.debugModeOn then
 		Debug.tag "Clashing instance detected: building matrix";
 	      match State.instances_of_square mix_id (-1) state env with
@@ -103,10 +103,10 @@ let apply_n_time x r state env counter pert_ids pert_events tracked =
 
 let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot counter =
   match eff with
-  | (Some r,INTRO (v,mix)) ->
+  | (Some r,Primitives.INTRO (v,mix)) ->
      let x = State.value state counter env v in
     if x = Nbr.F infinity then
-      let p_str = pert.flag in
+      let p_str = pert.Primitives.flag in
       invalid_arg
 	("Perturbation "^p_str^" would introduce an infinite number of agents, aborting...")
     else
@@ -114,12 +114,12 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
 	Debug.tag_if_debug "Introducing %a instances of %a"
 			   Nbr.print x (Mixture.print false env) mix
       in apply_n_time x r state env counter pert_ids pert_events tracked
-  | (Some r,DELETE (v,mix)) ->
-     let mix_id = Mixture.get_id r.lhs in
+  | (Some r,Primitives.DELETE (v,mix)) ->
+     let mix_id = Mixture.get_id r.Primitives.lhs in
      let instance_num = State.instance_number mix_id state env in
      let x = (Nbr.min (State.value state counter env v) instance_num) in
      apply_n_time x r state env counter pert_ids pert_events tracked
-  | (None,UPDATE_RULE (id,v)) ->
+  | (None,Primitives.UPDATE_RULE (id,v)) ->
      let () =
        Debug.tag_if_debug "Updating rate of rule '%a'"
 			 (Environment.print_rule env) id
@@ -128,7 +128,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
      let env,pert_ids =
        State.update_dep state ~cause:p_id (Term.RULE id) pert_ids counter env in
      (env,state ,pert_ids,tracked,pert_events)
-  | (None,UPDATE_VAR (id,v)) ->
+  | (None,Primitives.UPDATE_VAR (id,v)) ->
      let () =
        Debug.tag_if_debug "Updating variable '%a'"
 			  (Environment.print_alg env) id
@@ -136,7 +136,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
      State.update_dep_value state counter env v (Term.ALG id);
      let env,pert_ids = State.update_dep state (Term.ALG id) pert_ids counter env in
      (env,state,pert_ids,tracked,pert_events)
-  | (None,UPDATE_TOK (tk_id,v)) ->
+  | (None,Primitives.UPDATE_TOK (tk_id,v)) ->
      let _ = Debug.tag_if_debug "Updating token '%a'"
 				(Environment.print_token env) tk_id
     in
@@ -150,11 +150,11 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
       with Invalid_argument _ ->
 	        failwith "External.apply_effect: invalid token id"
     end
-  | (None,SNAPSHOT pexpr) ->
+  | (None,Primitives.SNAPSHOT pexpr) ->
       let str = eval_pexpr pexpr state counter env in
       snapshot str;
       (env, state ,pert_ids,tracked,pert_events)
-  | (None,PRINT (pexpr_file,pexpr)) ->
+  | (None,Primitives.PRINT (pexpr_file,pexpr)) ->
     let str = eval_pexpr pexpr_file state counter env in
     let desc =
       match str with "" -> stdout | _ -> Environment.get_desc str env
@@ -162,7 +162,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
     dump_print_expr desc pexpr state counter env ;
     flush desc ;
     (env,state,pert_ids,tracked,pert_events)
-  | (None,CFLOW id) ->
+  | (None,Primitives.CFLOW id) ->
     Debug.tag_if_debug "Tracking causality" ;
     Parameter.causalModeOn := true;
     let env =
@@ -170,14 +170,14 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
       else Environment.inc_active_cflows env in
     let env = Environment.track id env in
     (env, state, pert_ids,tracked,pert_events)
-  | (None,CFLOWOFF id) ->
+  | (None,Primitives.CFLOWOFF id) ->
     begin
       let env = Environment.dec_active_cflows env in
       let env = Environment.untrack id env in
       if Environment.active_cflows env = 0 then Parameter.causalModeOn := false;
       (env,state,pert_ids,tracked,pert_events)
     end
-  | (None,FLUXOFF pexpr) ->
+  | (None,Primitives.FLUXOFF pexpr) ->
     begin
       let str = eval_pexpr pexpr state counter env in
       let desc =
@@ -189,14 +189,14 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
       Parameter.fluxModeOn := false ;
       (env,state,pert_ids,tracked,pert_events)
     end
-  | (None,STOP pexpr) ->
+  | (None,Primitives.STOP pexpr) ->
      Debug.tag_if_debug "Interrupting simulation now!" ;
      let str = eval_pexpr pexpr state counter env in
      snapshot str ;
      raise (ExceptionDefn.StopReached
 	      (Printf.sprintf "STOP instruction was satisfied at (%d e,%f t.u)"
 			      (Counter.event counter) (Counter.time counter)))
-  | (None,FLUX pexpr) ->
+  | (None,Primitives.FLUX pexpr) ->
     begin
       if !Parameter.fluxModeOn
       then ExceptionDefn.warning "Flux modes are overlapping" ;
@@ -235,7 +235,7 @@ let apply_effect p_id pert tracked pert_events state counter env =
        Debug.tag msg;
        (env, state, pert_ids,tracked,pert_events)
     )
-    (env,state,IntSet.empty,tracked,pert_events) pert.effect
+    (env,state,IntSet.empty,tracked,pert_events) pert.Primitives.effect
 
 let has_reached_a_stopping_time state counter env =
   let depset = Environment.get_dependencies Term.TIME env in
@@ -249,7 +249,7 @@ let has_reached_a_stopping_time state counter env =
 	match State.maybe_find_perturbation pert_id state with
 	| None -> st_time
 	| Some pert ->
-	   match st_time,pert.stopping_time with
+	   match st_time,pert.Primitives.stopping_time with
 	   | Some a, Some b
 		when Nbr.is_smaller b (Nbr.F (Mods.Counter.time counter))
 	     -> Some (Nbr.min a b)
@@ -271,7 +271,7 @@ let try_perturbate tracked state pert_ids pert_events counter env =
 	 match State.maybe_find_perturbation pert_id state with
 	 | None -> acc
 	 | Some pert ->
-	    if State.value state counter env pert.precondition then
+	    if State.value state counter env pert.Primitives.precondition then
 	      begin
 		Debug.tag_if_debug
 		  "\n*************Applying perturbation %d***************" pert_id;

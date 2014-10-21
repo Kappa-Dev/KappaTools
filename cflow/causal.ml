@@ -42,7 +42,6 @@ type enriched_grid =
     }
 
 let empty_config = {events=IntMap.empty ; conflict = IntMap.empty ; prec_1 = IntMap.empty ; top = IntSet.empty}
-let is i c = (i land c = i)
 
 let empty_grid () = 
 {
@@ -130,17 +129,16 @@ let grid_add quark eid (attribute:attribute) grid =
   in 
   Hashtbl.replace grid.flow quark attribute ;
   grid
-		
-let impact q c = 
-	if q = 1 (*link*) 
-	then 
-		if (is _LINK_TESTED c) && (is _LINK_MODIF c) then 3 
-		else 
-			if (is _LINK_MODIF c) then 2 else 1
-	else (*internal state*)
-		if (is _INTERNAL_TESTED c) && (is _INTERNAL_MODIF c) then 3 
-		else 
-			if (is _INTERNAL_MODIF c) then 2 else 1
+
+let impact q c =
+  if q = 1 (*link*) then
+    if Primitives.Causality.is_link_modif c then
+      if Primitives.Causality.is_link_tested c then 3 else 2
+    else 1
+  else (*internal state*)
+    if Primitives.Causality.is_internal_modif c then
+      if Primitives.Causality.is_internal_tested c then 3 else 2
+      else 1
 
 let last_event attribute = 
 	match attribute with
@@ -158,39 +156,28 @@ let push (a:atom) (att:atom list) =
 				 
 
 let add (node_id,site_id) c grid event_number kind obs =
-  (* make  this function more compact *)
-	(*adding a link modification*)
-	let grid = 
-		if (is _LINK_TESTED c) || (is _LINK_MODIF c) then
-			let att = try grid_find (node_id,site_id,1) grid with Not_found -> [] in
-			let att = push {causal_impact = impact 1 c ; eid = event_number ; kind = kind (*; observation = obs*)} att
-			in
-                        let grid = 
-			  grid_add (node_id,site_id,1) event_number att grid
-                        in 
-                        let grid = 
-                          add_init_pid event_number (node_id,site_id,1) grid 
-                        in 
-                        grid
-		else
-			grid 
-	in
-	if (is _INTERNAL_TESTED c) || (is _INTERNAL_MODIF c) then
-	    (*adding an internal state modification*)
-	  let att = try grid_find (node_id,site_id,0) grid with Not_found -> [] in
-	  let att = push {causal_impact = impact 0 c ; eid = event_number ; kind = kind (*; observation = obs*)} att
-	  in
-          let grid = 
-	    grid_add (node_id,site_id,0) event_number att grid
-          in 
-           let grid = 
-            add_init_pid event_number (node_id,site_id,0) grid 
-          in 
-          grid 
-	else 
-	  grid
+  (* make this function more compact *)
+  (*adding a link modification*)
+  let grid =
+    if Primitives.Causality.is_link_something c then
+      let att = try grid_find (node_id,site_id,1) grid with Not_found -> [] in
+      let att = push {causal_impact = impact 1 c ; eid = event_number ; kind = kind (*; observation = obs*)} att
+      in
+      let grid = grid_add (node_id,site_id,1) event_number att grid in
+      add_init_pid event_number (node_id,site_id,1) grid
+    else
+      grid
+  in
+  if Primitives.Causality.is_internal_something c then
+    (*adding an internal state modification*)
+    let att = try grid_find (node_id,site_id,0) grid with Not_found -> [] in
+    let att = push {causal_impact = impact 0 c ; eid = event_number ; kind = kind (*; observation = obs*)} att
+    in
+    let grid = grid_add (node_id,site_id,0) event_number att grid in
+    add_init_pid event_number (node_id,site_id,0) grid
+  else
+    grid
 
-          
 (**side_effect Int2Set.t: pairs (agents,ports) that have been freed as a side effect --via a DEL or a FREE action*)
 (*NB no internal state modif as side effect*)
 let store_is_weak is_weak eid grid = 
@@ -201,10 +188,13 @@ let store_is_weak is_weak eid grid =
   else 
     grid 
 
+let causality_of_link =
+  (Primitives.Causality.add_link_modif (Primitives.Causality.create false true))
+
 let record ?decorate_with rule side_effects (embedding,fresh_map) is_weak event_number grid env = 
 	
-	let pre_causal = rule.Dynamics.pre_causal
-	and r_id = rule.Dynamics.r_id
+	let pre_causal = rule.Primitives.pre_causal
+	and r_id = rule.Primitives.r_id
 	and obs = match decorate_with with None -> [] | Some l -> (List.rev_map (fun (id,_) -> Environment.kappa_of_num id env) (List.rev l))
 	in
   	let kind = RULE r_id in
@@ -227,7 +217,9 @@ let record ?decorate_with rule side_effects (embedding,fresh_map) is_weak event_
 		(*adding side effects modifications*)
 		Int2Set.fold 
 		(fun (node_id,site_id) grid -> 
-                  add (node_id,site_id) (_LINK_TESTED lor _LINK_MODIF) grid event_number kind obs) 
+                  add (node_id,site_id)
+		      causality_of_link
+		      grid event_number kind obs) 
 		side_effects grid
 	in
 	grid
@@ -255,7 +247,7 @@ let record_obs side_effects ((r_id,state,embedding,_),test) is_weak event_number
     (*adding side effects modifications*)
     Int2Set.fold 
       (fun (node_id,site_id) grid -> 
-        add (node_id,site_id) (_LINK_TESTED lor _LINK_MODIF) grid event_number (OBS r_id) [])
+        add (node_id,site_id) (causality_of_link) grid event_number (OBS r_id) [])
       side_effects grid
   in
   grid
