@@ -62,6 +62,14 @@ let maybe_find_perturbation pert_id state =
   with | Not_found -> None
 let remove_perturbation pert_id state =
   {state with perturbations = IntMap.remove pert_id state.perturbations}
+let all_perturbations state =
+  let rec aux min max =
+    if min >= max then Mods.IntSet.singleton max
+    else Mods.IntSet.union (aux min ((max+min)/2)) (aux ((max+min)/2 + 1) max)
+  in
+  if IntMap.is_empty state.perturbations
+  then IntSet.empty
+  else aux 0 (IntMap.max_key state.perturbations)
 
 (*should use one representative of each cc of mixture in [set] in order to be more efficient*)
 let connex ?(d_map = IntMap.empty) ?(filter = false) ?start_with (roots,codomain) (radius:int) with_full_components state env =  

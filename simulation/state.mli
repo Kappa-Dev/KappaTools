@@ -23,6 +23,7 @@ val get_graph : t -> Graph.SiteGraph.t
 val get_nl_injections : t -> (InjProdHeap.t option) array
 val maybe_find_perturbation : int -> t -> Dynamics.perturbation option
 val remove_perturbation : int -> t -> t
+val all_perturbations : t -> IntSet.t
 
 val value :
   t -> Counter.t -> ?time:float -> Environment.t ->

@@ -6,13 +6,6 @@ open Graph
 open Mods
 open LargeArray
 
-let eval_pre_pert pert state counter env =
-  match pert.stopping_time with
-  | Some num ->
-     let t = (Nbr.to_float num) in
-     if t <= (Mods.Counter.time counter) then (Some t,true) else (None,false)
-  | _ -> (None, State.value state counter env pert.precondition)
-
 let eval_abort_pert just_applied pert state counter env =
   match pert.abort with
   | None -> just_applied
@@ -244,64 +237,73 @@ let apply_effect p_id pert tracked pert_events state counter env =
     )
     (env,state,IntSet.empty,tracked,pert_events) pert.effect
 
-let try_perturbate tracked state pert_ids pert_events counter env =
-  let rec iter state pert_ids tracked pert_events env =
-    let state,env,pert_ids',tracked,pert_events,stopping_time =
-      IntSet.fold
-	(fun pert_id (state,env,pert_ids,tracked,pert_events,stopping_time) ->
-	 let opt_pert = State.maybe_find_perturbation pert_id state
-	 in
-	 match opt_pert with
-	 | None -> (state,env,pert_ids,tracked,pert_events,None)
-	 | Some pert ->
-	    let state,pert_ids,tracked,pert_events,env,stopping_time' =
-	      let stopping_time',trigger_pert = eval_pre_pert pert state counter env in
-	      let () = match stopping_time' with
-		| Some t ->
-		   (Debug.tag_if_debug
-		      "Next event time is beyond perturbation time, applying null event and resetting clock to %f" t ;
-		    counter.Counter.time <- t)
-		| None -> () in
-	      if trigger_pert then
-		begin
-		  Debug.tag_if_debug
-		    "\n*************Applying perturbation %d***************" pert_id;
-		  let env,state,pert_ids,tracked,pert_events =
-		    apply_effect pert_id pert tracked pert_events state counter env in
-		  Debug.tag_if_debug "************End perturbation*************" ;
-		  let state,env =
-		    if eval_abort_pert true pert state counter env then
-		      (Debug.tag_if_debug "***Aborting pert[%d]***" pert_id;
-		    (State.remove_perturbation pert_id state,env))
-		    else
-		      begin
-			Debug.tag_if_debug "************Maintaining perturbation*************" ; 
-			(state,env)
-		      end
-		  in
-		  (state,pert_ids,tracked,pert_events,env,stopping_time')
-		end
-	      else
-		(state,pert_ids,tracked,pert_events,env,stopping_time')
-	    in
+let has_reached_a_stopping_time state counter env =
+  let depset = Environment.get_dependencies Term.TIME env in
+  Term.DepSet.fold
+    (fun dep st_time ->
+     match dep with
+     | Term.TIME | Term.EVENT | Term.KAPPA _ | Term.RULE _
+     | Term.ALG _ | Term.TOK _ -> st_time
+     | Term.PERT pert_id
+     | Term.ABORT pert_id ->
+	match State.maybe_find_perturbation pert_id state with
+	| None -> st_time
+	| Some pert ->
+	   match st_time,pert.stopping_time with
+	   | Some a, Some b
+		when Nbr.is_smaller b (Nbr.F (Mods.Counter.time counter))
+	     -> Some (Nbr.min a b)
+	   | None, Some b
+		when Nbr.is_smaller b (Nbr.F (Mods.Counter.time counter))
+	     -> Some b
+	   | e, (Some _ | None) -> e
+    ) depset None
 
-	    let stopping_time = match stopping_time' with Some _ -> stopping_time' | None -> stopping_time
-	    in
-	    if eval_abort_pert false pert state counter env then
-	      (Debug.tag_if_debug "***Aborting pert[%d]***" pert_id;
-	       (State.remove_perturbation pert_id state,env,IntSet.remove pert_id pert_ids,tracked,pert_events,stopping_time))
+let try_perturbate tracked state pert_ids pert_events counter env =
+  let rec iter state pert_ids triggered_perts tracked pert_events env =
+    let state,env,pert_ids',triggered_perts,tracked,pert_events =
+      let () = Debug.tag_if_debug "Should now try perturbations %a"
+				  (Pp.set IntSet.elements Pp.colon Pp.int)
+				  pert_ids in
+      IntSet.fold
+	(fun pert_id
+	     (state,env,pert_ids,triggered_perts,tracked,pert_events as acc) ->
+	 match State.maybe_find_perturbation pert_id state with
+	 | None -> acc
+	 | Some pert ->
+	    if State.value state counter env pert.precondition then
+	      begin
+		Debug.tag_if_debug
+		  "\n*************Applying perturbation %d***************" pert_id;
+		let env,state,new_pert_ids,tracked,pert_events =
+		  apply_effect pert_id pert tracked pert_events state counter env in
+		Debug.tag_if_debug "************End perturbation*************" ;
+		let state,triggered_perts =
+		  if eval_abort_pert true pert state counter env then
+		    let () =
+		      Debug.tag_if_debug "***Aborting pert[%d]***" pert_id in
+		    (State.remove_perturbation pert_id state,triggered_perts)
+		  else
+		    let () =
+		      Debug.tag_if_debug "************Maintaining perturbation*************"
+		    in (state,IntSet.add pert_id triggered_perts)
+		in
+		(state,env,IntSet.union new_pert_ids pert_ids,
+		 triggered_perts,tracked,pert_events)
+	      end
 	    else
-	      (state,env,pert_ids,tracked,pert_events,stopping_time)
+	      if eval_abort_pert false pert state counter env then
+		(Debug.tag_if_debug "***Aborting pert[%d]***" pert_id;
+		 (State.remove_perturbation pert_id state,env,
+		  IntSet.remove pert_id pert_ids,triggered_perts,tracked,pert_events))
+	      else acc
 	)
-	pert_ids (state,env,IntSet.empty,tracked,pert_events,None)
+	pert_ids (state,env,IntSet.empty,triggered_perts,tracked,pert_events)
     in
-    Debug.tag_if_debug "Should now try perturbations %a"
-		       (Pp.set IntSet.elements Pp.colon Pp.int)
-		       pert_ids';
     if IntSet.is_empty pert_ids' then
-      (state,env,tracked,pert_events,stopping_time)
+      (state,triggered_perts,env,tracked,pert_events)
     else
       (*Chance of looping perturbation if user was not careful*)
-      iter state pert_ids' tracked pert_events env
+      iter state pert_ids' triggered_perts tracked pert_events env
   in
-  iter state pert_ids tracked pert_events env
+  iter state pert_ids IntSet.empty tracked pert_events env
