@@ -3,8 +3,6 @@ open Tools
 open ExceptionDefn
 open Graph
 
-type 'a variable = CONST of 'a
-		   | VAR of ((int -> Nbr.t) -> (int -> Nbr.t) -> float -> int -> int -> float -> (int -> Nbr.t) -> 'a)
 type action =
 		BND of (port * port)
 	| FREE of (port * bool) (*FREE(p,b) b=true if FREE is side-effect free*)
@@ -17,40 +15,65 @@ and id = FRESH of int | KEPT of int (*binding or modifying a port that has been 
 (*Whenever v denotes a constant "variable" there is no need to keep it unevaluated, we use dummy arguments to reduce it*)
 let close_var v = v (fun _ -> Nbr.I 0) (fun i -> Nbr.I 0) 0.0 0 0 0. (fun i -> Nbr.I 0)
 
-module ActionSet = Set.Make(struct type t=action let compare = compare end) 
+module ActionSet = Set.Make(struct type t=action let compare = compare end)
 
 module IdMap = MapExt.Make (struct type t = id let compare = compare end)
 module Id2Map = MapExt.Make (struct type t = id*int let compare = compare end)
 
 type rule = {
-	k_def : Nbr.t variable ; (*standard kinetic constant*)
-	k_alt : Nbr.t variable option * Nbr.t variable option; (*Possible unary kinetic rate*)
-	over_sampling : float option ; (*Boosted kinetic rate for Bologna technique*)
-	script : action list ;
-	balance : (int * int * int) ;	(*#deleted,#preserved,#removed*)
-	kappa: string ;
-	lhs : Mixture.t ;
-	rhs : Mixture.t ;
-	refines: int option ; (*mixture id that is refined by lhs*)
-	r_id : int ;
-	added : IntSet.t;
-	(*side_effect : bool ;*)
-	modif_sites : Int2Set.t IdMap.t ;  
-	pre_causal : int Id2Map.t ; (* INTERNAL_TESTED (8) | INTERNAL_MODIF (4) | LINK_TESTED (2) | LINK_MODIF (1) *)
-	is_pert : bool ;
-	cc_impact : (IntSet.t IntMap.t * IntSet.t IntMap.t * IntSet.t IntMap.t) option ;
-	add_token : (Nbr.t variable * int) list ;
-	rm_token : (Nbr.t variable * int) list
-	}
-	(*connect: cc_i(lhs) -> {cc_j(lhs),...} if cc_i and cc_j are connected by rule application*)
-	(*disconnect: cc_i(rhs) -> {cc_j(rhs),...} if cc_i and cc_j are disconnected by rule application*)
-	(*side_effect: ag_i -> {site_j,...} if one should check at runtime the id of the agent connected to (ag_i,site_j) and build its cc after rule application*)
+  k_def : Nbr.t Primitives.variable ; (*standard kinetic constant*)
+  k_alt : Nbr.t Primitives.variable option *
+	    Nbr.t Primitives.variable option; (*Possible unary kinetic rate*)
+  over_sampling : float option ; (*Boosted kinetic rate for Bologna technique*)
+  script : action list ;
+  balance : (int * int * int) ;	(*#deleted,#preserved,#removed*)
+  kappa: string ;
+  lhs : Mixture.t ;
+  rhs : Mixture.t ;
+  refines: int option ; (*mixture id that is refined by lhs*)
+  r_id : int ;
+  added : IntSet.t;
+  (*side_effect : bool ;*)
+  modif_sites : Int2Set.t IdMap.t ;
+  pre_causal : int Id2Map.t ; (* INTERNAL_TESTED (8) | INTERNAL_MODIF (4) | LINK_TESTED (2) | LINK_MODIF (1) *)
+  is_pert: bool ;
+  cc_impact : (IntSet.t IntMap.t * IntSet.t IntMap.t * IntSet.t IntMap.t) option;
+  add_token : (Nbr.t Primitives.variable * int) list ;
+  rm_token : (Nbr.t Primitives.variable * int) list
+}
+(*connect: cc_i(lhs) -> {cc_j(lhs),...} if cc_i and cc_j are connected by rule application*)
+(*disconnect: cc_i(rhs) -> {cc_j(rhs),...} if cc_i and cc_j are disconnected by rule application*)
+(*side_effect: ag_i -> {site_j,...} if one should check at runtime the id of the agent connected to (ag_i,site_j) and build its cc after rule application*)
 
 
 let _INTERNAL_TESTED = 8
 let _INTERNAL_MODIF = 4
 let _LINK_TESTED = 2 
 let _LINK_MODIF = 1
+
+
+type modification =
+    INTRO of Nbr.t Primitives.variable * Mixture.t
+  | DELETE of Nbr.t Primitives.variable * Mixture.t
+  | UPDATE_RULE of int * Nbr.t Primitives.variable
+  | UPDATE_VAR of int * Nbr.t Primitives.variable
+  | UPDATE_TOK of int * Nbr.t Primitives.variable
+  | SNAPSHOT of Ast.mixture Ast.print_expr Term.with_pos list
+  | STOP of Ast.mixture Ast.print_expr Term.with_pos list
+  | CFLOW of int
+  | FLUX of Ast.mixture Ast.print_expr Term.with_pos list
+  | FLUXOFF of Ast.mixture Ast.print_expr Term.with_pos list
+  | CFLOWOFF of int
+  | PRINT of
+      (Ast.mixture Ast.print_expr Term.with_pos list *
+	 Ast.mixture Ast.print_expr Term.with_pos list)
+
+type perturbation =
+    { precondition: bool Primitives.variable;
+      effect : (rule option * modification) list;
+      abort : bool Primitives.variable option;
+      flag : string;
+      stopping_time : Nbr.t option }
 
 let compute_causal lhs rhs script env = 
 	let causal_map = (*adding tests for all sites mentionned in the left hand side --including existential site*) 
@@ -159,27 +182,6 @@ let compute_causal_init (((node_id,agent_name),interface),_) env =
 
 let compute_causal_obs lhs = 
   compute_causal lhs lhs [] 
-
-type perturbation =
-    { precondition: bool variable;
-      effect : (rule option * modification) list;
-      abort : bool variable option;
-      flag : string;
-      stopping_time : Nbr.t option }
- and modification =
-   INTRO of Nbr.t variable * Mixture.t
-   | DELETE of Nbr.t variable * Mixture.t
-   | UPDATE_RULE of int * Nbr.t variable
-   | UPDATE_VAR of int * Nbr.t variable
-   | UPDATE_TOK of int * Nbr.t variable
-   | SNAPSHOT of Ast.mixture Ast.print_expr Term.with_pos list
-   | STOP of Ast.mixture Ast.print_expr Term.with_pos list
-   | CFLOW of int
-   | FLUX of Ast.mixture Ast.print_expr Term.with_pos list
-   | FLUXOFF of Ast.mixture Ast.print_expr Term.with_pos list
-   | CFLOWOFF of int
-   | PRINT of
-       (Ast.mixture Ast.print_expr Term.with_pos list * Ast.mixture Ast.print_expr Term.with_pos list)
 
 let print_pert env f pert =
   let string_of_effect f (_, effect) =

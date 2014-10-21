@@ -14,7 +14,7 @@ type t =
       perturbations : perturbation IntMap.t;
       kappa_variables : (Mixture.t option) array;
       token_vector : float array ;
-      alg_variables : (Nbr.t Dynamics.variable option) array;
+      alg_variables : (Nbr.t Primitives.variable option) array;
       observables : obs list;
       influence_map : (int, (int IntMap.t list) IntMap.t) Hashtbl.t ;
       mutable activity_tree : Random_tree.tree;
@@ -23,7 +23,7 @@ type t =
       mutable silenced : IntSet.t (*Set of rule ids such that eval-activity was overestimated and whose activity was manually set to a lower value*)
     }
 and component_injections = (InjectionHeap.t option) array
-and obs = { label : string; expr : Nbr.t Dynamics.variable }
+and obs = { label : string; expr : Nbr.t Primitives.variable }
 
 let get_graph state = state.graph
 let get_nl_injections state = state.nl_injections
@@ -46,7 +46,7 @@ let kappa_of_id id state =
 let rule_of_id id state = Hashtbl.find state.rules id
 let update_rule id value state =
   let r = rule_of_id id state in
-  Hashtbl.replace state.rules id {r with k_def = Dynamics.CONST value}
+  Hashtbl.replace state.rules id {r with k_def = Primitives.CONST value}
 let update_token tk_id value state =
   state.token_vector.(tk_id) <- (Nbr.to_float value)
 
@@ -197,10 +197,10 @@ let instances_of_square ?(disjoint=false) mix_id radius_def state env =
 		) [] embeddings 
 
 let value state counter ?(time=Counter.time counter) env =
-  let rec aux : type a. a Dynamics.variable -> a =
+  let rec aux : type a. a Primitives.variable -> a =
 		    function
-		    | Dynamics.CONST v -> v
-		    | Dynamics.VAR f ->
+		    | Primitives.CONST v -> v
+		    | Primitives.VAR f ->
 		       let inst = fun v_i -> instance_number v_i state env in
 		       let values = fun i ->
 			 try aux (alg_of_id i state)
@@ -216,7 +216,7 @@ let value state counter ?(time=Counter.time counter) env =
 
 (*missing recomputation of dependencies*)
 let set_variable id v state =
-  try state.alg_variables.(id) <- Some (Dynamics.CONST v)
+  try state.alg_variables.(id) <- Some (Primitives.CONST v)
   with Invalid_argument msg -> invalid_arg ("State.set_variable: "^msg)
 
 let total_activity state =
@@ -482,8 +482,8 @@ let initialize sg token_vector rules kappa_vars alg_vars obs (pert,rule_pert) co
 					List.fold_left
 					(fun cont (plot_v, const, opt_v, dep, lbl) ->
 								let expr = 
-									if const then (match opt_v with Some v -> CONST v | None -> invalid_arg "State.initialize") 
-									else (VAR plot_v)
+									if const then (match opt_v with Some v -> Primitives.CONST v | None -> invalid_arg "State.initialize") 
+									else (Primitives.VAR plot_v)
 								in
 									{
 										expr = expr ;

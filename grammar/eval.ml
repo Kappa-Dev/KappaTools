@@ -450,9 +450,9 @@ let reduce_val v env mixs =
   (env',mixs',
    (if const then
       match opt_v with
-      | Some v -> Dynamics.CONST v
+      | Some v -> Primitives.CONST v
       | None -> invalid_arg "Eval.reduce_val: Variable is constant but was not evaluated"
-    else (VAR k)),
+    else (Primitives.VAR k)),
    dep)
 
 let rule_of_ast ?(backwards=false) env mixs (ast_rule_label, ast_rule) tolerate_new_state =
@@ -498,10 +498,10 @@ let rule_of_ast ?(backwards=false) env mixs (ast_rule_label, ast_rule) tolerate_
        in
        let v =
 	 if is_const then (match opt_v with
-			     Some v -> Dynamics.CONST v
+			     Some v -> Primitives.CONST v
 			   | None ->
 			      invalid_arg "Eval.rule_of_ast: Variable is constant but was not evaluated")
-	 else VAR f
+	 else Primitives.VAR f
        in
        (env',mixs',(v,id)::out)
       ) l (env,mixs,[])
@@ -668,8 +668,8 @@ let variables_of_result env (free_id,mixs) alg_a =
 	  let (f, constant, value_opt) = partial_eval_alg_of_alg env alg in
 	  let dep = Expr.deps_of_alg_expr (fst alg) in
 	  let v =
-	    if constant then Dynamics.CONST (close_var f)
-	    else Dynamics.VAR f
+	    if constant then Primitives.CONST (close_var f)
+	    else Primitives.VAR f
 	  in (v, dep, var_id)
 	 ) alg_a)
   in (env',compiled_mixs,vars)
@@ -725,9 +725,9 @@ let effects_of_modif variables env ast_list =
 	    let m,env = mixture_of_ast false env' ast_mix in
 	    let v =
 	      if is_constant
-	      then (match opt_v with Some v -> Dynamics.CONST v
+	      then (match opt_v with Some v -> Primitives.CONST v
 				   | None -> invalid_arg "Eval.effects_of_modif")
-	      else Dynamics.VAR x
+	      else Primitives.VAR x
 	    in
 	    let str =
 	      (Printf.sprintf "introduce %a * %s"
@@ -744,9 +744,9 @@ let effects_of_modif variables env ast_list =
 	    let m,env = mixture_of_ast ~mix_id:id true env ast_mix in
 	    let v =
 	      if is_constant
-	      then (match opt_v with Some v -> Dynamics.CONST v
+	      then (match opt_v with Some v -> Primitives.CONST v
 				   | None -> invalid_arg "Eval.effects_of_modif")
-	      else Dynamics.VAR x
+	      else Primitives.VAR x
 	    in
 	    let str =
 	      (Printf.sprintf "remove %a * %s" Expr.ast_alg_to_string (fst alg_expr)
@@ -767,9 +767,9 @@ let effects_of_modif variables env ast_list =
 	      partial_eval_alg env variables alg_expr in
 	    let v =
 	      if is_constant
-	      then (match opt_v with Some v -> Dynamics.CONST v
+	      then (match opt_v with Some v -> Primitives.CONST v
 				   | None -> invalid_arg "Eval.effects_of_modif")
-	      else Dynamics.VAR x
+	      else Primitives.VAR x
 	    in
 	    let str =
 	      (if is_rule then
@@ -794,9 +794,9 @@ let effects_of_modif variables env ast_list =
 	      partial_eval_alg env variables alg_expr in
 	    let v =
 	      if is_constant
-	      then (match opt_v with Some v -> Dynamics.CONST v
+	      then (match opt_v with Some v -> Primitives.CONST v
 				   | None -> invalid_arg "Eval.effects_of_modif")
-	      else Dynamics.VAR x
+	      else Primitives.VAR x
 	    in
 	    let str = (Printf.sprintf "set token '%s' to value %a" tk_nme
 				      Expr.ast_alg_to_string (fst alg_expr))::str_pert
@@ -877,8 +877,8 @@ let pert_of_result variables env res =
        let str_eff = String.concat ";" (List.rev str_eff) in
        let bv =
 	 if is_constant
-	 then Dynamics.CONST (close_var x)
-	 else Dynamics.VAR x in
+	 then Primitives.CONST (close_var x)
+	 else Primitives.VAR x in
        let str_pert,opt_abort =
 	 match opt_post with
 	 | None ->
@@ -897,8 +897,8 @@ let pert_of_result variables env res =
 				    (pos,"Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"))
 	    in
 	    let bv =
-	      if is_constant then Dynamics.CONST (close_var x)
-	      else Dynamics.VAR x
+	      if is_constant then Primitives.CONST (close_var x)
+	      else Primitives.VAR x
 	    in
 	    (Printf.sprintf "whenever %a, %s until %a"
 			    Expr.ast_bool_to_string (fst pre_expr) str_eff
@@ -933,7 +933,7 @@ let pert_of_result variables env res =
 		 let pre_causal = Dynamics.compute_causal lhs rhs script env in
 		 let rule =
 		   { Dynamics.rm_token = []; Dynamics.add_token = []; (*TODO*)
-		     Dynamics.k_def = Dynamics.CONST (Nbr.F 0.0);
+		     Dynamics.k_def = Primitives.CONST (Nbr.F 0.0);
 		     Dynamics.k_alt = (None,None);
 		     Dynamics.over_sampling = None;
 		     Dynamics.script = script ;
@@ -976,7 +976,7 @@ let pert_of_result variables env res =
 		 let pre_causal = Dynamics.compute_causal lhs rhs script env in
 		 let rule =
 		   { Dynamics.rm_token = [] ; Dynamics.add_token = [] ; (*TODO*)
-		     Dynamics.k_def = Dynamics.CONST (Nbr.F 0.0);
+		     Dynamics.k_def = Primitives.CONST (Nbr.F 0.0);
 		     Dynamics.k_alt = (None,None);
 		     Dynamics.over_sampling = None;
 		     Dynamics.script = script;

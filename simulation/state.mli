@@ -27,7 +27,7 @@ val all_perturbations : t -> IntSet.t
 
 val value :
   t -> Counter.t -> ?time:float -> Environment.t ->
-  'a Dynamics.variable -> 'a
+  'a Primitives.variable -> 'a
 
 val instance_number : int -> t -> Environment.t -> Nbr.t
 val nl_instance_number : int -> t -> Environment.t -> Nbr.t
@@ -45,10 +45,10 @@ val update_dep :
   t -> ?cause:int -> Term.dep_type -> IntSet.t ->
   Counter.t -> Environment.t -> Environment.t * IntSet.t
 val update_dep_value : t -> Counter.t -> Environment.t ->
-		       Nbr.t Dynamics.variable -> Term.dep_type -> unit
+		       Nbr.t Primitives.variable -> Term.dep_type -> unit
 
-val select_injection : float * Nbr.t Dynamics.variable option ->
-		       float * Nbr.t Dynamics.variable option -> t ->
+val select_injection : float * Nbr.t Primitives.variable option ->
+		       float * Nbr.t Primitives.variable option -> t ->
 		       Mixture.t -> Counter.t -> Environment.t -> Embedding.t
 val apply :
   t -> Dynamics.rule -> Embedding.t -> Counter.t -> Environment.t ->
@@ -65,7 +65,7 @@ val instances_of_square :
 
 val initialize :
   Graph.SiteGraph.t -> float array -> Dynamics.rule list ->
-  Mixture.t list -> (Nbr.t Dynamics.variable * Term.DepSet.t * int) list ->
+  Mixture.t list -> (Nbr.t Primitives.variable * Term.DepSet.t * int) list ->
   (((int -> Nbr.t) ->
     (int -> Nbr.t) -> float -> int -> int -> float -> (int -> Nbr.t) -> Nbr.t) *
      bool * Nbr.t option * 'a * string)

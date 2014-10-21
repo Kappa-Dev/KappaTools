@@ -6,6 +6,7 @@ type 'a named_declarations = (string Term.with_pos *'a) array * int StringMap.t
 type t = {
   tokens : unit named_declarations;
   algs : (Expr.alg_expr Term.with_pos) named_declarations;
+  perturbations : unit named_declarations;
 
 	signatures : Signature.t IntMap.t;
 	fresh_kappa : int ;
@@ -61,6 +62,7 @@ let empty =
 	tokens = ([||], StringMap.empty);
 	num_of_pert = StringMap.empty ;
 	pert_of_num = IntMap.empty ;
+	perturbations = ([||], StringMap.empty);
 	(*rule_of_pert = IntMap.empty ;*)
 	rule_indices = IntSet.empty ;
 	dependencies = Term.DepMap.empty ;

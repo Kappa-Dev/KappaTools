@@ -28,9 +28,9 @@ let eval_pexpr pexpr state counter env =
 	  | [] ->
 	     let v =
 	       if is_constant
-	       then (match opt_v with Some v -> Dynamics.CONST v
+	       then (match opt_v with Some v -> Primitives.CONST v
 				    | None -> invalid_arg "Eval.effects_of_modif")
-	       else Dynamics.VAR x
+	       else Primitives.VAR x
 	     in
 	     let n = State.value state counter env' v in
 	     (Nbr.to_string n)::cont
@@ -54,9 +54,9 @@ let dump_print_expr desc pexpr state counter env =
 	| [] ->
 	   let v =
 	     if is_constant
-	     then (match opt_v with Some v -> Dynamics.CONST v
+	     then (match opt_v with Some v -> Primitives.CONST v
 				  | None -> invalid_arg "Eval.effects_of_modif")
-	     else Dynamics.VAR x
+	     else Primitives.VAR x
 	   in
 	   Nbr.print desc (State.value state counter env' v)
     ) pexpr ;
