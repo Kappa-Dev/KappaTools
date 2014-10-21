@@ -211,14 +211,14 @@ let record ?decorate_with rule side_effects (embedding,fresh_map) is_weak event_
 	
 	let im embedding fresh_map id =
 		match id with
-			| FRESH j -> IntMap.find j fresh_map
-			| KEPT j -> IntMap.find j embedding
+			| Primitives.FRESH j -> IntMap.find j fresh_map
+			| Primitives.KEPT j -> IntMap.find j embedding
 	in
         let grid = store_is_weak is_weak event_number grid in 
 	let grid =  
 		(*adding side-effect free modifications and tests*)
 		let grid = 
-			Id2Map.fold
+			Primitives.PortMap.fold
 			(fun (id,site_id) c grid ->
 				let node_id = im embedding fresh_map id in
 				add (node_id,site_id) c grid event_number kind obs 
@@ -237,13 +237,13 @@ let record_obs side_effects ((r_id,state,embedding,_),test) is_weak event_number
   let grid = store_is_weak is_weak event_number grid in 
   let im embedding id =
     match id with
-      | FRESH j -> raise (Invalid_argument "Causal.record_obs")
-      | KEPT j -> IntMap.find j embedding
+      | Primitives.FRESH j -> raise (Invalid_argument "Causal.record_obs")
+      | Primitives.KEPT j -> IntMap.find j embedding
   in
   let causal = Dynamics.compute_causal_obs state env in 
   (*adding tests*)
   let grid = 
-    Id2Map.fold 
+    Primitives.PortMap.fold
       (fun (id,site_id) c grid ->
 	let node_id = im embedding id in
 	add (node_id,site_id) c grid event_number (OBS r_id) []

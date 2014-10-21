@@ -2,28 +2,15 @@ open Mods
 open Tools
 open ExceptionDefn
 open Graph
-
-type action =
-		BND of (port * port)
-	| FREE of (port * bool) (*FREE(p,b) b=true if FREE is side-effect free*)
-	| MOD of (port * int)
-	| DEL of int
-	| ADD of (int * int) (*(id in mixture, name_id)*)
-and port = id * int
-and id = FRESH of int | KEPT of int (*binding or modifying a port that has been added or kept from the lhs*)
+open Primitives
 
 (*Whenever v denotes a constant "variable" there is no need to keep it unevaluated, we use dummy arguments to reduce it*)
 let close_var v = v (fun _ -> Nbr.I 0) (fun i -> Nbr.I 0) 0.0 0 0 0. (fun i -> Nbr.I 0)
 
-module ActionSet = Set.Make(struct type t=action let compare = compare end)
-
-module IdMap = MapExt.Make (struct type t = id let compare = compare end)
-module Id2Map = MapExt.Make (struct type t = id*int let compare = compare end)
-
 type rule = {
-  k_def : Nbr.t Primitives.variable ; (*standard kinetic constant*)
-  k_alt : Nbr.t Primitives.variable option *
-	    Nbr.t Primitives.variable option; (*Possible unary kinetic rate*)
+  k_def : Nbr.t variable ; (*standard kinetic constant*)
+  k_alt : Nbr.t variable option *
+	    Nbr.t variable option; (*Possible unary kinetic rate*)
   over_sampling : float option ; (*Boosted kinetic rate for Bologna technique*)
   script : action list ;
   balance : (int * int * int) ;	(*#deleted,#preserved,#removed*)
@@ -35,7 +22,7 @@ type rule = {
   added : IntSet.t;
   (*side_effect : bool ;*)
   modif_sites : Int2Set.t IdMap.t ;
-  pre_causal : int Id2Map.t ; (* INTERNAL_TESTED (8) | INTERNAL_MODIF (4) | LINK_TESTED (2) | LINK_MODIF (1) *)
+  pre_causal : int PortMap.t ; (* INTERNAL_TESTED (8) | INTERNAL_MODIF (4) | LINK_TESTED (2) | LINK_MODIF (1) *)
   is_pert: bool ;
   cc_impact : (IntSet.t IntMap.t * IntSet.t IntMap.t * IntSet.t IntMap.t) option;
   add_token : (Nbr.t Primitives.variable * int) list ;
@@ -94,22 +81,22 @@ let compute_causal lhs rhs script env =
 				| Node.WLD -> c
 				      | _ -> (c lor _LINK_TESTED)
 			    in
-			    Id2Map.add (KEPT id,site_id) c causal_map,true
+			    PortMap.add (KEPT id,site_id) c causal_map,true
 			  else causal_map,bool)
 		      ag (causal_map,false)
                   in 
                   (* we put a TEsT on the existential site only if nothing else is tested *)
                   if bool 
                   then 
-                    Id2Map.add (KEPT id,0) 0 causal_map
+                    PortMap.add (KEPT id,0) 0 causal_map
                   else 
-                    Id2Map.add (KEPT id,0) _LINK_TESTED causal_map)
-		(Mixture.agents lhs) Id2Map.empty
+                    PortMap.add (KEPT id,0) _LINK_TESTED causal_map)
+		(Mixture.agents lhs) PortMap.empty
 	in
 	let add_causal p c map =
-		let c' = try Id2Map.find p map with Not_found -> 0
+		let c' = try PortMap.find p map with Not_found -> 0
 		in
-		Id2Map.add p (c lor c') map
+		PortMap.add p (c lor c') map
 	in
         let causal_map,bool = 
 	  List.fold_left
@@ -713,7 +700,7 @@ let dump r env =
 	(fun id ag -> 
 		Mixture.fold_interface 
 		(fun site_id _ _ -> 
-			let c = Id2Map.find (KEPT id,site_id) r.pre_causal in
+			let c = PortMap.find (KEPT id,site_id) r.pre_causal in
 			Printf.fprintf stderr "#%d.%d=%d\n" id site_id c
 		) ag ()
 	) (Mixture.agents r.lhs) ;

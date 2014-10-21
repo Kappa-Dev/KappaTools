@@ -1387,10 +1387,18 @@ let apply state r embedding_t counter env =
 	let app state embedding fresh_map (id, i) =
 		try
 			match id with
-			| FRESH j -> (SiteGraph.node_of_id state.graph (IntMap.find j fresh_map), i)
-			| KEPT j -> (SiteGraph.node_of_id state.graph (IntMap.find j embedding), i) 
-		with 
-			| Not_found -> invalid_arg (Printf.sprintf "State.apply: Incomplete embedding when applying rule %s on [%s -> %d]" r.kappa (match id with FRESH j -> (Printf.sprintf "F(%d)" j) | KEPT j -> string_of_int j) i)  
+			| Primitives.FRESH j ->
+			   (SiteGraph.node_of_id state.graph (IntMap.find j fresh_map), i)
+			| Primitives.KEPT j ->
+			   (SiteGraph.node_of_id state.graph (IntMap.find j embedding), i)
+		with
+			| Not_found ->
+			   invalid_arg
+			     (Printf.sprintf "State.apply: Incomplete embedding when applying rule %s on [%s -> %d]"
+					     r.kappa
+					     (match id with
+						Primitives.FRESH j -> (Printf.sprintf "F(%d)" j)
+					      | Primitives.KEPT j -> string_of_int j) i)
 	in
 	let rec edit state script psi side_effects pert_ids env =
 		(* phi: embedding, psi: fresh map *)
@@ -1402,7 +1410,7 @@ let apply state r embedding_t counter env =
 		| action :: script' ->
 				begin
 					match action with
-					| BND (p, p') ->
+					| Primitives.BND (p, p') ->
 							let ((u, i), (v, j)) =
 								let (u, i) = app state phi psi p in
 								let (v, j) = app state phi psi p'
@@ -1412,19 +1420,19 @@ let apply state r embedding_t counter env =
 								bind state r.r_id (u, i) (v, j) side_effects pert_ids counter env
 							in
 							edit state script' psi side_effects pert_ids env
-					| FREE (p,side_effect_free) ->
+					| Primitives.FREE (p,side_effect_free) ->
 							let x = app state phi psi p in
 							let (warn, env, side_effects,pert_ids) = break state r.r_id x side_effects pert_ids counter env side_effect_free
 							in
 							if warn > 0 then Counter.inc_null_action counter ;
 							edit state script' psi side_effects pert_ids env
-					| MOD (p, i) ->
+					| Primitives.MOD (p, i) ->
 							let x = app state phi psi p in
 							let warn,env, pert_ids = modify state r.r_id x i pert_ids counter env
 							in
 							if warn > 0 then Counter.inc_null_action counter ; 
 							edit state script' psi side_effects pert_ids env
-					| DEL i ->
+					| Primitives.DEL i ->
 							let phi_i =
 								(try IntMap.find i phi	with Not_found ->	invalid_arg "State.apply: incomplete embedding 3") 
 							in
@@ -1433,7 +1441,7 @@ let apply state r embedding_t counter env =
 								in
 								SiteGraph.remove sg phi_i;
 								edit state script' psi side_effects pert_ids env
-					| ADD (i, name) ->
+					| Primitives.ADD (i, name) ->
 							let node = Node.create name env in
 							let sg = SiteGraph.add sg node in
 							(* sg might be different address than sg if max array size  *)

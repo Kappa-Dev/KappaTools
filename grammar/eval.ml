@@ -532,7 +532,8 @@ let rule_of_ast ?(backwards=false) env mixs (ast_rule_label, ast_rule) tolerate_
     List.fold_left
       (fun (con_map,dis_map,side_eff) action ->
        match action with
-       | Dynamics.BND ((KEPT id,s),(KEPT id',s')) -> (*binding with a fresh agent doesn't impact connectedness*)
+       | Primitives.BND ((Primitives.KEPT id,s),(Primitives.KEPT id',s')) ->
+	  (*binding with a fresh agent doesn't impact connectedness*)
 	  let cc_id = Mixture.component_of_id id lhs
 	  and cc_id' = Mixture.component_of_id id' lhs
 	  in
@@ -546,7 +547,7 @@ let rule_of_ast ?(backwards=false) env mixs (ast_rule_label, ast_rule) tolerate_
 	    let con_map = IntMap.add cc_id' min_eq con_map in
 	    let con_map = IntMap.add max_eq min_eq con_map in
 	    (con_map,dis_map,side_eff)
-       | Dynamics.FREE ((KEPT id,s),side_effect_free) ->
+       | Primitives.FREE ((Primitives.KEPT id,s),side_effect_free) ->
 	  if side_effect_free then
 	    begin
 	      let id' = match Mixture.follow (id,s) lhs with None -> invalid_arg "Eval.build_cc_impact: Free action should be side effect free" | Some (id',s') -> id' in
@@ -569,7 +570,7 @@ let rule_of_ast ?(backwards=false) env mixs (ast_rule_label, ast_rule) tolerate_
 	    let set = try IntMap.find id side_eff with Not_found -> IntSet.empty in
 	    let side_eff = IntMap.add id (IntSet.add s set) side_eff in
 	    (con_map,dis_map,side_eff)
-       | Dynamics.DEL id ->
+       | Primitives.DEL id ->
 	  let ag = Mixture.agent_of_id id lhs in
 	  let sign = Environment.get_sig (Mixture.name ag) env in
 	  let set = try IntMap.find id (side_eff:IntSet.t IntMap.t) with Not_found -> IntSet.empty in

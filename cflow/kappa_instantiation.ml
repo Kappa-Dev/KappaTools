@@ -397,8 +397,8 @@ module Cflow_linker =
     let i,map = 
       match agent_id 
       with 
-	| Dynamics.KEPT i -> (i,Mixture.agents lhs)
-	| Dynamics.FRESH i -> (i,fresh_map)
+	| Primitives.KEPT i -> (i,Mixture.agents lhs)
+	| Primitives.FRESH i -> (i,fresh_map)
     in 
       try 
 	error,Mods.IntMap.find i map 
@@ -519,19 +519,19 @@ module Cflow_linker =
   let apply_embedding_on_action event id = 
     match id 
     with 
-      | Dynamics.KEPT i -> apply_embedding event i 
-      | Dynamics.FRESH i -> apply_fresh_map event i 
+      | Primitives.KEPT i -> apply_embedding event i 
+      | Primitives.FRESH i -> apply_fresh_map event i 
 
   let get_binding_state_of_site parameter handler error agent_id site_name mixture embedding fresh_map =
     match agent_id 
     with 
-      | Dynamics.KEPT(id) ->
+      | Primitives.KEPT(id) ->
 	  begin 
 	    match 
 	      Mixture.follow (id,site_name) mixture
 	    with 
 	      | Some (ag,site) -> 
-		  let fake_id = Dynamics.KEPT ag in 
+		  let fake_id = Primitives.KEPT ag in 
 		  let agent_id = apply_map ag embedding in 
 		  let error,kappa_agent = get_agent parameter handler error fake_id mixture fresh_map in 
 		  let agent_name = Mixture.name kappa_agent in 
@@ -554,7 +554,7 @@ module Cflow_linker =
 			  Not_found -> ANY
 		  end 
 	  end
-      | Dynamics.FRESH _ -> error,ANY 
+      | Primitives.FRESH _ -> error,ANY 
 
 
 
@@ -606,7 +606,7 @@ module Cflow_linker =
   let tests_of_lhs parameter handler error lhs embedding =
     Mods.IntMap.fold 
 	(fun lhs_id ag (error,list) -> 
-	   let fake_id = Dynamics.KEPT lhs_id in 
+	   let fake_id = Primitives.KEPT lhs_id in 
 	   let agent_id = apply_map lhs_id embedding in 
 	   let agent_name = Mixture.name ag in 
 	   let agent = build_agent agent_id agent_name in 
@@ -694,7 +694,7 @@ module Cflow_linker =
 	(fun (list_actions,side_sites,fresh,error) action -> 
 	   match action 
 	   with 
-	     | Dynamics.BND((lhs_id1,site1),(lhs_id2,site2)) ->
+	     | Primitives.BND((lhs_id1,site1),(lhs_id2,site2)) ->
 		 let agent_id1 = apply_embedding_on_action event lhs_id1 in 
 		 let error,agent_name1 = name_of_agent parameter handler error lhs_id1  lhs fresh in 
 		 let agent1 = build_agent agent_id1 agent_name1 in
@@ -710,7 +710,7 @@ module Cflow_linker =
 		     fresh,
                      error
 		   )
-	     | Dynamics.FREE((lhs_id,site_name),bool) ->
+	     | Primitives.FREE((lhs_id,site_name),bool) ->
 		 let agent_id = apply_embedding_on_action event lhs_id in 
 		 let error,agent_name = name_of_agent parameter handler error lhs_id lhs fresh in
 		 let agent = build_agent agent_id agent_name in 
@@ -734,7 +734,7 @@ module Cflow_linker =
                    fresh,
                    error
 		     
-	     | Dynamics.MOD((lhs_id,site),internal) -> 
+	     | Primitives.MOD((lhs_id,site),internal) ->
 		 let agent_id = apply_embedding_on_action event lhs_id in 
 		 let error,agent_name = name_of_agent parameter handler error lhs_id lhs fresh in 
 		 let agent = build_agent agent_id agent_name in 
@@ -744,8 +744,8 @@ module Cflow_linker =
 		 fresh,
                  error
 		   
-	     | Dynamics.DEL(lhs_id) -> 
-		 let fake_id = Dynamics.KEPT lhs_id in 
+	     | Primitives.DEL(lhs_id) ->
+		 let fake_id = Primitives.KEPT lhs_id in
 		 let agent_id = apply_embedding event lhs_id in 
 		 let error,agent_name = name_of_agent parameter handler error fake_id lhs fresh in 
 		 let agent = build_agent agent_id agent_name in 
@@ -767,8 +767,9 @@ module Cflow_linker =
 		 fresh,
                  error
 		
-	     | Dynamics.ADD(rhs_id,agent_name) -> 
-		 let agent_id = apply_embedding_on_action event (Dynamics.FRESH rhs_id) in 
+	     | Primitives.ADD(rhs_id,agent_name) ->
+		let agent_id =
+		  apply_embedding_on_action event (Primitives.FRESH rhs_id) in
 		 let error,interface = get_default_state parameter handler error agent_name in 
 		 let agent = build_agent agent_id agent_name in 
 		 let kappa_agent = build_kappa_agent agent_name interface in 
