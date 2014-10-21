@@ -10,19 +10,21 @@ ERROR_TMP=error_tmp
 
 EXPECTED_DAT= $(wildcard expected-output/*.dat)
 EXPECTED_DOT= $(wildcard expected-output/*.dot) 
+EXPECTED_LOG= $(wildcard expected-output/*.log)
 TESTED_DAT= $(wildcard tmp/*.dat)
 TESTED_DOT= $(wildcard tmp/*.dot) 
+TESTED_LOG= $(wildcard tmp/*.log)
 TESTED_REF= $(wildcard tmp/*.ref)
-DIFF=$(TESTED_DOT:.dot=.dot.diff) $(TESTED_DAT:.dat=.dat.diff)
-CHECK=$(TESTED_DOT:.dot=.dot.error) $(TESTED_REF:.ref=.error) $(TESTED_DAT:.dat=.dat.error) tmp/log.error 
-EXP=$(EXPECTED_DOT:.dot=.dot.ref) $(EXPECTED_DAT:.dat=.dat.ref)
+DIFF=$(TESTED_DOT:.dot=.dot.diff) $(TESTED_DAT:.dat=.dat.diff) $(TESTED_LOG:.log=.log.diff)
+CHECK=$(TESTED_DOT:.dot=.dot.error) $(TESTED_REF:.ref=.error) $(TESTED_DAT:.dat=.dat.error) $(TESTED_LOG:.log=.log.error) 
+EXP=$(EXPECTED_DOT:.dot=.dot.ref) $(EXPECTED_DAT:.dat=.dat.ref) $(EXPECTED_LOG:.log=.log.ref)
 
 all: test
 
 build: $(EXPECTED_OUTPUT_PATH)
 	@make clean_all
 	@make $(EXPECTED_OUTPUT_PATH)
-	@sh README 
+	@sh README >> $(EXPECTED_OUTPUT_PATH)/LOG 2> $(EXPECTED_OUTPUT_PATH)/error.log 
 
 $(EXPECTED_OUTPUT_PATH):
 	@mkdir $@
@@ -37,7 +39,7 @@ $(SCRIPT): README
 test: 
 	@make clean > /dev/null
 	@make $(TMP) > /dev/null
-	@make launch_script >> $(TMP)/LOG 2> $(TMP)/log.error 
+	@make launch_script >> $(TMP)/LOG 2> $(TMP)/error.log
 	@make do_copy > /dev/null
 	@make do_diff > /dev/null
 	@make error > /dev/null

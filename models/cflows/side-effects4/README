@@ -1,5 +1,5 @@
 #Command-line:
-timeout 300s KaSim -i side-effects.ka  -e 25 -seed 253329392 -d expected-output || exit 0 
+KaSim -i side-effects.ka  -e 25 -seed 253329392 -d expected-output || exit 0 
 
 
 #A and B can for dimmer.
