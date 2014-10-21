@@ -95,10 +95,12 @@ let find_available_name name ext =
     if (Filename.check_suffix name ext)
     then Filename.chop_extension name
     else name in
-  let v = ref 0 in
-  let () =
-    while Sys.file_exists (base^(string_of_int !v)^ext) do incr v; done
-  in base^(string_of_int !v)^ext
+  if Sys.file_exists (base^ext) then
+    let v = ref 0 in
+    let () =
+      while Sys.file_exists (base^"_"^(string_of_int !v)^ext) do incr v; done
+    in base^(string_of_int !v)^ext
+  else base^ext
 
 let array_fold_left_mapi f x a =
   let y = ref x in
