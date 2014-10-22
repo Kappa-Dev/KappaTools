@@ -62,10 +62,10 @@ type ('a,'b) contractible = NO of 'a
 			  | MAYBE of 'a * Term.bin_alg_op * 'a * 'b
 			  | YES of 'b
 
-let rec compile_alg var_map tk_map ?max_allowed_var
+let rec compile_alg ?label var_map tk_map ?max_allowed_var
 		    (fr_mix_id,mix_l as mixs) (alg,(beg_pos,_ as pos)) =
   let rec_call mixs x =
-    match compile_alg var_map tk_map mixs x with
+    match compile_alg var_map tk_map ?max_allowed_var mixs x with
     | (mixs', (ALG_VAR _ | TOKEN_ID _ | UN_ALG_OP _ | STATE_ALG_OP _
 		     | KAPPA_INSTANCE _ as alg,_)) -> (mixs', NO alg)
     | (mixs',(CONST n,_)) -> (mixs',YES n)
@@ -75,7 +75,7 @@ let rec compile_alg var_map tk_map ?max_allowed_var
   in
   match alg with
   | Ast.KAPPA_INSTANCE ast ->
-     ((succ fr_mix_id,ast::mix_l), (KAPPA_INSTANCE fr_mix_id,pos))
+     ((succ fr_mix_id,(label,ast)::mix_l), (KAPPA_INSTANCE fr_mix_id,pos))
   | Ast.OBS_VAR lab ->
      let i =
        try Mods.StringMap.find lab var_map with

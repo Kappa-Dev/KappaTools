@@ -646,10 +646,12 @@ let rule_of_ast ?(backwards=false) env mixs (ast_rule_label, ast_rule) tolerate_
 
 let variables_of_result env (free_id,mixs) alg_a =
   let (env',compiled_mixs,final_id) =
-    List.fold_left (fun (env,mixs,id) ast ->
+    List.fold_left (fun (env,mixs,id) (lbl,ast) ->
 		    (* <awful hack> *)
 		    let open Environment in
-		    let dummy_name = "%anonymous"^string_of_int id in
+		    let dummy_name = match lbl with
+		      | None ->"%anonymous"^string_of_int id
+		      | Some lbl -> lbl in
 		    let env = {env with
 				num_of_kappa = StringMap.add dummy_name id env.num_of_kappa;
 				kappa_of_num = IntMap.add id dummy_name env.kappa_of_num;
@@ -1264,9 +1266,9 @@ let initialize result counter =
   let vars_a = Array.of_list result.Ast.variables in
   let alg_map = name_map_of_array vars_a in
   let (fresh_kappa,_ as mixs),alg_a =
-    array_fold_left_mapi (fun i mixs (lbl_pos,ast) ->
+    array_fold_left_mapi (fun i mixs ((label,_ as lbl_pos),ast) ->
 			  let (mixs',alg) =
-			    Expr.compile_alg alg_map tk_map
+			    Expr.compile_alg ~label alg_map tk_map
 					     mixs ~max_allowed_var:(pred i) ast
 			  in (mixs',(lbl_pos,alg))) (0,[]) vars_a
   in
