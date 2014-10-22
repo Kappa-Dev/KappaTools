@@ -73,7 +73,7 @@ $(EXPECTED_OUTPUT_PATH)/%.ref: $(EXPECTED_OUTPUT_PATH)/%
 	@sed '/generation/d' $< > $@
 
 %.error_tmp: %.diff 
-	@if (test -s $*.diff) then (echo $*.dot has changed > $@ ; cat $*.diff >> $@ ; echo >> $@) else (touch $@) fi; 
+	@if (test -s $*.diff) then (echo $* has changed > $@ ; cat $*.diff >> $@ ; echo >> $@) else (touch $@) fi; 
 	@if (test -s $*.new) then (exit 0) else (echo $* has disappeared > $@ ; echo >> $@) fi; 
 	@if (test -s $*.ref) then (exit 0) else (echo $* is new > $@ ; echo >> $@) fi;
 

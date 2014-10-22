@@ -23,3 +23,4 @@ clean_all:
 
 pdf: 
 	@for i in * ; do (if (file $$i | grep directory ) then (cd $$i ; $(MAKE) pdf ; ) else (echo 0 ; ) ;  fi ; )   ; done 
+
