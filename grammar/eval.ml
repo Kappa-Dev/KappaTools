@@ -323,8 +323,8 @@ let rec partial_eval_alg_of_alg env (ast, (beg_pos,end_pos)) =
       Some (Nbr.F 0.))
   | Expr.KAPPA_INSTANCE id -> ((fun f _ _ _ _ _ _-> f id), false, Some (Nbr.I 0))
   | Expr.ALG_VAR i ->
-     let (_,_,c) =
-       partial_eval_alg_of_alg env (snd (fst env.Environment.algs).(i))
+     let (_,_,c) = partial_eval_alg_of_alg
+		     env (snd env.Environment.algs.NamedDecls.decls.(i))
      in ((fun _ v _ _ _ _ _-> v i),false,c)
   | Expr.TOKEN_ID i -> ((fun _ _ _ _ _ _ tk -> tk i),false,Some (Nbr.F 0.))
   | Expr.STATE_ALG_OP (Term.TIME_VAR) ->
@@ -386,7 +386,8 @@ let rec partial_eval_alg env mixs (ast, (beg_pos,end_pos)) =
             raise (ExceptionDefn.Semantics_Error
                      (pos_of_lex_pos beg_pos,lab ^ " is not a declared variable"))
      in
-     let (_,_,c) = partial_eval_alg_of_alg env (snd (fst env.Environment.algs).(i)) in
+     let (_,_,c) = partial_eval_alg_of_alg
+		     env (snd env.Environment.algs.NamedDecls.decls.(i)) in
        (env,mixs,(fun _ v _ _ _ _ _-> v i),false,c)
   | TOKEN_ID (tk_nme) ->
      let i =
@@ -444,7 +445,8 @@ let signature_of_ast s env =
 let reduce_val v env mixs =
   let (env', mixs', k, const, opt_v) = partial_eval_alg env mixs v in
   let (_mix',(alg,_pos)) =
-    Expr.compile_alg (snd env.Environment.algs) (snd env.Environment.tokens)
+    Expr.compile_alg env.Environment.algs.NamedDecls.finder
+		     env.Environment.tokens.NamedDecls.finder
 		     (env.Environment.fresh_kappa,[]) v in
   let dep = Expr.deps_of_alg_expr alg in
   (env',mixs',
@@ -706,7 +708,8 @@ let obs_of_result env mixs res =
     (fun (env,mix,cont) alg_expr ->
      let (env',mixs',f, const, opt_v) = partial_eval_alg env mix alg_expr in
      let (_mix',(alg,_pos)) =
-       Expr.compile_alg (snd env.Environment.algs) (snd env.Environment.tokens)
+       Expr.compile_alg env.Environment.algs.NamedDecls.finder
+			env.Environment.tokens.NamedDecls.finder
 			(env.Environment.fresh_kappa,[]) alg_expr in
      let dep = Expr.deps_of_alg_expr alg in
      env',mixs',(f,const,opt_v,dep,Expr.ast_alg_to_string () (fst alg_expr)) :: cont
@@ -811,26 +814,28 @@ let effects_of_modif variables env ast_list =
 	    let str = "interrupt simulation"::str_pert in
 	    (variables, (Primitives.STOP pexpr)::effects, str, env)
 	 | CFLOW ((lab,pos_lab),pos_pert) ->
-	    let id = try Environment.num_of_rule lab env
-		     with Not_found ->
-		       try let var = Environment.num_of_alg lab env in
-			   match (fst env.Environment.algs).(var) with
-			   |(_,(Expr.KAPPA_INSTANCE i,_)) -> i
-			   | _ -> raise Not_found
-		       with Not_found ->
-			 raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
+	    let id =
+	      try Environment.num_of_rule lab env
+	      with Not_found ->
+		try let var = Environment.num_of_alg lab env in
+		    match env.Environment.algs.NamedDecls.decls.(var) with
+		    |(_,(Expr.KAPPA_INSTANCE i,_)) -> i
+		    | _ -> raise Not_found
+		with Not_found ->
+		  raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
 	    in
 	    let str = (Printf.sprintf "Enable causality analysis for observable '%s'" lab)::str_pert in
 	    (variables, (Primitives.CFLOW id)::effects, str, env)
 	 | CFLOWOFF ((lab,pos_lab),pos_pert) ->
-	    let id = try Environment.num_of_rule lab env
-		     with Not_found ->
-			  try let var = Environment.num_of_alg lab env in
-			      match (fst env.Environment.algs).(var) with
-			      |(_,(Expr.KAPPA_INSTANCE i,_)) -> i
-			      | _ -> raise Not_found
-			  with Not_found ->
-			    raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
+	    let id =
+	      try Environment.num_of_rule lab env
+	      with Not_found ->
+		try let var = Environment.num_of_alg lab env in
+		    match env.Environment.algs.NamedDecls.decls.(var) with
+		    |(_,(Expr.KAPPA_INSTANCE i,_)) -> i
+		    | _ -> raise Not_found
+		with Not_found ->
+		  raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
 	    in
 	    let str = (Printf.sprintf "Disable causality analysis for observable '%s'" lab)::str_pert in
 	    (variables, (Primitives.CFLOWOFF id)::effects, str, env)
@@ -865,7 +870,8 @@ let pert_of_result variables env res =
        let (env', variables', x, is_constant) =
 	 partial_eval_bool env variables pre_expr in
        let (_mix',(pre,_pos)) =
-	 Expr.compile_bool (snd env.Environment.algs) (snd env.Environment.tokens)
+	 Expr.compile_bool env.Environment.algs.NamedDecls.finder
+			   env.Environment.tokens.NamedDecls.finder
 			   (env.Environment.fresh_kappa,[]) pre_expr in
        let (dep, stopping_time) = try Expr.deps_of_bool_expr pre
 		 with ExceptionDefn.Unsatisfiable ->
@@ -889,8 +895,9 @@ let pert_of_result variables env res =
 	    let (env', variables', x, is_constant) =
 	      partial_eval_bool env variables post_expr in
 	    let (_mix',(post,_pos)) =
-	      Expr.compile_bool (snd env.Environment.algs) (snd env.Environment.tokens)
-			       (env.Environment.fresh_kappa,[]) post_expr in
+	      Expr.compile_bool env.Environment.algs.NamedDecls.finder
+				env.Environment.tokens.NamedDecls.finder
+				(env.Environment.fresh_kappa,[]) post_expr in
 	    let (dep,stopping_time) = try Expr.deps_of_bool_expr post with
 			       ExceptionDefn.Unsatisfiable ->
 			       raise
@@ -1059,47 +1066,47 @@ let pert_of_result variables env res =
   (variables, lpert, (List.rev lrules), env)
 
 let init_graph_of_result env res =
-  let n = Array.length (fst env.Environment.tokens) in
+  let n = Array.length env.Environment.tokens.NamedDecls.decls in
   let token_vector = Array.init n (fun i -> 0.) in
   let sg,env =
     List.fold_left
       (fun (sg,env) (opt_vol,init_t,pos) -> (*TODO dealing with volumes*)
        match init_t with
        | INIT_MIX (alg, ast) ->
-	  begin
-	    let (_,alg') =
-	      Expr.compile_alg (snd env.Environment.algs)
-			       (snd env.Environment.tokens) (0,[]) alg in
-	    let value =
-	      match partial_eval_alg_of_alg env alg' with
-	      | (_, _, Some v) -> v
-	      | _ -> raise
-		       (ExceptionDefn.Semantics_Error
-			  (pos,
-			   Printf.sprintf "%a is not a constant, cannot initialize graph."
-					  Expr.ast_alg_to_string (fst alg)))
-	    in
-	    let cpt = ref 0 in
-	    let sg = ref sg in
-	    let env = ref env in
-	    let n = match !Parameter.rescale with
-	      | None -> Nbr.to_int value
-	      | Some i -> min i (Nbr.to_int value)
-	    in
-	    (* Cannot do Mixture.to_nodes env m once for all because of *)
-	    (* references                                               *)
-	    while !cpt < n do
-	      let nodes,env' = nodes_of_ast !env ast in
-	      env := env' ;
-	      sg := Graph.SiteGraph.add_nodes !sg nodes;
-	      cpt := !cpt + 1
-	    done;
-	    (!sg,!env)
-	  end
+	  let (_,alg') =
+	    Expr.compile_alg env.Environment.algs.NamedDecls.finder
+			     env.Environment.tokens.NamedDecls.finder (0,[]) alg
+	  in
+	  let value =
+	    match partial_eval_alg_of_alg env alg' with
+	    | (_, _, Some v) -> v
+	    | _ -> raise
+		     (ExceptionDefn.Semantics_Error
+			(pos,
+			 Printf.sprintf "%a is not a constant, cannot initialize graph."
+					Expr.ast_alg_to_string (fst alg)))
+	  in
+	  let cpt = ref 0 in
+	  let sg = ref sg in
+	  let env = ref env in
+	  let n = match !Parameter.rescale with
+	    | None -> Nbr.to_int value
+	    | Some i -> min i (Nbr.to_int value)
+	  in
+	  (* Cannot do Mixture.to_nodes env m once for all because of *)
+	  (* references                                               *)
+	  while !cpt < n do
+	    let nodes,env' = nodes_of_ast !env ast in
+	    env := env' ;
+	    sg := Graph.SiteGraph.add_nodes !sg nodes;
+	    cpt := !cpt + 1
+	  done;
+	  (!sg,!env)
        | INIT_TOK (alg, (tk_nme,pos_tk)) ->
 	  let (_,alg') =
-	    Expr.compile_alg (snd env.Environment.algs)
-			     (snd env.Environment.tokens) (0,[]) alg in
+	    Expr.compile_alg env.Environment.algs.NamedDecls.finder
+			     env.Environment.tokens.NamedDecls.finder (0,[]) alg
+	  in
 	  let value =
 	    match partial_eval_alg_of_alg env alg' with
 	    | (_, _, Some v) -> Nbr.to_float v
@@ -1246,35 +1253,27 @@ let configurations_of_result result =
     ) result.configurations
 
 let initialize result counter =
-  let name_map_of_array a =
-    fst (Array.fold_left
-	   (fun (map,i) ((x,(pos,_)),_) ->
-	    if StringMap.mem x map then
-	      raise (ExceptionDefn.Semantics_Error
-		       (Tools.pos_of_lex_pos pos, (Printf.sprintf "Label '%s' already defined" x)))
-	    else StringMap.add x i map,succ i)
-	   (StringMap.empty,0) a) in
   Debug.tag "+ Compiling..." ;
   Debug.tag "\t -simulation parameters" ;
   let _ = configurations_of_result result in
 
   Debug.tag "\t -agent signatures" ;
   let tk_l = List.map (fun x -> (x,())) result.Ast.tokens in
-  let tk_a = Array.of_list tk_l in
-  let tk_map = name_map_of_array tk_a in
+  let tk_nd = NamedDecls.create (Array.of_list tk_l) in
 
   Debug.tag "\t -variable declarations";
-  let vars_a = Array.of_list result.Ast.variables in
-  let alg_map = name_map_of_array vars_a in
+  let vars_nd = NamedDecls.create (Array.of_list result.Ast.variables) in
   let (fresh_kappa,_ as mixs),alg_a =
     array_fold_left_mapi (fun i mixs ((label,_ as lbl_pos),ast) ->
 			  let (mixs',alg) =
-			    Expr.compile_alg ~label alg_map tk_map
-					     mixs ~max_allowed_var:(pred i) ast
-			  in (mixs',(lbl_pos,alg))) (0,[]) vars_a
+			    Expr.compile_alg ~label vars_nd.NamedDecls.finder
+					     tk_nd.NamedDecls.finder mixs
+					     ~max_allowed_var:(pred i) ast
+			  in (mixs',(lbl_pos,alg))) (0,[])
+			 vars_nd.NamedDecls.decls
   in
 
-  let env = Environment.init (tk_a, tk_map) (alg_a,alg_map) fresh_kappa in
+  let env = Environment.init tk_nd (NamedDecls.create alg_a) fresh_kappa in
 
   let env = environment_of_result env result in
   let (env, kappa_vars, alg_vars) = variables_of_result env mixs alg_a in

@@ -1,12 +1,10 @@
 open Mods
 open ExceptionDefn
 
-type 'a named_declarations = (string Term.with_pos *'a) array * int StringMap.t
-
 type t = {
-  tokens : unit named_declarations;
-  algs : (Expr.alg_expr Term.with_pos) named_declarations;
-  perturbations : unit named_declarations;
+  tokens : unit NamedDecls.t;
+  algs : (Expr.alg_expr Term.with_pos) NamedDecls.t;
+  perturbations : unit NamedDecls.t;
 
 	signatures : Signature.t IntMap.t;
 	fresh_kappa : int ;
@@ -54,15 +52,15 @@ let empty =
 	kappa_of_num = IntMap.empty ;
 	num_of_rule = StringMap.empty ;
 	num_of_unary_rule = StringMap.empty ;
-	algs = ([||], StringMap.empty);
+	algs = NamedDecls.create [||];
 	rule_of_num = IntMap.empty ;
 	unary_rule_of_num = IntMap.empty ; 
 	fresh_kappa = 0 ;
 	fresh_pert = 0 ;
-	tokens = ([||], StringMap.empty);
+	tokens = NamedDecls.create [||];
 	num_of_pert = StringMap.empty ;
 	pert_of_num = IntMap.empty ;
-	perturbations = ([||], StringMap.empty);
+	perturbations = NamedDecls.create [||];
 	(*rule_of_pert = IntMap.empty ;*)
 	rule_indices = IntSet.empty ;
 	dependencies = Term.DepMap.empty ;
@@ -142,8 +140,8 @@ let unary_rule_of_num i env =  IntMap.find i env.unary_rule_of_num
 let pert_of_num i env = IntMap.find i env.pert_of_num
 let num_of_pert lab env = StringMap.find lab env.num_of_pert
 let is_rule i env = IntSet.mem i env.rule_indices
-let num_of_alg s env = StringMap.find s (snd env.algs)
-let alg_of_num i env = fst (fst env.algs).(i)
+let num_of_alg s env = StringMap.find s env.algs.NamedDecls.finder
+let alg_of_num i env = fst env.algs.NamedDecls.decls.(i)
 (*let bind_pert_rule pid rid env = {env with rule_of_pert = IntMap.add pid rid env.rule_of_pert}*)
 (*let rule_of_pert pid env = try Some (IntMap.find pid env.rule_of_pert) with Not_found -> None *)
 
@@ -236,8 +234,8 @@ let declare_sig sign pos env =
 	else
 		{env with signatures = IntMap.add (Signature.control sign) sign env.signatures}
 
-let num_of_token = fun str env -> StringMap.find str (snd env.tokens)
-let token_of_num = fun id env -> let ((x,_),_) = (fst env.tokens).(id) in x
+let num_of_token = fun str env -> StringMap.find str env.tokens.NamedDecls.finder
+let token_of_num = fun id env -> fst (fst env.tokens.NamedDecls.decls.(id))
 
 let declare_var_kappa ?(from_rule=false) label_pos_opt env =
 	let label,pos = match label_pos_opt with

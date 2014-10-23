@@ -226,7 +226,7 @@ type a. t -> Counter.t -> ?time:float -> Environment.t ->
        with_value state counter ?time env (value_state_alg_op state counter ?time env op) sk
     | Expr.ALG_VAR i ->
        exec_alg state counter ?time env with_value
-		(fst (snd (fst env.Environment.algs).(i))) sk
+		(fst (snd env.Environment.algs.NamedDecls.decls.(i))) sk
     | Expr.KAPPA_INSTANCE i ->
        with_value state counter ?time env (instance_number i state env) sk
     | Expr.TOKEN_ID i ->

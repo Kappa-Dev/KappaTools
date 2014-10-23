@@ -1,14 +1,15 @@
-module StringMap = MapExt.Make (struct type t = string let compare = compare end)   
+module StringMap = MapExt.Make (struct type t = string let compare= compare end)
 module IntMap = MapExt.Make (struct type t = int let compare = compare end)
 module IntSet = Set_patched.Make (struct type t = int let compare = compare end)
 module Int2Map = MapExt.Make (struct type t = int*int let compare = compare end)
 module StringSet = Set.Make (struct type t = string let compare = compare end)
 module Int2Set = Set.Make (struct type t = int*int let compare = compare end)
-module Int3Set = Set.Make (struct type t = int*int*int let compare = compare end)
+module Int3Set = Set.Make (struct type t = int*int*int let compare= compare end)
+module StringIntMap =
+  MapExt.Make (struct type t = (string * int) let compare = compare end)
 
 module DynArray = DynamicArray.DynArray(LargeArray.GenArray)
 
-module StringIntMap = MapExt.Make (struct type t = (string * int) let compare = compare end)
 module Injection = 
 	struct
 		type t = {map : (int,int) Hashtbl.t ; mutable address : int option ; coordinate : (int*int)}
