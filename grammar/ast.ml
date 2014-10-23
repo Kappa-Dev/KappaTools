@@ -9,11 +9,10 @@ type link =
   | LNK_ANY of Tools.pos
   | LNK_SOME of Tools.pos
   | LNK_TYPE of str_pos * str_pos
-type internal = string list
-type port = {port_nme:string;
+type internal = string Term.with_pos list
+type port = {port_nme:string Term.with_pos;
 	     port_int:internal;
-	     port_lnk:link;
-	     port_pos:Tools.pos}
+	     port_lnk:link;}
 type interface = PORT_SEP of port * interface | EMPTY_INTF
 type agent = {ag_nme:string ; ag_intf:interface ; ag_pos:Tools.pos}
 type mixture =

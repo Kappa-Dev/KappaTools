@@ -1,84 +1,80 @@
 open Mods
 open ExceptionDefn
 
-type t = {
-  control:int;
-  assoc : (string*(string array * int StringMap.t) option) array ;
-  num_of_site: int StringMap.t}
-
-let control sign = sign.control
+type t = ((unit NamedDecls.t) option) NamedDecls.t
 
 let fold f sign cont =
-  let cont,_ = Array.fold_left (fun (cont,i) _ -> (f i cont,i+1)) (cont,0) sign.assoc
+  let cont,_ = Array.fold_left (fun (cont,i) _ -> (f i cont,i+1)) (cont,0)
+			       sign.NamedDecls.decls
   in cont
 
 let num_of_site site_name sign =
-  StringMap.find site_name sign.num_of_site
+  StringMap.find site_name sign.NamedDecls.finder
 
 let site_of_num addr sign =
-  try
-    let site_name,_ = sign.assoc.(addr) in site_name
+  try NamedDecls.elt_name sign addr
   with Invalid_argument _ -> raise Not_found
 
 let add_site site_name sign =
-  let size = Array.length sign.assoc in
+  let size = NamedDecls.size sign in
   let assoc =
-    Array.init (size+1) (fun i -> if i<size then sign.assoc.(i) else (site_name,None))
+    Array.init (size+1)
+      (fun i -> if i<size then sign.NamedDecls.decls.(i) else (site_name,None))
   in
-  {sign with
-    assoc = assoc ;
-    num_of_site = StringMap.add site_name size sign.num_of_site}
+    NamedDecls.create assoc
 
 let add_internal_state st site_id sign =
   let (nm,opt) =
-    try sign.assoc.(site_id)
+    try sign.NamedDecls.decls.(site_id)
     with exn -> invalid_arg ("Signature.add_internal_state: "^(Printexc.to_string exn))
   in
   let opt',n =
     match opt with
-    | None -> (Some ([|st|],StringMap.add st 0 StringMap.empty),0)
-    | Some (ar,map) ->
-       let n = Array.length ar in
-       let ar = Array.init (n + 1) (fun i -> if i<n then ar.(i) else st)
+    | None -> (Some (NamedDecls.create [|st,()|]),0)
+    | Some nd ->
+       let n = NamedDecls.size nd in
+       let ar =
+	 Array.init
+	   (n + 1) (fun i -> if i<n then nd.NamedDecls.decls.(i) else (st,()))
        in
-       (Some (ar,StringMap.add st n map),n)
+       (Some (NamedDecls.create ar),n)
   in
-  sign.assoc.(site_id) <- (nm,opt') ;
+  sign.NamedDecls.decls.(site_id) <- (nm,opt') ;
   (sign,n)
 
 let num_of_internal_state site_name state sign =
   try
-    let _,values_opt = sign.assoc.(num_of_site site_name sign) in
+    let _,values_opt = sign.NamedDecls.decls.(num_of_site site_name sign) in
     match values_opt with
     | None -> raise Not_found
-    | Some (_,map) -> StringMap.find state map
+    | Some nd -> StringMap.find state nd.NamedDecls.finder
   with
   | Invalid_argument _ -> raise Not_found
 
 let internal_state_of_num site_num val_num sign =
   try
-    let _,values_opt = sign.assoc.(site_num) in
+    let _,values_opt = sign.NamedDecls.decls.(site_num) in
     match values_opt with
     | None -> raise Not_found
-    | Some (ar,_) -> ar.(val_num)
+    | Some nd -> fst (fst nd.NamedDecls.decls.(val_num))
   with
   | Invalid_argument _ -> raise Not_found
 
 let internal_states_number site_num sign =
   try
-    let _,values_opt = sign.assoc.(site_num) in
+    let _,values_opt = sign.NamedDecls.decls.(site_num) in
     match values_opt with
     | None -> 0
-    | Some (ar,_) -> Array.length ar
+    | Some nd -> NamedDecls.size nd
   with
   | Invalid_argument _ -> raise Not_found
 
 
-let arity sign = Array.length sign.assoc
+let arity sign = NamedDecls.size sign
 
 let default_num_value num_site sign =
   try
-    let _,values_opt = sign.assoc.(num_site) in
+    let _,values_opt = sign.NamedDecls.decls.(num_site) in
     match values_opt with
     | None -> None
     | Some _ -> Some 0
@@ -87,37 +83,31 @@ let default_num_value num_site sign =
      invalid_arg "Signature.default_num_value: invalid site identifier"
 
 let create ag_name intf_map =
-  let assoc = Array.make (StringMap.size intf_map) ("",None) in
-  let _,num_of_site =
+  let assoc = Array.make (StringMap.size intf_map)
+			 (("",(Lexing.dummy_pos,Lexing.dummy_pos)),None) in
+  let _ =
     StringMap.fold
-      (fun site_name (int_state_list,_,pos) (cpt,num_of_site_name) ->
+      (fun site_name (int_state_list,_,pos) cpt ->
        let ar_opt =
 	 match int_state_list with
 	 | [] -> None
 	 | l ->
-	    let ar_site = Array.make (List.length l) "" in
-	    let _,map_site =
-	      List.fold_left
-		(fun (i,num_of_state) v ->
-		 ar_site.(i)<-v ; (i+1,StringMap.add v i num_of_state)
-		) (0,StringMap.empty) l
-	    in
-	    Some (ar_site,map_site)
+	    let a = Array.of_list l in
+	    Some (NamedDecls.create (Array.map (fun x -> (x,())) a))
        in
        let cpt,cpt' =
 	 if site_name = "_" then (0,cpt) else (cpt,cpt+1) in
        (*making sure that "_" gets assigned to 0*)
-       assoc.(cpt) <- (site_name,ar_opt) ;
-       (cpt',StringMap.add site_name cpt num_of_site_name)
+       assoc.(cpt) <- ((site_name,pos),ar_opt) ;
+       cpt'
       )
-      intf_map (1,StringMap.empty)
-  in
-  {control = ag_name ; assoc = assoc ; num_of_site = num_of_site}
+      intf_map 1
+  in NamedDecls.create assoc
 
 let to_string sign =
   let str_of_assoc assoc =
     let cont = ref [] in
-    Array.iteri (fun i (name,_) ->
+    Array.iteri (fun i ((name,_),_) ->
 		 if name = "_" then ()
 		 else
 		   let int =
@@ -129,4 +119,4 @@ let to_string sign =
 		) assoc ;
     String.concat "," (List.rev !cont)
   in
-  Printf.sprintf "(%s)"	(str_of_assoc sign.assoc)
+  Printf.sprintf "(%s)"	(str_of_assoc sign.NamedDecls.decls)

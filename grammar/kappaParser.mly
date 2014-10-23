@@ -15,7 +15,8 @@
 %token <Tools.pos> FLUX ASSIGN ASSIGN2 TOKEN KAPPA_LNK PIPE KAPPA_LRAR
 %token <Tools.pos> PRINT PRINTF
 %token <int> INT
-%token <string*Tools.pos> ID LABEL KAPPA_MRK
+%token <string*Tools.pos> ID LABEL
+%token <string> KAPPA_MRK
 %token <float> FLOAT
 %token <string*Tools.pos> STRING
 %token <Tools.pos> STOP SNAPSHOT
@@ -424,12 +425,12 @@ ne_interface_expression:
 port_expression:
     | ID internal_state link_state
 	 {let (id,pos) = $1 in
-	  {Ast.port_nme=id; Ast.port_int=$2; Ast.port_lnk=$3; Ast.port_pos=pos}}
+	  {Ast.port_nme=(id,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=$3}}
     ;
 
 internal_state:
   /*empty*/ {[]}
-    | KAPPA_MRK internal_state {let m,pos = $1 in m::$2}
+    | KAPPA_MRK internal_state {add_pos $1::$2}
     | error
 	{raise (ExceptionDefn.Syntax_Error (None,"Invalid internal state"))}
     ;

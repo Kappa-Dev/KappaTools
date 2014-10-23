@@ -14,3 +14,7 @@ let name_map_of_array a =
 	 (StringMap.empty,0) a)
 
 let create a = { decls = a; finder = name_map_of_array a}
+
+let size nd = Array.length nd.decls
+
+let elt_name nd i = fst (fst nd.decls.(i))

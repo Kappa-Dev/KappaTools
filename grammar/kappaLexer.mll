@@ -143,8 +143,7 @@ rule token = parse
 	 | '!' {let pos = position lexbuf in KAPPA_LNK pos}
 	 | internal_state as s {let i = String.index s '~' in
 				let r = String.sub s (i+1) (String.length s-i-1) in
-				let pos = position lexbuf in
-				KAPPA_MRK (r,pos)
+				KAPPA_MRK r
 			       }
 	 | '?' {let pos = position lexbuf in (KAPPA_WLD pos)}
 	 | '_' {let pos = position lexbuf in (KAPPA_SEMI pos)}

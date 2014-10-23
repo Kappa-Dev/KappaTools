@@ -10,3 +10,5 @@ type 'a t = private
  }
 
 val create : (string Term.with_pos *'a) array -> 'a t
+val size : 'a t -> int
+val elt_name : 'a t -> int -> string

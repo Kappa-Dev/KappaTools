@@ -215,10 +215,10 @@ let id_of_site agent_name site_name env =
 	let sign = IntMap.find n env.signatures	in
 		Signature.num_of_site site_name sign 
 
-let site_of_id agent_id site_id env = 
-	let sign = IntMap.find agent_id env.signatures in
-		Signature.site_of_num site_id sign
-		
+let site_of_id agent_id site_id env =
+  let sign = IntMap.find agent_id env.signatures in
+  Signature.site_of_num site_id sign
+
 let id_of_state agent_name site_name state env =
 	let agent_id = StringMap.find agent_name env.num_of_name in 
 	let sign = IntMap.find agent_id env.signatures in
@@ -228,13 +228,14 @@ let state_of_id agent_id id_site id_state env =
 	let sign = IntMap.find agent_id env.signatures in
 		Signature.internal_state_of_num id_site id_state sign
 
-let declare_sig sign pos env = 
-	if IntMap.mem (Signature.control sign) env.signatures && not !Parameter.implicitSignature then
+let declare_sig id sign pos env =
+	if IntMap.mem id env.signatures && not !Parameter.implicitSignature then
 		raise (Semantics_Error (pos, "Signature already defined"))
 	else
-		{env with signatures = IntMap.add (Signature.control sign) sign env.signatures}
+		{env with signatures = IntMap.add id sign env.signatures}
 
-let num_of_token = fun str env -> StringMap.find str env.tokens.NamedDecls.finder
+let num_of_token = fun str env ->
+  StringMap.find str env.tokens.NamedDecls.finder
 let token_of_num = fun id env -> fst (fst env.tokens.NamedDecls.decls.(id))
 
 let declare_var_kappa ?(from_rule=false) label_pos_opt env =
