@@ -35,6 +35,27 @@ let event state maybe_active_pert_ids story_profiling
   let state,remain_pert_ids,env,obs_from_perturbation,pert_events =
     External.try_perturbate [] state pert_ids [] counter env
   in
+  (* Adding perturbation event to story -if any *)
+  let story_profiling,event_list,cpt =
+    if Environment.tracking_enabled env then (*if logging events is required*)
+      let story_profiling,event_list,cpt =
+	List.fold_left
+	  (fun (story_prof,event_list,cpt) (r,phi,psi,side_effects) ->
+	   let sp,el =
+	       Compression_main.D.S.PH.B.PB.CI.Po.K.store_event
+		 story_prof
+		 (Compression_main.D.S.PH.B.PB.CI.Po.K.import_event
+		    ((r,phi,psi),(obs_from_perturbation,r,cpt+1,side_effects))) event_list (*we are adding several events with the same id in the grid!*)
+	   in
+	   (sp,el,cpt+1)
+	  ) (story_profiling,event_list,Counter.event counter) pert_events
+      in
+      (story_profiling,event_list,cpt)
+    else
+      (story_profiling,event_list,Counter.event counter)
+  in
+  let () = counter.Counter.perturbation_events <- cpt in
+
   (*3. Time advance*)
   let activity = State.total_activity state in
   if activity < 0. then invalid_arg "Activity invariant violation" ;
@@ -79,7 +100,7 @@ let event state maybe_active_pert_ids story_profiling
       | Null_event i -> (Counter.stat_null i counter ; (None,state))
   in
 
-  (*3. Apply rule & negative update*)
+  (*5. Apply rule & negative update*)
   let opt_new_state =
     match opt_instance with
     | None -> None
@@ -104,7 +125,7 @@ let event state maybe_active_pert_ids story_profiling
        with Null_event _ -> None
   in
 
-  (*4. Positive update*)
+  (*6. Positive update*)
 
   let env,state,pert_ids,story_profiling,event_list =
     match opt_new_state with
@@ -177,29 +198,6 @@ let event state maybe_active_pert_ids story_profiling
        (**************END CFLOW PRODUCTION********************)
        (env,state,IntSet.union pert_ids pert_ids',story_profiling,event_list)
   in
-
-  (*Adding perturbation event to story -if any*)
-  let story_profiling,event_list,cpt =
-    if Environment.tracking_enabled env then (*if logging events is required*)
-      begin
-
-	let story_profiling,event_list,cpt =
-	  List.fold_left
-	    (fun (story_prof,event_list,cpt) (r,phi,psi,side_effects) ->
-	     let sp,el =
-	       Compression_main.D.S.PH.B.PB.CI.Po.K.store_event story_prof
-								(Compression_main.D.S.PH.B.PB.CI.Po.K.import_event
-								   ((r,phi,psi),(obs_from_perturbation,r,cpt+1,side_effects))) event_list (*we are adding several events with the same id in the grid!*)
-	     in
-	     (sp,el,cpt+1)
-	    ) (story_profiling,event_list,Counter.event counter) pert_events
-	in
-	(story_profiling,event_list,cpt)
-      end
-    else
-      (story_profiling,event_list,Counter.event counter)
-  in
-  counter.Counter.perturbation_events <- cpt ;
   (state,pert_ids,story_profiling,event_list,env)
 
 let loop state story_profiling event_list counter plot env =
