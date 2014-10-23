@@ -67,7 +67,7 @@ $(EXPECTED_OUTPUT_PATH)/%.ref: $(EXPECTED_OUTPUT_PATH)/%
 	touch $@
 
 %.diff:  %.ref %.new
-	@diff $^  > $@ || exit 0 
+	@diff -u $^  > $@ || exit 0 
 
 %.new: %
 	@sed '/generation/d' $< > $@
