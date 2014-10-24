@@ -51,9 +51,9 @@ start_rule:
 		    let inst = $1 in
 		    begin
 		      match inst with
-		      | Ast.SIG (ag,pos) ->
+		      | Ast.SIG ag ->
 			 (Ast.result:={!Ast.result with
-					Ast.signatures=(ag,pos)::!Ast.result.Ast.signatures}
+					Ast.signatures=ag::!Ast.result.Ast.signatures}
 			 )
 		      | Ast.TOKENSIG (str_pos) ->
 			 (Ast.result:={!Ast.result with
@@ -90,7 +90,7 @@ start_rule:
     ;
 
 instruction:
-    | SIGNATURE agent_expression {Ast.SIG ($2,$1)}
+    | SIGNATURE agent_expression {Ast.SIG $2}
     | TOKEN ID {let str,pos = $2 in Ast.TOKENSIG (str,rhs_pos 2)}
     | SIGNATURE error {raise (ExceptionDefn.Syntax_Error
 				(Some $1,"Malformed agent signature, I was expecting something of the form '%agent: A(x,y~u~v,z)'"))}
@@ -404,7 +404,7 @@ non_empty_mixture:
 
 agent_expression:
     | ID OP_PAR interface_expression CL_PAR
-	 {let (id,pos) = $1 in {Ast.ag_nme=id; Ast.ag_intf=$3; Ast.ag_pos=pos}}
+	 {let (id,pos) = $1 in ((id,rhs_pos 1), $3)}
     | ID error
 	 {let str,pos = $1 in
 	  raise (ExceptionDefn.Syntax_Error (Some pos,
@@ -412,13 +412,13 @@ agent_expression:
     ;
 
 interface_expression:
-  /*empty*/ {Ast.EMPTY_INTF}
+  /*empty*/ {[]}
     | ne_interface_expression {$1}
     ;
 
 ne_interface_expression:
-    | port_expression COMMA ne_interface_expression {Ast.PORT_SEP($1,$3)}
-    | port_expression {Ast.PORT_SEP($1,Ast.EMPTY_INTF)}
+    | port_expression COMMA ne_interface_expression {$1::$3}
+    | port_expression {[$1]}
     ;
 
 
@@ -436,11 +436,11 @@ internal_state:
     ;
 
 link_state:
-  /*empty*/ {Ast.FREE}
-    | KAPPA_LNK INT {Ast.LNK_VALUE ($2,Tools.pos_of_lex_pos (Parsing.symbol_start_pos ()))}
-    | KAPPA_LNK KAPPA_SEMI {Ast.LNK_SOME $2}
-    | KAPPA_LNK ID DOT ID {Ast.LNK_TYPE ($2,$4)}
-    | KAPPA_WLD {Ast.LNK_ANY $1}
+  /*empty*/ {add_pos Ast.FREE}
+    | KAPPA_LNK INT {(Ast.LNK_VALUE $2,rhs_pos 2)}
+    | KAPPA_LNK KAPPA_SEMI {(Ast.LNK_SOME,rhs_pos 2)}
+    | KAPPA_LNK ID DOT ID {add_pos (Ast.LNK_TYPE ($2,$4))}
+    | KAPPA_WLD {add_pos Ast.LNK_ANY}
     | KAPPA_LNK error
 		{let pos = $1 in
 		 raise (ExceptionDefn.Syntax_Error

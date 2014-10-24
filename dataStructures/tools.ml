@@ -61,10 +61,8 @@ let bit_rep_size n =
 	in
 		aux n 0  
 
-let replace_space str = 
-	let cpt = ref 0 in
-	String.iter (fun c -> if c=' ' then String.set str !cpt '_' ; cpt := !cpt+1) str ;
-	str
+let replace_space str =
+  String.map (fun c -> if c=' ' then '_' else c) str
 
 let read_input () =
 	let rec parse acc input =
@@ -98,6 +96,21 @@ let array_fold_left_mapi f x a =
 			       let () = y := y' in
 			       out) in
   (!y,o)
+
+let array_map_of_list f l =
+  let len = List.length l in
+  let rec fill i v = function
+    | [] -> ()
+    | x :: l ->
+       Array.unsafe_set v i (f x);
+       fill (succ i) v l
+  in
+  match l with
+  | [] -> [||]
+  | x :: l ->
+     let ans = Array.make len (f x) in
+     let () = fill 1 ans l in
+     ans
 
 let find_available_name name ext =
   let base = try Filename.chop_extension name with _ -> name in

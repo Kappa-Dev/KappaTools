@@ -4,17 +4,16 @@ open Mods
 type str_pos = string * Tools.pos
 
 type link =
-  | LNK_VALUE of int * Tools.pos
+  | LNK_VALUE of int
   | FREE
-  | LNK_ANY of Tools.pos
-  | LNK_SOME of Tools.pos
+  | LNK_ANY
+  | LNK_SOME
   | LNK_TYPE of str_pos * str_pos
 type internal = string Term.with_pos list
 type port = {port_nme:string Term.with_pos;
 	     port_int:internal;
-	     port_lnk:link;}
-type interface = PORT_SEP of port * interface | EMPTY_INTF
-type agent = {ag_nme:string ; ag_intf:interface ; ag_pos:Tools.pos}
+	     port_lnk:link with_pos;}
+type agent = (string with_pos * port list)
 type mixture =
 	| COMMA of agent * mixture
 	| EMPTY_MIX
@@ -103,7 +102,7 @@ type 'mixture init_t =
   | INIT_TOK of 'mixture ast_alg_expr with_pos * str_pos
 
 type 'mixture instruction =
-  | SIG of agent * Tools.pos
+  | SIG of agent
   | TOKENSIG of string Term.with_pos
   | VOLSIG of str_pos * float * str_pos (* type, volume, parameter*)
   | INIT of str_pos option * 'mixture init_t * Tools.pos (*volume, init, position *)
@@ -116,7 +115,7 @@ type 'mixture instruction =
 type ('agent,'mixture,'rule) compil =
   {
     variables : 'mixture variable_def list; (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
-    signatures : ('agent * Tools.pos) list ; (*agent signature declaration*)
+    signatures : 'agent list ; (*agent signature declaration*)
     rules : (rule_label * 'rule) list ; (*rules (possibly named)*)
     observables : 'mixture ast_alg_expr with_pos list ; (*list of patterns to plot*)
     init : (str_pos option * 'mixture init_t * Tools.pos) list ; (*initial graph declaration*)

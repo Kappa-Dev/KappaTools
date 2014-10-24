@@ -198,6 +198,7 @@ let main =
 	with
 	| ExceptionDefn.Semantics_Error (pos, msg) -> 
 		(close_desc None ; Printf.eprintf "***Error (%s) line %d, char %d: %s***\n" (fn pos) (ln pos) (cn pos) msg)
+	| ExceptionDefn.Malformed_Decl er -> Pp.error Pp.string er
 	| Invalid_argument msg ->	(close_desc None; let s = "" (*Printexc.get_backtrace()*) in Printf.eprintf "\n***Runtime error %s***\n%s\n" msg s)
 	| ExceptionDefn.UserInterrupted f -> 
 		let msg = f 0. 0 in 

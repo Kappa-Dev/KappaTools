@@ -10,10 +10,32 @@ type context =
     { pairing : link IntMap.t; curr_id : int;
       new_edges : (int * int) Int2Map.t }
 
+let interface_for_def ast_intf =
+  NamedDecls.create (
+    array_map_of_list
+      (fun p ->
+       match p.Ast.port_lnk with
+       | (Ast.FREE,_) ->
+	  (p.Ast.port_nme,
+	   match p.Ast.port_int with
+	   | [] -> None
+	   | l ->
+	      Some (NamedDecls.create (array_map_of_list (fun x -> (x,())) l))
+	  )
+       | (_, pos) ->
+	  raise (ExceptionDefn.Malformed_Decl
+		("Link status inside a definition of signature", pos))
+      ) ({Ast.port_nme =("_",(Lexing.dummy_pos,Lexing.dummy_pos));
+	  Ast.port_int=[];
+	  Ast.port_lnk =(Ast.FREE,(Lexing.dummy_pos,Lexing.dummy_pos));}
+	 :: ast_intf))
+
+let interface_for_decl ast_intf =()
+
 let eval_intf ast_intf =
   let rec iter ast_intf map =
     match ast_intf with
-    | Ast.PORT_SEP (p, ast_interface) ->
+    | p :: ast_interface ->
        let int_state_list = p.Ast.port_int
        and lnk_state = p.Ast.port_lnk
        in
@@ -25,36 +47,30 @@ let eval_intf ast_intf =
        else
 	 iter ast_interface
 	      (StringMap.add (fst p.Ast.port_nme) (int_state_list, lnk_state, (snd p.Ast.port_nme)) map)
-    | Ast.EMPTY_INTF -> StringMap.add "_" ([], Ast.FREE, (Lexing.dummy_pos,Lexing.dummy_pos)) map
+    | [] ->
+       StringMap.add
+	 "_" ([], (Ast.FREE,(Lexing.dummy_pos,Lexing.dummy_pos)), (Lexing.dummy_pos,Lexing.dummy_pos)) map
   in (*Adding default existential port*) iter ast_intf StringMap.empty
 
 let eval_node env a link_map node_map node_id =
-  let ast_intf = a.Ast.ag_intf in
-  let ag_name = a.Ast.ag_nme in
-  let pos_ag = a.Ast.ag_pos in
+  let ast_intf = snd a in
+  let ag_name = fst (fst a) in
+  let pos_ag = pos_of_lex_pos (fst (snd (fst a))) in
   let env,name_id =
     try (env,Environment.num_of_name ag_name env) with
     | Not_found ->
-       if !Parameter.implicitSignature
-       then (Environment.declare_name ag_name pos_ag env)
-       else raise (ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared"))
+       raise (ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared"))
   in
   let env,sign =
     try (env,Environment.get_sig name_id env) with
     | Not_found ->
-       if !Parameter.implicitSignature then
-	 let sign =
-	   Signature.create
-	     name_id
-	     (StringMap.add "_" ([], Ast.FREE, (Lexing.dummy_pos, Lexing.dummy_pos)) StringMap.empty)
-	 in (Environment.declare_sig name_id sign pos_ag env,sign)
-       else raise (ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared"))
+       raise (ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared"))
   in
 
   (*Begin sub function*)
   let rec build_intf ast link_map intf bond_list sign =
     match ast with
-    | Ast.PORT_SEP (p,ast') ->
+    | p :: ast' ->
        begin
 	 let int_state_list = p.Ast.port_int
 	 and lnk_state = p.Ast.port_lnk in
@@ -72,18 +88,19 @@ let eval_node env a link_map node_map node_id =
 	 in
 	 let link_map,bond_list =
 	   match lnk_state with
-	   | Ast.LNK_VALUE (i,pos) ->
+	   | (Ast.LNK_VALUE (i),(beg_pos,_)) ->
 	      begin
+		let pos = pos_of_lex_pos beg_pos in
 		try
-		  let opt_node = IntMap.find i link_map
-		  in
+		  let opt_node = IntMap.find i link_map in
 		  match opt_node with
-		  | None -> raise (ExceptionDefn.Semantics_Error (pos,"Edge identifier at site '" ^ port_name ^ "' is used multiple times"))
+		  | None -> raise (ExceptionDefn.Semantics_Error
+				     (pos,"Edge identifier at site '" ^ port_name ^ "' is used multiple times"))
 		  | Some (node_id',port_id',pos') ->
 		     (IntMap.add i None link_map,(node_id,port_id,node_id',port_id')::bond_list)
 		with Not_found -> (IntMap.add i (Some (node_id,port_id,pos)) link_map,bond_list)
 	      end
-	   | Ast.FREE -> (link_map,bond_list)
+	   | (Ast.FREE,_) -> (link_map,bond_list)
 	   | _ -> raise (ExceptionDefn.Semantics_Error
 			   (port_pos,"Site '" ^ port_name ^ "' is partially defined"))
 	 in
@@ -102,11 +119,7 @@ let eval_node env a link_map node_map node_id =
 	    in
 	    build_intf ast' link_map (IntMap.add port_id (Some i,Node.WLD) intf) bond_list sign (*Geekish, adding Node.WLD to be consistent with Node.create*)
        end
-    | Ast.EMPTY_INTF ->
-       let env = if !Parameter.implicitSignature
-		 then Environment.declare_sig name_id sign pos_ag env
-		 else env
-       in (bond_list,link_map,intf,env)
+    | [] -> (bond_list,link_map,intf,env)
   in
   (*end sub function*)
 
@@ -145,14 +158,12 @@ let nodes_of_ast env ast_mixture =
   iter ast_mixture IntMap.empty 0 IntMap.empty env
 
 let eval_agent is_pattern tolerate_new_state env a ctxt =
-  let (ag_name, ast_intf, pos_ag) =
-    ((a.Ast.ag_nme), (a.Ast.ag_intf), (a.Ast.ag_pos)) in
+  let ((ag_name, (pos_ag)),ast_intf) = a in
   let env,name_id =
     try (env,Environment.num_of_name ag_name env) with
     | Not_found ->
-       if !Parameter.implicitSignature
-       then (Environment.declare_name ag_name pos_ag env)
-       else raise (ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared"))
+       raise (ExceptionDefn.Malformed_Decl
+		("Agent '" ^ ag_name ^ "' is not declared",pos_ag))
   in
   let sign_opt =
     try Some (Environment.get_sig name_id env) with Not_found -> None in
@@ -160,13 +171,8 @@ let eval_agent is_pattern tolerate_new_state env a ctxt =
     match sign_opt with
     | Some s -> (env,s)
     | None ->
-       if !Parameter.implicitSignature then
-	 let sign =
-	   Signature.create
-	     name_id (StringMap.add "_" ([], Ast.FREE, (Lexing.dummy_pos,Lexing.dummy_pos)) StringMap.empty) in 
-	 (Environment.declare_sig name_id sign pos_ag env,sign)
-       else
-	 raise (ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared")) 
+       raise (ExceptionDefn.Malformed_Decl
+		("Agent '" ^ ag_name ^ "' is not declared",pos_ag))
   in
   let port_map = eval_intf ast_intf in
   let (interface, ctxt, sign) =
@@ -191,7 +197,7 @@ let eval_agent is_pattern tolerate_new_state env a ctxt =
 	 | [] -> (None,sign)
 	 | h::_ ->
 	    try
-	      Environment.check ag_name pos_ag site_name
+	      Environment.check ag_name (pos_of_lex_pos (fst pos_ag)) site_name
 				(pos_of_lex_pos beg_pos) (fst h) env;
 	      let i = Environment.id_of_state ag_name site_name (fst h) env
 	      in
@@ -207,8 +213,9 @@ let eval_agent is_pattern tolerate_new_state env a ctxt =
 	      else raise exn
        in
        let interface,ctx =
-	 match lnk_state with
-	 | Ast.LNK_VALUE (n, pos) ->
+	 let pos = pos_of_lex_pos (fst (snd lnk_state)) in
+	 match fst lnk_state with
+	 | Ast.LNK_VALUE n ->
 	    let lnk =
 	      (try Some (IntMap.find n ctxt.pairing)
 	       with | Not_found -> None)
@@ -237,13 +244,13 @@ let eval_agent is_pattern tolerate_new_state env a ctxt =
 				ctxt.pairing;
 		})
 	    )
-	 | Ast.LNK_SOME pos ->
+	 | Ast.LNK_SOME ->
 	    if is_pattern
 	    then ((IntMap.add site_id (int_s, Node.BND) interface), ctxt)
 	    else
 	      (let msg = "illegal use of '_' in concrete graph definition"
 	       in raise (ExceptionDefn.Semantics_Error (pos, msg)))
-	 | Ast.LNK_ANY pos ->
+	 | Ast.LNK_ANY ->
 	    if is_pattern
 	    then ((IntMap.add site_id (int_s, Node.WLD) interface), ctxt)
 	    else
@@ -276,9 +283,6 @@ let eval_agent is_pattern tolerate_new_state env a ctxt =
        (interface,ctx,sign)
       )
       port_map (IntMap.empty, ctxt, sign)
-  in
-  let env = if !Parameter.implicitSignature then
-	      Environment.declare_sig name_id sign pos_ag env else env
   in
   (ctxt, (Mixture.create_agent name_id interface), env)
 
@@ -456,13 +460,6 @@ let rec partial_eval_bool env mixs (ast,_) =
      | BOOL_OP(Term.AND,ast, ast') -> bin_op_bool ast ast' (&&)
      | BOOL_OP(Term.OR,ast, ast') -> bin_op_bool ast ast' (||)
      | COMPARE_OP(op,ast, ast') -> bin_op_alg ast ast' (Nbr.of_compare_op op)
-
-let signature_of_ast s env =
-  let (name, ast_intf, pos) =
-    ((s.Ast.ag_nme), (s.Ast.ag_intf), (s.Ast.ag_pos)) in
-  let intf_map = eval_intf ast_intf in
-  let env,name_id = Environment.declare_name name pos env in
-  (name_id,Signature.create name_id intf_map,env)
 
 let reduce_val v env mixs =
   let (env', mixs', k, const, opt_v) = partial_eval_alg env mixs v in
@@ -716,14 +713,6 @@ let rules_of_result env mixs res tolerate_new_state =
       )
       (env, mixs, []) res.Ast.rules
   in (env, mixs, (List.rev l))
-
-let environment_of_result env res =
-  List.fold_left
-    (fun env (sign, pos) ->
-     let name_id,sign,env = signature_of_ast sign env in
-     Environment.declare_sig name_id sign pos env
-    )
-    env res.Ast.signatures
 
 let obs_of_result env mixs res =
   List.fold_left
@@ -1280,8 +1269,12 @@ let initialize result counter =
   let _ = configurations_of_result result in
 
   Debug.tag "\t -agent signatures" ;
-  let tk_l = List.map (fun x -> (x,())) result.Ast.tokens in
-  let tk_nd = NamedDecls.create (Array.of_list tk_l) in
+  let sigs_nd =
+    NamedDecls.create (array_map_of_list
+			 (fun (name,intf) -> (name,interface_for_def intf))
+			 result.Ast.signatures) in
+  let tk_nd =
+    NamedDecls.create (array_map_of_list (fun x -> (x,())) result.Ast.tokens) in
 
   Debug.tag "\t -variable declarations";
   let vars_nd = NamedDecls.create (Array.of_list result.Ast.variables) in
@@ -1294,10 +1287,9 @@ let initialize result counter =
 			  in (mixs',(lbl_pos,alg))) (0,[])
 			 vars_nd.NamedDecls.decls
   in
+  let env =
+    Environment.init sigs_nd tk_nd (NamedDecls.create alg_a) fresh_kappa in
 
-  let env = Environment.init tk_nd (NamedDecls.create alg_a) fresh_kappa in
-
-  let env = environment_of_result env result in
   let (env, kappa_vars, alg_vars) = variables_of_result env mixs alg_a in
 
   Debug.tag "\t -initial conditions";

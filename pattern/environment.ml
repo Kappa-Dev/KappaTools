@@ -2,18 +2,14 @@ open Mods
 open ExceptionDefn
 
 type t = {
+  signatures : Signature.t NamedDecls.t;
   tokens : unit NamedDecls.t;
   algs : (Expr.alg_expr Term.with_pos) NamedDecls.t;
   perturbations : unit NamedDecls.t;
 
-	signatures : Signature.t IntMap.t;
 	fresh_kappa : int ;
 	num_of_kappa : int StringMap.t ; 
 	kappa_of_num : string IntMap.t ;
-	
-	fresh_name : int ;
-	num_of_name : int StringMap.t ;
-	name_of_num : string IntMap.t ;
 	
 	dependencies :  Term.DepSet.t Term.DepMap.t ; (*ALG i or KAPPA i -> {ALG j, RULE j} = modifying i implies recomputing j --closure is done*)  
 	
@@ -44,10 +40,7 @@ type t = {
 }
 
 let empty =
-	{signatures = IntMap.empty ; 
-	fresh_name = 0;
-	num_of_name = StringMap.empty ;
-	name_of_num = IntMap.empty ;
+	{signatures = NamedDecls.create [||] ;
 	num_of_kappa = StringMap.empty ; 
 	kappa_of_num = IntMap.empty ;
 	num_of_rule = StringMap.empty ;
@@ -75,8 +68,9 @@ let empty =
 	desc_table = Hashtbl.create 2 
 }
 
-let init tokens algs fresh_kappa =
-  { empty with tokens = tokens; algs = algs; fresh_kappa = fresh_kappa }
+let init sigs tokens algs fresh_kappa =
+  { empty with signatures = sigs; tokens = tokens;
+	       algs = algs; fresh_kappa = fresh_kappa }
 
 let get_desc file env = 
 	try Hashtbl.find env.desc_table file with 
@@ -126,8 +120,8 @@ let declare_empty_lhs id env = {env with empty_lhs = IntSet.add id env.empty_lhs
 let is_empty_lhs id env = IntSet.mem id env.empty_lhs
 
 (*let log env = env.log*)
-let name i env = IntMap.find i env.name_of_num
-let num_of_name nme env = StringMap.find nme env.num_of_name
+let name i env = NamedDecls.elt_name env.signatures i
+let num_of_name nme env = StringMap.find nme env.signatures.NamedDecls.finder
 let num_of_kappa lab env = StringMap.find lab env.num_of_kappa 
 let kappa_of_num i env =  IntMap.find i env.kappa_of_num 
 let num_of_rule lab env = StringMap.find lab env.num_of_rule
@@ -156,21 +150,7 @@ let declare_pert (lab,pos) env =
 					pert_of_num = IntMap.add i lab env.pert_of_num ;
 					num_of_pert = StringMap.add lab i env.num_of_pert
 				},i)
-
-let declare_name nme pos env = 
-	let opt = try Some (num_of_name nme env) with Not_found -> None in
-		match opt with
-			| Some i -> 
-				(ExceptionDefn.warning ~with_pos:pos ("Agent '"^nme^"' is defined twice, ignoring additional occurence") ; (env,i)) 
-			| None ->
-				let i,env = (env.fresh_name,{env with fresh_name = env.fresh_name+1})
-				in
-					({env with
-						name_of_num = IntMap.add i nme env.name_of_num ;
-						num_of_name = StringMap.add nme i env.num_of_name
-					},i)
-
-let name_number env = env.fresh_name
+let name_number env = NamedDecls.size env.signatures
 
 let add_dependencies dep dep' env =
   let set = try Term.DepMap.find dep env.dependencies
@@ -211,28 +191,22 @@ let declare_unary_rule rule_lbl id env =
 					{env with num_of_unary_rule = nr ; unary_rule_of_num = rn}
 
 let id_of_site agent_name site_name env =
-	let n = StringMap.find agent_name env.num_of_name in
-	let sign = IntMap.find n env.signatures	in
-		Signature.num_of_site site_name sign 
+  let n = StringMap.find agent_name env.signatures.NamedDecls.finder in
+  let (_,sign) = env.signatures.NamedDecls.decls.(n) in
+  Signature.num_of_site site_name sign
 
 let site_of_id agent_id site_id env =
-  let sign = IntMap.find agent_id env.signatures in
+  let (_,sign) = env.signatures.NamedDecls.decls.(agent_id) in
   Signature.site_of_num site_id sign
 
 let id_of_state agent_name site_name state env =
-	let agent_id = StringMap.find agent_name env.num_of_name in 
-	let sign = IntMap.find agent_id env.signatures in
-		Signature.num_of_internal_state site_name state sign
+  let n = StringMap.find agent_name env.signatures.NamedDecls.finder in
+  let (_,sign) = env.signatures.NamedDecls.decls.(n) in
+  Signature.num_of_internal_state site_name state sign
 
-let state_of_id agent_id id_site id_state env = 
-	let sign = IntMap.find agent_id env.signatures in
-		Signature.internal_state_of_num id_site id_state sign
-
-let declare_sig id sign pos env =
-	if IntMap.mem id env.signatures && not !Parameter.implicitSignature then
-		raise (Semantics_Error (pos, "Signature already defined"))
-	else
-		{env with signatures = IntMap.add id sign env.signatures}
+let state_of_id agent_id id_site id_state env =
+  let (_,sign) = env.signatures.NamedDecls.decls.(agent_id) in
+  Signature.internal_state_of_num id_site id_state sign
 
 let num_of_token = fun str env ->
   StringMap.find str env.tokens.NamedDecls.finder
@@ -260,30 +234,35 @@ let declare_var_kappa ?(from_rule=false) label_pos_opt env =
 					kappa_of_num = pn ; 
 					fresh_kappa = fp},fp-1)
 
-let get_sig agent_id env = 
-	if agent_id = -1 then invalid_arg "Environment.get_sig: Empty agent has no signature"
-	else 
-		IntMap.find agent_id env.signatures
+let get_sig agent_id env =
+  if agent_id = -1
+  then invalid_arg "Environment.get_sig: Empty agent has no signature"
+  else snd env.signatures.NamedDecls.decls.(agent_id)
 
 let check agent_name pos_ag site_name pos_site int_state env =
-	let agent_id = try StringMap.find agent_name env.num_of_name with
-		Not_found -> raise (Semantics_Error (pos_ag, "Undeclared agent \""^agent_name^"\""))
-	in
-	let sign = try IntMap.find agent_id env.signatures with 
-		Not_found -> raise (Semantics_Error (pos_ag, "Undeclared signature for agent \""^agent_name^"\""))
-	in
-		let _ = try Signature.num_of_site site_name sign with
-			Not_found -> raise (Semantics_Error (pos_site, "Site "^site_name^" is not consistent with \""^agent_name^"\"'s signature"))
-		and _ = try Signature.num_of_internal_state site_name int_state sign with  
-			Not_found -> raise (Semantics_Error (pos_site, "Internal state \""^int_state^"\" of site '"^site_name^"' is not consistent with \""^agent_name^"\"'s signature "))
-		in
-			()
+  let agent_id =
+    try StringMap.find agent_name env.signatures.NamedDecls.finder
+    with Not_found ->
+      raise (Semantics_Error (pos_ag, "Undeclared agent \""^agent_name^"\""))
+  in
+  let (_,sign) = env.signatures.NamedDecls.decls.(agent_id) in
+  let _ =
+    try Signature.num_of_site site_name sign with
+      Not_found ->
+      raise (Semantics_Error
+	       (pos_site, "Site "^site_name^" is not consistent with \""^agent_name^"\"'s signature"))
+  in
+  let _ =
+    try Signature.num_of_internal_state site_name int_state sign with
+      Not_found ->
+      raise (Semantics_Error
+	       (pos_site, "Internal state \""^int_state^"\" of site '"^site_name^"' is not consistent with \""^agent_name^"\"'s signature "))
+  in
+  ()
 
-let default_state name_id site_id env = 
-	let sign = try IntMap.find name_id env.signatures with
-		| Not_found -> invalid_arg ("Undeclared agent id\""^(string_of_int name_id)^"\"")
-	in
-		Signature.default_num_value site_id sign
+let default_state name_id site_id env =
+  let (_,sign) = env.signatures.NamedDecls.decls.(name_id) in
+  Signature.default_num_value site_id sign
 
 let print_rule env f id = Printf.fprintf f "%s" (rule_of_num id env)
 let print_alg env f id = Printf.fprintf f "%s" (fst (alg_of_num id env))

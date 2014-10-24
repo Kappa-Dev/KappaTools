@@ -274,27 +274,19 @@ let enum_alternate_anchors mix =
 				size_of_cc = size_of_cc}
 
 let site_defined site_id ag is_added env =
-	try
-		let (int,lnk) = IntMap.find site_id ag.interface
-		in
-			let tested = 
-				match int with
-					| Some _ -> true
-					| None -> false
-			in
-				if tested then Some (int,lnk)
-				else
-					match lnk with
-						| Node.WLD -> None
-						| _ -> Some (int,lnk)
-	with
-		| Not_found -> 
-			if not is_added then None
-			else 
-				try
-					Some (Environment.default_state (name ag) site_id env,Node.FREE)
-				with
-					| Not_found -> invalid_arg "Mixture.site_defined: invariant violation"
+  try
+    let (int,lnk) = IntMap.find site_id ag.interface in
+    match int with
+    | Some _ -> Some (int,lnk)
+    | None ->
+       match lnk with
+       | Node.WLD -> None
+       | _ -> Some (int,lnk)
+  with Not_found ->
+    if not is_added then None
+    else
+      try Some (Environment.default_state (name ag) site_id env,Node.FREE)
+      with Not_found -> invalid_arg "Mixture.site_defined: invariant violation"
 
 
 let dump_span mix = 
