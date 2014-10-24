@@ -1,0 +1,8 @@
+#Command-line:
+KaSim -i internal.ka -seed 240056667 -e 30000 -d expected-output || exit 0 
+
+#Test with modification without test.
+#There should be only one causal flow
+
+
+
