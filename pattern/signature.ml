@@ -15,33 +15,6 @@ let site_of_num addr sign =
   try NamedDecls.elt_name sign addr
   with Invalid_argument _ -> raise Not_found
 
-let add_site site_name sign =
-  let size = NamedDecls.size sign in
-  let assoc =
-    Array.init (size+1)
-      (fun i -> if i<size then sign.NamedDecls.decls.(i) else (site_name,None))
-  in
-    NamedDecls.create assoc
-
-let add_internal_state st site_id sign =
-  let (nm,opt) =
-    try sign.NamedDecls.decls.(site_id)
-    with exn -> invalid_arg ("Signature.add_internal_state: "^(Printexc.to_string exn))
-  in
-  let opt',n =
-    match opt with
-    | None -> (Some (NamedDecls.create [|st,()|]),0)
-    | Some nd ->
-       let n = NamedDecls.size nd in
-       let ar =
-	 Array.init
-	   (n + 1) (fun i -> if i<n then nd.NamedDecls.decls.(i) else (st,()))
-       in
-       (Some (NamedDecls.create ar),n)
-  in
-  sign.NamedDecls.decls.(site_id) <- (nm,opt') ;
-  (sign,n)
-
 let num_of_internal_state site_name state sign =
   try
     let _,values_opt = sign.NamedDecls.decls.(num_of_site site_name sign) in
@@ -68,7 +41,6 @@ let internal_states_number site_num sign =
     | Some nd -> NamedDecls.size nd
   with
   | Invalid_argument _ -> raise Not_found
-
 
 let arity sign = NamedDecls.size sign
 
