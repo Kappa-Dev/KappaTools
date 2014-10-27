@@ -8,3 +8,4 @@ val comma : out_channel -> unit
 val colon : out_channel -> unit
 val space : out_channel -> unit
 val error : (out_channel -> 'a -> unit) -> 'a Term.with_pos -> unit
+val warning : (out_channel -> 'a -> unit) -> 'a Term.with_pos -> unit

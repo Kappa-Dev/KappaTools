@@ -63,7 +63,6 @@ type rule = {
   kappa: string;
   lhs : Mixture.t;
   rhs : Mixture.t;
-  refines: int option; (** mixture id that is refined by lhs *)
   r_id : int;
   added : Mods.IntSet.t;
   (*side_effect : bool ;*)
@@ -81,8 +80,7 @@ type rule = {
 (*side_effect: ag_i -> {site_j,...} if one should check at runtime the id of the agent connected to (ag_i,site_j) and build its cc after rule application*)
 
 type modification =
-    INTRO of Nbr.t variable * Mixture.t
-  | DELETE of Nbr.t variable * Mixture.t
+    ITER_RULE of Nbr.t variable * rule
   | UPDATE_RULE of int * Nbr.t variable
   | UPDATE_VAR of int * Nbr.t variable
   | UPDATE_TOK of int * Nbr.t variable

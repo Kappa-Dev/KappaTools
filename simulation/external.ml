@@ -103,22 +103,17 @@ let apply_n_time x r state env counter pert_ids pert_events tracked =
 
 let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot counter =
   match eff with
-  | (Some r,Primitives.INTRO (v,mix)) ->
+  | (Some _,Primitives.ITER_RULE (v,r)) ->
      let x = State.value state counter env v in
     if x = Nbr.F infinity then
       let p_str = pert.Primitives.flag in
       invalid_arg
-	("Perturbation "^p_str^" would introduce an infinite number of agents, aborting...")
+	("Perturbation "^p_str^" would be applied infinitely, aborting...")
     else
       let () =
-	Debug.tag_if_debug "Introducing %a instances of %a"
-			   Nbr.print x (Mixture.print false env) mix
+	Debug.tag_if_debug "Applying %a instances of %a"
+			   Nbr.print x (Dynamics.pp_effect env) eff
       in apply_n_time x r state env counter pert_ids pert_events tracked
-  | (Some r,Primitives.DELETE (v,mix)) ->
-     let mix_id = Mixture.get_id r.Primitives.lhs in
-     let instance_num = State.instance_number mix_id state env in
-     let x = (Nbr.min (State.value state counter env v) instance_num) in
-     apply_n_time x r state env counter pert_ids pert_events tracked
   | (None,Primitives.UPDATE_RULE (id,v)) ->
      let () =
        Debug.tag_if_debug "Updating rate of rule '%a'"

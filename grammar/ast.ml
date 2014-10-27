@@ -53,10 +53,9 @@ type rule = {
 }
 
 and arrow = RAR of Tools.pos | LRAR of Tools.pos
-type rule_label = {lbl_nme:str_pos option ; lbl_ref:str_pos option}
 
 let flip (rule_label,rule) =
-  let lbl = match rule_label.lbl_nme with
+  let lbl = match rule_label with
       None -> None
     | Some (str,pos) -> Some (str^"_op",pos) in
   let rule =
@@ -66,13 +65,12 @@ let flip (rule_label,rule) =
       add_token = rule.rm_token ;
       rm_token = rule.add_token ;
       k_def = (match rule.k_op with
-		 None -> CONST (Nbr.F 0.),
-			 (Lexing.dummy_pos, Lexing.dummy_pos)
+		 None -> Term.with_dummy_pos (CONST (Nbr.F 0.))
 	       | Some k -> k);
       k_op = None
     }
   in
-  ({rule_label with lbl_nme=lbl},rule)
+  (lbl,rule)
 
 type 'mixture print_expr = Str_pexpr of string | Alg_pexpr of 'mixture ast_alg_expr
 type 'mixture modif_expr =
@@ -116,7 +114,7 @@ type ('agent,'mixture,'rule) compil =
   {
     variables : 'mixture variable_def list; (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
     signatures : 'agent list ; (*agent signature declaration*)
-    rules : (rule_label * 'rule) list ; (*rules (possibly named)*)
+    rules : (string with_pos option * 'rule) list ; (*rules (possibly named)*)
     observables : 'mixture ast_alg_expr with_pos list ; (*list of patterns to plot*)
     init : (str_pos option * 'mixture init_t * Tools.pos) list ; (*initial graph declaration*)
     perturbations : 'mixture perturbation list ;

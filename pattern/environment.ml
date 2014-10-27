@@ -172,7 +172,8 @@ let declare_rule rule_lbl id env =
 	match rule_lbl with
 		| None -> env
 		| Some (r_nme,pos) ->
-			if StringMap.mem r_nme env.num_of_rule then raise (Semantics_Error (pos, ("Rule name "^r_nme^" is already used")))
+			if StringMap.mem r_nme env.num_of_rule
+			then raise (Malformed_Decl (("Rule name "^r_nme^" is already used"),pos))
 			else
 				let nr = StringMap.add r_nme id env.num_of_rule
 				and rn = IntMap.add id r_nme env.rule_of_num
@@ -215,14 +216,16 @@ let token_of_num = fun id env -> fst (fst env.tokens.NamedDecls.decls.(id))
 let declare_var_kappa ?(from_rule=false) label_pos_opt env =
 	let label,pos = match label_pos_opt with
 		| Some (label,pos) -> (label,pos)
-		| None -> ("%anonymous"^(string_of_int env.fresh_kappa),Tools.no_pos) (*geek*)
+		| None ->
+		   Term.with_dummy_pos ("%anonymous"^(string_of_int env.fresh_kappa)) (*geek*)
 	in 
 	let already_defined = 
 		(try let _ = num_of_kappa label env in true with Not_found -> false)
 		||
 		(try let _ = num_of_alg label env in true with Not_found -> false)
 	in
-		if already_defined then raise (Semantics_Error (pos, (Printf.sprintf "Label '%s' already defined" label)))
+		if already_defined then
+		  raise (Malformed_Decl ((Printf.sprintf "Label '%s' already defined" label),pos))
 		else
 			let np = StringMap.add label env.fresh_kappa env.num_of_kappa
 			and pn = IntMap.add env.fresh_kappa label env.kappa_of_num

@@ -16,13 +16,19 @@ let comma f = fprintf f ", "
 let colon f = fprintf f "; "
 let space f = fprintf f " "
 
-let error pr (x,(beg_pos,end_pos)) =
+let position f (beg_pos,end_pos) =
   let () = assert (beg_pos.Lexing.pos_fname = end_pos.Lexing.pos_fname) in
   let pr_l f =
     if beg_pos.Lexing.pos_lnum = end_pos.Lexing.pos_lnum
     then fprintf f "line %i" beg_pos.Lexing.pos_lnum
     else fprintf f "lines %i-%i" beg_pos.Lexing.pos_lnum end_pos.Lexing.pos_lnum
   in
-  eprintf "File \"%s\", %t, characters %i-%i:@ %a" beg_pos.Lexing.pos_fname pr_l
+  fprintf f "File \"%s\", %t, characters %i-%i:" beg_pos.Lexing.pos_fname pr_l
 	  (beg_pos.Lexing.pos_cnum - beg_pos.Lexing.pos_bol)
-	  (end_pos.Lexing.pos_cnum - end_pos.Lexing.pos_bol) pr x
+	  (end_pos.Lexing.pos_cnum - end_pos.Lexing.pos_bol)
+
+let error pr (x,pos) =
+  eprintf "%a:@ %a@." position pos pr x
+
+let warning pr (x,pos) =
+eprintf "%a:@ <Warning>@ %a@." position pos pr x

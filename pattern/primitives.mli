@@ -47,7 +47,6 @@ type rule = {
   kappa: string;
   lhs : Mixture.t;
   rhs : Mixture.t;
-  refines: int option; (** mixture id that is refined by lhs *)
   r_id : int;
   added : Mods.IntSet.t;
   modif_sites : Mods.Int2Set.t IdMap.t;
@@ -61,8 +60,7 @@ type rule = {
 }
 
 type modification =
-    INTRO of Nbr.t variable * Mixture.t
-  | DELETE of Nbr.t variable * Mixture.t
+    ITER_RULE of Nbr.t variable * rule
   | UPDATE_RULE of int * Nbr.t variable
   | UPDATE_VAR of int * Nbr.t variable
   | UPDATE_TOK of int * Nbr.t variable

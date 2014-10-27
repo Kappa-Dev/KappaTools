@@ -430,23 +430,20 @@ let build_influence_map rules patterns env =
   let influence_map = Hashtbl.create (Hashtbl.length rules) in
   Hashtbl.iter
     (fun i r ->
-     match r.refines with
-     | Some _ -> ()
-     | None ->
-	Array.iteri
-	  (fun j opt ->
-	   match opt with
-	   | None -> () (*empty pattern*)
-	   | Some mix ->
-	      Debug.tag_if_debug "%s -+-> %a?" (Dynamics.to_kappa r env)
-				 (Mixture.print false env) mix;
-	      let glueings = Dynamics.enable r mix env in
-	      (*glueings: [phi_0;...;phi_n] partial embeddings list*)
-	      match glueings with
-	      | [] -> Debug.tag_if_debug "No"
-	      | _ ->
-		 Debug.tag_if_debug "Yes";
-		 add_influence influence_map i j glueings) patterns
+     Array.iteri
+       (fun j opt ->
+	match opt with
+	| None -> () (*empty pattern*)
+	| Some mix ->
+	   Debug.tag_if_debug "%s -+-> %a?" (Dynamics.to_kappa r env)
+			      (Mixture.print false env) mix;
+	   let glueings = Dynamics.enable r mix env in
+	   (*glueings: [phi_0;...;phi_n] partial embeddings list*)
+	   match glueings with
+	   | [] -> Debug.tag_if_debug "No"
+	   | _ ->
+	      Debug.tag_if_debug "Yes";
+	      add_influence influence_map i j glueings) patterns
     ) rules;
   influence_map
 

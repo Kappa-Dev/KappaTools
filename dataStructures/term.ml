@@ -77,3 +77,8 @@ let dep_to_string () = function
 let dep_of_state_alg_op = function
   | CPUTIME | EVENT_VAR | NULL_EVENT_VAR | PROD_EVENT_VAR -> EVENT
   | TIME_VAR -> TIME
+
+let with_dummy_pos x = (x, (Lexing.dummy_pos, Lexing.dummy_pos))
+let has_dummy_pos (_,(b_pos,e_pos)) =
+  b_pos = Lexing.dummy_pos &&
+    (e_pos = Lexing.dummy_pos || failwith "half dummy_pos")

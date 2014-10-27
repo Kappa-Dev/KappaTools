@@ -265,9 +265,9 @@ multiple:
 
 rule_label:
   /*empty */
-      {{Ast.lbl_nme = None ; Ast.lbl_ref = None}}
+      {None}
     | LABEL
-	{let lab,pos = $1 in {Ast.lbl_nme=Some (lab,pos) ; Ast.lbl_ref = None}}
+	{let lab,pos = $1 in Some (add_pos lab)}
     ;
 
 lhs_rhs:

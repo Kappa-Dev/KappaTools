@@ -25,9 +25,9 @@ let interface_for_def ast_intf =
        | (_, pos) ->
 	  raise (ExceptionDefn.Malformed_Decl
 		("Link status inside a definition of signature", pos))
-      ) ({Ast.port_nme =("_",(Lexing.dummy_pos,Lexing.dummy_pos));
+      ) ({Ast.port_nme =Term.with_dummy_pos "_";
 	  Ast.port_int=[];
-	  Ast.port_lnk =(Ast.FREE,(Lexing.dummy_pos,Lexing.dummy_pos));}
+	  Ast.port_lnk =Term.with_dummy_pos Ast.FREE;}
 	 :: ast_intf))
 
 let interface_for_decl ast_intf =()
@@ -49,7 +49,7 @@ let eval_intf ast_intf =
 	      (StringMap.add (fst p.Ast.port_nme) (int_state_list, lnk_state, (snd p.Ast.port_nme)) map)
     | [] ->
        StringMap.add
-	 "_" ([], (Ast.FREE,(Lexing.dummy_pos,Lexing.dummy_pos)), (Lexing.dummy_pos,Lexing.dummy_pos)) map
+	 "_" ([], Term.with_dummy_pos Ast.FREE,(Lexing.dummy_pos,Lexing.dummy_pos)) map
   in (*Adding default existential port*) iter ast_intf StringMap.empty
 
 let eval_node env a link_map node_map node_id =
@@ -452,19 +452,23 @@ let reduce_val v env mixs =
     else (Primitives.VAR k)),
    dep)
 
-let rule_of_ast ?(backwards=false) env mixs (ast_rule_label, ast_rule) =
-  let ast_rule_label,ast_rule = if backwards then Ast.flip (ast_rule_label, ast_rule) else (ast_rule_label, ast_rule) in
+let rule_of_ast ?(backwards=false) ~is_pert env mixs (ast_rule_label,ast_rule) =
+  let ast_rule_label,ast_rule =
+    if backwards then Ast.flip (ast_rule_label, ast_rule)
+    else (ast_rule_label, ast_rule) in
   let (env, lhs_id) =
-    Environment.declare_var_kappa ~from_rule:true ast_rule_label.lbl_nme env in
+    Environment.declare_var_kappa ~from_rule:true ast_rule_label env in
   (* reserving an id for rule's lhs in the pattern table *)
-  let env = Environment.declare_rule ast_rule_label.lbl_nme lhs_id env in
+  let env = Environment.declare_rule ast_rule_label lhs_id env in
   let env,mixs',k_def,dep = reduce_val ast_rule.k_def env mixs in
   let (env,mixs'',k_alt,radius,dep_alt) =
     match ast_rule.k_un with
     | None -> (env,mixs',None,None, Term.DepSet.empty)
-    | Some (ast,ast_opt) -> (****TODO HERE treat ast_opt that specifies application radius****)
+    | Some (ast,ast_opt) ->
+       (****TODO HERE treat ast_opt that specifies application radius****)
        let env =
-	 Environment.declare_unary_rule (Some (Environment.kappa_of_num lhs_id env,Tools.no_pos)) (*ast_rule_label.lbl_nme*) lhs_id env in
+	 Environment.declare_unary_rule
+	   (Some (Environment.kappa_of_num lhs_id env,Tools.no_pos)) (*ast_rule_label*) lhs_id env in
        let env,mixs'',k_alt,dep = reduce_val ast env mixs' in
        let env,mixs''',radius_alt,dep = match ast_opt with
 	   None -> (env,mixs'',None,dep)
@@ -478,7 +482,7 @@ let rule_of_ast ?(backwards=false) env mixs (ast_rule_label, ast_rule) =
   let lhs = match k_alt with None -> lhs | Some _ -> Mixture.set_unary lhs in
   let rhs,env = mixture_of_ast true env ast_rule.rhs in
   let (script, balance,added,modif_sites(*,side_effects*)) =
-    Dynamics.diff ast_rule.rule_pos lhs rhs ast_rule_label.lbl_nme env
+    Dynamics.diff ast_rule.rule_pos lhs rhs ast_rule_label env
 
   and kappa_lhs = Mixture.to_kappa false env lhs
 
@@ -488,16 +492,18 @@ let rule_of_ast ?(backwards=false) env mixs (ast_rule_label, ast_rule) =
       (fun (alg_expr,(nme,pos)) (env,mixs,out) ->
        let id =
 	 try Environment.num_of_token nme env
-	 with Not_found -> raise (ExceptionDefn.Semantics_Error (pos,"Token "^nme^" is undefined"))
+	 with Not_found ->
+	   raise (ExceptionDefn.Semantics_Error (pos,"Token "^nme^" is undefined"))
        in
-       let (env', mixs', f, is_const, opt_v) =
-	 partial_eval_alg env mixs alg_expr (*dependencies are not important here since variable is evaluated only when rule is applied*)
+       let (env', mixs', f, is_const,opt_v) = partial_eval_alg env mixs alg_expr
+       (*dependencies are not important here since variable is evaluated only when rule is applied*)
        in
        let v =
-	 if is_const then (match opt_v with
-			     Some v -> Primitives.CONST v
-			   | None ->
-			      invalid_arg "Eval.rule_of_ast: Variable is constant but was not evaluated")
+	 if is_const then
+	   (match opt_v with
+	      Some v -> Primitives.CONST v
+	    | None ->
+	       invalid_arg "Eval.rule_of_ast: Variable is constant but was not evaluated")
 	 else Primitives.VAR f
        in
        (env',mixs',(v,id)::out)
@@ -505,21 +511,15 @@ let rule_of_ast ?(backwards=false) env mixs (ast_rule_label, ast_rule) =
   in
   let env12,mixs12,add_token = tokenify env mixs'' ast_rule.add_token in
   let env21,mixs21,rm_token = tokenify env12 mixs12 ast_rule.rm_token in
-  let ref_id =
-    match ast_rule_label.lbl_ref with
-    | None -> None
-    | Some (ref, pos) ->
-       (try Some (Environment.num_of_kappa ref env21)
-	with
-	| Not_found ->
-	   raise
-	     (ExceptionDefn.Semantics_Error (pos, "undefined label " ^ ref))) in
   let r_id = Mixture.get_id lhs in
-  let env = if Mixture.is_empty lhs then Environment.declare_empty_lhs r_id env21 else env21 in
+  let env = if Mixture.is_empty lhs
+	    then Environment.declare_empty_lhs r_id env21
+	    else env21 in
   let env =
-    Term.DepSet.fold (*creating dependencies between variables in the kinetic rate and the activity of the rule*)
+    Term.DepSet.fold
+      (*creating dependencies between variables in the kinetic rate and the activity of the rule*)
       (fun dep env ->
-       (*Printf.printf "rule %d depends on %s\n" r_id (Mods.string_of_dep dep) ; *)
+       (*Printf.printf "rule %d depends on %s\n" r_id (Mods.string_of_dep dep); *)
        Environment.add_dependencies dep (Term.RULE r_id) env)
       (Term.DepSet.union dep dep_alt) env
   in
@@ -534,7 +534,8 @@ let rule_of_ast ?(backwards=false) env mixs (ast_rule_label, ast_rule) =
 	  let cc_id = Mixture.component_of_id id lhs
 	  and cc_id' = Mixture.component_of_id id' lhs
 	  in
-	  if cc_id = cc_id' then (con_map,dis_map,side_eff) (*rule binds two ports that were already part of the same cc*)
+	  if cc_id = cc_id' then (con_map,dis_map,side_eff)
+	  (*rule binds two ports that were already part of the same cc*)
 	  else
 	    let eq_id = try IntMap.find cc_id con_map with Not_found -> cc_id
 	    and eq_id'= try IntMap.find cc_id' con_map with Not_found -> cc_id'
@@ -630,16 +631,17 @@ let rule_of_ast ?(backwards=false) env mixs (ast_rule_label, ast_rule) =
      Primitives.script = script;
      Primitives.kappa = kappa_lhs ^ ("->" ^ kappa_rhs);
      Primitives.balance = balance;
-     Primitives.refines = ref_id;
      Primitives.lhs = lhs;
      Primitives.rhs = rhs;
      Primitives.r_id = r_id;
-     Primitives.added = List.fold_left (fun set i -> IntSet.add i set) IntSet.empty added ;
+     Primitives.added =
+       List.fold_left (fun set i -> IntSet.add i set) IntSet.empty added ;
      (*Primitives.side_effect = side_effect ; *)
      Primitives.modif_sites = modif_sites ;
-     Primitives.is_pert = false ;
+     Primitives.is_pert = is_pert ;
      Primitives.pre_causal = pre_causal ;
-     Primitives.cc_impact = Some (connect_impact,disconnect_impact,side_eff_impact)
+     Primitives.cc_impact =
+       Some (connect_impact,disconnect_impact,side_eff_impact)
   })
 
 let variables_of_result env (free_id,mixs) alg_a =
@@ -677,14 +679,14 @@ let rules_of_result env mixs res tolerate_new_state =
     List.fold_left
       (fun (env, mixs, cont) (ast_rule_label, ast_rule) ->
        let (env, mixs, r) =
-	 rule_of_ast env mixs (ast_rule_label, ast_rule)
+	 rule_of_ast ~is_pert:false env mixs (ast_rule_label, ast_rule)
        in
        match ast_rule.Ast.k_op with
        | None -> (env,mixs,r::cont)
        | Some k ->
 	  let (env,mixs,back_r) =
-	    rule_of_ast ~backwards:true env mixs (ast_rule_label, ast_rule)
-	  in
+	    rule_of_ast ~backwards:true ~is_pert:false
+			env mixs (ast_rule_label, ast_rule) in
 	  (env,mixs,back_r::(r::cont))
       )
       (env, mixs, []) res.Ast.rules
@@ -713,7 +715,18 @@ let effects_of_modif variables env ast_list =
 	 | INTRO (alg_expr, ast_mix, pos) ->
 	    let (env', mixs',x, is_constant, opt_v) =
 	      partial_eval_alg env variables alg_expr in
-	    let m,env = mixture_of_ast false env' ast_mix in
+	    let ast_rule =
+	      { rule_pos = Tools.no_pos; add_token=[]; rm_token=[];
+		lhs = Ast.EMPTY_MIX; arrow = Ast.RAR(Tools.no_pos);
+		rhs = ast_mix;
+		k_def=Term.with_dummy_pos (Ast.CONST(Nbr.F 0.0));
+		k_un=None;k_op=None;
+	      } in
+	    let nme_pert =
+	      Printf.sprintf "pert_%d" (Environment.next_pert_id env) in
+	    let env,mixs'',rule =
+	      rule_of_ast ~is_pert:true env mixs'
+			  (Some (Term.with_dummy_pos nme_pert),ast_rule) in
 	    let v =
 	      if is_constant
 	      then (match opt_v with Some v -> Primitives.CONST v
@@ -723,16 +736,23 @@ let effects_of_modif variables env ast_list =
 	    let str =
 	      (Printf.sprintf "introduce %a * %s"
 			      Expr.ast_alg_to_string (fst alg_expr)
-			      (Mixture.to_kappa false env m))::str_pert
-	    in (mixs', (Primitives.INTRO (v, m))::effects, str, env)
+			      (Mixture.to_kappa false env rule.Primitives.rhs))::str_pert
+	    in (mixs'', (Primitives.ITER_RULE (v, rule))::effects, str, env)
 	 | DELETE (alg_expr, ast_mix, pos) ->
 	    let (env',mixs',x, is_constant, opt_v) =
 	      partial_eval_alg env variables alg_expr in
-	    let nme_pert = Printf.sprintf "pert_%d" (Environment.next_pert_id env) in
-	    let (env, id) =
-	      Environment.declare_var_kappa (Some (nme_pert,pos)) env'
-	    in
-	    let m,env = mixture_of_ast ~mix_id:id true env ast_mix in
+	    let ast_rule =
+	      { rule_pos = Tools.no_pos; add_token=[]; rm_token=[];
+		lhs = ast_mix; arrow = Ast.RAR(Tools.no_pos);
+		rhs = Ast.EMPTY_MIX;
+		k_def=Term.with_dummy_pos (Ast.CONST(Nbr.F 0.0));
+		k_un=None;k_op=None;
+	      } in
+	    let nme_pert =
+	      Printf.sprintf "pert_%d" (Environment.next_pert_id env) in
+	    let env,mixs'',rule =
+	      rule_of_ast ~is_pert:true env mixs'
+			  (Some (Term.with_dummy_pos nme_pert),ast_rule) in
 	    let v =
 	      if is_constant
 	      then (match opt_v with Some v -> Primitives.CONST v
@@ -741,8 +761,8 @@ let effects_of_modif variables env ast_list =
 	    in
 	    let str =
 	      (Printf.sprintf "remove %a * %s" Expr.ast_alg_to_string (fst alg_expr)
-			      (Mixture.to_kappa false env m))::str_pert
-	    in ((m :: mixs'), (Primitives.DELETE (v, m))::effects, str, env)
+			      (Mixture.to_kappa false env rule.Primitives.lhs))::str_pert
+	    in (mixs'', (Primitives.ITER_RULE (v, rule))::effects, str, env)
 	 | UPDATE ((nme, pos_rule), alg_expr) ->
 	    let i,is_rule =
 	      (try (Environment.num_of_rule nme env,true)
@@ -905,90 +925,13 @@ let pert_of_result variables env res =
 	 List.fold_left
 	   (fun (env,rule_list,cpt) effect ->
 	    match effect with
-	    | Primitives.INTRO (_,mix) ->
+	    | Primitives.ITER_RULE (_,rule) ->
 	       begin
-		 let (env, id) =
-		   Environment.declare_var_kappa (Some (str_pert,pos)) env
-		 in
-		 let lhs = Mixture.empty (Some id) in
-		 let rhs = mix in
-		 let (script,balance,added,modif_sites(*,side_effect*)) =
-		   Dynamics.diff pos lhs rhs (Some (str_pert,pos)) env in
-		 let kappa_lhs = "" in
-		 let kappa_rhs = Mixture.to_kappa false env rhs in
-		 let r_id = Mixture.get_id lhs in
-		 let str_pert = Printf.sprintf "pert_%d%d" p_id cpt in
-		 let env = Environment.declare_rule (Some (str_pert,pos)) r_id env in
 		 let env =
 		   Term.DepSet.fold
 		     (fun dep env -> Environment.add_dependencies dep (Term.PERT p_id) env
 		     )
 		     dep env
-		 in
-		 let pre_causal = Dynamics.compute_causal lhs rhs script env in
-		 let rule =
-		   { Primitives.rm_token = []; Primitives.add_token = []; (*TODO*)
-		     Primitives.k_def = Primitives.CONST (Nbr.F 0.0);
-		     Primitives.k_alt = (None,None);
-		     Primitives.over_sampling = None;
-		     Primitives.script = script ;
-		     Primitives.kappa = kappa_lhs ^ ("->" ^ kappa_rhs);
-		     Primitives.balance = balance;
-		     Primitives.refines = None;
-		     Primitives.lhs = lhs;
-		     Primitives.rhs = rhs;
-		     Primitives.r_id = r_id;
-		     Primitives.added =
-		       List.fold_left (fun set i -> IntSet.add i set) IntSet.empty added ;
-		     (*Primitives.side_effect = side_effect ; *)
-		     Primitives.modif_sites = modif_sites ;
-		     Primitives.is_pert = true ;
-		     Primitives.pre_causal = pre_causal ;
-		     Primitives.cc_impact = None
-		   }
-		 in
-		 (env,(Some rule,effect)::rule_list,cpt+1)
-	       end
-	    | Primitives.DELETE (_,mix) ->
-	       begin
-		 let lhs = mix
-		 and rhs = Mixture.empty None
-		 in
-		 let (script,balance,added,modif_sites(*,side_effect*)) =
-		   Dynamics.diff pos lhs rhs (Some (str_pert,pos)) env in
-		 let kappa_lhs = Mixture.to_kappa false env lhs in
-		 let kappa_rhs = "" in
-		 let r_id = Mixture.get_id lhs in
-		 let str_pert = Printf.sprintf "pert_%d%d" p_id cpt in
-		 let env =
-		   Environment.declare_rule (Some (str_pert,pos)) r_id env in
-		 let env =
-		   Term.DepSet.fold
-		     (fun dep env -> Environment.add_dependencies dep (Term.PERT p_id) env
-		     )
-		     dep env
-		 in
-		 let pre_causal = Dynamics.compute_causal lhs rhs script env in
-		 let rule =
-		   { Primitives.rm_token = [] ; Primitives.add_token = [] ; (*TODO*)
-		     Primitives.k_def = Primitives.CONST (Nbr.F 0.0);
-		     Primitives.k_alt = (None,None);
-		     Primitives.over_sampling = None;
-		     Primitives.script = script;
-		     Primitives.kappa = kappa_lhs ^ ("->" ^ kappa_rhs);
-		     Primitives.balance = balance;
-		     Primitives.refines = None;
-		     Primitives.lhs = lhs;
-		     Primitives.rhs = rhs;
-		     Primitives.r_id = r_id;
-		     Primitives.added =
-		       List.fold_left (fun set i -> IntSet.add i set) IntSet.empty added;
-		     (*Primitives.side_effect = side_effect ; *)
-		     Primitives.modif_sites = modif_sites ;
-		     Primitives.pre_causal = pre_causal ;
-		     Primitives.is_pert = true ;
-		     Primitives.cc_impact = None ;
-		   }
 		 in
 		 (env,(Some rule,effect)::rule_list,cpt+1)
 	       end

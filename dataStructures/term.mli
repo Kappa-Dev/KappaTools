@@ -31,3 +31,6 @@ module DepSet : Set.S with type elt = dep_type
 
 val dep_of_state_alg_op : state_alg_op -> dep_type
 val dep_to_string : unit -> dep_type -> string
+
+val with_dummy_pos : 'a -> 'a with_pos
+val has_dummy_pos : 'a with_pos -> bool

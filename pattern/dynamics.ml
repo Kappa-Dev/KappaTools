@@ -104,364 +104,396 @@ let compute_causal_init (((node_id,agent_name),interface),_) env =
 
 let compute_causal_obs lhs = compute_causal lhs lhs []
 
+let pp_effect env f (_, effect) =
+  match effect with
+  | PRINT (nme,_) -> Printf.fprintf f "PRINT"
+  | ITER_RULE (_,rule) ->
+     if Mixture.is_empty rule.lhs then
+       Printf.fprintf f "INTRO %a" (Mixture.print false env) rule.rhs
+     else
+       let () = assert (Mixture.is_empty rule.rhs) in
+       Printf.fprintf f "DELETE %a" (Mixture.print false env) rule.lhs
+  | UPDATE_RULE (r_id,_) -> Printf.fprintf f "UPDATE rule[%d]" r_id
+  | UPDATE_VAR (v_id,_) -> Printf.fprintf f "UPDATE var[%d]" v_id
+  | UPDATE_TOK (t_id,_) ->
+     Printf.fprintf f "UPDATE token %s" (Environment.token_of_num t_id env)
+  | SNAPSHOT _ -> Printf.fprintf f "SNAPSHOT"
+  | STOP _ -> Printf.fprintf f "STOP"
+  | FLUX _ -> Printf.fprintf f "FLUX"
+  | FLUXOFF _ -> Printf.fprintf f "FLUXOFF"
+  | CFLOW id ->
+     let nme = try Environment.rule_of_num id env
+	       with Not_found -> Environment.kappa_of_num id env
+     in Printf.fprintf f "CFLOW %s" nme
+  | CFLOWOFF id ->
+     let nme = try Environment.rule_of_num id env
+	       with Not_found -> Environment.kappa_of_num id env
+     in Printf.fprintf f "CFLOWOFF %s" nme
+
+
 let print_pert env f pert =
-  let string_of_effect f (_, effect) =
-    match effect with
-    | PRINT (nme,_) -> Printf.fprintf f "PRINT"
-    | INTRO (_,mix) -> Printf.fprintf f "INTRO %a" (Mixture.print false env) mix
-    | DELETE (_,mix) ->
-       Printf.fprintf f "DELETE %a" (Mixture.print false env) mix
-    | UPDATE_RULE (r_id,_) -> Printf.fprintf f "UPDATE rule[%d]" r_id
-    | UPDATE_VAR (v_id,_) -> Printf.fprintf f "UPDATE var[%d]" v_id
-    | UPDATE_TOK (t_id,_) ->
-       Printf.fprintf f "UPDATE token %s" (Environment.token_of_num t_id env)
-    | SNAPSHOT _ -> Printf.fprintf f "SNAPSHOT"
-    | STOP _ -> Printf.fprintf f "STOP"
-    | FLUX _ -> Printf.fprintf f "FLUX"
-    | FLUXOFF _ -> Printf.fprintf f "FLUXOFF"
-    | CFLOW id ->
-       let nme = try Environment.rule_of_num id env
-		 with Not_found -> Environment.kappa_of_num id env
-       in Printf.fprintf f "CFLOW %s" nme
-    | CFLOWOFF id ->
-       let nme = try Environment.rule_of_num id env
-		 with Not_found -> Environment.kappa_of_num id env
-       in Printf.fprintf f "CFLOWOFF %s" nme
-  in
-  Pp.list Pp.colon string_of_effect f pert.effect
+  Pp.list Pp.colon (pp_effect env) f pert.effect
 
 let diff pos m0 m1 label_opt env =
-	let add_map id site_type map =
-		let set = try IdMap.find id map with Not_found -> Int2Set.empty
-		in
-			IdMap.add id (Int2Set.add site_type set) map
-	in
-	(*let side_effect = ref false in*)
-	let label = match label_opt with Some (_,pos) -> (string_of_pos pos) | None -> "" in
-	let compile_error pos msg = raise (ExceptionDefn.Semantics_Error (pos,msg)) in
-	let id_preserving ag1 ag2 = (*check whether ag2 can be the residual of ag1 for (same name)*)
-		Mixture.name ag1 = Mixture.name ag2
-	in
-	let prefix, deleted, add_index =
-		IntMap.fold
-			(fun id ag0 (prefix, deleted, ind) ->
-				if deleted = [] then
-						try
-							let ag1 = IntMap.find id (Mixture.agents m1) in
-							if id_preserving ag0 ag1 then (id:: prefix, deleted, ind)
-							else (prefix, id:: deleted, if id<ind then id else ind)
-						with Not_found -> (prefix, id:: deleted, ind) (*id is bigger than the max id in m1 so id is deleted*)
-				else (prefix,id::deleted,ind)
+  let add_map id site_type map =
+    let set = try IdMap.find id map with Not_found -> Int2Set.empty in
+    IdMap.add id (Int2Set.add site_type set) map
+  in
+  (*let side_effect = ref false in*)
+  let pp_warning pr =
+    match label_opt with Some (_,pos) -> (Pp.warning pr ((),pos))
+		       | None -> Printf.eprintf "%a" pr () in
+  let compile_error pos msg = raise (ExceptionDefn.Semantics_Error (pos,msg)) in
+  let id_preserving ag1 ag2 = (*check whether ag2 can be the residual of ag1 for (same name)*)
+    Mixture.name ag1 = Mixture.name ag2
+  in
+  let prefix, deleted, add_index =
+    IntMap.fold
+      (fun id ag0 (prefix, deleted, ind) ->
+       if deleted = [] then
+	 try
+	   let ag1 = IntMap.find id (Mixture.agents m1) in
+	   if id_preserving ag0 ag1 then (id:: prefix, deleted, ind)
+	   else (prefix, id:: deleted, if id<ind then id else ind)
+	 with Not_found -> (prefix, id:: deleted, ind) (*id is bigger than the max id in m1 so id is deleted*)
+       else (prefix,id::deleted,ind)
+      )
+      (Mixture.agents m0) ([],[], IntMap.size (Mixture.agents m0))
+  in
+  let added =
+    IntMap.fold
+      (fun id ag1 added ->
+       if id < add_index then added else (id:: added)
+      )	(Mixture.agents m1) []
+  in
+  let balance = (List.length deleted, List.length prefix, List.length added)
+  and instructions = (*adding deletion instructions*)
+    List.fold_left
+      (fun inst id ->
+       (*side_effect := true ;*)
+       (DEL id):: inst
+      )
+      [] deleted
+  in
+  let instructions = (*adding creation instructions*)
+    List.fold_left
+      (fun instructions id ->
+       let ag = Mixture.agent_of_id id m1 in
+       let name_id = Mixture.name ag in
+       ADD(id, name_id)::instructions
+      )
+      instructions added
+  in
+  let instructions,modif_sites = (*adding connections of new agents if partner has a lower id*)
+    List.fold_left
+      (fun (inst,idmap) id ->
+       let ag = Mixture.agent_of_id id m1 in
+       let name_id = Mixture.name ag in
+       let sign = Environment.get_sig name_id env in
+       let modif_sites =
+	 Signature.fold
+	   (fun site_id idmap -> add_map (FRESH id) (site_id,0) (add_map (FRESH id) (site_id,1) idmap)
+	   )
+	   sign idmap
+       in
+       let inst =
+	 Mixture.fold_interface
+	   (fun site_id (int, lnk) inst ->
+	    let def_int =
+	      try Some (Environment.state_of_id (Mixture.name ag) site_id 0 env)
+	      with Not_found -> None
+	    in
+	    let inst =
+	      match (def_int, int) with
+	      | (None, None) -> inst
+	      | (Some i, None) -> inst (*DCDW: default will be assumed*)
+	      | (Some i, Some j) -> (MOD((FRESH id, site_id), j))::inst
+	      | (None, Some k) ->
+		 compile_error pos "This rule is adding an agent that is not supposed to have an internal state"
+	    in
+	    match lnk with
+	    | Node.WLD ->
+	       compile_error pos "This rule is adding an agent that is not fully described (wild card link)"
+	    | Node.FREE -> inst
+	    | Node.TYPE _ ->
+	       compile_error pos "This rule is adding an agent that is not fully described (link type)"
+	    | Node.BND ->
+	       let opt = Mixture.follow (id, site_id) m1 in
+	       match opt with
+	       | None ->
+		  compile_error pos "This rule is adding an agent that is not fully described (semi-lnk)"
+	       | Some (i,x) ->
+		  let bnd_i =
+		    if List.mem i added then (FRESH i) else (KEPT i)
+		  in
+		  if i < id || (i = id && x < site_id) then
+		    BND((bnd_i, x),(FRESH id, site_id)):: inst
+		  else  inst
+	   )
+	   ag inst
+       in
+       (inst,modif_sites)
+      )
+      (instructions,IdMap.empty) added
+  in
+  let instructions,modif_sites =
+    List.fold_left
+      (fun (inst,idmap) id -> (*adding link and internal state modifications for agents conserved by the rule*)
+       let ag, ag' = (Mixture.agent_of_id id m0, Mixture.agent_of_id id m1) in
+       let ag_name = Environment.name (Mixture.name ag) env in
+       let interface' = Mixture.interface ag' in
+       (*folding on ag's interface: *)
+       (* problem when a site is not mentionned at all in ag but is used in ag'
+          --ie modif with no test*)
+       let sign = Environment.get_sig (Mixture.name ag) env in
+       let interface = Mixture.interface ag in
+       let interface = Signature.fold
+			 (fun site_id interface ->
+			  if IntMap.mem site_id interface then interface
+			  else IntMap.add site_id (None,Node.WLD) interface)
+			 sign interface in
+       IntMap.fold
+	 (fun site_id (int_state, lnk_state) (inst,idmap) ->
+	  let site_name = Environment.site_of_id (Mixture.name ag) site_id env in 
+	  let int_state', lnk_state' =
+	    try IntMap.find site_id interface' with
+	    | Not_found -> (None,Node.WLD) (*site is not mentioned in the right hand side*)
+	  in
+	  let inst,idmap =
+	    match (int_state, int_state') with
+	    | (Some i, Some j) ->
+	       if i = j then (inst,idmap)
+	       else
+		 let inst = (MOD ((KEPT id, site_id), j))::inst
+		 and idmap = add_map (KEPT id) (site_id,0) idmap
+		 in
+		 (inst,idmap)
+	    | (Some _, None) ->
+	       compile_error
+		 pos
+		 (Printf.sprintf "The internal state of agent '%s', site '%s' on the right hand side is underspecified" ag_name site_name)
+	    | (None, Some j) ->
+	       let site = Environment.site_of_id (Mixture.name ag) site_id env in
+	       let _ =
+		 pp_warning
+		   (fun f () ->
+		    Printf.fprintf
+		      f "internal state of site '%s' of agent '%s' is modified although it is left unpecified in the left hand side"
+		      site (Environment.name (Mixture.name ag) env)
+		   )
+	       in
+	       let inst = (MOD ((KEPT id, site_id), j))::inst
+	       and idmap = add_map (KEPT id) (site_id,0) idmap
+	       in
+	       (inst,idmap)
+	    | (None, None) -> (inst,idmap)
+	  in
+	  match lnk_state, lnk_state' with
+	  | (Node.BND, Node.FREE | Node.TYPE _, Node.FREE) -> (*connected -> disconnected*)
+	     let opt = Mixture.follow (id, site_id) m0 in
+	     begin
+	       match opt with
+	       | Some (id', site_id') -> (*generating a FREE instruction only for the smallest port*)
+		  let kept = List.exists (fun id -> id=id') prefix
+		  (*try let _ = (Mixture.agent_of_id id' m1) in true with Not_found -> false*)
+		  in
+		  let apply_anyway = (*generate the FREE instruction without testing whether a FREE instruction will be generated for (id',site_id')*)
+		    if not kept then true
+		    else
+		      match Mixture.follow (id',site_id') m1 with
+		      | None -> false
+		      | Some _ -> true
+		  in
+		  let idmap =
+		    if kept then
+		      add_map (KEPT id) (site_id,1) (add_map (KEPT id') (site_id',1) idmap) 
+		    else
+		      add_map (KEPT id) (site_id,1) idmap
+		  and inst =
+		    (*generating only one FREE instruction when id'<=id or when (id',site_id') is still bound in rhs*)
+		    if apply_anyway || id'< id || (id'= id && site_id'< site_id)
+		    then (FREE (((KEPT id), site_id),true)):: inst
+		    else inst
+		  in
+		  (inst,idmap)
+	       | None -> (*breaking a semi link so generate a FREE instruction*)
+		  let inst = (FREE (((KEPT id), site_id),false)):: inst
+		  and idmap = add_map (KEPT id) (site_id,1) idmap
+		  in
+		  (*side_effect := true ;*)
+		  let _ =
+		    pp_warning
+		      (fun f () ->
+		       Printf.fprintf
+			 f "breaking a semi-link on site '%s' will induce a side effect"
+			 (Environment.site_of_id (Mixture.name ag) site_id env)
+		      )
+		  in
+		  (inst,idmap)
+	     end
+	  | (Node.BND, Node.BND | Node.TYPE _, Node.BND) -> (*connected -> connected*)
+	     begin
+	       let opt, opt' = (Mixture.follow (id, site_id) m0, Mixture.follow (id, site_id) m1) in
+	       if opt = opt' then (inst,idmap) (*no change to be made*)
+	       else
+		 match (opt, opt') with
+		 | (None, Some (id1', i1')) -> (*sub-case: semi-link -> connected*)
+		    (*warning*)
+		    let site = Environment.site_of_id (Mixture.name ag) site_id env in
+		    let _ =
+		      pp_warning
+			(fun f () ->
+			 Printf.fprintf
+			   f "link state of site '%s' of agent '%s' is changed although it is a semi-link in the left hand side"
+			   site (Environment.name (Mixture.name ag) env)
 			)
-			(Mixture.agents m0) ([],[], IntMap.size (Mixture.agents m0))
-	in
-	let added =
-		IntMap.fold
-			(fun id ag1 added ->
-				if id < add_index then added else (id:: added)
-			)	(Mixture.agents m1) []
-	in
-	let balance = (List.length deleted, List.length prefix, List.length added)
-	and instructions = (*adding deletion instructions*)
-		List.fold_left
-			(fun inst id ->
-				(*side_effect := true ;*)
-				(DEL id):: inst
-			)
-			[] deleted
-	in
-	let instructions = (*adding creation instructions*) 
-		List.fold_left
-			(fun instructions id ->
-				let ag = Mixture.agent_of_id id m1 in
-				let name_id = Mixture.name ag in
-				ADD(id, name_id)::instructions
-			)
-			instructions added
-	in
-	let instructions,modif_sites = (*adding connections of new agents if partner has a lower id*)
-		List.fold_left
-		(fun (inst,idmap) id ->
-			let ag = Mixture.agent_of_id id m1 in
-			let name_id = Mixture.name ag in
-			let sign = Environment.get_sig name_id env in
-			let modif_sites = 
-				Signature.fold 
-				(fun site_id idmap -> add_map (FRESH id) (site_id,0) (add_map (FRESH id) (site_id,1) idmap)
-				) 
-				sign idmap 
+		    in
+		    (*modified sites*)
+		    let id'' = if List.exists (fun id -> id=id1') prefix then (KEPT id1') else (FRESH id1')
+		    in
+		    let idmap' = add_map (KEPT id) (site_id,1) (add_map id'' (i1',1) idmap) in
+		    (*instruction*)
+		    if id1' < id || (id1'= id && i1'< site_id) then (*generating an instruction only for one of both sites*)
+		      begin
+			let inst = BND((KEPT id, site_id), (id'',i1')):: inst
 			in
-			let inst = 
-				Mixture.fold_interface 
-					(fun site_id (int, lnk) inst ->
-						let def_int = try Some (Environment.state_of_id (Mixture.name ag) site_id 0 env) with Not_found -> None
-						in
-						let inst =
-							match (def_int, int) with
-							| (None, None) -> inst
-							| (Some i, None) -> inst (*DCDW: default will be assumed*)
-							| (Some i, Some j) -> (MOD((FRESH id, site_id), j))::inst
-							| (None, Some k) -> compile_error pos "This rule is adding an agent that is not supposed to have an internal state"
-						in
-						match lnk with
-						| Node.WLD -> compile_error pos "This rule is adding an agent that is not fully described (wild card link)"
-						| Node.FREE -> inst
-						| Node.TYPE _ -> compile_error pos "This rule is adding an agent that is not fully described (link type)"
-						| Node.BND ->
-								let opt = Mixture.follow (id, site_id) m1 in
-								match opt with
-								| None -> compile_error pos "This rule is adding an agent that is not fully described (semi-lnk)"
-								| Some (i,x) ->
-										let bnd_i =
-											if List.mem i added then (FRESH i) else (KEPT i)
-										in
-										if i < id || (i = id && x < site_id) then 
-											BND((bnd_i, x),(FRESH id, site_id)):: inst
-										else 
-											inst
-					)
-					ag inst
-			in
-				(inst,modif_sites)
+			(*side_effect := true ;*)
+			(inst,idmap')
+		      end
+		    else (inst,idmap')
+			   
+		 | (Some (id1, i1), Some (id1', i1')) -> (*sub-case: connected -> connected*)
+		    (*warning*)
+		    let site = Environment.site_of_id (Mixture.name ag) site_id env in
+		    let _ =
+		      pp_warning
+			(fun f () ->
+			 Printf.fprintf
+			   f "rule induces a link permutation on site '%s' of agent '%s'"
+			   site (Environment.name (Mixture.name ag) env)
 			)
-			(instructions,IdMap.empty) added
-	in
-	let instructions,modif_sites =
-		List.fold_left
-			(fun (inst,idmap) id -> (*adding link and internal state modifications for agents conserved by the rule*)
-						let ag, ag' = (Mixture.agent_of_id id m0, Mixture.agent_of_id id m1) in
-						let ag_name = Environment.name (Mixture.name ag) env in
-						let interface' = Mixture.interface ag' in
-						(*folding on ag's interface: problem when a site is not mentionned at all in ag but is used in ag' --ie modif with no test*)
-						let sign = Environment.get_sig (Mixture.name ag) env in
-						let interface = Mixture.interface ag in
-						let interface = Signature.fold (fun site_id interface -> if IntMap.mem site_id interface then interface else IntMap.add site_id (None,Node.WLD) interface) sign interface in
-						IntMap.fold
-							(fun site_id (int_state, lnk_state) (inst,idmap) ->
-										let site_name = Environment.site_of_id (Mixture.name ag) site_id env in 
-										let int_state', lnk_state' =
-											try IntMap.find site_id interface' with
-											| Not_found -> (None,Node.WLD) (*site is not mentioned in the right hand side*)
-										in
-										let inst,idmap =
-											match (int_state, int_state') with
-											| (Some i, Some j) -> 
-												if i = j then (inst,idmap) 
-												else 
-													let inst = (MOD ((KEPT id, site_id), j))::inst
-													and idmap = add_map (KEPT id) (site_id,0) idmap
-													in
-														(inst,idmap)
-											| (Some _, None) -> 
-												compile_error pos 
-												(Printf.sprintf "The internal state of agent '%s', site '%s' on the right hand side is underspecified" ag_name site_name)
-											| (None, Some j) ->
-													let site = Environment.site_of_id (Mixture.name ag) site_id env in
-													let _ =
-														warning
-															(Printf.sprintf
-																	"%s internal state of site '%s' of agent '%s' is modified although it is left unpecified in the left hand side"
-																	label site (Environment.name (Mixture.name ag) env)
-															)
-													in
-													let inst = (MOD ((KEPT id, site_id), j))::inst
-													and idmap = add_map (KEPT id) (site_id,0) idmap
-													in
-													(inst,idmap)
-											| (None, None) -> (inst,idmap)
-										in
-										match (lnk_state, lnk_state') with
-										| (Node.BND, Node.FREE) | (Node.TYPE _, Node.FREE) -> (*connected -> disconnected*)
-												let opt = Mixture.follow (id, site_id) m0 in
-												begin
-													match opt with
-													| Some (id', site_id') -> (*generating a FREE instruction only for the smallest port*)
-															let kept = List.exists (fun id -> id=id') prefix 
-																(*try let _ = (Mixture.agent_of_id id' m1) in true with Not_found -> false*)
-															in
-															let apply_anyway = (*generate the FREE instruction without testing whether a FREE instruction will be generated for (id',site_id')*)
-																if not kept then true 
-																else
-																	match Mixture.follow (id',site_id') m1 with
-																		| None -> false
-																		| Some _ -> true
-															in
-															let idmap = 
-																if kept then 
-																	add_map (KEPT id) (site_id,1) (add_map (KEPT id') (site_id',1) idmap) 
-																else
-																	add_map (KEPT id) (site_id,1) idmap
-															and inst =
-																(*generating only one FREE instruction when id'<=id or when (id',site_id') is still bound in rhs*)
-																if apply_anyway || id'< id || (id'= id && site_id'< site_id) then (FREE (((KEPT id), site_id),true)):: inst
-																else inst
-															in
-															(inst,idmap)
-													| None -> (*breaking a semi link so generate a FREE instruction*)
-															let inst = (FREE (((KEPT id), site_id),false)):: inst
-															and idmap = add_map (KEPT id) (site_id,1) idmap
-															in
-															(*side_effect := true ;*)
-															let _ =
-																warning
-																(Printf.sprintf
-																		"%s breaking a semi-link on site '%s' will induce a side effect"
-																		label (Environment.site_of_id (Mixture.name ag) site_id env)
-																)
-															in
-															(inst,idmap)
-												end
-										| (Node.BND, Node.BND) | (Node.TYPE _, Node.BND) -> (*connected -> connected*)
-												begin
-													let opt, opt' = (Mixture.follow (id, site_id) m0, Mixture.follow (id, site_id) m1) in
-													if opt = opt' then (inst,idmap) (*no change to be made*)
-													else
-														match (opt, opt') with
-														| (None, Some (id1', i1')) -> (*sub-case: semi-link -> connected*)
-															(*warning*)
-															let site = Environment.site_of_id (Mixture.name ag) site_id env in
-															let _ =
-																		warning
-																			(Printf.sprintf
-																					"%s link state of site '%s' of agent '%s' is changed although it is a semi-link in the left hand side"
-																					label site (Environment.name (Mixture.name ag) env)
-																			)
-															in
-															(*modified sites*)
-															let id'' = if List.exists (fun id -> id=id1') prefix then (KEPT id1') else (FRESH id1')
-															in
-															let idmap' = add_map (KEPT id) (site_id,1) (add_map id'' (i1',1) idmap) in
-															(*instruction*)
-															if id1' < id || (id1'= id && i1'< site_id) then (*generating an instruction only for one of both sites*)
-																begin
-																	let inst = BND((KEPT id, site_id), (id'',i1')):: inst
-																	in
-																		(*side_effect := true ;*)
-																		(inst,idmap')
-																end
-															else (inst,idmap')
-															
-														| (Some (id1, i1), Some (id1', i1')) -> (*sub-case: connected -> connected*)
-																(*warning*)
-																let site = Environment.site_of_id (Mixture.name ag) site_id env in
-																let _ =
-																	warning
-																		(Printf.sprintf
-																				"%s rule induces a link permutation on site '%s' of agent '%s'"
-																				label site (Environment.name (Mixture.name ag) env)
-																		)
-																in
-																(*modifed sites*)
-																(*it might be that id1 is not preserved by the reaction!*)
-																let idmap = if List.exists (fun id -> id=id1) prefix then add_map (KEPT id1) (i1,1) idmap else idmap
-																in
-																(*now id1' might be created by the reaction*)
-																let id1'' = if List.exists (fun id -> id=id1') prefix then (KEPT id1') else (FRESH id1') in
-																let idmap' = add_map id1'' (i1',1) idmap in
-																(*instruction*)
-																if id1'< id || (id1'= id && i1'< site_id) then
-																	let inst = BND((KEPT id, site_id), (id1'', i1')):: inst
-																	in
-																		(inst,idmap')
-																else 
-																	(inst,idmap')
-														| (Some (id1, i1), None) -> 
-															(*sub-case: connected -> semi-link*) 
-															compile_error pos 
-															(Printf.sprintf "The link status of agent '%s', site '%s' on the right hand side is underspecified"
-															ag_name site_name)
-														| (None, None) -> (*sub-case: semi-link -> semi-link*) 
-															(inst,idmap) (*nothing to be done*)
-												end
-										| (Node.FREE, Node.BND) -> (*free -> connected*)
-												begin
-													let opt' = Mixture.follow (id, site_id) m1 in
-													match opt' with
-													| None -> (*sub-case: free -> semi-link*) 
-													compile_error pos 
-													(Printf.sprintf "The link status of agent '%s', site '%s' on the right hand side is inconsistent"
-													ag_name site_name)
-													| Some (id', i') -> (*sub-case: free -> connected*)
-														(*no warning*)
-														(*modif sites*)
-														let id'' = if List.exists (fun id -> id=id') prefix then KEPT id' else FRESH id' in
-														let idmap' = add_map (KEPT id) (site_id,1) (add_map id'' (i',1) idmap) 
-														in
-														if (id'< id) || (id'= id && i'< site_id) then 
-															let inst = BND((KEPT id, site_id), (id'', i')):: inst 
-															in
-															(inst,idmap')
-														else 
-															(inst,idmap')
-												end
-										| (Node.FREE, Node.FREE) | (Node.WLD, Node.WLD) -> (*free -> free or wildcard -> wildcard*) (inst,idmap)
-										| (Node.TYPE (sid,nme),Node.TYPE(sid',nme')) -> 
-											if sid=sid' && nme=nme' then (inst,idmap)
-											else compile_error pos 
-											(Printf.sprintf "The link status of agent '%s', site '%s' on the right hand side is inconsistent" 
-											ag_name site_name)
-										| (Node.WLD, Node.FREE) ->  (*wildcard -> free*)
-												let site = Environment.site_of_id (Mixture.name ag) site_id env in
-												let _ =
-													warning
-														(Printf.sprintf
-																"%s application of this rule will induce a null event when applied to an agent '%s' that is free on '%s'"
-																label (Environment.name (Mixture.name ag) env) site
-														)
-												in
-												let inst = (FREE ((KEPT id, site_id),false))::inst
-												and idmap = add_map (KEPT id) (site_id,1) idmap
-												in
-												((*side_effect := true ;*)
-												(inst,idmap))
-										| (Node.WLD, Node.BND) ->  (*wildcard -> connected*)
-												let opt' = Mixture.follow (id, site_id) m1 in
-												begin
-													match opt' with
-													| None -> compile_error pos 
-													(Printf.sprintf "The link status of agent '%s', site '%s' on the right hand side is inconsistent" ag_name site_name)
-													| Some (id', i') ->
-														(*warning*)
-														let site = Environment.site_of_id (Mixture.name ag) site_id env in
-														let _ =
-																	warning
-																		(Printf.sprintf
-																				"%s site '%s' of agent '%s' is bound in the right hand side although it is unspecified in the left hand side"
-																				label site (Environment.name (Mixture.name ag) env)
-																		)
-														in
-														(*modif sites*)
-														let id'' = if List.exists (fun id -> id=id') prefix then KEPT id' else FRESH id' in
-														let idmap' = add_map (KEPT id) (site_id,1) (add_map id'' (i',1) idmap) in
-														(*instruction*)
-														if (id'< id) || (id'= id && i'< site_id) then
-															let inst = BND((KEPT id, site_id), (id'', i')):: inst
-															in
-															((*side_effect:= true;*)
-															(inst,idmap'))
-														else (inst,idmap')
-												end
-										| (_,_) -> (*connected,free -> wildcard*) 
-										compile_error pos 
-										(Printf.sprintf "The link status of agent '%s', site '%s' on the right hand side is underspecified" ag_name site_name)
-							)
-							interface (inst,idmap)
-			)
-			(instructions,modif_sites) prefix
-	in
-	let sort inst inst' =
-		let weight i = 
-			match i with
-				| ADD _ -> 0 (*adding new agents has biggest priority*)
-				| DEL _ -> 4 (*deleting agents last to minimize side effects*)
- 				| MOD _ -> 1 (*whatev*)
-				| BND _ -> 3 (*freeing links before creating new ones*)
-				| FREE _ -> 2
-		in
-		compare (weight inst) (weight inst')
-	in
-	((List.fast_sort sort instructions),balance,added,modif_sites (*,!side_effect*)) 
-	(*List.rev instructions, balance, added, modif_sites,!side_effect*)
+		    in
+		    (*modifed sites*)
+		    (*it might be that id1 is not preserved by the reaction!*)
+		    let idmap =
+		      if List.exists (fun id -> id=id1) prefix
+		      then add_map (KEPT id1) (i1,1) idmap
+		      else idmap
+		    in
+		    (*now id1' might be created by the reaction*)
+		    let id1'' =
+		      if List.exists (fun id -> id=id1') prefix
+		      then (KEPT id1')
+		      else (FRESH id1') in
+		    let idmap' = add_map id1'' (i1',1) idmap in
+		    (*instruction*)
+		    if id1'< id || (id1'= id && i1'< site_id) then
+		      let inst = BND((KEPT id, site_id), (id1'', i1')):: inst in
+		      (inst,idmap')
+		    else
+		      (inst,idmap')
+		 | (Some (id1, i1), None) ->
+		    (*sub-case: connected -> semi-link*)
+		    compile_error
+		      pos (Printf.sprintf "The link status of agent '%s', site '%s' on the right hand side is underspecified"
+					  ag_name site_name)
+		 | (None, None) -> (*sub-case: semi-link -> semi-link*)
+		    (inst,idmap) (*nothing to be done*)
+	     end
+	  | (Node.FREE, Node.BND) -> (*free -> connected*)
+	     begin
+	       let opt' = Mixture.follow (id, site_id) m1 in
+	       match opt' with
+	       | None -> (*sub-case: free -> semi-link*)
+		  compile_error
+		    pos (Printf.sprintf "The link status of agent '%s', site '%s' on the right hand side is inconsistent"
+					ag_name site_name)
+	       | Some (id', i') -> (*sub-case: free -> connected*)
+		  (*no warning*)
+		  (*modif sites*)
+		  let id'' = if List.exists (fun id -> id=id') prefix
+			     then KEPT id'
+			     else FRESH id' in
+		  let idmap' = add_map (KEPT id) (site_id,1) (add_map id'' (i',1) idmap) 
+		  in
+		  if (id'< id) || (id'= id && i'< site_id) then
+		    let inst = BND((KEPT id, site_id), (id'', i')):: inst in
+		    (inst,idmap')
+		  else
+		    (inst,idmap')
+	     end
+	  | (Node.FREE, Node.FREE | Node.WLD, Node.WLD) -> (*free -> free or wildcard -> wildcard*) (inst,idmap)
+	  | (Node.TYPE (sid,nme),Node.TYPE(sid',nme')) ->
+	     if sid=sid' && nme=nme' then (inst,idmap)
+	     else compile_error
+		    pos (Printf.sprintf "The link status of agent '%s', site '%s' on the right hand side is inconsistent" 
+					ag_name site_name)
+	  | Node.WLD, Node.FREE ->  (*wildcard -> free*)
+	     let site = Environment.site_of_id (Mixture.name ag) site_id env in
+	     let _ =
+	       pp_warning
+		 (fun f () ->
+		  Printf.fprintf
+		    f "application of this rule will induce a null event when applied to an agent '%s' that is free on '%s'"
+		    (Environment.name (Mixture.name ag) env) site
+		 )
+	     in
+	     let inst = (FREE ((KEPT id, site_id),false))::inst
+	     and idmap = add_map (KEPT id) (site_id,1) idmap
+	     in
+	     ((*side_effect := true ;*)
+	       (inst,idmap))
+	  | Node.WLD, Node.BND ->  (*wildcard -> connected*)
+	     let opt' = Mixture.follow (id, site_id) m1 in
+	     begin
+	       match opt' with
+	       | None ->
+		  compile_error
+		    pos (Printf.sprintf "The link status of agent '%s', site '%s' on the right hand side is inconsistent" ag_name site_name)
+	       | Some (id', i') ->
+		  (*warning*)
+		  let site = Environment.site_of_id (Mixture.name ag) site_id env in
+		  let _ =
+		    pp_warning
+		      (fun f () ->
+		       Printf.fprintf
+			 f "site '%s' of agent '%s' is bound in the right hand side although it is unspecified in the left hand side"
+			 site (Environment.name (Mixture.name ag) env)
+		      )
+		  in
+		  (*modif sites*)
+		  let id'' = if List.exists (fun id -> id=id') prefix then KEPT id' else FRESH id' in
+		  let idmap' = add_map (KEPT id) (site_id,1) (add_map id'' (i',1) idmap) in
+		  (*instruction*)
+		  if (id'< id) || (id'= id && i'< site_id) then
+		    let inst = BND((KEPT id, site_id), (id'', i')):: inst
+		    in
+		    ((*side_effect:= true;*)
+		      (inst,idmap'))
+		  else (inst,idmap')
+	     end
+	  | (_,_) -> (*connected,free -> wildcard*)
+	     compile_error
+	       pos (Printf.sprintf "The link status of agent '%s', site '%s' on the right hand side is underspecified"
+				   ag_name site_name)
+	 )
+	 interface (inst,idmap)
+      )
+      (instructions,modif_sites) prefix
+  in
+  let sort inst inst' =
+    let weight i =
+      match i with
+      | ADD _ -> 0 (*adding new agents has biggest priority*)
+      | DEL _ -> 4 (*deleting agents last to minimize side effects*)
+      | MOD _ -> 1 (*whatev*)
+      | BND _ -> 3 (*freeing links before creating new ones*)
+      | FREE _ -> 2
+    in
+    compare (weight inst) (weight inst')
+  in
+  ((List.fast_sort sort instructions),balance,added,modif_sites (*,!side_effect*)) 
+(*List.rev instructions, balance, added, modif_sites,!side_effect*)
 
 let rec superpose todo_list lhs rhs map already_done added codomain env =
 	match todo_list with
