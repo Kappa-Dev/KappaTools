@@ -16,7 +16,7 @@ let compute_causal lhs rhs script env =
 	 Mixture.fold_interface
 	   (fun site_id (int,lnk) (causal_map,bool) ->
 	    if site_id <> 0 then
-              let c = create (int <> None) (lnk <> Node.WLD) in
+              let c = create (int <> None) (lnk <> Mixture.WLD) in
 	      PortMap.add (KEPT id,site_id) c causal_map,true
 	    else causal_map,bool)
 	   ag (causal_map,false)
@@ -211,12 +211,12 @@ let diff pos m0 m1 label_opt env =
 		 compile_error pos "This rule is adding an agent that is not supposed to have an internal state"
 	    in
 	    match lnk with
-	    | Node.WLD ->
+	    | Mixture.WLD ->
 	       compile_error pos "This rule is adding an agent that is not fully described (wild card link)"
-	    | Node.FREE -> inst
-	    | Node.TYPE _ ->
+	    | Mixture.FREE -> inst
+	    | Mixture.TYPE _ ->
 	       compile_error pos "This rule is adding an agent that is not fully described (link type)"
-	    | Node.BND ->
+	    | Mixture.BND ->
 	       let opt = Mixture.follow (id, site_id) m1 in
 	       match opt with
 	       | None ->
@@ -249,14 +249,14 @@ let diff pos m0 m1 label_opt env =
        let interface = Signature.fold
 			 (fun site_id interface ->
 			  if IntMap.mem site_id interface then interface
-			  else IntMap.add site_id (None,Node.WLD) interface)
+			  else IntMap.add site_id (None,Mixture.WLD) interface)
 			 sign interface in
        IntMap.fold
 	 (fun site_id (int_state, lnk_state) (inst,idmap) ->
 	  let site_name = Environment.site_of_id (Mixture.name ag) site_id env in 
 	  let int_state', lnk_state' =
 	    try IntMap.find site_id interface' with
-	    | Not_found -> (None,Node.WLD) (*site is not mentioned in the right hand side*)
+	    | Not_found -> (None,Mixture.WLD) (*site is not mentioned in the right hand side*)
 	  in
 	  let inst,idmap =
 	    match (int_state, int_state') with
@@ -288,7 +288,8 @@ let diff pos m0 m1 label_opt env =
 	    | (None, None) -> (inst,idmap)
 	  in
 	  match lnk_state, lnk_state' with
-	  | (Node.BND, Node.FREE | Node.TYPE _, Node.FREE) -> (*connected -> disconnected*)
+	  | (Mixture.BND, Mixture.FREE | Mixture.TYPE _, Mixture.FREE) ->
+	     (*connected -> disconnected*)
 	     let opt = Mixture.follow (id, site_id) m0 in
 	     begin
 	       match opt with
@@ -330,7 +331,7 @@ let diff pos m0 m1 label_opt env =
 		  in
 		  (inst,idmap)
 	     end
-	  | (Node.BND, Node.BND | Node.TYPE _, Node.BND) -> (*connected -> connected*)
+	  | (Mixture.BND, Mixture.BND | Mixture.TYPE _, Mixture.BND) -> (*connected -> connected*)
 	     begin
 	       let opt, opt' = (Mixture.follow (id, site_id) m0, Mixture.follow (id, site_id) m1) in
 	       if opt = opt' then (inst,idmap) (*no change to be made*)
@@ -399,7 +400,7 @@ let diff pos m0 m1 label_opt env =
 		 | (None, None) -> (*sub-case: semi-link -> semi-link*)
 		    (inst,idmap) (*nothing to be done*)
 	     end
-	  | (Node.FREE, Node.BND) -> (*free -> connected*)
+	  | (Mixture.FREE, Mixture.BND) -> (*free -> connected*)
 	     begin
 	       let opt' = Mixture.follow (id, site_id) m1 in
 	       match opt' with
@@ -421,13 +422,14 @@ let diff pos m0 m1 label_opt env =
 		  else
 		    (inst,idmap')
 	     end
-	  | (Node.FREE, Node.FREE | Node.WLD, Node.WLD) -> (*free -> free or wildcard -> wildcard*) (inst,idmap)
-	  | (Node.TYPE (sid,nme),Node.TYPE(sid',nme')) ->
+	  | (Mixture.FREE, Mixture.FREE | Mixture.WLD, Mixture.WLD) ->
+	     (*free -> free or wildcard -> wildcard*) (inst,idmap)
+	  | (Mixture.TYPE (sid,nme),Mixture.TYPE(sid',nme')) ->
 	     if sid=sid' && nme=nme' then (inst,idmap)
 	     else compile_error
 		    pos (Printf.sprintf "The link status of agent '%s', site '%s' on the right hand side is inconsistent" 
 					ag_name site_name)
-	  | Node.WLD, Node.FREE ->  (*wildcard -> free*)
+	  | Mixture.WLD, Mixture.FREE ->  (*wildcard -> free*)
 	     let site = Environment.site_of_id (Mixture.name ag) site_id env in
 	     let _ =
 	       pp_warning
@@ -442,7 +444,7 @@ let diff pos m0 m1 label_opt env =
 	     in
 	     ((*side_effect := true ;*)
 	       (inst,idmap))
-	  | Node.WLD, Node.BND ->  (*wildcard -> connected*)
+	  | Mixture.WLD, Mixture.BND ->  (*wildcard -> connected*)
 	     let opt' = Mixture.follow (id, site_id) m1 in
 	     begin
 	       match opt' with
@@ -520,7 +522,7 @@ let rec superpose todo_list lhs rhs map already_done added codomain env =
 									if not compatible then raise False
 									else
 										match (lnk,lnk') with
-												| (Node.BND,Node.BND) -> 
+												| (Mixture.BND,Mixture.BND) -> 
 													begin
 														let opt = Mixture.follow (lhs_id,site_id) lhs 
 														and opt' = Mixture.follow (rhs_id,site_id) rhs in
@@ -535,7 +537,7 @@ let rec superpose todo_list lhs rhs map already_done added codomain env =
 																			else ((lhs_id',rhs_id')::todo,Int2Set.add (lhs_id',rhs_id') already_done)
 																		else raise False
 													end
-												| (Node.BND,Node.TYPE (site_j,name_id)) ->
+												| (Mixture.BND,Mixture.TYPE (site_j,name_id)) ->
 													begin
 														let opt = Mixture.follow (lhs_id,site_id) lhs in
 														match opt with
@@ -546,7 +548,7 @@ let rec superpose todo_list lhs rhs map already_done added codomain env =
 																if (name = name_id) && (site_id' = site_j) then (todo,already_done) 
 																else raise False
 													end
-												| (Node.TYPE (site_j,name_id),Node.BND) ->
+												| (Mixture.TYPE (site_j,name_id),Mixture.BND) ->
 													begin
 														let opt = Mixture.follow (rhs_id,site_id) rhs in
 														match opt with
@@ -557,10 +559,10 @@ let rec superpose todo_list lhs rhs map already_done added codomain env =
 																if (name = name_id) && (site_id' = site_j) then (todo,already_done) 
 																else raise False
 													end
-												| (Node.TYPE (site_j,name_id),Node.TYPE (site_j',name_id')) ->
+												| (Mixture.TYPE (site_j,name_id),Mixture.TYPE (site_j',name_id')) ->
 													if (name_id = name_id') && (site_j = site_j') then (todo,already_done) 
 													else raise False
-												| (Node.FREE,Node.FREE) | (Node.WLD,_) | (_,Node.WLD) -> (todo,already_done)
+												| (Mixture.FREE,Mixture.FREE) | (Mixture.WLD,_) | (_,Mixture.WLD) -> (todo,already_done)
 												| _ -> raise False
 					) lhs_ag (tl,already_done)
 				in
@@ -600,7 +602,7 @@ let enable r mix env =
 		  if t=0 (*int-modified*) then
 		    match int with Some _ -> true | None -> false
 		  else
-		    match lnk with Node.WLD -> false | _ -> true
+		    match lnk with Mixture.WLD -> false | _ -> true
 		end
 	     | None -> false
 	    ) modif_sites

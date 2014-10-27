@@ -4,7 +4,6 @@ open ExceptionDefn
 (**node: (name,array[site_name,internal_state,link])*)
 (**ptr(i,a) pointer to a node and a site at offset i*)
 
-type lnk_t = WLD | BND | FREE | TYPE of (int*int) (*(site_id,nme)*)
 type port_status = (int option * ptr) (*internal state,link state*)
 and port = {status:port_status ; mutable dep : (LiftSet.t * LiftSet.t)} (*dep : (lifts for int,lifts for lnk)*)
 and t = {name:int ; interface : port array ; mutable address : int option} 
@@ -252,29 +251,47 @@ let create ?with_interface name_id env =
 		| Invalid_argument str -> (invalid_arg ("Node.create: "^str))
 		| Not_found -> (invalid_arg "Node.create: not found")
 
-(*Tests whether status of port i of node n is compatible with (int,lnk) raises False if not otherwise returns completes*)
-(*the list port_list with (0,i) if i is int-tested or (1,i) if i is lnk-tested *)
-let test (n,i) (int,lnk) port_list = 
-	let intf_n = interface n in
-		let (state,link) = try intf_n.(i).status with exn -> (Debug.tag (Printf.sprintf "Node %d has no site %d" (name n) i) ; raise exn) in
-			let b,port_list = 
-				match int with
-					| None -> (true,port_list) (*None in pattern is compatible with anything in the node*)
-					| _ as s -> (s=state,(0,i)::port_list)
-			in
-				if not b then raise False
-				else
-					match lnk with
-						| WLD -> port_list (*None in pattern is compatible with anything in the node*)
-						| BND -> (match link with FPtr _ -> invalid_arg "Node.test" | Ptr _ -> (1,i)::port_list | Null -> raise False)
-						| TYPE (sid,nme) -> 
-							begin
-								match link with
-									| FPtr _ -> invalid_arg "Node.test"
-									| Ptr (u,j) -> if (name u = nme) && (j = sid) then (1,i)::port_list else raise False
-									| Null -> raise False
-							end
-						| FREE -> (match link with FPtr _ -> invalid_arg "Node.test" | Ptr _ -> raise False | Null -> (1,i)::port_list)
+(*Tests whether status of port i of node n is compatible with (int,lnk)
+@raises False if not otherwise returns completes*)
+(*the list port_list with (0,i) if i is int-tested or (1,i) if i is lnk-tested*)
+let test (n,i) (int,lnk) port_list =
+  let intf_n = interface n in
+  let (state,link) =
+    try intf_n.(i).status
+    with exn ->
+      (Debug.tag (Printf.sprintf "Node %d has no site %d" (name n) i)
+      ; raise exn) in
+  let b,port_list =
+    match int with
+    | None -> (true,port_list)
+    (*None in pattern is compatible with anything in the node*)
+    | _ as s -> (s=state,(0,i)::port_list)
+  in
+  if not b then raise False
+  else
+    match lnk with
+    | Mixture.WLD -> port_list
+    (*None in pattern is compatible with anything in the node*)
+    | Mixture.BND ->
+       (match link with
+	  FPtr _ -> invalid_arg "Node.test"
+	| Ptr _ -> (1,i)::port_list
+	| Null -> raise False)
+    | Mixture.TYPE (sid,nme) ->
+       begin
+	 match link with
+	 | FPtr _ -> invalid_arg "Node.test"
+	 | Ptr (u,j) ->
+	    if (name u = nme) && (j = sid)
+	    then (1,i)::port_list
+	    else raise False
+	 | Null -> raise False
+       end
+    | Mixture.FREE ->
+       (match link with
+	  FPtr _ -> invalid_arg "Node.test"
+	| Ptr _ -> raise False
+	| Null -> (1,i)::port_list)
 
 let follow (u,i) = 
 	let intf_u = interface u in

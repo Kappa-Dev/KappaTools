@@ -103,7 +103,7 @@ let eval_node env a link_map node_map node_id =
 	 in
 	 match int_state_list with
 	 | [] ->
-	    build_intf ast' link_map (IntMap.add port_id (None,Node.WLD) intf) bond_list
+	    build_intf ast' link_map (IntMap.add port_id (None,Mixture.WLD) intf) bond_list
 	 | s::_ ->
 	    let i =
 	      try Signature.num_of_internal_state port_name (fst s) sign
@@ -112,7 +112,9 @@ let eval_node env a link_map node_map node_id =
 			 ("Internal state of site'" ^ port_name ^ "' is not defined"
 			 ,prt_pos))
 	    in
-	    build_intf ast' link_map (IntMap.add port_id (Some i,Node.WLD) intf) bond_list (*Geekish, adding Node.WLD to be consistent with Node.create*)
+	    build_intf ast' link_map
+		       (IntMap.add port_id (Some i,Mixture.WLD) intf) bond_list
+       (*Geekish, adding Mixture.WLD to be consistent with Node.create*)
        end
     | [] -> (bond_list,link_map,intf)
   in
@@ -198,7 +200,7 @@ let eval_agent env a ctxt =
 	    in
 	    (match lnk with
 	     | Some (Semi (b, j, _)) ->
-		((IntMap.add site_id (int_s, Node.BND) interface),
+		((IntMap.add site_id (int_s, Mixture.BND) interface),
 		 {ctxt	with
 		   pairing = IntMap.add n Closed ctxt.pairing;
 		   new_edges =
@@ -211,7 +213,7 @@ let eval_agent env a ctxt =
 		    ((string_of_int n) ^ " is used too many times")
 		in raise (ExceptionDefn.Semantics_Error (pos, msg))
 	     | None ->
-		((IntMap.add site_id (int_s, Node.BND) interface),
+		((IntMap.add site_id (int_s, Mixture.BND) interface),
 		 {
 		   (ctxt)
 		 with
@@ -221,11 +223,11 @@ let eval_agent env a ctxt =
 		})
 	    )
 	 | Ast.LNK_SOME ->
-	    ((IntMap.add site_id (int_s, Node.BND) interface), ctxt)
+	    ((IntMap.add site_id (int_s, Mixture.BND) interface), ctxt)
 	 | Ast.LNK_ANY ->
-	    ((IntMap.add site_id (int_s, Node.WLD) interface), ctxt)
+	    ((IntMap.add site_id (int_s, Mixture.WLD) interface), ctxt)
 	 | Ast.FREE ->
-	    ((IntMap.add site_id (int_s, Node.FREE) interface), ctxt)
+	    ((IntMap.add site_id (int_s, Mixture.FREE) interface), ctxt)
 	 | Ast.LNK_TYPE ((ste_nm, pos_ste), (ag_nm, pos_ag)) ->
 	    (let site_num =
 	       try Environment.id_of_site ag_nm ste_nm env
@@ -242,7 +244,7 @@ let eval_agent env a ctxt =
 		    (ExceptionDefn.Semantics_Error
 		       (pos_ste, "Illegal binding type, agent "^ag_nm^" is not delcared"))
 	     in
-	     ((IntMap.add site_id (int_s, Node.TYPE (site_num, ag_num)) interface),ctxt)
+	     ((IntMap.add site_id (int_s, Mixture.TYPE (site_num, ag_num)) interface),ctxt)
 	    )
        in
        (interface,ctx)
@@ -574,7 +576,7 @@ let rule_of_ast ?(backwards=false) ~is_pert env mixs (ast_rule_label,ast_rule) =
 			let _,lnk =
 			  IntMap.find site_id (Mixture.interface (Mixture.agent_of_id id lhs)) in
 			match lnk with
-			| Node.BND | Node.TYPE _ ->
+			| Mixture.BND | Mixture.TYPE _ ->
 				      IntSet.add site_id set (*semi link deletion*)
 			| _ -> set
 		      with

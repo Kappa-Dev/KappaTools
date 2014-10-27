@@ -3,7 +3,8 @@ open ExceptionDefn
 open Ast
 open Tools
 
-type agent = {name:int ; interface : (int option * Node.lnk_t) IntMap.t}
+type lnk_t = WLD | BND | FREE | TYPE of (int*int) (*(site_id,nme)*)
+type agent = {name:int ; interface : (int option * lnk_t) IntMap.t}
 type covering = {span: (int*int) Int2Map.t ; internal: (int*int) Int2Map.t} 
 type t = {
 	agents:agent IntMap.t ; 
@@ -81,7 +82,7 @@ let is_bound (a_i,s_i) mix =
 	let ag_i = agent_of_id a_i mix in
 		let (_,lnk) = IntMap.find s_i ag_i.interface in
 			match lnk with
-				| Node.BND | Node.TYPE _ -> true
+				| BND | TYPE _ -> true
 				| _ -> false
 
 let fold_interface f ag = IntMap.fold f ag.interface 
@@ -155,7 +156,7 @@ let to_kappa_list with_number env mix =
 	     | None -> ""
 	   in
 	   let s_lnk = match opt_l with
-	     | Node.BND ->
+	     | BND ->
 		let opt = follow (agent_id,site_id) mix in
 		begin
 		  match opt with
@@ -178,9 +179,9 @@ let to_kappa_list with_number env mix =
 		       let lnk = Hashtbl.find bnd (agent_id,site_id) in
 		       "!"^(string_of_int lnk)
 		end
-	     | Node.FREE -> ""
-	     | Node.WLD -> "?"
-	     | Node.TYPE (i,nme) ->
+	     | FREE -> ""
+	     | WLD -> "?"
+	     | TYPE (i,nme) ->
 		let s = Environment.site_of_id nme i env
 		and n = Environment.name nme env in
 		("!"^s^"."^n)
@@ -280,12 +281,12 @@ let site_defined site_id ag is_added env =
     | Some _ -> Some (int,lnk)
     | None ->
        match lnk with
-       | Node.WLD -> None
+       | WLD -> None
        | _ -> Some (int,lnk)
   with Not_found ->
     if not is_added then None
     else
-      try Some (Environment.default_state (name ag) site_id env,Node.FREE)
+      try Some (Environment.default_state (name ag) site_id env,FREE)
       with Not_found -> invalid_arg "Mixture.site_defined: invariant violation"
 
 

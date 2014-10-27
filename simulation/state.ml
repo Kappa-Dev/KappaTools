@@ -1319,8 +1319,8 @@ let negative_upd state cause (u,i) int_lnk counter env =
 												LiftSet.remove lifts phi
 									in
 									match lnk_opt with
-									| Node.WLD -> ()
-									| Node.BND | Node.TYPE _ |	Node.FREE ->
+									| Mixture.WLD -> ()
+									| Mixture.BND | Mixture.TYPE _ |	Mixture.FREE ->
 										let (_, lifts) = try Node.get_lifts u_j	site_id with exn -> invalid_arg ("State.negative_update: "^(Printexc.to_string exn))
 										in
 										LiftSet.remove lifts phi

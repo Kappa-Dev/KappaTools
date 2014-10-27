@@ -416,7 +416,7 @@ module Cflow_linker =
     Mixture.create_agent 
       name
       (List.fold_left
-	  (fun map (a,b) -> Mods.IntMap.add a (b,Node.FREE) map)
+	  (fun map (a,b) -> Mods.IntMap.add a (b,Mixture.FREE) map)
 	  Mods.IntMap.empty interface)
 
   let build_site a b = (a,b)
@@ -545,11 +545,12 @@ module Cflow_linker =
 		      try 
 			let interface = Mixture.interface agent in 
 			  match snd (Mods.IntMap.find site_name interface)
-			  with 
-			    | Node.WLD -> ANY
-			    | Node.FREE -> FREE
-			    | Node.BND -> BOUND
-			    | Node.TYPE(site_name,agent_name) -> BOUND_TYPE(agent_name,site_name)
+			  with
+			    | Mixture.WLD -> ANY
+			    | Mixture.FREE -> FREE
+			    | Mixture.BND -> BOUND
+			    | Mixture.TYPE(site_name,agent_name) ->
+			       BOUND_TYPE(agent_name,site_name)
 		      with 
 			  Not_found -> ANY
 		  end 
@@ -622,12 +623,13 @@ module Cflow_linker =
 		   | None -> list
 		 in 
 		 let list' = 
-		   match lnk with 
-		   | Node.WLD -> list 
-		   | Node.FREE -> Is_Free(site)::list 
-		   | Node.BND -> Is_Bound(site)::list 
-		   | Node.TYPE(site_name,agent_name) -> Has_Binding_type(site,(agent_name,site_name))::list
-		 in 
+		   match lnk with
+		   | Mixture.WLD -> list
+		   | Mixture.FREE -> Is_Free(site)::list
+		   | Mixture.BND -> Is_Bound(site)::list
+		   | Mixture.TYPE(site_name,agent_name) ->
+		      Has_Binding_type(site,(agent_name,site_name))::list
+		 in
 		 refine_bound_state parameter handler error site list list' fake_id lhs embedding 
 	     )
 	     ag (error,list)

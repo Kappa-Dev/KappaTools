@@ -4,20 +4,19 @@ open Tools
 open Mixture
 open ExceptionDefn
 
-let compatible_info (int_state,lnk_state) ag i = 
-		let ok = 
-			match int_state with
-				| None -> true
-				| state -> (state = Node.internal_state (ag,i))
-		in
-			if not ok then false
-			else 
-				match lnk_state with
-					| Node.WLD -> true
-					| Node.BND -> Node.is_bound (ag,i)
-					| Node.FREE -> not (Node.is_bound (ag,i))
-					| Node.TYPE (site_id,nme) -> Node.is_bound ~with_type:(site_id,nme) (ag,i)
-
+let compatible_info (int_state,lnk_state) ag i =
+  let ok =
+    match int_state with
+    | None -> true
+    | state -> (state = Node.internal_state (ag,i))
+  in
+  ok &&
+    match lnk_state with
+    | Mixture.WLD -> true
+    | Mixture.BND -> Node.is_bound (ag,i)
+    | Mixture.FREE -> not (Node.is_bound (ag,i))
+    | Mixture.TYPE (site_id,nme) ->
+       Node.is_bound ~with_type:(site_id,nme) (ag,i)
 
 (*SHOULD BE OPTIMAL, WILL BE USED IN EVENT LOOP*)
 (*returns (Some component_injection) if mix anchored at id_agent has an injection in sg at root id_node*)

@@ -1,5 +1,7 @@
 (**Module for pattern expressions*)
 
+type lnk_t = WLD | BND | FREE | TYPE of (int*int) (*(site_id,nme)*)
+
 type agent
 type t
 
@@ -42,7 +44,7 @@ val arity : t -> int
 val component_of_id : int -> t -> int
 
 (**[interface ag] returns the map site_id->(int state,lnk state)*)
-val interface : agent -> (int option * Node.lnk_t) Mods.IntMap.t
+val interface : agent -> (int option * lnk_t) Mods.IntMap.t
 
 (**[is_bound (a_i,s_j) mix] returns [true] if site [s_j] of agent [a_i] is bound (or belongs to a semi link) in mixture [mix]*)
 val is_bound : (int*int) -> t -> bool
@@ -52,7 +54,7 @@ val print : bool -> Environment.t -> out_channel -> t -> unit
 val to_kappa : bool -> Environment.t -> t -> string
 
 (**[site_defined site_id mix is_added env]*)
-val site_defined : int -> agent -> bool -> Environment.t -> (int option * Node.lnk_t) option
+val site_defined : int -> agent -> bool -> Environment.t -> (int option * lnk_t) option
 
 (**[compose i ag mix edg cstr_opt] add agent [ag] with identifier [i] to mixture [mix] with edges [edg] represented as a map (id,j)->(k,l) where k is an agent identifier and j,l are site indices*)
 (**[cstr_opt] is used to add [constraints] to construct a mixture that requires some side checks upon matching*)
@@ -63,11 +65,11 @@ val follow_in_spanning_tree : int -> (int*int) -> t -> (int*int) option
 val follow : (int*int) -> t -> (int*int) option
 
 (**[fold_interface f ag cont] iterator of agent [ag] with continuation [cont]*)
-val fold_interface : (int -> (int option * Node.lnk_t) -> 'a -> 'a) -> agent -> 'a -> 'a
+val fold_interface : (int -> (int option * lnk_t) -> 'a -> 'a) -> agent -> 'a -> 'a
 
 (**[create_agent name port_map] returns an agent with name [name] and interface specified by the map [port_map] mapping site [i] to [(internal_state*link_state)]
 with None representing absence of information *)
-val create_agent : int -> (int option * Node.lnk_t) Mods.IntMap.t -> agent
+val create_agent : int -> (int option * lnk_t) Mods.IntMap.t -> agent
 
 (**[enum_alternate_anchors mix] Initialize the field [enum_cov] of mixture mix*)
 val enum_alternate_anchors : t -> t
