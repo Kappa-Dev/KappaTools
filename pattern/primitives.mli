@@ -76,7 +76,7 @@ type modification =
 
 type perturbation =
     { precondition: bool variable;
-      effect : (rule option * modification) list;
+      effect : modification list;
       abort : bool variable option;
       flag : string;
       stopping_time : Nbr.t option

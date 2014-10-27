@@ -103,7 +103,7 @@ let apply_n_time x r state env counter pert_ids pert_events tracked =
 
 let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot counter =
   match eff with
-  | (Some _,Primitives.ITER_RULE (v,r)) ->
+  | Primitives.ITER_RULE (v,r) ->
      let x = State.value state counter env v in
     if x = Nbr.F infinity then
       let p_str = pert.Primitives.flag in
@@ -114,7 +114,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
 	Debug.tag_if_debug "Applying %a instances of %a"
 			   Nbr.print x (Dynamics.pp_effect env) eff
       in apply_n_time x r state env counter pert_ids pert_events tracked
-  | (None,Primitives.UPDATE_RULE (id,v)) ->
+  | Primitives.UPDATE_RULE (id,v) ->
      let () =
        Debug.tag_if_debug "Updating rate of rule '%a'"
 			 (Environment.print_rule env) id
@@ -123,7 +123,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
      let env,pert_ids =
        State.update_dep state ~cause:p_id (Term.RULE id) pert_ids counter env in
      (env,state ,pert_ids,tracked,pert_events)
-  | (None,Primitives.UPDATE_VAR (id,v)) ->
+  | Primitives.UPDATE_VAR (id,v) ->
      let () =
        Debug.tag_if_debug "Updating variable '%a'"
 			  (Environment.print_alg env) id
@@ -131,7 +131,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
      State.update_dep_value state counter env v (Term.ALG id);
      let env,pert_ids = State.update_dep state (Term.ALG id) pert_ids counter env in
      (env,state,pert_ids,tracked,pert_events)
-  | (None,Primitives.UPDATE_TOK (tk_id,v)) ->
+  | Primitives.UPDATE_TOK (tk_id,v) ->
      let _ = Debug.tag_if_debug "Updating token '%a'"
 				(Environment.print_token env) tk_id
     in
@@ -143,13 +143,13 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
                 State.update_dep state (Term.TOK tk_id) pert_ids counter env in
                 (env,state,pert_ids,tracked,pert_events)
       with Invalid_argument _ ->
-	        failwith "External.apply_effect: invalid token id"
+	failwith "External.apply_effect: invalid token id"
     end
-  | (None,Primitives.SNAPSHOT pexpr) ->
+  | Primitives.SNAPSHOT pexpr ->
       let str = eval_pexpr pexpr state counter env in
       snapshot str;
       (env, state ,pert_ids,tracked,pert_events)
-  | (None,Primitives.PRINT (pexpr_file,pexpr)) ->
+  | Primitives.PRINT (pexpr_file,pexpr) ->
     let str = eval_pexpr pexpr_file state counter env in
     let desc =
       match str with "" -> stdout | _ -> Environment.get_desc str env
@@ -157,7 +157,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
     dump_print_expr desc pexpr state counter env ;
     flush desc ;
     (env,state,pert_ids,tracked,pert_events)
-  | (None,Primitives.CFLOW id) ->
+  | Primitives.CFLOW id ->
     Debug.tag_if_debug "Tracking causality" ;
     Parameter.causalModeOn := true;
     let env =
@@ -165,14 +165,14 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
       else Environment.inc_active_cflows env in
     let env = Environment.track id env in
     (env, state, pert_ids,tracked,pert_events)
-  | (None,Primitives.CFLOWOFF id) ->
+  | Primitives.CFLOWOFF id ->
     begin
       let env = Environment.dec_active_cflows env in
       let env = Environment.untrack id env in
       if Environment.active_cflows env = 0 then Parameter.causalModeOn := false;
       (env,state,pert_ids,tracked,pert_events)
     end
-  | (None,Primitives.FLUXOFF pexpr) ->
+  | Primitives.FLUXOFF pexpr ->
     begin
       let str = eval_pexpr pexpr state counter env in
       let desc =
@@ -184,14 +184,14 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
       Parameter.fluxModeOn := false ;
       (env,state,pert_ids,tracked,pert_events)
     end
-  | (None,Primitives.STOP pexpr) ->
+  | Primitives.STOP pexpr ->
      Debug.tag_if_debug "Interrupting simulation now!" ;
      let str = eval_pexpr pexpr state counter env in
      snapshot str ;
      raise (ExceptionDefn.StopReached
 	      (Printf.sprintf "STOP instruction was satisfied at (%d e,%f t.u)"
 			      (Counter.event counter) (Counter.time counter)))
-  | (None,Primitives.FLUX pexpr) ->
+  | Primitives.FLUX pexpr ->
     begin
       if !Parameter.fluxModeOn
       then ExceptionDefn.warning "Flux modes are overlapping" ;
@@ -205,7 +205,6 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
       Parameter.set Parameter.fluxFileName (Some "dot");
       (env, state, pert_ids,tracked,pert_events)
     end
-  | _ -> invalid_arg "External.trigger_effect"
 
 let apply_effect p_id pert tracked pert_events state counter env =
   let snapshot str =

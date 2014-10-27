@@ -152,7 +152,7 @@ let nodes_of_ast env ast_mixture =
   in
   iter ast_mixture IntMap.empty 0 IntMap.empty env
 
-let eval_agent is_pattern env a ctxt =
+let eval_agent env a ctxt =
   let ((ag_name, (pos_ag)),ast_intf) = a in
   let name_id =
     try Environment.num_of_name ag_name env with
@@ -221,40 +221,29 @@ let eval_agent is_pattern env a ctxt =
 		})
 	    )
 	 | Ast.LNK_SOME ->
-	    if is_pattern
-	    then ((IntMap.add site_id (int_s, Node.BND) interface), ctxt)
-	    else
-	      (let msg = "illegal use of '_' in concrete graph definition"
-	       in raise (ExceptionDefn.Semantics_Error (pos, msg)))
+	    ((IntMap.add site_id (int_s, Node.BND) interface), ctxt)
 	 | Ast.LNK_ANY ->
-	    if is_pattern
-	    then ((IntMap.add site_id (int_s, Node.WLD) interface), ctxt)
-	    else
-	      (let msg =
-		 "illegal use of wildcard '?' in concrete graph definition"
-	       in raise (ExceptionDefn.Semantics_Error (pos, msg)))
+	    ((IntMap.add site_id (int_s, Node.WLD) interface), ctxt)
 	 | Ast.FREE ->
 	    ((IntMap.add site_id (int_s, Node.FREE) interface), ctxt)
 	 | Ast.LNK_TYPE ((ste_nm, pos_ste), (ag_nm, pos_ag)) ->
-	    if is_pattern then
-	      (let site_num =
-		 try Environment.id_of_site ag_nm ste_nm env
-		 with
-		 | Not_found ->
-		    raise (ExceptionDefn.Semantics_Error (pos_ste, "binding type is not compatible with agent's signature"))
-	       in
-	       let ag_num =
-		 try Environment.num_of_name ag_nm env with
-		 | Not_found -> raise
-				  (ExceptionDefn.Semantics_Error (pos_ste,
-								  "Illegal binding type, agent "^ag_nm^" is not delcared"))
-	       in
-	       ((IntMap.add site_id (int_s, Node.TYPE (site_num, ag_num)) interface),ctxt)
-	      )
-	    else
-	      (let msg =
-		 "illegal use of binding type in concrete graph definition"
-	       in raise (ExceptionDefn.Semantics_Error (pos_ste, msg)))
+	    (let site_num =
+	       try Environment.id_of_site ag_nm ste_nm env
+	       with
+	       | Not_found ->
+		  raise
+		    (ExceptionDefn.Semantics_Error
+		       (pos_ste, "binding type is not compatible with agent's signature"))
+	     in
+	     let ag_num =
+	       try Environment.num_of_name ag_nm env with
+	       | Not_found ->
+		  raise
+		    (ExceptionDefn.Semantics_Error
+		       (pos_ste, "Illegal binding type, agent "^ag_nm^" is not delcared"))
+	     in
+	     ((IntMap.add site_id (int_s, Node.TYPE (site_num, ag_num)) interface),ctxt)
+	    )
        in
        (interface,ctx)
       )
@@ -262,11 +251,11 @@ let eval_agent is_pattern env a ctxt =
   in
   (ctxt, (Mixture.create_agent name_id interface))
 
-let mixture_of_ast ?mix_id is_pattern env ast_mix =
+let mixture_of_ast ?mix_id env ast_mix =
   let rec eval_mixture env ast_mix ctxt mixture =
     match ast_mix with
     | Ast.COMMA (a, ast_mix) ->
-       let (ctxt, agent) = eval_agent is_pattern env a ctxt in
+       let (ctxt, agent) = eval_agent env a ctxt in
        let id = ctxt.curr_id in let new_edges = ctxt.new_edges in
        let (ctxt, mixture, env) =
 	 eval_mixture env ast_mix
@@ -379,7 +368,7 @@ let rec partial_eval_alg env mixs (ast, (beg_pos,end_pos)) =
   | KAPPA_INSTANCE ast ->
      let (env', id) =
        Environment.declare_var_kappa None env in
-     let mix,env'' = mixture_of_ast ~mix_id:id true env' ast in
+     let mix,env'' = mixture_of_ast ~mix_id:id env' ast in
      (env'', mix::mixs, (fun f _ _ _ _ _ _-> f id), false, Some (Nbr.I 0))
   | OBS_VAR lab ->
      let i =
@@ -477,10 +466,10 @@ let rule_of_ast ?(backwards=false) ~is_pert env mixs (ast_rule_label,ast_rule) =
        in
        (env,mixs''',Some k_alt,radius_alt,dep)
   in
-  let lhs,env = mixture_of_ast ~mix_id:lhs_id true env ast_rule.lhs
+  let lhs,env = mixture_of_ast ~mix_id:lhs_id env ast_rule.lhs
   in
   let lhs = match k_alt with None -> lhs | Some _ -> Mixture.set_unary lhs in
-  let rhs,env = mixture_of_ast true env ast_rule.rhs in
+  let rhs,env = mixture_of_ast env ast_rule.rhs in
   let (script, balance,added,modif_sites(*,side_effects*)) =
     Dynamics.diff ast_rule.rule_pos lhs rhs ast_rule_label env
 
@@ -657,7 +646,7 @@ let variables_of_result env (free_id,mixs) alg_a =
 				kappa_of_num = IntMap.add id dummy_name env.kappa_of_num;
 			      } in
 		    (* </awful hack> *)
-		    let mix,env' = mixture_of_ast ~mix_id:id true env ast in
+		    let mix,env' = mixture_of_ast ~mix_id:id env ast in
 		    (env',mix::mixs,pred id)) (env,[],pred free_id) mixs
   in
   let () = assert (final_id = -1) in
@@ -921,41 +910,19 @@ let pert_of_result variables env res =
 	     Some (bv,dep))
        in
        let env,p_id = Environment.declare_pert (str_pert,pos) env' in
-       let env,effect_list,_ =
+       let has_tracking,lrules'=
 	 List.fold_left
-	   (fun (env,rule_list,cpt) effect ->
-	    match effect with
-	    | Primitives.ITER_RULE (_,rule) ->
-	       begin
-		 let env =
-		   Term.DepSet.fold
-		     (fun dep env -> Environment.add_dependencies dep (Term.PERT p_id) env
-		     )
-		     dep env
-		 in
-		 (env,(Some rule,effect)::rule_list,cpt+1)
-	       end
-	    | Primitives.CFLOW _ ->
-	       let env = {env with Environment.tracking_enabled = true} in
-	       let env =
-		 Term.DepSet.fold
-		   (fun dep env -> Environment.add_dependencies dep (Term.PERT p_id) env
-		   )
-		   dep env
-	       in
-	       (env,(None,effect)::rule_list,cpt)
-	    | Primitives.UPDATE_RULE _ |Primitives.UPDATE_VAR _
-	    | Primitives.UPDATE_TOK _ | Primitives.SNAPSHOT _ | Primitives.STOP _
-	    | Primitives.FLUX _ | Primitives.FLUXOFF _ | Primitives.CFLOWOFF _
-	    | Primitives.PRINT _ ->
-	       let env =
-		 Term.DepSet.fold
-		   (fun dep env -> Environment.add_dependencies dep (Term.PERT p_id) env
-		   )
-		   dep env
-	       in (env,(None,effect)::rule_list,cpt)
-	   ) (env,[],0) effects
-       in
+	   (fun (track,lr) -> function
+			     | Primitives.ITER_RULE (_,r) -> (track,r::lr)
+			     | Primitives.CFLOW _ -> (true,lr)
+			     | _ -> (track,lr))
+	   (env.Environment.tracking_enabled,lrules) effects in
+       let env =
+	 Term.DepSet.fold
+	   (fun dep env -> Environment.add_dependencies dep (Term.PERT p_id) env
+	   )
+	   dep
+	   { env with Environment.tracking_enabled = has_tracking } in
        (*let env = List.fold_left (fun env (r_opt,effect) -> Environment.bind_pert_rule p_id r.r_id env) env effect_list in *)
        let opt,env =
 	 match opt_abort with
@@ -972,17 +939,13 @@ let pert_of_result variables env res =
        in
        let pert =
 	 { Primitives.precondition = bv;
-	   Primitives.effect = effect_list;
+	   Primitives.effect = effects;
 	   Primitives.abort = opt;
 	   Primitives.flag = str_pert;
 	   Primitives.stopping_time = stopping_time
 	 }
        in
-       let lrules = List.fold_left (fun cont (r_opt,_) ->
-				    match r_opt with None -> cont
-						   | Some r -> r::cont) lrules effect_list
-       in
-       (variables', pert::lpert, lrules, env)
+       (variables', pert::lpert, lrules', env)
       )
       (variables, [], [], env) res.perturbations
   in
@@ -1224,7 +1187,7 @@ let initialize result counter =
   Debug.tag "\t -observables";
   let env,kappa_vars,observables = obs_of_result env kappa_vars result in
   Debug.tag "\t -perturbations" ;
-  let (kappa_vars, pert, rule_pert, env) =
+  let (kappa_vars, pert, rules_pert, env) =
     pert_of_result kappa_vars env result in
   Debug.tag "\t Done";
   Debug.tag "+ Analyzing non local patterns..." ;
@@ -1233,7 +1196,7 @@ let initialize result counter =
   Debug.tag "\t -Counting initial local patterns..." ;
   let (state, env) =
     State.initialize sg token_vector rules kappa_vars
-		     alg_vars observables (pert,rule_pert) counter env
+		     alg_vars observables (pert,rules_pert) counter env
   in
   let state =
     if env.Environment.has_intra then

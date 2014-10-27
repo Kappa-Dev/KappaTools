@@ -104,8 +104,7 @@ let compute_causal_init (((node_id,agent_name),interface),_) env =
 
 let compute_causal_obs lhs = compute_causal lhs lhs []
 
-let pp_effect env f (_, effect) =
-  match effect with
+let pp_effect env f = function
   | PRINT (nme,_) -> Printf.fprintf f "PRINT"
   | ITER_RULE (_,rule) ->
      if Mixture.is_empty rule.lhs then
