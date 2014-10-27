@@ -242,7 +242,7 @@ let eval_agent env a ctxt =
 	       | Not_found ->
 		  raise
 		    (ExceptionDefn.Semantics_Error
-		       (pos_ste, "Illegal binding type, agent "^ag_nm^" is not delcared"))
+		       (pos_ste,"Illegal binding type, agent "^ag_nm^" is not delcared"))
 	     in
 	     ((IntMap.add site_id (int_s, Mixture.TYPE (site_num, ag_num)) interface),ctxt)
 	    )
@@ -689,12 +689,12 @@ let obs_of_result env mixs res =
     )
     (env,mixs,[]) res.observables
 
-let effects_of_modif variables env ast_list =
-  let rec iter variables effects str_pert env ast_list =
+let effects_of_modif variables lrules env ast_list =
+  let rec iter variables lrules effects str_pert env ast_list =
     match ast_list with
-    | [] -> (variables,effects,str_pert,env)
+    | [] -> (variables,lrules,effects,str_pert,env)
     | ast::tl ->
-       let (variables,effects,str_pert,env) =
+       let (variables,lrules,effects,str_pert,env) =
 	 match ast with
 	 | INTRO (alg_expr, ast_mix, pos) ->
 	    let (env', mixs',x, is_constant, opt_v) =
@@ -722,7 +722,8 @@ let effects_of_modif variables env ast_list =
 			      Expr.ast_alg_to_string (fst alg_expr)
 			      (Kappa_printer.mixture_to_string false env)
 			      rule.Primitives.rhs)::str_pert
-	    in (mixs'', (Primitives.ITER_RULE (v, rule))::effects, str, env)
+	    in (mixs'', rule::lrules,
+		(Primitives.ITER_RULE (v, rule))::effects, str, env)
 	 | DELETE (alg_expr, ast_mix, pos) ->
 	    let (env',mixs',x, is_constant, opt_v) =
 	      partial_eval_alg env variables alg_expr in
@@ -749,7 +750,8 @@ let effects_of_modif variables env ast_list =
 			      Expr.ast_alg_to_string (fst alg_expr)
 			      (Kappa_printer.mixture_to_string false env)
 			      rule.Primitives.lhs)::str_pert
-	    in (mixs'', (Primitives.ITER_RULE (v, rule))::effects, str, env)
+	    in (mixs'', rule::lrules,
+		(Primitives.ITER_RULE (v, rule))::effects, str, env)
 	 | UPDATE ((nme, pos_rule), alg_expr) ->
 	    let i,is_rule =
 	      (try (Environment.num_of_rule nme env,true)
@@ -779,7 +781,7 @@ let effects_of_modif variables env ast_list =
 				(fst (Environment.alg_of_num i env)))
 		Expr.ast_alg_to_string (fst alg_expr)::str_pert
 	    in
-	    (mixs',
+	    (mixs',lrules,
 	     (if is_rule then Primitives.UPDATE_RULE (i, v)
 	      else Primitives.UPDATE_VAR (i, v))::effects, str, env')
 	 | UPDATE_TOK ((tk_nme,tk_pos),alg_expr) ->
@@ -800,14 +802,14 @@ let effects_of_modif variables env ast_list =
 	    let str = (Printf.sprintf "set token '%s' to value %a" tk_nme
 				      Expr.ast_alg_to_string (fst alg_expr))::str_pert
 	    in
-	    (mixs', (Primitives.UPDATE_TOK (tk_id, v))::effects, str, env')
+	    (mixs',lrules,(Primitives.UPDATE_TOK (tk_id, v))::effects, str,env')
 	 | SNAPSHOT (pexpr,pos) ->
 	    (*when specializing snapshots to particular mixtures, add variables below*)
 	    let str = ("snapshot state")::str_pert in
-	    (variables, (Primitives.SNAPSHOT pexpr)::effects, str, env)
+	    (variables, lrules, (Primitives.SNAPSHOT pexpr)::effects, str, env)
 	 | STOP (pexpr,pos) ->
 	    let str = "interrupt simulation"::str_pert in
-	    (variables, (Primitives.STOP pexpr)::effects, str, env)
+	    (variables, lrules, (Primitives.STOP pexpr)::effects, str, env)
 	 | CFLOW ((lab,pos_lab),pos_pert) ->
 	    let id =
 	      try Environment.num_of_rule lab env
@@ -822,7 +824,7 @@ let effects_of_modif variables env ast_list =
 			   ,pos_lab))
 	    in
 	    let str = (Printf.sprintf "Enable causality analysis for observable '%s'" lab)::str_pert in
-	    (variables, (Primitives.CFLOW id)::effects, str, env)
+	    (variables, lrules, (Primitives.CFLOW id)::effects, str, env)
 	 | CFLOWOFF ((lab,pos_lab),pos_pert) ->
 	    let id =
 	      try Environment.num_of_rule lab env
@@ -837,13 +839,13 @@ let effects_of_modif variables env ast_list =
 			   ,pos_lab))
 	    in
 	    let str = (Printf.sprintf "Disable causality analysis for observable '%s'" lab)::str_pert in
-	    (variables, (Primitives.CFLOWOFF id)::effects, str, env)
+	    (variables, lrules, (Primitives.CFLOWOFF id)::effects, str, env)
 	 | FLUX (pexpr,pos) ->
 	    let str = "Activate flux tracking"::str_pert in
-	    (variables,(Primitives.FLUX pexpr)::effects, str, env)
+	    (variables, lrules, (Primitives.FLUX pexpr)::effects, str, env)
 	 | FLUXOFF (pexpr,pos) ->
 	    let str = "Disable flux tracking"::str_pert in
-	    (variables,(Primitives.FLUXOFF pexpr)::effects, str, env)
+	    (variables, lrules, (Primitives.FLUXOFF pexpr)::effects, str, env)
 	 | PRINT (pexpr,print,pos) ->
 	    let str_l =
 	      List.fold_left
@@ -855,13 +857,13 @@ let effects_of_modif variables env ast_list =
 	    in
 	    let str = (Printf.sprintf "Print %s" (Tools.string_of_list (fun i->i) str_l))::str_pert
 	    in
-	    (variables,(Primitives.PRINT (pexpr,print))::effects, str, env)
+	    (variables,lrules,(Primitives.PRINT (pexpr,print))::effects,str,env)
        in
-       iter variables effects str_pert env tl
+       iter variables lrules effects str_pert env tl
   in
-  iter variables [] [] env ast_list
+  iter variables lrules [] [] env ast_list
 
-let pert_of_result variables env res =
+let pert_of_result variables env rules res =
   let (variables, lpert, lrules, env) =
     List.fold_left
       (fun (variables, lpert, lrules, env)
@@ -879,8 +881,8 @@ let pert_of_result variables env res =
 		     (ExceptionDefn.Semantics_Error
 			(bpos,"Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"))
        in
-       let (variables, effects, str_eff, env) =
-	 effects_of_modif variables' env' modif_expr_list in
+       let (variables, lrules', effects, str_eff, env) =
+	 effects_of_modif variables' lrules env' modif_expr_list in
        let str_eff = String.concat ";" (List.rev str_eff) in
        let bv =
 	 if is_constant
@@ -914,17 +916,14 @@ let pert_of_result variables env res =
 	     Some (bv,dep))
        in
        let env,p_id = Environment.declare_pert (str_pert,pos) env' in
-       let has_tracking,lrules'=
-	 List.fold_left
-	   (fun (track,lr) -> function
-			     | Primitives.ITER_RULE (_,r) -> (track,r::lr)
-			     | Primitives.CFLOW _ -> (true,lr)
-			     | _ -> (track,lr))
-	   (env.Environment.tracking_enabled,lrules) effects in
+       let has_tracking = env.Environment.tracking_enabled
+			  || List.exists
+			       (function
+				 | Primitives.CFLOW _ -> true
+				 | _ -> false) effects in
        let env =
 	 Term.DepSet.fold
-	   (fun dep env -> Environment.add_dependencies dep (Term.PERT p_id) env
-	   )
+	   (fun dep -> Environment.add_dependencies dep (Term.PERT p_id))
 	   dep
 	   { env with Environment.tracking_enabled = has_tracking } in
        (*let env = List.fold_left (fun env (r_opt,effect) -> Environment.bind_pert_rule p_id r.r_id env) env effect_list in *)
@@ -951,7 +950,7 @@ let pert_of_result variables env res =
        in
        (variables', pert::lpert, lrules', env)
       )
-      (variables, [], [], env) res.perturbations
+      (variables, [], rules, env) res.perturbations
   in
   (*making sure that perturbations containing a stopping time precondition are tested first*)
   let lpert = List.rev lpert in
@@ -1192,7 +1191,7 @@ let initialize result counter =
   let env,kappa_vars,observables = obs_of_result env kappa_vars result in
   Debug.tag "\t -perturbations" ;
   let (kappa_vars, pert, rules_pert, env) =
-    pert_of_result kappa_vars env result in
+    pert_of_result kappa_vars env [] result in
   Debug.tag "\t Done";
   Debug.tag "+ Analyzing non local patterns..." ;
   let env = Environment.init_roots_of_nl_rules env in
