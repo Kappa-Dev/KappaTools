@@ -436,7 +436,7 @@ let build_influence_map rules patterns env =
 	| None -> () (*empty pattern*)
 	| Some mix ->
 	   Debug.tag_if_debug "%s -+-> %a?" (Dynamics.to_kappa r env)
-			      (Mixture.print false env) mix;
+			      (Kappa_printer.mixture false env) mix;
 	   let glueings = Dynamics.enable r mix env in
 	   (*glueings: [phi_0;...;phi_n] partial embeddings list*)
 	   match glueings with
@@ -464,7 +464,7 @@ let dot_of_influence_map desc state env =
        | None -> ()
        | Some mix ->
 	  Printf.fprintf desc "\"%d:%a\" [shape=ellipse,fillcolor=palegreen3] ;\n"
-			 mix_id (Mixture.print false env) mix
+			 mix_id (Kappa_printer.mixture false env) mix
     ) state.kappa_variables ;
   Hashtbl.iter
     (fun r_id act_map ->
@@ -478,7 +478,7 @@ let dot_of_influence_map desc state env =
 	    Dynamics.to_kappa rule' env
 	  else
 	    let mix = kappa_of_id mix_id state in
-	    Mixture.to_kappa false env mix
+	    Kappa_printer.mixture_to_string false env () mix
 	in
 	let arrow_label =
 	  let ls =
@@ -1306,7 +1306,7 @@ let negative_upd state cause (u,i) int_lnk counter env =
 							(fun i j _ ->
 								let a_i = Mixture.agent_of_id i mix
 								and u_j =	try SiteGraph.node_of_id state.graph j with 
-									| exn -> invalid_arg (Printf.sprintf "State.negative_update: Node #%d is no longer in the graph and injection %s of mixture %s was pointing on it!" j (Injection.to_string phi) (Mixture.to_kappa false env mix))
+									| exn -> invalid_arg (Printf.sprintf "State.negative_update: Node #%d is no longer in the graph and injection %s of mixture %s was pointing on it!" j (Injection.to_string phi) (Kappa_printer.mixture_to_string false env () mix))
 								in
 								Mixture.fold_interface
 								(fun site_id (int_opt, lnk_opt) _ ->
@@ -1597,7 +1597,7 @@ let dump state counter env =
 						| Some injprod_hp -> 
 							(Printf.printf "#Unary[%d]: '%s' %a has %d unary instances\n" mix_id
 									(Environment.kappa_of_num mix_id env)
-									(Mixture.print false env) (kappa_of_id mix_id state)
+									(Kappa_printer.mixture false env) (kappa_of_id mix_id state)
 									(InjProdHeap.size injprod_hp);
 									if SiteGraph.size state.graph > 1000 then ()
 									else
@@ -1612,7 +1612,7 @@ let dump state counter env =
 					| Some comp_injs ->
 							(Printf.printf "#Var[%d]: '%s' %a has %d instances\n" mix_id
 									(Environment.kappa_of_num mix_id env)
-									(Mixture.print false env) (kappa_of_id mix_id state)
+									(Kappa_printer.mixture false env) (kappa_of_id mix_id state)
 									(Nbr.to_int (instance_number mix_id state env));
 									if SiteGraph.size state.graph > 1000 then ()
 									else

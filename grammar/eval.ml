@@ -475,9 +475,9 @@ let rule_of_ast ?(backwards=false) ~is_pert env mixs (ast_rule_label,ast_rule) =
   let (script, balance,added,modif_sites(*,side_effects*)) =
     Dynamics.diff ast_rule.rule_pos lhs rhs ast_rule_label env
 
-  and kappa_lhs = Mixture.to_kappa false env lhs
+  and kappa_lhs = Kappa_printer.mixture_to_string false env () lhs
 
-  and kappa_rhs = Mixture.to_kappa false env rhs in
+  and kappa_rhs = Kappa_printer.mixture_to_string false env () rhs in
   let tokenify env mixs l =
     List.fold_right
       (fun (alg_expr,(nme,pos)) (env,mixs,out) ->
@@ -725,9 +725,10 @@ let effects_of_modif variables env ast_list =
 	      else Primitives.VAR x
 	    in
 	    let str =
-	      (Printf.sprintf "introduce %a * %s"
+	      (Printf.sprintf "introduce %a * %a"
 			      Expr.ast_alg_to_string (fst alg_expr)
-			      (Mixture.to_kappa false env rule.Primitives.rhs))::str_pert
+			      (Kappa_printer.mixture_to_string false env)
+			      rule.Primitives.rhs)::str_pert
 	    in (mixs'', (Primitives.ITER_RULE (v, rule))::effects, str, env)
 	 | DELETE (alg_expr, ast_mix, pos) ->
 	    let (env',mixs',x, is_constant, opt_v) =
@@ -751,8 +752,10 @@ let effects_of_modif variables env ast_list =
 	      else Primitives.VAR x
 	    in
 	    let str =
-	      (Printf.sprintf "remove %a * %s" Expr.ast_alg_to_string (fst alg_expr)
-			      (Mixture.to_kappa false env rule.Primitives.lhs))::str_pert
+	      (Printf.sprintf "remove %a * %a"
+			      Expr.ast_alg_to_string (fst alg_expr)
+			      (Kappa_printer.mixture_to_string false env)
+			      rule.Primitives.lhs)::str_pert
 	    in (mixs'', (Primitives.ITER_RULE (v, rule))::effects, str, env)
 	 | UPDATE ((nme, pos_rule), alg_expr) ->
 	    let i,is_rule =

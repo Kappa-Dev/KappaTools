@@ -25,6 +25,7 @@ sig
 	val size: 'a t -> int
 	val root: 'a t -> (key * 'a) option
 	val max_key : 'a t -> key
+	val bindings: 'a t -> (key * 'a) list
 end
 
 module Make(Ord: OrderedType) = struct
@@ -216,4 +217,12 @@ module Make(Ord: OrderedType) = struct
 	  | Empty -> invalid_arg "MapExt.max_key"
 	  | Node (_,k,_,Empty,_,_) -> k
 	  | Node (_,_,_,m,_,_) -> max_key m
+
+	let rec bindings_aux accu = function
+            Empty -> accu
+	  | Node(l, v, d, r, _, _) ->
+	     bindings_aux ((v, d) :: bindings_aux accu r) l
+
+	let bindings s =
+	  bindings_aux [] s
 end

@@ -138,77 +138,8 @@ let follow_in_spanning_tree root_ag (i,site_id) mix =
 		with
 			| Not_found -> None
 
-let follow (i,site_id) mix = 
-	try Some (Int2Map.find (i,site_id) mix.graph) with Not_found -> None 
-
-let to_kappa_list with_number env mix =
-  let bnd = Hashtbl.create 10 in
-  let fresh = ref 0 in
-  let string_of_intf name_id agent_id interface =
-    let l =
-      IntMap.fold
-	(fun site_id (opt_v,opt_l) l ->
-	 let site_name = Environment.site_of_id name_id site_id env in
-	 if site_name = "_" then l (*skipping existential port*)
-	 else
-	   let s_int = match opt_v with
-	     | (Some x) -> ("~"^(Environment.state_of_id name_id site_id x env))
-	     | None -> ""
-	   in
-	   let s_lnk = match opt_l with
-	     | BND ->
-		let opt = follow (agent_id,site_id) mix in
-		begin
-		  match opt with
-		  | Some (agent_id',site_id') ->
-		     begin
-		       let lnk =
-			 try Hashtbl.find bnd (agent_id,site_id) with
-			 | Not_found ->
-			    (Hashtbl.replace bnd (agent_id',site_id') !fresh ;
-			     let i = !fresh in
-			     fresh := !fresh+1 ;
-			     i)
-		       in
-		       Hashtbl.replace bnd (agent_id,site_id) lnk ;
-		       "!"^(string_of_int lnk)
-		     end
-		  | None ->
-		     if not (Hashtbl.mem bnd (agent_id,site_id)) then "!_"
-		     else
-		       let lnk = Hashtbl.find bnd (agent_id,site_id) in
-		       "!"^(string_of_int lnk)
-		end
-	     | FREE -> ""
-	     | WLD -> "?"
-	     | TYPE (i,nme) ->
-		let s = Environment.site_of_id nme i env
-		and n = Environment.name nme env in
-		("!"^s^"."^n)
-	   in
-	   (site_name^s_int^s_lnk)::l
-	) interface []
-    in
-    String.concat "," (List.rev l)
-  in
-  let l =
-    IntMap.fold
-      (fun id agent l ->
-       let name = if with_number
-		  then (Environment.name agent.name env)^"#"^(string_of_int id)
-		  else Environment.name agent.name env
-       in
-       let s = Printf.sprintf "%s(%s)" name (string_of_intf agent.name id agent.interface) in
-       s::l
-      ) mix.agents []
-  in
-  List.rev l
-
-let print with_number env f mix =
-  Pp.list Pp.comma Pp.string f (to_kappa_list with_number env mix)
-
-let to_kappa with_number env mix =
-  String.concat "," (to_kappa_list with_number env mix)
+let follow (i,site_id) mix =
+  try Some (Int2Map.find (i,site_id) mix.graph) with Not_found -> None
 
 let create_sptr_from id mix = 
 	let rec depth_first queue viewed m2_span m2_internal component =

@@ -108,10 +108,10 @@ let pp_effect env f = function
   | PRINT (nme,_) -> Printf.fprintf f "PRINT"
   | ITER_RULE (_,rule) ->
      if Mixture.is_empty rule.lhs then
-       Printf.fprintf f "INTRO %a" (Mixture.print false env) rule.rhs
+       Printf.fprintf f "INTRO %a" (Kappa_printer.mixture false env) rule.rhs
      else
        let () = assert (Mixture.is_empty rule.rhs) in
-       Printf.fprintf f "DELETE %a" (Mixture.print false env) rule.lhs
+       Printf.fprintf f "DELETE %a" (Kappa_printer.mixture false env) rule.lhs
   | UPDATE_RULE (r_id,_) -> Printf.fprintf f "UPDATE rule[%d]" r_id
   | UPDATE_VAR (v_id,_) -> Printf.fprintf f "UPDATE var[%d]" v_id
   | UPDATE_TOK (t_id,_) ->
@@ -574,8 +574,8 @@ let enable r mix env =
       try Mixture.agent_of_id root pat1
       with Not_found ->
 	invalid_arg
-	  (Printf.sprintf "Dynamics.enable: agent %d not found in %s"
-			  root (Mixture.to_kappa true env pat1)) in
+	  (Printf.sprintf "Dynamics.enable: agent %d not found in %a"
+			  root (Kappa_printer.mixture_to_string true env) pat1) in
     let name_id_root = Mixture.name root_ag in
     let candidates = (*agent id in lhs --all cc-- that have the name name_id_root*)
       let cpt = ref 0
