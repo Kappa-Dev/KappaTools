@@ -1558,7 +1558,10 @@ let snapshot state counter desc hr env =
 			Printf.fprintf desc "# End snapshot\n"
 			end
 	with
-		| Sys_error msg -> ExceptionDefn.warning ("Cannot output snapshot: "^msg) 
+		| Sys_error msg ->
+		   ExceptionDefn.warning
+		     (fun f-> Printf.fprintf
+				f "Cannot output snapshot: %s" msg)
 
 let dump_rules state env =
   Hashtbl.iter (fun i r -> Dynamics.dump r env) state.rules

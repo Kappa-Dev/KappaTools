@@ -28,7 +28,4 @@ let position f (beg_pos,end_pos) =
 	  (end_pos.Lexing.pos_cnum - end_pos.Lexing.pos_bol)
 
 let error pr (x,pos) =
-  eprintf "%a:@ %a@." position pos pr x
-
-let warning pr (x,pos) =
-eprintf "%a:@ <Warning>@ %a@." position pos pr x
+  eprintf "%a@.%a@." position pos pr x

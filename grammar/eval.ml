@@ -864,7 +864,8 @@ let pert_of_result variables env res =
   let (variables, lpert, lrules, env) =
     List.fold_left
       (fun (variables, lpert, lrules, env)
-	   (pre_expr, modif_expr_list, pos, opt_post) ->
+	   ((pre_expr, modif_expr_list, opt_post),pos) ->
+       let bpos = pos_of_lex_pos (fst pos) in
        let (env', variables', x, is_constant) =
 	 partial_eval_bool env variables pre_expr in
        let (_mix',(pre,_pos)) =
@@ -875,7 +876,7 @@ let pert_of_result variables env res =
 		 with ExceptionDefn.Unsatisfiable ->
 		   raise
 		     (ExceptionDefn.Semantics_Error
-			(pos,"Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"))
+			(bpos,"Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"))
        in
        let (variables, effects, str_eff, env) =
 	 effects_of_modif variables' env' modif_expr_list in
@@ -900,7 +901,7 @@ let pert_of_result variables env res =
 			       ExceptionDefn.Unsatisfiable ->
 			       raise
 				 (ExceptionDefn.Semantics_Error
-				    (pos,"Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"))
+				    (bpos,"Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"))
 	    in
 	    let bv =
 	      if is_constant then Primitives.CONST (close_var x)
@@ -1025,12 +1026,11 @@ let init_graph_of_result env res =
 
 let configurations_of_result result =
   let set_value pos_p param value_list f ass =
-    try
-      let v,pos = List.hd value_list in
-      ass := f (v,pos)
-    with _ ->
-      ExceptionDefn.warning
-	~with_pos:pos_p (Printf.sprintf "Empty value for parameter %s" param)
+    match value_list with
+    | (v,pos) :: _ -> ass := f (v,pos)
+    | [] -> ExceptionDefn.warning
+	      ~pos:pos_p
+	      (fun f -> Printf.fprintf f "Empty value for parameter %s" param)
   in
   List.iter
     (fun ((param,pos_p),value_list) ->
@@ -1144,7 +1144,8 @@ let configurations_of_result result =
 		  )
 		  Parameter.showIntroEvents
      | _ as error ->
-	raise (ExceptionDefn.Semantics_Error (pos_p,Printf.sprintf "Unkown parameter %s" error))
+	raise (ExceptionDefn.Semantics_Error
+		 (pos_of_lex_pos (fst pos_p),Printf.sprintf "Unkown parameter %s" error))
     ) result.configurations
 
 let initialize result counter =

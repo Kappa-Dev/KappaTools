@@ -194,7 +194,8 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
   | Primitives.FLUX pexpr ->
     begin
       if !Parameter.fluxModeOn
-      then ExceptionDefn.warning "Flux modes are overlapping" ;
+      then ExceptionDefn.warning
+	     (fun f -> Printf.fprintf f "Flux modes are overlapping");
       Parameter.fluxModeOn := true ;
       let nme = eval_pexpr pexpr state counter env in
       let _ =

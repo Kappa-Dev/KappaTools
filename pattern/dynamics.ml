@@ -140,8 +140,8 @@ let diff pos m0 m1 label_opt env =
   in
   (*let side_effect = ref false in*)
   let pp_warning pr =
-    match label_opt with Some (_,pos) -> (Pp.warning pr ((),pos))
-		       | None -> Printf.eprintf "%a" pr () in
+    warning ?pos:(match label_opt with Some (_,pos) -> Some pos | None -> None)
+	    pr in
   let compile_error pos msg = raise (ExceptionDefn.Semantics_Error (pos,msg)) in
   let id_preserving ag1 ag2 = (*check whether ag2 can be the residual of ag1 for (same name)*)
     Mixture.name ag1 = Mixture.name ag2
@@ -275,7 +275,7 @@ let diff pos m0 m1 label_opt env =
 	       let site = Environment.site_of_id (Mixture.name ag) site_id env in
 	       let _ =
 		 pp_warning
-		   (fun f () ->
+		   (fun f ->
 		    Printf.fprintf
 		      f "internal state of site '%s' of agent '%s' is modified although it is left unpecified in the left hand side"
 		      site (Environment.name (Mixture.name ag) env)
@@ -323,7 +323,7 @@ let diff pos m0 m1 label_opt env =
 		  (*side_effect := true ;*)
 		  let _ =
 		    pp_warning
-		      (fun f () ->
+		      (fun f ->
 		       Printf.fprintf
 			 f "breaking a semi-link on site '%s' will induce a side effect"
 			 (Environment.site_of_id (Mixture.name ag) site_id env)
@@ -342,7 +342,7 @@ let diff pos m0 m1 label_opt env =
 		    let site = Environment.site_of_id (Mixture.name ag) site_id env in
 		    let _ =
 		      pp_warning
-			(fun f () ->
+			(fun f ->
 			 Printf.fprintf
 			   f "link state of site '%s' of agent '%s' is changed although it is a semi-link in the left hand side"
 			   site (Environment.name (Mixture.name ag) env)
@@ -367,7 +367,7 @@ let diff pos m0 m1 label_opt env =
 		    let site = Environment.site_of_id (Mixture.name ag) site_id env in
 		    let _ =
 		      pp_warning
-			(fun f () ->
+			(fun f ->
 			 Printf.fprintf
 			   f "rule induces a link permutation on site '%s' of agent '%s'"
 			   site (Environment.name (Mixture.name ag) env)
@@ -433,7 +433,7 @@ let diff pos m0 m1 label_opt env =
 	     let site = Environment.site_of_id (Mixture.name ag) site_id env in
 	     let _ =
 	       pp_warning
-		 (fun f () ->
+		 (fun f ->
 		  Printf.fprintf
 		    f "application of this rule will induce a null event when applied to an agent '%s' that is free on '%s'"
 		    (Environment.name (Mixture.name ag) env) site
@@ -456,7 +456,7 @@ let diff pos m0 m1 label_opt env =
 		  let site = Environment.site_of_id (Mixture.name ag) site_id env in
 		  let _ =
 		    pp_warning
-		      (fun f () ->
+		      (fun f ->
 		       Printf.fprintf
 			 f "site '%s' of agent '%s' is bound in the right hand side although it is unspecified in the left hand side"
 			 site (Environment.name (Mixture.name ag) env)

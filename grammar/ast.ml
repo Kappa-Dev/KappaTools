@@ -87,12 +87,12 @@ type 'mixture modif_expr =
 	| FLUX of 'mixture print_expr with_pos list * Tools.pos
 	| FLUXOFF of 'mixture print_expr with_pos list * Tools.pos
 type 'mixture perturbation =
-    'mixture ast_alg_expr bool_expr with_pos * ('mixture modif_expr list) *
-      Tools.pos * 'mixture ast_alg_expr bool_expr with_pos option
+    ('mixture ast_alg_expr bool_expr with_pos * ('mixture modif_expr list) *
+      'mixture ast_alg_expr bool_expr with_pos option) Term.with_pos
 
 
 
-type configuration = str_pos * (str_pos list)
+type configuration = string Term.with_pos * (str_pos list)
 
 type 'mixture variable_def = string with_pos * 'mixture ast_alg_expr with_pos
 type 'mixture init_t =

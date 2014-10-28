@@ -77,9 +77,11 @@ start_rule:
 		      | Ast.PLOT expr ->
 			 (Ast.result := {!Ast.result with
 					  Ast.observables = expr::!Ast.result.Ast.observables})
-		      | Ast.PERT (pre,effect,pos,opt) ->
+		      | Ast.PERT ((pre,effect,opt),pos) ->
 			 (Ast.result := {!Ast.result with
-					  Ast.perturbations = (pre,effect,pos,opt)::!Ast.result.Ast.perturbations})
+					  Ast.perturbations =
+					    ((pre,effect,opt),pos)
+					      ::!Ast.result.Ast.perturbations})
 		      | Ast.CONFIG (param_name,value_list) ->
 			 (Ast.result := {!Ast.result with
 					  Ast.configurations = (param_name,value_list)::!Ast.result.Ast.configurations})
@@ -109,25 +111,29 @@ instruction:
 			   (Some $1,"Malformed plot instruction, I was expecting an algebraic expression of variables"))}
     | PERT perturbation_declaration
 	   {let (bool_expr,mod_expr_list) = $2 in
-	    Ast.PERT (bool_expr,mod_expr_list,$1,None)}
+	    Ast.PERT (add_pos (bool_expr,mod_expr_list,None))}
     | PERT REPEAT perturbation_declaration UNTIL bool_expr
 	   {let (bool_expr,mod_expr_list) = $3 in
-	    if List.exists
-		 (fun effect ->
-		  match effect with
-		  | (Ast.CFLOW _ | Ast.CFLOWOFF _ | Ast.FLUX _ | Ast.FLUXOFF _) -> true 
-		  | _ -> false
-		 ) mod_expr_list
-	    then (ExceptionDefn.warning ~with_pos:$1
-					"Perturbation need not be applied repeatedly") ;
-	    Ast.PERT (bool_expr,mod_expr_list,$1,Some $5)}
+	    let () = if List.exists
+			  (fun effect ->
+			   match effect with
+			   | (Ast.CFLOW _ | Ast.CFLOWOFF _
+			      | Ast.FLUX _ | Ast.FLUXOFF _) -> true
+			   | _ -> false
+			  ) mod_expr_list
+		     then
+		       ExceptionDefn.warning
+			 ~pos:(Parsing.symbol_start_pos (), Parsing.symbol_end_pos ())
+			 (fun f -> Pp.string f "Perturbation need not be applied repeatedly") in
+	    Ast.PERT (add_pos (bool_expr,mod_expr_list,Some $5))}
     | CONFIG STRING value_list
-	     {Ast.CONFIG ($2,$3)}
+	     {Ast.CONFIG ((fst $2,rhs_pos 2),$3)}
     | PERT bool_expr DO effect_list UNTIL bool_expr
       /* backward compatibility */
-	   {ExceptionDefn.warning ~with_pos:$1
-				  "Deprecated perturbation syntax: use the 'repeat ... until' construction" ; 
-	    Ast.PERT ($2,$4,$1,Some $6)}
+	   {ExceptionDefn.warning
+	      ~pos:(Parsing.symbol_start_pos (), Parsing.symbol_end_pos ())
+	      (fun f -> Pp.string f "Deprecated perturbation syntax: use the 'repeat ... until' construction");
+	    Ast.PERT (add_pos ($2,$4,Some $6))}
     ;
 
 init_declaration:
@@ -147,8 +153,8 @@ perturbation_declaration:
     | bool_expr DO effect_list {($1,$3)}
     | bool_expr SET effect_list
 		{ExceptionDefn.warning
-		   ~with_pos:(Tools.pos_of_lex_pos (Parsing.symbol_start_pos ()))
-		   "Deprecated perturbation syntax: 'set' keyword is replaced by 'do'";
+		   ~pos:(Parsing.symbol_start_pos (), Parsing.symbol_end_pos ())
+		   (fun f -> Pp.string f "Deprecated perturbation syntax: 'set' keyword is replaced by 'do'");
 		 ($1,$3)} /*For backward compatibility*/
     ;
 
@@ -161,8 +167,12 @@ effect_list:
 effect:
     | LABEL ASSIGN alg_expr
       /*updating the rate of a rule -backward compatibility*/
-				       {let _ = ExceptionDefn.warning ~with_pos:$2
-								      "Deprecated syntax, use $UPDATE perturbation instead of the ':=' assignment (see Manual)" in 
+				{
+				  ExceptionDefn.warning
+				    ~pos:(Parsing.symbol_start_pos (), Parsing.symbol_end_pos ())
+				    (fun f ->
+				     Pp.string
+				       f "Deprecated syntax, use $UPDATE perturbation instead of the ':=' assignment (see Manual)");
 					Ast.UPDATE ($1,$3)}
     | ASSIGN2 LABEL alg_expr /*updating the rate of a rule*/
 						      {Ast.UPDATE ($2,$3)}
@@ -313,8 +323,10 @@ rule_expression:
     | rule_label lhs_rhs arrow lhs_rhs
 		 {let pos = match $3 with Ast.RAR pos | Ast.LRAR pos -> pos in
 		  let lhs,token_l = $2 and rhs,token_r = $4 in
-		  ExceptionDefn.warning ~with_pos:pos
-					"Rule has no kinetics. Default rate of 0.0 is assumed.";
+		  ExceptionDefn.warning
+		    ~pos:(Parsing.symbol_start_pos (), Parsing.symbol_end_pos ())
+		    (fun f -> Pp.string
+				f "Rule has no kinetics. Default rate of 0.0 is assumed.");
 		  ($1,{Ast.rule_pos = pos ;
 		       Ast.lhs = lhs;
 		       Ast.rm_token = token_l;

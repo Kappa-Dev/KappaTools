@@ -139,17 +139,23 @@ let alg_of_num i env = fst env.algs.NamedDecls.decls.(i)
 (*let bind_pert_rule pid rid env = {env with rule_of_pert = IntMap.add pid rid env.rule_of_pert}*)
 (*let rule_of_pert pid env = try Some (IntMap.find pid env.rule_of_pert) with Not_found -> None *)
 
-let declare_pert (lab,pos) env = 
-	let opt = try Some (num_of_pert lab env) with Not_found -> None in
-		match opt with
-			| Some i -> (ExceptionDefn.warning ~with_pos:pos "Perturbation is defined twice, ignoring additional occurence" ; (env,i)) 
-			| None ->
-				let i,env = (env.fresh_pert,{env with fresh_pert = env.fresh_pert+1})
-				in
-				({env with
-					pert_of_num = IntMap.add i lab env.pert_of_num ;
-					num_of_pert = StringMap.add lab i env.num_of_pert
-				},i)
+let declare_pert (lab,pos) env =
+  let opt = try Some (num_of_pert lab env) with Not_found -> None in
+  match opt with
+  | Some i ->
+     ExceptionDefn.warning
+       ~pos
+       (fun f ->
+	Printf.fprintf
+	  f "Perturbation is defined twice, ignoring additional occurence");
+     (env,i)
+  | None ->
+     let i,env = (env.fresh_pert,{env with fresh_pert = env.fresh_pert+1})
+     in
+     ({env with
+	pert_of_num = IntMap.add i lab env.pert_of_num ;
+	num_of_pert = StringMap.add lab i env.num_of_pert
+      },i)
 let name_number env = NamedDecls.size env.signatures
 
 let add_dependencies dep dep' env =

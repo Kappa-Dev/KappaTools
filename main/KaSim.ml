@@ -50,7 +50,10 @@ let main =
 	in
 	try
 		Arg.parse options (fun _ -> Arg.usage options usage_msg ; exit 1) usage_msg ;
-		if not !Parameter.plotModeOn then ExceptionDefn.warning "No data points are required, use -p option for plotting data.";
+		if not !Parameter.plotModeOn then
+		  ExceptionDefn.warning
+		    (fun f -> Printf.fprintf
+				f "No data points are required, use -p option for plotting data.");
 		let abort =
 			match !Parameter.inputKappaFileNames with
 			| [] -> if !Parameter.marshalizedInFile = "" then true else false
@@ -128,11 +131,17 @@ let main =
 		let plot = Plot.create !Parameter.outputDataName
 		and grid,profiling,event_list = 
 			if Environment.tracking_enabled env then
-				let _ = 
-					if !Parameter.mazCompression || !Parameter.weakCompression || !Parameter.strongCompression then ()
-					else (ExceptionDefn.warning "Causal flow compution is required but no compression is specified, will output flows with no compresion"  ; 
-					Parameter.mazCompression := true)
-				in  
+			  let () =
+			    if !Parameter.mazCompression
+			       || !Parameter.weakCompression
+			       || !Parameter.strongCompression then ()
+			    else (
+			      ExceptionDefn.warning
+				(fun f ->
+				 Pp.string
+				   f "Causal flow compution is required but no compression is specified, will output flows with no compresion");
+			      Parameter.mazCompression := true)
+			  in
 				let grid = Causal.empty_grid() in 
                                 let event_list = [] in 
                                 let profiling,event_list = 

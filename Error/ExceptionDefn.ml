@@ -21,18 +21,20 @@ exception Malformed_Decl of string Term.with_pos
 exception Semantics_Error of Tools.pos * string
 exception Unsatisfiable
 
-let warning_buffer:string list ref = ref []
+let warning_buffer:(out_channel -> unit) list ref = ref []
 
-let warning ?with_pos msg =
-  let str =
-    match with_pos with
-    | Some pos -> (Tools.string_of_pos pos)^" "
-    | None -> ""
+let warning ?pos msg =
+  let pr f =
+    match pos with
+    | Some pos -> Printf.fprintf f "%a\n" Pp.position pos
+    | None -> Printf.fprintf f ""
   in
-  warning_buffer := ("WARNING: "^str^msg^"\n")::!warning_buffer
+  warning_buffer :=
+    (fun f -> Printf.fprintf f "%tWARNING: %t\n" pr msg)::
+      !warning_buffer
 
 let flush_warning () =
   prerr_string "\n";
   let l = List.rev !warning_buffer in
-  List.iter (fun s -> prerr_string s) l ;
+  List.iter (fun s -> Printf.eprintf "%t" s) l;
   flush stderr
