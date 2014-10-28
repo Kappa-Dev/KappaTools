@@ -45,8 +45,8 @@ end = struct
   let is_internal_modif = is _INTERNAL_MODIF
   let is_internal_something = is (_INTERNAL_MODIF lor _INTERNAL_TESTED)
   let create i_t l_t =
-    if i_t then _INTERNAL_TESTED else 0 +
-    if l_t then _LINK_TESTED else 0
+    (if i_t then _INTERNAL_TESTED else 0) lor
+      (if l_t then _LINK_TESTED else 0)
   let add_internal_modif c = c lor _INTERNAL_MODIF
   let add_link_modif c = c lor _LINK_MODIF
   let to_int c = c
