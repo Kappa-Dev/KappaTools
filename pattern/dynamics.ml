@@ -496,6 +496,23 @@ let diff pos m0 m1 label_opt env =
   ((List.fast_sort sort instructions),balance,added,modif_sites (*,!side_effect*)) 
 (*List.rev instructions, balance, added, modif_sites,!side_effect*)
 
+let site_defined site_id ag is_added env =
+  try
+    let (int,lnk) = IntMap.find site_id (Mixture.interface ag) in
+    match int with
+    | Some _ -> Some (int,lnk)
+    | None ->
+       match lnk with
+       | Mixture.WLD -> None
+       | _ -> Some (int,lnk)
+  with Not_found ->
+    if not is_added then None
+    else
+      try Some (Environment.default_state (Mixture.name ag) site_id env,
+		Mixture.FREE)
+      with Not_found -> invalid_arg "Mixture.site_defined: invariant violation"
+
+
 let rec superpose todo_list lhs rhs map already_done added codomain env =
 	match todo_list with
 		| [] -> map
@@ -509,7 +526,7 @@ let rec superpose todo_list lhs rhs map already_done added codomain env =
 				else
 					Mixture.fold_interface 
 					(fun site_id (int,lnk) (todo,already_done) ->
-						let opt = Mixture.site_defined site_id rhs_ag (IntSet.mem rhs_id added) env in
+						let opt = site_defined site_id rhs_ag (IntSet.mem rhs_id added) env in
 						match opt with
 							| None -> (todo,already_done) (*site_id is not in the agent in the rhs*)
 							| Some (int',lnk') ->
@@ -595,7 +612,7 @@ let enable r mix env =
 	    (*checking that lhs contains --ie tests-- a site that is modified by rhs*) 
 	    (fun (site_id,t) ->
 	     let ag = Mixture.agent_of_id lhs_ag_id pat2 in
-	     let opt = Mixture.site_defined site_id ag false env in
+	     let opt = site_defined site_id ag false env in
 	     match opt with
 	     | Some (int,lnk) ->
 		begin

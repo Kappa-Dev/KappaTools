@@ -205,22 +205,6 @@ let enum_alternate_anchors mix =
 				ids_of_name = ids_of_name ;
 				size_of_cc = size_of_cc}
 
-let site_defined site_id ag is_added env =
-  try
-    let (int,lnk) = IntMap.find site_id ag.interface in
-    match int with
-    | Some _ -> Some (int,lnk)
-    | None ->
-       match lnk with
-       | WLD -> None
-       | _ -> Some (int,lnk)
-  with Not_found ->
-    if not is_added then None
-    else
-      try Some (Environment.default_state (name ag) site_id env,FREE)
-      with Not_found -> invalid_arg "Mixture.site_defined: invariant violation"
-
-
 let dump_span mix = 
 	Printf.printf "Arity: %d\n" (arity mix) ;
 	let ar = match mix.component_of_id with Some ar -> ar | None -> invalid_arg "Mixture.dump_span: component_of_id not computed"

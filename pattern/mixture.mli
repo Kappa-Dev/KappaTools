@@ -49,9 +49,6 @@ val interface : agent -> (int option * lnk_t) Mods.IntMap.t
 (**[is_bound (a_i,s_j) mix] returns [true] if site [s_j] of agent [a_i] is bound (or belongs to a semi link) in mixture [mix]*)
 val is_bound : (int*int) -> t -> bool
 
-(**[site_defined site_id mix is_added env]*)
-val site_defined : int -> agent -> bool -> Environment.t -> (int option * lnk_t) option
-
 (**[compose i ag mix edg cstr_opt] add agent [ag] with identifier [i] to mixture [mix] with edges [edg] represented as a map (id,j)->(k,l) where k is an agent identifier and j,l are site indices*)
 (**[cstr_opt] is used to add [constraints] to construct a mixture that requires some side checks upon matching*)
 val compose : int -> agent -> t -> (int*int) Mods.Int2Map.t -> t
