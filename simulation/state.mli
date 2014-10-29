@@ -65,7 +65,7 @@ val instances_of_square :
 
 val initialize :
   Graph.SiteGraph.t -> float array -> Primitives.rule list ->
-  Mixture.t list -> (Nbr.t Primitives.variable * Term.DepSet.t * int) list ->
+  Mixture.t list ->
   (((int -> Nbr.t) ->
     (int -> Nbr.t) -> float -> int -> int -> float -> (int -> Nbr.t) -> Nbr.t) *
      bool * Nbr.t option * 'a * string)

@@ -14,7 +14,7 @@ type t =
       perturbations : perturbation IntMap.t;
       kappa_variables : (Mixture.t option) array;
       token_vector : float array ;
-      alg_variables : (Nbr.t Primitives.variable option) array;
+      alg_variables : Nbr.t option array;
       observables : obs list;
       influence_map : (int, (int IntMap.t list) IntMap.t) Hashtbl.t ;
       mutable activity_tree : Random_tree.tree;
@@ -49,13 +49,6 @@ let update_rule id value state =
   Hashtbl.replace state.rules id {r with k_def = Primitives.CONST value}
 let update_token tk_id value state =
   state.token_vector.(tk_id) <- (Nbr.to_float value)
-
-let alg_of_id id state =
-	try
-		match state.alg_variables.(id) with
-		| None -> raise Not_found
-		| Some var_f -> var_f
-	with | Invalid_argument msg -> invalid_arg ("State.kappa_of_id: " ^ msg)
 
 let maybe_find_perturbation pert_id state =
   try Some (IntMap.find pert_id state.perturbations)
@@ -272,27 +265,31 @@ let value_bool state counter ?time env expr =
 let value_alg state counter ?time env alg =
   exec_alg state counter ?time env with_value_alg alg []
 
+let alg_of_id state counter ?time env id =
+  try
+    match state.alg_variables.(id) with
+    | None ->
+       value_alg state counter ?time env
+		 (fst (snd env.Environment.algs.NamedDecls.decls.(id)))
+    | Some var_f -> var_f
+  with | Invalid_argument msg -> invalid_arg ("State.kappa_of_id: " ^ msg)
+
 let value state counter ?(time=Counter.time counter) env =
-  let rec aux : type a. a Primitives.variable -> a =
-		    function
-		    | Primitives.CONST v -> v
-		    | Primitives.VAR f ->
-		       let inst = fun v_i -> instance_number v_i state env in
-		       let values = fun i ->
-			 try aux (alg_of_id i state)
-			 with Not_found -> invalid_arg (Printf.sprintf "v[%d] is not a valid variable" i)
-		       in
-		       let v_of_token id =
-			 try Nbr.F (state.token_vector.(id))
-			 with _ -> failwith "eval_var_in_state: Invalid token id"
-		       in
-		       f inst values time (Counter.event counter) (Counter.null_event counter)
-			 (Sys.time()) v_of_token
-		     in aux
+  function
+  | Primitives.CONST v -> v
+  | Primitives.VAR f ->
+     let inst = fun v_i -> instance_number v_i state env in
+     let values = fun i -> alg_of_id state counter ~time env i in
+     let v_of_token id =
+       try Nbr.F (state.token_vector.(id))
+       with _ -> failwith "eval_var_in_state: Invalid token id"
+     in
+     f inst values time (Counter.event counter) (Counter.null_event counter)
+       (Sys.time()) v_of_token
 
 (*missing recomputation of dependencies*)
 let set_variable id v state =
-  try state.alg_variables.(id) <- Some (Primitives.CONST v)
+  try state.alg_variables.(id) <- Some v
   with Invalid_argument msg -> invalid_arg ("State.set_variable: "^msg)
 
 let total_activity state =
@@ -496,13 +493,12 @@ let dot_of_influence_map desc state env =
     ) state.influence_map ;
   Printf.fprintf desc "}\n"
 
-let initialize sg token_vector rules kappa_vars alg_vars obs (pert,rule_pert) counter env =
+let initialize sg token_vector rules kappa_vars obs (pert,rule_pert) counter env =
 	let dim_pure_rule = max (List.length rules) 1
 	in
 	let dim_rule = dim_pure_rule + (List.length rule_pert) 
 	and dim_kappa = (List.length kappa_vars) + 1
-	and dim_var = List.length alg_vars 
-	in
+	and dim_var = Array.length env.Environment.algs.NamedDecls.decls in
 	
 	let injection_table = Array.make (dim_rule + dim_kappa) None
 	and kappa_var_table = Array.make (dim_rule + dim_kappa) None (*list of rule left hand sides and kappa variables*)
@@ -578,24 +574,7 @@ let initialize sg token_vector rules kappa_vars alg_vars obs (pert,rule_pert) co
 	in
 	
 	if !Parameter.debugModeOn then Debug.tag "\t * Initializing variables...";
-	let env =
-	  List.fold_left
-	    (fun env (v, deps, var_id) ->
-	     try
-	       let env =
-		 Term.DepSet.fold
-		   (fun dep env ->
-		    Environment.add_dependencies dep (Term.ALG var_id) env
-		   )
-		   deps env
-	       in (state.alg_variables.(var_id) <- Some v; env)
-	     with
-	     | Invalid_argument msg ->
-		invalid_arg ("State.initialize: " ^ msg)
-	    )
-	    env alg_vars
-	in
-	
+
 	if !Parameter.debugModeOn then Debug.tag	"\t * Initializing wake up map for side effects...";
 	let state =
 		(* initializing preconditions on pattern list for wake up map *)
@@ -1629,27 +1608,13 @@ let dump state counter env =
 										)	comp_injs
 							)	
 		 	) state.injections ;
-			Array.iteri
-			(fun var_id opt ->
-					match opt with
-					| None ->
-							Printf.printf "#x[%d]: '%s' na\n" var_id
-								((fun (s,_) -> s) (Environment.alg_of_num var_id env))
-					| Some v ->
-						match value state counter env v with
-							| Nbr.I x -> 
-								Printf.printf "#x[%d]: '%s' %d \n" var_id 
-								((fun (s,_) -> s) (Environment.alg_of_num var_id env))
-								x
-							| Nbr.F x -> 
-								Printf.printf "#x[%d]: '%s' %E \n" var_id 
-								((fun (s,_) -> s) (Environment.alg_of_num var_id env))
-								x
-							| Nbr.I64 x -> 
-								Printf.printf "#x[%d]: '%s' %Ld \n" var_id 
-								((fun (s,_) -> s) (Environment.alg_of_num var_id env))
-								x
-			) state.alg_variables;
+			Tools.iteri
+			  (fun var_id ->
+			   Printf.printf "#x[%d]: '%s' %a \n" var_id
+					 (fst (Environment.alg_of_num var_id env))
+					 Nbr.print
+					 (alg_of_id state counter env var_id)
+			  ) (Array.length state.alg_variables);
 			Array.iteri
 			(fun mix_id mix_opt ->
 				match mix_opt with

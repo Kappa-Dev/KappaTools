@@ -652,18 +652,22 @@ let variables_of_result env (free_id,mixs) alg_a =
 		    (env',mix::mixs,pred id)) (env,[],pred free_id) mixs
   in
   let () = assert (final_id = -1) in
-  let vars =
-    Array.to_list
-      (Array.mapi
-	 (fun var_id ((label,(beg_pos,_)),alg) ->
-	  let (f, constant, value_opt) = partial_eval_alg_of_alg env alg in
-	  let dep = Expr.deps_of_alg_expr (fst alg) in
-	  let v =
-	    if constant then Primitives.CONST (close_var f)
-	    else Primitives.VAR f
-	  in (v, dep, var_id)
-	 ) alg_a)
-  in (env',compiled_mixs,vars)
+  let env'',_ = Array.fold_left
+		(fun (env,var_id) (_,alg) ->
+		 let deps = Expr.deps_of_alg_expr (fst alg) in
+		 try
+		   (Term.DepSet.fold
+		      (fun dep env ->
+		       Environment.add_dependencies dep (Term.ALG var_id) env
+		      )
+		      deps env,
+		    succ var_id)
+		 with
+		 | Invalid_argument msg ->
+		    invalid_arg ("State.initialize: " ^ msg)
+		)
+		(env',0) alg_a
+  in (env'',compiled_mixs)
 
 let rules_of_result env mixs res tolerate_new_state =
   let (env, mixs, l) =
@@ -1183,7 +1187,7 @@ let initialize result counter =
   let env =
     Environment.init sigs_nd tk_nd (NamedDecls.create alg_a) fresh_kappa in
 
-  let (env, kappa_vars, alg_vars) = variables_of_result env mixs alg_a in
+  let (env, kappa_vars) = variables_of_result env mixs alg_a in
 
   Debug.tag "\t -initial conditions";
   let sg,token_vector,env = init_graph_of_result env result in
@@ -1207,7 +1211,7 @@ let initialize result counter =
   Debug.tag "\t -Counting initial local patterns..." ;
   let (state, env) =
     State.initialize sg token_vector rules kappa_vars
-		     alg_vars observables (pert,rules_pert) counter env
+		     observables (pert,rules_pert) counter env
   in
   let state =
     if env.Environment.has_intra then

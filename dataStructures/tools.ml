@@ -112,6 +112,11 @@ let array_map_of_list f l =
      let () = fill 1 ans l in
      ans
 
+let iteri f i =
+  let rec aux j =
+  if j < i then let () = f j in aux (succ j)
+  in aux 0
+
 let find_available_name name ext =
   let base = try Filename.chop_extension name with _ -> name in
   if Sys.file_exists (base^"."^ext) then
