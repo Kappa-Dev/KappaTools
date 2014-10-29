@@ -27,8 +27,7 @@
 %obs: 'n_b' 'n_a'
 %var: 'n_c' 100000
 
-%mod: [T]=2 do $PRINT <"Genial">
-%mod: [T]=5 do $PRINT <"Super">
+
 
 #### Initial conditions 
 %init: 'n_a' A()
