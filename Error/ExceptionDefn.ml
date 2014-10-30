@@ -30,7 +30,7 @@ let warning ?pos msg =
     | None -> Printf.fprintf f ""
   in
   warning_buffer :=
-    (fun f -> Printf.fprintf f "%tWARNING: %t\n" pr msg)::
+    (fun f -> Printf.fprintf f "%tWarning: %t\n" pr msg)::
       !warning_buffer
 
 let flush_warning () =

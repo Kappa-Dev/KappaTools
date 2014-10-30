@@ -762,8 +762,9 @@ let effects_of_modif variables env ast_list =
 		  try
 		     (Environment.num_of_alg nme env, false)
 		  with Not_found ->
-		    raise (ExceptionDefn.Semantics_Error
-			     (pos_rule,"Variable " ^ (nme ^ " is neither a constant nor a rule")))
+		    raise (ExceptionDefn.Malformed_Decl
+			     ("Variable " ^ (nme ^ " is neither a constant nor a rule")
+			     ,pos_rule))
 	      ) in
 	    let (env', mixs', x, is_constant, opt_v) =
 	      partial_eval_alg env variables alg_expr in
@@ -820,7 +821,9 @@ let effects_of_modif variables env ast_list =
 		    |(_,(Expr.KAPPA_INSTANCE i,_)) -> i
 		    | _ -> raise Not_found
 		with Not_found ->
-		  raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
+		  raise	(ExceptionDefn.Malformed_Decl
+			   ("Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"
+			   ,pos_lab))
 	    in
 	    let str = (Printf.sprintf "Enable causality analysis for observable '%s'" lab)::str_pert in
 	    (variables, (Primitives.CFLOW id)::effects, str, env)
@@ -833,7 +836,9 @@ let effects_of_modif variables env ast_list =
 		    |(_,(Expr.KAPPA_INSTANCE i,_)) -> i
 		    | _ -> raise Not_found
 		with Not_found ->
-		  raise	(ExceptionDefn.Semantics_Error (pos_lab, "Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"))
+		  raise	(ExceptionDefn.Malformed_Decl
+			   ("Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"
+			   ,pos_lab))
 	    in
 	    let str = (Printf.sprintf "Disable causality analysis for observable '%s'" lab)::str_pert in
 	    (variables, (Primitives.CFLOWOFF id)::effects, str, env)

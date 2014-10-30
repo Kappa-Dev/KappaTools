@@ -108,7 +108,7 @@ rule token = parse
 	 | '#' {comment lexbuf}
 	 | integer as n {INT (int_of_string n)}
 	 | real as f {FLOAT (float_of_string f)}
-	 | '\'' {let lab = read_label "" ['\''] lexbuf in let pos = position lexbuf in LABEL(lab,pos)}
+	 | '\'' [^'\n''\'']+ as x '\''{LABEL(x)}
 	 | id as str {let pos = position lexbuf in keyword_or_id str pos}
 	 | '@' {AT}
 	 | ',' {COMMA}

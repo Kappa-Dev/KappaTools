@@ -15,8 +15,8 @@
 %token <Tools.pos> FLUX ASSIGN ASSIGN2 TOKEN KAPPA_LNK PIPE KAPPA_LRAR
 %token <Tools.pos> PRINT PRINTF
 %token <int> INT
-%token <string*Tools.pos> ID LABEL
-%token <string> KAPPA_MRK
+%token <string*Tools.pos> ID
+%token <string> KAPPA_MRK LABEL
 %token <float> FLOAT
 %token <string*Tools.pos> STRING
 %token <Tools.pos> STOP SNAPSHOT
@@ -173,12 +173,12 @@ effect:
 				    (fun f ->
 				     Pp.string
 				       f "Deprecated syntax, use $UPDATE perturbation instead of the ':=' assignment (see Manual)");
-					Ast.UPDATE ($1,$3)}
+					Ast.UPDATE (($1,rhs_pos 1),$3)}
     | ASSIGN2 LABEL alg_expr /*updating the rate of a rule*/
-						      {Ast.UPDATE ($2,$3)}
+						      {Ast.UPDATE (($2,rhs_pos 2),$3)}
     | TRACK LABEL boolean
 	    {let ast = if $3 then (fun x -> Ast.CFLOW x)
-		       else (fun x -> Ast.CFLOWOFF x) in ast ($2,$1)}
+		       else (fun x -> Ast.CFLOWOFF x) in ast (($2,rhs_pos 2),$1)}
     | FLUX opt_string boolean
 	   {let ast = if $3 then (fun (x,y) -> Ast.FLUX (x,y))
 		      else (fun (x,y) -> Ast.FLUXOFF (x,y)) in
@@ -234,12 +234,12 @@ boolean:
     ;
 
 variable_declaration:
-    | LABEL alg_expr {(((fst $1),rhs_pos 1),$2)}
+    | LABEL alg_expr {(($1,rhs_pos 1),$2)}
     | LABEL error
-	    {let str,pos = $1 in
-	     raise
+	    {raise
 	       (ExceptionDefn.Syntax_Error
-		  (Some pos, "Illegal definition of variable '"^str^"'"))
+		  (Some (Tools.pos_of_lex_pos (Parsing.symbol_start_pos ())),
+		   "Illegal definition of variable '"^$1^"'"))
 	    }
     ;
 
@@ -270,14 +270,14 @@ string_or_pr_expr:
 multiple:
     | INT {add_pos (Ast.CONST (Nbr.I $1)) }
     | FLOAT {add_pos (Ast.CONST (Nbr.F $1)) }
-    | LABEL {let str,pos = $1 in add_pos (Ast.OBS_VAR (str)) }
+    | LABEL {add_pos (Ast.OBS_VAR ($1)) }
     ;
 
 rule_label:
   /*empty */
       {None}
     | LABEL
-	{let lab,pos = $1 in Some (add_pos lab)}
+	{Some (add_pos $1)}
     ;
 
 lhs_rhs:
@@ -356,7 +356,7 @@ constant:
 variable:
     | PIPE ID PIPE {let str,pos = $2 in add_pos (Ast.TOKEN_ID (str))}
     | PIPE non_empty_mixture PIPE { add_pos (Ast.KAPPA_INSTANCE $2) }
-    | LABEL {let str,pos = $1 in add_pos (Ast.OBS_VAR (str))}
+    | LABEL {add_pos (Ast.OBS_VAR ($1))}
     | TIME {add_pos (Ast.STATE_ALG_OP (Term.TIME_VAR))}
     | EVENT {add_pos (Ast.STATE_ALG_OP (Term.EVENT_VAR))}
     | NULL_EVENT {add_pos (Ast.STATE_ALG_OP (Term.NULL_EVENT_VAR))}
