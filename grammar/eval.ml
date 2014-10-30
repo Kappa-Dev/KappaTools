@@ -447,14 +447,13 @@ let mixtures_of_result c_mixs env (free_id,mixs) =
   in
   (env',compiled_mixs)
 
-let reduce_val v env mixs =
-  let (mix',(alg,_pos)) =
+let reduce_val v env a_mixs =
+  let (mixs',(alg,_pos)) =
     Expr.compile_alg env.Environment.algs.NamedDecls.finder
 		     env.Environment.tokens.NamedDecls.finder
-		     (env.Environment.fresh_kappa,[]) v in
+		     a_mixs v in
   let dep = Expr.deps_of_alg_expr alg in
-  let (env',mixs') = mixtures_of_result mixs env mix' in
-  (env',mixs',alg,dep)
+  (mixs',alg,dep)
 
 let rule_of_ast ?(backwards=false) ~is_pert env mixs (ast_rule_label,ast_rule) =
   let ast_rule_label,ast_rule =
@@ -464,22 +463,23 @@ let rule_of_ast ?(backwards=false) ~is_pert env mixs (ast_rule_label,ast_rule) =
     Environment.declare_var_kappa ~from_rule:true ast_rule_label env in
   (* reserving an id for rule's lhs in the pattern table *)
   let env = Environment.declare_rule ast_rule_label lhs_id env in
-  let env,mixs',k_def,dep = reduce_val ast_rule.k_def env mixs in
-  let (env,mixs'',k_alt,radius,dep_alt) =
+  let a_mixs',k_def,dep =
+    reduce_val ast_rule.k_def env (env.Environment.fresh_kappa,[]) in
+  let (env,a_mixs'',k_alt,radius,dep_alt) =
     match ast_rule.k_un with
-    | None -> (env,mixs',None,None, Term.DepSet.empty)
+    | None -> (env,a_mixs',None,None, Term.DepSet.empty)
     | Some (ast,ast_opt) ->
        (****TODO HERE treat ast_opt that specifies application radius****)
        let env =
 	 Environment.declare_unary_rule
 	   (Some (Environment.kappa_of_num lhs_id env,Tools.no_pos)) (*ast_rule_label*) lhs_id env in
-       let env,mixs'',k_alt,dep = reduce_val ast env mixs' in
-       let env,mixs''',radius_alt,dep = match ast_opt with
-	   None -> (env,mixs'',None,dep)
-	 | Some v -> let env4,mixs4,rad,dep' = reduce_val v env mixs'' in
-		     (env4,mixs4,Some rad,Term.DepSet.union dep dep')
+       let a_mixs'',k_alt,dep = reduce_val ast env a_mixs' in
+       let a_mixs''',radius_alt,dep = match ast_opt with
+	   None -> (a_mixs'',None,dep)
+	 | Some v -> let a_mixs''',rad,dep' = reduce_val v env a_mixs'' in
+		     (a_mixs''',Some rad,Term.DepSet.union dep dep')
        in
-       (env,mixs''',Some k_alt,radius_alt,dep)
+       (env,a_mixs''',Some k_alt,radius_alt,dep)
   in
   let lhs,env = mixture_of_ast ~mix_id:lhs_id env ast_rule.lhs
   in
@@ -492,27 +492,26 @@ let rule_of_ast ?(backwards=false) ~is_pert env mixs (ast_rule_label,ast_rule) =
   let kappa_rhs = Kappa_printer.mixture_to_string false env () rhs in
   let tokenify env mixs l =
     List.fold_right
-      (fun (alg_expr,(nme,pos)) (env,mixs,out) ->
+      (fun (alg_expr,(nme,pos)) (mixs,out) ->
        let id =
 	 try Environment.num_of_token nme env
 	 with Not_found ->
 	   raise (ExceptionDefn.Semantics_Error (pos,"Token "^nme^" is undefined"))
        in
 
-       let (mix',(alg,_pos)) =
+       let (mixs',(alg,_pos)) =
 	 Expr.compile_alg env.Environment.algs.NamedDecls.finder
 			  env.Environment.tokens.NamedDecls.finder
-			  (env.Environment.fresh_kappa,[]) alg_expr in
-       let (env',mixs') = mixtures_of_result mixs env mix' in
-       (env',mixs',(alg,id)::out)
-      ) l (env,mixs,[])
+			  mixs alg_expr in
+       (mixs',(alg,id)::out)
+      ) l (mixs,[])
   in
-  let env12,mixs12,add_token = tokenify env mixs'' ast_rule.add_token in
-  let env21,mixs21,rm_token = tokenify env12 mixs12 ast_rule.rm_token in
+  let a_mixs''',add_token = tokenify env a_mixs'' ast_rule.add_token in
+  let a_mixs,rm_token = tokenify env a_mixs''' ast_rule.rm_token in
   let r_id = Mixture.get_id lhs in
   let env = if Mixture.is_empty lhs
-	    then Environment.declare_empty_lhs r_id env21
-	    else env21 in
+	    then Environment.declare_empty_lhs r_id env
+	    else env in
   let env =
     Term.DepSet.fold
       (*creating dependencies between variables in the kinetic rate and the activity of the rule*)
@@ -619,7 +618,8 @@ let rule_of_ast ?(backwards=false) ~is_pert env mixs (ast_rule_label,ast_rule) =
 	  cc_id := !cc_id+1 ;
 	done ; !ptr_env)
   in
-  (env,mixs21,
+  let (env,mixs') = mixtures_of_result mixs env a_mixs in
+  (env,mixs',
    {
      Primitives.add_token = add_token ;
      Primitives.rm_token = rm_token ;
