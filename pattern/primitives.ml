@@ -72,8 +72,8 @@ type rule = {
   cc_impact :
     (Mods.IntSet.t Mods.IntMap.t * Mods.IntSet.t Mods.IntMap.t *
        Mods.IntSet.t Mods.IntMap.t) option;
-  add_token : (Nbr.t variable * int) list;
-  rm_token : (Nbr.t variable * int) list
+  add_token : (Expr.alg_expr * int) list;
+  rm_token : (Expr.alg_expr * int) list
 }
 (*connect: cc_i(lhs) -> {cc_j(lhs),...} if cc_i and cc_j are connected by rule application*)
 (*disconnect: cc_i(rhs) -> {cc_j(rhs),...} if cc_i and cc_j are disconnected by rule application*)

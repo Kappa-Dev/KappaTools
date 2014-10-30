@@ -1167,7 +1167,7 @@ let positive_update ?(with_tracked=[]) state r ((phi: int IntMap.t),psi) (side_m
 	let env,pert_ids =
 		List.fold_left
 		(fun (env,pert_ids) (v,t_id) ->
-			let value = Nbr.to_float (value state counter env v) in
+			let value = Nbr.to_float (value_alg state counter env v) in
 			try
 				if !Parameter.debugModeOn then
 					(Debug.tag (Printf.sprintf "adding %f token(s) %d" value t_id)) ;
@@ -1180,7 +1180,7 @@ let positive_update ?(with_tracked=[]) state r ((phi: int IntMap.t),psi) (side_m
 	let env,pert_ids = 
 		List.fold_left
 		(fun (env,pert_ids) (v,t_id) ->
-			let value = Nbr.to_float (value state counter env v) in
+			let value = Nbr.to_float (value_alg state counter env v) in
 			try
 				if !Parameter.debugModeOn then
 					(Debug.tag (Printf.sprintf "removing %f token(s) %d" value t_id)) ;

@@ -476,8 +476,8 @@ let rule_of_ast ?(backwards=false) ~is_pert env mixs (ast_rule_label,ast_rule) =
        let env,mixs'',k_alt,dep = reduce_val ast env mixs' in
        let env,mixs''',radius_alt,dep = match ast_opt with
 	   None -> (env,mixs'',None,dep)
-	 | Some v -> let env4,mix4,rad,dep' = reduce_val v env mixs'' in
-		     (env4,mix4,Some rad,Term.DepSet.union dep dep')
+	 | Some v -> let env4,mixs4,rad,dep' = reduce_val v env mixs'' in
+		     (env4,mixs4,Some rad,Term.DepSet.union dep dep')
        in
        (env,mixs''',Some k_alt,radius_alt,dep)
   in
@@ -499,18 +499,13 @@ let rule_of_ast ?(backwards=false) ~is_pert env mixs (ast_rule_label,ast_rule) =
 	 with Not_found ->
 	   raise (ExceptionDefn.Semantics_Error (pos,"Token "^nme^" is undefined"))
        in
-       let (env', mixs', f, is_const,opt_v) = partial_eval_alg env mixs alg_expr
-       (*dependencies are not important here since variable is evaluated only when rule is applied*)
-       in
-       let v =
-	 if is_const then
-	   (match opt_v with
-	      Some v -> Primitives.CONST v
-	    | None ->
-	       invalid_arg "Eval.rule_of_ast: Variable is constant but was not evaluated")
-	 else Primitives.VAR f
-       in
-       (env',mixs',(v,id)::out)
+
+       let (mix',(alg,_pos)) =
+	 Expr.compile_alg env.Environment.algs.NamedDecls.finder
+			  env.Environment.tokens.NamedDecls.finder
+			  (env.Environment.fresh_kappa,[]) alg_expr in
+       let (env',mixs') = mixtures_of_result mixs env mix' in
+       (env',mixs',(alg,id)::out)
       ) l (env,mixs,[])
   in
   let env12,mixs12,add_token = tokenify env mixs'' ast_rule.add_token in

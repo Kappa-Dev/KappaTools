@@ -55,8 +55,8 @@ type rule = {
   cc_impact :
     (Mods.IntSet.t Mods.IntMap.t * Mods.IntSet.t Mods.IntMap.t *
        Mods.IntSet.t Mods.IntMap.t) option;
-  add_token : (Nbr.t variable * int) list;
-  rm_token : (Nbr.t variable * int) list
+  add_token : (Expr.alg_expr * int) list;
+  rm_token : (Expr.alg_expr * int) list
 }
 
 type modification =
