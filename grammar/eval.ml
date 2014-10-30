@@ -428,20 +428,33 @@ let rec partial_eval_bool env mixs (ast,_) =
      | BOOL_OP(Term.OR,ast, ast') -> bin_op_bool ast ast' (||)
      | COMPARE_OP(op,ast, ast') -> bin_op_alg ast ast' (Nbr.of_compare_op op)
 
+let mixtures_of_result c_mixs env (free_id,mixs) =
+  let (env',compiled_mixs,final_id) =
+    List.fold_left
+      (fun (env,mixs,id) (lbl,ast) ->
+       (* <awful hack> *)
+       let open Environment in
+       let dummy_name = match lbl with
+	 | None ->"%anonymous"^string_of_int id
+	 | Some lbl -> lbl in
+       let env = {env with
+		   num_of_kappa = StringMap.add dummy_name id env.num_of_kappa;
+		   kappa_of_num = IntMap.add id dummy_name env.kappa_of_num;
+		 } in
+       (* </awful hack> *)
+       let mix,env' = mixture_of_ast ~mix_id:id env ast in
+       (env',mix::mixs,pred id)) (env,c_mixs,pred free_id) mixs
+  in
+  (env',compiled_mixs)
+
 let reduce_val v env mixs =
-  let (env', mixs', k, const, opt_v) = partial_eval_alg env mixs v in
-  let (_mix',(alg,_pos)) =
+  let (mix',(alg,_pos)) =
     Expr.compile_alg env.Environment.algs.NamedDecls.finder
 		     env.Environment.tokens.NamedDecls.finder
 		     (env.Environment.fresh_kappa,[]) v in
   let dep = Expr.deps_of_alg_expr alg in
-  (env',mixs',
-   (if const then
-      match opt_v with
-      | Some v -> Primitives.CONST v
-      | None -> invalid_arg "Eval.reduce_val: Variable is constant but was not evaluated"
-    else (Primitives.VAR k)),
-   dep)
+  let (env',mixs') = mixtures_of_result mixs env mix' in
+  (env',mixs',alg,dep)
 
 let rule_of_ast ?(backwards=false) ~is_pert env mixs (ast_rule_label,ast_rule) =
   let ast_rule_label,ast_rule =
@@ -635,38 +648,23 @@ let rule_of_ast ?(backwards=false) ~is_pert env mixs (ast_rule_label,ast_rule) =
        Some (connect_impact,disconnect_impact,side_eff_impact)
   })
 
-let variables_of_result env (free_id,mixs) alg_a =
-  let (env',compiled_mixs,final_id) =
-    List.fold_left (fun (env,mixs,id) (lbl,ast) ->
-		    (* <awful hack> *)
-		    let open Environment in
-		    let dummy_name = match lbl with
-		      | None ->"%anonymous"^string_of_int id
-		      | Some lbl -> lbl in
-		    let env = {env with
-				num_of_kappa = StringMap.add dummy_name id env.num_of_kappa;
-				kappa_of_num = IntMap.add id dummy_name env.kappa_of_num;
-			      } in
-		    (* </awful hack> *)
-		    let mix,env' = mixture_of_ast ~mix_id:id env ast in
-		    (env',mix::mixs,pred id)) (env,[],pred free_id) mixs
-  in
-  let () = assert (final_id = -1) in
+let variables_of_result env mixs alg_a =
+  let (env',compiled_mixs) = mixtures_of_result [] env mixs in
   let env'',_ = Array.fold_left
-		(fun (env,var_id) (_,alg) ->
-		 let deps = Expr.deps_of_alg_expr (fst alg) in
-		 try
-		   (Term.DepSet.fold
-		      (fun dep env ->
-		       Environment.add_dependencies dep (Term.ALG var_id) env
-		      )
-		      deps env,
-		    succ var_id)
-		 with
-		 | Invalid_argument msg ->
-		    invalid_arg ("State.initialize: " ^ msg)
-		)
-		(env',0) alg_a
+		  (fun (env,var_id) (_,alg) ->
+		   let deps = Expr.deps_of_alg_expr (fst alg) in
+		   try
+		     (Term.DepSet.fold
+			(fun dep env ->
+			 Environment.add_dependencies dep (Term.ALG var_id) env
+			)
+			deps env,
+		      succ var_id)
+		   with
+		   | Invalid_argument msg ->
+		      invalid_arg ("State.initialize: " ^ msg)
+		  )
+		  (env',0) alg_a
   in (env'',compiled_mixs)
 
 let rules_of_result env mixs res tolerate_new_state =

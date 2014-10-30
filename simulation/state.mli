@@ -47,8 +47,8 @@ val update_dep :
 val update_dep_value : t -> Counter.t -> Environment.t ->
 		       Nbr.t Primitives.variable -> Term.dep_type -> unit
 
-val select_injection : float * Nbr.t Primitives.variable option ->
-		       float * Nbr.t Primitives.variable option -> t ->
+val select_injection : float * Expr.alg_expr option ->
+		       float * Expr.alg_expr option -> t ->
 		       Mixture.t -> Counter.t -> Environment.t -> Embedding.t
 val apply :
   t -> Primitives.rule -> Embedding.t -> Counter.t -> Environment.t ->

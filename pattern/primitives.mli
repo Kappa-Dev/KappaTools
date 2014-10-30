@@ -37,8 +37,8 @@ sig
 end
 
 type rule = {
-  k_def : Nbr.t variable; (** standard kinetic constant *)
-  k_alt : Nbr.t variable option * Nbr.t variable option;
+  k_def : Expr.alg_expr; (** standard kinetic constant *)
+  k_alt : Expr.alg_expr option * Expr.alg_expr option;
   (** Possible unary kinetic rate *)
   over_sampling : float option;
   (** Boosted kinetic rate for Bologna technique *)

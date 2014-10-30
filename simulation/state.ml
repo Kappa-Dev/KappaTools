@@ -46,7 +46,7 @@ let kappa_of_id id state =
 let rule_of_id id state = Hashtbl.find state.rules id
 let update_rule id value state =
   let r = rule_of_id id state in
-  Hashtbl.replace state.rules id {r with k_def = Primitives.CONST value}
+  Hashtbl.replace state.rules id {r with k_def = Expr.CONST value}
 let update_token tk_id value state =
   state.token_vector.(tk_id) <- (Nbr.to_float value)
 
@@ -299,7 +299,7 @@ let total_activity state =
 let eval_activity ?using rule state counter env =
   let mix_id = Mixture.get_id rule.lhs in
   let a_2 = (*overestimated activity of binary instances of the rule*)
-    let k = value state counter env rule.k_def in
+    let k = value_alg state counter env rule.k_def in
     let n = (match using with None -> instance_number mix_id state env | Some x -> Nbr.I x) in
     if Nbr.is_zero n then (Nbr.I 0) else Nbr.mult k n
   in
@@ -308,7 +308,7 @@ let eval_activity ?using rule state counter env =
     match rule.k_alt with
     | (None,_) -> (Nbr.I 0)
     | (Some x ,_)->
-       let k = value state counter env x in
+       let k = value_alg state counter env x in
        let n = nl_instance_number mix_id state env in
        if Nbr.is_zero n then (Nbr.I 0) else Nbr.mult k n
   in
@@ -716,7 +716,7 @@ let select_injection (a2,radius_def) (a1,radius_alt) state mix counter env =
   							" has no instance but a positive activity"))
   		| Some prod_inj_hp ->
   			(try
-					let radius = match radius_alt with None -> (-1) | Some v -> Nbr.to_int (value state counter env v) in
+					let radius = match radius_alt with None -> (-1) | Some v -> Nbr.to_int (value_alg state counter env v) in
   				let injprod = InjProdHeap.random prod_inj_hp in (*injprod is an array of size #cc(mix_id) and injprod.(i):Injection.t a partial injection of cc(i)*)
   				let embedding = check_validity injprod radius false state counter env in (*returns either valid embedding or raises Null_event if injection is no longer valid --function also cleans inj_hp and nodes as a side effect*)
   				(Embedding.CONNEX embedding)
@@ -769,7 +769,7 @@ let select_injection (a2,radius_def) (a1,radius_alt) state mix counter env =
   						(0, IntMap.empty, IntSet.empty, IntSet.empty) comp_injs
   				in
   				
-					let radius = match radius_def with None -> (-1) | Some v -> Nbr.to_int (value state counter env v) in
+					let radius = match radius_def with None -> (-1) | Some v -> Nbr.to_int (value_alg state counter env v) in
 					
   				let rec build_component_map (roots,codomain) depth_map component_map = 
   					if IntSet.is_empty roots then (depth_map,component_map) (*no more root to check*)
@@ -873,7 +873,7 @@ let draw_rule state counter env =
 						(if !Parameter.debugModeOn then Debug.tag "Max consecutive clashes reached, I am giving up square approximation at this step" else ()) ;
 						let _ = Counter.reset_consecutive_null_event counter in
 					
-						let radius = match radius with None -> (-1) | Some v -> Nbr.to_int (value state counter env v) in
+						let radius = match radius with None -> (-1) | Some v -> Nbr.to_int (value_alg state counter env v) in
   				
 						let embeddings = instances_of_square ~disjoint:true rule_id radius state env in
 						let alpha,_ = eval_activity ~using:(List.length embeddings) r state counter env in 
