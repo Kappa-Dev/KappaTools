@@ -1,0 +1,7 @@
+digraph G{ node [shape=box, style=filled, fillcolor=lightskyblue]; 
+ "2:B+" ;
+"0:a.b" ;
+"1:B-" ;
+"2:B+" -> "0:a.b" [label="[0->1]"];
+"0:a.b" -> "1:B-" [label="[1->0]"];
+}
