@@ -486,11 +486,10 @@ let rule_of_ast ?(backwards=false) ~is_pert env mixs (ast_rule_label,ast_rule) =
   let lhs = match k_alt with None -> lhs | Some _ -> Mixture.set_unary lhs in
   let rhs,env = mixture_of_ast env ast_rule.rhs in
   let (script, balance,added,modif_sites(*,side_effects*)) =
-    Dynamics.diff ast_rule.rule_pos lhs rhs ast_rule_label env
+    Dynamics.diff ast_rule.rule_pos lhs rhs ast_rule_label env in
 
-  and kappa_lhs = Kappa_printer.mixture_to_string false env () lhs
-
-  and kappa_rhs = Kappa_printer.mixture_to_string false env () rhs in
+  let kappa_lhs = Kappa_printer.mixture_to_string false env () lhs in
+  let kappa_rhs = Kappa_printer.mixture_to_string false env () rhs in
   let tokenify env mixs l =
     List.fold_right
       (fun (alg_expr,(nme,pos)) (env,mixs,out) ->
