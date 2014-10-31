@@ -44,7 +44,6 @@ type rule = {
   (** Boosted kinetic rate for Bologna technique *)
   script : action list;
   balance : (int * int * int);	(** #deleted,#preserved,#removed *)
-  kappa: string;
   lhs : Mixture.t;
   rhs : Mixture.t;
   r_id : int;

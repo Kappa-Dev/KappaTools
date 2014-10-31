@@ -115,7 +115,7 @@ let event state maybe_active_pert_ids story_profiling
 	   in
 	   Debug.tag
 	     (Printf.sprintf "Applying %s version of '%s' with embedding:" version
-			     (try Environment.rule_of_num r.Primitives.r_id env with Not_found -> r.Primitives.kappa)
+			     (Dynamics.to_kappa r env)
 	     );
 	   Debug.tag (Printf.sprintf "%s" (string_of_map string_of_int string_of_int IntMap.fold embedding))
 	 end

@@ -674,56 +674,79 @@ let enable r mix env =
     glueings
   end
 
-let to_kappa r env = try Environment.rule_of_num r.r_id env with Not_found -> r.kappa
-	
+let to_kappa r env =
+  try Environment.rule_of_num r.r_id env
+  with Not_found ->
+    let kappa_lhs = Kappa_printer.mixture_to_string false env () r.lhs in
+    let kappa_rhs = Kappa_printer.mixture_to_string false env () r.rhs in
+    kappa_lhs ^ ("->" ^ kappa_rhs)
+
 let dump r env =
-	
-	let name = try Environment.rule_of_num r.r_id env with Not_found -> r.kappa in
-	Printf.fprintf stderr "****Rule '%s' [%s]****" name r.kappa ;
-	IntMap.iter 
-	(fun id ag -> 
-		Mixture.fold_interface 
-		(fun site_id _ _ -> 
-			let c = PortMap.find (KEPT id,site_id) r.pre_causal in
-			Printf.fprintf stderr "#%d.%d=%d\n" id site_id
-				       (Primitives.Causality.to_int c)
-		) ag ()
-	) (Mixture.agents r.lhs) ;
-	let dump_script script =
-		let id_of_port (id, s) =
-			match id with
-			| KEPT i -> (string_of_int i)^"."^(string_of_int s)
-			| FRESH i -> (string_of_int ((fun (deleted, kept, _) -> deleted + kept + i) r.balance))^"."^(string_of_int s)
-		in
-		List.iter
-			(fun action ->
-						match action with
-						| BND (p, p') -> Printf.fprintf stderr "BND (#%s,#%s)\n" (id_of_port p) (id_of_port p')
-						| FREE (p,b) -> if b then Printf.fprintf stderr "FREE #%s\n" (id_of_port p) else Printf.fprintf stderr "FREE* #%s\n" (id_of_port p)
-						| MOD (p, i) -> Printf.fprintf stderr "SET #%s to state %d\n" (id_of_port p) i
-						| DEL i -> Printf.fprintf stderr "DEL #%d\n" i
-						| ADD (i, name) ->
-								let sign = Environment.get_sig name env in
-								Printf.fprintf stderr "ADD %s%s with identifier #%d\n" (Environment.name name env) (Signature.to_string sign) ((fun (deleted, kept, _) -> deleted + kept + i) r.balance)
-			)
-			script
-	in
-	Printf.fprintf stderr "Apply %s\n" (to_kappa r env) ;
-	dump_script r.script ;
-	Printf.fprintf stderr "if pattern %d is matched \n" (Mixture.get_id r.lhs) ;
-	Printf.fprintf stderr "Modif sites: %s" 
-	(string_of_map 
-		(fun id -> match id with FRESH i | KEPT i -> string_of_int i) 
-		(string_of_set (fun (x,y) -> "("^(string_of_int x)^","^(string_of_int y)^")") Int2Set.fold)
-		IdMap.fold
-		r.modif_sites
-	) ;
-	Printf.fprintf stderr "\n";
-	match r.cc_impact with
-		| None -> Printf.fprintf stderr "No CC impact\n"
-		| Some (con,dis,se) ->
-			IntMap.iter (fun cc_i cc_set -> Printf.fprintf stderr "CC[%d] and CCs %s in the left hand side will merge\n" cc_i (Tools.string_of_set string_of_int IntSet.fold cc_set)) con ;
-			IntMap.iter (fun cc_i cc_set -> Printf.fprintf stderr "CC[%d] and CCs %s in the rhs are freshly disconnected  \n" cc_i (Tools.string_of_set string_of_int IntSet.fold cc_set)) dis ;
-			IntMap.iter (fun id site_id_set -> Printf.fprintf stderr "agent #%d might have side effect disconnection on sites %s\n" id (Tools.string_of_set string_of_int IntSet.fold site_id_set)) se 
-			
-			
+  let pr_r f =
+    Printf.fprintf f "%a->%a" (Kappa_printer.mixture false env) r.lhs
+		   (Kappa_printer.mixture false env) r.rhs in
+  let name = to_kappa r env in
+  Printf.fprintf stderr "****Rule '%s' [%t]****" name pr_r;
+  IntMap.iter
+    (fun id ag ->
+     Mixture.fold_interface
+       (fun site_id _ _ ->
+	let c = PortMap.find (KEPT id,site_id) r.pre_causal in
+	Printf.fprintf stderr "#%d.%d=%d\n" id site_id
+		       (Primitives.Causality.to_int c)
+       ) ag ()
+    ) (Mixture.agents r.lhs) ;
+  let dump_script script =
+    let id_of_port (id, s) =
+      match id with
+      | KEPT i -> (string_of_int i)^"."^(string_of_int s)
+      | FRESH i ->
+	 (string_of_int ((fun (deleted,kept,_) -> deleted +kept+ i) r.balance))
+	 ^"."^(string_of_int s)
+    in
+    List.iter
+      (fun action ->
+       match action with
+       | BND (p, p') ->
+	  Printf.fprintf stderr "BND (#%s,#%s)\n" (id_of_port p) (id_of_port p')
+       | FREE (p,b) ->
+	  if b then Printf.fprintf stderr "FREE #%s\n" (id_of_port p)
+	  else Printf.fprintf stderr "FREE* #%s\n" (id_of_port p)
+       | MOD (p, i) ->
+	  Printf.fprintf stderr "SET #%s to state %d\n" (id_of_port p) i
+       | DEL i ->
+	  Printf.fprintf stderr "DEL #%d\n" i
+       | ADD (i, name) ->
+	  let sign = Environment.get_sig name env in
+	  Printf.fprintf stderr "ADD %s%s with identifier #%d\n"
+			 (Environment.name name env) (Signature.to_string sign)
+			 ((fun (deleted,kept,_) -> deleted +kept+ i) r.balance)
+      )
+      script
+  in
+  Printf.fprintf stderr "Apply %s\n" (to_kappa r env) ;
+  dump_script r.script ;
+  Printf.fprintf stderr "if pattern %d is matched \n" (Mixture.get_id r.lhs) ;
+  Printf.fprintf stderr "Modif sites: %s"
+		 (string_of_map
+		    (fun id ->
+		     match id with FRESH i | KEPT i -> string_of_int i)
+		    (string_of_set
+		       (fun (x,y) ->
+			"("^(string_of_int x)^","^(string_of_int y)^")") Int2Set.fold)
+		    IdMap.fold
+		    r.modif_sites
+		 );
+  Printf.fprintf stderr "\n";
+  match r.cc_impact with
+  | None -> Printf.fprintf stderr "No CC impact\n"
+  | Some (con,dis,se) ->
+     IntMap.iter
+       (fun cc_i cc_set ->
+	Printf.fprintf stderr "CC[%d] and CCs %s in the left hand side will merge\n" cc_i (Tools.string_of_set string_of_int IntSet.fold cc_set)) con ;
+     IntMap.iter
+       (fun cc_i cc_set ->
+	Printf.fprintf stderr "CC[%d] and CCs %s in the rhs are freshly disconnected  \n" cc_i (Tools.string_of_set string_of_int IntSet.fold cc_set)) dis ;
+     IntMap.iter
+       (fun id site_id_set ->
+	Printf.fprintf stderr "agent #%d might have side effect disconnection on sites %s\n" id (Tools.string_of_set string_of_int IntSet.fold site_id_set)) se

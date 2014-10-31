@@ -342,8 +342,10 @@ module Cflow_linker =
     in Printf.fprintf log ")"
             
       
-  let print_event log env ((rule,emb,fresh),(rule_info)) = 
-    Printf.fprintf log "%s" rule.Primitives.kappa 
+  let print_event log env ((rule,emb,fresh),(rule_info)) =
+    Printf.fprintf log "%a->%a"
+		   (Kappa_printer.mixture false env) rule.Primitives.lhs
+		   (Kappa_printer.mixture false env) rule.Primitives.rhs
 
   let print_obs log env obs = () 
 
@@ -1210,8 +1212,9 @@ module Cflow_linker =
     with 
     | error,Subs (a,b) -> 
       let _ = Printf.fprintf log "Subs: %s/%s" (string_of_int b) (string_of_int a) in error 
-    | error,Event event -> 
-      let _ = print_event log handler event in error 
+    | error,Event event ->
+       let () = print_event log handler.Cflow_handler.Cflow_handler.env event in
+       error
     | error,Init init -> 
       let _ = Printf.fprintf log "Init: " in 
       let _ = print_init log handler init in 
@@ -1243,4 +1246,3 @@ module Cflow_linker =
       end
         
 end:Cflow_signature)
-

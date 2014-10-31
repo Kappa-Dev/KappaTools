@@ -488,8 +488,6 @@ let rule_of_ast ?(backwards=false) ~is_pert env mixs (ast_rule_label,ast_rule) =
   let (script, balance,added,modif_sites(*,side_effects*)) =
     Dynamics.diff ast_rule.rule_pos lhs rhs ast_rule_label env in
 
-  let kappa_lhs = Kappa_printer.mixture_to_string false env () lhs in
-  let kappa_rhs = Kappa_printer.mixture_to_string false env () rhs in
   let tokenify env mixs l =
     List.fold_right
       (fun (alg_expr,(nme,pos)) (mixs,out) ->
@@ -627,7 +625,6 @@ let rule_of_ast ?(backwards=false) ~is_pert env mixs (ast_rule_label,ast_rule) =
      Primitives.k_alt = (k_alt,radius) ;
      Primitives.over_sampling = None;
      Primitives.script = script;
-     Primitives.kappa = kappa_lhs ^ ("->" ^ kappa_rhs);
      Primitives.balance = balance;
      Primitives.lhs = lhs;
      Primitives.rhs = rhs;
