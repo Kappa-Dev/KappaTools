@@ -959,7 +959,7 @@ let pert_of_result variables env rules res =
   let lpert_stopping_time = List.filter pred lpert in
   let lpert_ineq = List.filter (fun p -> not (pred p)) lpert in
   let lpert = lpert_stopping_time@lpert_ineq in
-  (variables, lpert, (List.rev lrules), env)
+  (variables, lpert, lrules, env)
 
 let init_graph_of_result env res =
   let n = Array.length env.Environment.tokens.NamedDecls.decls in
@@ -1184,14 +1184,14 @@ let initialize result counter =
   Parameter.implicitSignature := false ;
 
   Debug.tag "\t -rules";
-  let (env, kappa_vars, rules) =
+  let (env, kappa_vars, pure_rules) =
     rules_of_result env kappa_vars result tolerate_new_state in
 
   Debug.tag "\t -observables";
   let env,kappa_vars,observables = obs_of_result env kappa_vars result in
   Debug.tag "\t -perturbations" ;
-  let (kappa_vars, pert, rules_pert, env) =
-    pert_of_result kappa_vars env [] result in
+  let (kappa_vars, pert, rules, env) =
+    pert_of_result kappa_vars env pure_rules result in
   Debug.tag "\t Done";
   Debug.tag "+ Analyzing non local patterns..." ;
   let env = Environment.init_roots_of_nl_rules env in
@@ -1199,7 +1199,7 @@ let initialize result counter =
   Debug.tag "\t -Counting initial local patterns..." ;
   let (state, env) =
     State.initialize sg token_vector rules kappa_vars
-		     observables (pert,rules_pert) counter env
+		     observables pert counter env
   in
   let state =
     if env.Environment.has_intra then

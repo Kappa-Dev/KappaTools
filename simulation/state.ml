@@ -493,13 +493,11 @@ let dot_of_influence_map desc state env =
     ) state.influence_map ;
   Printf.fprintf desc "}\n"
 
-let initialize sg token_vector rules kappa_vars obs (pert,rule_pert) counter env =
-	let dim_pure_rule = max (List.length rules) 1
-	in
-	let dim_rule = dim_pure_rule + (List.length rule_pert) 
-	and dim_kappa = (List.length kappa_vars) + 1
-	and dim_var = Array.length env.Environment.algs.NamedDecls.decls in
-	
+let initialize sg token_vector rules kappa_vars obs pert counter env =
+  let dim_rule = max (List.length rules) 1 in
+  let dim_kappa = (List.length kappa_vars) + 1 in
+  let dim_var = Array.length env.Environment.algs.NamedDecls.decls in
+
 	let injection_table = Array.make (dim_rule + dim_kappa) None
 	and kappa_var_table = Array.make (dim_rule + dim_kappa) None (*list of rule left hand sides and kappa variables*)
 	and alg_table = Array.make dim_var None (*list of algebraic values*)
@@ -508,24 +506,25 @@ let initialize sg token_vector rules kappa_vars obs (pert,rule_pert) counter env
 	and wake_up_table = Precondition.empty () (*wake up table for side effects*)
 	and influence_table = Hashtbl.create dim_rule (*influence map*)
 	in
-	
-	let _ = (*adding observables in the kappa table*) 
-		List.iter
-		(fun mix -> kappa_var_table.(Mixture.get_id mix) <- Some mix) kappa_vars
+
+	let _ = (*adding observables in the kappa table*)
+	  List.iter
+	    (fun mix -> kappa_var_table.(Mixture.get_id mix) <- Some mix) kappa_vars
 	in
 	let kappa_variables =
-		(* forming kappa variable list by merging rule (and perturbation) lhs with kappa variables *)
-		List.fold_left
-		(fun patterns r ->
-			let i = r.r_id
-			in
-				let patterns = 
-					if Mixture.is_empty r.lhs then patterns (*nothing to track if left hand side is empty*)
-					else (kappa_var_table.(Mixture.get_id r.lhs) <- Some r.lhs ; r.lhs :: patterns)
-				in
-				(Hashtbl.replace rule_table i r; patterns)
-		)
-		kappa_vars (rule_pert@rules) 
+	  (* forming kappa variable list by merging rule (and perturbation) lhs with kappa variables *)
+	  List.fold_left
+	    (fun patterns r ->
+	     let i = r.r_id in
+	     let patterns =
+	       if Mixture.is_empty r.lhs
+	       then patterns (*nothing to track if left hand side is empty*)
+	       else (kappa_var_table.(Mixture.get_id r.lhs) <- Some r.lhs;
+		     r.lhs :: patterns)
+	     in
+	     (Hashtbl.replace rule_table i r; patterns)
+	    )
+	    kappa_vars rules
 	in
 	let state_init =
 		{
@@ -560,7 +559,7 @@ let initialize sg token_vector rules kappa_vars obs (pert,rule_pert) counter env
 									} :: cont
 					)	[] obs
 				end ;
-			activity_tree = Random_tree.create dim_pure_rule ; (*put only true rules in the activity tree*)
+			activity_tree = Random_tree.create dim_rule;
 			influence_map = influence_table ;
 			wake_up = wake_up_table;
 			flux = if !Parameter.fluxModeOn then Hashtbl.create 5 else Hashtbl.create 0 ;

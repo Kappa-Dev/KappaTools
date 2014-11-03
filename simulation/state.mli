@@ -70,7 +70,7 @@ val initialize :
     (int -> Nbr.t) -> float -> int -> int -> float -> (int -> Nbr.t) -> Nbr.t) *
      bool * Nbr.t option * 'a * string)
     list ->
-  Primitives.perturbation list * Primitives.rule list ->
+  Primitives.perturbation list ->
   Counter.t -> Environment.t -> t * Environment.t
 
 val dump_rules : t -> Environment.t -> unit
