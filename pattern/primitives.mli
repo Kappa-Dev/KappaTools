@@ -60,9 +60,7 @@ type rule = {
 
 type modification =
     ITER_RULE of Expr.alg_expr Term.with_pos * rule
-  | UPDATE_RULE of int * Expr.alg_expr Term.with_pos
-  | UPDATE_VAR of int * Expr.alg_expr Term.with_pos
-  | UPDATE_TOK of int * Expr.alg_expr Term.with_pos
+  | UPDATE of Term.dep_type * Expr.alg_expr Term.with_pos
   | SNAPSHOT of Ast.mixture Ast.print_expr Term.with_pos list
   | STOP of Ast.mixture Ast.print_expr Term.with_pos list
   | CFLOW of int

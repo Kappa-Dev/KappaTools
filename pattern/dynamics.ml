@@ -112,10 +112,7 @@ let pp_effect env f = function
      else
        let () = assert (Mixture.is_empty rule.rhs) in
        Printf.fprintf f "DELETE %a" (Kappa_printer.mixture false env) rule.lhs
-  | UPDATE_RULE (r_id,_) -> Printf.fprintf f "UPDATE rule[%d]" r_id
-  | UPDATE_VAR (v_id,_) -> Printf.fprintf f "UPDATE var[%d]" v_id
-  | UPDATE_TOK (t_id,_) ->
-     Printf.fprintf f "UPDATE token %s" (Environment.token_of_num t_id env)
+  | UPDATE (d_id,_) -> Printf.fprintf f "UPDATE %a" Term.print_dep_type d_id
   | SNAPSHOT _ -> Printf.fprintf f "SNAPSHOT"
   | STOP _ -> Printf.fprintf f "STOP"
   | FLUX _ -> Printf.fprintf f "FLUX"

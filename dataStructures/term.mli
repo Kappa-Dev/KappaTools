@@ -34,3 +34,5 @@ val dep_to_string : unit -> dep_type -> string
 
 val with_dummy_pos : 'a -> 'a with_pos
 val has_dummy_pos : 'a with_pos -> bool
+
+val print_dep_type : out_channel -> dep_type -> unit

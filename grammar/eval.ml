@@ -773,8 +773,8 @@ let effects_of_modif variables lrules env ast_list =
 		Expr.ast_alg_to_string (fst alg_expr)::str_pert
 	    in
 	    (mixs',lrules,
-	     (if is_rule then Primitives.UPDATE_RULE (i, alg_pos)
-	      else Primitives.UPDATE_VAR (i, alg_pos))::effects, str, env')
+	     (Primitives.UPDATE ((if is_rule then Term.RULE i
+	      else Term.ALG i), alg_pos))::effects, str, env')
 	 | UPDATE_TOK ((tk_nme,tk_pos),alg_expr) ->
 	    let tk_id =
 	      try Environment.num_of_token tk_nme env with
@@ -790,7 +790,7 @@ let effects_of_modif variables lrules env ast_list =
 	    let str = (Printf.sprintf "set token '%s' to value %a" tk_nme
 				      Expr.ast_alg_to_string (fst alg_expr))::str_pert
 	    in
-	    (mixs',lrules,(Primitives.UPDATE_TOK (tk_id, alg_pos))::effects, str,env')
+	    (mixs',lrules,(Primitives.UPDATE (Term.TOK tk_id, alg_pos))::effects, str,env')
 	 | SNAPSHOT (pexpr,pos) ->
 	    (*when specializing snapshots to particular mixtures, add variables below*)
 	    let str = ("snapshot state")::str_pert in

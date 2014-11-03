@@ -82,3 +82,19 @@ let with_dummy_pos x = (x, (Lexing.dummy_pos, Lexing.dummy_pos))
 let has_dummy_pos (_,(b_pos,e_pos)) =
   b_pos = Lexing.dummy_pos &&
     (e_pos = Lexing.dummy_pos || failwith "half dummy_pos")
+
+let print_dep_type f = function
+  | RULE id ->
+     Printf.fprintf f "rate_of_rule [%i]" id
+  (*"rate of rule '%a'" (Environment.print_rule env) id*)
+  | ALG id ->
+     Printf.fprintf f "algebraic variable [%i]" id
+  (*"variable '%a'" (Environment.print_alg env) id*)
+  | TOK id ->
+     Printf.fprintf f "token [%i]" id
+  | KAPPA id ->
+     Printf.fprintf f "kappa_mixture [%i]" id
+  | EVENT -> Printf.fprintf f "event"
+  | TIME -> Printf.fprintf f "time"
+  | PERT id -> Printf.fprintf f "perturbation [%i]" id
+  | ABORT id -> Printf.fprintf f "ABORT(%i)" id

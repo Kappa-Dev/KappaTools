@@ -114,37 +114,12 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
 	Debug.tag_if_debug "Applying %a instances of %a"
 			   Nbr.print x (Dynamics.pp_effect env) eff
       in apply_n_time x r state env counter pert_ids pert_events tracked
-  | Primitives.UPDATE_RULE (id,(v,_)) ->
-     let () =
-       Debug.tag_if_debug "Updating rate of rule '%a'"
-			 (Environment.print_rule env) id
-     in
-     State.update_dep_value state counter env v (Term.RULE id);
+  | Primitives.UPDATE (g_id,(v,_)) ->
+     let () = Debug.tag_if_debug "Updating %a" Term.print_dep_type g_id in
+     State.update_dep_value state counter env v g_id;
      let env,pert_ids =
-       State.update_dep state ~cause:p_id (Term.RULE id) pert_ids counter env in
+       State.update_dep state ~cause:p_id g_id pert_ids counter env in
      (env,state ,pert_ids,tracked,pert_events)
-  | Primitives.UPDATE_VAR (id,(v,_)) ->
-     let () =
-       Debug.tag_if_debug "Updating variable '%a'"
-			  (Environment.print_alg env) id
-     in
-     State.update_dep_value state counter env v (Term.ALG id);
-     let env,pert_ids = State.update_dep state (Term.ALG id) pert_ids counter env in
-     (env,state,pert_ids,tracked,pert_events)
-  | Primitives.UPDATE_TOK (tk_id,(v,_)) ->
-     let _ = Debug.tag_if_debug "Updating token '%a'"
-				(Environment.print_token env) tk_id
-    in
-    (*Change here if one wants to have address passing style of assignation*)
-    begin
-      try
-        State.update_dep_value state counter env v (Term.TOK tk_id);
-        let env,pert_ids =
-                State.update_dep state (Term.TOK tk_id) pert_ids counter env in
-                (env,state,pert_ids,tracked,pert_events)
-      with Invalid_argument _ ->
-	failwith "External.apply_effect: invalid token id"
-    end
   | Primitives.SNAPSHOT pexpr ->
       let str = eval_pexpr pexpr state counter env in
       snapshot str;
