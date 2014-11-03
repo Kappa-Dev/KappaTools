@@ -59,10 +59,10 @@ type rule = {
 }
 
 type modification =
-    ITER_RULE of Nbr.t variable * rule
-  | UPDATE_RULE of int * Nbr.t variable
-  | UPDATE_VAR of int * Nbr.t variable
-  | UPDATE_TOK of int * Nbr.t variable
+    ITER_RULE of Expr.alg_expr Term.with_pos * rule
+  | UPDATE_RULE of int * Expr.alg_expr Term.with_pos
+  | UPDATE_VAR of int * Expr.alg_expr Term.with_pos
+  | UPDATE_TOK of int * Expr.alg_expr Term.with_pos
   | SNAPSHOT of Ast.mixture Ast.print_expr Term.with_pos list
   | STOP of Ast.mixture Ast.print_expr Term.with_pos list
   | CFLOW of int

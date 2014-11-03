@@ -29,6 +29,10 @@ val value :
   t -> Counter.t -> ?time:float -> Environment.t ->
   'a Primitives.variable -> 'a
 
+val value_alg :
+  t -> Counter.t -> ?time:float -> Environment.t ->
+  Expr.alg_expr -> Nbr.t
+
 val instance_number : int -> t -> Environment.t -> Nbr.t
 val nl_instance_number : int -> t -> Environment.t -> Nbr.t
 
@@ -44,8 +48,8 @@ val update_activity :
 val update_dep :
   t -> ?cause:int -> Term.dep_type -> IntSet.t ->
   Counter.t -> Environment.t -> Environment.t * IntSet.t
-val update_dep_value : t -> Counter.t -> Environment.t ->
-		       Nbr.t Primitives.variable -> Term.dep_type -> unit
+val update_dep_value :
+  t -> Counter.t -> Environment.t -> Expr.alg_expr -> Term.dep_type -> unit
 
 val select_injection : float * Expr.alg_expr option ->
 		       float * Expr.alg_expr option -> t ->

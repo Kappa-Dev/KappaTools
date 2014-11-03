@@ -103,8 +103,8 @@ let apply_n_time x r state env counter pert_ids pert_events tracked =
 
 let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot counter =
   match eff with
-  | Primitives.ITER_RULE (v,r) ->
-     let x = State.value state counter env v in
+  | Primitives.ITER_RULE ((v,_),r) ->
+     let x = State.value_alg state counter env v in
     if x = Nbr.F infinity then
       let p_str = pert.Primitives.flag in
       invalid_arg
@@ -114,7 +114,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
 	Debug.tag_if_debug "Applying %a instances of %a"
 			   Nbr.print x (Dynamics.pp_effect env) eff
       in apply_n_time x r state env counter pert_ids pert_events tracked
-  | Primitives.UPDATE_RULE (id,v) ->
+  | Primitives.UPDATE_RULE (id,(v,_)) ->
      let () =
        Debug.tag_if_debug "Updating rate of rule '%a'"
 			 (Environment.print_rule env) id
@@ -123,7 +123,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
      let env,pert_ids =
        State.update_dep state ~cause:p_id (Term.RULE id) pert_ids counter env in
      (env,state ,pert_ids,tracked,pert_events)
-  | Primitives.UPDATE_VAR (id,v) ->
+  | Primitives.UPDATE_VAR (id,(v,_)) ->
      let () =
        Debug.tag_if_debug "Updating variable '%a'"
 			  (Environment.print_alg env) id
@@ -131,7 +131,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
      State.update_dep_value state counter env v (Term.ALG id);
      let env,pert_ids = State.update_dep state (Term.ALG id) pert_ids counter env in
      (env,state,pert_ids,tracked,pert_events)
-  | Primitives.UPDATE_TOK (tk_id,v) ->
+  | Primitives.UPDATE_TOK (tk_id,(v,_)) ->
      let _ = Debug.tag_if_debug "Updating token '%a'"
 				(Environment.print_token env) tk_id
     in

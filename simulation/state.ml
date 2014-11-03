@@ -995,7 +995,7 @@ let update_dep state ?cause dep_in pert_ids counter env =
   iter env (Term.DepSet.singleton dep_in) pert_ids
 
 let update_dep_value state counter env v dep =
-  let value = value state counter env v in
+  let value = value_alg state counter env v in
   match dep with
   | Term.TOK t_id -> update_token t_id value state
   | Term.ALG v_id -> set_variable v_id value state
