@@ -586,22 +586,21 @@ let initialize sg token_vector rules kappa_vars obs (pert,rule_pert) counter env
 	in
 	
 	if !Parameter.debugModeOn then Debug.tag "\t * Initializing activity tree...";
-	let act_tree = (*initializing activity tree*)
-		Hashtbl.fold
-		(fun id rule act_tree ->
+	let () = (*initializing activity tree*)
+		Hashtbl.iter
+		(fun id rule ->
 			(*rule could be a perturbation*)
-			if not (Environment.is_rule id env) then act_tree
-			else
+			if not rule.is_pert then
 				let a2,a1 = eval_activity rule state counter env in
 				let alpha_rule = Nbr.to_float (Nbr.add a1 a2) in
-				(Random_tree.add id alpha_rule act_tree ; act_tree)
+				Random_tree.add id alpha_rule state.activity_tree
 		)
-			state.rules state.activity_tree	
+			state.rules
 	in
 	if !Parameter.debugModeOn then Debug.tag "\t * Computing influence map...";
 	let im = build_influence_map state.rules state.kappa_variables env 
 	in
-	({state with activity_tree = act_tree; influence_map = im}, env)
+	({state with influence_map = im (*activity_tree updated by side effect!*)}, env)
 	
 let clean_injprod injprod state counter env = 
 	let mix_id = InjProduct.get_coordinate injprod
