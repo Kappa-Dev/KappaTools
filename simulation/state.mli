@@ -69,11 +69,7 @@ val instances_of_square :
 
 val initialize :
   Graph.SiteGraph.t -> float array -> Primitives.rule list ->
-  Mixture.t list ->
-  (((int -> Nbr.t) ->
-    (int -> Nbr.t) -> float -> int -> int -> float -> (int -> Nbr.t) -> Nbr.t) *
-     bool * Nbr.t option * 'a * string)
-    list ->
+  Mixture.t list -> (Expr.alg_expr * string) list ->
   Primitives.perturbation list ->
   Counter.t -> Environment.t -> t * Environment.t
 
@@ -91,5 +87,6 @@ module Safe : sig
   type check_options = {rule_act : bool ; lifts : bool ; unary : bool}
 
   val check : int -> check_options
-  val check_invariants : check_options -> t -> Counter.t -> Environment.t -> unit
+  val check_invariants :
+    check_options -> t -> Counter.t -> Environment.t -> unit
 end

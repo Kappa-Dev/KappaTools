@@ -677,17 +677,19 @@ let rules_of_result env mixs res tolerate_new_state =
   in (env, mixs, (List.rev l))
 
 let obs_of_result env mixs res =
-  List.fold_left
-    (fun (env,mix,cont) alg_expr ->
-     let (env',mixs',f, const, opt_v) = partial_eval_alg env mix alg_expr in
-     let (_mix',(alg,_pos)) =
-       Expr.compile_alg env.Environment.algs.NamedDecls.finder
-			env.Environment.tokens.NamedDecls.finder
-			(env.Environment.fresh_kappa,[]) alg_expr in
-     let dep = Expr.deps_of_alg_expr alg in
-     env',mixs',(f,const,opt_v,dep,Expr.ast_alg_to_string () (fst alg_expr)) :: cont
-    )
-    (env,mixs,[]) res.observables
+  let (a_mixs,cont) =
+    List.fold_left
+      (fun (a_mixs,cont) alg_expr ->
+       let (a_mixs',(alg,_pos)) =
+	 Expr.compile_alg env.Environment.algs.NamedDecls.finder
+			  env.Environment.tokens.NamedDecls.finder
+			  a_mixs alg_expr in
+       a_mixs',(alg,Expr.ast_alg_to_string () (fst alg_expr)) :: cont
+      )
+      ((env.Environment.fresh_kappa,[]),[]) res.observables in
+  let (env',mixs') = mixtures_of_result mixs env a_mixs in
+  (env',mixs',cont)
+
 
 let effects_of_modif variables lrules env ast_list =
   let rec iter mixs lrules effects str_pert env ast_list =
@@ -1072,11 +1074,7 @@ let configurations_of_result result =
      | "plotSepChar" ->
 	set_value pos_p param value_list
 		  (fun (v,p) ->
-		   try
-		     String.unsafe_get v 0
-		   with _ ->
-		     raise (ExceptionDefn.Semantics_Error
-			      (p,Printf.sprintf "Value %s should be a character" v))
+		   fun f ->  Printf.fprintf f "%s" v
 		  ) Parameter.plotSepChar
      | "maxConsecutiveClash" ->
 	set_value pos_p param value_list

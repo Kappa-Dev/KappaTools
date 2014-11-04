@@ -6,6 +6,7 @@ open Graph
 open ValMap
 open Random_tree
 
+type obs = { label : string; expr : Expr.alg_expr }
 type t =
     { graph : SiteGraph.t;
       injections : (component_injections option) array;
@@ -23,7 +24,6 @@ type t =
       mutable silenced : IntSet.t (*Set of rule ids such that eval-activity was overestimated and whose activity was manually set to a lower value*)
     }
 and component_injections = (InjectionHeap.t option) array
-and obs = { label : string; expr : Nbr.t Primitives.variable }
 
 let get_graph state = state.graph
 let get_nl_injections state = state.nl_injections
@@ -545,20 +545,14 @@ let initialize sg token_vector rules kappa_vars obs pert counter env =
 			kappa_variables = kappa_var_table;
 			alg_variables = alg_table;
 			token_vector = token_vector ; 
-			observables = 
-				begin
-					List.fold_left
-					(fun cont (plot_v, const, opt_v, dep, lbl) ->
-								let expr = 
-									if const then (match opt_v with Some v -> Primitives.CONST v | None -> invalid_arg "State.initialize") 
-									else (Primitives.VAR plot_v)
-								in
-									{
-										expr = expr ;
-										label = replace_space lbl;
-									} :: cont
-					)	[] obs
-				end ;
+			observables =
+			  List.fold_left
+			    (fun cont (expr, lbl) ->
+			     {
+			       expr = expr ;
+			       label = replace_space lbl;
+			     } :: cont
+			    ) [] obs ;
 			activity_tree = Random_tree.create dim_rule;
 			influence_map = influence_table ;
 			wake_up = wake_up_table;
@@ -1672,20 +1666,18 @@ let print_observables_header f state =
 	   else Printf.fprintf f "# time" in
   let () = List.iter
 	     (fun obs ->
-	      Printf.fprintf f "%c%s" !Parameter.plotSepChar obs.label
+	      Printf.fprintf f "%t%s" !Parameter.plotSepChar obs.label
 	     ) state.observables in
   Printf.fprintf f "\n"
 
 let print_observables_values f time env counter state =
-  Printf.fprintf f "%c%E" !Parameter.plotSepChar time ;
-  List.iter
-    (fun obs ->
-     match value state counter ~time env obs.expr with
-     | Nbr.I x -> Printf.fprintf f "%c%d" !Parameter.plotSepChar x
-     | Nbr.F x -> Printf.fprintf f "%c%E" !Parameter.plotSepChar x
-     | Nbr.I64 x -> Printf.fprintf f "%c%Ld" !Parameter.plotSepChar x
-    ) state.observables ;
-  Printf.fprintf f "\n"
+  Printf.fprintf f "%t%E%t%a\n"
+		 !Parameter.plotSepChar time
+		 !Parameter.plotSepChar
+		 (Pp.list !Parameter.plotSepChar Nbr.print)
+		 (List.map
+		    (fun obs -> value_alg state counter ~time env obs.expr)
+		    state.observables)
 
 module Safe = struct
 exception Invariant_violation of string
