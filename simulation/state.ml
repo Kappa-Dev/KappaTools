@@ -218,8 +218,11 @@ type a. t -> Counter.t -> ?time:float -> Environment.t ->
     | Expr.STATE_ALG_OP (op) ->
        with_value state counter ?time env (value_state_alg_op state counter ?time env op) sk
     | Expr.ALG_VAR i ->
-       exec_alg state counter ?time env with_value
-		(fst (snd env.Environment.algs.NamedDecls.decls.(i))) sk
+       (match state.alg_variables.(i) with
+       | None ->
+	  exec_alg state counter ?time env with_value
+		   (fst (snd env.Environment.algs.NamedDecls.decls.(i))) sk
+       | Some var_f -> with_value state counter ?time env var_f sk)
     | Expr.KAPPA_INSTANCE i ->
        with_value state counter ?time env (instance_number i state env) sk
     | Expr.TOKEN_ID i ->
@@ -237,6 +240,12 @@ let rec with_value_alg state counter ?time env n = function
      with_value_alg state counter ?time env (Nbr.of_un_alg_op op n) sk
   | _ -> failwith "type error in with_value_alg"
 and with_value_alg_bool state counter ?time env n = function
+  | TO_EXEC_ALG (op,alg) :: sk ->
+     exec_alg state counter ?time env with_value_alg_bool alg (TO_COMPUTE_ALG (op,n)::sk)
+  | TO_COMPUTE_ALG (op,n1) :: sk ->
+     with_value_alg_bool state counter ?time env (Nbr.of_bin_alg_op op n1 n) sk
+  | TO_COMPUTE_UN op :: sk ->
+     with_value_alg_bool state counter ?time env (Nbr.of_un_alg_op op n) sk
   | TO_EXEC_COMP (op,alg) :: sk ->
      exec_alg state counter ?time env with_value_alg_bool alg (TO_COMPUTE_COMP (op,n)::sk)
   | TO_COMPUTE_COMP (op,n1) :: sk ->
@@ -273,19 +282,6 @@ let alg_of_id state counter ?time env id =
 		 (fst (snd env.Environment.algs.NamedDecls.decls.(id)))
     | Some var_f -> var_f
   with | Invalid_argument msg -> invalid_arg ("State.kappa_of_id: " ^ msg)
-
-let value state counter ?(time=Counter.time counter) env =
-  function
-  | Primitives.CONST v -> v
-  | Primitives.VAR f ->
-     let inst = fun v_i -> instance_number v_i state env in
-     let values = fun i -> alg_of_id state counter ~time env i in
-     let v_of_token id =
-       try Nbr.F (state.token_vector.(id))
-       with _ -> failwith "eval_var_in_state: Invalid token id"
-     in
-     f inst values time (Counter.event counter) (Counter.null_event counter)
-       (Sys.time()) v_of_token
 
 (*missing recomputation of dependencies*)
 let set_variable id v state =

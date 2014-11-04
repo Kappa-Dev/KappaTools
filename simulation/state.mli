@@ -25,13 +25,12 @@ val maybe_find_perturbation : int -> t -> Primitives.perturbation option
 val remove_perturbation : int -> t -> t
 val all_perturbations : t -> IntSet.t
 
-val value :
-  t -> Counter.t -> ?time:float -> Environment.t ->
-  'a Primitives.variable -> 'a
-
 val value_alg :
   t -> Counter.t -> ?time:float -> Environment.t ->
   Expr.alg_expr -> Nbr.t
+val value_bool :
+  t -> Counter.t -> ?time:float -> Environment.t ->
+  Expr.alg_expr Ast.bool_expr -> bool
 
 val instance_number : int -> t -> Environment.t -> Nbr.t
 val nl_instance_number : int -> t -> Environment.t -> Nbr.t

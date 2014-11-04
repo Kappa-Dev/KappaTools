@@ -287,146 +287,20 @@ let mixture_of_ast ?mix_id env ast_mix =
     (mix,env) (*Modifies mix as a side effect*)
   end
 
-(* returns partial evaluation of rate expression and a boolean that is set *)
-(* to true if partial evaluation is a constant function                    *)
-let rec partial_eval_alg_of_alg env (ast, (beg_pos,end_pos)) =
-  let bin_op ast ast' op =
-    let (f1, const1, opt_value1) = partial_eval_alg_of_alg env ast in
-    let (f2, const2, opt_value2) = partial_eval_alg_of_alg env ast' in
-    let part_eval inst values t e e_null cpu_t tk =
-      (*evaluation partielle symbolique*)
-      let v1 = f1 inst values t e e_null cpu_t tk in
-      let v2 = f2 inst values t e e_null cpu_t tk in op v1 v2 in
-    let opt_value' = match opt_value1,opt_value2 with
-	(Some a,Some b) -> Some (op a b)
-      | _ -> None in (*evaluation complete si connue*)
-    (part_eval, (const1 && const2), opt_value')
-  in
-  let un_op ast op =
-    let (f, const, opt_v) = partial_eval_alg_of_alg env ast in
-    let opt_v' = match opt_v with Some a -> Some (op a) | None -> None in
-    ((fun inst values t e e_null cpu_t tk ->
-      let v = f inst values t e e_null cpu_t tk in op v),
-     const, opt_v')
-  in
+let rec initial_value_alg env (ast, (beg_pos,end_pos)) =
   match ast with
-  | Expr.CONST n -> ((fun _ _ _ _ _ _ _-> n), true, (Some n))
-  | Expr.STATE_ALG_OP (Term.CPUTIME) ->
-     ((fun _ _ _ _ _ cpu_t _-> Nbr.F (cpu_t -. !Parameter.cpuTime)), false,
-      Some (Nbr.F 0.))
-  | Expr.KAPPA_INSTANCE id -> ((fun f _ _ _ _ _ _-> f id), false, Some (Nbr.I 0))
+  | Expr.CONST n -> n
+  | Expr.STATE_ALG_OP (Term.CPUTIME) -> Nbr.F 0.
+  | Expr.KAPPA_INSTANCE id -> Nbr.I 0
   | Expr.ALG_VAR i ->
-     let (_,_,c) = partial_eval_alg_of_alg
-		     env (snd env.Environment.algs.NamedDecls.decls.(i))
-     in ((fun _ v _ _ _ _ _-> v i),false,c)
-  | Expr.TOKEN_ID i -> ((fun _ _ _ _ _ _ tk -> tk i),false,Some (Nbr.F 0.))
-  | Expr.STATE_ALG_OP (Term.TIME_VAR) ->
-     ((fun _ _ t _ _ _ _-> Nbr.F t), false, Some (Nbr.F 0.))
-  | Expr.STATE_ALG_OP (Term.EVENT_VAR) ->
-     ((fun _ _ _ e ne _ _-> Nbr.I (e+ne)), false, Some (Nbr.I 0))
-  | Expr.STATE_ALG_OP (Term.NULL_EVENT_VAR) ->
-     ((fun _ _ _ _ ne _ _-> Nbr.I ne), false, Some (Nbr.I 0))
-  | Expr.STATE_ALG_OP (Term.PROD_EVENT_VAR) ->
-     ((fun _ _ _ e _ _ _-> Nbr.I e), false,Some (Nbr.I 0))
+     initial_value_alg
+       env (snd env.Environment.algs.NamedDecls.decls.(i))
+  | Expr.TOKEN_ID i -> Nbr.F 0.
+  | Expr.STATE_ALG_OP _ -> Nbr.I 0
   | Expr.BIN_ALG_OP (op,ast, ast') ->
-     bin_op ast ast' (Nbr.of_bin_alg_op op)
-  | Expr.UN_ALG_OP (op,ast) -> un_op ast (Nbr.of_un_alg_op op)
-
-let rec partial_eval_alg env mixs (ast, (beg_pos,end_pos)) =
-  let bin_op ast ast' op =
-    let (env1, mix1, f1, const1, opt_value1) =
-      partial_eval_alg env mixs ast in
-    let (env2, mix2, f2, const2, opt_value2) =
-      partial_eval_alg env1 mix1 ast' in
-    let part_eval inst values t e e_null cpu_t tk =
-      (*evaluation partielle symbolique*)
-      let v1 = f1 inst values t e e_null cpu_t tk in
-      let v2 = f2 inst values t e e_null cpu_t tk in op v1 v2 in
-    let opt_value' = match opt_value1,opt_value2 with
-        (Some a,Some b) -> Some (op a b)
-      | _ -> None in (*evaluation complete si connue*)
-    (env2, mix2, part_eval, (const1 && const2), opt_value')
-  in
-  let un_op ast op =
-    let (env', mix', f, const, opt_v) =
-      partial_eval_alg env mixs ast in
-    let opt_v' = match opt_v with Some a -> Some (op a) | None -> None in
-    (env', mix', (fun inst values t e e_null cpu_t tk ->
-		  let v = f inst values t e e_null cpu_t tk in op v),
-     const, opt_v')
-  in
-  match ast with
-  | EMAX ->
-     let v = Parameter.getMaxEventValue () in
-     (env,mixs,(fun _ _ _ _ _ _ _-> v), true, Some v)
-  | TMAX ->
-     let v = Parameter.getMaxTimeValue () in
-     (env,mixs,(fun _ _ _ _ _ _ _-> v), true, Some v)
-  | CONST n ->
-     (env,mixs,(fun _ _ _ _ _ _ _-> n), true, (Some n))
-  | STATE_ALG_OP (Term.CPUTIME) ->
-     (env,mixs,(fun _ _ _ _ _ cpu_t _-> Nbr.F (cpu_t -. !Parameter.cpuTime)), false,
-      Some (Nbr.F 0.))
-  | KAPPA_INSTANCE ast ->
-     let (env', id) =
-       Environment.declare_var_kappa None env in
-     let mix,env'' = mixture_of_ast ~mix_id:id env' ast in
-     (env'', mix::mixs, (fun f _ _ _ _ _ _-> f id), false, Some (Nbr.I 0))
-  | OBS_VAR lab ->
-     let i =
-         try Environment.num_of_alg lab env with
-         | Not_found ->
-            raise (ExceptionDefn.Semantics_Error
-                     (pos_of_lex_pos beg_pos,lab ^ " is not a declared variable"))
-     in
-     let (_,_,c) = partial_eval_alg_of_alg
-		     env (snd env.Environment.algs.NamedDecls.decls.(i)) in
-       (env,mixs,(fun _ v _ _ _ _ _-> v i),false,c)
-  | TOKEN_ID (tk_nme) ->
-     let i =
-       try Environment.num_of_token tk_nme env
-       with Not_found ->
-         raise (ExceptionDefn.Semantics_Error
-                  (pos_of_lex_pos beg_pos,tk_nme ^ " is not a declared token"))
-     in
-     (env,mixs,(fun _ _ _ _ _ _ tk -> tk i),false,Some (Nbr.F 0.))
-  | STATE_ALG_OP (Term.TIME_VAR) ->
-     (env,mixs,(fun _ _ t _ _ _ _-> Nbr.F t), false, Some (Nbr.F 0.))
-  | STATE_ALG_OP (Term.EVENT_VAR) ->
-     (env,mixs,(fun _ _ _ e ne _ _-> Nbr.I (e+ne)), false, Some (Nbr.I 0))
-  | STATE_ALG_OP (Term.NULL_EVENT_VAR) ->
-     (env,mixs,(fun _ _ _ _ ne _ _-> Nbr.I ne), false, Some (Nbr.I 0))
-  | STATE_ALG_OP (Term.PROD_EVENT_VAR) ->
-     (env,mixs,(fun _ _ _ e _ _ _-> Nbr.I e), false,Some (Nbr.I 0))
-  | BIN_ALG_OP (op,ast, ast') ->
-     bin_op ast ast' (Nbr.of_bin_alg_op op)
-  | UN_ALG_OP (op,ast) -> un_op ast (Nbr.of_un_alg_op op)
-
-let rec partial_eval_bool env mixs (ast,_) =
-  let bin_op_bool ast ast' op =
-    let (env1, mix1, f1, const1) = partial_eval_bool env mixs ast in
-    let (env2, mix2, f2, const2) = partial_eval_bool env1 mix1 ast' in
-    let part_eval inst values t e e_null cpu_t tk =
-      let b1 = f1 inst values t e e_null cpu_t tk in
-      let b2 = f2 inst values t e e_null cpu_t tk in op b1 b2
-    in (env2,mix2,part_eval, (const1 && const2))
-  in let bin_op_alg ast ast' op =
-       let (env1,mix1,f1, const1, _) = partial_eval_alg env mixs ast in
-       let (env2,mix2,f2, const2, _) = partial_eval_alg env1 mix1 ast' in
-       let part_eval inst values t e e_null cpu_t tk =
-	 let v1 = f1 inst values t e e_null cpu_t tk in
-	 let v2 = f2 inst values t e e_null cpu_t tk in
-	 op v1 v2
-       in
-       (env2,mix2,part_eval, (const1 && const2))
-     in
-     match ast with
-     | TRUE ->
-	(env,mixs,(fun _ _ _ _ _ _ _-> true), true)
-     | FALSE -> (env,mixs,(fun _ _ _ _ _ _ _-> false), true)
-     | BOOL_OP(Term.AND,ast, ast') -> bin_op_bool ast ast' (&&)
-     | BOOL_OP(Term.OR,ast, ast') -> bin_op_bool ast ast' (||)
-     | COMPARE_OP(op,ast, ast') -> bin_op_alg ast ast' (Nbr.of_compare_op op)
+     Nbr.of_bin_alg_op op (initial_value_alg env ast)
+		       (initial_value_alg env ast')
+  | Expr.UN_ALG_OP (op,ast) -> Nbr.of_un_alg_op op (initial_value_alg env ast)
 
 let mixtures_of_result c_mixs env (free_id,mixs) =
   let (env',compiled_mixs,final_id) =
@@ -859,12 +733,11 @@ let pert_of_result variables env rules res =
       (fun (variables, lpert, lrules, env)
 	   ((pre_expr, modif_expr_list, opt_post),pos) ->
        let bpos = pos_of_lex_pos (fst pos) in
-       let (env', variables', x, is_constant) =
-	 partial_eval_bool env variables pre_expr in
-       let (_mix',(pre,_pos)) =
+       let (mix,(pre,_pos)) =
 	 Expr.compile_bool env.Environment.algs.NamedDecls.finder
 			   env.Environment.tokens.NamedDecls.finder
 			   (env.Environment.fresh_kappa,[]) pre_expr in
+       let (env', variables') = mixtures_of_result variables env mix in
        let (dep, stopping_time) = try Expr.deps_of_bool_expr pre
 		 with ExceptionDefn.Unsatisfiable ->
 		   raise
@@ -874,36 +747,30 @@ let pert_of_result variables env rules res =
        let (variables, lrules', effects, str_eff, env) =
 	 effects_of_modif variables' lrules env' modif_expr_list in
        let str_eff = String.concat ";" (List.rev str_eff) in
-       let bv =
-	 if is_constant
-	 then Primitives.CONST (close_var x)
-	 else Primitives.VAR x in
-       let str_pert,opt_abort =
+       let env,variables,str_pert,opt_abort =
 	 match opt_post with
 	 | None ->
-	    (Printf.sprintf "whenever %a, %s"
+	    (env,variables,
+	     Printf.sprintf "whenever %a, %s"
 			    Expr.ast_bool_to_string (fst pre_expr) str_eff,None)
 	 | Some post_expr ->
-	    let (env', variables', x, is_constant) =
-	      partial_eval_bool env variables post_expr in
-	    let (_mix',(post,_pos)) =
+	    let (mix,(post,_pos)) =
 	      Expr.compile_bool env.Environment.algs.NamedDecls.finder
 				env.Environment.tokens.NamedDecls.finder
 				(env.Environment.fresh_kappa,[]) post_expr in
-	    let (dep,stopping_time) = try Expr.deps_of_bool_expr post with
-			       ExceptionDefn.Unsatisfiable ->
-			       raise
-				 (ExceptionDefn.Semantics_Error
-				    (bpos,"Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"))
+	    let (env', variables') = mixtures_of_result variables env mix in
+	    let (dep,stopping_time) =
+	      try Expr.deps_of_bool_expr post with
+		ExceptionDefn.Unsatisfiable ->
+		raise
+		  (ExceptionDefn.Semantics_Error
+		     (bpos,"Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"))
 	    in
-	    let bv =
-	      if is_constant then Primitives.CONST (close_var x)
-	      else Primitives.VAR x
-	    in
-	    (Printf.sprintf "whenever %a, %s until %a"
+	    (env',variables',
+	     Printf.sprintf "whenever %a, %s until %a"
 			    Expr.ast_bool_to_string (fst pre_expr) str_eff
 			    Expr.ast_bool_to_string (fst post_expr),
-	     Some (bv,dep))
+	     Some (post,dep))
        in
        let env,p_id = Environment.declare_pert (str_pert,pos) env' in
        let has_tracking = env.Environment.tracking_enabled
@@ -920,7 +787,7 @@ let pert_of_result variables env rules res =
        let opt,env =
 	 match opt_abort with
 	 | None -> (None,env)
-	 | Some (bv,dep) ->
+	 | Some (post,dep) ->
 	    let env =
 	      Term.DepSet.fold
 		(fun dep_type env ->
@@ -928,10 +795,10 @@ let pert_of_result variables env rules res =
 		)
 		dep env
 	    in
-	    (Some bv,env)
+	    (Some post,env)
        in
        let pert =
-	 { Primitives.precondition = bv;
+	 { Primitives.precondition = pre;
 	   Primitives.effect = effects;
 	   Primitives.abort = opt;
 	   Primitives.flag = str_pert;
@@ -963,15 +830,7 @@ let init_graph_of_result env res =
 	    Expr.compile_alg env.Environment.algs.NamedDecls.finder
 			     env.Environment.tokens.NamedDecls.finder (0,[]) alg
 	  in
-	  let value =
-	    match partial_eval_alg_of_alg env alg' with
-	    | (_, _, Some v) -> v
-	    | _ -> raise
-		     (ExceptionDefn.Semantics_Error
-			(pos,
-			 Printf.sprintf "%a is not a constant, cannot initialize graph."
-					Expr.ast_alg_to_string (fst alg)))
-	  in
+	  let value = initial_value_alg env alg' in
 	  let cpt = ref 0 in
 	  let sg = ref sg in
 	  let env = ref env in
@@ -993,15 +852,7 @@ let init_graph_of_result env res =
 	    Expr.compile_alg env.Environment.algs.NamedDecls.finder
 			     env.Environment.tokens.NamedDecls.finder (0,[]) alg
 	  in
-	  let value =
-	    match partial_eval_alg_of_alg env alg' with
-	    | (_, _, Some v) -> Nbr.to_float v
-	    | _ -> raise
-		     (ExceptionDefn.Semantics_Error
-			(pos_tk,
-			 Printf.sprintf "%a is not a constant, cannot initialize token value."
-					Expr.ast_alg_to_string (fst alg)))
-	  in
+	  let value = Nbr.to_float (initial_value_alg env alg') in
 	  let tok_id =
 	    try Environment.num_of_token tk_nme env
 	    with Not_found ->

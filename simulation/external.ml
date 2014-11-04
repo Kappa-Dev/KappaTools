@@ -9,7 +9,7 @@ open LargeArray
 let eval_abort_pert just_applied pert state counter env =
   match pert.Primitives.abort with
   | None -> just_applied
-  | Some var -> State.value state counter env var
+  | Some var -> State.value_bool state counter env var
 
 let eval_pexpr pexpr state counter env =
   let l =
@@ -17,22 +17,18 @@ let eval_pexpr pexpr state counter env =
       (fun cont (ast,pos) ->
        match ast with
        | Ast.Str_pexpr str -> str::cont
-       | Ast.Alg_pexpr alg ->
-	  let (env', mixs, x, is_constant, opt_v) =
-	    Eval.partial_eval_alg env [] (alg, pos) in
-	  match mixs with
-	  | _ :: _ ->
+       | Ast.Alg_pexpr alg_ex ->
+	    let (mix, (alg,_pos)) =
+	      Expr.compile_alg env.Environment.algs.NamedDecls.finder
+			       env.Environment.tokens.NamedDecls.finder
+			       (env.Environment.fresh_kappa,[]) (alg_ex,pos) in
+	  match mix with
+	  | _, _ :: _ ->
 	     raise (ExceptionDefn.Semantics_Error
 		      (pos_of_lex_pos (fst pos), "Mixture occurences of are not allowed here.
 						  Please use an auxilary variable."))
-	  | [] ->
-	     let v =
-	       if is_constant
-	       then (match opt_v with Some v -> Primitives.CONST v
-				    | None -> invalid_arg "Eval.effects_of_modif")
-	       else Primitives.VAR x
-	     in
-	     let n = State.value state counter env' v in
+	  | _, [] ->
+	     let n = State.value_alg state counter env alg in
 	     (Nbr.to_string n)::cont
       ) [] pexpr
   in
@@ -43,22 +39,18 @@ let dump_print_expr desc pexpr state counter env =
     (fun (ast,pos) ->
      match ast with
      | Ast.Str_pexpr str -> Printf.fprintf desc "%s" str
-     | Ast.Alg_pexpr alg ->
-	let (env', mixs, x, is_constant, opt_v) =
-	  Eval.partial_eval_alg env [] (alg, pos) in
-	match mixs with
-	| _ :: _ ->
+       | Ast.Alg_pexpr alg_ex ->
+	    let (mix, (alg,_pos)) =
+	      Expr.compile_alg env.Environment.algs.NamedDecls.finder
+			       env.Environment.tokens.NamedDecls.finder
+			       (env.Environment.fresh_kappa,[]) (alg_ex,pos) in
+	match mix with
+	| _, _ :: _ ->
 	   raise (ExceptionDefn.Semantics_Error
 		    (pos_of_lex_pos (fst pos), "Mixture occurences of are not allowed here.
 						Please use an auxilary variable."))
-	| [] ->
-	   let v =
-	     if is_constant
-	     then (match opt_v with Some v -> Primitives.CONST v
-				  | None -> invalid_arg "Eval.effects_of_modif")
-	     else Primitives.VAR x
-	   in
-	   Nbr.print desc (State.value state counter env' v)
+	| _, [] ->
+	   Nbr.print desc (State.value_alg state counter env alg)
     ) pexpr ;
   Printf.fprintf desc "\n"
 
@@ -241,7 +233,7 @@ let try_perturbate tracked state pert_ids pert_events counter env =
 	 match State.maybe_find_perturbation pert_id state with
 	 | None -> acc
 	 | Some pert ->
-	    if State.value state counter env pert.Primitives.precondition then
+	    if State.value_bool state counter env pert.Primitives.precondition then
 	      begin
 		Debug.tag_if_debug
 		  "\n*************Applying perturbation %d***************" pert_id;

@@ -1,9 +1,3 @@
-type 'a variable =
-    CONST of 'a
-  | VAR of
-      ((int -> Nbr.t) -> (int -> Nbr.t) -> float ->
-       int -> int -> float -> (int -> Nbr.t) -> 'a)
-
 (** binding or modifying a port that has been added or kept from the lhs *)
 type id = FRESH of int | KEPT of int
 type port = id * int
@@ -72,9 +66,9 @@ type modification =
 	 Ast.mixture Ast.print_expr Term.with_pos list)
 
 type perturbation =
-    { precondition: bool variable;
+    { precondition: Expr.alg_expr Ast.bool_expr;
       effect : modification list;
-      abort : bool variable option;
+      abort : Expr.alg_expr Ast.bool_expr option;
       flag : string;
       stopping_time : Nbr.t option
     }
