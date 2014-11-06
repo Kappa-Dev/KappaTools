@@ -12,3 +12,8 @@ _build/
 grammar/kappaParser.ml
 grammar/kappaParser.mli
 grammar/kappaLexer.ml
+
+# test suite
+models/cflows/*/tmp/
+models/cflows/*/error
+profiling.txt
