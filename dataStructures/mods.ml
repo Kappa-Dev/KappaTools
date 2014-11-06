@@ -1,9 +1,17 @@
-module StringMap = MapExt.Make (struct type t = string let compare= compare end)
-module IntMap = MapExt.Make (struct type t = int let compare = compare end)
-module IntSet = Set_patched.Make (struct type t = int let compare = compare end)
-module Int2Map = MapExt.Make (struct type t = int*int let compare = compare end)
-module StringSet = Set.Make (struct type t = string let compare = compare end)
-module Int2Set = Set.Make (struct type t = int*int let compare = compare end)
+let int_compare (x: int) y = Pervasives.compare x y
+let int_pair_compare (p,q) (p',q') =
+  let o = int_compare p p' in
+  if o = 0 then int_compare q q' else o
+
+module StringMap = MapExt.Make (String)
+module IntMap = MapExt.Make (struct type t = int let compare = int_compare end)
+module IntSet =
+  Set_patched.Make (struct type t = int let compare = int_compare end)
+module Int2Map =
+  MapExt.Make (struct type t = int*int let compare = int_pair_compare end)
+module StringSet = Set.Make (String)
+module Int2Set =
+  Set.Make (struct type t = int*int let compare = int_pair_compare end)
 module Int3Set = Set.Make (struct type t = int*int*int let compare= compare end)
 module StringIntMap =
   MapExt.Make (struct type t = (string * int) let compare = compare end)
@@ -33,15 +41,12 @@ module Injection =
 		let flush phi (var_id,cc_id) = 
 			{phi with address = None ; coordinate = (var_id,cc_id)}
 		
-		let compare phi psi = 
-			try
-				let a = get_address phi
-				and a'= get_address psi
-				and (m,c) = get_coordinate phi
-				and (m',c') = get_coordinate psi
-				in
-					compare (m,c,a) (m',c',a') (*might be better to compare a bit rep of this triple*)
-			with Not_found -> invalid_arg "Injection.compare"
+		let compare phi psi =
+		  let o = int_pair_compare phi.coordinate psi.coordinate in
+		  if o = 0 then match phi.address, psi.address with
+				| Some a, Some a' -> int_compare a a'
+				| _, _ -> invalid_arg "Injection.compare"
+		  else o
 		
 		let fold f phi cont = Hashtbl.fold f phi.map cont
 
