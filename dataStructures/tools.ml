@@ -85,12 +85,53 @@ let list_of_string str =
 		with Stream.Failure -> (acc::cont)
 	in
 	parse stream "" []
-	
-let find_available_name nme ext = 
-	let v = ref 0 in
-	let fic = ref nme in
-	while (Sys.file_exists (!fic^ext)) do
-		fic := nme^"~"^(string_of_int !v) ;
-		v := !v+1 ;
-	done;
-	(!fic^ext)
+
+
+let array_fold_left_mapi f x a =
+  let y = ref x in
+  let o = Array.init (Array.length a)
+		     (fun i -> let (y',out) = f i !y a.(i) in
+			       let () = y := y' in
+			       out) in
+  (!y,o)
+
+let array_map_of_list f l =
+  let len = List.length l in
+  let rec fill i v = function
+    | [] -> ()
+    | x :: l ->
+       Array.unsafe_set v i (f x);
+       fill (succ i) v l
+  in
+  match l with
+  | [] -> [||]
+  | x :: l ->
+     let ans = Array.make len (f x) in
+     let () = fill 1 ans l in
+     ans
+
+let iteri f i =
+  let rec aux j =
+  if j < i then let () = f j in aux (succ j)
+  in aux 0
+
+let find_available_name name ext =
+  let base = try Filename.chop_extension name with _ -> name in
+  if Sys.file_exists (base^"."^ext) then
+          let v = ref 0 in
+          let () =
+            while Sys.file_exists (base^"~"^(string_of_int !v)^"."^ext) do incr v; done
+          in base^"~"^(string_of_int !v)^"."^ext
+   else
+        (base^"."^ext)
+
+(**[build_fresh_filename base_name l ext] returns a filename that does 
+not exists in the working directory using [base_name] appended to strings 
+in [l] and adding the extension [ext] at the end*)
+let build_fresh_filename base_name concat_list ext =
+        let tmp_name = 
+                try Filename.chop_extension base_name with _ -> base_name
+        in
+        let base_name = String.concat "_" (tmp_name::concat_list) in
+        find_available_name base_name ext
+

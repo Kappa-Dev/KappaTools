@@ -40,8 +40,8 @@
  $SNAPSHOT <"snap".[int]([E+]/1000).".ka">) \
  until [false]
 
-%mod: [T]>5 do $ADD 10000 C()
-%mod: [T]>10 do ($TRACK 'Cpp' [true] ; $UPDATE 'cflow' 'Cpp')
+%mod: [T]=5 do $ADD 1000 C()
+%mod: [T]=10 do ($TRACK 'Cpp' [true] ; $UPDATE 'cflow' 'Cpp')
 %mod: [T]>10 && ('Cpp' - 'cflow' = 10) do ($TRACK 'Cpp' [false])
 
 
