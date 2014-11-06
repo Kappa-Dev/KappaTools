@@ -939,29 +939,31 @@ let update_dep state ?cause dep_in pert_ids counter env =
     else
       let dep_in = Term.DepSet.choose dep_to_check in
       let depset = Environment.get_dependencies dep_in env in
-      let dep_str = string_of_set (Term.dep_to_string ()) Term.DepSet.fold depset in
       let new_to_check =
 	Term.DepSet.union (Term.DepSet.remove dep_in dep_to_check) depset in
       match dep_in with
       | Term.TOK t_id -> (* token counter is changed *)
-	 let () = if !Parameter.debugModeOn then
-		    Debug.tag (Printf.sprintf "Token %d is changed, updating %s"
-					      t_id dep_str) in
+	 let () = Debug.tag_if_debug
+		    "Token %d is changed, updating %a" t_id
+		    (Pp.set Term.DepSet.elements Pp.comma Term.print_dep_type)
+		    depset in
 	 iter env new_to_check pert_ids
       | Term.ALG v_id ->
 	 (*variable v_id is changed -by a perturbation if used as
 	 initial dep_in argument*)
-	 let () = if !Parameter.debugModeOn then
-		    Debug.tag (Printf.sprintf
-				 "Variable %d is changed, updating %s" v_id dep_str) in
+	 let () = Debug.tag_if_debug
+		    "Variable %d is changed, updating %a" v_id
+		    (Pp.set Term.DepSet.elements Pp.comma Term.print_dep_type)
+		    depset in
 	 iter env new_to_check pert_ids
       | Term.RULE r_id ->
 	 (*rule activity is changed -by a perturbation if used as
 	 initial dep_in argument*)
 	 let () = update_activity state ?cause r_id counter env in
-	 let () = if !Parameter.debugModeOn then
-		    Debug.tag (Printf.sprintf "Rule %d is changed, updating %s"
-					      r_id dep_str) in
+	 let () = Debug.tag_if_debug
+		    "Rule %d is changed, updating %a" r_id
+		    (Pp.set Term.DepSet.elements Pp.comma Term.print_dep_type)
+		    depset in
 	 iter env new_to_check pert_ids
       | Term.PERT p_id ->
 	 if IntMap.mem p_id state.perturbations
@@ -975,9 +977,11 @@ let update_dep state ?cause dep_in pert_ids counter env =
 	 else iter (Environment.remove_dependencies dep_in (Term.PERT p_id) env) new_to_check pert_ids
       | Term.KAPPA i ->
 	 (*No need to update kappa observable, it will be updated if plotted*)
-	 let () = if !Parameter.debugModeOn && not (Term.DepSet.is_empty depset) then
-		    Debug.tag (Printf.sprintf "Observable %d is changed, updating %s"
-					      i dep_str) in
+	 let () = if not (Term.DepSet.is_empty depset) then
+		    Debug.tag_if_debug
+		      "Observable %d is changed, updating %a" i
+		      (Pp.set Term.DepSet.elements Pp.comma Term.print_dep_type)
+		      depset in
 	 iter env new_to_check pert_ids
       | Term.EVENT | Term.TIME ->
 		      iter env new_to_check pert_ids
