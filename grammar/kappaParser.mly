@@ -130,9 +130,10 @@ instruction:
 	     {Ast.CONFIG ((fst $2,rhs_pos 2),$3)}
     | PERT bool_expr DO effect_list UNTIL bool_expr
       /* backward compatibility */
-	   {ExceptionDefn.warning
+	   {ExceptionDefn.deprecated
 	      ~pos:(Parsing.symbol_start_pos (), Parsing.symbol_end_pos ())
-	      (fun f -> Pp.string f "Deprecated perturbation syntax: use the 'repeat ... until' construction");
+	      "perturbation"
+	      (fun f -> Pp.string f "use the 'repeat ... until' construction");
 	    Ast.PERT (add_pos ($2,$4,Some $6))}
     ;
 
@@ -152,9 +153,10 @@ perturbation_declaration:
     | OP_PAR perturbation_declaration CL_PAR {$2}
     | bool_expr DO effect_list {($1,$3)}
     | bool_expr SET effect_list
-		{ExceptionDefn.warning
+		{ExceptionDefn.deprecated
 		   ~pos:(Parsing.symbol_start_pos (), Parsing.symbol_end_pos ())
-		   (fun f -> Pp.string f "Deprecated perturbation syntax: 'set' keyword is replaced by 'do'");
+		   "perturbation"
+		   (fun f -> Pp.string f "'set' keyword is replaced by 'do'");
 		 ($1,$3)} /*For backward compatibility*/
     ;
 
@@ -168,11 +170,12 @@ effect:
     | LABEL ASSIGN alg_expr
       /*updating the rate of a rule -backward compatibility*/
 				{
-				  ExceptionDefn.warning
+				  ExceptionDefn.deprecated
 				    ~pos:(Parsing.symbol_start_pos (), Parsing.symbol_end_pos ())
+				    "perturbation effect"
 				    (fun f ->
 				     Pp.string
-				       f "Deprecated syntax, use $UPDATE perturbation instead of the ':=' assignment (see Manual)");
+				       f "use $UPDATE perturbation instead of the ':=' assignment (see Manual)");
 					Ast.UPDATE (($1,rhs_pos 1),$3)}
     | ASSIGN2 LABEL alg_expr /*updating the rate of a rule*/
 						      {Ast.UPDATE (($2,rhs_pos 2),$3)}
@@ -234,6 +237,15 @@ boolean:
     ;
 
 variable_declaration:
+    | LABEL non_empty_mixture
+	    {let () =
+	       ExceptionDefn.deprecated
+		 ~pos:(Parsing.symbol_start_pos (), Parsing.symbol_end_pos ())
+		 "variable"
+		 (fun f -> Pp.string
+			     f "use |kappa instance| instead.")
+	      in
+	      (($1,rhs_pos 1),(Ast.KAPPA_INSTANCE $2,rhs_pos 2))}
     | LABEL alg_expr {(($1,rhs_pos 1),$2)}
     | LABEL error
 	    {raise

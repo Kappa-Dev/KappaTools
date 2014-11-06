@@ -33,6 +33,9 @@ let warning ?pos msg =
     (fun f -> Printf.fprintf f "%tWarning: %t\n" pr msg)::
       !warning_buffer
 
+let deprecated ~pos entry msg =
+  warning ~pos (fun f -> Printf.fprintf f "Deprecated %s syntax: %t" entry msg)
+
 let flush_warning () =
   prerr_string "\n";
   let l = List.rev !warning_buffer in
