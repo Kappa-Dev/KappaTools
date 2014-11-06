@@ -1,0 +1,31 @@
+## DNA basic building block
+#e5: connects to e3, (dRP signifies that POLb needs to perform its lyase activity, P means that the connector is intact)
+%agent:  DNA(e5~lig~dRP~P~OH~PUA~NA,init~A~T~G~C~mC~damaged,base_state~OK~damaged~excised~gapped,base~A~T~G~C~U~AP~oxoG, \
+	 dg,ape,pol,xrc,dnm,lig,pnkp,meth~false~true,e3~lig~dRP~P~OH~PUA~NA)
+
+## Methylation enzyme
+#dbd:DNA interactions; dg:DNA glycosylase interactions; 
+%agent: DNMT(dbd,dg)
+
+## DNA glycosylase
+#type: T for TDG, U for UDG ; dbd:DNA sliding ; cat: catalytic pocket for excision; ape : (?) APE1 binding -no evidence
+%agent: DG(type~T~U~NEIL~OGG,dbd,cat) ## substrate Lig.damaged.Lig --(glycosylase)--> Lig.ap.Lig
+
+## Base excision repair
+#dbd: DNA binding; dg: DG binding; pol: POLB binding; xrc: XRCC1 binding
+%agent: APE1(dbd,dg,pol,xrc) ## substrate Lig.ap.Lig --(AP endonuclease)--> OH.ap.dRP
+
+#dbd: DNA binding; ape:APE1 binding; xrc: XRCC1 binding 
+%agent: POLb(dbd,ape,xrc) ## substrate OH.ap.dRP --(dRPlyase)--> OH.ap.P --(polymerase)--> OH.n.P 
+
+#dbd: DNA binding; ape: APE1 binding; pol: POLB binding; lig:LIG3 binding
+%agent: XRCC1(dbd,ape,pol,lig,xrc,pnk)
+
+#dbd: DNA binding; xrc:XRCC1 bindig; dnm: DNMT3 binding
+%agent: LIG3(dbd,xrc,dnm) ## substrate OH.n.P --(Ligase)--> Lig.n.Lig
+
+#dbd: DNA binding
+%agent: PNKP(dbd, xrc)
+
+## DNA building helpers
+%token: Cpt

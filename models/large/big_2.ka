@@ -1,0 +1,599 @@
+%init: 0  DG(type~T)
+%init: 2230  DG(type~U)
+%init: 28000 APE1()
+%init: 2700 POLb()
+%init: 400 LIG3()
+%init: 1200 XRCC1()
+%init: 0 PNKP()
+
+## add DNA damage: turn a certain percentage of C resp. 5mc into U resp. T
+
+%var: 'n' |DNA()|
+%var: 'bp' 'n'/2
+
+%var: 'damaged' |DNA(base_state~damaged?)|
+%var: 'correct' 'bp' - ('damaged' / 2)
+
+%var: 'k_deam' 0
+%var: 'k_SSB' 0
+
+'5mc Deamination' DNA(base~C?, meth~true) -> DNA(meth~false, base~T?, base_state~damaged, init~damaged) @ 'k_deam'
+'C Deamination' DNA(base~C?, meth~false) -> DNA(meth~true, base~U?, base_state~damaged, init~damaged) @ 'k_deam'
+
+## Generates a one nt gap
+'SSB' DNA(e3~lig!1),DNA(e5~lig!1,base?,e3!2),DNA(e5!2) -> DNA(e3~P!1),DNA(e5~NA!1,base~AP?,base_state~gapped,init~damaged,e3~NA!2),DNA(e5~P!2) @ 'k_SSB' 
+
+
+%var: 'deam_percent' 2 / 100
+%var: 'nCG' |DNA(base~C!_)|
+%var: 'n5mCG' |DNA(init~mC!_, base~C!_)|
+
+%mod: [T]>2 do ($UPDATE 'k_deam' 10000000000000 ; $PRINT <".">)
+
+%mod: 'damaged' > ('deam_percent' * 'bp') do \
+      ($UPDATE 'k_deam' 0.0)
+%var: 'DG_DNA_AP_find' 0.0001
+
+## This is an alternative to sliding to accelerate computations by directly attaching to damaged bases
+
+'DG damage bind (facilitated diff.)' \
+    DNA(dg, base_state~damaged, base!_), DG(dbd, cat) -> DNA(dg!1, base_state~damaged, base!_), DG(dbd!1, cat) \
+    @ 'DG_DNA_AP_find'
+%var: 'DG_DNA_bind' 0.000621063435257
+%var: 'DG_DNA_unbind' 10.7713267405
+
+%var: 'DG_DNA_anchors' 10000.0
+#%var: 'NEIL_DNA_anchors_AP' 0.0001
+#%var: 'OGG_DNA_anchors_AP' 0.0001
+
+%var: 'UDG_DNA_release_mismatch' 0.1
+%var: 'TDG_DNA_release_mismatch' 0.1
+%var: 'UDG_DNA_release_AP' 0.1
+%var: 'TDG_DNA_release_AP' 0.1
+#%var: 'NEIL_DNA_release' $NEIL_DNA_release
+#%var: 'OGG_DNA_release' $OGG_DNA_release
+
+#%var: 'OGG_excision' $OGG_excision
+%var: 'TDG_excision_TG' 0.00367
+%var: 'UDG_excision' 16
+#%var: 'NEIL_excision' $NEIL_excision
+
+## DG agent's actions 
+
+## DG binding is unconstrained if catalytic pocket is unbound, however
+## if the cat site is bound, DG is not allowed to rebind to a nucleobase
+'DG ns bind' \
+    DNA(dg), DG(dbd, cat) <-> DNA(dg!1), DG(dbd!1, cat) \
+    @ 'DG_DNA_bind', 'DG_DNA_unbind'
+
+## DG product inhibition (tight interaction)
+'UDG anchors DNA mismatch' \
+    DNA(e3~lig?, base~U?, dg!1, e5~lig?), DG(dbd!1, cat, type~U) -> \
+    DNA(e3~lig?, base~U?, dg!1, e5~lig?), DG(dbd, cat!1, type~U) @ 'DG_DNA_anchors'
+
+'UDG anchors AP DNA' \
+    DNA(e3~lig?, base~AP?, dg!1, e5~lig?), DG(dbd!1, cat, type~U) -> \
+    DNA(e3~lig?, base~AP?, dg!1, e5~lig?), DG(dbd, cat!1, type~U) @ 'DG_DNA_anchors'
+
+'TDG anchors DNA mismatch' \
+    DNA(e3~lig?, base_state~damaged, base~T?, dg!1, e5~lig?), DG(dbd!1, cat, type~T) -> \
+    DNA(e3~lig?, base_state~damaged, base~T?, dg!1, e5~lig?), DG(dbd, cat!1, type~T) @ 'DG_DNA_anchors'
+
+'TDG anchors AP DNA' \
+    DNA(e3~lig?, base~AP?, dg!1, e5~lig?), DG(dbd!1, cat, type~T) -> \
+    DNA(e3~lig?, base~AP?, dg!1, e5~lig?), DG(dbd, cat!1, type~T) @ 'DG_DNA_anchors'
+
+#'NEIL anchors DNA mismatch' \
+#    DNA(e3~lig?, base_state~damaged, base~oxoG?, dg!1, e5~lig?), DG(dbd!1, cat, type~NEIL) -> \
+#    DNA(e3~lig?, base_state~damaged, base~oxoG?, dg!1, e5~lig?), DG(dbd, cat!1, type~NEIL) @ 'DG_DNA_anchors'
+
+#'NEIL anchors AP DNA' \
+#    DNA(e3~lig?, base~AP?, dg!1, e5~lig?), DG(dbd!1, cat, type~NEIL) -> \
+#    DNA(e3~lig?, base~AP?, dg!1, e5~lig?), DG(dbd, cat!1, type~NEIL) @ 'DG_DNA_anchors'
+
+#'OGG anchors DNA mismatch' \
+#    DNA(e3~lig?, base_state~damaged, base~oxoG?, dg!1, e5~lig?), DG(dbd!1, cat, type~OGG) -> \
+#    DNA(e3~lig?, base_state~damaged, base~oxoG?, dg!1, e5~lig?), DG(dbd, cat!1, type~OGG) @ 'DG_DNA_anchors'
+
+#'OGG anchors AP DNA' \
+#    DNA(e3~lig?, base~AP?, dg!1, e5~lig?), DG(dbd!1, cat, type~OGG) -> \
+#    DNA(e3~lig?, base~AP?, dg!1, e5~lig?), DG(dbd, cat!1, type~OGG) @ 'DG_DNA_anchors'
+
+
+
+## weak unbinding
+
+'UDG release on mismatch' \
+    DNA(e3~lig?,dg!1, base_state~damaged,e5~lig?), DG(cat!1, type~U) -> \
+    DNA(e3~lig?,dg , base_state~damaged,e5~lig?), DG(cat,    type~U) @ 'UDG_DNA_release_mismatch'
+'TDG release on mismatch' \
+    DNA(e3~lig?,dg!1, base_state~damaged,e5~lig?), DG(cat!1, type~T) -> \
+    DNA(e3~lig?,dg  , base_state~damaged,e5~lig?), DG(cat,   type~T) @ 'TDG_DNA_release_mismatch'
+
+'UDG release on AP' \
+    DNA(e3~lig?,dg!1, base~AP?,e5~lig?), DG(cat!1, type~U) -> \
+    DNA(e3~lig?,dg  , base~AP?,e5~lig?), DG(cat,   type~U) @ 'UDG_DNA_release_AP'
+'TDG release on AP' \
+    DNA(e3~lig?,dg!1, base~AP?,e5~lig?), DG(cat!1, type~T) -> \
+    DNA(e3~lig?,dg  , base~AP?,e5~lig?), DG(cat,   type~T) @ 'TDG_DNA_release_AP'
+
+
+#'NEIL release' \
+#    DNA(dg!1), DG(cat!1, dbd,   type~NEIL) -> \
+#    DNA(dg!1), DG(cat,   dbd!1, type~NEIL) @ 'NEIL_DNA_release'
+#'OGG release' \
+#    DNA(dg!1), DG(cat!1, dbd,   type~OGG) -> \
+#    DNA(dg!1), DG(cat,   dbd!1, type~OGG) @ 'OGG_DNA_release'
+
+
+'DG release on normal repaired DNA' \
+    DG(cat!1),DNA(dg!1,base_state~OK) -> DG(cat),DNA(dg,base_state~OK) @  'DG_DNA_unbind'
+
+'DG release on unligated DNA' \
+    DG(cat!1),DNA(e5~NA?,dg!1,e3~NA?) -> DG(cat),DNA(e3~NA?,dg,e5~NA?) @  'DG_DNA_unbind'
+
+##[Kim et al '13] [Khanna et al '09]
+#'OGG mismatch excision' \
+#     DG(dbd!1, cat,   type~OGG), DNA(e5~lig!0), DNA(e3~lig!0, dg!1, base_state~damaged, base~oxoG?, e5~lig!2), DNA(e3~lig!2) -> \
+#     DG(dbd,   cat!1, type~OGG), DNA(e5~PUA!0), DNA(e3~NA!0,  dg!1, base_state~gapped,  base~AP?,   e5~NA!2 ),   DNA(e3~P!2) \
+#     @ 'OGG_excision'
+
+##[Hegde et al '12] [Khanna et al '09] 
+#'NEIL mismatch excision' \
+#     DG(dbd!1, cat,   type~NEIL), DNA(e5~lig!0), DNA(e3~lig!0, dg!1, base_state~damaged, base~oxoG?, e5~lig!2), DNA(e3~lig!2) -> \
+#     DG(dbd,   cat!1, type~NEIL), DNA(e5~P!0),   DNA(e3~NA!0,  dg!1, base_state~gapped,  base~AP?,   e5~NA!2),  DNA(e3~P!2) \
+#     @ 'NEIL_excision'
+
+
+## according to [MorBenDro07] this should be context sensitive
+'TDG TG mismatch excision' \
+     DG(cat!1, type~T), DNA(e3~lig!_, dg!1, base_state~damaged, base~T?,  e5~lig!_) -> \
+     DG(cat!1, type~T), DNA(e3~lig!_, dg!1, base_state~excised, base~AP?, e5~lig!_ ) @ 'TDG_excision_TG'
+
+'UDG mismatch excision' \
+     DG(cat!1, type~U), DNA(e3~lig!_, dg!1, base_state~damaged, base~U?,  e5~lig!_) -> \
+     DG(cat!1, type~U), DNA(e3~lig!_,  dg!1, base_state~excised, base~AP?, e5~lig!_ ) @ 'UDG_excision'
+
+
+%var: 'APE1_DNA_bind' 0.00040994310521
+%var: 'APE1_DNA_bind_unary' 10000.0
+
+%var: 'APE1_DNA_unbind_ns' 14.8120642774
+%var: 'APE1_DNA_unbind_AP' 0.148120642774 
+%var: 'APE1_DNA_unbind_gapped' 0.740603213872
+
+%var: 'APE1_incision' 3
+%var: 'APE1_PUA' 0.05
+
+## APE1 agent's actions
+
+## APE1 binds DNA (in the absence or presence of XRCC1, on gapped or nicked DNA)
+
+'APE1 binds AP or gapped DNA 1' \
+      APE1(dbd, xrc), DNA(ape,base~AP!_) -> APE1(dbd!1, xrc),DNA(ape!1,base~AP!_) \
+      @ 'APE1_DNA_bind'
+'APE1 binds AP or gapped DNA 2' \
+      APE1(dbd), DNA(ape,base~AP!_, xrc) -> APE1(dbd!1),DNA(ape!1,base~AP!_,xrc) \
+      @ 'APE1_DNA_bind'
+'APE1 binds AP or gapped DNA unary' \
+      APE1(dbd, xrc!1), DNA(ape,base~AP!_, xrc!2),XRCC1(ape!1, dbd!2) -> \
+      APE1(dbd!3, xrc!1),DNA(ape!3,base~AP!_,xrc!2),XRCC1(ape!1, dbd!2) \
+      @ 'APE1_DNA_bind_unary'
+
+'APE1 binds nicked DNA 1' \
+      APE1(dbd,xrc),DNA(ape,base!_,e3~OH?) -> APE1(dbd!1,xrc),DNA(ape!1,base!_,e3~OH?) \
+      @ 'APE1_DNA_bind'
+'APE1 binds nicked DNA 2' \
+      APE1(dbd),DNA(ape,base!_,e3~OH?,xrc) -> APE1(dbd!1),DNA(ape!1,base!_,e3~OH?,xrc) \
+      @ 'APE1_DNA_bind'
+'APE1 binds nicked DNA unary' \
+      APE1(dbd,xrc!1),DNA(ape,base!_,e3~OH?,xrc!2),XRCC1(ape!1,dbd!2) -> \
+      APE1(dbd!3,xrc!1),DNA(ape!3,base!_,e3~OH?,xrc!2),XRCC1(ape!1,dbd!2) \
+      @ 'APE1_DNA_bind_unary'
+
+
+
+## APE1 does not stick to normal duplex and incised DNA
+'APE1 non specific DNA unbinding' \
+      APE1(dbd!1), DNA(ape!1, base_state~OK) -> \
+      APE1(dbd  ), DNA(ape  , base_state~OK) \
+      @ 'APE1_DNA_unbind_ns'
+
+## AP unbinding for APE1 (specific binding)
+'APE1 AP site unbinding' \
+      APE1(dbd!1), DNA(ape!1, base_state~excised) -> \
+      APE1(dbd  ), DNA(ape,  base_state~excised) \
+      @ 'APE1_DNA_unbind_AP' 
+
+## gapped DNA unbinding for APE1 (less specific binding) 
+'APE1 gapped DNA unbinding' \
+      APE1(dbd!1), DNA(ape!1, base_state~gapped) -> \
+      APE1(dbd  ), DNA(ape,  base_state~gapped) \
+      @ 'APE1_DNA_unbind_gapped' 
+
+
+## APE1 catalytic activities
+
+## hypothesis --> AP endonuclease will prevent DG from rebinding to the AP site because DG requires DNA to be ligated (to be verified)
+%token: APE_perf
+'APE1 5-endonuclease' \
+      APE1(dbd!1), DNA(e3~lig!0), DNA(e5~lig!0, base_state~excised, base~AP?, ape!1, e3~lig!2), DNA(e5~lig!2) -> \
+      APE1(dbd), DNA(e3~OH !0), DNA(e5~NA!0, base_state~gapped,  base~AP?, ape, e3~NA!2), DNA(e5~dRP!2) | 1:APE_perf \
+      @ 'APE1_incision'
+
+%obs: 'ape_perf' |APE_perf|
+
+## [Kim et al '13]
+'APE1 3-phosphodiesterase' \
+      APE1(dbd!1), DNA(e3~PUA!0), DNA(e5~NA!0, ape!1) -> \
+      APE1(dbd), DNA(e3~OH !0), DNA(e5~NA!0, ape) \
+      @ 'APE1_PUA'
+
+
+%var: 'POLb_DNA_bind' 0.0005252324651
+%var: 'POLb_DNA_bind_unary' 10000.0
+
+%var: 'POLb_DNA_unbind_ns' 18.977699429 # >50nM in [Liu et al 07] assuming 100nM
+%var: 'POLb_DNA_unbind_gapped_dRP' 0.18977699429
+%var: 'POLb_DNA_unbind_gapped' 0.18977699429
+%var: 'POLb_DNA_unbind_nicked' 1.8977699429
+%var: 'POLb_DNA_unbind_AP' 18.977699429
+
+%var: 'POLb_lyase' 0.75
+%var: 'POLb_polymerase' 0.45
+%var: 'POLb_LP_polymerase' 0.45
+
+
+## POLb agent's actions 
+
+## POLb binds (gapped or nicked) DNA (in the absence or presence of XRCC1)
+'POLb DNA AP or gapped binding 1'\
+      POLb(dbd, xrc),DNA(base~AP!_,pol) -> POLb(dbd!1,xrc),DNA(base~AP!_,pol!1) @ 'POLb_DNA_bind'
+'POLb DNA AP or gapped binding 2'\
+      POLb(dbd),DNA(base~AP!_,pol, xrc) -> POLb(dbd!1),DNA(base~AP!_,pol!1,xrc) @ 'POLb_DNA_bind'
+'POLb DNA AP or gapped binding unary'\
+      POLb(dbd,  xrc!1),DNA(base~AP!_, pol,   xrc!2),XRCC1(pol!1, dbd!2) -> \
+      POLb(dbd!3,xrc!1),DNA(base~AP!_, pol!3, xrc!2),XRCC1(pol!1, dbd!2) @ 'POLb_DNA_bind_unary'
+
+'POLb DNA nicked binding 1'\
+      POLb(dbd,xrc),DNA(base!_, pol,e3~OH?) -> POLb(dbd!1,xrc),DNA(base!_, pol!1,e3~OH?) @ 'POLb_DNA_bind'
+'POLb DNA nicked binding 2'\
+      POLb(dbd),DNA(base!_, pol,e3~OH?,xrc) -> POLb(dbd!1),DNA(base!_, pol!1,e3~OH?,xrc) @ 'POLb_DNA_bind'
+'POLb DNA nicked binding unary'\
+      POLb(dbd,  xrc!1),DNA(base!_, pol,  e3~OH?,xrc!2),XRCC1(pol!1,dbd!2) -> \
+      POLb(dbd!3,xrc!1),DNA(base!_, pol!3,e3~OH?,xrc!2),XRCC1(pol!1,dbd!2) @ 'POLb_DNA_bind_unary'
+
+## POLb unbinding
+## POLb has no affinity for normal or mismatch DNA duplex
+'POLb duplex DNA unbinding'\
+      POLb(dbd!1),DNA(base_state~OK,pol!1,e3~lig?) -> POLb(dbd),DNA(base_state~OK,pol,e3~lig?) @ 'POLb_DNA_unbind_ns'
+
+'POLb mismatch DNA unbinding'\
+      POLb(dbd!1),DNA(base_state~damaged,pol!1,e3~lig?) -> POLb(dbd),DNA(base_state~damaged,pol,e3~lig?) @ 'POLb_DNA_unbind_ns'
+
+## Specific affinity for POLb
+'POLb gapped DNA with dRP flap unbinding' \
+      POLb(dbd!1), DNA(base_state~gapped, pol!1,e3!2),DNA(e5~dRP!2) -> \
+      POLb(dbd  ), DNA(base_state~gapped, pol  ,e3!2),DNA(e5~dRP!2) \
+      @ 'POLb_DNA_unbind_gapped_dRP'
+
+'POLb 1nt gapped DNA unbinding' \
+      POLb(dbd!1), DNA(base_state~gapped, pol!1,e3!2),DNA(e5~P!2) -> \
+      POLb(dbd  ), DNA(base_state~gapped, pol  ,e3!2),DNA(e5~P!2) \
+      @ 'POLb_DNA_unbind_gapped'
+
+'POLb nicked DNA unbinding' \
+      POLb(dbd!1), DNA(base_state~OK, pol!1,e3~OH!_) -> \
+      POLb(dbd  ), DNA(base_state~OK, pol  ,e3~OH!_) \
+      @ 'POLb_DNA_unbind_nicked'
+
+'POLb AP site unbinding' \
+      POLb(dbd!1), DNA(base_state~excised,pol!1) -> POLb(dbd), DNA(base_state~excised,pol) \
+      @ 'POLb_DNA_unbind_AP'
+
+
+## POLb catalytic activities
+## POLb repairs 5' dRP end
+%token: POLb_lyase_t
+'POLb dRP lyase' \
+      POLb(dbd!1), DNA(pol!1, e3!2), DNA(e5~dRP!2) -> \
+      POLb(dbd!1), DNA(pol!1, e3!2), DNA(e5~P!2  ) | 1 : POLb_lyase_t @ 'POLb_lyase'
+%obs: 'POLb_act_lyase' |POLb_lyase_t|
+
+## POLb inserts correct base
+%token: POLb_polymerase
+'POLb polymerase A on gap' \
+      POLb(dbd!1), DNA(e3~OH !0), DNA(e5~NA!0,  pol!1, base_state~gapped, base~AP!2, e3~NA!_), DNA(base~T!2) -> \
+      POLb(dbd  ), DNA(e3~lig!0), DNA(e5~lig!0, pol  , base_state~OK,	  base~A !2, e3~OH!_), DNA(base~T!2) | 1 : POLb_polymerase @ 'POLb_polymerase'
+'POLb polymerase T on gap' \
+      POLb(dbd!1), DNA(e3~OH !0), DNA(e5~NA!0,  pol!1, base_state~gapped, base~AP!2, e3~NA!_), DNA(base~A!2) -> \
+      POLb(dbd  ), DNA(e3~lig!0), DNA(e5~lig!0, pol  , base_state~OK,	  base~T !2, e3~OH!_), DNA(base~A!2) | 1 : POLb_polymerase  @ 'POLb_polymerase'
+'POLb polymerase C on gap' \
+      POLb(dbd!1), DNA(e3~OH !0), DNA(e5~NA!0,  pol!1, base_state~gapped, base~AP!2, e3~NA!_), DNA(base~G!2) -> \
+      POLb(dbd  ), DNA(e3~lig!0), DNA(e5~lig!0, pol  , base_state~OK,	  base~C !2, e3~OH!_), DNA(base~G!2) | 1 : POLb_polymerase  @ 'POLb_polymerase'
+'POLb polymerase G on gap' \
+      POLb(dbd!1), DNA(e3~OH !0), DNA(e5~NA!0,  pol!1, base_state~gapped, base~AP!2, e3~NA!_), DNA(base~C!2) -> \
+      POLb(dbd  ), DNA(e3~lig!0), DNA(e5~lig!0, pol  , base_state~OK,	  base~G !2, e3~OH!_), DNA(base~C!2) | 1 : POLb_polymerase  @ 'POLb_polymerase'
+%obs: 'POLb_act_poly' |POLb_polymerase|
+
+
+# Long patch repair mechanism (only if XRCC1 is not present)
+# Sketch:
+#    pol
+#    5' b-OH ... -b 3'
+#      |         |
+#    3' b---------b 5'
+# %token: LP_move
+# 'POLb LP polymerase A and move' \
+#       POLb(dbd!1), DNA(pol!1, base!2, xrc, e3~OH?  ), DNA(base!2, e5~lig!3), DNA(e3~lig!3, base~T!4), DNA(base!4) -> \
+#       POLb(dbd  ), DNA(pol  , base!2, xrc, e3~lig!5), DNA(base!2, e5~lig!3), DNA(e3~lig!3, base~T!6), DNA(base  ), DNA(e5~lig!5, base~A!6, pol, base_state~OK, init~A, e3~OH) \
+#       | 1 : LP_move @ 'POLb_LP_polymerase'
+# 'POLb LP polymerase T and move' \
+#       POLb(dbd!1), DNA(pol!1, base!2, xrc, e3~OH?  ), DNA(base!2, e5~lig!3), DNA(e3~lig!3, base~A!4), DNA(base!4) -> \
+#       POLb(dbd  ), DNA(pol  , base!2, xrc, e3~lig!5), DNA(base!2, e5~lig!3), DNA(e3~lig!3, base~A!6), DNA(base  ), DNA(e5~lig!5, base~T!6, pol, base_state~OK, init~T, e3~OH) \
+#       | 1 : LP_move @ 'POLb_LP_polymerase'
+# 'POLb LP polymerase C and move' \
+#       POLb(dbd!1), DNA(pol!1, base!2, xrc, e3~OH?  ), DNA(base!2, e5~lig!3), DNA(e3~lig!3, base~G!4), DNA(base!4) -> \
+#       POLb(dbd  ), DNA(pol  , base!2, xrc, e3~lig!5), DNA(base!2, e5~lig!3), DNA(e3~lig!3, base~G!6), DNA(base  ), DNA(e5~lig!5, base~C!6, pol, base_state~OK, init~C, e3~OH) \
+#       | 1 : LP_move @ 'POLb_LP_polymerase'
+# 'POLb LP polymerase G and move' \
+#       POLb(dbd!1), DNA(pol!1, base!2, xrc, e3~OH?  ), DNA(base!2, e5~lig!3), DNA(e3~lig!3, base~C!4), DNA(base!4) -> \
+#       POLb(dbd  ), DNA(pol  , base!2, xrc, e3~lig!5), DNA(base!2, e5~lig!3), DNA(e3~lig!3, base~C!6), DNA(base  ), DNA(e5~lig!5, base~G!6, pol, base_state~OK, init~G, e3~OH) \
+#       | 1 : LP_move @ 'POLb_LP_polymerase'
+
+%var: 'LIG3_DNA_bind' 0.000290819257795
+%var: 'LIG3_DNA_bind_unary' 10000.0
+%var: 'LIG3_DNA_unbind' 0.525394071133
+%var: 'LIG3_ligase' 0.04
+
+## LIG3 agent's actions
+
+## LIG3 binds to (nicked or gapped) DNA (in the absence or presence of XRCC1)
+'LIG3 nicked DNA binding 1' \
+      LIG3(dbd  , xrc), DNA(lig,   e3~OH!1), DNA(e5~P!1) -> \
+      LIG3(dbd!2, xrc), DNA(lig!2, e3~OH!1), DNA(e5~P!1) \
+      @ 'LIG3_DNA_bind' ##bi-molecular
+
+'LIG3 nicked DNA binding 2' \
+      LIG3(dbd  ), DNA(lig,   e3~OH!1, xrc), DNA(e5~P!1) -> \
+      LIG3(dbd!2), DNA(lig!2, e3~OH!1, xrc), DNA(e5~P!1) \
+      @ 'LIG3_DNA_bind' ##bi-molecular
+
+'LIG3 nicked DNA binding unary' \
+      LIG3(dbd  , xrc!1), DNA(lig,   e3~OH!2, xrc!3), DNA(e5~P!2), XRCC1(lig!1, dbd!3) -> \
+      LIG3(dbd!4, xrc!1), DNA(lig!4, e3~OH!2, xrc!3), DNA(e5~P!2), XRCC1(lig!1, dbd!3) \
+      @ 'LIG3_DNA_bind_unary'  ##uni-molecular
+
+'LIG3 gapped DNA binding 1' \
+      LIG3(dbd  , xrc), DNA(e5~NA?, lig,   e3~NA?) -> \
+      LIG3(dbd!1, xrc), DNA(e5~NA?, lig!1, e3~NA?) \
+      @ 'LIG3_DNA_bind' ##bi-molecular
+
+'LIG3 gapped DNA binding 2' \
+      LIG3(dbd  ), DNA(e5~NA?, lig,   xrc, e3~NA?) -> \
+      LIG3(dbd!1), DNA(e5~NA?, lig!1, xrc, e3~NA?) \
+      @ 'LIG3_DNA_bind' ##bi-molecular
+
+'LIG3 gapped DNA binding unary' \
+      LIG3(dbd  , xrc!1), DNA(e5~NA?, lig,   xrc!2, e3~NA?), XRCC1(lig!1, dbd!2) -> \
+      LIG3(dbd!3, xrc!1), DNA(e5~NA?, lig!3, xrc!2, e3~NA?), XRCC1(lig!1, dbd!2) \
+      @ 'LIG3_DNA_bind_unary' ##uni-molecular
+
+'LIG3 DNA unbinding' \
+      LIG3(dbd!1), DNA(lig!1) -> LIG3(dbd), DNA(lig) \
+      @ 'LIG3_DNA_unbind'
+
+## LIG3 ligates DNA (high turnover)
+%token: LIG3_lig_t
+'LIG3 ligase action' \
+      LIG3(dbd!1), DNA(e5~lig?, lig!1, e3~OH!2 ), DNA(e5~P!2  ) -> \
+      LIG3(dbd),   DNA(e5~lig?, lig,   e3~lig!2), DNA(e5~lig!2) | 1:LIG3_lig_t \
+      @ 'LIG3_ligase'
+
+%obs: 'LIG3_act_t' |LIG3_lig_t|
+%var: 'XRCC1_APE1_bind' 0.000893111312754
+%var: 'XRCC1_APE1_bind_unary' 10000.0
+%var: 'XRCC1_APE1_unbind' 322.698979524
+
+%var: 'XRCC1_POLb_bind' 0.000713417957648
+%var: 'XRCC1_POLb_bind_unary' 10000.0
+%var: 'XRCC1_POLb_unbind' 28.3549394103
+
+%var: 'XRCC1_LIG3_bind' 0.00034592586593
+%var: 'XRCC1_LIG3_bind_unary' 10000.0
+%var: 'XRCC1_LIG3_unbind' 12.4989933878
+
+%var: 'XRCC1_PNKP_bind' 0.0001
+%var: 'XRCC1_PNKP_bind_unary' 10000.0
+%var: 'XRCC1_PNKP_unbind' 0.1
+
+%var: 'XRCC1_DNA_bind' 0.000562492490354
+%var: 'XRCC1_DNA_bind_unary' 10000.0
+
+%var: 'XRCC1_DNA_unbind_ns' 46.7451509214
+%var: 'XRCC1_DNA_unbind_gapped' 8.12959146459 #46.7451509214/6.8
+%var: 'XRCC1_DNA_unbind_nicked' 13.21058613 #46.7451509214/3.5
+
+
+## XRCC1 interactions with BER enzymes
+
+## XRCC1-APE1
+'XRCC1 binds APE1 direct 1' \
+       XRCC1(ape), APE1(dbd, xrc) -> XRCC1(ape!1), APE1(dbd, xrc!1) @ 'XRCC1_APE1_bind'
+'XRCC1 binds APE1 direct 2' \
+       XRCC1(ape, dbd), APE1(xrc) -> XRCC1(dbd, ape!1), APE1(xrc!1) @ 'XRCC1_APE1_bind'
+'XRCC1 binds APE1 unary' \
+       XRCC1(ape,   dbd!1), APE1(xrc,   dbd!2), DNA(xrc!1, ape!2) -> \
+       XRCC1(dbd!1, ape!3), APE1(xrc!3, dbd!2), DNA(xrc!1, ape!2) @ 'XRCC1_APE1_bind_unary'
+
+'XRCC1 unbinds APE1' \
+       XRCC1(ape!1), APE1(xrc!1) -> XRCC1(ape), APE1(xrc) @ 'XRCC1_APE1_unbind'
+
+## XRCC1-POLb
+'XRCC1 binds POLb 1' \
+       XRCC1(pol), POLb(dbd, xrc) -> XRCC1(pol!1), POLb(dbd, xrc!1) @ 'XRCC1_POLb_bind' ##via DNA or APE1
+'XRCC1 binds POLb 2' \
+       XRCC1(pol, dbd), POLb(xrc) -> XRCC1(dbd, pol!1), POLb(xrc!1) @ 'XRCC1_POLb_bind' ##via DNA or APE1
+'XRCC1 binds POLb unary' \
+       XRCC1(pol  , dbd!1), POLb(dbd!2, xrc  ), DNA(xrc!1, pol!2) -> \
+       XRCC1(dbd!1, pol!3), POLb(dbd!2, xrc!3), DNA(xrc!1, pol!2) @ 'XRCC1_POLb_bind_unary' ##via DNA or APE1
+
+'XRCC1 unbinds POLb' \
+       XRCC1(pol!1),POLb(xrc!1) -> XRCC1(pol),POLb(xrc) @ 'XRCC1_POLb_unbind'
+
+## XRCC1-LIG3
+'XRCC1 binds LIG3 1' \
+       XRCC1(lig, dbd), LIG3(xrc) -> XRCC1(lig!1, dbd), LIG3(xrc!1) @ 'XRCC1_LIG3_bind'
+'XRCC1 binds LIG3 2' \
+       XRCC1(lig), LIG3(xrc, dbd) -> XRCC1(lig!1), LIG3(xrc!1, dbd) @ 'XRCC1_LIG3_bind'
+
+'XRCC1 binds LIG3 unary' \
+       XRCC1(lig,   dbd!1), LIG3(xrc,   dbd!2), DNA(xrc!1, lig!2) -> \
+       XRCC1(lig!3, dbd!1), LIG3(xrc!3, dbd!2), DNA(xrc!1, lig!2) @ 'XRCC1_LIG3_bind_unary' ##via DNA or PARP1 or NEIL
+
+'XRCC1 unbinds LIG3' \
+       XRCC1(lig!1),LIG3(xrc!1) -> XRCC1(lig),LIG3(xrc) @ 'XRCC1_LIG3_unbind'
+
+#'XRCC1 binds PNKP' \
+#       XRCC1(pnk), PNKP(xrc) -> XRCC1(pnk!1), PNKP(xrc!1) @ 'XRCC1_PNKP_bind' ('XRCC1_PNKP_bind_unary':3) ##via DNA or PARP1 or NEIL
+#'XRCC1 unbinds PNKP' \
+#       XRCC1(pnk!1),PNKP(xrc!1) -> XRCC1(pnk),PNKP(xrc) @ 'XRCC1_PNKP_unbind'
+       
+
+## XRCC1 interactions with DNA (binds gapped or nicked DNA, also through APE1, POLb or LIG3)
+
+'XRCC1 binds AP or gaped DNA' \
+       XRCC1(dbd), DNA(xrc, base~AP!_) -> XRCC1(dbd!1), DNA(xrc!1, base~AP!_) @ 'XRCC1_DNA_bind' #('XRCC1_DNA_bind_unary':3) ##via POLB or APE1
+'XRCC1 binds AP or gaped DNA via APE1' \
+       APE1(xrc!1,dbd!2), XRCC1(dbd  ,ape!1), DNA(xrc  , ape!2, base~AP!_) -> \
+       APE1(xrc!1,dbd!2), XRCC1(dbd!3,ape!1), DNA(xrc!3, ape!2, base~AP!_) @ 'XRCC1_DNA_bind_unary'
+'XRCC1 binds AP or gaped DNA via POLb' \
+       POLb(xrc!1,dbd!2), XRCC1(dbd  ,pol!1), DNA(xrc  , pol!2, base~AP!_) -> \
+       POLb(xrc!1,dbd!2), XRCC1(dbd!3,pol!1), DNA(xrc!3, pol!2, base~AP!_) @ 'XRCC1_DNA_bind_unary'
+'XRCC1 binds AP or gaped DNA via LIG3' \
+       LIG3(xrc!1,dbd!2), XRCC1(dbd  ,lig!1), DNA(xrc  , lig!2, base~AP!_) -> \
+       LIG3(xrc!1,dbd!2), XRCC1(dbd!3,lig!1), DNA(xrc!3, lig!2, base~AP!_) @ 'XRCC1_DNA_bind_unary'
+
+'XRCC1 binds nicked DNA' \
+       XRCC1(dbd), DNA(xrc, e3~OH?) -> XRCC1(dbd!1), DNA(xrc!1, e3~OH?) @ 'XRCC1_DNA_bind'
+'XRCC1 binds nicked DNA via APE1' \
+       APE1(xrc!1,dbd!2), XRCC1(dbd  ,ape!1), DNA(xrc  , ape!2, e3~OH?) -> \
+       APE1(xrc!1,dbd!2), XRCC1(dbd!3,ape!1), DNA(xrc!3, ape!2, e3~OH?) @ 'XRCC1_DNA_bind_unary'
+'XRCC1 binds nicked DNA via POLb' \
+       POLb(xrc!1,dbd!2), XRCC1(dbd  ,pol!1), DNA(xrc  , pol!2, e3~OH?) -> \
+       POLb(xrc!1,dbd!2), XRCC1(dbd!3,pol!1), DNA(xrc!3, pol!2, e3~OH?) @ 'XRCC1_DNA_bind_unary'
+'XRCC1 binds nicked DNA via LIG3' \
+       LIG3(xrc!1,dbd!2), XRCC1(dbd  ,lig!1), DNA(xrc  , lig!2, e3~OH?) -> \
+       LIG3(xrc!1,dbd!2), XRCC1(dbd!3,lig!1), DNA(xrc!3, lig!2, e3~OH?) @ 'XRCC1_DNA_bind_unary'
+
+
+## XRCC1 has non specific affinity with ligated DNA in general [HYPOTHESIS]
+'XRCC1 unbinds ns DNA' \
+       XRCC1(dbd!1), DNA(e5~lig!_, xrc!1, e3~lig!_) -> \
+       XRCC1(dbd  ), DNA(e5~lig!_, xrc  , e3~lig!_) @ 'XRCC1_DNA_unbind_ns' 
+
+
+## XRCC1 has specific affinity 1 nt gapped DNA
+'XRCC1 unbinds 1nt gapped DNA' \
+       XRCC1(dbd!1), DNA(base_state~OK,e3!0),DNA(e5~NA!0, base_state~gapped, xrc!1, e3~NA!2),DNA(e5!2,base_state~OK) -> \
+       XRCC1(dbd  ), DNA(base_state~OK,e3!0),DNA(e5~NA!0, base_state~gapped, xrc  , e3~NA!2),DNA(e5!2,base_state~OK) @ 'XRCC1_DNA_unbind_gapped' 
+
+## XRCC1 has no specific affinity >1 nt gapped DNA
+'XRCC1 unbinds 5prime 2nt gapped DNA' \
+       XRCC1(dbd!1), DNA(e3~NA!0),DNA(e5~NA!0, xrc!1, e3~NA?) -> \
+       XRCC1(dbd  ), DNA(e3~NA!0),DNA(e5~NA!0, xrc  , e3~NA?) @ 'XRCC1_DNA_unbind_ns' 
+'XRCC1 unbinds 3prime 2nt gapped DNA' \
+       XRCC1(dbd!1), DNA(e5~NA?, xrc!1, e3~NA!0),DNA(e5~NA!0) -> \
+       XRCC1(dbd  ), DNA(e5~NA?, xrc  , e3~NA!0),DNA(e5~NA!0) @ 'XRCC1_DNA_unbind_ns' 
+
+## XRCC1 has specific affinity for nicked DNA
+'XRCC1 unbinds 3 prime OH nicked DNA' \
+       XRCC1(dbd!1), DNA(e5~lig!_, base_state~OK, xrc!1, e3~OH!_) -> \
+       XRCC1(dbd  ), DNA(e5~lig!_, base_state~OK, xrc  , e3~OH!_) @ 'XRCC1_DNA_unbind_nicked' 
+
+'XRCC1 unbinds 3 prime P nicked DNA' \
+       XRCC1(dbd!1), DNA(e5~lig!_, base_state~OK, xrc!1, e3~P!_) -> \
+       XRCC1(dbd  ), DNA(e5~lig!_, base_state~OK, xrc  , e3~P!_) @ 'XRCC1_DNA_unbind_nicked' 
+
+'XRCC1 unbinds 3 prime dRP nicked DNA' \
+       XRCC1(dbd!1), DNA(e5~lig!_, base_state~OK, xrc!1, e3~dRP!_) -> \
+       XRCC1(dbd  ), DNA(e5~lig!_, base_state~OK, xrc  , e3~dRP!_) @ 'XRCC1_DNA_unbind_nicked' 
+
+'XRCC1 unbinds 3 prime PUA nicked DNA' \
+       XRCC1(dbd!1), DNA(e5~lig!_, base_state~OK, xrc!1, e3~PUA!_) -> \
+       XRCC1(dbd  ), DNA(e5~lig!_, base_state~OK, xrc  , e3~PUA!_) @ 'XRCC1_DNA_unbind_nicked' 
+
+%obs: 'Cpu' [Tsim]
+%obs: 'free XRCC1 w APE1' |XRCC1(dbd,ape!_)|
+%obs: 'free XRCC1 w POLb' |XRCC1(dbd,pol!_)|
+%obs: 'free XRCC1 w LIG3' |XRCC1(dbd,lig!_)|
+%obs: 'free repairosome' |XRCC1(dbd,pol!_, lig!_, ape!_)|
+
+
+%obs: 'XRCC1 on AP' |DNA(xrc!_,base~AP?)|
+%obs: 'XRCC1 on nicked' |DNA(xrc!_,e3~OH?)|
+
+%obs: 'XRCC1.APE1 on AP' |DNA(xrc!_,ape!_,base~AP?)|
+%obs: 'XRCC1.APE1 on nicked' |DNA(xrc!_,ape!_,e3~OH?)|
+
+%obs: 'XRCC1.POLb on AP' |DNA(xrc!_,ape,pol!_,base~AP?)|
+%obs: 'XRCC1.POLb on nicked' |DNA(xrc!_,ape,pol!_,e3~OH?)|
+
+%obs: 'XRCC1.APE1.POLb on AP' |DNA(xrc!_,ape!_,pol!_,base~AP?)|
+%obs: 'XRCC1.APE1.POLb on nicked' |DNA(xrc!_,ape!_,pol!_,e3~OH?)|
+
+%obs: 'XRCC1.LIG3 on AP' |DNA(xrc!_,lig!_,base~AP?)|
+%obs: 'XRCC1.LIG3 on nicked' |DNA(xrc!_,lig!_,e3~OH?)|
+
+%obs: 'XRCC1.POLb.LIG3 on AP' |DNA(xrc!_,pol!_,lig!_,base~AP?)|
+%obs: 'XRCC1.POLb.LIG3 on nicked' |DNA(xrc!_,pol!_,lig!_,e3~OH?)|
+
+%obs: 'XRCC1.full on AP' |DNA(xrc!_,ape!_,pol!_,lig!_,base~AP?)|
+%obs: 'XRCC1.full on nicked' |DNA(xrc!_,ape!_,pol!_,lig!_,e3~OH?)|
+
+## For computing causality analysis only
+#%mod: [T]>50 do $TRACK 'LIG3 ligase action' [true]
+#%mod: [T]>100 do $TRACK 'LIG3 ligase action' [false]  
+#%def: "displayCompression" "weak"
+
+%obs: 'DNA_tot' |DNA()|
+%obs: 'bp_tot' |DNA(base!1), DNA(base!1)|
+
+%var: 'true_damaged' |DNA(base!_, base_state~damaged)|
+%obs: 'damage (mismatches)' 'true_damaged'
+%obs: 'damage (AP sites)' |DNA(base~AP!_)|
+
+%var: 'free_AP' |DNA(base~AP!_, ape, pol, xrc)|
+%obs: 'free_AP (Gapped)' |DNA(e3~NA?,base~AP!_, ape, pol, xrc)|
+
+%obs: 'damage (free AP-X)' |DNA(base~AP!_, ape, pol)|
+%obs: 'damage (cytotoxic)' 'free_AP'
+
+%obs: 'free_excised'  |DNA(ape, pol, xrc, base_state~excised)|
+%obs: 'free_gapped'  |DNA(ape, pol, xrc, base_state~gapped)|
+%obs: 'free_nicked_P' |DNA(e3~OH!2, base_state~OK, xrc, ape, pol), DNA(e5~P!2)|
+%obs: 'full_cytotoxic' 'free_excised' + 'free_gapped' + 'free_nicked_P'  
+
+%obs: 'damage (total)' 'true_damaged' + 'free_AP'
+
+%var: 'free_AP dgless' |DNA(base~AP!_, dg, ape, pol, xrc)|
+%obs: 'free_AP (Gapped) dgless' |DNA(e3~NA?,base~AP!_, dg,ape, pol, xrc)|
+
+%obs: 'damage (free AP-X) dgless' |DNA(base~AP!_, dg, ape, pol)|
+%obs: 'damage (cytotoxic) dgless' 'free_AP dgless'
+
+%var: 'healthy_1' |DNA(e5~lig?, base_state~OK, e3~lig?)|
+%var: 'healthy_2' |DNA(e5~lig?, base_state~OK, base!_, e3~OH!0), DNA(e5~NA!0)|
+%var: 'healthy_3' |DNA(e5~dRP!0, base_state~OK, base!_, e3~lig?), DNA(e3~NA!0)|
+%var: 'healthy_4' |DNA(e5~P!0  , base_state~OK, base!_, e3~lig?), DNA(e3~OH!0)|
+
+%obs: 'healthy' 'healthy_1' + 'healthy_2' + 'healthy_3' + 'healthy_4'
+%obs: 'healed'  |DNA(e3~lig?, base_state~OK, init~damaged, e5~lig?)|
+%obs: 'healthy_ratio' 'healthy'/'DNA_tot'
+
+%obs: 'bound DG on mismtach' |DG(dbd!1),DNA(dg!1,base~U?)|
+%obs: 'bound APE1' |APE1(dbd!_)|
+%obs: 'bound POLb' |POLb(dbd!_)|
+%obs: 'LIG3 on AP' |DNA(lig!_,base~AP?)|
+%obs: 'LIG3 on ligatable' |DNA(lig!_,e3~OH!1),DNA(e5~P!1)|
+
