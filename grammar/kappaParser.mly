@@ -68,12 +68,13 @@ start_rule:
 		      | Ast.DECLARE var ->
 			 (Ast.result := {!Ast.result with
 					  Ast.variables = var::!Ast.result.Ast.variables})
-		      | Ast.OBS (_,expr as var) ->
+		      | Ast.OBS ((lbl,pos),_ as var) ->
 			 (*for backward compatibility, shortcut for %var + %plot*)
-			 (Ast.result :=
-			    {!Ast.result with
-			      Ast.variables = var::!Ast.result.Ast.variables;
-			      Ast.observables = expr::!Ast.result.Ast.observables})
+			 Ast.result :=
+			   {!Ast.result with
+			     Ast.variables = var::!Ast.result.Ast.variables;
+			     Ast.observables = (Ast.OBS_VAR lbl,pos)
+						 ::!Ast.result.Ast.observables}
 		      | Ast.PLOT expr ->
 			 (Ast.result := {!Ast.result with
 					  Ast.observables = expr::!Ast.result.Ast.observables})
