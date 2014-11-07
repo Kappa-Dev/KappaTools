@@ -209,7 +209,8 @@ let site_of_id agent_id site_id env =
 let id_of_state agent_name site_name state env =
   let n = StringMap.find agent_name env.signatures.NamedDecls.finder in
   let (_,sign) = env.signatures.NamedDecls.decls.(n) in
-  Signature.num_of_internal_state site_name state sign
+  let site_id = Signature.num_of_site site_name sign in
+  Signature.num_of_internal_state site_id state sign
 
 let state_of_id agent_id id_site id_state env =
   let (_,sign) = env.signatures.NamedDecls.decls.(agent_id) in
@@ -254,15 +255,15 @@ let check agent_name pos_ag site_name pos_site int_state env =
     with Not_found ->
       raise (Semantics_Error (pos_ag, "Undeclared agent \""^agent_name^"\""))
   in
-  let (_,sign) = env.signatures.NamedDecls.decls.(agent_id) in
-  let _ =
+  let sign = get_sig agent_id env in
+  let site_id =
     try Signature.num_of_site site_name sign with
       Not_found ->
       raise (Semantics_Error
 	       (pos_site, "Site "^site_name^" is not consistent with \""^agent_name^"\"'s signature"))
   in
   let _ =
-    try Signature.num_of_internal_state site_name int_state sign with
+    try Signature.num_of_internal_state site_id int_state sign with
       Not_found ->
       raise (Semantics_Error
 	       (pos_site, "Internal state \""^int_state^"\" of site '"^site_name^"' is not consistent with \""^agent_name^"\"'s signature "))

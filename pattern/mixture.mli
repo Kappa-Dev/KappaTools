@@ -5,7 +5,7 @@ type lnk_t = WLD | BND | FREE | TYPE of (int*int) (*(site_id,nme)*)
 type agent
 type t
 
-val empty_agent: agent 
+val dummy_agent: agent
 
 val set_root_of_cc : t -> t
 val root_of_cc : t -> int -> int option

@@ -10,26 +10,6 @@ type context =
     { pairing : link IntMap.t; curr_id : int;
       new_edges : (int * int) Int2Map.t }
 
-let interface_for_def ast_intf =
-  NamedDecls.create (
-    array_map_of_list
-      (fun p ->
-       match p.Ast.port_lnk with
-       | (Ast.FREE,_) ->
-	  (p.Ast.port_nme,
-	   match p.Ast.port_int with
-	   | [] -> None
-	   | l ->
-	      Some (NamedDecls.create (array_map_of_list (fun x -> (x,())) l))
-	  )
-       | (_, pos) ->
-	  raise (ExceptionDefn.Malformed_Decl
-		("Link status inside a definition of signature", pos))
-      ) ({Ast.port_nme =Term.with_dummy_pos "_";
-	  Ast.port_int=[];
-	  Ast.port_lnk =Term.with_dummy_pos Ast.FREE;}
-	 :: ast_intf))
-
 let interface_for_decl ast_intf =()
 
 let eval_intf ast_intf =
@@ -106,7 +86,7 @@ let eval_node env a link_map node_map node_id =
 	    build_intf ast' link_map (IntMap.add port_id (None,Mixture.WLD) intf) bond_list
 	 | s::_ ->
 	    let i =
-	      try Signature.num_of_internal_state port_name (fst s) sign
+	      try Signature.num_of_internal_state port_id (fst s) sign
 	      with Not_found ->
 		raise (ExceptionDefn.Malformed_Decl
 			 ("Internal state of site'" ^ port_name ^ "' is not defined"
@@ -993,7 +973,7 @@ let initialize result counter =
   Debug.tag "\t -agent signatures" ;
   let sigs_nd =
     NamedDecls.create (array_map_of_list
-			 (fun (name,intf) -> (name,interface_for_def intf))
+			 (fun (name,intf) -> (name,Signature.create intf))
 			 result.Ast.signatures) in
   let tk_nd =
     NamedDecls.create (array_map_of_list (fun x -> (x,())) result.Ast.tokens) in

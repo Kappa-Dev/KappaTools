@@ -408,7 +408,7 @@ module Cflow_linker =
 	| Not_found -> 
             let error_list,error = 
               H.create_error parameter handler error (Some "kappa_instantiation.ml") None (Some "get_agent") (Some "401") (Some "Kappa_instantiation") (failwith "Kappa instantiation, line 401")  in 
-            H.raise_error parameter handler error_list error Mixture.empty_agent
+            H.raise_error parameter handler error_list error Mixture.dummy_agent
  	    
   let name_of_agent parameter handler error agent_id event fresh_map = 
     let error,agent = get_agent parameter handler error agent_id event fresh_map in 
