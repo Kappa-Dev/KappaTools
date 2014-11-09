@@ -26,18 +26,17 @@ let warning_buffer:(Format.formatter -> unit) list ref = ref []
 let warning ?pos msg =
   let pr f =
     match pos with
-    | Some pos -> Format.fprintf f "%a@\n" Pp.position pos
+    | Some pos -> Format.fprintf f "%a@," Pp.position pos
     | None -> Format.fprintf f ""
   in
   warning_buffer :=
-    (fun f -> Format.fprintf f "%tWarning:@ %t\n" pr msg)::
+    (fun f -> Format.fprintf f "@[<v>%tWarning: @[%t@]@]@." pr msg)::
       !warning_buffer
 
 let deprecated ~pos entry msg =
   warning ~pos (fun f -> Format.fprintf f "Deprecated %s syntax:@ %t" entry msg)
 
 let flush_warning () =
-  prerr_string "\n";
+  Format.pp_print_newline Format.err_formatter ();
   let l = List.rev !warning_buffer in
-  List.iter (fun s -> Format.eprintf "%t" s) l;
-  flush stderr
+  List.iter (fun s -> Format.eprintf "%t" s) l

@@ -53,7 +53,7 @@ let main =
 		if not !Parameter.plotModeOn then
 		  ExceptionDefn.warning
 		    (fun f -> Format.fprintf
-				f "No data points are required, use -p option for plotting data.");
+				f "No data points are required,@ use -p option for plotting data.");
 		let abort =
 			match !Parameter.inputKappaFileNames with
 			| [] -> if !Parameter.marshalizedInFile = "" then true else false

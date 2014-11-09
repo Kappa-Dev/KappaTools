@@ -1561,7 +1561,7 @@ let dump state counter env =
 	 in
 	 let a2,a1  = eval_activity r state counter env in
 	 if Environment.is_rule i env then
-	   Format.printf "#rule[%d]: \t%s %s @ %f[upd:%f(%f)]@\n"
+	   Format.printf "#rule[%d]: \t%s %s @@ %f[upd:%f(%f)]@\n"
 			 i nme (Dynamics.to_kappa r env)
 			 (Random_tree.find i state.activity_tree)
 			 (Nbr.to_float a2) (Nbr.to_float a1)

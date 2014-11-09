@@ -675,7 +675,7 @@ let enable r mix env =
 let to_kappa r env =
   try Environment.rule_of_num r.r_id env
   with Not_found ->
-    Format.sprintf "%a@,->%a" (Kappa_printer.mixture_to_string false env) r.lhs
+    Format.sprintf "%a->%a" (Kappa_printer.mixture_to_string false env) r.lhs
 		   (Kappa_printer.mixture_to_string false env) r.rhs
 
 let dump r env =
