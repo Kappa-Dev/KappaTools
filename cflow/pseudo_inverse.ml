@@ -98,25 +98,25 @@
 
 
       let print_blackboard parameter handler error blackboard = 
-        let _ = Printf.fprintf parameter.Po.K.H.out_channel_err "Blackboard for removing pseudo inverse element\n" in 
-        let _ = Printf.fprintf parameter.Po.K.H.out_channel_err "n_events: %i\n" blackboard.nsteps in 
-        let _ = Printf.fprintf parameter.Po.K.H.out_channel_err "Steps_by_column:\n" in 
+        let _ = Format.fprintf parameter.Po.K.H.out_channel_err "Blackboard for removing pseudo inverse element\n" in 
+        let _ = Format.fprintf parameter.Po.K.H.out_channel_err "n_events: %i\n" blackboard.nsteps in 
+        let _ = Format.fprintf parameter.Po.K.H.out_channel_err "Steps_by_column:\n" in 
         let _ = 
           PredicateMap.iter 
             (fun pred list -> 
               let _ = 
-                Printf.fprintf parameter.Po.K.H.out_channel_err "%s: " (string_of_predicate_info pred)
+                Format.fprintf parameter.Po.K.H.out_channel_err "%s: " (string_of_predicate_info pred)
               in 
               let _ = 
                 List.iter 
                   (fun (eid,value,bool) -> 
-                    Printf.fprintf parameter.Po.K.H.out_channel_err "(%i,%s%s)," eid (string_of_predicate_value value) (if bool then "(Mod)" else ""))
+                    Format.fprintf parameter.Po.K.H.out_channel_err "(%i,%s%s)," eid (string_of_predicate_value value) (if bool then "(Mod)" else ""))
                   list 
               in 
-              Printf.fprintf parameter.Po.K.H.out_channel_err "\n")
+              Format.fprintf parameter.Po.K.H.out_channel_err "\n")
             blackboard.steps_by_column 
         in 
-        let _ = Printf.fprintf parameter.Po.K.H.out_channel_err "Events:\n" in 
+        let _ = Format.fprintf parameter.Po.K.H.out_channel_err "Events:\n" in 
         let rec aux k = 
           if k=blackboard.nsteps 
           then error
@@ -125,7 +125,7 @@
               try 
                 A.get blackboard.event k 
               with _ -> 
-                let _ = Printf.fprintf stderr "ERREUR %i 123\n" k in 
+                let _ = Format.eprintf "ERREUR %i 123\n" k in 
                 raise Exit 
             in 
             let _ = 
@@ -136,19 +136,19 @@
                 | Some event -> 
                   begin 
                     try 
-                      let _ = Printf.fprintf parameter.Po.K.H.out_channel_err "Event %i\n" k in 
+                      let _ = Format.fprintf parameter.Po.K.H.out_channel_err "Event %i\n" k in 
                       let error  = Po.K.print_refined_step parameter handler error event in 
-                      let _ = Printf.fprintf parameter.Po.K.H.out_channel_err "Predicates: " in 
+                      let _ = Format.fprintf parameter.Po.K.H.out_channel_err "Predicates: " in 
                       let list = A.get blackboard.predicates_of_event k in 
-                      let _ = List.iter (fun pid -> Printf.fprintf parameter.Po.K.H.out_channel_err "%s," (string_of_predicate_info pid)) list in 
-                      let _ = Printf.fprintf parameter.Po.K.H.out_channel_err "\n" in 
+                      let _ = List.iter (fun pid -> Format.fprintf parameter.Po.K.H.out_channel_err "%s," (string_of_predicate_info pid)) list in 
+                      let _ = Format.fprintf parameter.Po.K.H.out_channel_err "\n" in 
                       let bool = A.get blackboard.is_remove_action k in 
                       let _ = 
                         if bool 
                         then 
-                          Printf.fprintf parameter.Po.K.H.out_channel_err "contain a deletion\n" in 
+                          Format.fprintf parameter.Po.K.H.out_channel_err "contain a deletion\n" in 
                       let int = A.get blackboard.modified_predicates_of_event k in 
-                      let _ = Printf.fprintf parameter.Po.K.H.out_channel_err "%i modified predicates \n " int in
+                      let _ = Format.fprintf parameter.Po.K.H.out_channel_err "%i modified predicates \n " int in
                       error
                     with _ -> error
                   end 
@@ -160,8 +160,8 @@
 
       let p b = 
         let _ = 
-          if b then Printf.fprintf stderr "TRUE\n" 
-          else Printf.fprintf stderr "FALSE\n" 
+          if b then Format.eprintf "TRUE\n"
+          else Format.eprintf "FALSE\n"
         in 
         b 
 

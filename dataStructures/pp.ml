@@ -1,4 +1,4 @@
-open Printf
+open Format
 
 let list pr_sep pr_el f l =
   let rec aux f = function

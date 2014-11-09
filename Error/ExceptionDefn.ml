@@ -21,23 +21,23 @@ exception Malformed_Decl of string Term.with_pos
 exception Semantics_Error of Tools.pos * string
 exception Unsatisfiable
 
-let warning_buffer:(out_channel -> unit) list ref = ref []
+let warning_buffer:(Format.formatter -> unit) list ref = ref []
 
 let warning ?pos msg =
   let pr f =
     match pos with
-    | Some pos -> Printf.fprintf f "%a\n" Pp.position pos
-    | None -> Printf.fprintf f ""
+    | Some pos -> Format.fprintf f "%a@\n" Pp.position pos
+    | None -> Format.fprintf f ""
   in
   warning_buffer :=
-    (fun f -> Printf.fprintf f "%tWarning: %t\n" pr msg)::
+    (fun f -> Format.fprintf f "%tWarning:@ %t\n" pr msg)::
       !warning_buffer
 
 let deprecated ~pos entry msg =
-  warning ~pos (fun f -> Printf.fprintf f "Deprecated %s syntax: %t" entry msg)
+  warning ~pos (fun f -> Format.fprintf f "Deprecated %s syntax:@ %t" entry msg)
 
 let flush_warning () =
   prerr_string "\n";
   let l = List.rev !warning_buffer in
-  List.iter (fun s -> Printf.eprintf "%t" s) l;
+  List.iter (fun s -> Format.eprintf "%t" s) l;
   flush stderr

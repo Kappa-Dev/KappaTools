@@ -441,13 +441,14 @@ let build_influence_map rules patterns env =
   influence_map
 
 let dot_of_influence_map desc state env =
-  Printf.fprintf desc "digraph G{ node [shape=box, style=filled, fillcolor=lightskyblue]; \n " ;
+  Format.fprintf desc
+"digraph G{ node [shape=box, style=filled, fillcolor=lightskyblue]; @\n " ;
   Hashtbl.iter
     (fun r_id rule ->
      let opt = if rule.is_pert
 	       then "[shape=invhouse,fillcolor=lightsalmon]"
 	       else "" in
-     Printf.fprintf desc "\"%d:%s\" %s;\n" r_id (Dynamics.to_kappa rule env) opt
+     Format.fprintf desc "\"%d:%s\" %s;@\n" r_id (Dynamics.to_kappa rule env) opt
     ) state.rules ;
   Array.iteri
     (fun mix_id mix_opt ->
@@ -456,7 +457,7 @@ let dot_of_influence_map desc state env =
        match mix_opt with
        | None -> ()
        | Some mix ->
-	  Printf.fprintf desc "\"%d:%a\" [shape=ellipse,fillcolor=palegreen3] ;\n"
+	  Format.fprintf desc "\"%d:%a\" [shape=ellipse,fillcolor=palegreen3] ;\n"
 			 mix_id (Kappa_printer.mixture false env) mix
     ) state.kappa_variables ;
   Hashtbl.iter
@@ -484,10 +485,11 @@ let dot_of_influence_map desc state env =
 	  in
 	  LongString.to_string ls
 	in
-	Printf.fprintf desc "\"%d:%s\" -> \"%d:%s\" [label=\"%s\"];\n" r_id n_label mix_id n_label' arrow_label 
+	Format.fprintf desc "\"%d:%s\" -> \"%d:%s\" [label=\"%s\"];@\n"
+		       r_id n_label mix_id n_label' arrow_label
        ) act_map
     ) state.influence_map ;
-  Printf.fprintf desc "}\n"
+  Format.fprintf desc "}@."
 
 let initialize sg token_vector rules kappa_vars obs pert counter env =
   let dim_rule = max (List.length rules) 1 in
@@ -1538,145 +1540,154 @@ let snapshot state counter desc hr env =
 	with
 		| Sys_error msg ->
 		   ExceptionDefn.warning
-		     (fun f-> Printf.fprintf
+		     (fun f-> Format.fprintf
 				f "Cannot output snapshot: %s" msg)
 
 let dump_rules state env =
   Hashtbl.iter (fun i r -> Dynamics.dump r env) state.rules
 
 let dump state counter env =
-	if not !Parameter.debugModeOn
-	then ()
-	else
-		(
-			Printf.printf "#***[%f] Current state***\n" (Counter.time counter);
-			if SiteGraph.size state.graph > 1000 then () else SiteGraph.dump ~with_lift:true state.graph env;
-			Hashtbl.fold
-			(fun i r _ ->
-				let nme =
-					try "'" ^ ((Environment.rule_of_num i env) ^ "'")
-					with | Not_found -> ""
-				in
-				let a2,a1  = eval_activity r state counter env in
-				if Environment.is_rule i env then
-					Printf.printf "#rule[%d]: \t%s %s @ %f[upd:%f(%f)]\n" i nme (Dynamics.to_kappa r env)
-					(Random_tree.find i state.activity_tree)
-					(Nbr.to_float a2) (Nbr.to_float a1)
-				else
-					Printf.printf "#\t%s %s [found %d]\n" nme (Dynamics.to_kappa r env)
-					(Nbr.to_int (instance_number i state env))
-			) state.rules ();
-			Array.iteri
-			(fun mix_id opt ->
-					let injprod_hp_opt = try state.nl_injections.(mix_id) with Invalid_argument _ -> None in
-					begin
-					match injprod_hp_opt with
-						| None -> ()
-						| Some injprod_hp -> 
-							(Printf.printf "#Unary[%d]: '%s' %a has %d unary instances\n" mix_id
-									(Environment.kappa_of_num mix_id env)
-									(Kappa_printer.mixture false env) (kappa_of_id mix_id state)
-									(InjProdHeap.size injprod_hp);
-									if SiteGraph.size state.graph > 1000 then ()
-									else
-										InjProdHeap.iteri
-										(fun inj_id inj_prod ->
-											Printf.printf "#\t ip#%d: %s \n" inj_id	(InjProduct.to_string inj_prod)
-										) injprod_hp 
-							)
-					end ;
-					match opt with
-					| None -> ()
-					| Some comp_injs ->
-							(Printf.printf "#Var[%d]: '%s' %a has %d instances\n" mix_id
-									(Environment.kappa_of_num mix_id env)
-									(Kappa_printer.mixture false env) (kappa_of_id mix_id state)
-									(Nbr.to_int (instance_number mix_id state env));
-									if SiteGraph.size state.graph > 1000 then ()
-									else
-										Array.iteri
-										(fun cc_id injs_opt ->
-													match injs_opt with
-													| None -> Printf.printf "#\tCC[%d] : na\n" cc_id
-													| Some injs ->
-															InjectionHeap.iteri
-																(fun ad injection ->
-																			Printf.printf "#\tCC[%d]#%d: %s \n" cc_id ad
-																				(Injection.to_string injection))
-																injs
-										)	comp_injs
-							)	
-		 	) state.injections ;
-			Tools.iteri
-			  (fun var_id ->
-			   Printf.printf "#x[%d]: '%s' %a \n" var_id
-					 (fst (Environment.alg_of_num var_id env))
-					 Nbr.print
-					 (alg_of_id state counter env var_id)
-			  ) (Array.length state.alg_variables);
-			Array.iteri
-			(fun mix_id mix_opt ->
-				match mix_opt with
-				| None -> () 
-				| Some m -> 
-					let num = instance_number mix_id state env 
-					and name = Environment.kappa_of_num mix_id env
-					in
-					Printf.printf "kappa[%d] '%s' %s\n" mix_id name (Nbr.to_string num)
-			) state.kappa_variables ;
-			Array.iteri
-			(fun tk_id v ->
-				Printf.printf "token[%d]: '%s' %f\n" tk_id (Environment.token_of_num tk_id env) v
-			) state.token_vector ;
-			IntMap.fold
-			(fun i pert _ ->
-				Printf.printf "#pert[%d]: %s\n" i (Environment.pert_of_num i env)
-			)
-			state.perturbations ();
-			Printf.printf "#**********\n"
+  if not !Parameter.debugModeOn then ()
+  else
+    (
+      Format.printf "#***[%f] Current state***\n" (Counter.time counter);
+      if SiteGraph.size state.graph > 1000 then ()
+      else SiteGraph.dump ~with_lift:true state.graph env;
+      Hashtbl.fold
+	(fun i r _ ->
+	 let nme =
+	   try "'" ^ ((Environment.rule_of_num i env) ^ "'")
+	   with | Not_found -> ""
+	 in
+	 let a2,a1  = eval_activity r state counter env in
+	 if Environment.is_rule i env then
+	   Format.printf "#rule[%d]: \t%s %s @ %f[upd:%f(%f)]@\n"
+			 i nme (Dynamics.to_kappa r env)
+			 (Random_tree.find i state.activity_tree)
+			 (Nbr.to_float a2) (Nbr.to_float a1)
+	 else
+	   Format.printf "#\t%s %s [found %d]@\n" nme (Dynamics.to_kappa r env)
+			 (Nbr.to_int (instance_number i state env))
+	) state.rules ();
+      Array.iteri
+	(fun mix_id opt ->
+	 let injprod_hp_opt =
+	   try state.nl_injections.(mix_id) with Invalid_argument _ -> None in
+	 begin
+	   match injprod_hp_opt with
+	   | None -> ()
+	   | Some injprod_hp ->
+	      (Format.printf
+		 "#Unary[%d]: '%s' %a has %d unary instances@\n" mix_id
+		 (Environment.kappa_of_num mix_id env)
+		 (Kappa_printer.mixture false env) (kappa_of_id mix_id state)
+		 (InjProdHeap.size injprod_hp);
+	       if SiteGraph.size state.graph > 1000 then ()
+	       else
+		 InjProdHeap.iteri
+		   (fun inj_id inj_prod ->
+		    Format.printf "#\t ip#%d: %s @\n"
+				  inj_id(InjProduct.to_string inj_prod)
+		   ) injprod_hp
+	      )
+	 end ;
+	 match opt with
+	 | None -> ()
+	 | Some comp_injs ->
+	    (Format.printf "#Var[%d]: '%s' %a has %d instances@\n" mix_id
+			   (Environment.kappa_of_num mix_id env)
+			   (Kappa_printer.mixture false env)
+			   (kappa_of_id mix_id state)
+			   (Nbr.to_int (instance_number mix_id state env));
+	     if SiteGraph.size state.graph > 1000 then ()
+	     else
+	       Array.iteri
+		 (fun cc_id injs_opt ->
+		  match injs_opt with
+		  | None -> Format.printf "#\tCC[%d] : na@\n" cc_id
+		  | Some injs ->
+		     InjectionHeap.iteri
+		       (fun ad injection ->
+			Format.printf "#\tCC[%d]#%d: %s @\n" cc_id ad
+				      (Injection.to_string injection))
+		       injs
+		 )	comp_injs
+	    )
+	) state.injections ;
+      Tools.iteri
+	(fun var_id ->
+	 Format.printf "#x[%d]: '%s' %a @\n" var_id
+		       (fst (Environment.alg_of_num var_id env))
+		       Nbr.print
+		       (alg_of_id state counter env var_id)
+	) (Array.length state.alg_variables);
+      Array.iteri
+	(fun mix_id mix_opt ->
+	 match mix_opt with
+	 | None -> ()
+	 | Some m ->
+	    let num = instance_number mix_id state env
+	    and name = Environment.kappa_of_num mix_id env
+	    in
+	    Format.printf "kappa[%d] '%s' %s@\n" mix_id name (Nbr.to_string num)
+	) state.kappa_variables ;
+      Array.iteri
+	(fun tk_id v ->
+	 Format.printf "token[%d]: '%s' %f@\n" tk_id
+		       (Environment.token_of_num tk_id env) v
+	) state.token_vector ;
+      IntMap.fold
+	(fun i pert _ ->
+	 Format.printf "#pert[%d]: %s@\n" i (Environment.pert_of_num i env)
 	)
+	state.perturbations ();
+      Format.printf "#**********@."
+    )
 
 let dot_of_flux desc state  env =
-	
-	let print_flux flux pos =
-		Hashtbl.iter
-		(fun r_id map ->
-			let str1 = try Environment.rule_of_num r_id env with Not_found -> Dynamics.to_kappa (rule_of_id r_id state) env
-			in
-			IntMap.iter
-			(fun r_id' n ->
-				if n=0. then () 
-				else
-				let color,arrowhead,edge = 
-					if n<0. then ("red3","tee","filled") 
-					else ("green3","normal","filled") 
-				in 
-				let str2 = try Environment.rule_of_num r_id' env with Not_found -> Dynamics.to_kappa (rule_of_id r_id' state) env in
-				Printf.fprintf desc "\"%s\" -> \"%s\" [weight=%d,label=\"%.3f\",color=%s,arrowhead=%s];\n" str1 str2 (abs (int_of_float n)) n color arrowhead
+  let print_flux flux pos =
+    Hashtbl.iter
+      (fun r_id map ->
+       let str1 = try Environment.rule_of_num r_id env
+		  with
+		    Not_found -> Dynamics.to_kappa (rule_of_id r_id state) env
+       in
+       IntMap.iter
+	 (fun r_id' n ->
+	  if n=0. then ()
+	  else
+	    let color,arrowhead,edge =
+	      if n<0. then ("red3","tee","filled")
+	      else ("green3","normal","filled")
+	    in
+	    let str2 = try Environment.rule_of_num r_id' env
+		       with Not_found ->
+			 Dynamics.to_kappa (rule_of_id r_id' state) env in
+	    Format.fprintf desc "\"%s\" -> \"%s\" [weight=%d,label=\"%.3f\",color=%s,arrowhead=%s];@\n" str1 str2 (abs (int_of_float n)) n color arrowhead
 			) map 
 		) flux 
 	in
-	Printf.fprintf desc "digraph G{ label=\"Flux map\" ; labelloc=\"t\" ; node [shape=box,style=filled,fillcolor=lightskyblue]\n" ;
+	Format.fprintf desc
+		       "digraph G{ label=\"Flux map\" ; labelloc=\"t\" ; node [shape=box,style=filled,fillcolor=lightskyblue]@\n";
 	Hashtbl.iter
-	(fun r_id rule ->
-		let r_nme = try Environment.rule_of_num r_id env with Not_found -> (*rule is anonymous*) Dynamics.to_kappa (rule_of_id r_id state) env in
-		Printf.fprintf desc "\"%s\" ;\n" r_nme 
+	  (fun r_id rule ->
+	   let r_nme = try Environment.rule_of_num r_id env with Not_found -> (*rule is anonymous*) Dynamics.to_kappa (rule_of_id r_id state) env in
+	   Format.fprintf desc "\"%s\" ;@\n" r_nme 
 	) state.rules ;
 	print_flux state.flux true;
-	Printf.fprintf desc "}\n" ;
-	close_out desc
+	Format.fprintf desc "}@."
 
 let print_observables_header f state =
-  let () = if !Parameter.emacsMode then Printf.fprintf f "time"
-	   else Printf.fprintf f "# time" in
+  let () = if !Parameter.emacsMode then Format.fprintf f "time"
+	   else Format.fprintf f "# time" in
   let () = List.iter
 	     (fun obs ->
-	      Printf.fprintf f "%t%s" !Parameter.plotSepChar obs.label
+	      Format.fprintf f "%t%s" !Parameter.plotSepChar obs.label
 	     ) state.observables in
-  Printf.fprintf f "\n"
+  Format.fprintf f "@."
 
 let print_observables_values f time env counter state =
-  Printf.fprintf f "%t%E%t%a\n"
+  Format.fprintf f "%t%E%t%a@."
 		 !Parameter.plotSepChar time
 		 !Parameter.plotSepChar
 		 (Pp.list !Parameter.plotSepChar Nbr.print)

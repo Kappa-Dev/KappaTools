@@ -36,7 +36,7 @@ module type StoryStats =
     val inc_branch: log_info -> log_info 
     val inc_cut: log_info -> log_info 
     val reset_log: log_info -> log_info 
-    val dump_complete_log: out_channel -> log_info -> unit 
+    val dump_complete_log: Format.formatter -> log_info -> unit 
     val dump_short_log: out_channel -> log_info -> unit 
     val add_propagation_case_up: int -> log_info -> log_info 
     val add_propagation_case_down: int -> log_info -> log_info 
@@ -345,38 +345,37 @@ module StoryStats =
 
            
        let dump_complete_log log log_info = 
-         let _ = Printf.fprintf log "/*\n" in 
-         let _ = Printf.fprintf log "Story profiling\n" in 
-         let _ = Printf.fprintf log "Ellapsed_time:                  %f\n" (ellapsed_time log_info) in 
-         let _ = Printf.fprintf log "Concurrent event research time: %f\n" (log_info.concurrent_event_detection_time) in 
-         let _ = Printf.fprintf log "Concurrent event deletion time: %f\n" (log_info.concurrent_event_deletion_time) in 
-         let _ = Printf.fprintf log "Story research time:            %f\n" (log_info.story_research_time) in 
-         let _ = Printf.fprintf log "Grid generation time:           %f\n" (log_info.grid_time) in 
-         let _ = Printf.fprintf log "Canonicalization time:          %f\n" (log_info.canonicalization_time) in 
-         let _ = Printf.fprintf log "KaSim events:                   %i\n" log_info.kasim_events in 
-         let _ = Printf.fprintf log "Init events:                    %i\n" log_info.init_events in 
-         let _ = Printf.fprintf log "Obs events:                     %i\n" log_info.obs_events in 
-         let _ = Printf.fprintf log "Fictitious events:              %i\n" log_info.fictitious_events in 
-         let _ = Printf.fprintf log "Cut events (globally):          %i\n" log_info.global_cut in 
-         let _ = Printf.fprintf log "Pseudo-inverse events:          %i\n" log_info.pseudo_inv_cut in 
-         let _ = Printf.fprintf log "Cut events (for this story):    %i\n" log_info.cut_events in 
-         let _ = Printf.fprintf log "Selected events:                %i\n" log_info.current_stack.selected_events in 
-         let _ = Printf.fprintf log "Removed events:                 %i\n" log_info.current_stack.removed_events in 
-         let _ = Printf.fprintf log "Remaining events:               %i\n" (log_info.kasim_events + log_info.obs_events + log_info.init_events +log_info.fictitious_events - log_info.cut_events - log_info.current_stack.selected_events - log_info.current_stack.removed_events - log_info.global_cut - log_info.pseudo_inv_cut) in 
-         let _ = Printf.fprintf log "Exploration depth:              %i\n" log_info.current_stack.current_branch in 
-         let _ = Printf.fprintf log "Exploration cuts:               %i\n" log_info.cut in 
-         let _ = Printf.fprintf log "***\nPropagation Hits:\n" in 
+         let _ = Format.fprintf log "/*@\n" in 
+         let _ = Format.fprintf log "Story profiling@\n" in 
+         let _ = Format.fprintf log "Ellapsed_time:                  %f@\n" (ellapsed_time log_info) in 
+         let _ = Format.fprintf log "Concurrent event research time: %f@\n" (log_info.concurrent_event_detection_time) in 
+         let _ = Format.fprintf log "Concurrent event deletion time: %f@\n" (log_info.concurrent_event_deletion_time) in 
+         let _ = Format.fprintf log "Story research time:            %f@\n" (log_info.story_research_time) in 
+         let _ = Format.fprintf log "Grid generation time:           %f@\n" (log_info.grid_time) in 
+         let _ = Format.fprintf log "Canonicalization time:          %f@\n" (log_info.canonicalization_time) in 
+         let _ = Format.fprintf log "KaSim events:                   %i@\n" log_info.kasim_events in 
+         let _ = Format.fprintf log "Init events:                    %i@\n" log_info.init_events in 
+         let _ = Format.fprintf log "Obs events:                     %i@\n" log_info.obs_events in 
+         let _ = Format.fprintf log "Fictitious events:              %i@\n" log_info.fictitious_events in 
+         let _ = Format.fprintf log "Cut events (globally):          %i@\n" log_info.global_cut in 
+         let _ = Format.fprintf log "Pseudo-inverse events:          %i@\n" log_info.pseudo_inv_cut in 
+         let _ = Format.fprintf log "Cut events (for this story):    %i@\n" log_info.cut_events in 
+         let _ = Format.fprintf log "Selected events:                %i@\n" log_info.current_stack.selected_events in 
+         let _ = Format.fprintf log "Removed events:                 %i@\n" log_info.current_stack.removed_events in 
+         let _ = Format.fprintf log "Remaining events:               %i@\n" (log_info.kasim_events + log_info.obs_events + log_info.init_events +log_info.fictitious_events - log_info.cut_events - log_info.current_stack.selected_events - log_info.current_stack.removed_events - log_info.global_cut - log_info.pseudo_inv_cut) in 
+         let _ = Format.fprintf log "Exploration depth:              %i@\n" log_info.current_stack.current_branch in 
+         let _ = Format.fprintf log "Exploration cuts:               %i@\n" log_info.cut in 
+         let _ = Format.fprintf log "***\nPropagation Hits:@\n" in
          let rec aux k = 
            if k>=propagation_cases 
            then () 
            else 
              let _ = 
-               Printf.fprintf log                           "        %s %i\n" propagation_labels.(k) log_info.propagation.(k)
+               Format.fprintf log                           "        %s %i@\n" propagation_labels.(k) log_info.propagation.(k)
              in aux (k+1)
          in 
          let _ = aux 1 in 
-         let _ = Printf.fprintf log "*/ \n" in 
-         flush log
+         Format.fprintf log "*/ @."
 
        let tick log_info = 
          let time = Sys.time () in 

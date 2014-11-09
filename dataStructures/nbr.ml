@@ -105,9 +105,9 @@ let is_strictly_positive = function
   | I64 x -> x > Int64.zero
 
 let print f = function
-  | F x -> Printf.fprintf f "%E" x
-  | I64 x -> Printf.fprintf f "%Ld" x
-  | I x -> Printf.fprintf f "%d" x
+  | F x -> Format.fprintf f "%E" x
+  | I64 x -> Format.fprintf f "%Ld" x
+  | I x -> Format.fprintf f "%d" x
 
 let to_string = function
   | F x -> Printf.sprintf "%E" x

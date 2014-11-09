@@ -90,7 +90,8 @@ let compress env state log_info step_list =
                 List.iter 
                   (fun x -> let _ = D.S.PH.B.PB.CI.Po.K.print_refined_step parameter handler error x in ()) 
                   refined_event_list  
-              in flush parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel
+              in Format.pp_print_flush
+		   parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel ()
           in 
           
           let refined_event_list_cut,int = 
@@ -110,8 +111,9 @@ let compress env state log_info step_list =
                       List.iter 
                         (fun x -> 
                           let _ = D.S.PH.B.PB.CI.Po.K.print_refined_step parameter handler error x in ()) 
-                        refined_event_list_cut  
-                    in flush parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err
+                        refined_event_list_cut
+                    in Format.pp_print_flush
+			 parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err ()
                 in 
                 refined_event_list_cut,int 
               end
@@ -155,7 +157,8 @@ let compress env state log_info step_list =
                             in 
                             ()) 
                           refined_event_list_without_pseudo_inverse
-                      in flush parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err
+                      in Format.pp_print_flush
+			   parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err ()
                   in 
                   refined_event_list_without_pseudo_inverse,int_pseudo_inverse 
                 end
@@ -365,9 +368,9 @@ let compress env state log_info step_list =
                               let _ =
                                 if D.S.PH.B.is_failed output 
                                 then 
-                                  let _ = Printf.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err "Fail_to_compress" in  error
+                                  let _ = Format.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err "Fail_to_compress" in  error
                                 else 
-                                  let _ = Printf.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err "Succeed_to_compress" in 
+                                  let _ = Format.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err "Succeed_to_compress" in 
                                   error
                               in 
                               error 
@@ -474,9 +477,9 @@ let compress env state log_info step_list =
                               let _ =
                                 if D.S.PH.B.is_failed output 
                                 then 
-                                  let _ = Printf.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err "Fail_to_compress" in  error
+                                  let _ = Format.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err "Fail_to_compress" in  error
                                 else 
-                                  let _ = Printf.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err "Succeed_to_compress" in 
+                                  let _ = Format.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err "Succeed_to_compress" in 
                                   error
                               in 
                               error 

@@ -3,51 +3,43 @@ open Mods
 open ExceptionDefn
 
 type t = {
-	mutable desc:out_channel option ; 
-	file:string ; 
-	mutable last_point : int 
-	}
+  desc:out_channel;
+  form:Format.formatter;
+  file:string;
+  mutable last_point : int
+}
 
-let create filename = 
-	{desc=None;
-	file=filename;
-	last_point = 0
-	}
+let create filename state =
+  let d_chan = open_out filename in
+  let d = Format.formatter_of_out_channel d_chan in
+  let () = print_observables_header d state in
+  {desc=d_chan;
+   form=d;
+   file=filename;
+   last_point = 0
+  }
 
-let close plot = match plot.desc with Some d -> close_out d | None -> ()
+let close plot = close_out plot.desc
 
 let next_point counter time_increment =
-	match counter.Counter.dT with 
-		| None -> 
-			begin
-				match counter.Counter.dE with
-					| None -> invalid_arg "Plot.next_point: No point interval"
-					| Some dE ->
-						let point = (counter.Counter.events - counter.Counter.init_event) / dE in
-						point
-			end
-		| Some dT -> 
-			let point = int_of_float ((counter.Counter.time +. time_increment -. counter.Counter.init_time) /. dT) 
-			in
-				point
+  match counter.Counter.dT with
+  | None ->
+     begin
+       match counter.Counter.dE with
+       | None -> invalid_arg "Plot.next_point: No point interval"
+       | Some dE ->
+	  let point =
+	    (counter.Counter.events - counter.Counter.init_event) / dE in
+	  point
+     end
+  | Some dT ->
+     int_of_float
+       ((counter.Counter.time +. time_increment -. counter.Counter.init_time) /. dT) 
 
 let output state time plot env counter =
   if not !Parameter.plotModeOn then ()
   else
-    let d =
-      match plot.desc with
-      | None -> (*first value*)
-	 begin
-	   if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "\t *Creating data file...") ;
-	   let d = open_out plot.file in
-	   print_observables_header d state;
-	   plot.desc <- Some d ;
-	   d
-	 end
-      | Some d -> d
-    in
-    print_observables_values d time env counter state;
-    flush d
+    print_observables_values plot.form time env counter state
 
 let set_last_point plot p = plot.last_point <- p
 

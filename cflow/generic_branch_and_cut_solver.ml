@@ -51,12 +51,10 @@ struct
   let rec propagate parameter handler error log_info instruction_list propagate_list blackboard = 
     let bool,log_info = PH.B.tick log_info in 
     let _ = 
-      if bool 
-      then 
-        let _ = PH.B.PB.CI.Po.K.P.dump_complete_log parameter.PH.B.PB.CI.Po.K.H.out_channel_profiling log_info in 
-        let _ = flush parameter.PH.B.PB.CI.Po.K.H.out_channel_profiling
-        in () 
-    in 
+      if bool then
+        PH.B.PB.CI.Po.K.P.dump_complete_log
+	  parameter.PH.B.PB.CI.Po.K.H.out_channel_profiling log_info
+    in
     match instruction_list 
     with 
       | t::q ->
@@ -192,15 +190,10 @@ struct
       aux 0 events_to_keep []
     in 
     let error,forbidden_events = PH.forbidden_events parameter handler error events_to_remove in
-    let _ = 
-      if log_steps 
-      then 
-        let _ = Printf.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err "Start cutting\n" in 
-        let _ = 
-          flush parameter.PH.B.PB.CI.Po.K.H.out_channel_err
-            in 
-        ()
-    in 
+    let _ =
+      if log_steps then
+        Format.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err "Start cutting@."
+    in
     let error,log_info,blackboard,output = 
       propagate parameter handler error log_info forbidden_events [] blackboard  
     in 
@@ -219,26 +212,19 @@ struct
     let error,log_info,blackboard = PH.B.branch parameter handler error log_info blackboard in 
     let log_info = PH.B.PB.CI.Po.K.P.set_concurrent_event_deletion_time log_info in 
     let log_info = PH.B.PB.CI.Po.K.P.set_step_time log_info in 
-    let _ = 
-      if log_steps 
-      then 
-        let _ = Printf.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err "After Causal Cut  %i \n" (PH.B.get_n_unresolved_events blackboard) in 
-        let _ = 
-          flush parameter.PH.B.PB.CI.Po.K.H.out_channel 
-        in 
-        ()
+    let _ =
+      if log_steps then
+        Format.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err
+		       "After Causal Cut  %i @." (PH.B.get_n_unresolved_events blackboard)
     in 
     let error,log_info,blackboard,output = 
       propagate parameter handler error log_info list_order [] blackboard 
     in 
-    let _ = 
-      if log_steps 
-      then 
-        let _ = Printf.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err "After observable propagation  %i \n" (PH.B.get_n_unresolved_events blackboard) in 
-        let _ = 
-          flush parameter.PH.B.PB.CI.Po.K.H.out_channel 
-        in ()
-    in 
+    let _ =
+      if log_steps then
+        Format.fprintf parameter.PH.B.PB.CI.Po.K.H.out_channel_err
+		       "After observable propagation  %i @." (PH.B.get_n_unresolved_events blackboard)
+    in
     let error,log_info,blackboard,output = iter parameter handler error log_info blackboard empty_choice_list 
     in 
     let error,list = 

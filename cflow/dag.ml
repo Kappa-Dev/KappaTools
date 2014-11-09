@@ -90,32 +90,33 @@ module Dag =
       let dummy_cannonical_form = []
       let dummy_prehash = []
           
-      let print_graph parameter handler error graph = 
-        let _ = Printf.fprintf parameter.H.out_channel "****\ngraph\n****" in 
-        let _ = Printf.fprintf parameter.H.out_channel "Root: %i\n" graph.root in 
-        let _ = Printf.fprintf parameter.H.out_channel "Labels:\n" in 
-        let _ = A.iteri (fun i (_,j) -> Printf.fprintf parameter.H.out_channel "Node %i,Label %s\n" i j) graph.labels in 
-        let _ = Printf.fprintf parameter.H.out_channel "Succ:\n" in 
+      let print_graph parameter handler error graph =
+        let _ = Format.fprintf parameter.H.out_channel "****@\ngraph@\n****" in
+        let _ = Format.fprintf parameter.H.out_channel "Root: %i@\n" graph.root in
+        let _ = Format.fprintf parameter.H.out_channel "Labels:@\n" in
+        let _ = A.iteri (fun i (_,j) ->
+			 Format.fprintf parameter.H.out_channel "Node %i,Label %s@\n" i j) graph.labels in
+        let _ = Format.fprintf parameter.H.out_channel "Succ:@\n" in
         let _ = 
           A.iteri 
             (fun i l -> 
-              List.iter (Printf.fprintf parameter.H.out_channel "%i -> %i\n" i) l 
+              List.iter (Format.fprintf parameter.H.out_channel "%i -> %i@\n" i) l 
             ) 
             graph.succ 
         in 
         let _ = 
           A.iteri 
             (fun i l   -> 
-              List.iter (Printf.fprintf parameter.H.out_channel "%i <- %i\n" i) l 
+              List.iter (Format.fprintf parameter.H.out_channel "%i <- %i@\n" i) l 
             ) 
             graph.pred
         in 
-        let _ = Printf.fprintf parameter.H.out_channel "Conflicts:\n" in 
+        let _ = Format.fprintf parameter.H.out_channel "Conflicts:@\n" in 
         let _ = 
           A.iteri 
             (fun i l ->  
               List.iter 
-                (Printf.fprintf parameter.H.out_channel "%i --| %i\n" i)
+                (Format.fprintf parameter.H.out_channel "%i --| %i@\n" i)
                 l
             )
             graph.conflict_succ
@@ -124,21 +125,21 @@ module Dag =
           A.iteri 
             (fun i l  ->  
               List.iter 
-                (Printf.fprintf parameter.H.out_channel "%i |--  %i\n" i)
+                (Format.fprintf parameter.H.out_channel "%i |--  %i@\n" i)
                 l
             )
             graph.conflict_pred
           in 
-        let _ = Printf.fprintf parameter.H.out_channel "****\n\n" in 
+        let _ = Format.fprintf parameter.H.out_channel "****@\n@\n" in 
         error 
 
       let print_elt log elt = 
         match 
           elt 
         with 
-          | Stop -> Printf.fprintf log "STOP\n" 
-          | Former i -> Printf.fprintf log "Pointer %i\n" i 
-          | Fresh (_,s) -> Printf.fprintf log "Event %s\n" s 
+          | Stop -> Format.fprintf log "STOP@\n" 
+          | Former i -> Format.fprintf log "Pointer %i@\n" i 
+          | Fresh (_,s) -> Format.fprintf log "Event %s@\n" s 
 
       let print_canonical_form parameter handler error dag = 
         let _ =
@@ -146,16 +147,16 @@ module Dag =
             (print_elt parameter.H.out_channel_err)
             dag
         in 
-        let _ = Printf.fprintf parameter.H.out_channel_err "\n" in 
+        let _ = Format.fprintf parameter.H.out_channel_err "@." in 
         error 
 
       let print_prehash parameter handler error representation = 
         let _ = 
           List.iter 
-            (fun ((_,b),i) -> Printf.fprintf parameter.H.out_channel_err "%s:%i," b i)
+            (fun ((_,b),i) -> Format.fprintf parameter.H.out_channel_err "%s:%i," b i)
             representation 
         in 
-        let _ = Printf.fprintf parameter.H.out_channel_err "\n" in 
+        let _ = Format.fprintf parameter.H.out_channel_err "@." in 
         error 
 
       let label handler = Causal.label handler.H.env handler.H.state
@@ -420,15 +421,15 @@ module Dag =
             | _ -> FICTITIOUS,"" 
         in 
     (*    let print_to_beat to_beat= 
-          let _ = Printf.fprintf stderr "TO BEAT :" in 
+          let _ = Format.fprintf stderr "TO BEAT :" in 
           let _ = 
             match 
               to_beat 
             with 
-              | None -> Printf.fprintf stderr "NONE  " 
+              | None -> Format.fprintf stderr "NONE  " 
               | Some l -> List.iter (print_elt stderr) l
           in 
-          Printf.fprintf stderr "\n" 
+          Format.fprintf stderr "\n" 
         in *)
         let rec pop (candidate:key list) (to_beat:key list option) = 
           match 

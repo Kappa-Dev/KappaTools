@@ -52,7 +52,7 @@ let main =
 		Arg.parse options (fun _ -> Arg.usage options usage_msg ; exit 1) usage_msg ;
 		if not !Parameter.plotModeOn then
 		  ExceptionDefn.warning
-		    (fun f -> Printf.fprintf
+		    (fun f -> Format.fprintf
 				f "No data points are required, use -p option for plotting data.");
 		let abort =
 			match !Parameter.inputKappaFileNames with
@@ -122,13 +122,13 @@ let main =
 		if !Parameter.influenceFileName <> ""  then 
 			begin
 				let desc = open_out !Parameter.influenceFileName in
-				State.dot_of_influence_map desc state env ; 
+				State.dot_of_influence_map (Format.formatter_of_out_channel desc) state env ; 
 				close_out desc 
 			end ;  
 		if !Parameter.compileModeOn then (State.dump_rules state env; exit 0)
 		else () ;
     let profiling = Compression_main.D.S.PH.B.PB.CI.Po.K.P.init_log_info () in 
-		let plot = Plot.create !Parameter.outputDataName
+		let plot = Plot.create !Parameter.outputDataName state
 		and grid,profiling,event_list = 
 			if Environment.tracking_enabled env then
 			  let () =
@@ -169,7 +169,7 @@ let main =
 			if !Parameter.fluxModeOn then 
 				begin
 					let d = open_out !Parameter.fluxFileName in
-					State.dot_of_flux d state env ;
+					State.dot_of_flux (Format.formatter_of_out_channel d) state env ;
 					close_out d
 				end 
 			else () ;

@@ -75,12 +75,12 @@ val initialize :
 val dump_rules : t -> Environment.t -> unit
 val snapshot : t -> Counter.t -> out_channel -> bool -> Environment.t -> unit
 val dump : t -> Counter.t -> Environment.t -> unit
-val dot_of_flux : out_channel -> t -> Environment.t -> unit
-val dot_of_influence_map : out_channel -> t -> Environment.t -> unit
+val dot_of_flux : Format.formatter -> t -> Environment.t -> unit
+val dot_of_influence_map : Format.formatter -> t -> Environment.t -> unit
 
-val print_observables_header : out_channel -> t -> unit
+val print_observables_header : Format.formatter -> t -> unit
 val print_observables_values :
-  out_channel -> float -> Environment.t -> Counter.t -> t -> unit
+  Format.formatter -> float -> Environment.t -> Counter.t -> t -> unit
 
 module Safe : sig
   type check_options = {rule_act : bool ; lifts : bool ; unary : bool}

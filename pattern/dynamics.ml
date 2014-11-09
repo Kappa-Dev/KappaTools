@@ -105,26 +105,26 @@ let compute_causal_init (((node_id,agent_name),interface),_) env =
 let compute_causal_obs lhs = compute_causal lhs lhs []
 
 let pp_effect env f = function
-  | PRINT (nme,_) -> Printf.fprintf f "PRINT"
+  | PRINT (nme,_) -> Format.fprintf f "PRINT"
   | ITER_RULE (_,rule) ->
      if Mixture.is_empty rule.lhs then
-       Printf.fprintf f "INTRO %a" (Kappa_printer.mixture false env) rule.rhs
+       Format.fprintf f "INTRO %a" (Kappa_printer.mixture false env) rule.rhs
      else
        let () = assert (Mixture.is_empty rule.rhs) in
-       Printf.fprintf f "DELETE %a" (Kappa_printer.mixture false env) rule.lhs
-  | UPDATE (d_id,_) -> Printf.fprintf f "UPDATE %a" Term.print_dep_type d_id
-  | SNAPSHOT _ -> Printf.fprintf f "SNAPSHOT"
-  | STOP _ -> Printf.fprintf f "STOP"
-  | FLUX _ -> Printf.fprintf f "FLUX"
-  | FLUXOFF _ -> Printf.fprintf f "FLUXOFF"
+       Format.fprintf f "DELETE %a" (Kappa_printer.mixture false env) rule.lhs
+  | UPDATE (d_id,_) -> Format.fprintf f "UPDATE %a" Term.print_dep_type d_id
+  | SNAPSHOT _ -> Format.fprintf f "SNAPSHOT"
+  | STOP _ -> Format.fprintf f "STOP"
+  | FLUX _ -> Format.fprintf f "FLUX"
+  | FLUXOFF _ -> Format.fprintf f "FLUXOFF"
   | CFLOW id ->
      let nme = try Environment.rule_of_num id env
 	       with Not_found -> Environment.kappa_of_num id env
-     in Printf.fprintf f "CFLOW %s" nme
+     in Format.fprintf f "CFLOW %s" nme
   | CFLOWOFF id ->
      let nme = try Environment.rule_of_num id env
 	       with Not_found -> Environment.kappa_of_num id env
-     in Printf.fprintf f "CFLOWOFF %s" nme
+     in Format.fprintf f "CFLOWOFF %s" nme
 
 
 let print_pert env f pert =
@@ -273,7 +273,7 @@ let diff pos m0 m1 label_opt env =
 	       let _ =
 		 pp_warning
 		   (fun f ->
-		    Printf.fprintf
+		    Format.fprintf
 		      f "internal state of site '%s' of agent '%s' is modified although it is left unpecified in the left hand side"
 		      site (Environment.name (Mixture.name ag) env)
 		   )
@@ -321,7 +321,7 @@ let diff pos m0 m1 label_opt env =
 		  let _ =
 		    pp_warning
 		      (fun f ->
-		       Printf.fprintf
+		       Format.fprintf
 			 f "breaking a semi-link on site '%s' will induce a side effect"
 			 (Environment.site_of_id (Mixture.name ag) site_id env)
 		      )
@@ -340,7 +340,7 @@ let diff pos m0 m1 label_opt env =
 		    let _ =
 		      pp_warning
 			(fun f ->
-			 Printf.fprintf
+			 Format.fprintf
 			   f "link state of site '%s' of agent '%s' is changed although it is a semi-link in the left hand side"
 			   site (Environment.name (Mixture.name ag) env)
 			)
@@ -366,7 +366,7 @@ let diff pos m0 m1 label_opt env =
 		    let _ =
 		      pp_warning
 			(fun f ->
-			 Printf.fprintf
+			 Format.fprintf
 			   f "rule induces a link permutation on site '%s' of agent '%s'"
 			   site (Environment.name (Mixture.name ag) env)
 			)
@@ -432,7 +432,7 @@ let diff pos m0 m1 label_opt env =
 	     let _ =
 	       pp_warning
 		 (fun f ->
-		  Printf.fprintf
+		  Format.fprintf
 		    f "application of this rule will induce a null event when applied to an agent '%s' that is free on '%s'"
 		    (Environment.name (Mixture.name ag) env) site
 		 )
@@ -455,7 +455,7 @@ let diff pos m0 m1 label_opt env =
 		  let _ =
 		    pp_warning
 		      (fun f ->
-		       Printf.fprintf
+		       Format.fprintf
 			 f "site '%s' of agent '%s' is bound in the right hand side although it is unspecified in the left hand side"
 			 site (Environment.name (Mixture.name ag) env)
 		      )
@@ -589,7 +589,7 @@ let enable r mix env =
       try Mixture.agent_of_id root pat1
       with Not_found ->
 	invalid_arg
-	  (Printf.sprintf "Dynamics.enable: agent %d not found in %a"
+	  (Format.sprintf "Dynamics.enable: agent %d not found in %a"
 			  root (Kappa_printer.mixture_to_string true env) pat1) in
     let name_id_root = Mixture.name root_ag in
     let candidates = (*agent id in lhs --all cc-- that have the name name_id_root*)
@@ -675,16 +675,15 @@ let enable r mix env =
 let to_kappa r env =
   try Environment.rule_of_num r.r_id env
   with Not_found ->
-    let kappa_lhs = Kappa_printer.mixture_to_string false env () r.lhs in
-    let kappa_rhs = Kappa_printer.mixture_to_string false env () r.rhs in
-    kappa_lhs ^ ("->" ^ kappa_rhs)
+    Format.sprintf "%a@,->%a" (Kappa_printer.mixture_to_string false env) r.lhs
+		   (Kappa_printer.mixture_to_string false env) r.rhs
 
 let dump r env =
   let pr_r f =
-    Printf.fprintf f "%a->%a" (Kappa_printer.mixture false env) r.lhs
+    Format.fprintf f "%a->%a" (Kappa_printer.mixture false env) r.lhs
 		   (Kappa_printer.mixture false env) r.rhs in
   let name = to_kappa r env in
-  Printf.fprintf stderr "****Rule '%s' [%t]****" name pr_r;
+  Format.eprintf "****Rule '%s' [%t]****" name pr_r;
   IntMap.iter
     (fun id ag ->
      Mixture.fold_interface

@@ -38,7 +38,7 @@ let dump_print_expr desc pexpr state counter env =
   List.iter
     (fun (ast,pos) ->
      match ast with
-     | Ast.Str_pexpr str -> Printf.fprintf desc "%s" str
+     | Ast.Str_pexpr str -> Format.pp_print_string desc str
        | Ast.Alg_pexpr alg_ex ->
 	    let (mix, (alg,_pos)) =
 	      Expr.compile_alg env.Environment.algs.NamedDecls.finder
@@ -52,7 +52,7 @@ let dump_print_expr desc pexpr state counter env =
 	| _, [] ->
 	   Nbr.print desc (State.value_alg state counter env alg)
     ) pexpr ;
-  Printf.fprintf desc "\n"
+  Format.fprintf desc "@."
 
 let apply_n_time x r state env counter pert_ids pert_events tracked =
   Nbr.iteri
@@ -119,10 +119,10 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
   | Primitives.PRINT (pexpr_file,pexpr) ->
     let str = eval_pexpr pexpr_file state counter env in
     let desc =
-      match str with "" -> stdout | _ -> Environment.get_desc str env
+      match str with "" -> Format.std_formatter
+		   | _ -> Environment.get_desc str env
     in
-    dump_print_expr desc pexpr state counter env ;
-    flush desc ;
+    dump_print_expr desc pexpr state counter env;
     (env,state,pert_ids,tracked,pert_events)
   | Primitives.CFLOW id ->
     Debug.tag_if_debug "Tracking causality" ;
@@ -145,7 +145,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
       let desc =
 	match str with "" -> open_out !Parameter.fluxFileName | _ -> open_out str in
       Parameter.add_out_desc desc ;
-      State.dot_of_flux desc state env ;
+      State.dot_of_flux (Format.formatter_of_out_channel desc) state env ;
       close_out desc ;
       Parameter.openOutDescriptors := List.tl (!Parameter.openOutDescriptors) ;
       Parameter.fluxModeOn := false ;
@@ -162,7 +162,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
     begin
       if !Parameter.fluxModeOn
       then ExceptionDefn.warning
-	     (fun f -> Printf.fprintf f "Flux modes are overlapping");
+	     (fun f -> Format.fprintf f "Flux modes are overlapping");
       Parameter.fluxModeOn := true ;
       let nme = eval_pexpr pexpr state counter env in
       let _ =

@@ -23,7 +23,7 @@ let bin_alg_op_to_string () = function
   | MAX -> "[max]"
 
 let print_bin_alg_op f op =
-  Printf.fprintf f "%s" (bin_alg_op_to_string () op)
+  Format.fprintf f "%s" (bin_alg_op_to_string () op)
 
 let un_alg_op_to_string () = function
   | COSINUS -> "[cos]"
@@ -36,7 +36,7 @@ let un_alg_op_to_string () = function
   | UMINUS -> "-"
 
 let print_un_alg_op f op =
-  Printf.fprintf f "%s" (un_alg_op_to_string () op)
+  Format.fprintf f "%s" (un_alg_op_to_string () op)
 
 let state_alg_op_to_string () = function
   | CPUTIME -> "[Tsim]"
@@ -46,14 +46,14 @@ let state_alg_op_to_string () = function
   | PROD_EVENT_VAR -> "[E+]"
 
 let print_state_alg_op f op =
-  Printf.fprintf f "%s" (state_alg_op_to_string () op)
+  Format.fprintf f "%s" (state_alg_op_to_string () op)
 
 let bool_op_to_string () = function
   | AND -> "&&"
   | OR -> "||"
 
 let print_bool_op f op =
-  Printf.fprintf f "%s" (bool_op_to_string () op)
+  Format.fprintf f "%s" (bool_op_to_string () op)
 
 let compare_op_to_string () = function
   | GREATER -> ">"
@@ -62,7 +62,7 @@ let compare_op_to_string () = function
   | DIFF -> "!="
 
 let print_compare_op f op =
-  Printf.fprintf f "%s" (compare_op_to_string () op)
+  Format.fprintf f "%s" (compare_op_to_string () op)
 
 let dep_to_string () = function
   | TOK i -> "TOK("^(string_of_int i)^")"
@@ -85,16 +85,16 @@ let has_dummy_pos (_,(b_pos,e_pos)) =
 
 let print_dep_type f = function
   | RULE id ->
-     Printf.fprintf f "rate_of_rule [%i]" id
+     Format.fprintf f "rate_of_rule [%i]" id
   (*"rate of rule '%a'" (Environment.print_rule env) id*)
   | ALG id ->
-     Printf.fprintf f "algebraic variable [%i]" id
+     Format.fprintf f "algebraic variable [%i]" id
   (*"variable '%a'" (Environment.print_alg env) id*)
   | TOK id ->
-     Printf.fprintf f "token [%i]" id
+     Format.fprintf f "token [%i]" id
   | KAPPA id ->
-     Printf.fprintf f "kappa_mixture [%i]" id
-  | EVENT -> Printf.fprintf f "event"
-  | TIME -> Printf.fprintf f "time"
-  | PERT id -> Printf.fprintf f "perturbation [%i]" id
-  | ABORT id -> Printf.fprintf f "ABORT(%i)" id
+     Format.fprintf f "kappa_mixture [%i]" id
+  | EVENT -> Format.fprintf f "event"
+  | TIME -> Format.fprintf f "time"
+  | PERT id -> Format.fprintf f "perturbation [%i]" id
+  | ABORT id -> Format.fprintf f "ABORT(%i)" id

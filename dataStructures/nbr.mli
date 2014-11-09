@@ -17,7 +17,7 @@ val to_float : t -> float
 val to_int : t -> int
 val is_zero : t -> bool
 val is_strictly_positive : t -> bool
-val print : out_channel -> t -> unit
+val print : Format.formatter -> t -> unit
 val to_string : t -> string
 
 (** [iter f x n]

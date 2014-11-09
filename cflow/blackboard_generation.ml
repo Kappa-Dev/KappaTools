@@ -60,7 +60,7 @@ sig
 
   (**pretty printing*)
   val string_of_predicate_value: predicate_value -> string 
-  val print_predicate_value: out_channel ->  predicate_value -> unit 
+  val print_predicate_value: Format.formatter ->  predicate_value -> unit
   val print_preblackboard: (pre_blackboard -> CI.Po.K.H.error_channel) CI.Po.K.H.with_handler  
 
   (**interface*)
@@ -74,7 +74,7 @@ sig
   val get_fictitious_observable: (pre_blackboard -> CI.Po.K.H.error_channel * int option) CI.Po.K.H.with_handler 
   val get_level_of_event: (pre_blackboard -> step_id -> CI.Po.K.H.error_channel * Priority.level) CI.Po.K.H.with_handler 
   val levels: pre_blackboard -> Priority.level A.t
-  val print_predicate_info: out_channel -> predicate_info -> unit 
+  val print_predicate_info: Format.formatter -> predicate_info -> unit
 end
 
 module Preblackboard = 
@@ -191,22 +191,22 @@ module Preblackboard =
          let print_predicate_info log x = 
            match x 
            with 
-         | Here i -> Printf.fprintf log "Agent_Here %i" i
-         | Bound_site (i,s) -> Printf.fprintf log "Binding_state (%i,%i)" i s 
-         | Internal_state (i,s) -> Printf.fprintf log "Internal_state (%i,%i)" i s 
-         | Pointer (eid,id) -> Printf.fprintf log "Pointer(eid:%i,ag_id:%i)" eid id 
-         | Link (eid,id1,id2) -> Printf.fprintf log "Link(eid:%i,%i-%i)" eid id1 id2 
-         | Mutex (Lock_agent (int,int2)) -> Printf.fprintf log "Mutex (Step-id:%i,Agent_id:%i)" int int2 
-         | Mutex (Lock_rectangular (int,int2)) -> Printf.fprintf log "Mutex_inv (Step-id:%i,Agent_id:%i)" int int2 
-         | Mutex (Lock_links(int,(int2,int3))) -> Printf.fprintf log "Mutex_links (Step-id:%i,%i-%i)" int int2 int3
-         | Mutex (Lock_side_effect (int,int2,int3,int4)) -> Printf.fprintf log "Mutex_side_effect (Step-id:%i,%i/%i.%i)" int int2 int3 int4
-         | Fictitious -> Printf.fprintf log "Fictitious" 
+         | Here i -> Format.fprintf log "Agent_Here %i" i
+         | Bound_site (i,s) -> Format.fprintf log "Binding_state (%i,%i)" i s 
+         | Internal_state (i,s) -> Format.fprintf log "Internal_state (%i,%i)" i s 
+         | Pointer (eid,id) -> Format.fprintf log "Pointer(eid:%i,ag_id:%i)" eid id 
+         | Link (eid,id1,id2) -> Format.fprintf log "Link(eid:%i,%i-%i)" eid id1 id2 
+         | Mutex (Lock_agent (int,int2)) -> Format.fprintf log "Mutex (Step-id:%i,Agent_id:%i)" int int2 
+         | Mutex (Lock_rectangular (int,int2)) -> Format.fprintf log "Mutex_inv (Step-id:%i,Agent_id:%i)" int int2 
+         | Mutex (Lock_links(int,(int2,int3))) -> Format.fprintf log "Mutex_links (Step-id:%i,%i-%i)" int int2 int3
+         | Mutex (Lock_side_effect (int,int2,int3,int4)) -> Format.fprintf log "Mutex_side_effect (Step-id:%i,%i/%i.%i)" int int2 int3 int4
+         | Fictitious -> Format.fprintf log "Fictitious" 
            
          let print_known log t x = 
            match t
            with 
              | Unknown -> ()
-             | _ -> Printf.fprintf log "%s" x
+             | _ -> Format.fprintf log "%s" x
                
          let string_of_predicate_value x = 
 	   match x 
@@ -231,62 +231,62 @@ module Preblackboard =
 	        "Pointer("^(string_of_int agent_id)^")"
              | Unknown -> ""
 
-         let print_predicate_value log x = 
-              Printf.fprintf log "%s" (string_of_predicate_value x) 
+         let print_predicate_value log x =
+              Format.fprintf log "%s" (string_of_predicate_value x) 
          let print_predicate_id log blackboard i = 
            let predicate_info = A.get blackboard.pre_column_map_inv i in  
-           let _ = Printf.fprintf log "Predicate: %i " i in 
+           let _ = Format.fprintf log "Predicate: %i " i in 
            let _ = print_predicate_info log predicate_info in 
-           let _ = Printf.fprintf log "\n" in 
+           let _ = Format.fprintf log "\n" in 
            ()
              
          let print_preblackboard parameter handler error blackboard = 
            let log = parameter.CI.Po.K.H.out_channel in 
-           let _ = Printf.fprintf log "**\nPREBLACKBOARD\n**\n" in 
-           let _ = Printf.fprintf log "*\n agent types \n*\n" in 
+           let _ = Format.fprintf log "**\nPREBLACKBOARD\n**\n" in 
+           let _ = Format.fprintf log "*\n agent types \n*\n" in 
            let _ = 
              A.iteri 
                (fun name -> 
-                 let _ = Printf.fprintf log "\nAgent name: %i \n" name in 
+                 let _ = Format.fprintf log "\nAgent name: %i \n" name in 
                  List.iter 
-                   (Printf.fprintf log " id: %i \n"))
+                   (Format.fprintf log " id: %i \n"))
                blackboard.history_of_agent_ids_of_type
            in 
-           let _ = Printf.fprintf log "*\n steps by column\n*\n" in 
+           let _ = Format.fprintf log "*\n steps by column\n*\n" in 
            let _ = 
              A.iteri 
                (fun id (nevents,list) ->
                  let _ = print_predicate_id log blackboard id  in
-                 let _ = Printf.fprintf log "nevents: %i \n" nevents in 
+                 let _ = Format.fprintf log "nevents: %i \n" nevents in 
                  let _ = 
                    List.iter 
                      (fun (eid,seid,test,action) -> 
-                       let _ = Printf.fprintf log "Event id: %i \n" eid in 
-                       let _ = Printf.fprintf log "Short id: %i \n" seid in 
+                       let _ = Format.fprintf log "Event id: %i \n" eid in 
+                       let _ = Format.fprintf log "Short id: %i \n" seid in 
                        let _ = print_known log test "TEST:   " in
                        let _ = print_predicate_value log test in 
-                       let _ = Printf.fprintf log "\n" in 
+                       let _ = Format.fprintf log "\n" in 
                        let _ = print_known log action "ACTION: " in 
                        let _ = print_predicate_value log action in 
-                       let _ = Printf.fprintf log "\n" in 
+                       let _ = Format.fprintf log "\n" in 
                        ())
                      (List.rev list)
                  in 
-                 let _ = Printf.fprintf log "---\n" in 
+                 let _ = Format.fprintf log "---\n" in 
                  ())
                blackboard.pre_steps_by_column 
            in 
-           let _ = Printf.fprintf log "*\nSide effects \n*\n" in 
+           let _ = Format.fprintf log "*\nSide effects \n*\n" in 
            let _ = A.iteri 
              (fun i list -> 
-               let _ = Printf.fprintf log "event %i:\n " i in
+               let _ = Format.fprintf log "event %i:\n " i in
                let _ = CI.Po.K.print_side_effect log list in 
-               let _ = Printf.fprintf log "\n" in 
+               let _ = Format.fprintf log "\n" in 
                ()
              )
              blackboard.pre_side_effect_of_event 
            in 
-           let _ = Printf.fprintf log "*\nPredicate_id related to the predicate \n*\n" in 
+           let _ = Format.fprintf log "*\nPredicate_id related to the predicate \n*\n" in 
            
            let _ = 
              A.iteri 
@@ -294,15 +294,15 @@ module Preblackboard =
                  let _ = print_predicate_id log blackboard i in 
                  let _ = 
                    PredicateidSet.iter
-                     (fun s -> Printf.fprintf log "%i\n" s)
+                     (fun s -> Format.fprintf log "%i\n" s)
                      s
                  in 
-                 let _ = Printf.fprintf log "---\n" in 
+                 let _ = Format.fprintf log "---\n" in 
                  ()
                )
                blackboard.predicate_id_list_related_to_predicate_id 
            in 
-           let _ = Printf.fprintf log "*\nPast values of a predicate \n*\n" in 
+           let _ = Format.fprintf log "*\nPast values of a predicate \n*\n" in 
            let _ = 
              A.iteri 
                (fun i s -> 
@@ -312,23 +312,23 @@ module Preblackboard =
                      (fun s -> print_predicate_value log s)
                      s
                  in 
-                 let _ = Printf.fprintf log "---\n" in 
+                 let _ = Format.fprintf log "---\n" in 
                  ()
                )
                blackboard.history_of_predicate_values_to_predicate_id 
            in 
-           let _ = Printf.fprintf log "*\nObservables \n*\n" in
+           let _ = Format.fprintf log "*\nObservables \n*\n" in
            let _ = 
              List.iter 
                (fun (l,_) -> 
-                 let _ = List.iter (Printf.fprintf log "%i,") l in 
-                 let _ = Printf.fprintf log "\n" in 
+                 let _ = List.iter (Format.fprintf log "%i,") l in 
+                 let _ = Format.fprintf log "\n" in 
                  () 
                )
                blackboard.pre_observable_list 
            in 
            
-           let _ = Printf.fprintf log "**\n" in 
+           let _ = Format.fprintf log "**\n" in 
            error 
              
      (** information lattice *)
@@ -936,51 +936,51 @@ module Preblackboard =
      
          let print_data_structure parameter handler error data =
            let stderr = parameter.CI.Po.K.H.out_channel_err in 
-           let _ = Printf.fprintf stderr "New agents: \n" in 
+           let _ = Format.fprintf stderr "New agents: \n" in 
            let _ = 
-             AgentIdSet.iter (Printf.fprintf stderr " %i \n") data.new_agents
+             AgentIdSet.iter (Format.fprintf stderr " %i \n") data.new_agents
            in 
-           let _ = Printf.fprintf stderr "Old agents: \n" in 
+           let _ = Format.fprintf stderr "Old agents: \n" in 
            let _ = 
-             AgentIdMap.iter (Printf.fprintf stderr " id:%i: type:%i \n") data.old_agents 
+             AgentIdMap.iter (Format.fprintf stderr " id:%i: type:%i \n") data.old_agents 
            in 
-           let _ = Printf.fprintf stderr "Old agents implied in links: \n" in 
+           let _ = Format.fprintf stderr "Old agents implied in links: \n" in 
            let _ = 
-             AgentIdSet.iter (Printf.fprintf stderr " %i \n") data.subs_agents_involved_in_links 
+             AgentIdSet.iter (Format.fprintf stderr " %i \n") data.subs_agents_involved_in_links 
            in 
-           let _ = Printf.fprintf stderr "Tested_links_map: \n" in 
+           let _ = Format.fprintf stderr "Tested_links_map: \n" in 
            let _ = 
-             SiteIdMap.iter (fun (a,b) -> Printf.fprintf stderr " %i.%i -> %i \n" a b ) data.other_links_test_sites in 
-           let _ = Printf.fprintf stderr "Modified_links_map: \n" in 
+             SiteIdMap.iter (fun (a,b) -> Format.fprintf stderr " %i.%i -> %i \n" a b ) data.other_links_test_sites in 
+           let _ = Format.fprintf stderr "Modified_links_map: \n" in 
            let _ = 
-             SiteIdMap.iter (fun (a,b) -> Printf.fprintf stderr " %i.%i -> %i \n" a b ) data.other_links_action_sites 
+             SiteIdMap.iter (fun (a,b) -> Format.fprintf stderr " %i.%i -> %i \n" a b ) data.other_links_action_sites 
            in 
-           let _ = Printf.fprintf stderr "Potential substitution: \n" in 
+           let _ = Format.fprintf stderr "Potential substitution: \n" in 
            let _ = 
              AgentIdMap.iter 
                (fun id l -> 
                  let _ = 
-                   Printf.fprintf stderr " id:%i\n" id 
+                   Format.fprintf stderr " id:%i\n" id 
                  in 
-                 List.iter (Printf.fprintf stderr "   %i\n") l)
+                 List.iter (Format.fprintf stderr "   %i\n") l)
                data.old_agents_potential_substitution
            in 
-           let _ = Printf.fprintf stderr "Sure agents: \n" in 
+           let _ = Format.fprintf stderr "Sure agents: \n" in 
            let _ = 
-             AgentIdSet.iter (Printf.fprintf stderr " %i \n") data.sure_agents
+             AgentIdSet.iter (Format.fprintf stderr " %i \n") data.sure_agents
            in 
-           let _ = Printf.fprintf stderr "Sure tests: \n" in 
+           let _ = Format.fprintf stderr "Sure tests: \n" in 
            let error = 
              List.fold_left  
                (fun error -> CI.Po.K.print_test parameter handler error " ")
                error 
                (List.rev data.sure_tests)
            in 
-           let _ = Printf.fprintf stderr "Tests to be substituted: \n" in 
+           let _ = Format.fprintf stderr "Tests to be substituted: \n" in 
            let error = 
              AgentIdMap.fold 
                (fun id l error -> 
-                 let _ = Printf.fprintf stderr " %i\n" id in 
+                 let _ = Format.fprintf stderr " %i\n" id in 
                  let error = 
                    List.fold_left 
                      (fun error -> CI.Po.K.print_test parameter handler error "  ")
@@ -993,7 +993,7 @@ module Preblackboard =
            let error = 
              AgentId2Map.fold 
                (fun (id1,id2) l error -> 
-                 let _ = Printf.fprintf stderr " (%i,%i)\n" id1 id2 in 
+                 let _ = Format.fprintf stderr " (%i,%i)\n" id1 id2 in 
                  let error = 
                    List.fold_left 
                      (fun error -> CI.Po.K.print_test parameter handler error "  ")
@@ -1003,18 +1003,18 @@ module Preblackboard =
                data.other_links_tests
                error 
            in 
-           let _ = Printf.fprintf stderr "Sure actions: \n" in 
+           let _ = Format.fprintf stderr "Sure actions: \n" in 
            let error = 
              List.fold_left 
                (fun error -> CI.Po.K.print_action parameter handler error " ")
                error
                (List.rev data.sure_actions)
            in 
-           let _ = Printf.fprintf stderr "Actions to be substituted: \n" in 
+           let _ = Format.fprintf stderr "Actions to be substituted: \n" in 
            let error = 
              AgentIdMap.fold 
                (fun id l error -> 
-                 let _ = Printf.fprintf stderr " %i\n" id in 
+                 let _ = Format.fprintf stderr " %i\n" id in 
                  let error = 
                    List.fold_left 
                      (fun error -> CI.Po.K.print_action parameter handler error "  ")
@@ -1027,7 +1027,7 @@ module Preblackboard =
            let error = 
              AgentId2Map.fold
                (fun (id1,id2) l error -> 
-                 let _ = Printf.fprintf stderr " (%i,%i)\n" id1 id2 in 
+                 let _ = Format.fprintf stderr " (%i,%i)\n" id1 id2 in 
                  let error = 
                    List.fold_left  
                      (fun error -> CI.Po.K.print_action parameter handler error  "  ")
@@ -1037,17 +1037,17 @@ module Preblackboard =
                data.other_links_actions
                error
            in 
-           let _ = Printf.fprintf stderr "Sure side_effects \n" in 
+           let _ = Format.fprintf stderr "Sure side_effects \n" in 
            let _ = 
              List.iter 
                (CI.Po.K.print_side stderr handler " ")
                data.sure_side_effects
            in 
-           let _ = Printf.fprintf stderr "Side effect to be substituted: \n" in 
+           let _ = Format.fprintf stderr "Side effect to be substituted: \n" in 
            let _ = 
              AgentIdMap.iter 
                (fun id l -> 
-                 let _ = Printf.fprintf stderr " %i\n" id in 
+                 let _ = Format.fprintf stderr " %i\n" id in 
                  let _ = 
                    List.iter 
                      (CI.Po.K.print_side stderr handler "  ")
@@ -1966,7 +1966,7 @@ module Preblackboard =
                            data_structure.rule_agent_id_mutex 
                        with 
                          Not_found -> 
-                           let _ = Printf.fprintf stdout "ERROR line 1332: %i \n" rule_ag_id  in raise Exit
+                           let _ = Format.printf "ERROR line 1332: %i \n" rule_ag_id  in raise Exit
                      in 
                      let error,blackboard,test_map = 
                        List.fold_left 

@@ -851,7 +851,7 @@ let configurations_of_result result =
     | (v,pos) :: _ -> ass := f (v,pos)
     | [] -> ExceptionDefn.warning
 	      ~pos:pos_p
-	      (fun f -> Printf.fprintf f "Empty value for parameter %s" param)
+	      (fun f -> Format.fprintf f "Empty value for parameter %s" param)
   in
   List.iter
     (fun ((param,pos_p),value_list) ->
@@ -905,7 +905,7 @@ let configurations_of_result result =
      | "plotSepChar" ->
 	set_value pos_p param value_list
 		  (fun (v,p) ->
-		   fun f ->  Printf.fprintf f "%s" v
+		   fun f ->  Format.fprintf f "%s" v
 		  ) Parameter.plotSepChar
      | "maxConsecutiveClash" ->
 	set_value pos_p param value_list

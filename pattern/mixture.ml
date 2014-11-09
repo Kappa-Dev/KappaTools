@@ -104,8 +104,9 @@ let is_bound (a_i,s_i) mix =
 
 let empty id_opt = {
 	agents = IntMap.empty ;
-	site_number = 0 ;
 	graph = Int2Map.empty ;
+
+	site_number = 0 ;
 	enum_cov = None ;
 	ids_of_name = Int2Map.empty ;
 	component_of_id = None ;
