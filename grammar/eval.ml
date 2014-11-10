@@ -571,9 +571,9 @@ let effects_of_modif variables lrules env ast_list =
 	      rule_of_ast ~is_pert:true env mixs'
 			  (Some (Term.with_dummy_pos nme_pert),ast_rule) in
 	    let str =
-	      (Printf.sprintf "introduce %a * %a"
-			      Expr.ast_alg_to_string (fst alg_expr)
-			      (Kappa_printer.mixture_to_string false env)
+	      (Format.asprintf "introduce %a * %a"
+			       Expr.print_ast_alg (fst alg_expr)
+			       (Kappa_printer.mixture false env)
 			      rule.Primitives.rhs)::str_pert
 	    in (mixs'', rule::lrules,
 		(Primitives.ITER_RULE (alg_pos, rule))::effects, str, env)
@@ -596,9 +596,9 @@ let effects_of_modif variables lrules env ast_list =
 	      rule_of_ast ~is_pert:true env mixs'
 			  (Some (Term.with_dummy_pos nme_pert),ast_rule) in
 	    let str =
-	      (Printf.sprintf "remove %a * %a"
-			      Expr.ast_alg_to_string (fst alg_expr)
-			      (Kappa_printer.mixture_to_string false env)
+	      (Format.asprintf "remove %a * %a"
+			      Expr.print_ast_alg (fst alg_expr)
+			      (Kappa_printer.mixture false env)
 			      rule.Primitives.lhs)::str_pert
 	    in (mixs'', rule::lrules,
 		(Primitives.ITER_RULE (alg_pos, rule))::effects, str, env)

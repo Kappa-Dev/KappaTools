@@ -589,8 +589,8 @@ let enable r mix env =
       try Mixture.agent_of_id root pat1
       with Not_found ->
 	invalid_arg
-	  (Format.sprintf "Dynamics.enable: agent %d not found in %a"
-			  root (Kappa_printer.mixture_to_string true env) pat1) in
+	  (Format.asprintf "Dynamics.enable: agent %d not found in %a"
+			  root (Kappa_printer.mixture true env) pat1) in
     let name_id_root = Mixture.name root_ag in
     let candidates = (*agent id in lhs --all cc-- that have the name name_id_root*)
       let cpt = ref 0
@@ -675,8 +675,8 @@ let enable r mix env =
 let to_kappa r env =
   try Environment.rule_of_num r.r_id env
   with Not_found ->
-    Format.sprintf "%a->%a" (Kappa_printer.mixture_to_string false env) r.lhs
-		   (Kappa_printer.mixture_to_string false env) r.rhs
+    Format.asprintf "%a->%a" (Kappa_printer.mixture false env) r.lhs
+		   (Kappa_printer.mixture false env) r.rhs
 
 let dump r env =
   let pr_r f =

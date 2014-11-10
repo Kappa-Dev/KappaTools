@@ -467,13 +467,13 @@ let dot_of_influence_map desc state env =
      let n_label = Dynamics.to_kappa rule env in
      IntMap.iter
        (fun mix_id glueings ->
-	let n_label' =
+	let n_label' f =
 	  if Environment.is_rule mix_id env then
 	    let rule'=rule_of_id mix_id state in
-	    Dynamics.to_kappa rule' env
+	    Format.fprintf f "%s" (Dynamics.to_kappa rule' env)
 	  else
 	    let mix = kappa_of_id mix_id state in
-	    Kappa_printer.mixture_to_string false env () mix
+	    Kappa_printer.mixture false env f mix
 	in
 	let arrow_label =
 	  let ls =
@@ -486,7 +486,7 @@ let dot_of_influence_map desc state env =
 	  in
 	  LongString.to_string ls
 	in
-	Format.fprintf desc "\"%d:%s\" -> \"%d:%s\" [label=\"%s\"];@\n"
+	Format.fprintf desc "\"%d:%s\" -> \"%d:%t\" [label=\"%s\"];@\n"
 		       r_id n_label mix_id n_label' arrow_label
        ) act_map
     ) state.influence_map ;
@@ -1296,9 +1296,9 @@ let negative_upd state cause (u,i) int_lnk counter env =
 							   let a_i = Mixture.agent_of_id i mix in
 							   let u_j = try SiteGraph.node_of_id state.graph j
 								     with exn ->
-								       invalid_arg (Format.sprintf
-										      "State.negative_update: Node #%d is no longer in the graph and injection %s of mixture %s was pointing on it!"
-										      j (Injection.to_string phi) (Kappa_printer.mixture_to_string false env () mix))
+								       invalid_arg (Format.asprintf
+										      "State.negative_update: Node #%d is no longer in the graph and injection %s of mixture %a was pointing on it!"
+										      j (Injection.to_string phi) (Kappa_printer.mixture false env) mix)
 								in
 								Mixture.fold_interface
 								(fun site_id (int_opt, lnk_opt) _ ->
