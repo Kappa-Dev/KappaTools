@@ -22,8 +22,8 @@ EXP=$(EXPECTED_DOT:.dot=.dot.ref) $(EXPECTED_DAT:.dat=.dat.ref) $(EXPECTED_LOG:.
 all: test
 
 build: $(EXPECTED_OUTPUT_PATH)
-	@make clean_all
-	@make $(EXPECTED_OUTPUT_PATH)
+	@+$(MAKE) clean_all
+	@+$(MAKE) $(EXPECTED_OUTPUT_PATH)
 	@sh README >> $(EXPECTED_OUTPUT_PATH)/LOG 2> $(EXPECTED_OUTPUT_PATH)/error.log 
 
 $(EXPECTED_OUTPUT_PATH):
@@ -37,13 +37,13 @@ $(SCRIPT): README
 	@sed "s/expected-output/tmp/g" $< > $@
 
 test: 
-	@make clean > /dev/null
-	@make $(TMP) > /dev/null
-	@make launch_script >> $(TMP)/LOG 2> $(TMP)/error.log
-	@make do_copy > /dev/null
-	@make do_diff > /dev/null
-	@make error > /dev/null
-	@make clean_light > /dev/null
+	@+$(MAKE) clean > /dev/null
+	@+$(MAKE) $(TMP) > /dev/null
+	@+$(MAKE) launch_script >> $(TMP)/LOG 2> $(TMP)/error.log
+	@+$(MAKE) do_copy > /dev/null
+	@+$(MAKE) do_diff > /dev/null
+	@+$(MAKE) error > /dev/null
+	@+$(MAKE) clean_light > /dev/null
 
 launch_script: $(SCRIPT)
 	@sh $<
@@ -94,7 +94,7 @@ clean_light:
 	@rm -rf $(SCRIPT) $(ERROR_TMP)
 
 clean_all:
-	@make clean
+	@+$(MAKE) clean
 	@rm -rf $(EXPECTED_OUTPUT_PATH) 
 
 pdf: $(PDF)

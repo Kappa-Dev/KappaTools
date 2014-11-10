@@ -8,4 +8,4 @@ install: sudo apt-get install -qq ocaml-nox
 
 script:
   - make all
-  - make check
+  - make -j2 check

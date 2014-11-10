@@ -24,7 +24,7 @@ clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch
 	+$(MAKE) KAPPABIN=$(CURDIR)/bin/ -C models/cflows clean
 
 check:
-	+$(MAKE) KAPPABIN=$(CURDIR)/bin/ -C models/cflows
+	@+$(MAKE) KAPPABIN=$(CURDIR)/bin/ -C models/cflows
 
 temp-clean-for-ignorant-that-clean-must-be-done-before-fetch:
 	find . \( -name \*.cm\* -or -name \*.o -or -name \*.annot \) -delete

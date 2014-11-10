@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := all
 
 %/error: $(shell which $(KAPPABIN)KaSim)
-	+$(MAKE) -C $(shell dirname $@) test
+	@+$(MAKE) -C $(shell dirname $@) test
 
 error: $(foreach dir,$(shell find $(CURDIR) -mindepth 1 -maxdepth 1 -type d -print),$(dir)/error)
 	@cat $^ > $@
