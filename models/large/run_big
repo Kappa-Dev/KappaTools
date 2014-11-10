@@ -1,1 +1,1 @@
-${KASIMBIN}KaSim -i big_0.ka -i big_1.ka -i big_2.ka -t 100 -p 1000
+${KAPPABIN}KaSim -i big_0.ka -i big_1.ka -i big_2.ka -t 100 -p 1000
