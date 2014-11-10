@@ -62,7 +62,7 @@ module Injection =
 		let string_of_coord phi = 
 			let a = get_address phi and (m,c) = get_coordinate phi 
 			in 
-			Printf.sprintf "(%d,%d,%d)" m c a
+			Format.sprintf "(%d,%d,%d)" m c a
 		
 		let copy phi = fold (fun i j phi' -> add i j phi') phi {map = Hashtbl.create (size phi) ; address = None ; coordinate = get_coordinate phi}
 	end
@@ -213,43 +213,46 @@ module Counter =
 								Some m
 								
 		let tick counter time event =
-			let _ = 
-				if not counter.initialized then
-					let c = ref !Parameter.progressBarSize in
-						while !c > 0 do
-							print_string "_" ;
-							c:=!c-1
-						done ;
-						print_newline() ; 
-						counter.initialized <- true ; 
-			and last_event,last_time = counter.last_tick
-			in
-				let n_t = 
-					match !Parameter.maxTimeValue with
-						| None -> 0
-						| Some tmax ->
-							let n = int_of_float ((time -. last_time) *. (float_of_int !Parameter.progressBarSize) /. tmax) in
-								n
-				and n_e = 
-					match !Parameter.maxEventValue with
-						| None -> 0
-						| Some emax -> 
-							if emax = 0 then 0 
-							else
-							  let nplus = (event * !Parameter.progressBarSize) / emax in 
-                                                          let nminus = (last_event * !Parameter.progressBarSize) / emax in 
-                                                          nplus-nminus 
-				in
-					let n = ref (max n_t n_e) in
-						if !n>0 then set_tick counter (event,time) ;
-						while !n > 0 do
-							Printf.printf "%c" !Parameter.progressBarSymbol ;
-							if !Parameter.eclipseMode then print_newline() ;
-							inc_tick counter ;
-							n:=!n-1 
-						done ;
-						flush stdout
-	                                          
+		  let () =
+		    if not counter.initialized then
+		      let c = ref !Parameter.progressBarSize in
+		      while !c > 0 do
+			Format.print_string "_" ;
+			c:=!c-1
+		      done ;
+		      Format.print_newline () ;
+		      counter.initialized <- true
+		  in
+		  let last_event,last_time = counter.last_tick in
+		  let n_t =
+		    match !Parameter.maxTimeValue with
+		    | None -> 0
+		    | Some tmax ->
+		       int_of_float
+			 ((time -. last_time) *.
+			    (float_of_int !Parameter.progressBarSize) /. tmax)
+		  and n_e =
+		    match !Parameter.maxEventValue with
+		    | None -> 0
+		    | Some emax ->
+		       if emax = 0 then 0
+		       else
+			 let nplus =
+			   (event * !Parameter.progressBarSize) / emax in
+                         let nminus =
+			   (last_event * !Parameter.progressBarSize) / emax in
+                         nplus-nminus
+		  in
+		  let n = ref (max n_t n_e) in
+		  if !n>0 then set_tick counter (event,time) ;
+		  while !n > 0 do
+		    Format.printf "%c" !Parameter.progressBarSymbol ;
+		    if !Parameter.eclipseMode then Format.print_newline ();
+		    inc_tick counter ;
+		    n:=!n-1
+		  done;
+		  Format.print_flush ()
+
 	 	let stat_null i c = try c.stat_null.(i) <- c.stat_null.(i) + 1 with exn -> invalid_arg "Invalid null event identifier"
               
 		let create init_t init_e mx_t mx_e = 
@@ -303,32 +306,30 @@ module Palette:
 
 
 	let tick_stories n_stories (init,last,counter) =
-	  let _ = 
+	  let () =
 	    if not init then
 	      let c = ref !Parameter.progressBarSize in
-	      let _ = print_newline () in 
+	      let () = Format.print_newline () in
               while !c > 0 do
-		print_string "_" ;
+		Format.print_string "_" ;
 		c:=!c-1
 	      done ;
-	      print_newline() ; 
+	      Format.print_newline()
 	  in
-	  let nc = (counter * !Parameter.progressBarSize) / n_stories in 
-          let nl = (last * !Parameter.progressBarSize) / n_stories in 
-          let n = nc - nl in 
-          let rec aux n = 
-            if n<=0 then () 
-            else 
-              let _ = Printf.printf "%c" (!Parameter.progressBarSymbol) in 
-              let _ = 
-                if !Parameter.eclipseMode then print_newline() ;
-			    in 
+	  let nc = (counter * !Parameter.progressBarSize) / n_stories in
+          let nl = (last * !Parameter.progressBarSize) / n_stories in
+          let n = nc - nl in
+          let rec aux n =
+            if n<=0 then ()
+            else
+              let () = Format.printf "%c" (!Parameter.progressBarSymbol) in
+              let () = if !Parameter.eclipseMode then print_newline() in
               aux (n-1)
-          in 
-          let _ = aux n in 
-	  let _ =  flush stdout in  
+          in
+          let () = aux n in
+	  let _ =  Format.print_flush () in
           (true,counter,counter+1)
-            
+
 type 'a simulation_info = (* type of data to be given with obersables for story compression (such as date when the obs is triggered*)
     {
       story_id: int ; 
