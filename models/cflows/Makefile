@@ -1,7 +1,13 @@
-all:
-	@for i in * ; do (if (file $$i | grep directory ) then (cd $$i ; $(MAKE) ; ) else (echo 0 > /dev/null ; ) ;  fi ; )   ; done 
-	@cat */error > error 
-	@if (test -s error) then (cat error) else (echo "No difference has been found") fi;
+.DEFAULT_GOAL := all
+
+%/error: $(shell which $(KAPPABIN)KaSim)
+	+$(MAKE) -C $(shell dirname $@) test
+
+error: $(foreach dir,$(shell find $(CURDIR) -mindepth 1 -maxdepth 1 -type d -print),$(dir)/error)
+	@cat $^ > $@
+
+all: error
+	@if [ -s $< ] ; then cat $< && exit 2 ; else echo "No difference has been found" ; fi
 
 build:
 	@for i in * ; do (if (file $$i | grep directory ) then (cd $$i ; $(MAKE) build ; ) else (echo 0 > /dev/null ; ) ;  fi ; )   ; done 
