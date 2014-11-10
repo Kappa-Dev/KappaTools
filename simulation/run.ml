@@ -67,7 +67,9 @@ let event state maybe_active_pert_ids story_profiling
 		 let desc = if !Parameter.dotOutput
 			    then open_out "deadlock.dot"
 			    else open_out "deadlock.ka" in
-		 State.snapshot state counter desc true env
+		 let () =
+		   State.snapshot state counter desc true env in
+		 close_out desc
 	       else () ;
 	       raise Deadlock
 	     end in

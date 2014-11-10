@@ -183,7 +183,8 @@ let apply_effect p_id pert tracked pert_events state counter env =
     let desc = open_out filename in
     let hr = !Parameter.snapshotHighres in
     Parameter.openOutDescriptors := desc::(!Parameter.openOutDescriptors) ;
-    State.snapshot state counter desc hr env; (*could use a dedicated thread here*)
+    State.snapshot state counter desc hr env;
+    (*could use a dedicated thread here*)
     close_out desc ;
     Parameter.openOutDescriptors := List.tl (!Parameter.openOutDescriptors)
   in

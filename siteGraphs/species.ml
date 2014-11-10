@@ -21,74 +21,83 @@ let to_string spec env =
 	in
 	String.concat "," (List.rev l)
 
-let print desc spec env = 
-	let hsh_lnk = Hashtbl.create 0
-	and mx = IntMap.size spec.nodes in
-	let _ =
-		IntMap.fold
-		(fun id node (fresh,cpt) ->
-					let (str, fresh) = Node.to_string false (hsh_lnk, fresh) node env in
-					Printf.fprintf desc "%s" str ;
-					if cpt = (mx-1) then () else Printf.fprintf desc "," ;
-					(fresh,cpt+1)
-		) spec.nodes (0,0) 
-	in
-	()
-	
+let print env desc spec =
+  let hsh_lnk = Hashtbl.create 0 in
+  let mx = IntMap.size spec.nodes in
+  let _ =
+    IntMap.fold
+      (fun id node (fresh,cpt) ->
+       let (str, fresh) = Node.to_string false (hsh_lnk, fresh) node env in
+       Format.fprintf desc "%s" str ;
+       if cpt = (mx-1) then () else Format.fprintf desc "," ;
+       (fresh,cpt+1)
+      ) spec.nodes (0,0)
+  in
+  ()
 
-let to_dot hr palette k cpt spec desc env = 
-	let rand_rgb () = 
-		(fun (r,g,b) -> (string_of_float r^","^string_of_float g^","^string_of_float b)) 
-		((Random.float 0.5)+.0.5,(Random.float 0.5)+.0.5, (Random.float 0.5)+.0.5)
-	in
-	let get_color lbl = 
-		if not !Parameter.useColor then "white"
-		else
-		let rgb = try Hashtbl.find palette lbl with Not_found -> rand_rgb()
-		in
+let to_dot hr palette k cpt spec desc env =
+  let rand_rgb () =
+    Format.sprintf "%f,%f,%f" ((Random.float 0.5)+.0.5)
+		   ((Random.float 0.5)+.0.5) ((Random.float 0.5)+.0.5) in
+  let get_color lbl =
+    if not !Parameter.useColor then "white"
+    else
+      try Hashtbl.find palette lbl
+      with Not_found -> let rgb = rand_rgb() in
 			Hashtbl.replace palette lbl rgb ; rgb
-	in
-		
-	Printf.fprintf desc "subgraph cluster%d{\n" cpt ;
-	Printf.fprintf desc "\tcounter%d [label = \"%d instance(s)\", shape=none];\n" cpt k ;
-	let bonds = 
-		IntMap.fold
-		(fun i node bonds ->
-			let label = Node.label node env
-			in
-			Printf.fprintf desc "\tnode%d_%d [label = \"%s\", color = \"%s\", style=filled];\n" cpt i label (get_color label)  ; 
-			Printf.fprintf desc "\tnode%d_%d -> counter%d [style=invis];\n" cpt i cpt ; 
-			Node.fold_status 
-			(fun site_id status cont -> 
-				match status with
-					| (int_opt,Node.FPtr (j,k)) -> 
-						if j < i then cont
-						else
-							let node' = try IntMap.find j spec.nodes with Not_found -> invalid_arg "Species.to_dot: Node not found"
-							in
-							let int_opt'= Node.internal_state (node',k) in
-							let nme node_name site_id int_opt =
-								match int_opt with
-									| Some int -> 
-										let str = Environment.state_of_id node_name site_id int env 
-										in
-										let n = Environment.site_of_id node_name site_id env in
-										(n^"~"^str)
-									| None -> Environment.site_of_id node_name site_id env
-							in
-							(i,nme (Node.name node) site_id int_opt,j,nme (Node.name node') k int_opt')::cont
-						| _ -> cont
-			) node bonds
-		) spec.nodes []
-	in
-	List.iter
-	(fun (i,s_i,j,s_j) ->
-		if hr then
-			Printf.fprintf desc "\t node%d_%d -> node%d_%d [taillabel=\"%s\", headlabel=\"%s\", dir=none];\n" cpt i cpt j s_i s_j
-		else
-			Printf.fprintf desc "\t node%d_%d -> node%d_%d [dir=none];\n" cpt i cpt j 
-	) bonds ;
-	Printf.fprintf desc "}\n" 
+  in
+
+  Format.fprintf desc "subgraph cluster%d@,{@[<v 1>" cpt;
+  Format.fprintf desc
+		 "@,counter%d [label = \"@[<h>%d instance(s)@]\", shape=none];"
+		 cpt k ;
+  let bonds =
+    IntMap.fold
+      (fun i node bonds ->
+       let label = Node.label node env
+       in
+       Format.fprintf
+	 desc
+	 "@,node%d_%d [@[<h>label = \"%s\",@] @[<h>color = \"%s\",@] style=filled];"
+	 cpt i label (get_color label);
+       Format.fprintf desc "@,node%d_%d -> counter%d [style=invis];" cpt i cpt;
+       Node.fold_status
+	 (fun site_id status cont ->
+	  match status with
+	  | (int_opt,Node.FPtr (j,k)) ->
+	     if j < i then cont
+	     else
+	       let node' =
+		 try IntMap.find j spec.nodes
+		 with Not_found -> invalid_arg "Species.to_dot: Node not found"
+	       in
+	       let int_opt'= Node.internal_state (node',k) in
+	       let nme node_name site_id = function
+		 | Some int ->
+		    let str = Environment.state_of_id node_name site_id int env
+		    in
+		    let n = Environment.site_of_id node_name site_id env in
+		    (n^"~"^str)
+		 | None -> Environment.site_of_id node_name site_id env
+	       in
+	       (i,nme (Node.name node) site_id int_opt,
+		j,nme (Node.name node') k int_opt')::cont
+	  | _ -> cont
+	 ) node bonds
+      ) spec.nodes []
+  in
+  (match bonds with _::_ -> Format.pp_print_cut desc () | []-> ());
+  List.iter
+    (fun (i,s_i,j,s_j) ->
+     if hr then
+       Format.fprintf
+	 desc
+	 "@,node%d_%d -> node%d_%d [@[<h>taillabel = \"%s\",@] @[<h>headlabel = \"%s\",@] dir=none];"
+	 cpt i cpt j s_i s_j
+     else
+       Format.fprintf desc "@,node%d_%d -> node%d_%d [dir=none];" cpt i cpt j
+    ) bonds ;
+  Format.fprintf desc "@]@,}@,"
 
 
 (**[of_node sg root visited env] produces the species anchored at node [root] allocated in the graph [sg] and *)
@@ -226,35 +235,42 @@ let of_graph sg env =
 	species
 
 let dump desc table hr token_vector env =
-	let palette = Hashtbl.create 10 in
-	
-	Printf.fprintf desc "digraph G{\n" ;
-	let _ = 
-		Hashtbl.fold
-		(fun _ specs cpt ->
-				let c = ref cpt in
-				List.iter
-				(fun (spec, k) ->
-					to_dot hr palette k !c spec desc env ;
-					c := !c + 1
-				) specs ;
-				!c+1
-		) table 0
-	in
-	Array.iteri
-	(fun tk_id v ->
-		let tk = Environment.token_of_num tk_id env in
-		Printf.fprintf desc "token_%d [label = \"%s (%E)\" , shape=none]" tk_id tk v
-	) token_vector ;
-	Printf.fprintf desc "}\n" 
-	
+  let (palette: (string,string) Hashtbl.t) = Hashtbl.create 10 in
+
+  let () = Format.fprintf desc "digraph G{@.@[<v>" in
+  let _ =
+    Hashtbl.fold
+      (fun _ specs cpt ->
+       let c = ref cpt in
+       List.iter
+	 (fun (spec, k) ->
+	  to_dot hr palette k !c spec desc env ;
+	  c := !c + 1
+	 ) specs ;
+       !c+1
+      ) table 0
+  in
+  Array.iteri
+    (fun tk_id v ->
+     let tk = Environment.token_of_num tk_id env in
+     Format.fprintf desc "token_%d [label = \"%s (%E)\" , shape=none];@,"
+		    tk_id tk v
+    ) token_vector ;
+  Format.fprintf desc "@]}@."
+
 let dump_table table env =
-	Hashtbl.iter
-		(fun _ specs ->
-					List.iter
-						(fun (spec, k) ->
-									Printf.printf "%d instances of species: %s\n" k (to_string spec env);
-									Printf.printf "with signature %s\n" (Tools.string_of_map Int64.to_string (fun _ -> "") Int64Map.fold spec.views) ;
-									Printf.printf "******\n"
-						) specs
-		) table
+  let () = Format.open_vbox 0 in
+  let () =
+    Hashtbl.iter
+      (fun () specs ->
+       List.iter
+	 (fun (spec, k) ->
+	  Format.printf "%d instances of species: %s@," k (to_string spec env);
+	  Format.printf
+	    "with signature %s@,"
+	    (Tools.string_of_map Int64.to_string (fun _ -> "") Int64Map.fold spec.views);
+	  Printf.printf "******@,"
+	 ) specs
+      ) table in
+  let () = Format.close_box () in
+  Format.print_newline ()
