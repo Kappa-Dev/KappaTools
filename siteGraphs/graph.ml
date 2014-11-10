@@ -171,61 +171,61 @@ struct
 			(fun id node map ->
 						IntMap.add id (Node.marshalize node) map
 			) sg IntMap.empty
-	
+
 	let to_dot ?(with_heap=false) sg dotfile env =
-		let header = "digraph G{\n\t nodesep=.05;\n\t rankdir=LR;\n\t node [shape=record];\n" in
-		let hp_ls, nodes_ls, bonds_ls =
-			fold 
-			(fun i node (hp_ls,nodes_ls, bonds_ls) ->
-				let hp_ls = LongString.concat ~sep:'|' (Printf.sprintf "<n%d> %d" i i) hp_ls
-				and nodes_ls = 
-						let l = 
-							Node.fold_status 
-							(fun site_id status cont -> 
-								if site_id = 0 then (Printf.sprintf "<s%d> %s" site_id (Environment.name (Node.name node) env))::cont
-								else
-								let int_str = 
-									match status with 
-										| (Some i,_) -> "~"^(Environment.state_of_id (Node.name node) site_id i env) 
-										| _ -> "" 
-								in
-								let label = (Environment.site_of_id (Node.name node) site_id env)^int_str in
-								(Printf.sprintf "<s%d> %s" site_id label)::cont
-								) node [] 
-						in
-						LongString.concat (Printf.sprintf "\tnode%d [label = \"{%s}\"];\n" i (String.concat "|" (List.rev l))) nodes_ls
-				and bonds_ls = 
-					let l = 
-							Node.fold_status 
-							(fun site_id status cont -> 
-								match status with 
-									| (_,Node.Ptr (node',j)) -> (Printf.sprintf "node%d:s%d -> node%d:s%d;" i site_id (Node.get_address node') j)::cont
-									| (_,Node.FPtr (n,j)) -> (Printf.sprintf "node%d:s%d -> node%d:s%d;" i site_id n j)::cont
-									| _ -> cont
-							) node [] 
-					in
-					if with_heap then
-						LongString.concat (Printf.sprintf "heap:n%d -> node%d:s0\n" i i) (LongString.concat (String.concat "\n" l) bonds_ls)
-					else
-						LongString.concat (String.concat "\n" l) bonds_ls
-				in
-				(hp_ls,nodes_ls,bonds_ls)
-			)
-			sg (LongString.empty,LongString.empty,LongString.empty)
-		in
-		let d = open_out dotfile in
-		Printf.fprintf d "%s" header ;
-		if with_heap then
-			begin
-				Printf.fprintf d "heap [label = \"" ; 
-				LongString.printf d hp_ls ;
-				Printf.fprintf d "\",height=%f];\n" (float_of_int (size sg) /. 1.5)
-			end ;
-		LongString.printf d nodes_ls ;
-		LongString.printf d bonds_ls ;
-		Printf.fprintf d "}\n" ;
-		close_out d
-		
+	  let hp_ls, nodes_ls, bonds_ls =
+	    fold
+	      (fun i node (hp_ls,nodes_ls, bonds_ls) ->
+	       let hp_ls = LongString.concat ~sep:'|' (Printf.sprintf "<n%d> %d" i i) hp_ls
+	       and nodes_ls =
+		 let l =
+		   Node.fold_status
+		     (fun site_id status cont ->
+		      if site_id = 0 then (Printf.sprintf "<s%d> %s" site_id (Environment.name (Node.name node) env))::cont
+		      else
+			let int_str =
+			  match status with
+			  | (Some i,_) -> "~"^(Environment.state_of_id (Node.name node) site_id i env) 
+			  | _ -> ""
+			in
+			let label = (Environment.site_of_id (Node.name node) site_id env)^int_str in
+			(Printf.sprintf "<s%d> %s" site_id label)::cont
+		     ) node []
+		 in
+		 LongString.concat (Printf.sprintf "\tnode%d [label = \"{%s}\"];\n" i (String.concat "|" (List.rev l))) nodes_ls
+	       and bonds_ls =
+		 let l =
+		   Node.fold_status
+		     (fun site_id status cont ->
+		      match status with
+		      | (_,Node.Ptr (node',j)) -> (Printf.sprintf "node%d:s%d -> node%d:s%d;" i site_id (Node.get_address node') j)::cont
+		      | (_,Node.FPtr (n,j)) -> (Printf.sprintf "node%d:s%d -> node%d:s%d;" i site_id n j)::cont
+		      | _ -> cont
+		     ) node []
+		 in
+		 if with_heap then
+		   LongString.concat (Printf.sprintf "heap:n%d -> node%d:s0\n" i i) (LongString.concat (String.concat "\n" l) bonds_ls)
+		 else
+		   LongString.concat (String.concat "\n" l) bonds_ls
+	       in
+	       (hp_ls,nodes_ls,bonds_ls)
+	      )
+	      sg (LongString.empty,LongString.empty,LongString.empty)
+	  in
+	  let d_chan = open_out dotfile in
+	  let d = Format.formatter_of_out_channel d_chan in
+	  Format.fprintf
+	    d "@[<v>digraph G{@,\t nodesep=.05;@,\t rankdir=LR;@,\t node [shape=record];@,";
+	  let () =
+	    if with_heap then
+	      Format.fprintf d "heap [label = @[<h>\"%a\"@],height=%f];@,"
+			     (LongString.printf ?no_reverse:None) hp_ls
+			     (float_of_int (size sg) /. 1.5) in
+	  LongString.printf d nodes_ls ;
+	  LongString.printf d bonds_ls ;
+	  Format.fprintf d "}@." ;
+	  close_out d_chan
+
 	let dump ?(with_lift = false) sg env =
 		let hsh_lnk = Hashtbl.create (A.dimension sg)
 		

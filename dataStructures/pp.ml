@@ -15,6 +15,7 @@ let int f i = fprintf f "%i" i
 let comma f = fprintf f ", "
 let colon f = fprintf f "; "
 let space f = fprintf f " "
+let empty f = fprintf f ""
 
 let position f (beg_pos,end_pos) =
   let () = assert (beg_pos.Lexing.pos_fname = end_pos.Lexing.pos_fname) in

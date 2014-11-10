@@ -8,6 +8,7 @@ val int : Format.formatter -> int -> unit
 val comma : Format.formatter -> unit
 val colon : Format.formatter -> unit
 val space : Format.formatter -> unit
+val empty : Format.formatter -> unit
 val error : (Format.formatter -> 'a -> unit) -> 'a Term.with_pos -> unit
 val position : Format.formatter -> (Lexing.position * Lexing.position) -> unit
 

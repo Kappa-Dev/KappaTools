@@ -335,26 +335,24 @@ let cut attribute_ids grid =
 	in
 	build_config attribute_ids empty_config
 
-let string_of_atom atom = 
-	let imp_str = match atom.causal_impact with 1 -> "o" | 2 -> "x" | 3 -> "%" | _ -> invalid_arg "Causal.string_of_atom" in
-	Printf.sprintf "%s_%d" imp_str atom.eid
-		
-let dump grid fic state env = 
-	let d = open_out ((Filename.chop_extension fic)^".txt") in
-	Hashtbl.fold 
-	(fun (n_id,s_id,q) att _ ->
-		let q_name = "#"^(string_of_int n_id)^"."^(string_of_int s_id)^(if q=0 then "~" else "!") in
-		let att_ls =
-			List.fold_left
-			(fun ls atom -> LongString.concat (string_of_atom atom) ls) 
-			LongString.empty (List.rev att)
-		in
-		Printf.fprintf d "%s:" q_name ; 
-		LongString.printf d att_ls ;
-		Printf.fprintf d "\n"
-	) grid.flow () ;
-	close_out d
-	
+let pp_atom f atom =
+  let imp_str = match atom.causal_impact with
+      1 -> "o" | 2 -> "x" | 3 -> "%"
+      | _ -> invalid_arg "Causal.string_of_atom" in
+  Format.fprintf f "%s_%d" imp_str atom.eid
+
+let dump grid fic state env =
+  let d_chan = open_out ((Filename.chop_extension fic)^".txt") in
+  let d = Format.formatter_of_out_channel d_chan in
+  let () = Format.pp_open_vbox d 0 in
+  Hashtbl.fold
+    (fun (n_id,s_id,q) att _ ->
+     Format.fprintf d "#%i.%i%c:%a@," n_id s_id (if q=0 then '~' else '!')
+		    (Pp.list Pp.empty pp_atom) att
+    ) grid.flow () ;
+  let () = Format.fprintf d "@]@." in
+  close_out d_chan
+
 let label env state e = 
   match e with
     | OBS mix_id -> Environment.kappa_of_num mix_id env
