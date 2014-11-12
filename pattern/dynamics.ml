@@ -330,9 +330,9 @@ let diff pos m0 m1 label_opt env =
 	     end
 	  | (Mixture.BND, Mixture.BND | Mixture.TYPE _, Mixture.BND) -> (*connected -> connected*)
 	     begin
-	       let opt, opt' = (Mixture.follow (id, site_id) m0, Mixture.follow (id, site_id) m1) in
-	       if opt = opt' then (inst,idmap) (*no change to be made*)
-	       else
+               let opt, opt' = (Mixture.follow (id, site_id) m0, Mixture.follow (id, site_id) m1) in
+	       (*if opt = opt' then (inst,idmap) (*no change to be made*) (*issue87*)
+	       else*)
 		 match (opt, opt') with
 		 | (None, Some (id1', i1')) -> (*sub-case: semi-link -> connected*)
 		    (*warning*)
@@ -361,6 +361,7 @@ let diff pos m0 m1 label_opt env =
 			   
 		 | (Some (id1, i1), Some (id1', i1')) -> (*sub-case: connected -> connected*)
 		    (*warning*)
+                    let idmap = add_map (KEPT id) (site_id,1) idmap in (*issue87*)
 		    let site = Environment.site_of_id (Mixture.name ag) site_id env in
 		    let _ =
 		      pp_warning

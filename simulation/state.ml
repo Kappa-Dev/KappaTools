@@ -1323,7 +1323,8 @@ let negative_upd state cause (u,i) int_lnk counter env =
 
 (* bind allow for looping bond *)
 let bind state cause (u, i) (v, j) side_effects pert_ids counter env =
-	
+	if !Parameter.debugModeOn then
+                Printf.printf "Binding nodes %d and %d \n" (Node.name u) (Node.name v) ; flush stdout ;
 	let intf_u = Node.interface u and intf_v = Node.interface v in
 	(* no side effect *)
 	let (int_u_i, ptr_u_i) = try intf_u.(i).Node.status with Invalid_argument msg -> invalid_arg (Printf.sprintf "State.bind: agent %s has no site %d" (Environment.name (Node.name u) env) i)
@@ -1410,7 +1411,9 @@ let modify state cause (u, i) s pert_ids counter env =
 					((Environment.name (Node.name u) env)^" has no internal state to modify"))
 
 let delete state cause u side_effects pert_ids counter env =
-	Node.fold_status
+        if !Parameter.debugModeOn then
+                Printf.printf "Deleting node %d \n" (Node.name u) ; flush stdout ;
+        Node.fold_status
 	(fun i (_, lnk) (env,side_effects,pert_ids) ->
 		let env,pert_ids' = negative_upd state cause (u, i) 2 counter env in
 		let pert_ids = IntSet.union pert_ids pert_ids' in
@@ -1419,6 +1422,8 @@ let delete state cause u side_effects pert_ids counter env =
 			| Node.FPtr _ -> invalid_arg "State.delete"
 			| Node.Null -> (env,side_effects,pert_ids)
 			| Node.Ptr (v, j) ->
+                                        if !Parameter.debugModeOn then
+                                                Printf.printf "Deleting node %d which was connected to node %d \n" (Node.name u) (Node.name v) ; flush stdout ;
 					Node.set_ptr (v, j) Node.Null;
 					let env,pert_ids' = negative_upd state cause (v, j) 1 counter env in
 					let pert_ids = IntSet.union pert_ids pert_ids' in
