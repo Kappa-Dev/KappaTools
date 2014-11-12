@@ -4,9 +4,6 @@ open ExceptionDefn
 open Graph
 open Primitives
 
-(*Whenever v denotes a constant "variable" there is no need to keep it unevaluated, we use dummy arguments to reduce it*)
-let close_var v = v (fun _ -> Nbr.I 0) (fun i -> Nbr.I 0) 0.0 0 0 0. (fun i -> Nbr.I 0)
-
 let compute_causal lhs rhs script env =
   let open Primitives.Causality in
   let causal_map = (*adding tests for all sites mentionned in the left hand side --including existential site*)
