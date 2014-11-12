@@ -358,7 +358,7 @@ let diff pos m0 m1 label_opt env =
 			(inst,idmap')
 		      end
 		    else (inst,idmap')
-			   
+
 		 | (Some (id1, i1), Some (id1', i1')) -> (*sub-case: connected -> connected*)
 		    (*warning*)
                     let idmap = add_map (KEPT id) (site_id,1) idmap in (*issue87*)
@@ -491,7 +491,7 @@ let diff pos m0 m1 label_opt env =
     in
     compare (weight inst) (weight inst')
   in
-  ((List.fast_sort sort instructions),balance,added,modif_sites (*,!side_effect*)) 
+  ((List.fast_sort sort instructions),balance,added,modif_sites (*,!side_effect*))
 (*List.rev instructions, balance, added, modif_sites,!side_effect*)
 
 let site_defined site_id ag is_added env =
@@ -512,76 +512,82 @@ let site_defined site_id ag is_added env =
 
 
 let rec superpose todo_list lhs rhs map already_done added codomain env =
-	match todo_list with
-		| [] -> map
-		| (lhs_id,rhs_id)::tl ->
-			let map = IntMap.add lhs_id rhs_id map in (*attempt to map lhs_id to rhs_id*)
-			let lhs_ag = Mixture.agent_of_id lhs_id lhs
-			and rhs_ag = Mixture.agent_of_id rhs_id rhs 
-			in
-			let todo_list,already_done = 
-				if not (Mixture.name lhs_ag = Mixture.name rhs_ag) then raise False
-				else
-					Mixture.fold_interface 
-					(fun site_id (int,lnk) (todo,already_done) ->
-						let opt = site_defined site_id rhs_ag (IntSet.mem rhs_id added) env in
-						match opt with
-							| None -> (todo,already_done) (*site_id is not in the agent in the rhs*)
-							| Some (int',lnk') ->
-								let compatible = 
-									match (int,int') with
-										| (Some i,Some i') -> i=i'
-										| (None,_) -> true
-										| (_,None) -> true
-								in
-									if not compatible then raise False
-									else
-										match (lnk,lnk') with
-												| (Mixture.BND,Mixture.BND) -> 
-													begin
-														let opt = Mixture.follow (lhs_id,site_id) lhs 
-														and opt' = Mixture.follow (rhs_id,site_id) rhs in
-														match opt with
-															| None -> (*semi-link*) (todo,already_done)
-															| Some (lhs_id',site_id') ->
-																match opt' with
-																	| None -> (todo,already_done)
-																	| Some (rhs_id',site_id'') -> 
-																		if site_id'=site_id'' then 
-																			if Int2Set.mem (lhs_id',rhs_id') already_done then (todo,already_done)
-																			else ((lhs_id',rhs_id')::todo,Int2Set.add (lhs_id',rhs_id') already_done)
-																		else raise False
-													end
-												| (Mixture.BND,Mixture.TYPE (site_j,name_id)) ->
-													begin
-														let opt = Mixture.follow (lhs_id,site_id) lhs in
-														match opt with
-															| None -> (todo,already_done) (*semi-link < link_type*)
-															| Some (lhs_id',site_id') -> 
-																let ag' = Mixture.agent_of_id lhs_id' lhs in
-																let name = Mixture.name ag' in
-																if (name = name_id) && (site_id' = site_j) then (todo,already_done) 
-																else raise False
-													end
-												| (Mixture.TYPE (site_j,name_id),Mixture.BND) ->
-													begin
-														let opt = Mixture.follow (rhs_id,site_id) rhs in
-														match opt with
-															| None -> (todo,already_done) (*semi-link < link_type*)
-															| Some (rhs_id',site_id') -> 
-																let ag' = Mixture.agent_of_id rhs_id' rhs in
-																let name = Mixture.name ag' in
-																if (name = name_id) && (site_id' = site_j) then (todo,already_done) 
-																else raise False
-													end
-												| (Mixture.TYPE (site_j,name_id),Mixture.TYPE (site_j',name_id')) ->
-													if (name_id = name_id') && (site_j = site_j') then (todo,already_done) 
-													else raise False
-												| (Mixture.FREE,Mixture.FREE) | (Mixture.WLD,_) | (_,Mixture.WLD) -> (todo,already_done)
-												| _ -> raise False
-					) lhs_ag (tl,already_done)
-				in
-					superpose todo_list lhs rhs map (*IntMap.add lhs_id rhs_id map*) already_done added (IntSet.add rhs_id codomain) env
+  match todo_list with
+  | [] -> map
+  | (lhs_id,rhs_id)::tl ->
+     let map = IntMap.add lhs_id rhs_id map in (*attempt to map lhs_id to rhs_id*)
+     let lhs_ag = Mixture.agent_of_id lhs_id lhs
+     and rhs_ag = Mixture.agent_of_id rhs_id rhs
+     in
+     let todo_list,already_done =
+       if not (Mixture.name lhs_ag = Mixture.name rhs_ag) then raise False
+       else
+	 Mixture.fold_interface
+	   (fun site_id (int,lnk) (todo,already_done) ->
+	    let opt = site_defined site_id rhs_ag (IntSet.mem rhs_id added) env in
+	    match opt with
+	    | None -> (todo,already_done) (*site_id is not in the agent in the rhs*)
+	    | Some (int',lnk') ->
+	       let compatible =
+		 match (int,int') with
+		 | (Some i,Some i') -> i=i'
+		 | (None,_) -> true
+		 | (_,None) -> true
+	       in
+	       if not compatible then raise False
+	       else
+		 match (lnk,lnk') with
+		 | (Mixture.BND,Mixture.BND) ->
+		    begin
+		      let opt = Mixture.follow (lhs_id,site_id) lhs
+		      and opt' = Mixture.follow (rhs_id,site_id) rhs in
+		      match opt with
+		      | None -> (*semi-link*) (todo,already_done)
+		      | Some (lhs_id',site_id') ->
+			 match opt' with
+			 | None -> (todo,already_done)
+			 | Some (rhs_id',site_id'') ->
+			    if site_id'=site_id'' then
+			      if Int2Set.mem (lhs_id',rhs_id') already_done
+			      then (todo,already_done)
+			      else ((lhs_id',rhs_id')::todo,
+				    Int2Set.add (lhs_id',rhs_id') already_done)
+			    else raise False
+		    end
+		 | (Mixture.BND,Mixture.TYPE (site_j,name_id)) ->
+		    begin
+		      let opt = Mixture.follow (lhs_id,site_id) lhs in
+		      match opt with
+		      | None -> (todo,already_done) (*semi-link < link_type*)
+		      | Some (lhs_id',site_id') ->
+			 let ag' = Mixture.agent_of_id lhs_id' lhs in
+			 let name = Mixture.name ag' in
+			 if (name = name_id) && (site_id' = site_j)
+			 then (todo,already_done)
+			 else raise False
+		    end
+		 | (Mixture.TYPE (site_j,name_id),Mixture.BND) ->
+		    begin
+		      let opt = Mixture.follow (rhs_id,site_id) rhs in
+		      match opt with
+		      | None -> (todo,already_done) (*semi-link < link_type*)
+		      | Some (rhs_id',site_id') ->
+			 let ag' = Mixture.agent_of_id rhs_id' rhs in
+			 let name = Mixture.name ag' in
+			 if (name = name_id) && (site_id' = site_j)
+			 then (todo,already_done)
+			 else raise False
+		    end
+		 | (Mixture.TYPE (site_j,name_id),Mixture.TYPE (site_j',name_id')) ->
+		    if (name_id = name_id') && (site_j = site_j')
+		    then (todo,already_done)
+		    else raise False
+		 | (Mixture.FREE,Mixture.FREE)
+		 | (Mixture.WLD,_) | (_,Mixture.WLD) -> (todo,already_done)
+		 | _ -> raise False
+	   ) lhs_ag (tl,already_done)
+     in
+     superpose todo_list lhs rhs map (*IntMap.add lhs_id rhs_id map*) already_done added (IntSet.add rhs_id codomain) env
 
 let enable r mix env =
   let unify pat1 pat2 (root,modif_sites) glueings already_done =
