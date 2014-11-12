@@ -326,76 +326,61 @@ let diff pos m0 m1 label_opt env =
 		  (inst,idmap)
 	     end
 	  | (Mixture.BND, Mixture.BND | Mixture.TYPE _, Mixture.BND) -> (*connected -> connected*)
+             let opt = Mixture.follow (id, site_id) m0 in
+	     let opt' =  Mixture.follow (id, site_id) m1 in
+	     let site =
+	       Environment.site_of_id (Mixture.name ag) site_id env in
+	     let common_update inst idmap id1 i1 =
+	       let id1' =
+		 if List.exists (fun id -> id=id1) prefix
+		 then (KEPT id1)
+		 else (FRESH id1) in
+	       let idmap' =
+		 add_map (KEPT id) (site_id,1) (add_map id1' (i1,1) idmap) in
+	       let inst =
+		 if id1 < id || (id1 = id && i1 < site_id)
+		 (*generating an instruction only for one of both sites*)
+		 then BND((KEPT id, site_id), (id1',i1)):: inst
+		 else inst in
+	       (inst,idmap')
+	     in
 	     begin
-               let opt, opt' = (Mixture.follow (id, site_id) m0, Mixture.follow (id, site_id) m1) in
-		 match (opt, opt') with
-		 | (None, Some (id1', i1')) -> (*sub-case: semi-link -> connected*)
-		    (*warning*)
-		    let site = Environment.site_of_id (Mixture.name ag) site_id env in
-		    let _ =
+	       match (opt, opt') with
+	       | (None, Some (id1', i1')) -> (*sub-case: semi-link -> connected*)
+		  let () =
+		    pp_warning
+		      (fun f ->
+		       Format.fprintf
+			 f
+			 "link state of site '%s' of agent '%s' is changed although it is a semi-link in the left hand side"
+			 site (Environment.name (Mixture.name ag) env)
+		      ) in
+		  common_update inst idmap id1' i1'
+	       | (Some (id1, i1), Some (id1', i1')) -> (*sub-case: connected -> connected*)
+		  let kept_id1 = List.exists (fun id -> id=id1) prefix in
+                  if kept_id1 && id1=id1' && i1=i1' then (inst,idmap)
+                  else
+		    let () =
 		      pp_warning
 			(fun f ->
 			 Format.fprintf
-			   f "link state of site '%s' of agent '%s' is changed although it is a semi-link in the left hand side"
+			   f
+			   "rule induces a link permutation on site '%s' of agent '%s'"
 			   site (Environment.name (Mixture.name ag) env)
-			)
-		    in
-		    (*modified sites*)
-		    let id'' = if List.exists (fun id -> id=id1') prefix then (KEPT id1') else (FRESH id1')
-		    in
-		    let idmap' = add_map (KEPT id) (site_id,1) (add_map id'' (i1',1) idmap) in
-		    (*instruction*)
-		    if id1' < id || (id1'= id && i1'< site_id) then (*generating an instruction only for one of both sites*)
-		      begin
-			let inst = BND((KEPT id, site_id), (id'',i1')):: inst
-			in
-			(*side_effect := true ;*)
-			(inst,idmap')
-		      end
-		    else (inst,idmap')
-
-		 | (Some (id1, i1), Some (id1', i1')) -> (*sub-case: connected -> connected*)
-		    (*warning*)
-                    let kept_id1 = List.exists (fun id -> id=id1) prefix in
-                    let kept_id1' = List.exists (fun id -> id=id1') prefix in
-                    if kept_id1 && id1=id1' && i1=i1' then (inst,idmap)
-                    else
-                      let idmap = add_map (KEPT id) (site_id,1) idmap in (*issue87*)
-		      let site = Environment.site_of_id (Mixture.name ag) site_id env in
-		      let _ =
-		        pp_warning
-			   (fun f ->
-			     Format.fprintf
-			     f "rule induces a link permutation on site '%s' of agent '%s'"
-			     site (Environment.name (Mixture.name ag) env)
-			  )
-		      in
-		      (*modifed sites*)
-		      (*it might be that id1 is not preserved by the reaction!*)
-		      let idmap =
-		        if kept_id1
-		        then add_map (KEPT id1) (i1,1) idmap
-		        else idmap
-		      in
-		      (*now id1' might be created by the reaction*)
-		      let id1'' =
-		        if kept_id1'
-		          then (KEPT id1')
-		          else (FRESH id1') in
-		      let idmap' = add_map id1'' (i1',1) idmap in
-		      (*instruction*)
-		      if id1'< id || (id1'= id && i1'< site_id) then
-		        let inst = BND((KEPT id, site_id), (id1'', i1')):: inst in
-		        (inst,idmap')
-		      else
-		        (inst,idmap')
-		 | (Some (id1, i1), None) ->
-		    (*sub-case: connected -> semi-link*)
-		    compile_error
-		      pos (Printf.sprintf "The link status of agent '%s', site '%s' on the right hand side is underspecified"
-					  ag_name site_name)
-		 | (None, None) -> (*sub-case: semi-link -> semi-link*)
-		    (inst,idmap) (*nothing to be done*)
+			) in
+		    (*modifed sites*)
+		    (*it might be that id1 is not preserved by the reaction!*)
+		    let idmap = if kept_id1
+				then add_map (KEPT id1) (i1,1) idmap
+				else idmap in
+		    common_update inst idmap id1' i1'
+	       | (Some (id1, i1), None) ->
+		  (*sub-case: connected -> semi-link*)
+		  compile_error
+		    pos (Printf.sprintf "The link status of agent '%s', site '%s' on the right hand side is underspecified"
+					ag_name site_name)
+	       | (None, None) -> (*sub-case: semi-link -> semi-link*)
+		  (inst,idmap) (*nothing to be done*)
 	     end
 	  | (Mixture.FREE, Mixture.BND) -> (*free -> connected*)
 	     begin
