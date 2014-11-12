@@ -408,7 +408,12 @@ let diff pos m0 m1 label_opt env =
 															else (inst,idmap')
 															
 														| (Some (id1, i1), Some (id1', i1')) -> (*sub-case: connected -> connected*)
-																(*warning*)
+                                                                                                                                let kept_id1 = List.exists (fun id -> id=id1) prefix in
+                                                                                                                                let kept_id1' = List.exists (fun id -> id=id1') prefix in
+                                                                                                                                
+                                                                                                                                if kept_id1 && id1=id1' && i1=i1' then (inst,idmap)
+                                                                                                                                else
+																(*warning: id(site_id) is link modified because its partner has changed (issue87)*)
 																let idmap = add_map (KEPT id) (site_id,1) idmap in
 																let site = Environment.site_of_id (Mixture.name ag) site_id env in
 																let _ =
@@ -420,10 +425,10 @@ let diff pos m0 m1 label_opt env =
 																in
 																(*modifed sites*)
 																(*it might be that id1 is not preserved by the reaction!*)
-																let idmap = if List.exists (fun id -> id=id1) prefix then add_map (KEPT id1) (i1,1) idmap else idmap
+																let idmap = if kept_id1 then add_map (KEPT id1) (i1,1) idmap else idmap
 																in
 																(*now id1' might be created by the reaction*)
-																let id1'' = if List.exists (fun id -> id=id1') prefix then (KEPT id1') else (FRESH id1') in
+																let id1'' = if kept_id1' then (KEPT id1') else (FRESH id1') in
 																let idmap' = add_map id1'' (i1',1) idmap in
 																(*instruction*)
 																if id1'< id || (id1'= id && i1'< site_id) then
