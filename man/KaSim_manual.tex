@@ -678,17 +678,15 @@ where \textit{boolean\_expression} and \textit{effect\_list}\index{effect} are d
 \textit{effect} &::=& \tcb{\$ADD} \textit{algebraic\_expression agent\_expression} \\
     && | \tcb{\$DEL} \textit{algebraic\_expression agent\_expression} \\
     && | \tcb{t <-} \textit{algebraic\_expression} \\
-    && | \tcb{\$SNAPSHOT} \textit{opt\_filename}\\ 
-    && | \tcb{\$STOP} \textit{opt\_filename}\\
-	&& | \tcb{\$FLUX} \textit{opt\_filename} \textit{boolean} \\
+    && | \tcb{\$SNAPSHOT} \textit{string\_expression}\\
+    && | \tcb{\$STOP} \textit{string\_expression}\\
+	&& | \tcb{\$FLUX} \textit{string\_expression} \textit{boolean} \\
     && | \tcb{\$TRACK \var{var\_name}} \textit{boolean} \\
     && | \tcb{\$UPDATE \var{var\_name}} \textit{algebraic\_expression} \\
     && | \tcb{\$PRINT} \tcb{<}\textit{string\_expression}\tcb{>} \\
-    && | \tcb{\$PRINTF} \textit{filename} \tcb{<}\textit{string\_expression}\tcb{>} \\
+    && | \tcb{\$PRINTF} \textit{string\_expression} \tcb{<}\textit{string\_expression}\tcb{>} \\
     \\
-    \textit{filename} &::=& \tcb{<}\textit{string\_expression}\tcb{>} | \tcb{"filename"} \\
-    \textit{opt\_filename} &::=& \textit{filename} | \tcb{$\varepsilon$} \\\\
-	\textit{string\_expression} &::=& \tcb{$\varepsilon$} | \tcb{"string" . } \textit{string\_expression} \\
+    \textit{string\_expression} &::=& \tcb{$\varepsilon$} | \tcb{"string" . } \textit{string\_expression} \\
     && | \textit{algebraic\_expression}\tcb{ . } \textit{string\_expression} \\\\
 	\textit{boolean} &::=& \tcb{[true]} | \tcb{[false]}
   \end{tabular}

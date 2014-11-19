@@ -186,15 +186,10 @@ effect:
 						      {Ast.UPDATE (($2,rhs_pos 2),$3)}
     | TRACK LABEL boolean
 	    {let ast = if $3 then (fun x -> Ast.CFLOW x)
-		       else (fun x -> Ast.CFLOWOFF x) in ast (($2,rhs_pos 2),$1)}
-    | FLUX opt_string boolean
-	   {let ast = if $3 then (fun (x,y) -> Ast.FLUX (x,y))
-		      else (fun (x,y) -> Ast.FLUXOFF (x,y)) in
-	    match $2 with
-	    | (None,None) -> ast ([],$1)
-	    | (Some file,_) -> ast ([file],$1)
-	    | (None, Some pexpr) -> ast (pexpr,$1)
-	   }
+		       else (fun x -> Ast.CFLOWOFF x) in
+	     ast (($2,rhs_pos 2),$1)}
+    | FLUX print_expr boolean
+	   {if $3 then Ast.FLUX ($2,$1) else Ast.FLUXOFF ($2,$1)}
     | INTRO multiple_mixture
 	    {let (alg,mix) = $2 in Ast.INTRO (alg,mix,$1)}
     | INTRO error
@@ -207,25 +202,10 @@ effect:
 						 "Malformed perturbation instruction, I was expecting '$DEL alg_expression kappa_expression'"))}
     | ID LAR alg_expr /*updating the value of a token*/
 						{Ast.UPDATE_TOK ($1,$3)}
-    | SNAPSHOT opt_string
-	       {match $2 with
-		| (None,None) -> Ast.SNAPSHOT ([],$1)
-		| (Some file,_) -> Ast.SNAPSHOT ([file],$1)
-		| (None, Some pexpr) -> Ast.SNAPSHOT (pexpr,$1)
-	       }
-    | STOP opt_string
-	   {match $2 with
-	    | (None,None) -> Ast.STOP ([],$1)
-	    | (Some file,_) -> Ast.STOP ([file],$1)
-	    | (None, Some pexpr) -> Ast.STOP (pexpr,$1)
-	   }
+    | SNAPSHOT print_expr {Ast.SNAPSHOT ($2,$1)}
+    | STOP print_expr {Ast.STOP ($2,$1)}
     | PRINT SMALLER print_expr GREATER {(Ast.PRINT ([],$3,$1))}
-    | PRINTF string_or_pr_expr SMALLER print_expr GREATER
-	     {match $2 with
-	      | (None,None) -> Ast.PRINT ([],$4,$1)
-	      | (Some file,_) -> Ast.PRINT ([file],$4,$1)
-	      | (None, Some pexpr) -> Ast.PRINT (pexpr,$4,$1)
-	     }
+    | PRINTF print_expr SMALLER print_expr GREATER { Ast.PRINT ($2,$4,$1) }
     ;
 
 print_expr:
@@ -271,18 +251,6 @@ bool_expr:
     | TRUE {add_pos Ast.TRUE}
     | FALSE {add_pos Ast.FALSE}
     ;
-
-opt_string:
-  /*empty*/ {None,None}
-    | STRING {Some (add_pos (Ast.Str_pexpr (fst $1))),None}
-    | SMALLER print_expr GREATER {None, Some $2}
-    ;
-
-string_or_pr_expr:
-    | STRING {Some (add_pos (Ast.Str_pexpr (fst $1))),None}
-    | SMALLER print_expr GREATER {None, Some $2}
-    ;
-
 
 multiple:
     | INT {add_pos (Ast.CONST (Nbr.I $1)) }
