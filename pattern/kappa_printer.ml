@@ -65,3 +65,20 @@ let mixture with_number env f mix =
   Pp.set Mods.IntMap.bindings (fun f -> Format.fprintf f ",")
 	 (agent with_number env mix (bnd,fresh))
 	 f (Mixture.agents mix)
+
+let print_alg env f alg =
+  let rec aux f = function
+    | Expr.BIN_ALG_OP (op, (a,_), (b,_)) ->
+       Format.fprintf f "(%a %a %a)" aux a Term.print_bin_alg_op op aux b
+    | Expr.UN_ALG_OP (op, (a,_)) ->
+       Format.fprintf f "(%a %a)" Term.print_un_alg_op op aux a
+    | Expr.STATE_ALG_OP op -> Term.print_state_alg_op f op
+    | Expr.CONST n -> Nbr.print f n
+    | Expr.ALG_VAR i ->
+       Format.fprintf f "'%a'" (Environment.print_alg env) i
+    | Expr.KAPPA_INSTANCE i ->
+       Format.fprintf f "|#secret#|"
+		     (* (mixture false env) (Environment.kappa_of_num i env) *)
+    | Expr.TOKEN_ID i ->
+       Format.fprintf f "|%a|" (Environment.print_token env) i
+  in aux f alg

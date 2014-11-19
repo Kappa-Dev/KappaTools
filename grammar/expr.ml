@@ -12,20 +12,6 @@ let rec print_ast_alg f = function
 		    print_ast_alg a Term.print_bin_alg_op op print_ast_alg b
   |Ast.UN_ALG_OP (op, (a,_)) ->
    Format.fprintf f "(%a %a)" Term.print_un_alg_op op print_ast_alg a
-let rec ast_alg_to_string () = function
-  | Ast.EMAX -> Format.sprintf "[Emax]"
-  | Ast.TMAX -> Format.sprintf "[Tmax]"
-  | Ast.CONST n -> Nbr.to_string n
-  | Ast.OBS_VAR lab -> Format.sprintf "'%s'" lab
-  | Ast.KAPPA_INSTANCE ast ->
-     Format.sprintf "|#no printer for mixture, sorry#|"
-  | Ast.TOKEN_ID tk -> Format.sprintf "|%s|" tk
-  | Ast.STATE_ALG_OP op -> Term.state_alg_op_to_string () op
-  | Ast.BIN_ALG_OP (op, (a,_), (b,_)) ->
-     Format.sprintf "(%a %a %a)" ast_alg_to_string a
-		    Term.bin_alg_op_to_string op ast_alg_to_string b
-  | Ast.UN_ALG_OP (op, (a,_)) ->
-     Format.sprintf "(%a %a)" Term.un_alg_op_to_string op ast_alg_to_string a
 
 let rec print_bool p_alg f = function
   | Ast.TRUE -> Format.fprintf f "[true]"
@@ -36,21 +22,12 @@ let rec print_bool p_alg f = function
   | Ast.COMPARE_OP (op,(a,_), (b,_)) ->
      Format.fprintf f "(%a %a %a)"
 		    p_alg a Term.print_compare_op op p_alg b
-let rec bool_to_string alg_to_str () = function
-  | Ast.TRUE -> Format.sprintf "[true]"
-  | Ast.FALSE -> Format.sprintf "[false]"
-  | Ast.BOOL_OP (op, (a,_), (b,_)) ->
-     Format.sprintf "(%a %a %a)" (bool_to_string alg_to_str) a
-		    Term.bool_op_to_string op (bool_to_string alg_to_str) b
-  | Ast.COMPARE_OP (op, (a,_), (b,_)) ->
-     Format.sprintf "(%a %a %a)"
-		    alg_to_str a Term.compare_op_to_string op alg_to_str b
 
 let print_ast_bool = print_bool print_ast_alg
-let ast_bool_to_string = bool_to_string ast_alg_to_string
 
 type alg_expr =
-    BIN_ALG_OP of Term.bin_alg_op * alg_expr Term.with_pos * alg_expr Term.with_pos
+    BIN_ALG_OP of
+      Term.bin_alg_op * alg_expr Term.with_pos * alg_expr Term.with_pos
   | UN_ALG_OP of Term.un_alg_op * alg_expr Term.with_pos
   | STATE_ALG_OP of Term.state_alg_op
   | ALG_VAR of int

@@ -279,6 +279,6 @@ let default_state name_id site_id env =
   let (_,sign) = env.signatures.NamedDecls.decls.(name_id) in
   Signature.default_num_value site_id sign
 
-let print_rule env f id = Printf.fprintf f "%s" (rule_of_num id env)
-let print_alg env f id = Printf.fprintf f "%s" (fst (alg_of_num id env))
-let print_token env f id = Printf.fprintf f "%s" (token_of_num id env)
+let print_rule env f id = Format.fprintf f "%s" (rule_of_num id env)
+let print_alg env f id = Format.fprintf f "%s" (fst (alg_of_num id env))
+let print_token env f id = Format.fprintf f "%s" (token_of_num id env)

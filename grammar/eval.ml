@@ -538,7 +538,8 @@ let obs_of_result env mixs res =
 	 Expr.compile_alg env.Environment.algs.NamedDecls.finder
 			  env.Environment.tokens.NamedDecls.finder
 			  a_mixs alg_expr in
-       a_mixs',(alg,Expr.ast_alg_to_string () (fst alg_expr)) :: cont
+       a_mixs',
+       (alg,Format.asprintf "%a" Expr.print_ast_alg (fst alg_expr)) :: cont
       )
       ((env.Environment.fresh_kappa,[]),[]) res.observables in
   let (env',mixs') = mixtures_of_result mixs env a_mixs in
@@ -621,12 +622,12 @@ let effects_of_modif variables lrules env ast_list =
 	    let (env',mixs') = mixtures_of_result mixs env mix in
 	    let str =
 	      (if is_rule then
-		 Printf.sprintf "set rate of rule '%s' to %a"
+		 Format.asprintf "set rate of rule '%s' to %a"
 				(Environment.rule_of_num i env)
 	       else
-		 Printf.sprintf "set variable '%s' to %a"
+		 Format.asprintf "set variable '%s' to %a"
 				(fst (Environment.alg_of_num i env)))
-		Expr.ast_alg_to_string (fst alg_expr)::str_pert
+		Expr.print_ast_alg (fst alg_expr)::str_pert
 	    in
 	    (mixs',lrules,
 	     (Primitives.UPDATE ((if is_rule then Term.RULE i
@@ -643,8 +644,8 @@ let effects_of_modif variables lrules env ast_list =
 			       env.Environment.tokens.NamedDecls.finder
 			       (env.Environment.fresh_kappa,[]) alg_expr in
 	    let (env',mixs') = mixtures_of_result mixs env mix in
-	    let str = (Printf.sprintf "set token '%s' to value %a" tk_nme
-				      Expr.ast_alg_to_string (fst alg_expr))::str_pert
+	    let str = (Format.asprintf "set token '%s' to value %a" tk_nme
+				       Expr.print_ast_alg (fst alg_expr))::str_pert
 	    in
 	    (mixs',lrules,(Primitives.UPDATE (Term.TOK tk_id, alg_pos))::effects, str,env')
 	 | SNAPSHOT (pexpr,pos) ->
@@ -696,7 +697,8 @@ let effects_of_modif variables lrules env ast_list =
 		(fun cont (pexpr,pos) ->
 		 match pexpr with
 		 | Ast.Str_pexpr str -> str::cont
-		 | Ast.Alg_pexpr alg -> Expr.ast_alg_to_string () alg::cont
+		 | Ast.Alg_pexpr alg ->
+		    Format.asprintf "%a" Expr.print_ast_alg alg::cont
 		) [] print
 	    in
 	    let str = (Printf.sprintf "Print %s" (Tools.string_of_list (fun i->i) str_l))::str_pert
@@ -731,8 +733,8 @@ let pert_of_result variables env rules res =
 	 match opt_post with
 	 | None ->
 	    (env,variables,
-	     Printf.sprintf "whenever %a, %s"
-			    Expr.ast_bool_to_string (fst pre_expr) str_eff,None)
+	     Format.asprintf "whenever %a, %s"
+			     Expr.print_ast_bool (fst pre_expr) str_eff,None)
 	 | Some post_expr ->
 	    let (mix,(post,_pos)) =
 	      Expr.compile_bool env.Environment.algs.NamedDecls.finder
@@ -747,9 +749,9 @@ let pert_of_result variables env rules res =
 		     (bpos,"Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"))
 	    in
 	    (env',variables',
-	     Printf.sprintf "whenever %a, %s until %a"
-			    Expr.ast_bool_to_string (fst pre_expr) str_eff
-			    Expr.ast_bool_to_string (fst post_expr),
+	     Format.asprintf "whenever %a, %s until %a"
+			     Expr.print_ast_bool (fst pre_expr) str_eff
+			     Expr.print_ast_bool (fst post_expr),
 	     Some (post,dep))
        in
        let env,p_id = Environment.declare_pert (str_pert,pos) env' in
