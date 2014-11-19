@@ -17,19 +17,9 @@ let eval_pexpr pexpr state counter env =
       (fun cont (ast,pos) ->
        match ast with
        | Ast.Str_pexpr str -> str::cont
-       | Ast.Alg_pexpr alg_ex ->
-	    let (mix, (alg,_pos)) =
-	      Expr.compile_alg env.Environment.algs.NamedDecls.finder
-			       env.Environment.tokens.NamedDecls.finder
-			       (env.Environment.fresh_kappa,[]) (alg_ex,pos) in
-	  match mix with
-	  | _, _ :: _ ->
-	     raise (ExceptionDefn.Semantics_Error
-		      (pos_of_lex_pos (fst pos), "Mixture occurences of are not allowed here.
-						  Please use an auxilary variable."))
-	  | _, [] ->
-	     let n = State.value_alg state counter env alg in
-	     (Nbr.to_string n)::cont
+       | Ast.Alg_pexpr alg ->
+	  let n = State.value_alg state counter env alg in
+	  (Nbr.to_string n)::cont
       ) [] pexpr
   in
   String.concat "" (List.rev l)
@@ -39,18 +29,8 @@ let dump_print_expr desc pexpr state counter env =
     (fun (ast,pos) ->
      match ast with
      | Ast.Str_pexpr str -> Format.pp_print_string desc str
-       | Ast.Alg_pexpr alg_ex ->
-	    let (mix, (alg,_pos)) =
-	      Expr.compile_alg env.Environment.algs.NamedDecls.finder
-			       env.Environment.tokens.NamedDecls.finder
-			       (env.Environment.fresh_kappa,[]) (alg_ex,pos) in
-	match mix with
-	| _, _ :: _ ->
-	   raise (ExceptionDefn.Semantics_Error
-		    (pos_of_lex_pos (fst pos), "Mixture occurences of are not allowed here.
-						Please use an auxilary variable."))
-	| _, [] ->
-	   Nbr.print desc (State.value_alg state counter env alg)
+     | Ast.Alg_pexpr alg ->
+	Nbr.print desc (State.value_alg state counter env alg)
     ) pexpr ;
   Format.fprintf desc "@."
 
@@ -101,11 +81,11 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
       invalid_arg
 	(Format.asprintf
 	   "Perturbation %a would be applied infinitely, aborting..."
-	   (Dynamics.print_pert env) pert)
+	   (Kappa_printer.perturbation env) pert)
     else
       let () =
 	Debug.tag_if_debug "Applying %a instances of %a"
-			   Nbr.print x (Dynamics.pp_effect env) eff
+			   Nbr.print x (Kappa_printer.modification env) eff
       in apply_n_time x r state env counter pert_ids pert_events tracked
   | Primitives.UPDATE (g_id,(v,_)) ->
      let () = Debug.tag_if_debug "Updating %a" Term.print_dep_type g_id in
@@ -226,9 +206,10 @@ let has_reached_a_stopping_time state counter env =
 let try_perturbate tracked state pert_ids pert_events counter env =
   let rec iter state pert_ids triggered_perts tracked pert_events env =
     let state,env,pert_ids',triggered_perts,tracked,pert_events =
-      let () = Debug.tag_if_debug "Should now try perturbations %a"
-				  (Pp.set IntSet.elements Pp.colon Pp.int)
-				  pert_ids in
+      let () = Debug.tag_if_debug
+		 "Should now try perturbations %a"
+		 (Pp.set IntSet.elements Pp.colon Format.pp_print_int)
+		 pert_ids in
       IntSet.fold
 	(fun pert_id
 	     (state,env,pert_ids,triggered_perts,tracked,pert_events as acc) ->

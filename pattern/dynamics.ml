@@ -101,32 +101,6 @@ let compute_causal_init (((node_id,agent_name),interface),_) env =
 
 let compute_causal_obs lhs = compute_causal lhs lhs []
 
-let pp_effect env f = function
-  | PRINT (nme,_) -> Format.fprintf f "PRINT"
-  | ITER_RULE (_,rule) ->
-     if Mixture.is_empty rule.lhs then
-       Format.fprintf f "INTRO %a" (Kappa_printer.mixture false env) rule.rhs
-     else
-       let () = assert (Mixture.is_empty rule.rhs) in
-       Format.fprintf f "DELETE %a" (Kappa_printer.mixture false env) rule.lhs
-  | UPDATE (d_id,_) -> Format.fprintf f "UPDATE %a" Term.print_dep_type d_id
-  | SNAPSHOT _ -> Format.fprintf f "SNAPSHOT"
-  | STOP _ -> Format.fprintf f "STOP"
-  | FLUX _ -> Format.fprintf f "FLUX"
-  | FLUXOFF _ -> Format.fprintf f "FLUXOFF"
-  | CFLOW id ->
-     let nme = try Environment.rule_of_num id env
-	       with Not_found -> Environment.kappa_of_num id env
-     in Format.fprintf f "CFLOW %s" nme
-  | CFLOWOFF id ->
-     let nme = try Environment.rule_of_num id env
-	       with Not_found -> Environment.kappa_of_num id env
-     in Format.fprintf f "CFLOWOFF %s" nme
-
-
-let print_pert env f pert =
-  Pp.list Pp.colon (pp_effect env) f pert.effect
-
 let diff pos m0 m1 label_opt env =
   let add_map id site_type map =
     let set = try IdMap.find id map with Not_found -> Int2Set.empty in

@@ -66,7 +66,7 @@ let mixture with_number env f mix =
 	 (agent with_number env mix (bnd,fresh))
 	 f (Mixture.agents mix)
 
-let print_alg env f alg =
+let alg_expr env f alg =
   let rec aux f = function
     | Expr.BIN_ALG_OP (op, (a,_), (b,_)) ->
        Format.fprintf f "(%a %a %a)" aux a Term.print_bin_alg_op op aux b
@@ -82,3 +82,42 @@ let print_alg env f alg =
     | Expr.TOKEN_ID i ->
        Format.fprintf f "|%a|" (Environment.print_token env) i
   in aux f alg
+
+let print_expr env f e =
+  let rec aux f = function
+    | Ast.Str_pexpr str,_ -> Format.fprintf f "\"%s\"" str
+    | Ast.Alg_pexpr alg,_ -> alg_expr env f alg
+  in Pp.list (fun f -> Format.fprintf f ".") aux f e
+
+let modification env f = function
+  | Primitives.PRINT (nme,va) ->
+     Format.fprintf f "$PRINTF %a <%a>" (print_expr env) nme (print_expr env) va
+  | Primitives.ITER_RULE ((n,_),rule) ->
+     if Mixture.is_empty rule.Primitives.lhs then
+       Format.fprintf f "$ADD %a %a" (alg_expr env) n
+		      (mixture false env) rule.Primitives.rhs
+     else
+       let () = assert (Mixture.is_empty rule.Primitives.rhs) in
+       Format.fprintf f "$DEL %a %a" (alg_expr env) n
+		      (mixture false env) rule.Primitives.lhs
+  | Primitives.UPDATE (d_id,_) ->
+     Format.fprintf f "$UPDATE %a" Term.print_dep_type d_id
+  | Primitives.SNAPSHOT fn ->
+     Format.fprintf f "SNAPSHOT %a" (print_expr env) fn
+  | Primitives.STOP fn ->
+     Format.fprintf f "STOP %a" (print_expr env) fn
+  | Primitives.FLUX fn ->
+     Format.fprintf f "$FLUX %a [true]" (print_expr env) fn
+  | Primitives.FLUXOFF fn ->
+     Format.fprintf f "$FLUX %a [false]" (print_expr env) fn
+  | Primitives.CFLOW id ->
+     let nme = try Environment.rule_of_num id env
+	       with Not_found -> Environment.kappa_of_num id env
+     in Format.fprintf f "$TRACK '%s' [true]" nme
+  | Primitives.CFLOWOFF id ->
+     let nme = try Environment.rule_of_num id env
+	       with Not_found -> Environment.kappa_of_num id env
+     in Format.fprintf f "$TRACK '%s' [false]" nme
+
+let perturbation env f pert =
+  Pp.list Pp.colon (modification env) f pert.Primitives.effect

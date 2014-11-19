@@ -545,6 +545,18 @@ let obs_of_result env mixs res =
   let (env',mixs') = mixtures_of_result mixs env a_mixs in
   (env',mixs',cont)
 
+let compile_print_expr env mixs ex =
+  List.fold_right
+    (fun (el,pos) (mixs,out) ->
+     match el with
+     | Ast.Str_pexpr s -> (mixs,(Ast.Str_pexpr s,pos)::out)
+     | Ast.Alg_pexpr ast_alg ->
+	let (mixs', (alg,_pos)) =
+	  Expr.compile_alg env.Environment.algs.NamedDecls.finder
+			   env.Environment.tokens.NamedDecls.finder
+			   mixs (ast_alg,pos) in
+	(mixs',(Ast.Alg_pexpr alg,pos)::out))
+    ex (mixs,[])
 
 let effects_of_modif variables lrules env ast_list =
   let rec iter mixs lrules effects str_pert env ast_list =
@@ -649,12 +661,18 @@ let effects_of_modif variables lrules env ast_list =
 	    in
 	    (mixs',lrules,(Primitives.UPDATE (Term.TOK tk_id, alg_pos))::effects, str,env')
 	 | SNAPSHOT (pexpr,pos) ->
+	    let (mix,pexpr') =
+	      compile_print_expr env (env.Environment.fresh_kappa,[]) pexpr in
+	    let (env',mixs') = mixtures_of_result mixs env mix in
 	    (*when specializing snapshots to particular mixtures, add variables below*)
 	    let str = ("snapshot state")::str_pert in
-	    (mixs, lrules, (Primitives.SNAPSHOT pexpr)::effects, str, env)
+	    (mixs', lrules, (Primitives.SNAPSHOT pexpr')::effects, str, env')
 	 | STOP (pexpr,pos) ->
+	    let (mix,pexpr') =
+	      compile_print_expr env (env.Environment.fresh_kappa,[]) pexpr in
+	    let (env',mixs') = mixtures_of_result mixs env mix in
 	    let str = "interrupt simulation"::str_pert in
-	    (mixs, lrules, (Primitives.STOP pexpr)::effects, str, env)
+	    (mixs', lrules, (Primitives.STOP pexpr')::effects, str, env')
 	 | CFLOW ((lab,pos_lab),pos_pert) ->
 	    let id =
 	      try Environment.num_of_rule lab env
@@ -686,12 +704,22 @@ let effects_of_modif variables lrules env ast_list =
 	    let str = (Printf.sprintf "Disable causality analysis for observable '%s'" lab)::str_pert in
 	    (mixs, lrules, (Primitives.CFLOWOFF id)::effects, str, env)
 	 | FLUX (pexpr,pos) ->
+	    let (mix,pexpr') =
+	      compile_print_expr env (env.Environment.fresh_kappa,[]) pexpr in
+	    let (env',mixs') = mixtures_of_result mixs env mix in
 	    let str = "Activate flux tracking"::str_pert in
-	    (mixs, lrules, (Primitives.FLUX pexpr)::effects, str, env)
+	    (mixs', lrules, (Primitives.FLUX pexpr')::effects, str, env')
 	 | FLUXOFF (pexpr,pos) ->
+	    let (mix,pexpr') =
+	      compile_print_expr env (env.Environment.fresh_kappa,[]) pexpr in
+	    let (env',mixs') = mixtures_of_result mixs env mix in
 	    let str = "Disable flux tracking"::str_pert in
-	    (mixs, lrules, (Primitives.FLUXOFF pexpr)::effects, str, env)
+	    (mixs', lrules, (Primitives.FLUXOFF pexpr')::effects, str, env')
 	 | PRINT (pexpr,print,pos) ->
+	    let (mix,pexpr') =
+	      compile_print_expr env (env.Environment.fresh_kappa,[]) pexpr in
+	    let (mix',print') = compile_print_expr env mix pexpr in
+	    let (env',mixs') = mixtures_of_result mixs env mix' in
 	    let str_l =
 	      List.fold_left
 		(fun cont (pexpr,pos) ->
@@ -703,7 +731,7 @@ let effects_of_modif variables lrules env ast_list =
 	    in
 	    let str = (Printf.sprintf "Print %s" (Tools.string_of_list (fun i->i) str_l))::str_pert
 	    in
-	    (mixs,lrules,(Primitives.PRINT (pexpr,print))::effects,str,env)
+	    (mixs',lrules,(Primitives.PRINT (pexpr',print'))::effects,str,env')
        in
        iter variables lrules effects str_pert env tl
   in

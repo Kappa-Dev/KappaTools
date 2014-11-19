@@ -10,12 +10,14 @@ let list pr_sep pr_el f l =
 let set elements pr_sep pr_el f set =
   list pr_sep pr_el f (elements set)
 
-let string f s = fprintf f "%s" s
-let int f i = fprintf f "%i" i
-let comma f = fprintf f ", "
-let colon f = fprintf f "; "
-let space f = fprintf f " "
+let comma f = fprintf f ",@ "
+let colon f = fprintf f ";@ "
+let space f = pp_print_space f ()
 let empty f = fprintf f ""
+let option pr f = function
+  | None -> ()
+  | Some x -> fprintf f "@ %a" pr x
+
 
 let position f (beg_pos,end_pos) =
   let () = assert (beg_pos.Lexing.pos_fname = end_pos.Lexing.pos_fname) in

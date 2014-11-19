@@ -133,7 +133,6 @@ let rule_of_num i env =  IntMap.find i env.rule_of_num
 let num_of_unary_rule lab env = StringMap.find lab env.num_of_unary_rule
 let unary_rule_of_num i env =  IntMap.find i env.unary_rule_of_num
 
-
 let pert_of_num i env = IntMap.find i env.pert_of_num
 let is_rule i env = IntSet.mem i env.rule_indices
 let num_of_alg s env = StringMap.find s env.algs.NamedDecls.finder

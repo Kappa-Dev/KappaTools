@@ -72,23 +72,27 @@ let flip (rule_label,rule) =
   in
   (lbl,rule)
 
-type 'mixture print_expr = Str_pexpr of string | Alg_pexpr of 'mixture ast_alg_expr
+type 'alg_expr print_expr =
+    Str_pexpr of string | Alg_pexpr of 'alg_expr
 type 'mixture modif_expr =
-	| INTRO of ('mixture ast_alg_expr with_pos * 'mixture  * Tools.pos)
-	| DELETE of ('mixture ast_alg_expr with_pos * 'mixture * Tools.pos)
-	| UPDATE of (string Term.with_pos * 'mixture ast_alg_expr with_pos) (*TODO: pause*)
-	| UPDATE_TOK of (str_pos * 'mixture ast_alg_expr with_pos) (*TODO: pause*)
-	| STOP of ('mixture print_expr with_pos list * Tools.pos)
-	| SNAPSHOT of ('mixture print_expr with_pos list * Tools.pos)
-	(*maybe later of mixture too*)
-	| PRINT of (('mixture print_expr with_pos list) * ('mixture print_expr with_pos list) * Tools.pos)
-	| CFLOW of (string Term.with_pos * Tools.pos)
-	| CFLOWOFF of (string Term.with_pos * Tools.pos)
-	| FLUX of 'mixture print_expr with_pos list * Tools.pos
-	| FLUXOFF of 'mixture print_expr with_pos list * Tools.pos
+  | INTRO of ('mixture ast_alg_expr with_pos * 'mixture  * Tools.pos)
+  | DELETE of ('mixture ast_alg_expr with_pos * 'mixture * Tools.pos)
+  | UPDATE of
+      (string Term.with_pos * 'mixture ast_alg_expr with_pos) (*TODO: pause*)
+  | UPDATE_TOK of (str_pos * 'mixture ast_alg_expr with_pos) (*TODO: pause*)
+  | STOP of ('mixture ast_alg_expr print_expr with_pos list * Tools.pos)
+  | SNAPSHOT of ('mixture ast_alg_expr print_expr with_pos list * Tools.pos)
+  (*maybe later of mixture too*)
+  | PRINT of
+      (('mixture ast_alg_expr print_expr with_pos list) *
+	 ('mixture  ast_alg_expr print_expr with_pos list) * Tools.pos)
+  | CFLOW of (string Term.with_pos * Tools.pos)
+  | CFLOWOFF of (string Term.with_pos * Tools.pos)
+  | FLUX of 'mixture ast_alg_expr print_expr with_pos list * Tools.pos
+  | FLUXOFF of 'mixture ast_alg_expr print_expr with_pos list * Tools.pos
 type 'mixture perturbation =
     ('mixture ast_alg_expr bool_expr with_pos * ('mixture modif_expr list) *
-      'mixture ast_alg_expr bool_expr with_pos option) Term.with_pos
+       'mixture ast_alg_expr bool_expr with_pos option) Term.with_pos
 
 
 

@@ -125,7 +125,9 @@ instruction:
 		     then
 		       ExceptionDefn.warning
 			 ~pos:(Parsing.symbol_start_pos (), Parsing.symbol_end_pos ())
-			 (fun f -> Pp.string f "Perturbation need not be applied repeatedly") in
+			 (fun f ->
+			  Format.pp_print_string
+			    f "Perturbation need not be applied repeatedly") in
 	    Ast.PERT (add_pos (bool_expr,mod_expr_list,Some $5))}
     | CONFIG STRING value_list
 	     {Ast.CONFIG ((fst $2,rhs_pos 2),$3)}
@@ -134,7 +136,8 @@ instruction:
 	   {ExceptionDefn.deprecated
 	      ~pos:(Parsing.symbol_start_pos (), Parsing.symbol_end_pos ())
 	      "perturbation"
-	      (fun f -> Pp.string f "use the 'repeat ... until' construction");
+	      (fun f -> Format.pp_print_string
+			  f "use the 'repeat ... until' construction");
 	    Ast.PERT (add_pos ($2,$4,Some $6))}
     ;
 
@@ -157,7 +160,8 @@ perturbation_declaration:
 		{ExceptionDefn.deprecated
 		   ~pos:(Parsing.symbol_start_pos (), Parsing.symbol_end_pos ())
 		   "perturbation"
-		   (fun f -> Pp.string f "'set' keyword is replaced by 'do'");
+		   (fun f -> Format.pp_print_string
+			       f "'set' keyword is replaced by 'do'");
 		 ($1,$3)} /*For backward compatibility*/
     ;
 
@@ -175,7 +179,7 @@ effect:
 				    ~pos:(Parsing.symbol_start_pos (), Parsing.symbol_end_pos ())
 				    "perturbation effect"
 				    (fun f ->
-				     Pp.string
+				     Format.pp_print_string
 				       f "use $UPDATE perturbation instead of the ':=' assignment (see Manual)");
 					Ast.UPDATE (($1,rhs_pos 1),$3)}
     | ASSIGN2 LABEL alg_expr /*updating the rate of a rule*/
@@ -243,7 +247,7 @@ variable_declaration:
 	       ExceptionDefn.deprecated
 		 ~pos:(Parsing.symbol_start_pos (), Parsing.symbol_end_pos ())
 		 "variable"
-		 (fun f -> Pp.string
+		 (fun f -> Format.pp_print_string
 			     f "use |kappa instance| instead.")
 	      in
 	      (($1,rhs_pos 1),(Ast.KAPPA_INSTANCE $2,rhs_pos 2))}
@@ -338,7 +342,7 @@ rule_expression:
 		  let lhs,token_l = $2 and rhs,token_r = $4 in
 		  ExceptionDefn.warning
 		    ~pos:(Parsing.symbol_start_pos (), Parsing.symbol_end_pos ())
-		    (fun f -> Pp.string
+		    (fun f -> Format.pp_print_string
 				f "Rule has no kinetics. Default rate of 0.0 is assumed.");
 		  ($1,{Ast.rule_pos = pos ;
 		       Ast.lhs = lhs;

@@ -179,7 +179,7 @@ let main =
 	  else (
 	    ExceptionDefn.warning
 	      (fun f ->
-	       Pp.string
+	       Format.pp_print_string
 		 f "Causal flow compution is required but no compression is specified, will output flows with no compresion");
 	    Parameter.mazCompression := true)
 	in
@@ -265,7 +265,7 @@ let main =
 	   (close_desc None;
 	    Format.eprintf "***Error (%s) line %d, char %d: %s***@."
 			   (fn pos) (ln pos) (cn pos) msg)
-	| ExceptionDefn.Malformed_Decl er -> Pp.error Pp.string er
+	| ExceptionDefn.Malformed_Decl er -> Pp.error Format.pp_print_string er
 	| Invalid_argument msg ->
 	   (close_desc None;
 	    let s = "" (*Printexc.get_backtrace()*) in

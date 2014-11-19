@@ -75,15 +75,15 @@ type rule = {
 type modification =
     ITER_RULE of Expr.alg_expr Term.with_pos * rule
   | UPDATE of Term.dep_type * Expr.alg_expr Term.with_pos
-  | SNAPSHOT of Ast.mixture Ast.print_expr Term.with_pos list
-  | STOP of Ast.mixture Ast.print_expr Term.with_pos list
+  | SNAPSHOT of Expr.alg_expr Ast.print_expr Term.with_pos list
+  | STOP of Expr.alg_expr Ast.print_expr Term.with_pos list
   | CFLOW of int
-  | FLUX of Ast.mixture Ast.print_expr Term.with_pos list
-  | FLUXOFF of Ast.mixture Ast.print_expr Term.with_pos list
+  | FLUX of Expr.alg_expr Ast.print_expr Term.with_pos list
+  | FLUXOFF of Expr.alg_expr Ast.print_expr Term.with_pos list
   | CFLOWOFF of int
   | PRINT of
-      (Ast.mixture Ast.print_expr Term.with_pos list *
-	 Ast.mixture Ast.print_expr Term.with_pos list)
+      (Expr.alg_expr Ast.print_expr Term.with_pos list *
+	 Expr.alg_expr Ast.print_expr Term.with_pos list)
 
 type perturbation =
     { precondition: Expr.alg_expr Ast.bool_expr;

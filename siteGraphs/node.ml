@@ -65,7 +65,8 @@ let label node env =
   | [] -> Environment.name node.name env
   | _ ->
      Format.asprintf "%s(%a)" (Environment.name node.name env)
-		     (Pp.list Pp.space Pp.string) (List.rev str_intf)
+		     (Pp.list Pp.space Format.pp_print_string)
+		     (List.rev str_intf)
 
 let to_string with_detail (hsh_lnk,fresh) node env =
   let ptr_to_string u' i j fresh =
@@ -122,10 +123,12 @@ let to_string with_detail (hsh_lnk,fresh) node env =
   let s_addr = try string_of_int (get_address node) with Not_found -> "na" in
   if with_detail then
     (Format.asprintf "%s_%s:[%a]" (Environment.name node.name env) s_addr
-		     (Pp.list Pp.comma Pp.string) (List.rev intf_l) ,fresh')
+		     (Pp.list Pp.comma Format.pp_print_string) (List.rev intf_l)
+    ,fresh')
   else
     (Format.asprintf "%s(%a)" (Environment.name node.name env)
-		     (Pp.list Pp.comma Pp.string) (List.rev intf_l),fresh')
+		     (Pp.list Pp.comma Format.pp_print_string) (List.rev intf_l)
+    ,fresh')
 
 let add_dep phi port_list node env =
   let add lift int_lnk (x,y) =
