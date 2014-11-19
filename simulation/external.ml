@@ -98,9 +98,10 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
   | Primitives.ITER_RULE ((v,_),r) ->
      let x = State.value_alg state counter env v in
     if x = Nbr.F infinity then
-      let p_str = pert.Primitives.flag in
       invalid_arg
-	("Perturbation "^p_str^" would be applied infinitely, aborting...")
+	(Format.asprintf
+	   "Perturbation %a would be applied infinitely, aborting..."
+	   (Dynamics.print_pert env) pert)
     else
       let () =
 	Debug.tag_if_debug "Applying %a instances of %a"

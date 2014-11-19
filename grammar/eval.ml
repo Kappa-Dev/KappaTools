@@ -783,7 +783,6 @@ let pert_of_result variables env rules res =
 	 { Primitives.precondition = pre;
 	   Primitives.effect = effects;
 	   Primitives.abort = opt;
-	   Primitives.flag = str_pert;
 	   Primitives.stopping_time = stopping_time
 	 }
        in

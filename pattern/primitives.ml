@@ -89,6 +89,5 @@ type perturbation =
     { precondition: Expr.alg_expr Ast.bool_expr;
       effect : modification list;
       abort : Expr.alg_expr Ast.bool_expr option;
-      flag : string;
       stopping_time : Nbr.t option
     }
