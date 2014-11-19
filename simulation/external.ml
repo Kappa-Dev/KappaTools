@@ -11,28 +11,14 @@ let eval_abort_pert just_applied pert state counter env =
   | None -> just_applied
   | Some var -> State.value_bool state counter env var
 
+let pr_pexpr state counter env f pexpr =
+  let rec aux f = function
+    | Ast.Str_pexpr str,_ -> Format.pp_print_string f str
+    | Ast.Alg_pexpr alg,_ ->
+       Nbr.print f (State.value_alg state counter env alg)
+  in Pp.list Pp.empty aux f pexpr
 let eval_pexpr pexpr state counter env =
-  let l =
-    List.fold_left
-      (fun cont (ast,pos) ->
-       match ast with
-       | Ast.Str_pexpr str -> str::cont
-       | Ast.Alg_pexpr alg ->
-	  let n = State.value_alg state counter env alg in
-	  (Nbr.to_string n)::cont
-      ) [] pexpr
-  in
-  String.concat "" (List.rev l)
-
-let dump_print_expr desc pexpr state counter env =
-  List.iter
-    (fun (ast,pos) ->
-     match ast with
-     | Ast.Str_pexpr str -> Format.pp_print_string desc str
-     | Ast.Alg_pexpr alg ->
-	Nbr.print desc (State.value_alg state counter env alg)
-    ) pexpr ;
-  Format.fprintf desc "@."
+  Format.asprintf "%a" (pr_pexpr state counter env) pexpr
 
 let apply_n_time x r state env counter pert_ids pert_events tracked =
   Nbr.iteri
@@ -103,7 +89,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
       match str with "" -> Format.std_formatter
 		   | _ -> Environment.get_desc str env
     in
-    dump_print_expr desc pexpr state counter env;
+    pr_pexpr state counter env desc pexpr;
     (env,state,pert_ids,tracked,pert_events)
   | Primitives.CFLOW id ->
     Debug.tag_if_debug "Tracking causality" ;
