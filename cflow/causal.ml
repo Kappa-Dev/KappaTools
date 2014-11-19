@@ -353,12 +353,11 @@ let dump grid fic state env =
   let () = Format.fprintf d "@]@." in
   close_out d_chan
 
-let label env state e = 
-  match e with
-    | OBS mix_id -> Environment.kappa_of_num mix_id env
-    | PERT p_id -> Environment.pert_of_num p_id env
-    | RULE r_id -> Dynamics.to_kappa (State.rule_of_id r_id state) env
-    | INIT agent -> "Intro "^(Environment.name agent env)
+let label env state = function
+  | OBS mix_id -> Environment.kappa_of_num mix_id env
+  | PERT p_id -> assert false
+  | RULE r_id -> Dynamics.to_kappa (State.rule_of_id r_id state) env
+  | INIT agent -> "Intro "^(Environment.name agent env)
 
 let ids_of_grid grid = Hashtbl.fold (fun key _ l -> key::l) grid.flow []
 let config_of_grid = cut 

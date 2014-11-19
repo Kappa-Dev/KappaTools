@@ -20,8 +20,6 @@ type t = {
 	unary_rule_of_num : string IntMap.t ;
 	
 	fresh_pert : int ;
-	pert_of_num : string IntMap.t ;
-	(*rule_of_pert : IntSet.t IntMap.t ;*)
 	
 	rule_indices : IntSet.t ;
 	empty_lhs : IntSet.t ;
@@ -50,9 +48,7 @@ let empty =
 	fresh_kappa = 0 ;
 	fresh_pert = 0 ;
 	tokens = NamedDecls.create [||];
-	pert_of_num = IntMap.empty ;
 	perturbations = NamedDecls.create [||];
-	(*rule_of_pert = IntMap.empty ;*)
 	rule_indices = IntSet.empty ;
 	dependencies = Term.DepMap.empty ;
 	empty_lhs = IntSet.empty ;
@@ -133,16 +129,12 @@ let rule_of_num i env =  IntMap.find i env.rule_of_num
 let num_of_unary_rule lab env = StringMap.find lab env.num_of_unary_rule
 let unary_rule_of_num i env =  IntMap.find i env.unary_rule_of_num
 
-let pert_of_num i env = IntMap.find i env.pert_of_num
 let is_rule i env = IntSet.mem i env.rule_indices
 let num_of_alg s env = StringMap.find s env.algs.NamedDecls.finder
 let alg_of_num i env = fst env.algs.NamedDecls.decls.(i)
-(*let bind_pert_rule pid rid env = {env with rule_of_pert = IntMap.add pid rid env.rule_of_pert}*)
-(*let rule_of_pert pid env = try Some (IntMap.find pid env.rule_of_pert) with Not_found -> None *)
 
-let declare_pert (lab,pos) env =
+let declare_pert env =
   ({env with
-     pert_of_num = IntMap.add env.fresh_pert lab env.pert_of_num;
      fresh_pert = env.fresh_pert+1}
   ,env.fresh_pert)
 let name_number env = NamedDecls.size env.signatures

@@ -1663,8 +1663,9 @@ let dump state counter env =
 		       (Environment.token_of_num tk_id env) v
 	) state.token_vector ;
       IntMap.fold
-	(fun i pert _ ->
-	 Format.printf "#pert[%d]: %s@\n" i (Environment.pert_of_num i env)
+	(fun i pert () ->
+	 Format.printf "#pert[%d]: %a@\n"
+		       i (Kappa_printer.perturbation env) pert
 	)
 	state.perturbations ();
       Format.printf "#**********@."

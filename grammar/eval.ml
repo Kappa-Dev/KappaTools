@@ -559,11 +559,11 @@ let compile_print_expr env mixs ex =
     ex (mixs,[])
 
 let effects_of_modif variables lrules env ast_list =
-  let rec iter mixs lrules effects str_pert env ast_list =
+  let rec iter mixs lrules effects env ast_list =
     match ast_list with
-    | [] -> (mixs,lrules,effects,str_pert,env)
+    | [] -> (mixs,lrules,effects,env)
     | ast::tl ->
-       let (variables,lrules,effects,str_pert,env) =
+       let (variables,lrules,effects,env) =
 	 match ast with
 	 | INTRO (alg_expr, ast_mix, pos) ->
 	    let (mix,alg_pos) =
@@ -583,13 +583,8 @@ let effects_of_modif variables lrules env ast_list =
 	    let env,mixs'',rule =
 	      rule_of_ast ~is_pert:true env mixs'
 			  (Some (Term.with_dummy_pos nme_pert),ast_rule) in
-	    let str =
-	      (Format.asprintf "introduce %a * %a"
-			       Expr.print_ast_alg (fst alg_expr)
-			       (Kappa_printer.mixture false env)
-			      rule.Primitives.rhs)::str_pert
-	    in (mixs'', rule::lrules,
-		(Primitives.ITER_RULE (alg_pos, rule))::effects, str, env)
+	     (mixs'', rule::lrules,
+		(Primitives.ITER_RULE (alg_pos, rule))::effects, env)
 	 | DELETE (alg_expr, ast_mix, pos) ->
 	    let (mix,alg_pos) =
 	      Expr.compile_alg env.Environment.algs.NamedDecls.finder
@@ -608,13 +603,8 @@ let effects_of_modif variables lrules env ast_list =
 	    let env,mixs'',rule =
 	      rule_of_ast ~is_pert:true env mixs'
 			  (Some (Term.with_dummy_pos nme_pert),ast_rule) in
-	    let str =
-	      (Format.asprintf "remove %a * %a"
-			      Expr.print_ast_alg (fst alg_expr)
-			      (Kappa_printer.mixture false env)
-			      rule.Primitives.lhs)::str_pert
-	    in (mixs'', rule::lrules,
-		(Primitives.ITER_RULE (alg_pos, rule))::effects, str, env)
+	     (mixs'', rule::lrules,
+		(Primitives.ITER_RULE (alg_pos, rule))::effects, env)
 	 | UPDATE ((nme, pos_rule), alg_expr) ->
 	    let i,is_rule =
 	      (try (Environment.num_of_rule nme env,true)
@@ -632,18 +622,9 @@ let effects_of_modif variables lrules env ast_list =
 			       env.Environment.tokens.NamedDecls.finder
 			       (env.Environment.fresh_kappa,[]) alg_expr in
 	    let (env',mixs') = mixtures_of_result mixs env mix in
-	    let str =
-	      (if is_rule then
-		 Format.asprintf "set rate of rule '%s' to %a"
-				(Environment.rule_of_num i env)
-	       else
-		 Format.asprintf "set variable '%s' to %a"
-				(fst (Environment.alg_of_num i env)))
-		Expr.print_ast_alg (fst alg_expr)::str_pert
-	    in
 	    (mixs',lrules,
 	     (Primitives.UPDATE ((if is_rule then Term.RULE i
-	      else Term.ALG i), alg_pos))::effects, str, env')
+	      else Term.ALG i), alg_pos))::effects, env')
 	 | UPDATE_TOK ((tk_nme,tk_pos),alg_expr) ->
 	    let tk_id =
 	      try Environment.num_of_token tk_nme env with
@@ -656,23 +637,18 @@ let effects_of_modif variables lrules env ast_list =
 			       env.Environment.tokens.NamedDecls.finder
 			       (env.Environment.fresh_kappa,[]) alg_expr in
 	    let (env',mixs') = mixtures_of_result mixs env mix in
-	    let str = (Format.asprintf "set token '%s' to value %a" tk_nme
-				       Expr.print_ast_alg (fst alg_expr))::str_pert
-	    in
-	    (mixs',lrules,(Primitives.UPDATE (Term.TOK tk_id, alg_pos))::effects, str,env')
+	    (mixs',lrules,(Primitives.UPDATE (Term.TOK tk_id, alg_pos))::effects,env')
 	 | SNAPSHOT (pexpr,pos) ->
 	    let (mix,pexpr') =
 	      compile_print_expr env (env.Environment.fresh_kappa,[]) pexpr in
 	    let (env',mixs') = mixtures_of_result mixs env mix in
 	    (*when specializing snapshots to particular mixtures, add variables below*)
-	    let str = ("snapshot state")::str_pert in
-	    (mixs', lrules, (Primitives.SNAPSHOT pexpr')::effects, str, env')
+	    (mixs', lrules, (Primitives.SNAPSHOT pexpr')::effects, env')
 	 | STOP (pexpr,pos) ->
 	    let (mix,pexpr') =
 	      compile_print_expr env (env.Environment.fresh_kappa,[]) pexpr in
 	    let (env',mixs') = mixtures_of_result mixs env mix in
-	    let str = "interrupt simulation"::str_pert in
-	    (mixs', lrules, (Primitives.STOP pexpr')::effects, str, env')
+	    (mixs', lrules, (Primitives.STOP pexpr')::effects, env')
 	 | CFLOW ((lab,pos_lab),pos_pert) ->
 	    let id =
 	      try Environment.num_of_rule lab env
@@ -686,8 +662,7 @@ let effects_of_modif variables lrules env ast_list =
 			   ("Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"
 			   ,pos_lab))
 	    in
-	    let str = (Printf.sprintf "Enable causality analysis for observable '%s'" lab)::str_pert in
-	    (mixs, lrules, (Primitives.CFLOW id)::effects, str, env)
+	    (mixs, lrules, (Primitives.CFLOW id)::effects, env)
 	 | CFLOWOFF ((lab,pos_lab),pos_pert) ->
 	    let id =
 	      try Environment.num_of_rule lab env
@@ -701,41 +676,27 @@ let effects_of_modif variables lrules env ast_list =
 			   ("Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"
 			   ,pos_lab))
 	    in
-	    let str = (Printf.sprintf "Disable causality analysis for observable '%s'" lab)::str_pert in
-	    (mixs, lrules, (Primitives.CFLOWOFF id)::effects, str, env)
+	    (mixs, lrules, (Primitives.CFLOWOFF id)::effects, env)
 	 | FLUX (pexpr,pos) ->
 	    let (mix,pexpr') =
 	      compile_print_expr env (env.Environment.fresh_kappa,[]) pexpr in
 	    let (env',mixs') = mixtures_of_result mixs env mix in
-	    let str = "Activate flux tracking"::str_pert in
-	    (mixs', lrules, (Primitives.FLUX pexpr')::effects, str, env')
+	    (mixs', lrules, (Primitives.FLUX pexpr')::effects, env')
 	 | FLUXOFF (pexpr,pos) ->
 	    let (mix,pexpr') =
 	      compile_print_expr env (env.Environment.fresh_kappa,[]) pexpr in
 	    let (env',mixs') = mixtures_of_result mixs env mix in
-	    let str = "Disable flux tracking"::str_pert in
-	    (mixs', lrules, (Primitives.FLUXOFF pexpr')::effects, str, env')
+	    (mixs', lrules, (Primitives.FLUXOFF pexpr')::effects, env')
 	 | PRINT (pexpr,print,pos) ->
 	    let (mix,pexpr') =
 	      compile_print_expr env (env.Environment.fresh_kappa,[]) pexpr in
 	    let (mix',print') = compile_print_expr env mix pexpr in
 	    let (env',mixs') = mixtures_of_result mixs env mix' in
-	    let str_l =
-	      List.fold_left
-		(fun cont (pexpr,pos) ->
-		 match pexpr with
-		 | Ast.Str_pexpr str -> str::cont
-		 | Ast.Alg_pexpr alg ->
-		    Format.asprintf "%a" Expr.print_ast_alg alg::cont
-		) [] print
-	    in
-	    let str = (Printf.sprintf "Print %s" (Tools.string_of_list (fun i->i) str_l))::str_pert
-	    in
-	    (mixs',lrules,(Primitives.PRINT (pexpr',print'))::effects,str,env')
+	    (mixs',lrules,(Primitives.PRINT (pexpr',print'))::effects,env')
        in
-       iter variables lrules effects str_pert env tl
+       iter variables lrules effects env tl
   in
-  iter variables lrules [] [] env ast_list
+  iter variables lrules [] env ast_list
 
 let pert_of_result variables env rules res =
   let (variables, lpert, lrules, env) =
@@ -754,15 +715,12 @@ let pert_of_result variables env rules res =
 		     (ExceptionDefn.Semantics_Error
 			(bpos,"Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"))
        in
-       let (variables, lrules', effects, str_eff, env) =
+       let (variables, lrules', effects, env) =
 	 effects_of_modif variables' lrules env' modif_expr_list in
-       let str_eff = String.concat ";" (List.rev str_eff) in
-       let env,variables,str_pert,opt_abort =
+       let env,variables,opt_abort =
 	 match opt_post with
 	 | None ->
-	    (env,variables,
-	     Format.asprintf "whenever %a, %s"
-			     Expr.print_ast_bool (fst pre_expr) str_eff,None)
+	    (env,variables,None)
 	 | Some post_expr ->
 	    let (mix,(post,_pos)) =
 	      Expr.compile_bool env.Environment.algs.NamedDecls.finder
@@ -776,13 +734,9 @@ let pert_of_result variables env rules res =
 		  (ExceptionDefn.Semantics_Error
 		     (bpos,"Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"))
 	    in
-	    (env',variables',
-	     Format.asprintf "whenever %a, %s until %a"
-			     Expr.print_ast_bool (fst pre_expr) str_eff
-			     Expr.print_ast_bool (fst post_expr),
-	     Some (post,dep))
+	    (env',variables',Some (post,dep))
        in
-       let env,p_id = Environment.declare_pert (str_pert,pos) env' in
+       let env,p_id = Environment.declare_pert env' in
        let has_tracking = env.Environment.tracking_enabled
 			  || List.exists
 			       (function

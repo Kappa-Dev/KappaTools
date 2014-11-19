@@ -120,4 +120,13 @@ let modification env f = function
      in Format.fprintf f "$TRACK '%s' [false]" nme
 
 let perturbation env f pert =
-  Pp.list Pp.colon (modification env) f pert.Primitives.effect
+  let aux f =
+    Format.fprintf f "%a do %a"
+		   (Expr.print_bool (alg_expr env)) pert.Primitives.precondition
+		   (Pp.list Pp.colon (modification env)) pert.Primitives.effect
+  in
+  match pert.Primitives.abort with
+  | None -> Format.fprintf f "%%mod: %t@." aux
+  | Some ab ->
+     Format.fprintf f "%%mod: repeat %t until %a@." aux
+		    (Expr.print_bool (alg_expr env)) ab
