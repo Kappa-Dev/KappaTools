@@ -20,7 +20,6 @@ type t = {
 	unary_rule_of_num : string IntMap.t ;
 	
 	fresh_pert : int ;
-	num_of_pert : int StringMap.t ;
 	pert_of_num : string IntMap.t ;
 	(*rule_of_pert : IntSet.t IntMap.t ;*)
 	
@@ -51,7 +50,6 @@ let empty =
 	fresh_kappa = 0 ;
 	fresh_pert = 0 ;
 	tokens = NamedDecls.create [||];
-	num_of_pert = StringMap.empty ;
 	pert_of_num = IntMap.empty ;
 	perturbations = NamedDecls.create [||];
 	(*rule_of_pert = IntMap.empty ;*)
@@ -137,7 +135,6 @@ let unary_rule_of_num i env =  IntMap.find i env.unary_rule_of_num
 
 
 let pert_of_num i env = IntMap.find i env.pert_of_num
-let num_of_pert lab env = StringMap.find lab env.num_of_pert
 let is_rule i env = IntSet.mem i env.rule_indices
 let num_of_alg s env = StringMap.find s env.algs.NamedDecls.finder
 let alg_of_num i env = fst env.algs.NamedDecls.decls.(i)
@@ -145,22 +142,10 @@ let alg_of_num i env = fst env.algs.NamedDecls.decls.(i)
 (*let rule_of_pert pid env = try Some (IntMap.find pid env.rule_of_pert) with Not_found -> None *)
 
 let declare_pert (lab,pos) env =
-  let opt = try Some (num_of_pert lab env) with Not_found -> None in
-  match opt with
-  | Some i ->
-     ExceptionDefn.warning
-       ~pos
-       (fun f ->
-	Format.fprintf
-	  f "Perturbation is defined twice, ignoring additional occurence");
-     (env,i)
-  | None ->
-     let i,env = (env.fresh_pert,{env with fresh_pert = env.fresh_pert+1})
-     in
-     ({env with
-	pert_of_num = IntMap.add i lab env.pert_of_num ;
-	num_of_pert = StringMap.add lab i env.num_of_pert
-      },i)
+  ({env with
+     pert_of_num = IntMap.add env.fresh_pert lab env.pert_of_num;
+     fresh_pert = env.fresh_pert+1}
+  ,env.fresh_pert)
 let name_number env = NamedDecls.size env.signatures
 
 let add_dependencies dep dep' env =
