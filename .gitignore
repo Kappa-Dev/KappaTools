@@ -14,6 +14,12 @@ grammar/kappaParser.mli
 grammar/kappaLexer.ml
 
 # test suite
-models/cflows/*/tmp/
+models/cflows/*/output/*.diff
+models/cflows/*/output/*.dot
+models/cflows/*/output/*.dat
+models/cflows/*/output/data.out
+models/cflows/*/output/LOG
+models/cflows/*/output/error.log
 models/cflows/*/error
+models/cflows/error
 profiling.txt

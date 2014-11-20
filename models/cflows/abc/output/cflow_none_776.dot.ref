@@ -1,0 +1,324 @@
+/* Compression of 1 causal flows obtained in average at 2.067046E+01 t.u */
+/* Compressed causal flows were: [3857] */
+digraph G{
+ ranksep=.5 ; 
+{ rank = same ; "0" [shape=plaintext] ; node_1 [label ="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_2 [label ="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_3 [label ="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_4 [label ="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_5 [label ="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_6 [label ="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_7 [label ="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_8 [label ="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_9 [label ="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_10 [label ="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_11 [label ="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_12 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_13 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_14 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_15 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_16 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_17 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_18 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_19 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_20 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_21 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_22 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_23 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_24 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_25 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_26 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_27 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_28 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_29 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_30 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_31 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_32 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_33 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+}
+{ rank = same ; "1" [shape=plaintext] ; node_34 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_35 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_36 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_37 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_84 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "2" [shape=plaintext] ; node_38 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_39 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_40 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_44 [label="a.b_op", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_83 [label="a.b_op", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "3" [shape=plaintext] ; node_41 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_42 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_43 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_52 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "4" [shape=plaintext] ; node_45 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_46 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_47 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_55 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "5" [shape=plaintext] ; node_48 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_49 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_51 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_56 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "6" [shape=plaintext] ; node_50 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_54 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_58 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_61 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "7" [shape=plaintext] ; node_53 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_57 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_62 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_63 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "8" [shape=plaintext] ; node_59 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_64 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_65 [label="a.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "9" [shape=plaintext] ; node_60 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_66 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_72 [label="mod x2", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "10" [shape=plaintext] ; node_67 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_68 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_73 [label="a.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "11" [shape=plaintext] ; node_69 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_70 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_77 [label="mod x2", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "12" [shape=plaintext] ; node_71 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_74 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "13" [shape=plaintext] ; node_75 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_79 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "14" [shape=plaintext] ; node_76 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_82 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "15" [shape=plaintext] ; node_78 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_90 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "16" [shape=plaintext] ; node_80 [label="a.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "17" [shape=plaintext] ; node_81 [label="mod x2", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "18" [shape=plaintext] ; node_85 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "19" [shape=plaintext] ; node_86 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "20" [shape=plaintext] ; node_87 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "21" [shape=plaintext] ; node_88 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "22" [shape=plaintext] ; node_89 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "23" [shape=plaintext] ; node_91 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "24" [shape=plaintext] ; node_92 [label="a.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "25" [shape=plaintext] ; node_93 [label="mod x2", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "26" [shape=plaintext] ; node_94 [label ="Cpp", style=filled, fillcolor=red] ;
+}
+"0" -> "1" [style="invis"]; 
+"1" -> "2" [style="invis"]; 
+"2" -> "3" [style="invis"]; 
+"3" -> "4" [style="invis"]; 
+"4" -> "5" [style="invis"]; 
+"5" -> "6" [style="invis"]; 
+"6" -> "7" [style="invis"]; 
+"7" -> "8" [style="invis"]; 
+"8" -> "9" [style="invis"]; 
+"9" -> "10" [style="invis"]; 
+"10" -> "11" [style="invis"]; 
+"11" -> "12" [style="invis"]; 
+"12" -> "13" [style="invis"]; 
+"13" -> "14" [style="invis"]; 
+"14" -> "15" [style="invis"]; 
+"15" -> "16" [style="invis"]; 
+"16" -> "17" [style="invis"]; 
+"17" -> "18" [style="invis"]; 
+"18" -> "19" [style="invis"]; 
+"19" -> "20" [style="invis"]; 
+"20" -> "21" [style="invis"]; 
+"21" -> "22" [style="invis"]; 
+"22" -> "23" [style="invis"]; 
+"23" -> "24" [style="invis"]; 
+"24" -> "25" [style="invis"]; 
+"25" -> "26" [style="invis"]; 
+node_3 -> node_34
+node_5 -> node_34
+node_7 -> node_35
+node_10 -> node_35
+node_6 -> node_36
+node_11 -> node_36
+node_8 -> node_37
+node_9 -> node_37
+node_6 -> node_38
+node_26 -> node_38
+node_36 -> node_38
+node_9 -> node_39
+node_27 -> node_39
+node_37 -> node_39
+node_7 -> node_40
+node_23 -> node_40
+node_35 -> node_40
+node_23 -> node_41
+node_40 -> node_41
+node_27 -> node_42
+node_39 -> node_42
+node_26 -> node_43
+node_38 -> node_43
+node_34 -> node_44
+node_33 -> node_45
+node_35 -> node_45
+node_41 -> node_45
+node_13 -> node_46
+node_36 -> node_46
+node_43 -> node_46
+node_15 -> node_47
+node_37 -> node_47
+node_42 -> node_47
+node_33 -> node_48
+node_45 -> node_48
+node_13 -> node_49
+node_46 -> node_49
+node_22 -> node_50
+node_35 -> node_50
+node_48 -> node_50
+node_15 -> node_51
+node_47 -> node_51
+node_1 -> node_52
+node_44 -> node_52
+node_22 -> node_53
+node_50 -> node_53
+node_29 -> node_54
+node_37 -> node_54
+node_51 -> node_54
+node_1 -> node_55
+node_25 -> node_55
+node_52 -> node_55
+node_25 -> node_56
+node_55 -> node_56
+node_29 -> node_57
+node_54 -> node_57
+node_16 -> node_58
+node_36 -> node_58
+node_49 -> node_58
+node_19 -> node_59
+node_37 -> node_59
+node_57 -> node_59
+node_19 -> node_60
+node_59 -> node_60
+node_14 -> node_61
+node_52 -> node_61
+node_56 -> node_61
+node_16 -> node_62
+node_58 -> node_62
+node_14 -> node_63
+node_61 -> node_63
+node_17 -> node_64
+node_36 -> node_64
+node_62 -> node_64
+node_4 -> node_65
+node_14 -> node_65
+node_63 -> node_65
+node_17 -> node_66
+node_64 -> node_66
+node_28 -> node_67
+node_37 -> node_67
+node_60 -> node_67
+node_21 -> node_68
+node_36 -> node_68
+node_66 -> node_68
+node_21 -> node_69
+node_68 -> node_69
+node_28 -> node_70
+node_67 -> node_70
+node_31 -> node_71
+node_37 -> node_71
+node_70 -> node_71
+node_4 -> node_72
+node_14 -> node_72
+node_63 -> node_72
+node_65 -> node_72
+node_4 -> node_73
+node_22 -> node_73
+node_53 -> node_73
+node_72 -> node_73
+node_18 -> node_74
+node_36 -> node_74
+node_69 -> node_74
+node_18 -> node_75
+node_74 -> node_75
+node_24 -> node_76
+node_36 -> node_76
+node_75 -> node_76
+node_4 -> node_77
+node_22 -> node_77
+node_53 -> node_77
+node_73 -> node_77
+node_24 -> node_78
+node_76 -> node_78
+node_31 -> node_79
+node_71 -> node_79
+node_4 -> node_80
+node_24 -> node_80
+node_77 -> node_80
+node_78 -> node_80
+node_4 -> node_81
+node_24 -> node_81
+node_78 -> node_81
+node_80 -> node_81
+node_20 -> node_82
+node_37 -> node_82
+node_79 -> node_82
+node_37 -> node_83
+node_2 -> node_84
+node_4 -> node_84
+node_32 -> node_85
+node_81 -> node_85
+node_84 -> node_85
+node_32 -> node_86
+node_85 -> node_86
+node_12 -> node_87
+node_84 -> node_87
+node_86 -> node_87
+node_12 -> node_88
+node_87 -> node_88
+node_30 -> node_89
+node_84 -> node_89
+node_88 -> node_89
+node_20 -> node_90
+node_82 -> node_90
+node_30 -> node_91
+node_89 -> node_91
+node_30 -> node_92
+node_83 -> node_92
+node_90 -> node_92
+node_91 -> node_92
+node_30 -> node_93
+node_83 -> node_93
+node_91 -> node_93
+node_92 -> node_93
+node_91 -> node_94
+node_93 -> node_94
+node_83 -> node_67 [style=dotted, arrowhead = tee] 
+node_83 -> node_71 [style=dotted, arrowhead = tee] 
+node_83 -> node_82 [style=dotted, arrowhead = tee] 
+node_83 -> node_59 [style=dotted, arrowhead = tee] 
+node_83 -> node_54 [style=dotted, arrowhead = tee] 
+node_83 -> node_47 [style=dotted, arrowhead = tee] 
+node_83 -> node_39 [style=dotted, arrowhead = tee] 
+node_84 -> node_81 [style=dotted, arrowhead = tee] 
+node_84 -> node_80 [style=dotted, arrowhead = tee] 
+node_84 -> node_77 [style=dotted, arrowhead = tee] 
+node_84 -> node_73 [style=dotted, arrowhead = tee] 
+node_84 -> node_72 [style=dotted, arrowhead = tee] 
+node_84 -> node_65 [style=dotted, arrowhead = tee] 
+}
+/*
+*/

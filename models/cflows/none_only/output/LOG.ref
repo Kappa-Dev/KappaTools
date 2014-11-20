@@ -1,0 +1,46 @@
+Parsing none_only.ka...
+done
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -variable declarations
+	 -initial conditions
+	 -rules
+	 -observables
+	 -perturbations
+	 Done
++ Analyzing non local patterns...
++ Building initial simulation state...
+	 -Counting initial local patterns...
+	 Done
+____________________________________________________________
+############################################################
++ Producing causal traces
+	 - refining events
+	 - Causal flow (without simplification) computation
+		 * Causal flow computation (10)
+
+Stats:
+ number of step   : 11031
+ longest story    : 873
+ average length   : 340.312871287
+ geometric mean   : 421.938966071
+
+
+____________________________________________________________
+############################################################
+
+
+
+
+
+
++ Pretty printing 10 flows
+
+Simulation ended (eff.: 0.708215, detail below)
+	Valid embedding but no longer unary when required: 0.000000
+	Valid embedding but not binary when required: 0.000000
+	Clashing instance: 0.000000
+	Lazy negative update: 1.000000
+	Lazy negative update of non local instances: 0.000000
+	Perturbation interrupting time advance: 0.000000

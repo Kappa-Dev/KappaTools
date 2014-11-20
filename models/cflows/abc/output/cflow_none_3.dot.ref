@@ -1,0 +1,56 @@
+/* Compression of 329 causal flows obtained in average at 9.899843E+00 t.u */
+/* Compressed causal flows were: [39;104;108;120;171;186;188;194;200;203;210;222;228;229;247;248;267;268;270;274;278;280;281;284;285;286;291;309;312;326;331;333;339;346;359;370;372;377;393;394;396;397;403;410;437;443;445;447;452;454;456;461;473;475;490;501;504;509;511;516;518;524;527;534;542;546;548;550;555;557;569;583;588;592;593;596;601;622;624;629;634;636;642;645;657;665;672;680;686;700;706;717;723;726;728;730;738;747;755;762;764;767;774;781;786;800;802;804;810;815;821;826;832;841;844;846;850;854;855;872;875;876;879;884;886;897;899;903;908;927;929;933;940;956;963;982;992;994;998;1003;1004;1009;1011;1018;1024;1048;1056;1073;1074;1081;1083;1089;1090;1112;1113;1127;1130;1135;1137;1159;1173;1195;1196;1205;1208;1209;1210;1220;1240;1242;1245;1262;1271;1276;1280;1288;1295;1296;1302;1304;1309;1320;1327;1331;1344;1346;1357;1358;1361;1364;1375;1380;1387;1389;1397;1402;1412;1422;1426;1429;1432;1434;1439;1450;1459;1462;1463;1465;1468;1481;1485;1507;1519;1524;1525;1533;1534;1536;1553;1554;1580;1581;1589;1592;1593;1608;1643;1644;1645;1646;1652;1693;1706;1723;1746;1750;1751;1772;1773;1774;1775;1781;1785;1803;1819;1825;1841;1842;1849;1851;1877;1891;1894;1944;1991;2006;2007;2009;2015;2016;2029;2032;2034;2038;2055;2098;2106;2113;2121;2134;2201;2225;2270;2274;2293;2344;2348;2355;2368;2375;2380;2384;2395;2406;2433;2467;2493;2495;2512;2542;2575;2603;2631;2656;2661;2668;2684;2691;2717;2723;2743;2865;2965;2972;2974;2986;2996;3046;3070;3082;3125;3142;3256;3285;3328;3335;3369;3417;3418;3420;3427;3458;3533;3581;3602;3608;3676;3703;3858] */
+digraph G{
+ ranksep=.5 ; 
+{ rank = same ; "0" [shape=plaintext] ; node_1 [label ="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_2 [label ="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_3 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_4 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_5 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+}
+{ rank = same ; "1" [shape=plaintext] ; node_6 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "2" [shape=plaintext] ; node_7 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "3" [shape=plaintext] ; node_8 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "4" [shape=plaintext] ; node_9 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "5" [shape=plaintext] ; node_10 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "6" [shape=plaintext] ; node_11 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "7" [shape=plaintext] ; node_12 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "8" [shape=plaintext] ; node_13 [label ="Cpu", style=filled, fillcolor=red] ;
+}
+"0" -> "1" [style="invis"]; 
+"1" -> "2" [style="invis"]; 
+"2" -> "3" [style="invis"]; 
+"3" -> "4" [style="invis"]; 
+"4" -> "5" [style="invis"]; 
+"5" -> "6" [style="invis"]; 
+"6" -> "7" [style="invis"]; 
+"7" -> "8" [style="invis"]; 
+node_1 -> node_6
+node_2 -> node_6
+node_1 -> node_7
+node_5 -> node_7
+node_6 -> node_7
+node_5 -> node_8
+node_7 -> node_8
+node_3 -> node_9
+node_6 -> node_9
+node_8 -> node_9
+node_3 -> node_10
+node_9 -> node_10
+node_4 -> node_11
+node_6 -> node_11
+node_10 -> node_11
+node_4 -> node_12
+node_11 -> node_12
+node_4 -> node_13
+node_12 -> node_13
+}
+/*
+*/

@@ -1,0 +1,70 @@
+Parsing empty.ka...
+done
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -variable declarations
+	 -initial conditions
+	 -rules
+	 -observables
+	 -perturbations
+	 Done
++ Analyzing non local patterns...
++ Building initial simulation state...
+	 -Counting initial local patterns...
+	 Done
+____________________________________________________________
+############################################################
++ Producing causal compressions
+	 - refining events
+	 - Causal flow (without simplification) computation
+		 * Causal flow computation (4)
+
+Stats:
+ number of step   : 34
+ longest story    : 7
+ average length   : 3.94444444444
+ geometric mean   : 4.22295315311
+
+
+____________________________________________________________
+############################################################
+
+	 - Causal flow (with trivial simplifications) computation
+		 * detecting pseudo inverse events
+		 * Causal flow computation (4)
+
+Stats:
+ number of step   : 34
+ longest story    : 7
+ average length   : 4.85714285714
+ geometric mean   : 5.04267502706
+
+
+____________________________________________________________
+############################################################
+
+
+
+	 - Weak flow compression (2)
+
+____________________________________________________________
+############################################################
+
+	 - Strong flow compression (2)
+
+____________________________________________________________
+############################################################
++ Pretty printing 3 flows
+
++ Pretty printing 2 weakly compressed flows
+
++ Pretty printing 2 strongly compressed flows
+
+Simulation ended (eff.: 0.692308, detail below)
+	Valid embedding but no longer unary when required: 0.000000
+	Valid embedding but not binary when required: 0.000000
+	Clashing instance: 0.000000
+	Lazy negative update: 1.000000
+	Lazy negative update of non local instances: 0.000000
+	Perturbation interrupting time advance: 0.000000

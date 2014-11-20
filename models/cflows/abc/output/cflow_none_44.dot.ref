@@ -1,0 +1,96 @@
+/* Compression of 6 causal flows obtained in average at 1.369160E+01 t.u */
+/* Compressed causal flows were: [925;1517;1989;2220;2957;3423] */
+digraph G{
+ ranksep=.5 ; 
+{ rank = same ; "0" [shape=plaintext] ; node_1 [label ="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_2 [label ="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_3 [label ="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_4 [label ="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_5 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_6 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_7 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_8 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_9 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+}
+{ rank = same ; "1" [shape=plaintext] ; node_10 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_14 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "2" [shape=plaintext] ; node_11 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_17 [label="a.b_op", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_19 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "3" [shape=plaintext] ; node_12 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_20 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "4" [shape=plaintext] ; node_13 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_21 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "5" [shape=plaintext] ; node_15 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_22 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "6" [shape=plaintext] ; node_16 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "7" [shape=plaintext] ; node_18 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "8" [shape=plaintext] ; node_23 [label="a.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "9" [shape=plaintext] ; node_24 [label="mod x2", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "10" [shape=plaintext] ; node_25 [label ="Cpp", style=filled, fillcolor=red] ;
+}
+"0" -> "1" [style="invis"]; 
+"1" -> "2" [style="invis"]; 
+"2" -> "3" [style="invis"]; 
+"3" -> "4" [style="invis"]; 
+"4" -> "5" [style="invis"]; 
+"5" -> "6" [style="invis"]; 
+"6" -> "7" [style="invis"]; 
+"7" -> "8" [style="invis"]; 
+"8" -> "9" [style="invis"]; 
+"9" -> "10" [style="invis"]; 
+node_1 -> node_10
+node_2 -> node_10
+node_1 -> node_11
+node_7 -> node_11
+node_10 -> node_11
+node_7 -> node_12
+node_11 -> node_12
+node_8 -> node_13
+node_10 -> node_13
+node_12 -> node_13
+node_3 -> node_14
+node_4 -> node_14
+node_8 -> node_15
+node_13 -> node_15
+node_5 -> node_16
+node_10 -> node_16
+node_15 -> node_16
+node_10 -> node_17
+node_5 -> node_18
+node_16 -> node_18
+node_4 -> node_19
+node_9 -> node_19
+node_14 -> node_19
+node_9 -> node_20
+node_19 -> node_20
+node_6 -> node_21
+node_14 -> node_21
+node_20 -> node_21
+node_6 -> node_22
+node_21 -> node_22
+node_6 -> node_23
+node_17 -> node_23
+node_18 -> node_23
+node_22 -> node_23
+node_6 -> node_24
+node_17 -> node_24
+node_22 -> node_24
+node_23 -> node_24
+node_22 -> node_25
+node_24 -> node_25
+node_17 -> node_16 [style=dotted, arrowhead = tee] 
+node_17 -> node_13 [style=dotted, arrowhead = tee] 
+node_17 -> node_11 [style=dotted, arrowhead = tee] 
+}
+/*
+*/

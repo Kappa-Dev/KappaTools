@@ -1,0 +1,72 @@
+Parsing create.ka...
+done
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -variable declarations
+	 -initial conditions
+	 -rules
+	 -observables
+	 -perturbations
+	 Done
++ Analyzing non local patterns...
++ Building initial simulation state...
+	 -Counting initial local patterns...
+	 Done
+____________________________________________________________
+############################################################
++ Producing causal compressions
+	 - refining events
+	 - Causal flow (without simplification) computation
+		 * Causal flow computation (1023)
+
+Stats:
+ number of step   : 7024
+ longest story    : 202
+ average length   : 24.4169018761
+ geometric mean   : 36.445413138
+
+
+____________________________________________________________
+############################################################
+
+	 - Causal flow (with trivial simplifications) computation
+		 * detecting pseudo inverse events
+		 * Causal flow computation (1023)
+
+____________________________________________________________
+############################################################
+Stats:
+ number of step   : 4952
+ longest story    : 124
+ average length   : 19.1641873278
+ geometric mean   : 26.0910146762
+
+
+____________________________________________________________
+############################################################
+
+
+
+	 - Weak flow compression (359)
+
+____________________________________________________________
+############################################################
+
+	 - Strong flow compression (44)
+
+____________________________________________________________
+############################################################
++ Pretty printing 549 flows
+
++ Pretty printing 44 weakly compressed flows
+
++ Pretty printing 1 strongly compressed flow
+
+Simulation ended (eff.: 0.996413, detail below)
+	Valid embedding but no longer unary when required: 0.000000
+	Valid embedding but not binary when required: 0.000000
+	Clashing instance: 0.055556
+	Lazy negative update: 0.944444
+	Lazy negative update of non local instances: 0.000000
+	Perturbation interrupting time advance: 0.000000

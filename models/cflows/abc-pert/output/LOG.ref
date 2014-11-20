@@ -1,0 +1,52 @@
+Parsing abc-pert.ka...
+done
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -variable declarations
+	 -initial conditions
+	 -rules
+	 -observables
+	 -perturbations
+	 Done
++ Analyzing non local patterns...
++ Building initial simulation state...
+	 -Counting initial local patterns...
+	 Done
+____________________________________________________________
+############################################################
++ Producing causal compressions
+	 - refining events
+	 - Causal flow (with trivial simplifications) computation
+		 * detecting pseudo inverse events
+		 * Causal flow computation (10)
+
+____________________________________________________________
+############################################################
+Stats:
+ number of step   : 55663
+ longest story    : 2507
+ average length   : 290.859720605
+ geometric mean   : 457.622001011
+
+
+____________________________________________________________
+############################################################
+
+
+
+	 - Weak flow compression (10)
+
+____________________________________________________________
+############################################################
+
+
++ Pretty printing 1 weakly compressed flow
+
+Simulation ended (eff.: 0.993749, detail below)
+	Valid embedding but no longer unary when required: 0.000000
+	Valid embedding but not binary when required: 0.000000
+	Clashing instance: 0.000000
+	Lazy negative update: 1.000000
+	Lazy negative update of non local instances: 0.000000
+	Perturbation interrupting time advance: 0.000000

@@ -1,0 +1,52 @@
+Parsing binding_type.ka...
+done
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -variable declarations
+	 -initial conditions
+	 -rules
+	 -observables
+	 -perturbations
+	 Done
++ Analyzing non local patterns...
++ Building initial simulation state...
+	 -Counting initial local patterns...
+	 Done
+____________________________________________________________
+############################################################
++ Producing causal compressions
+	 - refining events
+	 - Causal flow (with trivial simplifications) computation
+		 * detecting pseudo inverse events
+		 * Causal flow computation (100)
+
+____________________________________________________________
+############################################################
+Stats:
+ number of step   : 4033
+ longest story    : 14
+ average length   : 4.84149448061
+ geometric mean   : 5.09138119454
+
+
+____________________________________________________________
+############################################################
+
+
+
+	 - Weak flow compression (1)
+
+____________________________________________________________
+############################################################
+
+
++ Pretty printing 1 weakly compressed flow
+
+Simulation ended (eff.: 0.939850, detail below)
+	Valid embedding but no longer unary when required: 0.000000
+	Valid embedding but not binary when required: 0.000000
+	Clashing instance: 0.000000
+	Lazy negative update: 1.000000
+	Lazy negative update of non local instances: 0.000000
+	Perturbation interrupting time advance: 0.000000

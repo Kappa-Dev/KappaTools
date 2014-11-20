@@ -1,0 +1,57 @@
+Parsing link_swapping_strong2.ka...
+done
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -variable declarations
+	 -initial conditions
+	 -rules
+	 -observables
+	 -perturbations
+	 Done
++ Analyzing non local patterns...
++ Building initial simulation state...
+	 -Counting initial local patterns...
+	 Done
+____________________________________________________________
+############################################################
++ Producing causal compressions
+	 - refining events
+	 - Causal flow (with trivial simplifications) computation
+		 * detecting pseudo inverse events
+		 * Causal flow computation (50)
+
+____________________________________________________________
+############################################################
+Stats:
+ number of step   : 353
+ longest story    : 300
+ average length   : 161.096153846
+ geometric mean   : 184.518969215
+
+
+____________________________________________________________
+############################################################
+
+
+
+	 - Weak flow compression (50)
+
+____________________________________________________________
+############################################################
+
+	 - Strong flow compression (18)
+
+____________________________________________________________
+############################################################
++ Pretty printing 18 weakly compressed flows
+
++ Pretty printing 1 strongly compressed flow
+
+Simulation ended (eff.: 0.473934, detail below)
+	Valid embedding but no longer unary when required: 0.000000
+	Valid embedding but not binary when required: 0.000000
+	Clashing instance: 0.000000
+	Lazy negative update: 1.000000
+	Lazy negative update of non local instances: 0.000000
+	Perturbation interrupting time advance: 0.000000
