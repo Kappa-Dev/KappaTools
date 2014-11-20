@@ -19,8 +19,6 @@ type t = {
 	num_of_unary_rule : int StringMap.t ;
 	unary_rule_of_num : string IntMap.t ;
 	
-	fresh_pert : int ;
-	
 	rule_indices : IntSet.t ;
 	empty_lhs : IntSet.t ;
 	
@@ -46,7 +44,6 @@ let empty =
 	rule_of_num = IntMap.empty ;
 	unary_rule_of_num = IntMap.empty ; 
 	fresh_kappa = 0 ;
-	fresh_pert = 0 ;
 	tokens = NamedDecls.create [||];
 	perturbations = NamedDecls.create [||];
 	rule_indices = IntSet.empty ;
@@ -114,7 +111,6 @@ let is_nl_root ag_nme env = IntMap.mem ag_nme env.nl_elements
 
 let is_nl_rule r_id env = IntMap.mem r_id env.unary_rule_of_num
 
-let next_pert_id env = env.fresh_pert
 let declare_empty_lhs id env = {env with empty_lhs = IntSet.add id env.empty_lhs}
 let is_empty_lhs id env = IntSet.mem id env.empty_lhs
 
@@ -133,10 +129,6 @@ let is_rule i env = IntSet.mem i env.rule_indices
 let num_of_alg s env = StringMap.find s env.algs.NamedDecls.finder
 let alg_of_num i env = fst env.algs.NamedDecls.decls.(i)
 
-let declare_pert env =
-  ({env with
-     fresh_pert = env.fresh_pert+1}
-  ,env.fresh_pert)
 let name_number env = NamedDecls.size env.signatures
 
 let add_dependencies dep dep' env =
@@ -156,16 +148,16 @@ let get_dependencies dep env =
   try Term.DepMap.find dep env.dependencies with Not_found -> Term.DepSet.empty
 
 let declare_rule rule_lbl id env =
-	match rule_lbl with
-		| None -> env
-		| Some (r_nme,pos) ->
-			if StringMap.mem r_nme env.num_of_rule
-			then raise (Malformed_Decl (("Rule name "^r_nme^" is already used"),pos))
-			else
-				let nr = StringMap.add r_nme id env.num_of_rule
-				and rn = IntMap.add id r_nme env.rule_of_num
-				in
-					{env with num_of_rule = nr ; rule_of_num = rn}
+  match rule_lbl with
+  | None -> env
+  | Some (r_nme,pos) ->
+     if StringMap.mem r_nme env.num_of_rule
+     then raise (Malformed_Decl (("Rule name "^r_nme^" is already used"),pos))
+     else
+       let nr = StringMap.add r_nme id env.num_of_rule
+       and rn = IntMap.add id r_nme env.rule_of_num
+       in
+       {env with num_of_rule = nr ; rule_of_num = rn}
 
 let declare_unary_rule rule_lbl id env =
 	match rule_lbl with

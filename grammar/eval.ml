@@ -516,16 +516,13 @@ let variables_of_result env mixs alg_a =
 let rules_of_result env mixs res tolerate_new_state =
   let (env, mixs, l) =
     List.fold_left
-      (fun (env, mixs, cont) (ast_rule_label, (ast_rule,rule_pos) as ast) ->
-       let (env, mixs, r) =
-	 rule_of_ast ~is_pert:false env mixs ast
-       in
+      (fun (env, mixs, cont) (_,(ast_rule,_) as ast) ->
+       let (env, mixs, r) = rule_of_ast ~is_pert:false env mixs ast in
        match ast_rule.Ast.k_op with
        | None -> (env,mixs,r::cont)
        | Some k ->
 	  let (env,mixs,back_r) =
-	    rule_of_ast ~backwards:true ~is_pert:false
-			env mixs ast in
+	    rule_of_ast ~backwards:true ~is_pert:false env mixs ast in
 	  (env,mixs,back_r::(r::cont))
       )
       (env, mixs, []) res.Ast.rules
@@ -577,12 +574,9 @@ let effects_of_modif variables lrules env ast_list =
 		rhs = ast_mix; k_def=Term.with_dummy_pos (Ast.CONST(Nbr.F 0.0));
 		k_un=None;k_op=None;
 	      } in
-	    let nme_pert =
-	      Printf.sprintf "pert_%d" (Environment.next_pert_id env) in
 	    let env,mixs'',rule =
 	      rule_of_ast ~is_pert:true env mixs'
-			  (Some (Term.with_dummy_pos nme_pert),
-			   Term.with_dummy_pos ast_rule) in
+			  (None, Term.with_dummy_pos ast_rule) in
 	     (mixs'', rule::lrules,
 		(Primitives.ITER_RULE (alg_pos, rule))::effects, env)
 	 | DELETE (alg_expr, ast_mix, pos) ->
@@ -597,12 +591,9 @@ let effects_of_modif variables lrules env ast_list =
 		k_def=Term.with_dummy_pos (Ast.CONST(Nbr.F 0.0));
 		k_un=None;k_op=None;
 	      } in
-	    let nme_pert =
-	      Printf.sprintf "pert_%d" (Environment.next_pert_id env) in
 	    let env,mixs'',rule =
 	      rule_of_ast ~is_pert:true env mixs'
-			  (Some (Term.with_dummy_pos nme_pert),
-			   Term.with_dummy_pos ast_rule) in
+			  (None,Term.with_dummy_pos ast_rule) in
 	     (mixs'', rule::lrules,
 		(Primitives.ITER_RULE (alg_pos, rule))::effects, env)
 	 | UPDATE ((nme, pos_rule), alg_expr) ->
@@ -699,9 +690,9 @@ let effects_of_modif variables lrules env ast_list =
   iter variables lrules [] env ast_list
 
 let pert_of_result variables env rules res =
-  let (variables, lpert, lrules, env) =
+  let (variables, _, lpert, lrules, env) =
     List.fold_left
-      (fun (variables, lpert, lrules, env)
+      (fun (variables, p_id, lpert, lrules, env)
 	   ((pre_expr, modif_expr_list, opt_post),pos) ->
        let bpos = pos_of_lex_pos (fst pos) in
        let (mix,(pre,_pos)) =
@@ -736,7 +727,6 @@ let pert_of_result variables env rules res =
 	    in
 	    (env',variables',Some (post,dep))
        in
-       let env,p_id = Environment.declare_pert env' in
        let has_tracking = env.Environment.tracking_enabled
 			  || List.exists
 			       (function
@@ -768,9 +758,9 @@ let pert_of_result variables env rules res =
 	   Primitives.stopping_time = stopping_time
 	 }
        in
-       (variables', pert::lpert, lrules', env)
+       (variables', succ p_id, pert::lpert, lrules', env)
       )
-      (variables, [], rules, env) res.perturbations
+      (variables, 0, [], rules, env) res.perturbations
   in
   (*making sure that perturbations containing a stopping time precondition are tested first*)
   let lpert = List.rev lpert in
