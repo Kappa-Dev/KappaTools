@@ -100,8 +100,19 @@ let modification env f = function
        let () = assert (Mixture.is_empty rule.Primitives.rhs) in
        Format.fprintf f "$DEL %a %a" (alg_expr env) n
 		      (mixture false env) rule.Primitives.lhs
-  | Primitives.UPDATE (d_id,_) ->
-     Format.fprintf f "$UPDATE %a" Term.print_dep_type d_id
+  | Primitives.UPDATE (d_id,(va,_)) ->
+     begin
+       match d_id with
+       | Term.TOK id ->
+	  Format.fprintf f "%s <- %a"
+			 (NamedDecls.elt_name env.Environment.tokens id)
+       | Term.ALG id ->
+	  Format.fprintf f "$UPDATE '%s' %a"
+			 (NamedDecls.elt_name env.Environment.algs id)
+       | Term.RULE id ->
+	  Format.fprintf f "$UPDATE '%s' %a" (Environment.rule_of_num id env)
+       | _ -> Format.fprintf f "$UPDATE '%a' %a" Term.print_dep_type d_id
+     end (alg_expr env) va
   | Primitives.SNAPSHOT fn ->
      Format.fprintf f "SNAPSHOT %a" (print_expr env) fn
   | Primitives.STOP fn ->
