@@ -57,8 +57,8 @@ rule token = parse
 	 | '\\' eol {Lexing.new_line lexbuf ; token lexbuf}
 	 | "&&" {AND}
 	 | "||" {OR}
-	 | "<->" {let pos = position lexbuf in KAPPA_LRAR pos}
-	 | "->" {let pos = position lexbuf in KAPPA_RAR pos}
+	 | "<->" {KAPPA_LRAR}
+	 | "->" {KAPPA_RAR}
 	 | "<-" {LAR}
 	 | ":=" {let pos = position lexbuf in ASSIGN pos}
 	 | "<>" {DIFF}

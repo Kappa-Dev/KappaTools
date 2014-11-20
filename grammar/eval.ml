@@ -309,7 +309,8 @@ let reduce_val v env a_mixs =
   let dep = Expr.deps_of_alg_expr alg in
   (mixs',alg,dep)
 
-let rule_of_ast ?(backwards=false) ~is_pert env mixs (ast_rule_label,ast_rule) =
+let rule_of_ast ?(backwards=false) ~is_pert env mixs
+		(ast_rule_label,(ast_rule,rule_pos)) =
   let ast_rule_label,ast_rule =
     if backwards then Ast.flip (ast_rule_label, ast_rule)
     else (ast_rule_label, ast_rule) in
@@ -340,7 +341,7 @@ let rule_of_ast ?(backwards=false) ~is_pert env mixs (ast_rule_label,ast_rule) =
   let lhs = match k_alt with None -> lhs | Some _ -> Mixture.set_unary lhs in
   let rhs,env = mixture_of_ast env ast_rule.rhs in
   let (script, balance,added,modif_sites(*,side_effects*)) =
-    Dynamics.diff ast_rule.rule_pos lhs rhs ast_rule_label env in
+    Dynamics.diff rule_pos lhs rhs env in
 
   let tokenify env mixs l =
     List.fold_right
@@ -515,16 +516,16 @@ let variables_of_result env mixs alg_a =
 let rules_of_result env mixs res tolerate_new_state =
   let (env, mixs, l) =
     List.fold_left
-      (fun (env, mixs, cont) (ast_rule_label, ast_rule) ->
+      (fun (env, mixs, cont) (ast_rule_label, (ast_rule,rule_pos) as ast) ->
        let (env, mixs, r) =
-	 rule_of_ast ~is_pert:false env mixs (ast_rule_label, ast_rule)
+	 rule_of_ast ~is_pert:false env mixs ast
        in
        match ast_rule.Ast.k_op with
        | None -> (env,mixs,r::cont)
        | Some k ->
 	  let (env,mixs,back_r) =
 	    rule_of_ast ~backwards:true ~is_pert:false
-			env mixs (ast_rule_label, ast_rule) in
+			env mixs ast in
 	  (env,mixs,back_r::(r::cont))
       )
       (env, mixs, []) res.Ast.rules
@@ -572,17 +573,16 @@ let effects_of_modif variables lrules env ast_list =
 			       (env.Environment.fresh_kappa,[]) alg_expr in
 	    let (env',mixs') = mixtures_of_result mixs env mix in
 	    let ast_rule =
-	      { rule_pos = Tools.no_pos; add_token=[]; rm_token=[];
-		lhs = Ast.EMPTY_MIX; arrow = Ast.RAR(Tools.no_pos);
-		rhs = ast_mix;
-		k_def=Term.with_dummy_pos (Ast.CONST(Nbr.F 0.0));
+	      { add_token=[]; rm_token=[]; lhs = Ast.EMPTY_MIX; arrow = Ast.RAR;
+		rhs = ast_mix; k_def=Term.with_dummy_pos (Ast.CONST(Nbr.F 0.0));
 		k_un=None;k_op=None;
 	      } in
 	    let nme_pert =
 	      Printf.sprintf "pert_%d" (Environment.next_pert_id env) in
 	    let env,mixs'',rule =
 	      rule_of_ast ~is_pert:true env mixs'
-			  (Some (Term.with_dummy_pos nme_pert),ast_rule) in
+			  (Some (Term.with_dummy_pos nme_pert),
+			   Term.with_dummy_pos ast_rule) in
 	     (mixs'', rule::lrules,
 		(Primitives.ITER_RULE (alg_pos, rule))::effects, env)
 	 | DELETE (alg_expr, ast_mix, pos) ->
@@ -592,8 +592,7 @@ let effects_of_modif variables lrules env ast_list =
 			       (env.Environment.fresh_kappa,[]) alg_expr in
 	    let (env',mixs') = mixtures_of_result mixs env mix in
 	    let ast_rule =
-	      { rule_pos = Tools.no_pos; add_token=[]; rm_token=[];
-		lhs = ast_mix; arrow = Ast.RAR(Tools.no_pos);
+	      { add_token=[]; rm_token=[]; lhs = ast_mix; arrow = Ast.RAR;
 		rhs = Ast.EMPTY_MIX;
 		k_def=Term.with_dummy_pos (Ast.CONST(Nbr.F 0.0));
 		k_un=None;k_op=None;
@@ -602,7 +601,8 @@ let effects_of_modif variables lrules env ast_list =
 	      Printf.sprintf "pert_%d" (Environment.next_pert_id env) in
 	    let env,mixs'',rule =
 	      rule_of_ast ~is_pert:true env mixs'
-			  (Some (Term.with_dummy_pos nme_pert),ast_rule) in
+			  (Some (Term.with_dummy_pos nme_pert),
+			   Term.with_dummy_pos ast_rule) in
 	     (mixs'', rule::lrules,
 		(Primitives.ITER_RULE (alg_pos, rule))::effects, env)
 	 | UPDATE ((nme, pos_rule), alg_expr) ->

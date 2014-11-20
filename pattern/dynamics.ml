@@ -101,17 +101,16 @@ let compute_causal_init (((node_id,agent_name),interface),_) env =
 
 let compute_causal_obs lhs = compute_causal lhs lhs []
 
-let diff pos m0 m1 label_opt env =
+let diff pos m0 m1 env =
   let add_map id site_type map =
     let set = try IdMap.find id map with Not_found -> Int2Set.empty in
     IdMap.add id (Int2Set.add site_type set) map
   in
   (*let side_effect = ref false in*)
-  let pp_warning pr =
-    warning ?pos:(match label_opt with Some (_,pos) -> Some pos | None -> None)
-	    pr in
-  let compile_error pos msg = raise (ExceptionDefn.Semantics_Error (pos,msg)) in
-  let id_preserving ag1 ag2 = (*check whether ag2 can be the residual of ag1 for (same name)*)
+  let pp_warning pr = warning ~pos pr in
+  let compile_error pos msg = raise (ExceptionDefn.Malformed_Decl (msg,pos)) in
+  let id_preserving ag1 ag2 =
+    (*check whether ag2 can be the residual of ag1 for (same name)*)
     Mixture.name ag1 = Mixture.name ag2
   in
   let prefix, deleted, add_index =
@@ -122,7 +121,8 @@ let diff pos m0 m1 label_opt env =
 	   let ag1 = IntMap.find id (Mixture.agents m1) in
 	   if id_preserving ag0 ag1 then (id:: prefix, deleted, ind)
 	   else (prefix, id:: deleted, if id<ind then id else ind)
-	 with Not_found -> (prefix, id:: deleted, ind) (*id is bigger than the max id in m1 so id is deleted*)
+	 with Not_found -> (prefix, id:: deleted, ind)
+       (*id is bigger than the max id in m1 so id is deleted*)
        else (prefix,id::deleted,ind)
       )
       (Mixture.agents m0) ([],[], IntMap.size (Mixture.agents m0))

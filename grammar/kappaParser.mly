@@ -9,10 +9,10 @@
 %token AT OP_PAR CL_PAR COMMA DOT TYPE LAR OP_CUR CL_CUR CPUTIME EMAX TMAX
 %token DO SET REPEAT UNTIL LOG PLUS MULT MINUS MAX MIN DIV SINUS COSINUS TAN
 %token POW ABS MODULO SQRT EXPONENT INFINITY TIME EVENT NULL_EVENT PROD_EVENT
-%token EQUAL AND OR GREATER SMALLER TRUE FALSE DIFF
-%token <Tools.pos> DELETE INTRO PERT OBS KAPPA_RAR TRACK CONFIG
+%token EQUAL AND OR GREATER SMALLER TRUE FALSE DIFF KAPPA_RAR KAPPA_LRAR
+%token <Tools.pos> DELETE INTRO PERT OBS TRACK CONFIG
 %token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INIT LET PLOT
-%token <Tools.pos> FLUX ASSIGN ASSIGN2 TOKEN KAPPA_LNK PIPE KAPPA_LRAR
+%token <Tools.pos> FLUX ASSIGN ASSIGN2 TOKEN KAPPA_LNK PIPE
 %token <Tools.pos> PRINT PRINTF
 %token <int> INT
 %token <string*Tools.pos> ID
@@ -42,9 +42,8 @@ newline:
 start_rule:
     | newline {$1}
     | rule_expression newline
-		      {let rule_label,r = $1 in
-		       Ast.result := {!Ast.result with
-				       Ast.rules = (rule_label,r)::!Ast.result.Ast.rules};
+		       {Ast.result := {!Ast.result with
+				       Ast.rules = $1::!Ast.result.Ast.rules};
 		       $2}
     | instruction newline
 		  {
@@ -289,44 +288,39 @@ mixture:
 
 rule_expression:
     | rule_label lhs_rhs arrow lhs_rhs AT rate
-		 { let pos = match $3 with Ast.RAR pos | Ast.LRAR pos -> pos in
+		 { let pos =
+		     (Parsing.rhs_start_pos 2, Parsing.symbol_end_pos ()) in
 		   let (k2,k1,kback) = $6 in
 		   let _ =
-		     match (kback,$3) with
-		     | (None,Ast.LRAR pos) | (Some _,Ast.RAR pos) ->
-					      raise (ExceptionDefn.Syntax_Error
-						       (Some pos,
-							"Malformed bi-directional rule expression"))
+		     match kback,$3 with
+		     | (None,Ast.LRAR | Some _,Ast.RAR) ->
+			raise (ExceptionDefn.Malformed_Decl
+				 ("Malformed bi-directional rule expression",pos))
 		     | _ -> ()
 		   in
 		   let lhs,token_l = $2 and rhs,token_r = $4 in
-		   ($1,{Ast.rule_pos = pos ; Ast.lhs=lhs;
-			Ast.rm_token = token_l ; Ast.arrow=$3;
-			Ast.rhs=rhs; Ast.add_token = token_r;
-			Ast.k_def=k2; Ast.k_un=k1; Ast.k_op=kback})
+		   ($1,({Ast.lhs=lhs; Ast.rm_token = token_l; Ast.arrow=$3;
+			 Ast.rhs=rhs; Ast.add_token = token_r;
+			 Ast.k_def=k2; Ast.k_un=k1; Ast.k_op=kback},pos))
 		 }
     | rule_label lhs_rhs arrow lhs_rhs
-		 {let pos = match $3 with Ast.RAR pos | Ast.LRAR pos -> pos in
+		 {let pos =
+		    (Parsing.rhs_start_pos 2, Parsing.symbol_end_pos ()) in
 		  let lhs,token_l = $2 and rhs,token_r = $4 in
 		  ExceptionDefn.warning
-		    ~pos:(Parsing.symbol_start_pos (), Parsing.symbol_end_pos ())
+		    ~pos
 		    (fun f -> Format.pp_print_string
 				f "Rule has no kinetics. Default rate of 0.0 is assumed.");
-		  ($1,{Ast.rule_pos = pos ;
-		       Ast.lhs = lhs;
-		       Ast.rm_token = token_l;
-		       Ast.arrow=$3;
-		       Ast.rhs=rhs;
-		       Ast.add_token = token_r;
-		       Ast.k_def=(Ast.CONST (Nbr.F 0.),
-				  (Lexing.dummy_pos, Lexing.dummy_pos));
-		       Ast.k_un=None;
-		       Ast.k_op=None})}
+		  ($1,({Ast.lhs = lhs; Ast.rm_token = token_l; Ast.arrow=$3;
+			Ast.rhs=rhs; Ast.add_token = token_r;
+			Ast.k_def=(Ast.CONST (Nbr.F 0.),
+				   (Lexing.dummy_pos, Lexing.dummy_pos));
+			Ast.k_un=None; Ast.k_op=None},pos))}
     ;
 
 arrow:
-    | KAPPA_RAR {Ast.RAR $1}
-    | KAPPA_LRAR {Ast.LRAR $1}
+    | KAPPA_RAR {Ast.RAR}
+    | KAPPA_LRAR {Ast.LRAR}
     ;
 
 constant:

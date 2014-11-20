@@ -38,21 +38,19 @@ type 'a bool_expr =
   | COMPARE_OP of
       compare_op * 'a with_pos * 'a with_pos
 
+type arrow = RAR | LRAR
 type rule = {
-  rule_pos: Tools.pos ;
   lhs: mixture ;
   rm_token: (mixture ast_alg_expr with_pos * str_pos) list ;
   arrow:arrow ;
-  rhs:mixture;
+  rhs: mixture ;
   add_token: (mixture ast_alg_expr with_pos * str_pos) list ;
-  k_def:mixture ast_alg_expr with_pos ;
+  k_def: mixture ast_alg_expr with_pos ;
   k_un:
     (mixture ast_alg_expr with_pos*mixture ast_alg_expr with_pos option) option;
   (*k_1:radius_opt*)
   k_op: mixture ast_alg_expr with_pos option ; (*rate for backward rule*)
 }
-
-and arrow = RAR of Tools.pos | LRAR of Tools.pos
 
 let flip (rule_label,rule) =
   let lbl = match rule_label with
@@ -118,7 +116,7 @@ type ('agent,'mixture,'rule) compil =
   {
     variables : 'mixture variable_def list; (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
     signatures : 'agent list ; (*agent signature declaration*)
-    rules : (string with_pos option * 'rule) list ; (*rules (possibly named)*)
+    rules : (string with_pos option * 'rule with_pos) list ; (*rules (possibly named)*)
     observables : 'mixture ast_alg_expr with_pos list ; (*list of patterns to plot*)
     init : (str_pos option * 'mixture init_t * Tools.pos) list ; (*initial graph declaration*)
     perturbations : 'mixture perturbation list ;
