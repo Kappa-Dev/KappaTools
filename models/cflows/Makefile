@@ -30,10 +30,10 @@ help:
 TODIFFFILES=$(filter-out %.diff,\
 	$(sort $(patsubst %.ref,%,$(wildcard $(dir $@)$(OUTPUT_PATH)/*))))
 %/$(ERROR): %/README $(shell which $(KAPPABIN)KaSim)
-	@find $(dir $@)$(OUTPUT_PATH) \( \( -not -name \*.ref \) -and -mindepth 1 \) -delete
+	@find $(dir $@)$(OUTPUT_PATH) -mindepth 1 \( -not -name \*.ref \) -delete
 	@+$(MAKE) $(dir $@)$(OUTPUT_PATH)/LOG
 	@+$(MAKE) $(TODIFFFILES:=.diff)
-	@TMP=$$(mktemp -t error_file) ; cat $(dir $@)$(OUTPUT_PATH)/*.diff > $$TMP ;\
+	@TMP=$$(mktemp -t error_file-XXXXXX) ; cat $(dir $@)$(OUTPUT_PATH)/*.diff > $$TMP ;\
 	if [ -s $$TMP ] ; then echo ****$(dir $(dir $@))**** > $@ ;\
 	  echo  >> $@ ; cat $(dir $(dir $@))README >> $@ ; echo >> $@ ; cat $$TMP >> $@ ; \
 	else touch $@ ; fi ; rm $$TMP
@@ -56,7 +56,7 @@ build:
 clean: clean_light
 	find $(CURDIR) \( -name \#\* -or -name \*~ -or -name \*.txt -or -name \*.sxw \) -delete
 	for i in $(DIRS_OF_TEST:=/$(OUTPUT_PATH)) ;\
-	  do [ -d $${i} ] && find $${i} \( -not -name \*.ref -and -mindepth 1 \) -delete || true;\
+	  do [ -d $${i} ] && find $${i} -mindepth 1 \( -not -name \*.ref \) -delete || true;\
 	done
 	rm -f $(DIRS_OF_TEST:=/$(ERROR))
 

@@ -538,7 +538,7 @@ let dot_of_grid profiling fic enriched_grid state env =
                   in () 
 	) config.conflict ;
 	fprintf desc "}\n" ;
-        fprintf desc "/*\n Dot generation time: %f\n*/" (Sys.time () -. t) ; 
+        fprintf desc "/*\n Dot generation time: %f\n*/\n" (Sys.time () -. t) ; 
         close_out desc 
 
 (*story_list:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_id:int story_time: float ; story_event: int}*)
