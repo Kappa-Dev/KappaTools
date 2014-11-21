@@ -1705,16 +1705,16 @@ let dot_of_flux desc state  env =
 	Format.fprintf desc "}@."
 
 let print_observables_header f state =
-  let () = if !Parameter.emacsMode then Format.fprintf f "time"
-	   else Format.fprintf f "# time" in
+  let () = Format.fprintf f "@[<h>%s"
+			  (if !Parameter.emacsMode then "time" else "# time") in
   let () = List.iter
 	     (fun obs ->
 	      Format.fprintf f "%t%s" !Parameter.plotSepChar obs.label
 	     ) state.observables in
-  Format.fprintf f "@."
+  Format.fprintf f "@]@."
 
 let print_observables_values f time env counter state =
-  Format.fprintf f "%t%E%t%a@."
+  Format.fprintf f "@[<h>%t%E%t%a@]@."
 		 !Parameter.plotSepChar time
 		 !Parameter.plotSepChar
 		 (Pp.list !Parameter.plotSepChar Nbr.print)

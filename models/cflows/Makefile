@@ -27,14 +27,15 @@ help:
 %.diff:
 	@sed '/generation/d' $(basename $@) | diff -u $(basename $@).ref - > $@ || true
 
-TODIFFFILES=$(sort $(patsubst %.ref,%,$(wildcard $(dir $@)/$(OUTPUT_PATH)/*)))
+TODIFFFILES=$(filter-out %.diff,\
+	$(sort $(patsubst %.ref,%,$(wildcard $(dir $@)$(OUTPUT_PATH)/*))))
 %/$(ERROR): %/README $(shell which $(KAPPABIN)KaSim)
 	@find $(dir $@)$(OUTPUT_PATH) \( \( -not -name \*.ref \) -and -mindepth 1 \) -delete
 	@+$(MAKE) $(dir $@)$(OUTPUT_PATH)/LOG
 	@+$(MAKE) $(TODIFFFILES:=.diff)
-	@TMP=$$(mktemp -t error_file) ; cat $(dir $@)/$(OUTPUT_PATH)/*.diff > $$TMP ;\
+	@TMP=$$(mktemp -t error_file) ; cat $(dir $@)$(OUTPUT_PATH)/*.diff > $$TMP ;\
 	if [ -s $$TMP ] ; then echo ****$(dir $(dir $@))**** > $@ ;\
-	  echo  >> $@ ; cat $(dir $(dir $@))/README >> $@ ; echo >> $@ ; cat $$TMP >> $@ ; \
+	  echo  >> $@ ; cat $(dir $(dir $@))README >> $@ ; echo >> $@ ; cat $$TMP >> $@ ; \
 	else touch $@ ; fi ; rm $$TMP
 
 error: $(DIRS_OF_TEST:=/$(ERROR))
@@ -43,7 +44,7 @@ error: $(DIRS_OF_TEST:=/$(ERROR))
 all: error
 	@if [ -s $< ] ; then cat $< && exit 2 ; else echo "No difference has been found" ; fi
 
-GENFILES=$(filter-out %.ref,$(wildcard */$(OUTPUT_PATH)/*))
+GENFILES=$(filter-out %.diff %.ref,$(wildcard */$(OUTPUT_PATH)/*))
 build:
 	@+$(MAKE) clean_all
 	@+$(MAKE) $(DIRS_OF_TEST:=/$(OUTPUT_PATH)/LOG)
