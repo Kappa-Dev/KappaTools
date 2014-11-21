@@ -45,8 +45,7 @@ let apply_n_time x r state env counter pert_ids pert_events tracked =
 	 State.apply state r embedding_t counter env in
        let phi = State.Embedding.map_of embedding_t in
        let env,state,pert_ids_pos,new_injs,tracked' =
-	 State.positive_update ~with_tracked state r (phi,psi)
-			       (side_effects,Int2Set.empty) counter env
+	 State.positive_update ~with_tracked state r phi psi side_effects Int2Set.empty counter env
        in
        let pert_ids =
 	 if Nbr.is_equal n x then (*only the first time*)

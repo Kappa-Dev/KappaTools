@@ -50,9 +50,9 @@ let event state maybe_active_pert_ids story_profiling
 	   (sp,el,cpt+1)
 	  ) (story_profiling,event_list,Counter.event counter) pert_events
       in
-      (story_profiling,event_list,cpt)
+      story_profiling,event_list,cpt
     else
-      (story_profiling,event_list,Counter.event counter)
+      story_profiling,event_list,Counter.event counter
   in
   let () = counter.Counter.perturbation_events <- cpt in
 
@@ -146,8 +146,7 @@ let event state maybe_active_pert_ids story_profiling
 
        (*Local positive update: adding new partial injection*)
        let env,state,pert_ids',new_injs,obs_from_rule_app =
-	 State.positive_update state r (State.Embedding.map_of embedding_t,psi)
-			       (side_effect,Int2Set.empty) counter env
+	 State.positive_update state r (State.Embedding.map_of embedding_t) psi side_effect Int2Set.empty counter env
        in
 
        (*Non local positive update: adding new possible intras*)

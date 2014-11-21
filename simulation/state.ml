@@ -1015,7 +1015,7 @@ let enabled r state =
 	try Hashtbl.find state.influence_map r_id with Not_found -> IntMap.empty
 	
 
-let positive_update ?(with_tracked=[]) state r ((phi: int IntMap.t),psi) (side_modifs,pert_intro) counter env = (*pert_intro is temporary*)
+let positive_update ?(with_tracked=[]) state r (phi: int IntMap.t) psi side_modifs pert_intro counter env = (*pert_intro is temporary*)
 	
 	(* sub function find_new_inj *)
 	let find_new_inj state var_id mix cc_id node_id root pert_ids already_done_map new_injs tracked env =
@@ -1233,7 +1233,7 @@ let positive_update ?(with_tracked=[]) state r ((phi: int IntMap.t),psi) (side_m
 		    | None -> invalid_arg "State.positive_update"
 		  in
 		  let possible_roots =
-		    Mixture.ids_of_name ((Node.name node), cc_id) mix
+		    Mixture.ids_of_name (Node.name node) cc_id mix
 		  in
 		  IntSet.fold
 		    (fun root (env,state, pert_ids, already_done_map, new_injs,tracked) ->
@@ -1258,11 +1258,11 @@ let negative_upd state cause (u,i) int_lnk counter env =
 			(fun phi (env,pert_ids) ->
 				if Injection.is_trashed phi then (LiftSet.remove liftset phi ; (env,pert_ids)) 
 				else
-				let (mix_id, cc_id, inj_id) =
+				let mix_id, cc_id, inj_id =
 					let i = Injection.get_address phi in
 					let (m,c) = Injection.get_coordinate phi
 					in
-					(m,c,i)
+					m,c,i
 				in
 				let comp_injs_opt =
 					try injections.(mix_id)
@@ -1313,7 +1313,7 @@ let negative_upd state cause (u,i) int_lnk counter env =
 									match lnk_opt with
 									| Mixture.WLD -> ()
 									| Mixture.BND | Mixture.TYPE _ |	Mixture.FREE ->
-										let (_, lifts) = try Node.get_lifts u_j	site_id with exn -> invalid_arg ("State.negative_update: "^(Printexc.to_string exn))
+										let (_, lifts) = try Node.get_lifts u_j site_id with exn -> invalid_arg ("State.negative_update: "^(Printexc.to_string exn))
 										in
 										LiftSet.remove lifts phi
 									) a_i ()

@@ -58,8 +58,8 @@ val apply :
   Environment.t * t * Int2Set.t * Embedding.t * int IntMap.t * IntSet.t
 val positive_update :
   ?with_tracked:(int * int IntMap.t) list ->
-  t -> Primitives.rule -> int IntMap.t * int IntMap.t ->
-  Int2Set.t * Int2Set.t -> Counter.t -> Environment.t ->
+  t -> Primitives.rule -> int IntMap.t -> int IntMap.t ->
+  Int2Set.t -> Int2Set.t -> Counter.t -> Environment.t ->
   Environment.t * t * IntSet.t * InjectionHeap.content list *
     (int * int IntMap.t) list
 val instances_of_square :

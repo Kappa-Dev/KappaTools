@@ -563,7 +563,7 @@ let enable r mix env =
       while !cpt < Mixture.arity pat2 do
 	candidates := IntSet.union
 			!candidates
-			(Mixture.ids_of_name (name_id_root,!cpt) pat2);
+			(Mixture.ids_of_name name_id_root !cpt pat2);
 	cpt := !cpt+1
       done ;
       !candidates

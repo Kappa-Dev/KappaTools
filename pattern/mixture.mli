@@ -14,7 +14,7 @@ val root_of_cc : t -> int -> int option
 val graph: t -> (int*int) Mods.Int2Map.t 
 
 (**[ids_of_name name mix] returns all agent id's in mixture [mix] whose name is equal to [name] *)
-val ids_of_name : int*int -> t -> Mods.IntSet.t
+val ids_of_name : int -> int -> t -> Mods.IntSet.t
 
 (**[agents mix] returns a map of agents in the mixture [mix]*)
 val agents : t -> agent Mods.IntMap.t 
@@ -47,7 +47,7 @@ val component_of_id : int -> t -> int
 val interface : agent -> (int option * lnk_t) Mods.IntMap.t
 
 (**[is_bound (a_i,s_j) mix] returns [true] if site [s_j] of agent [a_i] is bound (or belongs to a semi link) in mixture [mix]*)
-val is_bound : (int*int) -> t -> bool
+val is_bound : int -> int -> t -> bool
 
 (**[compose i ag mix edg cstr_opt] add agent [ag] with identifier [i] to mixture [mix] with edges [edg] represented as a map (id,j)->(k,l) where k is an agent identifier and j,l are site indices*)
 (**[cstr_opt] is used to add [constraints] to construct a mixture that requires some side checks upon matching*)

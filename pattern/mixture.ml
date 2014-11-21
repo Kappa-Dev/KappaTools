@@ -92,10 +92,10 @@ let root_of_cc mix cc_id =
 
 let agent_of_id i mix = IntMap.find i mix.agents
 let agents mix = mix.agents
-let ids_of_name (nm,cc_id) mix =
+let ids_of_name nm cc_id mix =
   try Int2Map.find (nm,cc_id) mix.ids_of_name with Not_found -> IntSet.empty
 
-let is_bound (a_i,s_i) mix =
+let is_bound a_i s_i mix =
   let ag_i = agent_of_id a_i mix in
   let (_,lnk) = IntMap.find s_i ag_i.interface in
   match lnk with

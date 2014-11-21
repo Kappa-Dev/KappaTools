@@ -6,4 +6,4 @@
 "siteGraphs" : include
 "Error" : include
 "main" : include
-true : bin_annot, debug
+true : bin_annot
