@@ -266,7 +266,7 @@ let create ?with_interface name_id env =
 (*Tests whether status of port i of node n is compatible with (int,lnk)
 @raises False if not otherwise returns completes*)
 (*the list port_list with (0,i) if i is int-tested or (1,i) if i is lnk-tested*)
-let test (n,i) (int,lnk) port_list =
+let test n i int lnk port_list =
   let intf_n = interface n in
   let (state,link) =
     try intf_n.(i).status
@@ -288,7 +288,7 @@ let test (n,i) (int,lnk) port_list =
      (1,i)::port_list
   | _, _ -> raise False
 
-let follow (u,i) =
+let follow u i =
   let intf_u = interface u in
   let (_,lnk) = intf_u.(i).status in
   match lnk with

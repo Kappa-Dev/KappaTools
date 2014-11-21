@@ -925,7 +925,7 @@ let wake_up state modif_type modifs wake_up_map env =
 										Precondition.find_all (Node.name node) site_id None	None is_free state.wake_up
 									else
 										(let link_opt =
-												match Node.follow (node, site_id) with
+												match Node.follow node site_id with
 												| None -> invalid_arg "State.wake_up"
 												| Some (node', site_id') ->	Some (Node.name node', site_id')
 											in
@@ -936,7 +936,7 @@ let wake_up state modif_type modifs wake_up_map env =
 								let is_free = not (Node.is_bound (node, site_id)) in
 								let new_candidates =
 									let link_opt =
-										(match Node.follow (node, site_id) with
+										(match Node.follow node site_id with
 											| None -> None
 											| Some (node', site_id') ->
 													Some (Node.name node', site_id'))
