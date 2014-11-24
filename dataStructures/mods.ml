@@ -18,116 +18,156 @@ module StringIntMap =
 
 module DynArray = DynamicArray.DynArray(LargeArray.GenArray)
 
-module Injection = 
-	struct
-		type t = {map : (int,int) Hashtbl.t ; mutable address : int option ; coordinate : (int*int)}
-		
-		exception Found of (int*int)
-		let root_image phi = try (Hashtbl.iter (fun i j -> raise (Found (i,j))) phi.map ; None) with Found (i,j) -> Some (i,j)
-		
-		let set_address addr phi = phi.address <- Some addr 
-			
-		let get_address phi = match phi.address with Some a -> a | None -> raise Not_found
-		let get_coordinate phi = phi.coordinate 
-		
-		let to_map phi = Hashtbl.fold (fun i j (map,cod) -> (IntMap.add i j map,IntSet.add j cod)) phi.map (IntMap.empty,IntSet.empty)
-		let is_trashed phi = match phi.address with Some (-1) -> true | _ -> false
-		
-		let add i j phi = Hashtbl.replace phi.map i j ; phi
-		let mem i phi = Hashtbl.mem phi.map i 
-		let size phi = Hashtbl.length phi.map
-		let find i phi = Hashtbl.find phi.map i
-		let empty n (mix_id,cc_id) = {map = Hashtbl.create n ; address = None ; coordinate = (mix_id,cc_id)}
-		let flush phi (var_id,cc_id) = 
-			{phi with address = None ; coordinate = (var_id,cc_id)}
-		
-		let compare phi psi =
-		  let o = int_pair_compare phi.coordinate psi.coordinate in
-		  if o = 0 then match phi.address, psi.address with
-				| Some a, Some a' -> int_compare a a'
-				| _, _ -> invalid_arg "Injection.compare"
-		  else o
-		
-		let fold f phi cont = Hashtbl.fold f phi.map cont
+module Injection : sig
+  type t
+  val compare : t -> t -> int
 
-		exception Clashing
-		let codomain phi (inj,cod) = 
-			Hashtbl.fold 
-			(fun i j (map,set) -> if IntSet.mem j set then raise Clashing else (IntMap.add i j map,IntSet.add j set)) 
-			phi.map (inj,cod)
-		
-		let to_string phi = 
-			Tools.string_of_map string_of_int string_of_int Hashtbl.fold phi.map 
-		
-		let string_of_coord phi = 
-			let a = get_address phi and (m,c) = get_coordinate phi 
-			in 
-			Format.sprintf "(%d,%d,%d)" m c a
-		
-		let copy phi = fold (fun i j phi' -> add i j phi') phi {map = Hashtbl.create (size phi) ; address = None ; coordinate = get_coordinate phi}
-	end
+  val empty : int -> int * int -> t
+  val add : int -> int -> t -> t
+  val flush : t -> int * int -> t
+
+  val find : int -> t -> int
+  val root_image : t -> (int * int) option
+  val get_coordinate : t -> (int * int)
+  val set_address :  int -> t -> unit
+  val get_address : t -> int
+  val is_trashed : t -> bool
+
+  exception Clashing
+  val codomain : t -> int IntMap.t * IntSet.t -> int IntMap.t * IntSet.t
+  val to_map : t -> int IntMap.t * IntSet.t
+
+  val fold : (int -> int -> 'a -> 'a) -> t -> 'a -> 'a
+  val to_string : t -> string
+  val string_of_coord : t -> string
+end = struct
+  type t = {map : (int,int) Hashtbl.t ;
+	    mutable address : int option ;
+	    coordinate : (int*int)}
+
+    exception Found of (int*int)
+    let root_image phi =
+      try (Hashtbl.iter (fun i j -> raise (Found (i,j))) phi.map ; None)
+      with Found (i,j) -> Some (i,j)
+
+    let set_address addr phi = phi.address <- Some addr
+
+    let get_address phi =
+      match phi.address with Some a -> a | None -> raise Not_found
+    let get_coordinate phi = phi.coordinate
+
+    let to_map phi =
+      Hashtbl.fold (fun i j (map,cod) -> (IntMap.add i j map,IntSet.add j cod))
+		   phi.map (IntMap.empty,IntSet.empty)
+    let is_trashed phi = match phi.address with Some (-1) -> true | _ -> false
+
+    let add i j phi = Hashtbl.replace phi.map i j ; phi
+    let mem i phi = Hashtbl.mem phi.map i
+    let size phi = Hashtbl.length phi.map
+    let find i phi = Hashtbl.find phi.map i
+    let empty n (mix_id,cc_id) =
+      {map = Hashtbl.create n ; address = None ; coordinate = (mix_id,cc_id)}
+    let flush phi (var_id,cc_id) =
+      {phi with address = None ; coordinate = (var_id,cc_id)}
+
+    let compare phi psi =
+      let o = int_pair_compare phi.coordinate psi.coordinate in
+      if o = 0 then match phi.address, psi.address with
+		    | Some a, Some a' -> int_compare a a'
+		    | _, _ -> invalid_arg "Injection.compare"
+      else o
+
+    let fold f phi cont = Hashtbl.fold f phi.map cont
+
+    exception Clashing
+    let codomain phi (inj,cod) =
+      Hashtbl.fold
+	(fun i j (map,set) ->
+	 if IntSet.mem j set then raise Clashing
+	 else (IntMap.add i j map,IntSet.add j set))
+	phi.map (inj,cod)
+
+    let to_string phi =
+      Tools.string_of_map string_of_int string_of_int Hashtbl.fold phi.map
+
+    let string_of_coord phi =
+      let a = get_address phi and (m,c) = get_coordinate phi in
+      Format.sprintf "(%d,%d,%d)" m c a
+
+    let copy phi =
+      fold (fun i j phi' -> add i j phi') phi
+	   {map = Hashtbl.create (size phi) ;
+	    address = None ;
+	    coordinate = get_coordinate phi}
+  end
 
 module InjProduct =
-	struct
-		type t = {elements : Injection.t array ; mutable address : int option ; coordinate : int ; signature : int array}
-		type key = int array
+  struct
+    type t = {elements : Injection.t array ;
+	      mutable address : int option ;
+	      coordinate : int ;
+	      signature : int array}
+    type key = int array
+		   
+    let allocate phi addr = phi.address <- Some addr
+						
+    let get_address phi = match phi.address with Some a -> a | None -> raise Not_found
+    let get_coordinate phi = phi.coordinate
+			       
+    let add cc_id inj injprod =
+      try
+	injprod.elements.(cc_id) <- inj ;
+	let root = (function Some (_,u) -> u
+			   | None -> invalid_arg "InjProduct.add")
+		     (Injection.root_image inj) in
+	injprod.signature.(cc_id) <- root
+      with Invalid_argument msg -> invalid_arg ("InjProduct.add: "^msg)
+					       
+    let is_trashed injprod =
+      match injprod.address with Some (-1) -> true | _ -> false
+							    
+    exception False
 		
-		let allocate phi addr = phi.address <- Some addr 
-			
-		let get_address phi = match phi.address with Some a -> a | None -> raise Not_found
-		let get_coordinate phi = phi.coordinate 
+    let is_complete injprod =
+      try
+	(Array.iteri (fun i inj_i ->
+		      let a,_ = Injection.get_coordinate inj_i in
+		      if a<0 then raise False else ()) injprod.elements ; true)
+      with False -> false
+		      
+    let size injprod = Array.length injprod.elements
+				    
+    let find i injprod =
+      try injprod.elements.(i) with Invalid_argument _ -> raise Not_found
 		
-		let add cc_id inj injprod = 
-			try 
-				injprod.elements.(cc_id) <- inj ;
-				let root = (function Some (_,u) -> u | None -> invalid_arg "InjProduct.add") (Injection.root_image inj) in
-				injprod.signature.(cc_id) <- root
-			with Invalid_argument msg -> invalid_arg ("InjProduct.add: "^msg)
-				
-		let is_trashed injprod = match injprod.address with Some (-1) -> true | _ -> false
+    let create n mix_id = {elements = Array.make n (Injection.empty 0 (-1,-1)) ; address = None ; coordinate = mix_id ; signature = Array.make n (-1)}
 		
-		exception False
+    let equal phi psi =
+      try
+	(Array.length phi.signature) = (Array.length psi.signature) &&
+	  (
+	    Array.iteri (fun cc_id u -> if u <> psi.signature.(cc_id) then raise False)
+			phi.signature ;
+	    true)
+      with False -> false
 		
-		let is_complete injprod = 
-			try 
-				(Array.iteri (fun i inj_i -> let a,_ = Injection.get_coordinate inj_i in if a<0 then raise False else ()) injprod.elements ; true)
-			with False -> false
-			
-		let size injprod = Array.length injprod.elements
+    let get_key phi = phi.signature
 		
-		let find i injprod = try injprod.elements.(i) with Invalid_argument _ -> raise Not_found
+    let compare phi psi =
+      let o = int_compare phi.coordinate psi.coordinate in
+      if o = 0 then
+	try
+	  let a = get_address phi in
+	  let a'= get_address psi in
+	  int_compare a a'
+	with Not_found -> invalid_arg "Injection.compare"
+      else o
+
+    let fold_left f cont phi = Array.fold_left f cont phi.elements
 		
-		let create n mix_id = {elements = Array.make n (Injection.empty 0 (-1,-1)) ; address = None ; coordinate = mix_id ; signature = Array.make n (-1)}
-		
-		let equal phi psi =
-			try 
-				if (Array.length phi.signature) <> (Array.length psi.signature) then false
-				else
-					(
-					Array.iteri (fun cc_id u -> if u <> psi.signature.(cc_id) then raise False ) phi.signature ;
-					true
-					) 
-			with 
-				| False -> false
-		
-		let get_key phi = phi.signature
-		
-		let compare phi psi = 
-			try
-				let a = get_address phi
-				and a'= get_address psi
-				and m = get_coordinate phi
-				and m' = get_coordinate psi
-				in
-					compare (m,a) (m',a') 
-			with Not_found -> invalid_arg "Injection.compare"
-		
-		let fold_left f cont phi = Array.fold_left f cont phi.elements
-		
-		let to_string phi = Tools.string_of_array Injection.to_string phi.elements 
-			
-	end
-	
+    let to_string phi = Tools.string_of_array Injection.to_string phi.elements
+  end
+
 (*module Activity:(ValMap.ValMap with type content = float) = 
 	ValMap.Make 
 	(struct 

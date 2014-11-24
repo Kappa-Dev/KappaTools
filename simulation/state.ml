@@ -134,18 +134,6 @@ let nl_instance_number mix_id state env =
 
 (**[instances_of_square mix_id state] returns [(inj_0,codom_0,prod_0);...] the list of full and valid embeddings inj_i, their codomains codom_j and the explicit product prod_i=[phi_cc0;phi_cc1;...]*)
 let instances_of_square ?(disjoint=false) mix_id radius_def state env =
-	let extend (inj, codom) phi =
-		try
-			Some
-			(Injection.fold
-					(fun i j (inj, codom) ->
-								if IntSet.mem j codom
-								then raise False
-								else ((IntMap.add i j inj), (IntSet.add j codom))
-					)
-					phi (inj, codom))
-		with | False -> None
-	in
 	let embeddings = 
 		match state.injections.(mix_id) with
 		| None -> [] (*mix_id has no cc injection*)
@@ -161,7 +149,8 @@ let instances_of_square ?(disjoint=false) mix_id radius_def state env =
 													let ext_injhp =
 														InjectionHeap.fold
 														(fun _ phi cont' ->
-																	let opt = extend (part_inj, part_codom) phi
+														 let opt = try Some (Injection.codomain phi (part_inj, part_codom))
+															   with Injection.Clashing -> None
 																	in
 																	match opt with
 																	| None -> cont'
@@ -655,16 +644,9 @@ let check_validity injprod with_full_components radius state counter env =
 					raise (Null_event 4))
 				else
 				(*injection product might be invalid because co-domains are no longer connected*)
-					let map,codom = 
-						Injection.fold 
-						(fun i j (map,codom) -> 
-							let map = IntMap.add i j map
-							and codom = 
-								if IntSet.mem j codom then raise (Null_event 2) (*clashing instance*) 
-								else IntSet.add j codom
-							in
-							(map,codom)
-						) inj_i (embedding,codom) in
+				  let map,codom =
+				    try Injection.codomain inj_i (embedding,codom)
+						with Injection.Clashing -> raise (Null_event 2) (*clashing instance*) in
 					let roots =
 						let mix_id,cc_id = Injection.get_coordinate inj_i in
 						let mix = kappa_of_id mix_id state in
@@ -1065,68 +1047,71 @@ let positive_update ?(with_tracked=[]) state r (phi: int IntMap.t) psi side_modi
 				(env,state, pert_ids, already_done_map, new_injs,tracked)
 				)
 		| Some (embedding, port_map) ->
-				Debug.tag_if_debug "New embedding: %s"
-						   (Injection.to_string embedding);
-				let cc_id_injections = InjectionHeap.alloc embedding cc_id_injections in
-				comp_injs.(cc_id) <- Some cc_id_injections ;
-				let graph =	SiteGraph.add_lift state.graph embedding port_map env
-				in
-				let state = {state with graph = graph}
-				in
-				begin
-					(*a new embedding was found for var_id*)
-					let tracked = 
-						if Environment.is_tracked var_id env then (*completing the embedding if incomplete*)
-							try
-								let m = kappa_of_id var_id state in	
-								let cpt = ref 0 in
-								let map,cod = (fun (x,y) -> (ref x,ref y)) (Injection.to_map embedding) in
-								while !cpt < (Mixture.arity m) do
-									if !cpt = cc_id then ()
-									else 
-										begin
-											let embedding',codomain' = 
-												match comp_injs.(!cpt) with
-													| None -> raise (ExceptionDefn.Break 0)
-													| Some hp -> 
-														let s = InjectionHeap.size hp in
-														if s = 0 then raise (Break 0)
-														else
-															let rec find_compatible cpt =
-																if cpt < 0 then raise (Break 1)
-																else
-																let inj = InjectionHeap.find cpt hp
-																in
-																if (Injection.is_trashed inj) then failwith "Incorrect heap size"
-																else
-																	try
-																		Injection.fold (fun i j (map,cod) -> (IntMap.add i j map, if IntSet.mem j cod then raise (Break 1) else IntSet.add j cod)) inj (!map,!cod)
-																	with Break _ -> find_compatible (cpt-1)
-															in
-															find_compatible (s-1)
-											in
-												map := embedding' ; cod := codomain' ;
-										end ;
-									cpt := !cpt+1 ;
-								done ;
-								Debug.tag_if_debug "Observable %d was found with embedding [%a]"
-										   var_id pp_injections !map ;
-								(var_id,!map)::tracked
-							with 
-								| Break 0 -> (if !Parameter.debugModeOn then Debug.tag "Incomplete embedding, no observable recorded" ; tracked)
-								| Break 1 -> (if !Parameter.debugModeOn then Debug.tag "Cannot complete embedding, clashing instances" ; tracked)
-					else tracked
+		   Debug.tag_if_debug "New embedding: %s"
+				      (Injection.to_string embedding);
+		   let cc_id_injections =
+		     InjectionHeap.alloc embedding cc_id_injections in
+		   comp_injs.(cc_id) <- Some cc_id_injections ;
+		   let graph =
+		     SiteGraph.add_lift state.graph embedding port_map env in
+		   let state = {state with graph = graph}
+		   in
+		   begin
+		     (*a new embedding was found for var_id*)
+		     let tracked =
+		       if Environment.is_tracked var_id env then (*completing the embedding if incomplete*)
+			 try
+			   let m = kappa_of_id var_id state in
+			   let cpt = ref 0 in
+			   let map,cod = (fun (x,y) -> (ref x,ref y))
+					   (Injection.to_map embedding) in
+			   while !cpt < (Mixture.arity m) do
+			     if !cpt = cc_id then ()
+			     else
+			       begin
+				 let embedding',codomain' =
+				   match comp_injs.(!cpt) with
+				   | None -> raise (ExceptionDefn.Break 0)
+				   | Some hp ->
+				      let s = InjectionHeap.size hp in
+				      if s = 0 then raise (Break 0)
+				      else
+					let rec find_compatible cpt =
+					  if cpt < 0 then raise (Break 1)
+					  else
+					    let inj = InjectionHeap.find cpt hp in
+					    if (Injection.is_trashed inj)
+					    then failwith "Incorrect heap size"
+					    else
+					      try Injection.codomain inj (!map,!cod)
+					      with Injection.Clashing -> find_compatible (cpt-1)
 					in
-					update_activity state ~cause:r.r_id var_id counter env;
-					let env,pert_ids = (*updating rule activities that depend --transitively-- on var_id*)
-						update_dep state ~cause:r.r_id (Term.KAPPA var_id) pert_ids counter env
-					in
-					(*Format.printf "done (%d,%d) for var[%d]@." root node_id var_id ;*) 
-					let already_done_map' = IntMap.add var_id	(Int2Set.add (root, node_id) root_node_set) already_done_map 
-					in
-					let new_injs' = if Environment.is_nl_rule var_id env then embedding::new_injs else new_injs in 
-					(env,state, pert_ids, already_done_map',new_injs',tracked)
-				end
+					find_compatible (s-1)
+				 in
+				 map := embedding' ; cod := codomain' ;
+			       end ;
+			     cpt := !cpt+1 ;
+			   done ;
+			   Debug.tag_if_debug "Observable %d was found with embedding [%a]"
+					      var_id pp_injections !map ;
+			   (var_id,!map)::tracked
+			 with
+			 | Break 0 ->
+			    (if !Parameter.debugModeOn then Debug.tag "Incomplete embedding, no observable recorded" ; tracked)
+			 | Break 1 ->
+			    (if !Parameter.debugModeOn then Debug.tag "Cannot complete embedding, clashing instances" ; tracked)
+		       else tracked
+		     in
+		     update_activity state ~cause:r.r_id var_id counter env;
+		     let env,pert_ids = (*updating rule activities that depend --transitively-- on var_id*)
+		       update_dep state ~cause:r.r_id (Term.KAPPA var_id) pert_ids counter env
+		     in
+		     (*Format.printf "done (%d,%d) for var[%d]@." root node_id var_id ;*) 
+		     let already_done_map' = IntMap.add var_id	(Int2Set.add (root, node_id) root_node_set) already_done_map 
+		     in
+		     let new_injs' = if Environment.is_nl_rule var_id env then embedding::new_injs else new_injs in 
+		     (env,state, pert_ids, already_done_map',new_injs',tracked)
+		   end
 	in
 	(* end of sub function find_new_inj definition *)
 	

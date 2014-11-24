@@ -186,8 +186,9 @@ let rec update_rooted_intras new_injs state counter env =
 					) components IntMap.empty
 				in 
 				if !Parameter.debugModeOn then
-					begin
-						Printf.printf "Trying to extend (%d,%d) : %s with:\n" mix_id cc_id (Injection.to_string injection) ;
+				  begin
+				    Printf.printf "Trying to extend (%d,%d) : %s with:\n"
+						  mix_id cc_id (Injection.to_string injection) ;
 						IntMap.iter 
 						(fun cc_id' inj_list -> 
 							Printf.printf "(%d,%d):%s\n" mix_id cc_id' 
