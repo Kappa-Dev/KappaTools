@@ -8,7 +8,7 @@ else
 endif
 
 .PHONY: all clean temp-clean-for-ignorant-that-clean-must-be-done-before-fetch
-.PHONY: check
+.PHONY: check build-tests
 
 %.native %.byte: $(filter-out _build/,$(wildcard */*.ml*))
 	ocamlbuild $(OCAMLBUILDFLAGS) $@
@@ -24,7 +24,10 @@ clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch
 	+$(MAKE) KAPPABIN=$(CURDIR)/bin/ -C models/cflows clean
 
 check:
-	@+$(MAKE) KAPPABIN=$(CURDIR)/bin/ -C models/cflows
+	@+$(MAKE) KAPPABIN=$(CURDIR)/bin/ -C models/cflows all
+
+build-tests:
+	@+$(MAKE) KAPPABIN=$(CURDIR)/bin/ -C models/cflows build
 
 temp-clean-for-ignorant-that-clean-must-be-done-before-fetch:
 	find . \( -name \*.cm\* -or -name \*.o -or -name \*.annot \) -delete

@@ -64,9 +64,9 @@ ____________________________________________________________
 + Pretty printing 1 strongly compressed flow
 
 Simulation ended (eff.: 1.000000, detail below)
-	Valid embedding but no longer unary when required: -nan
-	Valid embedding but not binary when required: -nan
-	Clashing instance: -nan
-	Lazy negative update: -nan
-	Lazy negative update of non local instances: -nan
-	Perturbation interrupting time advance: -nan
+	Valid embedding but no longer unary when required: nan
+	Valid embedding but not binary when required: nan
+	Clashing instance: nan
+	Lazy negative update: nan
+	Lazy negative update of non local instances: nan
+	Perturbation interrupting time advance: nan

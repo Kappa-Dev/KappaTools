@@ -34,8 +34,7 @@ let main =
      Arg.Float(fun t -> Parameter.maxTimeValue := Some t ;
 			Parameter.maxEventValue := None),
      "Max time of simulation (arbitrary time unit)");
-    ("-p", Arg.Int (fun i -> Parameter.plotModeOn := true ;
-			     Parameter.pointNumberValue:= Some i),
+    ("-p", Arg.Int (fun i -> Parameter.pointNumberValue:= Some i),
      "Number of points in plot");
     ("-o", Arg.String (fun s -> Parameter.outputDataName:=s ),
      "file name for data output") ;
@@ -81,10 +80,6 @@ let main =
   in
   try
     Arg.parse options (fun _ -> Arg.usage options usage_msg ; exit 1) usage_msg;
-    if not !Parameter.plotModeOn then
-      ExceptionDefn.warning
-	(fun f -> Format.fprintf
-		    f "No data points are required,@ use -p option for plotting data.");
     let abort =
       match !Parameter.inputKappaFileNames with
       | [] -> !Parameter.marshalizedInFile = ""
@@ -151,6 +146,14 @@ let main =
     Parameter.setOutputName() ; (*changin output names if -d option was used*)
     Parameter.checkFileExists() ;
 
+    let () = match !Parameter.pointNumberValue with
+      | Some _ -> Plot.create !Parameter.outputDataName env state counter
+      | None ->
+	 ExceptionDefn.warning
+	   (fun f -> Format.fprintf
+		       f "No data points are required,@ use -p option for plotting data.")
+    in
+
     let () =
       match !Parameter.marshalizedOutFile with
       | "" -> ()
@@ -169,8 +172,7 @@ let main =
       end ;
     if !Parameter.compileModeOn then (State.dump_rules state env; exit 0);
     let profiling = Compression_main.D.S.PH.B.PB.CI.Po.K.P.init_log_info () in
-    let plot = Plot.create !Parameter.outputDataName state
-    and grid,profiling,event_list =
+    let grid,profiling,event_list =
       if Environment.tracking_enabled env then
 	let () =
 	  if !Parameter.mazCompression
@@ -193,8 +195,8 @@ let main =
     ExceptionDefn.flush_warning () ;
     Parameter.initSimTime () ;
     try
-      Run.loop state profiling event_list counter plot env ;
-      print_newline() ;
+      Run.loop state profiling event_list counter env ;
+      Format.print_newline() ;
       Format.printf "Simulation ended (eff.: %f, detail below)@."
 		    ((float_of_int (Counter.event counter))
 		     /. (float_of_int (Counter.null_event counter + Counter.event counter))) ;

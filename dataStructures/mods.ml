@@ -193,25 +193,23 @@ module Counter =
 		
 		let last_increment c = let _,t = c.last_tick in (c.time -. t) 
 		
-		let compute_dT () = 
-			match !Parameter.pointNumberValue with
-				| None -> None
-				| Some points ->
-					match !Parameter.maxTimeValue with
-						| None -> None
-						| Some max_t -> 
-							Some (max_t /. (float_of_int points))
+		let compute_dT () =
+		  match !Parameter.pointNumberValue with
+		  | None -> None
+		  | Some points ->
+		     match !Parameter.maxTimeValue with
+		     | None -> None
+		     | Some max_t -> Some (max_t /. (float_of_int points))
 
 		let compute_dE () =
-			match !Parameter.pointNumberValue with
-				| None -> None
-				| Some points ->
-					match !Parameter.maxEventValue with
-						| None -> None
-						| Some max_e ->
-							let m = max (max_e / points) 1 in
-								Some m
-								
+		  match !Parameter.pointNumberValue with
+		  | None -> None
+		  | Some points ->
+		     match !Parameter.maxEventValue with
+		     | None -> None
+		     | Some max_e ->
+			Some (max (max_e / points) 1)
+
 		let tick counter time event =
 		  let () =
 		    if not counter.initialized then

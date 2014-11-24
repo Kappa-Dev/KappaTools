@@ -50,7 +50,6 @@ let (maxEventValue:int option ref) = ref None
 let (maxTimeValue:float option ref) = ref None
 let (pointNumberValue:int option ref) = ref None
 let (seedValue:int option ref) = ref None
-let plotModeOn = ref false
 let compileModeOn = ref false
 let implicitSignature = ref false
 let dotOutput = ref false

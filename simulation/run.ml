@@ -25,7 +25,7 @@ let determine_time_advance activity state counter env =
       ) depset infinity
 
 let event state maybe_active_pert_ids story_profiling
-	  event_list counter plot env =
+	  event_list counter env =
   (* 1. Updating dependencies of time or event number *)
   let env,pert_ids =
     State.update_dep state Term.EVENT maybe_active_pert_ids counter env in
@@ -73,7 +73,7 @@ let event state maybe_active_pert_ids story_profiling
 	       else () ;
 	       raise Deadlock
 	     end in
-  Plot.fill state counter plot env dt ;
+  Plot.fill state counter env dt ;
   Counter.inc_time counter dt ;
 
   State.dump state counter env ;
@@ -201,45 +201,39 @@ let event state maybe_active_pert_ids story_profiling
   in
   (state,pert_ids,story_profiling,event_list,env)
 
-let loop state story_profiling event_list counter plot env =
+let loop state story_profiling event_list counter env =
   (*Before entering the loop*)
-  
   Counter.tick counter counter.Counter.time counter.Counter.events ;
-  Plot.output state counter.Counter.time plot env counter ;
-  
-  let rec iter state pert_ids story_profiling event_list counter plot env =
-    if !Parameter.debugModeOn then 
-      Debug.tag (Printf.sprintf "[**Event %d (Activity %f)**]" counter.Counter.events (State.total_activity state));
-    if (Counter.check_time counter) && (Counter.check_events counter) && not (Counter.stop counter) then
+
+  let rec iter state pert_ids story_profiling event_list counter env =
+    let () = Debug.tag_if_debug
+	       "[**Event %d (Activity %f)**]" counter.Counter.events
+	       (State.total_activity state) in
+    if (Counter.check_time counter) && (Counter.check_events counter)
+       && not (Counter.stop counter) then
       let state,pert_ids,story_profiling,event_list,env =
-	event state pert_ids story_profiling event_list counter plot env
+	event state pert_ids story_profiling event_list counter env
       in
-      iter state pert_ids story_profiling event_list counter plot env
+      iter state pert_ids story_profiling event_list counter env
     else (*exiting the loop*)
-      begin
-	let _ = 
-	  Plot.fill state counter plot env 0.0; (*Plotting last measures*)
-	  Plot.flush_ticks counter ;
-	  Plot.close plot
-	in 
-        if Environment.tracking_enabled env then
-	  begin
-	    let causal,weak,strong = (*compressed_flows:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_id:int story_time: float ; story_event: int}*)
-              if !Parameter.weakCompression || !Parameter.mazCompression || !Parameter.strongCompression (*if a compression is required*)
-              then Compression_main.compress env state story_profiling event_list
-              else None,None,None
-	    in
-	    let g prefix label x = 
-	      match x with 
-	      | None -> ()
-	      | Some flows -> 
-		 Causal.pretty_print Graph_closure.config_std prefix label flows state env
-	    in 
-	    let _ = g "" "" causal in 
-	    let _ = g "Weakly" "weakly " weak in 
-	    let _ = g "Strongly" "strongly " strong in 
-	    ()
-	  end
-      end
+      let () = Plot.fill state counter env 0.0 in (*Plotting last measures*)
+      let () = Plot.close counter in
+      if Environment.tracking_enabled env then
+	let causal,weak,strong =
+	  (*compressed_flows:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_id:int story_time: float ; story_event: int}*)
+          if !Parameter.weakCompression || !Parameter.mazCompression
+	     || !Parameter.strongCompression (*if a compression is required*)
+          then Compression_main.compress env state story_profiling event_list
+          else None,None,None
+	in
+	let g prefix label x =
+	  match x with
+	  | None -> ()
+	  | Some flows ->
+	     Causal.pretty_print Graph_closure.config_std prefix label flows state env
+	in
+	let _ = g "" "" causal in
+	let _ = g "Weakly" "weakly " weak in
+	g "Strongly" "strongly " strong
   in
-  iter state (State.all_perturbations state) story_profiling event_list counter plot env
+  iter state (State.all_perturbations state) story_profiling event_list counter env

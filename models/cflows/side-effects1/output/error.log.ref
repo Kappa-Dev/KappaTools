@@ -1,4 +1,4 @@
 
-Warning: No data points are required, use -p option for plotting data.
 File "side-effects.ka", line 6, characters 1-18:
 Warning: breaking a semi-link on site 'a' will induce a side effect
+Warning: No data points are required, use -p option for plotting data.

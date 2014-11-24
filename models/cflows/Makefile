@@ -44,10 +44,11 @@ error: $(DIRS_OF_TEST:=/$(ERROR))
 all: error
 	@if [ -s $< ] ; then cat $< && exit 2 ; else echo "No difference has been found" ; fi
 
-GENFILES=$(filter-out %.diff %.ref,$(wildcard */$(OUTPUT_PATH)/*))
+GENFILES=$(filter-out %.diff %.ref,$(wildcard $(CURDIR)/*/$(OUTPUT_PATH)/*))
 build:
 	@+$(MAKE) clean_all
 	@+$(MAKE) $(DIRS_OF_TEST:=/$(OUTPUT_PATH)/LOG)
+	echo $(GENFILES)
 	@+$(MAKE) $(GENFILES:=.ref)
 	@+$(MAKE) clean
 
