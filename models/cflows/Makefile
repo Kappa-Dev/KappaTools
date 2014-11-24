@@ -48,7 +48,6 @@ GENFILES=$(filter-out %.diff %.ref,$(wildcard $(CURDIR)/*/$(OUTPUT_PATH)/*))
 build:
 	@+$(MAKE) clean_all
 	@+$(MAKE) $(DIRS_OF_TEST:=/$(OUTPUT_PATH)/LOG)
-	echo $(GENFILES)
 	@+$(MAKE) $(GENFILES:=.ref)
 	@+$(MAKE) clean
 
