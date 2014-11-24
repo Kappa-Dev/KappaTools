@@ -25,6 +25,11 @@ type t =
     }
 and component_injections = (InjectionHeap.t option) array
 
+let pp_injections f map =
+  Pp.set IntMap.bindings Pp.comma
+	 (fun f (i,j) -> Format.fprintf f " %i -> %i" i j)
+	 f map
+
 let get_graph state = state.graph
 let get_nl_injections state = state.nl_injections
 
@@ -1104,8 +1109,8 @@ let positive_update ?(with_tracked=[]) state r (phi: int IntMap.t) psi side_modi
 										end ;
 									cpt := !cpt+1 ;
 								done ;
-								Debug.tag_if_debug "Observable %d was found with embedding %s"
-										   var_id (Tools.string_of_map string_of_int string_of_int IntMap.fold !map) ;
+								Debug.tag_if_debug "Observable %d was found with embedding [%a]"
+										   var_id pp_injections !map ;
 								(var_id,!map)::tracked
 							with 
 								| Break 0 -> (if !Parameter.debugModeOn then Debug.tag "Incomplete embedding, no observable recorded" ; tracked)
@@ -1146,12 +1151,10 @@ let positive_update ?(with_tracked=[]) state r (phi: int IntMap.t) psi side_modi
 		       try IntMap.find root_rhs phi
 		       with Not_found ->
 			 (Debug.tag_if_debug
-			    "I was looking for the image of agent %d by embedding %s" 
-			    root_rhs
-			    (string_of_map string_of_int string_of_int IntMap.fold phi);
+			    "I was looking for the image of agent %d by embedding %a"
+			    root_rhs pp_injections phi;
 			  Debug.tag_if_debug
-			    "Glueing was %s"
-			    (string_of_map string_of_int string_of_int IntMap.fold glue);
+			    "Glueing was [%a]" pp_injections glue;
 			  invalid_arg "State.positive_update 3")
 		   in
 		   let mix =
