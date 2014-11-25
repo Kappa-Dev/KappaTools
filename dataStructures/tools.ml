@@ -13,14 +13,6 @@ let no_pos = ("",-1,-1)
 let string_of_pos (n,i,j) =
   ("(in "^n^") line "^(string_of_int i)^", char "^(string_of_int j)^": ")
 
-let string_of_map ?(swap=false) f1 f2 fold map =
-  let l =
-    fold (fun i j cont ->
-	  if swap then ((f2 j)^"->"^(f1 i))::cont
-	  else ((f1 i)^"->"^(f2 j))::cont) map []
-  in
-  Printf.sprintf "[%s]" (String.concat "," l)
-
 let string_of_list f l =
   "["^(String.concat ";" (List.rev_map f (List.rev l)))^"]"
 

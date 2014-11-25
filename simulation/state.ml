@@ -1033,7 +1033,7 @@ let positive_update ?(with_tracked=[]) state r (phi: int IntMap.t) psi side_modi
 			match InjectionHeap.next_alloc cc_id_injections with
 			| Some phi ->
 			   (Debug.tag_if_debug
-			      "reusing injection: %s" (Injection.to_string phi);
+			      "reusing injection: %a" Injection.print phi;
 			    Injection.flush phi (var_id,cc_id))
 			| None -> Injection.empty (Mixture.size_of_cc cc_id mix) (var_id,cc_id)
 		in
@@ -1044,8 +1044,8 @@ let positive_update ?(with_tracked=[]) state r (phi: int IntMap.t) psi side_modi
 				(env,state, pert_ids, already_done_map, new_injs,tracked)
 				)
 		| Some (embedding, port_map) ->
-		   Debug.tag_if_debug "New embedding: %s"
-				      (Injection.to_string embedding);
+		   Debug.tag_if_debug "New embedding: %a"
+				      Injection.print embedding;
 		   let cc_id_injections =
 		     InjectionHeap.alloc embedding cc_id_injections in
 		   comp_injs.(cc_id) <- Some cc_id_injections ;
@@ -1282,8 +1282,8 @@ let negative_upd state cause (u,i) int_lnk counter env =
 							   let u_j = try SiteGraph.node_of_id state.graph j
 								     with exn ->
 								       invalid_arg (Format.asprintf
-										      "State.negative_update: Node #%d is no longer in the graph and injection %s of mixture %a was pointing on it!"
-										      j (Injection.to_string phi) (Kappa_printer.mixture false env) mix)
+										      "State.negative_update: Node #%d is no longer in the graph and injection %a of mixture %a was pointing on it!"
+										      j Injection.print phi (Kappa_printer.mixture false env) mix)
 								in
 								Mixture.fold_interface
 								(fun site_id (int_opt, lnk_opt) _ ->
@@ -1597,8 +1597,8 @@ let dump state counter env =
 	       else
 		 InjProdHeap.iteri
 		   (fun inj_id inj_prod ->
-		    Format.printf "#\t ip#%d: %s @\n"
-				  inj_id(InjProduct.to_string inj_prod)
+		    Format.printf "#\t ip#%d: %a @\n"
+				  inj_id InjProduct.print inj_prod
 		   ) injprod_hp
 	      )
 	 end ;
@@ -1619,8 +1619,8 @@ let dump state counter env =
 		  | Some injs ->
 		     InjectionHeap.iteri
 		       (fun ad injection ->
-			Format.printf "#\tCC[%d]#%d: %s @\n" cc_id ad
-				      (Injection.to_string injection))
+			Format.printf "#\tCC[%d]#%d: %a @\n" cc_id ad
+				      Injection.print injection)
 		       injs
 		 )	comp_injs
 	    )

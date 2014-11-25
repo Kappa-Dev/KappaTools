@@ -10,6 +10,9 @@ let list pr_sep pr_el f l =
 let set elements pr_sep pr_el f set =
   list pr_sep pr_el f (elements set)
 
+let hashtbl pr_sep pr_el f tbl =
+  list pr_sep pr_el f (Hashtbl.fold (fun a b l -> (a,b)::l) tbl [])
+
 let comma f = fprintf f ",@ "
 let colon f = fprintf f ";@ "
 let space f = pp_print_space f ()

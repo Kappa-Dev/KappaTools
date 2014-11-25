@@ -188,8 +188,8 @@ let rec update_rooted_intras new_injs state counter env =
 				in 
 				if !Parameter.debugModeOn then
 				  begin
-				    Printf.printf "Trying to extend (%d,%d) : %s with:\n"
-						  mix_id cc_id (Injection.to_string injection) ;
+				    Format.printf "Trying to extend (%d,%d) : %a with:\n"
+						  mix_id cc_id Injection.print injection ;
 						IntMap.iter 
 						(fun cc_id' inj_list -> 
 							Printf.printf "(%d,%d):%s\n" mix_id cc_id' 

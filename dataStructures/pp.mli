@@ -4,6 +4,9 @@ val list : (formatter -> unit) -> (formatter -> 'a -> unit) ->
 	   formatter -> 'a list -> unit
 val set : ('b -> 'a list) -> (formatter -> unit) -> (formatter -> 'a -> unit) ->
 	  formatter -> 'b -> unit
+val hashtbl : (formatter -> unit) -> (formatter -> 'a * 'b -> unit) ->
+	  formatter -> ('a,'b) Hashtbl.t -> unit
+
 val option : (formatter -> 'a -> unit) -> formatter -> 'a option -> unit
 val comma : formatter -> unit
 val colon : formatter -> unit

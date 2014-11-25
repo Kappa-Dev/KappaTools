@@ -38,7 +38,7 @@ module Injection : sig
   val to_map : t -> int IntMap.t * IntSet.t
 
   val fold : (int -> int -> 'a -> 'a) -> t -> 'a -> 'a
-  val to_string : t -> string
+  val print : Format.formatter -> t -> unit
   val string_of_coord : t -> string
 end = struct
   type t = {map : (int,int) Hashtbl.t ;
@@ -87,8 +87,11 @@ end = struct
 	 else (IntMap.add i j map,IntSet.add j set))
 	phi.map (inj,cod)
 
-    let to_string phi =
-      Tools.string_of_map string_of_int string_of_int Hashtbl.fold phi.map
+    let print f phi =
+      Format.fprintf
+	f "[%a]" (Pp.hashtbl
+		    Pp.comma (fun f (i,j) -> Format.fprintf f "%i -> %i" i j))
+	phi.map
 
     let string_of_coord phi =
       let a = get_address phi and (m,c) = get_coordinate phi in
@@ -165,11 +168,7 @@ module InjProduct =
 
     let fold_left f cont phi = Array.fold_left f cont phi.elements
 		
-    let to_string phi =
-      Format.asprintf
-	"%a" (Pp.array
-		(fun f x -> Format.pp_print_string f (Injection.to_string x)))
-	phi.elements
+    let print f phi = Pp.array Injection.print f phi.elements
   end
 
 (*module Activity:(ValMap.ValMap with type content = float) = 
