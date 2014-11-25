@@ -186,18 +186,17 @@ let rec update_rooted_intras new_injs state counter env =
 						) lifts map
 					) components IntMap.empty
 				in 
-				if !Parameter.debugModeOn then
-				  begin
-				    Format.printf "Trying to extend (%d,%d) : %a with:\n"
-						  mix_id cc_id Injection.print injection ;
-						IntMap.iter 
-						(fun cc_id' inj_list -> 
-							Printf.printf "(%d,%d):%s\n" mix_id cc_id' 
-							(Tools.string_of_list Injection.string_of_coord inj_list)
-						) candidate_map 
-					end ;
-				if IntMap.size candidate_map < (Mixture.arity (kappa_of_id mix_id state)) - 1 then 
-					update_rooted_intras tl state counter env
+				Debug.tag_if_debug
+				  "@[<v>@[Trying to extend (%d,%d) : %a with:@]@,@[%a@]@]@."
+				  mix_id cc_id Injection.print injection
+				  (Pp.set IntMap.bindings Pp.empty
+					  (fun f (cc_id',inj_list) ->
+					   Format.fprintf
+					     f "(%d,%d):[%a]\n" mix_id cc_id'
+					     (Pp.list Pp.colon Injection.print_coord) inj_list))
+				  candidate_map;
+				if IntMap.size candidate_map < (Mixture.arity (kappa_of_id mix_id state)) - 1 then
+				  update_rooted_intras tl state counter env
 				else
 					let new_intras = 
 						IntMap.fold (*folding on candidate map*)
@@ -222,8 +221,9 @@ let rec update_rooted_intras new_injs state counter env =
 							(fun f injmap ->
 							 Format.fprintf f "new_intras: %a"
 									(Pp.set IntMap.bindings Pp.comma
-										(fun f (i,c) -> Format.fprintf f "%i->%s" i
-													       (Injection.string_of_coord c)))
+										(fun f (i,c) -> Format.fprintf
+												  f "%i->%a" i
+												  Injection.print_coord c))
 									injmap))
 					  new_intras ;
 

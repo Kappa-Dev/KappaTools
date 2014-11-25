@@ -13,9 +13,6 @@ let no_pos = ("",-1,-1)
 let string_of_pos (n,i,j) =
   ("(in "^n^") line "^(string_of_int i)^", char "^(string_of_int j)^": ")
 
-let string_of_list f l =
-  "["^(String.concat ";" (List.rev_map f (List.rev l)))^"]"
-
 let pow x n =
   let rec aux x n acc =
     if n = 0 then acc

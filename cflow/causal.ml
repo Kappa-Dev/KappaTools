@@ -461,7 +461,7 @@ let dot_of_grid profiling desc enriched_grid state env =
 		) depth_of_event IntMap.empty
 	in
 	let _ = Parameter.add_out_desc desc in 
-        let _ = profiling desc in
+        let _ = profiling (Format.formatter_of_out_channel desc) in
 	fprintf desc "digraph G{\n ranksep=.5 ; \n" ;
 	IntMap.iter
 	(fun d eids_at_d ->
@@ -565,11 +565,12 @@ let pretty_print config_closure compression_type label story_list state env =
 		| None -> invalid_arg "Causal.pretty_print"
 	    )(0.,[],0) (List.rev stories) 
 	in
-	let profiling = 
-	  (fun desc -> 
-	    Printf.fprintf desc "/* Compression of %d causal flows obtained in average at %E t.u */\n" n (av_t/.(float_of_int n)) ;
-	    Printf.fprintf desc "/* Compressed causal flows were: %s */\n" (Tools.string_of_list string_of_int ids) ;
-	  )
+	let profiling desc =
+	  Format.fprintf desc "/* Compression of %d causal flows obtained in average at %E t.u */@."
+			 n (av_t/.(float_of_int n)) ;
+	  Format.fprintf desc "/* Compressed causal flows were: [%a] */@."
+			 (Pp.list (fun f -> Format.fprintf f ";")
+				  Format.pp_print_int) ids
 	in
 	let desc =
 	  Tools.open_out_fresh_filename (!(Parameter.cflowFileName))

@@ -39,7 +39,7 @@ module Injection : sig
 
   val fold : (int -> int -> 'a -> 'a) -> t -> 'a -> 'a
   val print : Format.formatter -> t -> unit
-  val string_of_coord : t -> string
+  val print_coord : Format.formatter -> t -> unit
 end = struct
   type t = {map : (int,int) Hashtbl.t ;
 	    mutable address : int option ;
@@ -93,9 +93,9 @@ end = struct
 		    Pp.comma (fun f (i,j) -> Format.fprintf f "%i -> %i" i j))
 	phi.map
 
-    let string_of_coord phi =
+    let print_coord f phi =
       let a = get_address phi and (m,c) = get_coordinate phi in
-      Format.sprintf "(%d,%d,%d)" m c a
+      Format.fprintf f "(%d,%d,%d)" m c a
 
     let copy phi =
       fold (fun i j phi' -> add i j phi') phi
