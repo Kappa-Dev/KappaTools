@@ -18,6 +18,13 @@ let option pr f = function
   | None -> ()
   | Some x -> fprintf f "@ %a" pr x
 
+let array pr_el f a =
+  let rec aux i f =
+    if i < Array.length a then
+      let () = Format.fprintf f "%i:%a" i pr_el a.(i) in
+      if i < Array.length a - 1 then
+	Format.fprintf f ";@,%t" (aux (succ i))
+  in Format.fprintf f "[|%t|]" (aux 0)
 
 let position f (beg_pos,end_pos) =
   let () = assert (beg_pos.Lexing.pos_fname = end_pos.Lexing.pos_fname) in

@@ -165,7 +165,11 @@ module InjProduct =
 
     let fold_left f cont phi = Array.fold_left f cont phi.elements
 		
-    let to_string phi = Tools.string_of_array Injection.to_string phi.elements
+    let to_string phi =
+      Format.asprintf
+	"%a" (Pp.array
+		(fun f x -> Format.pp_print_string f (Injection.to_string x)))
+	phi.elements
   end
 
 (*module Activity:(ValMap.ValMap with type content = float) = 

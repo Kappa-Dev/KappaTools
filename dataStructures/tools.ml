@@ -27,11 +27,6 @@ let string_of_map ?(swap=false) f1 f2 fold map =
   in
     Printf.sprintf "[%s]" (String.concat "," l)
 
-let string_of_array f ar =
-	let l = ref [] in 
-		Array.iteri (fun i e -> l:=(((string_of_int i)^":"^(f e))::!l)) ar ;
-		"[|"^(String.concat ";" (List.rev !l))^"|]"
-		
 let string_of_list f l =
 	"["^(String.concat ";" (List.rev_map f (List.rev l)))^"]"
 
