@@ -13,12 +13,6 @@ let no_pos = ("",-1,-1)
 let string_of_pos (n,i,j) =
   ("(in "^n^") line "^(string_of_int i)^", char "^(string_of_int j)^": ")
 
-let string_of_set f fold set = 
-  let l = 
-    fold (fun i cont -> (f i)::cont) set [] 
-  in
-    Printf.sprintf "{%s}" (String.concat "," l)
-
 let string_of_map ?(swap=false) f1 f2 fold map =
   let l =
     fold (fun i j cont ->

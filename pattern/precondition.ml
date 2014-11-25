@@ -75,23 +75,3 @@ let find_all nme i int_opt lnk_opt is_free (hsh:t) =
 					try Int2Set.union (Hashtbl.find hsh (nme,i,BND0)) set_int with Not_found -> set_int
 				in
 					try Int2Set.union (Hashtbl.find hsh (nme,i,BND1 (nme',i'))) set_lnk with Not_found -> set_lnk
-							
-(*
-let to_string hsh =
-	let f = Misc.string_of_set (fun (x,y) -> "("^(string_of_int x)^","^(string_of_int y)^")") Int2Set.fold in 
-	let l =  
-		Hashtbl.fold 
-		(fun k set2 cont ->
-			let str = 
-				match k with
-					| (nme,i,INT j) -> Printf.sprintf "(%s,%d,INT %d)->%s" nme i j (f set2)
-					| (nme,i,FREE) -> Printf.sprintf "(%s,%d,FREE)->%s" nme i (f set2)
-					| (nme,i,BND0) -> Printf.sprintf "(%s,%d,BND0)->%s" nme i (f set2)
-					| (nme,i,BND1 (nme',i')) -> Printf.sprintf "(%d,%d,BND1(%d,%d))->%s" nme i nme' i' (f set2)
-			in
-				str::cont
-		) hsh []
-	in
-		String.concat "\n" l	
-*)
-

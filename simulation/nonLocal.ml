@@ -61,8 +61,10 @@ let update_intra_in_components r embedding_info state counter env =
 	let extensions,found = (*r_id -> cc_id -> part_inj_list*)
 		IntMap.fold 
 		(fun eq cc_set (extensions,found) ->
-			if !Parameter.debugModeOn then
-				Debug.tag (Printf.sprintf "CCs %s are merged by the rule and CC[%d] is the representative" (string_of_set string_of_int IntSet.fold cc_set) eq) ;
+		 Debug.tag_if_debug "CCs {%a} are merged by the rule and CC[%d] is the representative"
+				    (Pp.set IntSet.elements Pp.comma
+					    Format.pp_print_int) cc_set
+				    eq;
 			IntSet.fold 
 			(fun cc_i (extensions,found) ->
 				let root = 

@@ -698,14 +698,25 @@ let dump r env =
 					 s))
 		 r.modif_sites;
   match r.cc_impact with
-  | None -> Printf.fprintf stderr "No CC impact\n"
+  | None -> Format.eprintf "No CC impact@."
   | Some (con,dis,se) ->
-     IntMap.iter
-       (fun cc_i cc_set ->
-	Printf.fprintf stderr "CC[%d] and CCs %s in the left hand side will merge\n" cc_i (Tools.string_of_set string_of_int IntSet.fold cc_set)) con ;
-     IntMap.iter
-       (fun cc_i cc_set ->
-	Printf.fprintf stderr "CC[%d] and CCs %s in the rhs are freshly disconnected  \n" cc_i (Tools.string_of_set string_of_int IntSet.fold cc_set)) dis ;
-     IntMap.iter
-       (fun id site_id_set ->
-	Printf.fprintf stderr "agent #%d might have side effect disconnection on sites %s\n" id (Tools.string_of_set string_of_int IntSet.fold site_id_set)) se
+     Format.eprintf
+       "@[<v>%a@,%a@,%a@]@."
+       (Pp.set IntMap.bindings (fun f -> Format.pp_print_cut f ())
+	       (fun f (i,s) -> Format.fprintf
+				 f "@[CC[%d] and CCs {%a} in the left hand side will merge@]"
+				 i (Pp.set IntSet.elements Pp.comma
+					   Format.pp_print_int) s))
+       con
+       (Pp.set IntMap.bindings (fun f -> Format.pp_print_cut f ())
+	       (fun f (i,s) -> Format.fprintf
+				 f "@[CC[%d] and CCs {%a} in the rhs are freshly disconnected@]"
+				 i (Pp.set IntSet.elements Pp.comma
+					   Format.pp_print_int) s))
+       dis
+       (Pp.set IntMap.bindings (fun f -> Format.pp_print_cut f ())
+	       (fun f (i,s) -> Format.fprintf
+				 f "@[agent #%d might have side effect disconnection on sites {%a}@]"
+				 i (Pp.set IntSet.elements Pp.comma
+					   Format.pp_print_int) s))
+       se
