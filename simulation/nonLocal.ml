@@ -71,18 +71,17 @@ let update_intra_in_components r embedding_info state counter env =
 				let _ = 
 					if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Exploring into image of CC[%d] computed during rule %d application" cc_i r.Primitives.r_id)
 	 			in
-				let component_i = 
-					try IntMap.find root components with 
-						| Not_found -> 
-							(Debug.tag 
-							(Printf.sprintf "root %d (= phi(%d)) not found in %s" root (match Mixture.root_of_cc r.Primitives.lhs cc_i with Some r -> r | None -> -1)
-								(Tools.string_of_map string_of_int (Tools.string_of_set string_of_int IntSet.fold) 
-								IntMap.fold 
-								components
-								)
-							); invalid_arg "nl_pos_upd")
+				let component_i =
+				  try IntMap.find root components
+				  with Not_found ->
+				    (Debug.tag_if_debug "root %d (= phi(%d)) not found in %a" root (match Mixture.root_of_cc r.Primitives.lhs cc_i with Some r -> r | None -> -1)
+							(Pp.set IntMap.bindings Pp.comma
+								(fun f (i,s) ->
+								 Format.fprintf f "%i -> {%a}" i (Pp.set IntSet.elements Pp.comma Format.pp_print_int) s))
+							components;
+				     invalid_arg "nl_pos_upd")
 				in
-				if !Parameter.debugModeOn then Debug.tag (Tools.string_of_set string_of_int IntSet.fold component_i) ;
+				Debug.tag_if_debug "{%a}" (Pp.set IntSet.elements Pp.comma Format.pp_print_int) component_i ;
 				let opt = search_elements (get_graph state) component_i extensions env
 				in
 				match opt with
@@ -216,9 +215,16 @@ let rec update_rooted_intras new_injs state counter env =
 						) candidate_map [IntMap.add cc_id injection IntMap.empty]
 					in
 										
-					if !Parameter.debugModeOn then
-						List.iter (fun injmap -> Debug.tag ("new_intras: "^(string_of_map string_of_int Injection.string_of_coord IntMap.fold injmap))) new_intras ;
-					
+					Debug.tag_if_debug
+					  "%a" (Pp.list Pp.empty
+							(fun f injmap ->
+							 Format.fprintf f "new_intras: %a"
+									(Pp.set IntMap.bindings Pp.comma
+										(fun f (i,c) -> Format.fprintf f "%i->%s" i
+													       (Injection.string_of_coord c)))
+									injmap))
+					  new_intras ;
+
 					let injprod_hp = match (get_nl_injections state).(mix_id) with None -> InjProdHeap.create !Parameter.defaultHeapSize | Some hp -> hp in
 					let mix = kappa_of_id mix_id state in
 					let injprod_hp = 

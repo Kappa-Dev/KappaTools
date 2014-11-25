@@ -267,8 +267,10 @@ let dump_table table env =
 	 (fun (spec, k) ->
 	  Format.printf "%d instances of species: %s@," k (to_string spec env);
 	  Format.printf
-	    "with signature %s@,"
-	    (Tools.string_of_map Int64.to_string (fun _ -> "") Int64Map.fold spec.views);
+	    "with signature %a@,"
+	    (Pp.set Int64Map.bindings Pp.comma
+		    (fun f (i,_) -> Format.fprintf f "%Ld" i))
+	    spec.views;
 	  Printf.printf "******@,"
 	 ) specs
       ) table in

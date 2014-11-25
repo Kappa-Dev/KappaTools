@@ -108,20 +108,18 @@ let event state maybe_active_pert_ids story_profiling
     | None -> None
     | Some (r,embedding_t) ->
        (**********************************************)
-       if !Parameter.debugModeOn then
-	 begin
+       let () =
+	 if !Parameter.debugModeOn then
 	   let version,embedding = match embedding_t with
 	     | State.Embedding.DISJOINT emb -> ("binary",emb.State.Embedding.map)
 	     | State.Embedding.CONNEX emb -> ("unary",emb.State.Embedding.map)
 	     | State.Embedding.AMBIGUOUS emb -> ("ambig.",emb.State.Embedding.map)
 	   in
-	   Debug.tag
-	     (Printf.sprintf "Applying %s version of '%s' with embedding:" version
-			     (Dynamics.to_kappa r env)
-	     );
-	   Debug.tag (Printf.sprintf "%s" (string_of_map string_of_int string_of_int IntMap.fold embedding))
-	 end
-       else () ;
+	   Debug.tag_if_debug "Applying %s version of '%s' with embedding:%a"
+			      version (Dynamics.to_kappa r env)
+			      (Pp.set IntMap.bindings Pp.comma
+				      (fun f (i,j) -> Format.fprintf f "%i->%i" i j))
+			      embedding in
        (********************************************)
        try Some (State.apply state r embedding_t counter env,r)
        with Null_event _ -> None

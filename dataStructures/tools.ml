@@ -19,16 +19,16 @@ let string_of_set f fold set =
   in
     Printf.sprintf "{%s}" (String.concat "," l)
 
-let string_of_map ?(swap=false) f1 f2 fold map = 
-  let l = 
-    fold (fun i j cont -> 
-			if swap then ((f2 j)^"->"^(f1 i))::cont
-			else ((f1 i)^"->"^(f2 j))::cont) map [] 
+let string_of_map ?(swap=false) f1 f2 fold map =
+  let l =
+    fold (fun i j cont ->
+	  if swap then ((f2 j)^"->"^(f1 i))::cont
+	  else ((f1 i)^"->"^(f2 j))::cont) map []
   in
-    Printf.sprintf "[%s]" (String.concat "," l)
+  Printf.sprintf "[%s]" (String.concat "," l)
 
 let string_of_list f l =
-	"["^(String.concat ";" (List.rev_map f (List.rev l)))^"]"
+  "["^(String.concat ";" (List.rev_map f (List.rev l)))^"]"
 
 let pow x n =
   let rec aux x n acc =

@@ -647,7 +647,7 @@ let dump r env =
     Format.fprintf f "%a->%a" (Kappa_printer.mixture false env) r.lhs
 		   (Kappa_printer.mixture false env) r.rhs in
   let name = to_kappa r env in
-  Format.eprintf "****Rule '%s' [%t]****" name pr_r;
+  Format.eprintf "****Rule '%s' [%t]****@." name pr_r;
   IntMap.iter
     (fun id ag ->
      Mixture.fold_interface
@@ -688,17 +688,15 @@ let dump r env =
   Printf.fprintf stderr "Apply %s\n" (to_kappa r env) ;
   dump_script r.script ;
   Printf.fprintf stderr "if pattern %d is matched \n" (Mixture.get_id r.lhs) ;
-  Printf.fprintf stderr "Modif sites: %s"
-		 (string_of_map
-		    (fun id ->
-		     match id with FRESH i | KEPT i -> string_of_int i)
-		    (string_of_set
-		       (fun (x,y) ->
-			"("^(string_of_int x)^","^(string_of_int y)^")") Int2Set.fold)
-		    IdMap.fold
-		    r.modif_sites
-		 );
-  Printf.fprintf stderr "\n";
+  Format.eprintf "Modif sites: [%a]@."
+		 (Pp.set IdMap.bindings Pp.comma
+			 (fun f (id,s) ->
+			  Format.fprintf f "%i -> {%a}"
+					 (match id with FRESH i | KEPT i -> i)
+					 (Pp.set Int2Set.elements Pp.comma
+						 (fun f (x,y) -> Format.fprintf f "(%i,%i)" x y))
+					 s))
+		 r.modif_sites;
   match r.cc_impact with
   | None -> Printf.fprintf stderr "No CC impact\n"
   | Some (con,dis,se) ->

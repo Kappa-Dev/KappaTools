@@ -27,7 +27,7 @@ and component_injections = (InjectionHeap.t option) array
 
 let pp_injections f map =
   Pp.set IntMap.bindings Pp.comma
-	 (fun f (i,j) -> Format.fprintf f " %i -> %i" i j)
+	 (fun f (i,j) -> Format.fprintf f " %i->%i" i j)
 	 f map
 
 let get_graph state = state.graph
@@ -455,36 +455,33 @@ let dot_of_influence_map desc state env =
 	  Format.fprintf desc "\"%d:%a\" [shape=ellipse,fillcolor=palegreen3] ;\n"
 			 mix_id (Kappa_printer.mixture false env) mix
     ) state.kappa_variables ;
+  Format.pp_open_vbox desc 0;
   Hashtbl.iter
     (fun r_id act_map ->
      let rule = rule_of_id r_id state in
      let n_label = Dynamics.to_kappa rule env in
-     IntMap.iter
-       (fun mix_id glueings ->
-	let n_label' f =
-	  if Environment.is_rule mix_id env then
-	    let rule'=rule_of_id mix_id state in
-	    Format.fprintf f "%s" (Dynamics.to_kappa rule' env)
-	  else
-	    let mix = kappa_of_id mix_id state in
-	    Kappa_printer.mixture false env f mix
-	in
-	let arrow_label =
-	  let ls =
-	    List.fold_left
-	      (fun label glueing ->
-	       LongString.concat
-		 ~sep:';'
-		 (Tools.string_of_map ~swap:true string_of_int string_of_int IntMap.fold glueing)
-		 label) LongString.empty glueings
-	  in
-	  LongString.to_string ls
-	in
-	Format.fprintf desc "\"%d:%s\" -> \"%d:%t\" [label=\"%s\"];@\n"
-		       r_id n_label mix_id n_label' arrow_label
-       ) act_map
+     Pp.set IntMap.bindings (fun f -> Format.pp_print_cut f ())
+	    (fun f (mix_id,glueings) ->
+	     let n_label' f =
+	       if Environment.is_rule mix_id env then
+		 let rule'=rule_of_id mix_id state in
+		 Format.fprintf f "%s" (Dynamics.to_kappa rule' env)
+	       else
+		 let mix = kappa_of_id mix_id state in
+		 Kappa_printer.mixture false env f mix
+	     in
+	     let pp_glueing f glue =
+	       Format.fprintf
+		 f "[%a]" (Pp.set IntMap.bindings Pp.comma
+				  (fun f (i,j) -> Format.fprintf f "%i->%i" j i))
+		 glue in
+	     Format.fprintf desc "@[\"%d:%s\" -> \"%d:%t\" [label=\"@[<h>%a@]\"];@]"
+			    r_id n_label mix_id n_label'
+			    (Pp.list Pp.colon pp_glueing) glueings
+	    ) desc act_map;
+     Format.pp_print_cut desc ()
     ) state.influence_map ;
-  Format.fprintf desc "}@."
+  Format.fprintf desc "@]}@."
 
 let initialize sg token_vector rules kappa_vars obs pert counter env =
   let dim_rule = max (List.length rules) 1 in
