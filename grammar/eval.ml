@@ -681,7 +681,7 @@ let effects_of_modif variables lrules env ast_list =
 	 | PRINT (pexpr,print,pos) ->
 	    let (mix,pexpr') =
 	      compile_print_expr env (env.Environment.fresh_kappa,[]) pexpr in
-	    let (mix',print') = compile_print_expr env mix pexpr in
+	    let (mix',print') = compile_print_expr env mix print in
 	    let (env',mixs') = mixtures_of_result mixs env mix' in
 	    (mixs',lrules,(Primitives.PRINT (pexpr',print'))::rev_effects,env')
        in
