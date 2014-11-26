@@ -557,11 +557,11 @@ let compile_print_expr env mixs ex =
     ex (mixs,[])
 
 let effects_of_modif variables lrules env ast_list =
-  let rec iter mixs lrules effects env ast_list =
+  let rec iter mixs lrules rev_effects env ast_list =
     match ast_list with
-    | [] -> (mixs,lrules,effects,env)
+    | [] -> (mixs,lrules,List.rev rev_effects,env)
     | ast::tl ->
-       let (variables,lrules,effects,env) =
+       let (variables,lrules,rev_effects,env) =
 	 match ast with
 	 | INTRO (alg_expr, ast_mix, pos) ->
 	    let (mix,alg_pos) =
@@ -578,7 +578,7 @@ let effects_of_modif variables lrules env ast_list =
 	      rule_of_ast ~is_pert:true env mixs'
 			  (None, Term.with_dummy_pos ast_rule) in
 	     (mixs'', rule::lrules,
-		(Primitives.ITER_RULE (alg_pos, rule))::effects, env)
+		(Primitives.ITER_RULE (alg_pos, rule))::rev_effects, env)
 	 | DELETE (alg_expr, ast_mix, pos) ->
 	    let (mix,alg_pos) =
 	      Expr.compile_alg env.Environment.algs.NamedDecls.finder
@@ -595,7 +595,7 @@ let effects_of_modif variables lrules env ast_list =
 	      rule_of_ast ~is_pert:true env mixs'
 			  (None,Term.with_dummy_pos ast_rule) in
 	     (mixs'', rule::lrules,
-		(Primitives.ITER_RULE (alg_pos, rule))::effects, env)
+		(Primitives.ITER_RULE (alg_pos, rule))::rev_effects, env)
 	 | UPDATE ((nme, pos_rule), alg_expr) ->
 	    let i,is_rule =
 	      (try (Environment.num_of_rule nme env,true)
@@ -615,7 +615,7 @@ let effects_of_modif variables lrules env ast_list =
 	    let (env',mixs') = mixtures_of_result mixs env mix in
 	    (mixs',lrules,
 	     (Primitives.UPDATE ((if is_rule then Term.RULE i
-	      else Term.ALG i), alg_pos))::effects, env')
+	      else Term.ALG i), alg_pos))::rev_effects, env')
 	 | UPDATE_TOK ((tk_nme,tk_pos),alg_expr) ->
 	    let tk_id =
 	      try Environment.num_of_token tk_nme env with
@@ -628,18 +628,18 @@ let effects_of_modif variables lrules env ast_list =
 			       env.Environment.tokens.NamedDecls.finder
 			       (env.Environment.fresh_kappa,[]) alg_expr in
 	    let (env',mixs') = mixtures_of_result mixs env mix in
-	    (mixs',lrules,(Primitives.UPDATE (Term.TOK tk_id, alg_pos))::effects,env')
+	    (mixs',lrules,(Primitives.UPDATE (Term.TOK tk_id, alg_pos))::rev_effects,env')
 	 | SNAPSHOT (pexpr,pos) ->
 	    let (mix,pexpr') =
 	      compile_print_expr env (env.Environment.fresh_kappa,[]) pexpr in
 	    let (env',mixs') = mixtures_of_result mixs env mix in
 	    (*when specializing snapshots to particular mixtures, add variables below*)
-	    (mixs', lrules, (Primitives.SNAPSHOT pexpr')::effects, env')
+	    (mixs', lrules, (Primitives.SNAPSHOT pexpr')::rev_effects, env')
 	 | STOP (pexpr,pos) ->
 	    let (mix,pexpr') =
 	      compile_print_expr env (env.Environment.fresh_kappa,[]) pexpr in
 	    let (env',mixs') = mixtures_of_result mixs env mix in
-	    (mixs', lrules, (Primitives.STOP pexpr')::effects, env')
+	    (mixs', lrules, (Primitives.STOP pexpr')::rev_effects, env')
 	 | CFLOW ((lab,pos_lab),pos_pert) ->
 	    let id =
 	      try Environment.num_of_rule lab env
@@ -653,7 +653,7 @@ let effects_of_modif variables lrules env ast_list =
 			   ("Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"
 			   ,pos_lab))
 	    in
-	    (mixs, lrules, (Primitives.CFLOW id)::effects, env)
+	    (mixs, lrules, (Primitives.CFLOW id)::rev_effects, env)
 	 | CFLOWOFF ((lab,pos_lab),pos_pert) ->
 	    let id =
 	      try Environment.num_of_rule lab env
@@ -667,25 +667,25 @@ let effects_of_modif variables lrules env ast_list =
 			   ("Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"
 			   ,pos_lab))
 	    in
-	    (mixs, lrules, (Primitives.CFLOWOFF id)::effects, env)
+	    (mixs, lrules, (Primitives.CFLOWOFF id)::rev_effects, env)
 	 | FLUX (pexpr,pos) ->
 	    let (mix,pexpr') =
 	      compile_print_expr env (env.Environment.fresh_kappa,[]) pexpr in
 	    let (env',mixs') = mixtures_of_result mixs env mix in
-	    (mixs', lrules, (Primitives.FLUX pexpr')::effects, env')
+	    (mixs', lrules, (Primitives.FLUX pexpr')::rev_effects, env')
 	 | FLUXOFF (pexpr,pos) ->
 	    let (mix,pexpr') =
 	      compile_print_expr env (env.Environment.fresh_kappa,[]) pexpr in
 	    let (env',mixs') = mixtures_of_result mixs env mix in
-	    (mixs', lrules, (Primitives.FLUXOFF pexpr')::effects, env')
+	    (mixs', lrules, (Primitives.FLUXOFF pexpr')::rev_effects, env')
 	 | PRINT (pexpr,print,pos) ->
 	    let (mix,pexpr') =
 	      compile_print_expr env (env.Environment.fresh_kappa,[]) pexpr in
 	    let (mix',print') = compile_print_expr env mix pexpr in
 	    let (env',mixs') = mixtures_of_result mixs env mix' in
-	    (mixs',lrules,(Primitives.PRINT (pexpr',print'))::effects,env')
+	    (mixs',lrules,(Primitives.PRINT (pexpr',print'))::rev_effects,env')
        in
-       iter variables lrules effects env tl
+       iter variables lrules rev_effects env tl
   in
   iter variables lrules [] env ast_list
 
