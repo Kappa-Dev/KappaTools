@@ -78,9 +78,9 @@ let rec compile_alg ?label var_map tk_map ?max_allowed_var
      in (mixs,(TOKEN_ID i,pos))
   | Ast.STATE_ALG_OP (op) -> (mixs,(STATE_ALG_OP (op),pos))
   | Ast.CONST n -> (mixs,(CONST n,pos))
-  | Ast.EMAX -> (mixs,(CONST (Parameter.getMaxEventValue ()),pos))
-  | Ast.TMAX -> (mixs,(CONST (Parameter.getMaxTimeValue ()),pos))
-  | Ast.PLOTNUM -> (mixs,(CONST (Parameter.getPointNumberValue ()),pos))
+  | Ast.EMAX -> (mixs,(CONST (Nbr.getMaxEventValue ()),pos))
+  | Ast.TMAX -> (mixs,(CONST (Nbr.getMaxTimeValue ()),pos))
+  | Ast.PLOTNUM -> (mixs,(CONST (Nbr.getPointNumberValue ()),pos))
   | Ast.BIN_ALG_OP (op, (a,pos1), (b,pos2)) ->
      begin match rec_call mixs (a,pos1) with
 	   | (mixs',YES n1) ->

@@ -110,8 +110,9 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
   | Primitives.FLUXOFF pexpr ->
     begin
       let str = eval_pexpr pexpr state counter env in
-      let desc =
-	match str with "" -> open_out !Parameter.fluxFileName | _ -> open_out str in
+      let desc = Tools.kasim_open_out
+		   (match str with "" -> !Parameter.fluxFileName
+				 | _ -> str) in
       Parameter.add_out_desc desc ;
       State.dot_of_flux (Format.formatter_of_out_channel desc) state env ;
       close_out desc ;
@@ -147,8 +148,9 @@ let apply_effect p_id pert tracked pert_events state counter env =
     Debug.tag_if_debug "Taking a snapshot of current state (%s)" str;
     let ext = if !Parameter.dotOutput then "dot" else "ka" in
     let str = if str="" then !Parameter.snapshotFileName else str in
-    let filename = Tools.build_fresh_filename str [string_of_int (Counter.event counter)] ext in
-    let desc = open_out filename in
+    let desc =
+      Tools.open_out_fresh_filename
+	str [string_of_int (Counter.event counter)] ext in
     let hr = !Parameter.snapshotHighres in
     Parameter.openOutDescriptors := desc::(!Parameter.openOutDescriptors) ;
     State.snapshot state counter desc hr env;

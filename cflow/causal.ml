@@ -445,7 +445,7 @@ let enrich_grid config_closure grid =
     depth_of_event = depth_of_event 
   }
 
-let dot_of_grid profiling fic enriched_grid state env = 
+let dot_of_grid profiling desc enriched_grid state env = 
 	(*dump grid fic state env ; *)
 	let t = Sys.time () in 
         let config = enriched_grid.config in 
@@ -459,8 +459,6 @@ let dot_of_grid profiling fic enriched_grid state env =
 			in
 			IntMap.add d (IntSet.add eid set) dmap
 		) depth_of_event IntMap.empty
-	in
-	let desc = open_out fic
 	in
 	let _ = Parameter.add_out_desc desc in 
         let _ = profiling desc in
@@ -573,13 +571,17 @@ let pretty_print config_closure compression_type label story_list state env =
 	    Printf.fprintf desc "/* Compressed causal flows were: %s */\n" (Tools.string_of_list string_of_int ids) ;
 	  )
 	in
-	let fic = Tools.build_fresh_filename (!(Parameter.cflowFileName)) [compression_type;string_of_int cpt] "dot" in
-        dot_of_grid profiling fic enriched_config state env ;
+	let desc =
+	  Tools.open_out_fresh_filename (!(Parameter.cflowFileName))
+					[compression_type;string_of_int cpt]
+					"dot" in
+        dot_of_grid profiling desc enriched_config state env ;
 	cpt+1
       ) 0 story_list
   in
-  let fic = Tools.build_fresh_filename (!(Parameter.cflowFileName)) [compression_type;"Summary"] "dat" in
-  let desc = open_out fic in 
+  let desc =
+    Tools.open_out_fresh_filename (!(Parameter.cflowFileName))
+				  [compression_type;"Summary"] "dat" in
   let _ = fprintf desc "#id\tE\tT\t\tdepth\tsize\t\n" in 
   let _ = 
     List.fold_left 

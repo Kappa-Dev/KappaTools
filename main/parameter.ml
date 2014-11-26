@@ -93,46 +93,25 @@ let marshalizedInFile = ref ""
 let marshalizedOutFile = ref ""
 
 
-let set name ext_opt = 
-	if !name = "" then ()
-	else
-	let fname = Filename.concat !outputDirName !name in
-	let fname = 
-		match ext_opt with
-			| None -> fname
-			| Some ext ->
-				if (Filename.check_suffix fname ext) then fname 
-				else 
-				(fname^"."^ext)
-	in
-	name:=fname
+let set name ext_opt =
+  if !name <> "" then
+    let fname =
+      match ext_opt with
+      | None -> !name
+      | Some ext ->
+	 if (Filename.check_suffix !name ext) then !name
+	 else
+	   (!name^"."^ext)
+    in
+    name:=fname
 
-let setOutputName () = 
-	set snapshotFileName (Some "dot");
-	set dumpFileName (Some "ka");
-	set influenceFileName (Some "dot") ;
-	set fluxFileName (Some "dot") ;
-	set marshalizedOutFile None;
-	set cflowFileName (Some "dot") ; 
-	set outputDataName None
-
-let checkFileExists () =
-	let check file =  
-		match file with
-			| "" -> ()
-			| file -> 
-				if Sys.file_exists file then 
-					begin
-						Printf.fprintf stderr "File '%s' already exists do you want to erase (y/N)? \n" file ; flush stderr ; 
-						let answer = Tools.read_input () in
-						if answer="y" then () else exit 1
-					end
-				else ()
-	in
-	check !influenceFileName ;
-	check !fluxFileName ;
-	check !marshalizedOutFile ;
-	if !pointNumberValue > 0 then check !outputDataName
+let setOutputName () =
+  set snapshotFileName (Some "dot");
+  set dumpFileName (Some "ka");
+  set influenceFileName (Some "dot") ;
+  set fluxFileName (Some "dot") ;
+  set marshalizedOutFile None;
+  set outputDataName None
 
 let (openOutDescriptors:out_channel list ref) = ref []
 let (openInDescriptors:in_channel list ref) = ref []
@@ -160,17 +139,3 @@ let get_causal_trace_only x = not (x.weak_compression || x.strong_compression)
 let get_weak_compression x = x.weak_compression
 let get_strong_compression x = x.strong_compression
 let get_cache_size x = !cache_size
-
-let getMaxEventValue () =
-  match !maxEventValue with
-  | Some n -> Nbr.I n
-  | None -> Printf.eprintf "[emax] constant is evaluated to infinity";
-	    Nbr.F infinity
-
-let getMaxTimeValue () =
-  match !maxTimeValue with
-  | Some t -> Nbr.F t
-  | None -> Printf.eprintf "[tmax] constant is evaluated to infinity";
-	    Nbr.F infinity
-
-let getPointNumberValue () = Nbr.I !pointNumberValue

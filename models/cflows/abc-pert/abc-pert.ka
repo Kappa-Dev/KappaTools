@@ -29,10 +29,11 @@
 
 %var: 'cflow' 0
 
-#### Initial conditions 
+#### Initial conditions
 %init: 'n_ab' A(),B()
 %init: 'n_c' C()
 
+%mod: [true] do $PRINTF "example" <"first">; $PRINTF "example" <"last">
 %mod: [T]>10 do ($ADD 10000 C(); $UPDATE 'n_c' 'C') 
 %mod: [T]>20 do ($TRACK 'Cpp' [true] ; $UPDATE 'cflow' 'Cpp')
 %mod: ('Cpp' - 'cflow' > 9 && 'cflow' >0) do $TRACK 'Cpp' [false]

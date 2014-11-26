@@ -53,7 +53,7 @@ build:
 .PHONY: clean_light clean clean_all
 
 clean: clean_light
-	find $(CURDIR) \( -name \#\* -or -name \*~ -or -name \*.txt -or -name \*.sxw \) -delete
+	find $(CURDIR) \( -name \#\* -or -name \*~ -or -name \*.sxw \) -delete
 	for i in $(DIRS_OF_TEST:=/$(OUTPUT_PATH)) ;\
 	  do [ -d $${i} ] && find $${i} -mindepth 1 \( -not -name \*.ref \) -delete || true;\
 	done

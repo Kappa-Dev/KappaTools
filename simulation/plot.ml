@@ -11,7 +11,7 @@ type t = {
 let plotDescr : t option ref = ref None
 
 let create filename env state counter =
-  let d_chan = open_out filename in
+  let d_chan = Tools.kasim_open_out filename in
   let d = Format.formatter_of_out_channel d_chan in
   let () = print_observables_header d state in
   let () = print_observables_values d counter.Counter.time env counter state in

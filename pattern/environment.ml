@@ -66,7 +66,7 @@ let init sigs tokens algs fresh_kappa =
 let get_desc file env =
   try snd (Hashtbl.find env.desc_table file)
   with Not_found ->
-       let d_chan = open_out file in
+       let d_chan = Tools.kasim_open_out file in
     let d = Format.formatter_of_out_channel d_chan in
     (Hashtbl.add env.desc_table file (d_chan,d) ; d)
 

@@ -64,9 +64,10 @@ let event state maybe_active_pert_ids story_profiling
   let () = if dt = infinity || activity <= 0. then
 	     begin
 	       if !Parameter.dumpIfDeadlocked then
-		 let desc = if !Parameter.dotOutput
-			    then open_out "deadlock.dot"
-			    else open_out "deadlock.ka" in
+		 let desc =
+		   Tools.kasim_open_out (if !Parameter.dotOutput
+					 then "deadlock.dot"
+					 else "deadlock.ka") in
 		 let () =
 		   State.snapshot state counter desc true env in
 		 close_out desc

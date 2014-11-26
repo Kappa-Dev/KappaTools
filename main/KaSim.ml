@@ -9,6 +9,24 @@ let usage_msg =
     "Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
 
+let checkFileExists () =
+  let check file =
+    match file with
+    | "" -> ()
+    | file ->
+       let file = Tools.kasim_path file in
+       if Sys.file_exists file then
+	 let () =
+	   Format.eprintf
+	     "File '%s' already exists do you want to erase (y/N)?@." file in
+	 let answer = Tools.read_input () in
+	 if answer<>"y" then exit 1
+  in
+  check !Parameter.influenceFileName ;
+  check !Parameter.fluxFileName ;
+  check !Parameter.marshalizedOutFile ;
+  if !Parameter.pointNumberValue > 0 then check !Parameter.outputDataName
+
 let close_desc opt_env =
   List.iter (fun d -> close_out d) !Parameter.openOutDescriptors ;
   List.iter (fun d -> close_in d) !Parameter.openInDescriptors ;
@@ -143,8 +161,8 @@ let main =
 	    exit 1
     in
 
-    Parameter.setOutputName() ; (*changin output names if -d option was used*)
-    Parameter.checkFileExists() ;
+    Parameter.setOutputName ();
+    checkFileExists() ;
 
     let () =
       if !Parameter.pointNumberValue > 0 then
@@ -160,7 +178,7 @@ let main =
       match !Parameter.marshalizedOutFile with
       | "" -> ()
       | file ->
-	 let d = open_out_bin file in
+	 let d = open_out_bin (kasim_path file) in
 	 begin
 	   Marshal.to_channel d (env,state) [Marshal.Closures] ;
 	   close_out d
@@ -168,7 +186,7 @@ let main =
     in
     if !Parameter.influenceFileName <> ""  then
       begin
-	let desc = open_out !Parameter.influenceFileName in
+	let desc = Tools.kasim_open_out !Parameter.influenceFileName in
 	State.dot_of_influence_map (Format.formatter_of_out_channel desc) state env; 
 	close_out desc
       end ;
@@ -230,7 +248,7 @@ let main =
 	  ) counter.Counter.stat_null ;
       if !Parameter.fluxModeOn then
 	begin
-	  let d = open_out !Parameter.fluxFileName in
+	  let d = kasim_open_out !Parameter.fluxFileName in
 	  State.dot_of_flux (Format.formatter_of_out_channel d) state env ;
 	  close_out d
 	end
@@ -238,7 +256,7 @@ let main =
     | Invalid_argument msg ->
        begin
 	 (*if !Parameter.debugModeOn then (Debug.tag "State dumped! (dump.ka)";
- let desc = open_out "dump.ka" in State.snapshot state counter desc env;
+ let desc = kasim_open_out "dump.ka" in State.snapshot state counter desc env;
  close_out desc); *)
 	 let s = (* Printexc.get_backtrace() *) "" in
 	 Format.eprintf "@.***Runtime error %s***@,%s@." msg s ;
@@ -255,7 +273,7 @@ let main =
 	  | ("y" | "yes") ->
 	     begin
 	       Parameter.dotOutput := false ;
-	       let desc = open_out !Parameter.dumpFileName in
+	       let desc = kasim_open_out !Parameter.dumpFileName in
 	       State.snapshot state counter desc !Parameter.snapshotHighres env;
 	       Parameter.debugModeOn:=true ; State.dump state counter env ;
 	       close_out desc ;

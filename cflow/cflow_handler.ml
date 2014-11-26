@@ -73,7 +73,7 @@ module Cflow_handler =
           }
 
       let build_parameter () = 
-        let channel = open_out !Parameter.profilingName in 
+        let channel = Tools.kasim_open_out !Parameter.profilingName in 
         {
           current_compression_mode = None ; 
           priorities_weak = Priority.weak ; 
