@@ -34,7 +34,7 @@ let main =
      Arg.Float(fun t -> Parameter.maxTimeValue := Some t ;
 			Parameter.maxEventValue := None),
      "Max time of simulation (arbitrary time unit)");
-    ("-p", Arg.Int (fun i -> Parameter.pointNumberValue:= Some i),
+    ("-p", Arg.Int (fun i -> Parameter.pointNumberValue:= i),
      "Number of points in plot");
     ("-o", Arg.String (fun s -> Parameter.outputDataName:=s ),
      "file name for data output") ;
@@ -146,12 +146,14 @@ let main =
     Parameter.setOutputName() ; (*changin output names if -d option was used*)
     Parameter.checkFileExists() ;
 
-    let () = match !Parameter.pointNumberValue with
-      | Some _ -> Plot.create !Parameter.outputDataName env state counter
-      | None ->
-	 ExceptionDefn.warning
-	   (fun f -> Format.fprintf
-		       f "No data points are required,@ use -p option for plotting data.")
+    let () =
+      if !Parameter.pointNumberValue > 0 then
+	Plot.create !Parameter.outputDataName env state counter
+      else
+	ExceptionDefn.warning
+	  (fun f ->
+	   Format.fprintf
+	     f "No data points are required,@ use -p option for plotting data.")
     in
 
     let () =

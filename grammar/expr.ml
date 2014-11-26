@@ -1,5 +1,6 @@
 let rec print_ast_alg f = function
   | Ast.EMAX -> Format.fprintf f "[Emax]"
+  | Ast.PLOTNUM -> Format.fprintf f "[p]"
   | Ast.TMAX -> Format.fprintf f "[Tmax]"
   | Ast.CONST n -> Nbr.print f n
   | Ast.OBS_VAR lab -> Format.fprintf f "'%s'" lab
@@ -79,6 +80,7 @@ let rec compile_alg ?label var_map tk_map ?max_allowed_var
   | Ast.CONST n -> (mixs,(CONST n,pos))
   | Ast.EMAX -> (mixs,(CONST (Parameter.getMaxEventValue ()),pos))
   | Ast.TMAX -> (mixs,(CONST (Parameter.getMaxTimeValue ()),pos))
+  | Ast.PLOTNUM -> (mixs,(CONST (Parameter.getPointNumberValue ()),pos))
   | Ast.BIN_ALG_OP (op, (a,pos1), (b,pos2)) ->
      begin match rec_call mixs (a,pos1) with
 	   | (mixs',YES n1) ->

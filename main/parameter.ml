@@ -48,7 +48,7 @@ let emacsMode = ref false
 (*User definable values*)
 let (maxEventValue:int option ref) = ref None
 let (maxTimeValue:float option ref) = ref None
-let (pointNumberValue:int option ref) = ref None
+let (pointNumberValue:int ref) = ref 0
 let (seedValue:int option ref) = ref None
 let compileModeOn = ref false
 let implicitSignature = ref false
@@ -131,9 +131,8 @@ let checkFileExists () =
 	in
 	check !influenceFileName ;
 	check !fluxFileName ;
-	check !marshalizedOutFile ; 
-	let points = match !pointNumberValue with None -> false | Some _ -> true in
-	if points then check !outputDataName 
+	check !marshalizedOutFile ;
+	if !pointNumberValue > 0 then check !outputDataName
 
 let (openOutDescriptors:out_channel list ref) = ref []
 let (openInDescriptors:in_channel list ref) = ref []
@@ -173,3 +172,5 @@ let getMaxTimeValue () =
   | Some t -> Nbr.F t
   | None -> Printf.eprintf "[tmax] constant is evaluated to infinity";
 	    Nbr.F infinity
+
+let getPointNumberValue () = Nbr.I !pointNumberValue

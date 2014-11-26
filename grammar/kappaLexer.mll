@@ -99,6 +99,7 @@ rule token = parse
 		| "min" -> MIN
 		| "Emax" -> EMAX
 		| "Tmax" -> TMAX
+		| "p" -> PLOTNUM
 		| _ as s -> return_error None lexbuf ("Symbol \""^s^"\" is not defined")
 	       }
 	 | ':' {TYPE}
