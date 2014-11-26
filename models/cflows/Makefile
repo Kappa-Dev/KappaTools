@@ -21,15 +21,13 @@ help:
 	@[ -d $(dir $<)$(OUTPUT_PATH) ] || mkdir $(dir $<)$(OUTPUT_PATH)
 	cd $(dir $<) && sh $(notdir $<) > $(OUTPUT_PATH)/LOG 2> $(OUTPUT_PATH)/error.log
 
-%.ref: %
-	@sed '/generation/d' $< > $@
-
 %.diff:
 	@sed '/generation/d' $(basename $@) | diff -u $(basename $@).ref - > $@ || true
 
 TODIFFFILES=$(filter-out %.diff,\
 	$(sort $(patsubst %.ref,%,$(wildcard $(dir $@)$(OUTPUT_PATH)/*))))
 %/$(ERROR): %/README $(shell which $(KAPPABIN)KaSim)
+	@rm -f $@
 	@find $(dir $@)$(OUTPUT_PATH) -mindepth 1 \( -not -name \*.ref \) -delete
 	@+$(MAKE) $(dir $@)$(OUTPUT_PATH)/LOG
 	@+$(MAKE) $(TODIFFFILES:=.diff)
@@ -44,11 +42,12 @@ error: $(DIRS_OF_TEST:=/$(ERROR))
 all: error
 	@if [ -s $< ] ; then cat $< && exit 2 ; else echo "No difference has been found" ; fi
 
-GENFILES=$(filter-out %.diff %.ref,$(wildcard $(CURDIR)/*/$(OUTPUT_PATH)/*))
 build:
 	@+$(MAKE) clean_all
 	@+$(MAKE) $(DIRS_OF_TEST:=/$(OUTPUT_PATH)/LOG)
-	@+$(MAKE) $(GENFILES:=.ref)
+	find $(CURDIR) \( -path \*/$(OUTPUT_PATH)/\* -and -not -name \*.diff \
+		-and -not -name \*.ref \) -exec mv \{\} \{\}.ref \;
+	find $(CURDIR) -name \*.ref -exec sed -i"" -e '/generation/d' \{\} \;
 	@+$(MAKE) clean
 
 .PHONY: clean_light clean clean_all
