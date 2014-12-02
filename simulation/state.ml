@@ -999,235 +999,240 @@ let enabled r state =
 	try Hashtbl.find state.influence_map r_id with Not_found -> IntMap.empty
 	
 
-let positive_update ?(with_tracked=[]) state r (phi: int IntMap.t) psi side_modifs pert_intro counter env = (*pert_intro is temporary*)
-	
-	(* sub function find_new_inj *)
-	let find_new_inj state var_id mix cc_id node_id root pert_ids already_done_map new_injs tracked env =
-		Debug.tag_if_debug "Trying to embed Var[%d] using root %d at node %d"
-				   var_id root node_id;
-		let root_node_set =	try IntMap.find var_id already_done_map
+let positive_update ?(with_tracked=[]) state r (phi: int IntMap.t) psi
+		    side_modifs pert_intro counter env = (*pert_intro is temporary*)
+  (* sub function find_new_inj *)
+  let find_new_inj state var_id mix cc_id node_id root pert_ids
+		   already_done_map new_injs tracked env =
+    Debug.tag_if_debug "Trying to embed Var[%d] using root %d at node %d"
+		       var_id root node_id;
+    let root_node_set =	try IntMap.find var_id already_done_map
 			with Not_found -> Int2Set.empty in
-		let opt =
-			try state.injections.(var_id)
-			with Invalid_argument msg -> invalid_arg ("State.positive_update: " ^ msg) 
-		in
-		let comp_injs =
-			match opt with
-			| None -> (*may happen when initial graph was empty*)
-				let ar = Array.make (Mixture.arity mix) None in
-				state.injections.(var_id) <- (Some ar) ;
-				ar
-			| Some injs -> injs 
-		in
-		let opt =
-			try comp_injs.(cc_id)
-			with
-			| Invalid_argument msg ->
-					invalid_arg ("State.positive_update: " ^ msg) in
-		let cc_id_injections =
-			match opt with
-			| Some injections -> injections
-			| None ->	InjectionHeap.create !Parameter.defaultHeapSize 
-		in
-		let reuse_embedding =
-			match InjectionHeap.next_alloc cc_id_injections with
-			| Some phi ->
-			   (Debug.tag_if_debug
-			      "reusing injection: %a" Injection.print phi;
-			    Injection.flush phi (var_id,cc_id))
-			| None -> Injection.empty (Mixture.size_of_cc cc_id mix) (var_id,cc_id)
-		in
-		let opt_emb = Matching.component ~already_done:root_node_set reuse_embedding root (state.graph, node_id) mix in 
-		match opt_emb	with
-		| None ->
-				(if !Parameter.debugModeOn then Debug.tag "No new embedding was found";
-				(env,state, pert_ids, already_done_map, new_injs,tracked)
-				)
-		| Some (embedding, port_map) ->
-		   Debug.tag_if_debug "New embedding: %a"
-				      Injection.print embedding;
-		   let cc_id_injections =
-		     InjectionHeap.alloc embedding cc_id_injections in
-		   comp_injs.(cc_id) <- Some cc_id_injections ;
-		   let graph =
-		     SiteGraph.add_lift state.graph embedding port_map env in
-		   let state = {state with graph = graph}
-		   in
+    let opt =
+      try state.injections.(var_id)
+      with Invalid_argument msg -> invalid_arg ("State.positive_update: " ^ msg)
+    in
+    let comp_injs =
+      match opt with
+      | None -> (*may happen when initial graph was empty*)
+	 let ar = Array.make (Mixture.arity mix) None in
+	 state.injections.(var_id) <- (Some ar) ;
+	 ar
+      | Some injs -> injs
+    in
+    let opt =
+      try comp_injs.(cc_id)
+      with
+      | Invalid_argument msg ->
+	 invalid_arg ("State.positive_update: " ^ msg) in
+    let cc_id_injections =
+      match opt with
+      | Some injections -> injections
+      | None ->	InjectionHeap.create !Parameter.defaultHeapSize
+    in
+    let reuse_embedding =
+      match InjectionHeap.next_alloc cc_id_injections with
+      | Some phi ->
+	 (Debug.tag_if_debug
+	    "reusing injection: %a" Injection.print phi;
+	  Injection.flush phi (var_id,cc_id))
+      | None -> Injection.empty (Mixture.size_of_cc cc_id mix) (var_id,cc_id)
+    in
+    let opt_emb =
+      Matching.component ~already_done:root_node_set reuse_embedding root (state.graph, node_id) mix in 
+    match opt_emb with
+    | None ->
+       (if !Parameter.debugModeOn then Debug.tag "No new embedding was found";
+	(env,state, pert_ids, already_done_map, new_injs,tracked)
+       )
+    | Some (embedding, port_map) ->
+       Debug.tag_if_debug "New embedding: %a"
+			  Injection.print embedding;
+       let cc_id_injections =
+	 InjectionHeap.alloc embedding cc_id_injections in
+       comp_injs.(cc_id) <- Some cc_id_injections ;
+       let graph =
+	 SiteGraph.add_lift state.graph embedding port_map env in
+       let state = {state with graph = graph}
+       in
+       begin
+	 (*a new embedding was found for var_id*)
+	 let tracked =
+	   if Environment.is_tracked var_id env then (*completing the embedding if incomplete*)
+	     try
+	       let m = kappa_of_id var_id state in
+	       let cpt = ref 0 in
+	       let map,cod = (fun (x,y) -> (ref x,ref y))
+			       (Injection.to_map embedding) in
+	       while !cpt < (Mixture.arity m) do
+		 if !cpt = cc_id then ()
+		 else
 		   begin
-		     (*a new embedding was found for var_id*)
-		     let tracked =
-		       if Environment.is_tracked var_id env then (*completing the embedding if incomplete*)
-			 try
-			   let m = kappa_of_id var_id state in
-			   let cpt = ref 0 in
-			   let map,cod = (fun (x,y) -> (ref x,ref y))
-					   (Injection.to_map embedding) in
-			   while !cpt < (Mixture.arity m) do
-			     if !cpt = cc_id then ()
-			     else
-			       begin
-				 let embedding',codomain' =
-				   match comp_injs.(!cpt) with
-				   | None -> raise (ExceptionDefn.Break 0)
-				   | Some hp ->
-				      let s = InjectionHeap.size hp in
-				      if s = 0 then raise (Break 0)
-				      else
-					let rec find_compatible cpt =
-					  if cpt < 0 then raise (Break 1)
-					  else
-					    let inj = InjectionHeap.find cpt hp in
-					    if (Injection.is_trashed inj)
-					    then failwith "Incorrect heap size"
-					    else
-					      try Injection.codomain inj (!map,!cod)
-					      with Injection.Clashing -> find_compatible (cpt-1)
-					in
-					find_compatible (s-1)
-				 in
-				 map := embedding' ; cod := codomain' ;
-			       end ;
-			     cpt := !cpt+1 ;
-			   done ;
-			   Debug.tag_if_debug "Observable %d was found with embedding [%a]"
-					      var_id pp_injections !map ;
-			   (var_id,!map)::tracked
-			 with
-			 | Break 0 ->
-			    (if !Parameter.debugModeOn then Debug.tag "Incomplete embedding, no observable recorded" ; tracked)
-			 | Break 1 ->
-			    (if !Parameter.debugModeOn then Debug.tag "Cannot complete embedding, clashing instances" ; tracked)
-		       else tracked
+		     let embedding',codomain' =
+		       match comp_injs.(!cpt) with
+		       | None -> raise (ExceptionDefn.Break 0)
+		       | Some hp ->
+			  let s = InjectionHeap.size hp in
+			  if s = 0 then raise (Break 0)
+			  else
+			    let rec find_compatible cpt =
+			      if cpt < 0 then raise (Break 1)
+			      else
+				let inj = InjectionHeap.find cpt hp in
+				if (Injection.is_trashed inj)
+				then failwith "Incorrect heap size"
+				else
+				  try Injection.codomain inj (!map,!cod)
+				  with Injection.Clashing -> find_compatible (cpt-1)
+			    in
+			    find_compatible (s-1)
 		     in
-		     update_activity state ~cause:r.r_id var_id counter env;
-		     let env,pert_ids = (*updating rule activities that depend --transitively-- on var_id*)
-		       update_dep state ~cause:r.r_id (Term.KAPPA var_id) pert_ids counter env
-		     in
-		     (*Format.printf "done (%d,%d) for var[%d]@." root node_id var_id ;*) 
-		     let already_done_map' = IntMap.add var_id	(Int2Set.add (root, node_id) root_node_set) already_done_map 
-		     in
-		     let new_injs' = if Environment.is_nl_rule var_id env then embedding::new_injs else new_injs in 
-		     (env,state, pert_ids, already_done_map',new_injs',tracked)
-		   end
-	in
-	(* end of sub function find_new_inj definition *)
-	
-	let vars_to_wake_up = enabled r state in
-	let env,state,pert_ids,already_done_map,new_injs,tracked =
-	  IntMap.fold
-	    (fun var_id map_list (env, state,pert_ids,already_done_map,new_injs, tracked) ->
-	     Debug.tag_if_debug
-	       "Influence map tells me I should look for new injections of var[%d]"
-	       var_id;
-	     List.fold_left
-	       (fun (env,state,pert_ids,already_done_map, new_injs,tracked) glue ->
-		let opt = IntMap.root glue in
-		match opt with
-		| None -> invalid_arg "State.positive_update"
-		| Some (root_mix,root_rhs) ->
-		   let node_id =
-		     if IntSet.mem root_rhs r.added then
-		       (try IntMap.find root_rhs psi
-			with Not_found -> invalid_arg "State.positive_update 1")
-		     else
-		       try IntMap.find root_rhs phi
-		       with Not_found ->
-			 (Debug.tag_if_debug
-			    "I was looking for the image of agent %d by embedding %a"
-			    root_rhs pp_injections phi;
-			  Debug.tag_if_debug
-			    "Glueing was [%a]" pp_injections glue;
-			  invalid_arg "State.positive_update 3")
-		   in
-		   let mix =
-		     let opt =
-		       try state.kappa_variables.(var_id)
-		       with Invalid_argument msg ->
-			 invalid_arg ("State.positive_update: " ^ msg)
-		     in
-		     match opt with
-		     | Some mix -> mix
-		     | None -> invalid_arg "State.positive_update"
-		   in
-		   let cc_id = Mixture.component_of_id root_mix mix in
-		   (*already_done_map is empty because glueings are guaranteed to be different by construction*)
-		   let env,state,pert_ids,already_done_map,new_injs,tracked =
-		     find_new_inj state var_id mix cc_id node_id root_mix
-				  pert_ids already_done_map new_injs tracked env
-		   in
-		   (env,state, pert_ids, already_done_map, new_injs,tracked)
-	       ) (env,state, pert_ids, already_done_map, new_injs,tracked) map_list
-	    ) vars_to_wake_up (env, state, IntSet.empty, IntMap.empty,[],with_tracked)  
-	in
+		     map := embedding' ; cod := codomain' ;
+		   end ;
+		 cpt := !cpt+1 ;
+	       done ;
+	       Debug.tag_if_debug "Observable %d was found with embedding [%a]"
+				  var_id pp_injections !map ;
+	       (var_id,!map)::tracked
+	     with
+	     | Break 0 ->
+		(if !Parameter.debugModeOn then
+		   Debug.tag "Incomplete embedding, no observable recorded" ; tracked)
+	     | Break 1 ->
+		(if !Parameter.debugModeOn then
+		   Debug.tag "Cannot complete embedding, clashing instances" ; tracked)
+	   else tracked
+	 in
+	 update_activity state ~cause:r.r_id var_id counter env;
+	 let env,pert_ids = (*updating rule activities that depend --transitively-- on var_id*)
+	   update_dep state ~cause:r.r_id (Term.KAPPA var_id) pert_ids counter env
+	 in
+	 (*Format.printf "done (%d,%d) for var[%d]@." root node_id var_id ;*)
+	 let already_done_map' =
+	   IntMap.add var_id (Int2Set.add (root, node_id) root_node_set) already_done_map 
+	 in
+	 let new_injs' =
+	   if Environment.is_nl_rule var_id env
+	   then embedding::new_injs
+	   else new_injs in
+	 (env,state, pert_ids, already_done_map',new_injs',tracked)
+       end
+  in
+  (* end of sub function find_new_inj definition *)
+  
+  let vars_to_wake_up = enabled r state in
+  let env,state,pert_ids,already_done_map,new_injs,tracked =
+    IntMap.fold
+      (fun var_id map_list (env, state,pert_ids,already_done_map,new_injs, tracked) ->
+       Debug.tag_if_debug
+	 "Influence map tells me I should look for new injections of var[%d]"
+	 var_id;
+       List.fold_left
+	 (fun (env,state,pert_ids,already_done_map, new_injs,tracked) glue ->
+	  let opt = IntMap.root glue in
+	  match opt with
+	  | None -> invalid_arg "State.positive_update"
+	  | Some (root_mix,root_rhs) ->
+	     let node_id =
+	       if IntSet.mem root_rhs r.added then
+		 (try IntMap.find root_rhs psi
+		  with Not_found -> invalid_arg "State.positive_update 1")
+	       else
+		 try IntMap.find root_rhs phi
+		 with Not_found ->
+		   (Debug.tag_if_debug
+		      "I was looking for the image of agent %d by embedding %a"
+		      root_rhs pp_injections phi;
+		    Debug.tag_if_debug
+		      "Glueing was [%a]" pp_injections glue;
+		    invalid_arg "State.positive_update 3")
+	     in
+	     let mix =
+	       let opt =
+		 try state.kappa_variables.(var_id)
+		 with Invalid_argument msg ->
+		   invalid_arg ("State.positive_update: " ^ msg)
+	       in
+	       match opt with
+	       | Some mix -> mix
+	       | None -> invalid_arg "State.positive_update"
+	     in
+	     let cc_id = Mixture.component_of_id root_mix mix in
+	     (*already_done_map is empty because glueings are guaranteed to be different by construction*)
+	     find_new_inj state var_id mix cc_id node_id root_mix
+			  pert_ids already_done_map new_injs tracked env
+	 ) (env,state, pert_ids, already_done_map, new_injs,tracked) map_list
+      ) vars_to_wake_up (env, state, IntSet.empty, IntMap.empty,[],with_tracked)  
+  in
 
-	(*updating tokens if rule is hybrid*)
+  (*updating tokens if rule is hybrid*)
 
-	let env,pert_ids =
-	  List.fold_left
-	    (fun (env,pert_ids) (v,t_id) ->
-	     let value = Nbr.to_float (value_alg state counter env v) in
-	     try
-	       Debug.tag_if_debug "adding %f token(s) %d" value t_id;
-	       state.token_vector.(t_id) <- state.token_vector.(t_id) +. value;
-	       (*updating rule activities that depend on |t_id|*)
-	       update_dep state ~cause:r.r_id (Term.TOK t_id) pert_ids counter env
-	     with Invalid_argument _ ->
-	       failwith "State.positive_update: invalid token id"
-	    ) (env,pert_ids) r.add_token
-	in
-	let env,pert_ids =
-	  List.fold_left
-	    (fun (env,pert_ids) (v,t_id) ->
-	     let value = Nbr.to_float (value_alg state counter env v) in
-	     try
-	       Debug.tag_if_debug "removing %f token(s) %d" value t_id;
+  let env,pert_ids =
+    List.fold_left
+      (fun (env,pert_ids) (v,t_id) ->
+       let value = Nbr.to_float (value_alg state counter env v) in
+       try
+	 Debug.tag_if_debug "adding %f token(s) %d" value t_id;
+	 state.token_vector.(t_id) <- state.token_vector.(t_id) +. value;
+	 (*updating rule activities that depend on |t_id|*)
+	 update_dep state ~cause:r.r_id (Term.TOK t_id) pert_ids counter env
+       with Invalid_argument _ ->
+	 failwith "State.positive_update: invalid token id"
+      ) (env,pert_ids) r.add_token
+  in
+  let env,pert_ids =
+    List.fold_left
+      (fun (env,pert_ids) (v,t_id) ->
+       let value = Nbr.to_float (value_alg state counter env v) in
+       try
+	 Debug.tag_if_debug "removing %f token(s) %d" value t_id;
 
-	       state.token_vector.(t_id) <- state.token_vector.(t_id) -. value ;
-	       update_dep state ~cause:r.r_id (Term.TOK t_id) pert_ids counter env
-	     with Invalid_argument _ ->
-	       failwith "State.positive_update: invalid token id"
-	    ) (env,pert_ids) r.rm_token
-	in
+	 state.token_vector.(t_id) <- state.token_vector.(t_id) -. value ;
+	 update_dep state ~cause:r.r_id (Term.TOK t_id) pert_ids counter env
+       with Invalid_argument _ ->
+	 failwith "State.positive_update: invalid token id"
+      ) (env,pert_ids) r.rm_token
+  in
 
-	(*Checking if any side effect needs to be checked*)
-	if Int2Set.is_empty side_modifs
-	then (env,state,pert_ids,new_injs,tracked)
-	else	(*Handling side effects*)
-	  let wu_map = IntMap.empty in
-	  let () = Debug.tag_if_debug
-		     "Checking positive update entailed by side effects" in
-	  let wu_map = wake_up state 1 side_modifs wu_map env in
-	  let wu_map = wake_up state 2 pert_intro wu_map env in
-	  let (env,state, pert_ids,_,new_injs,tracked) =
-	    IntMap.fold
-	      (fun node_id candidates (env,state, pert_ids, already_done_map,new_injs,tracked) ->
-	       Debug.tag_if_debug
-		 "Side effect on node %d forces me to look for new embedding..."
-		 node_id;
-	       let node = SiteGraph.node_of_id state.graph node_id in
-	       Int2Set.fold
-		 (fun (var_id, cc_id) (env, state, pert_ids, already_done_map, new_injs,tracked) ->
-		  let mix =
-		    let opt =
-		      try state.kappa_variables.(var_id)
-		      with Invalid_argument msg ->
-			invalid_arg ("State.positive_update: " ^ msg)
-		    in
-		    match opt with
-		    | Some mix -> mix
-		    | None -> invalid_arg "State.positive_update"
-		  in
-		  let possible_roots =
-		    Mixture.ids_of_name (Node.name node) cc_id mix
-		  in
-		  IntSet.fold
-		    (fun root (env,state, pert_ids, already_done_map, new_injs,tracked) ->
-		     find_new_inj state var_id mix cc_id node_id root pert_ids already_done_map new_injs tracked env
-		    ) possible_roots (env,state, pert_ids, already_done_map, new_injs, tracked)
-		 ) candidates (env, state, pert_ids, already_done_map, new_injs, tracked)
-	      )	wu_map (env, state, pert_ids, already_done_map, new_injs,tracked)
-	  in
-	  (env,state,pert_ids, new_injs,tracked)
+  (*Checking if any side effect needs to be checked*)
+  if Int2Set.is_empty side_modifs
+  then (env,state,pert_ids,new_injs,tracked)
+  else	(*Handling side effects*)
+    let wu_map = IntMap.empty in
+    let () = Debug.tag_if_debug
+	       "Checking positive update entailed by side effects" in
+    let wu_map = wake_up state 1 side_modifs wu_map env in
+    let wu_map = wake_up state 2 pert_intro wu_map env in
+    let (env,state, pert_ids,_,new_injs,tracked) =
+      IntMap.fold
+	(fun node_id candidates (env,state, pert_ids, already_done_map,new_injs,tracked) ->
+	 Debug.tag_if_debug
+	   "Side effect on node %d forces me to look for new embedding..."
+	   node_id;
+	 let node = SiteGraph.node_of_id state.graph node_id in
+	 Int2Set.fold
+	   (fun (var_id, cc_id) (env, state, pert_ids, already_done_map, new_injs,tracked) ->
+	    let mix =
+	      let opt =
+		try state.kappa_variables.(var_id)
+		with Invalid_argument msg ->
+		  invalid_arg ("State.positive_update: " ^ msg)
+	      in
+	      match opt with
+	      | Some mix -> mix
+	      | None -> invalid_arg "State.positive_update"
+	    in
+	    let possible_roots =
+	      Mixture.ids_of_name (Node.name node) cc_id mix
+	    in
+	    IntSet.fold
+	      (fun root (env,state, pert_ids, already_done_map, new_injs,tracked) ->
+	       find_new_inj state var_id mix cc_id node_id root pert_ids already_done_map new_injs tracked env
+	      ) possible_roots (env,state, pert_ids, already_done_map, new_injs, tracked)
+	   ) candidates (env, state, pert_ids, already_done_map, new_injs, tracked)
+	)	wu_map (env, state, pert_ids, already_done_map, new_injs,tracked)
+    in
+    (env,state,pert_ids, new_injs,tracked)
 
 (* Negative update *)
 let negative_upd state cause (u,i) int_lnk counter env =
