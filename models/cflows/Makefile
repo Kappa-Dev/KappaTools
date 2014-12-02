@@ -19,18 +19,17 @@ help:
 
 %/$(OUTPUT_PATH)/LOG: %/README $(shell which $(KAPPABIN)KaSim)
 	@[ -d $(dir $<)$(OUTPUT_PATH) ] || mkdir $(dir $<)$(OUTPUT_PATH)
+	@find $(dir $<)$(OUTPUT_PATH) -mindepth 1 \( -not -name \*.ref \) -delete
 	cd $(dir $<) && sh $(notdir $<) > $(OUTPUT_PATH)/LOG 2> $(OUTPUT_PATH)/error.log
 
 %.diff:
+	@touch $(basename $@).ref $(basename $@)
 	@sed '/generation/d' $(basename $@) | diff -u $(basename $@).ref - > $@ || true
 
-TODIFFFILES=$(filter-out %.diff,\
-	$(sort $(patsubst %.ref,%,$(wildcard $(dir $@)$(OUTPUT_PATH)/*))))
-%/$(ERROR): %/README $(shell which $(KAPPABIN)KaSim)
+%/$(ERROR): %/$(OUTPUT_PATH)/LOG
 	@rm -f $@
-	@find $(dir $@)$(OUTPUT_PATH) -mindepth 1 \( -not -name \*.ref \) -delete
-	@+$(MAKE) $(dir $@)$(OUTPUT_PATH)/LOG
-	@+$(MAKE) $(TODIFFFILES:=.diff)
+	@+$(MAKE) $$(find $(dir $@)$(OUTPUT_PATH) \( -not -type d -and -not -name \*.diff.\* \) -print \
+		| sed -e 's/^\(.*\).ref/\1/g' | sort | uniq | sed -e 's/$$/.diff/')
 	@TMP=$$(mktemp -t error_file-XXXXXX) ; cat $(dir $@)$(OUTPUT_PATH)/*.diff > $$TMP ;\
 	if [ -s $$TMP ] ; then echo ****$(dir $(dir $@))**** > $@ ;\
 	  echo  >> $@ ; cat $(dir $(dir $@))README >> $@ ; echo >> $@ ; cat $$TMP >> $@ ; \
