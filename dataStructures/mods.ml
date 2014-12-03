@@ -179,14 +179,14 @@ module InjProduct =
 	end)
 *)
 
-module InjectionHeap = 
-	Heap.Make 
-	(struct 
-		type t = Injection.t 
-		let allocate = fun inj i -> Injection.set_address i inj  
-		let get_address inj = Injection.get_address inj 
-	end)
-	
+module InjectionHeap =
+  Heap.Make
+    (struct
+      type t = Injection.t
+      let allocate = fun inj i -> Injection.set_address i inj
+      let get_address inj = Injection.get_address inj
+    end)
+
 module InjProdHeap = SafeHeap.Make(InjProduct) 
 
 module InjProdSet = Set.Make(InjProduct)
