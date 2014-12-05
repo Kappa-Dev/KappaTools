@@ -1554,8 +1554,8 @@ let snapshot state counter desc hr env =
        (fun f -> Format.fprintf
 		  f "Cannot output snapshot: %s" msg)
 
-let dump_rules state env =
-  Hashtbl.iter (fun i r -> Dynamics.dump r env) state.rules
+let dump_rules err_fmt state env =
+  Hashtbl.iter (fun i r -> Dynamics.dump err_fmt r env) state.rules
 
 let dump state counter env =
   if not !Parameter.debugModeOn then ()

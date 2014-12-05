@@ -72,7 +72,7 @@ val initialize :
   Primitives.perturbation list ->
   Counter.t -> Environment.t -> t * Environment.t
 
-val dump_rules : t -> Environment.t -> unit
+val dump_rules : Format.formatter -> t -> Environment.t -> unit
 val snapshot : t -> Counter.t -> out_channel -> bool -> Environment.t -> unit
 val dump : t -> Counter.t -> Environment.t -> unit
 val dot_of_flux : Format.formatter -> t -> Environment.t -> unit

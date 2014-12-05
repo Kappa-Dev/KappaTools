@@ -1,1 +1,54 @@
+****Rule 'ab.c' [A(x!_,c),C(x1~u)->A(x!_,c!0),C(x1~u!0)]****
+#0.0=0 #0.1=2 #0.2=3 #1.0=0 #1.1=11 
+Apply ab.c
+BND (#1.1,#0.2)
+if pattern 6 is matched
+Modif sites: [0 -> {(2,1)}, 1 -> {(1,1)}]
+CC[0] and CCs {0, 1} in the left hand side will merge
+
+****Rule 'a.c' [A(x,c),C(x1~p,x2~u)->A(x,c!0),C(x1~p,x2~u!0)]****
+#0.0=0 #0.1=2 #0.2=3 #1.0=0 #1.1=10 #1.2=11 
+Apply a.c
+BND (#1.2,#0.2)
+if pattern 8 is matched
+Modif sites: [0 -> {(2,1)}, 1 -> {(2,1)}]
+CC[0] and CCs {0, 1} in the left hand side will merge
+
+****Rule 'mod x1' [C(x1~u!0),A(c!0)->C(x1~p),A(c)]****
+#0.0=0 #0.1=15 #1.0=0 #1.2=3 
+Apply mod x1
+SET #0.1 to state 1
+FREE #1.2
+if pattern 7 is matched
+Modif sites: [0 -> {(1,0), (1,1)}, 1 -> {(2,1)}]
+CC[0] and CCs {1} in the rhs are freshly disconnected
+CC[1] and CCs {0} in the rhs are freshly disconnected
+
+****Rule 'a.b_op' [A(x!0),B(x!0)->A(x),B(x)]****
+#0.0=0 #0.1=3 #1.0=0 #1.1=3 
+Apply a.b_op
+FREE #1.1
+if pattern 5 is matched
+Modif sites: [0 -> {(1,1)}, 1 -> {(1,1)}]
+CC[0] and CCs {1} in the rhs are freshly disconnected
+CC[1] and CCs {0} in the rhs are freshly disconnected
+
+****Rule 'a.b' [A(x),B(x)->A(x!0),B(x!0)]****
+#0.0=0 #0.1=3 #1.0=0 #1.1=3 
+Apply a.b
+BND (#1.1,#0.1)
+if pattern 4 is matched
+Modif sites: [0 -> {(1,1)}, 1 -> {(1,1)}]
+CC[0] and CCs {0, 1} in the left hand side will merge
+
+****Rule 'mod x2' [A(x,c!0),C(x1~p,x2~u!0)->A(x,c),C(x1~p,x2~p)]****
+#0.0=0 #0.1=2 #0.2=3 #1.0=0 #1.1=10 #1.2=15 
+Apply mod x2
+SET #1.2 to state 1
+FREE #1.2
+if pattern 9 is matched
+Modif sites: [0 -> {(2,1)}, 1 -> {(2,0), (2,1)}]
+CC[0] and CCs {1} in the rhs are freshly disconnected
+CC[1] and CCs {0} in the rhs are freshly disconnected
+
 

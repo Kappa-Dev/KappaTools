@@ -190,7 +190,7 @@ let main =
 	State.dot_of_influence_map (Format.formatter_of_out_channel desc) state env; 
 	close_out desc
       end ;
-    if !Parameter.compileModeOn then (State.dump_rules state env; exit 0);
+    if !Parameter.compileModeOn then (State.dump_rules Format.err_formatter state env; exit 0);
     let profiling = Compression_main.D.S.PH.B.PB.CI.Po.K.P.init_log_info () in
     let grid,profiling,event_list =
       if Environment.tracking_enabled env then
@@ -288,20 +288,20 @@ let main =
 	 "?@.A deadlock was reached after %d events and %Es (Activity = %.5f)@."
 	 (Counter.event counter) (Counter.time counter)
 	 (State.total_activity state)
-	with
-	| ExceptionDefn.Semantics_Error (pos, msg) ->
-	   (close_desc None;
-	    Format.eprintf "***Error (%s) line %d, char %d: %s***@."
-			   (fn pos) (ln pos) (cn pos) msg)
-	| ExceptionDefn.Malformed_Decl er -> Pp.error Format.pp_print_string er
-	| Invalid_argument msg ->
-	   (close_desc None;
-	    let s = "" (*Printexc.get_backtrace()*) in
-	    Format.eprintf "@.@[<v>***Runtime error %s***@,%s@]@." msg s)
-	| ExceptionDefn.UserInterrupted f ->
-	   let msg = f 0. 0 in
-	   let () =Format.eprintf "@.***Interrupted by user: %s***@." msg in
-	   close_desc None
-	| ExceptionDefn.StopReached msg ->
-	   (Format.eprintf "@.***%s***@." msg ; close_desc None)
-	| Sys_error msg -> (close_desc None; Format.eprintf "%s@." msg)
+  with
+  | ExceptionDefn.Semantics_Error (pos, msg) ->
+     (close_desc None;
+      Format.eprintf "***Error (%s) line %d, char %d: %s***@."
+		     (fn pos) (ln pos) (cn pos) msg)
+  | ExceptionDefn.Malformed_Decl er -> Pp.error Format.pp_print_string er
+  | Invalid_argument msg ->
+     (close_desc None;
+      let s = "" (*Printexc.get_backtrace()*) in
+      Format.eprintf "@.@[<v>***Runtime error %s***@,%s@]@." msg s)
+  | ExceptionDefn.UserInterrupted f ->
+     let msg = f 0. 0 in
+     let () =Format.eprintf "@.***Interrupted by user: %s***@." msg in
+     close_desc None
+  | ExceptionDefn.StopReached msg ->
+     (Format.eprintf "@.***%s***@." msg ; close_desc None)
+  | Sys_error msg -> (close_desc None; Format.eprintf "%s@." msg)

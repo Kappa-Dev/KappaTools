@@ -642,21 +642,25 @@ let to_kappa r env =
     Format.asprintf "%a->%a" (Kappa_printer.mixture false env) r.lhs
 		   (Kappa_printer.mixture false env) r.rhs
 
-let dump r env =
+let dump err_fmt r env =
+  let () = Format.pp_open_vbox err_fmt 0 in
   let pr_r f =
     Format.fprintf f "%a->%a" (Kappa_printer.mixture false env) r.lhs
 		   (Kappa_printer.mixture false env) r.rhs in
   let name = to_kappa r env in
-  Format.eprintf "****Rule '%s' [%t]****@." name pr_r;
-  IntMap.iter
-    (fun id ag ->
-     Mixture.fold_interface
-       (fun site_id _ _ ->
-	let c = PortMap.find (KEPT id,site_id) r.pre_causal in
-	Printf.fprintf stderr "#%d.%d=%d\n" id site_id
-		       (Primitives.Causality.to_int c)
-       ) ag ()
-    ) (Mixture.agents r.lhs) ;
+  Format.fprintf err_fmt "****Rule '%s' [%t]****@," name pr_r;
+  let () = Format.pp_open_hvbox err_fmt 0 in
+  let () = IntMap.iter
+	     (fun id ag ->
+	      Mixture.fold_interface
+		(fun site_id _ _ ->
+		 let c = PortMap.find (KEPT id,site_id) r.pre_causal in
+		 Format.fprintf err_fmt  "#%d.%d=%d@ " id site_id
+				(Primitives.Causality.to_int c)
+		) ag ()
+	     ) (Mixture.agents r.lhs) in
+  let () = Format.pp_close_box err_fmt () in
+  let () = Format.pp_print_cut err_fmt () in
   let dump_script script =
     let id_of_port (id, s) =
       match id with
@@ -669,39 +673,39 @@ let dump r env =
       (fun action ->
        match action with
        | BND (p, p') ->
-	  Printf.fprintf stderr "BND (#%s,#%s)\n" (id_of_port p) (id_of_port p')
+	  Format.fprintf err_fmt "BND (#%s,#%s)@," (id_of_port p) (id_of_port p')
        | FREE (p,b) ->
-	  if b then Printf.fprintf stderr "FREE #%s\n" (id_of_port p)
-	  else Printf.fprintf stderr "FREE* #%s\n" (id_of_port p)
+	  if b then Format.fprintf err_fmt "FREE #%s@," (id_of_port p)
+	  else Format.fprintf err_fmt "FREE* #%s@," (id_of_port p)
        | MOD (p, i) ->
-	  Printf.fprintf stderr "SET #%s to state %d\n" (id_of_port p) i
+	  Format.fprintf err_fmt "SET #%s to state %d@," (id_of_port p) i
        | DEL i ->
-	  Printf.fprintf stderr "DEL #%d\n" i
+	  Format.fprintf err_fmt "DEL #%d@," i
        | ADD (i, name) ->
 	  let sign = Environment.get_sig name env in
-	  Printf.fprintf stderr "ADD %s%s with identifier #%d\n"
+	  Format.fprintf err_fmt "ADD %s%s with identifier #%d@,"
 			 (Environment.name name env) (Signature.to_string sign)
 			 ((fun (deleted,kept,_) -> deleted +kept+ i) r.balance)
       )
       script
   in
-  Printf.fprintf stderr "Apply %s\n" (to_kappa r env) ;
+  Format.fprintf err_fmt "Apply %s@," (to_kappa r env) ;
   dump_script r.script ;
-  Printf.fprintf stderr "if pattern %d is matched \n" (Mixture.get_id r.lhs) ;
-  Format.eprintf "Modif sites: [%a]@."
+  Format.fprintf err_fmt "if pattern %d is matched@," (Mixture.get_id r.lhs) ;
+  Format.fprintf err_fmt "Modif sites: @[[%a]@]@,"
 		 (Pp.set IdMap.bindings Pp.comma
 			 (fun f (id,s) ->
-			  Format.fprintf f "%i -> {%a}"
+			  Format.fprintf f "%i -> @[{%a}@]"
 					 (match id with FRESH i | KEPT i -> i)
 					 (Pp.set Int2Set.elements Pp.comma
 						 (fun f (x,y) -> Format.fprintf f "(%i,%i)" x y))
 					 s))
 		 r.modif_sites;
   match r.cc_impact with
-  | None -> Format.eprintf "No CC impact@."
+  | None -> Format.fprintf err_fmt "No CC impact@,"
   | Some (con,dis,se) ->
-     Format.eprintf
-       "@[<v>%a@,%a@,%a@]@."
+     Format.fprintf err_fmt
+       "@[<v>%a%a%a@]@,"
        (Pp.set IntMap.bindings (fun f -> Format.pp_print_cut f ())
 	       (fun f (i,s) -> Format.fprintf
 				 f "@[CC[%d] and CCs {%a} in the left hand side will merge@]"
@@ -719,4 +723,6 @@ let dump r env =
 				 f "@[agent #%d might have side effect disconnection on sites {%a}@]"
 				 i (Pp.set IntSet.elements Pp.comma
 					   Format.pp_print_int) s))
-       se
+       se;
+     let () = Format.pp_close_box err_fmt () in
+     Format.pp_print_newline err_fmt ()
