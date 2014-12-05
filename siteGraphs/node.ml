@@ -146,122 +146,127 @@ let add_dep phi port_list node env =
 let iteri f node  = Array.iteri f (interface node)
 
 let marshalize node =
-	let f_intf =
-		fold_interface
-		(fun site_id port intf ->
-			let (int,lnk) = port.status in
-				let f_lnk =
-					match lnk with
-						| FPtr (i,j) -> FPtr (i,j)
-						| Null -> Null
-						| Ptr (node',site_id') -> FPtr ((try get_address node' with Not_found -> invalid_arg "Node.marshalize"),site_id')
-				in
-					intf.(site_id) <- {dep = port.dep ; status = (int,f_lnk)} ;
-					intf
-		) node (Array.copy node.interface)
-	in
-		{node with address = Some (get_address node) ; interface = f_intf}
-		
+  let f_intf =
+    fold_interface
+      (fun site_id port intf ->
+       let (int,lnk) = port.status in
+       let f_lnk =
+	 match lnk with
+	 | FPtr (i,j) -> FPtr (i,j)
+	 | Null -> Null
+	 | Ptr (node',site_id') ->
+	    FPtr ((try get_address node'
+		   with Not_found -> invalid_arg "Node.marshalize"),site_id')
+       in
+       intf.(site_id) <- {dep = port.dep ; status = (int,f_lnk)} ;
+       intf
+      ) node (Array.copy node.interface)
+  in
+  {node with address = Some (get_address node) ; interface = f_intf}
+
 let is_bound ?with_type (n,i) =
-	let intf = n.interface.(i).status 
-	in
-	match intf with
-		| (_,FPtr _) -> invalid_arg "Node.is_bound"
-		| (_,Null) -> false
-		| (_,Ptr (u,j)) -> 
-			match with_type with
-				| Some (site_id,nme) -> (name u = nme) && (j = site_id)
-				| None -> true
+  let intf = n.interface.(i).status in
+  match intf with
+  | (_,FPtr _) -> invalid_arg "Node.is_bound"
+  | (_,Null) -> false
+  | (_,Ptr (u,j)) ->
+     match with_type with
+     | Some (site_id,nme) -> (name u = nme) && (j = site_id)
+     | None -> true
 
 exception TooBig
 
 let bit_encode node env =
-	try
-  	let tot_offset = ref 0 in 
-  	let sign = Environment.get_sig (name node) env in
-  	let max_val = fun site_id -> Signature.internal_states_number site_id sign in
-  	let bit_rep = 
-  		fold_status
-  		(fun site_id (int,lnk) bit_rep ->
-  			let n = max_val site_id in 
-  			let bit_rep = 
-  				match int with
-  					| None -> if n = 0 then bit_rep else invalid_arg "Node.bit_encode" 
-  					| Some i -> 
-  						if i>n then invalid_arg "Node.bit_encode"
-  						else
-  							let offset = Tools.bit_rep_size n in
-  							let bit_rep = Int64.shift_left bit_rep offset in
-  							(tot_offset := !tot_offset + offset ;
-  							if !tot_offset > 63 then raise TooBig
-  							else
-  								Int64.logor bit_rep (Int64.of_int i))
-  			in
-  			match lnk with
-  					|	FPtr _ | Ptr _ -> let bit_rep = (Int64.shift_left bit_rep 1) in (tot_offset := !tot_offset + 1 ; (Int64.shift_left bit_rep 1))
-  					| Null -> (tot_offset := !tot_offset + 1 ; Int64.shift_left bit_rep 1)
-  		) node Int64.zero
-  	in
-  	let offset = Tools.bit_rep_size (Environment.name_number env) in
-  	tot_offset := !tot_offset + offset ;
-  	if !tot_offset > 63 then raise TooBig
-  	else 
-  		Int64.logor (Int64.shift_left bit_rep offset) (Int64.of_int (name node)) 
-	with TooBig ->
-		Int64.of_int (name node) (*If the interface is too big, retaining only the name of the agent as a view*)
-	
-let internal_state (n,i) = 
-	match n.interface.(i).status with
-		| (s,_) -> s
+  try
+    let tot_offset = ref 0 in
+    let sign = Environment.get_sig (name node) env in
+    let max_val site_id = Signature.internal_states_number site_id sign in
+    let bit_rep =
+      fold_status
+	(fun site_id (int,lnk) bit_rep ->
+	 let n = max_val site_id in
+	 let bit_rep =
+	   match int with
+	   | None -> if n = 0 then bit_rep else invalid_arg "Node.bit_encode"
+	   | Some i ->
+	      if i>n then invalid_arg "Node.bit_encode"
+	      else
+		let offset = Tools.bit_rep_size n in
+		let bit_rep = Int64.shift_left bit_rep offset in
+		(tot_offset := !tot_offset + offset ;
+		 if !tot_offset > 63 then raise TooBig
+		 else
+		   Int64.logor bit_rep (Int64.of_int i))
+	 in
+	 match lnk with
+	 | ( FPtr _ | Ptr _ ) ->
+	    let bit_rep = (Int64.shift_left bit_rep 1) in
+	    (tot_offset := !tot_offset + 1 ; (Int64.shift_left bit_rep 1))
+	 | Null -> (tot_offset := !tot_offset + 1 ; Int64.shift_left bit_rep 1)
+	) node Int64.zero
+    in
+    let offset = Tools.bit_rep_size (Environment.name_number env) in
+    tot_offset := !tot_offset + offset ;
+    if !tot_offset > 63 then raise TooBig
+    else
+      Int64.logor (Int64.shift_left bit_rep offset) (Int64.of_int (name node))
+  with TooBig ->
+    Int64.of_int (name node)
+(*If the interface is too big, retaining only the name of the agent as a view*)
 
-let link_state (n,i) = 
-	match n.interface.(i).status with
-		| (_,i) -> i
+let internal_state (n,i) = fst n.interface.(i).status
+let link_state (n,i) = snd n.interface.(i).status
 
-let set_ptr (u,i) value = 
-	let intf = interface u in
-		let port = intf.(i) in
-			let int,_ = port.status in
-				intf.(i) <- {port with status = (int,value)}
+let set_ptr (u,i) value =
+  let intf = interface u in
+  let port = intf.(i) in
+  let int,_ = port.status in
+  intf.(i) <- {port with status = (int,value)}
 
-let set_int (u,i) value = 
-	let intf = interface u in
-		let port = intf.(i) in
-			let _,lnk = port.status in
-				intf.(i) <- {port with status = (value,lnk)}
+let set_int (u,i) value =
+  let intf = interface u in
+  let port = intf.(i) in
+  let _,lnk = port.status in
+  intf.(i) <- {port with status = (value,lnk)}
 
 let create ?with_interface name_id env =
-	try 
-		if name_id<0 then (*Adding the empty agent*)
-			invalid_arg "Node.create: null agent"
-			(*{name="%" ; interface = Array.make 0 {status = (None,Null) ; dep = (LiftSet.create 0,LiftSet.create 0)}; address=None ; species_id = None}*)
-		else
-			let sign = try Environment.get_sig name_id env with Not_found -> invalid_arg "Node.create 1"
-			in
-			let size = Signature.arity sign in
-			let intf = 
-				Array.init size
-				(fun i -> 
-					let def_int = Signature.default_num_value i sign in
-						{status = (def_int,Null) ; dep = (LiftSet.create !Parameter.defaultLiftSetSize,LiftSet.create !Parameter.defaultLiftSetSize)}
-				)
-			in 
-				let u = {name = name_id ; interface = intf ; address = None} in
-					match with_interface with
-						| None -> u
-						| Some m ->
-							let (_:unit) =  
-								IntMap.iter 
-								(fun i (int,_) -> 
-									match int with
-										| None -> ()
-										| Some _ -> set_int (u,i) int
-								) m 
-							in
-								u	
-	with
-		| Invalid_argument str -> (invalid_arg ("Node.create: "^str))
-		| Not_found -> (invalid_arg "Node.create: not found")
+  try
+    if name_id<0 then (*Adding the empty agent*)
+      invalid_arg "Node.create: null agent"
+	(*{name="%" ; interface = Array.make 0 {status = (None,Null) ;
+ dep = (LiftSet.create 0,LiftSet.create 0)}; address=None ; species_id = None}*)
+    else
+      let sign =
+	try Environment.get_sig name_id env
+	with Not_found -> invalid_arg "Node.create 1"
+      in
+      let size = Signature.arity sign in
+      let intf =
+	Array.init
+	  size
+	  (fun i ->
+	   let def_int = Signature.default_num_value i sign in
+	   {status = (def_int,Null) ;
+	    dep = (LiftSet.create !Parameter.defaultLiftSetSize,
+		   LiftSet.create !Parameter.defaultLiftSetSize)}
+	  )
+      in
+      let u = {name = name_id ; interface = intf ; address = None} in
+      match with_interface with
+      | None -> u
+      | Some m ->
+	 let (_:unit) =
+	   IntMap.iter
+	     (fun i (int,_) ->
+	      match int with
+	      | None -> ()
+	      | Some _ -> set_int (u,i) int
+	     ) m
+	 in
+	 u
+  with
+  | Invalid_argument str -> (invalid_arg ("Node.create: "^str))
+  | Not_found -> (invalid_arg "Node.create: not found")
 
 (*Tests whether status of port i of node n is compatible with (int,lnk)
 @raises False if not otherwise returns completes*)
