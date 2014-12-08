@@ -191,134 +191,139 @@ module InjProdHeap = SafeHeap.Make(InjProduct)
 
 module InjProdSet = Set.Make(InjProduct)
 
-module Counter = 
-	struct
-		type t = {
-			mutable time:float ; 
-			mutable events:int ; 
-			mutable null_events:int ; 
-			mutable cons_null_events:int;
-			mutable perturbation_events:int ;
-			mutable null_action:int ;
-			mutable last_tick : (int * float) ;
-			mutable initialized : bool ;
-			mutable ticks : int ; 
-			stat_null : int array ; 
-			init_time : float ;
-			init_event : int ;
-			max_time : float option ; 
-			max_events : int option ;
-			dE : int option ;
-			dT : float option ;
-			mutable stop : bool
-			}
+module Counter =
+  struct
+    type t = {
+      mutable time:float ;
+      mutable events:int ;
+      mutable null_events:int ;
+      mutable cons_null_events:int;
+      mutable perturbation_events:int ;
+      mutable null_action:int ;
+      mutable last_tick : (int * float) ;
+      mutable initialized : bool ;
+      mutable ticks : int ;
+      stat_null : int array ;
+      init_time : float ;
+      init_event : int ;
+      max_time : float option ;
+      max_events : int option ;
+      dE : int option ;
+      dT : float option ;
+      mutable stop : bool
+    }
 
-		let stop c = c.stop
-		let inc_tick c = c.ticks <- c.ticks + 1
-		let time c = c.time
-		let event c = c.events
-		let null_event c = c.null_events
-		let null_action c = c.null_action
-		let is_initial c = c.time = c.init_time
-		let inc_time c dt = c.time <- (c.time +. dt)
-		let inc_events c =c.events <- (c.events + 1) 
-		let inc_null_events c = c.null_events <- (c.null_events + 1) 
-		let inc_consecutive_null_events c = (c.cons_null_events <- c.cons_null_events + 1)
-		let inc_null_action c = c.null_action <- (c.null_action + 1)
-		let	reset_consecutive_null_event c = c.cons_null_events <- 0 
-		let check_time c = match c.max_time with None -> true | Some max -> c.time < max
-		let check_output_time c ot = match c.max_time with None -> true | Some max -> ot < max
-		let check_events c = match c.max_events with None -> true | Some max -> c.events < max
-		let dT c = c.dT
-		let dE c = c.dE
-		let last_tick c = c.last_tick
-		let set_tick c (i,x) = c.last_tick <- (i,x)
-		
-		let last_increment c = let _,t = c.last_tick in (c.time -. t) 
-		
-		let compute_dT () =
-		  let points = !Parameter.pointNumberValue in
-		  if points <= 0 then None else
-		    match !Parameter.maxTimeValue with
-		    | None -> None
-		    | Some max_t -> Some (max_t /. (float_of_int points))
+    let stop c = c.stop
+    let inc_tick c = c.ticks <- c.ticks + 1
+    let time c = c.time
+    let event c = c.events
+    let null_event c = c.null_events
+    let null_action c = c.null_action
+    let is_initial c = c.time = c.init_time
+    let inc_time c dt = c.time <- (c.time +. dt)
+    let inc_events c =c.events <- (c.events + 1)
+    let inc_null_events c = c.null_events <- (c.null_events + 1)
+    let inc_consecutive_null_events c =
+      (c.cons_null_events <- c.cons_null_events + 1)
+    let inc_null_action c = c.null_action <- (c.null_action + 1)
+    let	reset_consecutive_null_event c = c.cons_null_events <- 0
+    let check_time c =
+      match c.max_time with None -> true | Some max -> c.time < max
+    let check_output_time c ot =
+      match c.max_time with None -> true | Some max -> ot < max
+    let check_events c =
+      match c.max_events with None -> true | Some max -> c.events < max
+    let dT c = c.dT
+    let dE c = c.dE
+    let last_tick c = c.last_tick
+    let set_tick c (i,x) = c.last_tick <- (i,x)
 
-		let compute_dE () =
-		  let points = !Parameter.pointNumberValue in
-		  if points <= 0 then None else
-		    match !Parameter.maxEventValue with
-		    | None -> None
-		    | Some max_e ->
-		       Some (max (max_e / points) 1)
+    let last_increment c = let _,t = c.last_tick in (c.time -. t)
 
-		let tick counter time event =
-		  let () =
-		    if not counter.initialized then
-		      let c = ref !Parameter.progressBarSize in
-		      while !c > 0 do
-			Format.print_string "_" ;
-			c:=!c-1
-		      done ;
-		      Format.print_newline () ;
-		      counter.initialized <- true
-		  in
-		  let last_event,last_time = counter.last_tick in
-		  let n_t =
-		    match !Parameter.maxTimeValue with
-		    | None -> 0
-		    | Some tmax ->
-		       int_of_float
-			 ((time -. last_time) *.
-			    (float_of_int !Parameter.progressBarSize) /. tmax)
-		  and n_e =
-		    match !Parameter.maxEventValue with
-		    | None -> 0
-		    | Some emax ->
-		       if emax = 0 then 0
-		       else
-			 let nplus =
-			   (event * !Parameter.progressBarSize) / emax in
-                         let nminus =
-			   (last_event * !Parameter.progressBarSize) / emax in
-                         nplus-nminus
-		  in
-		  let n = ref (max n_t n_e) in
-		  if !n>0 then set_tick counter (event,time) ;
-		  while !n > 0 do
-		    Format.printf "%c" !Parameter.progressBarSymbol ;
-		    if !Parameter.eclipseMode then Format.print_newline ();
-		    inc_tick counter ;
-		    n:=!n-1
-		  done;
-		  Format.print_flush ()
+    let compute_dT () =
+      let points = !Parameter.pointNumberValue in
+      if points <= 0 then None else
+	match !Parameter.maxTimeValue with
+	| None -> None
+	| Some max_t -> Some (max_t /. (float_of_int points))
 
-	 	let stat_null i c = try c.stat_null.(i) <- c.stat_null.(i) + 1 with exn -> invalid_arg "Invalid null event identifier"
-              
-		let create init_t init_e mx_t mx_e = 
-			let dE = compute_dE() in
-				let dT = match dE with None -> compute_dT() | Some _ -> None
-				in
-				{time = init_t ; 
-				events = init_e ; 
-				null_events = 0 ; 
-				cons_null_events = 0;
-				stat_null = Array.init 6 (fun i -> 0) ;
-				perturbation_events = 0;
-				null_action = 0 ;
-				max_time = mx_t ; 
-				max_events = mx_e ;
-				last_tick = (init_e,init_t);
-				dE = dE ;
-				dT = dT ;
-				init_time = init_t ;
-				init_event = init_e ;
-				initialized = false ;
-				ticks = 0 ;
-				stop = false
-				}
-		
-	end
-	
+    let compute_dE () =
+      let points = !Parameter.pointNumberValue in
+      if points <= 0 then None else
+	match !Parameter.maxEventValue with
+	| None -> None
+	| Some max_e ->
+	   Some (max (max_e / points) 1)
+
+    let tick counter time event =
+      let () =
+	if not counter.initialized then
+	  let c = ref !Parameter.progressBarSize in
+	  while !c > 0 do
+	    Format.print_string "_" ;
+	    c:=!c-1
+	  done ;
+	  Format.print_newline () ;
+	  counter.initialized <- true
+      in
+      let last_event,last_time = counter.last_tick in
+      let n_t =
+	match !Parameter.maxTimeValue with
+	| None -> 0
+	| Some tmax ->
+	   int_of_float
+	     ((time -. last_time) *.
+		(float_of_int !Parameter.progressBarSize) /. tmax)
+      and n_e =
+	match !Parameter.maxEventValue with
+	| None -> 0
+	| Some emax ->
+	   if emax = 0 then 0
+	   else
+	     let nplus =
+	       (event * !Parameter.progressBarSize) / emax in
+             let nminus =
+	       (last_event * !Parameter.progressBarSize) / emax in
+             nplus-nminus
+      in
+      let n = ref (max n_t n_e) in
+      if !n>0 then set_tick counter (event,time) ;
+      while !n > 0 do
+	Format.printf "%c" !Parameter.progressBarSymbol ;
+	if !Parameter.eclipseMode then Format.print_newline ();
+	inc_tick counter ;
+	n:=!n-1
+      done;
+      Format.print_flush ()
+
+    let stat_null i c =
+      try c.stat_null.(i) <- c.stat_null.(i) + 1
+      with exn -> invalid_arg "Invalid null event identifier"
+
+    let create init_t init_e mx_t mx_e =
+      let dE = compute_dE() in
+      let dT = match dE with None -> compute_dT() | Some _ -> None
+      in
+      {time = init_t ;
+       events = init_e ;
+       null_events = 0 ;
+       cons_null_events = 0;
+       stat_null = Array.init 6 (fun i -> 0) ;
+       perturbation_events = 0;
+       null_action = 0 ;
+       max_time = mx_t ;
+       max_events = mx_e ;
+       last_tick = (init_e,init_t);
+       dE = dE ;
+       dT = dT ;
+       init_time = init_t ;
+       init_event = init_e ;
+       initialized = false ;
+       ticks = 0 ;
+       stop = false
+      }
+  end
+
 module Palette:
 	sig
 	  type t
