@@ -9,26 +9,20 @@
  let reset_eof lexbuf =
    lexbuf.lex_eof_reached <- false
 
+ let position lexbuf =
+   let pos = lexbuf.lex_curr_p in
+   (pos.pos_fname, pos.pos_lnum, pos.pos_cnum - pos.pos_bol)
+
  let return_error opt_pos lexbuf msg =
    let fn,lnum,cnum =
      match opt_pos with
      | Some (fn,ln,cn) -> (fn,ln,cn)
-     | None ->
-	let pos = lexbuf.lex_curr_p in
-	let line = pos.pos_lnum in
-	let cn = pos.pos_cnum - pos.pos_bol
-	in
-	(pos.pos_fname,line,cn)
+     | None -> position lexbuf
    in
    let loc = Printf.sprintf "line %d, character %d:" lnum cnum in
    let full_msg = Printf.sprintf "Error (%s) %s %s" fn loc msg
    in
    Printf.eprintf "%s\n" full_msg ; exit 1
-
- let position lexbuf =
-   let pos = lexbuf.lex_curr_p in
-   (pos.pos_fname, pos.pos_lnum, pos.pos_cnum - pos.pos_bol)
-
 
  let keyword_or_id =
  let keywords = Hashtbl.create 15 in
@@ -74,8 +68,10 @@ rule token = parse
 		      | "$PRINT" -> (PRINT pos)
 		      | "$PRINTF" -> (PRINTF pos)
 		      | s ->
-			 return_error None lexbuf
-				      ("Perturbation effect \""^s^"\" is not defined")
+			 raise
+			   (Syntax_Error
+			      (Some (position lexbuf),
+			       ("Perturbation effect \""^s^"\" is not defined")))
 		     }
 	 | '[' {let lab = read_label "" [']'] lexbuf in
 		match lab with
@@ -100,11 +96,15 @@ rule token = parse
 		| "Emax" -> EMAX
 		| "Tmax" -> TMAX
 		| "p" -> PLOTNUM
-		| _ as s -> return_error None lexbuf ("Symbol \""^s^"\" is not defined")
+		| _ as s ->
+		   raise (Syntax_Error
+			    (Some (position lexbuf),
+			     ("Symbol \""^s^"\" is not defined")))
 	       }
 	 | ':' {TYPE}
 	 | ';' {SEMICOLON}
-	 | '\"' {let str = read_label "" ['\"'] lexbuf in let pos = position lexbuf in STRING (str,pos)}
+	 | '\"' {let str = read_label "" ['\"'] lexbuf in
+		 let pos = position lexbuf in STRING (str,pos)}
 	 | eol {Lexing.new_line lexbuf ; NEWLINE}
 	 | '#' {comment lexbuf}
 	 | integer as n {INT (int_of_string n)}
@@ -138,9 +138,10 @@ rule token = parse
 		| "obs" -> (OBS pos)
 		| "def" -> (CONFIG pos)
 		| "token" -> (TOKEN pos)
-		| _ as s -> return_error None lexbuf
-					 ("Instruction \""^s^"\" not recognized")
-					 }
+		| _ as s ->
+		   raise (Syntax_Error (Some (position lexbuf),
+					("Instruction \""^s^"\" not recognized")))
+	       }
 	 | '!' {let pos = position lexbuf in KAPPA_LNK pos}
 	 | internal_state as s {let i = String.index s '~' in
 				let r = String.sub s (i+1) (String.length s-i-1) in
@@ -150,8 +151,11 @@ rule token = parse
 	 | '_' {let pos = position lexbuf in (KAPPA_SEMI pos)}
 	 | blank  {token lexbuf}
 	 | eof {reach_eof lexbuf; EOF}
-	 | _ as c {return_error None lexbuf
-				(Printf.sprintf "invalid use of character %c" c)}
+	 | _ as c {
+		    raise (Syntax_Error
+			     (Some (position lexbuf),
+			      (Format.sprintf "invalid use of character %c" c)))
+		  }
 
 and read_label acc char_list =
   parse
