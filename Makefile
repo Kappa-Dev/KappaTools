@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := all
 
-OCAMLINCLUDES=-cflags -I,+labltk,-I,+lablgtk2 -lflags -I,+labltk,-I,+lablgtk2,unix.cmxa,str.cmxa,nums.cmxa,labltk.cmxa,jpflib.cmxa,frxlib.cmxa
+
 
 TERM = $(shell echo $$TERM)
 ifeq ($(TERM), dumb) # An approximation of "am I launched from emacs ?" :-)
@@ -8,6 +8,15 @@ ifeq ($(TERM), dumb) # An approximation of "am I launched from emacs ?" :-)
 else
  OCAMLBUILDFLAGS = 
 endif
+
+USE_TK?=0
+
+ifeq ($(USE_TK),1)
+OCAMLINCLUDES = -cflags -I,+labltk,-I,+lablgtk2 -lflags -I,+labltk,-I,+lablgtk2,unix.cmxa,str.cmxa,nums.cmxa,labltk.cmxa,jpflib.cmxa,frxlib.cmxa,KaSa_rep/lib/full
+else
+OCAMLINCLUDES = -cflags -I,KaSa_rep/lib/light -lflags unix.cmxa,str.cmxa,nums.cmxa 
+endif
+
 
 .PHONY: all clean temp-clean-for-ignorant-that-clean-must-be-done-before-fetch
 .PHONY: check build-tests
