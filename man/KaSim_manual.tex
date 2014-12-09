@@ -124,16 +124,28 @@ The easiest way to use \KaSim~is to use pre-compiled versions available in the r
 To test whether your program does work, simply type \ttt{./KaSim \dd version} on a terminal, from the directory that contains the binaries. If the version is displayed it means that the binaries are indeed compatible with your OS. Otherwise you may need to compile \KaSim~from the sources (see next Section).
 
 \section{Obtaining the sources}\label{sec:sources}
-To obtain \KaSim~you can either use pre-compiled binaries (see previous section) or compile the sources for your architecture. To do so, download the source code from \url{https://github.com/Kappa-Dev/KaSim} and make sure you have a recent ocaml compiler installed (\KaSim~requires Ocaml 4.01.0 to compile). From a terminal window type \ttt{ocamlopt.opt -v}. If nothing appears then you need to install Ocaml Native compiler that can be downloaded from \url{http://caml.inria.fr/download.en.html}.
+To obtain \KaSim~you can either use pre-compiled binaries (see previous section)
+or compile the sources for your architecture. To do so, download the source code
+from \url{https://github.com/Kappa-Dev/KaSim}, make sure you have a recent ocaml
+compiler (\KaSim~requires Ocaml 4.01.0 to compile) and the findlib library
+installed. From a terminal window type \ttt{ocamlfind ocamlopt -v}. If it fails
+then you need to install Ocaml Native compiler that can be downloaded from
+\url{http://caml.inria.fr/download.en.html} and/or findlib available at
+\url{http://projects.camlcity.org/projects/findlib.html}.
 
 \section{Compilation}
-Once Ocaml is safely installed, untar \KaSim~archive and compile following these few steps:
-\ITE{
+Once Ocaml is safely installed, untar \KaSim~archive and compile following these
+few steps: \ITE{
 \item[\$]\ttt{tar xzvf kasim.tar.gz -d Kappa}
 \item[\$]\ttt{cd Kappa}
-\item[\$]\ttt{make}
-}
-At the end of these steps you should see, in the \ttt{Kappa} directory, an executable file named KaSim.  In order to check the compilation went fine, simply type $.\bs$\ttt{KaSim -\,-version}. If the ocaml native compiler \ttt{ocamlopt.opt} is not in the path of your system, you may set the variable \ttt{OCAMLBINPATH} to point to the location of the compiler by editing the corresponding line in the Makefile.
+\item[\$]\ttt{make bin/KaSim} } At the end of these steps you should see, in the
+\ttt{bin} directory of the \ttt{Kappa} directory, an executable file named
+KaSim.  In order to check the compilation went fine, simply type
+\ttt{bin/KaSim -\,-version}.
+
+If the tool \ttt{ocamlbuild} is not in your path, you may
+set the variable \ttt{OCAMLBINPATH} to point to the location of the
+compiler by doing \ttt{make OCAMLBINPATH='the\_correct\_dir' bin/KaSim}.
 
 \chapter{The command line}\label{chap:cl}
 
