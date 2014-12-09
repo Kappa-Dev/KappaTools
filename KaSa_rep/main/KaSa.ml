@@ -69,5 +69,4 @@ let main () =
   let error = Print_quarks.dot_of_influence_map parameters_influence_map error handler c_compil (wake_up_map,inhibition_map) in 
   let _ = Exception.print parameters error  in 
   () 
-    
-let _ = main () 
+
