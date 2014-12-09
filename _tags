@@ -12,10 +12,10 @@
 "KaSa_rep/error_handlers" : include
 "KaSa_rep/data_structures" : include
 "KaSa_rep/lib" : include
-"KaSa_rep/lib/light" : include
 "KaSa_rep/main" : include
 "KaSa_rep/tools" : include
 "KaSa_rep/frontend/preprocess" : include
 "KaSa_rep/influence_map" : include
 "KaSa_rep/export_to_KaSim" : include
+<KaSa_rep/main/KaSa.*> : use_unix
 true : bin_annot

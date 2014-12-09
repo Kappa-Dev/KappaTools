@@ -1,7 +1,5 @@
 .DEFAULT_GOAL := all
 
-
-
 TERM = $(shell echo $$TERM)
 ifeq ($(TERM), dumb) # An approximation of "am I launched from emacs ?" :-)
  OCAMLBUILDFLAGS = -classic-display 
@@ -14,7 +12,7 @@ USE_TK?=0
 ifeq ($(USE_TK),1)
 OCAMLINCLUDES = -cflags -I,+labltk,-I,+lablgtk2 -lflags -I,+labltk,-I,+lablgtk2,unix.cmxa,str.cmxa,nums.cmxa,labltk.cmxa,jpflib.cmxa,frxlib.cmxa,KaSa_rep/lib/full
 else
-OCAMLINCLUDES = -cflags -I,KaSa_rep/lib/light -lflags unix.cmxa,str.cmxa,nums.cmxa 
+OCAMLINCLUDES = -I KaSa_rep/lib/light
 endif
 
 
