@@ -22,16 +22,16 @@ endif
 .PHONY: check build-tests
 
 %.native %.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(filter_out _build/,$(wildcard */*/*.ml*)) $(filter_out _build/,$(wildcard */*/*/*.ml*))
-	ocamlbuild $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) $@
+	$(OCAMLBINPATH)ocamlbuild $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) $@
 
-all: KaSim.native KaSa.native 
-	[ -d bin ] || mkdir bin && cp _build/main/KaSim.native bin/KaSim
-	rm -f KaSim && ln -s bin/KaSim KaSim
-	[ -d bin ] || mkdir bin && cp _build/KaSa_rep/main/KaSa.native bin/KaSa
-	rm -f KaSa && ln -s bin/KaSa KaSa
+bin/%: %.native
+	[ -d bin ] || mkdir bin && cp $< $@
+	rm -f $(notdir $@) && ln -s $@ $(notdir $@)
+
+all: bin/KaSim bin/KaSa
 
 clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch
-	ocamlbuild -clean
+	$(OCAMLBINPATH)ocamlbuild -clean
 	rm -f KaSim bin/KaSim KaSa bin/KaSa
 	find . -name \*~ -delete
 	+$(MAKE) KAPPABIN=$(CURDIR)/bin/ -C models/cflows clean
