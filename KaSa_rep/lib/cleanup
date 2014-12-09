@@ -1,0 +1,7 @@
+CLEANUP=rm -f *.cm* *.o *~ *.a
+
+clean:
+	cd full ; $(CLEANUP) ;
+	cd light ; $(CLEANUP) ;
+	cd with_key ; $(CLEANUP) ;
+	cd without_key ; $(CLEANUP) ;

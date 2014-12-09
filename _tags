@@ -6,4 +6,15 @@
 "siteGraphs" : include
 "Error" : include
 "main" : include
+"KaSa_rep" : include
+"KaSa_rep/pipeline" : include
+"KaSa_rep/config" : include
+"KaSa_rep/error_handlers" : include
+"KaSa_rep/data_structures" : include
+"KaSa_rep/lib" : include
+"KaSa_rep/lib/full" : include
+"KaSa_rep/main" : include
+"KaSa_rep/tools" : include
+"KaSa_rep/frontend/preprocess" : include
+"KaSa_rep/influence_map" : include
 true : bin_annot
