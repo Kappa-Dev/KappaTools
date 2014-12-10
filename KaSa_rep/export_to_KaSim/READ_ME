@@ -13,4 +13,3 @@ let compil =
 let state = Export_to_KaSim.Export_to_KaSim.init compil 
 let state,contact_map = Export_to_KaSim.Export_to_KaSim.get_contact_map state 
 let _ = Export_to_KaSim.Export_to_KaSim.dump_contact_map state 
-let _ = main () 

@@ -51,7 +51,7 @@ let translate_state parameter error handler agent site state =
   in 
   let error,(a,_,_) = 
     Misc_sa.unsome 
-      (Cckappa_sig.Dictionary_of_States.translate parameter error site dic)
+      (Cckappa_sig.Dictionary_of_States.translate parameter error state dic)
       (fun error -> warn parameter error (Some "line 36") Exit (Ckappa_sig.Internal "",(),()))
   in 
    error,a

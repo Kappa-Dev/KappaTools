@@ -70,3 +70,5 @@ let main () =
   let _ = Exception.print parameters error  in 
   () 
 
+let _ = main () 
+

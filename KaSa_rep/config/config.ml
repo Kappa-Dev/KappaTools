@@ -18,7 +18,7 @@
 (** if unsafe = true, then whenever an exception is raised, a default value is output, and no exception is raised*)
 
 let version = "1.04"
-let date = "2014/12/08"
+let date = "2014/12/10"
 let unsafe = ref true 
 let trace = ref false
 let dump_error_as_soon_as_they_occur = ref false 
