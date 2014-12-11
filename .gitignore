@@ -5,13 +5,14 @@ KaSim.docdir
 KaSim.native
 KaSim.byte
 KaSim
+KaSa.native
+KaSa.byte
+KaSa
+bin/
 *~
 _build/
 ._d/
 ._ncdi/
-grammar/kappaParser.ml
-grammar/kappaParser.mli
-grammar/kappaLexer.ml
 
 # test suite
 models/cflows/*/output/*.diff
