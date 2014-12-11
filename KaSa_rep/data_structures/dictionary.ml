@@ -108,7 +108,7 @@ module Dictionary =
         | None -> invalid_arg parameters error (Some "missing entry, line 101") Association_is_not_defined    
    
     let prestabilize in_construction = 
-      let array = Array.create in_construction.fresh None in 
+      let array = Array.make in_construction.fresh None in 
       let _ = 
          Hash.iter 
           (fun a  (asso,asso') i -> array.(i)<-Some (a,asso,asso'))
@@ -118,7 +118,7 @@ module Dictionary =
     
     let init a = 
       {in_construction =  (preinit ());
-       stabilized = Array.create 0 None;
+       stabilized = Array.make 0 None;
        is_stabilized = true}
        
       

@@ -249,7 +249,7 @@ let scan_perts parameters =
                 scan_mixture parameters remanent m 
               | Ast.UPDATE _ | Ast.STOP _ | Ast.SNAPSHOT _  
 	      | Ast.UPDATE_TOK _ | Ast.PRINT _ | Ast.CFLOW _ 
-	      | Ast.CFLOWOFF _ | Ast.FLUXOFF _ -> remanent 
+	      | Ast.CFLOWOFF _ | Ast.FLUXOFF _ | Ast.FLUX _ -> remanent 
             ) remanent m)
               
 let scan_rules parameters a b =  
@@ -263,7 +263,10 @@ let scan_rules parameters a b =
       a b
   
 let scan_compil parameters error compil =
-   let parameters = {parameters with Remanent_parameters_sig.trace = local_trace or parameters.Remanent_parameters_sig.trace} in 
+   let parameters =
+     {parameters with
+       Remanent_parameters_sig.trace =
+	 local_trace || parameters.Remanent_parameters_sig.trace} in
    let remanent = empty_handler parameters error in 
    let remanent = scan_initial_states parameters remanent compil.Ast.init in 
    let remanent = scan_declarations parameters remanent compil.Ast.signatures  in 

@@ -187,10 +187,10 @@ let print_diffview parameters error handler diff =
           let error = print_short_alg parameters error handler a1 in 
           let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "))" in
          error  
-     | STATE_ALG_OP Term.TIME_VAR,_ ->   
+     | Ast.STATE_ALG_OP Term.TIME_VAR,_ ->   
         let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "#TIME#" in
         error 
-     | STATE_ALG_OP Term.EVENT_VAR,_ ->   
+     | Ast.STATE_ALG_OP Term.EVENT_VAR,_ ->   
         let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "#EVENT#" in
         error 
    
@@ -200,13 +200,13 @@ let print_diffview parameters error handler diff =
      | Ast.CONST(Nbr.F(f)),_ ->
        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%f" f in 
          error 
-     | UN_ALG_OP _,_
-     | BIN_ALG_OP _,_
-     | STATE_ALG_OP _,_
-     | CONST _,_
-     | TOKEN_ID _,_ 
-     | KAPPA_INSTANCE _,_
-     | PLOTNUM _,_ ->  (*to do*) error 
+     | Ast.UN_ALG_OP _,_
+     | Ast.BIN_ALG_OP _,_
+     | Ast.STATE_ALG_OP _,_
+     | Ast.CONST _,_
+     | Ast.TOKEN_ID _,_ 
+     | Ast.KAPPA_INSTANCE _,_
+     | Ast.PLOTNUM,_ ->  (*to do*) error 
     (* | Ast.INFINITY _ -> 
       let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "+oo" in 
          error *)

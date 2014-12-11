@@ -484,8 +484,9 @@ let translate_mixture parameters error handler mixture =
  let set_released_sites parameters error k ag ag' set = 
    Cckappa_sig.Site_map_and_set.fold2_map parameters error  
      (fun site state state' (error,set) -> 
-       if state.Cckappa_sig.site_free  = state'.Cckappa_sig.site_free or state.Cckappa_sig.site_free = Some true 
-         then error,set
+       if state.Cckappa_sig.site_free  = state'.Cckappa_sig.site_free
+	  || state.Cckappa_sig.site_free = Some true
+       then error,set
          else Cckappa_sig.Address_map_and_set.add_set parameters error {Cckappa_sig.agent_index=k; Cckappa_sig.agent_type=ag.Cckappa_sig.agent_name;Cckappa_sig.site=site} set)
      (fun site state _ -> 
        warn parameters error (Some "line 514") Exit set)

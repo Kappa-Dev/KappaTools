@@ -5,14 +5,14 @@ let rec print_ast_alg f = function
   | Ast.CONST n -> Nbr.print f n
   | Ast.OBS_VAR lab -> Format.fprintf f "'%s'" lab
   | Ast.KAPPA_INSTANCE ast ->
-     Format.fprintf f "|#no printer for mixture, sorry#|"
+     Format.pp_print_string f "|#no printer for mixture, sorry#|"
   | Ast.TOKEN_ID tk -> Format.fprintf f "|%s|" tk
   | Ast.STATE_ALG_OP op -> Term.print_state_alg_op f op
   | Ast.BIN_ALG_OP (op, (a,_), (b,_)) ->
      Format.fprintf f "(%a %a %a)"
 		    print_ast_alg a Term.print_bin_alg_op op print_ast_alg b
   |Ast.UN_ALG_OP (op, (a,_)) ->
-   Format.fprintf f "(%a %a)" Term.print_un_alg_op op print_ast_alg a
+    Format.fprintf f "(%a %a)" Term.print_un_alg_op op print_ast_alg a
 
 let rec print_bool p_alg f = function
   | Ast.TRUE -> Format.fprintf f "[true]"

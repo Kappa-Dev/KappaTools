@@ -141,7 +141,7 @@ let print_mixture  parameter error mixture =
            aux error true mixture 
   in aux error false mixture 
 
-let rec print_alg parameter error alg = 
+let rec print_alg parameter error alg =
   match alg 
   with 
   | Ast.BIN_ALG_OP (op,(alg1,_),(alg2,_)) -> 
@@ -177,16 +177,17 @@ let rec print_alg parameter error alg =
   | Ast.EMAX -> 
     let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "EMAX" 
     in error 
-
-
+  | Ast.PLOTNUM ->
+     let () = Printf.fprintf parameter.Remanent_parameters_sig.log "[p]" in
+     error
 
 let print_rule parameter error rule = 
   let error = print_mixture parameter error rule.Ckappa_sig.lhs in 
   let arrow = 
     match rule.Ckappa_sig.arrow 
     with 
-      | Ast.RAR _         -> parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.uni_arrow 
-      | Ast.LRAR _ -> parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.bi_arrow 
+      | Ast.RAR -> parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.uni_arrow 
+      | Ast.LRAR -> parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.bi_arrow 
   in 
   let _ = Printf.fprintf parameter.Remanent_parameters_sig.log " %s " arrow in  
   let error = print_mixture parameter error rule.Ckappa_sig.rhs in 

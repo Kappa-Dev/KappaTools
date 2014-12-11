@@ -115,8 +115,8 @@ let translate_port parameters int_set port remanent =
     Ckappa_sig.port_free = 
       (match port.Ast.port_lnk 
        with Ast.FREE,_ -> Some true 
-       | Ast.LNK_ANY _,_ -> None 
-       | Ast.LNK_SOME _,_ 
+       | Ast.LNK_ANY,_ -> None 
+       | Ast.LNK_SOME,_ 
        | Ast.LNK_TYPE _,_ 
        | Ast.LNK_VALUE _,_ -> Some false ) 
   },

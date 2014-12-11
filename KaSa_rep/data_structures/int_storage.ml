@@ -68,7 +68,7 @@ module Int_storage_imperatif =
        else  
        error,
            {
-              array = Array.create (size+1) None; 
+              array = Array.make (size+1) None; 
               size = size;
                }
             
@@ -83,7 +83,7 @@ module Int_storage_imperatif =
        error,{array = Array.sub array.array 0 size ; size = size} 
        
    let set parameters error key value array = 
-     if key>array.size or key<0 
+     if key>array.size || key<0 
      then 
        invalid_arg parameters error (Some "set, line 81") Exit array
      else  
@@ -91,7 +91,7 @@ module Int_storage_imperatif =
        error,array
        
    let get parameters error key array = 
-      if key>array.size or key<0 then  
+      if key>array.size || key<0 then  
          invalid_arg parameters error (Some "get, line 88") Exit None 
       else 
         match array.array.(key) with 
@@ -99,7 +99,7 @@ module Int_storage_imperatif =
           | a -> error,a 
                                                
    let unsafe_get parameters error key array = 
-      if key>array.size or key<0 then  
+      if key>array.size || key<0 then  
          error,None 
       else 
         error,array.array.(key)  

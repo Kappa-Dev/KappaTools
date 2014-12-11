@@ -88,7 +88,7 @@ let update_prefix parameters suffix =
   {parameters with Remanent_parameters_sig.prefix = parameters.Remanent_parameters_sig.prefix^suffix}
   
 let update_call_stack parameters bool name = 
-  let rep_bool = parameters.Remanent_parameters_sig.trace or bool in 
+  let rep_bool = parameters.Remanent_parameters_sig.trace || bool in 
     match name,parameters.Remanent_parameters_sig.trace=bool  with
       | None,true -> parameters 
       | None,false -> {parameters with Remanent_parameters_sig.trace = rep_bool}

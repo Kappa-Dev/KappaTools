@@ -163,7 +163,7 @@ let dot_of_contact_map parameters (error:Exception.method_handler) handler =
               parameters_dot
               error 
               (fun parameters_dot error (i,(j,k)) (i',j',k') -> 
-                if i<i' or (i=i' && j<=j') 
+                if i<i' || (i=i' && j<=j') 
                 then 
                   let _ = 
                     Printf.fprintf parameters_dot.Remanent_parameters_sig.log "%d.%d -- %d.%d\n" i j i' j' 
