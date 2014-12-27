@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := all
 
-
+KASAREP = KaSa_rep/
 
 TERM = $(shell echo $$TERM)
 ifeq ($(TERM), dumb) # An approximation of "am I launched from emacs ?" :-)
@@ -21,7 +21,7 @@ endif
 .PHONY: all clean temp-clean-for-ignorant-that-clean-must-be-done-before-fetch
 .PHONY: check build-tests
 
-%.native %.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(filter_out _build/,$(wildcard */*/*.ml*)) $(filter_out _build/,$(wildcard */*/*/*.ml*))
+%.native %.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*)
 	$(OCAMLBINPATH)ocamlbuild $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) $@
 
 bin/%: %.native
