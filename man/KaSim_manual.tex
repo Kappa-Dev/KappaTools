@@ -309,7 +309,7 @@ Token expressions are also given by the grammar in Table~\ref{tab:patterns}.
   \begin{tabular}{@{} lcl @{}}
     \textit{kappa\_expression} & ::= & \textit{agent\_expression} \tcb{,} \textit{kappa\_expression} $\mid\varepsilon$ \\ 
     \textit{agent\_expression} & ::= &  \tcb{Id}\tcb{(}\textit{interface}\tcb{)} \\
-    \textit{interface} &::=& $\varepsilon\mid$ \tcb{Id} \textit{internal\_state link\_state}\\
+    \textit{interface} &::=& \tcb{Id} \textit{internal\_state link\_state}  \tcb{,} \textit{interface} $\mid\varepsilon$ \\
     \textit{internal\_state} &::=& $\varepsilon$ | \tcb{\int Id} \\
     \textit{link\_state} &::=& $\varepsilon$ | \tcb{!n} | \tcb{!\_} | \tcb{?}  \\\\
    \textit{token\_expression} &::=&  \textit{algebraic\_expression}\tcb{:}\textit{token\_name} \\
@@ -336,7 +336,7 @@ Sticking with \ttt{A}'s signature\index{agent signature}, the rule
 \ITE{
 \item[] \ttt{\var{budding A}~A(z)} $\rar$ \ttt{A(z!1),A(x!1) @ $\ga$ } 
 }
-indicates that an agent \ttt{A} free on site \ttt{z}, no matter what its internal state is, may beget a new copy of \ttt{A} bound to it \via site \ttt{x}. Note that in the RHS, agent \ttt{A}' s interface is not completely described. Following the DCDW convention\index{don't care don't write}, \KaSim~will then assume that the sites that are not mentioned are created in the \emph{default state}\index{default state}, \ie they appear free of any bond and their internal state (if any) is the first of the list shown in the signature\index{agent signature} (here state \ttt{u} for \ttt{y} and \ttt{0} for \ttt{z}).
+indicates that an agent \ttt{A} free on site \ttt{z}, no matter what its internal state is, may beget a new copy of \ttt{A} bound to it \via site \ttt{x}. Note that in the RHS, the interface of the new copy is not completely described. Following the DCDW convention\index{don't care don't write}, \KaSim~will then assume that the sites that are not mentioned are created in the \emph{default state}\index{default state}, \ie they appear free of any bond and their internal state (if any) is the first of the list shown in the signature\index{agent signature} (here state \ttt{u} for \ttt{y} and \ttt{0} for \ttt{z}).
 
 Importantly, \KaSim~respects the \emph{longest prefix convention}\index{longest prefix convention} to determine which agent in the RHS stems from an agent in the LHS. 
 In a word, from a rule of the form $a_1,\dots,a_n\rar b_1,\dots,b_k$, with $a_i$s and $b_j$s being agents, one computes the largest $i\leq n,k$ such that the agents $a_1,\dots,a_i$ are pairwise consistent with $b_1,\dots,b_i$, \ie the $a_j$s and $b_j$s have the same name and the same number of sites. In which case we say that the for all $j\leq i$, $a_j$ is \emph{preserved} by the transition and for all $j>i$, $a_j$ is \emph{deleted} by the transition and $b_j$ is \emph{created} by the transition. This convention allows us to write a deletion rule as:
@@ -555,13 +555,13 @@ where \ttt{var\_name} can be any string and \textit{algebraic\_expression} are d
 \toprule
 \ttt{\tcb{unary/binary\_op}} & Interpretation \\
 \midrule
-\ttt{[}$f$\texttt{]} & the intuitive mathematical function or constant \\ &associated to $f\in\set{\hbox{\ttt{log,sin,cos,tan,sqrt,pi}}}$ \\
-\ttt{[mod]} & the \emph{modulo} operator (infix notation)\\
-\ttt{[max]} & the \emph{maximum} between two values \\
-\ttt{[min]} & the \emph{minimum} between two values \\
-\ttt{[exp]} & the exponentiation operation $x\mapsto e^x$ \\
+\ttt{[}$f$\texttt{]} & usual mathematical functions and constants \\ &with $f\in\set{\hbox{\ttt{log,exp,sin,cos,tan,sqrt,pi}}}$ \\
 \ttt{[int]} & the floor function $x\in\Real\mapsto \lfloor x\rfloor\in\Z$ \\
-\ttt{+,-,*,/,\^} & the corresponding mathematical operators (infix notation)\\
+\ttt{+,-,*,/,\^} & basic mathematical operators (infix notation)\\
+\ttt{[mod]} & the \emph{modulo} operator (infix notation)\\
+\ttt{[max]} & the \emph{maximum} of two values \\
+\ttt{[min]} & the \emph{minimum} of two values \\
+%\ttt{[exp]} & the exponentiation operation $x\mapsto e^x$ \\
 \bottomrule
 \end{tabular}
 \label{tab:operators}
@@ -598,7 +598,7 @@ The initial mixture\index{mixture} to which rules in the KF\index{kappa file} wi
 }
 or
 \ITE{
-\item[] \ttt{\%init: }  \textit{token} \ttt{<-} \textit{algebraic\_expression}
+\item[] \ttt{\%init: }  \textit{token\_name} \ttt{<-} \textit{algebraic\_expression}
 }
 
 %%
@@ -703,7 +703,7 @@ where \textit{boolean\_expression} and \textit{effect\_list}\index{effect} are d
     \textit{effect\_list} &::=& \textit{effect} \tcb{\ttt {;}} \textit{effect\_list} | \textit{effect} \\\\
 \textit{effect} &::=& \tcb{\$ADD} \textit{algebraic\_expression agent\_expression} \\
     && | \tcb{\$DEL} \textit{algebraic\_expression agent\_expression} \\
-    && | \tcb{t <-} \textit{algebraic\_expression} \\
+    && | \textit{token\_name} \tcb{<-} \textit{algebraic\_expression} \\
     && | \tcb{\$SNAPSHOT} \textit{string\_expression}\\
     && | \tcb{\$STOP} \textit{string\_expression}\\
 	&& | \tcb{\$FLUX} \textit{string\_expression} \textit{boolean} \\
@@ -782,9 +782,7 @@ will ask \KaSim~to export the mixture\index{mixture} the first time the percenta
 \item[] \%mod:  [E-]/[E]>0.9 do \$SNAPSHOT
 }}
 in which case the default prefix \ttt{snap} will be used for naming snapshots.
-
-Note that if the name already exists a counter will be appended at the end of the file to prevent overwriting.
-Note that snapshots can be performed multiple times, for instance every 1000 events, using the declaration\index{declaration}:
+If the name already exists a counter will be appended at the end of the file to prevent overwriting. Snapshots can be performed multiple times, for instance every 1000 events, using the declaration\index{declaration}:
 \ttt{\ITE{
 \item[] \%mod: \ttt{repeat} ([E+] [mod] 1000)=0 do \$SNAPSHOT \textquotedbl abc\textquotedbl~until [false] 
 }}
