@@ -51,10 +51,12 @@ type rule = {
   k_op: mixture ast_alg_expr with_pos option ; (*rate for backward rule*)
 }
 
+let flip_label str = str^"_op"
+
 let flip (rule_label,rule) =
   let lbl = match rule_label with
       None -> None
-    | Some (str,pos) -> Some (str^"_op",pos) in
+    | Some (str,pos) -> Some (flip_label str,pos) in
   let rule =
     {rule with
       lhs = rule.rhs ;

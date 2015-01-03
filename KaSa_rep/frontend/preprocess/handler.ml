@@ -106,7 +106,16 @@ let string_of_rule parameters error handler compiled rule_id =
              let label = rule.Cckappa_sig.e_rule_label in 
              let error,(m1,_) = Misc_sa.unsome (error,label) 
 	       (fun error -> error,("",(Lexing.dummy_pos,Lexing.dummy_pos))) in 
-             error,(if m1="" then ("rule "^(string_of_int rule_id)) else ("rule "^string_of_int rule_id)^": "^m1)
+             let m1 = 
+	       if m1 = "" then m1
+	       else 
+		 match 
+		   rule.Cckappa_sig.e_rule_initial_direction 
+		 with
+		 | Direct -> m1 
+		 | Reverse -> Ast.flip_label m1 
+	     in 
+	     error,(if m1="" then ("rule "^(string_of_int rule_id)) else ("rule "^string_of_int rule_id)^": "^m1)
     end 
   else 
     begin
@@ -205,7 +214,16 @@ let print_rule_dot parameters error rule_id m1 m2 rule =
          | None -> let a,b = warn parameters error (Some "line 103") Exit () in a,false,b
          | Some rule ->
              let label = rule.Cckappa_sig.e_rule_label in 
-             let error,(m1,_) = Misc_sa.unsome (error,label) (fun error -> error,("",(Lexing.dummy_pos,Lexing.dummy_pos))) in 
+	     let error,(m1,_) = Misc_sa.unsome (error,label) (fun error -> error,("",(Lexing.dummy_pos,Lexing.dummy_pos))) in 
+	     let m1 = 
+	       if m1 = "" then m1
+	       else 
+		 match 
+		   rule.Cckappa_sig.e_rule_initial_direction 
+		 with
+		 | Direct -> m1 
+		 | Reverse -> Ast.flip_label m1 
+	     in 
              let error = print_rule parameters error rule_id m1 (string_of_int rule_id) rule.Cckappa_sig.e_rule_rule in  
                error,true,() 
     end 
