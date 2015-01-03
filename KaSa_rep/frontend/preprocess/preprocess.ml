@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   * 
   * Creation: 12/08/2010
-  * Last modification: 09/12/2014
+  * Last modification: 02/01/2015
   * * 
   * Translation from kASim ast to OpenKappa internal representations, and linkage
   *  
@@ -240,12 +240,12 @@ let translate_view parameters error handler k kasim_id agent bond_list =
                     site_name 
                     { Cckappa_sig.site_name = site_name ;
                       Cckappa_sig.site_position = Lexing.dummy_pos,Lexing.dummy_pos ; 
-                      Cckappa_sig.site_free = port.Ckappa_sig.port_free ; 
-                        Cckappa_sig.site_state = 
-                          {
-                            Cckappa_sig.min = (internal:int) ; 
-                            Cckappa_sig.max = internal
-                          };
+                      Cckappa_sig.site_free = None ; 
+                      Cckappa_sig.site_state = 
+                        {
+                          Cckappa_sig.min = (internal:int) ; 
+                          Cckappa_sig.max = internal
+                        };
                     } c_interface
             | _ -> warn parameters error (Some "line 199") Exit c_interface 
         in 
@@ -295,7 +295,7 @@ let translate_view parameters error handler k kasim_id agent bond_list =
                         Cckappa_sig.site_name = site_name ;
                         Cckappa_sig.site_free = port.Ckappa_sig.port_free; 
                         Cckappa_sig.site_position = Lexing.dummy_pos,Lexing.dummy_pos; 
-                        Cckappa_sig.site_state = {Cckappa_sig.min = 1; Cckappa_sig.max = max}
+                        Cckappa_sig.site_state = {Cckappa_sig.min = min 1 max; Cckappa_sig.max = max}
                       } 
                       c_interface 
                 in 
@@ -498,7 +498,8 @@ let translate_mixture parameters error handler mixture =
    ag.Cckappa_sig.agent_interface ag'.Cckappa_sig.agent_interface set
    
    
- let equ_port s1 s2 = s1.Cckappa_sig.site_name = s2.Cckappa_sig.site_name 
+ let equ_port s1 s2 = 
+   s1.Cckappa_sig.site_name = s2.Cckappa_sig.site_name 
    && s1.Cckappa_sig.site_free = s2.Cckappa_sig.site_free 
    && s1.Cckappa_sig.site_state = s2.Cckappa_sig.site_state 
 
