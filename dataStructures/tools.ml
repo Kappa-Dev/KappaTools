@@ -104,18 +104,20 @@ let kasim_open_out f =
   open_out (kasim_path f)
 
 let find_available_name name ext =
-  let base = try Filename.chop_extension name with _ -> name in
+  let base = try Filename.chop_extension name
+	     with Invalid_argument _ -> name in
   if Sys.file_exists (base^"."^ext) then
     let v = ref 0 in
     let () =
-      while Sys.file_exists (base^"~"^(string_of_int !v)^"."^ext) do incr v; done
+      while Sys.file_exists (base^"~"^(string_of_int !v)^"."^ext)
+      do incr v; done
     in base^"~"^(string_of_int !v)^"."^ext
   else
     (base^"."^ext)
 
 let open_out_fresh_filename base_name concat_list ext =
   let tmp_name =
-    try kasim_path (Filename.chop_extension base_name) with _ -> base_name
-  in
+    kasim_path (try Filename.chop_extension base_name
+		with Invalid_argument _ -> base_name) in
   let base_name = String.concat "_" (tmp_name::concat_list) in
   open_out (find_available_name base_name ext)
