@@ -121,3 +121,10 @@ let open_out_fresh_filename base_name concat_list ext =
 		with Invalid_argument _ -> base_name) in
   let base_name = String.concat "_" (tmp_name::concat_list) in
   open_out (find_available_name base_name ext)
+
+let mk_dir_r d =
+  let rec aux d =
+    let par = Filename.dirname d in
+    let () = if not (Sys.file_exists par) then aux par in
+    Unix.mkdir d 0o775 in
+  Unix.handle_unix_error aux d

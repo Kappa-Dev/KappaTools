@@ -37,7 +37,7 @@
 
 %mod: repeat ([E+] [mod] 1000 = 0) do \
  ($UPDATE 'snapshots' ('snapshots'+1) ; \
- $SNAPSHOT <"snap".[int]([E+]/1000).".ka">) \
+ $SNAPSHOT "snap".[int]([E+]/1000).".ka") \
  until [false]
 
 %mod: [T]>5 do $ADD 10000 C()

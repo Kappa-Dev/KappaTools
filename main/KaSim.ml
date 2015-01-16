@@ -59,11 +59,11 @@ let main =
     ("-d",
      Arg.String
        (fun s ->
-	try
-	  if Sys.is_directory s then Parameter.outputDirName := s
-	  else (Format.eprintf "'%s' is not a directory@." s ; exit 1)
-	with Sys_error msg -> (*directory does not exists*)
-	  (Format.eprintf "%s@." msg ; exit 1)
+	let () = try
+	    if not (Sys.is_directory s)
+	    then (Format.eprintf "'%s' is not a directory@." s ; exit 1)
+	  with Sys_error msg -> Tools.mk_dir_r s in
+	Parameter.outputDirName := s
        ), "Specifies directory name where output file(s) should be stored") ;
     ("-load-sim", Arg.String (fun file -> Parameter.marshalizedInFile := file),
      "load simulation package instead of kappa files") ;
