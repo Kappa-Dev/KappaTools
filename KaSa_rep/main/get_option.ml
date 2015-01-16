@@ -16,6 +16,6 @@ let options = List.rev []
   
 let get_option error = 
   let parameters = Remanent_parameters.get_parameters () in   
-  let _ = SuperargTk.parse parameters options FileName.input in 
-  error,parameters,!FileName.input 
+  let _ = SuperargTk.parse parameters options FileNames.input in 
+  error,parameters,!FileNames.input 
   
