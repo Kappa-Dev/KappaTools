@@ -1535,7 +1535,7 @@ let snapshot state counter desc hr env =
 	  (fun sign specs ->
 	   List.iter
 	     (fun (spec,k) ->
-	      Format.fprintf desc "@[<v>%%init: %d\\@,%a@]@," k
+	      Format.fprintf desc "@[<v>%%init: %d\\@,@[<h>%a@]@]@," k
 			     (Species.print env) spec
 	     ) specs
 	  ) table ;

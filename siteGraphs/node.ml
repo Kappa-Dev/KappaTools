@@ -64,7 +64,7 @@ let label node env =
   match str_intf with
   | [] -> Environment.name node.name env
   | _ ->
-     Format.asprintf "%s(%a)" (Environment.name node.name env)
+     Format.asprintf "%s(@[<h>%a@])" (Environment.name node.name env)
 		     (Pp.list Pp.space Format.pp_print_string)
 		     (List.rev str_intf)
 
@@ -113,7 +113,7 @@ let to_string with_detail (hsh_lnk,fresh) node env =
 	   Format.fprintf f "(%d,%d)" m c in
 	 ((if with_detail then
 	     Format.asprintf
-	       "%s%s%a%s%a" s_i s_int
+	       "%s%s@[<h>%a@]%s@[<h>%a@]" s_i s_int
 	       (Pp.set LiftSet.elements Pp.comma pp_lift) lifts_int s_lnk
 	       (Pp.set LiftSet.elements Pp.comma pp_lift) lifts_lnk
 	   else
@@ -122,11 +122,11 @@ let to_string with_detail (hsh_lnk,fresh) node env =
   in
   let s_addr = try string_of_int (get_address node) with Not_found -> "na" in
   if with_detail then
-    (Format.asprintf "%s_%s:[%a]" (Environment.name node.name env) s_addr
+    (Format.asprintf "%s_%s:[@[<h>%a@]]" (Environment.name node.name env) s_addr
 		     (Pp.list Pp.comma Format.pp_print_string) (List.rev intf_l)
     ,fresh')
   else
-    (Format.asprintf "%s(%a)" (Environment.name node.name env)
+    (Format.asprintf "%s(@[<h>%a@])" (Environment.name node.name env)
 		     (Pp.list Pp.comma Format.pp_print_string) (List.rev intf_l)
     ,fresh')
 
