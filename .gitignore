@@ -14,6 +14,17 @@ _build/
 ._d/
 ._ncdi/
 
+# doc
+*.log
+*.aux
+*.out
+man/KaSim_manual.pdf
+man/KaSim_manual.bbl
+man/KaSim_manual.blg
+man/KaSim_manual.idx
+man/KaSim_manual.lot
+man/KaSim_manual.toc
+
 # test suite
 models/cflows/*/output/*.diff
 models/cflows/*/output/*.dot

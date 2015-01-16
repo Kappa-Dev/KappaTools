@@ -19,7 +19,7 @@ endif
 
 
 .PHONY: all clean temp-clean-for-ignorant-that-clean-must-be-done-before-fetch
-.PHONY: check build-tests
+.PHONY: check build-tests doc
 
 %.native %.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*)
 	$(OCAMLBINPATH)ocamlbuild $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) $@
@@ -28,12 +28,21 @@ bin/%: %.native
 	[ -d bin ] || mkdir bin && cp $< $@
 	rm -f $(notdir $@) && ln -s $@ $(notdir $@)
 
+
+%.pdf: %.tex
+	cd $(dir $<) && pdflatex $(notdir $<) && \
+	bibtex $(basename $(notdir $<)) && \
+	pdflatex $(notdir $<) && pdflatex $(notdir $<)
+
+doc: man/KaSim_manual.pdf
+
 all: bin/KaSim bin/KaSa
 
 clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch
 	$(OCAMLBINPATH)ocamlbuild -clean
 	rm -f KaSim bin/KaSim KaSa bin/KaSa
 	find . -name \*~ -delete
+	find man \( -not -name \*.tex -and -name KaSim_manual.\* \) -delete
 	+$(MAKE) KAPPABIN=$(CURDIR)/bin/ -C models/cflows clean
 
 check:
