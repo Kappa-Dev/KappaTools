@@ -4,8 +4,11 @@ before_install:
   - sudo add-apt-repository ppa:avsm/ppa -y
   - sudo apt-get update -qq
 
-install: sudo apt-get install -qq ocaml-nox
+install:
+  - sudo apt-get install -qq ocaml-nox
+  - sudo apt-get install -qq  gnuplot-nox graphviz texlive-latex-base
 
 script:
   - make all
+  - make doc_html
   - make -j2 check
