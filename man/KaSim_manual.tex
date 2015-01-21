@@ -31,7 +31,8 @@
 
 \def\KaSim{\textsf{KaSim}}
 \def\sep{\hbox{-}}
-\def\int{\hbox{\texttt{\~}}}
+\def\int{\textasciitilde}
+\def\intstate{\textasciitilde}
 \def\tcb#1{\textcolor{blue}{\ttt{#1}}}
 \def\ttt#1{\texttt{#1}}
 \def\var#1{{\textquotesingle}#1{\textquotesingle}}
@@ -62,7 +63,6 @@
 \def\imp#1{\emph{#1}\index{#1}}
 %%%%
 \def\version{3}
-
 
 \title{KaSim\version~reference manual\\ \small (release 4-dev)}
 \author{Pierre Boutillier, J\'er\^ome Feret and Jean Krivine\thanks{corresponding author: jean.krivine@pps.univ-paris-diderot.fr} \\\url{KappaLanguage.org}}
@@ -176,8 +176,8 @@ Table~\ref{tab:options} summarizes the main options that are accessible through 
 \begin{tabular}{|l|l|}
 \hline 
 Argument & Description \\ \hline
-\ttt{-e $e_\mit{max}$} & Terminates simulation after $e_\mit{max}\geq 0$ events\\
-\ttt{-t $t_\mit{max}$} & Terminates simulation after $t_\mit{max}\geq 0.0$ time units\\
+\ttt{-e $e_{\mit{max}}$} & Terminates simulation after $e_{\mit{max}}\geq 0$ events\\
+\ttt{-t $t_{\mit{max}}$} & Terminates simulation after $t_{\mit{max}}\geq 0.0$ time units\\
 \ttt{-p $n$} & Produces a data file\index{data file} (default: \ttt{data.out}) with $n\geq 0$ data points\\
 \ttt{-o} \textit{file} & Set the name of data file to \textit{file}\\ 
 \ttt{-d} \textit{dir} & Output any produced file to the directory \textit{dir}\\
@@ -247,7 +247,7 @@ marker \ttt{\#} that tells \KaSim~to ignore the rest of the line. The
 combined use of \ttt{$\bs$} and \ttt{\#} allows to write comments in
 the middle of a declaration\index{declaration}.
 
-\section{Agent and token signature\index{agent signature}s}\label{sec:sig}
+\section{Agent and token signatures}\index{agent signature}\label{sec:sig}
 %
 In Kappa there are two entities that can be used for representing biological elements: \imp{agents} and \imp{tokens}.  Agents are used to represent complex molecules that may bind to other molecules on specific sites. Tokens are typically used to represent small particles such as ions, ATP, etc. Tokens cannot bind to each other, they can only appear or disappear. In a given model, agents always have a discrete number of instances while tokens may have a continuous concentration.
 
@@ -264,7 +264,7 @@ according to the grammar given Table~\ref{tab:sig} where terminal symbols are wr
   \begin{tabular}{@{} lcl @{}}
     \textit{signature\_expression} & ::= & \tcb{Id}\tcb{(}\textit{sig}\tcb{)} \\ 
     \textit{sig} & ::= & \tcb{Id}~\textit{internal\_state\_list}\tcb{,}\ \textit{sig} $\mid\varepsilon$ \\ 
-    \textit{internal\_state\_list} & ::= & \tcb{\int Id}~\textit{internal\_state\_list} $\mid\varepsilon$
+    \textit{internal\_state\_list} & ::= & \tcb{\intstate Id}~\textit{internal\_state\_list} $\mid\varepsilon$ 
     \end{tabular}
   \label{tab:sig}
 \end{table}
@@ -272,7 +272,7 @@ according to the grammar given Table~\ref{tab:sig} where terminal symbols are wr
 
 For instance the line:
 \ITE{
-\item[] \ttt{\%agent: A(x,y\int u\int p,z\int 0\int 1\int 2) \# Signature of agent A} 
+\item[] \ttt{\%agent: A(x,y\intstate u\intstate p,z\intstate 0\intstate 1\intstate 2) \# Signature of agent A}
 }
 will declare an agent \ttt{A} with 3 \emph{(interaction) sites} \ttt{x,y} and \ttt{z} with the site \ttt{y} possessing two \emph{internal states}\index{internal state} \ttt{u} and \ttt{p} (for instance for the unphosphorylated and phosphorylated forms of \ttt{y}) and the site \ttt{z} having three possible states $0$, $1$ and $2$. Note that internal states\index{internal state} values are treated as untyped symbols by \KaSim, so choosing a character or an integer as internal state is purely a matter of convention. 
 
@@ -310,7 +310,7 @@ Token expressions are also given by the grammar in Table~\ref{tab:patterns}.
     \textit{kappa\_expression} & ::= & \textit{agent\_expression} \tcb{,} \textit{kappa\_expression} $\mid\varepsilon$ \\ 
     \textit{agent\_expression} & ::= &  \tcb{Id}\tcb{(}\textit{interface}\tcb{)} \\
     \textit{interface} &::=& \tcb{Id} \textit{internal\_state link\_state}  \tcb{,} \textit{interface} $\mid\varepsilon$ \\
-    \textit{internal\_state} &::=& $\varepsilon$ | \tcb{\int Id} \\
+    \textit{internal\_state} &::=& $\varepsilon$ | \tcb{\intstate Id} \\
     \textit{link\_state} &::=& $\varepsilon$ | \tcb{!n} | \tcb{!\_} | \tcb{?}  \\\\
    \textit{token\_expression} &::=&  \textit{algebraic\_expression}\tcb{:}\textit{token\_name} \\
 	&&|  \textit{token\_expression} \tcb{+}\ \textit{token\_expression} \\\\
@@ -322,12 +322,13 @@ Token expressions are also given by the grammar in Table~\ref{tab:patterns}.
   \label{tab:patterns}
 \end{table}
 %%
+
 \subsection{Pure rules}\index{pure rule}
 
 \subsubsection*{A simple rule}
 With the signature\index{agent signature} of \ttt{A} defined in the previous section, the line
 \ITE{
-\item[] \ttt{{\textquotesingle}A dimerization\textquotesingle~  A(x),A(y\int p)} $\rar$ \ttt{A(x!1),A(y\int p!1) @ $\ga$} 
+\item[] \ttt{{\textquotesingle}A dimerization\textquotesingle~  A(x),A(y\intstate p)} $\rar$ \ttt{A(x!1),A(y\intstate p!1) @ $\ga$} 
 }
 declares a dimerization rule between two instances of agent \ttt{A} provided the second is phosphorylated (say that is here the meaning of \ttt{p}) on site \ttt{y}. Note that the bond between both \ttt{A}s is denoted by the identifier \ttt{!1} which uses an arbitrary integer (\ttt{!0} would denote the same bond). In Kappa, a bond may connect exactly two sites so any occurrence of a bond identifier \ttt{!}$n$ has to be paired with exactly one other sibling in the expression. Note also the fact that site \ttt{z} of \ttt{A} is not mentioned in the expression which means that it has no influence on the triggering of this rule. This is the \emph{don't care don't write convention} (DCDW) \index{don't care don't write} that plays a key role in resisting combinatorial explosion when writing models.
 
@@ -353,9 +354,9 @@ It may happen that the application of a rule has some \emph{side effects}\index{
 }
 The \ttt{A} in the graph that is matched to the second occurrence of \ttt{A} in the LHS will be deleted by the rule. As a consequence all its sites will disappear together with the bonds that were pointing to them. For instance, when applied to the graph 
 \ITE{
-\item[] $G=$\ttt{A(x!1,y\int p,z\int2),A(x!2,y\int u,z\int0!1),C(t!2)}
+\item[] $G=$\ttt{A(x!1,y\intstate p,z\intstate2),A(x!2,y\intstate u,z\intstate0!1),C(t!2)}
 } 
-the above rule will result in a new graph $G' =\ttt{A(x!1,y\int p,z\int2),C(t)}$ where the site \ttt{t} of \ttt{C} is now free as side effect.
+the above rule will result in a new graph $G' =\ttt{A(x!1,y{\intstate}p,z\intstate2),C(t)}$ where the site \ttt{t} of \ttt{C} is now free as side effect.
 
 \emph{Wildcard} symbols for link state \ttt{?} (for bound or not), \ttt{!\_} (for bound to someone), may also induce side effects when they are not preserved in the RHS of a rule, as in
 \ITE{
@@ -377,7 +378,7 @@ Using KaSim \imp{hybrid rules}, one may declare that an action has effects on th
 }
 One may then use these tokens in conjunction with a classical rule using the hybrid format:
 \ITE{
-\item[] \ttt{\var{hybrid rule}~ S(x\int u!1),K(y!1)\ |\ 0.1:atp $\rar$ S(x\int p),K(y)\ |\ 0.1:adp\ @ \var{k}} 
+\item[] \ttt{\var{hybrid rule}~ S(x\intstate u!1),K(y!1)\ |\ 0.1:atp $\rar$ S(x\intstate p),K(y)\ |\ 0.1:adp\ @ \var{k}} 
 }
 When applied, the above rule will consume 0.1 \ttt{atp} token and produce 0.1 \ttt{adp} token. Note that as specified by the grammar given Table~\ref{tab:patterns}, the number of consumed (and produced) tokens can be given by a sum of the form:
 \ITE{
@@ -501,7 +502,7 @@ Notice at lines 10-12 the use of binary/unary notation for rules. As a result bi
 
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=10cm]{img/poly.pdf}
+\includegraphics[width=15cm,natwidth=2171pt,natheight=581pt]{generated_img/poly.png}
 \caption{Final mixture\index{mixture} obtained after 10,000 events of simulation of the \ttt{poly.ka} model. The infinite rate for cycle closure allows one to obtain a large number of triangles.}
 \label{fig:species}
 \end{center}
@@ -605,10 +606,10 @@ or
 where \textit{algebraic\_expression} is evaluated before initialization of the simulation (hence all token and kappa expression values in the expression are evaluated to 0). This will add to the initial state of the model \textit{mult} copies of the graph described by the kappa expression. Again the DCDW convention\index{don't care don't write} allows us not to write the complete interface of added agents (the remaining sites will be completed according to the agent's signature\index{agent signature}). For instance:
 \ITE{
 \item[] \ttt{\%var: {\textquotesingle}n\textquotesingle~1000}
-\item[] \ttt{\%init: {\textquotesingle}n\textquotesingle~(A(),A(y\int p))}
+\item[] \ttt{\%init: {\textquotesingle}n\textquotesingle~(A(),A(y\intstate p))}
 \item[] \ttt{\%init: ca2+ <- 0.39 \#mM}
 }
-will add 1000 instances of \ttt{A} in its default state \ttt{A(x,y\int u,z\int 0)}, 1000 instances of \ttt{A} in state \ttt{A(x,y\int p,z\int 0)} and a concentration of 0.39 mM of calcium ions. Recall that the concentration of calcium can be observed during simulation using \ttt{|ca2+|}.
+will add 1000 instances of \ttt{A} in its default state \ttt{A(x,y\intstate u,z\intstate 0)}, 1000 instances of \ttt{A} in state \ttt{A(x,y\intstate p,z\intstate 0)} and a concentration of 0.39 mM of calcium ions. Recall that the concentration of calcium can be observed during simulation using \ttt{|ca2+|}.
 As any other declaration\index{declaration}, \ttt{\%init} can be used multiple times, and agents will add up to the initial state.
 
 \chapter{A simple model}\label{chap:abc}
@@ -621,32 +622,32 @@ We describe below the content of a simple Kappa model and give examples of some 
 \item \tcb{\#\#\#\# Signatures}
 \item \%agent: A(x,c) \tcb{\# Declaration of agent A}
 \item \%agent: B(x) \tcb{\# Declaration of B}
-\item \%agent: C(x1\int u\int p,x2\int u\int p) \tcb{\# Declaration of C with 2 modifiable sites}
+\item \%agent: C(x1\intstate u\intstate p,x2\intstate u\intstate p) \tcb{\# Declaration of C with 2 modifiable sites}
 \item \tcb{\#\#\#\# Rules}
 \item {\textquotesingle}a.b{\textquotesingle} A(x),B(x) -> A(x!1),B(x!1) @ {\textquotesingle}on\_rate{\textquotesingle} \tcb{\#A binds B}
 \item {\textquotesingle}a..b{\textquotesingle} A(x!1),B(x!1) -> A(x),B(x) @ {\textquotesingle}off\_rate{\textquotesingle} \tcb{\#AB dissociation}
-\item {\textquotesingle}ab.c{\textquotesingle} A(x!\_,c),C(x1\int u) -> A(x!\_,c!2),C(x1\int u!2)  @ {\textquotesingle}on\_rate{\textquotesingle} \tcb{\#AB binds C}
-\item {\textquotesingle}mod x1{\textquotesingle} C(x1\int u!1),A(c!1) -> C(x1\int p),A(c)  @ {\textquotesingle}mod\_rate{\textquotesingle} \tcb{\#ABC modifies x1}
-\item {\textquotesingle}a.c{\textquotesingle} A(x,c),C(x1\int p,x2\int u) -> A(x,c!1),C(x1\int p,x2\int u!1) @ {\textquotesingle}on\_rate{\textquotesingle} \tcb{\#A binds C on x2}
-\item {\textquotesingle}mod x2{\textquotesingle} A(x,c!1),C(x1\int p,x2\int u!1) -> A(x,c),C(x1\int p,x2\int p) @ {\textquotesingle}mod\_rate{\textquotesingle} \tcb{\#A modifies x2}
+\item {\textquotesingle}ab.c{\textquotesingle} A(x!\_,c),C(x1\intstate u) -> A(x!\_,c!2),C(x1\intstate u!2)  @ {\textquotesingle}on\_rate{\textquotesingle} \tcb{\#AB binds C}
+\item {\textquotesingle}mod x1{\textquotesingle} C(x1\intstate u!1),A(c!1) -> C(x1\intstate p),A(c)  @ {\textquotesingle}mod\_rate{\textquotesingle} \tcb{\#ABC modifies x1}
+\item {\textquotesingle}a.c{\textquotesingle} A(x,c),C(x1\intstate p,x2\intstate u) -> A(x,c!1),C(x1\intstate p,x2\intstate u!1) @ {\textquotesingle}on\_rate{\textquotesingle} \tcb{\#A binds C on x2}
+\item {\textquotesingle}mod x2{\textquotesingle} A(x,c!1),C(x1\intstate p,x2\intstate u!1) -> A(x,c),C(x1\intstate p,x2\intstate p) @ {\textquotesingle}mod\_rate{\textquotesingle} \tcb{\#A modifies x2}
 \item \tcb{\#\#\#\# Variables}
 \item \%var: {\textquotesingle}on\_rate{\textquotesingle} 1.0E-4 \tcb{\# per molecule per second}
 \item \%var: {\textquotesingle}off\_rate{\textquotesingle} 0.1 \tcb{\# per second}
 \item \%var: {\textquotesingle}mod\_rate{\textquotesingle} 1 \tcb{\# per second}
 \item \%obs: {\textquotesingle}AB{\textquotesingle} |A(x!x.B)|
-\item \%obs: {\textquotesingle}Cuu{\textquotesingle} |C(x1\int u,x2\int u)|
-\item \%obs: {\textquotesingle}Cpu{\textquotesingle} |C(x1\int p,x2\int u)|
-\item \%obs: {\textquotesingle}Cpp{\textquotesingle} |C(x1\int p,x2\int p)|
+\item \%obs: {\textquotesingle}Cuu{\textquotesingle} |C(x1\intstate u,x2\intstate u)|
+\item \%obs: {\textquotesingle}Cpu{\textquotesingle} |C(x1\intstate p,x2\intstate u)|
+\item \%obs: {\textquotesingle}Cpp{\textquotesingle} |C(x1\intstate p,x2\intstate p)|
 \item \tcb{\#\#\#\# Initial conditions}
 \item \%init: 1000 A(),B()
 \item \%init: 10000 C()
 }
 }}
-%
+
 
 Line 1-4 of this KF\index{kappa file} contains signature\index{agent signature} declarations\index{signature}\index{declaration}. Agents of type \ttt{C} have 2 sites \ttt{x1} and \ttt{x2} whose internal state may be \ttt{u}(nphosphorylated) or \ttt{p}(hosphorylated). Recall that the default state of these sites is \ttt{u} (the first one). Line 8, rule \ttt{{\textquotesingle}ab.c{\textquotesingle}} binds an \ttt{A} connected to someone on site \ttt{x} (link type \ttt{!\_}) to a \ttt{C}. Note that the only rule that binds an agent to \ttt{x} of \ttt{A} is \ttt{{\textquotesingle}a.b{\textquotesingle}} at line 6. Hence the use of \ttt{!\_} is a commodity and the rule could be replaced by 
 \ITE{
-\item[]\ttt{\var{alt\_ab.c} A(x!1,c),B(x!1),C(x1\int u) $\rar\dots$}
+\item[]\ttt{\var{alt\_ab.c} A(x!1,c),B(x!1),C(x1\intstate u) $\rar\dots$}
 }
 There are two main points to notice about this model: \ttt{A} can modify both sites of \ttt{C} once it is bound to them. However, only an \ttt{A} bound to a \ttt{B} can connect on \ttt{x1} and only a free \ttt{A} can connect on \ttt{x2}. Note also that \ttt{x2} is available for connection only when \ttt{x1} is already modified. 
 
@@ -664,7 +665,7 @@ Plotting the content of the \ttt{abc.out} file one notices that nothing of signi
 which produces the data points whose rendering is given in Fig.~\ref{fig:abc}.
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=12cm]{img/plot-abc.png}
+\includegraphics[width=12cm]{generated_img/plot-abc.png}
 \caption{Simulation of the ABC model: population of unmodified \ttt{C}s (observable \ttt{Cuu} in red) drops rapidly and is replaced, in a first step by simply modified \ttt{C}s (observable \ttt{Cpu} in blue) which are in turn replaced by doubly modified \ttt{C}s (observable \ttt{Cpp} in red). Note that the population of \ttt{AB} complexes (observable \ttt{AB} in black) stabilizes slightly below 400 individuals after about 20s.}
 \label{fig:abc}
 \end{center}
@@ -741,7 +742,7 @@ will interrupt the simulation after exactly 10 time units.
 
 Continuing with the ABC model, the perturbation effect\index{effect}: 
 \ttt{\ITE{
-\item[] \$ADD $n$ C(x1\int p)
+\item[] \$ADD $n$ C(x1\intstate p)
 }}
 will add $n\geq 0$ instances of \ttt{C} with \ttt{x1} already in state \ttt{p} (and the rest of its interface in the default state as specified line 4 of ABC.ka). Also the perturbation effect\index{effect}:
 \ttt{\ITE{
@@ -757,13 +758,13 @@ The modified kappa file is available in the source repository, in the \ttt{model
 Running again a simulation (a bit longer) by entering in the command line:
 \ttt{
 \ITE{
-\item[\$] KaSim -i ABC-pert.ka -e 100000 -t 300 -o abc2.out
+\item[\$] KaSim -i ABC-pert.ka -e 100000 -t 300 -p 1000 -o abc2.out
 }}
 one obtains the curve given in Fig.~\ref{fig:abc2}. 
 
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=10cm]{img/plot-abc2.png}
+\includegraphics[width=10cm]{generated_img/plot-abc2.png}
 \caption{Simulation of the ABC model with a perturbation: for t<25s, only \ttt{{\textquotesingle}a.b{\textquotesingle}} and \ttt{{\textquotesingle}a..b{\textquotesingle}} rules may apply. This enables the concentration of \ttt{{\textquotesingle}AB{\textquotesingle}} complexes to go to steady state, before introducing fresh \ttt{C}s at t=25s.}
 \label{fig:abc2}
 \end{center}
@@ -805,7 +806,7 @@ In our ABC example, adding the instruction:
 
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width=5cm]{img/cflow.png}
+\includegraphics[width=5cm]{generated_img/cflow.png}
 \caption{Causal flow for the observable \ttt{{\textquotesingle}Cpp{\textquotesingle}} of the ABC model. Plain arrows represent causal dependency, dotted arrows show asymmetric conflict between rule occurrences. Here the \ttt{{\textquotesingle}ab.c{\textquotesingle}} rule has to occur before the \ttt{{\textquotesingle}a.b{\textquotesingle}} rule. Red observable indicate that the last rule allowed one to observe a new instance of \ttt{{\textquotesingle}Cpp{\textquotesingle}}.}
 \label{fig:cflow}
 \end{center}
@@ -832,7 +833,7 @@ will ask \KaSim~to output 3 versions of each computed causal flow, with all poss
 
 \begin{figure}[h] %  figure placement: here, top, bottom, or page
    \centering
-   \includegraphics[width=6cm]{img/flux.pdf} 
+\includegraphics[width=6cm,natwidth=921pt,natheight=793pt]{generated_img/flux.png}
    \caption{Flux map of the \ttt{abc.ka} model, taken from t=0 to t=20 time units. The \ttt{A} releasing rules \ttt{a..b} and \ttt{mod x2} are contributing very little to the activity of \ttt{a.c} which is a sign of an excess of free \ttt{A}s in the system at this time interval.}
    \label{fig:flux}
 \end{figure}
@@ -958,7 +959,7 @@ Unlike the flux map, the influence map is \emph{statically} computed and does no
 \begin{figure}[htbp] %  figure placement: here, top, bottom, or page
    \centering
    \includegraphics[width=15cm]{img/abc-im.png} 
-   \caption{The influence map of the \ttt{abc.ka} model defined in Chapter~\ref{chap:abc}. Note that observable \ttt{C(x1\int u?,x2\int u?)} is not activated by any other rule. This implies that its number of occurrences does not change during a simulation. Edge labels denote embeddings with the convention that $[i\rar j]$ denotes the embedding of agent number $i$ of the origin{\textquotesingle}s rhs, into agent $j$ of the target{\textquotesingle}s lhs.}
+   \caption{The influence map of the \ttt{abc.ka} model defined in Chapter~\ref{chap:abc}. Note that observable \ttt{C(x1\intstate u?,x2\intstate u?)} is not activated by any other rule. This implies that its number of occurrences does not change during a simulation. Edge labels denote embeddings with the convention that $[i\rar j]$ denotes the embedding of agent number $i$ of the origin{\textquotesingle}s rhs, into agent $j$ of the target{\textquotesingle}s lhs.}
    \label{fig:abc-im}
 \end{figure}
 
@@ -966,7 +967,7 @@ More formally, consider the rules $r:L\rar R$ and $s:L'\rar R'$. One wishes to k
 
 \begin{figure}[htbp] %  figure placement: here, top, bottom, or page
    \centering
-   \includegraphics[width=8cm]{img/im.png} 
+\includegraphics[width=8cm,natwidth=1462pt,natheight=756pt]{img/im.png}
    \caption{Computation of the influence of the top rule on the rule below: the right hand side of the first rules embeds in a common term with the left hand side of the second rule. It results that the first rule has a positive influence on the second.}
    \label{fig:im}
 \end{figure}
@@ -985,7 +986,8 @@ Null events\index{null event} is a way for \KaSim~to compensate for some over ap
 Make sure you have \ttt{\%obs} or \ttt{\%plot} instructions in your KF\index{kappa file}. Also make sure to use the \ttt{-p} option in the command line to tell KaSim how many points you wish to have on your curves. 
 
 \section*{Too many instances of an observable}
-The value of a kappa expression $E$  is equal to the number of embeddings\index{embedding} it has in the current mixture\index{mixture} $M$. Embeddings are maps from agents in $E$  to agents in $M$. If $E$ has symmetries then every permutation of $E$ will be counted as a new embedding. For instance let $E=$\ttt{A(x!1),A(x!1)} and let $M=$\ttt{A(x!1,y\int p),A(x!1,y\int u)}. \KaSim~will count two instances of $E$ in $M$: the one mapping the first \ttt{A} of $E$ to the first \ttt{A} of $M$ and the one mapping the first \ttt{A} of $E$ to the second \ttt{A} of $M$.
+The value of a kappa expression $E$  is equal to the number of embeddings\index{embedding} it has in the current mixture\index{mixture} $M$. Embeddings are maps from agents in $E$  to agents in $M$. If $E$ has symmetries then every permutation of $E$ will be counted as a new embedding. For instance let $E=$\ttt{A(x!1),A(x!1)}  and let $M=$\ttt{A(x!1,y\intstate p),A(x!1,y\intstate u)}. 
+\KaSim~will count two instances of $E$ in $M$: the one mapping the first \ttt{A} of $E$ to the first \ttt{A} of $M$ and the one mapping the first \ttt{A} of $E$ to the second \ttt{A} of $M$.
  
 \section*{The computed influence map is incorrect, it misses some activation or has to much of them}
 The influence map\index{influence map} contains relations that are computed on side effect free rules only. It is likely that a missing activation is due to a side effect that is not taken into account. If the influence map shows an activation between rule $r$ and $s$ that is never possible with a given model, just remember that activation computation implies that \emph{there exists} a context in which applying rule $r$ will create a new instance of rule $s$. This context might simply never be realized with the given rules or initial conditions.

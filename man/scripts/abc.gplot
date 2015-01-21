@@ -1,0 +1,15 @@
+set xlabel 'time'
+set ylabel 'concentration'
+set title 'abc.out'
+set term png linewidth 2
+set autoscale 
+set xrange [0.:250.]
+set yrange [0.:10500.]
+set output '../generated_img/plot-abc.png' 
+plot 'abc.out' using 1:2 title 'AB'w l lt rgb "black" 
+set output '../generated_img/plot-abc.png' 
+replot 'abc.out' using 1:3 title 'Cuu' w l lt rgb "red" 
+set output '../generated_img/plot-abc.png' 
+replot 'abc.out' using 1:4 title 'Cuu' w l lt rgb "blue" 
+set output '../generated_img/plot-abc.png' 
+replot 'abc.out' using 1:5 title 'Cuu' w l lt rgb "green" 
