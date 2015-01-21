@@ -53,7 +53,7 @@ bin/%: %.native
 	cd $(dir $<) && htlatex $(notdir $<)  "nma.cfg,htm,charset=utf-8,p-width" " -cunihtf -utf8" &&\
 	htlatex $(notdir $<)  "nma.cfg,htm,charset=utf-8,p-width" " -cunihtf -utf8"
 
-%.witness: %.sh bin/KaSim bin/KaSa $(MODELS)
+%.witness: %.sh $(MAGENREP) bin/KaSim bin/KaSa $(MODELS)
 	cd $(dir $@) && sh $(notdir $<) && touch $(notdir $@)
 
 doc: $(SCRIPTSWITNESS) man/KaSim_manual.pdf 
