@@ -32,8 +32,8 @@ MODELS = $(wildcard $(MANKAPPAMODELSREP)*.ka)
 .PHONY: check build-tests doc
 
 $(MANGENREP): 
-	rm -f $<
-	mkdir $<
+	rm -f $@
+	mkdir $@
 
 %.native %.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*)
 	$(OCAMLBINPATH)ocamlbuild $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) $@
@@ -53,7 +53,7 @@ bin/%: %.native
 	cd $(dir $<) && htlatex $(notdir $<)  "nma.cfg,htm,charset=utf-8,p-width" " -cunihtf -utf8" &&\
 	htlatex $(notdir $<)  "nma.cfg,htm,charset=utf-8,p-width" " -cunihtf -utf8"
 
-%.witness: %.sh $(MAGENREP) bin/KaSim bin/KaSa $(MODELS)
+%.witness: %.sh $(MANGENREP) bin/KaSim bin/KaSa $(MODELS)
 	cd $(dir $@) && sh $(notdir $<) && touch $(notdir $@)
 
 doc: $(SCRIPTSWITNESS) man/KaSim_manual.pdf 
