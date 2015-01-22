@@ -6,8 +6,7 @@ before_install:
 
 install:
   - sudo apt-get install -qq ocaml-nox
-  - sudo apt-get install -qq  gnuplot-nox graphviz
-  - sudo apt-get install -qq  texlive-latex-base texlive-fonts-recommended
+  - sudo apt-get install -qq gnuplot-nox graphviz texlive-latex-recommended
 
 script:
   - make all
