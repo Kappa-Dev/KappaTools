@@ -76,13 +76,13 @@ clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch clean_doc
 	$(OCAMLBINPATH)ocamlbuild -clean
 	rm -f KaSim bin/KaSim KaSa bin/KaSa
 	find . -name \*~ -delete
-	+$(MAKE) KAPPABIN=$(CURDIR)/bin/ -C models/cflows clean
+	+$(MAKE) KAPPABIN=$(CURDIR)/bin/ -C models/test_suite clean
 
 check:
-	@+$(MAKE) KAPPABIN=$(CURDIR)/bin/ -C models/cflows all
+	@+$(MAKE) KAPPABIN=$(CURDIR)/bin/ -C models/test_suite all
 
 build-tests:
-	@+$(MAKE) KAPPABIN=$(CURDIR)/bin/ -C models/cflows build
+	@+$(MAKE) KAPPABIN=$(CURDIR)/bin/ -C models/test_suite build
 
 temp-clean-for-ignorant-that-clean-must-be-done-before-fetch:
 	find . \( -name \*.cm\* -or -name \*.o -or -name \*.annot \) -delete
