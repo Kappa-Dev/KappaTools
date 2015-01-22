@@ -31,6 +31,8 @@ MODELS = $(wildcard $(MANKAPPAMODELSREP)*.ka)
 .PHONY: all clean temp-clean-for-ignorant-that-clean-must-be-done-before-fetch
 .PHONY: check build-tests doc clean_doc
 
+.PRECIOUS: $(SCRIPTSWITNESS)
+
 $(MANGENREP): 
 	rm -rf $@
 	mkdir $@
@@ -52,6 +54,9 @@ bin/%: %.native
 %.htm: %.tex %.pdf
 	cd $(dir $<) && htlatex $(notdir $<)  "nma.cfg,htm,charset=utf-8,p-width" " -cunihtf -utf8" &&\
 	htlatex $(notdir $<)  "nma.cfg,htm,charset=utf-8,p-width" " -cunihtf -utf8"
+
+%.witness: %.sh $(MANGENREP) bin/KaSim bin/KaSa $(MODELS) %.gplot 
+	cd $(dir $@) && KAPPABIN=$(CURDIR)/bin/ sh $(notdir $<) && touch $(notdir $@)
 
 %.witness: %.sh $(MANGENREP) bin/KaSim bin/KaSa $(MODELS)
 	cd $(dir $@) && KAPPABIN=$(CURDIR)/bin/ sh $(notdir $<) && touch $(notdir $@)
