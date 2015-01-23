@@ -1,0 +1,5 @@
+#Command-line:
+${KAPPABIN}KaSa abc.ka || exit 0 
+mv *.dot output/
+
+#This is the classical abc model. 

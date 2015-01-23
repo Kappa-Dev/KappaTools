@@ -20,7 +20,7 @@
 let version = "1.04"
 let date = "2014/12/10"
 let unsafe = ref true 
-let trace = ref false
+let trace = ref true 
 let dump_error_as_soon_as_they_occur = ref false 
 let log = ref stdout 
 let formatter = ref Format.std_formatter
