@@ -1,5 +1,4 @@
 #Command-line:
-${KAPPABIN}KaSa abc.ka || exit 0 
-mv *.dot output/
+${KAPPABIN}KaSa abc.ka --debugging-mode --output-directory output || exit 0 
 
 #This is the classical abc model. 
