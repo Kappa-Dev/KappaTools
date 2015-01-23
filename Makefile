@@ -130,6 +130,9 @@ release: fetch_version
 	echo -n $(DATE) > tag/date 
 	make PREF="Release " send_caml
 
+fetch_version:
+	cd tag ; git checkout HEAD * 
+
 send_caml: 
 	echo -n xxx$(VN)$(RELEASE)$(VERSION)$(DATE)xxx
 	echo -n let git_commit_version,git_commit_release,git_commit_tag,git_commit_date  = $(VERSION),$(RELEASE),$(VN),\"$(DATE)\" > KaSa_rep/automatically_generated/git_commit_info.ml 
