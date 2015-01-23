@@ -18,4 +18,5 @@
 "KaSa_rep/frontend/preprocess" : include
 "KaSa_rep/influence_map" : include
 "KaSa_rep/export_to_KaSim" : include
+"KaSa_rep/automatically_generated" : include
 true : bin_annot

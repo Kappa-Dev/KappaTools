@@ -37,7 +37,18 @@ let get_symbols () =
   
 let get_influence_map () = 
   {
-    Remanent_parameters_sig.im_file = !Config.influence_map_file ; 
+    Remanent_parameters_sig.im_file = 
+      (match !Config.influence_map_file 
+      with 
+      | "" -> None 
+      | x -> Some x) ;
+	
+    Remanent_parameters_sig.im_directory =
+      (match !Config.output_directory 
+      with 
+      | "" -> Some ""
+      | x -> Some (x^"/")) ; 
+	
     Remanent_parameters_sig.rule_shape = !Config.rule_shape ;
     Remanent_parameters_sig.rule_color = !Config.rule_color ; 
     Remanent_parameters_sig.variable_shape = !Config.variable_shape ;
@@ -52,7 +63,19 @@ let get_influence_map () =
   
 let get_contact_map () = 
    {
-    Remanent_parameters_sig.cm_file = !Config.contact_map_file ;
+     Remanent_parameters_sig.cm_file = 
+       (match !Config.contact_map_file 
+	with 
+	| "" -> None 
+	| x -> Some x) ;
+     
+     Remanent_parameters_sig.cm_directory =
+       (match !Config.output_directory 
+	with 
+	| "" -> Some ""
+      | x -> Some (x^"/")) ; 
+     
+
     Remanent_parameters_sig.binding_site_shape = !Config.binding_site_shape ;
     Remanent_parameters_sig.binding_site_color = !Config.binding_site_color ;
     Remanent_parameters_sig.internal_site_shape = !Config.internal_site_shape ;
@@ -116,20 +139,22 @@ let close_file parameters error =
     
 let open_influence_map_file parameters error = 
   let error,channel = 
-    match parameters.Remanent_parameters_sig.influence_map_output.Remanent_parameters_sig.im_file
+    match parameters.Remanent_parameters_sig.influence_map_output.Remanent_parameters_sig.im_file,parameters.Remanent_parameters_sig.influence_map_output.Remanent_parameters_sig.im_directory
     with 
-      | None -> error,stdout
-      | Some a -> error,open_out a 
+      | None,_  -> error,stdout
+      | Some a,None -> error,open_out a
+      | Some a,Some d -> error,open_out (d^a)
   in 
     error,
     {parameters with Remanent_parameters_sig.log = channel}
        
  let open_contact_map_file parameters error = 
   let error,channel = 
-    match parameters.Remanent_parameters_sig.contact_map_output.Remanent_parameters_sig.cm_file
+    match parameters.Remanent_parameters_sig.contact_map_output.Remanent_parameters_sig.cm_file,parameters.Remanent_parameters_sig.contact_map_output.Remanent_parameters_sig.cm_directory
     with 
-      | None -> error,stdout
-      | Some a -> error,open_out a 
+      | None,_ -> error,stdout
+      | Some a,None -> error,open_out a 
+      | Some a,Some d -> error,open_out (d^a)
   in 
     error,
     {parameters with Remanent_parameters_sig.log = channel}

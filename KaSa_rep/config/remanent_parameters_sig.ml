@@ -39,6 +39,7 @@ type symbol_table =
 
 type influence_map_output =
   {
+    im_directory : string option ;
     im_file : string option ; 
     rule_shape : string ; 
     rule_color : string ;
@@ -54,6 +55,7 @@ type influence_map_output =
   
 type contact_map_output = 
   {
+    cm_directory : string option ;
     cm_file : string option ;
     binding_site_shape : string ;
     binding_site_color : string ; 

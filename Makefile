@@ -1,3 +1,8 @@
+VN:=$(shell cat tag/number)#            #Git version number for commit tag
+VERSION:=$(shell cat tag/version)#      #Major revision release number
+RELEASE:=$(shell cat tag/release)#      #Release number
+DATE:=`date +'%Y-%m-%d %H:%M:%S'`#      #date YYYY-MM-DD 
+
 .DEFAULT_GOAL := all
 
 MANREP= man/
@@ -29,7 +34,7 @@ SCRIPTSWITNESS = $(SCRIPTSSOURCE:.sh=.witness)
 MODELS = $(wildcard $(MANKAPPAMODELSREP)*.ka)
 
 .PHONY: all clean temp-clean-for-ignorant-that-clean-must-be-done-before-fetch
-.PHONY: check build-tests doc clean_doc
+.PHONY: check build-tests doc clean_doc fetch_version
 
 .PRECIOUS: $(SCRIPTSWITNESS)
 
@@ -106,3 +111,29 @@ light:
 	make 
 	@cp Makefile.tmp Makefile
 	@cp _tags.tmp _tags
+
+commit: fetch_version 
+	echo -n `expr $(VN) + 1` > tag/number 
+	echo -n $(DATE) > tag/date 
+	make PREF="Not a release" send_caml
+
+major_version: fetch_version
+	echo -n `expr $(VERSION) + 1` > tag/version
+	echo -n `expr $(VN) + 1`> tag/number 
+	echo -n 1 > tag/release
+	echo -n $(DATE) > tag/date 
+	make PREF="Release " send_caml
+
+release: fetch_version
+	echo -n `expr $(RELEASE) + 1`> tag/release
+	echo -n `expr $(VN) + 1`> tag/number 
+	echo -n $(DATE) > tag/date 
+	make PREF="Release " send_caml
+
+send_caml: 
+	echo -n xxx$(VN)$(RELEASE)$(VERSION)$(DATE)xxx
+	echo -n let git_commit_version,git_commit_release,git_commit_tag,git_commit_date  = $(VERSION),$(RELEASE),$(VN),\"$(DATE)\" > KaSa_rep/automatically_generated/git_commit_info.ml 
+	git commit -a 
+	git tag -a $(VN)  -m "$(PREF) v$(VERSION).$(RELEASE)...$(VN) $(DATE)"  
+	git push --tags
+	git push 
