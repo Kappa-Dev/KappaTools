@@ -6,7 +6,8 @@ before_install:
 
 install:
   - sudo apt-get install -qq ocaml-nox
-  - sudo apt-get install -qq gnuplot-nox graphviz texlive-latex-recommended
+  - sudo apt-get install -qq gnuplot-nox graphviz
+  - sudo apt-get install -qq texlive-latex-recommended tex4ht
 
 script:
   - make all
