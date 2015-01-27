@@ -196,10 +196,17 @@ let print_diffview parameters error handler diff =
    
      | Ast.OBS_VAR s,_ -> 
        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "(OBS(%s))" s in
-        error 
+       error
+
      | Ast.CONST(Nbr.F(f)),_ ->
-       let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%f" f in 
-         error 
+       let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%f " f in 
+       error
+         
+      (*MOD: add print integer at compilation variables*)
+      | Ast.CONST(Nbr.I(i)),_ ->
+       let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%d " i in 
+       error
+
      | Ast.UN_ALG_OP _,_
      | Ast.BIN_ALG_OP _,_
      | Ast.STATE_ALG_OP _,_
