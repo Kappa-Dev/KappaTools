@@ -239,35 +239,38 @@ let print_diffview parameters error handler diff =
     
  let print_signatures parameters error handler signature = error
 
+ (*MOD:change (agent_type,agent_index)@site to (agent_index,agent_type)@site*)
  let print_bond parameters relation (add1,add2) = 
    Printf.fprintf 
      parameters.Remanent_parameters_sig.log 
-     "%s(%d,%d)@%d%s(%d,%d)@%d\n" 
+     "%s(agent_id:%d,agent_type:%d)@site_type:%d%s(agent_id:%d,agent_type:%d)@site_type:%d\n" 
      parameters.Remanent_parameters_sig.prefix 
-     add1.Cckappa_sig.agent_type 
-     add1.Cckappa_sig.agent_index
+     add1.Cckappa_sig.agent_index 
+     add1.Cckappa_sig.agent_type
      add1.Cckappa_sig.site
      relation
-     add2.Cckappa_sig.agent_type 
-     add2.Cckappa_sig.agent_index
+     add2.Cckappa_sig.agent_index 
+     add2.Cckappa_sig.agent_type
      add2.Cckappa_sig.site
-    
+
+(*MOD:change (agent_type,agent_index)@site to (agent_index,agent_type)@site*)
  let print_half_bond parameters relation (add1,_) = 
    Printf.fprintf 
      parameters.Remanent_parameters_sig.log 
-     "%s(%d,%d)@%d\n" 
+     "%s(agent_id:%d,agent_type:%d)@site_type:%d\n" 
      parameters.Remanent_parameters_sig.prefix 
-     add1.Cckappa_sig.agent_type 
      add1.Cckappa_sig.agent_index
+     add1.Cckappa_sig.agent_type
      add1.Cckappa_sig.site
      
  let print_remove parameters (index,agent,list) =
    let _ = Printf.fprintf 
      parameters.Remanent_parameters_sig.log 
-     "%s(%d,%d)\n" 
-     parameters.Remanent_parameters_sig.prefix 
+     "%s(agent_id:%d,agent_type:%d)\n" 
+     parameters.Remanent_parameters_sig.prefix
+     index
      agent.Cckappa_sig.agent_name 
-     index  
+     (*index*)  (*MOD:change order agent_name, index to index, agent_name*)
    in 
    let parameters_doc =  Remanent_parameters.update_prefix parameters "documented_site:" in
     let _ = 
@@ -275,10 +278,11 @@ let print_diffview parameters error handler diff =
         (fun site _ -> 
             Printf.fprintf 
                parameters_doc.Remanent_parameters_sig.log 
-               "%s(%d,%d)@%d\n"
-               parameters_doc.Remanent_parameters_sig.prefix 
-               agent.Cckappa_sig.agent_name 
+               "%s(agent_id:%d,agent_type:%d)@site_type:%d\n"
+               parameters_doc.Remanent_parameters_sig.prefix
                index
+               agent.Cckappa_sig.agent_name 
+               (*index*)
                site)
          agent.Cckappa_sig.agent_interface
    in 
@@ -288,10 +292,11 @@ let print_diffview parameters error handler diff =
        (fun site  -> 
          Printf.fprintf 
            parameters.Remanent_parameters_sig.log 
-           "%s(%d,%d)@%d\n"
-           parameters.Remanent_parameters_sig.prefix 
-           agent.Cckappa_sig.agent_name 
+           "%s(agent_id:%d,agent_type:%d)@site_type:%d\n"
+           parameters.Remanent_parameters_sig.prefix
            index
+           agent.Cckappa_sig.agent_name 
+           (*index*)
            site)
        list
    in  ()
@@ -299,10 +304,11 @@ let print_diffview parameters error handler diff =
    let print_created_agent parameters (index,agent) =
      Printf.fprintf 
        parameters.Remanent_parameters_sig.log 
-       "%s(%d,%d)\n" 
-       parameters.Remanent_parameters_sig.prefix 
+       "%s(agent_id:%d,agent_type:%d)\n" 
+       parameters.Remanent_parameters_sig.prefix
+       index
        agent 
-       index  
+       (*index*)
     
    let print_actions parameters error handler actions = 
    let parameters_unbinding =  Remanent_parameters.update_prefix parameters "unbinding:" in 
@@ -313,8 +319,8 @@ let print_diffview parameters error handler diff =
    let _ = List.iter (print_remove parameters_removal) actions.Cckappa_sig.remove in
    let parameters_creation =  Remanent_parameters.update_prefix parameters "creation:" in 
    let _ = List.iter (print_created_agent  parameters_creation) actions.Cckappa_sig.creation in
-   let parameters_unbinding =  Remanent_parameters.update_prefix parameters "binding:" in 
-   let _ = List.iter (print_bond parameters_unbinding "----") actions.Cckappa_sig.bind in 
+   let parameters_binding =  Remanent_parameters.update_prefix parameters "binding:" in 
+   let _ = List.iter (print_bond parameters_binding "----") actions.Cckappa_sig.bind in 
     error 
    
  let print_rule parameters error handler rule = 
