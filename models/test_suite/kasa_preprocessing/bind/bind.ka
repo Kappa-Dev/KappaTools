@@ -1,0 +1,15 @@
+############ TEST ACTIONS ##############
+
+#### Signatures
+
+%agent: A(x)
+%agent: B(x~p)
+%agent: C(x)
+
+#### Rules
+
+A(x), B(x~p) <-> A(x!1), B(x~p!1)
+A(x), C(x) -> A(x!1), C(x!1)
+B(x~p!_), C(x) -> A(x!1), C(x!1)
+
+
