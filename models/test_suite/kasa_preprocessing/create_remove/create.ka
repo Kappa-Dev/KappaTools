@@ -1,0 +1,12 @@
+############ TEST ACTIONS ##############
+
+#### Signatures
+
+%agent: A()
+%agent: B()
+%agent: C()
+
+#### Rules
+
+'b' A() -> B()
+'c' B() -> C()
