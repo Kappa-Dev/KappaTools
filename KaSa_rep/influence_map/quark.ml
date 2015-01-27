@@ -71,21 +71,32 @@ let add_generic get set parameter error rule_id agent_id key map =
       set parameter error key new_agent map  
             
     
-let add_agent parameters error rule_id agent_id agent_type = 
-  let _ = Misc_sa.trace parameters (fun () -> (string_of_int rule_id)^(string_of_int agent_type)^"\n")
+let add_agent parameters error rule_id agent_id agent_type = (*MOD*)
+  let _ = Misc_sa.trace parameters (fun () -> "rule_id:"^ (string_of_int rule_id)^",agent_id:*,agent_type:"^(string_of_int agent_type)^"\n")
   in 
   add_generic Quark_type.AgentMap.unsafe_get Quark_type.AgentMap.set parameters error rule_id agent_id agent_type
-  
-let add_site parameters error rule_id agent_id agent_type site_type state = 
-  let _ = Misc_sa.trace parameters (fun () -> (string_of_int rule_id)^(string_of_int agent_type)^(string_of_int site_type)^(string_of_int state)^"\n")
+
+(*MOD:add var in quarks*)
+let add_var parameters error rule_id agent_id agent_type = (*MOD*)
+  let _ = Misc_sa.trace parameters (fun () -> "var_id:"^ (string_of_int rule_id)^",agent_id:*,agent_type:"^(string_of_int agent_type)^"\n")
+  in 
+  add_generic Quark_type.AgentMap.unsafe_get Quark_type.AgentMap.set parameters error rule_id agent_id agent_type
+
+let add_site parameters error rule_id agent_id agent_type site_type state = (*MOD*)
+  let _ = Misc_sa.trace parameters (fun () -> "rule_id:"^(string_of_int rule_id)^",agent_id:*,agent_type:"^(string_of_int agent_type)^",site_type:"^(string_of_int site_type)^",state:"^(string_of_int state)^"\n")
   in 
   add_generic Quark_type.SiteMap.unsafe_get Quark_type.SiteMap.set parameters error rule_id agent_id (agent_type,(site_type,state))      
-    
+
+let add_site_var parameters error rule_id agent_id agent_type site_type state = (*MOD*)
+  let _ = Misc_sa.trace parameters (fun () -> "var_id:"^(string_of_int rule_id)^",agent_id:*,agent_type:"^(string_of_int agent_type)^",site_type:"^(string_of_int site_type)^",state:"^(string_of_int state)^"\n")
+  in 
+  add_generic Quark_type.SiteMap.unsafe_get Quark_type.SiteMap.set parameters error rule_id agent_id (agent_type,(site_type,state))
+
 let add_half_bond_breaking parameter error handler rule_id agent_id agent_type site k (site_modif_plus,site_modif_minus) = 
   match Handler.dual parameter error handler agent_type site k 
   with
     | error,None -> error,(site_modif_plus,site_modif_minus)
-    | error,Some (agent_type2,site2,k2) -> 
+    | error,Some (agent_type2,site2,k2) ->
       let error,site_modif_plus = add_site parameter error rule_id agent_id agent_type2 site2 0 site_modif_plus in 
       let error,site_modif_minus =  add_site parameter error rule_id agent_id agent_type2 site2 k2 site_modif_minus in  
        error,(site_modif_plus,site_modif_minus)
@@ -112,7 +123,7 @@ let scan_mixture_in_var bool parameter error handler var_id mixture quarks =
         | Cckappa_sig.Agent agent -> 
           let error,kasim_id = Quark_type.Labels.label_of_int parameter error agent.Cckappa_sig.agent_kasim_id in 
           let agent_type = agent.Cckappa_sig.agent_name in 
-          let error,agent_var = add_agent parameter error var_id kasim_id agent_type agent_var in 
+          let error,agent_var = add_var parameter error var_id kasim_id agent_type agent_var in (*MOD*)
           let error,site_var = 
             Cckappa_sig.Site_map_and_set.fold_map 
               (fun site port (error,site_var) -> 
@@ -123,7 +134,7 @@ let scan_mixture_in_var bool parameter error handler var_id mixture quarks =
                   then 
                     error,site_var
                   else 
-                    aux (k+1) (add_site parameter error var_id kasim_id agent_type site k site_var)
+                    aux (k+1) (add_site_var parameter error var_id kasim_id agent_type site k site_var) (*MOD*)
                 in 
                 aux interval.Cckappa_sig.min (error,site_var)
               )
