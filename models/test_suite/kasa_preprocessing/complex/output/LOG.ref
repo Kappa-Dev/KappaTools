@@ -1,0 +1,592 @@
+Parsing complex.ka...
+done
+Scan rules!
+Signature::
+Signature:agents: 
+Signature:agents:0:A
+Signature:agents:1:B
+Signature:agents:2:C
+Signature:agents:3:
+Signature:sites: 
+Signature:sites:0:
+Signature:sites:0:0->x(binding state)
+Signature:sites:0:1->y(binding state)
+Signature:sites:1:
+Signature:sites:1:0->x(binding state)
+Signature:sites:1:1->y(binding state)
+Signature:sites:2:
+Signature:sites:2:0->x(internal state)
+Signature:sites:2:1->y(internal state)
+Signature:sites:2:2->x(binding state)
+Signature:sites:3:
+Signature:sites:3:0->(binding state)
+Signature:states: 
+Signature:states:0:
+Signature:states:0:0:
+Signature:states:0:0:0->free
+Signature:states:0:0:1->1@0
+Signature:states:0:0:2->1@1
+Signature:states:0:0:3->3@0
+Signature:states:0:1:
+Signature:states:0:1:0->free
+Signature:states:0:1:1->1@1
+Signature:states:0:1:2->1@0
+Signature:states:1:
+Signature:states:1:0:
+Signature:states:1:0:0->free
+Signature:states:1:0:1->0@0
+Signature:states:1:0:2->0@1
+Signature:states:1:0:3->3@0
+Signature:states:1:1:
+Signature:states:1:1:0->free
+Signature:states:1:1:1->0@1
+Signature:states:1:1:2->0@0
+Signature:states:2:
+Signature:states:2:0:
+Signature:states:2:0:0->u
+Signature:states:2:1:
+Signature:states:2:1:0->p
+Signature:states:2:2:
+Signature:states:2:2:0->free
+Signature:states:2:2:1->3@0
+Signature:states:3:
+Signature:states:3:0:
+Signature:states:3:0:0->free
+Signature:states:3:0:1->2@2
+Signature:states:3:0:2->1@0
+Signature:states:3:0:3->0@0
+Signature:duals: 
+Signature:duals:0:
+Signature:duals:0:0:
+Signature:duals:0:0:1:
+Signature:duals:0:0:1:1,0,1
+Signature:duals:0:0:2:
+Signature:duals:0:0:2:1,1,2
+Signature:duals:0:0:3:
+Signature:duals:0:0:3:3,0,3
+Signature:duals:0:1:
+Signature:duals:0:1:1:
+Signature:duals:0:1:1:1,1,1
+Signature:duals:0:1:2:
+Signature:duals:0:1:2:1,0,2
+Signature:duals:1:
+Signature:duals:1:0:
+Signature:duals:1:0:1:
+Signature:duals:1:0:1:0,0,1
+Signature:duals:1:0:2:
+Signature:duals:1:0:2:0,1,2
+Signature:duals:1:0:3:
+Signature:duals:1:0:3:3,0,2
+Signature:duals:1:1:
+Signature:duals:1:1:1:
+Signature:duals:1:1:1:0,1,1
+Signature:duals:1:1:2:
+Signature:duals:1:1:2:0,0,2
+Signature:duals:2:
+Signature:duals:2:2:
+Signature:duals:2:2:1:
+Signature:duals:2:2:1:3,0,1
+Signature:duals:3:
+Signature:duals:3:0:
+Signature:duals:3:0:1:
+Signature:duals:3:0:1:2,2,1
+Signature:duals:3:0:2:
+Signature:duals:3:0:2:1,0,3
+Signature:duals:3:0:3:
+Signature:duals:3:0:3:0,0,3
+Compilation:
+Compilation:rules:0:
+Compilation:rules:0:lhs:
+Compilation:rules:0:lhs:agent_id_0:
+Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type:0->state:[0;0]
+Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type:1->state:[0;0]
+Compilation:rules:0:lhs:agent_id_1:
+Compilation:rules:0:lhs:agent_id_1:Ghost
+Compilation:rules:0:rhs:
+Compilation:rules:0:rhs:agent_id_0:
+Compilation:rules:0:rhs:agent_id_0:Ghost
+Compilation:rules:0:rhs:agent_id_1:
+Compilation:rules:0:rhs:agent_id_1:agent_type_1:site_type:0->state:[0;0]
+Compilation:rules:0:rhs:agent_id_1:agent_type_1:site_type:1->state:[0;0]
+Compilation:rules:0:direct:
+Compilation:rules:0:direct:agent_id_1:
+Compilation:rules:0:direct:agent_id_1:agent_type_1:site_type:0->state:[0;0]
+Compilation:rules:0:direct:agent_id_1:agent_type_1:site_type:1->state:[0;0]
+Compilation:rules:0:reverse:
+Compilation:rules:0:reverse:agent_id_0:
+Compilation:rules:0:reverse:agent_id_0:agent_type_0:site_type:0->state:[0;0]
+Compilation:rules:0:reverse:agent_id_0:agent_type_0:site_type:1->state:[0;0]
+Compilation:rules:0:actions:deletion:(agent_id:0,agent_type:0)
+Compilation:rules:0:actions:deletion:documented_site:(agent_id:0,agent_type:0)@site_type:0
+Compilation:rules:0:actions:deletion:documented_site:(agent_id:0,agent_type:0)@site_type:1
+Compilation:rules:0:actions:creation:(agent_id:1,agent_type:1)
+Compilation:rules:1:
+Compilation:rules:1:lhs:
+Compilation:rules:1:lhs:agent_id_0:
+Compilation:rules:1:lhs:agent_id_0:Ghost
+Compilation:rules:1:lhs:agent_id_1:
+Compilation:rules:1:lhs:agent_id_1:agent_type_1:site_type:0->state:[0;0]
+Compilation:rules:1:lhs:agent_id_1:agent_type_1:site_type:1->state:[0;0]
+Compilation:rules:1:rhs:
+Compilation:rules:1:rhs:agent_id_0:
+Compilation:rules:1:rhs:agent_id_0:agent_type_0:site_type:0->state:[0;0]
+Compilation:rules:1:rhs:agent_id_0:agent_type_0:site_type:1->state:[0;0]
+Compilation:rules:1:rhs:agent_id_1:
+Compilation:rules:1:rhs:agent_id_1:Ghost
+Compilation:rules:1:direct:
+Compilation:rules:1:direct:agent_id_0:
+Compilation:rules:1:direct:agent_id_0:agent_type_0:site_type:0->state:[0;0]
+Compilation:rules:1:direct:agent_id_0:agent_type_0:site_type:1->state:[0;0]
+Compilation:rules:1:reverse:
+Compilation:rules:1:reverse:agent_id_1:
+Compilation:rules:1:reverse:agent_id_1:agent_type_1:site_type:0->state:[0;0]
+Compilation:rules:1:reverse:agent_id_1:agent_type_1:site_type:1->state:[0;0]
+Compilation:rules:1:actions:deletion:(agent_id:1,agent_type:1)
+Compilation:rules:1:actions:deletion:documented_site:(agent_id:1,agent_type:1)@site_type:0
+Compilation:rules:1:actions:deletion:documented_site:(agent_id:1,agent_type:1)@site_type:1
+Compilation:rules:1:actions:creation:(agent_id:0,agent_type:0)
+Compilation:rules:2:
+Compilation:rules:2:lhs:
+Compilation:rules:2:lhs:agent_id_0:
+Compilation:rules:2:lhs:agent_id_0:agent_type_1:site_type:0->state:[0;0]
+Compilation:rules:2:lhs:agent_id_1:
+Compilation:rules:2:lhs:agent_id_1:agent_type_0:site_type:0->state:[0;0]
+Compilation:rules:2:rhs:
+Compilation:rules:2:rhs:agent_id_0:
+Compilation:rules:2:rhs:agent_id_0:agent_type_1:site_type:0->state:[1;1]
+Compilation:rules:2:rhs:agent_id_1:
+Compilation:rules:2:rhs:agent_id_1:agent_type_0:site_type:0->state:[1;1]
+Compilation:rules:2:rhs:bonds:agent_id_0:
+Compilation:rules:2:rhs:bonds:agent_id_0:site_id_0->agent_id_1.site_id_0
+Compilation:rules:2:rhs:bonds:agent_id_1:
+Compilation:rules:2:rhs:bonds:agent_id_1:site_id_0->agent_id_0.site_id_0
+Compilation:rules:2:direct:
+Compilation:rules:2:direct:agent_id_0:
+Compilation:rules:2:direct:agent_id_0:agent_type_1:site_type:0->state:[1;1]
+Compilation:rules:2:direct:agent_id_1:
+Compilation:rules:2:direct:agent_id_1:agent_type_0:site_type:0->state:[1;1]
+Compilation:rules:2:reverse:
+Compilation:rules:2:reverse:agent_id_0:
+Compilation:rules:2:reverse:agent_id_0:agent_type_1:site_type:0->state:[0;0]
+Compilation:rules:2:reverse:agent_id_1:
+Compilation:rules:2:reverse:agent_id_1:agent_type_0:site_type:0->state:[0;0]
+Compilation:rules:2:actions:binding:(agent_id:0,agent_type:1)@site_type:0----(agent_id:1,agent_type:0)@site_type:0
+Compilation:rules:3:
+Compilation:rules:3:lhs:
+Compilation:rules:3:lhs:agent_id_0:
+Compilation:rules:3:lhs:agent_id_0:agent_type_1:site_type:0->state:[1;1]
+Compilation:rules:3:lhs:agent_id_1:
+Compilation:rules:3:lhs:agent_id_1:agent_type_0:site_type:0->state:[1;1]
+Compilation:rules:3:lhs:bonds:agent_id_0:
+Compilation:rules:3:lhs:bonds:agent_id_0:site_id_0->agent_id_1.site_id_0
+Compilation:rules:3:lhs:bonds:agent_id_1:
+Compilation:rules:3:lhs:bonds:agent_id_1:site_id_0->agent_id_0.site_id_0
+Compilation:rules:3:rhs:
+Compilation:rules:3:rhs:agent_id_0:
+Compilation:rules:3:rhs:agent_id_0:agent_type_1:site_type:0->state:[0;0]
+Compilation:rules:3:rhs:agent_id_1:
+Compilation:rules:3:rhs:agent_id_1:agent_type_0:site_type:0->state:[0;0]
+Compilation:rules:3:direct:
+Compilation:rules:3:direct:agent_id_0:
+Compilation:rules:3:direct:agent_id_0:agent_type_1:site_type:0->state:[0;0]
+Compilation:rules:3:direct:agent_id_1:
+Compilation:rules:3:direct:agent_id_1:agent_type_0:site_type:0->state:[0;0]
+Compilation:rules:3:reverse:
+Compilation:rules:3:reverse:agent_id_0:
+Compilation:rules:3:reverse:agent_id_0:agent_type_1:site_type:0->state:[1;1]
+Compilation:rules:3:reverse:agent_id_1:
+Compilation:rules:3:reverse:agent_id_1:agent_type_0:site_type:0->state:[1;1]
+Compilation:rules:3:actions:unbinding:(agent_id:0,agent_type:1)@site_type:0....(agent_id:1,agent_type:0)@site_type:0
+Compilation:rules:4:
+Compilation:rules:4:lhs:
+Compilation:rules:4:lhs:agent_id_0:
+Compilation:rules:4:lhs:agent_id_0:agent_type_1:site_type:1->state:[0;0]
+Compilation:rules:4:lhs:agent_id_1:
+Compilation:rules:4:lhs:agent_id_1:agent_type_0:site_type:1->state:[0;0]
+Compilation:rules:4:rhs:
+Compilation:rules:4:rhs:agent_id_0:
+Compilation:rules:4:rhs:agent_id_0:agent_type_1:site_type:1->state:[1;1]
+Compilation:rules:4:rhs:agent_id_1:
+Compilation:rules:4:rhs:agent_id_1:agent_type_0:site_type:1->state:[1;1]
+Compilation:rules:4:rhs:bonds:agent_id_0:
+Compilation:rules:4:rhs:bonds:agent_id_0:site_id_1->agent_id_1.site_id_1
+Compilation:rules:4:rhs:bonds:agent_id_1:
+Compilation:rules:4:rhs:bonds:agent_id_1:site_id_1->agent_id_0.site_id_1
+Compilation:rules:4:direct:
+Compilation:rules:4:direct:agent_id_0:
+Compilation:rules:4:direct:agent_id_0:agent_type_1:site_type:1->state:[1;1]
+Compilation:rules:4:direct:agent_id_1:
+Compilation:rules:4:direct:agent_id_1:agent_type_0:site_type:1->state:[1;1]
+Compilation:rules:4:reverse:
+Compilation:rules:4:reverse:agent_id_0:
+Compilation:rules:4:reverse:agent_id_0:agent_type_1:site_type:1->state:[0;0]
+Compilation:rules:4:reverse:agent_id_1:
+Compilation:rules:4:reverse:agent_id_1:agent_type_0:site_type:1->state:[0;0]
+Compilation:rules:4:actions:binding:(agent_id:0,agent_type:1)@site_type:1----(agent_id:1,agent_type:0)@site_type:1
+Compilation:rules:5:
+Compilation:rules:5:lhs:
+Compilation:rules:5:lhs:agent_id_0:
+Compilation:rules:5:lhs:agent_id_0:agent_type_1:site_type:1->state:[1;1]
+Compilation:rules:5:lhs:agent_id_1:
+Compilation:rules:5:lhs:agent_id_1:agent_type_0:site_type:1->state:[1;1]
+Compilation:rules:5:lhs:bonds:agent_id_0:
+Compilation:rules:5:lhs:bonds:agent_id_0:site_id_1->agent_id_1.site_id_1
+Compilation:rules:5:lhs:bonds:agent_id_1:
+Compilation:rules:5:lhs:bonds:agent_id_1:site_id_1->agent_id_0.site_id_1
+Compilation:rules:5:rhs:
+Compilation:rules:5:rhs:agent_id_0:
+Compilation:rules:5:rhs:agent_id_0:agent_type_1:site_type:1->state:[0;0]
+Compilation:rules:5:rhs:agent_id_1:
+Compilation:rules:5:rhs:agent_id_1:agent_type_0:site_type:1->state:[0;0]
+Compilation:rules:5:direct:
+Compilation:rules:5:direct:agent_id_0:
+Compilation:rules:5:direct:agent_id_0:agent_type_1:site_type:1->state:[0;0]
+Compilation:rules:5:direct:agent_id_1:
+Compilation:rules:5:direct:agent_id_1:agent_type_0:site_type:1->state:[0;0]
+Compilation:rules:5:reverse:
+Compilation:rules:5:reverse:agent_id_0:
+Compilation:rules:5:reverse:agent_id_0:agent_type_1:site_type:1->state:[1;1]
+Compilation:rules:5:reverse:agent_id_1:
+Compilation:rules:5:reverse:agent_id_1:agent_type_0:site_type:1->state:[1;1]
+Compilation:rules:5:actions:unbinding:(agent_id:0,agent_type:1)@site_type:1....(agent_id:1,agent_type:0)@site_type:1
+Compilation:rules:6:
+Compilation:rules:6:lhs:
+Compilation:rules:6:lhs:agent_id_0:
+Compilation:rules:6:lhs:agent_id_0:agent_type_1:site_type:0->state:[1;1]
+Compilation:rules:6:lhs:agent_id_0:agent_type_1:site_type:1->state:[1;1]
+Compilation:rules:6:lhs:agent_id_1:
+Compilation:rules:6:lhs:agent_id_1:agent_type_0:site_type:0->state:[1;1]
+Compilation:rules:6:lhs:agent_id_1:agent_type_0:site_type:1->state:[1;1]
+Compilation:rules:6:lhs:bonds:agent_id_0:
+Compilation:rules:6:lhs:bonds:agent_id_0:site_id_0->agent_id_1.site_id_0
+Compilation:rules:6:lhs:bonds:agent_id_0:site_id_1->agent_id_1.site_id_1
+Compilation:rules:6:lhs:bonds:agent_id_1:
+Compilation:rules:6:lhs:bonds:agent_id_1:site_id_0->agent_id_0.site_id_0
+Compilation:rules:6:lhs:bonds:agent_id_1:site_id_1->agent_id_0.site_id_1
+Compilation:rules:6:rhs:
+Compilation:rules:6:rhs:agent_id_0:
+Compilation:rules:6:rhs:agent_id_0:agent_type_1:site_type:0->state:[2;2]
+Compilation:rules:6:rhs:agent_id_0:agent_type_1:site_type:1->state:[2;2]
+Compilation:rules:6:rhs:agent_id_1:
+Compilation:rules:6:rhs:agent_id_1:agent_type_0:site_type:0->state:[2;2]
+Compilation:rules:6:rhs:agent_id_1:agent_type_0:site_type:1->state:[2;2]
+Compilation:rules:6:rhs:bonds:agent_id_0:
+Compilation:rules:6:rhs:bonds:agent_id_0:site_id_0->agent_id_1.site_id_1
+Compilation:rules:6:rhs:bonds:agent_id_0:site_id_1->agent_id_1.site_id_0
+Compilation:rules:6:rhs:bonds:agent_id_1:
+Compilation:rules:6:rhs:bonds:agent_id_1:site_id_0->agent_id_0.site_id_1
+Compilation:rules:6:rhs:bonds:agent_id_1:site_id_1->agent_id_0.site_id_0
+Compilation:rules:6:direct:
+Compilation:rules:6:direct:agent_id_0:
+Compilation:rules:6:direct:agent_id_0:agent_type_1:site_type:0->state:[2;2]
+Compilation:rules:6:direct:agent_id_0:agent_type_1:site_type:1->state:[2;2]
+Compilation:rules:6:direct:agent_id_1:
+Compilation:rules:6:direct:agent_id_1:agent_type_0:site_type:0->state:[2;2]
+Compilation:rules:6:direct:agent_id_1:agent_type_0:site_type:1->state:[2;2]
+Compilation:rules:6:reverse:
+Compilation:rules:6:reverse:agent_id_0:
+Compilation:rules:6:reverse:agent_id_0:agent_type_1:site_type:0->state:[1;1]
+Compilation:rules:6:reverse:agent_id_0:agent_type_1:site_type:1->state:[1;1]
+Compilation:rules:6:reverse:agent_id_1:
+Compilation:rules:6:reverse:agent_id_1:agent_type_0:site_type:0->state:[1;1]
+Compilation:rules:6:reverse:agent_id_1:agent_type_0:site_type:1->state:[1;1]
+Compilation:rules:6:actions:unbinding:(agent_id:0,agent_type:1)@site_type:1....(agent_id:1,agent_type:0)@site_type:1
+Compilation:rules:6:actions:unbinding:(agent_id:0,agent_type:1)@site_type:0....(agent_id:1,agent_type:0)@site_type:0
+Compilation:rules:6:actions:binding:(agent_id:0,agent_type:1)@site_type:1----(agent_id:1,agent_type:0)@site_type:0
+Compilation:rules:6:actions:binding:(agent_id:0,agent_type:1)@site_type:0----(agent_id:1,agent_type:0)@site_type:1
+Compilation:rules:7:
+Compilation:rules:7:lhs:
+Compilation:rules:7:lhs:agent_id_0:
+Compilation:rules:7:lhs:agent_id_0:agent_type_2:site_type:0->state:[0;0]
+Compilation:rules:7:lhs:agent_id_0:agent_type_2:site_type:2->state:[0;0]
+Compilation:rules:7:lhs:agent_id_1:
+Compilation:rules:7:lhs:agent_id_1:agent_type_1:site_type:0->state:[0;0]
+Compilation:rules:7:lhs:agent_id_2:
+Compilation:rules:7:lhs:agent_id_2:agent_type_0:site_type:0->state:[0;0]
+Compilation:rules:7:rhs:
+Compilation:rules:7:rhs:agent_id_0:
+Compilation:rules:7:rhs:agent_id_0:agent_type_2:site_type:2->state:[1;1]
+Compilation:rules:7:rhs:agent_id_1:
+Compilation:rules:7:rhs:agent_id_1:agent_type_1:site_type:0->state:[3;3]
+Compilation:rules:7:rhs:agent_id_2:
+Compilation:rules:7:rhs:agent_id_2:agent_type_0:site_type:0->state:[3;3]
+Compilation:rules:7:rhs:bonds:agent_id_0:
+Compilation:rules:7:rhs:bonds:agent_id_0:site_id_2->agent_id_0.site_id_0
+Compilation:rules:7:rhs:bonds:agent_id_1:
+Compilation:rules:7:rhs:bonds:agent_id_1:site_id_0->agent_id_0.site_id_0
+Compilation:rules:7:rhs:bonds:agent_id_2:
+Compilation:rules:7:rhs:bonds:agent_id_2:site_id_0->agent_id_0.site_id_0
+Compilation:rules:7:direct:
+Compilation:rules:7:direct:agent_id_0:
+Compilation:rules:7:direct:agent_id_0:agent_type_2:site_type:2->state:[1;1]
+Compilation:rules:7:direct:agent_id_1:
+Compilation:rules:7:direct:agent_id_1:agent_type_1:site_type:0->state:[3;3]
+Compilation:rules:7:direct:agent_id_2:
+Compilation:rules:7:direct:agent_id_2:agent_type_0:site_type:0->state:[3;3]
+Compilation:rules:7:reverse:
+Compilation:rules:7:reverse:agent_id_0:
+Compilation:rules:7:reverse:agent_id_0:agent_type_2:site_type:0->state:[0;0]
+Compilation:rules:7:reverse:agent_id_0:agent_type_2:site_type:2->state:[0;0]
+Compilation:rules:7:reverse:agent_id_1:
+Compilation:rules:7:reverse:agent_id_1:agent_type_1:site_type:0->state:[0;0]
+Compilation:rules:7:reverse:agent_id_2:
+Compilation:rules:7:reverse:agent_id_2:agent_type_0:site_type:0->state:[0;0]
+Quarks:Quarkify
+Quarks:Rule 0
+Quarks:TEST
+Quarks:rule_id:0,agent_id:*,agent_type:0
+Quarks:rule_id:0,agent_id:*,agent_type:0,site_type:0,state:0
+Quarks:rule_id:0,agent_id:*,agent_type:0,site_type:1,state:0
+Quarks:CREATION
+Quarks:rule_id:0,agent_id:*,agent_type:1
+Quarks:REMOVAL
+Quarks:rule_id:0,agent_id:*,agent_type:0
+Quarks:MODIFICATION+
+Quarks:rule_id:0,agent_id:*,agent_type:1,site_type:0,state:0
+Quarks:rule_id:0,agent_id:*,agent_type:1,site_type:1,state:0
+Quarks:MODIFICATION-
+Quarks:rule_id:0,agent_id:*,agent_type:0,site_type:0,state:0
+Quarks:rule_id:0,agent_id:*,agent_type:0,site_type:1,state:0
+Quarks:Rule 1
+Quarks:TEST
+Quarks:rule_id:1,agent_id:*,agent_type:1
+Quarks:rule_id:1,agent_id:*,agent_type:1,site_type:0,state:0
+Quarks:rule_id:1,agent_id:*,agent_type:1,site_type:1,state:0
+Quarks:CREATION
+Quarks:rule_id:1,agent_id:*,agent_type:0
+Quarks:REMOVAL
+Quarks:rule_id:1,agent_id:*,agent_type:1
+Quarks:MODIFICATION+
+Quarks:rule_id:1,agent_id:*,agent_type:0,site_type:0,state:0
+Quarks:rule_id:1,agent_id:*,agent_type:0,site_type:1,state:0
+Quarks:MODIFICATION-
+Quarks:rule_id:1,agent_id:*,agent_type:1,site_type:0,state:0
+Quarks:rule_id:1,agent_id:*,agent_type:1,site_type:1,state:0
+Quarks:Rule 2
+Quarks:TEST
+Quarks:rule_id:2,agent_id:*,agent_type:0
+Quarks:rule_id:2,agent_id:*,agent_type:0,site_type:0,state:0
+Quarks:rule_id:2,agent_id:*,agent_type:1
+Quarks:rule_id:2,agent_id:*,agent_type:1,site_type:0,state:0
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:2,agent_id:*,agent_type:0,site_type:0,state:1
+Quarks:rule_id:2,agent_id:*,agent_type:1,site_type:0,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:2,agent_id:*,agent_type:0,site_type:0,state:0
+Quarks:rule_id:2,agent_id:*,agent_type:1,site_type:0,state:0
+Quarks:Rule 3
+Quarks:TEST
+Quarks:rule_id:3,agent_id:*,agent_type:0
+Quarks:rule_id:3,agent_id:*,agent_type:0,site_type:0,state:1
+Quarks:rule_id:3,agent_id:*,agent_type:1
+Quarks:rule_id:3,agent_id:*,agent_type:1,site_type:0,state:1
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:3,agent_id:*,agent_type:0,site_type:0,state:0
+Quarks:rule_id:3,agent_id:*,agent_type:1,site_type:0,state:0
+Quarks:MODIFICATION-
+Quarks:rule_id:3,agent_id:*,agent_type:0,site_type:0,state:1
+Quarks:rule_id:3,agent_id:*,agent_type:1,site_type:0,state:1
+Quarks:Rule 4
+Quarks:TEST
+Quarks:rule_id:4,agent_id:*,agent_type:0
+Quarks:rule_id:4,agent_id:*,agent_type:0,site_type:1,state:0
+Quarks:rule_id:4,agent_id:*,agent_type:1
+Quarks:rule_id:4,agent_id:*,agent_type:1,site_type:1,state:0
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:4,agent_id:*,agent_type:0,site_type:1,state:1
+Quarks:rule_id:4,agent_id:*,agent_type:1,site_type:1,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:4,agent_id:*,agent_type:0,site_type:1,state:0
+Quarks:rule_id:4,agent_id:*,agent_type:1,site_type:1,state:0
+Quarks:Rule 5
+Quarks:TEST
+Quarks:rule_id:5,agent_id:*,agent_type:0
+Quarks:rule_id:5,agent_id:*,agent_type:0,site_type:1,state:1
+Quarks:rule_id:5,agent_id:*,agent_type:1
+Quarks:rule_id:5,agent_id:*,agent_type:1,site_type:1,state:1
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:5,agent_id:*,agent_type:0,site_type:1,state:0
+Quarks:rule_id:5,agent_id:*,agent_type:1,site_type:1,state:0
+Quarks:MODIFICATION-
+Quarks:rule_id:5,agent_id:*,agent_type:0,site_type:1,state:1
+Quarks:rule_id:5,agent_id:*,agent_type:1,site_type:1,state:1
+Quarks:Rule 6
+Quarks:TEST
+Quarks:rule_id:6,agent_id:*,agent_type:0
+Quarks:rule_id:6,agent_id:*,agent_type:0,site_type:0,state:1
+Quarks:rule_id:6,agent_id:*,agent_type:0,site_type:1,state:1
+Quarks:rule_id:6,agent_id:*,agent_type:1
+Quarks:rule_id:6,agent_id:*,agent_type:1,site_type:0,state:1
+Quarks:rule_id:6,agent_id:*,agent_type:1,site_type:1,state:1
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:6,agent_id:*,agent_type:0,site_type:0,state:2
+Quarks:rule_id:6,agent_id:*,agent_type:0,site_type:1,state:2
+Quarks:rule_id:6,agent_id:*,agent_type:1,site_type:0,state:2
+Quarks:rule_id:6,agent_id:*,agent_type:1,site_type:1,state:2
+Quarks:MODIFICATION-
+Quarks:rule_id:6,agent_id:*,agent_type:0,site_type:0,state:1
+Quarks:rule_id:6,agent_id:*,agent_type:0,site_type:1,state:1
+Quarks:rule_id:6,agent_id:*,agent_type:1,site_type:0,state:1
+Quarks:rule_id:6,agent_id:*,agent_type:1,site_type:1,state:1
+Quarks:Rule 7
+Quarks:TEST
+Quarks:rule_id:7,agent_id:*,agent_type:0
+Quarks:rule_id:7,agent_id:*,agent_type:0,site_type:0,state:0
+Quarks:rule_id:7,agent_id:*,agent_type:1
+Quarks:rule_id:7,agent_id:*,agent_type:1,site_type:0,state:0
+Quarks:rule_id:7,agent_id:*,agent_type:2
+Quarks:rule_id:7,agent_id:*,agent_type:2,site_type:0,state:0
+Quarks:rule_id:7,agent_id:*,agent_type:2,site_type:2,state:0
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:7,agent_id:*,agent_type:0,site_type:0,state:3
+Quarks:rule_id:7,agent_id:*,agent_type:1,site_type:0,state:3
+Quarks:rule_id:7,agent_id:*,agent_type:2,site_type:2,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:7,agent_id:*,agent_type:0,site_type:0,state:0
+Quarks:rule_id:7,agent_id:*,agent_type:1,site_type:0,state:0
+Quarks:rule_id:7,agent_id:*,agent_type:2,site_type:0,state:0
+Quarks:rule_id:7,agent_id:*,agent_type:2,site_type:2,state:0
+Quarks:agent_test**:agent_type:2,rule:7->[0]
+Quarks:agent_test**:agent_type:1,rule:7->[1]
+Quarks:agent_test**:agent_type:1,rule:6->[0]
+Quarks:agent_test**:agent_type:1,rule:5->[0]
+Quarks:agent_test**:agent_type:1,rule:4->[0]
+Quarks:agent_test**:agent_type:1,rule:3->[0]
+Quarks:agent_test**:agent_type:1,rule:2->[0]
+Quarks:agent_test**:agent_type:1,rule:1->[0]
+Quarks:agent_test**:agent_type:0,rule:7->[2]
+Quarks:agent_test**:agent_type:0,rule:6->[1]
+Quarks:agent_test**:agent_type:0,rule:5->[1]
+Quarks:agent_test**:agent_type:0,rule:4->[1]
+Quarks:agent_test**:agent_type:0,rule:3->[1]
+Quarks:agent_test**:agent_type:0,rule:2->[1]
+Quarks:agent_test**:agent_type:0,rule:0->[0]
+Quarks:agent_modif+:agent_type:0,rule:1->[0]
+Quarks:agent_modif+:agent_type:1,rule:0->[0]
+Quarks:agent_modif-:agent_type:1,rule:1->[0]
+Quarks:agent_modif-:agent_type:0,rule:0->[0]
+Quarks:site_test**:agent_type:2,site_type:2,state:0,rule:7->[0]
+Quarks:site_test**:agent_type:2,site_type:0,state:0,rule:7->[0]
+Quarks:site_test**:agent_type:1,site_type:1,state:1,rule:6->[0]
+Quarks:site_test**:agent_type:1,site_type:1,state:1,rule:5->[0]
+Quarks:site_test**:agent_type:1,site_type:1,state:0,rule:4->[0]
+Quarks:site_test**:agent_type:1,site_type:1,state:0,rule:1->[0]
+Quarks:site_test**:agent_type:1,site_type:0,state:1,rule:6->[0]
+Quarks:site_test**:agent_type:1,site_type:0,state:1,rule:3->[0]
+Quarks:site_test**:agent_type:1,site_type:0,state:0,rule:7->[1]
+Quarks:site_test**:agent_type:1,site_type:0,state:0,rule:2->[0]
+Quarks:site_test**:agent_type:1,site_type:0,state:0,rule:1->[0]
+Quarks:site_test**:agent_type:0,site_type:1,state:1,rule:6->[1]
+Quarks:site_test**:agent_type:0,site_type:1,state:1,rule:5->[1]
+Quarks:site_test**:agent_type:0,site_type:1,state:0,rule:4->[1]
+Quarks:site_test**:agent_type:0,site_type:1,state:0,rule:0->[0]
+Quarks:site_test**:agent_type:0,site_type:0,state:1,rule:6->[1]
+Quarks:site_test**:agent_type:0,site_type:0,state:1,rule:3->[1]
+Quarks:site_test**:agent_type:0,site_type:0,state:0,rule:7->[2]
+Quarks:site_test**:agent_type:0,site_type:0,state:0,rule:2->[1]
+Quarks:site_test**:agent_type:0,site_type:0,state:0,rule:0->[0]
+Quarks:site_modif+:agent_type:2,site_type:2,state:1,rule:7->[0]
+Quarks:site_modif+:agent_type:0,site_type:1,state:2,rule:6->[1]
+Quarks:site_modif+:agent_type:0,site_type:1,state:1,rule:4->[1]
+Quarks:site_modif+:agent_type:0,site_type:1,state:0,rule:5->[1]
+Quarks:site_modif+:agent_type:0,site_type:1,state:0,rule:1->[0]
+Quarks:site_modif+:agent_type:0,site_type:0,state:3,rule:7->[2]
+Quarks:site_modif+:agent_type:0,site_type:0,state:2,rule:6->[1]
+Quarks:site_modif+:agent_type:0,site_type:0,state:1,rule:2->[1]
+Quarks:site_modif+:agent_type:0,site_type:0,state:0,rule:3->[1]
+Quarks:site_modif+:agent_type:0,site_type:0,state:0,rule:1->[0]
+Quarks:site_modif+:agent_type:1,site_type:1,state:2,rule:6->[0]
+Quarks:site_modif+:agent_type:1,site_type:1,state:1,rule:4->[0]
+Quarks:site_modif+:agent_type:1,site_type:1,state:0,rule:5->[0]
+Quarks:site_modif+:agent_type:1,site_type:1,state:0,rule:0->[0]
+Quarks:site_modif+:agent_type:1,site_type:0,state:3,rule:7->[1]
+Quarks:site_modif+:agent_type:1,site_type:0,state:2,rule:6->[0]
+Quarks:site_modif+:agent_type:1,site_type:0,state:1,rule:2->[0]
+Quarks:site_modif+:agent_type:1,site_type:0,state:0,rule:3->[0]
+Quarks:site_modif+:agent_type:1,site_type:0,state:0,rule:0->[0]
+Quarks:site_modif-:agent_type:2,site_type:2,state:0,rule:7->[0]
+Quarks:site_modif-:agent_type:2,site_type:0,state:0,rule:7->[0]
+Quarks:site_modif-:agent_type:1,site_type:1,state:1,rule:6->[0]
+Quarks:site_modif-:agent_type:1,site_type:1,state:1,rule:5->[0]
+Quarks:site_modif-:agent_type:1,site_type:1,state:0,rule:4->[0]
+Quarks:site_modif-:agent_type:1,site_type:1,state:0,rule:1->[0]
+Quarks:site_modif-:agent_type:1,site_type:0,state:1,rule:6->[0]
+Quarks:site_modif-:agent_type:1,site_type:0,state:1,rule:3->[0]
+Quarks:site_modif-:agent_type:1,site_type:0,state:0,rule:7->[1]
+Quarks:site_modif-:agent_type:1,site_type:0,state:0,rule:2->[0]
+Quarks:site_modif-:agent_type:1,site_type:0,state:0,rule:1->[0]
+Quarks:site_modif-:agent_type:0,site_type:1,state:1,rule:6->[1]
+Quarks:site_modif-:agent_type:0,site_type:1,state:1,rule:5->[1]
+Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:4->[1]
+Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:0->[0]
+Quarks:site_modif-:agent_type:0,site_type:0,state:1,rule:6->[1]
+Quarks:site_modif-:agent_type:0,site_type:0,state:1,rule:3->[1]
+Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:7->[2]
+Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:2->[1]
+Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:0->[0]
+Influence_map:Wake_up_map:rule(0):0A(x,y),0 -> 0->rule(1):10 -> A(x,y),0[0->0]
+Influence_map:Wake_up_map:rule(0):0A(x,y),0 -> 0->rule(2):2B(x),A(x) -> B(x!1),A(x!1)[0->0]
+Influence_map:Wake_up_map:rule(0):0A(x,y),0 -> 0->rule(3):3B(x!1),A(x!1) -> B(x),A(x)[0->0]
+Influence_map:Wake_up_map:rule(0):0A(x,y),0 -> 0->rule(4):4B(y),A(y) -> B(y!1),A(y!1)[0->0]
+Influence_map:Wake_up_map:rule(0):0A(x,y),0 -> 0->rule(5):5B(y!1),A(y!1) -> B(y),A(y)[0->0]
+Influence_map:Wake_up_map:rule(0):0A(x,y),0 -> 0->rule(6):6B(x!1,y!2),A(x!1,y!2) -> B(x!2,y!1),A(x!1,y!2)[0->0]
+Influence_map:Wake_up_map:rule(0):0A(x,y),0 -> 0->rule(7):abc7C(x~u),B(x),A(x) -> C(x!1),B(x!1),A(x!1)[0->1]
+Influence_map:Wake_up_map:rule(1):10 -> A(x,y),0->rule(0):0A(x,y),0 -> 0[0->0]
+Influence_map:Wake_up_map:rule(1):10 -> A(x,y),0->rule(2):2B(x),A(x) -> B(x!1),A(x!1)[0->1]
+Influence_map:Wake_up_map:rule(1):10 -> A(x,y),0->rule(3):3B(x!1),A(x!1) -> B(x),A(x)[0->1]
+Influence_map:Wake_up_map:rule(1):10 -> A(x,y),0->rule(4):4B(y),A(y) -> B(y!1),A(y!1)[0->1]
+Influence_map:Wake_up_map:rule(1):10 -> A(x,y),0->rule(5):5B(y!1),A(y!1) -> B(y),A(y)[0->1]
+Influence_map:Wake_up_map:rule(1):10 -> A(x,y),0->rule(6):6B(x!1,y!2),A(x!1,y!2) -> B(x!2,y!1),A(x!1,y!2)[0->1]
+Influence_map:Wake_up_map:rule(1):10 -> A(x,y),0->rule(7):abc7C(x~u),B(x),A(x) -> C(x!1),B(x!1),A(x!1)[0->2]
+Influence_map:Wake_up_map:rule(2):2B(x),A(x) -> B(x!1),A(x!1)->rule(3):3B(x!1),A(x!1) -> B(x),A(x)[0->0];[1->1]
+Influence_map:Wake_up_map:rule(2):2B(x),A(x) -> B(x!1),A(x!1)->rule(6):6B(x!1,y!2),A(x!1,y!2) -> B(x!2,y!1),A(x!1,y!2)[0->0];[1->1]
+Influence_map:Wake_up_map:rule(3):3B(x!1),A(x!1) -> B(x),A(x)->rule(0):0A(x,y),0 -> 0[1->0]
+Influence_map:Wake_up_map:rule(3):3B(x!1),A(x!1) -> B(x),A(x)->rule(1):10 -> A(x,y),0[0->0]
+Influence_map:Wake_up_map:rule(3):3B(x!1),A(x!1) -> B(x),A(x)->rule(2):2B(x),A(x) -> B(x!1),A(x!1)[0->0];[1->1]
+Influence_map:Wake_up_map:rule(3):3B(x!1),A(x!1) -> B(x),A(x)->rule(7):abc7C(x~u),B(x),A(x) -> C(x!1),B(x!1),A(x!1)[0->1];[1->2]
+Influence_map:Wake_up_map:rule(4):4B(y),A(y) -> B(y!1),A(y!1)->rule(5):5B(y!1),A(y!1) -> B(y),A(y)[0->0];[1->1]
+Influence_map:Wake_up_map:rule(4):4B(y),A(y) -> B(y!1),A(y!1)->rule(6):6B(x!1,y!2),A(x!1,y!2) -> B(x!2,y!1),A(x!1,y!2)[0->0];[1->1]
+Influence_map:Wake_up_map:rule(5):5B(y!1),A(y!1) -> B(y),A(y)->rule(0):0A(x,y),0 -> 0[1->0]
+Influence_map:Wake_up_map:rule(5):5B(y!1),A(y!1) -> B(y),A(y)->rule(1):10 -> A(x,y),0[0->0]
+Influence_map:Wake_up_map:rule(5):5B(y!1),A(y!1) -> B(y),A(y)->rule(4):4B(y),A(y) -> B(y!1),A(y!1)[0->0];[1->1]
+Influence_map:Inhibition_map:rule(0):0A(x,y),0 -> 0->rule(2):2B(x),A(x) -> B(x!1),A(x!1)[0->1]
+Influence_map:Inhibition_map:rule(0):0A(x,y),0 -> 0->rule(3):3B(x!1),A(x!1) -> B(x),A(x)[0->1]
+Influence_map:Inhibition_map:rule(0):0A(x,y),0 -> 0->rule(4):4B(y),A(y) -> B(y!1),A(y!1)[0->1]
+Influence_map:Inhibition_map:rule(0):0A(x,y),0 -> 0->rule(5):5B(y!1),A(y!1) -> B(y),A(y)[0->1]
+Influence_map:Inhibition_map:rule(0):0A(x,y),0 -> 0->rule(6):6B(x!1,y!2),A(x!1,y!2) -> B(x!2,y!1),A(x!1,y!2)[0->1]
+Influence_map:Inhibition_map:rule(0):0A(x,y),0 -> 0->rule(7):abc7C(x~u),B(x),A(x) -> C(x!1),B(x!1),A(x!1)[0->2]
+Influence_map:Inhibition_map:rule(1):10 -> A(x,y),0->rule(2):2B(x),A(x) -> B(x!1),A(x!1)[0->0]
+Influence_map:Inhibition_map:rule(1):10 -> A(x,y),0->rule(3):3B(x!1),A(x!1) -> B(x),A(x)[0->0]
+Influence_map:Inhibition_map:rule(1):10 -> A(x,y),0->rule(4):4B(y),A(y) -> B(y!1),A(y!1)[0->0]
+Influence_map:Inhibition_map:rule(1):10 -> A(x,y),0->rule(5):5B(y!1),A(y!1) -> B(y),A(y)[0->0]
+Influence_map:Inhibition_map:rule(1):10 -> A(x,y),0->rule(6):6B(x!1,y!2),A(x!1,y!2) -> B(x!2,y!1),A(x!1,y!2)[0->0]
+Influence_map:Inhibition_map:rule(1):10 -> A(x,y),0->rule(7):abc7C(x~u),B(x),A(x) -> C(x!1),B(x!1),A(x!1)[0->1]
+Influence_map:Inhibition_map:rule(2):2B(x),A(x) -> B(x!1),A(x!1)->rule(0):0A(x,y),0 -> 0[1->0]
+Influence_map:Inhibition_map:rule(2):2B(x),A(x) -> B(x!1),A(x!1)->rule(1):10 -> A(x,y),0[0->0]
+Influence_map:Inhibition_map:rule(2):2B(x),A(x) -> B(x!1),A(x!1)->rule(7):abc7C(x~u),B(x),A(x) -> C(x!1),B(x!1),A(x!1)[0->1];[1->2]
+Influence_map:Inhibition_map:rule(3):3B(x!1),A(x!1) -> B(x),A(x)->rule(6):6B(x!1,y!2),A(x!1,y!2) -> B(x!2,y!1),A(x!1,y!2)[0->0];[1->1]
+Influence_map:Inhibition_map:rule(4):4B(y),A(y) -> B(y!1),A(y!1)->rule(0):0A(x,y),0 -> 0[1->0]
+Influence_map:Inhibition_map:rule(4):4B(y),A(y) -> B(y!1),A(y!1)->rule(1):10 -> A(x,y),0[0->0]
+Influence_map:Inhibition_map:rule(5):5B(y!1),A(y!1) -> B(y),A(y)->rule(6):6B(x!1,y!2),A(x!1,y!2) -> B(x!2,y!1),A(x!1,y!2)[0->0];[1->1]
+Influence_map:Inhibition_map:rule(6):6B(x!1,y!2),A(x!1,y!2) -> B(x!2,y!1),A(x!1,y!2)->rule(3):3B(x!1),A(x!1) -> B(x),A(x)[0->0];[1->1]
+Influence_map:Inhibition_map:rule(6):6B(x!1,y!2),A(x!1,y!2) -> B(x!2,y!1),A(x!1,y!2)->rule(5):5B(y!1),A(y!1) -> B(y),A(y)[0->0];[1->1]
+Influence_map:Inhibition_map:rule(7):abc7C(x~u),B(x),A(x) -> C(x!1),B(x!1),A(x!1)->rule(0):0A(x,y),0 -> 0[2->0]
+Influence_map:Inhibition_map:rule(7):abc7C(x~u),B(x),A(x) -> C(x!1),B(x!1),A(x!1)->rule(1):10 -> A(x,y),0[1->0]
+Influence_map:Inhibition_map:rule(7):abc7C(x~u),B(x),A(x) -> C(x!1),B(x!1),A(x!1)->rule(2):2B(x),A(x) -> B(x!1),A(x!1)[1->0];[2->1]
+Some exceptions have been raised
+error: file_name: Preprocess; message: line 514; exception:Exit
+error: file_name: Translate; message: line 44; exception:Exit
+error: file_name: Translate; message: line 44; exception:Exit
+error: file_name: Translate; message: line 44; exception:Exit
