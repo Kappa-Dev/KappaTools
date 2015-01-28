@@ -253,7 +253,6 @@ let print_diffview parameters error handler diff =
      add2.Cckappa_sig.agent_type
      add2.Cckappa_sig.site
 
-(*MOD:change (agent_type,agent_index)@site to (agent_index,agent_type)@site*)
  let print_half_bond parameters relation (add1,_) = 
    Printf.fprintf 
      parameters.Remanent_parameters_sig.log 
@@ -269,8 +268,7 @@ let print_diffview parameters error handler diff =
      "%s(agent_id:%d,agent_type:%d)\n" 
      parameters.Remanent_parameters_sig.prefix
      index
-     agent.Cckappa_sig.agent_name 
-     (*index*)  (*MOD:change order agent_name, index to index, agent_name*)
+     agent.Cckappa_sig.agent_name
    in 
    let parameters_doc =  Remanent_parameters.update_prefix parameters "documented_site:" in
     let _ = 
@@ -282,7 +280,6 @@ let print_diffview parameters error handler diff =
                parameters_doc.Remanent_parameters_sig.prefix
                index
                agent.Cckappa_sig.agent_name 
-               (*index*)
                site)
          agent.Cckappa_sig.agent_interface
    in 
@@ -296,7 +293,6 @@ let print_diffview parameters error handler diff =
            parameters.Remanent_parameters_sig.prefix
            index
            agent.Cckappa_sig.agent_name 
-           (*index*)
            site)
        list
    in  ()
@@ -307,8 +303,7 @@ let print_diffview parameters error handler diff =
        "%s(agent_id:%d,agent_type:%d)\n" 
        parameters.Remanent_parameters_sig.prefix
        index
-       agent 
-       (*index*)
+       agent
     
    let print_actions parameters error handler actions = 
    let parameters_unbinding =  Remanent_parameters.update_prefix parameters "unbinding:" in 
