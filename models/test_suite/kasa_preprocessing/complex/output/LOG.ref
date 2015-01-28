@@ -3,97 +3,97 @@ done
 Scan rules!
 Signature::
 Signature:agents: 
-Signature:agents:0:A
-Signature:agents:1:B
-Signature:agents:2:C
-Signature:agents:3:
-Signature:sites: 
-Signature:sites:0:
-Signature:sites:0:0->x(binding state)
-Signature:sites:0:1->y(binding state)
-Signature:sites:1:
-Signature:sites:1:0->x(binding state)
-Signature:sites:1:1->y(binding state)
-Signature:sites:2:
-Signature:sites:2:0->x(internal state)
-Signature:sites:2:1->y(internal state)
-Signature:sites:2:2->x(binding state)
-Signature:sites:3:
-Signature:sites:3:0->(binding state)
+Signature:agents:agent_type:0:A
+Signature:agents:agent_type:1:B
+Signature:agents:agent_type:2:C
+Signature:agents:agent_type:3:
+Signature:sites:site_type: 
+Signature:sites:site_type:0:
+Signature:sites:site_type:0:site_id:0->x(binding state)
+Signature:sites:site_type:0:site_id:1->y(binding state)
+Signature:sites:site_type:1:
+Signature:sites:site_type:1:site_id:0->x(binding state)
+Signature:sites:site_type:1:site_id:1->y(binding state)
+Signature:sites:site_type:2:
+Signature:sites:site_type:2:site_id:0->x(internal state)
+Signature:sites:site_type:2:site_id:1->y(internal state)
+Signature:sites:site_type:2:site_id:2->x(binding state)
+Signature:sites:site_type:3:
+Signature:sites:site_type:3:site_id:0->(binding state)
 Signature:states: 
 Signature:states:0:
 Signature:states:0:0:
-Signature:states:0:0:0->free
-Signature:states:0:0:1->1@0
-Signature:states:0:0:2->1@1
-Signature:states:0:0:3->3@0
+Signature:states:0:0:state_id:0->free
+Signature:states:0:0:state_id:1->agent_type:1@site_type:0
+Signature:states:0:0:state_id:2->agent_type:1@site_type:1
+Signature:states:0:0:state_id:3->agent_type:3@site_type:0
 Signature:states:0:1:
-Signature:states:0:1:0->free
-Signature:states:0:1:1->1@1
-Signature:states:0:1:2->1@0
+Signature:states:0:1:state_id:0->free
+Signature:states:0:1:state_id:1->agent_type:1@site_type:1
+Signature:states:0:1:state_id:2->agent_type:1@site_type:0
 Signature:states:1:
 Signature:states:1:0:
-Signature:states:1:0:0->free
-Signature:states:1:0:1->0@0
-Signature:states:1:0:2->0@1
-Signature:states:1:0:3->3@0
+Signature:states:1:0:state_id:0->free
+Signature:states:1:0:state_id:1->agent_type:0@site_type:0
+Signature:states:1:0:state_id:2->agent_type:0@site_type:1
+Signature:states:1:0:state_id:3->agent_type:3@site_type:0
 Signature:states:1:1:
-Signature:states:1:1:0->free
-Signature:states:1:1:1->0@1
-Signature:states:1:1:2->0@0
+Signature:states:1:1:state_id:0->free
+Signature:states:1:1:state_id:1->agent_type:0@site_type:1
+Signature:states:1:1:state_id:2->agent_type:0@site_type:0
 Signature:states:2:
 Signature:states:2:0:
-Signature:states:2:0:0->u
+Signature:states:2:0:state_id:0->u
 Signature:states:2:1:
-Signature:states:2:1:0->p
+Signature:states:2:1:state_id:0->p
 Signature:states:2:2:
-Signature:states:2:2:0->free
-Signature:states:2:2:1->3@0
+Signature:states:2:2:state_id:0->free
+Signature:states:2:2:state_id:1->agent_type:3@site_type:0
 Signature:states:3:
 Signature:states:3:0:
-Signature:states:3:0:0->free
-Signature:states:3:0:1->2@2
-Signature:states:3:0:2->1@0
-Signature:states:3:0:3->0@0
+Signature:states:3:0:state_id:0->free
+Signature:states:3:0:state_id:1->agent_type:2@site_type:2
+Signature:states:3:0:state_id:2->agent_type:1@site_type:0
+Signature:states:3:0:state_id:3->agent_type:0@site_type:0
 Signature:duals: 
 Signature:duals:0:
 Signature:duals:0:0:
 Signature:duals:0:0:1:
-Signature:duals:0:0:1:1,0,1
+Signature:duals:0:0:1:agent_type:1,site_id:0,state_id:1
 Signature:duals:0:0:2:
-Signature:duals:0:0:2:1,1,2
+Signature:duals:0:0:2:agent_type:1,site_id:1,state_id:2
 Signature:duals:0:0:3:
-Signature:duals:0:0:3:3,0,3
+Signature:duals:0:0:3:agent_type:3,site_id:0,state_id:3
 Signature:duals:0:1:
 Signature:duals:0:1:1:
-Signature:duals:0:1:1:1,1,1
+Signature:duals:0:1:1:agent_type:1,site_id:1,state_id:1
 Signature:duals:0:1:2:
-Signature:duals:0:1:2:1,0,2
+Signature:duals:0:1:2:agent_type:1,site_id:0,state_id:2
 Signature:duals:1:
 Signature:duals:1:0:
 Signature:duals:1:0:1:
-Signature:duals:1:0:1:0,0,1
+Signature:duals:1:0:1:agent_type:0,site_id:0,state_id:1
 Signature:duals:1:0:2:
-Signature:duals:1:0:2:0,1,2
+Signature:duals:1:0:2:agent_type:0,site_id:1,state_id:2
 Signature:duals:1:0:3:
-Signature:duals:1:0:3:3,0,2
+Signature:duals:1:0:3:agent_type:3,site_id:0,state_id:2
 Signature:duals:1:1:
 Signature:duals:1:1:1:
-Signature:duals:1:1:1:0,1,1
+Signature:duals:1:1:1:agent_type:0,site_id:1,state_id:1
 Signature:duals:1:1:2:
-Signature:duals:1:1:2:0,0,2
+Signature:duals:1:1:2:agent_type:0,site_id:0,state_id:2
 Signature:duals:2:
 Signature:duals:2:2:
 Signature:duals:2:2:1:
-Signature:duals:2:2:1:3,0,1
+Signature:duals:2:2:1:agent_type:3,site_id:0,state_id:1
 Signature:duals:3:
 Signature:duals:3:0:
 Signature:duals:3:0:1:
-Signature:duals:3:0:1:2,2,1
+Signature:duals:3:0:1:agent_type:2,site_id:2,state_id:1
 Signature:duals:3:0:2:
-Signature:duals:3:0:2:1,0,3
+Signature:duals:3:0:2:agent_type:1,site_id:0,state_id:3
 Signature:duals:3:0:3:
-Signature:duals:3:0:3:0,0,3
+Signature:duals:3:0:3:agent_type:0,site_id:0,state_id:3
 Compilation:
 Compilation:rules:0:
 Compilation:rules:0:lhs:

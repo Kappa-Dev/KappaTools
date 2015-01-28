@@ -3,13 +3,13 @@ done
 Scan rules!
 Signature::
 Signature:agents: 
-Signature:agents:0:A
-Signature:agents:1:B
-Signature:agents:2:C
-Signature:sites: 
-Signature:sites:0:
-Signature:sites:1:
-Signature:sites:2:
+Signature:agents:agent_type:0:A
+Signature:agents:agent_type:1:B
+Signature:agents:agent_type:2:C
+Signature:sites:site_type: 
+Signature:sites:site_type:0:
+Signature:sites:site_type:1:
+Signature:sites:site_type:2:
 Signature:states: 
 Signature:duals: 
 Compilation:

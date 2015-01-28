@@ -3,67 +3,67 @@ done
 Scan rules!
 Signature::
 Signature:agents: 
-Signature:agents:0:A
-Signature:agents:1:B
-Signature:agents:2:C
-Signature:sites: 
-Signature:sites:0:
-Signature:sites:0:0->x(binding state)
-Signature:sites:0:1->c(binding state)
-Signature:sites:1:
-Signature:sites:1:0->x(binding state)
-Signature:sites:2:
-Signature:sites:2:0->x1(internal state)
-Signature:sites:2:1->x2(internal state)
-Signature:sites:2:2->x1(binding state)
-Signature:sites:2:3->x2(binding state)
+Signature:agents:agent_type:0:A
+Signature:agents:agent_type:1:B
+Signature:agents:agent_type:2:C
+Signature:sites:site_type: 
+Signature:sites:site_type:0:
+Signature:sites:site_type:0:site_id:0->x(binding state)
+Signature:sites:site_type:0:site_id:1->c(binding state)
+Signature:sites:site_type:1:
+Signature:sites:site_type:1:site_id:0->x(binding state)
+Signature:sites:site_type:2:
+Signature:sites:site_type:2:site_id:0->x1(internal state)
+Signature:sites:site_type:2:site_id:1->x2(internal state)
+Signature:sites:site_type:2:site_id:2->x1(binding state)
+Signature:sites:site_type:2:site_id:3->x2(binding state)
 Signature:states: 
 Signature:states:0:
 Signature:states:0:0:
-Signature:states:0:0:0->free
-Signature:states:0:0:1->1@0
+Signature:states:0:0:state_id:0->free
+Signature:states:0:0:state_id:1->agent_type:1@site_type:0
 Signature:states:0:1:
-Signature:states:0:1:0->free
-Signature:states:0:1:1->2@2
-Signature:states:0:1:2->2@3
+Signature:states:0:1:state_id:0->free
+Signature:states:0:1:state_id:1->agent_type:2@site_type:2
+Signature:states:0:1:state_id:2->agent_type:2@site_type:3
 Signature:states:1:
 Signature:states:1:0:
-Signature:states:1:0:0->free
-Signature:states:1:0:1->0@0
+Signature:states:1:0:state_id:0->free
+Signature:states:1:0:state_id:1->agent_type:0@site_type:0
 Signature:states:2:
 Signature:states:2:0:
-Signature:states:2:0:0->u
-Signature:states:2:0:1->p
+Signature:states:2:0:state_id:0->u
+Signature:states:2:0:state_id:1->p
 Signature:states:2:1:
-Signature:states:2:1:0->u
-Signature:states:2:1:1->p
+Signature:states:2:1:state_id:0->u
+Signature:states:2:1:state_id:1->p
 Signature:states:2:2:
-Signature:states:2:2:0->free
-Signature:states:2:2:1->0@1
+Signature:states:2:2:state_id:0->free
+Signature:states:2:2:state_id:1->agent_type:0@site_type:1
 Signature:states:2:3:
-Signature:states:2:3:0->free
-Signature:states:2:3:1->0@1
+Signature:states:2:3:state_id:0->free
+Signature:states:2:3:state_id:1->agent_type:0@site_type:1
 Signature:duals: 
 Signature:duals:0:
 Signature:duals:0:0:
 Signature:duals:0:0:1:
-Signature:duals:0:0:1:1,0,1
+Signature:duals:0:0:1:agent_type:1,site_id:0,state_id:1
 Signature:duals:0:1:
 Signature:duals:0:1:1:
-Signature:duals:0:1:1:2,2,1
+Signature:duals:0:1:1:agent_type:2,site_id:2,state_id:1
 Signature:duals:0:1:2:
-Signature:duals:0:1:2:2,3,1
+Signature:duals:0:1:2:agent_type:2,site_id:3,state_id:1
 Signature:duals:1:
 Signature:duals:1:0:
 Signature:duals:1:0:1:
-Signature:duals:1:0:1:0,0,1
+Signature:duals:1:0:1:agent_type:0,site_id:0,state_id:1
 Signature:duals:2:
 Signature:duals:2:2:
 Signature:duals:2:2:1:
-Signature:duals:2:2:1:0,1,1
+Signature:duals:2:2:1:agent_type:0,site_id:1,state_id:1
 Signature:duals:2:3:
 Signature:duals:2:3:1:
-Signature:duals:2:3:1:0,1,2
+Signature:duals:2:3:1:agent_type:0,site_id:1,state_id:2
 Compilation:
 Compilation:variables:0:
 Compilation:variables:0:on_rate: 0.000100 Compilation:variables:1:
@@ -383,10 +383,10 @@ Quarks:var_id:6,agent_id:*,agent_type:2,site_type:0,state:1
 Quarks:var_id:6,agent_id:*,agent_type:2,site_type:1,state:1
 Quarks:Var 7
 Quarks:Var 8
-Quarks:agent_var++**:agent_type:2,rule:6->[0]
-Quarks:agent_var++**:agent_type:2,rule:5->[0]
-Quarks:agent_var++**:agent_type:2,rule:4->[0]
-Quarks:agent_var++**:agent_type:0,rule:3->[0]
+Quarks:agent_var++**:agent_type:2,var:6->[0]
+Quarks:agent_var++**:agent_type:2,var:5->[0]
+Quarks:agent_var++**:agent_type:2,var:4->[0]
+Quarks:agent_var++**:agent_type:0,var:3->[0]
 Quarks:agent_test**:agent_type:2,rule:5->[0]
 Quarks:agent_test**:agent_type:2,rule:4->[0]
 Quarks:agent_test**:agent_type:2,rule:3->[1]
@@ -399,13 +399,13 @@ Quarks:agent_test**:agent_type:0,rule:3->[0]
 Quarks:agent_test**:agent_type:0,rule:2->[1]
 Quarks:agent_test**:agent_type:0,rule:1->[1]
 Quarks:agent_test**:agent_type:0,rule:0->[1]
-Quarks:site_vars++**:agent_type:2,site_type:1,state:1,rule:6->[0]
-Quarks:site_vars++**:agent_type:2,site_type:1,state:0,rule:5->[0]
-Quarks:site_vars++**:agent_type:2,site_type:1,state:0,rule:4->[0]
-Quarks:site_vars++**:agent_type:2,site_type:0,state:1,rule:6->[0]
-Quarks:site_vars++**:agent_type:2,site_type:0,state:1,rule:5->[0]
-Quarks:site_vars++**:agent_type:2,site_type:0,state:0,rule:4->[0]
-Quarks:site_vars++**:agent_type:0,site_type:0,state:1,rule:3->[0]
+Quarks:site_vars++**:agent_type:2,site_type:1,state:1,var:6->[0]
+Quarks:site_vars++**:agent_type:2,site_type:1,state:0,var:5->[0]
+Quarks:site_vars++**:agent_type:2,site_type:1,state:0,var:4->[0]
+Quarks:site_vars++**:agent_type:2,site_type:0,state:1,var:6->[0]
+Quarks:site_vars++**:agent_type:2,site_type:0,state:1,var:5->[0]
+Quarks:site_vars++**:agent_type:2,site_type:0,state:0,var:4->[0]
+Quarks:site_vars++**:agent_type:0,site_type:0,state:1,var:3->[0]
 Quarks:site_test**:agent_type:2,site_type:3,state:1,rule:5->[0]
 Quarks:site_test**:agent_type:2,site_type:3,state:0,rule:4->[0]
 Quarks:site_test**:agent_type:2,site_type:1,state:0,rule:5->[0]

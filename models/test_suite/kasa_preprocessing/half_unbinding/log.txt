@@ -1,27 +1,28 @@
+---------------------haft_unbinding.ka---------------
 Parsing haft_unbinding.ka...
 done
 Scan rules!
 Signature::
 Signature:agents: 
-Signature:agents:agent_type:0:A
-Signature:agents:agent_type:1:B
-Signature:agents:agent_type:2:C
-Signature:sites:site_type: 
-Signature:sites:site_type:0:
-Signature:sites:site_type:0:site_id:0->x(binding state)
-Signature:sites:site_type:1:
-Signature:sites:site_type:2:
-Signature:sites:site_type:2:site_id:0->x(internal state)
-Signature:sites:site_type:2:site_id:1->y(internal state)
+Signature:agents:0:A
+Signature:agents:1:B
+Signature:agents:2:C
+Signature:sites: 
+Signature:sites:0:
+Signature:sites:0:0->x(binding state)
+Signature:sites:1:
+Signature:sites:2:
+Signature:sites:2:0->x(internal state)
+Signature:sites:2:1->y(internal state)
 Signature:states: 
 Signature:states:0:
 Signature:states:0:0:
-Signature:states:0:0:state_id:0->free
+Signature:states:0:0:0->free
 Signature:states:2:
 Signature:states:2:0:
-Signature:states:2:0:state_id:0->u
+Signature:states:2:0:0->u
 Signature:states:2:1:
-Signature:states:2:1:state_id:0->p
+Signature:states:2:1:0->p
 Signature:duals: 
 Compilation:
 Compilation:rules:0:
