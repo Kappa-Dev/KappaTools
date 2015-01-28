@@ -90,6 +90,16 @@ let array_map_of_list f l =
      let () = fill 1 ans l in
      ans
 
+let array_fold_lefti f x a =
+  let y = ref x in
+  let () = Array.iteri (fun i e -> y := f i !y e) a in
+  !y
+
+let array_fold_left2 f x a1 a2 =
+  let l = Array.length a1 in
+  if l <> Array.length a2 then raise (Invalid_argument "array_fold_left2")
+  else array_fold_lefti (fun i x e -> f x e a2.(i)) x a1
+
 let iteri f i =
   let rec aux j =
   if j < i then let () = f j in aux (succ j)
