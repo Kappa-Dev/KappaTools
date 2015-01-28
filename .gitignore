@@ -26,12 +26,13 @@ man/KaSim_manual.lot
 man/KaSim_manual.toc
 
 # test suite
-models/cflows/*/output/*.diff
-models/cflows/*/output/*.dot
-models/cflows/*/output/*.dat
-models/cflows/*/output/data.out
-models/cflows/*/output/LOG
-models/cflows/*/output/error.log
-models/cflows/*/error
-models/cflows/error
+models/test_suite/*/*/output/*.diff
+models/test_suite/*/*/output/*.dot
+models/test_suite/*/*/output/*.dat
+models/test_suite/*/*/output/data.out
+models/test_suite/*/*/output/LOG
+models/test_suite/*/*/output/example
+models/test_suite/*/*/output/error.log
+models/test_suite/*/*/error
+models/test_suite/error
 profiling.txt
