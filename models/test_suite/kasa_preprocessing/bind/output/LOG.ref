@@ -1,19 +1,19 @@
 Parsing bind.ka...
 done
 Scan rules!
-Signature::
+Signature:
 Signature:agents: 
 Signature:agents:agent_type:0:A
 Signature:agents:agent_type:1:B
 Signature:agents:agent_type:2:C
-Signature:sites:site_type: 
-Signature:sites:site_type:0:
-Signature:sites:site_type:0:site_id:0->x(binding state)
-Signature:sites:site_type:1:
-Signature:sites:site_type:1:site_id:0->x(internal state)
-Signature:sites:site_type:1:site_id:1->x(binding state)
-Signature:sites:site_type:2:
-Signature:sites:site_type:2:site_id:0->x(binding state)
+Signature:sites:agent_type: 
+Signature:sites:agent_type:0:
+Signature:sites:agent_type:0:site_type:0->x(binding state)
+Signature:sites:agent_type:1:
+Signature:sites:agent_type:1:site_type:0->x(internal state)
+Signature:sites:agent_type:1:site_type:1->x(binding state)
+Signature:sites:agent_type:2:
+Signature:sites:agent_type:2:site_type:0->x(binding state)
 Signature:states: 
 Signature:states:0:
 Signature:states:0:0:
@@ -34,17 +34,17 @@ Signature:duals:
 Signature:duals:0:
 Signature:duals:0:0:
 Signature:duals:0:0:1:
-Signature:duals:0:0:1:agent_type:1,site_id:1,state_id:1
+Signature:duals:0:0:1:agent_type:1,site_type:1,state_id:1
 Signature:duals:0:0:2:
-Signature:duals:0:0:2:agent_type:2,site_id:0,state_id:1
+Signature:duals:0:0:2:agent_type:2,site_type:0,state_id:1
 Signature:duals:1:
 Signature:duals:1:1:
 Signature:duals:1:1:1:
-Signature:duals:1:1:1:agent_type:0,site_id:0,state_id:1
+Signature:duals:1:1:1:agent_type:0,site_type:0,state_id:1
 Signature:duals:2:
 Signature:duals:2:0:
 Signature:duals:2:0:1:
-Signature:duals:2:0:1:agent_type:0,site_id:0,state_id:2
+Signature:duals:2:0:1:agent_type:0,site_type:0,state_id:2
 Compilation:
 Compilation:rules:0:
 Compilation:rules:0:lhs:
@@ -169,68 +169,68 @@ Compilation:rules:3:actions:binding:(agent_id:0,agent_type:2)@site_type:0----(ag
 Quarks:Quarkify
 Quarks:Rule 0
 Quarks:TEST
-Quarks:rule_id:0,agent_id:*,agent_type:0
-Quarks:rule_id:0,agent_id:*,agent_type:0,site_type:0,state:0
-Quarks:rule_id:0,agent_id:*,agent_type:1
-Quarks:rule_id:0,agent_id:*,agent_type:1,site_type:0,state:0
-Quarks:rule_id:0,agent_id:*,agent_type:1,site_type:1,state:0
+Quarks:rule_id:0,agent_type:0
+Quarks:rule_id:0,agent_type:0,site_type:0,state:0
+Quarks:rule_id:0,agent_type:1
+Quarks:rule_id:0,agent_type:1,site_type:0,state:0
+Quarks:rule_id:0,agent_type:1,site_type:1,state:0
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
-Quarks:rule_id:0,agent_id:*,agent_type:0,site_type:0,state:1
-Quarks:rule_id:0,agent_id:*,agent_type:1,site_type:1,state:1
+Quarks:rule_id:0,agent_type:0,site_type:0,state:1
+Quarks:rule_id:0,agent_type:1,site_type:1,state:1
 Quarks:MODIFICATION-
-Quarks:rule_id:0,agent_id:*,agent_type:0,site_type:0,state:0
-Quarks:rule_id:0,agent_id:*,agent_type:1,site_type:1,state:0
+Quarks:rule_id:0,agent_type:0,site_type:0,state:0
+Quarks:rule_id:0,agent_type:1,site_type:1,state:0
 Quarks:Rule 1
 Quarks:TEST
-Quarks:rule_id:1,agent_id:*,agent_type:0
-Quarks:rule_id:1,agent_id:*,agent_type:0,site_type:0,state:1
-Quarks:rule_id:1,agent_id:*,agent_type:1
-Quarks:rule_id:1,agent_id:*,agent_type:1,site_type:0,state:0
-Quarks:rule_id:1,agent_id:*,agent_type:1,site_type:1,state:1
+Quarks:rule_id:1,agent_type:0
+Quarks:rule_id:1,agent_type:0,site_type:0,state:1
+Quarks:rule_id:1,agent_type:1
+Quarks:rule_id:1,agent_type:1,site_type:0,state:0
+Quarks:rule_id:1,agent_type:1,site_type:1,state:1
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
-Quarks:rule_id:1,agent_id:*,agent_type:0,site_type:0,state:0
-Quarks:rule_id:1,agent_id:*,agent_type:1,site_type:1,state:0
+Quarks:rule_id:1,agent_type:0,site_type:0,state:0
+Quarks:rule_id:1,agent_type:1,site_type:1,state:0
 Quarks:MODIFICATION-
-Quarks:rule_id:1,agent_id:*,agent_type:0,site_type:0,state:1
-Quarks:rule_id:1,agent_id:*,agent_type:1,site_type:1,state:1
+Quarks:rule_id:1,agent_type:0,site_type:0,state:1
+Quarks:rule_id:1,agent_type:1,site_type:1,state:1
 Quarks:Rule 2
 Quarks:TEST
-Quarks:rule_id:2,agent_id:*,agent_type:0
-Quarks:rule_id:2,agent_id:*,agent_type:0,site_type:0,state:0
-Quarks:rule_id:2,agent_id:*,agent_type:2
-Quarks:rule_id:2,agent_id:*,agent_type:2,site_type:0,state:0
+Quarks:rule_id:2,agent_type:0
+Quarks:rule_id:2,agent_type:0,site_type:0,state:0
+Quarks:rule_id:2,agent_type:2
+Quarks:rule_id:2,agent_type:2,site_type:0,state:0
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
-Quarks:rule_id:2,agent_id:*,agent_type:0,site_type:0,state:2
-Quarks:rule_id:2,agent_id:*,agent_type:2,site_type:0,state:1
+Quarks:rule_id:2,agent_type:0,site_type:0,state:2
+Quarks:rule_id:2,agent_type:2,site_type:0,state:1
 Quarks:MODIFICATION-
-Quarks:rule_id:2,agent_id:*,agent_type:0,site_type:0,state:0
-Quarks:rule_id:2,agent_id:*,agent_type:2,site_type:0,state:0
+Quarks:rule_id:2,agent_type:0,site_type:0,state:0
+Quarks:rule_id:2,agent_type:2,site_type:0,state:0
 Quarks:Rule 3
 Quarks:TEST
-Quarks:rule_id:3,agent_id:*,agent_type:1
-Quarks:rule_id:3,agent_id:*,agent_type:1,site_type:0,state:0
-Quarks:rule_id:3,agent_id:*,agent_type:1,site_type:1,state:1
-Quarks:rule_id:3,agent_id:*,agent_type:2
-Quarks:rule_id:3,agent_id:*,agent_type:2,site_type:0,state:0
+Quarks:rule_id:3,agent_type:1
+Quarks:rule_id:3,agent_type:1,site_type:0,state:0
+Quarks:rule_id:3,agent_type:1,site_type:1,state:1
+Quarks:rule_id:3,agent_type:2
+Quarks:rule_id:3,agent_type:2,site_type:0,state:0
 Quarks:CREATION
-Quarks:rule_id:3,agent_id:*,agent_type:0
+Quarks:rule_id:3,agent_type:0
 Quarks:REMOVAL
-Quarks:rule_id:3,agent_id:*,agent_type:1
+Quarks:rule_id:3,agent_type:1
 Quarks:MODIFICATION+
-Quarks:rule_id:3,agent_id:*,agent_type:0,site_type:0,state:2
-Quarks:rule_id:3,agent_id:*,agent_type:2,site_type:0,state:1
+Quarks:rule_id:3,agent_type:0,site_type:0,state:2
+Quarks:rule_id:3,agent_type:2,site_type:0,state:1
 Quarks:MODIFICATION-
-Quarks:rule_id:3,agent_id:*,agent_type:1,site_type:0,state:0
-Quarks:rule_id:3,agent_id:*,agent_type:1,site_type:1,state:1
-Quarks:rule_id:3,agent_id:*,agent_type:2,site_type:0,state:0
-Quarks:rule_id:3,agent_id:*,agent_type:0,site_type:0,state:0
-Quarks:rule_id:3,agent_id:*,agent_type:0,site_type:0,state:1
+Quarks:rule_id:3,agent_type:1,site_type:0,state:0
+Quarks:rule_id:3,agent_type:1,site_type:1,state:1
+Quarks:rule_id:3,agent_type:2,site_type:0,state:0
+Quarks:rule_id:3,agent_type:0,site_type:0,state:0
+Quarks:rule_id:3,agent_type:0,site_type:0,state:1
 Quarks:agent_test**:agent_type:2,rule:3->[0]
 Quarks:agent_test**:agent_type:2,rule:2->[0]
 Quarks:agent_test**:agent_type:1,rule:3->[1]
