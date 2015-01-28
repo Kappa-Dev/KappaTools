@@ -36,16 +36,34 @@ let print_agent_map parameter error handler map =
               let _ = Quark_type.Labels.dump parameter error handler im' in 
               let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "\n" in
             error)
+          im)  
+      map
+  in error
+
+(*MOD:print var instead of rule*)
+let print_agent_var_map parameter error handler map = 
+  let error = 
+    Quark_type.AgentMap.iter 
+      parameter 
+      error 
+      (fun parameters error key im -> 
+        Int_storage.Quick_Nearly_inf_Imperatif.iter 
+          parameter
+          error
+          (fun parameters error key' im' -> 
+              let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "%sagent_type:%i,var:%i->" parameter.Remanent_parameters_sig.prefix key key' in 
+              let _ = Quark_type.Labels.dump parameter error handler im' in 
+              let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "\n" in
+            error)
           im)      
       map
-  in error      
-        
-  
+  in error
+
 let print_agents parameter error handler quark = 
   let parameter_var = Remanent_parameters.update_prefix parameter "agent_var++**:" in 
-  let error = print_agent_map parameter_var error handler quark.Quark_type.agent_var_plus in
+  let error = print_agent_var_map parameter_var error handler quark.Quark_type.agent_var_plus in
   let parameter_var = Remanent_parameters.update_prefix parameter "agent_var--**:" in 
-  let error = print_agent_map parameter_var error handler quark.Quark_type.agent_var_minus in
+  let error = print_agent_var_map parameter_var error handler quark.Quark_type.agent_var_minus in
   let parameter_plus = Remanent_parameters.update_prefix parameter "agent_test**:" in 
   let error = print_agent_map parameter_plus error handler quark.Quark_type.agent_test in
   let parameter_plus = Remanent_parameters.update_prefix parameter "agent_modif+:" in 
@@ -69,15 +87,31 @@ let print_site_map parameter error handler map =
                  error)
           im
       )
-      map 
-                
-        
+      map
+
+(*MOD:print var instead of rule*)      
+let print_site_var_map parameter error handler map = 
+     Quark_type.SiteMap.iter 
+      parameter 
+      error 
+      (fun parameters error (agent_type,(site_type,state)) im -> 
+        Int_storage.Quick_Nearly_inf_Imperatif.iter 
+          parameter
+          error
+          (fun parameters error rule im' -> 
+               let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "%sagent_type:%i,site_type:%i,state:%i,var:%i->" parameter.Remanent_parameters_sig.prefix agent_type site_type state rule  in 
+               let _ = Quark_type.Labels.dump parameter error handler im' in 
+               let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "\n" in
+                 error)
+          im
+      )
+      map         
   
 let print_sites parameter error handler quark = 
   let parameter_var = Remanent_parameters.update_prefix parameter "site_vars++**:" in 
-  let error = print_site_map parameter_var error handler quark.Quark_type.site_var_plus in
+  let error = print_site_var_map parameter_var error handler quark.Quark_type.site_var_plus in
   let parameter_var = Remanent_parameters.update_prefix parameter "site_vars--**:" in 
-  let error = print_site_map parameter_var error handler quark.Quark_type.site_var_minus in
+  let error = print_site_var_map parameter_var error handler quark.Quark_type.site_var_minus in
   let parameter_plus = Remanent_parameters.update_prefix parameter "site_test**:" in 
   let error = print_site_map parameter_plus error handler quark.Quark_type.site_test in 
   let parameter_plus = Remanent_parameters.update_prefix parameter "site_modif+:" in 
