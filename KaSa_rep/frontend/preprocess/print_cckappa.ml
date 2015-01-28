@@ -60,7 +60,7 @@ let print_mixture parameters error handler mixture =
           let error = 
             Cckappa_sig.Site_map_and_set.fold_map 
               (fun k a error -> 
-                let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%ssite_type_%i->agent_id_%i.site_type_%i\n" parameters.Remanent_parameters_sig.prefix k a.Cckappa_sig.agent_index a.Cckappa_sig.site
+                let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%ssite_id_%i->agent_id_%i.site_id_%i\n" parameters.Remanent_parameters_sig.prefix k a.Cckappa_sig.agent_index a.Cckappa_sig.site
                 in error
                 )
               a 
