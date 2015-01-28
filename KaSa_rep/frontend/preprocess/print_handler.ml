@@ -45,9 +45,9 @@ let print_handler parameters error handler =
   in
   (*MOD:print_f for state*)
   let print_state_f print_aux =   
-    (fun parameters error i site () () -> 
-     let parameters = Remanent_parameters.update_prefix parameters ("state_type:"^(string_of_int i)^"->") in
-     let _ =   print_aux parameters site in
+    (fun parameters error i state () () -> 
+     let parameters = Remanent_parameters.update_prefix parameters ("state_id:"^(string_of_int i)^"->") in
+     let _ =   print_aux parameters state in
       let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "\n" in 
        error)
   in
