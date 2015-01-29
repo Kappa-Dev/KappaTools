@@ -6,7 +6,7 @@ Signature:agents:
 Signature:agents:agent_type:0:A
 Signature:agents:agent_type:1:B
 Signature:agents:agent_type:2:C
-Signature:sites:agent_type: 
+Signature:sites: 
 Signature:sites:agent_type:0:
 Signature:sites:agent_type:0:site_type:0->x(binding state)
 Signature:sites:agent_type:1:
@@ -34,33 +34,33 @@ Compilation:
 Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
-Compilation:rules:0:lhs:agent_id_0:agent_type_1:site_type:0->state:[0;0]
+Compilation:rules:0:lhs:agent_id_0:agent_type_1:site_type:0->state:[state_min:0;state_max:0]
 Compilation:rules:0:lhs:agent_id_1:
-Compilation:rules:0:lhs:agent_id_1:agent_type_0:site_type:0->state:[0;0]
+Compilation:rules:0:lhs:agent_id_1:agent_type_0:site_type:0->state:[state_min:0;state_max:0]
 Compilation:rules:0:rhs:
 Compilation:rules:0:rhs:agent_id_0:
-Compilation:rules:0:rhs:agent_id_0:agent_type_1:site_type:0->state:[1;1]
+Compilation:rules:0:rhs:agent_id_0:agent_type_1:site_type:0->state:[state_min:1;state_max:1]
 Compilation:rules:0:rhs:agent_id_1:
-Compilation:rules:0:rhs:agent_id_1:agent_type_0:site_type:0->state:[1;1]
+Compilation:rules:0:rhs:agent_id_1:agent_type_0:site_type:0->state:[state_min:1;state_max:1]
 Compilation:rules:0:rhs:bonds:agent_id_0:
 Compilation:rules:0:rhs:bonds:agent_id_0:site_id_0->agent_id_1.site_id_0
 Compilation:rules:0:rhs:bonds:agent_id_1:
 Compilation:rules:0:rhs:bonds:agent_id_1:site_id_0->agent_id_0.site_id_0
 Compilation:rules:0:direct:
 Compilation:rules:0:direct:agent_id_0:
-Compilation:rules:0:direct:agent_id_0:agent_type_1:site_type:0->state:[1;1]
+Compilation:rules:0:direct:agent_id_0:agent_type_1:site_type:0->state:[state_min:1;state_max:1]
 Compilation:rules:0:direct:agent_id_1:
-Compilation:rules:0:direct:agent_id_1:agent_type_0:site_type:0->state:[1;1]
+Compilation:rules:0:direct:agent_id_1:agent_type_0:site_type:0->state:[state_min:1;state_max:1]
 Compilation:rules:0:reverse:
 Compilation:rules:0:reverse:agent_id_0:
-Compilation:rules:0:reverse:agent_id_0:agent_type_1:site_type:0->state:[0;0]
+Compilation:rules:0:reverse:agent_id_0:agent_type_1:site_type:0->state:[state_min:0;state_max:0]
 Compilation:rules:0:reverse:agent_id_1:
-Compilation:rules:0:reverse:agent_id_1:agent_type_0:site_type:0->state:[0;0]
+Compilation:rules:0:reverse:agent_id_1:agent_type_0:site_type:0->state:[state_min:0;state_max:0]
 Compilation:rules:0:actions:binding:(agent_id:0,agent_type:1)@site_type:0----(agent_id:1,agent_type:0)@site_type:0
 Compilation:rules:1:
 Compilation:rules:1:lhs:
 Compilation:rules:1:lhs:agent_id_0:
-Compilation:rules:1:lhs:agent_id_0:agent_type_1:site_type:0->state:[0;0]
+Compilation:rules:1:lhs:agent_id_0:agent_type_1:site_type:0->state:[state_min:0;state_max:0]
 Compilation:rules:1:lhs:agent_id_1:
 Compilation:rules:1:lhs:agent_id_1:Ghost
 Compilation:rules:1:rhs:
@@ -71,7 +71,7 @@ Compilation:rules:1:direct:
 Compilation:rules:1:direct:agent_id_1:
 Compilation:rules:1:reverse:
 Compilation:rules:1:reverse:agent_id_0:
-Compilation:rules:1:reverse:agent_id_0:agent_type_1:site_type:0->state:[0;0]
+Compilation:rules:1:reverse:agent_id_0:agent_type_1:site_type:0->state:[state_min:0;state_max:0]
 Compilation:rules:1:actions:deletion:(agent_id:0,agent_type:1)
 Compilation:rules:1:actions:deletion:documented_site:(agent_id:0,agent_type:1)@site_type:0
 Compilation:rules:1:actions:creation:(agent_id:1,agent_type:2)
@@ -114,6 +114,6 @@ Quarks:site_modif+:agent_type:0,site_type:0,state:1,rule:0->[1]
 Quarks:site_modif-:agent_type:1,site_type:0,state:0,rule:1->[0]
 Quarks:site_modif-:agent_type:1,site_type:0,state:0,rule:0->[0]
 Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:0->[1]
-Influence_map:Inhibition_map:rule(0):0B(x),A(x) -> B(x!1),A(x!1)->rule(1):1B(x),0 -> 0[0->0]
 Influence_map:Inhibition_map:rule(1):1B(x),0 -> 0->rule(0):0B(x),A(x) -> B(x!1),A(x!1)[0->0]
+Influence_map:Inhibition_map:rule(0):0B(x),A(x) -> B(x!1),A(x!1)->rule(1):1B(x),0 -> 0[0->0]
 execution finished without any exception
