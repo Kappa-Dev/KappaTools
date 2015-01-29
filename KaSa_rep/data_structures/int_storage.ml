@@ -24,7 +24,10 @@ module type Storage =
     val get: Remanent_parameters_sig.parameters -> Exception.method_handler -> key -> 'a t -> Exception.method_handler * 'a option
     val unsafe_get: Remanent_parameters_sig.parameters ->Exception.method_handler -> key -> 'a t -> Exception.method_handler * 'a option
     val dimension: Exception.method_handler -> 'a t -> Exception.method_handler * dimension
-    val print: Exception.method_handler -> (Exception.method_handler -> Remanent_parameters_sig.parameters -> 'a -> Exception.method_handler) -> Remanent_parameters_sig.parameters -> 'a t -> Exception.method_handler  
+    val print: Exception.method_handler -> (Exception.method_handler -> Remanent_parameters_sig.parameters -> 'a -> Exception.method_handler) -> Remanent_parameters_sig.parameters -> 'a t -> Exception.method_handler
+    (*MOD*)
+   val print_site_f: Exception.method_handler -> (Exception.method_handler -> Remanent_parameters_sig.parameters -> 'a -> Exception.method_handler) -> Remanent_parameters_sig.parameters -> 'a t -> Exception.method_handler
+
     val key_list: Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a t -> (Exception.method_handler * key list)   
     val iter:Remanent_parameters_sig.parameters -> Exception.method_handler -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> key  -> 'a  ->  Exception.method_handler ) -> 'a t ->  Exception.method_handler 
     val fold: Remanent_parameters_sig.parameters -> Exception.method_handler -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> key  -> 'a  -> 'b-> Exception.method_handler  * 'b ) -> 'a t -> 'b ->  Exception.method_handler * 'b
@@ -111,14 +114,31 @@ module Int_storage_imperatif =
          let error = 
            match array.array.(i) with 
             | None -> error
-            | Some elt -> 
+            | Some elt ->
               let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s%d:\n" parameters.Remanent_parameters_sig.prefix i in 
               let parameters =  Remanent_parameters.update_prefix parameters ((string_of_int i)^":") in 
               let error = print_elt error parameters elt in
               error
            in aux (i+1) error
    in aux 0 error 
-       
+            
+   (*MOD:print function for sites in print_hander*)
+    let print_site_f error print_elt parameters array = 
+     let rec aux i error = 
+       if i>array.size then error
+       else 
+         let error = 
+           match array.array.(i) with 
+            | None -> error
+            | Some elt ->
+              let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%sagent_type:%d:\n" parameters.Remanent_parameters_sig.prefix i in 
+              let parameters =  Remanent_parameters.update_prefix parameters ("agent_type:"^(string_of_int i)^":") in 
+              let error = print_elt error parameters elt in
+              error
+           in aux (i+1) error
+   in aux 0 error
+
+
   let equal parameters error p a b = 
     if a==b 
     then error,true 
@@ -247,6 +267,7 @@ module Nearly_infinite_arrays =
         Basic.set parameters error key value array  
      
      let print = Basic.print
+     let print_site_f = Basic.print_site_f (*MOD*)
      let iter = Basic.iter
      let fold = Basic.fold 
      let fold2_common = Basic.fold2_common 
@@ -326,7 +347,14 @@ module Extend =
           (fun error -> Underlying.print error print_of)
           parameters
           a.matrix
-     
+
+      (*MOD*)
+      let print_site_f error print_of parameters a = 
+        Extension.print error 
+          (fun error -> Underlying.print error print_of)
+          parameters
+          a.matrix
+          
       let iter parameter error f a = 
         Extension.iter
           parameter 
@@ -408,7 +436,10 @@ module Quick_key_list =
               
       let dimension error a = Basic.dimension error a.basic 
         
-      let print error f parameters a = Basic.print error f parameters a.basic  
+      let print error f parameters a = Basic.print error f parameters a.basic
+
+      (*MOD*)
+       let print_site_f error f parameters a = Basic.print_site_f error f parameters a.basic  
        
       let iter parameters error f a = 
         let error,list = key_list parameters error a in 
