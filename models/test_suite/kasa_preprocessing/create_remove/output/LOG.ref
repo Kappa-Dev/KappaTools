@@ -68,5 +68,5 @@ Quarks:agent_modif+:agent_type:2,rule:1->[0]
 Quarks:agent_modif+:agent_type:1,rule:0->[0]
 Quarks:agent_modif-:agent_type:1,rule:1->[0]
 Quarks:agent_modif-:agent_type:0,rule:0->[0]
-Influence_map:Wake_up_map:rule(0):'b', rule 0: A(),0 -> 0->rule(1):'c', rule 1: B(),0 -> 0[0->0]
+Influence_map:Wake_up_map:rule(0):'b' A(),0 -> 0->rule(1):'c' B(),0 -> 0[0->0]
 execution finished without any exception
