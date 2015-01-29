@@ -76,7 +76,7 @@ Quarks:rule_id:0,agent_type:0,site_type:1,state:1
 Quarks:MODIFICATION-
 Quarks:rule_id:0,agent_type:0,site_type:0,state:0
 Quarks:agent_test**:agent_type:0,rule:0->[position 0]
-Quarks:agent_modif+:agent_type:0,rule:0->[position 0;1]
+Quarks:agent_modif+:agent_type:0,rule:0->[position 0;position 1]
 Quarks:agent_modif-:agent_type:0,rule:0->[position 0]
 Quarks:site_test**:agent_type:0,site_type:0,state:0,rule:0->[position 0]
 Quarks:site_modif+:agent_type:0,site_type:1,state:1,rule:0->[position 0]

@@ -111,7 +111,7 @@ module Extensive =
               let _ = 
                 if bool 
                 then 
-                   Printf.fprintf parameter.Remanent_parameters_sig.log ";%s" a'  
+                   Printf.fprintf parameter.Remanent_parameters_sig.log ";position %s" a'  
                 else 
                    Printf.fprintf parameter.Remanent_parameters_sig.log "%s" a' 
               in 
