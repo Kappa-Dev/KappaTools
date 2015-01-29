@@ -168,7 +168,7 @@ module InjProduct =
 
     let fold_left f cont phi = Array.fold_left f cont phi.elements
 		
-    let print f phi = Pp.array Injection.print f phi.elements
+    let print f phi = Pp.plain_array Injection.print f phi.elements
   end
 
 (*module Activity:(ValMap.ValMap with type content = float) = 

@@ -231,7 +231,7 @@ let dump_span mix =
       Some ar -> ar
     | None -> invalid_arg "Mixture.dump_span: component_of_id not computed"
   in
-  Format.printf "component map: %a\n" (Pp.array Format.pp_print_int) ar;
+  Format.printf "component map: %a\n" (Pp.plain_array Format.pp_print_int) ar;
   let hsh = match mix.enum_cov with
       Some hsh -> hsh
     | None -> invalid_arg "Mixture.dump_span: hsh not computed"

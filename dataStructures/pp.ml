@@ -21,7 +21,15 @@ let option pr f = function
   | None -> ()
   | Some x -> fprintf f "@ %a" pr x
 
-let array pr_el f a =
+let array pr_sep pr_el f a =
+  let rec aux i f =
+    if i < Array.length a then
+      let () = Format.fprintf f "%a" (pr_el i) a.(i) in
+      if i < Array.length a - 1 then
+	Format.fprintf f "%t%t" pr_sep (aux (succ i))
+  in Format.fprintf f "[|%t|]" (aux 0)
+
+let plain_array pr_el f a =
   let rec aux i f =
     if i < Array.length a then
       let () = Format.fprintf f "%i:%a" i pr_el a.(i) in
