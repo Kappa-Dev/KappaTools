@@ -52,19 +52,19 @@ let print_handler parameters error handler =
        error)
   in
   let error = 
-    Ckappa_sig.Dictionary_of_agents.print 
+    Ckappa_sig.Dictionary_of_agents.print
       parameters_agent
       error
       (fun parameters error i agent_name () () -> 
        let _ = Printf.fprintf parameters_agent.Remanent_parameters_sig.log "%sagent_type:%d:%s\n" parameters_agent.Remanent_parameters_sig.prefix i agent_name (*MOD*)
         in error)
-      handler.Cckappa_sig.agents_dic 
+      handler.Cckappa_sig.agents_dic
   in 
-  let parameters_sites = Remanent_parameters.update_prefix parameters "sites:agent_type:" in (*MOD*)
+  let parameters_sites = Remanent_parameters.update_prefix parameters "sites:" in
   let _ = Printf.fprintf log "%s \n" parameters_sites.Remanent_parameters_sig.prefix in
   let error = 
-    Int_storage.Nearly_inf_Imperatif.print
-      error 
+    Int_storage.Nearly_inf_Imperatif.print_site_f (*MOD*)
+      error
       (fun error parameters a ->
        let _ = Ckappa_sig.Dictionary_of_sites.print parameters error (print_f print_site) a in error)
       parameters_sites
@@ -73,7 +73,7 @@ let print_handler parameters error handler =
   let parameters_states = Remanent_parameters.update_prefix parameters "states:" in 
   let _ = Printf.fprintf log "%s \n" parameters_states.Remanent_parameters_sig.prefix in
   let error = 
-    Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.print  
+    Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.print (*TEST*)
       error 
       (fun error parameters a -> (*MOD*)
        Cckappa_sig.Dictionary_of_States.print parameters error (print_state_f print_state) a)
@@ -83,7 +83,7 @@ let print_handler parameters error handler =
   let parameters_duals = Remanent_parameters.update_prefix parameters "duals:" in 
   let _ = Printf.fprintf log "%s \n" parameters_duals.Remanent_parameters_sig.prefix in
   let error = 
-    Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.print  
+    Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.print
       error 
       (fun error parameters (a,b,c) -> 
           let _ = Printf.fprintf log "%sagent_type:%i,site_type:%i,state_id:%i\n" parameters.Remanent_parameters_sig.prefix a b c in (*MOD*)
