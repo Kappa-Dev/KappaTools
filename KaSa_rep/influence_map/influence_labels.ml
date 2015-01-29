@@ -102,8 +102,8 @@ module Extensive =
           (error,sol)
     
         
-      let dump parameter error handler  a =
-        let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "[" in
+      let dump parameter error handler  a = (*MOD*)
+        let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "[position " in
         let _,error  = 
           Set.fold_set 
             (fun a (bool,error) -> 
@@ -123,7 +123,7 @@ module Extensive =
         let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "]" in 
           error
   
-        let to_string parameter error handler a = 
+      let to_string parameter error handler a =
           let sol = ["["] in  
           let _,sol,error = 
             Set.fold_set 
@@ -142,7 +142,7 @@ module Extensive =
           let sol = List.rev ("]"::sol) in 
             error,sol   
           
-      let dump_couple parameter error handler a =
+      let dump_couple parameter error handler a = (*MOD*)
         let _,error  = 
           Pair_Set.fold_set 
             (fun (a,b) (bool,error) -> 
@@ -151,9 +151,9 @@ module Extensive =
               let _ = 
                 if bool 
                 then 
-                   Printf.fprintf parameter.Remanent_parameters_sig.log ";[%s->%s]" a' b' 
+                   Printf.fprintf parameter.Remanent_parameters_sig.log ";[position %s (first rule/var) -> position %s (second rule/var)]" a' b' 
                 else 
-                   Printf.fprintf parameter.Remanent_parameters_sig.log "[%s->%s]" a' b'
+                   Printf.fprintf parameter.Remanent_parameters_sig.log "[position %s (first rule/var) -> position %s (second rule/var)]" a' b'
               in 
                 true,error
             )
@@ -172,7 +172,7 @@ module Extensive =
                  let _ = 
                     if bool 
                     then 
-                      (";["^a'^"->"^b'^"]")::sol  
+                      (";["^a'^"->"^b'^"]")::sol 
                     else 
                       ("["^a'^"->"^b'^"]")::sol               
                  in true,sol,error)
