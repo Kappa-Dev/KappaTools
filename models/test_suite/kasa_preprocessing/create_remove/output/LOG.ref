@@ -62,11 +62,11 @@ Quarks:REMOVAL
 Quarks:rule_id:1,agent_type:1
 Quarks:MODIFICATION+
 Quarks:MODIFICATION-
-Quarks:agent_test**:agent_type:1,rule:1->[0]
-Quarks:agent_test**:agent_type:0,rule:0->[0]
-Quarks:agent_modif+:agent_type:2,rule:1->[0]
-Quarks:agent_modif+:agent_type:1,rule:0->[0]
-Quarks:agent_modif-:agent_type:1,rule:1->[0]
-Quarks:agent_modif-:agent_type:0,rule:0->[0]
-Influence_map:Wake_up_map:rule(0):'b' A(),0 -> 0->rule(1):'c' B(),0 -> 0[0->0]
+Quarks:agent_test**:agent_type:1,rule:1->[position 0]
+Quarks:agent_test**:agent_type:0,rule:0->[position 0]
+Quarks:agent_modif+:agent_type:2,rule:1->[position 0]
+Quarks:agent_modif+:agent_type:1,rule:0->[position 0]
+Quarks:agent_modif-:agent_type:1,rule:1->[position 0]
+Quarks:agent_modif-:agent_type:0,rule:0->[position 0]
+Influence_map:Wake_up_map:rule(0):'b' A(),0 -> 0->rule(1):'c' B(),0 -> 0[position 0 (first rule/var) -> position 0 (second rule/var)]
 execution finished without any exception

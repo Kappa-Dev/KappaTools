@@ -6,11 +6,11 @@ node [shape=box, style=filled, fillcolor=lightskyblue];
 "1:A() -> 0" ; 
 "2:0 -> B()" ; 
 edge [color=green, arrowhead=normal];
-"0:B(x,y?),A(x,y?),0 -> 0"->"0:B(x,y?),A(x,y?),0 -> 0"[label ="[0->0];[1->1]"] ; 
-"0:B(x,y?),A(x,y?),0 -> 0"->"1:A() -> 0"[label ="[1->0]"] ; 
-"1:A() -> 0"->"0:B(x,y?),A(x,y?),0 -> 0"[label ="[-1->0]"] ; 
-"2:0 -> B()"->"0:B(x,y?),A(x,y?),0 -> 0"[label ="[0->0]"] ; 
+"0:B(x,y?),A(x,y?),0 -> 0"->"0:B(x,y?),A(x,y?),0 -> 0"[label ="[position 0 (first rule/var) -> position 0 (second rule/var)];[position 1 (first rule/var) -> position 1 (second rule/var)]"] ; 
+"0:B(x,y?),A(x,y?),0 -> 0"->"1:A() -> 0"[label ="[position 1 (first rule/var) -> position 0 (second rule/var)]"] ; 
+"1:A() -> 0"->"0:B(x,y?),A(x,y?),0 -> 0"[label ="[position -1 (first rule/var) -> position 0 (second rule/var)]"] ; 
+"2:0 -> B()"->"0:B(x,y?),A(x,y?),0 -> 0"[label ="[position 0 (first rule/var) -> position 0 (second rule/var)]"] ; 
 edge [color=red, arrowhead=tee];
-"0:B(x,y?),A(x,y?),0 -> 0"->"1:A() -> 0"[label ="[1->0]"] ; 
-"1:A() -> 0"->"0:B(x,y?),A(x,y?),0 -> 0"[label ="[0->1]"] ; 
+"0:B(x,y?),A(x,y?),0 -> 0"->"1:A() -> 0"[label ="[position 1 (first rule/var) -> position 0 (second rule/var)]"] ; 
+"1:A() -> 0"->"0:B(x,y?),A(x,y?),0 -> 0"[label ="[position 0 (first rule/var) -> position 1 (second rule/var)]"] ; 
 }
