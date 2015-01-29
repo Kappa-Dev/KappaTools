@@ -37,7 +37,7 @@ let translate_site parameter error handler agent site =
       (fun error -> warn parameter error (Some "line 44") Exit (Ckappa_sig.Dictionary_of_sites.init ()))
   in 
    let error,(a,_,_) = 
-    Misc_sa.unsome 
+    Misc_sa.unsome
       (Ckappa_sig.Dictionary_of_sites.translate parameter error site dic)
       (fun error -> warn parameter error (Some "line 36") Exit (Ckappa_sig.Internal "",(),()))
   in 
@@ -153,14 +153,14 @@ let print_labels_dot parameters error handler couple =
    let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "\"]" in 
      error  
   
-let print_rule_txt parameters error rule_id m1 m2 rule = 
-   let m = m1^m2 in 
+let print_rule_txt parameters error rule_id m1 m2 rule = (*TEST*)
+   let m = "'"^m1^"', rule "^m2^": " in 
    let error,_ = error,Printf.fprintf parameters.Remanent_parameters_sig.log "%s" (if m="" then ("rule("^(string_of_int rule_id)^")") else ("rule("^string_of_int rule_id)^"):"^m) in 
    let error = Print_ckappa.print_rule parameters error rule in
      error 
    
-let print_var_txt parameters error var_id m1 m2 var = 
-   let m = m1^m2 in 
+let print_var_txt parameters error var_id m1 m2 var = (*TEST*)
+   let m = "'"^m1^"', var "^m2^": " in 
    let error,_ = error,Printf.fprintf parameters.Remanent_parameters_sig.log "%s" (if m="" then ("var("^(string_of_int var_id)^")") else ("var("^string_of_int var_id)^"):"^m) in 
    let error = Print_ckappa.print_alg parameters error var  in
      error 

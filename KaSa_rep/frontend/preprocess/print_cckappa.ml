@@ -18,12 +18,12 @@ let warn parameters mh message exn default =
 let trace = false
 let local_trace = false 
    
-let string_of_port port = "["^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.min)^";"^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.max)^"]"
+let string_of_port port = "[state_min:"^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.min)^";state_max:"^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.max)^"]" (*MOD*)
    
 let print_agent parameters error handler agent = 
      match agent with 
     | Cckappa_sig.Agent agent -> 
-       let parameters = Remanent_parameters.update_prefix parameters ("agent_type_"^(string_of_int agent.Cckappa_sig.agent_name)^":") in
+       let parameters = Remanent_parameters.update_prefix parameters ("agent_type_"^(string_of_int agent.Cckappa_sig.agent_name)^":") in (*TEST*)
          Cckappa_sig.Site_map_and_set.fold_map
           (fun a b error ->  
              let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%ssite_type:%i->state:%s\n" parameters.Remanent_parameters_sig.prefix a (string_of_port b)  in 
@@ -47,7 +47,7 @@ let print_mixture parameters error handler mixture =
       Int_storage.Quick_Nearly_inf_Imperatif.print 
        error 
        (fun error parameters a -> 
-          let _ = print_agent parameters error handler a in 
+        let _ = print_agent parameters error handler a in (*TEST*)
             error 
        ) 
        (Remanent_parameters.update_prefix parameters "agent_id_") 
@@ -320,7 +320,7 @@ let print_diffview parameters error handler diff =
    
  let print_rule parameters error handler rule = 
   let parameters_lhs =  Remanent_parameters.update_prefix parameters "lhs:" in 
-  let error = print_mixture parameters_lhs error handler rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs in 
+  let error = print_mixture parameters_lhs error handler rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs in
   let parameters_rhs =  Remanent_parameters.update_prefix parameters "rhs:" in 
   let error = print_mixture parameters_rhs error handler rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_rhs in
   let parameters_lhsdiff =  Remanent_parameters.update_prefix parameters "direct:" in 
