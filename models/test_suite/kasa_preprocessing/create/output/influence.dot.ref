@@ -4,5 +4,5 @@ digraph G{
 node [shape=box, style=filled, fillcolor=lightskyblue];
 "0:A(x),0 -> 0" ; 
 edge [color=green, arrowhead=normal];
-"0:A(x),0 -> 0"->"0:A(x),0 -> 0"[label ="[position -1 (first rule/var) -> position 0 (second rule/var)];[position 0 (first rule/var) -> position 0 (second rule/var)];[position 1 (first rule/var) -> position 0 (second rule/var)]"] ; 
+"0:A(x),0 -> 0" -> "0:A(x),0 -> 0"[label ="[-1->0];[0->0];[1->0]"] ; 
 }

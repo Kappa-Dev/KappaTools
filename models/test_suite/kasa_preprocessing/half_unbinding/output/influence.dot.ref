@@ -5,5 +5,5 @@ node [shape=box, style=filled, fillcolor=lightskyblue];
 "b" ; 
 "a" ; 
 edge [color=green, arrowhead=normal];
-"a"->"b"[label ="[position 0 (first rule/var) -> position 0 (second rule/var)]"] ; 
+"a" -> "b"[label ="[0->0]"] ; 
 }
