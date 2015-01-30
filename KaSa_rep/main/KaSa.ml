@@ -69,7 +69,7 @@ let main () =
   let error = Print_quarks.dot_of_influence_map parameters_influence_map error handler c_compil (wake_up_map,inhibition_map) in 
   let _ = Exception.print parameters error  in
   (*MOD*)
-  let _ = Printf.printf "REMARK: If a position is a negative number [-k], then it refers an agent that is connected to the agent at position (k-1) that is modified by side effects. \n" in
+  let _ = Printf.printf "\nREMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects. \n\nInfluence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.\n" in
   ()
 
 let _ = main () 
