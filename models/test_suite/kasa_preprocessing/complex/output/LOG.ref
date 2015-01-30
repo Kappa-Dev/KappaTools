@@ -590,3 +590,4 @@ error: file_name: Preprocess; message: line 514; exception:Exit
 error: file_name: Translate; message: line 44; exception:Exit
 error: file_name: Translate; message: line 44; exception:Exit
 error: file_name: Translate; message: line 44; exception:Exit
+REMARK: If a position is a negative number [-k], then it refers an agent that is connected to the agent at position (k-1) that is modified by side effects. 

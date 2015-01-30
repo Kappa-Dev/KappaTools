@@ -155,3 +155,4 @@ Influence_map:Wake_up_map:rule(1):'' 0 -> A(x),0->rule(1):'' 0 -> A(x),0[positio
 Influence_map:Inhibition_map:rule(0):'' A(x),0 -> 0->rule(1):'' 0 -> A(x),0[position -1 (first rule/var) -> position 1 (second rule/var)];[position 0 (first rule/var) -> position 0 (second rule/var)];[position 0 (first rule/var) -> position 1 (second rule/var)]
 Influence_map:Inhibition_map:rule(1):'' 0 -> A(x),0->rule(0):'' A(x),0 -> 0[position 0 (first rule/var) -> position 0 (second rule/var)];[position 1 (first rule/var) -> position 0 (second rule/var)]
 execution finished without any exception
+REMARK: If a position is a negative number [-k], then it refers an agent that is connected to the agent at position (k-1) that is modified by side effects. 

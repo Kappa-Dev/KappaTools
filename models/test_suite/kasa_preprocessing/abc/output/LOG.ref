@@ -486,3 +486,4 @@ Influence_map:Inhibition_map:rule(5):'mod x2' C(x1~p,x2~u!1),A(x,c!1) -> C(x1~p,
 Influence_map:Inhibition_map:rule(5):'mod x2' C(x1~p,x2~u!1),A(x,c!1) -> C(x1~p,x2~p),A(x,c)->var(4):'Cuu' C(x1~u?,x2~u?)[position 0 (first rule/var) -> position 0 (second rule/var)]
 Influence_map:Inhibition_map:rule(5):'mod x2' C(x1~p,x2~u!1),A(x,c!1) -> C(x1~p,x2~p),A(x,c)->var(5):'Cpu' C(x1~p?,x2~u?)[position 0 (first rule/var) -> position 0 (second rule/var)]
 execution finished without any exception
+REMARK: If a position is a negative number [-k], then it refers an agent that is connected to the agent at position (k-1) that is modified by side effects. 

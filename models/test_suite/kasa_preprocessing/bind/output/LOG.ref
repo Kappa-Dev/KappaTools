@@ -286,3 +286,4 @@ Influence_map:Inhibition_map:rule(3):'' C(x),B(x~p!),0 -> C(x!1),0->rule(0):'' B
 Influence_map:Inhibition_map:rule(3):'' C(x),B(x~p!),0 -> C(x!1),0->rule(1):'' B(x~p!1),A(x!1) -> B(x~p),A(x)[position -2 (first rule/var) -> position 1 (second rule/var)];[position 1 (first rule/var) -> position 0 (second rule/var)]
 Influence_map:Inhibition_map:rule(3):'' C(x),B(x~p!),0 -> C(x!1),0->rule(2):'' C(x),A(x) -> C(x!1),A(x!1)[position 0 (first rule/var) -> position 0 (second rule/var)]
 execution finished without any exception
+REMARK: If a position is a negative number [-k], then it refers an agent that is connected to the agent at position (k-1) that is modified by side effects. 
