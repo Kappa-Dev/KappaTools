@@ -102,8 +102,8 @@ module Extensive =
           (error,sol)
     
         
-      let dump parameter error handler  a = (*MOD*)
-        let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "[position " in
+      let dump parameter error handler  a =
+        let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "[" in
         let _,error  = 
           Set.fold_set 
             (fun a (bool,error) -> 
@@ -111,7 +111,7 @@ module Extensive =
               let _ = 
                 if bool 
                 then 
-                   Printf.fprintf parameter.Remanent_parameters_sig.log ";position %s" a'  
+                   Printf.fprintf parameter.Remanent_parameters_sig.log ";%s" a'  
                 else 
                    Printf.fprintf parameter.Remanent_parameters_sig.log "%s" a' 
               in 
@@ -142,7 +142,7 @@ module Extensive =
           let sol = List.rev ("]"::sol) in 
             error,sol   
           
-      let dump_couple parameter error handler a = (*MOD*)
+      let dump_couple parameter error handler a =
         let _,error  = 
           Pair_Set.fold_set 
             (fun (a,b) (bool,error) -> 
@@ -151,9 +151,9 @@ module Extensive =
               let _ = 
                 if bool 
                 then 
-                   Printf.fprintf parameter.Remanent_parameters_sig.log ";[position %s (first rule/var) -> position %s (second rule/var)]" a' b' 
+                   Printf.fprintf parameter.Remanent_parameters_sig.log ";[%s->%s]" a' b' 
                 else 
-                   Printf.fprintf parameter.Remanent_parameters_sig.log "[position %s (first rule/var) -> position %s (second rule/var)]" a' b'
+                   Printf.fprintf parameter.Remanent_parameters_sig.log "[%s->%s]" a' b'
               in 
                 true,error
             )
@@ -171,7 +171,7 @@ module Extensive =
                  let error,b' = L.to_string parameter error b in 
                  let _ = 
                     if bool 
-                    then 
+                    then
                       (";["^a'^"->"^b'^"]")::sol 
                     else 
                       ("["^a'^"->"^b'^"]")::sol               
@@ -261,7 +261,7 @@ module Implicit =
         in 
           error
   
-      let to_string_couple parameter error handler a = 
+      let to_string_couple parameter error handler a =
         let sol = ["["] in  
         let _,sol = 
           List.fold_left
