@@ -119,10 +119,10 @@ let eval_node env a link_map node_map node_id =
 let nodes_of_ast env ast_mixture =
   let rec iter ast_mixture node_map node_id link_map env =
     match ast_mixture with
-    | Ast.COMMA (a, ast_mix) ->
+    | a :: ast_mix ->
        let (node_map,link_map,env) = eval_node env a link_map node_map node_id in
        iter ast_mix node_map (node_id+1) link_map env
-    | Ast.EMPTY_MIX ->
+    | [] ->
        IntMap.iter
 	 (fun i opt ->
 	  match opt with
@@ -236,7 +236,7 @@ let eval_agent env a ctxt =
 let mixture_of_ast ?mix_id env ast_mix =
   let rec eval_mixture env ast_mix ctxt mixture =
     match ast_mix with
-    | Ast.COMMA (a, ast_mix) ->
+    | a :: ast_mix ->
        let (ctxt, agent) = eval_agent env a ctxt in
        let id = ctxt.curr_id in let new_edges = ctxt.new_edges in
        let (ctxt, mixture, env) =
@@ -246,7 +246,7 @@ let mixture_of_ast ?mix_id env ast_mix =
 			new_edges = Int2Map.empty;
 		      } mixture
        in (ctxt, (Mixture.compose id agent mixture new_edges), env)
-    | Ast.EMPTY_MIX -> (ctxt, mixture, env)
+    | [] -> (ctxt, mixture, env)
   in
   let ctxt = { pairing = IntMap.empty; curr_id = 0; new_edges = Int2Map.empty; } in
   let (ctxt, mix, env) = eval_mixture env ast_mix ctxt (Mixture.empty mix_id)
@@ -570,7 +570,7 @@ let effects_of_modif variables lrules env ast_list =
 			       (env.Environment.fresh_kappa,[]) alg_expr in
 	    let (env',mixs') = mixtures_of_result mixs env mix in
 	    let ast_rule =
-	      { add_token=[]; rm_token=[]; lhs = Ast.EMPTY_MIX; arrow = Ast.RAR;
+	      { add_token=[]; rm_token=[]; lhs = []; arrow = Ast.RAR;
 		rhs = ast_mix; k_def=Term.with_dummy_pos (Ast.CONST(Nbr.F 0.0));
 		k_un=None;k_op=None;
 	      } in
@@ -587,7 +587,7 @@ let effects_of_modif variables lrules env ast_list =
 	    let (env',mixs') = mixtures_of_result mixs env mix in
 	    let ast_rule =
 	      { add_token=[]; rm_token=[]; lhs = ast_mix; arrow = Ast.RAR;
-		rhs = Ast.EMPTY_MIX;
+		rhs = [];
 		k_def=Term.with_dummy_pos (Ast.CONST(Nbr.F 0.0));
 		k_un=None;k_op=None;
 	      } in

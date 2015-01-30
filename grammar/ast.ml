@@ -14,9 +14,7 @@ type port = {port_nme:string Term.with_pos;
 	     port_int:internal;
 	     port_lnk:link with_pos;}
 type agent = (string with_pos * port list)
-type mixture =
-	| COMMA of agent * mixture
-	| EMPTY_MIX
+type mixture = agent list
 
 type 'mixt ast_alg_expr =
     BIN_ALG_OP of

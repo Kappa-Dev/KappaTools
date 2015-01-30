@@ -282,7 +282,7 @@ sum_token:
     | alg_expr TYPE ID PLUS sum_token {let l = $5 in ($1,$3)::l}
 
 mixture:
-      /*empty*/ {Ast.EMPTY_MIX}
+      /*empty*/ {[]}
     | non_empty_mixture {$1}
 ;
 
@@ -390,8 +390,8 @@ multiple_mixture:
 
 non_empty_mixture:
     | OP_PAR non_empty_mixture CL_PAR {$2}
-    | agent_expression COMMA non_empty_mixture {Ast.COMMA ($1,$3)}
-    | agent_expression {Ast.COMMA($1,Ast.EMPTY_MIX)}
+    | agent_expression COMMA non_empty_mixture {$1 :: $3}
+    | agent_expression {[$1]}
     ;
 
 agent_expression:

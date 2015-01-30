@@ -46,11 +46,11 @@ let add_entry parameters id agent site index (error,map) =
 let rev_ast mixture = 
   let rec aux mixture sol = 
     match mixture with
-      | Ast.EMPTY_MIX -> sol 
+      | [] -> sol
 (*      | Ast.DOT(i,agent,mixture) -> aux mixture (Ast.DOT(i,agent,sol))*)
 (*      | Ast.PLUS(i,agent,mixture) -> aux mixture (Ast.PLUS(i,agent,sol))*)
-      | Ast.COMMA(agent,mixture) -> aux mixture (Ast.COMMA(agent,sol))
-  in aux mixture Ast.EMPTY_MIX 
+      | agent :: mixture -> aux mixture (agent :: sol)
+  in aux mixture []
   
 let pop_entry parameters error id map = 
   let error,list = Ckappa_sig.Int_Set_and_Map.find_map parameters error id map 
@@ -83,11 +83,11 @@ let rec scan_interface parameters k agent interface remanent =
 let scan_agent parameters k agent remanent = 
   fst (scan_interface parameters k (fst (fst agent)) (snd agent) (remanent,Mods.StringSet.empty))
 
-let rec collect_binding_label parameters mixture f k remanent = 
-  match mixture with 
-  | Ast.COMMA (agent,mixture) (*| Ast.DOT (_,agent,mixture) | Ast.PLUS(_,agent,mixture)*) -> 
-           collect_binding_label parameters mixture f (k+1) (scan_agent parameters (f k) agent remanent)
-        | Ast.EMPTY_MIX -> remanent 
+let rec collect_binding_label parameters mixture f k remanent =
+  match mixture with
+  | agent :: mixture (*| Ast.DOT (_,agent,mixture) | Ast.PLUS(_,agent,mixture)*) ->
+     collect_binding_label parameters mixture f (k+1) (scan_agent parameters (f k) agent remanent)
+  | [] -> remanent
 
 let translate_lnk_state parameters lnk_state remanent = 
     match lnk_state with 
@@ -148,8 +148,8 @@ let rec build_skip k mixture =
   
 let rec translate_mixture_zero_zero  parameters mixture remanent tail_size = 
    match mixture with 
-     | Ast.EMPTY_MIX -> build_skip tail_size Ckappa_sig.EMPTY_MIX,remanent
-     | Ast.COMMA(agent,mixture) ->
+     | [] -> build_skip tail_size Ckappa_sig.EMPTY_MIX,remanent
+     | agent :: mixture ->
        let agent,remanent = translate_agent parameters agent remanent in 
        let mixture,remanent = translate_mixture_zero_zero parameters mixture remanent tail_size  in 
        Ckappa_sig.COMMA(agent,mixture),remanent 
@@ -170,8 +170,8 @@ let rec translate_mixture_in_rule parameters mixture remanent prefix_size empty_
         build_skip empty_size tail,remanent 
    else 
       match mixture with 
-      | Ast.EMPTY_MIX -> Ckappa_sig.EMPTY_MIX,remanent
-      | Ast.COMMA(agent,mixture) ->
+      | [] -> Ckappa_sig.EMPTY_MIX,remanent
+      | agent :: mixture ->
           let agent,remanent = translate_agent parameters agent remanent in 
           let mixture,remanent = translate_mixture_in_rule parameters mixture remanent (prefix_size-1) empty_size tail_size  in 
             Ckappa_sig.COMMA(agent,mixture),remanent 
@@ -186,8 +186,8 @@ let rec translate_mixture_in_rule parameters mixture remanent prefix_size empty_
 
  let rec translate_mixture parameters mixture remanent  = 
     match mixture with 
-      | Ast.EMPTY_MIX -> Ckappa_sig.EMPTY_MIX,remanent
-      | Ast.COMMA(agent,mixture) ->
+      | [] -> Ckappa_sig.EMPTY_MIX,remanent
+      | agent :: mixture ->
           let agent,remanent = translate_agent parameters agent remanent in 
           let mixture,remanent = translate_mixture parameters mixture remanent in 
             Ckappa_sig.COMMA(agent,mixture),remanent 
@@ -216,26 +216,23 @@ let support_agent ag =
 let compatible_agent ag1 ag2 = 
   support_agent ag1 = support_agent ag2
   
-let length mixture = 
-  let rec aux mixture k = 
-    match mixture with 
-      | Ast.EMPTY_MIX -> k 
-      | Ast.COMMA(_,mixture) (*| Ast.DOT(_,_,mixture) | Ast.PLUS(_,_,mixture)*) -> aux mixture (k+1)
-  in aux mixture 0 
+let length mixture =
+  let rec aux mixture k =
+    match mixture with
+    | [] -> k
+    | _ :: mixture (*| Ast.DOT(_,_,mixture) | Ast.PLUS(_,_,mixture)*) -> aux mixture (k+1)
+  in aux mixture 0
   
   
 let longuest_prefix mixture1 mixture2 =
-  let rec common_prefix mixture1 mixture2 k = 
-    match mixture1 with 
-      | Ast.EMPTY_MIX -> 
+  let rec common_prefix mixture1 mixture2 k =
+    match mixture1 with
+      | [] -> (k,mixture1,mixture2)
+      | agent :: mixture (*| Ast.DOT(_,agent,mixture) | Ast.PLUS(_,agent,mixture)*) ->
         begin
-          k,mixture1,mixture2
-        end 
-      | Ast.COMMA(agent,mixture) (*| Ast.DOT(_,agent,mixture) | Ast.PLUS(_,agent,mixture)*) ->
-        begin
-          match mixture2 with 
-            | Ast.EMPTY_MIX -> k,mixture1,mixture2
-            | Ast.COMMA(agent',mixture') (*| Ast.DOT(_,agent',mixture') | Ast.PLUS(_,agent',mixture')*) -> 
+          match mixture2 with
+            | [] -> (k,mixture1,mixture2)
+            | agent' :: mixture' (*| Ast.DOT(_,agent',mixture') | Ast.PLUS(_,agent',mixture')*) ->
                begin 
                  if compatible_agent agent agent'
                  then  
