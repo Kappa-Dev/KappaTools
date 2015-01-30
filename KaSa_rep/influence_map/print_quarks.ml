@@ -36,7 +36,7 @@ let print_agent_map parameter error handler map =
               let _ = Quark_type.Labels.dump parameter error handler im' in 
               let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "\n" in
             error)
-          im)  
+          im)
       map
   in error
 
@@ -129,11 +129,11 @@ let print_maps parameters error handler compilation print_rule print_var print_l
   let _  = 
     Quark_type.Int2Set_and_map.fold_map
       (fun (a,b) couple error -> 
-         let error,ruleb = Handler.string_of_rule parameters error handler compilation b in 
+       let error,ruleb = Handler.string_of_rule parameters error handler compilation b in
          let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s" prefix in 
          let error,bool,() = Handler.print_rule_or_var parameters error handler compilation print_rule print_var a in 
-         let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "->" in 
-         let error,bool,()  = Handler.print_rule_or_var parameters error handler compilation print_rule print_var b in 
+         let _ = Printf.fprintf parameters.Remanent_parameters_sig.log " -> " in
+         let error,bool,()  = Handler.print_rule_or_var parameters error handler compilation print_rule print_var b in
          let _ = print_labels parameters error handler couple in 
          let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s" suffix in 
               error
