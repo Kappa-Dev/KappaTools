@@ -143,12 +143,12 @@ Quarks:site_modif+:agent_type:0,site_type:0,state:1,rule:0->[1]
 Quarks:site_modif-:agent_type:1,site_type:0,state:1,rule:1->[-1]
 Quarks:site_modif-:agent_type:1,site_type:0,state:0,rule:0->[0]
 Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:0->[1]
-Influence_map:Wake_up_map:rule(0):'' B(x,y?),A(x,y?),0 -> 0 -> rule(0):'' B(x,y?),A(x,y?),0 -> 0[0->0];[1->1]
-Influence_map:Wake_up_map:rule(0):'' B(x,y?),A(x,y?),0 -> 0 -> rule(1):'' A() -> 0[1->0]
-Influence_map:Wake_up_map:rule(1):'' A() -> 0 -> rule(0):'' B(x,y?),A(x,y?),0 -> 0[-1->0]
-Influence_map:Wake_up_map:rule(2):'' 0 -> B() -> rule(0):'' B(x,y?),A(x,y?),0 -> 0[0->0]
-Influence_map:Inhibition_map:rule(0):'' B(x,y?),A(x,y?),0 -> 0 -> rule(1):'' A() -> 0[1->0]
-Influence_map:Inhibition_map:rule(1):'' A() -> 0 -> rule(0):'' B(x,y?),A(x,y?),0 -> 0[0->1]
+Influence_map:Wake_up_map:rule(0):'' B(x,y?),A(x,y?),Ghost->Ghost -> rule(0):'' B(x,y?),A(x,y?),Ghost->Ghost[0->0];[1->1]
+Influence_map:Wake_up_map:rule(0):'' B(x,y?),A(x,y?),Ghost->Ghost -> rule(1):'' A()->Ghost[1->0]
+Influence_map:Wake_up_map:rule(1):'' A()->Ghost -> rule(0):'' B(x,y?),A(x,y?),Ghost->Ghost[-1->0]
+Influence_map:Wake_up_map:rule(2):'' Ghost->B() -> rule(0):'' B(x,y?),A(x,y?),Ghost->Ghost[0->0]
+Influence_map:Inhibition_map:rule(0):'' B(x,y?),A(x,y?),Ghost->Ghost -> rule(1):'' A()->Ghost[1->0]
+Influence_map:Inhibition_map:rule(1):'' A()->Ghost -> rule(0):'' B(x,y?),A(x,y?),Ghost->Ghost[0->1]
 execution finished without any exception
 
 REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects. 
