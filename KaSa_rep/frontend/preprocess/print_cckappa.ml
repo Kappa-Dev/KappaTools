@@ -344,9 +344,9 @@ let print_diffview parameters error handler diff =
 
  let print_observables parameters error handler obs = error
  
- let print_init parameters error handler init = 
-  let parameters_init =  Remanent_parameters.update_prefix parameters "coef:" in 
-(*  let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s%i\n" parameters_init.Remanent_parameters_sig.prefix init.Cckappa_sig.e_init_factor in *)
+ let print_init parameters error handler init =
+(*  let parameters_init =  Remanent_parameters.update_prefix parameters "coef:" in
+  let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s%i\n" parameters_init.Remanent_parameters_sig.prefix init.Cckappa_sig.e_init_factor in *)
   let parameters_rhs =  Remanent_parameters.update_prefix parameters "mixture:" in 
   let error = print_mixture parameters_rhs error handler init.Cckappa_sig.e_init_c_mixture  in 
    error 

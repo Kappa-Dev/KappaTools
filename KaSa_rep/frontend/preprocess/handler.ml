@@ -112,8 +112,8 @@ let string_of_rule parameters error handler compiled rule_id =
 		 match 
 		   rule.Cckappa_sig.e_rule_initial_direction 
 		 with
-		 | Direct -> m1
-		 | Reverse -> Ast.flip_label m1
+		 | Ckappa_sig.Direct -> m1
+		 | Ckappa_sig.Reverse -> Ast.flip_label m1
 	     in 
 	     error,(if m1="" then ("rule "^(string_of_int rule_id)) else ("rule "^string_of_int rule_id)^": "^m1)
     end 
@@ -223,8 +223,8 @@ let print_rule_dot parameters error rule_id m1 m2 rule =
 		 match 
 		   rule.Cckappa_sig.e_rule_initial_direction 
 		 with
-		 | Direct -> m1
-		 | Reverse -> Ast.flip_label m1
+		 | Ckappa_sig.Direct -> m1
+		 | Ckappa_sig.Reverse -> Ast.flip_label m1
 	     in 
              let error = print_rule parameters error rule_id m1 (string_of_int rule_id) rule.Cckappa_sig.e_rule_rule in  
                error,true,() 

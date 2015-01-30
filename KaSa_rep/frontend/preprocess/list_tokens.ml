@@ -230,9 +230,10 @@ let scan_initial_states parameters =
       match 
 	init_t
       with 
-	Ast.INIT_MIX((alg,pos),mixture) ->
+      | Ast.INIT_MIX((alg,pos),mixture) ->
 	  let remanent = scan_mixture parameters remanent mixture in 
-          scan_alg parameters remanent alg) 
+          scan_alg parameters remanent alg
+       | Ast.INIT_TOK ((alg,pos),tok) -> scan_alg parameters remanent alg)
     
 let scan_declarations parameters  = 
   List.fold_left 
