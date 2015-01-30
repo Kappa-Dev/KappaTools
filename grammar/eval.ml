@@ -34,17 +34,14 @@ let eval_intf ast_intf =
 
 let eval_node env a link_map node_map node_id =
   let ast_intf = snd a in
-  let ag_name = fst (fst a) in
+  let (agent_name,_ as agent) = fst a in
   let pos_ag = pos_of_lex_pos (fst (snd (fst a))) in
-  let name_id =
-    try Environment.num_of_name ag_name env with
-    | Not_found ->
-       raise (ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared"))
-  in
+  let name_id = Environment.num_of_name agent env in
   let sign =
     try Environment.get_sig name_id env with
     | Not_found ->
-       raise (ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ ag_name ^ "' is not declared"))
+       raise (ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ agent_name ^
+						      "' is not declared"))
   in
 
   (*Begin sub function*)
@@ -54,14 +51,9 @@ let eval_node env a link_map node_map node_id =
        begin
 	 let int_state_list = p.Ast.port_int
 	 and lnk_state = p.Ast.port_lnk in
-	 let port_name = fst p.Ast.port_nme in
+	 let port_name = p.Ast.port_nme in
 	 let prt_pos = snd p.Ast.port_nme in
-	 let port_id =
-	   try Signature.num_of_site port_name sign with
-	     Not_found ->
-	     raise (ExceptionDefn.Malformed_Decl
-		      ("Site '" ^ port_name ^ "' is not declared",prt_pos))
-	 in
+	 let port_id = Signature.num_of_site ~agent_name port_name sign in
 	 let link_map,bond_list =
 	   match lnk_state with
 	   | (Ast.LNK_VALUE (i),(beg_pos,_)) ->
@@ -71,27 +63,21 @@ let eval_node env a link_map node_map node_id =
 		  let opt_node = IntMap.find i link_map in
 		  match opt_node with
 		  | None -> raise (ExceptionDefn.Semantics_Error
-				     (pos,"Edge identifier at site '" ^ port_name ^ "' is used multiple times"))
+				     (pos,"Edge identifier at site '" ^ fst port_name ^ "' is used multiple times"))
 		  | Some (node_id',port_id',pos') ->
 		     (IntMap.add i None link_map,(node_id,port_id,node_id',port_id')::bond_list)
 		with Not_found -> (IntMap.add i (Some (node_id,port_id,pos)) link_map,bond_list)
 	      end
 	   | (Ast.FREE,_) -> (link_map,bond_list)
 	   | _ -> raise (ExceptionDefn.Malformed_Decl
-			   ("Site '" ^ port_name ^ "' is partially defined",
+			   ("Site '" ^ fst port_name ^ "' is partially defined",
 			    prt_pos))
 	 in
 	 match int_state_list with
 	 | [] ->
 	    build_intf ast' link_map (IntMap.add port_id (None,Mixture.WLD) intf) bond_list
 	 | s::_ ->
-	    let i =
-	      try Signature.num_of_internal_state port_id (fst s) sign
-	      with Not_found ->
-		raise (ExceptionDefn.Malformed_Decl
-			 ("Internal state of site'" ^ port_name ^ "' is not defined"
-			 ,prt_pos))
-	    in
+	    let i = Signature.num_of_internal_state port_id s sign in
 	    build_intf ast' link_map
 		       (IntMap.add port_id (Some i,Mixture.WLD) intf) bond_list
        (*Geekish, adding Mixture.WLD to be consistent with Node.create*)
@@ -135,39 +121,27 @@ let nodes_of_ast env ast_mixture =
   iter ast_mixture IntMap.empty 0 IntMap.empty env
 
 let eval_agent env a ctxt =
-  let ((ag_name, (pos_ag)),ast_intf) = a in
+  let ((agent_name, pos_ag),ast_intf) = a in
   let name_id =
-    try Environment.num_of_name ag_name env with
-    | Not_found ->
-       raise (ExceptionDefn.Malformed_Decl
-		("Agent '" ^ ag_name ^ "' is not declared",pos_ag))
-  in
+    Environment.num_of_name (agent_name,pos_ag) env in
   let sign =
     try (Environment.get_sig name_id env)
     with Not_found ->
       raise (ExceptionDefn.Malformed_Decl
-	       ("Agent '" ^ ag_name ^ "' is not declared",pos_ag))
+	       ("Agent '" ^ agent_name ^ "' is not declared",pos_ag))
   in
   let port_map = eval_intf ast_intf in
   let (interface, ctxt) =
     StringMap.fold
       (fun site_name (int_state_list, lnk_state, prt_pos) (interface, ctxt) ->
        let site_id =
-	 try (Signature.num_of_site site_name sign)
-	 with Not_found ->
-	   let msg =
-	     "Eval.eval_agent: site '" ^
-	       (site_name^("' is not defined for agent '"^ag_name^"'"))
-	   in
-	   raise (ExceptionDefn.Malformed_Decl (msg,prt_pos))
-       in
+	 Signature.num_of_site ~agent_name (site_name,prt_pos) sign in
        let int_s =
 	 match int_state_list with
 	 | [] -> None
 	 | h::_ ->
-	    Environment.check ag_name (pos_of_lex_pos (fst pos_ag)) site_name
-			      (pos_of_lex_pos (fst prt_pos)) (fst h) env;
-	    let i = Environment.id_of_state ag_name site_name (fst h) env
+	    Environment.check (agent_name,pos_ag) (site_name,prt_pos) h env;
+	    let i = Environment.id_of_state agent_name site_name h env
 	    in Some i
        in
        let interface,ctx =
@@ -218,12 +192,7 @@ let eval_agent env a ctxt =
 		       (pos_ste, "binding type is not compatible with agent's signature"))
 	     in
 	     let ag_num =
-	       try Environment.num_of_name ag_nm env with
-	       | Not_found ->
-		  raise
-		    (ExceptionDefn.Semantics_Error
-		       (pos_ste,"Illegal binding type, agent "^ag_nm^" is not delcared"))
-	     in
+	       Environment.num_of_name (Term.with_dummy_pos ag_nm) env in
 	     ((IntMap.add site_id (int_s, Mixture.TYPE (site_num, ag_num)) interface),ctxt)
 	    )
        in

@@ -1,4 +1,5 @@
 type 'a with_pos = 'a * (Lexing.position * Lexing.position)
+type 'a maybe_pos = ?pos:(Lexing.position * Lexing.position) -> 'a
 
 type bin_alg_op = MULT | SUM | DIV | MINUS | POW | MODULO | MIN | MAX
 type un_alg_op = LOG | SQRT | EXP | SINUS | COSINUS | TAN | INT | UMINUS

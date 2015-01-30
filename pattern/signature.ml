@@ -8,8 +8,11 @@ let fold f sign cont =
 			      sign.NamedDecls.decls
   in cont
 
-let num_of_site site_name sign =
-  StringMap.find site_name sign.NamedDecls.finder
+let num_of_site ?agent_name site_name sign =
+  let kind = match agent_name with
+    | None -> "site name"
+    | Some agent_name -> "site name for agent "^agent_name
+  in NamedDecls.elt_id ~kind sign site_name
 
 let site_of_num addr sign =
   try NamedDecls.elt_name sign addr
@@ -17,10 +20,11 @@ let site_of_num addr sign =
 
 let num_of_internal_state site_id state sign =
   try
-    let _,values_opt = sign.NamedDecls.decls.(site_id) in
+    let (na,_),values_opt = sign.NamedDecls.decls.(site_id) in
     match values_opt with
     | None -> raise Not_found
-    | Some nd -> StringMap.find state nd.NamedDecls.finder
+    | Some nd ->
+       NamedDecls.elt_id ~kind:("internal state for site "^na) nd state
   with
   | Invalid_argument _ -> raise Not_found
 
