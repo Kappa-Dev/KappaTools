@@ -104,7 +104,7 @@ let string_of_rule parameters error handler compiled rule_id =
          | None -> warn parameters error (Some "line 103") Exit ""
          | Some rule ->
              let label = rule.Cckappa_sig.e_rule_label in 
-             let error,(m1,_) = Misc_sa.unsome (error,label) 
+             let error,(m1,_) = Misc_sa.unsome (error,label)
 	       (fun error -> error,("",(Lexing.dummy_pos,Lexing.dummy_pos))) in 
              let m1 = 
 	       if m1 = "" then m1
@@ -112,8 +112,8 @@ let string_of_rule parameters error handler compiled rule_id =
 		 match 
 		   rule.Cckappa_sig.e_rule_initial_direction 
 		 with
-		 | Direct -> m1 
-		 | Reverse -> Ast.flip_label m1 
+		 | Direct -> m1
+		 | Reverse -> Ast.flip_label m1
 	     in 
 	     error,(if m1="" then ("rule "^(string_of_int rule_id)) else ("rule "^string_of_int rule_id)^": "^m1)
     end 
@@ -153,15 +153,15 @@ let print_labels_dot parameters error handler couple =
    let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "\"]" in 
      error  
   
-let print_rule_txt parameters error rule_id m1 m2 rule = (*TEST*)
-   let m = "'"^m1^"' " in 
-   let error,_ = error,Printf.fprintf parameters.Remanent_parameters_sig.log "%s" (if m="" then ("rule("^(string_of_int rule_id)^")") else ("rule("^string_of_int rule_id)^"):"^m) in
+let print_rule_txt parameters error rule_id m1 m2 rule = (*MOD*)
+  let m = "'"^m1^"' " in
+  let error,_ = error,Printf.fprintf parameters.Remanent_parameters_sig.log "%s" (if m="" then ("rule("^(string_of_int rule_id)^"): ") else ("rule("^string_of_int rule_id)^"):"^m) in
    let error = Print_ckappa.print_rule parameters error rule in
      error 
    
-let print_var_txt parameters error var_id m1 m2 var = (*TEST*)
+let print_var_txt parameters error var_id m1 m2 var = (*MOD*)
   let m = "'"^m1^"' " in 
-  (*let m = "'"^m1^"' "^m2^" " in *)
+ (* let m = "'"^m1^"' "^m2^" " in *)
    let error,_ = error,Printf.fprintf parameters.Remanent_parameters_sig.log "%s" (if m="" then ("var("^(string_of_int var_id)^")") else ("var("^string_of_int var_id)^"):"^m) in 
    let error = Print_ckappa.print_alg parameters error var  in
      error 
@@ -195,7 +195,8 @@ let print_rule_dot parameters error rule_id m1 m2 rule =
    in 
    let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "\"" in 
    error
-   
+
+ (*TEST*)
  let print_rule_or_var parameters error handler compiled print_rule print_var rule_id = 
   let rules = compiled.Cckappa_sig.rules in
   let vars = compiled.Cckappa_sig.variables in 
@@ -222,8 +223,8 @@ let print_rule_dot parameters error rule_id m1 m2 rule =
 		 match 
 		   rule.Cckappa_sig.e_rule_initial_direction 
 		 with
-		 | Direct -> m1 
-		 | Reverse -> Ast.flip_label m1 
+		 | Direct -> m1
+		 | Reverse -> Ast.flip_label m1
 	     in 
              let error = print_rule parameters error rule_id m1 (string_of_int rule_id) rule.Cckappa_sig.e_rule_rule in  
                error,true,() 

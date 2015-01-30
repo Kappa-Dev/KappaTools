@@ -48,7 +48,7 @@ let print_mixture parameters error handler mixture =
        error 
        (fun error parameters a -> 
         let _ = print_agent parameters error handler a in (*TEST*)
-            error 
+            error
        ) 
        (Remanent_parameters.update_prefix parameters "agent_id_") 
        mixture.Cckappa_sig.views 
