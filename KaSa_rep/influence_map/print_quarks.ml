@@ -40,7 +40,6 @@ let print_agent_map parameter error handler map =
       map
   in error
 
-(*MOD:print var instead of rule*)
 let print_agent_var_map parameter error handler map = 
   let error = 
     Quark_type.AgentMap.iter 
@@ -89,7 +88,6 @@ let print_site_map parameter error handler map =
       )
       map
 
-(*MOD:print var instead of rule*)      
 let print_site_var_map parameter error handler map = 
      Quark_type.SiteMap.iter 
       parameter 
@@ -121,7 +119,7 @@ let print_sites parameter error handler quark =
     error 
   
 let print_quarks parameters  error handler quark = 
-  let _ = Printf.fprintf parameters.Remanent_parameters_sig.log  "\nREMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects." in 
+  let _ = Printf.fprintf parameters.Remanent_parameters_sig.log  "\nREMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.\n" in 
   let error = print_agents  parameters error handler quark in 
   let error = print_sites parameters  error handler quark in 
   error
