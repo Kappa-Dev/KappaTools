@@ -13,7 +13,6 @@ Signature:sites:agent_type:2:
 Signature:states: 
 Signature:duals: 
 Compilation:
-Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_1:
@@ -28,7 +27,7 @@ Compilation:rules:0:reverse:
 Compilation:rules:0:reverse:agent_id_0:
 Compilation:rules:0:actions:deletion:(agent_id:0,agent_type:0)
 Compilation:rules:0:actions:creation:(agent_id:1,agent_type:1)
-Compilation:rules:1:
+
 Compilation:rules:1:lhs:
 Compilation:rules:1:lhs:agent_id_0:
 Compilation:rules:1:lhs:agent_id_1:

@@ -25,7 +25,6 @@ Signature:duals:0:1:
 Signature:duals:0:1:1:
 Signature:duals:0:1:1:agent_type:0,site_type:0,state_id:1
 Compilation:
-Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type:0->state:[state_min:0;state_max:0]

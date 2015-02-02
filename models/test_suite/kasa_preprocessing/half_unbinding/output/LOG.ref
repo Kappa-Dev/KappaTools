@@ -24,7 +24,6 @@ Signature:states:2:1:
 Signature:states:2:1:state_id:0->p
 Signature:duals: 
 Compilation:
-Compilation:rules:0:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type:0->state:[state_min:0;state_max:0]
@@ -43,7 +42,7 @@ Compilation:rules:0:actions:1/2unbinding:(agent_id:0,agent_type:0)@site_type:0
 Compilation:rules:0:actions:deletion:(agent_id:0,agent_type:0)
 Compilation:rules:0:actions:deletion:documented_site:(agent_id:0,agent_type:0)@site_type:0
 Compilation:rules:0:actions:creation:(agent_id:1,agent_type:1)
-Compilation:rules:1:
+
 Compilation:rules:1:lhs:
 Compilation:rules:1:lhs:agent_id_0:
 Compilation:rules:1:lhs:agent_id_0:agent_type_2:site_type:0->state:[state_min:0;state_max:0]
