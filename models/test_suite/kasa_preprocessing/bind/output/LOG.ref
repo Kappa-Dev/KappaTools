@@ -59,9 +59,9 @@ Compilation:rules:0:rhs:agent_id_0:agent_type_1:site_type:1->state:[state_min:1;
 Compilation:rules:0:rhs:agent_id_1:
 Compilation:rules:0:rhs:agent_id_1:agent_type_0:site_type:0->state:[state_min:1;state_max:1]
 Compilation:rules:0:rhs:bonds:agent_id_0:
-Compilation:rules:0:rhs:bonds:agent_id_0:site_id_1->agent_id_1.site_id_0
+Compilation:rules:0:rhs:bonds:agent_id_0:site_type:1->agent_id_1.site_type:0
 Compilation:rules:0:rhs:bonds:agent_id_1:
-Compilation:rules:0:rhs:bonds:agent_id_1:site_id_0->agent_id_0.site_id_1
+Compilation:rules:0:rhs:bonds:agent_id_1:site_type:0->agent_id_0.site_type:1
 Compilation:rules:0:direct:
 Compilation:rules:0:direct:agent_id_0:
 Compilation:rules:0:direct:agent_id_0:agent_type_1:site_type:1->state:[state_min:1;state_max:1]
@@ -81,9 +81,9 @@ Compilation:rules:1:lhs:agent_id_0:agent_type_1:site_type:1->state:[state_min:1;
 Compilation:rules:1:lhs:agent_id_1:
 Compilation:rules:1:lhs:agent_id_1:agent_type_0:site_type:0->state:[state_min:1;state_max:1]
 Compilation:rules:1:lhs:bonds:agent_id_0:
-Compilation:rules:1:lhs:bonds:agent_id_0:site_id_1->agent_id_1.site_id_0
+Compilation:rules:1:lhs:bonds:agent_id_0:site_type:1->agent_id_1.site_type:0
 Compilation:rules:1:lhs:bonds:agent_id_1:
-Compilation:rules:1:lhs:bonds:agent_id_1:site_id_0->agent_id_0.site_id_1
+Compilation:rules:1:lhs:bonds:agent_id_1:site_type:0->agent_id_0.site_type:1
 Compilation:rules:1:rhs:
 Compilation:rules:1:rhs:agent_id_0:
 Compilation:rules:1:rhs:agent_id_0:agent_type_1:site_type:0->state:[state_min:0;state_max:0]
@@ -113,9 +113,9 @@ Compilation:rules:2:rhs:agent_id_0:agent_type_2:site_type:0->state:[state_min:1;
 Compilation:rules:2:rhs:agent_id_1:
 Compilation:rules:2:rhs:agent_id_1:agent_type_0:site_type:0->state:[state_min:2;state_max:2]
 Compilation:rules:2:rhs:bonds:agent_id_0:
-Compilation:rules:2:rhs:bonds:agent_id_0:site_id_0->agent_id_1.site_id_0
+Compilation:rules:2:rhs:bonds:agent_id_0:site_type:0->agent_id_1.site_type:0
 Compilation:rules:2:rhs:bonds:agent_id_1:
-Compilation:rules:2:rhs:bonds:agent_id_1:site_id_0->agent_id_0.site_id_0
+Compilation:rules:2:rhs:bonds:agent_id_1:site_type:0->agent_id_0.site_type:0
 Compilation:rules:2:direct:
 Compilation:rules:2:direct:agent_id_0:
 Compilation:rules:2:direct:agent_id_0:agent_type_2:site_type:0->state:[state_min:1;state_max:1]
@@ -144,9 +144,9 @@ Compilation:rules:3:rhs:agent_id_1:Ghost
 Compilation:rules:3:rhs:agent_id_2:
 Compilation:rules:3:rhs:agent_id_2:agent_type_0:site_type:0->state:[state_min:2;state_max:2]
 Compilation:rules:3:rhs:bonds:agent_id_0:
-Compilation:rules:3:rhs:bonds:agent_id_0:site_id_0->agent_id_1.site_id_0
+Compilation:rules:3:rhs:bonds:agent_id_0:site_type:0->agent_id_1.site_type:0
 Compilation:rules:3:rhs:bonds:agent_id_2:
-Compilation:rules:3:rhs:bonds:agent_id_2:site_id_0->agent_id_0.site_id_0
+Compilation:rules:3:rhs:bonds:agent_id_2:site_type:0->agent_id_0.site_type:0
 Compilation:rules:3:direct:
 Compilation:rules:3:direct:agent_id_0:
 Compilation:rules:3:direct:agent_id_0:agent_type_2:site_type:0->state:[state_min:1;state_max:1]

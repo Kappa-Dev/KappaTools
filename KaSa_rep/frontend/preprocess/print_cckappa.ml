@@ -20,7 +20,7 @@ let local_trace = false
    
 let string_of_port port = "[state_min:"^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.min)^";state_max:"^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.max)^"]" (*MOD*)
    
-let print_agent parameters error handler agent = 
+let print_agent parameters error handler agent =
      match agent with 
     | Cckappa_sig.Agent agent -> 
        let parameters = Remanent_parameters.update_prefix parameters ("agent_type_"^(string_of_int agent.Cckappa_sig.agent_name)^":") in (*TEST*)
@@ -60,7 +60,7 @@ let print_mixture parameters error handler mixture =
           let error = 
             Cckappa_sig.Site_map_and_set.fold_map 
               (fun k a error -> 
-                let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%ssite_type_%i->agent_id_%i.site_type_%i\n" parameters.Remanent_parameters_sig.prefix k a.Cckappa_sig.agent_index a.Cckappa_sig.site
+                let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%ssite_type:%i->agent_id_%i.site_type:%i\n" parameters.Remanent_parameters_sig.prefix k a.Cckappa_sig.agent_index a.Cckappa_sig.site
                 in error
                 )
               a 
