@@ -156,9 +156,9 @@ Compilation:rules:2:rhs:agent_id_0:agent_type_1:site_type:0->state:[state_min:1;
 Compilation:rules:2:rhs:agent_id_1:
 Compilation:rules:2:rhs:agent_id_1:agent_type_0:site_type:0->state:[state_min:1;state_max:1]
 Compilation:rules:2:rhs:bonds:agent_id_0:
-Compilation:rules:2:rhs:bonds:agent_id_0:site_id_0->agent_id_1.site_id_0
+Compilation:rules:2:rhs:bonds:agent_id_0:site_type_0->agent_id_1.site_type_0
 Compilation:rules:2:rhs:bonds:agent_id_1:
-Compilation:rules:2:rhs:bonds:agent_id_1:site_id_0->agent_id_0.site_id_0
+Compilation:rules:2:rhs:bonds:agent_id_1:site_type_0->agent_id_0.site_type_0
 Compilation:rules:2:direct:
 Compilation:rules:2:direct:agent_id_0:
 Compilation:rules:2:direct:agent_id_0:agent_type_1:site_type:0->state:[state_min:1;state_max:1]
@@ -177,9 +177,9 @@ Compilation:rules:3:lhs:agent_id_0:agent_type_1:site_type:0->state:[state_min:1;
 Compilation:rules:3:lhs:agent_id_1:
 Compilation:rules:3:lhs:agent_id_1:agent_type_0:site_type:0->state:[state_min:1;state_max:1]
 Compilation:rules:3:lhs:bonds:agent_id_0:
-Compilation:rules:3:lhs:bonds:agent_id_0:site_id_0->agent_id_1.site_id_0
+Compilation:rules:3:lhs:bonds:agent_id_0:site_type_0->agent_id_1.site_type_0
 Compilation:rules:3:lhs:bonds:agent_id_1:
-Compilation:rules:3:lhs:bonds:agent_id_1:site_id_0->agent_id_0.site_id_0
+Compilation:rules:3:lhs:bonds:agent_id_1:site_type_0->agent_id_0.site_type_0
 Compilation:rules:3:rhs:
 Compilation:rules:3:rhs:agent_id_0:
 Compilation:rules:3:rhs:agent_id_0:agent_type_1:site_type:0->state:[state_min:0;state_max:0]
@@ -208,9 +208,9 @@ Compilation:rules:4:rhs:agent_id_0:agent_type_1:site_type:1->state:[state_min:1;
 Compilation:rules:4:rhs:agent_id_1:
 Compilation:rules:4:rhs:agent_id_1:agent_type_0:site_type:1->state:[state_min:1;state_max:1]
 Compilation:rules:4:rhs:bonds:agent_id_0:
-Compilation:rules:4:rhs:bonds:agent_id_0:site_id_1->agent_id_1.site_id_1
+Compilation:rules:4:rhs:bonds:agent_id_0:site_type_1->agent_id_1.site_type_1
 Compilation:rules:4:rhs:bonds:agent_id_1:
-Compilation:rules:4:rhs:bonds:agent_id_1:site_id_1->agent_id_0.site_id_1
+Compilation:rules:4:rhs:bonds:agent_id_1:site_type_1->agent_id_0.site_type_1
 Compilation:rules:4:direct:
 Compilation:rules:4:direct:agent_id_0:
 Compilation:rules:4:direct:agent_id_0:agent_type_1:site_type:1->state:[state_min:1;state_max:1]
@@ -229,9 +229,9 @@ Compilation:rules:5:lhs:agent_id_0:agent_type_1:site_type:1->state:[state_min:1;
 Compilation:rules:5:lhs:agent_id_1:
 Compilation:rules:5:lhs:agent_id_1:agent_type_0:site_type:1->state:[state_min:1;state_max:1]
 Compilation:rules:5:lhs:bonds:agent_id_0:
-Compilation:rules:5:lhs:bonds:agent_id_0:site_id_1->agent_id_1.site_id_1
+Compilation:rules:5:lhs:bonds:agent_id_0:site_type_1->agent_id_1.site_type_1
 Compilation:rules:5:lhs:bonds:agent_id_1:
-Compilation:rules:5:lhs:bonds:agent_id_1:site_id_1->agent_id_0.site_id_1
+Compilation:rules:5:lhs:bonds:agent_id_1:site_type_1->agent_id_0.site_type_1
 Compilation:rules:5:rhs:
 Compilation:rules:5:rhs:agent_id_0:
 Compilation:rules:5:rhs:agent_id_0:agent_type_1:site_type:1->state:[state_min:0;state_max:0]
@@ -257,11 +257,11 @@ Compilation:rules:6:lhs:agent_id_1:
 Compilation:rules:6:lhs:agent_id_1:agent_type_0:site_type:0->state:[state_min:1;state_max:1]
 Compilation:rules:6:lhs:agent_id_1:agent_type_0:site_type:1->state:[state_min:1;state_max:1]
 Compilation:rules:6:lhs:bonds:agent_id_0:
-Compilation:rules:6:lhs:bonds:agent_id_0:site_id_0->agent_id_1.site_id_0
-Compilation:rules:6:lhs:bonds:agent_id_0:site_id_1->agent_id_1.site_id_1
+Compilation:rules:6:lhs:bonds:agent_id_0:site_type_0->agent_id_1.site_type_0
+Compilation:rules:6:lhs:bonds:agent_id_0:site_type_1->agent_id_1.site_type_1
 Compilation:rules:6:lhs:bonds:agent_id_1:
-Compilation:rules:6:lhs:bonds:agent_id_1:site_id_0->agent_id_0.site_id_0
-Compilation:rules:6:lhs:bonds:agent_id_1:site_id_1->agent_id_0.site_id_1
+Compilation:rules:6:lhs:bonds:agent_id_1:site_type_0->agent_id_0.site_type_0
+Compilation:rules:6:lhs:bonds:agent_id_1:site_type_1->agent_id_0.site_type_1
 Compilation:rules:6:rhs:
 Compilation:rules:6:rhs:agent_id_0:
 Compilation:rules:6:rhs:agent_id_0:agent_type_1:site_type:0->state:[state_min:2;state_max:2]
@@ -270,11 +270,11 @@ Compilation:rules:6:rhs:agent_id_1:
 Compilation:rules:6:rhs:agent_id_1:agent_type_0:site_type:0->state:[state_min:2;state_max:2]
 Compilation:rules:6:rhs:agent_id_1:agent_type_0:site_type:1->state:[state_min:2;state_max:2]
 Compilation:rules:6:rhs:bonds:agent_id_0:
-Compilation:rules:6:rhs:bonds:agent_id_0:site_id_0->agent_id_1.site_id_1
-Compilation:rules:6:rhs:bonds:agent_id_0:site_id_1->agent_id_1.site_id_0
+Compilation:rules:6:rhs:bonds:agent_id_0:site_type_0->agent_id_1.site_type_1
+Compilation:rules:6:rhs:bonds:agent_id_0:site_type_1->agent_id_1.site_type_0
 Compilation:rules:6:rhs:bonds:agent_id_1:
-Compilation:rules:6:rhs:bonds:agent_id_1:site_id_0->agent_id_0.site_id_1
-Compilation:rules:6:rhs:bonds:agent_id_1:site_id_1->agent_id_0.site_id_0
+Compilation:rules:6:rhs:bonds:agent_id_1:site_type_0->agent_id_0.site_type_1
+Compilation:rules:6:rhs:bonds:agent_id_1:site_type_1->agent_id_0.site_type_0
 Compilation:rules:6:direct:
 Compilation:rules:6:direct:agent_id_0:
 Compilation:rules:6:direct:agent_id_0:agent_type_1:site_type:0->state:[state_min:2;state_max:2]
@@ -310,11 +310,11 @@ Compilation:rules:7:rhs:agent_id_1:agent_type_1:site_type:0->state:[state_min:3;
 Compilation:rules:7:rhs:agent_id_2:
 Compilation:rules:7:rhs:agent_id_2:agent_type_0:site_type:0->state:[state_min:3;state_max:3]
 Compilation:rules:7:rhs:bonds:agent_id_0:
-Compilation:rules:7:rhs:bonds:agent_id_0:site_id_2->agent_id_0.site_id_0
+Compilation:rules:7:rhs:bonds:agent_id_0:site_type_2->agent_id_0.site_type_0
 Compilation:rules:7:rhs:bonds:agent_id_1:
-Compilation:rules:7:rhs:bonds:agent_id_1:site_id_0->agent_id_0.site_id_0
+Compilation:rules:7:rhs:bonds:agent_id_1:site_type_0->agent_id_0.site_type_0
 Compilation:rules:7:rhs:bonds:agent_id_2:
-Compilation:rules:7:rhs:bonds:agent_id_2:site_id_0->agent_id_0.site_id_0
+Compilation:rules:7:rhs:bonds:agent_id_2:site_type_0->agent_id_0.site_type_0
 Compilation:rules:7:direct:
 Compilation:rules:7:direct:agent_id_0:
 Compilation:rules:7:direct:agent_id_0:agent_type_2:site_type:2->state:[state_min:1;state_max:1]
@@ -457,7 +457,8 @@ Quarks:rule_id:7,agent_type:0,site_type:0,state:0
 Quarks:rule_id:7,agent_type:1,site_type:0,state:0
 Quarks:rule_id:7,agent_type:2,site_type:0,state:0
 Quarks:rule_id:7,agent_type:2,site_type:2,state:0
-Quarks:agent_test**:agent_type:2,rule:7->[0]
+
+REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.Quarks:agent_test**:agent_type:2,rule:7->[0]
 Quarks:agent_test**:agent_type:1,rule:7->[1]
 Quarks:agent_test**:agent_type:1,rule:6->[0]
 Quarks:agent_test**:agent_type:1,rule:5->[0]
@@ -535,6 +536,7 @@ Quarks:site_modif-:agent_type:0,site_type:0,state:1,rule:3->[1]
 Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:7->[2]
 Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:2->[1]
 Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:0->[0]
+Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Influence_map:Wake_up_map:rule(0):'' A(x,y),Ghost->Ghost -> rule(1):'' Ghost->A(x,y),Ghost[0->0]
 Influence_map:Wake_up_map:rule(0):'' A(x,y),Ghost->Ghost -> rule(2):'' B(x),A(x)->B(x!1),A(x!1)[0->0]
 Influence_map:Wake_up_map:rule(0):'' A(x,y),Ghost->Ghost -> rule(3):'' B(x!1),A(x!1)->B(x),A(x)[0->0]
@@ -589,7 +591,3 @@ error: file_name: Preprocess; message: line 514; exception:Exit
 error: file_name: Translate; message: line 44; exception:Exit
 error: file_name: Translate; message: line 44; exception:Exit
 error: file_name: Translate; message: line 44; exception:Exit
-
-REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects. 
-
-Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.

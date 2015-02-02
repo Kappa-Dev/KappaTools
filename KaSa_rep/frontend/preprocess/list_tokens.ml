@@ -221,7 +221,12 @@ let rec scan_mixture parameters remanent mixture =
         let remanent = scan_agent parameters remanent agent in 
          scan_mixture parameters remanent mixture
 
-let rec scan_alg parameters remanent alg = 
+let scan_token parameters remanent alg = (*TO DO*)
+  let error,remanent = remanent in 
+  let error,remanent = warn parameters error (Some "line 221, scan_token is not implemented yet") Exit remanent in 
+  error,remanent 
+
+let rec scan_alg parameters remanent alg = (*TO DO*)
   remanent 
 
 let scan_initial_states parameters = 
@@ -231,15 +236,19 @@ let scan_initial_states parameters =
 	init_t
       with 
       | Ast.INIT_MIX((alg,pos),mixture) ->
-	  let remanent = scan_mixture parameters remanent mixture in 
+	let remanent = scan_mixture parameters remanent mixture in 
           scan_alg parameters remanent alg
-       | Ast.INIT_TOK ((alg,pos),tok) -> scan_alg parameters remanent alg)
+      | Ast.INIT_TOK ((alg,pos),tok) -> 
+	let remanent = scan_token parameters remanent tok in 
+	 scan_alg parameters remanent alg)
     
 let scan_declarations parameters  = 
   List.fold_left 
     (fun remanent a -> scan_agent parameters remanent a) 
    
-let scan_observables parameters remanent variable = remanent 
+let scan_observables parameters remanent variable = (*TODO*) 
+  remanent 
+
 let scan_perts parameters = 
   List.fold_left 
     (fun remanent ((_,m,_),_) -> 

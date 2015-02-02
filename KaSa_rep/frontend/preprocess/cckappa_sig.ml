@@ -180,7 +180,26 @@ type enriched_init =
    e_init_c_mixture : mixture ; 
    e_init_pos : Tools.pos
   } 
-  
+
+let dummy_init parameters error =
+  let error,views = Int_storage.Quick_Nearly_inf_Imperatif.create parameters error 0 in 
+  let error,bonds = Int_storage.Quick_Nearly_inf_Imperatif.create parameters error 0 in 
+  error,{
+   e_init_factor=Ast.CONST (Nbr.I 0);
+   e_init_c_factor=Ast.CONST (Nbr.I 0);
+   e_init_string_pos=None;
+   e_init_mixture=Ckappa_sig.EMPTY_MIX; 
+   e_init_c_mixture=
+       { 
+	 c_mixture= Ckappa_sig.EMPTY_MIX ;
+	 views= views;
+	 bonds= bonds;
+	 plus = [];
+	 dot = []
+       };
+   e_init_pos=Tools.no_pos
+  }  
+
 type compil = 
   {
     variables : enriched_variable Int_storage.Nearly_inf_Imperatif.t ; (*pattern declaration for reusing as variable in perturbations or kinetic rate*)

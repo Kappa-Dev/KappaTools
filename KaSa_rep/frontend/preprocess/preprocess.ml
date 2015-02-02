@@ -706,8 +706,9 @@ let translate_init parameters error handler init =
     Cckappa_sig.e_init_c_mixture = c_mixture ;
     Cckappa_sig.e_init_string_pos = a;
     Cckappa_sig.e_init_pos = c} 
-   | Ast.INIT_TOK _ -> 
-     warn parameters error (Some "line 708") Exit (raise Exit)
+   | Ast.INIT_TOK _ -> (*TO DO*)
+     let error,dft = Cckappa_sig.dummy_init parameters error in 
+     warn parameters error (Some "line 710, token are not supported yet") Exit dft 
 
 let alg_with_pos_map = Prepreprocess.map_with_pos Prepreprocess.alg_map
 

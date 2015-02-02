@@ -427,15 +427,22 @@ let with_option_map map f =
 let alg_with_pos_with_option_map = with_option_map alg_with_pos_map
 let bool_with_pos_with_option_map = with_option_map bool_with_pos_map 
 
+let refine_token parameters error token = 
+  let error,token = warn parameters error (Some ("Line 431: Token are not implemented in KaSa yet")) Exit token in 
+  error,token 
+  
 let refine_init_t parameters error init_t = 
   match 
     init_t 
   with 
-    Ast.INIT_MIX(alg_ex,mixture) -> 
-      let error,alg_ex = alg_with_pos_map (refine_mixture parameters) error alg_ex in 
-      let error,mixture = refine_mixture parameters error mixture in 
+  | Ast.INIT_MIX(alg_ex,mixture) -> 
+    let error,alg_ex = alg_with_pos_map (refine_mixture parameters) error alg_ex in 
+    let error,mixture = refine_mixture parameters error mixture in 
       error,Some(Ast.INIT_MIX(alg_ex,mixture))
-  | _ -> error,None
+  | Ast.INIT_TOK (alg_ex,token) -> 
+    let error,alg_ex = alg_with_pos_map (refine_mixture parameters) error alg_ex in 
+    let error,token = refine_token parameters error token in 
+    error,Some(Ast.INIT_TOK(alg_ex,token))
 
 
 let refine_agent parameters error agent_set agent =

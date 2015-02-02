@@ -29,7 +29,7 @@ let do_influence_map = ref true
 
 
 let unsafe = ref true 
-let trace = ref false 
+let trace = ref false
 let dump_error_as_soon_as_they_occur = ref false 
 let log = ref stdout 
 let formatter = ref Format.std_formatter

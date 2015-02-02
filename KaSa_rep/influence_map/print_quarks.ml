@@ -121,9 +121,11 @@ let print_sites parameter error handler quark =
     error 
   
 let print_quarks parameters  error handler quark = 
+  let _ = Printf.fprintf parameters.Remanent_parameters_sig.log  "\nREMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects." in 
   let error = print_agents  parameters error handler quark in 
   let error = print_sites parameters  error handler quark in 
-  error 
+  error
+
   
 let print_maps parameters error handler compilation print_rule print_var print_labels prefix suffix map =
   let _  = 
@@ -144,6 +146,7 @@ let print_maps parameters error handler compilation print_rule print_var print_l
                   
 let print_wake_up_map parameters error handler compilation print_rule print_var print_labels suffix  map =
   let parameters = Remanent_parameters.update_prefix parameters "Wake_up_map:" in 
+  let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.\n" in
   print_maps parameters error handler compilation print_rule print_var print_labels parameters.Remanent_parameters_sig.prefix suffix map
   
 let print_inhibition_map parameters error handler compilation print_rule print_var print_labels suffix  map =
