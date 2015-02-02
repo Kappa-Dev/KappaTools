@@ -129,9 +129,6 @@ let print_mixture  parameter error mixture = (*TEST*)
        let _ = Misc_sa.print_comma parameter bool parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.site_sep_comma in
        let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "%s" parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.ghost_agent in
        error
-    (*MOD*)
-    (*let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "Ghost %s" parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.ghost_agent in
-    error *)
     | Ckappa_sig.COMMA (agent,mixture) -> 
        let _ = if bool then Printf.fprintf parameter.Remanent_parameters_sig.log "%s" parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.agent_sep_comma in
          let error = print_agent parameter error agent in
