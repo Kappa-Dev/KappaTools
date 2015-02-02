@@ -16,15 +16,7 @@ subgraph cluster2 {
    2.2 [style = filled label = "x" shape =circle color = yellow size = "5"]
 label =  "C";  shape = rectangle; color = red 
 } ; 
-subgraph cluster3 {
-   3.0 [style = filled label = "" shape =circle color = yellow size = "5"]
-label =  "";  shape = rectangle; color = red 
-} ; 
-2.2 -- 3.0
-0.1 -- 1.0
 0.1 -- 1.1
-0.0 -- 3.0
-0.0 -- 1.1
 0.0 -- 1.0
-1.0 -- 3.0
+1.1 -- 2.2
 }
