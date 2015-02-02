@@ -8,9 +8,6 @@
 
 #### Rules
 
-A(x,y) <-> B(x,y)
-A(x),B(x) <-> A(x!1), B(x!1)
-A(y),B(y) <-> A(y!1), B(y!1)
-A(x!1,y!2),B(x!1,y!2) -> A(x!1,y!2), B(x!2,y!1)
-'abc' A(x),B(x),C(x~u) -> A(x!1),B(x!1),C(x!1) # TODO change 
+A(x,y),B(x,y) <-> A(x!1,y!2),B(x!1,y!2),C(x~u,y~p)
+A(y),B(y),C(x~u,y~p) <-> A(x!1,y), B(x!1,y!2),C(x~u!2,y~p)
 

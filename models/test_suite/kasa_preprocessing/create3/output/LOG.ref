@@ -48,9 +48,15 @@ Compilation:rules:0:rhs:agent_id_2:agent_type_1:site_type:0->state:[state_min:1;
 Compilation:rules:0:rhs:agent_id_3:
 Compilation:rules:0:rhs:agent_id_3:agent_type_0:site_type:0->state:[state_min:1;state_max:1]
 Compilation:rules:0:rhs:bonds:agent_id_2:
+<<<<<<< HEAD
 Compilation:rules:0:rhs:bonds:agent_id_2:site_type_0->agent_id_3.site_type_0
 Compilation:rules:0:rhs:bonds:agent_id_3:
 Compilation:rules:0:rhs:bonds:agent_id_3:site_type_0->agent_id_0.site_type_0
+=======
+Compilation:rules:0:rhs:bonds:agent_id_2:site_type:0->agent_id_3.site_type:0
+Compilation:rules:0:rhs:bonds:agent_id_3:
+Compilation:rules:0:rhs:bonds:agent_id_3:site_type:0->agent_id_0.site_type:0
+>>>>>>> 8c533593a0b8dbd9c37ce77173c5697bdaf461db
 Compilation:rules:0:direct:
 Compilation:rules:0:direct:agent_id_2:
 Compilation:rules:0:direct:agent_id_2:agent_type_1:site_type:0->state:[state_min:1;state_max:1]

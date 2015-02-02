@@ -85,9 +85,15 @@ Compilation:rules:0:rhs:agent_id_0:agent_type_1:site_type:0->state:[state_min:1;
 Compilation:rules:0:rhs:agent_id_1:
 Compilation:rules:0:rhs:agent_id_1:agent_type_0:site_type:0->state:[state_min:1;state_max:1]
 Compilation:rules:0:rhs:bonds:agent_id_0:
+<<<<<<< HEAD
 Compilation:rules:0:rhs:bonds:agent_id_0:site_type_0->agent_id_1.site_type_0
 Compilation:rules:0:rhs:bonds:agent_id_1:
 Compilation:rules:0:rhs:bonds:agent_id_1:site_type_0->agent_id_0.site_type_0
+=======
+Compilation:rules:0:rhs:bonds:agent_id_0:site_type:0->agent_id_1.site_type:0
+Compilation:rules:0:rhs:bonds:agent_id_1:
+Compilation:rules:0:rhs:bonds:agent_id_1:site_type:0->agent_id_0.site_type:0
+>>>>>>> 8c533593a0b8dbd9c37ce77173c5697bdaf461db
 Compilation:rules:0:direct:
 Compilation:rules:0:direct:agent_id_0:
 Compilation:rules:0:direct:agent_id_0:agent_type_1:site_type:0->state:[state_min:1;state_max:1]
@@ -106,9 +112,15 @@ Compilation:rules:1:lhs:agent_id_0:agent_type_1:site_type:0->state:[state_min:1;
 Compilation:rules:1:lhs:agent_id_1:
 Compilation:rules:1:lhs:agent_id_1:agent_type_0:site_type:0->state:[state_min:1;state_max:1]
 Compilation:rules:1:lhs:bonds:agent_id_0:
+<<<<<<< HEAD
 Compilation:rules:1:lhs:bonds:agent_id_0:site_type_0->agent_id_1.site_type_0
 Compilation:rules:1:lhs:bonds:agent_id_1:
 Compilation:rules:1:lhs:bonds:agent_id_1:site_type_0->agent_id_0.site_type_0
+=======
+Compilation:rules:1:lhs:bonds:agent_id_0:site_type:0->agent_id_1.site_type:0
+Compilation:rules:1:lhs:bonds:agent_id_1:
+Compilation:rules:1:lhs:bonds:agent_id_1:site_type:0->agent_id_0.site_type:0
+>>>>>>> 8c533593a0b8dbd9c37ce77173c5697bdaf461db
 Compilation:rules:1:rhs:
 Compilation:rules:1:rhs:agent_id_0:
 Compilation:rules:1:rhs:agent_id_0:agent_type_1:site_type:0->state:[state_min:0;state_max:0]
@@ -141,9 +153,15 @@ Compilation:rules:2:rhs:agent_id_1:
 Compilation:rules:2:rhs:agent_id_1:agent_type_0:site_type:0->state:[state_min:1;state_max:1]
 Compilation:rules:2:rhs:agent_id_1:agent_type_0:site_type:1->state:[state_min:1;state_max:1]
 Compilation:rules:2:rhs:bonds:agent_id_0:
+<<<<<<< HEAD
 Compilation:rules:2:rhs:bonds:agent_id_0:site_type_2->agent_id_1.site_type_1
 Compilation:rules:2:rhs:bonds:agent_id_1:
 Compilation:rules:2:rhs:bonds:agent_id_1:site_type_1->agent_id_0.site_type_2
+=======
+Compilation:rules:2:rhs:bonds:agent_id_0:site_type:2->agent_id_1.site_type:1
+Compilation:rules:2:rhs:bonds:agent_id_1:
+Compilation:rules:2:rhs:bonds:agent_id_1:site_type:1->agent_id_0.site_type:2
+>>>>>>> 8c533593a0b8dbd9c37ce77173c5697bdaf461db
 Compilation:rules:2:direct:
 Compilation:rules:2:direct:agent_id_0:
 Compilation:rules:2:direct:agent_id_0:agent_type_2:site_type:2->state:[state_min:1;state_max:1]
@@ -163,9 +181,15 @@ Compilation:rules:3:lhs:agent_id_1:
 Compilation:rules:3:lhs:agent_id_1:agent_type_2:site_type:0->state:[state_min:0;state_max:0]
 Compilation:rules:3:lhs:agent_id_1:agent_type_2:site_type:2->state:[state_min:1;state_max:1]
 Compilation:rules:3:lhs:bonds:agent_id_0:
+<<<<<<< HEAD
 Compilation:rules:3:lhs:bonds:agent_id_0:site_type_1->agent_id_1.site_type_2
 Compilation:rules:3:lhs:bonds:agent_id_1:
 Compilation:rules:3:lhs:bonds:agent_id_1:site_type_2->agent_id_0.site_type_1
+=======
+Compilation:rules:3:lhs:bonds:agent_id_0:site_type:1->agent_id_1.site_type:2
+Compilation:rules:3:lhs:bonds:agent_id_1:
+Compilation:rules:3:lhs:bonds:agent_id_1:site_type:2->agent_id_0.site_type:1
+>>>>>>> 8c533593a0b8dbd9c37ce77173c5697bdaf461db
 Compilation:rules:3:rhs:
 Compilation:rules:3:rhs:agent_id_0:
 Compilation:rules:3:rhs:agent_id_0:agent_type_0:site_type:1->state:[state_min:0;state_max:0]
@@ -205,9 +229,15 @@ Compilation:rules:4:rhs:agent_id_1:
 Compilation:rules:4:rhs:agent_id_1:agent_type_0:site_type:0->state:[state_min:0;state_max:0]
 Compilation:rules:4:rhs:agent_id_1:agent_type_0:site_type:1->state:[state_min:2;state_max:2]
 Compilation:rules:4:rhs:bonds:agent_id_0:
+<<<<<<< HEAD
 Compilation:rules:4:rhs:bonds:agent_id_0:site_type_3->agent_id_1.site_type_1
 Compilation:rules:4:rhs:bonds:agent_id_1:
 Compilation:rules:4:rhs:bonds:agent_id_1:site_type_1->agent_id_0.site_type_3
+=======
+Compilation:rules:4:rhs:bonds:agent_id_0:site_type:3->agent_id_1.site_type:1
+Compilation:rules:4:rhs:bonds:agent_id_1:
+Compilation:rules:4:rhs:bonds:agent_id_1:site_type:1->agent_id_0.site_type:3
+>>>>>>> 8c533593a0b8dbd9c37ce77173c5697bdaf461db
 Compilation:rules:4:direct:
 Compilation:rules:4:direct:agent_id_0:
 Compilation:rules:4:direct:agent_id_0:agent_type_2:site_type:3->state:[state_min:1;state_max:1]
@@ -230,9 +260,15 @@ Compilation:rules:5:lhs:agent_id_1:
 Compilation:rules:5:lhs:agent_id_1:agent_type_0:site_type:0->state:[state_min:0;state_max:0]
 Compilation:rules:5:lhs:agent_id_1:agent_type_0:site_type:1->state:[state_min:2;state_max:2]
 Compilation:rules:5:lhs:bonds:agent_id_0:
+<<<<<<< HEAD
 Compilation:rules:5:lhs:bonds:agent_id_0:site_type_3->agent_id_1.site_type_1
 Compilation:rules:5:lhs:bonds:agent_id_1:
 Compilation:rules:5:lhs:bonds:agent_id_1:site_type_1->agent_id_0.site_type_3
+=======
+Compilation:rules:5:lhs:bonds:agent_id_0:site_type:3->agent_id_1.site_type:1
+Compilation:rules:5:lhs:bonds:agent_id_1:
+Compilation:rules:5:lhs:bonds:agent_id_1:site_type:1->agent_id_0.site_type:3
+>>>>>>> 8c533593a0b8dbd9c37ce77173c5697bdaf461db
 Compilation:rules:5:rhs:
 Compilation:rules:5:rhs:agent_id_0:
 Compilation:rules:5:rhs:agent_id_0:agent_type_2:site_type:0->state:[state_min:1;state_max:1]

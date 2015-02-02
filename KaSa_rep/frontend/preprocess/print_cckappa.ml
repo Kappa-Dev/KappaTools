@@ -20,13 +20,13 @@ let local_trace = false
    
 let string_of_port port = "[state_min:"^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.min)^";state_max:"^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.max)^"]" (*MOD*)
    
-let print_agent parameters error handler agent = 
+let print_agent parameters error handler agent =
      match agent with 
     | Cckappa_sig.Agent agent -> 
        let parameters = Remanent_parameters.update_prefix parameters ("agent_type_"^(string_of_int agent.Cckappa_sig.agent_name)^":") in (*TEST*)
          Cckappa_sig.Site_map_and_set.fold_map
           (fun a b error ->  
-             let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%ssite_type:%i->state:%s\n" parameters.Remanent_parameters_sig.prefix a (string_of_port b)  in 
+             let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%ssite_type_%i->state:%s\n" parameters.Remanent_parameters_sig.prefix a (string_of_port b)  in 
            error ) 
           agent.Cckappa_sig.agent_interface
            error 
@@ -36,7 +36,7 @@ let print_diffagent parameters error handler agent =
      let parameters = Remanent_parameters.update_prefix parameters ("agent_type_"^(string_of_int agent.Cckappa_sig.agent_name)^":") in
          Cckappa_sig.Site_map_and_set.fold_map
           (fun a b error -> 
-             let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%ssite_type:%i->state:%s\n" parameters.Remanent_parameters_sig.prefix a (string_of_port b)  in 
+             let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%ssite_type_%i->state:%s\n" parameters.Remanent_parameters_sig.prefix a (string_of_port b)  in 
            error ) 
           agent.Cckappa_sig.agent_interface
            error 
@@ -243,7 +243,7 @@ let print_diffview parameters error handler diff =
  let print_bond parameters relation (add1,add2) = 
    Printf.fprintf 
      parameters.Remanent_parameters_sig.log 
-     "%s(agent_id:%d,agent_type:%d)@site_type:%d%s(agent_id:%d,agent_type:%d)@site_type:%d\n" 
+     "%s(agent_id_%d,agent_type_%d)@site_type_%d%s(agent_id_%d,agent_type_%d)@site_type_%d\n" 
      parameters.Remanent_parameters_sig.prefix 
      add1.Cckappa_sig.agent_index 
      add1.Cckappa_sig.agent_type
@@ -256,7 +256,7 @@ let print_diffview parameters error handler diff =
  let print_half_bond parameters relation (add1,_) = 
    Printf.fprintf 
      parameters.Remanent_parameters_sig.log 
-     "%s(agent_id:%d,agent_type:%d)@site_type:%d\n" 
+     "%s(agent_id_%d,agent_type_%d)@site_type_%d\n" 
      parameters.Remanent_parameters_sig.prefix 
      add1.Cckappa_sig.agent_index
      add1.Cckappa_sig.agent_type
@@ -265,7 +265,7 @@ let print_diffview parameters error handler diff =
  let print_remove parameters (index,agent,list) =
    let _ = Printf.fprintf 
      parameters.Remanent_parameters_sig.log 
-     "%s(agent_id:%d,agent_type:%d)\n" 
+     "%s(agent_id_%d,agent_type_%d)\n" 
      parameters.Remanent_parameters_sig.prefix
      index
      agent.Cckappa_sig.agent_name
@@ -276,7 +276,7 @@ let print_diffview parameters error handler diff =
         (fun site _ -> 
             Printf.fprintf 
                parameters_doc.Remanent_parameters_sig.log 
-               "%s(agent_id:%d,agent_type:%d)@site_type:%d\n"
+               "%s(agent_id_%d,agent_type_%d)@site_type_%d\n"
                parameters_doc.Remanent_parameters_sig.prefix
                index
                agent.Cckappa_sig.agent_name 
@@ -289,7 +289,7 @@ let print_diffview parameters error handler diff =
        (fun site  -> 
          Printf.fprintf 
            parameters.Remanent_parameters_sig.log 
-           "%s(agent_id:%d,agent_type:%d)@site_type:%d\n"
+           "%s(agent_id_%d,agent_type_%d)@site_type_%d\n"
            parameters.Remanent_parameters_sig.prefix
            index
            agent.Cckappa_sig.agent_name 
@@ -300,7 +300,7 @@ let print_diffview parameters error handler diff =
    let print_created_agent parameters (index,agent) =
      Printf.fprintf 
        parameters.Remanent_parameters_sig.log 
-       "%s(agent_id:%d,agent_type:%d)\n" 
+       "%s(agent_id_%d,agent_type_%d)\n" 
        parameters.Remanent_parameters_sig.prefix
        index
        agent
