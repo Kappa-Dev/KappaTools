@@ -26,7 +26,8 @@ module type Storage =
     val dimension: Exception.method_handler -> 'a t -> Exception.method_handler * dimension
     val print: Exception.method_handler -> (Exception.method_handler -> Remanent_parameters_sig.parameters -> 'a -> Exception.method_handler) -> Remanent_parameters_sig.parameters -> 'a t -> Exception.method_handler
     (*MOD*)
-   val print_site_f: Exception.method_handler -> (Exception.method_handler -> Remanent_parameters_sig.parameters -> 'a -> Exception.method_handler) -> Remanent_parameters_sig.parameters -> 'a t -> Exception.method_handler
+    val print_var_f: Exception.method_handler -> (Exception.method_handler -> Remanent_parameters_sig.parameters -> 'a -> Exception.method_handler) -> Remanent_parameters_sig.parameters -> 'a t -> Exception.method_handler  
+    val print_site_f: Exception.method_handler -> (Exception.method_handler -> Remanent_parameters_sig.parameters -> 'a -> Exception.method_handler) -> Remanent_parameters_sig.parameters -> 'a t -> Exception.method_handler
 
     val key_list: Remanent_parameters_sig.parameters -> Exception.method_handler -> 'a t -> (Exception.method_handler * key list)   
     val iter:Remanent_parameters_sig.parameters -> Exception.method_handler -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> key  -> 'a  ->  Exception.method_handler ) -> 'a t ->  Exception.method_handler 
@@ -105,8 +106,8 @@ module Int_storage_imperatif =
       if key>array.size || key<0 then  
          error,None 
       else 
-        error,array.array.(key)  
-           
+        error,array.array.(key)
+
    let print error print_elt parameters array = 
      let rec aux i error = 
        if i>array.size then error
@@ -115,12 +116,29 @@ module Int_storage_imperatif =
            match array.array.(i) with 
             | None -> error
             | Some elt ->
-              let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s%d:\n" parameters.Remanent_parameters_sig.prefix i in 
+               let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s%d:\n" parameters.Remanent_parameters_sig.prefix i in
               let parameters =  Remanent_parameters.update_prefix parameters ((string_of_int i)^":") in 
               let error = print_elt error parameters elt in
               error
            in aux (i+1) error
-   in aux 0 error 
+     in aux 0 error
+
+   (*MOD*)
+   let print_var_f error print_elt parameters array = 
+     let rec aux i error = 
+       if i>array.size then error
+       else 
+         let error = 
+           match array.array.(i) with 
+            | None -> error
+            | Some elt ->
+               let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "\n"  in
+              let parameters =  Remanent_parameters.update_prefix parameters ((string_of_int i)^":") in 
+              let error = print_elt error parameters elt in
+              error
+           in aux (i+1) error
+     in aux 0 error
+            
             
    (*MOD:print function for sites in print_hander*)
     let print_site_f error print_elt parameters array = 
@@ -266,12 +284,13 @@ module Nearly_infinite_arrays =
       else
         Basic.set parameters error key value array  
      
-     let print = Basic.print
-     let print_site_f = Basic.print_site_f (*MOD*)
-     let iter = Basic.iter
-     let fold = Basic.fold 
-     let fold2_common = Basic.fold2_common 
-      
+    let print = Basic.print
+    let print_var_f = Basic.print_var_f (*MOD*)
+    let print_site_f = Basic.print_site_f 
+    let iter = Basic.iter
+    let fold = Basic.fold 
+    let fold2_common = Basic.fold2_common 
+
 end:Storage with type key = int and type dimension = int)
   
 module Extend =
@@ -349,6 +368,12 @@ module Extend =
           a.matrix
 
       (*MOD*)
+      let print_var_f error print_of parameters a = 
+        Extension.print error 
+          (fun error -> Underlying.print error print_of)
+          parameters
+          a.matrix
+                        
       let print_site_f error print_of parameters a = 
         Extension.print error 
           (fun error -> Underlying.print error print_of)
@@ -439,6 +464,8 @@ module Quick_key_list =
       let print error f parameters a = Basic.print error f parameters a.basic
 
       (*MOD*)
+      let print_var_f error f parameters a = Basic.print_var_f error f parameters a.basic
+                                                   
        let print_site_f error f parameters a = Basic.print_site_f error f parameters a.basic  
        
       let iter parameters error f a = 

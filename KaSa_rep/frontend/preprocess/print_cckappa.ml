@@ -220,23 +220,23 @@ let print_diffview parameters error handler diff =
     (* | _ -> (*to do*)
        error *)
    
- let print_var parameters error handler var = 
+ let print_var parameters error handler var =
    let s = var.Cckappa_sig.e_id in
    let _ = 
      if s <> "" 
      then Printf.fprintf parameters.Remanent_parameters_sig.log "%s: " var.Cckappa_sig.e_id 
    in 
-     print_short_alg parameters error handler (var.Cckappa_sig.c_variable,(Lexing.dummy_pos,Lexing.dummy_pos))  
-       
+     print_short_alg parameters error handler (var.Cckappa_sig.c_variable,(Lexing.dummy_pos,Lexing.dummy_pos))
+
         
- let print_variables parameters error handler var = 
-    Int_storage.Nearly_inf_Imperatif.print
+ let print_variables parameters error handler var =
+   Int_storage.Nearly_inf_Imperatif.print_var_f (*MOD*)
        error 
-       (fun error parameters var -> 
-          let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s" parameters.Remanent_parameters_sig.prefix in 
+       (fun error parameters var ->
+        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s" parameters.Remanent_parameters_sig.prefix in
            print_var parameters error handler var) 
-       parameters  var 
-    
+       parameters var
+
  let print_signatures parameters error handler signature = error
 
  (*MOD:change (agent_type,agent_index)@site to (agent_index,agent_type)@site*)
@@ -334,12 +334,12 @@ let print_diffview parameters error handler diff =
    error 
    
  let print_rules parameters error handler rules = 
-    Int_storage.Nearly_inf_Imperatif.print
+   Int_storage.Nearly_inf_Imperatif.print_var_f (*MOD*)
        error 
-       (fun error parameters rule -> 
-           print_rule parameters error handler rule) 
+       (fun error parameters rule ->
+        print_rule parameters error handler rule) 
        parameters
-       rules 
+       rules
    
 
  let print_observables parameters error handler obs = error
@@ -362,8 +362,8 @@ let print_diffview parameters error handler diff =
  let print_perturbations parameters error handler perturbations = error  
    
  let print_compil parameters error handler compil = 
-   let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s\n" parameters.Remanent_parameters_sig.prefix in 
-   let parameters' =  Remanent_parameters.update_prefix parameters "variables:" in 
+   let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s" parameters.Remanent_parameters_sig.prefix in 
+   let parameters' =  Remanent_parameters.update_prefix parameters "variables:" in
    let error = print_variables parameters' error handler compil.Cckappa_sig.variables in 
    let parameters' =  Remanent_parameters.update_prefix parameters "signature:" in 
    let error = print_signatures parameters' error handler compil.Cckappa_sig.signatures in 
