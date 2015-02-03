@@ -53,6 +53,8 @@ let () =
      "load simulation package instead of kappa files") ;
     ("-make-sim", Arg.String Kappa_files.set_marshalized,
      "save kappa files as a simulation package") ;
+    ("-dump-cc", Arg.String Kappa_files.set_ccFile,
+     "file name for dumping the domain of observables") ;
     ("--implicit-signature",
      Arg.Unit (fun () ->
 	       Format.eprintf "--implicitSignature is currently unplugged.@.";
@@ -133,27 +135,27 @@ let () =
     Format.printf
       "+ Initialized random number generator with seed %d@." theSeed;
 
-    let (env, counter, state) =
+    let (env, cc_env, counter, state) =
       match !Parameter.marshalizedInFile with
       | "" ->
 	 Eval.initialize Format.std_formatter !Parameter.alg_var_overwrite result
       | marshalized_file ->
 	 try
 	   let d = open_in_bin marshalized_file in
-	   begin
+	   let () =
 	     if !Parameter.inputKappaFileNames <> [] then
 	       Format.printf
 		 "+ Loading simulation package %s (kappa files are ignored)...@."
 		 marshalized_file
 	     else
 	       Format.printf "+Loading simulation package %s...@."
-			     marshalized_file;
-	     let env,counter,state =
-	       (Marshal.from_channel d : Environment.t * Counter.t * State.t) in
-	     Pervasives.close_in d ;
-	     Format.printf "Done@." ;
-	     (env,counter,state)
-	   end
+			     marshalized_file in
+	   let env,cc_env,counter,state =
+	     (Marshal.from_channel d :
+		Environment.t*Connected_component.env * Counter.t * State.t) in
+	   let () = Pervasives.close_in d  in
+	   let () = Format.printf "Done@." in
+	   (env,cc_env,counter,state)
 	 with
 	 | _exn ->
 	    Debug.tag
@@ -170,7 +172,7 @@ let () =
 
     let () = Kappa_files.with_marshalized
 	       (fun d -> Marshal.to_channel
-			   d (env,counter,state) [Marshal.Closures]) in
+			   d (env,cc_env,counter,state) [Marshal.Closures]) in
 
     Kappa_files.with_influence
       (fun d -> State.dot_of_influence_map d state env);

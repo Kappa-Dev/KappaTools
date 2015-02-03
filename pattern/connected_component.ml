@@ -48,7 +48,7 @@ let print_node ?sigs f (cc,ty,i) =
 let print_internal ?sigs (_,agent,_) site f id =
   match sigs with
   | Some sigs ->
-     Signature.print_site_agent sigs agent site f id
+     Signature.print_site_internal_state sigs agent site f (Some id)
   | None -> Format.pp_print_int f id
 
 let already_specified ?sigs x i =
@@ -75,7 +75,7 @@ let new_env sigs id_by_type nb_id ccs =
   }
 
 let empty_env sigs =
-  new_env sigs (Array.make (NamedDecls.size sigs) []) 0 IntMap.empty
+  new_env sigs (Array.make (Signature.size sigs) []) 0 IntMap.empty
 
 let check_vitality env = assert (env.used_by_a_begin_new = false)
 
@@ -277,7 +277,7 @@ let finish_new wk =
   | Some cc -> (new_env wk.sigs wk.reserved_id wk.free_id wk.cc_env, cc)
 
 let get_site_id ?(pos=(Lexing.dummy_pos,Lexing.dummy_pos)) wk (_,ty,_) site =
-  Signature.num_of_site (site,pos) (snd wk.sigs.NamedDecls.decls.(ty))
+  Signature.num_of_site (site,pos) (Signature.get wk.sigs ty)
 
 let new_link ?(pos=(Lexing.dummy_pos,Lexing.dummy_pos))
 	     wk ((cc1,_,x as n1),i) ((cc2,_,y as n2),j) =
@@ -320,12 +320,12 @@ let new_internal_state ?(pos=(Lexing.dummy_pos,Lexing.dummy_pos))
 		       wk ((_,ty,_),site_id as place) va =
   let internal_state_id =
     Signature.num_of_internal_state site_id (va,pos)
-				    (snd wk.sigs.NamedDecls.decls.(ty)) in
+				    (Signature.get  wk.sigs ty) in
   raw_new_internal_state wk place internal_state_id
 
 let raw_new_node wk type_id =
   let () = check_dangling wk in
-  let arity = Signature.arity (snd wk.sigs.NamedDecls.decls.(type_id)) in
+  let arity = Signature.arity  wk.sigs type_id in
   match wk.reserved_id.(type_id) with
   | h::t ->
      let () = wk.used_id.(type_id) <- h :: wk.used_id.(type_id) in
@@ -353,4 +353,4 @@ let raw_new_node wk type_id =
 	} (node,0))
 
 let new_node ?(pos=(Lexing.dummy_pos,Lexing.dummy_pos)) wk typ =
-  raw_new_node wk (NamedDecls.elt_id ~kind:"type of node" wk.sigs (typ,pos))
+  raw_new_node wk (Signature.num_of_agent (typ,pos) wk.sigs)

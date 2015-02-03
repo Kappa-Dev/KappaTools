@@ -26,6 +26,8 @@ val set_influence : string -> unit
 val set_up_influence : unit -> unit
 val with_influence : (Format.formatter -> unit) -> unit
 
+val set_ccFile : string -> unit
+
 val add_out_desc : out_channel -> unit
 val close_out_desc : out_channel -> unit
 val close_all_out_desc : unit -> unit

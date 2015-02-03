@@ -4,7 +4,7 @@ type t
 type work
 type node
 
-val empty_env : Signature.t NamedDecls.t -> env
+val empty_env : Signature.s -> env
 val cc_map : env -> t Mods.IntMap.t
 
 (** {5 Create a connected component } *)

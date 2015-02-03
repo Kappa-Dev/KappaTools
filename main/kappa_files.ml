@@ -1,6 +1,7 @@
 let outputDirName = ref ""
 let marshalizedOutFile = ref ""
 let snapshotFileName = ref "snap"
+let ccFileName = ref ""
 let dumpFileName = ref "dump.ka"
 let cflowFileName = ref "cflow.dot"
 let profilingName = ref "profiling.txt"
@@ -60,6 +61,7 @@ let setOutputName () =
   set snapshotFileName (Some "dot");
   set dumpFileName (Some "ka");
   set influenceFileName (Some "dot") ;
+  set ccFileName (Some "dot") ;
   set fluxFileName (Some "dot") ;
   set marshalizedOutFile None;
   set outputDataName None
@@ -149,6 +151,8 @@ let with_dump f =
   let () = f desc in
   let () = close_out desc in
   Format.eprintf "Final state dumped (%s)@." !dumpFileName
+
+let set_ccFile f = ccFileName := f
 
 let close_out_desc desc =
   let () = openOutDescriptors :=
