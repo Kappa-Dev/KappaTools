@@ -104,6 +104,12 @@ let get_parameters () =
     Remanent_parameters_sig.call_stack = []; 
     Remanent_parameters_sig.link_mode = !Config.link_mode ;
     Remanent_parameters_sig.kasa_state = Remanent_state_signature.empty_engine_state;    
+    Remanent_parameters_sig.make_id_compatible_with_dot = 
+      List.fold_left 
+	(fun map (a,b) -> 
+	  Remanent_parameters_sig.CharMap.add a b map)
+	Remanent_parameters_sig.CharMap.empty 
+	Config.make_labels_compatible_with_dot
   } 
 
   

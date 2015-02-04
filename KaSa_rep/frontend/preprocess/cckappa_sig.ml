@@ -126,6 +126,7 @@ type mixture =
 type enriched_variable = 
   { 
     e_id: string; 
+    e_id_dot: string;
     c_variable:Ckappa_sig.mixture Ast.ast_alg_expr; 
     e_variable:mixture Ast.variable_def 
   }
@@ -167,6 +168,7 @@ and modif_expr =
 
 type enriched_rule = 
   {e_rule_label : (string * position) option ; 
+   e_rule_label_dot : (string * position) option ;
    e_rule_initial_direction : Ckappa_sig.direction ; 
    e_rule_rule : Ckappa_sig.mixture Ckappa_sig.rule ;
    e_rule_c_rule : rule }

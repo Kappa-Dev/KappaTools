@@ -64,3 +64,9 @@ let link_color = ref "black"
 let influence_color = ref "red"
 let influence_arrow = ref "normal" 
    
+(** dot output*)
+let make_labels_compatible_with_dot = 
+  [
+    '"',['\\';'"'];
+    '\\',['\\';'\\']
+  ]
