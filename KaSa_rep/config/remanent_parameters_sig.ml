@@ -15,8 +15,6 @@
 
 (** if unsafe = true, then whenever an exception is raised, a default value is output, and no exception is raised*)
 
-module CharMap = Map.Make (struct type t = char let compare = compare end)
-
 type link_mode = Bound_indices | Site_address | Bound_type 
   
 type symbol_table = 
@@ -87,7 +85,7 @@ type parameters =
    influence_map_output : influence_map_output ;
    contact_map_output : contact_map_output ;
    kasa_state : Remanent_state_signature.engine_state ;
-   make_id_compatible_with_dot: char list CharMap.t
+   make_id_compatible_with_dot: string -> string ;
   } 
 
 
