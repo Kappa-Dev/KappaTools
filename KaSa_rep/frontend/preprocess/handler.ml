@@ -4,11 +4,11 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   * 
   * Creation: 2011, the 16th of March
-  * Last modification: 2014, the 9th of December
+  * Last modification: 2015, the 4th of February
   * * 
   * Primitives to use a kappa handler 
   *  
-  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et   
+  * Copyright 2010,2011,2012,2013,2014,2015 Institut National de Recherche en Informatique et   
   * en Automatique.  All rights reserved.  This file is distributed    
   * under the terms of the GNU Library General Public License *)
 
@@ -152,7 +152,14 @@ let print_labels_dot parameters error handler couple =
    let _ = Quark_type.Labels.dump_couple parameters error handler couple in 
    let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "\"]" in 
      error  
-  
+
+let get_label_of_rule_txt parameters error rule = error,rule.Cckappa_sig.e_rule_label 
+let get_label_of_rule_dot parameters error rule = error,rule.Cckappa_sig.e_rule_label_dot 
+
+
+let get_label_of_var_txt parameters error rule = error,rule.Cckappa_sig.e_id  
+let get_label_of_var_dot parameters error rule = error,rule.Cckappa_sig.e_id_dot
+
 let print_rule_txt parameters error rule_id m1 m2 rule = (*MOD*)
   let m = "'"^m1^"' " in
   let error,_ = error,Printf.fprintf parameters.Remanent_parameters_sig.log "%s" (if m="" then ("rule("^(string_of_int rule_id)^"): ") else ("rule("^string_of_int rule_id)^"):"^m) in
@@ -165,7 +172,8 @@ let print_var_txt parameters error var_id m1 m2 var = (*MOD*)
    let error,_ = error,Printf.fprintf parameters.Remanent_parameters_sig.log "%s" (if m="" then ("var("^(string_of_int var_id)^")") else ("var("^string_of_int var_id)^"):"^m) in 
    let error = Print_ckappa.print_alg parameters error var  in
      error 
-   
+
+
 let print_rule_dot parameters error rule_id m1 m2 rule = 
   let error = 
      if m1<>"" && (not parameters.Remanent_parameters_sig.influence_map_output.Remanent_parameters_sig.prompt_full_rule_def)
@@ -185,7 +193,7 @@ let print_rule_dot parameters error rule_id m1 m2 rule =
      if m1<>"" && (not parameters.Remanent_parameters_sig.influence_map_output.Remanent_parameters_sig.prompt_full_var_def)
      then 
        let _ = 
-	 Printf.fprintf parameters.Remanent_parameters_sig.log "\"%s" m1 
+	 Printf.fprintf parameters.Remanent_parameters_sig.log "\"%s" m1
        in error
      else 
        let _ = 
@@ -197,7 +205,7 @@ let print_rule_dot parameters error rule_id m1 m2 rule =
    error
 
  (*TEST*)
- let print_rule_or_var parameters error handler compiled print_rule print_var rule_id = 
+ let print_rule_or_var parameters error handler compiled print_rule print_var get_label_of_rule get_label_of_var rule_id = 
   let rules = compiled.Cckappa_sig.rules in
   let vars = compiled.Cckappa_sig.variables in 
   let nrules = nrules parameters error handler in 
@@ -213,9 +221,11 @@ let print_rule_dot parameters error rule_id m1 m2 rule =
       in 
         match rule 
         with 
-         | None -> let a,b = warn parameters error (Some "line 103") Exit () in a,false,b
+         | None -> 
+	   let a,b = warn parameters error (Some "line 103") Exit () in 
+	   a,false,b
          | Some rule ->
-             let label = rule.Cckappa_sig.e_rule_label in 
+             let error,label = get_label_of_rule parameters error rule in 
 	     let error,(m1,_) = Misc_sa.unsome (error,label) (fun error -> error,("",(Lexing.dummy_pos,Lexing.dummy_pos))) in 
 	     let m1 = 
 	       if m1 = "" then m1
@@ -246,7 +256,7 @@ let print_rule_dot parameters error rule_id m1 m2 rule =
 	   in a,false,b   
          | Some var -> 
 	   let b = var.Cckappa_sig.c_variable in 
-	   let m1 = var.Cckappa_sig.e_id in  
+	   let error,m1 = get_label_of_var parameters error var in  
            let m2 = string_of_int var_id in
            let error = 
              print_var parameters error var_id m1 m2 b

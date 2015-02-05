@@ -125,15 +125,15 @@ let print_quarks parameters  error handler quark =
   error
 
   
-let print_maps parameters error handler compilation print_rule print_var print_labels prefix suffix map =
+let print_maps parameters error handler compilation print_rule print_var get_label_of_rule get_label_of_var print_labels prefix suffix map =
   let _  = 
     Quark_type.Int2Set_and_map.fold_map
       (fun (a,b) couple error -> 
        let error,ruleb = Handler.string_of_rule parameters error handler compilation b in
          let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s" prefix in 
-         let error,bool,() = Handler.print_rule_or_var parameters error handler compilation print_rule print_var a in 
+         let error,bool,() = Handler.print_rule_or_var parameters error handler compilation print_rule print_var get_label_of_rule get_label_of_var a in 
          let _ = Printf.fprintf parameters.Remanent_parameters_sig.log " -> " in
-         let error,bool,()  = Handler.print_rule_or_var parameters error handler compilation print_rule print_var b in
+         let error,bool,()  = Handler.print_rule_or_var parameters error handler compilation print_rule print_var get_label_of_rule get_label_of_var b in
          let _ = print_labels parameters error handler couple in 
          let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s" suffix in 
               error
@@ -142,14 +142,14 @@ let print_maps parameters error handler compilation print_rule print_var print_l
       error
   in error 
                   
-let print_wake_up_map parameters error handler compilation print_rule print_var print_labels suffix  map =
+let print_wake_up_map parameters error handler compilation print_rule print_var print_label_rule print_label_var print_labels suffix  map =
   let parameters = Remanent_parameters.update_prefix parameters "Wake_up_map:" in 
   let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.\n" in
-  print_maps parameters error handler compilation print_rule print_var print_labels parameters.Remanent_parameters_sig.prefix suffix map
+  print_maps parameters error handler compilation print_rule print_var print_label_rule print_label_var print_labels parameters.Remanent_parameters_sig.prefix suffix map
   
-let print_inhibition_map parameters error handler compilation print_rule print_var print_labels suffix  map =
+let print_inhibition_map parameters error handler compilation print_rule print_var print_label_rule print_label_var print_labels suffix  map =
   let parameters = Remanent_parameters.update_prefix parameters "Inhibition_map:" in 
-  print_maps parameters error handler compilation print_rule print_var print_labels parameters.Remanent_parameters_sig.prefix suffix map
+  print_maps parameters error handler compilation print_rule print_var print_label_rule print_label_var print_labels parameters.Remanent_parameters_sig.prefix suffix map
   
 let dot_of_influence_map parameters error handler compilation (wake_up_map,inhibition_map) = 
     let error,parameters_dot = 
@@ -181,7 +181,11 @@ let dot_of_influence_map parameters error handler compilation (wake_up_map,inhib
 		 Handler.print_rule_or_var 
 		   parameters_dot error handler compilation 
 		   Handler.print_rule_dot 
-		   Handler.print_var_dot k in 
+		   Handler.print_var_dot 
+		   Handler.get_label_of_rule_dot 
+		   Handler.get_label_of_var_dot 
+		   k 
+	       in 
                let _ = if bool then 
                    Printf.fprintf parameters_dot.Remanent_parameters_sig.log " ; \n"
                in aux (k+1) error 
@@ -203,7 +207,7 @@ let dot_of_influence_map parameters error handler compilation (wake_up_map,inhib
           let rec aux k error = 
              if k>= ntot then error 
              else 
-               let error,bool,_  = Handler.print_rule_or_var parameters_dot error handler compilation Handler.print_rule_dot Handler.print_var_dot k in 
+               let error,bool,_  = Handler.print_rule_or_var parameters_dot error handler compilation Handler.print_rule_dot Handler.print_var_dot Handler.get_label_of_rule_dot Handler.get_label_of_var_dot k in 
                let _ = if bool then 
                    Printf.fprintf parameters_dot.Remanent_parameters_sig.log " ; \n" else () 
                in aux (k+1) error 
@@ -222,7 +226,7 @@ let dot_of_influence_map parameters error handler compilation (wake_up_map,inhib
               parameters_dot.Remanent_parameters_sig.influence_map_output.Remanent_parameters_sig.wake_up_color 
               parameters_dot.Remanent_parameters_sig.influence_map_output.Remanent_parameters_sig.wake_up_arrow 
          in 
-         let error = print_maps parameters_dot error handler compilation Handler.print_rule_dot Handler.print_var_dot Handler.print_labels_dot "" " ; \n" wake_up_map in 
+         let error = print_maps parameters_dot error handler compilation Handler.print_rule_dot Handler.print_var_dot Handler.get_label_of_rule_dot Handler.get_label_of_var_dot Handler.print_labels_dot "" " ; \n" wake_up_map in 
          error 
     in 
     let error = 
@@ -236,7 +240,7 @@ let dot_of_influence_map parameters error handler compilation (wake_up_map,inhib
               parameters_dot.Remanent_parameters_sig.influence_map_output.Remanent_parameters_sig.inhibition_color 
               parameters_dot.Remanent_parameters_sig.influence_map_output.Remanent_parameters_sig.inhibition_arrow 
          in 
-         let error = print_maps parameters_dot error handler compilation Handler.print_rule_dot Handler.print_var_dot Handler.print_labels_dot "" " ; \n" inhibition_map in 
+         let error = print_maps parameters_dot error handler compilation Handler.print_rule_dot Handler.print_var_dot Handler.get_label_of_rule_dot Handler.get_label_of_var_dot  Handler.print_labels_dot "" " ; \n" inhibition_map in 
          error 
     in 
     let _ = Printf.fprintf parameters_dot.Remanent_parameters_sig.log "}\n" in 

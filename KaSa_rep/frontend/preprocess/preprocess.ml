@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   * 
   * Creation: 12/08/2010
-  * Last modification: 02/01/2015
+  * Last modification: 04/02/2015
   * * 
   * Translation from kASim ast to OpenKappa internal representations, and linkage
   *  
@@ -56,16 +56,19 @@ let empty_rule handler error  =
 
 let empty_e_rule handler error = 
     let error,rule = empty_rule handler error in 
-    {Cckappa_sig.e_rule_label= None ;
-     Cckappa_sig.e_rule_initial_direction = Ckappa_sig.Direct ;
-     Cckappa_sig.e_rule_rule = {
-       Ckappa_sig.lhs = Ckappa_sig.EMPTY_MIX ; 
-       Ckappa_sig.arrow = Ast.RAR (*empty_pos*);
-       Ckappa_sig.rhs = Ckappa_sig.EMPTY_MIX; 
-       Ckappa_sig.k_def = (Ast.CONST (Nbr.F 0.),(Lexing.dummy_pos,Lexing.dummy_pos));
-(*       Ckappa_sig.k_un_radius = None ; *)
-       Ckappa_sig.k_un = None};
-     Cckappa_sig.e_rule_c_rule = rule }
+    {
+      Cckappa_sig.e_rule_label= None ;
+      Cckappa_sig.e_rule_label_dot = None ;
+      Cckappa_sig.e_rule_initial_direction = Ckappa_sig.Direct ;
+      Cckappa_sig.e_rule_rule = 
+	{
+	  Ckappa_sig.lhs = Ckappa_sig.EMPTY_MIX ; 
+	  Ckappa_sig.arrow = Ast.RAR (*empty_pos*);
+	  Ckappa_sig.rhs = Ckappa_sig.EMPTY_MIX; 
+	  Ckappa_sig.k_def = (Ast.CONST (Nbr.F 0.),(Lexing.dummy_pos,Lexing.dummy_pos));
+       (*       Ckappa_sig.k_un_radius = None ; *)
+	  Ckappa_sig.k_un = None};
+      Cckappa_sig.e_rule_c_rule = rule }
 
 let rename_rule_rlhs handler error id_agent tab =
   let error,agent = 
@@ -651,8 +654,18 @@ let translate_mixture parameters error handler mixture =
        (List.rev list) 
    in 
    let actions = {actions with Cckappa_sig.half_break = list} in 
+   let error,label_dot = 
+     match 
+       label 
+     with 
+     | None -> error,None 
+     | Some (string,pos) -> 
+       let error,s = Tools_kasa.make_id_compatible_with_dot_format parameters error string in
+       error,Some(s,pos)
+   in 
    error, 
     ({Cckappa_sig.e_rule_label = label;
+      Cckappa_sig.e_rule_label_dot = label_dot;
       Cckappa_sig.e_rule_initial_direction = direction; 
       Cckappa_sig.e_rule_rule = rule;
       Cckappa_sig.e_rule_c_rule = 
@@ -714,9 +727,11 @@ let alg_with_pos_map = Prepreprocess.map_with_pos Prepreprocess.alg_map
 
 let translate_var parameters error handler (a,b) =
    let error,b' = alg_with_pos_map  (lift (translate_mixture parameters) handler) error b in 
+   let error,a_dot = Tools_kasa.make_id_compatible_with_dot_format parameters error (fst a) in 
    error,
 	  {
 	    Cckappa_sig.e_id = fst a; 
+	    Cckappa_sig.e_id_dot = a_dot;
 	    Cckappa_sig.c_variable = fst b ;
 	    Cckappa_sig.e_variable = (a,b')}
    

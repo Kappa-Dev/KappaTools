@@ -25,8 +25,8 @@ Compilation:rules:0:direct:
 Compilation:rules:0:direct:agent_id_1:
 Compilation:rules:0:reverse:
 Compilation:rules:0:reverse:agent_id_0:
-Compilation:rules:0:actions:deletion:(agent_id:0,agent_type:0)
-Compilation:rules:0:actions:creation:(agent_id:1,agent_type:1)
+Compilation:rules:0:actions:deletion:(agent_id_0,agent_type_0)
+Compilation:rules:0:actions:creation:(agent_id_1,agent_type_1)
 
 Compilation:rules:1:lhs:
 Compilation:rules:1:lhs:agent_id_0:
@@ -40,8 +40,8 @@ Compilation:rules:1:direct:
 Compilation:rules:1:direct:agent_id_1:
 Compilation:rules:1:reverse:
 Compilation:rules:1:reverse:agent_id_0:
-Compilation:rules:1:actions:deletion:(agent_id:0,agent_type:1)
-Compilation:rules:1:actions:creation:(agent_id:1,agent_type:2)
+Compilation:rules:1:actions:deletion:(agent_id_0,agent_type_1)
+Compilation:rules:1:actions:creation:(agent_id_1,agent_type_2)
 Quarks:Quarkify
 Quarks:Rule 0
 Quarks:TEST
@@ -62,7 +62,8 @@ Quarks:rule_id:1,agent_type:1
 Quarks:MODIFICATION+
 Quarks:MODIFICATION-
 
-REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.Quarks:agent_test**:agent_type:1,rule:1->[0]
+REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
+Quarks:agent_test**:agent_type:1,rule:1->[0]
 Quarks:agent_test**:agent_type:0,rule:0->[0]
 Quarks:agent_modif+:agent_type:2,rule:1->[0]
 Quarks:agent_modif+:agent_type:1,rule:0->[0]

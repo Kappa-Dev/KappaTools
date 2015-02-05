@@ -104,6 +104,8 @@ let get_parameters () =
     Remanent_parameters_sig.call_stack = []; 
     Remanent_parameters_sig.link_mode = !Config.link_mode ;
     Remanent_parameters_sig.kasa_state = Remanent_state_signature.empty_engine_state;    
+    Remanent_parameters_sig.make_id_compatible_with_dot = 
+      Config.escape_label_in_dot
   } 
 
   

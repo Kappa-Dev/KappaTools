@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   * 
   * Creation: 2010, the 19th of December
-  * Last modification: 2014, the 9th of December
+  * Last modification: 2015, the 4th of February
   * * 
   * Configuration parameters which are passed through functions computation
 
@@ -84,8 +84,9 @@ type parameters =
    symbols : symbol_table ; 
    influence_map_output : influence_map_output ;
    contact_map_output : contact_map_output ;
-   kasa_state : Remanent_state_signature.engine_state 
- } 
+   kasa_state : Remanent_state_signature.engine_state ;
+   make_id_compatible_with_dot: string -> string ;
+  } 
 
 
     

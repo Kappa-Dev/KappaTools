@@ -58,12 +58,12 @@ let main () =
   let error,wake_up_map,inhibition_map = Influence_map.compute_influence_map parameters_influence_map error handler quark_map nrules in 
   let error = 
     if parameters_influence_map.Remanent_parameters_sig.trace || Print_quarks.trace 
-    then Print_quarks.print_wake_up_map parameters_influence_map error handler c_compil Handler.print_rule_txt Handler.print_var_txt Handler.print_labels_txt "\n" wake_up_map  
+    then Print_quarks.print_wake_up_map parameters_influence_map error handler c_compil Handler.print_rule_txt Handler.print_var_txt Handler.get_label_of_rule_txt Handler.get_label_of_var_txt Handler.print_labels_txt "\n" wake_up_map  
     else error
   in 
   let error = 
     if parameters_influence_map.Remanent_parameters_sig.trace || Print_quarks.trace 
-    then Print_quarks.print_inhibition_map parameters_influence_map error handler c_compil Handler.print_rule_txt Handler.print_var_txt Handler.print_labels_txt "\n" inhibition_map  
+    then Print_quarks.print_inhibition_map parameters_influence_map error handler c_compil Handler.print_rule_txt Handler.print_var_txt Handler.get_label_of_rule_txt Handler.get_label_of_var_txt Handler.print_labels_txt "\n" inhibition_map  
     else error 
   in 
   let error = Print_quarks.dot_of_influence_map parameters_influence_map error handler c_compil (wake_up_map,inhibition_map) in 
