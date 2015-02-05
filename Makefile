@@ -24,7 +24,7 @@ endif
 USE_TK=0
 
 ifeq ($(USE_TK),1)
-OCAMLINCLUDES =  -cflags -I,$(CAML_LD_LIBRARY_PATH)/../labltk -lflags -I,$(CAML_LD_LIBRARY_PATH)/../labltk,unix.cmxa,str.cmxa,nums.cmxa -libs labltk,jpflib
+OCAMLINCLUDES =  -cflags -I,$(CAML_LD_LIBRARY_PATH)/../labltk,-I,+labltk -lflags -I,$(CAML_LD_LIBRARY_PATH)/../labltk,-I,+labltk,unix.cmxa,str.cmxa,nums.cmxa -libs labltk,jpflib
 else
 OCAMLINCLUDES = -lflags unix.cmxa,str.cmxa,nums.cmxa
 endif
