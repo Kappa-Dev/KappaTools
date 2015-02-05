@@ -437,13 +437,13 @@ let build_influence_map rules patterns env =
 
 let dot_of_influence_map desc state env =
   Format.fprintf desc
-"digraph G{ node [shape=box, style=filled, fillcolor=lightskyblue]; @\n " ;
+"@[<v>digraph G{ node [shape=box, style=filled, fillcolor=lightskyblue];@," ;
   Hashtbl.iter
     (fun r_id rule ->
      let opt = if rule.is_pert
 	       then "[shape=invhouse,fillcolor=lightsalmon]"
 	       else "" in
-     Format.fprintf desc "\"%d:%s\" %s;@\n" r_id (Dynamics.to_kappa rule env) opt
+     Format.fprintf desc "@[\"%d:%s\" %s;@]@," r_id (Dynamics.to_kappa rule env) opt
     ) state.rules ;
   Array.iteri
     (fun mix_id mix_opt ->
@@ -452,10 +452,9 @@ let dot_of_influence_map desc state env =
        match mix_opt with
        | None -> ()
        | Some mix ->
-	  Format.fprintf desc "\"%d:%a\" [shape=ellipse,fillcolor=palegreen3] ;\n"
+	  Format.fprintf desc "@[@[<h>\"%d:%a\"@]@ [shape=ellipse,fillcolor=palegreen3] ;@]@,"
 			 mix_id (Kappa_printer.mixture false env) mix
     ) state.kappa_variables ;
-  Format.pp_open_vbox desc 0;
   Hashtbl.iter
     (fun r_id act_map ->
      let rule = rule_of_id r_id state in
@@ -475,7 +474,7 @@ let dot_of_influence_map desc state env =
 		 f "[%a]" (Pp.set IntMap.bindings Pp.comma
 				  (fun f (i,j) -> Format.fprintf f "%i->%i" j i))
 		 glue in
-	     Format.fprintf desc "@[\"%d:%s\" -> \"%d:%t\" [label=\"@[<h>%a@]\"];@]"
+	     Format.fprintf desc "@[\"%d:%s\" ->@ @[<h>\"%d:%t\"@]@ [label=@[<h>\"%a\"@]];@]"
 			    r_id n_label mix_id n_label'
 			    (Pp.list Pp.colon pp_glueing) glueings
 	    ) desc act_map;
