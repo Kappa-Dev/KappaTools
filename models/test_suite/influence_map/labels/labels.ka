@@ -1,0 +1,6 @@
+%agent: A(x~u~p~q) 
+
+'veryveryveryveryverylonglonglonglabel' A(x~u) -> A(x~p) 
+'otherotherveryveryveryverylonglabel' A(x~p) -> A(x~q)
+'"0' A(x~q) -> A(x~u)
+'\0' A(x~q) -> A(x~p)
