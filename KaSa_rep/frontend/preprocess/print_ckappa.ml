@@ -18,15 +18,15 @@ let warn parameters mh message exn default =
 let local_trace = false
   
 let print_agent_name parameter error agent_name = 
-  let  _ = Printf.fprintf parameter.Remanent_parameters_sig.log "%s" agent_name in 
+  let  _ = Printf.fprintf (Remanent_parameters.get_log parameter) "%s" agent_name in 
     error
   
 let print_site_name parameter error site_name = 
-  let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "%s" site_name in
+  let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "%s" site_name in
     error
   
 let print_internal_state parameter error internal_state = 
-  let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "%s" internal_state in 
+  let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "%s" internal_state in 
     error
   
 let print_binding_state parameter error binding_state =
@@ -35,7 +35,7 @@ let print_binding_state parameter error binding_state =
     | Ckappa_sig.Free -> error 
     | Ckappa_sig.Lnk_type (agent_name,site_name) -> 
         let error = print_agent_name parameter error agent_name in 
-        let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "@" in  
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "@" in  
         let error = print_site_name parameter error site_name in 
           error
 
@@ -45,60 +45,60 @@ let print_link_state parameter error link =
   with 
     | Ckappa_sig.LNK_VALUE (agent_index,agent_name,site_name,link_index,_) ->
         begin
-          match parameter.Remanent_parameters_sig.link_mode 
+          match Remanent_parameters.get_link_mode parameter
           with 
             | Remanent_parameters_sig.Bound_indices ->
-                let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "%s%i" parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.bound link_index in 
+                let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "%s%i" (Remanent_parameters.get_bound_symbol parameter) link_index in 
                   error
             | Remanent_parameters_sig.Site_address -> 
                 let _ = Printf.fprintf 
-                          parameter.Remanent_parameters_sig.log 
+                          (Remanent_parameters.get_log parameter) 
                           "%s(%s,%i)%s%s" 
-                          parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.bound 
+                          (Remanent_parameters.get_bound_symbol parameter)
                           agent_name 
                           agent_index 
-                          parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.at
+                          (Remanent_parameters.get_at_symbol parameter)
                           site_name 
                 in 
                   error
             | Remanent_parameters_sig.Bound_type  ->
                 let _ = Printf.fprintf 
-                          parameter.Remanent_parameters_sig.log 
+                          (Remanent_parameters.get_log parameter) 
                           "%s%s%s%s" 
-                          parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.bound 
+			  (Remanent_parameters.get_bound_symbol parameter)
                           agent_name   
-                          parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.at
+			   (Remanent_parameters.get_at_symbol parameter)
                           site_name
                 in 
                   error 
         end 
     | Ckappa_sig.FREE -> error
     | Ckappa_sig.LNK_ANY _  -> 
-       let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "%s" parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.link_to_any in 
+       let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "%s"  (Remanent_parameters.get_link_to_any_symbol parameter) in 
        error 
     | Ckappa_sig.LNK_SOME _ -> 
-       let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "%s" parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.link_to_some in 
+       let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "%s" (Remanent_parameters.get_link_to_some_symbol parameter) in 
        error
          
     (*MOD:change ex: A(x!B@x) to A(x!x.B) as the input in kappa file*)
     | Ckappa_sig.LNK_TYPE ((agent_type,_),(site_type,_)) -> 
        let _ = Printf.fprintf 
-                 parameter.Remanent_parameters_sig.log 
+                 (Remanent_parameters.get_log parameter) 
                  "%s%s%s%s"
-                 parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.bound
+		  (Remanent_parameters.get_bound_symbol parameter)
                  site_type
-                 parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.agent_sep_dot
+		 (Remanent_parameters.get_btype_sep_symbol parameter)
                  agent_type  
        in 
        error
    
 let print_internal_state parameter error internal =
   List.iter 
-    (fun x -> Printf.fprintf parameter.Remanent_parameters_sig.log "%s%s" parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.internal x)
+    (Printf.fprintf (Remanent_parameters.get_log parameter) "%s%s" (Remanent_parameters.get_internal_symbol parameter))
     internal 
 
 let print_port parameter error port =
-  let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "%s" port.Ckappa_sig.port_nme in
+  let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "%s" port.Ckappa_sig.port_nme in
   let _ = print_internal_state parameter error port.Ckappa_sig.port_int in 
   let error = print_link_state parameter error port.Ckappa_sig.port_lnk in 
     error 
@@ -109,16 +109,16 @@ let print_interface  parameter error interface =
     with 
     | Ckappa_sig.EMPTY_INTF -> error 
     | Ckappa_sig.PORT_SEP (port,interface) -> 
-        let _ = Misc_sa.print_comma parameter bool parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.site_sep_comma in
+        let _ = Misc_sa.print_comma parameter bool (Remanent_parameters.get_site_sep_comma_symbol parameter) in 
         let error = print_port parameter error port in 
          aux error true interface 
   in aux error false interface 
 
 let print_agent parameter error agent = (*TEST*)
-  let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "%s%s" agent.Ckappa_sig.ag_nme parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.agent_open in
+  let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "%s%s" agent.Ckappa_sig.ag_nme (Remanent_parameters.get_agent_open_symbol parameter) in 
   let error = print_interface parameter error agent.Ckappa_sig.ag_intf in 
-  let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "%s" parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.agent_close in
-                 error 
+  let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "%s" (Remanent_parameters.get_agent_close_symbol parameter) in 
+  error 
     
 let print_mixture  parameter error mixture = (*TEST*)
   let rec aux error bool mixture =  
@@ -126,19 +126,19 @@ let print_mixture  parameter error mixture = (*TEST*)
     with 
     | Ckappa_sig.EMPTY_MIX -> error 
     | Ckappa_sig.SKIP _ -> 
-       let _ = Misc_sa.print_comma parameter bool parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.site_sep_comma in
-       let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "%s" parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.ghost_agent in
+       let _ = Misc_sa.print_comma parameter bool (Remanent_parameters.get_agent_sep_comma_symbol parameter) in 
+       let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "%s" (Remanent_parameters.get_ghost_agent_symbol parameter) in 
        error
     | Ckappa_sig.COMMA (agent,mixture) -> 
-       let _ = if bool then Printf.fprintf parameter.Remanent_parameters_sig.log "%s" parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.agent_sep_comma in
+       let _ = if bool then Printf.fprintf (Remanent_parameters.get_log parameter) "%s" (Remanent_parameters.get_agent_sep_comma_symbol parameter) in 
          let error = print_agent parameter error agent in
            aux error true mixture 
     | Ckappa_sig.DOT (i,agent,mixture) -> 
-         let _ = if bool then Printf.fprintf parameter.Remanent_parameters_sig.log "%s%i" parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.agent_sep_dot i in
+         let _ = if bool then Printf.fprintf (Remanent_parameters.get_log parameter) "%s%i" (Remanent_parameters.get_agent_sep_dot_symbol parameter) i in
          let error = print_agent parameter error agent in 
            aux error true mixture 
     | Ckappa_sig.PLUS (i,agent,mixture) -> 
-         let _ = if bool then Printf.fprintf parameter.Remanent_parameters_sig.log "%s%i" parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.agent_sep_plus i in
+         let _ = if bool then Printf.fprintf (Remanent_parameters.get_log parameter) "%s%i" (Remanent_parameters.get_agent_sep_plus_symbol parameter) i in 
          let error = print_agent parameter error agent in 
            aux error true mixture 
   in aux error false mixture 
@@ -147,40 +147,40 @@ let rec print_alg parameter error alg =
   match alg 
   with 
   | Ast.BIN_ALG_OP (op,(alg1,_),(alg2,_)) -> 
-    let _ = Printf.fprintf parameter.Remanent_parameters_sig.log  "(" in 
+    let _ = Printf.fprintf (Remanent_parameters.get_log parameter)  "(" in 
     let _ = print_alg parameter error alg1 in 
-    let _ = Term.print_bin_alg_op parameter.Remanent_parameters_sig.formatter op in 
+    let _ = Term.print_bin_alg_op (Remanent_parameters.get_formatter parameter) op in 
     let _ = print_alg parameter error alg2 in 
-    let _ =  Printf.fprintf parameter.Remanent_parameters_sig.log ")" in 
+    let _ =  Printf.fprintf (Remanent_parameters.get_log parameter) ")" in 
     error
   | Ast.UN_ALG_OP (op,(alg,_)) -> 
-    let _ = Printf.fprintf parameter.Remanent_parameters_sig.log  "(" in 
-    let _ = Term.print_un_alg_op parameter.Remanent_parameters_sig.formatter op in 
+    let _ = Printf.fprintf (Remanent_parameters.get_log parameter)  "(" in 
+    let _ = Term.print_un_alg_op (Remanent_parameters.get_formatter parameter) op in 
     let _ = print_alg parameter error alg in 
-    let _ =  Printf.fprintf parameter.Remanent_parameters_sig.log  ")" in 
+    let _ =  Printf.fprintf (Remanent_parameters.get_log parameter)  ")" in 
     error
   | Ast.STATE_ALG_OP state_alg_op -> 
-    let _ = Term.print_state_alg_op parameter.Remanent_parameters_sig.formatter state_alg_op in 
+    let _ = Term.print_state_alg_op (Remanent_parameters.get_formatter parameter) state_alg_op in 
     error 
   | Ast.OBS_VAR string -> 
-    let _ = Printf.fprintf parameter.Remanent_parameters_sig.log  "%s" string 
+    let _ = Printf.fprintf (Remanent_parameters.get_log parameter)  "%s" string 
     in error
   | Ast.TOKEN_ID token -> 
-    let _ = Printf.fprintf parameter.Remanent_parameters_sig.log  "%s" token 
+    let _ = Printf.fprintf (Remanent_parameters.get_log parameter)  "%s" token 
     in error
   | Ast.KAPPA_INSTANCE mixture -> 
     print_mixture parameter error mixture 
   | Ast.CONST t -> 
-    let _ = Printf.fprintf parameter.Remanent_parameters_sig.log  "%s" (Nbr.to_string t) 
+    let _ = Printf.fprintf (Remanent_parameters.get_log parameter)  "%s" (Nbr.to_string t) 
     in error
   | Ast.TMAX -> 
-    let _ = Printf.fprintf parameter.Remanent_parameters_sig.log  "TMAX" 
+    let _ = Printf.fprintf (Remanent_parameters.get_log parameter)  "TMAX" 
     in error  
   | Ast.EMAX -> 
-    let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "EMAX" 
+    let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "EMAX" 
     in error 
   | Ast.PLOTNUM ->
-     let () = Printf.fprintf parameter.Remanent_parameters_sig.log "[p]" in
+     let () = Printf.fprintf (Remanent_parameters.get_log parameter) "[p]" in
      error
 
 let print_rule parameter error rule = 
@@ -188,10 +188,10 @@ let print_rule parameter error rule =
   let arrow = 
     match rule.Ckappa_sig.arrow 
     with 
-      | Ast.RAR -> parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.uni_arrow 
-      | Ast.LRAR -> parameter.Remanent_parameters_sig.symbols.Remanent_parameters_sig.bi_arrow 
+      | Ast.RAR -> (Remanent_parameters.get_uni_arrow_symbol parameter)
+      | Ast.LRAR -> (Remanent_parameters.get_bi_arrow_symbol parameter) 
   in 
-  let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "%s" arrow in
+  let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "%s" arrow in
   let error = print_mixture parameter error rule.Ckappa_sig.rhs in 
     error 
 

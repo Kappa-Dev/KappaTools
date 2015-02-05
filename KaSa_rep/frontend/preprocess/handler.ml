@@ -148,9 +148,9 @@ let print_labels_txt parameters error handler couple =
    in error 
  
 let print_labels_dot parameters error handler couple = 
-   let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "[label =\"" in 
+   let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "[label =\"" in 
    let _ = Quark_type.Labels.dump_couple parameters error handler couple in 
-   let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "\"]" in 
+   let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "\"]" in 
      error  
 
 let get_label_of_rule_txt parameters error rule = error,rule.Cckappa_sig.e_rule_label 
@@ -162,46 +162,46 @@ let get_label_of_var_dot parameters error rule = error,rule.Cckappa_sig.e_id_dot
 
 let print_rule_txt parameters error rule_id m1 m2 rule = (*MOD*)
   let m = "'"^m1^"' " in
-  let error,_ = error,Printf.fprintf parameters.Remanent_parameters_sig.log "%s" (if m="" then ("rule("^(string_of_int rule_id)^"): ") else ("rule("^string_of_int rule_id)^"):"^m) in
+  let error,_ = error,Printf.fprintf (Remanent_parameters.get_log parameters) "%s" (if m="" then ("rule("^(string_of_int rule_id)^"): ") else ("rule("^string_of_int rule_id)^"):"^m) in
    let error = Print_ckappa.print_rule parameters error rule in
      error 
    
 let print_var_txt parameters error var_id m1 m2 var = (*MOD*)
   let m = "'"^m1^"' " in 
  (* let m = "'"^m1^"' "^m2^" " in *)
-   let error,_ = error,Printf.fprintf parameters.Remanent_parameters_sig.log "%s" (if m="" then ("var("^(string_of_int var_id)^")") else ("var("^string_of_int var_id)^"):"^m) in 
+   let error,_ = error,Printf.fprintf (Remanent_parameters.get_log parameters) "%s" (if m="" then ("var("^(string_of_int var_id)^")") else ("var("^string_of_int var_id)^"):"^m) in 
    let error = Print_ckappa.print_alg parameters error var  in
      error 
 
 
 let print_rule_dot parameters error rule_id m1 m2 rule = 
   let error = 
-     if m1<>"" && (not parameters.Remanent_parameters_sig.influence_map_output.Remanent_parameters_sig.prompt_full_rule_def)
+     if m1<>"" && (not (Remanent_parameters.get_prompt_full_rule_def parameters))
      then 
-       let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "\"%s" m1 in 
+       let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "\"%s" m1 in 
        error
      else 
-       let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "\"%s:" m2 in 
+       let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "\"%s:" m2 in 
        let error = Print_ckappa.print_rule parameters error rule in 
        error 
   in 
-  let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "\"" in 
+  let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "\"" in 
   error
    
  let print_var_dot parameters (error:Exception.method_handler)  var_id m1 m2 var = 
    let error = 
-     if m1<>"" && (not parameters.Remanent_parameters_sig.influence_map_output.Remanent_parameters_sig.prompt_full_var_def)
+     if m1<>"" && (not (Remanent_parameters.get_prompt_full_var_def parameters))
      then 
        let _ = 
-	 Printf.fprintf parameters.Remanent_parameters_sig.log "\"%s" m1
+	 Printf.fprintf (Remanent_parameters.get_log parameters) "\"%s" m1
        in error
      else 
        let _ = 
-	 Printf.fprintf parameters.Remanent_parameters_sig.log "\"%s:" m2 in 
+	 Printf.fprintf (Remanent_parameters.get_log parameters) "\"%s:" m2 in 
        let error = Print_ckappa.print_alg parameters error var 
        in error 
    in 
-   let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "\"" in 
+   let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "\"" in 
    error
 
  (*TEST*)

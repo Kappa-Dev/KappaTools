@@ -47,9 +47,9 @@ let rev_inter_list compare l1 l2 =
  in aux l1 l2 []
   
 let trace parameters string = 
-  if parameters.Remanent_parameters_sig.trace
+  if parameters.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.trace
   then 
-    Printf.fprintf parameters.Remanent_parameters_sig.log "%s%s" parameters.Remanent_parameters_sig.prefix (string ()) 
+    Printf.fprintf parameters.Remanent_parameters_sig.log "%s%s" parameters.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix (string ()) 
 
 let inter_list compare l1 l2 = List.rev (rev_inter_list compare l1 l2)
   

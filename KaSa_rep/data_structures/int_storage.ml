@@ -4,7 +4,7 @@
     * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
     * 
     * Creation: 2010, the 27th of July
-    * Last modification: 2011, the 15th of March 
+    * Last modification: 2015, the 5th of February
     * * 
     * This library provides primitives to deal with storage functions
     *  
@@ -116,7 +116,7 @@ module Int_storage_imperatif =
            match array.array.(i) with 
             | None -> error
             | Some elt ->
-               let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s%d:\n" parameters.Remanent_parameters_sig.prefix i in
+               let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%s%d:\n" (Remanent_parameters.get_prefix parameters) i in
               let parameters =  Remanent_parameters.update_prefix parameters ((string_of_int i)^":") in 
               let error = print_elt error parameters elt in
               error
@@ -132,7 +132,7 @@ module Int_storage_imperatif =
            match array.array.(i) with 
             | None -> error
             | Some elt ->
-               let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "\n"  in
+               let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "\n"  in
               let parameters =  Remanent_parameters.update_prefix parameters ((string_of_int i)^":") in 
               let error = print_elt error parameters elt in
               error
@@ -149,7 +149,7 @@ module Int_storage_imperatif =
            match array.array.(i) with 
             | None -> error
             | Some elt ->
-              let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%sagent_type:%d:\n" parameters.Remanent_parameters_sig.prefix i in 
+              let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%sagent_type:%d:\n" (Remanent_parameters.get_prefix parameters) i in 
               let parameters =  Remanent_parameters.update_prefix parameters ("agent_type:"^(string_of_int i)^":") in 
               let error = print_elt error parameters elt in
               error

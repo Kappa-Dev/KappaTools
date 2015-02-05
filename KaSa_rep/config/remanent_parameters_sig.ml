@@ -26,6 +26,7 @@ type symbol_table =
    agent_open : string ;
    agent_close : string ; 
    site_sep_comma : string ;
+   btype_sep : string ;
    agent_sep_comma : string ;
    agent_sep_dot : string ; 
    agent_sep_plus : string ; 
@@ -70,13 +71,11 @@ type contact_map_output =
     influence_arrow : string ;
   }
 
-type parameters = 
+type marshalisable_parameters = 
  { 
    unsafe : bool ;
    trace  : bool ;
    dump_error_as_soon_as_they_occur : bool ;
-   log    : out_channel ;
-   formatter : Format.formatter ; 
    file : string option ; 
    prefix : string ; 
    call_stack : string list;
@@ -85,8 +84,14 @@ type parameters =
    influence_map_output : influence_map_output ;
    contact_map_output : contact_map_output ;
    kasa_state : Remanent_state_signature.engine_state ;
-   make_id_compatible_with_dot: string -> string ;
-  } 
+ } 
 
+type parameters = 
+  {
+    log: out_channel ;
+    formatter: Format.formatter ; 
+    make_id_compatible_with_dot: string -> string ;
+    marshalisable_parameters:marshalisable_parameters  
+  }
 
     

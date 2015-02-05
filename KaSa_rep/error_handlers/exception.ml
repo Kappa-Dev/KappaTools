@@ -4,7 +4,7 @@
     * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
     * 
     * Creation: 08/03/2010
-    * Last modification: 09/12/2014
+    * Last modification: 05/02/2015
     * * 
     * This library declares exceptions 
     *  
@@ -97,9 +97,9 @@ let safe_warn parameters error_handler file message exn default =
                             message = message;
                             alarm = exn}
   in 
-  let stringlist = stringlist_of_uncaught uncaught [parameters.Remanent_parameters_sig.prefix] in 
-  let _ = List.iter (Printf.fprintf parameters.Remanent_parameters_sig.log "%s") stringlist in 
-  let _ = Printf.fprintf  parameters.Remanent_parameters_sig.log "\n" in 
+  let stringlist = stringlist_of_uncaught uncaught [Remanent_parameters.get_prefix parameters] in 
+  let _ = List.iter (Printf.fprintf (Remanent_parameters.get_log parameters) "%s") stringlist in 
+  let _ = Printf.fprintf  (Remanent_parameters.get_log parameters) "\n" in 
     raise (Uncaught_exception {file_name = file;
                             message = message;
                             alarm = exn})
@@ -112,32 +112,32 @@ let unsafe_warn parameters error_handler file message exn default =
        alarm = exn}::error_handler.mh_uncaught_error_list},default ()  
     
 let warn parameters =
-  if parameters.Remanent_parameters_sig.unsafe 
+  if Remanent_parameters.get_unsafe parameters 
   then unsafe_warn parameters 
   else safe_warn parameters 
       
 let print parameters handlers =
   if handlers.mh_caught_error_list = [] && handlers.mh_uncaught_error_list = [] 
   then 
-    Printf.fprintf parameters.Remanent_parameters_sig.log "%sexecution finished without any exception\n" parameters.Remanent_parameters_sig.prefix
+    Printf.fprintf (Remanent_parameters.get_log parameters) "%sexecution finished without any exception\n" (Remanent_parameters.get_prefix parameters)
   else 
-    let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%sSome exceptions have been raised\n" parameters.Remanent_parameters_sig.prefix in 
+    let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%sSome exceptions have been raised\n" (Remanent_parameters.get_prefix parameters) in 
     let parameters = Remanent_parameters.update_prefix parameters "error: " in   
     let _ = 
       List.iter 
         (fun caught -> 
-            let stringlist = parameters.Remanent_parameters_sig.prefix::(stringlist_of_caught caught []) in 
-            let _ = List.iter (Printf.fprintf parameters.Remanent_parameters_sig.log "%s") stringlist in 
-            let _ = Printf.fprintf  parameters.Remanent_parameters_sig.log "\n" in 
+            let stringlist = (Remanent_parameters.get_prefix parameters)::(stringlist_of_caught caught []) in 
+            let _ = List.iter (Printf.fprintf (Remanent_parameters.get_log parameters) "%s") stringlist in 
+            let _ = Printf.fprintf  (Remanent_parameters.get_log parameters) "\n" in 
             ())
         handlers.mh_caught_error_list 
     in 
     let _ = 
       List.iter 
         (fun uncaught -> 
-            let stringlist =  parameters.Remanent_parameters_sig.prefix::(stringlist_of_uncaught uncaught []) in 
-            let _ = List.iter (Printf.fprintf parameters.Remanent_parameters_sig.log "%s") stringlist in 
-            let _ = Printf.fprintf  parameters.Remanent_parameters_sig.log "\n" in 
+            let stringlist =  (Remanent_parameters.get_prefix parameters)::(stringlist_of_uncaught uncaught []) in 
+            let _ = List.iter (Printf.fprintf (Remanent_parameters.get_log parameters) "%s") stringlist in 
+            let _ = Printf.fprintf  (Remanent_parameters.get_log parameters) "\n" in 
             ())
         handlers.mh_uncaught_error_list 
     in 

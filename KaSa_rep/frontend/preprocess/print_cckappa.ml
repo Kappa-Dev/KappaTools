@@ -26,23 +26,25 @@ let print_agent parameters error handler agent =
        let parameters = Remanent_parameters.update_prefix parameters ("agent_type_"^(string_of_int agent.Cckappa_sig.agent_name)^":") in
        Cckappa_sig.Site_map_and_set.fold_map (*TEST*)
           (fun a b error ->  
-           let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%ssite_type_%i->state:%s\n" parameters.Remanent_parameters_sig.prefix a (string_of_port b)  in 
+           let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%ssite_type_%i->state:%s\n" (Remanent_parameters.get_prefix parameters) a (string_of_port b)  in 
            error ) 
           agent.Cckappa_sig.agent_interface
           error
-    | Cckappa_sig.Ghost -> let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%sGhost\n" parameters.Remanent_parameters_sig.prefix in error  
+    | Cckappa_sig.Ghost -> 
+      let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%sGhost\n" (Remanent_parameters.get_prefix parameters) in 
+      error  
 
 let print_diffagent parameters error handler agent = (*TEST*)
      let parameters = Remanent_parameters.update_prefix parameters ("agent_type_"^(string_of_int agent.Cckappa_sig.agent_name)^":") in
      Cckappa_sig.Site_map_and_set.fold_map
        (fun a b error -> 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%ssite_type_%i->state:%s\n" parameters.Remanent_parameters_sig.prefix a (string_of_port b) in 
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%ssite_type_%i->state:%s\n" (Remanent_parameters.get_prefix parameters) a (string_of_port b) in 
         error)
        agent.Cckappa_sig.agent_interface
        error
       
 let print_mixture parameters error handler mixture =
-    let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s\n" parameters.Remanent_parameters_sig.prefix in 
+    let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%s\n" (Remanent_parameters.get_prefix parameters) in 
     let error = 
       Int_storage.Quick_Nearly_inf_Imperatif.print
        error 
@@ -60,7 +62,7 @@ let print_mixture parameters error handler mixture =
          let error = (*TEST*)
            Cckappa_sig.Site_map_and_set.fold_map 
               (fun k a error -> 
-                let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%ssite_type_%i->agent_id_%i.site_type_%i\n" parameters.Remanent_parameters_sig.prefix k a.Cckappa_sig.agent_index a.Cckappa_sig.site
+                let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%ssite_type_%i->agent_id_%i.site_type_%i\n" (Remanent_parameters.get_prefix parameters) k a.Cckappa_sig.agent_index a.Cckappa_sig.site
                 in error
                 )
               a
@@ -72,7 +74,7 @@ let print_mixture parameters error handler mixture =
     let error = 
       List.fold_left 
         (fun error (i,j) -> 
-          let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%i+%i" i j in 
+          let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%i+%i" i j in 
             error 
           )
         error
@@ -81,7 +83,7 @@ let print_mixture parameters error handler mixture =
      let error = 
        List.fold_left 
         (fun error (i,j) -> 
-          let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%i.%i" i j 
+          let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%i.%i" i j 
           in  error )
         error 
         mixture.Cckappa_sig.dot
@@ -89,7 +91,7 @@ let print_mixture parameters error handler mixture =
        error 
 
 let print_diffview parameters error handler diff =
-    let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s\n" parameters.Remanent_parameters_sig.prefix in 
+    let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%s\n" (Remanent_parameters.get_prefix parameters) in 
     let error = 
       Int_storage.Quick_Nearly_inf_Imperatif.print (*TEST*)
        error 
@@ -105,106 +107,106 @@ let print_diffview parameters error handler diff =
  let rec print_short_alg parameters error handler alg = 
     match alg with 
      |Ast.BIN_ALG_OP(Term.MULT,a1,a2),_ -> 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "(" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(" in
         let error = print_short_alg parameters error handler a1 in 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "*" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "*" in
         let error = print_short_alg parameters error handler a2 in 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log ")" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) ")" in
          error  
      | Ast.BIN_ALG_OP(Term.SUM,a1,a2),_ -> 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "(" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(" in
         let error = print_short_alg parameters error handler a1 in 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "+" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "+" in
         let error = print_short_alg parameters error handler a2 in 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log ")" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) ")" in
          error  
      | Ast.BIN_ALG_OP(Term.DIV,a1,a2),_ -> 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "(" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(" in
         let error = print_short_alg parameters error handler a1 in 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "/" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "/" in
         let error = print_short_alg parameters error handler a2 in 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log ")" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) ")" in
          error   
      | Ast.BIN_ALG_OP(Term.MINUS,a1,a2),_ -> 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "(" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(" in
         let error = print_short_alg parameters error handler a1 in 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "-" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "-" in
         let error = print_short_alg parameters error handler a2 in 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log ")" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) ")" in
          error   
      | Ast.BIN_ALG_OP(Term.POW,a1,a2),_ -> 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "(" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(" in
         let error = print_short_alg parameters error handler a1 in 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "**" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "**" in
         let error = print_short_alg parameters error handler a2 in 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log ")" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) ")" in
          error   
      | Ast.BIN_ALG_OP(Term.MODULO,a1,a2),_ -> 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "(" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(" in
         let error = print_short_alg parameters error handler a1 in 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "mod" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "mod" in
         let error = print_short_alg parameters error handler a2 in 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log ")" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) ")" in
          error  
      | Ast.UN_ALG_OP(Term.LOG,a1),_ -> 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "(log(" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(log(" in
         let error = print_short_alg parameters error handler a1 in 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "))" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "))" in
          error  
      | Ast.UN_ALG_OP(Term.SQRT,a1),_ -> 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "(sqrt(" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(sqrt(" in
         let error = print_short_alg parameters error handler a1 in 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "))" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "))" in
          error 
      | Ast.UN_ALG_OP(Term.EXP,a1),_ -> 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "(exp(" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(exp(" in
         let error = print_short_alg parameters error handler a1 in 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "))" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "))" in
          error 
      | Ast.UN_ALG_OP(Term.SINUS,a1),_ -> 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "(sin(" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(sin(" in
         let error = print_short_alg parameters error handler a1 in 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "))" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "))" in
          error 
      | Ast.UN_ALG_OP(Term.COSINUS,a1),_ -> 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "(cos(" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(cos(" in
         let error = print_short_alg parameters error handler a1 in 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "))" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "))" in
          error 
    (*  | Ast.UN_ALG_OP(Term.ABS,a1),_ -> 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "(abs(" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(abs(" in
         let error = print_short_alg parameters error handler a1 in 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "))" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "))" in
          error  *)
      | Ast.EMAX,_  -> 
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "#Event_MAX#" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "#Event_MAX#" in
          error
      | Ast.TMAX,_ -> 
-         let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "#Time_MAX#" in
+         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "#Time_MAX#" in
            error
      | Ast.UN_ALG_OP(Term.TAN,a1),_ -> 
-          let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "(tan(" in
+          let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(tan(" in
           let error = print_short_alg parameters error handler a1 in 
-          let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "))" in
+          let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "))" in
          error  
      | Ast.STATE_ALG_OP Term.TIME_VAR,_ ->   
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "#TIME#" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "#TIME#" in
         error 
      | Ast.STATE_ALG_OP Term.EVENT_VAR,_ ->   
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "#EVENT#" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "#EVENT#" in
         error 
    
      | Ast.OBS_VAR s,_ -> 
-       let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "(OBS(%s))" s in
+       let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(OBS(%s))" s in
        error
 
      | Ast.CONST(Nbr.F(f)),_ ->
-       let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%f " f in 
+       let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%f " f in 
        error
          
       (*MOD: add print integer at compilation variables*)
       | Ast.CONST(Nbr.I(i)),_ ->
-       let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%d " i in 
+       let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%d " i in 
        error
 
      | Ast.UN_ALG_OP _,_
@@ -215,7 +217,7 @@ let print_diffview parameters error handler diff =
      | Ast.KAPPA_INSTANCE _,_
      | Ast.PLOTNUM,_ ->  (*to do*) error 
     (* | Ast.INFINITY _ -> 
-      let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "+oo" in 
+      let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "+oo" in 
          error *)
     (* | _ -> (*to do*)
        error *)
@@ -224,7 +226,7 @@ let print_diffview parameters error handler diff =
    let s = var.Cckappa_sig.e_id in
    let _ = 
      if s <> "" 
-     then Printf.fprintf parameters.Remanent_parameters_sig.log "%s: " var.Cckappa_sig.e_id 
+     then Printf.fprintf (Remanent_parameters.get_log parameters) "%s: " var.Cckappa_sig.e_id 
    in 
      print_short_alg parameters error handler (var.Cckappa_sig.c_variable,(Lexing.dummy_pos,Lexing.dummy_pos))
 
@@ -233,7 +235,7 @@ let print_diffview parameters error handler diff =
    Int_storage.Nearly_inf_Imperatif.print_var_f (*MOD*)
        error 
        (fun error parameters var ->
-        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s" parameters.Remanent_parameters_sig.prefix in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%s" (Remanent_parameters.get_prefix parameters) in
            print_var parameters error handler var) 
        parameters var
 
@@ -242,9 +244,9 @@ let print_diffview parameters error handler diff =
  (*TEST: change the order *)
  let print_bond parameters relation (add1,add2) = 
    Printf.fprintf 
-     parameters.Remanent_parameters_sig.log 
+     (Remanent_parameters.get_log parameters) 
      "%s(agent_id_%d,agent_type_%d)@site_type_%d%s(agent_id_%d,agent_type_%d)@site_type_%d\n" 
-     parameters.Remanent_parameters_sig.prefix 
+     (Remanent_parameters.get_prefix parameters) 
      add2.Cckappa_sig.agent_index 
      add2.Cckappa_sig.agent_type
      add2.Cckappa_sig.site
@@ -255,18 +257,18 @@ let print_diffview parameters error handler diff =
 
  let print_half_bond parameters relation (add1,_) = 
    Printf.fprintf 
-     parameters.Remanent_parameters_sig.log 
+     (Remanent_parameters.get_log parameters) 
      "%s(agent_id_%d,agent_type_%d)@site_type_%d\n" 
-     parameters.Remanent_parameters_sig.prefix 
+     (Remanent_parameters.get_prefix parameters) 
      add1.Cckappa_sig.agent_index
      add1.Cckappa_sig.agent_type
      add1.Cckappa_sig.site
      
  let print_remove parameters (index,agent,list) =
    let _ = Printf.fprintf 
-     parameters.Remanent_parameters_sig.log 
+     (Remanent_parameters.get_log parameters) 
      "%s(agent_id_%d,agent_type_%d)\n" 
-     parameters.Remanent_parameters_sig.prefix
+     (Remanent_parameters.get_prefix parameters)
      index
      agent.Cckappa_sig.agent_name
    in 
@@ -275,12 +277,12 @@ let print_diffview parameters error handler diff =
       Cckappa_sig.Site_map_and_set.iter_map 
         (fun site _ -> 
             Printf.fprintf 
-               parameters_doc.Remanent_parameters_sig.log 
-               "%s(agent_id_%d,agent_type_%d)@site_type_%d\n"
-               parameters_doc.Remanent_parameters_sig.prefix
-               index
-               agent.Cckappa_sig.agent_name 
-               site)
+              (Remanent_parameters.get_log parameters_doc)
+	      "%s(agent_id_%d,agent_type_%d)@site_type_%d\n"
+              (Remanent_parameters.get_prefix parameters_doc)
+              index
+              agent.Cckappa_sig.agent_name 
+              site)
          agent.Cckappa_sig.agent_interface
    in 
    let parameters =  Remanent_parameters.update_prefix parameters "undocumented_site:" in
@@ -288,9 +290,9 @@ let print_diffview parameters error handler diff =
      List.iter   
        (fun site  -> 
          Printf.fprintf 
-           parameters.Remanent_parameters_sig.log 
+           (Remanent_parameters.get_log parameters) 
            "%s(agent_id_%d,agent_type_%d)@site_type_%d\n"
-           parameters.Remanent_parameters_sig.prefix
+           (Remanent_parameters.get_prefix parameters)
            index
            agent.Cckappa_sig.agent_name 
            site)
@@ -299,9 +301,9 @@ let print_diffview parameters error handler diff =
    
    let print_created_agent parameters (index,agent) =
      Printf.fprintf 
-       parameters.Remanent_parameters_sig.log 
+       (Remanent_parameters.get_log parameters) 
        "%s(agent_id_%d,agent_type_%d)\n" 
-       parameters.Remanent_parameters_sig.prefix
+       (Remanent_parameters.get_prefix parameters)
        index
        agent
     
@@ -343,7 +345,7 @@ let print_diffview parameters error handler diff =
  
  let print_init parameters error handler init =
 (*  let parameters_init =  Remanent_parameters.update_prefix parameters "coef:" in
-  let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s%i\n" parameters_init.Remanent_parameters_sig.prefix init.Cckappa_sig.e_init_factor in *)
+  let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%s%i\n" parameters_init.Remanent_parameters_sig.prefix init.Cckappa_sig.e_init_factor in *)
   let parameters_rhs =  Remanent_parameters.update_prefix parameters "mixture:" in 
   let error = print_mixture parameters_rhs error handler init.Cckappa_sig.e_init_c_mixture  in 
    error 
@@ -359,7 +361,7 @@ let print_diffview parameters error handler diff =
  let print_perturbations parameters error handler perturbations = error  
    
  let print_compil parameters error handler compil = 
-   let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s" parameters.Remanent_parameters_sig.prefix in 
+   let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%s" (Remanent_parameters.get_prefix parameters) in 
    let parameters' =  Remanent_parameters.update_prefix parameters "variables:" in
    let error = print_variables parameters' error handler compil.Cckappa_sig.variables in 
    let parameters' =  Remanent_parameters.update_prefix parameters "signature:" in 

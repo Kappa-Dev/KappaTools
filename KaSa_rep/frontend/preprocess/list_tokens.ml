@@ -264,24 +264,21 @@ let scan_perts parameters =
               
 let scan_rules parameters a b =  
   let _ = 
-    if parameters.Remanent_parameters_sig.trace 
+    if Remanent_parameters.get_trace parameters
     then 
-      let _ = Printf.fprintf parameters.Remanent_parameters_sig.log  "Scan rules!\n" in ()  
+      let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "Scan rules!\n" in ()  
   in 
     List.fold_left 
       (fun remanent (_,((_,rule),_)) -> scan_mixture parameters (scan_mixture parameters remanent rule.Ckappa_sig.lhs) rule.Ckappa_sig.rhs)
       a b
   
 let scan_compil parameters error compil =
-   let parameters =
-     {parameters with
-       Remanent_parameters_sig.trace =
-	 local_trace || parameters.Remanent_parameters_sig.trace} in
-   let remanent = empty_handler parameters error in 
-   let remanent = scan_initial_states parameters remanent compil.Ast.init in 
-   let remanent = scan_declarations parameters remanent compil.Ast.signatures  in 
-   let remanent = scan_observables parameters remanent compil.Ast.observables in 
-   let remanent = scan_perts parameters remanent compil.Ast.perturbations in 
-   let remanent = scan_rules parameters remanent compil.Ast.rules in
-     remanent 
+  let parameters = Remanent_parameters.set_trace parameters (local_trace || (Remanent_parameters.get_trace parameters)) in
+  let remanent = empty_handler parameters error in 
+  let remanent = scan_initial_states parameters remanent compil.Ast.init in 
+  let remanent = scan_declarations parameters remanent compil.Ast.signatures  in 
+  let remanent = scan_observables parameters remanent compil.Ast.observables in 
+  let remanent = scan_perts parameters remanent compil.Ast.perturbations in 
+  let remanent = scan_rules parameters remanent compil.Ast.rules in
+  remanent 
    
