@@ -49,6 +49,13 @@ let inhibition_arrow = ref "tee"
 let influence_map_file = ref "influence.dot"
 let prompt_full_var_def = ref false 
 let prompt_full_rule_def = ref false 
+let make_labels_compatible_with_dot = 
+  ref 
+    [ 
+      '\"', ['\\';'\"'];
+      '\\', ['\\';'\\']
+    ]
+
 
 (** contact map*)
 let contact_map_file = ref "contact.dot"
@@ -64,9 +71,4 @@ let link_color = ref "black"
 let influence_color = ref "red"
 let influence_arrow = ref "normal" 
    
-(** dot output*)
-let escape_label_in_dot s =
-  Str.global_substitute (Str.regexp "[\"\\]") (function
-  | "\"" -> "\\\""
-  | "\\" -> "\\\\"
-  | x -> x) s
+

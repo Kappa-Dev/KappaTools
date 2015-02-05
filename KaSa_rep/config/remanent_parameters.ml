@@ -62,7 +62,12 @@ let get_influence_map () =
     Remanent_parameters_sig.wake_up_arrow = !Config.wake_up_arrow ; 
     Remanent_parameters_sig.inhibition_arrow = !Config.inhibition_arrow ;
     Remanent_parameters_sig.prompt_full_var_def = !Config.prompt_full_var_def ; 
-    Remanent_parameters_sig.prompt_full_rule_def = !Config.prompt_full_rule_def 
+    Remanent_parameters_sig.prompt_full_rule_def = !Config.prompt_full_rule_def ;
+    Remanent_parameters_sig.make_labels_compatible = 
+      List.fold_left
+	(fun map (a,l) -> Remanent_parameters_sig.CharMap.add a l map)
+	Remanent_parameters_sig.CharMap.empty 
+	!Config.make_labels_compatible_with_dot
 }
   
 let get_contact_map () = 
@@ -109,7 +114,6 @@ let get_parameters () =
 	Remanent_parameters_sig.kasa_state = Remanent_state_signature.empty_engine_state  } ;
         Remanent_parameters_sig.log    = !Config.log ;
 	Remanent_parameters_sig.formatter = !Config.formatter ;
-	Remanent_parameters_sig.make_id_compatible_with_dot = Config.escape_label_in_dot
   } 
     
 let get_btype_sep_symbol_1         symbol = symbol.Remanent_parameters_sig.btype_sep 
@@ -142,6 +146,7 @@ let get_wake_up_arrow_1        influence = influence.Remanent_parameters_sig.wak
 let get_inhibition_arrow_1     influence = influence.Remanent_parameters_sig.inhibition_arrow
 let get_prompt_full_var_def_1  influence = influence.Remanent_parameters_sig.prompt_full_var_def 
 let get_prompt_full_rule_def_1 influence = influence.Remanent_parameters_sig.prompt_full_rule_def
+let get_make_labels_compatible_1 influence = influence.Remanent_parameters_sig.make_labels_compatible 
 
 let get_cm_file_1             cm = cm.Remanent_parameters_sig.cm_file 
 let get_cm_directory_1        cm = cm.Remanent_parameters_sig.cm_directory 
@@ -175,7 +180,6 @@ let get_kasa_state_1                       marshalisable = marshalisable.Remanen
 let get_marshalisable parameter = parameter.Remanent_parameters_sig.marshalisable_parameters
 let get_log parameter = parameter.Remanent_parameters_sig.log   
 let get_formatter parameter = parameter.Remanent_parameters_sig.formatter 
-let get_make_id_compatible_with_dot parameter = parameter.Remanent_parameters_sig.make_id_compatible_with_dot 
 
 let upgrade_from_marshal_field f = compose f get_marshalisable 
 let get_symbols = upgrade_from_marshal_field get_symbols_1 
@@ -223,6 +227,7 @@ let get_wake_up_arrow = upgrade_from_influence_map_field get_wake_up_arrow_1
 let get_inhibition_arrow = upgrade_from_influence_map_field get_inhibition_arrow_1
 let get_prompt_full_var_def = upgrade_from_influence_map_field get_prompt_full_var_def_1
 let get_prompt_full_rule_def = upgrade_from_influence_map_field get_prompt_full_rule_def_1
+let get_make_labels_compatible_with_dot = upgrade_from_influence_map_field get_make_labels_compatible_1 
 
 let get_cm_file = upgrade_from_contact_map_field get_cm_file_1 
 let get_cm_directory = upgrade_from_contact_map_field get_cm_directory_1
