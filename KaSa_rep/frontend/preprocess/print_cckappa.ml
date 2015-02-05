@@ -18,65 +18,65 @@ let warn parameters mh message exn default =
 let trace = false
 let local_trace = false 
    
-let string_of_port port = "[state_min:"^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.min)^";state_max:"^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.max)^"]" (*MOD*)
+let string_of_port port = "[state_min:"^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.min)^";state_max:"^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.max)^"]"
    
 let print_agent parameters error handler agent =
      match agent with 
     | Cckappa_sig.Agent agent -> 
-       let parameters = Remanent_parameters.update_prefix parameters ("agent_type_"^(string_of_int agent.Cckappa_sig.agent_name)^":") in (*TEST*)
-         Cckappa_sig.Site_map_and_set.fold_map
+       let parameters = Remanent_parameters.update_prefix parameters ("agent_type_"^(string_of_int agent.Cckappa_sig.agent_name)^":") in
+       Cckappa_sig.Site_map_and_set.fold_map (*TEST*)
           (fun a b error ->  
-             let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%ssite_type_%i->state:%s\n" parameters.Remanent_parameters_sig.prefix a (string_of_port b)  in 
+           let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%ssite_type_%i->state:%s\n" parameters.Remanent_parameters_sig.prefix a (string_of_port b)  in 
            error ) 
           agent.Cckappa_sig.agent_interface
-           error 
+          error
     | Cckappa_sig.Ghost -> let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%sGhost\n" parameters.Remanent_parameters_sig.prefix in error  
 
-let print_diffagent parameters error handler agent = 
+let print_diffagent parameters error handler agent = (*TEST*)
      let parameters = Remanent_parameters.update_prefix parameters ("agent_type_"^(string_of_int agent.Cckappa_sig.agent_name)^":") in
-         Cckappa_sig.Site_map_and_set.fold_map
-          (fun a b error -> 
-             let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%ssite_type_%i->state:%s\n" parameters.Remanent_parameters_sig.prefix a (string_of_port b)  in 
-           error ) 
-          agent.Cckappa_sig.agent_interface
-           error 
+     Cckappa_sig.Site_map_and_set.fold_map
+       (fun a b error -> 
+        let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%ssite_type_%i->state:%s\n" parameters.Remanent_parameters_sig.prefix a (string_of_port b) in 
+        error)
+       agent.Cckappa_sig.agent_interface
+       error
       
 let print_mixture parameters error handler mixture =
     let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s\n" parameters.Remanent_parameters_sig.prefix in 
     let error = 
-      Int_storage.Quick_Nearly_inf_Imperatif.print 
+      Int_storage.Quick_Nearly_inf_Imperatif.print
        error 
        (fun error parameters a -> 
-        let _ = print_agent parameters error handler a in (*TEST*)
+        let _ = print_agent parameters error handler a in 
             error
        ) 
        (Remanent_parameters.update_prefix parameters "agent_id_") 
        mixture.Cckappa_sig.views 
     in 
     let error = 
-      Int_storage.Quick_Nearly_inf_Imperatif.print 
-        error 
+      Int_storage.Quick_Nearly_inf_Imperatif.print
+        error
         (fun error parameters a -> 
-          let error = 
-            Cckappa_sig.Site_map_and_set.fold_map 
+         let error = (*TEST*)
+           Cckappa_sig.Site_map_and_set.fold_map 
               (fun k a error -> 
                 let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%ssite_type_%i->agent_id_%i.site_type_%i\n" parameters.Remanent_parameters_sig.prefix k a.Cckappa_sig.agent_index a.Cckappa_sig.site
                 in error
                 )
-              a 
-              error 
+              a
+              error
           in error)
         (Remanent_parameters.update_prefix parameters "bonds:agent_id_") 
-        mixture.Cckappa_sig.bonds 
+        mixture.Cckappa_sig.bonds
     in 
     let error = 
-       List.fold_left 
+      List.fold_left 
         (fun error (i,j) -> 
           let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%i+%i" i j in 
             error 
           )
-        error 
-        mixture.Cckappa_sig.plus 
+        error
+        mixture.Cckappa_sig.plus
     in 
      let error = 
        List.fold_left 
@@ -91,7 +91,7 @@ let print_mixture parameters error handler mixture =
 let print_diffview parameters error handler diff =
     let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s\n" parameters.Remanent_parameters_sig.prefix in 
     let error = 
-      Int_storage.Quick_Nearly_inf_Imperatif.print 
+      Int_storage.Quick_Nearly_inf_Imperatif.print (*TEST*)
        error 
        (fun error parameters a -> 
           let _ = print_diffagent parameters error handler a in 
@@ -239,19 +239,19 @@ let print_diffview parameters error handler diff =
 
  let print_signatures parameters error handler signature = error
 
- (*MOD:change (agent_type,agent_index)@site to (agent_index,agent_type)@site*)
+ (*TEST: change the order *)
  let print_bond parameters relation (add1,add2) = 
    Printf.fprintf 
      parameters.Remanent_parameters_sig.log 
      "%s(agent_id_%d,agent_type_%d)@site_type_%d%s(agent_id_%d,agent_type_%d)@site_type_%d\n" 
      parameters.Remanent_parameters_sig.prefix 
-     add1.Cckappa_sig.agent_index 
-     add1.Cckappa_sig.agent_type
-     add1.Cckappa_sig.site
-     relation
      add2.Cckappa_sig.agent_index 
      add2.Cckappa_sig.agent_type
      add2.Cckappa_sig.site
+     relation
+     add1.Cckappa_sig.agent_index 
+     add1.Cckappa_sig.agent_type
+     add1.Cckappa_sig.site
 
  let print_half_bond parameters relation (add1,_) = 
    Printf.fprintf 
@@ -305,36 +305,34 @@ let print_diffview parameters error handler diff =
        index
        agent
     
-   let print_actions parameters error handler actions = 
+   let print_actions parameters error handler actions = (*TEST*)
    let parameters_unbinding =  Remanent_parameters.update_prefix parameters "unbinding:" in 
-   let _ = List.iter (print_bond parameters_unbinding "....") actions.Cckappa_sig.release in 
+   let _ = List.iter (print_bond parameters_unbinding "....") (List.rev actions.Cckappa_sig.release) in 
    let parameters_half_unbinding =  Remanent_parameters.update_prefix parameters "1/2unbinding:" in 
-   let _ = List.iter (print_half_bond parameters_half_unbinding "....") actions.Cckappa_sig.half_break in 
+   let _ = List.iter (print_half_bond parameters_half_unbinding "....") (List.rev actions.Cckappa_sig.half_break) in 
    let parameters_removal =  Remanent_parameters.update_prefix parameters "deletion:" in 
-   let _ = List.iter (print_remove parameters_removal) actions.Cckappa_sig.remove in
+   let _ = List.iter (print_remove parameters_removal) (List.rev actions.Cckappa_sig.remove) in
    let parameters_creation =  Remanent_parameters.update_prefix parameters "creation:" in 
-   let _ = List.iter (print_created_agent  parameters_creation) actions.Cckappa_sig.creation in
+   let _ = List.iter (print_created_agent  parameters_creation) (List.rev actions.Cckappa_sig.creation) in
    let parameters_binding =  Remanent_parameters.update_prefix parameters "binding:" in 
-   let _ = List.iter (print_bond parameters_binding "----") actions.Cckappa_sig.bind in 
-    error 
+   let _ = List.iter (print_bond parameters_binding "----") (List.rev actions.Cckappa_sig.bind) in 
+    error
    
- let print_rule parameters error handler rule = 
-  let parameters_lhs =  Remanent_parameters.update_prefix parameters "lhs:" in 
-  let error = print_mixture parameters_lhs error handler rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs in
-  let parameters_rhs =  Remanent_parameters.update_prefix parameters "rhs:" in 
-  let error = print_mixture parameters_rhs error handler rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_rhs in
-  let parameters_lhsdiff =  Remanent_parameters.update_prefix parameters "direct:" in 
-  let error = print_diffview parameters_lhsdiff error handler rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.diff_direct in
-  let parameters_rhsdiff =  Remanent_parameters.update_prefix parameters "reverse:" in 
-  let error = print_diffview parameters_rhsdiff error handler rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.diff_reverse in
-  let parameters_actions =  Remanent_parameters.update_prefix parameters "actions:" in 
-  let error = print_actions parameters_actions error handler rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.actions in
-  
+   let print_rule parameters error handler rule = (*TEST*)
+     let parameters_lhs =  Remanent_parameters.update_prefix parameters "lhs:" in 
+     let error = print_mixture parameters_lhs error handler rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs in
+     let parameters_rhs =  Remanent_parameters.update_prefix parameters "rhs:" in 
+     let error = print_mixture parameters_rhs error handler rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_rhs in
+     let parameters_lhsdiff =  Remanent_parameters.update_prefix parameters "direct:" in 
+     let error = print_diffview parameters_lhsdiff error handler rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.diff_direct in
+     let parameters_rhsdiff =  Remanent_parameters.update_prefix parameters "reverse:" in 
+     let error = print_diffview parameters_rhsdiff error handler rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.diff_reverse in
+     let parameters_actions =  Remanent_parameters.update_prefix parameters "actions:" in 
+     let error = print_actions parameters_actions error handler rule.Cckappa_sig.e_rule_c_rule.Cckappa_sig.actions in
+     error 
    
-   error 
-   
- let print_rules parameters error handler rules = 
-   Int_storage.Nearly_inf_Imperatif.print_var_f (*MOD*)
+   let print_rules parameters error handler rules =
+     Int_storage.Nearly_inf_Imperatif.print_var_f
        error 
        (fun error parameters rule ->
         print_rule parameters error handler rule) 
