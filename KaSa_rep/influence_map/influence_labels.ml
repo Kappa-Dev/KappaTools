@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   * 
   * Creation: March, the 7th 2011
-  * Last modification: March, the 23rd 2011
+  * Last modification: February, the 5th 2015
   * * 
   * Labels to be associated with influence relations
   *  
@@ -36,7 +36,7 @@ module Int_labels =
       
   let dump h error i = 
     let error,s = to_string h error i  in 
-    let _ = Printf.fprintf h.Remanent_parameters_sig.log "%s" s in 
+    let _ = Printf.fprintf (Remanent_parameters.get_log h) "%s" s in 
       error
     
 end:Labels)
@@ -103,7 +103,7 @@ module Extensive =
     
         
       let dump parameter error handler  a =
-        let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "[" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "[" in
         let _,error  = 
           Set.fold_set 
             (fun a (bool,error) -> 
@@ -111,16 +111,16 @@ module Extensive =
               let _ = 
                 if bool 
                 then 
-                   Printf.fprintf parameter.Remanent_parameters_sig.log ";%s" a'  
+                   Printf.fprintf (Remanent_parameters.get_log parameter) ";%s" a'  
                 else 
-                   Printf.fprintf parameter.Remanent_parameters_sig.log "%s" a' 
+                   Printf.fprintf (Remanent_parameters.get_log parameter) "%s" a' 
               in 
                 true,error
             )
             a 
             (false,error)
         in 
-        let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "]" in 
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "]" in 
           error
   
       let to_string parameter error handler a =
@@ -151,9 +151,9 @@ module Extensive =
               let _ = 
                 if bool 
                 then 
-                   Printf.fprintf parameter.Remanent_parameters_sig.log ";[%s->%s]" a' b' 
+                   Printf.fprintf (Remanent_parameters.get_log parameter) ";[%s->%s]" a' b' 
                 else 
-                   Printf.fprintf parameter.Remanent_parameters_sig.log "[%s->%s]" a' b'
+                   Printf.fprintf (Remanent_parameters.get_log parameter) "[%s->%s]" a' b'
               in 
                 true,error
             )
@@ -198,7 +198,7 @@ module Implicit =
       let add_couple remanent error a b sol = error,(a,b)::sol 
         
       let dump parameter error handler a =
-        let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "[" in
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "[" in
         let _ = 
           Set.fold_set 
                 (fun x bool ->
@@ -206,14 +206,14 @@ module Implicit =
                      let _ = 
                          if bool 
                          then 
-                            Printf.fprintf parameter.Remanent_parameters_sig.log ";%s" x'  
+                            Printf.fprintf (Remanent_parameters.get_log parameter) ";%s" x'  
                          else 
-                            Printf.fprintf parameter.Remanent_parameters_sig.log "%s" x' 
+                            Printf.fprintf (Remanent_parameters.get_log parameter) "%s" x' 
                      in true)
                        a 
                 false
         in 
-        let _ = Printf.fprintf parameter.Remanent_parameters_sig.log "]" in 
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "]" in 
           error
   
     let to_string parameter error handler a = 
@@ -248,9 +248,9 @@ module Implicit =
                           let _ = 
                             if bool 
                             then 
-                              Printf.fprintf parameter.Remanent_parameters_sig.log ";[%s->%s]" x' y' 
+                              Printf.fprintf (Remanent_parameters.get_log parameter) ";[%s->%s]" x' y' 
                             else 
-                              Printf.fprintf parameter.Remanent_parameters_sig.log "[%s->%s]" x' y'
+                              Printf.fprintf (Remanent_parameters.get_log parameter) "[%s->%s]" x' y'
                           in true)
                       b 
                       bool)
