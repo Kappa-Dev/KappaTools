@@ -123,7 +123,12 @@ let of_bin_alg_op = function
   | Term.DIV -> fun x y -> cast_bin_op ~op_f:(/.) x y
   | Term.MINUS -> sub
   | Term.POW ->
-     cast_bin_op ~op_f:( ** ) ~op_i:Tools.pow ~op_i64:Tools.pow64
+     fun x n ->
+     let f =
+       cast_bin_op ~op_f:( ** ) ~op_i:Tools.pow ~op_i64:Tools.pow64 in
+     if is_zero n || is_strictly_positive n
+     then f x n
+     else f (F (1. /. to_float x)) (neg n)
   | Term.MODULO ->
      cast_bin_op ~op_i:(mod)  ~op_i64:Int64.rem
 		 ~op_f:(fun a b ->

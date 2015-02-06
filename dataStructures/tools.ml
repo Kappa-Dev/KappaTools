@@ -14,6 +14,7 @@ let string_of_pos (n,i,j) =
   ("(in "^n^") line "^(string_of_int i)^", char "^(string_of_int j)^": ")
 
 let pow x n =
+  assert (n >= 0);
   let rec aux x n acc =
     if n = 0 then acc
     else
@@ -22,6 +23,7 @@ let pow x n =
   aux x n 1
 
 let pow64 x n =
+  assert (n >= Int64.zero);
   let rec aux x n acc =
     if n = Int64.zero then acc
     else
