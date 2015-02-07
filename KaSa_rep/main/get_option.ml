@@ -30,12 +30,12 @@ let options =
 	  "--no-compute-contact-map";
 	  "--no-compute-influence-map";
 	],[]),"reset everything",["0_Actions"],Normal;
-      "--output-directory",String Config.output_directory,"put output files in this directory",["1_Output"],Normal;
-       "--compute-contact-map",Bool Config.do_contact_map,"compute the contact map",["0_Actions";"2_Reachability_analysis"],Normal;
-      "--output-contact-map",String Config.contact_map_file,"file name for the contact map output",["1_Output";"2_Reachability_analysis"],Normal;
-      "--compute-influence-map",Bool Config.do_influence_map,"compute the influence map",["0_Actions";"3_Influence_map"],Normal; 
-      "--output-influence-map",String Config.influence_map_file,"file name for the influence map",["1_Output";"3_Influence_map"],Normal;
-      "--debugging-mode",Bool Config.trace,"dump debugging information",["4_debugging_info"],Expert;
+        "--compute-contact-map",Bool Config.do_contact_map,"compute the contact map",["0_Actions";"2_Reachability_analysis"],Normal;
+	  "--compute-influence-map",Bool Config.do_influence_map,"compute the influence map",["0_Actions";"3_Influence_map"],Normal; 
+	  "--output-directory",String Config.output_directory,"put output files in this directory",["1_Output";"2_Reachability_analysis";"3_Influence_map"],Normal;
+ "--output-contact-map",String Config.contact_map_file,"file name for the contact map output",["1_Output";"2_Reachability_analysis"],Normal;
+          "--output-influence-map",String Config.influence_map_file,"file name for the influence map",["1_Output";"3_Influence_map"],Normal;
+          "--debugging-mode",Bool Config.trace,"dump debugging information",["4_debugging_info"],Expert;
     ]
 
 
