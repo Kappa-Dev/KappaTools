@@ -23,7 +23,7 @@ else
  OCAMLBUILDFLAGS = 
 endif
 
-USE_TK=1
+USE_TK=0
 
 ifeq ($(USE_TK),1)
 OCAMLINCLUDES =  -cflags -I,$(LABLTKLIBREP),-I,+labltk -lflags -I,$(LABLTKLIBREP),-I,+labltk,unix.cmxa,str.cmxa,nums.cmxa -libs labltk,jpflib
@@ -47,7 +47,7 @@ $(MANGENREP):
 %.native %.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*)
 	$(OCAMLBINPATH)ocamlbuild $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) $@
 
-bin/%: %.native
+bin/%: %.native Makefile
 	[ -d bin ] || mkdir bin && cp $< $@
 	rm -f $(notdir $@) && ln -s $@ $(notdir $@)
 
