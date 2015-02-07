@@ -118,7 +118,7 @@ each step (see Fig.~\ref{fig:event-loop}). Importantly, the cost of a simulation
 Note that \KaSim~is not equipped with a %curve 
 visualization tool. However, data outputs are given in a text format that can be displayed using any standard plotting software such as \href{http://www.gnuplot.info/}{gnuplot}.
 
-\section{The \KaSa~tool}
+\section{The \KaSa~static analyser}
 
 \KaSa~is an open source static analyser  tool of rule-based models~\cite{DanLan04,Dan_etal07a,Fae_etal05} written in Kappa. \KaSa~takes one or several \hyperref[chap:kappa]{Kappa files} as input and some command line options to toggle on/off some specific static analysis. Currently, only the computation of the contact map and of the influence map are available. Other analyses including reachability analysis \cite{Feret-ICCMSE2007,DanosEtAl-VMCAI08} and model reduction \cite{Feret-et-al-pnas2009,DanosEtAl-LICS2010,Feret-MFPSXXVII} will come soon. 
 
@@ -1020,7 +1020,7 @@ More formally, consider the rules $r:L\rar R$ and $s:L'\rar R'$. One wishes to k
    \label{fig:im}
 \end{figure}
 
-\chapter{The \KaSa~tool}
+\chapter{The \KaSa~static analyser}
 
 \section{General usage}
 
@@ -1049,7 +1049,7 @@ without any option.
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=8cm,natwidth=920pt,natheight=582pt]{img/kasa_0.png}
+\includegraphics[width=12cm,natwidth=920pt,natheight=582pt]{img/kasa_0.png}
 \caption{\KaSa~ graphical interface - main onglet}
 \label{fig:kasa:0}
 \end{figure}
@@ -1060,7 +1060,7 @@ There are five different areas of importance in the graphical interface:
 \begin{enumerate}
 \item On the top left of the window, a button allows for the selection between the Normal and the Expert mode (other modes may be available if activated at compilation). 
 In expert modes, more options are available in the graphical interface.
-\item On the top center/right, some button allows for the selection of the onglet. There are currently five onglets available: 0\_Actions, 1\_Output, 2\_Reachability\_analysis, 3\_Influence\_map, 4\_debugging\_information. 
+\item On the top center/right, some button allows for the selection of the onglet. There are currently five onglets available: \texttt{0\_Actions}, \texttt{1\_Output}, \texttt{2\_Reachability\_analysis}, \texttt{3\_Influence\_map}, \texttt{4\_debugging\_information}. 
 \item Center: The options of the selected onglet are displayed and can be tuned. 
 
 Contextual help is provided when the mouse is hovered over an element. 
@@ -1092,7 +1092,7 @@ The onglet \texttt{0\_Actions} (see Fig.~\ref{fig:kasa:0}) contains the main act
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=8cm,natwidth=920pt,natheight=582pt]{img/kasa_0.png}
+\includegraphics[width=12cm,natwidth=920pt,natheight=582pt]{img/kasa_1.png}
 \caption{\KaSa~ graphical interface - main onglet}
 \label{fig:kasa:1}
 \end{figure}
@@ -1110,8 +1110,16 @@ The onglet \texttt{1\_Ouput} (see Fig.~\ref{fig:kasa:1}) contains the names of t
 
 The contact map of a model is an object that may help modelers checking the consistency of the rule set they use. The contact map is \emph{statically} computed and does not depend on kinetic rates nor initial conditions.
 
-The contact map summarises the different types of agent, their interface and the potential binding between sites. 
-It is an over approximation, thus if the contact map indicates a potential bond, it does not mean that it is always possible to reach a state in which two sites of these kinds are bound, but if the contact map indicates no bond between two sites, it means that it is NOT possible to reach a state in which two sites of these kinds are bound together.  \KaSa~will produce a dot format file. The produced graph is given in Figure~\ref{fig:abc-contact}. 
+The contact map summarises the different types of agent, their interface and the potential binding between sites. It is an over approximation, thus if the contact map indicates a potential bond, it does not mean that it is always possible to reach a state in which two sites of these kinds are bound, but if the contact map indicates no bond between two sites, it means that it is NOT possible to reach a state in which two sites of these kinds are bound together.  
+Typing the following instruction:
+
+\texttt{KaSa abc.ka --reset-all --compute-contact-map}
+
+will produce a dot format file named \texttt{contact.dot}. 
+
+The contact map for the \ttt{abc.ka} model  defined in Chapter~\ref{chap:abc} is given in Figure~\ref{fig:abc-contact}. On this map, we notice that there are three kinds of agent, namely $A$, $B$, and $C$. 
+Agents of kind $A$ have two sites $x$ and $c$, that bear no internal state (they appear in yellow only), agents of kind $B$ have one site $x$, that bears no internal state (they appear in yellow only), and agents of kind $C$ have two sites $x_1$ and $x_2$ with both a binding state and an internal state (they appear both in yellow and in green). 
+Additionally, the contact map indicates that sites $x$ of the agents of kind $A$ can be bound to the site $x$ of an agent of kind $B$ and that sites $c$ of the agents of kind $A$ can be bound to the agents of kind $C$ either on the site $x_1$, or on the site $x_2$. 
 
 \begin{figure}[htbp]
 \centering
@@ -1119,6 +1127,18 @@ It is an over approximation, thus if the contact map indicates a potential bond,
 \caption{Contact Map for the \ttt{abc.ka} model defined in Chapter~\ref{chap:abc}}
 \label{fig:abc-contact}
 \end{figure}
+
+It is possible to change the name of the output by using the option \ttt{--output-contact}, it is also possible to put the output in another repository thanks to the option \ttt{--output-directory}. All the options related to the computation of the contact map can be accessed on the 
+onglet \texttt{2\_Reachability\_analysis} of the graphical interface (see Fig.~\ref{fig:kasa:2}). 
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=12cm,natwidth=920pt,natheight=582pt]{img/kasa_2.png}
+\caption{\KaSa~ graphical interface - onglet \texttt{2\_Reachability\_analysis}}
+\label{fig:kasa:2}
+\end{figure}
+
+
 \section{Influence map}
 
 
