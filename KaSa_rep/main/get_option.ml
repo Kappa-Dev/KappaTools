@@ -35,7 +35,7 @@ let options =
       "--output-contact-map",String Config.contact_map_file,"file name for the contact map output",["1_Output";"2_Reachability_analysis"],Normal;
       "--compute-influence-map",Bool Config.do_influence_map,"compute the influence map",["0_Actions";"3_Influence_map"],Normal; 
       "--output-influence-map",String Config.influence_map_file,"file name for the influence map",["1_Output";"3_Influence_map"],Normal;
-      "--debugging-mode",Bool Config.trace,"dump debugging information",["4_debugging_info"],Normal;
+      "--debugging-mode",Bool Config.trace,"dump debugging information",["4_debugging_info"],Expert;
     ]
 
 
