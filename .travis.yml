@@ -8,8 +8,10 @@ install:
   - sudo apt-get install -qq ocaml-nox
   - sudo apt-get install -qq gnuplot-nox graphviz
   - sudo apt-get install -qq texlive-latex-recommended tex4ht
+  - sudo apt-get install -qq tk-dev
 
 script:
   - make all
+  - make full
   - make doc_html
   - make -j2 check
