@@ -30,6 +30,7 @@
 \end{titlepage}
 
 \def\KaSim{\textsf{KaSim}}
+\def\KaSa{\textsf{KaSa}}
 \def\sep{\hbox{-}}
 \def\int{\textasciitilde}
 \def\intstate{\textasciitilde}
@@ -64,7 +65,7 @@
 %%%%
 \def\version{3}
 
-\title{KaSim\version~reference manual\\ \small (release 4-dev)}
+\title{KaSim\version~\& KaSa\version~reference manual\\ \small (release 4-dev)}
 \author{Pierre Boutillier, J\'er\^ome Feret, Jean Krivine\thanks{corresponding author: jean.krivine@pps.univ-paris-diderot.fr} and L\'y Kim Quy\^en \\\url{KappaLanguage.org}}
 
 \date{}
@@ -84,7 +85,7 @@
 \begin{center}\includegraphics[width=9cm]{img/KaSim-logo.png}\end{center}
 
 \section{Preamble}
-This manual describes the usage of \KaSim, the latest implementation of Kappa, one member of the growing family of rule-based languages. Rule-based modelling has attracted recent attention in developing biological models that are concise, comprehensible, easily extensible, and allows one to deal with the combinatorial complexity of multi-state and multi-component biological molecules. 
+This manual describes the usage of \KaSim~and \KaSa, the latest implementation of Kappa, one member of the growing family of rule-based languages. Rule-based modelling has attracted recent attention in developing biological models that are concise, comprehensible, easily extensible, and allows one to deal with the combinatorial complexity of multi-state and multi-component biological molecules. 
 Although this manual contains a self-contained description of Kappa, it is \emph{not} intended as a tutorial on rule-based modeling.%%Therefore, in the following of this manual some familiarity with Kappa is assumed and 
 %
 
@@ -117,6 +118,13 @@ each step (see Fig.~\ref{fig:event-loop}). Importantly, the cost of a simulation
 Note that \KaSim~is not equipped with a %curve 
 visualization tool. However, data outputs are given in a text format that can be displayed using any standard plotting software such as \href{http://www.gnuplot.info/}{gnuplot}.
 
+\section{The \KaSa~tool}
+
+\KaSa~is an open source static analyser  tool of rule-based models~\cite{DanLan04,Dan_etal07a,Fae_etal05} written in Kappa. \KaSa~takes one or several \hyperref[chap:kappa]{Kappa files} as input and some command line options to toggle on/off some specific static analysis. Currently, only the computation of the contact map and of the influence map are available. Other analyses including reachability analysis \cite{Feret-ICCMSE2007,DanosEtAl-VMCAI08} and model reduction \cite{Feret-et-al-pnas2009,DanosEtAl-LICS2010,Feret-MFPSXXVII} will come soon. 
+
+A graphical interface is proposed to navigate through the various options and utilities  of \KaSa. The compilation of this interface requires \href{https://forge.ocamlcore.org/projects/labltk/}{labltk} and, in particular,  \href{http://www.tcl.tk/}{tk-dev}.
+
+
 \section{Support}
 \ITE{
 \item[-] Kappa language tutorials and downloads: \url{http://kappalanguage.org}
@@ -128,16 +136,16 @@ visualization tool. However, data outputs are given in a text format that can be
 \chapter{Installation}\label{chap:install}
 
 \section{Using precompiled binaries}
-The easiest way to use \KaSim~is to use pre-compiled versions available in the release section on the github repository (\url{https://github.com/Kappa-Dev/KaSim/releases}). Download the version that corresponds to your operating system (Windows, Linux or Mac OSX) and rename the downloaded file into \KaSim. Note that on Mac OSX or Linux, it might be necessary to give executable permissions to \KaSim. This can be done using the shell command:
-\ttt{chmod u+x KaSim}.
+The easiest way to use \KaSim~and \KaSa~is to use pre-compiled versions available in the release section on the github repository (\url{https://github.com/Kappa-Dev/KaSim/releases}). Download the version that corresponds to your operating system (Windows, Linux or Mac OSX) and rename the downloaded file into \KaSim~and \KaSa. Note that on Mac OSX or Linux, it might be necessary to give executable permissions to \KaSim~and \KaSa. This can be done using the shell commands:
+\ttt{chmod u+x KaSim} and \ttt{chmod u+x KaSa}
 
 To test whether your program does work, simply type \ttt{./KaSim \dd version} on a terminal, from the directory that contains the binaries. If the version is displayed it means that the binaries are indeed compatible with your OS. Otherwise you may need to compile \KaSim~from the sources (see next Section).
 
 \section{Obtaining the sources}\label{sec:sources}
-To obtain \KaSim~you can either use pre-compiled binaries (see previous section)
+To obtain \KaSim/\KaSa~you can either use pre-compiled binaries (see previous section)
 or compile the sources for your architecture. To do so, download the source code
 from \url{https://github.com/Kappa-Dev/KaSim}, make sure you have a recent ocaml
-compiler (\KaSim~currently requires Ocaml 4.01.0 to compile) and the findlib library
+compiler (\KaSim/\KaSa~currently requires Ocaml 4.01.0 to compile) and the findlib library
 installed. From a terminal window type \ttt{ocamlfind ocamlopt -v}. If it fails
 then you need to install Ocaml Native compiler that can be downloaded from
 \url{http://caml.inria.fr/download.en.html} and/or findlib available at
@@ -148,7 +156,8 @@ Once Ocaml is safely installed, untar \KaSim~archive and compile following these
 few steps: \ITE{
 \item[\$]\ttt{tar xzvf kasim.tar.gz -d Kappa}
 \item[\$]\ttt{cd Kappa}
-\item[\$]\ttt{make bin/KaSim} } At the end of these steps you should see, in the
+\item[\$]\ttt{make bin/KaSim} 
+\item[\$]\ttt{make bin/KaSa}} At the end of these steps you should see, in the
 \ttt{bin} directory of the \ttt{Kappa} directory, an executable file named
 KaSim.  In order to check the compilation went fine, simply type
 \ttt{bin/KaSim -\,-version}.
@@ -156,6 +165,45 @@ KaSim.  In order to check the compilation went fine, simply type
 If the tool \ttt{ocamlbuild} is not in your path, you may
 set the variable \ttt{OCAMLBINPATH} to point to the location of the
 compiler by doing \ttt{make OCAMLBINPATH='the\_correct\_dir' bin/KaSim}.
+
+\section{Compilation of KaSa~graphical interface}
+
+The graphical interface of \KaSa~requires \href{http://www.tcl.tk/}{tk-dev} and 
+\href{https://forge.ocamlcore.org/projects/labltk/}{labltk}. By default, the graphical interface is not compiled. The compilation of this interface can be toggled on by using the following script: \ITE{
+\item[\$]\ttt{cd Kappa}
+\item[\$]\ttt{sh switch\_full.sh}
+\item[\$]\ttt{make bin/KaSa}}
+
+Common compilation errors are the following:
+\begin{enumerate}
+\item The following error: 
+
+\begin{verbatim}
+/usr/bin/ld: cannot find -ltk
+collect2: error: ld returned 1 exit status
+File "caml_startup", line 1:
+Error: Error during linking
+Command exited with code 2.
+\end{verbatim}
+
+occurs when the module  \href{http://www.tcl.tk/}{tk-dev} is not installed. 
+\item The following error:
+
+\begin{verbatim}
+File "_none_", line 1:
+Error: Cannot find file jpflib.cmxa
+Command exited with code 2.
+\end{verbatim}
+
+occurs when ocaml cannot link the labltk library. 
+
+Please document the variable \texttt{LABLTKLIBREP} in the Makefile. 
+
+\end{enumerate}
+
+
+
+
 
 \chapter{The command line}\label{chap:cl}
 
@@ -972,6 +1020,108 @@ More formally, consider the rules $r:L\rar R$ and $s:L'\rar R'$. One wishes to k
    \label{fig:im}
 \end{figure}
 
+\chapter{The \KaSa~tool}
+
+\section{General usage}
+
+From a terminal window, \KaSa~can be invoked by typing 
+\ITE{
+\item[\$] \ttt{KaSa file\_1 ... file\_n  [option]}
+}
+where \ttt{file\_i} are the input Kappa files containing the rules, initial conditions and observables (see Chapter~\ref{chap:kappa}). 
+
+All the options are summarised as follows: 
+\input{generated_img/KaSa_options.txt}
+
+Orders in option matter, since they can be used to toggle on/off some functionality or to assign a value to some environment variables. 
+The options are interpreted from left to right. 
+
+More options are available in the OCaml file \texttt{KaSa\_rep/config/config.ml} and can be tuned before compilation. 
+
+\section{Graphical interface}
+
+\subsection{Launching the interface}
+
+The graphical interface can be launched by typing 
+\ITE{\item[\$] \ttt{KaSa}}
+
+without any option. 
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=8cm,natwidth=920pt,natheight=582pt]{img/kasa_0.png}
+\caption{\KaSa~ graphical interface - main onglet}
+\label{fig:kasa:0}
+\end{figure}
+
+\subsection{The areas of interests} 
+
+There are five different areas of importance in the graphical interface: 
+\begin{enumerate}
+\item On the top left of the window, a button allows for the selection between the Normal and the Expert mode (other modes may be available if activated at compilation). 
+In expert modes, more options are available in the graphical interface.
+\item On the top center/right, some button allows for the selection of the onglet. There are currently five onglets available: 0\_Actions, 1\_Output, 2\_Reachability\_analysis, 3\_Influence\_map, 4\_debugging\_information. 
+\item Center: The options of the selected onglet are displayed and can be tuned. 
+
+Contextual help is provided when the mouse is hovered over an element. 
+
+The interface will store the options that are checked or filled and in which order. 
+When launched, the analysis will interpret these options in the order they have been entered. 
+
+Some options appear in several onglets. They denote the same option and share the same value. 
+
+\item File selector: The file selector can be used to upload as many kappa file as desired. The button \texttt{Clear} can be used to reset the selection of files.
+\item Bottom: Some buttons are available. The button \texttt{Quit} can be used to leave the interface. The button \texttt{Reset to default} tune all the options to their default value. The button \texttt{Import options} can be used to restore the value of the options as saved during a previous session of the graphical interfaces. The button \texttt{Save options} can be used to save the value of the options for a further session. The button \texttt{Launch analyze} launch \KaSa\ with the current options. 
+
+Importantly, options are saved automatically under various occasions. Thus, it is possible to restore the value of the options 
+before the last reset, before the last quit, or before the last analysis. 
+\end{enumerate}
+
+\subsection{The onglet \texttt{0\_Actions}}
+
+The onglet \texttt{0\_Actions} (see Fig.~\ref{fig:kasa:0}) contains the main actions which can be performed. 
+
+\begin{itemize}
+\item The button \texttt{--do-all} activates all the functionalities. 
+\item The button \texttt{--reset-all} inactivates all the functionalities.
+\item The option \texttt{--compute-contact-map} can be used to activate the computation of the contact map. 
+\item The option \texttt{--compute-influence-map} can be used to activate the computation of the influence map.
+\end{itemize}
+
+\subsection{The onglet \texttt{1\_Output}}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=8cm,natwidth=920pt,natheight=582pt]{img/kasa_0.png}
+\caption{\KaSa~ graphical interface - main onglet}
+\label{fig:kasa:1}
+\end{figure}
+
+
+The onglet \texttt{1\_Ouput} (see Fig.~\ref{fig:kasa:1}) contains the names of the output file. 
+
+\begin{itemize}
+\item The field \texttt{--output-directory} can be used to set the repository where output file are written. \KaSa~will not create this repository, thus it has to exist. 
+\item The field \texttt{--output-contact-map} contains the name of the file for the contact map. 
+\item The field \texttt{--output-influence-map} contains the name of the file for the influence map. 
+\end{itemize}
+
+\section{Contact map}
+
+The contact map of a model is an object that may help modelers checking the consistency of the rule set they use. The contact map is \emph{statically} computed and does not depend on kinetic rates nor initial conditions.
+
+The contact map summarises the different types of agent, their interface and the potential binding between sites. 
+It is an over approximation, thus if the contact map indicates a potential bond, it does not mean that it is always possible to reach a state in which two sites of these kinds are bound, but if the contact map indicates no bond between two sites, it means that it is NOT possible to reach a state in which two sites of these kinds are bound together.  \KaSa~will produce a dot format file. The produced graph is given in Figure~\ref{fig:abc-contact}. 
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=8cm,natwidth=920pt,natheight=582pt]{generated_img/abc_contact.png}
+\caption{Contact Map for the \ttt{abc.ka} model defined in Chapter~\ref{chap:abc}}
+\label{fig:abc-contact}
+\end{figure}
+\section{Influence map}
+
+
 \chapter{Frequently asked questions}
 \section*{Simulation hangs after a while}
 If the progress bar seems stalled, it does not necessarily mean that the simulation is blocked. In particular when a simulation is triggered with a \emph{time} limit (\ttt{-t} option of the command line) it might only indicate that the bio clock is stalled while computation events still occur. Recall that the average (bio) time one has to wait in order to apply a rule is $1/A$, where $A$ is the sum of all the rule activities (which is equal to the number of instances that a rule has, times its kinetic rate). Whenever the number of occurrences of a rule grows too fast (if new agents are created during the simulation for instance), or if the kinetic rate of a rule is defined by a function that grows rapidly, the average time increment might tend to 0 and if it remains so for a while, it will block the progress bar whose advance is proportional to the bio time \ttt{[T]}. 
@@ -996,8 +1146,11 @@ The influence map\index{influence map} contains relations that are computed on s
 The value \ttt{nan} means "Not a Number". It is generated when a plotted variable is infinite. Make sure this variable is not divided by zero at some point.
 
 \bibliographystyle{plain}
-\bibliography{fmb,concur} 
+\bibliography{fmb,concur,static_analyses} 
 
 \printindex
 
 \end{document}  
+%%% Local Variables:
+%%% ispell-local-dictionary: "british"
+%%% End:
