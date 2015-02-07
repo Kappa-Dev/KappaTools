@@ -23,7 +23,7 @@ else
  OCAMLBUILDFLAGS = 
 endif
 
-USE_TK=1
+USE_TK=0
 
 ifeq ($(USE_TK),1)
 OCAMLINCLUDES =  -cflags -I,$(LABLTKLIBREP),-I,+labltk -lflags -I,$(LABLTKLIBREP),-I,+labltk,unix.cmxa,str.cmxa,nums.cmxa -libs labltk,jpflib
