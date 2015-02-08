@@ -1033,7 +1033,7 @@ where \ttt{file\_i} are the input Kappa files containing the rules, initial cond
 All the options are summarised as follows: 
 \input{generated_img/KaSa_options.txt}
 
-Orders in option matter, since they can be used to toggle on/off some functionality or to assign a value to some environment variables. 
+Orders in option matter, since they can be used to toggle on/off some functionalities or to assign a value to some environment variables. 
 The options are interpreted from left to right. 
 
 More options are available in the OCaml file \texttt{KaSa\_rep/config/config.ml} and can be tuned before compilation. 
@@ -1065,13 +1065,13 @@ In expert modes, more options are available in the graphical interface.
 
 Contextual help is provided when the mouse is hovered over an element. 
 
-The interface will store the options that are checked or filled and in which order. 
-When launched, the analysis will interpret these options in the order they have been entered. 
+The interface will store the options that are checked or filled and the order in which they have been selected. 
+When launched, the analysis interprets these options in the order they have been entered. 
 
 Some options appear in several onglets. They denote the same option and share the same value. 
 
-\item File selector: The file selector can be used to upload as many kappa file as desired. The button \texttt{Clear} can be used to reset the selection of files.
-\item Bottom: Some buttons are available. The button \texttt{Quit} can be used to leave the interface. The button \texttt{Reset to default} tune all the options to their default value. The button \texttt{Import options} can be used to restore the value of the options as saved during a previous session of the graphical interfaces. The button \texttt{Save options} can be used to save the value of the options for a further session. The button \texttt{Launch analyze} launch \KaSa\ with the current options. 
+\item File selector: The file selector can be used to upload as many kappa files as desired. The button '\texttt{Clear}' can be used to reset the selection of files.
+\item Bottom: Some buttons are available. The button '\texttt{Quit}' can be used to leave the interface. The button '\texttt{Reset to default}' tune all the options to their default value. The button '\texttt{Import options}' can be used to restore the value of the options as saved during a previous session of the graphical interfaces. The button '\texttt{Save options}' can be used to save the value of the options for a further session. The button '\texttt{Launch analyze}' launch \KaSa\ with the current options. 
 
 Importantly, options are saved automatically under various occasions. Thus, it is possible to restore the value of the options 
 before the last reset, before the last quit, or before the last analysis. 
@@ -1098,7 +1098,7 @@ The onglet \texttt{0\_Actions} (see Fig.~\ref{fig:kasa:0}) contains the main act
 \end{figure}
 
 
-The onglet \texttt{1\_Ouput} (see Fig.~\ref{fig:kasa:1}) contains the names of the output file. 
+The onglet \texttt{1\_Ouput} (see Fig.~\ref{fig:kasa:1}) contains the names of the output files. 
 
 \begin{itemize}
 \item The field \texttt{--output-directory} can be used to set the repository where output file are written. \KaSa~will not create this repository, thus it has to exist. 
@@ -1106,29 +1106,20 @@ The onglet \texttt{1\_Ouput} (see Fig.~\ref{fig:kasa:1}) contains the names of t
 \item The field \texttt{--output-influence-map} contains the name of the file for the influence map. 
 \end{itemize}
 
+When a file already exists, it is overwritten without any warning. 
+
 \section{Contact map}
 
 The contact map of a model is an object that may help modelers checking the consistency of the rule set they use. The contact map is \emph{statically} computed and does not depend on kinetic rates nor initial conditions.
 
-The contact map summarises the different types of agent, their interface and the potential binding between sites. It is an over approximation, thus if the contact map indicates a potential bond, it does not mean that it is always possible to reach a state in which two sites of these kinds are bound, but if the contact map indicates no bond between two sites, it means that it is NOT possible to reach a state in which two sites of these kinds are bound together.  
+
 Typing the following instruction:
 
 \texttt{KaSa abc.ka --reset-all --compute-contact-map}
 
 will produce a dot format file named \texttt{contact.dot}. 
-
-The contact map for the \ttt{abc.ka} model  defined in Chapter~\ref{chap:abc} is given in Figure~\ref{fig:abc-contact}. On this map, we notice that there are three kinds of agent, namely $A$, $B$, and $C$. 
-Agents of kind $A$ have two sites $x$ and $c$, that bear no internal state (they appear in yellow only), agents of kind $B$ have one site $x$, that bears no internal state (they appear in yellow only), and agents of kind $C$ have two sites $x_1$ and $x_2$ with both a binding state and an internal state (they appear both in yellow and in green). 
-Additionally, the contact map indicates that sites $x$ of the agents of kind $A$ can be bound to the site $x$ of an agent of kind $B$ and that sites $c$ of the agents of kind $A$ can be bound to the agents of kind $C$ either on the site $x_1$, or on the site $x_2$. 
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=8cm,natwidth=920pt,natheight=582pt]{generated_img/abc_contact.png}
-\caption{Contact Map for the \ttt{abc.ka} model defined in Chapter~\ref{chap:abc}}
-\label{fig:abc-contact}
-\end{figure}
-
-It is possible to change the name of the output by using the option \ttt{--output-contact}, it is also possible to put the output in another repository thanks to the option \ttt{--output-directory}. All the options related to the computation of the contact map can be accessed on the 
+The name of the output file and the directory can be changed to the command line options \texttt{--output-contact-map} and \texttt{--output-directory}. 
+The directory is assumed to exist. The file will be overwritten if it exists. All the options related to the computation of the contact map can be accessed on the 
 onglet \texttt{2\_Reachability\_analysis} of the graphical interface (see Fig.~\ref{fig:kasa:2}). 
 
 \begin{figure}[htbp]
@@ -1139,8 +1130,71 @@ onglet \texttt{2\_Reachability\_analysis} of the graphical interface (see Fig.~\
 \end{figure}
 
 
+The contact map summarises the different types of agent, their interface and the potential binding between sites. It is an over approximation, thus if the contact map indicates a potential bond, it does not mean that it is always possible to reach a state in which two sites of these kinds are bound, but if the contact map indicates no bond between two sites, it means that it is NOT possible to reach a state in which two sites of these kinds are bound together.  
+
+
+The contact map for the \ttt{abc.ka} model  defined in Chapter~\ref{chap:abc} is given in Figure~\ref{fig:abc-contact}. On this map, we notice that there are three kinds of agent, namely $A$, $B$, and $C$. 
+Agents of kind $A$ have two sites $x$ and $c$, that bear no internal state (they appear in yellow only), agents of kind $B$ have one site $x$, that bears no internal state (they appear in yellow only), and agents of kind $C$ have two sites $x_1$ and $x_2$ with both a binding state and an internal state (they appear both in yellow and in green). We notice that when a site can bear both an internal state and a binding state, they are considered as two different sites in the contact map. Additionally, the contact map indicates that sites $x$ of the agents of kind $A$ can be bound to the site $x$ of an agent of kind $B$ and that sites $c$ of the agents of kind $A$ can be bound to the agents of kind $C$ either on the site $x_1$, or on the site $x_2$. 
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=8cm,natwidth=920pt,natheight=582pt]{generated_img/abc_contact.png}
+\caption{Contact Map for the \ttt{abc.ka} model defined in Chapter~\ref{chap:abc}}
+\label{fig:abc-contact}
+\end{figure}
+
+
+
 \section{Influence map}
 
+The influence map of a model is an object that may help modelers checking the consistency of the rule set they use. 
+
+Typing the following instruction:
+
+\texttt{KaSa abc.ka --reset-all --compute-influence-map}
+
+will produce a dot format file named \texttt{influence.dot}. 
+The name of the output file and the directory can be changed to the command line options \texttt{--output-influence-map} and \texttt{--output-directory}. 
+The directory is assumed to exist. The file will be overwritten if it exists.  All the options related to the computation of the influence map can be accessed on the onglet \texttt{3\_Influence\_map} of the graphical interface (see Fig.~\ref{fig:kasa:3}). 
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=12cm,natwidth=920pt,natheight=582pt]{img/kasa_3.png}
+\caption{\KaSa~ graphical interface - onglet \texttt{3\_Influence\_map}}
+\label{fig:kasa:3}
+\end{figure}
+
+Unlike the flux map, the influence map is \emph{statically} computed and does not depend on kinetic rates nor initial conditions. It describes how rules may potentially influence each other during a simulation. \KaSa~will produce a dot format file containing the influence relation over all rules and observables of the model. The produced graph visualised using a circular rendering\footnote{One may use for instance the \ttt{circo} program that is part of the \textit{graphviz} suite.} is given in Figure~\ref{fig:kasa-abc-im}. Observables are represented as circular nodes and rules as rectangular nodes. The labels of the nodes are either the label of the rule or of the observable (if available), otherwise it is made of a unique identifier allocated by \KaSa~followed by the kappa definition of the rule/observable. 
+Edges are decorated with the list of embeddings (separated by a semi-colon) allowing rules{\textquotesingle}s right hand sides to be mapped to left hand sides. Observables have no influence, but they can be influenced by rules, if the rule can increase or decrease their value. 
+
+
+\begin{figure}[htbp] %  figure placement: here, top, bottom, or page
+   \centering
+   \includegraphics[width=15cm]{generated_img/abc_influence.png} 
+   \caption{The influence map of the \ttt{abc.ka} model defined in Chapter~\ref{chap:abc}. Edge labels denote embeddings with the convention that $[i\rar j]$ denotes the embedding of agent number $i$ of the origin{\textquotesingle}s rhs, into agent $j$ of the target{\textquotesingle}s lhs.}
+   \label{fig:kasa-abc-im}
+\end{figure}
+
+More formally, consider the rules $r:L\rar R$ and $s:L'\rar R'$. One wishes to know whether it is possible that the application of rule $r$ over a graph $G$ creates a new instance of rule $s$ (which is called a positive influence and that is described by green arrows in the influence map), or destroy a previous instance of rule $s$ (which is called negative influence and that is described by red arrows in the influence map). 
+In Fig.~\ref{fig:im}, we illustrate the construction of positive influences due to overlap of the left hand side of a rule and the right hand side of another rule on some sites that are modified by the former one. 
+
+\begin{figure}[htbp] %  figure placement: here, top, bottom, or page
+   \centering
+\includegraphics[width=8cm,natwidth=1462pt,natheight=756pt]{img/im.png}
+   \caption{Computation of the influence of the top rule on the rule below: the right hand side of the first rules embeds in a common term with the left hand side of the second rule. It results that the first rule has a positive influence on the second.}
+   \label{fig:im}
+\end{figure}
+
+The current implementation has the following limitations:
+\begin{itemize}
+\item Currently, only observables that are defined as patterns are taken into account. 
+\item Not atomic observables which are defined as algebraic expressions are not taken into account yet. The observables are ignored. 
+\item The influence map does not take into account indirect influences due to perturbations (which could arises when the application of a rule triggers a perturbation which would create some agents or increase/decrease the value of some variables). 
+\item Token are not taken into yet. They are currently ignored. 
+\item Positive/negative influence of time is not taken into account either. 
+\end{itemize}
+
+Lastly, KaSa\ computes an over-approximation of the influence map. They may show an influence despite the fact that there can be no actual one. But if it shows no influence it means that either there are NO such influence, or that we are in a case that is not covered yet as itemised previously. 
 
 \chapter{Frequently asked questions}
 \section*{Simulation hangs after a while}
@@ -1159,8 +1213,8 @@ Make sure you have \ttt{\%obs} or \ttt{\%plot} instructions in your KF\index{kap
 The value of a kappa expression $E$  is equal to the number of embeddings\index{embedding} it has in the current mixture\index{mixture} $M$. Embeddings are maps from agents in $E$  to agents in $M$. If $E$ has symmetries then every permutation of $E$ will be counted as a new embedding. For instance let $E=$\ttt{A(x!1),A(x!1)}  and let $M=$\ttt{A(x!1,y\intstate p),A(x!1,y\intstate u)}. 
 \KaSim~will count two instances of $E$ in $M$: the one mapping the first \ttt{A} of $E$ to the first \ttt{A} of $M$ and the one mapping the first \ttt{A} of $E$ to the second \ttt{A} of $M$.
  
-\section*{The computed influence map is incorrect, it misses some activation or has to much of them}
-The influence map\index{influence map} contains relations that are computed on side effect free rules only. It is likely that a missing activation is due to a side effect that is not taken into account. If the influence map shows an activation between rule $r$ and $s$ that is never possible with a given model, just remember that activation computation implies that \emph{there exists} a context in which applying rule $r$ will create a new instance of rule $s$. This context might simply never be realized with the given rules or initial conditions.
+\section*{The computed influence map is incorrect, it misses some activation or has too much of them}
+The influence map\index{influence map} computed by \KaSim~contains relations that are computed on side effect free rules only. It is likely that a missing activation is due to a side effect that is not taken into account. If the influence map shows an activation between rule $r$ and $s$ that is never possible with a given model, just remember that activation computation implies that \emph{there exists} a context in which applying rule $r$ will create a new instance of rule $s$. This context might simply never be realized with the given rules or initial conditions.
 
 \section*{Value \ttt{nan} in the data file\index{data file} at the end of the simulation}
 The value \ttt{nan} means "Not a Number". It is generated when a plotted variable is infinite. Make sure this variable is not divided by zero at some point.

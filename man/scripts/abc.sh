@@ -1,6 +1,6 @@
 ${KAPPABIN}KaSim -i ../kappa/abc.ka -e 100000 -p 1000 -o abc.out && \
 gnuplot abc.gplot && \
-dot -Tpng flux.dot -o ../generated_img/flux.png && \
+circo -Tpng flux.dot -o ../generated_img/flux.png && \
 ${KAPPABIN}KaSa ../kappa/abc.ka && \
 dot -Tpng contact.dot -o ../generated_img/abc_contact.png && \
 dot -Tpng influence.dot -o ../generated_img/abc_influence.png && \
