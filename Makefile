@@ -101,7 +101,7 @@ full:
 	@cp _tags _tags.tmp
 	make clean
 	@sh switch_full.sh 
-	make 
+	make || echo 0 
 	@cp Makefile.tmp Makefile
 	@cp _tags.tmp _tags 
 
@@ -110,7 +110,7 @@ light:
 	@cp _tags _tags.tmp
 	make clean
 	@sh switch_light.sh
-	make 
+	make || echo 0 
 	@cp Makefile.tmp Makefile
 	@cp _tags.tmp _tags
 
