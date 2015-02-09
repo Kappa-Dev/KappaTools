@@ -81,12 +81,12 @@ module Export_to_KaSim =
 		print_string "@";
 		print_string y;
 		print_string ": ";
-		List.fold_left
-		  (fun bool x ->
-		   print_string x;
-		   (if bool then print_string ", ");
-		   true)
-		  true l1;
+		let _ = List.fold_left
+			  (fun bool x ->
+			   (if bool then print_string ", ");
+			   print_string x;
+			   true)
+			  false l1 in
 		print_newline ()
 	      end
 	    else ();
@@ -134,7 +134,7 @@ module Export_to_KaSim =
       let parameters_sig =
 	Remanent_parameters.update_prefix parameters "Signature:" in
       let errors =
-	if parameters_sig.Remanent_parameters_sig.trace || Print_handler.trace
+	if Remanent_parameters.get_trace parameters || Print_handler.trace
 	then Print_handler.print_handler parameters_sig errors handler
 	else errors
       in
