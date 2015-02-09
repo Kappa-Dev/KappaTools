@@ -120,7 +120,7 @@ module Export_to_KaSim =
 
     let init compil  =
       let errors = Exception.empty_error_handler in
-      let errors,parameters,files  = Get_option.get_option errors in
+      let parameters = Remanent_parameters.get_parameters () in   
       let parameters_compil =
 	Remanent_parameters.update_call_stack
 	  parameters Preprocess.local_trace (Some "Prepreprocess.translate_compil") in
