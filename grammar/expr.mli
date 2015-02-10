@@ -2,6 +2,7 @@
 
 (** {6 Printers} *)
 
+val print_ast_mix : Format.formatter -> Ast.mixture -> unit
 val print_ast_alg : Format.formatter -> Ast.mixture Ast.ast_alg_expr -> unit
 
 val print_bool :

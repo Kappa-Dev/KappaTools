@@ -1,3 +1,24 @@
+let print_ast_link f = function
+  | Ast.FREE -> ()
+  | Ast.LNK_TYPE ((p,_), (a,_)) -> Format.fprintf f "!%s.%s" p a
+  | Ast.LNK_ANY -> Format.fprintf f "?"
+  | Ast.LNK_SOME -> Format.fprintf f "!_"
+  | Ast.LNK_VALUE i -> Format.fprintf f "!%i" i
+
+let print_ast_internal f l =
+  Pp.list Pp.empty (fun f (x,_) -> Format.fprintf f "~%s" x) f l
+
+let print_ast_port f p =
+  Format.fprintf f "%s%a%a" (fst p.Ast.port_nme)
+		 print_ast_internal p.Ast.port_int
+		 print_ast_link (fst p.Ast.port_lnk)
+
+let print_ast_agent f ((ag_na,_),l) =
+  Format.fprintf f "%s(%a)" ag_na
+		 (Pp.list (fun f -> Format.fprintf f ",") print_ast_port) l
+
+let print_ast_mix f m = Pp.list Pp.comma print_ast_agent f m
+
 let rec print_ast_alg f = function
   | Ast.EMAX -> Format.fprintf f "[Emax]"
   | Ast.PLOTNUM -> Format.fprintf f "[p]"
@@ -5,7 +26,7 @@ let rec print_ast_alg f = function
   | Ast.CONST n -> Nbr.print f n
   | Ast.OBS_VAR lab -> Format.fprintf f "'%s'" lab
   | Ast.KAPPA_INSTANCE ast ->
-     Format.pp_print_string f "|#no printer for mixture, sorry#|"
+     Format.fprintf f "|%a|" print_ast_mix ast
   | Ast.TOKEN_ID tk -> Format.fprintf f "|%s|" tk
   | Ast.STATE_ALG_OP op -> Term.print_state_alg_op f op
   | Ast.BIN_ALG_OP (op, (a,_), (b,_)) ->
