@@ -18,17 +18,17 @@ KASAREP = KaSa_rep/
 
 TERM = $(shell echo $$TERM)
 ifeq ($(TERM), dumb) # An approximation of "am I launched from emacs ?" :-)
- OCAMLBUILDFLAGS = -classic-display
+ OCAMLBUILDFLAGS = -classic-display -use-ocamlfind
 else
- OCAMLBUILDFLAGS = 
+ OCAMLBUILDFLAGS = -use-ocamlfind
 endif
 
 USE_TK=0
 
 ifeq ($(USE_TK),1)
-OCAMLINCLUDES =  -cflags -I,$(LABLTKLIBREP),-I,+labltk -lflags -I,$(LABLTKLIBREP),-I,+labltk,unix.cmxa,str.cmxa,nums.cmxa -libs labltk,jpflib
+OCAMLINCLUDES =  -cflags -I,$(LABLTKLIBREP),-I,+labltk -lflags -I,$(LABLTKLIBREP),-I,+labltk -libs labltk,jpflib
 else
-OCAMLINCLUDES = -lflags unix.cmxa,str.cmxa,nums.cmxa
+OCAMLINCLUDES =
 endif
 
 SCRIPTSSOURCE = $(wildcard $(MANSCRIPTREP)*.sh)

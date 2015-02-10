@@ -19,4 +19,4 @@
 "KaSa_rep/influence_map" : include
 "KaSa_rep/export_to_KaSim" : include
 "KaSa_rep/automatically_generated" : include
-true : bin_annot
+true : bin_annot, package(str), package(unix)
