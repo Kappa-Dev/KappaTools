@@ -85,12 +85,12 @@ Compilation:rules:1:reverse:agent_id_1:agent_type_0:site_type_1->state:[state_mi
 Compilation:rules:1:reverse:agent_id_2:
 Compilation:rules:1:reverse:agent_id_2:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
 Compilation:rules:1:actions:unbinding:(agent_id_2,agent_type_0)@site_type_0....(agent_id_1,agent_type_0)@site_type_1
-Compilation:rules:1:actions:deletion:(agent_id_2,agent_type_0)
-Compilation:rules:1:actions:deletion:documented_site:(agent_id_2,agent_type_0)@site_type_0
-Compilation:rules:1:actions:deletion:undocumented_site:(agent_id_2,agent_type_0)@site_type_1
 Compilation:rules:1:actions:deletion:(agent_id_1,agent_type_0)
 Compilation:rules:1:actions:deletion:documented_site:(agent_id_1,agent_type_0)@site_type_1
 Compilation:rules:1:actions:deletion:undocumented_site:(agent_id_1,agent_type_0)@site_type_0
+Compilation:rules:1:actions:deletion:(agent_id_2,agent_type_0)
+Compilation:rules:1:actions:deletion:documented_site:(agent_id_2,agent_type_0)@site_type_0
+Compilation:rules:1:actions:deletion:undocumented_site:(agent_id_2,agent_type_0)@site_type_1
 Compilation:rules:1:actions:creation:(agent_id_0,agent_type_0)
 Quarks:Quarkify
 Quarks:Rule 0
