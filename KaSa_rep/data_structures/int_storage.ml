@@ -25,7 +25,6 @@ module type Storage =
     val unsafe_get: Remanent_parameters_sig.parameters ->Exception.method_handler -> key -> 'a t -> Exception.method_handler * 'a option
     val dimension: Exception.method_handler -> 'a t -> Exception.method_handler * dimension
     val print: Exception.method_handler -> (Exception.method_handler -> Remanent_parameters_sig.parameters -> 'a -> Exception.method_handler) -> Remanent_parameters_sig.parameters -> 'a t -> Exception.method_handler
-    (*MOD*)
     val print_var_f: Exception.method_handler -> (Exception.method_handler -> Remanent_parameters_sig.parameters -> 'a -> Exception.method_handler) -> Remanent_parameters_sig.parameters -> 'a t -> Exception.method_handler  
     val print_site_f: Exception.method_handler -> (Exception.method_handler -> Remanent_parameters_sig.parameters -> 'a -> Exception.method_handler) -> Remanent_parameters_sig.parameters -> 'a t -> Exception.method_handler
 
@@ -123,7 +122,6 @@ module Int_storage_imperatif =
            in aux (i+1) error
      in aux 0 error
 
-   (*MOD*)
    let print_var_f error print_elt parameters array = 
      let rec aux i error = 
        if i>array.size then error
@@ -138,9 +136,7 @@ module Int_storage_imperatif =
               error
            in aux (i+1) error
      in aux 0 error
-            
-            
-   (*MOD:print function for sites in print_hander*)
+
     let print_site_f error print_elt parameters array = 
      let rec aux i error = 
        if i>array.size then error
@@ -477,7 +473,7 @@ module Quick_key_list =
                 | None -> let error,_ = invalid_arg parameters error (Some "fold, line 391") Exit () in error
                 | Some im -> f parameters error k im)
             error
-            list
+            (List.rev list)
               
       let fold parameters error f a b = 
         let error,list = key_list parameters error a in 
