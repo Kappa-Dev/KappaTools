@@ -26,9 +26,9 @@ endif
 USE_TK=0
 
 ifeq ($(USE_TK),1)
-OCAMLINCLUDES =  -cflags -I,$(LABLTKLIBREP),-I,+labltk -lflags -I,$(LABLTKLIBREP),-I,+labltk -libs labltk,jpflib
+OCAMLINCLUDES = -I KaSa_rep/lib/full -cflags -I,$(LABLTKLIBREP),-I,+labltk -lflags -I,$(LABLTKLIBREP),-I,+labltk -libs labltk,jpflib
 else
-OCAMLINCLUDES =
+OCAMLINCLUDES = -I KaSa_rep/lib/light
 endif
 
 SCRIPTSSOURCE = $(wildcard $(MANSCRIPTREP)*.sh)
@@ -98,21 +98,17 @@ temp-clean-for-ignorant-that-clean-must-be-done-before-fetch:
 
 full: 
 	@cp Makefile Makefile.tmp
-	@cp _tags _tags.tmp
 	make clean
 	@sh switch_full.sh 
 	make || echo 0 
 	@cp Makefile.tmp Makefile
-	@cp _tags.tmp _tags 
 
 light: 
 	@cp Makefile Makefile.tmp
-	@cp _tags _tags.tmp
 	make clean
 	@sh switch_light.sh
 	make || echo 0 
 	@cp Makefile.tmp Makefile
-	@cp _tags.tmp _tags
 
 commit: fetch_version 
 	echo -n `expr $(VN) + 1` > tag/number 

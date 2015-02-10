@@ -12,7 +12,6 @@
 "KaSa_rep/error_handlers" : include
 "KaSa_rep/data_structures" : include
 "KaSa_rep/lib" : include
-"KaSa_rep/lib/light" : include
 "KaSa_rep/main" : include
 "KaSa_rep/tools" : include
 "KaSa_rep/frontend/preprocess" : include
