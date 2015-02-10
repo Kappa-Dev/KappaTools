@@ -61,9 +61,10 @@ module type Set_and_Map = sig
   val remove_map: Remanent_parameters_sig.parameters ->Exception.method_handler -> key -> 'a map -> Exception.method_handler * 'a map
   val mem_map:  key -> 'a map -> bool
   val iter_map: (key -> 'a -> unit) -> 'a map -> unit
+
   val map_map: ('a -> 'b) -> 'a map -> 'b map
   val mapi_map: (key -> 'a -> 'b) -> 'a map -> 'b map
-  val fold_map: (key -> 'a -> 'b -> 'b) -> 'a map -> 'b -> 'b
+  val fold_map: (key -> 'a -> 'b -> 'b) -> 'a map -> 'b -> 'b                                     
   val equal_map: ('a -> 'a -> bool) -> 'a map -> 'a map -> bool
   val update_map: Remanent_parameters_sig.parameters ->Exception.method_handler -> 'a map -> 'a map -> Exception.method_handler * 'a map    
   val map2_map: Remanent_parameters_sig.parameters ->Exception.method_handler -> ('a -> 'a -> 'a) -> 'a map -> 'a map -> Exception.method_handler * 'a map 
@@ -415,7 +416,7 @@ module Make(Ord:OrderedType) =
     
   let height_map map = 
       match map with 
-          | Empty_map -> 0 
+          | Empty_map -> 0
           | Node_map(_,_,_,_,h) -> h
             
   let create_map left key0 data right  = 
@@ -551,16 +552,19 @@ module Make(Ord:OrderedType) =
                  else 
                    let rh', right' = remove_map parameters rh key right in 
                    balance_map parameters rh' left key_map data right'
-               
+
+   (*TEST*)
   let rec map_map f map = 
       match map with
              | Empty_map -> empty_map
-             | Node_map(left,key,data,right,height) -> Node_map(map_map f left,key,f data,map_map f right,height)
-
+             | Node_map(left,key,data,right,height) ->
+                Node_map(map_map f left,key,f data,map_map f right,height)
+                        
    let rec mapi_map f map = 
       match map with
              | Empty_map -> empty_map
-             | Node_map(left,key,data,right,height) -> Node_map(mapi_map f left,key,f key data,mapi_map f right,height)
+             | Node_map(left,key,data,right,height) ->
+                Node_map(mapi_map f left,key,f key data,mapi_map f right,height)
                
    let rec mem_map key map = 
     match map with  
@@ -577,35 +581,33 @@ module Make(Ord:OrderedType) =
           | Node_map(left,key,data,right,_) -> 
               let _ = iter_map f left in 
               let _ = f key data in 
-                iter_map f right
-            
-            
-            
-  let rec fold_map f map value = 
+              iter_map f right
+
+  (*TEST*)
+  let rec fold_map f map value =
     match map with 
-          | Empty_map -> value 
-          | Node_map(left,key,data,right,_) -> 
-              fold_map f right (f key data (fold_map f left value)) 
-                   
-            
+    | Empty_map -> value 
+    | Node_map(left,key,data,right,_) ->
+       fold_map f right (f key data (fold_map f left value))
+                
   let rec cut_opt value map = 
-      match map with 
-          | Empty_map -> None 
-          | Node_map (left1,key1,data1,right1,height1) -> 
-              let cmp = Ord.compare value key1 in 
-              if cmp = 0 then
-                Some (left1,data1,right1)
-              else if cmp < 0 then 
-                match cut_opt value left1 with  
-                  | None -> None 
-                  |Some (left2,data2,right2) -> 
-                    Some (left2,data2,Node_map(right2,key1,data1,right1,height1))
-              else 
-                match cut_opt value right1 with 
-                  | None -> None
-                  | Some (left2,data2,right2) -> 
-                    Some (Node_map(left1,key1,data1,left2,height1),data2,right2)
-   
+    match map with 
+    | Empty_map -> None 
+    | Node_map (left1,key1,data1,right1,height1) -> 
+       let cmp = Ord.compare value key1 in 
+       if cmp = 0 then
+         Some (left1,data1,right1)
+       else if cmp < 0 then 
+         match cut_opt value left1 with  
+         | None -> None 
+         |Some (left2,data2,right2) -> 
+           Some (left2,data2,Node_map(right2,key1,data1,right1,height1))
+       else 
+         match cut_opt value right1 with 
+         | None -> None
+         | Some (left2,data2,right2) -> 
+            Some (Node_map(left1,key1,data1,left2,height1),data2,right2)
+                 
   let rec join_map parameters rh left key value right =
     match balance_map parameters rh left key value right with 
             | rh',Empty_map -> invalid_arg_map parameters rh (Some "join_map, line 580") (invalid_arg "Set_and_map.join_map")
