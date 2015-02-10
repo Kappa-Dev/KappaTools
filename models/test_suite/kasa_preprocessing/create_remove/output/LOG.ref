@@ -63,12 +63,12 @@ Quarks:MODIFICATION+
 Quarks:MODIFICATION-
 
 REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
-Quarks:agent_test**:agent_type:1,rule:1->[0]
 Quarks:agent_test**:agent_type:0,rule:0->[0]
-Quarks:agent_modif+:agent_type:2,rule:1->[0]
+Quarks:agent_test**:agent_type:1,rule:1->[0]
 Quarks:agent_modif+:agent_type:1,rule:0->[0]
-Quarks:agent_modif-:agent_type:1,rule:1->[0]
+Quarks:agent_modif+:agent_type:2,rule:1->[0]
 Quarks:agent_modif-:agent_type:0,rule:0->[0]
+Quarks:agent_modif-:agent_type:1,rule:1->[0]
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Influence_map:Wake_up_map:rule(0):'b' A(),Ghost->Ghost -> rule(1):'c' B(),Ghost->Ghost[0->0]
 execution finished without any exception
