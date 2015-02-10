@@ -1,0 +1,4 @@
+load_printer "db_printers.cma"
+
+install_printer Expr.print_ast_mix
+install_printer Expr.print_ast_alg
