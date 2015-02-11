@@ -1176,13 +1176,13 @@ Edges are decorated with the list of embeddings (separated by a semi-colon) allo
 \end{figure}
 
 More formally, consider the rules $r:L\rar R$ and $s:L'\rar R'$. One wishes to know whether it is possible that the application of rule $r$ over a graph $G$ creates a new instance of rule $s$ (which is called a positive influence and that is described by green arrows in the influence map), or destroy a previous instance of rule $s$ (which is called negative influence and that is described by red arrows in the influence map). 
-In Fig.~\ref{fig:im}, we illustrate the construction of positive influences due to overlap of the left hand side of a rule and the right hand side of another rule on some sites that are modified by the former one. 
+In Fig.~\ref{fig:imbis}, we illustrate the construction of positive influences due to overlap of the left hand side of a rule and the right hand side of another rule on some sites that are modified by the former one. 
 
 \begin{figure}[htbp] %  figure placement: here, top, bottom, or page
    \centering
 \includegraphics[width=8cm,natwidth=1462pt,natheight=756pt]{img/im.png}
    \caption{Computation of the influence of the top rule on the rule below: the right hand side of the first rules embeds in a common term with the left hand side of the second rule. It results that the first rule has a positive influence on the second.}
-   \label{fig:im}
+   \label{fig:imbis}
 \end{figure}
 
 The current implementation has the following limitations:
