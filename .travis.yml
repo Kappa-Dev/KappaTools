@@ -5,7 +5,9 @@ before_install:
   - sudo apt-get update -qq
 
 install:
-  - sudo apt-get install -qq ocaml-nox ocaml-findlib
+  - sudo apt-get install -qq ocaml-nox opam
+  - opam init -a git://github.com/ocaml/opam-repository && eval $(opam config env)
+  - opam install ocamlfind
   - sudo apt-get install -qq gnuplot-nox graphviz
   - sudo apt-get install -qq texlive-latex-recommended tex4ht
 
