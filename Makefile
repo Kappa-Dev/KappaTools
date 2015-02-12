@@ -23,7 +23,7 @@ else
  OCAMLBUILDFLAGS = -use-ocamlfind
 endif
 
-USE_TK=0
+USE_TK?=0
 
 ifeq ($(USE_TK),1)
 OCAMLINCLUDES = -I KaSa_rep/lib/full -cflags -I,$(LABLTKLIBREP),-I,+labltk -lflags -I,$(LABLTKLIBREP),-I,+labltk -libs labltk,jpflib
@@ -97,18 +97,12 @@ temp-clean-for-ignorant-that-clean-must-be-done-before-fetch:
 
 
 full: 
-	@cp Makefile Makefile.tmp
 	make clean
-	@sh switch_full.sh 
-	make || echo 0 
-	@cp Makefile.tmp Makefile
+	make USE_TK=1 || echo 0 
 
 light: 
-	@cp Makefile Makefile.tmp
 	make clean
-	@sh switch_light.sh
-	make || echo 0 
-	@cp Makefile.tmp Makefile
+	make USE_TK=0 || echo 0 
 
 commit: fetch_version 
 	echo -n `expr $(VN) + 1` > tag/number 
