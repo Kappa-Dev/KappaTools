@@ -2,24 +2,29 @@
 
 digraph G{ 
 node [shape=box, style=filled, fillcolor=lightskyblue];
-"0:B(x~p),A(x)->B(x~p!1),A(x!1)" ; 
-"1:B(x~p!1),A(x!1)->B(x~p),A(x)" ; 
-"2:C(x),A(x)->C(x!1),A(x!1)" ; 
-"3:C(x),B(x~p!),Ghost->C(x!1),Ghost" ; 
+"0:A(x),B(x~p)->A(x!1),B(x~p!1)" ; 
+"1:A(x!1),B(x~p!1)->A(x),B(x~p)" ; 
+"2:A(x),C(x)->A(x!1),C(x!1)" ; 
+"3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)" ; 
 edge [color=green, arrowhead=normal];
-"0:B(x~p),A(x)->B(x~p!1),A(x!1)" -> "1:B(x~p!1),A(x!1)->B(x~p),A(x)"[label ="[0->0];[1->1]"] ; 
-"0:B(x~p),A(x)->B(x~p!1),A(x!1)" -> "3:C(x),B(x~p!),Ghost->C(x!1),Ghost"[label ="[0->1]"] ; 
-"1:B(x~p!1),A(x!1)->B(x~p),A(x)" -> "0:B(x~p),A(x)->B(x~p!1),A(x!1)"[label ="[0->0];[1->1]"] ; 
-"1:B(x~p!1),A(x!1)->B(x~p),A(x)" -> "2:C(x),A(x)->C(x!1),A(x!1)"[label ="[1->1]"] ; 
-"3:C(x),B(x~p!),Ghost->C(x!1),Ghost" -> "0:B(x~p),A(x)->B(x~p!1),A(x!1)"[label ="[-2->1];[1->1]"] ; 
-"3:C(x),B(x~p!),Ghost->C(x!1),Ghost" -> "1:B(x~p!1),A(x!1)->B(x~p),A(x)"[label ="[1->1]"] ; 
-"3:C(x),B(x~p!),Ghost->C(x!1),Ghost" -> "2:C(x),A(x)->C(x!1),A(x!1)"[label ="[-2->1];[1->1]"] ; 
+"0:A(x),B(x~p)->A(x!1),B(x~p!1)" -> "1:A(x!1),B(x~p!1)->A(x),B(x~p)"[label ="[0->0];[1->1]"] ; 
+"0:A(x),B(x~p)->A(x!1),B(x~p!1)" -> "3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)"[label ="[1->0]"] ; 
+"1:A(x!1),B(x~p!1)->A(x),B(x~p)" -> "0:A(x),B(x~p)->A(x!1),B(x~p!1)"[label ="[0->0];[1->1]"] ; 
+"1:A(x!1),B(x~p!1)->A(x),B(x~p)" -> "2:A(x),C(x)->A(x!1),C(x!1)"[label ="[0->0]"] ; 
+"3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)" -> "0:A(x),B(x~p)->A(x!1),B(x~p!1)"[label ="[-1->0];[0->0]"] ; 
+"3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)" -> "1:A(x!1),B(x~p!1)->A(x),B(x~p)"[label ="[0->0]"] ; 
+"3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)" -> "2:A(x),C(x)->A(x!1),C(x!1)"[label ="[-1->0];[0->0];[1->1]"] ; 
+"3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)" -> "3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)"[label ="[1->1]"] ; 
 edge [color=red, arrowhead=tee];
-"0:B(x~p),A(x)->B(x~p!1),A(x!1)" -> "2:C(x),A(x)->C(x!1),A(x!1)"[label ="[1->1]"] ; 
-"1:B(x~p!1),A(x!1)->B(x~p),A(x)" -> "3:C(x),B(x~p!),Ghost->C(x!1),Ghost"[label ="[0->1]"] ; 
-"2:C(x),A(x)->C(x!1),A(x!1)" -> "0:B(x~p),A(x)->B(x~p!1),A(x!1)"[label ="[1->1]"] ; 
-"2:C(x),A(x)->C(x!1),A(x!1)" -> "3:C(x),B(x~p!),Ghost->C(x!1),Ghost"[label ="[0->0]"] ; 
-"3:C(x),B(x~p!),Ghost->C(x!1),Ghost" -> "0:B(x~p),A(x)->B(x~p!1),A(x!1)"[label ="[1->0]"] ; 
-"3:C(x),B(x~p!),Ghost->C(x!1),Ghost" -> "1:B(x~p!1),A(x!1)->B(x~p),A(x)"[label ="[-2->1];[1->0]"] ; 
-"3:C(x),B(x~p!),Ghost->C(x!1),Ghost" -> "2:C(x),A(x)->C(x!1),A(x!1)"[label ="[0->0]"] ; 
+"0:A(x),B(x~p)->A(x!1),B(x~p!1)" -> "0:A(x),B(x~p)->A(x!1),B(x~p!1)"[label =""] ; 
+"0:A(x),B(x~p)->A(x!1),B(x~p!1)" -> "2:A(x),C(x)->A(x!1),C(x!1)"[label =""] ; 
+"1:A(x!1),B(x~p!1)->A(x),B(x~p)" -> "1:A(x!1),B(x~p!1)->A(x),B(x~p)"[label =""] ; 
+"1:A(x!1),B(x~p!1)->A(x),B(x~p)" -> "3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)"[label ="[1->0]"] ; 
+"2:A(x),C(x)->A(x!1),C(x!1)" -> "0:A(x),B(x~p)->A(x!1),B(x~p!1)"[label =""] ; 
+"2:A(x),C(x)->A(x!1),C(x!1)" -> "2:A(x),C(x)->A(x!1),C(x!1)"[label =""] ; 
+"2:A(x),C(x)->A(x!1),C(x!1)" -> "3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)"[label =""] ; 
+"3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)" -> "0:A(x),B(x~p)->A(x!1),B(x~p!1)"[label ="[0->1]"] ; 
+"3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)" -> "1:A(x!1),B(x~p!1)->A(x),B(x~p)"[label ="[-1->0];[0->1]"] ; 
+"3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)" -> "2:A(x),C(x)->A(x!1),C(x!1)"[label =""] ; 
+"3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)" -> "3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)"[label =""] ; 
 }

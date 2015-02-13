@@ -1,5 +1,8 @@
 Parsing create.ka...
 done
+INIT
+SIGNATURE
+RULES
 Scan rules!
 Signature:
 Signature:agents: 
@@ -70,5 +73,7 @@ Quarks:agent_modif+:agent_type:2,rule:1->[0]
 Quarks:agent_modif-:agent_type:0,rule:0->[0]
 Quarks:agent_modif-:agent_type:1,rule:1->[0]
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
-Influence_map:Wake_up_map:rule(0):'b' A(),Ghost->Ghost -> rule(1):'c' B(),Ghost->Ghost[0->0]
+Influence_map:Wake_up_map:rule(0):'b' A(),Ghost->Ghost,B() -> rule(1):'c' B(),Ghost->Ghost,C()[0->0]
+Influence_map:Inhibition_map:rule(0):'b' A(),Ghost->Ghost,B() -> rule(0):'b' A(),Ghost->Ghost,B()
+Influence_map:Inhibition_map:rule(1):'c' B(),Ghost->Ghost,C() -> rule(1):'c' B(),Ghost->Ghost,C()
 execution finished without any exception

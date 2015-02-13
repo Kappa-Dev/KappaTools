@@ -2,7 +2,9 @@
 
 digraph G{ 
 node [shape=box, style=filled, fillcolor=lightskyblue];
-"0:A(x),Ghost->Ghost" ; 
+"0:A(x),Ghost->A(x!1),A(y!1)" ; 
 edge [color=green, arrowhead=normal];
-"0:A(x),Ghost->Ghost" -> "0:A(x),Ghost->Ghost"[label ="[-1->0];[0->0];[1->0]"] ; 
+"0:A(x),Ghost->A(x!1),A(y!1)" -> "0:A(x),Ghost->A(x!1),A(y!1)"[label ="[1->0]"] ; 
+edge [color=red, arrowhead=tee];
+"0:A(x),Ghost->A(x!1),A(y!1)" -> "0:A(x),Ghost->A(x!1),A(y!1)"[label =""] ; 
 }

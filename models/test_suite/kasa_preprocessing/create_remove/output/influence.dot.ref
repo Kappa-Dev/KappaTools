@@ -6,4 +6,7 @@ node [shape=box, style=filled, fillcolor=lightskyblue];
 "c" ; 
 edge [color=green, arrowhead=normal];
 "b" -> "c"[label ="[0->0]"] ; 
+edge [color=red, arrowhead=tee];
+"b" -> "b"[label =""] ; 
+"c" -> "c"[label =""] ; 
 }

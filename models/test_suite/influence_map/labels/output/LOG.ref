@@ -1,5 +1,8 @@
 Parsing labels.ka...
 done
+INIT
+SIGNATURE
+RULES
 Scan rules!
 Signature:
 Signature:agents: 
@@ -131,6 +134,10 @@ Influence_map:Wake_up_map:rule(1):'otherotherveryveryveryverylonglabel' A(x~p)->
 Influence_map:Wake_up_map:rule(1):'otherotherveryveryveryverylonglabel' A(x~p)->A(x~q) -> rule(3):'\0' A(x~q)->A(x~p)[0->0]
 Influence_map:Wake_up_map:rule(2):'"0' A(x~q)->A(x~u) -> rule(0):'veryveryveryveryverylonglonglonglabel' A(x~u)->A(x~p)[0->0]
 Influence_map:Wake_up_map:rule(3):'\0' A(x~q)->A(x~p) -> rule(1):'otherotherveryveryveryverylonglabel' A(x~p)->A(x~q)[0->0]
-Influence_map:Inhibition_map:rule(2):'"0' A(x~q)->A(x~u) -> rule(3):'\0' A(x~q)->A(x~p)[0->0]
-Influence_map:Inhibition_map:rule(3):'\0' A(x~q)->A(x~p) -> rule(2):'"0' A(x~q)->A(x~u)[0->0]
+Influence_map:Inhibition_map:rule(0):'veryveryveryveryverylonglonglonglabel' A(x~u)->A(x~p) -> rule(0):'veryveryveryveryverylonglonglonglabel' A(x~u)->A(x~p)
+Influence_map:Inhibition_map:rule(1):'otherotherveryveryveryverylonglabel' A(x~p)->A(x~q) -> rule(1):'otherotherveryveryveryverylonglabel' A(x~p)->A(x~q)
+Influence_map:Inhibition_map:rule(2):'"0' A(x~q)->A(x~u) -> rule(2):'"0' A(x~q)->A(x~u)
+Influence_map:Inhibition_map:rule(2):'"0' A(x~q)->A(x~u) -> rule(3):'\0' A(x~q)->A(x~p)
+Influence_map:Inhibition_map:rule(3):'\0' A(x~q)->A(x~p) -> rule(2):'"0' A(x~q)->A(x~u)
+Influence_map:Inhibition_map:rule(3):'\0' A(x~q)->A(x~p) -> rule(3):'\0' A(x~q)->A(x~p)
 execution finished without any exception

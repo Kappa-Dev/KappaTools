@@ -13,6 +13,10 @@ edge [color=green, arrowhead=normal];
 "\"0" -> "veryveryveryveryverylonglonglonglabel"[label ="[0->0]"] ; 
 "\\0" -> "otherotherveryveryveryverylonglabel"[label ="[0->0]"] ; 
 edge [color=red, arrowhead=tee];
-"\"0" -> "\\0"[label ="[0->0]"] ; 
-"\\0" -> "\"0"[label ="[0->0]"] ; 
+"veryveryveryveryverylonglonglonglabel" -> "veryveryveryveryverylonglonglonglabel"[label =""] ; 
+"otherotherveryveryveryverylonglabel" -> "otherotherveryveryveryverylonglabel"[label =""] ; 
+"\"0" -> "\"0"[label =""] ; 
+"\"0" -> "\\0"[label =""] ; 
+"\\0" -> "\"0"[label =""] ; 
+"\\0" -> "\\0"[label =""] ; 
 }
