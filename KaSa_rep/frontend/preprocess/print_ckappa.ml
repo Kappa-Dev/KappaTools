@@ -125,10 +125,10 @@ let print_mixture  parameter error mixture = (*TEST*)
     match mixture 
     with 
     | Ckappa_sig.EMPTY_MIX -> error 
-    | Ckappa_sig.SKIP _ -> 
+    | Ckappa_sig.SKIP mixture -> 
        let _ = Misc_sa.print_comma parameter bool (Remanent_parameters.get_agent_sep_comma_symbol parameter) in 
        let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "%s" (Remanent_parameters.get_ghost_agent_symbol parameter) in 
-       error
+       aux error true mixture 
     | Ckappa_sig.COMMA (agent,mixture) -> 
        let _ = if bool then Printf.fprintf (Remanent_parameters.get_log parameter) "%s" (Remanent_parameters.get_agent_sep_comma_symbol parameter) in 
          let error = print_agent parameter error agent in
