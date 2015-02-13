@@ -17,7 +17,7 @@ let warn parameters mh message exn default =
 
 let local_trace = true
                                                      
-let generic_add fold2_common diag parameters error handler n a b c = 
+let generic_add fold2_common agent_diag rule_diag parameters error handler n a b c = 
   fold2_common
      parameters 
      error 
@@ -31,23 +31,24 @@ let generic_add fold2_common diag parameters error handler n a b c =
                     error 
                     (fun parameters error rule' a' map -> 
                         let rule' = n + rule' in 
-                        if not diag && rule = rule' then 
+                        if not rule_diag && rule = rule' 
+			then 
                           (error,map) 
                         else 
-                        let key = rule,rule' in 
-                        let error,old = Quark_type.Int2Set_and_map.find_map_option parameters error key map in                        
-                        let old = 
+                          let key = rule,rule' in 
+                          let error,old = Quark_type.Int2Set_and_map.find_map_option parameters error key map in                        
+                          let old = 
                             match old with 
-                              | None -> Quark_type.Labels.empty_couple  
-                              | Some old -> old 
-                        in 
-                      let error,couple = Quark_type.Labels.add_couple parameters error a a' old in
-                      Quark_type.Int2Set_and_map.add_map parameters error key couple map)
-                  b 
-                  map)
-                a
-                map)
-        a b c 
+                            | None -> Quark_type.Labels.empty_couple  
+                            | Some old -> old 
+                          in 
+			  let error,couple = Quark_type.Labels.add_couple parameters error agent_diag a a' old in
+			  Quark_type.Int2Set_and_map.add_map parameters error key couple map)
+                 b 
+                 map)
+          a
+          map)
+    a b c 
 
 let compute_influence_map parameters error handler quark_maps nrules = 
   let wake_up_map = Quark_type.Int2Set_and_map.empty_map in 
@@ -55,6 +56,7 @@ let compute_influence_map parameters error handler quark_maps nrules =
   let error,wake_up_map = 
     generic_add 
       Quark_type.AgentMap.fold2_common
+      true
       true
       parameters 
       error 
@@ -68,6 +70,7 @@ let compute_influence_map parameters error handler quark_maps nrules =
     generic_add 
       Quark_type.AgentMap.fold2_common
       true
+      true
       parameters 
       error 
       handler 
@@ -80,6 +83,7 @@ let compute_influence_map parameters error handler quark_maps nrules =
     generic_add 
       Quark_type.AgentMap.fold2_common
       true
+      true
       parameters 
       error 
       handler 
@@ -91,6 +95,7 @@ let compute_influence_map parameters error handler quark_maps nrules =
   let error,wake_up_map = 
     generic_add 
       Quark_type.SiteMap.fold2_common
+      true
       true
       parameters 
       error 
@@ -104,6 +109,7 @@ let compute_influence_map parameters error handler quark_maps nrules =
     generic_add 
       Quark_type.SiteMap.fold2_common
       true
+      true
       parameters 
       error 
       handler
@@ -115,6 +121,7 @@ let compute_influence_map parameters error handler quark_maps nrules =
   let error,inhibition_map = 
     generic_add 
       Quark_type.SiteMap.fold2_common
+      true
       true
       parameters 
       error 
@@ -128,6 +135,7 @@ let compute_influence_map parameters error handler quark_maps nrules =
     generic_add 
       Quark_type.AgentMap.fold2_common
       false
+      true
       parameters 
       error 
       handler 
@@ -140,6 +148,7 @@ let compute_influence_map parameters error handler quark_maps nrules =
     generic_add 
       Quark_type.SiteMap.fold2_common
       false
+      true
       parameters 
       error 
       handler 
@@ -152,6 +161,7 @@ let compute_influence_map parameters error handler quark_maps nrules =
     generic_add 
       Quark_type.AgentMap.fold2_common
       false
+      true 
       parameters 
       error 
       handler 
@@ -164,6 +174,7 @@ let compute_influence_map parameters error handler quark_maps nrules =
     generic_add 
       Quark_type.SiteMap.fold2_common
       false
+      true 
       parameters 
       error 
       handler 
@@ -175,7 +186,8 @@ let compute_influence_map parameters error handler quark_maps nrules =
    let error,wake_up_map = 
     generic_add 
       Quark_type.AgentMap.fold2_common
-      false
+      true
+      true
       parameters 
       error 
       handler 
@@ -187,7 +199,8 @@ let compute_influence_map parameters error handler quark_maps nrules =
   let error,wake_up_map = 
     generic_add 
       Quark_type.SiteMap.fold2_common
-      false
+      true
+      true
       parameters 
       error 
       handler 

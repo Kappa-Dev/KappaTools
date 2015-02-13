@@ -51,7 +51,7 @@ sig
   val empty: label_set
   val empty_couple: label_set_couple   
   val add_set:     Remanent_parameters_sig.parameters -> Exception.method_handler -> label -> label_set -> Exception.method_handler * label_set 
-  val add_couple:  Remanent_parameters_sig.parameters -> Exception.method_handler -> label_set -> label_set -> label_set_couple -> Exception.method_handler * label_set_couple
+  val add_couple:  Remanent_parameters_sig.parameters -> Exception.method_handler -> bool -> label_set -> label_set -> label_set_couple -> Exception.method_handler * label_set_couple
   val dump:        Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.kappa_handler -> label_set  -> Exception.method_handler 
   val dump_couple: Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.kappa_handler ->label_set_couple -> Exception.method_handler 
   val to_string :  Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.kappa_handler ->label_set -> Exception.method_handler * string list 
@@ -68,7 +68,7 @@ module Empty =
   let empty = () 
   let empty_couple = ()
   let add_set _ error _ _ = error,() 
-  let add_couple _ error _ _ _ = error,() 
+  let add_couple _ error _ _ _ _ = error,() 
   let dump _ error _ _ = error 
   let to_string _ error _ _ = error,[]
   let dump_couple _ error _ _ = error 
@@ -88,12 +88,16 @@ module Extensive =
       let empty = Set.empty_set   
       let empty_couple = Pair_Set.empty_set  
       let add_set = Set.add_set
-      let add_couple remanent error a b sol = 
+      let add_couple remanent error bool a b sol = 
         Set.fold_set 
           (fun a (error,sol) -> 
             Set.fold_set
               (fun b (error,sol) -> 
-                Pair_Set.add_set remanent error (a,b) sol
+		if not bool && a=b 
+		then 
+		  error,sol 
+		else 
+                  Pair_Set.add_set remanent error (a,b) sol
               )  
               b 
               (error,sol)
@@ -195,7 +199,7 @@ module Implicit =
       let empty = Set.empty_set 
       let empty_couple  = []
       let add_set = Set.add_set
-      let add_couple remanent error a b sol = error,(a,b)::sol 
+      let add_couple remanent error bool a b sol = error,(a,b)::sol 
         
       let dump parameter error handler a =
         let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "[" in
