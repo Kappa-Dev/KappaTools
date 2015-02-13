@@ -43,14 +43,15 @@ let add_entry parameters id agent site index (error,map) =
     in 
       Ckappa_sig.Int_Set_and_Map.add_map parameters error id ((agent,site,index)::old_list) map 
 
-let rev_ast mixture = 
+let rev_ast = List.rev 
+(*mixture = 
   let rec aux mixture sol = 
     match mixture with
       | [] -> sol
 (*      | Ast.DOT(i,agent,mixture) -> aux mixture (Ast.DOT(i,agent,sol))*)
 (*      | Ast.PLUS(i,agent,mixture) -> aux mixture (Ast.PLUS(i,agent,sol))*)
       | agent :: mixture -> aux mixture (agent :: sol)
-  in aux mixture []
+  in aux mixture []*)
   
 let pop_entry parameters error id map = 
   let error,list = Ckappa_sig.Int_Set_and_Map.find_map parameters error id map 
@@ -495,7 +496,7 @@ let translate_compil parameters error compil =
 	  | None -> error,id_set 
 	  | Some id -> check_freshness parameters error "Label" (fst id) id_set 
 	in 
-        let ast_lhs,ast_rhs = rev_ast rule.Ast.lhs,rev_ast rule.Ast.rhs in 
+        let ast_lhs,ast_rhs = rule.Ast.lhs,rule.Ast.rhs in 
         let prefix,tail_lhs,tail_rhs = longuest_prefix ast_lhs ast_rhs in 
         let error,lhs = refine_mixture_in_rule parameters error prefix 0 tail_rhs ast_lhs in 
         let error,rhs = refine_mixture_in_rule parameters error prefix tail_lhs 0 ast_rhs in 
