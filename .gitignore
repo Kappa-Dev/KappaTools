@@ -24,6 +24,7 @@ man/KaSim_manual.blg
 man/KaSim_manual.idx
 man/KaSim_manual.lot
 man/KaSim_manual.toc
+*.witness
 
 # test suite
 models/test_suite/*/*/output/*.diff

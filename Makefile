@@ -53,20 +53,24 @@ bin/%: %.native Makefile
 
 
 %.pdf: %.tex $(SCRIPTSWITNESS)
-	cd $(dir $<) && rm -f *.aux && \
-	pdflatex $(notdir $<) && \
-	bibtex $(basename $(notdir $<)) && \
-	pdflatex $(notdir $<) && pdflatex $(notdir $<)
+	cd $(dir $<) && LOG=$$(mktemp -t latexlogXXXX); rm -f *.aux && \
+	pdflatex -halt-on-error $(notdir $<) > $${LOG} && \
+	bibtex $(basename $(notdir $<)) >> $${LOG} && \
+	pdflatex -halt-on-error $(notdir $<) >> $${LOG} && \
+	pdflatex -halt-on-error $(notdir $<) >> $${LOG} && \
+	rm $${LOG} || { cat $${LOG}; rm $${LOG}; exit 2; }
 
 %.htm: %.tex %.pdf
 	cd $(dir $<) && htlatex $(notdir $<)  "nma.cfg,htm,charset=utf-8,p-width" " -cunihtf -utf8" &&\
 	htlatex $(notdir $<)  "nma.cfg,htm,charset=utf-8,p-width" " -cunihtf -utf8"
 
-%.witness: %.sh $(MANGENREP) bin/KaSim bin/KaSa $(MODELS) %.gplot 
-	cd $(dir $@) && KAPPABIN=$(CURDIR)/bin/ sh $(notdir $<) && touch $(notdir $@)
+%.witness: %.sh $(MANGENREP) bin/KaSim bin/KaSa $(MODELS) %.gplot
+	cd $(dir $@) && KAPPABIN=$(CURDIR)/bin/ sh $(notdir $<) > $(notdir $@) 2>&1 \
+	|| { cat $(notdir $@); exit 2; }
 
 %.witness: %.sh $(MANGENREP) bin/KaSim bin/KaSa $(MODELS)
-	cd $(dir $@) && KAPPABIN=$(CURDIR)/bin/ sh $(notdir $<) && touch $(notdir $@)
+	cd $(dir $@) && KAPPABIN=$(CURDIR)/bin/ sh $(notdir $<) > $(notdir $@) 2>&1 \
+	|| { cat $(notdir $@); exit 2; }
 
 doc: man/KaSim_manual.pdf
 doc_html: man/KaSim_manual.htm
