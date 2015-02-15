@@ -1,5 +1,6 @@
 Parsing internal.ka...
 done
++ Initialized random number generator with seed 240056667
 + Compiling...
 	 -simulation parameters
 	 -agent signatures

@@ -1,5 +1,6 @@
 Parsing side-effects.ka...
 done
++ Initialized random number generator with seed 253329392
 + Compiling...
 	 -simulation parameters
 	 -agent signatures

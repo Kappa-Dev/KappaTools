@@ -120,19 +120,19 @@ let main =
       List.iter (fun fic -> KappaLexer.compile fic)
 		!Parameter.inputKappaFileNames ;
       !Ast.result in
-    let () =
+    let theSeed =
       match !Parameter.seedValue with
-      | Some seed -> Random.init seed
+      | Some seed -> seed
       | None ->
 	 begin
 	   Format.printf "+ Self seeding...@." ;
 	   Random.self_init() ;
-	   let i = Random.bits () in
-	   Random.init i ;
-	   Format.printf
-	     "+ Initialized random number generator with seed %d@." i
+	   Random.bits ()
 	 end
     in
+    Random.init theSeed ;
+    Format.printf
+      "+ Initialized random number generator with seed %d@." theSeed;
 
     let counter =
       Counter.create 0.0 0 !Parameter.maxTimeValue !Parameter.maxEventValue in
