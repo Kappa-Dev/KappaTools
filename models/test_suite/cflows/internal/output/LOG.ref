@@ -1,3 +1,4 @@
++ Command line is: '/Users/pirbo/KaSim/bin/KaSim' '-i' 'internal.ka' '-seed' '240056667' '-e' '30000' '-d' 'output'
 Parsing internal.ka...
 done
 + Initialized random number generator with seed 240056667

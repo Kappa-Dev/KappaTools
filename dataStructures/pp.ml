@@ -27,7 +27,7 @@ let array pr_sep pr_el f a =
       let () = Format.fprintf f "%a" (pr_el i) a.(i) in
       if i < Array.length a - 1 then
 	Format.fprintf f "%t%t" pr_sep (aux (succ i))
-  in Format.fprintf f "[|%t|]" (aux 0)
+  in aux 0 f
 
 let plain_array pr_el f a =
   let rec aux i f =
