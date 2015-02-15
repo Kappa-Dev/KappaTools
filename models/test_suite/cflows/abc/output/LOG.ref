@@ -1,4 +1,4 @@
-+ Command line is: '/Users/pirbo/KaSim/bin/KaSim' '-i' 'abc.ka' '-seed' '785872661' '--compile'
++ Command line is: 'KaSim' '-i' 'abc.ka' '-seed' '785872661' '--compile'
 Parsing abc.ka...
 done
 + Initialized random number generator with seed 785872661
@@ -15,7 +15,7 @@ done
 + Building initial simulation state...
 	 -Counting initial local patterns...
 	 Done
-+ Command line is: '/Users/pirbo/KaSim/bin/KaSim' '-i' 'abc.ka' '-seed' '924556145' '-e' '10000' '-d' 'output' '-p' '500'
++ Command line is: 'KaSim' '-i' 'abc.ka' '-seed' '924556145' '-e' '10000' '-d' 'output' '-p' '500'
 Parsing abc.ka...
 done
 + Initialized random number generator with seed 924556145

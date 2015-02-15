@@ -1,4 +1,4 @@
-+ Command line is: '/Users/pirbo/KaSim/bin/KaSim' '-i' 'weak_events.ka' '-seed' '924556145' '-e' '1000' '-d' 'output'
++ Command line is: 'KaSim' '-i' 'weak_events.ka' '-seed' '924556145' '-e' '1000' '-d' 'output'
 Parsing weak_events.ka...
 done
 + Initialized random number generator with seed 924556145

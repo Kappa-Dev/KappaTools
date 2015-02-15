@@ -121,7 +121,11 @@ let main =
     (*let _ = Printexc.record_backtrace !Parameter.debugModeOn in*)
 
     Format.printf "+ Command line is: @[<h>%a@]@."
-		  (Pp.array Pp.space (fun _ f s -> Format.fprintf f "'%s'" s)) Sys.argv;
+		  (Pp.array Pp.space
+			    (fun i f s ->
+			     Format.fprintf
+			       f "'%s'" (if i = 0 then "KaSim" else s)))
+		  Sys.argv;
 
     let result =
       Ast.init_compil() ;

@@ -1,4 +1,4 @@
-+ Command line is: '/Users/pirbo/KaSim/bin/KaSim' '-i' 'agents_without_sites.ka' '-seed' '924556145' '-e' '10000' '-d' 'output' '-p' '50'
++ Command line is: 'KaSim' '-i' 'agents_without_sites.ka' '-seed' '924556145' '-e' '10000' '-d' 'output' '-p' '50'
 Parsing agents_without_sites.ka...
 done
 + Initialized random number generator with seed 924556145

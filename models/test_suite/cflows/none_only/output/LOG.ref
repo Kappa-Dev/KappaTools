@@ -1,4 +1,4 @@
-+ Command line is: '/Users/pirbo/KaSim/bin/KaSim' 'none_only.ka' '-seed' '924556145' '-e' '1000' '-d' 'output' '-p' '50'
++ Command line is: 'KaSim' 'none_only.ka' '-seed' '924556145' '-e' '1000' '-d' 'output' '-p' '50'
 Parsing none_only.ka...
 done
 + Initialized random number generator with seed 924556145
