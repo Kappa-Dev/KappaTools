@@ -6,7 +6,7 @@ let version = "4.0-refactoring"
 
 let usage_msg =
   "KaSim "^version^":\n"^
-    "Usage is KaSim -i input_file [-e events | -t time] [-p points] [-o output_file]\n"
+    "Usage is KaSim [-i] input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
 
 let checkFileExists () =
@@ -52,9 +52,9 @@ let main =
      Arg.Float(fun t -> Parameter.maxTimeValue := Some t ;
 			Parameter.maxEventValue := None),
      "Max time of simulation (arbitrary time unit)");
-    ("-p", Arg.Int (fun i -> Parameter.pointNumberValue:= i),
+    ("-p", Arg.Set_int Parameter.pointNumberValue,
      "Number of points in plot");
-    ("-o", Arg.String (fun s -> Parameter.outputDataName:=s ),
+    ("-o", Arg.Set_string Parameter.outputDataName,
      "file name for data output") ;
     ("-d",
      Arg.String
@@ -65,9 +65,9 @@ let main =
 	  with Sys_error msg -> Tools.mk_dir_r s in
 	Parameter.outputDirName := s
        ), "Specifies directory name where output file(s) should be stored") ;
-    ("-load-sim", Arg.String (fun file -> Parameter.marshalizedInFile := file),
+    ("-load-sim", Arg.Set_string Parameter.marshalizedInFile,
      "load simulation package instead of kappa files") ;
-    ("-make-sim", Arg.String (fun file -> Parameter.marshalizedOutFile := file),
+    ("-make-sim", Arg.Set_string Parameter.marshalizedOutFile,
      "save kappa files as a simulation package") ;
     ("--implicit-signature",
      Arg.Unit (fun () ->
@@ -76,17 +76,17 @@ let main =
      "Program will guess agent signatures automatically") ;
     ("-seed", Arg.Int (fun i -> Parameter.seedValue := Some i),
      "Seed for the random number generator") ;
-    ("--eclipse", Arg.Unit (fun () -> Parameter.eclipseMode:= true),
+    ("--eclipse", Arg.Set Parameter.eclipseMode,
      "enable this flag for running KaSim behind eclipse plugin") ;
-    ("--emacs-mode", Arg.Unit (fun () -> Parameter.emacsMode:= true),
+    ("--emacs-mode", Arg.Set Parameter.emacsMode,
      "enable this flag for running KaSim using emacs-mode") ;
-    ("--compile", Arg.Unit (fun _ -> Parameter.compileModeOn := true),
+    ("--compile", Arg.Set Parameter.compileModeOn,
      "Display rule compilation as action list") ;
-    ("--debug", Arg.Unit (fun () -> Parameter.debugModeOn:= true),
+    ("--debug", Arg.Set Parameter.debugModeOn,
      "Enable debug mode") ;
-    ("--safe", Arg.Unit (fun () -> Parameter.safeModeOn:= true),
+    ("--safe", Arg.Set Parameter.safeModeOn,
      "Enable safe mode") ;
-    ("--backtrace", Arg.Unit (fun () -> Parameter.backtrace:= true),
+    ("--backtrace", Arg.Set Parameter.backtrace,
      "Backtracing exceptions") ;
     ("--gluttony",
      Arg.Unit (fun () -> Gc.set { (Gc.get()) with
@@ -97,7 +97,11 @@ let main =
   ]
   in
   try
-    Arg.parse options (fun _ -> Arg.usage options usage_msg ; exit 1) usage_msg;
+    Arg.parse options
+	      (fun fic ->
+	       Parameter.inputKappaFileNames:=
+		 fic::(!Parameter.inputKappaFileNames))
+	      usage_msg;
     let abort =
       match !Parameter.inputKappaFileNames with
       | [] -> !Parameter.marshalizedInFile = ""
