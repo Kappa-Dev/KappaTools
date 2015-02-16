@@ -107,6 +107,7 @@ rule token = parse
 		 let pos = position lexbuf in STRING (str,pos)}
 	 | eol {Lexing.new_line lexbuf ; NEWLINE}
 	 | '#' {comment lexbuf}
+	 | '/' '*' {inline_comment lexbuf; token lexbuf}
 	 | integer as n {INT (int_of_string n)}
 	 | real as f {FLOAT (float_of_string f)}
 	 | '\'' ([^'\n''\'']+ as x) '\''{LABEL(x)}
@@ -170,6 +171,14 @@ and comment = parse
 	    | eof {EOF}
 	    | _ {comment lexbuf}
 
+and inline_comment = parse
+		   | eol {Lexing.new_line lexbuf; inline_comment lexbuf}
+		   | '*' '/' { () }
+		   | '\"'
+		       {ignore (read_label "" ['\"'] lexbuf);
+			inline_comment lexbuf}
+		   | '/' '*' {inline_comment lexbuf; inline_comment lexbuf}
+		   | _ {inline_comment lexbuf}
 {
   let compile fic =
     let d = open_in fic in
