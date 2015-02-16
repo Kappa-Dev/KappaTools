@@ -212,7 +212,7 @@ Please document the variable \texttt{LABLTKLIBREP} in the Makefile.
 \section{General usage}
 From a terminal window, \KaSim~can be invoked by typing 
 \ITE{
-\item[\$] \ttt{KaSim -i file\_1 ... -i file\_n [option] }
+\item[\$] \ttt{KaSim file\_1 ... file\_n [option] }
 }
 where \ttt{file\_i} are the input Kappa files containing the rules, initial conditions and observables (see Chapter~\ref{chap:kappa}). Tables~\ref{tab:options} and \ref{tab:add-options} summarize all the options that can be given to the simulator. Basically, one specifies an upper bound either in simulated or bio-time (arbitrary time unit), or in number of events. Note that bio-time is computed using Gillespie{\textquotesingle}s formula for time advance (see Fig.~\ref{fig:event-loop}) and should not be confused with CPU-time (it{\textquotesingle}s not even proportional). In doubt, we recommend using a bound in number of events since the cost of one event is bounded (in CPU time) by a constant, so the CPU-time used for simulating $n$ events is roughly $k$ times lower than that used for simulating $k\times n$ events.
 
@@ -229,7 +229,9 @@ Argument & Description \\ \hline
 \ttt{-e $e_{\mit{max}}$} & Terminates simulation after $e_{\mit{max}}\geq 0$ events\\
 \ttt{-t $t_{\mit{max}}$} & Terminates simulation after $t_{\mit{max}}\geq 0.0$ time units\\
 \ttt{-p $n$} & Produces a data file\index{data file} (default: \ttt{data.out}) with $n\geq 0$ data points\\
-\ttt{-o} \textit{file} & Set the name of data file to \textit{file}\\ 
+\ttt{-o} \textit{file} & Set the name of data file to \textit{file}\\
+\ttt{-i} \textit{file} & Interpret \textit{file} as an input filename\\
+& (for compatibility with \KaSim <= 3 and filenames starting by -)\\
 \ttt{-d} \textit{dir} & Output any produced file to the directory \textit{dir}\\
 \hline
 \end{tabular}
@@ -263,11 +265,11 @@ Argument & Description \\ \hline
 \section{Example}
 The command 
 \ITE{
-\item[\$] \ttt{KaSim -i model.ka -e 1000000 -p 1000 -o model.out}  
+\item[\$] \ttt{KaSim model.ka -e 1000000 -p 1000 -o model.out}  
 }
 will generate a file \ttt{model.out} containing the trajectories of the observables defined in the kappa file \ttt{model.ka}. The file \ttt{model.out} will contain 1000 data points (\ie in this case, a measure will be taken every 1000 events). The command
 \ITE{
-\item[\$] \ttt{KaSim -i init.ka -i rules.ka -i obs.ka -i mod.ka -t 1.5 -p 1000}  
+\item[\$] \ttt{KaSim init.ka rules.ka obs.ka mod.ka -t 1.5 -p 1000}  
 }
 will generate a file \ttt{data.out} (default name) containing 1000 data points of a simulation of 1.5 (arbitrary) time units of the model. Note that the input Kappa file is split in four files containing, for instance, the initial conditions, \ttt{init.ka}, the rule set, \ttt{rules.ka}, the observables, \ttt{obs.ka}, and the perturbations, \ttt{pert.ka} (see Chapter~\ref{chap:kappa} for details). The order in which the files are given does not matter.
 
@@ -276,13 +278,12 @@ will generate a file \ttt{data.out} (default name) containing 1000 data points o
 \section{General remarks}
 The \emph{Kappa File}\index{kappa file} (KF) is the formal
 representation of your model. We use KF\index{kappa file} to denote
-the union of the files that are given as input to \KaSim~(argument
-\ttt{-i}). Each line of the KF\index{kappa file} is interpreted by
-\KaSim~as a \emph{declaration}\index{declaration}. If the line is
-ended by the escape character~{\textquotesingle}
-\ttt{$\bs$}{\textquotesingle} ~the continuation of the
-declaration\index{declaration} is parsed onto the next
-line. Declarations can be: agent and token \emph{signatures}
+the union of the files that are given as input to \KaSim. Each line of
+the KF\index{kappa file} is interpreted by \KaSim~as a
+\emph{declaration}\index{declaration}. If the line is ended by the
+escape character~{\textquotesingle} \ttt{$\bs$}{\textquotesingle} ~the
+continuation of the declaration\index{declaration} is parsed onto the
+next line. Declarations can be: agent and token \emph{signatures}
 (Sec.~\ref{sec:sig}), \emph{rules}\index{rule} (Sec.~\ref{sec:rules}),
 \emph{variables}\index{variable} (Sec.~\ref{sec:var}), \emph{initial
   conditions}\index{initial condition} (Sec.~\ref{sec:init}),
@@ -705,12 +706,12 @@ There are two main points to notice about this model: \ttt{A} can modify both si
 We try first a coarse simulation of $100,000$ events (10 times the number of agents in the initial system).
 \ttt{
 \ITE{
-\item[\$] KaSim -i ABC.ka -e 100000 -p 1000 -o abc.out
+\item[\$] KaSim ABC.ka -e 100000 -p 1000 -o abc.out
 }}
 Plotting the content of the \ttt{abc.out} file one notices that nothing of significant interest happen to the observables after 250s. So we can now specify a meaningful time limit by running
 \ttt{
 \ITE{
-\item[\$] KaSim -i ABC.ka -e 100000 -t 250 -p 1000 -o abc.out
+\item[\$] KaSim ABC.ka -e 100000 -t 250 -p 1000 -o abc.out
 }}
 which produces the data points whose rendering is given in Fig.~\ref{fig:abc}.
 \begin{figure}[htbp]
@@ -808,7 +809,7 @@ The modified kappa file is available in the source repository, in the \ttt{model
 Running again a simulation (a bit longer) by entering in the command line:
 \ttt{
 \ITE{
-\item[\$] KaSim -i ABC-pert.ka -e 100000 -t 300 -p 1000 -o abc2.out
+\item[\$] KaSim ABC-pert.ka -e 100000 -t 300 -p 1000 -o abc2.out
 }}
 one obtains the curve given in Fig.~\ref{fig:abc2}. 
 
@@ -957,7 +958,7 @@ will count the number of \ttt{A}s whose site \ttt{x} is connected to a site \ttt
 
 The simulation algorithm that is implemented in \KaSim~requires an initialization phase whose complexity is proportional to $R*G$ where $R$ is the cardinal of the rule set and $G$ the size of the initial mixture\index{mixture}. Thus for large systems, initialization may take a while. Whenever a user wishes to run several simulations of the \emph{same} kappa model, it is possible to skip this initialization phase by creating a \emph{simulation package}\index{simulation package}. For instance:
 \ttt{\ITE{
-\item [] KaSim -i abc.ka -t $n$ -make-sim abc.kasim
+\item [] KaSim abc.ka -t $n$ -make-sim abc.kasim
 }}
 will generate a standard simulation of the \ttt{abc.ka} model, but in addition, will create the simulation package \ttt{abc.kasim} (.kasim extension is not mandatory). This package is a binary file, \ie not human readable, that can be used as input of a new simulation using the command:
 \ttt{\ITE{
