@@ -1,6 +1,8 @@
-<img
-src="https://raw.githubusercontent.com/Kappa-Dev/KaSim/master/man/img/KaSim-Logo.svg"
-alt="KaSim logo" title="Stochastic Kappa Simulator" align="right" />
+<object
+data="https://raw.githubusercontent.com/Kappa-Dev/KaSim/master/man/img/KaSim-Logo.svg"
+type="image/svg+xml" align="right">
+<p>KaSim logo</p>
+</object>
 # KaSim
 
 KaSim is a stochastic simulator for rule-based models written in Kappa. A pdf of
