@@ -27,7 +27,7 @@ let print_agent parameters error handler agent =
        Cckappa_sig.Site_map_and_set.fold_map
          (fun a b error ->  
           let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%ssite_type_%i->state:%s\n" (Remanent_parameters.get_prefix parameters) a (string_of_port b)  in 
-          error) (*FIXME*)
+          error)
          agent.Cckappa_sig.agent_interface
             error
     | Cckappa_sig.Ghost -> 
@@ -241,19 +241,18 @@ let print_diffview parameters error handler diff =
 
  let print_signatures parameters error handler signature = error
 
- (*TEST: change the order *)
  let print_bond parameters relation (add1,add2) = 
    Printf.fprintf 
      (Remanent_parameters.get_log parameters) 
      "%s(agent_id_%d,agent_type_%d)@site_type_%d%s(agent_id_%d,agent_type_%d)@site_type_%d\n" 
      (Remanent_parameters.get_prefix parameters) 
-     add2.Cckappa_sig.agent_index 
-     add2.Cckappa_sig.agent_type
-     add2.Cckappa_sig.site
-     relation
      add1.Cckappa_sig.agent_index 
      add1.Cckappa_sig.agent_type
      add1.Cckappa_sig.site
+     relation
+     add2.Cckappa_sig.agent_index 
+     add2.Cckappa_sig.agent_type
+     add2.Cckappa_sig.site
 
  let print_half_bond parameters relation (add1,_) = 
    Printf.fprintf 
