@@ -183,4 +183,17 @@ let connected_components_of_mixture env mix =
 
 let connected_components_sum_of_ambiguous_mixture contact_map env mix =
   let all_mixs = add_implicit_infos (find_implicit_infos contact_map mix) in
-  Tools.list_fold_right_map connected_components_of_mixture env all_mixs
+  let (env',ccs) =
+    Tools.list_fold_right_map connected_components_of_mixture env all_mixs in
+  let () =
+    if !Parameter.compileModeOn then
+      let boxed_cc f cc =
+	let () = Format.pp_open_box f 2 in
+	let () = Connected_component.print env' f cc in
+	Format.pp_close_box f () in
+      let one_ccs f x =
+	Format.fprintf f "---@,%a"
+		       (Pp.list ~trailing:Pp.space Pp.space boxed_cc) x in
+      Format.eprintf "@[<v>-----@,@[<2>%a@]@,%a@,@]@." Expr.print_ast_mix mix
+		     (Pp.list Pp.space one_ccs) ccs in
+  (env',ccs)
