@@ -159,7 +159,8 @@ let diff pos m0 m1 env =
        let sign = Environment.get_sig name_id env in
        let modif_sites =
 	 Signature.fold
-	   (fun site_id idmap -> add_map (FRESH id) (site_id,0) (add_map (FRESH id) (site_id,1) idmap)
+	   (fun site_id _ idmap ->
+	    add_map (FRESH id) (site_id,0) (add_map (FRESH id) (site_id,1) idmap)
 	   )
 	   sign idmap
        in
@@ -215,7 +216,7 @@ let diff pos m0 m1 env =
        let sign = Environment.get_sig (Mixture.name ag) env in
        let interface = Mixture.interface ag in
        let interface = Signature.fold
-			 (fun site_id interface ->
+			 (fun site_id _ interface ->
 			  if IntMap.mem site_id interface then interface
 			  else IntMap.add site_id (None,Mixture.WLD) interface)
 			 sign interface in

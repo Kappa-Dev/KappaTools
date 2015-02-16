@@ -4,8 +4,9 @@ open ExceptionDefn
 type t = ((unit NamedDecls.t) option) NamedDecls.t
 
 let fold f sign cont =
-  let cont,_ = Array.fold_left (fun (cont,i) _ -> (f i cont,i+1)) (cont,0)
-			      sign.NamedDecls.decls
+  let cont,_ = Array.fold_left
+		 (fun (cont,i) ((na,_),_) -> (f i na cont,i+1)) (cont,0)
+		 sign.NamedDecls.decls
   in cont
 
 let num_of_site ?agent_name site_name sign =

@@ -9,6 +9,8 @@ val cn : pos -> int
 (** {5 Combinators on primitive types *)
 val iteri : (int -> unit) -> int -> unit
 val array_map_of_list : ('a -> 'b) -> 'a list -> 'b array
+val array_fold_lefti :
+  (int -> 'a -> 'b -> 'a) -> 'a -> 'b array -> 'a
 val array_fold_left_mapi :
   (int -> 'a -> 'b -> 'a * 'c) -> 'a -> 'b array -> 'a * 'c array
 val array_fold_left2 :

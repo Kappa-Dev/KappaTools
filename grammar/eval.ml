@@ -393,7 +393,7 @@ let rule_of_ast ?(backwards=false) ~is_pert env mixs
 	  let set = try IntMap.find id (side_eff:IntSet.t IntMap.t) with Not_found -> IntSet.empty in
 	  let set =
 	    Signature.fold
-	      (fun site_id set ->
+	      (fun site_id _ set ->
 	       if site_id = 0 then set
 	       else
 		 let opt = Mixture.follow (id,site_id) lhs in
