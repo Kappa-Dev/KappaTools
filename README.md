@@ -1,5 +1,5 @@
 <img
-src="https://raw.githubusercontent.com/Kappa-Dev/KaSim/master/man/img/KaSim-logo.png"
+src="https://raw.githubusercontent.com/Kappa-Dev/KaSim/master/man/img/KaSim-Logo.svg"
 alt="KaSim logo" title="Stochastic Kappa Simulator" align="right" />
 # KaSim
 
