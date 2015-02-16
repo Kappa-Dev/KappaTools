@@ -15,6 +15,11 @@ val array_fold_left_mapi :
   (int -> 'a -> 'b -> 'a * 'c) -> 'a -> 'b array -> 'a * 'c array
 val array_fold_left2 :
   ('a -> 'b -> 'c -> 'a) -> 'a -> 'b array -> 'c array -> 'a
+val list_exists_uniq :
+  ('a -> bool) -> 'a list -> bool
+val list_map_flatten : ('a -> 'b list) -> 'a list -> 'b list
+val list_fold_right_map :
+  ('a -> 'b -> 'a * 'c) -> 'a -> 'b list -> 'a * 'c list
 
 (** {5 Utilities on files } *)
 val kasim_open_out : string -> out_channel

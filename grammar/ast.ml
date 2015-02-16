@@ -8,7 +8,7 @@ type link =
   | FREE
   | LNK_ANY
   | LNK_SOME
-  | LNK_TYPE of str_pos * str_pos
+  | LNK_TYPE of str_pos (* port *) * str_pos (*agent_type*)
 type internal = string Term.with_pos list
 type port = {port_nme:string Term.with_pos;
 	     port_int:internal;

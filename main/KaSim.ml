@@ -307,6 +307,9 @@ let main =
       Format.eprintf "***Error (%s) line %d, char %d: %s***@."
 		     (fn pos) (ln pos) (cn pos) msg)
   | ExceptionDefn.Malformed_Decl er -> Pp.error Format.pp_print_string er
+  | ExceptionDefn.Internal_Error er ->
+     Pp.error
+       (fun f x -> Format.fprintf f "Internal Error (please report):@ %s" x) er
   | Invalid_argument msg ->
      (close_desc None;
       let s = "" (*Printexc.get_backtrace()*) in

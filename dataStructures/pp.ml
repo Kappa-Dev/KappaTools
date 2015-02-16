@@ -1,14 +1,15 @@
 open Format
 
-let list pr_sep pr_el f l =
-  let rec aux f = function
-  | [] -> ()
-  | [el] -> pr_el f el
-  | h :: t -> fprintf f "%a%t%a" pr_el h pr_sep aux t
-  in aux f l
+let list ?(trailing=(fun f -> ())) pr_sep pr_el f l =
+  let rec aux empty f = function
+    | [] -> if not empty then trailing f
+    | [el] -> pr_el f el
+    | h :: t -> fprintf f "%a%t%a" pr_el h pr_sep (aux false) t
+  in aux true f l
 
-let set elements pr_sep pr_el f set =
-  list pr_sep pr_el f (elements set)
+let set ?(trailing=(fun f -> ()))
+	elements pr_sep pr_el f set =
+  list ~trailing pr_sep pr_el f (elements set)
 
 let hashtbl pr_sep pr_el f tbl =
   list pr_sep pr_el f (Hashtbl.fold (fun a b l -> (a,b)::l) tbl [])

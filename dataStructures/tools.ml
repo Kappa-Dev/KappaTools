@@ -68,6 +68,27 @@ let list_of_string str =
 	in
 	parse stream "" []
 
+let list_exists_uniq f l =
+  let rec second = function
+    | [] -> true
+    | h :: t -> not (f h) && second t in
+  let rec first = function
+    | [] -> false
+    | h :: t -> if f h then second t else first t in
+  first l
+
+let rec list_map_flatten f = function (* list_bind *)
+  | [] -> []
+  | h :: t -> List.append (f h) (list_map_flatten f t)
+(*  List.rev
+    (List.fold_left (fun x y -> List.rev_append y x) [] (List.rev_map f l))
+ *)
+
+let rec list_fold_right_map f x = function
+  | [] -> (x,[])
+  | h :: t ->
+     let (x',t') = list_fold_right_map f x t in
+     let (x'', h') = f x' h in (x'', h'::t')
 
 let array_fold_left_mapi f x a =
   let y = ref x in
