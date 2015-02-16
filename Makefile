@@ -40,7 +40,7 @@ MODELS = $(wildcard $(MANKAPPAMODELSREP)*.ka)
 
 .PRECIOUS: $(SCRIPTSWITNESS)
 
-$(MANGENREP): 
+$(MANGENREP): $(SCRIPTSSOURCE) $(MODELS)
 	rm -rf $@
 	mkdir $@
 
