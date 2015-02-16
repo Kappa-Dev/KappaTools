@@ -51,7 +51,7 @@ Compilation:rules:0:reverse:
 Compilation:rules:0:reverse:agent_id_0:
 Compilation:rules:0:reverse:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
 Compilation:rules:0:actions:creation:(agent_id_1,agent_type_0)
-Compilation:rules:0:actions:binding:(agent_id_1,agent_type_0)@site_type_1----(agent_id_0,agent_type_0)@site_type_0
+Compilation:rules:0:actions:binding:(agent_id_0,agent_type_0)@site_type_0----(agent_id_1,agent_type_0)@site_type_1
 Quarks:Quarkify
 Quarks:Rule 0
 Quarks:TEST

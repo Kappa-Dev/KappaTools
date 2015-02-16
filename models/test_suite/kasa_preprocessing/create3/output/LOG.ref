@@ -70,7 +70,7 @@ Compilation:rules:0:actions:deletion:(agent_id_1,agent_type_1)
 Compilation:rules:0:actions:deletion:documented_site:(agent_id_1,agent_type_1)@site_type_0
 Compilation:rules:0:actions:creation:(agent_id_2,agent_type_0)
 Compilation:rules:0:actions:creation:(agent_id_3,agent_type_1)
-Compilation:rules:0:actions:binding:(agent_id_3,agent_type_1)@site_type_0----(agent_id_2,agent_type_0)@site_type_0
+Compilation:rules:0:actions:binding:(agent_id_2,agent_type_0)@site_type_0----(agent_id_3,agent_type_1)@site_type_0
 
 Compilation:rules:1:lhs:
 Compilation:rules:1:lhs:agent_id_0:

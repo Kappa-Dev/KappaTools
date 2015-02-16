@@ -64,7 +64,7 @@ Compilation:rules:0:reverse:agent_id_0:
 Compilation:rules:0:reverse:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
 Compilation:rules:0:reverse:agent_id_1:
 Compilation:rules:0:reverse:agent_id_1:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
-Compilation:rules:0:actions:unbinding:(agent_id_1,agent_type_0)@site_type_1....(agent_id_0,agent_type_0)@site_type_0
+Compilation:rules:0:actions:unbinding:(agent_id_0,agent_type_0)@site_type_0....(agent_id_1,agent_type_0)@site_type_1
 Compilation:rules:0:actions:deletion:(agent_id_1,agent_type_0)
 Compilation:rules:0:actions:deletion:documented_site:(agent_id_1,agent_type_0)@site_type_1
 Compilation:rules:0:actions:deletion:undocumented_site:(agent_id_1,agent_type_0)@site_type_0
@@ -104,7 +104,7 @@ Compilation:rules:2:direct:agent_id_1:agent_type_1:site_type_0->state:[state_min
 Compilation:rules:2:reverse:
 Compilation:rules:2:reverse:agent_id_0:
 Compilation:rules:2:actions:creation:(agent_id_1,agent_type_1)
-Compilation:rules:2:actions:binding:(agent_id_1,agent_type_1)@site_type_0----(agent_id_0,agent_type_0)@site_type_0
+Compilation:rules:2:actions:binding:(agent_id_0,agent_type_0)@site_type_0----(agent_id_1,agent_type_1)@site_type_0
 Quarks:Quarkify
 Quarks:Rule 0
 Quarks:TEST
