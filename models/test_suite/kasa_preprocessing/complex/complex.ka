@@ -8,6 +8,6 @@
 
 #### Rules
 
-A(x,y),B(x,y) <-> A(x!1,y!2),B(x!1,y!2),C(x~u,y~p)
-A(y),B(y),C(x~u,y~p) <-> A(x!1,y), B(x!1,y!2),C(x~u!2,y~p)
+'r0' A(x,y),B(x,y) <-> A(x!1,y!2),B(x!1,y!2)
+'r1' B(x!_,y!_),C(x~u,y~p) <-> B(x!1,y!2),C(x~u!1,y~p!2)
 

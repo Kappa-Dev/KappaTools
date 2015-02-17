@@ -2,29 +2,24 @@
 
 digraph G{ 
 node [shape=box, style=filled, fillcolor=lightskyblue];
-"0:A(x),B(x~p)->A(x!1),B(x~p!1)" ; 
-"1:A(x!1),B(x~p!1)->A(x),B(x~p)" ; 
-"2:A(x),C(x)->A(x!1),C(x!1)" ; 
-"3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)" ; 
+"r0" ; 
+"r0_op" ; 
+"r1" ; 
+"r2" ; 
 edge [color=green, arrowhead=normal];
-"0:A(x),B(x~p)->A(x!1),B(x~p!1)" -> "1:A(x!1),B(x~p!1)->A(x),B(x~p)"[label ="[0->0];[1->1]"] ; 
-"0:A(x),B(x~p)->A(x!1),B(x~p!1)" -> "3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)"[label ="[1->0]"] ; 
-"1:A(x!1),B(x~p!1)->A(x),B(x~p)" -> "0:A(x),B(x~p)->A(x!1),B(x~p!1)"[label ="[0->0];[1->1]"] ; 
-"1:A(x!1),B(x~p!1)->A(x),B(x~p)" -> "2:A(x),C(x)->A(x!1),C(x!1)"[label ="[0->0]"] ; 
-"3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)" -> "0:A(x),B(x~p)->A(x!1),B(x~p!1)"[label ="[-1->0];[0->0]"] ; 
-"3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)" -> "1:A(x!1),B(x~p!1)->A(x),B(x~p)"[label ="[0->0]"] ; 
-"3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)" -> "2:A(x),C(x)->A(x!1),C(x!1)"[label ="[-1->0];[0->0];[1->1]"] ; 
-"3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)" -> "3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)"[label ="[1->1]"] ; 
+"r0" -> "r0_op"[label ="[0->0];[1->1]"] ; 
+"r0_op" -> "r0"[label ="[0->0];[1->1]"] ; 
+"r0_op" -> "r1"[label ="[0->0]"] ; 
+"r0_op" -> "r2"[label ="[1->0]"] ; 
+"r1" -> "r2"[label ="[1->1]"] ; 
 edge [color=red, arrowhead=tee];
-"0:A(x),B(x~p)->A(x!1),B(x~p!1)" -> "0:A(x),B(x~p)->A(x!1),B(x~p!1)"[label =""] ; 
-"0:A(x),B(x~p)->A(x!1),B(x~p!1)" -> "2:A(x),C(x)->A(x!1),C(x!1)"[label =""] ; 
-"1:A(x!1),B(x~p!1)->A(x),B(x~p)" -> "1:A(x!1),B(x~p!1)->A(x),B(x~p)"[label =""] ; 
-"1:A(x!1),B(x~p!1)->A(x),B(x~p)" -> "3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)"[label ="[1->0]"] ; 
-"2:A(x),C(x)->A(x!1),C(x!1)" -> "0:A(x),B(x~p)->A(x!1),B(x~p!1)"[label =""] ; 
-"2:A(x),C(x)->A(x!1),C(x!1)" -> "2:A(x),C(x)->A(x!1),C(x!1)"[label =""] ; 
-"2:A(x),C(x)->A(x!1),C(x!1)" -> "3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)"[label =""] ; 
-"3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)" -> "0:A(x),B(x~p)->A(x!1),B(x~p!1)"[label ="[0->1]"] ; 
-"3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)" -> "1:A(x!1),B(x~p!1)->A(x),B(x~p)"[label ="[-1->0];[0->1]"] ; 
-"3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)" -> "2:A(x),C(x)->A(x!1),C(x!1)"[label =""] ; 
-"3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)" -> "3:B(x~p!),C(x),Ghost,Ghost->Ghost,Ghost,A(x!1),C(x!1)"[label =""] ; 
+"r0" -> "r0"[label =""] ; 
+"r0" -> "r1"[label =""] ; 
+"r0" -> "r2"[label ="[1->0]"] ; 
+"r0_op" -> "r0_op"[label =""] ; 
+"r1" -> "r0"[label =""] ; 
+"r1" -> "r1"[label =""] ; 
+"r2" -> "r0"[label ="[0->1]"] ; 
+"r2" -> "r0_op"[label ="[0->1]"] ; 
+"r2" -> "r2"[label =""] ; 
 }

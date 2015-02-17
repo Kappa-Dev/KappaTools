@@ -2,11 +2,11 @@
 
 digraph G{ 
 node [shape=box, style=filled, fillcolor=lightskyblue];
-"b" ; 
-"a" ; 
+"r0" ; 
+"r1" ; 
 edge [color=green, arrowhead=normal];
-"a" -> "b"[label ="[0->0]"] ; 
+"r1" -> "r0"[label ="[0->0]"] ; 
 edge [color=red, arrowhead=tee];
-"b" -> "b"[label =""] ; 
-"a" -> "a"[label =""] ; 
+"r0" -> "r0"[label =""] ; 
+"r1" -> "r1"[label =""] ; 
 }

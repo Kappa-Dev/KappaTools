@@ -2,11 +2,13 @@
 
 digraph G{ 
 node [shape=box, style=filled, fillcolor=lightskyblue];
-"0:A(x),B(x)->A(x!1),B(x!1)" ; 
-"1:B(x),Ghost->Ghost,C(x)" ; 
+"r0" ; 
+"r1" ; 
+edge [color=green, arrowhead=normal];
+"r0" -> "r1"[label ="[1->0]"] ; 
+"r1" -> "r0"[label ="[-1->0]"] ; 
 edge [color=red, arrowhead=tee];
-"0:A(x),B(x)->A(x!1),B(x!1)" -> "0:A(x),B(x)->A(x!1),B(x!1)"[label =""] ; 
-"0:A(x),B(x)->A(x!1),B(x!1)" -> "1:B(x),Ghost->Ghost,C(x)"[label ="[1->0]"] ; 
-"1:B(x),Ghost->Ghost,C(x)" -> "0:A(x),B(x)->A(x!1),B(x!1)"[label ="[0->1]"] ; 
-"1:B(x),Ghost->Ghost,C(x)" -> "1:B(x),Ghost->Ghost,C(x)"[label =""] ; 
+"r0" -> "r0"[label =""] ; 
+"r1" -> "r0"[label ="[0->1]"] ; 
+"r1" -> "r1"[label =""] ; 
 }
