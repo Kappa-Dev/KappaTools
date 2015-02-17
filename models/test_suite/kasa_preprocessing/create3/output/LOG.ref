@@ -95,10 +95,10 @@ Compilation:rules:2:actions:creation:(agent_id_0,agent_type_1)
 Quarks:Quarkify
 Quarks:Rule 0
 Quarks:TEST
-Quarks:rule_id:0,agent_type:1
-Quarks:rule_id:0,agent_type:1,site_type:0,state:0
 Quarks:rule_id:0,agent_type:0
 Quarks:rule_id:0,agent_type:0,site_type:0,state:0
+Quarks:rule_id:0,agent_type:1
+Quarks:rule_id:0,agent_type:1,site_type:0,state:0
 Quarks:CREATION
 Quarks:rule_id:0,agent_type:1
 Quarks:rule_id:0,agent_type:0
@@ -106,11 +106,11 @@ Quarks:REMOVAL
 Quarks:rule_id:0,agent_type:1
 Quarks:rule_id:0,agent_type:0
 Quarks:MODIFICATION+
-Quarks:rule_id:0,agent_type:1,site_type:0,state:1
 Quarks:rule_id:0,agent_type:0,site_type:0,state:1
+Quarks:rule_id:0,agent_type:1,site_type:0,state:1
 Quarks:MODIFICATION-
-Quarks:rule_id:0,agent_type:1,site_type:0,state:0
 Quarks:rule_id:0,agent_type:0,site_type:0,state:0
+Quarks:rule_id:0,agent_type:1,site_type:0,state:0
 Quarks:Rule 1
 Quarks:TEST
 Quarks:rule_id:1,agent_type:0
@@ -130,23 +130,23 @@ Quarks:MODIFICATION+
 Quarks:MODIFICATION-
 
 REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
-Quarks:agent_test**:agent_type:1,rule:0->[1]
 Quarks:agent_test**:agent_type:0,rule:0->[0]
 Quarks:agent_test**:agent_type:0,rule:1->[0]
+Quarks:agent_test**:agent_type:1,rule:0->[1]
 Quarks:agent_modif+:agent_type:1,rule:0->[1]
 Quarks:agent_modif+:agent_type:1,rule:2->[0]
 Quarks:agent_modif+:agent_type:0,rule:0->[0]
 Quarks:agent_modif-:agent_type:1,rule:0->[1]
 Quarks:agent_modif-:agent_type:0,rule:0->[0]
 Quarks:agent_modif-:agent_type:0,rule:1->[0]
-Quarks:site_test**:agent_type:1,site_type:0,state:0,rule:0->[1]
 Quarks:site_test**:agent_type:0,site_type:0,state:0,rule:0->[0]
+Quarks:site_test**:agent_type:1,site_type:0,state:0,rule:0->[1]
+Quarks:site_modif+:agent_type:0,site_type:0,state:1,rule:0->[0]
 Quarks:site_modif+:agent_type:1,site_type:0,state:1,rule:0->[1]
 Quarks:site_modif+:agent_type:1,site_type:0,state:0,rule:1->[-1]
-Quarks:site_modif+:agent_type:0,site_type:0,state:1,rule:0->[0]
+Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:0->[0]
 Quarks:site_modif-:agent_type:1,site_type:0,state:0,rule:0->[1]
 Quarks:site_modif-:agent_type:1,site_type:0,state:1,rule:1->[-1]
-Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:0->[0]
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Influence_map:Wake_up_map:rule(0):'' A(x,y?),B(x,y?),Ghost,Ghost->Ghost,Ghost,A(x!1),B(x!1) -> rule(0):'' A(x,y?),B(x,y?),Ghost,Ghost->Ghost,Ghost,A(x!1),B(x!1)[0->0];[1->1]
 Influence_map:Wake_up_map:rule(0):'' A(x,y?),B(x,y?),Ghost,Ghost->Ghost,Ghost,A(x!1),B(x!1) -> rule(1):'' A()->Ghost[0->0]
