@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   * 
   * Creation: 2011, the 17th of January
-  * Last modification: 2015, the 13th of February
+  * Last modification: 2015, the 17th of February
   * * 
   * Number agents, sites, states in ckappa represenations
   *  
@@ -276,13 +276,10 @@ let scan_rules parameters a b =
 let scan_compil parameters error compil =
   let parameters = Remanent_parameters.set_trace parameters (local_trace || (Remanent_parameters.get_trace parameters)) in
   let remanent = empty_handler parameters error in 
-  let _ = Printf.fprintf stdout "INIT\n" in 
   let remanent = scan_initial_states parameters remanent compil.Ast.init in 
-  let _ = Printf.fprintf stdout "SIGNATURE\n" in 
   let remanent = scan_declarations parameters remanent compil.Ast.signatures  in 
   let remanent = scan_observables parameters remanent compil.Ast.observables in 
   let remanent = scan_perts parameters remanent compil.Ast.perturbations in 
-  let _ = Printf.fprintf stdout "RULES\n" in 
   let remanent = scan_rules parameters remanent compil.Ast.rules in
   remanent 
    
