@@ -281,7 +281,7 @@ module Nearly_infinite_arrays =
         Basic.set parameters error key value array  
      
     let print = Basic.print
-    let print_var_f = Basic.print_var_f (*MOD*)
+    let print_var_f = Basic.print_var_f
     let print_site_f = Basic.print_site_f 
     let iter = Basic.iter
     let fold = Basic.fold 
@@ -340,7 +340,8 @@ module Extend =
                Underlying.create parameters error (snd array.dimension) 
         in 
         let error,new_underlying = Underlying.set parameters error j value old_underlying in 
-        let error,new_matrix = Extension.set parameters error i new_underlying array.matrix in                                                                                                                              (*        let ordered = ordered && Extension.ordered new_matrix in*) 
+        let error,new_matrix = Extension.set parameters error i new_underlying array.matrix in
+        (* let ordered = ordered && Extension.ordered new_matrix in*) 
           error,{array with matrix = new_matrix}
              
       let get parameters error (i,j) array = 
@@ -363,7 +364,6 @@ module Extend =
           parameters
           a.matrix
 
-      (*MOD*)
       let print_var_f error print_of parameters a = 
         Extension.print error 
           (fun error -> Underlying.print error print_of)
@@ -459,7 +459,6 @@ module Quick_key_list =
         
       let print error f parameters a = Basic.print error f parameters a.basic
 
-      (*MOD*)
       let print_var_f error f parameters a = Basic.print_var_f error f parameters a.basic
                                                    
        let print_site_f error f parameters a = Basic.print_site_f error f parameters a.basic  
@@ -484,7 +483,7 @@ module Quick_key_list =
                 | None -> invalid_arg parameters error (Some "fold, line 391") Exit b
                 | Some im -> f parameters error k im b)
             (error,b) 
-            list
+            (List.rev list)
 
       let fold2_common parameter error f a b c = 
         fold 
