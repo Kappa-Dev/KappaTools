@@ -64,7 +64,7 @@ bin/%: %.native Makefile
 
 
 %.pdf: %.tex $(SCRIPTSWITNESS)
-	cd $(dir $<) && LOG=$$(mktemp -t latexlogXXXX); rm -f *.aux && \
+	cd $(dir $<) && LOG=$$(mktemp -t pdflatexlogXXXX); rm -f *.aux && \
 	pdflatex -halt-on-error $(notdir $<) > $${LOG} 2>&1 && \
 	bibtex $(basename $(notdir $<)) >> $${LOG} 2>&1 && \
 	makeindex $(basename $(notdir $<)).idx >> $${LOG} 2>&1 && \
@@ -73,8 +73,10 @@ bin/%: %.native Makefile
 	rm $${LOG} || { cat $${LOG}; rm $${LOG}; exit 2; }
 
 %.htm: %.tex %.pdf
-	cd $(dir $<) && htlatex $(notdir $<)  "nma.cfg,htm,charset=utf-8,p-width" " -cunihtf -utf8" &&\
-	htlatex $(notdir $<)  "nma.cfg,htm,charset=utf-8,p-width" " -cunihtf -utf8"
+	cd $(dir $<) && LOG=$$(mktemp -t htlatexlogXXXX); \
+	htlatex $(notdir $<)  "nma.cfg,htm,charset=utf-8,p-width" \
+	" -cunihtf -utf8" "" "-halt-on-error"> $${LOG} 2>&1 && \
+	rm $${LOG} || { cat $${LOG}; rm $${LOG}; exit 2; }
 
 %.witness: %.sh $(MANGENREP) bin/KaSim bin/KaSa $(MODELS) %.gplot
 	cd $(dir $@) && KAPPABIN=$(CURDIR)/bin/ sh $(notdir $<) > $(notdir $@) 2>&1 \
