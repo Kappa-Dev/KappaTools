@@ -56,6 +56,7 @@ bin/%: %.native Makefile
 	cd $(dir $<) && LOG=$$(mktemp -t latexlogXXXX); rm -f *.aux && \
 	pdflatex -halt-on-error $(notdir $<) > $${LOG} 2>&1 && \
 	bibtex $(basename $(notdir $<)) >> $${LOG} 2>&1 && \
+	makeindex $(basename $(notdir $<)).idx >> $${LOG} 2>&1 && \
 	pdflatex -halt-on-error $(notdir $<) >> $${LOG} 2>&1 && \
 	pdflatex -halt-on-error $(notdir $<) >> $${LOG} 2>&1 && \
 	rm $${LOG} || { cat $${LOG}; rm $${LOG}; exit 2; }
