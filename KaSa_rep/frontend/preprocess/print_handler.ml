@@ -24,7 +24,7 @@ let print_state parameters state =
   match state with 
     | Ckappa_sig.Internal a -> Printf.fprintf (Remanent_parameters.get_log parameters) "%s%s" (Remanent_parameters.get_prefix parameters) a
     | Ckappa_sig.Binding Cckappa_sig.Free -> Printf.fprintf (Remanent_parameters.get_log parameters) "%sfree" (Remanent_parameters.get_prefix parameters) 
-    | Ckappa_sig.Binding Cckappa_sig.Lnk_type (a,b) -> Printf.fprintf (Remanent_parameters.get_log parameters) "%sagent_type:%d@site_type:%d" (Remanent_parameters.get_prefix parameters) a b (*MOD*)
+    | Ckappa_sig.Binding Cckappa_sig.Lnk_type (a,b) -> Printf.fprintf (Remanent_parameters.get_log parameters) "%sagent_type:%d@site_type:%d" (Remanent_parameters.get_prefix parameters) a b
 
 let print_site parameters site = 
   match site with 
@@ -38,12 +38,11 @@ let print_handler parameters error handler =
   let _ = Printf.fprintf log "%s \n" (Remanent_parameters.get_prefix parameters_agent) in 
   let print_f print_aux =   
     (fun parameters error i site () () -> 
-     let parameters = Remanent_parameters.update_prefix parameters ("site_type:"^(string_of_int i)^"->") in (*MOD*)
+     let parameters = Remanent_parameters.update_prefix parameters ("site_type:"^(string_of_int i)^"->") in
       let _ = print_aux parameters site in 
       let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "\n" in
        error)
   in
-  (*MOD:print_f for state*)
   let print_state_f print_aux =   
     (fun parameters error i state () () -> 
      let parameters = Remanent_parameters.update_prefix parameters ("state_id:"^(string_of_int i)^"->") in
@@ -56,14 +55,14 @@ let print_handler parameters error handler =
       parameters_agent
       error
       (fun parameters error i agent_name () () -> 
-       let _ = Printf.fprintf (Remanent_parameters.get_log parameters_agent) "%sagent_type:%d:%s\n" (Remanent_parameters.get_prefix parameters_agent) i agent_name (*MOD*)
+       let _ = Printf.fprintf (Remanent_parameters.get_log parameters_agent) "%sagent_type:%d:%s\n" (Remanent_parameters.get_prefix parameters_agent) i agent_name
         in error)
       handler.Cckappa_sig.agents_dic
   in 
   let parameters_sites = Remanent_parameters.update_prefix parameters "sites:" in
   let _ = Printf.fprintf log "%s \n" (Remanent_parameters.get_prefix parameters_sites) in
   let error = 
-    Int_storage.Nearly_inf_Imperatif.print_site_f (*MOD*)
+    Int_storage.Nearly_inf_Imperatif.print_site_f
       error
       (fun error parameters a ->
        let _ = Ckappa_sig.Dictionary_of_sites.print parameters error (print_f print_site) a in error)
@@ -73,9 +72,9 @@ let print_handler parameters error handler =
   let parameters_states = Remanent_parameters.update_prefix parameters "states:" in 
   let _ = Printf.fprintf log "%s \n" (Remanent_parameters.get_prefix parameters_states) in
   let error = 
-    Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.print (*TEST*)
+    Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.print
       error 
-      (fun error parameters a -> (*MOD*)
+      (fun error parameters a ->
        Cckappa_sig.Dictionary_of_States.print parameters error (print_state_f print_state) a)
       parameters_states
       handler.Cckappa_sig.states_dic
@@ -86,7 +85,7 @@ let print_handler parameters error handler =
     Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.print
       error 
       (fun error parameters (a,b,c) -> 
-          let _ = Printf.fprintf log "%sagent_type:%i,site_type:%i,state_id:%i\n" (Remanent_parameters.get_prefix parameters) a b c in (*MOD*)
+          let _ = Printf.fprintf log "%sagent_type:%i,site_type:%i,state_id:%i\n" (Remanent_parameters.get_prefix parameters) a b c in
           error)
       parameters_duals
       handler.Cckappa_sig.dual 
