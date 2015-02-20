@@ -489,13 +489,13 @@ let translate_mixture parameters error handler mixture =
      (error,set)
 
  (*TODO*)
-(* let covering_class parameters error handler rule =
+ (*let covering_class parameters error handler rule =
    let error,c_rule_lhs = translate_mixture parameters error handler rule.Ckappa_sig.lhs in
    let error,size = Int_storage.Quick_Nearly_inf_Imperatif.dimension error
      c_rule_lhs.Cckappa_sig.views in
    let covering_class = Cckappa_sig.Address_map_and_set.empty_set in
    let rec aux_agent k (error, covering_class) =
-     if k >= size then (error, covering_classes)
+     if k >= size then (error, covering_class)
      else
        begin
          let error, lhsk = Int_storage.Quick_Nearly_inf_Imperatif.get parameters error
@@ -534,9 +534,9 @@ let translate_mixture parameters error handler mixture =
                          if compare source source' < 0
                          then (source, source') :: covering_class
                          else covering_class
-                       in (error, classes))
-                 in bond_l (error,classes) in
-               let _ = aux_agent (k+1) (error, (agent_type, site_name, lbondk, classes))
+                       in (error, covering_class))
+                 in bond_l (error, covering_class)
+               let _ = aux_agent (k+1) (error, (covering_class, agent_type, lbondk))
        end
          error,
          ({
