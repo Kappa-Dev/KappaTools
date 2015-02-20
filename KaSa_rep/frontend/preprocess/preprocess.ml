@@ -473,40 +473,107 @@ let translate_mixture parameters error handler mixture =
        []
    in 
    l 
-   
- 
+
  let set_bound_sites parameters error k ag set = 
    Cckappa_sig.Site_map_and_set.fold_map 
      (fun site state (error,set) -> 
         if state.Cckappa_sig.site_free = Some true 
         then error,set 
-        else Cckappa_sig.Address_map_and_set.add_set parameters error {Cckappa_sig.agent_index=k; Cckappa_sig.agent_type=ag.Cckappa_sig.agent_name;Cckappa_sig.site=site} set)
+        else Cckappa_sig.Address_map_and_set.add_set parameters error
+          {
+            Cckappa_sig.agent_index = k;
+            Cckappa_sig.agent_type = ag.Cckappa_sig.agent_name;
+            Cckappa_sig.site = site}
+          set)
      ag.Cckappa_sig.agent_interface
      (error,set)
-   
+
+ (*TODO*)
+(* let covering_class parameters error handler rule =
+   let error,c_rule_lhs = translate_mixture parameters error handler rule.Ckappa_sig.lhs in
+   let error,size = Int_storage.Quick_Nearly_inf_Imperatif.dimension error
+     c_rule_lhs.Cckappa_sig.views in
+   let covering_class = Cckappa_sig.Address_map_and_set.empty_set in
+   let rec aux_agent k (error, covering_class) =
+     if k >= size then (error, covering_classes)
+     else
+       begin
+         let error, lhsk = Int_storage.Quick_Nearly_inf_Imperatif.get parameters error
+           k c_rule_lhs.Cckappa_sig.views in
+         let error, (covering_class, agent_type, lbondk) =
+           match lhsk with
+             | None | Some Cckappa_sig.Ghost ->
+               warn parameters error (Some "line 524") Exit
+                 ( Cckappa_sig.Site_map_and_set.empty_map, 0,
+                   Cckappa_sig.Site_map_and_set.empty_map)
+             | Some Cckappa_sig.Agent lagk ->
+               begin
+                 let agent_type = lagk.Cckappa_sig.agent_name in
+                 let error,lbondk = Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get
+                   parameters error k c_rule_lhs.Cckappa_sig.bonds in
+                 let lbondk =
+                   match lbondk with
+                   | None ->  Cckappa_sig.Site_map_and_set.empty_map
+                   | Some a -> a
+                 in
+                 
+                 (*let error, covering_class = Int_storage.Quick_Nearly_inf_Imperatif.set
+                   parameters eror k (Cckappa_sig.update_some_interface lagk) covering_class in
+                 let error, bond_l = Cckappa_sig.Site_map_and_set.diff_map parameters
+                   error lbondk in
+                 let classes = actions.Cckappa_sig.bind in*)
+
+                 (*compute covering class*)
+                 let error, covering_class =
+                   Cckappa_sig.Site_map_and_set.fold_map
+                     (fun site site' (error, covering_class) ->
+                       let source = Cckappa_sig.build_address k agent_type site in
+                       let source' = Cckappa_sig.build_address k agent_type site' in
+
+                       let covering_class = (*TODO*)
+                         if compare source source' < 0
+                         then (source, source') :: covering_class
+                         else covering_class
+                       in (error, classes))
+                 in bond_l (error,classes) in
+               let _ = aux_agent (k+1) (error, (agent_type, site_name, lbondk, classes))
+       end
+         error,
+         ({
+           Cckappa_sig.rule_lhs = c_rule_lhs;
+          }
+         )
+         *)
+
  let set_released_sites parameters error k ag ag' set = 
    Cckappa_sig.Site_map_and_set.fold2_map parameters error  
-     (fun site state state' (error,set) -> 
+     (fun site state state' (error,set) ->
        if state.Cckappa_sig.site_free  = state'.Cckappa_sig.site_free
-	  || state.Cckappa_sig.site_free = Some true
-       then error,set
-         else Cckappa_sig.Address_map_and_set.add_set parameters error {Cckappa_sig.agent_index=k; Cckappa_sig.agent_type=ag.Cckappa_sig.agent_name;Cckappa_sig.site=site} set)
-     (fun site state _ -> 
+       || state.Cckappa_sig.site_free = Some true
+       then error, set
+       else Cckappa_sig.Address_map_and_set.add_set parameters error
+         {
+           Cckappa_sig.agent_index = k;
+           Cckappa_sig.agent_type = ag.Cckappa_sig.agent_name;
+           Cckappa_sig.site = site} set)
+     (fun site state _ ->
        warn parameters error (Some "line 514") Exit set)
      (fun site state (error,set) -> 
-        if state.Cckappa_sig.site_free = Some true 
-	then 
-	  Cckappa_sig.Address_map_and_set.add_set parameters error {Cckappa_sig.agent_index=k; Cckappa_sig.agent_type=ag.Cckappa_sig.agent_name;Cckappa_sig.site=site} set
-	else error,set)
-   ag.Cckappa_sig.agent_interface ag'.Cckappa_sig.agent_interface set
-   
-   
+       if state.Cckappa_sig.site_free = Some true 
+       then 
+	 Cckappa_sig.Address_map_and_set.add_set parameters error
+           {
+             Cckappa_sig.agent_index = k;
+             Cckappa_sig.agent_type = ag.Cckappa_sig.agent_name;
+             Cckappa_sig.site = site} set
+       else error,set)
+     ag.Cckappa_sig.agent_interface ag'.Cckappa_sig.agent_interface set
+
  let equ_port s1 s2 = 
    s1.Cckappa_sig.site_name = s2.Cckappa_sig.site_name 
    && s1.Cckappa_sig.site_free = s2.Cckappa_sig.site_free 
-   && s1.Cckappa_sig.site_state = s2.Cckappa_sig.site_state 
+     && s1.Cckappa_sig.site_state = s2.Cckappa_sig.site_state 
 
-   
  let translate_rule parameters error handler rule = 
    let label,((direction,rule),position) = rule in 
    let error,c_rule_lhs = translate_mixture parameters error handler rule.Ckappa_sig.lhs in 
@@ -552,30 +619,30 @@ let translate_mixture parameters error handler mixture =
                             )
                end 
            | Some Cckappa_sig.Ghost, Some Cckappa_sig.Agent ragk -> (*creation*)
-               begin 
-                let agent_type = ragk.Cckappa_sig.agent_name in 
-                let error,direct = Int_storage.Quick_Nearly_inf_Imperatif.set parameters error k (Cckappa_sig.upgrade_some_interface ragk) direct in  
-                let error,rbondk = Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get parameters error k c_rule_rhs.Cckappa_sig.bonds in  
-                let rbondk  = 
-                  match rbondk with 
-                     | None  -> Cckappa_sig.Site_map_and_set.empty_map
-                     | Some a -> a 
-                in 
-                let lbondk = Cckappa_sig.Site_map_and_set.empty_map in   
-                   error,
-                   (
-                      direct,
-                      reverse,
-                      {
-                        actions 
-                         with Cckappa_sig.creation = (k,ragk.Cckappa_sig.agent_name)::actions.Cckappa_sig.creation
-                      },
-                      half_release_set,
-                      agent_type,
-                      lbondk, 
-                      rbondk
-                             )
-               end 
+             begin 
+               let agent_type = ragk.Cckappa_sig.agent_name in 
+               let error,direct = Int_storage.Quick_Nearly_inf_Imperatif.set parameters error k (Cckappa_sig.upgrade_some_interface ragk) direct in  
+               let error,rbondk = Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get parameters error k c_rule_rhs.Cckappa_sig.bonds in  
+               let rbondk  = 
+                 match rbondk with 
+                   | None  -> Cckappa_sig.Site_map_and_set.empty_map
+                   | Some a -> a 
+               in 
+               let lbondk = Cckappa_sig.Site_map_and_set.empty_map in   
+               error,
+               (
+                 direct,
+                 reverse,
+                 {
+                   actions 
+                  with Cckappa_sig.creation = (k,ragk.Cckappa_sig.agent_name)::actions.Cckappa_sig.creation
+                 },
+                 half_release_set,
+                 agent_type,
+                 lbondk, 
+                 rbondk
+               )
+             end 
            | Some Cckappa_sig.Agent lagk,Some Cckappa_sig.Agent ragk -> 
              let agent_type = lagk.Cckappa_sig.agent_name in 
              let error,ldiff,rdiff = Cckappa_sig.Site_map_and_set.diff_map_pred parameters error equ_port lagk.Cckappa_sig.agent_interface ragk.Cckappa_sig.agent_interface in 
