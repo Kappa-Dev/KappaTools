@@ -67,11 +67,11 @@ bin/%: %.native Makefile
 
 %.witness: %.sh $(MANGENREP) bin/KaSim bin/KaSa $(MODELS) %.gplot
 	cd $(dir $@) && KAPPABIN=$(CURDIR)/bin/ sh $(notdir $<) > $(notdir $@) 2>&1 \
-	|| { cat $(notdir $@); exit 2; }
+	|| { cat $(notdir $@); rm $(notdir $@); exit 2; }
 
 %.witness: %.sh $(MANGENREP) bin/KaSim bin/KaSa $(MODELS)
 	cd $(dir $@) && KAPPABIN=$(CURDIR)/bin/ sh $(notdir $<) > $(notdir $@) 2>&1 \
-	|| { cat $(notdir $@); exit 2; }
+	|| { cat $(notdir $@); rm $(notdir $@); exit 2; }
 
 doc: man/KaSim_manual.pdf
 doc_html: man/KaSim_manual.htm
