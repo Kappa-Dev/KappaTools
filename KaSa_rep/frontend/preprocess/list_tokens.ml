@@ -258,7 +258,7 @@ let scan_perts parameters =
               match m with 
               | Ast.INTRO (_,m,_) | Ast.DELETE(_,m,_) ->   
                 scan_mixture parameters remanent m 
-              | Ast.UPDATE _ | Ast.STOP _ | Ast.SNAPSHOT _  
+              | Ast.UPDATE _ | Ast.STOP _ | Ast.SNAPSHOT _ | Ast.PLOTNOW
 	      | Ast.UPDATE_TOK _ | Ast.PRINT _ | Ast.CFLOW _ 
 	      | Ast.CFLOWOFF _ | Ast.FLUXOFF _ | Ast.FLUX _ -> remanent 
             ) remanent m)

@@ -67,6 +67,7 @@ rule token = parse
 		      | "$UPDATE" -> (ASSIGN2 pos)
 		      | "$PRINT" -> (PRINT pos)
 		      | "$PRINTF" -> (PRINTF pos)
+		      | "$PLOTNOW" -> PLOTNOW
 		      | s ->
 			 raise
 			   (Syntax_Error

@@ -392,6 +392,7 @@ let rec modif_map f error alg =
 	 (error,[]) (List.rev list2)
      in 
 	error,Ast.PRINT (list1',list2',pos)
+   | Ast.PLOTNOW -> error,Ast.PLOTNOW
    | Ast.CFLOW (a,b) -> error,Ast.CFLOW(a,b)
    | Ast.CFLOWOFF (a,b) -> error,Ast.CFLOWOFF(a,b)
    | Ast.FLUX(list,pos) -> 

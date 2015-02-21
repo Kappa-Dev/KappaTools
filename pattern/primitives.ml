@@ -81,6 +81,7 @@ type modification =
   | FLUX of Expr.alg_expr Ast.print_expr Term.with_pos list
   | FLUXOFF of Expr.alg_expr Ast.print_expr Term.with_pos list
   | CFLOWOFF of int
+  | PLOTNOW
   | PRINT of
       (Expr.alg_expr Ast.print_expr Term.with_pos list *
 	 Expr.alg_expr Ast.print_expr Term.with_pos list)

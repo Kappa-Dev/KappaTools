@@ -1697,7 +1697,7 @@ let print_observables_header f state =
 	     ) state.observables in
   Format.fprintf f "@]@."
 
-let print_observables_values f time env counter state =
+let print_observables_values f env counter ?(time=counter.Counter.time) state =
   Format.fprintf f "@[<h>%t%E%t%a@]@."
 		 !Parameter.plotSepChar time
 		 !Parameter.plotSepChar

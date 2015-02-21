@@ -14,7 +14,7 @@ let create filename env state counter =
   let d_chan = Tools.kasim_open_out filename in
   let d = Format.formatter_of_out_channel d_chan in
   let () = print_observables_header d state in
-  let () = print_observables_values d counter.Counter.time env counter state in
+  let () = print_observables_values d env counter state in
   plotDescr :=
     Some { desc=d_chan; form=d; last_point = 0 }
 
@@ -37,11 +37,17 @@ let next_point counter time_increment =
 	/. dT)
   | None ->
      match counter.Counter.dE with
-     | None -> invalid_arg "Plot.next_point: No point interval"
+     | None -> 0
      | Some dE ->
 	(counter.Counter.events - counter.Counter.init_event) / dE
 
 let set_last_point plot p = plot.last_point <- p
+
+let plot_now env counter ?time state =
+  match !plotDescr with
+  | None -> ()
+  | Some plot ->
+     print_observables_values plot.form env counter ?time state
 
 let fill state counter env time_increment =
   let () =
@@ -58,7 +64,7 @@ let fill state counter env time_increment =
 	    invalid_arg (Printf.sprintf "Plot.fill: invalid increment %d" n)
 	  else
 	    if n <> 0
-	    then print_observables_values plot.form counter.Counter.time env counter state
+	    then plot_now env counter state
        | None ->
 	  match counter.Counter.dT with
 	  | None -> ()
@@ -68,7 +74,7 @@ let fill state counter env time_increment =
 	     while (!n > 0) && (Counter.check_output_time counter !output_time) do
 	       output_time := !output_time +. dT ;
 	       Counter.tick counter !output_time counter.Counter.events ;
-	       print_observables_values plot.form !output_time env counter state;
+	       plot_now env counter ~time:!output_time  state;
 	       n:=!n-1 ;
 	     done in
   Counter.tick counter counter.Counter.time counter.Counter.events
