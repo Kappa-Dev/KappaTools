@@ -1,4 +1,3 @@
 
 File "side-effects.ka", line 5, characters 0-17:
 Warning: breaking a semi-link on site 'x' will induce a side effect
-Warning: No data points are required, use -p option for plotting data.

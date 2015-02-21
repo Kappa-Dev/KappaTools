@@ -25,7 +25,7 @@ let checkFileExists () =
   check !Parameter.influenceFileName ;
   check !Parameter.fluxFileName ;
   check !Parameter.marshalizedOutFile ;
-  if !Parameter.pointNumberValue > 0 then check !Parameter.outputDataName
+  check !Parameter.outputDataName
 
 let close_desc opt_env =
   List.iter (fun d -> close_out d) !Parameter.openOutDescriptors ;
@@ -177,15 +177,9 @@ let main =
     Parameter.setOutputName ();
     checkFileExists() ;
 
-    let () =
-      if !Parameter.pointNumberValue > 0 then
-	Plot.create !Parameter.outputDataName env state counter
-      else
-	ExceptionDefn.warning
-	  (fun f ->
-	   Format.fprintf
-	     f "No data points are required,@ use -p option for plotting data.")
-    in
+    let () = Plot.create !Parameter.outputDataName in
+    let () = if !Parameter.pointNumberValue > 0 then
+	       Plot.plot_now env counter state in
 
     let () =
       match !Parameter.marshalizedOutFile with

@@ -2,26 +2,30 @@ open State
 open Mods
 open ExceptionDefn
 
-type t = {
+type opened = {
   desc:out_channel;
   form:Format.formatter;
   mutable last_point : int
 }
 
-let plotDescr : t option ref = ref None
+type t = Wait of string | Ready of opened
 
-let create filename env state counter =
+let plotDescr = ref (Wait "__dummy")
+
+let create filename = plotDescr := Wait filename
+
+let set_up filename env counter ?time state =
   let d_chan = Tools.kasim_open_out filename in
   let d = Format.formatter_of_out_channel d_chan in
   let () = print_observables_header d state in
   let () = print_observables_values d env counter state in
   plotDescr :=
-    Some { desc=d_chan; form=d; last_point = 0 }
+    Ready { desc=d_chan; form=d; last_point = 0 }
 
 let close counter =
   match !plotDescr with
-  | None -> ()
-  | Some plot ->
+  | Wait _ -> ()
+  | Ready plot ->
      let n = ref (!Parameter.progressBarSize - counter.Counter.ticks) in
      let () = while !n > 0 do
 		Format.printf "%c" !Parameter.progressBarSymbol ;
@@ -45,15 +49,15 @@ let set_last_point plot p = plot.last_point <- p
 
 let plot_now env counter ?time state =
   match !plotDescr with
-  | None -> ()
-  | Some plot ->
+  | Wait f -> set_up f env counter ?time state
+  | Ready plot ->
      print_observables_values plot.form env counter ?time state
 
 let fill state counter env time_increment =
   let () =
     match !plotDescr with
-    | None -> ()
-    | Some plot ->
+    | Wait _ -> ()
+    | Ready plot ->
        let next = next_point counter time_increment in
        let last = plot.last_point in
        let n = next - last in
