@@ -24,17 +24,19 @@ let determine_time_advance activity state counter env =
        | _ -> dt
       ) depset infinity
 
-let event state maybe_active_pert_ids story_profiling
-	  event_list counter env =
-  (* 1. Updating dependencies of time or event number *)
+let exec_perts pert_ids state counter env =
   let env,pert_ids =
-    State.update_dep state Term.EVENT maybe_active_pert_ids counter env in
+    State.update_dep state Term.EVENT pert_ids counter env in
   let env,pert_ids =
     State.update_dep state Term.TIME pert_ids counter env in
-  (* 2. Applying perturbations *)
+  External.try_perturbate [] state pert_ids [] counter env
+
+
+let event state maybe_active_pert_ids story_profiling
+	  event_list counter env =
+  (* 1. Updating dependencies of time or event numb then apply perturbations *)
   let state,remain_pert_ids,env,obs_from_perturbation,pert_events =
-    External.try_perturbate [] state pert_ids [] counter env
-  in
+    exec_perts maybe_active_pert_ids state counter env in
   (* Adding perturbation event to story -if any *)
   let story_profiling,event_list,cpt =
     if Environment.tracking_enabled env then (*if logging events is required*)
@@ -56,7 +58,7 @@ let event state maybe_active_pert_ids story_profiling
   in
   let () = counter.Counter.perturbation_events <- cpt in
 
-  (*3. Time advance*)
+  (*2. Time advance*)
   let activity = State.total_activity state in
   if activity < 0. then invalid_arg "Activity invariant violation" ;
   let activity = abs_float activity (* -0 must become +0 *) in
@@ -91,7 +93,7 @@ let event state maybe_active_pert_ids story_profiling
     | None -> false
   in
 
-  (*4. Draw rule*)
+  (*3. Draw rule*)
   if !Parameter.debugModeOn then
     Debug.tag (Printf.sprintf "Drawing a rule... (activity=%f) " (State.total_activity state));
 
@@ -103,7 +105,7 @@ let event state maybe_active_pert_ids story_profiling
       | Null_event i -> (Counter.stat_null i counter ; (None,state))
   in
 
-  (*5. Apply rule & negative update*)
+  (*4. Apply rule & negative update*)
   let opt_new_state =
     match opt_instance with
     | None -> None
@@ -126,7 +128,7 @@ let event state maybe_active_pert_ids story_profiling
        with Null_event _ -> None
   in
 
-  (*6. Positive update*)
+  (*5. Positive update*)
 
   let env,state,pert_ids,story_profiling,event_list =
     match opt_new_state with
@@ -216,6 +218,8 @@ let loop state story_profiling event_list counter env =
       iter state pert_ids story_profiling event_list counter env
     else (*exiting the loop*)
       let () = Plot.fill state counter env 0.0 in (*Plotting last measures*)
+      let state,_remain_pert_ids,env,_obs_from_perturbation,_pert_events =
+	exec_perts pert_ids state counter env in
       let () = Plot.close counter in
       if Environment.tracking_enabled env then
 	let causal,weak,strong =
