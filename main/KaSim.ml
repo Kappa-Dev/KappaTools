@@ -15,7 +15,7 @@ let checkFileExists () =
     | "" -> ()
     | file ->
        let file = Tools.kasim_path file in
-       if Sys.file_exists file then
+       if not !Parameter.batchmode && Sys.file_exists file then
 	 let () =
 	   Format.eprintf
 	     "File '%s' already exists do you want to erase (y/N)?@." file in
@@ -88,6 +88,8 @@ let main =
      "Enable safe mode") ;
     ("--backtrace", Arg.Set Parameter.backtrace,
      "Backtracing exceptions") ;
+    ("--batch", Arg.Set Parameter.batchmode,
+     "Set non interactive mode (always assume default answer)") ;
     ("--gluttony",
      Arg.Unit (fun () -> Gc.set { (Gc.get()) with
 				  Gc.space_overhead = 500 (*default 80*) } ;),
@@ -194,10 +196,11 @@ let main =
     if !Parameter.influenceFileName <> ""  then
       begin
 	let desc = Tools.kasim_open_out !Parameter.influenceFileName in
-	State.dot_of_influence_map (Format.formatter_of_out_channel desc) state env; 
+	State.dot_of_influence_map (Format.formatter_of_out_channel desc) state env;
 	close_out desc
       end ;
-    if !Parameter.compileModeOn then (State.dump_rules Format.err_formatter state env; exit 0);
+    if !Parameter.compileModeOn
+    then (State.dump_rules Format.err_formatter state env; exit 0);
     let profiling = Compression_main.D.S.PH.B.PB.CI.Po.K.P.init_log_info () in
     let grid,profiling,event_list =
       if Environment.tracking_enabled env then
@@ -215,7 +218,7 @@ let main =
 	let grid = Causal.empty_grid() in
         let event_list = [] in
         let profiling,event_list =
-          Compression_main.D.S.PH.B.PB.CI.Po.K.store_init profiling state event_list in 
+          Compression_main.D.S.PH.B.PB.CI.Po.K.store_init profiling state event_list in
         grid,profiling,event_list
       else (Causal.empty_grid(),profiling,[])
     in
@@ -276,18 +279,20 @@ let main =
 	 Format.eprintf
 	   "@.***%s: would you like to record the current state? (y/N)***@."
 	   msg;
-	 (match String.lowercase (Tools.read_input ()) with
-	  | ("y" | "yes") ->
-	     begin
-	       Parameter.dotOutput := false ;
-	       let desc = kasim_open_out !Parameter.dumpFileName in
-	       State.snapshot state counter desc !Parameter.snapshotHighres env;
-	       Parameter.debugModeOn:=true ; State.dump state counter env ;
-	       close_out desc ;
-	       Format.eprintf "Final state dumped (%s)@." !Parameter.dumpFileName
-	     end
-	  | _ -> ()
-	 ) ;
+	 if not !Parameter.batchmode then
+	   (match String.lowercase (Tools.read_input ()) with
+	    | ("y" | "yes") ->
+	       begin
+		 Parameter.dotOutput := false ;
+		 let desc = kasim_open_out !Parameter.dumpFileName in
+		 State.snapshot
+		   state counter desc !Parameter.snapshotHighres env;
+		 Parameter.debugModeOn:=true ; State.dump state counter env ;
+		 close_out desc ;
+		 Format.eprintf "Final state dumped (%s)@." !Parameter.dumpFileName
+	       end
+	    | _ -> ()
+	   ) ;
 	 close_desc (Some env) (*closes all other opened descriptors*)
        end
     | ExceptionDefn.Deadlock ->
