@@ -37,7 +37,7 @@
 %mod: [T]>10 do ($ADD 10000 C(); $UPDATE 'n_c' 'C') 
 %mod: [T]>20 do ($TRACK 'Cpp' [true] ; $UPDATE 'cflow' 'Cpp')
 %mod: ('Cpp' - 'cflow' > 9 && 'cflow' >0) do $TRACK 'Cpp' [false]
-%mod: repeat [E+] [mod] ([Emax] / 50) = 0 do $PLOTNOW until [false]
+%mod: repeat [E+] [mod] ([Emax] / 50) = 0 do $PLOTENTRY until [false]
 
 %def: "displayCompression" "weak" 
 %def: "showIntroEvents" "true"

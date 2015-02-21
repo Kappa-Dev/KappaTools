@@ -92,7 +92,7 @@ let print_expr env f e =
 let modification env f = function
   | Primitives.PRINT (nme,va) ->
      Format.fprintf f "$PRINTF %a <%a>" (print_expr env) nme (print_expr env) va
-  | Primitives.PLOTNOW -> Format.pp_print_string f "$PLOTNOW"
+  | Primitives.PLOTENTRY -> Format.pp_print_string f "$PLOTENTRY"
   | Primitives.ITER_RULE ((n,_),rule) ->
      if Mixture.is_empty rule.Primitives.lhs then
        Format.fprintf f "$ADD %a %a" (alg_expr env) n

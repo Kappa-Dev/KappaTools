@@ -763,6 +763,7 @@ where \textit{boolean\_expression} and \textit{effect\_list}\index{effect} are d
 	&& | \tcb{\$FLUX} \textit{string\_expression} \textit{boolean} \\
     && | \tcb{\$TRACK \var{var\_name}} \textit{boolean} \\
     && | \tcb{\$UPDATE \var{var\_name}} \textit{algebraic\_expression} \\
+    && | \tcb{\$PLOTENTRY} \\
     && | \tcb{\$PRINT} \tcb{<}\textit{string\_expression}\tcb{>} \\
     && | \tcb{\$PRINTF} \textit{string\_expression} \tcb{<}\textit{string\_expression}\tcb{>} \\
     \\
@@ -939,6 +940,13 @@ The effect \ttt{\$PRINT <\textit{string\_expression}>} enables one to output val
 \item [] until [false]
 }}
 will ask \KaSim~to output the value of token \ttt{A} in a file "token\_$n$.dat" which changes at each new productive event, each time its value gets below 0.
+
+\subsection{Add an entry in the output data}
+The effect \ttt{\$PLOTENTRY} outputs a line with the current value of observables in the data file. For example,
+\ttt{\ITE{
+\item[] \%mod: repeat [E+] [mod] 10 = 0 do \$PLOTENTRY until [false]
+}}
+will store the value of observables every 10 productive events.
 
 \section{Link type}
 

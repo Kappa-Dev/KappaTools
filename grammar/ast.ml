@@ -83,7 +83,7 @@ type 'mixture modif_expr =
   | PRINT of
       (('mixture ast_alg_expr print_expr with_pos list) *
 	 ('mixture  ast_alg_expr print_expr with_pos list) * Tools.pos)
-  | PLOTNOW
+  | PLOTENTRY
   | CFLOW of (string Term.with_pos * Tools.pos)
   | CFLOWOFF of (string Term.with_pos * Tools.pos)
   | FLUX of 'mixture ast_alg_expr print_expr with_pos list * Tools.pos

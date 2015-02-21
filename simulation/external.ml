@@ -84,7 +84,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
       let str = eval_pexpr pexpr state counter env in
       snapshot str;
       (env, state ,pert_ids,tracked,pert_events)
-  | Primitives.PLOTNOW ->
+  | Primitives.PLOTENTRY ->
      let () = Plot.plot_now env counter state in
      (env, state, pert_ids, tracked, pert_events)
   | Primitives.PRINT (pexpr_file,pexpr) ->

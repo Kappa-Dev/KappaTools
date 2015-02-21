@@ -653,8 +653,8 @@ let effects_of_modif variables lrules env ast_list =
 	    let (mix',print') = compile_print_expr env mix print in
 	    let (env',mixs') = mixtures_of_result mixs env mix' in
 	    (mixs',lrules,(Primitives.PRINT (pexpr',print'))::rev_effects,env')
-	 | PLOTNOW ->
-	    (mixs, lrules, (Primitives.PLOTNOW)::rev_effects, env)
+	 | PLOTENTRY ->
+	    (mixs, lrules, (Primitives.PLOTENTRY)::rev_effects, env)
        in
        iter variables lrules rev_effects env tl
   in
