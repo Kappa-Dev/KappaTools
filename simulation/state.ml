@@ -1688,23 +1688,13 @@ let dot_of_flux desc state  env =
 	print_flux state.flux true;
 	Format.fprintf desc "}@."
 
-let print_observables_header f state =
-  let () = Format.fprintf f "@[<h>%s"
-			  (if !Parameter.emacsMode then "time" else "# time") in
-  let () = List.iter
-	     (fun obs ->
-	      Format.fprintf f "%t%s" !Parameter.plotSepChar obs.label
-	     ) state.observables in
-  Format.fprintf f "@]@."
+let observables_header state =
+  Tools.array_map_of_list (fun obs -> obs.label) state.observables
 
-let print_observables_values f env counter ?(time=counter.Counter.time) state =
-  Format.fprintf f "@[<h>%t%E%t%a@]@."
-		 !Parameter.plotSepChar time
-		 !Parameter.plotSepChar
-		 (Pp.list !Parameter.plotSepChar Nbr.print)
-		 (List.map
-		    (fun obs -> value_alg state counter ~time env obs.expr)
-		    state.observables)
+let observables_values env counter ?(time=counter.Counter.time) state =
+  (time, Tools.array_map_of_list
+	   (fun obs -> value_alg state counter ~time env obs.expr)
+	   state.observables)
 
 module Safe = struct
 exception Invariant_violation of string

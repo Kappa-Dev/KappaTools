@@ -14,14 +14,6 @@ let plotDescr = ref (Wait "__dummy")
 
 let create filename = plotDescr := Wait filename
 
-let set_up filename env counter ?time state =
-  let d_chan = Tools.kasim_open_out filename in
-  let d = Format.formatter_of_out_channel d_chan in
-  let () = print_observables_header d state in
-  let () = print_observables_values d env counter state in
-  plotDescr :=
-    Ready { desc=d_chan; form=d; last_point = 0 }
-
 let close counter =
   match !plotDescr with
   | Wait _ -> ()
@@ -32,6 +24,26 @@ let close counter =
 		n := !n-1
 	      done in
      close_out plot.desc
+
+let print_header_raw f a =
+  Format.fprintf f "@[<h>%s%t%a@]@."
+		 (if !Parameter.emacsMode then "time" else "# time")
+		 !Parameter.plotSepChar
+		 (Pp.array !Parameter.plotSepChar
+			   (fun _ -> Format.pp_print_string)) a
+
+let print_values_raw f (time,l) =
+  Format.fprintf f "@[<h>%t%E%t%a@]@."
+		 !Parameter.plotSepChar time !Parameter.plotSepChar
+		 (Pp.array !Parameter.plotSepChar (fun _ -> Nbr.print)) l
+
+let set_up filename env counter ?time state =
+  let d_chan = Tools.kasim_open_out filename in
+  let d = Format.formatter_of_out_channel d_chan in
+  let () = print_header_raw d (observables_header state) in
+  let () = print_values_raw d (observables_values env counter state) in
+  plotDescr :=
+    Ready { desc=d_chan; form=d; last_point = 0 }
 
 let next_point counter time_increment =
   match counter.Counter.dT with
@@ -51,7 +63,7 @@ let plot_now env counter ?time state =
   match !plotDescr with
   | Wait f -> set_up f env counter ?time state
   | Ready plot ->
-     print_observables_values plot.form env counter ?time state
+     print_values_raw plot.form (observables_values env counter ?time state)
 
 let fill state counter env time_increment =
   let () =

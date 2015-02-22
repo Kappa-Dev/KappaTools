@@ -78,9 +78,9 @@ val dump : t -> Counter.t -> Environment.t -> unit
 val dot_of_flux : Format.formatter -> t -> Environment.t -> unit
 val dot_of_influence_map : Format.formatter -> t -> Environment.t -> unit
 
-val print_observables_header : Format.formatter -> t -> unit
-val print_observables_values :
-  Format.formatter -> Environment.t -> Counter.t -> ?time:float -> t -> unit
+val observables_header : t -> string array
+val observables_values :
+  Environment.t -> Counter.t -> ?time:float -> t -> (float * Nbr.t array)
 
 module Safe : sig
   type check_options = {rule_act : bool ; lifts : bool ; unary : bool}
