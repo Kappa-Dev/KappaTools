@@ -11,6 +11,7 @@ module Env : sig
   val sigs : t -> Signature.s
   val cc_map : t -> cc Mods.IntMap.t
   val nb_ag : t -> int
+  val print : Format.formatter -> t -> unit
   val print_dot : Format.formatter -> t -> unit
 end
 
@@ -29,5 +30,5 @@ val finish_new : work -> (Env.t*t)
 
 (** {5 Use a connected component } *)
 (*val equal : t -> t -> bool*)
-val print : Signature.s -> Format.formatter -> t -> unit
+val print : bool -> Signature.s -> Format.formatter -> t -> unit
 val print_dot : Signature.s -> Format.formatter -> t -> unit

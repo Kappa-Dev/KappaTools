@@ -133,7 +133,7 @@ let find_ty cc id =
     if List.mem id cc.nodes_by_type.(i) then i else aux (pred i)
   in aux (Array.length cc.nodes_by_type - 1)
 
-let print sigs f cc =
+let print with_id sigs f cc =
   let print_intf (_,_,ag_i as ag) link_ids internals neigh =
     snd
       (Tools.array_fold_lefti
@@ -164,6 +164,7 @@ let print sigs f cc =
 	       let () = Format.fprintf f "!%i" i in
 	       true,out') (false,link_ids) neigh) in
   let () = Format.pp_open_box f 2 in
+  let () = if with_id then Format.fprintf f "/*cc%i*/@ " cc.id in
   let (_,_) =
     IntMap.fold
       (fun x el (not_empty,link_ids) ->
@@ -251,7 +252,7 @@ let print_sons_dot cc_id f sons =
 let print_point_dot sigs f (id,point) =
   let style = if point.is_obs then "box" else "circle" in
   Format.fprintf f "@[cc%i [label=\"%a\", shape=\"%s\"];@]@,%a"
-		 point.cc.id (print sigs) point.cc
+		 point.cc.id (print false sigs) point.cc
 		 style (print_sons_dot id) point.sons
 
 module Env : sig
@@ -268,6 +269,7 @@ module Env : sig
   val to_work : t -> work
   val fresh_id : t -> int
   val nb_ag : t -> int
+  val print : Format.formatter -> t -> unit
   val print_dot : Format.formatter -> t -> unit
 end = struct
   type t = {
@@ -301,6 +303,18 @@ let check_vitality env = assert (env.used_by_a_begin_new = false)
 let cc_map env = IntMap.fold (fun i x out ->
 			      if x.is_obs then IntMap.add i x.cc out else out)
 			     env.domain IntMap.empty
+let print f env =
+  Format.fprintf
+    f "@[<v>%a@]"
+    (Pp.set ~trailing:Pp.space IntMap.bindings Pp.space
+	    (fun f (_,p) ->
+	     Format.fprintf f "@[<h>(%a) -> %a -> (%a)@]"
+			    (Pp.list Pp.space Format.pp_print_int) p.fathers
+			    (print true env.sig_decl) p.cc
+			    (Pp.list Pp.space
+				     (fun f s -> Format.pp_print_int f s.dst))
+			    p.sons))
+    env.domain
 
 let add_point id el env =
   {

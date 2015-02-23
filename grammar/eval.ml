@@ -913,6 +913,7 @@ let initialize logger overwrite result =
 
   Debug.tag logger "\t -agent signatures" ;
   let sigs_nd = Signature.create result.Ast.signatures in
+  let () = Debug.global_sigs := sigs_nd in
   let tk_nd =
     NamedDecls.create (array_map_of_list (fun x -> (x,())) result.Ast.tokens) in
 

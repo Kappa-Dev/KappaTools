@@ -189,8 +189,8 @@ let connected_components_sum_of_ambiguous_mixture contact_map env mix =
     if !Parameter.compileModeOn then
       let boxed_cc f cc =
 	let () = Format.pp_open_box f 2 in
-	let () =
-	  Connected_component.print (Connected_component.Env.sigs env') f cc in
+	let () = Connected_component.print
+		   true (Connected_component.Env.sigs env') f cc in
 	Format.pp_close_box f () in
       let one_ccs f x =
 	Format.fprintf f "---@,%a"

@@ -3,4 +3,4 @@
 BUILDROOT=${KAPPABIN}../_build/
 
 ledit ocamldebug -I ${BUILDROOT}dev -I ${BUILDROOT}grammar \
-      ${BUILDROOT}main/KaSim.byte $@
+      -I ${BUILDROOT}pattern ${BUILDROOT}main/KaSim.byte $@

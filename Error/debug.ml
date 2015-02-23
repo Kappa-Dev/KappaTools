@@ -5,3 +5,5 @@ let tag_if_debug s =
   then Format.kfprintf (fun f -> Format.pp_print_newline f ())
 		       Format.std_formatter s
   else Format.ifprintf Format.std_formatter s
+
+let global_sigs : Signature.s ref = ref (Signature.create [])
