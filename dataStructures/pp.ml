@@ -17,17 +17,19 @@ let hashtbl pr_sep pr_el f tbl =
 let comma f = fprintf f ",@ "
 let colon f = fprintf f ";@ "
 let space f = pp_print_space f ()
+let cut f = pp_print_cut f ()
 let empty f = fprintf f ""
 let option pr f = function
   | None -> ()
   | Some x -> fprintf f "@ %a" pr x
 
-let array pr_sep pr_el f a =
+let array ?(trailing=(fun f -> ())) pr_sep pr_el f a =
   let rec aux i f =
     if i < Array.length a then
       let () = Format.fprintf f "%a" (pr_el i) a.(i) in
       if i < Array.length a - 1 then
 	Format.fprintf f "%t%t" pr_sep (aux (succ i))
+      else if i > 0 then trailing f
   in aux 0 f
 
 let plain_array pr_el f a =

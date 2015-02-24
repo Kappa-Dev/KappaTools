@@ -2,13 +2,19 @@ open State
 open Mods
 open ExceptionDefn
 
-type opened = {
+type fd = {
   desc:out_channel;
   form:Format.formatter;
+}
+
+type format = Raw of fd | Svg of Pp_svg.store
+
+type plot = {
+  format: format;
   mutable last_point : int
 }
 
-type t = Wait of string | Ready of opened
+type t = Wait of string | Ready of plot
 
 let plotDescr = ref (Wait "__dummy")
 
@@ -23,7 +29,9 @@ let close counter =
 		Format.printf "%c" !Parameter.progressBarSymbol ;
 		n := !n-1
 	      done in
-     close_out plot.desc
+     match plot.format with
+     | Raw plot ->  close_out plot.desc
+     | Svg s -> Pp_svg.to_file s
 
 let print_header_raw f a =
   Format.fprintf f "@[<h>%s%t%a@]@."
@@ -38,12 +46,30 @@ let print_values_raw f (time,l) =
 		 (Pp.array !Parameter.plotSepChar (fun _ -> Nbr.print)) l
 
 let set_up filename env counter ?time state =
-  let d_chan = Tools.kasim_open_out filename in
-  let d = Format.formatter_of_out_channel d_chan in
-  let () = print_header_raw d (observables_header state) in
-  let () = print_values_raw d (observables_values env counter state) in
+  let head = observables_header state in
+  let init_va = observables_values env counter state in
+  let title =
+    if !Parameter.marshalizedInFile <> ""
+    then !Parameter.marshalizedInFile ^" output"
+    else match !Parameter.inputKappaFileNames with
+	 | [ f ] -> f^" output"
+	 | _ -> "KaSim output" in
+  let format =
+    if Filename.check_suffix filename ".svg" then
+      Svg {Pp_svg.file = filename;
+	   Pp_svg.title = title;
+	   Pp_svg.descr = "";
+	   Pp_svg.legend = head;
+	   Pp_svg.points = [init_va];
+	  }
+    else
+      let d_chan = Tools.kasim_open_out filename in
+      let d = Format.formatter_of_out_channel d_chan in
+      let () = print_header_raw d head in
+      let () = print_values_raw d init_va in
+      Raw {desc=d_chan; form=d} in
   plotDescr :=
-    Ready { desc=d_chan; form=d; last_point = 0 }
+    Ready {format = format; last_point = 0}
 
 let next_point counter time_increment =
   match counter.Counter.dT with
@@ -63,7 +89,12 @@ let plot_now env counter ?time state =
   match !plotDescr with
   | Wait f -> set_up f env counter ?time state
   | Ready plot ->
-     print_values_raw plot.form (observables_values env counter ?time state)
+     match plot.format with
+     | Raw fd ->
+	print_values_raw fd.form (observables_values env counter ?time state)
+     | Svg s ->
+	s.Pp_svg.points <-
+	  observables_values env counter ?time state :: s.Pp_svg.points
 
 let fill state counter env time_increment =
   let () =
