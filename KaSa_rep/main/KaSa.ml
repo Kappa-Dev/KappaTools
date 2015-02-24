@@ -66,7 +66,12 @@ let main () =
     then Print_quarks.print_inhibition_map parameters_influence_map error handler c_compil Handler.print_rule_txt Handler.print_var_txt Handler.get_label_of_rule_txt Handler.get_label_of_var_txt Handler.print_labels_txt "\n" inhibition_map  
     else error 
   in 
-  let error = Print_quarks.dot_of_influence_map parameters_influence_map error handler c_compil (wake_up_map,inhibition_map) in 
+  let error = Print_quarks.dot_of_influence_map parameters_influence_map error handler c_compil (wake_up_map,inhibition_map) in
+  (*FIXME*)
+  (*let parameters_covering_classes = Remanent_parameters.update_call_stack parameters Covering_classes.local_trace (Some "Covering_classes.covering_classes") in 
+  let parameters_covering_classes = Remanent_parameters.update_prefix parameters_covering_classes "Covering_classes:" in 
+  let error,covering_classes = Covering_classes.covering_classes parameters_covering_classes error handler c_compil  in *)
+ 
   let _ = Exception.print parameters error  in
    ()
 
