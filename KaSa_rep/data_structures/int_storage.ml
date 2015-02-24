@@ -48,7 +48,7 @@ module Int_storage_imperatif =
         size:int ; 
      }
  
-  let dimension error a = error,a.size
+  let dimension error a = error, a.size
    
   let imperatif = true 
   let ordered _ = true 
@@ -73,8 +73,8 @@ module Int_storage_imperatif =
            {
               array = Array.make (size+1) None; 
               size = size;
-               }
-            
+           }
+
    let init parameters error array size = 
      let error,dimension = dimension error array in 
      if dimension < size 
@@ -498,10 +498,91 @@ module Quick_key_list =
             c
            
 end:Storage with type key = Basic.key and type dimension = Basic.dimension) 
- 
+
+(*TODO: union find *)
+(*
+module Union_find_array =
+  functor (Basic:Storage with type key = int and type dimension = int) ->
+  (struct
+      type key = int
+      type dimension = int
+      type 'a t =
+        {
+          array: 'a array;
+          size : int
+        }
+
+      let dimension error a = error, a.size
+      let key_list = Basic.key_list
+      let get = Basic.get
+      let unsafe_get = Basic.unsafe_get
+      let init = Basic.init
+      let set = Basic.set
+      let print = Basic.print
+      let print_var_f = Basic.print_var_f
+      let print_site_f = Basic.print_site_f
+      let iter = Basic.iter
+      let fold = Basic.fold
+      let fold2_common = Basic.fold2_common
+                     
+      let rec create parameters error size = (*FIXME*)
+        if size < 0
+        then
+          let error, array = create parameters error 0 in
+          invalid_arg parameters error (Some "create, line 60") Exit array
+        else
+        error,
+          {array = Array.make (size+1);
+           size = size
+          }
+
+      let find_parent parent i =
+        let rec find j =
+          if parent.(j) = j
+          then j
+          else find parent.(j)
+        in
+        find i
+
+      let union_rank {array; _} i j =
+        let parent_i = find_parent array i in
+        let parent_j = find_parent array j in
+        if parent_i < parent_j
+        then
+          begin
+            array.(parent_i) <- array.(parent_j);
+            parent_j = parent_j + parent_i
+          end
+        else
+          begin
+            array.(parent_j) <- array.(parent_i);
+            parent_i = parent_i + parent_j
+          end
+            
+      (*let union_rank {array; size} i j =
+        let parent_i = find_parent array i in
+        let parent_j = find_parent array j in
+        if size.(parent_i) < size.(parent_j)
+        then
+          begin
+            array.(parent_i) <- array.(parent_j);
+            size.(parent_j)  <- size.(parent_j) + size.(parent_i)
+          end
+        else
+          begin
+            array.(parent_j) <- array.(parent_i);
+            size.(parent_i)  <- size.(parent_i) + size.(parent_j)
+          end*)
+
+      let is_connected_ranked {array; _} i j =
+        (find_parent array i) = (find_parent array j)
+      
+  end:Storage with type key = int and type dimension = int)
+ *)
   
 module Nearly_inf_Imperatif = Nearly_infinite_arrays (Int_storage_imperatif)
-module Quick_Nearly_inf_Imperatif = Quick_key_list(Nearly_inf_Imperatif)                                           
+module Quick_Nearly_inf_Imperatif = Quick_key_list(Nearly_inf_Imperatif)
+
 module Int_Int_storage_Imperatif_Imperatif = Extend(Int_storage_imperatif)(Int_storage_imperatif)  
 module Nearly_Inf_Int_Int_storage_Imperatif_Imperatif = Extend(Quick_Nearly_inf_Imperatif)(Quick_Nearly_inf_Imperatif)
 module Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif = Extend(Quick_Nearly_inf_Imperatif)(Extend(Quick_Nearly_inf_Imperatif)(Quick_Nearly_inf_Imperatif))
