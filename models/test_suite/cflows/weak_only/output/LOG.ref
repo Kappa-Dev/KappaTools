@@ -1,4 +1,4 @@
-+ Command line is: 'KaSim' '-i' 'weak_only.ka' '-seed' '924556145' '-e' '100000' '-d' 'output' '-p' '50'
++ Command line is: 'KaSim' '-i' 'weak_only.ka' '-seed' '924556145' '-e' '100000' '-d' 'output' '-o' 'data.svg' '-p' '50'
 Parsing weak_only.ka...
 done
 + Initialized random number generator with seed 924556145
