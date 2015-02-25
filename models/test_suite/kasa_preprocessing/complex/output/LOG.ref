@@ -396,12 +396,6 @@ Influence_map:Wake_up_map:rule(2):'r1' B(x!,y!),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y
 Influence_map:Wake_up_map:rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!,y!),C(x~u,y~p) -> rule(1):'r0_op' A(x!1,y!2),B(x!1,y!2)->A(x,y),B(x,y)[0->1]
 Influence_map:Wake_up_map:rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!,y!),C(x~u,y~p) -> rule(2):'r1' B(x!,y!),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2)[0->0];[1->1]
 Influence_map:Wake_up_map:rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!,y!),C(x~u,y~p) -> rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!,y!),C(x~u,y~p)[0->0]
-Influence_map:Inhibition_map:rule(0):'r0' A(x,y),B(x,y)->A(x!1,y!2),B(x!1,y!2) -> rule(0):'r0' A(x,y),B(x,y)->A(x!1,y!2),B(x!1,y!2)
-Influence_map:Inhibition_map:rule(1):'r0_op' A(x!1,y!2),B(x!1,y!2)->A(x,y),B(x,y) -> rule(1):'r0_op' A(x!1,y!2),B(x!1,y!2)->A(x,y),B(x,y)
 Influence_map:Inhibition_map:rule(1):'r0_op' A(x!1,y!2),B(x!1,y!2)->A(x,y),B(x,y) -> rule(2):'r1' B(x!,y!),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2)[1->0]
 Influence_map:Inhibition_map:rule(2):'r1' B(x!,y!),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2) -> rule(1):'r0_op' A(x!1,y!2),B(x!1,y!2)->A(x,y),B(x,y)[0->1]
-Influence_map:Inhibition_map:rule(2):'r1' B(x!,y!),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2) -> rule(2):'r1' B(x!,y!),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2)
-Influence_map:Inhibition_map:rule(2):'r1' B(x!,y!),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2) -> rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!,y!),C(x~u,y~p)
-Influence_map:Inhibition_map:rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!,y!),C(x~u,y~p) -> rule(2):'r1' B(x!,y!),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2)
-Influence_map:Inhibition_map:rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!,y!),C(x~u,y~p) -> rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!,y!),C(x~u,y~p)
 execution finished without any exception

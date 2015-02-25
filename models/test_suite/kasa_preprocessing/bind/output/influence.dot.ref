@@ -13,13 +13,7 @@ edge [color=green, arrowhead=normal];
 "r0_op" -> "r2"[label ="[1->0]"] ; 
 "r1" -> "r2"[label ="[1->1]"] ; 
 edge [color=red, arrowhead=tee];
-"r0" -> "r0"[label =""] ; 
-"r0" -> "r1"[label =""] ; 
 "r0" -> "r2"[label ="[1->0]"] ; 
-"r0_op" -> "r0_op"[label =""] ; 
-"r1" -> "r0"[label =""] ; 
-"r1" -> "r1"[label =""] ; 
 "r2" -> "r0"[label ="[0->1]"] ; 
 "r2" -> "r0_op"[label ="[0->1]"] ; 
-"r2" -> "r2"[label =""] ; 
 }

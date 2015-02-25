@@ -8,7 +8,5 @@ edge [color=green, arrowhead=normal];
 "r0" -> "r1"[label ="[1->0]"] ; 
 "r1" -> "r0"[label ="[-1->0]"] ; 
 edge [color=red, arrowhead=tee];
-"r0" -> "r0"[label =""] ; 
 "r1" -> "r0"[label ="[0->1]"] ; 
-"r1" -> "r1"[label =""] ; 
 }

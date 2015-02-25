@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   * 
   * Creation: March the 10th of 2011
-  * Last modification: October the 5th of 2014
+  * Last modification: February the 25th of 2015
   * 
   * Compute the influence relations between rules and sites. 
   *  
@@ -31,7 +31,7 @@ let generic_add fold2_common agent_diag rule_diag parameters error handler n a b
                     error 
                     (fun parameters error rule' a' map -> 
                         let rule' = n + rule' in 
-                        if not rule_diag && rule = rule' 
+                        if (not rule_diag && rule = rule') 
 			then 
                           (error,map) 
                         else 
@@ -43,7 +43,11 @@ let generic_add fold2_common agent_diag rule_diag parameters error handler n a b
                             | Some old -> old 
                           in 
 			  let error,couple = Quark_type.Labels.add_couple parameters error agent_diag a a' old in
-			  Quark_type.Int2Set_and_map.add_map parameters error key couple map)
+			  if Quark_type.Labels.is_empty_couple couple
+			  then 
+			    error,map
+			  else 
+			    Quark_type.Int2Set_and_map.add_map parameters error key couple map)
                  b 
                  map)
           a

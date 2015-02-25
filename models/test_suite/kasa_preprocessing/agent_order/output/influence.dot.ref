@@ -8,7 +8,6 @@ edge [color=green, arrowhead=normal];
 "remove" -> "bind"[label ="[1->1];[2->0]"] ; 
 "remove" -> "remove"[label ="[2->0];[2->1]"] ; 
 edge [color=red, arrowhead=tee];
-"bind" -> "bind"[label =""] ; 
 "bind" -> "remove"[label ="[0->1]"] ; 
 "remove" -> "bind"[label ="[1->0]"] ; 
 "remove" -> "remove"[label ="[1->0]"] ; 

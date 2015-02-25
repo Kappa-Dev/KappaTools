@@ -149,8 +149,4 @@ Influence_map:Wake_up_map:rule(0):'r0' A(x,y?),B(x,y?),Ghost,Ghost->Ghost,Ghost,
 Influence_map:Wake_up_map:rule(0):'r0' A(x,y?),B(x,y?),Ghost,Ghost->Ghost,Ghost,A(x!1),B(x!1) -> rule(1):'r1' A()->Ghost[0->0]
 Influence_map:Wake_up_map:rule(1):'r1' A()->Ghost -> rule(0):'r0' A(x,y?),B(x,y?),Ghost,Ghost->Ghost,Ghost,A(x!1),B(x!1)[-1->1]
 Influence_map:Wake_up_map:rule(2):'r2' Ghost->B() -> rule(0):'r0' A(x,y?),B(x,y?),Ghost,Ghost->Ghost,Ghost,A(x!1),B(x!1)[0->1]
-Influence_map:Inhibition_map:rule(0):'r0' A(x,y?),B(x,y?),Ghost,Ghost->Ghost,Ghost,A(x!1),B(x!1) -> rule(0):'r0' A(x,y?),B(x,y?),Ghost,Ghost->Ghost,Ghost,A(x!1),B(x!1)
-Influence_map:Inhibition_map:rule(0):'r0' A(x,y?),B(x,y?),Ghost,Ghost->Ghost,Ghost,A(x!1),B(x!1) -> rule(1):'r1' A()->Ghost
-Influence_map:Inhibition_map:rule(1):'r1' A()->Ghost -> rule(0):'r0' A(x,y?),B(x,y?),Ghost,Ghost->Ghost,Ghost,A(x!1),B(x!1)
-Influence_map:Inhibition_map:rule(1):'r1' A()->Ghost -> rule(1):'r1' A()->Ghost
 execution finished without any exception

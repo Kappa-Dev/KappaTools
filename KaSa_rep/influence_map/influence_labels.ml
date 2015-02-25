@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   * 
   * Creation: March, the 7th 2011
-  * Last modification: February, the 5th 2015
+  * Last modification: February, the 25th 2015
   * * 
   * Labels to be associated with influence relations
   *  
@@ -50,6 +50,7 @@ sig
   val label_of_int: Remanent_parameters_sig.parameters -> Exception.method_handler -> int -> Exception.method_handler * label  
   val empty: label_set
   val empty_couple: label_set_couple   
+  val is_empty_couple: label_set_couple -> bool 
   val add_set:     Remanent_parameters_sig.parameters -> Exception.method_handler -> label -> label_set -> Exception.method_handler * label_set 
   val add_couple:  Remanent_parameters_sig.parameters -> Exception.method_handler -> bool -> label_set -> label_set -> label_set_couple -> Exception.method_handler * label_set_couple
   val dump:        Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.kappa_handler -> label_set  -> Exception.method_handler 
@@ -67,6 +68,7 @@ module Empty =
   let label_of_int handler error _ = error,() 
   let empty = () 
   let empty_couple = ()
+  let is_empty_couple _ = true
   let add_set _ error _ _ = error,() 
   let add_couple _ error _ _ _ _ = error,() 
   let dump _ error _ _ = error 
@@ -87,6 +89,7 @@ module Extensive =
       let label_of_int = L.label_of_int
       let empty = Set.empty_set   
       let empty_couple = Pair_Set.empty_set  
+      let is_empty_couple = Pair_Set.is_empty_set
       let add_set = Set.add_set
       let add_couple remanent error bool a b sol = 
         Set.fold_set 
@@ -198,6 +201,7 @@ module Implicit =
       let label_of_int = L.label_of_int
       let empty = Set.empty_set 
       let empty_couple  = []
+      let is_empty_couple x = x=[]
       let add_set = Set.add_set
       let add_couple remanent error bool a b sol = error,(a,b)::sol 
         

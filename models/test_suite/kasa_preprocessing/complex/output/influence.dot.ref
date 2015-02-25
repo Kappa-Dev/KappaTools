@@ -16,12 +16,6 @@ edge [color=green, arrowhead=normal];
 "r1_op" -> "r1"[label ="[0->0];[1->1]"] ; 
 "r1_op" -> "r1_op"[label ="[0->0]"] ; 
 edge [color=red, arrowhead=tee];
-"r0" -> "r0"[label =""] ; 
-"r0_op" -> "r0_op"[label =""] ; 
 "r0_op" -> "r1"[label ="[1->0]"] ; 
 "r1" -> "r0_op"[label ="[0->1]"] ; 
-"r1" -> "r1"[label =""] ; 
-"r1" -> "r1_op"[label =""] ; 
-"r1_op" -> "r1"[label =""] ; 
-"r1_op" -> "r1_op"[label =""] ; 
 }
