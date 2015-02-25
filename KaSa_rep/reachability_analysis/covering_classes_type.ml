@@ -18,21 +18,16 @@ let warn parameters mh message exn default =
 let local_trace = false
                     
 module Label  = Covering_classes_labels.Int_labels
-module Labels = Covering_classes_labels.Extensive (label)
+module Labels = Covering_classes_labels.Extensive(Label)
 
-type agent_class = Cckappa_sig.agent_name
-type covering_class  = (Cckappa_sig.agent_name * Cckappa_sig.site_name * Cckappa_sig.site_name)
-
+type covering_class = (Cckappa_sig.agent_name * Cckappa_sig.site_name)
+                          
 module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
-module SiteMap  = Int_storage.Extend (AgentMap)
-                  (Int_storage.Extend (AgentMap)(AgentMap))
+module SiteMap = Int_storage.Extend (AgentMap)(AgentMap)
 
-type agents_classes = Labels.label_set AgentMap.t (*FIXME*)
-                                       
-type covering_classes  = Labels.label_set SiteMap.t (*FIXME*)
+type sites_covering_classes  = Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t SiteMap.t
 
 type covering_classes =
   {
-    agent_test : agent_classes;
-    covering_classes : covering_classes;
+    covering_classes : sites_covering_classes;
   }

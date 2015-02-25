@@ -18,25 +18,17 @@ let warn parameters mh message exn default =
 module type Labels =
   sig
     type label
+
     val label_of_int : Remanent_parameters_sig.parameters -> Exception.method_handler -> int -> Exception.method_handler * label
     val to_string : Remanent_parameters_sig.parameters -> Exception.method_handler -> label -> Exception.method_handler * string
-    val dump : Remanent_parameters_sig.parameters -> Exception.method_handler -> label -> Exception.method_handler
   end
 
 module Int_labels =
   (struct
       type label = int
-                     
+                    
       let label_of_int _ error i = error, i
-                                            
-      let to_string parameter error i =
-        error, string_of_int i
-                             
-      let dump h error i =
-        let error, s = to_string h error i in
-        let _ = Printf.fprintf (Remanent_parameters.get_log h) "%s" s in
-        error
-
+      let to_string parameter error i = error, string_of_int i
     end:Labels)
 
 module type Label_handler =
@@ -44,11 +36,10 @@ module type Label_handler =
     type label
     type label_set
            
-    (*TODO if needed*)
+    (*TODO*)
     val label_of_int : Remanent_parameters_sig.parameters -> Exception.method_handler -> int -> Exception.method_handler * label
     val empty : label_set
     val add_set : Remanent_parameters_sig.parameters -> Exception.method_handler -> label -> label_set -> Exception.method_handler * label_set
-    val dump : Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.kappa_handler -> label_set -> Exception.method_handler
     val to_string : Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.kappa_handler -> label_set -> Exception.method_handler * string list
   end
 
@@ -57,15 +48,14 @@ module Empty =
       type label = unit
       type label_set = unit
 
-      let lable_of_int handler error _ = error, ()
+      let label_of_int handler error _ = error, ()
       let empty = ()
       let add_set _ error _ _ = error, ()
-      let dump _ error _ _ = error
       let to_string _ error _ _ = error, []
    end:Label_handler with type label = unit)
     
 module Extensive =
-  (functor (L:Lables) ->
+  (functor (L:Labels) ->
    (struct
        type label = L.label
        module Set = Set_and_map.Make
@@ -78,24 +68,6 @@ module Extensive =
        let label_of_int = L.label_of_int
        let empty = Set.empty_set
        let add_set = Set.add_set
-
-       let dump parameter error handler a =
-         let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "[" in
-         let _, error =
-           Set.fold_set
-             (fun a (bool, error) ->
-              let error, a' = L.to_string parameter error a in
-              let _ =
-                if bool
-                then Printf.fprintf (Remanent_parameters.get_log parameter) ";%s" a'
-                else Printf.fprintf (Remanent_parameters.get_log parameter) "%s" a'
-              in
-              true, error
-             )
-             a (false, error)
-         in
-         let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "]" in
-         error
 
        let to_string parameter error handler a =
          let solution = [ "[" ] in
@@ -114,6 +86,5 @@ module Extensive =
          let solution = List.rev ("]" :: solution) in
          error, solution
                              
-   end:Label_handler)
-  )
+   end:Label_handler))
     
