@@ -56,6 +56,10 @@ let read_input () =
 	with
 		| Stream.Failure -> invalid_arg "Tools.Read_input: cannot read stream"
 
+let option_map f = function
+  | Some x -> Some (f x)
+  | None -> None
+
 let list_of_string str =
 	let stream = Stream.of_string str in
 	let rec parse stream acc cont =

@@ -960,7 +960,8 @@ let initialize result =
   let env = Environment.init_roots_of_nl_rules env in
   Debug.tag "+ Building initial simulation state...";
   let counter =
-    Counter.create 0.0 0 !Parameter.maxTimeValue !Parameter.maxEventValue in
+    Counter.create !Parameter.pointNumberValue
+		   0.0 0 !Parameter.maxTimeValue !Parameter.maxEventValue in
   Debug.tag "\t -Counting initial local patterns..." ;
   let (state, env) =
     State.initialize sg token_vector rules kappa_vars

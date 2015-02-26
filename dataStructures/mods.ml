@@ -240,17 +240,15 @@ module Counter =
 
     let last_increment c = let _,t = c.last_tick in (c.time -. t)
 
-    let compute_dT () =
-      let points = !Parameter.pointNumberValue in
+    let compute_dT points mx_t =
       if points <= 0 then None else
-	match !Parameter.maxTimeValue with
+	match mx_t with
 	| None -> None
 	| Some max_t -> Some (max_t /. (float_of_int points))
 
-    let compute_dE () =
-      let points = !Parameter.pointNumberValue in
+    let compute_dE points mx_e =
       if points <= 0 then None else
-	match !Parameter.maxEventValue with
+	match mx_e with
 	| None -> None
 	| Some max_e ->
 	   Some (max (max_e / points) 1)
@@ -268,14 +266,14 @@ module Counter =
       in
       let last_event,last_time = counter.last_tick in
       let n_t =
-	match !Parameter.maxTimeValue with
+	match counter.max_time with
 	| None -> 0
 	| Some tmax ->
 	   int_of_float
 	     ((time -. last_time) *.
 		(float_of_int !Parameter.progressBarSize) /. tmax)
       and n_e =
-	match !Parameter.maxEventValue with
+	match counter.max_events with
 	| None -> 0
 	| Some emax ->
 	   if emax = 0 then 0
@@ -300,9 +298,13 @@ module Counter =
       try c.stat_null.(i) <- c.stat_null.(i) + 1
       with exn -> invalid_arg "Invalid null event identifier"
 
-    let create init_t init_e mx_t mx_e =
-      let dE = compute_dE() in
-      let dT = match dE with None -> compute_dT() | Some _ -> None
+    let create nb_points init_t init_e mx_t mx_e =
+      let dE =
+	compute_dE nb_points (Tools.option_map (fun x -> x - init_e) mx_e) in
+      let dT = match dE with
+	  None ->
+	  compute_dT nb_points (Tools.option_map (fun x -> x -. init_t) mx_t)
+	| Some _ -> None
       in
       {time = init_t ;
        events = init_e ;
