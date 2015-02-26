@@ -127,37 +127,3 @@ let iteri f i =
   let rec aux j =
   if j < i then let () = f j in aux (succ j)
   in aux 0
-
-let kasim_path f =
-  if Filename.is_relative f && Filename.dirname f = Filename.current_dir_name
-  then Filename.concat !Parameter.outputDirName f
-  else f
-
-let kasim_open_out f =
-  open_out (kasim_path f)
-
-let find_available_name name ext =
-  let base = try Filename.chop_extension name
-	     with Invalid_argument _ -> name in
-  if Sys.file_exists (base^"."^ext) then
-    let v = ref 0 in
-    let () =
-      while Sys.file_exists (base^"~"^(string_of_int !v)^"."^ext)
-      do incr v; done
-    in base^"~"^(string_of_int !v)^"."^ext
-  else
-    (base^"."^ext)
-
-let open_out_fresh_filename base_name concat_list ext =
-  let tmp_name =
-    kasim_path (try Filename.chop_extension base_name
-		with Invalid_argument _ -> base_name) in
-  let base_name = String.concat "_" (tmp_name::concat_list) in
-  open_out (find_available_name base_name ext)
-
-let mk_dir_r d =
-  let rec aux d =
-    let par = Filename.dirname d in
-    let () = if not (Sys.file_exists par) then aux par in
-    Unix.mkdir d 0o775 in
-  Unix.handle_unix_error aux d

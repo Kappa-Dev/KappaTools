@@ -7,7 +7,7 @@ type store = {
 }
 
 let new_file name =
-  let chan = Tools.kasim_open_out name in
+  let chan = Kappa_files.open_out name in
   let f = Format.formatter_of_out_channel chan in
   let () = Format.fprintf f "@[<v><?xml version=\"1.0\"?>@," in
   let () =

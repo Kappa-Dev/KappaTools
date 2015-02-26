@@ -790,13 +790,15 @@ let init_graph_of_result env res =
   (sg,token_vector,env)
 
 let configurations_of_result result =
-  let set_value pos_p param value_list f ass =
+  let raw_set_value pos_p param value_list f =
     match value_list with
-    | (v,pos) :: _ -> ass := f (v,pos)
+    | (v,pos) :: _ -> f (v,pos)
     | [] -> ExceptionDefn.warning
 	      ~pos:pos_p
 	      (fun f -> Format.fprintf f "Empty value for parameter %s" param)
   in
+  let set_value pos_p param value_list f ass =
+    raw_set_value pos_p param value_list (fun x -> ass := f x) in
   List.iter
     (fun ((param,pos_p),value_list) ->
      match param with
@@ -816,7 +818,7 @@ let configurations_of_result result =
 	  parse value_list
 	end
      | "cflowFileName"	->
-	set_value pos_p param value_list fst Parameter.cflowFileName
+	raw_set_value pos_p param value_list (fun x -> Kappa_files.set_cflow (fst x))
      | "progressBarSize" ->
 	set_value pos_p param value_list
 		  (fun (v,p) ->
@@ -881,19 +883,19 @@ let configurations_of_result result =
 			       (pos_v,Printf.sprintf "Value %s should be either \"yes\" or \"no\"" error))
 		  ) Parameter.useColor
      | "dumpInfluenceMap" ->
-	set_value pos_p param value_list
-		  (fun (v,p) ->
-		   match v with
-		   | "true" | "yes" ->
-			       if !Parameter.influenceFileName = ""
-			       then "im.dot" else !Parameter.influenceFileName
-		   | "false" | "no" -> ""
-		   | _ as error ->
-		      raise (ExceptionDefn.Semantics_Error
-			       (p,Printf.sprintf "Value %s should be either \"yes\" or \"no\"" error))
-		  ) Parameter.influenceFileName
+	raw_set_value
+	  pos_p param value_list
+	  (fun (v,p) ->
+	   match v with
+	   | "true" | "yes" -> Kappa_files.set_up_influence ()
+	   | "false" | "no" -> Kappa_files.set_influence ""
+	   | _ as error ->
+	      raise (ExceptionDefn.Semantics_Error
+		       (p,"Value "^error^" should be either \"yes\" or \"no\""))
+	     )
      | "influenceMapFileName" ->
-	set_value pos_p param value_list fst Parameter.influenceFileName
+	raw_set_value pos_p param value_list
+		      (fun x -> Kappa_files.set_influence (fst x))
      | "showIntroEvents" ->
 	set_value pos_p param value_list
 		  (fun (v,p) -> match v with

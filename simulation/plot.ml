@@ -63,7 +63,7 @@ let set_up filename env counter ?time state =
 	   Pp_svg.points = [init_va];
 	  }
     else
-      let d_chan = Tools.kasim_open_out filename in
+      let d_chan = Kappa_files.open_out filename in
       let d = Format.formatter_of_out_channel d_chan in
       let () = print_header_raw d head in
       let () = print_values_raw d init_va in

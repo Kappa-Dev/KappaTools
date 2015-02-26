@@ -113,13 +113,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
   | Primitives.FLUXOFF pexpr ->
     begin
       let str = eval_pexpr pexpr state counter env in
-      let desc = Tools.kasim_open_out
-		   (match str with "" -> !Parameter.fluxFileName
-				 | _ -> str) in
-      Parameter.add_out_desc desc ;
-      State.dot_of_flux (Format.formatter_of_out_channel desc) state env ;
-      close_out desc ;
-      Parameter.openOutDescriptors := List.tl (!Parameter.openOutDescriptors) ;
+      Kappa_files.with_flux str (fun d -> State.dot_of_flux d state env);
       Parameter.fluxModeOn := false ;
       (env,state,pert_ids,tracked,pert_events)
     end
@@ -137,12 +131,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
 	     (fun f -> Format.fprintf f "Flux modes are overlapping");
       Parameter.fluxModeOn := true ;
       let nme = eval_pexpr pexpr state counter env in
-      let _ =
-	match nme with
-	| "" -> Parameter.fluxFileName := "flux"^"_"^(string_of_int (Counter.event counter))
-	| _ -> Parameter.fluxFileName := nme
-      in
-      Parameter.set Parameter.fluxFileName (Some "dot");
+      let () = Kappa_files.set_flux nme (Counter.event counter) in
       (env, state, pert_ids,tracked,pert_events)
     end
 
@@ -150,16 +139,11 @@ let apply_effect p_id pert tracked pert_events state counter env =
   let snapshot str =
     Debug.tag_if_debug "Taking a snapshot of current state (%s)" str;
     let ext = if !Parameter.dotOutput then "dot" else "ka" in
-    let str = if str="" then !Parameter.snapshotFileName else str in
-    let desc =
-      Tools.open_out_fresh_filename
-	str [string_of_int (Counter.event counter)] ext in
+    let desc = Kappa_files.open_snapshot str (Counter.event counter) ext in
     let hr = !Parameter.snapshotHighres in
-    Parameter.openOutDescriptors := desc::(!Parameter.openOutDescriptors) ;
     State.snapshot state counter desc hr env;
     (*could use a dedicated thread here*)
-    close_out desc ;
-    Parameter.openOutDescriptors := List.tl (!Parameter.openOutDescriptors)
+    Kappa_files.close_out_desc desc;
   in
   List.fold_left
     (fun (env, state, pert_ids,tracked,pert_events) effect ->

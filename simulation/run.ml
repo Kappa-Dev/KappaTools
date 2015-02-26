@@ -67,9 +67,9 @@ let event state maybe_active_pert_ids story_profiling
 	     begin
 	       if !Parameter.dumpIfDeadlocked then
 		 let desc =
-		   Tools.kasim_open_out (if !Parameter.dotOutput
-					 then "deadlock.dot"
-					 else "deadlock.ka") in
+		   Kappa_files.open_out (if !Parameter.dotOutput
+					  then "deadlock.dot"
+					  else "deadlock.ka") in
 		 let () =
 		   State.snapshot state counter desc true env in
 		 close_out desc

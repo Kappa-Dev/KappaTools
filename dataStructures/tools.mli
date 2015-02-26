@@ -21,15 +21,9 @@ val list_map_flatten : ('a -> 'b list) -> 'a list -> 'b list
 val list_fold_right_map :
   ('a -> 'b -> 'a * 'c) -> 'a -> 'b list -> 'a * 'c list
 
-(** {5 Utilities on files } *)
-val kasim_open_out : string -> out_channel
-val open_out_fresh_filename : string -> string list -> string -> out_channel
-val kasim_path : string -> string
-
 (** {5 Misc utilities } *)
 val bit_rep_size : int -> int (**number of bits used to represent n in base 2*)
 val pow : int -> int -> int
 val pow64 : Int64.t -> Int64.t -> Int64.t
 val read_input : unit -> string
 val replace_space : string -> string
-val mk_dir_r : string -> unit

@@ -9,26 +9,8 @@ let usage_msg =
     "Usage is KaSim [-i] input_file [-e events | -t time] [-p points] [-o output_file]\n"
 let version_msg = "Kappa Simulator: "^version^"\n"
 
-let checkFileExists () =
-  let check file =
-    match file with
-    | "" -> ()
-    | file ->
-       let file = Tools.kasim_path file in
-       if not !Parameter.batchmode && Sys.file_exists file then
-	 let () =
-	   Format.eprintf
-	     "File '%s' already exists do you want to erase (y/N)?@." file in
-	 let answer = Tools.read_input () in
-	 if answer<>"y" then exit 1
-  in
-  check !Parameter.influenceFileName ;
-  check !Parameter.fluxFileName ;
-  check !Parameter.marshalizedOutFile ;
-  check !Parameter.outputDataName
-
 let close_desc opt_env =
-  List.iter (fun d -> close_out d) !Parameter.openOutDescriptors ;
+  let () = Kappa_files.close_all_out_desc () in
   List.iter (fun d -> close_in d) !Parameter.openInDescriptors ;
   match opt_env with
   | None -> ()
@@ -54,20 +36,14 @@ let main =
      "Max time of simulation (arbitrary time unit)");
     ("-p", Arg.Set_int Parameter.pointNumberValue,
      "Number of points in plot");
-    ("-o", Arg.Set_string Parameter.outputDataName,
+    ("-o", Arg.String Kappa_files.set_data,
      "file name for data output") ;
     ("-d",
-     Arg.String
-       (fun s ->
-	let () = try
-	    if not (Sys.is_directory s)
-	    then (Format.eprintf "'%s' is not a directory@." s ; exit 1)
-	  with Sys_error msg -> Tools.mk_dir_r s in
-	Parameter.outputDirName := s
-       ), "Specifies directory name where output file(s) should be stored") ;
+     Arg.String Kappa_files.set_dir,
+     "Specifies directory name where output file(s) should be stored") ;
     ("-load-sim", Arg.Set_string Parameter.marshalizedInFile,
      "load simulation package instead of kappa files") ;
-    ("-make-sim", Arg.Set_string Parameter.marshalizedOutFile,
+    ("-make-sim", Arg.String Kappa_files.set_marshalized,
      "save kappa files as a simulation package") ;
     ("--implicit-signature",
      Arg.Unit (fun () ->
@@ -176,29 +152,17 @@ let main =
 	    exit 1
     in
 
-    Parameter.setOutputName ();
-    checkFileExists() ;
+    Kappa_files.setCheckFileExists() ;
 
-    let () = Plot.create !Parameter.outputDataName in
+    let () = Plot.create (Kappa_files.get_data ()) in
     let () = if !Parameter.pointNumberValue > 0 then
 	       Plot.plot_now env counter state in
 
-    let () =
-      match !Parameter.marshalizedOutFile with
-      | "" -> ()
-      | file ->
-	 let d = open_out_bin (kasim_path file) in
-	 begin
-	   Marshal.to_channel d (env,state) [Marshal.Closures] ;
-	   close_out d
-	 end
-    in
-    if !Parameter.influenceFileName <> ""  then
-      begin
-	let desc = Tools.kasim_open_out !Parameter.influenceFileName in
-	State.dot_of_influence_map (Format.formatter_of_out_channel desc) state env;
-	close_out desc
-      end ;
+    let () = Kappa_files.with_marshalized
+	       (fun d -> Marshal.to_channel d (env,state) [Marshal.Closures]) in
+
+    Kappa_files.with_influence
+      (fun d -> State.dot_of_influence_map d state env);
     if !Parameter.compileModeOn
     then (State.dump_rules Format.err_formatter state env; exit 0);
     let profiling = Compression_main.D.S.PH.B.PB.CI.Po.K.P.init_log_info () in
@@ -256,12 +220,8 @@ let main =
 				((float_of_int n) /. (float_of_int (Counter.null_event counter)))
 	   |_ -> Format.printf "\tna@."
 	  ) counter.Counter.stat_null ;
-      if !Parameter.fluxModeOn then
-	begin
-	  let d = kasim_open_out !Parameter.fluxFileName in
-	  State.dot_of_flux (Format.formatter_of_out_channel d) state env ;
-	  close_out d
-	end
+	if !Parameter.fluxModeOn then
+	  Kappa_files.with_flux "" (fun d -> State.dot_of_flux d state env)
     with
     | Invalid_argument msg ->
        begin
@@ -284,12 +244,11 @@ let main =
 	    | ("y" | "yes") ->
 	       begin
 		 Parameter.dotOutput := false ;
-		 let desc = kasim_open_out !Parameter.dumpFileName in
-		 State.snapshot
-		   state counter desc !Parameter.snapshotHighres env;
-		 Parameter.debugModeOn:=true ; State.dump state counter env ;
-		 close_out desc ;
-		 Format.eprintf "Final state dumped (%s)@." !Parameter.dumpFileName
+		 Kappa_files.with_dump
+		   (fun desc ->
+		    State.snapshot
+		      state counter desc !Parameter.snapshotHighres env;
+		    Parameter.debugModeOn:=true ; State.dump state counter env)
 	       end
 	    | _ -> ()
 	   ) ;

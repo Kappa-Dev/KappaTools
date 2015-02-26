@@ -78,47 +78,10 @@ let cpuTime = ref 0.0
 let initSimTime () = cpuTime := Sys.time ()  
 
 (*Name convention*)
-let outputDirName = ref ""
-let snapshotFileName = ref "snap"
-
-let dumpFileName = ref "dump.ka"
-let cflowFileName = ref "cflow.dot" 
-let profilingName = ref "profiling.txt" 
-let with_weak_compression = "weakly_compressed"
-let without_compression = "without_compression" 
-let influenceFileName = ref ""
-let fluxFileName = ref ""
-let outputDataName = ref "data.out"
 let inputKappaFileNames:(string list ref) = ref [] 
 let marshalizedInFile = ref "" 
-let marshalizedOutFile = ref ""
-
-
-let set name ext_opt =
-  if !name <> "" then
-    let fname =
-      match ext_opt with
-      | None -> !name
-      | Some ext ->
-	 if (Filename.check_suffix !name ext) then !name
-	 else
-	   (!name^"."^ext)
-    in
-    name:=fname
-
-let setOutputName () =
-  set snapshotFileName (Some "dot");
-  set dumpFileName (Some "ka");
-  set influenceFileName (Some "dot") ;
-  set fluxFileName (Some "dot") ;
-  set marshalizedOutFile None;
-  set outputDataName None
-
-let (openOutDescriptors:out_channel list ref) = ref []
 let (openInDescriptors:in_channel list ref) = ref []
-
-let add_out_desc d = openOutDescriptors := d::!openOutDescriptors  
-let add_in_desc d = openInDescriptors := d::!openInDescriptors  
+let add_in_desc d = openInDescriptors := d::!openInDescriptors
 
 type current_compression_mode = Weak | Strong | Causal
 type compression_mode = 

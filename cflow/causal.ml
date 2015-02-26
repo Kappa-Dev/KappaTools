@@ -460,7 +460,7 @@ let dot_of_grid profiling desc enriched_grid state env =
 			IntMap.add d (IntSet.add eid set) dmap
 		) depth_of_event IntMap.empty
 	in
-	let _ = Parameter.add_out_desc desc in 
+	let () = Kappa_files.add_out_desc desc in
         let _ = profiling (Format.formatter_of_out_channel desc) in
 	fprintf desc "digraph G{\n ranksep=.5 ; \n" ;
 	IntMap.iter
@@ -572,17 +572,15 @@ let pretty_print config_closure compression_type label story_list state env =
 			 (Pp.list (fun f -> Format.fprintf f ";")
 				  Format.pp_print_int) ids
 	in
-	let desc =
-	  Tools.open_out_fresh_filename (!(Parameter.cflowFileName))
-					[compression_type;string_of_int cpt]
-					"dot" in
-        dot_of_grid profiling desc enriched_config state env ;
+	let desc = Kappa_files.fresh_cflow_filename
+		     [compression_type;string_of_int cpt] "dot" in
+        let () = dot_of_grid profiling desc enriched_config state env in
+	close_out desc;
 	cpt+1
       ) 0 story_list
   in
   let desc =
-    Tools.open_out_fresh_filename (!(Parameter.cflowFileName))
-				  [compression_type;"Summary"] "dat" in
+    Kappa_files.fresh_cflow_filename [compression_type;"Summary"] "dat" in
   let _ = fprintf desc "#id\tE\tT\t\tdepth\tsize\t\n" in 
   let _ = 
     List.fold_left 
