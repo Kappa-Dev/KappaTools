@@ -99,9 +99,22 @@ let rec compile_alg ?label var_map tk_map ?max_allowed_var
      in (mixs,(TOKEN_ID i,pos))
   | Ast.STATE_ALG_OP (op) -> (mixs,(STATE_ALG_OP (op),pos))
   | Ast.CONST n -> (mixs,(CONST n,pos))
-  | Ast.EMAX -> (mixs,(CONST (Nbr.getMaxEventValue ()),pos))
-  | Ast.TMAX -> (mixs,(CONST (Nbr.getMaxTimeValue ()),pos))
-  | Ast.PLOTNUM -> (mixs,(CONST (Nbr.getPointNumberValue ()),pos))
+  | Ast.EMAX ->
+     let getMaxEventValue =
+       match !Parameter.maxEventValue with
+       | Some n -> Nbr.I n
+       | None -> Format.eprintf "[emax] constant is evaluated to infinity@.";
+		 Nbr.F infinity in
+     (mixs,(CONST getMaxEventValue,pos))
+  | Ast.TMAX ->
+     let getMaxTimeValue = match !Parameter.maxTimeValue with
+       | Some t -> Nbr.F t
+       | None -> Format.eprintf "[tmax] constant is evaluated to infinity@.";
+		 Nbr.F infinity in
+     (mixs,(CONST getMaxTimeValue,pos))
+  | Ast.PLOTNUM ->
+	  let getPointNumberValue = Nbr.I !Parameter.pointNumberValue in
+	  (mixs,(CONST getPointNumberValue,pos))
   | Ast.BIN_ALG_OP (op, (a,pos1), (b,pos2)) ->
      begin match rec_call mixs (a,pos1) with
 	   | (mixs',YES n1) ->

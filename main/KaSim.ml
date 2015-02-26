@@ -36,6 +36,18 @@ let main =
      "Max time of simulation (arbitrary time unit)");
     ("-p", Arg.Set_int Parameter.pointNumberValue,
      "Number of points in plot");
+    ("-var",
+     Arg.Tuple
+       [Arg.Set_string Parameter.tmp_var_name;
+	Arg.String
+	  (fun var_val ->
+	   Parameter.alg_var_overwrite :=
+	     (!Parameter.tmp_var_name,
+	      try Nbr.of_string var_val with
+		Failure _ ->
+		raise (Arg.Bad ("\""^var_val^"\" is not a valid value")))
+	       ::!Parameter.alg_var_overwrite)],
+	"Set a variable to a given value");
     ("-o", Arg.String Kappa_files.set_data,
      "file name for data output") ;
     ("-d",
@@ -127,7 +139,7 @@ let main =
 
     let (env, counter, state) =
       match !Parameter.marshalizedInFile with
-      | "" -> Eval.initialize result
+      | "" -> Eval.initialize !Parameter.alg_var_overwrite result
       | marshalized_file ->
 	 try
 	   let d = open_in_bin marshalized_file in

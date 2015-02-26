@@ -911,7 +911,7 @@ let configurations_of_result result =
 		 (pos_of_lex_pos (fst pos_p),Printf.sprintf "Unkown parameter %s" error))
     ) result.configurations
 
-let initialize result =
+let initialize overwrite result =
   Debug.tag "+ Compiling..." ;
   Debug.tag "\t -simulation parameters" ;
   let _ = configurations_of_result result in
@@ -925,7 +925,15 @@ let initialize result =
     NamedDecls.create (array_map_of_list (fun x -> (x,())) result.Ast.tokens) in
 
   Debug.tag "\t -variable declarations";
-  let vars_nd = NamedDecls.create (Array.of_list result.Ast.variables) in
+  let alg_vars_over =
+    Tools.list_rev_map_append
+      (fun (x,v) -> (Term.with_dummy_pos x,
+		     Term.with_dummy_pos (Ast.CONST v))) overwrite
+      (List.filter
+	 (fun ((x,_),_) ->
+	  List.for_all (fun (x',_) -> x <> x') overwrite)
+	 result.Ast.variables) in
+  let vars_nd = NamedDecls.create (Array.of_list alg_vars_over) in
   let (fresh_kappa,_ as mixs),alg_a =
     array_fold_left_mapi (fun i mixs ((label,_ as lbl_pos),ast) ->
 			  let (mixs',alg) =

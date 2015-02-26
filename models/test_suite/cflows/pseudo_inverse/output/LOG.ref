@@ -1,4 +1,4 @@
-+ Command line is: 'KaSim' 'pseudo.ka' '-seed' '924556145' '-e' '10000' '-d' 'output' '-p' '50'
++ Command line is: 'KaSim' 'pseudo.ka' '-seed' '924556145' '-var' 'n_a' '1000' '-e' '10000' '-d' 'output' '-p' '50'
 Parsing pseudo.ka...
 done
 + Initialized random number generator with seed 924556145

@@ -81,6 +81,11 @@ let list_exists_uniq f l =
     | h :: t -> if f h then second t else first t in
   first l
 
+let rec list_rev_map_append f l acc =
+  match l with
+  | [] -> acc
+  | h :: t -> list_rev_map_append f t (f h::acc)
+
 let rec list_map_flatten f = function (* list_bind *)
   | [] -> []
   | h :: t -> List.append (f h) (list_map_flatten f t)
