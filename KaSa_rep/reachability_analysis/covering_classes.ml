@@ -23,7 +23,7 @@ let empty_classes parameter error handler =
     Covering_classes_type.SiteMap.create parameter error (n_agents, 0) in
   error,
   {
-    Covering_classes_type.covering_classes  = covering_classes
+     Covering_classes_type.covering_classes  = covering_classes
   }
 
 let add_generic get set parameter error rule_id agent_id key map =
@@ -55,9 +55,44 @@ let add_site parameters error rule_id agent_id agent_type site_id =
           (fun () ->
              "covering_class: site_type:" ^ (string_of_int site_id) ^ "\n")
   in
-  add_generic Covering_classes_type.SiteMap.unsafe_get Covering_classes_type.SiteMap.set parameters error rule_id agent_id (agent_type, site_id)
+  add_generic Covering_classes_type.SiteMap.unsafe_get 
+  Covering_classes_type.SiteMap.set parameters error rule_id agent_id 
+  (agent_type, site_id)
 
 (*Compute covering class*)
+ (* let scan_rule parameter error handler rule_id rule classes =
+    let viewslhs = rule.Cckappa_sig.rule_lhs.Cckappa_sig.views in
+    let covering_classes = classes.Covering_classes_type.covering_classes in
+    let _ = Misc_sa.trace parameter (fun () -> "TEST\n") in
+	let error, site_modif =
+	Int_storage.Quick_Nearly_inf_Imperatif.fold
+	parameter error
+	(fun parameter error agent_id agent site_modif ->
+		Cckappa_sig.Site_map_and_set.fold_map 
+		(fun site _ (error, site_modif) ->  error, site_modif)
+	  	agent.Cckappa_sig.agent_interface (error, site_modif)
+	) rule.Cckappa_sig.diff_reverse site_modif
+	in
+    let error, covering_classes =	
+	Int_storage.Quick_Nearly_inf_Imperatif.fold
+	parameter error
+	(fun parameter error agent_id agent covering_classes ->
+	 	Cckappa_sig.Site_map_and_set.fold_map
+  	  	(fun site _ (error, covering_classes) ->
+        	if Cckappa_sig.Site_map_and_set.exists (fun site' ->
+  	    	   site = site') site_modif (*'a t type*)
+  	    	   then (error, covering_classes)
+        	else
+             (error, covering_classes)
+  		) agent.Cckappa_sig.agent_interface (error, covering_classes)
+	) viewslhs covering_classes
+  in
+    error,
+    {
+      classes with
+      Covering_classes_type.covering_classes = covering_classes
+    }*)
+
 let scan_rule parameter error handler rule_id rule classes =
   let viewslhs = rule.Cckappa_sig.rule_lhs.Cckappa_sig.views in
   let rule_diff = rule.Cckappa_sig.diff_reverse in
@@ -66,36 +101,25 @@ let scan_rule parameter error handler rule_id rule classes =
   let error, covering_classes =
     Int_storage.Quick_Nearly_inf_Imperatif.fold2_common
       parameter error
-    (fun parameter error agent_id agent site_modif covering_classes ->
+    (fun parameter error agent_id agent _ covering_classes ->
        match agent with
        | Cckappa_sig.Ghost -> error, covering_classes
        | Cckappa_sig.Agent agent ->
-		   let agent_type = agent.Cckappa_sig.agent_name in
-	      Cckappa_sig.Site_map_and_set.fold_map (
-			  fun site _ (error, site_modif) ->
-				  (error, site_modif)
-		   )	 
-	      agent.Cckappa_sig.agent_interface (error, covering_classes)
-		  (*
+          let error, agent_id = Covering_classes_type.Labels.label_of_int
+		  parameter error agent.Cckappa_sig.agent_kasim_id in 
           let agent_type = agent.Cckappa_sig.agent_name in
-          let error, site_modif =
-            Cckappa_sig.Site_map_and_set.fold_map
-              (fun site (error, site_modif) ->
-               add_site parameter error rule_id agent_id agent_type site site_modif              )
-              agent.Cckappa_sig.agent_interface (error, site_modif)
-          in
-          let error, covering_classes =
-            Cckappa_sig.Site_map_and_set.fold_map 
-              (fun site (error, covering_classes) ->
-               if Cckappa_sig.Site_map_and_set.exists (fun site_modif ->
-                          site = site_modif) site_modif
-               then error, covering_classes
-               else
-                 add_site parameter error rule_id agent_id agent_type site
-                          covering_classes
-              ) agent.Cckappa_sig.agent_interface (error, covering_classes)
-          in*)
-          (*(error, covering_classes)*)
+		  Cckappa_sig.Site_map_and_set.fold_map
+		  (fun site site_modif (error, covering_classes) ->
+     	   if Cckappa_sig.Site_map_and_set.exists (fun site' ->
+	    	   site = site'
+	       ) site_modif
+	       then
+			add_site parameter error rule_id agent_id agent_type site
+		   covering_classes
+           else
+			   error, covering_classes
+		  )
+		  agent.Cckappa_sig.agent_interface (error, covering_classes)
     ) viewslhs rule_diff covering_classes
   in
   error,
@@ -116,5 +140,4 @@ let scan_rule_set parameter error handler rules =
       
 let covering_classes parameters error handler cc_compil =
   let _ = Misc_sa.trace parameters (fun () -> "Covering_classes \n") in
-  (*let error, covering_classes =*)
     scan_rule_set parameters error handler cc_compil.Cckappa_sig.rules

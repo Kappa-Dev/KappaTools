@@ -68,10 +68,10 @@ let main () =
   in 
   let error = Print_quarks.dot_of_influence_map parameters_influence_map error handler c_compil (wake_up_map,inhibition_map) in
   (*FIXME*)
-  let parameters_covering_classes = Remanent_parameters.update_call_stack parameters Covering_classes.local_trace (Some "Covering_classes.covering_classes") in 
+  (*let parameters_covering_classes = Remanent_parameters.update_call_stack parameters Covering_classes.local_trace (Some "Covering_classes.covering_classes") in 
   (*let parameters_covering_classes = Remanent_parameters.update_prefix parameters_covering_classes "Covering_classes:" in 
   let error,covering_classes = Covering_classes.covering_classes parameters_covering_classes error handler c_compil  in *)
-
+  *)
   let _ = Exception.print parameters error  in
    ()
 
