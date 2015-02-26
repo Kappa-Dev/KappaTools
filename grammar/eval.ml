@@ -911,7 +911,7 @@ let configurations_of_result result =
 		 (pos_of_lex_pos (fst pos_p),Printf.sprintf "Unkown parameter %s" error))
     ) result.configurations
 
-let initialize result counter =
+let initialize result =
   Debug.tag "+ Compiling..." ;
   Debug.tag "\t -simulation parameters" ;
   let _ = configurations_of_result result in
@@ -959,6 +959,8 @@ let initialize result counter =
   Debug.tag "+ Analyzing non local patterns..." ;
   let env = Environment.init_roots_of_nl_rules env in
   Debug.tag "+ Building initial simulation state...";
+  let counter =
+    Counter.create 0.0 0 !Parameter.maxTimeValue !Parameter.maxEventValue in
   Debug.tag "\t -Counting initial local patterns..." ;
   let (state, env) =
     State.initialize sg token_vector rules kappa_vars
@@ -972,4 +974,4 @@ let initialize result counter =
       end
     else state
   in
-  (Debug.tag "\t Done"; (env, state))
+  (Debug.tag "\t Done"; (env, counter, state))

@@ -125,11 +125,9 @@ let main =
     Format.printf
       "+ Initialized random number generator with seed %d@." theSeed;
 
-    let counter =
-      Counter.create 0.0 0 !Parameter.maxTimeValue !Parameter.maxEventValue in
-    let (env, state) =
+    let (env, counter, state) =
       match !Parameter.marshalizedInFile with
-      | "" -> Eval.initialize result counter
+      | "" -> Eval.initialize result
       | marshalized_file ->
 	 try
 	   let d = open_in_bin marshalized_file in
@@ -141,10 +139,11 @@ let main =
 	     else
 	       Format.printf "+Loading simulation package %s...@."
 			     marshalized_file;
-	     let env,state = (Marshal.from_channel d : Environment.t * State.t) in
+	     let env,counter,state =
+	       (Marshal.from_channel d : Environment.t * Counter.t * State.t) in
 	     Pervasives.close_in d ;
 	     Format.printf "Done@." ;
-	     (env,state)
+	     (env,counter,state)
 	   end
 	 with
 	 | exn ->
@@ -159,7 +158,8 @@ let main =
 	       Plot.plot_now env counter state in
 
     let () = Kappa_files.with_marshalized
-	       (fun d -> Marshal.to_channel d (env,state) [Marshal.Closures]) in
+	       (fun d -> Marshal.to_channel
+			   d (env,counter,state) [Marshal.Closures]) in
 
     Kappa_files.with_influence
       (fun d -> State.dot_of_influence_map d state env);
