@@ -101,7 +101,7 @@ let scan_rule parameter error handler rule_id rule classes =
   let error, covering_classes =
     Int_storage.Quick_Nearly_inf_Imperatif.fold2_common
       parameter error
-    (fun parameter error agent_id agent _ covering_classes ->
+    (fun parameter error agent_id agent site_modif covering_classes ->
        match agent with
        | Cckappa_sig.Ghost -> error, covering_classes
        | Cckappa_sig.Agent agent ->
@@ -109,7 +109,7 @@ let scan_rule parameter error handler rule_id rule classes =
 		  parameter error agent.Cckappa_sig.agent_kasim_id in 
           let agent_type = agent.Cckappa_sig.agent_name in
 		  Cckappa_sig.Site_map_and_set.fold_map
-		  (fun site site_modif (error, covering_classes) ->
+		  (fun site _ (error, covering_classes) ->
      	   if Cckappa_sig.Site_map_and_set.exists (fun site' ->
 	    	   site = site'
 	       ) site_modif
