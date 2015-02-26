@@ -27,8 +27,8 @@ let main =
      "name of a kappa file to use as input (can be used multiple times for multiple input files)");
     ("-e",
      Arg.Int (fun i -> if i < 0 then Parameter.maxEventValue := None
-		       else Parameter.maxTimeValue:= None ;
-		       Parameter.maxEventValue := Some i),
+		       else let () = Parameter.maxTimeValue:= None in
+			    Parameter.maxEventValue := Some i),
      "Number of total simulation events, including null events (negative value for unbounded simulation)");
     ("-t",
      Arg.Float(fun t -> Parameter.maxTimeValue := Some t ;
