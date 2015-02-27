@@ -94,8 +94,8 @@ let length_covering_classes lists =
             covering_class, List.length covering_class) lists
 
 let length_sort lists =
-  let lists = List.map (fun list -> length_covering_classes list, list) lists in
-  let lists = List.sort (fun a b -> compare (fst a) (fst b)) lists in
+  let lists = List.sort (fun a b -> compare (fst a) (fst b))
+                        (length_covering_classes lists) in
   List.map snd lists
   
 
