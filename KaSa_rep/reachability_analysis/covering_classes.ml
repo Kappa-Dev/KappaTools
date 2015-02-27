@@ -49,7 +49,7 @@ let add_covering_class parameter error agent_type new_covering_class covering_cl
          error
          agent_type
          new_list
-         covering_classes 
+         covering_classes
 
 let scan_rule parameter error handler rule classes =
   let viewslhs = rule.Cckappa_sig.rule_lhs.Cckappa_sig.views in
@@ -87,6 +87,24 @@ let scan_rule parameter error handler rule classes =
   {
     Covering_classes_type.covering_classes = covering_classes
   }
+
+(*TODO*)
+let length_covering_classes list =
+  let rec aux count acc = function
+    | [] -> []
+    | [x] -> (x, count + 1) :: acc
+    | a :: (b :: _ as tl) ->
+       if a = b
+       then aux (count + 1) acc tl
+       else aux 0 ((a, count + 1) :: acc) tl
+  in
+  aux 0 [] list
+
+let length_sort lists =
+  let lists = List.map (fun list -> length_covering_classes list, list) lists in
+  let lists = List.sort (fun a b -> compare (fst a) (fst b)) lists in
+  List.map snd lists
+  
 
 let scan_rule_set parameter error handler rules =
   let error, init = empty_classes parameter error handler in
