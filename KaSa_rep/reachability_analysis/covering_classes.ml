@@ -16,84 +16,42 @@ let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Covering classes") message exn (fun () -> default)
 
 let local_trace = false
-                    
+
 let empty_classes parameter error handler =
   let n_agents = handler.Cckappa_sig.nagents in
-  let error, covering_classes =
-    Covering_classes_type.SiteMap.create parameter error (n_agents, 0) in
+  let error, covering_classes = 
+    Covering_classes_type.AgentMap.create parameter error n_agents in
   error,
   {
      Covering_classes_type.covering_classes  = covering_classes
   }
 
-let add_generic get set parameter error rule_id agent_id key map =
-  let error, old_agent =
-    match get parameter error key map with
-    | error, None -> Int_storage.Quick_Nearly_inf_Imperatif.create
-                       parameter error 0
-    | error, Some x -> error, x
-  in
-  let error, old_label_set =
-    match Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get
-            parameter error rule_id old_agent with
-    | error, None -> error, Covering_classes_type.Labels.empty
-    | error, Some x -> error, x
-  in
-  let error, new_label_set =
-    Covering_classes_type.Labels.add_set parameter error agent_id old_label_set in
-  if new_label_set == old_label_set
-  then error, map
-  else
-    let error, new_agent =
-      Int_storage.Quick_Nearly_inf_Imperatif.set
-        parameter error rule_id new_label_set old_agent
-    in
-    set parameter error key new_agent map
+let add_covering_class parameter error agent_type new_covering_class covering_classes =
+  match new_covering_class with
+    | [] -> error, covering_classes
+    | _ ->
+       let error, agent =
+         Covering_classes_type.AgentMap.get
+           parameter
+           error
+           agent_type
+           covering_classes in
+       (* fetch the former list of covering classes *)
+       let old_list =
+         match agent with
+         | None -> []
+         | Some a -> a
+       in
+       (* store the new list of covering classes *)
+       let new_list = new_covering_class::old_list in
+       Covering_classes_type.AgentMap.set
+         parameter
+         error
+         agent_type
+         new_list
+         covering_classes 
 
-let add_site parameters error rule_id agent_id agent_type site_id =
-  let _ = Misc_sa.trace parameters
-          (fun () ->
-             "covering_class: site_type:" ^ (string_of_int site_id) ^ "\n")
-  in
-  add_generic Covering_classes_type.SiteMap.unsafe_get 
-  Covering_classes_type.SiteMap.set parameters error rule_id agent_id 
-  (agent_type, site_id)
-
-(*Compute covering class*)
- (* let scan_rule parameter error handler rule_id rule classes =
-    let viewslhs = rule.Cckappa_sig.rule_lhs.Cckappa_sig.views in
-    let covering_classes = classes.Covering_classes_type.covering_classes in
-    let _ = Misc_sa.trace parameter (fun () -> "TEST\n") in
-	let error, site_modif =
-	Int_storage.Quick_Nearly_inf_Imperatif.fold
-	parameter error
-	(fun parameter error agent_id agent site_modif ->
-		Cckappa_sig.Site_map_and_set.fold_map 
-		(fun site _ (error, site_modif) ->  error, site_modif)
-	  	agent.Cckappa_sig.agent_interface (error, site_modif)
-	) rule.Cckappa_sig.diff_reverse site_modif
-	in
-    let error, covering_classes =	
-	Int_storage.Quick_Nearly_inf_Imperatif.fold
-	parameter error
-	(fun parameter error agent_id agent covering_classes ->
-	 	Cckappa_sig.Site_map_and_set.fold_map
-  	  	(fun site _ (error, covering_classes) ->
-        	if Cckappa_sig.Site_map_and_set.exists (fun site' ->
-  	    	   site = site') site_modif (*'a t type*)
-  	    	   then (error, covering_classes)
-        	else
-             (error, covering_classes)
-  		) agent.Cckappa_sig.agent_interface (error, covering_classes)
-	) viewslhs covering_classes
-  in
-    error,
-    {
-      classes with
-      Covering_classes_type.covering_classes = covering_classes
-    }*)
-
-let scan_rule parameter error handler rule_id rule classes =
+let scan_rule parameter error handler rule classes =
   let viewslhs = rule.Cckappa_sig.rule_lhs.Cckappa_sig.views in
   let rule_diff = rule.Cckappa_sig.diff_reverse in
   let covering_classes = classes.Covering_classes_type.covering_classes in
@@ -105,26 +63,28 @@ let scan_rule parameter error handler rule_id rule classes =
        match agent with
        | Cckappa_sig.Ghost -> error, covering_classes
        | Cckappa_sig.Agent agent ->
-          let error, agent_id = Covering_classes_type.Labels.label_of_int
-		  parameter error agent.Cckappa_sig.agent_kasim_id in 
+          let new_covering_class =
+            Cckappa_sig.Site_map_and_set.fold_map
+	      (fun site _ current_covering_class ->
+               site::current_covering_class)
+              agent.Cckappa_sig.agent_interface []
+          in
           let agent_type = agent.Cckappa_sig.agent_name in
-		  Cckappa_sig.Site_map_and_set.fold_map
-		  (fun site _ (error, covering_classes) ->
-     	   if Cckappa_sig.Site_map_and_set.exists (fun site' ->
-	    	   site = site'
-	       ) site_modif
-	       then
-			add_site parameter error rule_id agent_id agent_type site
-		   covering_classes
-           else
-			   error, covering_classes
-		  )
-		  agent.Cckappa_sig.agent_interface (error, covering_classes)
+          (* store new_covering class in the classes of the agent type
+               agent_type *)
+          let error,covering_classes =
+            add_covering_class
+              parameter
+              error
+              agent_type
+              new_covering_class
+              covering_classes 
+          in
+          error, covering_classes
     ) viewslhs rule_diff covering_classes
   in
   error,
   {
-    classes with
     Covering_classes_type.covering_classes = covering_classes
   }
 
@@ -135,7 +95,12 @@ let scan_rule_set parameter error handler rules =
     (fun parameter error rule_id rule classes ->
      let _ = Misc_sa.trace parameter
       (fun () -> "Rule " ^ (string_of_int rule_id) ^ "\n") in
-     scan_rule parameter error handler rule_id rule.Cckappa_sig.e_rule_c_rule classes
+     scan_rule
+       parameter
+       error
+       handler
+       rule.Cckappa_sig.e_rule_c_rule
+       classes
     ) rules init
       
 let covering_classes parameters error handler cc_compil =

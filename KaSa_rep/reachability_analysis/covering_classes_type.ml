@@ -20,14 +20,11 @@ let local_trace = false
 module Label  = Covering_classes_labels.Int_labels
 module Labels = Covering_classes_labels.Extensive(Label)
 
-type covering_class = (Cckappa_sig.agent_name * Cckappa_sig.site_name)
-                          
 module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
-module SiteMap = Int_storage.Extend (AgentMap)(AgentMap)
 
-type sites_covering_classes  = Labels.label_set Int_storage.Quick_Nearly_inf_Imperatif.t SiteMap.t
-
+type sites_covering_classes  = int list list AgentMap.t
+                                   
 type covering_classes =
   {
-    covering_classes : sites_covering_classes;
+    covering_classes : sites_covering_classes
   }
