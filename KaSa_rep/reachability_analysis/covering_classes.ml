@@ -31,7 +31,7 @@ let add_covering_class parameter error agent_type new_covering_class covering_cl
     | [] -> error, covering_classes
     | _ ->
        let error, agent =
-         Covering_classes_type.AgentMap.get
+         Covering_classes_type.AgentMap.unsafe_get
            parameter
            error
            agent_type
