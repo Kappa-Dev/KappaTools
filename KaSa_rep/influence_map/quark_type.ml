@@ -14,8 +14,8 @@
 
 let warn parameters mh message exn default = 
      Exception.warn parameters mh (Some "Quark_type") message exn (fun () -> default) 
-  
-                                                                                                                                                                       (*module Int_Set_and_Map = Set_and_map.Make (struct type t = int let compare = compare end)*) 
+(*module Int_Set_and_Map = Set_and_map.Make (struct type t = int let compare = compare end)*)
+
 let local_trace = false
  
 module Label = Influence_labels.Int_labels 

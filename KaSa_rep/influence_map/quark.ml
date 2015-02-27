@@ -86,7 +86,7 @@ let add_site parameters error rule_id agent_id agent_type site_type state =
 
 let add_site_var parameters error var_id agent_id agent_type site_type state =
   let _ = Misc_sa.trace parameters (fun () -> "var_id:"^(string_of_int var_id)^",agent_type:"^(string_of_int agent_type)^",site_type:"^(string_of_int site_type)^",state:"^(string_of_int state)^"\n")
-  in 
+  in
   add_generic Quark_type.SiteMap.unsafe_get Quark_type.SiteMap.set parameters error var_id agent_id (agent_type,(site_type,state))
 
 let add_half_bond_breaking parameter error handler rule_id agent_id agent_type site k (site_modif_plus,site_modif_minus) = 
@@ -131,7 +131,7 @@ let scan_mixture_in_var bool parameter error handler var_id mixture quarks =
                   then 
                     error,site_var
                   else 
-                    aux (k+1) (add_site_var parameter error var_id kasim_id agent_type site k site_var) (*MOD*)
+                    aux (k+1) (add_site_var parameter error var_id kasim_id agent_type site k site_var)
                 in 
                 aux interval.Cckappa_sig.min (error,site_var)
               )
@@ -177,7 +177,6 @@ let scan_var parameter error handler var_id var quarks =
   in 
    error,quarks 
 
-       
 let scan_rule parameter error handler rule_id rule quarks = 
     let viewslhs = rule.Cckappa_sig.rule_lhs.Cckappa_sig.views in 
     let viewsrhs = rule.Cckappa_sig.rule_rhs.Cckappa_sig.views in
@@ -206,7 +205,7 @@ let scan_rule parameter error handler rule_id rule quarks =
                              let max = interval.Cckappa_sig.max in 
                              let rec aux k (error,site_test) = 
                                if k>max 
-                               then 
+                               then
                                  error,site_test
                                else 
                                  aux (k+1) (add_site parameter error rule_id kasim_id agent_type site k site_test) 

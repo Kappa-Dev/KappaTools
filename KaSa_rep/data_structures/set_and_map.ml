@@ -52,7 +52,6 @@ module type Set_and_Map = sig
   val max_elt: set -> elt 
   val choose: set -> elt
   val split: Remanent_parameters_sig.parameters ->Exception.method_handler -> elt -> set -> Exception.method_handler * (set * bool * set)
-  
   val empty_map: 'a map
   val is_empty_map: 'a map -> bool
   val add_map: Remanent_parameters_sig.parameters ->Exception.method_handler -> key -> 'a -> 'a map -> Exception.method_handler * 'a map
@@ -368,8 +367,7 @@ module Make(Ord:OrderedType) =
     let rec part (rh,t,f as accu) set = 
         match set with 
             | Empty_set -> accu 
-            | Node_set(left,value,right,_) -> 
-               
+            | Node_set(left,value,right,_) ->              
               part 
                 (part 
                   begin
@@ -553,7 +551,6 @@ module Make(Ord:OrderedType) =
                    let rh', right' = remove_map parameters rh key right in 
                    balance_map parameters rh' left key_map data right'
 
-   (*TEST*)
   let rec map_map f map = 
       match map with
              | Empty_map -> empty_map
@@ -583,7 +580,6 @@ module Make(Ord:OrderedType) =
               let _ = f key data in 
               iter_map f right
 
-  (*TEST*)
   let rec fold_map f map value =
     match map with 
     | Empty_map -> value 

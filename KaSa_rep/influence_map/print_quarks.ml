@@ -117,13 +117,12 @@ let print_sites parameter error handler quark =
   let parameter_minus = Remanent_parameters.update_prefix parameter "site_modif-:" in 
   let error = print_site_map parameter_minus error handler quark.Quark_type.site_modif_minus in
     error 
-  
+
 let print_quarks parameters  error handler quark = 
   let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "\nREMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.\n" in 
   let error = print_agents  parameters error handler quark in 
   let error = print_sites parameters  error handler quark in 
   error
-
   
 let print_maps parameters error handler compilation print_rule print_var get_label_of_rule get_label_of_var print_labels prefix suffix map =
   let _  = 

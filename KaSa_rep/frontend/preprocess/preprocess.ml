@@ -488,63 +488,6 @@ let translate_mixture parameters error handler mixture =
      ag.Cckappa_sig.agent_interface
      (error,set)
 
- (*TODO*)
- (*let covering_class parameters error handler rule =
-   let error,c_rule_lhs = translate_mixture parameters error handler rule.Ckappa_sig.lhs in
-   let error,size = Int_storage.Quick_Nearly_inf_Imperatif.dimension error
-     c_rule_lhs.Cckappa_sig.views in
-   let covering_class = Cckappa_sig.Address_map_and_set.empty_set in
-   let rec aux_agent k (error, covering_class) =
-     if k >= size then (error, covering_class)
-     else
-       begin
-         let error, lhsk = Int_storage.Quick_Nearly_inf_Imperatif.get parameters error
-           k c_rule_lhs.Cckappa_sig.views in
-         let error, (covering_class, agent_type, lbondk) =
-           match lhsk with
-             | None | Some Cckappa_sig.Ghost ->
-               warn parameters error (Some "line 524") Exit
-                 ( Cckappa_sig.Site_map_and_set.empty_map, 0,
-                   Cckappa_sig.Site_map_and_set.empty_map)
-             | Some Cckappa_sig.Agent lagk ->
-               begin
-                 let agent_type = lagk.Cckappa_sig.agent_name in
-                 let error,lbondk = Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get
-                   parameters error k c_rule_lhs.Cckappa_sig.bonds in
-                 let lbondk =
-                   match lbondk with
-                   | None ->  Cckappa_sig.Site_map_and_set.empty_map
-                   | Some a -> a
-                 in
-                 
-                 (*let error, covering_class = Int_storage.Quick_Nearly_inf_Imperatif.set
-                   parameters eror k (Cckappa_sig.update_some_interface lagk) covering_class in
-                 let error, bond_l = Cckappa_sig.Site_map_and_set.diff_map parameters
-                   error lbondk in
-                 let classes = actions.Cckappa_sig.bind in*)
-
-                 (*compute covering class*)
-                 let error, covering_class =
-                   Cckappa_sig.Site_map_and_set.fold_map
-                     (fun site site' (error, covering_class) ->
-                       let source = Cckappa_sig.build_address k agent_type site in
-                       let source' = Cckappa_sig.build_address k agent_type site' in
-
-                       let covering_class = (*TODO*)
-                         if compare source source' < 0
-                         then (source, source') :: covering_class
-                         else covering_class
-                       in (error, covering_class))
-                 in bond_l (error, covering_class)
-               let _ = aux_agent (k+1) (error, (covering_class, agent_type, lbondk))
-       end
-         error,
-         ({
-           Cckappa_sig.rule_lhs = c_rule_lhs;
-          }
-         )
-         *)
-
  let set_released_sites parameters error k ag ag' set = 
    Cckappa_sig.Site_map_and_set.fold2_map parameters error  
      (fun site state state' (error,set) ->
