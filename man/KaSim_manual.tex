@@ -1178,13 +1178,18 @@ The directory is assumed to exist. The file will be overwritten if it exists.  A
 \end{figure}
 
 Unlike the flux map, the influence map is \emph{statically} computed and does not depend on kinetic rates nor initial conditions. It describes how rules may potentially influence each other during a simulation. \KaSa~will produce a dot format file containing the influence relation over all rules and observables of the model. The produced graph visualised using a circular rendering\footnote{One may use for instance the \ttt{circo} program that is part of the \textit{graphviz} suite.} is given in Figure~\ref{fig:kasa-abc-im}. Observables are represented as circular nodes and rules as rectangular nodes. The labels of the nodes are either the label of the rule or of the observable (if available), otherwise it is made of a unique identifier allocated by \KaSa~followed by the kappa definition of the rule/observable. 
-Edges are decorated with the list of embeddings (separated by a semi-colon) allowing rules{\textquotesingle}s right hand sides to be mapped to left hand sides. Observables have no influence, but they can be influenced by rules, if the rule can increase or decrease their value. 
+Edges are decorated with the list of embeddings (separated by a semi-colon) allowing the identification of agents in both rules{\textquotesingle}s right hand sides/left hand sides. 
+More precisely, for positive influences,  the notation $[i\rar j]$ denotes a pair of embeddings from the agent number $i$ of the origin{\textquotesingle}s right hand side and from the agent number $j$ of the target{\textquotesingle}s left hand side and the notation $[i\star \rar j]$ denotes a pair of embeddings from an agent attached to the agent number $i$  of the origin{\textquotesingle}s left hand side, which have been freed by side effect  and   from the agent number $j$ of the target{\textquotesingle}s left hand side; for negative influences,  the notation $[i\rar j]$ denotes a pair of embeddings from the agent number $i$ of the origin{\textquotesingle}s left hand side and from the agent number $j$ of the target{\textquotesingle}s left hand side and the notation $[i\star \rar j]$ denotes a pair of embeddings from an agent attached to the agent number $i$  of the origin{\textquotesingle}s left hand side, which have been freed by side effect  and   from the agent number $j$ of the target{\textquotesingle}s left hand side;
+ Observables have no influence, but they can be influenced by rules, if the rule can increase or decrease their value. 
 
 
 \begin{figure}[htbp] %  figure placement: here, top, bottom, or page
    \centering
    \includegraphics[width=15cm]{generated_img/abc_influence.png} 
-   \caption{The influence map of the \ttt{abc.ka} model defined in Chapter~\ref{chap:abc}. Edge labels denote embeddings with the convention that $[i\rar j]$ denotes the embedding of agent number $i$ of the origin{\textquotesingle}s rhs, into agent $j$ of the target{\textquotesingle}s lhs.}
+   \caption{The influence map of the \ttt{abc.ka} model defined in Chapter~\ref{chap:abc}. Edge labels denote embeddings with the convention that 
+the notation $[i\rar j]$, in a positive influence, denotes a pair of embeddings from the agent number $i$ of the origin{\textquotesingle}s right hand side and from the agent number $j$ of the target{\textquotesingle}s left hand side; 
+the notation $[i\rar j]$, in negative influence,  denotes a pair of embeddings from the agent number $i$ of the origin{\textquotesingle}s left hand side and from the agent number $j$ of the target{\textquotesingle}s left hand side; 
+the notation $[i\star \rar j]$, whatever the influence is positive of negative,  denotes a pair of embeddings from an agent attached to the agent number $i$  of the origin{\textquotesingle}s left hand side, which have been freed by side effect  and   from the agent number $j$ of the target{\textquotesingle}s left hand side. }
    \label{fig:kasa-abc-im}
 \end{figure}
 

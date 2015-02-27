@@ -1,0 +1,4 @@
+#Command-line:
+${KAPPABIN}KaSa side_effects.ka --debugging-mode --output-directory output || exit 0 
+
+#Test dot output 
