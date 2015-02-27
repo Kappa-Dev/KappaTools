@@ -911,7 +911,7 @@ let configurations_of_result result =
 		 (pos_of_lex_pos (fst pos_p),Printf.sprintf "Unkown parameter %s" error))
     ) result.configurations
 
-let initialize result counter =
+let initialize overwrite result =
   Debug.tag "+ Compiling..." ;
   Debug.tag "\t -simulation parameters" ;
   let _ = configurations_of_result result in
@@ -925,7 +925,15 @@ let initialize result counter =
     NamedDecls.create (array_map_of_list (fun x -> (x,())) result.Ast.tokens) in
 
   Debug.tag "\t -variable declarations";
-  let vars_nd = NamedDecls.create (Array.of_list result.Ast.variables) in
+  let alg_vars_over =
+    Tools.list_rev_map_append
+      (fun (x,v) -> (Term.with_dummy_pos x,
+		     Term.with_dummy_pos (Ast.CONST v))) overwrite
+      (List.filter
+	 (fun ((x,_),_) ->
+	  List.for_all (fun (x',_) -> x <> x') overwrite)
+	 result.Ast.variables) in
+  let vars_nd = NamedDecls.create (Array.of_list alg_vars_over) in
   let (fresh_kappa,_ as mixs),alg_a =
     array_fold_left_mapi (fun i mixs ((label,_ as lbl_pos),ast) ->
 			  let (mixs',alg) =
@@ -959,6 +967,9 @@ let initialize result counter =
   Debug.tag "+ Analyzing non local patterns..." ;
   let env = Environment.init_roots_of_nl_rules env in
   Debug.tag "+ Building initial simulation state...";
+  let counter =
+    Counter.create !Parameter.pointNumberValue
+		   0.0 0 !Parameter.maxTimeValue !Parameter.maxEventValue in
   Debug.tag "\t -Counting initial local patterns..." ;
   let (state, env) =
     State.initialize sg token_vector rules kappa_vars
@@ -972,4 +983,4 @@ let initialize result counter =
       end
     else state
   in
-  (Debug.tag "\t Done"; (env, state))
+  (Debug.tag "\t Done"; (env, counter, state))

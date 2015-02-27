@@ -24,10 +24,7 @@ val to_string : t -> string
 returns f (n - k) (... (f (n - 1) (f n x))) where k < n <= k+1 *)
 val iteri : (t -> 'a -> 'a) -> 'a -> t -> 'a
 
+val of_string : string -> t (** @raise Failure "float_of_string" *)
 val of_un_alg_op : Term.un_alg_op -> t -> t
 val of_bin_alg_op : Term.bin_alg_op -> t -> t -> t
 val of_compare_op : Term.compare_op -> t -> t -> bool
-
-val getMaxEventValue : unit -> t
-val getMaxTimeValue : unit -> t
-val getPointNumberValue : unit -> t

@@ -117,6 +117,10 @@ let to_string = function
 let rec iteri f x n =
   if is_strictly_positive n then iteri f (f n x) (pred n) else x
 
+let of_string x =
+  try I (int_of_string x)
+  with Failure _ -> F (float_of_string x)
+
 let of_bin_alg_op = function
   | Term.MULT -> mult
   | Term.SUM -> add
@@ -153,17 +157,3 @@ let of_compare_op = function
   | Term.SMALLER -> is_smaller
   | Term.EQUAL -> is_equal
   | Term.DIFF -> fun v v' -> not (is_equal v v')
-
-let getMaxEventValue () =
-  match !Parameter.maxEventValue with
-  | Some n -> I n
-  | None -> Format.eprintf "[emax] constant is evaluated to infinity@.";
-	    F infinity
-
-let getMaxTimeValue () =
-  match !Parameter.maxTimeValue with
-  | Some t -> F t
-  | None -> Format.eprintf "[tmax] constant is evaluated to infinity@.";
-	    F infinity
-
-let getPointNumberValue () = I !Parameter.pointNumberValue

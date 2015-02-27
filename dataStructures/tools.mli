@@ -7,6 +7,7 @@ val ln : pos -> int
 val cn : pos -> int
 
 (** {5 Combinators on primitive types *)
+val option_map : ('a -> 'b) -> 'a option -> 'b option
 val iteri : (int -> unit) -> int -> unit
 val array_map_of_list : ('a -> 'b) -> 'a list -> 'b array
 val array_fold_lefti :
@@ -17,6 +18,7 @@ val array_fold_left2 :
   ('a -> 'b -> 'c -> 'a) -> 'a -> 'b array -> 'c array -> 'a
 val list_exists_uniq :
   ('a -> bool) -> 'a list -> bool
+val list_rev_map_append : ('a -> 'b) -> 'a list -> 'b list -> 'b list
 val list_map_flatten : ('a -> 'b list) -> 'a list -> 'b list
 val list_fold_right_map :
   ('a -> 'b -> 'a * 'c) -> 'a -> 'b list -> 'a * 'c list

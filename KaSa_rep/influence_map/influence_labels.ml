@@ -32,7 +32,11 @@ module Int_labels =
   let label_of_int _ error i = error,i  
                   
   let to_string parameter error i = 
-     error,string_of_int i
+    if i < 0 then 
+     error,(string_of_int (-i-1))^"*"
+    else 
+      error,string_of_int i 
+
       
   let dump h error i = 
     let error,s = to_string h error i  in 

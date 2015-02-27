@@ -27,8 +27,8 @@ let main =
      "name of a kappa file to use as input (can be used multiple times for multiple input files)");
     ("-e",
      Arg.Int (fun i -> if i < 0 then Parameter.maxEventValue := None
-		       else Parameter.maxTimeValue:= None ;
-		       Parameter.maxEventValue := Some i),
+		       else let () = Parameter.maxTimeValue:= None in
+			    Parameter.maxEventValue := Some i),
      "Number of total simulation events, including null events (negative value for unbounded simulation)");
     ("-t",
      Arg.Float(fun t -> Parameter.maxTimeValue := Some t ;
@@ -36,6 +36,18 @@ let main =
      "Max time of simulation (arbitrary time unit)");
     ("-p", Arg.Set_int Parameter.pointNumberValue,
      "Number of points in plot");
+    ("-var",
+     Arg.Tuple
+       [Arg.Set_string Parameter.tmp_var_name;
+	Arg.String
+	  (fun var_val ->
+	   Parameter.alg_var_overwrite :=
+	     (!Parameter.tmp_var_name,
+	      try Nbr.of_string var_val with
+		Failure _ ->
+		raise (Arg.Bad ("\""^var_val^"\" is not a valid value")))
+	       ::!Parameter.alg_var_overwrite)],
+	"Set a variable to a given value");
     ("-o", Arg.String Kappa_files.set_data,
      "file name for data output") ;
     ("-d",
@@ -125,11 +137,9 @@ let main =
     Format.printf
       "+ Initialized random number generator with seed %d@." theSeed;
 
-    let counter =
-      Counter.create 0.0 0 !Parameter.maxTimeValue !Parameter.maxEventValue in
-    let (env, state) =
+    let (env, counter, state) =
       match !Parameter.marshalizedInFile with
-      | "" -> Eval.initialize result counter
+      | "" -> Eval.initialize !Parameter.alg_var_overwrite result
       | marshalized_file ->
 	 try
 	   let d = open_in_bin marshalized_file in
@@ -141,10 +151,11 @@ let main =
 	     else
 	       Format.printf "+Loading simulation package %s...@."
 			     marshalized_file;
-	     let env,state = (Marshal.from_channel d : Environment.t * State.t) in
+	     let env,counter,state =
+	       (Marshal.from_channel d : Environment.t * Counter.t * State.t) in
 	     Pervasives.close_in d ;
 	     Format.printf "Done@." ;
-	     (env,state)
+	     (env,counter,state)
 	   end
 	 with
 	 | exn ->
@@ -159,7 +170,8 @@ let main =
 	       Plot.plot_now env counter state in
 
     let () = Kappa_files.with_marshalized
-	       (fun d -> Marshal.to_channel d (env,state) [Marshal.Closures]) in
+	       (fun d -> Marshal.to_channel
+			   d (env,counter,state) [Marshal.Closures]) in
 
     Kappa_files.with_influence
       (fun d -> State.dot_of_influence_map d state env);

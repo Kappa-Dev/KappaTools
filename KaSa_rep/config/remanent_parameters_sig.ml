@@ -33,6 +33,7 @@ type symbol_table =
    agent_sep_dot : string ; 
    agent_sep_plus : string ; 
    ghost_agent : string ;
+   show_ghost : bool ; 
    internal : string ;
    uni_arrow : string ;
    rev_arrow : string ; 

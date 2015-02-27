@@ -56,6 +56,10 @@ let read_input () =
 	with
 		| Stream.Failure -> invalid_arg "Tools.Read_input: cannot read stream"
 
+let option_map f = function
+  | Some x -> Some (f x)
+  | None -> None
+
 let list_of_string str =
 	let stream = Stream.of_string str in
 	let rec parse stream acc cont =
@@ -76,6 +80,11 @@ let list_exists_uniq f l =
     | [] -> false
     | h :: t -> if f h then second t else first t in
   first l
+
+let rec list_rev_map_append f l acc =
+  match l with
+  | [] -> acc
+  | h :: t -> list_rev_map_append f t (f h::acc)
 
 let rec list_map_flatten f = function (* list_bind *)
   | [] -> []
