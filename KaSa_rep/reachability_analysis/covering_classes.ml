@@ -25,11 +25,19 @@ let empty_classes parameter error handler =
   {
      Covering_classes_type.covering_classes  = covering_classes
   }
-		 
+
+let rec print_list ls =
+  	match ls with
+  	| [] -> ()
+  	| is :: ls' ->
+  		let _ = List.iter (fun i -> Printf.printf " %i " i) is in
+  	print_list ls'
+				 
 let add_covering_class parameter error agent_type new_covering_class covering_classes =
   match new_covering_class with
     | [] -> error, covering_classes
-    | _ ->		
+    | _ ->
+      let _ = Misc_sa.trace parameter (fun () -> "agent_type:" ^(string_of_int agent_type) ^":")in	
        let error, agent =
          Covering_classes_type.AgentMap.unsafe_get
            parameter
@@ -44,6 +52,7 @@ let add_covering_class parameter error agent_type new_covering_class covering_cl
        in
        (* store the new list of covering classes *)
        let new_list = new_covering_class::old_list in
+       let _ = print_string "site_type:"; print_list new_list; print_string "\n" in
 	   Covering_classes_type.AgentMap.set
          parameter
          error
@@ -55,7 +64,6 @@ let scan_rule parameter error handler rule classes =
   let viewslhs = rule.Cckappa_sig.rule_lhs.Cckappa_sig.views in
   let rule_diff = rule.Cckappa_sig.diff_reverse in
   let covering_classes = classes.Covering_classes_type.covering_classes in
-  (*let _ = Misc_sa.trace parameter (fun () -> "\n") in*)
   let error, covering_classes =
     Int_storage.Quick_Nearly_inf_Imperatif.fold2_common
       parameter error
@@ -114,5 +122,4 @@ let scan_rule_set parameter error handler rules =
     ) rules init
       
 let covering_classes parameters error handler cc_compil =
-  let _ = Misc_sa.trace parameters (fun () -> "\n") in
-    scan_rule_set parameters error handler cc_compil.Cckappa_sig.rules
+  scan_rule_set parameters error handler cc_compil.Cckappa_sig.rules
