@@ -25,17 +25,17 @@ let empty_classes parameter error handler =
   {
      Covering_classes_type.covering_classes  = covering_classes
   }
-
+		 
 let add_covering_class parameter error agent_type new_covering_class covering_classes =
   match new_covering_class with
     | [] -> error, covering_classes
-    | _ ->
+    | _ ->		
        let error, agent =
          Covering_classes_type.AgentMap.unsafe_get
            parameter
            error
            agent_type
-           covering_classes in
+           covering_classes in		 
        (* fetch the former list of covering classes *)
        let old_list =
          match agent with
@@ -44,7 +44,7 @@ let add_covering_class parameter error agent_type new_covering_class covering_cl
        in
        (* store the new list of covering classes *)
        let new_list = new_covering_class::old_list in
-       Covering_classes_type.AgentMap.set
+	   Covering_classes_type.AgentMap.set
          parameter
          error
          agent_type
@@ -55,7 +55,7 @@ let scan_rule parameter error handler rule classes =
   let viewslhs = rule.Cckappa_sig.rule_lhs.Cckappa_sig.views in
   let rule_diff = rule.Cckappa_sig.diff_reverse in
   let covering_classes = classes.Covering_classes_type.covering_classes in
-  let _ = Misc_sa.trace parameter (fun () -> "TEST\n") in
+  (*let _ = Misc_sa.trace parameter (fun () -> "\n") in*)
   let error, covering_classes =
     Int_storage.Quick_Nearly_inf_Imperatif.fold2_common
       parameter error
@@ -94,10 +94,9 @@ let length_covering_classes lists =
             covering_class, List.length covering_class) lists
 
 let length_sort lists =
-  let lists = List.sort (fun a b -> compare (fst a) (fst b))
+  let lists = List.sort (fun a b -> compare (fst b) (fst a))
                         (length_covering_classes lists) in
   List.map snd lists
-  
 
 let scan_rule_set parameter error handler rules =
   let error, init = empty_classes parameter error handler in
@@ -115,5 +114,5 @@ let scan_rule_set parameter error handler rules =
     ) rules init
       
 let covering_classes parameters error handler cc_compil =
-  let _ = Misc_sa.trace parameters (fun () -> "Covering_classes \n") in
+  let _ = Misc_sa.trace parameters (fun () -> "\n") in
     scan_rule_set parameters error handler cc_compil.Cckappa_sig.rules
