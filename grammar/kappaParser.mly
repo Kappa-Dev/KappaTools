@@ -432,7 +432,8 @@ link_state:
   /*empty*/ {add_pos Ast.FREE}
     | KAPPA_LNK INT {(Ast.LNK_VALUE $2,rhs_pos 2)}
     | KAPPA_LNK KAPPA_SEMI {(Ast.LNK_SOME,rhs_pos 2)}
-    | KAPPA_LNK ID DOT ID {add_pos (Ast.LNK_TYPE ($2,$4))}
+    | KAPPA_LNK ID DOT ID {add_pos (Ast.LNK_TYPE
+				      ((fst $2,rhs_pos 2),(fst $4,rhs_pos 4)))}
     | KAPPA_WLD {add_pos Ast.LNK_ANY}
     | KAPPA_LNK error
 		{let pos = $1 in

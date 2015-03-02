@@ -44,7 +44,7 @@ and link =
 	| FREE 
 	| LNK_ANY of position
 	| LNK_SOME of position
-	| LNK_TYPE of ((string * Tools.pos) * (string * Tools.pos))
+	| LNK_TYPE of (string Term.with_pos * string Term.with_pos)
 type 'mixture rule = 
   {
     lhs: 'mixture ; 

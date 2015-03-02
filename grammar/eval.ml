@@ -188,8 +188,9 @@ let eval_agent env a ctxt =
 	       with
 	       | Not_found ->
 		  raise
-		    (ExceptionDefn.Semantics_Error
-		       (pos_ste, "binding type is not compatible with agent's signature"))
+		    (ExceptionDefn.Malformed_Decl
+		       ("binding type is not compatible with agent's signature",
+			pos_ste))
 	     in
 	     let ag_num =
 	       Environment.num_of_name (Term.with_dummy_pos ag_nm) env in
