@@ -1,11 +1,14 @@
 open Format
 
-let list ?(trailing=(fun f -> ())) pr_sep pr_el f l =
-  let rec aux empty f = function
-    | [] -> if not empty then trailing f
-    | [el] -> pr_el f el
-    | h :: t -> fprintf f "%a%t%a" pr_el h pr_sep (aux false) t
-  in aux true f l
+let listi ?(trailing=(fun f -> ())) pr_sep pr_el f l =
+  let rec aux acc f = function
+    | [] -> if acc<>0 then trailing f
+    | [el] -> pr_el acc f el
+    | h :: t -> fprintf f "%a%t%a" (pr_el acc) h pr_sep (aux (succ acc)) t
+  in aux 0 f l
+
+let list ?trailing pr_sep pr_el f l =
+  listi ?trailing pr_sep (fun _ f x -> pr_el f x) f l
 
 let set ?(trailing=(fun f -> ()))
 	elements pr_sep pr_el f set =

@@ -1,5 +1,9 @@
 open Format
 
+val listi :
+  ?trailing:(formatter -> unit) ->
+  (formatter -> unit) -> (int -> formatter -> 'a -> unit) ->
+  formatter -> 'a list -> unit
 val list :
   ?trailing:(formatter -> unit) ->
   (formatter -> unit) -> (formatter -> 'a -> unit) ->
