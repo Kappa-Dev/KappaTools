@@ -451,10 +451,10 @@ let dot_of_grid profiling desc enriched_grid state env =
   let () = Kappa_files.add_out_desc desc in
   let form  = Format.formatter_of_out_channel desc in
   let _ = profiling form in
-  Format.fprintf form "@[<v>digraph G{\n ranksep=.5 ; @," ;(*TODO*)
+  Format.fprintf form "@[<v>digraph G{\n ranksep=.5 ;@," ;
   IntMap.iter
     (fun d eids_at_d ->
-     Format.fprintf form "@[<v>{ rank = same ; \"%d\" [shape=plaintext] ; " d ; (*TODO*)
+     Format.fprintf form "@[<hv>{ rank = same ; \"%d\" [shape=plaintext] ;@," d;
      IntSet.iter
        (fun eid ->
 	let atom = IntMap.find eid config.events in
@@ -482,7 +482,7 @@ let dot_of_grid profiling desc enriched_grid state env =
     ) sorted_events ;
   let cpt = ref 0 in
   while !cpt+1 < (IntMap.size sorted_events) do
-    Format.fprintf form "\"%d\" -> \"%d\" [style=\"invis\"]; @," !cpt (!cpt+1);(*TODO*)
+    Format.fprintf form "\"%d\" -> \"%d\" [style=\"invis\"];@," !cpt (!cpt+1);
     cpt := !cpt + 1
   done ;
   IntMap.iter
@@ -519,7 +519,7 @@ let dot_of_grid profiling desc enriched_grid state env =
             let () =
 	      if bool then
 		Format.fprintf
-		  form "node_%d -> node_%d [style=dotted, arrowhead = tee] @ "(*TODO*)
+		  form "node_%d -> node_%d [style=dotted, arrowhead = tee]@ "
 		  eid eid'
             in
             prec
