@@ -58,7 +58,7 @@ let label node env =
 	 | Some x ->
 	    let s_int = ("~"^(Environment.state_of_id node.name i x env))
 	    in
-	    (Printf.sprintf "%s%s" s_i s_int)::cont
+	    (s_i^s_int)::cont
       ) node []
   in
   match str_intf with
@@ -276,7 +276,7 @@ let test n i int lnk port_list =
   let (state,link) =
     try intf_n.(i).status
     with exn ->
-      (Debug.tag (Printf.sprintf "Node %d has no site %d" (name n) i)
+      (Debug.tag (Format.sprintf "Node %d has no site %d" (name n) i)
       ; raise exn) in
   let port_list =
     match int with

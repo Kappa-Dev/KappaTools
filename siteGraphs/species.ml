@@ -91,42 +91,49 @@ let to_dot hr palette k cpt spec desc env =
 (**[of_node sg root visited env] produces the species anchored at node [root] allocated in the graph [sg] and *)
 (** returns a pair [(spec,visited')] where [visited'=visited U node_id] of [spec]*)
 let of_node sg root visited env =
-	let rec iter todo spec visited =
-		match todo with
-		| [] -> (spec, visited)
-		| id:: tl ->
-				let node = 
-					try SiteGraph.node_of_id sg id with 
-						| Not_found -> invalid_arg (Printf.sprintf "Species.of_node: Node %d is no longer in the graph" id) in
-				let todo', spec'=
-					Node.fold_status
-						(fun site_id (_, lnk_state) (todo, spec) ->
-								match lnk_state with
-								| Node.Null -> (todo, spec)
-								| Node.Ptr (node', site_id') ->
-										let id' = Node.get_address node' in
-										if IntMap.mem id' spec.nodes then (todo, spec)
-										else
-											let view = Node.bit_encode node' env in
-											let set =
-												try IntSet.add id' (Int64Map.find view spec.views) with
-												| Not_found -> IntSet.singleton id'
-											in
-											(id':: todo,
-												{ nodes = IntMap.add id' (Node.marshalize node') spec.nodes ;
-													views = Int64Map.add view set spec.views }
-											)
-								| Node.FPtr _ -> invalid_arg "Species.of_node"
-						) node (tl, spec)
-				in
-				iter todo' spec' (IntSet.add id visited)
-	in
-	let view_root = Node.bit_encode root env in
-	iter [Node.get_address root]
-	{ nodes = IntMap.add (Node.get_address root) (Node.marshalize root) IntMap.empty ;
-		views = Int64Map.add view_root (IntSet.singleton (Node.get_address root)) Int64Map.empty ;
-	} visited 
-	
+  let rec iter todo spec visited =
+    match todo with
+    | [] -> (spec, visited)
+    | id:: tl ->
+       let node =
+	 try SiteGraph.node_of_id sg id
+	 with Not_found ->
+	   invalid_arg
+	     (Format.sprintf
+		"Species.of_node: Node %d is no longer in the graph" id) in
+       let todo', spec'=
+	 Node.fold_status
+	   (fun site_id (_, lnk_state) (todo, spec) ->
+	    match lnk_state with
+	    | Node.Null -> (todo, spec)
+	    | Node.Ptr (node', site_id') ->
+	       let id' = Node.get_address node' in
+	       if IntMap.mem id' spec.nodes then (todo, spec)
+	       else
+		 let view = Node.bit_encode node' env in
+		 let set =
+		   try IntSet.add id' (Int64Map.find view spec.views) with
+		   | Not_found -> IntSet.singleton id'
+		 in
+		 (id':: todo,
+		  { nodes = IntMap.add id' (Node.marshalize node') spec.nodes ;
+		    views = Int64Map.add view set spec.views }
+		 )
+	    | Node.FPtr _ -> invalid_arg "Species.of_node"
+	   ) node (tl, spec)
+       in
+       iter todo' spec' (IntSet.add id visited)
+  in
+  let view_root = Node.bit_encode root env in
+  iter [Node.get_address root]
+       { nodes =
+	   IntMap.add (Node.get_address root) (Node.marshalize root)
+		      IntMap.empty ;
+	 views =
+	   Int64Map.add view_root (IntSet.singleton (Node.get_address root))
+			Int64Map.empty ;
+       } visited
+
 let iso spec1 spec2 env =
 	
 	let check i i' assoc = 

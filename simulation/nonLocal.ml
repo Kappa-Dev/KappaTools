@@ -24,35 +24,39 @@ let update_intra_in_components r embedding_info state counter env =
 	in
 	
 	let search_elements graph component extensions env =
-		let ext,modified = 
-			IntSet.fold
-			(fun u_id (extensions,modified) ->
-				if !Parameter.debugModeOn then (Printf.printf "looking for a piece of intra on lifts of node %d\n" u_id) ;
-				let u = try SiteGraph.node_of_id graph u_id with Not_found -> invalid_arg "NonLocal.search_elements"
-				in
-				let _,lifts = Node.get_lifts u 0 in (*BUG here site 0 is not always "_"*)
-				(if !Parameter.safeModeOn then let str = Environment.site_of_id (Node.name u) 0 env in if str <> "_" then failwith "Invariant violation in NonLocal.search_element") ;
-				LiftSet.fold
-				(fun inj (extensions,modified) ->
-					if Injection.is_trashed inj then (extensions,modified) (*injection should not be already invalid...*)
-					else
-						let (mix_id,cc_id) = Injection.get_coordinate inj in
-						
-						if not (Environment.is_nl_rule mix_id env) then 
-							begin
-								if !Parameter.debugModeOn then Printf.printf "a lift points to rule %d but it is a local one\n" mix_id ;
-								(extensions,modified)
-							end
-						else
-							let inj_map = try IntMap.find mix_id extensions with Not_found -> IntMap.empty in
-							let inj_list = try IntMap.find cc_id inj_map with Not_found -> [] in
-							let inj_map' = IntMap.add cc_id (inj::inj_list) inj_map in
-							(IntMap.add mix_id inj_map' extensions,true)
-				) lifts (extensions,modified)
-			) component (extensions,false)
-		in
-		if modified then (Some ext)
-		else None
+	  let ext,modified =
+	    IntSet.fold
+	      (fun u_id (extensions,modified) ->
+	       Debug.tag_if_debug "looking for a piece of intra on lifts of node %d" u_id ;
+	    let u = try SiteGraph.node_of_id graph u_id
+		    with Not_found -> invalid_arg "NonLocal.search_elements" in
+	    let _,lifts = Node.get_lifts u 0 in (*BUG here site 0 is not always "_"*)
+	    (if !Parameter.safeModeOn then
+	       let str = Environment.site_of_id (Node.name u) 0 env in
+	       if str <> "_" then failwith "Invariant violation in NonLocal.search_element") ;
+	    LiftSet.fold
+	      (fun inj (extensions,modified) ->
+	       if Injection.is_trashed inj
+	       then (extensions,modified) (*injection should not be already invalid...*)
+	       else
+		 let (mix_id,cc_id) = Injection.get_coordinate inj in
+		 if not (Environment.is_nl_rule mix_id env) then
+		   begin
+		     Debug.tag_if_debug "a lift points to rule %d but it is a local one" mix_id ;
+		     (extensions,modified)
+		   end
+		 else
+		   let inj_map = try IntMap.find mix_id extensions
+				 with Not_found -> IntMap.empty in
+		   let inj_list = try IntMap.find cc_id inj_map
+				  with Not_found -> [] in
+		   let inj_map' = IntMap.add cc_id (inj::inj_list) inj_map in
+		   (IntMap.add mix_id inj_map' extensions,true)
+	      ) lifts (extensions,modified)
+	      ) component (extensions,false)
+	  in
+	  if modified then (Some ext)
+	  else None
 	in
 	
 	(*reusing components that were computed to check that the rule was indeed binary*)
@@ -70,9 +74,11 @@ let update_intra_in_components r embedding_info state counter env =
 				let root = 
 					match Mixture.root_of_cc r.Primitives.lhs cc_i with Some r -> IntMap.find r embedding_info.Embedding.map | None -> invalid_arg "State.nl_positive_update" 
 				in
-				let _ = 
-					if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Exploring into image of CC[%d] computed during rule %d application" cc_i r.Primitives.r_id)
-	 			in
+				let () =
+				  Debug.tag_if_debug
+				    "Exploring into image of CC[%d] computed during rule %d application"
+				    cc_i r.Primitives.r_id
+				in
 				let component_i =
 				  try IntMap.find root components
 				  with Not_found ->
@@ -97,7 +103,7 @@ let update_intra_in_components r embedding_info state counter env =
 	else
 		IntMap.fold 
 		(fun r_id cc_map state ->
-			if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "Trying to find intra(s) for rule [%d]" r_id) ;
+		 Debug.tag_if_debug "Trying to find intra(s) for rule [%d]" r_id;
 			
 			let lhs = kappa_of_id r_id state in
 			try
@@ -122,8 +128,11 @@ let update_intra_in_components r embedding_info state counter env =
 					) cc_map ([IntMap.empty],0)
 				in
 				
-				if cc <> Mixture.arity lhs then 
-					(if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "One CC of rule [%d] has no candidate for intra, aborting" r_id); state)
+				if cc <> Mixture.arity lhs then
+				  let () =
+				    Debug.tag_if_debug
+				      "One CC of rule [%d] has no candidate for intra, aborting"
+				      r_id in state
 				else
 					List.fold_left  (*nl_injections : (InjProdHeap.t option) array*)
 					(fun state injprod_map -> 
@@ -145,7 +154,9 @@ let update_intra_in_components r embedding_info state counter env =
 					) state intras_for_r_id
 		with 
 		| Break cc_id ->
-			 (if !Parameter.debugModeOn then Debug.tag (Printf.sprintf "CC[%d] of rule [%d] has no candidate for intra, aborting" cc_id r_id); state)
+		   Debug.tag_if_debug
+		     "CC[%d] of rule [%d] has no candidate for intra, aborting" cc_id r_id;
+		   state
 		) extensions state
 		
 (**[update_rooted_intras injection_list state counter env] tries to form new intras using injections in [injection_list] as one component*)

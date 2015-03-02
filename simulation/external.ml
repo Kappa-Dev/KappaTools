@@ -122,7 +122,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
      let str = eval_pexpr pexpr state counter env in
      snapshot str ;
      raise (ExceptionDefn.StopReached
-	      (Printf.sprintf "STOP instruction was satisfied at (%d e,%f t.u)"
+	      (Format.sprintf "STOP instruction was satisfied at (%d e,%f t.u)"
 			      (Counter.event counter) (Counter.time counter)))
   | Primitives.FLUX pexpr ->
     begin

@@ -94,8 +94,8 @@ let event state maybe_active_pert_ids story_profiling
   in
 
   (*3. Draw rule*)
-  if !Parameter.debugModeOn then
-    Debug.tag (Printf.sprintf "Drawing a rule... (activity=%f) " (State.total_activity state));
+  Debug.tag_if_debug "Drawing a rule... (activity=%f)"
+		     (State.total_activity state);
 
   (*let t_draw = StoryProfiling.start_chrono () in*)
   let opt_instance,state =

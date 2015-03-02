@@ -1423,25 +1423,24 @@ let modify state cause (u, i) s pert_ids counter env =
 					((Environment.name (Node.name u) env)^" has no internal state to modify"))
 
 let delete state cause u side_effects pert_ids counter env =
-        if !Parameter.debugModeOn then
-                Printf.printf "Deleting node %d \n" (Node.name u) ; flush stdout ;
-        Node.fold_status
-	(fun i (_, lnk) (env,side_effects,pert_ids) ->
-		let env,pert_ids' = negative_upd state cause (u, i) 2 counter env in
-		let pert_ids = IntSet.union pert_ids pert_ids' in
-			(* delete injection pointed by both lnk and int-lifts *)
-			match lnk with
-			| Node.FPtr _ -> invalid_arg "State.delete"
-			| Node.Null -> (env,side_effects,pert_ids)
-			| Node.Ptr (v, j) ->
-                                        if !Parameter.debugModeOn then
-                                                Printf.printf "Deleting node %d which was connected to node %d \n" (Node.name u) (Node.name v) ; flush stdout ;
-					Node.set_ptr (v, j) Node.Null;
-					let env,pert_ids' = negative_upd state cause (v, j) 1 counter env in
-					let pert_ids = IntSet.union pert_ids pert_ids' in
-					(env,Int2Set.add ((Node.get_address v), j) side_effects,pert_ids)
-	)
-	u (env,side_effects,pert_ids)
+  Debug.tag_if_debug "Deleting node %d" (Node.name u);
+  Node.fold_status
+    (fun i (_, lnk) (env,side_effects,pert_ids) ->
+     let env,pert_ids' = negative_upd state cause (u, i) 2 counter env in
+     let pert_ids = IntSet.union pert_ids pert_ids' in
+     (* delete injection pointed by both lnk and int-lifts *)
+     match lnk with
+     | Node.FPtr _ -> invalid_arg "State.delete"
+     | Node.Null -> (env,side_effects,pert_ids)
+     | Node.Ptr (v, j) ->
+        Debug.tag_if_debug "Deleting node %d which was connected to node %d"
+			   (Node.name u) (Node.name v);
+	Node.set_ptr (v, j) Node.Null;
+	let env,pert_ids' = negative_upd state cause (v, j) 1 counter env in
+	let pert_ids = IntSet.union pert_ids pert_ids' in
+	(env,Int2Set.add ((Node.get_address v), j) side_effects,pert_ids)
+    )
+    u (env,side_effects,pert_ids)
 
 let apply state r embedding_t counter env =
   let app state embedding fresh_map (id, i) =

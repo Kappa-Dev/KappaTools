@@ -108,7 +108,7 @@ let fill state counter env time_increment =
        match counter.Counter.dE with
        | Some dE ->
 	  if n>1 then
-	    invalid_arg (Printf.sprintf "Plot.fill: invalid increment %d" n)
+	    invalid_arg ("Plot.fill: invalid increment "^string_of_int n)
 	  else
 	    if n <> 0
 	    then plot_now env counter state
