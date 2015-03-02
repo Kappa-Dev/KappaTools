@@ -33,7 +33,7 @@ sig
   val member: Remanent_parameters_sig.parameters -> Exception.method_handler -> value -> ('a,'b) dictionary -> Exception.method_handler * bool
   val allocate: Remanent_parameters_sig.parameters -> Exception.method_handler -> ('a -> 'a -> int) -> value -> 'a -> (int -> 'b) -> ('a,'b) dictionary -> Exception.method_handler * (int * 'a * 'b * ('a,'b) dictionary) option
   val allocate_uniquely: Remanent_parameters_sig.parameters -> Exception.method_handler -> ('a -> 'a -> int) -> value -> 'a -> (int -> 'b) -> ('a,'b) dictionary -> Exception.method_handler * (int * 'a * 'b * ('a,'b) dictionary) option
-                                                                                                                                                                                                                                                                                                                                                           (*  val allocate_f_id: Exception.method_handler -> ('a -> 'a -> int) -> value -> (int -> 'a) -> 'a dictionary -> Exception.method_handler * (int * 'a * 'a dictionary) option*)
+  (*  val allocate_f_id: Exception.method_handler -> ('a -> 'a -> int) -> value -> (int -> 'a) -> 'a dictionary -> Exception.method_handler * (int * 'a * 'a dictionary) option*)
   val allocate_bool: Remanent_parameters_sig.parameters -> Exception.method_handler -> ('a -> 'a -> int) -> value -> 'a -> (int -> 'b) -> ('a,'b) dictionary -> Exception.method_handler * (bool * (int * 'a * 'b * ('a,'b) dictionary) option)
     
   val unsafe_allocate: Remanent_parameters_sig.parameters -> Exception.method_handler -> value -> 'a -> (int -> 'b) -> ('a,'b) dictionary -> Exception.method_handler * (int * 'a * 'b * ('a,'b)  dictionary)

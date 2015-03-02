@@ -86,12 +86,12 @@ let declare_site create parameters make_site make_state (error,handler) agent_id
   let error,sites = Int_storage.Nearly_inf_Imperatif.get parameters error agent_id handler.Cckappa_sig.sites in
    match sites with 
     | None  -> warn parameters error (Some "line 87") Exit (handler,[],0)   
-     | Some sites -> 
+    | Some sites -> 
          let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit site () Misc_sa.const_unit sites in 
         begin
            match output with 
-     | None -> warn parameters error (Some "line 92") Exit (handler,[],0) 
-             | Some (k,_,_,sites) -> 
+           | None -> warn parameters error (Some "line 92") Exit (handler,[],0) 
+           | Some (k,_,_,sites) -> 
                let error,(states_dic,dic_states,handler) = 
                if bool 
                then 

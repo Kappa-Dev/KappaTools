@@ -114,13 +114,13 @@ let print_interface  parameter error interface =
          aux error true interface 
   in aux error false interface 
 
-let print_agent parameter error agent = (*TEST*)
+let print_agent parameter error agent =
   let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "%s%s" agent.Ckappa_sig.ag_nme (Remanent_parameters.get_agent_open_symbol parameter) in 
   let error = print_interface parameter error agent.Ckappa_sig.ag_intf in 
   let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "%s" (Remanent_parameters.get_agent_close_symbol parameter) in 
   error 
     
-let print_mixture  parameter error mixture = (*TEST*)
+let print_mixture  parameter error mixture =
   let rec aux error bool mixture =  
     match mixture 
     with 
