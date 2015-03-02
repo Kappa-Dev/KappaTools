@@ -9,18 +9,6 @@ type table = (int list, (t * int) list) Hashtbl.t
 
 let empty_table () = Hashtbl.create 10
 
-let to_string spec env =
-	let hsh_lnk = Hashtbl.create 0
-	in
-	let _, l =
-		IntMap.fold
-			(fun id node (fresh, cont) ->
-						let (str, c) = Node.to_string false (hsh_lnk, fresh) node env in
-						(c, str:: cont)
-			) spec.nodes (0,[])
-	in
-	String.concat "," (List.rev l)
-
 let print env desc spec =
   let hsh_lnk = Hashtbl.create 0 in
   let mx = IntMap.size spec.nodes in
@@ -258,21 +246,21 @@ let dump desc table hr token_vector env =
     ) token_vector ;
   Format.fprintf desc "@]}@."
 
-let dump_table table env =
-  let () = Format.open_vbox 0 in
+let dump_table f table env =
+  let () = Format.pp_open_vbox f 0 in
   let () =
     Hashtbl.iter
       (fun () specs ->
        List.iter
 	 (fun (spec, k) ->
-	  Format.printf "%d instances of species: %s@," k (to_string spec env);
-	  Format.printf
-	    "with signature %a@,"
+	  Format.fprintf f "%d instances of species: %a@," k (print env) spec;
+	  Format.fprintf
+	    f "with signature %a@,"
 	    (Pp.set Int64Map.bindings Pp.comma
 		    (fun f (i,_) -> Format.fprintf f "%Ld" i))
 	    spec.views;
-	  Printf.printf "******@,"
+	  Format.fprintf f "******@,"
 	 ) specs
       ) table in
-  let () = Format.close_box () in
-  Format.print_newline ()
+  let () = Format.pp_close_box f () in
+  Format.pp_print_newline f ()
