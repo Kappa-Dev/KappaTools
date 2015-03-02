@@ -114,7 +114,7 @@ let nodes_of_ast env ast_mixture =
 	  match opt with
 	  | None -> ()
 	  | Some (_,_,pos) ->
-	     raise (ExceptionDefn.Semantics_Error (pos,Printf.sprintf "Edge identifier %d is dangling" i))
+	     raise (ExceptionDefn.Semantics_Error (pos,"Edge identifier "^string_of_int i^" is dangling"))
 	 ) link_map ;
        (node_map,env)
   in
@@ -782,7 +782,7 @@ let init_graph_of_result env res =
 	    try Environment.num_of_token tk_nme env
 	    with Not_found ->
 	      raise (ExceptionDefn.Semantics_Error
-		       (pos_tk, Printf.sprintf "token %s is undeclared" tk_nme))
+		       (pos_tk, "token "^tk_nme^" is undeclared"))
 	  in
 	  token_vector.(tok_id) <- value;
 	  (sg,env)
@@ -793,13 +793,13 @@ let init_graph_of_result env res =
 let configurations_of_result result =
   let raw_set_value pos_p param value_list f =
     match value_list with
-    | (v,pos) :: _ -> f (v,pos)
+    | (v,pos) :: _ -> f v pos_p
     | [] -> ExceptionDefn.warning
 	      ~pos:pos_p
 	      (fun f -> Format.fprintf f "Empty value for parameter %s" param)
   in
   let set_value pos_p param value_list f ass =
-    raw_set_value pos_p param value_list (fun x -> ass := f x) in
+    raw_set_value pos_p param value_list (fun x p -> ass := f x p) in
   List.iter
     (fun ((param,pos_p),value_list) ->
      match param with
@@ -813,103 +813,102 @@ let configurations_of_result result =
 	    | ("none",_)::tl -> (Parameter.mazCompression := true ; parse tl)
 	    | [] -> ()
 	    | (error,pos)::tl ->
-	       raise (ExceptionDefn.Semantics_Error
-			(pos,Printf.sprintf "Unkown value %s for compression mode" error))
+	       raise (ExceptionDefn.Malformed_Decl
+			("Unkown value "^error^" for compression mode", pos_p))
 	  in
 	  parse value_list
 	end
      | "cflowFileName"	->
-	raw_set_value pos_p param value_list (fun x -> Kappa_files.set_cflow (fst x))
+	raw_set_value pos_p param value_list (fun x p -> Kappa_files.set_cflow x)
      | "progressBarSize" ->
 	set_value pos_p param value_list
-		  (fun (v,p) ->
+		  (fun v p ->
 		   try int_of_string v
 		   with _ ->
-		     raise (ExceptionDefn.Semantics_Error
-			      (p,Printf.sprintf "Value %s should be an integer" v))
+		     raise (ExceptionDefn.Malformed_Decl
+			      ("Value "^v^" should be an integer", p))
 		  ) Parameter.progressBarSize
 
      | "progressBarSymbol" ->
 	set_value pos_p param value_list
-		  (fun (v,p) ->
+		  (fun v p ->
 		   try
 		     String.unsafe_get v 0
 		   with _ ->
-		     raise (ExceptionDefn.Semantics_Error
-			      (p,Printf.sprintf "Value %s should be a character" v))
+		     raise (ExceptionDefn.Malformed_Decl
+			      ("Value "^v^" should be a character",p))
 		  ) Parameter.progressBarSymbol
 
      | "dumpIfDeadlocked" ->
 	set_value pos_p param value_list
-		  (fun (value,pos_v) ->
+		  (fun value pos_v ->
 		   match value with
 		   | "true" | "yes" -> true
 		   | "false" | "no" -> false
 		   | _ as error ->
-		      raise (ExceptionDefn.Semantics_Error
-			       (pos_v,Printf.sprintf "Value %s should be either \"yes\" or \"no\"" error))
+		      raise (ExceptionDefn.Malformed_Decl
+			       ("Value "^error^" should be either \"yes\" or \"no\"", pos_v))
 		  ) Parameter.dumpIfDeadlocked
      | "plotSepChar" ->
 	set_value pos_p param value_list
-		  (fun (v,p) ->
+		  (fun v p ->
 		   fun f ->  Format.fprintf f "%s" v
 		  ) Parameter.plotSepChar
      | "maxConsecutiveClash" ->
 	set_value pos_p param value_list
-		  (fun (v,p) ->
+		  (fun v p ->
 		   try int_of_string v
 		   with _ ->
-		     raise (ExceptionDefn.Semantics_Error
-			      (p,Printf.sprintf "Value %s should be an integer" v))
+		     raise (ExceptionDefn.Malformed_Decl
+			      ("Value "^v^" should be an integer",p))
 		  ) Parameter.maxConsecutiveClash
 
      | "dotSnapshots" ->
 	set_value pos_p param value_list
-		  (fun (value,pos_v) ->
+		  (fun value pos_v ->
 		   match value with
 		   | "true" | "yes" -> true
 		   | "false" | "no" -> false
 		   | _ as error ->
-		      raise (ExceptionDefn.Semantics_Error
-			       (pos_v,Printf.sprintf "Value %s should be either \"yes\" or \"no\"" error))
+		      raise (ExceptionDefn.Malformed_Decl
+			       ("Value "^error^" should be either \"yes\" or \"no\"", pos_v))
 		  ) Parameter.dotOutput
      | "colorDot" ->
 	set_value pos_p param value_list
-		  (fun (value,pos_v) ->
+		  (fun value pos_v ->
 		   match value with
 		   | "true" | "yes" -> true
 		   | "false" | "no" -> false
 		   | _ as error ->
-		      raise (ExceptionDefn.Semantics_Error
-			       (pos_v,Printf.sprintf "Value %s should be either \"yes\" or \"no\"" error))
+		      raise (ExceptionDefn.Malformed_Decl
+			       ("Value "^error^" should be either \"yes\" or \"no\"", pos_v))
 		  ) Parameter.useColor
      | "dumpInfluenceMap" ->
 	raw_set_value
 	  pos_p param value_list
-	  (fun (v,p) ->
+	  (fun v p ->
 	   match v with
 	   | "true" | "yes" -> Kappa_files.set_up_influence ()
 	   | "false" | "no" -> Kappa_files.set_influence ""
 	   | _ as error ->
-	      raise (ExceptionDefn.Semantics_Error
-		       (p,"Value "^error^" should be either \"yes\" or \"no\""))
+	      raise (ExceptionDefn.Malformed_Decl
+		       ("Value "^error^" should be either \"yes\" or \"no\"",p))
 	     )
      | "influenceMapFileName" ->
 	raw_set_value pos_p param value_list
-		      (fun x -> Kappa_files.set_influence (fst x))
+		      (fun x p -> Kappa_files.set_influence x)
      | "showIntroEvents" ->
 	set_value pos_p param value_list
-		  (fun (v,p) -> match v with
+		  (fun v p -> match v with
 				| "true" | "yes" -> true
 				| "false" | "no" -> false
 				| _ as error ->
-				   raise (ExceptionDefn.Semantics_Error
-					    (p,Printf.sprintf "Value %s should be either \"yes\" or \"no\"" error))
+				   raise (ExceptionDefn.Malformed_Decl
+					    ("Value "^error^" should be either \"yes\" or \"no\"",p))
 		  )
 		  Parameter.showIntroEvents
      | _ as error ->
-	raise (ExceptionDefn.Semantics_Error
-		 (pos_of_lex_pos (fst pos_p),Printf.sprintf "Unkown parameter %s" error))
+	raise (ExceptionDefn.Malformed_Decl ("Unkown parameter "^error, pos_p))
     ) result.configurations
 
 let initialize overwrite result =

@@ -400,8 +400,8 @@ agent_expression:
 	 {let (id,pos) = $1 in ((id,rhs_pos 1), $3)}
     | ID error
 	 {let str,pos = $1 in
-	  raise (ExceptionDefn.Syntax_Error (Some pos,
-					     Printf.sprintf "Malformed agent '%s'" str))}
+	  raise (ExceptionDefn.Syntax_Error
+		   (Some pos,"Malformed agent '"^str^"'"))}
     ;
 
 interface_expression:

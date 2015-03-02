@@ -6,10 +6,10 @@ type 'a t =
 
 let name_map_of_array a =
   fst (Array.fold_left
-	 (fun (map,i) ((x,(pos,_)),_) ->
+	 (fun (map,i) ((x,pos),_) ->
 	  if StringMap.mem x map then
-	    raise (ExceptionDefn.Semantics_Error
-		     (Tools.pos_of_lex_pos pos, (Printf.sprintf "Label '%s' already defined" x)))
+	    raise (ExceptionDefn.Malformed_Decl
+		     ("Label '"^x^"' already defined", pos))
 	  else StringMap.add x i map,succ i)
 	 (StringMap.empty,0) a)
 

@@ -13,16 +13,14 @@
    let pos = lexbuf.lex_curr_p in
    (pos.pos_fname, pos.pos_lnum, pos.pos_cnum - pos.pos_bol)
 
- let return_error opt_pos lexbuf msg =
+ let return_error f opt_pos lexbuf msg =
    let fn,lnum,cnum =
      match opt_pos with
      | Some (fn,ln,cn) -> (fn,ln,cn)
      | None -> position lexbuf
    in
-   let loc = Printf.sprintf "line %d, character %d:" lnum cnum in
-   let full_msg = Printf.sprintf "Error (%s) %s %s" fn loc msg
-   in
-   Printf.eprintf "%s\n" full_msg ; exit 1
+   let loc f = Format.fprintf f "line %d, character %d:" lnum cnum in
+   Format.fprintf f "Error (%s) %t %s@." fn loc msg
 
  let keyword_or_id =
  let keywords = Hashtbl.create 15 in
@@ -74,7 +72,7 @@ rule token = parse
 			      (Some (position lexbuf),
 			       ("Perturbation effect \""^s^"\" is not defined")))
 		     }
-	 | '[' {let lab = read_label "" [']'] lexbuf in
+	 | '[' {let lab = read_label [] [']'] lexbuf in
 		match lab with
 		| "E" -> EVENT
 		| "E+" -> PROD_EVENT
@@ -104,7 +102,7 @@ rule token = parse
 	       }
 	 | ':' {TYPE}
 	 | ';' {SEMICOLON}
-	 | '\"' {let str = read_label "" ['\"'] lexbuf in
+	 | '\"' {let str = read_label [] ['\"'] lexbuf in
 		 let pos = position lexbuf in STRING (str,pos)}
 	 | eol {Lexing.new_line lexbuf ; NEWLINE}
 	 | '#' {comment lexbuf}
@@ -129,7 +127,7 @@ rule token = parse
 	 | '<' {SMALLER}
 	 | '>' {GREATER}
 	 | '=' {EQUAL}
-	 | '%' {let lab = read_label "" [':'] lexbuf in
+	 | '%' {let lab = read_label [] [':'] lexbuf in
 		let pos = position lexbuf in
 		match lab with
 		| "agent" -> (SIGNATURE pos)
@@ -161,10 +159,11 @@ rule token = parse
 
 and read_label acc char_list =
   parse
-  | eof {acc}
+  | eof {String.concat "" (List.rev_map (fun x -> String.make 1 x) acc)}
   | '\\' eol {Lexing.new_line lexbuf ; read_label acc char_list lexbuf}
-  | _ as c {if List.mem c char_list then acc
-	    else read_label (Printf.sprintf "%s%c" acc c) char_list lexbuf}
+  | _ as c {if List.mem c char_list
+	    then String.concat "" (List.rev_map (fun x -> String.make 1 x) acc)
+	    else read_label (c::acc) char_list lexbuf}
 
 and comment = parse
 	    | eol {Lexing.new_line lexbuf ; NEWLINE}
@@ -176,7 +175,7 @@ and inline_comment = parse
 		   | eol {Lexing.new_line lexbuf; inline_comment lexbuf}
 		   | '*' '/' { () }
 		   | '\"'
-		       {ignore (read_label "" ['\"'] lexbuf);
+		       {ignore (read_label [] ['\"'] lexbuf);
 			inline_comment lexbuf}
 		   | '/' '*' {inline_comment lexbuf; inline_comment lexbuf}
 		   | _ {inline_comment lexbuf}
@@ -187,13 +186,14 @@ and inline_comment = parse
     let lexbuf = Lexing.from_channel d in
     lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = fic} ;
     try
-      Debug.tag (Printf.sprintf "Parsing %s..." fic) ;
+      Debug.tag ("Parsing "^fic^"...") ;
       KappaParser.start_rule token lexbuf ; Debug.tag "done" ; close_in d ;
       Parameter.openInDescriptors := List.tl (!Parameter.openInDescriptors)
     with
     | Syntax_Error (opt_pos,msg) ->
        (close_in d ;
 	Parameter.openInDescriptors := List.tl (!Parameter.openInDescriptors);
-	return_error opt_pos lexbuf msg
+	let () = return_error Format.err_formatter opt_pos lexbuf msg in
+	exit 1
        )
 }
