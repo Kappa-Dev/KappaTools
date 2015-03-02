@@ -26,18 +26,24 @@ let empty_classes parameter error handler =
      Covering_classes_type.covering_classes  = covering_classes
   }
 
-let rec print_list ls =
-  	match ls with
-  	| [] -> ()
-  	| is :: ls' ->
-  		let _ = List.iter (fun i -> Printf.printf " %i " i) is in
-  	print_list ls'
-				 
+(*MOVE*)
+let rec print parameter map =
+ match map with
+ | [] -> ()
+ | is :: tl ->
+    let _ = List.iter (fun i -> Printf.fprintf
+                                  (Remanent_parameters.get_log parameter)
+                                  "%ssite_type: %i "
+                                  (Remanent_parameters.get_prefix parameter)i) is in
+    let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "\n" in
+    print parameter tl
+
 let add_covering_class parameter error agent_type new_covering_class covering_classes =
   match new_covering_class with
     | [] -> error, covering_classes
     | _ ->
-      let _ = Misc_sa.trace parameter (fun () -> "agent_type:" ^(string_of_int agent_type) ^":")in	
+       let _ = Misc_sa.trace parameter (fun () -> "agent_type:" ^
+                                       (string_of_int agent_type) ^":") in	
        let error, agent =
          Covering_classes_type.AgentMap.unsafe_get
            parameter
@@ -52,14 +58,14 @@ let add_covering_class parameter error agent_type new_covering_class covering_cl
        in
        (* store the new list of covering classes *)
        let new_list = new_covering_class::old_list in
-       let _ = print_string "site_type:"; print_list new_list; print_string "\n" in
-	   Covering_classes_type.AgentMap.set
+       let _ = print parameter new_list in
+       Covering_classes_type.AgentMap.set
          parameter
          error
          agent_type
          new_list
          covering_classes
-
+           
 let scan_rule parameter error handler rule classes =
   let viewslhs = rule.Cckappa_sig.rule_lhs.Cckappa_sig.views in
   let rule_diff = rule.Cckappa_sig.diff_reverse in
@@ -89,6 +95,7 @@ let scan_rule parameter error handler rule classes =
               covering_classes 
           in
           error, covering_classes
+                   
     ) viewslhs rule_diff covering_classes
   in
   error,
@@ -97,15 +104,45 @@ let scan_rule parameter error handler rule classes =
   }
 
 (*TODO*)
-let length_covering_classes lists =
-  List.map (fun covering_class ->
-            covering_class, List.length covering_class) lists
+let rec remove_dups l =
+  match l with
+  | [] -> [] 
+  | h :: t -> h :: (remove_dups (List.filter (fun x -> x <> h)t))
+            
+let rec remove_dups_lists ls =
+  match ls with
+  | [] -> []
+  | h :: t -> let h' = remove_dups h in
+              h' :: (remove_dups_lists
+                       (List.filter
+                          (fun x -> let x' = remove_dups x in x' <> h') t))
 
-let length_sort lists =
-  let lists = List.sort (fun a b -> compare (fst b) (fst a))
-                        (length_covering_classes lists) in
-  List.map snd lists
+(*let length_covering_classes lists =
+  List.rev_map (fun covering_class ->
+                covering_class, List.length covering_class) lists*)
+           
+let length_sort_remove_dups lists =
+  let remove_lists = remove_dups_lists lists in
+  let length_lists = List.rev_map (fun list ->
+                                   list, List.length list) remove_lists in
+  let lists = List.sort (fun a b -> compare (snd a) (snd b)) length_lists in
+  List.rev_map fst lists
 
+(*clean function: remove duplicate inside a list of lists, sort the length
+of a list of lists in descreasing order; convert a list into a set; check
+if there is l such that l is subset of l', if yes remove l, update the list
+inside the list of lists *)
+
+(*
+let clean lists =
+  let l = length_sort_remove_dups l in
+  (*convert a list into a set *)
+  let empty_set = Cckappa_sig.Site_map_and_set.empty_set in
+  let set_of_list = List.fold_left
+                      (fun acc x ->
+                       Cckappa_sig.Site_map_and_set.add_set x acc) empty_set
+  in*)              
+    
 let scan_rule_set parameter error handler rules =
   let error, init = empty_classes parameter error handler in
   Int_storage.Nearly_inf_Imperatif.fold
