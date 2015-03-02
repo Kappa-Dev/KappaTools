@@ -207,7 +207,7 @@ let declare_var_kappa ?(from_rule=false) label_pos_opt env =
 		(try let _ = num_of_alg label env in true with Not_found -> false)
 	in
 		if already_defined then
-		  raise (Malformed_Decl ((Printf.sprintf "Label '%s' already defined" label),pos))
+		  raise (Malformed_Decl ("Label "^label^"' already defined",pos))
 		else
 			let np = StringMap.add label env.fresh_kappa env.num_of_kappa
 			and pn = IntMap.add env.fresh_kappa label env.kappa_of_num

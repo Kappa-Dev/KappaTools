@@ -80,19 +80,18 @@ let create ast_intf =
 	  Ast.port_lnk =Term.with_dummy_pos Ast.FREE;}
 	 :: ast_intf))
 
-let to_string sign =
-  let str_of_assoc assoc =
-    let cont = ref [] in
-    Array.iteri (fun i ((name,_),_) ->
-		 if name = "_" then ()
-		 else
-		   let int =
-		     match default_num_value i sign with
-		     | None -> ""
-		     | Some n ->  "~"^(internal_state_of_num i n sign)
-		   in
-		   cont:=(name^int)::!cont
-		) assoc ;
-    String.concat "," (List.rev !cont)
-  in
-  Printf.sprintf "(%s)"	(str_of_assoc sign.NamedDecls.decls)
+let print f sign =
+  Format.fprintf
+    f "(%a)"
+    (Pp.array
+       (fun f -> Format.pp_print_string f ",")
+       (fun i f ((name,_),_) ->
+	if name = "_" then ()
+	else
+	  let int =
+	    match default_num_value i sign with
+	    | None -> ""
+	    | Some n ->  "~"^(internal_state_of_num i n sign)
+	  in
+	  Format.fprintf f "%s%s" name int))
+    sign.NamedDecls.decls

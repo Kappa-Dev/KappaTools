@@ -239,7 +239,7 @@ let diff pos m0 m1 env =
 	    | (Some _, None) ->
 	       compile_error
 		 pos
-		 (Printf.sprintf "The internal state of agent '%s', site '%s' on the right hand side is underspecified" ag_name site_name)
+		 (Format.sprintf "The internal state of agent '%s', site '%s' on the right hand side is underspecified" ag_name site_name)
 	    | (None, Some j) ->
 	       let site = Environment.site_of_id (Mixture.name ag) site_id env in
 	       let _ =
@@ -352,7 +352,7 @@ let diff pos m0 m1 env =
 	       | (Some (id1, i1), None) ->
 		  (*sub-case: connected -> semi-link*)
 		  compile_error
-		    pos (Printf.sprintf "The link status of agent '%s', site '%s' on the right hand side is underspecified"
+		    pos (Format.sprintf "The link status of agent '%s', site '%s' on the right hand side is underspecified"
 					ag_name site_name)
 	       | (None, None) -> (*sub-case: semi-link -> semi-link*)
 		  (inst,idmap) (*nothing to be done*)
@@ -363,7 +363,7 @@ let diff pos m0 m1 env =
 	       match opt' with
 	       | None -> (*sub-case: free -> semi-link*)
 		  compile_error
-		    pos (Printf.sprintf "The link status of agent '%s', site '%s' on the right hand side is inconsistent"
+		    pos (Format.sprintf "The link status of agent '%s', site '%s' on the right hand side is inconsistent"
 					ag_name site_name)
 	       | Some (id', i') -> (*sub-case: free -> connected*)
 		  (*no warning*)
@@ -384,7 +384,7 @@ let diff pos m0 m1 env =
 	  | (Mixture.TYPE (sid,nme),Mixture.TYPE(sid',nme')) ->
 	     if sid=sid' && nme=nme' then (inst,idmap)
 	     else compile_error
-		    pos (Printf.sprintf "The link status of agent '%s', site '%s' on the right hand side is inconsistent" 
+		    pos (Format.sprintf "The link status of agent '%s', site '%s' on the right hand side is inconsistent" 
 					ag_name site_name)
 	  | Mixture.WLD, Mixture.FREE ->  (*wildcard -> free*)
 	     let site = Environment.site_of_id (Mixture.name ag) site_id env in
@@ -407,7 +407,7 @@ let diff pos m0 m1 env =
 	       match opt' with
 	       | None ->
 		  compile_error
-		    pos (Printf.sprintf "The link status of agent '%s', site '%s' on the right hand side is inconsistent" ag_name site_name)
+		    pos (Format.sprintf "The link status of agent '%s', site '%s' on the right hand side is inconsistent" ag_name site_name)
 	       | Some (id', i') ->
 		  (*warning*)
 		  let site = Environment.site_of_id (Mixture.name ag) site_id env in
@@ -432,7 +432,7 @@ let diff pos m0 m1 env =
 	     end
 	  | (_,_) -> (*connected,free -> wildcard*)
 	     compile_error
-	       pos (Printf.sprintf "The link status of agent '%s', site '%s' on the right hand side is underspecified"
+	       pos (Format.sprintf "The link status of agent '%s', site '%s' on the right hand side is underspecified"
 				   ag_name site_name)
 	 )
 	 interface (inst,idmap)
@@ -684,8 +684,8 @@ let dump err_fmt r env =
 	  Format.fprintf err_fmt "DEL #%d@," i
        | ADD (i, name) ->
 	  let sign = Environment.get_sig name env in
-	  Format.fprintf err_fmt "ADD %s%s with identifier #%d@,"
-			 (Environment.name name env) (Signature.to_string sign)
+	  Format.fprintf err_fmt "ADD %s%a with identifier #%d@,"
+			 (Environment.name name env) Signature.print sign
 			 ((fun (deleted,kept,_) -> deleted +kept+ i) r.balance)
       )
       script

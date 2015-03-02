@@ -147,7 +147,9 @@ let follow_in_spanning_tree root_ag (i,site_id) mix =
   let span =
     try (span root_ag mix)
     with Not_found ->
-      invalid_arg (Printf.sprintf "Mixture.follow_in_spanning_tree: span not precompiled for root %d" root_ag)
+      invalid_arg
+	("Mixture.follow_in_spanning_tree: span not precompiled for root "^
+	   string_of_int root_ag)
   in
   try Some (Int2Map.find (i,site_id) span)
   with Not_found -> None

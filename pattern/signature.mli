@@ -11,6 +11,6 @@ val num_of_internal_state : int -> string Term.with_pos -> t -> int
 val internal_state_of_num : int -> int -> t -> string
 val default_num_value : int -> t -> int option
 
-val to_string : t -> string
+val print : Format.formatter -> t -> unit
 
 val create : Ast.port list -> t
