@@ -21,26 +21,32 @@ module type Labels =
 
     val label_of_int : Remanent_parameters_sig.parameters -> Exception.method_handler -> int -> Exception.method_handler * label
     val to_string : Remanent_parameters_sig.parameters -> Exception.method_handler -> label -> Exception.method_handler * string
+    val dump : Remanent_parameters_sig.parameters -> Exception.method_handler -> label -> Exception.method_handler
   end
 
 module Int_labels =
   (struct
       type label = int
                     
-      let label_of_int _ error i = error, i
-      let to_string parameter error i = error, string_of_int i
+      let label_of_int _ error a = error, a
+      let to_string parameter error a = error, string_of_int a
+      let dump handler error a =
+        let error, s = to_string handler error a in
+        let _ = Printf.fprintf (Remanent_parameters.get_log handler) "%s" s in
+        error
+
     end:Labels)
 
 module type Label_handler =
   sig
     type label
     type label_set
-           
-    (*TODO*)
+
     val label_of_int : Remanent_parameters_sig.parameters -> Exception.method_handler -> int -> Exception.method_handler * label
     val empty : label_set
     val add_set : Remanent_parameters_sig.parameters -> Exception.method_handler -> label -> label_set -> Exception.method_handler * label_set
     val to_string : Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.kappa_handler -> label_set -> Exception.method_handler * string list
+    val dump: Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.kappa_handler -> label_set  -> Exception.method_handler
   end
 
 module Empty =
@@ -52,6 +58,7 @@ module Empty =
       let empty = ()
       let add_set _ error _ _ = error, ()
       let to_string _ error _ _ = error, []
+      let dump _ error _ _ = error           
    end:Label_handler with type label = unit)
     
 module Extensive =
@@ -85,6 +92,27 @@ module Extensive =
          in
          let solution = List.rev ("]" :: solution) in
          error, solution
-                             
+                  
+       let dump parameter error handler  a =
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "[" in
+        let _,error  = 
+          Set.fold_set 
+            (fun a (bool,error) -> 
+              let error, a' = L.to_string parameter error a in 
+              let _ = 
+                if bool 
+                then 
+                   Printf.fprintf (Remanent_parameters.get_log parameter) ";%s" a'  
+                else 
+                   Printf.fprintf (Remanent_parameters.get_log parameter) "%s" a' 
+              in 
+                true,error
+            )
+            a 
+            (false,error)
+        in 
+        let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "]" in 
+        error
+          
    end:Label_handler))
     
