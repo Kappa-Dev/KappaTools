@@ -110,9 +110,9 @@ let print f = function
   | I x -> Format.fprintf f "%d" x
 
 let to_string = function
-  | F x -> Printf.sprintf "%E" x
-  | I64 x -> Printf.sprintf "%Ld" x
-  | I x -> Printf.sprintf "%d" x
+  | F x -> string_of_float x
+  | I64 x -> Int64.to_string x
+  | I x -> string_of_int x
 
 let rec iteri f x n =
   if is_strictly_positive n then iteri f (f n x) (pred n) else x

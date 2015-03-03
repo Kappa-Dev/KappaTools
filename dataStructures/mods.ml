@@ -391,9 +391,6 @@ let update_profiling_info a info =
     story_event = info.story_event ;
     profiling_info = a}
 
-let dump_simulation_info log info = 
-  Printf.fprintf log "Story: %i\nTime: %f\nEvent: %i\n" info.story_id info.story_time info.story_event 
-
 let compare_profiling_info info1 info2 = 
   match info1,info2
   with 
