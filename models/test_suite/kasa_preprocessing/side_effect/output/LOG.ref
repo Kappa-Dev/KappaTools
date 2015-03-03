@@ -178,6 +178,5 @@ Covering_classes:site_type: 0
 Covering_classes:Rule 1
 Covering_classes:agent_type:0:Covering_classes:site_type: 0 
 Covering_classes:site_type: 1 
-Covering_classes:site_type: 0 
 Covering_classes:Rule 2
 execution finished without any exception
