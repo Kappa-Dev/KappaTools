@@ -38,6 +38,49 @@ let rec print parameter map =
     let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "\n" in
     print parameter tl
 
+let rec remove_dups l =
+  match l with
+  | [] -> [] 
+  | h :: t -> h :: (remove_dups (List.filter (fun x -> x <> h)t))
+            
+let rec remove_dups_lists ls =
+  match ls with
+  | [] -> []
+  | h :: t -> let h' = remove_dups h in
+              h' :: (remove_dups_lists
+                       (List.filter
+                          (fun x -> let x' = remove_dups x in x' <> h') t))
+          
+let length_sort_remove_dups lists =
+  let remove_lists = remove_dups_lists lists in
+  let length_lists = List.rev_map (fun list ->
+                                   list, List.length list) remove_lists in
+  let lists = List.sort (fun a b -> compare (snd a) (snd b)) length_lists in
+  List.rev_map fst lists
+
+let set_of_list parameters error =
+  List.fold_left
+    (fun acc x ->
+     let error, set =
+       Cckappa_sig.Site_map_and_set.add_set parameters error x acc
+     in set)
+    Cckappa_sig.Site_map_and_set.empty_set
+             
+(*clean function: remove duplicate inside a list of lists, sort the length
+of a list of lists in descreasing order; convert a list into a set; check
+if there is l such that l is subset of l', if yes remove l, update the list
+inside the list of lists *)
+
+(*
+let clean lists =
+  let l = length_sort_remove_dups l in
+  (*convert a list into a set *)
+  let empty_set = Cckappa_sig.Site_map_and_set.empty_set in
+  let set_of_list = List.fold_left
+                      (fun acc x ->
+                       Cckappa_sig.Site_map_and_set.add_set x acc) empty_set
+  in*)
+
 let add_covering_class parameter error agent_type new_covering_class covering_classes =
   match new_covering_class with
     | [] -> error, covering_classes
@@ -57,8 +100,10 @@ let add_covering_class parameter error agent_type new_covering_class covering_cl
          | Some a -> a
        in
        (* store the new list of covering classes *)
-       let new_list = new_covering_class::old_list in
-       let _ = print parameter new_list in
+       let new_list = (List.rev new_covering_class) :: old_list in
+       (*TODO: use clean function here*)
+       let _ = print parameter (length_sort_remove_dups new_list) in
+       (*let _ = print parameter new_list in*)
        Covering_classes_type.AgentMap.set
          parameter
          error
@@ -92,7 +137,7 @@ let scan_rule parameter error handler rule classes =
               error
               agent_type
               new_covering_class
-              covering_classes 
+              covering_classes
           in
           error, covering_classes
                    
@@ -101,47 +146,7 @@ let scan_rule parameter error handler rule classes =
   error,
   {
     Covering_classes_type.covering_classes = covering_classes
-  }
-
-(*TODO*)
-let rec remove_dups l =
-  match l with
-  | [] -> [] 
-  | h :: t -> h :: (remove_dups (List.filter (fun x -> x <> h)t))
-            
-let rec remove_dups_lists ls =
-  match ls with
-  | [] -> []
-  | h :: t -> let h' = remove_dups h in
-              h' :: (remove_dups_lists
-                       (List.filter
-                          (fun x -> let x' = remove_dups x in x' <> h') t))
-
-(*let length_covering_classes lists =
-  List.rev_map (fun covering_class ->
-                covering_class, List.length covering_class) lists*)
-           
-let length_sort_remove_dups lists =
-  let remove_lists = remove_dups_lists lists in
-  let length_lists = List.rev_map (fun list ->
-                                   list, List.length list) remove_lists in
-  let lists = List.sort (fun a b -> compare (snd a) (snd b)) length_lists in
-  List.rev_map fst lists
-
-(*clean function: remove duplicate inside a list of lists, sort the length
-of a list of lists in descreasing order; convert a list into a set; check
-if there is l such that l is subset of l', if yes remove l, update the list
-inside the list of lists *)
-
-(*
-let clean lists =
-  let l = length_sort_remove_dups l in
-  (*convert a list into a set *)
-  let empty_set = Cckappa_sig.Site_map_and_set.empty_set in
-  let set_of_list = List.fold_left
-                      (fun acc x ->
-                       Cckappa_sig.Site_map_and_set.add_set x acc) empty_set
-  in*)              
+  }           
     
 let scan_rule_set parameter error handler rules =
   let error, init = empty_classes parameter error handler in
