@@ -160,13 +160,13 @@ let get_label_of_rule_dot parameters error rule = error,rule.Cckappa_sig.e_rule_
 let get_label_of_var_txt parameters error rule = error,rule.Cckappa_sig.e_id  
 let get_label_of_var_dot parameters error rule = error,rule.Cckappa_sig.e_id_dot
 
-let print_rule_txt parameters error rule_id m1 m2 rule = (*MOD*)
+let print_rule_txt parameters error rule_id m1 m2 rule =
   let m = "'"^m1^"' " in
   let error,_ = error,Printf.fprintf (Remanent_parameters.get_log parameters) "%s" (if m="" then ("rule("^(string_of_int rule_id)^"): ") else ("rule("^string_of_int rule_id)^"):"^m) in
    let error = Print_ckappa.print_rule parameters error rule in
      error 
    
-let print_var_txt parameters error var_id m1 m2 var = (*MOD*)
+let print_var_txt parameters error var_id m1 m2 var =
   let m = "'"^m1^"' " in 
  (* let m = "'"^m1^"' "^m2^" " in *)
    let error,_ = error,Printf.fprintf (Remanent_parameters.get_log parameters) "%s" (if m="" then ("var("^(string_of_int var_id)^")") else ("var("^string_of_int var_id)^"):"^m) in 
@@ -204,7 +204,6 @@ let print_rule_dot parameters error rule_id m1 m2 rule =
    let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "\"" in 
    error
 
- (*TEST*)
  let print_rule_or_var parameters error handler compiled print_rule print_var get_label_of_rule get_label_of_var rule_id = 
   let rules = compiled.Cckappa_sig.rules in
   let vars = compiled.Cckappa_sig.variables in 
