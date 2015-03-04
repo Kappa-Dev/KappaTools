@@ -25,18 +25,17 @@ let empty_classes parameter error handler =
   {
      Covering_classes_type.covering_classes  = covering_classes
   }
-
-(*MOVE*)
-let rec print parameter map =
+               
+let rec print_covering_classes parameter map =
  match map with
  | [] -> ()
  | is :: tl ->
+    let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "sites_type:" in
     let _ = List.iter (fun i -> Printf.fprintf
                                   (Remanent_parameters.get_log parameter)
-                                  "%ssite_type: %i "
-                                  (Remanent_parameters.get_prefix parameter)i) is in
+                                  "%i " i) is in
     let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "\n" in
-    print parameter tl
+    print_covering_classes parameter tl
 
 let rec remove_dups l =
   match l with
@@ -58,28 +57,22 @@ let length_sort_remove_dups lists =
   let lists = List.sort (fun a b -> compare (snd a) (snd b)) length_lists in
   List.rev_map fst lists
 
-let set_of_list parameters error =
-  List.fold_left
-    (fun acc x ->
-     let error, set =
-       Cckappa_sig.Site_map_and_set.add_set parameters error x acc
-     in set)
-    Cckappa_sig.Site_map_and_set.empty_set
-             
-(*clean function: remove duplicate inside a list of lists, sort the length
-of a list of lists in descreasing order; convert a list into a set; check
-if there is l such that l is subset of l', if yes remove l, update the list
-inside the list of lists *)
+let map_filter l1 ls =
+  List.map (List.filter (fun x -> List.mem x l1))ls
 
-(*
-let clean lists =
-  let l = length_sort_remove_dups l in
-  (*convert a list into a set *)
-  let empty_set = Cckappa_sig.Site_map_and_set.empty_set in
-  let set_of_list = List.fold_left
-                      (fun acc x ->
-                       Cckappa_sig.Site_map_and_set.add_set x acc) empty_set
-  in*)
+let result_subset ls =
+  match ls with
+  | [] -> []
+  | l1 :: ls' -> map_filter l1 ls'
+  
+let remove_subset ls =
+  let ls' = result_subset ls in
+  List.filter (fun l -> not (List.mem l ls')) ls
+
+let clean ls =
+  let remove_dups = length_sort_remove_dups ls in
+  let remove_sub = remove_subset remove_dups in
+  remove_sub
 
 let add_covering_class parameter error agent_type new_covering_class covering_classes =
   match new_covering_class with
@@ -101,9 +94,7 @@ let add_covering_class parameter error agent_type new_covering_class covering_cl
        in
        (* store the new list of covering classes *)
        let new_list = (List.rev new_covering_class) :: old_list in
-       (*TODO: use clean function here*)
-       let _ = print parameter (length_sort_remove_dups new_list) in
-       (*let _ = print parameter new_list in*)
+       let _ = print_covering_classes parameter (clean new_list) in
        Covering_classes_type.AgentMap.set
          parameter
          error
@@ -129,7 +120,7 @@ let scan_rule parameter error handler rule classes =
               agent.Cckappa_sig.agent_interface []
           in
           let agent_type = agent.Cckappa_sig.agent_name in
-          (* store new_covering class in the classes of the agent type
+          (* store new_covering_class in the classes of the agent type
                agent_type *)
           let error,covering_classes =
             add_covering_class
@@ -139,8 +130,7 @@ let scan_rule parameter error handler rule classes =
               new_covering_class
               covering_classes
           in
-          error, covering_classes
-                   
+          error, covering_classes                   
     ) viewslhs rule_diff covering_classes
   in
   error,

@@ -172,11 +172,11 @@ Influence_map:Inhibition_map:rule(0):'r0' A(x!1),A(z!1)->A(x) -> rule(1):'r1' A(
 Influence_map:Inhibition_map:rule(0):'r0' A(x!1),A(z!1)->A(x) -> rule(2):'r2' A(x?)->A(x!1),B(x!1)[1->0]
 Influence_map:Inhibition_map:rule(1):'r1' A(x!_)->A(x) -> rule(0):'r0' A(x!1),A(z!1)->A(x)[0*->1]
 Covering_classes:Rule 0
-Covering_classes:agent_type:0:Covering_classes:site_type: 0 
-Covering_classes:agent_type:0:Covering_classes:site_type: 1 
-Covering_classes:site_type: 0 
+Covering_classes:agent_type:0:sites_type:0 
+Covering_classes:agent_type:0:sites_type:1 
+sites_type:0 
 Covering_classes:Rule 1
-Covering_classes:agent_type:0:Covering_classes:site_type: 0 
-Covering_classes:site_type: 1 
+Covering_classes:agent_type:0:sites_type:0 
+sites_type:1 
 Covering_classes:Rule 2
 execution finished without any exception
