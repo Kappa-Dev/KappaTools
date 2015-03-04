@@ -12,7 +12,7 @@ let new_file name =
   let () = Format.fprintf f "@[<v><?xml version=\"1.0\"?>@," in
   let () =
     Format.fprintf
-      f "@[<!DOCTYPE@ svg@ PUBLIC@ \"-//W3C//DTD SVG 1.1//EN\"@ " in
+      f "@[<><!DOCTYPE@ svg@ PUBLIC@ \"-//W3C//DTD SVG 1.1//EN\"@ " in
   let () =
     Format.fprintf
       f "\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">@]@,@," in
@@ -129,7 +129,7 @@ let axis (w,h) (b_op,b_w,b_h) f l =
       (fun i ->
        let v = grad_h *. float i in
        draw_fun (fun x y ->
-		 let () = Format.fprintf f "<text x=\"%f\" y=\"%f\">%.3F</text>@,"
+		 let () = Format.fprintf f "<text x=\"%f\" y=\"%f\">%.3g</text>@,"
 					 (x -. 8.) y v in
 		 Format.fprintf f "<line x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\"/>@,"
 				(x -. 5.) y (x +. 5.) y)
@@ -145,7 +145,7 @@ let axis (w,h) (b_op,b_w,b_h) f l =
       (fun i ->
        let v = grad_w *. float i in
        draw_fun (fun x y ->
-		 let () = Format.fprintf f "<text x=\"%f\" y=\"%f\">%.3F</text>@,"
+		 let () = Format.fprintf f "<text x=\"%f\" y=\"%f\">%.3g</text>@,"
 					 x (y +. 8.) v in
 		 Format.fprintf
 		   f "<line x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\"/>@,"
@@ -161,7 +161,7 @@ let data draw_fun l f p =
 		Format.fprintf
 		  f "@[<><use xlink:href=\"#%s\" x=\"%f\" y=\"%f\">@,"
 		  styles.(i mod Array.length styles) x y in
-	      Format.fprintf f "<title>%s t=%F v=%a</title>@,</use>@]"
+	      Format.fprintf f "<title>%s t=%g v=%a</title>@,</use>@]"
 			     s t Nbr.print va
 	     ) t va in
   Format.fprintf
@@ -177,7 +177,7 @@ let data draw_fun l f p =
 
 let draw (w,h as size) border f s =
   let () = Format.fprintf
-	     f "@[<svg@ xmlns=\"http://www.w3.org/2000/svg\"@ " in
+	     f "@[<><svg@ xmlns=\"http://www.w3.org/2000/svg\"@ " in
   let () = Format.fprintf
 	     f "xmlns:xlink=\"http://www.w3.org/1999/xlink\"@ " in
   let () = Format.fprintf

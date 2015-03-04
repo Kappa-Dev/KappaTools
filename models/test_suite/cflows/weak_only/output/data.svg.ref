@@ -27,7 +27,7 @@ xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
 <g id="axis_va">
   <title>Observable values</title>
   <path d="M 70,10 L 70,575"/>
-  <text x="62.000000" y="575.000000">0.</text>
+  <text x="62.000000" y="575.000000">0</text>
   <line x1="65.000000" y1="575.000000" x2="75.000000" y2="575.000000"/>
   <text x="62.000000" y="512.222222">1.11e+03</text>
   <line x1="65.000000" y1="512.222222" x2="75.000000" y2="512.222222"/>
@@ -51,29 +51,29 @@ xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
 <g id="axis_t">
   <title>Time in second</title>
   <path d="M 70,575 L 790,575"/>
-  <text x="70.000000" y="583.000000">0.</text>
+  <text x="70.000000" y="583.000000">0</text>
   <line x1="70.000000" y1="570.000000" x2="70.000000" y2="580.000000"/>
   <text x="130.000000" y="583.000000">36.9</text>
   <line x1="130.000000" y1="570.000000" x2="130.000000" y2="580.000000"/>
   <text x="190.000000" y="583.000000">73.8</text>
   <line x1="190.000000" y1="570.000000" x2="190.000000" y2="580.000000"/>
-  <text x="250.000000" y="583.000000">111.</text>
+  <text x="250.000000" y="583.000000">111</text>
   <line x1="250.000000" y1="570.000000" x2="250.000000" y2="580.000000"/>
-  <text x="310.000000" y="583.000000">148.</text>
+  <text x="310.000000" y="583.000000">148</text>
   <line x1="310.000000" y1="570.000000" x2="310.000000" y2="580.000000"/>
-  <text x="370.000000" y="583.000000">184.</text>
+  <text x="370.000000" y="583.000000">184</text>
   <line x1="370.000000" y1="570.000000" x2="370.000000" y2="580.000000"/>
-  <text x="430.000000" y="583.000000">221.</text>
+  <text x="430.000000" y="583.000000">221</text>
   <line x1="430.000000" y1="570.000000" x2="430.000000" y2="580.000000"/>
-  <text x="490.000000" y="583.000000">258.</text>
+  <text x="490.000000" y="583.000000">258</text>
   <line x1="490.000000" y1="570.000000" x2="490.000000" y2="580.000000"/>
-  <text x="550.000000" y="583.000000">295.</text>
+  <text x="550.000000" y="583.000000">295</text>
   <line x1="550.000000" y1="570.000000" x2="550.000000" y2="580.000000"/>
-  <text x="610.000000" y="583.000000">332.</text>
+  <text x="610.000000" y="583.000000">332</text>
   <line x1="610.000000" y1="570.000000" x2="610.000000" y2="580.000000"/>
-  <text x="670.000000" y="583.000000">369.</text>
+  <text x="670.000000" y="583.000000">369</text>
   <line x1="670.000000" y1="570.000000" x2="670.000000" y2="580.000000"/>
-  <text x="730.000000" y="583.000000">406.</text>
+  <text x="730.000000" y="583.000000">406</text>
   <line x1="730.000000" y1="570.000000" x2="730.000000" y2="580.000000"/>
   </g>
 </g>
@@ -194,7 +194,7 @@ xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
   <use xlink:href="#plus" x="85.855011" y="533.755000">
   <title>'AB' t=9.74509 v=730</title></use>
   <use xlink:href="#plus" x="70.000000" y="575.000000">
-  <title>'AB' t=0. v=0</title></use></g>
+  <title>'AB' t=0 v=0</title></use></g>
 <g id="data_1" style="color:purple">
   <use xlink:href="#cross" x="730.000000" y="575.000000">
   <title>'Cuu' t=405.661 v=0</title></use>
@@ -297,7 +297,7 @@ xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
   <use xlink:href="#cross" x="85.855011" y="575.000000">
   <title>'Cuu' t=9.74509 v=0</title></use>
   <use xlink:href="#cross" x="70.000000" y="575.000000">
-  <title>'Cuu' t=0. v=0</title></use></g>
+  <title>'Cuu' t=0 v=0</title></use></g>
 <g id="data_2" style="color:green">
   <use xlink:href="#point" x="730.000000" y="575.000000">
   <title>'Cpu' t=405.661 v=0</title></use>
@@ -400,7 +400,7 @@ xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
   <use xlink:href="#point" x="85.855011" y="575.000000">
   <title>'Cpu' t=9.74509 v=0</title></use>
   <use xlink:href="#point" x="70.000000" y="575.000000">
-  <title>'Cpu' t=0. v=0</title></use></g>
+  <title>'Cpu' t=0 v=0</title></use></g>
 <g id="data_3" style="color:peru">
   <use xlink:href="#plus" x="730.000000" y="10.000000">
   <title>'Cpp' t=405.661 v=10000</title></use>
@@ -503,7 +503,7 @@ xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
   <use xlink:href="#plus" x="85.855011" y="575.000000">
   <title>'Cpp' t=9.74509 v=0</title></use>
   <use xlink:href="#plus" x="70.000000" y="575.000000">
-  <title>'Cpp' t=0. v=0</title></use></g>
+  <title>'Cpp' t=0 v=0</title></use></g>
 <g id="data_4" style="color:blue">
   <use xlink:href="#cross" x="730.000000" y="575.000000">
   <title>'n_c' t=405.661 v=0</title></use>
@@ -606,6 +606,6 @@ xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
   <use xlink:href="#cross" x="85.855011" y="575.000000">
   <title>'n_c' t=9.74509 v=0</title></use>
   <use xlink:href="#cross" x="70.000000" y="575.000000">
-  <title>'n_c' t=0. v=0</title></use></g></g>
+  <title>'n_c' t=0 v=0</title></use></g></g>
 
 </svg>
