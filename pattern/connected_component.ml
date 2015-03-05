@@ -527,12 +527,12 @@ and add_new_point obs_id env free_id sons cc =
 let add_domain env cc =
   let known_cc = Env.find env cc in
   match known_cc with
-  | Some (id,_,point) ->
+  | Some (id,inj,point) ->
      (if point.is_obs then env
-      else propagate_add_obs id env id),point.cc
+      else propagate_add_obs id env id),inj,point.cc
   | None ->
      let (_,env'),_ = add_new_point cc.id env (succ cc.id) [] cc in
-     (env',cc)
+     (env',Array.make (Env.nb_ag env) (-1), cc)
 
 (** Operation to create cc *)
 let check_dangling wk =

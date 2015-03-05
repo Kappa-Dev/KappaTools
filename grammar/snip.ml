@@ -574,7 +574,7 @@ let connected_components_of_mixture env mix =
   | h :: t ->
      let wk = Connected_component.begin_new env in
      let (wk_out,remains) = add_agents_in_cc wk IntMap.empty t [h] in
-     let (env',cc) = Connected_component.finish_new wk_out in
+     let (env',_, cc) = Connected_component.finish_new wk_out in
      aux env' (cc::acc) remains
   in aux env [] mix
 
