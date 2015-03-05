@@ -96,7 +96,7 @@ module Make(T:Content) =
 	       h
 	     end
       with
-      | Invalid_argument msg ->
+      | Invalid_argument _msg ->
 	 invalid_arg (Format.sprintf "MemoryManagement.alloc: %d/%d"
 				     h.fresh (dimension h))
 

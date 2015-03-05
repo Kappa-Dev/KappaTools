@@ -133,7 +133,7 @@ module InjProduct =
 		
     let is_complete injprod =
       try
-	(Array.iteri (fun i inj_i ->
+	(Array.iter (fun inj_i ->
 		      let a,_ = Injection.get_coordinate inj_i in
 		      if a<0 then raise False else ()) injprod.elements ; true)
       with False -> false
@@ -296,7 +296,7 @@ module Counter =
 
     let stat_null i c =
       try c.stat_null.(i) <- c.stat_null.(i) + 1
-      with exn -> invalid_arg "Invalid null event identifier"
+      with _ -> invalid_arg "Invalid null event identifier"
 
     let create nb_points init_t init_e mx_t mx_e =
       let dE =
@@ -310,7 +310,7 @@ module Counter =
        events = init_e ;
        null_events = 0 ;
        cons_null_events = 0;
-       stat_null = Array.init 6 (fun i -> 0) ;
+       stat_null = Array.init 6 (fun _ -> 0) ;
        perturbation_events = 0;
        null_action = 0 ;
        max_time = mx_t ;

@@ -1,4 +1,3 @@
-open ExceptionDefn
 open Mods
 
 module type NodeMemoryModel =

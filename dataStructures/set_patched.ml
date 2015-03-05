@@ -128,8 +128,8 @@ module Make(Ord: OrderedType) =
         | Node(l, v, r, _) ->
           let c = Ord.compare x v in
           if c = 0 then t0 else
-          if c < 0 then bal (add x l) v r else bal l v (add x r)
-      in aux x t0 
+          if c < 0 then bal (aux x l) v r else bal l v (aux x r)
+      in aux x t0
 
     (* Same as create and bal, but no assumptions are made on the
        relative heights of l and r. *)
@@ -147,19 +147,19 @@ module Make(Ord: OrderedType) =
 
     let rec min_elt = function
         Empty -> raise Not_found
-      | Node(Empty, v, r, _) -> v
-      | Node(l, v, r, _) -> min_elt l
+      | Node(Empty, v, _, _) -> v
+      | Node(l, _, _, _) -> min_elt l
 
     let rec max_elt = function
         Empty -> raise Not_found
-      | Node(l, v, Empty, _) -> v
-      | Node(l, v, r, _) -> max_elt r
+      | Node(_, v, Empty, _) -> v
+      | Node(_, _, r, _) -> max_elt r
 
     (* Remove the smallest element of the given set *)
 
     let rec remove_min_elt = function
         Empty -> invalid_arg "Set.remove_min_elt"
-      | Node(Empty, v, r, _) -> r
+      | Node(Empty, _, r, _) -> r
       | Node(l, v, r, _) -> bal (remove_min_elt l) v r
 
     (* Merge two trees l and r into one.
@@ -170,7 +170,7 @@ module Make(Ord: OrderedType) =
       match (t1, t2) with
         (Empty, t) -> t
       | (t, Empty) -> t
-      | (_, _) -> bal t1 (min_elt t2) (remove_min_elt t2)
+      | (Node _, Node _) -> bal t1 (min_elt t2) (remove_min_elt t2)
 
     (* Merge two trees l and r into one.
        All elements of l must precede the elements of r.
@@ -180,7 +180,7 @@ module Make(Ord: OrderedType) =
       match (t1, t2) with
         (Empty, t) -> t
       | (t, Empty) -> t
-      | (_, _) -> join t1 (min_elt t2) (remove_min_elt t2)
+      | (Node _, Node _) -> join t1 (min_elt t2) (remove_min_elt t2)
 
     (* Splitting.  split x s returns a triple (l, present, r) where
         - l is the set of elements of s that are < x
@@ -203,7 +203,7 @@ module Make(Ord: OrderedType) =
 
     let empty = Empty
 
-    let is_empty = function Empty -> true | _ -> false
+    let is_empty = function Empty -> true | Node _ -> false
 
     let rec mem x = function
         Empty -> false
@@ -238,8 +238,8 @@ module Make(Ord: OrderedType) =
 
     let rec inter s1 s2 =
       match (s1, s2) with
-        (Empty, t2) -> Empty
-      | (t1, Empty) -> Empty
+        (Empty, _) -> Empty
+      | (_, Empty) -> Empty
       | (Node(l1, v1, r1, _), t2) ->
           match split v1 t2 with
             (l2, false, r2) ->
@@ -249,7 +249,7 @@ module Make(Ord: OrderedType) =
 
     let rec diff s1 s2 =
       match (s1, s2) with
-        (Empty, t2) -> Empty
+        (Empty, t2) -> t2
       | (t1, Empty) -> t1
       | (Node(l1, v1, r1, _), t2) ->
           match split v1 t2 with
@@ -303,7 +303,7 @@ module Make(Ord: OrderedType) =
 
     let rec iter_inv f = function
       | Empty -> ()
-      | Node(l, v, r, _) -> iter f r; f v; iter f l
+      | Node(l, v, r, _) -> iter_inv f r; f v; iter_inv f l
 
     let rec fold f s accu =
       match s with
@@ -313,7 +313,7 @@ module Make(Ord: OrderedType) =
     let rec fold_inv f s accu = 
       match s with 
         Empty -> accu 
-      | Node(l, v, r, _) -> fold_inv f l (f v (fold f r accu))
+      | Node(l, v, r, _) -> fold_inv f l (f v (fold_inv f r accu))
 
     let rec for_all p = function
         Empty -> true
@@ -339,7 +339,7 @@ module Make(Ord: OrderedType) =
 
     let rec cardinal = function
         Empty -> 0
-      | Node(l, v, r, _) -> cardinal l + 1 + cardinal r
+      | Node(l, _, r, _) -> cardinal l + 1 + cardinal r
 
     let rec elements_aux accu = function
         Empty -> accu

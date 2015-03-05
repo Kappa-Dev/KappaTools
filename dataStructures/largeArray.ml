@@ -67,8 +67,6 @@ module GenArray =
 					let q = Array.length (Array.unsafe_get a (p - 1)) in
 					(p - 1) * max_array_size1 + q
 		
-		let size = length
-		
 		let get2 a p q = Array.unsafe_get (Array.unsafe_get a p) q
 		
 		let get a i =
@@ -132,7 +130,7 @@ module GenArray =
 					l in
 			match l
 			with [] -> Unary [||]
-			|	t:: q ->
+			|	t:: _ ->
 					let elt = get t 0 in
 					let c =
 						List.fold_left
@@ -193,7 +191,7 @@ module GenArray =
 		
 		let of_list l =
 			match l with [] -> Unary [||]
-			|	t:: q ->
+			|	t:: _ ->
 					let size = List.length l in
 					let a = create size t in
 					let rec aux l k =
@@ -206,8 +204,6 @@ module GenArray =
 				Unary a -> h1 (g1 f a)
 			|	Binary a ->
 					h2 (g2 (g1 f) a)
-		
-		let iter = gen Array.iter Array.iter (fun _ -> ()) (fun _ -> ())
 		
 		let iter f a =
 			match a with

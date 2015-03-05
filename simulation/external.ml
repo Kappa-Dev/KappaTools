@@ -1,10 +1,6 @@
-open Dynamics
 open State
-open Tools
 open ExceptionDefn
-open Graph
 open Mods
-open LargeArray
 
 let eval_abort_pert just_applied pert state counter env =
   match pert.Primitives.abort with
@@ -12,7 +8,7 @@ let eval_abort_pert just_applied pert state counter env =
   | Some var -> State.value_bool state counter env var
 
 let raw_pr_pexpr state counter env f pexpr =
-  let rec aux f = function
+  let aux f = function
     | Ast.Str_pexpr str,_ -> Format.pp_print_string f str
     | Ast.Alg_pexpr alg,_ ->
        Nbr.print f (State.value_alg state counter env alg)
@@ -46,7 +42,7 @@ let apply_n_time x r state env counter pert_ids pert_events tracked =
        let (env, state, side_effects, embedding_t, psi, pert_ids_neg) =
 	 State.apply state r embedding_t counter env in
        let phi = State.Embedding.map_of embedding_t in
-       let env,state,pert_ids_pos,new_injs,tracked' =
+       let env,state,pert_ids_pos,_new_injs,tracked' =
 	 State.positive_update ~with_tracked state r phi psi side_effects Int2Set.empty counter env
        in
        let pert_ids =

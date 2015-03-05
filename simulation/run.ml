@@ -1,7 +1,6 @@
 open Mods
 open Tools
 open ExceptionDefn
-open Random_tree
 
 (** random exponential selection if finite, next perturbation time if
 infinite ... *)

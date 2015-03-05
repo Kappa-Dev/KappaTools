@@ -12,7 +12,7 @@ let add ls inj = (ls.injs <- InjSet.add inj ls.injs);ls
 
 let remove ls inj = ls.injs <- InjSet.remove inj ls.injs
 
-let create s = {injs = InjSet.empty}
+let create _ls = {injs = InjSet.empty}
 
 let flush ls = ls.injs <- InjSet.empty
 

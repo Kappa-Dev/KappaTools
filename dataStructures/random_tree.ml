@@ -147,23 +147,6 @@ module Random_tree =
 				unbalanced_events = unbalanced_events;
 				layer = layer }
 		
-		let raz t =
-			let n = t.size in
-			let _ =
-				let rec aux k =
-					if k = 0 then ()
-					else
-						(t.unbalanced_events.(k) <- false ;
-							t.weight_of_subtrees.(k) <- 0. ;
-							t.weight_of_nodes.(k) <- 0.)
-				in aux n in
-			let _ =
-				Array.iteri
-					(fun k _ -> t.unbalanced_events_by_layer.(k) <-[])
-					t.unbalanced_events_by_layer
-			in
-			t
-		
 		let add i w t =
 			let i = mask t i in
 			let w = 

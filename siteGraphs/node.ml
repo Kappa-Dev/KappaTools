@@ -23,7 +23,7 @@ let is_empty node = node.name = -1
 
 let get_lifts u i =
   try u.interface.(i).dep
-  with Invalid_argument msg ->
+  with Invalid_argument _msg ->
     invalid_arg (Format.sprintf
 		   "Node.get_lifts: node %d has no site %d" (name u) i)
 
@@ -291,14 +291,16 @@ let test n i int lnk port_list =
   | (Mixture.BND, Ptr _ | Mixture.FREE, Null ) -> (1,i)::port_list
   | Mixture.TYPE (sid,nme), Ptr (u,j) when (name u = nme) && (j = sid) ->
      (1,i)::port_list
-  | _, _ -> raise False
+  | Mixture.TYPE _, (Null|Ptr _) -> raise False
+  | Mixture.FREE, Ptr _ -> raise False
+  | Mixture.BND, Null -> raise False
 
 let follow u i =
   let intf_u = interface u in
   let (_,lnk) = intf_u.(i).status in
   match lnk with
   | Ptr (v,j) -> Some (v,j)
-  | _ -> None
+  | (Null | FPtr _) -> None
 
 module NodeHeap =
   MemoryManagement.Make (struct

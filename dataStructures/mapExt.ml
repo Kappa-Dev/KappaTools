@@ -84,7 +84,7 @@ module Make(Ord: OrderedType) = struct
 	
 	let empty = Empty
 	
-	let is_empty = function Empty -> true | _ -> false
+	let is_empty = function Empty -> true | Node _ -> false
 	
 	let rec add x data = function
 			Empty -> Node(Empty, x, data, Empty, 1, 1)
@@ -108,29 +108,29 @@ module Make(Ord: OrderedType) = struct
 	let rec mem x = function
 			Empty ->
 				false
-		| Node(l, v, d, r, _, _) ->
+		| Node(l, v, _, r, _, _) ->
 				let c = Ord.compare x v in
 				c = 0 || mem x (if c < 0 then l else r)
 	
-	let rec get = function
+	let get = function
 			Empty -> raise Not_found
 		| Node(_, x, d, _, _, _) -> (x, d)
 	
 	let rec min_binding = function
 			Empty -> raise Not_found
-		| Node(Empty, x, d, r, _, _) -> (x, d)
-		| Node(l, x, d, r, _, _) -> min_binding l
+		| Node(Empty, x, d, _, _, _) -> (x, d)
+		| Node(l, _, _, _, _, _) -> min_binding l
 	
 	let rec remove_min_binding = function
 			Empty -> invalid_arg "Map.remove_min_elt"
-		| Node(Empty, x, d, r, _, _) -> r
+		| Node(Empty, _, _, r, _, _) -> r
 		| Node(l, x, d, r, _, _) -> bal (remove_min_binding l) x d r
 	
 	let merge t1 t2 =
 		match (t1, t2) with
 			(Empty, t) -> t
 		| (t, Empty) -> t
-		| (_, _) ->
+		| (Node _, Node _) ->
 				let (x, d) = min_binding t2 in
 				bal t1 x d (remove_min_binding t2)
 	

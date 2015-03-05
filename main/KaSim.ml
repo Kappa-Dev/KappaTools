@@ -1,6 +1,5 @@
 open Tools
 open Mods
-open Random_tree
 
 let version = "4.0-refactoring"
 
@@ -158,7 +157,7 @@ let main =
 	     (env,counter,state)
 	   end
 	 with
-	 | exn ->
+	 | _exn ->
 	    Debug.tag "!Simulation package seems to have been created with a different version of KaSim, aborting...";
 	    exit 1
     in
@@ -178,7 +177,7 @@ let main =
     if !Parameter.compileModeOn
     then (State.dump_rules Format.err_formatter state env; exit 0);
     let profiling = Compression_main.D.S.PH.B.PB.CI.Po.K.P.init_log_info () in
-    let grid,profiling,event_list =
+    let _grid,profiling,event_list =
       if Environment.tracking_enabled env then
 	let () =
 	  if !Parameter.mazCompression

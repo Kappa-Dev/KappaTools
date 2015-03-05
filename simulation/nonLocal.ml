@@ -2,8 +2,6 @@
 open Mods
 open Graph
 open State
-open Tools
-open Dynamics
 open ExceptionDefn
 
 (**updating non local mixtures after application of a linking rule using embedding [embedding_info]*)
@@ -167,7 +165,7 @@ let rec update_rooted_intras new_injs state counter env =
 			let (mix_id,cc_id) = Injection.get_coordinate injection in (*mix_id is the id of a non local lhs by invariant*)
 			
 			(*one should look into cc(root_injection) whether some nodes have a lift to (mix_id,cc_id') with cc_id <> cc_id'*)
-			let (a_0,u_0) = match Injection.root_image injection with None -> invalid_arg "NonLocal.complete_injections" | Some p -> p
+			let u_0 = match Injection.root_image injection with None -> invalid_arg "NonLocal.complete_injections" | Some (_,p) -> p
 			in
 			(*if activity of mix_id is null then there can be no intra*)
 			if not (is_complete mix_id state) then update_rooted_intras tl state counter env
@@ -179,7 +177,7 @@ let rec update_rooted_intras new_injs state counter env =
 						let _,liftset = Node.get_lifts node 0 in
 						LiftSet.exists (fun inj -> let (mix_id',cc_id') = Injection.get_coordinate inj in (mix_id' = mix_id) && (cc_id <> cc_id') ) liftset
 				in   
-				let (_,d_map,components,_) = SiteGraph.neighborhood ~filter_elements:predicate (get_graph state) u_0 (-1) in
+				let (_,_,components,_) = SiteGraph.neighborhood ~filter_elements:predicate (get_graph state) u_0 (-1) in
 				
 				(*components contains nodes whose name is the root of at least one complemetary injection*)
 				let candidate_map = 
@@ -247,7 +245,7 @@ let rec update_rooted_intras new_injs state counter env =
 							else
 								let injprod = match InjProdHeap.next_alloc injprod_hp with None -> InjProduct.create (Mixture.arity mix) mix_id | Some ip -> ip 
 								in
-								let injprod,new_roots = 
+								let injprod,_new_roots = 
 									IntMap.fold 
 									(fun cc_id inj (injprod,new_roots) ->
 										let root = (function Some (_,j) -> j | None -> invalid_arg "") (Injection.root_image inj) in
@@ -281,7 +279,7 @@ let rec update_rooted_intras new_injs state counter env =
 
 let initialize_embeddings state counter env = 
 	SiteGraph.fold 
-	(fun id u state ->
+	(fun _id u state ->
 		let name = Node.name u in
 		if Environment.is_nl_root name env then (*node is potentially the root of an intra rule*) 
 		let _,lifts = Node.get_lifts u 0 in

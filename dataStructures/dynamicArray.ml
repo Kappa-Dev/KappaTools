@@ -89,7 +89,7 @@ module DynArray =
 	    l in
 	match l
 	with [] -> raise (Invalid_argument "DynamicArray.concat")
-	  |	t:: q ->
+	  |	t:: _ ->
 	    let elt = get t 0 in
 	    let c =
 	      List.fold_left

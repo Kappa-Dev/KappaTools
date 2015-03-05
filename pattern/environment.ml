@@ -71,7 +71,7 @@ let get_desc file env =
     (Hashtbl.add env.desc_table file (d_chan,d) ; d)
 
 let close_desc env =
-	Hashtbl.iter (fun file (d_chan,d) ->
+	Hashtbl.iter (fun _file (d_chan,d) ->
 		      let () = Format.pp_print_newline d () in
 		      close_out d_chan) env.desc_table
 

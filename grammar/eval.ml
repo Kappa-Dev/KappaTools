@@ -1,6 +1,4 @@
 open Mods
-open Mixture
-open Dynamics
 open Tools
 open Ast
 
@@ -69,9 +67,10 @@ let eval_node env a link_map node_map node_id =
 		with Not_found -> (IntMap.add i (Some (node_id,port_id,pos)) link_map,bond_list)
 	      end
 	   | (Ast.FREE,_) -> (link_map,bond_list)
-	   | _ -> raise (ExceptionDefn.Malformed_Decl
-			   ("Site '" ^ fst port_name ^ "' is partially defined",
-			    prt_pos))
+	   | (Ast.LNK_SOME, _ | Ast.LNK_TYPE _, _ | Ast.LNK_ANY, _) ->
+	      raise (ExceptionDefn.Malformed_Decl
+		       ("Site '" ^ fst port_name ^ "' is partially defined",
+			prt_pos))
 	 in
 	 match int_state_list with
 	 | [] ->
@@ -406,7 +405,7 @@ let rule_of_ast ?(backwards=false) ~is_pert env mixs
 			match lnk with
 			| Mixture.BND | Mixture.TYPE _ ->
 				      IntSet.add site_id set (*semi link deletion*)
-			| _ -> set
+			| Mixture.FREE | Mixture.WLD -> set
 		      with
 		      | Not_found ->
 			 IntSet.add site_id set (*deletion of site that was not mentionned so possible side_effect*)

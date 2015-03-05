@@ -1,5 +1,4 @@
 open Term
-open Mods
 
 type str_pos = string * Tools.pos
 
