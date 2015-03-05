@@ -1,4 +1,4 @@
-${KAPPABIN}KaSim ../kappa/abc.ka -e 100000 -p 1000 -o abc.out && \
+${KAPPABIN}KaSim ../kappa/abc.ka -seed 751761073 -e 100000 -p 1000 -o abc.out && \
 gnuplot abc.gplot && \
 circo -Tpng flux.dot -o ../generated_img/flux.png && \
 ${KAPPABIN}KaSa ../kappa/abc.ka && \
