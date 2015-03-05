@@ -240,7 +240,6 @@ let mixture_of_ast ?mix_id env ast_mix =
 let rec initial_value_alg env (ast, (beg_pos,end_pos)) =
   match ast with
   | Expr.CONST n -> n
-  | Expr.STATE_ALG_OP (Term.CPUTIME) -> Nbr.F 0.
   | Expr.KAPPA_INSTANCE id -> Nbr.I 0
   | Expr.ALG_VAR i ->
      initial_value_alg
@@ -417,7 +416,9 @@ let rule_of_ast ?(backwards=false) ~is_pert env mixs
 	      ) sign set
 	  in
 	  (con_map,dis_map,IntMap.add id set side_eff)
-       | _ -> (con_map,dis_map,side_eff)
+       | (Primitives.MOD _ | Primitives.ADD _
+	  | Primitives.BND _ | Primitives.FREE ((Primitives.FRESH _,_),_)) ->
+	  (con_map,dis_map,side_eff)
       ) (IntMap.empty,IntMap.empty,IntMap.empty) script
   in
   let connect_impact =
