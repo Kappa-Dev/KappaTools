@@ -25,17 +25,64 @@ let empty_classes parameter error handler =
   {
      Covering_classes_type.covering_classes  = covering_classes
   }
-               
-let rec print_covering_classes parameter map =
- match map with
- | [] -> ()
- | is :: tl ->
-    let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "sites_type:" in
-    let _ = List.iter (fun i -> Printf.fprintf
-                                  (Remanent_parameters.get_log parameter)
-                                  "%i " i) is in
-    let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "\n" in
-    print_covering_classes parameter tl
+
+let print_agent parameter error handler =
+  Ckappa_sig.Dictionary_of_agents.print
+    parameter
+    error
+    (fun parameter error i agent_name () () ->
+     let _ = Printf.fprintf (Remanent_parameters.get_log parameter)
+                            "agent_type:%d:%s:\n" i agent_name
+     in error)
+    handler.Cckappa_sig.agents_dic
+      
+let print_site_type parameters site =
+  match site with
+  | Ckappa_sig.Internal a ->
+     Printf.fprintf (Remanent_parameters.get_log parameters) "%s%s(internal state)" (Remanent_parameters.get_prefix parameters) a
+  | Ckappa_sig.Binding a ->
+     Printf.fprintf (Remanent_parameters.get_log parameters) "%s%s(binding state)" (Remanent_parameters.get_prefix parameters) a
+                    
+let print_site parameters error handler =
+  let print print_aux =
+    (fun parameters error i site () () ->
+     let parameters = Remanent_parameters.update_prefix
+                        parameters                      
+                        ("site_type:"^(string_of_int i)^"->")
+     in
+     let _ = print_aux parameters site in
+     let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "\n" in
+     error)
+  in
+  let parameters_site = Remanent_parameters.update_prefix parameters "sites:" in
+  Int_storage.Nearly_inf_Imperatif.print_site_f
+    error
+    (fun error parameters s ->
+     let _ = Ckappa_sig.Dictionary_of_sites.print
+               parameters
+               error
+               (print print_site_type) s
+     in error)
+    parameters_site
+    handler.Cckappa_sig.sites
+
+let rec print_class parameter l =
+  match l with
+  | [] -> ()
+  | site :: tl ->
+     let _ = Printf.fprintf (Remanent_parameters.get_log parameter)
+                            "%i " site in
+     print_class parameter tl
+
+let rec print_classes parameter ls =
+  match ls with
+  | [] -> ()
+  | l :: tl ->
+     let _ = Printf.fprintf (Remanent_parameters.get_log parameter)
+                            "sites_type:" in
+     let _ = print_class parameter l in
+     let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "\n" in
+     print_classes parameter tl
 
 let rec remove_dups l =
   match l with
@@ -57,13 +104,13 @@ let length_sort_remove_dups lists =
   let lists = List.sort (fun a b -> compare (snd a) (snd b)) length_lists in
   List.rev_map fst lists
 
-let map_filter l1 ls =
+let subset l1 ls =
   List.map (List.filter (fun x -> List.mem x l1))ls
 
 let result_subset ls =
   match ls with
   | [] -> []
-  | l1 :: ls' -> map_filter l1 ls'
+  | l1 :: ls' -> subset l1 ls'
   
 let remove_subset ls =
   let ls' = result_subset ls in
@@ -79,7 +126,7 @@ let add_covering_class parameter error agent_type new_covering_class covering_cl
     | [] -> error, covering_classes
     | _ ->
        let _ = Misc_sa.trace parameter (fun () -> "agent_type:" ^
-                                       (string_of_int agent_type) ^":") in	
+                              (string_of_int agent_type) ^":") in
        let error, agent =
          Covering_classes_type.AgentMap.unsafe_get
            parameter
@@ -94,7 +141,11 @@ let add_covering_class parameter error agent_type new_covering_class covering_cl
        in
        (* store the new list of covering classes *)
        let new_list = (List.rev new_covering_class) :: old_list in
-       let _ = print_covering_classes parameter (clean new_list) in
+       let clean_new_list = clean new_list in
+       let _ = print_classes
+                 parameter
+                 clean_new_list
+       in
        Covering_classes_type.AgentMap.set
          parameter
          error
