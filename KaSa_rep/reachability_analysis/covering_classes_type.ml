@@ -23,6 +23,16 @@ module Labels = Covering_classes_labels.Extensive(Label)
 module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
 
 type sites_covering_classes  = int list list AgentMap.t
+
+(*Define a dictionary for covering classes *)
+ 
+module Covering_classes =
+  struct
+    type t = int list
+    let compare = compare
+  end
+
+module Dictionary_of_Covering_classes = Dictionary.Dictionary_of_Ord(Covering_classes)
                                    
 type covering_classes =
   {

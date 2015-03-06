@@ -65,7 +65,7 @@ let print_site parameters error handler =
      in error)
     parameters_site
     handler.Cckappa_sig.sites
-
+    
 let rec print_class parameter l =
   match l with
   | [] -> ()
@@ -121,6 +121,66 @@ let clean ls =
   let remove_sub = remove_subset remove_dups in
   remove_sub
 
+(*TODO*) 
+let length_sorted lists =
+  let list_length = List.rev_map (fun list -> list, List.length list) lists in
+  let lists = List.sort (fun a b -> compare (snd a) (snd b)) list_length in
+  List.rev_map fst lists
+
+let length_longest lists =
+  List.rev_map (fun list -> list, List.length list) lists
+
+(*compute the size of agent*)
+(*let length_agent agent =
+  let rec aux agent size =
+    match agent with
+    | Cckappa_sig.Ghost -> size
+    | Cckappa_sig.Agent _ -> aux agent (size + 1)
+  in aux agent 0*)
+  (* array: int -> 'b?
+  build a data structure for a new array, this one will be use to update
+  the image. The size of this array will be the sites of the agents*)
+
+(*TODO: new cleaning function with the dictionary*)
+(*
+let clean_new parameter error classes = (*return 'a list list*)
+  (* create an initial good lists *)
+  let init_good_lists =
+    Covering_classes_type.Dictionary_of_Covering_classes.init () in
+  (*a list to deal with is the list has longest size in a descreasing order*)
+  let lists_to_deal_with = length_sorted classes in
+  (*allocate the value in the dictionary*)
+  let error, good_lists =
+    Covering_classes_type.Dictionary_of_Covering_classes.unsafe_allocate
+      parameter
+      error
+      (*value type*)
+      Covering_classes_type.Covering_classes.t
+      (*'a*)
+      ()
+      (*int -> 'b*)
+      Misc_sa.const_unit
+      (*dictionary*)
+      init_good_lists
+  in
+  (*good_lists*)
+    (*return the value in a good list here*)
+  let error, value_good_list = (*int list *)
+    match good_lists with
+    | [] -> warn parameter error (Some "line 45") Exit 0
+    | is -> error, is
+  in
+  (*Iterate in the list_to_deal_with, and check the member of this list
+  with the good_lists*)
+  (* List.iter (fun l ->
+              (*checking each element of l and value in a value_good_lists*)
+              (*if it is a member of value_good_lists*)
+               
+              (*if not*)
+               
+              ) lists_to_deal_with*)   
+  *)
+  
 let add_covering_class parameter error agent_type new_covering_class covering_classes =
   match new_covering_class with
     | [] -> error, covering_classes
@@ -141,6 +201,7 @@ let add_covering_class parameter error agent_type new_covering_class covering_cl
        in
        (* store the new list of covering classes *)
        let new_list = (List.rev new_covering_class) :: old_list in
+       (*let clean_new_list = clean_new parameter error new_list in*)
        let clean_new_list = clean new_list in
        let _ = print_classes
                  parameter
