@@ -172,15 +172,15 @@ let clean_new parameter error classes = (*return 'a list list*)
   in
   (*Iterate in the list_to_deal_with, and check the member of this list
   with the good_lists*)
-  (* List.iter (fun l ->
+   List.iter (fun f ->
               (*checking each element of l and value in a value_good_lists*)
               (*if it is a member of value_good_lists*)
-               
-              (*if not*)
-               
-              ) lists_to_deal_with*)   
-  *)
-  
+              if not (Hashtbl.mem value_good_list f)
+              then (*replace value_good_lists by f*)
+                
+              (*if not: throw away*)
+             ) (*something here*)
+   *)
 let add_covering_class parameter error agent_type new_covering_class covering_classes =
   match new_covering_class with
     | [] -> error, covering_classes
