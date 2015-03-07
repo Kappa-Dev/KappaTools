@@ -142,9 +142,9 @@ let length_longest lists =
   the image. The size of this array will be the sites of the agents*)
 
 (*TODO: new cleaning function with the dictionary*)
-(*
-let clean_new parameter error classes = (*return 'a list list*)
-  (* create an initial good lists *)
+
+let clean_new parameter error new_class classes = (*return 'a list list*)
+  (* create an initial good lists as a dictionary type *)
   let init_good_lists =
     Covering_classes_type.Dictionary_of_Covering_classes.init () in
   (*a list to deal with is the list has longest size in a descreasing order*)
@@ -155,7 +155,7 @@ let clean_new parameter error classes = (*return 'a list list*)
       parameter
       error
       (*value type*)
-      Covering_classes_type.Covering_classes.t
+      new_class.Covering_classes_type.v
       (*'a*)
       ()
       (*int -> 'b*)
@@ -163,24 +163,36 @@ let clean_new parameter error classes = (*return 'a list list*)
       (*dictionary*)
       init_good_lists
   in
-  (*good_lists*)
-    (*return the value in a good list here*)
-  let error, value_good_list = (*int list *)
+ (*return the value in a good list here*)
+ let error, value_good_list = (*int list *)
     match good_lists with
-    | [] -> warn parameter error (Some "line 45") Exit 0
-    | is -> error, is
-  in
+      | (_,_, _, _) -> warn parameter error (Some "line 45") Exit init_good_lists
+      | (_,_,_,dic) (*int, unit, unit, dic*) -> error, dic
+ in
   (*Iterate in the list_to_deal_with, and check the member of this list
-  with the good_lists*)
-   List.iter (fun f ->
+    with the good_lists*)
+ List.iter (fun f ->
+    let error, is_member =
+   Covering_classes_type.Dictionary_of_Covering_classes.member
+	 parameter
+	 error
+         (*value*)
+	 f
+         (*dic*)
+         value_good_list
+   in
+   if not is_member 
+   then
+     (* update and print out the dictionary *)
+     ()
               (*checking each element of l and value in a value_good_lists*)
               (*if it is a member of value_good_lists*)
-              if not (Hashtbl.mem value_good_list f)
+              (*if not (Hashtbl.mem value_good_list f)
               then (*replace value_good_lists by f*)
-                
+              *)
               (*if not: throw away*)
-             ) (*something here*)
-   *)
+             ) lists_to_deal_with
+
 let add_covering_class parameter error agent_type new_covering_class covering_classes =
   match new_covering_class with
     | [] -> error, covering_classes
