@@ -149,13 +149,15 @@ let clean_new parameter error new_class classes = (*return 'a list list*)
     Covering_classes_type.Dictionary_of_Covering_classes.init () in
   (*a list to deal with is the list has longest size in a descreasing order*)
   let lists_to_deal_with = length_sorted classes in
+  let value = new_class.Covering_classes_type.v in
   (*allocate the value in the dictionary*)
   let error, good_lists =
     Covering_classes_type.Dictionary_of_Covering_classes.unsafe_allocate
       parameter
       error
       (*value type*)
-      new_class.Covering_classes_type.v
+      (*new_class.Covering_classes_type.v*)
+      value
       (*'a*)
       ()
       (*int -> 'b*)
@@ -184,14 +186,8 @@ let clean_new parameter error new_class classes = (*return 'a list list*)
    if not is_member 
    then
      (* update and print out the dictionary *)
-     ()
-              (*checking each element of l and value in a value_good_lists*)
-              (*if it is a member of value_good_lists*)
-              (*if not (Hashtbl.mem value_good_list f)
-              then (*replace value_good_lists by f*)
-              *)
-              (*if not: throw away*)
-             ) lists_to_deal_with
+    ()
+ ) lists_to_deal_with
 
 let add_covering_class parameter error agent_type new_covering_class covering_classes =
   match new_covering_class with
