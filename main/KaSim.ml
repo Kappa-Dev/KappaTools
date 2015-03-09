@@ -200,7 +200,7 @@ let main =
     ExceptionDefn.flush_warning () ;
     Parameter.initSimTime () ;
     try
-      Run.loop state profiling event_list counter env ;
+      Run.loop Format.std_formatter state profiling event_list counter env ;
       Format.print_newline() ;
       Format.printf "Simulation ended";
       if Counter.null_event counter = 0 then Format.print_newline()

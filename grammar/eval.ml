@@ -811,7 +811,7 @@ let configurations_of_result result =
 	    | ("weak",_)::tl -> (Parameter.weakCompression := true ; parse tl)
 	    | ("none",_)::tl -> (Parameter.mazCompression := true ; parse tl)
 	    | [] -> ()
-	    | (error,pos)::tl ->
+	    | (error,pos)::_ ->
 	       raise (ExceptionDefn.Malformed_Decl
 			("Unkown value "^error^" for compression mode", pos_p))
 	  in
@@ -895,7 +895,7 @@ let configurations_of_result result =
 	     )
      | "influenceMapFileName" ->
 	raw_set_value pos_p param value_list
-		      (fun x p -> Kappa_files.set_influence x)
+		      (fun x _ -> Kappa_files.set_influence x)
      | "showIntroEvents" ->
 	set_value pos_p param value_list
 		  (fun v p -> match v with

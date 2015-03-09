@@ -1,6 +1,5 @@
 open State
 open Mods
-open ExceptionDefn
 
 type fd = {
   desc:out_channel;
@@ -47,7 +46,7 @@ let print_values_raw f (time,l) =
 
 let set_up filename env counter ?time state =
   let head = observables_header state in
-  let init_va = observables_values env counter state in
+  let init_va = observables_values env counter ?time state in
   let title =
     if !Parameter.marshalizedInFile <> ""
     then !Parameter.marshalizedInFile ^" output"
@@ -96,7 +95,7 @@ let plot_now env counter ?time state =
 	s.Pp_svg.points <-
 	  observables_values env counter ?time state :: s.Pp_svg.points
 
-let fill state counter env time_increment =
+let fill form state counter env time_increment =
   let () =
     match !plotDescr with
     | Wait _ -> ()
@@ -106,7 +105,7 @@ let fill state counter env time_increment =
        let n = next - last in
        let () = set_last_point plot next in
        match counter.Counter.dE with
-       | Some dE ->
+       | Some _ ->
 	  if n>1 then
 	    invalid_arg ("Plot.fill: invalid increment "^string_of_int n)
 	  else
@@ -120,8 +119,8 @@ let fill state counter env time_increment =
 	     and output_time = ref ((float_of_int last) *. dT) in
 	     while (!n > 0) && (Counter.check_output_time counter !output_time) do
 	       output_time := !output_time +. dT ;
-	       Counter.tick counter !output_time counter.Counter.events ;
+	       Counter.tick form counter !output_time counter.Counter.events ;
 	       plot_now env counter ~time:!output_time  state;
 	       n:=!n-1 ;
 	     done in
-  Counter.tick counter counter.Counter.time counter.Counter.events
+  Counter.tick form counter counter.Counter.time counter.Counter.events

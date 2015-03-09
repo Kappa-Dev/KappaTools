@@ -253,15 +253,15 @@ module Counter =
 	| Some max_e ->
 	   Some (max (max_e / points) 1)
 
-    let tick counter time event =
+    let tick f counter time event =
       let () =
 	if not counter.initialized then
 	  let c = ref !Parameter.progressBarSize in
 	  while !c > 0 do
-	    Format.print_string "_" ;
+	    Format.pp_print_string f "_" ;
 	    c:=!c-1
 	  done ;
-	  Format.print_newline () ;
+	  Format.pp_print_newline f () ;
 	  counter.initialized <- true
       in
       let last_event,last_time = counter.last_tick in
@@ -287,8 +287,8 @@ module Counter =
       let n = ref (max n_t n_e) in
       if !n>0 then set_tick counter (event,time) ;
       while !n > 0 do
-	Format.printf "%c" !Parameter.progressBarSymbol ;
-	if !Parameter.eclipseMode then Format.print_newline ();
+	Format.fprintf f "%c" !Parameter.progressBarSymbol ;
+	if !Parameter.eclipseMode then Format.pp_print_newline f ();
 	inc_tick counter ;
 	n:=!n-1
       done;

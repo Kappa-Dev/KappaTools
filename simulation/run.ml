@@ -1,5 +1,4 @@
 open Mods
-open Tools
 open ExceptionDefn
 
 (** random exponential selection if finite, next perturbation time if
@@ -20,7 +19,8 @@ let determine_time_advance activity state counter env =
 			    | Some dt -> dt
 			    | None -> Mods.Counter.last_increment counter
 	  end
-       | _ -> dt
+       | (Term.TIME | Term.ALG _ | Term.EVENT | Term.ABORT _ | Term.RULE _
+	  | Term.KAPPA _ | Term.TOK _) -> dt
       ) depset infinity
 
 let exec_perts pert_ids state counter env =
@@ -31,7 +31,7 @@ let exec_perts pert_ids state counter env =
   External.try_perturbate [] state pert_ids [] counter env
 
 
-let event state maybe_active_pert_ids story_profiling
+let event stdout state maybe_active_pert_ids story_profiling
 	  event_list counter env =
   (* 1. Updating dependencies of time or event numb then apply perturbations *)
   let state,remain_pert_ids,env,obs_from_perturbation,pert_events =
@@ -75,7 +75,7 @@ let event state maybe_active_pert_ids story_profiling
 	       else () ;
 	       raise Deadlock
 	     end in
-  Plot.fill state counter env dt ;
+  Plot.fill stdout state counter env dt ;
   Counter.inc_time counter dt ;
 
   State.dump state counter env ;
@@ -201,9 +201,9 @@ let event state maybe_active_pert_ids story_profiling
   in
   (state,pert_ids,story_profiling,event_list,env)
 
-let loop state story_profiling event_list counter env =
+let loop stdout state story_profiling event_list counter env =
   (*Before entering the loop*)
-  Counter.tick counter counter.Counter.time counter.Counter.events ;
+  Counter.tick stdout counter counter.Counter.time counter.Counter.events ;
 
   let rec iter state pert_ids story_profiling event_list counter env =
     let () = Debug.tag_if_debug
@@ -212,11 +212,11 @@ let loop state story_profiling event_list counter env =
     if (Counter.check_time counter) && (Counter.check_events counter)
        && not (Counter.stop counter) then
       let state,pert_ids,story_profiling,event_list,env =
-	event state pert_ids story_profiling event_list counter env
+	event stdout state pert_ids story_profiling event_list counter env
       in
       iter state pert_ids story_profiling event_list counter env
     else (*exiting the loop*)
-      let () = Plot.fill state counter env 0.0 in (*Plotting last measures*)
+      let () = Plot.fill stdout state counter env 0.0 in (*Plotting last measures*)
       let state,_remain_pert_ids,env,_obs_from_perturbation,_pert_events =
 	exec_perts pert_ids state counter env in
       let () = Plot.close counter in
