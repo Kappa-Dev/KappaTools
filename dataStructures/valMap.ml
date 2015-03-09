@@ -9,7 +9,7 @@ module type ValMap =
 		type key = int
 		type tree
 		type content
-		val to_string : tree -> string
+		val print : Format.formatter -> tree -> unit
 		val size : tree -> int
 		val random_val : tree -> (key*content)
 		val empty: tree
@@ -27,9 +27,11 @@ module Make(C:Content) =
         Empty
       | Node of tree * key * C.t * tree * int * int * float (*Node(left,key,value,right,height,size,acc)*)
 	  
-		let rec to_string = function
-			| Empty -> "Empty"
-			| Node (l,k,content,r,_,_,acc) -> Printf.sprintf "<%d,%f(%f)>[%s|%s]\n" k acc (C.to_f content) (to_string l) (to_string r) 
+    let rec print f = function
+      | Empty -> Format.pp_print_string f "Empty"
+      | Node (l,k,content,r,_,_,acc) ->
+	 Format.fprintf f "<%d,%f(%f)>[%a|%a]@," k acc (C.to_f content)
+			print l print r
 		
 		let height = function
         Empty -> 0
@@ -89,7 +91,7 @@ module Make(C:Content) =
           	Node(l, x, d, r, (if hl >= hr then hl + 1 else hr + 1), (size l) + (size r) + 1, (C.to_f d) +. acc1 +. acc2)
 
     let empty = Empty
-    let is_empty = function Empty -> true | _ -> false
+    let is_empty = function Empty -> true | Node _ -> false
 
     let rec add key data = function
         Empty -> Node(Empty,key, data, Empty,1,1,C.to_f data)
@@ -141,7 +143,7 @@ module Make(C:Content) =
       match (t1, t2) with
         (Empty, t) -> t
       | (t, Empty) -> t
-      | (_, _) ->
+      | (Node _, Node _) ->
           let (x, d) = min_binding t2 in
           bal t1 x d (remove_min_binding t2)
 

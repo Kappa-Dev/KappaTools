@@ -36,8 +36,8 @@ module type StoryStats =
     val inc_branch: log_info -> log_info 
     val inc_cut: log_info -> log_info 
     val reset_log: log_info -> log_info 
-    val dump_complete_log: Format.formatter -> log_info -> unit 
-    val dump_short_log: out_channel -> log_info -> unit 
+    val dump_complete_log: Format.formatter -> log_info -> unit
+    val dump_short_log: Format.formatter -> log_info -> unit
     val add_propagation_case_up: int -> log_info -> log_info 
     val add_propagation_case_down: int -> log_info -> log_info 
     val add_look_up_case: int -> log_info -> log_info
@@ -184,9 +184,13 @@ module StoryStats =
            cut_events = 0 ;
          }
 
-       let dump_short_log log log_info = 
-         let _ = Printf.fprintf log "Remaining events: %i ; Stack size: %i ; Total branch: %i ; Total cut: %i ; Current depth: %i \n " log_info.current_stack.remaining_events log_info.current_stack.stack_size log_info.branch log_info.cut log_info.current_stack.current_branch in 
-         flush log
+       let dump_short_log log log_info =
+         let _ = Format.fprintf log "Remaining events: %i ; Stack size: %i ; "
+				log_info.current_stack.remaining_events
+				log_info.current_stack.stack_size in
+	 Format.fprintf
+	   log "Total branch: %i ; Total cut: %i ; Current depth: %i @."
+	   log_info.branch log_info.cut log_info.current_stack.current_branch
 
            
        let reset_log log = 

@@ -62,10 +62,10 @@ module Propagation_heuristic =
 
     let print_output log x = 
       if B.is_failed x
-      then Printf.fprintf log "FAILED"
-      else if B.is_ignored x 
-      then Printf.fprintf log "IGNORED" 
-      else Printf.fprintf log "SUCCESS" 
+      then Format.fprintf log "FAILED"
+      else if B.is_ignored x
+      then Format.fprintf log "IGNORED"
+      else Format.fprintf log "SUCCESS"
 
     let forced_events parameter handler error blackboard = 
       let list = B.forced_events blackboard in 

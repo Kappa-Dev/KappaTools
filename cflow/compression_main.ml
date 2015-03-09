@@ -146,16 +146,13 @@ let compress env state log_info step_list =
                     then 
                       let _ = 
                         List.iter 
-                          (fun (x,bool) -> 
-                            let _ = D.S.PH.B.PB.CI.Po.K.print_refined_step parameter handler error x in 
-                            let _ = 
-                              if bool 
-                              then 
-                                let _ = Printf.fprintf stderr "Weak event \n" in
-                                let _ = Printf.fprintf stderr "\n" in 
-                                ()
-                            in 
-                            ()) 
+                          (fun (x,bool) ->
+                           let _ = D.S.PH.B.PB.CI.Po.K.print_refined_step parameter handler error x in
+                           if bool then
+                             Format.fprintf
+			       parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err
+			       "@[<v>Weak event @,@,@]"
+                          )
                           refined_event_list_without_pseudo_inverse
                       in Format.pp_print_flush
 			   parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err ()

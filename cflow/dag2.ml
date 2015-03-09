@@ -36,13 +36,13 @@ let rec compare_list compare l1 l2 =
         | _ -> cmp 
     end 
 
-let rec compare_superlist compare a b = 
-  match 
-    a,b 
-  with 
-  | Elt a,Elt b -> compare a b 
-  | Super_list a,Super_list b -> 
-    compare_list (compare_list (compare_superlist compare)) a b 
+let rec compare_superlist compare a b =
+  match a,b with
+  | Elt a,Elt b -> compare a b
+  | Super_list a,Super_list b ->
+     compare_list (compare_list (compare_superlist compare)) a b
+  | Elt _, Super_list _ -> -1
+  | Super_list _, Elt _ -> 1
 
 let rec sort compare superlist = 
   match 
@@ -59,24 +59,23 @@ let rec sort compare superlist =
          )
          (List.rev a))
 
-let dump_super_list s l = 
-  let rec aux depth l = 
-    match l with 
-    | Elt a -> 
-        Printf.fprintf stderr "%s%s\n" depth (s a) 
-    | Super_list l -> 
-      List.iter 
-        (fun l -> 
-          let _ = Printf.fprintf stderr "%s\n" depth in 
-          List.iter 
-            (fun l -> 
-              let _ = Printf.fprintf stderr "(%s\n" depth in 
-              aux ("--"^depth) l)
-            l)
-        l 
-  in aux "->" l 
-
-
+let dump_super_list f s l =
+  let rec aux depth f l =
+    match l with
+    | Elt a ->
+        Format.fprintf f "%s%a@," depth s a
+    | Super_list l ->
+       Pp.list
+	 Pp.cut
+	 (fun f l ->
+	  Format.fprintf f "%s@,%a" depth
+			 (Pp.list
+			    Pp.cut (fun f l ->
+				    Format.fprintf
+				      f "(%s@,%a" depth (aux ("--"^depth)) l)
+			 ) l
+	 ) f l
+  in Format.fprintf f "@[<v>%a@]@." (aux "->") l
 
 type 'a info = 
   {
@@ -88,28 +87,25 @@ type 'a info =
 
 let compare_fst_triple (a,_,_) (b,_,_) = compare a b 
 
-let smash compare l = 
-  let rec aux to_do old current accu = 
-    match 
-      to_do 
-    with 
-    | [] -> current::accu 
-    | h::t -> 
-      if compare h old = 0 
-      then (Printf.fprintf stderr "SUCCES\n";aux t old (h::current) accu )
-      else (Printf.fprintf stderr "FAIL\n";aux t h [h] (current::accu))
-  in 
-  match l 
-  with 
-  | Elt a -> Elt a 
-  | Super_list l -> 
-    Super_list 
-      (List.rev (List.fold_left 
-         (fun accu l -> 
-           match l with 
-           | [] -> accu
-           | h::t ->  aux t h [h] accu)
-         [] l)) 
+let smash compare l =
+  let rec aux to_do old current accu =
+    match to_do with
+    | [] -> current::accu
+    | h::t ->
+       if compare h old = 0
+       then aux t old (h::current) accu
+       else aux t h [h] (current::accu)
+  in
+  match l with
+  | Elt a -> Elt a
+  | Super_list l ->
+     Super_list
+       (List.rev (List.fold_left
+		    (fun accu l ->
+		     match l with
+		     | [] -> accu
+		     | h::t ->  aux t h [h] accu)
+		    [] l))
 
 (*let l = 
   Super_list 
@@ -130,10 +126,8 @@ let dump_triple (a,b,c) =   ("("^(string_of_int a)^","^(string_of_int b)^","^(st
 
 let _ = dump_super_list dump_triple l
 let l1 = sort compare_fst_triple l 
-let _ = Printf.fprintf stderr "END\n" 
 let _ = dump_super_list dump_triple l1 
 let l2 = smash (compare_superlist compare_fst_triple) l1
-let _ = Printf.fprintf stderr "ENDEND\n" 
 let _ = dump_super_list dump_triple l2  *)
     (*
 let normal_form root compare f = 

@@ -475,7 +475,7 @@ let dot_of_grid profiling desc enriched_grid state env =
 	       form
 	       "node_%d [label =\"%s\", shape=%s, style=%s, fillcolor=%s] ;@,"
 	       eid (label atom.kind) "house" "filled" "green"
-	| _ -> invalid_arg "Event type not handled"
+	| PERT _ -> invalid_arg "Event type not handled"
        (* List.iter (fun obs -> fprintf desc "obs_%d [label =\"%s\", style=filled, fillcolor=red] ;\n node_%d -> obs_%d [arrowhead=vee];\n" eid obs eid eid) atom.observation ;*) 
        ) eids_at_d ;
      Format.fprintf form "}@]@," ;
@@ -498,7 +498,7 @@ let dot_of_grid profiling desc enriched_grid state env =
 	      let atom = IntMap.find eid' config.events in
 	      match atom.kind with
 	      | INIT _ -> ()
-	      | _ -> Format.fprintf form "node_%d -> node_%d@," eid' eid
+	      | PERT _ | RULE _ | OBS _ -> Format.fprintf form "node_%d -> node_%d@," eid' eid
 	 ) pred_set
     ) config.prec_1 ;
   IntMap.iter
@@ -535,10 +535,10 @@ let pretty_print config_closure compression_type label story_list state env =
   let n = List.length story_list in
   let _ =
     if compression_type = "" then
-      Debug.tag (Printf.sprintf "\n+ Pretty printing %d flow%s"
+      Debug.tag (Format.sprintf "\n+ Pretty printing %d flow%s"
 				n (if n>1 then "s" else ""))
     else
-      Debug.tag (Printf.sprintf "\n+ Pretty printing %d %scompressed flow%s"
+      Debug.tag (Format.sprintf "\n+ Pretty printing %d %scompressed flow%s"
 				n label (if n>1 then "s" else ""))
   in
   let compression_type =

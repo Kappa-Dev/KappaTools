@@ -81,41 +81,31 @@ let concat_rev a b =
 
 let concat a = concat_rev (List.rev a)
 
-let print_list l = 
-  let _ = List.iter (Printf.fprintf stderr "%i,") l in 
-  let _ = Printf.fprintf stderr "\n" in 
-  let _ = flush stderr in 
-  ()
+let print_list f l =
+  Format.fprintf f "@[%a@]@." (Pp.list Pp.comma Format.pp_print_string) l
 
+let check form p f string a b =
+  match p a,p b with
+  | false,false -> let () = print_list form a in
+                   let () = print_list form b in
+                   failwith (string^"_arg1_2")
+  | true,false  -> let () = print_list form b in failwith (string^"_arg2")
+  | false,true -> let () = print_list form a in failwith (string^"_arg1")
+  | true,true ->
+     let rep = f a b in
+     let () = print_list form rep in
+     if p rep then rep
+     else
+       (print_list form a;print_list form b;print_list form rep;
+	failwith (string^"_output"))
 
-
-
-let check p f string a b = 
-  match p a,p b
-  with 
-  | false,false -> (let _ = print_list a in 
-                    let _ = print_list b in 
-                    failwith (string^"_arg1_2"))
-  | true,false  -> (print_list b;failwith (string^"_arg2"))
-  | false,true -> (let _ = print_list a in 
-                   failwith (string^"_arg1"))
-  | true,true -> 
-    let rep = f a b in 
-    let _ = print_list rep in 
-    if p rep 
-    then 
-      rep
-    else 
-      (print_list a;print_list b;print_list rep;failwith (string^"_output"))
-
-let merge_list p a b = 
+let merge_list p a b =
   let rec aux a b accu =
-      match a,b 
-      with 
-      | l,[] | [],l ->  List.rev (concat_rev l accu)
-      | h::t,h'::t' when h=h' -> aux t t' (h::accu)
-      | h::t,h'::t' when p h h' -> aux t b (h::accu)
-      | h::t,h'::t' -> aux a t' (h'::accu)
+    match a,b with
+    | l,[] | [],l ->  List.rev (concat_rev l accu)
+    | h::t,h'::t' when h=h' -> aux t t' (h::accu)
+    | h::t,h'::t' when p h h' -> aux t b (h::accu)
+    | h::t,h'::t' -> aux a t' (h'::accu)
   in aux a b []
 
 let is_sublist p a b = 
@@ -406,8 +396,5 @@ in aux 1 S.empty M.empty
 
 
 let t = generate_triangle 10000
-let _ = Printf.fprintf stderr "generated\n"
-let _ = flush stderr 
-let _ = closure t (fun x -> x - (x/100)*100 = 0) 
-let _ = flush stderr 
+closure t (fun x -> x - (x/100)*100 = 0)
 *)

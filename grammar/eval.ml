@@ -337,7 +337,6 @@ let rule_of_ast ?(backwards=false) ~is_pert env mixs
     Term.DepSet.fold
       (*creating dependencies between variables in the kinetic rate and the activity of the rule*)
       (fun dep env ->
-       (*Printf.printf "rule %d depends on %s\n" r_id (Mods.string_of_dep dep); *)
        Environment.add_dependencies dep (Term.RULE r_id) env)
       (Term.DepSet.union dep dep_alt) env
   in
