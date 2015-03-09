@@ -71,4 +71,4 @@ val enum_alternate_anchors : t -> t
 val internal_edges : int -> t -> (int*int) Mods.Int2Map.t
 
 (**for debugging*)
-val dump_span : (*Environment.t ->*) t -> unit
+val dump_span : (*Environment.t ->*)Format.formatter -> t -> unit

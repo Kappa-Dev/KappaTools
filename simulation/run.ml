@@ -220,7 +220,7 @@ let loop stdout state story_profiling event_list counter env =
       let () = Plot.fill stdout state counter env 0.0 in (*Plotting last measures*)
       let state,_remain_pert_ids,env,_obs_from_perturbation,_pert_events =
 	exec_perts stdout pert_ids state counter env in
-      let () = Plot.close counter in
+      let () = Plot.close stdout counter in
       if Environment.tracking_enabled env then
 	let causal,weak,strong =
 	  (*compressed_flows:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_id:int story_time: float ; story_event: int}*)

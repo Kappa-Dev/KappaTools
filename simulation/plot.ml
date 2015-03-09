@@ -19,13 +19,13 @@ let plotDescr = ref (Wait "__dummy")
 
 let create filename = plotDescr := Wait filename
 
-let close counter =
+let close form counter =
   match !plotDescr with
   | Wait _ -> ()
   | Ready plot ->
      let n = ref (!Parameter.progressBarSize - counter.Counter.ticks) in
      let () = while !n > 0 do
-		Format.printf "%c" !Parameter.progressBarSymbol ;
+		Format.fprintf form "%c" !Parameter.progressBarSymbol ;
 		n := !n-1
 	      done in
      match plot.format with

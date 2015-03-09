@@ -1,5 +1,5 @@
 val create : string -> unit
-val close : Mods.Counter.t -> unit
+val close : Format.formatter -> Mods.Counter.t -> unit
 
 val plot_now : Environment.t -> Mods.Counter.t -> ?time:float -> State.t -> unit
 

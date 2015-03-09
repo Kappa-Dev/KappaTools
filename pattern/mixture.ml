@@ -100,7 +100,7 @@ let is_bound a_i s_i mix =
   let (_,lnk) = IntMap.find s_i ag_i.interface in
   match lnk with
   | BND | TYPE _ -> true
-  | _ -> false
+  | WLD | FREE -> false
 
 let empty id_opt = {
 	agents = IntMap.empty ;
@@ -227,22 +227,23 @@ let enum_alternate_anchors mix =
 	    ids_of_name = ids_of_name ;
 	    size_of_cc = size_of_cc}
 
-let dump_span mix =
-  Format.printf "Arity: %d@." (arity mix) ;
+let dump_span f mix =
+  Format.fprintf f "Arity: %d@." (arity mix) ;
   let ar = match mix.component_of_id with
       Some ar -> ar
     | None -> invalid_arg "Mixture.dump_span: component_of_id not computed"
   in
-  Format.printf "component map: %a\n" (Pp.plain_array Format.pp_print_int) ar;
+  Format.fprintf
+    f "component map: %a@." (Pp.plain_array Format.pp_print_int) ar;
   let hsh = match mix.enum_cov with
       Some hsh -> hsh
     | None -> invalid_arg "Mixture.dump_span: hsh not computed"
   in
   Hashtbl.iter
     (fun root_id cov ->
-     Format.printf "SPTR[%d]: [%a]@." root_id
-		   (Pp.set Int2Map.bindings Pp.comma
-			   (fun f ((i,j),(i',j')) ->
-			    Format.fprintf f "(%d,%d) -> (%d,%d)" i j i' j'))
-		   cov.span;
+     Format.fprintf f "SPTR[%d]: [%a]@." root_id
+		    (Pp.set Int2Map.bindings Pp.comma
+			    (fun f ((i,j),(i',j')) ->
+			     Format.fprintf f "(%d,%d) -> (%d,%d)" i j i' j'))
+		    cov.span;
     ) hsh

@@ -8,8 +8,6 @@ type context =
     { pairing : link IntMap.t; curr_id : int;
       new_edges : (int * int) Int2Map.t }
 
-let interface_for_decl ast_intf =()
-
 let eval_intf ast_intf =
   let rec iter ast_intf map =
     match ast_intf with

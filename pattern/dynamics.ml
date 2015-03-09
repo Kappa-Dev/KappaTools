@@ -1,7 +1,5 @@
 open Mods
-open Tools
 open ExceptionDefn
-open Graph
 open Primitives
 
 let compute_causal lhs rhs script env =
@@ -26,7 +24,7 @@ let compute_causal lhs rhs script env =
     let c' = try PortMap.find p map with Not_found -> create false false in
     PortMap.add p (f c') map
   in
-  let causal_map,bool =
+  let causal_map,_ =
     List.fold_left
       (fun (causal_map,bool) action ->
        match action with
@@ -45,14 +43,14 @@ let compute_causal lhs rhs script env =
 				 (add_causal p1 add_link_modif causal_map),true
 		   | None -> invalid_arg "Dynamics.Compute_causal"
 		 end
-	      | (FRESH id, site_id) -> invalid_arg "Dynamics.Compute_causal"
+	      | (FRESH _, _) -> invalid_arg "Dynamics.Compute_causal"
 	    end
 	  else
 	    add_causal p1 add_link_modif causal_map,true
-       | MOD (p,i) -> add_causal p add_internal_modif causal_map,true
+       | MOD (p,_) -> add_causal p add_internal_modif causal_map,true
        | DEL ag_id ->
 	  Mixture.fold_interface
-	    (fun site_id (int,lnk) (causal_map,bool) ->
+	    (fun site_id (int,_lnk) (causal_map,bool) ->
 	     let causal_map =
 	       match int with
 		 Some _ -> add_causal (KEPT ag_id,site_id) add_internal_modif causal_map | None -> causal_map
@@ -430,7 +428,7 @@ let diff pos m0 m1 env =
 		      (inst,idmap'))
 		  else (inst,idmap')
 	     end
-	  | (_,_) -> (*connected,free -> wildcard*)
+	  | _,(Mixture.WLD | Mixture.TYPE _) -> (*connected,free -> wildcard*)
 	     compile_error
 	       pos (Format.sprintf "The link status of agent '%s', site '%s' on the right hand side is underspecified"
 				   ag_name site_name)
@@ -461,7 +459,7 @@ let site_defined site_id ag is_added env =
     | None ->
        match lnk with
        | Mixture.WLD -> None
-       | _ -> Some (int,lnk)
+       | Mixture.BND | Mixture.TYPE _ | Mixture.FREE -> Some (int,lnk)
   with Not_found ->
     if not is_added then None
     else
@@ -543,7 +541,8 @@ let rec superpose todo_list lhs rhs map already_done added codomain env =
 		    else raise False
 		 | (Mixture.FREE,Mixture.FREE)
 		 | (Mixture.WLD,_) | (_,Mixture.WLD) -> (todo,already_done)
-		 | _ -> raise False
+		 | (Mixture.FREE | Mixture.TYPE _ | Mixture.BND), _ ->
+		    raise False
 	   ) lhs_ag (tl,already_done)
      in
      superpose todo_list lhs rhs map (*IntMap.add lhs_id rhs_id map*) already_done added (IntSet.add rhs_id codomain) env
@@ -582,7 +581,9 @@ let enable r mix env =
 		  if t=0 (*int-modified*) then
 		    match int with Some _ -> true | None -> false
 		  else
-		    match lnk with Mixture.WLD -> false | _ -> true
+		    match lnk with Mixture.WLD -> false
+				 | (Mixture.BND | Mixture.TYPE _
+				    | Mixture.FREE) -> true
 		end
 	     | None -> false
 	    ) modif_sites

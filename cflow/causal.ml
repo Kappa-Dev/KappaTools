@@ -1,8 +1,4 @@
 open Mods
-open Dynamics
-open Graph
-open State
-open LargeArray
 
 type atom_state = FREE | BND of int*int | INT of int | UNDEF
 type event_kind = OBS of int | RULE of int | INIT of int | PERT of int
@@ -224,7 +220,7 @@ let record_obs side_effects ((r_id,state,embedding,_),test)
   let grid = store_is_weak is_weak event_number grid in
   let im embedding id =
     match id with
-    | Primitives.FRESH j -> raise (Invalid_argument "Causal.record_obs")
+    | Primitives.FRESH _ -> raise (Invalid_argument "Causal.record_obs")
     | Primitives.KEPT j -> IntMap.find j embedding
   in
   let causal = Dynamics.compute_causal_obs state env in
