@@ -271,13 +271,13 @@ let create ?with_interface name_id env =
 (*Tests whether status of port i of node n is compatible with (int,lnk)
 @raises False if not otherwise returns completes*)
 (*the list port_list with (0,i) if i is int-tested or (1,i) if i is lnk-tested*)
-let test n i int lnk port_list =
+let test err_fmt n i int lnk port_list =
   let intf_n = interface n in
   let (state,link) =
     try intf_n.(i).status
     with exn ->
-      (Debug.tag (Format.sprintf "Node %d has no site %d" (name n) i)
-      ; raise exn) in
+      let () = Format.fprintf err_fmt "Node %d has no site %d@." (name n) i in
+      raise exn in
   let port_list =
     match int with
     | None -> port_list

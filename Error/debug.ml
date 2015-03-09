@@ -1,4 +1,4 @@
-let tag s = print_string (s^"\n") ; flush stdout
+let tag f s = Format.fprintf f "%s@." s
 
 let tag_if_debug s =
   if !Parameter.debugModeOn

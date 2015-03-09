@@ -57,7 +57,7 @@ val apply :
   t -> Primitives.rule -> Embedding.t -> Counter.t -> Environment.t ->
   Environment.t * t * Int2Set.t * Embedding.t * int IntMap.t * IntSet.t
 val positive_update :
-  ?with_tracked:(int * int IntMap.t) list ->
+  ?with_tracked:(int * int IntMap.t) list -> Format.formatter ->
   t -> Primitives.rule -> int IntMap.t -> int IntMap.t ->
   Int2Set.t -> Int2Set.t -> Counter.t -> Environment.t ->
   Environment.t * t * IntSet.t * InjectionHeap.content list *
@@ -67,8 +67,8 @@ val instances_of_square :
   Environment.t -> (int IntMap.t * IntSet.t * InjectionHeap.content list) list
 
 val initialize :
-  Graph.SiteGraph.t -> float array -> Primitives.rule list ->
-  Mixture.t list -> (Expr.alg_expr * string) list ->
+  Format.formatter -> Graph.SiteGraph.t -> float array ->
+  Primitives.rule list -> Mixture.t list -> (Expr.alg_expr * string) list ->
   Primitives.perturbation list ->
   Counter.t -> Environment.t -> t * Environment.t
 

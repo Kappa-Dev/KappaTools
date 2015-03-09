@@ -11,7 +11,7 @@ open ExceptionDefn
         component injection, in which case checking additional edges is not
         necessary*)
 let component ?(check_additional_edges=true) ?(already_done=Int2Set.empty)
-	      embedding id_agent (sg,id_node) mix =
+	      err_fmt embedding id_agent (sg,id_node) mix =
   let rec reco queue part_embedding port_map =
     match queue with
     | [] -> (part_embedding,port_map)
@@ -36,7 +36,7 @@ let component ?(check_additional_edges=true) ?(already_done=Int2Set.empty)
 	       Mixture.fold_interface
 		 (fun site_id (int_opt,lnk_opt) (queue,port_list_j) ->
 		  let port_list_j =
-		    Node.test node_j site_id int_opt lnk_opt port_list_j
+		    Node.test err_fmt node_j site_id int_opt lnk_opt port_list_j
 		  (*may raise False if test fails*)
 		  in
 		  (*following the spanning tree rooted at id_agent*)
@@ -85,7 +85,7 @@ let component ?(check_additional_edges=true) ?(already_done=Int2Set.empty)
 	     with Not_found -> invalid_arg "Matching.component"
 	   in
 	   let port_list_i =
-	     Node.test node_i s_i int_opt lnk_opt port_list_i
+	     Node.test err_fmt node_i s_i int_opt lnk_opt port_list_i
 	   (*may raise False*) in
 	   let port_map = IntMap.add n_i port_list_i port_map in
 	   let opt = Node.follow node_i s_i in
@@ -105,7 +105,7 @@ let component ?(check_additional_edges=true) ?(already_done=Int2Set.empty)
 		      s_j (Mixture.interface (Mixture.agent_of_id b_j mix))
 		  in
 		  let _ = (*no need to modify port_map*)
-		    Node.test node_j s_j int_opt lnk_opt []
+		    Node.test err_fmt node_j s_j int_opt lnk_opt []
 		  (*may raise False*) in
 		  let n_x =
 		    try Node.get_address node_x

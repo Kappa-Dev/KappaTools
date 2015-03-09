@@ -6,7 +6,8 @@ open ExceptionDefn
 
 (**updating non local mixtures after application of a linking rule using embedding [embedding_info]*)
 let update_intra_in_components r embedding_info state counter env =
-	if !Parameter.debugModeOn then Debug.tag "Looking for side effect update of non local rules..." ;
+  let () =
+    Debug.tag_if_debug "Looking for side effect update of non local rules..." in
 	let components = 
 		match embedding_info.Embedding.components with
 			| Some map -> map
@@ -96,8 +97,11 @@ let update_intra_in_components r embedding_info state counter env =
 			) cc_set (extensions,found) 
 		) con_map (IntMap.empty,0)
 	in
-	if found < 2 then 
-		(if !Parameter.debugModeOn then Debug.tag "Potential new intras are not shared between merged cc and cannot be new, skipping"; state)
+	if found < 2 then
+	  let () =
+	    Debug.tag_if_debug
+	      "Potential new intras are not shared between merged cc and cannot be new, skipping" in
+	  state
 	else
 		IntMap.fold 
 		(fun r_id cc_map state ->
@@ -269,7 +273,7 @@ let rec update_rooted_intras new_injs state counter env =
 								let injprod_hp = InjProdHeap.alloc ~check:true injprod injprod_hp in
 									injprod_hp
 								with InjProdHeap.Is_present -> 
-									if !Parameter.debugModeOn then Debug.tag "Intra already added, skipping" ;
+									Debug.tag_if_debug "Intra already added, skipping" ;
 									injprod_hp 
 						) injprod_hp new_intras
 					in
@@ -305,31 +309,27 @@ let positive_update r embedding_t new_injs state counter env =
 	(*If rule is potentially breaking up some connected component this should wake up silenced rules*)
 	begin
 		match r.Primitives.cc_impact with
-			| None -> (if !Parameter.debugModeOn then Debug.tag "Rule cannot decrease connectedness no need to update silenced rules") 
+			| None -> Debug.tag_if_debug "Rule cannot decrease connectedness no need to update silenced rules"
 			| Some _ -> (*should be more precise here*) State.unsilence_rule state r counter env
 	end ;
 		
 	(*If rule is potentially merging two connected components this should trigger a positive update of non local rules*)
 	begin
-		match r.Primitives.cc_impact with
-			| None -> 
-				(if !Parameter.debugModeOn then 
-					Debug.tag "No possible side effect update of unary rules because applied rule cannot increase connectedness" ;
-				state
-				)
-			| Some (con_map,_,_) ->
-				if IntMap.is_empty con_map then state
-				else
-					begin
-						match embedding_t with
-							| Embedding.CONNEX _ -> 
-								(if !Parameter.debugModeOn then 
-									Debug.tag "No possible side effect update of unary rules because a unary instance was applied"; 
-								state
-								)
-							| Embedding.DISJOINT e | Embedding.AMBIGUOUS e -> (*one may need to compute connected components if they are not present in e, as in the AMBIGUOUS case*)
-								update_intra_in_components r e state counter env 
-					end
-	end 
-	
-	
+	  match r.Primitives.cc_impact with
+	  | None ->
+	     let () = Debug.tag_if_debug
+			"No possible side effect update of unary rules because applied rule cannot increase connectedness" in
+	     state
+	  | Some (con_map,_,_) ->
+	     if IntMap.is_empty con_map then state
+	     else
+	       begin
+		 match embedding_t with
+		 | Embedding.CONNEX _ ->
+		    let () = Debug.tag_if_debug
+			       "No possible side effect update of unary rules because a unary instance was applied" in
+		    state
+		 | Embedding.DISJOINT e | Embedding.AMBIGUOUS e -> (*one may need to compute connected components if they are not present in e, as in the AMBIGUOUS case*)
+					   update_intra_in_components r e state counter env
+	       end
+	end

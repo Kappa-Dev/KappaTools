@@ -137,52 +137,36 @@ let diff_list_decreasing =  diff_list (swap compare_bool)
 let merge_list_decreasing = merge_list (swap compare_bool)
 (*let is_sublist_decreasing = is_sublist (swap compare_bool)*)
 
-let closure config prec is_obs init_to_eidmax weak_events init = 
-  let max_index = 
-    M.fold 
-      (fun i _ -> max i)
-      prec 
-      0 
-  in 
-  let is_init x = 
-    try 
-      let s = M.find x prec in 
+let closure err_fmt config prec is_obs init_to_eidmax weak_events init =
+  let max_index = M.fold (fun i _ -> max i) prec 0 in
+  let is_init x =
+    try
+      let s = M.find x prec in
       S.is_empty s || (S.equal s (S.singleton x))
-    with _ -> true 
-  in 
-  let weak_events = 
-    if config.detect_separable_components 
-    then (fun x -> (try weak_events x with _ -> false) && (init_to_eidmax x = 0) && (not (is_obs x)))
-    else (fun _ -> false)
-  in 
-  let _ = 
-    if config.stat_trans_closure_for_big_graphs && config.max_index > 300 
-    then 
-      let n_edges = 
-        M.fold 
-          (ignore_fst
-             (S.fold 
-                (ignore_fst succ)
-             ))
-          prec 0 
-      in 
-      let _ = Debug.tag "" in 
-      let _ = Debug.tag ("\t\tTransitive closure ("^(string_of_int max_index)^" nodes, "^(string_of_int n_edges)^" edges)") in 
-      let _ = flush stderr in 
-      ()
-    else 
-      ()
-  in 
-  let do_tick,tick = 
-    if max_index > 300 && config.do_tick 
-    then 
-      let tick = Mods.tick_stories max_index (false,0,0) in 
-      let f = Mods.tick_stories max_index in 
-      f,tick 
-    else 
+    with _ -> true
+  in
+  let weak_events x =
+    config.detect_separable_components &&
+      (try weak_events x with _ -> false) &&
+	init_to_eidmax x = 0 && not (is_obs x)
+  in
+  let () =
+    if config.stat_trans_closure_for_big_graphs && config.max_index > 300
+    then
+      let n_edges =
+        M.fold (ignore_fst (S.fold (ignore_fst succ))) prec 0 in
+      Format.fprintf err_fmt "@.\t\tTransitive closure (%i nodes, %i edges)@."
+		     max_index n_edges in
+  let do_tick,tick =
+    if max_index > 300 && config.do_tick
+    then
+      let tick = Mods.tick_stories max_index (false,0,0) in
+      let f = Mods.tick_stories max_index in
+      f,tick
+    else
       (fun x -> x),(false,0,0)
-  in 
-  let s_pred_star = A.make (max_index+1) ([],0) in 
+  in
+  let s_pred_star = A.make (max_index+1) ([],0) in
   let clean,max_succ,set_succ,redirect,cut_event,is_final = 
     if config.enable_gc || config.detect_separable_components 
     then 

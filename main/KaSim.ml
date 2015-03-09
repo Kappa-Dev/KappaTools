@@ -118,7 +118,7 @@ let main =
 
     let result =
       Ast.init_compil() ;
-      List.iter (fun fic -> KappaLexer.compile fic)
+      List.iter (fun fic -> KappaLexer.compile Format.std_formatter fic)
 		!Parameter.inputKappaFileNames ;
       !Ast.result in
 
@@ -138,7 +138,8 @@ let main =
 
     let (env, counter, state) =
       match !Parameter.marshalizedInFile with
-      | "" -> Eval.initialize !Parameter.alg_var_overwrite result
+      | "" ->
+	 Eval.initialize Format.std_formatter !Parameter.alg_var_overwrite result
       | marshalized_file ->
 	 try
 	   let d = open_in_bin marshalized_file in
@@ -158,7 +159,9 @@ let main =
 	   end
 	 with
 	 | _exn ->
-	    Debug.tag "!Simulation package seems to have been created with a different version of KaSim, aborting...";
+	    Debug.tag
+	      Format.std_formatter
+	      "!Simulation package seems to have been created with a different version of KaSim, aborting...";
 	    exit 1
     in
 

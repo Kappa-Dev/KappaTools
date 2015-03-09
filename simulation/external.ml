@@ -18,7 +18,7 @@ let pr_pexpr state counter env f pexpr =
 let eval_pexpr pexpr state counter env =
   Format.asprintf "@[<h>%a@]" (raw_pr_pexpr state counter env) pexpr
 
-let apply_n_time x r state env counter pert_ids pert_events tracked =
+let apply_n_time err_fmt x r state env counter pert_ids pert_events tracked =
   Nbr.iteri
     (fun n (env,state,pert_ids,with_tracked,pert_events as pack) ->
      try
@@ -28,8 +28,7 @@ let apply_n_time x r state env counter pert_ids pert_events tracked =
 				    state r.Primitives.lhs counter env
 	 with Null_event _ ->
 	      let mix_id = Mixture.get_id r.Primitives.lhs in
-	      if !Parameter.debugModeOn then
-		Debug.tag "Clashing instance detected: building matrix";
+	      Debug.tag_if_debug "Clashing instance detected: building matrix";
 	      match State.instances_of_square mix_id (-1) state env with
 	      (*JK: un peu bete de generer la matrice pour ne prendre que la premiere injection*)
 	      | (embedding,_,_)::_ -> Embedding.DISJOINT
@@ -43,7 +42,8 @@ let apply_n_time x r state env counter pert_ids pert_events tracked =
 	 State.apply state r embedding_t counter env in
        let phi = State.Embedding.map_of embedding_t in
        let env,state,pert_ids_pos,_new_injs,tracked' =
-	 State.positive_update ~with_tracked state r phi psi side_effects Int2Set.empty counter env
+	 State.positive_update ~with_tracked err_fmt state r phi psi
+			       side_effects Int2Set.empty counter env
        in
        let pert_ids =
 	 if Nbr.is_equal n x then (*only the first time*)
@@ -56,7 +56,8 @@ let apply_n_time x r state env counter pert_ids pert_events tracked =
        in pack)
     (env,state,pert_ids,tracked,pert_events) x
 
-let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot counter =
+let trigger_effect err_fmt state env pert_ids tracked pert_events pert p_id
+		   eff snapshot counter =
   match eff with
   | Primitives.ITER_RULE ((v,_),r) ->
      let x = State.value_alg state counter env v in
@@ -69,7 +70,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
       let () =
 	Debug.tag_if_debug "Applying %a instances of %a"
 			   Nbr.print x (Kappa_printer.modification env) eff
-      in apply_n_time x r state env counter pert_ids pert_events tracked
+      in apply_n_time err_fmt x r state env counter pert_ids pert_events tracked
   | Primitives.UPDATE (g_id,(v,_)) ->
      let () = Debug.tag_if_debug "Updating %a" Term.print_dep_type g_id in
      State.update_dep_value state counter env v g_id;
@@ -131,7 +132,7 @@ let trigger_effect state env pert_ids tracked pert_events pert p_id eff snapshot
       (env, state, pert_ids,tracked,pert_events)
     end
 
-let apply_effect p_id pert tracked pert_events state counter env =
+let apply_effect err_fmt p_id pert tracked pert_events state counter env =
   let snapshot str =
     Debug.tag_if_debug "Taking a snapshot of current state (%s)" str;
     let ext = if !Parameter.dotOutput then "dot" else "ka" in
@@ -144,11 +145,11 @@ let apply_effect p_id pert tracked pert_events state counter env =
   List.fold_left
     (fun (env, state, pert_ids,tracked,pert_events) effect ->
      try
-       trigger_effect state env pert_ids tracked pert_events pert p_id effect
-		      snapshot counter
+       trigger_effect err_fmt state env pert_ids tracked pert_events
+		      pert p_id effect snapshot counter
      with ExceptionDefn.StopReached msg ->
        counter.Counter.stop <- true;
-       Debug.tag msg;
+       Debug.tag err_fmt msg;
        (env, state, pert_ids,tracked,pert_events)
     )
     (env,state,IntSet.empty,tracked,pert_events) pert.Primitives.effect
@@ -175,7 +176,7 @@ let has_reached_a_stopping_time state counter env =
 	   | e, (Some _ | None) -> e
     ) depset None
 
-let try_perturbate tracked state pert_ids pert_events counter env =
+let try_perturbate err_fmt tracked state pert_ids pert_events counter env =
   let rec iter state pert_ids triggered_perts tracked pert_events env =
     let state,env,pert_ids',triggered_perts,tracked,pert_events =
       let () = Debug.tag_if_debug
@@ -193,7 +194,7 @@ let try_perturbate tracked state pert_ids pert_events counter env =
 		Debug.tag_if_debug
 		  "\n*************Applying perturbation %d***************" pert_id;
 		let env,state,new_pert_ids,tracked,pert_events =
-		  apply_effect pert_id pert tracked pert_events state counter env in
+		  apply_effect err_fmt pert_id pert tracked pert_events state counter env in
 		Debug.tag_if_debug "************End perturbation*************" ;
 		let state,triggered_perts =
 		  if eval_abort_pert true pert state counter env then

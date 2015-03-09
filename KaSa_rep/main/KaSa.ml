@@ -18,7 +18,7 @@ let main () =
     let _ = Ast.init_compil() in 
     let _ =  
       List.iter (fun fic -> 
-                 let _ = KappaLexer.compile fic in 
+                 let () = KappaLexer.compile Format.std_formatter fic in
                  ())
                 files 
     in 

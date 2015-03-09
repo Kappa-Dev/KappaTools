@@ -180,14 +180,14 @@ and inline_comment = parse
 		   | '/' '*' {inline_comment lexbuf; inline_comment lexbuf}
 		   | _ {inline_comment lexbuf}
 {
-  let compile fic =
+  let compile logger fic =
     let d = open_in fic in
     Parameter.openInDescriptors := d::(!Parameter.openInDescriptors);
     let lexbuf = Lexing.from_channel d in
     lexbuf.lex_curr_p <- {lexbuf.lex_curr_p with pos_fname = fic} ;
     try
-      Debug.tag ("Parsing "^fic^"...") ;
-      KappaParser.start_rule token lexbuf ; Debug.tag "done" ; close_in d ;
+      Debug.tag logger ("Parsing "^fic^"...") ;
+      KappaParser.start_rule token lexbuf ; Debug.tag logger "done" ; close_in d ;
       Parameter.openInDescriptors := List.tl (!Parameter.openInDescriptors)
     with
     | Syntax_Error (opt_pos,msg) ->

@@ -910,12 +910,12 @@ let configurations_of_result result =
 	raise (ExceptionDefn.Malformed_Decl ("Unkown parameter "^error, pos_p))
     ) result.configurations
 
-let initialize overwrite result =
-  Debug.tag "+ Compiling..." ;
-  Debug.tag "\t -simulation parameters" ;
+let initialize logger overwrite result =
+  Debug.tag logger "+ Compiling..." ;
+  Debug.tag logger "\t -simulation parameters" ;
   let _ = configurations_of_result result in
 
-  Debug.tag "\t -agent signatures" ;
+  Debug.tag logger "\t -agent signatures" ;
   let sigs_nd =
     NamedDecls.create (array_map_of_list
 			 (fun (name,intf) -> (name,Signature.create intf))
@@ -923,7 +923,7 @@ let initialize overwrite result =
   let tk_nd =
     NamedDecls.create (array_map_of_list (fun x -> (x,())) result.Ast.tokens) in
 
-  Debug.tag "\t -variable declarations";
+  Debug.tag logger "\t -variable declarations";
   let alg_vars_over =
     Tools.list_rev_map_append
       (fun (x,v) -> (Term.with_dummy_pos x,
@@ -947,39 +947,39 @@ let initialize overwrite result =
 
   let (env, kappa_vars) = variables_of_result env mixs alg_a in
 
-  Debug.tag "\t -initial conditions";
+  Debug.tag logger "\t -initial conditions";
   let sg,token_vector,env = init_graph_of_result env result in
 
   let tolerate_new_state = !Parameter.implicitSignature in
   Parameter.implicitSignature := false ;
 
-  Debug.tag "\t -rules";
+  Debug.tag logger "\t -rules";
   let (env, kappa_vars, pure_rules) =
     rules_of_result env kappa_vars result tolerate_new_state in
 
-  Debug.tag "\t -observables";
+  Debug.tag logger "\t -observables";
   let env,kappa_vars,observables = obs_of_result env kappa_vars result in
-  Debug.tag "\t -perturbations" ;
+  Debug.tag logger "\t -perturbations" ;
   let (kappa_vars, pert, rules, env) =
     pert_of_result kappa_vars env pure_rules result in
-  Debug.tag "\t Done";
-  Debug.tag "+ Analyzing non local patterns..." ;
+  Debug.tag logger "\t Done";
+  Debug.tag logger "+ Analyzing non local patterns..." ;
   let env = Environment.init_roots_of_nl_rules env in
-  Debug.tag "+ Building initial simulation state...";
+  Debug.tag logger "+ Building initial simulation state...";
   let counter =
     Counter.create !Parameter.pointNumberValue
 		   0.0 0 !Parameter.maxTimeValue !Parameter.maxEventValue in
-  Debug.tag "\t -Counting initial local patterns..." ;
+  Debug.tag logger "\t -Counting initial local patterns..." ;
   let (state, env) =
-    State.initialize sg token_vector rules kappa_vars
+    State.initialize logger sg token_vector rules kappa_vars
 		     observables pert counter env
   in
   let state =
     if env.Environment.has_intra then
       begin
-	Debug.tag "\t -Counting initial non local patterns..." ;
+	Debug.tag logger "\t -Counting initial non local patterns..." ;
 	NonLocal.initialize_embeddings state counter env
       end
     else state
   in
-  (Debug.tag "\t Done"; (env, counter, state))
+  (Debug.tag logger "\t Done"; (env, counter, state))

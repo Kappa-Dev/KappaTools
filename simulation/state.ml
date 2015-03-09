@@ -232,7 +232,8 @@ let rec with_value_alg state counter ?time env n = function
      with_value_alg state counter ?time env (Nbr.of_bin_alg_op op n1 n) sk
   | TO_COMPUTE_UN op :: sk ->
      with_value_alg state counter ?time env (Nbr.of_un_alg_op op n) sk
-  | _ -> failwith "type error in with_value_alg"
+  | (TO_COMPUTE_COMP _ | TO_EXEC_COMP _ | TO_EXEC_BOOL _)
+    :: _ -> failwith "type error in with_value_alg"
 and with_value_alg_bool state counter ?time env n = function
   | TO_EXEC_ALG (op,alg) :: sk ->
      exec_alg state counter ?time env with_value_alg_bool alg (TO_COMPUTE_ALG (op,n)::sk)
@@ -244,7 +245,9 @@ and with_value_alg_bool state counter ?time env n = function
      exec_alg state counter ?time env with_value_alg_bool alg (TO_COMPUTE_COMP (op,n)::sk)
   | TO_COMPUTE_COMP (op,n1) :: sk ->
      with_value_bool state counter ?time env (Nbr.of_compare_op op n1 n) sk
-  | _ -> failwith "type error in with_value_alg_bool"
+  | (TO_COMPUTE_COMP _ | TO_EXEC_COMP _ | TO_EXEC_BOOL _)
+    :: _ -> failwith "type error in with_value_alg_bool"
+  | [] -> failwith "type error in with_value_alg_bool"
 and exec_bool state counter ?time env expr sk =
   match expr with
   | Ast.TRUE -> with_value_bool state counter ?time env true sk
@@ -339,56 +342,49 @@ let unsilence_rule state rule counter env =
 
 (* compute complete embedding of mix into sg at given root --for           *)
 (* initialization phase                                                    *)
-let generate_embeddings sg u_i mix comp_injs env =
-	let mix_id = Mixture.get_id mix in
-	
-	let rec iter cc_id sg comp_injs  =
-		if cc_id = (Mixture.arity mix)
-		then (sg, comp_injs)
-		else
-			(
-			let id_opt = Mixture.root_of_cc mix cc_id 
-			in
-				match id_opt with
-				| None -> iter (cc_id + 1) sg comp_injs
-				| Some id_root ->
-						let opt_inj =
-							Matching.component
-								(Injection.empty (Mixture.size_of_cc cc_id mix) (mix_id,cc_id)) id_root
-								(sg, u_i) mix
-						in
-						(match opt_inj with
-							| None -> iter (cc_id + 1) sg comp_injs 
-							| Some (injection, port_map) ->
-							(* port_map: u_i -> [(p_k,0/1);...] if port k of node i is   *)
-							(* int/lnk-tested by map                                     *)
-								let opt =
-									(try comp_injs.(cc_id)
-									with
-									| Invalid_argument msg ->
-											invalid_arg ("State.generate_embeddings: " ^ msg)) in
-								let cc_id_injections =
-									(match opt with
-										| Some injections -> injections
-										| None ->
-												InjectionHeap.create
-													!Parameter.defaultHeapSize) in
-								let cc_id_injections =
-									InjectionHeap.alloc injection cc_id_injections
-								in
-								(comp_injs.(cc_id) <- Some cc_id_injections;
-									let sg =
-										SiteGraph.add_lift sg injection port_map env
-									in 
-									iter (cc_id + 1) sg comp_injs 
-								)
-						)
-			)
-	in 
-	iter 0 sg comp_injs 
+let generate_embeddings err_fmt sg u_i mix comp_injs env =
+  let mix_id = Mixture.get_id mix in
+  let rec iter cc_id sg comp_injs  =
+    if cc_id = (Mixture.arity mix)
+    then (sg, comp_injs)
+    else
+      let id_opt = Mixture.root_of_cc mix cc_id in
+      match id_opt with
+      | None -> iter (cc_id + 1) sg comp_injs
+      | Some id_root ->
+	 let opt_inj =
+	   Matching.component
+	     err_fmt
+	     (Injection.empty (Mixture.size_of_cc cc_id mix) (mix_id,cc_id))
+	     id_root (sg, u_i) mix
+	 in
+	 match opt_inj with
+	 | None -> iter (cc_id + 1) sg comp_injs
+	 | Some (injection, port_map) ->
+	    (* port_map: u_i -> [(p_k,0/1);...] if port k of node i is   *)
+	    (* int/lnk-tested by map                                     *)
+	    let opt =
+	      (try comp_injs.(cc_id)
+	       with Invalid_argument msg ->
+		 invalid_arg ("State.generate_embeddings: " ^ msg)) in
+	    let cc_id_injections =
+	      (match opt with
+	       | Some injections -> injections
+	       | None ->
+		  InjectionHeap.create
+		    !Parameter.defaultHeapSize) in
+	    let cc_id_injections =
+	      InjectionHeap.alloc injection cc_id_injections
+	    in
+	    let () = comp_injs.(cc_id) <- Some cc_id_injections in
+	    let sg =
+	      SiteGraph.add_lift sg injection port_map env in
+	    iter (cc_id + 1) sg comp_injs
+  in
+  iter 0 sg comp_injs
 
 (**[initialize_embeddings state mix_list] *) (*mix list is the list of kappa observables one wishes to track during simulation*)
-let initialize_embeddings state mix_list counter env =
+let initialize_embeddings err_fmt state mix_list counter env =
 	SiteGraph.fold 
 	(fun i node_i state ->
 		List.fold_left
@@ -400,7 +396,7 @@ let initialize_embeddings state mix_list counter env =
 				| None -> Array.make (Mixture.arity mix) None
 				| Some comp_injs -> comp_injs in
 			(* complement the embeddings of mix in sg using node i  as anchor for matching *)
-			let (sg, comp_injs) =	generate_embeddings state.graph i mix comp_injs env
+			let (sg, comp_injs) = generate_embeddings err_fmt state.graph i mix comp_injs env
 			in
 				(* adding injections.(mix_id) = injs(mix) to injections array*)
 				injs.(Mixture.get_id mix) <- Some comp_injs;
@@ -482,7 +478,7 @@ let dot_of_influence_map desc state env =
     ) state.influence_map ;
   Format.fprintf desc "@]}@."
 
-let initialize sg token_vector rules kappa_vars obs pert counter env =
+let initialize err_fmt sg token_vector rules kappa_vars obs pert counter env =
   let dim_rule = max (List.length rules) 1 in
   let dim_kappa = (List.length kappa_vars) + 1 in
   let dim_var = Array.length env.Environment.algs.NamedDecls.decls in
@@ -550,14 +546,14 @@ let initialize sg token_vector rules kappa_vars obs pert counter env =
 		}
 	in
 	
-	if !Parameter.debugModeOn then Debug.tag "\t * Initializing injections...";
+	Debug.tag_if_debug "\t * Initializing injections...";
 	let state = (*initializing injections*)
-		initialize_embeddings state_init kappa_variables counter env
+		initialize_embeddings err_fmt state_init kappa_variables counter env
 	in
 	
-	if !Parameter.debugModeOn then Debug.tag "\t * Initializing variables...";
+	Debug.tag_if_debug "\t * Initializing variables...";
 
-	if !Parameter.debugModeOn then Debug.tag	"\t * Initializing wake up map for side effects...";
+	Debug.tag_if_debug "\t * Initializing wake up map for side effects...";
 	let state =
 		(* initializing preconditions on pattern list for wake up map *)
 		List.fold_left
@@ -567,7 +563,7 @@ let initialize sg token_vector rules kappa_vars obs pert counter env =
 		state kappa_variables
 	in
 	
-	if !Parameter.debugModeOn then Debug.tag "\t * Initializing activity tree...";
+	Debug.tag_if_debug "\t * Initializing activity tree...";
 	let () = (*initializing activity tree*)
 		Hashtbl.iter
 		(fun id rule ->
@@ -579,7 +575,7 @@ let initialize sg token_vector rules kappa_vars obs pert counter env =
 		)
 			state.rules
 	in
-	if !Parameter.debugModeOn then Debug.tag "\t * Computing influence map...";
+	Debug.tag_if_debug "\t * Computing influence map...";
 	let im = build_influence_map state.rules state.kappa_variables env 
 	in
 	({state with influence_map = im (*activity_tree updated by side effect!*)}, env)
@@ -636,7 +632,8 @@ let check_validity injprod with_full_components radius state counter env =
 			InjProduct.fold_left
 			(fun (embedding,roots,codom) inj_i ->
 				if Injection.is_trashed inj_i then (*injection product is no longer valid because one of its element is trashed*) 
-					(if !Parameter.debugModeOn then Debug.tag "Clashing because one of the component of injection product is no longer valid" ;
+					(Debug.tag_if_debug
+					   "Clashing because one of the component of injection product is no longer valid" ;
 					raise (Null_event 4))
 				else
 				(*injection product might be invalid because co-domains are no longer connected*)
@@ -661,9 +658,10 @@ let check_validity injprod with_full_components radius state counter env =
 			 Embedding.depth_map = Some d_map ;
 			 Embedding.roots = roots}
 			)
-		else 
-			(if !Parameter.debugModeOn then Debug.tag "Clashing because injection product's codomain is no longer connex" ;
-			raise (Null_event 0))
+		else
+		  let () = Debug.tag_if_debug
+			     "Clashing because injection product's codomain is no longer connex" in
+		  raise (Null_event 0)
 	with
 		| Null_event i -> (*correcting over approximation*)
 			begin
@@ -730,14 +728,13 @@ let select_injection (a2,radius_def) (a1,radius_alt) state mix counter env =
   												in
   													(*match Injection.root_image inj with None -> invalid_arg "State.select_binary" | Some (_,u_i) -> IntSet.add u_i roots in*)
   												let total_inj,total_cod =
-  													try Injection.codomain inj (total_inj,total_cod)
-  													with 
-  														| Injection.Clashing -> 
-  															(if !Parameter.debugModeOn then Debug.tag "Clashing because codomains of selected partial injections are overlapping" ;
-  															raise (Null_event 2))
-  												in 
+  												  try Injection.codomain inj (total_inj,total_cod)
+  												  with Injection.Clashing ->
+  												    let () = Debug.tag_if_debug
+													       "Clashing because codomains of selected partial injections are overlapping" in
+  												    raise (Null_event 2) in
   												(i + 1, total_inj,total_cod, roots)
-  											with
+  											  with
   											| Invalid_argument msg ->
   													invalid_arg ("State.select_injection: " ^ msg)))
   						(0, IntMap.empty, IntSet.empty, IntSet.empty) comp_injs
@@ -753,7 +750,7 @@ let select_injection (a2,radius_def) (a1,radius_alt) state mix counter env =
   						let (_,d_map,components,remaining_roots) = connex ~d_map:depth_map ~filter:true ~start_with:root (roots,codomain) radius true state env 
   						in
   						if not ((IntSet.cardinal remaining_roots) = (IntSet.cardinal roots) - 1) then
-  							(if !Parameter.debugModeOn then Debug.tag "Clashing because selected instance of n-nary rule is not totally disjoint" ; 
+  							(Debug.tag_if_debug "Clashing because selected instance of n-nary rule is not totally disjoint" ; 
   							raise (Null_event 1)
   							)
   						else () ;
@@ -784,8 +781,7 @@ let select_injection (a2,radius_def) (a1,radius_alt) state mix counter env =
   				       | Some (con_map,_,_) ->
   					  if IntMap.is_empty con_map then ambiguous_embedding
   					  else
-  					    (if !Parameter.debugModeOn then
-  					       Debug.tag "Connectedness is not required for this rule but will compute it nonetheless because rule might create more intras" ;
+  					    (Debug.tag_if_debug "Connectedness is not required for this rule but will compute it nonetheless because rule might create more intras" ;
   					     let (d_map,comp_map) = build_component_map (roots,codomain) IntMap.empty IntMap.empty in
   					     (Embedding.AMBIGUOUS
 						{Embedding.map=embedding;
@@ -827,7 +823,7 @@ let draw_rule state counter env =
 			if alpha = infinity then ()
 			else
 				if alpha > alpha' then 
-					if IntSet.mem rule_id state.silenced then (if !Parameter.debugModeOn then Debug.tag "Real activity is below approximation... but I knew it!") else invalid_arg "State.draw_rule: activity invariant violation"
+					if IntSet.mem rule_id state.silenced then (Debug.tag_if_debug "Real activity is below approximation... but I knew it!") else invalid_arg "State.draw_rule: activity invariant violation"
 				else ();
 				let rd = Random.float 1.0
 				in
@@ -847,7 +843,7 @@ let draw_rule state counter env =
 			| Null_event 1 | Null_event 2 as exn -> (*null event because of clashing instance of a binary rule*)
 				if counter.Counter.cons_null_events > !Parameter.maxConsecutiveClash then 
 					begin
-						(if !Parameter.debugModeOn then Debug.tag "Max consecutive clashes reached, I am giving up square approximation at this step" else ()) ;
+					  Debug.tag_if_debug "Max consecutive clashes reached, I am giving up square approximation at this step" ;
 						let _ = Counter.reset_consecutive_null_event counter in
 					
 						let radius = match radius with None -> (-1) | Some v -> Nbr.to_int (value_alg state counter env v) in
@@ -997,7 +993,7 @@ let enabled r state =
   try Hashtbl.find state.influence_map (Mixture.get_id r.lhs)
   with Not_found -> IntMap.empty
 
-let positive_update ?(with_tracked=[]) state r (phi: int IntMap.t) psi
+let positive_update ?(with_tracked=[]) err_fmt state r (phi: int IntMap.t) psi
 		    side_modifs pert_intro counter env = (*pert_intro is temporary*)
   (* sub function find_new_inj *)
   let update_tracked var_id cc_id state embedding comp_injs tracked =
@@ -1034,11 +1030,13 @@ let positive_update ?(with_tracked=[]) state r (phi: int IntMap.t) psi
       (var_id,!map)::tracked
     with
     | Break 0 ->
-       (if !Parameter.debugModeOn then
-	  Debug.tag "Incomplete embedding, no observable recorded" ; tracked)
+       let () = Debug.tag_if_debug
+		  "Incomplete embedding, no observable recorded" in
+       tracked
     | Break 1 ->
-       (if !Parameter.debugModeOn then
-	  Debug.tag "Cannot complete embedding, clashing instances" ; tracked)
+       let () = Debug.tag_if_debug
+		  "Cannot complete embedding, clashing instances" in
+       tracked
   in
   let find_new_inj state var_id mix cc_id node_id root pert_ids
 		   already_done_map new_injs tracked env =
@@ -1073,11 +1071,11 @@ let positive_update ?(with_tracked=[]) state r (phi: int IntMap.t) psi
       | None -> Injection.empty (Mixture.size_of_cc cc_id mix) (var_id,cc_id)
     in
     let opt_emb =
-      Matching.component ~already_done:root_node_set
+      Matching.component ~already_done:root_node_set err_fmt
 			 reuse_embedding root (state.graph, node_id) mix in
     match opt_emb with
     | None ->
-       (if !Parameter.debugModeOn then Debug.tag "No new embedding was found";
+       (Debug.tag_if_debug "No new embedding was found";
 	(env,state, pert_ids, already_done_map, new_injs,tracked)
        )
     | Some (embedding, port_map) ->
@@ -1561,7 +1559,7 @@ let dump state counter env =
     (
       Format.printf "#***[%f] Current state***\n" (Counter.time counter);
       if SiteGraph.size state.graph > 1000 then ()
-      else SiteGraph.dump ~with_lift:true state.graph env;
+      else SiteGraph.dump ~with_lift:true env Format.std_formatter state.graph;
       Hashtbl.fold
 	(fun i r _ ->
 	 let nme =

@@ -385,9 +385,10 @@ let config_of_grid = cut
       IntMap.add eid set prec_star
     ) config.events IntMap.empty *)
 
-let prec_star_of_config config_closure config to_keep init_to_eidmax weak_events init = 
+let prec_star_of_config err_fmt config_closure config to_keep init_to_eidmax
+			weak_events init =
   let a =
-    Graph_closure.closure config_closure config.prec_1 to_keep
+    Graph_closure.closure err_fmt config_closure config.prec_1 to_keep
 			  init_to_eidmax weak_events init in
   Graph_closure.A.map fst a
 
@@ -404,7 +405,7 @@ let depth_and_size_of_event config =
       IntMap.add eid d emap,size+1,d
     ) config.prec_1 (IntMap.empty,0,0)
 
-let enrich_grid config_closure grid =
+let enrich_grid err_fmt config_closure grid =
   let keep_l =
     List.fold_left (fun a b -> IntSet.add b a) IntSet.empty grid.obs in
   let to_keep i = IntSet.mem i keep_l in
@@ -423,7 +424,7 @@ let enrich_grid config_closure grid =
   let init_to_eid_max i =
     try Hashtbl.find grid.init_to_eidmax i
     with Not_found -> 0 in
-  let prec_star = prec_star_of_config config_closure config to_keep
+  let prec_star = prec_star_of_config err_fmt config_closure config to_keep
 				      init_to_eid_max weak_fun init_fun in
   let depth_of_event,size,depth = depth_and_size_of_event config in
   {
@@ -531,20 +532,21 @@ let dot_of_grid profiling desc enriched_grid state env =
   close_out desc
 
 (*story_list:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_id:int story_time: float ; story_event: int}*)
-let pretty_print config_closure compression_type label story_list state env =
+let pretty_print err_fmt config_closure compression_type
+		 label story_list state env =
   let n = List.length story_list in
-  let _ =
+  let () =
     if compression_type = "" then
-      Debug.tag (Format.sprintf "\n+ Pretty printing %d flow%s"
-				n (if n>1 then "s" else ""))
+      Format.fprintf err_fmt "@.+ Pretty printing %d flow%s@."
+		     n (if n>1 then "s" else "")
     else
-      Debug.tag (Format.sprintf "\n+ Pretty printing %d %scompressed flow%s"
-				n label (if n>1 then "s" else ""))
+      Format.fprintf err_fmt "@.+ Pretty printing %d %scompressed flow%s@."
+		     n label (if n>1 then "s" else "")
   in
   let compression_type =
     if compression_type = "" then "none" else compression_type in
   let story_list =
-    List.map (fun (x,y) -> enrich_grid config_closure x,y) story_list in
+    List.map (fun (x,y) -> enrich_grid err_fmt config_closure x,y) story_list in
   let _ =
     List.fold_left
       (fun cpt (enriched_config,stories) ->
@@ -594,7 +596,7 @@ let pretty_print config_closure compression_type label story_list state env =
   let () = Format.fprintf form "@]@?" in
   close_out desc
 
-let print_stat parameter handler enriched_grid =
+let print_stat f parameter handler enriched_grid =
   let size = Array.length enriched_grid.prec_star in
   let rec aux k n_step longest_story n_nonempty length_sum length_square_sum =
     if k>=size
@@ -606,13 +608,13 @@ let print_stat parameter handler enriched_grid =
         (length_sum+cc) (length_square_sum+cc*cc) in
   let n_step,longest_story,n_nonempty,length_sum,length_square_sum =
     aux 0 0 0 0 0 0 in
-  let () = Debug.tag "" in
-  let () = Debug.tag "Stats:" in
-  let () = Debug.tag (" number of step   : "^(string_of_int n_step)) in
-(*  let () = Debug.tag (" number of stories: "^(string_of_int n_nonempty)) in *)
-  let () = Debug.tag (" longest story    : "^(string_of_int longest_story)) in
-  let () = Debug.tag (" average length   : "
-		     ^(string_of_float ((float_of_int length_sum)/.(float_of_int n_nonempty)))) in
-  let () = Debug.tag (" geometric mean   : "
-		     ^(string_of_float (sqrt ((float_of_int length_square_sum)/.(float_of_int n_nonempty))))) in
-  Debug.tag ""
+  let () = Format.fprintf f "@[<v>@," in
+  let () = Format.fprintf f  "Stats:@," in
+  let () = Format.fprintf f " number of step   : %i@," n_step in
+(*  let () = Format.fprintf f " number of stories: %i@," n_nonempty in *)
+  let () = Format.fprintf f " longest story    : %i@," longest_story in
+  let () = Format.fprintf f " average length   : %F@,"
+			  (float length_sum /. float n_nonempty) in
+  let () = Format.fprintf f " geometric mean   : %F@,"
+			  (sqrt (float length_square_sum /. float n_nonempty)) in
+  Format.fprintf f "@]@."

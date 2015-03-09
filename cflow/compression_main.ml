@@ -35,54 +35,45 @@ let th_of_int n =
 
 let dummy_weak = false
 
-let compress env state log_info step_list =  
-  let parameter = D.S.PH.B.PB.CI.Po.K.H.build_parameter () in 
-  let mode = parameter.D.S.PH.B.PB.CI.Po.K.H.compression_mode in 
-  let causal_trace_on = Parameter.get_causal_trace mode in 
-  let weak_compression_on = Parameter.get_weak_compression mode in 
-  let strong_compression_on = Parameter.get_strong_compression mode in 
-  let handler = 
+let compress logger env state log_info step_list =
+  let parameter = D.S.PH.B.PB.CI.Po.K.H.build_parameter () in
+  let mode = parameter.D.S.PH.B.PB.CI.Po.K.H.compression_mode in
+  let causal_trace_on = Parameter.get_causal_trace mode in
+  let weak_compression_on = Parameter.get_weak_compression mode in
+  let strong_compression_on = Parameter.get_strong_compression mode in
+  let handler =
     {
       D.S.PH.B.PB.CI.Po.K.H.env = env ;
-      D.S.PH.B.PB.CI.Po.K.H.state = state 
-    }
-  in 
-  let causal,trivial,weak,strong = 
+      D.S.PH.B.PB.CI.Po.K.H.state = state
+    } in
+  let causal,trivial,weak,strong =
     if (not causal_trace_on)
-      && (not weak_compression_on)  
-      && (not strong_compression_on)
-    then 
-      [],[],[],[]
+       && (not weak_compression_on)
+       && (not strong_compression_on)
+    then [],[],[],[]
     else
-      let _ = print_newline () in 
+      let () = Format.pp_print_newline logger () in
       begin (* causal compression *)
-        let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_none parameter in 
-        if D.S.PH.B.PB.CI.Po.K.no_obs_found step_list 
-        then 
-          let _ = Debug.tag "+ No causal flow found" in 
+        let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_none parameter in
+        if D.S.PH.B.PB.CI.Po.K.no_obs_found step_list
+        then
+          let () = Debug.tag logger "+ No causal flow found" in
           [],[],[],[]
-        else 
-          begin
-            let _ = 
-              if (weak_compression_on || strong_compression_on)
-            then 
-                let _ = Debug.tag "+ Producing causal compressions" in ()
-              else 
-                let _ = Debug.tag "+ Producing causal traces" in ()
-            in 
-          let error = D.S.PH.B.PB.CI.Po.K.H.error_init in 
-          let step_list = D.S.PH.B.PB.CI.Po.K.disambiguate step_list handler in 
-          let _ = 
-            if log_step
-            then 
-              Debug.tag "\t - refining events" 
-          in 
+        else
+          let () =
+            if (weak_compression_on || strong_compression_on)
+            then Debug.tag logger "+ Producing causal compressions"
+            else Debug.tag logger "+ Producing causal traces"
+          in
+          let error = D.S.PH.B.PB.CI.Po.K.H.error_init in
+          let step_list = D.S.PH.B.PB.CI.Po.K.disambiguate step_list handler in
+          let () = if log_step then Debug.tag logger"\t - refining events" in
           let refined_event_list = 
             List.rev_map 
               (fun x -> 
                 snd (D.S.PH.B.PB.CI.Po.K.refine_step parameter handler error x))
               step_list 
-          in       
+          in
           let _ = 
             if debug_mode
             then 
@@ -101,7 +92,7 @@ let compress env state log_info step_list =
                 let _ = 
                   if log_step
                   then 
-                    Debug.tag "\t - cutting concurrent events" 
+                    Debug.tag logger "\t - cutting concurrent events"
                 in 
                 let error,(refined_event_list_cut,int) = D.S.PH.B.PB.CI.Po.cut parameter handler error refined_event_list in 
                 let _ = 
@@ -116,7 +107,7 @@ let compress env state log_info step_list =
 			 parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err ()
                 in 
                 refined_event_list_cut,int 
-              end
+	      end
             else 
               refined_event_list,0 
           in 
@@ -127,9 +118,9 @@ let compress env state log_info step_list =
               then 
                 if cut
                 then 
-                  Debug.tag "\t - Causal flow (with trivial simplifications) computation"
+                  Debug.tag logger "\t - Causal flow (with trivial simplifications) computation"
                 else
-                  Debug.tag "\t - Causal flow (without simplification) computation" 
+                  Debug.tag logger "\t - Causal flow (without simplification) computation" 
             in 
             let refined_event_list_without_pseudo_inverse,int_pseudo_inverse = 
               if cut && Parameter.cut_pseudo_inverse_event 
@@ -138,7 +129,7 @@ let compress env state log_info step_list =
                   let _ = 
                     if log_step
                     then 
-                      Debug.tag "\t\t * detecting pseudo inverse events" 
+                      Debug.tag logger "\t\t * detecting pseudo inverse events" 
                   in 
                   let error,refined_event_list_without_pseudo_inverse,int_pseudo_inverse  = D.S.PH.B.PB.CI.cut parameter handler error refined_event_list_cut  in 
                   let _ = 
@@ -162,19 +153,19 @@ let compress env state log_info step_list =
               else 
                 List.rev_map (fun x -> x,dummy_weak) (List.rev refined_event_list_cut),0 
             in 
-            let _ = 
+            let () = 
               if log_step 
               then 
-                Debug.tag "\t\t * blackboard generation"
+                Debug.tag logger "\t\t * blackboard generation"
             in 
             let error,log_info,blackboard = D.S.PH.B.import parameter handler error log_info (List.rev_map (fun (x,_)->x) (List.rev refined_event_list_without_pseudo_inverse)) in 
            
             let log_info = D.S.PH.B.PB.CI.Po.K.P.set_global_cut int log_info in 
             let log_info = D.S.PH.B.PB.CI.Po.K.P.set_pseudo_inv int_pseudo_inverse log_info in 
-            let _ = 
+            let () = 
               if debug_mode && log_step  
               then 
-                Debug.tag "\t\t * pretty printing the grid"
+                Debug.tag logger "\t\t * pretty printing the grid"
             in 
             let error = 
               if debug_mode 
@@ -186,12 +177,13 @@ let compress env state log_info step_list =
             in  
             let error,list = D.S.PH.forced_events parameter handler error blackboard in 
             let n_stories = List.length list in 
-            let _ = Debug.tag ("\t\t * Causal flow computation ("^(string_of_int n_stories)^")") in           
+            let () =
+	      Format.fprintf logger "\t\t * Causal flow computation (%i)@." n_stories in
             let error,_,_,causal_story_array = 
-              let _ = 
+              let () = 
                 if debug_mode
                 then 
-                  Debug.tag "\t\t * causal compression "
+                  Debug.tag logger "\t\t * causal compression "
               in 
               let log_info = D.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
               let refined_list = 
@@ -209,11 +201,11 @@ let compress env state log_info step_list =
                 else 
                   Graph_closure.config_std 
               in 
-              let enriched_grid = Causal.enrich_grid config_init grid in 
+              let enriched_grid = Causal.enrich_grid logger config_init grid in 
               let _ = 
                 if Parameter.log_number_of_causal_flows
                 then 
-                  Causal.print_stat parameter handler enriched_grid 
+                  Causal.print_stat logger parameter handler enriched_grid 
               in 
               let tick = 
                 if n_stories > 0 
@@ -222,10 +214,10 @@ let compress env state log_info step_list =
               in 
               List.fold_left 
                 (fun (error,counter,tick,causal_story_array) (list_order,list_eid,info) -> 
-                  let _ = 
+                  let () = 
                     if debug_mode
                     then 
-                      Debug.tag "\t\t * causal compression "
+                      Debug.tag logger "\t\t * causal compression "
                   in 
                   let eid = 
                     match list_eid with [a] -> a 
@@ -262,7 +254,7 @@ let compress env state log_info step_list =
                       (List.rev_map (fun (x,_) -> (x,D.S.PH.B.PB.CI.Po.K.empty_side_effect,dummy_weak)) (List.rev refined_event_list_without_pseudo_inverse))
                   in 
                   let grid = D.S.PH.B.PB.CI.Po.K.build_grid refined_list true handler in
-                  let enriched_grid = Causal.enrich_grid Graph_closure.config_intermediary grid in 
+                  let enriched_grid = Causal.enrich_grid logger Graph_closure.config_intermediary grid in 
                   let event_id_list_rev = ((eid+1)::(enriched_grid.Causal.prec_star.(eid+1))) in 
                   let event_id_list = List.rev_map pred (event_id_list_rev) in 
                   let error,event_list,result_wo_compression = D.S.translate parameter handler error blackboard event_id_list in 
@@ -290,11 +282,7 @@ let compress env state log_info step_list =
                 (error,1,tick,[]) 
                 (List.rev list)
             in 
-            let _ = 
-              if log_step 
-              then 
-                Debug.tag "\n" 
-            in 
+            let () = if log_step then Format.fprintf logger "@.@." in
             let error,causal_story_array = 
               D.hash_list parameter handler error 
                 (List.rev causal_story_array) 
@@ -330,7 +318,7 @@ let compress env state log_info step_list =
             if weak_compression_on || strong_compression_on 
             then 
               begin 
-                let _ = Debug.tag ("\t - Weak flow compression ("^(string_of_int n_stories)^")") in 
+                let () = Format.fprintf logger "\t - Weak flow compression (%i)@." n_stories in
                 let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_weak parameter in 
                 let tick = 
                   if n_stories > 0 
@@ -361,7 +349,7 @@ let compress env state log_info step_list =
                           let error = 
                             if debug_mode
                             then 
-                              let _ =  Debug.tag "\t\t * result"  in 
+                              let _ =  Debug.tag logger "\t\t * result"  in
                               let _ =
                                 if D.S.PH.B.is_failed output 
                                 then 
@@ -414,8 +402,8 @@ let compress env state log_info step_list =
                     (List.rev causal_story_array)
                 in 
 	        let error,weakly_compressed_story_array = D.hash_list parameter handler error   (List.rev weakly_compressed_story_array) in
-                error,weakly_compression_faillure,weakly_compressed_story_array 
-              end
+                error,weakly_compression_faillure,weakly_compressed_story_array
+	      end
             else 
               error,0,[]
           in 
@@ -432,15 +420,16 @@ let compress env state log_info step_list =
               weakly_compression_faillure 
             with 
             | 0 -> ()
-            | 1 -> Debug.tag "\n\t 1 weak compression has failed" 
-            | _ -> Debug.tag ("\n\t "^(string_of_int weakly_compression_faillure)^" weak compressions have failed")
-          in 
+            | 1 -> Format.fprintf logger "@.\t 1 weak compression has failed@."
+            | _ -> Format.fprintf logger "@.\t %i weak compressions have failed@."
+				  weakly_compression_faillure
+          in
           let error,strong_compression_faillure,strongly_compressed_story_array = 
             if strong_compression_on 
             then 
               begin 
                 let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_strong parameter in 
-                let _ = Debug.tag ("\t - Strong flow compression ("^(string_of_int n_stories)^")") in 
+                let () = Format.fprintf logger "\t - Strong flow compression (%i)@." n_stories in
                 let tick = 
                   if n_stories > 0 
                   then Mods.tick_stories n_stories (false,0,0) 
@@ -470,7 +459,7 @@ let compress env state log_info step_list =
                           let error = 
                             if debug_mode
                             then 
-                              let _ =  Debug.tag "\t\t * result"  in 
+                              let _ =  Debug.tag logger "\t\t * result"  in
                               let _ =
                                 if D.S.PH.B.is_failed output 
                                 then 
@@ -527,8 +516,9 @@ let compress env state log_info step_list =
               strong_compression_faillure 
             with 
             | 0 -> ()
-            | 1 -> Debug.tag "\n\t 1 strong compression has failed" 
-            | _ -> Debug.tag ("\n\t "^(string_of_int strong_compression_faillure)^" strong compressions have failed")
+            | 1 -> Format.fprintf logger "@.\t 1 strong compression has failed"
+            | _ -> Format.fprintf logger "@.\t %i strong compressions have failed"
+				  strong_compression_faillure
           in 
             
           let _ = 
@@ -538,7 +528,6 @@ let compress env state log_info step_list =
           in 
           causal,causal_story_array,weakly_compressed_story_array,strongly_compressed_story_array
         end 
-    end 
   in 
   let lift bool x = 
     if bool 

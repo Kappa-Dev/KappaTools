@@ -22,7 +22,8 @@ module type SG =
     val node_of_id : t -> int -> Node.t
     val add : t -> Node.t -> t
     val add_nodes : t -> Node.t Mods.IntMap.t -> t
-    val dump : ?with_lift: bool -> t -> Environment.t -> unit
+    val dump :
+      ?with_lift: bool -> Environment.t -> Format.formatter -> t -> unit
     val remove : t -> int -> unit
     val ( & ) : Node.t -> int
     val neighborhood :
@@ -180,19 +181,18 @@ module Make (A : NodeMemoryModel) : SG =
 	 IntMap.add id (Node.marshalize node) map
 	) sg IntMap.empty
 
-    let dump ?(with_lift = false) sg env =
+    let dump ?(with_lift = false) env f sg =
       let hsh_lnk = Hashtbl.create (A.dimension sg) in
       let fresh = ref 0 in
       A.iteri
 	(fun i node ->
 	 if Node.is_empty node
-	 then (Debug.tag "!")
+	 then Format.pp_print_string f "!"
 	 else
-	   (let (str, c) =
-	      Node.to_string with_lift (hsh_lnk, (!fresh)) node env in
-	    (fresh := c;
-	     print_string ("#"^(string_of_int i)^":"^str);
-	     print_newline ())))
+	   let (str, c) =
+	     Node.to_string with_lift (hsh_lnk, (!fresh)) node env in
+	   let () = fresh := c in
+	   Format.fprintf f "#%i:%s@." i str)
 	sg
 end
 
