@@ -156,9 +156,9 @@ node_5 -> node_36
 node_35 -> node_36
 node_5 -> node_37
 node_36 -> node_37
-node_30 -> node_24 [style=dotted, arrowhead = tee]
-node_30 -> node_26 [style=dotted, arrowhead = tee]
 node_30 -> node_28 [style=dotted, arrowhead = tee]
+node_30 -> node_26 [style=dotted, arrowhead = tee]
+node_30 -> node_24 [style=dotted, arrowhead = tee]
 node_30 -> node_22 [style=dotted, arrowhead = tee]
 node_30 -> node_20 [style=dotted, arrowhead = tee]
 node_30 -> node_17 [style=dotted, arrowhead = tee]

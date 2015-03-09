@@ -289,9 +289,9 @@ node_78 -> node_81
 node_80 -> node_81
 node_73 -> node_82
 node_81 -> node_82
-node_79 -> node_76 [style=dotted, arrowhead = tee]
-node_79 -> node_77 [style=dotted, arrowhead = tee]
 node_79 -> node_78 [style=dotted, arrowhead = tee]
+node_79 -> node_77 [style=dotted, arrowhead = tee]
+node_79 -> node_76 [style=dotted, arrowhead = tee]
 node_79 -> node_75 [style=dotted, arrowhead = tee]
 node_79 -> node_74 [style=dotted, arrowhead = tee]
 node_79 -> node_65 [style=dotted, arrowhead = tee]
