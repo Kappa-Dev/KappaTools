@@ -403,12 +403,10 @@ module Dag =
              (let l=ref [] in 
               let _ = 
                 A.iter 
-                  (fun a -> 
-                    match a 
-                    with
+                  (function
                     | FICTITIOUS,_ -> ()
-                    | _ ->    l:=(a,1)::(!l))
-                  graph.labels 
+                    | (OBS|PERT|RULE|INIT),_ as a -> l:=(a,1)::(!l))
+                  graph.labels
               in 
               !l))
 
@@ -420,16 +418,14 @@ module Dag =
           with 
             | _ -> FICTITIOUS,"" 
         in 
-    (*    let print_to_beat to_beat= 
-          let _ = Format.fprintf stderr "TO BEAT :" in 
-          let _ = 
-            match 
-              to_beat 
-            with 
-              | None -> Format.fprintf stderr "NONE  " 
-              | Some l -> List.iter (print_elt stderr) l
-          in 
-          Format.fprintf stderr "\n" 
+    (*    let print_to_beat f to_beat =
+          let () = Format.fprintf f "TO BEAT :" in
+          let () =
+            match to_beat with ≈
+              | None -> Format.fprintf f "NONE  "
+              | Some l -> List.iter (print_elt f) l
+          in
+          Format.pp_print_new_line f ()
         in *)
         let rec pop (candidate:key list) (to_beat:key list option) = 
           match 
