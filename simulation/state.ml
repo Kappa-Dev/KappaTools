@@ -245,8 +245,7 @@ and with_value_alg_bool state counter ?time env n = function
      exec_alg state counter ?time env with_value_alg_bool alg (TO_COMPUTE_COMP (op,n)::sk)
   | TO_COMPUTE_COMP (op,n1) :: sk ->
      with_value_bool state counter ?time env (Nbr.of_compare_op op n1 n) sk
-  | (TO_COMPUTE_COMP _ | TO_EXEC_COMP _ | TO_EXEC_BOOL _)
-    :: _ -> failwith "type error in with_value_alg_bool"
+  | TO_EXEC_BOOL _ :: _ -> failwith "type error in with_value_alg_bool"
   | [] -> failwith "type error in with_value_alg_bool"
 and exec_bool state counter ?time env expr sk =
   match expr with
