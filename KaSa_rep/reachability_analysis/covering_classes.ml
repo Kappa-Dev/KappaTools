@@ -85,6 +85,44 @@ let rec print_classes parameter ls =
      let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "\n" in
      print_classes parameter tl
 
+(*REMOVE*)
+let rec remove_dups l =
+  match l with
+  | [] -> []
+  | h :: t -> h :: (remove_dups (List.filter (fun x -> x <> h)t))
+                     
+let rec remove_dups_lists ls =
+  match ls with
+  | [] -> []
+  | h :: t -> let h' = remove_dups h in
+              h' :: (remove_dups_lists
+                       (List.filter
+                          (fun x -> let x' = remove_dups x in x' <> h') t))
+                      
+let length_sort_remove_dups lists =
+  let remove_lists = remove_dups_lists lists in
+  let length_lists = List.rev_map (fun list ->
+                                   list, List.length list) remove_lists in
+  let lists = List.sort (fun a b -> compare (snd a) (snd b)) length_lists in
+  List.rev_map fst lists
+               
+let subset l1 ls =
+  List.map (List.filter (fun x -> List.mem x l1))ls
+           
+let result_subset ls =
+  match ls with
+  | [] -> []
+  | l1 :: ls' -> subset l1 ls'
+
+let remove_subset ls =
+  let ls' = result_subset ls in
+  List.filter (fun l -> not (List.mem l ls')) ls
+              
+let clean ls =
+  let remove_dups = length_sort_remove_dups ls in
+  let remove_sub = remove_subset remove_dups in
+  remove_sub
+
 let length_sorted lists =
   let list_length = List.rev_map (fun list -> list, List.length list) lists in
   let lists = List.sort (fun a b -> compare (snd a) (snd b)) list_length in
@@ -252,13 +290,13 @@ let add_covering_class parameter error agent_type new_covering_class covering_cl
          clean_new parameter error (List.rev new_covering_class)
        in
        let new_list = clean_new_covering_class :: old_list in*)
-       let new_list = new_covering_class :: old_list in
+       let new_list = (List.rev new_covering_class) :: old_list in
        (*let clean_new_list = clean_new parameter error new_list in*)
-       (*let clean_new_list = clean_new parameter error new_list in
+       let clean_new_list = clean new_list in
        let _ = print_classes
                  parameter
                  clean_new_list
-       in*)
+       in
        Covering_classes_type.AgentMap.set
          parameter
          error
