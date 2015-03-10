@@ -62,8 +62,6 @@ end = struct
     let is_trashed phi = match phi.address with Some (-1) -> true | _ -> false
 
     let add i j phi = Hashtbl.replace phi.map i j ; phi
-    let mem i phi = Hashtbl.mem phi.map i
-    let size phi = Hashtbl.length phi.map
     let find i phi = Hashtbl.find phi.map i
     let empty n (mix_id,cc_id) =
       {map = Hashtbl.create n ; address = None ; coordinate = (mix_id,cc_id)}
@@ -96,12 +94,6 @@ end = struct
     let print_coord f phi =
       let a = get_address phi and (m,c) = get_coordinate phi in
       Format.fprintf f "(%d,%d,%d)" m c a
-
-    let copy phi =
-      fold (fun i j phi' -> add i j phi') phi
-	   {map = Hashtbl.create (size phi) ;
-	    address = None ;
-	    coordinate = get_coordinate phi}
   end
 
 module InjProduct =
@@ -350,31 +342,30 @@ module Palette:
 	  let string_of_color (r,g,b) = String.concat "," (List.rev_map string_of_float [b;g;r])
 	end
 
-
-	let tick_stories n_stories (init,last,counter) =
-	  let () =
-	    if not init then
-	      let c = ref !Parameter.progressBarSize in
-	      let () = Format.print_newline () in
-              while !c > 0 do
-		Format.print_string "_" ;
-		c:=!c-1
-	      done ;
-	      Format.print_newline()
-	  in
-	  let nc = (counter * !Parameter.progressBarSize) / n_stories in
-          let nl = (last * !Parameter.progressBarSize) / n_stories in
-          let n = nc - nl in
-          let rec aux n =
-            if n<=0 then ()
-            else
-              let () = Format.printf "%c" (!Parameter.progressBarSymbol) in
-              let () = if !Parameter.eclipseMode then print_newline() in
-              aux (n-1)
-          in
-          let () = aux n in
-	  let _ =  Format.print_flush () in
-          (true,counter,counter+1)
+let tick_stories f n_stories (init,last,counter) =
+  let () =
+    if not init then
+      let c = ref !Parameter.progressBarSize in
+      let () = Format.pp_print_newline f () in
+      while !c > 0 do
+	Format.pp_print_string f "_" ;
+	c:=!c-1
+      done ;
+      Format.pp_print_newline f ()
+  in
+  let nc = (counter * !Parameter.progressBarSize) / n_stories in
+  let nl = (last * !Parameter.progressBarSize) / n_stories in
+  let n = nc - nl in
+  let rec aux n =
+    if n<=0 then ()
+    else
+      let () = Format.fprintf f "%c" (!Parameter.progressBarSymbol) in
+      let () = if !Parameter.eclipseMode then Format.pp_print_newline f () in
+      aux (n-1)
+  in
+  let () = aux n in
+  let _ =  Format.pp_print_flush f () in
+  (true,counter,counter+1)
 
 type 'a simulation_info = (* type of data to be given with obersables for story compression (such as date when the obs is triggered*)
     {

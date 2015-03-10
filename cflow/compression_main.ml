@@ -209,7 +209,7 @@ let compress logger env state log_info step_list =
               in 
               let tick = 
                 if n_stories > 0 
-                then Mods.tick_stories n_stories (false,0,0) 
+                then Mods.tick_stories logger n_stories (false,0,0) 
                 else (false,0,0)
               in 
               List.fold_left 
@@ -275,7 +275,7 @@ let compress logger env state log_info step_list =
                       in 
                       Some info
                   in 
-                  let tick = Mods.tick_stories n_stories tick in 
+                  let tick = Mods.tick_stories logger n_stories tick in 
                   let causal_story_array = (prehash,[grid,graph,None,(event_id_list,list_order,event_list),[],[info]])::causal_story_array in 
                   error,counter+1,tick,causal_story_array
                 )
@@ -322,7 +322,7 @@ let compress logger env state log_info step_list =
                 let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_weak parameter in 
                 let tick = 
                   if n_stories > 0 
-                  then Mods.tick_stories n_stories (false,0,0) 
+                  then Mods.tick_stories logger n_stories (false,0,0) 
                   else (false,0,0)
                 in 
                 let error,_,_,_,weakly_compressed_story_array,weakly_compression_faillure = 
@@ -395,7 +395,7 @@ let compress logger env state log_info step_list =
                                   error,weakly_compressed_story_array,weakly_compression_faillure,None
                           in 
                           let error,log_info,blackboard = D.S.PH.B.reset_init parameter handler error log_info blackboard in 
-                          let tick = Mods.tick_stories n_stories tick in 
+                          let tick = Mods.tick_stories logger n_stories tick in 
                           error,counter+1,tick,blackboard,weakly_compressed_story_array,weakly_compression_faillure)
                         (error,counter,tick,blackboard,weakly_compressed_story_array,weakly_compression_faillure) a) 
                     (error,1,tick,blackboard,[],0) 
@@ -432,7 +432,7 @@ let compress logger env state log_info step_list =
                 let () = Format.fprintf logger "\t - Strong flow compression (%i)@." n_stories in
                 let tick = 
                   if n_stories > 0 
-                  then Mods.tick_stories n_stories (false,0,0) 
+                  then Mods.tick_stories logger n_stories (false,0,0)
                   else (false,0,0)
                 in 
                 let error,_,_,_,strong_compression_faillure,strongly_compressed_story_array = 
@@ -499,7 +499,7 @@ let compress logger env state log_info step_list =
                                 error,strong_compression_faillure,(prehash,[grid,graph,None,(event_id_list,list_order,event_list),[],list_info])::strongly_compressed_story_array,info
                           in 
                           let error,log_info,blackboard = D.S.PH.B.reset_init parameter handler error log_info blackboard in 
-                          let tick = Mods.tick_stories n_stories tick in 
+                          let tick = Mods.tick_stories logger n_stories tick in
                           error,counter+1,tick,blackboard,strong_compression_faillure,strongly_compressed_story_array)
                         (error,counter,tick,blackboard,strong_compression_faillure,strongly_compressed_story_array) a) 
                     (error,1,tick,blackboard,0,[]) 

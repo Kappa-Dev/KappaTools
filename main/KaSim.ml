@@ -200,7 +200,7 @@ let main =
         grid,profiling,event_list
       else (Causal.empty_grid(),profiling,[])
     in
-    ExceptionDefn.flush_warning () ;
+    ExceptionDefn.flush_warning Format.err_formatter ;
     Parameter.initSimTime () ;
     try
       Run.loop Format.std_formatter state profiling event_list counter env ;

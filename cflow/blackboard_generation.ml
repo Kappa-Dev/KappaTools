@@ -202,12 +202,11 @@ module Preblackboard =
          | Mutex (Lock_side_effect (int,int2,int3,int4)) -> Format.fprintf log "Mutex_side_effect (Step-id:%i,%i/%i.%i)" int int2 int3 int4
          | Fictitious -> Format.fprintf log "Fictitious" 
            
-         let print_known log t x = 
-           match t
-           with 
-             | Unknown -> ()
-             | _ -> Format.fprintf log "%s" x
-               
+         let print_known log t x =
+           match t with
+           | Unknown -> ()
+           | _ -> Format.fprintf log "%s" x
+
          let string_of_predicate_value x = 
 	   match x 
            with 
@@ -1657,16 +1656,14 @@ module Preblackboard =
              let map = PredicateidMap.add pid (test,action) map in 
              map 
            in 
-           let fadd pid p map = 
-             match p 
-             with 
-               | Counter _ | Internal_state_is _ | Undefined 
-               | Defined | Present | Bound | Bound_to_type _ | Unknown -> 
-                 ()
-               | _ -> 
-                 let old = A.get map pid in 
-                 A.set map pid (C.add p old) 
-           in 
+           let fadd pid p map =
+             match p with
+             | Counter _ | Internal_state_is _ | Undefined
+             | Defined | Present | Bound | Bound_to_type _ | Unknown -> ()
+             | (Free | Pointer_to_agent _ | Bound_to _) ->
+		let old = A.get map pid in
+                A.set map pid (C.add p old)
+           in
 
 
              (* deal with created agents *) 
@@ -1965,8 +1962,10 @@ module Preblackboard =
                            rule_ag_id 
                            data_structure.rule_agent_id_mutex 
                        with 
-                         Not_found -> 
-                           let _ = Format.printf "ERROR line 1332: %i \n" rule_ag_id  in raise Exit
+                         Not_found ->
+                         (*let () =
+			   Format.fprintf f? "ERROR line 1332: %i@." rule_ag_id in*)
+			 raise Exit
                      in 
                      let error,blackboard,test_map = 
                        List.fold_left 
@@ -2531,12 +2530,11 @@ module Preblackboard =
              map 
            in 
            let fadd pid p map = 
-             match p 
-             with 
+             match p with
                | Counter _ | Internal_state_is _ | Undefined 
                | Defined | Present | Bound | Bound_to_type _ | Unknown -> 
                  ()
-               | _ -> 
+               | Free | Pointer_to_agent _ | Bound_to _ -> 
                  let old = A.get map pid in 
                  A.set map pid (C.add p old) 
            in 

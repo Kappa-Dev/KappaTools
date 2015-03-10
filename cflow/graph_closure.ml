@@ -160,8 +160,8 @@ let closure err_fmt config prec is_obs init_to_eidmax weak_events init =
   let do_tick,tick =
     if max_index > 300 && config.do_tick
     then
-      let tick = Mods.tick_stories max_index (false,0,0) in
-      let f = Mods.tick_stories max_index in
+      let tick = Mods.tick_stories err_fmt max_index (false,0,0) in
+      let f = Mods.tick_stories err_fmt max_index in
       f,tick
     else
       (fun x -> x),(false,0,0)
