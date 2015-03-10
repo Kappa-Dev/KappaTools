@@ -26,6 +26,7 @@ let empty_classes parameter error handler =
      Covering_classes_type.covering_classes  = covering_classes
   }
 
+(*FIXME*)
 let print_agent parameter error handler =
   Ckappa_sig.Dictionary_of_agents.print
     parameter
@@ -84,110 +85,158 @@ let rec print_classes parameter ls =
      let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "\n" in
      print_classes parameter tl
 
-let rec remove_dups l =
-  match l with
-  | [] -> [] 
-  | h :: t -> h :: (remove_dups (List.filter (fun x -> x <> h)t))
-            
-let rec remove_dups_lists ls =
-  match ls with
-  | [] -> []
-  | h :: t -> let h' = remove_dups h in
-              h' :: (remove_dups_lists
-                       (List.filter
-                          (fun x -> let x' = remove_dups x in x' <> h') t))
-          
-let length_sort_remove_dups lists =
-  let remove_lists = remove_dups_lists lists in
-  let length_lists = List.rev_map (fun list ->
-                                   list, List.length list) remove_lists in
-  let lists = List.sort (fun a b -> compare (snd a) (snd b)) length_lists in
-  List.rev_map fst lists
-
-let subset l1 ls =
-  List.map (List.filter (fun x -> List.mem x l1))ls
-
-let result_subset ls =
-  match ls with
-  | [] -> []
-  | l1 :: ls' -> subset l1 ls'
-  
-let remove_subset ls =
-  let ls' = result_subset ls in
-  List.filter (fun l -> not (List.mem l ls')) ls
-
-let clean ls =
-  let remove_dups = length_sort_remove_dups ls in
-  let remove_sub = remove_subset remove_dups in
-  remove_sub
-
-(*TODO*) 
 let length_sorted lists =
   let list_length = List.rev_map (fun list -> list, List.length list) lists in
   let lists = List.sort (fun a b -> compare (snd a) (snd b)) list_length in
   List.rev_map fst lists
 
-let length_longest lists =
-  List.rev_map (fun list -> list, List.length list) lists
+(*MOVE*)
+(* key(label t): int; 'a t = infinite array of list(id) *)
+module Inf_array = Int_storage.Nearly_inf_Imperatif
 
-(*compute the size of agent*)
-(*let length_agent agent =
-  let rec aux agent size =
-    match agent with
-    | Cckappa_sig.Ghost -> size
-    | Cckappa_sig.Agent _ -> aux agent (size + 1)
-  in aux agent 0*)
-  (* array: int -> 'b?
-  build a data structure for a new array, this one will be use to update
-  the image. The size of this array will be the sites of the agents*)
+module Inf_array_set = Set_and_map.Make
+                         (struct
+                             type t = Inf_array
+                             let compare = compare
+                           end)
 
-(*TODO: new cleaning function with the dictionary*)
+(* create a type set for an infinite list(id) *)
+type pointer_set = Inf_array_set.set
 
-let clean_new parameter error new_class classes = (*return 'a list list*)
-  (* create an initial good lists as a dictionary type *)
-  let init_good_lists =
+type remanent_dic =
+  (unit, unit)
+    Covering_classes_type.Dictionary_of_Covering_classes.dictionary
+
+type remanent =
+  {dic: remanent_dic;
+   pointer_backward: pointer_set Inf_array.t (* map infinite array into a set *)
+  }
+
+(*
+let clean_new parameter error classes remanent = (*return 'a list*)
+  let good_lists =
     Covering_classes_type.Dictionary_of_Covering_classes.init () in
   (*a list to deal with is the list has longest size in a descreasing order*)
   let lists_to_deal_with = length_sorted classes in
-  let value = new_class.Covering_classes_type.v in
-  (*allocate the value in the dictionary*)
-  let error, good_lists =
-    Covering_classes_type.Dictionary_of_Covering_classes.unsafe_allocate
-      parameter
-      error
-      (*value type*)
-      (*new_class.Covering_classes_type.v*)
-      value
-      (*'a*)
-      ()
-      (*int -> 'b*)
-      Misc_sa.const_unit
-      (*dictionary*)
-      init_good_lists
+  let store_new_class l = (*'a list *)
+    match l with
+    | [] -> []
+    | list ->
+       let error, allocate_id =
+         Covering_classes_type.Dictionary_of_Covering_classes.unsafe_allocate
+           parameter
+           error
+           (*value type*)
+           list
+           (*'a*)
+           ()
+           (*int -> 'b*)
+           Misc_sa.const_unit
+           (*dictionary*)
+           good_lists
+       in
+       let error, get_id =
+         match allocate_id with
+         |(id, _, _, _) -> error, id
+       in
+       (* for any elt in the list add #id in the image of the elt in
+       pointer_backward*)
+       let error, old_elt =
+         match Int_storage.Nearly_inf_Imperatif.get
+                 parameter
+                 error
+                 (*key*)
+                 get_id
+                 (*'a t: set of list(id)*)
+                 remanent.pointer_backward
+         with
+         | error, None ->
+            warn
+              parameter
+              error
+              (Some "line 52")
+              Exit
+              Inf_array_set.empty_set
+         | error, Some id -> error, id
+       in
+       List.fold_left (fun elt pointer_backward ->
+                       let error, set_sol =
+                         Inf_array_set.fold_set (fun id _ ->
+                                                 Inf_array_set.add_set
+                                                   parameter
+                                                   error
+                                                   (*elt*)
+                                                   id
+                                                   (*set*)
+                                                   old_elt
+                                                ) elt pointer_backward
+                       in  set_sol
+                      ) [] list (*FIXME*)
   in
- (*return the value in a good list here*)
- let error, value_good_list = (*int list *)
-    match good_lists with
-      | (_,_, _, _) -> warn parameter error (Some "line 45") Exit init_good_lists
-      | (_,_,_,dic) (*int, unit, unit, dic*) -> error, dic
- in
-  (*Iterate in the list_to_deal_with, and check the member of this list
-    with the good_lists*)
- List.iter (fun f ->
-    let error, is_member =
-   Covering_classes_type.Dictionary_of_Covering_classes.member
-	 parameter
-	 error
-         (*value*)
-	 f
-         (*dic*)
-         value_good_list
-   in
-   if not is_member 
-   then
-     (* update and print out the dictionary *)
-    ()
- ) lists_to_deal_with
+  List.fold_left (fun f acc ->
+                  match f with
+                  | [] -> acc (*'a list*)
+                  | t::q ->
+                     (* get the set of list(id) containing t *)
+                     let error, potential_supersets =
+                       match Int_storage.Nearly_inf_Imperatif.get
+                               parameter
+                               error
+                               (*key*)
+                               t
+                               (*'a t: set of list(id) *)
+                               remanent.pointer_backward
+                       with
+                       | error, None ->
+                          warn
+                            parameter
+                            error
+                            (Some "line 52")
+                            Exit
+                            Inf_array_set.empty_set
+                       | error, Some id -> error, id
+                     in
+                     let rec aux to_visit potential_supersets =
+                       match to_visit
+                       with
+                       | [] -> store_new_class f
+                       | t::q ->
+                           let error, potential_supersets' =
+                             match Int_storage.Nearly_inf_Imperatif.get
+                                     parameter
+                                     error
+                                     (*key*)
+                                     t
+                                     (*'a t: set of list(id) *)
+                                     remanent.pointer_backward
+                             with
+                             | error, None ->
+                                warn
+                                  parameter
+                                  error
+                                  (Some "line 52")
+                                  Exit
+                                  Inf_array_set.empty_set
+                             | error, Some id -> error, id
+                           in           
+                           (* intersection of two sets *)
+                           let error, potential_superset =
+                             Inf_array_set.inter
+                               parameter
+                               error
+                               potential_supersets
+                               potential_supersets'
+                           in
+                           if Inf_array_set.is_empty_set
+                                potential_superset
+                           then
+                             acc (*'a list *)
+                           else
+                             aux q potential_superset
+                     in
+                     aux q potential_supersets)
+                 [] lists_to_deal_with
+  *)
 
 let add_covering_class parameter error agent_type new_covering_class covering_classes =
   match new_covering_class with
@@ -208,13 +257,17 @@ let add_covering_class parameter error agent_type new_covering_class covering_cl
          | Some a -> a
        in
        (* store the new list of covering classes *)
-       let new_list = (List.rev new_covering_class) :: old_list in
+       (*let clean_new_covering_class =
+         clean_new parameter error (List.rev new_covering_class)
+       in
+       let new_list = clean_new_covering_class :: old_list in*)
+       let new_list = new_covering_class :: old_list in
        (*let clean_new_list = clean_new parameter error new_list in*)
-       let clean_new_list = clean new_list in
+       (*let clean_new_list = clean_new parameter error new_list in
        let _ = print_classes
                  parameter
                  clean_new_list
-       in
+       in*)
        Covering_classes_type.AgentMap.set
          parameter
          error

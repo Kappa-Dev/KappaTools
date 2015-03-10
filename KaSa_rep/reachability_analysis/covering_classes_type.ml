@@ -25,7 +25,6 @@ module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
 type sites_covering_classes  = int list list AgentMap.t
 
 (*Define a dictionary for covering classes *)
-type value = {v : int list}
  
 module Covering_classes =
   struct
