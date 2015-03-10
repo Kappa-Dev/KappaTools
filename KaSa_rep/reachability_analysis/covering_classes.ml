@@ -112,7 +112,6 @@ type remanent =
    pointer_backward: pointer_set Inf_array.t (* map infinite array into a set *)
   }
 
-(*
 let clean_new parameter error classes remanent = (*return 'a list*)
   let good_lists =
     Covering_classes_type.Dictionary_of_Covering_classes.init () in
@@ -139,39 +138,32 @@ let clean_new parameter error classes remanent = (*return 'a list*)
          match allocate_id with
          |(id, _, _, _) -> error, id
        in
-       (* for any elt in the list add #id in the image of the elt in
-       pointer_backward*)
-       let error, old_elt =
-         match Int_storage.Nearly_inf_Imperatif.get
+       let error, elt =
+         Int_storage.Nearly_inf_Imperatif.unsafe_get
                  parameter
                  error
                  (*key*)
                  get_id
                  (*'a t: set of list(id)*)
                  remanent.pointer_backward
-         with
-         | error, None ->
-            warn
-              parameter
-              error
-              (Some "line 52")
-              Exit
-              Inf_array_set.empty_set
-         | error, Some id -> error, id
        in
-       List.fold_left (fun elt pointer_backward ->
-                       let error, set_sol =
-                         Inf_array_set.fold_set (fun id _ ->
-                                                 Inf_array_set.add_set
-                                                   parameter
-                                                   error
-                                                   (*elt*)
-                                                   id
-                                                   (*set*)
-                                                   old_elt
-                                                ) elt pointer_backward
-                       in  set_sol
-                      ) [] list (*FIXME*)
+       let old_elt =
+         match elt with
+         | None -> Inf_array_set.empty_set
+         | Some e -> e
+       in
+       let error, pointer_backward =
+       Int_storage.Nearly_inf_Imperatif.set
+         parameter
+         error
+         (*key*)
+         get_id
+         (*'a *)
+         old_elt
+         (*'a t: remanent*)
+         remanent.pointer_backward
+       in
+       [] (*FIXME*)
   in
   List.fold_left (fun f acc ->
                   match f with
@@ -236,7 +228,6 @@ let clean_new parameter error classes remanent = (*return 'a list*)
                      in
                      aux q potential_supersets)
                  [] lists_to_deal_with
-  *)
 
 let add_covering_class parameter error agent_type new_covering_class covering_classes =
   match new_covering_class with
