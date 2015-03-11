@@ -129,7 +129,7 @@ let length_sorted lists =
   List.rev_map fst lists
 
 (*MOVE*)
-(* key(label t): int; 'a t = infinite array of list(id) *)
+(* key(#id): int; 'a t = infinite array of list(#id) *)
 module Inf_array = Int_storage.Nearly_inf_Imperatif
 
 module Inf_array_set = Set_and_map.Make
@@ -139,7 +139,7 @@ module Inf_array_set = Set_and_map.Make
                            end)
 
 (* create a type set for an infinite list(id) *)
-type pointer_set = Inf_array_set.set
+type set_list_id = Inf_array_set.set
 
 type remanent_dic =
   (unit, unit)
@@ -147,9 +147,8 @@ type remanent_dic =
 
 type remanent =
   {dic: remanent_dic;
-   pointer_backward: pointer_set Inf_array.t (* map infinite array into a set *)
-  }
-
+   pointer_backward: (int*set_list_id) Inf_array.t (* map infinite array into a set *) }
+  
 let clean_new parameter error classes remanent = (*return 'a list*)
   let good_lists =
     Covering_classes_type.Dictionary_of_Covering_classes.init () in
@@ -158,63 +157,63 @@ let clean_new parameter error classes remanent = (*return 'a list*)
   let store_new_class l = (*'a list *)
     match l with
     | [] -> []
-    | list ->
-       let error, allocate_id =
+    | list -> []
+       (* allocate *)
+      (* let error, allocate_id =
          Covering_classes_type.Dictionary_of_Covering_classes.unsafe_allocate
            parameter
            error
            (*value type*)
            list
-           (*'a*)
+           (*'a:asso*)
            ()
-           (*int -> 'b*)
+           (*int -> 'b:build*)
            Misc_sa.const_unit
            (*dictionary*)
            good_lists
        in
+       (*get #id in the dictionary*)
        let error, get_id =
          match allocate_id with
-         |(id, _, _, _) -> error, id
+         | (id, _, _, _) -> error, id
        in
-       let error, elt =
-         Int_storage.Nearly_inf_Imperatif.unsafe_get
-                 parameter
-                 error
-                 (*key*)
-                 get_id
-                 (*'a t: set of list(id)*)
-                 remanent.pointer_backward
-       in
-       let old_elt =
-         match elt with
-         | None -> Inf_array_set.empty_set
-         | Some e -> e
-       in
-       let error, pointer_backward =
-       Int_storage.Nearly_inf_Imperatif.set
-         parameter
-         error
-         (*key*)
-         get_id
-         (*'a *)
-         old_elt
-         (*'a t: remanent*)
-         remanent.pointer_backward
-       in
-       [] (*FIXME*)
+       (*get the set_list(id) *)
+        let error, old_set_list_id =
+          match Int_storage.Nearly_inf_Imperatif.get
+                  parameter
+                  error
+                  (*key: #id*)
+                  get_id
+                  (*'a t: set of (t, list(id)) *)
+                  remanent.pointer_backward
+          with
+          | error, None ->
+             warn
+               parameter
+               error
+               (Some "line 52")
+               Exit
+               Inf_array_set.empty_set
+          | error, Some (_, set_list_id) -> error, set_list_id
+        in
+        (*add id to the set*)(*FIXME*)
+        Inf_array_set.fold_set (fun id current_set ->
+                                id :: current_set
+                               ) old_set_list_id list
+  in*)
   in
-  List.fold_left (fun f acc ->
-                  match f with
-                  | [] -> acc (*'a list*)
+  List.fold_left (fun list elem ->
+                  match list with
+                  | [] -> elem (*'a list*)
                   | t::q ->
                      (* get the set of list(id) containing t *)
                      let error, potential_supersets =
                        match Int_storage.Nearly_inf_Imperatif.get
                                parameter
                                error
-                               (*key*)
+                               (*key: #id*)
                                t
-                               (*'a t: set of list(id) *)
+                               (*'a t: set of (t, list(id)) *)
                                remanent.pointer_backward
                        with
                        | error, None ->
@@ -224,20 +223,21 @@ let clean_new parameter error classes remanent = (*return 'a list*)
                             (Some "line 52")
                             Exit
                             Inf_array_set.empty_set
-                       | error, Some id -> error, id
+                       | error, Some (t, set_list_id) -> error, set_list_id
                      in
                      let rec aux to_visit potential_supersets =
                        match to_visit
                        with
-                       | [] -> store_new_class f
-                       | t::q ->
+                       | [] -> store_new_class list
+                       | t'::q' ->
+                           (* get the set of list(id) containing t *)
                            let error, potential_supersets' =
                              match Int_storage.Nearly_inf_Imperatif.get
                                      parameter
                                      error
                                      (*key*)
-                                     t
-                                     (*'a t: set of list(id) *)
+                                     t'
+                                     (*'a t: set of (t, list(id)) *)
                                      remanent.pointer_backward
                              with
                              | error, None ->
@@ -247,7 +247,8 @@ let clean_new parameter error classes remanent = (*return 'a list*)
                                   (Some "line 52")
                                   Exit
                                   Inf_array_set.empty_set
-                             | error, Some id -> error, id
+                             | error, Some (t', set_list_id) ->
+                                error, set_list_id
                            in           
                            (* intersection of two sets *)
                            let error, potential_superset =
@@ -260,9 +261,9 @@ let clean_new parameter error classes remanent = (*return 'a list*)
                            if Inf_array_set.is_empty_set
                                 potential_superset
                            then
-                             acc (*'a list *)
+                             elem (*'a list *)
                            else
-                             aux q potential_superset
+                             aux q' potential_superset
                      in
                      aux q potential_supersets)
                  [] lists_to_deal_with
