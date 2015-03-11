@@ -49,22 +49,17 @@ let label node env =
   let str_intf =
     fold_interface
       (fun i port cont ->
-       let s_i = Environment.site_of_id node.name i env in
-       if (s_i = "_") then cont
+       if i = 0 then cont
        else
 	 let (int_state,_) = port.status in
-	 match int_state with
-	 | None -> cont
-	 | Some x ->
-	    let s_int = ("~"^(Environment.state_of_id node.name i x env))
-	    in
-	    (s_i^s_int)::cont
+	 (Format.asprintf
+	    "%a" (Environment.print_site_state env node.name i) int_state)::cont
       ) node []
   in
   match str_intf with
-  | [] -> Environment.name node.name env
+  | [] -> Format.asprintf "%a" (Environment.print_agent env) node.name
   | _ ->
-     Format.asprintf "%s(@[<h>%a@])" (Environment.name node.name env)
+     Format.asprintf "%a(@[<h>%a@])" (Environment.print_agent env) node.name
 		     (Pp.list Pp.space Format.pp_print_string)
 		     (List.rev str_intf)
 
@@ -86,16 +81,11 @@ let to_string with_detail (hsh_lnk,fresh) node env =
   let intf_l,fresh' =
     fold_interface
       (fun i port (cont,fresh) ->
-       let s_i = Environment.site_of_id node.name i env in
-       if not with_detail && (s_i = "_")
+       if not with_detail && (i = 0)
        then (cont,fresh) (*Skipping existential port*)
        else
 	 let (int_state,lnk_state) = port.status in
 	 let (lifts_int,lifts_lnk) = port.dep in
-	 let s_int =
-	   match int_state with
-	     None -> ""
-	   | Some x -> ("~"^(Environment.state_of_id node.name i x env)) in
 	 let s_lnk,fresh =
 	   match lnk_state with
 	   | FPtr (u',j) ->
@@ -113,20 +103,24 @@ let to_string with_detail (hsh_lnk,fresh) node env =
 	   Format.fprintf f "(%d,%d)" m c in
 	 ((if with_detail then
 	     Format.asprintf
-	       "%s%s@[<h>%a@]%s@[<h>%a@]" s_i s_int
+	       "%a@[<h>%a@]%s@[<h>%a@]"
+	       (Environment.print_site_state env node.name i) int_state
 	       (Pp.set LiftSet.elements Pp.comma pp_lift) lifts_int s_lnk
 	       (Pp.set LiftSet.elements Pp.comma pp_lift) lifts_lnk
 	   else
-	     Format.sprintf "%s%s%s" s_i s_int s_lnk)::cont,fresh)
+	     Format.asprintf
+	       "%a%s" (Environment.print_site_state env node.name i) int_state
+	       s_lnk)::cont,fresh)
       ) node ([],fresh)
   in
   let s_addr = try string_of_int (get_address node) with Not_found -> "na" in
   if with_detail then
-    (Format.asprintf "%s_%s:[@[<h>%a@]]" (Environment.name node.name env) s_addr
+    (Format.asprintf "%a_%s:[@[<h>%a@]]" (Environment.print_agent env) node.name
+		     s_addr
 		     (Pp.list Pp.comma Format.pp_print_string) (List.rev intf_l)
     ,fresh')
   else
-    (Format.asprintf "%s(@[<h>%a@])" (Environment.name node.name env)
+    (Format.asprintf "%a(@[<h>%a@])" (Environment.print_agent env) node.name
 		     (Pp.list Pp.comma Format.pp_print_string) (List.rev intf_l)
     ,fresh')
 
@@ -242,8 +236,7 @@ let create ?with_interface name_id env =
 	Array.init
 	  size
 	  (fun i ->
-	   let def_int = Signature.default_num_value
-			   name_id i env.Environment.signatures in
+	   let def_int = Environment.default_state name_id i env in
 	   {status = (def_int,Null) ;
 	    dep = (LiftSet.create !Parameter.defaultLiftSetSize,
 		   LiftSet.create !Parameter.defaultLiftSetSize)}

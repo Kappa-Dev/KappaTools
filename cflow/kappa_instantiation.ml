@@ -277,7 +277,7 @@ module Cflow_linker =
 
   let get_default_state parameter handler error = 
     map_sites parameter handler error 
-      (fun x k sigs -> (k,Signature.default_num_value x k sigs))
+      (fun x k sigs -> (k,Signature.default_internal_state x k sigs))
       handler.H.env
   
   let fresh_map_of_event ((_,_,x),_) = x 
@@ -302,7 +302,9 @@ module Cflow_linker =
   
   let site_name_of_binding_type = snd 
     
-  let string_of_agent env agent = (Environment.name (agent_name_of_agent agent) env.H.env)^"_"^(string_of_int (agent_id_of_agent agent))
+  let string_of_agent env agent =
+    Format.asprintf "%a_%i" (Environment.print_agent env.H.env)
+		    (agent_name_of_agent agent) (agent_id_of_agent agent)
  
   let string_of_site_name env = string_of_int 
   

@@ -60,13 +60,9 @@ let to_dot hr palette k cpt spec desc env =
 		 with Not_found -> invalid_arg "Species.to_dot: Node not found"
 	       in
 	       let int_opt'= Node.internal_state (node',k) in
-	       let nme node_name site_id = function
-		 | Some int ->
-		    let str = Environment.state_of_id node_name site_id int env
-		    in
-		    let n = Environment.site_of_id node_name site_id env in
-		    (n^"~"^str)
-		 | None -> Environment.site_of_id node_name site_id env
+	       let nme node_name site_id int =
+		 Format.asprintf
+		   "%a" (Environment.print_site_state env node_name site_id) int
 	       in
 	       (i,nme (Node.name node) site_id int_opt,
 		j,nme (Node.name node') k int_opt')::cont

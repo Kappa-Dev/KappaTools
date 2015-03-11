@@ -115,7 +115,7 @@ let declare_empty_lhs id env = {env with empty_lhs = IntSet.add id env.empty_lhs
 let is_empty_lhs id env = IntSet.mem id env.empty_lhs
 
 (*let log env = env.log*)
-let name i env = Signature.agent_of_num i env.signatures
+let print_agent env f i = Signature.print_agent env.signatures f i
 let num_of_name nme env =
   Signature.num_of_agent nme env.signatures
 let num_of_kappa lab env = StringMap.find lab env.num_of_kappa 
@@ -175,17 +175,17 @@ let id_of_site agent_name site_name env =
   Signature.id_of_site (Term.with_dummy_pos agent_name)
 		       (Term.with_dummy_pos site_name) env.signatures
 
-let site_of_id agent_id site_id env =
-  Signature.site_of_id agent_id site_id env.signatures
+let print_site env agent_id f site_id =
+  Signature.print_site env.signatures agent_id f site_id
 
 let id_of_state agent_name site_name state env =
   Signature.id_of_internal_state
     (Term.with_dummy_pos agent_name)
     (Term.with_dummy_pos site_name) state env.signatures
 
-let state_of_id agent_id id_site id_state env =
-  Signature.internal_state_of_id
-    agent_id id_site id_state env.signatures
+let print_site_state env agent_id id_site f id_state =
+  Signature.print_internal_state env.signatures
+    agent_id id_site f id_state
 
 let num_of_token = fun str env ->
   StringMap.find str env.tokens.NamedDecls.finder
@@ -226,7 +226,7 @@ let check agent site_name int_state env =
   ()
 
 let default_state name_id site_id env =
-  Signature.default_num_value name_id site_id env.signatures
+  Signature.default_internal_state name_id site_id env.signatures
 
 let print_rule env f id = Format.fprintf f "%s" (rule_of_num id env)
 let print_alg env f id = Format.fprintf f "%s" (fst (alg_of_num id env))

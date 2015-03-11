@@ -165,9 +165,7 @@ let diff pos m0 m1 env =
 	 Mixture.fold_interface
 	   (fun site_id (int, lnk) inst ->
 	    let def_int =
-	      try Some (Environment.state_of_id (Mixture.name ag) site_id 0 env)
-	      with Not_found -> None
-	    in
+	      Environment.default_state (Mixture.name ag) site_id env in
 	    let inst =
 	      match (def_int, int) with
 	      | (None, None) -> inst
@@ -205,7 +203,7 @@ let diff pos m0 m1 env =
     List.fold_left
       (fun (inst,idmap) id -> (*adding link and internal state modifications for agents conserved by the rule*)
        let ag, ag' = (Mixture.agent_of_id id m0, Mixture.agent_of_id id m1) in
-       let ag_name = Environment.name (Mixture.name ag) env in
+       let ag_name f = Environment.print_agent env f (Mixture.name ag) in
        let interface' = Mixture.interface ag' in
        (*folding on ag's interface: *)
        (* problem when a site is not mentionned at all in ag but is used in ag'
@@ -219,7 +217,7 @@ let diff pos m0 m1 env =
 			 sign interface in
        IntMap.fold
 	 (fun site_id (int_state, lnk_state) (inst,idmap) ->
-	  let site_name = Environment.site_of_id (Mixture.name ag) site_id env in 
+	  let site_name f = Environment.print_site env (Mixture.name ag) f site_id in
 	  let int_state', lnk_state' =
 	    try IntMap.find site_id interface' with
 	    | Not_found -> (None,Mixture.WLD) (*site is not mentioned in the right hand side*)
@@ -236,15 +234,14 @@ let diff pos m0 m1 env =
 	    | (Some _, None) ->
 	       compile_error
 		 pos
-		 (Format.sprintf "The internal state of agent '%s', site '%s' on the right hand side is underspecified" ag_name site_name)
+		 (Format.asprintf "The internal state of agent '%t', site '%t' on the right hand side is underspecified" ag_name site_name)
 	    | (None, Some j) ->
-	       let site = Environment.site_of_id (Mixture.name ag) site_id env in
 	       let _ =
 		 pp_warning
 		   (fun f ->
 		    Format.fprintf
-		      f "internal state of site '%s' of agent '%s' is modified although it is left unpecified in the left hand side"
-		      site (Environment.name (Mixture.name ag) env)
+		      f "internal state of site '%t' of agent '%t' is modified although it is left unpecified in the left hand side"
+		      site_name ag_name
 		   )
 	       in
 	       let inst = (MOD ((KEPT id, site_id), j))::inst
@@ -291,8 +288,8 @@ let diff pos m0 m1 env =
 		    pp_warning
 		      (fun f ->
 		       Format.fprintf
-			 f "breaking a semi-link on site '%s' will induce a side effect"
-			 (Environment.site_of_id (Mixture.name ag) site_id env)
+			 f "breaking a semi-link on site '%t' will induce a side effect"
+			 site_name
 		      )
 		  in
 		  (inst,idmap)
@@ -300,8 +297,6 @@ let diff pos m0 m1 env =
 	  | (Mixture.BND, Mixture.BND | Mixture.TYPE _, Mixture.BND) -> (*connected -> connected*)
              let opt = Mixture.follow (id, site_id) m0 in
 	     let opt' =  Mixture.follow (id, site_id) m1 in
-	     let site =
-	       Environment.site_of_id (Mixture.name ag) site_id env in
 	     let common_update inst idmap id1 i1 =
 	       let id1' =
 		 if List.exists (fun id -> id=id1) prefix
@@ -324,8 +319,8 @@ let diff pos m0 m1 env =
 		      (fun f ->
 		       Format.fprintf
 			 f
-			 "link state of site '%s' of agent '%s' is changed although it is a semi-link in the left hand side"
-			 site (Environment.name (Mixture.name ag) env)
+			 "link state of site '%t' of agent '%t' is changed although it is a semi-link in the left hand side"
+			 site_name ag_name
 		      ) in
 		  common_update inst idmap id1' i1'
 	       | (Some (id1, i1), Some (id1', i1')) -> (*sub-case: connected -> connected*)
@@ -337,8 +332,8 @@ let diff pos m0 m1 env =
 			(fun f ->
 			 Format.fprintf
 			   f
-			   "rule induces a link permutation on site '%s' of agent '%s'"
-			   site (Environment.name (Mixture.name ag) env)
+			   "rule induces a link permutation on site '%t' of agent '%t'"
+			   site_name ag_name
 			) in
 		    (*modifed sites*)
 		    (*it might be that id1 is not preserved by the reaction!*)
@@ -349,8 +344,9 @@ let diff pos m0 m1 env =
 	       | (Some (id1, i1), None) ->
 		  (*sub-case: connected -> semi-link*)
 		  compile_error
-		    pos (Format.sprintf "The link status of agent '%s', site '%s' on the right hand side is underspecified"
-					ag_name site_name)
+		    pos (Format.asprintf
+			   "The link status of agent '%t', site '%t' on the right hand side is underspecified"
+			   ag_name site_name)
 	       | (None, None) -> (*sub-case: semi-link -> semi-link*)
 		  (inst,idmap) (*nothing to be done*)
 	     end
@@ -360,8 +356,9 @@ let diff pos m0 m1 env =
 	       match opt' with
 	       | None -> (*sub-case: free -> semi-link*)
 		  compile_error
-		    pos (Format.sprintf "The link status of agent '%s', site '%s' on the right hand side is inconsistent"
-					ag_name site_name)
+		    pos (Format.asprintf
+			   "The link status of agent '%t', site '%t' on the right hand side is inconsistent"
+			   ag_name site_name)
 	       | Some (id', i') -> (*sub-case: free -> connected*)
 		  (*no warning*)
 		  (*modif sites*)
@@ -381,16 +378,16 @@ let diff pos m0 m1 env =
 	  | (Mixture.TYPE (sid,nme),Mixture.TYPE(sid',nme')) ->
 	     if sid=sid' && nme=nme' then (inst,idmap)
 	     else compile_error
-		    pos (Format.sprintf "The link status of agent '%s', site '%s' on the right hand side is inconsistent" 
+		    pos (Format.asprintf
+			   "The link status of agent '%t', site '%t' on the right hand side is inconsistent"
 					ag_name site_name)
 	  | Mixture.WLD, Mixture.FREE ->  (*wildcard -> free*)
-	     let site = Environment.site_of_id (Mixture.name ag) site_id env in
 	     let _ =
 	       pp_warning
 		 (fun f ->
 		  Format.fprintf
-		    f "application of this rule will induce a null event when applied to an agent '%s' that is free on '%s'"
-		    (Environment.name (Mixture.name ag) env) site
+		    f "application of this rule will induce a null event when applied to an agent '%t' that is free on '%t'"
+		    ag_name site_name
 		 )
 	     in
 	     let inst = (FREE ((KEPT id, site_id),false))::inst
@@ -404,16 +401,17 @@ let diff pos m0 m1 env =
 	       match opt' with
 	       | None ->
 		  compile_error
-		    pos (Format.sprintf "The link status of agent '%s', site '%s' on the right hand side is inconsistent" ag_name site_name)
+		    pos (Format.asprintf
+			   "The link status of agent '%t', site '%t' on the right hand side is inconsistent"
+			   ag_name site_name)
 	       | Some (id', i') ->
 		  (*warning*)
-		  let site = Environment.site_of_id (Mixture.name ag) site_id env in
-		  let _ =
+		  let () =
 		    pp_warning
 		      (fun f ->
 		       Format.fprintf
-			 f "site '%s' of agent '%s' is bound in the right hand side although it is unspecified in the left hand side"
-			 site (Environment.name (Mixture.name ag) env)
+			 f "site '%t' of agent '%t' is bound in the right hand side although it is unspecified in the left hand side"
+			 site_name ag_name
 		      )
 		  in
 		  (*modif sites*)
@@ -429,8 +427,9 @@ let diff pos m0 m1 env =
 	     end
 	  | _,(Mixture.WLD | Mixture.TYPE _) -> (*connected,free -> wildcard*)
 	     compile_error
-	       pos (Format.sprintf "The link status of agent '%s', site '%s' on the right hand side is underspecified"
-				   ag_name site_name)
+	       pos (Format.asprintf
+		      "The link status of agent '%t', site '%t' on the right hand side is underspecified"
+		      ag_name site_name)
 	 )
 	 interface (inst,idmap)
       )
@@ -684,8 +683,8 @@ let dump err_fmt r env =
 	  Format.fprintf err_fmt "DEL #%d@," i
        | ADD (i, name) ->
 	  let sign = Environment.get_sig name env in
-	  Format.fprintf err_fmt "ADD %s%a with identifier #%d@,"
-			 (Environment.name name env) Signature.print sign
+	  Format.fprintf err_fmt "ADD %a%a with identifier #%d@,"
+			 (Environment.print_agent env) name Signature.print sign
 			 ((fun (deleted,kept,_) -> deleted +kept+ i) r.balance)
       )
       script

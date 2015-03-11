@@ -30,9 +30,6 @@ let update_intra_in_components r embedding_info state counter env =
 	    let u = try SiteGraph.node_of_id graph u_id
 		    with Not_found -> invalid_arg "NonLocal.search_elements" in
 	    let _,lifts = Node.get_lifts u 0 in (*BUG here site 0 is not always "_"*)
-	    (if !Parameter.safeModeOn then
-	       let str = Environment.site_of_id (Node.name u) 0 env in
-	       if str <> "_" then failwith "Invariant violation in NonLocal.search_element") ;
 	    LiftSet.fold
 	      (fun inj (extensions,modified) ->
 	       if Injection.is_trashed inj

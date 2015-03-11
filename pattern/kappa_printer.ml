@@ -3,8 +3,8 @@ let lnk_t env f = function
   | Mixture.BND -> Format.fprintf f "!"
   | Mixture.FREE -> Format.fprintf f ""
   | Mixture.TYPE (site_id,sig_id) ->
-     Format.fprintf f "!%s.%s" (Environment.site_of_id sig_id site_id env)
-	(Environment.name sig_id env)
+     Format.fprintf f "!%a.%a" (Environment.print_site env sig_id) site_id
+		    (Environment.print_agent env) sig_id
 
 let follower_string (bnd,fresh) mix uid = function
   | Mixture.BND ->
@@ -32,17 +32,12 @@ let follower_string (bnd,fresh) mix uid = function
 
 let intf_item env (bnd,fresh) mix sig_id agent_id
 		    f (site_id,(opt_v,opt_l)) =
-  let s_int f = match opt_v with
-    | (Some x) ->
-       Format.fprintf f "~%s" (Environment.state_of_id sig_id site_id x env)
-    | None -> Format.fprintf f ""
-  in
+  let s_s f = Environment.print_site_state env sig_id site_id f opt_v in
   let s_lnk f =
     Format.fprintf f "%a%s" (lnk_t env) opt_l
        (follower_string (bnd,fresh) mix (agent_id,site_id) opt_l)
   in
-  Format.fprintf f "%s%t%t" (Environment.site_of_id sig_id site_id env)
-     s_int s_lnk
+  Format.fprintf f "%t%t" s_s s_lnk
 
 let intf env mix sig_id agent_id (bnd,fresh) f interface =
   Pp.set Mods.IntMap.bindings (fun f -> Format.fprintf f ",")
@@ -52,11 +47,10 @@ let intf env mix sig_id agent_id (bnd,fresh) f interface =
 
 let agent with_number env mix (bnd,fresh) f (id,ag) =
   let sig_id = Mixture.name ag in
-  let name = if with_number
-	     then (Environment.name sig_id env)^"#"^(string_of_int id)
-	     else Environment.name sig_id env
-  in
-  Format.fprintf f "%s(%a)" name (intf env mix sig_id id (bnd,fresh))
+  let name =
+    if with_number then "#"^(string_of_int id) else "" in
+  Format.fprintf f "%a%s(%a)" (Environment.print_agent env) sig_id name
+		 (intf env mix sig_id id (bnd,fresh))
 		 (Mixture.interface ag)
 
 let mixture with_number env f mix =
@@ -84,7 +78,7 @@ let alg_expr env f alg =
   in aux f alg
 
 let print_expr env f e =
-  let rec aux f = function
+  let aux f = function
     | Ast.Str_pexpr str,_ -> Format.fprintf f "\"%s\"" str
     | Ast.Alg_pexpr alg,_ -> alg_expr env f alg
   in Pp.list (fun f -> Format.fprintf f ".") aux f e

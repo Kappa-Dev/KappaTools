@@ -895,8 +895,8 @@ let wake_up state modif_type modifs wake_up_map env =
 								let is_free =
 								  try not (Node.is_bound (node, site_id))
 								  with Invalid_argument msg ->
-								    invalid_arg (Format.sprintf "State.wake_up : no site %d in agent %s"
-												site_id (Environment.name (Node.name node) env))
+								    invalid_arg (Format.asprintf "State.wake_up : no site %d in agent %a"
+												site_id (Environment.print_agent env) (Node.name node))
 								in
 								let new_candidates =
 									if is_free
@@ -1227,8 +1227,8 @@ let positive_update ?(with_tracked=[]) err_fmt state r (phi: int IntMap.t) psi
 
 (* Negative update *)
 let negative_upd state cause (u,i) int_lnk counter env =
-  Debug.tag_if_debug "Negative update as indicated by %s#%d site %d"
-		     (Environment.name (Node.name u) env) (Node.get_address u) i;
+  Debug.tag_if_debug "Negative update as indicated by %a#%d site %d"
+		     (Environment.print_agent env) (Node.name u) (Node.get_address u) i;
 
   (* sub-function that removes all injections pointed by lifts --if they *)
   (* still exist                                                         *)
@@ -1331,13 +1331,13 @@ let bind state cause (u, i) (v, j) side_effects pert_ids counter env =
   let (int_u_i, ptr_u_i) =
     try intf_u.(i).Node.status
     with Invalid_argument msg ->
-      invalid_arg (Format.sprintf "State.bind: agent %s has no site %d"
-				  (Environment.name (Node.name u) env) i)
+      invalid_arg (Format.asprintf "State.bind: agent %a has no site %d"
+				  (Environment.print_agent env) (Node.name u) i)
   and (int_v_j, ptr_v_j) =
     try intf_v.(j).Node.status
     with Invalid_argument msg ->
-      invalid_arg (Format.sprintf "State.bind: agent %s has no site %d"
-				  (Environment.name (Node.name v) env) j)
+      invalid_arg (Format.asprintf "State.bind: agent %a has no site %d"
+				  (Environment.print_agent env) (Node.name v) j)
   in
 
   let env,side_effects,pert_ids = (*checking for side effects*)
@@ -1411,13 +1411,14 @@ let modify state cause (u, i) s pert_ids counter env =
 				let warn = if s = j then warn + 1 else warn
 				in
 				(* if s=j then null event *)
-				let env,pert_ids' = (*if s <> j then*) negative_upd state cause (u, i) 0 counter env in 
+				let env,pert_ids' = (*if s <> j then*) negative_upd state cause (u, i) 0 counter env in
 				(warn,env,IntSet.union pert_ids pert_ids')
 			)
 	| None ->
-			invalid_arg
-				("State.modify: node " ^
-					((Environment.name (Node.name u) env)^" has no internal state to modify"))
+	   invalid_arg
+	     (Format.asprintf "State.modify: node %a%s"
+			      (Environment.print_agent env) (Node.name u)
+			      " has no internal state to modify")
 
 let delete state cause u side_effects pert_ids counter env =
   Debug.tag_if_debug "Deleting node %d" (Node.name u);
@@ -1741,12 +1742,7 @@ let check_invariants check_opt state counter env =
     	   let _ =
       	     Node.fold_dep
       	       (fun j (int_j,lnk_j) lifts_base ->
-      		if j=0 then
-      		  begin
-        	    let str = Environment.site_of_id (Node.name u_i) 0 env in
-        	    if str <> "_" then raise (Invariant_violation "Site 0 should be '_'") ;
-        	    lnk_j
-      		  end
+      		if j=0 then lnk_j
       		else
     		  begin
         	    LiftSet.fold

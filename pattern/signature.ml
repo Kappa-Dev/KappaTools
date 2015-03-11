@@ -112,7 +112,7 @@ let internal_states_number agent_id site_num sigs =
   with
   | Invalid_argument _ -> raise Not_found
 
-let default_num_value agent_id site_id sigs =
+let default_internal_state agent_id site_id sigs =
   try
     match (get sigs agent_id).NamedDecls.decls.(site_id) with
     | _, None -> None
@@ -125,3 +125,13 @@ let create l =
   NamedDecls.create (Tools.array_map_of_list
 		       (fun (name,intf) -> (name,create_t intf))
 		       l)
+
+let print_agent sigs f ag_ty =
+ Format.pp_print_string f @@ agent_of_num ag_ty sigs
+let print_site sigs ag_ty f id =
+ Format.pp_print_string f @@ site_of_id ag_ty id sigs
+let print_internal_state sigs ag_ty site f = function
+  | None -> print_site sigs ag_ty f site
+  | Some id ->
+     Format.fprintf f "%s~%s" (site_of_id ag_ty site sigs)
+		    (internal_state_of_id ag_ty site id sigs)
