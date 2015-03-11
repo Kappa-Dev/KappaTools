@@ -60,20 +60,21 @@ module Union_find_array =
       (* path-compression *)
 
       let rec path_compression parent i =
-        if parent.(i) = i
+        let parent_i = parent.(i) in
+        if parent_i = i
         then
           parent, i
         else
-          let parent, j = path_compression parent j in
-          let parent_j = parent.(i) <- j in
-          parent_j, j
+          let parent, j = path_compression parent parent_i in
+          let parent = parent.(parent_i) <- j in
+          parent, j
 
       (* find_parent *)
 
       let find_parent {parent; _} i =
-        let a, rx = path_compression parent i in
+        let a, parent_i = path_compression parent i in
         parent <- a;
-        rx
+        parent_i
 
       let union_rank {parent; _} i j =
         let parent_i = find_parent parent i in
