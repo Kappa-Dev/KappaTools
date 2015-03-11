@@ -33,12 +33,7 @@ let eval_node env a link_map node_map node_id =
   let (agent_name,_ as agent) = fst a in
   let pos_ag = pos_of_lex_pos (fst (snd (fst a))) in
   let name_id = Environment.num_of_name agent env in
-  let sign =
-    try Environment.get_sig name_id env with
-    | Not_found ->
-       raise (ExceptionDefn.Semantics_Error (pos_ag,"Agent '" ^ agent_name ^
-						      "' is not declared"))
-  in
+  let sign = Environment.get_sig name_id env in
 
   (*Begin sub function*)
   let rec build_intf ast link_map intf bond_list =
@@ -121,12 +116,7 @@ let eval_agent env a ctxt =
   let ((agent_name, pos_ag),ast_intf) = a in
   let name_id =
     Environment.num_of_name (agent_name,pos_ag) env in
-  let sign =
-    try (Environment.get_sig name_id env)
-    with Not_found ->
-      raise (ExceptionDefn.Malformed_Decl
-	       ("Agent '" ^ agent_name ^ "' is not declared",pos_ag))
-  in
+  let sign = Environment.get_sig name_id env in
   let port_map = eval_intf ast_intf in
   let (interface, ctxt) =
     StringMap.fold
@@ -914,10 +904,7 @@ let initialize logger overwrite result =
   let _ = configurations_of_result result in
 
   Debug.tag logger "\t -agent signatures" ;
-  let sigs_nd =
-    NamedDecls.create (array_map_of_list
-			 (fun (name,intf) -> (name,Signature.create intf))
-			 result.Ast.signatures) in
+  let sigs_nd = Signature.create result.Ast.signatures in
   let tk_nd =
     NamedDecls.create (array_map_of_list (fun x -> (x,())) result.Ast.tokens) in
 

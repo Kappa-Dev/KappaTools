@@ -2,7 +2,7 @@ open Mods
 open ExceptionDefn
 
 type t = {
-  signatures : Signature.t NamedDecls.t;
+  signatures : Signature.s;
   tokens : unit NamedDecls.t;
   algs : (Expr.alg_expr Term.with_pos) NamedDecls.t;
   perturbations : unit NamedDecls.t;
@@ -35,7 +35,7 @@ type t = {
 }
 
 let empty =
-	{signatures = NamedDecls.create [||] ;
+	{signatures = Signature.create [] ;
 	num_of_kappa = StringMap.empty ; 
 	kappa_of_num = IntMap.empty ;
 	num_of_rule = StringMap.empty ;
@@ -115,9 +115,9 @@ let declare_empty_lhs id env = {env with empty_lhs = IntSet.add id env.empty_lhs
 let is_empty_lhs id env = IntSet.mem id env.empty_lhs
 
 (*let log env = env.log*)
-let name i env = NamedDecls.elt_name env.signatures i
+let name i env = Signature.agent_of_num i env.signatures
 let num_of_name nme env =
-  NamedDecls.elt_id ~kind:"agent" env.signatures nme
+  Signature.num_of_agent nme env.signatures
 let num_of_kappa lab env = StringMap.find lab env.num_of_kappa 
 let kappa_of_num i env =  IntMap.find i env.kappa_of_num 
 let num_of_rule lab env = StringMap.find lab env.num_of_rule
@@ -130,7 +130,7 @@ let is_rule i env = IntSet.mem i env.rule_indices
 let num_of_alg s env = StringMap.find s env.algs.NamedDecls.finder
 let alg_of_num i env = fst env.algs.NamedDecls.decls.(i)
 
-let name_number env = NamedDecls.size env.signatures
+let name_number env = Signature.size env.signatures
 
 let add_dependencies dep dep' env =
   let set = try Term.DepMap.find dep env.dependencies
@@ -172,24 +172,20 @@ let declare_unary_rule rule_lbl id env =
 					{env with num_of_unary_rule = nr ; unary_rule_of_num = rn}
 
 let id_of_site agent_name site_name env =
-  let n = num_of_name (Term.with_dummy_pos agent_name) env in
-  let (_,sign) = env.signatures.NamedDecls.decls.(n) in
-  Signature.num_of_site ~agent_name (Term.with_dummy_pos site_name) sign
+  Signature.id_of_site (Term.with_dummy_pos agent_name)
+		       (Term.with_dummy_pos site_name) env.signatures
 
 let site_of_id agent_id site_id env =
-  let (_,sign) = env.signatures.NamedDecls.decls.(agent_id) in
-  Signature.site_of_num site_id sign
+  Signature.site_of_id agent_id site_id env.signatures
 
 let id_of_state agent_name site_name state env =
-  let n = num_of_name (Term.with_dummy_pos agent_name) env in
-  let (_,sign) = env.signatures.NamedDecls.decls.(n) in
-  let site_id =
-    Signature.num_of_site ~agent_name (Term.with_dummy_pos site_name) sign in
-  Signature.num_of_internal_state site_id state sign
+  Signature.id_of_internal_state
+    (Term.with_dummy_pos agent_name)
+    (Term.with_dummy_pos site_name) state env.signatures
 
 let state_of_id agent_id id_site id_state env =
-  let (_,sign) = env.signatures.NamedDecls.decls.(agent_id) in
-  Signature.internal_state_of_num id_site id_state sign
+  Signature.internal_state_of_id
+    agent_id id_site id_state env.signatures
 
 let num_of_token = fun str env ->
   StringMap.find str env.tokens.NamedDecls.finder
@@ -222,19 +218,15 @@ let declare_var_kappa ?(from_rule=false) label_pos_opt env =
 let get_sig agent_id env =
   if agent_id = -1
   then invalid_arg "Environment.get_sig: Empty agent has no signature"
-  else snd env.signatures.NamedDecls.decls.(agent_id)
+  else Signature.get env.signatures agent_id
 
-let check (agent_name,_ as agent) site_name int_state env =
-  let agent_id = num_of_name agent env in
-  let sign = get_sig agent_id env in
-  let site_id = Signature.num_of_site ~agent_name site_name sign in
+let check agent site_name int_state env =
   let _ =
-    Signature.num_of_internal_state site_id int_state sign in
+    Signature.id_of_internal_state agent site_name int_state env.signatures in
   ()
 
 let default_state name_id site_id env =
-  let (_,sign) = env.signatures.NamedDecls.decls.(name_id) in
-  Signature.default_num_value site_id sign
+  Signature.default_num_value name_id site_id env.signatures
 
 let print_rule env f id = Format.fprintf f "%s" (rule_of_num id env)
 let print_alg env f id = Format.fprintf f "%s" (fst (alg_of_num id env))

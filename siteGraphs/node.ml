@@ -179,8 +179,9 @@ exception TooBig
 let bit_encode node env =
   try
     let tot_offset = ref 0 in
-    let sign = Environment.get_sig (name node) env in
-    let max_val site_id = Signature.internal_states_number site_id sign in
+    let max_val site_id =
+      Signature.internal_states_number (name node) site_id
+env.Environment.signatures in
     let bit_rep =
       fold_status
 	(fun site_id (int,lnk) bit_rep ->
@@ -236,16 +237,13 @@ let create ?with_interface name_id env =
 	(*{name="%" ; interface = Array.make 0 {status = (None,Null) ;
  dep = (LiftSet.create 0,LiftSet.create 0)}; address=None ; species_id = None}*)
     else
-      let sign =
-	try Environment.get_sig name_id env
-	with Not_found -> invalid_arg "Node.create 1"
-      in
-      let size = Signature.arity sign in
+      let size = Signature.arity env.Environment.signatures name_id in
       let intf =
 	Array.init
 	  size
 	  (fun i ->
-	   let def_int = Signature.default_num_value i sign in
+	   let def_int = Signature.default_num_value
+			   name_id i env.Environment.signatures in
 	   {status = (def_int,Null) ;
 	    dep = (LiftSet.create !Parameter.defaultLiftSetSize,
 		   LiftSet.create !Parameter.defaultLiftSetSize)}

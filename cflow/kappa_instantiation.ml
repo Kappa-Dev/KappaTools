@@ -258,12 +258,11 @@ module Cflow_linker =
   let agent_of_binding_type = fst
   let map_sites parameter handler error f map x = 
       try 
-	let sign = Environment.get_sig x map in 
         let rec aux k list = 
           if k=0 
           then list
-          else aux (k-1) ((f k sign)::list)
-        in error,aux (Signature.arity sign -1) []
+          else aux (k-1) ((f x k map.Environment.signatures)::list)
+        in error,aux (Signature.arity map.Environment.signatures x -1) []
       with 
 	  Not_found -> 
 	    let error_list,error = 
@@ -273,12 +272,12 @@ module Cflow_linker =
 
   let get_binding_sites parameter handler error = 
     map_sites parameter handler error 
-      (fun k _ -> k)
+      (fun _ k _ -> k)
       handler.H.env
 
   let get_default_state parameter handler error = 
     map_sites parameter handler error 
-      (fun k sign -> (k,Signature.default_num_value k sign))
+      (fun x k sigs -> (k,Signature.default_num_value x k sigs))
       handler.H.env
   
   let fresh_map_of_event ((_,_,x),_) = x 

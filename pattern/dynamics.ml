@@ -59,8 +59,7 @@ let compute_causal lhs rhs script env =
 	    )
 	    (Mixture.agent_of_id ag_id lhs) (causal_map,bool)
        | ADD (ag_id,name_id) -> (*Interface might be partial!*)
-	  let sign = Environment.get_sig name_id env in
-	  let arity = Signature.arity sign in
+	  let arity = Signature.arity env.Environment.signatures name_id in
 	  let site_id = ref 0 in
 	  let p_causal = ref causal_map in
 	  while !site_id < arity do
