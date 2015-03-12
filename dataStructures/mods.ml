@@ -21,7 +21,7 @@ module DynArray = DynamicArray.DynArray(LargeArray.GenArray)
 module Injection : sig
   type t
   val compare : t -> t -> int
-
+  (** [empty expected_size inj_address] *)
   val empty : int -> int * int -> t
   val add : int -> int -> t -> t
   val flush : t -> int * int -> t

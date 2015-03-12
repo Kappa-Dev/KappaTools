@@ -48,6 +48,9 @@ let print_agent sigs f ag =
   Format.fprintf f "%a(@[<h>%a@])" (Signature.print_agent sigs) ag.a_type
 		 (print_intf sigs ag.a_type) (ag.a_ports,ag.a_ints)
 
+let print_mixture sigs f mix =
+  Pp.list Pp.comma (print_agent sigs) f mix
+
 let full_agent_of_rule_agent config rm =
   let links_of_rule_links l =
     Array.map
