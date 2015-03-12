@@ -19,12 +19,13 @@ type rule_link =
   | L_VAL of int Term.with_pos * switching
 type rule_agent =
     { ra_type: int; ra_ports: rule_link array; ra_ints: rule_internal array; }
+type rule_mixture = rule_agent list
 
 type internal = int option
 type link = ANY | FREE | VAL of int
 type agent =
     { a_type: int; a_ports: link array; a_ints: internal array; }
-
+type mixture = agent list
 
 let print_link f = function
   | ANY -> Format.pp_print_string f "?"
@@ -550,11 +551,14 @@ let connected_components_of_mixture env mix =
      aux env' (cc::acc) remains
   in aux env [] mix
 
+let rule_mixtures_of_ambiguous_rule contact_map sigs lhs rhs =
+  let precomp_mixs = annotate_lhs_with_diff sigs lhs rhs in
+  add_implicit_infos
+    sigs (find_implicit_infos sigs contact_map precomp_mixs)
+
 let connected_components_sum_of_ambiguous_rule contact_map env lhs rhs =
   let sigs = Connected_component.Env.sigs env in
-  let precomp_mixs = annotate_lhs_with_diff sigs lhs rhs in
-  let all_mixs = add_implicit_infos
-		   sigs (find_implicit_infos sigs contact_map precomp_mixs) in
+  let all_mixs = rule_mixtures_of_ambiguous_rule contact_map sigs lhs rhs in
   let (env',ccs) =
     Tools.list_fold_right_map connected_components_of_mixture env all_mixs in
   let () =

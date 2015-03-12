@@ -6,6 +6,7 @@ type t = {
   tokens : unit NamedDecls.t;
   algs : (Expr.alg_expr Term.with_pos) NamedDecls.t;
   perturbations : unit NamedDecls.t;
+  delta_mixtures : (Snip.mixture * Snip.mixture) list NamedDecls.t;
 
 	fresh_kappa : int ;
 	num_of_kappa : int StringMap.t ; 
@@ -40,6 +41,7 @@ let empty =
 	kappa_of_num = IntMap.empty ;
 	num_of_rule = StringMap.empty ;
 	num_of_unary_rule = StringMap.empty ;
+	delta_mixtures = NamedDecls.create [||];
 	algs = NamedDecls.create [||];
 	rule_of_num = IntMap.empty ;
 	unary_rule_of_num = IntMap.empty ; 
@@ -161,15 +163,15 @@ let declare_rule rule_lbl id env =
        {env with num_of_rule = nr ; rule_of_num = rn}
 
 let declare_unary_rule rule_lbl id env =
-	match rule_lbl with
-		| None -> env
-		| Some (r_nme,pos) ->
-			if StringMap.mem r_nme env.num_of_unary_rule then raise (Malformed_Decl (("Rule name "^r_nme^" is already used"),pos))
-			else
-				let nr = StringMap.add r_nme id env.num_of_unary_rule
-				and rn = IntMap.add id r_nme env.unary_rule_of_num
-				in
-					{env with num_of_unary_rule = nr ; unary_rule_of_num = rn}
+  match rule_lbl with
+  | None -> env
+  | Some (r_nme,pos) ->
+     if StringMap.mem r_nme env.num_of_unary_rule
+     then raise (Malformed_Decl (("Rule name "^r_nme^" is already used"),pos))
+     else
+       let nr = StringMap.add r_nme id env.num_of_unary_rule
+       and rn = IntMap.add id r_nme env.unary_rule_of_num in
+       {env with num_of_unary_rule = nr ; unary_rule_of_num = rn}
 
 let id_of_site agent_name site_name env =
   Signature.id_of_site (Term.with_dummy_pos agent_name)
@@ -191,29 +193,32 @@ let num_of_token = fun str env ->
   StringMap.find str env.tokens.NamedDecls.finder
 let token_of_num = fun id env -> fst (fst env.tokens.NamedDecls.decls.(id))
 
+let artificialy_name env = function
+  | Some (label,pos) -> (label,pos)
+  | None ->
+     Term.with_dummy_pos ("%anonymous"^(string_of_int env.fresh_kappa)) (*geek*)
+
 let declare_var_kappa ?(from_rule=false) label_pos_opt env =
-	let label,pos = match label_pos_opt with
-		| Some (label,pos) -> (label,pos)
-		| None ->
-		   Term.with_dummy_pos ("%anonymous"^(string_of_int env.fresh_kappa)) (*geek*)
-	in 
-	let already_defined = 
-		(try let _ = num_of_kappa label env in true with Not_found -> false)
-		||
-		(try let _ = num_of_alg label env in true with Not_found -> false)
-	in
-		if already_defined then
-		  raise (Malformed_Decl ("Label "^label^"' already defined",pos))
-		else
-			let np = StringMap.add label env.fresh_kappa env.num_of_kappa
-			and pn = IntMap.add env.fresh_kappa label env.kappa_of_num
-			and fp = env.fresh_kappa+1
-			in
-				({env with 
-					rule_indices = if from_rule then IntSet.add env.fresh_kappa env.rule_indices else env.rule_indices ; 
-					num_of_kappa = np ; 
-					kappa_of_num = pn ; 
-					fresh_kappa = fp},fp-1)
+  let (label,pos) = artificialy_name env label_pos_opt in
+  let already_defined =
+    (try let _ = num_of_kappa label env in true with Not_found -> false)
+    ||
+      (try let _ = num_of_alg label env in true with Not_found -> false)
+  in
+  if already_defined then
+    raise (Malformed_Decl ("Label "^label^"' already defined",pos))
+  else
+    let np = StringMap.add label env.fresh_kappa env.num_of_kappa
+    and pn = IntMap.add env.fresh_kappa label env.kappa_of_num
+    and fp = env.fresh_kappa+1
+    in
+    ({env with
+       rule_indices = if from_rule
+		      then IntSet.add env.fresh_kappa env.rule_indices
+		      else env.rule_indices ;
+       num_of_kappa = np ;
+       kappa_of_num = pn ;
+       fresh_kappa = fp},fp-1)
 
 let get_sig agent_id env =
   if agent_id = -1
