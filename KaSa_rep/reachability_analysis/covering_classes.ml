@@ -92,7 +92,7 @@ let store_new_class parameter error l remanent =
                Exit
                (0,good_lists)
      in
-     let _ = print_string "AFTER UNSAFE ALLOCATION\n" in
+     (*let _ = print_string "AFTER UNSAFE ALLOCATION\n" in
      let _ = Covering_classes_type.Dictionary_of_Covering_classes.print
                  parameter error
                  (fun parameter error elt list _ _ ->
@@ -101,7 +101,7 @@ let store_new_class parameter error l remanent =
                                     list in
                   let _ = print_newline () in error
                  ) dic
-     in 
+     in *)
      (*store pointer backward*)
      let error,pointer_backward =
        List.fold_left
@@ -135,7 +135,7 @@ let store_new_class parameter error l remanent =
          Covering_classes_type.pointer_backward = pointer_backward}
       
 let clean_new parameter error classes =
-  let _ = print_string "START PRINT_NEW \n" in 
+  (*let _ = print_string "START PRINT_NEW \n" in *)
   let good_lists =
     Covering_classes_type.Dictionary_of_Covering_classes.init () in
   let error,pbw = Int_storage.Nearly_inf_Imperatif.create parameter error 0 in 
@@ -147,14 +147,14 @@ let clean_new parameter error classes =
   List.fold_left (fun (error,acc) list ->
                   match list with
                   | [] -> (error, acc)
-                  | t::q ->
+                  | t::q ->(*
                      let _ = print_string "\nTHIS IS THE REMANENT STATE\n" in 
                      let _ = print_remanent parameter error acc in
                      let _ = print_string "\nLIST TO BE HANDLED WITH\n" in 
                      let _ = List.iter (fun x -> print_int x;print_string "," )
                                        list in
-                     let _ = print_newline () in 
-                     let pointer_backward = acc.pointer_backward in 
+                     let _ = print_newline () in *)
+                     let pointer_backward = acc.Covering_classes_type.pointer_backward in 
                      (* get the set of list(id) containing t *)
                      let error, potential_supersets =
                        match Int_storage.Nearly_inf_Imperatif.unsafe_get
@@ -171,8 +171,8 @@ let clean_new parameter error classes =
                        match to_visit
                        with
                        | [] ->
-                          let _ = print_string "THIS IS ACTUALLY A SUBSET\n" in
-                          error,acc 
+                          (*let _ = print_string "THIS IS ACTUALLY A SUBSET\n" in*)
+                          error,acc
                        | t'::q' ->
                            (* get the set of list(id) containing t *)
                            let error, potential_supersets' =
@@ -305,7 +305,7 @@ let scan_rule_set parameter error handler rules =
           
 let covering_classes parameters error handler cc_compil =
   let error,result = scan_rule_set parameters error handler cc_compil.Cckappa_sig.rules in
-  let _ = print_string "START PRINTING\n" in 
+(*  let _ = print_string "START PRINTING\n" in*)
   let _ =
     Covering_classes_type.AgentMap.print
       error

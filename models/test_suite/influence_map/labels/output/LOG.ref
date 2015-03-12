@@ -131,50 +131,6 @@ Influence_map:Wake_up_map:rule(1):'otherotherveryveryveryverylonglabel' A(x~p)->
 Influence_map:Wake_up_map:rule(1):'otherotherveryveryveryverylonglabel' A(x~p)->A(x~q) -> rule(3):'\0' A(x~q)->A(x~p)[0->0]
 Influence_map:Wake_up_map:rule(2):'"0' A(x~q)->A(x~u) -> rule(0):'veryveryveryveryverylonglonglonglabel' A(x~u)->A(x~p)[0->0]
 Influence_map:Wake_up_map:rule(3):'\0' A(x~q)->A(x~p) -> rule(1):'otherotherveryveryveryverylonglabel' A(x~p)->A(x~q)[0->0]
-START PRINT_NEW 
-
-THIS IS THE REMANENT STATE
-pointers
-dictionary
-
-LIST TO BE HANDLED WITH
-0,
-AFTER UNSAFE ALLOCATION
-0:0,
-
-THIS IS THE REMANENT STATE
-pointers
-Covering_classes:0:
-sites_type:0
-dictionary
-0:0,
-
-LIST TO BE HANDLED WITH
-0,
-THIS IS ACTUALLY A SUBSET
-
-THIS IS THE REMANENT STATE
-pointers
-Covering_classes:0:
-sites_type:0
-dictionary
-0:0,
-
-LIST TO BE HANDLED WITH
-0,
-THIS IS ACTUALLY A SUBSET
-
-THIS IS THE REMANENT STATE
-pointers
-Covering_classes:0:
-sites_type:0
-dictionary
-0:0,
-
-LIST TO BE HANDLED WITH
-0,
-THIS IS ACTUALLY A SUBSET
-START PRINTING
 Covering_classes:0:
 0:0,
 execution finished without any exception

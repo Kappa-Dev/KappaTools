@@ -115,32 +115,6 @@ Quarks:site_modif+:agent_type:0,site_type:2,state:1,rule:1->[0]
 Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:0->[0]
 Quarks:site_modif-:agent_type:0,site_type:2,state:0,rule:1->[0]
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
-START PRINT_NEW 
-
-THIS IS THE REMANENT STATE
-pointers
-dictionary
-
-LIST TO BE HANDLED WITH
-0,2,
-AFTER UNSAFE ALLOCATION
-0:0,2,
-
-THIS IS THE REMANENT STATE
-pointers
-Covering_classes:0:
-sites_type:0
-Covering_classes:2:
-sites_type:0
-dictionary
-0:0,2,
-
-LIST TO BE HANDLED WITH
-0,1,
-AFTER UNSAFE ALLOCATION
-0:0,2,
-1:0,1,
-START PRINTING
 Covering_classes:0:
 0:0,2,
 1:0,1,
