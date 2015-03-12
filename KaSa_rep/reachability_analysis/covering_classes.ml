@@ -33,11 +33,13 @@ let length_sorted lists =
   List.rev_map fst lists
 
 let store_new_class parameter error l remanent =
+  (*the current remanent information: dictionary, pointer_backward*)
   let good_lists = remanent.Covering_classes_type.dic in
   let pointer_backward = remanent.Covering_classes_type.pointer_backward in
   match l with
   | [] -> error, remanent
   | _ ->
+     (*get allocate_id from a dictionary*)
      let error, output =
        Covering_classes_type.Dictionary_of_Covering_classes.allocate
          parameter
@@ -49,15 +51,15 @@ let store_new_class parameter error l remanent =
          good_lists
      in
      let error,(allocate_id,dic) =
-       match output
-       with Some (al,_,_,d) -> error,(al,d)
-          | None ->
-             warn
-               parameter
-               error
-               (Some "line 106")
-               Exit
-               (0,good_lists)
+       match output with
+       |Some (al,_,_,dic) -> error,(al,dic)
+       | None ->
+          warn
+            parameter
+            error
+            (Some "line 106")
+            Exit
+            (0,good_lists)
      in
      (*store pointer backward*)
      let error,pointer_backward =
@@ -84,7 +86,7 @@ let store_new_class parameter error l remanent =
             elt
             new_set_id
             pointer_backward)
-         (error,pointer_backward)
+         (error, pointer_backward)
          l
      in
      error, {
@@ -92,18 +94,21 @@ let store_new_class parameter error l remanent =
          Covering_classes_type.pointer_backward = pointer_backward}
       
 let clean_new parameter error classes =
+  (* beginning state of a remanent: empty dictionary and pointer_backward*)
   let good_lists =
     Covering_classes_type.Dictionary_of_Covering_classes.init () in
   let error,pbw = Int_storage.Nearly_inf_Imperatif.create parameter error 0 in 
   let empty_acc =
     { Covering_classes_type.dic = good_lists ;
       Covering_classes_type.pointer_backward = pbw }
-  in        
+  in
+  (*sorted the length of covering classes*)
   let lists_to_deal_with = length_sorted classes in
   List.fold_left (fun (error,acc) list ->
                   match list with
                   | [] -> (error, acc)
                   | t::q ->
+                     (*create a storage for pointer_backward*)
                      let pointer_backward = acc.Covering_classes_type.pointer_backward in 
                      (* get the set of list(id) containing t *)
                      let error, potential_supersets =
@@ -150,9 +155,11 @@ let clean_new parameter error classes =
                            else
                              aux q' potential_superset
                      in
+                     (*check the beginning state of a superset*)
                      if Covering_classes_type.Set_list_id.is_empty_set
                           potential_supersets
                      then
+                       (*if it is empty then store it to remanent*)
                        store_new_class parameter error list acc
                      else
                        aux q potential_supersets)
@@ -191,7 +198,7 @@ let scan_rule parameter error handler rule classes =
     Int_storage.Quick_Nearly_inf_Imperatif.fold2_common
       parameter error
       (fun parameter error agent_id agent site_modif covering_classes ->
-       (* if the site does not modify then do nothing  *)
+       (* if the site does not modify at all then do nothing  *)
        if Cckappa_sig.Site_map_and_set.is_empty_map
             site_modif.Cckappa_sig.agent_interface
        then
@@ -227,7 +234,8 @@ let scan_rule parameter error handler rule classes =
 
 let scan_rule_set parameter error handler rules =
   let error, init = empty_classes parameter error handler in
-  let error,agent_map =
+  (*map each agent to a covering classes.*)
+  let error, agent_map =
     Int_storage.Nearly_inf_Imperatif.fold
       parameter error
       (fun parameter error rule_id rule classes ->
@@ -244,12 +252,12 @@ let scan_rule_set parameter error handler rules =
     Covering_classes_type.AgentMap.fold
       parameter error
       (fun parameters error id list init ->
-       let error,list = clean_new parameters error list in
-       Covering_classes_type.AgentMap.set parameters error id list init)
+       let error, clean_list = clean_new parameters error list in
+       Covering_classes_type.AgentMap.set parameters error id clean_list init)
       agent_map.Covering_classes_type.covering_classes
       init
   in
-  error,result
+  error, result
           
 let covering_classes parameters error handler cc_compil =
   let error,result = scan_rule_set parameters error handler cc_compil.Cckappa_sig.rules in

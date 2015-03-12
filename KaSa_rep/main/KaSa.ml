@@ -67,8 +67,9 @@ let main () =
     else error 
   in 
   let error = Print_quarks.dot_of_influence_map parameters_influence_map error handler c_compil (wake_up_map,inhibition_map) in
-  let parameters_cv = Remanent_parameters.update_prefix
-                        parameters "Covering_classes:" in
+  let parameters_cv = print_string "Covering_classes:\n";
+    Remanent_parameters.update_prefix
+      parameters "Agent_type:" in
   let error =
     if (Remanent_parameters.get_trace parameters_cv) || Covering_classes.trace
     then
