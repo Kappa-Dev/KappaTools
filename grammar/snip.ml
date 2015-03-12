@@ -81,13 +81,18 @@ let full_agent_of_rule_agent config rm =
 	  failwith "attempt to make an agent from an ambiguous rule agent"
        | I_CREATED _, _ -> None
       ) i in
-  List.map (fun rag ->
-	    {
-	      a_type = rag.ra_type;
-	      a_ports = links_of_rule_links rag.ra_ports;
-	      a_ints = ints_of_rule_ints rag.ra_ints;
-	    })
-	   rm
+  List.fold_right (fun rag acc ->
+		   let ports = links_of_rule_links rag.ra_ports in
+		   let ints = ints_of_rule_ints rag.ra_ints in
+		   if Array.fold_left (fun b e -> b || e <> ANY) false ports ||
+			Array.fold_left (fun b e -> b || e <> None) false ints
+		   then
+		     {
+		       a_type = rag.ra_type;
+		       a_ports = ports;
+		       a_ints = ints;
+		     }:: acc
+		   else acc) rm []
 
 let agent_of_rule_agent_positive rm =
   full_agent_of_rule_agent (Some true) rm
@@ -111,7 +116,7 @@ let agents_are_compatibles contraints o p =
     let ints = Array.copy o.a_ints in
     if Tools.array_fold_left2i (fun i b x y ->
 				b && match x,y with
-				     | Some i, Some j -> ints.(i) <- None; i = j
+				     | Some a, Some b -> ints.(i) <- None; a = b
 				     | (Some _ | None), _ -> true)
 			       true o.a_ints p.a_ints
     then
@@ -137,22 +142,28 @@ let agents_are_compatibles contraints o p =
     else None
   else None
 
-let rec differences_under_contraints acc b1 r1 b2 r2 l =
+let intersect ag1 ag2 =
+  let aux a1 a2 = Tools.array_fold_left2i
+		    (fun i b x y -> b || (i <> 0 && x <>y)) false a1 a2 in
+  aux ag1.a_ports ag2.a_ports || aux ag1.a_ints ag2.a_ints
+
+let rec differences_under_contraints inter acc b1 r1 b2 r2 l =
   match r1, r2 with
-  | [],_ -> if l = [] && acc <> [] then [List.rev_append b1 acc] else []
-  | _,[] -> if l = [] && acc <> []
+  | [],_ -> if l = [] && inter then [List.rev_append b1 acc] else []
+  | _,[] -> if l = [] && inter
 	    then [List.rev_append b1 (List.rev_append acc r1)] else []
   | h1::t1, h2::t2 ->
      (match agents_are_compatibles l h1 h2 with
      | None -> []
      | Some (a,l') ->
-	differences_under_contraints (a::acc) [] (List.rev_append b1 t1)
-					   [] (List.rev_append b2 t2) l') @
-       differences_under_contraints acc (h1::b1) t1 b2 r2 l @
-	 differences_under_contraints acc b1 r1 (h2::b2) t2 l
+	differences_under_contraints
+	  (inter || intersect h1 a)
+	  (a::acc) [] (List.rev_append b1 t1) [] (List.rev_append b2 t2) l') @
+       differences_under_contraints inter acc (h1::b1) t1 b2 r2 l @
+	 differences_under_contraints inter acc b1 r1 (h2::b2) t2 l
 
 let differences o p =
-  differences_under_contraints [] [] o [] p []
+  differences_under_contraints false [] [] o [] p []
 
 let build_l_type sigs dst_ty dst_p switch =
   let ty_id = Signature.num_of_agent dst_ty sigs in

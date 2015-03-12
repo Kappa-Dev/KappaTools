@@ -732,7 +732,7 @@ let dump err_fmt r env =
 		    se;
      let () = Format.pp_close_box err_fmt () in
      let print_differences r f p =
-       Pp.list Pp.space (Snip.print_mixture env.Environment.signatures) f
+       Pp.list Pp.colon (Snip.print_mixture env.Environment.signatures) f
 	       (Snip.differences (Snip.agent_of_rule_agent r) p) in
      let () =
        Format.fprintf
@@ -742,13 +742,13 @@ let dump err_fmt r env =
 		   Format.fprintf err_fmt "WUPS :@ %a"
 				  (Pp.array Pp.space
 					    (fun _ f  ((name,_),l) ->
-					     Format.fprintf f "@[%s:@ %a@]" name
-							    (Pp.list Pp.colon
+					     Format.fprintf f "%s:@ %a" name
+							    (Pp.list Pp.space
 								     (fun f (p,n) ->
-								      Format.fprintf f "@[%a%t%a@]"
-										     (print_differences m) p
-										     Pp.colon
-										     (print_differences m) n))
+								      Format.fprintf f "@[%a <>%t%a@]"
+										     (print_differences m) n
+										     Pp.space
+										     (print_differences m) p))
 							    l)) env.Environment.delta_mixtures.NamedDecls.decls))
 	 r.rule_mixtures in
      Format.pp_print_newline err_fmt ()

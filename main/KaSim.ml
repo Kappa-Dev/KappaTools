@@ -179,7 +179,19 @@ let () =
     Kappa_files.with_influence
       (fun d -> State.dot_of_influence_map d state env);
     if !Parameter.compileModeOn
-    then (State.dump_rules Format.err_formatter state env; exit 0);
+    then
+      begin
+	let pp_mix = Snip.print_mixture env.Environment.signatures in
+	Format.eprintf "@[<v>%a@]@,"
+		       (NamedDecls.print
+			  (Pp.list Pp.colon
+				   (fun f (p,n) -> Format.fprintf
+						     f "%a <> %a"
+						     pp_mix n pp_mix p)))
+		       env.Environment.delta_mixtures;
+	State.dump_rules Format.err_formatter state env;
+	exit 0
+      end;
     let profiling = Compression_main.init_secret_log_info () in
     let _grid,profiling,event_list =
       if Environment.tracking_enabled env then
