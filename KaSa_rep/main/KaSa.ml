@@ -67,11 +67,14 @@ let main () =
     else error 
   in 
   let error = Print_quarks.dot_of_influence_map parameters_influence_map error handler c_compil (wake_up_map,inhibition_map) in
-
-  let parameters_covering_classes = Remanent_parameters.update_call_stack parameters Covering_classes.local_trace (Some "Covering_classes.covering_classes") in 
-  let parameters_covering_classes = Remanent_parameters.update_prefix parameters_covering_classes "Covering_classes:" in
-  let error, covering_classes = Covering_classes.covering_classes parameters_covering_classes error handler c_compil in
-  
+  let parameters_cv = Remanent_parameters.update_prefix
+                        parameters "Covering_classes:" in
+  let error =
+    if (Remanent_parameters.get_trace parameters_cv) || Covering_classes.trace
+    then
+      let error, covering_classes = Covering_classes.covering_classes parameters_cv error handler c_compil in error     
+    else error
+  in
   let _ = Exception.print parameters error  in
    ()
 
