@@ -128,6 +128,6 @@ Influence_map:Wake_up_map:rule(1):'r1_op' A(x!1),A(y!1)->A(x) -> rule(0):'r1' A(
 Influence_map:Inhibition_map:rule(1):'r1_op' A(x!1),A(y!1)->A(x) -> rule(0):'r1' A(x)->A(x!1),A(y!1)[1->0]
 Influence_map:Inhibition_map:rule(1):'r1_op' A(x!1),A(y!1)->A(x) -> rule(1):'r1_op' A(x!1),A(y!1)->A(x)[1*->1];[1->0]
 Covering_classes:0:
-0:1,
-1:0,
+Covering_class_id:0:site_type:{1}
+Covering_class_id:1:site_type:{0}
 execution finished without any exception

@@ -479,9 +479,9 @@ Influence_map:Inhibition_map:rule(3):'mod x1' C(x1~u!1),A(c!1)->C(x1~p),A(c) -> 
 Influence_map:Inhibition_map:rule(5):'mod x2' A(x,c!1),C(x1~p,x2~u!1)->A(x,c),C(x1~p,x2~p) -> var(4):'Cuu' C(x1~u?,x2~u?)[1->0]
 Influence_map:Inhibition_map:rule(5):'mod x2' A(x,c!1),C(x1~p,x2~u!1)->A(x,c),C(x1~p,x2~p) -> var(5):'Cpu' C(x1~p?,x2~u?)[1->0]
 Covering_classes:0:
-0:0,1,
+Covering_class_id:0:site_type:{0,1}
 Covering_classes:1:
-0:0,
+Covering_class_id:0:site_type:{0}
 Covering_classes:2:
-0:0,1,2,3,
+Covering_class_id:0:site_type:{0,1,2,3}
 execution finished without any exception

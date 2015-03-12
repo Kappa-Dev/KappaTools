@@ -252,9 +252,9 @@ Influence_map:Inhibition_map:rule(0):'r0' A(x),B(x~p)->A(x!1),B(x~p!1) -> rule(3
 Influence_map:Inhibition_map:rule(3):'r2' B(x~p),C(x!_)->B(x~u),C(x!_) -> rule(0):'r0' A(x),B(x~p)->A(x!1),B(x~p!1)[0->1]
 Influence_map:Inhibition_map:rule(3):'r2' B(x~p),C(x!_)->B(x~u),C(x!_) -> rule(1):'r0_op' A(x!1),B(x~p!1)->A(x),B(x~p)[0->1]
 Covering_classes:0:
-0:0,
+Covering_class_id:0:site_type:{0}
 Covering_classes:1:
-0:0,1,
+Covering_class_id:0:site_type:{0,1}
 Covering_classes:2:
-0:0,
+Covering_class_id:0:site_type:{0}
 execution finished without any exception

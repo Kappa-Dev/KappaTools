@@ -15,8 +15,9 @@
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Covering classes") message exn
                  (fun () -> default)
-
-let local_trace = false
+                 
+let trace = false
+(*let local_trace = false*)
 
 let empty_classes parameter error handler =
   let n_agents = handler.Cckappa_sig.nagents in
@@ -32,7 +33,7 @@ let length_sorted lists =
   let lists = List.sort (fun a b -> compare (snd a) (snd b)) list_length in
   List.rev_map fst lists
 
-let print_remanent parameter error remanent =
+(*let print_remanent parameter error remanent =
   let _ = print_string "pointers\n" in 
   let error =
     Int_storage.Nearly_inf_Imperatif.print
@@ -63,7 +64,7 @@ let print_remanent parameter error remanent =
                                     list in
                   let _ = print_newline () in error
                  ) remanent.Covering_classes_type.dic
-  in error
+  in error*)
       
 let store_new_class parameter error l remanent =
   let good_lists = remanent.Covering_classes_type.dic in
@@ -313,10 +314,18 @@ let covering_classes parameters error handler cc_compil =
        let _ = Covering_classes_type.Dictionary_of_Covering_classes.print
                  parameter error
                  (fun parameter error elt l _ _ ->
-                  let _ = Printf.printf "%i:" elt in
+                  let _ = Printf.printf "Covering_class_id:%i:" elt in
                   let _ =
-                    List.iter (fun x ->
-                               print_int x; print_string ",") l in
+                    print_string "site_type:{";
+                    let rec print_list l =
+                      match l with
+                      | [] -> ()
+                      | h :: [] -> print_int h; print_string "}"
+                      | h :: tl ->
+                         let _ = print_int h; print_string "," in
+                         print_list tl in
+                    print_list l
+                  in
                   let _ = print_newline () in
                   error
                  ) dic.Covering_classes_type.dic

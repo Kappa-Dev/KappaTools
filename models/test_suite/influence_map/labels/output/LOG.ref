@@ -132,5 +132,5 @@ Influence_map:Wake_up_map:rule(1):'otherotherveryveryveryverylonglabel' A(x~p)->
 Influence_map:Wake_up_map:rule(2):'"0' A(x~q)->A(x~u) -> rule(0):'veryveryveryveryverylonglonglonglabel' A(x~u)->A(x~p)[0->0]
 Influence_map:Wake_up_map:rule(3):'\0' A(x~q)->A(x~p) -> rule(1):'otherotherveryveryveryverylonglabel' A(x~p)->A(x~q)[0->0]
 Covering_classes:0:
-0:0,
+Covering_class_id:0:site_type:{0}
 execution finished without any exception
