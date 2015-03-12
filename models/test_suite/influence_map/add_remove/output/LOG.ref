@@ -163,13 +163,51 @@ Influence_map:Wake_up_map:rule(3):'' B(x~p)->B(x~u) -> rule(2):'' B(x~u)->B(x~p)
 Influence_map:Inhibition_map:rule(0):'' A(x~u),B(x~p)->A(x~u),A(x~p) -> rule(2):'' B(x~u)->B(x~p)[1->0]
 Influence_map:Inhibition_map:rule(0):'' A(x~u),B(x~p)->A(x~u),A(x~p) -> rule(3):'' B(x~p)->B(x~u)[1->0]
 Influence_map:Inhibition_map:rule(3):'' B(x~p)->B(x~u) -> rule(0):'' A(x~u),B(x~p)->A(x~u),A(x~p)[0->1]
-Covering_classes:Rule 0
-Covering_classes:agent_type:0:sites_type:0 
-Covering_classes:agent_type:1:sites_type:0 
-Covering_classes:Rule 1
-Covering_classes:agent_type:0:sites_type:0 
-Covering_classes:Rule 2
-Covering_classes:agent_type:1:sites_type:0 
-Covering_classes:Rule 3
-Covering_classes:agent_type:1:sites_type:0 
+START PRINT_NEW 
+
+THIS IS THE REMANENT STATE
+pointers
+dictionary
+
+LIST TO BE HANDLED WITH
+0,
+AFTER UNSAFE ALLOCATION
+0:0,
+
+THIS IS THE REMANENT STATE
+pointers
+Covering_classes:0:
+sites_type:0
+dictionary
+0:0,
+
+LIST TO BE HANDLED WITH
+0,
+THIS IS ACTUALLY A SUBSET
+
+THIS IS THE REMANENT STATE
+pointers
+Covering_classes:0:
+sites_type:0
+dictionary
+0:0,
+
+LIST TO BE HANDLED WITH
+0,
+THIS IS ACTUALLY A SUBSET
+START PRINT_NEW 
+
+THIS IS THE REMANENT STATE
+pointers
+dictionary
+
+LIST TO BE HANDLED WITH
+0,
+AFTER UNSAFE ALLOCATION
+0:0,
+START PRINTING
+Covering_classes:0:
+0:0,
+Covering_classes:1:
+0:0,
 execution finished without any exception

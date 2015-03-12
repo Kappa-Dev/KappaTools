@@ -209,14 +209,62 @@ Influence_map:Inhibition_map:rule(1):'' A(x!_)->A(x) -> rule(2):'' B(x!_)->B(x)[
 Influence_map:Inhibition_map:rule(2):'' B(x!_)->B(x) -> rule(1):'' A(x!_)->A(x)[0*->0]
 Influence_map:Inhibition_map:rule(3):'' A()-> -> rule(2):'' B(x!_)->B(x)[0*->0]
 Influence_map:Inhibition_map:rule(4):'' B(x)-> -> rule(0):'' A(x),B(x)->A(x!1),B(x!1)[0->1]
-Covering_classes:Rule 0
-Covering_classes:agent_type:0:sites_type:0 
-Covering_classes:agent_type:1:sites_type:0 
-Covering_classes:Rule 1
-Covering_classes:agent_type:0:sites_type:0 
-Covering_classes:Rule 2
-Covering_classes:agent_type:1:sites_type:0 
-Covering_classes:Rule 3
-Covering_classes:Rule 4
-Covering_classes:agent_type:1:sites_type:0 
+START PRINT_NEW 
+
+THIS IS THE REMANENT STATE
+pointers
+dictionary
+
+LIST TO BE HANDLED WITH
+0,
+AFTER UNSAFE ALLOCATION
+0:0,
+
+THIS IS THE REMANENT STATE
+pointers
+Covering_classes:0:
+sites_type:0
+dictionary
+0:0,
+
+LIST TO BE HANDLED WITH
+0,
+THIS IS ACTUALLY A SUBSET
+START PRINT_NEW 
+
+THIS IS THE REMANENT STATE
+pointers
+dictionary
+
+LIST TO BE HANDLED WITH
+0,
+AFTER UNSAFE ALLOCATION
+0:0,
+
+THIS IS THE REMANENT STATE
+pointers
+Covering_classes:0:
+sites_type:0
+dictionary
+0:0,
+
+LIST TO BE HANDLED WITH
+0,
+THIS IS ACTUALLY A SUBSET
+
+THIS IS THE REMANENT STATE
+pointers
+Covering_classes:0:
+sites_type:0
+dictionary
+0:0,
+
+LIST TO BE HANDLED WITH
+0,
+THIS IS ACTUALLY A SUBSET
+START PRINTING
+Covering_classes:0:
+0:0,
+Covering_classes:1:
+0:0,
 execution finished without any exception

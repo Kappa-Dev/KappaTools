@@ -1,0 +1,3 @@
+#Command-line:
+${KAPPABIN}KaSa covering_class_trivial.ka --debugging-mode --output-directory output || exit 0 
+

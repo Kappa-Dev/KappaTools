@@ -24,7 +24,7 @@ module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
 
 type sites_covering_classes  = int list list AgentMap.t
 
-(*Define a dictionary for covering classes *)
+(* define a dictionary for covering classes *)
  
 module Covering_classes =
   struct
@@ -38,3 +38,20 @@ type covering_classes =
   {
     covering_classes : sites_covering_classes
   }
+
+(* define a remanent *)
+(* key(t): int; 'a t = infinite array of list(#id) *)
+module Inf_array = Int_storage.Nearly_inf_Imperatif
+                     
+module Set_list_id = Set_and_map.Make
+                       (struct
+                           type t = int
+                           let compare = compare
+                         end)
+type remanent_dic =
+  (unit, unit)
+    Dictionary_of_Covering_classes.dictionary
+    
+type remanent =
+  {dic: remanent_dic;
+   pointer_backward: Set_list_id.set Inf_array.t }

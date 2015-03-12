@@ -149,9 +149,29 @@ Influence_map:Wake_up_map:rule(0):'r0' A(x,y?),B(x,y?)->A(x!1),B(x!1) -> rule(0)
 Influence_map:Wake_up_map:rule(0):'r0' A(x,y?),B(x,y?)->A(x!1),B(x!1) -> rule(1):'r1' A()->[0->0]
 Influence_map:Wake_up_map:rule(1):'r1' A()-> -> rule(0):'r0' A(x,y?),B(x,y?)->A(x!1),B(x!1)[0*->1]
 Influence_map:Wake_up_map:rule(2):'r2' ->B() -> rule(0):'r0' A(x,y?),B(x,y?)->A(x!1),B(x!1)[0->1]
-Covering_classes:Rule 0
-Covering_classes:agent_type:0:sites_type:0 
-Covering_classes:agent_type:1:sites_type:0 
-Covering_classes:Rule 1
-Covering_classes:Rule 2
+START PRINT_NEW 
+
+THIS IS THE REMANENT STATE
+pointers
+dictionary
+
+LIST TO BE HANDLED WITH
+0,
+AFTER UNSAFE ALLOCATION
+0:0,
+START PRINT_NEW 
+
+THIS IS THE REMANENT STATE
+pointers
+dictionary
+
+LIST TO BE HANDLED WITH
+0,
+AFTER UNSAFE ALLOCATION
+0:0,
+START PRINTING
+Covering_classes:0:
+0:0,
+Covering_classes:1:
+0:0,
 execution finished without any exception

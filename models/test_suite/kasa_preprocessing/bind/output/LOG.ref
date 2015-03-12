@@ -251,16 +251,89 @@ Influence_map:Wake_up_map:rule(2):'r1' A(x),C(x)->A(x!1),C(x!1) -> rule(3):'r2' 
 Influence_map:Inhibition_map:rule(0):'r0' A(x),B(x~p)->A(x!1),B(x~p!1) -> rule(3):'r2' B(x~p),C(x!_)->B(x~u),C(x!_)[1->0]
 Influence_map:Inhibition_map:rule(3):'r2' B(x~p),C(x!_)->B(x~u),C(x!_) -> rule(0):'r0' A(x),B(x~p)->A(x!1),B(x~p!1)[0->1]
 Influence_map:Inhibition_map:rule(3):'r2' B(x~p),C(x!_)->B(x~u),C(x!_) -> rule(1):'r0_op' A(x!1),B(x~p!1)->A(x),B(x~p)[0->1]
-Covering_classes:Rule 0
-Covering_classes:agent_type:0:sites_type:0 
-Covering_classes:agent_type:1:sites_type:0 1 
-Covering_classes:Rule 1
-Covering_classes:agent_type:0:sites_type:0 
-Covering_classes:agent_type:1:sites_type:0 1 
-Covering_classes:Rule 2
-Covering_classes:agent_type:0:sites_type:0 
-Covering_classes:agent_type:2:sites_type:0 
-Covering_classes:Rule 3
-Covering_classes:agent_type:1:sites_type:0 1 
-Covering_classes:agent_type:2:sites_type:0 
+START PRINT_NEW 
+
+THIS IS THE REMANENT STATE
+pointers
+dictionary
+
+LIST TO BE HANDLED WITH
+0,
+AFTER UNSAFE ALLOCATION
+0:0,
+
+THIS IS THE REMANENT STATE
+pointers
+Covering_classes:0:
+sites_type:0
+dictionary
+0:0,
+
+LIST TO BE HANDLED WITH
+0,
+THIS IS ACTUALLY A SUBSET
+
+THIS IS THE REMANENT STATE
+pointers
+Covering_classes:0:
+sites_type:0
+dictionary
+0:0,
+
+LIST TO BE HANDLED WITH
+0,
+THIS IS ACTUALLY A SUBSET
+START PRINT_NEW 
+
+THIS IS THE REMANENT STATE
+pointers
+dictionary
+
+LIST TO BE HANDLED WITH
+0,1,
+AFTER UNSAFE ALLOCATION
+0:0,1,
+
+THIS IS THE REMANENT STATE
+pointers
+Covering_classes:0:
+sites_type:0
+Covering_classes:1:
+sites_type:0
+dictionary
+0:0,1,
+
+LIST TO BE HANDLED WITH
+0,1,
+THIS IS ACTUALLY A SUBSET
+
+THIS IS THE REMANENT STATE
+pointers
+Covering_classes:0:
+sites_type:0
+Covering_classes:1:
+sites_type:0
+dictionary
+0:0,1,
+
+LIST TO BE HANDLED WITH
+0,1,
+THIS IS ACTUALLY A SUBSET
+START PRINT_NEW 
+
+THIS IS THE REMANENT STATE
+pointers
+dictionary
+
+LIST TO BE HANDLED WITH
+0,
+AFTER UNSAFE ALLOCATION
+0:0,
+START PRINTING
+Covering_classes:0:
+0:0,
+Covering_classes:1:
+0:0,1,
+Covering_classes:2:
+0:0,
 execution finished without any exception
