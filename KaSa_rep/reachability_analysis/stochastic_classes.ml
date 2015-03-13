@@ -54,6 +54,11 @@ let add_stochastic_class parameter error agent_type new_stochastic_class stochas
        new_list
        stochastic_classes                                                         
 
+(*let build_union_find l =
+  let  _ = 
+  in
+  {Union_find.treeArr = treeArr}*)
+
 (*TODO*)
 let scan_rule parameter error handler rule classes =
   let stochastic_classes = classes.Stochastic_classes_type.stochastic_classes in
@@ -65,41 +70,46 @@ let scan_rule parameter error handler rule classes =
        match agent with
        | Cckappa_sig.Ghost -> error, stochastic_classes
        | Cckappa_sig.Agent agent ->
+         if Cckappa_sig.Site_map_and_set.is_empty_map
+           agent.Cckappa_sig.agent_interface
+         then error, stochastic_classes
+         else
           (*compute a new class in the same interface; if there are 2
             site: site, site' are of the same set then they are equivance*)
-          let new_stochastic_class =
-            Cckappa_sig.Site_map_and_set.fold2_map
-              parameter error
-              (fun k site site' (error, current_class) ->
-               (*test:create an empty array*)
-               let empty_arr = Union_find.makeSets 0 in
-               if Union_find.is_equivalence site site' empty_arr
+         let error, new_stochastic_class =
+           Cckappa_sig.Site_map_and_set.fold2z_map
+             parameter error
+             (fun k site site' (error, current_class) ->
+             (*test:create an empty array*)
+             (*let empty_arr = Union_find.makeSets 0 in*)
+               (*if Union_find.is_equivalence site site'
                then
                  error, site :: current_class
-               else
+               else*)
                  error, current_class
-              )
-              agent.Cckappa_sig.agent_interface
-              agent.Cckappa_sig.agent_interface
-              []
-          in
-          let agent_type = agent.Cckappa_sig.agent_name in
-          let error, stochastic_classes =
-            add_stochastic_class
-              parameter
-              error
-              agent_type
-              new_stochastic_class
-              stochastic_classes
-          in
-          error, stochastic_classes
+             )
+             agent.Cckappa_sig.agent_interface
+             agent.Cckappa_sig.agent_interface
+             []
+         in
+         let agent_type = agent.Cckappa_sig.agent_name in
+         let error, stochastic_classes =
+           add_stochastic_class
+             parameter
+             error
+             agent_type
+             new_stochastic_class
+             stochastic_classes
+         in
+         error, stochastic_classes
       )
-      rule stochastic_classes
+      rule.Cckappa_sig.rule_lhs.Cckappa_sig.views stochastic_classes
   in
   error,
   {
     Stochastic_classes_type.stochastic_classes = stochastic_classes
   }   
+
 
 let scan_rule_set parameter error handler rules =
   let error, init = empty_classes parameter error handler in
