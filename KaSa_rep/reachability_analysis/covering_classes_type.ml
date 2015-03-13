@@ -16,24 +16,11 @@ let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Covering_classes_type") message exn (fun () -> default)
 
 let local_trace = false
-                    
-module Label  = Covering_classes_labels.Int_labels
-module Labels = Covering_classes_labels.Extensive(Label)
 
 module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
 
 type sites_covering_classes  = int list list AgentMap.t
-
-(* define a dictionary for covering classes *)
- 
-module Covering_classes =
-  struct
-    type t = int list
-    let compare = compare
-  end
-
-module Dictionary_of_Covering_classes = Dictionary.Dictionary_of_Ord(Covering_classes)
-                                   
+                                  
 type covering_classes =
   {
     covering_classes : sites_covering_classes
@@ -48,6 +35,17 @@ module Set_list_id = Set_and_map.Make
                            type t = int
                            let compare = compare
                          end)
+
+(* define a dictionary for covering classes *)
+ 
+module Covering_classes =
+  struct
+    type t = int list
+    let compare = compare
+  end
+
+module Dictionary_of_Covering_classes = Dictionary.Dictionary_of_Ord(Covering_classes)
+                                                                    
 type remanent_dic =
   (unit, unit)
     Dictionary_of_Covering_classes.dictionary

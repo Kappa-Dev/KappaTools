@@ -44,7 +44,7 @@ let store_new_class parameter error l remanent =
        Covering_classes_type.Dictionary_of_Covering_classes.allocate
          parameter
          error
-         (fun _ _ -> 0)
+         Misc_sa.compare_unit
          l
          ()
          Misc_sa.const_unit
@@ -198,7 +198,7 @@ let scan_rule parameter error handler rule classes =
     Int_storage.Quick_Nearly_inf_Imperatif.fold2_common
       parameter error
       (fun parameter error agent_id agent site_modif covering_classes ->
-       (* if the site does not modify at all then do nothing  *)
+       (* if the interface is empty then do nothing  *)
        if Cckappa_sig.Site_map_and_set.is_empty_map
             site_modif.Cckappa_sig.agent_interface
        then
@@ -234,7 +234,7 @@ let scan_rule parameter error handler rule classes =
 
 let scan_rule_set parameter error handler rules =
   let error, init = empty_classes parameter error handler in
-  (*map each agent to a covering classes.*)
+  (*map each agent to a covering classes*)
   let error, agent_map =
     Int_storage.Nearly_inf_Imperatif.fold
       parameter error
