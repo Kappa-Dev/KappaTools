@@ -47,6 +47,14 @@ $(MANGENREP): $(SCRIPTSSOURCE) $(MODELS)
 %.native %.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*)
 	$(OCAMLBINPATH)ocamlbuild $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) $@
 
+JaSim.byte: $(filter-out _build/,$(wildcard */*.ml*))
+	ocamlbuild $(OCAMLbuiLDFLAGS) $(OCAMLBUILDFLAGS) -I js \
+	-tag-line "<js/**> : thread, package(js_of_ocaml.tyxml), package(js_of_ocaml.syntax), package(tyxml.syntax), package(lwt), syntax(camlp4o)" \
+	$@
+
+js/JaSim.js: JaSim.byte
+	js_of_ocaml "+weak.js" _build/js/$< -o $@
+
 bin/%: %.native Makefile
 	[ -d bin ] || mkdir bin && cp $< $@
 	rm -f $(notdir $@) && ln -s $@ $(notdir $@)

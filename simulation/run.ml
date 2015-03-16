@@ -202,7 +202,27 @@ let event stdout state maybe_active_pert_ids story_profiling
   in
   (state,pert_ids,story_profiling,event_list,env)
 
-let loop stdout state story_profiling event_list counter env =
+let finalize stdout env counter state story_profiling event_list =
+  let () = Plot.close stdout counter in
+  if Environment.tracking_enabled env then
+    let causal,weak,strong =
+      (*compressed_flows:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_id:int story_time: float ; story_event: int}*)
+      if !Parameter.weakCompression || !Parameter.mazCompression
+	 || !Parameter.strongCompression (*if a compression is required*)
+      then Compression_main.compress stdout env state story_profiling event_list
+      else None,None,None
+    in
+    let g prefix label x =
+      match x with
+      | None -> ()
+      | Some flows ->
+	 Causal.pretty_print stdout Graph_closure.config_std prefix label
+			     flows state env in
+    let _ = g "" "" causal in
+    let _ = g "Weakly" "weakly " weak in
+    g "Strongly" "strongly " strong
+
+let loop_cps stdout hook return state story_profiling event_list counter env =
   (*Before entering the loop*)
   Counter.tick stdout counter counter.Counter.time counter.Counter.events ;
 
@@ -215,28 +235,14 @@ let loop stdout state story_profiling event_list counter env =
       let state,pert_ids,story_profiling,event_list,env =
 	event stdout state pert_ids story_profiling event_list counter env
       in
-      iter state pert_ids story_profiling event_list counter env
+      hook (fun () -> iter state pert_ids story_profiling event_list counter env)
     else (*exiting the loop*)
       let () = Plot.fill stdout state counter env 0.0 in (*Plotting last measures*)
       let state,_remain_pert_ids,env,_obs_from_perturbation,_pert_events =
 	exec_perts stdout pert_ids state counter env in
-      let () = Plot.close stdout counter in
-      if Environment.tracking_enabled env then
-	let causal,weak,strong =
-	  (*compressed_flows:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_id:int story_time: float ; story_event: int}*)
-          if !Parameter.weakCompression || !Parameter.mazCompression
-	     || !Parameter.strongCompression (*if a compression is required*)
-          then Compression_main.compress stdout env state story_profiling event_list
-          else None,None,None
-	in
-	let g prefix label x =
-	  match x with
-	  | None -> ()
-	  | Some flows ->
-	     Causal.pretty_print stdout Graph_closure.config_std prefix label
-				 flows state env in
-	let _ = g "" "" causal in
-	let _ = g "Weakly" "weakly " weak in
-	g "Strongly" "strongly " strong
+      return stdout env counter state story_profiling event_list
   in
   iter state (State.all_perturbations state) story_profiling event_list counter env
+
+let loop stdout state story_profiling event_list counter env =
+  loop_cps stdout (fun f -> f ()) finalize state story_profiling event_list counter env
