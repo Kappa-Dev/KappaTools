@@ -109,7 +109,7 @@ let graduation_step draw_l min_grad_l va_min va_max =
   (va_min',int_of_float nb_grad,delta_grad,va_max')
 
 let axis (w,h) (b_op,b_w,b_h) f l =
-  let (t_max,va_min,va_max as limits) = get_limits l in
+  let (t_max,va_min,va_max) = get_limits l in
   let data_w = w - (b_op + b_w) in
   let data_h = h - (b_op + b_h) in
   let (_,nb_w,grad_w,t_max') =
@@ -190,6 +190,14 @@ let draw (w,h as size) border f s =
   let () = legend w f s.legend in
   let () = data draw_fun s.legend f s.points in
   Format.fprintf f "</svg>"
+
+let to_string ?(width=800) s =
+  let b = Buffer.create 1024 in
+  let f = Format.formatter_of_buffer b in
+  let size = (width,int_of_float (float width /. sqrt 2.)) in
+  let border = (10,70,25) in
+  let () = draw size border f s in
+  Buffer.contents b
 
 let to_file s =
   let (form,chan) = new_file s.file in

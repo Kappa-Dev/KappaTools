@@ -127,7 +127,7 @@ type ('agent,'mixture,'rule) compil =
 let result:(agent,mixture,rule) compil ref =
   ref {variables=[]; signatures=[]; rules=[]; init=[]; observables=[];
        perturbations=[]; configurations=[]; tokens=[]; volumes=[]}
-let init_compil _ =
+let init_compil () =
   result :=
     {variables=[]; signatures=[]; rules=[]; init = []; observables=[];
      perturbations=[]; configurations=[]; tokens=[]; volumes=[]}

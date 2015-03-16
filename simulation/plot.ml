@@ -19,6 +19,14 @@ let plotDescr = ref (Wait "__dummy")
 
 let create filename = plotDescr := Wait filename
 
+let value width =
+  match !plotDescr with
+  | Wait _ -> ""
+  | Ready plot ->
+     match plot.format with
+     | Raw _ ->  ""
+     | Svg s -> Pp_svg.to_string ~width s
+
 let close form counter =
   match !plotDescr with
   | Wait _ -> ()

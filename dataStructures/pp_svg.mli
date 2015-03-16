@@ -6,4 +6,5 @@ type store = {
   mutable points: (float * Nbr.t array) list;
 }
 
+val to_string : ?width:int -> store -> string
 val to_file : store -> unit
