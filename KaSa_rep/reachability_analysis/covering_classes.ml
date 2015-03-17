@@ -287,7 +287,3 @@ let covering_classes parameters error handler cc_compil =
       parameters
       result
   in error, result
-
-(*test union_find function*)
-(*let test parameter error =
-  Union_find.Union_find_array.create parameter error 0*)
