@@ -78,7 +78,7 @@ let main () =
     else error
   in
   (*stochastic classes*)
-  (*let parameters_cv = print_string "Stochastic_classes:\n";
+  let parameters_cv = print_string "Stochastic_classes:\n";
     Remanent_parameters.update_prefix
       parameters "Agent_type:" in
   let error =
@@ -87,7 +87,7 @@ let main () =
       let error, stochastic_classes =
         Stochastic_classes.stochastic_classes parameters_cv error handler c_compil in error     
     else error
-  in*)
+  in
  
   let _ = Exception.print parameters error  in
    ()
