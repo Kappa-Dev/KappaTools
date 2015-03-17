@@ -485,4 +485,4 @@ Agent_type:1:
 Covering_class_id:0:site_type:{0}
 Agent_type:2:
 Covering_class_id:0:site_type:{0,1,2,3}
-execution finished without any exception
+Stochastic_classes:

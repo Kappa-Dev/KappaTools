@@ -203,4 +203,4 @@ Agent_type:0:
 Covering_class_id:0:site_type:{0,1}
 Agent_type:1:
 Covering_class_id:0:site_type:{0,1}
-execution finished without any exception
+Stochastic_classes:

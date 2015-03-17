@@ -134,4 +134,6 @@ Influence_map:Wake_up_map:rule(3):'\0' A(x~q)->A(x~p) -> rule(1):'otherothervery
 Covering_classes:
 Agent_type:0:
 Covering_class_id:0:site_type:{0}
+Stochastic_classes:
+START
 execution finished without any exception

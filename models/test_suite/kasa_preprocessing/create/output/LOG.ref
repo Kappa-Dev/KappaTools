@@ -75,4 +75,6 @@ Influence_map:Wake_up_map:rule(0):'r1' A(x)->A(x!1),A(y!1) -> rule(0):'r1' A(x)-
 Covering_classes:
 Agent_type:0:
 Covering_class_id:0:site_type:{0}
+Stochastic_classes:
+START
 execution finished without any exception

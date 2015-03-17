@@ -108,4 +108,6 @@ Agent_type:0:
 Covering_class_id:0:site_type:{0}
 Agent_type:2:
 Covering_class_id:0:site_type:{0}
+Stochastic_classes:
+START
 execution finished without any exception
