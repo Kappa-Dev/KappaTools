@@ -20,7 +20,7 @@ type edge = ToNode of int * int | ToNew of int * int * int (* type, id, port *)
 type son = {
   extra_edge: ((int*int)*edge);
   dst: int (** t.id *);
-  inj: int array;
+  inj: Dipping.t;
   above_obs: int list;
 }
 
@@ -85,17 +85,17 @@ let equal max_id cc1 cc2 =
     IntMap.fold
       (fun k a out->
        out &&
-	 let a' = IntMap.find iso.(k) cc2.internals in
+	 let a' = IntMap.find (Dipping.apply iso k) cc2.internals in
 	 Tools.array_fold_left2i (fun _ b x y -> b && x = y) true a a')
       cc1.internals true in
   let rec admissible_mapping iso = function
     | [] -> if internals_are_ok iso then [iso] else []
     | (x,y) :: t ->
-       let cand = iso.(x) in
-       if cand <> -1 then
-       if cand = y then admissible_mapping iso t else []
-       else
-	 let () = iso.(x) <- y in
+       try
+	 let cand = Dipping.apply iso x in
+	 if cand = y then admissible_mapping iso t else []
+       with Dipping.Undefined ->
+	 let iso' = Dipping.add x y iso in
 	 let n_x = IntMap.find x cc1.links in
 	 let n_y = IntMap.find y cc2.links in
 	 try
@@ -107,22 +107,21 @@ let equal max_id cc1 cc2 =
 				    when i = j -> (a,b)::out
 			       | (UnSpec | Free | Link _), _ ->
 				  raise Not_found) t n_x n_y in
-	   admissible_mapping iso remains
+	   admissible_mapping iso' remains
 	 with Not_found -> []
   in
-  if cc1 == cc2 then [Array.init max_id (fun x -> x)] else
+  if cc1 == cc2 then [Dipping.identity (Array.fold_left List.append [] cc1.nodes_by_type)] else
     match Tools.array_fold_left2i always_equal_min_but_not_null (Some (0,[],[]))
 				  cc1.nodes_by_type cc2.nodes_by_type with
     | None -> []
     | Some (_,l1,l2) ->
        match l1 with
-       | [] -> let empty_inj = Array.make max_id (-1) in [empty_inj]
+       | [] -> [Dipping.empty]
        | h :: _ ->
 	  let rec find_admissible = function
 	    | [] -> []
 	    | x ::  t ->
-	       let empty_inj = Array.make max_id (-1) in
-	       match admissible_mapping empty_inj [(h,x)] with
+	       match admissible_mapping Dipping.empty [(h,x)] with
 	       | [] -> find_admissible t
 	       | _ :: _ as l -> l in
 	  find_admissible l2
@@ -132,6 +131,38 @@ let find_ty cc id =
     assert (i >= 0);
     if List.mem id cc.nodes_by_type.(i) then i else aux (pred i)
   in aux (Array.length cc.nodes_by_type - 1)
+
+let to_navigation cc =
+  let rec build_for out don = function
+    | [] -> out
+    | h ::  t ->
+       let out_ints =
+	 Tools.array_fold_lefti
+	   (fun i acc v -> if v < 0 then acc else ((h,i),ToInternal v)::acc)
+	   out (IntMap.find h cc.internals) in
+       let out',todo =
+	 Tools.array_fold_lefti
+	   (fun i (ans,re as acc) ->
+	    function
+	    | UnSpec -> acc
+	    | Free ->
+	       if i > 0 then (((h,i),ToNothing)::ans,re) else acc
+	    | Link (n,l) ->
+	       if List.mem n don then acc
+	       else if List.mem n re
+	       then (((h,i),ToNode (n,l))::ans,re)
+	       else
+		 (((h,0),ToNothing)::((h,i),ToNew (find_ty cc h,n,l))::ans,
+		  h::re))
+	   (out_ints,t) (IntMap.find h cc.links) in
+       build_for out' (h::don) todo in
+  let rec find_root i =
+    if i = Array.length cc.nodes_by_type
+    then []
+    else match cc.nodes_by_type.(i) with
+	 | [] -> find_root (succ i)
+	 | x :: _ -> build_for [(x,0),ToNothing] [] [x]
+  in find_root 0
 
 let print with_id sigs f cc =
   let print_intf (_,_,ag_i as ag) link_ids internals neigh =
@@ -261,7 +292,7 @@ module Env : sig
   val fresh : Signature.s -> int list array -> int -> point IntMap.t -> t
   val empty : Signature.s -> t
   val sigs : t -> Signature.s
-  val find : t -> cc -> (int * int array * point) option
+  val find : t -> cc -> (int * Dipping.t * point) option
   val get : t -> int -> point
   val check_vitality : t -> unit
   val cc_map : t -> cc IntMap.t
@@ -345,6 +376,20 @@ let to_work env =
     cc_internals = IntMap.empty;
     dangling = (0,0,0);
   }
+
+(** Behare of invarient on nav (it starts by a first element of
+id_by_type (so that we don't need to apply an injection on it to get
+the canonical))) *)
+let navigate env nav =
+  let rec aux inj i = function
+    | [] -> Some i
+    | h :: t ->
+       let point = IntMap.find i env.domain in
+       try
+	 let son = List.find (fun s -> s.extra_edge = h) point.sons in
+	 aux (Dipping.compose inj son.inj) son.dst t
+       with Not_found -> None
+  in aux Dipping.empty 0 nav
 
 let find env cc =
   IntMap.fold (fun id point ->
@@ -508,10 +553,12 @@ let rec complete_domain_with obs_id dst env free_id cc edge =
      (free_id,propagate_add_obs obs_id (Env.add_point cc_id point'' env) cc_id)
      , cc_id
   | None ->
-     let son = new_son (Array.init (Env.nb_ag env) (fun x -> x)) in
+     let son = new_son (Dipping.identity
+			  (Array.fold_left List.append [] cc.nodes_by_type)) in
      add_new_point obs_id env free_id [son] cc
 and add_new_point obs_id env free_id sons cc =
   let (free_id',cand) = compute_father_candidates free_id cc in
+  let () = Format.eprintf "%a@." (print true (Env.sigs env)) cc in
   let (free_id'',env'),fathers =
     Tools.list_fold_right_map
       (fun (free_id'',env') (cc', edge) ->
@@ -532,7 +579,7 @@ let add_domain env cc =
       else propagate_add_obs id env id),inj,point.cc
   | None ->
      let (_,env'),_ = add_new_point cc.id env (succ cc.id) [] cc in
-     (env',Array.make (Env.nb_ag env) (-1), cc)
+     (env',Dipping.empty, cc)
 
 (** Operation to create cc *)
 let check_dangling wk =

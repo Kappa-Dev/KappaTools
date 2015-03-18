@@ -23,7 +23,7 @@ val new_link :
 val new_free : work -> (node * int) -> work
 val new_internal_state : work -> (node * int) -> int -> work
 (** [new_link_type work (node,site) type] *)
-val finish_new : work -> (Env.t*int array*t)
+val finish_new : work -> (Env.t*Dipping.t*t)
 
 (** {5 Use a connected component } *)
 (*val equal : t -> t -> bool*)
