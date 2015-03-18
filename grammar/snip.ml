@@ -18,13 +18,16 @@ type rule_link =
   | L_TYPE of int * int * switching (** ty_id,p_id,switch *)
   | L_VAL of int Term.with_pos * switching
 type rule_agent =
-    { ra_type: int; ra_ports: rule_link array; ra_ints: rule_internal array; }
+    { ra_type: int;
+      ra_ports: rule_link array;
+      ra_ints: rule_internal array;
+    }
 type rule_mixture = rule_agent list
 
 type internal = int option
 type link = ANY | FREE | VAL of int
 type agent =
-    { a_type: int; a_ports: link array; a_ints: internal array; }
+    { a_id: int; a_type: int; a_ports: link array; a_ints: internal array; }
 type mixture = agent list
 
 let print_link f = function
@@ -81,25 +84,27 @@ let full_agent_of_rule_agent config rm =
 	  failwith "attempt to make an agent from an ambiguous rule agent"
        | I_CREATED _, _ -> None
       ) i in
-  List.fold_right (fun rag acc ->
+  List.fold_right (fun rag (free_id,acc) ->
 		   let ports = links_of_rule_links rag.ra_ports in
 		   let ints = ints_of_rule_ints rag.ra_ints in
 		   if Array.fold_left (fun b e -> b || e <> ANY) false ports ||
 			Array.fold_left (fun b e -> b || e <> None) false ints
 		   then
+		     succ free_id,
 		     {
+		       a_id = free_id;
 		       a_type = rag.ra_type;
 		       a_ports = ports;
 		       a_ints = ints;
 		     }:: acc
-		   else acc) rm []
+		   else succ free_id,acc) rm (0,[])
 
 let agent_of_rule_agent_positive rm =
-  full_agent_of_rule_agent (Some true) rm
+  snd (full_agent_of_rule_agent (Some true) rm)
 let agent_of_rule_agent_negative rm =
-  full_agent_of_rule_agent (Some false) rm
+  snd (full_agent_of_rule_agent (Some false) rm)
 let agent_of_rule_agent rm =
-  full_agent_of_rule_agent None rm
+  snd (full_agent_of_rule_agent None rm)
 
 let links_are_compatibles i j l =
   let rec aux acc = function
@@ -138,7 +143,8 @@ let agents_are_compatibles contraints o p =
 	      (Some contraints) o.a_ports p.a_ports with
       | None -> None
       | Some l' ->
-	 Some ({a_type = o.a_type; a_ports = ports; a_ints = ints },l')
+	 Some ({a_id = o.a_id; a_type = o.a_type;
+		a_ports = ports; a_ints = ints },l')
     else None
   else None
 
@@ -147,23 +153,27 @@ let intersect ag1 ag2 =
 		    (fun i b x y -> b || (i <> 0 && x <>y)) false a1 a2 in
   aux ag1.a_ports ag2.a_ports || aux ag1.a_ints ag2.a_ints
 
-let rec differences_under_contraints inter acc b1 r1 b2 r2 l =
+let rec differences_under_contraints inter forbidden acc b1 r1 b2 r2 l =
   match r1, r2 with
   | [],_ -> if l = [] && inter then [List.rev_append b1 acc] else []
   | _,[] -> if l = [] && inter
 	    then [List.rev_append b1 (List.rev_append acc r1)] else []
   | h1::t1, h2::t2 ->
-     (match agents_are_compatibles l h1 h2 with
-     | None -> []
-     | Some (a,l') ->
-	differences_under_contraints
-	  (inter || intersect h1 a)
-	  (a::acc) [] (List.rev_append b1 t1) [] (List.rev_append b2 t2) l') @
-       differences_under_contraints inter acc (h1::b1) t1 b2 r2 l @
-	 differences_under_contraints inter acc b1 r1 (h2::b2) t2 l
+     let pair = (h1.a_id,h2.a_id) in
+     (if List.mem pair forbidden then [] else
+	match agents_are_compatibles l h1 h2 with
+	| None -> []
+	| Some (a,l') ->
+	   differences_under_contraints
+	     (inter || intersect h1 a) forbidden
+	     (a::acc) [] (List.rev_append b1 t1) [] (List.rev_append b2 t2) l')@
+       differences_under_contraints inter (pair::forbidden) acc
+				    (h1::b1) t1 b2 r2 l @
+	 differences_under_contraints inter (pair::forbidden) acc
+				      b1 r1 (h2::b2) t2 l
 
 let differences o p =
-  differences_under_contraints false [] [] o [] p []
+  differences_under_contraints false [] [] [] o [] p []
 
 let build_l_type sigs dst_ty dst_p switch =
   let ty_id = Signature.num_of_agent dst_ty sigs in
@@ -315,17 +325,18 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
        register_port_modif p_id (Term.with_dummy_pos Ast.LNK_ANY) p) rp_r in
   { ra_type = ag_id; ra_ports = ports; ra_ints = internals; }
 
-let rec annotate_lhs_with_diff sigs lhs rhs =
+let rec annotate_lhs_with_diff sigs acc lhs rhs =
   match lhs,rhs with
   | ((lag_na,_ as ag_ty),lag_p)::lt, ((rag_na,_),rag_p)::rt
        when String.compare lag_na rag_na = 0 ->
-     annotate_agent_with_diff sigs ag_ty lag_p rag_p
-     :: annotate_lhs_with_diff sigs lt rt
+     annotate_lhs_with_diff
+       sigs (annotate_agent_with_diff sigs ag_ty lag_p rag_p::acc) lt rt
   | erased, added ->
-     List.fold_left (fun acc x -> annotate_dropped_agent sigs x::acc)
+     List.fold_left (fun acc x ->
+		     annotate_dropped_agent sigs x::acc)
 		    (List.fold_left
-		       (fun acc x -> annotate_created_agent sigs x::acc)
-		       [] added)
+		       (fun acc x ->
+			annotate_created_agent sigs x::acc) acc added)
 		    erased
 
 let ports_from_contact_map sigs contact_map ty_id p_id =
@@ -333,8 +344,10 @@ let ports_from_contact_map sigs contact_map ty_id p_id =
   let p_na = Format.asprintf "%a" (Signature.print_site sigs ty_id) p_id in
   let cand = snd (Export_to_KaSim.String2Map.find (ty_na,p_na) contact_map) in
   List.map (fun (ty_na,p_na) ->
-	    let ty_id = Signature.num_of_agent (Term.with_dummy_pos ty_na) sigs in
-	    (ty_id,Signature.id_of_site (Term.with_dummy_pos ty_na) (Term.with_dummy_pos p_na) sigs))
+	    let ty_id =
+	      Signature.num_of_agent (Term.with_dummy_pos ty_na) sigs in
+	    (ty_id,Signature.id_of_site (Term.with_dummy_pos ty_na)
+					(Term.with_dummy_pos p_na) sigs))
 	   cand
 
 let internals_from_contact_map sigs contact_map ty_id p_id =
@@ -566,7 +579,7 @@ let connected_components_of_mixture env mix =
   in aux env [] mix
 
 let rule_mixtures_of_ambiguous_rule contact_map sigs lhs rhs =
-  let precomp_mixs = annotate_lhs_with_diff sigs lhs rhs in
+  let precomp_mixs = List.rev (annotate_lhs_with_diff sigs [] lhs rhs) in
   add_implicit_infos
     sigs (find_implicit_infos sigs contact_map precomp_mixs)
 
