@@ -26,7 +26,7 @@ let empty_classes parameter error handler =
   {
      Covering_classes_type.covering_classes  = covering_classes
   }
-    
+                     
 let length_sorted lists =
   let list_length = List.rev_map (fun list -> list, List.length list) lists in
   let lists = List.sort (fun a b -> compare (snd a) (snd b)) list_length in
@@ -165,8 +165,8 @@ let clean_new parameter error classes =
                        aux q potential_supersets)
                  (error, empty_acc) lists_to_deal_with
 
-let add_covering_class parameter error agent_type new_covering_class covering_classes =
-  match new_covering_class with
+let add_covering_class parameter error agent_type sites_list covering_classes =
+  match sites_list with
     | [] -> error, covering_classes
     | _ ->
        let error, agent =
@@ -179,10 +179,10 @@ let add_covering_class parameter error agent_type new_covering_class covering_cl
        let old_list =
          match agent with
          | None -> []
-         | Some a -> a
+         | Some sites -> sites
        in
        (* store the new list of covering classes *)
-       let new_list = (List.rev new_covering_class) :: old_list in
+       let new_list = (List.rev sites_list) :: old_list in
        Covering_classes_type.AgentMap.set
          parameter
          error
@@ -207,10 +207,10 @@ let scan_rule parameter error handler rule classes =
          match agent with
          | Cckappa_sig.Ghost -> error, covering_classes
          | Cckappa_sig.Agent agent ->
-            let new_covering_class =
+            let sites_list =
               Cckappa_sig.Site_map_and_set.fold_map
-	        (fun site _ current_covering_class ->
-                 site::current_covering_class)
+	        (fun site _ current_class ->
+                 site::current_class)
                 agent.Cckappa_sig.agent_interface []
             in          
             let agent_type = agent.Cckappa_sig.agent_name in
@@ -221,7 +221,7 @@ let scan_rule parameter error handler rule classes =
                 parameter
                 error
                 agent_type
-                new_covering_class
+                sites_list
                 covering_classes
             in
             error, covering_classes                   

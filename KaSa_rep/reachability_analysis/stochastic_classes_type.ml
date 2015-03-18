@@ -20,8 +20,8 @@ let local_trace = false
 module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
 
 (*type sites_stochastic_classes = int list list AgentMap.t*)
-type sites_stochastic_classes = Union_find.ufind AgentMap.t (*FIXME ufind list t?*)
-
+type sites_stochastic_classes = Union_find.union_find AgentMap.t
+                                        
 type stochastic_classes =
   {
     stochastic_classes : sites_stochastic_classes

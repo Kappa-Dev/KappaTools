@@ -27,11 +27,11 @@ let empty_classes parameter error handler =
     Stochastic_classes_type.stochastic_classes = stochastic_classes
   }
 
-(*let rec print_list l =
-  print_string "site_type:{";
+let rec print_list l =
+  (*print_string "site_type:{";*)
   match l with
-  | [] -> print_string "empty}"
-  | h :: [] -> print_int h; print_string "} "
+  | [] -> print_string "empty"
+  | h :: [] ->  print_int h; print_string " "
   | h :: tl ->
      let _ = print_int h; print_string "," in
      print_list tl
@@ -41,12 +41,45 @@ let rec print_list_list ls =
   | [] -> ()
   | h :: tl ->
      let _ = print_list h in
-     print_list_list tl*)
+     print_list_list tl
 
+let print_stochastic_classes parameter error stochastic_classes =
+  Stochastic_classes_type.AgentMap.print
+    error
+    (fun error parameter u ->
+     let _ = print_string "\nPrint union";
+             Union_find.print_union u; 
+             print_string "\n"
+     in
+     error)
+    parameter
+    stochastic_classes
+
+(*MOVE*)
+module Stochastic_classes =
+  struct
+    type t = Union_find.union_find
+    let compare = compare
+  end
+
+module Dictionary_of_Stochastic_classes =
+  Dictionary.Dictionary_of_Ord (Stochastic_classes)
+                               
+type remanent_dic = (unit, unit) Dictionary_of_Stochastic_classes.dictionary
+type remanent = {dic : remanent_dic}
+
+(*
+let equivalence_classes parameter error classes =
+  let init_dic = Dictionary_of_Stochastic_classes.init () in
+  let init_remanent = {dic = init_dic} in
+  (**)
+ *)
+                                       
+    
 let add_stochastic_class parameter error agent_type sites_list stochastic_classes =
   match sites_list with
-  | [] | [_] -> error, stochastic_classes
-  | t :: q ->
+  | [] -> error, stochastic_classes                         
+  | t :: tl ->
      let error, agent =
        Stochastic_classes_type.AgentMap.unsafe_get
          parameter
@@ -59,17 +92,21 @@ let add_stochastic_class parameter error agent_type sites_list stochastic_classe
      let old_list =
        match agent with
        | None -> empty_ufind
-       | Some a -> a
+       | Some sites -> sites
      in
-     (*store the new list of stochastic classes*)(*FIXME*)
-     let new_list = List.fold_left
-                      (fun _ t' ->
-                       Union_find.union old_list t t') empty_ufind q
+     (*store the new list of stochastic classes*)
+     let new_list = List.fold_left (fun union t' ->
+                                    Union_find.union t t' union) old_list tl
+     in
+     (*TEST*)
+     (*let _ = print_string "\nPRINT old_list:";
+             Union_find.print_union old_list;
+             print_string "\n"
      in
      let _ = print_string "\nPRINT new_list:";
              Union_find.print_union new_list;
              print_string "\n"
-     in
+     in*)
      (*add this new list into the result list*)
      Stochastic_classes_type.AgentMap.set
        parameter
@@ -147,15 +184,6 @@ let stochastic_classes parameter error handler cc_compil =
   let error, result =
     scan_rule_set parameter error handler cc_compil.Cckappa_sig.rules in
   let _ = print_string "START\n";
-    Stochastic_classes_type.AgentMap.print
-      error
-      (fun error parameter u ->
-       let _ = print_string "\nPrint union";
-         Union_find.print_union u; 
-         print_string "\n"
-       in
-       error)
-      parameter
-      result
+          print_stochastic_classes parameter error result
   in
   error, result

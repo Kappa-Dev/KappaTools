@@ -13,134 +13,46 @@
     * en Automatique.  All rights reserved.  This file is distributed     
     *  under the terms of the GNU Library General Public License *)
 
-module type Storage =
-  sig
-    type t = data ref
-     and data = Array of int array
-              | Node_Array of int * int * t
+type union_find =
+    {
+      treeArr: int array
+    }
 
-    val create : int -> int -> data ref
-    val init : int -> (int -> int) -> data ref
-    val rerootk : t -> (unit -> 'a) -> 'a
-    val reroot : t -> unit
-    val get : t -> int -> int
-    val set : t -> int -> int -> t
-    val print_array : t -> unit
-
-  end
-
-module UnionFind =
-  (struct
-      type t = data ref
-       and data =
-         | Array of int array 
-         | Node_Array of int * int * t
-                                       
-      let create n v = ref (Array (Array.make n v))
-      let init n f = ref (Array (Array.init n f))
-                         
-      (* reroot t ensures that t becomes an Array node *)
-      let rec reroot t =
-        match !t with
-        | Array _ -> ()
-        | Node_Array (i, v, t') -> 
-           reroot t';
-           begin match !t' with
-                 | Array a as n ->
-                    let v' = a.(i) in
-                    a.(i) <- v;
-                    t := n;
-                    t' := Node_Array (i, v', t)
-                 | Node_Array _ -> assert false
-           end
-             
-      let rec rerootk t k =
-        match !t with
-        | Array _ -> k ()
-        | Node_Array (i, v, t') -> 
-           rerootk t' (fun () ->
-                       begin
-                         match !t' with
-                         | Array a as n ->
-                            let v' = a.(i) in
-                            a.(i) <- v;
-                            t := n;
-                            t' := Node_Array (i, v', t)
-                         | Node_Array _ -> assert false
-                       end;
-                       k()
-                      )
-
-      let reroot t = rerootk t (fun () -> ())
-
-      let rec get t i =
-        match !t with
-        | Array a -> 
-           a.(i)
-        | Node_Array _ -> 
-           reroot t; 
-           begin
-             match !t with
-             | Array a -> a.(i)
-             | Node_Array _ -> assert false
-           end
-             
-      let set t i v = 
-        reroot t;
-        match !t with
-        | Array a as n ->
-           let old = a.(i) in
-           if old == v then
-             t
-           else begin
-               a.(i) <- v;
-               let res = ref n in
-               t := Node_Array (i, old, res);
-               res
-             end
-        | Node_Array _ -> assert false
-
-      let rec print_array t =
-        match !t with
-        | Array l -> Array.iter (fun i -> print_int i; print_string " ") l
-        | Node_Array (_,_,t')-> print_array t'
-                                            
-    end)
-
-(****************************************************************************)
-(* union find *)
-
-type ufind = { 
-    mutable father: UnionFind.t; (* mutable to allow path compression *)
+let create n =
+  {
+    treeArr = Array.init n (fun i -> i)
   }
-      
-let create n = 
-  { father = UnionFind.init n (fun i -> i) }
 
-let rec find_aux f i = 
-  let fi = UnionFind.get f i in
-  if fi == i then 
-    f, i
-  else 
-    let f, r = find_aux f fi in 
-    let f = UnionFind.set f i r in
-    f, r
-      
-let find h x = 
-  let f, rx = find_aux h.father x in
-  h.father <- f;
-  rx
-  
-let union h x y =
-  let rx = find h x in
-  let ry = find h y in
-  if rx != ry
-  then
-    begin
-      { father = UnionFind.set h.father ry rx }
-    end
-  else
-    h
+(* findSet(e): which return a pointer to the representative of the set
+   containing e. Since the set are disjoint, e containted in one set
+   only. Therefore, the returned representative can be uniquely determined.
+*)
 
-let print_union {father} =
-  UnionFind.print_array father
+let findSet e union_find =
+  let treeArr = union_find.treeArr in
+  let pointToRoot root =
+    List.iter (fun i -> treeArr.(i) <- root) in
+  let rec helper e l =
+    let parent = treeArr.(e) in
+    if e <> parent
+    then
+      helper parent (e::l)
+    else
+      begin
+        (* we hit the root node make all collected nodes on the
+           path point to the root. and return the root afterwards *)
+        pointToRoot parent l;
+        parent;
+      end
+  in
+  helper e []
+
+let union x y union_find =
+  let root_x = findSet x union_find in
+  let root_y = findSet y union_find in
+  let treeArr = union_find.treeArr in
+  treeArr.(root_x) <- root_y;
+  union_find
+                        
+let print_union {treeArr} =
+  Array.iter (fun x -> print_int x; print_string " ") treeArr
