@@ -22,17 +22,11 @@ exception Internal_Error of string Term.with_pos
 exception Semantics_Error of Tools.pos * string
 exception Unsatisfiable
 
-let warning_buffer:(Format.formatter -> unit) list ref = ref []
+let warning_buffer:
+      ((Lexing.position * Lexing.position) option*(Format.formatter -> unit)) list ref = ref []
 
 let warning ?pos msg =
-  let pr f =
-    match pos with
-    | Some pos -> Format.fprintf f "%a@," Pp.position pos
-    | None -> Format.fprintf f ""
-  in
-  warning_buffer :=
-    (fun f -> Format.fprintf f "@[<v>%tWarning: @[%t@]@]@." pr msg)::
-      !warning_buffer
+  warning_buffer :=(pos,msg)::!warning_buffer
 
 let deprecated ~pos entry msg =
   warning ~pos (fun f -> Format.fprintf f "Deprecated %s syntax:@ %t" entry msg)
@@ -40,4 +34,10 @@ let deprecated ~pos entry msg =
 let flush_warning f =
   let () = Format.pp_print_newline f () in
   let l = List.rev !warning_buffer in
-  List.iter (fun s -> s f) l
+  List.iter (fun (pos,msg) ->
+	     let pr f =
+	       match pos with
+	       | Some pos -> Format.fprintf f "%a@," Pp.position pos
+	       | None -> Format.fprintf f ""
+	     in
+	     Format.fprintf f "@[<v>%tWarning: @[%t@]@]@." pr msg) l
