@@ -13,15 +13,6 @@
    let pos = lexbuf.lex_curr_p in
    (pos.pos_fname, pos.pos_lnum, pos.pos_cnum - pos.pos_bol)
 
- let return_error f opt_pos lexbuf msg =
-   let fn,lnum,cnum =
-     match opt_pos with
-     | Some (fn,ln,cn) -> (fn,ln,cn)
-     | None -> position lexbuf
-   in
-   let loc f = Format.fprintf f "line %d, character %d:" lnum cnum in
-   Format.fprintf f "Error (%s) %t %s@." fn loc msg
-
  let keyword_or_id =
  let keywords = Hashtbl.create 15 in
  let () = Hashtbl.add keywords "do" DO in
@@ -69,8 +60,9 @@ rule token = parse
 		      | s ->
 			 raise
 			   (Syntax_Error
-			      (Some (position lexbuf),
-			       ("Perturbation effect \""^s^"\" is not defined")))
+			      ("Perturbation effect \""^s^"\" is not defined",
+			       (Lexing.lexeme_start_p lexbuf,
+				Lexing.lexeme_end_p lexbuf)))
 		     }
 	 | '[' {let lab = read_label [] [']'] lexbuf in
 		match lab with
@@ -97,8 +89,9 @@ rule token = parse
 		| "p" -> PLOTNUM
 		| _ as s ->
 		   raise (Syntax_Error
-			    (Some (position lexbuf),
-			     ("Symbol \""^s^"\" is not defined")))
+			    ("Symbol \""^s^"\" is not defined",
+			     (Lexing.lexeme_start_p lexbuf,
+			      Lexing.lexeme_end_p lexbuf)))
 	       }
 	 | ':' {TYPE}
 	 | ';' {SEMICOLON}
@@ -139,8 +132,9 @@ rule token = parse
 		| "def" -> (CONFIG pos)
 		| "token" -> (TOKEN pos)
 		| _ as s ->
-		   raise (Syntax_Error (Some (position lexbuf),
-					("Instruction \""^s^"\" not recognized")))
+		   raise (Syntax_Error ("Instruction \""^s^"\" not recognized",
+					(Lexing.lexeme_start_p lexbuf,
+					 Lexing.lexeme_end_p lexbuf)))
 	       }
 	 | '!' {let pos = position lexbuf in KAPPA_LNK pos}
 	 | internal_state as s {let i = String.index s '~' in
@@ -153,8 +147,9 @@ rule token = parse
 	 | eof {reach_eof lexbuf; EOF}
 	 | _ as c {
 		    raise (Syntax_Error
-			     (Some (position lexbuf),
-			      (Format.sprintf "invalid use of character %c" c)))
+			     ("invalid use of character "^ String.make 1 c,
+			      (Lexing.lexeme_start_p lexbuf,
+			       Lexing.lexeme_end_p lexbuf)))
 		  }
 
 and read_label acc char_list =
@@ -190,10 +185,10 @@ and inline_comment = parse
       KappaParser.start_rule token lexbuf ; Debug.tag logger "done" ; close_in d ;
       Parameter.openInDescriptors := List.tl (!Parameter.openInDescriptors)
     with
-    | Syntax_Error (opt_pos,msg) ->
+    | Syntax_Error (msg,pos) ->
        (close_in d ;
 	Parameter.openInDescriptors := List.tl (!Parameter.openInDescriptors);
-	let () = return_error Format.err_formatter opt_pos lexbuf msg in
+	let () = Pp.error Format.pp_print_string (msg,pos) in
 	exit 1
        )
 }
