@@ -88,27 +88,26 @@ start_rule:
 		    end ; $2
 		  }
     | error
-	{raise (ExceptionDefn.Syntax_Error (None, "Syntax error"))}
+	{raise (ExceptionDefn.Syntax_Error (add_pos "Syntax error"))}
     ;
 
 instruction:
     | SIGNATURE agent_expression {Ast.SIG $2}
     | TOKEN ID {let str,pos = $2 in Ast.TOKENSIG (str,rhs_pos 2)}
     | SIGNATURE error {raise (ExceptionDefn.Syntax_Error
-				(Some $1,"Malformed agent signature, I was expecting something of the form '%agent: A(x,y~u~v,z)'"))}
+				(add_pos "Malformed agent signature, I was expecting something of the form '%agent: A(x,y~u~v,z)'"))}
 
     | INIT init_declaration
 	   {let (opt_vol,init) = $2 in Ast.INIT (opt_vol,init,$1)}
     | INIT error
-	   {let pos = $1 in
-	    raise (ExceptionDefn.Syntax_Error
-		     (Some pos,"Malformed initial condition"))}
+	{ raise (ExceptionDefn.Syntax_Error
+		   (add_pos "Malformed initial condition"))}
 
     | LET variable_declaration {Ast.DECLARE $2}
     | OBS variable_declaration {Ast.OBS $2}
     | PLOT alg_expr {Ast.PLOT $2}
     | PLOT error {raise (ExceptionDefn.Syntax_Error
-			   (Some $1,"Malformed plot instruction, I was expecting an algebraic expression of variables"))}
+			   (add_pos "Malformed plot instruction, I was expecting an algebraic expression of variables"))}
     | PERT perturbation_declaration
 	   {let (bool_expr,mod_expr_list) = $2 in
 	    Ast.PERT (add_pos (bool_expr,mod_expr_list,None))}
@@ -192,13 +191,13 @@ effect:
     | INTRO multiple_mixture
 	    {let (alg,mix) = $2 in Ast.INTRO (alg,mix,$1)}
     | INTRO error
-	    {raise (ExceptionDefn.Syntax_Error (Some $1,
-						"Malformed perturbation instruction, I was expecting '$ADD alg_expression kappa_expression'"))}
+	{raise (ExceptionDefn.Syntax_Error
+		  (add_pos "Malformed perturbation instruction, I was expecting '$ADD alg_expression kappa_expression'"))}
     | DELETE multiple_mixture
 	     {let (alg,mix) = $2 in Ast.DELETE (alg,mix,$1)}
     | DELETE error
-	     {raise (ExceptionDefn.Syntax_Error (Some $1,
-						 "Malformed perturbation instruction, I was expecting '$DEL alg_expression kappa_expression'"))}
+	{raise (ExceptionDefn.Syntax_Error
+		  (add_pos "Malformed perturbation instruction, I was expecting '$DEL alg_expression kappa_expression'"))}
     | ID LAR alg_expr /*updating the value of a token*/
 						{Ast.UPDATE_TOK ($1,$3)}
     | SNAPSHOT print_expr {Ast.SNAPSHOT ($2,$1)}
@@ -235,8 +234,7 @@ variable_declaration:
     | LABEL error
 	    {raise
 	       (ExceptionDefn.Syntax_Error
-		  (Some (Tools.pos_of_lex_pos (Parsing.symbol_start_pos ())),
-		   "Illegal definition of variable '"^$1^"'"))
+		  (add_pos ("Illegal definition of variable '"^$1^"'")))
 	    }
     ;
 
@@ -272,9 +270,8 @@ token_expr:
   /*empty*/ {[]}
     | PIPE sum_token {$2}
     | PIPE error
-	   {let pos = $1 in
-	    raise (ExceptionDefn.Syntax_Error (Some pos,
-					       "Malformed token expression, I was expecting a_0 t_0 + ... + a_n t_n, where t_i are tokens and a_i any algebraic formula"))}
+	{raise (ExceptionDefn.Syntax_Error
+		  (add_pos  "Malformed token expression, I was expecting a_0 t_0 + ... + a_n t_n, where t_i are tokens and a_i any algebraic formula"))}
     ;
 
 sum_token:
@@ -401,7 +398,7 @@ agent_expression:
     | ID error
 	 {let str,pos = $1 in
 	  raise (ExceptionDefn.Syntax_Error
-		   (Some pos,"Malformed agent '"^str^"'"))}
+		   (add_pos ("Malformed agent '"^str^"'")))}
     ;
 
 interface_expression:
@@ -425,7 +422,7 @@ internal_state:
   /*empty*/ {[]}
     | KAPPA_MRK internal_state {add_pos $1::$2}
     | error
-	{raise (ExceptionDefn.Syntax_Error (None,"Invalid internal state"))}
+	{raise (ExceptionDefn.Syntax_Error (add_pos "Invalid internal state"))}
     ;
 
 link_state:
@@ -436,9 +433,8 @@ link_state:
 				      ((fst $2,rhs_pos 2),(fst $4,rhs_pos 4)))}
     | KAPPA_WLD {add_pos Ast.LNK_ANY}
     | KAPPA_LNK error
-		{let pos = $1 in
-		 raise (ExceptionDefn.Syntax_Error
-			  (Some pos,"Invalid link state"))}
+	{raise (ExceptionDefn.Syntax_Error
+		  (add_pos "Invalid link state"))}
 ;
 
 %%

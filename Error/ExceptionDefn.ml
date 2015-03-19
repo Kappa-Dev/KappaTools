@@ -16,7 +16,7 @@ exception Deadlock
 exception UserInterrupted of (float -> int -> string)
 exception StopReached of string
 
-exception Syntax_Error of (Tools.pos option) * string
+exception Syntax_Error of string Term.with_pos
 exception Malformed_Decl of string Term.with_pos
 exception Internal_Error of string Term.with_pos
 exception Semantics_Error of Tools.pos * string
