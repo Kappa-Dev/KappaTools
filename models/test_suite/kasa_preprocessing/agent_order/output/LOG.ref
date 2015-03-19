@@ -149,10 +149,4 @@ Agent_type:1:
 Covering_class_id:0:site_type:{0}
 Stochastic_classes:
 START
-Agent_type:0:
-
-Print union
-Agent_type:1:
-
-Print union
 execution finished without any exception

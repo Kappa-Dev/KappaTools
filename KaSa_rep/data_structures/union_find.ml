@@ -51,8 +51,27 @@ let union x y union_find =
   let root_x = findSet x union_find in
   let root_y = findSet y union_find in
   let treeArr = union_find.treeArr in
-  treeArr.(root_x) <- root_y;
+  treeArr.(root_y) <- root_x;
   union_find
-                        
+
+let union_list l union_find =
+  match l with
+    | [] -> union_find
+    | h :: tl ->
+       List.fold_left (fun union_c t -> 
+                       union h t union_c) union_find tl
+                                
+let list_of_union {treeArr} =
+  let rec list_of_union i res =
+    if i < 0
+    then res
+    else
+      list_of_union (i - 1) (Array.unsafe_get treeArr i :: res)
+  in
+  list_of_union (Array.length treeArr - 1) []
+
+let union_of_list l =
+  {treeArr = Array.of_list l}
+
 let print_union {treeArr} =
   Array.iter (fun x -> print_int x; print_string " ") treeArr

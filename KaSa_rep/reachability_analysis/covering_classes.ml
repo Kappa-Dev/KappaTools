@@ -189,7 +189,7 @@ let add_covering_class parameter error agent_type sites_list covering_classes =
          agent_type
          new_list
          covering_classes
-           
+                
 let scan_rule parameter error handler rule classes =
   let viewslhs = rule.Cckappa_sig.rule_lhs.Cckappa_sig.views in
   let rule_diff = rule.Cckappa_sig.diff_reverse in
@@ -212,7 +212,7 @@ let scan_rule parameter error handler rule classes =
 	        (fun site _ current_class ->
                  site::current_class)
                 agent.Cckappa_sig.agent_interface []
-            in          
+            in
             let agent_type = agent.Cckappa_sig.agent_name in
             (* store new_covering_class in the classes of the agent type
                agent_type *)
@@ -258,7 +258,7 @@ let scan_rule_set parameter error handler rules =
       init
   in
   error, result
-          
+
 let covering_classes parameters error handler cc_compil =
   let error,result = scan_rule_set parameters error handler cc_compil.Cckappa_sig.rules in
   let _ =
