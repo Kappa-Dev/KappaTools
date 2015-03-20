@@ -170,7 +170,7 @@ let stochastic_classes parameter error handler cc_compil =
           Stochastic_classes_type.AgentMap.print
             error
             (fun error parameter ls ->
-             let _ = print_string "site_type:{"  in
+             let _ = print_string "site_type:{{"  in
              print_list_list ls;              
              let _ = print_newline () in
              error)

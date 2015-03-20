@@ -210,7 +210,7 @@ union_list:{1,1}
 new_list:{{1,1}}
 START
 Stochastic_classes:agent_type:0:
-site_type:{1,1}}
+site_type:{{1,1}}
 Stochastic_classes:agent_type:1:
-site_type:{1,1}}
+site_type:{{1,1}}
 execution finished without any exception
