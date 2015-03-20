@@ -259,7 +259,13 @@ Covering_class_id:0:site_type:{0,1}
 Covering_classes:agent_type:2:
 Covering_class_id:0:site_type:{0}
 Stochastic_classes:
+union_list:{1,1}
+new_list:{1,1}
+union_list:{1,1}
+new_list:{1,1}1,1}
+union_list:{1,1}
+new_list:{1,1}1,1}1,1}
 START
 Stochastic_classes:agent_type:1:
-List:1,1 1,1 1,1 
+site_type:{1,1}1,1}1,1}
 execution finished without any exception

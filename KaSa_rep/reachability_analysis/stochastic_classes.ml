@@ -28,10 +28,10 @@ let empty_classes parameter error handler =
   }
 
 let rec print_list l =
-  (*print_string "site_type:{";*)
+  (*print_string "{";*)
   match l with
   | [] -> print_string "empty"
-  | h :: [] ->  print_int h; print_string " "
+  | h :: [] ->  print_int h; print_string "}"
   | h :: tl ->
      let _ = print_int h; print_string "," in
      print_list tl
@@ -61,6 +61,12 @@ let add_stochastic_class parameter error agent_type sites_list stochastic_classe
      in           
      let union_list = Union_find.union_list l in
      let new_list = union_list :: old_list in
+     (*TEST*)
+     let _ = print_string "union_list:{";
+             print_list union_list; print_string "\n";
+             print_string "new_list:{";
+             print_list_list new_list; print_string "\n"
+     in
      Stochastic_classes_type.AgentMap.set
        parameter
        error
@@ -202,11 +208,10 @@ let stochastic_classes parameter error handler cc_compil =
   let _ = print_string "START\n";
           Stochastic_classes_type.AgentMap.print
             error
-            (fun error parameter l ->
-             let _ = print_string "List:";
-                     print_list_list l
-             in
-             let _ = print_newline() in
+            (fun error parameter ls ->
+             let _ = print_string "site_type:{"  in
+             print_list_list ls;                             
+             let _ = print_newline () in
              error)
             parameter
             result

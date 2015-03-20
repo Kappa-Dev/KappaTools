@@ -120,3 +120,5 @@ Covering_classes:agent_type:0:
 Covering_class_id:0:site_type:{0,2}
 Covering_class_id:1:site_type:{0,1}
 Stochastic_classes:
+union_list:{1,1}
+new_list:{1,1}
