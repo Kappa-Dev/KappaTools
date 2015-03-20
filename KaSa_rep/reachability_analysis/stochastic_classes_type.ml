@@ -19,22 +19,21 @@ let local_trace = false
 
 module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
 
-module Stochastic_classes = (*REMOVE*)
-  struct
-    type t = Union_find.union_find
-    let compare = compare
-  end
-
-module Dictionary_of_Stochastic_classes =
-  Dictionary.Dictionary_of_Ord (Stochastic_classes)
-                               
-type remanent_dic = (unit, unit) Dictionary_of_Stochastic_classes.dictionary
-type remanent = {dic : remanent_dic}
-
-type sites_stochastic_classes = int list AgentMap.t
-(*type sites_stochastic_classes = remanent AgentMap.t*)(*FIXME*)
+type sites_stochastic_classes = int list list AgentMap.t
 
 type stochastic_classes =
   {
     stochastic_classes : sites_stochastic_classes
   }
+
+(*Dictionary*)
+module Stochastic_classes =
+  struct
+    type t = int list
+    let compare = compare
+  end
+
+module Dictionary_of_Stochastic_classes = Dictionary.Dictionary_of_Ord (Stochastic_classes)
+
+type remanent_dic = (unit, unit) Dictionary_of_Stochastic_classes.dictionary
+type remanent = {dic : remanent_dic}

@@ -67,20 +67,19 @@ let main () =
     else error 
   in 
   let error = Print_quarks.dot_of_influence_map parameters_influence_map error handler c_compil (wake_up_map,inhibition_map) in
-  (*covering classes*)
-  let parameters_cv = print_string "Covering_classes:\n";
-    Remanent_parameters.update_prefix
-      parameters "Agent_type:" in
+  let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "Covering_classes:\n"
+  in
+  let parameters_cv =
+    Remanent_parameters.update_prefix parameters "Covering_classes:" in
   let error =
     if (Remanent_parameters.get_trace parameters_cv) || Covering_classes.trace
     then
-      let error, covering_classes = Covering_classes.covering_classes parameters_cv error handler c_compil in error     
+      let error, covering_classes = Covering_classes.covering_classes parameters_cv error handler c_compil in error
     else error
   in
-  (*stochastic classes*)
-  let parameters_cv = print_string "Stochastic_classes:\n";
-    Remanent_parameters.update_prefix
-      parameters "Agent_type:" in
+  let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "Stochastic_classes:\n"
+  in
+  let parameters_cv = Remanent_parameters.update_prefix parameters "Stochastic_classes:" in
   let error =
     if (Remanent_parameters.get_trace parameters_cv) || Stochastic_classes.trace
     then
@@ -88,7 +87,7 @@ let main () =
         Stochastic_classes.stochastic_classes parameters_cv error handler c_compil in error     
     else error
   in
- 
+
   let _ = Exception.print parameters error  in
    ()
 

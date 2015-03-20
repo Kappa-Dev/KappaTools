@@ -189,7 +189,7 @@ let add_covering_class parameter error agent_type sites_list covering_classes =
          agent_type
          new_list
          covering_classes
-                
+
 let scan_rule parameter error handler rule classes =
   let viewslhs = rule.Cckappa_sig.rule_lhs.Cckappa_sig.views in
   let rule_diff = rule.Cckappa_sig.diff_reverse in
@@ -260,6 +260,7 @@ let scan_rule_set parameter error handler rules =
   error, result
 
 let covering_classes parameters error handler cc_compil =
+  let parameters =  Remanent_parameters.update_prefix parameters "agent_type:" in 
   let error,result = scan_rule_set parameters error handler cc_compil.Cckappa_sig.rules in
   let _ =
     Covering_classes_type.AgentMap.print
@@ -271,7 +272,7 @@ let covering_classes parameters error handler cc_compil =
                   let _ = Printf.printf "Covering_class_id:%i:" elt in
                   let _ =
                     print_string "site_type:{";
-                    let rec print_list l =
+                  let rec print_list l =
                       match l with
                       | [] -> ()
                       | h :: [] -> print_int h; print_string "}"
@@ -286,4 +287,4 @@ let covering_classes parameters error handler cc_compil =
        in error )
       parameters
       result
-  in error, result
+  in error, result    

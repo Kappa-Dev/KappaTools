@@ -199,10 +199,33 @@ Quarks:site_modif-:agent_type:1,site_type:0,state:0,rule:1->[1]
 Quarks:site_modif-:agent_type:1,site_type:1,state:0,rule:2->[1]
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Covering_classes:
-Agent_type:0:
+Covering_classes:agent_type:0:
 Covering_class_id:0:site_type:{0,1}
-Agent_type:1:
+Covering_classes:agent_type:1:
 Covering_class_id:0:site_type:{0,1}
 Stochastic_classes:
-START
+sites_list: 0,1 
+h:0
+tl: 1 
+union_list: 1,1 
+sites_list: 0,1 
+h:0
+tl: 1 
+union_list: 1,1 
+sites_list: 0 
+h:0
+tl: empty
+union_list: 0 
+sites_list: 0 
+h:0
+tl: empty
+union_list: 0 
+sites_list: 1 
+h:1
+tl: empty
+union_list: 1 
+sites_list: 1 
+h:1
+tl: empty
+union_list: 1 
 execution finished without any exception

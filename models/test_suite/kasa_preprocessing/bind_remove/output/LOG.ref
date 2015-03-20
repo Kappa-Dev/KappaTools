@@ -125,10 +125,21 @@ Influence_map:Wake_up_map:rule(0):'r0' A(x),B(x)->A(x!1),B(x!1) -> rule(1):'r1' 
 Influence_map:Wake_up_map:rule(1):'r1' B(x!_)->C(x) -> rule(0):'r0' A(x),B(x)->A(x!1),B(x!1)[0*->0]
 Influence_map:Inhibition_map:rule(1):'r1' B(x!_)->C(x) -> rule(0):'r0' A(x),B(x)->A(x!1),B(x!1)[0->1]
 Covering_classes:
-Agent_type:0:
+Covering_classes:agent_type:0:
 Covering_class_id:0:site_type:{0}
-Agent_type:1:
+Covering_classes:agent_type:1:
 Covering_class_id:0:site_type:{0}
 Stochastic_classes:
-START
+sites_list: 0 
+h:0
+tl: empty
+union_list: 0 
+sites_list: 0 
+h:0
+tl: empty
+union_list: 0 
+sites_list: 0 
+h:0
+tl: empty
+union_list: 0 
 execution finished without any exception
