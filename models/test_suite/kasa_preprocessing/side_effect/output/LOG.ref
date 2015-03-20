@@ -176,17 +176,5 @@ Covering_classes:agent_type:0:
 Covering_class_id:0:site_type:{0}
 Covering_class_id:1:site_type:{1}
 Stochastic_classes:
-sites_list: 0 
-h:0
-tl: empty
-union_list: 0 
-sites_list: 1 
-h:1
-tl: empty
-union_list: 1 
-sites_list: 0 
-h:0
-tl: empty
-union_list: 0 
-sites_list: empty
+START
 execution finished without any exception
