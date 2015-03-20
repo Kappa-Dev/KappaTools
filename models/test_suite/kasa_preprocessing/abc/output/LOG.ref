@@ -487,4 +487,4 @@ Covering_classes:agent_type:2:
 Covering_class_id:0:site_type:{0,1,2,3}
 Stochastic_classes:
 union_list:{1,1}
-new_list:{1,1}
+new_list:{{1,1}}
