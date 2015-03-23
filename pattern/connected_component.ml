@@ -562,11 +562,9 @@ let finish_new wk =
   let env = Env.fresh wk.sigs wk.reserved_id wk.free_id wk.cc_env in
   add_domain env cc_candidate
 
-let get_site_id ?(pos=(Lexing.dummy_pos,Lexing.dummy_pos)) wk (_,ty,_) site =
-  Signature.num_of_site (site,pos) (Signature.get wk.sigs ty)
 
-let new_link ?(pos=(Lexing.dummy_pos,Lexing.dummy_pos))
-	     wk ((cc1,_,x as n1),i) ((cc2,_,y as n2),j) =
+let new_link wk ((cc1,_,x as n1),i) ((cc2,_,y as n2),j) =
+  let pos = (Lexing.dummy_pos,Lexing.dummy_pos) in
   let () = check_node_adequacy ~pos wk cc1 in
   let () = check_node_adequacy ~pos wk cc2 in
   let x_n = IntMap.find x wk.cc_links in
@@ -582,9 +580,8 @@ let new_link ?(pos=(Lexing.dummy_pos,Lexing.dummy_pos))
     then { wk with dangling = (0,0,0) }
     else wk
 
-let new_free ?(pos=(Lexing.dummy_pos,Lexing.dummy_pos))
-	     wk ((cc,_,x as n),i) =
-  let () = check_node_adequacy ~pos wk cc in
+let new_free wk ((cc,_,x as n),i) =
+  let () = check_node_adequacy ~pos:(Lexing.dummy_pos,Lexing.dummy_pos) wk cc in
   let x_n = IntMap.find x wk.cc_links in
   if x_n.(i) <> UnSpec then
     raise (already_specified ~sigs:wk.sigs n i)
@@ -592,9 +589,8 @@ let new_free ?(pos=(Lexing.dummy_pos,Lexing.dummy_pos))
     let () = x_n.(i) <- Free in
     wk
 
-let raw_new_internal_state wk ((cc,_,x as n), i) va =
-  let () = check_node_adequacy ~pos:(Lexing.dummy_pos,Lexing.dummy_pos)
-			       wk cc in
+let new_internal_state wk ((cc,_,x as n), i) va =
+  let () = check_node_adequacy ~pos:(Lexing.dummy_pos,Lexing.dummy_pos) wk cc in
   let x_n = IntMap.find x wk.cc_internals in
   if x_n.(i) >= 0 then
     raise (already_specified ~sigs:wk.sigs n i)
@@ -602,14 +598,7 @@ let raw_new_internal_state wk ((cc,_,x as n), i) va =
     let () = x_n.(i) <- va in
     wk
 
-let new_internal_state ?(pos=(Lexing.dummy_pos,Lexing.dummy_pos))
-		       wk ((_,ty,_),site_id as place) va =
-  let internal_state_id =
-    Signature.num_of_internal_state site_id (va,pos)
-				    (Signature.get wk.sigs ty) in
-  raw_new_internal_state wk place internal_state_id
-
-let raw_new_node wk type_id =
+let new_node wk type_id =
   let () = check_dangling wk in
   let arity = Signature.arity wk.sigs type_id in
   match wk.reserved_id.(type_id) with
@@ -637,6 +626,3 @@ let raw_new_node wk type_id =
 	  cc_internals =
 	    IntMap.add wk.free_id (Array.make arity (-1)) wk.cc_internals;
 	} (node,0))
-
-let new_node ?(pos=(Lexing.dummy_pos,Lexing.dummy_pos)) wk typ =
-  raw_new_node wk (Signature.num_of_agent (typ,pos) wk.sigs)

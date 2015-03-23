@@ -17,14 +17,11 @@ end
 
 (** {5 Create a connected component } *)
 val begin_new : Env.t -> work
-val new_node :
-  (work -> string (** node_type *) -> (node*work)) Term.maybe_pos
-val get_site_id : (work -> node -> string -> int) Term.maybe_pos
+val new_node : work -> int (** node_type *) -> (node*work)
 val new_link :
-  (work -> (node * int) (** node * site id *) -> (node * int) -> work)
-    Term.maybe_pos
-val new_free : (work -> (node * int) -> work) Term.maybe_pos
-val new_internal_state : (work -> (node * int) -> string -> work) Term.maybe_pos
+  work -> (node * int) (** node * site id *) -> (node * int) -> work
+val new_free : work -> (node * int) -> work
+val new_internal_state : work -> (node * int) -> int -> work
 (** [new_link_type work (node,site) type] *)
 val finish_new : work -> (Env.t*t)
 
