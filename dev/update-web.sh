@@ -14,7 +14,7 @@ case $1 in
 	;;
     js )
 	[ -d ${PLAYGROUND}/try ] || \
-	    mkdir@ ${PLAYGROUND}/try
+	    mkdir ${PLAYGROUND}/try
 	cp js/index.html js/JaSim.js ${PLAYGROUND}/try/
 	;;
 esac
