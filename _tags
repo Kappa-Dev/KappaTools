@@ -23,5 +23,4 @@
 "KaSa_rep/sanity_test" : include
 "KaSa_rep/reachability_analysis" : include
 
-
-true : bin_annot, package(str), package(unix)
+true : debug, bin_annot, package(str), package(unix)
