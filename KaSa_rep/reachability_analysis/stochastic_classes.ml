@@ -91,7 +91,8 @@ let store_new_class parameter error l remanent =
      in
      error, {Stochastic_classes_type.dic = dic;
             Stochastic_classes_type.key = key}
-  
+
+(*TODO: change to return the list of equivalence classes*)
 let clean_classes parameter error classes =
   let init_dic = Stochastic_classes_type.Dictionary_of_Stochastic_classes.init() in
   let error, init_key = Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
@@ -188,15 +189,88 @@ let add_sites_class parameter error agent_type sites_list stochastic_classes =
        new_list
        stochastic_classes
 
+let add_generic parameter error agent_id key map =
+  let get_agent =
+    Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get
+      parameter
+      error
+      key
+      map
+  in
+  let error, old_agent =
+    match get_agent with
+    | error, None -> Int_storage.Quick_Nearly_inf_Imperatif.create parameter
+                                                                   error 0
+    | error, Some a -> error, a
+  in
+  let error, new_agent=
+    Int_storage.Quick_Nearly_inf_Imperatif.set
+      parameter
+      error
+      agent_id
+      old_agent
+      map
+  in new_agent
+
+let add_agent parameter error agent_id agent_type =
+  add_generic
+    parameter
+    error
+    agent_id
+    agent_type
+
+let is_empty l =
+  match l with
+  | [] -> true
+  | _ -> false
+
 let scan_rule parameter error handler rule classes =
-  let viewlhs = rule.Cckappa_sig.rule_lhs.Cckappa_sig.views in
-  (* let creation = rule.Cckappa_sig.actions.Cckappa_sig.creation in*)
+  let viewslhs = rule.Cckappa_sig.rule_lhs.Cckappa_sig.views in
+  let viewsrhs = rule.Cckappa_sig.rule_rhs.Cckappa_sig.views in
+  let creation = rule.Cckappa_sig.actions.Cckappa_sig.creation in
+  let error, agent_modif_plus =
+    Stochastic_classes_type.AgentMap.create parameter error 0 in
   let stochastic_classes = classes.Stochastic_classes_type.stochastic_classes in
+  (*check the created agent*)
+  let error, agent_modif_plus =
+    List.fold_left (fun (error, agent_modif_plus) (agent_id, agent_type) ->
+                    let error, get_agent =
+                      Int_storage.Quick_Nearly_inf_Imperatif.get
+                        parameter
+                        error
+                        agent_id
+                        viewsrhs
+                    in
+                    match get_agent with
+                    | None -> warn
+                                parameter
+                                error
+                                (Some "line 242") Exit
+                                agent_modif_plus
+                    | Some Cckappa_sig.Ghost -> error, agent_modif_plus
+                    | Some Cckappa_sig.Agent agent ->
+                       error,
+                       add_agent
+                         parameter
+                         error
+                         agent_id
+                         agent_type
+                         agent_modif_plus
+                   )
+                   (error, agent_modif_plus) creation
+  in
   let error, stochastic_classes =
     Int_storage.Quick_Nearly_inf_Imperatif.fold
       parameter
       error
-      (fun parameter error agent_id agent stochastic_classes ->
+      (fun parameter error agent_id agent (*agent_created*) stochastic_classes ->
+       (*let agent_create =
+         Cckappa_sig.Site_map_and_set.fold_map
+           (fun agent _ current_list ->
+            agent :: current_list)
+           agent.Cckappa_sig.agent_interface agent_created
+       in*)
+       (*TODO: if the interface of creation is empty then it is the stochastic_classes*)
        match agent with
        | Cckappa_sig.Ghost -> error, stochastic_classes
        | Cckappa_sig.Agent agent ->
@@ -233,7 +307,7 @@ let scan_rule parameter error handler rule classes =
               stochastic_classes
           in
           error, stochastic_classes
-      ) viewlhs stochastic_classes
+      ) viewslhs (*agent_modif_plus*) stochastic_classes
   in
   error,
   {
@@ -262,7 +336,8 @@ let scan_rule_set parameter error handler rules =
       parameter
       error
       (fun parameter error id classes init ->
-       (*reunion sites to get only one list of sites for each agent_type*)
+       (*TODO: 
+         union sites to get only one list of sites for each agent_type*)
        let error, cleaned_classes =
          clean_classes parameter error classes in
        (*store the result*)
