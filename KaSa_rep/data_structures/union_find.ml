@@ -81,7 +81,6 @@ let is_equivalence x y l =
 let union_list l =
   match l with
   | [] -> []
-  (*| [_] -> []*)
   | x :: tl as l ->
     let a = Array.of_list l in
     List.iter (fun y ->
@@ -101,11 +100,14 @@ let warn parameters mh message exn default =
 let dic_of_union parameter error l =
    let init_dic =
     Stochastic_classes_type.Dictionary_of_Stochastic_classes.init ()
-  in
-  let init_remanent =
-    { Stochastic_classes_type.dic = init_dic}
-  in
-  let error, output =
+   in
+   let error, key = Int_storage.Nearly_inf_Imperatif.create parameter error 0
+   in
+   let init_remanent =
+     { Stochastic_classes_type.dic = init_dic;
+       Stochastic_classes_type.key = key}
+   in
+   let error, output =
     Stochastic_classes_type.Dictionary_of_Stochastic_classes.allocate
       parameter
       error
@@ -115,13 +117,38 @@ let dic_of_union parameter error l =
       Misc_sa.const_unit
       init_dic
   in
-  let error, dic =
+  let error, (id, dic) =
     match output with
     | None -> warn parameter error (Some "line 92") Exit
-                   init_dic
-    | Some (_, _, _, dic) -> error, dic  
+                   (0, init_dic)
+    | Some (id, _, _, dic) -> error, (id, dic)
   in
-  {Stochastic_classes_type.dic = dic}
+  let error, key =
+       List.fold_left (fun (error, key) elt ->
+                       let error, old_set_key =
+                           match Int_storage.Nearly_inf_Imperatif.unsafe_get
+                                   parameter error elt key
+                           with
+                           | error, None ->
+                              error, Stochastic_classes_type.Set_list_keys.empty_set
+                           | error, Some set_list_keys -> error, set_list_keys
+                       in
+                       let error,new_set_key =
+                         Stochastic_classes_type.Set_list_keys.add_set
+                           parameter error id old_set_key
+                       in         
+                       Int_storage.Nearly_inf_Imperatif.set
+                         parameter
+                         error
+                         elt
+                         new_set_key
+                         key
+                      ) (error, key) l
+
+  in
+  error, 
+  {Stochastic_classes_type.dic = dic;
+  Stochastic_classes_type.key = key}
 
 let print_union {treeArr} =
   Array.iter (fun x -> print_int x; print_string " ") treeArr

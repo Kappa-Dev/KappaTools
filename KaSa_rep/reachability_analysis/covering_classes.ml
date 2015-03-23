@@ -26,6 +26,23 @@ let empty_classes parameter error handler =
   {
      Covering_classes_type.covering_classes  = covering_classes
   }
+
+let rec print_list l =
+  match l with
+  | [] -> print_string "empty"
+  | h :: [] ->  print_int h; print_string " "
+  | h :: tl ->
+     let _ = print_int h; print_string "," in
+     print_list tl
+                     
+let rec print_list_list ls =
+  match ls with
+  | [] -> ()
+  | h :: [] -> print_list h; print_string " "
+  | h :: tl ->
+     let _ =  print_string " "; print_list h;
+              print_string "; " in
+     print_list_list tl
                      
 let length_sorted lists =
   let list_length = List.rev_map (fun list -> list, List.length list) lists in
@@ -109,7 +126,7 @@ let clean_new parameter error classes =
                   | [] -> (error, acc)
                   | t::q ->
                      (*create a storage for pointer_backward*)
-                     let pointer_backward = acc.Covering_classes_type.pointer_backward in 
+                     let pointer_backward = acc.Covering_classes_type.pointer_backward in
                      (* get the set of list(id) containing t *)
                      let error, potential_supersets =
                        match Int_storage.Nearly_inf_Imperatif.unsafe_get
@@ -123,8 +140,7 @@ let clean_new parameter error classes =
                        | error, Some set_list_id -> error, set_list_id
                      in
                      let rec aux to_visit potential_supersets =
-                       match to_visit
-                       with
+                      match to_visit with
                        | [] -> error,acc
                        | t'::q' ->
                            (* get the set of list(id) containing t *)
@@ -139,7 +155,7 @@ let clean_new parameter error classes =
                                 error, Covering_classes_type.Set_list_id.empty_set
                              | error, Some set_list_id ->
                                 error, set_list_id
-                           in           
+                           in
                            (* intersection of two sets *)
                            let error, potential_superset =
                              Covering_classes_type.Set_list_id.inter
@@ -262,29 +278,28 @@ let scan_rule_set parameter error handler rules =
 let covering_classes parameters error handler cc_compil =
   let parameters =  Remanent_parameters.update_prefix parameters "agent_type:" in 
   let error,result = scan_rule_set parameters error handler cc_compil.Cckappa_sig.rules in
-  let _ =
-    Covering_classes_type.AgentMap.print
-      error
-      (fun error parameter dic ->
-       let _ = Covering_classes_type.Dictionary_of_Covering_classes.print
-                 parameter error
-                 (fun parameter error elt l _ _ ->
-                  let _ = Printf.printf "Covering_class_id:%i:" elt in
-                  let _ =
-                    print_string "site_type:{";
-                  let rec print_list l =
-                      match l with
-                      | [] -> ()
-                      | h :: [] -> print_int h; print_string "}"
-                      | h :: tl ->
-                         let _ = print_int h; print_string "," in
-                         print_list tl in
-                    print_list l
-                  in
-                  let _ = print_newline () in
-                  error
-                 ) dic.Covering_classes_type.dic
-       in error )
-      parameters
-      result
-  in error, result    
+  let _ = Covering_classes_type.AgentMap.print
+            error
+            (fun error parameter dic ->
+             let _ = Covering_classes_type.Dictionary_of_Covering_classes.print
+                       parameter error
+                       (fun parameter error elt l _ _ ->
+                        let _ = Printf.printf "Covering_class_id:%i:" elt in
+                        let _ =
+                          print_string "site_type:{";
+                          let rec print_list l =
+                            match l with
+                            | [] -> ()
+                            | h :: [] -> print_int h; print_string "}"
+                            | h :: tl ->
+                               let _ = print_int h; print_string "," in
+                               print_list tl in
+                          print_list l
+                        in
+                        let _ = print_newline () in
+                        error
+                       ) dic.Covering_classes_type.dic
+             in error )
+            parameters
+            result
+  in error, result           

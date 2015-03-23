@@ -35,5 +35,16 @@ module Stochastic_classes =
 
 module Dictionary_of_Stochastic_classes = Dictionary.Dictionary_of_Ord (Stochastic_classes)
 
+module Inf_array = Int_storage.Nearly_inf_Imperatif
+
+module Set_list_keys = Set_and_map.Make
+                         (struct
+                           type t = int
+                           let compare = compare
+                         end)
+
 type remanent_dic = (unit, unit) Dictionary_of_Stochastic_classes.dictionary
-type remanent = {dic : remanent_dic}
+                                 
+type remanent = {dic : remanent_dic;
+                 key : Set_list_keys.set Inf_array.t
+                }
