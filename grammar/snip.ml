@@ -196,7 +196,11 @@ let annotate_dropped_agent sigs ((agent_name, _ as ag_ty),intf) =
   let arity = Signature.arity sigs ag_id in
   let ports =
     Array.init arity (fun i -> if i = 0 then L_FREE Erased else L_ANY Erased) in
-  let internals = Array.make arity I_ANY_ERASED in
+  let internals =
+    Array.init arity
+               (fun i ->
+		match Signature.default_internal_state ag_id i sigs with
+		| None -> I_ANY | Some _ -> I_ANY_ERASED) in
   let () =
     List.iter
       (fun p ->
