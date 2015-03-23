@@ -35,5 +35,5 @@ val default_internal_state : int -> int -> s -> int option
 val print_agent : s -> Format.formatter -> int -> unit
 val print_site : s -> int -> Format.formatter -> int -> unit
 (** [print_internal_state sigs agent_type site_id f state_id] *)
-val print_internal_state :
+val print_site_internal_state :
   s -> int -> int -> Format.formatter -> int option -> unit

@@ -94,7 +94,7 @@ let main =
     let abort =
       match !Parameter.inputKappaFileNames with
       | [] -> !Parameter.marshalizedInFile = ""
-      | _ -> false
+     | _ -> false
     in
     if abort then (prerr_string usage_msg ; exit 1) ;
     let sigint_handle = fun _ ->

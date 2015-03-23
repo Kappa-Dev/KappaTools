@@ -72,6 +72,19 @@ let list_of_string str =
 	in
 	parse stream "" []
 
+let rec list_smart_filter f = function
+  | t :: q as l ->
+     let q' = list_smart_filter f q in
+     if f t then if q == q' then l else t::q' else q'
+  | l -> l
+
+let rec list_smart_map f = function
+  | t :: q as l ->
+     let q' = list_smart_map f q in
+     let t' = f t in
+     if t' == t && q' == q then l else t' :: q'
+  | l -> l
+
 let list_exists_uniq f l =
   let rec second = function
     | [] -> true
@@ -98,6 +111,12 @@ let rec list_fold_right_map f x = function
   | h :: t ->
      let (x',t') = list_fold_right_map f x t in
      let (x'', h') = f x' h in (x'', h'::t')
+
+let rec list_fold_left2 f x l1 l2 =
+  match l1, l2 with
+  | [], [] -> x
+  | [], _ :: _ | _ :: _, [] -> raise (Invalid_argument "list_fold_left2")
+  | h1::t1, h2::t2 -> list_fold_left2 f (f x h1 h2) t1 t2
 
 let array_fold_left_mapi f x a =
   let y = ref x in
@@ -127,10 +146,13 @@ let array_fold_lefti f x a =
   let () = Array.iteri (fun i e -> y := f i !y e) a in
   !y
 
-let array_fold_left2 f x a1 a2 =
+let array_fold_left2i  f x a1 a2 =
   let l = Array.length a1 in
-  if l <> Array.length a2 then raise (Invalid_argument "array_fold_left2")
-  else array_fold_lefti (fun i x e -> f x e a2.(i)) x a1
+  if l <> Array.length a2 then raise (Invalid_argument "array_fold_left2i")
+  else array_fold_lefti (fun i x e -> f i x e a2.(i)) x a1
+
+let array_filter f a =
+  array_fold_lefti (fun i acc x -> if f i x then i :: acc else acc) [] a
 
 let iteri f i =
   let rec aux j =

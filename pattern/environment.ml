@@ -184,8 +184,8 @@ let id_of_state agent_name site_name state env =
     (Term.with_dummy_pos site_name) state env.signatures
 
 let print_site_state env agent_id id_site f id_state =
-  Signature.print_internal_state env.signatures
-    agent_id id_site f id_state
+  Signature.print_site_internal_state env.signatures
+				      agent_id id_site f id_state
 
 let num_of_token = fun str env ->
   StringMap.find str env.tokens.NamedDecls.finder

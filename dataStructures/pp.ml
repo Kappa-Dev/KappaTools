@@ -1,6 +1,6 @@
 open Format
 
-let listi ?(trailing=(fun f -> ())) pr_sep pr_el f l =
+let listi ?(trailing=(fun _ -> ())) pr_sep pr_el f l =
   let rec aux acc f = function
     | [] -> if acc<>0 then trailing f
     | [el] -> pr_el acc f el
@@ -10,7 +10,7 @@ let listi ?(trailing=(fun f -> ())) pr_sep pr_el f l =
 let list ?trailing pr_sep pr_el f l =
   listi ?trailing pr_sep (fun _ f x -> pr_el f x) f l
 
-let set ?(trailing=(fun f -> ()))
+let set ?(trailing=(fun _ -> ()))
 	elements pr_sep pr_el f set =
   list ~trailing pr_sep pr_el f (elements set)
 
@@ -26,7 +26,7 @@ let option pr f = function
   | None -> ()
   | Some x -> fprintf f "@ %a" pr x
 
-let array ?(trailing=(fun f -> ())) pr_sep pr_el f a =
+let array ?(trailing=(fun _ -> ())) pr_sep pr_el f a =
   let rec aux i f =
     if i < Array.length a then
       let () = Format.fprintf f "%a" (pr_el i) a.(i) in
@@ -45,12 +45,15 @@ let plain_array pr_el f a =
 
 let position f (beg_pos,end_pos) =
   let () = assert (beg_pos.Lexing.pos_fname = end_pos.Lexing.pos_fname) in
+  let pr_f f =
+    if beg_pos.Lexing.pos_fname <> "" then
+      fprintf f "File \"%s\", " beg_pos.Lexing.pos_fname in
   let pr_l f =
     if beg_pos.Lexing.pos_lnum = end_pos.Lexing.pos_lnum
     then fprintf f "line %i" beg_pos.Lexing.pos_lnum
     else fprintf f "lines %i-%i" beg_pos.Lexing.pos_lnum end_pos.Lexing.pos_lnum
   in
-  fprintf f "File \"%s\", %t, characters %i-%i:" beg_pos.Lexing.pos_fname pr_l
+  fprintf f "%t%t, characters %i-%i:" pr_f pr_l
 	  (beg_pos.Lexing.pos_cnum - beg_pos.Lexing.pos_bol)
 	  (end_pos.Lexing.pos_cnum - end_pos.Lexing.pos_bol)
 

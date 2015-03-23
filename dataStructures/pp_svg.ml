@@ -71,6 +71,7 @@ let legend w f a =
 		 (Pp.array ~trailing:Pp.cut Pp.cut pp_line) a
 
 let get_limits l =
+  let dummy_values = (0.,Nbr.I 0,Nbr.I 0) in
   let rec aux t_max va_min va_max = function
     | [] ->
        if Nbr.is_equal va_min va_max then
@@ -81,11 +82,11 @@ let get_limits l =
        aux (max t t_max) (Array.fold_left Nbr.min va_min va)
 	   (Array.fold_left Nbr.max va_max va) q in
   match l with
-  | [] -> failwith "No data to plot in Pp_svg"
+  | [] -> dummy_values
   | (_,va)::_ when Array.length va = 0 ->
-     failwith "No data to plot in Pp_svg"
-  | (t,va)::q -> aux t (Array.fold_left min va.(0) va)
-		     (Array.fold_left max va.(0) va) q
+     dummy_values
+  | (t,va)::q -> aux t (Array.fold_left Nbr.min va.(0) va)
+		     (Array.fold_left Nbr.max va.(0) va) q
 
 let draw_in_data ((t_max,va_min,va_max),(zero_w,zero_h,draw_w,draw_h)) =
   let delta_va = Nbr.to_float (Nbr.sub va_max va_min) in
@@ -98,14 +99,16 @@ let draw_in_data ((t_max,va_min,va_max),(zero_w,zero_h,draw_w,draw_h)) =
 		  ((Nbr.to_float (Nbr.sub y va_min) *. draw_h') /. delta_va))
 
 let graduation_step draw_l min_grad_l va_min va_max =
-  let delta_va = Nbr.to_float (Nbr.sub va_max va_min) in
+  let nbr_delta = Nbr.sub va_max va_min in
+  let delta_va = if Nbr.is_zero nbr_delta then 1. else Nbr.to_float nbr_delta in
   let nb_grad = ceil (float draw_l /. float min_grad_l) in
   let exact_step = delta_va /. nb_grad in
   let delta_grad = 10. ** (log10 exact_step) in
   let va_min' =
     Nbr.F (delta_grad *. floor ((Nbr.to_float va_min) /. exact_step)) in
   let va_max' =
-    Nbr.F (delta_grad *. ceil ((Nbr.to_float va_max) /. exact_step)) in
+    if Nbr.is_zero nbr_delta then Nbr.succ va_min' else
+      Nbr.F (delta_grad *. ceil ((Nbr.to_float va_max) /. exact_step)) in
   (va_min',int_of_float nb_grad,delta_grad,va_max')
 
 let axis (w,h) (b_op,b_w,b_h) f l =
@@ -197,6 +200,7 @@ let to_string ?(width=800) s =
   let size = (width,int_of_float (float width /. sqrt 2.)) in
   let border = (10,70,25) in
   let () = draw size border f s in
+  let () = Format.pp_print_newline f () in
   Buffer.contents b
 
 let to_file s =
