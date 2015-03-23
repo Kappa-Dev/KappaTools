@@ -13,11 +13,12 @@ before_install:
 
 install:
   - sudo apt-get install -qq ocaml-nox opam
+  - sh -c "if [ '$CHECKED' = js ] ; then sudo apt-get install -qq camlp4 ; fi"
   - opam init -a git://github.com/ocaml/opam-repository && eval $(opam config env)
   - opam install ocamlfind
   - sh -c "if [ '$CHECKED' = js ] ; then opam install -y reactiveData tyxml js_of_ocaml ; fi"
-  - sudo apt-get install -qq gnuplot-nox graphviz
-  - sudo apt-get install -qq texlive-latex-recommended tex4ht
+  - sh -c "if [ '$CHECKED' = native ] ; then sudo apt-get install -qq gnuplot-nox graphviz ; fi"
+  - sh -c "if [ '$CHECKED' = native ] ; then sudo apt-get install -qq texlive-latex-recommended tex4ht ; fi"
 
 script:
   - make all
