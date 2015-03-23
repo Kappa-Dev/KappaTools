@@ -15,7 +15,7 @@ type cc = {
 }
 type t = cc
 
-type edge = ToNode of int * int | ToNew of int * int
+type edge = ToNode of int * int | ToNew of int * int * int (* type, id, port *)
 	    | ToNothing | ToInternal of int
 type son = {
   extra_edge: ((int*int)*edge);
@@ -238,7 +238,7 @@ let print_sons_dot cc_id f sons =
     match e with
     | ToNode (n',p') ->
        Format.fprintf f "(%i,%i) -> (%i,%i)" n p n' p'
-    | ToNew (n',p') ->
+    | ToNew (_, n',p') ->
        Format.fprintf f "(%i,%i) -> (%i,%i) + (%i,0)" n p n' p' n'
     | ToNothing ->
        Format.fprintf f "(%i,%i) -> %t" n p print_bot
@@ -486,7 +486,7 @@ let compute_father_candidates free_id cc =
 	    let cc' = update_cc f_id (remove_ag_cc f_id cc ag_id)
 				n' links_dst' int_dst in
 	    succ f_id,
-	    (cc',((n',i'),ToNew (ag_id,i)))::out)
+	    (cc',((n',i'),ToNew (find_ty cc ag_id,ag_id,i)))::out)
       (remove_one_internal acc ag_id links internals) links in
   let remove_or_remove_one (f_id,out as acc) ag_id links internals =
     if agent_is_removable 0 links internals then
