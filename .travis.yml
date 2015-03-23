@@ -15,13 +15,14 @@ install:
   - sudo apt-get install -qq ocaml-nox opam
   - opam init -a git://github.com/ocaml/opam-repository && eval $(opam config env)
   - opam install ocamlfind
-  - sh -c "[ '$CHECKED' = js ] && opam install reactiveData tyxml js_of_ocaml"
+  - sh -c "if [ '$CHECKED' = js ] ; then opam install -y reactiveData tyxml js_of_ocaml ; fi"
   - sudo apt-get install -qq gnuplot-nox graphviz
   - sudo apt-get install -qq texlive-latex-recommended tex4ht
 
 script:
   - make all
-  - sh -c [ '$CHECKED' = native ] && make doc_html
-  - sh -c [ '$CHECKED' = native ] && make -j2 check
+  - sh -c "if [ '$CHECKED' = native ] ; then make doc_html ; fi"
+  - sh -c "if [ '$CHECKED' = native ] ; then make -j2 check ; fi"
+  - sh -c "if [ '$CHECKED' = js ] ; then make js/JaSim.js ; fi"
 
 after_success: dev/update-web.sh $CHECKED
