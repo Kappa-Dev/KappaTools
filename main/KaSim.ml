@@ -152,7 +152,7 @@ let () =
 			     marshalized_file in
 	   let env,cc_env,counter,state =
 	     (Marshal.from_channel d :
-		Environment.t*Connected_component.env * Counter.t * State.t) in
+		Environment.t*Connected_component.Env.t*Counter.t*State.t) in
 	   let () = Pervasives.close_in d  in
 	   let () = Format.printf "Done@." in
 	   (env,cc_env,counter,state)
@@ -173,6 +173,8 @@ let () =
     let () = Kappa_files.with_marshalized
 	       (fun d -> Marshal.to_channel
 			   d (env,cc_env,counter,state) [Marshal.Closures]) in
+  let () = Kappa_files.with_ccFile
+	     (fun f -> Connected_component.Env.print_dot f cc_env) in
 
     Kappa_files.with_influence
       (fun d -> State.dot_of_influence_map d state env);

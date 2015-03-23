@@ -938,7 +938,7 @@ let initialize logger overwrite result =
   let pre_kasa_state = Export_to_KaSim.Export_to_KaSim.init result in
   let kasa_state,contact_map =
     Export_to_KaSim.Export_to_KaSim.get_contact_map pre_kasa_state in
-  let cc_env = Connected_component.empty_env sigs_nd in
+  let cc_env = Connected_component.Env.empty sigs_nd in
 
   let env =
     Environment.init sigs_nd tk_nd (NamedDecls.create alg_a) fresh_kappa in

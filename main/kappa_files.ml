@@ -85,6 +85,13 @@ let setCheckFileExists () =
   check !marshalizedOutFile ;
   check !outputDataName
 
+let with_formatter str f =
+  if str <> ""  then
+    let desc = open_out str in
+    let fr = Format.formatter_of_out_channel desc in
+    let () = f fr in
+    close_out desc
+
 let (openOutDescriptors:out_channel list ref) = ref []
 
 let add_out_desc d = openOutDescriptors := d::!openOutDescriptors
@@ -120,12 +127,9 @@ let set_flux nme event =
     | _ -> fluxFileName := nme
   in
   set fluxFileName (Some "dot")
+
 let with_flux str f =
-  let desc = open_out (match str with "" -> !fluxFileName | _ -> str) in
-  let fr = Format.formatter_of_out_channel desc in
-  let () = add_out_desc desc in
-  let () = f fr in
-  close_out desc
+  with_formatter (match str with "" -> !fluxFileName | _ -> str) f
 
 let open_snapshot str event ext =
   let str = if str="" then !snapshotFileName else str in
@@ -139,12 +143,7 @@ let set_influence s = influenceFileName := s
 let set_up_influence () =
   set_influence
     (if !influenceFileName = "" then "im.dot" else !influenceFileName)
-let with_influence f =
-  if !influenceFileName <> ""  then
-    let desc = open_out !influenceFileName in
-    let fr = Format.formatter_of_out_channel desc in
-    let () = f fr in
-    close_out desc
+let with_influence f = with_formatter !influenceFileName f
 
 let with_dump f =
   let desc = open_out !dumpFileName in
@@ -153,6 +152,7 @@ let with_dump f =
   Format.eprintf "Final state dumped (%s)@." !dumpFileName
 
 let set_ccFile f = ccFileName := f
+let with_ccFile f = with_formatter !ccFileName f
 
 let close_out_desc desc =
   let () = openOutDescriptors :=
