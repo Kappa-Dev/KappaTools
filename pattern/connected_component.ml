@@ -110,7 +110,9 @@ let equal max_id cc1 cc2 =
 	   admissible_mapping iso' remains
 	 with Not_found -> []
   in
-  if cc1 == cc2 then [Dipping.identity (Array.fold_left List.append [] cc1.nodes_by_type)] else
+  if cc1 == cc2 then
+    [Dipping.identity (Array.fold_left List.append [] cc1.nodes_by_type)]
+  else
     match Tools.array_fold_left2i always_equal_min_but_not_null (Some (0,[],[]))
 				  cc1.nodes_by_type cc2.nodes_by_type with
     | None -> []
@@ -132,9 +134,19 @@ let find_ty cc id =
     if List.mem id cc.nodes_by_type.(i) then i else aux (pred i)
   in aux (Array.length cc.nodes_by_type - 1)
 
+let print_edge sigs f = function
+  | (source,site), ToNothing ->
+     Format.fprintf f "-%i_%i-%t->" source site print_bot
+  | (source,site), ToNew (ty,id,port) ->
+     Format.fprintf f "-%i_%i-!%a-%i_%i->" source site
+		    (Signature.print_agent sigs) ty id port
+  | (source,site), ToNode (id,port) ->
+     Format.fprintf f "-%i_%i-%i_%i->" source site id port
+  | (source,site), ToInternal i -> Format.fprintf f "-%i_%i-~%i->" source site i
+
 let to_navigation cc =
   let rec build_for out don = function
-    | [] -> out
+    | [] -> List.rev out
     | h ::  t ->
        let out_ints =
 	 Tools.array_fold_lefti
@@ -149,19 +161,19 @@ let to_navigation cc =
 	       if i > 0 then (((h,i),ToNothing)::ans,re) else acc
 	    | Link (n,l) ->
 	       if List.mem n don then acc
-	       else if List.mem n re
+	       else if n = h || List.mem n re
 	       then (((h,i),ToNode (n,l))::ans,re)
 	       else
-		 (((h,0),ToNothing)::((h,i),ToNew (find_ty cc h,n,l))::ans,
-		  h::re))
+		 ((*((n,0),ToNothing)::*)((h,i),ToNew (find_ty cc n,n,l))::ans,
+		  n::re))
 	   (out_ints,t) (IntMap.find h cc.links) in
        build_for out' (h::don) todo in
   let rec find_root i =
     if i = Array.length cc.nodes_by_type
-    then []
+    then (0,[])
     else match cc.nodes_by_type.(i) with
 	 | [] -> find_root (succ i)
-	 | x :: _ -> build_for [(x,0),ToNothing] [] [x]
+	 | x :: _ -> (x,build_for [(x,0),ToNothing] [] [x])
   in find_root 0
 
 let print with_id sigs f cc =
@@ -380,26 +392,39 @@ let to_work env =
 (** Behare of invarient on nav (it starts by a first element of
 id_by_type (so that we don't need to apply an injection on it to get
 the canonical))) *)
-let navigate env nav =
+let navigate env root nav =
   let rec aux inj i = function
-    | [] -> Some i
-    | h :: t ->
-       let point = IntMap.find i env.domain in
-       try
-	 let son = List.find (fun s -> s.extra_edge = h) point.sons in
-	 aux (Dipping.compose inj son.inj) son.dst t
-       with Not_found -> None
-  in aux Dipping.empty 0 nav
+    | [] -> Some (i,inj,IntMap.find i env.domain)
+    | ((id,site),e) :: t ->
+       let rec find_good_edge = function
+	 | [] -> None
+	 | s :: tail ->
+	    match e with
+	    | (ToNothing | ToInternal _) ->
+	       if s.extra_edge = ((Dipping.apply inj id,site),e)
+	       then aux (Dipping.compose inj s.inj) s.dst t
+	       else find_good_edge tail
+	    | ToNode (id',site') ->
+	       if s.extra_edge =
+		    ((Dipping.apply inj id,site),
+		     ToNode (Dipping.apply inj id',site'))
+	       then aux (Dipping.compose inj s.inj) s.dst t
+	       else find_good_edge tail
+	    | ToNew (ty,id',site') ->
+	       match s.extra_edge with
+	       | _, (ToNothing | ToNode _ | ToInternal _) -> find_good_edge tail
+	       | (sid,ssite), ToNew(ty',sid',ssite') ->
+		  if sid = Dipping.apply inj id && ssite = site
+		     && ty' = ty && ssite' = site'
+		  then aux (Dipping.add id' sid' (Dipping.compose inj s.inj))
+			   s.dst t
+		  else find_good_edge tail in
+       find_good_edge (IntMap.find i env.domain).sons
+  in aux (Dipping.add root root Dipping.empty) 0 nav
 
 let find env cc =
-  IntMap.fold (fun id point ->
-	       function
-	       | Some _ as o -> o
-	       | None ->
-		  match equal env.nb_id point.cc cc with
-		  | [] -> None
-		  | inj :: _ -> Some (id,inj,point))
-	      env.domain None
+  let (root,nav) = to_navigation cc in
+  navigate env root nav
 
 let get env cc_id = IntMap.find cc_id env.domain
 
