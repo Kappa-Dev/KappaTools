@@ -27,20 +27,7 @@ let create n =
    containing e. Since the set are disjoint, e containted in one set
    only. Therefore, the returned representative can be uniquely determined.
 *)
-                      
-(*
-let list_of_union {treeArr} =
-  let rec list_of_union i res =
-    if i < 0
-    then res
-    else
-      list_of_union (i - 1) (Array.unsafe_get treeArr i :: res)
-  in
-  list_of_union (Array.length treeArr - 1) []
-
-let union_of_list l =
-  {treeArr = Array.of_list l}*)
-
+      
 let findSet e list =
   let a = Array.of_list list in
   let union_find = {treeArr = a} in
@@ -90,65 +77,151 @@ let union_list l =
                let treeArr = union_find.treeArr in
                treeArr.(root_x) <- root_y) tl;
     let l = Array.to_list a in
-    l      
-      
+    l
+	
 (*convert union_find to dictionary type *)
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Stochastic classes") message exn
                  (fun () -> default)
-                 
-let dic_of_union parameter error l =
-   let init_dic =
-    Stochastic_classes_type.Dictionary_of_Stochastic_classes.init ()
-   in
-   let error, key = Int_storage.Nearly_inf_Imperatif.create parameter error 0
-   in
-   let init_remanent =
-     { Stochastic_classes_type.dic = init_dic;
-       Stochastic_classes_type.key = key}
-   in
-   let error, output =
-    Stochastic_classes_type.Dictionary_of_Stochastic_classes.allocate
-      parameter
+
+ let get_id_for_value parameter error t set =
+  match  Int_storage.Nearly_inf_Imperatif.unsafe_get parameter error t set with
+    | error, None ->
+      error, Stochastic_classes_type.Set_list_union.empty_set
+    | error, Some ids -> error, ids
+
+ let rec print_list l =
+  match l with
+  | [] -> print_string "empty"
+  | h :: [] ->  print_int h; print_string " "
+  | h :: tl ->
+     let _ = print_int h; print_string "," in
+     print_list tl
+       
+ let rec print_list_list ls =
+  match ls with
+  | [] -> ()
+  | h :: [] -> print_list h; print_string " "
+  | h :: tl ->
+     let _ =  print_list h;
+              print_string "; " in
+     print_list_list tl
+       
+let store_pointer_backward parameter error id pointer_backward l =
+  List.fold_left
+    (fun (error,pointer_backward) elt ->
+      let error, old_set_id =
+	get_id_for_value parameter error elt pointer_backward
+      in
+      let error,new_set_id =
+        Stochastic_classes_type.Set_list_union.add_set
+          parameter error id old_set_id
+      in
+      Int_storage.Nearly_inf_Imperatif.set
+        parameter
+        error
+        elt
+        new_set_id
+        pointer_backward)
+    (error, pointer_backward)
+    l
+    
+let print_remanent_dic parameter error dic =
+  Stochastic_classes_type.Dictionary_of_Stochastic_classes.print
+    parameter
+    error
+    (fun parameter error elt l _ _ ->
+      let _ = Printf.printf "Stochastic_class_id:%i:" elt in
+      let _ =
+        print_string "site_type:{";
+        let rec print_list l =
+          match l with
+            | [] -> ()
+            | h :: [] -> print_int h; print_string "}"
+            | h :: tl ->
+              let _ = print_int h; print_string "," in
+              print_list tl in
+        print_list l
+      in
+      let _ = print_newline () in
       error
-      Misc_sa.compare_unit
-      l
-      ()
-      Misc_sa.const_unit
-      init_dic
-  in
-  let error, (id, dic) =
-    match output with
-    | None -> warn parameter error (Some "line 92") Exit
-                   (0, init_dic)
-    | Some (id, _, _, dic) -> error, (id, dic)
-  in
-  let error, key =
-       List.fold_left (fun (error, key) elt ->
-                       let error, old_set_key =
-                           match Int_storage.Nearly_inf_Imperatif.unsafe_get
-                                   parameter error elt key
-                           with
-                           | error, None ->
-                              error, Stochastic_classes_type.Set_list_keys.empty_set
-                           | error, Some set_list_keys -> error, set_list_keys
-                       in
-                       let error,new_set_key =
-                         Stochastic_classes_type.Set_list_keys.add_set
-                           parameter error id old_set_key
-                       in         
-                       Int_storage.Nearly_inf_Imperatif.set
-                         parameter
-                         error
-                         elt
-                         new_set_key
-                         key
-                      ) (error, key) l
+    ) dic.Stochastic_classes_type.dic_union
 
-  in
-  error, 
-  {Stochastic_classes_type.dic = dic;
-  Stochastic_classes_type.key = key}
+ let store_new_class parameter error l remanent =
+  (*the current remanent information: dictionary, pointer_backward*)
+  let good_lists = remanent.Stochastic_classes_type.dic_union in
+  let pointer_backward = remanent.Stochastic_classes_type.pointer in
+  match l with
+  | [] -> error, remanent
+  | _ ->
+     (*get allocate_id from a dictionary*)
+     let error, output =
+       Stochastic_classes_type.Dictionary_of_Stochastic_classes.allocate
+         parameter
+         error
+         Misc_sa.compare_unit
+         l
+         ()
+         Misc_sa.const_unit
+         good_lists
+     in
+     let error,(id,dic) =
+       match output with
+       |Some (al,_,_,dic) -> error,(al,dic)
+       | None -> warn
+            parameter
+            error
+            (Some "line 106")
+            Exit
+            (0,good_lists)
+     in
+     (*store pointer backward*)
+     let error,pointer_backward =
+       store_pointer_backward parameter error id pointer_backward l
+     in
+     error, {
+       Stochastic_classes_type.dic_union = dic; 
+       Stochastic_classes_type.pointer = pointer_backward}
 
+let union_list_dic parameter error classes =
+  let init_dic = Stochastic_classes_type.Dictionary_of_Stochastic_classes.init()in
+  let error, init_pointer = Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
+  let empty_list =
+    {Stochastic_classes_type.dic_union = init_dic;
+     Stochastic_classes_type.pointer = init_pointer}
+  in
+  List.fold_left (fun (error, acc) list ->
+    let list = union_list list in
+    match list with
+      | [] -> error, acc
+      | t :: tl ->
+	let pointer = acc.Stochastic_classes_type.pointer in
+	let error, potential_supersets =
+	  get_id_for_value parameter error t pointer
+        in
+	let rec aux to_visit potential_supersets =
+	  match to_visit with
+	    | [] -> error, acc
+	    | t' :: tl' ->
+	      let error, potential_supersets' =
+		get_id_for_value parameter error t' pointer
+              in
+	      if Stochastic_classes_type.Set_list_union.is_empty_set
+                potential_supersets'
+	      then
+		store_new_class parameter error list acc
+              else
+	        aux tl' potential_supersets'
+        in
+        (*check the beginning state of a superset*)
+        if Stochastic_classes_type.Set_list_union.is_empty_set
+          potential_supersets
+        then
+          (*if it is empty then store it to remanent*)
+          store_new_class parameter error list acc
+        else
+          aux tl potential_supersets
+  ) (error, empty_list) classes
+    
 let print_union {treeArr} =
   Array.iter (fun x -> print_int x; print_string " ") treeArr

@@ -49,6 +49,31 @@ let length_sorted lists =
   let lists = List.sort (fun a b -> compare (snd a) (snd b)) list_length in
   List.rev_map fst lists
 
+let get_id_for_value parameter error t set =
+  match  Int_storage.Nearly_inf_Imperatif.unsafe_get parameter error t set with
+    | error, None ->
+      error, Covering_classes_type.Set_list_id.empty_set
+    | error, Some ids -> error, ids
+
+let store_pointer_backward parameter error id pointer_backward l =
+  List.fold_left
+    (fun (error,pointer_backward) elt ->
+      let error, old_set_id =
+	get_id_for_value parameter error elt pointer_backward
+      in
+      let error,new_set_id =
+        Covering_classes_type.Set_list_id.add_set
+          parameter error id old_set_id
+      in
+      Int_storage.Nearly_inf_Imperatif.set
+        parameter
+        error
+        elt
+        new_set_id
+        pointer_backward)
+    (error, pointer_backward)
+    l
+
 let store_new_class parameter error l remanent =
   (*the current remanent information: dictionary, pointer_backward*)
   let good_lists = remanent.Covering_classes_type.dic in
@@ -67,11 +92,10 @@ let store_new_class parameter error l remanent =
          Misc_sa.const_unit
          good_lists
      in
-     let error,(allocate_id,dic) =
+     let error,(id,dic) =
        match output with
        |Some (al,_,_,dic) -> error,(al,dic)
-       | None ->
-          warn
+       | None -> warn
             parameter
             error
             (Some "line 106")
@@ -80,107 +104,65 @@ let store_new_class parameter error l remanent =
      in
      (*store pointer backward*)
      let error,pointer_backward =
-       List.fold_left
-         (fun (error,pointer_backward) elt ->
-           let error, old_set_id =   
-            match Int_storage.Nearly_inf_Imperatif.unsafe_get
-                    parameter
-                    error
-                    elt 
-                    pointer_backward
-            with
-            | error, None ->
-               error, Covering_classes_type.Set_list_id.empty_set
-            | error, Some set_list_id -> error, set_list_id
-          in
-          let error,new_set_id =
-            Covering_classes_type.Set_list_id.add_set
-              parameter error allocate_id old_set_id
-          in
-           Int_storage.Nearly_inf_Imperatif.set
-            parameter
-            error
-            elt
-            new_set_id
-            pointer_backward)
-         (error, pointer_backward)
-         l
+       store_pointer_backward parameter error id pointer_backward l
      in
      error, {
-         Covering_classes_type.dic = dic; 
-         Covering_classes_type.pointer_backward = pointer_backward}
-      
-let clean_new parameter error classes =
-  (* beginning state of a remanent: empty dictionary and pointer_backward*)
+       Covering_classes_type.dic = dic; 
+       Covering_classes_type.pointer_backward = pointer_backward}
+
+let empty_remanent parameter error =
   let good_lists =
     Covering_classes_type.Dictionary_of_Covering_classes.init () in
   let error,pbw = Int_storage.Nearly_inf_Imperatif.create parameter error 0 in 
-  let empty_acc =
+  let empty_remanent =
     { Covering_classes_type.dic = good_lists ;
       Covering_classes_type.pointer_backward = pbw }
-  in
-  (*sorted the length of covering classes*)
+  in empty_remanent
+    
+let clean_new parameter error classes =
   let lists_to_deal_with = length_sorted classes in
-  List.fold_left (fun (error,acc) list ->
+  List.fold_left (fun (error, acc) list ->
                   match list with
-                  | [] -> (error, acc)
+                  | [] -> error, acc
                   | t::q ->
-                     (*create a storage for pointer_backward*)
-                     let pointer_backward = acc.Covering_classes_type.pointer_backward in
+                    let pointer_backward = acc.Covering_classes_type.pointer_backward in
                      (* get the set of list(id) containing t *)
-                     let error, potential_supersets =
-                       match Int_storage.Nearly_inf_Imperatif.unsafe_get
-                               parameter
-                               error
-                               t
-                               pointer_backward
-                       with
-                       | error, None ->
-                          error, Covering_classes_type.Set_list_id.empty_set
-                       | error, Some set_list_id -> error, set_list_id
-                     in
-                     let rec aux to_visit potential_supersets =
+                    let error, potential_supersets =
+		      get_id_for_value parameter error t pointer_backward
+                    in
+                    let rec aux to_visit potential_supersets =
                       match to_visit with
-                       | [] -> error,acc
-                       | t'::q' ->
-                           (* get the set of list(id) containing t *)
-                           let error, potential_supersets' =
-                             match Int_storage.Nearly_inf_Imperatif.unsafe_get
-                                     parameter
-                                     error
-                                     t'
-                                     pointer_backward
-                             with
-                             | error, None ->
-                                error, Covering_classes_type.Set_list_id.empty_set
-                             | error, Some set_list_id ->
-                                error, set_list_id
-                           in
-                           (* intersection of two sets *)
-                           let error, potential_superset =
-                             Covering_classes_type.Set_list_id.inter
-                               parameter
-                               error
-                               potential_supersets
-                               potential_supersets'
-                           in
-                           if Covering_classes_type.Set_list_id.is_empty_set
-                                potential_superset
-                           then
-                             store_new_class parameter error list acc
-                           else
-                             aux q' potential_superset
-                     in
+			| [] -> error,acc
+			| t'::q' ->
+                         (* get the set of list(id) containing t *)
+                          let error, potential_supersets' =
+			    get_id_for_value parameter error t' pointer_backward
+                          in
+                         (* intersection of two sets *)
+                          let error, potential_superset =
+                            Covering_classes_type.Set_list_id.inter
+                              parameter
+                              error
+                              potential_supersets
+                              potential_supersets'
+                          in
+                          if Covering_classes_type.Set_list_id.is_empty_set
+                            potential_superset
+                          then
+                            store_new_class parameter error list acc
+                          else
+                            aux q' potential_superset
+                    in
                      (*check the beginning state of a superset*)
-                     if Covering_classes_type.Set_list_id.is_empty_set
-                          potential_supersets
-                     then
+                    if Covering_classes_type.Set_list_id.is_empty_set
+                      potential_supersets
+                    then
                        (*if it is empty then store it to remanent*)
-                       store_new_class parameter error list acc
-                     else
-                       aux q potential_supersets)
-                 (error, empty_acc) lists_to_deal_with
-
+                      store_new_class parameter error list acc
+                    else
+                      aux q potential_supersets)
+    (error, empty_remanent parameter error) lists_to_deal_with
+    
 let add_covering_class parameter error agent_type sites_list covering_classes =
   match sites_list with
     | [] -> error, covering_classes
@@ -275,31 +257,34 @@ let scan_rule_set parameter error handler rules =
   in
   error, result
 
-let covering_classes parameters error handler cc_compil =
-  let parameters =  Remanent_parameters.update_prefix parameters "agent_type:" in 
-  let error,result = scan_rule_set parameters error handler cc_compil.Cckappa_sig.rules in
-  let _ = Covering_classes_type.AgentMap.print
-            error
-            (fun error parameter dic ->
-             let _ = Covering_classes_type.Dictionary_of_Covering_classes.print
-                       parameter error
-                       (fun parameter error elt l _ _ ->
-                        let _ = Printf.printf "Covering_class_id:%i:" elt in
-                        let _ =
-                          print_string "site_type:{";
-                          let rec print_list l =
-                            match l with
-                            | [] -> ()
-                            | h :: [] -> print_int h; print_string "}"
-                            | h :: tl ->
-                               let _ = print_int h; print_string "," in
-                               print_list tl in
-                          print_list l
-                        in
-                        let _ = print_newline () in
-                        error
-                       ) dic.Covering_classes_type.dic
-             in error )
-            parameters
-            result
-  in error, result           
+let print_remanent_t parameter error result =
+  Covering_classes_type.AgentMap.print
+    error
+    (fun error parameter dic ->
+      let _ = Covering_classes_type.Dictionary_of_Covering_classes.print
+        parameter error
+        (fun parameter error elt l _ _ ->
+          let _ = Printf.printf "Covering_class_id:%i:" elt in
+          let _ =
+            print_string "site_type:{";
+            let rec print_list l =
+              match l with
+                | [] -> ()
+                | h :: [] -> print_int h; print_string "}"
+                | h :: tl ->
+                  let _ = print_int h; print_string "," in
+                  print_list tl in
+            print_list l
+          in
+          let _ = print_newline () in
+          error
+        ) dic.Covering_classes_type.dic
+      in error )
+    parameter
+    result
+ 
+let covering_classes parameter error handler cc_compil =
+  let parameter =  Remanent_parameters.update_prefix parameter "agent_type:" in 
+  let error,result = scan_rule_set parameter error handler cc_compil.Cckappa_sig.rules in
+  let _ = print_remanent_t parameter error result in
+  error, result
