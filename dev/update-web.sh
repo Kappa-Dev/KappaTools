@@ -22,6 +22,6 @@ COMMITNAME=$(git show --pretty=oneline -s --no-color)
 cd ${PLAYGROUND}
 git config user.email "kappa-dev@listes.sc.univ-paris-diderot.fr"
 git config user.name "KappaBot"
-git add ${PLAYGROUND}/docs/KaSim-manual-master/ && \
-    { git commit -m "Sync website with Kappa-Dev/KaSim@${COMMITNAME}" && \
+git add ${PLAYGROUND}/docs/KaSim-manual-master/ ${PLAYGROUND}/try/ && \
+    { git commit -m "Sync website for $1 with Kappa-Dev/KaSim@${COMMITNAME}" && \
     git push -q origin master || echo "No Changes" ; }
