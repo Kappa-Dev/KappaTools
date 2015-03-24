@@ -28,6 +28,8 @@ module InfluenceNodeMap =
   MapExt.Make (struct type t = influence_node let compare = compare end)
 module String2Map =
   MapExt.Make (struct type t = string*string let compare = compare end)
+module StringMap = 
+  MapExt.Make (struct type t = string let compare = compare end)
 
 type influence_map =
     {
@@ -43,10 +45,15 @@ module type Export_to_KaSim =
     val get_influence_map: state -> state * influence_map
     val get_contact_map:
       state -> state * (string list * (string*string) list) String2Map.t
+    val get_signature: 
+      state -> state * Signature.s
+
     val dump_errors: state -> unit
     val flush_errors: state -> state
+
     val dump_influence_map: state -> unit
     val dump_contact_map: state -> unit
+    val dump_signature: state -> unit
   end
 
 module Export_to_KaSim =
@@ -71,35 +78,26 @@ module Export_to_KaSim =
       Printf.fprintf parameters.Remanent_parameters_sig.log "\n"
 
     let print_contact_map parameters contact_map =
-      print_string "Contact map: \n";
+      Printf.fprintf parameters.Remanent_parameters_sig.log  "Contact map: \n";
       String2Map.iter
 	(fun (x,y) (l1,l2) ->
 	    if l1<>[]
 	    then
 	      begin
-		print_string x;
-		print_string "@";
-		print_string y;
-		print_string ": ";
+		let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s@%s: " x y in 
 		let _ = List.fold_left
 			  (fun bool x ->
-			   (if bool then print_string ", ");
-			   print_string x;
+			   (if bool then 
+			       Printf.fprintf parameters.Remanent_parameters_sig.log ", ");
+			    Printf.fprintf parameters.Remanent_parameters_sig.log "%s" x;
 			   true)
 			  false l1 in
-		print_newline ()
+		Printf.fprintf parameters.Remanent_parameters_sig.log "\n"
 	      end
 	    else ();
 	    List.iter
 	      (fun (z,t) ->
-	       print_string x;
-	       print_string "@";
-	       print_string y;
-	       print_string "--";
-	       print_string z;
-	       print_string "@";
-	       print_string t;
-	       print_newline ()
+		Printf.fprintf parameters.Remanent_parameters_sig.log "%s@%s--%s@%s\n" x y z t 
 	      ) l2
 	)
 	contact_map
@@ -115,6 +113,7 @@ module Export_to_KaSim =
 	  compilation: compilation ;
 	  influence_map:influence_map option ;
 	  contact_map:contact_map  option ;
+	  signature: Signature.s option;
 	  errors: Exception.method_handler ;
 	}
 
@@ -151,6 +150,7 @@ module Export_to_KaSim =
 	  parameters = parameters ;
 	  contact_map = None;
 	  influence_map = None;
+	  signature = None;
 	  errors=errors
 	}
 
@@ -184,11 +184,6 @@ module Export_to_KaSim =
         match site with
 	| Ckappa_sig.Binding site_name
 	| Ckappa_sig.Internal site_name -> site_name
-      in
-      let has_internal_state site =
-	match site with
-	| Ckappa_sig.Internal _ -> true
-	| Ckappa_sig.Binding _ -> false
       in
       let _ =
 	Ckappa_sig.Dictionary_of_agents.print
@@ -267,7 +262,7 @@ module Export_to_KaSim =
       {state with contact_map = Some sol ; errors = error }
 
     let compute_influence_map state = state
-
+      
     let rec get_contact_map state =
       match state.contact_map with
       | Some x -> state,x
@@ -280,6 +275,52 @@ module Export_to_KaSim =
       | None ->
 	 get_influence_map (compute_influence_map state)
 
+     let compute_signature state = 
+      let state,contact_map = get_contact_map state in 
+      let add a x states map = 
+	let old = 
+	  try 
+	    StringMap.find a map 
+	  with 
+	    Not_found -> []
+	in 
+	StringMap.add a ((x,states)::old) map
+      in 
+      let l = 
+	String2Map.fold 
+	  (fun (a,x) (states,binding) map -> 
+	    add a x (states,binding) map
+	  )
+	  contact_map
+	  StringMap.empty
+      in 
+      let l = 
+	StringMap.fold 
+	  (fun a interface list -> 
+	    (Term.with_dummy_pos a ,
+	     
+	     List.rev_map 
+	       (fun (x,(states,binding)) -> 
+		 { 
+		   Ast.port_nme = Term.with_dummy_pos x ;
+		   Ast.port_int = 
+		     List.rev_map
+		       (fun s -> Term.with_dummy_pos s)
+		       (List.rev states);
+		   Ast.port_lnk = Term.with_dummy_pos Ast.FREE})
+	       (List.rev interface))::list)
+	  l 
+	  []
+      in 
+      {state with signature = Some (Signature.create l)}
+
+
+	
+    let rec get_signature state = 
+      match state.signature with 
+      | Some x -> state,x
+      | None -> get_signature (compute_signature state)
+	   
     let dump_influence_map state =
       match state.influence_map with
       | None -> ()
@@ -292,6 +333,11 @@ module Export_to_KaSim =
 	| Some contact_map ->
 	   print_contact_map state.parameters contact_map
 
+    let dump_signature state = 
+      match state.signature with 
+      | None -> ()
+      | Some signature -> ()
+      
     let dump_errors state =
       Exception.print state.parameters state.errors
   end:Export_to_KaSim)
