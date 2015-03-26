@@ -44,17 +44,15 @@ module Set_list_keys = Set_and_map.Make
                          end)
 
 type remanent_dic = (unit, unit) Dictionary_of_Stochastic_classes.dictionary
-                                 
-type remanent = {dic : remanent_dic;
-                 key : Set_list_keys.set Inf_array.t
-                }
-    
+
 module Set_list_union = Set_and_map.Make
-                         (struct
-                           type t = int
-                           let compare = compare
-                         end)
+                          (struct
+                              type t = int
+                              let compare = compare
+                            end)
                                  
-type remanent_union = {dic_union : remanent_dic;
-                       pointer : Set_list_union.set Inf_array.t
-                      }
+type remanent_union =
+  {
+    dic_union : remanent_dic;
+    pointer : Set_list_union.set Inf_array.t
+  }
