@@ -26,23 +26,6 @@ let empty_classes parameter error handler =
   {
     Stochastic_classes_type.stochastic_classes = stochastic_classes
   }
-
-let rec print_list l =
-  match l with
-  | [] -> print_string "empty"
-  | h :: [] ->  print_int h; print_string "}"
-  | h :: tl ->
-     let _ = print_int h; print_string "," in
-     print_list tl
-                     
-let rec print_list_list ls =
-  match ls with
-  | [] -> ()
-  | h :: [] -> print_list h; print_string "}"
-  | h :: tl ->
-     let _ =  print_string "{"; print_list h;
-              print_string "; {" in
-     print_list_list tl
                    
 let add_generic parameter error agent_id key map =
   let get_agent =
@@ -97,9 +80,9 @@ let agent_creation parameter error viewsrhs agent_modif_plus creation =
 let add_sites_class parameter error agent_type sites_list stochastic_classes =
   match sites_list with
   | [] -> error, stochastic_classes
-  | l ->
+  | _ ->
      (*fetch the former list of stochastic classes*)
-     let error, agent =
+     (*let error, agent =
        Stochastic_classes_type.AgentMap.unsafe_get
          parameter
          error
@@ -109,8 +92,8 @@ let add_sites_class parameter error agent_type sites_list stochastic_classes =
        match agent with
        | None -> []
        | Some sites -> sites
-     in
-     (*add the normal sites without union first*)
+     in*)
+     (*add the normal sites without union*)
      let new_list = (List.rev sites_list) ::[] in
      Stochastic_classes_type.AgentMap.set
        parameter
@@ -208,7 +191,7 @@ let scan_rule_set parameter error handler rules =
       error
       (fun parameter error id classes init ->
        	let error, eq_classes =
-          Union_find.union_list_dic parameter error classes in
+          Union_find.union_dic parameter error classes in
 	(*store the result*)
 	Stochastic_classes_type.AgentMap.set
           parameter error id eq_classes init)

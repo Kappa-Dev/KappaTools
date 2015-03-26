@@ -65,7 +65,7 @@ let union x y l =
 let is_equivalence x y l =
   (findSet x l) = (findSet y l)
 
-let union_list l =
+let union_list l = (*REMOVE*)
   match l with
   | [] -> []
   | x :: tl as l ->
@@ -84,12 +84,6 @@ let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Stochastic classes") message exn
                  (fun () -> default)
 
- let get_id_for_value parameter error t set =
-  match  Int_storage.Nearly_inf_Imperatif.unsafe_get parameter error t set with
-    | error, None ->
-      error, Stochastic_classes_type.Set_list_union.empty_set
-    | error, Some ids -> error, ids
-
  let rec print_list l =
   match l with
   | [] -> print_string "empty"
@@ -106,27 +100,8 @@ let warn parameters mh message exn default =
      let _ =  print_list h;
               print_string "; " in
      print_list_list tl
-       
-let store_pointer_backward parameter error id pointer_backward l =
-  List.fold_left
-    (fun (error,pointer_backward) elt ->
-      let error, old_set_id =
-	get_id_for_value parameter error elt pointer_backward
-      in
-      let error,new_set_id =
-        Stochastic_classes_type.Set_list_union.add_set
-          parameter error id old_set_id
-      in
-      Int_storage.Nearly_inf_Imperatif.set
-        parameter
-        error
-        elt
-        new_set_id
-        pointer_backward)
-    (error, pointer_backward)
-    l
-    
-let print_remanent_dic parameter error dic =
+
+ let print_remanent_dic parameter error dic =
   Stochastic_classes_type.Dictionary_of_Stochastic_classes.print
     parameter
     error
@@ -146,6 +121,31 @@ let print_remanent_dic parameter error dic =
       let _ = print_newline () in
       error
     ) dic.Stochastic_classes_type.dic_union
+                               
+let get_id_for_value parameter error t set =
+  match  Int_storage.Nearly_inf_Imperatif.unsafe_get parameter error t set with
+    | error, None ->
+      error, Stochastic_classes_type.Set_list_union.empty_set
+    | error, Some ids -> error, ids
+
+let store_pointer_backward parameter error id pointer_backward l =
+  List.fold_left
+    (fun (error,pointer_backward) elt ->
+      let error, old_set_id =
+	get_id_for_value parameter error elt pointer_backward
+      in
+      let error,new_set_id =
+        Stochastic_classes_type.Set_list_union.add_set
+          parameter error id old_set_id
+      in
+      Int_storage.Nearly_inf_Imperatif.set
+        parameter
+        error
+        elt
+        new_set_id
+        pointer_backward)
+    (error, pointer_backward)
+    l   
 
  let store_new_class parameter error l remanent =
   (*the current remanent information: dictionary, pointer_backward*)
@@ -183,13 +183,65 @@ let print_remanent_dic parameter error dic =
        Stochastic_classes_type.dic_union = dic; 
        Stochastic_classes_type.pointer = pointer_backward}
 
-let union_list_dic parameter error classes =
+ let empty_remanent parameter error =
   let init_dic = Stochastic_classes_type.Dictionary_of_Stochastic_classes.init()in
   let error, init_pointer = Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
-  let empty_list =
+  let empty =
     {Stochastic_classes_type.dic_union = init_dic;
      Stochastic_classes_type.pointer = init_pointer}
-  in
+  in empty
+
+ (*let component l =
+   let result = ref [] in
+   match l with
+   | [] -> []
+   | x :: tl ->
+      List.iter (fun y ->
+                 result := union x y l :: !result) tl;
+      !result*)
+ 
+ let print_eq_classes l =
+   let a = Array.of_list l in
+   (* create an array for storing the classes *)
+   let classes = Array.make (Array.length a) [] in
+   (* going backwards in the array to have nicer printing *)
+   for i = (Array.length classes) - 1 downto 0
+   do classes.(a.(i)) <- i :: (classes.(a.(i))) done;
+   (* And now the printing *)
+   Array.iter (
+       function
+       | [] -> ()
+       | h::t ->
+          Printf.printf "{%d%a}" h
+                        (fun c -> List.iter (fun x -> Printf.fprintf c ",%i" x)) t
+     ) classes
+              
+let component l =
+   let result = ref [] in
+   match l with
+   | [] -> []
+   | x :: tl  ->
+     List.iter (fun y ->
+       let u = union x y l in
+       let _ = print_eq_classes u in
+       print_string "\n";
+       result := u :: !result       
+     ) tl;
+     !result
+      
+ let eq_union parameter error list =
+   let classes = component list in      
+   List.fold_left (fun (error, acc) list ->
+                   match list with
+                   | [] -> error, acc
+                   | _ -> store_new_class parameter error list acc)
+                  (error, empty_remanent parameter error) classes
+
+ let union_dic parameter error classes =
+   List.fold_left (fun _ list -> eq_union parameter error list)
+                  (error, empty_remanent parameter error) classes
+
+ let union_list_dic2 parameter error classes =(*FIXME*)
   List.fold_left (fun (error, acc) list ->
     let list = union_list list in
     match list with
@@ -221,7 +273,7 @@ let union_list_dic parameter error classes =
           store_new_class parameter error list acc
         else
           aux tl potential_supersets
-  ) (error, empty_list) classes
+  ) (error, empty_remanent parameter error) classes
     
 let print_union {treeArr} =
   Array.iter (fun x -> print_int x; print_string " ") treeArr
