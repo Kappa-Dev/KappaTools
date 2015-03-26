@@ -505,24 +505,26 @@ let compute_cycle_edges cc =
       | h :: _ -> snd (aux [] [] [] h) in
   element 0 cc.nodes_by_type
 
-let remove_cycle_edges free_id cc =
-  let rec aux (free_id,acc as out) = function
+let remove_cycle_edges complete_domain_with obs_id dst env free_id cc =
+  let rec aux ((f_id,env'),out as acc) = function
     | ((n,i),ToNode(n',i') as e) :: q ->
        let links = IntMap.find n cc.links in
        let int = IntMap.find n cc.internals in
        let links' = Array.copy links in
        let () = links'.(i) <- UnSpec in
-       let cc_tmp = update_cc free_id cc n links' int in
+       let cc_tmp = update_cc f_id cc n links' int in
        let links_dst = IntMap.find n' cc_tmp.links in
        let int_dst = IntMap.find n' cc_tmp.internals in
        let links_dst' = Array.copy links_dst in
        let () = links_dst'.(i') <- UnSpec in
-       let cc' = update_cc free_id cc_tmp n' links_dst' int_dst in
-       aux (succ free_id,(cc',e)::acc) q
-    | l -> assert (l = []); out in
-  aux (free_id,[]) (compute_cycle_edges cc)
+       let cc' = update_cc f_id cc_tmp n' links_dst' int_dst in
+       let pack,ans =
+	 complete_domain_with obs_id dst env' (succ f_id) cc' e in
+       aux (pack,ans::out) q
+    | l -> assert (l = []); acc in
+  aux ((free_id,env),[]) (compute_cycle_edges cc)
 
-let compute_father_candidates free_id cc =
+let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
   let agent_is_removable lp links internals =
     try
       let () = Array.iter (fun el -> if el >= 0 then raise Found) internals in
@@ -533,25 +535,31 @@ let compute_father_candidates free_id cc =
     with Found -> false in
   let remove_one_internal acc ag_id links internals =
     Tools.array_fold_lefti
-      (fun i (f_id, out as acc) el ->
+      (fun i ((f_id,env'), out as acc) el ->
        if el >= 0 then
 	 let int' = Array.copy internals in
 	 let () = int'.(i) <- -1 in
-	 (succ f_id,
-	  (update_cc f_id cc ag_id links int',((ag_id,i),ToInternal el))::out)
+	 let pack,ans =
+	   complete_domain_with obs_id dst env' (succ f_id)
+				(update_cc f_id cc ag_id links int')
+				((ag_id,i),ToInternal el) in
+	 (pack,ans::out)
        else acc)
       acc internals in
   let remove_one_frontier acc ag_id links internals =
     Tools.array_fold_lefti
-      (fun i (f_id,out as acc) ->
+      (fun i ((f_id,env'),out as acc) ->
        function
        | UnSpec -> acc
        | Free ->
 	  if i = 0 then acc else
 	    let links' = Array.copy links in
 	    let () = links'.(i) <- UnSpec in
-	    (succ f_id, (update_cc f_id cc ag_id links' internals,
-			 ((ag_id,i),ToNothing))::out)
+	    let pack,ans =
+	      complete_domain_with obs_id dst env' (succ f_id)
+				   (update_cc f_id cc ag_id links' internals)
+				   ((ag_id,i),ToNothing) in
+	    (pack,ans::out)
        | Link (n',i') ->
 	  if not (agent_is_removable i links internals) then acc else
 	    let links_dst = IntMap.find n' cc.links in
@@ -560,17 +568,23 @@ let compute_father_candidates free_id cc =
 	    let () = links_dst'.(i') <- UnSpec in
 	    let cc' = update_cc f_id (remove_ag_cc f_id cc ag_id)
 				n' links_dst' int_dst in
-	    succ f_id,
-	    (cc',((n',i'),ToNew (find_ty cc ag_id,ag_id,i)))::out)
+	    let pack,ans =
+	      complete_domain_with obs_id dst env' (succ f_id) cc'
+				   ((n',i'),ToNew (find_ty cc ag_id,ag_id,i)) in
+	    (pack,ans::out))
       (remove_one_internal acc ag_id links internals) links in
-  let remove_or_remove_one (f_id,out as acc) ag_id links internals =
+  let remove_or_remove_one ((f_id,env'),out as acc) ag_id links internals =
     if agent_is_removable 0 links internals then
-      succ f_id,
-      (remove_ag_cc f_id cc ag_id,((ag_id,0),ToNothing)) :: out
+      let pack,ans =
+	complete_domain_with
+	  obs_id dst env' (succ f_id) (remove_ag_cc f_id cc ag_id)
+	  ((ag_id,0),ToNothing) in
+      (pack,ans::out)
     else remove_one_frontier acc ag_id links internals in
   IntMap.fold (fun i links acc ->
 	       remove_or_remove_one acc i links (IntMap.find i cc.internals))
-	      cc.links (remove_cycle_edges free_id cc)
+	      cc.links
+	      (remove_cycle_edges complete_domain_with obs_id dst env free_id cc)
 
 let rec complete_domain_with obs_id dst env free_id cc edge =
   let new_son inj =
@@ -587,19 +601,15 @@ let rec complete_domain_with obs_id dst env free_id cc edge =
 			  (Array.fold_left List.append [] cc.nodes_by_type)) in
      add_new_point obs_id env free_id [son] cc
 and add_new_point obs_id env free_id sons cc =
-  let (free_id',cand) = compute_father_candidates free_id cc in
   let () = Format.eprintf "%a@." (print true (Env.sigs env)) cc in
   let (free_id'',env'),fathers =
-    Tools.list_fold_right_map
-      (fun (free_id'',env') (cc', edge) ->
-		      complete_domain_with obs_id cc.id env' free_id'' cc' edge)
-	   (free_id',env) cand in
-       ((free_id'',
-	 Env.add_point
-	   cc.id
-	   {cc = cc; is_obs = cc.id = obs_id; sons=sons; fathers = fathers;}
-	   env')
-       ,cc.id)
+    compute_father_candidates complete_domain_with obs_id cc.id env free_id cc in
+  ((free_id'',
+    Env.add_point
+      cc.id
+      {cc = cc; is_obs = cc.id = obs_id; sons=sons; fathers = fathers;}
+      env')
+  ,cc.id)
 
 let add_domain env cc =
   let known_cc = Env.find env cc in
