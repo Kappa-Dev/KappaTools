@@ -106,74 +106,76 @@ let agent_of_rule_agent_negative rm =
 let agent_of_rule_agent rm =
   snd (full_agent_of_rule_agent None rm)
 
-let links_are_compatibles i j l =
-  let rec aux acc = function
-  | [] -> Some (List.rev_append acc [(i,j)])
-  | (a,b as h)::t -> if i = a
-		     then if j = b then Some (List.rev_append acc t)
-			  else None
-		     else if j = b then None
-		     else aux (h::acc) t
-  in aux [] l
+let agent_is_linked_on_port me i id = function
+  | VAL j when i = j -> id <> me
+  | (VAL _ | FREE | ANY) -> false
 
-let agents_are_compatibles contraints o p =
-  if o.a_type = p.a_type then
-    let ints = Array.copy o.a_ints in
-    if Tools.array_fold_left2i (fun i b x y ->
-				b && match x,y with
-				     | Some a, Some b -> ints.(i) <- None; a = b
-				     | (Some _ | None), _ -> true)
-			       true o.a_ints p.a_ints
-    then
-      let ports = Array.copy o.a_ports in
-      match Tools.array_fold_left2i
-	      (fun i c x y ->
-	       match c with
-	       | None -> None
-	       | Some l -> match x, y with
-			   | (FREE, VAL _ | VAL _, FREE) -> None
-			   | ANY, VAL j ->
-			      if List.exists (fun (_,v) -> v=j) l then None else Some l
-			   | VAL i, ANY ->
-			      if List.exists (fun (v,_) -> v=i) l then None else Some l
-			   | (ANY, _ | _, ANY) -> ports.(i) <- ANY; Some l
-			   | FREE, FREE -> ports.(i) <- ANY; Some l
-			   | VAL a, VAL b ->
-			      ports.(i) <- ANY; links_are_compatibles a b l)
-	      (Some contraints) o.a_ports p.a_ports with
-      | None -> None
-      | Some l' ->
-	 Some ({a_id = o.a_id; a_type = o.a_type;
-		a_ports = ports; a_ints = ints },l')
-    else None
-  else None
+let agent_is_linked_on forbidden i ag =
+  Tools.array_filter (agent_is_linked_on_port forbidden i) ag.a_ports <> []
 
-let intersect ag1 ag2 =
-  let aux a1 a2 = Tools.array_fold_left2i
-		    (fun i b x y -> b || (i <> 0 && x <>y)) false a1 a2 in
-  aux ag1.a_ports ag2.a_ports || aux ag1.a_ints ag2.a_ints
+let rec agents_are_compatibles don remains = function
+  | [] -> Some (don,remains)
+  | (o,p)::q ->
+     if o.a_type = p.a_type then
+       let ints = Array.copy o.a_ints in
+       let modif,i_ok =
+	 Tools.array_fold_left2i
+	   (fun i (modif,b) x y ->
+	    if b then match x,y with
+		      | Some a, Some b -> ints.(i) <- None; (true,(a = b))
+		      | (Some _ | None), _ -> (modif,true)
+	    else (modif,b))
+	   (false,true) o.a_ints p.a_ints in
+       if i_ok then
+	 let ports = Array.copy o.a_ports in
+	 match Tools.array_fold_left2i
+		 (fun i c x y ->
+		  match c with
+		  | _,None -> c
+		  | modif,(Some (todo,(g,h)) as op) ->
+		     match x, y with
+		     | (FREE, VAL _ | VAL _, FREE) -> (modif,None)
+		     | ANY, VAL _ -> c
+		     | VAL _, ANY -> c
+		     | (ANY, _ | _, ANY) -> ports.(i) <- ANY; (modif||i<>0,op)
+		     | FREE, FREE -> ports.(i) <- ANY; (modif||i<>0,op)
+		     | VAL a, VAL b ->
+			ports.(i) <- ANY;
+			match List.partition (agent_is_linked_on (-1) a) g,
+			      List.partition (agent_is_linked_on (-1) b) h with
+			| ([],_), ([],_) -> c
+			   (* if List.exists *)
+			   (* 	(fun (o,p) -> *)
+			   (* 	 agent_is_linked_on i a o && agent_is_linked_on i b p) *)
+			   (* 	todos *)
+			   (* then c *)
+			   (* else None *)
+			| ([x],g'), ([y],h') -> true,Some ((x,y)::todo,(g',h'))
+			| _, _ -> true,None
+		 )
+	      (modif,Some (q,remains)) o.a_ports p.a_ports with
+	 | true,Some (todo',rem') ->
+	    agents_are_compatibles ({a_id = o.a_id; a_type = o.a_type;
+				     a_ports = ports; a_ints = ints }::don)
+				   rem' todo'
+	 | _,_ -> None
+       else None
+     else None
 
-let rec differences_under_contraints inter forbidden acc b1 r1 b2 r2 l =
-  match r1, r2 with
-  | [],_ -> if l = [] && inter then [List.rev_append b1 acc] else []
-  | _,[] -> if l = [] && inter
-	    then [List.rev_append b1 (List.rev_append acc r1)] else []
-  | h1::t1, h2::t2 ->
-     let pair = (h1.a_id,h2.a_id) in
-     (if List.mem pair forbidden then [] else
-	match agents_are_compatibles l h1 h2 with
-	| None -> []
-	| Some (a,l') ->
-	   differences_under_contraints
-	     (inter || intersect h1 a) forbidden
-	     (a::acc) [] (List.rev_append b1 t1) [] (List.rev_append b2 t2) l')@
-       differences_under_contraints inter (pair::forbidden) acc
-				    (h1::b1) t1 b2 r2 l @
-	 differences_under_contraints inter (pair::forbidden) acc
-				      b1 r1 (h2::b2) t2 l
+
+let rec differences_bundles o pre p =
+  match o,p with
+  | [],_ | _,[] -> []
+  | oh :: ot, ph :: pt ->
+     (match agents_are_compatibles [] (ot,List.rev_append pre pt) [oh,ph] with
+      | None -> []
+      | Some (don,(o',_)) -> [don@o']
+     ) @ List.fold_right (fun out acc -> (if out == ot then o else oh::out)::acc)
+			 (differences_bundles ot pre p)
+			 (differences_bundles o (ph::pre) pt)
 
 let differences o p =
-  differences_under_contraints false [] [] [] o [] p []
+  List.filter (fun x -> x != o) (differences_bundles o [] p)
 
 let build_l_type sigs dst_ty dst_p switch =
   let ty_id = Signature.num_of_agent dst_ty sigs in
