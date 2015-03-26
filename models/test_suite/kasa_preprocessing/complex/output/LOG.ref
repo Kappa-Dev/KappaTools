@@ -406,17 +406,12 @@ Covering_class_id:0:site_type:{0,1}
 Covering_classes:agent_type:2:
 Covering_class_id:0:site_type:{0,1,2,3}
 Stochastic_classes:
-{0,1}
-{0,1}
-{0,1}{2}{3}
-{1}{0,2}{3}
-{1}{2}{0,3}
 Stochastic_classes:agent_type:0:
-Stochastic_class_id:0:site_type:{1,1}
+Stochastic_class_id:0:site_type:{0,1}
 Stochastic_classes:agent_type:1:
-Stochastic_class_id:0:site_type:{1,1}
+Stochastic_class_id:0:site_type:{0,1}
 Stochastic_classes:agent_type:2:
-Stochastic_class_id:0:site_type:{3,1,2,3}
-Stochastic_class_id:1:site_type:{2,1,2,3}
-Stochastic_class_id:2:site_type:{1,1,2,3}
+Stochastic_class_id:0:site_type:{0,3}
+Stochastic_class_id:1:site_type:{0,2}
+Stochastic_class_id:2:site_type:{0,1}
 execution finished without any exception
