@@ -3,16 +3,16 @@
 digraph G{
  ranksep=.5 ;
 { rank = same ; "0" [shape=plaintext] ;
-node_1 [label ="Intro A", shape=house, style=filled, fillcolor=green] ;
-node_2 [label ="Intro B", shape=house, style=filled, fillcolor=green] ;
-node_3 [label ="Intro B", shape=house, style=filled, fillcolor=green] ;
-node_4 [label ="Intro B", shape=house, style=filled, fillcolor=green] ;
-node_5 [label ="Intro B", shape=house, style=filled, fillcolor=green] ;
-node_6 [label ="Intro A", shape=house, style=filled, fillcolor=green] ;
-node_7 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
-node_8 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
-node_9 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
-node_10 [label ="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_1 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_2 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_3 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_4 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_5 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_6 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_7 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_8 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_9 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_10 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
 }
 { rank = same ; "1" [shape=plaintext] ;
 node_11 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
@@ -54,7 +54,7 @@ node_26 [label="a.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_27 [label="mod x2", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "12" [shape=plaintext] ;
-node_28 [label ="Cpp", style=filled, fillcolor=red] ;
+node_28 [label="Cpp", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];

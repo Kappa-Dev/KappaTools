@@ -3,7 +3,7 @@
 digraph G{
  ranksep=.5 ;
 { rank = same ; "0" [shape=plaintext] ;
-node_1 [label ="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_1 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 }
 { rank = same ; "1" [shape=plaintext] ;
 node_2 [label="R1", shape=invhouse, style=filled, fillcolor = lightblue] ;
@@ -48,7 +48,7 @@ node_14 [label="R1", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_15 [label="R3", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "15" [shape=plaintext] ;
-node_16 [label ="c", style=filled, fillcolor=red] ;
+node_16 [label="c", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];

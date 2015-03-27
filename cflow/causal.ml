@@ -464,13 +464,13 @@ let dot_of_grid profiling desc enriched_grid state env =
 	       eid (label atom.kind) "invhouse" "filled" "lightblue"
           | OBS _  ->
 	     Format.fprintf
-	       form "node_%d [label =\"%s\", style=filled, fillcolor=red] ;@,"
+	       form "node_%d [label=\"%s\", style=filled, fillcolor=red] ;@,"
 	       eid (label atom.kind)
         | INIT _  ->
 	   if !Parameter.showIntroEvents then
 	     Format.fprintf
 	       form
-	       "node_%d [label =\"%s\", shape=%s, style=%s, fillcolor=%s] ;@,"
+	       "node_%d [label=\"%s\", shape=%s, style=%s, fillcolor=%s] ;@,"
 	       eid (label atom.kind) "house" "filled" "green"
 	| PERT _ -> invalid_arg "Event type not handled"
        (* List.iter (fun obs -> fprintf desc "obs_%d [label =\"%s\", style=filled, fillcolor=red] ;\n node_%d -> obs_%d [arrowhead=vee];\n" eid obs eid eid) atom.observation ;*) 
