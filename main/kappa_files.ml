@@ -18,24 +18,26 @@ let path f =
 let open_out f =
   open_out (path f)
 
-let find_available_name name ext =
+let find_available_name name facultative ext =
   let base = try Filename.chop_extension name
 	     with Invalid_argument _ -> name in
   if Sys.file_exists (base^"."^ext) then
-    let v = ref 0 in
-    let () =
-      while Sys.file_exists (base^"~"^(string_of_int !v)^"."^ext)
-      do incr v; done
-    in base^"~"^(string_of_int !v)^"."^ext
-  else
-    (base^"."^ext)
+    let base' = if facultative <> "" then base^"_"^facultative else base in
+    if Sys.file_exists (base'^"."^ext) then
+      let v = ref 0 in
+      let () =
+	while Sys.file_exists (base'^"~"^(string_of_int !v)^"."^ext)
+	do incr v; done
+      in base'^"~"^(string_of_int !v)^"."^ext
+    else base'^"."^ext
+  else base^"."^ext
 
-let open_out_fresh_filename base_name concat_list ext =
+let open_out_fresh_filename base_name concat_list facultative ext =
   let tmp_name =
     path (try Filename.chop_extension base_name
 		with Invalid_argument _ -> base_name) in
   let base_name = String.concat "_" (tmp_name::concat_list) in
-  open_out (find_available_name base_name ext)
+  open_out (find_available_name base_name facultative ext)
 
 let mk_dir_r d =
   let rec aux d =
@@ -107,7 +109,7 @@ let with_marshalized f =
      close_out d
 
 let set_cflow s = cflowFileName := s
-let fresh_cflow_filename l e = open_out_fresh_filename !cflowFileName l e
+let fresh_cflow_filename l e = open_out_fresh_filename !cflowFileName l "" e
 
 let open_profiling () = open_out !profilingName
 
@@ -129,7 +131,7 @@ let open_snapshot str event ext =
   let str = if str="" then !snapshotFileName else str in
   let desc =
     open_out_fresh_filename
-      str [string_of_int event] ext in
+      str [] (string_of_int event) ext in
   let () = add_out_desc desc in
   desc
 
