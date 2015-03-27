@@ -185,17 +185,17 @@ let rec agent_sites parameter error agent_id agent_type agent viewsrhs creation 
               parameter
               error
               (fun site a b (error, current_sites) ->
-               let c = site :: current_sites in
+               let c = current_sites in
                error,c)
               (fun site a (error, current_sites)->
-               let c =  site :: current_sites in
-               error, c)
+               warn parameter error (Some "line 191") Exit current_sites
+              )
               (fun site b (error, current_sites)->
                let c = site :: current_sites in
                error, c)
               agent.Cckappa_sig.agent_interface
               agent2.Cckappa_sig.agent_interface
-              agent2_sites_list(* all_sites*)
+              all_sites
           in
           let _ = print_string "\nsites_list_new:";
                   Union_find.print_list sites_list;
