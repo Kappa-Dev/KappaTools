@@ -557,10 +557,10 @@ let pretty_print err_fmt config_closure compression_type
        in
        let profiling desc =
 	 Format.fprintf
-	   desc "/* Compression of %d causal flows obtained in average at %E t.u */@."
+	   desc "/* @[Compression of %d causal flows@ obtained in average at %E t.u@] */@."
 	   n (av_t/.(float_of_int n)) ;
-	 Format.fprintf desc "/* Compressed causal flows were: [%a] */@."
-			(Pp.list (fun f -> Format.fprintf f ";")
+	 Format.fprintf desc "@[/* Compressed causal flows were:@ [%a] */@]@."
+			(Pp.list (fun f -> Format.fprintf f ";@,")
 				 Format.pp_print_int) ids
 	in
 	let desc = Kappa_files.fresh_cflow_filename

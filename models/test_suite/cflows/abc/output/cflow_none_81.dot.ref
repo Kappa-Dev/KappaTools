@@ -1,5 +1,6 @@
 /* Compression of 9 causal flows obtained in average at 1.524656E+01 t.u */
-/* Compressed causal flows were: [1333;1623;1936;2521;2588;2864;3049;3433;3512] */
+/* Compressed causal flows were: [1333;1623;1936;2521;2588;2864;3049;3433;
+3512] */
 digraph G{
  ranksep=.5 ;
 { rank = same ; "0" [shape=plaintext] ;
