@@ -15,7 +15,7 @@ let close_desc opt_env =
   | None -> ()
   | Some env -> Environment.close_desc env
 
-let main =
+let () =
   let options = [
     ("--version",
      Arg.Unit (fun () -> print_string (version_msg^"\n") ; flush stdout ; exit 0),
@@ -46,7 +46,7 @@ let main =
 		Failure _ ->
 		raise (Arg.Bad ("\""^var_val^"\" is not a valid value")))
 	       ::!Parameter.alg_var_overwrite)],
-	"Set a variable to a given value");
+     "Set a variable to a given value");
     ("-o", Arg.String Kappa_files.set_data,
      "file name for data output") ;
     ("-d",
@@ -94,7 +94,7 @@ let main =
     let abort =
       match !Parameter.inputKappaFileNames with
       | [] -> !Parameter.marshalizedInFile = ""
-     | _ -> false
+      | _ -> false
     in
     if abort then (prerr_string usage_msg ; exit 1) ;
     let sigint_handle = fun _ ->
@@ -202,94 +202,98 @@ let main =
     in
     ExceptionDefn.flush_warning Format.err_formatter ;
     Parameter.initSimTime () ;
-    try
-      Run.loop Format.std_formatter state profiling event_list counter env ;
-      Format.print_newline() ;
-      Format.printf "Simulation ended";
-      if Counter.null_event counter = 0 then Format.print_newline()
-      else
-	let () =
-	  Format.printf " (eff.: %f, detail below)@."
-			((float_of_int (Counter.event counter)) /.
-			   (float_of_int
-			      (Counter.null_event counter + Counter.event counter))) in
-	Array.iteri
-	  (fun i n ->
-	   match i with
-	   | 0 ->
-	      Format.printf "\tValid embedding but no longer unary when required: %f@."
-			    ((float_of_int n) /. (float_of_int (Counter.null_event counter)))
-	   | 1 ->
-	      Format.printf "\tValid embedding but not binary when required: %f@."
-			    ((float_of_int n) /. (float_of_int (Counter.null_event counter)))
-	   | 2 ->
-	      Format.printf "\tClashing instance: %f@."
-			    ((float_of_int n) /. (float_of_int (Counter.null_event counter)))
-	   | 3 ->
-	      Format.printf "\tLazy negative update: %f@."
-			    ((float_of_int n) /. (float_of_int (Counter.null_event counter)))
-	   | 4 -> Format.printf "\tLazy negative update of non local instances: %f@."
-				((float_of_int n) /. (float_of_int (Counter.null_event counter)))
-	   | 5 -> Format.printf "\tPerturbation interrupting time advance: %f@."
-				((float_of_int n) /. (float_of_int (Counter.null_event counter)))
-	   |_ -> Format.printf "\tna@."
-	  ) counter.Counter.stat_null ;
-	if !Parameter.fluxModeOn then
-	  Kappa_files.with_flux "" (fun d -> State.dot_of_flux d state env)
-    with
-    | Invalid_argument msg ->
-       begin
-	 (*if !Parameter.debugModeOn then (Debug.tag "State dumped! (dump.ka)";
- let desc = kasim_open_out "dump.ka" in State.snapshot state counter desc env;
- close_out desc); *)
-	 let s = (* Printexc.get_backtrace() *) "" in
-	 Format.eprintf "@.***Runtime error %s***@,%s@." msg s ;
-	 exit 1
-       end
-    | ExceptionDefn.UserInterrupted f ->
-       begin
-	 flush stdout ;
-	 let msg = f (Counter.time counter) (Counter.event counter) in
-	 Format.eprintf
-	   "@.***%s: would you like to record the current state? (y/N)***@."
-	   msg;
-	 if not !Parameter.batchmode then
-	   (match String.lowercase (Tools.read_input ()) with
-	    | ("y" | "yes") ->
-	       begin
-		 Parameter.dotOutput := false ;
-		 Kappa_files.with_dump
-		   (fun desc ->
-		    State.snapshot
-		      state counter desc !Parameter.snapshotHighres env;
-		    Parameter.debugModeOn:=true ; State.dump state counter env)
-	       end
-	    | _ -> ()
-	   ) ;
-	 close_desc (Some env) (*closes all other opened descriptors*)
-       end
-    | ExceptionDefn.Deadlock ->
-       Format.printf
-	 "?@.A deadlock was reached after %d events and %Es (Activity = %.5f)@."
-	 (Counter.event counter) (Counter.time counter)
-	 (State.total_activity state)
+    let () =
+      try Run.loop Format.std_formatter state profiling event_list counter env
+      with
+      | ExceptionDefn.UserInterrupted f ->
+	 begin
+	   let () = Format.print_newline() in
+	   let msg = f (Counter.time counter) (Counter.event counter) in
+	   let () =
+	     Format.eprintf
+	       "@.***%s: would you like to record the current state? (y/N)***"
+	       msg in
+	   let () = close_desc (Some env) in
+	   (*closes all other opened descriptors*)
+	   if !Parameter.batchmode
+	   then raise (ExceptionDefn.UserInterrupted f)
+	   else
+	     match String.lowercase (Tools.read_input ()) with
+	     | ("y" | "yes") ->
+		let () =  Parameter.dotOutput := false in
+		Kappa_files.with_dump
+		  (fun desc ->
+		   State.snapshot
+		     state counter desc !Parameter.snapshotHighres env;
+		   Parameter.debugModeOn:=true;
+		   State.dump state counter env)
+	     | _ -> ()
+	 end
+      | ExceptionDefn.Deadlock ->
+	 Format.printf
+	   "?@.A deadlock was reached after %d events and %Es (Activity = %.5f)"
+	   (Counter.event counter) (Counter.time counter)
+	   (State.total_activity state) in
+    Format.print_newline() ;
+    Format.printf "Simulation ended";
+    if Counter.null_event counter = 0 then Format.print_newline()
+    else
+      let () =
+	Format.printf " (eff.: %f, detail below)@."
+		      ((float_of_int (Counter.event counter)) /.
+			 (float_of_int
+			    (Counter.null_event counter + Counter.event counter))) in
+      Array.iteri
+	(fun i n ->
+	 match i with
+	 | 0 ->
+	    Format.printf "\tValid embedding but no longer unary when required: %f@."
+			  ((float_of_int n) /. (float_of_int (Counter.null_event counter)))
+	 | 1 ->
+	    Format.printf "\tValid embedding but not binary when required: %f@."
+			  ((float_of_int n) /. (float_of_int (Counter.null_event counter)))
+	 | 2 ->
+	    Format.printf "\tClashing instance: %f@."
+			  ((float_of_int n) /. (float_of_int (Counter.null_event counter)))
+	 | 3 ->
+	    Format.printf "\tLazy negative update: %f@."
+			  ((float_of_int n) /. (float_of_int (Counter.null_event counter)))
+	 | 4 -> Format.printf "\tLazy negative update of non local instances: %f@."
+			      ((float_of_int n) /. (float_of_int (Counter.null_event counter)))
+	 | 5 -> Format.printf "\tPerturbation interrupting time advance: %f@."
+			      ((float_of_int n) /. (float_of_int (Counter.null_event counter)))
+	 |_ -> Format.printf "\tna@."
+	) counter.Counter.stat_null ;
+      if !Parameter.fluxModeOn then
+	Kappa_files.with_flux "" (fun d -> State.dot_of_flux d state env)
   with
   | ExceptionDefn.Semantics_Error (pos, msg) ->
-     (close_desc None;
-      Format.eprintf "***Error (%s) line %d, char %d: %s***@."
-		     (fn pos) (ln pos) (cn pos) msg)
-  | ExceptionDefn.Malformed_Decl er -> Pp.error Format.pp_print_string er
+     let () = close_desc None in
+     let () = Format.eprintf "***Error (%s) line %d, char %d: %s***@."
+			     (fn pos) (ln pos) (cn pos) msg in
+     exit 2
+  | ExceptionDefn.Malformed_Decl er ->
+     let () = close_desc None in
+     let () = Pp.error Format.pp_print_string er in
+     exit 2
   | ExceptionDefn.Internal_Error er ->
-     Pp.error
-       (fun f x -> Format.fprintf f "Internal Error (please report):@ %s" x) er
+     let () = close_desc None in
+     let () =
+       Pp.error
+	 (fun f x -> Format.fprintf f "Internal Error (please report):@ %s" x)
+	 er in
+     exit 2
   | Invalid_argument msg ->
-     (close_desc None;
-      let s = "" (*Printexc.get_backtrace()*) in
-      Format.eprintf "@.@[<v>***Runtime error %s***@,%s@]@." msg s)
+     let () = close_desc None in
+     let s = "" (*Printexc.get_backtrace()*) in
+     let () = Format.eprintf "@.@[<v>***Runtime error %s***@,%s@]@." msg s in
+    exit 2
   | ExceptionDefn.UserInterrupted f ->
+     let () = close_desc None in
      let msg = f 0. 0 in
      let () =Format.eprintf "@.***Interrupted by user: %s***@." msg in
-     close_desc None
-  | ExceptionDefn.StopReached msg ->
-     (Format.eprintf "@.***%s***@." msg ; close_desc None)
-  | Sys_error msg -> (close_desc None; Format.eprintf "%s@." msg)
+     exit 2
+  | Sys_error msg ->
+     let () = close_desc None in
+     let () = Format.eprintf "%s@." msg in
+     exit 2
