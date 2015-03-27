@@ -408,6 +408,9 @@ let navigate env root nav =
 	       if s.extra_edge =
 		    ((Dipping.apply inj id,site),
 		     ToNode (Dipping.apply inj id',site'))
+		|| s.extra_edge =
+		    ((Dipping.apply inj id',site'),
+		     ToNode (Dipping.apply inj id,site))
 	       then aux (Dipping.compose inj s.inj) s.dst t
 	       else find_good_edge tail
 	    | ToNew (ty,id',site') ->
@@ -424,7 +427,9 @@ let navigate env root nav =
 
 let find env cc =
   let (root,nav) = to_navigation cc in
-  navigate env root nav
+(*  let () = Format.eprintf
+	     "[%a]@." (Pp.list Pp.space (print_edge (sigs env))) nav in
+ *)  navigate env root nav
 
 let get env cc_id = IntMap.find cc_id env.domain
 
