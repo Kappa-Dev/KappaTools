@@ -80,7 +80,7 @@
 digraph G{
  ranksep=.5 ;
 { rank = same ; "0" [shape=plaintext] ;
-node_1 [label ="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_1 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 }
 { rank = same ; "1" [shape=plaintext] ;
 node_2 [label="y++", shape=invhouse, style=filled, fillcolor = lightblue] ;
@@ -99,7 +99,7 @@ node_6 [label="y--", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_7 [label="x++_", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "6" [shape=plaintext] ;
-node_8 [label ="GOAL", style=filled, fillcolor=red] ;
+node_8 [label="GOAL", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];

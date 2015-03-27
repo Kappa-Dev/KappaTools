@@ -7,16 +7,14 @@ let eval_abort_pert just_applied pert state counter env =
   | None -> just_applied
   | Some var -> State.value_bool state counter env var
 
-let raw_pr_pexpr state counter env f pexpr =
-  let aux f = function
-    | Ast.Str_pexpr str,_ -> Format.pp_print_string f str
-    | Ast.Alg_pexpr alg,_ ->
-       Nbr.print f (State.value_alg state counter env alg)
-  in Pp.list (fun f -> Format.pp_print_cut f ()) aux f pexpr
 let pr_pexpr state counter env f pexpr =
-  Format.fprintf f "%a@." (raw_pr_pexpr state counter env) pexpr
+  Format.fprintf
+    f "%a@." (Kappa_printer.print_expr_val env (State.value_alg state counter))
+    pexpr
 let eval_pexpr pexpr state counter env =
-  Format.asprintf "@[<h>%a@]" (raw_pr_pexpr state counter env) pexpr
+  Format.asprintf
+    "@[<h>%a@]" (Kappa_printer.print_expr_val env (State.value_alg state counter))
+    pexpr
 
 let apply_n_time err_fmt x r state env counter pert_ids pert_events tracked =
   Nbr.iteri
