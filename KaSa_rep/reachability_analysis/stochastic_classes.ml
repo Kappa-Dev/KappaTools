@@ -122,65 +122,88 @@ let rec agent_sites parameter error agent_id agent_type agent viewsrhs creation 
              print_string "\n"
      in
      sites_list
-  | (agent_id2, agent_type2)::tl ->   
+  | (agent_id2, agent_type2) :: tl ->
      let error, get_agent_rhs =
-        Stochastic_classes_type.AgentMap.get
-        parameter
-        error
-        agent_id2
-        viewsrhs
-    in
-    match get_agent_rhs with
-    | None | Some Cckappa_sig.Ghost -> []
-    | Some Cckappa_sig.Agent agent2 ->
-       let _ =
-         (*add_set agent_interface*)
-         (*let error, add_agent_interface =
-           Cckappa_sig.Site_map_and_set.add_map
-             parameter
-             error
-             agent_id2
-             agent2.Cckappa_sig.agent_interface
-             agent.Cckappa_sig.agent_interface
-         in*)
-         let error, get_agent_sites =
-           Stochastic_classes_type.AgentMap.unsafe_get
-             parameter
-             error
-             agent_type2
-             init
-         in
-         let agent_sites_list =
-           match get_agent_sites with
-           | None -> []
-           | Some sites -> sites
-         in
-         let sites_list =
-           Cckappa_sig.Site_map_and_set.fold_map
-             (fun site _ current_list ->
-              let sites_list = site :: current_list in
-              sites_list
-             )
-             (*add_agent_interface agent_sites_list*)
-             agent2.Cckappa_sig.agent_interface agent_sites_list
-         in
-         (*let error, sites_list =
-           Cckappa_sig.Site_map_and_set.fold2z_map
-             parameter error
-             (fun site _ _  (error, current_list) ->
-              let sites_list = site :: current_list in
-              error, sites_list
-             )
-             agent2.Cckappa_sig.agent_interface agent.Cckappa_sig.agent_interface
-             agent_sites_list
-         in*)
-         let _ = print_string "\nsites_list_new:";
-                 Union_find.print_list sites_list;
-                 print_string "\n"
-         in
-         sites_list
-       in
-       agent_sites parameter error agent_id agent_type agent viewsrhs tl
+       Stochastic_classes_type.AgentMap.get
+         parameter
+         error
+         agent_id2
+         viewsrhs
+     in
+     match get_agent_rhs with
+     | None | Some Cckappa_sig.Ghost -> []
+     | Some Cckappa_sig.Agent agent2 ->
+        let _ =
+          (*get old agent in init*)
+          let get_old_agent =
+            match Stochastic_classes_type.AgentMap.unsafe_get
+                    parameter
+                    error
+                    agent_id
+                    init with
+            | error, None -> []
+            | error, Some a -> a
+          in
+          (*add old_agent and agent_modif into init*)
+          let error, new_init =
+            Stochastic_classes_type.AgentMap.set
+              parameter
+              error
+              agent_id2
+              get_old_agent
+              init
+          in
+          (*get sites of agent2 from new_init*)
+          let error, get_agent2_sites =
+            Stochastic_classes_type.AgentMap.unsafe_get
+              parameter
+              error
+              agent_type2 (*agent_type*)
+              new_init
+          in
+          let agent2_sites_list =
+            match get_agent2_sites with
+            | None -> []
+            | Some sites -> sites
+          in
+          (*get sites of agent from new_init*)
+          let error, get_agent_sites =
+            Stochastic_classes_type.AgentMap.unsafe_get
+              parameter
+              error
+              agent_type
+              new_init
+          in
+          let agent_sites_list =
+            match get_agent_sites with
+            | None -> []
+            | Some sites -> sites
+          in
+          let all_sites = List.append agent_sites_list agent2_sites_list in
+          let error, sites_list =
+            Cckappa_sig.Site_map_and_set.fold2_map
+              parameter
+              error
+              (fun site a b (error, current_sites) ->
+               let c = site :: current_sites in
+               error,c)
+              (fun site a (error, current_sites)->
+               let c =  site :: current_sites in
+               error, c)
+              (fun site b (error, current_sites)->
+               let c = site :: current_sites in
+               error, c)
+              agent.Cckappa_sig.agent_interface
+              agent2.Cckappa_sig.agent_interface
+              agent2_sites_list(* all_sites*)
+          in
+          let _ = print_string "\nsites_list_new:";
+                  Union_find.print_list sites_list;
+                  print_string "\n"
+          in
+          sites_list
+        in
+        agent_sites parameter error agent_id agent_type agent viewsrhs tl
     
 let scan_rule parameter error handler rule classes =
   let viewslhs = rule.Cckappa_sig.rule_lhs.Cckappa_sig.views in
@@ -210,9 +233,6 @@ let scan_rule parameter error handler rule classes =
               viewsrhs
               creation
 	  in
-          (*let sites_list =
-            agent_sites parameter error agent_type agent
-	  in*)
           (*store all sites associated with agent_type*)
           let error, stochastic_classes =
             add_sites_class
