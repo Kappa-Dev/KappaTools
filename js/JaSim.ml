@@ -1,3 +1,5 @@
+open Lwt
+
 module Html5 = Tyxml_js.Html5
 let document = Dom_html.window##document
 let log_buffer = Buffer.create 512
@@ -14,7 +16,7 @@ let write_out div () =
     let va = Buffer.contents log_buffer in
     let va_l = String.length va in
     let () = if va_l <> old_l then p##innerHTML <- (Js.string va) in
-    Lwt.bind (Lwt.bind (Lwt_js.sleep 1.) (fun () -> Lwt.return va_l)) aux in
+    Lwt_js.sleep 1. >>= (fun () -> return va_l) >>= aux in
   aux 0
 
 let run stop out_div s =
@@ -30,37 +32,35 @@ let run stop out_div s =
 	       Plot.plot_now env counter state in
     let profiling = Compression_main.D.S.PH.B.PB.CI.Po.K.P.init_log_info () in
     let () = Feedback.show_warnings out_div in
-    Lwt.bind
       (Run.loop_cps log_form
 		    (fun f -> if Lwt.is_sleeping stop
 			      then Lwt.bind (Lwt_js.yield ()) f
 			      else Lwt.return_unit)
 		    (fun _ _ _ _ _ _ -> Lwt.return_unit)
 		    state profiling [] counter env)
-      (fun () ->
-       Lwt.return (Plot.value 555))
+      >>= fun () -> return (Plot.value 555)
   with
   | ExceptionDefn.Syntax_Error er ->
      let () = Feedback.show_error Format.pp_print_string out_div er in
-     Lwt.return ""
+     return ""
   | ExceptionDefn.Semantics_Error ((fn,ln,cn), msg) ->
      let () = Format.eprintf "***Error (%s) line %d, char %d: %s***@."
 			     fn ln cn msg in
-     Lwt.return ""
+     return ""
   | ExceptionDefn.Malformed_Decl er ->
      let () = Feedback.show_error Format.pp_print_string out_div er in
-     Lwt.return ""
+     return ""
   | ExceptionDefn.Internal_Error er ->
      let () =
        Feedback.show_error
 	 (fun f x -> Format.fprintf f "Internal Error (please report):@ %s" x)
 	 out_div er in
-     Lwt.return ""
+     return ""
   | Invalid_argument msg ->
       let s = "" (*Printexc.get_backtrace()*) in
       let () =
 	Format.eprintf "@.@[<v>***Runtime error %s***@,%s@]@." msg s in
-      Lwt.return ""
+      return ""
 
 let launch_simulation go_button stop_button out_div graph program =
   let () = Buffer.reset log_buffer in
@@ -71,14 +71,14 @@ let launch_simulation go_button stop_button out_div graph program =
     stop_button##onclick <- Dom_html.handler
 			       (fun _ -> let () = Lwt.wakeup stopper () in
 					 Js._false) in
-  Lwt.bind (run stoppe out_div (Js.to_string program##value))
-	   (fun plot ->
-	    let () = Feedback.show_warnings out_div in
-	    let () = go_button##disabled <- Js._false in
-	    let () = stop_button##disabled <- Js._true in
-	    let () =
-	      graph##innerHTML <- Js.string plot in
-	    Lwt.return ())
+  run stoppe out_div (Js.to_string program##value) >>=
+    fun plot ->
+    let () = Feedback.show_warnings out_div in
+    let () = go_button##disabled <- Js._false in
+    let () = stop_button##disabled <- Js._true in
+    let () =
+      graph##innerHTML <- Js.string plot in
+    return ()
 
 let onload _ =
   let main =

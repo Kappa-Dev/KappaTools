@@ -1,6 +1,4 @@
 open Mods
-open Tools
-open ExceptionDefn
 
 type t = (int*int*view,Int2Set.t) Hashtbl.t
 and view = FREE | BND1 of int * int | BND0 | INT of int
