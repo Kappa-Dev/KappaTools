@@ -1,7 +1,6 @@
 (** {5 Old fashion positions } *)
 type pos = string * int * int
 val no_pos : pos
-val pos_of_lex_pos : Lexing.position -> pos
 val fn : pos -> string
 val ln : pos -> int
 val cn : pos -> int

@@ -62,7 +62,7 @@ type ('a,'b) contractible = NO of 'a
 			  | YES of 'b
 
 let rec compile_alg ?label var_map tk_map ?max_allowed_var
-		    (fr_mix_id,mix_l as mixs) (alg,(beg_pos,_ as pos)) =
+		    (fr_mix_id,mix_l as mixs) (alg,pos) =
   let rec_call mixs x =
     match compile_alg var_map tk_map ?max_allowed_var mixs x with
     | (mixs', (ALG_VAR _ | TOKEN_ID _ | UN_ALG_OP _ | STATE_ALG_OP _
@@ -79,23 +79,22 @@ let rec compile_alg ?label var_map tk_map ?max_allowed_var
      let i =
        try Mods.StringMap.find lab var_map with
        | Not_found ->
-	  raise (ExceptionDefn.Semantics_Error
-		   (Tools.pos_of_lex_pos beg_pos,
-		    lab ^" is not a declared variable"))
+	  raise (ExceptionDefn.Malformed_Decl
+		   (lab ^" is not a declared variable",pos))
      in
      let () = match max_allowed_var with
        | Some j when j < i ->
-	  raise (ExceptionDefn.Semantics_Error
-		   (Tools.pos_of_lex_pos beg_pos,
-		    "Reference to not yet defined '"^lab ^"' is forbidden."))
+	  raise (ExceptionDefn.Malformed_Decl
+		   ("Reference to not yet defined '"^lab ^"' is forbidden.",
+		    pos))
        | None | Some _ -> ()
      in(mixs,(ALG_VAR i,pos))
   | Ast.TOKEN_ID tk_nme ->
      let i =
        try Mods.StringMap.find tk_nme tk_map
        with Not_found ->
-	 raise (ExceptionDefn.Semantics_Error
-		  (Tools.pos_of_lex_pos beg_pos,tk_nme ^ " is not a declared token"))
+	 raise (ExceptionDefn.Malformed_Decl
+		  (tk_nme ^ " is not a declared token",pos))
      in (mixs,(TOKEN_ID i,pos))
   | Ast.STATE_ALG_OP (op) -> (mixs,(STATE_ALG_OP (op),pos))
   | Ast.CONST n -> (mixs,(CONST n,pos))
@@ -150,13 +149,14 @@ let rec compile_bool var_map tk_map mixs = function
 	   | (_,(Ast.FALSE,_)), Term.AND -> (mixs,(Ast.FALSE,pos))
 	   | (_,(Ast.TRUE,_)), Term.AND
 	   | (_,(Ast.FALSE,_)), Term.OR -> compile_bool var_map tk_map mixs b
-	   | (mixs',a' as out1),_ ->
+	   | (mixs',((Ast.BOOL_OP _ | Ast.COMPARE_OP _) ,_ as a') as out1),_ ->
 	      match compile_bool var_map tk_map mixs' b, op with
 	      | (_,(Ast.TRUE,_)), Term.OR -> (mixs,(Ast.TRUE,pos))
 	      | (_,(Ast.FALSE,_)), Term.AND -> (mixs,(Ast.FALSE,pos))
 	      | (_,(Ast.TRUE,_)), Term.AND
 	      | (_,(Ast.FALSE,_)), Term.OR -> out1
-	      | (mixs'',b'),_ -> (mixs'',(Ast.BOOL_OP (op,a',b'),pos))
+	      | (mixs'',((Ast.BOOL_OP _ | Ast.COMPARE_OP _) ,_ as b')),_ ->
+		 (mixs'',(Ast.BOOL_OP (op,a',b'),pos))
      end
   | Ast.COMPARE_OP (op,a,b),pos ->
      let (mixs',a') = compile_alg var_map tk_map mixs a in
@@ -169,8 +169,8 @@ let rec compile_bool var_map tk_map mixs = function
 
 let add_dep el s = Term.DepSet.add el s
 let rec aux_dep s = function
-  | BIN_ALG_OP (op, (a,_), (b,_)) -> aux_dep (aux_dep s a) b
-  | UN_ALG_OP (op, (a,_)) -> aux_dep s a
+  | BIN_ALG_OP (_, (a,_), (b,_)) -> aux_dep (aux_dep s a) b
+  | UN_ALG_OP (_, (a,_)) -> aux_dep s a
   | STATE_ALG_OP op -> add_dep (Term.dep_of_state_alg_op op) s
   | ALG_VAR i -> add_dep (Term.ALG i) s
   | KAPPA_INSTANCE i -> add_dep (Term.KAPPA i) s

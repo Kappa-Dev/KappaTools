@@ -15,7 +15,7 @@
 %token <Tools.pos> FLUX ASSIGN ASSIGN2 TOKEN KAPPA_LNK PIPE
 %token <Tools.pos> PRINT PRINTF
 %token <int> INT
-%token <string*Tools.pos> ID
+%token <string> ID
 %token <string> KAPPA_MRK LABEL
 %token <float> FLOAT
 %token <string*Tools.pos> STRING
@@ -93,7 +93,7 @@ start_rule:
 
 instruction:
     | SIGNATURE agent_expression {Ast.SIG $2}
-    | TOKEN ID {let str,pos = $2 in Ast.TOKENSIG (str,rhs_pos 2)}
+    | TOKEN ID {Ast.TOKENSIG ($2,rhs_pos 2)}
     | SIGNATURE error {raise (ExceptionDefn.Syntax_Error
 				(add_pos "Malformed agent signature, I was expecting something of the form '%agent: A(x,y~u~v,z)'"))}
 
@@ -142,8 +142,9 @@ instruction:
 init_declaration:
     | multiple non_empty_mixture
 	       {(None,Ast.INIT_MIX ($1,$2))}
-    | ID LAR multiple {(None,Ast.INIT_TOK ($3,$1))}
-    | ID OP_CUR init_declaration CL_CUR {let _,init = $3 in (Some $1,init)}
+    | ID LAR multiple {(None,Ast.INIT_TOK ($3,($1,rhs_pos 1)))}
+    | ID OP_CUR init_declaration CL_CUR
+	 {let _,init = $3 in (Some ($1,rhs_pos 1),init)}
     ;
 
 value_list:
@@ -199,7 +200,7 @@ effect:
 	{raise (ExceptionDefn.Syntax_Error
 		  (add_pos "Malformed perturbation instruction, I was expecting '$DEL alg_expression kappa_expression'"))}
     | ID LAR alg_expr /*updating the value of a token*/
-						{Ast.UPDATE_TOK ($1,$3)}
+						{Ast.UPDATE_TOK (($1,rhs_pos 1),$3)}
     | SNAPSHOT print_expr {Ast.SNAPSHOT ($2,$1)}
     | STOP print_expr {Ast.STOP ($2,$1)}
     | PRINT SMALLER print_expr GREATER {(Ast.PRINT ([],$3,$1))}
@@ -276,8 +277,8 @@ token_expr:
 
 sum_token:
     | OP_PAR sum_token CL_PAR {$2}
-    | alg_expr TYPE ID {[($1,$3)]}
-    | alg_expr TYPE ID PLUS sum_token {let l = $5 in ($1,$3)::l}
+    | alg_expr TYPE ID {[($1,($3,rhs_pos 3))]}
+    | alg_expr TYPE ID PLUS sum_token {let l = $5 in ($1,($3,rhs_pos 3))::l}
 
 mixture:
       /*empty*/ {[]}
@@ -332,7 +333,7 @@ constant:
     ;
 
 variable:
-    | PIPE ID PIPE {let str,pos = $2 in add_pos (Ast.TOKEN_ID (str))}
+    | PIPE ID PIPE {add_pos (Ast.TOKEN_ID ($2))}
     | PIPE non_empty_mixture PIPE { add_pos (Ast.KAPPA_INSTANCE $2) }
     | LABEL {add_pos (Ast.OBS_VAR ($1))}
     | TIME {add_pos (Ast.STATE_ALG_OP (Term.TIME_VAR))}
@@ -394,11 +395,10 @@ non_empty_mixture:
 
 agent_expression:
     | ID OP_PAR interface_expression CL_PAR
-	 {let (id,pos) = $1 in ((id,rhs_pos 1), $3)}
+	 {(($1,rhs_pos 1), $3)}
     | ID error
-	 {let str,pos = $1 in
-	  raise (ExceptionDefn.Syntax_Error
-		   (add_pos ("Malformed agent '"^str^"'")))}
+	 { raise (ExceptionDefn.Syntax_Error
+		    (add_pos ("Malformed agent '"^$1^"'")))}
     ;
 
 interface_expression:
@@ -414,8 +414,7 @@ ne_interface_expression:
 
 port_expression:
     | ID internal_state link_state
-	 {let (id,pos) = $1 in
-	  {Ast.port_nme=(id,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=$3}}
+	 { {Ast.port_nme=($1,rhs_pos 1); Ast.port_int=$2; Ast.port_lnk=$3}}
     ;
 
 internal_state:
@@ -430,7 +429,7 @@ link_state:
     | KAPPA_LNK INT {(Ast.LNK_VALUE $2,rhs_pos 2)}
     | KAPPA_LNK KAPPA_SEMI {(Ast.LNK_SOME,rhs_pos 2)}
     | KAPPA_LNK ID DOT ID {add_pos (Ast.LNK_TYPE
-				      ((fst $2,rhs_pos 2),(fst $4,rhs_pos 4)))}
+				      (($2,rhs_pos 2),($4,rhs_pos 4)))}
     | KAPPA_WLD {add_pos Ast.LNK_ANY}
     | KAPPA_LNK error
 	{raise (ExceptionDefn.Syntax_Error

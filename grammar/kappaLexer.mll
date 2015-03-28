@@ -20,8 +20,8 @@
  let () = Hashtbl.add keywords "repeat" REPEAT in
  let () = Hashtbl.add keywords "until" UNTIL in
  let () = Hashtbl.add keywords "INF" INFINITY in
- fun x pos ->
- try Hashtbl.find keywords x with Not_found -> ID (x,pos)
+ fun x ->
+ try Hashtbl.find keywords x with Not_found -> ID x
 }
 
 let eol = '\r'? '\n'
@@ -103,7 +103,7 @@ rule token = parse
 	 | integer as n {INT (int_of_string n)}
 	 | real as f {FLOAT (float_of_string f)}
 	 | '\'' ([^'\n''\'']+ as x) '\''{LABEL(x)}
-	 | id as str {let pos = position lexbuf in keyword_or_id str pos}
+	 | id as str {keyword_or_id str}
 	 | '@' {AT}
 	 | ',' {COMMA}
 	 | '(' {OP_PAR}

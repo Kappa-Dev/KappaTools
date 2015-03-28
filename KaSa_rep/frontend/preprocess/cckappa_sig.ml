@@ -177,7 +177,7 @@ type enriched_init =
   {
    e_init_factor : Ckappa_sig.mixture Ast.ast_alg_expr ;
    e_init_c_factor : mixture Ast.ast_alg_expr ;
-   e_init_string_pos: Ast.str_pos option ; 
+   e_init_string_pos: string Term.with_pos option ; 
    e_init_mixture : Ckappa_sig.mixture ;
    e_init_c_mixture : mixture ; 
    e_init_pos : Tools.pos

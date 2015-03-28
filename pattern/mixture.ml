@@ -1,7 +1,4 @@
 open Mods
-open ExceptionDefn
-open Ast
-open Tools
 
 type lnk_t = WLD | BND | FREE | TYPE of (int*int) (*(site_id,nme)*)
 type agent = {name:int ; interface : (int option * lnk_t) IntMap.t}
@@ -10,7 +7,6 @@ let dummy_agent = {name = 0 ; interface = IntMap.empty}
 let name ag = ag.name
 let interface ag = ag.interface
 let fold_interface f ag = IntMap.fold f ag.interface
-let create_interface name = ()
 let create_agent name intf = {name=name ; interface = intf}
 
 

@@ -1,4 +1,3 @@
-open Tools
 open Mods
 
 let version = "4.0-refactoring"
@@ -267,11 +266,6 @@ let () =
       if !Parameter.fluxModeOn then
 	Kappa_files.with_flux "" (fun d -> State.dot_of_flux d state env)
   with
-  | ExceptionDefn.Semantics_Error (pos, msg) ->
-     let () = close_desc None in
-     let () = Format.eprintf "***Error (%s) line %d, char %d: %s***@."
-			     (fn pos) (ln pos) (cn pos) msg in
-     exit 2
   | ExceptionDefn.Malformed_Decl er ->
      let () = close_desc None in
      let () = Pp.error Format.pp_print_string er in

@@ -4,8 +4,6 @@ let snapshotFileName = ref "snap"
 let dumpFileName = ref "dump.ka"
 let cflowFileName = ref "cflow.dot"
 let profilingName = ref "profiling.txt"
-let with_weak_compression = "weakly_compressed"
-let without_compression = "without_compression"
 let influenceFileName = ref ""
 let fluxFileName = ref ""
 let outputDataName = ref "data.out"
@@ -93,11 +91,11 @@ let set_dir s =
   let () = try
       if not (Sys.is_directory s)
       then (Format.eprintf "'%s' is not a directory@." s ; exit 1)
-    with Sys_error msg -> mk_dir_r s in
+    with Sys_error _ -> mk_dir_r s in
   outputDirName := s
 
 let set_data f = outputDataName := f
-let get_data f = !outputDataName
+let get_data () = !outputDataName
 
 let set_marshalized f = marshalizedOutFile := f
 let with_marshalized f =

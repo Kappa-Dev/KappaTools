@@ -1,6 +1,3 @@
-open Mods
-open ExceptionDefn
-
 type t = ((unit NamedDecls.t) option) NamedDecls.t
 
 let fold f sign cont =

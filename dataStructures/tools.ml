@@ -4,14 +4,7 @@ let ln (_,i,_) = i
 let cn (_,_,j) = j
 let fn (n,_,_) = n
 
-let pos_of_lex_pos pos =
-  (pos.Lexing.pos_fname, pos.Lexing.pos_lnum,
-   pos.Lexing.pos_cnum - pos.Lexing.pos_bol)
-
 let no_pos = ("",-1,-1)
-
-let string_of_pos (n,i,j) =
-  ("(in "^n^") line "^(string_of_int i)^", char "^(string_of_int j)^": ")
 
 let pow x n =
   assert (n >= 0);
@@ -59,18 +52,6 @@ let read_input () =
 let option_map f = function
   | Some x -> Some (f x)
   | None -> None
-
-let list_of_string str =
-	let stream = Stream.of_string str in
-	let rec parse stream acc cont =
-		try
-		match Stream.next stream with
-			| ' ' | '\t' -> parse stream "" (acc::cont)
-				| '\n' -> (acc::cont)
-			| c -> parse stream  (Printf.sprintf "%s%c" acc c ) cont
-		with Stream.Failure -> (acc::cont)
-	in
-	parse stream "" []
 
 let rec list_smart_filter f = function
   | t :: q as l ->

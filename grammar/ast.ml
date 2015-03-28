@@ -38,10 +38,10 @@ type 'a bool_expr =
 type arrow = RAR | LRAR
 type rule = {
   lhs: mixture ;
-  rm_token: (mixture ast_alg_expr with_pos * str_pos) list ;
+  rm_token: (mixture ast_alg_expr with_pos * string with_pos) list ;
   arrow:arrow ;
   rhs: mixture ;
-  add_token: (mixture ast_alg_expr with_pos * str_pos) list ;
+  add_token: (mixture ast_alg_expr with_pos * string with_pos) list ;
   k_def: mixture ast_alg_expr with_pos ;
   k_un:
     (mixture ast_alg_expr with_pos*mixture ast_alg_expr with_pos option) option;
@@ -76,7 +76,7 @@ type 'mixture modif_expr =
   | DELETE of ('mixture ast_alg_expr with_pos * 'mixture * Tools.pos)
   | UPDATE of
       (string Term.with_pos * 'mixture ast_alg_expr with_pos) (*TODO: pause*)
-  | UPDATE_TOK of (str_pos * 'mixture ast_alg_expr with_pos) (*TODO: pause*)
+  | UPDATE_TOK of (string with_pos * 'mixture ast_alg_expr with_pos) (*TODO: pause*)
   | STOP of ('mixture ast_alg_expr print_expr with_pos list * Tools.pos)
   | SNAPSHOT of ('mixture ast_alg_expr print_expr with_pos list * Tools.pos)
   (*maybe later of mixture too*)
@@ -99,13 +99,13 @@ type configuration = string Term.with_pos * (str_pos list)
 type 'mixture variable_def = string with_pos * 'mixture ast_alg_expr with_pos
 type 'mixture init_t =
   | INIT_MIX of 'mixture ast_alg_expr with_pos * 'mixture
-  | INIT_TOK of 'mixture ast_alg_expr with_pos * str_pos
+  | INIT_TOK of 'mixture ast_alg_expr with_pos * string with_pos
 
 type 'mixture instruction =
   | SIG of agent
   | TOKENSIG of string Term.with_pos
   | VOLSIG of str_pos * float * str_pos (* type, volume, parameter*)
-  | INIT of str_pos option * 'mixture init_t * Tools.pos (*volume, init, position *)
+  | INIT of string with_pos option * 'mixture init_t * Tools.pos (*volume, init, position *)
   | DECLARE of 'mixture variable_def
   | OBS of 'mixture variable_def (*for backward compatibility*)
   | PLOT of 'mixture ast_alg_expr with_pos
@@ -118,7 +118,7 @@ type ('agent,'mixture,'rule) compil =
     signatures : 'agent list ; (*agent signature declaration*)
     rules : (string with_pos option * 'rule with_pos) list ; (*rules (possibly named)*)
     observables : 'mixture ast_alg_expr with_pos list ; (*list of patterns to plot*)
-    init : (str_pos option * 'mixture init_t * Tools.pos) list ; (*initial graph declaration*)
+    init : (string with_pos option * 'mixture init_t * Tools.pos) list ; (*initial graph declaration*)
     perturbations : 'mixture perturbation list ;
     configurations : configuration list ;
     tokens :  string Term.with_pos list ;

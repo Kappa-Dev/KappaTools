@@ -58,10 +58,6 @@ let run stop out_div s =
       | ExceptionDefn.Syntax_Error er ->
 	 let () = Feedback.show_error Format.pp_print_string out_div er in
 	 return ""
-      | ExceptionDefn.Semantics_Error ((fn,ln,cn), msg) ->
-	 let () = Format.eprintf "***Error (%s) line %d, char %d: %s***@."
-				 fn ln cn msg in
-	 return ""
       | ExceptionDefn.Malformed_Decl er ->
 	 let () = Feedback.show_error Format.pp_print_string out_div er in
 	 return ""

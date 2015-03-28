@@ -164,7 +164,7 @@ let declare_unary_rule rule_lbl id env =
 	match rule_lbl with
 		| None -> env
 		| Some (r_nme,pos) ->
-			if StringMap.mem r_nme env.num_of_unary_rule then raise (Semantics_Error (pos, ("Rule name "^r_nme^" is already used")))
+			if StringMap.mem r_nme env.num_of_unary_rule then raise (Malformed_Decl (("Rule name "^r_nme^" is already used"),pos))
 			else
 				let nr = StringMap.add r_nme id env.num_of_unary_rule
 				and rn = IntMap.add id r_nme env.unary_rule_of_num
