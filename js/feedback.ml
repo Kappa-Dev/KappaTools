@@ -36,3 +36,11 @@ let show_error pr div (x,pos) =
 	  <p>$str:Format.asprintf "%a %a@." Pp.position pos pr x$</p>
 	  </div> >> in
   Dom.appendChild div (Tyxml_js.To_dom.of_div raw)
+
+let show_info pr div =
+  let raw =
+  <:html5<<div class="alert alert-info alert-dismisible">
+	  $raw_alert_close_button ()$
+	  <p>$str:Format.asprintf "%t@." pr$</p>
+	  </div> >> in
+  Dom.appendChild div (Tyxml_js.To_dom.of_div raw)

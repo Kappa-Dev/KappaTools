@@ -20,47 +20,69 @@ let write_out div () =
   aux 0
 
 let run stop out_div s =
-  try
-    let result =
-      let () = Parameter.pointNumberValue := 100 in
-      let () = Ast.init_compil () in
-      let () = parse s in
-      !Ast.result in
-    let (env,counter,state) = Eval.initialize log_form [] result in
-    let () = Plot.create "foo.svg" in
-    let () = if !Parameter.pointNumberValue > 0 then
-	       Plot.plot_now env counter state in
-    let profiling = Compression_main.D.S.PH.B.PB.CI.Po.K.P.init_log_info () in
-    let () = Feedback.show_warnings out_div in
-      (Run.loop_cps log_form
-		    (fun f -> if Lwt.is_sleeping stop
-			      then Lwt.bind (Lwt_js.yield ()) f
-			      else Lwt.return_unit)
-		    (fun _ _ _ _ _ _ -> Lwt.return_unit)
-		    state profiling [] counter env)
-      >>= fun () -> return (Plot.value 555)
-  with
-  | ExceptionDefn.Syntax_Error er ->
-     let () = Feedback.show_error Format.pp_print_string out_div er in
-     return ""
-  | ExceptionDefn.Semantics_Error ((fn,ln,cn), msg) ->
-     let () = Format.eprintf "***Error (%s) line %d, char %d: %s***@."
-			     fn ln cn msg in
-     return ""
-  | ExceptionDefn.Malformed_Decl er ->
-     let () = Feedback.show_error Format.pp_print_string out_div er in
-     return ""
-  | ExceptionDefn.Internal_Error er ->
-     let () =
-       Feedback.show_error
-	 (fun f x -> Format.fprintf f "Internal Error (please report):@ %s" x)
-	 out_div er in
-     return ""
-  | Invalid_argument msg ->
-      let s = "" (*Printexc.get_backtrace()*) in
-      let () =
-	Format.eprintf "@.@[<v>***Runtime error %s***@,%s@]@." msg s in
-      return ""
+  catch
+    (fun () ->
+     let () = Parameter.pointNumberValue := 100 in
+     let () = Ast.init_compil () in
+     wrap1 parse s
+     >>= fun () ->
+     let result = !Ast.result in
+     wrap3 Eval.initialize log_form [] result
+     >>= fun (env,counter,state) ->
+     let () = Plot.create "foo.svg" in
+     let () = if !Parameter.pointNumberValue > 0 then
+		Plot.plot_now env counter state in
+     let profiling = Compression_main.D.S.PH.B.PB.CI.Po.K.P.init_log_info () in
+     let () = Feedback.show_warnings out_div in
+     catch
+       (fun () ->
+	(Run.loop_cps log_form
+		      (fun f -> if Lwt.is_sleeping stop
+				then Lwt.bind (Lwt_js.yield ()) f
+				else Lwt.return_unit)
+		      (fun _ _ _ _ _ _ -> Lwt.return_unit)
+		      state profiling [] counter env)
+	>>= fun () -> return (Plot.value 555))
+       (function
+	 | ExceptionDefn.Deadlock ->
+	    let () =
+	      Feedback.show_info
+		(fun f ->
+		 Format.fprintf
+		   f "A deadlock was reached after %d events and %Es (Activity = %.5f)"
+		   (Mods.Counter.event counter) (Mods.Counter.time counter)
+		   (State.total_activity state)) out_div in
+	    return ""
+	 | e -> fail e))
+    (function
+      | ExceptionDefn.Syntax_Error er ->
+	 let () = Feedback.show_error Format.pp_print_string out_div er in
+	 return ""
+      | ExceptionDefn.Semantics_Error ((fn,ln,cn), msg) ->
+	 let () = Format.eprintf "***Error (%s) line %d, char %d: %s***@."
+				 fn ln cn msg in
+	 return ""
+      | ExceptionDefn.Malformed_Decl er ->
+	 let () = Feedback.show_error Format.pp_print_string out_div er in
+	 return ""
+      | ExceptionDefn.Internal_Error er ->
+	 let () =
+	   Feedback.show_error
+	     (fun f x -> Format.fprintf f "Internal Error (please report):@ %s" x)
+	     out_div er in
+	 return ""
+      | Invalid_argument msg ->
+	 let () =
+	   Feedback.show_error
+	     (fun f msg ->
+	      Format.fprintf f "Runtime error %s" msg)
+	     out_div (Term.with_dummy_pos msg) in
+	 return ""
+      | Sys_error msg ->
+	 let () = Feedback.show_error
+		    Format.pp_print_string out_div (Term.with_dummy_pos msg) in
+	 return ""
+      | e -> fail e)
 
 let launch_simulation go_button stop_button out_div graph program =
   let () = Buffer.reset log_buffer in
