@@ -284,7 +284,7 @@ module Counter =
 	inc_tick counter ;
 	n:=!n-1
       done;
-      Format.print_flush ()
+      Format.pp_print_flush f ()
 
     let stat_null i c =
       try c.stat_null.(i) <- c.stat_null.(i) + 1
