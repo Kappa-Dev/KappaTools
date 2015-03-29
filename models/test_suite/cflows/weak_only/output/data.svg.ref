@@ -505,104 +505,104 @@ xmlns:xlink="http://www.w3.org/1999/xlink" width="800" height="600">
   <use xlink:href="#plus" x="70.000000" y="575.000000">
   <title>'Cpp' t=0 v=0</title></use></g>
 <g id="data_4" style="color:blue">
-  <use xlink:href="#cross" x="730.000000" y="575.000000">
-  <title>'n_c' t=405.661 v=0</title></use>
-  <use xlink:href="#cross" x="708.073502" y="575.000000">
-  <title>'n_c' t=392.184 v=0</title></use>
-  <use xlink:href="#cross" x="685.826779" y="575.000000">
-  <title>'n_c' t=378.51 v=0</title></use>
-  <use xlink:href="#cross" x="664.158925" y="575.000000">
-  <title>'n_c' t=365.192 v=0</title></use>
-  <use xlink:href="#cross" x="641.576923" y="575.000000">
-  <title>'n_c' t=351.313 v=0</title></use>
-  <use xlink:href="#cross" x="619.244802" y="575.000000">
-  <title>'n_c' t=337.587 v=0</title></use>
-  <use xlink:href="#cross" x="597.291915" y="575.000000">
-  <title>'n_c' t=324.093 v=0</title></use>
-  <use xlink:href="#cross" x="575.659711" y="575.000000">
-  <title>'n_c' t=310.797 v=0</title></use>
-  <use xlink:href="#cross" x="553.203786" y="575.000000">
-  <title>'n_c' t=296.995 v=0</title></use>
-  <use xlink:href="#cross" x="531.466917" y="575.000000">
-  <title>'n_c' t=283.635 v=0</title></use>
-  <use xlink:href="#cross" x="508.514768" y="575.000000">
-  <title>'n_c' t=269.528 v=0</title></use>
-  <use xlink:href="#cross" x="486.138363" y="575.000000">
-  <title>'n_c' t=255.774 v=0</title></use>
-  <use xlink:href="#cross" x="463.681908" y="575.000000">
-  <title>'n_c' t=241.972 v=0</title></use>
-  <use xlink:href="#cross" x="440.686396" y="575.000000">
-  <title>'n_c' t=227.838 v=0</title></use>
-  <use xlink:href="#cross" x="418.311480" y="575.000000">
-  <title>'n_c' t=214.085 v=0</title></use>
-  <use xlink:href="#cross" x="395.476762" y="575.000000">
-  <title>'n_c' t=200.05 v=0</title></use>
-  <use xlink:href="#cross" x="372.059268" y="575.000000">
-  <title>'n_c' t=185.657 v=0</title></use>
-  <use xlink:href="#cross" x="350.212069" y="575.000000">
-  <title>'n_c' t=172.229 v=0</title></use>
-  <use xlink:href="#cross" x="327.897273" y="575.000000">
-  <title>'n_c' t=158.513 v=0</title></use>
-  <use xlink:href="#cross" x="306.206167" y="575.000000">
-  <title>'n_c' t=145.181 v=0</title></use>
-  <use xlink:href="#cross" x="284.717003" y="575.000000">
-  <title>'n_c' t=131.973 v=0</title></use>
-  <use xlink:href="#cross" x="262.595484" y="575.000000">
-  <title>'n_c' t=118.376 v=0</title></use>
-  <use xlink:href="#cross" x="240.008867" y="575.000000">
-  <title>'n_c' t=104.494 v=0</title></use>
-  <use xlink:href="#cross" x="218.606800" y="575.000000">
-  <title>'n_c' t=91.3393 v=0</title></use>
-  <use xlink:href="#cross" x="197.664867" y="575.000000">
-  <title>'n_c' t=78.4676 v=0</title></use>
-  <use xlink:href="#cross" x="180.741438" y="575.000000">
-  <title>'n_c' t=68.0659 v=0</title></use>
-  <use xlink:href="#cross" x="169.001983" y="575.000000">
-  <title>'n_c' t=60.8503 v=0</title></use>
-  <use xlink:href="#cross" x="160.411406" y="575.000000">
-  <title>'n_c' t=55.5703 v=0</title></use>
-  <use xlink:href="#cross" x="153.065823" y="575.000000">
-  <title>'n_c' t=51.0554 v=0</title></use>
-  <use xlink:href="#cross" x="146.832815" y="575.000000">
-  <title>'n_c' t=47.2243 v=0</title></use>
-  <use xlink:href="#cross" x="141.353953" y="575.000000">
-  <title>'n_c' t=43.8568 v=0</title></use>
-  <use xlink:href="#cross" x="136.033680" y="575.000000">
-  <title>'n_c' t=40.5868 v=0</title></use>
-  <use xlink:href="#cross" x="131.439893" y="575.000000">
-  <title>'n_c' t=37.7633 v=0</title></use>
-  <use xlink:href="#cross" x="127.333795" y="575.000000">
-  <title>'n_c' t=35.2395 v=0</title></use>
-  <use xlink:href="#cross" x="123.186826" y="575.000000">
-  <title>'n_c' t=32.6906 v=0</title></use>
-  <use xlink:href="#cross" x="119.332133" y="575.000000">
-  <title>'n_c' t=30.3214 v=0</title></use>
-  <use xlink:href="#cross" x="115.901351" y="575.000000">
-  <title>'n_c' t=28.2127 v=0</title></use>
-  <use xlink:href="#cross" x="112.768854" y="575.000000">
-  <title>'n_c' t=26.2873 v=0</title></use>
-  <use xlink:href="#cross" x="109.873550" y="575.000000">
-  <title>'n_c' t=24.5078 v=0</title></use>
-  <use xlink:href="#cross" x="107.097667" y="575.000000">
-  <title>'n_c' t=22.8016 v=0</title></use>
-  <use xlink:href="#cross" x="104.496110" y="575.000000">
-  <title>'n_c' t=21.2026 v=0</title></use>
-  <use xlink:href="#cross" x="101.970655" y="575.000000">
-  <title>'n_c' t=19.6504 v=0</title></use>
-  <use xlink:href="#cross" x="99.710203" y="575.000000">
-  <title>'n_c' t=18.261 v=0</title></use>
-  <use xlink:href="#cross" x="97.532056" y="575.000000">
-  <title>'n_c' t=16.9222 v=0</title></use>
-  <use xlink:href="#cross" x="95.467340" y="575.000000">
-  <title>'n_c' t=15.6532 v=0</title></use>
-  <use xlink:href="#cross" x="93.448018" y="575.000000">
-  <title>'n_c' t=14.412 v=0</title></use>
-  <use xlink:href="#cross" x="91.509834" y="575.000000">
-  <title>'n_c' t=13.2208 v=0</title></use>
-  <use xlink:href="#cross" x="89.602119" y="575.000000">
-  <title>'n_c' t=12.0482 v=0</title></use>
-  <use xlink:href="#cross" x="87.693119" y="575.000000">
-  <title>'n_c' t=10.8749 v=0</title></use>
+  <use xlink:href="#cross" x="730.000000" y="10.000000">
+  <title>'n_c' t=405.661 v=10000</title></use>
+  <use xlink:href="#cross" x="708.073502" y="10.000000">
+  <title>'n_c' t=392.184 v=10000</title></use>
+  <use xlink:href="#cross" x="685.826779" y="10.000000">
+  <title>'n_c' t=378.51 v=10000</title></use>
+  <use xlink:href="#cross" x="664.158925" y="10.000000">
+  <title>'n_c' t=365.192 v=10000</title></use>
+  <use xlink:href="#cross" x="641.576923" y="10.000000">
+  <title>'n_c' t=351.313 v=10000</title></use>
+  <use xlink:href="#cross" x="619.244802" y="10.000000">
+  <title>'n_c' t=337.587 v=10000</title></use>
+  <use xlink:href="#cross" x="597.291915" y="10.000000">
+  <title>'n_c' t=324.093 v=10000</title></use>
+  <use xlink:href="#cross" x="575.659711" y="10.000000">
+  <title>'n_c' t=310.797 v=10000</title></use>
+  <use xlink:href="#cross" x="553.203786" y="10.000000">
+  <title>'n_c' t=296.995 v=10000</title></use>
+  <use xlink:href="#cross" x="531.466917" y="10.000000">
+  <title>'n_c' t=283.635 v=10000</title></use>
+  <use xlink:href="#cross" x="508.514768" y="10.000000">
+  <title>'n_c' t=269.528 v=10000</title></use>
+  <use xlink:href="#cross" x="486.138363" y="10.000000">
+  <title>'n_c' t=255.774 v=10000</title></use>
+  <use xlink:href="#cross" x="463.681908" y="10.000000">
+  <title>'n_c' t=241.972 v=10000</title></use>
+  <use xlink:href="#cross" x="440.686396" y="10.000000">
+  <title>'n_c' t=227.838 v=10000</title></use>
+  <use xlink:href="#cross" x="418.311480" y="10.000000">
+  <title>'n_c' t=214.085 v=10000</title></use>
+  <use xlink:href="#cross" x="395.476762" y="10.000000">
+  <title>'n_c' t=200.05 v=10000</title></use>
+  <use xlink:href="#cross" x="372.059268" y="10.000000">
+  <title>'n_c' t=185.657 v=10000</title></use>
+  <use xlink:href="#cross" x="350.212069" y="10.000000">
+  <title>'n_c' t=172.229 v=10000</title></use>
+  <use xlink:href="#cross" x="327.897273" y="10.000000">
+  <title>'n_c' t=158.513 v=10000</title></use>
+  <use xlink:href="#cross" x="306.206167" y="10.000000">
+  <title>'n_c' t=145.181 v=10000</title></use>
+  <use xlink:href="#cross" x="284.717003" y="10.000000">
+  <title>'n_c' t=131.973 v=10000</title></use>
+  <use xlink:href="#cross" x="262.595484" y="10.000000">
+  <title>'n_c' t=118.376 v=10000</title></use>
+  <use xlink:href="#cross" x="240.008867" y="10.000000">
+  <title>'n_c' t=104.494 v=10000</title></use>
+  <use xlink:href="#cross" x="218.606800" y="10.000000">
+  <title>'n_c' t=91.3393 v=10000</title></use>
+  <use xlink:href="#cross" x="197.664867" y="10.000000">
+  <title>'n_c' t=78.4676 v=10000</title></use>
+  <use xlink:href="#cross" x="180.741438" y="10.000000">
+  <title>'n_c' t=68.0659 v=10000</title></use>
+  <use xlink:href="#cross" x="169.001983" y="10.000000">
+  <title>'n_c' t=60.8503 v=10000</title></use>
+  <use xlink:href="#cross" x="160.411406" y="10.000000">
+  <title>'n_c' t=55.5703 v=10000</title></use>
+  <use xlink:href="#cross" x="153.065823" y="10.000000">
+  <title>'n_c' t=51.0554 v=10000</title></use>
+  <use xlink:href="#cross" x="146.832815" y="10.000000">
+  <title>'n_c' t=47.2243 v=10000</title></use>
+  <use xlink:href="#cross" x="141.353953" y="10.000000">
+  <title>'n_c' t=43.8568 v=10000</title></use>
+  <use xlink:href="#cross" x="136.033680" y="10.000000">
+  <title>'n_c' t=40.5868 v=10000</title></use>
+  <use xlink:href="#cross" x="131.439893" y="10.000000">
+  <title>'n_c' t=37.7633 v=10000</title></use>
+  <use xlink:href="#cross" x="127.333795" y="10.000000">
+  <title>'n_c' t=35.2395 v=10000</title></use>
+  <use xlink:href="#cross" x="123.186826" y="10.000000">
+  <title>'n_c' t=32.6906 v=10000</title></use>
+  <use xlink:href="#cross" x="119.332133" y="10.000000">
+  <title>'n_c' t=30.3214 v=10000</title></use>
+  <use xlink:href="#cross" x="115.901351" y="10.000000">
+  <title>'n_c' t=28.2127 v=10000</title></use>
+  <use xlink:href="#cross" x="112.768854" y="10.000000">
+  <title>'n_c' t=26.2873 v=10000</title></use>
+  <use xlink:href="#cross" x="109.873550" y="10.000000">
+  <title>'n_c' t=24.5078 v=10000</title></use>
+  <use xlink:href="#cross" x="107.097667" y="10.000000">
+  <title>'n_c' t=22.8016 v=10000</title></use>
+  <use xlink:href="#cross" x="104.496110" y="10.000000">
+  <title>'n_c' t=21.2026 v=10000</title></use>
+  <use xlink:href="#cross" x="101.970655" y="10.000000">
+  <title>'n_c' t=19.6504 v=10000</title></use>
+  <use xlink:href="#cross" x="99.710203" y="10.000000">
+  <title>'n_c' t=18.261 v=10000</title></use>
+  <use xlink:href="#cross" x="97.532056" y="10.000000">
+  <title>'n_c' t=16.9222 v=10000</title></use>
+  <use xlink:href="#cross" x="95.467340" y="10.000000">
+  <title>'n_c' t=15.6532 v=10000</title></use>
+  <use xlink:href="#cross" x="93.448018" y="10.000000">
+  <title>'n_c' t=14.412 v=10000</title></use>
+  <use xlink:href="#cross" x="91.509834" y="10.000000">
+  <title>'n_c' t=13.2208 v=10000</title></use>
+  <use xlink:href="#cross" x="89.602119" y="10.000000">
+  <title>'n_c' t=12.0482 v=10000</title></use>
+  <use xlink:href="#cross" x="87.693119" y="10.000000">
+  <title>'n_c' t=10.8749 v=10000</title></use>
   <use xlink:href="#cross" x="85.855011" y="575.000000">
   <title>'n_c' t=9.74509 v=0</title></use>
   <use xlink:href="#cross" x="70.000000" y="575.000000">
