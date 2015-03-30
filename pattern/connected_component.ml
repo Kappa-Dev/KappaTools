@@ -170,10 +170,11 @@ let to_navigation cc =
        build_for out' (h::don) todo in
   let rec find_root i =
     if i = Array.length cc.nodes_by_type
-    then (0,[])
+    then (0,0,[])
     else match cc.nodes_by_type.(i) with
 	 | [] -> find_root (succ i)
-	 | x :: _ -> (x,build_for [(x,0),ToNothing] [] [x])
+	 | x::_ ->
+	    (x,i,build_for [(x,0),ToNothing] [] [x])
   in find_root 0
 
 let print with_id sigs f cc =
@@ -389,10 +390,7 @@ let to_work env =
     dangling = (0,0,0);
   }
 
-(** Behare of invarient on nav (it starts by a first element of
-id_by_type (so that we don't need to apply an injection on it to get
-the canonical))) *)
-let navigate env root nav =
+let navigate env (id,ty as _root) nav =
   let rec aux inj i = function
     | [] -> Some (i,inj,IntMap.find i env.domain)
     | ((id,site),e) :: t ->
@@ -423,13 +421,13 @@ let navigate env root nav =
 			   s.dst t
 		  else find_good_edge tail in
        find_good_edge (IntMap.find i env.domain).sons
-  in aux (Dipping.add root root Dipping.empty) 0 nav
+  in aux (Dipping.add id (List.hd env.id_by_type.(ty)) Dipping.empty) 0 nav
 
 let find env cc =
-  let (root,nav) = to_navigation cc in
-(*  let () = Format.eprintf
-	     "[%a]@." (Pp.list Pp.space (print_edge (sigs env))) nav in
- *)  navigate env root nav
+  let (root,ty,nav) = to_navigation cc in
+  let () = Format.eprintf
+	     "@[[%a]@]@." (Pp.list Pp.space (print_edge (sigs env))) nav in
+  navigate env (root,ty) nav
 
 let get env cc_id = IntMap.find cc_id env.domain
 
@@ -647,6 +645,7 @@ let finish_new wk =
     { id = wk.cc_id; nodes_by_type = wk.used_id;
       links = wk.cc_links; internals = wk.cc_internals; } in
   let env = Env.fresh wk.sigs wk.reserved_id wk.free_id wk.cc_env in
+  let _ = read_line () in
   add_domain env cc_candidate
 
 
