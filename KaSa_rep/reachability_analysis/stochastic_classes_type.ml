@@ -50,3 +50,26 @@ type remanent_union =
     dic_union : remanent_dic;
     pointer : Set_list_union.set Inf_array.t
   }
+
+(*new*)
+module Stochastic_classes2 =
+  struct
+    type t = int list
+    let compare = compare
+  end
+
+module Dictionary_of_Stochastic_classes2 = Dictionary.Dictionary_of_Ord (Stochastic_classes2)
+
+module Set_list = Set_and_map.Make
+                          (struct
+                              type t = int
+                              let compare = compare
+                            end)
+
+type remanent_dic2 = (unit, unit) Dictionary_of_Stochastic_classes2.dictionary
+
+type remanent_union2 =
+  {
+    dic_union2 : remanent_dic2;
+    pointer2 : Set_list.set Inf_array.t
+  }
