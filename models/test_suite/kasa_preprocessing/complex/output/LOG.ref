@@ -406,14 +406,6 @@ Covering_class_id:0:site_type:{0,1}
 Covering_classes:agent_type:2:
 Covering_class_id:0:site_type:{0,1,2,3}
 Stochastic_classes:
-agent_type:0:sites_list:0,1  
-agent_type:1:sites_list:0,1  
-agent_type:0:sites_list:0,1  
-agent_type:1:sites_list:0,1  
-agent_type:1:sites_list:0,1  
-agent_type:2:sites_list:0,1,2,3  
-agent_type:1:sites_list:0,1  
-agent_type:2:sites_list:0,1,2,3  
 dic:Stochastic_classes:agent_type:1:
 0,1 
 dic:Stochastic_classes:agent_type:1:
