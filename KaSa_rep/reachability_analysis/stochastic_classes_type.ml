@@ -29,19 +29,13 @@ type stochastic_classes =
 (*Dictionary*)
 module Stochastic_classes =
   struct
-    type t = int list
+    type t = int array
     let compare = compare
   end
 
 module Dictionary_of_Stochastic_classes = Dictionary.Dictionary_of_Ord (Stochastic_classes)
 
 module Inf_array = Int_storage.Nearly_inf_Imperatif
-
-module Set_list_keys = Set_and_map.Make
-                         (struct
-                           type t = int
-                           let compare = compare
-                         end)
 
 type remanent_dic = (unit, unit) Dictionary_of_Stochastic_classes.dictionary
 

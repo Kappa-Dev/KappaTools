@@ -73,12 +73,4 @@ Influence_map: The notation [i -> j] means an agent at position [i] of the first
 Influence_map:Wake_up_map:rule(0):'r0' A()->B() -> rule(1):'r1' B()->C()[0->0]
 Covering_classes:
 Stochastic_classes:
-
-sites_list_new:empty
-
-sites_list:empty
-
-sites_list_new:empty
-
-sites_list:empty
 execution finished without any exception

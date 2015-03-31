@@ -109,14 +109,6 @@ Covering_class_id:0:site_type:{0}
 Covering_classes:agent_type:2:
 Covering_class_id:0:site_type:{0}
 Stochastic_classes:
-
-sites_list_new:empty
-
-sites_list:0 
-
-sites_list_new:0 
-
-sites_list:0 
-Stochastic_classes:agent_type:0:
-Stochastic_classes:agent_type:2:
+agent_type:0:sites_list:0  
+agent_type:2:sites_list:0  
 execution finished without any exception
