@@ -4,6 +4,5 @@
 %agent: A(x,y) 
 
 #### Rules 
-'r0' A(x~u, y~u) -> A(x~u,y~p)
-'r1' A(x~u, z~u) -> A(x~u,z~p), B(x, y)
-'r2' A(x~u, y~u, z~u), B(x,y) -> A(x~u!1,y~u!2,z~u),B(x!1,y!2)
+'r0' A(x~u, y~u) -> A(x,y)
+'r1' -> B(x~u, y~u)

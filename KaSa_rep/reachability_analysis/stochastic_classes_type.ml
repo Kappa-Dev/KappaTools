@@ -23,7 +23,8 @@ type sites_stochastic_classes = int list list AgentMap.t
 
 type stochastic_classes =
   {
-    stochastic_classes : sites_stochastic_classes
+    stochastic_classes_lhs : sites_stochastic_classes;
+    stochastic_classes_rhs : sites_stochastic_classes
   }
 
 (*Dictionary*)
