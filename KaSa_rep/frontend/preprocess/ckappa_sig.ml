@@ -148,7 +148,7 @@ type c_proper_agent =
     c_agent_kasim_id : int ; 
     c_agent_name : c_agent_name ;
     c_agent_interface : c_interface ;
-     c_agent_position : position ;
+    c_agent_position : position ;
   }
 
 type site_address = {agent_index : int ; site : c_site_name }
