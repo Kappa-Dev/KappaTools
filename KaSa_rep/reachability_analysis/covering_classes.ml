@@ -27,6 +27,7 @@ let empty_classes parameter error handler =
      Covering_classes_type.covering_classes  = covering_classes
   }
 
+(*MOVE*)
 let rec print_list l =
   match l with
   | [] -> print_string "empty"
@@ -113,13 +114,13 @@ let store_new_class parameter error l remanent =
 let empty_remanent parameter error =
   let good_lists =
     Covering_classes_type.Dictionary_of_Covering_classes.init () in
-  let error,pbw = Int_storage.Nearly_inf_Imperatif.create parameter error 0 in 
+  let error, pointer = Int_storage.Nearly_inf_Imperatif.create parameter error 0 in 
   let empty_remanent =
     { Covering_classes_type.dic = good_lists ;
-      Covering_classes_type.pointer_backward = pbw }
+      Covering_classes_type.pointer_backward = pointer }
   in empty_remanent
     
-let clean_new parameter error classes =
+let clean_classes parameter error classes =
   let lists_to_deal_with = length_sorted classes in
   List.fold_left (fun (error, acc) list ->
                   match list with
@@ -196,7 +197,7 @@ let scan_rule parameter error handler rule classes =
     Int_storage.Quick_Nearly_inf_Imperatif.fold2_common
       parameter error
       (fun parameter error agent_id agent site_modif covering_classes ->
-       (* if the interface is empty then do nothing  *)
+       (* if in the interface there is no site modified then do nothing  *)
        if Cckappa_sig.Site_map_and_set.is_empty_map
             site_modif.Cckappa_sig.agent_interface
        then
@@ -250,8 +251,8 @@ let scan_rule_set parameter error handler rules =
     Covering_classes_type.AgentMap.fold
       parameter error
       (fun parameters error id list init ->
-       let error, clean_list = clean_new parameters error list in
-       Covering_classes_type.AgentMap.set parameters error id clean_list init)
+       let error, list_cleaned = clean_classes parameters error list in
+       Covering_classes_type.AgentMap.set parameters error id list_cleaned init)
       agent_map.Covering_classes_type.covering_classes
       init
   in
