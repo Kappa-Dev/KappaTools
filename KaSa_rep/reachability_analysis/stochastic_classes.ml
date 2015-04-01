@@ -28,7 +28,7 @@ let empty_classes parameter error handler =
     Stochastic_classes_type.stochastic_classes_rhs = stochastic_classes
   }
                    
-let add_generic parameter error agent_id key map =
+let add_generic parameter error agent_id key map = (*REMOVE*)
   let get_agent =
     Stochastic_classes_type.AgentMap.unsafe_get
       parameter
@@ -51,14 +51,14 @@ let add_generic parameter error agent_id key map =
       map
   in new_agent
 
-let add_agent parameter error agent_id agent_type =
+let add_agent parameter error agent_id agent_type = (*REMOVE*)
   add_generic
     parameter
     error
     agent_id
     agent_type
 
-let agent_creation parameter error viewsrhs creation =
+let agent_creation parameter error viewsrhs creation = (*REMOVE*)
   let error, agent_modif_plus =
     Stochastic_classes_type.AgentMap.create parameter error 0
   in
@@ -187,7 +187,7 @@ let scan_rule_set parameter error handler rules =
   in
   let error, init = Stochastic_classes_type.AgentMap.create
                       parameter error 0 in
-  let error, result1 =
+  let error, result_lhs =
     Stochastic_classes_type.AgentMap.fold
       parameter
       error
@@ -200,7 +200,7 @@ let scan_rule_set parameter error handler rules =
       agent_map.Stochastic_classes_type.stochastic_classes_lhs
       init
   in
-  let error, result2 =
+  let error, result_rhs =
     Stochastic_classes_type.AgentMap.fold
       parameter
       error
@@ -213,34 +213,46 @@ let scan_rule_set parameter error handler rules =
       agent_map.Stochastic_classes_type.stochastic_classes_rhs
       init
   in
-  let _ = error, result1 in
-  error, result2
+  let _ = error, result_lhs in
+  error, result_rhs
              
-let print_remanent_t parameter error result =
+let print_remanent_t parameter error result =(*FIXME*)
   Stochastic_classes_type.AgentMap.print
     error
     (fun error parameter dic ->
       let _ = Stochastic_classes_type.Dictionary_of_Stochastic_classes.print
         parameter
         error
-        (fun parameter error elt a _ _ ->
+        (fun parameter error elt (l,a) _ _ ->
           let _ = Printf.printf "Stochastic_class_id:%i:" elt in
           let _ =
             print_string "site_type:{";
-            Array.iter (fun i -> Printf.fprintf stdout "%i " i)
-                       a
+            (*print int list t*)
+            let print_list_t = Int_storage.Nearly_inf_Imperatif.print
+              error
+              (fun error parameter l ->
+                let _ = Union_find.print_list l in
+                error
+              ) parameter l
+            in
+            print_list_t;
+            (*print union_find*)
+            let array = Array.iter (fun i -> Printf.fprintf stdout "%i " i)
+              a
+            in
+            array
           in
           let _ = print_string "}"; print_newline () in
           error
-        ) dic.Stochastic_classes_type.dic_union
+        ) dic.Stochastic_classes_type.dic
       in error)
     parameter
     result
-     
+    
 let stochastic_classes parameter error handler cc_compil =
   let parameter =  Remanent_parameters.update_prefix parameter "agent_type:" in 
   let error, result =
     scan_rule_set parameter error handler cc_compil.Cckappa_sig.rules
   in
-  (*let _ = print_remanent_t parameter error result in*)
+  let _ = print_remanent_t parameter error result in
   error, result

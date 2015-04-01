@@ -28,9 +28,11 @@ type stochastic_classes =
   }
 
 (*Dictionary*)
+type pair = (int list Int_storage.Nearly_inf_Imperatif.t * int array)
+
 module Stochastic_classes =
   struct
-    type t = int array
+    type t = pair
     let compare = compare
   end
 
@@ -38,39 +40,16 @@ module Dictionary_of_Stochastic_classes = Dictionary.Dictionary_of_Ord (Stochast
 
 module Inf_array = Int_storage.Nearly_inf_Imperatif
 
-type remanent_dic = (unit, unit) Dictionary_of_Stochastic_classes.dictionary
+type dic = (unit, unit) Dictionary_of_Stochastic_classes.dictionary
 
-module Set_list_union = Set_and_map.Make
+module Set_list_fst_pair = Set_and_map.Make
                           (struct
                               type t = int
                               let compare = compare
                             end)
                                  
-type remanent_union =
+type remanent =
   {
-    dic_union : remanent_dic;
-    pointer : Set_list_union.set Inf_array.t
-  }
-
-(*new*)
-module Stochastic_classes2 =
-  struct
-    type t = int list
-    let compare = compare
-  end
-
-module Dictionary_of_Stochastic_classes2 = Dictionary.Dictionary_of_Ord (Stochastic_classes2)
-
-module Set_list = Set_and_map.Make
-                          (struct
-                              type t = int
-                              let compare = compare
-                            end)
-
-type remanent_dic2 = (unit, unit) Dictionary_of_Stochastic_classes2.dictionary
-
-type remanent_union2 =
-  {
-    dic_union2 : remanent_dic2;
-    pointer2 : Set_list.set Inf_array.t
+    dic : dic;
+    pointer : Set_list_fst_pair.set Inf_array.t
   }

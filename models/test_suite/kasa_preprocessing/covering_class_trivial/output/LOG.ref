@@ -120,10 +120,10 @@ Covering_classes:agent_type:0:
 Covering_class_id:0:site_type:{0,2}
 Covering_class_id:1:site_type:{0,1}
 Stochastic_classes:
-dic:Stochastic_classes:agent_type:1:
+FST_PAIR:Stochastic_classes:agent_type:1:
 0,1 
 Stochastic_classes:agent_type:2:
 2 
-dic:Stochastic_classes:agent_type:2:
+FST_PAIR:Stochastic_classes:agent_type:2:
 0,1,2 
 execution finished without any exception
