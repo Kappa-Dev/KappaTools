@@ -73,6 +73,10 @@ let dangling_node ?sigs x =
 	  "Cannot proceed because last declared agent %a%a" (print_node ?sigs) x
 	  Format.pp_print_string " is not linked to its connected component."))
 
+let identity_injection cc =
+  Dipping.identity
+    (Array.fold_left (fun x y -> List.rev_append y x) [] cc.nodes_by_type)
+
 let equal max_id cc1 cc2 =
   let always_equal_min_but_not_null _ p l1 l2 =
     match p with
@@ -111,7 +115,7 @@ let equal max_id cc1 cc2 =
 	 with Not_found -> []
   in
   if cc1 == cc2 then
-    [Dipping.identity (Array.fold_left List.append [] cc1.nodes_by_type)]
+    [identity_injection cc1]
   else
     match Tools.array_fold_left2i always_equal_min_but_not_null (Some (0,[],[]))
 				  cc1.nodes_by_type cc2.nodes_by_type with
@@ -152,28 +156,35 @@ let to_navigation cc =
 	 Tools.array_fold_lefti
 	   (fun i acc v -> if v < 0 then acc else ((h,i),ToInternal v)::acc)
 	   out (IntMap.find h cc.internals) in
-       let out',todo =
+       let news,out_lnk,todo =
 	 Tools.array_fold_lefti
-	   (fun i (ans,re as acc) ->
+	   (fun i (news,ans,re as acc) ->
 	    function
 	    | UnSpec -> acc
 	    | Free ->
-	       if i > 0 then (((h,i),ToNothing)::ans,re) else acc
+	       if i > 0 then (news,((h,i),ToNothing)::ans,re) else acc
 	    | Link (n,l) ->
 	       if List.mem n don then acc
 	       else if n = h || List.mem n re
-	       then (((h,i),ToNode (n,l))::ans,re)
+	       then (news,((h,i),ToNode (n,l))::ans,re)
 	       else
-		 ((*((n,0),ToNothing)::*)((h,i),ToNew (find_ty cc n,n,l))::ans,
-		  n::re))
-	   (out_ints,t) (IntMap.find h cc.links) in
-       build_for out' (h::don) todo in
+		 ((*((n,0),ToNothing)::*)((h,i),(n,l))::news,
+					 ans, n::re))
+	   ([],[],t) (IntMap.find h cc.links) in
+       let out' =
+	 List.fold_left
+	   (fun acc (s,(n,l)) -> (s,ToNew (find_ty cc n,n,l))::acc)
+	   out_ints
+	   (List.sort (fun (_,(a,_)) (_,(b,_)) -> Mods.int_compare a b) news) in
+       let out'' = List.rev_append out_lnk out' in
+       build_for out'' (h::don) todo in
   let rec find_root i =
     if i = Array.length cc.nodes_by_type
     then (0,0,[])
     else match cc.nodes_by_type.(i) with
 	 | [] -> find_root (succ i)
-	 | x::_ ->
+	 | h::t ->
+	    let x = List.fold_left (fun _ x -> x) h t in
 	    (x,i,build_for [(x,0),ToNothing] [] [x])
   in find_root 0
 
@@ -356,7 +367,11 @@ let print f env =
 			    (Pp.list Pp.space Format.pp_print_int) p.fathers
 			    (print true env.sig_decl) p.cc
 			    (Pp.list Pp.space
-				     (fun f s -> Format.pp_print_int f s.dst))
+				     (fun f s -> Format.fprintf
+						   f "%a(@[%a@])%i"
+						   (print_edge env.sig_decl)
+						   s.extra_edge
+						   Dipping.print s.inj s.dst))
 			    p.sons))
     env.domain
 
@@ -417,16 +432,19 @@ let navigate env (id,ty as _root) nav =
 	       | (sid,ssite), ToNew(ty',sid',ssite') ->
 		  if sid = Dipping.apply inj id && ssite = site
 		     && ty' = ty && ssite' = site'
-		  then aux (Dipping.add id' sid' (Dipping.compose inj s.inj))
-			   s.dst t
+		  then
+		    let inj' = Dipping.compose (Dipping.add id' sid' inj) s.inj in
+		    aux inj' s.dst t
 		  else find_good_edge tail in
        find_good_edge (IntMap.find i env.domain).sons
-  in aux (Dipping.add id (List.hd env.id_by_type.(ty)) Dipping.empty) 0 nav
+  in
+  if nav = [] then Some (0,Dipping.empty,IntMap.find 0 env.domain)
+  else aux (Dipping.add id (List.hd env.id_by_type.(ty)) Dipping.empty) 0 nav
 
 let find env cc =
   let (root,ty,nav) = to_navigation cc in
-  let () = Format.eprintf
-	     "@[[%a]@]@." (Pp.list Pp.space (print_edge (sigs env))) nav in
+(*  let () = Format.eprintf
+	     "@[[%a]@]@." (Pp.list Pp.space (print_edge (sigs env))) nav in*)
   navigate env (root,ty) nav
 
 let get env cc_id = IntMap.find cc_id env.domain
@@ -465,13 +483,43 @@ let update_cc cc_id cc ag_id links internals =
     links = IntMap.add ag_id links cc.links;}
 
 let remove_ag_cc cc_id cc ag_id =
-    { id = cc_id;
-      nodes_by_type =
-	Array.map
-	  (Tools.list_smart_filter (fun x -> x <> ag_id))
-	  cc.nodes_by_type;
-      links = IntMap.remove ag_id cc.links;
-      internals = IntMap.remove ag_id cc.internals;}
+  let ty = find_ty cc ag_id in
+  match cc.nodes_by_type.(ty) with
+  | [] -> assert false
+  | max :: tail ->
+     let rec build_subst subst pre = function
+       | _ when pre = ag_id -> Dipping.add pre max subst
+       | [] -> assert false
+       | h :: t -> build_subst (Dipping.add pre h subst) h t in
+     let to_subst = build_subst (identity_injection cc) max tail in
+     let new_nbt =
+       Array.mapi (fun i l -> if i = ty then tail else l) cc.nodes_by_type in
+     if Dipping.is_identity to_subst then
+       { id = cc_id;
+	 nodes_by_type = new_nbt;
+	 links = IntMap.remove ag_id cc.links;
+	 internals = IntMap.remove ag_id cc.internals;},to_subst
+     else
+       let swip map =
+	 let map' =
+	   List.fold_right
+	     (fun (s,d) map ->
+	      if s = max || s = d then map else
+		let tmp = IntMap.find max map in
+		let map' = IntMap.add max (IntMap.find s map) map in
+		IntMap.add s tmp map') (Dipping.to_list to_subst) map in
+	 IntMap.remove max map' in
+       let new_ints = swip cc.internals in
+       let prelinks = swip cc.links in
+       let new_links =
+	 IntMap.map
+	   (fun a -> Array.map (function
+				 | (UnSpec | Free) as x -> x
+				 | Link (n,s) as x ->
+				    try Link (Dipping.apply to_subst n,s)
+				    with Not_found -> x) a) prelinks in
+       { id = cc_id; nodes_by_type = new_nbt;
+	 links = new_links; internals = new_ints;},to_subst
 
 let compute_cycle_edges cc =
   let rec aux don acc path ag_id =
@@ -517,7 +565,8 @@ let remove_cycle_edges complete_domain_with obs_id dst env free_id cc =
        let () = links_dst'.(i') <- UnSpec in
        let cc' = update_cc f_id cc_tmp n' links_dst' int_dst in
        let pack,ans =
-	 complete_domain_with obs_id dst env' (succ f_id) cc' e in
+	 complete_domain_with obs_id dst env' (succ f_id)
+			      cc' e (identity_injection cc) in
        aux (pack,ans::out) q
     | l -> assert (l = []); acc in
   aux ((free_id,env),[]) (compute_cycle_edges cc)
@@ -540,7 +589,7 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
 	 let pack,ans =
 	   complete_domain_with obs_id dst env' (succ f_id)
 				(update_cc f_id cc ag_id links int')
-				((ag_id,i),ToInternal el) in
+				((ag_id,i),ToInternal el) (identity_injection cc) in
 	 (pack,ans::out)
        else acc)
       acc internals in
@@ -556,7 +605,7 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
 	    let pack,ans =
 	      complete_domain_with obs_id dst env' (succ f_id)
 				   (update_cc f_id cc ag_id links' internals)
-				   ((ag_id,i),ToNothing) in
+				   ((ag_id,i),ToNothing) (identity_injection cc) in
 	    (pack,ans::out)
        | Link (n',i') ->
 	  if not (agent_is_removable i links internals) then acc else
@@ -564,19 +613,22 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
 	    let int_dst = IntMap.find n' cc.internals in
 	    let links_dst' = Array.copy links_dst in
 	    let () = links_dst'.(i') <- UnSpec in
-	    let cc' = update_cc f_id (remove_ag_cc f_id cc ag_id)
-				n' links_dst' int_dst in
+	    let cc',inj =
+	      remove_ag_cc f_id (update_cc f_id cc n' links_dst' int_dst)
+			   ag_id in
 	    let pack,ans =
 	      complete_domain_with obs_id dst env' (succ f_id) cc'
-				   ((n',i'),ToNew (find_ty cc ag_id,ag_id,i)) in
+				   ((Dipping.apply inj n',i'),
+				    ToNew (find_ty cc ag_id,Dipping.apply inj ag_id,i))
+				   inj in
 	    (pack,ans::out))
       (remove_one_internal acc ag_id links internals) links in
   let remove_or_remove_one ((f_id,env'),out as acc) ag_id links internals =
     if agent_is_removable 0 links internals then
       let pack,ans =
 	complete_domain_with
-	  obs_id dst env' (succ f_id) (remove_ag_cc f_id cc ag_id)
-	  ((ag_id,0),ToNothing) in
+	  obs_id dst env' (succ f_id) (fst (remove_ag_cc f_id cc ag_id))
+	  ((ag_id,0),ToNothing) (identity_injection cc) in
       (pack,ans::out)
     else remove_one_frontier acc ag_id links internals in
   IntMap.fold (fun i links acc ->
@@ -584,30 +636,29 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
 	      cc.links
 	      (remove_cycle_edges complete_domain_with obs_id dst env free_id cc)
 
-let rec complete_domain_with obs_id dst env free_id cc edge =
-  let new_son inj =
+let rec complete_domain_with obs_id dst env free_id cc edge inj =
+  let new_son inj' =
     { dst = dst; extra_edge = edge;
-      inj = inj; above_obs = [obs_id];} in
+      inj = Dipping.compose inj' inj; above_obs = [obs_id];} in
   let known_cc = Env.find env cc in
   match known_cc with
   | Some (cc_id, inj, point') ->
      let point'' = {point' with sons = new_son inj :: point'.sons} in
-     (free_id,propagate_add_obs obs_id (Env.add_point cc_id point'' env) cc_id)
-     , cc_id
+     let completed =
+       propagate_add_obs obs_id (Env.add_point cc_id point'' env) cc_id in
+     (free_id,completed), cc_id
   | None ->
-     let son = new_son (Dipping.identity
-			  (Array.fold_left List.append [] cc.nodes_by_type)) in
+     let son = new_son (identity_injection cc) in
      add_new_point obs_id env free_id [son] cc
 and add_new_point obs_id env free_id sons cc =
-  let () = Format.eprintf "%a@." (print true (Env.sigs env)) cc in
   let (free_id'',env'),fathers =
     compute_father_candidates complete_domain_with obs_id cc.id env free_id cc in
-  ((free_id'',
+  let completed =
     Env.add_point
       cc.id
       {cc = cc; is_obs = cc.id = obs_id; sons=sons; fathers = fathers;}
-      env')
-  ,cc.id)
+      env' in
+  ((free_id'',completed),cc.id)
 
 let add_domain env cc =
   let known_cc = Env.find env cc in
@@ -645,7 +696,6 @@ let finish_new wk =
     { id = wk.cc_id; nodes_by_type = wk.used_id;
       links = wk.cc_links; internals = wk.cc_internals; } in
   let env = Env.fresh wk.sigs wk.reserved_id wk.free_id wk.cc_env in
-  let _ = read_line () in
   add_domain env cc_candidate
 
 
