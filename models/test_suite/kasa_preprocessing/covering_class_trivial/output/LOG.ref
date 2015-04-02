@@ -120,5 +120,5 @@ Covering_classes:agent_type:0:
 Covering_class_id:0:site_type:{0,2}
 Covering_class_id:1:site_type:{0,1}
 Stochastic_classes:
-0,1,2 
+Stochastic_classes:site_type:{0,1,2}
 execution finished without any exception

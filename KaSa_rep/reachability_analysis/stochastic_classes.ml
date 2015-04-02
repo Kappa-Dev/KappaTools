@@ -201,7 +201,7 @@ let scan_rule_set parameter error handler rules =
       agent_map.Stochastic_classes_type.stochastic_classes_rhs
       init
   in
-  let _ = error, result_lhs in
+  error, result_lhs;
   error, result_rhs
              
 let print_remanent parameter error result =
@@ -221,5 +221,5 @@ let stochastic_classes parameter error handler cc_compil =
   let error, result =
     scan_rule_set parameter error handler cc_compil.Cckappa_sig.rules
   in
- (* let _ = print_remanent parameter error result in*)
+  (*let _ = print_remanent parameter error result in*)
   error, result

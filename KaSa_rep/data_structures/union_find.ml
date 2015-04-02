@@ -64,7 +64,7 @@ let union x y a =
  let rec print_list l =
   match l with
   | [] -> print_string "empty"
-  | h :: [] ->  print_int h; print_string " "
+  | h :: [] ->  print_int h
   | h :: tl ->
      let _ = print_int h; print_string "," in
      print_list tl
@@ -72,7 +72,7 @@ let union x y a =
  let rec print_list_list ls =
   match ls with
   | [] -> ()
-  | h :: [] -> print_list h; print_string " "
+  | h :: [] -> print_list h
   | h :: tl ->
      let _ =  print_list h;
               print_string "; " in
@@ -119,15 +119,16 @@ let eq_classes_map parameter error a =
   then
   let classes =
     Cckappa_sig.Site_map_and_set.fold_map
-      (fun k list output -> 
-	print_list list; print_string "\n";
+      (fun k list output ->
+	print_string "Stochastic_classes:site_type:{";
+	print_list list; print_string "}\n";
 	list
       )
       classes []
   in
   classes
   else [];
-  classes,a
+  classes, a
 
 let union_dic parameter error classes =
   List.fold_left (fun (error, output) l ->
