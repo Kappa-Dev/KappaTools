@@ -57,6 +57,7 @@ module type Set_and_Map = sig
   val add_map: Remanent_parameters_sig.parameters ->Exception.method_handler -> key -> 'a -> 'a map -> Exception.method_handler * 'a map
   val find_map: Remanent_parameters_sig.parameters ->Exception.method_handler -> key -> 'a map -> Exception.method_handler * 'a
   val find_map_option : Remanent_parameters_sig.parameters ->Exception.method_handler -> key -> 'a map -> Exception.method_handler * 'a option 
+  val cardinal_map : 'a map -> int
   val remove_map: Remanent_parameters_sig.parameters ->Exception.method_handler -> key -> 'a map -> Exception.method_handler * 'a map
   val mem_map:  key -> 'a map -> bool
   val iter_map: (key -> 'a -> unit) -> 'a map -> unit
@@ -428,7 +429,11 @@ module Make(Ord:OrderedType) =
             if cmp = 0 then rh,data
             else if cmp>0 then find_map parameters rh key right  
             else find_map parameters rh key left 
-  
+
+  let rec cardinal_map = function
+    | Empty_map -> 0
+    | Node_map (left, _, _, right, _) -> cardinal_map left + 1 + cardinal_map right
+		   
   let rec find_map_option parameters rh key map = 
     match map with  
           | Empty_map -> rh,None             
