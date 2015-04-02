@@ -168,8 +168,7 @@ let to_navigation cc =
 	       else if n = h || List.mem n re
 	       then (news,((h,i),ToNode (n,l))::ans,re)
 	       else
-		 ((*((n,0),ToNothing)::*)((h,i),(n,l))::news,
-					 ans, n::re))
+		 ((*((n,0),ToNothing)::*)((h,i),(n,l))::news, ans, n::re))
 	   ([],[],t) (IntMap.find h cc.links) in
        let out' =
 	 List.fold_left

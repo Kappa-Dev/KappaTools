@@ -540,10 +540,10 @@ let rec add_agents_in_cc wk registered_links remains = function
 		     (Term.with_dummy_pos
 			"Try to create the connected components of an ambiguous mixture."))
 	 | L_VAL ((i,pos),s) ->
-	    try let dst = IntMap.find i r_l in
-		let wk'' =
-		  Connected_component.new_link wk' (node,site_id) dst in
-		handle_ports wk'' (IntMap.remove i r_l) re acc (succ site_id)
+	    try
+	      let dst = IntMap.find i r_l in
+	      let wk'' = Connected_component.new_link wk' (node,site_id) dst in
+	      handle_ports wk'' (IntMap.remove i r_l) re acc (succ site_id)
 	    with Not_found ->
 		 match Tools.array_filter (is_linked_on_port site_id i) ag.ra_ports with
 		 | [site_id'] (* link between 2 sites of 1 agent *)
