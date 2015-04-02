@@ -4,6 +4,12 @@ type t = cc
 type work
 type node
 
+type place = Existing of node | Fresh of int
+type transformation =
+    Freed of place * int
+  | Linked of (place * int) * (place * int)
+  | Internalized of place * int * int
+
 module Env : sig
   type t
 

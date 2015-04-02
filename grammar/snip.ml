@@ -10,7 +10,6 @@ type rule_internal =
   | I_ANY_ERASED
   | I_VAL_CHANGED of int * int
   | I_VAL_ERASED of int
-  | I_CREATED of int
 type rule_link =
     L_ANY of switching
   | L_FREE of switching
@@ -54,7 +53,7 @@ let print_agent sigs f ag =
 let print_mixture sigs f mix =
   Pp.list Pp.comma (print_agent sigs) f mix
 
-let full_agent_of_rule_agent config rm =
+let full_agent_of_rule_agent free_id config rm =
   let links_of_rule_links l =
     Array.map
       (fun l ->
@@ -77,11 +76,9 @@ let full_agent_of_rule_agent config rm =
        | I_VAL_CHANGED (i,j), Some _ when i = j -> None
        | I_VAL_CHANGED (_,i), Some true -> Some i
        | I_VAL_CHANGED (i,_), _ -> Some i
-       | I_CREATED i, Some true -> Some i
        | I_VAL_ERASED i, _ -> Some i
        | (I_ANY_CHANGED _ | I_ANY_ERASED), _ ->
 	  failwith "attempt to make an agent from an ambiguous rule agent"
-       | I_CREATED _, _ -> None
       ) i in
   List.fold_right (fun rag (free_id,acc) ->
 		   let ports = links_of_rule_links rag.ra_ports in
@@ -96,16 +93,15 @@ let full_agent_of_rule_agent config rm =
 		       a_ports = ports;
 		       a_ints = ints;
 		     }:: acc
-		   else succ free_id,acc) rm (0,[])
+		   else succ free_id,acc) rm (free_id,[])
 
-let agent_of_rule_agent_positive (rm,(_,created)) =
+let agent_of_rule_agent_positive (rm,(free_id,created)) =
   List.append
-    created
-    (snd (full_agent_of_rule_agent (Some true) rm))
+    created (snd (full_agent_of_rule_agent free_id (Some true) rm))
 let agent_of_rule_agent_negative (rm,_) =
-  snd (full_agent_of_rule_agent (Some false) rm)
+  snd (full_agent_of_rule_agent 0 (Some false) rm)
 let agent_of_rule_agent rm =
-  snd (full_agent_of_rule_agent None rm)
+  snd (full_agent_of_rule_agent 0 None rm)
 
 let agent_is_linked_on_port me i id = function
   | VAL j when i = j -> id <> me
@@ -343,7 +339,7 @@ let rec annotate_lhs_with_diff sigs acc lhs rhs =
 		    acc erased,
      List.fold_left
        (fun (id,acc) x ->
-	succ id, annotate_created_agent id sigs x::acc) (1000,[]) added
+	succ id, annotate_created_agent id sigs x::acc) (0,[]) added
 
 
 let ports_from_contact_map sigs contact_map ty_id p_id =
@@ -373,7 +369,7 @@ let find_implicit_infos sigs contact_map ags =
     else
       let acc' =
 	match ints.(i) with
-	| (I_ANY | I_CREATED _ | I_VAL_CHANGED _ | I_VAL_ERASED _) -> acc
+	| (I_ANY | I_VAL_CHANGED _ | I_VAL_ERASED _) -> acc
 	| I_ANY_CHANGED j ->
 	   Tools.list_map_flatten
 	     (fun ints' ->
@@ -511,6 +507,33 @@ let dangling_link side key =
 	   (Term.with_dummy_pos ("At least link "^string_of_int key^
 				   " is dangling on the" ^side)))
 
+let define_full_transformation (removed,added as transf) links_transf
+			  place site dst switch =
+  let cand = match dst with
+    | None -> Connected_component.Freed (place,site)
+    | Some dst -> Connected_component.Linked ((place,site),dst) in
+  match switch with
+  | Freed -> ((cand::removed,(Connected_component.Freed(place,site)::added)),
+	      links_transf)
+  | Maintained -> (transf,links_transf)
+  | Erased ->
+     ((cand::removed,added),links_transf)
+  | Linked (i,_) ->
+     try
+       let dst' = IntMap.find i links_transf in
+       let links_transf' = IntMap.remove i links_transf in
+       if Some dst' = dst then (transf,links_transf)
+       else
+	 ((cand::removed,
+	   Connected_component.Linked((place,site),dst')::added),
+	  links_transf')
+     with Not_found ->
+	  let links_transf' = IntMap.add i ((place,site)) links_transf in
+       (transf,links_transf')
+
+let define_negative_transformation (removed,added as transf) links_transf switch =
+  (transf,links_transf)
+
 let rec add_agents_in_cc wk registered_links transf links_transf remains =
   function
   | [] ->
@@ -520,12 +543,13 @@ let rec add_agents_in_cc wk registered_links transf links_transf remains =
      end
   | ag :: ag_l ->
      let (node,wk) = Connected_component.new_node wk ag.ra_type in
+     let place = Connected_component.Existing node in
      let rec handle_ports wk r_l transf l_t re acc site_id =
        if site_id = Array.length ag.ra_ports
        then add_agents_in_cc wk r_l transf l_t re acc
        else
 	 let wk' = match ag.ra_ints.(site_id) with
-	   | (I_ANY | I_CREATED _) -> wk
+	   | I_ANY -> wk
 	   | (I_VAL_CHANGED (i,_) | I_VAL_ERASED i ) ->
 	      Connected_component.new_internal_state wk (node,site_id) i
 	   | (I_ANY_ERASED | I_ANY_CHANGED _) ->
@@ -539,16 +563,22 @@ let rec add_agents_in_cc wk registered_links transf links_transf remains =
 	 | L_FREE s ->
 	    let wk'' = if site_id = 0 then wk'
 		       else Connected_component.new_free wk' (node,site_id) in
-	    handle_ports wk'' r_l transf l_t re acc (succ site_id)
+	    let transf',l_t' =
+	      define_full_transformation transf l_t place site_id None s in
+	    handle_ports wk'' r_l transf' l_t' re acc (succ site_id)
 	 | (L_SOME _ | L_TYPE _ | L_ANY ( Erased | Linked _ | Freed))->
 	    raise (ExceptionDefn.Internal_Error
 		     (Term.with_dummy_pos
 			"Try to create the connected components of an ambiguous mixture."))
-	 | L_VAL ((i,pos),(Erased | Linked _ | Freed | Maintained as s)) ->
+	 | L_VAL ((i,pos),s) ->
 	    try
-	      let dst = IntMap.find i r_l in
+	      let (node',site' as dst) = IntMap.find i r_l in
+	      let dst_place = (Connected_component.Existing node',site') in
 	      let wk'' = Connected_component.new_link wk' (node,site_id) dst in
-	      handle_ports wk'' (IntMap.remove i r_l) transf l_t
+	      let transf',l_t' =
+		define_full_transformation
+		  transf l_t place site_id (Some dst_place) s in
+	      handle_ports wk'' (IntMap.remove i r_l) transf' l_t'
 			   re acc (succ site_id)
 	    with Not_found ->
 		 match Tools.array_filter (is_linked_on_port site_id i) ag.ra_ports with
@@ -560,20 +590,25 @@ let rec add_agents_in_cc wk registered_links transf links_transf remains =
 			Connected_component.new_link
 			  wk' (node,site_id) (node,site_id')
 		      else wk' in
-		    handle_ports wk'' r_l transf l_t re acc (succ site_id)
+		    let transf',l_t' =
+		      define_full_transformation
+			transf l_t place site_id (Some (place,site_id')) s in
+		    handle_ports wk'' r_l transf' l_t' re acc (succ site_id)
 		 | _ :: _ ->
 		    raise (ExceptionDefn.Malformed_Decl
 			     ("There are more than two sites using link "^
 				string_of_int i,pos))
 		 | [] -> (* link between 2 agents *)
 		    let r_l' = IntMap.add i (node,site_id) r_l in
+		    let transf',l_t' =
+		      define_negative_transformation transf l_t s in
 		    match List.partition (is_linked_on i) re with
 		    | [], re'
 			 when Tools.list_exists_uniq (is_linked_on i) acc ->
-		       handle_ports wk' r_l' transf l_t re' acc (succ site_id)
+		       handle_ports wk' r_l' transf' l_t' re' acc (succ site_id)
 		    | [n], re' when List.for_all
 				      (fun x -> not(is_linked_on i x)) acc ->
-		       handle_ports wk' r_l' transf l_t re' (n::acc) (succ site_id)
+		       handle_ports wk' r_l' transf' l_t' re' (n::acc) (succ site_id)
 		    | _, _ ->
 		       raise (ExceptionDefn.Malformed_Decl
 				("There are more than two agents using link "^
@@ -596,7 +631,7 @@ let connected_components_of_mixture created env mix =
        add_agents_in_cc wk IntMap.empty transformations links_transf t [h] in
      let (env',_, cc) = Connected_component.finish_new wk_out in
      aux env' transf' l_t (cc::acc) remains
-  in aux env [] IntMap.empty [] mix
+  in aux env ([],[]) IntMap.empty [] mix
 
 let rule_mixtures_of_ambiguous_rule contact_map sigs lhs rhs =
   let precomp_mixs,created = annotate_lhs_with_diff sigs [] lhs rhs in

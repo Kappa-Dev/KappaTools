@@ -31,13 +31,11 @@ type point = {
   sons: son list;
 }
 
-type action = Add | Remove
 type place = Existing of node | Fresh of int
-type category =
+type transformation =
     Freed of place * int
   | Linked of (place * int) * (place * int)
   | Internalized of place * int * int
-type transformation = action * category
 
 type work = {
   sigs: Signature.s;
