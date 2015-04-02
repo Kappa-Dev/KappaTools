@@ -750,5 +750,5 @@ let dump err_fmt r env =
 										     Pp.space
 										     (print_differences m) p))
 							    l)) env.Environment.delta_mixtures.NamedDecls.decls))
-	 r.rule_mixtures in
+	 (fst r.rule_mixtures) in
      Format.pp_print_newline err_fmt ()

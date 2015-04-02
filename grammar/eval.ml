@@ -441,9 +441,10 @@ let rule_of_ast ?(backwards=false) ~is_pert env (contact_map,cc_env as cc_stuff)
       ast_rule.lhs ast_rule.rhs in
   let delta_mix_point =
     (Environment.artificialy_name env ast_rule_label,
+     let modified,created = rule_mixtures in
      List.map (fun rmix ->
-		(Snip.agent_of_rule_agent_positive rmix,
-		 Snip.agent_of_rule_agent_negative rmix)) rule_mixtures) in
+	       (Snip.agent_of_rule_agent_positive (rmix,created),
+		Snip.agent_of_rule_agent_negative (rmix,modified))) modified) in
   (env,cc_stuff,mixs',delta_mix_point,
    {
      Primitives.add_token = add_token ;
