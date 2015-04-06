@@ -82,4 +82,6 @@ Influence_map: The notation [i -> j] means an agent at position [i] of the first
 Covering_classes:
 Stochastic_classes:
 Stochastic_classes:site_type:{0,1}
+Stochastic_classes:agent_type:1:
+site_type:{empty}
 execution finished without any exception
