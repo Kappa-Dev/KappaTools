@@ -61,7 +61,7 @@ let union x y a =
   (*let _ = print_string "dump: "; dump a; print_string "\n" in*)
   a
 
- let rec print_list l =
+ let rec print_list l = (*REMOVE*)
   match l with
   | [] -> print_string "empty"
   | h :: [] ->  print_int h
@@ -69,7 +69,7 @@ let union x y a =
      let _ = print_int h; print_string "," in
      print_list tl
        
- let rec print_list_list ls =
+ let rec print_list_list ls = (*REMOVE*)
   match ls with
   | [] -> ()
   | h :: [] -> print_list h
@@ -113,7 +113,9 @@ let eq_classes_map parameter error a =
       aux (k - 1) (classes, union_list)
   in
   let classes, a = aux (size - 1) (classes, a) in
-  (*convert to lists*)
+  classes, a
+
+let print_classes classes =
   let i = Cckappa_sig.Site_map_and_set.cardinal_map classes in
   if i = 1
   then
@@ -127,8 +129,7 @@ let eq_classes_map parameter error a =
       classes []
   in
   classes
-  else [];
-  classes, a
+  else []
 
 let union_dic parameter error (classes: int list list) =
   List.fold_left (fun (error, output) l ->
@@ -143,6 +144,7 @@ let union_dic parameter error (classes: int list list) =
             | t' :: q' ->
               let union_array = union t t' a in
               let (classes, a) = eq_classes_map parameter error union_array in
+	      let _ = print_classes classes in
 	      classes;
               aux q'
         in aux q
