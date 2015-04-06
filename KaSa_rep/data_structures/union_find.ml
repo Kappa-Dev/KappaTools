@@ -122,7 +122,7 @@ let eq_classes_map parameter error a =
       (fun k list output ->
 	print_string "Stochastic_classes:site_type:{";
 	print_list list; print_string "}\n";
-	list
+	list::output
       )
       classes []
   in
@@ -130,7 +130,7 @@ let eq_classes_map parameter error a =
   else [];
   classes, a
 
-let union_dic parameter error classes =
+let union_dic parameter error (classes: int list list) =
   List.fold_left (fun (error, output) l ->
     let size = List.length l in
     let a = Array.init size (fun i -> i) in
@@ -143,7 +143,7 @@ let union_dic parameter error classes =
             | t' :: q' ->
               let union_array = union t t' a in
               let (classes, a) = eq_classes_map parameter error union_array in
-              classes;
+	      classes;
               aux q'
         in aux q
   ) (error, [])  classes
