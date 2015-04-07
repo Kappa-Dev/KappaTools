@@ -31,7 +31,7 @@ type point = {
   sons: son list;
 }
 
-type place = Existing of node | Fresh of int
+type place = Existing of node | Fresh of int * int (* type_id, node_id *)
 type transformation =
     Freed of place * int
   | Linked of (place * int) * (place * int)
