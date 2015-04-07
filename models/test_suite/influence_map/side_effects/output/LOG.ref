@@ -207,8 +207,11 @@ Influence_map:Wake_up_map:rule(3):'' A()-> -> rule(4):'' B(x)->[0*->0]
 Influence_map:Inhibition_map:rule(0):'' A(x),B(x)->A(x!1),B(x!1) -> rule(4):'' B(x)->[1->0]
 Influence_map:Inhibition_map:rule(1):'' A(x!_)->A(x) -> rule(2):'' B(x!_)->B(x)[0*->0]
 Influence_map:Inhibition_map:rule(2):'' B(x!_)->B(x) -> rule(1):'' A(x!_)->A(x)[0*->0]
+Influence_map:Inhibition_map:rule(3):'' A()-> -> rule(0):'' A(x),B(x)->A(x!1),B(x!1)[0->0]
+Influence_map:Inhibition_map:rule(3):'' A()-> -> rule(1):'' A(x!_)->A(x)[0->0]
 Influence_map:Inhibition_map:rule(3):'' A()-> -> rule(2):'' B(x!_)->B(x)[0*->0]
 Influence_map:Inhibition_map:rule(4):'' B(x)-> -> rule(0):'' A(x),B(x)->A(x!1),B(x!1)[0->1]
+Influence_map:Inhibition_map:rule(4):'' B(x)-> -> rule(2):'' B(x!_)->B(x)[0->0]
 Covering_classes:
 Covering_classes:agent_type:0:
 Covering_class_id:0:site_type:{0}

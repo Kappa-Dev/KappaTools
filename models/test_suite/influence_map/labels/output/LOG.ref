@@ -131,6 +131,8 @@ Influence_map:Wake_up_map:rule(1):'otherotherveryveryveryverylonglabel' A(x~p)->
 Influence_map:Wake_up_map:rule(1):'otherotherveryveryveryverylonglabel' A(x~p)->A(x~q) -> rule(3):'\0' A(x~q)->A(x~p)[0->0]
 Influence_map:Wake_up_map:rule(2):'"0' A(x~q)->A(x~u) -> rule(0):'veryveryveryveryverylonglonglonglabel' A(x~u)->A(x~p)[0->0]
 Influence_map:Wake_up_map:rule(3):'\0' A(x~q)->A(x~p) -> rule(1):'otherotherveryveryveryverylonglabel' A(x~p)->A(x~q)[0->0]
+Influence_map:Inhibition_map:rule(2):'"0' A(x~q)->A(x~u) -> rule(3):'\0' A(x~q)->A(x~p)[0->0]
+Influence_map:Inhibition_map:rule(3):'\0' A(x~q)->A(x~p) -> rule(2):'"0' A(x~q)->A(x~u)[0->0]
 Covering_classes:
 Covering_classes:agent_type:0:
 Covering_class_id:0:site_type:{0}
