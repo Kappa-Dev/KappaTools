@@ -79,15 +79,25 @@ let main () =
   in
   let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "Stochastic_classes:\n"
   in
-  let parameters_cv = Remanent_parameters.update_prefix parameters "Stochastic_classes:" in
+  let parameters_sv = Remanent_parameters.update_prefix parameters "Stochastic_classes:" in
   let error =
-    if (Remanent_parameters.get_trace parameters_cv) || Stochastic_classes.trace
+    if (Remanent_parameters.get_trace parameters_sv) || Stochastic_classes.trace
     then
       let error, stochastic_classes =
-        Stochastic_classes.stochastic_classes parameters_cv error handler c_compil in error     
+        Stochastic_classes.stochastic_classes parameters_sv error handler c_compil in error     
     else error
   in
-
+  let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "ODE_fragmentation:\n"
+  in
+  let parameters_ode = Remanent_parameters.update_prefix parameters "ODE_fragmentation:" in
+  let error =
+    if (Remanent_parameters.get_trace parameters_ode) || Stochastic_classes.trace
+    then
+      let error, ode_fragmentation =
+        Ode_fragmentation.ode_fragmentation parameters_ode error handler c_compil
+      in error
+    else error
+  in
   let _ = Exception.print parameters error  in
    ()
 

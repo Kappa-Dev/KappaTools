@@ -77,4 +77,7 @@ Covering_classes:agent_type:0:
 Covering_class_id:0:site_type:{0}
 Stochastic_classes:
 - DO with rule:0
+ODE_fragmentation:
+ODE_fragmentation:agent_type:0:
+site_type_modified:{0}
 execution finished without any exception

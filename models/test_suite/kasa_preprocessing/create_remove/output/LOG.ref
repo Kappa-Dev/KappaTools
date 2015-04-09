@@ -75,4 +75,5 @@ Covering_classes:
 Stochastic_classes:
 - DO with rule:0
 - DO with rule:1
+ODE_fragmentation:
 execution finished without any exception

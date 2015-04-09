@@ -173,4 +173,9 @@ Stochastic_classes:
 - DO with rule:1
 - DO with rule:2
 - DO with rule:3
+ODE_fragmentation:
+ODE_fragmentation:agent_type:0:
+site_type_modified:{0}
+ODE_fragmentation:agent_type:1:
+site_type_modified:{0,0,0}
 execution finished without any exception
