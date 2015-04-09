@@ -131,21 +131,14 @@ let print_classes classes =
   classes
   else []
 
-let union_dic parameter error (classes: int list list) =
-  List.fold_left (fun (error, output) l ->
-    let size = List.length l in
-    let a = Array.init size (fun i -> i) in
-    match l with
-      | [] -> error, output
+let union_dic parameter error a (list: int list) =
+  match list with
+      | [] -> error, a
       | t :: q ->
-        let rec aux to_visit =
+        let rec aux to_visit a =
 	  match to_visit with
-            | [] -> error, output
+            | [] -> error, a
             | t' :: q' ->
               let union_array = union t t' a in
-              let (classes, a) = eq_classes_map parameter error union_array in
-	      let _ = print_classes classes in
-	      classes;
-              aux q'
-        in aux q
-  ) (error, [])  classes
+              aux q' union_array
+        in aux q a

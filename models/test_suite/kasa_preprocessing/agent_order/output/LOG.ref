@@ -148,6 +148,6 @@ Covering_class_id:0:site_type:{0}
 Covering_classes:agent_type:1:
 Covering_class_id:0:site_type:{0}
 Stochastic_classes:
-Stochastic_classes:agent_type:1:
-site_type:{empty}
+- DO with rule:0
+- DO with rule:1
 execution finished without any exception

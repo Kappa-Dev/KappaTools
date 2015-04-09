@@ -19,16 +19,15 @@ let local_trace = false
 
 module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
 
-type sites_stochastic_classes = int list list AgentMap.t
+type sites_stochastic_class = int list AgentMap.t
 
-type stochastic_classes =
+type stochastic_class =
   {
-    stochastic_classes_lhs : sites_stochastic_classes;
-    stochastic_classes_rhs : sites_stochastic_classes
+    stochastic_class : sites_stochastic_class
   }
 
 (*Dictionary*)
-type pair = (int list Int_storage.Nearly_inf_Imperatif.t * int array)
+(*type pair = (int list Int_storage.Nearly_inf_Imperatif.t * int array)
 
 module Stochastic_classes =
   struct
@@ -53,3 +52,4 @@ type remanent =
     dic : dic;
     pointer : Set_list_fst_pair.set Inf_array.t
   }
+ *)
