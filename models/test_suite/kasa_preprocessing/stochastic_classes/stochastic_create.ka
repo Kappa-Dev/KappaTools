@@ -1,8 +1,15 @@
 ####### TEMPLATE MODEL AS DESCRIBED IN THE MANUAL#############
 
 #### Signatures 
-%agent: A(x,y) 
+%agent: A(x~u~p,y~u~p) 
 
 #### Rules 
-'r0' A(x~u, y~u) -> A(x~u,y~u)
-'r1' -> B(x~u, y~u)
+'r0' A(x~u), A(y~u) -> A(x~p) , A(y~p)
+'r1'  -> B(x~u), B(y~u)
+'r2' C(x~u,y~u) -> C(x~p,y~u)
+'r3' -> D(x~u,y~u)
+'r4' E(x~u,y~u) -> 
+'r5' E(y~p),E(z~p) -> 
+'r6' F(x~u) ->
+'r7' F(y~p) -> 
+
