@@ -505,20 +505,20 @@ let is_linked_on i ag =
 let dangling_link side key =
   raise (ExceptionDefn.Malformed_Decl
 	   (Term.with_dummy_pos ("At least link "^string_of_int key^
-				   " is dangling on the" ^side)))
+				   " is dangling on the " ^side)))
 
 let define_full_transformation (removed,added as transf) links_transf
 			  place site dst switch =
   let cand = match dst with
-    | None -> Connected_component.Freed (place,site)
-    | Some dst -> Connected_component.Linked ((place,site),dst) in
+    | None -> Transformations.Freed (place,site)
+    | Some dst -> Transformations.Linked ((place,site),dst) in
   let cands l = match dst with
-    | None -> Connected_component.Freed (place,site)::l
+    | None -> Transformations.Freed (place,site)::l
     | Some dst ->
-       Connected_component.Linked ((place,site),dst) ::
-	 Connected_component.Linked (dst,(place,site)) :: l in
+       Transformations.Linked ((place,site),dst) ::
+	 Transformations.Linked (dst,(place,site)) :: l in
   match switch with
-  | Freed -> ((cand::removed,(Connected_component.Freed(place,site)::added)),
+  | Freed -> ((cand::removed,(Transformations.Freed(place,site)::added)),
 	      links_transf)
   | Maintained -> (transf,links_transf)
   | Erased ->
@@ -527,10 +527,10 @@ let define_full_transformation (removed,added as transf) links_transf
      try
        let dst' = IntMap.find i links_transf in
        let links_transf' = IntMap.remove i links_transf in
-       if Some dst' = dst then (transf,links_transf)
+       if Some dst' = dst then (transf,links_transf')
        else
 	 ((cands removed,
-	   Connected_component.Linked((place,site),dst')::added),
+	   Transformations.Linked((place,site),dst')::added),
 	  links_transf')
      with Not_found ->
 	  let links_transf' = IntMap.add i ((place,site)) links_transf in
@@ -540,14 +540,14 @@ let define_positive_transformation (removed,added as transf) links_transf
 				   place site switch =
   match switch with
   | Freed ->
-     ((removed,Connected_component.Freed (place,site)::added),links_transf)
+     ((removed,Transformations.Freed (place,site)::added),links_transf)
   | (Erased | Maintained) -> (transf,links_transf)
   | Linked (i,_) ->
      try
        let dst' = IntMap.find i links_transf in
        let links_transf' = IntMap.remove i links_transf in
        ((removed,
-	 Connected_component.Linked((place,site),dst')::added),
+	 Transformations.Linked((place,site),dst')::added),
 	links_transf')
      with Not_found ->
        let links_transf' = IntMap.add i ((place,site)) links_transf in
@@ -563,7 +563,7 @@ let rec add_agents_in_cc wk registered_links transf links_transf remains =
      end
   | ag :: ag_l ->
      let (node,wk) = Connected_component.new_node wk ag.ra_type in
-     let place = Connected_component.Existing node in
+     let place = Transformations.Existing node in
      let rec handle_ports wk r_l (removed,added) l_t re acc site_id =
        if site_id = Array.length ag.ra_ports
        then add_agents_in_cc wk r_l (removed,added) l_t re acc
@@ -572,11 +572,11 @@ let rec add_agents_in_cc wk registered_links transf links_transf remains =
 	   | I_ANY -> (removed,added),wk
 	   | I_VAL_CHANGED (i,j) ->
 	      (if i = j then (removed,added)
-	       else Connected_component.Internalized (place,site_id,i)::removed,
-		    Connected_component.Internalized (place,site_id,j)::removed),
+	       else Transformations.Internalized (place,site_id,i)::removed,
+		    Transformations.Internalized (place,site_id,j)::added),
 		Connected_component.new_internal_state wk (node,site_id) i
 	   | I_VAL_ERASED i ->
-	      (Connected_component.Internalized (place,site_id,i)::removed,added),
+	      (Transformations.Internalized (place,site_id,i)::removed,added),
 	      Connected_component.new_internal_state wk (node,site_id) i
 	   | (I_ANY_ERASED | I_ANY_CHANGED _) ->
 	      raise (ExceptionDefn.Internal_Error
@@ -599,7 +599,7 @@ let rec add_agents_in_cc wk registered_links transf links_transf remains =
 	 | L_VAL ((i,pos),s) ->
 	    try
 	      let (node',site' as dst) = IntMap.find i r_l in
-	      let dst_place = (Connected_component.Existing node',site') in
+	      let dst_place = (Transformations.Existing node',site') in
 	      let wk'' = Connected_component.new_link wk' (node,site_id) dst in
 	      let transf',l_t' =
 		define_full_transformation
@@ -644,14 +644,14 @@ let rec add_agents_in_cc wk registered_links transf links_transf remains =
 				   string_of_int i,pos))
      in handle_ports wk registered_links transf links_transf remains ag_l 0
 
-let rec complete_with_creation (added,removed as transf) links_transf fresh = function
+let rec complete_with_creation (removed,added as transf) links_transf fresh = function
   | [] ->
      begin match IntMap.root links_transf with
 	   | None -> transf
 	   | Some (i,_) -> dangling_link "right" i
      end
   | ag :: ag_l ->
-     let place = Connected_component.Fresh (ag.a_type,fresh) in
+     let place = Transformations.Fresh (ag.a_type,fresh) in
      let rec handle_ports added l_t site_id =
        if site_id = Array.length ag.a_ports
        then complete_with_creation (removed,added) l_t (succ fresh) ag_l
@@ -659,7 +659,7 @@ let rec complete_with_creation (added,removed as transf) links_transf fresh = fu
 	 let added' = match ag.a_ints.(site_id) with
 	   | None -> added
 	   | Some i ->
-	      Connected_component.Internalized (place,site_id,i)::added in
+	      Transformations.Internalized (place,site_id,i)::added in
 	 let added'',l_t' =
 	   match ag.a_ports.(site_id) with
 	   | ANY ->
@@ -667,12 +667,12 @@ let rec complete_with_creation (added,removed as transf) links_transf fresh = fu
 		       (Term.with_dummy_pos
 			  "Try to create the connected components of an ambiguous mixture."))
 	   | FREE ->
-	      Connected_component.Freed (place,site_id)::added',l_t
+	      Transformations.Freed (place,site_id)::added',l_t
 	   | VAL i ->
 	      try
 		let dst = IntMap.find i l_t in
 		let l_t' = IntMap.remove i l_t in
-		Connected_component.Linked((place,site_id),dst)::added',
+		Transformations.Linked((place,site_id),dst)::added',
 		l_t'
 	      with Not_found ->
 		let l_t' = IntMap.add i ((place,site_id)) l_t in
@@ -686,10 +686,16 @@ let connected_components_of_mixture created env mix =
        (env,(acc,complete_with_creation transformations links_transf 0 created))
     | h :: t ->
        let wk = Connected_component.begin_new env in
-     let (wk_out,transf',l_t,remains) =
+     let (wk_out,(removed,added),l_t,remains) =
        add_agents_in_cc wk IntMap.empty transformations links_transf t [h] in
-     let (env',_, cc) = Connected_component.finish_new wk_out in
-     aux env' transf' l_t (cc::acc) remains
+     let (env',inj, cc) = Connected_component.finish_new wk_out in
+     let added' = List.map (Transformations.rename wk_out cc inj) added in
+     let removed' = List.map (Transformations.rename wk_out cc inj) removed in
+     let l_t' = IntMap.map
+		  (fun (p,s as x) ->
+		   let p' = Transformations.rename_place wk cc inj p in
+		   if p == p' then x else (p',s)) l_t in
+     aux env' (removed',added') l_t' (cc::acc) remains
   in aux env ([],[]) IntMap.empty [] mix
 
 let rule_mixtures_of_ambiguous_rule contact_map sigs lhs rhs =
@@ -712,10 +718,13 @@ let connected_components_sum_of_ambiguous_rule contact_map env lhs rhs =
 	let () = Connected_component.print
 		   true (Connected_component.Env.sigs env') f cc in
 	Format.pp_close_box f () in
-      let one_ccs f (x,_) =
-	Format.fprintf f "---@,%a"
-		       (Pp.list ~trailing:Pp.space Pp.space boxed_cc) x in
-      Format.eprintf "@[<v>-----@,@[<2>%a@]@,%a@,@]@." Expr.print_ast_mix lhs
+      let one_ccs f (x,(removed,added)) =
+	Format.fprintf
+	  f "___@,%a@,---@,@[%a@]@,+++@,@[%a@]@,"
+	  (Pp.list Pp.space boxed_cc) x
+	  (Pp.list Pp.comma (Transformations.print (Connected_component.Env.sigs env'))) removed
+	  (Pp.list Pp.comma (Transformations.print (Connected_component.Env.sigs env'))) added in
+      Format.eprintf "@[<v>_____@,@[<2>%a@]@,%a@,@]@." Expr.print_ast_mix lhs
 		     (Pp.list Pp.space one_ccs) rules' in
   (env',rules')
 

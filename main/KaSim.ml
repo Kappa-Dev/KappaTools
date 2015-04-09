@@ -181,14 +181,6 @@ let () =
     if !Parameter.compileModeOn
     then
       begin
-	let pp_mix = Snip.print_mixture env.Environment.signatures in
-	Format.eprintf "@[<v>%a@]@,"
-		       (NamedDecls.print
-			  (Pp.list Pp.colon
-				   (fun f (p,n) -> Format.fprintf
-						     f "%a <> %a"
-						     pp_mix n pp_mix p)))
-		       env.Environment.delta_mixtures;
 	State.dump_rules Format.err_formatter state env;
 	exit 0
       end;

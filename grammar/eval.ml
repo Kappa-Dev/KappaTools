@@ -434,18 +434,12 @@ let rule_of_ast ?(backwards=false) ~is_pert env (contact_map,cc_env as cc_stuff)
 	  cc_id := !cc_id+1 ;
 	done ; !ptr_env)
   in
-  let (env,cc_stuff,mixs') = mixtures_of_result mixs env cc_stuff a_mixs in
-  let rule_mixtures =
-    Snip.rule_mixtures_of_ambiguous_rule
-      contact_map (Connected_component.Env.sigs cc_env)
-      ast_rule.lhs ast_rule.rhs in
-  let delta_mix_point =
-    (Environment.artificialy_name env ast_rule_label,
-     let modified,created = rule_mixtures in
-     List.map (fun rmix ->
-	       (Snip.agent_of_rule_agent_positive (rmix,created),
-		Snip.agent_of_rule_agent_negative (rmix,modified))) modified) in
-  (env,cc_stuff,mixs',delta_mix_point,
+  let (env,(cc_map,cc_env),mixs') =
+    mixtures_of_result mixs env cc_stuff a_mixs in
+  let cc_env',rule_mixtures =
+    Snip.connected_components_sum_of_ambiguous_rule
+      contact_map cc_env ast_rule.lhs ast_rule.rhs in
+  (env,(cc_map,cc_env'),mixs',
    {
      Primitives.add_token = add_token ;
      Primitives.rm_token = rm_token ;
@@ -488,20 +482,20 @@ let variables_of_result env cc_env mixs alg_a =
   in (env'',cc_env',compiled_mixs)
 
 let rules_of_result env cc_env mixs res =
-  let (env, cc_env, mixs, deltas, l) =
+  let (env, cc_env, mixs, l) =
     List.fold_left
-      (fun (env, cc_env, mixs, deltas, cont) (_,(ast_rule,_) as ast) ->
-       let (env, cc_env, mixs, delta_r, r) =
+      (fun (env, cc_env, mixs, cont) (_,(ast_rule,_) as ast) ->
+       let (env, cc_env, mixs, r) =
 	 rule_of_ast ~is_pert:false env cc_env mixs ast in
        match ast_rule.Ast.k_op with
-       | None -> (env,cc_env,mixs,delta_r::deltas,r::cont)
+       | None -> (env,cc_env,mixs,r::cont)
        | Some _ ->
-	  let (env,cc_env,mixs,delta_back_r,back_r) =
+	  let (env,cc_env,mixs,back_r) =
 	    rule_of_ast ~backwards:true ~is_pert:false env cc_env mixs ast in
-	  (env,cc_env,mixs,delta_back_r::delta_r::deltas,back_r::(r::cont))
+	  (env,cc_env,mixs,back_r::(r::cont))
       )
-      (env, cc_env, mixs, [], []) res.Ast.rules
-  in (env, cc_env, mixs, (List.rev deltas), (List.rev l))
+      (env, cc_env, mixs, []) res.Ast.rules
+  in (env, cc_env, mixs, (List.rev l))
 
 let obs_of_result env cc_env mixs res =
   let (a_mixs,cont) =
@@ -531,12 +525,12 @@ let compile_print_expr env mixs ex =
 	(mixs',(Ast.Alg_pexpr alg,pos)::out))
     ex (mixs,[])
 
-let effects_of_modif variables ldelta lrules env cc_env ast_list =
-  let rec iter mixs ldelta lrules rev_effects env cc_env ast_list =
+let effects_of_modif variables lrules env cc_env ast_list =
+  let rec iter mixs lrules rev_effects env cc_env ast_list =
     match ast_list with
-    | [] -> (mixs,ldelta,lrules,List.rev rev_effects,env,cc_env)
+    | [] -> (mixs,lrules,List.rev rev_effects,env,cc_env)
     | ast::tl ->
-       let (variables,ldelta,lrules,rev_effects,env,cc_env) =
+       let (variables,lrules,rev_effects,env,cc_env) =
 	 match ast with
 	 | INTRO (alg_expr, ast_mix, _) ->
 	    let (mix,alg_pos) =
@@ -549,10 +543,10 @@ let effects_of_modif variables ldelta lrules env cc_env ast_list =
 		rhs = ast_mix; k_def=Term.with_dummy_pos (Ast.CONST(Nbr.F 0.0));
 		k_un=None;k_op=None;
 	      } in
-	    let env,cc_env,mixs'',delta,rule =
+	    let env,cc_env,mixs'',rule =
 	      rule_of_ast ~is_pert:true env' cc_env' mixs'
 			  (None, Term.with_dummy_pos ast_rule) in
-	     (mixs'', delta::ldelta,rule::lrules,
+	     (mixs'',rule::lrules,
 		(Primitives.ITER_RULE (alg_pos, rule))::rev_effects, env,cc_env)
 	 | DELETE (alg_expr, ast_mix, pos) ->
 	    let (mix,alg_pos) =
@@ -566,10 +560,10 @@ let effects_of_modif variables ldelta lrules env cc_env ast_list =
 		k_def=Term.with_dummy_pos (Ast.CONST(Nbr.F 0.0));
 		k_un=None;k_op=None;
 	      } in
-	    let env,cc_env,mixs'',delta,rule =
+	    let env,cc_env,mixs'',rule =
 	      rule_of_ast ~is_pert:true env' cc_env' mixs'
 			  (None,Term.with_dummy_pos ast_rule) in
-	    (mixs'', delta::ldelta,rule::lrules,
+	    (mixs'',rule::lrules,
 	     (Primitives.ITER_RULE (alg_pos, rule))::rev_effects, env, cc_env)
 	 | UPDATE ((nme, pos_rule), alg_expr) ->
 	    let i,is_rule =
@@ -588,7 +582,7 @@ let effects_of_modif variables ldelta lrules env cc_env ast_list =
 			       env.Environment.tokens.NamedDecls.finder
 			       (env.Environment.fresh_kappa,[]) alg_expr in
 	    let (env',cc_env',mixs') = mixtures_of_result mixs env cc_env mix in
-	    (mixs',ldelta,lrules,
+	    (mixs',lrules,
 	     (Primitives.UPDATE ((if is_rule then Term.RULE i
 	      else Term.ALG i), alg_pos))::rev_effects, env', cc_env')
 	 | UPDATE_TOK ((tk_nme,tk_pos),alg_expr) ->
@@ -603,7 +597,7 @@ let effects_of_modif variables ldelta lrules env cc_env ast_list =
 			       env.Environment.tokens.NamedDecls.finder
 			       (env.Environment.fresh_kappa,[]) alg_expr in
 	    let (env',cc_env',mixs') = mixtures_of_result mixs env cc_env mix in
-	    (mixs',ldelta,lrules,
+	    (mixs',lrules,
 	     (Primitives.UPDATE (Term.TOK tk_id, alg_pos))::rev_effects,
 	     env',cc_env')
 	 | SNAPSHOT (pexpr,_) ->
@@ -611,13 +605,13 @@ let effects_of_modif variables ldelta lrules env cc_env ast_list =
 	      compile_print_expr env (env.Environment.fresh_kappa,[]) pexpr in
 	    let (env',cc_env',mixs') = mixtures_of_result mixs env cc_env mix in
 	    (*when specializing snapshots to particular mixtures, add variables below*)
-	    (mixs', ldelta, lrules,
+	    (mixs', lrules,
 	     (Primitives.SNAPSHOT pexpr')::rev_effects, env',cc_env')
 	 | STOP (pexpr,_) ->
 	    let (mix,pexpr') =
 	      compile_print_expr env (env.Environment.fresh_kappa,[]) pexpr in
 	    let (env',cc_env',mixs') = mixtures_of_result mixs env cc_env mix in
-	    (mixs', ldelta, lrules,
+	    (mixs', lrules,
 	     (Primitives.STOP pexpr')::rev_effects, env',cc_env')
 	 | CFLOW ((lab,pos_lab),_) ->
 	    let id =
@@ -632,7 +626,7 @@ let effects_of_modif variables ldelta lrules env cc_env ast_list =
 			   ("Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"
 			   ,pos_lab))
 	    in
-	    (mixs, ldelta, lrules,
+	    (mixs, lrules,
 	     (Primitives.CFLOW id)::rev_effects, env, cc_env)
 	 | CFLOWOFF ((lab,pos_lab),_) ->
 	    let id =
@@ -647,19 +641,19 @@ let effects_of_modif variables ldelta lrules env cc_env ast_list =
 			   ("Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"
 			   ,pos_lab))
 	    in
-	    (mixs, ldelta, lrules,
+	    (mixs, lrules,
 	     (Primitives.CFLOWOFF id)::rev_effects, env, cc_env)
 	 | FLUX (pexpr,_) ->
 	    let (mix,pexpr') =
 	      compile_print_expr env (env.Environment.fresh_kappa,[]) pexpr in
 	    let (env',cc_env',mixs') = mixtures_of_result mixs env cc_env mix in
-	    (mixs', ldelta, lrules,
+	    (mixs', lrules,
 	     (Primitives.FLUX pexpr')::rev_effects, env', cc_env')
 	 | FLUXOFF (pexpr,_) ->
 	    let (mix,pexpr') =
 	      compile_print_expr env (env.Environment.fresh_kappa,[]) pexpr in
 	    let (env',cc_env',mixs') = mixtures_of_result mixs env cc_env mix in
-	    (mixs', ldelta, lrules,
+	    (mixs', lrules,
 	     (Primitives.FLUXOFF pexpr')::rev_effects, env', cc_env')
 	 | PRINT (pexpr,print,_) ->
 	    let (mix,pexpr') =
@@ -667,21 +661,21 @@ let effects_of_modif variables ldelta lrules env cc_env ast_list =
 	    let (mix',print') = compile_print_expr env mix print in
 	    let (env',cc_env', mixs') =
 	      mixtures_of_result mixs env cc_env mix' in
-	    (mixs',ldelta,lrules,
+	    (mixs',lrules,
 	     (Primitives.PRINT (pexpr',print'))::rev_effects,
 	     env',cc_env')
 	 | PLOTENTRY ->
-	    (mixs, ldelta, lrules,
+	    (mixs, lrules,
 	     (Primitives.PLOTENTRY)::rev_effects, env, cc_env)
        in
-       iter variables ldelta lrules rev_effects env cc_env tl
+       iter variables lrules rev_effects env cc_env tl
   in
-  iter variables ldelta lrules [] env cc_env ast_list
+  iter variables lrules [] env cc_env ast_list
 
-let pert_of_result variables env cc_env deltas rules res =
-  let (variables, _, lpert, ldeltas, lrules, env, cc_env) =
+let pert_of_result variables env cc_env rules res =
+  let (variables, _, lpert, lrules, env, cc_env) =
     List.fold_left
-      (fun (variables, p_id, lpert, ldeltas, lrules, env, cc_env)
+      (fun (variables, p_id, lpert, lrules, env, cc_env)
 	   ((pre_expr, modif_expr_list, opt_post),pos) ->
        let (mix,(pre,_pos)) =
 	 Expr.compile_bool env.Environment.algs.NamedDecls.finder
@@ -695,8 +689,8 @@ let pert_of_result variables env cc_env deltas rules res =
 			("Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"
 			,pos))
        in
-       let (variables, ldeltas', lrules', effects, env, cc_env) =
-	 effects_of_modif variables' ldeltas lrules env' cc_env' modif_expr_list in
+       let (variables, lrules', effects, env, cc_env) =
+	 effects_of_modif variables' lrules env' cc_env' modif_expr_list in
        let env,cc_env,variables,opt_abort =
 	 match opt_post with
 	 | None ->
@@ -748,9 +742,9 @@ let pert_of_result variables env cc_env deltas rules res =
 	   Primitives.stopping_time = stopping_time
 	 }
        in
-       (variables', succ p_id, pert::lpert, ldeltas', lrules', env, cc_env)
+       (variables', succ p_id, pert::lpert, lrules', env, cc_env)
       )
-      (variables, 0, [], deltas, rules, env, cc_env) res.perturbations
+      (variables, 0, [], rules, env, cc_env) res.perturbations
   in
   (*making sure that perturbations containing a stopping time precondition are tested first*)
   let lpert = List.rev lpert in
@@ -759,7 +753,7 @@ let pert_of_result variables env cc_env deltas rules res =
   let lpert_stopping_time = List.filter pred lpert in
   let lpert_ineq = List.filter (fun p -> not (pred p)) lpert in
   let lpert = lpert_stopping_time@lpert_ineq in
-  (variables, lpert, ldeltas, lrules, env, cc_env)
+  (variables, lpert, lrules, env, cc_env)
 
 let init_graph_of_result env res =
   let n = Array.length env.Environment.tokens.NamedDecls.decls in
@@ -971,20 +965,17 @@ let initialize logger overwrite result =
   let sg,token_vector = init_graph_of_result env result in
 
   Debug.tag logger "\t -rules";
-  let (env, (_,cc_env), kappa_vars, pure_deltas, pure_rules) =
+  let (env, (_,cc_env), kappa_vars, pure_rules) =
     rules_of_result env (contact_map,cc_env) kappa_vars result in
 
   Debug.tag logger "\t -observables";
   let env,(_,cc_env),kappa_vars,observables =
     obs_of_result env (contact_map,cc_env) kappa_vars result in
   Debug.tag logger "\t -perturbations" ;
-  let (kappa_vars, pert, deltas, rules, env, (_,cc_env)) =
+  let (kappa_vars, pert, rules, env, (_,cc_env)) =
     pert_of_result kappa_vars env (contact_map,cc_env)
-		   pure_deltas pure_rules result in
+		   pure_rules result in
   Debug.tag logger "\t Done";
-  let env =
-    { env with
-      Environment.delta_mixtures = NamedDecls.create (Array.of_list deltas) } in
   Debug.tag logger "+ Analyzing non local patterns..." ;
   let env = Environment.init_roots_of_nl_rules env in
   Debug.tag logger "+ Building initial simulation state...";

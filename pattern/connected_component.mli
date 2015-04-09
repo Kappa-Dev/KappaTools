@@ -4,11 +4,7 @@ type t = cc
 type work
 type node
 
-type place = Existing of node | Fresh of  int * int (* type_id, node_id *)
-type transformation =
-    Freed of place * int
-  | Linked of (place * int) * (place * int)
-  | Internalized of place * int * int
+val rename_node : work -> cc -> Dipping.t -> node -> node
 
 module Env : sig
   type t
@@ -33,5 +29,9 @@ val finish_new : work -> (Env.t*Dipping.t*t)
 
 (** {5 Use a connected component } *)
 (*val equal : t -> t -> bool*)
+val print_node : ?sigs:Signature.s -> Format.formatter -> node -> unit
+val print_site : ?sigs:Signature.s -> node -> Format.formatter -> int -> unit
+val print_internal :
+  ?sigs:Signature.s -> node -> int -> Format.formatter -> int -> unit
 val print : bool -> Signature.s -> Format.formatter -> t -> unit
 val print_dot : Signature.s -> Format.formatter -> t -> unit

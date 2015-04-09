@@ -6,7 +6,6 @@ type t = {
   tokens : unit NamedDecls.t;
   algs : (Expr.alg_expr Term.with_pos) NamedDecls.t;
   perturbations : unit NamedDecls.t;
-  delta_mixtures : (Snip.mixture * Snip.mixture) list NamedDecls.t;
 
 	fresh_kappa : int ;
 	num_of_kappa : int StringMap.t ; 
@@ -41,7 +40,6 @@ let empty =
 	kappa_of_num = IntMap.empty ;
 	num_of_rule = StringMap.empty ;
 	num_of_unary_rule = StringMap.empty ;
-	delta_mixtures = NamedDecls.create [||];
 	algs = NamedDecls.create [||];
 	rule_of_num = IntMap.empty ;
 	unary_rule_of_num = IntMap.empty ; 

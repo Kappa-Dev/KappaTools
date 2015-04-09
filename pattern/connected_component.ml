@@ -31,12 +31,6 @@ type point = {
   sons: son list;
 }
 
-type place = Existing of node | Fresh of int * int (* type_id, node_id *)
-type transformation =
-    Freed of place * int
-  | Linked of (place * int) * (place * int)
-  | Internalized of place * int * int
-
 type work = {
   sigs: Signature.s;
   cc_env: point IntMap.t;
@@ -50,7 +44,6 @@ type work = {
 }
 
 (** Errors *)
-let print_bot f = Format.pp_print_string f "\xE2\x8A\xA5"
 let print_site ?sigs (cc,agent,i) f id =
   match sigs with
   | Some sigs ->
@@ -82,6 +75,10 @@ let dangling_node ?sigs x =
 let identity_injection cc =
   Dipping.identity
     (Array.fold_left (fun x y -> List.rev_append y x) [] cc.nodes_by_type)
+
+let rename_node wk cc inj (n_cc,n_ty,n_id as node) =
+  if wk.cc_id = n_cc then (cc.id,n_ty, Dipping.apply inj n_id)
+  else node
 
 let equal max_id cc1 cc2 =
   let always_equal_min_but_not_null _ p l1 l2 =
@@ -146,7 +143,7 @@ let find_ty cc id =
 
 let print_edge sigs f = function
   | (source,site), ToNothing ->
-     Format.fprintf f "-%i_%i-%t->" source site print_bot
+     Format.fprintf f "-%i_%i-%t->" source site Pp.bottom
   | (source,site), ToNew (ty,id,port) ->
      Format.fprintf f "-%i_%i-!%a-%i_%i->" source site
 		    (Signature.print_agent sigs) ty id port
@@ -247,7 +244,7 @@ let print_dot sigs f cc =
        if i <> 0 then
 	 let () = Format.fprintf
 		    f "@[%a@ [label=\"%t\",@ height=\".1\",@ width=\".1\""
-		    (print_site ?sigs:None n) i print_bot in
+		    (print_site ?sigs:None n) i Pp.bottom in
 	 let () =
 	   Format.fprintf f ",@ margin=\".05,.02\",@ fontsize=\"11\"];@]@," in
 	 let () = Format.fprintf
@@ -301,7 +298,7 @@ let print_sons_dot cc_id f sons =
     | ToNew (_, n',p') ->
        Format.fprintf f "(%i,%i) -> (%i,%i) + (%i,0)" n p n' p' n'
     | ToNothing ->
-       Format.fprintf f "(%i,%i) -> %t" n p print_bot
+       Format.fprintf f "(%i,%i) -> %t" n p Pp.bottom
     | ToInternal i ->
        Format.fprintf f "(%i,%i)~%i" n p i in
   Pp.list Pp.space ~trailing:Pp.space

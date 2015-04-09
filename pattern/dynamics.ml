@@ -731,7 +731,7 @@ let dump err_fmt r env =
 							Format.pp_print_int) s))
 		    se;
      let () = Format.pp_close_box err_fmt () in
-     let print_differences r f p =
+(*     let print_differences r f p =
        Pp.list Pp.colon (Snip.print_mixture env.Environment.signatures) f
 	       (Snip.differences (Snip.agent_of_rule_agent r) p) in
      let () =
@@ -750,5 +750,5 @@ let dump err_fmt r env =
 										     Pp.space
 										     (print_differences m) p))
 							    l)) env.Environment.delta_mixtures.NamedDecls.decls))
-	 (fst r.rule_mixtures) in
+	 (fst r.rule_mixtures) in*)
      Format.pp_print_newline err_fmt ()

@@ -17,6 +17,8 @@ let set ?(trailing=(fun _ -> ()))
 let hashtbl pr_sep pr_el f tbl =
   list pr_sep pr_el f (Hashtbl.fold (fun a b l -> (a,b)::l) tbl [])
 
+let bottom f = Format.pp_print_string f "\xE2\x8A\xA5"
+let nu f = Format.pp_print_string f "\xCE\xBD"
 let comma f = fprintf f ",@ "
 let colon f = fprintf f ";@ "
 let space f = pp_print_space f ()
