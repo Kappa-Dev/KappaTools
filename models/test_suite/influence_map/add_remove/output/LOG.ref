@@ -169,10 +169,33 @@ Covering_class_id:0:site_type:{0}
 Covering_classes:agent_type:1:
 Covering_class_id:0:site_type:{0}
 Stochastic_classes:
+
 - DO with rule:0
+- DO Agent:0
+nsites:1
+sites_list:0,0
+- ARRAY:[|0|]
+- UNION_ARRAY:0 
+- DO Agent:1
+nsites:1
+sites_list:0
+
 - DO with rule:1
+- DO Agent:0
+nsites:1
+sites_list:0
+
 - DO with rule:2
+- DO Agent:1
+nsites:1
+sites_list:0
+
 - DO with rule:3
+- DO Agent:1
+nsites:1
+sites_list:0
+Stochastic_classes:agent_type:0:
+site_type:[|0|]
 ODE_fragmentation:
 ODE_fragmentation:agent_type:0:
 site_type_modified:{0}

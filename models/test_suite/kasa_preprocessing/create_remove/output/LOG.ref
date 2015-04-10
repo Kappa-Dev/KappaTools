@@ -73,7 +73,21 @@ Influence_map: The notation [i -> j] means an agent at position [i] of the first
 Influence_map:Wake_up_map:rule(0):'r0' A()->B() -> rule(1):'r1' B()->C()[0->0]
 Covering_classes:
 Stochastic_classes:
+
 - DO with rule:0
+- DO Agent:1
+nsites:0
+sites_list:empty
+- DO Agent:0
+nsites:0
+sites_list:empty
+
 - DO with rule:1
+- DO Agent:2
+nsites:0
+sites_list:empty
+- DO Agent:1
+nsites:0
+sites_list:empty
 ODE_fragmentation:
 execution finished without any exception

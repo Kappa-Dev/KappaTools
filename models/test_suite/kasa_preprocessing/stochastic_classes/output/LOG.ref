@@ -13,6 +13,8 @@ Signature:sites:
 Signature:sites:agent_type:0:
 Signature:sites:agent_type:0:site_type:0->x(internal state)
 Signature:sites:agent_type:0:site_type:1->y(internal state)
+Signature:sites:agent_type:0:site_type:2->z(internal state)
+Signature:sites:agent_type:0:site_type:3->t(internal state)
 Signature:sites:agent_type:1:
 Signature:sites:agent_type:1:site_type:0->x(internal state)
 Signature:sites:agent_type:1:site_type:1->y(internal state)
@@ -37,6 +39,11 @@ Signature:states:0:0:state_id:1->p
 Signature:states:0:1:
 Signature:states:0:1:state_id:0->u
 Signature:states:0:1:state_id:1->p
+Signature:states:0:2:
+Signature:states:0:2:state_id:0->u
+Signature:states:0:2:state_id:1->p
+Signature:states:0:3:
+Signature:states:0:3:state_id:0->u
 Signature:states:1:
 Signature:states:1:0:
 Signature:states:1:0:state_id:0->u
@@ -212,6 +219,25 @@ Compilation:rules:7:actions:1/2unbinding:(agent_id_0,agent_type_5)@site_type_1
 Compilation:rules:7:actions:deletion:(agent_id_0,agent_type_5)
 Compilation:rules:7:actions:deletion:documented_site:(agent_id_0,agent_type_5)@site_type_1
 Compilation:rules:7:actions:deletion:undocumented_site:(agent_id_0,agent_type_5)@site_type_0
+
+Compilation:rules:8:lhs:
+Compilation:rules:8:lhs:agent_id_0:
+Compilation:rules:8:lhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
+Compilation:rules:8:lhs:agent_id_1:
+Compilation:rules:8:lhs:agent_id_1:agent_type_0:site_type_3->state:[state_min:0;state_max:0]
+Compilation:rules:8:rhs:
+Compilation:rules:8:rhs:agent_id_0:
+Compilation:rules:8:rhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:1;state_max:1]
+Compilation:rules:8:rhs:agent_id_1:
+Compilation:rules:8:rhs:agent_id_1:agent_type_0:site_type_3->state:[state_min:0;state_max:0]
+Compilation:rules:8:direct:
+Compilation:rules:8:direct:agent_id_0:
+Compilation:rules:8:direct:agent_id_0:agent_type_0:site_type_2->state:[state_min:1;state_max:1]
+Compilation:rules:8:direct:agent_id_1:
+Compilation:rules:8:reverse:
+Compilation:rules:8:reverse:agent_id_0:
+Compilation:rules:8:reverse:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
+Compilation:rules:8:reverse:agent_id_1:
 Quarks:Quarkify
 Quarks:Rule 0
 Quarks:TEST
@@ -303,9 +329,22 @@ Quarks:rule_id:7,agent_type:5
 Quarks:MODIFICATION+
 Quarks:MODIFICATION-
 Quarks:rule_id:7,agent_type:5,site_type:1,state:0
+Quarks:Rule 8
+Quarks:TEST
+Quarks:rule_id:8,agent_type:0
+Quarks:rule_id:8,agent_type:0,site_type:2,state:0
+Quarks:rule_id:8,agent_type:0
+Quarks:rule_id:8,agent_type:0,site_type:3,state:0
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:8,agent_type:0,site_type:2,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:8,agent_type:0,site_type:2,state:0
 
 REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
 Quarks:agent_test**:agent_type:0,rule:0->[0;1]
+Quarks:agent_test**:agent_type:0,rule:8->[0;1]
 Quarks:agent_test**:agent_type:2,rule:2->[0]
 Quarks:agent_test**:agent_type:4,rule:4->[0]
 Quarks:agent_test**:agent_type:4,rule:5->[0;1]
@@ -319,6 +358,8 @@ Quarks:agent_modif-:agent_type:5,rule:6->[0]
 Quarks:agent_modif-:agent_type:5,rule:7->[0]
 Quarks:site_test**:agent_type:0,site_type:0,state:0,rule:0->[0]
 Quarks:site_test**:agent_type:0,site_type:1,state:0,rule:0->[1]
+Quarks:site_test**:agent_type:0,site_type:2,state:0,rule:8->[0]
+Quarks:site_test**:agent_type:0,site_type:3,state:0,rule:8->[1]
 Quarks:site_test**:agent_type:2,site_type:0,state:0,rule:2->[0]
 Quarks:site_test**:agent_type:2,site_type:1,state:0,rule:2->[0]
 Quarks:site_test**:agent_type:4,site_type:0,state:0,rule:4->[0]
@@ -329,6 +370,7 @@ Quarks:site_test**:agent_type:5,site_type:0,state:0,rule:6->[0]
 Quarks:site_test**:agent_type:5,site_type:1,state:0,rule:7->[0]
 Quarks:site_modif+:agent_type:0,site_type:0,state:1,rule:0->[0]
 Quarks:site_modif+:agent_type:0,site_type:1,state:1,rule:0->[1]
+Quarks:site_modif+:agent_type:0,site_type:2,state:1,rule:8->[0]
 Quarks:site_modif+:agent_type:1,site_type:0,state:0,rule:1->[0]
 Quarks:site_modif+:agent_type:1,site_type:1,state:0,rule:1->[1]
 Quarks:site_modif+:agent_type:2,site_type:0,state:1,rule:2->[0]
@@ -336,6 +378,7 @@ Quarks:site_modif+:agent_type:3,site_type:0,state:0,rule:3->[0]
 Quarks:site_modif+:agent_type:3,site_type:1,state:0,rule:3->[0]
 Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:0->[0]
 Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:0->[1]
+Quarks:site_modif-:agent_type:0,site_type:2,state:0,rule:8->[0]
 Quarks:site_modif-:agent_type:2,site_type:0,state:0,rule:2->[0]
 Quarks:site_modif-:agent_type:4,site_type:0,state:0,rule:4->[0]
 Quarks:site_modif-:agent_type:4,site_type:1,state:0,rule:4->[0]
@@ -351,8 +394,9 @@ Influence_map:Inhibition_map:rule(6):'r6' F(x~u)-> -> rule(7):'r7' F(y~p)->[0->0
 Influence_map:Inhibition_map:rule(7):'r7' F(y~p)-> -> rule(6):'r6' F(x~u)->[0->0]
 Covering_classes:
 Covering_classes:agent_type:0:
-Covering_class_id:0:site_type:{1}
-Covering_class_id:1:site_type:{0}
+Covering_class_id:0:site_type:{2}
+Covering_class_id:1:site_type:{1}
+Covering_class_id:2:site_type:{0}
 Covering_classes:agent_type:2:
 Covering_class_id:0:site_type:{0,1}
 Covering_classes:agent_type:4:
@@ -362,17 +406,78 @@ Covering_classes:agent_type:5:
 Covering_class_id:0:site_type:{1}
 Covering_class_id:1:site_type:{0}
 Stochastic_classes:
+
 - DO with rule:0
+- DO Agent:0
+nsites:4
+sites_list:1,0
+- ARRAY:[|0; 1; 2; 3|]
+- UNION_ARRAY:0 0 2 3 
+
 - DO with rule:1
+- DO Agent:1
+nsites:2
+sites_list:0,1
+- ARRAY:[|0; 1|]
+- UNION_ARRAY:1 1 
+
 - DO with rule:2
+- DO Agent:2
+nsites:2
+sites_list:1,0
+- ARRAY:[|0; 1|]
+- UNION_ARRAY:0 0 
+
 - DO with rule:3
+- DO Agent:3
+nsites:2
+sites_list:1,0
+- ARRAY:[|0; 1|]
+- UNION_ARRAY:0 0 
+
 - DO with rule:4
+- DO Agent:4
+nsites:3
+sites_list:1,0
+- ARRAY:[|0; 1; 2|]
+- UNION_ARRAY:0 0 2 
+
 - DO with rule:5
+- DO Agent:4
+nsites:3
+sites_list:2,1
+- ARRAY:[|0; 0; 2|]
+- UNION_ARRAY:0 0 0 
+
 - DO with rule:6
+- DO Agent:5
+nsites:2
+sites_list:0
+
 - DO with rule:7
+- DO Agent:5
+nsites:2
+sites_list:1
+
+- DO with rule:8
+- DO Agent:0
+nsites:4
+sites_list:3,2
+- ARRAY:[|0; 0; 2; 3|]
+- UNION_ARRAY:0 0 2 2 
+Stochastic_classes:agent_type:0:
+site_type:[|0; 0; 2; 2|]
+Stochastic_classes:agent_type:1:
+site_type:[|1; 1|]
+Stochastic_classes:agent_type:2:
+site_type:[|0; 0|]
+Stochastic_classes:agent_type:3:
+site_type:[|0; 0|]
+Stochastic_classes:agent_type:4:
+site_type:[|0; 0; 0|]
 ODE_fragmentation:
 ODE_fragmentation:agent_type:0:
-site_type_modified:{1,0}
+site_type_modified:{2,1,0}
 ODE_fragmentation:agent_type:2:
 site_type_modified:{0}
 ODE_fragmentation:agent_type:4:

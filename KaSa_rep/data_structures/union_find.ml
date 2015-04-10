@@ -17,28 +17,20 @@ let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Stochastic classes") message exn
                  (fun () -> default)
 
-type union_find =
-    {
-      treeArr: int array
-    }
+type union_find = int array
 
-let create n =
-  {
-    treeArr = Array.init n (fun i -> i)
-  }
+let create n = Array.init n (fun i -> i)
 
 (* findSet(e): which return a pointer to the representative of the set
    containing e. Since the set are disjoint, e containted in one set
    only. Therefore, the returned representative can be uniquely determined.
 *)
       
-let findSet e a =
-  let union_find = {treeArr = a} in
-  let treeArr = union_find.treeArr in
+let findSet e union_find =
   let pointToRoot root =
-    List.iter (fun i -> treeArr.(i) <- root) in
+    List.iter (fun i -> union_find.(i) <- root) in
   let rec helper e l =
-    let parent = treeArr.(e) in
+    let parent = union_find.(e) in
     if e <> parent
     then
       helper parent (e::l)
@@ -77,7 +69,7 @@ let union x y a =
      let _ =  print_list h;
               print_string "; " in
      print_list_list tl
-    
+              
 let eq_classes_map parameter error a =
   let classes = Cckappa_sig.Site_map_and_set.empty_map in
   let size = Array.length a in
@@ -115,30 +107,14 @@ let eq_classes_map parameter error a =
   let classes, a = aux (size - 1) (classes, a) in
   classes, a
 
-let print_classes classes =
-  let i = Cckappa_sig.Site_map_and_set.cardinal_map classes in
-  if i = 1
-  then
-  let classes =
-    Cckappa_sig.Site_map_and_set.fold_map
-      (fun k list output ->
-	print_string "Stochastic_classes:site_type:{";
-	print_list list; print_string "}\n";
-	list::output
-      )
-      classes []
-  in
-  classes
-  else []
-
-let union_dic parameter error a (list: int list) =
+let union_list parameter error a (list: int list) =
   match list with
-      | [] -> error, a
-      | t :: q ->
-        let rec aux to_visit a =
-	  match to_visit with
-            | [] -> error, a
-            | t' :: q' ->
-              let union_array = union t t' a in
-              aux q' union_array
-        in aux q a
+  | [] -> error, a
+  | t :: q ->
+     let rec aux to_visit a =
+       match to_visit with
+       | [] -> error, a
+       | t' :: q' ->
+          let union_array = union t t' a in
+          aux q' union_array
+     in aux q a
