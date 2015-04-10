@@ -345,7 +345,9 @@ let rec annotate_lhs_with_diff sigs acc lhs rhs =
 let ports_from_contact_map sigs contact_map ty_id p_id =
   let ty_na = Format.asprintf "%a" (Signature.print_agent sigs) ty_id in
   let p_na = Format.asprintf "%a" (Signature.print_site sigs ty_id) p_id in
-  let cand = snd (Export_to_KaSim.String2Map.find (ty_na,p_na) contact_map) in
+  let cand =
+    try snd (Export_to_KaSim.String2Map.find (ty_na,p_na) contact_map)
+    with Not_found -> [] in
   List.map (fun (ty_na,p_na) ->
 	    let ty_id =
 	      Signature.num_of_agent (Term.with_dummy_pos ty_na) sigs in
@@ -357,7 +359,9 @@ let internals_from_contact_map sigs contact_map ty_id p_id =
   let sign = Signature.get sigs ty_id in
   let ty_na = Format.asprintf "%a" (Signature.print_agent sigs) ty_id in
   let p_na = Format.asprintf "%a" (Signature.print_site sigs ty_id) p_id in
-  let cand = fst (Export_to_KaSim.String2Map.find (ty_na,p_na) contact_map) in
+  let cand =
+    try fst (Export_to_KaSim.String2Map.find (ty_na,p_na) contact_map)
+    with Not_found -> [] in
   List.map
     (fun i_na ->
      Signature.num_of_internal_state p_id (Term.with_dummy_pos i_na) sign)
