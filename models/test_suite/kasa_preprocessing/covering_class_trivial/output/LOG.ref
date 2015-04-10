@@ -128,21 +128,21 @@ Stochastic_classes:
 nsites:3
 sites_list:1,0
 - ARRAY:[|0; 1; 2|]
-- UNION_ARRAY:0 0 2 
+- UNION_ARRAY:[|0; 0; 2|]
 
 - DO with rule:1
 - DO Agent:0
 nsites:3
 sites_list:2,0
 - ARRAY:[|0; 0; 2|]
-- UNION_ARRAY:0 0 0 
+- UNION_ARRAY:[|0; 0; 0|]
 
 - DO with rule:2
 - DO Agent:0
 nsites:3
 sites_list:2,1,0
 - ARRAY:[|0; 0; 0|]
-- UNION_ARRAY:0 0 0 
+- UNION_ARRAY:[|0; 0; 0|]
 Stochastic_classes:agent_type:0:
 site_type:[|0; 0; 0|]
 ODE_fragmentation:

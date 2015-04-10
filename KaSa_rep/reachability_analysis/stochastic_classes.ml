@@ -211,8 +211,7 @@ let scan_rule_set parameter error handler rules =
                  Union_find.union_list parameter error array sites_list
                in
                let _ = print_string "- UNION_ARRAY:";
-                       Array.iter (fun i -> Printf.fprintf stdout "%i" i; print_string " ")
-                                  union_array; print_string "\n"
+                       print_array union_array
                in
                (*store*)
                let error, result =

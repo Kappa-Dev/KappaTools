@@ -175,7 +175,7 @@ Stochastic_classes:
 nsites:1
 sites_list:0,0
 - ARRAY:[|0|]
-- UNION_ARRAY:0 
+- UNION_ARRAY:[|0|]
 - DO Agent:1
 nsites:1
 sites_list:0

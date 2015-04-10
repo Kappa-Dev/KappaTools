@@ -270,7 +270,7 @@ sites_list:0
 nsites:2
 sites_list:1,0
 - ARRAY:[|0; 1|]
-- UNION_ARRAY:0 0 
+- UNION_ARRAY:[|0; 0|]
 
 - DO with rule:1
 - DO Agent:0
@@ -280,7 +280,7 @@ sites_list:0
 nsites:2
 sites_list:1,0
 - ARRAY:[|0; 0|]
-- UNION_ARRAY:0 0 
+- UNION_ARRAY:[|0; 0|]
 
 - DO with rule:2
 - DO Agent:0
@@ -295,7 +295,7 @@ sites_list:0
 nsites:2
 sites_list:1,0
 - ARRAY:[|0; 0|]
-- UNION_ARRAY:0 0 
+- UNION_ARRAY:[|0; 0|]
 - DO Agent:2
 nsites:1
 sites_list:0

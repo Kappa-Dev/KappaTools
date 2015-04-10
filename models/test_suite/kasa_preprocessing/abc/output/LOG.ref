@@ -517,19 +517,19 @@ sites_list:0
 nsites:2
 sites_list:1,0
 - ARRAY:[|0; 1|]
-- UNION_ARRAY:0 0 
+- UNION_ARRAY:[|0; 0|]
 - DO Agent:2
 nsites:4
 sites_list:2,0
 - ARRAY:[|0; 1; 2; 3|]
-- UNION_ARRAY:0 1 0 3 
+- UNION_ARRAY:[|0; 1; 0; 3|]
 
 - DO with rule:3
 - DO Agent:2
 nsites:4
 sites_list:2,0
 - ARRAY:[|0; 1; 0; 3|]
-- UNION_ARRAY:0 1 0 3 
+- UNION_ARRAY:[|0; 1; 0; 3|]
 - DO Agent:0
 nsites:2
 sites_list:1
@@ -539,24 +539,24 @@ sites_list:1
 nsites:2
 sites_list:1,0
 - ARRAY:[|0; 0|]
-- UNION_ARRAY:0 0 
+- UNION_ARRAY:[|0; 0|]
 - DO Agent:2
 nsites:4
 sites_list:3,2,1,0
 - ARRAY:[|0; 1; 0; 3|]
-- UNION_ARRAY:1 1 0 1 
+- UNION_ARRAY:[|1; 1; 0; 1|]
 
 - DO with rule:5
 - DO Agent:0
 nsites:2
 sites_list:1,0
 - ARRAY:[|0; 0|]
-- UNION_ARRAY:0 0 
+- UNION_ARRAY:[|0; 0|]
 - DO Agent:2
 nsites:4
 sites_list:3,2,1,0
-- ARRAY:[|1; 1; 1; 1|]
-- UNION_ARRAY:1 1 1 1 
+- ARRAY:[|1; 1; 0; 1|]
+- UNION_ARRAY:[|1; 1; 1; 1|]
 Stochastic_classes:agent_type:0:
 site_type:[|0; 0|]
 Stochastic_classes:agent_type:2:
