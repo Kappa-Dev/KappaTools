@@ -670,7 +670,7 @@ let add_domain env cc =
       else propagate_add_obs id env id),inj,point.cc
   | None ->
      let (_,env'),_ = add_new_point cc.id env (succ cc.id) [] cc in
-     (env',Dipping.empty, cc)
+     (env',identity_injection cc, cc)
 
 (** Operation to create cc *)
 let check_dangling wk =

@@ -742,7 +742,7 @@ let pert_of_result variables env cc_env rules res =
 	   Primitives.stopping_time = stopping_time
 	 }
        in
-       (variables', succ p_id, pert::lpert, lrules', env, cc_env)
+       (variables, succ p_id, pert::lpert, lrules', env, cc_env)
       )
       (variables, 0, [], rules, env, cc_env) res.perturbations
   in
