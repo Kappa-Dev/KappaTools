@@ -720,11 +720,11 @@ let connected_components_sum_of_ambiguous_rule contact_map env lhs rhs =
 	Format.pp_close_box f () in
       let one_ccs f (x,(removed,added)) =
 	Format.fprintf
-	  f "___@,%a@,---@,@[%a@]@,+++@,@[%a@]@,"
+	  f "___@,%a@,---@,@[%a@]@,+++@,@[%a@]"
 	  (Pp.list Pp.space boxed_cc) x
 	  (Pp.list Pp.comma (Transformations.print (Connected_component.Env.sigs env'))) removed
 	  (Pp.list Pp.comma (Transformations.print (Connected_component.Env.sigs env'))) added in
-      Format.eprintf "@[<v>_____@,@[<2>%a@]@,%a@,@]@." Expr.print_ast_mix lhs
+      Format.eprintf "@[<v>_____@,@[<2>%a@]@,%a@]@." Expr.print_ast_mix lhs
 		     (Pp.list Pp.space one_ccs) rules' in
   (env',rules')
 
