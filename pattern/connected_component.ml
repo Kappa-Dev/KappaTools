@@ -15,10 +15,11 @@ type cc = {
 }
 type t = cc
 
-type edge = ToNode of int * int | ToNew of int * int * int (* type, id, port *)
-	    | ToNothing | ToInternal of int
+type node_id = Existing of int (* id *)
+	     | Fresh of int * int (* type, id *)
+type edge = ToNode of node_id * int | ToNothing | ToInternal of int
 type son = {
-  extra_edge: ((int*int)*edge);
+  extra_edge: ((node_id*int)*edge);
   dst: int (** t.id *);
   inj: Dipping.t;
   above_obs: int list;
@@ -141,15 +142,19 @@ let find_ty cc id =
     if List.mem id cc.nodes_by_type.(i) then i else aux (pred i)
   in aux (Array.length cc.nodes_by_type - 1)
 
+let print_node_id sigs f = function
+  | Existing id -> Format.pp_print_int f id
+  | Fresh (ty,id) ->
+     Format.fprintf f "!%a-%i" (Signature.print_agent sigs) ty id
+
 let print_edge sigs f = function
   | (source,site), ToNothing ->
-     Format.fprintf f "-%i_%i-%t->" source site Pp.bottom
-  | (source,site), ToNew (ty,id,port) ->
-     Format.fprintf f "-%i_%i-!%a-%i_%i->" source site
-		    (Signature.print_agent sigs) ty id port
+     Format.fprintf f "-%a_%i-%t->" (print_node_id sigs) source site Pp.bottom
   | (source,site), ToNode (id,port) ->
-     Format.fprintf f "-%i_%i-%i_%i->" source site id port
-  | (source,site), ToInternal i -> Format.fprintf f "-%i_%i-~%i->" source site i
+     Format.fprintf f "-%a_%i-%a_%i->" (print_node_id sigs) source site
+		    (print_node_id sigs) id port
+  | (source,site), ToInternal i ->
+     Format.fprintf f "-%a_%i-~%i->" (print_node_id sigs) source site i
 
 let to_navigation cc =
   let rec build_for out don = function
@@ -157,7 +162,8 @@ let to_navigation cc =
     | h ::  t ->
        let out_ints =
 	 Tools.array_fold_lefti
-	   (fun i acc v -> if v < 0 then acc else ((h,i),ToInternal v)::acc)
+	   (fun i acc v ->
+	    if v < 0 then acc else ((Existing h,i),ToInternal v)::acc)
 	   out (IntMap.find h cc.internals) in
        let news,out_lnk,todo =
 	 Tools.array_fold_lefti
@@ -165,19 +171,20 @@ let to_navigation cc =
 	    function
 	    | UnSpec -> acc
 	    | Free ->
-	       if i > 0 then (news,((h,i),ToNothing)::ans,re) else acc
+	       if i > 0 then (news,((Existing h,i),ToNothing)::ans,re) else acc
 	    | Link (n,l) ->
 	       if List.mem n don then acc
 	       else if n = h || List.mem n re
-	       then (news,((h,i),ToNode (n,l))::ans,re)
+	       then (news,((Existing h,i),ToNode (Existing n,l))::ans,re)
 	       else
-		 ((*((n,0),ToNothing)::*)((h,i),(n,l))::news, ans, n::re))
+		 ((Existing h,i),(n,l))::news,
+		 ans, n::re)
 	   ([],[],t) (IntMap.find h cc.links) in
        let out' =
-	 List.fold_left
-	   (fun acc (s,(n,l)) -> (s,ToNew (find_ty cc n,n,l))::acc)
-	   out_ints
-	   (List.sort (fun (_,(a,_)) (_,(b,_)) -> Mods.int_compare a b) news) in
+	 List.fold_left (fun acc (x,(n,s)) ->
+			 (x,ToNode(Fresh(find_ty cc n,n),s))::acc) out_ints
+			(List.sort (fun (_,(a,_)) (_,(b,_)) ->
+				    Mods.int_compare a b) news) in
        let out'' = List.rev_append out_lnk out' in
        build_for out'' (h::don) todo in
   let rec find_root i =
@@ -187,7 +194,7 @@ let to_navigation cc =
 	 | [] -> find_root (succ i)
 	 | h::t ->
 	    let x = List.fold_left (fun _ x -> x) h t in
-	    (x,i,build_for [(x,0),ToNothing] [] [x])
+	    (x,i,build_for [(Fresh (find_ty cc x,x),0),ToNothing] [] [x])
   in find_root 0
 
 let print with_id sigs f cc =
@@ -290,17 +297,16 @@ let print_dot sigs f cc =
 	    IntMap.bindings (fun f -> Format.pp_print_cut f ())
 	    (pp_slot pp_one_internal)) cc.internals
 
-let print_sons_dot cc_id f sons =
+let print_sons_dot sigs cc_id f sons =
   let pp_edge f ((n,p),e) =
     match e with
     | ToNode (n',p') ->
-       Format.fprintf f "(%i,%i) -> (%i,%i)" n p n' p'
-    | ToNew (_, n',p') ->
-       Format.fprintf f "(%i,%i) -> (%i,%i) + (%i,0)" n p n' p' n'
+       Format.fprintf f "(%a,%i) -> (%a,%i)"
+		      (print_node_id sigs) n p (print_node_id sigs) n' p'
     | ToNothing ->
-       Format.fprintf f "(%i,%i) -> %t" n p Pp.bottom
+       Format.fprintf f "(%a,%i) -> %t" (print_node_id sigs) n p Pp.bottom
     | ToInternal i ->
-       Format.fprintf f "(%i,%i)~%i" n p i in
+       Format.fprintf f "(%a,%i)~%i" (print_node_id sigs) n p i in
   Pp.list Pp.space ~trailing:Pp.space
 	  (fun f son -> Format.fprintf f "@[cc%i -> cc%i [label=\"%a\"];@]"
 				       cc_id son.dst pp_edge son.extra_edge)
@@ -310,7 +316,7 @@ let print_point_dot sigs f (id,point) =
   let style = if point.is_obs then "box" else "circle" in
   Format.fprintf f "@[cc%i [label=\"%a\", shape=\"%s\"];@]@,%a"
 		 point.cc.id (print false sigs) point.cc
-		 style (print_sons_dot id) point.sons
+		 style (print_sons_dot sigs id) point.sons
 
 module Env : sig
   type t
@@ -408,36 +414,57 @@ let to_work env =
   }
 
 let navigate env (id,ty as _root) nav =
+  let compatible_point inj = function
+    | ((Existing id,site), ToNothing), e ->
+       if e = ((Existing (Dipping.apply inj id),site),ToNothing)
+       then Some inj else None
+    | ((Existing id,site), ToInternal i), e ->
+       if e = ((Existing (Dipping.apply inj id),site),ToInternal i)
+       then Some inj else None
+    | ((Existing id,site), ToNode (Existing id',site')), e ->
+       if e =
+	    ((Existing (Dipping.apply inj id),site),
+	     ToNode (Existing (Dipping.apply inj id'),site'))
+	  || e =
+	       ((Existing (Dipping.apply inj id'),site'),
+		ToNode (Existing (Dipping.apply inj id),site))
+       then Some inj else None
+    | ((Existing id,site),ToNode (Fresh (ty,id'),site')),
+      ((Existing sid,ssite), ToNode(Fresh(ty',sid'),ssite')) ->
+       if sid = Dipping.apply inj id && ssite = site
+	  && ty' = ty && ssite' = site'
+       then Some (Dipping.add id' sid' inj) else None
+    | ((Existing _,_), ToNode (Fresh _,_)),
+      (((Fresh _ | Existing _), _), _) -> None
+    | ((Fresh (ty,id),site), ToNothing), ((Fresh (ty',id'),site'),x) ->
+       if ty = ty' && site = site' && x = ToNothing && not (Dipping.mem id inj)
+       then Some (Dipping.add id id' inj) else None
+    | ((Fresh (ty,id),site), ToInternal i), ((Fresh (ty',id'),site'),x) ->
+       if ty = ty' && site = site' &&
+	    x = ToInternal i && not (Dipping.mem id inj)
+       then Some (Dipping.add id id' inj) else None
+    | ((Fresh (ty,id),site), ToNode (Existing id',site')), e ->
+       None (* Forbidden by construction *)
+    | ((Fresh (ty,id),site), ToNode (Fresh (ty',id'),site')),
+      ((Fresh (sty,sid),ssite), ToNode (Fresh (sty',sid'),ssite')) ->
+       if not (Dipping.mem id inj) && not (Dipping.mem id inj) then
+	 if ty = sty && site = ssite && ty' = sty' && site' = ssite'
+	 then Some (Dipping.add id' sid' (Dipping.add id sid inj))
+	 else if ty = sty && site = ssite && ty' = sty' && site' = ssite'
+	 then Some (Dipping.add id' sid (Dipping.add id sid' inj))
+	 else None
+       else None
+    | ((Fresh _,_), _), ((Fresh _,_),_) -> None
+    | ((Fresh _,_), _), ((Existing _,_),_) -> None in
   let rec aux inj i = function
     | [] -> Some (i,inj,IntMap.find i env.domain)
-    | ((id,site),e) :: t ->
+    | e :: t ->
        let rec find_good_edge = function
 	 | [] -> None
 	 | s :: tail ->
-	    match e with
-	    | (ToNothing | ToInternal _) ->
-	       if s.extra_edge = ((Dipping.apply inj id,site),e)
-	       then aux (Dipping.compose inj s.inj) s.dst t
-	       else find_good_edge tail
-	    | ToNode (id',site') ->
-	       if s.extra_edge =
-		    ((Dipping.apply inj id,site),
-		     ToNode (Dipping.apply inj id',site'))
-		|| s.extra_edge =
-		    ((Dipping.apply inj id',site'),
-		     ToNode (Dipping.apply inj id,site))
-	       then aux (Dipping.compose inj s.inj) s.dst t
-	       else find_good_edge tail
-	    | ToNew (ty,id',site') ->
-	       match s.extra_edge with
-	       | _, (ToNothing | ToNode _ | ToInternal _) -> find_good_edge tail
-	       | (sid,ssite), ToNew(ty',sid',ssite') ->
-		  if sid = Dipping.apply inj id && ssite = site
-		     && ty' = ty && ssite' = site'
-		  then
-		    let inj' = Dipping.compose (Dipping.add id' sid' inj) s.inj in
-		    aux inj' s.dst t
-		  else find_good_edge tail in
+	    match compatible_point inj (e,s.extra_edge) with
+	    | Some inj' -> aux (Dipping.compose inj' s.inj) s.dst t
+	    | None -> find_good_edge tail in
        find_good_edge (IntMap.find i env.domain).sons
   in
   if nav = [] then Some (0,Dipping.empty,IntMap.find 0 env.domain)
@@ -532,15 +559,16 @@ let compute_cycle_edges cc =
 	     | Link (n',i') ->
 		if List.mem n' don then out
 		else
-		  let edge = ((ag_id,i),ToNode(n',i')) in
+		  let edge = ((Existing ag_id,i),ToNode(Existing n',i')) in
 		  if ag_id = n' then (don, edge::acc)
 		  else
 		    let rec extract_cycle acc' = function
-		      | ((n,i),_ as e) :: t ->
+		      | ((Existing n,i),_ as e) :: t ->
 			 if n' = n then
 			   if i' = i then out
 			   else (don,edge::e::acc')
 			 else extract_cycle (e::acc') t
+		      | ((Fresh _,_),_) :: _ -> assert false
 		      | [] ->
 			 let (don',acc') = aux don acc (edge::path) n' in
 			 (n'::don',acc') in
@@ -555,7 +583,7 @@ let compute_cycle_edges cc =
 
 let remove_cycle_edges complete_domain_with obs_id dst env free_id cc =
   let rec aux ((f_id,env'),out as acc) = function
-    | ((n,i),ToNode(n',i') as e) :: q ->
+    | ((Existing n,i),ToNode(Existing n',i') as e) :: q ->
        let links = IntMap.find n cc.links in
        let int = IntMap.find n cc.internals in
        let links' = Array.copy links in
@@ -589,9 +617,9 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
 	 let int' = Array.copy internals in
 	 let () = int'.(i) <- -1 in
 	 let pack,ans =
-	   complete_domain_with obs_id dst env' (succ f_id)
-				(update_cc f_id cc ag_id links int')
-				((ag_id,i),ToInternal el) (identity_injection cc) in
+	   complete_domain_with
+	     obs_id dst env' (succ f_id) (update_cc f_id cc ag_id links int')
+	     ((Existing ag_id,i),ToInternal el) (identity_injection cc) in
 	 (pack,ans::out)
        else acc)
       acc internals in
@@ -605,9 +633,10 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
 	    let links' = Array.copy links in
 	    let () = links'.(i) <- UnSpec in
 	    let pack,ans =
-	      complete_domain_with obs_id dst env' (succ f_id)
-				   (update_cc f_id cc ag_id links' internals)
-				   ((ag_id,i),ToNothing) (identity_injection cc) in
+	      complete_domain_with
+		obs_id dst env' (succ f_id)
+		(update_cc f_id cc ag_id links' internals)
+		((Existing ag_id,i),ToNothing) (identity_injection cc) in
 	    (pack,ans::out)
        | Link (n',i') ->
 	  if not (agent_is_removable i links internals) then acc else
@@ -619,10 +648,12 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
 	      remove_ag_cc f_id (update_cc f_id cc n' links_dst' int_dst)
 			   ag_id in
 	    let pack,ans =
-	      complete_domain_with obs_id dst env' (succ f_id) cc'
-				   ((Dipping.apply inj n',i'),
-				    ToNew (find_ty cc ag_id,Dipping.apply inj ag_id,i))
-				   inj in
+	      complete_domain_with
+		obs_id dst env' (succ f_id) cc'
+		((Existing (Dipping.apply inj n'),i'),
+		 ToNode
+		   (Fresh(find_ty cc ag_id,Dipping.apply inj ag_id),i))
+		inj in
 	    (pack,ans::out))
       (remove_one_internal acc ag_id links internals) links in
   let remove_or_remove_one ((f_id,env'),out as acc) ag_id links internals =
@@ -630,7 +661,7 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
       let pack,ans =
 	complete_domain_with
 	  obs_id dst env' (succ f_id) (fst (remove_ag_cc f_id cc ag_id))
-	  ((ag_id,0),ToNothing) (identity_injection cc) in
+	  ((Fresh(find_ty cc ag_id,ag_id),0),ToNothing) (identity_injection cc) in
       (pack,ans::out)
     else remove_one_frontier acc ag_id links internals in
   IntMap.fold (fun i links acc ->

@@ -7,6 +7,7 @@ val identity : int list -> t
 val add : int -> int -> t -> t
 val compose : t -> t -> t
 val apply : t -> int -> int
+val mem : int -> t -> bool
 
 (* val fold : (int -> int -> 'a -> 'a) -> t -> 'a -> 'a *)
 val to_list : t -> (int*int) list

@@ -7,6 +7,7 @@ let empty = IntMap.empty
 let is_identity i = IntMap.fold (fun x y b -> b && x = y) i true
 let to_list = IntMap.bindings
 let add = IntMap.add
+let mem = IntMap.mem
 let identity l =
   List.fold_left (fun out x -> IntMap.add x x out) IntMap.empty l
 let apply i x = try IntMap.find x i with Not_found -> raise Undefined
