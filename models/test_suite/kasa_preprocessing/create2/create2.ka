@@ -1,9 +1,0 @@
-############ TEST ACTIONS ##############
-
-#### Signatures
-
-%agent: A(x,y)
-
-#### Rules
-
-'r1' A(x) <-> A(x!1), A(y!1)

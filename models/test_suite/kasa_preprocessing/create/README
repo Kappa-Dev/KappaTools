@@ -1,3 +1,0 @@
-#Command-line:
-${KAPPABIN}KaSa create.ka --debugging-mode --output-directory output || exit 0 
-
