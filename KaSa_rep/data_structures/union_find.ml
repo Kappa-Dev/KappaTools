@@ -52,23 +52,6 @@ let union x y a =
   let _ = a.(root_x) <- root_y in
   (*let _ = print_string "dump: "; dump a; print_string "\n" in*)
   a
-
- let rec print_list l = (*REMOVE*)
-  match l with
-  | [] -> print_string "empty"
-  | h :: [] ->  print_int h
-  | h :: tl ->
-     let _ = print_int h; print_string "," in
-     print_list tl
-       
- let rec print_list_list ls = (*REMOVE*)
-  match ls with
-  | [] -> ()
-  | h :: [] -> print_list h
-  | h :: tl ->
-     let _ =  print_list h;
-              print_string "; " in
-     print_list_list tl
               
 let eq_classes_map parameter error a =
   let classes = Cckappa_sig.Site_map_and_set.empty_map in

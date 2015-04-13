@@ -406,65 +406,6 @@ Covering_classes:agent_type:5:
 Covering_class_id:0:site_type:{1}
 Covering_class_id:1:site_type:{0}
 Stochastic_classes:
-
-- DO with rule:0
-- DO Agent:0
-nsites:4
-sites_list:1,0
-- ARRAY:[|0; 1; 2; 3|]
-- UNION_ARRAY:[|0; 0; 2; 3|]
-
-- DO with rule:1
-- DO Agent:1
-nsites:2
-sites_list:0,1
-- ARRAY:[|0; 1|]
-- UNION_ARRAY:[|1; 1|]
-
-- DO with rule:2
-- DO Agent:2
-nsites:2
-sites_list:1,0
-- ARRAY:[|0; 1|]
-- UNION_ARRAY:[|0; 0|]
-
-- DO with rule:3
-- DO Agent:3
-nsites:2
-sites_list:1,0
-- ARRAY:[|0; 1|]
-- UNION_ARRAY:[|0; 0|]
-
-- DO with rule:4
-- DO Agent:4
-nsites:3
-sites_list:1,0
-- ARRAY:[|0; 1; 2|]
-- UNION_ARRAY:[|0; 0; 2|]
-
-- DO with rule:5
-- DO Agent:4
-nsites:3
-sites_list:2,1
-- ARRAY:[|0; 0; 2|]
-- UNION_ARRAY:[|0; 0; 0|]
-
-- DO with rule:6
-- DO Agent:5
-nsites:2
-sites_list:0
-
-- DO with rule:7
-- DO Agent:5
-nsites:2
-sites_list:1
-
-- DO with rule:8
-- DO Agent:0
-nsites:4
-sites_list:3,2
-- ARRAY:[|0; 0; 2; 3|]
-- UNION_ARRAY:[|0; 0; 2; 2|]
 Stochastic_classes:agent_type:0:
 site_type:[|0; 0; 2; 2|]
 Stochastic_classes:agent_type:1:
