@@ -500,10 +500,42 @@ site_type:[|0; 0|]
 Stochastic_classes:agent_type:2:
 site_type:[|1; 1; 1; 1|]
 ODE_fragmentation:
-ODE_fragmentation:agent_type:0:
-site_type_modified:{1,1,1,1,0,0}
-ODE_fragmentation:agent_type:1:
-site_type_modified:{0,0}
+- DO rule_id:0
+AGENT_ID:0
+AGENT_TYPE:0
+SITE:0
+NEW_LIST:{0}
+
+AGENT_ID:1
+AGENT_TYPE:1
+SITE:0
+NEW_LIST:{0}
+
+- DO rule_id:1
+- DO rule_id:2
+AGENT_ID:0
+AGENT_TYPE:0
+SITE:1
+NEW_LIST:{1}
+
+AGENT_ID:1
+AGENT_TYPE:2
+SITE:2
+NEW_LIST:{2}
+
+- DO rule_id:3
+- DO rule_id:4
+AGENT_ID:0
+AGENT_TYPE:0
+SITE:1
+NEW_LIST:{1}
+
+AGENT_ID:1
+AGENT_TYPE:2
+SITE:3
+NEW_LIST:{3}
+
+- DO rule_id:5
 ODE_fragmentation:agent_type:2:
-site_type_modified:{3,1,3,2,0,2}
+site_type_modified:{3}
 execution finished without any exception

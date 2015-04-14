@@ -138,6 +138,8 @@ Covering_classes:agent_type:0:
 Covering_class_id:0:site_type:{0}
 Stochastic_classes:
 ODE_fragmentation:
-ODE_fragmentation:agent_type:0:
-site_type_modified:{0,0,0,0}
+- DO rule_id:0
+- DO rule_id:1
+- DO rule_id:2
+- DO rule_id:3
 execution finished without any exception
