@@ -32,15 +32,6 @@ let print_list l =
   let output = sprintf_list l in
   Printf.fprintf stdout "%s\n" output
 
-let print_result parameter error result =
-  Int_storage.Nearly_inf_Imperatif.print
-    error
-    (fun error parameter l ->
-     let _ =
-       print_string "site_type_modified:";
-       print_list l in
-     error) parameter result
-
 let add_site_modified parameter error agent_type sites_list store_sites_modified =
   let error, old =
     Int_storage.Nearly_inf_Imperatif.unsafe_get
@@ -283,10 +274,12 @@ let scan_rule_set parameter error handler rules =
          ode_class
       ) rules init_ode
   in
+  error, ode_class
+(*
   let error, result =
     Int_storage.Nearly_inf_Imperatif.fold
       parameter error
-      (fun parameter error agent_id sites_anchors store_sites_anchors ->
+      (fun parameter error agent_id (sites_anchors, sites_anchors') store_sites_anchors ->
        (*starting from the second element in a pair ode_class,
          map each agent, sites_anchors into a store_site_anchors*)
        let error, result =
@@ -294,18 +287,44 @@ let scan_rule_set parameter error handler rules =
            parameter
            error
            agent_id
-           sites_anchors
+           (sites_anchors, sites_anchors')
            store_sites_anchors
        in error, result
       )
-      (snd ode_class)
-      init
+      (*(snd ode_class)*)
+      ode_class
+      init_ode
   in
-  error, result
-                    
+  error, result*)
+          
+let print_modified parameter error result =
+  Int_storage.Nearly_inf_Imperatif.print
+    error
+    (fun error parameter l ->
+     let _ =
+       print_string "site_type_modified:";
+       print_list l
+     in
+     error) parameter result
+
+let print_bind parameter error result =
+  Int_storage.Nearly_inf_Imperatif.print
+    error
+    (fun error parameter l ->
+     let _ =
+       print_string "site_type_bind:";
+       print_list l
+     in
+     error) parameter result
+
+let print parameter error (result, result') = 
+  let p1 = print_modified parameter error result in
+  let p2 = print_bind parameter error result' in
+  p1, p2
+          
 let ode_fragmentation parameter error handler cc_compil =
   let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
   let error, result = scan_rule_set parameter error handler cc_compil.Cckappa_sig.rules in
-  let _ = print_result parameter error result in
+  let _ = print parameter error result in
   error, result
   

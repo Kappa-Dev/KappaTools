@@ -258,6 +258,8 @@ AGENT_TYPE:1
 SITE:1
 NEW_LIST:{1}
 
-ODE_fragmentation:agent_type:1:
+ODE_fragmentation:agent_type:0:
 site_type_modified:{1}
+ODE_fragmentation:agent_type:1:
+site_type_bind:{1}
 execution finished without any exception

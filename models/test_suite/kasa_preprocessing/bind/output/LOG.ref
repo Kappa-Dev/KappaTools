@@ -288,6 +288,8 @@ SITE:0
 NEW_LIST:{0}
 
 - DO rule_id:3
-ODE_fragmentation:agent_type:2:
+ODE_fragmentation:agent_type:0:
 site_type_modified:{0}
+ODE_fragmentation:agent_type:2:
+site_type_bind:{0}
 execution finished without any exception

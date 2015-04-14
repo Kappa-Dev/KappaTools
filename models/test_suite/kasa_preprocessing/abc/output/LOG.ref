@@ -536,6 +536,8 @@ SITE:3
 NEW_LIST:{3}
 
 - DO rule_id:5
+ODE_fragmentation:agent_type:0:
+site_type_modified:{1}
 ODE_fragmentation:agent_type:2:
-site_type_modified:{3}
+site_type_bind:{3}
 execution finished without any exception
