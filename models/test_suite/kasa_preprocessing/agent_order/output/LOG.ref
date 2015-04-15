@@ -151,20 +151,6 @@ Stochastic_classes:
 Stochastic_classes:agent_type:0:
 site_type:[|0|]
 ODE_fragmentation:
-- DO rule_id:0
-agent_pos:1:agent_type:1:site:0
-NEW_LIST:{0}
-
-agent_pos:0:agent_type:0:site:0
-NEW_LIST:{0}
-
-agent_pos:0:agent_type:0:site:0
-NEW_LIST:{0}
-
-agent_pos:1:agent_type:1:site:0
-NEW_LIST:{0}
-
-- DO rule_id:1
 * Anchor sites in the first case:
 - (site_address_modified, site_address)
 + First element in a pair of agents:

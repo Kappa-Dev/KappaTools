@@ -138,10 +138,6 @@ Covering_classes:agent_type:0:
 Covering_class_id:0:site_type:{0}
 Stochastic_classes:
 ODE_fragmentation:
-- DO rule_id:0
-- DO rule_id:1
-- DO rule_id:2
-- DO rule_id:3
 * Anchor sites in the first case:
 - (site_address_modified, site_address)
 + First element in a pair of agents:

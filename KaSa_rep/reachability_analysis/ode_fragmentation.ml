@@ -380,7 +380,7 @@ let scan_rule_set parameter error handler rules =
     Int_storage.Nearly_inf_Imperatif.fold
       parameter error
       (fun parameter error rule_id rule ode_class ->
-       let _ = Printf.fprintf stdout "- DO rule_id:%i\n" rule_id in
+       (*let _ = Printf.fprintf stdout "- DO rule_id:%i\n" rule_id in*)
        scan_rule
          parameter
          error

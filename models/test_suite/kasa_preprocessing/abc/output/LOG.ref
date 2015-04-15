@@ -500,48 +500,6 @@ site_type:[|0; 0|]
 Stochastic_classes:agent_type:2:
 site_type:[|1; 1; 1; 1|]
 ODE_fragmentation:
-- DO rule_id:0
-agent_pos:1:agent_type:1:site:0
-NEW_LIST:{0}
-
-agent_pos:0:agent_type:0:site:0
-NEW_LIST:{0}
-
-agent_pos:0:agent_type:0:site:0
-NEW_LIST:{0}
-
-agent_pos:1:agent_type:1:site:0
-NEW_LIST:{0}
-
-- DO rule_id:1
-- DO rule_id:2
-agent_pos:1:agent_type:2:site:2
-NEW_LIST:{2}
-
-agent_pos:0:agent_type:0:site:1
-NEW_LIST:{1; 0}
-
-agent_pos:0:agent_type:0:site:1
-NEW_LIST:{1; 0}
-
-agent_pos:1:agent_type:2:site:2
-NEW_LIST:{2}
-
-- DO rule_id:3
-- DO rule_id:4
-agent_pos:1:agent_type:2:site:3
-NEW_LIST:{3; 2}
-
-agent_pos:0:agent_type:0:site:1
-NEW_LIST:{1; 1; 0}
-
-agent_pos:0:agent_type:0:site:1
-NEW_LIST:{1; 1; 0}
-
-agent_pos:1:agent_type:2:site:3
-NEW_LIST:{3; 2}
-
-- DO rule_id:5
 * Anchor sites in the first case:
 - (site_address_modified, site_address)
 + First element in a pair of agents:
