@@ -15,11 +15,11 @@ type cc = {
 }
 type t = cc
 
-type node_id = Existing of int (* id *)
-	     | Fresh of int * int (* type, id *)
-type edge = ToNode of node_id * int | ToNothing | ToInternal of int
+type 'id place = Existing of 'id
+	       | Fresh of int * int (* type, id *)
+type edge = ToNode of int place * int | ToNothing | ToInternal of int
 type son = {
-  extra_edge: ((node_id*int)*edge);
+  extra_edge: ((int place*int)*edge);
   dst: int (** t.id *);
   inj: Dipping.t;
   above_obs: int list;
@@ -60,6 +60,23 @@ let print_internal ?sigs (_,agent,_) site f id =
      Signature.print_site_internal_state sigs agent site f (Some id)
   | None -> Format.pp_print_int f id
 
+let print_place sigs f = function
+  | Existing n -> print_node ~sigs f n
+  | Fresh (ty,i) ->
+     Format.fprintf f "%a/*%t %i*/" (Signature.print_agent sigs) ty Pp.nu i
+
+let print_place_site sigs place f site =
+  match place with
+  | Existing n -> print_site ~sigs n f site
+  | Fresh (ty,_) ->
+     Signature.print_site sigs ty f site
+
+let print_place_internal sigs place site f id =
+  match place with
+  | Existing n -> print_internal ~sigs n site f id
+  | Fresh (ty,_) ->
+     Signature.print_site_internal_state sigs ty site f (Some id)
+
 let already_specified ?sigs x i =
   ExceptionDefn.Malformed_Decl
     (Term.with_dummy_pos
@@ -80,6 +97,12 @@ let identity_injection cc =
 let rename_node wk cc inj (n_cc,n_ty,n_id as node) =
   if wk.cc_id = n_cc then (cc.id,n_ty, Dipping.apply inj n_id)
   else node
+
+let rename_place wk cc inj = function
+  | Existing n as x ->
+     let n' = rename_node wk cc inj n in
+     if n == n' then x else Existing n'
+  | Fresh _ as x -> x
 
 let equal max_id cc1 cc2 =
   let always_equal_min_but_not_null _ p l1 l2 =
@@ -795,3 +818,18 @@ let new_node wk type_id =
 	  cc_internals =
 	    IntMap.add wk.free_id (Array.make arity (-1)) wk.cc_internals;
 	} (node,0))
+
+(*let specialize domain (inj,cc_id) concrete_edges =
+  let point = Env.get domain cc_id in
+  List.fold_left
+    (fun acc x ->
+     match x.extra_edge with
+     | (Existing n, s), e ->
+	if Edges.exists ~typ:() (Dipping.apply inj n) s e then
+	  (Dipping.compose (opposite x.inj) inj,x.dst)::acc
+	else acc
+     | (Fresh (ty,n), s), e -> acc) [] point.sons
+ *)
+let generalize domain (inj,cc_id) =
+  let point = Env.get domain cc_id in
+  List.map (fun x -> (inj,x)) point.fathers
