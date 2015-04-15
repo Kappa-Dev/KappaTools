@@ -142,14 +142,52 @@ site_type:[|0; 0; 1|]
 Stochastic_classes:agent_type:1:
 site_type:[|0; 0|]
 ODE_fragmentation:
+- DO rule_id:0
+agent_pos:1:agent_type:1:site:1
+NEW_LIST:{1; 0}
+
+agent_pos:1:agent_type:1:site:0
+NEW_LIST:{1; 0; 1; 0}
+
+agent_pos:0:agent_type:0:site:2
+NEW_LIST:{2; 1}
+
+agent_pos:0:agent_type:0:site:1
+NEW_LIST:{2; 1; 2; 1}
+
+agent_pos:0:agent_type:0:site:2
+NEW_LIST:{2; 1}
+
+agent_pos:1:agent_type:1:site:1
+NEW_LIST:{1; 0}
+
+agent_pos:0:agent_type:0:site:1
+NEW_LIST:{2; 1; 2; 1}
+
+agent_pos:1:agent_type:1:site:0
+NEW_LIST:{1; 0; 1; 0}
+
+* Anchor sites in the first case:
 - (site_address_modified, site_address)
++ First element in a pair of agents:
 ODE_fragmentation:agent_type:0:
-site_type_modified:{2; 1; 0}
+site_type_modified:{2; 1; 0; 2; 1; 0}
++ Second element in a pair of agents:
 ODE_fragmentation:agent_type:1:
-site_type_bond:{1; 0}
+site_type_bond:{1; 0; 1; 0}
 - (site_address,site_address_modified)
++ First element in a pair of agents:
 ODE_fragmentation:agent_type:0:
-site_type_bond:{2; 1}
+site_type_bond:{2; 1; 2; 1}
++ Second element in a pair of agents:
 ODE_fragmentation:agent_type:1:
-site_type_modified:{1; 0}
+site_type_modified:{1; 0; 1; 0}
+* Anchor sites in the second case:
+- (site_address,site_address)
++ First element in a pair of agents:
+ODE_fragmentation:agent_type:0:
+site_type_bond:{2; 1; 2; 1}
++ Second element in a pair agents:
+ODE_fragmentation:agent_type:1:
+site_type_bond:{1; 0; 1; 0}
 execution finished without any exception

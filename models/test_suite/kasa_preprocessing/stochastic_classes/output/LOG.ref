@@ -417,6 +417,24 @@ site_type:[|0; 0|]
 Stochastic_classes:agent_type:4:
 site_type:[|0; 0; 0|]
 ODE_fragmentation:
+- DO rule_id:0
+- DO rule_id:1
+- DO rule_id:2
+- DO rule_id:3
+- DO rule_id:4
+- DO rule_id:5
+- DO rule_id:6
+- DO rule_id:7
+- DO rule_id:8
+* Anchor sites in the first case:
 - (site_address_modified, site_address)
++ First element in a pair of agents:
++ Second element in a pair of agents:
 - (site_address,site_address_modified)
++ First element in a pair of agents:
++ Second element in a pair of agents:
+* Anchor sites in the second case:
+- (site_address,site_address)
++ First element in a pair of agents:
++ Second element in a pair agents:
 execution finished without any exception
