@@ -213,40 +213,14 @@ Stochastic_classes:agent_type:1:
 site_type:[|0; 0|]
 ODE_fragmentation:
 - DO rule_id:0
-AGENT_ID:0
-AGENT_TYPE:0
-SITE:0
-NEW_LIST:{0}
-
-AGENT_ID:1
-AGENT_TYPE:1
-SITE:0
-NEW_LIST:{0}
-
 - DO rule_id:1
-AGENT_ID:0
-AGENT_TYPE:0
-SITE:0
-NEW_LIST:{0}
-
-AGENT_ID:1
-AGENT_TYPE:1
-SITE:0
-NEW_LIST:{0}
-
 - DO rule_id:2
-AGENT_ID:0
-AGENT_TYPE:0
-SITE:1
-NEW_LIST:{1}
-
-AGENT_ID:1
-AGENT_TYPE:1
-SITE:1
-NEW_LIST:{1}
-
 ODE_fragmentation:agent_type:0:
 site_type_modified:{1}
 ODE_fragmentation:agent_type:1:
-site_type_bind:{1}
+site_type_bond:{1}
+ODE_fragmentation:agent_type:0:
+site_type_bond:{1}
+ODE_fragmentation:agent_type:1:
+site_type_modified:{1}
 execution finished without any exception

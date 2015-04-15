@@ -17,7 +17,6 @@ let warn parameter mh message exn default =
   Exception.warn parameter mh (Some "ODE fragmentation") message exn
                  (fun () -> default)
 
-(*REMOVE*)
 let sprintf_list l =
   let acc = ref "{" in
   List.iteri (fun i x ->
@@ -86,17 +85,17 @@ let collect_sites_modified parameter error rule store_sites_modified =
   in error, store_sites_modified
   
 let collect_sites_bond_2 parameter error site_address bond_rhs store_sites_bond_2 =
-  (*store_sites_bond2 is a set of sites that are bond, it is taken from a list of sites
+  (*store_sites_bond_2 is a set of sites that are bond, it is taken from a list of sites
   in rule rhs that are bond.*) 
   let agent_id = site_address.Cckappa_sig.agent_index in
   let agent_type = site_address.Cckappa_sig.agent_type in
   let site = site_address.Cckappa_sig.site in
-  let _ = print_string "AGENT_ID:"; print_int agent_id;
+  (*let _ = print_string "AGENT_ID:"; print_int agent_id;
           print_string "\n" in
   let _ = print_string "AGENT_TYPE:"; print_int agent_type
           ; print_string "\n"
   in
-  let _ = print_string "SITE:"; print_int site; print_string "\n" in
+  let _ = print_string "SITE:"; print_int site; print_string "\n" in*)
   (*get sites_address map from bond_rhs*)
   let error, site_address_map =
     Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get
@@ -116,7 +115,7 @@ let collect_sites_bond_2 parameter error site_address bond_rhs store_sites_bond_
       (fun site _ current_list ->
        site :: current_list) site_address []
   in
-  (*get the old_list in store_sites_bond2*)
+  (*get the old_list in store_sites_bond_2*)
   let error, old_list =
     Int_storage.Nearly_inf_Imperatif.unsafe_get
       parameter
@@ -129,10 +128,10 @@ let collect_sites_bond_2 parameter error site_address bond_rhs store_sites_bond_
     | None -> []
     | Some old_list -> old_list
   in                                   
-  (*store *)
+  (*store*)
   let new_list = List.concat [sites_bond_list; old_list] in
-  let _ = print_string "NEW_LIST:";
-          print_list new_list; print_string "\n" in
+  (*let _ = print_string "NEW_LIST:";
+    print_list new_list; print_string "\n" in*)
   let error, store_sites_bond_2 =
     Int_storage.Nearly_inf_Imperatif.set
       parameter
@@ -148,13 +147,13 @@ let collect_store_bond_1 parameter error site_address store_sites_modified store
   let agent_id = site_address.Cckappa_sig.agent_index in
   let agent_type = site_address.Cckappa_sig.agent_type in
   let site = site_address.Cckappa_sig.site in
-  let _ = print_string "AGENT_ID:"; print_int agent_id;
+  (*let _ = print_string "AGENT_ID:"; print_int agent_id;
           print_string "\n" in
   let _ = print_string "AGENT_TYPE:"; print_int agent_type
           ; print_string "\n"
   in
-  let _ = print_string "SITE:"; print_int site; print_string "\n" in
-  (*get sites_address map *)
+  let _ = print_string "SITE:"; print_int site; print_string "\n" in*)
+  (*get site_address list *)
   let error, get_sites_list =
     Int_storage.Nearly_inf_Imperatif.unsafe_get
       parameter
@@ -167,7 +166,7 @@ let collect_store_bond_1 parameter error site_address store_sites_modified store
     | None -> []
     | Some s -> s
   in
-  (*get the old_list in sites_bond_class*)
+  (*get the old_list in store_sites_bond_1*)
   let error, old_list =
     Int_storage.Nearly_inf_Imperatif.unsafe_get
       parameter
@@ -182,8 +181,8 @@ let collect_store_bond_1 parameter error site_address store_sites_modified store
   in
   (*store*)
   let new_list = List.concat [sites_list; old_list] in
-  let _ = print_string "NEW_LIST:";
-          print_list new_list; print_string "\n" in
+  (*let _ = print_string "NEW_LIST:";
+          print_list new_list; print_string "\n" in*)
   let error, store_sites_bond_1 =
     Int_storage.Nearly_inf_Imperatif.set
       parameter
@@ -195,7 +194,8 @@ let collect_store_bond_1 parameter error site_address store_sites_modified store
   error, store_sites_bond_1
               
 (*anchor first case*)
-let collect_sites_bond_pair parameter error rule site_address_modified site_address store_sites_modified store_sites_bond_1 store_sites_bond_2 store_sites_bond_pair =
+let collect_sites_bond_pair_1 parameter error rule site_address_modified site_address store_sites_modified store_sites_bond_1 store_sites_bond_2 store_sites_bond_pair =
+  (*store_sites_bond_pair_1:(site_adress_modified, site_address*)
   (*a) collect sites that are modified *)
   let error, store_sites_modified =
     collect_sites_modified
@@ -229,38 +229,106 @@ let collect_sites_bond_pair parameter error rule site_address_modified site_addr
     (store_sites_bond_1, store_sites_bond_2)    
   in
   error, store_sites_bond_pair
-  
-let scan_rule parameter error handler rule store_sites_bond_pair =
+
+let collect_sites_bond_pair_2 parameter error rule site_address site_address_modified store_sites_modified store_sites_bond_1 store_sites_bond_2 store_sites_bond_pair =
+  (*store_sites_bond_pair_2:(site_adress, site_address_modified)*)
+  (*a) collect sites that are modified *)
+  let error, store_sites_modified =
+    collect_sites_modified
+      parameter
+      error
+      rule
+      store_sites_modified
+  in
+  (*b) collect sites that are bond where sites are taken from a set of
+  sites that are modified*)
+  let error, store_sites_bond_1 =
+    collect_store_bond_1
+      parameter
+      error
+      site_address_modified
+      store_sites_modified
+      store_sites_bond_1
+  in
+  (*c) collect sites that are bond where sites are taken from a set of
+  sites in the rule rhs that are bond*)
+  let bond_rhs = rule.Cckappa_sig.rule_rhs.Cckappa_sig.bonds in
+  let error, store_sites_bond_2 =
+    collect_sites_bond_2
+      parameter
+      error
+      site_address
+      bond_rhs
+      store_sites_bond_2
+  in
+  let error, store_sites_bond_pair =
+    (store_sites_bond_2, store_sites_bond_1)    
+  in
+  error, store_sites_bond_pair
+
+module AgentMap = Int_storage.Nearly_inf_Imperatif
+
+type sites_ode = (int list AgentMap.t * int list AgentMap.t)
+
+type ode_frag =
+    {
+      store_sites_bond_pair_1 : sites_ode;
+      store_sites_bond_pair_2 : sites_ode
+    }
+
+let scan_rule parameter error handler rule ode_class =
   let bind = rule.Cckappa_sig.actions.Cckappa_sig.bind in
-  (*create the init *)
+  (*create the init*)
   let error, init_store_sites_modified =
     Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
   let error, init_store_sites_bond_1 =
     Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
   let error, init_store_sites_bond_2 =
     Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
-  let error, store_sites_bond_pair =
+  let error, store_sites_bond_pair_1 =
     List.fold_left (fun (error, store_sites_bond_pair)
-                        (site_address_modified, site_address) ->
-                    error, collect_sites_bond_pair
-                             parameter
-                             error
-                             rule
-                             site_address_modified
-                             site_address
-                             init_store_sites_modified
-                             init_store_sites_bond_1
-                             init_store_sites_bond_2
-                             store_sites_bond_pair
-                   )
-                   (error, store_sites_bond_pair) bind
+      (site_address_modified, site_address) ->
+        error, collect_sites_bond_pair_1
+          parameter
+          error
+          rule
+            site_address_modified
+              site_address
+              init_store_sites_modified
+              init_store_sites_bond_1
+              init_store_sites_bond_2
+              store_sites_bond_pair
+    )(error, ode_class.store_sites_bond_pair_1) bind
   in
-  error, store_sites_bond_pair
+  let error, store_sites_bond_pair_2 =
+    List.fold_left (fun (error, store_sites_bond_pair)
+      (site_address, site_address_modified) ->
+        error, collect_sites_bond_pair_2
+          parameter
+          error
+          rule
+            site_address
+              site_address_modified
+              init_store_sites_modified
+              init_store_sites_bond_1
+              init_store_sites_bond_2
+              store_sites_bond_pair
+    )(error, ode_class.store_sites_bond_pair_2) bind
+  in
+  error,
+  {
+    store_sites_bond_pair_1 = store_sites_bond_pair_1;
+    store_sites_bond_pair_2 = store_sites_bond_pair_2
+  }
     
 let scan_rule_set parameter error handler rules =
   let error, init =
     Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
-  let init_ode = (init, init) in
+  let init_pair = (init, init) in
+  let init_ode = 
+    {store_sites_bond_pair_1 = init_pair;
+     store_sites_bond_pair_2 = init_pair}
+  in
   let error, ode_class =
     Int_storage.Nearly_inf_Imperatif.fold
       parameter error
@@ -275,27 +343,6 @@ let scan_rule_set parameter error handler rules =
       ) rules init_ode
   in
   error, ode_class
-(*
-  let error, result =
-    Int_storage.Nearly_inf_Imperatif.fold
-      parameter error
-      (fun parameter error agent_id (sites_anchors, sites_anchors') store_sites_anchors ->
-       (*starting from the second element in a pair ode_class,
-         map each agent, sites_anchors into a store_site_anchors*)
-       let error, result =
-         Int_storage.Nearly_inf_Imperatif.set
-           parameter
-           error
-           agent_id
-           (sites_anchors, sites_anchors')
-           store_sites_anchors
-       in error, result
-      )
-      (*(snd ode_class)*)
-      ode_class
-      init_ode
-  in
-  error, result*)
           
 let print_modified parameter error result =
   Int_storage.Nearly_inf_Imperatif.print
@@ -307,24 +354,34 @@ let print_modified parameter error result =
      in
      error) parameter result
 
-let print_bind parameter error result =
+let print_bond parameter error result =
   Int_storage.Nearly_inf_Imperatif.print
     error
     (fun error parameter l ->
      let _ =
-       print_string "site_type_bind:";
+       print_string "site_type_bond:";
        print_list l
      in
      error) parameter result
 
-let print parameter error (result, result') = 
+let print_pair_1 parameter error (result, result') = 
   let p1 = print_modified parameter error result in
-  let p2 = print_bind parameter error result' in
+  let p2 = print_bond parameter error result' in
   p1, p2
+
+let print_pair_2 parameter error (result, result') = 
+  let p1 = print_bond parameter error result in
+  let p2 = print_modified parameter error result' in
+  p1, p2
+
+let print_ode parameter error {store_sites_bond_pair_1; store_sites_bond_pair_2} =
+  let p1 = print_pair_1 parameter error store_sites_bond_pair_1 in
+  let p2 = print_pair_2 parameter error store_sites_bond_pair_2 in
+  p1; p2
           
 let ode_fragmentation parameter error handler cc_compil =
   let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
   let error, result = scan_rule_set parameter error handler cc_compil.Cckappa_sig.rules in
-  let _ = print parameter error result in
+  let _ = print_ode parameter error result in
   error, result
   
