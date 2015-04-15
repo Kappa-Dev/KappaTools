@@ -415,14 +415,12 @@ site_type:[|0; 0|]
 Stochastic_classes:agent_type:2:
 site_type:[|0; 0; 0; 0|]
 ODE_fragmentation:
-- DO rule_id:0
-- DO rule_id:1
-- DO rule_id:2
-- DO rule_id:3
+- (site_address_modified, site_address)
 ODE_fragmentation:agent_type:1:
 site_type_modified:{1; 0}
 ODE_fragmentation:agent_type:2:
 site_type_bond:{3; 2}
+- (site_address,site_address_modified)
 ODE_fragmentation:agent_type:1:
 site_type_bond:{1; 0}
 ODE_fragmentation:agent_type:2:

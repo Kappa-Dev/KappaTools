@@ -195,7 +195,7 @@ let collect_store_bond_1 parameter error site_address store_sites_modified store
               
 (*anchor first case*)
 let collect_sites_bond_pair_1 parameter error rule site_address_modified site_address store_sites_modified store_sites_bond_1 store_sites_bond_2 store_sites_bond_pair =
-  (*store_sites_bond_pair_1:(site_adress_modified, site_address*)
+  (*store_sites_bond_pair_1:(site_address_modified, site_address*)
   (*a) collect sites that are modified *)
   let error, store_sites_modified =
     collect_sites_modified
@@ -231,7 +231,7 @@ let collect_sites_bond_pair_1 parameter error rule site_address_modified site_ad
   error, store_sites_bond_pair
 
 let collect_sites_bond_pair_2 parameter error rule site_address site_address_modified store_sites_modified store_sites_bond_1 store_sites_bond_2 store_sites_bond_pair =
-  (*store_sites_bond_pair_2:(site_adress, site_address_modified)*)
+  (*store_sites_bond_pair_2:(site_address, site_address_modified)*)
   (*a) collect sites that are modified *)
   let error, store_sites_modified =
     collect_sites_modified
@@ -333,7 +333,7 @@ let scan_rule_set parameter error handler rules =
     Int_storage.Nearly_inf_Imperatif.fold
       parameter error
       (fun parameter error rule_id rule ode_class ->
-       let _ = Printf.fprintf stdout "- DO rule_id:%i\n" rule_id in
+        (*let _ = Printf.fprintf stdout "- DO rule_id:%i\n" rule_id in*)
        scan_rule
          parameter
          error
@@ -375,7 +375,9 @@ let print_pair_2 parameter error (result, result') =
   p1, p2
 
 let print_ode parameter error {store_sites_bond_pair_1; store_sites_bond_pair_2} =
+  let _ = Printf.fprintf stdout "- (site_address_modified, site_address)\n" in
   let p1 = print_pair_1 parameter error store_sites_bond_pair_1 in
+  let _ = Printf.fprintf stdout "- (site_address,site_address_modified)\n" in
   let p2 = print_pair_2 parameter error store_sites_bond_pair_2 in
   p1; p2
           
@@ -384,4 +386,3 @@ let ode_fragmentation parameter error handler cc_compil =
   let error, result = scan_rule_set parameter error handler cc_compil.Cckappa_sig.rules in
   let _ = print_ode parameter error result in
   error, result
-  

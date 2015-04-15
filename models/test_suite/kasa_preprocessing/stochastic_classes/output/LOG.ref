@@ -417,13 +417,6 @@ site_type:[|0; 0|]
 Stochastic_classes:agent_type:4:
 site_type:[|0; 0; 0|]
 ODE_fragmentation:
-- DO rule_id:0
-- DO rule_id:1
-- DO rule_id:2
-- DO rule_id:3
-- DO rule_id:4
-- DO rule_id:5
-- DO rule_id:6
-- DO rule_id:7
-- DO rule_id:8
+- (site_address_modified, site_address)
+- (site_address,site_address_modified)
 execution finished without any exception
