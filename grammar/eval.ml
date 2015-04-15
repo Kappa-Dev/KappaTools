@@ -91,14 +91,14 @@ let eval_node env a link_map node_map node_id =
        Node.set_ptr (node_i,pi) (Node.Ptr (node_j,pj))
      with Not_found -> invalid_arg "Eval.eval_node"
     ) bond_list ;
-  (node_map,link_map,env)
+  (node_map,link_map)
 
 let nodes_of_ast env ast_mixture =
-  let rec iter ast_mixture node_map node_id link_map env =
+  let rec iter ast_mixture node_map node_id link_map =
     match ast_mixture with
     | a :: ast_mix ->
-       let (node_map,link_map,env) = eval_node env a link_map node_map node_id in
-       iter ast_mix node_map (node_id+1) link_map env
+       let (node_map,link_map) = eval_node env a link_map node_map node_id in
+       iter ast_mix node_map (node_id+1) link_map
     | [] ->
        IntMap.iter
 	 (fun i opt ->
@@ -108,9 +108,9 @@ let nodes_of_ast env ast_mixture =
 	     raise (ExceptionDefn.Malformed_Decl
 		      ("Edge identifier "^string_of_int i^" is dangling",pos))
 	 ) link_map ;
-       (node_map,env)
+       (node_map)
   in
-  iter ast_mixture IntMap.empty 0 IntMap.empty env
+  iter ast_mixture IntMap.empty 0 IntMap.empty
 
 let eval_agent env a ctxt =
   let ((agent_name, pos_ag),ast_intf) = a in
@@ -737,9 +737,9 @@ let pert_of_result variables env rules res =
 let init_graph_of_result env res =
   let n = Array.length env.Environment.tokens.NamedDecls.decls in
   let token_vector = Array.init n (fun _ -> 0.) in
-  let sg,env =
+  let sg =
     List.fold_left
-      (fun (sg,env) (opt_vol,init_t,_) -> (*TODO dealing with volumes*)
+      (fun sg (opt_vol,init_t,_) -> (*TODO dealing with volumes*)
        match init_t with
        | INIT_MIX (alg, ast) ->
 	  let (_,alg') =
@@ -749,7 +749,6 @@ let init_graph_of_result env res =
 	  let value = initial_value_alg env alg' in
 	  let cpt = ref 0 in
 	  let sg = ref sg in
-	  let env = ref env in
 	  let n = match !Parameter.rescale with
 	    | None -> Nbr.to_int value
 	    | Some i -> min i (Nbr.to_int value)
@@ -757,12 +756,11 @@ let init_graph_of_result env res =
 	  (* Cannot do Mixture.to_nodes env m once for all because of *)
 	  (* references                                               *)
 	  while !cpt < n do
-	    let nodes,env' = nodes_of_ast !env ast in
-	    env := env' ;
+	    let nodes = nodes_of_ast env ast in
 	    sg := Graph.SiteGraph.add_nodes !sg nodes;
 	    cpt := !cpt + 1
 	  done;
-	  (!sg,!env)
+	  !sg
        | INIT_TOK (alg, (tk_nme,pos_tk)) ->
 	  let (_,alg') =
 	    Expr.compile_alg env.Environment.algs.NamedDecls.finder
@@ -776,10 +774,10 @@ let init_graph_of_result env res =
 		       ("token "^tk_nme^" is undeclared",pos_tk))
 	  in
 	  token_vector.(tok_id) <- value;
-	  (sg,env)
-      )	(Graph.SiteGraph.init !Parameter.defaultGraphSize,env) res.Ast.init
+	  sg
+      )	(Graph.SiteGraph.init !Parameter.defaultGraphSize) res.Ast.init
   in
-  (sg,token_vector,env)
+  (sg,token_vector)
 
 let configurations_of_result result =
   let raw_set_value pos_p param value_list f =
@@ -937,7 +935,7 @@ let initialize logger overwrite result =
   let (env, kappa_vars) = variables_of_result env mixs alg_a in
 
   Debug.tag logger "\t -initial conditions";
-  let sg,token_vector,env = init_graph_of_result env result in
+  let sg,token_vector = init_graph_of_result env result in
 
   Debug.tag logger "\t -rules";
   let (env, kappa_vars, pure_rules) =
