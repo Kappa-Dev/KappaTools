@@ -258,7 +258,7 @@ let collect_sites_bond_pair_2 parameter error rule bond_rhs site_address site_ad
 (*anchor second case*)
  (*a) collect sites that are bond, where sites are taken from a set of
   sites in the rule rhs that are bond*)
-let collect_sites_bond_rhs parameter error rule bond_rhs site_address_1 site_address_2 (store_sites_bond_rhs_1, store_sites_bond_rhs_2) =
+let collect_sites_bond_rhs parameter error rule bond_rhs site_address_1 site_address_2 (*store_sites_bond_rhs_1 store_sites_bond_rhs_2*) store_sites_bond_rhs_1 store_sites_bond_rhs_2 store_sites_bond_rhs = (*FIXME*)
   (*fist agent that are bond in a pair of agents*)
   let error, store_sites_bond_1 =
     collect_sites_bond_2
@@ -309,7 +309,7 @@ let scan_rule parameter error handler rule ode_class =
   (*a)collect anchor sites in the first case*)
   let error, store_sites_bond_pair_1 =
     List.fold_left (fun (error, store_sites_bond_pair)
-      (site_address_modified, site_address) ->
+      (site_address_modified, site_address) -> (*FIXME*)
         error, collect_sites_bond_pair_1
           parameter
           error
@@ -318,6 +318,8 @@ let scan_rule parameter error handler rule ode_class =
             site_address_modified
               site_address
               init_store_sites_modified
+              (*init_store_sites_bond_1
+              init_store_sites_bond_2*)
               (fst store_sites_bond_pair)
               (snd store_sites_bond_pair)
               store_sites_bond_pair
@@ -325,7 +327,7 @@ let scan_rule parameter error handler rule ode_class =
   in
   let error, store_sites_bond_pair_2 =
     List.fold_left (fun (error, store_sites_bond_pair)
-      (site_address, site_address_modified) ->
+      (site_address, site_address_modified) ->(*FIXME*)
         error, collect_sites_bond_pair_2
           parameter
           error
@@ -334,6 +336,8 @@ let scan_rule parameter error handler rule ode_class =
             site_address
               site_address_modified
               init_store_sites_modified
+              (*init_store_sites_bond_1
+              init_store_sites_bond_2*)
               (snd store_sites_bond_pair)
               (fst store_sites_bond_pair)
               store_sites_bond_pair
@@ -344,7 +348,7 @@ let scan_rule parameter error handler rule ode_class =
   (*return binding sites*)
   let error, store_sites_bond_rhs =
     List.fold_left (fun (error, store_sites_bond_rhs)
-      (site_address_1, site_address_2) ->
+      (site_address_1, site_address_2) ->(*FIXME*)
         error, collect_sites_bond_rhs
           parameter
           error
@@ -352,6 +356,10 @@ let scan_rule parameter error handler rule ode_class =
             bond_rhs
             site_address_1
               site_address_2
+              (fst store_sites_bond_rhs)
+              (snd store_sites_bond_rhs)
+              (*init_store_sites_bond_1 (*FIXME*)
+              init_store_sites_bond_2*)
               store_sites_bond_rhs
     )
       (error, ode_class.store_sites_bond_rhs) bind
@@ -410,6 +418,8 @@ let print_bond parameter error result =
        print_list l
      in
      error) parameter result
+
+(*TODO: do not print as a list, print as a pair of information*)
 
 (*print functions of anchor sites in the first case*)
 let print_pair_1 parameter error (result, result') = 
