@@ -256,7 +256,9 @@ type ode_frag =
       store_sites_modified : int list AgentMap.t; (*Information*)
       store_sites_bond_pair_1 : sites_ode;
       store_sites_anchor_1 : int list AgentMap.t; (*Information*)
-      store_sites_bond_rhs : sites_ode
+      store_sites_bond_rhs : sites_ode;
+      (*external flow (a, b) if a is an anchor or b is a modified sites*)
+      store_external_flow : (int list * int list)
     }
 
 let scan_rule parameter error handler rule ode_class =
@@ -265,10 +267,6 @@ let scan_rule parameter error handler rule ode_class =
   (*create the init*)
   let error, init_store_sites_modified =
     Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
-  (*let error, init_store_sites_bond_1 =
-    Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
-  let error, init_store_sites_bond_2 =
-    Int_storage.Nearly_inf_Imperatif.create parameter error 0 in*)
   (*FOR information about modified sites*)
   let error, store_sites_modified =
     collect_sites_modified
@@ -289,15 +287,13 @@ let scan_rule parameter error handler rule ode_class =
             site_address_modified
               site_address
               init_store_sites_modified
-              (*init_store_sites_bond_1
-              init_store_sites_bond_2*)
               (fst store_sites_bond_pair)
               (snd store_sites_bond_pair)
               store_sites_bond_pair
     )(error, ode_class.store_sites_bond_pair_1) bind
   in
   (*b)collect anchor sites in the second case*)
-  (*TEST*)
+  (*TODO:check the conditions*)
   (*return binding sites*)
   let error, store_sites_bond_rhs =
     List.fold_left (fun (error, store_sites_bond_rhs)
@@ -311,11 +307,66 @@ let scan_rule parameter error handler rule ode_class =
               site_address_2
               (fst store_sites_bond_rhs)
               (snd store_sites_bond_rhs)
-              (*init_store_sites_bond_1 (*FIXME*)
-              init_store_sites_bond_2*)
               store_sites_bond_rhs
     )
       (error, ode_class.store_sites_bond_rhs) bind
+  in
+  (*d) External flow: link between 'a' and 'b'. If 'a' is an anchor or 'b'
+  is a modified site*)
+  let store_external_flow =
+    (*folding a set of modified sites into a list of sites*)
+    let error, get_sites_modified =
+      Int_storage.Nearly_inf_Imperatif.fold
+        parameter
+        error
+        (fun parameter error k a b ->
+         (*new_list*)
+         let sites = List.concat [a; b] in
+         error, sites
+        )
+        (fst store_sites_bond_pair_1)
+        []
+    in
+    (*let _ = print_string "modified:";
+            print_list get_sites_modified in*)
+    (*folding a set of anchor sites into a list of sites (first case)*)
+    let error, get_sites_anchor =
+      Int_storage.Nearly_inf_Imperatif.fold
+        parameter
+        error
+        (fun parameter error k a b ->
+         let sites = List.concat [a; b] in
+         error, sites)
+        (snd store_sites_bond_pair_1)
+        []
+    in
+    (*store the external flow by checking the condition above*)
+    (*check if 'a' is a member of a list of anchor sites
+      or 'b' is a member of a list of modified sites*)
+    let store_external_flow =
+      let store_anchor =
+        List.fold_left (fun old_list a ->
+                        let is_mem_anchor =
+                          List.mem a get_sites_anchor in
+                        if is_mem_anchor
+                        then List.concat [[a];old_list]
+                        else []
+                       )
+                       [] get_sites_anchor
+      in
+      let store_modified =
+        List.fold_left (fun old_list b ->
+                        let is_mem_modified =
+                          List.mem b get_sites_modified in
+                        if is_mem_modified
+                        then List.concat [[b];old_list]
+                        else []
+                       )
+                       [] get_sites_modified
+      in
+      (store_anchor, store_modified)
+    in
+    store_external_flow
   in
   (*return value of ode_class*)
   error,
@@ -323,7 +374,8 @@ let scan_rule parameter error handler rule ode_class =
     store_sites_modified = store_sites_modified;
     store_sites_bond_pair_1 = store_sites_bond_pair_1;
     store_sites_anchor_1 = (snd store_sites_bond_pair_1);
-    store_sites_bond_rhs = store_sites_bond_rhs
+    store_sites_bond_rhs = store_sites_bond_rhs;
+    store_external_flow = store_external_flow
   }
     
 let scan_rule_set parameter error handler rules =
@@ -336,7 +388,8 @@ let scan_rule_set parameter error handler rules =
       store_sites_modified = init;
       store_sites_bond_pair_1 = init_pair;
       store_sites_anchor_1 = init;
-      store_sites_bond_rhs = init_pair
+      store_sites_bond_rhs = init_pair;
+      store_external_flow = [], []
     }
   in
   let error, ode_class =
@@ -384,6 +437,22 @@ let print_anchor_1 parameter error result =
      in
      error) parameter result
 
+let print_external_flow (a,b) =
+  match a, b with
+  | [], [] | _, [] | [], _ -> ()
+  | a, b ->
+     let output = sprintf_list a in
+     let a = Printf.fprintf stdout "anchor:%s -> " output in
+     let b = Printf.fprintf stdout "modified:"; print_list b in
+     a;b
+
+(*let print_external_flow result =
+  match result with
+  | [] -> []
+  | (a,b)::tl ->
+     let _ = Printf.fprintf stdout "anchor:%i -> modified:%i\n" a b in
+     tl*)
+     
 (*TODO: do not print as a list, print as a pair of information*)
 
 (*print functions of anchor sites in the first case*)
@@ -404,7 +473,9 @@ let print_rhs_pair parameter error (result, result') =
 (*print function of ode_class*)
 let print_ode parameter error
               {store_sites_modified; store_sites_bond_pair_1;
-               store_sites_anchor_1; store_sites_bond_rhs} =
+               store_sites_anchor_1; store_sites_bond_rhs;
+               store_external_flow
+              } =
   let _ = Printf.fprintf stdout "* Sites that are modified:\n" in
   let m = print_modified parameter error store_sites_modified in
   m;
@@ -418,7 +489,10 @@ let print_ode parameter error
   let _ = Printf.fprintf stdout "* Anchor sites in the second case:\n" in
   let _ = Printf.fprintf stdout "- (site_address,site_address)\n" in
   let p2 = print_rhs_pair parameter error store_sites_bond_rhs in
-  p2
+  p2;
+  let _ = Printf.fprintf stdout "- External flow :\n" in
+  let f = print_external_flow store_external_flow in
+  f
           
 let ode_fragmentation parameter error handler cc_compil =
   let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in

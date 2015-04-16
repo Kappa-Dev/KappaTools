@@ -534,4 +534,6 @@ ODE_fragmentation:agent_type:1:
 site_type_bond:{0}
 ODE_fragmentation:agent_type:2:
 site_type_bond:{3; 2}
+- External flow :
+anchor:{0; 2; 3} -> modified:{0; 1; 1}
 execution finished without any exception
