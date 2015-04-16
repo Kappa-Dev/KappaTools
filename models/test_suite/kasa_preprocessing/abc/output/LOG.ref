@@ -512,15 +512,6 @@ ODE_fragmentation:agent_type:1:
 site_type_bond:{0}
 ODE_fragmentation:agent_type:2:
 site_type_bond:{3; 2}
-- (site_address,site_address_modified)
-+ First element in a pair of agents:
-ODE_fragmentation:agent_type:0:
-site_type_bond:{1; 1; 0}
-+ Second element in a pair of agents:
-ODE_fragmentation:agent_type:1:
-site_type_modified:{0}
-ODE_fragmentation:agent_type:2:
-site_type_modified:{3; 2}
 * Anchor sites in the second case:
 - (site_address,site_address)
 + First element in a pair of agents:

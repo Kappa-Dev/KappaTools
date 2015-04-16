@@ -70,7 +70,7 @@ let collect_sites_modified parameter error rule store_sites_modified =
              (fun site _ current_list ->
               site :: current_list) site_modif.Cckappa_sig.agent_interface []
          in
-         (*map those sites with agent_type and store it into a store_sites_modified*)
+           (*map those sites with agent_type and store it into a store_sites_modified*)
            let error, store_sites_modified =
            add_site_modified
              parameter
@@ -220,6 +220,7 @@ let collect_sites_bond_pair_1 parameter error rule bond_rhs site_address_modifie
   in
   error, store_sites_bond_pair
 
+(*FIXME: use only one case is enought, remove this function*)
 let collect_sites_bond_pair_2 parameter error rule bond_rhs site_address site_address_modified store_sites_modified store_sites_bond_1 store_sites_bond_2 store_sites_bond_pair =
   (*store_sites_bond_pair_2:(site_address, site_address_modified)*)
   (*a) collect sites that are modified *)
@@ -292,7 +293,7 @@ type sites_ode = (int list AgentMap.t * int list AgentMap.t)
 type ode_frag =
     {
       store_sites_bond_pair_1 : sites_ode;
-      store_sites_bond_pair_2 : sites_ode;
+      (*store_sites_bond_pair_2 : sites_ode;*)
       store_sites_bond_rhs : sites_ode
     }
 
@@ -309,7 +310,7 @@ let scan_rule parameter error handler rule ode_class =
   (*a)collect anchor sites in the first case*)
   let error, store_sites_bond_pair_1 =
     List.fold_left (fun (error, store_sites_bond_pair)
-      (site_address_modified, site_address) -> (*FIXME*)
+      (site_address_modified, site_address) ->
         error, collect_sites_bond_pair_1
           parameter
           error
@@ -325,7 +326,8 @@ let scan_rule parameter error handler rule ode_class =
               store_sites_bond_pair
     )(error, ode_class.store_sites_bond_pair_1) bind
   in
-  let error, store_sites_bond_pair_2 =
+  (*FIXME: The case above is enought, remove this function*)
+  (*let error, store_sites_bond_pair_2 =
     List.fold_left (fun (error, store_sites_bond_pair)
       (site_address, site_address_modified) ->(*FIXME*)
         error, collect_sites_bond_pair_2
@@ -342,13 +344,13 @@ let scan_rule parameter error handler rule ode_class =
               (fst store_sites_bond_pair)
               store_sites_bond_pair
     )(error, ode_class.store_sites_bond_pair_2) bind
-  in
+  in*)
   (*b)collect anchor sites in the second case*)
   (*TEST*)
   (*return binding sites*)
   let error, store_sites_bond_rhs =
     List.fold_left (fun (error, store_sites_bond_rhs)
-      (site_address_1, site_address_2) ->(*FIXME*)
+      (site_address_1, site_address_2) ->
         error, collect_sites_bond_rhs
           parameter
           error
@@ -368,7 +370,7 @@ let scan_rule parameter error handler rule ode_class =
   error,
   {
     store_sites_bond_pair_1 = store_sites_bond_pair_1;
-    store_sites_bond_pair_2 = store_sites_bond_pair_2;
+    (*store_sites_bond_pair_2 = store_sites_bond_pair_2;*)
     store_sites_bond_rhs = store_sites_bond_rhs
   }
     
@@ -380,7 +382,7 @@ let scan_rule_set parameter error handler rules =
   (*init state of ode_class*)
   let init_ode = 
     {store_sites_bond_pair_1 = init_pair;
-     store_sites_bond_pair_2 = init_pair;
+     (*store_sites_bond_pair_2 = init_pair;*)
      store_sites_bond_rhs = init_pair
     }
   in
@@ -429,12 +431,13 @@ let print_pair_1 parameter error (result, result') =
   let p2 = print_bond parameter error result' in
   p1, p2
 
-let print_pair_2 parameter error (result, result') = 
+(*FIXME: only one case is enought, remove this function*)
+(*let print_pair_2 parameter error (result, result') = 
   let _ = Printf.fprintf stdout "+ First element in a pair of agents:\n" in
   let p1 = print_bond parameter error result in
   let _ = Printf.fprintf stdout "+ Second element in a pair of agents:\n" in
   let p2 = print_modified parameter error result' in
-  p1, p2
+  p1, p2*)
 
 let print_rhs_pair parameter error (result, result') =
   let _ = Printf.fprintf stdout "+ First element in a pair of agents:\n" in
@@ -445,13 +448,14 @@ let print_rhs_pair parameter error (result, result') =
 
 (*print function of ode_class*)
 let print_ode parameter error
-    {store_sites_bond_pair_1; store_sites_bond_pair_2; store_sites_bond_rhs} =
+    {store_sites_bond_pair_1; (*store_sites_bond_pair_2;*) store_sites_bond_rhs} =
   let _ = Printf.fprintf stdout "* Anchor sites in the first case:\n" in
   let _ = Printf.fprintf stdout "- (site_address_modified, site_address)\n" in
   let p1 = print_pair_1 parameter error store_sites_bond_pair_1 in
-  let _ = Printf.fprintf stdout "- (site_address,site_address_modified)\n" in
+  (*let _ = Printf.fprintf stdout "- (site_address,site_address_modified)\n" in
   let p2 = print_pair_2 parameter error store_sites_bond_pair_2 in
-  let _ = p1; p2 in
+  let _ = p1; p2 in*)
+  p1;
   let _ = Printf.fprintf stdout "* Anchor sites in the second case:\n" in
   let _ = Printf.fprintf stdout "- (site_address,site_address)\n" in
   let p3 = print_rhs_pair parameter error store_sites_bond_rhs in

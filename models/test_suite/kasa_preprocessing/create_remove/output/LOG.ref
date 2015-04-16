@@ -80,9 +80,6 @@ ODE_fragmentation:
 - (site_address_modified, site_address)
 + First element in a pair of agents:
 + Second element in a pair of agents:
-- (site_address,site_address_modified)
-+ First element in a pair of agents:
-+ Second element in a pair of agents:
 * Anchor sites in the second case:
 - (site_address,site_address)
 + First element in a pair of agents:
