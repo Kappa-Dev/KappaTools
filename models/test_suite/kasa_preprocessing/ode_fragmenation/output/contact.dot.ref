@@ -5,8 +5,9 @@ subgraph cluster0 {
 label =  "A";  shape = rectangle; color = red 
 } ; 
 subgraph cluster1 {
-   1.0 [style = filled label = "x" shape =circle color = yellow size = "5"]
+   1.0 [style = filled label = "x" shape =ellipse color = green size = "5"]
+   1.1 [style = filled label = "x" shape =circle color = yellow size = "5"]
 label =  "B";  shape = rectangle; color = red 
 } ; 
-0.0 -- 1.0
+0.0 -- 1.1
 }

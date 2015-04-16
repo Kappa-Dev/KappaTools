@@ -224,7 +224,7 @@ let collect_sites_bond_pair_1 parameter error rule bond_rhs site_address_modifie
  (*a) collect sites that are bond, where sites are taken from a set of
   sites in the rule rhs that are bond*)
 let collect_sites_bond_rhs parameter error rule bond_rhs site_address_1 site_address_2 store_sites_bond_rhs_1 store_sites_bond_rhs_2 store_sites_bond_rhs =
-  (*fist agent that are bond in a pair of agents*)
+  (*first agent that are bond in a pair of agents*)
   let error, store_sites_bond_1 =
     collect_sites_bond_2
       parameter
@@ -327,8 +327,6 @@ let scan_rule parameter error handler rule ode_class =
         (fst store_sites_bond_pair_1)
         []
     in
-    (*let _ = print_string "modified:";
-            print_list get_sites_modified in*)
     (*folding a set of anchor sites into a list of sites (first case)*)
     let error, get_sites_anchor =
       Int_storage.Nearly_inf_Imperatif.fold
