@@ -401,6 +401,7 @@ Influence_map:Inhibition_map:rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~
 Influence_map:Inhibition_map:rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2) -> rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!_,y!_),C(x~u,y~p)[0->0]
 Influence_map:Inhibition_map:rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!_,y!_),C(x~u,y~p) -> rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2)[0->0]
 Covering_classes:
+Agents:{A; B; C}
 Covering_classes:agent_type:0:
 Covering_class_id:0:site_type:{0,1}
 Covering_classes:agent_type:1:
@@ -408,6 +409,7 @@ Covering_class_id:0:site_type:{0,1}
 Covering_classes:agent_type:2:
 Covering_class_id:0:site_type:{0,1,2,3}
 Stochastic_classes:
+Agents:{A; B; C}
 Stochastic_classes:agent_type:0:
 site_type:[|0; 0|]
 Stochastic_classes:agent_type:1:

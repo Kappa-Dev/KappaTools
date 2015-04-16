@@ -143,11 +143,13 @@ Influence_map:Inhibition_map:rule(0):'bind' A(x),B(x)->A(x!1),B(x!1) -> rule(1):
 Influence_map:Inhibition_map:rule(1):'remove' A(x),A(x)->A(x),B(x),A(x) -> rule(0):'bind' A(x),B(x)->A(x!1),B(x!1)[1->0]
 Influence_map:Inhibition_map:rule(1):'remove' A(x),A(x)->A(x),B(x),A(x) -> rule(1):'remove' A(x),A(x)->A(x),B(x),A(x)[1->0]
 Covering_classes:
+Agents:{A; B}
 Covering_classes:agent_type:0:
 Covering_class_id:0:site_type:{0}
 Covering_classes:agent_type:1:
 Covering_class_id:0:site_type:{0}
 Stochastic_classes:
+Agents:{A; B}
 Stochastic_classes:agent_type:0:
 site_type:[|0|]
 ODE_fragmentation:

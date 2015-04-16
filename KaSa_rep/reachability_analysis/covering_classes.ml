@@ -26,24 +26,6 @@ let empty_classes parameter error handler =
   {
      Covering_classes_type.covering_classes  = covering_classes
   }
-
-(*MOVE*)
-let rec print_list l =
-  match l with
-  | [] -> print_string "empty"
-  | h :: [] ->  print_int h; print_string " "
-  | h :: tl ->
-     let _ = print_int h; print_string "," in
-     print_list tl
-                     
-let rec print_list_list ls =
-  match ls with
-  | [] -> ()
-  | h :: [] -> print_list h; print_string " "
-  | h :: tl ->
-     let _ =  print_string " "; print_list h;
-              print_string "; " in
-     print_list_list tl
                      
 let length_sorted lists =
   let list_length = List.rev_map (fun list -> list, List.length list) lists in
@@ -188,7 +170,7 @@ let add_covering_class parameter error agent_type sites_list covering_classes =
          agent_type
          new_list
          covering_classes
-
+ 
 let scan_rule parameter error handler rule classes =
   let viewslhs = rule.Cckappa_sig.rule_lhs.Cckappa_sig.views in
   let rule_diff = rule.Cckappa_sig.diff_reverse in
@@ -280,12 +262,43 @@ let print_remanent_t parameter error result =
           let _ = print_newline () in
           error
         ) dic.Covering_classes_type.dic
-      in error )
+      in error
+    )
     parameter
     result
- 
+
+let sprintf_list l =
+  let acc = ref "{" in
+  List.iteri (fun i x ->
+    acc := !acc ^
+      if i <> 0
+      then Printf.sprintf "; %s" x
+      else Printf.sprintf "%s" x
+  ) l;
+  !acc ^ "}"
+    
+let print_list l =
+  let output = sprintf_list l in
+  Printf.fprintf stdout "%s\n" output
+
+let dump_agent parameter error handler =
+  let agent_dic = handler.Cckappa_sig.agents_dic in
+  let acc = ref [] in
+  let _ = 
+    Ckappa_sig.Dictionary_of_agents.print
+      parameter
+      error
+      (fun parameter error i v a b ->
+        acc := v::!acc ;
+        error)
+      agent_dic
+  in error;
+  !acc
+
 let covering_classes parameter error handler cc_compil =
-  let parameter =  Remanent_parameters.update_prefix parameter "agent_type:" in 
+  let agent_list = dump_agent parameter error handler in
+  let _ = print_string "Agents:"; print_list (List.rev agent_list) in
+  let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in        
   let error,result = scan_rule_set parameter error handler cc_compil.Cckappa_sig.rules in
   let _ = print_remanent_t parameter error result in
   error, result

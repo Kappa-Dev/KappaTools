@@ -195,8 +195,38 @@ let print_result parameter error result =
        print_array a
      in
      error) parameter result
+
+let sprintf_list_string l =
+  let acc = ref "{" in
+  List.iteri (fun i x ->
+    acc := !acc ^
+      if i <> 0
+      then Printf.sprintf "; %s" x
+      else Printf.sprintf "%s" x
+  ) l;
+  !acc ^ "}"
     
+let print_list_string l =
+  let output = sprintf_list_string l in
+  Printf.fprintf stdout "%s\n" output
+
+let dump_agent parameter error handler =
+  let agent_dic = handler.Cckappa_sig.agents_dic in
+  let acc = ref [] in
+  let _ = 
+    Ckappa_sig.Dictionary_of_agents.print
+      parameter
+      error
+      (fun parameter error i v a b ->
+        acc := v::!acc ;
+        error)
+      agent_dic
+  in error;
+  !acc
+   
 let stochastic_classes parameter error handler cc_compil =
+  let agent_list = dump_agent parameter error handler in
+  let _ = print_string "Agents:"; print_list_string (List.rev agent_list) in
   let parameter =  Remanent_parameters.update_prefix parameter "agent_type:" in 
   let error, result =
     scan_rule_set parameter error handler cc_compil.Cckappa_sig.rules

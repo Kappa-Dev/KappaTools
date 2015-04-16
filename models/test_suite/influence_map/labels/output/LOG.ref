@@ -134,9 +134,11 @@ Influence_map:Wake_up_map:rule(3):'\0' A(x~q)->A(x~p) -> rule(1):'otherothervery
 Influence_map:Inhibition_map:rule(2):'"0' A(x~q)->A(x~u) -> rule(3):'\0' A(x~q)->A(x~p)[0->0]
 Influence_map:Inhibition_map:rule(3):'\0' A(x~q)->A(x~p) -> rule(2):'"0' A(x~q)->A(x~u)[0->0]
 Covering_classes:
+Agents:{A}
 Covering_classes:agent_type:0:
 Covering_class_id:0:site_type:{0}
 Stochastic_classes:
+Agents:{A}
 ODE_fragmentation:
 * Anchor sites in the first case:
 - (site_address_modified, site_address)
