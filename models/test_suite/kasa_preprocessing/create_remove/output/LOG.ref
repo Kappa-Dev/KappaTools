@@ -76,10 +76,12 @@ Agents:{A; B; C}
 Stochastic_classes:
 Agents:{A; B; C}
 ODE_fragmentation:
+* Sites that are modified:
 * Anchor sites in the first case:
 - (site_address_modified, site_address)
 + First element in a pair of agents:
 + Second element in a pair of agents:
+- Anchor sites :
 * Anchor sites in the second case:
 - (site_address,site_address)
 + First element in a pair of agents:

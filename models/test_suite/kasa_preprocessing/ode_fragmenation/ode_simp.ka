@@ -1,0 +1,9 @@
+############ TEST ACTIONS ##############
+
+#### Signatures
+%agent: A(x)
+%agent: B(x)
+
+
+#### Rules
+'r0' A(x), B(x) -> A(x!1), B(x!1)

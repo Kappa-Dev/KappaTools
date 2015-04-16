@@ -182,6 +182,11 @@ Agents:{A; B}
 Stochastic_classes:agent_type:0:
 site_type:[|0; 0|]
 ODE_fragmentation:
+* Sites that are modified:
+ODE_fragmentation:agent_type:0:
+site_type_modified:{0; 1; 0}
+ODE_fragmentation:agent_type:1:
+site_type_modified:{0}
 * Anchor sites in the first case:
 - (site_address_modified, site_address)
 + First element in a pair of agents:
@@ -190,6 +195,9 @@ site_type_modified:{}
 + Second element in a pair of agents:
 ODE_fragmentation:agent_type:1:
 site_type_bond:{0}
+- Anchor sites :
+ODE_fragmentation:agent_type:1:
+site_type_anchor:{0}
 * Anchor sites in the second case:
 - (site_address,site_address)
 + First element in a pair of agents:

@@ -1,3 +1,3 @@
 #Command-line:
-${KAPPABIN}KaSa ode_frag.ka --debugging-mode --output-directory output || exit 0 
+${KAPPABIN}KaSa ode_simp.ka --debugging-mode --output-directory output || exit 0 
 

@@ -1,4 +1,4 @@
-Parsing ode_frag.ka...
+Parsing ode_simp.ka...
 done
 Scan rules!
 Signature:
@@ -7,157 +7,110 @@ Signature:agents:agent_type:0:A
 Signature:agents:agent_type:1:B
 Signature:sites: 
 Signature:sites:agent_type:0:
-Signature:sites:agent_type:0:site_type:0->x(internal state)
-Signature:sites:agent_type:0:site_type:1->x(binding state)
-Signature:sites:agent_type:0:site_type:2->y(binding state)
+Signature:sites:agent_type:0:site_type:0->x(binding state)
 Signature:sites:agent_type:1:
 Signature:sites:agent_type:1:site_type:0->x(binding state)
-Signature:sites:agent_type:1:site_type:1->y(binding state)
 Signature:states: 
 Signature:states:0:
 Signature:states:0:0:
-Signature:states:0:0:state_id:0->u
-Signature:states:0:0:state_id:1->p
-Signature:states:0:1:
-Signature:states:0:1:state_id:0->free
-Signature:states:0:1:state_id:1->agent_type:1@site_type:0
-Signature:states:0:2:
-Signature:states:0:2:state_id:0->free
-Signature:states:0:2:state_id:1->agent_type:1@site_type:1
+Signature:states:0:0:state_id:0->free
+Signature:states:0:0:state_id:1->agent_type:1@site_type:0
 Signature:states:1:
 Signature:states:1:0:
 Signature:states:1:0:state_id:0->free
-Signature:states:1:0:state_id:1->agent_type:0@site_type:1
-Signature:states:1:1:
-Signature:states:1:1:state_id:0->free
-Signature:states:1:1:state_id:1->agent_type:0@site_type:2
+Signature:states:1:0:state_id:1->agent_type:0@site_type:0
 Signature:duals: 
 Signature:duals:0:
-Signature:duals:0:1:
-Signature:duals:0:1:1:
-Signature:duals:0:1:1:agent_type:1,site_type:0,state_id:1
-Signature:duals:0:2:
-Signature:duals:0:2:1:
-Signature:duals:0:2:1:agent_type:1,site_type:1,state_id:1
+Signature:duals:0:0:
+Signature:duals:0:0:1:
+Signature:duals:0:0:1:agent_type:1,site_type:0,state_id:1
 Signature:duals:1:
 Signature:duals:1:0:
 Signature:duals:1:0:1:
-Signature:duals:1:0:1:agent_type:0,site_type:1,state_id:1
-Signature:duals:1:1:
-Signature:duals:1:1:1:
-Signature:duals:1:1:1:agent_type:0,site_type:2,state_id:1
+Signature:duals:1:0:1:agent_type:0,site_type:0,state_id:1
 Compilation:
 Compilation:rules:0:lhs:
 Compilation:rules:0:lhs:agent_id_0:
 Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
-Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
-Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
 Compilation:rules:0:lhs:agent_id_1:
 Compilation:rules:0:lhs:agent_id_1:agent_type_1:site_type_0->state:[state_min:0;state_max:0]
-Compilation:rules:0:lhs:agent_id_1:agent_type_1:site_type_1->state:[state_min:0;state_max:0]
 Compilation:rules:0:rhs:
 Compilation:rules:0:rhs:agent_id_0:
 Compilation:rules:0:rhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
-Compilation:rules:0:rhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
-Compilation:rules:0:rhs:agent_id_0:agent_type_0:site_type_2->state:[state_min:1;state_max:1]
 Compilation:rules:0:rhs:agent_id_1:
 Compilation:rules:0:rhs:agent_id_1:agent_type_1:site_type_0->state:[state_min:1;state_max:1]
-Compilation:rules:0:rhs:agent_id_1:agent_type_1:site_type_1->state:[state_min:1;state_max:1]
 Compilation:rules:0:rhs:bonds:agent_id_0:
-Compilation:rules:0:rhs:bonds:agent_id_0:site_type_1->agent_id_1.site_type_0
-Compilation:rules:0:rhs:bonds:agent_id_0:site_type_2->agent_id_1.site_type_1
+Compilation:rules:0:rhs:bonds:agent_id_0:site_type_0->agent_id_1.site_type_0
 Compilation:rules:0:rhs:bonds:agent_id_1:
-Compilation:rules:0:rhs:bonds:agent_id_1:site_type_0->agent_id_0.site_type_1
-Compilation:rules:0:rhs:bonds:agent_id_1:site_type_1->agent_id_0.site_type_2
+Compilation:rules:0:rhs:bonds:agent_id_1:site_type_0->agent_id_0.site_type_0
 Compilation:rules:0:direct:
 Compilation:rules:0:direct:agent_id_0:
 Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
-Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
-Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_2->state:[state_min:1;state_max:1]
 Compilation:rules:0:direct:agent_id_1:
 Compilation:rules:0:direct:agent_id_1:agent_type_1:site_type_0->state:[state_min:1;state_max:1]
-Compilation:rules:0:direct:agent_id_1:agent_type_1:site_type_1->state:[state_min:1;state_max:1]
 Compilation:rules:0:reverse:
 Compilation:rules:0:reverse:agent_id_0:
 Compilation:rules:0:reverse:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
-Compilation:rules:0:reverse:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
-Compilation:rules:0:reverse:agent_id_0:agent_type_0:site_type_2->state:[state_min:0;state_max:0]
 Compilation:rules:0:reverse:agent_id_1:
 Compilation:rules:0:reverse:agent_id_1:agent_type_1:site_type_0->state:[state_min:0;state_max:0]
-Compilation:rules:0:reverse:agent_id_1:agent_type_1:site_type_1->state:[state_min:0;state_max:0]
-Compilation:rules:0:actions:binding:(agent_id_0,agent_type_0)@site_type_1----(agent_id_1,agent_type_1)@site_type_0
-Compilation:rules:0:actions:binding:(agent_id_0,agent_type_0)@site_type_2----(agent_id_1,agent_type_1)@site_type_1
+Compilation:rules:0:actions:binding:(agent_id_0,agent_type_0)@site_type_0----(agent_id_1,agent_type_1)@site_type_0
 Quarks:Quarkify
 Quarks:Rule 0
 Quarks:TEST
 Quarks:rule_id:0,agent_type:0
 Quarks:rule_id:0,agent_type:0,site_type:0,state:0
-Quarks:rule_id:0,agent_type:0,site_type:1,state:0
-Quarks:rule_id:0,agent_type:0,site_type:2,state:0
 Quarks:rule_id:0,agent_type:1
 Quarks:rule_id:0,agent_type:1,site_type:0,state:0
-Quarks:rule_id:0,agent_type:1,site_type:1,state:0
 Quarks:CREATION
 Quarks:REMOVAL
 Quarks:MODIFICATION+
 Quarks:rule_id:0,agent_type:0,site_type:0,state:1
-Quarks:rule_id:0,agent_type:0,site_type:1,state:1
-Quarks:rule_id:0,agent_type:0,site_type:2,state:1
 Quarks:rule_id:0,agent_type:1,site_type:0,state:1
-Quarks:rule_id:0,agent_type:1,site_type:1,state:1
 Quarks:MODIFICATION-
 Quarks:rule_id:0,agent_type:0,site_type:0,state:0
-Quarks:rule_id:0,agent_type:0,site_type:1,state:0
-Quarks:rule_id:0,agent_type:0,site_type:2,state:0
 Quarks:rule_id:0,agent_type:1,site_type:0,state:0
-Quarks:rule_id:0,agent_type:1,site_type:1,state:0
 
 REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
 Quarks:agent_test**:agent_type:0,rule:0->[0]
 Quarks:agent_test**:agent_type:1,rule:0->[1]
 Quarks:site_test**:agent_type:0,site_type:0,state:0,rule:0->[0]
-Quarks:site_test**:agent_type:0,site_type:1,state:0,rule:0->[0]
-Quarks:site_test**:agent_type:0,site_type:2,state:0,rule:0->[0]
 Quarks:site_test**:agent_type:1,site_type:0,state:0,rule:0->[1]
-Quarks:site_test**:agent_type:1,site_type:1,state:0,rule:0->[1]
 Quarks:site_modif+:agent_type:0,site_type:0,state:1,rule:0->[0]
-Quarks:site_modif+:agent_type:0,site_type:1,state:1,rule:0->[0]
-Quarks:site_modif+:agent_type:0,site_type:2,state:1,rule:0->[0]
 Quarks:site_modif+:agent_type:1,site_type:0,state:1,rule:0->[1]
-Quarks:site_modif+:agent_type:1,site_type:1,state:1,rule:0->[1]
 Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:0->[0]
-Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:0->[0]
-Quarks:site_modif-:agent_type:0,site_type:2,state:0,rule:0->[0]
 Quarks:site_modif-:agent_type:1,site_type:0,state:0,rule:0->[1]
-Quarks:site_modif-:agent_type:1,site_type:1,state:0,rule:0->[1]
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Covering_classes:
 Agents:{A; B}
 Covering_classes:agent_type:0:
-Covering_class_id:0:site_type:{0,1,2}
+Covering_class_id:0:site_type:{0}
 Covering_classes:agent_type:1:
-Covering_class_id:0:site_type:{0,1}
+Covering_class_id:0:site_type:{0}
 Stochastic_classes:
 Agents:{A; B}
-Stochastic_classes:agent_type:0:
-site_type:[|0; 0; 1|]
-Stochastic_classes:agent_type:1:
-site_type:[|0; 0|]
 ODE_fragmentation:
+* Sites that are modified:
+ODE_fragmentation:agent_type:0:
+site_type_modified:{0}
+ODE_fragmentation:agent_type:1:
+site_type_modified:{0}
 * Anchor sites in the first case:
 - (site_address_modified, site_address)
 + First element in a pair of agents:
 ODE_fragmentation:agent_type:0:
-site_type_modified:{2; 1; 0; 2; 1; 0}
+site_type_modified:{0}
 + Second element in a pair of agents:
 ODE_fragmentation:agent_type:1:
-site_type_bond:{1; 0; 1; 0}
+site_type_bond:{0}
+- Anchor sites :
+ODE_fragmentation:agent_type:1:
+site_type_anchor:{0}
 * Anchor sites in the second case:
 - (site_address,site_address)
 + First element in a pair of agents:
 ODE_fragmentation:agent_type:0:
-site_type_bond:{2; 1; 2; 1}
+site_type_bond:{0}
 + Second element in a pair agents:
 ODE_fragmentation:agent_type:1:
-site_type_bond:{1; 0; 1; 0}
+site_type_bond:{0}
 execution finished without any exception

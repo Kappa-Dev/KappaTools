@@ -112,10 +112,16 @@ Covering_class_id:0:site_type:{0}
 Stochastic_classes:
 Agents:{A; B; C}
 ODE_fragmentation:
+* Sites that are modified:
+ODE_fragmentation:agent_type:0:
+site_type_modified:{0}
+ODE_fragmentation:agent_type:2:
+site_type_modified:{0}
 * Anchor sites in the first case:
 - (site_address_modified, site_address)
 + First element in a pair of agents:
 + Second element in a pair of agents:
+- Anchor sites :
 * Anchor sites in the second case:
 - (site_address,site_address)
 + First element in a pair of agents:
