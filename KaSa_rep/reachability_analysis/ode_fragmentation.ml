@@ -381,7 +381,7 @@ let get_sites_list_rhs parameter error store_sites_list_rhs =
   in
   get_sites_list
 
-(*Condition of internal flow*)
+(*Condition of internal flow: FIXME these sites tested are belong to the same agent_name*)
 let store_internal_flow parameter error get_sites_list store_sites_modified store_sites_bond_pair_1 store_internal_flow =
   match get_sites_list with
   | [] ->
