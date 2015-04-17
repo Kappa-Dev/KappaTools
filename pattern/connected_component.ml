@@ -331,12 +331,13 @@ let print_sons_dot sigs cc_id f sons =
     | ToInternal i ->
        Format.fprintf f "(%a,%i)~%i" (print_node_id sigs) n p i in
   Pp.list Pp.space ~trailing:Pp.space
-	  (fun f son -> Format.fprintf f "@[cc%i -> cc%i [label=\"%a\"];@]"
-				       cc_id son.dst pp_edge son.extra_edge)
+	  (fun f son -> Format.fprintf f "@[cc%i -> cc%i [label=\"%a %a\"];@]"
+				       cc_id son.dst pp_edge son.extra_edge
+				       Dipping.print son.inj)
 	  f sons
 
 let print_point_dot sigs f (id,point) =
-  let style = if point.is_obs then "circle" else "box" in
+  let style = if point.is_obs then "octagon" else "box" in
   Format.fprintf f "@[cc%i [label=\"%a\", shape=\"%s\"];@]@,%a"
 		 point.cc.id (print false sigs) point.cc
 		 style (print_sons_dot sigs id) point.sons
