@@ -4,12 +4,12 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   * 
   * Creation: 2010, the 19th of December
-  * Last modification: 2015, the 4th of February
+  * Last modification: Time-stamp <>  
   * * 
   * Configuration parameters which are passed through functions computation
-
   *  
-  * Copyright 2010 Institut National de Recherche en Informatique et   
+  * Copyright 2010,2011,2012,2013,2014,2015 
+  * Institut National de Recherche en Informatique et   
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
@@ -79,6 +79,11 @@ type marshalisable_parameters =
  { 
    unsafe : bool ;
    trace  : bool ;
+   do_contact_map : bool ;
+   do_influence_map : bool ; 
+   do_ODE_flow_of_information : bool ; 
+   do_stochastic_flow_of_information : bool ; 
+   do_site_dependencies : bool ; 
    dump_error_as_soon_as_they_occur : bool ;
    file : string option ; 
    prefix : string ; 

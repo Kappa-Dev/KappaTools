@@ -37,7 +37,11 @@ let main () =
   in 
   let parameters_c_compil = Remanent_parameters.update_call_stack parameters Preprocess.local_trace (Some "Preprocess.translate_c_compil") in 
   let error,handler,c_compil = Preprocess.translate_c_compil parameters_c_compil error handler refined_compil in 
-  let error = Print_handler.dot_of_contact_map parameters error handler in 
+  let error = 
+    if Remanent_parameters.get_do_contact_map parameters
+    then Print_handler.dot_of_contact_map parameters error handler 
+    else error 
+  in 
   let nrules = Handler.nrules parameters error handler in 
   let parameters_compil = Remanent_parameters.update_prefix parameters "Compilation:" in 
   let error = 
@@ -54,49 +58,64 @@ let main () =
     then Print_quarks.print_quarks parameters_quark error handler quark_map  
     else error 
   in 
-  let parameters_influence_map = Remanent_parameters.update_prefix parameters "Influence_map:" in 
-  let error,wake_up_map,inhibition_map = Influence_map.compute_influence_map parameters_influence_map error handler quark_map nrules in 
   let error = 
-    if (Remanent_parameters.get_trace parameters_influence_map) || Print_quarks.trace 
-    then Print_quarks.print_wake_up_map parameters_influence_map error handler c_compil Handler.print_rule_txt Handler.print_var_txt Handler.get_label_of_rule_txt Handler.get_label_of_var_txt Handler.print_labels_txt "\n" wake_up_map  
-    else error
+    if Remanent_parameters.get_do_influence_map parameters 
+    then 
+      let parameters_influence_map = Remanent_parameters.update_prefix parameters "Influence_map:" in 
+      let error,wake_up_map,inhibition_map = Influence_map.compute_influence_map parameters_influence_map error handler quark_map nrules in 
+      let error = 
+	if (Remanent_parameters.get_trace parameters_influence_map) || Print_quarks.trace 
+	then Print_quarks.print_wake_up_map parameters_influence_map error handler c_compil Handler.print_rule_txt Handler.print_var_txt Handler.get_label_of_rule_txt Handler.get_label_of_var_txt Handler.print_labels_txt "\n" wake_up_map  
+	else error
+      in 
+      let error = 
+	if (Remanent_parameters.get_trace parameters_influence_map) || Print_quarks.trace 
+	then Print_quarks.print_inhibition_map parameters_influence_map error handler c_compil Handler.print_rule_txt Handler.print_var_txt Handler.get_label_of_rule_txt Handler.get_label_of_var_txt Handler.print_labels_txt "\n" inhibition_map  
+	else error 
+      in 
+      let error = Print_quarks.dot_of_influence_map parameters_influence_map error handler c_compil (wake_up_map,inhibition_map) in
+      error
+    else
+      error 
   in 
-  let error = 
-    if (Remanent_parameters.get_trace parameters_influence_map) || Print_quarks.trace 
-    then Print_quarks.print_inhibition_map parameters_influence_map error handler c_compil Handler.print_rule_txt Handler.print_var_txt Handler.get_label_of_rule_txt Handler.get_label_of_var_txt Handler.print_labels_txt "\n" inhibition_map  
-    else error 
-  in 
-  let error = Print_quarks.dot_of_influence_map parameters_influence_map error handler c_compil (wake_up_map,inhibition_map) in
-  let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "Covering_classes:\n"
+  let error,covering_classes = 
+    if Remanent_parameters.get_do_site_dependencies parameters
+    then 
+      let parameters_cv =
+	Remanent_parameters.update_prefix parameters "Potential dependencies between sites:\n" in 
+      let _ = 
+	if (Remanent_parameters.get_trace parameters_cv)
+	then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "Potential dependencies between sites:\n" 
+      in
+      let error,dep = Covering_classes.covering_classes parameters_cv error handler c_compil 
+      in error,Some dep 
+    else 
+      error,None 
   in
-  let parameters_cv =
-    Remanent_parameters.update_prefix parameters "Covering_classes:" in
-  let error =
-    if (Remanent_parameters.get_trace parameters_cv) || Covering_classes.trace
-    then
-      let error, covering_classes = Covering_classes.covering_classes parameters_cv error handler c_compil in error
-    else error
-  in
-  let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "Stochastic_classes:\n"
-  in
-  let parameters_sv = Remanent_parameters.update_prefix parameters "Stochastic_classes:" in
-  let error =
-    if (Remanent_parameters.get_trace parameters_sv) || Stochastic_classes.trace
-    then
+  let error,stoc_flow = 
+    if Remanent_parameters.get_do_stochastic_flow_of_information parameters 
+    then 
+      let parameters_sv = Remanent_parameters.update_prefix parameters "Flow of information in the stochastic semantics:" in
+      let _ = 
+	if (Remanent_parameters.get_trace parameters_sv) || Stochastic_classes.trace 
+	then Printf.fprintf (Remanent_parameters.get_log parameters_sv) "Flow of information in the stochastic semantics:\n"
+      in
       let error, stochastic_classes =
-        Stochastic_classes.stochastic_classes parameters_sv error handler c_compil in error     
-    else error
+        Stochastic_classes.stochastic_classes parameters_sv error handler c_compil in error, Some stochastic_classes 
+    else error,None 
   in
-  let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "ODE_fragmentation:\n"
-  in
-  let parameters_ode = Remanent_parameters.update_prefix parameters "ODE_fragmentation:" in
-  let error =
-    if (Remanent_parameters.get_trace parameters_ode) || Stochastic_classes.trace
-    then
+  let error,ode_flow = 
+    if Remanent_parameters.get_do_ODE_flow_of_information parameters
+    then 
+      let parameters_ode = Remanent_parameters.update_prefix parameters "Flow of information in the ODE semantics:" in
+      let _ = 
+	if (Remanent_parameters.get_trace parameters)
+	then Printf.fprintf (Remanent_parameters.get_log parameters) "Flow of information in the ODE semantics:\n"
+      in
       let error, ode_fragmentation =
         Ode_fragmentation.ode_fragmentation parameters_ode error handler c_compil
-      in error
-    else error
+      in error,Some ode_fragmentation
+    else error,None 
   in
   let _ = Exception.print parameters error  in
    ()

@@ -10,22 +10,18 @@
   * references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
   *  
-  * Copyright 2010,2011,2012,2013,2014 
+  * Copyright 2010,2011,2012,2013,2014,2015 
   * Institut National de Recherche en Informatique et   
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
 (** if unsafe = true, then whenever an exception is raised, a default value is output, and no exception is raised*)
 
-let date="2015.01.23"
+let date="<2015.01.23"
 let date_commit=Git_commit_info.git_commit_date 
 let version = "4.01" 
 
 let output_directory = ref "" 
-
-
-let do_contact_map = ref true
-let do_influence_map = ref true 
 
 
 let unsafe = ref true 
@@ -38,6 +34,7 @@ let link_mode = ref Remanent_parameters_sig.Bound_indices
 
 
 (** influence map *)
+let do_influence_map = ref true
 let rule_shape = ref "box"
 let rule_color = ref "lightskyblue"
 let variable_shape = ref "ellipse"
@@ -58,6 +55,7 @@ let make_labels_compatible_with_dot =
 
 
 (** contact map*)
+let do_contact_map = ref true 
 let contact_map_file = ref "contact.dot"
 let binding_site_shape = ref "circle"
 let binding_site_color = ref "yellow"
@@ -72,3 +70,7 @@ let influence_color = ref "red"
 let influence_arrow = ref "normal" 
    
 
+(**flow of information*)
+let do_ODE_flow_of_information = ref true
+let do_stochastic_flow_of_information = ref true 
+let do_site_dependencies = ref true 

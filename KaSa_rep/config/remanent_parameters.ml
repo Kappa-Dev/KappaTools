@@ -85,7 +85,6 @@ let get_contact_map () =
 	| "" -> Some ""
       | x -> Some (x^"/")) ; 
      
-
     Remanent_parameters_sig.binding_site_shape = !Config.binding_site_shape ;
     Remanent_parameters_sig.binding_site_color = !Config.binding_site_color ;
     Remanent_parameters_sig.internal_site_shape = !Config.internal_site_shape ;
@@ -102,6 +101,11 @@ let get_contact_map () =
 let get_parameters () = 
   { Remanent_parameters_sig.marshalisable_parameters = 
       {
+	Remanent_parameters_sig.do_contact_map = !Config.do_contact_map ; 
+	Remanent_parameters_sig.do_influence_map = !Config.do_influence_map ;
+	Remanent_parameters_sig.do_ODE_flow_of_information = !Config.do_ODE_flow_of_information ; 
+	Remanent_parameters_sig.do_stochastic_flow_of_information = !Config.do_stochastic_flow_of_information ; 
+	Remanent_parameters_sig.do_site_dependencies = !Config.do_site_dependencies ;
 	Remanent_parameters_sig.file = !Config.file ;
 	Remanent_parameters_sig.symbols = get_symbols () ; 
 	Remanent_parameters_sig.influence_map_output = get_influence_map () ;
@@ -176,14 +180,26 @@ let get_prefix_1                           marshalisable = marshalisable.Remanen
 let get_call_stack_1                       marshalisable = marshalisable.Remanent_parameters_sig.call_stack 
 let get_link_mode_1                        marshalisable = marshalisable.Remanent_parameters_sig.link_mode 
 let get_kasa_state_1                       marshalisable = marshalisable.Remanent_parameters_sig.kasa_state 
-
+let get_do_contact_map_1                   marshalisable = marshalisable.Remanent_parameters_sig.do_contact_map 
+let get_do_influence_map_1                 marshalisable = marshalisable.Remanent_parameters_sig.do_influence_map 
+let get_do_ODE_flow_of_information_1                   marshalisable = marshalisable.Remanent_parameters_sig.do_ODE_flow_of_information
+let get_do_stochastic_flow_of_information_1                 marshalisable = marshalisable.Remanent_parameters_sig.do_stochastic_flow_of_information 
+let get_do_site_dependencies_1                              marshalisable = marshalisable.Remanent_parameters_sig.do_site_dependencies
 
 
 let get_marshalisable parameter = parameter.Remanent_parameters_sig.marshalisable_parameters
 let get_log parameter = parameter.Remanent_parameters_sig.log   
 let get_formatter parameter = parameter.Remanent_parameters_sig.formatter 
 
+
 let upgrade_from_marshal_field f = compose f get_marshalisable 
+
+let get_do_contact_map = upgrade_from_marshal_field get_do_contact_map_1
+let get_do_influence_map = upgrade_from_marshal_field get_do_influence_map_1
+let get_do_ODE_flow_of_information = upgrade_from_marshal_field get_do_ODE_flow_of_information_1
+let get_do_stochastic_flow_of_information = upgrade_from_marshal_field get_do_stochastic_flow_of_information_1
+let get_do_site_dependencies = upgrade_from_marshal_field get_do_site_dependencies_1
+
 let get_symbols = upgrade_from_marshal_field get_symbols_1 
 let get_file = upgrade_from_marshal_field get_file_1 
 let get_influence_map = upgrade_from_marshal_field get_influence_map_1
@@ -252,6 +268,8 @@ let set_call_stack_1 marshalisable call_stack =
   {marshalisable with Remanent_parameters_sig.call_stack = call_stack}
 let set_trace_1 marshalisable bool = 
   {marshalisable with Remanent_parameters_sig.trace = bool}
+
+
 
 let upgrade_to_marshalisable f parameters prefix = 
   {parameters with Remanent_parameters_sig.marshalisable_parameters = f (get_marshalisable parameters) prefix}
