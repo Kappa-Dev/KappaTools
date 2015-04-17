@@ -404,6 +404,17 @@ ODE_fragmentation:agent_type:2:
 site_type_bond:{0}
 ODE_fragmentation:agent_type:3:
 site_type_bond:{0}
-- External flow :
+* Internal flow :
+site:0 -> anchor/modified:1
+* Sites list rhs :
+ODE_fragmentation:agent_type:0:
+{1; 0}
+ODE_fragmentation:agent_type:1:
+{4; 3; 2; 1; 0}
+ODE_fragmentation:agent_type:2:
+{1; 0}
+ODE_fragmentation:agent_type:3:
+{0}
+* External flow :
 anchor:{0; 2; 3; 0; 0} -> modified:{0; 1; 1; 2; 4; 1}
 execution finished without any exception

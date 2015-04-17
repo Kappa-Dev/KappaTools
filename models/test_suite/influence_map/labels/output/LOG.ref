@@ -152,5 +152,10 @@ site_type_modified:{0; 0; 0; 0}
 - (site_address,site_address)
 + First element in a pair of agents:
 + Second element in a pair agents:
-- External flow :
+* Internal flow :
+site:0 -> anchor/modified:0
+* Sites list rhs :
+ODE_fragmentation:agent_type:0:
+{0; 0; 0; 0}
+* External flow :
 execution finished without any exception

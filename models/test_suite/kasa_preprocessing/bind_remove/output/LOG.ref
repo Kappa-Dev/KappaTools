@@ -157,6 +157,13 @@ site_type_bond:{0}
 + Second element in a pair agents:
 ODE_fragmentation:agent_type:1:
 site_type_bond:{0}
-- External flow :
+* Internal flow :
+site:0 -> anchor/modified:0
+* Sites list rhs :
+ODE_fragmentation:agent_type:0:
+{0}
+ODE_fragmentation:agent_type:1:
+{0}
+* External flow :
 anchor:{0} -> modified:{0}
 execution finished without any exception
