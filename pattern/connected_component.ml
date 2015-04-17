@@ -21,7 +21,7 @@ type edge = ToNode of int place * int | ToNothing | ToInternal of int
 type son = {
   extra_edge: ((int place*int)*edge);
   dst: int (** t.id *);
-  inj: Dipping.t;
+  inj: Dipping.t; (* From dst To ("this" cc + extra edge) *)
   above_obs: int list;
 }
 
@@ -212,12 +212,12 @@ let to_navigation cc =
        build_for out'' (h::don) todo in
   let rec find_root i =
     if i = Array.length cc.nodes_by_type
-    then (0,0,[])
+    then []
     else match cc.nodes_by_type.(i) with
 	 | [] -> find_root (succ i)
 	 | h::t ->
 	    let x = List.fold_left (fun _ x -> x) h t in
-	    (x,i,build_for [(Fresh (find_ty cc x,x),0),ToNothing] [] [x])
+	    build_for [(Fresh (i,x),0),ToNothing] [] [x]
   in find_root 0
 
 let print with_id sigs f cc =
@@ -336,7 +336,7 @@ let print_sons_dot sigs cc_id f sons =
 	  f sons
 
 let print_point_dot sigs f (id,point) =
-  let style = if point.is_obs then "box" else "circle" in
+  let style = if point.is_obs then "circle" else "box" in
   Format.fprintf f "@[cc%i [label=\"%a\", shape=\"%s\"];@]@,%a"
 		 point.cc.id (print false sigs) point.cc
 		 style (print_sons_dot sigs id) point.sons
@@ -394,7 +394,7 @@ let print f env =
     f "@[<v>%a@]"
     (Pp.set ~trailing:Pp.space IntMap.bindings Pp.space
 	    (fun f (_,p) ->
-	     Format.fprintf f "@[<h>(%a) -> %a -> (%a)@]"
+	     Format.fprintf f "@[<hov 2>(%a)@ -> @[<h>%a@]@ -> @[(%a)@]@]"
 			    (Pp.list Pp.space Format.pp_print_int) p.fathers
 			    (print true env.sig_decl) p.cc
 			    (Pp.list Pp.space
@@ -436,7 +436,7 @@ let to_work env =
     dangling = (0,0,0);
   }
 
-let navigate env (id,ty as _root) nav =
+let navigate env nav =
   let compatible_point inj = function
     | ((Existing id,site), ToNothing), e ->
        if e = ((Existing (Dipping.apply inj id),site),ToNothing)
@@ -452,8 +452,16 @@ let navigate env (id,ty as _root) nav =
 	       ((Existing (Dipping.apply inj id'),site'),
 		ToNode (Existing (Dipping.apply inj id),site))
        then Some inj else None
+    | (
+      ((Existing id,site),ToNode (Fresh (ty,id'),site')),
+      ((Existing sid,ssite), ToNode (Fresh(ty',sid'),ssite'))
+    | ((Fresh (ty,id'),site),ToNode (Existing id,site')),
+      ((Existing sid,ssite), ToNode (Fresh(ty',sid'),ssite'))
     | ((Existing id,site),ToNode (Fresh (ty,id'),site')),
-      ((Existing sid,ssite), ToNode(Fresh(ty',sid'),ssite')) ->
+      ((Fresh(ty',sid'),ssite), ToNode (Existing sid,ssite'))
+    | ((Fresh (ty,id'),site),ToNode (Existing id,site')),
+      ((Fresh(ty',sid'),ssite), ToNode (Existing sid,ssite'))
+    ) ->
        if sid = Dipping.apply inj id && ssite = site
 	  && ty' = ty && ssite' = site'
        then Some (Dipping.add id' sid' inj) else None
@@ -466,8 +474,6 @@ let navigate env (id,ty as _root) nav =
        if ty = ty' && site = site' &&
 	    x = ToInternal i && not (Dipping.mem id inj)
        then Some (Dipping.add id id' inj) else None
-    | ((Fresh (ty,id),site), ToNode (Existing id',site')), e ->
-       None (* Forbidden by construction *)
     | ((Fresh (ty,id),site), ToNode (Fresh (ty',id'),site')),
       ((Fresh (sty,sid),ssite), ToNode (Fresh (sty',sid'),ssite')) ->
        if not (Dipping.mem id inj) && not (Dipping.mem id inj) then
@@ -479,25 +485,24 @@ let navigate env (id,ty as _root) nav =
        else None
     | ((Fresh _,_), _), ((Fresh _,_),_) -> None
     | ((Fresh _,_), _), ((Existing _,_),_) -> None in
-  let rec aux inj i = function
-    | [] -> Some (i,inj,IntMap.find i env.domain)
+  let rec aux inj_dst2nav i = function
+    | [] -> Some (i,inj_dst2nav,IntMap.find i env.domain)
     | e :: t ->
        let rec find_good_edge = function
 	 | [] -> None
 	 | s :: tail ->
-	    match compatible_point inj (e,s.extra_edge) with
-	    | Some inj' -> aux (Dipping.compose inj' s.inj) s.dst t
+	    match compatible_point inj_dst2nav (s.extra_edge,e) with
+	    | Some inj' -> aux (Dipping.compose s.inj inj') s.dst t
 	    | None -> find_good_edge tail in
        find_good_edge (IntMap.find i env.domain).sons
-  in
-  if nav = [] then Some (0,Dipping.empty,IntMap.find 0 env.domain)
-  else aux (Dipping.add id (List.hd env.id_by_type.(ty)) Dipping.empty) 0 nav
+  in aux Dipping.empty 0 nav
 
 let find env cc =
-  let (root,ty,nav) = to_navigation cc in
+  let nav = to_navigation cc in
 (*  let () = Format.eprintf
-	     "@[[%a]@]@." (Pp.list Pp.space (print_edge (sigs env))) nav in*)
-  navigate env (root,ty) nav
+	     "@[[%a]@]@,%a@." (Pp.list Pp.space (print_edge (sigs env))) nav
+	     print env in*)
+  navigate env nav
 
 let get env cc_id = IntMap.find cc_id env.domain
 
@@ -667,16 +672,16 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
 	    let int_dst = IntMap.find n' cc.internals in
 	    let links_dst' = Array.copy links_dst in
 	    let () = links_dst'.(i') <- UnSpec in
-	    let cc',inj =
+	    let cc',inj2cc' =
 	      remove_ag_cc f_id (update_cc f_id cc n' links_dst' int_dst)
 			   ag_id in
 	    let pack,ans =
 	      complete_domain_with
 		obs_id dst env' (succ f_id) cc'
-		((Existing (Dipping.apply inj n'),i'),
+		((Existing (Dipping.apply inj2cc' n'),i'),
 		 ToNode
-		   (Fresh(find_ty cc ag_id,Dipping.apply inj ag_id),i))
-		inj in
+		   (Fresh(find_ty cc ag_id,Dipping.apply inj2cc' ag_id),i))
+		inj2cc' in
 	    (pack,ans::out))
       (remove_one_internal acc ag_id links internals) links in
   let remove_or_remove_one ((f_id,env'),out as acc) ag_id links internals =
@@ -692,14 +697,16 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
 	      cc.links
 	      (remove_cycle_edges complete_domain_with obs_id dst env free_id cc)
 
-let rec complete_domain_with obs_id dst env free_id cc edge inj =
-  let new_son inj' =
-    { dst = dst; extra_edge = edge;
-      inj = Dipping.compose inj' inj; above_obs = [obs_id];} in
+let rec complete_domain_with obs_id dst env free_id cc edge inj_dst2cc =
+  let new_son inj_found2cc =
+    { dst = dst;
+      extra_edge = edge;
+      inj = Dipping.compose inj_dst2cc (Dipping.inverse inj_found2cc);
+      above_obs = [obs_id];} in
   let known_cc = Env.find env cc in
   match known_cc with
-  | Some (cc_id, inj, point') ->
-     let point'' = {point' with sons = new_son inj :: point'.sons} in
+  | Some (cc_id, inj_cc_id2cc, point') ->
+     let point'' = {point' with sons = new_son inj_cc_id2cc :: point'.sons} in
      let completed =
        propagate_add_obs obs_id (Env.add_point cc_id point'' env) cc_id in
      (free_id,completed), cc_id

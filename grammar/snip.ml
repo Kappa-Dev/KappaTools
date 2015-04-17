@@ -23,6 +23,50 @@ type rule_agent =
     }
 type rule_mixture = rule_agent list
 
+let print_rule_internal f = function
+  | I_ANY -> ()
+  | I_ANY_CHANGED j -> Format.fprintf f "~>>%i" j
+  | I_ANY_ERASED -> Format.fprintf f "~--"
+  | I_VAL_CHANGED (i,j) -> if i <> j then Format.fprintf f "~%i>>%i" i j
+  | I_VAL_ERASED i -> Format.fprintf f "~%i--" i
+
+let print_switching f = function
+  | Linked (i,_) -> Format.fprintf f ">>%i" i
+  | Freed -> Format.fprintf f ">>%t" Pp.bottom
+  | Maintained -> ()
+  | Erased -> Format.fprintf f "--"
+
+let print_rule_link f = function
+  | L_ANY s ->
+     Format.fprintf f "?%a" print_switching s
+  | L_FREE s -> Format.fprintf f "%a" print_switching s
+  | L_SOME s -> Format.fprintf f "!_%a" print_switching s
+  | L_TYPE (ag,p,s) -> Format.fprintf f "!%i.%i%a"
+				      p ag
+				      print_switching s
+  | L_VAL ((i,_),s) -> Format.fprintf f "!%i%a" i print_switching s
+
+let print_rule_intf sigs ag_ty f (ports,ints) =
+  let rec aux empty i =
+    if i < Array.length ports then
+      if ports.(i) <> L_ANY Maintained || ints.(i) <> I_ANY then
+	let () = Format.fprintf
+		   f "%t%a%a%a" (if empty then Pp.empty else Pp.comma)
+		   (Signature.print_site sigs ag_ty) i
+		   print_rule_internal ints.(i)
+					      print_rule_link ports.(i) in
+	aux false (succ i)
+      else aux empty (succ i) in
+  aux true 0
+
+let print_rule_agent sigs f ag =
+  Format.fprintf f "%a(@[<h>%a@])" (Signature.print_agent sigs) ag.ra_type
+		 (print_rule_intf sigs ag.ra_type) (ag.ra_ports,ag.ra_ints)
+
+
+let print_rule_mixture sigs f mix =
+  Pp.list Pp.comma (print_rule_agent sigs) f mix
+
 type internal = int option
 type link = ANY | FREE | VAL of int
 type agent =
@@ -393,6 +437,9 @@ let find_implicit_infos sigs contact_map ags =
 		       (internals_from_contact_map sigs contact_map ty_id i))
 	     acc in
       aux_internals ty_id ints acc' (succ i) in
+  let new_switch = function
+    | Maintained | Freed as s  -> s
+    | Linked _ | Erased -> Freed in
   let rec aux_one ag_tail ty_id max_id ports i =
     if i = Array.length ports
     then List.map (fun (f,a,c) -> (f,ports,a,c)) (aux_ags max_id ag_tail)
@@ -402,7 +449,7 @@ let find_implicit_infos sigs contact_map ags =
 	List.map (fun (free_id,ports,ags,cor) ->
 		  let () =
 		    ports.(i) <- L_VAL (Term.with_dummy_pos free_id,s) in
-		  (succ free_id, ports, ags, (free_id,(a,p),s)::cor))
+		  (succ free_id, ports, ags, (free_id,(a,p),new_switch s)::cor))
 		 (aux_one ag_tail ty_id max_id ports (succ i))
      | L_SOME s ->
 	Tools.list_map_flatten
@@ -411,7 +458,7 @@ let find_implicit_infos sigs contact_map ags =
 		     let ports' = Array.copy ports in
 		     let () =
 		       ports'.(i) <- L_VAL (Term.with_dummy_pos free_id,s) in
-		     (succ free_id, ports', ags, (free_id,x,s)::cor))
+		     (succ free_id, ports', ags, (free_id,x,new_switch s)::cor))
 		    (ports_from_contact_map sigs contact_map ty_id i))
 	  (aux_one ag_tail ty_id max_id ports (succ i))
      | L_VAL ((j,_),_) ->
@@ -421,13 +468,13 @@ let find_implicit_infos sigs contact_map ags =
      | L_ANY (Erased | Linked _ | Freed as s) ->
 	Tools.list_map_flatten
 	  (fun (free_id,ports,ags,cor) ->
-	   let () = ports.(i) <- L_FREE s in
+	   let () = ports.(i) <- L_FREE (if s = Freed then Maintained else s) in
 	   (free_id, ports, ags, cor) ::
 	     List.map (fun x ->
 		       let ports' = Array.copy ports in
 		       let () =
 			 ports'.(i) <- L_VAL (Term.with_dummy_pos free_id,s) in
-		       (succ free_id, ports', ags, (free_id,x,s)::cor))
+		       (succ free_id, ports', ags, (free_id,x,new_switch s)::cor))
 		      (ports_from_contact_map sigs contact_map ty_id i))
 	  (aux_one ag_tail ty_id max_id ports (succ i))
   and aux_ags max_id = function
@@ -444,12 +491,13 @@ let find_implicit_infos sigs contact_map ags =
 	 (aux_one ag_tail ag.ra_type max_id ag.ra_ports 0)
   in List.map (fun (_,mix,todo) -> (mix,todo)) (aux_ags 0 ags)
 
-let complete_with_candidate ag id todo p_id =
+let complete_with_candidate ag id todo p_id p_switch =
   Tools.array_fold_lefti
     (fun i acc port ->
      if i <> p_id then acc else
        match port with
        | L_ANY s ->
+	  assert (s = Maintained);
 	  let ports' = Array.copy ag.ra_ports in
 	  let () = ports'.(i) <- L_VAL (Term.with_dummy_pos id,s) in
 	  ({ ra_type = ag.ra_type; ra_ports = ports'; ra_ints = ag.ra_ints; }, todo)
@@ -458,7 +506,8 @@ let complete_with_candidate ag id todo p_id =
 	  begin
 	    match
 	      List.partition
-		(fun (j,(a',p'),_) -> j=k && i=p' && a'= ag.ra_type) todo with
+		(fun (j,(a',p'),sw') ->
+		 j=k && i=p' && a'= ag.ra_type && sw' = p_switch) todo with
 	    | [ _ ], todo' ->
 	       let ports' = Array.copy ag.ra_ports in
 	       let () = ports'.(i) <- L_VAL (Term.with_dummy_pos id,s) in
@@ -486,7 +535,7 @@ let rec add_one_implicit_info sigs id ((ty_id,port),s as info) todo = function
        if ty_id = ag.ra_type then
 	 (List.map
 	    (fun (ag',todo') -> ag'::ag_tail,todo')
-	    (complete_with_candidate ag id todo port))
+	    (complete_with_candidate ag id todo port s))
        else [] in
      List.fold_left (fun l (x,todo') -> ((ag::x,todo')::l)) extra_ags out_tail
 
@@ -709,9 +758,17 @@ let rule_mixtures_of_ambiguous_rule contact_map sigs lhs rhs =
   created
 
 let connected_components_sum_of_ambiguous_rule contact_map env lhs rhs =
+  let () =
+    if !Parameter.compileModeOn then
+      Format.eprintf "@[<v>_____@,@[<2>%a@]@," Expr.print_ast_mix lhs in
   let sigs = Connected_component.Env.sigs env in
   let all_mixs,created =
     rule_mixtures_of_ambiguous_rule contact_map sigs lhs rhs in
+  let () =
+    if !Parameter.compileModeOn then
+      Format.eprintf "@[%a@]@,"
+		     (Pp.list Pp.cut (print_rule_mixture sigs))
+		     all_mixs in
   let (env',rules') =
     Tools.list_fold_right_map (connected_components_of_mixture (snd created))
 			      env all_mixs in
@@ -728,8 +785,7 @@ let connected_components_sum_of_ambiguous_rule contact_map env lhs rhs =
 	  (Pp.list Pp.space boxed_cc) x
 	  (Pp.list Pp.comma (Transformations.print (Connected_component.Env.sigs env'))) removed
 	  (Pp.list Pp.comma (Transformations.print (Connected_component.Env.sigs env'))) added in
-      Format.eprintf "@[<v>_____@,@[<2>%a@]@,%a@]@." Expr.print_ast_mix lhs
-		     (Pp.list Pp.space one_ccs) rules' in
+      Format.eprintf "%a@]@." (Pp.list Pp.space one_ccs) rules' in
   (env',rules')
 
 let connected_components_sum_of_ambiguous_mixture contact_map env mix =

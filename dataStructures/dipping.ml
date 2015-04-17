@@ -1,6 +1,7 @@
 open Mods
 
 exception Undefined
+exception NotBijective
 type t = int IntMap.t
 
 let empty = IntMap.empty
@@ -12,7 +13,13 @@ let identity l =
   List.fold_left (fun out x -> IntMap.add x x out) IntMap.empty l
 let apply i x = try IntMap.find x i with Not_found -> raise Undefined
 let compose  i i' =
-  IntMap.fold (fun x y out -> IntMap.add x (apply i' y) out) i i'
+  IntMap.fold (fun x y out ->
+	       if mem y i' then IntMap.add x (apply i' y) out else out) i i
+
+let inverse i =
+  IntMap.fold (fun x y out ->
+	       if IntMap.mem y out then raise NotBijective
+	       else IntMap.add y x out) i IntMap.empty
 
 let print f i =
   ignore
