@@ -163,21 +163,21 @@ Influence_map:Wake_up_map:rule(3):'' B(x~p)->B(x~u) -> rule(2):'' B(x~u)->B(x~p)
 Influence_map:Inhibition_map:rule(0):'' A(x~u),B(x~p)->A(x~u),A(x~p) -> rule(2):'' B(x~u)->B(x~p)[1->0]
 Influence_map:Inhibition_map:rule(0):'' A(x~u),B(x~p)->A(x~u),A(x~p) -> rule(3):'' B(x~p)->B(x~u)[1->0]
 Influence_map:Inhibition_map:rule(3):'' B(x~p)->B(x~u) -> rule(0):'' A(x~u),B(x~p)->A(x~u),A(x~p)[0->1]
-Covering_classes:
+Potential dependencies between sites:
 Agents:{A; B}
-Covering_classes:agent_type:0:
+Potential dependencies between sites:agent_type:0:
 Covering_class_id:0:site_type:{0}
-Covering_classes:agent_type:1:
+Potential dependencies between sites:agent_type:1:
 Covering_class_id:0:site_type:{0}
-Stochastic_classes:
+Flow of information in the stochastic semantics:
 Agents:{A; B}
-Stochastic_classes:agent_type:0:
+Flow of information in the stochastic semantics:agent_type:0:
 site_type:[|0|]
-ODE_fragmentation:
+Flow of information in the ODE semantics:
 * Sites that are modified:
-ODE_fragmentation:agent_type:0:
+Flow of information in the ODE semantics:agent_type:0:
 site_type_modified:{0}
-ODE_fragmentation:agent_type:1:
+Flow of information in the ODE semantics:agent_type:1:
 site_type_modified:{0; 0; 0}
 * Anchor sites in the first case:
 - (site_address_modified, site_address)
@@ -191,9 +191,9 @@ site_type_modified:{0; 0; 0}
 * Internal flow :
 site:0 -> anchor/modified:0
 * Sites list rhs :
-ODE_fragmentation:agent_type:0:
+Flow of information in the ODE semantics:agent_type:0:
 {0; 0; 0}
-ODE_fragmentation:agent_type:1:
+Flow of information in the ODE semantics:agent_type:1:
 {0; 0}
 * External flow :
 execution finished without any exception

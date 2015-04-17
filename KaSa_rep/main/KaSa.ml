@@ -4,7 +4,7 @@
  * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
  * 
  * Creation: December, the 18th of 2010 
- * Last modification: February, the 5th of 2015
+ * Last modification: Time-stamp: <2015-04-17 21:00:39 feret>
  * * 
  *  
  * Copyright 2010,2011 Institut National de Recherche en Informatique et   
@@ -82,7 +82,7 @@ let main () =
     if Remanent_parameters.get_do_site_dependencies parameters
     then 
       let parameters_cv =
-	Remanent_parameters.update_prefix parameters "Potential dependencies between sites:\n" in 
+	Remanent_parameters.update_prefix parameters "Potential dependencies between sites:" in 
       let _ = 
 	if (Remanent_parameters.get_trace parameters_cv)
 	then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "Potential dependencies between sites:\n" 

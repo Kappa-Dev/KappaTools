@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
   * 
   * Creation: 18/12/2010
-  * Last modification: 23/01/2015
+  * Last modification: Time-stamp: <2015-04-17 20:53:09 feret>
   * * 
   * primitive to parse command-line options 
   *  

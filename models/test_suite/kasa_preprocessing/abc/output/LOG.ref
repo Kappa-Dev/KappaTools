@@ -487,61 +487,61 @@ Influence_map:Inhibition_map:rule(4):'a.c' A(x,c),C(x1~p,x2~u)->A(x,c!1),C(x1~p,
 Influence_map:Inhibition_map:rule(5):'mod x2' A(x,c!1),C(x1~p,x2~u!1)->A(x,c),C(x1~p,x2~p) -> rule(4):'a.c' A(x,c),C(x1~p,x2~u)->A(x,c!1),C(x1~p,x2~u!1)[1->1]
 Influence_map:Inhibition_map:rule(5):'mod x2' A(x,c!1),C(x1~p,x2~u!1)->A(x,c),C(x1~p,x2~p) -> var(4):'Cuu' C(x1~u?,x2~u?)[1->0]
 Influence_map:Inhibition_map:rule(5):'mod x2' A(x,c!1),C(x1~p,x2~u!1)->A(x,c),C(x1~p,x2~p) -> var(5):'Cpu' C(x1~p?,x2~u?)[1->0]
-Covering_classes:
+Potential dependencies between sites:
 Agents:{A; B; C}
-Covering_classes:agent_type:0:
+Potential dependencies between sites:agent_type:0:
 Covering_class_id:0:site_type:{0,1}
-Covering_classes:agent_type:1:
+Potential dependencies between sites:agent_type:1:
 Covering_class_id:0:site_type:{0}
-Covering_classes:agent_type:2:
+Potential dependencies between sites:agent_type:2:
 Covering_class_id:0:site_type:{0,1,2,3}
-Stochastic_classes:
+Flow of information in the stochastic semantics:
 Agents:{A; B; C}
-Stochastic_classes:agent_type:0:
+Flow of information in the stochastic semantics:agent_type:0:
 site_type:[|0; 0|]
-Stochastic_classes:agent_type:2:
+Flow of information in the stochastic semantics:agent_type:2:
 site_type:[|1; 1; 1; 1|]
-ODE_fragmentation:
+Flow of information in the ODE semantics:
 * Sites that are modified:
-ODE_fragmentation:agent_type:0:
+Flow of information in the ODE semantics:agent_type:0:
 site_type_modified:{1; 1; 1; 1; 0; 0}
-ODE_fragmentation:agent_type:1:
+Flow of information in the ODE semantics:agent_type:1:
 site_type_modified:{0; 0}
-ODE_fragmentation:agent_type:2:
+Flow of information in the ODE semantics:agent_type:2:
 site_type_modified:{3; 1; 3; 2; 0; 2}
 * Anchor sites in the first case:
 - (site_address_modified, site_address)
 + First element in a pair of agents:
-ODE_fragmentation:agent_type:0:
+Flow of information in the ODE semantics:agent_type:0:
 site_type_modified:{1; 1; 0}
 + Second element in a pair of agents:
-ODE_fragmentation:agent_type:1:
+Flow of information in the ODE semantics:agent_type:1:
 site_type_bond:{0}
-ODE_fragmentation:agent_type:2:
+Flow of information in the ODE semantics:agent_type:2:
 site_type_bond:{3; 2}
 - Anchor sites :
-ODE_fragmentation:agent_type:1:
+Flow of information in the ODE semantics:agent_type:1:
 site_type_anchor:{0}
-ODE_fragmentation:agent_type:2:
+Flow of information in the ODE semantics:agent_type:2:
 site_type_anchor:{3; 2}
 * Anchor sites in the second case:
 - (site_address,site_address)
 + First element in a pair of agents:
-ODE_fragmentation:agent_type:0:
+Flow of information in the ODE semantics:agent_type:0:
 site_type_bond:{1; 1; 0}
 + Second element in a pair agents:
-ODE_fragmentation:agent_type:1:
+Flow of information in the ODE semantics:agent_type:1:
 site_type_bond:{0}
-ODE_fragmentation:agent_type:2:
+Flow of information in the ODE semantics:agent_type:2:
 site_type_bond:{3; 2}
 * Internal flow :
 site:3 -> anchor/modified:2
 * Sites list rhs :
-ODE_fragmentation:agent_type:0:
+Flow of information in the ODE semantics:agent_type:0:
 {1; 0; 1; 0; 1; 1; 0; 0; 0}
-ODE_fragmentation:agent_type:1:
+Flow of information in the ODE semantics:agent_type:1:
 {0; 0}
-ODE_fragmentation:agent_type:2:
+Flow of information in the ODE semantics:agent_type:2:
 {3; 2; 1; 0; 3; 2; 1; 0; 2; 0; 2; 0}
 * External flow :
 anchor:{0; 2; 3} -> modified:{0; 1; 1}

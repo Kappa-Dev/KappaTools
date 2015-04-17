@@ -170,48 +170,48 @@ Influence_map: The notation [i -> j] means an agent at position [i] of the first
 Influence_map:Wake_up_map:rule(2):'r2' A(x?),B(x)->A(x!1),B(x!1) -> rule(1):'r1' A(x!_)->A(x)[0->0]
 Influence_map:Inhibition_map:rule(0):'r0' A(x!1),A(z!1)->A(x),A(z) -> rule(1):'r1' A(x!_)->A(x)[0->0]
 Influence_map:Inhibition_map:rule(1):'r1' A(x!_)->A(x) -> rule(0):'r0' A(x!1),A(z!1)->A(x),A(z)[0*->1];[0->0]
-Covering_classes:
+Potential dependencies between sites:
 Agents:{A; B}
-Covering_classes:agent_type:0:
+Potential dependencies between sites:agent_type:0:
 Covering_class_id:0:site_type:{0}
 Covering_class_id:1:site_type:{1}
-Covering_classes:agent_type:1:
+Potential dependencies between sites:agent_type:1:
 Covering_class_id:0:site_type:{0}
-Stochastic_classes:
+Flow of information in the stochastic semantics:
 Agents:{A; B}
-Stochastic_classes:agent_type:0:
+Flow of information in the stochastic semantics:agent_type:0:
 site_type:[|0; 0|]
-ODE_fragmentation:
+Flow of information in the ODE semantics:
 * Sites that are modified:
-ODE_fragmentation:agent_type:0:
+Flow of information in the ODE semantics:agent_type:0:
 site_type_modified:{0; 1; 0}
-ODE_fragmentation:agent_type:1:
+Flow of information in the ODE semantics:agent_type:1:
 site_type_modified:{0}
 * Anchor sites in the first case:
 - (site_address_modified, site_address)
 + First element in a pair of agents:
-ODE_fragmentation:agent_type:0:
+Flow of information in the ODE semantics:agent_type:0:
 site_type_modified:{}
 + Second element in a pair of agents:
-ODE_fragmentation:agent_type:1:
+Flow of information in the ODE semantics:agent_type:1:
 site_type_bond:{0}
 - Anchor sites :
-ODE_fragmentation:agent_type:1:
+Flow of information in the ODE semantics:agent_type:1:
 site_type_anchor:{0}
 * Anchor sites in the second case:
 - (site_address,site_address)
 + First element in a pair of agents:
-ODE_fragmentation:agent_type:0:
+Flow of information in the ODE semantics:agent_type:0:
 site_type_bond:{0}
 + Second element in a pair agents:
-ODE_fragmentation:agent_type:1:
+Flow of information in the ODE semantics:agent_type:1:
 site_type_bond:{0}
 * Internal flow :
 site:0 -> anchor/modified:0
 * Sites list rhs :
-ODE_fragmentation:agent_type:0:
+Flow of information in the ODE semantics:agent_type:0:
 {0; 0; 1; 0}
-ODE_fragmentation:agent_type:1:
+Flow of information in the ODE semantics:agent_type:1:
 {0}
 * External flow :
 execution finished without any exception

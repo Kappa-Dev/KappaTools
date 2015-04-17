@@ -133,15 +133,15 @@ Influence_map:Wake_up_map:rule(2):'"0' A(x~q)->A(x~u) -> rule(0):'veryveryveryve
 Influence_map:Wake_up_map:rule(3):'\0' A(x~q)->A(x~p) -> rule(1):'otherotherveryveryveryverylonglabel' A(x~p)->A(x~q)[0->0]
 Influence_map:Inhibition_map:rule(2):'"0' A(x~q)->A(x~u) -> rule(3):'\0' A(x~q)->A(x~p)[0->0]
 Influence_map:Inhibition_map:rule(3):'\0' A(x~q)->A(x~p) -> rule(2):'"0' A(x~q)->A(x~u)[0->0]
-Covering_classes:
+Potential dependencies between sites:
 Agents:{A}
-Covering_classes:agent_type:0:
+Potential dependencies between sites:agent_type:0:
 Covering_class_id:0:site_type:{0}
-Stochastic_classes:
+Flow of information in the stochastic semantics:
 Agents:{A}
-ODE_fragmentation:
+Flow of information in the ODE semantics:
 * Sites that are modified:
-ODE_fragmentation:agent_type:0:
+Flow of information in the ODE semantics:agent_type:0:
 site_type_modified:{0; 0; 0; 0}
 * Anchor sites in the first case:
 - (site_address_modified, site_address)
@@ -155,7 +155,7 @@ site_type_modified:{0; 0; 0; 0}
 * Internal flow :
 site:0 -> anchor/modified:0
 * Sites list rhs :
-ODE_fragmentation:agent_type:0:
+Flow of information in the ODE semantics:agent_type:0:
 {0; 0; 0; 0}
 * External flow :
 execution finished without any exception
