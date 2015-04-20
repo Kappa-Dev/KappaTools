@@ -616,7 +616,7 @@ let rec add_agents_in_cc wk registered_links transf links_transf remains =
      end
   | ag :: ag_l ->
      let (node,wk) = Connected_component.new_node wk ag.ra_type in
-     let place = Connected_component.Existing node in
+     let place = Transformations.Existing node in
      let rec handle_ports wk r_l (removed,added) l_t re acc site_id =
        if site_id = Array.length ag.ra_ports
        then add_agents_in_cc wk r_l (removed,added) l_t re acc
@@ -652,7 +652,7 @@ let rec add_agents_in_cc wk registered_links transf links_transf remains =
 	 | L_VAL ((i,pos),s) ->
 	    try
 	      let (node',site' as dst) = IntMap.find i r_l in
-	      let dst_place = (Connected_component.Existing node',site') in
+	      let dst_place = (Transformations.Existing node',site') in
 	      let wk'' = Connected_component.new_link wk' (node,site_id) dst in
 	      let transf',l_t' =
 		define_full_transformation
@@ -704,7 +704,7 @@ let rec complete_with_creation (removed,added as transf) links_transf fresh = fu
 	   | Some (i,_) -> dangling_link "right" i
      end
   | ag :: ag_l ->
-     let place = Connected_component.Fresh (ag.a_type,fresh) in
+     let place = Transformations.Fresh (ag.a_type,fresh) in
      let rec handle_ports added l_t site_id =
        if site_id = Array.length ag.a_ports
        then complete_with_creation (removed,added) l_t (succ fresh) ag_l
@@ -746,7 +746,7 @@ let connected_components_of_mixture created env mix =
      let removed' = List.map (Transformations.rename wk_out cc inj) removed in
      let l_t' = IntMap.map
 		  (fun (p,s as x) ->
-		   let p' = Connected_component.rename_place wk cc inj p in
+		   let p' = Transformations.rename_place wk cc inj p in
 		   if p == p' then x else (p',s)) l_t in
      aux env' (removed',added') l_t' (cc::acc) remains
   in aux env ([],[]) IntMap.empty [] mix

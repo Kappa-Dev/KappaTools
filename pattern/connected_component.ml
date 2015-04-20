@@ -1,6 +1,5 @@
 open Mods
 
-type node = int * int * int (** (cc_id,type_id,node_id) *)
 type link = UnSpec | Free | Link of int * int (** node_id, site_id *)
 
 (** The link of site k of node i is stored in links(i).(k).
@@ -15,11 +14,14 @@ type cc = {
 }
 type t = cc
 
-type 'id place = Existing of 'id
-	       | Fresh of int * int (* type, id *)
-type edge = ToNode of int place * int | ToNothing | ToInternal of int
+type 'id raw_place =
+    Existing of 'id
+  | Fresh of int * int (* type, id *)
+
+type edge = ToNode of int raw_place * int | ToNothing | ToInternal of int
+
 type son = {
-  extra_edge: ((int place*int)*edge);
+  extra_edge: ((int raw_place*int)*edge);
   dst: int (** t.id *);
   inj: Dipping.t; (* From dst To ("this" cc + extra edge) *)
   above_obs: int list;
@@ -41,129 +43,65 @@ type work = {
   cc_id: int;
   cc_links: link array IntMap.t;
   cc_internals: int array IntMap.t;
-  dangling: node;
+  dangling: int; (* node_id *)
 }
 
+module Node = struct
+  type t = int * int * int (** (cc_id,type_id,node_id) *)
+
+  let compare (cc,_,n) (cc',_,n') =
+    let c = int_compare cc cc' in
+    if c = 0 then int_compare n n' else c
+
+  let rename wk cc inj (n_cc,n_ty,n_id as node) =
+    if wk.cc_id = n_cc then (cc.id,n_ty, Dipping.apply inj n_id)
+    else node
+
+  let print ?sigs f (cc,ty,i) =
+    match sigs with
+    | Some sigs ->
+       Format.fprintf f "%a/*%i*/" (Signature.print_agent sigs) ty i
+    | None -> Format.fprintf f "cc%in%i" cc i
+
+  let print_site ?sigs (cc,agent,i) f id =
+    match sigs with
+    | Some sigs ->
+       Signature.print_site sigs agent f id
+    | None -> Format.fprintf f "cc%in%is%i" cc i id
+
+  let print_internal ?sigs (_,agent,_) site f id =
+    match sigs with
+    | Some sigs ->
+       Signature.print_site_internal_state sigs agent site f (Some id)
+    | None -> Format.pp_print_int f id
+end
+
+let raw_find_ty tys id =
+  let rec aux i =
+    assert (i >= 0);
+    if List.mem id tys.(i) then i else aux (pred i)
+  in aux (Array.length tys - 1)
+
+let find_ty cc id = raw_find_ty cc.nodes_by_type id
+
 (** Errors *)
-let print_site ?sigs (cc,agent,i) f id =
-  match sigs with
-  | Some sigs ->
-     Signature.print_site sigs agent f id
-  | None -> Format.fprintf f "cc%in%is%i" cc i id
-let print_node ?sigs f (cc,ty,i) =
-  match sigs with
-  | Some sigs -> Format.fprintf f "%a/*%i*/" (Signature.print_agent sigs) ty i
-  | None -> Format.fprintf f "cc%in%i" cc i
-let print_internal ?sigs (_,agent,_) site f id =
-  match sigs with
-  | Some sigs ->
-     Signature.print_site_internal_state sigs agent site f (Some id)
-  | None -> Format.pp_print_int f id
-
-let print_place sigs f = function
-  | Existing n -> print_node ~sigs f n
-  | Fresh (ty,i) ->
-     Format.fprintf f "%a/*%t %i*/" (Signature.print_agent sigs) ty Pp.nu i
-
-let print_place_site sigs place f site =
-  match place with
-  | Existing n -> print_site ~sigs n f site
-  | Fresh (ty,_) ->
-     Signature.print_site sigs ty f site
-
-let print_place_internal sigs place site f id =
-  match place with
-  | Existing n -> print_internal ~sigs n site f id
-  | Fresh (ty,_) ->
-     Signature.print_site_internal_state sigs ty site f (Some id)
-
 let already_specified ?sigs x i =
   ExceptionDefn.Malformed_Decl
     (Term.with_dummy_pos
        (Format.asprintf "Site %a of agent %a already specified"
-			(print_site ?sigs x) i (print_node ?sigs) x))
+			(Node.print_site ?sigs x) i (Node.print ?sigs) x))
 
-let dangling_node ?sigs x =
+let dangling_node ~sigs tys x =
   ExceptionDefn.Malformed_Decl
     (Term.with_dummy_pos
        (Format.asprintf
-	  "Cannot proceed because last declared agent %a%a" (print_node ?sigs) x
+	  "Cannot proceed because last declared agent %a/*%i*/%a"
+	  (Signature.print_agent sigs) (raw_find_ty tys x) x
 	  Format.pp_print_string " is not linked to its connected component."))
 
 let identity_injection cc =
   Dipping.identity
     (Array.fold_left (fun x y -> List.rev_append y x) [] cc.nodes_by_type)
-
-let rename_node wk cc inj (n_cc,n_ty,n_id as node) =
-  if wk.cc_id = n_cc then (cc.id,n_ty, Dipping.apply inj n_id)
-  else node
-
-let rename_place wk cc inj = function
-  | Existing n as x ->
-     let n' = rename_node wk cc inj n in
-     if n == n' then x else Existing n'
-  | Fresh _ as x -> x
-
-let equal max_id cc1 cc2 =
-  let always_equal_min_but_not_null _ p l1 l2 =
-    match p with
-    | None -> None
-    | Some (l,_,_) ->
-       let l' = List.length l1 in
-       if l' <> List.length l2 then None
-       else if l = 0 || (l' > 0 && l' < l) then Some (l',l1,l2) else p in
-  let internals_are_ok iso =
-    IntMap.fold
-      (fun k a out->
-       out &&
-	 let a' = IntMap.find (Dipping.apply iso k) cc2.internals in
-	 Tools.array_fold_left2i (fun _ b x y -> b && x = y) true a a')
-      cc1.internals true in
-  let rec admissible_mapping iso = function
-    | [] -> if internals_are_ok iso then [iso] else []
-    | (x,y) :: t ->
-       try
-	 let cand = Dipping.apply iso x in
-	 if cand = y then admissible_mapping iso t else []
-       with Dipping.Undefined ->
-	 let iso' = Dipping.add x y iso in
-	 let n_x = IntMap.find x cc1.links in
-	 let n_y = IntMap.find y cc2.links in
-	 try
-	   let remains =
-	     Tools.array_fold_left2i
-	       (fun _ out a b -> match a,b with
-			       | ((UnSpec, UnSpec) | (Free, Free)) -> out
-			       | Link (a,i), Link (b,j)
-				    when i = j -> (a,b)::out
-			       | (UnSpec | Free | Link _), _ ->
-				  raise Not_found) t n_x n_y in
-	   admissible_mapping iso' remains
-	 with Not_found -> []
-  in
-  if cc1 == cc2 then
-    [identity_injection cc1]
-  else
-    match Tools.array_fold_left2i always_equal_min_but_not_null (Some (0,[],[]))
-				  cc1.nodes_by_type cc2.nodes_by_type with
-    | None -> []
-    | Some (_,l1,l2) ->
-       match l1 with
-       | [] -> [Dipping.empty]
-       | h :: _ ->
-	  let rec find_admissible = function
-	    | [] -> []
-	    | x ::  t ->
-	       match admissible_mapping Dipping.empty [(h,x)] with
-	       | [] -> find_admissible t
-	       | _ :: _ as l -> l in
-	  find_admissible l2
-
-let find_ty cc id =
-  let rec aux i =
-    assert (i >= 0);
-    if List.mem id cc.nodes_by_type.(i) then i else aux (pred i)
-  in aux (Array.length cc.nodes_by_type - 1)
 
 let print_node_id sigs f = function
   | Existing id -> Format.pp_print_int f id
@@ -231,12 +169,12 @@ let print with_id sigs f cc =
 	      if internals.(p) >= 0
 	      then Format.fprintf f "%t%a"
 				  (if not_empty then Pp.comma else Pp.empty)
-				  (print_internal ~sigs ag p) internals.(p)
+				  (Node.print_internal ~sigs ag p) internals.(p)
 	      else
 		if  el <> UnSpec then
 		  Format.fprintf f "%t%a"
 				 (if not_empty then Pp.comma else Pp.empty)
-				 (print_site ~sigs ag) p in
+				 (Node.print_site ~sigs ag) p in
 	    match el with
 	    | UnSpec ->
 	       if internals.(p) >= 0
@@ -260,7 +198,7 @@ let print with_id sigs f cc =
 	 Format.fprintf
 	   f "%t@[<h>%a("
 	   (if not_empty then Pp.comma else Pp.empty)
-	   (print_node ~sigs) ag_x in
+	   (Node.print ~sigs) ag_x in
        let out = print_intf ag_x link_ids (IntMap.find x cc.internals) el in
        let () = Format.fprintf f ")@]" in
        true,out) cc.links (false,(1,Int2Map.empty)) in
@@ -274,16 +212,16 @@ let print_dot sigs f cc =
        if i <> 0 then
 	 let () = Format.fprintf
 		    f "@[%a@ [label=\"%t\",@ height=\".1\",@ width=\".1\""
-		    (print_site ?sigs:None n) i Pp.bottom in
+		    (Node.print_site ?sigs:None n) i Pp.bottom in
 	 let () =
 	   Format.fprintf f ",@ margin=\".05,.02\",@ fontsize=\"11\"];@]@," in
 	 let () = Format.fprintf
 		    f "@[<b>%a ->@ %a@ @[[headlabel=\"%a\",@ weight=\"25\""
-		    (print_site ?sigs:None n) i (print_node ?sigs:None) n
-		    (print_site ~sigs n) i in
+		    (Node.print_site ?sigs:None n) i (Node.print ?sigs:None) n
+		    (Node.print_site ~sigs n) i in
 	 Format.fprintf f",@ arrowhead=\"odot\",@ minlen=\".1\"]@];@]@,"
        else Format.fprintf f "@[%a [label=\"%a\"]@];@,"
-			   (print_node ?sigs:None) n (print_node ~sigs) n
+			   (Node.print ?sigs:None) n (Node.print ~sigs) n
     | Link (y,j) ->
        let n = (cc.id,find_ty cc x,x) in
        let n' = (cc.id,find_ty cc y,y) in
@@ -291,8 +229,8 @@ let print_dot sigs f cc =
 	 let () = Format.fprintf
 		    f
 		    "@[<b>%a ->@ %a@ @[[taillabel=\"%a\",@ headlabel=\"%a\""
-		    (print_node ?sigs:None) n (print_node ?sigs:None) n'
-		    (print_site ~sigs n) i (print_site ~sigs n') j in
+		    (Node.print ?sigs:None) n (Node.print ?sigs:None) n'
+		    (Node.print_site ~sigs n) i (Node.print_site ~sigs n') j in
 	 Format.fprintf
 	   f ",@ arrowhead=\"odot\",@ arrowtail=\"odot\",@ dir=\"both\"]@];@]@,"
   in
@@ -301,13 +239,14 @@ let print_dot sigs f cc =
     if k >= 0 then
       let () = Format.fprintf
 		 f "@[%ai@ [label=\"%a\",@ height=\".1\",@ width=\".1\""
-		 (print_site ?sigs:None n) i (print_internal ~sigs n i) k in
+		 (Node.print_site ?sigs:None n) i
+		 (Node.print_internal ~sigs n i) k in
       let () =
 	Format.fprintf f ",@ margin=\".05,.02\",@ fontsize=\"11\"];@]@," in
       let () = Format.fprintf
 		 f "@[<b>%ai ->@ %a@ @[[headlabel=\"%a\",@ weight=25"
-		 (print_site ?sigs:None n) i (print_node ?sigs:None) n
-		 (print_site ~sigs n) i in
+		 (Node.print_site ?sigs:None n) i (Node.print ?sigs:None) n
+		 (Node.print_site ~sigs n) i in
       Format.fprintf f ",@ arrowhead=\"odot\",@ minlen=\".1\"]@];@]@," in
   let pp_slot pp_el f (x,a) =
     Pp.array (fun _ -> ()) (pp_el x) f a in
@@ -434,7 +373,7 @@ let to_work env =
     cc_id = fresh_id env;
     cc_links = IntMap.empty;
     cc_internals = IntMap.empty;
-    dangling = (0,0,0);
+    dangling = 0;
   }
 
 let navigate env nav =
@@ -736,8 +675,8 @@ let add_domain env cc =
 
 (** Operation to create cc *)
 let check_dangling wk =
-  if wk.dangling <> (0,0,0) then
-    raise (dangling_node ~sigs:wk.sigs wk.dangling)
+  if wk.dangling <> 0 then
+    raise (dangling_node ~sigs:wk.sigs wk.used_id wk.dangling)
 let check_node_adequacy ~pos wk cc_id =
   if wk.cc_id <> cc_id then
     raise (
@@ -776,8 +715,8 @@ let new_link wk ((cc1,_,x as n1),i) ((cc2,_,y as n2),j) =
   else
     let () = x_n.(i) <- Link (y,j) in
     let () = y_n.(j) <- Link (x,i) in
-    if wk.dangling = n1 || wk.dangling = n2
-    then { wk with dangling = (0,0,0) }
+    if wk.dangling = x || wk.dangling = y
+    then { wk with dangling = 0 }
     else wk
 
 let new_free wk ((cc,_,x as n),i) =
@@ -809,7 +748,7 @@ let new_node wk type_id =
      (node,
       new_free
 	{ wk with
-	  dangling = if IntMap.is_empty wk.cc_links then (0,0,0) else node;
+	  dangling = if IntMap.is_empty wk.cc_links then 0 else h;
 	  cc_links = IntMap.add h (Array.make arity UnSpec) wk.cc_links;
 	  cc_internals = IntMap.add h (Array.make arity (-1)) wk.cc_internals;
 	} (node,0))
@@ -820,12 +759,18 @@ let new_node wk type_id =
       new_free
 	{ wk with
 	  free_id = succ wk.free_id;
-	  dangling = if IntMap.is_empty wk.cc_links then (0,0,0) else node;
+	  dangling = if IntMap.is_empty wk.cc_links then 0 else wk.free_id;
 	  cc_links =
 	    IntMap.add wk.free_id (Array.make arity UnSpec) wk.cc_links;
 	  cc_internals =
 	    IntMap.add wk.free_id (Array.make arity (-1)) wk.cc_internals;
 	} (node,0))
+
+module NodeMap = MapExt.Make(Node)
+
+module Matching = struct
+  type t = int NodeMap.t
+end
 
 (*let specialize domain (inj,cc_id) concrete_edges =
   let point = Env.get domain cc_id in
@@ -841,3 +786,4 @@ let new_node wk type_id =
 let generalize domain (inj,cc_id) =
   let point = Env.get domain cc_id in
   List.map (fun x -> (inj,x)) point.fathers
+
