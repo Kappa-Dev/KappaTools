@@ -127,6 +127,8 @@ let print_agent sigs f ag_ty =
  Format.pp_print_string f @@ agent_of_num ag_ty sigs
 let print_site sigs ag_ty f id =
  Format.pp_print_string f @@ site_of_id ag_ty id sigs
+let print_internal_state sigs ag_ty site f id =
+  Format.pp_print_string f @@ internal_state_of_id ag_ty site id sigs
 let print_site_internal_state sigs ag_ty site f = function
   | None -> print_site sigs ag_ty f site
   | Some id ->

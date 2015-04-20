@@ -23,12 +23,21 @@ type rule_agent =
     }
 type rule_mixture = rule_agent list
 
-let print_rule_internal f = function
+let print_rule_internal sigs ag_ty site f = function
   | I_ANY -> ()
-  | I_ANY_CHANGED j -> Format.fprintf f "~>>%i" j
+  | I_ANY_CHANGED j ->
+     Format.fprintf f "~>>%a" (Signature.print_internal_state sigs ag_ty site) j
   | I_ANY_ERASED -> Format.fprintf f "~--"
-  | I_VAL_CHANGED (i,j) -> if i <> j then Format.fprintf f "~%i>>%i" i j
-  | I_VAL_ERASED i -> Format.fprintf f "~%i--" i
+  | I_VAL_CHANGED (i,j) ->
+     if i <> j then
+       Format.fprintf
+	 f "~%a>>%a" (Signature.print_internal_state sigs ag_ty site) i
+	 (Signature.print_internal_state sigs ag_ty site) j
+     else
+       Format.fprintf f "~%a" (Signature.print_internal_state sigs ag_ty site) i
+  | I_VAL_ERASED i ->
+     Format.fprintf
+       f "~%a--" (Signature.print_internal_state sigs ag_ty site) i
 
 let print_switching f = function
   | Linked (i,_) -> Format.fprintf f ">>%i" i
@@ -49,12 +58,13 @@ let print_rule_link f = function
 let print_rule_intf sigs ag_ty f (ports,ints) =
   let rec aux empty i =
     if i < Array.length ports then
-      if ports.(i) <> L_ANY Maintained || ints.(i) <> I_ANY then
+      if (ports.(i) <> L_ANY Maintained || ints.(i) <> I_ANY)
+	 && (i <> 0 || ports.(i) <> L_FREE Maintained) then
 	let () = Format.fprintf
 		   f "%t%a%a%a" (if empty then Pp.empty else Pp.comma)
 		   (Signature.print_site sigs ag_ty) i
-		   print_rule_internal ints.(i)
-					      print_rule_link ports.(i) in
+		   (print_rule_internal sigs ag_ty i) ints.(i)
+							     print_rule_link ports.(i) in
 	aux false (succ i)
       else aux empty (succ i) in
   aux true 0
