@@ -226,32 +226,14 @@ Flow of information in the ODE semantics:agent_type:0:
 site_type_modified:{0; 0}
 Flow of information in the ODE semantics:agent_type:1:
 site_type_modified:{0; 0; 0}
-* Anchor sites in the first case:
-- (site_address_modified, site_address)
-+ First element in a pair of agents:
-Flow of information in the ODE semantics:agent_type:0:
-site_type_modified:{0}
-+ Second element in a pair of agents:
-Flow of information in the ODE semantics:agent_type:1:
-site_type_bond:{0}
 - Anchor sites :
 Flow of information in the ODE semantics:agent_type:1:
 site_type_anchor:{0}
-* Anchor sites in the second case:
-- (site_address,site_address)
-+ First element in a pair of agents:
-Flow of information in the ODE semantics:agent_type:0:
-site_type_bond:{0}
-+ Second element in a pair agents:
-Flow of information in the ODE semantics:agent_type:1:
-site_type_bond:{0}
 * Internal flow :
-site:0 -> anchor/modified:0
-* Sites list rhs :
 Flow of information in the ODE semantics:agent_type:0:
-{0; 0}
+{}
 Flow of information in the ODE semantics:agent_type:1:
-{0; 0}
+{}
 * External flow :
 anchor:{0} -> modified:{0}
 execution finished without any exception

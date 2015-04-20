@@ -127,22 +127,40 @@ Agents:{A}
 Flow of information in the stochastic semantics:agent_type:0:
 site_type:[|0; 0; 0|]
 Flow of information in the ODE semantics:
+from_site:{1}
+
+to_site:{1}
+
+from_site:{0}
+
+to_site:{1}
+
+from_site:{2}
+
+to_site:{2}
+
+from_site:{0}
+
+to_site:{2}
+
+from_site:{2}
+
+to_site:{2}
+
+from_site:{1}
+
+to_site:{2}
+
+from_site:{0}
+
+to_site:{2}
+
 * Sites that are modified:
 Flow of information in the ODE semantics:agent_type:0:
 site_type_modified:{2; 1}
-* Anchor sites in the first case:
-- (site_address_modified, site_address)
-+ First element in a pair of agents:
-+ Second element in a pair of agents:
 - Anchor sites :
-* Anchor sites in the second case:
-- (site_address,site_address)
-+ First element in a pair of agents:
-+ Second element in a pair agents:
 * Internal flow :
-site:2 -> anchor/modified:1
-* Sites list rhs :
 Flow of information in the ODE semantics:agent_type:0:
-{2; 1; 0; 2; 0; 1; 0}
+{0; 1; 2; 0; 2; 0; 1}
 * External flow :
 execution finished without any exception

@@ -89,10 +89,6 @@ let collect_sites_bond_2 parameter error bond_rhs site_address store_sites_bond_
   in rule rhs that are bond.*) 
   let agent_id = site_address.Cckappa_sig.agent_index in
   let agent_type = site_address.Cckappa_sig.agent_type in
-  let site = site_address.Cckappa_sig.site in
-  (*let _ = Printf.fprintf stdout "agent_pos:%i:agent_type:%i:site:%i\n"
-    agent_id agent_type site 
-  in*)
   (*get sites_address map from bond_rhs*)
   let error, site_address_map =
     Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get
@@ -127,9 +123,6 @@ let collect_sites_bond_2 parameter error bond_rhs site_address store_sites_bond_
   in                                   
   (*store*)
   let new_list = List.concat [sites_bond_list; old_list] in
-  (*let _ = print_string "NEW_LIST:";
-    print_list new_list; print_string "\n"
-  in*)
   let error, store_sites_bond_2 =
     Int_storage.Nearly_inf_Imperatif.set
       parameter
@@ -142,9 +135,7 @@ let collect_sites_bond_2 parameter error bond_rhs site_address store_sites_bond_
 let collect_store_bond_1 parameter error site_address store_sites_modified store_sites_bond_1 =
   (*store_sites_bond_1 is a set of sites that are bond, it is taken from a
   list of sites in a set of sites that is modified.*)    
-  let agent_id = site_address.Cckappa_sig.agent_index in
   let agent_type = site_address.Cckappa_sig.agent_type in
-  let site = site_address.Cckappa_sig.site in
   (*get site_address list *)
   let error, get_sites_list =
     Int_storage.Nearly_inf_Imperatif.unsafe_get
@@ -257,12 +248,11 @@ type ode_frag =
       store_sites_bond_pair_1 : sites_ode;
       store_sites_anchor_1 : int list AgentMap.t; (*Information*)
       store_sites_bond_rhs : sites_ode;
-      (*internal flow*)
-      (*store_internal_flow : (int list * int list); (*TESTING*)*)
-      store_internal_flow : (int * int) list; (*TESTING*)
-      store_sites_list_rhs: int list AgentMap.t; (*DO not print this*)
+      (*internal flow (a,b); if b is an anchor/modified site*)
+      store_internal_flow : int list AgentMap.t; (*Information*)
+      store_sites_list_rhs: int list AgentMap.t; 
       (*external flow (a, b) if a is an anchor or b is a modified sites*)
-      store_external_flow : (int list * int list)
+      store_external_flow : (int list * int list) (*Information*)
     }
 
 (*Folding a set of anchor sites into a list of anchor sites*)
@@ -316,7 +306,7 @@ let store_modified get_sites_modified =
                  )
                  [] get_sites_modified
 
-(*collect a list of sites from the rule rhs*)
+(*collect a list of sites from the rule rhs*)(*REMOVE*)
 let store_sites_list_rhs parameter error rule store_sites_list_rhs =
   let error, store_sites_list_rhs =
     Int_storage.Quick_Nearly_inf_Imperatif.fold
@@ -381,59 +371,104 @@ let get_sites_list_rhs parameter error store_sites_list_rhs =
   in
   get_sites_list
 
-(*Condition of internal flow: FIXME these sites tested are belong to the same agent_name*)
-let store_internal_flow parameter error get_sites_list store_sites_modified store_sites_bond_pair_1 store_internal_flow =
-  match get_sites_list with
-  | [] ->
-     let error, w =
-       warn parameter error (Some "line 448") Exit []
-     in w
-  | a :: tl -> (*TODO: test a reverse case where 'a' is anchor/modified*)
-     let rec aux to_visit =
-       match to_visit with
-       | [] ->
-          let error, w =
-            warn parameter error (Some "line 455") Exit []
-          in w
-       | b :: tl' ->
-          (*Folding store_sites_modified to be able to get a list of modified sites*)
+(*Internal flow*)
+let add_internal_flow parameter error agent_type pair_sites store_internal_flow =(*FIXME*)
+  let error, old =
+    Int_storage.Nearly_inf_Imperatif.unsafe_get
+      parameter
+      error
+      agent_type
+      store_internal_flow
+  in
+  let old_list =
+    match old with
+    | None -> []
+    | Some sites -> sites
+  in
+  (*store*)
+  let new_list = List.concat [pair_sites; old_list] in
+  Int_storage.Nearly_inf_Imperatif.set
+    parameter
+    error
+    agent_type
+    new_list
+    store_internal_flow
+      
+let store_internal_flow parameter error rule store_sites_modified store_sites_bond_pair_1 store_internal_flow = (*FIXME*)
+  (*an internal flow is a flow from a site that is tested ->
+  anchors/modified site in each agent*)
+  (*test in a set of sites in rhs*)
+  let error, store_internal_flow =
+    Int_storage.Quick_Nearly_inf_Imperatif.fold
+      parameter
+      error
+      (fun parameter error agent_id agent store_internal_flow ->
+       match agent with
+       | Cckappa_sig.Ghost -> error, store_internal_flow
+       | Cckappa_sig.Agent agent ->
+          (*condition of internal flow inside each agent*)
+          let agent_type = agent.Cckappa_sig.agent_name in
           let error, get_sites_modified =
-            Int_storage.Nearly_inf_Imperatif.fold
-              parameter
-              error
-              (fun parameter error k a old_list ->
-               let sites_list = List.concat [a; old_list] in
-               error, sites_list)
-              store_sites_modified
-              []                  
+                 Int_storage.Nearly_inf_Imperatif.fold
+                   parameter
+                   error
+                   (fun parameter error k a old_list ->
+                    let sites_list = List.concat [a; old_list] in
+                    error, sites_list
+                   )
+                   store_sites_modified []
           in
-          (*check b is a member of sites_modified?*)
-          let is_mem_modified =
-            List.mem b get_sites_modified
-          in
-          (*taken from a set of sites that are an anchor*)
+          (*Get a list of anchor sites*)
           let get_sites_anchor =
             get_sites_anchor
               parameter
               error
               store_sites_bond_pair_1
           in
-          let is_mem_anchor =
-            List.mem b get_sites_anchor
+          let sites_list =
+            Cckappa_sig.Site_map_and_set.fold_map
+              (fun x _ current_list ->
+               x :: current_list)
+              agent.Cckappa_sig.agent_interface []
+          in (*TODO:combine site in the same agent *)
+          (*match sites_list*)
+          let pair_sites =
+            match sites_list with
+            | [] | [_] -> []
+            | x :: tl ->
+               let rec aux to_visit =
+                 match to_visit with
+                 | [] -> []
+                 | y :: tl' -> (*TODO: clean connect to itself*)
+                    if List.mem x get_sites_modified ||
+                         List.mem x get_sites_anchor
+                    then
+                      (*TODO: return value of internal flow*)
+                      let from_site = y ::[] in
+                      let to_site = x :: [] in
+                      let _ = print_string "from_site:";
+                              print_list from_site; print_string "\n" in
+                      let _ = print_string "to_site:";
+                              print_list to_site; print_string "\n" in
+                      List.concat [aux tl';[y]]
+                    else []
+               in aux sites_list
+          in          
+          (*store internal flow with each agent*)
+          let error, store_internal_flow =(*FIXME*)
+            add_internal_flow
+              parameter
+              error
+              agent_type
+              pair_sites
+              store_internal_flow
           in
-          if is_mem_modified || is_mem_anchor
-          then
-            (*return 'a' and 'b', store a, b into store_internal_flow pair*)
-            (*let store_internal_flow = (a, b) :: aux tl' in*)
-            (*get the old_list inside store_internal_flow then concat with the new one*)
-            (*let store_internal_flow = (a, b) :: aux tl' in
-            store_internal_flow (*todo*)*)
-            List.concat [[(a,b)]; store_internal_flow] (*FIXME*)
-          else
-            (*todo:'a' is anchor/modified, then b -> a*)
-            aux tl'
-     in aux tl
-    
+          error, store_internal_flow
+      )
+      rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
+      store_internal_flow
+  in
+  error, store_internal_flow
     
 let scan_rule parameter error handler rule ode_class =
   let bind = rule.Cckappa_sig.actions.Cckappa_sig.bind in
@@ -453,7 +488,6 @@ let scan_rule parameter error handler rule ode_class =
   an agent with a modified site.
   Ex: a, b -> a.b; 'a' is a modified site; -> 'b' is an anchor site*)
   let error, store_sites_bond_pair_1 =
-    (*TODO? return (site, agent_type) list 't from site_add*)
     List.fold_left (fun (error, store_sites_bond_pair)
                         (site_address_modified, site_address) ->
                     error, collect_sites_bond_pair_1
@@ -491,31 +525,22 @@ let scan_rule parameter error handler rule ode_class =
   in
   (*d) Internal flow: link between 'a' (tested;bond?) and 'b'. If 'b' is an
   anchor or a modified site*)
-  let store_sites_list_rhs =
+  let store_sites_list_rhs =(*REMOVE*)
     store_sites_list_rhs
       parameter
       error
       rule
       ode_class.store_sites_list_rhs
   in 
-  let store_internal_flow =
-    (*get a list of sites from an agent interface rhs, then check into this list:
-      a -> b, if 'b' is a modified site or 'b' is an anchor site.
-     *)
-    let get_sites_list_rhs =
-      get_sites_list_rhs
-        parameter
-        error
-        store_sites_list_rhs
-    in
+  let error, store_internal_flow =
     store_internal_flow
       parameter
       error
-      get_sites_list_rhs
+      rule
       store_sites_modified
       store_sites_bond_pair_1
       ode_class.store_internal_flow
-  in
+  in  
   (*e) External flow: link between 'a' and 'b'. If 'a' is an anchor or 'b'
   is a modified site*)
   let store_external_flow =
@@ -559,7 +584,7 @@ let scan_rule_set parameter error handler rules =
       store_sites_bond_pair_1 = init_pair;
       store_sites_anchor_1 = init;
       store_sites_bond_rhs = init_pair;
-      store_internal_flow = []; (*TEST*)
+      store_internal_flow = init; (*TEST*)
       store_sites_list_rhs = init;
       store_external_flow = [], []
     }
@@ -609,17 +634,14 @@ let print_anchor_1 parameter error result =
      in
      error) parameter result
 
-let print_sites_list_rhs parameter error result = (*TODO:MOVE?*)
+let print_sites_list_rhs parameter error result = (*REMOVE?*)
   Int_storage.Nearly_inf_Imperatif.print
     error (fun error parameter l -> let _ = print_list l in error) parameter result
    
-let print_internal_flow result = (*FIXME*)
-  match result with
-  | [] -> []
-  | (a,b) :: tl ->
-     let _ = Printf.fprintf stdout "site:%i -> anchor/modified:%i\n" a b in
-     tl
-  
+let print_internal_flow parameter error result =
+  Int_storage.Nearly_inf_Imperatif.print
+    error (fun error parameter l -> let _ = print_list l in error) parameter result
+    
 let print_external_flow (a,b) = (*TODO:print as pair information*)
   match a, b with
   | [], [] | _, [] | [], _ -> ()
@@ -629,13 +651,7 @@ let print_external_flow (a,b) = (*TODO:print as pair information*)
      let b = Printf.fprintf stdout "modified:"; print_list b in
      a;b
 
-(*let print_external_flow result =
-  match result with
-  | [] -> []
-  | (a,b)::tl ->
-     let _ = Printf.fprintf stdout "anchor:%i -> modified:%i\n" a b in
-     tl*)
-     
+    
 (*TODO: do not print as a list, print as a pair of information*)
 
 (*print functions of anchor sites in the first case*)
@@ -663,23 +679,23 @@ let print_ode parameter error
   let _ = Printf.fprintf stdout "* Sites that are modified:\n" in
   let m = print_modified parameter error store_sites_modified in
   m;
-  let _ = Printf.fprintf stdout "* Anchor sites in the first case:\n" in
+  (*let _ = Printf.fprintf stdout "* Anchor sites in the first case:\n" in
   let _ = Printf.fprintf stdout "- (site_address_modified, site_address)\n" in
   let p1 = print_pair_1 parameter error store_sites_bond_pair_1 in
-  p1;
+  p1;*)
   let _ = Printf.fprintf stdout "- Anchor sites :\n" in
   let a = print_anchor_1 parameter error store_sites_anchor_1 in
   a;
-  let _ = Printf.fprintf stdout "* Anchor sites in the second case:\n" in
+  (*let _ = Printf.fprintf stdout "* Anchor sites in the second case:\n" in
   let _ = Printf.fprintf stdout "- (site_address,site_address)\n" in
   let p2 = print_rhs_pair parameter error store_sites_bond_rhs in
-  p2;
+  p2;*)
   let _ = Printf.fprintf stdout "* Internal flow :\n" in (*TEST*)
-  let i = print_internal_flow store_internal_flow in
+  let i = print_internal_flow parameter error store_internal_flow in
   i;
-  let _ = Printf.fprintf stdout "* Sites list rhs :\n" in (*TEST*)
+  (*let _ = Printf.fprintf stdout "* Sites list rhs :\n" in (*TEST*)
   let s = print_sites_list_rhs parameter error store_sites_list_rhs in
-  s;
+  s;*)
   let _ = Printf.fprintf stdout "* External flow :\n" in
   let f = print_external_flow store_external_flow in
   f
