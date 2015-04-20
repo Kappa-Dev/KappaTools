@@ -6,12 +6,12 @@ module Edge = struct
 	 | Internal of int
 
   let compare x y = match x,y with
-    | ToFree _, Internal _ -> -1
+    | ToFree, Internal _ -> -1
     | Internal _, Link _ -> -1
     | Link _, Internal _ -> 1
-    | Internal _, ToFree _ -> 1
-    | ToFree _, Link _ -> -2
-    | Link _, ToFree _ -> 2
+    | Internal _, ToFree -> 1
+    | ToFree, Link _ -> -2
+    | Link _, ToFree -> 2
     | ToFree, ToFree -> 0
     | Link (_,n,s), Link (_,n',s') ->
        let c = int_compare n n' in

@@ -14,7 +14,7 @@ val mem : int -> t -> bool
 val inverse : t -> t
 (** @raise NotBijective *)
 
-(* val fold : (int -> int -> 'a -> 'a) -> t -> 'a -> 'a *)
+val fold : (int -> int -> 'a -> 'a) -> t -> 'a -> 'a
 val to_list : t -> (int*int) list
 
 val print : Format.formatter -> t -> unit

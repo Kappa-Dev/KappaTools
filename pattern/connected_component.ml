@@ -288,6 +288,8 @@ module Env : sig
   val empty : Signature.s -> t
   val sigs : t -> Signature.s
   val find : t -> cc -> (int * Dipping.t * point) option
+  val navigate :
+    t -> ((int raw_place*int)*edge) list -> (int * Dipping.t * point) option
   val get : t -> int -> point
   val check_vitality : t -> unit
   val cc_map : t -> cc IntMap.t
@@ -768,22 +770,52 @@ let new_node wk type_id =
 
 module NodeMap = MapExt.Make(Node)
 
+let injection_for_one_more_edge inj graph = function
+  | ((Fresh _,_),_) -> None
+  | ((Existing id,site),ToNothing) ->
+     if Edges.is_free (Dipping.apply inj id) site graph then Some inj else None
+  | ((Existing id,site),ToInternal i) ->
+     if Edges.is_internal i (Dipping.apply inj id) site graph
+     then Some inj else None
+  | ((Existing id,site),ToNode (Existing id',site')) ->
+     if Edges.link_exists (Dipping.apply inj id) site
+			  (Dipping.apply inj id') site' graph
+     then Some inj else None
+  | ((Existing id,site),ToNode (Fresh (ty,id'),site')) ->
+     match Edges.exists_fresh (Dipping.apply inj id) site ty site' graph with
+     | None -> None
+     | Some node -> Some (Dipping.add id' node inj)
+
 module Matching = struct
   type t = int NodeMap.t
+
+  let from_dipping cc inj =
+    Dipping.fold
+      (fun src dst acc ->
+       NodeMap.add (cc.id,find_ty cc dst,dst) src acc)
+      inj NodeMap.empty
+
+  let from_edge domain graph edge =
+    let rec aux cache acc = function
+      | [] -> acc
+      | (point,inj_point2graph) :: remains ->
+	 let acc' = if point.is_obs then point.cc :: acc else acc in
+	 let remains' =
+	   List.fold_left
+	     (fun re son ->
+	      match injection_for_one_more_edge inj_point2graph graph son.extra_edge with
+	      | None -> re
+	      | Some inj' -> (Env.get domain son.dst,inj')::re)
+	     remains point.sons in
+	 aux cache acc' remains' in
+    match Env.navigate domain [edge] with
+    | None -> []
+    | Some (_,inj,point) -> aux inj [] [(point,inj)]
+  let form_free domain graph ty node_id site =
+    from_edge domain graph ((Fresh (ty,node_id),site),ToNothing)
+  let from_internal domain graph node_id ty site id =
+    from_edge domain graph ((Fresh (ty,node_id),site),ToInternal id)
+  let from_node domain graph (n_id,ty) site (n_id',ty') site' =
+    from_edge
+      domain graph ((Fresh (ty,n_id),site),ToNode (Fresh (ty',n_id'),site'))
 end
-
-(*let specialize domain (inj,cc_id) concrete_edges =
-  let point = Env.get domain cc_id in
-  List.fold_left
-    (fun acc x ->
-     match x.extra_edge with
-     | (Existing n, s), e ->
-	if Edges.exists ~typ:() (Dipping.apply inj n) s e then
-	  (Dipping.compose (opposite x.inj) inj,x.dst)::acc
-	else acc
-     | (Fresh (ty,n), s), e -> acc) [] point.sons
- *)
-let generalize domain (inj,cc_id) =
-  let point = Env.get domain cc_id in
-  List.map (fun x -> (inj,x)) point.fathers
-
