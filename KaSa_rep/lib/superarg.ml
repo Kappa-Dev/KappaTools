@@ -68,9 +68,14 @@ let show_level (lvl:level) : bool = match lvl with
 | Developper -> !dev_mode && !expert_mode
 | Hidden -> false
 
-let accept_level (lvl:level) : bool = match lvl with
-| Normal | Expert | Hidden -> true
-| Developper -> !dev_mode
+let accept_level_display (lvl:level) : bool = match lvl with
+  | Normal | Expert -> true
+  | Developper -> !dev_mode
+  | Hidden -> false
+
+let accept_level_use (lvl:level) : bool = match lvl with 
+  | Normal | Expert | Hidden -> true 
+  | Developper -> !dev_mode 
 
 let iskey (k:key) = String.length k > 2 && k.[0]='-' && k.[1]='-'
 
@@ -116,7 +121,7 @@ let error = Exception.empty_error_handler
 let order parameters (a:t) =
   let ordered = ref StringMap.empty_map in
   List.iter (fun (a,b,c,cat,lvl) ->
-    if accept_level lvl then
+    if accept_level_display lvl then
       List.iter 
 	(fun cat -> 
 	  ordered := snd (StringMap.add_map parameters error cat
@@ -284,7 +289,7 @@ let parse_list parameters (a:t) (l:string list) : string list =
 	    try
 	      List.find 
 		(fun (key,spec,msg,cat,lvl) ->
-		  (accept_level lvl) &&
+		  (accept_level_use lvl) &&
 		  (opt=key || (opt=(nokey key)))
 		) a
 	    with Not_found ->
