@@ -266,30 +266,6 @@ Agents:{A; B; C}
 Flow of information in the stochastic semantics:agent_type:1:
 site_type:[|0; 0|]
 Flow of information in the ODE semantics:
-from_site:{1}
-
-to_site:{1}
-
-from_site:{0}
-
-to_site:{1}
-
-from_site:{1}
-
-to_site:{1}
-
-from_site:{0}
-
-to_site:{1}
-
-from_site:{1}
-
-to_site:{1}
-
-from_site:{0}
-
-to_site:{1}
-
 * Sites that are modified:
 Flow of information in the ODE semantics:agent_type:0:
 site_type_modified:{0; 0; 0}
@@ -297,18 +273,9 @@ Flow of information in the ODE semantics:agent_type:1:
 site_type_modified:{0; 1; 1}
 Flow of information in the ODE semantics:agent_type:2:
 site_type_modified:{0}
-- Anchor sites :
+* Anchor sites:
 Flow of information in the ODE semantics:agent_type:1:
 site_type_anchor:{1}
 Flow of information in the ODE semantics:agent_type:2:
 site_type_anchor:{0}
-* Internal flow :
-Flow of information in the ODE semantics:agent_type:0:
-{}
-Flow of information in the ODE semantics:agent_type:1:
-{0; 1; 0; 1; 0; 1}
-Flow of information in the ODE semantics:agent_type:2:
-{}
-* External flow :
-anchor:{1; 0} -> modified:{0; 0}
 execution finished without any exception

@@ -143,9 +143,5 @@ Flow of information in the ODE semantics:
 * Sites that are modified:
 Flow of information in the ODE semantics:agent_type:0:
 site_type_modified:{0; 0; 0; 0}
-- Anchor sites :
-* Internal flow :
-Flow of information in the ODE semantics:agent_type:0:
-{}
-* External flow :
+* Anchor sites:
 execution finished without any exception

@@ -77,11 +77,5 @@ Flow of information in the stochastic semantics:
 Agents:{A; B; C}
 Flow of information in the ODE semantics:
 * Sites that are modified:
-- Anchor sites :
-* Internal flow :
-Flow of information in the ODE semantics:agent_type:1:
-{}
-Flow of information in the ODE semantics:agent_type:2:
-{}
-* External flow :
+* Anchor sites:
 execution finished without any exception

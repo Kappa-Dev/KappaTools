@@ -158,14 +158,7 @@ Flow of information in the ODE semantics:agent_type:0:
 site_type_modified:{0; 0}
 Flow of information in the ODE semantics:agent_type:1:
 site_type_modified:{0}
-- Anchor sites :
+* Anchor sites:
 Flow of information in the ODE semantics:agent_type:1:
 site_type_anchor:{0}
-* Internal flow :
-Flow of information in the ODE semantics:agent_type:0:
-{}
-Flow of information in the ODE semantics:agent_type:1:
-{}
-* External flow :
-anchor:{0} -> modified:{0}
 execution finished without any exception
