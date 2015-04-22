@@ -22,6 +22,9 @@ let inverse i =
 	       if IntMap.mem y out then raise NotBijective
 	       else IntMap.add y x out) i IntMap.empty
 
+let compare i i' = IntMap.compare int_compare i i'
+let equal i i' = (compare i i') = 0
+
 let print f i =
   ignore
     (IntMap.fold

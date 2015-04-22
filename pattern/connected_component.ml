@@ -117,29 +117,45 @@ let print_edge sigs f = function
   | (source,site), ToInternal i ->
      Format.fprintf f "-%a_%i-~%i->" (print_node_id sigs) source site i
 
-let to_navigation cc =
+let find_root cc =
+  let rec aux ty =
+    if ty = Array.length cc.nodes_by_type
+    then None
+    else match cc.nodes_by_type.(ty) with
+	 | [] -> aux (succ ty)
+	 | h::t ->
+	    let x = List.fold_left (fun _ x -> x) h t in
+	    Some(ty,x)
+  in aux 0
+
+let to_navigation full cc =
   let rec build_for out don = function
     | [] -> List.rev out
     | h ::  t ->
        let out_ints =
-	 Tools.array_fold_lefti
-	   (fun i acc v ->
-	    if v < 0 then acc else ((Existing h,i),ToInternal v)::acc)
-	   out (IntMap.find h cc.internals) in
+	 if full then
+	   Tools.array_fold_lefti
+	     (fun i acc v ->
+	      if v < 0 then acc else ((Existing h,i),ToInternal v)::acc)
+	     out (IntMap.find h cc.internals)
+	 else out in
        let news,out_lnk,todo =
 	 Tools.array_fold_lefti
 	   (fun i (news,ans,re as acc) ->
 	    function
 	    | UnSpec -> acc
 	    | Free ->
-	       if i > 0 then (news,((Existing h,i),ToNothing)::ans,re) else acc
+	       if full && i > 0
+	       then (news,((Existing h,i),ToNothing)::ans,re)
+	       else acc
 	    | Link (n,l) ->
 	       if List.mem n don then acc
 	       else if n = h || List.mem n re
-	       then (news,((Existing h,i),ToNode (Existing n,l))::ans,re)
+	       then
+		 if full then (news,((Existing h,i),ToNode (Existing n,l))::ans ,re)
+		 else acc
 	       else
-		 ((Existing h,i),(n,l))::news,
-		 ans, n::re)
+		 ((Existing h,i),(n,l))::news, ans, n::re)
 	   ([],[],t) (IntMap.find h cc.links) in
        let out' =
 	 List.fold_left (fun acc (x,(n,s)) ->
@@ -148,15 +164,10 @@ let to_navigation cc =
 				    Mods.int_compare a b) news) in
        let out'' = List.rev_append out_lnk out' in
        build_for out'' (h::don) todo in
-  let rec find_root i =
-    if i = Array.length cc.nodes_by_type
-    then []
-    else match cc.nodes_by_type.(i) with
-	 | [] -> find_root (succ i)
-	 | h::t ->
-	    let x = List.fold_left (fun _ x -> x) h t in
-	    build_for [(Fresh (i,x),0),ToNothing] [] [x]
-  in find_root 0
+  match find_root cc with
+  | None -> []
+  | Some (i,x) ->
+     build_for [(Fresh (i,x),0),ToNothing] [] [x]
 
 let print with_id sigs f cc =
   let print_intf (_,_,ag_i as ag) link_ids internals neigh =
@@ -440,7 +451,7 @@ let navigate env nav =
   in aux Dipping.empty 0 nav
 
 let find env cc =
-  let nav = to_navigation cc in
+  let nav = to_navigation true cc in
 (*  let () = Format.eprintf
 	     "@[[%a]@]@,%a@." (Pp.list Pp.space (print_edge (sigs env))) nav
 	     print env in*)
@@ -799,18 +810,30 @@ module Matching = struct
     let rec aux cache acc = function
       | [] -> acc
       | (point,inj_point2graph) :: remains ->
-	 let acc' = if point.is_obs then point.cc :: acc else acc in
-	 let remains' =
+	 let acc' =
+	   if point.is_obs
+	   then match find_root point.cc with
+		| None -> assert false
+		| Some (_,root) ->
+		   (point.cc,Dipping.apply inj_point2graph root) :: acc
+	   else acc in
+	 let remains',cache' =
 	   List.fold_left
-	     (fun re son ->
+	     (fun (re,ca as acc) son ->
 	      match injection_for_one_more_edge inj_point2graph graph son.extra_edge with
-	      | None -> re
-	      | Some inj' -> (Env.get domain son.dst,inj')::re)
-	     remains point.sons in
-	 aux cache acc' remains' in
+	      | None -> acc
+	      | Some inj' ->
+		 if
+		   try Dipping.equal (IntMap.find son.dst cache) inj'
+		   with Not_found -> false
+		 then acc
+		 else
+		   (Env.get domain son.dst,inj')::re,IntMap.add son.dst inj' ca)
+	     (remains,cache) point.sons in
+	 aux cache' acc' remains' in
     match Env.navigate domain [edge] with
     | None -> []
-    | Some (_,inj,point) -> aux inj [] [(point,inj)]
+    | Some (cc_id,inj,point) -> aux (IntMap.add cc_id inj IntMap.empty) [] [(point,inj)]
   let form_free domain graph ty node_id site =
     from_edge domain graph ((Fresh (ty,node_id),site),ToNothing)
   let from_internal domain graph node_id ty site id =

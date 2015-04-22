@@ -13,6 +13,8 @@ val apply : t -> int -> int
 val mem : int -> t -> bool
 val inverse : t -> t
 (** @raise NotBijective *)
+val compare : t -> t -> int
+val equal : t -> t -> bool
 
 val fold : (int -> int -> 'a -> 'a) -> t -> 'a -> 'a
 val to_list : t -> (int*int) list
