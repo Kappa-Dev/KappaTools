@@ -182,65 +182,17 @@ Agents:{A; B}
 Flow of information in the stochastic semantics:agent_type:0:
 site_type:[|0; 0|]
 Flow of information in the ODE semantics:
-START
-anchor_list:{}
-
-agent_id:0:site_rhs_bond:{}
-
-agent_id:0:site_rhs_list:{1; 0}
-
-agent_id:0:site_rhs_list:{1; 0}
-
-emptySTART
-anchor_list:{}
-
-agent_id:0:site_rhs_bond:{}
-
-agent_id:0:site_rhs_list:{1; 0}
-
-agent_id:0:site_rhs_list:{1; 0}
-
-emptySTART
-anchor_list:{}
-
-agent_id:0:site_rhs_bond:{}
-
-agent_id:0:site_rhs_list:{0; 1; 0}
-
-agent_id:0:site_rhs_list:{0; 1; 0}
-
-emptySTART
-anchor_list:{}
-
-agent_id:0:site_rhs_bond:{}
-
-agent_id:0:site_rhs_list:{0; 0; 1; 0}
-
-agent_id:0:site_rhs_list:{0; 0; 1; 0}
-
-emptySTART
-anchor_list:{0}
-
-agent_id:1:site_rhs_bond:{0}
-
-agent_id:1:site_rhs_list:{0}
-
-agent_id:1:site_rhs_list:{0}
-
 * Sites that are modified:
 Flow of information in the ODE semantics:agent_type:0:
 site_type_modified:{0; 1; 0}
 Flow of information in the ODE semantics:agent_type:1:
 site_type_modified:{0}
-* Sites rhs:
-Flow of information in the ODE semantics:agent_type:0:
-site_type:{0; 0; 1; 0}
-Flow of information in the ODE semantics:agent_type:1:
-site_type:{0}
 * Anchor sites:
 Flow of information in the ODE semantics:agent_type:1:
 site_type_anchor:{0}
 * Anchor sites 2:
+Flow of information in the ODE semantics:agent_type:1:
+site_type_anchor:{0}
 * External flow:
-external_flow:anchor_type:0 -> modified_type:site:0
+external_flow:anchor_type:0 -> modified_type:0
 execution finished without any exception
