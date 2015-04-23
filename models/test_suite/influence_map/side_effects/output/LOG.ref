@@ -230,7 +230,7 @@ site_type_modified:{0; 0; 0}
 Flow of information in the ODE semantics:agent_type:1:
 site_type_anchor:{0}
 * Anchor sites 2:
-Flow of information in the ODE semantics:agent_type:1:
+Flow of information in the ODE semantics:agent_type:0:
 site_type_anchor:{0}
 * External flow:
 external_flow:anchor_type:0 -> modified_type:0

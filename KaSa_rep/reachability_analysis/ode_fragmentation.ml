@@ -519,7 +519,7 @@ let scan_rule parameter error handler rule ode_class =
           error, sites_list
       )
       rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
-      store_sites_anchor1
+      ode_class.store_sites_anchor2 (*FIXME*)
   in  
   (*------------------------------------------------------------------------------*)
   (*e)external flow: a -> b, if 'a': anchor site or 'b':modified site*)
