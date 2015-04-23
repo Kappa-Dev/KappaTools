@@ -7,4 +7,4 @@
 
 #### Rules
 'r0' A(x~u,y), B(x) -> A(x~p,y!1), B(x!1)
-'r1' B(y), C(x) -> B(y!1), C(x!1)
+'r1' C(x), B(y) -> C(x!1), B(y!1)
