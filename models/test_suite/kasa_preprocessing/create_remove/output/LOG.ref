@@ -78,4 +78,5 @@ Agents:{A; B; C}
 Flow of information in the ODE semantics:
 * Sites that are modified:
 * Anchor sites:
+* External flow:
 execution finished without any exception

@@ -144,4 +144,5 @@ Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:agent_type:0:
 site_type_modified:{0; 0; 0; 0}
 * Anchor sites:
+* External flow:
 execution finished without any exception

@@ -429,4 +429,5 @@ site_type_modified:{2; 1; 1; 0}
 Flow of information in the ODE semantics:agent_type:5:
 site_type_modified:{1; 0}
 * Anchor sites:
+* External flow:
 execution finished without any exception

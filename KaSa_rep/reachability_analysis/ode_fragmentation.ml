@@ -247,7 +247,7 @@ let store_sites_bond_pair parameter error bond_rhs bind
 (*------------------------------------------------------------------------------*)
 (*- collect anchor sites*)
 
-let store_sites_anchor parameter error init store_sites_bond_pair =
+let store_sites_anchor parameter error init store_sites_bond_pair = (*REMOVE*)
   (*get the old_list*)
   let error, store_sites_anchor =
     Int_storage.Nearly_inf_Imperatif.fold
@@ -289,11 +289,14 @@ module AgentMap = Int_storage.Nearly_inf_Imperatif
 
 type sites_ode = (int list AgentMap.t * int list AgentMap.t)
 
+(*type external_anchor = int AgentMap.t list*)
+  
 type ode_frag =
     {
       store_sites_modified  : int list AgentMap.t;
       store_sites_bond_pair : sites_ode;
-      store_sites_anchor    : int list AgentMap.t
+      store_sites_anchor    : int list AgentMap.t;
+      store_external_flow   : (int * int) list
     }
       
 (************************************************************************************)   
@@ -321,23 +324,56 @@ let scan_rule parameter error handler rule ode_class =
       bond_rhs
       bind
       store_sites_modified
-      (ode_class.store_sites_bond_pair)
+      ode_class.store_sites_bond_pair
   in
-  let error, store_sites_anchor =
-    let error, init = Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
-    store_sites_anchor
-      parameter
-      error
-      init
-      store_sites_bond_pair
+  let store_sites_anchor =
+    snd store_sites_bond_pair
+  in
+  (*------------------------------------------------------------------------------*)
+  (*d)external flow: a -> b, if 'a': anchor site or 'b':modified site*)
+  let store_external_flow =
+    let store_external_flow =
+      (*get a list of anchor sites*)
+      let error, get_sites_anchor =
+        Int_storage.Nearly_inf_Imperatif.fold
+          parameter
+          error
+          (fun parameter error agent_type a old_list ->
+           let sites_anchor = List.concat [a; old_list] in
+           error, sites_anchor
+          )
+          store_sites_anchor []
+      in
+      (*get a list of modified sites that are bond*)
+      let error, get_sites_modified =
+        Int_storage.Nearly_inf_Imperatif.fold
+          parameter
+          error
+          (fun parameter error agent_type m old_list ->
+           let sites_modified = List.concat [m; old_list] in
+           error, sites_modified)
+          (fst store_sites_bond_pair) []
+      in
+      let external_flow =
+        let rec aux acc acc' =
+          match acc, acc' with
+          | [], [] | [], _ | _, [] -> []
+          | x :: tl, y :: tl' -> (x, y) :: aux tl tl'
+        in
+        aux get_sites_anchor get_sites_modified
+      in
+      external_flow
+    in
+    store_external_flow
   in
   (*------------------------------------------------------------------------------*)
   (*return value of ode_class*)
   error,
   {
-    store_sites_modified = store_sites_modified;
+    store_sites_modified  = store_sites_modified;
     store_sites_bond_pair = store_sites_bond_pair;
-    store_sites_anchor = store_sites_anchor
+    store_sites_anchor    = store_sites_anchor;
+    store_external_flow   = store_external_flow
   }
     
 (************************************************************************************)
@@ -347,12 +383,15 @@ let scan_rule_set parameter error handler rules =
   let error, init =
     Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
   let init_pair = (init, init) in
+  let error, init_external = (*REMOVE*)
+    Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
   (*init state of ode_class*)
   let init_ode =
     {
       store_sites_modified  = init;
       store_sites_bond_pair = init_pair;
-      store_sites_anchor    = init
+      store_sites_anchor    = init;
+      store_external_flow   = []                   
     }
   in
   let error, ode_class =
@@ -392,6 +431,25 @@ let print_anchor parameter error result =
      in
      error) parameter result
 
+let print_external_flow parameter error result =
+  let rec aux acc =
+    match acc with
+    | [] -> acc
+    | (x,y) :: tl ->
+       Printf.fprintf stdout "external_flow:anchor_type:%i -> modified_type:%i\n" x y;
+       aux tl
+  in aux result
+  (*Int_storage.Nearly_inf_Imperatif.print
+    error
+    (fun error parameter l ->
+     match l with
+     | [] -> error
+     | (x,y) :: tl ->
+        let _ =
+          Printf.fprintf stdout "external_flow:anchor_type:%i -> modified_type:%i\n" x y;
+          tl
+        in
+        error) parameter result*)
 
 (************************************************************************************)
 (*MAIN PRINT*)
@@ -399,14 +457,18 @@ let print_anchor parameter error result =
 let print_ode parameter error
               { store_sites_modified;
                 store_sites_bond_pair;
-                store_sites_anchor
+                store_sites_anchor;
+                store_external_flow
               } =
   let _ = Printf.fprintf stdout "* Sites that are modified:\n" in
   let m = print_modified parameter error store_sites_modified in
   m;
   let _ = Printf.fprintf stdout "* Anchor sites:\n" in
   let a = print_anchor parameter error store_sites_anchor in
-  a
+  a;
+  let _ = Printf.fprintf stdout "* External flow:\n" in
+  let e = print_external_flow parameter error store_external_flow in
+  e
 
     
 (************************************************************************************)     
