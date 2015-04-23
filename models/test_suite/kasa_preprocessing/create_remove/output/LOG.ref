@@ -76,7 +76,33 @@ Agents:{A; B; C}
 Flow of information in the stochastic semantics:
 Agents:{A; B; C}
 Flow of information in the ODE semantics:
+START
+START
+anchor_list:{}
+
+agent_id:1:site_rhs_bond:{}
+
+agent_id:1:site_rhs_list:{}
+
+agent_id:1:site_rhs_list:{}
+
+START
+START
+anchor_list:{}
+
+agent_id:2:site_rhs_bond:{}
+
+agent_id:2:site_rhs_list:{}
+
+agent_id:2:site_rhs_list:{}
+
 * Sites that are modified:
+* Sites rhs:
+Flow of information in the ODE semantics:agent_type:1:
+site_type:{}
+Flow of information in the ODE semantics:agent_type:2:
+site_type:{}
 * Anchor sites:
+* Anchor sites 2:
 * External flow:
 execution finished without any exception
