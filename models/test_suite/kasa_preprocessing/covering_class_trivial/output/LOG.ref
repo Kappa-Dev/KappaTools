@@ -135,6 +135,8 @@ site_type_modified:{2; 1}
 * Internal flow:
 site_type:1 -> modified_type:2
 site_type:0 -> modified_type:2
-site_type:0 -> modified_type:1
+site_type:0 -> modified_type:2
+site_type:1 -> modified_type:2
+site_type:0 -> modified_type:2
 * External flow:
 execution finished without any exception

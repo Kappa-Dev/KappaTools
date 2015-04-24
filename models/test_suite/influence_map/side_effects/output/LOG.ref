@@ -233,10 +233,6 @@ site_type_anchor:{0}
 Flow of information in the ODE semantics:agent_type:0:
 site_type_anchor:{0}
 * Internal flow:
-site_type:0 -> modified_type:0
-site_type:0 -> modified_type:0
-site_type:0 -> anchor_type:0
-site_type:0 -> anchor_type:0
 * External flow:
 anchor_type:0 -> modified_type:0
 execution finished without any exception

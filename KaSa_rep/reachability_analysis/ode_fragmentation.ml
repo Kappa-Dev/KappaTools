@@ -373,7 +373,7 @@ type ode_frag =
       store_sites_anchor1    : int list AgentMap.t;
       store_sites_anchor2    : int list AgentMap.t;
       store_internal_flow    : (pair_flow * pair_flow);
-      store_external_flow    : pair_flow;
+      store_external_flow    : pair_flow
     }
       
 (************************************************************************************)   
@@ -526,7 +526,7 @@ let scan_rule parameter error handler rule ode_class =
   in  
   (*------------------------------------------------------------------------------*)
   (*f)internal flow: a -> b, if 'a': site tested; 'b':modified/anchor site*)
-  let store_internal_flow =
+  let store_internal_flow = (*FIXME*)
     let store_internal_flow =
       (*get sites that are tested. Sites on the rhs? FIXME*)
       let error, get_sites_tested =
@@ -587,7 +587,12 @@ let scan_rule parameter error handler rule ode_class =
                   match acc' with
                     | [] -> []
                     | y :: tl' ->
-                      (y, x) :: aux tl'
+                      (*FIXME:
+                        check if site_type and modified_site are the same then return empty*)
+                      if List.mem y get_sites_tested && x = y
+                      then aux' tl'
+                      else
+                      (y, x) :: aux' tl'
                 in
                 aux' tl
               else aux tl
@@ -606,7 +611,12 @@ let scan_rule parameter error handler rule ode_class =
                   match acc' with
                     | [] -> []
                     | y :: tl' ->
-                      (y, x) :: aux tl'
+                      (*FIXME:
+                        check if site_type and anchor_site are the same then return empty*)
+                      if List.mem y get_sites_tested && x = y
+                      then aux' tl'
+                      else
+                      (y, x) :: aux' tl'
                 in
                 aux' tl
               else
@@ -632,8 +642,8 @@ let scan_rule parameter error handler rule ode_class =
           parameter
           error
           (fun parameter error agent_type a old_list ->
-           let sites_anchor = List.concat [a; old_list] in
-           error, sites_anchor
+            let sites_anchor = List.concat [a; old_list] in
+            error, sites_anchor
           )
           store_sites_anchor1 []
       in
@@ -658,8 +668,8 @@ let scan_rule parameter error handler rule ode_class =
           parameter
           error
           (fun parameter error agent_type m old_list ->
-           let sites_modified = List.concat [m; old_list] in
-           error, sites_modified)
+            let sites_modified = List.concat [m; old_list] in
+            error, sites_modified)
           (fst store_sites_bond_pair) []
       in
       let external_flow =
@@ -675,6 +685,9 @@ let scan_rule parameter error handler rule ode_class =
     store_external_flow
   in
   (*------------------------------------------------------------------------------*)
+  (*FIXME*)
+  
+  (*------------------------------------------------------------------------------*)
   (*return value of ode_class*)
   error,
   {
@@ -685,7 +698,7 @@ let scan_rule parameter error handler rule ode_class =
     store_sites_anchor1    = store_sites_anchor1;
     store_sites_anchor2    = store_sites_anchor2;
     store_internal_flow    = store_internal_flow;
-    store_external_flow    = store_external_flow
+    store_external_flow    = store_external_flow;
   }
     
 (************************************************************************************)
@@ -694,6 +707,8 @@ let scan_rule parameter error handler rule ode_class =
 let scan_rule_set parameter error handler rules =
   let error, init =
     Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
+  let error, init' =
+   Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
   let init_pair = (init, init) in
   (*init state of ode_class*)
   let init_ode =
@@ -705,19 +720,19 @@ let scan_rule_set parameter error handler rules =
       store_sites_anchor1    = init;
       store_sites_anchor2    = init;
       store_internal_flow    = ([], []);
-      store_external_flow    = []                   
+      store_external_flow    = []
     }
   in
   let error, ode_class =
     Int_storage.Nearly_inf_Imperatif.fold
       parameter error
       (fun parameter error rule_id rule ode_class ->
-       scan_rule
-         parameter
-         error
-         handler
-         rule.Cckappa_sig.e_rule_c_rule
-         ode_class
+        scan_rule
+          parameter
+          error
+          handler
+          rule.Cckappa_sig.e_rule_c_rule
+          ode_class
       ) rules init_ode
   in
   error, ode_class
@@ -771,7 +786,7 @@ let print_internal_flow2 result =
     match acc with
       | [] -> acc
       | (x,y) :: tl ->
-        Printf.fprintf stdout "site_type:%i -> anchor_type:%i\n" x y;
+        Printf.fprintf stdout "site_type:%i -> anchor_type:%i\n" x y; (*FIXME*)
         aux tl
   in aux result
     

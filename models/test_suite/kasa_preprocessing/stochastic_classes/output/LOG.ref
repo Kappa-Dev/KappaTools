@@ -434,6 +434,8 @@ site_type_modified:{1; 0}
 site_type:0 -> modified_type:1
 site_type:0 -> modified_type:1
 site_type:0 -> modified_type:1
-site_type:1 -> modified_type:2
+site_type:3 -> modified_type:1
+site_type:2 -> modified_type:1
+site_type:0 -> modified_type:1
 * External flow:
 execution finished without any exception

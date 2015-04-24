@@ -182,7 +182,5 @@ site_type_modified:{0; 0; 0}
 * Anchor sites:
 * Anchor sites 2:
 * Internal flow:
-site_type:0 -> modified_type:0
-site_type:0 -> modified_type:0
 * External flow:
 execution finished without any exception
