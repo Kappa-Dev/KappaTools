@@ -526,7 +526,7 @@ let scan_rule parameter error handler rule ode_class =
   in  
   (*------------------------------------------------------------------------------*)
   (*f)internal flow: a -> b, if 'a': site tested; 'b':modified/anchor site*)
-  let store_internal_flow = (*FIXME*)
+  let store_internal_flow =
     let store_internal_flow =
       (*get sites that are tested. Sites on the rhs? FIXME*)
       let error, get_sites_tested =
@@ -539,11 +539,6 @@ let scan_rule parameter error handler rule ode_class =
           )
           store_sites_rhs []
       in
-      let _ = 
-        print_string "get_sites_tested:";
-        print_list get_sites_tested;
-        print_string "\n"
-      in
       (*get modified sites*)
       let error, get_sites_modified =
         Int_storage.Nearly_inf_Imperatif.fold
@@ -554,11 +549,6 @@ let scan_rule parameter error handler rule ode_class =
             error, sites_modified
           )
           store_sites_modified []
-      in
-      let _ = 
-        print_string "get_sites_modified:";
-        print_list get_sites_modified;
-        print_string "\n"
       in
       (*get anchor sites*)
       let error, get_sites_anchor1 =
@@ -571,11 +561,6 @@ let scan_rule parameter error handler rule ode_class =
           )
           store_sites_anchor1 []
       in
-      let _ = 
-        print_string "get_sites_anchor1:";
-        print_list get_sites_anchor1;
-        print_string "\n"
-      in
       let error, get_sites_anchor2 =
         Int_storage.Nearly_inf_Imperatif.fold
           parameter
@@ -586,18 +571,8 @@ let scan_rule parameter error handler rule ode_class =
           )
           store_sites_anchor2 []
       in
-      let _ = 
-        print_string "get_sites_anchor2:";
-        print_list get_sites_anchor2;
-        print_string "\n"
-      in
       let get_sites_anchor =
         List.concat [get_sites_anchor1; get_sites_anchor2]
-      in
-      let _ = 
-        print_string "get_sites_anchor:";
-        print_list get_sites_anchor;
-        print_string "\n"
       in
       (*compute internal_flow*)
       (*- site_tested -> modified site*)
@@ -612,22 +587,13 @@ let scan_rule parameter error handler rule ode_class =
                   match acc' with
                     | [] -> []
                     | y :: tl' ->
-                      (y,x) :: aux tl'
+                      (y, x) :: aux tl'
                 in
                 aux' tl
               else aux tl
         in
         aux get_sites_tested
       in
-      (*let internal_flow1 =
-        let rec aux acc acc' =
-          match acc, acc' with
-            | [], [] | [], _ | _, [] -> []
-            | x :: tl, y :: tl' ->
-              (x,y) :: aux tl tl'
-        in
-        aux get_sites_tested get_sites_modified
-      in*)
       (*- site_tested -> anchor site*)
       let internal_flow2 =
         let rec aux acc =
@@ -648,15 +614,6 @@ let scan_rule parameter error handler rule ode_class =
         in
         aux get_sites_tested
       in
-      (*let internal_flow2 =
-        let rec aux acc acc' =
-          match acc, acc' with
-            | [], [] | [], _ | _, [] -> []
-            | x :: tl, y :: tl' ->
-              (x,y) :: aux tl tl'
-        in
-        aux get_sites_tested get_sites_anchor        
-      in*)
       (*- combine the result*)
       let internal_flow =
         (internal_flow1, internal_flow2)
@@ -755,7 +712,6 @@ let scan_rule_set parameter error handler rules =
     Int_storage.Nearly_inf_Imperatif.fold
       parameter error
       (fun parameter error rule_id rule ode_class ->
-        let _ = Printf.fprintf stdout "rule_id:%i\n" rule_id in
        scan_rule
          parameter
          error

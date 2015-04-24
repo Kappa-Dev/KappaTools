@@ -133,28 +133,6 @@ Covering_class_id:0:site_type:{0}
 Flow of information in the stochastic semantics:
 Agents:{A; B; C}
 Flow of information in the ODE semantics:
-rule_id:0
-get_sites_tested:{0; 0}
-
-get_sites_modified:{0; 0}
-
-get_sites_anchor1:{0}
-
-get_sites_anchor2:{}
-
-get_sites_anchor:{0}
-
-rule_id:1
-get_sites_tested:{0; 0}
-
-get_sites_modified:{0; 0; 0}
-
-get_sites_anchor1:{0}
-
-get_sites_anchor2:{}
-
-get_sites_anchor:{0}
-
 * Sites that are modified:
 Flow of information in the ODE semantics:agent_type:0:
 site_type_modified:{0}

@@ -417,50 +417,6 @@ site_type:[|0; 0|]
 Flow of information in the stochastic semantics:agent_type:2:
 site_type:[|0; 0; 0; 0|]
 Flow of information in the ODE semantics:
-rule_id:0
-get_sites_tested:{1; 0; 1; 0}
-
-get_sites_modified:{1; 0; 1; 0}
-
-get_sites_anchor1:{1; 0; 1; 0}
-
-get_sites_anchor2:{1; 0; 1; 0}
-
-get_sites_anchor:{1; 0; 1; 0; 1; 0; 1; 0}
-
-rule_id:1
-get_sites_tested:{1; 0; 1; 0; 1; 0; 1; 0}
-
-get_sites_modified:{1; 0; 1; 0; 1; 0; 1; 0}
-
-get_sites_anchor1:{1; 0; 1; 0}
-
-get_sites_anchor2:{1; 0; 1; 0}
-
-get_sites_anchor:{1; 0; 1; 0; 1; 0; 1; 0}
-
-rule_id:2
-get_sites_tested:{3; 2; 1; 0; 1; 0; 1; 0; 1; 0; 1; 0; 1; 0}
-
-get_sites_modified:{3; 2; 1; 0; 1; 0; 1; 0; 1; 0; 1; 0}
-
-get_sites_anchor1:{3; 2; 3; 2; 1; 0; 1; 0}
-
-get_sites_anchor2:{1; 0; 1; 0; 1; 0; 1; 0}
-
-get_sites_anchor:{3; 2; 3; 2; 1; 0; 1; 0; 1; 0; 1; 0; 1; 0; 1; 0}
-
-rule_id:3
-get_sites_tested:{3; 2; 1; 0; 3; 2; 1; 0; 1; 0; 1; 0; 1; 0; 1; 0; 1; 0; 1; 0}
-
-get_sites_modified:{3; 2; 3; 2; 1; 0; 1; 0; 1; 0; 1; 0; 1; 0; 1; 0}
-
-get_sites_anchor1:{3; 2; 3; 2; 1; 0; 1; 0}
-
-get_sites_anchor2:{1; 0; 1; 0; 1; 0; 1; 0}
-
-get_sites_anchor:{3; 2; 3; 2; 1; 0; 1; 0; 1; 0; 1; 0; 1; 0; 1; 0}
-
 * Sites that are modified:
 Flow of information in the ODE semantics:agent_type:0:
 site_type_modified:{1; 0; 1; 0}
