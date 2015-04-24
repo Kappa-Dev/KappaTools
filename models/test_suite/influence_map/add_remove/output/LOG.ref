@@ -174,6 +174,50 @@ Agents:{A; B}
 Flow of information in the stochastic semantics:agent_type:0:
 site_type:[|0|]
 Flow of information in the ODE semantics:
+rule_id:0
+get_sites_tested:{0; 0}
+
+get_sites_modified:{0}
+
+get_sites_anchor1:{}
+
+get_sites_anchor2:{}
+
+get_sites_anchor:{}
+
+rule_id:1
+get_sites_tested:{0; 0; 0}
+
+get_sites_modified:{0; 0}
+
+get_sites_anchor1:{}
+
+get_sites_anchor2:{}
+
+get_sites_anchor:{}
+
+rule_id:2
+get_sites_tested:{0; 0; 0; 0}
+
+get_sites_modified:{0; 0; 0}
+
+get_sites_anchor1:{}
+
+get_sites_anchor2:{}
+
+get_sites_anchor:{}
+
+rule_id:3
+get_sites_tested:{0; 0; 0; 0; 0}
+
+get_sites_modified:{0; 0; 0; 0}
+
+get_sites_anchor1:{}
+
+get_sites_anchor2:{}
+
+get_sites_anchor:{}
+
 * Sites that are modified:
 Flow of information in the ODE semantics:agent_type:0:
 site_type_modified:{0}
@@ -182,8 +226,6 @@ site_type_modified:{0; 0; 0}
 * Anchor sites:
 * Anchor sites 2:
 * Internal flow:
-site_type:0 -> modified_type:0
-site_type:0 -> modified_type:0
 site_type:0 -> modified_type:0
 site_type:0 -> modified_type:0
 * External flow:
