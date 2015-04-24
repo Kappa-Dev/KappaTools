@@ -758,7 +758,7 @@ let print_internal_flow2 result =
     
 let print_internal_flow (result, result') =
   let p1 = print_internal_flow1 result in
-  let p2 = print_internal_flow2 result in
+  let p2 = print_internal_flow2 result' in
   p1, p2
 
 let print_external_flow result =

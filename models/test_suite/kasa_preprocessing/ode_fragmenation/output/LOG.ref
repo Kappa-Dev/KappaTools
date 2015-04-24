@@ -195,11 +195,10 @@ site_type:1 -> modified_type:1
 site_type:0 -> modified_type:0
 site_type:1 -> modified_type:1
 site_type:0 -> modified_type:0
+site_type:0 -> anchor_type:1
+site_type:1 -> anchor_type:0
 site_type:0 -> anchor_type:0
 site_type:1 -> anchor_type:1
-site_type:0 -> anchor_type:0
-site_type:1 -> anchor_type:1
-site_type:0 -> anchor_type:0
 * External flow:
 anchor_type:1 -> modified_type:0
 anchor_type:0 -> modified_type:1
