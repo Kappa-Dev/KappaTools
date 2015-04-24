@@ -79,5 +79,6 @@ Flow of information in the ODE semantics:
 * Sites that are modified:
 * Anchor sites:
 * Anchor sites 2:
+* Internal flow:
 * External flow:
 execution finished without any exception
