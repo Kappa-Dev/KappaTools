@@ -588,8 +588,8 @@ let scan_rule parameter error handler rule ode_class =
                     | [] -> []
                     | y :: tl' ->
                       (*FIXME:
-                        check if site_type and modified_site are the same then return empty*)
-                      if List.mem y get_sites_tested && x = y
+                        check if site_type and modified_site are the same then continue to the rest of the list*)
+                      if x = y
                       then aux' tl'
                       else
                       (y, x) :: aux' tl'
@@ -612,8 +612,8 @@ let scan_rule parameter error handler rule ode_class =
                     | [] -> []
                     | y :: tl' ->
                       (*FIXME:
-                        check if site_type and anchor_site are the same then return empty*)
-                      if List.mem y get_sites_tested && x = y
+                        check if site_type and anchor_site are the same then continue to the rest of the list*)
+                      if x = y
                       then aux' tl'
                       else
                       (y, x) :: aux' tl'
