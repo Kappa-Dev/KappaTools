@@ -12,6 +12,13 @@ type t =
       free_id: int;
     }
 
+
+let empty = {
+  roots_of_ccs = Connected_component.Map.empty;
+  edges = Edges.empty;
+  free_id = 1;
+}
+
 let update_roots is_add map cc root =
   let va = try Connected_component.Map.find cc map
 	   with Not_found -> RootHeap.create 13 in
