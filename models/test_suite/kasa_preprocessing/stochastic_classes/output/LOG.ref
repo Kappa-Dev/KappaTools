@@ -419,68 +419,15 @@ site_type:[|0; 0|]
 Flow of information in the stochastic semantics:agent_type:4:
 site_type:[|0; 0; 0|]
 Flow of information in the ODE semantics:
-agent_type:0:x:0
-agent_type:0:y:1
-agent_type:0:site:1->agent_type:0modified:0
-agent_type:0:x:0
-agent_type:0:y:1
-agent_type:0:site:1->agent_type:0modified:0
-
-SECOND:
-agent_type:0:x:0
-
-SECOND:
-agent_type:0:x:0
-agent_type:1:x:0
-agent_type:1:x:0
-
-SECOND:
-agent_type:1:x:0
-
-SECOND:
-agent_type:1:x:0
-agent_type:2:x:0
-agent_type:2:y:1
-agent_type:2:site:1->agent_type:2modified:0
-
-SECOND:
-agent_type:2:x:0
-agent_type:3:x:0
-
-SECOND:
-agent_type:3:x:0
-agent_type:0:x:0
-agent_type:0:y:1
-agent_type:0:site:1->agent_type:0modified:0
-agent_type:0:y:2
-agent_type:0:site:2->agent_type:0modified:0
-agent_type:0:y:3
-agent_type:0:site:3->agent_type:0modified:0
-agent_type:0:x:0
-agent_type:0:y:1
-agent_type:0:site:1->agent_type:0modified:0
-agent_type:0:y:2
-agent_type:0:site:2->agent_type:0modified:0
-agent_type:0:y:3
-agent_type:0:site:3->agent_type:0modified:0
-
-SECOND:
-agent_type:0:x:0
-
-SECOND:
-agent_type:0:x:1
-
-SECOND:
-agent_type:0:x:2
-
-SECOND:
-agent_type:0:x:0
-
-SECOND:
-agent_type:0:x:1
-
-SECOND:
-agent_type:0:x:2
+rule_id:0
+rule_id:1
+rule_id:2
+rule_id:3
+rule_id:4
+rule_id:5
+rule_id:6
+rule_id:7
+rule_id:8
 * Sites that are modified:
 Flow of information in the ODE semantics:agent_type:0:
 site_type_modified:{2; 1; 0}
@@ -491,17 +438,10 @@ site_type_modified:{2; 1; 1; 0}
 Flow of information in the ODE semantics:agent_type:5:
 site_type_modified:{1; 0}
 * Anchor sites:
-* Internal flow':
-agent_type:0:site:0 -> agent_type:0:site_modified:0
-* Anchor sites 2:
-* Internal flow'':
-agent_type:0:site:0 -> agent_type:0:site_anchor:0
 * Internal flow:
-site_type:1 -> modified_type:0
-site_type:2 -> modified_type:0
-site_type:3 -> modified_type:0
-site_type:1 -> modified_type:0
-site_type:1 -> modified_type:0
-site_type:1 -> modified_type:0
+agent_type:0:site:1 -> agent_type:0:site_modified:0
+agent_type:0:site:2 -> agent_type:0:site_modified:0
+agent_type:0:site:3 -> agent_type:0:site_modified:0
+* Internal flow 2:
 * External flow:
 execution finished without any exception
