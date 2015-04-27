@@ -37,6 +37,9 @@ let add_link ty ag s ty' ag' s' t =
 let remove ag s t = function
   | (Edge.ToFree | Edge.Internal _) -> Int2Map.remove (ag,s) t
   | Edge.Link (_,ag',s') -> Int2Map.remove (ag,s) (Int2Map.remove (ag',s') t)
+let remove_free ag s t = remove ag s t Edge.ToFree
+let remove_internal ag s i t = remove ag s t (Edge.Internal i)
+let remove_link ag s ag' s' t = remove ag s t (Edge.Link (-1,ag',s'))
 
 let is_free ag s t =
   try Int2Map.find (ag,s) t = Edge.ToFree with Not_found -> false

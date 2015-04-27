@@ -57,6 +57,8 @@ module Node = struct
     if wk.cc_id = n_cc then (cc.id,n_ty, Dipping.apply inj n_id)
     else node
 
+  let get_sort (_,ty,_) = ty
+
   let print ?sigs f (cc,ty,i) =
     match sigs with
     | Some sigs ->
@@ -800,11 +802,30 @@ let injection_for_one_more_edge inj graph = function
 module Matching = struct
   type t = int NodeMap.t
 
-  let from_dipping cc inj =
+  let empty = NodeMap.empty
+
+  let from_dipping cc =
     Dipping.fold
       (fun src dst acc ->
        NodeMap.add (cc.id,find_ty cc dst,dst) src acc)
-      inj NodeMap.empty
+
+  let reconstruct env graph inj cc root =
+    match find_root cc with
+    | None -> inj
+    | Some (_,node) ->
+       let dip = Dipping.add node root Dipping.empty in
+       let full_dip =
+	 List.fold_left
+	   (fun inj_op nav ->
+	    match inj_op with
+	    | None -> None
+	    | Some inj -> injection_for_one_more_edge inj graph nav)
+	   (Some dip) (List.tl (to_navigation false cc)) in
+       match full_dip with
+       | None -> failwith "Matching.reconstruct error"
+       | Some dip -> from_dipping cc dip inj
+
+  let get node t = NodeMap.find node t
 
   let from_edge domain graph edge =
     let rec aux cache acc = function
@@ -833,12 +854,14 @@ module Matching = struct
 	 aux cache' acc' remains' in
     match Env.navigate domain [edge] with
     | None -> []
-    | Some (cc_id,inj,point) -> aux (IntMap.add cc_id inj IntMap.empty) [] [(point,inj)]
-  let form_free domain graph ty node_id site =
+    | Some (cc_id,inj,point) ->
+       aux (IntMap.add cc_id inj IntMap.empty) [] [(point,inj)]
+
+  let observables_from_free domain graph ty node_id site =
     from_edge domain graph ((Fresh (ty,node_id),site),ToNothing)
-  let from_internal domain graph node_id ty site id =
+  let observables_from_internal domain graph ty node_id site id =
     from_edge domain graph ((Fresh (ty,node_id),site),ToInternal id)
-  let from_node domain graph (n_id,ty) site (n_id',ty') site' =
+  let observables_from_link domain graph ty n_id site  ty' n_id' site' =
     from_edge
       domain graph ((Fresh (ty,n_id),site),ToNode (Fresh (ty',n_id'),site'))
 end
