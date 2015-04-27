@@ -429,7 +429,6 @@ site_type_modified:{2; 1; 1; 0}
 Flow of information in the ODE semantics:agent_type:5:
 site_type_modified:{1; 0}
 * Anchor sites:
-* Anchor sites':
 * Anchor sites 2:
 * Internal flow:
 site_type:1 -> modified_type:0
@@ -439,4 +438,7 @@ site_type:1 -> modified_type:0
 site_type:1 -> modified_type:0
 site_type:1 -> modified_type:0
 * External flow:
+* Store sites address:
+agent_index:0:site:0:agent_type:0
+agent_index':0:site':0:agent_type':0
 execution finished without any exception

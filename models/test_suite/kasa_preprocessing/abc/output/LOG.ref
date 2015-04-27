@@ -514,13 +514,6 @@ Flow of information in the ODE semantics:agent_type:1:
 site_type_anchor:{0}
 Flow of information in the ODE semantics:agent_type:2:
 site_type_anchor:{3; 2}
-* Anchor sites':
-Flow of information in the ODE semantics:agent_type:1:
-site_type_anchor:{0}
-Flow of information in the ODE semantics:agent_type:2:
-site_type_anchor:{3; 2}
-Flow of information in the ODE semantics:agent_type:0:
-site_type_anchor:{1; 1; 0}
 * Anchor sites 2:
 Flow of information in the ODE semantics:agent_type:0:
 site_type_anchor:{1; 1; 0}
@@ -559,10 +552,13 @@ site_type:0 -> anchor_type:3
 site_type:0 -> anchor_type:3
 site_type:0 -> anchor_type:3
 * External flow:
-anchor_type:3 -> modified_type:1
+anchor_type:3 -> modified_type:3
 anchor_type:2 -> modified_type:1
-anchor_type:0 -> modified_type:1
+anchor_type:0 -> modified_type:3
+anchor_type:1 -> modified_type:2
 anchor_type:1 -> modified_type:0
-anchor_type:1 -> modified_type:0
-anchor_type:0 -> modified_type:1
+anchor_type:0 -> modified_type:2
+* Store sites address:
+agent_index:0:site:1:agent_type:0
+agent_index':1:site':3:agent_type':2
 execution finished without any exception
