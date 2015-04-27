@@ -127,18 +127,68 @@ Agents:{A}
 Flow of information in the stochastic semantics:agent_type:0:
 site_type:[|0; 0; 0|]
 Flow of information in the ODE semantics:
+agent_type:0:x:0
+
+SECOND:
+agent_type:0:x:0
+agent_type:0:x:0
+agent_type:0:x:1
+agent_type:0:y:0
+agent_type:0:site:0->agent_type:0modified:1
+agent_type:0:y:2
+agent_type:0:site:2->agent_type:0modified:1
+
+SECOND:
+agent_type:0:x:0
+
+SECOND:
+agent_type:0:x:1
+
+SECOND:
+agent_type:0:x:0
+agent_type:0:x:0
+agent_type:0:x:1
+agent_type:0:y:0
+agent_type:0:site:0->agent_type:0modified:1
+agent_type:0:y:2
+agent_type:0:site:2->agent_type:0modified:1
+agent_type:0:y:0
+agent_type:0:site:0->agent_type:0modified:1
+agent_type:0:y:1
+agent_type:0:site:1->agent_type:0modified:1
+agent_type:0:y:2
+agent_type:0:site:2->agent_type:0modified:1
+
+SECOND:
+agent_type:0:x:0
+
+SECOND:
+agent_type:0:x:1
+
+SECOND:
+agent_type:0:x:0
+
+SECOND:
+agent_type:0:x:2
+
+SECOND:
+agent_type:0:x:0
+
+SECOND:
+agent_type:0:x:1
 * Sites that are modified:
 Flow of information in the ODE semantics:agent_type:0:
 site_type_modified:{2; 1}
 * Anchor sites:
+* Internal flow':
+agent_type:0:site:0 -> agent_type:0:site_modified:0
 * Anchor sites 2:
+* Internal flow'':
+agent_type:0:site:0 -> agent_type:0:site_anchor:0
 * Internal flow:
 site_type:0 -> modified_type:1
 site_type:2 -> modified_type:1
 site_type:0 -> modified_type:1
 site_type:2 -> modified_type:1
 * External flow:
-* Store sites address:
-agent_index:0:site:0:agent_type:0
-agent_index':0:site':0:agent_type':0
 execution finished without any exception

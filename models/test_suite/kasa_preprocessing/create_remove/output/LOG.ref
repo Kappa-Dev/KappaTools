@@ -78,10 +78,11 @@ Agents:{A; B; C}
 Flow of information in the ODE semantics:
 * Sites that are modified:
 * Anchor sites:
+* Internal flow':
+agent_type:0:site:0 -> agent_type:0:site_modified:0
 * Anchor sites 2:
+* Internal flow'':
+agent_type:0:site:0 -> agent_type:0:site_anchor:0
 * Internal flow:
 * External flow:
-* Store sites address:
-agent_index:0:site:0:agent_type:0
-agent_index':0:site':0:agent_type':0
 execution finished without any exception
