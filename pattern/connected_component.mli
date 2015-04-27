@@ -38,3 +38,5 @@ val finish_new : work -> (Env.t*Dipping.t*t)
 (** {5 Use a connected component } *)
 val print : bool -> Signature.s -> Format.formatter -> t -> unit
 val print_dot : Signature.s -> Format.formatter -> t -> unit
+
+module Map : MapExt.S with type key=t

@@ -4,7 +4,6 @@ module type Content =
   sig
     type t
     val allocate : t -> int -> unit
-    val get_address : t -> int
   end
 
 module type T =
@@ -109,14 +108,13 @@ module Make(C:Content) =
     exception End_of_Array
 
     let iteri f h =
-      let cpt = ref 0 in
       try
-	GenArray.iter
-	  (function
-	    | None -> raise End_of_Array
-	    | Some content ->
-	       if !cpt = h.next_address then raise End_of_Array
-	       else (cpt:=!cpt+1 ; f (C.get_address content) content)) h.ar
+	GenArray.iteri
+	  (fun cpt -> function
+		   | None -> raise End_of_Array
+		   | Some content ->
+		      if cpt = h.next_address then raise End_of_Array
+		      else f cpt content) h.ar
       with End_of_Array -> ()
 
     let fold f h cont =

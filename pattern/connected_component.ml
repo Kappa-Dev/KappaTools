@@ -842,3 +842,10 @@ module Matching = struct
     from_edge
       domain graph ((Fresh (ty,n_id),site),ToNode (Fresh (ty',n_id'),site'))
 end
+
+module ForState = struct
+  type t = cc
+  let compare cc cc' = Mods.int_compare cc.id cc'.id
+end
+
+module Map = MapExt.Make(ForState)
