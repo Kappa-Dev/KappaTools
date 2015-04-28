@@ -6,10 +6,10 @@ done
 	 -simulation parameters
 	 -agent signatures
 	 -variable declarations
-	 -initial conditions
 	 -rules
 	 -observables
 	 -perturbations
+	 -initial conditions
 	 Done
 + Analyzing non local patterns...
 + Building initial simulation state...

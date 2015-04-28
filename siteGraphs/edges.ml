@@ -15,6 +15,8 @@ end
 
 type t = Edge.t Int2Map.t * int Int2Map.t
 
+let empty = (Int2Map.empty, Int2Map.empty)
+
 let add_free ag s (connect,state) =
   (Int2Map.add (ag,s) Edge.ToFree connect,state)
 let add_internal ag s i (connect,state) =

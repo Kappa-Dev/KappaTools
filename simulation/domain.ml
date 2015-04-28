@@ -88,5 +88,5 @@ let apply_rule domain state (ccs_rule,removed_edges,added_edges) =
        let root =
 	 RootHeap.random (Connected_component.Map.find cc state.roots_of_ccs) in
        Connected_component.Matching.reconstruct domain state.edges inj cc root)
-    Connected_component.Matching.empty in
-  update_edges domain () state removed_edges added_edges
+    Connected_component.Matching.empty ccs_rule in
+  update_edges domain inj state removed_edges added_edges

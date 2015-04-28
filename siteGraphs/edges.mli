@@ -1,5 +1,7 @@
 type t
 
+val empty : t
+
 val add_free : int -> int -> t -> t
 (** [add_free agent site graph] *)
 val add_internal : int -> int -> int -> t -> t

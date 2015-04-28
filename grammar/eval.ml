@@ -755,7 +755,7 @@ let pert_of_result variables env cc_env rules res =
   let lpert = lpert_stopping_time@lpert_ineq in
   (variables, lpert, lrules, env, cc_env)
 
-let init_graph_of_result env res =
+let init_graph_of_result env cc_env res =
   let n = Array.length env.Environment.tokens.NamedDecls.decls in
   let token_vector = Array.init n (fun _ -> 0.) in
   let sg =
@@ -798,7 +798,7 @@ let init_graph_of_result env res =
 	  sg
       )	(Graph.SiteGraph.init !Parameter.defaultGraphSize) res.Ast.init
   in
-  (sg,token_vector)
+  (cc_env,Domain.empty,sg,token_vector)
 
 let configurations_of_result result =
   let raw_set_value pos_p param value_list f =
@@ -954,27 +954,28 @@ let initialize logger overwrite result =
   let pre_kasa_state = Export_to_KaSim.Export_to_KaSim.init result in
   let kasa_state,contact_map =
     Export_to_KaSim.Export_to_KaSim.get_contact_map pre_kasa_state in
-  let cc_env = Connected_component.Env.empty sigs_nd in
+  let domain = Connected_component.Env.empty sigs_nd in
 
   let env =
     Environment.init sigs_nd tk_nd (NamedDecls.create alg_a) fresh_kappa in
-  let (env, (_,cc_env), kappa_vars) =
-    variables_of_result env (contact_map,cc_env) mixs alg_a in
-
-  Debug.tag logger "\t -initial conditions";
-  let sg,token_vector = init_graph_of_result env result in
+  let (env, (_,domain), kappa_vars) =
+    variables_of_result env (contact_map,domain) mixs alg_a in
 
   Debug.tag logger "\t -rules";
-  let (env, (_,cc_env), kappa_vars, pure_rules) =
-    rules_of_result env (contact_map,cc_env) kappa_vars result in
+  let (env, (_,domain), kappa_vars, pure_rules) =
+    rules_of_result env (contact_map,domain) kappa_vars result in
 
   Debug.tag logger "\t -observables";
-  let env,(_,cc_env),kappa_vars,observables =
-    obs_of_result env (contact_map,cc_env) kappa_vars result in
+  let env,(_,domain),kappa_vars,observables =
+    obs_of_result env (contact_map,domain) kappa_vars result in
   Debug.tag logger "\t -perturbations" ;
-  let (kappa_vars, pert, rules, env, (_,cc_env)) =
-    pert_of_result kappa_vars env (contact_map,cc_env)
+  let (kappa_vars, pert, rules, env, (_,domain)) =
+    pert_of_result kappa_vars env (contact_map,domain)
 		   pure_rules result in
+
+  Debug.tag logger "\t -initial conditions";
+  let domain,state,sg,token_vector = init_graph_of_result env domain result in
+
   Debug.tag logger "\t Done";
   Debug.tag logger "+ Analyzing non local patterns..." ;
   let env = Environment.init_roots_of_nl_rules env in
@@ -995,4 +996,4 @@ let initialize logger overwrite result =
       end
     else state
   in
-  (Debug.tag logger "\t Done"; (env, cc_env, counter, state))
+  (Debug.tag logger "\t Done"; (env, domain, counter, state))
