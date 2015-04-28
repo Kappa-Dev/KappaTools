@@ -53,7 +53,7 @@ type alg_expr =
   | UN_ALG_OP of Term.un_alg_op * alg_expr Term.with_pos
   | STATE_ALG_OP of Term.state_alg_op
   | ALG_VAR of int
-  | KAPPA_INSTANCE of int
+  | KAPPA_INSTANCE of (int * Connected_component.cc list list)
   | TOKEN_ID of int
   | CONST of Nbr.t
 
@@ -62,19 +62,24 @@ type ('a,'b) contractible = NO of 'a
 			  | YES of 'b
 
 let rec compile_alg ?label var_map tk_map ?max_allowed_var
+		    contact_map domain
 		    (fr_mix_id,mix_l as mixs) (alg,pos) =
-  let rec_call mixs x =
-    match compile_alg var_map tk_map ?max_allowed_var mixs x with
-    | (mixs', (ALG_VAR _ | TOKEN_ID _ | UN_ALG_OP _ | STATE_ALG_OP _
-		     | KAPPA_INSTANCE _ as alg,_)) -> (mixs', NO alg)
-    | (mixs',(CONST n,_)) -> (mixs',YES n)
-    | (mixs',(BIN_ALG_OP (op, (x,_), (CONST y,_)) as alg,_)) ->
-       (mixs',MAYBE(alg,op,x,y))
-    | (mixs',(BIN_ALG_OP _ as alg,_)) -> (mixs',NO alg)
+  let rec_call domain mixs x =
+    match compile_alg var_map tk_map ?max_allowed_var contact_map domain mixs x with
+    | (domain',mixs', (ALG_VAR _ | TOKEN_ID _ | UN_ALG_OP _ | STATE_ALG_OP _
+		       | KAPPA_INSTANCE _ as alg,_)) -> (domain',mixs', NO alg)
+    | (domain',mixs',(CONST n,_)) -> (domain',mixs',YES n)
+    | (domain',mixs',(BIN_ALG_OP (op, (x,_), (CONST y,_)) as alg,_)) ->
+       (domain',mixs',MAYBE(alg,op,x,y))
+    | (domain',mixs',(BIN_ALG_OP _ as alg,_)) -> (domain',mixs',NO alg)
   in
   match alg with
   | Ast.KAPPA_INSTANCE ast ->
-     ((succ fr_mix_id,(label,ast)::mix_l), (KAPPA_INSTANCE fr_mix_id,pos))
+     let domain',ccs =
+       Snip.connected_components_sum_of_ambiguous_mixture
+	 contact_map domain ast in
+     (domain',
+      (succ fr_mix_id,(label,ast)::mix_l), (KAPPA_INSTANCE (fr_mix_id,ccs),pos))
   | Ast.OBS_VAR lab ->
      let i =
        try Mods.StringMap.find lab var_map with
@@ -88,84 +93,92 @@ let rec compile_alg ?label var_map tk_map ?max_allowed_var
 		   ("Reference to not yet defined '"^lab ^"' is forbidden.",
 		    pos))
        | None | Some _ -> ()
-     in(mixs,(ALG_VAR i,pos))
+     in (domain,mixs,(ALG_VAR i,pos))
   | Ast.TOKEN_ID tk_nme ->
      let i =
        try Mods.StringMap.find tk_nme tk_map
        with Not_found ->
 	 raise (ExceptionDefn.Malformed_Decl
 		  (tk_nme ^ " is not a declared token",pos))
-     in (mixs,(TOKEN_ID i,pos))
-  | Ast.STATE_ALG_OP (op) -> (mixs,(STATE_ALG_OP (op),pos))
-  | Ast.CONST n -> (mixs,(CONST n,pos))
+     in (domain,mixs,(TOKEN_ID i,pos))
+  | Ast.STATE_ALG_OP (op) -> (domain,mixs,(STATE_ALG_OP (op),pos))
+  | Ast.CONST n -> (domain,mixs,(CONST n,pos))
   | Ast.EMAX ->
      let getMaxEventValue =
        match !Parameter.maxEventValue with
        | Some n -> Nbr.I n
        | None -> Format.eprintf "[emax] constant is evaluated to infinity@.";
 		 Nbr.F infinity in
-     (mixs,(CONST getMaxEventValue,pos))
+     (domain,mixs,(CONST getMaxEventValue,pos))
   | Ast.TMAX ->
      let getMaxTimeValue = match !Parameter.maxTimeValue with
        | Some t -> Nbr.F t
        | None -> Format.eprintf "[tmax] constant is evaluated to infinity@.";
 		 Nbr.F infinity in
-     (mixs,(CONST getMaxTimeValue,pos))
+     (domain,mixs,(CONST getMaxTimeValue,pos))
   | Ast.PLOTNUM ->
 	  let getPointNumberValue = Nbr.I !Parameter.pointNumberValue in
-	  (mixs,(CONST getPointNumberValue,pos))
+	  (domain,mixs,(CONST getPointNumberValue,pos))
   | Ast.BIN_ALG_OP (op, (a,pos1), (b,pos2)) ->
-     begin match rec_call mixs (a,pos1) with
-	   | (mixs',YES n1) ->
+     begin match rec_call domain mixs (a,pos1) with
+	   | (domain',mixs',YES n1) ->
 	      begin
-		match rec_call mixs' (b,pos2) with
-		| (mixs'',YES n2) ->
-		   (mixs'',(CONST (Nbr.of_bin_alg_op op n1 n2),pos))
-		| (mixs'',( NO y | MAYBE (y,_,_,_) )) ->
-		   (mixs'',
+		match rec_call domain' mixs' (b,pos2) with
+		| (domain'',mixs'',YES n2) ->
+		   (domain'',mixs'',(CONST (Nbr.of_bin_alg_op op n1 n2),pos))
+		| (domain'',mixs'',( NO y | MAYBE (y,_,_,_) )) ->
+		   (domain'',mixs'',
 		    (BIN_ALG_OP (op, (CONST n1,pos1), (y,pos2)),pos))
 	      end
-	   | (mixs',( NO x | MAYBE (x,_,_,_) )) ->
-	      match rec_call mixs' (b,pos2) with
-	      | (mixs'',YES n2) ->
-		 (mixs'', (BIN_ALG_OP (op, (x,pos1), (CONST n2,pos2)),pos))
-	      | (mixs'',( NO y | MAYBE (y,_,_,_) )) ->
-		 (mixs'',(BIN_ALG_OP (op, (x,pos1), (y,pos2)),pos))
+	   | (domain',mixs',( NO x | MAYBE (x,_,_,_) )) ->
+	      match rec_call domain' mixs' (b,pos2) with
+	      | (domain'',mixs'',YES n2) ->
+		 (domain'', mixs'',
+		  (BIN_ALG_OP (op, (x,pos1), (CONST n2,pos2)),pos))
+	      | (domain'',mixs'',( NO y | MAYBE (y,_,_,_) )) ->
+		 (domain'',mixs'',(BIN_ALG_OP (op, (x,pos1), (y,pos2)),pos))
      end
   | Ast.UN_ALG_OP (op,(a,pos1)) ->
-     begin match rec_call mixs (a,pos1) with
-	   | (mixs',YES n) ->
-	      (mixs',(CONST (Nbr.of_un_alg_op op n),pos))
-	   | (mixs',(NO x | MAYBE (x,_,_,_))) ->
-	      (mixs',(UN_ALG_OP (op,(x,pos1)),pos))
+     begin match rec_call domain mixs (a,pos1) with
+	   | (domain',mixs',YES n) ->
+	      (domain',mixs',(CONST (Nbr.of_un_alg_op op n),pos))
+	   | (domain',mixs',(NO x | MAYBE (x,_,_,_))) ->
+	      (domain',mixs',(UN_ALG_OP (op,(x,pos1)),pos))
      end
 
-let rec compile_bool var_map tk_map mixs = function
-  | Ast.TRUE,pos -> (mixs,(Ast.TRUE,pos))
-  | Ast.FALSE,pos -> (mixs,(Ast.FALSE,pos))
+let rec compile_bool var_map tk_map contact_map domain mixs = function
+  | Ast.TRUE,pos -> (domain,mixs,(Ast.TRUE,pos))
+  | Ast.FALSE,pos -> (domain,mixs,(Ast.FALSE,pos))
   | Ast.BOOL_OP (op,a,b), pos ->
-     begin match compile_bool var_map tk_map mixs a, op with
-	   | (_,(Ast.TRUE,_)), Term.OR -> (mixs,(Ast.TRUE,pos))
-	   | (_,(Ast.FALSE,_)), Term.AND -> (mixs,(Ast.FALSE,pos))
-	   | (_,(Ast.TRUE,_)), Term.AND
-	   | (_,(Ast.FALSE,_)), Term.OR -> compile_bool var_map tk_map mixs b
-	   | (mixs',((Ast.BOOL_OP _ | Ast.COMPARE_OP _) ,_ as a') as out1),_ ->
-	      match compile_bool var_map tk_map mixs' b, op with
-	      | (_,(Ast.TRUE,_)), Term.OR -> (mixs,(Ast.TRUE,pos))
-	      | (_,(Ast.FALSE,_)), Term.AND -> (mixs,(Ast.FALSE,pos))
-	      | (_,(Ast.TRUE,_)), Term.AND
-	      | (_,(Ast.FALSE,_)), Term.OR -> out1
-	      | (mixs'',((Ast.BOOL_OP _ | Ast.COMPARE_OP _) ,_ as b')),_ ->
-		 (mixs'',(Ast.BOOL_OP (op,a',b'),pos))
+     begin match compile_bool var_map tk_map contact_map domain mixs a, op with
+	   | (_,_,(Ast.TRUE,_)), Term.OR -> (domain,mixs,(Ast.TRUE,pos))
+	   | (_,_,(Ast.FALSE,_)), Term.AND -> (domain,mixs,(Ast.FALSE,pos))
+	   | (_,_,(Ast.TRUE,_)), Term.AND
+	   | (_,_,(Ast.FALSE,_)), Term.OR ->
+	      compile_bool var_map tk_map contact_map domain mixs b
+	   | (domain',mixs',
+	      ((Ast.BOOL_OP _ | Ast.COMPARE_OP _) ,_ as a') as out1),_ ->
+	      match compile_bool var_map tk_map contact_map domain' mixs' b, op with
+	      | (_,_,(Ast.TRUE,_)), Term.OR -> (domain,mixs,(Ast.TRUE,pos))
+	      | (_,_,(Ast.FALSE,_)), Term.AND -> (domain,mixs,(Ast.FALSE,pos))
+	      | (_,_,(Ast.TRUE,_)), Term.AND
+	      | (_,_,(Ast.FALSE,_)), Term.OR -> out1
+	      | (domain'',mixs'',
+		 ((Ast.BOOL_OP _ | Ast.COMPARE_OP _),_ as b')),_ ->
+		 (domain'',mixs'',(Ast.BOOL_OP (op,a',b'),pos))
      end
   | Ast.COMPARE_OP (op,a,b),pos ->
-     let (mixs',a') = compile_alg var_map tk_map mixs a in
-     let (mixs'',b') = compile_alg var_map tk_map mixs' b in
+     let (domain',mixs',a') =
+       compile_alg var_map tk_map contact_map domain mixs a in
+     let (domain'',mixs'',b') =
+       compile_alg var_map tk_map contact_map domain' mixs' b in
      match a',b' with
      | (CONST n1,_), (CONST n2,_) ->
-	(mixs'',
+	(domain'',mixs'',
 	 ((if Nbr.of_compare_op op n1 n2 then Ast.TRUE else Ast.FALSE),pos))
-     | _, _ -> (mixs'',(Ast.COMPARE_OP (op,a',b'), pos))
+     | (( BIN_ALG_OP _ | UN_ALG_OP _ | STATE_ALG_OP _ | ALG_VAR _
+	  | KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _),_), _ ->
+	(domain'',mixs'',(Ast.COMPARE_OP (op,a',b'), pos))
 
 let add_dep el s = Term.DepSet.add el s
 let rec aux_dep s = function
@@ -173,7 +186,7 @@ let rec aux_dep s = function
   | UN_ALG_OP (_, (a,_)) -> aux_dep s a
   | STATE_ALG_OP op -> add_dep (Term.dep_of_state_alg_op op) s
   | ALG_VAR i -> add_dep (Term.ALG i) s
-  | KAPPA_INSTANCE i -> add_dep (Term.KAPPA i) s
+  | KAPPA_INSTANCE (i,_) -> add_dep (Term.KAPPA i) s
   | TOKEN_ID i -> add_dep (Term.TOK i) s
   | CONST _ -> s
 let deps_of_alg_expr alg = aux_dep Term.DepSet.empty alg
@@ -198,6 +211,10 @@ let rec deps_of_bool_expr = function
 	  begin match a,b with
 		| STATE_ALG_OP (Term.TIME_VAR), CONST n
 		| CONST n, STATE_ALG_OP (Term.TIME_VAR) -> (s, Some n)
-		| _, _ -> raise ExceptionDefn.Unsatisfiable
+		| ( BIN_ALG_OP _ | UN_ALG_OP _ | ALG_VAR _
+		    | STATE_ALG_OP (Term.CPUTIME | Term.EVENT_VAR | Term.TIME_VAR
+				    | Term.NULL_EVENT_VAR | Term.PROD_EVENT_VAR)
+		    | KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _), _ ->
+		   raise ExceptionDefn.Unsatisfiable
 	  end
-       | _ -> (s, None)
+       | (Term.EQUAL | Term.SMALLER | Term.GREATER | Term.DIFF) -> (s, None)

@@ -195,15 +195,13 @@ let eval_agent env a ctxt =
   in
   (ctxt, (Mixture.create_agent name_id interface))
 
-let mixture_of_ast ?mix_id env (contact_map,cc_env) ast_mix =
-  let (cc_env',_) =
-    Snip.connected_components_sum_of_ambiguous_mixture
-      contact_map cc_env ast_mix in
+let mixture_of_ast ?mix_id env ast_mix =
   let rec eval_mixture env ast_mix ctxt mixture =
     match ast_mix with
     | a :: ast_mix ->
        let (ctxt, agent) = eval_agent env a ctxt in
-       let id = ctxt.curr_id in let new_edges = ctxt.new_edges in
+       let id = ctxt.curr_id in
+       let new_edges = ctxt.new_edges in
        let (ctxt, mixture, env) =
 	 eval_mixture env ast_mix
 		      { ctxt with
@@ -230,20 +228,20 @@ let mixture_of_ast ?mix_id env (contact_map,cc_env) ast_mix =
       ctxt.pairing;
     let mix = Mixture.enum_alternate_anchors mix in
     let mix = Mixture.set_root_of_cc mix in
-    (mix,env,(contact_map,cc_env')) (*Modifies mix as a side effect*)
+    (mix,env) (*Modifies mix as a side effect*)
   end
 
 let initial_value_alg counter env (ast, _) =
-  Expr_vm.value_alg
+  Expr_interpreter.value_alg
     counter
     ~get_alg:(fun i ->
 	      fst (snd env.Environment.algs.NamedDecls.decls.(i)))
     ~get_mix:(fun _ -> Nbr.zero) ~get_tok:(fun _ -> Nbr.zero) ast
 
-let mixtures_of_result c_mixs env cc_env (free_id,mixs) =
-  let (env',cc_env',compiled_mixs,final_id) =
+let mixtures_of_result c_mixs env domain (free_id,mixs) =
+  let (env',compiled_mixs,_final_id) =
     List.fold_left
-      (fun (env,cc_env,mixs,id) (lbl,ast) ->
+      (fun (env,mixs,id) (lbl,ast) ->
        (* <awful hack> *)
        let open Environment in
        let dummy_name = match lbl with
@@ -254,47 +252,51 @@ let mixtures_of_result c_mixs env cc_env (free_id,mixs) =
 		   kappa_of_num = IntMap.add id dummy_name env.kappa_of_num;
 		 } in
        (* </awful hack> *)
-       let mix,env',cc_env' = mixture_of_ast ~mix_id:id env cc_env ast in
-       (env',cc_env',mix::mixs,pred id)) (env,cc_env,c_mixs,pred free_id) mixs
+       let mix,env' = mixture_of_ast ~mix_id:id env ast in
+       (env',mix::mixs,pred id)) (env,c_mixs,pred free_id) mixs
   in
-  (env',cc_env',compiled_mixs)
+  (env',domain,compiled_mixs)
 
-let reduce_val v env a_mixs =
-  let (mixs',(alg,_pos)) =
+let reduce_val v env domain a_mixs =
+  let (domain',mixs',(alg,_pos)) =
     Expr.compile_alg env.Environment.algs.NamedDecls.finder
 		     env.Environment.tokens.NamedDecls.finder
+		     env.Environment.contact_map domain
 		     a_mixs v in
   let dep = Expr.deps_of_alg_expr alg in
-  (mixs',alg,dep)
+  (domain',mixs',alg,dep)
 
-let tokenify env mixs l =
+let tokenify env domain mixs l =
   List.fold_right
-    (fun (alg_expr,(nme,pos)) (mixs,out) ->
+    (fun (alg_expr,(nme,pos)) (domain,mixs,out) ->
      let id =
        try Environment.num_of_token nme env
        with Not_found ->
 	 raise (ExceptionDefn.Malformed_Decl
 		  ("Token "^nme^" is undefined",pos))
      in
-     let (mixs',(alg,_pos)) =
+     let (domain',mixs',(alg,_pos)) =
        Expr.compile_alg env.Environment.algs.NamedDecls.finder
 			env.Environment.tokens.NamedDecls.finder
+			env.Environment.contact_map domain
 			mixs alg_expr in
-     (mixs',(alg,id)::out)
-    ) l (mixs,[])
+     (domain',mixs',(alg,id)::out)
+    ) l (domain,mixs,[])
 
-let newrules_of_ast contact_map env domain mixs (ast_rule,rule_pos) =
-  let mixs',rm_toks = tokenify env mixs ast_rule.rm_token in
-  let mixs'',add_toks = tokenify env mixs' ast_rule.add_token in
+let newrules_of_ast env domain mixs (ast_rule,rule_pos) =
+  let domain',mixs',rm_toks = tokenify env domain mixs ast_rule.rm_token in
+  let domain'',mixs'',add_toks =
+    tokenify env domain' mixs' ast_rule.add_token in
   let one_side (domain,a_mixs,acc) rate lhs rhs rm add =
-    let a_mixs',(crate,_) =
+    let domain',a_mixs',(crate,_) =
       Expr.compile_alg env.Environment.algs.NamedDecls.finder
 		       env.Environment.tokens.NamedDecls.finder
+		       env.Environment.contact_map domain
 		       a_mixs rate in
-    let domain',rule_mixtures =
+    let domain'',rule_mixtures =
       Snip.connected_components_sum_of_ambiguous_rule
-	contact_map domain lhs rhs in
-    domain',a_mixs',
+	env.Environment.contact_map domain' lhs rhs in
+    domain'',a_mixs',
     List.fold_left
       (fun out (ccs,(neg,pos)) ->
        {
@@ -306,9 +308,10 @@ let newrules_of_ast contact_map env domain mixs (ast_rule,rule_pos) =
 	 Primitives.injected_tokens = add;
        }::out) acc rule_mixtures in
   let rev = match ast_rule.arrow, ast_rule.k_op with
-    | RAR, None -> domain,mixs'',[]
+    | RAR, None -> domain'',mixs'',[]
     | LRAR, Some rate ->
-       one_side (domain,mixs'',[]) rate ast_rule.rhs ast_rule.lhs add_toks rm_toks
+       one_side (domain'',mixs'',[]) rate
+		ast_rule.rhs ast_rule.lhs add_toks rm_toks
     | (RAR, Some _ | LRAR, None) ->
        raise
 	 (ExceptionDefn.Malformed_Decl
@@ -317,7 +320,7 @@ let newrules_of_ast contact_map env domain mixs (ast_rule,rule_pos) =
   in
   one_side rev ast_rule.k_def ast_rule.lhs ast_rule.rhs rm_toks add_toks
 
-let rule_of_ast ?(backwards=false) ~is_pert env (contact_map,cc_env as cc_stuff)
+let rule_of_ast ?(backwards=false) ~is_pert env domain
 		mixs (ast_rule_label,(ast_rule,rule_pos)) =
   let ast_rule_label,ast_rule =
     if backwards then Ast.flip (ast_rule_label, ast_rule)
@@ -326,34 +329,38 @@ let rule_of_ast ?(backwards=false) ~is_pert env (contact_map,cc_env as cc_stuff)
     Environment.declare_var_kappa ~from_rule:true ast_rule_label env in
   (* reserving an id for rule's lhs in the pattern table *)
   let env = Environment.declare_rule ast_rule_label lhs_id env in
-  let a_mixs',k_def,dep =
-    reduce_val ast_rule.k_def env (env.Environment.fresh_kappa,[]) in
-  let (env,a_mixs'',k_alt,radius,dep_alt) =
+  let domain',a_mixs',k_def,dep =
+    reduce_val ast_rule.k_def env domain (env.Environment.fresh_kappa,[]) in
+  let (env,domain'',a_mixs'',k_alt,radius,dep_alt) =
     match ast_rule.k_un with
-    | None -> (env,a_mixs',None,None, Term.DepSet.empty)
+    | None -> (env,domain',a_mixs',None,None, Term.DepSet.empty)
     | Some (ast,ast_opt) ->
        (****TODO HERE treat ast_opt that specifies application radius****)
        let env =
 	 Environment.declare_unary_rule
 	   (Some (Term.with_dummy_pos (Environment.kappa_of_num lhs_id env)))
 	   (*ast_rule_label*) lhs_id env in
-       let a_mixs'',k_alt,dep = reduce_val ast env a_mixs' in
-       let a_mixs''',radius_alt,dep = match ast_opt with
-	   None -> (a_mixs'',None,dep)
-	 | Some v -> let a_mixs''',rad,dep' = reduce_val v env a_mixs'' in
-		     (a_mixs''',Some rad,Term.DepSet.union dep dep')
+       let domain'',a_mixs'',k_alt,dep =
+	 reduce_val ast env domain' a_mixs' in
+       let domain''',a_mixs''',radius_alt,dep = match ast_opt with
+	   None -> (domain'',a_mixs'',None,dep)
+	 | Some v ->
+	    let domain''',a_mixs''',rad,dep' =
+	      reduce_val v env domain'' a_mixs'' in
+	    (domain''',a_mixs''',Some rad,Term.DepSet.union dep dep')
        in
-       (env,a_mixs''',Some k_alt,radius_alt,dep)
+       (env,domain''',a_mixs''',Some k_alt,radius_alt,dep)
   in
-  let lhs,env,cc_stuff = mixture_of_ast ~mix_id:lhs_id env cc_stuff ast_rule.lhs
-  in
+  let lhs,env = mixture_of_ast ~mix_id:lhs_id env ast_rule.lhs in
   let lhs = match k_alt with None -> lhs | Some _ -> Mixture.set_unary lhs in
-  let rhs,env,cc_stuff = mixture_of_ast env cc_stuff ast_rule.rhs in
+  let rhs,env = mixture_of_ast env ast_rule.rhs in
   let (script, balance,added,modif_sites(*,side_effects*)) =
     Dynamics.diff rule_pos lhs rhs env in
 
-  let a_mixs''',add_token = tokenify env a_mixs'' ast_rule.add_token in
-  let a_mixs,rm_token = tokenify env a_mixs''' ast_rule.rm_token in
+  let domain''',a_mixs''',add_token =
+    tokenify env domain'' a_mixs'' ast_rule.add_token in
+  let a_domain,a_mixs,rm_token =
+    tokenify env domain''' a_mixs''' ast_rule.rm_token in
   let r_id = Mixture.get_id lhs in
   let env = if Mixture.is_empty lhs
 	    then Environment.declare_empty_lhs r_id env
@@ -467,9 +474,8 @@ let rule_of_ast ?(backwards=false) ~is_pert env (contact_map,cc_env as cc_stuff)
 	  cc_id := !cc_id+1 ;
 	done ; !ptr_env)
   in
-  let (env,(cc_map,cc_env),mixs') =
-    mixtures_of_result mixs env cc_stuff a_mixs in
-  (env,(cc_map,cc_env),mixs',
+  let (env,domain',mixs') = mixtures_of_result mixs env a_domain a_mixs in
+  (env,domain',mixs',
    {
      Primitives.add_token = add_token ;
      Primitives.rm_token = rm_token ;
@@ -526,74 +532,80 @@ let rules_of_result env cc_env mixs res =
       (env, cc_env, mixs, []) res.Ast.rules
   in (env, cc_env, mixs, (List.rev l))
 
-let obs_of_result env cc_env mixs res =
-  let (a_mixs,cont) =
+let obs_of_result env domain mixs res =
+  let (domain',a_mixs,cont) =
     List.fold_left
-      (fun (a_mixs,cont) alg_expr ->
-       let (a_mixs',(alg,_pos)) =
+      (fun (domain,a_mixs,cont) alg_expr ->
+       let (domain',a_mixs',(alg,_pos)) =
 	 Expr.compile_alg env.Environment.algs.NamedDecls.finder
 			  env.Environment.tokens.NamedDecls.finder
+			  env.Environment.contact_map domain
 			  a_mixs alg_expr in
-       a_mixs',
+       domain',a_mixs',
        (alg,Format.asprintf "%a" Expr.print_ast_alg (fst alg_expr)) :: cont
       )
-      ((env.Environment.fresh_kappa,[]),[]) res.observables in
-  let (env',cc_env',mixs') = mixtures_of_result mixs env cc_env a_mixs in
-  (env',cc_env',mixs',cont)
+      (domain,(env.Environment.fresh_kappa,[]),[]) res.observables in
+  let (env',domain'',mixs') = mixtures_of_result mixs env domain' a_mixs in
+  (env',domain'',mixs',cont)
 
-let compile_print_expr env mixs ex =
+let compile_print_expr env domain mixs ex =
   List.fold_right
-    (fun (el,pos) (mixs,out) ->
+    (fun (el,pos) (domain,mixs,out) ->
      match el with
-     | Ast.Str_pexpr s -> (mixs,(Ast.Str_pexpr s,pos)::out)
+     | Ast.Str_pexpr s -> (domain,mixs,(Ast.Str_pexpr s,pos)::out)
      | Ast.Alg_pexpr ast_alg ->
-	let (mixs', (alg,_pos)) =
+	let (domain',mixs', (alg,_pos)) =
 	  Expr.compile_alg env.Environment.algs.NamedDecls.finder
 			   env.Environment.tokens.NamedDecls.finder
+			   env.Environment.contact_map domain
 			   mixs (ast_alg,pos) in
-	(mixs',(Ast.Alg_pexpr alg,pos)::out))
-    ex (mixs,[])
+	(domain',mixs',(Ast.Alg_pexpr alg,pos)::out))
+    ex (domain,mixs,[])
 
-let effects_of_modif variables lrules env cc_env ast_list =
-  let rec iter mixs lrules rev_effects env cc_env ast_list =
+let effects_of_modif variables lrules env domain ast_list =
+  let rec iter mixs lrules rev_effects env domain ast_list =
     match ast_list with
-    | [] -> (mixs,lrules,List.rev rev_effects,env,cc_env)
+    | [] -> (env,domain,mixs,lrules,List.rev rev_effects)
     | ast::tl ->
-       let (variables,lrules,rev_effects,env,cc_env) =
+       let (env,domain,variables,lrules,rev_effects) =
 	 match ast with
 	 | INTRO (alg_expr, ast_mix, _) ->
-	    let (mix,alg_pos) =
+	    let (domain',mix,alg_pos) =
 	      Expr.compile_alg env.Environment.algs.NamedDecls.finder
 			       env.Environment.tokens.NamedDecls.finder
+			       env.Environment.contact_map domain
 			       (env.Environment.fresh_kappa,[]) alg_expr in
-	    let (env',cc_env',mixs') = mixtures_of_result mixs env cc_env mix in
+	    let (env',domain'',mixs') =
+	      mixtures_of_result mixs env domain' mix in
 	    let ast_rule =
 	      { add_token=[]; rm_token=[]; lhs = []; arrow = Ast.RAR;
-		rhs = ast_mix; k_def=Term.with_dummy_pos (Ast.CONST(Nbr.F 0.0));
+		rhs = ast_mix; k_def=Term.with_dummy_pos (Ast.CONST Nbr.zero);
 		k_un=None;k_op=None;
 	      } in
-	    let env,cc_env,mixs'',rule =
-	      rule_of_ast ~is_pert:true env' cc_env' mixs'
+	    let env,domain,mixs'',rule =
+	      rule_of_ast ~is_pert:true env' domain'' mixs'
 			  (None, Term.with_dummy_pos ast_rule) in
-	     (mixs'',rule::lrules,
-		(Primitives.ITER_RULE (alg_pos, rule))::rev_effects, env,cc_env)
+	     (env,domain,mixs'',rule::lrules,
+		(Primitives.ITER_RULE (alg_pos, rule))::rev_effects)
 	 | DELETE (alg_expr, ast_mix, pos) ->
-	    let (mix,alg_pos) =
+	    let (domain',mix,alg_pos) =
 	      Expr.compile_alg env.Environment.algs.NamedDecls.finder
 			       env.Environment.tokens.NamedDecls.finder
+			       env.Environment.contact_map domain
 			       (env.Environment.fresh_kappa,[]) alg_expr in
-	    let (env',cc_env',mixs') = mixtures_of_result mixs env cc_env mix in
+	    let (env',domain'',mixs') =
+	      mixtures_of_result mixs env domain' mix in
 	    let ast_rule =
 	      { add_token=[]; rm_token=[]; lhs = ast_mix; arrow = Ast.RAR;
 		rhs = [];
-		k_def=Term.with_dummy_pos (Ast.CONST(Nbr.F 0.0));
+		k_def=Term.with_dummy_pos (Ast.CONST Nbr.zero);
 		k_un=None;k_op=None;
 	      } in
-	    let env,cc_env,mixs'',rule =
-	      rule_of_ast ~is_pert:true env' cc_env' mixs'
+	    let env,domain,mixs'',rule =
+	      rule_of_ast ~is_pert:true env' domain'' mixs'
 			  (None,Term.with_dummy_pos ast_rule) in
-	    (mixs'',rule::lrules,
-	     (Primitives.ITER_RULE (alg_pos, rule))::rev_effects, env, cc_env)
+	    (env, domain, mixs'',rule::lrules,
+	     (Primitives.ITER_RULE (alg_pos, rule))::rev_effects)
 	 | UPDATE ((nme, pos_rule), alg_expr) ->
 	    let i,is_rule =
 	      (try (Environment.num_of_rule nme env,true)
@@ -606,14 +618,16 @@ let effects_of_modif variables lrules env cc_env ast_list =
 			     ("Variable " ^ (nme ^ " is neither a constant nor a rule")
 			     ,pos_rule))
 	      ) in
-	    let (mix, alg_pos) =
+	    let (domain', mix, alg_pos) =
 	      Expr.compile_alg env.Environment.algs.NamedDecls.finder
 			       env.Environment.tokens.NamedDecls.finder
+			       env.Environment.contact_map domain
 			       (env.Environment.fresh_kappa,[]) alg_expr in
-	    let (env',cc_env',mixs') = mixtures_of_result mixs env cc_env mix in
-	    (mixs',lrules,
+	    let (env',domain'',mixs') =
+	      mixtures_of_result mixs env domain' mix in
+	    (env',domain'',mixs',lrules,
 	     (Primitives.UPDATE ((if is_rule then Term.RULE i
-	      else Term.ALG i), alg_pos))::rev_effects, env', cc_env')
+	      else Term.ALG i), alg_pos))::rev_effects)
 	 | UPDATE_TOK ((tk_nme,tk_pos),alg_expr) ->
 	    let tk_id =
 	      try Environment.num_of_token tk_nme env with
@@ -621,96 +635,112 @@ let effects_of_modif variables lrules env cc_env ast_list =
 		 raise (ExceptionDefn.Malformed_Decl
 			  ("Token " ^ (tk_nme ^ " is not defined"),tk_pos))
 	    in
-	    let (mix, alg_pos) =
+	    let (domain', mix, alg_pos) =
 	      Expr.compile_alg env.Environment.algs.NamedDecls.finder
 			       env.Environment.tokens.NamedDecls.finder
+			       env.Environment.contact_map domain
 			       (env.Environment.fresh_kappa,[]) alg_expr in
-	    let (env',cc_env',mixs') = mixtures_of_result mixs env cc_env mix in
-	    (mixs',lrules,
-	     (Primitives.UPDATE (Term.TOK tk_id, alg_pos))::rev_effects,
-	     env',cc_env')
+	    let (env',domain'',mixs') =
+	      mixtures_of_result mixs env domain' mix in
+	    (env',domain'',mixs',lrules,
+	     (Primitives.UPDATE (Term.TOK tk_id, alg_pos))::rev_effects)
 	 | SNAPSHOT (pexpr,_) ->
-	    let (mix,pexpr') =
-	      compile_print_expr env (env.Environment.fresh_kappa,[]) pexpr in
-	    let (env',cc_env',mixs') = mixtures_of_result mixs env cc_env mix in
+	    let (domain',mix,pexpr') =
+	      compile_print_expr env domain
+				 (env.Environment.fresh_kappa,[]) pexpr in
+	    let (env',domain'',mixs') =
+	      mixtures_of_result mixs env domain' mix in
 	    (*when specializing snapshots to particular mixtures, add variables below*)
-	    (mixs', lrules,
-	     (Primitives.SNAPSHOT pexpr')::rev_effects, env',cc_env')
+	    (env',domain'',mixs', lrules,
+	     (Primitives.SNAPSHOT pexpr')::rev_effects)
 	 | STOP (pexpr,_) ->
-	    let (mix,pexpr') =
-	      compile_print_expr env (env.Environment.fresh_kappa,[]) pexpr in
-	    let (env',cc_env',mixs') = mixtures_of_result mixs env cc_env mix in
-	    (mixs', lrules,
-	     (Primitives.STOP pexpr')::rev_effects, env',cc_env')
+	    let (domain',mix,pexpr') =
+	      compile_print_expr env domain
+				 (env.Environment.fresh_kappa,[]) pexpr in
+	    let (env',domain'',mixs') =
+	      mixtures_of_result mixs env domain' mix in
+	    (env',domain'',mixs', lrules,
+	     (Primitives.STOP pexpr')::rev_effects)
 	 | CFLOW ((lab,pos_lab),_) ->
 	    let id =
 	      try Environment.num_of_rule lab env
 	      with Not_found ->
 		try let var = Environment.num_of_alg lab env in
 		    match env.Environment.algs.NamedDecls.decls.(var) with
-		    |(_,(Expr.KAPPA_INSTANCE i,_)) -> i
-		    | _ -> raise Not_found
+		    |(_,(Expr.KAPPA_INSTANCE (i,_),_)) -> i
+		    | (_,((Expr.CONST _ | Expr.BIN_ALG_OP _ | Expr.TOKEN_ID _ |
+			   Expr.STATE_ALG_OP _ | Expr.UN_ALG_OP _ |
+			   Expr.ALG_VAR _),_)) -> raise Not_found
 		with Not_found ->
 		  raise	(ExceptionDefn.Malformed_Decl
 			   ("Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"
 			   ,pos_lab))
 	    in
-	    (mixs, lrules,
-	     (Primitives.CFLOW id)::rev_effects, env, cc_env)
+	    (env,domain,mixs, lrules,
+	     (Primitives.CFLOW id)::rev_effects)
 	 | CFLOWOFF ((lab,pos_lab),_) ->
 	    let id =
 	      try Environment.num_of_rule lab env
 	      with Not_found ->
 		try let var = Environment.num_of_alg lab env in
 		    match env.Environment.algs.NamedDecls.decls.(var) with
-		    |(_,(Expr.KAPPA_INSTANCE i,_)) -> i
-		    | _ -> raise Not_found
+		    |(_,(Expr.KAPPA_INSTANCE (i,_),_)) -> i
+		    | (_,((Expr.CONST _ | Expr.BIN_ALG_OP _ | Expr.TOKEN_ID _ |
+			   Expr.STATE_ALG_OP _ | Expr.UN_ALG_OP _ |
+			   Expr.ALG_VAR _),_)) -> raise Not_found
 		with Not_found ->
 		  raise	(ExceptionDefn.Malformed_Decl
 			   ("Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"
 			   ,pos_lab))
 	    in
-	    (mixs, lrules,
-	     (Primitives.CFLOWOFF id)::rev_effects, env, cc_env)
+	    (env,domain,mixs, lrules,
+	     (Primitives.CFLOWOFF id)::rev_effects)
 	 | FLUX (pexpr,_) ->
-	    let (mix,pexpr') =
-	      compile_print_expr env (env.Environment.fresh_kappa,[]) pexpr in
-	    let (env',cc_env',mixs') = mixtures_of_result mixs env cc_env mix in
-	    (mixs', lrules,
-	     (Primitives.FLUX pexpr')::rev_effects, env', cc_env')
+	    let (domain',mix,pexpr') =
+	      compile_print_expr env domain
+				 (env.Environment.fresh_kappa,[]) pexpr in
+	    let (env',domain'',mixs') =
+	      mixtures_of_result mixs env domain' mix in
+	    (env',domain'',mixs', lrules,
+	     (Primitives.FLUX pexpr')::rev_effects)
 	 | FLUXOFF (pexpr,_) ->
-	    let (mix,pexpr') =
-	      compile_print_expr env (env.Environment.fresh_kappa,[]) pexpr in
-	    let (env',cc_env',mixs') = mixtures_of_result mixs env cc_env mix in
-	    (mixs', lrules,
-	     (Primitives.FLUXOFF pexpr')::rev_effects, env', cc_env')
+	    let (domain',mix,pexpr') =
+	      compile_print_expr env domain
+				 (env.Environment.fresh_kappa,[]) pexpr in
+	    let (env',domain'',mixs') =
+	      mixtures_of_result mixs env domain' mix in
+	    (env',domain'',mixs', lrules,
+	     (Primitives.FLUXOFF pexpr')::rev_effects)
 	 | PRINT (pexpr,print,_) ->
-	    let (mix,pexpr') =
-	      compile_print_expr env (env.Environment.fresh_kappa,[]) pexpr in
-	    let (mix',print') = compile_print_expr env mix print in
-	    let (env',cc_env', mixs') =
-	      mixtures_of_result mixs env cc_env mix' in
-	    (mixs',lrules,
-	     (Primitives.PRINT (pexpr',print'))::rev_effects,
-	     env',cc_env')
+	    let (domain',mix,pexpr') =
+	      compile_print_expr env domain
+				 (env.Environment.fresh_kappa,[]) pexpr in
+	    let (domain'',mix',print') =
+	      compile_print_expr env domain' mix print in
+	    let (env',domain''', mixs') =
+	      mixtures_of_result mixs env domain'' mix' in
+	    (env',domain''',mixs',lrules,
+	     (Primitives.PRINT (pexpr',print'))::rev_effects)
 	 | PLOTENTRY ->
-	    (mixs, lrules,
-	     (Primitives.PLOTENTRY)::rev_effects, env, cc_env)
+	    (env,domain,mixs, lrules,
+	     (Primitives.PLOTENTRY)::rev_effects)
        in
-       iter variables lrules rev_effects env cc_env tl
+       iter variables lrules rev_effects env domain tl
   in
-  iter variables lrules [] env cc_env ast_list
+  iter variables lrules [] env domain ast_list
 
-let pert_of_result variables env cc_env rules res =
-  let (variables, _, lpert, lrules, env, cc_env) =
+let pert_of_result variables env domain rules res =
+  let (env, domain, variables, _, lpert, lrules) =
     List.fold_left
-      (fun (variables, p_id, lpert, lrules, env, cc_env)
+      (fun (env, domain, variables, p_id, lpert, lrules)
 	   ((pre_expr, modif_expr_list, opt_post),pos) ->
-       let (mix,(pre,_pos)) =
+       let (domain',mix,(pre,_pos)) =
 	 Expr.compile_bool env.Environment.algs.NamedDecls.finder
 			   env.Environment.tokens.NamedDecls.finder
+			   env.Environment.contact_map domain
 			   (env.Environment.fresh_kappa,[]) pre_expr in
-       let (env', cc_env', variables') = mixtures_of_result variables env cc_env mix in
+       let (env', domain'', variables') =
+	 mixtures_of_result variables env domain' mix in
        let (dep, stopping_time) = try Expr.deps_of_bool_expr pre
 		 with ExceptionDefn.Unsatisfiable ->
 		   raise
@@ -718,18 +748,20 @@ let pert_of_result variables env cc_env rules res =
 			("Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"
 			,pos))
        in
-       let (variables, lrules', effects, env, cc_env) =
-	 effects_of_modif variables' lrules env' cc_env' modif_expr_list in
-       let env,cc_env,variables,opt_abort =
+       let (env,domain,variables, lrules', effects) =
+	 effects_of_modif variables' lrules env' domain'' modif_expr_list in
+       let env,domain,variables,opt_abort =
 	 match opt_post with
 	 | None ->
-	    (env,cc_env,variables,None)
+	    (env,domain,variables,None)
 	 | Some post_expr ->
-	    let (mix,(post,_pos)) =
+	    let (domain',mix,(post,_pos)) =
 	      Expr.compile_bool env.Environment.algs.NamedDecls.finder
 				env.Environment.tokens.NamedDecls.finder
+				env.Environment.contact_map domain
 				(env.Environment.fresh_kappa,[]) post_expr in
-	    let (env', cc_env', variables') = mixtures_of_result variables env cc_env mix in
+	    let (env', domain'', variables') =
+	      mixtures_of_result variables env domain' mix in
 	    let (dep,stopping_time') =
 	      try Expr.deps_of_bool_expr post with
 		ExceptionDefn.Unsatisfiable ->
@@ -738,13 +770,17 @@ let pert_of_result variables env cc_env rules res =
 		     ("Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"
 		     ,pos))
 	    in
-	    (env',cc_env',variables',Some (post,dep))
+	    (env',domain'',variables',Some (post,dep))
        in
        let has_tracking = env.Environment.tracking_enabled
 			  || List.exists
 			       (function
 				 | Primitives.CFLOW _ -> true
-				 | _ -> false) effects in
+				 | (Primitives.CFLOWOFF _ | Primitives.PRINT _ |
+				    Primitives.UPDATE _ | Primitives.SNAPSHOT _
+				    | Primitives.FLUX _ | Primitives.FLUXOFF _ |
+				    Primitives.PLOTENTRY | Primitives.STOP _ |
+				    Primitives.ITER_RULE _) -> false) effects in
        let env =
 	 Term.DepSet.fold
 	   (fun dep -> Environment.add_dependencies dep (Term.PERT p_id))
@@ -771,9 +807,9 @@ let pert_of_result variables env cc_env rules res =
 	   Primitives.stopping_time = stopping_time
 	 }
        in
-       (variables, succ p_id, pert::lpert, lrules', env, cc_env)
+       (env, domain, variables, succ p_id, pert::lpert, lrules')
       )
-      (variables, 0, [], rules, env, cc_env) res.perturbations
+      (env, domain, variables, 0, [], rules) res.perturbations
   in
   (*making sure that perturbations containing a stopping time precondition are tested first*)
   let lpert = List.rev lpert in
@@ -782,37 +818,36 @@ let pert_of_result variables env cc_env rules res =
   let lpert_stopping_time = List.filter pred lpert in
   let lpert_ineq = List.filter (fun p -> not (pred p)) lpert in
   let lpert = lpert_stopping_time@lpert_ineq in
-  (variables, lpert, lrules, env, cc_env)
+  (env, domain, variables, lpert, lrules)
 
-let init_graph_of_result counter env contact_map cc_env res =
+let init_graph_of_result counter env domain res =
   let n = Array.length env.Environment.tokens.NamedDecls.decls in
   let token_vector = Array.init n (fun _ -> 0.) in
-  let cc_env',init_state,sg =
+  let domain',init_state,sg =
     List.fold_left
-      (fun (cc_env,state,sg) (opt_vol,init_t,_) -> (*TODO dealing with volumes*)
+      (fun (domain,state,sg) (opt_vol,init_t,_) -> (*TODO dealing with volumes*)
        match init_t with
        | INIT_MIX (alg, ast) ->
-	  let (_,alg') =
+	  let (domain',_,alg') =
 	    Expr.compile_alg env.Environment.algs.NamedDecls.finder
-			     env.Environment.tokens.NamedDecls.finder (0,[]) alg
-	  in
+			     env.Environment.tokens.NamedDecls.finder
+			     env.Environment.contact_map domain (0,[]) alg in
 	  let value = initial_value_alg counter env alg' in
 	  let fake_rule =
 	    { lhs = []; rm_token = []; arrow = RAR; rhs = ast; add_token = [];
 	      k_def = Term.with_dummy_pos (CONST Nbr.zero);
 	      k_un = None; k_op = None; } in
-	  let cc_env',state' =
+	  let domain'',state' =
 	    match
-	      newrules_of_ast
-		contact_map env cc_env (0,[]) (Term.with_dummy_pos fake_rule)
+	      newrules_of_ast env domain' (0,[]) (Term.with_dummy_pos fake_rule)
 	    with
-	    | cc_env',_,[ compiled_rule ] ->
-	       cc_env',
+	    | domain'',_,[ compiled_rule ] ->
+	       domain'',
 	       Nbr.iteri
-		 (fun _ s -> Domain.apply_rule cc_env' s compiled_rule)
+		 (fun _ s -> Domain.apply_rule domain'' s compiled_rule)
 		 state value
-	    | cc_env',_,[] -> cc_env',state
-	    | cc_env',_,_ -> cc_env',state in
+	    | domain'',_,[] -> domain'',state
+	    | domain'',_,_ -> (* TODO error *) domain'',state in
 	  let cpt = ref 0 in
 	  let sg = ref sg in
 	  let n = match !Parameter.rescale with
@@ -826,11 +861,12 @@ let init_graph_of_result counter env contact_map cc_env res =
 	    sg := Graph.SiteGraph.add_nodes !sg nodes;
 	    cpt := !cpt + 1
 	  done;
-	  cc_env',state',!sg
+	  domain'',state',!sg
        | INIT_TOK (alg, (tk_nme,pos_tk)) ->
-	  let (_,alg') =
+	  let (domain',_,alg') =
 	    Expr.compile_alg env.Environment.algs.NamedDecls.finder
-			     env.Environment.tokens.NamedDecls.finder (0,[]) alg
+			     env.Environment.tokens.NamedDecls.finder
+			     env.Environment.contact_map domain (0,[]) alg
 	  in
 	  let value = Nbr.to_float (initial_value_alg counter env alg') in
 	  let tok_id =
@@ -840,12 +876,12 @@ let init_graph_of_result counter env contact_map cc_env res =
 		       ("token "^tk_nme^" is undeclared",pos_tk))
 	  in
 	  token_vector.(tok_id) <- value;
-	  cc_env,state,sg
-      )	(cc_env,Domain.empty env.Environment.tokens,
+	  domain',state,sg
+      )	(domain,Domain.empty env.Environment.tokens,
 	 Graph.SiteGraph.init !Parameter.defaultGraphSize)
       res.Ast.init
   in
-  (cc_env',init_state,sg,token_vector)
+  (domain',init_state,sg,token_vector)
 
 let configurations_of_result result =
   let raw_set_value pos_p param value_list f =
@@ -983,6 +1019,11 @@ let initialize logger overwrite result =
   let tk_nd =
     NamedDecls.create (array_map_of_list (fun x -> (x,())) result.Ast.tokens) in
 
+  let pre_kasa_state = Export_to_KaSim.Export_to_KaSim.init result in
+  let kasa_state,contact_map =
+    Export_to_KaSim.Export_to_KaSim.get_contact_map pre_kasa_state in
+  let domain = Connected_component.Env.empty sigs_nd in
+
   Debug.tag logger "\t -variable declarations";
   let alg_vars_over =
     Tools.list_rev_map_append
@@ -993,40 +1034,38 @@ let initialize logger overwrite result =
 	  List.for_all (fun (x',_) -> x <> x') overwrite)
 	 result.Ast.variables) in
   let vars_nd = NamedDecls.create (Array.of_list alg_vars_over) in
-  let (fresh_kappa,_ as mixs),alg_a =
-    array_fold_left_mapi (fun i mixs ((label,_ as lbl_pos),ast) ->
-			  let (mixs',alg) =
+  let (domain',(fresh_kappa,_ as mixs)),alg_a =
+    array_fold_left_mapi (fun i (domain,mixs) ((label,_ as lbl_pos),ast) ->
+			  let (domain',mixs',alg) =
 			    Expr.compile_alg ~label vars_nd.NamedDecls.finder
-					     tk_nd.NamedDecls.finder mixs
-					     ~max_allowed_var:(pred i) ast
-			  in (mixs',(lbl_pos,alg))) (0,[])
+					     tk_nd.NamedDecls.finder
+					     ~max_allowed_var:(pred i)
+					     contact_map domain mixs
+					     ast
+			  in ((domain',mixs'),(lbl_pos,alg))) (domain,(0,[]))
 			 vars_nd.NamedDecls.decls
   in
-  let pre_kasa_state = Export_to_KaSim.Export_to_KaSim.init result in
-  let kasa_state,contact_map =
-    Export_to_KaSim.Export_to_KaSim.get_contact_map pre_kasa_state in
-  let domain = Connected_component.Env.empty sigs_nd in
 
   let env =
-    Environment.init sigs_nd tk_nd (NamedDecls.create alg_a) fresh_kappa in
-  let (env, (_,domain), kappa_vars) =
-    variables_of_result env (contact_map,domain) mixs alg_a in
+    Environment.init sigs_nd contact_map tk_nd
+		     (NamedDecls.create alg_a) fresh_kappa in
+  let (env, domain, kappa_vars) =
+    variables_of_result env domain' mixs alg_a in
 
   Debug.tag logger "\t -rules";
-  let (env, (_,domain), kappa_vars, pure_rules) =
-    rules_of_result env (contact_map,domain) kappa_vars result in
+  let (env, domain, kappa_vars, pure_rules) =
+    rules_of_result env domain kappa_vars result in
 
   Debug.tag logger "\t -observables";
-  let env,(_,domain),kappa_vars,observables =
-    obs_of_result env (contact_map,domain) kappa_vars result in
+  let env,domain,kappa_vars,observables =
+    obs_of_result env domain kappa_vars result in
   Debug.tag logger "\t -perturbations" ;
-  let (kappa_vars, pert, rules, env, (_,domain)) =
-    pert_of_result kappa_vars env (contact_map,domain)
-		   pure_rules result in
+  let (env, domain, kappa_vars, pert, rules) =
+    pert_of_result kappa_vars env domain pure_rules result in
 
   Debug.tag logger "\t -initial conditions";
   let domain,state,sg,token_vector =
-    init_graph_of_result counter env contact_map domain result in
+    init_graph_of_result counter env domain result in
 
   Debug.tag logger "\t Done";
   Debug.tag logger "+ Analyzing non local patterns..." ;

@@ -36,7 +36,7 @@ type a. Counter.t -> ?time:float -> get_alg:(int -> Expr.alg_expr) ->
     | Expr.ALG_VAR i ->
        exec_alg counter ?time ~get_alg ~get_mix ~get_tok with_value
 		(get_alg i) sk
-    | Expr.KAPPA_INSTANCE i ->
+    | Expr.KAPPA_INSTANCE (i,_) ->
        with_value counter ?time ~get_alg ~get_mix ~get_tok
 		  (get_mix i) sk
     | Expr.TOKEN_ID i ->

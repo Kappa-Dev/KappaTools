@@ -3,6 +3,8 @@ open ExceptionDefn
 
 type t = {
   signatures : Signature.s;
+  contact_map :
+    (string list * (string * string) list) Export_to_KaSim.String2Map.t;
   tokens : unit NamedDecls.t;
   algs : (Expr.alg_expr Term.with_pos) NamedDecls.t;
   perturbations : unit NamedDecls.t;
@@ -35,7 +37,8 @@ type t = {
 }
 
 let empty =
-	{signatures = Signature.create [] ;
+  {signatures = Signature.create [] ;
+   contact_map = Export_to_KaSim.String2Map.empty;
 	num_of_kappa = StringMap.empty ; 
 	kappa_of_num = IntMap.empty ;
 	num_of_rule = StringMap.empty ;
@@ -59,8 +62,9 @@ let empty =
 	desc_table = Hashtbl.create 2 
 }
 
-let init sigs tokens algs fresh_kappa =
+let init sigs contact_map tokens algs fresh_kappa =
   { empty with signatures = sigs; tokens = tokens;
+	       contact_map = contact_map;
 	       algs = algs; fresh_kappa = fresh_kappa }
 
 let get_desc file env =

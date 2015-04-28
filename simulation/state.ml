@@ -182,7 +182,7 @@ let instances_of_square ?(disjoint=false) mix_id radius_def state env =
 		) [] embeddings 
 
 let value_bool state counter ?time env expr =
-  Expr_vm.value_bool
+  Expr_interpreter.value_bool
     counter ?time
     ~get_alg:(fun i ->
 	      match state.alg_variables.(i) with
@@ -192,7 +192,7 @@ let value_bool state counter ?time env expr =
     ~get_tok:(fun i -> Nbr.F (state.token_vector.(i)))
     expr
 let value_alg state counter ?time env alg =
-  Expr_vm.value_alg
+  Expr_interpreter.value_alg
     counter ?time
     ~get_alg:(fun i ->
 	      match state.alg_variables.(i) with
