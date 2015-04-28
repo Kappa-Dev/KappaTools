@@ -30,6 +30,17 @@ sig
   val to_int : t -> int
 end
 
+type elementary_rule = {
+  rate : Expr.alg_expr;
+  (** must be [something] * |cc1| * |cc2| * ... * |ccn|
+      for connected_components = [cc1; cc2; ... ; ccn] *)
+  connected_components : Connected_component.t list;
+  removed : Transformations.t list;
+  inserted : Transformations.t list;
+  consumed_tokens : (Expr.alg_expr * int) list;
+  injected_tokens : (Expr.alg_expr * int) list;
+}
+
 type rule = {
   k_def : Expr.alg_expr; (** standard kinetic constant *)
   k_alt : Expr.alg_expr option * Expr.alg_expr option;
@@ -38,8 +49,6 @@ type rule = {
   (** Boosted kinetic rate for Bologna technique *)
   script : action list;
   balance : (int * int * int);	(** #deleted,#preserved,#removed *)
-  rule_mixtures :
-    (Connected_component.cc list * (Transformations.t list * Transformations.t list)) list;
   lhs : Mixture.t;
   rhs : Mixture.t;
   r_id : int;

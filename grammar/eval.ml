@@ -18,10 +18,14 @@ let eval_intf ast_intf =
        if StringMap.mem (fst p.Ast.port_nme) map then
 	 raise
 	   (ExceptionDefn.Malformed_Decl
-	      ("Site '" ^ (fst p.Ast.port_nme) ^ "' is used multiple times",snd p.Ast.port_nme))
+	      ("Site '" ^ (fst p.Ast.port_nme) ^ "' is used multiple times",
+	       snd p.Ast.port_nme))
        else
 	 iter ast_interface
-	      (StringMap.add (fst p.Ast.port_nme) (int_state_list, lnk_state, (snd p.Ast.port_nme)) map)
+	      (StringMap.add
+		 (fst p.Ast.port_nme)
+		 (int_state_list, lnk_state, (snd p.Ast.port_nme))
+		 map)
     | [] ->
        StringMap.add
 	 "_" ([], Term.with_dummy_pos Ast.FREE,(Lexing.dummy_pos,Lexing.dummy_pos)) map
@@ -180,7 +184,9 @@ let eval_agent env a ctxt =
 	     in
 	     let ag_num =
 	       Environment.num_of_name (Term.with_dummy_pos ag_nm) env in
-	     ((IntMap.add site_id (int_s, Mixture.TYPE (site_num, ag_num)) interface),ctxt)
+	     ((IntMap.add
+		 site_id (int_s, Mixture.TYPE (site_num, ag_num)) interface),
+	      ctxt)
 	    )
        in
        (interface,ctx)
@@ -207,7 +213,8 @@ let mixture_of_ast ?mix_id env (contact_map,cc_env) ast_mix =
        in (ctxt, (Mixture.compose id agent mixture new_edges), env)
     | [] -> (ctxt, mixture, env)
   in
-  let ctxt = { pairing = IntMap.empty; curr_id = 0; new_edges = Int2Map.empty; } in
+  let ctxt =
+    { pairing = IntMap.empty; curr_id = 0; new_edges = Int2Map.empty; } in
   let (ctxt, mix, env) = eval_mixture env ast_mix ctxt (Mixture.empty mix_id)
   in
   begin
@@ -267,6 +274,56 @@ let reduce_val v env a_mixs =
   let dep = Expr.deps_of_alg_expr alg in
   (mixs',alg,dep)
 
+let tokenify env mixs l =
+  List.fold_right
+    (fun (alg_expr,(nme,pos)) (mixs,out) ->
+     let id =
+       try Environment.num_of_token nme env
+       with Not_found ->
+	 raise (ExceptionDefn.Malformed_Decl
+		  ("Token "^nme^" is undefined",pos))
+     in
+     let (mixs',(alg,_pos)) =
+       Expr.compile_alg env.Environment.algs.NamedDecls.finder
+			env.Environment.tokens.NamedDecls.finder
+			mixs alg_expr in
+     (mixs',(alg,id)::out)
+    ) l (mixs,[])
+
+let newrules_of_ast contact_map env domain mixs (ast_rule,rule_pos) =
+  let mixs',rm_toks = tokenify env mixs ast_rule.rm_token in
+  let mixs'',add_toks = tokenify env mixs' ast_rule.add_token in
+  let one_side (domain,a_mixs,acc) rate lhs rhs rm add =
+    let a_mixs',(crate,_) =
+      Expr.compile_alg env.Environment.algs.NamedDecls.finder
+		       env.Environment.tokens.NamedDecls.finder
+		       a_mixs rate in
+    let domain',rule_mixtures =
+      Snip.connected_components_sum_of_ambiguous_rule
+	contact_map domain lhs rhs in
+    domain',a_mixs',
+    List.fold_left
+      (fun out (ccs,(neg,pos)) ->
+       {
+	 Primitives.rate = crate;
+	 Primitives.connected_components = ccs;
+	 Primitives.removed = neg;
+	 Primitives.inserted = pos;
+	 Primitives.consumed_tokens = rm;
+	 Primitives.injected_tokens = add;
+       }::out) acc rule_mixtures in
+  let rev = match ast_rule.arrow, ast_rule.k_op with
+    | RAR, None -> domain,mixs'',[]
+    | LRAR, Some rate ->
+       one_side (domain,mixs'',[]) rate ast_rule.rhs ast_rule.lhs add_toks rm_toks
+    | (RAR, Some _ | LRAR, None) ->
+       raise
+	 (ExceptionDefn.Malformed_Decl
+	    ("Incompatible arrow and kinectic rate for inverse definition",
+	     rule_pos))
+  in
+  one_side rev ast_rule.k_def ast_rule.lhs ast_rule.rhs rm_toks add_toks
+
 let rule_of_ast ?(backwards=false) ~is_pert env (contact_map,cc_env as cc_stuff)
 		mixs (ast_rule_label,(ast_rule,rule_pos)) =
   let ast_rule_label,ast_rule =
@@ -302,23 +359,6 @@ let rule_of_ast ?(backwards=false) ~is_pert env (contact_map,cc_env as cc_stuff)
   let (script, balance,added,modif_sites(*,side_effects*)) =
     Dynamics.diff rule_pos lhs rhs env in
 
-  let tokenify env mixs l =
-    List.fold_right
-      (fun (alg_expr,(nme,pos)) (mixs,out) ->
-       let id =
-	 try Environment.num_of_token nme env
-	 with Not_found ->
-	   raise (ExceptionDefn.Malformed_Decl
-		    ("Token "^nme^" is undefined",pos))
-       in
-
-       let (mixs',(alg,_pos)) =
-	 Expr.compile_alg env.Environment.algs.NamedDecls.finder
-			  env.Environment.tokens.NamedDecls.finder
-			  mixs alg_expr in
-       (mixs',(alg,id)::out)
-      ) l (mixs,[])
-  in
   let a_mixs''',add_token = tokenify env a_mixs'' ast_rule.add_token in
   let a_mixs,rm_token = tokenify env a_mixs''' ast_rule.rm_token in
   let r_id = Mixture.get_id lhs in
@@ -436,10 +476,7 @@ let rule_of_ast ?(backwards=false) ~is_pert env (contact_map,cc_env as cc_stuff)
   in
   let (env,(cc_map,cc_env),mixs') =
     mixtures_of_result mixs env cc_stuff a_mixs in
-  let cc_env',rule_mixtures =
-    Snip.connected_components_sum_of_ambiguous_rule
-      contact_map cc_env ast_rule.lhs ast_rule.rhs in
-  (env,(cc_map,cc_env'),mixs',
+  (env,(cc_map,cc_env),mixs',
    {
      Primitives.add_token = add_token ;
      Primitives.rm_token = rm_token ;
@@ -448,7 +485,6 @@ let rule_of_ast ?(backwards=false) ~is_pert env (contact_map,cc_env as cc_stuff)
      Primitives.over_sampling = None;
      Primitives.script = script;
      Primitives.balance = balance;
-     Primitives.rule_mixtures = rule_mixtures;
      Primitives.lhs = lhs;
      Primitives.rhs = rhs;
      Primitives.r_id = r_id;
@@ -755,12 +791,12 @@ let pert_of_result variables env cc_env rules res =
   let lpert = lpert_stopping_time@lpert_ineq in
   (variables, lpert, lrules, env, cc_env)
 
-let init_graph_of_result env cc_env res =
+let init_graph_of_result env contact_map cc_env res =
   let n = Array.length env.Environment.tokens.NamedDecls.decls in
   let token_vector = Array.init n (fun _ -> 0.) in
-  let sg =
+  let cc_env',init_state,sg =
     List.fold_left
-      (fun sg (opt_vol,init_t,_) -> (*TODO dealing with volumes*)
+      (fun (cc_env,state,sg) (opt_vol,init_t,_) -> (*TODO dealing with volumes*)
        match init_t with
        | INIT_MIX (alg, ast) ->
 	  let (_,alg') =
@@ -768,6 +804,22 @@ let init_graph_of_result env cc_env res =
 			     env.Environment.tokens.NamedDecls.finder (0,[]) alg
 	  in
 	  let value = initial_value_alg env alg' in
+	  let fake_rule =
+	    { lhs = []; rm_token = []; arrow = RAR; rhs = ast; add_token = [];
+	      k_def = Term.with_dummy_pos (CONST Nbr.zero);
+	      k_un = None; k_op = None; } in
+	  let cc_env',state' =
+	    match
+	      newrules_of_ast
+		contact_map env cc_env (0,[]) (Term.with_dummy_pos fake_rule)
+	    with
+	    | cc_env',_,[ compiled_rule ] ->
+	       cc_env',
+	       Nbr.iteri
+		 (fun _ s -> Domain.apply_rule cc_env' s compiled_rule)
+		 state value
+	    | cc_env',_,[] -> cc_env',state
+	    | cc_env',_,_ -> cc_env',state in
 	  let cpt = ref 0 in
 	  let sg = ref sg in
 	  let n = match !Parameter.rescale with
@@ -781,7 +833,7 @@ let init_graph_of_result env cc_env res =
 	    sg := Graph.SiteGraph.add_nodes !sg nodes;
 	    cpt := !cpt + 1
 	  done;
-	  !sg
+	  cc_env',state',!sg
        | INIT_TOK (alg, (tk_nme,pos_tk)) ->
 	  let (_,alg') =
 	    Expr.compile_alg env.Environment.algs.NamedDecls.finder
@@ -795,10 +847,12 @@ let init_graph_of_result env cc_env res =
 		       ("token "^tk_nme^" is undeclared",pos_tk))
 	  in
 	  token_vector.(tok_id) <- value;
-	  sg
-      )	(Graph.SiteGraph.init !Parameter.defaultGraphSize) res.Ast.init
+	  cc_env,state,sg
+      )	(cc_env,Domain.empty env.Environment.tokens,
+	 Graph.SiteGraph.init !Parameter.defaultGraphSize)
+      res.Ast.init
   in
-  (cc_env,Domain.empty,sg,token_vector)
+  (cc_env',init_state,sg,token_vector)
 
 let configurations_of_result result =
   let raw_set_value pos_p param value_list f =
@@ -974,7 +1028,8 @@ let initialize logger overwrite result =
 		   pure_rules result in
 
   Debug.tag logger "\t -initial conditions";
-  let domain,state,sg,token_vector = init_graph_of_result env domain result in
+  let domain,state,sg,token_vector =
+    init_graph_of_result env contact_map domain result in
 
   Debug.tag logger "\t Done";
   Debug.tag logger "+ Analyzing non local patterns..." ;

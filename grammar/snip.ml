@@ -799,4 +799,6 @@ let connected_components_sum_of_ambiguous_rule contact_map env lhs rhs =
   (env',rules')
 
 let connected_components_sum_of_ambiguous_mixture contact_map env mix =
-  connected_components_sum_of_ambiguous_rule contact_map env mix mix
+  let cc_env,rules =
+    connected_components_sum_of_ambiguous_rule contact_map env mix mix in
+  (cc_env, List.map fst rules)

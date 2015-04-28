@@ -92,6 +92,7 @@ let to_int n =
   | I x -> x
   | I64 x -> Int64.to_int x (*Might exceed thebiggest 32 bits integer*)
 
+let zero = I 0
 let is_zero = function
   | I64 x -> x = Int64.zero
   | I x -> x = 0

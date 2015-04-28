@@ -9,13 +9,15 @@ type t =
     {
       roots_of_ccs: RootHeap.t Connected_component.Map.t;
       edges: Edges.t;
+      tokens: Nbr.t array;
       free_id: int;
     }
 
 
-let empty = {
+let empty tokens_sigs = {
   roots_of_ccs = Connected_component.Map.empty;
   edges = Edges.empty;
+  tokens = Array.make (NamedDecls.size tokens_sigs) (Nbr.zero);
   free_id = 1;
 }
 
@@ -79,14 +81,15 @@ let update_edges domain inj_nodes state removed added =
       (fun (inj2graph,edges,roots) transf ->
        deal_transformation true domain inj2graph edges roots transf)
       aux added in
-  { roots_of_ccs = roots'; edges = edges'; free_id = free_id'; }
+  { roots_of_ccs = roots'; edges = edges';
+    tokens = state.tokens; free_id = free_id'; }
 
-let apply_rule domain state (ccs_rule,removed_edges,added_edges) =
+let apply_rule domain state rule =
   let inj =
     List.fold_left
       (fun inj cc ->
        let root =
 	 RootHeap.random (Connected_component.Map.find cc state.roots_of_ccs) in
        Connected_component.Matching.reconstruct domain state.edges inj cc root)
-    Connected_component.Matching.empty ccs_rule in
-  update_edges domain inj state removed_edges added_edges
+    Connected_component.Matching.empty rule.Primitives.connected_components in
+  update_edges domain inj state rule.Primitives.removed rule.Primitives.inserted
