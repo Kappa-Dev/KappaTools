@@ -233,19 +233,12 @@ let mixture_of_ast ?mix_id env (contact_map,cc_env) ast_mix =
     (mix,env,(contact_map,cc_env')) (*Modifies mix as a side effect*)
   end
 
-let rec initial_value_alg env (ast, _) =
-  match ast with
-  | Expr.CONST n -> n
-  | Expr.KAPPA_INSTANCE _ -> Nbr.I 0
-  | Expr.ALG_VAR i ->
-     initial_value_alg
-       env (snd env.Environment.algs.NamedDecls.decls.(i))
-  | Expr.TOKEN_ID _ -> Nbr.F 0.
-  | Expr.STATE_ALG_OP _ -> Nbr.I 0
-  | Expr.BIN_ALG_OP (op,ast, ast') ->
-     Nbr.of_bin_alg_op op (initial_value_alg env ast)
-		       (initial_value_alg env ast')
-  | Expr.UN_ALG_OP (op,ast) -> Nbr.of_un_alg_op op (initial_value_alg env ast)
+let initial_value_alg counter env (ast, _) =
+  Expr_vm.value_alg
+    counter
+    ~get_alg:(fun i ->
+	      fst (snd env.Environment.algs.NamedDecls.decls.(i)))
+    ~get_mix:(fun _ -> Nbr.zero) ~get_tok:(fun _ -> Nbr.zero) ast
 
 let mixtures_of_result c_mixs env cc_env (free_id,mixs) =
   let (env',cc_env',compiled_mixs,final_id) =
@@ -791,7 +784,7 @@ let pert_of_result variables env cc_env rules res =
   let lpert = lpert_stopping_time@lpert_ineq in
   (variables, lpert, lrules, env, cc_env)
 
-let init_graph_of_result env contact_map cc_env res =
+let init_graph_of_result counter env contact_map cc_env res =
   let n = Array.length env.Environment.tokens.NamedDecls.decls in
   let token_vector = Array.init n (fun _ -> 0.) in
   let cc_env',init_state,sg =
@@ -803,7 +796,7 @@ let init_graph_of_result env contact_map cc_env res =
 	    Expr.compile_alg env.Environment.algs.NamedDecls.finder
 			     env.Environment.tokens.NamedDecls.finder (0,[]) alg
 	  in
-	  let value = initial_value_alg env alg' in
+	  let value = initial_value_alg counter env alg' in
 	  let fake_rule =
 	    { lhs = []; rm_token = []; arrow = RAR; rhs = ast; add_token = [];
 	      k_def = Term.with_dummy_pos (CONST Nbr.zero);
@@ -839,7 +832,7 @@ let init_graph_of_result env contact_map cc_env res =
 	    Expr.compile_alg env.Environment.algs.NamedDecls.finder
 			     env.Environment.tokens.NamedDecls.finder (0,[]) alg
 	  in
-	  let value = Nbr.to_float (initial_value_alg env alg') in
+	  let value = Nbr.to_float (initial_value_alg counter env alg') in
 	  let tok_id =
 	    try Environment.num_of_token tk_nme env
 	    with Not_found ->
@@ -976,6 +969,10 @@ let configurations_of_result result =
     ) result.configurations
 
 let initialize logger overwrite result =
+  Debug.tag logger "+ Building initial simulation state...";
+  let counter =
+    Counter.create !Parameter.pointNumberValue
+		   0.0 0 !Parameter.maxTimeValue !Parameter.maxEventValue in
   Debug.tag logger "+ Compiling..." ;
   Debug.tag logger "\t -simulation parameters" ;
   let _ = configurations_of_result result in
@@ -1029,15 +1026,11 @@ let initialize logger overwrite result =
 
   Debug.tag logger "\t -initial conditions";
   let domain,state,sg,token_vector =
-    init_graph_of_result env contact_map domain result in
+    init_graph_of_result counter env contact_map domain result in
 
   Debug.tag logger "\t Done";
   Debug.tag logger "+ Analyzing non local patterns..." ;
   let env = Environment.init_roots_of_nl_rules env in
-  Debug.tag logger "+ Building initial simulation state...";
-  let counter =
-    Counter.create !Parameter.pointNumberValue
-		   0.0 0 !Parameter.maxTimeValue !Parameter.maxEventValue in
   Debug.tag logger "\t -Counting initial local patterns..." ;
   let (state, env) =
     State.initialize logger sg token_vector rules kappa_vars
