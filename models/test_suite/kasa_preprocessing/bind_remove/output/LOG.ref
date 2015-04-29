@@ -133,15 +133,19 @@ Covering_class_id:0:site_type:{0}
 Flow of information in the stochastic semantics:
 Agents:{A; B; C}
 Flow of information in the ODE semantics:
-rule_id:0
-rule_id:1
 * Sites that are modified:
 Flow of information in the ODE semantics:agent_type:0:
 site_type_modified:{0}
 Flow of information in the ODE semantics:agent_type:1:
 site_type_modified:{0; 0}
 * Anchor sites:
+* Anchor sites 2:
 * Internal flow:
-* Internal flow 2:
+Flow of information in the ODE semantics:agent_type:0:
+Flow of information in the ODE semantics:agent_type:1:
+Flow of information in the ODE semantics:agent_type:2:
+Flow of information in the ODE semantics:agent_type:0:
+Flow of information in the ODE semantics:agent_type:1:
+Flow of information in the ODE semantics:agent_type:2:
 * External flow:
 execution finished without any exception

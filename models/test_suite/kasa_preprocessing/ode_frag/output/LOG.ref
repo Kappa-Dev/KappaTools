@@ -356,24 +356,6 @@ Agents:{E; R; Sh; ab}
 Flow of information in the stochastic semantics:agent_type:1:
 site_type:[|0; 1; 1; 3; 4|]
 Flow of information in the ODE semantics:
-rule_id:0
-rule_id:1
-agent_type:1:site:0 -> anchor:1
-agent_type:1:site:0 -> anchor:2
-agent_type:1:site:0 -> anchor:1
-agent_type:1:site:0 -> anchor:2
-rule_id:2
-agent_type:0:site:0 -> anchor:1
-agent_type:1:site:0 -> anchor:1
-agent_type:1:site:0 -> anchor:2
-agent_type:1:site:0 -> anchor:3
-rule_id:3
-agent_type:1:site:0 -> anchor:1
-agent_type:1:site:0 -> anchor:2
-agent_type:1:site:0 -> anchor:3
-agent_type:1:site:0 -> anchor:4
-rule_id:4
-agent_type:2:site:0 -> anchor:1
 * Sites that are modified:
 Flow of information in the ODE semantics:agent_type:0:
 site_type_modified:{1; 0}
@@ -390,20 +372,50 @@ Flow of information in the ODE semantics:agent_type:2:
 site_type_anchor:{0}
 Flow of information in the ODE semantics:agent_type:3:
 site_type_anchor:{0}
-Flow of information in the ODE semantics:agent_type:0:
-site_type_anchor:{1; 0}
+* Anchor sites 2:
 Flow of information in the ODE semantics:agent_type:1:
-site_type_anchor:{4; 1}
+site_type_anchor:{3; 2; 0}
+Flow of information in the ODE semantics:agent_type:2:
+site_type_anchor:{0}
+Flow of information in the ODE semantics:agent_type:3:
+site_type_anchor:{0}
 * Internal flow:
-* Internal flow 2:
+Flow of information in the ODE semantics:agent_type:0:
+- agent_type:0:site:1 -> agent_type:0:modified_type:0
+Flow of information in the ODE semantics:agent_type:1:
+- agent_type:1:site:1 -> agent_type:1:modified_type:0
+- agent_type:1:site:2 -> agent_type:1:modified_type:0
+- agent_type:1:site:3 -> agent_type:1:modified_type:0
+- agent_type:1:site:4 -> agent_type:1:modified_type:0
+- agent_type:1:site:1 -> agent_type:1:modified_type:0
+- agent_type:1:site:2 -> agent_type:1:modified_type:0
+- agent_type:1:site:3 -> agent_type:1:modified_type:0
+- agent_type:1:site:1 -> agent_type:1:modified_type:0
+- agent_type:1:site:2 -> agent_type:1:modified_type:0
+- agent_type:1:site:1 -> agent_type:1:modified_type:0
+- agent_type:1:site:2 -> agent_type:1:modified_type:0
+Flow of information in the ODE semantics:agent_type:2:
+- agent_type:2:site:1 -> agent_type:2:modified_type:0
+Flow of information in the ODE semantics:agent_type:3:
+Flow of information in the ODE semantics:agent_type:0:
+Flow of information in the ODE semantics:agent_type:1:
+- agent_type:1:site:1 -> agent_type:1:anchor_type:0
+- agent_type:1:site:2 -> agent_type:1:anchor_type:0
+- agent_type:1:site:3 -> agent_type:1:anchor_type:0
+- agent_type:1:site:4 -> agent_type:1:anchor_type:0
+- agent_type:1:site:1 -> agent_type:1:anchor_type:0
+- agent_type:1:site:2 -> agent_type:1:anchor_type:0
+- agent_type:1:site:3 -> agent_type:1:anchor_type:0
+- agent_type:1:site:1 -> agent_type:1:anchor_type:0
+- agent_type:1:site:2 -> agent_type:1:anchor_type:0
+- agent_type:1:site:1 -> agent_type:1:anchor_type:0
+- agent_type:1:site:2 -> agent_type:1:anchor_type:0
+Flow of information in the ODE semantics:agent_type:2:
+- agent_type:2:site:1 -> agent_type:2:anchor_type:0
+Flow of information in the ODE semantics:agent_type:3:
 * External flow:
-anchor_type:0 -> modified_type:0
-anchor_type:0 -> modified_type:1
-anchor_type:3 -> modified_type:0
-anchor_type:2 -> modified_type:4
-anchor_type:0 -> modified_type:3
-anchor_type:4 -> modified_type:2
-anchor_type:1 -> modified_type:1
-anchor_type:1 -> modified_type:0
-anchor_type:0 -> modified_type:1
+anchor_type:3:anchor:0 -> agent_type:2:modified_type:1
+anchor_type:2:anchor:0 -> agent_type:1:modified_type:1
+anchor_type:1:anchor:0 -> agent_type:0:modified_type:1
+anchor_type:1:anchor:0 -> agent_type:1:modified_type:1
 execution finished without any exception
