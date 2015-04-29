@@ -57,11 +57,12 @@ type ode_frag =
       store_internal_flow2       : pair_int_flow;
       store_external_flow        : pair_ext_flow
     }
- (************************************************************************************)   
-(*UTILITY FUNCTIONS *)
+
+(************************************************************************************)   
+(*UTILITIES FUNCTIONS *)
 
 (*------------------------------------------------------------------------------*)
-(* A set of RHS site -> a list of RHS site*)
+(* A set of site -> a list of site*)
 
 let get_site_common_list parameter error agent_type store_sites_common =
   let error, get_sites =
@@ -95,7 +96,7 @@ let get_sites_fold_common parameter error store_sites_common =
   get_sites
  
 (*------------------------------------------------------------------------------*)
-(* A set of anchors site -> a list of anchors site: (combine two cases)*)
+(* A set of site*)
 
 let get_set_common parameter error agent_type store_sites_common =
   let error, get_set =
@@ -111,6 +112,9 @@ let get_set_common parameter error agent_type store_sites_common =
       | Some s -> s
   in
   set
+
+(*------------------------------------------------------------------------------*)
+(* A set of anchor site*)
 
 let anchor_set parameter error agent_type store_sites_anchor1 store_sites_anchor2 =
   let anchor_set1 =
@@ -400,6 +404,7 @@ let store_sites_rhs parameter error rule store_sites_rhs =
 
 (*------------------------------------------------------------------------------*)
 (*first case*)
+
 let collect_sites_anchor_set1 parameter error get_rule 
     store_sites_modified_set
     store_sites_bond_pair_set
@@ -414,7 +419,7 @@ let collect_sites_anchor_set1 parameter error get_rule
         | Cckappa_sig.Ghost -> error, store_sites_anchor_set1
         | Cckappa_sig.Agent agent ->
           let agent_type = agent.Cckappa_sig.agent_name in
-          (*get a list of modified site in the rule rhs*)
+          (*get a set of modified site in the rule rhs*)
           let modified_set =
             get_set_common
               parameter
@@ -422,7 +427,7 @@ let collect_sites_anchor_set1 parameter error get_rule
               agent_type
               store_sites_modified_set
           in
-          (*- get a list of sites in the rule rhs that are bond (fst
+          (*- get a set of sites in the rule rhs that are bond (fst
             agent that has site that are bond*)
           let site_rhs_bond_fst_set =
             get_set_common
@@ -476,12 +481,12 @@ let collect_sites_anchor_set2 parameter error get_rule
         | Cckappa_sig.Ghost -> error, store_sites_anchor_set2
         | Cckappa_sig.Agent agent ->
           let agent_type = agent.Cckappa_sig.agent_name in
-          (*get a list of anchor sites from the first case and second case*)
+          (*get a set of anchor sites from the first case and second case*)
           let anchor_set =
             anchor_set parameter error agent_type store_sites_anchor_set1
               store_sites_anchor_set2
           in
-          (*get a list of site that are bond in the rhs (snd element)*)
+          (*get a set of site that are bond in the rhs (fst element)*)
           let site_rhs_bond_set =
             get_set_common
               parameter
@@ -527,6 +532,7 @@ let collect_sites_anchor_set2 parameter error get_rule
 
 (*------------------------------------------------------------------------------*)
 (*compute internal_flow: site -> modified site*)
+
 let collect_internal_flow1 parameter error get_rule
     store_sites_modified_set
     store_sites_rhs
@@ -540,7 +546,7 @@ let collect_internal_flow1 parameter error get_rule
         | Cckappa_sig.Ghost -> error, store_internal_flow1
         | Cckappa_sig.Agent agent ->
           let agent_type = agent.Cckappa_sig.agent_name in
-          (*get a list of modified site*)
+          (*get a set of modified site*)
           let error, get_modified_set =
             Int_storage.Nearly_inf_Imperatif.unsafe_get
               parameter
@@ -570,7 +576,7 @@ let collect_internal_flow1 parameter error get_rule
                         if Cckappa_sig.Site_map_and_set.mem_set
                           x modified_set
                         then
-                          (agent_type,y, x) :: aux' tl'
+                          (agent_type, y, x) :: aux' tl'
                         else aux' tl'
                   in aux' tl
             in
@@ -600,6 +606,7 @@ let collect_internal_flow1 parameter error get_rule
 
 (*------------------------------------------------------------------------------*)
 (*compute internal_flow: site -> anchor site*)
+
 let collect_internal_flow2 parameter error get_rule
     store_sites_anchor_set1
     store_sites_anchor_set2
@@ -614,15 +621,16 @@ let collect_internal_flow2 parameter error get_rule
         | Cckappa_sig.Ghost -> error, store_internal_flow2
         | Cckappa_sig.Agent agent ->
           let agent_type = agent.Cckappa_sig.agent_name in
+          (*get a set of anchor sites*)
           let anchor_set =
             anchor_set parameter error agent_type store_sites_anchor_set1
               store_sites_anchor_set2
           in
-            (*get a list of sites in the rule rhs*)
+          (*get a list of sites in the rule rhs*)
           let site_rhs_list =
             get_site_common_list parameter error agent_type store_sites_rhs
           in
-            (*compute internal_flow: site -> anchor site*)
+          (*compute internal_flow: site -> anchor site*)
           let internal_flow =
             let rec aux acc =
               match acc with
@@ -635,7 +643,7 @@ let collect_internal_flow2 parameter error get_rule
                         if Cckappa_sig.Site_map_and_set.mem_set
                           x anchor_set
                         then
-                          (agent_type,y, x) :: aux' tl'
+                          (agent_type, y, x) :: aux' tl'
                         else aux' tl'
                   in aux' tl
             in
@@ -677,7 +685,7 @@ let collect_external_flow parameter error bind
     (site_address, site_address') ->
       let agent_type = site_address.Cckappa_sig.agent_type in
       let agent_type' = site_address'.Cckappa_sig.agent_type in
-        (*collect site that are bond in the rhs; fst element in a pair*)
+      (*collect site that are bond in the rhs; fst element in a pair*)
       let bond_set =
         get_set_common
           parameter
@@ -685,7 +693,7 @@ let collect_external_flow parameter error bind
           agent_type
           (fst store_sites_bond_pair_set)
       in
-      (*get a list of anchor sites*)
+      (*get a set of anchor sites*)
       let anchor_set =
         fold_anchor_set
           parameter
@@ -693,13 +701,13 @@ let collect_external_flow parameter error bind
           store_sites_anchor_set1 
           store_sites_anchor_set2 
       in
-        (*get a list of rhs sites*)
+      (*get a list of rhs sites*)
       let site_rhs_list =
         get_sites_fold_common parameter error store_sites_rhs
       in
-        (*compute external_flow*)
+      (*compute external_flow*)
       let external_flow =
-          (*check in a list of site in the rhs*)
+        (*check in a list of site in the rhs*)
         let rec aux acc =
           match acc with
             | [] -> error, store_external_flow
@@ -708,14 +716,14 @@ let collect_external_flow parameter error bind
                 match acc' with
                   | [] -> []
                   | y :: tl' ->
-                      (*check if x is a member of anchor*)
+                    (*check if x is a member of anchor*)
                     if Cckappa_sig.Site_map_and_set.mem_set
                       x anchor_set &&
                       Cckappa_sig.Site_map_and_set.mem_set
                       y bond_set
                     then
                       let external_flow_list =
-                        (agent_type', x, agent_type, y)::[] in
+                        (agent_type', x, agent_type, y) :: [] in
                         (*store: combine the result with old result in the list*)
                       List.concat [external_flow_list; store_external_flow]
                     else aux' tl'
