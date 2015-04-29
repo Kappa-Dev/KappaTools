@@ -17,9 +17,9 @@ type alg_stack_element =
 
 let rec exec_alg :
 type a. Counter.t -> ?time:float -> get_alg:(int -> Expr.alg_expr) ->
-     get_mix:(int -> Nbr.t) -> get_tok:(int -> Nbr.t) ->
+     get_mix:((int * Connected_component.t list list) -> Nbr.t) -> get_tok:(int -> Nbr.t) ->
      (Counter.t -> ?time:float -> get_alg:(int -> Expr.alg_expr) ->
-      get_mix:(int -> Nbr.t) -> get_tok:(int -> Nbr.t) ->
+      get_mix:((int * Connected_component.t list list) -> Nbr.t) -> get_tok:(int -> Nbr.t) ->
       Nbr.t -> alg_stack_element list -> a) ->
      Expr.alg_expr -> alg_stack_element list -> a =
     fun counter ?time ~get_alg ~get_mix ~get_tok with_value alg sk ->
@@ -36,9 +36,9 @@ type a. Counter.t -> ?time:float -> get_alg:(int -> Expr.alg_expr) ->
     | Expr.ALG_VAR i ->
        exec_alg counter ?time ~get_alg ~get_mix ~get_tok with_value
 		(get_alg i) sk
-    | Expr.KAPPA_INSTANCE (i,_) ->
+    | Expr.KAPPA_INSTANCE (i,ccs) ->
        with_value counter ?time ~get_alg ~get_mix ~get_tok
-		  (get_mix i) sk
+		  (get_mix (i,ccs)) sk
     | Expr.TOKEN_ID i ->
        with_value counter ?time ~get_alg ~get_mix ~get_tok
 		  (get_tok i) sk

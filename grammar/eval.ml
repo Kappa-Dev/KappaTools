@@ -844,10 +844,16 @@ let init_graph_of_result counter env domain res =
 	    | domain'',_,[ compiled_rule ] ->
 	       domain'',
 	       Nbr.iteri
-		 (fun _ s -> Rule_interpreter.apply_rule domain'' s compiled_rule)
+		 (fun _ s ->
+		  Rule_interpreter.apply_rule env domain'' counter s compiled_rule)
 		 state value
 	    | domain'',_,[] -> domain'',state
-	    | domain'',_,_ -> (* TODO error *) domain'',state in
+	    | _,_,_ ->
+	       raise (ExceptionDefn.Malformed_Decl
+			(Term.with_dummy_pos
+			   (Format.asprintf
+			      "initial mixture %a is partially defined"
+			      Expr.print_ast_mix ast))) in
 	  let cpt = ref 0 in
 	  let sg = ref sg in
 	  let n = match !Parameter.rescale with
@@ -863,10 +869,23 @@ let init_graph_of_result counter env domain res =
 	  done;
 	  domain'',state',!sg
        | INIT_TOK (alg, (tk_nme,pos_tk)) ->
-	  let (domain',_,alg') =
+	  let fake_rule =
+	    { lhs = []; rm_token = []; arrow = RAR; rhs = [];
+	      add_token = [(alg, (tk_nme,pos_tk))];
+	      k_def = Term.with_dummy_pos (CONST Nbr.zero);
+	      k_un = None; k_op = None; } in
+	  let domain',state' =
+	    match
+	      newrules_of_ast env domain (0,[]) (Term.with_dummy_pos fake_rule)
+	    with
+	    | domain'',_,[ compiled_rule ] ->
+	       domain'',
+	       Rule_interpreter.apply_rule env domain'' counter state compiled_rule
+	    | _,_,_ -> assert false in
+	  let (domain'',_,alg') =
 	    Expr.compile_alg env.Environment.algs.NamedDecls.finder
 			     env.Environment.tokens.NamedDecls.finder
-			     env.Environment.contact_map domain (0,[]) alg
+			     env.Environment.contact_map domain' (0,[]) alg
 	  in
 	  let value = Nbr.to_float (initial_value_alg counter env alg') in
 	  let tok_id =
@@ -876,8 +895,8 @@ let init_graph_of_result counter env domain res =
 		       ("token "^tk_nme^" is undeclared",pos_tk))
 	  in
 	  token_vector.(tok_id) <- value;
-	  domain',state,sg
-      )	(domain,Rule_interpreter.empty env.Environment.tokens,
+	  domain'',state',sg
+      )	(domain,Rule_interpreter.empty env,
 	 Graph.SiteGraph.init !Parameter.defaultGraphSize)
       res.Ast.init
   in

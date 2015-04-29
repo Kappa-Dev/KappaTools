@@ -188,7 +188,7 @@ let value_bool state counter ?time env expr =
 	      match state.alg_variables.(i) with
 	      | None -> fst (snd env.Environment.algs.NamedDecls.decls.(i))
 	      | Some var_f -> Expr.CONST var_f)
-    ~get_mix:(fun i -> instance_number i state env)
+    ~get_mix:(fun (i,_) -> instance_number i state env)
     ~get_tok:(fun i -> Nbr.F (state.token_vector.(i)))
     expr
 let value_alg state counter ?time env alg =
@@ -198,7 +198,7 @@ let value_alg state counter ?time env alg =
 	      match state.alg_variables.(i) with
 	      | None -> fst (snd env.Environment.algs.NamedDecls.decls.(i))
 	      | Some var_f -> Expr.CONST var_f)
-    ~get_mix:(fun i -> instance_number i state env)
+    ~get_mix:(fun (i,_) -> instance_number i state env)
     ~get_tok:(fun i -> Nbr.F (state.token_vector.(i)))
     alg
 

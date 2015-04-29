@@ -1,6 +1,7 @@
 type t
 
-val empty : unit NamedDecls.t -> t
+val empty : Environment.t -> t
 
 val apply_rule :
-  Connected_component.Env.t -> t -> Primitives.elementary_rule -> t
+  Environment.t -> Connected_component.Env.t -> Mods.Counter.t ->
+  t -> Primitives.elementary_rule -> t
