@@ -433,11 +433,9 @@ site_type_modified:{0; 1}
 * Internal flow:
 Flow of information in the ODE semantics:agent_type:0:
 - agent_type:0:site:1 -> agent_type:0:modified_type:0
-- agent_type:0:site:2 -> agent_type:0:modified_type:0
-- agent_type:0:site:3 -> agent_type:0:modified_type:0
+- agent_type:0:site:3 -> agent_type:0:modified_type:2
 - agent_type:0:site:1 -> agent_type:0:modified_type:0
-- agent_type:0:site:2 -> agent_type:0:modified_type:0
-- agent_type:0:site:3 -> agent_type:0:modified_type:0
+- agent_type:0:site:3 -> agent_type:0:modified_type:2
 - agent_type:0:site:1 -> agent_type:0:modified_type:0
 - agent_type:0:site:1 -> agent_type:0:modified_type:0
 Flow of information in the ODE semantics:agent_type:1:

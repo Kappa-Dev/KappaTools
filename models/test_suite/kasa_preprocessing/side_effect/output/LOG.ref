@@ -195,9 +195,7 @@ site_type_anchor:{0}
 Flow of information in the ODE semantics:agent_type:0:
 - agent_type:0:site:1 -> agent_type:0:modified_type:0
 - agent_type:0:site:0 -> agent_type:0:modified_type:0
-- agent_type:0:site:0 -> agent_type:0:modified_type:0
 - agent_type:0:site:1 -> agent_type:0:modified_type:0
-- agent_type:0:site:0 -> agent_type:0:modified_type:0
 - agent_type:0:site:1 -> agent_type:0:modified_type:0
 - agent_type:0:site:1 -> agent_type:0:modified_type:0
 Flow of information in the ODE semantics:agent_type:1:

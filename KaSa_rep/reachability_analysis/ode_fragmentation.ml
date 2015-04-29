@@ -564,6 +564,24 @@ let collect_internal_flow1 parameter error get_rule
             get_site_common_list parameter error agent_type store_sites_rhs
           in
           (*compute internal_flow: site -> modified site*)
+          let internal_flow' = (*FIXME*)
+            let rec aux acc =
+              begin
+                match acc with
+                  | [] | [_] -> []
+                  | x :: tl ->
+                    if Cckappa_sig.Site_map_and_set.mem_set
+                      x modified_set
+                    then
+                      match tl with
+                        | [] -> []
+                        | y :: tl' ->
+                          (agent_type, y, x) :: aux tl'
+                    else
+                      aux tl
+              end
+            in aux (List.rev site_rhs_list)
+          in
           let internal_flow =
             let rec aux acc =
               match acc with
@@ -576,7 +594,7 @@ let collect_internal_flow1 parameter error get_rule
                         if Cckappa_sig.Site_map_and_set.mem_set
                           x modified_set
                         then
-                          (agent_type, y, x) :: aux' tl'
+                          (agent_type, y, x) :: aux' tl'(*FIXME*)
                         else aux' tl'
                   in aux' tl
             in
@@ -590,7 +608,7 @@ let collect_internal_flow1 parameter error get_rule
               agent_type
               store_internal_flow1
           in
-          let new_list = List.concat [internal_flow; old_list] in
+          let new_list = List.concat [internal_flow'; old_list] in
           let error, store_internal_flow =
             Int_storage.Nearly_inf_Imperatif.set
               parameter
@@ -631,7 +649,7 @@ let collect_internal_flow2 parameter error get_rule
             get_site_common_list parameter error agent_type store_sites_rhs
           in
           (*compute internal_flow: site -> anchor site*)
-          let internal_flow =
+          let internal_flow = (*FIXME*)
             let rec aux acc =
               match acc with
                 | [] | [_]  -> []
@@ -643,7 +661,7 @@ let collect_internal_flow2 parameter error get_rule
                         if Cckappa_sig.Site_map_and_set.mem_set
                           x anchor_set
                         then
-                          (agent_type, y, x) :: aux' tl'
+                          (agent_type, y, x) :: [] (*aux' tl'*)(*FIXME*)
                         else aux' tl'
                   in aux' tl
             in
@@ -708,7 +726,7 @@ let collect_external_flow parameter error bind
       (*compute external_flow*)
       let external_flow =
         (*check in a list of site in the rhs*)
-        let rec aux acc =
+        let rec aux acc = (*FIXME*)
           match acc with
             | [] -> error, store_external_flow
             | x :: tl ->
@@ -997,7 +1015,6 @@ let print_ode parameter error
   let _ = Printf.fprintf stdout "* Internal flow:\n" in
   let i = print_store_internal_flow1 parameter error store_internal_flow1 in
   i;
-  (*let _ = Printf.fprintf stdout "* Internal flow 2:\n" in*)
   let i2 = print_store_internal_flow2 parameter error store_internal_flow2 in
   i2;
   let _ = Printf.fprintf stdout "* External flow:\n" in
