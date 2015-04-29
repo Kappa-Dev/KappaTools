@@ -1,0 +1,2 @@
+#!/bin/sh
+${KAPPABIN}KaSim tokens.ka -seed 580151237 --compile -d output || exit 0

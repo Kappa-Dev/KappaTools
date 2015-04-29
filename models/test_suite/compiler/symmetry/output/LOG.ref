@@ -1,0 +1,17 @@
++ Command line is: 'KaSim' 'symmetry.ka' '-seed' '880671133' '--compile' '-d' 'output'
+Parsing symmetry.ka...
+done
++ Initialized random number generator with seed 880671133
++ Building initial simulation state...
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -variable declarations
+	 -rules
+	 -observables
+	 -perturbations
+	 -initial conditions
+	 Done
++ Analyzing non local patterns...
+	 -Counting initial local patterns...
+	 Done

@@ -1,0 +1,4 @@
+%agent: A(x)
+%token: tt
+
+%init: tt <- 33

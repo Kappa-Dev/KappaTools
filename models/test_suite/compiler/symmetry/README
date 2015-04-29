@@ -1,0 +1,2 @@
+#!/bin/sh
+${KAPPABIN}KaSim symmetry.ka -seed 880671133 --compile -d output || exit 0
