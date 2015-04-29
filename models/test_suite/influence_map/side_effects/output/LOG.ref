@@ -223,9 +223,9 @@ Agents:{A; B}
 Flow of information in the ODE semantics:
 * Sites that are modified:
 Flow of information in the ODE semantics:agent_type:0:
-site_type_modified:{0; 0}
+site_type_modified:{0}
 Flow of information in the ODE semantics:agent_type:1:
-site_type_modified:{0; 0; 0}
+site_type_modified:{0}
 * Anchor sites:
 Flow of information in the ODE semantics:agent_type:1:
 site_type_anchor:{0}

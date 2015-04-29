@@ -36,82 +36,217 @@ let print_list l =
 
 module AgentMap = Int_storage.Nearly_inf_Imperatif
 
-type sites_ode = (int list AgentMap.t * int list AgentMap.t)
+type set = Cckappa_sig.Site_map_and_set.set
+
+type sites_ode = (set AgentMap.t * set AgentMap.t)
 
 type pair_int_flow =
     ((Cckappa_sig.agent_name * int *  int) list) AgentMap.t
 
-type pair_int_flow' =
+type pair_ext_flow =
     ((Cckappa_sig.agent_name * int * Cckappa_sig.agent_name * int) list)
 
 type ode_frag =
     {
-      store_sites_modified   : int list AgentMap.t;
-      store_sites_bond_pair  : sites_ode;
-      store_sites_rhs        : int list AgentMap.t;
-      store_sites_anchor1    : int list AgentMap.t;
-      store_internal_flow1   : pair_int_flow;
-      store_sites_anchor2    : int list AgentMap.t;
-      store_internal_flow2   : pair_int_flow;
-      store_external_flow    : pair_int_flow'(*TODO*)
+      store_sites_modified_set   : set AgentMap.t;
+      store_sites_bond_pair_set  : sites_ode;
+      store_sites_rhs            : int list AgentMap.t;
+      store_sites_anchor_set1    : set AgentMap.t;
+      store_internal_flow1       : pair_int_flow;
+      store_sites_anchor_set2    : set AgentMap.t;
+      store_internal_flow2       : pair_int_flow;
+      store_external_flow        : pair_ext_flow
     }
                  
 (************************************************************************************)
 (*MODIFIED SITES*)
 
-let add_site_modified parameter error agent_type sites_list store_sites_modified =
-  let error, old =
+let add_site_modified parameter error agent_type site_set store_sites_modified_set =
+  let error, get_old =
     Int_storage.Nearly_inf_Imperatif.unsafe_get
       parameter
       error
       agent_type
-      store_sites_modified
+      store_sites_modified_set
   in
-  let old_list =
-    match old with
-    | None -> []
-    | Some sites -> sites
+  let old_set =
+    match get_old with
+      | None -> Cckappa_sig.Site_map_and_set.empty_set
+      | Some s -> s
   in
-  (*store*)
-  let new_list = List.concat [sites_list; old_list] in
+  let error, new_set = Cckappa_sig.Site_map_and_set.union
+    parameter
+    error
+    site_set
+    old_set
+  in
   Int_storage.Nearly_inf_Imperatif.set
     parameter
     error
     agent_type
-    new_list
-    store_sites_modified
+    new_set
+    store_sites_modified_set     
 
-let collect_sites_modified parameter error rule store_sites_modified =
-  let error, store_sites_modified =
+let collect_sites_modified_set parameter error rule store_sites_modified_set =
+  let error, store_sites_modified_set =
     Int_storage.Quick_Nearly_inf_Imperatif.fold
-      parameter error
-      (fun parameter error agent_id site_modif store_sites_modified ->
-       let agent_type = site_modif.Cckappa_sig.agent_name in
-       (*if there is no sites modified then do nothing*)
-       if Cckappa_sig.Site_map_and_set.is_empty_map
-            site_modif.Cckappa_sig.agent_interface
-       then error, store_sites_modified
-       else
-         (*collect sites in an agent interface*)
-         let sites_list =
-           Cckappa_sig.Site_map_and_set.fold_map
-             (fun site _ current_list ->
-              site :: current_list)
-             site_modif.Cckappa_sig.agent_interface []
-         in
-           (*map those sites with agent_type and store it into a store_sites_modified*)
-           let error, store_sites_modified =
-           add_site_modified
-             parameter
-             error
-             agent_type
-             sites_list
-             store_sites_modified
-           in
-           error, store_sites_modified
+      parameter
+      error
+      (fun parameter error agent_id site_modif store_sites_modified_set ->
+        let agent_type = site_modif.Cckappa_sig.agent_name in
+        if Cckappa_sig.Site_map_and_set.is_empty_map
+          site_modif.Cckappa_sig.agent_interface
+        then
+          error, store_sites_modified_set
+        else
+          (*collect site and return a set *)
+          let site_set =
+            Cckappa_sig.Site_map_and_set.fold_map
+              (fun site _ current_set ->
+                let error, set =
+                  Cckappa_sig.Site_map_and_set.add_set
+                    parameter
+                    error
+                    site
+                    current_set
+                in
+                set
+              )
+              site_modif.Cckappa_sig.agent_interface
+              Cckappa_sig.Site_map_and_set.empty_set
+          in
+          (*store*)
+          let error, store_sites_modified_set =
+            add_site_modified
+              parameter
+              error
+              agent_type
+              site_set
+              store_sites_modified_set
+          in
+          error, store_sites_modified_set
       )
-      rule.Cckappa_sig.diff_reverse store_sites_modified
-  in error, store_sites_modified
+      rule.Cckappa_sig.diff_reverse store_sites_modified_set
+  in
+  error, store_sites_modified_set
+
+(************************************************************************************)
+(*BINDING SITES - SET TEST*)
+
+(*------------------------------------------------------------------------------*)
+(*++ element in a pair of site that are bond*)
+
+let collect_store_bond_set parameter error bond_rhs site_address store_sites_bond_set =
+  let agent_id = site_address.Cckappa_sig.agent_index in
+  let agent_type = site_address.Cckappa_sig.agent_type in
+  let error, site_address_map =
+    Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get
+      parameter
+      error
+      agent_id
+      bond_rhs
+  in
+  let site_address =
+    match site_address_map with
+      | None -> Cckappa_sig.Site_map_and_set.empty_map
+      | Some s -> s
+  in
+  (*get a set of site that are bond*)
+  let sites_bond_set =
+    Cckappa_sig.Site_map_and_set.fold_map
+      (fun site _ current_set ->
+        let error, set =
+          Cckappa_sig.Site_map_and_set.add_set
+            parameter
+            error
+            site
+            current_set
+        in
+        set
+      )
+      site_address Cckappa_sig.Site_map_and_set.empty_set
+  in
+  (*get old set*)
+  let error, get_old_set =
+    Int_storage.Nearly_inf_Imperatif.unsafe_get
+      parameter
+      error
+      agent_type
+      store_sites_bond_set
+  in
+  let old_set =
+    match get_old_set with
+      | None -> Cckappa_sig.Site_map_and_set.empty_set
+      | Some s -> s
+  in
+  (*store*)
+  let error, new_set = Cckappa_sig.Site_map_and_set.union
+    parameter
+    error
+    sites_bond_set
+    old_set
+  in
+  let error, store_sites_bond_set =
+    Int_storage.Nearly_inf_Imperatif.set
+      parameter
+      error
+      agent_type
+      new_set
+      store_sites_bond_set
+  in error, store_sites_bond_set
+
+(*------------------------------------------------------------------------------*)
+(*-- collect binding sites in the rhs with: site -> site*)
+
+let collect_sites_bond_pair_set parameter error bond_rhs
+    site_address_1
+    site_address_2
+    store_sites_bond_set_1
+    store_sites_bond_set_2
+    store_sites_bond_pair_set
+    =
+  let error, store_sites_bond_set_1 =
+    collect_store_bond_set
+      parameter
+      error
+      bond_rhs
+      site_address_1
+      store_sites_bond_set_1
+  in
+  let error, store_sites_bond_set_2 =
+    collect_store_bond_set
+      parameter
+      error
+      bond_rhs
+      site_address_2
+      store_sites_bond_set_2
+  in
+  let error, store_sites_bond_pair_set =
+    (store_sites_bond_set_1, store_sites_bond_set_2)
+  in
+  error, store_sites_bond_pair_set
+
+(*-- collect binding sites in the rhs with: site -> site*)
+let store_sites_bond_pair_set parameter error bond_rhs bind 
+    store_sites_bond_pair_set
+    =
+  List.fold_left (fun (error, store_sites_bond_pair_set)
+    (site_address_1, site_address_2) ->
+      let error, store_sites_bond_pair_set =
+        error, collect_sites_bond_pair_set
+          parameter
+          error
+          bond_rhs
+          site_address_1
+          site_address_2
+          (fst store_sites_bond_pair_set)
+          (snd store_sites_bond_pair_set)
+          store_sites_bond_pair_set
+      in
+      error, store_sites_bond_pair_set
+  )
+    (error, store_sites_bond_pair_set)
+    bind
 
 (************************************************************************************)
 (*BINDING SITES*)
@@ -293,88 +428,43 @@ let site_rhs_list parameter error agent_type store_sites_rhs =
       | Some s -> s
   in
   site_rhs_list
-
-(*------------------------------------------------------------------------------*)
-(* A set of modified site -> a list of modified site*)
-
-let modified_list parameter error agent_type store_sites_modified =
-  let error, get_sites_modified = 
-    Int_storage.Nearly_inf_Imperatif.unsafe_get
-      parameter
-      error
-      agent_type
-      store_sites_modified
-  in
-  let modified_list =
-    match get_sites_modified with
-      | None -> []
-      | Some s -> s
-  in
-  modified_list
    
 (*------------------------------------------------------------------------------*)
 (* A set of anchors site -> a list of anchors site: (combine two cases)*)
 
-let anchor_list parameter error agent_type store_sites_anchor1 store_sites_anchor2 =
-  let error, get_anchor_list1 =
+let anchor_set parameter error agent_type store_sites_anchor1 store_sites_anchor2 =
+  let error, get_anchor_set1 =
     Int_storage.Nearly_inf_Imperatif.unsafe_get
       parameter
       error
       agent_type
       store_sites_anchor1
   in
-  let anchor_list1 =
-    match get_anchor_list1 with
-      | None -> []
+  let anchor_set1 =
+    match get_anchor_set1 with
+      | None -> Cckappa_sig.Site_map_and_set.empty_set
       | Some s -> s
   in
-  let error, get_anchor_list2 =
+  let error, get_anchor_set2 =
     Int_storage.Nearly_inf_Imperatif.unsafe_get
       parameter
       error
       agent_type
       store_sites_anchor2
   in
-  let anchor_list2 =
-    match get_anchor_list2 with
-      | None -> []
+  let anchor_set2 =
+    match get_anchor_set2 with
+      | None -> Cckappa_sig.Site_map_and_set.empty_set
       | Some s -> s
   in
-  let anchor_list =
-    List.concat [anchor_list1; anchor_list2]
-  in
-  anchor_list
-
-(*------------------------------------------------------------------------------*)
-(*A common function return a list by using folding in a set*)
-
-let get_sites_list_common parameter error store_sites_common =
-  let error, get_sites =
-    Int_storage.Nearly_inf_Imperatif.fold
+  let error, anchor_set =
+    Cckappa_sig.Site_map_and_set.union
       parameter
       error
-      (fun parameter error agent_type sites old_list ->
-        let sites_list = List.concat [sites; old_list] in
-        error, sites_list
-      )
-      store_sites_common []
+      anchor_set1
+      anchor_set2
   in
-  get_sites
-
-(*------------------------------------------------------------------------------*)
-(*ANCHOR *)
-
-let anchor_list_common parameter error store_sites_anchor1 store_sites_anchor2 =
-  let get_sites_anchor1 =
-    get_sites_list_common parameter error store_sites_anchor1
-  in
-  let get_sites_anchor2 =
-    get_sites_list_common parameter error store_sites_anchor2
-  in
-  let anchor_list =
-    List.concat [get_sites_anchor1; get_sites_anchor2]
-  in
-  anchor_list
+  anchor_set
 
 (************************************************************************************)   
 (*RULE*)
@@ -384,22 +474,22 @@ let scan_rule parameter error handler rule ode_class =
   let bond_rhs = rule.Cckappa_sig.rule_rhs.Cckappa_sig.bonds in
   (*------------------------------------------------------------------------------*)
   (*a)collect modified sites*)
-  let error, store_sites_modified =
-    collect_sites_modified
+  let error, store_sites_modified_set =
+    collect_sites_modified_set
       parameter
       error
       rule
-      ode_class.store_sites_modified
+      ode_class.store_sites_modified_set
   in
   (*------------------------------------------------------------------------------*)
   (*b) collect binding sites*)
-  let error, store_sites_bond_pair =
-    store_sites_bond_pair
+  let error, store_sites_bond_pair_set =
+    store_sites_bond_pair_set
       parameter
       error
       bond_rhs
       bind
-      ode_class.store_sites_bond_pair
+      ode_class.store_sites_bond_pair_set
   in
   (*------------------------------------------------------------------------------*)
   (*c)collect sites from the rhs rule*)
@@ -411,25 +501,29 @@ let scan_rule parameter error handler rule ode_class =
       ode_class.store_sites_rhs
   in
   (*------------------------------------------------------------------------------*)
-  (*FIXME*)
   (*d)Anchor sites(first case): A(x,y), B(x): 'x' of A is a modified site,
     'y' of A bind to 'y' of B => B(y) is an anchor site*)
-  let error, store_sites_anchor1 =
+  let error, store_sites_anchor_set1 =
     Int_storage.Quick_Nearly_inf_Imperatif.fold
       parameter
       error
-      (fun parameter error agent_id agent store_sites_anchor1 ->
+      (fun parameter error agent_id agent store_sites_anchor_set1 ->
         match agent with
-          | Cckappa_sig.Ghost -> error, store_sites_anchor1
+          | Cckappa_sig.Ghost -> error, store_sites_anchor_set1
           | Cckappa_sig.Agent agent ->
             let agent_type = agent.Cckappa_sig.agent_name in
             (*get a list of modified site in the rule rhs*)
-            let modified_list =
-              modified_list parameter error agent_type store_sites_modified
+            let error, get_modified_set =
+              Int_storage.Nearly_inf_Imperatif.unsafe_get
+                parameter
+                error
+                agent_type
+                store_sites_modified_set
             in
-            (*get a list of sites in the rule rhs*)
-            let site_rhs_list =
-              site_rhs_list parameter error agent_type store_sites_rhs
+            let modified_set =
+              match get_modified_set with
+                | None -> Cckappa_sig.Site_map_and_set.empty_set
+                | Some s -> s
             in
             (*- get a list of sites in the rule rhs that are bond (fst
               agent that has site that are bond*)
@@ -438,27 +532,33 @@ let scan_rule parameter error handler rule ode_class =
                 parameter
                 error
                 agent_type
-                (fst store_sites_bond_pair)
+                (fst store_sites_bond_pair_set)
             in
-            let site_rhs_bond_fst_list =
+            let site_rhs_bond_fst_set =
               match get_site_rhs_bond_fst with
-                | None -> []
+                | None -> Cckappa_sig.Site_map_and_set.empty_set
                 | Some s -> s
+            in
+            (*get a list of sites in the rule rhs*)
+            let site_rhs_list =
+              site_rhs_list parameter error agent_type store_sites_rhs
             in
             (*compute anchor site*)
             let error, sites_list =
               let rec aux acc =
                 match acc with
-                  | [] | [_] -> error, store_sites_anchor1
+                  | [] | [_] -> error, store_sites_anchor_set1
                   | x :: tl ->
                     let rec aux' acc' =
                       match acc' with
-                        | [] -> error, store_sites_anchor1
+                        | [] -> error, store_sites_anchor_set1
                         | y :: tl' ->
-                          if List.mem x modified_list && (*FIXME*)
-                            List.mem y site_rhs_bond_fst_list
+                          if Cckappa_sig.Site_map_and_set.mem_set
+                            x modified_set &&
+                            Cckappa_sig.Site_map_and_set.mem_set
+                            y site_rhs_bond_fst_set
                           then
-                            let a = snd store_sites_bond_pair in
+                            let a = snd store_sites_bond_pair_set in
                             error, a
                           else aux' tl'
                     in aux' tl
@@ -467,84 +567,60 @@ let scan_rule parameter error handler rule ode_class =
             error, sites_list
        )
             rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
-              ode_class.store_sites_anchor1
+              ode_class.store_sites_anchor_set1
        in
   (*------------------------------------------------------------------------------*)
   (*e) collect anchor sites (second case): a site connected to a site in an
     agent with an anchor, the second agent should contain at least an anchor on
     another site. For example: A(x,y), B(x): Agent A where site x is an
     anchor, y bind to x in agent B. Site x of B is an anchor.*)
-  let error, store_sites_anchor2 =
+  let error, store_sites_anchor_set2 =
     Int_storage.Quick_Nearly_inf_Imperatif.fold 
       parameter
       error
-      (fun parameter error agent_id agent store_sites_anchor ->
+      (fun parameter error agent_id agent store_sites_anchor_set2 ->
        match agent with
-       | Cckappa_sig.Ghost -> error, store_sites_anchor
+       | Cckappa_sig.Ghost -> error, store_sites_anchor_set2
        | Cckappa_sig.Agent agent ->
           let agent_type = agent.Cckappa_sig.agent_name in
           (*get a list of anchor sites from the first case and second case*)
-          let anchor_list =
-            anchor_list parameter error agent_type store_sites_anchor1
-              store_sites_anchor (*FIXME*)
+          let anchor_set =
+            anchor_set parameter error agent_type store_sites_anchor_set1
+              store_sites_anchor_set2
           in
-          (*let anchor_list =
-            get_sites_list_common parameter error store_sites_anchor1
-          in*)
           (*get a list of site from the rhs of rule*)
           let site_rhs_list =
             site_rhs_list parameter error agent_type store_sites_rhs
           in
           (*get a list of site that are bond in the rhs (snd element)*)
-          let error, get_site_rhs_bond = (*FIXME*)
+          let error, get_site_rhs_bond =
             Int_storage.Nearly_inf_Imperatif.unsafe_get
               parameter
               error
               agent_type
-              (fst store_sites_bond_pair) (*FIXME*)
+              (fst store_sites_bond_pair_set)
           in
-          let site_rhs_bond_list =
+          let site_rhs_bond_set =
             match get_site_rhs_bond with
-            | None -> []
+            | None -> Cckappa_sig.Site_map_and_set.empty_set
             | Some s -> s
           in
-          (*let _ = 
-            print_string "bond_list:";
-            print_list site_rhs_bond_list;
-            print_string "\n"
-          in*)
           (*compute anchor site*)
-          let error, sites_list1 =
+          let error, sites_list =
             let rec aux acc =
               match acc with
-                | [] | [_] -> error, store_sites_anchor
+                | [] | [_] -> error, store_sites_anchor_set2
                 | x :: tl ->
-                  (*let _ = Printf.fprintf stdout "agent_type:%i:x:%i\n" agent_type x
-                  in*)
                   let rec aux' acc' =
                     match acc' with
-                      | [] -> error, store_sites_anchor
+                      | [] -> error, store_sites_anchor_set2
                       | y :: tl' ->
-                        (*let _ = Printf.fprintf stdout "agent_type:%i:y:%i\n" agent_type y
-                        in*)
-                        if List.mem x anchor_list && 
-                          List.mem y site_rhs_bond_list (*FIXME*)
+                        if Cckappa_sig.Site_map_and_set.mem_set
+                          x anchor_set && 
+                          Cckappa_sig.Site_map_and_set.mem_set
+                         y site_rhs_bond_set
                         then
-                          let a = snd store_sites_bond_pair in (*FIXME*)
-                          (*FIXME: return only at that rule*)
-                          (*let _ =
-                            Int_storage.Nearly_inf_Imperatif.print
-                              error
-                              (fun error parameter a ->
-                                let _ = 
-                                  print_string "anchor2:";
-                                  print_list a; print_string "\n"
-                                in
-                                error
-                              )
-                              parameter
-                              a
-                          in*)
+                          let a = snd store_sites_bond_pair_set in
                           error, a
                         else
                           aux' tl'
@@ -553,10 +629,10 @@ let scan_rule parameter error handler rule ode_class =
             in
             aux (List.rev site_rhs_list)
           in
-          error, sites_list1
+          error, sites_list
       )
       rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
-      ode_class.store_sites_anchor2 (*FIXME*)
+      ode_class.store_sites_anchor_set2 (*FIXME*)
       (*store_sites_anchor1*)
   in
   (*------------------------------------------------------------------------------*)
@@ -571,8 +647,17 @@ let scan_rule parameter error handler rule ode_class =
           | Cckappa_sig.Agent agent ->
             let agent_type = agent.Cckappa_sig.agent_name in
             (*get a list of modified site*)
-            let modified_list =
-              modified_list parameter error agent_type store_sites_modified
+            let error, get_modified_set =
+              Int_storage.Nearly_inf_Imperatif.unsafe_get
+                parameter
+                error
+                agent_type
+                store_sites_modified_set
+            in
+            let modified_set =
+              match get_modified_set with
+                | None -> Cckappa_sig.Site_map_and_set.empty_set
+                | Some s -> s
             in
             (*get a list of sites in the rule rhs*)
             let site_rhs_list =
@@ -588,7 +673,8 @@ let scan_rule parameter error handler rule ode_class =
                       match acc' with
                         | [] -> []
                         | y :: tl' ->
-                          if List.mem x modified_list
+                          if Cckappa_sig.Site_map_and_set.mem_set
+                            x modified_set
                           then
                             (agent_type,y, x) :: aux' tl'
                           else aux' tl'
@@ -634,9 +720,9 @@ let scan_rule parameter error handler rule ode_class =
           | Cckappa_sig.Ghost -> error, store_internal_flow2
           | Cckappa_sig.Agent agent ->
             let agent_type = agent.Cckappa_sig.agent_name in
-            let anchor_list =
-              anchor_list parameter error agent_type store_sites_anchor1
-                store_sites_anchor2
+            let anchor_set =
+              anchor_set parameter error agent_type store_sites_anchor_set1
+                store_sites_anchor_set2
             in
             (*get a list of sites in the rule rhs*)
             let site_rhs_list =
@@ -652,7 +738,8 @@ let scan_rule parameter error handler rule ode_class =
                       match acc' with
                         | [] -> []
                         | y :: tl' ->
-                          if List.mem x anchor_list
+                          if Cckappa_sig.Site_map_and_set.mem_set
+                            x anchor_set
                           then
                             (agent_type,y, x) :: aux' tl'
                           else aux' tl'
@@ -696,21 +783,55 @@ let scan_rule parameter error handler rule ode_class =
         let agent_type = site_address.Cckappa_sig.agent_type in
         let agent_type' = site_address'.Cckappa_sig.agent_type in
         (*collect site that are bond in the rhs; fst element in a pair*)
-        let error, get_bond_list =
+        let error, get_bond_set =
           Int_storage.Nearly_inf_Imperatif.unsafe_get
             parameter
             error
             agent_type
-            (fst store_sites_bond_pair)
+            (fst store_sites_bond_pair_set)
         in
-        let bond_list =
-          match get_bond_list with
-            | None -> []
+        let bond_set =
+          match get_bond_set with
+            | None -> Cckappa_sig.Site_map_and_set.empty_set
             | Some s -> s
         in
         (*get a list of anchor sites*)
-        let anchor_list =
-          anchor_list_common parameter error store_sites_anchor1 store_sites_anchor2
+        let error, get_anchor_set1 =
+          Int_storage.Nearly_inf_Imperatif.fold
+            parameter
+            error
+            (fun parameter error agent_type site old_set ->
+              let error, set =
+                Cckappa_sig.Site_map_and_set.union
+                  parameter
+                  error
+                  site
+                  old_set                 
+              in
+              error, set
+            ) store_sites_anchor_set1 Cckappa_sig.Site_map_and_set.empty_set
+        in
+        let error, get_anchor_set2 =
+          Int_storage.Nearly_inf_Imperatif.fold
+            parameter
+            error
+            (fun parameter error agent_type site old_set ->
+              let error, set =
+                Cckappa_sig.Site_map_and_set.union
+                  parameter
+                  error
+                  site
+                  old_set                 
+              in
+              error, set
+            ) store_sites_anchor_set2 Cckappa_sig.Site_map_and_set.empty_set
+        in
+        let error, anchor_set =
+          Cckappa_sig.Site_map_and_set.union
+            parameter
+            error
+            get_anchor_set1
+            get_anchor_set2
         in
         (*get a list of rhs sites*)
         let site_rhs_list =
@@ -728,8 +849,10 @@ let scan_rule parameter error handler rule ode_class =
                     | [] -> []
                     | y :: tl' ->
                       (*check if x is a member of anchor*)
-                      if List.mem x anchor_list && (*FIXME*)
-                        List.mem y bond_list
+                      if Cckappa_sig.Site_map_and_set.mem_set
+                        x anchor_set &&
+                        Cckappa_sig.Site_map_and_set.mem_set
+                        y bond_set
                       then
                         let external_flow_list =
                           (agent_type', x, agent_type, y)::[] in
@@ -747,14 +870,14 @@ let scan_rule parameter error handler rule ode_class =
   (*return value of ode_class*)
   error,
   {
-    store_sites_modified   = store_sites_modified;
-    store_sites_bond_pair  = store_sites_bond_pair;
-    store_sites_rhs        = store_sites_rhs;
-    store_sites_anchor1    = store_sites_anchor1;
-    store_internal_flow1   = store_internal_flow1;
-    store_sites_anchor2    = store_sites_anchor2;
-    store_internal_flow2   = store_internal_flow2;
-    store_external_flow    = store_external_flow
+    store_sites_modified_set   = store_sites_modified_set;
+    store_sites_bond_pair_set  = store_sites_bond_pair_set;
+    store_sites_rhs            = store_sites_rhs;
+    store_sites_anchor_set1    = store_sites_anchor_set1;
+    store_internal_flow1       = store_internal_flow1;
+    store_sites_anchor_set2    = store_sites_anchor_set2;
+    store_internal_flow2       = store_internal_flow2;
+    store_external_flow        = store_external_flow
   }
     
 (************************************************************************************)
@@ -764,6 +887,8 @@ let scan_rule_set parameter error handler rules =
   let error, init =
     Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
   let init_pair = (init, init) in
+  let error, init_rhs =
+    Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
   let error, init_internal =
     Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
   let error, init_external =
@@ -771,14 +896,14 @@ let scan_rule_set parameter error handler rules =
   (*init state of ode_class*)
   let init_ode =
     {
-      store_sites_modified   = init;
-      store_sites_bond_pair  = init_pair;
-      store_sites_rhs        = init;
-      store_sites_anchor1    = init;
-      store_internal_flow1   = init_internal;
-      store_sites_anchor2    = init;
-      store_internal_flow2   = init_internal;
-      store_external_flow    = []
+      store_sites_modified_set   = init;
+      store_sites_bond_pair_set  = init_pair;
+      store_sites_rhs            = init_rhs;
+      store_sites_anchor_set1    = init;
+      store_internal_flow1       = init_internal;
+      store_sites_anchor_set2    = init;
+      store_internal_flow2       = init_internal;
+      store_external_flow        = []
     }
   in
   let error, ode_class =
@@ -802,23 +927,26 @@ let scan_rule_set parameter error handler rules =
 let print_modified parameter error result =
   Int_storage.Nearly_inf_Imperatif.print
     error
-    (fun error parameter l ->
-     let _ =
-       print_string "site_type_modified:";
-       print_list l
-     in
-     error) parameter result
+    (fun error parameter s ->
+      let l = Cckappa_sig.Site_map_and_set.elements s in
+      let _ =
+        print_string "site_type_modified:";
+        print_list l
+      in
+      error) parameter result
 
 (*------------------------------------------------------------------------------*)    
+
 let print_anchor parameter error result = 
   Int_storage.Nearly_inf_Imperatif.print
     error
-    (fun error parameter l ->
-     let _ =
-       print_string "site_type_anchor:";
-       print_list l
-     in
-     error) parameter result
+    (fun error parameter s ->
+      let l = Cckappa_sig.Site_map_and_set.elements s in
+      let _ =
+        print_string "site_type_anchor:";
+        print_list l
+      in
+      error) parameter result
 
 let print_anchor_pair parameter error (result, result') =
   let a = print_anchor parameter error result in
@@ -882,23 +1010,23 @@ let print_external_flow result =
 (*MAIN PRINT*)
     
 let print_ode parameter error
-              { store_sites_modified;
-                store_sites_bond_pair;
+              { store_sites_modified_set;
+                store_sites_bond_pair_set;
                 store_sites_rhs;
-                store_sites_anchor1;
+                store_sites_anchor_set1;
                 store_internal_flow1;
-                store_sites_anchor2;
+                store_sites_anchor_set2;
                 store_internal_flow2;
                 store_external_flow
               } =
   let _ = Printf.fprintf stdout "* Sites that are modified:\n" in
-  let m = print_modified parameter error store_sites_modified in
+  let m = print_modified parameter error store_sites_modified_set in
   m;
   let _ = Printf.fprintf stdout "* Anchor sites:\n" in
-  let a = print_anchor parameter error store_sites_anchor1 in
+  let a = print_anchor parameter error store_sites_anchor_set1 in
   a;
   let _ = Printf.fprintf stdout "* Anchor sites 2:\n" in
-  let a2 = print_anchor parameter error store_sites_anchor2 in
+  let a2 = print_anchor parameter error store_sites_anchor_set2 in
   a2;
   let _ = Printf.fprintf stdout "* Internal flow:\n" in
   let i = print_store_internal_flow1 parameter error store_internal_flow1 in

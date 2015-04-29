@@ -216,12 +216,12 @@ site_type:[|0; 0|]
 Flow of information in the ODE semantics:
 * Sites that are modified:
 Flow of information in the ODE semantics:agent_type:0:
-site_type_modified:{1; 0; 0}
+site_type_modified:{0; 1}
 Flow of information in the ODE semantics:agent_type:1:
-site_type_modified:{1; 0; 0}
+site_type_modified:{0; 1}
 * Anchor sites:
 Flow of information in the ODE semantics:agent_type:1:
-site_type_anchor:{1; 0; 0}
+site_type_anchor:{0; 1}
 * Anchor sites 2:
 * Internal flow:
 Flow of information in the ODE semantics:agent_type:0:
