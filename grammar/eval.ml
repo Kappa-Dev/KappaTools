@@ -266,51 +266,59 @@ let reduce_val v env domain a_mixs =
   let dep = Expr.deps_of_alg_expr alg in
   (domain',mixs',alg,dep)
 
-let tokenify env domain mixs l =
+let tokenify algs tokens contact_map domain mixs l =
   List.fold_right
     (fun (alg_expr,(nme,pos)) (domain,mixs,out) ->
      let id =
-       try Environment.num_of_token nme env
+       try StringMap.find nme tokens
        with Not_found ->
 	 raise (ExceptionDefn.Malformed_Decl
 		  ("Token "^nme^" is undefined",pos))
      in
      let (domain',mixs',(alg,_pos)) =
-       Expr.compile_alg env.Environment.algs.NamedDecls.finder
-			env.Environment.tokens.NamedDecls.finder
-			env.Environment.contact_map domain
-			mixs alg_expr in
+       Expr.compile_alg algs tokens contact_map domain mixs alg_expr in
      (domain',mixs',(alg,id)::out)
     ) l (domain,mixs,[])
 
-let newrules_of_ast env domain mixs (ast_rule,rule_pos) =
-  let domain',mixs',rm_toks = tokenify env domain mixs ast_rule.rm_token in
+let newrules_of_ast algs tokens contact_map domain mixs
+		    label_opt (ast_rule,rule_pos) =
+  let label = match label_opt with
+    | None -> Term.with_dummy_pos ("%anonymous"^(string_of_float (Sys.time ())))
+    | Some (lab,pos) -> (lab,pos) in
+  let opposite (lab,pos) = (lab^"_op",pos) in
+  let domain',mixs',rm_toks =
+    tokenify algs tokens contact_map domain mixs ast_rule.rm_token in
   let domain'',mixs'',add_toks =
-    tokenify env domain' mixs' ast_rule.add_token in
-  let one_side (domain,a_mixs,acc) rate lhs rhs rm add =
+    tokenify algs tokens contact_map domain' mixs' ast_rule.add_token in
+  let one_side label (domain,a_mixs,acc) rate lhs rhs rm add =
     let domain',a_mixs',(crate,_) =
-      Expr.compile_alg env.Environment.algs.NamedDecls.finder
-		       env.Environment.tokens.NamedDecls.finder
-		       env.Environment.contact_map domain
-		       a_mixs rate in
+      Expr.compile_alg algs tokens contact_map domain a_mixs rate in
+    let count = let x = ref 0 in fun (lab,pos) ->
+				 incr x; (lab^"__"^string_of_int !x,pos) in
+    let build (ccs,(neg,pos)) =
+      {
+	Primitives.rate = crate;
+	Primitives.connected_components = ccs;
+	Primitives.removed = neg;
+	Primitives.inserted = pos;
+	Primitives.consumed_tokens = rm;
+	Primitives.injected_tokens = add;
+      } in
     let domain'',rule_mixtures =
       Snip.connected_components_sum_of_ambiguous_rule
-	env.Environment.contact_map domain' lhs rhs in
+	contact_map domain' lhs rhs in
     domain'',a_mixs',
-    List.fold_left
-      (fun out (ccs,(neg,pos)) ->
-       {
-	 Primitives.rate = crate;
-	 Primitives.connected_components = ccs;
-	 Primitives.removed = neg;
-	 Primitives.inserted = pos;
-	 Primitives.consumed_tokens = rm;
-	 Primitives.injected_tokens = add;
-       }::out) acc rule_mixtures in
+    match rule_mixtures with
+    | [] -> acc
+    | [ r ] -> (label, build r) :: acc
+    | _ ->
+       List.fold_left
+	 (fun out r ->
+	  (count label,build r)::out) acc rule_mixtures in
   let rev = match ast_rule.arrow, ast_rule.k_op with
     | RAR, None -> domain'',mixs'',[]
     | LRAR, Some rate ->
-       one_side (domain'',mixs'',[]) rate
+       one_side (opposite label) (domain'',mixs'',[]) rate
 		ast_rule.rhs ast_rule.lhs add_toks rm_toks
     | (RAR, Some _ | LRAR, None) ->
        raise
@@ -318,7 +326,7 @@ let newrules_of_ast env domain mixs (ast_rule,rule_pos) =
 	    ("Incompatible arrow and kinectic rate for inverse definition",
 	     rule_pos))
   in
-  one_side rev ast_rule.k_def ast_rule.lhs ast_rule.rhs rm_toks add_toks
+  one_side label rev ast_rule.k_def ast_rule.lhs ast_rule.rhs rm_toks add_toks
 
 let rule_of_ast ?(backwards=false) ~is_pert env domain
 		mixs (ast_rule_label,(ast_rule,rule_pos)) =
@@ -358,9 +366,13 @@ let rule_of_ast ?(backwards=false) ~is_pert env domain
     Dynamics.diff rule_pos lhs rhs env in
 
   let domain''',a_mixs''',add_token =
-    tokenify env domain'' a_mixs'' ast_rule.add_token in
+    tokenify env.Environment.algs.NamedDecls.finder
+	     env.Environment.tokens.NamedDecls.finder
+	     env.Environment.contact_map  domain'' a_mixs'' ast_rule.add_token in
   let a_domain,a_mixs,rm_token =
-    tokenify env domain''' a_mixs''' ast_rule.rm_token in
+    tokenify env.Environment.algs.NamedDecls.finder
+	     env.Environment.tokens.NamedDecls.finder
+	     env.Environment.contact_map domain''' a_mixs''' ast_rule.rm_token in
   let r_id = Mixture.get_id lhs in
   let env = if Mixture.is_empty lhs
 	    then Environment.declare_empty_lhs r_id env
@@ -569,7 +581,7 @@ let effects_of_modif variables lrules env domain ast_list =
     | ast::tl ->
        let (env,domain,variables,lrules,rev_effects) =
 	 match ast with
-	 | INTRO (alg_expr, ast_mix, _) ->
+	 | INTRO (alg_expr, ast_mix, _pos) ->
 	    let (domain',mix,alg_pos) =
 	      Expr.compile_alg env.Environment.algs.NamedDecls.finder
 			       env.Environment.tokens.NamedDecls.finder
@@ -587,7 +599,7 @@ let effects_of_modif variables lrules env domain ast_list =
 			  (None, Term.with_dummy_pos ast_rule) in
 	     (env,domain,mixs'',rule::lrules,
 		(Primitives.ITER_RULE (alg_pos, rule))::rev_effects)
-	 | DELETE (alg_expr, ast_mix, pos) ->
+	 | DELETE (alg_expr, ast_mix, _pos) ->
 	    let (domain',mix,alg_pos) =
 	      Expr.compile_alg env.Environment.algs.NamedDecls.finder
 			       env.Environment.tokens.NamedDecls.finder
@@ -839,9 +851,12 @@ let init_graph_of_result counter env domain res =
 	      k_un = None; k_op = None; } in
 	  let domain'',state' =
 	    match
-	      newrules_of_ast env domain' (0,[]) (Term.with_dummy_pos fake_rule)
+	      newrules_of_ast env.Environment.algs.NamedDecls.finder
+			      env.Environment.tokens.NamedDecls.finder
+			      env.Environment.contact_map domain' (0,[]) None
+			      (Term.with_dummy_pos fake_rule)
 	    with
-	    | domain'',_,[ compiled_rule ] ->
+	    | domain'',_,[ _, compiled_rule ] ->
 	       domain'',
 	       Nbr.iteri
 		 (fun _ s ->
@@ -876,9 +891,12 @@ let init_graph_of_result counter env domain res =
 	      k_un = None; k_op = None; } in
 	  let domain',state' =
 	    match
-	      newrules_of_ast env domain (0,[]) (Term.with_dummy_pos fake_rule)
+	      newrules_of_ast env.Environment.algs.NamedDecls.finder
+			      env.Environment.tokens.NamedDecls.finder
+			      env.Environment.contact_map domain (0,[]) None
+			      (Term.with_dummy_pos fake_rule)
 	    with
-	    | domain'',_,[ compiled_rule ] ->
+	    | domain'',_,[ _, compiled_rule ] ->
 	       domain'',
 	       Rule_interpreter.apply_rule env domain'' counter state compiled_rule
 	    | _,_,_ -> assert false in
@@ -1023,8 +1041,33 @@ let configurations_of_result result =
 	raise (ExceptionDefn.Malformed_Decl ("Unkown parameter "^error, pos_p))
     ) result.configurations
 
+let compile_alg_vars tokens contact_map domain overwrite vars =
+  let alg_vars_over =
+    Tools.list_rev_map_append
+      (fun (x,v) -> (Term.with_dummy_pos x,
+		     Term.with_dummy_pos (Ast.CONST v))) overwrite
+      (List.filter
+	 (fun ((x,_),_) ->
+	  List.for_all (fun (x',_) -> x <> x') overwrite) vars) in
+  let vars_nd = NamedDecls.create (Array.of_list alg_vars_over) in
+  array_fold_left_mapi (fun i (domain,mixs) ((label,_ as lbl_pos),ast) ->
+			let (domain',mixs',alg) =
+			  Expr.compile_alg ~label vars_nd.NamedDecls.finder
+					   tokens ~max_allowed_var:(pred i)
+					   contact_map domain mixs ast
+			in ((domain',mixs'),(lbl_pos,alg))) (domain,(0,[]))
+		       vars_nd.NamedDecls.decls
+
+let compile_rules algs tokens contact_map domain mixs rules =
+  List.fold_left
+    (fun (domain,mixs,acc) (rule_label,rule) ->
+     let (domain',mixs',cr) =
+       newrules_of_ast algs tokens contact_map domain mixs rule_label rule in
+    domain',mixs',List.append cr acc)
+    (domain,mixs,[]) rules
+
 let initialize logger overwrite result =
-  Debug.tag logger "+ Building initial simulation state...";
+  Debug.tag logger "+ Building initial simulation conditions...";
   let counter =
     Counter.create !Parameter.pointNumberValue
 		   0.0 0 !Parameter.maxTimeValue !Parameter.maxEventValue in
@@ -1039,37 +1082,25 @@ let initialize logger overwrite result =
     NamedDecls.create (array_map_of_list (fun x -> (x,())) result.Ast.tokens) in
 
   let pre_kasa_state = Export_to_KaSim.Export_to_KaSim.init result in
-  let kasa_state,contact_map =
+  let _kasa_state,contact_map =
     Export_to_KaSim.Export_to_KaSim.get_contact_map pre_kasa_state in
-  let domain = Connected_component.Env.empty sigs_nd in
 
+  let domain = Connected_component.Env.empty sigs_nd in
   Debug.tag logger "\t -variable declarations";
-  let alg_vars_over =
-    Tools.list_rev_map_append
-      (fun (x,v) -> (Term.with_dummy_pos x,
-		     Term.with_dummy_pos (Ast.CONST v))) overwrite
-      (List.filter
-	 (fun ((x,_),_) ->
-	  List.for_all (fun (x',_) -> x <> x') overwrite)
-	 result.Ast.variables) in
-  let vars_nd = NamedDecls.create (Array.of_list alg_vars_over) in
-  let (domain',(fresh_kappa,_ as mixs)),alg_a =
-    array_fold_left_mapi (fun i (domain,mixs) ((label,_ as lbl_pos),ast) ->
-			  let (domain',mixs',alg) =
-			    Expr.compile_alg ~label vars_nd.NamedDecls.finder
-					     tk_nd.NamedDecls.finder
-					     ~max_allowed_var:(pred i)
-					     contact_map domain mixs
-					     ast
-			  in ((domain',mixs'),(lbl_pos,alg))) (domain,(0,[]))
-			 vars_nd.NamedDecls.decls
-  in
+  let (domain',mixs),alg_a =
+    compile_alg_vars tk_nd.NamedDecls.finder contact_map domain
+		     overwrite result.Ast.variables in
+  let alg_nd = NamedDecls.create alg_a in
+
+  let (domain',(fresh_kappa,_ as mixs'),compiled_rules) =
+    compile_rules alg_nd.NamedDecls.finder tk_nd.NamedDecls.finder contact_map
+		  domain' mixs result.Ast.rules in
+  let rule_nd = NamedDecls.create (Array.of_list compiled_rules) in
 
   let env =
-    Environment.init sigs_nd contact_map tk_nd
-		     (NamedDecls.create alg_a) fresh_kappa in
+    Environment.init sigs_nd contact_map tk_nd alg_nd rule_nd fresh_kappa in
   let (env, domain, kappa_vars) =
-    variables_of_result env domain' mixs alg_a in
+    variables_of_result env domain' mixs' alg_a in
 
   Debug.tag logger "\t -rules";
   let (env, domain, kappa_vars, pure_rules) =

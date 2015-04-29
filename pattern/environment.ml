@@ -7,6 +7,7 @@ type t = {
     (string list * (string * string) list) Export_to_KaSim.String2Map.t;
   tokens : unit NamedDecls.t;
   algs : (Expr.alg_expr Term.with_pos) NamedDecls.t;
+  rules : Primitives.elementary_rule NamedDecls.t;
   perturbations : unit NamedDecls.t;
 
 	fresh_kappa : int ;
@@ -39,6 +40,7 @@ type t = {
 let empty =
   {signatures = Signature.create [] ;
    contact_map = Export_to_KaSim.String2Map.empty;
+   rules = NamedDecls.create [||] ;
 	num_of_kappa = StringMap.empty ; 
 	kappa_of_num = IntMap.empty ;
 	num_of_rule = StringMap.empty ;
@@ -62,9 +64,9 @@ let empty =
 	desc_table = Hashtbl.create 2 
 }
 
-let init sigs contact_map tokens algs fresh_kappa =
+let init sigs contact_map tokens algs rules fresh_kappa =
   { empty with signatures = sigs; tokens = tokens;
-	       contact_map = contact_map;
+	       contact_map = contact_map; rules = rules;
 	       algs = algs; fresh_kappa = fresh_kappa }
 
 let get_desc file env =
