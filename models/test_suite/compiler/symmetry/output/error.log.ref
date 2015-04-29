@@ -7,40 +7,121 @@ ___
 +++
 
 _____
+A(x!1>>⊥), A(y!1>>⊥)
+___
+/*cc4*/ A/*1*/(y!1), A/*2*/(x!1)
+---
+A/*1*/.y = A/*2*/.x
++++
+A/*1*/.y = ⊥, A/*2*/.x = ⊥
+_____
+A(x>>1), A(y>>1)
+___
+/*cc23*/ A/*1*/(y)
+/*cc11*/ A/*1*/(x)
+---
+A/*1*/.y = ⊥, A/*1*/.x = ⊥
++++
+A/*1*/.y = A/*1*/.x
+_____
+A(x~a>>b!1>>⊥), A(y!1>>⊥)
+___
+/*cc24*/ A/*1*/(x~a!1), A/*2*/(y!1)
+---
+A/*2*/.y = A/*1*/.x, A/*1*/.x~a =
++++
+A/*2*/.y = ⊥, A/*1*/.x = ⊥, A/*1*/.x~b =
+_____
+A(_--, x~b--!1--, y!2--), A(_--, x~b--!2--, y!1--)A(_--, x~a--!1--, y!2--),
+A(_--, x~b--!2--, y!1--)A(_--, x~b--!1--, y!2--), A(_--, x~a--!2--, y!1--)
+A(_--, x~a--!1--, y!2--), A(_--, x~a--!2--, y!1--)
+___
+/*cc54*/ A/*1*/(x~b!1, y!2), A/*2*/(x~b!2, y!1)
+---
+A/*2*/.y = A/*1*/.x, A/*2*/.x = A/*1*/.y, A/*2*/.x~b =, A/*2*/._ = ⊥,
+A/*1*/.x~b =, A/*1*/._ = ⊥
++++
+
+___
+/*cc40*/ A/*1*/(x~b!1, y!2), A/*2*/(x~a!2, y!1)
+---
+A/*1*/.y = A/*2*/.x, A/*1*/.x = A/*2*/.y, A/*1*/.x~b =, A/*1*/._ = ⊥,
+A/*2*/.x~a =, A/*2*/._ = ⊥
++++
+
+___
+/*cc40*/ A/*1*/(x~b!1, y!2), A/*2*/(x~a!2, y!1)
+---
+A/*2*/.y = A/*1*/.x, A/*2*/.x = A/*1*/.y, A/*2*/.x~a =, A/*2*/._ = ⊥,
+A/*1*/.x~b =, A/*1*/._ = ⊥
++++
+
+___
+/*cc27*/ A/*1*/(x~a!1, y!2), A/*2*/(x~a!2, y!1)
+---
+A/*2*/.y = A/*1*/.x, A/*2*/.x = A/*1*/.y, A/*2*/.x~a =, A/*2*/._ = ⊥,
+A/*1*/.x~a =, A/*1*/._ = ⊥
++++
+
+_____
+A(x!1>>1, y!3>>3), A(x!2>>2, y!1>>1), A(x~b>>3, y!2>>2), A(x!3>>⊥)
+A(x!1>>1, y>>3), A(x!2>>2, y!1>>1), A(x~b>>3, y!2>>2)
+___
+/*cc77*/ A/*1*/(x!1, y!2), A/*2*/(x!2), A/*3*/(x!3, y!1), A/*4*/(x~b, y!3)
+---
+A/*4*/.x = ⊥, A/*2*/.x = A/*1*/.y
++++
+A/*4*/.x = A/*1*/.y, A/*2*/.x = ⊥
+___
+/*cc63*/ A/*1*/(x!1, y), A/*2*/(x!2, y!1), A/*3*/(x~b, y!2)
+---
+A/*3*/.x = ⊥, A/*1*/.y = ⊥
++++
+A/*3*/.x = A/*1*/.y
+_____
 A(y!1>>1), A(x~a!1>>1)
 ___
-/*cc23*/ A/*1*/(y!1), A/*2*/(x~a!1)
+/*cc29*/ A/*1*/(y!1), A/*2*/(x~a!1)
 ---
 
 +++
+
+****Rule 'colle_op' [A(x!0),A(y!0)->A(x),A(y)]****
+#0.0=0 #0.1=3 #1.0=0 #1.2=3 
+Apply colle_op
+FREE #1.2
+if pattern 2 is matched
+Modif sites: [0 -> {(1,1)}, 1 -> {(2,1)}]
+CC[0] and CCs {1} in the rhs are freshly disconnected
+CC[1] and CCs {0} in the rhs are freshly disconnected
 
 ****Rule 'monte' [A(x~a!0),A(y!0)->A(x~b),A(y)]****
 #0.0=0 #0.1=15 #1.0=0 #1.2=3 
 Apply monte
 SET #0.1 to state 1
 FREE #1.2
-if pattern 2 is matched
+if pattern 3 is matched
 Modif sites: [0 -> {(1,0), (1,1)}, 1 -> {(2,1)}]
 CC[0] and CCs {1} in the rhs are freshly disconnected
 CC[1] and CCs {0} in the rhs are freshly disconnected
+
+****Rule 'boucle' [A(x!0),A(x!1,y!0),A(x~b,y!1)->A(x!0,y!1),A(x!2,y!0),A(x~b!1,y!2)]****
+#0.0=0 #0.1=2 #1.0=0 #1.1=2 #1.2=2 #2.0=0 #2.1=11 #2.2=2 
+Apply boucle
+BND (#2.1,#0.2)
+if pattern 5 is matched
+Modif sites: [0 -> {(2,1)}, 2 -> {(1,1)}]
+
 
 ****Rule 'detruit' [A(x!0,y!1),A(x!1,y!0)->]****
 #0.0=1 #0.1=3 #0.2=3 #1.0=1 #1.1=3 #1.2=3 
 Apply detruit
 DEL #0
 DEL #1
-if pattern 3 is matched
+if pattern 4 is matched
 Modif sites: []
 agent #0 might have side effect disconnection on sites {1, 2}
 agent #1 might have side effect disconnection on sites {1, 2}
-
-****Rule 'boucle' [A(x!0),A(x!1,y!0),A(x~b,y!1)->A(x!0,y!1),A(x!2,y!0),A(x~b!1,y!2)]****
-#0.0=0 #0.1=2 #1.0=0 #1.1=2 #1.2=2 #2.0=0 #2.1=11 #2.2=2 
-Apply boucle
-BND (#2.1,#0.2)
-if pattern 4 is matched
-Modif sites: [0 -> {(2,1)}, 2 -> {(1,1)}]
-
 
 ****Rule 'colle' [A(x),A(y)->A(x!0),A(y!0)]****
 #0.0=0 #0.1=3 #1.0=0 #1.2=3 
