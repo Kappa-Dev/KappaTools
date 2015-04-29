@@ -299,7 +299,7 @@ let store_sites_rhs parameter error rule store_sites_rhs =
   error, store_sites_rhs
 
 (************************************************************************************)   
-(*RETURN A LIST FROM A SET *)
+(*UTILITY FUNCTIONS *)
 
 (*------------------------------------------------------------------------------*)
 (* A set of RHS site -> a list of RHS site*)
@@ -362,6 +362,40 @@ let anchor_set parameter error agent_type store_sites_anchor1 store_sites_anchor
     match get_anchor_set2 with
       | None -> Cckappa_sig.Site_map_and_set.empty_set
       | Some s -> s
+  in
+  let error, anchor_set =
+    Cckappa_sig.Site_map_and_set.union
+      parameter
+      error
+      anchor_set1
+      anchor_set2
+  in
+  anchor_set
+
+(*------------------------------------------------------------------------------*)
+(* A set of anchors site -> a list of anchors site: (combine two cases) fold*)
+
+let get_anchor_common parameter error store_sites_anchor =
+   Int_storage.Nearly_inf_Imperatif.fold
+     parameter
+     error
+     (fun parameter error agent_type site old_set ->
+       let error, set =
+         Cckappa_sig.Site_map_and_set.union
+           parameter
+           error
+           site
+           old_set                 
+       in
+       error, set
+     ) store_sites_anchor Cckappa_sig.Site_map_and_set.empty_set
+
+let fold_anchor_set parameter error store_sites_anchor_set1 store_sites_anchor_set2 =
+  let error, anchor_set1 =
+    get_anchor_common parameter error store_sites_anchor_set1
+  in
+  let error, anchor_set2 =
+    get_anchor_common parameter error store_sites_anchor_set2
   in
   let error, anchor_set =
     Cckappa_sig.Site_map_and_set.union
@@ -692,43 +726,13 @@ let collect_external_flow parameter error bind
           | None -> Cckappa_sig.Site_map_and_set.empty_set
           | Some s -> s
       in
-        (*get a list of anchor sites*)
-      let error, get_anchor_set1 =
-        Int_storage.Nearly_inf_Imperatif.fold
+      (*get a list of anchor sites*)
+      let anchor_set =
+        fold_anchor_set
           parameter
           error
-          (fun parameter error agent_type site old_set ->
-            let error, set =
-              Cckappa_sig.Site_map_and_set.union
-                parameter
-                error
-                site
-                old_set                 
-            in
-            error, set
-          ) store_sites_anchor_set1 Cckappa_sig.Site_map_and_set.empty_set
-      in
-      let error, get_anchor_set2 =
-        Int_storage.Nearly_inf_Imperatif.fold
-          parameter
-          error
-          (fun parameter error agent_type site old_set ->
-            let error, set =
-              Cckappa_sig.Site_map_and_set.union
-                parameter
-                error
-                site
-                old_set                 
-            in
-            error, set
-          ) store_sites_anchor_set2 Cckappa_sig.Site_map_and_set.empty_set
-      in
-      let error, anchor_set =
-        Cckappa_sig.Site_map_and_set.union
-          parameter
-          error
-          get_anchor_set1
-          get_anchor_set2
+          store_sites_anchor_set1 
+          store_sites_anchor_set2 
       in
         (*get a list of rhs sites*)
       let site_rhs_list =
