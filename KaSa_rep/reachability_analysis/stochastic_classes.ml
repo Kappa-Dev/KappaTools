@@ -106,7 +106,7 @@ let get_nsites parameter error key handler =
   in
   let error, sites_dic =
     match get_nsites with
-    | None -> warn parameter error (Some "line 141") Exit
+    | None -> warn parameter error (Some "line 109") Exit
                    (Ckappa_sig.Dictionary_of_sites.init())
     | Some dic -> error, dic
   in                  
