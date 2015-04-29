@@ -844,7 +844,7 @@ let init_graph_of_result counter env domain res =
 	    | domain'',_,[ compiled_rule ] ->
 	       domain'',
 	       Nbr.iteri
-		 (fun _ s -> Domain.apply_rule domain'' s compiled_rule)
+		 (fun _ s -> Rule_interpreter.apply_rule domain'' s compiled_rule)
 		 state value
 	    | domain'',_,[] -> domain'',state
 	    | domain'',_,_ -> (* TODO error *) domain'',state in
@@ -877,7 +877,7 @@ let init_graph_of_result counter env domain res =
 	  in
 	  token_vector.(tok_id) <- value;
 	  domain',state,sg
-      )	(domain,Domain.empty env.Environment.tokens,
+      )	(domain,Rule_interpreter.empty env.Environment.tokens,
 	 Graph.SiteGraph.init !Parameter.defaultGraphSize)
       res.Ast.init
   in
