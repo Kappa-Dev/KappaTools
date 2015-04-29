@@ -6,11 +6,11 @@
 %}
 
 %token EOF NEWLINE SEMICOLON COMMA DOT OP_PAR CL_PAR OP_CUR CL_CUR
-%token AT TYPE LAR CPUTIME EMAX TMAX PLOTNUM PLOTENTRY
+%token AT TYPE LAR CPUTIME EMAX TMAX PLOTNUM PLOTENTRY DELETE INTRO
 %token DO SET REPEAT UNTIL LOG PLUS MULT MINUS MAX MIN DIV SINUS COSINUS TAN
 %token POW ABS MODULO SQRT EXPONENT INFINITY TIME EVENT NULL_EVENT PROD_EVENT
 %token EQUAL AND OR GREATER SMALLER TRUE FALSE DIFF KAPPA_RAR KAPPA_LRAR
-%token <Tools.pos> DELETE INTRO PERT OBS TRACK CONFIG
+%token <Tools.pos> PERT OBS TRACK CONFIG
 %token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INIT LET PLOT
 %token <Tools.pos> FLUX ASSIGN ASSIGN2 TOKEN KAPPA_LNK PIPE
 %token <Tools.pos> PRINT PRINTF
@@ -140,9 +140,9 @@ instruction:
     ;
 
 init_declaration:
-    | multiple non_empty_mixture
-	       {(None,Ast.INIT_MIX ($1,$2))}
-    | ID LAR multiple {(None,Ast.INIT_TOK ($3,($1,rhs_pos 1)))}
+    | alg_expr non_empty_mixture
+	       {(None,Ast.INIT_MIX ($1,($2,rhs_pos 2)))}
+    | ID LAR alg_expr {(None,Ast.INIT_TOK ($3,($1,rhs_pos 1)))}
     | ID OP_CUR init_declaration CL_CUR
 	 {let _,init = $3 in (Some ($1,rhs_pos 1),init)}
     ;
@@ -190,12 +190,12 @@ effect:
     | FLUX print_expr boolean
 	   {if $3 then Ast.FLUX ($2,$1) else Ast.FLUXOFF ($2,$1)}
     | INTRO multiple_mixture
-	    {let (alg,mix) = $2 in Ast.INTRO (alg,mix,$1)}
+	    {let (alg,mix) = $2 in Ast.INTRO (alg,mix)}
     | INTRO error
 	{raise (ExceptionDefn.Syntax_Error
 		  (add_pos "Malformed perturbation instruction, I was expecting '$ADD alg_expression kappa_expression'"))}
     | DELETE multiple_mixture
-	     {let (alg,mix) = $2 in Ast.DELETE (alg,mix,$1)}
+	     {let (alg,mix) = $2 in Ast.DELETE (alg,mix)}
     | DELETE error
 	{raise (ExceptionDefn.Syntax_Error
 		  (add_pos "Malformed perturbation instruction, I was expecting '$DEL alg_expression kappa_expression'"))}
@@ -249,12 +249,6 @@ bool_expr:
     | alg_expr DIFF alg_expr {add_pos (Ast.COMPARE_OP(Term.DIFF,$1,$3))}
     | TRUE {add_pos Ast.TRUE}
     | FALSE {add_pos Ast.FALSE}
-    ;
-
-multiple:
-    | INT {add_pos (Ast.CONST (Nbr.I $1)) }
-    | FLOAT {add_pos (Ast.CONST (Nbr.F $1)) }
-    | LABEL {add_pos (Ast.OBS_VAR ($1)) }
     ;
 
 rule_label:
@@ -381,10 +375,10 @@ alg_with_radius:
     ;
 
 multiple_mixture:
-    | alg_expr non_empty_mixture {($1,$2)}
+    | alg_expr non_empty_mixture {($1,($2, rhs_pos 2))}
       /*conflict here because ID (blah) could be token non_empty mixture or mixture...*/
     | non_empty_mixture
-	{((Ast.CONST (Nbr.F 1.),(Lexing.dummy_pos,Lexing.dummy_pos)),$1)}
+	{((Ast.CONST (Nbr.I 1),(Lexing.dummy_pos,Lexing.dummy_pos)),add_pos $1)}
     ;
 
 non_empty_mixture:

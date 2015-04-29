@@ -236,7 +236,7 @@ let scan_initial_states parameters =
       match 
 	init_t
       with 
-      | Ast.INIT_MIX((alg,pos),mixture) ->
+      | Ast.INIT_MIX((alg,pos),(mixture,_pos')) ->
 	let remanent = scan_mixture parameters remanent mixture in 
           scan_alg parameters remanent alg
       | Ast.INIT_TOK ((alg,pos),tok) -> 
@@ -256,7 +256,7 @@ let scan_perts parameters =
           List.fold_left 
             (fun remanent m -> 
               match m with 
-              | Ast.INTRO (_,m,_) | Ast.DELETE(_,m,_) ->   
+              | Ast.INTRO (_,(m,_)) | Ast.DELETE(_,(m,_)) ->   
                 scan_mixture parameters remanent m 
               | Ast.UPDATE _ | Ast.STOP _ | Ast.SNAPSHOT _ | Ast.PLOTENTRY
 	      | Ast.UPDATE_TOK _ | Ast.PRINT _ | Ast.CFLOW _ 

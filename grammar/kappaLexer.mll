@@ -47,8 +47,8 @@ rule token = parse
 	 | "<>" {DIFF}
 	 | pert as s {let pos = position lexbuf in
 		      match s with
-		      | "$DEL" -> (DELETE pos)
-		      | "$ADD" -> (INTRO pos)
+		      | "$DEL" -> DELETE
+		      | "$ADD" -> INTRO
 		      | "$SNAPSHOT" -> (SNAPSHOT pos)
 		      | "$STOP" -> (STOP pos)
 		      | "$FLUX" -> (FLUX pos)

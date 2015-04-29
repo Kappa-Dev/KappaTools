@@ -28,7 +28,7 @@ let follower_string (bnd,fresh) mix uid = function
 	  try string_of_int (Hashtbl.find bnd uid)
 	  with Not_found -> "_"
      end
-  | _ -> ""
+  | Mixture.FREE | Mixture.WLD | Mixture.TYPE _ -> ""
 
 let intf_item env (bnd,fresh) mix sig_id agent_id
 		    f (site_id,(opt_v,opt_l)) =
@@ -70,9 +70,16 @@ let alg_expr env f alg =
     | Expr.CONST n -> Nbr.print f n
     | Expr.ALG_VAR i ->
        Format.fprintf f "'%a'" (Environment.print_alg env) i
-    | Expr.KAPPA_INSTANCE i ->
-       Format.fprintf f "|#secret#|"
-		     (* (mixture false env) (Environment.kappa_of_num i env) *)
+    | Expr.KAPPA_INSTANCE (_,ccs) ->
+       Pp.list
+	 (fun f -> Format.fprintf f " +@ ")
+	 (Pp.list
+	    (fun f -> Format.fprintf f "*")
+	    (fun f cc ->
+	     Format.fprintf
+	       f "|%a|"
+	       (Connected_component.print false env.Environment.signatures) cc))
+	 f ccs
     | Expr.TOKEN_ID i ->
        Format.fprintf f "|%a|" (Environment.print_token env) i
   in aux f alg
@@ -94,7 +101,7 @@ let modification env f = function
   | Primitives.PRINT (nme,va) ->
      Format.fprintf f "$PRINTF %a <%a>" (print_expr env) nme (print_expr env) va
   | Primitives.PLOTENTRY -> Format.pp_print_string f "$PLOTENTRY"
-  | Primitives.ITER_RULE ((n,_),rule) ->
+  | Primitives.ITER_RULE ((n,_),rule,_) ->
      if Mixture.is_empty rule.Primitives.lhs then
        Format.fprintf f "$ADD %a %a" (alg_expr env) n
 		      (mixture false env) rule.Primitives.rhs
@@ -113,7 +120,8 @@ let modification env f = function
 			 (NamedDecls.elt_name env.Environment.algs id)
        | Term.RULE id ->
 	  Format.fprintf f "$UPDATE '%s' %a" (Environment.rule_of_num id env)
-       | _ -> Format.fprintf f "$UPDATE '%a' %a" Term.print_dep_type d_id
+       | (Term.KAPPA _ | Term.TIME | Term.EVENT | Term.ABORT _ | Term.PERT _) ->
+	  Format.fprintf f "$UPDATE '%a' %a" Term.print_dep_type d_id
      end (alg_expr env) va
   | Primitives.SNAPSHOT fn ->
      Format.fprintf f "SNAPSHOT %a" (print_expr env) fn

@@ -725,7 +725,7 @@ let translate_init parameters error handler init =
    let (a,init_t,c) = init in
    match 
      init_t
-   with Ast.INIT_MIX((alg,pos),mixture) -> 
+   with Ast.INIT_MIX((alg,pos),(mixture,_pos')) -> 
      let error,c_alg = Prepreprocess.alg_map (lift (translate_mixture parameters) handler) error alg in 
      let error,c_mixture = translate_mixture parameters error handler mixture in 
    error,

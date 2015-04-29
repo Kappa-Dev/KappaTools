@@ -576,48 +576,50 @@ let compile_print_expr env domain mixs ex =
 
 let effects_of_modif variables lrules env domain ast_list =
   let rec iter mixs lrules rev_effects env domain ast_list =
+    let rule_effect alg_expr ast_rule mix_pos =
+      let (domain',mix,alg_pos) =
+	Expr.compile_alg env.Environment.algs.NamedDecls.finder
+			 env.Environment.tokens.NamedDecls.finder
+			 env.Environment.contact_map domain
+			 (env.Environment.fresh_kappa,[]) alg_expr in
+      let domain'',mix',elem_rules =
+	newrules_of_ast env.Environment.algs.NamedDecls.finder
+			env.Environment.tokens.NamedDecls.finder
+			env.Environment.contact_map domain'
+			mix None (ast_rule,mix_pos) in
+      let elem_rule = match elem_rules with
+	| [ _, r ] -> r
+	| _ ->
+	   raise
+	     (ExceptionDefn.Malformed_Decl
+		("Ambiguous rule in perturbation is impossible",mix_pos)) in
+      let (env',domain''',mixs') =
+	mixtures_of_result mixs env domain'' mix' in
+      let env,domain,mixs'',rule =
+	rule_of_ast ~is_pert:true env' domain''' mixs'
+		    (None, (ast_rule,mix_pos)) in
+      (env,domain,mixs'',rule::lrules,
+       (Primitives.ITER_RULE (alg_pos, rule, elem_rule))::rev_effects) in
     match ast_list with
     | [] -> (env,domain,mixs,lrules,List.rev rev_effects)
     | ast::tl ->
        let (env,domain,variables,lrules,rev_effects) =
 	 match ast with
-	 | INTRO (alg_expr, ast_mix, _pos) ->
-	    let (domain',mix,alg_pos) =
-	      Expr.compile_alg env.Environment.algs.NamedDecls.finder
-			       env.Environment.tokens.NamedDecls.finder
-			       env.Environment.contact_map domain
-			       (env.Environment.fresh_kappa,[]) alg_expr in
-	    let (env',domain'',mixs') =
-	      mixtures_of_result mixs env domain' mix in
+	 | INTRO (alg_expr, (ast_mix,mix_pos)) ->
 	    let ast_rule =
 	      { add_token=[]; rm_token=[]; lhs = []; arrow = Ast.RAR;
 		rhs = ast_mix; k_def=Term.with_dummy_pos (Ast.CONST Nbr.zero);
 		k_un=None;k_op=None;
 	      } in
-	    let env,domain,mixs'',rule =
-	      rule_of_ast ~is_pert:true env' domain'' mixs'
-			  (None, Term.with_dummy_pos ast_rule) in
-	     (env,domain,mixs'',rule::lrules,
-		(Primitives.ITER_RULE (alg_pos, rule))::rev_effects)
-	 | DELETE (alg_expr, ast_mix, _pos) ->
-	    let (domain',mix,alg_pos) =
-	      Expr.compile_alg env.Environment.algs.NamedDecls.finder
-			       env.Environment.tokens.NamedDecls.finder
-			       env.Environment.contact_map domain
-			       (env.Environment.fresh_kappa,[]) alg_expr in
-	    let (env',domain'',mixs') =
-	      mixtures_of_result mixs env domain' mix in
+	    rule_effect alg_expr ast_rule mix_pos
+	 | DELETE (alg_expr, (ast_mix, mix_pos)) ->
 	    let ast_rule =
 	      { add_token=[]; rm_token=[]; lhs = ast_mix; arrow = Ast.RAR;
 		rhs = [];
 		k_def=Term.with_dummy_pos (Ast.CONST Nbr.zero);
 		k_un=None;k_op=None;
 	      } in
-	    let env,domain,mixs'',rule =
-	      rule_of_ast ~is_pert:true env' domain'' mixs'
-			  (None,Term.with_dummy_pos ast_rule) in
-	    (env, domain, mixs'',rule::lrules,
-	     (Primitives.ITER_RULE (alg_pos, rule))::rev_effects)
+	    rule_effect alg_expr ast_rule mix_pos
 	 | UPDATE ((nme, pos_rule), alg_expr) ->
 	    let i,is_rule =
 	      (try (Environment.num_of_rule nme env,true)
@@ -839,7 +841,7 @@ let init_graph_of_result counter env domain res =
     List.fold_left
       (fun (domain,state,sg) (opt_vol,init_t,_) -> (*TODO dealing with volumes*)
        match init_t with
-       | INIT_MIX (alg, ast) ->
+       | INIT_MIX (alg, (ast,mix_pos)) ->
 	  let (domain',_,alg') =
 	    Expr.compile_alg env.Environment.algs.NamedDecls.finder
 			     env.Environment.tokens.NamedDecls.finder
@@ -854,7 +856,7 @@ let init_graph_of_result counter env domain res =
 	      newrules_of_ast env.Environment.algs.NamedDecls.finder
 			      env.Environment.tokens.NamedDecls.finder
 			      env.Environment.contact_map domain' (0,[]) None
-			      (Term.with_dummy_pos fake_rule)
+			      (fake_rule,mix_pos)
 	    with
 	    | domain'',_,[ _, compiled_rule ] ->
 	       domain'',
@@ -865,10 +867,9 @@ let init_graph_of_result counter env domain res =
 	    | domain'',_,[] -> domain'',state
 	    | _,_,_ ->
 	       raise (ExceptionDefn.Malformed_Decl
-			(Term.with_dummy_pos
-			   (Format.asprintf
-			      "initial mixture %a is partially defined"
-			      Expr.print_ast_mix ast))) in
+			(Format.asprintf
+			   "initial mixture %a is partially defined"
+			   Expr.print_ast_mix ast,mix_pos)) in
 	  let cpt = ref 0 in
 	  let sg = ref sg in
 	  let n = match !Parameter.rescale with

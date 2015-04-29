@@ -344,14 +344,14 @@ let rec modif_map f error alg =
   match 
     alg 
   with 
-  | Ast.INTRO (alg,mixture,pos) ->
+  | Ast.INTRO (alg,(mixture,pos)) ->
     let error,alg' = (map_with_pos alg_map) f error alg in
     let error,mixture' = f error mixture in 
-    error,Ast.INTRO(alg',mixture',pos)
-  | Ast.DELETE (alg,mixture,pos) ->
+    error,Ast.INTRO(alg',(mixture',pos))
+  | Ast.DELETE (alg,(mixture,pos)) ->
     let error,alg' = (map_with_pos alg_map) f error alg in
     let error,mixture' = f error mixture in 
-    error,Ast.DELETE(alg',mixture',pos)
+    error,Ast.DELETE(alg',(mixture',pos))
   | Ast.UPDATE (pos,alg) -> 
     let error,alg' = (map_with_pos alg_map) f error alg in 
     error,Ast.UPDATE (pos,alg')
@@ -437,10 +437,10 @@ let refine_init_t parameters error init_t =
   match 
     init_t 
   with 
-  | Ast.INIT_MIX(alg_ex,mixture) -> 
+  | Ast.INIT_MIX(alg_ex,(mixture,pos)) -> 
     let error,alg_ex = alg_with_pos_map (refine_mixture parameters) error alg_ex in 
     let error,mixture = refine_mixture parameters error mixture in 
-      error,Some(Ast.INIT_MIX(alg_ex,mixture))
+      error,Some(Ast.INIT_MIX(alg_ex,(mixture,pos)))
   | Ast.INIT_TOK (alg_ex,token) -> 
     let error,alg_ex = alg_with_pos_map (refine_mixture parameters) error alg_ex in 
     let error,token = refine_token parameters error token in 
@@ -557,14 +557,14 @@ let translate_compil parameters error compil =
           List.fold_left 
             (fun (error,list) m -> 
               match m with 
-              | Ast.INTRO (a,m,p) -> 
+              | Ast.INTRO (a,(m,p)) -> 
 		let error,a' = alg_with_pos_map (refine_mixture parameters) error a in 
                 let error,m' = refine_mixture parameters error (rev_ast m) in 
-                error,Ast.INTRO(a',m',p)::list
-              | Ast.DELETE (a,m,p) -> 
+                error,Ast.INTRO(a',(m',p))::list
+              | Ast.DELETE (a,(m,p)) -> 
                 let error,a' = alg_with_pos_map (refine_mixture parameters) error a in 
 		let error,m' = refine_mixture parameters error (rev_ast m) in 
-                error,Ast.DELETE(a',m',p)::list
+                error,Ast.DELETE(a',(m',p))::list
               | Ast.UPDATE (x,y) -> 
 		let error,y' = alg_with_pos_map (refine_mixture parameters) error y in  
 		error,(Ast.UPDATE (x,y'))::list

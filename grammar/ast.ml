@@ -80,8 +80,8 @@ type 'alg_expr print_expr =
   | Alg_pexpr of 'alg_expr
 
 type 'mixture modif_expr =
-  | INTRO of ('mixture ast_alg_expr with_pos * 'mixture  * Tools.pos)
-  | DELETE of ('mixture ast_alg_expr with_pos * 'mixture * Tools.pos)
+  | INTRO of ('mixture ast_alg_expr with_pos * 'mixture with_pos)
+  | DELETE of ('mixture ast_alg_expr with_pos * 'mixture with_pos)
   | UPDATE of
       (string Term.with_pos * 'mixture ast_alg_expr with_pos) (*TODO: pause*)
   | UPDATE_TOK of (string with_pos * 'mixture ast_alg_expr with_pos) (*TODO: pause*)
@@ -106,7 +106,7 @@ type configuration = string Term.with_pos * (str_pos list)
 type 'mixture variable_def = string with_pos * 'mixture ast_alg_expr with_pos
 
 type 'mixture init_t =
-  | INIT_MIX of 'mixture ast_alg_expr with_pos * 'mixture
+  | INIT_MIX of 'mixture ast_alg_expr with_pos * 'mixture with_pos
   | INIT_TOK of 'mixture ast_alg_expr with_pos * string with_pos
 
 type 'mixture instruction =

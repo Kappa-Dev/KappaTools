@@ -84,7 +84,7 @@ type rule = {
 (*side_effect: ag_i -> {site_j,...} if one should check at runtime the id of the agent connected to (ag_i,site_j) and build its cc after rule application*)
 
 type modification =
-    ITER_RULE of Expr.alg_expr Term.with_pos * rule
+    ITER_RULE of Expr.alg_expr Term.with_pos * rule * elementary_rule
   | UPDATE of Term.dep_type * Expr.alg_expr Term.with_pos
   | SNAPSHOT of Expr.alg_expr Ast.print_expr Term.with_pos list
   | STOP of Expr.alg_expr Ast.print_expr Term.with_pos list

@@ -57,7 +57,7 @@ let apply_n_time err_fmt x r state env counter pert_ids pert_events tracked =
 let trigger_effect err_fmt state env pert_ids tracked pert_events pert p_id
 		   eff snapshot counter =
   match eff with
-  | Primitives.ITER_RULE ((v,_),r) ->
+  | Primitives.ITER_RULE ((v,_),r,_) ->
      let x = State.value_alg state counter env v in
     if x = Nbr.F infinity then
       invalid_arg
