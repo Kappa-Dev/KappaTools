@@ -12,7 +12,6 @@ type t = {
   free_id: int;
 }
 
-
 let empty env = {
   roots_of_ccs = Connected_component.Map.empty;
   edges = Edges.empty;
@@ -121,10 +120,17 @@ let apply_rule ~get_alg domain counter state rule =
       (fun inj cc ->
        let root =
 	 RootHeap.random (Connected_component.Map.find cc state.roots_of_ccs) in
-       Connected_component.Matching.reconstruct domain state.edges inj cc root)
-      Connected_component.Matching.empty rule.Primitives.connected_components in
-  let () =
-    update_tokens
-      ~get_alg counter state rule.Primitives.consumed_tokens
-      rule.Primitives.injected_tokens in
-  update_edges domain inj state rule.Primitives.removed rule.Primitives.inserted
+       match inj with
+       | Some inj ->
+	  Connected_component.Matching.reconstruct state.edges inj cc root
+       | None -> None)
+      (Some Connected_component.Matching.empty)
+      rule.Primitives.connected_components in
+  match inj with
+  | Some inj ->
+     let () =
+       update_tokens
+	 ~get_alg counter state rule.Primitives.consumed_tokens
+	 rule.Primitives.injected_tokens in
+     update_edges domain inj state rule.Primitives.removed rule.Primitives.inserted
+  | None -> state

@@ -46,7 +46,7 @@ module Matching : sig
   type t
   val empty : t
   val get : Node.t -> t -> int
-  val reconstruct : Env.t -> Edges.t -> t -> cc -> int -> t
+  val reconstruct : Edges.t -> t -> cc -> int -> t option
 
   val observables_from_free :
     Env.t -> Edges.t -> int -> int -> int -> (cc * int) list
