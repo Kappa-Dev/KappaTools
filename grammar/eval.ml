@@ -643,21 +643,15 @@ let effects_of_modif variables lrules env domain ast_list =
 	     (Primitives.UPDATE ((if is_rule then Term.RULE i
 	      else Term.ALG i), alg_pos))::rev_effects)
 	 | UPDATE_TOK ((tk_nme,tk_pos),alg_expr) ->
-	    let tk_id =
-	      try Environment.num_of_token tk_nme env with
-	      | Not_found ->
-		 raise (ExceptionDefn.Malformed_Decl
-			  ("Token " ^ (tk_nme ^ " is not defined"),tk_pos))
-	    in
-	    let (domain', mix, alg_pos) =
-	      Expr.compile_alg env.Environment.algs.NamedDecls.finder
-			       env.Environment.tokens.NamedDecls.finder
-			       env.Environment.contact_map domain
-			       (env.Environment.fresh_kappa,[]) alg_expr in
-	    let (env',domain'',mixs') =
-	      mixtures_of_result mixs env domain' mix in
-	    (env',domain'',mixs',lrules,
-	     (Primitives.UPDATE (Term.TOK tk_id, alg_pos))::rev_effects)
+	    let ast_rule =
+	      { add_token=[(alg_expr,(tk_nme,tk_pos))];
+		rm_token=[Term.with_dummy_pos (Ast.TOKEN_ID tk_nme),
+			  (tk_nme,tk_pos)];
+		arrow = Ast.RAR; lhs=[]; rhs=[];
+		k_def=Term.with_dummy_pos (Ast.CONST Nbr.zero);
+		k_un=None; k_op= None; } in
+	    rule_effect (Term.with_dummy_pos (Ast.CONST (Nbr.I 1)))
+			ast_rule tk_pos
 	 | SNAPSHOT (pexpr,_) ->
 	    let (domain',mix,pexpr') =
 	      compile_print_expr env domain

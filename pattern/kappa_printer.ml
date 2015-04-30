@@ -103,8 +103,16 @@ let modification env f = function
   | Primitives.PLOTENTRY -> Format.pp_print_string f "$PLOTENTRY"
   | Primitives.ITER_RULE ((n,_),rule,_) ->
      if Mixture.is_empty rule.Primitives.lhs then
-       Format.fprintf f "$ADD %a %a" (alg_expr env) n
-		      (mixture false env) rule.Primitives.rhs
+       if Mixture.is_empty rule.Primitives.rhs then
+	 match rule.Primitives.add_token with
+	 | [ va, id ] ->
+	    Format.fprintf f "%s <- %a"
+			   (NamedDecls.elt_name env.Environment.tokens id)
+			   (alg_expr env) va
+	 | _ -> assert false
+       else
+	 Format.fprintf f "$ADD %a %a" (alg_expr env) n
+			(mixture false env) rule.Primitives.rhs
      else
        let () = assert (Mixture.is_empty rule.Primitives.rhs) in
        Format.fprintf f "$DEL %a %a" (alg_expr env) n
@@ -112,15 +120,13 @@ let modification env f = function
   | Primitives.UPDATE (d_id,(va,_)) ->
      begin
        match d_id with
-       | Term.TOK id ->
-	  Format.fprintf f "%s <- %a"
-			 (NamedDecls.elt_name env.Environment.tokens id)
        | Term.ALG id ->
 	  Format.fprintf f "$UPDATE '%s' %a"
 			 (NamedDecls.elt_name env.Environment.algs id)
        | Term.RULE id ->
 	  Format.fprintf f "$UPDATE '%s' %a" (Environment.rule_of_num id env)
-       | (Term.KAPPA _ | Term.TIME | Term.EVENT | Term.ABORT _ | Term.PERT _) ->
+       | (Term.KAPPA _ | Term.TIME | Term.EVENT
+	  | Term.ABORT _ | Term.PERT _ | Term.TOK _) ->
 	  Format.fprintf f "$UPDATE '%a' %a" Term.print_dep_type d_id
      end (alg_expr env) va
   | Primitives.SNAPSHOT fn ->
