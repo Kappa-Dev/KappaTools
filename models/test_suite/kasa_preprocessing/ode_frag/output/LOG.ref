@@ -380,27 +380,6 @@ site_type_anchor:{0}
 Flow of information in the ODE semantics:agent_type:3:
 site_type_anchor:{0}
 * Internal flow:
-Flow of information in the ODE semantics:agent_type:0:
-- agent_type:0:site:1 -> agent_type:0:modified_type:0
-Flow of information in the ODE semantics:agent_type:1:
-- agent_type:1:site:1 -> agent_type:1:modified_type:0
-- agent_type:1:site:3 -> agent_type:1:modified_type:2
-- agent_type:1:site:1 -> agent_type:1:modified_type:0
-- agent_type:1:site:3 -> agent_type:1:modified_type:2
-- agent_type:1:site:1 -> agent_type:1:modified_type:0
-- agent_type:1:site:1 -> agent_type:1:modified_type:0
-Flow of information in the ODE semantics:agent_type:2:
-- agent_type:2:site:1 -> agent_type:2:modified_type:0
-Flow of information in the ODE semantics:agent_type:3:
-Flow of information in the ODE semantics:agent_type:0:
-Flow of information in the ODE semantics:agent_type:1:
-- agent_type:1:site:1 -> agent_type:1:anchor_type:0
-- agent_type:1:site:1 -> agent_type:1:anchor_type:0
-- agent_type:1:site:1 -> agent_type:1:anchor_type:0
-- agent_type:1:site:1 -> agent_type:1:anchor_type:0
-Flow of information in the ODE semantics:agent_type:2:
-- agent_type:2:site:1 -> agent_type:2:anchor_type:0
-Flow of information in the ODE semantics:agent_type:3:
 * External flow:
 anchor_type:3:anchor:0 -> agent_type:2:modified_type:1
 anchor_type:2:anchor:0 -> agent_type:1:modified_type:1

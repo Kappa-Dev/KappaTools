@@ -80,9 +80,5 @@ Flow of information in the ODE semantics:
 * Anchor sites:
 * Anchor sites 2:
 * Internal flow:
-Flow of information in the ODE semantics:agent_type:1:
-Flow of information in the ODE semantics:agent_type:2:
-Flow of information in the ODE semantics:agent_type:1:
-Flow of information in the ODE semantics:agent_type:2:
 * External flow:
 execution finished without any exception
