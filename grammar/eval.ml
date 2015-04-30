@@ -856,7 +856,10 @@ let init_graph_of_result counter env domain res =
 	       domain'',
 	       Nbr.iteri
 		 (fun _ s ->
-		  Rule_interpreter.apply_rule env domain'' counter s compiled_rule)
+		  Rule_interpreter.apply_rule
+		    ~get_alg:(fun i ->
+			      fst (snd env.Environment.algs.NamedDecls.decls.(i)))
+		    domain'' counter s compiled_rule)
 		 state value
 	    | domain'',_,[] -> domain'',state
 	    | _,_,_ ->
@@ -893,7 +896,10 @@ let init_graph_of_result counter env domain res =
 	    with
 	    | domain'',_,[ _, compiled_rule ] ->
 	       domain'',
-	       Rule_interpreter.apply_rule env domain'' counter state compiled_rule
+	       Rule_interpreter.apply_rule
+		 ~get_alg:(fun i ->
+			   fst (snd env.Environment.algs.NamedDecls.decls.(i)))
+		 domain'' counter state compiled_rule
 	    | _,_,_ -> assert false in
 	  let (domain'',_,alg') =
 	    Expr.compile_alg env.Environment.algs.NamedDecls.finder
@@ -1109,8 +1115,9 @@ let initialize logger overwrite result =
     pert_of_result kappa_vars env domain pure_rules result in
 
   Debug.tag logger "\t -initial conditions";
-  let domain,state,sg,token_vector =
+  let domain,graph,sg,token_vector =
     init_graph_of_result counter env domain result in
+  let state = State_interpreter.initial env counter graph [] in
 
   Debug.tag logger "\t Done";
   Debug.tag logger "+ Analyzing non local patterns..." ;

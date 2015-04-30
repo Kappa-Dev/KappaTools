@@ -5,21 +5,18 @@ end
 
 module RootHeap = Heap.Make(Root)
 
-type t =
-    {
-      roots_of_ccs: RootHeap.t Connected_component.Map.t;
-      edges: Edges.t;
-      tokens: Nbr.t array;
-      variables_overwrite: Expr.alg_expr option array;
-      free_id: int;
-    }
+type t = {
+  roots_of_ccs: RootHeap.t Connected_component.Map.t;
+  edges: Edges.t;
+  tokens: Nbr.t array;
+  free_id: int;
+}
 
 
 let empty env = {
   roots_of_ccs = Connected_component.Map.empty;
   edges = Edges.empty;
   tokens = Array.make (NamedDecls.size env.Environment.tokens) Nbr.zero;
-  variables_overwrite = Array.make (NamedDecls.size env.Environment.algs) None;
   free_id = 1;
 }
 
@@ -84,7 +81,6 @@ let update_edges domain inj_nodes state removed added =
        deal_transformation true domain inj2graph edges roots transf)
       aux added in
   { roots_of_ccs = roots'; edges = edges';
-    variables_overwrite = state.variables_overwrite;
     tokens = state.tokens; free_id = free_id'; }
 
 let instance_number state ccs_l =
@@ -97,37 +93,29 @@ let instance_number state ccs_l =
     List.fold_left (fun acc cc -> Nbr.mult acc (size cc)) (Nbr.I 1) ccs in
   List.fold_left (fun acc ccs -> Nbr.add acc (rect_approx ccs)) Nbr.zero ccs_l
 
-let value_bool env counter state expr =
+let value_bool ~get_alg counter state expr =
   Expr_interpreter.value_bool
-    counter
-    ~get_alg:(fun i ->
-	      match state.variables_overwrite.(i) with
-	      | None -> fst (snd env.Environment.algs.NamedDecls.decls.(i))
-	      | Some expr -> expr)
+    counter ~get_alg
     ~get_mix:(fun (_,ccs) -> instance_number state ccs)
     ~get_tok:(fun i -> state.tokens.(i))
     expr
-let value_alg env counter state alg =
+let value_alg ~get_alg counter state alg =
   Expr_interpreter.value_alg
-    counter
-    ~get_alg:(fun i ->
-	      match state.variables_overwrite.(i) with
-	      | None -> fst (snd env.Environment.algs.NamedDecls.decls.(i))
-	      | Some expr -> expr)
+    counter ~get_alg
     ~get_mix:(fun (_,ccs) -> instance_number state ccs)
     ~get_tok:(fun i -> state.tokens.(i))
     alg
 
-let update_tokens env counter state consumed injected =
+let update_tokens ~get_alg counter state consumed injected =
   let do_op op l =
     List.iter
       (fun (expr,i) ->
        state.tokens.(i) <-
-	 op state.tokens.(i) (value_alg env counter state expr))
+	 op state.tokens.(i) (value_alg ~get_alg counter state expr))
       l in
   let () = do_op Nbr.sub consumed in do_op Nbr.add injected
 
-let apply_rule env domain counter state rule =
+let apply_rule ~get_alg domain counter state rule =
   let inj =
     List.fold_left
       (fun inj cc ->
@@ -137,6 +125,6 @@ let apply_rule env domain counter state rule =
       Connected_component.Matching.empty rule.Primitives.connected_components in
   let () =
     update_tokens
-      env counter state rule.Primitives.consumed_tokens
+      ~get_alg counter state rule.Primitives.consumed_tokens
       rule.Primitives.injected_tokens in
   update_edges domain inj state rule.Primitives.removed rule.Primitives.inserted

@@ -2,6 +2,12 @@ type t
 
 val empty : Environment.t -> t
 
+val value_alg :
+  get_alg:(int -> Expr.alg_expr) -> Mods.Counter.t -> t ->
+  Expr.alg_expr -> Nbr.t
+val value_bool :
+  get_alg:(int -> Expr.alg_expr) -> Mods.Counter.t -> t ->
+  Expr.alg_expr Ast.bool_expr -> bool
 val apply_rule :
-  Environment.t -> Connected_component.Env.t -> Mods.Counter.t ->
-  t -> Primitives.elementary_rule -> t
+  get_alg:(int -> Expr.alg_expr) -> Connected_component.Env.t -> Mods.Counter.t
+  -> t -> Primitives.elementary_rule -> t
