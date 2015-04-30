@@ -1161,96 +1161,96 @@ let negative_upd state cause (u,i) int_lnk counter env =
 
   (* sub-function that removes all injections pointed by lifts --if they *)
   (* still exist                                                         *)
-	let remove_injs state liftset pert_ids env =
-		let injections = state.injections
+  let remove_injs state liftset pert_ids env =
+    let injections = state.injections
+    in
+    LiftSet.fold
+      (fun phi (env,pert_ids) ->
+       if Injection.is_trashed phi then (LiftSet.remove liftset phi ; (env,pert_ids)) 
+       else
+	 let mix_id, cc_id, inj_id =
+	   let i = Injection.get_address phi in
+	   let (m,c) = Injection.get_coordinate phi
+	   in
+	   m,c,i
+	 in
+	 let comp_injs_opt =
+	   try injections.(mix_id)
+	   with
+	   | Invalid_argument msg ->
+	      invalid_arg ("State.negative_upd: " ^ msg)
+	 in
+	 match comp_injs_opt with
+	 | None ->
+	    invalid_arg
+	      "State.negative_upd: rule was applied with no injection"
+	 | Some comp_injs ->
+	    let opt_inj_cc_id =
+	      (try comp_injs.(cc_id)
+	       with
+	       | Invalid_argument msg ->
+		  invalid_arg ("State.negative_upd: " ^ msg)) in
+	    let injs_cc_id =
+	      match opt_inj_cc_id with
+	      | None ->
+		 invalid_arg
+		   "State.negative_upd: rule was applied when a cc had no injection"
+	      | Some injs_cc_id -> injs_cc_id
+	    in
+	    let _ (*injs_cc_id*) =
+	      begin
+		let mix = kappa_of_id mix_id state
 		in
-		LiftSet.fold
-			(fun phi (env,pert_ids) ->
-				if Injection.is_trashed phi then (LiftSet.remove liftset phi ; (env,pert_ids)) 
-				else
-				let mix_id, cc_id, inj_id =
-					let i = Injection.get_address phi in
-					let (m,c) = Injection.get_coordinate phi
-					in
-					m,c,i
-				in
-				let comp_injs_opt =
-					try injections.(mix_id)
-					with
-					| Invalid_argument msg ->
-							invalid_arg ("State.negative_upd: " ^ msg)
-				in
-				match comp_injs_opt with
-				| None ->
-						invalid_arg
-							"State.negative_upd: rule was applied with no injection"
-				| Some comp_injs ->
-						let opt_inj_cc_id =
-							(try comp_injs.(cc_id)
-							with
-							| Invalid_argument msg ->
-									invalid_arg ("State.negative_upd: " ^ msg)) in
-						let injs_cc_id =
-							match opt_inj_cc_id with
-								| None ->
-										invalid_arg
-											"State.negative_upd: rule was applied when a cc had no injection"
-								| Some injs_cc_id -> injs_cc_id
-						in
-						let _ (*injs_cc_id*) =
-						begin
-							let mix = kappa_of_id mix_id state
-							in
-							Injection.fold
-							  (fun i j _ ->
-							   let a_i = Mixture.agent_of_id i mix in
-							   let u_j = try SiteGraph.node_of_id state.graph j
-								     with _ ->
-								       invalid_arg (Format.asprintf
-										      "State.negative_update: Node #%d is no longer in the graph and injection %a of mixture %a was pointing on it!"
-										      j Injection.print phi (Kappa_printer.mixture false env) mix)
-								in
-								Mixture.fold_interface
-								(fun site_id (int_opt, lnk_opt) _ ->
-									let (_ : unit) =
-										match int_opt with
-										| None -> ()
-										| Some _ ->
-												let (lifts, _) = Node.get_lifts u_j site_id 
-												in
-												LiftSet.remove lifts phi
-									in
-									match lnk_opt with
-									| Mixture.WLD -> ()
-									| Mixture.BND | Mixture.TYPE _ |	Mixture.FREE ->
-										let (_, lifts) = try Node.get_lifts u_j site_id with exn -> invalid_arg ("State.negative_update: "^(Printexc.to_string exn))
-										in
-										LiftSet.remove lifts phi
-									) a_i ()
-								) phi () ;
-								let _ = InjectionHeap.remove inj_id injs_cc_id in
-								if !Parameter.fluxModeOn then update_activity state ~cause mix_id counter env ;
-						end
-						in
-						(* comp_injs.(cc_id) <- Some injs_cc_id; *)
-						(* not necessary because comp_injs.(cc_id) has been    *)
-						(* modified by side effect                             *)
-						update_dep state ~cause (Term.KAPPA mix_id) pert_ids counter env (*TODO: use influence map for this?*)
-					)
-					liftset (env,pert_ids) 
-	in
-	(*end sub function*)
-	let (liftset_int, liftset_lnk) = try Node.get_lifts u i with _ -> failwith "State.negative_udpate"
-	in
-	let env,pert_ids = 
-		match int_lnk with
-			| 0 -> remove_injs state liftset_int IntSet.empty env
-			| 1 -> remove_injs state liftset_lnk IntSet.empty env
-			| _ -> (*removing both dependencies*) 
-				(let env,pert_ids = remove_injs state liftset_lnk IntSet.empty env in 
-					remove_injs state liftset_int pert_ids env)
-	in
-	(env,pert_ids)
+		Injection.fold
+		  (fun i j _ ->
+		   let a_i = Mixture.agent_of_id i mix in
+		   let u_j = try SiteGraph.node_of_id state.graph j
+			     with _ ->
+			       invalid_arg (Format.asprintf
+					      "State.negative_update: Node #%d is no longer in the graph and injection %a of mixture %a was pointing on it!"
+					      j Injection.print phi (Kappa_printer.mixture false env) mix)
+		   in
+		   Mixture.fold_interface
+		     (fun site_id (int_opt, lnk_opt) _ ->
+		      let (_ : unit) =
+			match int_opt with
+			| None -> ()
+			| Some _ ->
+			   let (lifts, _) = Node.get_lifts u_j site_id 
+			   in
+			   LiftSet.remove lifts phi
+		      in
+		      match lnk_opt with
+		      | Mixture.WLD -> ()
+		      | (Mixture.BND | Mixture.TYPE _ |	Mixture.FREE) ->
+			 let (_, lifts) = try Node.get_lifts u_j site_id with exn -> invalid_arg ("State.negative_update: "^(Printexc.to_string exn))
+			 in
+			 LiftSet.remove lifts phi
+		     ) a_i ()
+		  ) phi () ;
+		let _ = InjectionHeap.remove inj_id injs_cc_id in
+		if !Parameter.fluxModeOn then update_activity state ~cause mix_id counter env ;
+	      end
+	    in
+	    (* comp_injs.(cc_id) <- Some injs_cc_id; *)
+	    (* not necessary because comp_injs.(cc_id) has been    *)
+	    (* modified by side effect                             *)
+	    update_dep state ~cause (Term.KAPPA mix_id) pert_ids counter env (*TODO: use influence map for this?*)
+      )
+      liftset (env,pert_ids) 
+  in
+  (*end sub function*)
+  let (liftset_int, liftset_lnk) = try Node.get_lifts u i with _ -> failwith "State.negative_udpate"
+  in
+  let env,pert_ids = 
+    match int_lnk with
+    | 0 -> remove_injs state liftset_int IntSet.empty env
+    | 1 -> remove_injs state liftset_lnk IntSet.empty env
+    | _ -> (*removing both dependencies*) 
+       (let env,pert_ids = remove_injs state liftset_lnk IntSet.empty env in 
+	remove_injs state liftset_int pert_ids env)
+  in
+  (env,pert_ids)
 
 (* bind allow for looping bond *)
 let bind state cause (u, i) (v, j) side_effects pert_ids counter env =
