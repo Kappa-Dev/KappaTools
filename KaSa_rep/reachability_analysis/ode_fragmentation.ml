@@ -40,12 +40,9 @@ type set = Cckappa_sig.Site_map_and_set.set
 
 type sites_ode = (set AgentMap.t * set AgentMap.t)
 
-type pair_int_flow =
-    ((Cckappa_sig.agent_name * int *  int) list) AgentMap.t
-
 type elt_set = Cckappa_sig.Site_map_and_set.elt
 
-type pair_int_flow' =
+type pair_int_flow =
     ((Cckappa_sig.agent_name * elt_set *  elt_set) list)AgentMap.t
 
 type pair_ext_flow =
@@ -58,9 +55,9 @@ type ode_frag =
       store_sites_rhs            : int list AgentMap.t;
       store_sites_rhs_set        : set AgentMap.t;
       store_sites_anchor_set1    : set AgentMap.t;
-      (*store_internal_flow1       : pair_int_flow';*) 
+      store_internal_flow1       : pair_int_flow;
       store_sites_anchor_set2    : set AgentMap.t;
-      (*store_internal_flow2      : pair_int_flow'; *)
+      store_internal_flow2       : pair_int_flow; 
       store_external_flow        : pair_ext_flow
     }
 
@@ -614,19 +611,10 @@ let cartesian_prod i a b =
   in
   loop a [] 
 
-let cartesian_prod' i a b =
-  let b' = List.rev b in
-  let rec loop a acc = match a with
-    | [] -> List.rev acc
-    | x :: xs ->
-      loop xs (List.rev_append (List.rev_map (fun y -> (i,x, y)) b') acc)
-  in
-  loop a [] 
-
 let internal_flow_rhs_modified parameter error agent_type store_sites_rhs_set
     store_sites_modified_set =
   (*get the result of intersection between rhs and modified*)
-  let error, result_inter_set =
+  (*  let error, result_inter_set =
     Cckappa_sig.Site_map_and_set.inter
       parameter
       error
@@ -635,15 +623,24 @@ let internal_flow_rhs_modified parameter error agent_type store_sites_rhs_set
   in
   (*TODO: keep type set and use casteran product for set *)
   let result_inter_list =
-    Cckappa_sig.Site_map_and_set.elements result_inter_set in
+    Cckappa_sig.Site_map_and_set.elements result_inter_set in*)
+  let result_modified_list =
+    Cckappa_sig.Site_map_and_set.elements store_sites_modified_set in
   let rhs_list =
     Cckappa_sig.Site_map_and_set.elements store_sites_rhs_set in
-  (*match rhs_list with
+  (*let error, result =
+    if Cckappa_sig.Site_map_and_set.is_empty_set
+      result_inter_set
+    then*)
+  match rhs_list with
     | [] | [_] -> []
-    | _ ->*)
-      (*return the casterant product of two lists*)
-      cartesian_prod' agent_type rhs_list result_inter_list 
-
+    | _ ->
+    (*return the casterant product of two lists*)
+      cartesian_prod
+	agent_type
+	rhs_list
+	result_modified_list
+	
 (*------------------------------------------------------------------------------*)
 (*compute internal_flow: site -> modified site*)
 
@@ -660,6 +657,7 @@ let collect_internal_flow1 parameter error get_rule
         | Cckappa_sig.Ghost -> error, store_internal_flow
         | Cckappa_sig.Agent agent ->
           let agent_type = agent.Cckappa_sig.agent_name in
+	  (*get a set of rhs site*)
           let error, get_rhs_set =
             Int_storage.Nearly_inf_Imperatif.unsafe_get
               parameter
@@ -672,6 +670,7 @@ let collect_internal_flow1 parameter error get_rule
               | None -> Cckappa_sig.Site_map_and_set.empty_set
               | Some s -> s
           in
+	  (*get a set of modified site*)
           let error, get_modified_set =
             Int_storage.Nearly_inf_Imperatif.unsafe_get
               parameter
@@ -684,6 +683,7 @@ let collect_internal_flow1 parameter error get_rule
               | None -> Cckappa_sig.Site_map_and_set.empty_set
               | Some s -> s
           in
+	  (**)
           let get_internal_flow =
             internal_flow_rhs_modified
               parameter
@@ -693,7 +693,7 @@ let collect_internal_flow1 parameter error get_rule
               modified_set           
           in
           (*store*)
-          let error, get_old_list =
+          (*let error, get_old_list =
             Int_storage.Nearly_inf_Imperatif.unsafe_get
               parameter
               error
@@ -705,12 +705,12 @@ let collect_internal_flow1 parameter error get_rule
               | None -> []
               | Some s -> s
           in
-          let new_list = List.concat [get_internal_flow; old_list] in
+	  let new_list = List.concat [get_internal_flow; old_list] in*) (*TODO*)
           Int_storage.Nearly_inf_Imperatif.set
             parameter
             error
             agent_type
-            new_list
+            get_internal_flow
             store_internal_flow
     )
     get_rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
@@ -722,22 +722,23 @@ let collect_internal_flow1 parameter error get_rule
 let internal_flow_rhs_anchor parameter error agent_type store_sites_rhs_set
     anchor_set
     =
-  let error, result_inter_set =
+  (*  let error, result_inter_set =
     Cckappa_sig.Site_map_and_set.inter
       parameter
       error
       store_sites_rhs_set
       anchor_set
-  in  
+  in  *)
   (*TODO:keep set*)
-  let result_inter_list =
-    Cckappa_sig.Site_map_and_set.elements result_inter_set in
+  (*let result_inter_list =
+    Cckappa_sig.Site_map_and_set.elements result_inter_set in*)
+  let anchor_list = 
+    Cckappa_sig.Site_map_and_set.elements anchor_set in
   let rhs_list = 
     Cckappa_sig.Site_map_and_set.elements store_sites_rhs_set in
   match rhs_list with
     | [] | [_] -> []
-    | _ -> cartesian_prod agent_type rhs_list result_inter_list
-
+    | _ -> cartesian_prod agent_type rhs_list anchor_list
 
 (*------------------------------------------------------------------------------*)
 (*compute internal_flow: site -> anchor site*)
@@ -782,7 +783,7 @@ let collect_internal_flow2 parameter error get_rule
               anchor_set
           in
           (*store*)
-          let error, get_old_list =
+          (*let error, get_old_list =
             Int_storage.Nearly_inf_Imperatif.unsafe_get
               parameter
               error
@@ -794,12 +795,12 @@ let collect_internal_flow2 parameter error get_rule
               | None -> []
               | Some s -> s
           in
-          let new_list = List.concat [get_internal_flow; old_list] in
+          let new_list = List.concat [get_internal_flow; old_list] in*)
           Int_storage.Nearly_inf_Imperatif.set
             parameter
             error
             agent_type
-            new_list
+            get_internal_flow
             store_internal_flow2
     )
     get_rule.Cckappa_sig.rule_rhs.Cckappa_sig.views
@@ -941,7 +942,7 @@ let scan_rule parameter error handler get_rule ode_class =
   in
   (*------------------------------------------------------------------------------*)
   (*f)compute internal_flow: site -> modified site*)
- (* let error, store_internal_flow1 =
+  let error, store_internal_flow1 =
     collect_internal_flow1
       parameter
       error
@@ -960,7 +961,7 @@ let scan_rule parameter error handler get_rule ode_class =
      store_sites_anchor_set1
      store_sites_anchor_set2
      ode_class.store_internal_flow2
-  in*)
+  in
   (*------------------------------------------------------------------------------*)
   (*g)external flow: a -> b, if 'a': anchor site or 'b':modified site*)
   let error, store_external_flow =
@@ -983,9 +984,9 @@ let scan_rule parameter error handler get_rule ode_class =
     store_sites_rhs            = store_sites_rhs;
     store_sites_rhs_set        = store_sites_rhs_set;
     store_sites_anchor_set1    = store_sites_anchor_set1;
-    (*store_internal_flow1       = store_internal_flow1;*)
+    store_internal_flow1       = store_internal_flow1;
     store_sites_anchor_set2    = store_sites_anchor_set2;
-    (*store_internal_flow2       = store_internal_flow2;*)
+    store_internal_flow2       = store_internal_flow2;
     store_external_flow        = store_external_flow
   }
     
@@ -1010,9 +1011,9 @@ let scan_rule_set parameter error handler rules =
       store_sites_rhs            = init_rhs;
       store_sites_rhs_set        = init;
       store_sites_anchor_set1    = init;
-      (*store_internal_flow1       = init_internal;*)
+      store_internal_flow1       = init_internal;	
       store_sites_anchor_set2    = init;
-      (*store_internal_flow2       = init_internal;*)
+      store_internal_flow2       = init_internal;
       store_external_flow        = []
     }
   in
@@ -1082,6 +1083,22 @@ let print_internal_flow1 parameter error result =
       in error
     ) parameter result
 
+let print_internal_flow1' parameter error result = (*TODO*)
+  Int_storage.Nearly_inf_Imperatif.print
+    error
+    (fun error parameter (s,s') ->
+      let l = Cckappa_sig.Site_map_and_set.elements s in
+      let l' = Cckappa_sig.Site_map_and_set.elements s' in
+      let _ = 
+	let p = print_string "first set:";
+	  print_list l; print_string "\n" in
+	let p1 = print_string "second set:";
+	  print_list l'; print_string "\n" in
+	(p,p1)
+      in error
+    ) parameter result
+
+
 let print_internal_flow2 (agent_name, site, site') =
   let i1 = Printf.fprintf stdout "- agent_type:%i:site:%i -> " agent_name site in
   let i2 = Printf.fprintf stdout "agent_type:%i:anchor_type:%i\n" agent_name site' in
@@ -1103,6 +1120,7 @@ let print_internal_flow2 parameter error result =
     parameter result
 
 (*------------------------------------------------------------------------------*)
+
 let print_external_flow result =
   let rec aux acc =
     match acc with
@@ -1123,9 +1141,9 @@ let print_ode parameter error
                 store_sites_rhs;
                 store_sites_rhs_set;
                 store_sites_anchor_set1;
-                (*store_internal_flow1;*)
+                store_internal_flow1;
                 store_sites_anchor_set2;
-                (*store_internal_flow2;*)
+                store_internal_flow2;
                 store_external_flow
               } =
   let _ = Printf.fprintf stdout "* Sites that are modified:\n" in
@@ -1138,10 +1156,10 @@ let print_ode parameter error
   let a2 = print_anchor parameter error store_sites_anchor_set2 in
   a2;
   let _ = Printf.fprintf stdout "* Internal flow:\n" in
-  (*let i = print_internal_flow1 parameter error store_internal_flow1 in
+  let i = print_internal_flow1 parameter error store_internal_flow1 in
   i;
   let i2 = print_internal_flow2 parameter error store_internal_flow2 in
-  i2;*)
+  i2;
   let _ = Printf.fprintf stdout "* External flow:\n" in
   let e = print_external_flow store_external_flow in
   e
