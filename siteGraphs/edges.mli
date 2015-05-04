@@ -21,3 +21,5 @@ val link_exists : int -> int -> int -> int -> t -> bool
 (** [link_exists ag1 site1 ag2 site2 graph] *)
 val exists_fresh : int -> int -> int -> int -> t -> int option
 (** [exists_fresh ag1 site1 type_of_ag2 site2 graph] *)
+
+val print : Signature.s -> Format.formatter -> t -> unit

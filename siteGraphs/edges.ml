@@ -56,59 +56,57 @@ let exists_fresh ag s ty s' (t,_,_) =
   with Not_found -> None
 
 (** The snapshot machinery *)
-(*let equal max_id cc1 cc2 =
-  let always_equal_min_but_not_null _ p l1 l2 =
-    match p with
-    | None -> None
-    | Some (l,_,_) ->
-       let l' = List.length l1 in
-       if l' <> List.length l2 then None
-       else if l = 0 || (l' > 0 && l' < l) then Some (l',l1,l2) else p in
-  let internals_are_ok iso =
-    IntMap.fold
-      (fun k a out->
-       out &&
-	 let a' = IntMap.find (Dipping.apply iso k) cc2.internals in
-	 Tools.array_fold_left2i (fun _ b x y -> b && x = y) true a a')
-      cc1.internals true in
-  let rec admissible_mapping iso = function
-    | [] -> if internals_are_ok iso then [iso] else []
-    | (x,y) :: t ->
-       try
-	 let cand = Dipping.apply iso x in
-	 if cand = y then admissible_mapping iso t else []
-       with Dipping.Undefined ->
-	 let iso' = Dipping.add x y iso in
-	 let n_x = IntMap.find x cc1.links in
-	 let n_y = IntMap.find y cc2.links in
-	 try
-	   let remains =
-	     Tools.array_fold_left2i
-	       (fun _ out a b -> match a,b with
-				 | ((UnSpec, UnSpec) | (Free, Free)) -> out
-				 | Link (a,i), Link (b,j)
-				      when i = j -> (a,b)::out
-				 | (UnSpec | Free | Link _), _ ->
-				    raise Not_found) t n_x n_y in
-	   admissible_mapping iso' remains
-	 with Not_found -> []
-  in
-  if cc1 == cc2 then
-    [identity_injection cc1]
-  else
-    match Tools.array_fold_left2i always_equal_min_but_not_null (Some (0,[],[]))
-				  cc1.nodes_by_type cc2.nodes_by_type with
-    | None -> []
-    | Some (_,l1,l2) ->
-       match l1 with
-       | [] -> [Dipping.empty]
-       | h :: _ ->
-	  let rec find_admissible = function
-	    | [] -> []
-	    | x ::  t ->
-	       match admissible_mapping Dipping.empty [(h,x)] with
-	       | [] -> find_admissible t
-	       | _ :: _ as l -> l in
-	  find_admissible l2
-	  *)
-let dump = ()
+let one_connected_component sigs free_id node graph =
+  let rec build acc free_id dangling (links,internals,sorts as graph) = function
+    | [] -> acc,free_id,graph
+    | node :: todos ->
+       match IntMap.pop node sorts with
+       | None, _ ->
+	  failwith ("Node "^string_of_int node^" of graph has no entry in sorts")
+       | Some ty, sorts' ->
+	  let arity = Signature.arity sigs ty in
+	  let ports = Array.make arity Raw_mixture.FREE in
+	  let ints = Array.make arity None in
+	  let (free_id',links',dangling',todos'),ports =
+	    Tools.array_fold_left_mapi
+	      (fun i (free_id,links,dangling,todos) _ ->
+	       match Int2Map.pop (node,i) links with
+	       | None, _ ->
+		  failwith ("missing edge in graph for node "^string_of_int node
+			    ^" edge "^string_of_int i)
+	       | Some Edge.ToFree, links' ->
+		  (free_id,links',dangling,todos),Raw_mixture.FREE
+	       | Some (Edge.Link (_,n',s')), links' ->
+		  match Int2Map.pop (n',s') dangling with
+		  | None, dangling ->
+		     (succ free_id,links',
+		      Int2Map.add (node,i) free_id dangling,
+		      if n' <> node && List.mem n' todos then todos else n'::todos),
+		     Raw_mixture.VAL free_id
+		  | Some id, dangling' ->
+		     (free_id,links',dangling',todos), Raw_mixture.VAL id)
+	      (free_id,links,dangling,todos) ports in
+	  let internals',ints =
+	    Tools.array_fold_left_mapi
+	      (fun i internals _ ->
+	       let (a,b) = Int2Map.pop (node,i) internals in (b,a))
+	      internals ints in
+	  let skel =
+	    { Raw_mixture.a_id = node; Raw_mixture.a_type = ty;
+	      Raw_mixture.a_ports = ports; Raw_mixture.a_ints = ints; } in
+	  build (skel::acc) free_id' dangling'
+		(links',internals',sorts') todos'
+  in build [] free_id Int2Map.empty graph [node]
+
+let build_snapshot sigs graph =
+  let rec aux ccs free_id (_,_,sorts as graph) =
+    match IntMap.root sorts with
+    | None -> ccs
+    | Some (node,_) ->
+       let (out,free_id',graph') =
+	 one_connected_component sigs free_id node graph in
+       aux (out::ccs) free_id' graph' in
+  aux [] 1 graph
+
+let print sigs f graph =
+  Pp.list Pp.space (Raw_mixture.print sigs) f (build_snapshot sigs graph)

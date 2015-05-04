@@ -73,160 +73,8 @@ let print_rule_agent sigs f ag =
   Format.fprintf f "%a(@[<h>%a@])" (Signature.print_agent sigs) ag.ra_type
 		 (print_rule_intf sigs ag.ra_type) (ag.ra_ports,ag.ra_ints)
 
-
 let print_rule_mixture sigs f mix =
   Pp.list Pp.comma (print_rule_agent sigs) f mix
-
-type internal = int option
-type link = ANY | FREE | VAL of int
-type agent =
-    { a_id: int; a_type: int; a_ports: link array; a_ints: internal array; }
-type mixture = agent list
-
-let print_link f = function
-  | ANY -> Format.pp_print_string f "?"
-  | FREE -> ()
-  | VAL i -> Format.fprintf f "!%i" i
-
-let print_intf sigs ag_ty f (ports,ints) =
-  let rec aux empty i =
-    if i < Array.length ports then
-      if ports.(i) <> ANY || ints.(i) <> None then
-	let () = Format.fprintf
-		   f "%t%a%a" (if empty then Pp.empty else Pp.comma)
-		   (Signature.print_site_internal_state sigs ag_ty i)
-		   ints.(i) print_link ports.(i) in
-	aux false (succ i)
-      else aux empty (succ i) in
-  aux true 0
-
-let print_agent sigs f ag =
-  Format.fprintf f "%a(@[<h>%a@])" (Signature.print_agent sigs) ag.a_type
-		 (print_intf sigs ag.a_type) (ag.a_ports,ag.a_ints)
-
-let print_mixture sigs f mix =
-  Pp.list Pp.comma (print_agent sigs) f mix
-
-let full_agent_of_rule_agent free_id config rm =
-  let links_of_rule_links l =
-    Array.map
-      (fun l ->
-       match l,config with
-       | L_ANY Maintained,_ -> ANY
-       | (L_ANY _ | L_SOME _ | L_TYPE _), _ ->
-	  failwith "attempt to make an agent from an ambiguous rule agent"
-       | (L_FREE Maintained | L_VAL (_,Maintained)), Some _ -> ANY
-       | (L_FREE (Linked i) | L_VAL (_,Linked i)),Some true -> VAL (fst i)
-       | L_VAL (_,(Freed)), Some true -> FREE
-       | (L_FREE Erased | L_VAL (_,Erased)), Some true -> ANY
-       | L_FREE _, _ -> FREE
-       | L_VAL (i,_), (Some false | None) -> VAL (fst i)
-      ) l in
-  let ints_of_rule_ints i =
-    Array.map
-      (fun i ->
-       match i, config with
-       | I_ANY,_ -> None
-       | I_VAL_CHANGED (i,j), Some _ when i = j -> None
-       | I_VAL_CHANGED (_,i), Some true -> Some i
-       | I_VAL_CHANGED (i,_), _ -> Some i
-       | I_VAL_ERASED i, _ -> Some i
-       | (I_ANY_CHANGED _ | I_ANY_ERASED), _ ->
-	  failwith "attempt to make an agent from an ambiguous rule agent"
-      ) i in
-  List.fold_right (fun rag (free_id,acc) ->
-		   let ports = links_of_rule_links rag.ra_ports in
-		   let ints = ints_of_rule_ints rag.ra_ints in
-		   if Array.fold_left (fun b e -> b || e <> ANY) false ports ||
-			Array.fold_left (fun b e -> b || e <> None) false ints
-		   then
-		     succ free_id,
-		     {
-		       a_id = free_id;
-		       a_type = rag.ra_type;
-		       a_ports = ports;
-		       a_ints = ints;
-		     }:: acc
-		   else succ free_id,acc) rm (free_id,[])
-
-let agent_of_rule_agent_positive (rm,(free_id,created)) =
-  List.append
-    created (snd (full_agent_of_rule_agent free_id (Some true) rm))
-let agent_of_rule_agent_negative (rm,_) =
-  snd (full_agent_of_rule_agent 0 (Some false) rm)
-let agent_of_rule_agent rm =
-  snd (full_agent_of_rule_agent 0 None rm)
-
-let agent_is_linked_on_port me i id = function
-  | VAL j when i = j -> id <> me
-  | (VAL _ | FREE | ANY) -> false
-
-let agent_is_linked_on forbidden i ag =
-  Tools.array_filter (agent_is_linked_on_port forbidden i) ag.a_ports <> []
-
-let rec agents_are_compatibles don remains = function
-  | [] -> Some (don,remains)
-  | (o,p)::q ->
-     if o.a_type = p.a_type then
-       let ints = Array.copy o.a_ints in
-       let modif,i_ok =
-	 Tools.array_fold_left2i
-	   (fun i (modif,b) x y ->
-	    if b then match x,y with
-		      | Some a, Some b -> ints.(i) <- None; (true,(a = b))
-		      | (Some _ | None), _ -> (modif,true)
-	    else (modif,b))
-	   (false,true) o.a_ints p.a_ints in
-       if i_ok then
-	 let ports = Array.copy o.a_ports in
-	 match Tools.array_fold_left2i
-		 (fun i c x y ->
-		  match c with
-		  | _,None -> c
-		  | modif,(Some (todo,(g,h)) as op) ->
-		     match x, y with
-		     | (FREE, VAL _ | VAL _, FREE) -> (modif,None)
-		     | ANY, VAL _ -> c
-		     | VAL _, ANY -> c
-		     | (ANY, _ | _, ANY) -> ports.(i) <- ANY; (modif||i<>0,op)
-		     | FREE, FREE -> ports.(i) <- ANY; (modif||i<>0,op)
-		     | VAL a, VAL b ->
-			ports.(i) <- ANY;
-			match List.partition (agent_is_linked_on (-1) a) g,
-			      List.partition (agent_is_linked_on (-1) b) h with
-			| ([],_), ([],_) -> c
-			   (* if List.exists *)
-			   (* 	(fun (o,p) -> *)
-			   (* 	 agent_is_linked_on i a o && agent_is_linked_on i b p) *)
-			   (* 	todos *)
-			   (* then c *)
-			   (* else None *)
-			| ([x],g'), ([y],h') -> true,Some ((x,y)::todo,(g',h'))
-			| _, _ -> true,None
-		 )
-	      (modif,Some (q,remains)) o.a_ports p.a_ports with
-	 | true,Some (todo',rem') ->
-	    agents_are_compatibles ({a_id = o.a_id; a_type = o.a_type;
-				     a_ports = ports; a_ints = ints }::don)
-				   rem' todo'
-	 | _,_ -> None
-       else None
-     else None
-
-
-let rec differences_bundles o pre p =
-  match o,p with
-  | [],_ | _,[] -> []
-  | oh :: ot, ph :: pt ->
-     (match agents_are_compatibles [] (ot,List.rev_append pre pt) [oh,ph] with
-      | None -> []
-      | Some (don,(o',_)) -> [don@o']
-     ) @ List.fold_right (fun out acc -> (if out == ot then o else oh::out)::acc)
-			 (differences_bundles ot pre p)
-			 (differences_bundles o (ph::pre) pt)
-
-let differences o p =
-  List.filter (fun x -> x != o) (differences_bundles o [] p)
 
 let build_l_type sigs dst_ty dst_p switch =
   let ty_id = Signature.num_of_agent dst_ty sigs in
@@ -279,7 +127,7 @@ let annotate_created_agent id sigs ((agent_name, _ as ag_ty),intf) =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
-  let ports = Array.make arity (FREE) in
+  let ports = Array.make arity (Raw_mixture.FREE) in
   let internals =
     Array.init arity
 	       (fun i ->
@@ -299,10 +147,11 @@ let annotate_created_agent id sigs ((agent_name, _ as ag_ty),intf) =
        | (Ast.LNK_ANY, _) -> ()
        | ((Ast.LNK_SOME, _) | (Ast.LNK_TYPE _,_)) ->
 	  too_much_or_not_enough false agent_name p_na
-       | (Ast.LNK_VALUE i, _) ->  ports.(p_id) <- VAL i
+       | (Ast.LNK_VALUE i, _) ->  ports.(p_id) <- Raw_mixture.VAL i
        | (Ast.FREE, _) -> ()
       ) intf in
-  { a_id = id; a_type = ag_id; a_ports = ports; a_ints = internals; }
+  { Raw_mixture.a_id = id; Raw_mixture.a_type = ag_id;
+    Raw_mixture.a_ports = ports; Raw_mixture.a_ints = internals; }
 
 let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
   let ag_id = Signature.num_of_agent ag_ty sigs in
@@ -714,24 +563,20 @@ let rec complete_with_creation (removed,added as transf) links_transf fresh = fu
 	   | Some (i,_) -> dangling_link "right" i
      end
   | ag :: ag_l ->
-     let place = Transformations.Fresh (ag.a_type,fresh) in
+     let place = Transformations.Fresh (ag.Raw_mixture.a_type,fresh) in
      let rec handle_ports added l_t site_id =
-       if site_id = Array.length ag.a_ports
+       if site_id = Array.length ag.Raw_mixture.a_ports
        then complete_with_creation (removed,added) l_t (succ fresh) ag_l
        else
-	 let added' = match ag.a_ints.(site_id) with
+	 let added' = match ag.Raw_mixture.a_ints.(site_id) with
 	   | None -> added
 	   | Some i ->
 	      Transformations.Internalized (place,site_id,i)::added in
 	 let added'',l_t' =
-	   match ag.a_ports.(site_id) with
-	   | ANY ->
-	      raise (ExceptionDefn.Internal_Error
-		       (Term.with_dummy_pos
-			  "Try to create the connected components of an ambiguous mixture."))
-	   | FREE ->
+	   match ag.Raw_mixture.a_ports.(site_id) with
+	   | Raw_mixture.FREE ->
 	      Transformations.Freed (place,site_id)::added',l_t
-	   | VAL i ->
+	   | Raw_mixture.VAL i ->
 	      try
 		let dst = IntMap.find i l_t in
 		let l_t' = IntMap.remove i l_t in
@@ -788,7 +633,7 @@ let connected_components_sum_of_ambiguous_rule contact_map env lhs rhs =
 			    | [] -> ()
 			    | _ -> Format.fprintf
 				     f "@ (+%t) %a" Pp.nu
-				     (print_mixture sigs) created)))
+				     (Raw_mixture.print sigs) created)))
 		     all_mixs in
   let (env',rules') =
     Tools.list_fold_right_map (connected_components_of_mixture created)

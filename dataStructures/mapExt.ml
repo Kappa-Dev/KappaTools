@@ -14,6 +14,7 @@ sig
 	val add: key -> 'a -> 'a t -> 'a t
 	val find: key -> 'a t -> 'a
 	val remove: key -> 'a t -> 'a t
+	val pop: key -> 'a t -> ('a option * 'a t)
 	val mem: key -> 'a t -> bool
 	val iter: (key -> 'a -> unit) -> 'a t -> unit
 	val map: ('a -> 'b) -> 'a t -> 'b t
@@ -145,7 +146,22 @@ module Make(Ord: OrderedType) = struct
 					bal (remove x l) v d r
 				else
 					bal l v d (remove x r)
-	
+
+	let rec pop x = function
+	  | Empty as m -> (None, m)
+	  | Node(l, v, d, r, _, _) as m ->
+	     let c = Ord.compare x v in
+	     if c = 0 then
+	       (Some d,merge l r)
+	     else if c < 0 then
+	       match pop x l with
+	       | None as o, _ -> (o, m)
+	       | Some _ as o, t -> (o, bal t v d r)
+	     else
+	       match pop x r with
+	       | None as o, _ -> (o, m)
+	       | Some _ as o, t -> (o, bal l v d t)
+
 	let rec iter f = function
 			Empty -> ()
 		| Node(l, v, d, r, _, _) ->

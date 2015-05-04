@@ -148,3 +148,13 @@ let all_injections state rule =
 	new_injs inj_list)
        (Connected_component.Map.find cc state.roots_of_ccs) [])
     [] rule.Primitives.connected_components
+
+let print env f state =
+  Format.fprintf f "@[<v>@[%a@]@,%a@]"
+		 (Edges.print env.Environment.signatures) state.edges
+		 (Pp.array Pp.space (fun i f el ->
+				     Format.fprintf f "%%init: %s <- %a"
+						    (NamedDecls.elt_name
+						       env.Environment.tokens i)
+						    Nbr.print el))
+		 state.tokens

@@ -11,3 +11,5 @@ val value_bool :
 val apply_rule :
   get_alg:(int -> Expr.alg_expr) -> Connected_component.Env.t -> Mods.Counter.t
   -> t -> Primitives.elementary_rule -> t
+
+val print : Environment.t -> Format.formatter -> t -> unit
