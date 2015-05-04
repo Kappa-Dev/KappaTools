@@ -150,7 +150,7 @@ let all_injections state rule =
     [] rule.Primitives.connected_components
 
 let print env f state =
-  Format.fprintf f "@[<v>@[%a@]@,%a@]"
+  Format.fprintf f "@[<v>%a@,%a@]"
 		 (Edges.print env.Environment.signatures) state.edges
 		 (Pp.array Pp.space (fun i f el ->
 				     Format.fprintf f "%%init: %s <- %a"

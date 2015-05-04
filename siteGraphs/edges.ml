@@ -99,14 +99,22 @@ let one_connected_component sigs free_id node graph =
   in build [] free_id Int2Map.empty graph [node]
 
 let build_snapshot sigs graph =
+  let rec increment x = function
+    | [] -> [1,x]
+    | (n,y as h)::t ->
+       if Raw_mixture.equal x y then (succ n,y)::t
+       else h::increment x t in
   let rec aux ccs free_id (_,_,sorts as graph) =
     match IntMap.root sorts with
     | None -> ccs
     | Some (node,_) ->
        let (out,free_id',graph') =
 	 one_connected_component sigs free_id node graph in
-       aux (out::ccs) free_id' graph' in
+       aux (increment out ccs) free_id' graph' in
   aux [] 1 graph
 
 let print sigs f graph =
-  Pp.list Pp.space (Raw_mixture.print sigs) f (build_snapshot sigs graph)
+  Pp.list Pp.space (fun f (i,mix) ->
+		    Format.fprintf f "%%init: %i %a" i
+				   (Raw_mixture.print sigs) mix)
+	  f (build_snapshot sigs graph)
