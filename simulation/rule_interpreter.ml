@@ -40,7 +40,7 @@ let deal_transformation is_add domain inj2graph edges roots transf =
     match transf with
     | Transformations.Freed (n,s) ->
        let ty, id, inj2graph' = from_place inj2graph n in
-       let edges' = Edges.add_free id s edges in
+       let edges' = Edges.add_free ty id s edges in
        let new_obs =
 	 Connected_component.Matching.observables_from_free
 	   domain (if is_add then edges' else edges) ty id s in
