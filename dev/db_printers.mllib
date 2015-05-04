@@ -19,7 +19,36 @@ Expr
 Signature
 NamedDecls
 
+Set_and_map
+Hash
+Dictionary
+Git_commit_info
+Config
+Misc_sa
+Tools_kasa
+Int_storage
+Headers
+Exception
+Handler
+Print_handler
+Remanent_parameters_sig
+Remanent_parameters
+Remanent_state_signature
+Influence_labels
+Quark_type
+List_tokens
+Cckappa_sig
+Ckappa_sig
+Prepreprocess
+Preprocess
+Print_ckappa
+Export_to_KaSim
+
+Raw_mixture
+Edges
+Transformations
 Connected_component
+Snip
 
 Debug
 Raw_printers
