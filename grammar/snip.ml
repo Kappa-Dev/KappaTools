@@ -772,15 +772,26 @@ let connected_components_sum_of_ambiguous_rule contact_map env lhs rhs =
     if !Parameter.compileModeOn then
       Format.eprintf "@[<v>_____@,"(*"@[<2>%a@]@," Expr.print_ast_mix lhs*) in
   let sigs = Connected_component.Env.sigs env in
-  let all_mixs,created =
+  let all_mixs,(_,created) =
     rule_mixtures_of_ambiguous_rule contact_map sigs lhs rhs in
   let () =
     if !Parameter.compileModeOn then
-      Format.eprintf "@[%a@]@,"
-		     (Pp.list Pp.cut (print_rule_mixture sigs))
+      Format.eprintf "%a@,"
+		     (Pp.list
+			Pp.cut
+			(fun f x ->
+			 Format.fprintf
+			   f "@[%a%t@]"
+			   (print_rule_mixture sigs) x
+			   (fun f ->
+			    match created with
+			    | [] -> ()
+			    | _ -> Format.fprintf
+				     f "@ (+%t) %a" Pp.nu
+				     (print_mixture sigs) created)))
 		     all_mixs in
   let (env',rules') =
-    Tools.list_fold_right_map (connected_components_of_mixture (snd created))
+    Tools.list_fold_right_map (connected_components_of_mixture created)
 			      env all_mixs in
   let () =
     if !Parameter.compileModeOn then

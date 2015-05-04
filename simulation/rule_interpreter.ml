@@ -134,3 +134,17 @@ let apply_rule ~get_alg domain counter state rule =
 	 rule.Primitives.injected_tokens in
      update_edges domain inj state rule.Primitives.removed rule.Primitives.inserted
   | None -> state
+
+let all_injections state rule =
+  List.fold_left
+    (fun inj_list cc ->
+     RootHeap.fold
+       (fun _ root new_injs ->
+	List.fold_left
+	  (fun corrects inj ->
+	   match Connected_component.Matching.reconstruct state.edges inj cc root with
+	   | None -> corrects
+	   | Some new_inj -> new_inj :: corrects)
+	new_injs inj_list)
+       (Connected_component.Map.find cc state.roots_of_ccs) [])
+    [] rule.Primitives.connected_components
