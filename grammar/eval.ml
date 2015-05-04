@@ -1117,6 +1117,7 @@ let initialize logger overwrite result =
   Debug.tag logger "\t -initial conditions";
   let domain,graph,sg,token_vector =
     init_graph_of_result counter env domain result in
+  let () = Format.printf "%a@." (Rule_interpreter.print env) graph in
   let state = State_interpreter.initial env counter graph [] in
 
   Debug.tag logger "\t Done";
