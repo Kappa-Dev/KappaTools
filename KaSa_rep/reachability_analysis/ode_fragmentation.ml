@@ -320,13 +320,14 @@ let collect_store_bond_set parameter error bond_rhs site_address store_sites_bon
 (*------------------------------------------------------------------------------*)
 (*-- collect binding sites in the rhs with: site -> site*)
 
-(*Use for internal_flow*)
+(*Use for collecting anchor site*)
 let collect_sites_bond_pair_set parameter error bond_rhs
     site_address_1
     site_address_2
     store_sites_bond_set_1
     store_sites_bond_set_2
     store_sites_bond_pair_set =
+  (*first binding agent, check at each rule, and not combine witht the old result*)
   let error, store_sites_bond_set_1 =
     collect_store_bond_set'
       parameter
@@ -335,8 +336,9 @@ let collect_sites_bond_pair_set parameter error bond_rhs
       site_address_1
       store_sites_bond_set_1
   in
+  (*the second binding agent, it is a result of anchor, combine with the old result*)
   let error, store_sites_bond_set_2 =
-    collect_store_bond_set (*TODO*)
+    collect_store_bond_set
       parameter
       error
       bond_rhs
@@ -597,25 +599,6 @@ let internal_flow_rhs_modified parameter error agent_type
 (*------------------------------------------------------------------------------*)
 (*compute internal_flow: site -> anchor site*)
 
-let cartesian_anchor i lhs_list anchor_set = (*REMOVE*)
-  let anchor_list = Cckappa_sig.Site_map_and_set.elements anchor_set in
-  let rec loop lhs_list acc =
-    match lhs_list with
-      | [] -> List.rev acc
-      | x :: xs ->
-        loop xs (
-          List.rev_append
-            (List.rev (List.fold_left 
-                         (fun acc y ->
-                         if x <> y &&
-                           not (Cckappa_sig.Site_map_and_set.mem_set x anchor_set)
-                         then (i, x, y) :: acc                           
-                         else acc
-                         ) [] anchor_list))
-              acc
-        )
-  in loop lhs_list []
-
 let internal_flow_lhs_anchor parameter error agent_type
     store_sites_lhs
     anchor_set =
@@ -666,7 +649,7 @@ let collect_internal_flow parameter error get_rule
               (fst store_sites_anchor_set)
               (snd store_sites_anchor_set)
           in
-          (*site -> modified site*)
+          (*1st: site -> modified site*)
           let get_internal_flow1 =
             internal_flow_rhs_modified
               parameter
@@ -683,7 +666,7 @@ let collect_internal_flow parameter error get_rule
               get_internal_flow1
               (fst store_internal_flow)
           in
-          (*site -> anchor site*)
+          (*2nd: site -> anchor site*)
           let get_internal_flow2 =
             internal_flow_lhs_anchor
               parameter
@@ -863,13 +846,13 @@ let scan_rule parameter error handler get_rule ode_class =
   (*return value of ode_class*)
   error,
   {
-    store_sites_modified_set   = store_sites_modified_set;
-    store_sites_bond_pair_set  = store_sites_bond_pair_set;
+    store_sites_modified_set            = store_sites_modified_set;
+    store_sites_bond_pair_set           = store_sites_bond_pair_set;
     store_sites_bond_pair_set_external  = store_sites_bond_pair_set_external;
-    store_sites_lhs            = store_sites_lhs;
-    store_sites_anchor_set     = store_sites_anchor_set;
-    store_internal_flow        = store_internal_flow;
-    store_external_flow        = store_external_flow
+    store_sites_lhs                     = store_sites_lhs;
+    store_sites_anchor_set              = store_sites_anchor_set;
+    store_internal_flow                 = store_internal_flow;
+    store_external_flow                 = store_external_flow
   }
     
 (************************************************************************************)
@@ -884,13 +867,13 @@ let scan_rule_set parameter error handler rules =
   (*init state of ode_class*)
   let init_ode =
     {
-      store_sites_modified_set   = init;
-      store_sites_bond_pair_set  = init_pair;
+      store_sites_modified_set            = init;
+      store_sites_bond_pair_set           = init_pair;
       store_sites_bond_pair_set_external  = init_pair;
-      store_sites_lhs            = init_lhs;
-      store_sites_anchor_set     = (init, init);
-      store_internal_flow        = (init_internal, init_internal);
-      store_external_flow        = []
+      store_sites_lhs                     = init_lhs;
+      store_sites_anchor_set              = (init, init);
+      store_internal_flow                 = (init_internal, init_internal);
+      store_external_flow                 = []
     }
   in
   let error, ode_class =
