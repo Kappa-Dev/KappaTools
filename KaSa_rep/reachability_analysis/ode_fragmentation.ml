@@ -577,7 +577,7 @@ let cartesian_prod_eq i a b =
 (*------------------------------------------------------------------------------*)
 (*compute internal_flow: site -> modified site*)
 
-let internal_flow_rhs_modified parameter error agent_type
+let internal_flow_lhs_modified parameter error agent_type
     store_sites_lhs
     store_sites_modified_set =
   let result_modified_list =
@@ -651,7 +651,7 @@ let collect_internal_flow parameter error get_rule
           in
           (*1st: site -> modified site*)
           let get_internal_flow1 =
-            internal_flow_rhs_modified
+            internal_flow_lhs_modified
               parameter
               error
               agent_type
@@ -792,7 +792,7 @@ let scan_rule parameter error handler get_rule ode_class =
       ode_class.store_sites_bond_pair_set_external
   in
   (*------------------------------------------------------------------------------*)
-  (*c) collect sites from the lhs rule without combining their site at each rule*)
+  (*c) collect sites from the lhs rule at each rule without combining their sites*)
   let error, store_sites_lhs =
     store_sites_lhs
       parameter
@@ -801,12 +801,12 @@ let scan_rule parameter error handler get_rule ode_class =
       ode_class.store_sites_lhs
   in
   (*------------------------------------------------------------------------------*)
-  (*d) 1st: anchor sites (first case): A(x,y), B(x): 'x' of A is a modified site,
-    'y' of A bind to 'y' of B => B(y) is an anchor site;
+  (*d) 1st: anchor sites (first case): A(x), B(x): 'x' of A is a modified site,
+    'x' of A bind to 'x' of B => B(x) is an anchor site;
     - 2nd: collect anchor sites (second case): a site connected to a site in an
     agent with an anchor, the second agent should contain at least an anchor on
     another site. For example: A(x,y), B(x): Agent A where site x is an
-    anchor, y bind to x in agent B. Site x of B is an anchor.
+    anchor/modified, y bind to x in agent B. Site x of B is an anchor.
   *)
   let error, store_sites_anchor_set =
     collect_sites_anchor_set
