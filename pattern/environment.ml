@@ -7,8 +7,9 @@ type t = {
     (string list * (string * string) list) Export_to_KaSim.String2Map.t;
   tokens : unit NamedDecls.t;
   algs : (Expr.alg_expr Term.with_pos) NamedDecls.t;
+  observables : Expr.alg_expr Term.with_pos array;
   rules : Primitives.elementary_rule NamedDecls.t;
-  perturbations : unit NamedDecls.t;
+  perturbations : Primitives.perturbation array;
 
 	fresh_kappa : int ;
 	num_of_kappa : int StringMap.t ; 
@@ -39,18 +40,19 @@ type t = {
 
 let empty =
   {signatures = Signature.create [] ;
+   tokens = NamedDecls.create [||];
    contact_map = Export_to_KaSim.String2Map.empty;
    rules = NamedDecls.create [||] ;
+   algs = NamedDecls.create [||];
+   observables = [||];
+   perturbations = [||];
 	num_of_kappa = StringMap.empty ; 
 	kappa_of_num = IntMap.empty ;
 	num_of_rule = StringMap.empty ;
 	num_of_unary_rule = StringMap.empty ;
-	algs = NamedDecls.create [||];
 	rule_of_num = IntMap.empty ;
 	unary_rule_of_num = IntMap.empty ; 
 	fresh_kappa = 0 ;
-	tokens = NamedDecls.create [||];
-	perturbations = NamedDecls.create [||];
 	rule_indices = IntSet.empty ;
 	dependencies = Term.DepMap.empty ;
 	empty_lhs = IntSet.empty ;

@@ -10,6 +10,10 @@ val value_bool :
   Expr.alg_expr Ast.bool_expr -> bool
 val apply_rule :
   get_alg:(int -> Expr.alg_expr) -> Connected_component.Env.t -> Mods.Counter.t
-  -> t -> Primitives.elementary_rule -> t
+  -> t -> Primitives.elementary_rule -> t option
+val force_rule :
+  get_alg:(int -> Expr.alg_expr) -> Connected_component.Env.t -> Mods.Counter.t
+  -> t -> Primitives.elementary_rule ->
+  (t  * Connected_component.Matching.t list option)
 
 val print : Environment.t -> Format.formatter -> t -> unit

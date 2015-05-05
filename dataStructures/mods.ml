@@ -210,13 +210,24 @@ module Counter =
     let inc_consecutive_null_events c =
       (c.cons_null_events <- c.cons_null_events + 1)
     let inc_null_action c = c.null_action <- (c.null_action + 1)
-    let	reset_consecutive_null_event c = c.cons_null_events <- 0
+    let	reset_consecutive_null_events c = c.cons_null_events <- 0
     let check_time c =
       match c.max_time with None -> true | Some max -> c.time < max
     let check_output_time c ot =
       match c.max_time with None -> true | Some max -> ot < max
     let check_events c =
       match c.max_events with None -> true | Some max -> c.events < max
+    let one_constructive_event c dt =
+      let () = reset_consecutive_null_events c in
+      let () = inc_events c in
+      let () = inc_time c dt in
+      check_time c && check_events c
+    let one_null_event c dt =
+      let () = inc_null_events c in
+      let () = inc_consecutive_null_events c in
+      let () = inc_time c dt in
+      check_time c && check_events c
+
     let dT c = c.dT
     let dE c = c.dE
     let last_tick c = c.last_tick

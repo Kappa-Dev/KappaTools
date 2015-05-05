@@ -548,14 +548,12 @@ let obs_of_result env domain mixs res =
   let (domain',a_mixs,cont) =
     List.fold_left
       (fun (domain,a_mixs,cont) alg_expr ->
-       let (domain',a_mixs',(alg,_pos)) =
+       let (domain',a_mixs',(alg_pos)) =
 	 Expr.compile_alg env.Environment.algs.NamedDecls.finder
 			  env.Environment.tokens.NamedDecls.finder
 			  env.Environment.contact_map domain
 			  a_mixs alg_expr in
-       domain',a_mixs',
-       (alg,Format.asprintf "%a" Expr.print_ast_alg (fst alg_expr)) :: cont
-      )
+       domain',a_mixs',alg_pos :: cont)
       (domain,(env.Environment.fresh_kappa,[]),[]) res.observables in
   let (env',domain'',mixs') = mixtures_of_result mixs env domain' a_mixs in
   (env',domain'',mixs',cont)
@@ -858,10 +856,11 @@ let init_graph_of_result counter env domain res =
 	       domain'',
 	       Nbr.iteri
 		 (fun _ s ->
-		  Rule_interpreter.apply_rule
-		    ~get_alg:(fun i ->
-			      fst (snd env.Environment.algs.NamedDecls.decls.(i)))
-		    domain'' counter s compiled_rule)
+		  fst
+		    (Rule_interpreter.force_rule
+		       ~get_alg:(fun i ->
+				 fst (snd env.Environment.algs.NamedDecls.decls.(i)))
+		       domain'' counter s compiled_rule))
 		 state value
 	    | domain'',_,[] -> domain'',state
 	    | _,_,_ ->
@@ -898,10 +897,10 @@ let init_graph_of_result counter env domain res =
 	    with
 	    | domain'',_,[ _, compiled_rule ] ->
 	       domain'',
-	       Rule_interpreter.apply_rule
-		 ~get_alg:(fun i ->
-			   fst (snd env.Environment.algs.NamedDecls.decls.(i)))
-		 domain'' counter state compiled_rule
+	       fst (Rule_interpreter.force_rule
+		      ~get_alg:(fun i ->
+				fst (snd env.Environment.algs.NamedDecls.decls.(i)))
+		      domain'' counter state compiled_rule)
 	    | _,_,_ -> assert false in
 	  let (domain'',_,alg') =
 	    Expr.compile_alg env.Environment.algs.NamedDecls.finder
@@ -1112,16 +1111,23 @@ let initialize logger overwrite result =
   Debug.tag logger "\t -observables";
   let env,domain,kappa_vars,observables =
     obs_of_result env domain kappa_vars result in
+  let deprecated_observables =
+    List.map (fun (bli,_) ->
+	      (bli,Format.asprintf "%a" (Kappa_printer.alg_expr env) bli))
+	     observables in
   Debug.tag logger "\t -perturbations" ;
   let (env, domain, kappa_vars, pert, rules,stops) =
     pert_of_result kappa_vars env domain pure_rules result in
 
+  let env = { env with Environment.observables = Array.of_list observables;
+	    Environment.perturbations = Array.of_list pert;} in
   Debug.tag logger "\t -initial conditions";
   let domain,graph,sg,token_vector =
     init_graph_of_result counter env domain result in
   let () =
     if !Parameter.compileModeOn then
-      Format.eprintf "%a@." (Rule_interpreter.print env) graph in
+      Format.eprintf "@[<v>Intial graph;@,@]%a@."
+		     (Rule_interpreter.print env) graph in
   let state = State_interpreter.initial env counter graph stops in
 
   Debug.tag logger "\t Done";
@@ -1130,7 +1136,7 @@ let initialize logger overwrite result =
   Debug.tag logger "\t -Counting initial local patterns..." ;
   let (state, env) =
     State.initialize logger sg token_vector rules kappa_vars
-		     observables pert counter env
+		     deprecated_observables pert counter env
   in
   let state =
     if env.Environment.has_intra then

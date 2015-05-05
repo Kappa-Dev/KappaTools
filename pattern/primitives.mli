@@ -32,8 +32,6 @@ end
 
 type elementary_rule = {
   rate : Expr.alg_expr;
-  (** must be [something] * |cc1| * |cc2| * ... * |ccn|
-      for connected_components = [cc1; cc2; ... ; ccn] *)
   connected_components : Connected_component.t list;
   removed : Transformations.t list;
   inserted : Transformations.t list;

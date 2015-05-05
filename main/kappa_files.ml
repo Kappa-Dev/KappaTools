@@ -138,6 +138,15 @@ let open_snapshot str event ext =
       str [] (string_of_int event) ext in
   let () = add_out_desc desc in
   desc
+let with_snapshot str event ext f =
+  let str = if str="" then !snapshotFileName else str in
+  let desc =
+    open_out_fresh_filename
+      str [] (string_of_int event) ext in
+    let fr = Format.formatter_of_out_channel desc in
+    let () =
+      Format.fprintf fr "# Snapshot [Event: %d]@.%t" (*", Time: %f"*) event f in
+    close_out desc
 
 let set_influence s = influenceFileName := s
 let set_up_influence () =

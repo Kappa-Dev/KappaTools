@@ -114,6 +114,13 @@ let update_tokens ~get_alg counter state consumed injected =
       l in
   let () = do_op Nbr.sub consumed in do_op Nbr.add injected
 
+let transform_by_a_rule ~get_alg domain counter state rule inj =
+  let () =
+    update_tokens
+      ~get_alg counter state rule.Primitives.consumed_tokens
+      rule.Primitives.injected_tokens in
+  update_edges domain inj state rule.Primitives.removed rule.Primitives.inserted
+
 let apply_rule ~get_alg domain counter state rule =
   let inj =
     List.fold_left
@@ -128,12 +135,8 @@ let apply_rule ~get_alg domain counter state rule =
       rule.Primitives.connected_components in
   match inj with
   | Some inj ->
-     let () =
-       update_tokens
-	 ~get_alg counter state rule.Primitives.consumed_tokens
-	 rule.Primitives.injected_tokens in
-     update_edges domain inj state rule.Primitives.removed rule.Primitives.inserted
-  | None -> state
+     Some (transform_by_a_rule ~get_alg domain counter state rule inj)
+  | None -> None
 
 let all_injections state rule =
   List.fold_left
@@ -142,12 +145,22 @@ let all_injections state rule =
        (fun _ root new_injs ->
 	List.fold_left
 	  (fun corrects inj ->
-	   match Connected_component.Matching.reconstruct state.edges inj cc root with
+	   match Connected_component.Matching.reconstruct
+		   state.edges inj cc root with
 	   | None -> corrects
 	   | Some new_inj -> new_inj :: corrects)
 	new_injs inj_list)
        (Connected_component.Map.find cc state.roots_of_ccs) [])
     [] rule.Primitives.connected_components
+
+let force_rule ~get_alg domain counter state rule =
+  match apply_rule ~get_alg domain counter state rule with
+  | Some state -> state,None
+  | None ->
+     match all_injections state rule with
+     | [] -> state,Some []
+     | h :: t ->
+	transform_by_a_rule ~get_alg domain counter state rule h, Some t
 
 let print env f state =
   Format.fprintf f "@[<v>%a@,%a@]"
