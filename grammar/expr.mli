@@ -43,4 +43,4 @@ val compile_bool :
     (int * (string option*Ast.mixture) list) * alg_expr Ast.bool_expr Term.with_pos
 
 val deps_of_alg_expr : alg_expr -> Term.DepSet.t
-val deps_of_bool_expr : alg_expr Ast.bool_expr -> (Term.DepSet.t * Nbr.t option)
+val deps_of_bool_expr : alg_expr Ast.bool_expr -> (Term.DepSet.t * Nbr.t list)

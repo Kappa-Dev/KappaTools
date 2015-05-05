@@ -738,23 +738,24 @@ let effects_of_modif variables lrules env domain ast_list =
   iter variables lrules [] env domain ast_list
 
 let pert_of_result variables env domain rules res =
-  let (env, domain, variables, _, lpert, lrules) =
+  let (env, domain, variables, _, lpert, lrules, stop_times) =
     List.fold_left
-      (fun (env, domain, variables, p_id, lpert, lrules)
+      (fun (env, domain, variables, p_id, lpert, lrules, stop_times)
 	   ((pre_expr, modif_expr_list, opt_post),pos) ->
-       let (domain',mix,(pre,_pos)) =
+       let (domain',mix,(pre,pos_pre)) =
 	 Expr.compile_bool env.Environment.algs.NamedDecls.finder
 			   env.Environment.tokens.NamedDecls.finder
 			   env.Environment.contact_map domain
 			   (env.Environment.fresh_kappa,[]) pre_expr in
        let (env', domain'', variables') =
 	 mixtures_of_result variables env domain' mix in
-       let (dep, stopping_time) = try Expr.deps_of_bool_expr pre
-		 with ExceptionDefn.Unsatisfiable ->
-		   raise
-		     (ExceptionDefn.Malformed_Decl
-			("Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"
-			,pos))
+       let (dep, stopping_time) =
+	 try Expr.deps_of_bool_expr pre
+	 with ExceptionDefn.Unsatisfiable ->
+	   raise
+	     (ExceptionDefn.Malformed_Decl
+		("Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"
+		,pos_pre))
        in
        let (env,domain,variables, lrules', effects) =
 	 effects_of_modif variables' lrules env' domain'' modif_expr_list in
@@ -778,7 +779,7 @@ let pert_of_result variables env domain rules res =
 		     ("Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"
 		     ,pos))
 	    in
-	    (env',domain'',variables',Some (post,dep))
+	    (env',domain'',variables',Some (post,dep,stopping_time'))
        in
        let has_tracking = env.Environment.tracking_enabled
 			  || List.exists
@@ -795,10 +796,10 @@ let pert_of_result variables env domain rules res =
 	   dep
 	   { env with Environment.tracking_enabled = has_tracking } in
        (*let env = List.fold_left (fun env (r_opt,effect) -> Environment.bind_pert_rule p_id r.r_id env) env effect_list in *)
-       let opt,env =
+       let opt,env,stopping_time =
 	 match opt_abort with
-	 | None -> (None,env)
-	 | Some (post,dep) ->
+	 | None -> (None,env,stopping_time)
+	 | Some (post,dep,stopping_time') ->
 	    let env =
 	      Term.DepSet.fold
 		(fun dep_type env ->
@@ -806,7 +807,7 @@ let pert_of_result variables env domain rules res =
 		)
 		dep env
 	    in
-	    (Some post,env)
+	    (Some post,env,stopping_time'@stopping_time)
        in
        let pert =
 	 { Primitives.precondition = pre;
@@ -815,18 +816,19 @@ let pert_of_result variables env domain rules res =
 	   Primitives.stopping_time = stopping_time
 	 }
        in
-       (env, domain, variables, succ p_id, pert::lpert, lrules')
+       (env, domain, variables, succ p_id, pert::lpert, lrules',
+	List.fold_left (fun acc el -> (el,p_id)::acc) stop_times stopping_time)
       )
-      (env, domain, variables, 0, [], rules) res.perturbations
+      (env, domain, variables, 0, [], rules,[]) res.perturbations
   in
   (*making sure that perturbations containing a stopping time precondition are tested first*)
   let lpert = List.rev lpert in
   let pred = (fun p -> match p.Primitives.stopping_time with
-			 None -> false | Some _ -> true) in
+			 [] -> false | _ :: _ -> true) in
   let lpert_stopping_time = List.filter pred lpert in
   let lpert_ineq = List.filter (fun p -> not (pred p)) lpert in
   let lpert = lpert_stopping_time@lpert_ineq in
-  (env, domain, variables, lpert, lrules)
+  (env, domain, variables, lpert, lrules,stop_times)
 
 let init_graph_of_result counter env domain res =
   let n = Array.length env.Environment.tokens.NamedDecls.decls in
@@ -1111,7 +1113,7 @@ let initialize logger overwrite result =
   let env,domain,kappa_vars,observables =
     obs_of_result env domain kappa_vars result in
   Debug.tag logger "\t -perturbations" ;
-  let (env, domain, kappa_vars, pert, rules) =
+  let (env, domain, kappa_vars, pert, rules,stops) =
     pert_of_result kappa_vars env domain pure_rules result in
 
   Debug.tag logger "\t -initial conditions";
@@ -1120,7 +1122,7 @@ let initialize logger overwrite result =
   let () =
     if !Parameter.compileModeOn then
       Format.eprintf "%a@." (Rule_interpreter.print env) graph in
-  let state = State_interpreter.initial env counter graph [] in
+  let state = State_interpreter.initial env counter graph stops in
 
   Debug.tag logger "\t Done";
   Debug.tag logger "+ Analyzing non local patterns..." ;

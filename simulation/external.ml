@@ -165,13 +165,19 @@ let has_reached_a_stopping_time state counter env =
 	| None -> st_time
 	| Some pert ->
 	   match st_time,pert.Primitives.stopping_time with
-	   | Some a, Some b
-		when Nbr.is_smaller b (Nbr.F (Mods.Counter.time counter))
-	     -> Some (Nbr.min a b)
-	   | None, Some b
-		when Nbr.is_smaller b (Nbr.F (Mods.Counter.time counter))
-	     -> Some b
-	   | e, (Some _ | None) -> e
+	   |  Some a ,  l
+		when List.exists
+		       (fun b ->
+			Nbr.is_smaller b (Nbr.F (Mods.Counter.time counter)))
+		       l
+	      -> Some (List.fold_left Nbr.min a l)
+	   | None, (b :: t as l)
+		when List.exists
+		       (fun b ->
+			Nbr.is_smaller b (Nbr.F (Mods.Counter.time counter)))
+		       l
+	     -> Some (List.fold_left Nbr.min b t)
+	   | e, _ -> e
     ) depset None
 
 let try_perturbate err_fmt tracked state pert_ids pert_events counter env =

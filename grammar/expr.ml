@@ -192,17 +192,16 @@ let rec aux_dep s = function
 let deps_of_alg_expr alg = aux_dep Term.DepSet.empty alg
 
 let rec deps_of_bool_expr = function
-    | Ast.TRUE | Ast.FALSE -> Term.DepSet.empty,None
+    | Ast.TRUE | Ast.FALSE -> Term.DepSet.empty,[]
     | Ast.BOOL_OP (op,(a,_),(b,_)) ->
        let (s1,st1) = deps_of_bool_expr a in
        let (s2,st2) = deps_of_bool_expr b in
        (Term.DepSet.union s1 s2,
 	match op,st1,st2 with
-	| _, None, _ -> st2
-	| _, _, None -> st1
-	| Term.OR, Some n1, Some n2 -> Some (Nbr.min n1 n2)
-	| Term.AND, Some n1, Some n2 ->
-	   if Nbr.is_equal n1 n2 then st1 else raise ExceptionDefn.Unsatisfiable
+	| _, [], _ -> st2
+	| _, _, [] -> st1
+	| Term.OR, n1, n2 -> n1 @ n2
+	| Term.AND, _, _ -> raise ExceptionDefn.Unsatisfiable
        )
     | Ast.COMPARE_OP (op,(a,_),(b,_)) ->
        let s = aux_dep (aux_dep Term.DepSet.empty a) b in
@@ -210,11 +209,11 @@ let rec deps_of_bool_expr = function
        | Term.EQUAL when Term.DepSet.mem Term.TIME s ->
 	  begin match a,b with
 		| STATE_ALG_OP (Term.TIME_VAR), CONST n
-		| CONST n, STATE_ALG_OP (Term.TIME_VAR) -> (s, Some n)
+		| CONST n, STATE_ALG_OP (Term.TIME_VAR) -> (s, [n])
 		| ( BIN_ALG_OP _ | UN_ALG_OP _ | ALG_VAR _
 		    | STATE_ALG_OP (Term.CPUTIME | Term.EVENT_VAR | Term.TIME_VAR
 				    | Term.NULL_EVENT_VAR | Term.PROD_EVENT_VAR)
 		    | KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _), _ ->
 		   raise ExceptionDefn.Unsatisfiable
 	  end
-       | (Term.EQUAL | Term.SMALLER | Term.GREATER | Term.DIFF) -> (s, None)
+       | (Term.EQUAL | Term.SMALLER | Term.GREATER | Term.DIFF) -> (s, [])
