@@ -898,7 +898,7 @@ let print_modified parameter error result =
     error
     (fun error parameter s ->
       let l = Cckappa_sig.Site_map_and_set.elements s in
-      let _ = print_string "site_type_modified:"; print_list l in
+      let _ = print_string "modified_type:"; print_list l in
       error) parameter result
 
 (*------------------------------------------------------------------------------*)    
@@ -908,7 +908,7 @@ let print_anchor parameter error result =
     error
     (fun error parameter s ->
       let l = Cckappa_sig.Site_map_and_set.elements s in
-      let _ = print_string "site_type_anchor:"; print_list l in
+      let _ = print_string "anchor_type:"; print_list l in
       error) parameter result
 
 (*------------------------------------------------------------------------------*)
@@ -953,7 +953,7 @@ let print_external_flow result =
       | [] -> acc
       | (agent_type,x,agent_type',y) :: tl ->
         Printf.fprintf stdout
-          "anchor_type:%i:anchor:%i -> agent_type:%i:modified_type:%i\n"
+          "- agent_type:%i:anchor_type:%i -> agent_type:%i:modified_type:%i\n"
           agent_type x agent_type' y;
         aux tl
   in aux result

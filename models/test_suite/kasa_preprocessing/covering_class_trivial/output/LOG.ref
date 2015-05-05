@@ -129,7 +129,7 @@ site_type:[|0; 0; 0|]
 Flow of information in the ODE semantics:
 * Sites that are modified:
 Flow of information in the ODE semantics:agent_type:0:
-site_type_modified:{1; 2}
+modified_type:{1; 2}
 * Anchor sites:
 * Anchor sites 2:
 * Internal flow:
