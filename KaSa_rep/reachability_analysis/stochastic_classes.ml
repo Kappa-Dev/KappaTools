@@ -30,7 +30,6 @@ type stochastic_class =
     stochastic_class : sites_stochastic_class
   }
 
-
 (*------------------------------------------------------------------------------*)
 (*return a list of site in the rhs rule. And combine the site of each agent.
   For example: A(x), A(y) => A(x,y)
