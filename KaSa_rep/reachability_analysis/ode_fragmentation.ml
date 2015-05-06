@@ -696,7 +696,7 @@ let collect_internal_flow parameter error get_rule
 (************************************************************************************)   
 (*EXTERNAL FLOW:
   A binding between two agents: 
-  agent with an anchor -> agent with an modified.
+  agent with an anchor -> agent with a modified site.
   For example: A(x), B(x)
   where 'x' of A is an anchor, and bond to 'x' of B ('x' is a modified site).
   => A(x) -> B(x)  
