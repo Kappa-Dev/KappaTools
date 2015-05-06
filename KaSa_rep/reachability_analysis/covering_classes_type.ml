@@ -26,8 +26,13 @@ type covering_classes =
     covering_classes : sites_covering_classes
   }
 
-(* define a remanent *)
-(* key(t): int; 'a t = infinite array of list(#id) *)
+(************************************************************************************)
+(* DICTIONARY for covering classes *)
+
+(*------------------------------------------------------------------------------*)
+(* TYPE REMANENT:
+   key(t): int; 'a t = infinite array of list(#id) *)
+
 module Inf_array = Int_storage.Nearly_inf_Imperatif
                      
 module Set_list_id = Set_and_map.Make
@@ -36,8 +41,6 @@ module Set_list_id = Set_and_map.Make
                            let compare = compare
                          end)
 
-(* define a dictionary for covering classes *)
- 
 module Covering_classes =
   struct
     type t = int list
@@ -51,5 +54,5 @@ type remanent_dic =
     Dictionary_of_Covering_classes.dictionary
     
 type remanent =
-  {dic: remanent_dic;
+  {dic             : remanent_dic;
    pointer_backward: Set_list_id.set Inf_array.t }
