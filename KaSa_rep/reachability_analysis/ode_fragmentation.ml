@@ -63,7 +63,7 @@ type ode_frag =
 (*UTILITIES FUNCTIONS*)
 
 (*------------------------------------------------------------------------------*)
-(* A set of site -> a list of site*)
+(* A list of site*)
 
 let get_site_common_list parameter error agent_type store_sites_common =
   let error, get_sites =
@@ -129,12 +129,12 @@ let get_anchor_common parameter error store_sites_anchor =
    Int_storage.Nearly_inf_Imperatif.fold
      parameter
      error
-     (fun parameter error agent_type site old_set ->
+     (fun parameter error agent_type site_set old_set ->
        let error, set =
          Cckappa_sig.Site_map_and_set.union
            parameter
            error
-           site
+           site_set
            old_set                 
        in error, set)
      store_sites_anchor
@@ -222,8 +222,9 @@ let collect_sites_modified_set parameter error rule store_sites_modified_set =
 (*------------------------------------------------------------------------------*)
 (*++ element in a pair of site that are bond*)
 
-(*without take the old result*)
-let collect_store_bond_set' parameter error bond_rhs site_address store_sites_bond_set =
+(*without adding the old result*)
+let collect_store_bond_set_each_rule parameter error bond_rhs
+    site_address store_sites_bond_set =
   let agent_id = site_address.Cckappa_sig.agent_index in
   let agent_type = site_address.Cckappa_sig.agent_type in
    let error, site_address_map =
@@ -262,7 +263,7 @@ let collect_store_bond_set' parameter error bond_rhs site_address store_sites_bo
       store_sites_bond_set
   in error, store_sites_bond_set
 
-(*with the old_result*)
+(*combine with the old_result*)
 let collect_store_bond_set parameter error bond_rhs site_address store_sites_bond_set =
   let agent_id = site_address.Cckappa_sig.agent_index in
   let agent_type = site_address.Cckappa_sig.agent_type in
@@ -327,9 +328,9 @@ let collect_sites_bond_pair_set parameter error bond_rhs
     store_sites_bond_set_1
     store_sites_bond_set_2
     store_sites_bond_pair_set =
-  (*first binding agent, check at each rule, and not combine witht the old result*)
+  (*the first binding agent, check at each rule, and not combine with the old result*)
   let error, store_sites_bond_set_1 =
-    collect_store_bond_set'
+    collect_store_bond_set_each_rule
       parameter
       error
       bond_rhs
@@ -383,7 +384,7 @@ let collect_sites_bond_pair_set_external parameter error bond_rhs
     store_sites_bond_set_2
     store_sites_bond_pair_set =
   let error, store_sites_bond_set_1 =
-    collect_store_bond_set'
+    collect_store_bond_set_each_rule
       parameter
       error
       bond_rhs
@@ -391,7 +392,7 @@ let collect_sites_bond_pair_set_external parameter error bond_rhs
       store_sites_bond_set_1
   in
   let error, store_sites_bond_set_2 =
-    collect_store_bond_set'
+    collect_store_bond_set_each_rule
       parameter
       error
       bond_rhs
@@ -481,7 +482,7 @@ let collect_sites_anchor_set parameter error get_rule
               agent_type
               store_sites_modified_set
           in
-          (*get a set of sites in the rule rhs that are bond (fst
+          (*get a set of sites in the rule rhs that are bond (the first
             agent that has site that are bond*)
           let site_rhs_bond_fst_set =
             get_site_common_set
@@ -508,7 +509,7 @@ let collect_sites_anchor_set parameter error get_rule
               (snd store_sites_anchor_set)
           in
           (*first case: a site connected to a modified site*)
-          let error, anchor_list1 =
+          let error, anchor_set1 =
             let rec aux acc =
               match acc with
                 | [] -> error, (fst store_sites_anchor_set)
@@ -519,16 +520,15 @@ let collect_sites_anchor_set parameter error get_rule
                       Cckappa_sig.Site_map_and_set.mem_set
                       x site_rhs_bond_fst_set
                     then
-                      let a = snd store_sites_bond_pair_set in
-                      error, a
+                      let anchor = snd store_sites_bond_pair_set in
+                      error, anchor
                     else aux tl
                   end
             in aux (List.rev site_lhs_list)
           in
-          (* second case: at least two sites, one of them belong to an anchor site*)
-          (*get a set of sites in the rule rhs that are bond (fst
-            agent that has site that are bond*)
-          let error, anchor_list2 =
+          (* second case: at least two sites, one of them belong to an anchor/modified
+             site*)
+          let error, anchor_set2 =
             match (List.rev site_lhs_list) with
               | [] | [_] -> error, (snd store_sites_anchor_set)
               | x :: tl ->
@@ -544,19 +544,25 @@ let collect_sites_anchor_set parameter error get_rule
                           Cckappa_sig.Site_map_and_set.mem_set
                           y site_rhs_bond_fst_set
                         then
-                          let a = snd store_sites_bond_pair_set in
-                          error, a
+                          let anchor = snd store_sites_bond_pair_set in
+                          error, anchor
                         else aux tl'
                       end
                 in aux tl
-          in error, (anchor_list1, anchor_list2)
+          in error, (anchor_set1, anchor_set2)
      ) get_rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
        store_sites_anchor_set
 
 (************************************************************************************)
 (*INTERNAL FLOW*)
 
-(*cartesian product*)
+(*cartesian product: remove the self binding.
+  For example: A(x,y) where both 'x,y' are modified sites.
+  Two list:
+  - site_list (x,y)
+  - modified_list (x,y)
+  Then remove the self-binding at (x,x) and (y,y)
+*)
 
 let cartesian_prod_eq i a b =
   let rec loop a acc = match a with
@@ -612,11 +618,10 @@ let internal_flow_lhs_anchor parameter error agent_type
   let anchor_list = Cckappa_sig.Site_map_and_set.elements anchor_set in
   match site_lhs with
     | [] | [_] -> []
-    | _ ->
-      cartesian_prod_eq
-        agent_type
-        site_lhs
-        anchor_list
+    | _ -> cartesian_prod_eq
+      agent_type
+      site_lhs
+      anchor_list
 
 (*------------------------------------------------------------------------------*)
 (*INTERNAL FLOW*)
@@ -689,7 +694,13 @@ let collect_internal_flow parameter error get_rule
       store_internal_flow
 
 (************************************************************************************)   
-(*EXTERNAL FLOW*)
+(*EXTERNAL FLOW:
+  A binding between two agents: 
+  agent with an anchor -> agent with an modified.
+  For example: A(x), B(x)
+  where 'x' of A is an anchor, and bond to 'x' of B ('x' is a modified site).
+  => A(x) -> B(x)  
+*)
 
 let cartesian_prod_external i anchor_set i' bond_fst_list bond_snd_set =
   let anchor_list = Cckappa_sig.Site_map_and_set.elements anchor_set in
@@ -720,7 +731,7 @@ let collect_external_flow parameter error bind
     (site_address_1, site_address_2) ->
       let agent_type_1 = site_address_1.Cckappa_sig.agent_type in
       let agent_type_2 = site_address_2.Cckappa_sig.agent_type in
-      (*collect site that are bond in the rhs; fst element in a pair*)
+      (*collect site that are bond in the rhs; the first element in a pair*)
       let bond_fst_set =
         get_site_common_set
           parameter
@@ -728,6 +739,7 @@ let collect_external_flow parameter error bind
           agent_type_1
           (fst store_sites_bond_pair_set_external)
       in
+      (*collect site that are bond in the rhs; the second element in a pair*)
       let bond_snd_set =
         get_site_common_set
           parameter
@@ -752,7 +764,7 @@ let collect_external_flow parameter error bind
 	  bond_fst_list
           bond_snd_set
       in
-     (*store by getting the old result and combine with the new result*)
+      (*store by getting the old result and combine with the current result*)
       let external_flow = List.concat [collect_external_flow; store_external_flow] in
       error, external_flow)
     (error, store_external_flow)
