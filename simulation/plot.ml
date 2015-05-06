@@ -54,7 +54,11 @@ let print_values_raw f (time,l) =
 		 (Pp.array !Parameter.plotSepChar (fun _ -> Nbr.print)) l
 
 let set_up filename env counter ?time state =
-  let head = observables_header state in
+  let head =
+    Array.map
+      (fun (ex,_) ->
+       Format.asprintf "%a" (Kappa_printer.alg_expr env) ex)
+      env.Environment.observables in
   let init_va = observables_values env counter ?time state in
   let title =
     if !Parameter.marshalizedInFile <> ""

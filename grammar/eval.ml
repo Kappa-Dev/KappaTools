@@ -1119,7 +1119,8 @@ let initialize logger overwrite result =
   let (env, domain, kappa_vars, pert, rules,stops) =
     pert_of_result kappa_vars env domain pure_rules result in
 
-  let env = { env with Environment.observables = Array.of_list observables;
+  let env = { env with
+	      Environment.observables = Array.of_list (List.rev observables);
 	    Environment.perturbations = Array.of_list pert;} in
   Debug.tag logger "\t -initial conditions";
   let domain,graph,sg,token_vector =
