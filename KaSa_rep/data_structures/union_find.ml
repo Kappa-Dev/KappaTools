@@ -21,6 +21,7 @@ type union_find = int array
 
 let create n = Array.init n (fun i -> i)
 
+(************************************************************************************) 
 (* findSet(e): which return a pointer to the representative of the set
    containing e. Since the set are disjoint, e containted in one set
    only. Therefore, the returned representative can be uniquely determined.
@@ -45,6 +46,9 @@ let findSet e union_find =
   helper e []
 
 let dump a = Array.iteri (Printf.fprintf stdout "%i:%i") a
+
+(************************************************************************************)   
+(*UNION*)
 
 let union x y a =
   let root_x = findSet x a in
@@ -89,6 +93,9 @@ let eq_classes_map parameter error a =
   in
   let classes, a = aux (size - 1) (classes, a) in
   classes, a
+
+(************************************************************************************)   
+(* compute union-find in a list*)
 
 let union_list parameter error a (list: int list) =
   match list with

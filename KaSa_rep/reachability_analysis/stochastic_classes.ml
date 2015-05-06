@@ -153,7 +153,7 @@ let get_nsites parameter error key handler =
   in nsites + 1
 
 (*------------------------------------------------------------------------------*)
-(*the initial state of stchastic classes*)
+(*the initial state of stochastic classes*)
 
 let empty_stochastic_classes parameter error handler =
   let n_agents = handler.Cckappa_sig.nagents in
