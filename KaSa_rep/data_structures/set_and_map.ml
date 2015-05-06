@@ -46,7 +46,6 @@ module type Set_and_Map = sig
   val filter: Remanent_parameters_sig.parameters ->Exception.method_handler -> (elt -> bool) -> set -> Exception.method_handler * set
   val partition: Remanent_parameters_sig.parameters ->Exception.method_handler -> (elt -> bool) -> set -> Exception.method_handler * set * set
   val cardinal: set -> int
-  val cartesian_product: Remanent_parameters_sig.parameters -> Exception.method_handler -> set -> set -> set (*FIXME:return a pair of set*)
   val elements: set -> elt list
   val min_elt: set -> elt 
   val max_elt: set -> elt 
@@ -205,29 +204,6 @@ module Make(Ord:OrderedType) =
       | _ -> 
           let mh',left2 =remove_min_elt_set parameters mh set2 in  
             join_set parameters mh' set1 (min_elt set2) left2 
-        
-  let rec op_map f = function
-    | Empty_set -> Empty_set
-    | Node_set (left, set_value, right, hight) ->
-      Node_set (op_map f left, f set_value, op_map f right, hight)
-
-  let cartesian_product parameters mh a b =
-    let rec product a b =
-      match a with
-        | Empty_set -> Empty_set
-        | Node_set (la, xa, ra, _) ->
-          let lab = product la b in
-          let xab = op_map (fun xb -> xa;xb) b in (*FIXME: return a pair of (xa,xb)*)
-          let rab = product ra b in
-          let error, concat =
-            concat_set parameters mh xab rab
-          in
-          let error, concat2 =
-            concat_set parameters mh lab concat
-          in
-          concat2
-    in
-    product a b
 
   let rec split parameters mh split_value set = 
       match set with 
@@ -807,71 +783,3 @@ module Make(Ord:OrderedType) =
          end       
                   
 end:Set_and_Map with type key = Ord.t and type elt = Ord.t)
-
-(*module Set_and_Map_pair (Ord:OrderedType) =
-  functor (Basic:Set_and_Map with type key = Ord.t and type elt = Ord.t) ->
-    (struct
-      type elt = Ord.t 
-      type key = Basic.key
-      type 'a set =
-          Empty_set
-        | Node_set of set * (Ord.t * Ord.t) * set * int
-            
-      let empty_set = Empty_set
-      let is_empty_set set = set == Empty_set
-
-      let mem_set elt set = Basic.mem_set elt set
-
-      let add_set = Basic.add_set
-      let singleton = Basic.singleton
-      let is_singleton = Basic.is_singleton
-      let remove = Basic.remove
-      let union = Basic.union
-      let inter = Basic.inter
-      let diff = Basic.diff
-      let compare_set = Basic.compare_set
-      let equal_set = Basic.equal_set
-      let subset = Basic.subset
-      let iter_set = Basic.iter_set
-      let fold_set = Basic.fold_set
-      let exists = Basic.exists
-      let for_all = Basic.for_all
-      let filter = Basic.filter
-      let partition = Basic.partition
-      let cardinal = Basic.cardinal
-      let elements = Basic.elements
-      let min_elt = Basic.min_elt
-      let max_elt = Basic.max_elt
-      let choose = Basic.choose
-      let split = Basic.split
-
-      type 'data map =  
-          Empty_map 
-        | Node_map of 'data map * Ord.t * 'data * 'data map * int
-
-      let empty_map = Basic.empty_map
-      let is_empty_map = Basic.is_empty_map
-      let add_map = Basic.add_map
-      let find_map = Basic.find_map
-      let find_map_option = Basic.find_map_option
-      let cardinal_map = Basic.cardinal_map
-      let remove_map = Basic.remove_map
-      let mem_map = Basic.mem_map
-      let iter_map = Basic.iter_map
-      let map_map = Basic.map_map
-      let mapi_map = Basic.mapi_map
-      let fold_map = Basic.fold_map
-      let equal_map = Basic.equal_map
-      let update_map = Basic.update_map
-      let map2_map = Basic.map2_map
-      let fold2z_map = Basic.fold2z_map
-      let fold2_map = Basic.fold2_map
-      let forall_map = Basic.forall_map
-      let min_elt_map = Basic.min_elt_map
-      let diff_map = Basic.diff_map
-      let diff_map_pred = Basic.diff_map_pred
-
-
-
-     end:Set_and_Map with type key = Basic.key and type elt = Ord.t)
-*)
