@@ -809,9 +809,9 @@ module Matching = struct
       (fun src dst -> function
       | None -> None
       | Some (acc,co) ->
-	 if IntSet.mem src co then None
+	 if IntSet.mem dst co then None
 	 else
-	   Some (NodeMap.add (cc.id,find_ty cc dst,dst) src acc, IntSet.add src co))
+	   Some (NodeMap.add (cc.id,find_ty cc src,src) dst acc, IntSet.add dst co))
 
   let reconstruct graph inj cc root =
     match find_root cc with
@@ -831,7 +831,7 @@ module Matching = struct
 
   let get node (t,_) = NodeMap.find node t
 
-  let from_edge domain graph edge =
+  let from_edge domain graph edges =
     let rec aux cache acc = function
       | [] -> acc
       | (point,inj_point2graph) :: remains ->
@@ -856,18 +856,24 @@ module Matching = struct
 		   (Env.get domain son.dst,inj')::re,IntMap.add son.dst inj' ca)
 	     (remains,cache) point.sons in
 	 aux cache' acc' remains' in
-    match Env.navigate domain [edge] with
+    match Env.navigate domain edges with
     | None -> []
     | Some (cc_id,inj,point) ->
        aux (IntMap.add cc_id inj IntMap.empty) [] [(point,inj)]
 
   let observables_from_free domain graph ty node_id site =
-    from_edge domain graph ((Fresh (ty,node_id),site),ToNothing)
+    if site = 0 then
+      from_edge domain graph [(Fresh (ty,node_id),site),ToNothing]
+    else
+      from_edge domain graph [(Fresh (ty,node_id),0),ToNothing;
+			      (Existing node_id,site),ToNothing]
   let observables_from_internal domain graph ty node_id site id =
-    from_edge domain graph ((Fresh (ty,node_id),site),ToInternal id)
+    from_edge domain graph [(Fresh (ty,node_id),0),ToNothing;
+			    (Existing node_id,site),ToInternal id]
   let observables_from_link domain graph ty n_id site  ty' n_id' site' =
     from_edge
-      domain graph ((Fresh (ty,n_id),site),ToNode (Fresh (ty',n_id'),site'))
+      domain graph [(Fresh (ty,n_id),0),ToNothing;
+		    (Existing n_id,site),ToNode (Fresh (ty',n_id'),site')]
 end
 
 module ForState = struct

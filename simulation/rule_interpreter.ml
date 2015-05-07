@@ -5,6 +5,7 @@ end
 
 module RootHeap = Heap.Make(Root)
 
+
 type t = {
   roots_of_ccs: RootHeap.t Connected_component.Map.t;
   edges: Edges.t;
@@ -19,11 +20,35 @@ let empty env = {
   free_id = 1;
 }
 
+let print_heap f h =
+  let () = Format.pp_open_box f 0 in
+  let () = RootHeap.iteri
+	     (fun i c -> Format.fprintf f "%i%t" c Pp.comma) h in
+  Format.pp_close_box f ()
+
+let print_injections env f state =
+  Format.fprintf
+    f "@[<v>%a@]"
+    (Pp.set Connected_component.Map.bindings Pp.space
+	    (fun f (cc,roots) ->
+	     Format.fprintf
+	       f "@[%a@] ==> %a"
+	       (Connected_component.print true env.Environment.signatures)
+	       cc print_heap roots
+	    )
+    ) state.roots_of_ccs
+
+let desallocate content heap =
+  let id =
+    RootHeap.fold (fun i c id -> if c = content then i else id) heap (-1) in
+  if id < 0 then failwith "try to desallocate absent element for heap"
+  else RootHeap.remove id heap
+
 let update_roots is_add map cc root =
   let va = try Connected_component.Map.find cc map
 	   with Not_found -> RootHeap.create 13 in
   Connected_component.Map.add
-    cc ((if is_add then RootHeap.alloc else RootHeap.remove) root va) map
+    cc ((if is_add then RootHeap.alloc else desallocate) root va) map
 
 let from_place (inj_nodes,inj_fresh,free_id as inj2graph) = function
   | Transformations.Existing n ->
@@ -40,7 +65,9 @@ let deal_transformation is_add domain inj2graph edges roots transf =
     match transf with
     | Transformations.Freed (n,s) ->
        let ty, id, inj2graph' = from_place inj2graph n in
-       let edges' = Edges.add_free ty id s edges in
+       let edges' =
+	 if is_add then Edges.add_free ty id s edges
+	 else Edges.remove_free id s edges in
        let new_obs =
 	 Connected_component.Matching.observables_from_free
 	   domain (if is_add then edges' else edges) ty id s in
@@ -48,14 +75,18 @@ let deal_transformation is_add domain inj2graph edges roots transf =
     | Transformations.Linked ((n,s),(n',s')) ->
        let ty, id, inj2graph' = from_place inj2graph n in
        let ty', id', inj2graph'' = from_place inj2graph' n' in
-       let edges' = Edges.add_link ty id s ty' id' s' edges in
+       let edges' =
+	 if is_add then Edges.add_link ty id s ty' id' s' edges
+	 else Edges.remove_link id s id' s' edges in
        let new_obs =
 	 Connected_component.Matching.observables_from_link
 	   domain (if is_add then edges' else edges) ty id s ty' id' s' in
        (inj2graph'',edges',new_obs)
     | Transformations.Internalized (n,s,i) ->
        let ty, id, inj2graph' = from_place inj2graph n in
-       let edges' = Edges.add_internal id s i edges in
+       let edges' =
+	 if is_add then Edges.add_internal id s i edges
+	 else  Edges.remove_internal id s i edges in
        let new_obs =
 	 Connected_component.Matching.observables_from_internal
 	   domain (if is_add then edges' else edges) ty id i s in
@@ -63,10 +94,16 @@ let deal_transformation is_add domain inj2graph edges roots transf =
   in
   let roots' =
     List.fold_left
-      (fun r' (cc,root) -> update_roots is_add r' cc root) roots obs in
+      (fun r' (cc,root) ->
+       (* let () = *)
+       (* 	 Format.eprintf *)
+       (* 	   "@[add:%b %a in %i@]@." is_add *)
+       (* 	   (Connected_component.print true !Debug.global_sigs) cc root in *)
+       update_roots is_add r' cc root) roots obs in
   (inj,graph,roots')
 
 let update_edges domain inj_nodes state removed added =
+  (* let () = Format.printf "@[%a@]@." (Edges.debug_print) state.edges in *)
   let aux =
     List.fold_left
       (fun (inj2graph,edges,roots) transf ->

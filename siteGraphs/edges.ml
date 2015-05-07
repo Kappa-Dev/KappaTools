@@ -115,6 +115,18 @@ let build_snapshot sigs graph =
 
 let print sigs f graph =
   Pp.list Pp.space (fun f (i,mix) ->
-		    Format.fprintf f "%%init: %i %a" i
+		    Format.fprintf f "%%init: %i @[%a@]" i
 				   (Raw_mixture.print sigs) mix)
 	  f (build_snapshot sigs graph)
+
+let debug_print f (links,_,sorts) =
+  Pp.set
+    Int2Map.bindings Pp.comma
+    (fun f ((ag,s),l) ->
+     Format.fprintf
+       f "%i:%i->%t" ag s
+       (match l with
+	| Edge.ToFree -> Pp.bottom
+	| Edge.Link (ty,ag',s') ->
+	   fun f -> Format.fprintf f "%i(%i):%i" ag' ty s'))
+    f links

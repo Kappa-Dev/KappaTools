@@ -1129,7 +1129,7 @@ let initialize logger overwrite result =
     if !Parameter.compileModeOn then
       Format.eprintf "@[<v>Intial graph;@,@]%a@."
 		     (Rule_interpreter.print env) graph in
-  let state = State_interpreter.initial env counter graph stops in
+  let new_state = State_interpreter.initial env counter graph stops in
 
   Debug.tag logger "\t Done";
   Debug.tag logger "+ Analyzing non local patterns..." ;
@@ -1147,4 +1147,4 @@ let initialize logger overwrite result =
       end
     else state
   in
-  (Debug.tag logger "\t Done"; (env, domain, counter, state))
+  (Debug.tag logger "\t Done"; (env, domain, counter, graph, new_state, state))

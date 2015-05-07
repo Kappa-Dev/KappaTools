@@ -75,7 +75,7 @@ let event stdout state maybe_active_pert_ids story_profiling
 	       else () ;
 	       raise Deadlock
 	     end in
-  Plot.fill stdout state counter env dt ;
+  Plot.fill stdout counter env dt (State.observables_values env counter state);
   Counter.inc_time counter dt ;
 
   State.dump state counter env ;
@@ -240,7 +240,9 @@ let loop_cps stdout hook return state story_profiling event_list counter env =
       in
       hook (fun () -> iter state pert_ids story_profiling event_list counter env)
     else (*exiting the loop*)
-      let () = Plot.fill stdout state counter env 0.0 in (*Plotting last measures*)
+      let () =
+	Plot.fill stdout counter env 0.0
+		  (State.observables_values env counter state) in (*Plotting last measures*)
       let state,_remain_pert_ids,env,_obs_from_perturbation,_pert_events =
 	exec_perts stdout pert_ids state counter env in
       return stdout env counter state story_profiling event_list

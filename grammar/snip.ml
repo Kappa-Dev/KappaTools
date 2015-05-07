@@ -559,7 +559,7 @@ let rec add_agents_in_cc wk registered_links transf links_transf remains =
 let rec complete_with_creation (removed,added as transf) links_transf fresh = function
   | [] ->
      begin match IntMap.root links_transf with
-	   | None -> transf
+	   | None -> (List.rev removed, List.rev added)
 	   | Some (i,_) -> dangling_link "right" i
      end
   | ag :: ag_l ->

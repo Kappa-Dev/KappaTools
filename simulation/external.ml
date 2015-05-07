@@ -80,7 +80,7 @@ let trigger_effect err_fmt state env pert_ids tracked pert_events pert p_id
       snapshot str;
       (env, state ,pert_ids,tracked,pert_events)
   | Primitives.PLOTENTRY ->
-     let () = Plot.plot_now env counter state in
+     let () = Plot.plot_now env (State.observables_values env counter state) in
      (env, state, pert_ids, tracked, pert_events)
   | Primitives.PRINT (pexpr_file,pexpr) ->
     let str = eval_pexpr pexpr_file state counter env in

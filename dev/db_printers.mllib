@@ -18,6 +18,7 @@ Ast
 Expr
 Signature
 NamedDecls
+Primitives
 
 Set_and_map
 Hash
@@ -49,6 +50,9 @@ Edges
 Transformations
 Connected_component
 Snip
+Edges
+Expr_interpreter
+Rule_interpreter
 
 Debug
 Raw_printers

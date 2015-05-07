@@ -135,7 +135,7 @@ let () =
     Format.printf
       "+ Initialized random number generator with seed %d@." theSeed;
 
-    let (env, cc_env, counter, state) =
+    let (env, cc_env, counter, graph, new_state, state) =
       match !Parameter.marshalizedInFile with
       | "" ->
 	 Eval.initialize Format.std_formatter !Parameter.alg_var_overwrite result
@@ -150,12 +150,13 @@ let () =
 	     else
 	       Format.printf "+Loading simulation package %s...@."
 			     marshalized_file in
-	   let env,cc_env,counter,state =
+	   let env,cc_env,counter,graph,new_state,state =
 	     (Marshal.from_channel d :
-		Environment.t*Connected_component.Env.t*Counter.t*State.t) in
+		Environment.t*Connected_component.Env.t*Counter.t*
+		  Rule_interpreter.t * State_interpreter.t * State.t) in
 	   let () = Pervasives.close_in d  in
 	   let () = Format.printf "Done@." in
-	   (env,cc_env,counter,state)
+	   (env,cc_env,counter,graph,new_state,state)
 	 with
 	 | _exn ->
 	    Debug.tag
@@ -168,7 +169,7 @@ let () =
 
     let () = Plot.create (Kappa_files.get_data ()) in
     let () = if !Parameter.pointNumberValue > 0 then
-	       Plot.plot_now env counter state in
+	       Plot.plot_now env (State.observables_values env counter state) in
 
     let () = Kappa_files.with_marshalized
 	       (fun d -> Marshal.to_channel
@@ -208,7 +209,7 @@ let () =
     ExceptionDefn.flush_warning Format.err_formatter ;
     Parameter.initSimTime () ;
     let () =
-      try Run.loop Format.std_formatter state profiling event_list counter env
+      try State_interpreter.loop Format.std_formatter env cc_env counter graph new_state
       with
       | ExceptionDefn.UserInterrupted f ->
 	 begin

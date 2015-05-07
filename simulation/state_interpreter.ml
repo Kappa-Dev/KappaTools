@@ -34,6 +34,13 @@ let get_alg env state i =
   | None -> fst (snd env.Environment.algs.NamedDecls.decls.(i))
   | Some expr -> expr
 
+let observables_values env counter graph state =
+  let get_alg i = get_alg env state i in
+  (counter.Mods.Counter.time,
+   Array.map
+     (fun (obs,_) -> Rule_interpreter.value_alg counter graph ~get_alg obs)
+     env.Environment.observables)
+
 let do_it env domain counter graph state = function
   | Primitives.ITER_RULE ((v,_),_,r) ->
      let get_alg i = get_alg env state i in
@@ -86,7 +93,9 @@ let do_it env domain counter graph state = function
 			     Rule_interpreter.value_alg counter graph ~get_alg))
 	 pe_expr in
      (false, graph, state)
-  | Primitives.PLOTENTRY -> (false, graph, state)
+  | Primitives.PLOTENTRY ->
+     let () = Plot.plot_now env (observables_values env counter graph state) in
+     (false, graph, state)
   | Primitives.SNAPSHOT pexpr  ->
      let get_alg i = get_alg env state i in
      let file =
@@ -119,6 +128,8 @@ let update_activity get_alg env counter graph state =
     env.Environment.rules.NamedDecls.decls
 
 let perturbate env domain counter graph state =
+  let not_done_yet =
+    Array.make (Array.length env.Environment.perturbations) true in
   let get_alg i = get_alg env state i in
   let rec do_until_noop i graph state stop =
     if stop || i >= Array.length env.Environment.perturbations then
@@ -126,7 +137,7 @@ let perturbate env domain counter graph state =
       (stop,graph,state)
     else
       let pert = env.Environment.perturbations.(i) in
-      if state.perturbations_alive.(i) &&
+      if state.perturbations_alive.(i) && not_done_yet.(i) &&
 	   Rule_interpreter.value_bool
 	     counter graph ~get_alg pert.Primitives.precondition
       then
@@ -135,6 +146,7 @@ let perturbate env domain counter graph state =
 			  if stop then acc else
 			    do_it env domain counter graph state effect)
 			 (stop,graph,state) pert.Primitives.effect in
+	let () = not_done_yet.(i) <- false in
 	let () =
 	  state.perturbations_alive.(i) <-
 	    match pert.Primitives.abort with
@@ -150,27 +162,62 @@ let one_rule env domain counter graph state =
   let rule_id,_ = Random_tree.random state.activities in
   let _,rule = env.Environment.rules.NamedDecls.decls.(rule_id) in
   let get_alg i = get_alg env state i in
+  (* let () = *)
+  (*   Format.eprintf "%a@." (Rule_interpreter.print_injections env) graph in *)
   match Rule_interpreter.apply_rule ~get_alg domain counter graph rule with
   | None -> None
   | Some graph' ->
      let () = update_activity get_alg env counter graph state in
      Some (graph',state)
 
-let a_loop env domain counter graph state =
+let a_loop form env domain counter graph state =
   let activity = Random_tree.total state.activities in
   let rd = Random.float 1.0 in
   let dt = abs_float (log rd /. activity) in
-  match !(state.stopping_times) with
-  | (ti,_) :: tail
-       when Nbr.is_smaller ti (Nbr.F (Mods.Counter.time counter +. dt)) ->
-     let () = state.stopping_times := tail in
-     let () = counter.Mods.Counter.time <- Nbr.to_float ti in
-     perturbate env domain counter graph state
-  | _ ->
-     let (stop,graph',state') =
-       perturbate env domain counter graph state in
-     match one_rule env domain counter graph' state' with
-     | None ->
-	(Mods.Counter.one_null_event counter dt||stop,graph',state')
-     | Some (graph'',state'') ->
-	(Mods.Counter.one_constructive_event counter dt||stop,graph'',state'')
+  if not (activity > 0.) || dt = infinity then
+    match !(state.stopping_times) with
+    | [] -> (true,graph,state)
+    | (ti,_) :: tail ->
+       let () = state.stopping_times := tail in
+       let () = counter.Mods.Counter.time <- Nbr.to_float ti in
+       perturbate env domain counter graph state
+  else
+    match !(state.stopping_times) with
+    | (ti,_) :: tail
+	 when Nbr.is_smaller ti (Nbr.F (Mods.Counter.time counter +. dt)) ->
+       let () = state.stopping_times := tail in
+       let () = counter.Mods.Counter.time <- Nbr.to_float ti in
+       perturbate env domain counter graph state
+    | _ ->
+       let (stop,graph',state') =
+	 perturbate env domain counter graph state in
+       match one_rule env domain counter graph' state' with
+       | None ->
+	  (not (Mods.Counter.one_null_event counter dt)||stop,graph',state')
+       | Some (graph'',state'') ->
+	  let () =
+	    Plot.fill form counter env dt
+		      (observables_values env counter graph state) in
+	  (not (Mods.Counter.one_constructive_event counter dt)||stop,graph'',state'')
+
+let loop_cps form hook return env domain counter graph state =
+  let () =
+    Mods.Counter.tick
+      form counter counter.Mods.Counter.time counter.Mods.Counter.events in
+  let rec iter graph state =
+    let stop,graph',state' = a_loop form env domain counter graph state in
+    if stop then
+      let () =
+	Plot.fill form counter env 0.0
+		  (observables_values env counter graph' state') in
+      let (_,_,_) = perturbate env domain counter graph' state' in
+      return form counter
+    else
+      hook (fun () -> iter graph' state')
+  in iter graph state
+
+let finalize form counter =
+  Plot.close form counter
+
+let loop form env domain counter graph state =
+  loop_cps form (fun f -> f ()) finalize env domain counter graph state

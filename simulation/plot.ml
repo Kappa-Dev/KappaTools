@@ -53,13 +53,12 @@ let print_values_raw f (time,l) =
 		 !Parameter.plotSepChar time !Parameter.plotSepChar
 		 (Pp.array !Parameter.plotSepChar (fun _ -> Nbr.print)) l
 
-let set_up filename env counter ?time state =
+let set_up filename env init_va =
   let head =
     Array.map
       (fun (ex,_) ->
        Format.asprintf "%a" (Kappa_printer.alg_expr env) ex)
       env.Environment.observables in
-  let init_va = observables_values env counter ?time state in
   let title =
     if !Parameter.marshalizedInFile <> ""
     then !Parameter.marshalizedInFile ^" output"
@@ -97,18 +96,17 @@ let next_point counter time_increment =
 
 let set_last_point plot p = plot.last_point <- p
 
-let plot_now env counter ?time state =
+let plot_now env observables_values =
   match !plotDescr with
-  | Wait f -> set_up f env counter ?time state
+  | Wait f -> set_up f env observables_values
   | Ready plot ->
      match plot.format with
      | Raw fd ->
-	print_values_raw fd.form (observables_values env counter ?time state)
+	print_values_raw fd.form observables_values
      | Svg s ->
-	s.Pp_svg.points <-
-	  observables_values env counter ?time state :: s.Pp_svg.points
+	s.Pp_svg.points <- observables_values :: s.Pp_svg.points
 
-let fill form state counter env time_increment =
+let fill form counter env time_increment observables_values =
   let () =
     match !plotDescr with
     | Wait _ -> ()
@@ -123,7 +121,7 @@ let fill form state counter env time_increment =
 	    invalid_arg ("Plot.fill: invalid increment "^string_of_int n)
 	  else
 	    if n <> 0
-	    then plot_now env counter state
+	    then plot_now env observables_values
        | None ->
 	  match counter.Counter.dT with
 	  | None -> ()
@@ -133,7 +131,7 @@ let fill form state counter env time_increment =
 	     while (!n > 0) && (Counter.check_output_time counter !output_time) do
 	       output_time := !output_time +. dT ;
 	       Counter.tick form counter !output_time counter.Counter.events ;
-	       plot_now env counter ~time:!output_time  state;
+	       plot_now env observables_values;
 	       n:=!n-1 ;
 	     done in
   Counter.tick form counter counter.Counter.time counter.Counter.events
