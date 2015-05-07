@@ -556,7 +556,7 @@ let rec add_agents_in_cc wk registered_links transf links_transf remains =
 				   string_of_int i,pos))
      in handle_ports wk registered_links transf links_transf remains ag_l 0
 
-let rec complete_with_creation (removed,added as transf) links_transf fresh = function
+let rec complete_with_creation (removed,added) links_transf fresh = function
   | [] ->
      begin match IntMap.root links_transf with
 	   | None -> (List.rev removed, List.rev added)
@@ -621,7 +621,7 @@ let connected_components_sum_of_ambiguous_rule contact_map env lhs rhs =
     rule_mixtures_of_ambiguous_rule contact_map sigs lhs rhs in
   let () =
     if !Parameter.compileModeOn then
-      Format.eprintf "%a@,"
+      Format.eprintf "%a@]@."
 		     (Pp.list
 			Pp.cut
 			(fun f x ->
@@ -635,24 +635,8 @@ let connected_components_sum_of_ambiguous_rule contact_map env lhs rhs =
 				     f "@ (+%t) %a" Pp.nu
 				     (Raw_mixture.print sigs) created)))
 		     all_mixs in
-  let (env',rules') =
-    Tools.list_fold_right_map (connected_components_of_mixture created)
-			      env all_mixs in
-  let () =
-    if !Parameter.compileModeOn then
-      let boxed_cc f cc =
-	let () = Format.pp_open_box f 2 in
-	let () = Connected_component.print
-		   true (Connected_component.Env.sigs env') f cc in
-	Format.pp_close_box f () in
-      let one_ccs f (x,(removed,added)) =
-	Format.fprintf
-	  f "___@,%a@,---@,@[%a@]@,+++@,@[%a@]"
-	  (Pp.list Pp.space boxed_cc) x
-	  (Pp.list Pp.comma (Transformations.print (Connected_component.Env.sigs env'))) removed
-	  (Pp.list Pp.comma (Transformations.print (Connected_component.Env.sigs env'))) added in
-      Format.eprintf "%a@]@." (Pp.list Pp.space one_ccs) rules' in
-  (env',rules')
+  Tools.list_fold_right_map (connected_components_of_mixture created)
+			    env all_mixs
 
 let connected_components_sum_of_ambiguous_mixture contact_map env mix =
   let cc_env,rules =

@@ -23,20 +23,8 @@ let empty env = {
 let print_heap f h =
   let () = Format.pp_open_box f 0 in
   let () = RootHeap.iteri
-	     (fun i c -> Format.fprintf f "%i%t" c Pp.comma) h in
+	     (fun _ c -> Format.fprintf f "%i%t" c Pp.comma) h in
   Format.pp_close_box f ()
-
-let print_injections env f state =
-  Format.fprintf
-    f "@[<v>%a@]"
-    (Pp.set Connected_component.Map.bindings Pp.space
-	    (fun f (cc,roots) ->
-	     Format.fprintf
-	       f "@[%a@] ==> %a"
-	       (Connected_component.print true env.Environment.signatures)
-	       cc print_heap roots
-	    )
-    ) state.roots_of_ccs
 
 let desallocate content heap =
   let id =
@@ -86,10 +74,10 @@ let deal_transformation is_add domain inj2graph edges roots transf =
        let ty, id, inj2graph' = from_place inj2graph n in
        let edges' =
 	 if is_add then Edges.add_internal id s i edges
-	 else  Edges.remove_internal id s i edges in
+	 else Edges.remove_internal id s i edges in
        let new_obs =
 	 Connected_component.Matching.observables_from_internal
-	   domain (if is_add then edges' else edges) ty id i s in
+	   domain (if is_add then edges' else edges) ty id s i in
        (inj2graph',edges',new_obs)
   in
   let roots' =
@@ -199,8 +187,20 @@ let force_rule ~get_alg domain counter state rule =
      | h :: t ->
 	transform_by_a_rule ~get_alg domain counter state rule h, Some t
 
+let print_injections env f roots_of_ccs =
+  Format.fprintf
+    f "@[<v>%a@]"
+    (Pp.set Connected_component.Map.bindings Pp.space
+	    (fun f (cc,roots) ->
+	     Format.fprintf
+	       f "@[# @[%a@] ==> %a@]"
+	       (Connected_component.print true env.Environment.signatures)
+	       cc print_heap roots
+	    )
+    ) roots_of_ccs
+
 let print env f state =
-  Format.fprintf f "@[<v>%a@,%a@]"
+  Format.fprintf f "@[<v>%a@,%a@,%a@]"
 		 (Edges.print env.Environment.signatures) state.edges
 		 (Pp.array Pp.space (fun i f el ->
 				     Format.fprintf f "%%init: %s <- %a"
@@ -208,3 +208,4 @@ let print env f state =
 						       env.Environment.tokens i)
 						    Nbr.print el))
 		 state.tokens
+		 (print_injections env) state.roots_of_ccs

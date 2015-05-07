@@ -20,4 +20,3 @@ val force_rule :
   (t  * Connected_component.Matching.t list option)
 
 val print : Environment.t -> Format.formatter -> t -> unit
-val print_injections : Environment.t -> Format.formatter -> t -> unit

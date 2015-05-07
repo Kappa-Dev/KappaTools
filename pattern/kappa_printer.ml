@@ -97,6 +97,29 @@ let print_expr_val env alg_val f e =
        Nbr.print f (alg_val env alg)
   in Pp.list (fun f -> Format.pp_print_cut f ()) aux f e
 
+let elementary_rule env f r =
+  let pr_alg f a = alg_expr env f a in
+  let pr_tok f (va,tok) =
+    Format.fprintf
+      f "%s <- %a"
+      (NamedDecls.elt_name env.Environment.tokens tok)
+      pr_alg va in
+  let pr_trans f t =
+    Transformations.print env.Environment.signatures f t in
+  let boxed_cc f cc =
+    let () = Format.pp_open_box f 2 in
+    let () = Connected_component.print
+	       true env.Environment.signatures f cc in
+    Format.pp_close_box f () in
+  Format.fprintf
+    f "@[%a@]@ -- @[@[%a@]@ @[%a@]@]@ ++ @[@[%a@]@ @[%a@]@]@ @@%a"
+    (Pp.list Pp.comma boxed_cc) r.Primitives.connected_components
+    (Pp.list Pp.comma pr_trans) r.Primitives.removed
+    (Pp.list Pp.space pr_tok) r.Primitives.consumed_tokens
+    (Pp.list Pp.comma pr_trans) r.Primitives.inserted
+    (Pp.list Pp.space pr_tok) r.Primitives.injected_tokens
+    (alg_expr env) r.Primitives.rate
+
 let modification env f = function
   | Primitives.PRINT (nme,va) ->
      Format.fprintf f "$PRINTF %a <%a>" (print_expr env) nme (print_expr env) va

@@ -1101,6 +1101,16 @@ let initialize logger overwrite result =
 
   let env =
     Environment.init sigs_nd contact_map tk_nd alg_nd rule_nd fresh_kappa in
+  let () =
+    if !Parameter.compileModeOn then
+      Format.eprintf
+	"@[<v>%a@]@."
+	(Pp.list
+	   Pp.space
+	   (fun f (_,r) ->
+	    Format.fprintf f "@[%a@]" (Kappa_printer.elementary_rule env) r))
+	compiled_rules in
+
   let (env, domain, kappa_vars) =
     variables_of_result env domain' mixs' alg_a in
 
@@ -1127,7 +1137,8 @@ let initialize logger overwrite result =
     init_graph_of_result counter env domain result in
   let () =
     if !Parameter.compileModeOn then
-      Format.eprintf "@[<v>Intial graph;@,@]%a@."
+      Format.eprintf "@[<v>Domain:@,@[%a@]@,Intial graph;@,@]%a@."
+		     Connected_component.Env.print domain
 		     (Rule_interpreter.print env) graph in
   let new_state = State_interpreter.initial env counter graph stops in
 

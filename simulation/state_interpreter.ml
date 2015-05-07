@@ -168,6 +168,11 @@ let one_rule env domain counter graph state =
   | None -> None
   | Some graph' ->
      let () = update_activity get_alg env counter graph state in
+     let () =
+       if !Parameter.debugModeOn then
+	 Format.printf "@[<v>Applied@ @[%a@]@ Obtained@ %a@]@."
+			(Kappa_printer.elementary_rule env) rule
+			(Rule_interpreter.print env) graph' in
      Some (graph',state)
 
 let a_loop form env domain counter graph state =
