@@ -54,7 +54,8 @@ type ode_frag =
       store_sites_bond_pair_set           : sites_ode;
       store_sites_bond_pair_set_external  : sites_ode;
       store_sites_lhs                     : int list AgentMap.t;
-      store_sites_anchor_set              : (set AgentMap.t * set AgentMap.t);
+      store_sites_anchor_set              : (set AgentMap.t * set AgentMap.t); (*REMOVE*)
+      (*store_sites_anchor                  : set AgentMap.t (*TODO*);*)
       store_internal_flow                 : (pair_int_flow * pair_int_flow);
       store_external_flow                 : pair_ext_flow
     }
@@ -154,27 +155,6 @@ let fold_anchor_set parameter error store_sites_anchor_set1 store_sites_anchor_s
 (************************************************************************************)
 (*MODIFIED SITES*)
 
-let add_site_modified parameter error agent_type site_set store_sites_modified_set =
-  let old_set =
-    get_site_common_set
-      parameter
-      error
-      agent_type
-      store_sites_modified_set
-  in
-  let error, new_set = Cckappa_sig.Site_map_and_set.union
-    parameter
-    error
-    site_set
-    old_set
-  in
-  Int_storage.Nearly_inf_Imperatif.set
-    parameter
-    error
-    agent_type
-    new_set
-    store_sites_modified_set     
-
 let collect_sites_modified_set parameter error rule store_sites_modified_set =
   let error, store_sites_modified_set =
     Int_storage.Quick_Nearly_inf_Imperatif.fold
@@ -203,7 +183,7 @@ let collect_sites_modified_set parameter error rule store_sites_modified_set =
           in
           (*store*)
           let error, store_sites_modified_set =
-            add_site_modified
+            Int_storage.Nearly_inf_Imperatif.set
               parameter
               error
               agent_type
@@ -223,7 +203,7 @@ let collect_sites_modified_set parameter error rule store_sites_modified_set =
 (*++ element in a pair of site that are bond*)
 
 (*without adding the old result*)
-let collect_store_bond_set_each_rule parameter error bond_rhs
+let collect_store_bond_set_each_rule parameter error bond_lhs
     site_address store_sites_bond_set =
   let agent_id = site_address.Cckappa_sig.agent_index in
   let agent_type = site_address.Cckappa_sig.agent_type in
@@ -232,7 +212,7 @@ let collect_store_bond_set_each_rule parameter error bond_rhs
       parameter
       error
       agent_id
-      bond_rhs
+      bond_lhs
    in
   let site_address =
     match site_address_map with
@@ -263,8 +243,8 @@ let collect_store_bond_set_each_rule parameter error bond_rhs
       store_sites_bond_set
   in error, store_sites_bond_set
 
-(*combine with the old_result*)
-let collect_store_bond_set parameter error bond_rhs site_address store_sites_bond_set =
+(*combine with the old_result*) (*REMOVE?*)
+let collect_store_bond_set parameter error bond_lhs site_address store_sites_bond_set =
   let agent_id = site_address.Cckappa_sig.agent_index in
   let agent_type = site_address.Cckappa_sig.agent_type in
    let error, site_address_map =
@@ -272,7 +252,7 @@ let collect_store_bond_set parameter error bond_rhs site_address store_sites_bon
       parameter
       error
       agent_id
-      bond_rhs
+      bond_lhs
    in
   let site_address =
     match site_address_map with
@@ -319,10 +299,10 @@ let collect_store_bond_set parameter error bond_rhs site_address store_sites_bon
   in error, store_sites_bond_set
 
 (*------------------------------------------------------------------------------*)
-(*-- collect binding sites in the rhs with: site -> site*)
+(*-- collect binding sites in the lhs with: site -> site*)
 
 (*Use for collecting anchor site*)
-let collect_sites_bond_pair_set parameter error bond_rhs
+let collect_sites_bond_pair_set parameter error bond_lhs
     site_address_1
     site_address_2
     store_sites_bond_set_1
@@ -333,7 +313,7 @@ let collect_sites_bond_pair_set parameter error bond_rhs
     collect_store_bond_set_each_rule
       parameter
       error
-      bond_rhs
+      bond_lhs
       site_address_1
       store_sites_bond_set_1
   in
@@ -342,7 +322,7 @@ let collect_sites_bond_pair_set parameter error bond_rhs
     collect_store_bond_set
       parameter
       error
-      bond_rhs
+      bond_lhs
       site_address_2
       store_sites_bond_set_2
   in
@@ -351,9 +331,9 @@ let collect_sites_bond_pair_set parameter error bond_rhs
   in
   error, store_sites_bond_pair_set
 
-(*-- collect binding sites in the rhs with: site -> site*)
+(*-- collect binding sites in the lhs with: site -> site*)
 
-let result_sites_bond_pair_set parameter error bond_rhs bind 
+let result_sites_bond_pair_set parameter error bond_lhs release
     store_sites_bond_pair_set =
   List.fold_left (fun (error, store_sites_bond_pair_set)
     (site_address_1, site_address_2) ->
@@ -361,7 +341,7 @@ let result_sites_bond_pair_set parameter error bond_rhs bind
         error, collect_sites_bond_pair_set
           parameter
           error
-          bond_rhs
+          bond_lhs
           site_address_1
           site_address_2
           (fst store_sites_bond_pair_set)
@@ -370,15 +350,15 @@ let result_sites_bond_pair_set parameter error bond_rhs bind
       in
       error, store_sites_bond_pair_set)
     (error, store_sites_bond_pair_set)
-    bind
+    release
 
 (*------------------------------------------------------------------------------*)
-(*-- collect binding sites in the rhs with: site -> site*)
+(*-- collect binding sites in the lhs with: site -> site*)
 
 (*use for external flow; collect binding site at each rule and not combine
   them with old result*)
 
-let collect_sites_bond_pair_set_external parameter error bond_rhs
+let collect_sites_bond_pair_set_external parameter error bond_lhs
     site_address_1
     site_address_2
     store_sites_bond_set_1
@@ -388,7 +368,7 @@ let collect_sites_bond_pair_set_external parameter error bond_rhs
     collect_store_bond_set_each_rule
       parameter
       error
-      bond_rhs
+      bond_lhs
       site_address_1
       store_sites_bond_set_1
   in
@@ -396,7 +376,7 @@ let collect_sites_bond_pair_set_external parameter error bond_rhs
     collect_store_bond_set_each_rule
       parameter
       error
-      bond_rhs
+      bond_lhs
       site_address_2
       store_sites_bond_set_2
   in
@@ -405,9 +385,9 @@ let collect_sites_bond_pair_set_external parameter error bond_rhs
   in
   error, store_sites_bond_pair_set
 
-(*-- collect binding sites in the rhs with: site -> site*)
+(*-- collect binding sites in the lhs with: site -> site*)
 
-let result_sites_bond_pair_set_external parameter error bond_rhs bind 
+let result_sites_bond_pair_set_external parameter error bond_lhs release
     store_sites_bond_pair_set =
   List.fold_left (fun (error, store_sites_bond_pair_set)
     (site_address_1, site_address_2) ->
@@ -415,7 +395,7 @@ let result_sites_bond_pair_set_external parameter error bond_rhs bind
         error, collect_sites_bond_pair_set_external
           parameter
           error
-          bond_rhs
+          bond_lhs
           site_address_1
           site_address_2
           (fst store_sites_bond_pair_set)
@@ -424,7 +404,7 @@ let result_sites_bond_pair_set_external parameter error bond_rhs bind
       in
       error, store_sites_bond_pair_set)
     (error, store_sites_bond_pair_set)
-    bind
+    release
 
 (************************************************************************************)
 (*SITES LHS: get site of each agent in each rule*)
@@ -476,7 +456,7 @@ let collect_sites_anchor_set parameter error get_rule
         | Cckappa_sig.Ghost -> error, store_sites_anchor_set
         | Cckappa_sig.Agent agent ->
           let agent_type = agent.Cckappa_sig.agent_name in
-          (*get a set of modified site in the rule rhs*)
+          (*get a set of modified site in the rule lhs*)
           let modified_set =
             get_site_common_set
               parameter
@@ -484,9 +464,9 @@ let collect_sites_anchor_set parameter error get_rule
               agent_type
               store_sites_modified_set
           in
-          (*get a set of sites in the rule rhs that are bond (the first
+          (*get a set of sites in the rule lhs that are bond (the first
             agent that has site that are bond*)
-          let site_rhs_bond_fst_set =
+          let site_lhs_bond_fst_set =
             get_site_common_set
               parameter
               error
@@ -510,6 +490,11 @@ let collect_sites_anchor_set parameter error get_rule
               (fst store_sites_anchor_set)
               (snd store_sites_anchor_set)
           in
+          (*t _ = Printf.fprintf stdout "agent_type:%i" agent_type;
+            let l = Cckappa_sig.Site_map_and_set.elements anchor_set in
+            print_string "anchor_set:";
+            print_list l; print_string "\n"
+          in*)
           (*first case: a site connected to a modified site*)
           let error, anchor_set1 =
             let rec aux acc =
@@ -520,7 +505,7 @@ let collect_sites_anchor_set parameter error get_rule
                     if Cckappa_sig.Site_map_and_set.mem_set
                       x modified_set &&
                       Cckappa_sig.Site_map_and_set.mem_set
-                      x site_rhs_bond_fst_set
+                      x site_lhs_bond_fst_set
                     then
                       let anchor = snd store_sites_bond_pair_set in
                       error, anchor
@@ -544,7 +529,7 @@ let collect_sites_anchor_set parameter error get_rule
                           Cckappa_sig.Site_map_and_set.mem_set
                           x modified_set &&
                           Cckappa_sig.Site_map_and_set.mem_set
-                          y site_rhs_bond_fst_set
+                          y site_lhs_bond_fst_set
                         then
                           let anchor = snd store_sites_bond_pair_set in
                           error, anchor
@@ -553,8 +538,72 @@ let collect_sites_anchor_set parameter error get_rule
                 in aux tl
           in error, (anchor_set1, anchor_set2)
      ) get_rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
-       store_sites_anchor_set
+          store_sites_anchor_set
 
+(*combine*)
+(*t collect_store_sites_anchor parameter error get_rule
+    store_sites_anchor_set
+    store_sites_anchor
+    =
+  Int_storage.Quick_Nearly_inf_Imperatif.fold
+    parameter
+    error
+    (fun parameter error agent_type agent store_sites_anchor ->
+      match agent with
+        | Cckappa_sig.Ghost -> error, store_sites_anchor
+        | Cckappa_sig.Agent agent ->
+          (*union the result of two anchor set*)
+          let get_anchor1 =
+            get_site_common_set
+              parameter
+              error
+              agent_type
+              (fst store_sites_anchor_set)
+          in
+          let get_anchor2 =
+            get_site_common_set
+              parameter
+              error
+              agent_type
+              (snd store_sites_anchor_set)
+          in
+          (*union*)
+          let error, get_anchor =
+            Cckappa_sig.Site_map_and_set.union
+              parameter
+              error
+              get_anchor1
+              get_anchor2
+          in
+          (*check anchor state*)
+          if Cckappa_sig.Site_map_and_set.is_empty_set get_anchor1
+          then
+            Int_storage.Nearly_inf_Imperatif.set
+              parameter
+              error
+              agent_type
+              get_anchor2
+              store_sites_anchor
+          else
+            if Cckappa_sig.Site_map_and_set.is_empty_set get_anchor2
+            then
+              Int_storage.Nearly_inf_Imperatif.set
+                parameter
+                error
+                agent_type
+                get_anchor1
+                store_sites_anchor
+            else
+              Int_storage.Nearly_inf_Imperatif.set
+                parameter
+                error
+                agent_type
+                get_anchor
+                store_sites_anchor
+    )
+    get_rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
+    store_sites_anchor*)
+    
 (************************************************************************************)
 (*INTERNAL FLOW*)
 
@@ -716,7 +765,7 @@ let cartesian_prod_external i anchor_set i' bond_fst_list bond_snd_set =
   in
   loop anchor_list [] 
     
-let collect_external_flow parameter error bind
+let collect_external_flow parameter error release
     store_sites_bond_pair_set_external
     store_sites_anchor_set1
     store_sites_anchor_set2
@@ -724,7 +773,7 @@ let collect_external_flow parameter error bind
   List.fold_left (fun (error, store_external_flow) (site_address_1, site_address_2) ->
     let agent_type_1 = site_address_1.Cckappa_sig.agent_type in
     let agent_type_2 = site_address_2.Cckappa_sig.agent_type in
-    (*collect site that are bond in the rhs; the first element in a pair*)
+    (*collect site that are bond in the lhs; the first element in a pair*)
     let bond_fst_set =
       get_site_common_set
         parameter
@@ -732,7 +781,7 @@ let collect_external_flow parameter error bind
         agent_type_1
         (fst store_sites_bond_pair_set_external)
     in
-    (*collect site that are bond in the rhs; the second element in a pair*)
+    (*collect site that are bond in the lhs; the second element in a pair*)
     let bond_snd_set =
       get_site_common_set
         parameter
@@ -761,14 +810,14 @@ let collect_external_flow parameter error bind
     let external_flow = List.concat [collect_external_flow; store_external_flow] in
     error, external_flow)
     (error, store_external_flow)
-    bind
+    release
     
 (************************************************************************************)   
 (*RULE*)
 
 let scan_rule parameter error handler get_rule ode_class =
-  let bind = get_rule.Cckappa_sig.actions.Cckappa_sig.bind in
-  let bond_rhs = get_rule.Cckappa_sig.rule_rhs.Cckappa_sig.bonds in
+  let release = get_rule.Cckappa_sig.actions.Cckappa_sig.release in
+  let bond_lhs = get_rule.Cckappa_sig.rule_lhs.Cckappa_sig.bonds in
   (*------------------------------------------------------------------------------*)
   (*a) collect modified sites*)
   let error, store_sites_modified_set =
@@ -784,16 +833,16 @@ let scan_rule parameter error handler get_rule ode_class =
     result_sites_bond_pair_set
       parameter
       error
-      bond_rhs
-      bind
+      bond_lhs
+      release
       ode_class.store_sites_bond_pair_set
   in
   let error, store_sites_bond_pair_set_external =
     result_sites_bond_pair_set_external
       parameter
       error
-      bond_rhs
-      bind
+      bond_lhs
+      release
       ode_class.store_sites_bond_pair_set_external
   in
   (*------------------------------------------------------------------------------*)
@@ -823,6 +872,14 @@ let scan_rule parameter error handler get_rule ode_class =
       store_sites_lhs
       ode_class.store_sites_anchor_set
   in
+  (*let error, store_sites_anchor =
+    collect_store_sites_anchor
+      parameter
+      error
+      get_rule
+      store_sites_anchor_set
+      ode_class.store_sites_anchor
+  in*)
   (*------------------------------------------------------------------------------*)
   (*e) compute internal_flow: site -> modified/anchor site*)
   let error, store_internal_flow =
@@ -841,7 +898,7 @@ let scan_rule parameter error handler get_rule ode_class =
     collect_external_flow
       parameter
       error
-      bind
+      release
       store_sites_bond_pair_set_external
       (fst store_sites_anchor_set)
       (snd store_sites_anchor_set)
@@ -856,6 +913,7 @@ let scan_rule parameter error handler get_rule ode_class =
     store_sites_bond_pair_set_external  = store_sites_bond_pair_set_external;
     store_sites_lhs                     = store_sites_lhs;
     store_sites_anchor_set              = store_sites_anchor_set;
+    (*store_sites_anchor                  = store_sites_anchor;*)
     store_internal_flow                 = store_internal_flow;
     store_external_flow                 = store_external_flow
   }
@@ -877,6 +935,7 @@ let scan_rule_set parameter error handler rules =
       store_sites_bond_pair_set_external  = init_pair;
       store_sites_lhs                     = init_lhs;
       store_sites_anchor_set              = (init, init);
+      (*store_sites_anchor                  = init;*)
       store_internal_flow                 = (init_internal, init_internal);
       store_external_flow                 = []
     }
@@ -972,6 +1031,7 @@ let print_ode parameter error
                 store_sites_bond_pair_set_external;
                 store_sites_lhs;
                 store_sites_anchor_set;
+                (*store_sites_anchor;*)
                 store_internal_flow;
                 store_external_flow
               } =
@@ -981,6 +1041,8 @@ let print_ode parameter error
   let _ = print_anchor parameter error (fst store_sites_anchor_set) in
   let _ = Printf.fprintf stdout "* Anchor sites 2:\n" in
   let _ = print_anchor parameter error (snd store_sites_anchor_set) in
+  (*let _ = Printf.fprintf stdout "* Anchor sites finally:\n" in
+  let _ = print_anchor parameter error store_sites_anchor in*)
   let _ = Printf.fprintf stdout "* Internal flow:\n" in
   let _ = print_internal_flow1 parameter error (fst store_internal_flow) in
   let _ = print_internal_flow2 parameter error (snd store_internal_flow) in
