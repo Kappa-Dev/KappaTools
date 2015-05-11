@@ -123,7 +123,7 @@ let anchor_set parameter error agent_type store_sites_anchor1 store_sites_anchor
   in anchor_set
 
 (*------------------------------------------------------------------------------*)
-(* A set of anchors site -> a list of anchors site: (combine two cases) fold*)
+(* A set of anchors site (combine two cases) fold*)
 
 let get_anchor_common parameter error store_sites_anchor =
    Int_storage.Nearly_inf_Imperatif.fold
@@ -375,7 +375,8 @@ let result_sites_bond_pair_set parameter error bond_rhs bind
 (*------------------------------------------------------------------------------*)
 (*-- collect binding sites in the rhs with: site -> site*)
 
-(*use for external flow; collect binding site at each rule and not combine them*)
+(*use for external flow; collect binding site at each rule and not combine
+  them with old result*)
 
 let collect_sites_bond_pair_set_external parameter error bond_rhs
     site_address_1
@@ -444,6 +445,7 @@ let store_sites_lhs parameter error rule store_sites_lhs =
                 site :: current_list)
               agent.Cckappa_sig.agent_interface []
           in
+          (*store*)
           let error, sites_list =
             Int_storage.Nearly_inf_Imperatif.set
               parameter
@@ -558,25 +560,22 @@ let collect_sites_anchor_set parameter error get_rule
 
 (*cartesian product: remove the self binding.
   For example: A(x,y) where both 'x,y' are modified sites.
-  Two list:
+  Two lists:
   - site_list (x,y)
   - modified_list (x,y)
   Then remove the self-binding at (x,x) and (y,y)
 *)
 
 let cartesian_prod_eq i a b =
-  let rec loop a acc = match a with
-    | [] -> List.rev acc
-    | x :: xs ->
-      loop xs (
-        List.rev_append
-          (List.rev (List.fold_left
-                       (fun acc y ->
-                         if x <> y then (i, x, y) :: acc
-                         else acc
-                       ) [] b))
-          acc
-      )
+  let rec loop a acc =
+    match a with
+      | [] -> List.rev acc
+      | x :: xs ->
+        loop xs (List.rev_append (List.rev (List.fold_left (fun acc y ->
+          if x <> y
+          then (i, x, y) :: acc
+          else acc
+        ) [] b)) acc)
   in
   loop a [] 
 
@@ -698,7 +697,7 @@ let collect_internal_flow parameter error get_rule
   A binding between two agents: 
   agent with an anchor -> agent with a modified site.
   For example: A(x), B(x)
-  where 'x' of A is an anchor, and bond to 'x' of B ('x' is a modified site).
+  where 'x' of A is an anchor, and bind to 'x' of B ('x' is a modified site).
   => A(x) -> B(x)  
 *)
 
@@ -708,17 +707,12 @@ let cartesian_prod_external i anchor_set i' bond_fst_list bond_snd_set =
     match anchor_list with
       | [] -> List.rev acc
       | x :: xs ->
-        loop xs
-          (List.rev_append
-             (List.rev (List.fold_left
-                          (fun acc y ->
-                            if Cckappa_sig.Site_map_and_set.mem_set x anchor_set &&
-                              Cckappa_sig.Site_map_and_set.mem_set x bond_snd_set
-                            then (i, x, i', y) :: acc
-                            else acc
-                          ) [] bond_fst_list))
-             acc
-          )
+        loop xs (List.rev_append (List.rev (List.fold_left (fun acc y ->
+          if Cckappa_sig.Site_map_and_set.mem_set x anchor_set &&
+            Cckappa_sig.Site_map_and_set.mem_set x bond_snd_set
+          then (i, x, i', y) :: acc
+          else acc
+        ) [] bond_fst_list)) acc)
   in
   loop anchor_list [] 
     
@@ -727,49 +721,48 @@ let collect_external_flow parameter error bind
     store_sites_anchor_set1
     store_sites_anchor_set2
     store_external_flow =
-  List.fold_left (fun (error, store_external_flow)
-    (site_address_1, site_address_2) ->
-      let agent_type_1 = site_address_1.Cckappa_sig.agent_type in
-      let agent_type_2 = site_address_2.Cckappa_sig.agent_type in
-      (*collect site that are bond in the rhs; the first element in a pair*)
-      let bond_fst_set =
-        get_site_common_set
-          parameter
-          error
-          agent_type_1
-          (fst store_sites_bond_pair_set_external)
-      in
-      (*collect site that are bond in the rhs; the second element in a pair*)
-      let bond_snd_set =
-        get_site_common_set
-          parameter
-          error
-          agent_type_2
-          (snd store_sites_bond_pair_set_external)
-      in
-      (*get a set of anchor sites*)
-      let anchor_set =
-        fold_anchor_set
-          parameter
-          error
-          store_sites_anchor_set1 
-          store_sites_anchor_set2 
-      in
-      let bond_fst_list = Cckappa_sig.Site_map_and_set.elements bond_fst_set in
-      let collect_external_flow =
-        cartesian_prod_external
-          agent_type_2
-          anchor_set
-          agent_type_1
-	  bond_fst_list
-          bond_snd_set
-      in
-      (*store by getting the old result and combine with the current result*)
-      let external_flow = List.concat [collect_external_flow; store_external_flow] in
-      error, external_flow)
+  List.fold_left (fun (error, store_external_flow) (site_address_1, site_address_2) ->
+    let agent_type_1 = site_address_1.Cckappa_sig.agent_type in
+    let agent_type_2 = site_address_2.Cckappa_sig.agent_type in
+    (*collect site that are bond in the rhs; the first element in a pair*)
+    let bond_fst_set =
+      get_site_common_set
+        parameter
+        error
+        agent_type_1
+        (fst store_sites_bond_pair_set_external)
+    in
+    (*collect site that are bond in the rhs; the second element in a pair*)
+    let bond_snd_set =
+      get_site_common_set
+        parameter
+        error
+        agent_type_2
+        (snd store_sites_bond_pair_set_external)
+    in
+    (*get a set of anchor sites*)
+    let anchor_set =
+      fold_anchor_set
+        parameter
+        error
+        store_sites_anchor_set1 
+        store_sites_anchor_set2 
+    in
+    let bond_fst_list = Cckappa_sig.Site_map_and_set.elements bond_fst_set in
+    let collect_external_flow =
+      cartesian_prod_external
+        agent_type_2
+        anchor_set
+        agent_type_1
+	bond_fst_list
+        bond_snd_set
+    in
+    (*store by getting the old result and combine with the current result*)
+    let external_flow = List.concat [collect_external_flow; store_external_flow] in
+    error, external_flow)
     (error, store_external_flow)
     bind
-
+    
 (************************************************************************************)   
 (*RULE*)
 
