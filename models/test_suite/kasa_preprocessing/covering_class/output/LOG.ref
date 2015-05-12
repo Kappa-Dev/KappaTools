@@ -204,7 +204,7 @@ Influence_map:Inhibition_map:rule(2):'r2' A(y),B(y)->A(y!1),B(y!1) -> rule(0):'r
 Potential dependencies between sites:
 Agents:{A; B}
 Potential dependencies between sites:agent_type:0:
-Covering_class_id:0:site_type:{0,1}
+Covering_class_id:0:site_type:{0; 1}
 Number of covering classes:1
 Re-index the sites in Covering_class_id:0:site_type:{1; 2}
 TEST:
@@ -212,7 +212,7 @@ Covering_class_id:0:
 site_type:1
 site_type:2
 Potential dependencies between sites:agent_type:1:
-Covering_class_id:0:site_type:{0,1}
+Covering_class_id:0:site_type:{0; 1}
 Number of covering classes:1
 Re-index the sites in Covering_class_id:0:site_type:{1; 2}
 TEST:

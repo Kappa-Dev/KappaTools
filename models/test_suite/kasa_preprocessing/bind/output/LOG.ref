@@ -263,7 +263,7 @@ TEST:
 Covering_class_id:0:
 site_type:1
 Potential dependencies between sites:agent_type:1:
-Covering_class_id:0:site_type:{0,1}
+Covering_class_id:0:site_type:{0; 1}
 Number of covering classes:1
 Re-index the sites in Covering_class_id:0:site_type:{1; 2}
 TEST:

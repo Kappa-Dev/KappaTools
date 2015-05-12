@@ -404,18 +404,9 @@ let print_remanent_dic parameter error store_dic =
     error
     (fun parameter error elt value_list _ _ ->
       let _ = Printf.printf "Covering_class_id:%i:" elt in
-      let _ =
-        print_string "site_type:{";
-        let rec print_list l =
-          match l with
-            | [] -> ()
-            | h :: [] -> print_int h; print_string "}"
-            | h :: tl ->
-              let _ = print_int h; print_string "," in
-              print_list tl in
-        print_list value_list
+      let _ = print_string "site_type:";
+        print_int_list value_list
       in
-      let _ = print_newline () in
       error
     ) store_dic
 
