@@ -23,7 +23,7 @@ type sites_covering_classes  = int list list AgentMap.t
                                   
 type covering_classes =
   {
-    covering_classes : sites_covering_classes
+    store_covering_classes : sites_covering_classes
   }
 
 (************************************************************************************)
@@ -36,23 +36,23 @@ type covering_classes =
 module Inf_array = Int_storage.Nearly_inf_Imperatif
                      
 module Set_list_id = Set_and_map.Make
-                       (struct
-                           type t = int
-                           let compare = compare
-                         end)
-
+  (struct
+    type t = int
+    let compare = compare
+   end)
+    
 module Covering_classes =
   struct
     type t = int list
     let compare = compare
   end
 
-module Dictionary_of_Covering_classes = Dictionary.Dictionary_of_Ord(Covering_classes)
+module Dictionary_of_Covering_classes = Dictionary.Dictionary_of_Ord (Covering_classes)
                                                                     
-type remanent_dic =
-  (unit, unit)
-    Dictionary_of_Covering_classes.dictionary
+type pair_dic = (unit, unit) Dictionary_of_Covering_classes.dictionary
     
 type remanent =
-  {dic             : remanent_dic;
-   pointer_backward: Set_list_id.set Inf_array.t }
+  {
+    store_dic              : pair_dic;
+    store_pointer_backward : Set_list_id.set Inf_array.t
+  }
