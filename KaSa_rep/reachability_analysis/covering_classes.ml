@@ -79,7 +79,9 @@ let length_sorted lists =
 
 let get_elt_common_set parameter error t set =
   match Int_storage.Nearly_inf_Imperatif.unsafe_get parameter error t set with
-    | error, None -> error, Covering_classes_type.Set_list_id.empty_set
+    | error, None -> error, 
+      (*Covering_classes_type.Set_list_id.empty_set*)
+      Cckappa_sig.Site_map_and_set.empty_set
     | error, Some id -> error, id
 
 (************************************************************************************)
@@ -100,7 +102,8 @@ let store_pointer_backward parameter error elt pointer_backward value_list =
     in
     (*add the current set of elt into the old set*)
     let error,new_elt_set =
-      Covering_classes_type.Set_list_id.add_set
+      (*Covering_classes_type.Set_list_id.add_set*)
+      Cckappa_sig.Site_map_and_set.add_set
         parameter
         error
         elt
@@ -123,6 +126,7 @@ let store_remanent parameter error value_list remanent =
   (* current state of remanent*)
   let good_lists       = remanent.Covering_classes_type.store_dic in
   let pointer_backward = remanent.Covering_classes_type.store_pointer_backward in
+  let store_modified_set = remanent.Covering_classes_type.store_modified_set in
   (*------------------------------------------------------------------------------*)
   match value_list with
   | [] -> error, remanent
@@ -157,7 +161,8 @@ let store_remanent parameter error value_list remanent =
      error,
      {
        Covering_classes_type.store_dic              = dic; 
-       Covering_classes_type.store_pointer_backward = pointer_backward
+       Covering_classes_type.store_pointer_backward = pointer_backward;
+       Covering_classes_type.store_modified_set     = store_modified_set
      }
 
 (*------------------------------------------------------------------------------*)
@@ -171,13 +176,14 @@ let clean_classes parameter error classes =
   let init_remanent = 
     {
       Covering_classes_type.store_dic              = init_dic;
-      Covering_classes_type.store_pointer_backward = init_pointer
+      Covering_classes_type.store_pointer_backward = init_pointer;
+      Covering_classes_type.store_modified_set     = init_pointer
     }
   in
   (*------------------------------------------------------------------------------*)
   (*cleaning*)
   let lists_to_deal_with = length_sorted classes in
-  List.fold_left (fun (error, remanent) list ->
+  List.fold_left (fun (error, remanent) list -> (*list is type set*)
     match list with
       | [] -> error, remanent
       | t :: tl ->
@@ -204,13 +210,16 @@ let clean_classes parameter error classes =
               in
               (* intersection of two sets *)
               let error, potential_superset =
-                Covering_classes_type.Set_list_id.inter
+                (*Covering_classes_type.Set_list_id.inter*)
+                Cckappa_sig.Site_map_and_set.inter
                   parameter
                   error
                   potential_supersets
                   potential_supersets'
               in
-              if Covering_classes_type.Set_list_id.is_empty_set potential_superset
+              if 
+                (*Covering_classes_type.Set_list_id.is_empty_set potential_superset*)
+                Cckappa_sig.Site_map_and_set.is_empty_set potential_superset
               then
                 store_remanent
                   parameter
@@ -221,7 +230,9 @@ let clean_classes parameter error classes =
                 aux tl' potential_superset
         in
         (*check the beginning state of a superset*)
-        if Covering_classes_type.Set_list_id.is_empty_set potential_supersets
+        if 
+          (*Covering_classes_type.Set_list_id.is_empty_set potential_supersets*)
+          Cckappa_sig.Site_map_and_set.is_empty_set potential_supersets
         then
           (*if it is empty then store it to remanent*)
           store_remanent
@@ -363,7 +374,7 @@ let collect_sites_modified_set parameter error rule store_sites_modified_set =
           error, store_sites_modified_set
         else
           (*collect site and return a set *)
-          let site_set =
+          (*let site_set =
             Cckappa_sig.Site_map_and_set.fold_map
               (fun site _ current_set ->
                 let error, set =
@@ -375,6 +386,13 @@ let collect_sites_modified_set parameter error rule store_sites_modified_set =
                 in set)
               site_modif.Cckappa_sig.agent_interface
               Cckappa_sig.Site_map_and_set.empty_set
+          in*)
+          (*TEST LIST first*)
+          let sites_list =
+            Cckappa_sig.Site_map_and_set.fold_map
+              (fun site _ current_list ->
+                site :: current_list)
+              site_modif.Cckappa_sig.agent_interface []
           in
           (*store*)
           let error, store_sites_modified_set =
@@ -382,7 +400,7 @@ let collect_sites_modified_set parameter error rule store_sites_modified_set =
               parameter
               error
               agent_type
-              site_set
+              sites_list
               store_sites_modified_set
           in
           error, store_sites_modified_set
@@ -390,9 +408,20 @@ let collect_sites_modified_set parameter error rule store_sites_modified_set =
       rule.Cckappa_sig.diff_reverse
       store_sites_modified_set
   in error, store_sites_modified_set
-  
 
-
+let project_modified_site parameter error value_list store_modified_set =
+  let rec aux acc =
+    match acc with
+      | [] -> acc
+      | x :: tl ->
+        (*if x is a member of value_list; if yes then return the new position of
+          x; otherwise continue to the rest of the list*)
+        if List.mem x value_list (*TODO: change value_list to value_set*)
+        then
+          let n = (position x value_list) + 1 in
+          n :: aux tl
+        else aux tl        
+  in aux store_modified_set
 
 
 (************************************************************************************)   
@@ -449,7 +478,30 @@ let print_site_test parameter error store_dic =
       in
       error      
     ) store_dic
-  
+
+(*------------------------------------------------------------------------------*)
+
+let print_modification parameter error store_dic store_modified_set =
+  Covering_classes_type.Dictionary_of_Covering_classes.print
+    parameter
+    error
+    (fun parameter error elt value_list _ _ ->
+      let _ =
+        let modified =
+          project_modified_site
+            parameter
+            error
+            value_list
+            store_modified_set
+        in
+        let _ = 
+          print_string "MODIFICATION:\nsite_type:";
+          print_int_list modified
+        in
+        error
+      in
+      error
+    ) store_dic
 
 (************************************************************************************)
 (*MAIN PRINT*)
@@ -491,6 +543,15 @@ let print_result parameter error result =
             error
             remanent.Covering_classes_type.store_dic
         in
+        (*------------------------------------------------------------------------------*)
+        (*site that are tested in covering classes*)
+        (*let _ =
+          print_modification
+            parameter
+            error
+            remanent.Covering_classes_type.store_dic
+            remanent.Covering_classes_type.store_modified_set
+        in*)
         (*------------------------------------------------------------------------------*)
         error
       in
@@ -571,6 +632,24 @@ let scan_rule_set parameter error handler rules =
       init_result
   in
   error, remanent_dictionary
+  (*------------------------------------------------------------------------------*)
+  (*compute modified sites*)
+  (*let error, store_modified_set =
+    collect_sites_modified_set
+      parameter
+      error
+      rule
+        
+      
+    
+  in
+  (*------------------------------------------------------------------------------*)
+  error, 
+  {
+    Covering_classes_type.store_dic = remanent_dictionary;
+    Covering_classes_type.pointer_backward = ;
+    Covering_classes_type.store_modified_set = store_modified_set
+  }*)
 
 (************************************************************************************)   
 (*MAIN*)
