@@ -175,8 +175,22 @@ Agents:{A; B}
 Potential dependencies between sites:agent_type:0:
 Covering_class_id:0:site_type:{0}
 Covering_class_id:1:site_type:{1}
+Number of covering classes:2
+Re-index the sites in Covering_class_id:0:site_type:{1}
+Re-index the sites in Covering_class_id:1:site_type:{1}
+TEST:
+Covering_class_id:0:
+site_type:1
+TEST:
+Covering_class_id:1:
+site_type:1
 Potential dependencies between sites:agent_type:1:
 Covering_class_id:0:site_type:{0}
+Number of covering classes:1
+Re-index the sites in Covering_class_id:0:site_type:{1}
+TEST:
+Covering_class_id:0:
+site_type:1
 Flow of information in the stochastic semantics:
 Agents:{A; B}
 Flow of information in the stochastic semantics:agent_type:0:
