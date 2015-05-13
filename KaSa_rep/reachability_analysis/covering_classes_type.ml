@@ -20,10 +20,13 @@ let local_trace = false
 module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
 
 type sites_covering_classes  = int list list AgentMap.t 
-                                  
+
+type set = Cckappa_sig.Site_map_and_set.set
+                             
 type covering_classes =
   {
-    store_covering_classes : sites_covering_classes
+    store_covering_classes : sites_covering_classes;
+    store_modified_set     : int list AgentMap.t (*FIXME: change to set*)
   }
 
 (************************************************************************************)
@@ -47,8 +50,6 @@ module Covering_classes =
     let compare = compare
   end
 
-type set = Cckappa_sig.Site_map_and_set.set
-
 module Dictionary_of_Covering_classes = Dictionary.Dictionary_of_Ord (Covering_classes)
                                                                     
 type pair_dic = (unit, unit) Dictionary_of_Covering_classes.dictionary
@@ -56,6 +57,6 @@ type pair_dic = (unit, unit) Dictionary_of_Covering_classes.dictionary
 type remanent =
   {
     store_dic              : pair_dic;
-    store_pointer_backward : set Inf_array.t;
-    store_modified_set     : set Inf_array.t
+    store_pointer_backward : set Inf_array.t
+    (*store_modified_set     : set Inf_array.t*)
   }
