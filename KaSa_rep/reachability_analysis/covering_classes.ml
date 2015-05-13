@@ -51,6 +51,15 @@ let print_list l =
   let output = sprintf_list l in
   Printf.fprintf stdout "%s\n" output
 
+let print_pair_list l =
+  let rec aux acc =
+    match acc with
+      | [] -> acc
+      | (s, i) :: tl ->
+        Printf.fprintf stdout "s:%s:i%i" s i;
+        aux tl
+  in aux l
+
 let print_list_list l =
   let rec aux acc =
     match acc with
@@ -546,7 +555,7 @@ let dump_agent parameter error handler =
         acc := v::!acc ;
         error)
       agent_dic
-  in error;
+  in ();
   !acc
 
 (************************************************************************************)   
