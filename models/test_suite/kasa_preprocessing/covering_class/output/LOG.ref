@@ -235,7 +235,9 @@ modified_type:{1}
 * Anchor sites 2:
 * Internal flow:
 Flow of information in the ODE semantics:agent_type:0:
+- agent_type:0:site_type:1 -> agent_type:0:modified_type:0
 Flow of information in the ODE semantics:agent_type:1:
+- agent_type:1:site_type:1 -> agent_type:1:modified_type:0
 Flow of information in the ODE semantics:agent_type:0:
 Flow of information in the ODE semantics:agent_type:1:
 * External flow:

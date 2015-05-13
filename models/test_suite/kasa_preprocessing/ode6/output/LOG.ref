@@ -479,9 +479,18 @@ Flow of information in the ODE semantics:agent_type:1:
 - agent_type:1:site_type:1 -> agent_type:1:modified_type:0
 - agent_type:1:site_type:1 -> agent_type:1:modified_type:2
 - agent_type:1:site_type:0 -> agent_type:1:modified_type:2
+- agent_type:1:site_type:2 -> agent_type:1:modified_type:0
+- agent_type:1:site_type:2 -> agent_type:1:modified_type:1
+- agent_type:1:site_type:1 -> agent_type:1:modified_type:0
+- agent_type:1:site_type:0 -> agent_type:1:modified_type:1
 Flow of information in the ODE semantics:agent_type:2:
 - agent_type:2:site_type:1 -> agent_type:2:modified_type:4
 - agent_type:2:site_type:0 -> agent_type:2:modified_type:4
+- agent_type:2:site_type:2 -> agent_type:2:modified_type:3
+- agent_type:2:site_type:3 -> agent_type:2:modified_type:2
+- agent_type:2:site_type:3 -> agent_type:2:modified_type:2
+- agent_type:2:site_type:4 -> agent_type:2:modified_type:0
+- agent_type:2:site_type:1 -> agent_type:2:modified_type:0
 Flow of information in the ODE semantics:agent_type:3:
 Flow of information in the ODE semantics:agent_type:0:
 Flow of information in the ODE semantics:agent_type:1:

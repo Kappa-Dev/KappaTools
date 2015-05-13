@@ -297,9 +297,12 @@ anchor_type:{1}
 Flow of information in the ODE semantics:agent_type:0:
 Flow of information in the ODE semantics:agent_type:1:
 - agent_type:1:site_type:1 -> agent_type:1:modified_type:0
+- agent_type:1:site_type:0 -> agent_type:1:modified_type:1
+- agent_type:1:site_type:0 -> agent_type:1:modified_type:1
 Flow of information in the ODE semantics:agent_type:2:
 Flow of information in the ODE semantics:agent_type:0:
 Flow of information in the ODE semantics:agent_type:1:
+- agent_type:1:site_type:0 -> agent_type:1:anchor_type:1
 - agent_type:1:site_type:0 -> agent_type:1:anchor_type:1
 Flow of information in the ODE semantics:agent_type:2:
 * External flow:

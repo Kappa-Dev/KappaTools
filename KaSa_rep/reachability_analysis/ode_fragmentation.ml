@@ -711,14 +711,30 @@ let collect_internal_flow parameter error get_rule
               store_sites_lhs
               modified_set           
           in
+          (*get old_result*)
+          let error, get_old1 =
+            Int_storage.Nearly_inf_Imperatif.unsafe_get
+              parameter
+              error
+              agent_type
+              (fst store_internal_flow)
+          in
+          let old1 =
+            match get_old1 with
+              | None -> []
+              | Some s -> s
+          in
+          (*store*)
+          let new_flow1 = List.concat [get_internal_flow1; old1] in
           let error, internal_flow1 =
             Int_storage.Nearly_inf_Imperatif.set
               parameter
               error
               agent_type
-              get_internal_flow1
+              new_flow1
               (fst store_internal_flow)
           in
+          (*------------------------------------------------------------------------------*)
           (*2nd: site -> anchor site*)
           let get_internal_flow2 =
             internal_flow_lhs_anchor
@@ -728,18 +744,33 @@ let collect_internal_flow parameter error get_rule
               store_sites_lhs
               anchor_set
           in
+          (*get old_result*)
+          let error, get_old2 =
+            Int_storage.Nearly_inf_Imperatif.unsafe_get
+              parameter
+              error
+              agent_type
+              (snd store_internal_flow)
+          in
+          let old2 =
+            match get_old2 with
+              | None -> []
+              | Some s -> s
+          in
+          (*store*)
+          let new_flow2 = List.concat [get_internal_flow2; old2] in
           let error, internal_flow2 =
             Int_storage.Nearly_inf_Imperatif.set
               parameter
               error
               agent_type
-              get_internal_flow2
+              new_flow2
               (snd store_internal_flow)
           in
           (*result*)
           error, (internal_flow1, internal_flow2)
     ) get_rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
-      store_internal_flow
+    store_internal_flow
 
 (************************************************************************************)   
 (*EXTERNAL FLOW:
