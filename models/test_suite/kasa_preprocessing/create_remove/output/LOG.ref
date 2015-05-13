@@ -73,6 +73,8 @@ Influence_map: The notation [i -> j] means an agent at position [i] of the first
 Influence_map:Wake_up_map:rule(0):'r0' A()->B() -> rule(1):'r1' B()->C()[0->0]
 Potential dependencies between sites:
 Agents:{A; B; C}
+rule_id:0
+rule_id:1
 Flow of information in the stochastic semantics:
 Agents:{A; B; C}
 Flow of information in the ODE semantics:

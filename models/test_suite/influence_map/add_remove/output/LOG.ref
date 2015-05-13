@@ -165,6 +165,14 @@ Influence_map:Inhibition_map:rule(0):'' A(x~u),B(x~p)->A(x~u),A(x~p) -> rule(3):
 Influence_map:Inhibition_map:rule(3):'' B(x~p)->B(x~u) -> rule(0):'' A(x~u),B(x~p)->A(x~u),A(x~p)[0->1]
 Potential dependencies between sites:
 Agents:{A; B}
+rule_id:0
+rule_id:1
+rule_id:2
+rule_id:3
+MODIFICATION:agent_type:1:
+Covering_class_id:0:site_type:{1; 1; 1}
+MODIFICATION:agent_type:0:
+Covering_class_id:0:site_type:{1}
 Potential dependencies between sites:agent_type:0:
 Covering_class_id:0:site_type:{0}
 Number of covering classes:1
