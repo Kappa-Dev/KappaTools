@@ -158,6 +158,10 @@ Quarks:site_modif-:agent_type:2,site_type:0,state:1,rule:1->[1]
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Potential dependencies between sites:
 Agents:{A; B; C}
+internal:site_name:x:0
+binding:site_name:y
+binding:site_name:x
+binding:site_name:x
 Potential dependencies between sites:agent_type:0:
 Covering_class_id:0:site_type:{0; 1}
 Number of covering classes:1

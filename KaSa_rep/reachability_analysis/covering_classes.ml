@@ -597,6 +597,38 @@ let scan_rule_set parameter error handler rules =
       parameter
       error
       (fun parameters error agent_type value_list init_remanent ->
+        (*TEST site_dic*)
+        let get_sites = handler.Cckappa_sig.sites in
+        let error, get_site = 
+          Int_storage.Nearly_inf_Imperatif.unsafe_get
+            parameter
+            error
+            agent_type
+            get_sites
+        in
+        let site =
+          match get_site with
+            | None -> Ckappa_sig.Dictionary_of_sites.init ()
+            | Some site_dic -> site_dic
+        in
+        let _ =
+          Ckappa_sig.Dictionary_of_sites.print
+            parameter
+            error
+            (fun parameter error i v _ _ ->
+              match v with
+                | Ckappa_sig.Internal site_name ->
+                  let _ =
+                    Printf.fprintf stdout "internal:site_name:%s:%i\n" site_name i
+                  in
+                  error
+                | Ckappa_sig.Binding site_name ->
+                  let _ =
+                  Printf.fprintf stdout "binding:site_name:%s:%i\n" site_name i
+                  in error
+            )
+            site
+        in
        (*clean the covering classes, removed duplicate covering classes*)
         let error, store_remanent =
           clean_classes

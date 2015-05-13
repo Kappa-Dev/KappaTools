@@ -489,6 +489,13 @@ Influence_map:Inhibition_map:rule(5):'mod x2' A(x,c!1),C(x1~p,x2~u!1)->A(x,c),C(
 Influence_map:Inhibition_map:rule(5):'mod x2' A(x,c!1),C(x1~p,x2~u!1)->A(x,c),C(x1~p,x2~p) -> var(5):'Cpu' C(x1~p?,x2~u?)[1->0]
 Potential dependencies between sites:
 Agents:{A; B; C}
+binding:site_name:x
+binding:site_name:c
+binding:site_name:x
+internal:site_name:x1:0
+internal:site_name:x2:1
+binding:site_name:x1
+binding:site_name:x2
 Potential dependencies between sites:agent_type:0:
 Covering_class_id:0:site_type:{0; 1}
 Number of covering classes:1

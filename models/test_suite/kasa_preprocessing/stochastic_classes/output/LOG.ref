@@ -394,6 +394,17 @@ Influence_map:Inhibition_map:rule(6):'r6' F(x~u)-> -> rule(7):'r7' F(y~p)->[0->0
 Influence_map:Inhibition_map:rule(7):'r7' F(y~p)-> -> rule(6):'r6' F(x~u)->[0->0]
 Potential dependencies between sites:
 Agents:{A; B; C; D; E; F}
+internal:site_name:x:0
+internal:site_name:y:1
+internal:site_name:z:2
+internal:site_name:t:3
+internal:site_name:x:0
+internal:site_name:y:1
+internal:site_name:x:0
+internal:site_name:y:1
+internal:site_name:z:2
+internal:site_name:x:0
+internal:site_name:y:1
 Potential dependencies between sites:agent_type:0:
 Covering_class_id:0:site_type:{2}
 Covering_class_id:1:site_type:{1}

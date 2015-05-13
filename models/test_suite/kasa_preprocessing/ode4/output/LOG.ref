@@ -172,6 +172,11 @@ Influence_map:Wake_up_map:rule(0):'r0' A(x~u,y),B(x,y)->A(x~p,y!1),B(x!1,y) -> r
 Influence_map:Inhibition_map:rule(1):'r1' B(x!_,y),C(x)->B(x!_,y!1),C(x!1) -> rule(0):'r0' A(x~u,y),B(x,y)->A(x~p,y!1),B(x!1,y)[0->1]
 Potential dependencies between sites:
 Agents:{A; B; C}
+internal:site_name:x:0
+binding:site_name:y
+binding:site_name:x
+binding:site_name:y
+binding:site_name:x
 Potential dependencies between sites:agent_type:0:
 Covering_class_id:0:site_type:{0; 1}
 Number of covering classes:1

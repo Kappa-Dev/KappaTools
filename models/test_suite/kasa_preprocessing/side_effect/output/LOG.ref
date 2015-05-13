@@ -172,6 +172,9 @@ Influence_map:Inhibition_map:rule(0):'r0' A(x!1),A(z!1)->A(x),A(z) -> rule(1):'r
 Influence_map:Inhibition_map:rule(1):'r1' A(x!_)->A(x) -> rule(0):'r0' A(x!1),A(z!1)->A(x),A(z)[0*->1];[0->0]
 Potential dependencies between sites:
 Agents:{A; B}
+binding:site_name:x
+binding:site_name:z
+binding:site_name:x
 Potential dependencies between sites:agent_type:0:
 Covering_class_id:0:site_type:{0}
 Covering_class_id:1:site_type:{1}
