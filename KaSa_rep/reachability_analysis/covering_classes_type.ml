@@ -25,8 +25,7 @@ type set = Cckappa_sig.Site_map_and_set.set
                              
 type covering_classes =
   {
-    store_covering_classes : sites_covering_classes;
-    store_modified_set     : int list AgentMap.t (*FIXME: change to set*)
+    store_covering_classes : sites_covering_classes
   }
 
 (************************************************************************************)
@@ -38,25 +37,18 @@ type covering_classes =
 
 module Inf_array = Int_storage.Nearly_inf_Imperatif
                      
-module Set_list_id = Set_and_map.Make
-  (struct
-    type t = int
-    let compare = compare
-   end)
-    
-module Covering_classes =
+module Covering_class =
   struct
-    type t = int list (*change to set*)
+    type t = int list
     let compare = compare
   end
 
-module Dictionary_of_Covering_classes = Dictionary.Dictionary_of_Ord (Covering_classes)
+module Dictionary_of_Covering_class = Dictionary.Dictionary_of_Ord (Covering_class)
                                                                     
-type pair_dic = (unit, unit) Dictionary_of_Covering_classes.dictionary
+type pair_dic = (unit, unit) Dictionary_of_Covering_class.dictionary
     
 type remanent =
   {
-    store_dic              : pair_dic;
-    store_pointer_backward : set Inf_array.t
-    (*store_modified_set     : set Inf_array.t*)
+    store_pointer_backward : set Inf_array.t;
+    store_dic              : pair_dic
   }

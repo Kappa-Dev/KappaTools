@@ -144,25 +144,17 @@ Influence_map:Inhibition_map:rule(1):'remove' A(x),A(x)->A(x),B(x),A(x) -> rule(
 Influence_map:Inhibition_map:rule(1):'remove' A(x),A(x)->A(x),B(x),A(x) -> rule(1):'remove' A(x),A(x)->A(x),B(x),A(x)[1->0]
 Potential dependencies between sites:
 Agents:{A; B}
-rule_id:0
-rule_id:1
-MODIFICATION:agent_type:0:
-Covering_class_id:0:site_type:{1; 1}
-MODIFICATION:agent_type:1:
-Covering_class_id:0:site_type:{1}
 Potential dependencies between sites:agent_type:0:
 Covering_class_id:0:site_type:{0}
 Number of covering classes:1
 Re-index the sites in Covering_class_id:0:site_type:{1}
-TEST:
-Covering_class_id:0:
+TEST:Covering_class_id:0:
 site_type:1
 Potential dependencies between sites:agent_type:1:
 Covering_class_id:0:site_type:{0}
 Number of covering classes:1
 Re-index the sites in Covering_class_id:0:site_type:{1}
-TEST:
-Covering_class_id:0:
+TEST:Covering_class_id:0:
 site_type:1
 Flow of information in the stochastic semantics:
 Agents:{A; B}

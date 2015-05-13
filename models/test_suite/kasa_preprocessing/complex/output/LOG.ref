@@ -402,38 +402,25 @@ Influence_map:Inhibition_map:rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~
 Influence_map:Inhibition_map:rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!_,y!_),C(x~u,y~p) -> rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2)[0->0]
 Potential dependencies between sites:
 Agents:{A; B; C}
-rule_id:0
-rule_id:1
-rule_id:2
-rule_id:3
-MODIFICATION:agent_type:0:
-Covering_class_id:0:site_type:{2; 1; 2; 1}
-MODIFICATION:agent_type:1:
-Covering_class_id:0:site_type:{2; 1; 2; 1; 2; 1; 2; 1}
-MODIFICATION:agent_type:2:
-Covering_class_id:0:site_type:{4; 3; 4; 3}
 Potential dependencies between sites:agent_type:0:
 Covering_class_id:0:site_type:{0; 1}
 Number of covering classes:1
 Re-index the sites in Covering_class_id:0:site_type:{1; 2}
-TEST:
-Covering_class_id:0:
+TEST:Covering_class_id:0:
 site_type:1
 site_type:2
 Potential dependencies between sites:agent_type:1:
 Covering_class_id:0:site_type:{0; 1}
 Number of covering classes:1
 Re-index the sites in Covering_class_id:0:site_type:{1; 2}
-TEST:
-Covering_class_id:0:
+TEST:Covering_class_id:0:
 site_type:1
 site_type:2
 Potential dependencies between sites:agent_type:2:
 Covering_class_id:0:site_type:{0; 1; 2; 3}
 Number of covering classes:1
 Re-index the sites in Covering_class_id:0:site_type:{1; 2; 3; 4}
-TEST:
-Covering_class_id:0:
+TEST:Covering_class_id:0:
 site_type:1
 site_type:2
 site_type:3

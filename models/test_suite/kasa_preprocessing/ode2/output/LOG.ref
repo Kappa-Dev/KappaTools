@@ -162,22 +162,11 @@ Quarks:site_modif-:agent_type:2,site_type:0,state:0,rule:1->[1]
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Potential dependencies between sites:
 Agents:{A; B; C}
-rule_id:0
-rule_id:1
-MODIFICATION:agent_type:0:
-Covering_class_id:0:site_type:{2; 1}
-MODIFICATION:agent_type:1:
-Covering_class_id:0:site_type:{1}
-
-Covering_class_id:1:site_type:{1}
-MODIFICATION:agent_type:2:
-Covering_class_id:0:site_type:{1}
 Potential dependencies between sites:agent_type:0:
 Covering_class_id:0:site_type:{0; 1}
 Number of covering classes:1
 Re-index the sites in Covering_class_id:0:site_type:{1; 2}
-TEST:
-Covering_class_id:0:
+TEST:Covering_class_id:0:
 site_type:1
 site_type:2
 Potential dependencies between sites:agent_type:1:
@@ -186,18 +175,15 @@ Covering_class_id:1:site_type:{0}
 Number of covering classes:2
 Re-index the sites in Covering_class_id:0:site_type:{1}
 Re-index the sites in Covering_class_id:1:site_type:{1}
-TEST:
-Covering_class_id:0:
+TEST:Covering_class_id:0:
 site_type:1
-TEST:
-Covering_class_id:1:
+TEST:Covering_class_id:1:
 site_type:1
 Potential dependencies between sites:agent_type:2:
 Covering_class_id:0:site_type:{0}
 Number of covering classes:1
 Re-index the sites in Covering_class_id:0:site_type:{1}
-TEST:
-Covering_class_id:0:
+TEST:Covering_class_id:0:
 site_type:1
 Flow of information in the stochastic semantics:
 Agents:{A; B; C}
