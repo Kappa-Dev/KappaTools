@@ -398,16 +398,16 @@ Potential dependencies between sites:
 Agents:{A; B; C; D}
 internal:site_name:x:0
 internal:site_name:y:1
-binding:site_name:x
-binding:site_name:y
-binding:site_name:z
-binding:site_name:x
-binding:site_name:y
-binding:site_name:x
-binding:site_name:y
-binding:site_name:x
-binding:site_name:y
-binding:site_name:z
+binding:site_name:x:2
+binding:site_name:y:3
+binding:site_name:z:4
+binding:site_name:x:0
+binding:site_name:y:1
+binding:site_name:x:0
+binding:site_name:y:1
+binding:site_name:x:0
+binding:site_name:y:1
+binding:site_name:z:2
 Potential dependencies between sites:agent_type:0:
 Covering_class_id:0:site_type:{2; 3; 4}
 Covering_class_id:1:site_type:{1; 3}

@@ -412,16 +412,16 @@ Influence_map:Inhibition_map:rule(4):'r4' R(x,y,z),E(x)->R(x!1,y,z),E(x!1) -> ru
 Potential dependencies between sites:
 Agents:{ab; Sh; R; E}
 internal:site_name:x:0
-binding:site_name:x
-binding:site_name:y
-binding:site_name:x
-binding:site_name:z
-binding:site_name:y
-binding:site_name:k
-binding:site_name:t
-binding:site_name:x
-binding:site_name:y
-binding:site_name:x
+binding:site_name:x:1
+binding:site_name:y:2
+binding:site_name:x:0
+binding:site_name:z:0
+binding:site_name:y:1
+binding:site_name:k:2
+binding:site_name:t:3
+binding:site_name:x:4
+binding:site_name:y:0
+binding:site_name:x:1
 Potential dependencies between sites:agent_type:0:
 Covering_class_id:0:site_type:{0}
 Number of covering classes:1

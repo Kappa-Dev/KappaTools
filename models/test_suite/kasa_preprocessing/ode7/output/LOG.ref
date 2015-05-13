@@ -159,9 +159,9 @@ Influence_map: The notation [i -> j] means an agent at position [i] of the first
 Potential dependencies between sites:
 Agents:{A; B; C}
 internal:site_name:x:0
-binding:site_name:y
-binding:site_name:x
-binding:site_name:x
+binding:site_name:y:1
+binding:site_name:x:0
+binding:site_name:x:0
 Potential dependencies between sites:agent_type:0:
 Covering_class_id:0:site_type:{0; 1}
 Number of covering classes:1

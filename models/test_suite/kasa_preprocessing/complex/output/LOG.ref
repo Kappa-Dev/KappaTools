@@ -402,14 +402,14 @@ Influence_map:Inhibition_map:rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~
 Influence_map:Inhibition_map:rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!_,y!_),C(x~u,y~p) -> rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2)[0->0]
 Potential dependencies between sites:
 Agents:{A; B; C}
-binding:site_name:x
-binding:site_name:y
-binding:site_name:x
-binding:site_name:y
+binding:site_name:x:0
+binding:site_name:y:1
+binding:site_name:x:0
+binding:site_name:y:1
 internal:site_name:x:0
 internal:site_name:y:1
-binding:site_name:x
-binding:site_name:y
+binding:site_name:x:2
+binding:site_name:y:3
 Potential dependencies between sites:agent_type:0:
 Covering_class_id:0:site_type:{0; 1}
 Number of covering classes:1
