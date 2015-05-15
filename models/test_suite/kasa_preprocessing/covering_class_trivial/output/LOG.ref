@@ -139,9 +139,25 @@ Agents:{A}
 Flow of information in the stochastic semantics:agent_type:0:
 site_type:[|0; 0; 0|]
 Flow of information in the ODE semantics:
+rule_id:0
+Flow of information in the ODE semantics:agent_type:0:
+Modified sites:{1}
+
+Internal:y:1
+rule_id:1
+Flow of information in the ODE semantics:agent_type:0:
+Modified sites:{2}
+
+Internal:z:2
+rule_id:2
 * Sites that are modified:
 Flow of information in the ODE semantics:agent_type:0:
 modified_type:{2}
+* Sites that are modified-site_dic:
+Flow of information in the ODE semantics:agent_type:0:
+Internal:site_type_modif:x:0
+Internal:site_type_modif:y:1
+Internal:site_type_modif:z:2
 * Anchor sites:
 * Anchor sites 2:
 * Internal flow:

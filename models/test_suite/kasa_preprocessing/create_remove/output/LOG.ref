@@ -76,7 +76,10 @@ Agents:{A; B; C}
 Flow of information in the stochastic semantics:
 Agents:{A; B; C}
 Flow of information in the ODE semantics:
+rule_id:0
+rule_id:1
 * Sites that are modified:
+* Sites that are modified-site_dic:
 * Anchor sites:
 * Anchor sites 2:
 * Internal flow:

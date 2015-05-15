@@ -466,6 +466,110 @@ site_type:[|0; 0; 0|]
 Flow of information in the stochastic semantics:agent_type:2:
 site_type:[|0; 0; 0; 0; 0|]
 Flow of information in the ODE semantics:
+rule_id:0
+Flow of information in the ODE semantics:agent_type:1:
+Modified sites:{0; 1}
+
+Flow of information in the ODE semantics:agent_type:0:
+Modified sites:{0}
+
+Flow of information in the ODE semantics:agent_type:1:
+Modified sites:{0; 1}
+
+Internal:x:0
+Binding:x:1
+Binding:x:0
+rule_id:1
+Flow of information in the ODE semantics:agent_type:0:
+Modified sites:{0}
+
+Flow of information in the ODE semantics:agent_type:1:
+Modified sites:{0; 2}
+
+Flow of information in the ODE semantics:agent_type:0:
+Modified sites:{0}
+
+Flow of information in the ODE semantics:agent_type:1:
+Modified sites:{0; 2}
+
+Flow of information in the ODE semantics:agent_type:2:
+Modified sites:{0}
+
+Internal:x:0
+Binding:y:2
+Binding:z:0
+rule_id:2
+Flow of information in the ODE semantics:agent_type:0:
+Modified sites:{0}
+
+Flow of information in the ODE semantics:agent_type:1:
+Modified sites:{0; 2}
+
+Flow of information in the ODE semantics:agent_type:2:
+Modified sites:{1}
+
+Flow of information in the ODE semantics:agent_type:0:
+Modified sites:{0}
+
+Flow of information in the ODE semantics:agent_type:1:
+Modified sites:{0; 2}
+
+Flow of information in the ODE semantics:agent_type:2:
+Modified sites:{2}
+
+Binding:y:1
+Binding:k:2
+rule_id:3
+Flow of information in the ODE semantics:agent_type:0:
+Modified sites:{0}
+
+Flow of information in the ODE semantics:agent_type:1:
+Modified sites:{0; 2}
+
+Flow of information in the ODE semantics:agent_type:2:
+Modified sites:{3}
+
+Flow of information in the ODE semantics:agent_type:0:
+Modified sites:{0}
+
+Flow of information in the ODE semantics:agent_type:1:
+Modified sites:{0; 2}
+
+Flow of information in the ODE semantics:agent_type:2:
+Modified sites:{3}
+
+Flow of information in the ODE semantics:agent_type:3:
+Modified sites:{0}
+
+Binding:t:3
+Binding:y:0
+rule_id:4
+Flow of information in the ODE semantics:agent_type:0:
+Modified sites:{0}
+
+Flow of information in the ODE semantics:agent_type:1:
+Modified sites:{0; 2}
+
+Flow of information in the ODE semantics:agent_type:2:
+Modified sites:{4}
+
+Flow of information in the ODE semantics:agent_type:3:
+Modified sites:{0}
+
+Flow of information in the ODE semantics:agent_type:0:
+Modified sites:{0}
+
+Flow of information in the ODE semantics:agent_type:1:
+Modified sites:{0; 2}
+
+Flow of information in the ODE semantics:agent_type:2:
+Modified sites:{4}
+
+Flow of information in the ODE semantics:agent_type:3:
+Modified sites:{1}
+
+Binding:x:4
+Binding:x:1
 * Sites that are modified:
 Flow of information in the ODE semantics:agent_type:0:
 modified_type:{0}
@@ -475,6 +579,22 @@ Flow of information in the ODE semantics:agent_type:2:
 modified_type:{4}
 Flow of information in the ODE semantics:agent_type:3:
 modified_type:{1}
+* Sites that are modified-site_dic:
+Flow of information in the ODE semantics:agent_type:0:
+Binding:site_type_modif:x:0
+Flow of information in the ODE semantics:agent_type:1:
+Internal:site_type_modif:x:0
+Binding:site_type_modif:x:1
+Binding:site_type_modif:y:2
+Flow of information in the ODE semantics:agent_type:2:
+Binding:site_type_modif:z:0
+Binding:site_type_modif:y:1
+Binding:site_type_modif:k:2
+Binding:site_type_modif:t:3
+Binding:site_type_modif:x:4
+Flow of information in the ODE semantics:agent_type:3:
+Binding:site_type_modif:y:0
+Binding:site_type_modif:x:1
 * Anchor sites:
 * Anchor sites 2:
 * Internal flow:

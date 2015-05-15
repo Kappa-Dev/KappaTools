@@ -196,11 +196,39 @@ Agents:{A; B}
 Flow of information in the stochastic semantics:agent_type:0:
 site_type:[|0; 0|]
 Flow of information in the ODE semantics:
+rule_id:0
+Flow of information in the ODE semantics:agent_type:0:
+Modified sites:{0}
+
+Flow of information in the ODE semantics:agent_type:0:
+Modified sites:{1}
+
+Binding:x:0
+Binding:z:1
+rule_id:1
+Flow of information in the ODE semantics:agent_type:0:
+Modified sites:{0}
+
+Binding:x:0
+rule_id:2
+Flow of information in the ODE semantics:agent_type:0:
+Modified sites:{0}
+
+Flow of information in the ODE semantics:agent_type:1:
+Modified sites:{0}
+
+Binding:x:0
 * Sites that are modified:
 Flow of information in the ODE semantics:agent_type:0:
 modified_type:{0}
 Flow of information in the ODE semantics:agent_type:1:
 modified_type:{0}
+* Sites that are modified-site_dic:
+Flow of information in the ODE semantics:agent_type:0:
+Binding:site_type_modif:x:0
+Binding:site_type_modif:z:1
+Flow of information in the ODE semantics:agent_type:1:
+Binding:site_type_modif:x:0
 * Anchor sites:
 Flow of information in the ODE semantics:agent_type:0:
 anchor_type:{1}

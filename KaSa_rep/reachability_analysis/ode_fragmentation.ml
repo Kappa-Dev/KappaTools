@@ -51,6 +51,7 @@ type pair_ext_flow =
 type ode_frag =
     {
       store_sites_modified_set            : set AgentMap.t;
+      store_sites_modif_site_dic          : Ckappa_sig.site_dic AgentMap.t; (*TEST*)
       store_sites_bond_pair_set           : sites_ode;
       store_sites_bond_pair_set_external  : sites_ode;
       store_sites_lhs                     : int list AgentMap.t;
@@ -152,7 +153,7 @@ let fold_anchor_set parameter error store_sites_anchor_set1 store_sites_anchor_s
       anchor_set2
   in anchor_set
                 
-(************************************************************************************)
+(***********************************************************************************)
 (*MODIFIED SITES*)
 
 let collect_sites_modified_set parameter error rule store_sites_modified_set =
@@ -190,12 +191,99 @@ let collect_sites_modified_set parameter error rule store_sites_modified_set =
               site_set
               store_sites_modified_set
           in
+	  let _ =
+	    Int_storage.Nearly_inf_Imperatif.print
+	      error
+	      (fun error parameter set ->
+		let _ =
+		  let l = Cckappa_sig.Site_map_and_set.elements set in
+		  print_string "Modified sites:";
+		  print_list l; print_string "\n"
+		in
+		error
+	      )
+	      parameter store_sites_modified_set
+	  in
           error, store_sites_modified_set
       )
       rule.Cckappa_sig.diff_reverse
       store_sites_modified_set
   in error, store_sites_modified_set
 
+(*TEST*)
+let collect_sites_modif_site_dic parameter error rule handler store_modif_site_dic =
+  Int_storage.Quick_Nearly_inf_Imperatif.fold
+    parameter
+    error
+    (fun parameter error agent_id site_modif store_modif_site_dic ->
+      let agent_type = site_modif.Cckappa_sig.agent_name in
+      if Cckappa_sig.Site_map_and_set.is_empty_map
+	site_modif.Cckappa_sig.agent_interface
+      then
+	error, store_modif_site_dic
+      else
+    (*collect site_dic information*)
+	let error, site_dic =
+	  Misc_sa.unsome
+	    (Int_storage.Nearly_inf_Imperatif.get
+	       parameter
+	       error
+	       agent_type
+	       handler.Cckappa_sig.sites)
+	    (fun error -> warn parameter error (Some "line 218") Exit (Ckappa_sig.Dictionary_of_sites.init()))
+	in
+	let site_dic_2 =
+	  Cckappa_sig.Site_map_and_set.fold_map
+	    (fun site _ current_dic ->
+	      let error, (value, _, _) =
+		Misc_sa.unsome
+		  (Ckappa_sig.Dictionary_of_sites.translate
+		     parameter
+		     error
+		     site
+		     site_dic)
+		  (fun error -> warn parameter error (Some "line 239") Exit (Ckappa_sig.Internal "", (), ()))
+	      in
+	      let _ =
+		match value with
+		  | Ckappa_sig.Internal s ->
+		    Printf.fprintf stdout "Internal:%s:%i\n" s site
+		  | Ckappa_sig.Binding s ->
+		    Printf.fprintf stdout "Binding:%s:%i\n" s site
+	      in
+	      let error, some_allocate =
+		Ckappa_sig.Dictionary_of_sites.allocate
+		  parameter
+		  error
+		  Misc_sa.compare_unit
+		  value
+		  ()
+		  Misc_sa.const_unit
+		  site_dic
+	      in
+	      let error, (id,dic) =
+		match some_allocate with
+		  | None -> warn parameter error (Some "line 258") Exit (0,current_dic)
+		  | Some (id, _, _, dic) -> error, (id,dic)
+	      in
+	      dic
+	    )
+	    site_modif.Cckappa_sig.agent_interface
+	    (Ckappa_sig.Dictionary_of_sites.init ())
+	in
+	(*store site_dic into the result*)
+	Int_storage.Nearly_inf_Imperatif.set
+	  parameter
+	  error
+	  agent_type
+	  site_dic_2
+	  store_modif_site_dic
+    )
+    rule.Cckappa_sig.diff_reverse
+    store_modif_site_dic
+
+
+  
 (************************************************************************************)
 (*BINDING SITES - SET*)
 
@@ -858,6 +946,15 @@ let scan_rule parameter error handler get_rule ode_class =
       get_rule
       ode_class.store_sites_modified_set
   in
+  (*TEST*)
+  let error, store_sites_modif_site_dic =
+    collect_sites_modif_site_dic
+      parameter
+      error
+      get_rule
+      handler
+      ode_class.store_sites_modif_site_dic
+  in
   (*------------------------------------------------------------------------------*)
   (*b) collect binding sites*)
   let error, store_sites_bond_pair_set =
@@ -940,6 +1037,7 @@ let scan_rule parameter error handler get_rule ode_class =
   error,
   {
     store_sites_modified_set            = store_sites_modified_set;
+    store_sites_modif_site_dic          = store_sites_modif_site_dic;
     store_sites_bond_pair_set           = store_sites_bond_pair_set;
     store_sites_bond_pair_set_external  = store_sites_bond_pair_set_external;
     store_sites_lhs                     = store_sites_lhs;
@@ -954,6 +1052,7 @@ let scan_rule parameter error handler get_rule ode_class =
 
 let scan_rule_set parameter error handler rules =
   let error, init = Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
+  let error, init_site_dic = Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
   let init_pair = (init, init) in
   let error, init_lhs = Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
   let error, init_internal = Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
@@ -962,6 +1061,7 @@ let scan_rule_set parameter error handler rules =
   let init_ode =
     {
       store_sites_modified_set            = init;
+      store_sites_modif_site_dic          = init_site_dic;
       store_sites_bond_pair_set           = init_pair;
       store_sites_bond_pair_set_external  = init_pair;
       store_sites_lhs                     = init_lhs;
@@ -975,6 +1075,7 @@ let scan_rule_set parameter error handler rules =
     Int_storage.Nearly_inf_Imperatif.fold
       parameter error
       (fun parameter error rule_id rule ode_class ->
+	let _ = Printf.fprintf stdout "rule_id:%i\n" rule_id in
         scan_rule
           parameter
           error
@@ -996,6 +1097,32 @@ let print_modified parameter error result =
       let _ = print_string "modified_type:"; print_list l in
       error) parameter result
 
+
+(*TEST*)
+let print_site_modif_dic parameter error result =
+  Int_storage.Nearly_inf_Imperatif.print
+    error
+    (fun error parameter site_dic ->
+      let _ =
+	  Ckappa_sig.Dictionary_of_sites.print
+	    parameter
+	    error
+	    (fun parameter error i site _ _ ->
+	      match site with
+		| Ckappa_sig.Internal s ->
+		  let _ =
+		    Printf.fprintf stdout "Internal:site_type_modif:%s:%i\n" s i
+		  in error
+		| Ckappa_sig.Binding s ->
+		  let _ =
+		    Printf.fprintf stdout "Binding:site_type_modif:%s:%i\n" s i
+		  in error
+	    ) site_dic
+      in
+      error
+    )
+    parameter result
+  
 (*------------------------------------------------------------------------------*)    
 
 let print_anchor parameter error result = 
@@ -1057,17 +1184,21 @@ let print_external_flow result =
 (*MAIN PRINT*)
     
 let print_ode parameter error
-              { store_sites_modified_set;
-                store_sites_bond_pair_set;
-                store_sites_bond_pair_set_external;
-                store_sites_lhs;
-                store_sites_anchor_set;
-                (*store_sites_anchor;*)
-                store_internal_flow;
-                store_external_flow
-              } =
+    { store_sites_modified_set;
+      store_sites_modif_site_dic;
+      store_sites_bond_pair_set;
+      store_sites_bond_pair_set_external;
+      store_sites_lhs;
+      store_sites_anchor_set;
+      (*store_sites_anchor;*)
+      store_internal_flow;
+      store_external_flow
+    } =
   let _ = Printf.fprintf stdout "* Sites that are modified:\n" in
   let _ = print_modified parameter error store_sites_modified_set in
+  (*TEST*)
+  let _ = Printf.fprintf stdout "* Sites that are modified-site_dic:\n" in
+  let _ = print_site_modif_dic parameter error store_sites_modif_site_dic in
   let _ = Printf.fprintf stdout "* Anchor sites:\n" in
   let _ = print_anchor parameter error (fst store_sites_anchor_set) in
   let _ = Printf.fprintf stdout "* Anchor sites 2:\n" in
