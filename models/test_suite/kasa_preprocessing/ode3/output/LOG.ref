@@ -192,36 +192,16 @@ Agents:{A; B; C}
 Flow of information in the stochastic semantics:agent_type:0:
 site_type:[|0; 0; 2|]
 Flow of information in the ODE semantics:
-rule_id:0
-agent_type:0:site_modified:0->x(internal state)
-agent_type:0:site_modified:1->x(binding state)
-agent_type:1:site_modified:0->x(binding state)
-agent_type:0:anchor_type:{}
-agent_type:1:anchor_type:{}
-Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:rule_id:0
+Flow of information in the ODE semantics:agent_type:0:site_modified:0->x(internal state)
+Flow of information in the ODE semantics:agent_type:0:site_modified:1->x(binding state)
+Flow of information in the ODE semantics:agent_type:1:site_modified:0->x(binding state)
+Flow of information in the ODE semantics:Internal flow:
 - agent_type:0:site_type:1 -> agent_type:0:modified_type:0
+Flow of information in the ODE semantics:Internal flow:
 - agent_type:0:site_type:0 -> agent_type:0:modified_type:1
-Flow of information in the ODE semantics:0:
-Flow of information in the ODE semantics:0:
-- agent_type:0:site_type:1 -> agent_type:0:modified_type:0
-- agent_type:0:site_type:0 -> agent_type:0:modified_type:1
-Flow of information in the ODE semantics:1:
-Flow of information in the ODE semantics:0:
-Flow of information in the ODE semantics:1:
-rule_id:1
-agent_type:0:site_modified:2->y(binding state)
-agent_type:2:site_modified:0->x(binding state)
-agent_type:0:anchor_type:{}
-agent_type:2:anchor_type:{}
-Flow of information in the ODE semantics:0:
-Flow of information in the ODE semantics:1:
-Flow of information in the ODE semantics:0:
-Flow of information in the ODE semantics:1:
-Flow of information in the ODE semantics:0:
-Flow of information in the ODE semantics:1:
-Flow of information in the ODE semantics:2:
-Flow of information in the ODE semantics:0:
-Flow of information in the ODE semantics:1:
-Flow of information in the ODE semantics:2:
-* External flow:
+Flow of information in the ODE semantics:rule_id:1
+Flow of information in the ODE semantics:agent_type:0:site_modified:2->y(binding state)
+Flow of information in the ODE semantics:agent_type:2:site_modified:0->x(binding state)
+Flow of information in the ODE semantics:External flow:
 execution finished without any exception

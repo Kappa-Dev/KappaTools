@@ -136,23 +136,18 @@ Agents:{A}
 Flow of information in the stochastic semantics:agent_type:0:
 site_type:[|0; 0; 0|]
 Flow of information in the ODE semantics:
-rule_id:0
-agent_type:0:site_modified:1->y(internal state)
-agent_type:0:anchor_type:{}
-Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:rule_id:0
+Flow of information in the ODE semantics:agent_type:0:site_modified:1->y(internal state)
+Flow of information in the ODE semantics:Internal flow:
 - agent_type:0:site_type:0 -> agent_type:0:modified_type:1
-Flow of information in the ODE semantics:0:
-rule_id:1
-agent_type:0:site_modified:2->z(internal state)
-agent_type:0:anchor_type:{}
-Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:rule_id:1
+Flow of information in the ODE semantics:agent_type:0:site_modified:2->z(internal state)
+Flow of information in the ODE semantics:Internal flow:
 - agent_type:0:site_type:0 -> agent_type:0:modified_type:2
-Flow of information in the ODE semantics:0:
-rule_id:2
-agent_type:0:anchor_type:{}
-Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:rule_id:2
+Flow of information in the ODE semantics:Internal flow:
 - agent_type:0:site_type:1 -> agent_type:0:modified_type:2
+Flow of information in the ODE semantics:Internal flow:
 - agent_type:0:site_type:0 -> agent_type:0:modified_type:2
-Flow of information in the ODE semantics:0:
-* External flow:
+Flow of information in the ODE semantics:External flow:
 execution finished without any exception

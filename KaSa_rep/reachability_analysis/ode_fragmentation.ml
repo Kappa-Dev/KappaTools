@@ -18,14 +18,17 @@ let warn parameter mh message exn default =
                  (fun () -> default)
 
 let sprintf_list l =
-  let acc = ref "{" in
-  List.iteri (fun i x ->
-              acc := !acc ^
-                       if i <> 0
-                       then Printf.sprintf "; %d" x
-                       else Printf.sprintf "%d" x
-             ) l;
-  !acc ^ "}"
+  match l with
+    | [] -> ""
+    | _ as l' ->
+      let acc = ref "{" in
+      List.iteri (fun i x ->
+        acc := !acc ^
+          if i <> 0
+          then Printf.sprintf "; %d" x
+          else Printf.sprintf "%d" x
+      ) l';
+      !acc ^ "}"
            
 let print_list l =
   let output = sprintf_list l in
@@ -54,7 +57,7 @@ type ode_frag =
       store_sites_bond_pair_set           : sites_ode;
       store_sites_bond_pair_set_external  : sites_ode;
       store_sites_lhs                     : int list AgentMap.t;
-      store_sites_anchor_set              : (set AgentMap.t * set AgentMap.t); (*FIXME*)
+      store_sites_anchor_set              : (set AgentMap.t * set AgentMap.t);
       store_internal_flow                 : (pair_int_flow * pair_int_flow);
       store_external_flow                 : pair_ext_flow
     }
@@ -198,7 +201,7 @@ let collect_sites_modified_set parameter error rule handler store_sites_modified
 	       error
 	       agent_type
 	       handler.Cckappa_sig.sites)
-	    (fun error -> warn parameter error (Some "line 218") Exit (Ckappa_sig.Dictionary_of_sites.init()))
+	    (fun error -> warn parameter error (Some "line 204") Exit (Ckappa_sig.Dictionary_of_sites.init()))
 	in
 	let _ =
 	  Cckappa_sig.Site_map_and_set.fold_map
@@ -210,10 +213,10 @@ let collect_sites_modified_set parameter error rule handler store_sites_modified
 		     error
 		     site
 		     site_dic)
-		  (fun error -> warn parameter error (Some "line 239") Exit (Ckappa_sig.Internal "", (), ()))
+		  (fun error -> warn parameter error (Some "line 216") Exit (Ckappa_sig.Internal "", (), ()))
 	      in
 	      let _ = 
-                Printf.fprintf stdout "agent_type:%i:" agent_type;
+                Printf.fprintf stdout "Flow of information in the ODE semantics:agent_type:%i:" agent_type;
                 match value with
 		  | Ckappa_sig.Internal s ->
 		    Printf.fprintf stdout "site_modified:%i->%s(internal state)\n" site s
@@ -293,7 +296,7 @@ let collect_store_bond_set_each_rule parameter error bond_lhs
       store_sites_bond_set
   in error, store_sites_bond_set
 
-(*combine with the old_result*) (*REMOVE?*)
+(*combine with the old_result*)
 let collect_store_bond_set parameter error bond_lhs site_address store_sites_bond_set =
   let agent_id = site_address.Cckappa_sig.agent_index in
   let agent_type = site_address.Cckappa_sig.agent_type in
@@ -619,10 +622,13 @@ let collect_sites_anchor_set parameter error get_rule
                 get_anchor_set2
             in
             (*print the final set*)
-            Printf.fprintf stdout "agent_type:%i:" agent_type;
             let l = Cckappa_sig.Site_map_and_set.elements final_anchor_set in
-            print_string "anchor_type:";
-            print_list l
+            match l with
+              | [] -> ()
+              | _ as l' ->
+                Printf.fprintf stdout "Flow of information in the ODE semantics:agent_type:%i:" agent_type;
+                print_string "anchor_type:";
+                print_list l'
           in
           (*result*)
           error, (anchor_set1, anchor_set2)
@@ -747,20 +753,15 @@ let collect_internal_flow parameter error get_rule
           in
           (*PRINT*)
           let _ =
-            Int_storage.Nearly_inf_Imperatif.print
-              error
-              (fun error parameter l ->
-                let _ = 
-                  let rec aux acc =
-                    match acc with
-                      | [] -> []
-                      | (agent_type, x, y) :: tl ->
-                        Printf.fprintf stdout
-                          "- agent_type:%i:site_type:%i -> agent_type:%i:modified_type:%i\n"
-                          agent_type x agent_type y;
-                        aux tl
-                  in aux l
-                in error) parameter internal_flow1
+            let rec aux acc =
+              match acc with
+                | [] -> acc
+                | (agent_type, x, y) :: tl ->
+                  Printf.fprintf stdout
+                    "Flow of information in the ODE semantics:Internal flow:\n- agent_type:%i:site_type:%i -> agent_type:%i:modified_type:%i\n"
+                    agent_type x agent_type y;
+                  aux tl                    
+            in aux get_internal_flow1
           in
           (*------------------------------------------------------------------------------*)
           (*2nd: site -> anchor site*)
@@ -782,21 +783,16 @@ let collect_internal_flow parameter error get_rule
               (snd store_internal_flow)
           in
           (*PRINT*)
-          let _ = 
-            Int_storage.Nearly_inf_Imperatif.print
-              error
-              (fun error parameter l ->
-                let _ = 
-                  let rec aux acc =
-                    match acc with
-                      | [] -> acc
-                      | (agent_type, x, y) :: tl ->
-                        Printf.fprintf stdout
-                          "- agent_type:%i:site_type:%i -> agent_type:%i:anchor_type:%i\n" 
-                          agent_type x agent_type y;
-                        aux tl
-                  in aux l
-                in error) parameter internal_flow2
+          let _ =
+            let rec aux acc =
+              match acc with
+                | [] -> acc
+                | (agent_type, x, y) :: tl ->
+                  Printf.fprintf stdout
+                    "Flow of information in the ODE semantics:Internal flow:\n- agent_type:%i:site_type:%i -> agent_type:%i:anchor_type:%i\n"
+                    agent_type x agent_type y;
+                  aux tl                    
+            in aux get_internal_flow2
           in
           (*result*)
           error, (internal_flow1, internal_flow2)
@@ -997,7 +993,7 @@ let scan_rule_set parameter error handler rules =
     Int_storage.Nearly_inf_Imperatif.fold
       parameter error
       (fun parameter error rule_id rule ode_class ->
-	let _ = Printf.fprintf stdout "rule_id:%i\n" rule_id in
+	let _ = Printf.fprintf stdout "Flow of information in the ODE semantics:rule_id:%i\n" rule_id in
         scan_rule
           parameter
           error
@@ -1010,43 +1006,6 @@ let scan_rule_set parameter error handler rules =
            
 (************************************************************************************)
 (*PRINT*)
-
-(*TEST*)
-let print_site_modif_dic parameter error result =
-  Int_storage.Nearly_inf_Imperatif.print
-    error
-    (fun error parameter site_dic ->
-      let _ =
-	  Ckappa_sig.Dictionary_of_sites.print
-	    parameter
-	    error
-	    (fun parameter error i site _ _ ->
-	      match site with
-		| Ckappa_sig.Internal s ->
-		  let _ =
-		    Printf.fprintf stdout "Internal:site_type_modif:%s:%i\n" s i
-		  in error
-		| Ckappa_sig.Binding s ->
-		  let _ =
-		    Printf.fprintf stdout "Binding:site_type_modif:%s:%i\n" s i
-		  in error
-	    ) site_dic
-      in
-      error
-    )
-    parameter result
-  
-(*------------------------------------------------------------------------------*)    
-
-let print_anchor parameter error result = 
-  Int_storage.Nearly_inf_Imperatif.print
-    error
-    (fun error parameter s ->
-      let l = Cckappa_sig.Site_map_and_set.elements s in
-      let _ = print_string "anchor_type:"; print_list l in
-      error) parameter result
-
-(*------------------------------------------------------------------------------*)
 
 let print_external_flow result =
   let rec aux acc =
@@ -1071,11 +1030,7 @@ let print_ode parameter error
       store_internal_flow;
       store_external_flow
     } =
-  (*let _ = Printf.fprintf stdout "* Anchor sites:\n" in
-  let _ = print_anchor parameter error (fst store_sites_anchor_set) in
-  let _ = Printf.fprintf stdout "* Anchor sites 2:\n" in
-  let _ = print_anchor parameter error (snd store_sites_anchor_set) in*)
-  let _ = Printf.fprintf stdout "* External flow:\n" in
+  let _ = Printf.fprintf stdout "Flow of information in the ODE semantics:External flow:\n" in
   let _ = print_external_flow store_external_flow in
   ()
     
