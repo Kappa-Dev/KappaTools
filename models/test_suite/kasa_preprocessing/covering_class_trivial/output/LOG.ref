@@ -132,7 +132,6 @@ TEST:Covering_class_id:1:
 site_type:1
 site_type:2
 Flow of information in the stochastic semantics:
-Agents:{A}
 Flow of information in the stochastic semantics:agent_type:0:
 site_type:[|0; 0; 0|]
 Flow of information in the ODE semantics:

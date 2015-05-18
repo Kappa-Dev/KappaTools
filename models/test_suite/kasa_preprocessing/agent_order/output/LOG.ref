@@ -158,7 +158,6 @@ Re-index the sites in Covering_class_id:0:site_type:{1}
 TEST:Covering_class_id:0:
 site_type:1
 Flow of information in the stochastic semantics:
-Agents:{A; B}
 Flow of information in the stochastic semantics:agent_type:0:
 site_type:[|0|]
 Flow of information in the ODE semantics:

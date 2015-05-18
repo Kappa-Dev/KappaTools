@@ -440,7 +440,6 @@ site_type:1
 site_type:2
 site_type:3
 Flow of information in the stochastic semantics:
-Agents:{A; B; C; D}
 Flow of information in the stochastic semantics:agent_type:0:
 site_type:[|0; 0; 0; 1; 1|]
 Flow of information in the stochastic semantics:agent_type:1:
