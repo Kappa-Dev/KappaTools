@@ -19,7 +19,9 @@ let local_trace = false
 
 module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
 
-type sites_covering_classes  = int list list AgentMap.t 
+type agent_dic =  Ckappa_sig.agent_dic
+
+type sites_covering_classes  = (agent_dic * int list list AgentMap.t) 
 
 type set = Cckappa_sig.Site_map_and_set.set
                              

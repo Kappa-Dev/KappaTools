@@ -254,11 +254,9 @@ Influence_map:Inhibition_map:rule(2):'r1' A(x),C(x)->A(x!1),C(x!1) -> rule(0):'r
 Influence_map:Inhibition_map:rule(3):'r2' B(x~p),C(x!_)->B(x~u),C(x!_) -> rule(0):'r0' A(x),B(x~p)->A(x!1),B(x~p!1)[0->1]
 Influence_map:Inhibition_map:rule(3):'r2' B(x~p),C(x!_)->B(x~u),C(x!_) -> rule(1):'r0_op' A(x!1),B(x~p!1)->A(x),B(x~p)[0->1]
 Potential dependencies between sites:
-Agents:{A; B; C}
-binding:site_name:x:0
-internal:site_name:x:0
-binding:site_name:x:1
-binding:site_name:x:0
+Potential dependencies between sites:agent_type:0:A
+Potential dependencies between sites:agent_type:1:B
+Potential dependencies between sites:agent_type:2:C
 Potential dependencies between sites:agent_type:0:
 Covering_class_id:0:site_type:{0}
 Number of covering classes:1
@@ -284,92 +282,72 @@ Flow of information in the stochastic semantics:agent_type:1:
 site_type:[|0; 0|]
 Flow of information in the ODE semantics:
 rule_id:0
-Flow of information in the ODE semantics:agent_type:0:
-Modified sites:{0}
-
-Flow of information in the ODE semantics:agent_type:0:
-Modified sites:{0}
-
-Flow of information in the ODE semantics:agent_type:1:
-Modified sites:{1}
-
-Binding:x:0
-Binding:x:1
+agent_type:0:site_modified:0->x(binding state)
+agent_type:1:site_modified:1->x(binding state)
+agent_type:0:anchor_type:{}
+agent_type:1:anchor_type:{}
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:1:
+- agent_type:1:site_type:0 -> agent_type:1:modified_type:1
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:1:
 rule_id:1
-Flow of information in the ODE semantics:agent_type:0:
-Modified sites:{0}
-
-Flow of information in the ODE semantics:agent_type:1:
-Modified sites:{1}
-
-Flow of information in the ODE semantics:agent_type:0:
-Modified sites:{0}
-
-Flow of information in the ODE semantics:agent_type:1:
-Modified sites:{1}
-
-Binding:x:0
-Binding:x:1
+agent_type:0:site_modified:0->x(binding state)
+agent_type:1:site_modified:1->x(binding state)
+agent_type:0:anchor_type:{}
+agent_type:1:anchor_type:{1}
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:1:
+- agent_type:1:site_type:0 -> agent_type:1:modified_type:1
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:1:
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:1:
+- agent_type:1:site_type:0 -> agent_type:1:modified_type:1
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:1:
+- agent_type:1:site_type:0 -> agent_type:1:anchor_type:1
 rule_id:2
-Flow of information in the ODE semantics:agent_type:0:
-Modified sites:{0}
-
-Flow of information in the ODE semantics:agent_type:1:
-Modified sites:{1}
-
-Flow of information in the ODE semantics:agent_type:0:
-Modified sites:{0}
-
-Flow of information in the ODE semantics:agent_type:1:
-Modified sites:{1}
-
-Flow of information in the ODE semantics:agent_type:2:
-Modified sites:{0}
-
-Binding:x:0
-Binding:x:0
+agent_type:0:site_modified:0->x(binding state)
+agent_type:2:site_modified:0->x(binding state)
+agent_type:0:anchor_type:{}
+agent_type:2:anchor_type:{}
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:1:
+- agent_type:1:site_type:0 -> agent_type:1:modified_type:1
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:1:
+- agent_type:1:site_type:0 -> agent_type:1:anchor_type:1
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:1:
+- agent_type:1:site_type:0 -> agent_type:1:modified_type:1
+Flow of information in the ODE semantics:2:
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:1:
+- agent_type:1:site_type:0 -> agent_type:1:anchor_type:1
+Flow of information in the ODE semantics:2:
 rule_id:3
-Flow of information in the ODE semantics:agent_type:0:
-Modified sites:{0}
-
-Flow of information in the ODE semantics:agent_type:1:
-Modified sites:{0}
-
-Flow of information in the ODE semantics:agent_type:2:
-Modified sites:{0}
-
-Internal:x:0
-* Sites that are modified:
-Flow of information in the ODE semantics:agent_type:0:
-modified_type:{0}
-Flow of information in the ODE semantics:agent_type:1:
-modified_type:{0}
-Flow of information in the ODE semantics:agent_type:2:
-modified_type:{0}
-* Sites that are modified-site_dic:
-Flow of information in the ODE semantics:agent_type:0:
-Binding:site_type_modif:x:0
-Flow of information in the ODE semantics:agent_type:1:
-Internal:site_type_modif:x:0
-Binding:site_type_modif:x:1
-Flow of information in the ODE semantics:agent_type:2:
-Binding:site_type_modif:x:0
-* Anchor sites:
-Flow of information in the ODE semantics:agent_type:1:
-anchor_type:{1}
-* Anchor sites 2:
-* Internal flow:
-Flow of information in the ODE semantics:agent_type:0:
-Flow of information in the ODE semantics:agent_type:1:
+agent_type:1:site_modified:0->x(internal state)
+agent_type:1:anchor_type:{1}
+agent_type:2:anchor_type:{}
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:1:
 - agent_type:1:site_type:1 -> agent_type:1:modified_type:0
-- agent_type:1:site_type:0 -> agent_type:1:modified_type:1
-- agent_type:1:site_type:0 -> agent_type:1:modified_type:1
-Flow of information in the ODE semantics:agent_type:2:
-Flow of information in the ODE semantics:agent_type:0:
-Flow of information in the ODE semantics:agent_type:1:
+Flow of information in the ODE semantics:2:
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:1:
 - agent_type:1:site_type:0 -> agent_type:1:anchor_type:1
+Flow of information in the ODE semantics:2:
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:1:
+- agent_type:1:site_type:1 -> agent_type:1:modified_type:0
+Flow of information in the ODE semantics:2:
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:1:
 - agent_type:1:site_type:0 -> agent_type:1:anchor_type:1
-Flow of information in the ODE semantics:agent_type:2:
+Flow of information in the ODE semantics:2:
 * External flow:
 - agent_type:1:anchor_type:1 -> agent_type:0:modified_type:0
 execution finished without any exception

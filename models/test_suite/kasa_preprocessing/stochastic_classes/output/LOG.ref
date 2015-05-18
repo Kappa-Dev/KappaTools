@@ -393,18 +393,12 @@ Influence_map:Inhibition_map:rule(5):'r5' E(y~p),E(z~p)-> -> rule(5):'r5' E(y~p)
 Influence_map:Inhibition_map:rule(6):'r6' F(x~u)-> -> rule(7):'r7' F(y~p)->[0->0]
 Influence_map:Inhibition_map:rule(7):'r7' F(y~p)-> -> rule(6):'r6' F(x~u)->[0->0]
 Potential dependencies between sites:
-Agents:{A; B; C; D; E; F}
-internal:site_name:x:0
-internal:site_name:y:1
-internal:site_name:z:2
-internal:site_name:t:3
-internal:site_name:x:0
-internal:site_name:y:1
-internal:site_name:x:0
-internal:site_name:y:1
-internal:site_name:z:2
-internal:site_name:x:0
-internal:site_name:y:1
+Potential dependencies between sites:agent_type:0:A
+Potential dependencies between sites:agent_type:1:B
+Potential dependencies between sites:agent_type:2:C
+Potential dependencies between sites:agent_type:3:D
+Potential dependencies between sites:agent_type:4:E
+Potential dependencies between sites:agent_type:5:F
 Potential dependencies between sites:agent_type:0:
 Covering_class_id:0:site_type:{2}
 Covering_class_id:1:site_type:{1}
@@ -461,137 +455,101 @@ Flow of information in the stochastic semantics:agent_type:4:
 site_type:[|0; 0; 0|]
 Flow of information in the ODE semantics:
 rule_id:0
-Flow of information in the ODE semantics:agent_type:0:
-Modified sites:{0}
-
-Flow of information in the ODE semantics:agent_type:0:
-Modified sites:{1}
-
-Internal:x:0
-Internal:y:1
+agent_type:0:site_modified:0->x(internal state)
+agent_type:0:site_modified:1->y(internal state)
+agent_type:0:anchor_type:{}
+agent_type:0:anchor_type:{}
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:0:
 rule_id:1
 rule_id:2
-Flow of information in the ODE semantics:agent_type:0:
-Modified sites:{1}
-
-Flow of information in the ODE semantics:agent_type:2:
-Modified sites:{0}
-
-Internal:x:0
+agent_type:2:site_modified:0->x(internal state)
+agent_type:2:anchor_type:{}
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:2:
+- agent_type:2:site_type:1 -> agent_type:2:modified_type:0
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:2:
 rule_id:3
 rule_id:4
-Flow of information in the ODE semantics:agent_type:0:
-Modified sites:{1}
-
-Flow of information in the ODE semantics:agent_type:2:
-Modified sites:{0}
-
-Flow of information in the ODE semantics:agent_type:4:
-Modified sites:{0; 1}
-
-Internal:x:0
-Internal:y:1
-rule_id:5
-Flow of information in the ODE semantics:agent_type:0:
-Modified sites:{1}
-
-Flow of information in the ODE semantics:agent_type:2:
-Modified sites:{0}
-
-Flow of information in the ODE semantics:agent_type:4:
-Modified sites:{1}
-
-Flow of information in the ODE semantics:agent_type:0:
-Modified sites:{1}
-
-Flow of information in the ODE semantics:agent_type:2:
-Modified sites:{0}
-
-Flow of information in the ODE semantics:agent_type:4:
-Modified sites:{2}
-
-Internal:y:1
-Internal:z:2
-rule_id:6
-Flow of information in the ODE semantics:agent_type:0:
-Modified sites:{1}
-
-Flow of information in the ODE semantics:agent_type:2:
-Modified sites:{0}
-
-Flow of information in the ODE semantics:agent_type:4:
-Modified sites:{2}
-
-Flow of information in the ODE semantics:agent_type:5:
-Modified sites:{0}
-
-Internal:x:0
-rule_id:7
-Flow of information in the ODE semantics:agent_type:0:
-Modified sites:{1}
-
-Flow of information in the ODE semantics:agent_type:2:
-Modified sites:{0}
-
-Flow of information in the ODE semantics:agent_type:4:
-Modified sites:{2}
-
-Flow of information in the ODE semantics:agent_type:5:
-Modified sites:{1}
-
-Internal:y:1
-rule_id:8
-Flow of information in the ODE semantics:agent_type:0:
-Modified sites:{2}
-
-Flow of information in the ODE semantics:agent_type:2:
-Modified sites:{0}
-
-Flow of information in the ODE semantics:agent_type:4:
-Modified sites:{2}
-
-Flow of information in the ODE semantics:agent_type:5:
-Modified sites:{1}
-
-Internal:z:2
-* Sites that are modified:
-Flow of information in the ODE semantics:agent_type:0:
-modified_type:{2}
-Flow of information in the ODE semantics:agent_type:2:
-modified_type:{0}
-Flow of information in the ODE semantics:agent_type:4:
-modified_type:{2}
-Flow of information in the ODE semantics:agent_type:5:
-modified_type:{1}
-* Sites that are modified-site_dic:
-Flow of information in the ODE semantics:agent_type:0:
-Internal:site_type_modif:x:0
-Internal:site_type_modif:y:1
-Internal:site_type_modif:z:2
-Internal:site_type_modif:t:3
-Flow of information in the ODE semantics:agent_type:2:
-Internal:site_type_modif:x:0
-Internal:site_type_modif:y:1
-Flow of information in the ODE semantics:agent_type:4:
-Internal:site_type_modif:x:0
-Internal:site_type_modif:y:1
-Internal:site_type_modif:z:2
-Flow of information in the ODE semantics:agent_type:5:
-Internal:site_type_modif:x:0
-Internal:site_type_modif:y:1
-* Anchor sites:
-* Anchor sites 2:
-* Internal flow:
-Flow of information in the ODE semantics:agent_type:0:
-Flow of information in the ODE semantics:agent_type:2:
+agent_type:4:site_modified:0->x(internal state)
+agent_type:4:site_modified:1->y(internal state)
+agent_type:4:anchor_type:{}
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:2:
 - agent_type:2:site_type:1 -> agent_type:2:modified_type:0
-Flow of information in the ODE semantics:agent_type:4:
+Flow of information in the ODE semantics:4:
 - agent_type:4:site_type:1 -> agent_type:4:modified_type:0
 - agent_type:4:site_type:0 -> agent_type:4:modified_type:1
-Flow of information in the ODE semantics:agent_type:5:
-Flow of information in the ODE semantics:agent_type:0:
-Flow of information in the ODE semantics:agent_type:2:
-Flow of information in the ODE semantics:agent_type:4:
-Flow of information in the ODE semantics:agent_type:5:
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:2:
+Flow of information in the ODE semantics:4:
+rule_id:5
+agent_type:4:site_modified:1->y(internal state)
+agent_type:4:site_modified:2->z(internal state)
+agent_type:4:anchor_type:{}
+agent_type:4:anchor_type:{}
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:2:
+- agent_type:2:site_type:1 -> agent_type:2:modified_type:0
+Flow of information in the ODE semantics:4:
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:2:
+Flow of information in the ODE semantics:4:
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:2:
+- agent_type:2:site_type:1 -> agent_type:2:modified_type:0
+Flow of information in the ODE semantics:4:
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:2:
+Flow of information in the ODE semantics:4:
+rule_id:6
+agent_type:5:site_modified:0->x(internal state)
+agent_type:5:anchor_type:{}
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:2:
+- agent_type:2:site_type:1 -> agent_type:2:modified_type:0
+Flow of information in the ODE semantics:4:
+Flow of information in the ODE semantics:5:
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:2:
+Flow of information in the ODE semantics:4:
+Flow of information in the ODE semantics:5:
+rule_id:7
+agent_type:5:site_modified:1->y(internal state)
+agent_type:5:anchor_type:{}
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:2:
+- agent_type:2:site_type:1 -> agent_type:2:modified_type:0
+Flow of information in the ODE semantics:4:
+Flow of information in the ODE semantics:5:
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:2:
+Flow of information in the ODE semantics:4:
+Flow of information in the ODE semantics:5:
+rule_id:8
+agent_type:0:site_modified:2->z(internal state)
+agent_type:0:anchor_type:{}
+agent_type:0:anchor_type:{}
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:2:
+- agent_type:2:site_type:1 -> agent_type:2:modified_type:0
+Flow of information in the ODE semantics:4:
+Flow of information in the ODE semantics:5:
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:2:
+Flow of information in the ODE semantics:4:
+Flow of information in the ODE semantics:5:
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:2:
+- agent_type:2:site_type:1 -> agent_type:2:modified_type:0
+Flow of information in the ODE semantics:4:
+Flow of information in the ODE semantics:5:
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:2:
+Flow of information in the ODE semantics:4:
+Flow of information in the ODE semantics:5:
 * External flow:
 execution finished without any exception

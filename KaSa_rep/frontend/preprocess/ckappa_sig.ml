@@ -53,6 +53,7 @@ type 'mixture rule =
     k_def:'mixture Ast.ast_alg_expr Term.with_pos; 
     k_un:'mixture Ast.ast_alg_expr Term.with_pos option ;
   }
+
 type 'mixture perturbation = 'mixture Ast.perturbation 
 
 type 'mixture modif_expr = 'mixture Ast.modif_expr 
@@ -122,7 +123,8 @@ type agent_dic =
   (unit,unit) Dictionary_of_agents.dictionary
 
 type kappa_handler = 
-  {agents_dic : agent_dic; 
+  {
+    agents_dic : agent_dic; 
    interface_constraints: agent_specification Int_storage.Nearly_inf_Imperatif.t;
    sites: site_dic Int_storage.Nearly_inf_Imperatif.t;
    states_dic: state_dic Int_storage.Nearly_inf_Imperatif.t Int_storage.Nearly_inf_Imperatif.t;

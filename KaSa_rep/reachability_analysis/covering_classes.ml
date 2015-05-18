@@ -244,11 +244,14 @@ let clean_classes parameter error classes =
               in
               if is_empty_set potential_superset
               then
-                store_remanent
-                  parameter
-                  error
-                  covering_class
-                  remanent
+                let error, result_covering_dic =
+                  store_remanent
+                    parameter
+                    error
+                    covering_class
+                    remanent
+                in
+                error, result_covering_dic
               else
                 aux tl' potential_superset
         in
@@ -256,11 +259,14 @@ let clean_classes parameter error classes =
         if is_empty_set potential_supersets
         then
           (*if it is empty then store it to remanent*)
-          store_remanent
-            parameter
-            error
-            covering_class
-            remanent
+          let error, result_covering_dic =
+            store_remanent
+              parameter
+              error
+              covering_class
+              remanent
+          in
+          error, result_covering_dic
         else
           aux tl potential_supersets)
     (error, init_remanent)
@@ -334,17 +340,21 @@ let scan_rule parameter error handler rule classes =
                 agent.Cckappa_sig.agent_interface []
             in
             let agent_type = agent.Cckappa_sig.agent_name in
+            (*get agent_dic here*)
+            let agent_dic = handler.Cckappa_sig.agents_dic in
             (* store new_covering_class in the classes of the agent type
                agent_type *)
-            let error,covering_classes =
+            let error, covering_classes =
               add_covering_class
                 parameter
                 error
                 agent_type
                 sites_list
-                covering_classes
+                (snd covering_classes)
             in
-            error, covering_classes                   
+            (*return a pair of (agent_dic, covering classes)*)
+            error, 
+            (agent_dic, covering_classes)
       )
       rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
       rule.Cckappa_sig.diff_reverse
@@ -495,6 +505,21 @@ let print_modification parameter error store_dic store_modified_set =
 (************************************************************************************)
 (*MAIN PRINT*)
 
+let print_agent_dic parameter error agent_dic =
+  Ckappa_sig.Dictionary_of_agents.print
+    parameter
+    error
+    (fun parameter error i agent_name () () ->
+      let _ = Printf.fprintf
+        (Remanent_parameters.get_log parameter) "%s%d:%s\n"
+        (Remanent_parameters.get_prefix parameter) i agent_name        
+      in
+      error
+    )
+    agent_dic
+
+(*------------------------------------------------------------------------------*)
+
 let print_result parameter error result_remanent =
   Covering_classes_type.AgentMap.print
     error
@@ -522,7 +547,7 @@ let print_result parameter error result_remanent =
           print_re_index
             parameter
             error
-            remanent.Covering_classes_type.store_dic          
+            remanent.Covering_classes_type.store_dic
         in
         (*------------------------------------------------------------------------------*)
         (*sites that are tested in covering classes*)
@@ -542,34 +567,19 @@ let print_result parameter error result_remanent =
     parameter
     result_remanent
 
-(*------------------------------------------------------------------------------*)
-
-let dump_agent parameter error handler =
-  let agent_dic = handler.Cckappa_sig.agents_dic in
-  let acc = ref [] in
-  let _ = 
-    Ckappa_sig.Dictionary_of_agents.print
-      parameter
-      error
-      (fun parameter error i v a b ->
-        acc := v::!acc ;
-        error)
-      agent_dic
-  in ();
-  !acc
-
 (************************************************************************************)   
 (*RULES*)
 
 let scan_rule_set parameter error handler rules =
   let n_agents = handler.Cckappa_sig.nagents in
+  let init_agent_dic = Ckappa_sig.Dictionary_of_agents.init () in
   let error, init_class = Covering_classes_type.AgentMap.create parameter error n_agents
   in
   (*------------------------------------------------------------------------------*)
   (*init state of covering class*)
   let init_class =
     {
-      Covering_classes_type.store_covering_classes = init_class
+      Covering_classes_type.store_covering_classes = (init_agent_dic, init_class)
     }
   in
   (*------------------------------------------------------------------------------*)
@@ -597,39 +607,7 @@ let scan_rule_set parameter error handler rules =
       parameter
       error
       (fun parameters error agent_type value_list init_remanent ->
-        (*TEST site_dic*)
-        let get_sites = handler.Cckappa_sig.sites in
-        let error, get_site = 
-          Int_storage.Nearly_inf_Imperatif.unsafe_get
-            parameter
-            error
-            agent_type
-            get_sites
-        in
-        let site =
-          match get_site with
-            | None -> Ckappa_sig.Dictionary_of_sites.init ()
-            | Some site_dic -> site_dic
-        in
-        let _ =
-          Ckappa_sig.Dictionary_of_sites.print
-            parameter
-            error
-            (fun parameter error i v _ _ ->
-              match v with
-                | Ckappa_sig.Internal site_name ->
-                  let _ =
-                    Printf.fprintf stdout "internal:site_name:%s:%i\n" site_name i
-                  in
-                  error
-                | Ckappa_sig.Binding site_name ->
-                  let _ =
-                  Printf.fprintf stdout "binding:site_name:%s:%i\n" site_name i
-                  in error
-            )
-            site
-        in
-       (*clean the covering classes, removed duplicate covering classes*)
+        (*clean the covering classes, removed duplicate covering classes*)
         let error, store_remanent =
           clean_classes
             parameters
@@ -648,18 +626,22 @@ let scan_rule_set parameter error handler rules =
         (*result*)
         error, store_dic
       )
-      scan_rule.Covering_classes_type.store_covering_classes
+      (snd scan_rule.Covering_classes_type.store_covering_classes)
       init_result
   in
-  error, remanent_dictionary (*FIXME: find a better return type*)
+  (*get agent_dic from scan_rule *)
+  let agent_dic =
+    (fst scan_rule.Covering_classes_type.store_covering_classes)
+  in
+  error, 
+  (agent_dic, remanent_dictionary) (*FIXME: find a better return type*)
 
 (************************************************************************************)   
 (*MAIN*)
 
 let covering_classes parameter error handler cc_compil =
-  let agent_list = dump_agent parameter error handler in
-  let _ = print_string "Agents:"; print_string_list (List.rev agent_list) in
-  let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in        
+  let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
   let error, result = scan_rule_set parameter error handler cc_compil.Cckappa_sig.rules in
-  let _ = print_result parameter error result in
+  let _ = print_agent_dic parameter error (fst result) in
+  let _ = print_result parameter error (snd result) in
   error, result

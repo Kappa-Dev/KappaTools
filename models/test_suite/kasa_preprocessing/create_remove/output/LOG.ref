@@ -72,20 +72,18 @@ Quarks:agent_modif-:agent_type:1,rule:1->[0]
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Influence_map:Wake_up_map:rule(0):'r0' A()->B() -> rule(1):'r1' B()->C()[0->0]
 Potential dependencies between sites:
-Agents:{A; B; C}
 Flow of information in the stochastic semantics:
 Agents:{A; B; C}
 Flow of information in the ODE semantics:
 rule_id:0
+agent_type:0:anchor_type:{}
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:0:
 rule_id:1
-* Sites that are modified:
-* Sites that are modified-site_dic:
-* Anchor sites:
-* Anchor sites 2:
-* Internal flow:
-Flow of information in the ODE semantics:agent_type:0:
-Flow of information in the ODE semantics:agent_type:1:
-Flow of information in the ODE semantics:agent_type:0:
-Flow of information in the ODE semantics:agent_type:1:
+agent_type:1:anchor_type:{}
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:1:
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:1:
 * External flow:
 execution finished without any exception

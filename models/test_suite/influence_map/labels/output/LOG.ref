@@ -134,8 +134,7 @@ Influence_map:Wake_up_map:rule(3):'\0' A(x~q)->A(x~p) -> rule(1):'otherothervery
 Influence_map:Inhibition_map:rule(2):'"0' A(x~q)->A(x~u) -> rule(3):'\0' A(x~q)->A(x~p)[0->0]
 Influence_map:Inhibition_map:rule(3):'\0' A(x~q)->A(x~p) -> rule(2):'"0' A(x~q)->A(x~u)[0->0]
 Potential dependencies between sites:
-Agents:{A}
-internal:site_name:x:0
+Potential dependencies between sites:agent_type:0:A
 Potential dependencies between sites:agent_type:0:
 Covering_class_id:0:site_type:{0}
 Number of covering classes:1
@@ -146,35 +145,24 @@ Flow of information in the stochastic semantics:
 Agents:{A}
 Flow of information in the ODE semantics:
 rule_id:0
-Flow of information in the ODE semantics:agent_type:0:
-Modified sites:{0}
-
-Internal:x:0
+agent_type:0:site_modified:0->x(internal state)
+agent_type:0:anchor_type:{}
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:0:
 rule_id:1
-Flow of information in the ODE semantics:agent_type:0:
-Modified sites:{0}
-
-Internal:x:0
+agent_type:0:site_modified:0->x(internal state)
+agent_type:0:anchor_type:{}
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:0:
 rule_id:2
-Flow of information in the ODE semantics:agent_type:0:
-Modified sites:{0}
-
-Internal:x:0
+agent_type:0:site_modified:0->x(internal state)
+agent_type:0:anchor_type:{}
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:0:
 rule_id:3
-Flow of information in the ODE semantics:agent_type:0:
-Modified sites:{0}
-
-Internal:x:0
-* Sites that are modified:
-Flow of information in the ODE semantics:agent_type:0:
-modified_type:{0}
-* Sites that are modified-site_dic:
-Flow of information in the ODE semantics:agent_type:0:
-Internal:site_type_modif:x:0
-* Anchor sites:
-* Anchor sites 2:
-* Internal flow:
-Flow of information in the ODE semantics:agent_type:0:
-Flow of information in the ODE semantics:agent_type:0:
+agent_type:0:site_modified:0->x(internal state)
+agent_type:0:anchor_type:{}
+Flow of information in the ODE semantics:0:
+Flow of information in the ODE semantics:0:
 * External flow:
 execution finished without any exception
