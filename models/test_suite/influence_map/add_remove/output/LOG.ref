@@ -191,5 +191,4 @@ Flow of information in the ODE semantics:rule_id:2
 Flow of information in the ODE semantics:agent_type:1:site_modified:0->x(internal state)
 Flow of information in the ODE semantics:rule_id:3
 Flow of information in the ODE semantics:agent_type:1:site_modified:0->x(internal state)
-Flow of information in the ODE semantics:External flow:
 execution finished without any exception

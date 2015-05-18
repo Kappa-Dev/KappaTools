@@ -487,5 +487,4 @@ Flow of information in the ODE semantics:Internal flow:
 - agent_type:0:site_type:3 -> agent_type:0:modified_type:4
 Flow of information in the ODE semantics:Internal flow:
 - agent_type:0:site_type:2 -> agent_type:0:modified_type:4
-Flow of information in the ODE semantics:External flow:
 execution finished without any exception

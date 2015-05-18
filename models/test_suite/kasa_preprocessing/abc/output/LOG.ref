@@ -527,6 +527,8 @@ Flow of information in the ODE semantics:rule_id:1
 Flow of information in the ODE semantics:agent_type:0:site_modified:0->x(binding state)
 Flow of information in the ODE semantics:agent_type:1:site_modified:0->x(binding state)
 Flow of information in the ODE semantics:agent_type:1:anchor_type:{0}
+Flow of information in the ODE semantics:External flow:
+- agent_type:1:anchor_type:0 -> agent_type:0:modified_type:0
 Flow of information in the ODE semantics:rule_id:2
 Flow of information in the ODE semantics:agent_type:0:site_modified:1->c(binding state)
 Flow of information in the ODE semantics:agent_type:2:site_modified:2->x1(binding state)
@@ -543,6 +545,8 @@ Flow of information in the ODE semantics:Internal flow:
 - agent_type:2:site_type:2 -> agent_type:2:modified_type:0
 Flow of information in the ODE semantics:Internal flow:
 - agent_type:2:site_type:0 -> agent_type:2:modified_type:2
+Flow of information in the ODE semantics:External flow:
+- agent_type:0:anchor_type:1 -> agent_type:2:modified_type:2
 Flow of information in the ODE semantics:rule_id:4
 Flow of information in the ODE semantics:agent_type:0:site_modified:1->c(binding state)
 Flow of information in the ODE semantics:agent_type:2:site_modified:3->x2(binding state)
@@ -587,6 +591,4 @@ Flow of information in the ODE semantics:Internal flow:
 - agent_type:2:site_type:0 -> agent_type:2:anchor_type:3
 Flow of information in the ODE semantics:External flow:
 - agent_type:2:anchor_type:3 -> agent_type:0:modified_type:1
-- agent_type:0:anchor_type:1 -> agent_type:2:modified_type:2
-- agent_type:1:anchor_type:0 -> agent_type:0:modified_type:0
 execution finished without any exception

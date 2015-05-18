@@ -864,9 +864,19 @@ let collect_external_flow parameter error release
 	bond_fst_list
         bond_snd_set
     in
-    (*store by getting the old result and combine with the current result*)
-    let external_flow = List.concat [collect_external_flow; store_external_flow] in
-    error, external_flow)
+    (*PRINT*)
+    let _ =
+      let rec aux acc =
+        match acc with
+          | [] -> acc
+          | (agent_type,x,agent_type',y) :: tl ->
+            Printf.fprintf stdout
+              "Flow of information in the ODE semantics:External flow:\n- agent_type:%i:anchor_type:%i -> agent_type:%i:modified_type:%i\n"
+              agent_type x agent_type' y;
+            aux tl
+      in aux collect_external_flow
+    in
+    error, collect_external_flow)
     (error, store_external_flow)
     release
     
@@ -1003,42 +1013,10 @@ let scan_rule_set parameter error handler rules =
       ) rules init_ode
   in
   error, ode_class
-           
-(************************************************************************************)
-(*PRINT*)
-
-let print_external_flow result =
-  let rec aux acc =
-    match acc with
-      | [] -> acc
-      | (agent_type,x,agent_type',y) :: tl ->
-        Printf.fprintf stdout
-          "- agent_type:%i:anchor_type:%i -> agent_type:%i:modified_type:%i\n"
-          agent_type x agent_type' y;
-        aux tl
-  in aux result
-  
-(************************************************************************************)
-(*MAIN PRINT*)
-    
-let print_ode parameter error
-    { store_sites_modified_set;
-      store_sites_bond_pair_set;
-      store_sites_bond_pair_set_external;
-      store_sites_lhs;
-      store_sites_anchor_set;
-      store_internal_flow;
-      store_external_flow
-    } =
-  let _ = Printf.fprintf stdout "Flow of information in the ODE semantics:External flow:\n" in
-  let _ = print_external_flow store_external_flow in
-  ()
     
 (************************************************************************************)     
 (*MAIN*)
 
 let ode_fragmentation parameter error handler cc_compil =
-  (* let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in*)
   let error, result = scan_rule_set parameter error handler cc_compil.Cckappa_sig.rules in
-  let _ = print_ode parameter error result in
   error, result

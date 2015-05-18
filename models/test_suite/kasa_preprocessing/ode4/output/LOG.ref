@@ -216,5 +216,4 @@ Flow of information in the ODE semantics:agent_type:1:site_modified:1->y(binding
 Flow of information in the ODE semantics:agent_type:2:site_modified:0->x(binding state)
 Flow of information in the ODE semantics:Internal flow:
 - agent_type:1:site_type:0 -> agent_type:1:modified_type:1
-Flow of information in the ODE semantics:External flow:
 execution finished without any exception
