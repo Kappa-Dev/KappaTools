@@ -92,18 +92,6 @@ let main () =
     else 
       error,None 
   in
-  let error,stoc_flow = 
-    if Remanent_parameters.get_do_stochastic_flow_of_information parameters 
-    then 
-      let parameters_sv = Remanent_parameters.update_prefix parameters "Flow of information in the stochastic semantics:" in
-      let _ = 
-	if (Remanent_parameters.get_trace parameters_sv) || Stochastic_classes.trace 
-	then Printf.fprintf (Remanent_parameters.get_log parameters_sv) "Flow of information in the stochastic semantics:\n"
-      in
-      let error, stochastic_classes =
-        Stochastic_classes.stochastic_classes parameters_sv error handler c_compil in error, Some stochastic_classes 
-    else error,None 
-  in
   let error,ode_flow = 
     if Remanent_parameters.get_do_ODE_flow_of_information parameters
     then 
