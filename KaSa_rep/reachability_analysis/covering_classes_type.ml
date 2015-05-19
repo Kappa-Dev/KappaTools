@@ -21,13 +21,14 @@ module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
 
 type agent_dic =  Ckappa_sig.agent_dic
 
-type sites_covering_classes  = (agent_dic * int list list AgentMap.t) 
-
 type set = Cckappa_sig.Site_map_and_set.set
+
+type sites_covering_classes  = (agent_dic * int list list AgentMap.t) 
                              
 type covering_classes =
   {
-    store_covering_classes : sites_covering_classes
+    store_sites_modified_set : set AgentMap.t;
+    store_covering_classes   : sites_covering_classes
   }
 
 (************************************************************************************)
@@ -52,5 +53,6 @@ type pair_dic = (unit, unit) Dictionary_of_Covering_class.dictionary
 type remanent =
   {
     store_pointer_backward : set Inf_array.t;
-    store_dic              : pair_dic
+    store_dic              : (set Inf_array.t * pair_dic)
+    (*store_project_modfied  : int list Inf_array.t*)
   }

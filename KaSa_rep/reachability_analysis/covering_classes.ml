@@ -74,11 +74,11 @@ let print_dic parameter error remanent_field =
   Covering_classes_type.Dictionary_of_Covering_class.print
     parameter
     error
-    (fun parameter error i v _ _ ->
+    (fun parameter error i value _ _ ->
       let _ =
         Printf.fprintf stdout "int:%i\n" i;
         print_string "value_list:";
-        print_list v; print_string "\n"
+        print_list value; print_string "\n"
       in
       error
     ) remanent_field
@@ -140,8 +140,9 @@ let store_pointer_backward parameter error id pointer_backward covering_class =
 let store_remanent parameter error covering_class remanent =
   (* current state of remanent*)
   let pointer_backward    = remanent.Covering_classes_type.store_pointer_backward in
-  let good_covering_class = remanent.Covering_classes_type.store_dic in
-  (*------------------------------------------------------------------------------*)
+  let good_covering_class = (snd remanent.Covering_classes_type.store_dic) in
+  let modified_set  = (fst remanent.Covering_classes_type.store_dic) in
+ (*------------------------------------------------------------------------------*)
   match covering_class with
   | [] -> error, remanent
   | _ ->
@@ -175,7 +176,7 @@ let store_remanent parameter error covering_class remanent =
      error,
      {
        Covering_classes_type.store_pointer_backward = pointer_backward;
-       Covering_classes_type.store_dic              = store_dic
+       Covering_classes_type.store_dic              = (modified_set, store_dic)
      }
 
 (*------------------------------------------------------------------------------*)
@@ -189,8 +190,20 @@ let store_remanent parameter error covering_class remanent =
   -> 0
 *)
 
-let clean_classes parameter error classes =
+let set_init_remanent parameter error =
   let error, init_pointer = Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
+  let error, init_modif = Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
+  let init_dic = Covering_classes_type.Dictionary_of_Covering_class.init () in
+  (*------------------------------------------------------------------------------*)
+  (*init state of dictionary*)
+  {
+    Covering_classes_type.store_pointer_backward = init_pointer;
+    Covering_classes_type.store_dic              = (init_modif, init_dic)
+  }
+
+
+let clean_classes parameter error classes =
+  (*let error, init_pointer = Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
   let init_dic = Covering_classes_type.Dictionary_of_Covering_class.init () in
   (*------------------------------------------------------------------------------*)
   (*init state of dictionary*)
@@ -199,7 +212,7 @@ let clean_classes parameter error classes =
       Covering_classes_type.store_pointer_backward = init_pointer;
       Covering_classes_type.store_dic              = init_dic
     }
-  in
+  in*)
   (*------------------------------------------------------------------------------*)
   (*cleaning*)
   let current_covering_classes = length_sorted classes in
@@ -269,7 +282,7 @@ let clean_classes parameter error classes =
           error, result_covering_dic
         else
           aux tl potential_supersets)
-    (error, init_remanent)
+    (error, set_init_remanent parameter error)
     current_covering_classes
 
 (************************************************************************************)   
@@ -320,6 +333,67 @@ let add_covering_class parameter error agent_type sites_list covering_classes =
 *)
 
 let scan_rule parameter error handler rule classes =
+  (*collect modified_set*)
+  let error, store_sites_modified_set =
+    Int_storage.Quick_Nearly_inf_Imperatif.fold
+      parameter
+      error
+      (fun parameter error agent_id site_modif store_sites_modified_set ->
+        let agent_type = site_modif.Cckappa_sig.agent_name in
+        if Cckappa_sig.Site_map_and_set.is_empty_map
+          site_modif.Cckappa_sig.agent_interface
+        then
+          error, store_sites_modified_set
+        else
+          let site_set =
+            Cckappa_sig.Site_map_and_set.fold_map
+              (fun site _ current_set ->
+                let error, set =
+                  Cckappa_sig.Site_map_and_set.add_set
+                    parameter
+                    error
+                    site
+                    current_set
+                in set)
+              site_modif.Cckappa_sig.agent_interface
+              Cckappa_sig.Site_map_and_set.empty_set
+          in
+          (*store*)
+          (*get old_modified_set*)
+          let error, out_old_set =
+            Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get
+              parameter
+              error
+              agent_type
+              store_sites_modified_set
+          in
+          let old_set =
+            match out_old_set with
+              | None -> Cckappa_sig.Site_map_and_set.empty_set
+              | Some s -> s
+          in
+          (*union the old and the current one*)
+          let error, set =
+            Cckappa_sig.Site_map_and_set.union
+              parameter
+              error
+              site_set
+              old_set
+          in
+          let error, store_sites_modified_set =
+            Int_storage.Quick_Nearly_inf_Imperatif.set
+              parameter
+              error
+              agent_type
+              set
+              store_sites_modified_set
+          in
+          error, store_sites_modified_set
+      )
+      rule.Cckappa_sig.diff_reverse
+      classes.Covering_classes_type.store_sites_modified_set
+  in
+  (*compute covering_class*)
   let error, store_covering_classes =
     Int_storage.Quick_Nearly_inf_Imperatif.fold2_common
       parameter error
@@ -333,6 +407,7 @@ let scan_rule parameter error handler rule classes =
          match agent with
          | Cckappa_sig.Ghost -> error, covering_classes
          | Cckappa_sig.Agent agent ->
+           (*get a list of sites from an interface at each rule*)
             let sites_list =
               Cckappa_sig.Site_map_and_set.fold_map
 	        (fun site _ current_class ->
@@ -340,7 +415,7 @@ let scan_rule parameter error handler rule classes =
                 agent.Cckappa_sig.agent_interface []
             in
             let agent_type = agent.Cckappa_sig.agent_name in
-            (*get agent_dic here*)
+            (*get agent_dic*)
             let agent_dic = handler.Cckappa_sig.agents_dic in
             (* store new_covering_class in the classes of the agent type
                agent_type *)
@@ -363,7 +438,8 @@ let scan_rule parameter error handler rule classes =
   (*------------------------------------------------------------------------------*)
   error,
   {
-    Covering_classes_type.store_covering_classes = store_covering_classes
+    Covering_classes_type.store_sites_modified_set = store_sites_modified_set;
+    Covering_classes_type.store_covering_classes  = store_covering_classes
   }           
 
 (************************************************************************************)   
@@ -402,26 +478,20 @@ let re_index_value_list value_list =
         (nth + 1) :: aux tl
   in aux value_list
 
-(*TEST*)
-
-
 (*------------------------------------------------------------------------------*)
-(*Projection*)(*TODO*)
+(*Projection site that are modified with new index*)
 
-let project_modified_site parameter error value_list store_modified_set =
+let project_modified_site parameter error value_list modified_set =
   let rec aux acc =
     match acc with
       | [] -> acc
       | x :: tl ->
-        (*if x is a member of value_list; if yes then return the new position of
-          x; otherwise continue to the rest of the list*)
-        if List.mem x value_list (*TODO: change value_list to value_set*)
+        if Cckappa_sig.Site_map_and_set.mem_set x modified_set
         then
           let n = (position x value_list) + 1 in
           n :: aux tl
         else aux tl        
-  in aux store_modified_set
-
+  in aux value_list
 
 (************************************************************************************)   
 (*PRINT*)
@@ -431,7 +501,7 @@ let print_remanent_dic parameter error store_dic =
     parameter
     error
     (fun parameter error elt value_list _ _ ->
-      let _ = Printf.printf "Covering_class_id:%i:" elt in
+      let _ = Printf.printf "Potential dependencies between sites:Covering_class_id:%i:" elt in
       let _ = print_string "site_type:";
         print_list value_list
       in
@@ -446,7 +516,7 @@ let print_re_index parameter error store_dic =
     error
     (fun parameter error elt value_list _ _ ->
       let _ = 
-        Printf.fprintf stdout "Re-index the sites in Covering_class_id:%i:site_type:" elt;
+        Printf.fprintf stdout "Potential dependencies between sites:New-index:Covering_class_id:%i:site_type:" elt;
         let re_index = re_index_value_list value_list in
         print_list re_index
       in
@@ -461,26 +531,17 @@ let print_site_test parameter error store_dic =
     error
     (fun parameter error elt value_list _ _ ->
       let _ = 
-        Printf.fprintf stdout "TEST:Covering_class_id:%i:\n" elt;
+        Printf.fprintf stdout "Potential dependencies between sites:TEST:Covering_class_id:%i:site_type:" elt;
         let re_index = re_index_value_list value_list in
-        let site_test =
-          let rec aux acc =
-            match acc with
-              | [] -> acc
-              | x :: tl ->
-                Printf.fprintf stdout "site_type:%i\n" x;
-                aux tl
-          in
-          aux re_index
-        in
+        let site_test = print_list re_index in
         site_test
       in
       error      
     ) store_dic
 
 (*------------------------------------------------------------------------------*)
-(*FIXME*)
-let print_modification parameter error store_dic store_modified_set =
+
+let print_modification parameter error store_dic modified_set =
   Covering_classes_type.Dictionary_of_Covering_class.print
     parameter
     error
@@ -491,10 +552,10 @@ let print_modification parameter error store_dic store_modified_set =
             parameter
             error
             value_list
-            store_modified_set
+            modified_set
         in
         let _ = 
-          Printf.fprintf stdout "\nCovering_class_id:%i:site_type:" elt;
+          Printf.fprintf stdout "Potential dependencies between sites:New-index:Covering_class_id:%i:site_modified:" elt;
           print_list modified
         in
         error
@@ -530,7 +591,7 @@ let print_result parameter error result_remanent =
           print_remanent_dic
             parameter
             error
-            remanent.Covering_classes_type.store_dic
+            (snd remanent.Covering_classes_type.store_dic)
         in
         (*------------------------------------------------------------------------------*)
         (* number of covering classes*)
@@ -538,28 +599,35 @@ let print_result parameter error result_remanent =
           number_of_covering_classes
             parameter
             error
-            remanent.Covering_classes_type.store_dic
+            (snd remanent.Covering_classes_type.store_dic)
         in
-        let _ = Printf.fprintf stdout "Number of covering classes:%i\n" number in
+        let _ = Printf.fprintf stdout "Potential dependencies between sites:Number of covering classes:%i\n" number in
         (*------------------------------------------------------------------------------*)
         (* re-index site in covering classes*)
         let _ =
           print_re_index
             parameter
             error
-            remanent.Covering_classes_type.store_dic
+            (snd remanent.Covering_classes_type.store_dic)
         in
+        (*STORE*)
+       
         (*------------------------------------------------------------------------------*)
         (*sites that are tested in covering classes*)
         let _ =
           print_site_test
             parameter
             error
-            remanent.Covering_classes_type.store_dic
+            (snd remanent.Covering_classes_type.store_dic)
         in
         (*------------------------------------------------------------------------------*)
         (*sites that are modified in covering classes*)
-      
+        (*let _ =
+          print_modification
+            parameter
+            error
+            (snd remanent.Covering_classes_type.store_dic)
+        in*)
         (*------------------------------------------------------------------------------*)
         error
       in
@@ -573,22 +641,24 @@ let print_result parameter error result_remanent =
 let scan_rule_set parameter error handler rules =
   let n_agents = handler.Cckappa_sig.nagents in
   let init_agent_dic = Ckappa_sig.Dictionary_of_agents.init () in
+  let error, init_modif = Covering_classes_type.AgentMap.create parameter error n_agents
+  in
   let error, init_class = Covering_classes_type.AgentMap.create parameter error n_agents
   in
   (*------------------------------------------------------------------------------*)
   (*init state of covering class*)
   let init_class =
     {
+      Covering_classes_type.store_sites_modified_set = init_modif;
       Covering_classes_type.store_covering_classes = (init_agent_dic, init_class)
     }
   in
   (*------------------------------------------------------------------------------*)
   (*map each agent to a covering classes*)
-  let error, scan_rule =
+  let error, store_covering_classes =
     Int_storage.Nearly_inf_Imperatif.fold
       parameter error
       (fun parameter error rule_id rule classes ->
-        (*let _ = Printf.fprintf stdout "rule_id:%i\n" rule_id in*)
         scan_rule
           parameter
           error
@@ -615,25 +685,46 @@ let scan_rule_set parameter error handler rules =
             value_list
         in
         (*store the covering classes after cleaning the duplicate*)
-        let error, store_dic =
+        let error, store_remanent_dic =
           Covering_classes_type.AgentMap.set
             parameters
             error
             agent_type
             store_remanent
             init_remanent
-        in 
+        in
+        (*get modified site*)
+        let error, out_modified_set =
+          Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get
+            parameter
+            error
+            agent_type
+            store_covering_classes.Covering_classes_type.store_sites_modified_set
+        in
+        let modified_set =
+          match out_modified_set with
+            | None -> Cckappa_sig.Site_map_and_set.empty_set
+            | Some s -> s
+        in
+        let _ =
+          print_modification
+            parameter
+            error
+            (snd store_remanent.Covering_classes_type.store_dic)
+            modified_set
+        in
         (*result*)
-        error, store_dic
+        error, 
+        store_remanent_dic
       )
-      (snd scan_rule.Covering_classes_type.store_covering_classes)
+      (snd store_covering_classes.Covering_classes_type.store_covering_classes)
       init_result
   in
   (*get agent_dic from scan_rule *)
   let agent_dic =
-    (fst scan_rule.Covering_classes_type.store_covering_classes)
+    (fst store_covering_classes.Covering_classes_type.store_covering_classes)
   in
-  error, 
+  error,
   (agent_dic, remanent_dictionary) (*FIXME: find a better return type*)
 
 (************************************************************************************)   

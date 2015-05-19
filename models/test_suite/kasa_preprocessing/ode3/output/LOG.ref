@@ -161,35 +161,31 @@ Quarks:site_modif-:agent_type:1,site_type:0,state:0,rule:0->[1]
 Quarks:site_modif-:agent_type:2,site_type:0,state:0,rule:1->[1]
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Potential dependencies between sites:
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:{1; 2}
+Potential dependencies between sites:New-index:Covering_class_id:1:site_modified:{1}
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:{1}
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:{1}
 Potential dependencies between sites:agent_type:0:A
 Potential dependencies between sites:agent_type:1:B
 Potential dependencies between sites:agent_type:2:C
 Potential dependencies between sites:agent_type:0:
-Covering_class_id:0:site_type:{0; 1}
-Covering_class_id:1:site_type:{2}
-Number of covering classes:2
-Re-index the sites in Covering_class_id:0:site_type:{1; 2}
-Re-index the sites in Covering_class_id:1:site_type:{1}
-TEST:Covering_class_id:0:
-site_type:1
-site_type:2
-TEST:Covering_class_id:1:
-site_type:1
+Potential dependencies between sites:Covering_class_id:0:site_type:{0; 1}
+Potential dependencies between sites:Covering_class_id:1:site_type:{2}
+Potential dependencies between sites:Number of covering classes:2
+Potential dependencies between sites:New-index:Covering_class_id:0:site_type:{1; 2}
+Potential dependencies between sites:New-index:Covering_class_id:1:site_type:{1}
+Potential dependencies between sites:TEST:Covering_class_id:0:site_type:{1; 2}
+Potential dependencies between sites:TEST:Covering_class_id:1:site_type:{1}
 Potential dependencies between sites:agent_type:1:
-Covering_class_id:0:site_type:{0}
-Number of covering classes:1
-Re-index the sites in Covering_class_id:0:site_type:{1}
-TEST:Covering_class_id:0:
-site_type:1
+Potential dependencies between sites:Covering_class_id:0:site_type:{0}
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:New-index:Covering_class_id:0:site_type:{1}
+Potential dependencies between sites:TEST:Covering_class_id:0:site_type:{1}
 Potential dependencies between sites:agent_type:2:
-Covering_class_id:0:site_type:{0}
-Number of covering classes:1
-Re-index the sites in Covering_class_id:0:site_type:{1}
-TEST:Covering_class_id:0:
-site_type:1
-Flow of information in the stochastic semantics:
-Flow of information in the stochastic semantics:agent_type:0:
-site_type:[|0; 0; 2|]
+Potential dependencies between sites:Covering_class_id:0:site_type:{0}
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:New-index:Covering_class_id:0:site_type:{1}
+Potential dependencies between sites:TEST:Covering_class_id:0:site_type:{1}
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
 Flow of information in the ODE semantics:agent_type:0:site_modified:0->x(internal state)

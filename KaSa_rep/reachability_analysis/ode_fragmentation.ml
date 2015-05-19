@@ -157,6 +157,12 @@ let fold_anchor_set parameter error store_sites_anchor_set1 store_sites_anchor_s
 (***********************************************************************************)
 (*MODIFIED SITES*)
 
+(*TEST*)
+let empty_value_site value =
+  match value with
+    | Ckappa_sig.Internal _ -> ""
+    | Ckappa_sig.Binding _ -> ""
+
 let collect_sites_modified_set parameter error rule handler store_sites_modified_set =
   let error, store_sites_modified_set =
     Int_storage.Quick_Nearly_inf_Imperatif.fold
@@ -223,6 +229,7 @@ let collect_sites_modified_set parameter error rule handler store_sites_modified
 		  | Ckappa_sig.Binding s ->
 		    Printf.fprintf stdout "site_modified:%i->%s(binding state)\n" site s
               in
+              (*FIXME: how to use value type here?*)
               let error, some_allocate =
 		Ckappa_sig.Dictionary_of_sites.allocate
 		  parameter

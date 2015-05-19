@@ -410,52 +410,42 @@ Influence_map:Inhibition_map:rule(3):'r3' R(k,t),E(y)->R(k,t!1),E(y!1) -> rule(2
 Influence_map:Inhibition_map:rule(4):'r4' R(x,y,z),E(x)->R(x!1,y,z),E(x!1) -> rule(1):'r1' Sh(x~u,y),R(x,y,z)->Sh(x~p,y!1),R(x,y,z!1)[0->1]
 Influence_map:Inhibition_map:rule(4):'r4' R(x,y,z),E(x)->R(x!1,y,z),E(x!1) -> rule(2):'r2' R(x,y,z),R(k,t)->R(x,y!1,z),R(k!1,t)[0->0]
 Potential dependencies between sites:
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:{1; 2; 3}
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:{1}
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:{1; 2; 3}
+Potential dependencies between sites:New-index:Covering_class_id:1:site_modified:{1; 2}
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:{1}
+Potential dependencies between sites:New-index:Covering_class_id:1:site_modified:{1}
 Potential dependencies between sites:agent_type:0:ab
 Potential dependencies between sites:agent_type:1:Sh
 Potential dependencies between sites:agent_type:2:R
 Potential dependencies between sites:agent_type:3:E
 Potential dependencies between sites:agent_type:0:
-Covering_class_id:0:site_type:{0}
-Number of covering classes:1
-Re-index the sites in Covering_class_id:0:site_type:{1}
-TEST:Covering_class_id:0:
-site_type:1
+Potential dependencies between sites:Covering_class_id:0:site_type:{0}
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:New-index:Covering_class_id:0:site_type:{1}
+Potential dependencies between sites:TEST:Covering_class_id:0:site_type:{1}
 Potential dependencies between sites:agent_type:1:
-Covering_class_id:0:site_type:{0; 1; 2}
-Number of covering classes:1
-Re-index the sites in Covering_class_id:0:site_type:{1; 2; 3}
-TEST:Covering_class_id:0:
-site_type:1
-site_type:2
-site_type:3
+Potential dependencies between sites:Covering_class_id:0:site_type:{0; 1; 2}
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:New-index:Covering_class_id:0:site_type:{1; 2; 3}
+Potential dependencies between sites:TEST:Covering_class_id:0:site_type:{1; 2; 3}
 Potential dependencies between sites:agent_type:2:
-Covering_class_id:0:site_type:{0; 1; 4}
-Covering_class_id:1:site_type:{2; 3}
-Number of covering classes:2
-Re-index the sites in Covering_class_id:0:site_type:{1; 2; 3}
-Re-index the sites in Covering_class_id:1:site_type:{1; 2}
-TEST:Covering_class_id:0:
-site_type:1
-site_type:2
-site_type:3
-TEST:Covering_class_id:1:
-site_type:1
-site_type:2
+Potential dependencies between sites:Covering_class_id:0:site_type:{0; 1; 4}
+Potential dependencies between sites:Covering_class_id:1:site_type:{2; 3}
+Potential dependencies between sites:Number of covering classes:2
+Potential dependencies between sites:New-index:Covering_class_id:0:site_type:{1; 2; 3}
+Potential dependencies between sites:New-index:Covering_class_id:1:site_type:{1; 2}
+Potential dependencies between sites:TEST:Covering_class_id:0:site_type:{1; 2; 3}
+Potential dependencies between sites:TEST:Covering_class_id:1:site_type:{1; 2}
 Potential dependencies between sites:agent_type:3:
-Covering_class_id:0:site_type:{1}
-Covering_class_id:1:site_type:{0}
-Number of covering classes:2
-Re-index the sites in Covering_class_id:0:site_type:{1}
-Re-index the sites in Covering_class_id:1:site_type:{1}
-TEST:Covering_class_id:0:
-site_type:1
-TEST:Covering_class_id:1:
-site_type:1
-Flow of information in the stochastic semantics:
-Flow of information in the stochastic semantics:agent_type:1:
-site_type:[|0; 0; 0|]
-Flow of information in the stochastic semantics:agent_type:2:
-site_type:[|0; 0; 0; 0; 0|]
+Potential dependencies between sites:Covering_class_id:0:site_type:{1}
+Potential dependencies between sites:Covering_class_id:1:site_type:{0}
+Potential dependencies between sites:Number of covering classes:2
+Potential dependencies between sites:New-index:Covering_class_id:0:site_type:{1}
+Potential dependencies between sites:New-index:Covering_class_id:1:site_type:{1}
+Potential dependencies between sites:TEST:Covering_class_id:0:site_type:{1}
+Potential dependencies between sites:TEST:Covering_class_id:1:site_type:{1}
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
 Flow of information in the ODE semantics:agent_type:1:site_modified:0->x(internal state)
