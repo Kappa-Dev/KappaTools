@@ -49,10 +49,11 @@ module Covering_class =
 module Dictionary_of_Covering_class = Dictionary.Dictionary_of_Ord (Covering_class)
                                                                     
 type pair_dic = (unit, unit) Dictionary_of_Covering_class.dictionary
+type index_dic = (unit, unit) Dictionary_of_Covering_class.dictionary
     
 type remanent =
   {
     store_pointer_backward : set Inf_array.t;
-    store_dic              : (set Inf_array.t * pair_dic)
-    (*store_project_modfied  : int list Inf_array.t*)
+    store_dic              : (set Inf_array.t * pair_dic);
+    store_new_index_dic    : index_dic
   }
