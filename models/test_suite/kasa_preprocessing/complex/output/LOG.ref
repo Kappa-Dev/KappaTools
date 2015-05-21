@@ -401,27 +401,138 @@ Influence_map:Inhibition_map:rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~
 Influence_map:Inhibition_map:rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2) -> rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!_,y!_),C(x~u,y~p)[0->0]
 Influence_map:Inhibition_map:rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!_,y!_),C(x~u,y~p) -> rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2)[0->0]
 Potential dependencies between sites:
-Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:{1; 2}
-Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:{1; 2}
-Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:{3; 4}
-Potential dependencies between sites:agent_type:0:A
-Potential dependencies between sites:agent_type:1:B
-Potential dependencies between sites:agent_type:2:C
+state:[state_min:1;state_max:1][state_min:0;state_max:0]
 Potential dependencies between sites:agent_type:0:
-Potential dependencies between sites:Covering_class_id:0:site_type:{0; 1}
-Potential dependencies between sites:Number of covering classes:1
-Potential dependencies between sites:New-index:Covering_class_id:0:site_type:{1; 2}
-Potential dependencies between sites:TEST:Covering_class_id:0:site_type:{1; 2}
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
 Potential dependencies between sites:agent_type:1:
-Potential dependencies between sites:Covering_class_id:0:site_type:{0; 1}
-Potential dependencies between sites:Number of covering classes:1
-Potential dependencies between sites:New-index:Covering_class_id:0:site_type:{1; 2}
-Potential dependencies between sites:TEST:Covering_class_id:0:site_type:{1; 2}
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
 Potential dependencies between sites:agent_type:2:
-Potential dependencies between sites:Covering_class_id:0:site_type:{0; 1; 2; 3}
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
+Potential dependencies between sites:agent_type:0:
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
+Potential dependencies between sites:agent_type:1:
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
+Potential dependencies between sites:agent_type:2:
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
+state:[state_min:2;state_max:2][state_min:1;state_max:2][state_min:1;state_max:1][state_min:0;state_max:0]
+Potential dependencies between sites:agent_type:0:
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
+Potential dependencies between sites:agent_type:1:
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
+Potential dependencies between sites:agent_type:2:
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
+Potential dependencies between sites:agent_type:0:
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
+Potential dependencies between sites:agent_type:1:
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
+Potential dependencies between sites:agent_type:2:
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
+state:[state_min:1;state_max:1][state_min:0;state_max:0]
+Potential dependencies between sites:agent_type:0:
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
+Potential dependencies between sites:agent_type:1:
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
+Potential dependencies between sites:agent_type:2:
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
+Potential dependencies between sites:agent_type:0:
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
+Potential dependencies between sites:agent_type:1:
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
+Potential dependencies between sites:agent_type:2:
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->y(binding state)
+Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
+Potential dependencies between sites:agent_type:0:
 Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:site_type:{1; 0}
+Potential dependencies between sites:New-index:Covering_class_id:0:site_type:{1; 2}
+Potential dependencies between sites:New-index:TEST:Covering_class_id:0:site_type{1; 2}
+Potential dependencies between sites:agent_type:1:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:site_type:{1; 0}
+Potential dependencies between sites:New-index:Covering_class_id:0:site_type:{1; 2}
+Potential dependencies between sites:New-index:TEST:Covering_class_id:0:site_type{1; 2}
+Potential dependencies between sites:agent_type:2:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:site_type:{3; 2; 1; 0}
 Potential dependencies between sites:New-index:Covering_class_id:0:site_type:{1; 2; 3; 4}
-Potential dependencies between sites:TEST:Covering_class_id:0:site_type:{1; 2; 3; 4}
+Potential dependencies between sites:New-index:TEST:Covering_class_id:0:site_type{1; 2; 3; 4}
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
 Flow of information in the ODE semantics:agent_type:0:site_modified:0->x(binding state)

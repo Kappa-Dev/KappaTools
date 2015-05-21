@@ -157,12 +157,6 @@ let fold_anchor_set parameter error store_sites_anchor_set1 store_sites_anchor_s
 (***********************************************************************************)
 (*MODIFIED SITES*)
 
-(*TEST*)
-let empty_value_site value =
-  match value with
-    | Ckappa_sig.Internal _ -> ""
-    | Ckappa_sig.Binding _ -> ""
-
 let collect_sites_modified_set parameter error rule handler store_sites_modified_set =
   let error, store_sites_modified_set =
     Int_storage.Quick_Nearly_inf_Imperatif.fold
@@ -175,82 +169,64 @@ let collect_sites_modified_set parameter error rule handler store_sites_modified
         then
           error, store_sites_modified_set
         else
-          (*collect site and return a set *)
-          let site_set =
-            SiteSet.fold_map
-              (fun site _ current_set ->
-                let error, set =
-                  SiteSet.add_set
-                    parameter
-                    error
-                    site
-                    current_set
-                in set)
+          (*get a site_dic from handler*)
+          let error, site_dic =
+	    Misc_sa.unsome
+	      (AgentMap.get
+	         parameter
+	         error
+	         agent_type
+	         handler.Cckappa_sig.sites)
+	      (fun error -> warn parameter error (Some "line 204") Exit
+                (Ckappa_sig.Dictionary_of_sites.init()))
+	  in
+          (*get a pair of (site_set, value)*)
+          let pair_site =
+            SiteSet.fold_map (fun site _ (current_set, error) ->
+              (*get a set of site*)
+              let error, set =
+                SiteSet.add_set
+                  parameter
+                  error
+                  site
+                  current_set
+              in
+              (*get value*)
+              let error, (value, _, _) =
+	        Misc_sa.unsome
+	          (Ckappa_sig.Dictionary_of_sites.translate
+		     parameter
+		     error
+		     site
+		     site_dic)
+	          (fun error -> warn parameter error (Some "line 216") Exit
+                    (Ckappa_sig.Internal "", (), ()))
+	      in
+              (*PRINT*)
+	      let print_value = 
+                Printf.fprintf stdout
+                  "Flow of information in the ODE semantics:agent_type:%i:" agent_type;
+                match value with
+	          | Ckappa_sig.Internal s ->
+		    Printf.fprintf stdout "site_modified:%i->%s(internal state)\n" site s
+	          | Ckappa_sig.Binding s ->
+		    Printf.fprintf stdout "site_modified:%i->%s(binding state)\n" site s
+              in
+              (set, error)
+            )
               site_modif.Cckappa_sig.agent_interface
-              SiteSet.empty_set
+              (SiteSet.empty_set, error)
           in
-          (*store*)
+          (*store only site_set*)
           let error, store_sites_modified_set =
             AgentMap.set
               parameter
               error
               agent_type
-              site_set
+              (fst pair_site)
               store_sites_modified_set
           in
-          (*------------------------------------------------------------------------------*)
-          (*get side_dic*)
-          let error, site_dic =
-	  Misc_sa.unsome
-	    (AgentMap.get
-	       parameter
-	       error
-	       agent_type
-	       handler.Cckappa_sig.sites)
-	    (fun error -> warn parameter error (Some "line 204") Exit (Ckappa_sig.Dictionary_of_sites.init()))
-	in
-	let _ =
-	  SiteSet.fold_map
-	    (fun site _ current_dic ->
-	      let error, (value, _, _) =
-		Misc_sa.unsome
-		  (Ckappa_sig.Dictionary_of_sites.translate
-		     parameter
-		     error
-		     site
-		     site_dic)
-		  (fun error -> warn parameter error (Some "line 216") Exit (Ckappa_sig.Internal "", (), ()))
-	      in
-	      let _ = 
-                Printf.fprintf stdout "Flow of information in the ODE semantics:agent_type:%i:" agent_type;
-                match value with
-		  | Ckappa_sig.Internal s ->
-		    Printf.fprintf stdout "site_modified:%i->%s(internal state)\n" site s
-		  | Ckappa_sig.Binding s ->
-		    Printf.fprintf stdout "site_modified:%i->%s(binding state)\n" site s
-              in
-              (*FIXME: how to use value type here?*)
-              let error, some_allocate =
-		Ckappa_sig.Dictionary_of_sites.allocate
-		  parameter
-		  error
-		  Misc_sa.compare_unit
-		  value
-		  ()
-		  Misc_sa.const_unit
-		  site_dic
-	      in
-	      let error, (id,dic) =
-		match some_allocate with
-		  | None -> warn parameter error (Some "line 258") Exit (0,current_dic)
-		  | Some (id, _, _, dic) -> error, (id,dic)
-	      in
-	      dic
-	    )
-            site_modif.Cckappa_sig.agent_interface
-            (Ckappa_sig.Dictionary_of_sites.init ())
-        in
-        error, store_sites_modified_set
+          error, store_sites_modified_set
       )
       rule.Cckappa_sig.diff_reverse
       store_sites_modified_set
