@@ -213,6 +213,8 @@ Influence_map:Inhibition_map:rule(3):'' A()-> -> rule(2):'' B(x!_)->B(x)[0*->0]
 Influence_map:Inhibition_map:rule(4):'' B(x)-> -> rule(0):'' A(x),B(x)->A(x!1),B(x!1)[0->1]
 Influence_map:Inhibition_map:rule(4):'' B(x)-> -> rule(2):'' B(x!_)->B(x)[0->0]
 Potential dependencies between sites:
+value_index_dic:{1}
+
 state:[state_min:1;state_max:1][state_min:0;state_max:0]
 Potential dependencies between sites:agent_type:0:
 Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
@@ -221,6 +223,8 @@ Potential dependencies between sites:agent_type:1:
 Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
 Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
 Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
+value_index_dic:{1}
+
 state:[state_min:0;state_max:0][state_min:1;state_max:1][state_min:0;state_max:0]
 Potential dependencies between sites:agent_type:0:
 Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)

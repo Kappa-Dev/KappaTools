@@ -157,6 +157,8 @@ Quarks:site_modif-:agent_type:1,site_type:0,state:2,rule:1->[0]
 Quarks:site_modif-:agent_type:2,site_type:0,state:1,rule:1->[1]
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Potential dependencies between sites:
+value_index_dic:{1; 2}
+
 state:[state_min:1;state_max:1]
 Potential dependencies between sites:agent_type:0:
 Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
@@ -174,6 +176,8 @@ Potential dependencies between sites:New-index:Covering_class_id:0:site_modified
 Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
 Potential dependencies between sites:agent_type:2:
 Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:2->x(binding state)
+value_index_dic:{1}
+
 state:[state_min:2;state_max:2][state_min:1;state_max:1]
 Potential dependencies between sites:agent_type:0:
 Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
@@ -183,6 +187,8 @@ Potential dependencies between sites:New-index:Covering_class_id:0:site_modified
 Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
 Potential dependencies between sites:agent_type:2:
 Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
+value_index_dic:{1}
+
 state:[state_min:1;state_max:1]
 Potential dependencies between sites:agent_type:0:
 Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->y(binding state)
@@ -194,7 +200,7 @@ Potential dependencies between sites:agent_type:2:
 Potential dependencies between sites:New-index:Covering_class_id:0:site_modified:1->x(binding state)
 Potential dependencies between sites:agent_type:0:
 Potential dependencies between sites:Number of covering classes:1
-Potential dependencies between sites:Covering_class_id:0:site_type:{1; 0}
+Potential dependencies between sites:Covering_class_id:0:site_type:{0; 1}
 Potential dependencies between sites:New-index:Covering_class_id:0:site_type:{1; 2}
 Potential dependencies between sites:New-index:TEST:Covering_class_id:0:site_type{1; 2}
 Potential dependencies between sites:agent_type:1:

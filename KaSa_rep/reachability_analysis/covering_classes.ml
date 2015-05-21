@@ -233,6 +233,10 @@ let store_remanent parameter error pair_covering_class remanent =
          (fun error -> warn parameter error (Some "line 236") Exit
            ([], (),()))
      in
+     let _ =
+       print_string "value_index_dic:";
+       print_list value_index_dic; print_string "\n"
+     in
      (*return site_test_dic*)
      let error, out_value_dic =
        Covering_classes_type.Dictionary_of_Covering_class.allocate
@@ -384,7 +388,7 @@ let add_covering_class parameter error agent_type pair_site store_covering_class
        in
        (* store the new list of covering classes *)
        (*let new_list = (fst (List.rev pair_site)) :: old_list in*)
-       let new_pair = (fst pair_site) :: (fst old_pair) in
+       let new_pair = (List.rev (fst pair_site)) :: (fst old_pair) in
        let new_string = (snd pair_site) ^ (snd old_pair) in
        Covering_classes_type.AgentMap.set
          parameter
@@ -601,8 +605,8 @@ let project_modified_site parameter error value_list modified_set =
       | x :: tl ->
         if Cckappa_sig.Site_map_and_set.mem_set x modified_set
         then
-          let n = (position x value_list) + 1 in
-          n :: aux tl
+          let nth_1 = (position x value_list) + 1 in
+          nth_1 :: aux tl
         else aux tl        
   in aux value_list
 
@@ -685,6 +689,36 @@ let print_dic_and_new_index parameter error store_index store_test store_dic =
 
 (*------------------------------------------------------------------------------*)
 
+let print_value_site parameter error elt site value_site =
+  Int_storage.Quick_Nearly_inf_Imperatif.print
+    error
+    (fun error parameter value_site_list ->
+      let _ =
+        let rec aux_value acc' =
+          match acc' with
+            | [] -> acc'
+            | vsite :: tl' ->
+              let _ =
+                Printf.fprintf stdout 
+                  "Potential dependencies between sites:New-index:Covering_class_id:%i:" elt;
+                match vsite with
+                  | Ckappa_sig.Internal s ->
+		    Printf.fprintf stdout "site_modified:%i->%s(internal state)\n"
+                      site s
+	          | Ckappa_sig.Binding s ->
+		    Printf.fprintf stdout "site_modified:%i->%s(binding state)\n"
+                      site s                                     
+              in
+              aux_value tl'
+        in
+        aux_value value_site_list
+      in
+      error
+    )
+    parameter
+    value_site
+(*------------------------------------------------------------------------------*)
+
 let print_modification parameter error modified_set value_site store_dic =
   Covering_classes_type.Dictionary_of_Covering_class.print
     parameter
@@ -698,43 +732,24 @@ let print_modification parameter error modified_set value_site store_dic =
             value_list
             modified_set
         in
-        (*print value_site*)
+        (*print modified site with new index*)
         let rec aux acc =
           match acc with
             | [] -> acc
             | site :: tl ->
               let _ =
-                (*print value_site*)
-                Int_storage.Quick_Nearly_inf_Imperatif.print
-                  error
-                  (fun error parameter value_site_list ->
-                    let _ =
-                      let rec aux_value acc' =
-                        match acc' with
-                          | [] -> acc'
-                          | vsite :: tl' ->
-                            let _ =
-                              Printf.fprintf stdout 
-                                "Potential dependencies between sites:New-index:Covering_class_id:%i:" elt;
-                              match vsite with
-                                | Ckappa_sig.Internal s ->
-		                  Printf.fprintf stdout "site_modified:%i->%s(internal state)\n"
-                                    site s
-	                        | Ckappa_sig.Binding s ->
-		                  Printf.fprintf stdout "site_modified:%i->%s(binding state)\n"
-                                    site s                                     
-                            in
-                            aux_value tl'
-                      in
-                      aux_value value_site_list
-                    in
-                    error
-                  )
+                print_value_site
                   parameter
+                  error
+                  elt
+                  site
                   value_site
               in aux tl
-        in aux modified_list
-      in error) store_dic
+        in
+        aux modified_list
+      in
+      error)
+    store_dic
     
 (************************************************************************************)
 (*MAIN PRINT*)
@@ -820,7 +835,6 @@ let scan_rule_set parameter error handler rules =
     Int_storage.Nearly_inf_Imperatif.fold
       parameter error
       (fun parameter error rule_id rule classes ->
-        (*let _ = Printf.fprintf stdout "rule_id:%i\n" rule_id in*)
         scan_rule
           parameter
           error
