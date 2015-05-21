@@ -783,6 +783,20 @@ let new_node wk type_id =
 
 module NodeMap = MapExt.Make(Node)
 
+let check_edge graph = function
+  | ((Fresh (_,id),site),ToNothing) -> Edges.is_free id site graph
+  | ((Fresh (_,id),site),ToInternal i) -> Edges.is_internal i id site graph
+  | ((Fresh (_,id),site),ToNode (Existing id',site')) ->
+     Edges.link_exists id site id' site' graph
+  | ((Fresh (_,id),site),ToNode (Fresh (_,id'),site')) ->
+     Edges.link_exists id site id' site' graph
+  | ((Existing id,site),ToNothing) -> Edges.is_free id site graph
+  | ((Existing id,site),ToInternal i) -> Edges.is_internal i id site graph
+  | ((Existing id,site),ToNode (Existing id',site')) ->
+     Edges.link_exists id site id' site' graph
+  | ((Existing id,site),ToNode (Fresh (_,id'),site')) ->
+     Edges.link_exists id site id' site' graph
+
 let injection_for_one_more_edge inj graph = function
   | ((Fresh _,_),_) -> None
   | ((Existing id,site),ToNothing) ->
@@ -856,10 +870,12 @@ module Matching = struct
 		   (Env.get domain son.dst,inj')::re,IntMap.add son.dst inj' ca)
 	     (remains,cache) point.sons in
 	 aux cache' acc' remains' in
-    match Env.navigate domain edges with
-    | None -> []
-    | Some (cc_id,inj,point) ->
-       aux (IntMap.add cc_id inj IntMap.empty) [] [(point,inj)]
+    if List.for_all (check_edge graph) edges then
+      match Env.navigate domain edges with
+      | None -> []
+      | Some (cc_id,inj,point) ->
+	 aux (IntMap.add cc_id inj IntMap.empty) [] [(point,inj)]
+    else []
 
   let observables_from_free domain graph ty node_id site =
     if site = 0 then

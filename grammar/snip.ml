@@ -591,7 +591,9 @@ let rec complete_with_creation (removed,added) links_transf fresh = function
 let connected_components_of_mixture created env mix =
   let rec aux env transformations links_transf acc = function
     | [] ->
-       (env,(acc,complete_with_creation transformations links_transf 0 created))
+       let removed,added = transformations in
+       let transformations' = (List.rev removed, List.rev added) in
+       (env,(acc,complete_with_creation transformations' links_transf 0 created))
     | h :: t ->
        let wk = Connected_component.begin_new env in
      let (wk_out,(removed,added),l_t,remains) =

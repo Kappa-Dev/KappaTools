@@ -161,6 +161,10 @@ let perturbate env domain counter graph state =
 let one_rule env domain counter graph state =
   let rule_id,_ = Random_tree.random state.activities in
   let _,rule = env.Environment.rules.NamedDecls.decls.(rule_id) in
+  let () =
+    if !Parameter.debugModeOn then
+      Format.printf "@[<v>Applied@ @[%a@]@]@."
+		    (Kappa_printer.elementary_rule env) rule in
   let get_alg i = get_alg env state i in
   (* let () = *)
   (*   Format.eprintf "%a@." (Rule_interpreter.print_injections env) graph in *)
@@ -170,9 +174,8 @@ let one_rule env domain counter graph state =
      let () = update_activity get_alg env counter graph state in
      let () =
        if !Parameter.debugModeOn then
-	 Format.printf "@[<v>Applied@ @[%a@]@ Obtained@ %a@]@."
-			(Kappa_printer.elementary_rule env) rule
-			(Rule_interpreter.print env) graph' in
+	 Format.printf "@[<v>Obtained@ %a@]@."
+		       (Rule_interpreter.print env) graph' in
      Some (graph',state)
 
 let a_loop form env domain counter graph state =
