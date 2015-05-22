@@ -188,7 +188,7 @@ type c_agent =
 
 type c_mixture = 
     { 
-      c_views :  c_agent Int_storage.Quick_Nearly_inf_Imperatif.t;
+      c_views : c_agent Int_storage.Quick_Nearly_inf_Imperatif.t;
       c_bonds : site_address C_site_map_and_set.map Int_storage.Nearly_inf_Imperatif.t; 
       c_plus  : (int * int) list;
       c_dot   : (int * int) list
