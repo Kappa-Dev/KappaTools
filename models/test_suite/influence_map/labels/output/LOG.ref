@@ -142,6 +142,8 @@ Potential dependencies between sites:New-index:Covering_class_id:0:
 site_type:1->state:[state_min:2;state_max:2]
 Potential dependencies between sites:New-index:TEST:Covering_class_id:0:
 site_type:1->state:[state_min:2;state_max:2]
+Potential dependencies between sites:New-index:MODIFICATION+:Covering_class_id:0:
+site_type:1->state:
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
 Flow of information in the ODE semantics:agent_type:0:site_modified:0->x(internal state)
