@@ -40,6 +40,19 @@ type covering_classes =
 
 module Inf_array = Int_storage.Nearly_inf_Imperatif
 
+(*module Covering_class =
+  struct
+    type t = 
+      | Covering_class of (site * port) list
+      | Modified_class of site list
+
+    let get_covering_class t =
+      match t with
+        | Covering_class x -> x
+       
+    let compare = compare
+  end*)
+
 module Covering_class =
   struct
     type t = (site * port) list
