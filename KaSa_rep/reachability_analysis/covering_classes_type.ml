@@ -23,13 +23,11 @@ type agent_dic  = Ckappa_sig.agent_dic
 type set        = Cckappa_sig.Site_map_and_set.set
 type value_site = (Ckappa_sig.site_name, Ckappa_sig.site_name) Ckappa_sig.site_type
 type port       = Cckappa_sig.state_index Cckappa_sig.interval Cckappa_sig.port
-
-type sites_covering_classes  = int list list
-                             
+                            
 type covering_classes =
   {
     store_sites_modified_set : (set AgentMap.t * value_site list AgentMap.t);
-    store_covering_classes   : (sites_covering_classes *  string) AgentMap.t
+    store_covering_classes   : ((int * string) list list) AgentMap.t
   }
 
 (************************************************************************************)
@@ -43,7 +41,7 @@ module Inf_array = Int_storage.Nearly_inf_Imperatif
                      
 module Covering_class =
   struct
-    type t = int list
+    type t = (int * string) list
     let compare = compare
   end
 
