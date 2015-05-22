@@ -71,7 +71,7 @@ type 'mixture rule =
       rhs   : 'mixture; 
       k_def : 'mixture Ast.ast_alg_expr Term.with_pos; 
       k_un  : 'mixture Ast.ast_alg_expr Term.with_pos option
-  }
+    }
 
 type 'mixture perturbation = 'mixture Ast.perturbation 
 
@@ -87,9 +87,9 @@ type ('a,'b) site_type =
   | Internal of 'a 
   | Binding  of 'b 
       
-type site  = (site_name,site_name) site_type     
+type site  = (site_name, site_name) site_type     
 
-type state = (internal_state,binding_state) site_type  
+type state = (internal_state, binding_state) site_type  
 
 module State = 
 struct
@@ -149,7 +149,7 @@ type kappa_handler =
 type c_agent_name = int
 type c_site_name  = int 
 type c_state      = int 
-type 'a interval  = {min:'a ; max:'a}
+type 'a interval  = {min:'a; max:'a}
   
 type c_port = 
     { 
@@ -212,8 +212,7 @@ type c_rule =
     }
 
 type c_perturbation = 
-  (((c_mixture Ast.ast_alg_expr Ast.bool_expr) * position)
-   * (c_modif_expr list) 
+  (((c_mixture Ast.ast_alg_expr Ast.bool_expr) * position) * (c_modif_expr list) 
    * (c_mixture Ast.ast_alg_expr Ast.bool_expr * position) option) * position
 
 and c_modif_expr = 
@@ -223,7 +222,7 @@ and c_modif_expr =
   | C_STOP     of position
   | C_SNAPSHOT of position (*maybe later of mixture too*)
 
-type enriched_rule = 
+type enriched_rule =
     {
       e_rule_label  : (string * position) option; 
       e_rule_direct : bool; 
