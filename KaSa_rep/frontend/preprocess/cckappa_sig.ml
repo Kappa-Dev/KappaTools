@@ -23,7 +23,7 @@ type binding_state =
     | Free 
     | Lnk_type of agent_name * site_name 
 
-type site  = (site_name,site_name) Ckappa_sig.site_type     
+type site  = (site_name,site_name) Ckappa_sig.site_type
 type state = (Ckappa_sig.internal_state,binding_state) Ckappa_sig.site_type  
  
 module State = 
@@ -34,23 +34,26 @@ end
     
 type state_index = int
 
-module Dictionary_of_States = Dictionary.Dictionary_of_Ord(State)
+module Dictionary_of_States = Dictionary.Dictionary_of_Ord (State)
   
 type state_dic = (unit,unit) Dictionary_of_States.dictionary
   
 type kappa_handler = 
-  {
-    nrules: int; 
-    nvars: int;
-    nagents:int ;
-    agents_dic : Ckappa_sig.agent_dic; 
-    interface_constraints: Ckappa_sig.agent_specification Int_storage.Nearly_inf_Imperatif.t;
-    sites: Ckappa_sig.site_dic Int_storage.Nearly_inf_Imperatif.t;
-    states_dic: state_dic Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.t;
-    dual: (agent_name * site_name * state_index) Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.t;
-  }          
+    {
+      nrules                : int; 
+      nvars                 : int; 
+      nagents               : int;
+      agents_dic            : Ckappa_sig.agent_dic; 
+      interface_constraints : Ckappa_sig.agent_specification
+                              Int_storage.Nearly_inf_Imperatif.t;
+      sites                 : Ckappa_sig.site_dic Int_storage.Nearly_inf_Imperatif.t;
+      states_dic            : state_dic
+                              Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.t;
+      dual                  : (agent_name * site_name * state_index)
+                 Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.t;
+    }
      
-type 'a interval = {min:'a;max:'a}
+type 'a interval = {min:'a; max:'a}
   
 type 'state port = 
   { 
@@ -80,7 +83,7 @@ let upgrade_interface ag interface  =
   {
     agent_kasim_id  = ag.agent_kasim_id;
     agent_name      = ag.agent_name; 
-    agent_interface =  interface;
+    agent_interface = interface;
     agent_position  = ag.agent_position 
   }
 
@@ -193,11 +196,11 @@ type perturbation =
         ((mixture Ast.ast_alg_expr Ast.bool_expr*position)  option)) * position
 
 and modif_expr = 
-	| INTRO    of (mixture Ast.ast_alg_expr * mixture * position) 
-	| DELETE   of (mixture Ast.ast_alg_expr * mixture * position) 
-	| UPDATE   of (string * position * mixture Ast.ast_alg_expr * position) (*TODO: pause*)
-	| STOP     of position
-	| SNAPSHOT of position (*maybe later of mixture too*)
+  | INTRO    of (mixture Ast.ast_alg_expr * mixture * position) 
+  | DELETE   of (mixture Ast.ast_alg_expr * mixture * position) 
+  | UPDATE   of (string * position * mixture Ast.ast_alg_expr * position) (*TODO: pause*)
+  | STOP     of position
+  | SNAPSHOT of position (*maybe later of mixture too*)
 
 type enriched_rule = 
   {
