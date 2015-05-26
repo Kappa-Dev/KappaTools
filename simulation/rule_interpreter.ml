@@ -39,9 +39,9 @@ let update_roots is_add map cc root =
     cc ((if is_add then RootHeap.alloc else desallocate) root va) map
 
 let from_place (inj_nodes,inj_fresh,free_id as inj2graph) = function
-  | Transformations.Existing n ->
+  | Transformations.Existing (n,id) ->
      (Connected_component.Node.get_sort n,
-      Connected_component.Matching.get n inj_nodes,
+      Connected_component.Matching.get (n,id) inj_nodes,
       inj2graph)
   | Transformations.Fresh (ty,id) ->
      try (ty,Mods.IntMap.find id inj_fresh,inj2graph)
@@ -114,7 +114,7 @@ let instance_number state ccs_l =
 	(RootHeap.size (Connected_component.Map.find cc state.roots_of_ccs))
     with Not_found -> Nbr.zero in
   let rect_approx ccs =
-    List.fold_left (fun acc cc -> Nbr.mult acc (size cc)) (Nbr.I 1) ccs in
+    Array.fold_left (fun acc cc -> Nbr.mult acc (size cc)) (Nbr.I 1) ccs in
   List.fold_left (fun acc ccs -> Nbr.add acc (rect_approx ccs)) Nbr.zero ccs_l
 
 let value_bool ~get_alg counter state expr =
@@ -148,13 +148,13 @@ let transform_by_a_rule ~get_alg domain counter state rule inj =
 
 let apply_rule ~get_alg domain counter state rule =
   let inj =
-    List.fold_left
-      (fun inj cc ->
+    Tools.array_fold_lefti
+      (fun id inj cc ->
        let root =
 	 RootHeap.random (Connected_component.Map.find cc state.roots_of_ccs) in
        match inj with
        | Some inj ->
-	  Connected_component.Matching.reconstruct state.edges inj cc root
+	  Connected_component.Matching.reconstruct state.edges inj id cc root
        | None -> None)
       (Some Connected_component.Matching.empty)
       rule.Primitives.connected_components in
@@ -164,14 +164,14 @@ let apply_rule ~get_alg domain counter state rule =
   | None -> None
 
 let all_injections state rule =
-  List.fold_left
-    (fun inj_list cc ->
+  Tools.array_fold_lefti
+    (fun id inj_list cc ->
      RootHeap.fold
        (fun _ root new_injs ->
 	List.fold_left
 	  (fun corrects inj ->
 	   match Connected_component.Matching.reconstruct
-		   state.edges inj cc root with
+		   state.edges inj id cc root with
 	   | None -> corrects
 	   | Some new_inj -> new_inj :: corrects)
 	new_injs inj_list)

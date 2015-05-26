@@ -17,7 +17,7 @@ type alg_expr =
   | UN_ALG_OP of Term.un_alg_op * alg_expr Term.with_pos
   | STATE_ALG_OP of Term.state_alg_op
   | ALG_VAR of int
-  | KAPPA_INSTANCE of (int * Connected_component.t list list)
+  | KAPPA_INSTANCE of (int * Connected_component.t array list)
   | TOKEN_ID of int
   | CONST of Nbr.t
 

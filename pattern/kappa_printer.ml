@@ -73,9 +73,9 @@ let alg_expr env f alg =
     | Expr.KAPPA_INSTANCE (_,ccs) ->
        Pp.list
 	 (fun f -> Format.fprintf f " +@ ")
-	 (Pp.list
+	 (Pp.array
 	    (fun f -> Format.fprintf f "*")
-	    (fun f cc ->
+	    (fun _ f cc ->
 	     Format.fprintf
 	       f "|%a|"
 	       (Connected_component.print false env.Environment.signatures) cc))
@@ -106,14 +106,16 @@ let elementary_rule env f r =
       pr_alg va in
   let pr_trans f t =
     Transformations.print env.Environment.signatures f t in
-  let boxed_cc f cc =
+  let boxed_cc i f cc =
     let () = Format.pp_open_box f 2 in
+    let () = Format.pp_print_int f i in
+    let () = Format.pp_print_string f ": " in
     let () = Connected_component.print
 	       true env.Environment.signatures f cc in
     Format.pp_close_box f () in
   Format.fprintf
     f "@[%a@]@ -- @[@[%a@]@ @[%a@]@]@ ++ @[@[%a@]@ @[%a@]@]@ @@%a"
-    (Pp.list Pp.comma boxed_cc) r.Primitives.connected_components
+    (Pp.array Pp.comma boxed_cc) r.Primitives.connected_components
     (Pp.list Pp.comma pr_trans) r.Primitives.removed
     (Pp.list Pp.space pr_tok) r.Primitives.consumed_tokens
     (Pp.list Pp.comma pr_trans) r.Primitives.inserted

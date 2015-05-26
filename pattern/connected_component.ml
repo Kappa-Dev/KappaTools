@@ -814,9 +814,9 @@ let injection_for_one_more_edge inj graph = function
      | Some node -> Some (Dipping.add id' node inj)
 
 module Matching = struct
-  type t = int NodeMap.t * IntSet.t
+  type t = int NodeMap.t IntMap.t * IntSet.t
 
-  let empty = (NodeMap.empty, IntSet.empty)
+  let empty = (IntMap.empty, IntSet.empty)
 
   let from_dipping cc =
     Dipping.fold
@@ -827,7 +827,7 @@ module Matching = struct
 	 else
 	   Some (NodeMap.add (cc.id,find_ty cc src,src) dst acc, IntSet.add dst co))
 
-  let reconstruct graph inj cc root =
+  let reconstruct graph inj id cc root =
     match find_root cc with
     | None -> Some inj
     | Some (_,node) ->
@@ -841,9 +841,12 @@ module Matching = struct
 	   (Some dip) (List.tl (to_navigation false cc)) in
        match full_dip with
        | None -> failwith "Matching.reconstruct error"
-       | Some dip -> from_dipping cc dip (Some inj)
+       | Some dip ->
+	  match from_dipping cc dip (Some (NodeMap.empty, snd inj)) with
+	  | None -> None
+	  | Some (inj',co) -> Some (IntMap.add id inj' (fst inj),co)
 
-  let get node (t,_) = NodeMap.find node t
+  let get (node,id) (t,_) = NodeMap.find node (IntMap.find id t)
 
   let from_edge domain graph edges =
     let rec aux cache acc = function

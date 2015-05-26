@@ -32,7 +32,7 @@ end
 
 type elementary_rule = {
   rate : Expr.alg_expr;
-  connected_components : Connected_component.t list;
+  connected_components : Connected_component.t array;
   removed : Transformations.t list;
   inserted : Transformations.t list;
   consumed_tokens : (Expr.alg_expr * int) list;

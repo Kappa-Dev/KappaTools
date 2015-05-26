@@ -470,7 +470,7 @@ let define_positive_transformation (removed,added as transf) links_transf
        (transf,links_transf')
 
 
-let rec add_agents_in_cc wk registered_links transf links_transf remains =
+let rec add_agents_in_cc id wk registered_links transf links_transf remains =
   function
   | [] ->
      begin match IntMap.root registered_links with
@@ -479,10 +479,10 @@ let rec add_agents_in_cc wk registered_links transf links_transf remains =
      end
   | ag :: ag_l ->
      let (node,wk) = Connected_component.new_node wk ag.ra_type in
-     let place = Transformations.Existing node in
+     let place = Transformations.Existing (node,id) in
      let rec handle_ports wk r_l (removed,added) l_t re acc site_id =
        if site_id = Array.length ag.ra_ports
-       then add_agents_in_cc wk r_l (removed,added) l_t re acc
+       then add_agents_in_cc id wk r_l (removed,added) l_t re acc
        else
 	 let transf,wk' = match ag.ra_ints.(site_id) with
 	   | I_ANY -> (removed,added),wk
@@ -515,7 +515,7 @@ let rec add_agents_in_cc wk registered_links transf links_transf remains =
 	 | L_VAL ((i,pos),s) ->
 	    try
 	      let (node',site' as dst) = IntMap.find i r_l in
-	      let dst_place = (Transformations.Existing node',site') in
+	      let dst_place = (Transformations.Existing (node',id),site') in
 	      let wk'' = Connected_component.new_link wk' (node,site_id) dst in
 	      let transf',l_t' =
 		define_full_transformation
@@ -593,15 +593,16 @@ let rec complete_with_creation (removed,added) links_transf fresh = function
      handle_ports added links_transf 0
 
 let connected_components_of_mixture created env mix =
-  let rec aux env transformations links_transf acc = function
+  let rec aux env transformations links_transf acc id = function
     | [] ->
        let removed,added = transformations in
        let transformations' = (List.rev removed, List.rev added) in
-       (env,(acc,complete_with_creation transformations' links_transf 0 created))
+       (env,(Tools.array_rev_of_list acc,
+	     complete_with_creation transformations' links_transf 0 created))
     | h :: t ->
        let wk = Connected_component.begin_new env in
      let (wk_out,(removed,added),l_t,remains) =
-       add_agents_in_cc wk IntMap.empty transformations links_transf t [h] in
+       add_agents_in_cc id wk IntMap.empty transformations links_transf t [h] in
      let (env',inj, cc) = Connected_component.finish_new wk_out in
      let added' = List.map (Transformations.rename wk_out cc inj) added in
      let removed' = List.map (Transformations.rename wk_out cc inj) removed in
@@ -609,8 +610,8 @@ let connected_components_of_mixture created env mix =
 		  (fun (p,s as x) ->
 		   let p' = Transformations.rename_place wk cc inj p in
 		   if p == p' then x else (p',s)) l_t in
-     aux env' (removed',added') l_t' (cc::acc) remains
-  in aux env ([],[]) IntMap.empty [] mix
+     aux env' (removed',added') l_t' (cc::acc) (succ id) remains
+  in aux env ([],[]) IntMap.empty [] 0 mix
 
 let rule_mixtures_of_ambiguous_rule contact_map sigs lhs rhs =
   let precomp_mixs,created = annotate_lhs_with_diff sigs [] lhs rhs in

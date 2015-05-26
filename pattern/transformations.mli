@@ -1,5 +1,5 @@
 type place =
-    Existing of Connected_component.Node.t
+    Existing of Connected_component.Node.t * int (* node, id *)
   | Fresh of int * int (* type, id *)
 
 type t =
