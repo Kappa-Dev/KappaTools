@@ -81,7 +81,7 @@ let one_connected_component sigs free_id node graph =
 		  | None, dangling ->
 		     (succ free_id,links',
 		      Int2Map.add (node,i) free_id dangling,
-		      if n' <> node && List.mem n' todos then todos else n'::todos),
+		      if n' = node || List.mem n' todos then todos else n'::todos),
 		     Raw_mixture.VAL free_id
 		  | Some id, dangling' ->
 		     (free_id,links',dangling',todos), Raw_mixture.VAL id)

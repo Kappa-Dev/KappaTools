@@ -357,8 +357,12 @@ let complete_with_candidate ag id todo p_id p_switch =
        match port with
        | L_ANY s ->
 	  assert (s = Maintained);
+	  let s' =
+	    match p_switch with
+	      Maintained -> s
+	    | (Freed | Erased | Linked _) -> Freed in
 	  let ports' = Array.copy ag.ra_ports in
-	  let () = ports'.(i) <- L_VAL (Term.with_dummy_pos id,s) in
+	  let () = ports'.(i) <- L_VAL (Term.with_dummy_pos id,s') in
 	  ({ ra_type = ag.ra_type; ra_ports = ports'; ra_ints = ag.ra_ints; }, todo)
 	  :: acc
        | L_VAL ((k,_),s) when k > id ->
