@@ -156,7 +156,7 @@ let with_influence f = with_formatter !influenceFileName f
 
 let with_dump f =
   let desc = open_out !dumpFileName in
-  let () = f desc in
+  let () = f (Format.formatter_of_out_channel desc) in
   let () = close_out desc in
   Format.eprintf "Final state dumped (%s)@." !dumpFileName
 

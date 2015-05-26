@@ -22,7 +22,7 @@ val open_snapshot : string -> int -> string -> out_channel
 val with_snapshot :
   string -> int -> string -> (Format.formatter -> unit) -> unit
 
-val with_dump : (out_channel -> unit) -> unit
+val with_dump : (Format.formatter -> unit) -> unit
 
 val set_influence : string -> unit
 val set_up_influence : unit -> unit

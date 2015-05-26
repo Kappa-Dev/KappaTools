@@ -178,8 +178,11 @@ let one_rule env domain counter graph state =
 		       (Rule_interpreter.print env) graph' in
      Some (graph',state)
 
+let activity state =
+  Random_tree.total state.activities
+
 let a_loop form env domain counter graph state =
-  let activity = Random_tree.total state.activities in
+  let activity = activity state in
   let rd = Random.float 1.0 in
   let dt = abs_float (log rd /. activity) in
   if not (activity > 0.) || dt = infinity then

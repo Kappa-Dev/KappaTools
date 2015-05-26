@@ -1158,4 +1158,4 @@ let initialize logger overwrite result =
       end
     else state
   in
-  (Debug.tag logger "\t Done"; (env, domain, counter, graph, new_state, state))
+  (Debug.tag logger "\t Done"; (env, domain, counter, graph, new_state))

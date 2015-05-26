@@ -135,7 +135,7 @@ let () =
     Format.printf
       "+ Initialized random number generator with seed %d@." theSeed;
 
-    let (env, cc_env, counter, graph, new_state, state) =
+    let (env, cc_env, counter, graph, new_state) =
       match !Parameter.marshalizedInFile with
       | "" ->
 	 Eval.initialize Format.std_formatter !Parameter.alg_var_overwrite result
@@ -150,13 +150,13 @@ let () =
 	     else
 	       Format.printf "+Loading simulation package %s...@."
 			     marshalized_file in
-	   let env,cc_env,counter,graph,new_state,state =
+	   let env,cc_env,counter,graph,new_state =
 	     (Marshal.from_channel d :
 		Environment.t*Connected_component.Env.t*Counter.t*
-		  Rule_interpreter.t * State_interpreter.t * State.t) in
+		  Rule_interpreter.t * State_interpreter.t) in
 	   let () = Pervasives.close_in d  in
 	   let () = Format.printf "Done@." in
-	   (env,cc_env,counter,graph,new_state,state)
+	   (env,cc_env,counter,graph,new_state)
 	 with
 	 | _exn ->
 	    Debug.tag
@@ -168,25 +168,24 @@ let () =
     Kappa_files.setCheckFileExists() ;
 
     let () = Plot.create (Kappa_files.get_data ()) in
-    let () = if !Parameter.pointNumberValue > 0 then
-	       Plot.plot_now env (State.observables_values env counter state) in
+    let () =
+      if !Parameter.pointNumberValue > 0 then
+	Plot.plot_now
+	  env
+	  (State_interpreter.observables_values env counter graph new_state) in
 
     let () = Kappa_files.with_marshalized
 	       (fun d -> Marshal.to_channel
-			   d (env,cc_env,counter,state) [Marshal.Closures]) in
+			   d (env,cc_env,counter) [Marshal.Closures]) in
   let () = Kappa_files.with_ccFile
 	     (fun f -> Connected_component.Env.print_dot f cc_env) in
 
-    Kappa_files.with_influence
-      (fun d -> State.dot_of_influence_map d state env);
-    if !Parameter.compileModeOn
-    then
-      begin
-	State.dump_rules Format.err_formatter state env;
-	exit 0
-      end;
+(*    Kappa_files.with_influence
+      (fun d -> State.dot_of_influence_map d state env); *)
+    if !Parameter.compileModeOn then exit 0 else ();
+
     let profiling = Compression_main.init_secret_log_info () in
-    let _grid,profiling,event_list =
+(*    let _grid,profiling,event_list =
       if Environment.tracking_enabled env then
 	let () =
 	  if !Parameter.mazCompression
@@ -205,7 +204,7 @@ let () =
           Compression_main.secret_store_init profiling state event_list in
         grid,profiling,event_list
       else (Causal.empty_grid(),profiling,[])
-    in
+    in *)
     ExceptionDefn.flush_warning Format.err_formatter ;
     Parameter.initSimTime () ;
     let () =
@@ -226,20 +225,18 @@ let () =
 	   else
 	     match String.lowercase (Tools.read_input ()) with
 	     | ("y" | "yes") ->
-		let () =  Parameter.dotOutput := false in
-		Kappa_files.with_dump
-		  (fun desc ->
-		   State.snapshot
-		     state counter desc !Parameter.snapshotHighres env;
-		   Parameter.debugModeOn:=true;
-		   State.dump state counter env)
+		let () =
+		  Kappa_files.with_dump
+		    (fun f -> Rule_interpreter.print env f graph) in
+		Parameter.debugModeOn:=true;
+	     (*State.dump state counter env*)
 	     | _ -> ()
 	 end
       | ExceptionDefn.Deadlock ->
 	 Format.printf
 	   "?@.A deadlock was reached after %d events and %Es (Activity = %.5f)@."
 	   (Counter.event counter) (Counter.time counter)
-	   (State.total_activity state) in
+	   (State_interpreter.activity new_state) in
     Format.printf "Simulation ended";
     if Counter.null_event counter = 0 then Format.print_newline()
     else
@@ -269,8 +266,8 @@ let () =
 			      ((float_of_int n) /. (float_of_int (Counter.null_event counter)))
 	 |_ -> Format.printf "\tna@."
 	) counter.Counter.stat_null ;
-      if !Parameter.fluxModeOn then
-	Kappa_files.with_flux "" (fun d -> State.dot_of_flux d state env)
+(*      if !Parameter.fluxModeOn then
+	Kappa_files.with_flux "" (fun d -> State.dot_of_flux d state env)*)
   with
   | ExceptionDefn.Malformed_Decl er ->
      let () = close_desc None in
