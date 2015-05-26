@@ -9,6 +9,7 @@ val cn : pos -> int
 val option_map : ('a -> 'b) -> 'a option -> 'b option
 val iteri : (int -> unit) -> int -> unit
 val array_map_of_list : ('a -> 'b) -> 'a list -> 'b array
+val array_rev_of_list : 'a list -> 'a array
 val array_fold_lefti :
   (int -> 'a -> 'b -> 'a) -> 'a -> 'b array -> 'a
 val array_filter : (int -> 'a -> bool) -> 'a array -> int list

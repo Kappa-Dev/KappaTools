@@ -127,6 +127,19 @@ let array_map_of_list f l =
      let () = fill 1 ans l in
      ans
 
+let array_rev_of_list = function
+  | [] -> [||]
+  | h :: t ->
+     let l = succ (List.length t) in
+     let out = Array.make l h in
+     let rec fill i = function
+       | [] -> assert (i= -1)
+       | h' :: t' ->
+	  let () = Array.unsafe_set out i h' in
+	  fill (pred i) t' in
+     let () = fill (l - 2) t in
+     out
+
 let array_fold_lefti f x a =
   let y = ref x in
   let () = Array.iteri (fun i e -> y := f i !y e) a in
