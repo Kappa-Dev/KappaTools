@@ -42,7 +42,7 @@ let observables_values env counter graph state =
      env.Environment.observables)
 
 let do_it env domain counter graph state = function
-  | Primitives.ITER_RULE ((v,_),_,r) ->
+  | Primitives.ITER_RULE ((v,_),r) ->
      let get_alg i = get_alg env state i in
      let n = Rule_interpreter.value_alg counter graph ~get_alg v in
      (false,
@@ -120,7 +120,7 @@ let update_activity get_alg env counter graph state =
      let rate = Rule_interpreter.value_alg counter graph ~get_alg
 					   rule.Primitives.rate in
      let cc_exp =
-       Expr.KAPPA_INSTANCE (-3,[rule.Primitives.connected_components]) in
+       Expr.KAPPA_INSTANCE [rule.Primitives.connected_components] in
      let act =
        Nbr.mult
 	 rate (Rule_interpreter.value_alg counter graph ~get_alg cc_exp) in

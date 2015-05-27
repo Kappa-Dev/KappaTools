@@ -120,13 +120,13 @@ let instance_number state ccs_l =
 let value_bool ~get_alg counter state expr =
   Expr_interpreter.value_bool
     counter ~get_alg
-    ~get_mix:(fun (_,ccs) -> instance_number state ccs)
+    ~get_mix:(fun ccs -> instance_number state ccs)
     ~get_tok:(fun i -> state.tokens.(i))
     expr
 let value_alg ~get_alg counter state alg =
   Expr_interpreter.value_alg
     counter ~get_alg
-    ~get_mix:(fun (_,ccs) -> instance_number state ccs)
+    ~get_mix:(fun ccs -> instance_number state ccs)
     ~get_tok:(fun i -> state.tokens.(i))
     alg
 

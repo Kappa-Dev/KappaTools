@@ -17,7 +17,7 @@ type alg_expr =
   | UN_ALG_OP of Term.un_alg_op * alg_expr Term.with_pos
   | STATE_ALG_OP of Term.state_alg_op
   | ALG_VAR of int
-  | KAPPA_INSTANCE of (int * Connected_component.t array list)
+  | KAPPA_INSTANCE of Connected_component.t array list
   | TOKEN_ID of int
   | CONST of Nbr.t
 
@@ -29,18 +29,14 @@ val compile_alg :
   ?max_allowed_var:int ->
   (string list * (string * string) list) Export_to_KaSim.String2Map.t ->
   Connected_component.Env.t ->
-  int * (string option*Ast.mixture) list ->
   Ast.mixture Ast.ast_alg_expr Term.with_pos ->
-  Connected_component.Env.t *
-    (int * (string option*Ast.mixture) list) * alg_expr Term.with_pos
+  Connected_component.Env.t * alg_expr Term.with_pos
 val compile_bool :
   int Mods.StringMap.t -> int Mods.StringMap.t ->
   (string list * (string * string) list) Export_to_KaSim.String2Map.t ->
   Connected_component.Env.t ->
-  int * (string option*Ast.mixture) list ->
   Ast.mixture Ast.ast_alg_expr Ast.bool_expr Term.with_pos ->
-  Connected_component.Env.t *
-    (int * (string option*Ast.mixture) list) * alg_expr Ast.bool_expr Term.with_pos
+  Connected_component.Env.t * alg_expr Ast.bool_expr Term.with_pos
 
 val deps_of_alg_expr : alg_expr -> Term.DepSet.t
 val deps_of_bool_expr : alg_expr Ast.bool_expr -> (Term.DepSet.t * Nbr.t list)

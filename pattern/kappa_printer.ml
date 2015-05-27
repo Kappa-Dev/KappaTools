@@ -70,7 +70,7 @@ let alg_expr env f alg =
     | Expr.CONST n -> Nbr.print f n
     | Expr.ALG_VAR i ->
        Format.fprintf f "'%a'" (Environment.print_alg env) i
-    | Expr.KAPPA_INSTANCE (_,ccs) ->
+    | Expr.KAPPA_INSTANCE ccs ->
        Pp.list
 	 (fun f -> Format.fprintf f " +@ ")
 	 (Pp.array
@@ -126,22 +126,29 @@ let modification env f = function
   | Primitives.PRINT (nme,va) ->
      Format.fprintf f "$PRINTF %a <%a>" (print_expr env) nme (print_expr env) va
   | Primitives.PLOTENTRY -> Format.pp_print_string f "$PLOTENTRY"
-  | Primitives.ITER_RULE ((n,_),rule,_) ->
-     if Mixture.is_empty rule.Primitives.lhs then
-       if Mixture.is_empty rule.Primitives.rhs then
-	 match rule.Primitives.add_token with
+  | Primitives.ITER_RULE ((n,_),rule) ->
+     if rule.Primitives.inserted = [] then
+       if rule.Primitives.connected_components = [||] then
+	 match rule.Primitives.injected_tokens with
 	 | [ va, id ] ->
 	    Format.fprintf f "%s <- %a"
 			   (NamedDecls.elt_name env.Environment.tokens id)
 			   (alg_expr env) va
 	 | _ -> assert false
        else
-	 Format.fprintf f "$ADD %a %a" (alg_expr env) n
-			(mixture false env) rule.Primitives.rhs
+	 let boxed_cc i f cc =
+	   let () = Format.pp_open_box f 2 in
+	   let () = Format.pp_print_int f i in
+	   let () = Format.pp_print_string f ": " in
+	   let () = Connected_component.print
+		      false env.Environment.signatures f cc in
+	   Format.pp_close_box f () in
+	 Format.fprintf f "$DEL %a %a" (alg_expr env) n
+			(Pp.array Pp.comma boxed_cc)
+			rule.Primitives.connected_components
      else
-       let () = assert (Mixture.is_empty rule.Primitives.rhs) in
-       Format.fprintf f "$DEL %a %a" (alg_expr env) n
-		      (mixture false env) rule.Primitives.lhs
+       Format.fprintf f "$APPLY %a %a" (alg_expr env) n
+		      (elementary_rule env) rule (* TODO Later *)
   | Primitives.UPDATE (d_id,(va,_)) ->
      begin
        match d_id with

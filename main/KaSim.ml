@@ -184,8 +184,8 @@ let () =
       (fun d -> State.dot_of_influence_map d state env); *)
     if !Parameter.compileModeOn then exit 0 else ();
 
-    let profiling = Compression_main.init_secret_log_info () in
-(*    let _grid,profiling,event_list =
+(*    let profiling = Compression_main.init_secret_log_info () in
+    let _grid,profiling,event_list =
       if Environment.tracking_enabled env then
 	let () =
 	  if !Parameter.mazCompression

@@ -66,10 +66,10 @@ let empty =
 	desc_table = Hashtbl.create 2 
 }
 
-let init sigs contact_map tokens algs rules fresh_kappa =
+let init sigs contact_map tokens algs rules =
   { empty with signatures = sigs; tokens = tokens;
 	       contact_map = contact_map; rules = rules;
-	       algs = algs; fresh_kappa = fresh_kappa }
+	       algs = algs }
 
 let get_desc file env =
   try snd (Hashtbl.find env.desc_table file)
@@ -155,29 +155,6 @@ let remove_dependencies dep dep' env =
 
 let get_dependencies dep env =
   try Term.DepMap.find dep env.dependencies with Not_found -> Term.DepSet.empty
-
-let declare_rule rule_lbl id env =
-  match rule_lbl with
-  | None -> env
-  | Some (r_nme,pos) ->
-     if StringMap.mem r_nme env.num_of_rule
-     then raise (Malformed_Decl (("Rule name "^r_nme^" is already used"),pos))
-     else
-       let nr = StringMap.add r_nme id env.num_of_rule
-       and rn = IntMap.add id r_nme env.rule_of_num
-       in
-       {env with num_of_rule = nr ; rule_of_num = rn}
-
-let declare_unary_rule rule_lbl id env =
-  match rule_lbl with
-  | None -> env
-  | Some (r_nme,pos) ->
-     if StringMap.mem r_nme env.num_of_unary_rule
-     then raise (Malformed_Decl (("Rule name "^r_nme^" is already used"),pos))
-     else
-       let nr = StringMap.add r_nme id env.num_of_unary_rule
-       and rn = IntMap.add id r_nme env.unary_rule_of_num in
-       {env with num_of_unary_rule = nr ; unary_rule_of_num = rn}
 
 let id_of_site agent_name site_name env =
   Signature.id_of_site (Term.with_dummy_pos agent_name)

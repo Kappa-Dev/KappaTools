@@ -62,7 +62,7 @@ type rule = {
 }
 
 type modification =
-    ITER_RULE of Expr.alg_expr Term.with_pos * rule * elementary_rule
+    ITER_RULE of Expr.alg_expr Term.with_pos * elementary_rule
   | UPDATE of Term.dep_type * Expr.alg_expr Term.with_pos
   | SNAPSHOT of Expr.alg_expr Ast.print_expr Term.with_pos list
   | STOP of Expr.alg_expr Ast.print_expr Term.with_pos list
