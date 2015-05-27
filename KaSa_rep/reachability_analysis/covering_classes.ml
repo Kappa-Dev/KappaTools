@@ -21,6 +21,8 @@ let trace = false
 (************************************************************************************)
 (*UTILITIES FUNCTION*)
 
+let empty_set = Cckappa_sig.Site_map_and_set.empty_set
+
 let sprintf_string_list l =
   let acc = ref "{" in
   List.iteri (fun i x ->
@@ -96,8 +98,7 @@ let int_of_port port =
 
 let get_id_common_set parameter error t set =
   match Int_storage.Nearly_inf_Imperatif.unsafe_get parameter error t set with
-    | error, None -> error, 
-      Cckappa_sig.Site_map_and_set.empty_set
+    | error, None -> error, empty_set      
     | error, Some id -> error, id
 
 (************************************************************************************)
@@ -342,21 +343,20 @@ let store_remanent parameter error pair_covering_class modified_set remanent =
   -> 0
 *)
 
-let clean_classes parameter error
-    (pair_covering_classes: (int * Cckappa_sig.Site_map_and_set.set *
-                               Cckappa_sig.Site_map_and_set.set) list list)
-    modified_set =
+let init_dic = Covering_classes_type.Dictionary_of_Covering_class.init ()
+
+let clean_classes parameter error pair_covering_classes   modified_set =
   let error, init_pointer = Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
-  let init_index = Covering_classes_type.Dictionary_of_Covering_class.init() in
-  let init_dic = Covering_classes_type.Dictionary_of_Covering_class.init() in
-  let init_test_index = Covering_classes_type.Dictionary_of_Covering_class.init() in
+  let init_index       = init_dic in
+  let init_store_dic   = init_dic in
+  let init_test_index  = init_dic in
   let init_modif_index = Covering_classes_type.Dictionary_of_Modified_class.init() in
   (*------------------------------------------------------------------------------*)
   (*init state of dictionary*)
   let init_remanent = 
     {
       Covering_classes_type.store_pointer_backward    = init_pointer;
-      Covering_classes_type.store_dic                 = init_dic;
+      Covering_classes_type.store_dic                 = init_store_dic;
       Covering_classes_type.store_new_index_dic       = init_index;
       Covering_classes_type.store_test_new_index_dic  = init_test_index;
       Covering_classes_type.store_modif_new_index_dic = init_modif_index
@@ -444,7 +444,7 @@ let clean_classes parameter error
 
 let add_modified_set parameter error agent_type site_set store_sites_modified_set =
   let error, out_old_set =
-    Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get
+    Covering_classes_type.AgentMap.unsafe_get
       parameter
       error
       agent_type
@@ -452,7 +452,7 @@ let add_modified_set parameter error agent_type site_set store_sites_modified_se
   in
   let old_set =
     match out_old_set with
-      | None -> Cckappa_sig.Site_map_and_set.empty_set
+      | None -> empty_set
       | Some s -> s
   in
   (*union the old and the current one*)
@@ -464,7 +464,7 @@ let add_modified_set parameter error agent_type site_set store_sites_modified_se
       old_set
   in
   let error, store_fst_modified_set =
-    Int_storage.Quick_Nearly_inf_Imperatif.set
+    Covering_classes_type.AgentMap.set
       parameter
       error
       agent_type
@@ -485,7 +485,7 @@ let get_old_port parameter error agent_type port_set store_port =
   in
   let old =
     match out_port with
-      | None -> Cckappa_sig.Site_map_and_set.empty_set
+      | None -> empty_set
       | Some s -> s
   in
   let error, set =
@@ -547,7 +547,7 @@ let collect_modified_set parameter error diff_reverse store_modified_set =
                 set
               )
               site_modif.Cckappa_sig.agent_interface
-              Cckappa_sig.Site_map_and_set.empty_set
+              empty_set
           in        
           (*store modified_set*)
           let error, store_modified_set =
@@ -597,6 +597,80 @@ let add_covering_class parameter error agent_type pair_site store_covering_class
 (*------------------------------------------------------------------------------*)
 (*compute the state information*)
 
+let store_port_state parameter error agent_type port_min current_port_min
+    port_max current_port_max 
+    snd_cv thrd_cv
+    =
+  let error, port_set_min =
+    Cckappa_sig.Site_map_and_set.add_set
+      parameter
+      error
+      port_min
+      current_port_min
+  in
+  let error, set_min =
+    get_old_port
+      parameter
+      error
+      agent_type
+      port_set_min
+      snd_cv
+  in
+  (*get state max*)
+  let error, port_set_max =
+    Cckappa_sig.Site_map_and_set.add_set
+      parameter
+      error
+      port_max
+      current_port_max
+  in
+  let error, set_max =
+    get_old_port
+      parameter
+      error
+      agent_type
+      port_set_max
+      thrd_cv
+  in
+  (set_min, set_max)
+
+(*------------------------------------------------------------------------------*)
+(*store covering class and port state class*)
+
+let store_covering_port_state_class parameter error agent_type site_list fst_cv
+    port_set_min snd_cv port_set_max thrd_cv
+    =
+  (*store covering class*)
+  let error, covering_classes =
+    add_covering_class
+      parameter
+      error
+      agent_type
+      site_list
+      fst_cv
+  in
+  (*store port min*)
+  let error, store_port_min =
+    add_state_class
+      parameter
+      error
+      agent_type
+      port_set_min
+      snd_cv
+  in
+  (*store port max*)
+  let error, store_port_max =
+    add_state_class
+      parameter
+      error
+      agent_type
+      port_set_max
+      thrd_cv
+  in
+  error, (covering_classes, store_port_min, store_port_max)
+
+(*------------------------------------------------------------------------------*)
+
 let collect_covering_classes parameter error views diff_reverse store_covering_classes =
   let error, store_covering_classes =
     Int_storage.Quick_Nearly_inf_Imperatif.fold2_common
@@ -619,35 +693,16 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
 	          (fun site port (current_class, current_port_min, current_port_max) ->
                     (*get state min*)
                     let (port_min, port_max) = int_of_port port in
-                    let error, port_set_min =
-                      Cckappa_sig.Site_map_and_set.add_set
+                    let (set_min, set_max) =
+                      store_port_state
                         parameter
                         error
+                        agent_type
                         port_min
                         current_port_min
-                    in
-                    let error, set_min =
-                      get_old_port
-                        parameter
-                        error
-                        agent_type
-                        port_set_min
-                        snd_cv
-                    in
-                    (*get state max*)
-                    let error, port_set_max =
-                      Cckappa_sig.Site_map_and_set.add_set
-                        parameter
-                        error
                         port_max
                         current_port_max
-                    in
-                    let error, set_max =
-                      get_old_port
-                        parameter
-                        error
-                        agent_type
-                        port_set_max
+                        snd_cv
                         thrd_cv
                     in
                     (*store*)
@@ -655,36 +710,21 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
                     (site_list, set_min, set_max)
                   )
                   agent.Cckappa_sig.agent_interface
-                  ([], Cckappa_sig.Site_map_and_set.empty_set,
-                   Cckappa_sig.Site_map_and_set.empty_set)
+                  ([], empty_set, empty_set)
               in
               (* store new_covering_class in the classes of the agent type
                  agent_type *)
               let (site_list, port_set_min, port_set_max) = pair_site in
               (*store covering class*)
-              let error, covering_classes =
-                add_covering_class
+              let error, (covering_classes, store_port_min, store_port_max) =
+                store_covering_port_state_class
                   parameter
                   error
                   agent_type
                   site_list
                   fst_cv
-              in
-              (*store port min*)
-              let error, store_port_min =
-                add_state_class
-                  parameter
-                  error
-                  agent_type
                   port_set_min
                   snd_cv
-              in
-              (*store port max*)
-              let error, store_port_max =
-                add_state_class
-                  parameter
-                  error
-                  agent_type
                   port_set_max
                   thrd_cv
               in
@@ -935,12 +975,15 @@ let print_result parameter error result_remanent =
 (************************************************************************************)   
 (*RULES*)
 
+let create_map parameter error n_agents =
+  Covering_classes_type.AgentMap.create parameter error n_agents
+
 let scan_rule_set parameter error handler rules =
   let n_agents = handler.Cckappa_sig.nagents in
-  let error, init_modif = Covering_classes_type.AgentMap.create parameter error n_agents in
-  let error, init_class = Covering_classes_type.AgentMap.create parameter error n_agents in
-  let error, init_min = Covering_classes_type.AgentMap.create parameter error n_agents in
-  let error, init_max = Covering_classes_type.AgentMap.create parameter error n_agents in
+  let error, init_modif = create_map parameter error n_agents in
+  let error, init_class = create_map parameter error n_agents in
+  let error, init_min   = create_map parameter error n_agents in
+  let error, init_max   = create_map parameter error n_agents in
   (*------------------------------------------------------------------------------*)
   (*init state of covering class*)
   let init_class =
@@ -987,7 +1030,7 @@ let scan_rule_set parameter error handler rules =
         in
         let modified_set =
           match out_modified_set with
-            | None -> Cckappa_sig.Site_map_and_set.empty_set
+            | None -> empty_set
             | Some s -> s
         in
         (*------------------------------------------------------------------------------*)
