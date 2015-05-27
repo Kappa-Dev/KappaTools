@@ -28,20 +28,21 @@ let run stop out_div s =
      >>= fun () ->
      let result = !Ast.result in
      wrap3 Eval.initialize log_form [] result
-     >>= fun (env,counter,state) ->
+     >>= fun (env,domain,counter,graph,state) ->
      let () = Plot.create "foo.svg" in
-     let () = if !Parameter.pointNumberValue > 0 then
-		Plot.plot_now env counter state in
-     let profiling = Compression_main.init_secret_log_info () in
+     let () =
+       if !Parameter.pointNumberValue > 0 then
+	 Plot.plot_now
+	   env (State_interpreter.observables_values env counter graph state) in
      let () = Feedback.show_warnings out_div in
      catch
        (fun () ->
-	(Run.loop_cps log_form
+	(State_interpreter.loop_cps log_form
 		      (fun f -> if Lwt.is_sleeping stop
 				then Lwt.bind (Lwt_js.yield ()) f
 				else Lwt.return_unit)
-		      (fun _ _ _ _ _ _ -> Lwt.return_unit)
-		      state profiling [] counter env)
+		      (fun _ _ -> Lwt.return_unit)
+		      env domain counter graph state)
 	>>= fun () -> return (Plot.value 555))
        (function
 	 | ExceptionDefn.Deadlock ->
@@ -51,7 +52,7 @@ let run stop out_div s =
 		 Format.fprintf
 		   f "A deadlock was reached after %d events and %Es (Activity = %.5f)"
 		   (Mods.Counter.event counter) (Mods.Counter.time counter)
-		   (State.total_activity state)) out_div in
+		   (State_interpreter.activity state)) out_div in
 	    return ""
 	 | e -> fail e))
     (function
