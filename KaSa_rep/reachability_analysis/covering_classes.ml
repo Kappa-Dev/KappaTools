@@ -56,7 +56,7 @@ let print_pair_list l =
     match acc with
       | [] -> acc
       | (i, s) :: tl ->
-        Printf.fprintf stdout "i:%i:s:%s" i s;
+        Printf.fprintf stdout "site_type:%i:state:%s\n" i s;
         aux tl
   in aux l
 
@@ -64,14 +64,18 @@ let print_list_list l =
   let rec aux acc =
     match acc with
       | [] -> acc
-      | x :: tl -> print_list x; aux tl
+      | x :: tl ->
+        print_pair_list x;
+        aux tl
   in
   aux l
 
 (************************************************************************************)
 (*sorted and ordered a covering classes in an descreasing order *)
 
-let length_sorted (l: (int*string) list list) : (int*string) list list =
+let length_sorted (l: (int * Cckappa_sig.Site_map_and_set.set *
+                         Cckappa_sig.Site_map_and_set.set) list list):
+    (int * Cckappa_sig.Site_map_and_set.set * Cckappa_sig.Site_map_and_set.set) list list =
   let list_length = List.rev_map (fun list -> list, List.length list) l in
   let lists = List.sort (fun a b -> compare (snd a) (snd b)) list_length in
   List.rev_map fst lists
@@ -84,8 +88,8 @@ let string_of_port port =
     ";state_max:"^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.max)^"]"
 
 let int_of_port port =
-  port.Cckappa_sig.site_state.Cckappa_sig.min(*,
-   port.Cckappa_sig.site_state.Cckappa_sig.max)*)
+  (port.Cckappa_sig.site_state.Cckappa_sig.min,
+   port.Cckappa_sig.site_state.Cckappa_sig.max)
     
 (************************************************************************************)
 (*common function for getting an id in pointer backward*)
@@ -143,14 +147,21 @@ let position x =
       else aux (k+1) ys
   in aux 0;;
 
+let fst_list l =
+  let rec aux acc =
+    match acc with
+    | [] -> []
+    | (x,_,_) :: tl -> x:: aux tl
+  in aux l
+
 let re_index_value_list pair_list =
   let rec aux acc =
     match acc with
       | [] -> acc
-      | (x,s) :: tl ->
-        let value_list = fst (List.split pair_list) in
+      | (x,s,s') :: tl ->
+        let value_list = fst_list pair_list in
         let nth = position x value_list in
-        ((nth + 1), s) :: aux tl
+        ((nth + 1), s, s') :: aux tl
   in aux pair_list
 
 (*------------------------------------------------------------------------------*)
@@ -256,7 +267,7 @@ let store_remanent parameter error pair_covering_class modified_set remanent =
       in
       (*------------------------------------------------------------------------------*)
       (*store pointer backward*)
-      let covering_class = fst (List.split pair_covering_class) in
+      let covering_class = fst_list pair_covering_class in
       let error, pointer_backward =
         store_pointer_backward
           parameter
@@ -331,7 +342,9 @@ let store_remanent parameter error pair_covering_class modified_set remanent =
   -> 0
 *)
 
-let clean_classes parameter error (pair_covering_classes: (int * string) list list)
+let clean_classes parameter error
+    (pair_covering_classes: (int * Cckappa_sig.Site_map_and_set.set *
+                               Cckappa_sig.Site_map_and_set.set) list list)
     modified_set =
   let error, init_pointer = Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
   let init_index = Covering_classes_type.Dictionary_of_Covering_class.init() in
@@ -356,7 +369,7 @@ let clean_classes parameter error (pair_covering_classes: (int * string) list li
   List.fold_left (fun (error, remanent) covering_class ->
     match covering_class with
       | [] -> error, remanent
-      | (t, s) :: tl ->
+      | (t, s,y) :: tl ->
         let pointer_backward = remanent.Covering_classes_type.store_pointer_backward in
         (* return the set of list(id) containing t.
            For example: current_covering_classes: [[0;1];[0]]
@@ -374,7 +387,7 @@ let clean_classes parameter error (pair_covering_classes: (int * string) list li
         let rec aux to_visit potential_supersets =
           match to_visit with
 	    | [] -> error, remanent
-	    | (t', s') :: tl' ->
+	    | (t', s',y') :: tl' ->
               (* get the set of list(id) containing t' *)
               let error, potential_supersets' =
 		get_id_common_set
@@ -530,6 +543,54 @@ let add_covering_class parameter error agent_type pair_site store_covering_class
          new_site_list
          store_covering_classes
 
+(*------------------------------------------------------------------------------*)
+
+let get_old_port parameter error agent_type port_set store_port =
+  let error, out_port =
+    Covering_classes_type.AgentMap.unsafe_get
+      parameter
+      error
+      agent_type
+      store_port
+  in
+  let old =
+    match out_port with
+      | None -> Cckappa_sig.Site_map_and_set.empty_set
+      | Some s -> s
+  in
+  let error, set =
+    Cckappa_sig.Site_map_and_set.union
+      parameter
+      error
+      port_set
+      old                  
+  in
+  error, set
+
+(*------------------------------------------------------------------------------*)
+
+let add_state_class parameter error agent_type port_set store_port =
+  let error, set =
+    get_old_port
+      parameter
+      error
+      agent_type
+      port_set
+      store_port
+  in
+  let error, store_port =
+    Covering_classes_type.AgentMap.set
+      parameter
+      error
+      agent_type
+      set
+      store_port
+  in
+  error, store_port
+
+(*------------------------------------------------------------------------------*)
+(*compute the state information*)
+
 let collect_covering_classes parameter error views diff_reverse store_covering_classes =
   let error, store_covering_classes =
     Int_storage.Quick_Nearly_inf_Imperatif.fold2_common
@@ -545,26 +606,84 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
             | Cckappa_sig.Ghost -> error, store_covering_classes
             | Cckappa_sig.Agent agent ->
               let agent_type = agent.Cckappa_sig.agent_name in
+              let (fst_cv, snd_cv, thrd_cv) = store_covering_classes in
               (*get a list of sites from an interface at each rule*)
               let pair_site =
                 Cckappa_sig.Site_map_and_set.fold_map
-	          (fun site port current_class ->
-                    let port_string = string_of_port port in
-                    let site_list   = (site, port_string) :: current_class in
-                    site_list)
-                  agent.Cckappa_sig.agent_interface []
+	          (fun site port (current_class, current_port_min, current_port_max) ->
+                    (*get state min*)
+                    let (port_min, port_max) = int_of_port port in
+                    let error, port_set_min =
+                      Cckappa_sig.Site_map_and_set.add_set
+                        parameter
+                        error
+                        port_min
+                        current_port_min
+                    in
+                    let error, set_min =
+                      get_old_port
+                        parameter
+                        error
+                        agent_type
+                        port_set_min
+                        snd_cv
+                    in
+                    (*get state max*)
+                    let error, port_set_max =
+                      Cckappa_sig.Site_map_and_set.add_set
+                        parameter
+                        error
+                        port_max
+                        current_port_max
+                    in
+                    let error, set_max =
+                      get_old_port
+                        parameter
+                        error
+                        agent_type
+                        port_set_max
+                        thrd_cv
+                    in
+                    (*store*)
+                    let site_list = (site, set_min, set_max) :: current_class in
+                    (site_list, set_min, set_max)
+                  )
+                  agent.Cckappa_sig.agent_interface
+                  ([], Cckappa_sig.Site_map_and_set.empty_set,
+                   Cckappa_sig.Site_map_and_set.empty_set)
               in
               (* store new_covering_class in the classes of the agent type
                  agent_type *)
+              let (site_list, port_set_min, port_set_max) = pair_site in
+              (*store covering class*)
               let error, covering_classes =
                 add_covering_class
                   parameter
                   error
                   agent_type
-                  pair_site
-                  store_covering_classes
+                  site_list
+                  fst_cv
               in
-              error, covering_classes
+              (*store port min*)
+              let error, store_port_min =
+                add_state_class
+                  parameter
+                  error
+                  agent_type
+                  port_set_min
+                  snd_cv
+              in
+              (*store port max*)
+              let error, store_port_max =
+                add_state_class
+                  parameter
+                  error
+                  agent_type
+                  port_set_max
+                  thrd_cv
+              in
+              (*store*)
+              error, (covering_classes, store_port_min, store_port_max)
       )
       views
       diff_reverse
@@ -626,18 +745,30 @@ let number_of_covering_classes parameter error store_dic =
       parameter
       error
       store_dic
-  in
-  num + 1
+  in num + 1
 
 (************************************************************************************)   
 (*PRINT*)
+
+let print_state l l' =
+  let rec aux acc acc' =
+    match acc, acc' with
+      | [], [] | _, [] | [], _ -> acc
+      | x :: tl, y :: tl' ->
+        Printf.fprintf stdout "[state_min:%i; state_max:%i]" x y;
+        aux tl tl'
+  in
+  aux l l'
 
 let print_pair_list l =
   let rec aux acc =
     match acc with
       | [] -> ()
-      | (x,s) :: tl -> 
-        Printf.fprintf stdout "site_type:%i->state:%s\n" x s;
+      | (x,s,s') :: tl ->
+        let l = Cckappa_sig.Site_map_and_set.elements s in
+        let l' = Cckappa_sig.Site_map_and_set.elements s' in
+        Printf.fprintf stdout "site_type:%i->state:" x;
+        print_state l l'; print_string "\n";
         aux tl
   in aux l
 
@@ -805,12 +936,14 @@ let scan_rule_set parameter error handler rules =
   let n_agents = handler.Cckappa_sig.nagents in
   let error, init_modif = Covering_classes_type.AgentMap.create parameter error n_agents in
   let error, init_class = Covering_classes_type.AgentMap.create parameter error n_agents in
+  let error, init_min = Covering_classes_type.AgentMap.create parameter error n_agents in
+  let error, init_max = Covering_classes_type.AgentMap.create parameter error n_agents in
   (*------------------------------------------------------------------------------*)
   (*init state of covering class*)
   let init_class =
     {
       Covering_classes_type.store_modified_set     = init_modif;
-      Covering_classes_type.store_covering_classes = init_class
+      Covering_classes_type.store_covering_classes = (init_class, init_min, init_max)
     }
   in
   (*------------------------------------------------------------------------------*)
@@ -819,7 +952,7 @@ let scan_rule_set parameter error handler rules =
     Int_storage.Nearly_inf_Imperatif.fold
       parameter error
       (fun parameter error rule_id rule classes ->
-        (*let _ = Printf.fprintf stdout "rule_id:%i:\n" rule_id in *)
+        (*let _ = Printf.fprintf stdout "rule_id:%i:\n" rule_id in*)
         scan_rule
           parameter
           error
@@ -830,6 +963,8 @@ let scan_rule_set parameter error handler rules =
       rules
       init_class
   in
+  let (fst_cv, snd_cv, thrd_cv) =
+      store_covering_classes.Covering_classes_type.store_covering_classes in
   (*------------------------------------------------------------------------------*)
   (*create a new initial state to store after cleaning the covering classes*)
   let error, init_result = Covering_classes_type.AgentMap.create parameter error 0 in
@@ -874,7 +1009,7 @@ let scan_rule_set parameter error handler rules =
         (*result*)
         error, store_remanent_dic
       )
-      store_covering_classes.Covering_classes_type.store_covering_classes
+      fst_cv
       init_result
   in
   error, remanent_dictionary
