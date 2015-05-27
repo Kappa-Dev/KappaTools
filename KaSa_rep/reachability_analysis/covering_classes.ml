@@ -369,7 +369,7 @@ let clean_classes parameter error
   List.fold_left (fun (error, remanent) covering_class ->
     match covering_class with
       | [] -> error, remanent
-      | (t, s,y) :: tl ->
+      | (t, s, y) :: tl ->
         let pointer_backward = remanent.Covering_classes_type.store_pointer_backward in
         (* return the set of list(id) containing t.
            For example: current_covering_classes: [[0;1];[0]]
@@ -387,7 +387,7 @@ let clean_classes parameter error
         let rec aux to_visit potential_supersets =
           match to_visit with
 	    | [] -> error, remanent
-	    | (t', s',y') :: tl' ->
+	    | (t', s', y') :: tl' ->
               (* get the set of list(id) containing t' *)
               let error, potential_supersets' =
 		get_id_common_set
@@ -473,76 +473,6 @@ let add_modified_set parameter error agent_type site_set store_sites_modified_se
   in
   error, store_fst_modified_set
 
-let collect_modified_set parameter error diff_reverse store_modified_set =
-  let error, store_modified_set =
-    Int_storage.Quick_Nearly_inf_Imperatif.fold
-      parameter
-      error
-      (fun parameter error agent_id site_modif store_modified_set ->
-        let agent_type = site_modif.Cckappa_sig.agent_name in
-        if Cckappa_sig.Site_map_and_set.is_empty_map
-          site_modif.Cckappa_sig.agent_interface
-        then
-          error, store_modified_set
-        else
-          let site_set =
-            Cckappa_sig.Site_map_and_set.fold_map
-              (fun site port current_set ->
-                let error, set =
-                  Cckappa_sig.Site_map_and_set.add_set
-                    parameter
-                    error
-                    site
-                    current_set
-                in set)
-              site_modif.Cckappa_sig.agent_interface
-              Cckappa_sig.Site_map_and_set.empty_set
-          in        
-          (*store modified_set*)
-          let error, store_modified_set =
-            add_modified_set
-              parameter
-              error
-              agent_type
-              site_set
-              store_modified_set
-          in
-          (*result*)
-          error, store_modified_set
-      )
-      diff_reverse
-      store_modified_set
-  in error, store_modified_set
-    
-(*------------------------------------------------------------------------------*)
-(*compute covering_class*)
-
-let add_covering_class parameter error agent_type pair_site store_covering_classes =
-  match pair_site with
-    | [] -> error, store_covering_classes
-    | _ ->
-      let error, get_old =
-        Covering_classes_type.AgentMap.unsafe_get
-          parameter
-          error
-          agent_type
-          store_covering_classes
-      in		 
-       (* fetch the former list of covering classes *)
-       let old_pair =
-         match get_old with
-           | None -> []
-           | Some sites -> sites
-       in
-       (* store the new list of covering classes *)
-       let new_site_list = (List.rev pair_site) :: old_pair in
-       Covering_classes_type.AgentMap.set
-         parameter
-         error
-         agent_type
-         new_site_list
-         store_covering_classes
-
 (*------------------------------------------------------------------------------*)
 
 let get_old_port parameter error agent_type port_set store_port =
@@ -587,6 +517,82 @@ let add_state_class parameter error agent_type port_set store_port =
       store_port
   in
   error, store_port
+
+(*------------------------------------------------------------------------------*)
+
+let collect_modified_set parameter error diff_reverse store_modified_set =
+  let error, store_modified_set =
+    Int_storage.Quick_Nearly_inf_Imperatif.fold
+      parameter
+      error
+      (fun parameter error agent_id site_modif store_modified_set ->
+        if Cckappa_sig.Site_map_and_set.is_empty_map
+          site_modif.Cckappa_sig.agent_interface
+        then
+          error, store_modified_set
+        else
+          let agent_type = site_modif.Cckappa_sig.agent_name in
+          let store_site =
+            Cckappa_sig.Site_map_and_set.fold_map
+              (fun site port current_class ->
+                (*get port_min*)
+                let (port_min, port_max) = int_of_port port in
+                let error, set =
+                  Cckappa_sig.Site_map_and_set.add_set
+                    parameter
+                    error
+                    site
+                    current_class
+                in
+                set
+              )
+              site_modif.Cckappa_sig.agent_interface
+              Cckappa_sig.Site_map_and_set.empty_set
+          in        
+          (*store modified_set*)
+          let error, store_modified_set =
+            add_modified_set
+              parameter
+              error
+              agent_type
+              store_site
+              store_modified_set
+          in
+          (*result*)
+          error, store_modified_set
+      )
+      diff_reverse
+      store_modified_set
+  in error, store_modified_set
+    
+(*------------------------------------------------------------------------------*)
+(*compute covering_class*)
+
+let add_covering_class parameter error agent_type pair_site store_covering_classes =
+  match pair_site with
+    | [] -> error, store_covering_classes
+    | _ ->
+      let error, get_old =
+        Covering_classes_type.AgentMap.unsafe_get
+          parameter
+          error
+          agent_type
+          store_covering_classes
+      in		 
+       (* fetch the former list of covering classes *)
+       let old_pair =
+         match get_old with
+           | None -> []
+           | Some sites -> sites
+       in
+       (* store the new list of covering classes *)
+       let new_site_list = (List.rev pair_site) :: old_pair in
+       Covering_classes_type.AgentMap.set
+         parameter
+         error
+         agent_type
+         new_site_list
+         store_covering_classes
 
 (*------------------------------------------------------------------------------*)
 (*compute the state information*)
@@ -814,13 +820,10 @@ let print_modified_dic parameter error elt_id store_modif =(*FIXME*)
     error
     (fun parameter error elt l _ _ ->
       let _ =
-        match l with
-          | [] -> ()
-          | _ as l' ->
-            Printf.fprintf stdout 
-                "Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:%i:\n"
-                elt_id;
-              print_list l'
+        Printf.fprintf stdout 
+          "Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:%i:\n"
+          elt_id;
+        print_list l
       in
       error
     ) store_modif
