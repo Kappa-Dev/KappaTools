@@ -1,0 +1,27 @@
++ Command line is: 'KaSim' '-i' 'clash.ka' '-e' '3'
+Parsing clash.ka...
+done
++ Self seeding...
++ Initialized random number generator with seed 948381828
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -variable declarations
+	 -initial conditions
+	 -rules
+	 -observables
+	 -perturbations
+	 Done
++ Analyzing non local patterns...
++ Building initial simulation state...
+	 -Counting initial local patterns...
+	 Done
+____________________________________________________________
+############################################################
+Simulation ended (eff.: 0.750000, detail below)
+	Valid embedding but no longer unary when required: 0.000000
+	Valid embedding but not binary when required: 0.000000
+	Clashing instance: 1.000000
+	Lazy negative update: 0.000000
+	Lazy negative update of non local instances: 0.000000
+	Perturbation interrupting time advance: 0.000000
