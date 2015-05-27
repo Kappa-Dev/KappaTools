@@ -85,7 +85,11 @@ module Make(Ord:OrderedType) =
     type set =
       | Empty_set
       | Node_set of set * elt * set * int 
+<<<<<<< HEAD
           
+=======
+	  
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
     let height_set t = 
       match t with 
         | Empty_set -> 0
@@ -102,7 +106,11 @@ module Make(Ord:OrderedType) =
           
     let invalid_arg_set parameters mh message exn  = 
       Exception.warn parameters mh (Some "Set_and_map") message exn (fun () -> empty_set)
+<<<<<<< HEAD
         
+=======
+	
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
     let node_set left value right =
       Node_set(left,value,right,(max (height_set left) (height_set right))+1)       
 
@@ -133,8 +141,13 @@ module Make(Ord:OrderedType) =
               mh,node_set (node_set left value rightleft) rightvalue rightright
             else begin
               match rightleft with 
+<<<<<<< HEAD
                 | Empty_set -> invalid_arg_set parameters mh (Some "balance_set,line 116") (invalid_arg "Set_and_Map.balance_set")
                 | Node_set(rightleftleft,rightleftvalue,rightleftright,_) -> 
+=======
+		| Empty_set -> invalid_arg_set parameters mh (Some "balance_set,line 116") (invalid_arg "Set_and_Map.balance_set")
+		| Node_set(rightleftleft,rightleftvalue,rightleftright,_) -> 
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
                   mh,node_set 
                     (node_set left value rightleftleft)
                     rightleftvalue
@@ -145,8 +158,13 @@ module Make(Ord:OrderedType) =
             
     let rec add_set parameters mh new_value set = 
       match set with 
+<<<<<<< HEAD
         | Empty_set -> mh,Node_set(empty_set,new_value,empty_set,1)
         | Node_set(left,value_set,right,_) -> 
+=======
+	| Empty_set -> mh,Node_set(empty_set,new_value,empty_set,1)
+	| Node_set(left,value_set,right,_) -> 
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
           let c = Ord.compare new_value value_set in 
           if c = 0 then mh,set 
           else if c<0 then 
@@ -158,9 +176,15 @@ module Make(Ord:OrderedType) =
               
     let rec join_set parameters mh left value right = 
       match left,right with 
+<<<<<<< HEAD
         | Empty_set,_ -> add_set parameters mh value right 
         | _,Empty_set -> add_set parameters mh value left
         | Node_set(leftleft,leftvalue,leftright,leftheight),Node_set(rightleft,rightvalue,rightright,rightheight) -> 
+=======
+	| Empty_set,_ -> add_set parameters mh value right 
+	| _,Empty_set -> add_set parameters mh value left
+	| Node_set(leftleft,leftvalue,leftright,leftheight),Node_set(rightleft,rightvalue,rightright,rightheight) -> 
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
           if leftheight > rightheight + 2 
           then 
             let mh', right' = join_set parameters mh leftright value right in  
@@ -173,6 +197,7 @@ module Make(Ord:OrderedType) =
               
     let rec min_elt set = 
       match set with 
+<<<<<<< HEAD
         |   Empty_set -> raise Not_found 
         | Node_set(Empty_set,v,r,_) -> v 
         | Node_set(left,_,_,_) -> min_elt set 
@@ -189,29 +214,64 @@ module Make(Ord:OrderedType) =
         | Empty_set -> invalid_arg_set parameters mh (Some "remove_min_elt_set,line 169") (invalid_arg "Set_and_Map.remove_min_elt_set")
         | Node_set(Empty_set,_,right,_) -> mh,right
         | Node_set(left,value,right,_) -> 
+=======
+	|   Empty_set -> raise Not_found 
+	| Node_set(Empty_set,v,r,_) -> v 
+	| Node_set(left,_,_,_) -> min_elt set 
+          
+	  
+    let rec max_elt set = 
+      match set with 
+	|   Empty_set -> raise Not_found 
+	| Node_set(_,v,Empty_set,_) -> v 
+	| Node_set(_,_,right,_) -> max_elt set 
+
+    let rec remove_min_elt_set parameters mh set =
+      match set with 
+	| Empty_set -> invalid_arg_set parameters mh (Some "remove_min_elt_set,line 169") (invalid_arg "Set_and_Map.remove_min_elt_set")
+	| Node_set(Empty_set,_,right,_) -> mh,right
+	| Node_set(left,value,right,_) -> 
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
           let mh', left' = remove_min_elt_set parameters mh left in 
           balance_set parameters mh' left' value right
             
     let merge_set parameters mh set1 set2 = 
       match set1,set2 with 
+<<<<<<< HEAD
         | Empty_set,_ -> mh,set2
         | _,Empty_set -> mh,set1 
         | _ -> 
+=======
+	| Empty_set,_ -> mh,set2
+	| _,Empty_set -> mh,set1 
+	| _ -> 
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
           let mh',left2 = remove_min_elt_set parameters mh set2 in 
           balance_set parameters mh' set1 (min_elt set2)  left2 
             
     let concat_set parameters mh set1 set2 = 
       match set1,set2 with 
+<<<<<<< HEAD
         |   Empty_set,_ -> mh,set2 
         | _,Empty_set -> mh,set1 
         | _ -> 
+=======
+	|   Empty_set,_ -> mh,set2 
+	| _,Empty_set -> mh,set1 
+	| _ -> 
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
           let mh',left2 =remove_min_elt_set parameters mh set2 in  
           join_set parameters mh' set1 (min_elt set2) left2 
 
     let rec split parameters mh split_value set = 
       match set with 
+<<<<<<< HEAD
         | Empty_set -> mh,(empty_set,false,empty_set)
         | Node_set(left,set_value,right,_) ->
+=======
+	| Empty_set -> mh,(empty_set,false,empty_set)
+	| Node_set(left,set_value,right,_) ->
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
           let c = Ord.compare split_value set_value in 
           if c=0 then mh,(left,true,right)
           else if c<0 then 
@@ -225,8 +285,13 @@ module Make(Ord:OrderedType) =
               
     let rec mem_set searched_value set = 
       match set with 
+<<<<<<< HEAD
         |   Empty_set -> false
         | Node_set(left,set_value,right,_) -> 
+=======
+	|   Empty_set -> false
+	| Node_set(left,set_value,right,_) -> 
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
           let c = Ord.compare searched_value set_value in 
           c=0 || mem_set searched_value (if c < 0 then left else right)
               
@@ -274,11 +339,16 @@ module Make(Ord:OrderedType) =
         join_set parameters mh'' left' value1 right'
       else
         concat_set parameters mh'' left' right' 
+<<<<<<< HEAD
           
+=======
+	  
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
     let suture_not_set parameters mh (left1,value1,right1) (left2,bool,right2) f = 
       let mh' ,left' = f parameters mh left1 left2 in 
       let mh'', right' = f parameters mh' right1 right2 in 
       if bool then 
+<<<<<<< HEAD
         concat_set parameters mh'' left' right'
       else 
         join_set parameters mh'' left' value1 right'
@@ -288,14 +358,31 @@ module Make(Ord:OrderedType) =
         | Empty_set,_ 
         | _,Empty_set -> mh,empty_set
         | Node_set(left1,value1,right1,_),_ ->
+=======
+	concat_set parameters mh'' left' right'
+      else 
+	join_set parameters mh'' left' value1 right'
+	  
+    let rec inter parameters mh set1 set2 = 
+      match set1,set2 with 
+	| Empty_set,_ 
+	| _,Empty_set -> mh,empty_set
+	| Node_set(left1,value1,right1,_),_ ->
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
           let mh',triple2 = split parameters mh value1 set2 in  
           suture_set parameters mh' (left1,value1,right1) triple2 inter 
             
     let rec diff parameters mh set1 set2 = 
       match set1,set2 with 
+<<<<<<< HEAD
         | Empty_set,_ -> mh,empty_set       
         | _,Empty_set -> mh,set1 
         | Node_set(left1,value1,right1,_),_ -> 
+=======
+	| Empty_set,_ -> mh,empty_set       
+	| _,Empty_set -> mh,set1 
+	| Node_set(left1,value1,right1,_),_ -> 
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
           let mh',triple2 = split parameters mh value1 set2 in 
           suture_not_set parameters mh' (left1,value1,right1) triple2 diff  
             
@@ -319,7 +406,11 @@ module Make(Ord:OrderedType) =
             
     let compare_set set1 set2 = 
       compare_aux (cons_enum set1 End) (cons_enum set2 End)
+<<<<<<< HEAD
         
+=======
+	
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
     let equal_set set1 set2 = 
       compare set1 set2 = 0 
       
@@ -407,9 +498,15 @@ module Make(Ord:OrderedType) =
       
     type key = Ord.t
     type 'data map =  
+<<<<<<< HEAD
         Empty_map 
       | Node_map of 'data map * key * 'data * 'data map * int
           
+=======
+	Empty_map 
+      | Node_map of 'data map * key * 'data * 'data map * int
+	  
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
     let empty_map = Empty_map 
       
     let invalid_arg_map parameters mh message exn  =    
@@ -425,7 +522,11 @@ module Make(Ord:OrderedType) =
           
     let create_map left key0 data right  = 
       Node_map (left,key0,data,right, 1 + max (height_map left) (height_map right))
+<<<<<<< HEAD
         
+=======
+	
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
     let rec find_map parameters rh key map = 
       match map with  
         | Empty_map -> Exception.warn parameters rh (Some "Set_and_map.ml") (Some "find_map, line 405") Not_found (fun () -> raise Not_found)
@@ -452,13 +553,19 @@ module Make(Ord:OrderedType) =
       let height_left = height_map left in
       let height_right = height_map right in 
       begin
+<<<<<<< HEAD
         if height_left <= height_right + 2 
         then
+=======
+	if height_left <= height_right + 2 
+	then
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
           begin
             if height_right <= height_left + 2 
             then rh,create_map left key data right
             else 
               begin
+<<<<<<< HEAD
                 match right with 
                     Empty_map -> invalid_arg_map parameters rh (Some "balance_map, line 424") (invalid_arg "Set_and_map.balance_map")
                   | Node_map (left0,key0,data0,right0,_) -> 
@@ -482,6 +589,31 @@ module Make(Ord:OrderedType) =
               end
           end
         else
+=======
+		match right with 
+		    Empty_map -> invalid_arg_map parameters rh (Some "balance_map, line 424") (invalid_arg "Set_and_map.balance_map")
+		  | Node_map (left0,key0,data0,right0,_) -> 
+		    begin
+		      if height_map left0 <= height_map right0 
+		      then 
+			rh,create_map (create_map left key data left0) key0 data0 right0
+		      else
+			begin
+			  match left0 with 
+			    | Empty_map -> invalid_arg_map parameters rh (Some "Set_and_map.balance_map, line 433") (invalid_arg "Set_and_map.balance_map")
+			    | Node_map (left1,key1,data1,right1,_) -> 
+			      rh,  
+			      create_map
+				(create_map left key data left1)
+				key1
+				data1 
+				(create_map right1 key0 data0 right0)
+			end  
+		    end
+              end
+          end
+	else
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
           begin
             match left with 
               | Empty_map -> invalid_arg_map parameters rh (Some "balance_map,448") (invalid_arg "Set_and_map.balance_map") 
@@ -505,11 +637,19 @@ module Make(Ord:OrderedType) =
                 end
           end  
       end
+<<<<<<< HEAD
         
     let rec add_map parameters rh key data map = 
       match map with 
         | Empty_map -> rh,Node_map (empty_map,key,data,empty_map,1)
         | Node_map (left,key_map,data_map,right,height)->
+=======
+	
+    let rec add_map parameters rh key data map = 
+      match map with 
+	| Empty_map -> rh,Node_map (empty_map,key,data,empty_map,1)
+	| Node_map (left,key_map,data_map,right,height)->
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
           let cmp = compare key key_map in 
           if cmp = 0 then 
             rh,Node_map(left,key_map,data,right,height)
@@ -522,6 +662,7 @@ module Make(Ord:OrderedType) =
               
     let rec min_binding map key data = 
       match map with 
+<<<<<<< HEAD
         | Empty_map -> (key,data)
         | Node_map (left2,key2,data2,_,_) -> 
           min_binding left2 key2 data2 
@@ -538,20 +679,39 @@ module Make(Ord:OrderedType) =
       match map with 
         | Empty_map -> rh,map'
         | Node_map (left2,key2,data2,right2,_) ->
+=======
+	  Empty_map -> (key,data)
+	| Node_map (left2,key2,data2,_,_) -> 
+          min_binding left2 key2 data2 
+	    
+    let rec remove_min_binding parameters rh map key data map' = 
+      match map with 
+	| Empty_map -> rh,map'
+	| Node_map (left2,key2,data2,right2,_) ->
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
           let rh', left'  = remove_min_binding parameters rh left2 key2 data right2 in 
           balance_map parameters rh' left' key2 data2 right2
             
     let merge_map parameters rh map1 map2 = 
       match map1 with 
+<<<<<<< HEAD
         | Empty_map -> rh,map2 
         | Node_map(left1,key1,data1,right1,_) ->
+=======
+	| Empty_map -> rh,map2 
+	| Node_map(left1,key1,data1,right1,_) ->
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
           begin
             match map2 with 
               | Empty_map -> rh,map1 
               | Node_map(left2,key2,data2,right2,_) -> 
                 let (key3,data3) = min_binding left2 key2 data2 in 
                 let rh', left' = remove_min_binding parameters rh left2 key2 data2 right2 in     
+<<<<<<< HEAD
                 balance_map parameters rh' map1 key3 data3 left' 
+=======
+		balance_map parameters rh' map1 key3 data3 left' 
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
           end  
             
     let rec remove_map parameters rh key map = 
@@ -600,6 +760,7 @@ module Make(Ord:OrderedType) =
 
     let rec fold_map f map value =
       match map with 
+<<<<<<< HEAD
         | Empty_map -> value 
         | Node_map(left,key,data,right,_) ->
           fold_map f right (f key data (fold_map f left value))
@@ -621,6 +782,29 @@ module Make(Ord:OrderedType) =
               | None -> None
               | Some (left2,data2,right2) -> 
                 Some (Node_map(left1,key1,data1,left2,height1),data2,right2)
+=======
+	| Empty_map -> value 
+	| Node_map(left,key,data,right,_) ->
+	  fold_map f right (f key data (fold_map f left value))
+            
+    let rec cut_opt value map = 
+      match map with 
+	| Empty_map -> None 
+	| Node_map (left1,key1,data1,right1,height1) -> 
+	  let cmp = Ord.compare value key1 in 
+	  if cmp = 0 then
+            Some (left1,data1,right1)
+	  else if cmp < 0 then 
+            match cut_opt value left1 with  
+              | None -> None 
+              |Some (left2,data2,right2) -> 
+		Some (left2,data2,Node_map(right2,key1,data1,right1,height1))
+	  else 
+            match cut_opt value right1 with 
+              | None -> None
+              | Some (left2,data2,right2) -> 
+		Some (Node_map(left1,key1,data1,left2,height1),data2,right2)
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
                   
     let rec join_map parameters rh left key value right =
       match balance_map parameters rh left key value right with 
@@ -630,7 +814,11 @@ module Make(Ord:OrderedType) =
           if h > 2 || h< -2 
           then join_map parameters rh' left2 key2 data2 right2 
           else rh',map2 
+<<<<<<< HEAD
             
+=======
+	    
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
     let rec split_map parameters rh value map = 
       match map with 
         | Empty_map -> rh,(empty_map,None,empty_map) 
@@ -672,6 +860,7 @@ module Make(Ord:OrderedType) =
             && forall_map p right 
             && forall_map p left    
           end                      
+<<<<<<< HEAD
             
     let rec min_elt_map p map = 
       match map with 
@@ -683,12 +872,29 @@ module Make(Ord:OrderedType) =
               | some -> some 
           end
             
+=======
+	    
+    let rec min_elt_map p map = 
+      match map with 
+        | Empty_map -> None 
+        | Node_map(left,key,data,right,_) -> 
+          begin 
+            match min_elt_map p left with 
+              | None -> if p key data then Some key else min_elt_map p right
+              | some -> some 
+          end
+            
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
     let equal_map p = forall2iz (fun x -> p) (fun ()->false)
       
     let rec update_map parameters rh map1 map2 =
       if map1==map2 then rh,map2 
       else  
+<<<<<<< HEAD
         match map1 with 
+=======
+	match map1 with 
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
           | Empty_map -> rh,map2 
           | Node_map(left1,key1,data1,right1,_) -> 
             let rh',(left2,data2,right2) = split_map parameters rh key1 map2 in 
@@ -746,15 +952,22 @@ module Make(Ord:OrderedType) =
             
     let rec diff_map parameters rh map1 map2 =
       match map1 with 
+<<<<<<< HEAD
         | Empty_map -> 
           rh,Empty_map,map2 
         | Node_map(left1,key1,data1,right1,_) -> 
+=======
+	| Empty_map -> 
+          rh,Empty_map,map2 
+	| Node_map(left1,key1,data1,right1,_) -> 
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
           let error,(left2,data2,right2) = split_map parameters rh key1 map2 in 
           let error,oleft1,oleft2 = diff_map parameters error left1 left2 in
           let error,oright1,oright2 = diff_map parameters error right1 right2 in
           begin 
             match data2 with 
               | Some x when x = data1 ->  
+<<<<<<< HEAD
                 let error,o1 = merge_map parameters error oleft1 oright1 in 
                 let error,o2 = merge_map parameters error oleft2 oright2 in
                 error,o1,o2 
@@ -766,19 +979,39 @@ module Make(Ord:OrderedType) =
                 let error,o1 = join_map parameters error oleft1 key1 data1 oright1 in 
                 let error,o2 = merge_map parameters error oleft2 oright2 in
                 error,o1,o2 
+=======
+		let error,o1 = merge_map parameters error oleft1 oright1 in 
+		let error,o2 = merge_map parameters error oleft2 oright2 in
+		error,o1,o2 
+              | Some data2  ->  
+		let error,o1 = join_map parameters error oleft1 key1 data1 oright1 in 
+		let error,o2 = join_map parameters error oleft2 key1 data2 oright2 in
+		error,o1,o2 
+              | None -> 
+		let error,o1 = join_map parameters error oleft1 key1 data1 oright1 in 
+		let error,o2 = merge_map parameters error oleft2 oright2 in
+		error,o1,o2 
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
           end 
 
     let rec diff_map_pred parameters rh pred map1 map2 =
       match map1 with 
+<<<<<<< HEAD
         | Empty_map -> 
           rh,Empty_map,map2 
         | Node_map(left1,key1,data1,right1,_) -> 
+=======
+	| Empty_map -> 
+          rh,Empty_map,map2 
+	| Node_map(left1,key1,data1,right1,_) -> 
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
           let error,(left2,data2,right2) = split_map parameters rh key1 map2 in 
           let error,oleft1,oleft2 = diff_map_pred parameters error pred left1 left2 in
           let error,oright1,oright2 = diff_map_pred parameters error pred right1 right2 in
           begin 
             match data2 with 
               | Some x when pred x data1 ->  
+<<<<<<< HEAD
                 let error,o1 = merge_map parameters error oleft1 oright1 in 
                 let error,o2 = merge_map parameters error oleft2 oright2 in
                 error,o1,o2 
@@ -791,6 +1024,20 @@ module Make(Ord:OrderedType) =
                 let error,o1 = join_map parameters error oleft1 key1 data1 oright1 in 
                 let error,o2 = merge_map parameters error oleft2 oright2 in
                 error,o1,o2 
+=======
+		let error,o1 = merge_map parameters error oleft1 oright1 in 
+		let error,o2 = merge_map parameters error oleft2 oright2 in
+		error,o1,o2 
+		  
+              | Some data2  ->  
+		let error,o1 = join_map parameters error oleft1 key1 data1 oright1 in 
+		let error,o2 = join_map parameters error oleft2 key1 data2 oright2 in
+		error,o1,o2 
+              | None -> 
+		let error,o1 = join_map parameters error oleft1 key1 data1 oright1 in 
+		let error,o2 = merge_map parameters error oleft2 oright2 in
+		error,o1,o2 
+>>>>>>> bd46113d8f6b81867ecb0066f00b4fa4097ffe14
           end       
             
    end:Set_and_Map with type key = Ord.t and type elt = Ord.t)

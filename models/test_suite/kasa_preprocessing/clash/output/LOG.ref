@@ -1,0 +1,27 @@
++ Command line is: 'KaSim' '-i' 'clash.ka' '-seed' '728130018' '-e' '3'
+Parsing clash.ka...
+done
++ Initialized random number generator with seed 728130018
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -variable declarations
+	 -initial conditions
+	 -rules
+	 -observables
+	 -perturbations
+	 Done
++ Analyzing non local patterns...
++ Building initial simulation state...
+	 -Counting initial local patterns...
+	 Done
+____________________________________________________________
+########################################?
+A deadlock was reached after 2 events and 1.985216E+00s (Activity = 0.00000)
+Simulation ended (eff.: 0.250000, detail below)
+	Valid embedding but no longer unary when required: 0.000000
+	Valid embedding but not binary when required: 0.000000
+	Clashing instance: 0.666667
+	Lazy negative update: 0.333333
+	Lazy negative update of non local instances: 0.000000
+	Perturbation interrupting time advance: 0.000000
