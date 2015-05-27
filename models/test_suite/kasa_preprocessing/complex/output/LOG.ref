@@ -412,9 +412,8 @@ site_type:2->state:[state_min:1;state_max:1]
 Potential dependencies between sites:New-index:TEST:Covering_class_id:0:
 site_type:1->state:[state_min:1;state_max:1]
 site_type:2->state:[state_min:1;state_max:1]
-Potential dependencies between sites:New-index:MODIFICATION+:Covering_class_id:0:
-site_type:1->state:
-site_type:2->state:
+Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:
+{1; 2}
 Potential dependencies between sites:agent_type:1:
 Potential dependencies between sites:Number of covering classes:1
 Potential dependencies between sites:Covering_class_id:0:
@@ -426,9 +425,8 @@ site_type:2->state:[state_min:2;state_max:2]
 Potential dependencies between sites:New-index:TEST:Covering_class_id:0:
 site_type:1->state:[state_min:2;state_max:2]
 site_type:2->state:[state_min:2;state_max:2]
-Potential dependencies between sites:New-index:MODIFICATION+:Covering_class_id:0:
-site_type:1->state:
-site_type:2->state:
+Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:
+{1; 2}
 Potential dependencies between sites:agent_type:2:
 Potential dependencies between sites:Number of covering classes:1
 Potential dependencies between sites:Covering_class_id:0:
@@ -446,9 +444,8 @@ site_type:1->state:[state_min:0;state_max:0]
 site_type:2->state:[state_min:0;state_max:0]
 site_type:3->state:[state_min:1;state_max:1]
 site_type:4->state:[state_min:1;state_max:1]
-Potential dependencies between sites:New-index:MODIFICATION+:Covering_class_id:0:
-site_type:3->state:
-site_type:4->state:
+Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:
+{3; 4}
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
 Flow of information in the ODE semantics:agent_type:0:site_modified:0->x(binding state)

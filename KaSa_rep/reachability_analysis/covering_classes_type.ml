@@ -20,14 +20,15 @@ let local_trace = false
 module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
 
 type agent_dic  = Ckappa_sig.agent_dic
-type set        = Cckappa_sig.Site_map_and_set.set
-type value_site = (Ckappa_sig.site_name, Ckappa_sig.site_name) Ckappa_sig.site_type
 type site       = int
 type port       = string
+type set        = Cckappa_sig.Site_map_and_set.set
+type map        = (int * port) Cckappa_sig.Site_map_and_set.map
+type value_site = (Ckappa_sig.site_name, Ckappa_sig.site_name) Ckappa_sig.site_type
 
 type covering_classes =
   {
-    store_sites_modified_set : (set AgentMap.t * value_site list AgentMap.t);
+    store_modified_set : set AgentMap.t;
     store_covering_classes   : ((site * port) list list) AgentMap.t
   }
 
@@ -40,31 +41,25 @@ type covering_classes =
 
 module Inf_array = Int_storage.Nearly_inf_Imperatif
 
-(*module Covering_class =
-  struct
-    type t = 
-      | Covering_class of (site * port) list
-      | Modified_class of site list
-
-    let get_covering_class t =
-      match t with
-        | Covering_class x -> x
-       
-    let compare = compare
-  end*)
-
 module Covering_class =
   struct
     type t = (site * port) list
     let compare = compare
   end
 
+module Modified_class =
+  struct
+    type t = site list
+    let compare = compare
+  end
+
 module Dictionary_of_Covering_class = Dictionary.Dictionary_of_Ord (Covering_class)
+module Dictionary_of_Modified_class = Dictionary.Dictionary_of_Ord (Modified_class)
                                                                     
 type pair_dic  = (unit, unit) Dictionary_of_Covering_class.dictionary
 type index_dic = (unit, unit) Dictionary_of_Covering_class.dictionary
 type test_dic  = (unit, unit) Dictionary_of_Covering_class.dictionary
-type modif_dic = (unit, unit) Dictionary_of_Covering_class.dictionary
+type modif_dic = (unit, unit) Dictionary_of_Modified_class.dictionary
     
 type remanent =
     {
