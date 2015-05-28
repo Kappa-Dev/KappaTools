@@ -163,6 +163,14 @@ module InjProduct =
     let print f phi = Pp.plain_array Injection.print f phi.elements
   end
 
+(*module Activity:(ValMap.ValMap with type content = float) = 
+	ValMap.Make 
+	(struct 
+		type t = float (*mix_id -> rule_activity*) 
+		let to_f = fun alpha -> alpha
+	end)
+*)
+
 module InjectionHeap =
   Heap.Make
     (struct
