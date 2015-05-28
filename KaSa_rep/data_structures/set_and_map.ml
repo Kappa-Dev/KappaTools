@@ -74,6 +74,7 @@ module type Set_and_Map = sig
   val min_elt_map: (key -> 'a -> bool) -> 'a map -> key option  
   val diff_map: Remanent_parameters_sig.parameters ->Exception.method_handler -> 'a map -> 'a map -> Exception.method_handler * 'a map * 'a map 
   val diff_map_pred: Remanent_parameters_sig.parameters ->Exception.method_handler -> ('a -> 'a -> bool) -> 'a map -> 'a map -> Exception.method_handler * 'a map * 'a map 
+  val merge_map : Remanent_parameters_sig.parameters ->Exception.method_handler -> 'a map -> 'a map -> Exception.method_handler * 'a map
 end
 
 module Make(Ord:OrderedType) =  

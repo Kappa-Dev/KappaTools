@@ -434,6 +434,14 @@ Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0
 {1}
 Potential dependencies between sites:agent_type:4:
 Potential dependencies between sites:Number of covering classes:2
+Potential dependencies between sites:Covering_classes:1/2unbinding:site_type:0
+Potential dependencies between sites:Covering_classes:1/2unbinding:site_type:1
+Potential dependencies between sites:Covering_classes:New_index:1/2unbinding:site_type:2
+Potential dependencies between sites:Covering_classes:New_index:1/2unbinding:site_type:1
+Potential dependencies between sites:Covering_classes:1/2unbinding:site_type:1
+Potential dependencies between sites:Covering_classes:New_index:1/2unbinding:site_type:2
+Potential dependencies between sites:Covering_classes:1/2unbinding:site_type:2
+Potential dependencies between sites:Covering_classes:New_index:1/2unbinding:site_type:1
 Potential dependencies between sites:Covering_class_id:0:
 site_type:0->state:[state_min:0; state_max:0]
 site_type:1->state:[state_min:0; state_max:0]
@@ -469,6 +477,10 @@ Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:1
 {1}
 Potential dependencies between sites:agent_type:5:
 Potential dependencies between sites:Number of covering classes:2
+Potential dependencies between sites:Covering_classes:1/2unbinding:site_type:1
+Potential dependencies between sites:Covering_classes:New_index:1/2unbinding:site_type:1
+Potential dependencies between sites:Covering_classes:1/2unbinding:site_type:0
+Potential dependencies between sites:Covering_classes:New_index:1/2unbinding:site_type:1
 Potential dependencies between sites:Covering_class_id:0:
 site_type:1->state:[state_min:0; state_max:0]
 Potential dependencies between sites:New-index:Covering_class_id:0:

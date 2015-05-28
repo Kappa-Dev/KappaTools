@@ -1,0 +1,26 @@
+
+
+digraph G{ 
+node [shape=box, style=filled, fillcolor=lightskyblue];
+"r0" ; 
+"r1" ; 
+"r2" ; 
+"r3" ; 
+edge [color=green, arrowhead=normal];
+"r2" -> "r1"[label ="[0->1]"] ; 
+"r2" -> "r2"[label ="[0->1]"] ; 
+"r3" -> "r3"[label ="[0->1]"] ; 
+edge [color=red, arrowhead=tee];
+"r0" -> "r1"[label ="[0*->1];[0->0]"] ; 
+"r0" -> "r2"[label ="[0*->1];[0->0]"] ; 
+"r0" -> "r3"[label ="[0*->1];[0->0]"] ; 
+"r1" -> "r0"[label ="[1*->0];[0->0]"] ; 
+"r1" -> "r1"[label ="[1*->0];[0*->1]"] ; 
+"r1" -> "r2"[label ="[1*->0];[0*->1];[0->0];[1->1]"] ; 
+"r2" -> "r0"[label ="[0->0]"] ; 
+"r2" -> "r1"[label ="[0->0];[1->1]"] ; 
+"r2" -> "r3"[label ="[0*->1];[0->0]"] ; 
+"r3" -> "r0"[label ="[0->0]"] ; 
+"r3" -> "r1"[label ="[0*->1];[0->0]"] ; 
+"r3" -> "r2"[label ="[0*->1];[0->0]"] ; 
+}

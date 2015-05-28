@@ -53,7 +53,7 @@ let print_list l =
   let output = sprintf_list l in
   Printf.fprintf stdout "%s\n" output
 
-let print_pair_list l =
+let print_pair_list l = (*REMOVE*)
   let rec aux acc =
     match acc with
       | [] -> acc
@@ -85,7 +85,7 @@ let length_sorted (l: (int * Cckappa_sig.Site_map_and_set.set *
 (************************************************************************************)
 (*print port information for site*)
 
-let string_of_port port =
+let string_of_port port = (*REMOVE*)
   "[state_min:"^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.min)^
     ";state_max:"^(string_of_int port.Cckappa_sig.site_state.Cckappa_sig.max)^"]"
 
@@ -152,7 +152,7 @@ let fst_list l =
   let rec aux acc =
     match acc with
     | [] -> []
-    | (x,_,_) :: tl -> x:: aux tl
+    | (x,_,_) :: tl -> x :: aux tl
   in aux l
 
 let re_index_value_list pair_list =
@@ -168,7 +168,7 @@ let re_index_value_list pair_list =
 (*------------------------------------------------------------------------------*)
 (*projection site that are modified with new index*)
 
-let project_modified_site parameter error value_list modified_set =
+let project_modified_site value_list modified_set = (*TODO*)
   let rec aux acc =
     match acc with
       | [] -> []
@@ -177,6 +177,22 @@ let project_modified_site parameter error value_list modified_set =
         then
           let nth_1 = (position x value_list) + 1 in
           let l = nth_1 :: aux tl in
+          l
+        else aux tl
+  in aux value_list
+
+(*------------------------------------------------------------------------------*)
+(*check if in covering class there is a site that belong to site effect set*)
+
+let collect_site_effect value_list effect_set =
+  let rec aux acc =
+    match acc with
+      | [] -> []
+      | x :: tl ->
+        if Cckappa_sig.Site_map_and_set.mem_set x effect_set
+        then
+          let nth_1 = (position x value_list) + 1 in
+          let l = (x, nth_1) :: aux tl in
           l
         else aux tl
   in aux value_list
@@ -244,15 +260,68 @@ let test_new_index_dic parameter error new_id new_dic good_test_dic =
     good_test_dic
 
 (*------------------------------------------------------------------------------*)
+(*compute modified dictionary with new_index*)
+
+let modified_index_dic parameter error covering_class modified_set good_modif_dic =
+  let modified_value =
+    project_modified_site
+      covering_class
+      modified_set
+  in
+  let error, out_modif_dic =
+    Covering_classes_type.Dictionary_of_Modified_class.allocate
+      parameter
+      error
+      Misc_sa.compare_unit
+      modified_value
+      ()
+      Misc_sa.const_unit
+      good_modif_dic
+  in
+  let error, (new_modif_id, modif_index_dic) =
+    match out_modif_dic with
+      | None -> warn parameter error (Some "line 252") Exit (0, good_modif_dic)
+      | Some (id, _, _, dic) -> error, (id, dic)        
+  in
+  error, (new_modif_id, modif_index_dic)
+
+(*------------------------------------------------------------------------------*)
+(*compute site effect with and without new_index*)
+
+let half_break_dic parameter error covering_class effect_set good_effect_dic =
+  let effect_value =
+    collect_site_effect
+      covering_class
+      effect_set
+  in
+  let error, out_effect_dic =
+    Covering_classes_type.Dictionary_of_Effect_class.allocate
+      parameter
+      error
+      Misc_sa.compare_unit
+      effect_value
+      ()
+      Misc_sa.const_unit
+      good_effect_dic
+  in
+  let error, (new_effect_id, store_effect_dic) =
+    match out_effect_dic with
+      | None -> warn parameter error (Some "line 339") Exit (0, good_effect_dic)
+      | Some (id, _, _, dic) -> error, (id, dic)
+  in
+  error, (new_effect_id, store_effect_dic)
+
+(*------------------------------------------------------------------------------*)
 (*store remanent*)
 
-let store_remanent parameter error pair_covering_class modified_set remanent =
+let store_remanent parameter error pair_covering_class modified_set effect_set remanent =
   (* current state of remanent*)
   let pointer_backward    = remanent.Covering_classes_type.store_pointer_backward in
   let good_covering_class = remanent.Covering_classes_type.store_dic in
   let good_index          = remanent.Covering_classes_type.store_new_index_dic in
   let good_test_dic       = remanent.Covering_classes_type.store_test_new_index_dic in
   let good_modif_dic      = remanent.Covering_classes_type.store_modif_new_index_dic in
+  let good_effect_dic     = remanent.Covering_classes_type.store_effect_dic in
   (*------------------------------------------------------------------------------*)
   match pair_covering_class with
     | [] -> error, remanent
@@ -299,10 +368,17 @@ let store_remanent parameter error pair_covering_class modified_set remanent =
       in     
       (*------------------------------------------------------------------------------*)
       (*PART II: site modified with new_index*)
-      let projection_list =
-        project_modified_site
+      let error, (new_modif_id, modif_index_dic) =
+        modified_index_dic
           parameter
           error
+          covering_class
+          modified_set
+          good_modif_dic
+      in
+      (*
+      let modified_value =
+        project_modified_site
           covering_class
           modified_set
       in
@@ -311,7 +387,7 @@ let store_remanent parameter error pair_covering_class modified_set remanent =
           parameter
           error
           Misc_sa.compare_unit
-          projection_list
+          modified_value
           ()
           Misc_sa.const_unit
           good_modif_dic
@@ -320,16 +396,47 @@ let store_remanent parameter error pair_covering_class modified_set remanent =
         match out_modif_dic with
           | None -> warn parameter error (Some "line 252") Exit (0, good_modif_dic)
           | Some (id, _, _, dic) -> error, (id, dic)        
+      in*)
+      (*------------------------------------------------------------------------------*)
+      (*collect site effect in covering class *)
+      let error, (new_effect_id, store_effect_dic) =
+        half_break_dic
+          parameter
+          error
+          covering_class
+          effect_set
+          good_effect_dic
       in
+      (*let effect_value =
+        collect_site_effect
+          covering_class
+          effect_set
+      in
+      let error, out_effect_dic =
+        Covering_classes_type.Dictionary_of_Effect_class.allocate
+          parameter
+          error
+          Misc_sa.compare_unit
+          effect_value
+          ()
+          Misc_sa.const_unit
+          good_effect_dic
+      in
+      let error, (new_effect_id, store_effect_dic) =
+        match out_effect_dic with
+          | None -> warn parameter error (Some "line 339") Exit (0, good_effect_dic)
+          | Some (id, _, _, dic) -> error, (id, dic)
+      in*)
       (*------------------------------------------------------------------------------*)
       (*result*)
       error,
       {
-        Covering_classes_type.store_pointer_backward   = pointer_backward;
-        Covering_classes_type.store_dic                = store_dic;
-        Covering_classes_type.store_new_index_dic      = new_dic;
-        Covering_classes_type.store_test_new_index_dic = test_new_index_dic;
+        Covering_classes_type.store_pointer_backward    = pointer_backward;
+        Covering_classes_type.store_dic                 = store_dic;
+        Covering_classes_type.store_new_index_dic       = new_dic;
+        Covering_classes_type.store_test_new_index_dic  = test_new_index_dic;
         Covering_classes_type.store_modif_new_index_dic = modif_index_dic;
+        Covering_classes_type.store_effect_dic          = store_effect_dic
       }
 
 (*------------------------------------------------------------------------------*)
@@ -345,12 +452,13 @@ let store_remanent parameter error pair_covering_class modified_set remanent =
 
 let init_dic = Covering_classes_type.Dictionary_of_Covering_class.init ()
 
-let clean_classes parameter error pair_covering_classes   modified_set =
+let clean_classes parameter error pair_covering_classes modified_set effect_set =
   let error, init_pointer = Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
   let init_index       = init_dic in
   let init_store_dic   = init_dic in
   let init_test_index  = init_dic in
   let init_modif_index = Covering_classes_type.Dictionary_of_Modified_class.init() in
+  let init_effect_dic = Covering_classes_type.Dictionary_of_Effect_class.init() in
   (*------------------------------------------------------------------------------*)
   (*init state of dictionary*)
   let init_remanent = 
@@ -359,7 +467,8 @@ let clean_classes parameter error pair_covering_classes   modified_set =
       Covering_classes_type.store_dic                 = init_store_dic;
       Covering_classes_type.store_new_index_dic       = init_index;
       Covering_classes_type.store_test_new_index_dic  = init_test_index;
-      Covering_classes_type.store_modif_new_index_dic = init_modif_index
+      Covering_classes_type.store_modif_new_index_dic = init_modif_index;
+      Covering_classes_type.store_effect_dic          = init_effect_dic
     }
   in
   (*------------------------------------------------------------------------------*)
@@ -412,6 +521,7 @@ let clean_classes parameter error pair_covering_classes   modified_set =
                     error
                     covering_class
                     modified_set
+                    effect_set
                     remanent
                 in
                 error, result_covering_dic
@@ -428,6 +538,7 @@ let clean_classes parameter error pair_covering_classes   modified_set =
               error
               covering_class
               modified_set
+              effect_set
               remanent
           in
           error, result_covering_dic
@@ -442,13 +553,13 @@ let clean_classes parameter error pair_covering_classes   modified_set =
 (*------------------------------------------------------------------------------*)
 (*compute modified set in the left hand site*)
 
-let add_modified_set parameter error agent_type site_set store_sites_modified_set =
+let add_modified_set parameter error agent_type site_set store_modified_set =
   let error, out_old_set =
     Covering_classes_type.AgentMap.unsafe_get
       parameter
       error
       agent_type
-      store_sites_modified_set
+      store_modified_set
   in
   let old_set =
     match out_old_set with
@@ -463,15 +574,15 @@ let add_modified_set parameter error agent_type site_set store_sites_modified_se
       site_set
       old_set
   in
-  let error, store_fst_modified_set =
+  let error, store_modified_set =
     Covering_classes_type.AgentMap.set
       parameter
       error
       agent_type
       set
-      store_sites_modified_set
+      store_modified_set
   in
-  error, store_fst_modified_set
+  error, store_modified_set
 
 (*------------------------------------------------------------------------------*)
 
@@ -563,8 +674,78 @@ let collect_modified_set parameter error diff_reverse store_modified_set =
       )
       diff_reverse
       store_modified_set
-  in error, store_modified_set
-    
+  in error, store_modified_set   
+
+(*------------------------------------------------------------------------------*)
+(*compute site effect*)
+
+let collect_half_break parameter error handler store_half_break half_break =
+  List.fold_left (fun (error, store_half_break) (site_add, state) ->
+    (*get information of site and agent_type in site_address*)
+    let site = site_add.Cckappa_sig.site in
+    let agent_type = site_add.Cckappa_sig.agent_type in
+    let error, (min, max) = (*TO BE USED*)
+      match state with
+        | None ->
+          begin
+            let error, value_state =
+              Misc_sa.unsome
+                (Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+                   parameter
+                   error
+                   (agent_type, site)
+                   handler.Cckappa_sig.states_dic)
+                (fun error -> warn parameter error (Some "line 782")
+                  Exit (Cckappa_sig.Dictionary_of_States.init ()))
+            in
+            let error, last_entry =
+              Cckappa_sig.Dictionary_of_States.last_entry
+                parameter
+                error
+                value_state
+            in
+            error, (1, last_entry)
+          end
+        | Some interval ->
+          error, (interval.Cckappa_sig.min, interval.Cckappa_sig.max)
+    in
+    (*get the old one*)
+    let error, out_old =
+      Covering_classes_type.AgentMap.unsafe_get
+        parameter
+        error
+        agent_type
+        store_half_break
+    in
+    let old_set =
+      match out_old with
+        | None -> empty_set
+        | Some s -> s
+    in
+    (*new set*)
+    let error, add_set =
+      Cckappa_sig.Site_map_and_set.add_set
+        parameter
+        error
+        site
+        old_set
+    in
+    let error, new_set =
+      Cckappa_sig.Site_map_and_set.union
+        parameter
+        error
+        add_set
+        old_set
+    in
+    (*store*)
+    Covering_classes_type.AgentMap.set
+      parameter
+      error
+      agent_type
+      new_set
+      store_half_break     
+  )(error, store_half_break) half_break
+
 (*------------------------------------------------------------------------------*)
 (*compute covering_class*)
 
@@ -762,6 +943,16 @@ let scan_rule parameter error handler rule classes =
       classes.Covering_classes_type.store_modified_set
   in
   (*------------------------------------------------------------------------------*)
+  (*compute site effects - half break actions*)
+  let error, store_half_break =
+    collect_half_break
+      parameter
+      error
+      handler
+      classes.Covering_classes_type.store_half_break
+      rule.Cckappa_sig.actions.Cckappa_sig.half_break
+  in
+  (*------------------------------------------------------------------------------*)
   (*compute covering_class*)
   let error, store_covering_classes =
     collect_covering_classes
@@ -776,6 +967,7 @@ let scan_rule parameter error handler rule classes =
   error,
   {
     Covering_classes_type.store_modified_set     = store_modified_set;
+    Covering_classes_type.store_half_break       = store_half_break;
     Covering_classes_type.store_covering_classes = store_covering_classes
   }           
 
@@ -869,8 +1061,35 @@ let print_modified_dic parameter error elt_id store_modif =(*FIXME*)
     ) store_modif
 
 (*------------------------------------------------------------------------------*)
+(*print site effect in covering class*)
 
-let print_dic_and_new_index parameter error store_index store_test store_modif store_dic =
+let print_effect_dic parameter error store_effect =
+  Covering_classes_type.Dictionary_of_Effect_class.print
+    parameter
+    error
+    (fun parameter error elt l _ _ ->
+      let _ =
+        let rec aux acc =
+          match acc with
+            | [] -> ()
+            | (x,y) :: tl ->
+              let _ =
+                Printf.fprintf stdout
+                  "Potential dependencies between sites:Covering_classes:1/2unbinding:site_type:%i\n" x; aux tl
+              in
+              Printf.fprintf stdout
+                "Potential dependencies between sites:Covering_classes:New_index:1/2unbinding:site_type:%i\n" y ; aux tl
+        in
+        aux l
+      in
+      error
+    )
+    store_effect
+
+(*------------------------------------------------------------------------------*)
+
+let print_dic_and_new_index parameter error store_index store_test store_modif 
+    store_dic =
   Covering_classes_type.Dictionary_of_Covering_class.print
     parameter
     error
@@ -897,10 +1116,10 @@ let print_dic_and_new_index parameter error store_index store_test store_modif s
         in
         (*print site that is modified with its new_index*)
         print_modified_dic
-          parameter
-          error
-          elt_id
-          store_modif
+            parameter
+            error
+            elt_id
+            store_modif
       in error
     ) store_dic
 
@@ -955,6 +1174,14 @@ let print_result parameter error result_remanent =
           "Potential dependencies between sites:Number of covering classes:%i\n" number
         in
         (*------------------------------------------------------------------------------*)
+        (* site effect of covering classes*)
+        let _ =
+          print_effect_dic
+            parameter
+            error
+            remanent.Covering_classes_type.store_effect_dic
+        in
+        (*------------------------------------------------------------------------------*)
         (*print covering class and theirs new-index*)
         let _ =
           print_dic_and_new_index
@@ -980,7 +1207,8 @@ let create_map parameter error n_agents =
 
 let scan_rule_set parameter error handler rules =
   let n_agents = handler.Cckappa_sig.nagents in
-  let error, init_modif = create_map parameter error n_agents in
+  let error, init_modif      = create_map parameter error n_agents in
+  let error, init_half_break = create_map parameter error n_agents in
   let error, init_class = create_map parameter error n_agents in
   let error, init_min   = create_map parameter error n_agents in
   let error, init_max   = create_map parameter error n_agents in
@@ -989,6 +1217,7 @@ let scan_rule_set parameter error handler rules =
   let init_class =
     {
       Covering_classes_type.store_modified_set     = init_modif;
+      Covering_classes_type.store_half_break       = init_half_break;
       Covering_classes_type.store_covering_classes = (init_class, init_min, init_max)
     }
   in
@@ -1034,6 +1263,20 @@ let scan_rule_set parameter error handler rules =
             | Some s -> s
         in
         (*------------------------------------------------------------------------------*)
+        (*get site effect*)
+        let error, out_effect =
+          Covering_classes_type.AgentMap.unsafe_get
+            parameter
+            error
+            agent_type
+            store_covering_classes.Covering_classes_type.store_half_break
+        in
+        let effect_set =
+          match out_effect with
+            | None -> empty_set
+            | Some s -> s
+        in
+        (*------------------------------------------------------------------------------*)
         (*clean the covering classes, removed duplicate covering classes*)
         let error, store_remanent =
           clean_classes
@@ -1041,6 +1284,7 @@ let scan_rule_set parameter error handler rules =
             error
             pair_covering_class
             modified_set
+            effect_set
         in
         (*store the covering classes after cleaning the duplicate*)
         let error, store_remanent_dic =

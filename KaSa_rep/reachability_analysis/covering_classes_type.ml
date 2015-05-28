@@ -19,9 +19,9 @@ let local_trace = false
 
 module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
 
-type agent_dic  = Ckappa_sig.agent_dic
-type site       = int
-type set        = Cckappa_sig.Site_map_and_set.set
+type agent_dic = Ckappa_sig.agent_dic
+type site = int
+type set = Cckappa_sig.Site_map_and_set.set
 
 type port_min = set AgentMap.t
 type port_max = set AgentMap.t
@@ -29,6 +29,7 @@ type port_max = set AgentMap.t
 type covering_classes =
   {
     store_modified_set     : set AgentMap.t;
+    store_half_break       : set AgentMap.t;
     store_covering_classes : ((site * set * set) list list) AgentMap.t 
                              * port_min * port_max
   }
@@ -54,13 +55,21 @@ module Modified_class =
     let compare = compare
   end
 
+module Effect_class =
+  struct
+    type t = (site * site) list
+    let compare = compare
+  end
+
 module Dictionary_of_Covering_class = Dictionary.Dictionary_of_Ord (Covering_class)
 module Dictionary_of_Modified_class = Dictionary.Dictionary_of_Ord (Modified_class)
+module Dictionary_of_Effect_class   = Dictionary.Dictionary_of_Ord (Effect_class)
                                                                     
 type pair_dic  = (unit, unit) Dictionary_of_Covering_class.dictionary
 type index_dic = (unit, unit) Dictionary_of_Covering_class.dictionary
 type test_dic  = (unit, unit) Dictionary_of_Covering_class.dictionary
 type modif_dic = (unit, unit) Dictionary_of_Modified_class.dictionary
+type effect_dic = (unit, unit) Dictionary_of_Effect_class.dictionary
     
 type remanent =
     {
@@ -68,5 +77,6 @@ type remanent =
       store_dic                 : pair_dic;
       store_new_index_dic       : index_dic;
       store_test_new_index_dic  : test_dic;
-      store_modif_new_index_dic : modif_dic
+      store_modif_new_index_dic : modif_dic;
+      store_effect_dic          : effect_dic
     }
