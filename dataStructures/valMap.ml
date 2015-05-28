@@ -15,8 +15,12 @@ module type ValMap =
     val empty: tree
     val is_empty: tree -> bool
     val add: key -> content -> tree -> tree
+    val remove: key -> tree -> tree
     val find : key -> tree -> content
     val total : tree -> float
+
+    val fold: (key -> content -> 'a -> 'a) -> tree -> 'a -> 'a
+    val iter: (key -> content -> unit) -> tree -> unit
   end
 
 module Make(C:Content) =

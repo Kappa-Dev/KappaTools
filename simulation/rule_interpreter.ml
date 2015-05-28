@@ -1,13 +1,13 @@
 module Root = struct
-  type t = int
-  let allocate _ _ = ()
+  type t = unit
+  let to_f () = 1.0
 end
 
-module RootHeap = Heap.Make(Root)
+module RootHeap = ValMap.Make(Root)
 
 
 type t = {
-  roots_of_ccs: RootHeap.t Connected_component.Map.t;
+  roots_of_ccs: RootHeap.tree Connected_component.Map.t;
   edges: Edges.t;
   tokens: Nbr.t array;
   free_id: int;
@@ -22,21 +22,17 @@ let empty env = {
 
 let print_heap f h =
   let () = Format.pp_open_box f 0 in
-  let () = RootHeap.iteri
-	     (fun _ c -> Format.fprintf f "%i%t" c Pp.comma) h in
+  let () = RootHeap.iter
+	     (fun c () -> Format.fprintf f "%i%t" c Pp.comma) h in
   Format.pp_close_box f ()
 
-let desallocate content heap =
-  let id =
-    RootHeap.fold (fun i c id -> if c = content then i else id) heap (-1) in
-  if id < 0 then failwith "try to desallocate absent element for heap"
-  else RootHeap.remove id heap
+let allocate id heap = RootHeap.add id () heap
 
 let update_roots is_add map cc root =
   let va = try Connected_component.Map.find cc map
-	   with Not_found -> RootHeap.create 13 in
+	   with Not_found -> RootHeap.empty in
   Connected_component.Map.add
-    cc ((if is_add then RootHeap.alloc else desallocate) root va) map
+    cc ((if is_add then allocate else RootHeap.remove) root va) map
 
 let from_place (inj_nodes,inj_fresh,free_id as inj2graph) = function
   | Transformations.Existing (n,id) ->
@@ -110,8 +106,8 @@ let update_edges domain inj_nodes state removed added =
 let instance_number state ccs_l =
   let size cc =
     try
-      Nbr.I
-	(RootHeap.size (Connected_component.Map.find cc state.roots_of_ccs))
+      Nbr.F
+	(RootHeap.total (Connected_component.Map.find cc state.roots_of_ccs))
     with Not_found -> Nbr.zero in
   let rect_approx ccs =
     Array.fold_left (fun acc cc -> Nbr.mult acc (size cc)) (Nbr.I 1) ccs in
@@ -150,8 +146,9 @@ let apply_rule ~get_alg domain counter state rule =
   let inj =
     Tools.array_fold_lefti
       (fun id inj cc ->
-       let root =
-	 RootHeap.random (Connected_component.Map.find cc state.roots_of_ccs) in
+       let (root,()) =
+	 RootHeap.random_val
+	   (Connected_component.Map.find cc state.roots_of_ccs) in
        match inj with
        | Some inj ->
 	  Connected_component.Matching.reconstruct state.edges inj id cc root
@@ -167,7 +164,7 @@ let all_injections state rule =
   Tools.array_fold_lefti
     (fun id inj_list cc ->
      RootHeap.fold
-       (fun _ root new_injs ->
+       (fun root () new_injs ->
 	List.fold_left
 	  (fun corrects inj ->
 	   match Connected_component.Matching.reconstruct
