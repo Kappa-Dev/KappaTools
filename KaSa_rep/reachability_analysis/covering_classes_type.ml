@@ -30,6 +30,7 @@ type covering_classes =
   {
     store_modified_set     : set AgentMap.t;
     store_half_break       : set AgentMap.t;
+    store_unbinding        : ((int * int * int * int) list) AgentMap.t; (*TODO*)
     store_covering_classes : ((site * set * set) list list) AgentMap.t 
                              * port_min * port_max
   }
@@ -55,9 +56,14 @@ module Modified_class =
     let compare = compare
   end
 
+type orignial_site = site
+type new_index     = site
+
+type unknow_binding = (orignial_site * new_index) list
+
 module Effect_class =
   struct
-    type t = (site * site) list
+    type t = unknow_binding
     let compare = compare
   end
 
@@ -65,10 +71,10 @@ module Dictionary_of_Covering_class = Dictionary.Dictionary_of_Ord (Covering_cla
 module Dictionary_of_Modified_class = Dictionary.Dictionary_of_Ord (Modified_class)
 module Dictionary_of_Effect_class   = Dictionary.Dictionary_of_Ord (Effect_class)
                                                                     
-type pair_dic  = (unit, unit) Dictionary_of_Covering_class.dictionary
-type index_dic = (unit, unit) Dictionary_of_Covering_class.dictionary
-type test_dic  = (unit, unit) Dictionary_of_Covering_class.dictionary
-type modif_dic = (unit, unit) Dictionary_of_Modified_class.dictionary
+type pair_dic   = (unit, unit) Dictionary_of_Covering_class.dictionary
+type index_dic  = (unit, unit) Dictionary_of_Covering_class.dictionary
+type test_dic   = (unit, unit) Dictionary_of_Covering_class.dictionary
+type modif_dic  = (unit, unit) Dictionary_of_Modified_class.dictionary
 type effect_dic = (unit, unit) Dictionary_of_Effect_class.dictionary
     
 type remanent =
