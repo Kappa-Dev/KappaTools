@@ -100,6 +100,8 @@ let is_zero = function
 	   | FP_zero -> true
 	   | FP_normal | FP_subnormal |FP_infinite | FP_nan -> false
 
+let one = I 1
+
 let is_strictly_positive = function
   | F x -> x > 0.
   | I x -> x > 0

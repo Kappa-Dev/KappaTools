@@ -1,13 +1,5 @@
-module Root = struct
-  type t = unit
-  let to_f () = 1.0
-end
-
-module RootHeap = ValMap.Make(Root)
-
-
 type t = {
-  roots_of_ccs: RootHeap.tree Connected_component.Map.t;
+  roots_of_ccs: ValMap.tree Connected_component.Map.t;
   edges: Edges.t;
   tokens: Nbr.t array;
   free_id: int;
@@ -22,17 +14,15 @@ let empty env = {
 
 let print_heap f h =
   let () = Format.pp_open_box f 0 in
-  let () = RootHeap.iter
-	     (fun c () -> Format.fprintf f "%i%t" c Pp.comma) h in
+  let () = ValMap.iter
+	     (fun c -> Format.fprintf f "%i%t" c Pp.comma) h in
   Format.pp_close_box f ()
-
-let allocate id heap = RootHeap.add id () heap
 
 let update_roots is_add map cc root =
   let va = try Connected_component.Map.find cc map
-	   with Not_found -> RootHeap.empty in
+	   with Not_found -> ValMap.empty in
   Connected_component.Map.add
-    cc ((if is_add then allocate else RootHeap.remove) root va) map
+    cc ((if is_add then ValMap.add else ValMap.remove) root va) map
 
 let from_place (inj_nodes,inj_fresh,free_id as inj2graph) = function
   | Transformations.Existing (n,id) ->
@@ -106,12 +96,11 @@ let update_edges domain inj_nodes state removed added =
 let instance_number state ccs_l =
   let size cc =
     try
-      Nbr.F
-	(RootHeap.total (Connected_component.Map.find cc state.roots_of_ccs))
-    with Not_found -> Nbr.zero in
+      ValMap.total (Connected_component.Map.find cc state.roots_of_ccs)
+    with Not_found -> 0 in
   let rect_approx ccs =
-    Array.fold_left (fun acc cc -> Nbr.mult acc (size cc)) (Nbr.I 1) ccs in
-  List.fold_left (fun acc ccs -> Nbr.add acc (rect_approx ccs)) Nbr.zero ccs_l
+    Array.fold_left (fun acc cc -> ( *) acc (size cc)) 1 ccs in
+  Nbr.I (List.fold_left (fun acc ccs -> (+) acc (rect_approx ccs)) 0 ccs_l)
 
 let value_bool ~get_alg counter state expr =
   Expr_interpreter.value_bool
@@ -146,8 +135,8 @@ let apply_rule ~get_alg domain counter state rule =
   let inj =
     Tools.array_fold_lefti
       (fun id inj cc ->
-       let (root,()) =
-	 RootHeap.random_val
+       let root =
+	 ValMap.random_val
 	   (Connected_component.Map.find cc state.roots_of_ccs) in
        match inj with
        | Some inj ->
@@ -163,8 +152,8 @@ let apply_rule ~get_alg domain counter state rule =
 let all_injections state rule =
   Tools.array_fold_lefti
     (fun id inj_list cc ->
-     RootHeap.fold
-       (fun root () new_injs ->
+     ValMap.fold
+       (fun root new_injs ->
 	List.fold_left
 	  (fun corrects inj ->
 	   match Connected_component.Matching.reconstruct

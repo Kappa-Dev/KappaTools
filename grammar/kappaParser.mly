@@ -378,7 +378,7 @@ multiple_mixture:
     | alg_expr non_empty_mixture {($1,($2, rhs_pos 2))}
       /*conflict here because ID (blah) could be token non_empty mixture or mixture...*/
     | non_empty_mixture
-	{((Ast.CONST (Nbr.I 1),(Lexing.dummy_pos,Lexing.dummy_pos)),add_pos $1)}
+	{((Ast.CONST (Nbr.one),(Lexing.dummy_pos,Lexing.dummy_pos)),add_pos $1)}
     ;
 
 non_empty_mixture:

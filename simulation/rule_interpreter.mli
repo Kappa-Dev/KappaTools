@@ -1,7 +1,6 @@
 type t
 
-module RootHeap : ValMap.ValMap with type content=unit
-val print_heap : Format.formatter -> RootHeap.tree -> unit
+val print_heap : Format.formatter -> ValMap.tree -> unit
 
 val empty : Environment.t -> t
 

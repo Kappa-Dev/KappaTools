@@ -17,6 +17,7 @@ val to_float : t -> float
 val to_int : t -> int
 val zero : t
 val is_zero : t -> bool
+val one : t
 val is_strictly_positive : t -> bool
 val print : Format.formatter -> t -> unit
 val to_string : t -> string

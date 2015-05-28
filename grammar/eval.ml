@@ -196,7 +196,7 @@ let effects_of_modif env domain ast_list =
 		arrow = Ast.RAR; lhs=[]; rhs=[];
 		k_def=Term.with_dummy_pos (Ast.CONST Nbr.zero);
 		k_un=None; k_op= None; } in
-	    rule_effect (Term.with_dummy_pos (Ast.CONST (Nbr.I 1)))
+	    rule_effect (Term.with_dummy_pos (Ast.CONST (Nbr.one)))
 			ast_rule tk_pos
 	 | SNAPSHOT (pexpr,_) ->
 	    let (domain',pexpr') =
