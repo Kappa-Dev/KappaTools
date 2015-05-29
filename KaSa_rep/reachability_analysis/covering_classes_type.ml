@@ -24,9 +24,11 @@ type site = int
 type set = Cckappa_sig.Site_map_and_set.set
 type agent_name = Cckappa_sig.agent_name
 
+(*state information*)
 type port_min = set AgentMap.t
 type port_max = set AgentMap.t
 
+(*site effects*)
 type orignial_site = site
 type new_index     = site
 type unknow_unbinding = (orignial_site * new_index) list
@@ -38,9 +40,19 @@ module Unbinding_class =
     let compare = compare
   end
 
+type deletion = set * set (** set * set*)
+
+module Remove_class =
+  struct
+    type t = deletion
+    let compare = compare
+  end
+
 module Dictionary_of_Unbinding_class  = Dictionary.Dictionary_of_Ord (Unbinding_class)
+module Dictionary_of_Remove_class  = Dictionary.Dictionary_of_Ord (Remove_class)
 
 type unbinding_dic = (unit, unit) Dictionary_of_Unbinding_class.dictionary
+type remove_dic = (unit, unit) Dictionary_of_Remove_class.dictionary
 
 type covering_classes =
   {
@@ -48,6 +60,8 @@ type covering_classes =
     store_half_break       : set AgentMap.t;
     store_unbinding        : know_unbinding;
     store_unbinding_dic    : unbinding_dic;
+    (*store_remove           : deletion;
+    store_remove_dic       : remove_dic;*)
     store_covering_classes : ((site * set * set) list list) AgentMap.t 
                              * port_min * port_max
   }

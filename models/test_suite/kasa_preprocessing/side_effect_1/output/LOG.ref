@@ -280,10 +280,7 @@ Influence_map:Inhibition_map:rule(3):'r3' A(y!1),C(x!1)->C(x) -> rule(0):'r0' A(
 Influence_map:Inhibition_map:rule(3):'r3' A(y!1),C(x!1)->C(x) -> rule(1):'r1' A(x!_),B(x!_)->A(x),B(x)[0*->1];[0->0]
 Influence_map:Inhibition_map:rule(3):'r3' A(y!1),C(x!1)->C(x) -> rule(2):'r2' A(x!1),B(x!1)->B(x)[0*->1];[0->0]
 Potential dependencies between sites:
-Potential dependencies between sites:class_id:0:unbinding:
-Potential dependencies between sites:class_id:1:unbinding:
-agent_type:0:site_type:0 -> agent_type:1:site_type:0
-Potential dependencies between sites:class_id:2:unbinding:
+Potential dependencies between sites:unbinding:
 agent_type:0:site_type:1 -> agent_type:2:site_type:0
 agent_type:0:site_type:0 -> agent_type:1:site_type:0
 Potential dependencies between sites:agent_type:0:

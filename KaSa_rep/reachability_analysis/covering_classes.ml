@@ -540,8 +540,7 @@ let collect_modified_set parameter error diff_reverse store_modified_set =
           (*result*)
           error, store_modified_set
       ) diff_reverse store_modified_set
-  in error, store_modified_set 
-
+  in error, store_modified_set
 
 (*------------------------------------------------------------------------------*)
 (*compute site effect*)
@@ -625,6 +624,102 @@ let collect_unbinding_dic parameter error value_unbinding store_unbinding_dic =
       | Some (id, _, _, dic) -> error, (id, dic)
   in
   error, store_unbinding_dic
+
+(*------------------------------------------------------------------------------*)
+(*collect remove actions*)
+
+(*let collect_remove parameter error store_remove remove =
+  List.fold_left (fun store_remove (index, agent, list) ->
+    let agent_type = agent.Cckappa_sig.agent_name in
+      (*store document site*)
+    let (set_agent1, set_site1) =
+      Cckappa_sig.Site_map_and_set.fold_map
+        (fun site _ (current_agent_class, current_class) ->
+          let error, set_site =
+            Cckappa_sig.Site_map_and_set.add_set parameter error
+              site
+              current_class
+          in
+          let error, set_agent =
+            Cckappa_sig.Site_map_and_set.add_set
+              parameter
+              error
+              agent_type
+              current_agent_class
+          in
+          (set_agent, set_site)
+        ) agent.Cckappa_sig.agent_interface (empty_set, empty_set)
+    in
+    let (set_agent2, set_site2) =
+      List.fold_left (fun (current_agent_class, current_class) site ->
+        let error, set_site =
+          Cckappa_sig.Site_map_and_set.add_set
+            parameter
+            error
+            site
+            current_class
+        in
+        let error, set_agent =
+          Cckappa_sig.Site_map_and_set.add_set
+            parameter
+            error
+            agent_type
+            current_agent_class
+        in
+        (set_agent, set_site)
+      ) (empty_set, empty_set) list
+    in
+    let (old_agent1, old_set1, old_agent2, old_set2)  = store_remove in
+    let error, new_set1 = 
+      Cckappa_sig.Site_map_and_set.union
+        parameter
+        error
+        set_site1
+        old_set1
+    in
+    let error, new_agent1 =
+      Cckappa_sig.Site_map_and_set.union
+        parameter
+        error
+        set_agent1
+        old_agent1
+    in
+    let error, new_set2 = 
+      Cckappa_sig.Site_map_and_set.union
+        parameter
+        error
+        set_site2
+        old_set2
+    in
+    let error, new_agent2 =
+      Cckappa_sig.Site_map_and_set.union
+        parameter
+        error
+        set_agent2
+        old_agent2
+    in
+    (new_agent1, new_set1, new_agent2, new_set2)
+  
+  ) store_remove remove
+
+(*collect remove in dictionary*)
+let collect_remove_dic parameter error value_remove store_remove_dic =
+  let error, out_dic =
+    Covering_classes_type.Dictionary_of_Remove_class.allocate
+      parameter
+      error
+      Misc_sa.compare_unit
+      value_remove
+      ()
+      Misc_sa.const_unit
+      store_remove_dic
+  in
+  let error, (new_id, store_remove_dic) =
+    match out_dic with
+      | None -> warn parameter error (Some "line 303") Exit (0, store_remove_dic)
+      | Some (id, _, _, dic) -> error, (id, dic)
+  in
+  error, store_remove_dic*)
 
 (*------------------------------------------------------------------------------*)
 (*compute covering_class*)
@@ -785,6 +880,21 @@ let scan_rule parameter error handler rule classes =
       classes.Covering_classes_type.store_unbinding_dic
   in
   (*------------------------------------------------------------------------------*)
+  (*compute remove site*)
+  (*let store_remove =
+    collect_remove
+      parameter error
+    classes.Covering_classes_type.store_remove
+    rule.Cckappa_sig.actions.Cckappa_sig.remove
+  in
+  (*------------------------------------------------------------------------------*)
+  (*store remove dictionary*)
+  let error, store_remove_dic =
+    collect_remove_dic parameter error
+      store_remove
+      classes.Covering_classes_type.store_remove_dic
+  in*)
+  (*------------------------------------------------------------------------------*)
   (*compute covering_class*)
   let error, store_covering_classes =
     collect_covering_classes parameter error
@@ -800,6 +910,8 @@ let scan_rule parameter error handler rule classes =
     Covering_classes_type.store_half_break       = store_half_break;
     Covering_classes_type.store_unbinding        = store_unbinding;
     Covering_classes_type.store_unbinding_dic    = store_unbinding_dic;
+    (*Covering_classes_type.store_remove           = store_remove;
+    Covering_classes_type.store_remove_dic       = store_remove_dic;*)
     Covering_classes_type.store_covering_classes = store_covering_classes
   }           
 
@@ -937,6 +1049,46 @@ let print_unbinding_dic parameter error store_unbinding =
     ) store_unbinding
 
 (*------------------------------------------------------------------------------*)
+(*print remove dictionary*)
+
+(*let print_remove_dic parameter error store_remove_dic = (*FIXME*)
+  Covering_classes_type.Dictionary_of_Remove_class.print
+    parameter
+    error
+    (fun parameter error elt (set_agent1, set_site1, set_agent2, set_site2) _ _ ->
+      let _ =
+        let l1 = Cckappa_sig.Site_map_and_set.elements set_agent1 in
+        let l2 = Cckappa_sig.Site_map_and_set.elements set_agent2 in
+        let s1 = Cckappa_sig.Site_map_and_set.elements set_site1 in
+        let s2 = Cckappa_sig.Site_map_and_set.elements set_site2 in
+        let _ =
+        (*print document site deletion*)
+          let rec aux acc =
+            match acc with
+              | [] -> ()
+              | a :: tl ->
+                Printf.fprintf stdout
+                  "Potential dependencies between sites:class_id:%i:deletion:document_site:agent_type:%i\n" elt a;
+                aux tl
+          in
+          aux l1
+        in
+        (*print undocument site deletion*)
+        let rec aux acc =
+          match acc with
+            | [] -> ()
+            | a :: tl ->
+              Printf.fprintf stdout
+                "Potential dependencies between sites:class_id:%i:deletion:undocument_site:agent_type:%i:\n" elt a;
+              aux tl
+        in
+        aux l2
+      in
+      error
+    )
+    store_remove_dic*)
+
+(*------------------------------------------------------------------------------*)
 
 let print_dic_and_new_index parameter error store_index store_test store_modif 
     store_dic =
@@ -1040,6 +1192,8 @@ let scan_rule_set parameter error handler rules =
   let error, init_half_break = create_map parameter error n_agents in
   let error, init_unbinding  = create_map parameter error n_agents in
   let init_dic  = Covering_classes_type.Dictionary_of_Unbinding_class.init() in 
+  let init_remove = (empty_set, empty_set, empty_set, empty_set) in
+  let init_remove_dic  = Covering_classes_type.Dictionary_of_Remove_class.init() in 
   let error, init_class = create_map parameter error n_agents in
   let error, init_min   = create_map parameter error n_agents in
   let error, init_max   = create_map parameter error n_agents in
@@ -1051,6 +1205,8 @@ let scan_rule_set parameter error handler rules =
       Covering_classes_type.store_half_break       = init_half_break;
       Covering_classes_type.store_unbinding        = [];
       Covering_classes_type.store_unbinding_dic    = init_dic;
+      (*Covering_classes_type.store_remove           = init_remove;
+      Covering_classes_type.store_remove_dic       = init_remove_dic;*)
       Covering_classes_type.store_covering_classes = (init_class, init_min, init_max)
     }
   in
@@ -1121,10 +1277,39 @@ let scan_rule_set parameter error handler rules =
       result_covering_classes
       init_result
   in
+  (*print unbinding dictionary*)
   let _ =
+    Printf.fprintf stdout "Potential dependencies between sites:unbinding:\n";
+    let rec aux acc =
+      match acc with
+        | [] -> []
+        | (a,x,b,y) :: tl ->
+          Printf.fprintf stdout
+            "agent_type:%i:site_type:%i -> agent_type:%i:site_type:%i\n" a x b y; aux tl
+    in
+    aux store_covering_classes.Covering_classes_type.store_unbinding
+  in
+  (*let _ =
      print_unbinding_dic parameter error
        store_covering_classes.Covering_classes_type.store_unbinding_dic
-  in
+  in*)
+  (*let _ =
+    let (set_agent1, set_site1, set_agent2, set_site2) =
+      store_covering_classes.Covering_classes_type.store_remove in
+    let l1 = Cckappa_sig.Site_map_and_set.elements set_agent1 in
+    let l2 = Cckappa_sig.Site_map_and_set.elements set_agent2 in
+    let s1 = Cckappa_sig.Site_map_and_set.elements set_site1 in
+    let s2 = Cckappa_sig.Site_map_and_set.elements set_site2 in
+    let _ = print_string "document_site:agent_type:"; print_list l1 in
+    let _ = print_string "undocument_site:agent_type:"; print_list l2 in
+    let _ = print_string "document_site:site_type:"; print_list s1 in
+    print_string "undocument_site:site_type:"; print_list s2    
+  in*)
+  (*print remove action*)
+  (*let _ =
+    print_remove_dic parameter error
+      store_covering_classes.Covering_classes_type.store_remove_dic
+  in*)
   error, remanent_dictionary
 
 (************************************************************************************)   

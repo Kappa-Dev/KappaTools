@@ -143,7 +143,7 @@ Influence_map:Inhibition_map:rule(0):'bind' A(x),B(x)->A(x!1),B(x!1) -> rule(1):
 Influence_map:Inhibition_map:rule(1):'remove' A(x),A(x)->A(x),B(x),A(x) -> rule(0):'bind' A(x),B(x)->A(x!1),B(x!1)[1->0]
 Influence_map:Inhibition_map:rule(1):'remove' A(x),A(x)->A(x),B(x),A(x) -> rule(1):'remove' A(x),A(x)->A(x),B(x),A(x)[1->0]
 Potential dependencies between sites:
-Potential dependencies between sites:class_id:0:unbinding:
+Potential dependencies between sites:unbinding:
 Potential dependencies between sites:agent_type:0:
 Potential dependencies between sites:Number of covering classes:1
 Potential dependencies between sites:Covering_class_id:0:
