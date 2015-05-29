@@ -397,6 +397,7 @@ Influence_map:Wake_up_map:rule(3):'r3' C(x!_,y),D(y)->C(x!_,y!1),D(y!1) -> rule(
 Potential dependencies between sites:
 Potential dependencies between sites:agent_type:0:
 Potential dependencies between sites:Number of covering classes:3
+Potential dependencies between sites:class_id:0:unbinding:
 Potential dependencies between sites:Covering_class_id:0:
 site_type:2->state:[state_min:0; state_max:0][state_min:1; state_max:1]
 site_type:3->state:[state_min:0; state_max:0][state_min:1; state_max:1]
@@ -463,6 +464,7 @@ Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:2
 {1; 2}
 Potential dependencies between sites:agent_type:1:
 Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:class_id:0:unbinding:
 Potential dependencies between sites:Covering_class_id:0:
 site_type:0->state:[state_min:0; state_max:0][state_min:1; state_max:1]
 site_type:1->state:[state_min:0; state_max:0][state_min:1; state_max:1]
@@ -476,6 +478,7 @@ Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0
 {1; 2}
 Potential dependencies between sites:agent_type:2:
 Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:class_id:0:unbinding:
 Potential dependencies between sites:Covering_class_id:0:
 site_type:0->state:[state_min:0; state_max:0][state_min:1; state_max:1]
 site_type:1->state:[state_min:0; state_max:0][state_min:1; state_max:1]
@@ -489,6 +492,7 @@ Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0
 {1; 2}
 Potential dependencies between sites:agent_type:3:
 Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:class_id:0:unbinding:
 Potential dependencies between sites:Covering_class_id:0:
 site_type:0->state:[state_min:0; state_max:0][state_min:1; state_max:1]
 site_type:1->state:[state_min:0; state_max:0][state_min:1; state_max:1]

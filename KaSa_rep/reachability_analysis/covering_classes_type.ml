@@ -31,7 +31,7 @@ type covering_classes =
   {
     store_modified_set     : set AgentMap.t;
     store_half_break       : set AgentMap.t;
-    store_unbinding        : ((agent_name * site * agent_name * site) list);
+    store_unbinding        : ((site * agent_name * agent_name * site) list);
     store_covering_classes : ((site * set * set) list list) AgentMap.t 
                              * port_min * port_max
   }
@@ -63,22 +63,30 @@ type new_index     = site
 type unknow_unbinding = (orignial_site * new_index) list
 type know_unbinding = (agent_name * site * agent_name * site) list
 
-module Effect_class =
+module Unbinding_class =
   struct
-    type t = (unknow_unbinding * know_unbinding)
+    type t = know_unbinding
+    let compare = compare
+  end
+
+module Halfbreak_class =
+  struct
+    type t = unknow_unbinding
     let compare = compare
   end
 
 module Dictionary_of_Covering_class = Dictionary.Dictionary_of_Ord (Covering_class)
 module Dictionary_of_Modified_class = Dictionary.Dictionary_of_Ord (Modified_class)
-module Dictionary_of_Effect_class   = Dictionary.Dictionary_of_Ord (Effect_class)
+module Dictionary_of_Halfbreak_class   = Dictionary.Dictionary_of_Ord (Halfbreak_class)
+module Dictionary_of_Unbinding_class   = Dictionary.Dictionary_of_Ord (Unbinding_class)
                                                                     
 type pair_dic   = (unit, unit) Dictionary_of_Covering_class.dictionary
 type index_dic  = (unit, unit) Dictionary_of_Covering_class.dictionary
 type test_dic   = (unit, unit) Dictionary_of_Covering_class.dictionary
 type modif_dic  = (unit, unit) Dictionary_of_Modified_class.dictionary
-type effect_dic = (unit, unit) Dictionary_of_Effect_class.dictionary
-    
+type halfbreak_dic = (unit, unit) Dictionary_of_Halfbreak_class.dictionary
+type unbinding_dic = (unit, unit) Dictionary_of_Unbinding_class.dictionary
+
 type remanent =
     {
       store_pointer_backward    : set Inf_array.t;
@@ -86,5 +94,6 @@ type remanent =
       store_new_index_dic       : index_dic;
       store_test_new_index_dic  : test_dic;
       store_modif_new_index_dic : modif_dic;
-      store_effect_dic          : effect_dic
+      store_halfbreak_dic       : halfbreak_dic;
+      store_unbinding_dic       : unbinding_dic;
     }
