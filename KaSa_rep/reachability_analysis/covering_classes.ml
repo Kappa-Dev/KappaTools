@@ -177,7 +177,7 @@ let project_modified_site value_list modified_set = (*TODO:add state information
 (*------------------------------------------------------------------------------*)
 (*check if in covering class there is a site that belong to site effect set*)
 
-let collect_site_effect value_list effect_set =
+let collect_site_effect value_list effect_set = (*TODO*)
   let rec aux acc =
     match acc with
       | [] -> []
@@ -243,7 +243,7 @@ let test_new_index_dic parameter error new_id new_dic good_test_dic =
 (*------------------------------------------------------------------------------*)
 (*compute modified dictionary with new_index*)
 
-let modified_index_dic parameter error covering_class modified_set good_modif_dic =
+let modified_index_dic parameter error covering_class modified_set good_new_index_modif_dic =
   let modified_value = project_modified_site covering_class modified_set in
   let error, out_modif_dic =
     Covering_classes_type.Dictionary_of_Modified_class.allocate
@@ -253,11 +253,11 @@ let modified_index_dic parameter error covering_class modified_set good_modif_di
       modified_value
       ()
       Misc_sa.const_unit
-      good_modif_dic
+      good_new_index_modif_dic
   in
   let error, (new_modif_id, modif_index_dic) =
     match out_modif_dic with
-      | None -> warn parameter error (Some "line 252") Exit (0, good_modif_dic)
+      | None -> warn parameter error (Some "line 252") Exit (0, good_new_index_modif_dic)
       | Some (id, _, _, dic) -> error, (id, dic)        
   in
   error, (new_modif_id, modif_index_dic)
@@ -265,7 +265,7 @@ let modified_index_dic parameter error covering_class modified_set good_modif_di
 (*------------------------------------------------------------------------------*)
 (*compute site effect with and without new_index*)
 
-let halfbreak_dic parameter error covering_class effect_set good_halfbreak_dic =
+let halfbreak_dic parameter error covering_class effect_set good_halfbreak_dic =(*TODO*)
   let halfbreak_value = collect_site_effect covering_class effect_set in
   let error, out_effect_dic =
     Covering_classes_type.Dictionary_of_Halfbreak_class.allocate
@@ -540,7 +540,8 @@ let collect_modified_set parameter error diff_reverse store_modified_set =
           (*result*)
           error, store_modified_set
       ) diff_reverse store_modified_set
-  in error, store_modified_set   
+  in error, store_modified_set 
+
 
 (*------------------------------------------------------------------------------*)
 (*compute site effect*)
@@ -602,10 +603,28 @@ let collect_know_binding error store_unbinding release =
       (*store unbinding information*)
       let unbinding_list =
         (agent_type_1, site_1, agent_type_2, site_2) :: store_unbinding
-      in error, unbinding_list)
-      (error, store_unbinding) release
+      in error, unbinding_list
+    )(error, store_unbinding) release
   in
   error, store_unbinding
+
+let collect_unbinding_dic parameter error value_unbinding store_unbinding_dic =
+  let error, out_dic =
+    Covering_classes_type.Dictionary_of_Unbinding_class.allocate
+      parameter
+      error
+      Misc_sa.compare_unit
+      value_unbinding
+      ()
+      Misc_sa.const_unit
+      store_unbinding_dic
+  in
+  let error, (new_id, store_unbinding_dic) =
+    match out_dic with
+      | None -> warn parameter error (Some "line 303") Exit (0, store_unbinding_dic)
+      | Some (id, _, _, dic) -> error, (id, dic)
+  in
+  error, store_unbinding_dic
 
 (*------------------------------------------------------------------------------*)
 (*compute covering_class*)
@@ -759,6 +778,13 @@ let scan_rule parameter error handler rule classes =
       rule.Cckappa_sig.actions.Cckappa_sig.release
   in
   (*------------------------------------------------------------------------------*)
+  (*store dictionary of unbinding*)
+  let error, store_unbinding_dic =
+    collect_unbinding_dic parameter error
+      store_unbinding
+      classes.Covering_classes_type.store_unbinding_dic
+  in
+  (*------------------------------------------------------------------------------*)
   (*compute covering_class*)
   let error, store_covering_classes =
     collect_covering_classes parameter error
@@ -773,6 +799,7 @@ let scan_rule parameter error handler rule classes =
     Covering_classes_type.store_modified_set     = store_modified_set;
     Covering_classes_type.store_half_break       = store_half_break;
     Covering_classes_type.store_unbinding        = store_unbinding;
+    Covering_classes_type.store_unbinding_dic    = store_unbinding_dic;
     Covering_classes_type.store_covering_classes = store_covering_classes
   }           
 
@@ -983,10 +1010,10 @@ let print_result parameter error result_remanent =
         in
         (*------------------------------------------------------------------------------*)
         (* site effect of unbinding without covering classes *)
-        let _ =
+        (*let _ =
           print_unbinding_dic parameter error
             remanent.Covering_classes_type.store_unbinding_dic
-        in
+        in*)
         (*------------------------------------------------------------------------------*)
         (*print covering class and theirs new-index*)
         let _ =
@@ -1012,6 +1039,7 @@ let scan_rule_set parameter error handler rules =
   let error, init_modif      = create_map parameter error n_agents in
   let error, init_half_break = create_map parameter error n_agents in
   let error, init_unbinding  = create_map parameter error n_agents in
+  let init_dic  = Covering_classes_type.Dictionary_of_Unbinding_class.init() in 
   let error, init_class = create_map parameter error n_agents in
   let error, init_min   = create_map parameter error n_agents in
   let error, init_max   = create_map parameter error n_agents in
@@ -1022,6 +1050,7 @@ let scan_rule_set parameter error handler rules =
       Covering_classes_type.store_modified_set     = init_modif;
       Covering_classes_type.store_half_break       = init_half_break;
       Covering_classes_type.store_unbinding        = [];
+      Covering_classes_type.store_unbinding_dic    = init_dic;
       Covering_classes_type.store_covering_classes = (init_class, init_min, init_max)
     }
   in
@@ -1048,12 +1077,12 @@ let scan_rule_set parameter error handler rules =
       (fun parameters error agent_type pair_covering_class init_remanent ->
         (*------------------------------------------------------------------------------*)
         (*get modified site*)
-        let error, out_modified_set =
+        let error, out_modified =
           Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get parameter error agent_type
             store_covering_classes.Covering_classes_type.store_modified_set
         in
         let modified_set =
-          match out_modified_set with
+          match out_modified with
             | None -> empty_set
             | Some s -> s
         in
@@ -1091,6 +1120,10 @@ let scan_rule_set parameter error handler rules =
       )
       result_covering_classes
       init_result
+  in
+  let _ =
+     print_unbinding_dic parameter error
+       store_covering_classes.Covering_classes_type.store_unbinding_dic
   in
   error, remanent_dictionary
 
