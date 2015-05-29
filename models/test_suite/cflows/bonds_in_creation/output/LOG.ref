@@ -1,0 +1,72 @@
++ Command line is: 'KaSim' '-i' 'bonds_in_creation.ka' '-t' '40' '-p' '100' '-seed' '611463625' '-d' 'output'
+Parsing bonds_in_creation.ka...
+done
++ Initialized random number generator with seed 611463625
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -variable declarations
+	 -initial conditions
+	 -rules
+	 -observables
+	 -perturbations
+	 Done
++ Analyzing non local patterns...
++ Building initial simulation state...
+	 -Counting initial local patterns...
+	 Done
+____________________________________________________________
+############################################################
++ Producing causal compressions
+	 - refining events
+	 - Causal flow (without simplification) computation
+		 * Causal flow computation (42)
+
+Stats:
+ number of step   : 827
+ longest story    : 616
+ average length   : 229.123
+ geometric mean   : 297.901
+
+
+____________________________________________________________
+############################################################
+
+	 - Causal flow (with trivial simplifications) computation
+		 * detecting pseudo inverse events
+		 * Causal flow computation (42)
+
+Stats:
+ number of step   : 249
+ longest story    : 27
+ average length   : 15.66
+ geometric mean   : 16.4128
+
+
+____________________________________________________________
+############################################################
+
+
+
+	 - Weak flow compression (13)
+
+____________________________________________________________
+############################################################
+
+	 - Strong flow compression (3)
+
+____________________________________________________________
+############################################################
++ Pretty printing 32 flows
+
++ Pretty printing 3 weakly compressed flows
+
++ Pretty printing 1 strongly compressed flow
+
+Simulation ended (eff.: 0.806758, detail below)
+	Valid embedding but no longer unary when required: 0.000000
+	Valid embedding but not binary when required: 0.000000
+	Clashing instance: 0.000000
+	Lazy negative update: 1.000000
+	Lazy negative update of non local instances: 0.000000
+	Perturbation interrupting time advance: 0.000000

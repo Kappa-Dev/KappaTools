@@ -1,0 +1,12 @@
+#Command-line:
+${KAPPABIN}KaSim -i bonds_in_init.ka  -t 40  -seed 611463625 -d output || exit 0 
+
+
+#To test non regression against a fix to a 
+#bug found by Jonathan. 
+#In case of bonds in initial state, the musical notation 
+#for strong compression were wrong and the link could be removed 
+#while keeping the agent. 
+
+
+

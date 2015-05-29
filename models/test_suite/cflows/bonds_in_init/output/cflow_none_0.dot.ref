@@ -1,0 +1,40 @@
+/* Compression of 3 causal flows obtained in average at 1.453942E+00 t.u */
+/* Compressed causal flows were: [1;2;3] */
+digraph G{
+ ranksep=.5 ;
+{ rank = same ; "0" [shape=plaintext] ;}
+{ rank = same ; "1" [shape=plaintext] ;
+node_5 [label="Signal", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "2" [shape=plaintext] ;
+node_6 [label="K.S", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "3" [shape=plaintext] ;
+node_7 [label="KpSx", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_8 [label="KpSy", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "4" [shape=plaintext] ;
+node_9 [label="S.L.Z", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "5" [shape=plaintext] ;
+node_10 [label="S..L..Z", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "6" [shape=plaintext] ;
+node_11 [label="L", style=filled, fillcolor=red] ;
+}
+"0" -> "1" [style="invis"];
+"1" -> "2" [style="invis"];
+"2" -> "3" [style="invis"];
+"3" -> "4" [style="invis"];
+"4" -> "5" [style="invis"];
+"5" -> "6" [style="invis"];
+node_5 -> node_6
+node_6 -> node_7
+node_6 -> node_8
+node_7 -> node_9
+node_8 -> node_9
+node_9 -> node_10
+node_10 -> node_11
+}
+/*
+*/
