@@ -22,6 +22,7 @@ module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
 type agent_dic = Ckappa_sig.agent_dic
 type site = int
 type set = Cckappa_sig.Site_map_and_set.set
+type agent_name = Cckappa_sig.agent_name
 
 type port_min = set AgentMap.t
 type port_max = set AgentMap.t
@@ -30,7 +31,7 @@ type covering_classes =
   {
     store_modified_set     : set AgentMap.t;
     store_half_break       : set AgentMap.t;
-    store_unbinding        : ((int * int * int * int) list) AgentMap.t; (*TODO*)
+    store_unbinding        : ((agent_name * site * agent_name * site) list);
     store_covering_classes : ((site * set * set) list list) AgentMap.t 
                              * port_min * port_max
   }
@@ -59,11 +60,12 @@ module Modified_class =
 type orignial_site = site
 type new_index     = site
 
-type unknow_binding = (orignial_site * new_index) list
+type unknow_unbinding = (orignial_site * new_index) list
+type know_unbinding = (agent_name * site * agent_name * site) list
 
 module Effect_class =
   struct
-    type t = unknow_binding
+    type t = (unknow_unbinding * know_unbinding)
     let compare = compare
   end
 

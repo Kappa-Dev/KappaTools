@@ -401,24 +401,16 @@ Influence_map:Inhibition_map:rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~
 Influence_map:Inhibition_map:rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2) -> rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!_,y!_),C(x~u,y~p)[0->0]
 Influence_map:Inhibition_map:rule(3):'r1_op' B(x!1,y!2),C(x~u!1,y~p!2)->B(x!_,y!_),C(x~u,y~p) -> rule(2):'r1' B(x!_,y!_),C(x~u,y~p)->B(x!1,y!2),C(x~u!1,y~p!2)[0->0]
 Potential dependencies between sites:
-Potential dependencies between sites:agent_type:2:
-agent_type:1:site_type:0 -> agent_type:2:site:2
-agent_type:1:site_type:1 -> agent_type:2:site:3
-agent_type:0:site_type:0 -> agent_type:1:site:0
-agent_type:0:site_type:1 -> agent_type:1:site:1
-agent_type:0:site_type:1 -> agent_type:1:site:1
-agent_type:0:site_type:0 -> agent_type:1:site:0
-agent_type:0:site_type:1 -> agent_type:1:site:1
-agent_type:0:site_type:1 -> agent_type:1:site:1
-agent_type:1:site_type:1 -> agent_type:2:site:3
-agent_type:0:site_type:0 -> agent_type:1:site:0
-agent_type:0:site_type:1 -> agent_type:1:site:1
-agent_type:0:site_type:1 -> agent_type:1:site:1
-agent_type:0:site_type:0 -> agent_type:1:site:0
-agent_type:0:site_type:1 -> agent_type:1:site:1
-agent_type:0:site_type:1 -> agent_type:1:site:1
 Potential dependencies between sites:agent_type:0:
 Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:unbinding:
+agent_type:1:site_type:0 -> agent_type:2:site_type:2
+Potential dependencies between sites:unbinding:
+agent_type:1:site_type:1 -> agent_type:2:site_type:3
+Potential dependencies between sites:unbinding:
+agent_type:0:site_type:0 -> agent_type:1:site_type:0
+Potential dependencies between sites:unbinding:
+agent_type:0:site_type:1 -> agent_type:1:site_type:1
 Potential dependencies between sites:Covering_class_id:0:
 site_type:0->state:[state_min:0; state_max:0][state_min:1; state_max:1]
 site_type:1->state:[state_min:0; state_max:0][state_min:1; state_max:1]
@@ -432,6 +424,14 @@ Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0
 {1; 2}
 Potential dependencies between sites:agent_type:1:
 Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:unbinding:
+agent_type:1:site_type:0 -> agent_type:2:site_type:2
+Potential dependencies between sites:unbinding:
+agent_type:1:site_type:1 -> agent_type:2:site_type:3
+Potential dependencies between sites:unbinding:
+agent_type:0:site_type:0 -> agent_type:1:site_type:0
+Potential dependencies between sites:unbinding:
+agent_type:0:site_type:1 -> agent_type:1:site_type:1
 Potential dependencies between sites:Covering_class_id:0:
 site_type:0->state:[state_min:0; state_max:0][state_min:1; state_max:1][state_min:2; state_max:2]
 site_type:1->state:[state_min:0; state_max:0][state_min:1; state_max:1][state_min:2; state_max:2]
@@ -445,6 +445,14 @@ Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0
 {1; 2}
 Potential dependencies between sites:agent_type:2:
 Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:unbinding:
+agent_type:1:site_type:0 -> agent_type:2:site_type:2
+Potential dependencies between sites:unbinding:
+agent_type:1:site_type:1 -> agent_type:2:site_type:3
+Potential dependencies between sites:unbinding:
+agent_type:0:site_type:0 -> agent_type:1:site_type:0
+Potential dependencies between sites:unbinding:
+agent_type:0:site_type:1 -> agent_type:1:site_type:1
 Potential dependencies between sites:Covering_class_id:0:
 site_type:0->state:[state_min:0; state_max:0]
 site_type:1->state:[state_min:0; state_max:0]
