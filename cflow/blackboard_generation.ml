@@ -1297,8 +1297,11 @@ module Preblackboard =
                    data_structure.old_agents_potential_substitution
                    data_structure.sure_agents}
            in 
-           let sure_agent x = 
-             AgentIdSet.mem x data_structure.sure_agents 
+           let sure_agent = 
+	     if init then (fun _ -> true)
+	     else 
+	       (fun x -> 
+             AgentIdSet.mem x data_structure.sure_agents)
            in 
            let data_structure = 
              {
