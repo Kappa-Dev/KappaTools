@@ -22,23 +22,26 @@ module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
 type agent_dic = Ckappa_sig.agent_dic
 type site = int
 type set = Cckappa_sig.Site_map_and_set.set
+type 'a map = 'a Cckappa_sig.Site_map_and_set.map
 type agent_name = Cckappa_sig.agent_name
+type agent_index = int
 
 (*state information*)
 type port_min = set AgentMap.t
 type port_max = set AgentMap.t
 
 (*site effect*)
-type know_unbinding = (agent_name * site * agent_name * site) list
+type know_unbinding = (agent_index * agent_name * site * 
+                         agent_index * agent_name * site) list
 
 (*deletion*)
-type document_del = (int * agent_name * site) Cckappa_sig.Site_map_and_set.map
-type undocument_del = (int * agent_name * site) Cckappa_sig.Site_map_and_set.map
+type document_del = (agent_index * agent_name * site) map
+type undocument_del= (agent_index * agent_name * site) map
 type deletion = document_del AgentMap.t * undocument_del AgentMap.t
 
 type covering_classes =
   {
-    store_modified_set     : set AgentMap.t;
+    store_modified_map     : (int map) AgentMap.t;
     store_half_break       : set AgentMap.t;
     store_unbinding        : know_unbinding;
     store_remove_map       : deletion;

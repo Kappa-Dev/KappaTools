@@ -161,14 +161,14 @@ let re_index_value_list pair_list =
 (*------------------------------------------------------------------------------*)
 (*projection site that are modified with new index*)
 
-let project_modified_site value_list modified_set = (*TODO:add state information*)
+let project_modified_site value_list modified_map = (*TODO:add state information*)
   let rec aux acc =
     match acc with
       | [] -> []
       | x :: tl ->
-        if not (Cckappa_sig.Site_map_and_set.is_empty_set modified_set)
+        if not (Cckappa_sig.Site_map_and_set.is_empty_map modified_map)
         then
-          if Cckappa_sig.Site_map_and_set.mem_set x modified_set
+          if Cckappa_sig.Site_map_and_set.mem_map x modified_map
           then
             let nth_1 = (position x value_list) + 1 in
             let l = nth_1 :: aux tl in
@@ -249,8 +249,8 @@ let test_new_index_dic parameter error new_id new_dic good_test_dic =
 (*------------------------------------------------------------------------------*)
 (*compute modified dictionary with new_index*)
 
-let modified_index_dic parameter error covering_class modified_set good_new_index_modif_dic =
-  let modified_value = project_modified_site covering_class modified_set in
+let modified_index_dic parameter error covering_class modified_map good_new_index_modif_dic =
+  let modified_value = project_modified_site covering_class modified_map in
   let error, out_modif_dic =
     Covering_classes_type.Dictionary_of_Modified_class.allocate
       parameter
@@ -293,7 +293,7 @@ let halfbreak_dic parameter error covering_class effect_set good_halfbreak_dic =
 (*------------------------------------------------------------------------------*)
 (*store remanent*)
 
-let store_remanent parameter error pair_covering_class modified_set effect_set
+let store_remanent parameter error pair_covering_class modified_map effect_set
     remanent =
   (* current state of remanent*)
   let pointer_backward    = remanent.Covering_classes_type.store_pointer_backward in
@@ -328,7 +328,7 @@ let store_remanent parameter error pair_covering_class modified_set effect_set
       (*------------------------------------------------------------------------------*)
       (*PART II: site modified with new_index*)
       let error, (new_modif_id, modif_index_dic) =
-        modified_index_dic parameter error covering_class modified_set good_modif_dic in
+        modified_index_dic parameter error covering_class modified_map good_modif_dic in
       (*------------------------------------------------------------------------------*)
       (*collect site effect in covering class *)
       let error, (new_halfbreak_id, store_halfbreak_dic) =
@@ -358,7 +358,7 @@ let store_remanent parameter error pair_covering_class modified_set effect_set
 
 let init_dic = Covering_classes_type.Dictionary_of_Covering_class.init ()
 
-let clean_classes parameter error pair_covering_classes modified_set effect_set =
+let clean_classes parameter error pair_covering_classes modified_map effect_set =
   let error, init_pointer = Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
   let init_index       = init_dic in
   let init_store_dic   = init_dic in
@@ -412,7 +412,7 @@ let clean_classes parameter error pair_covering_classes modified_set effect_set 
                 let error, result_covering_dic =
                   store_remanent parameter error
                     covering_class
-                    modified_set
+                    modified_map
                     effect_set
                     remanent
                 in
@@ -427,7 +427,7 @@ let clean_classes parameter error pair_covering_classes modified_set effect_set 
           let error, result_covering_dic =
             store_remanent parameter error
               covering_class
-              modified_set
+              modified_map
               effect_set
               remanent
           in
@@ -440,25 +440,59 @@ let clean_classes parameter error pair_covering_classes modified_set effect_set 
 (************************************************************************************)   
 (*RULE*)
 
-(*------------------------------------------------------------------------------*)
-(*compute modified set in the left hand site*)
-
-let add_modified_set parameter error agent_type site_set store_modified_set =
-  let error, out_old_set =
-    Covering_classes_type.AgentMap.unsafe_get parameter error agent_type
-      store_modified_set in
-  let old_set =
-    match out_old_set with
-      | None -> empty_set
-      | Some s -> s
-  in
-  (*union the old and the current one*)
-  let error, set =
-    Cckappa_sig.Site_map_and_set.union parameter error site_set old_set in
-  let error, store_modified_set =
-    Covering_classes_type.AgentMap.set parameter error agent_type
-      set store_modified_set
-  in error, store_modified_set
+let collect_modified_map parameter error diff_reverse store_modified_map =
+  Covering_classes_type.AgentMap.fold parameter error
+    (fun parameter error agent_id site_modif store_modified_map ->
+      if Cckappa_sig.Site_map_and_set.is_empty_map
+        site_modif.Cckappa_sig.agent_interface
+      then error, store_modified_map
+      else
+        let agent_type = site_modif.Cckappa_sig.agent_name in
+        let store_site =
+          Cckappa_sig.Site_map_and_set.fold_map
+            (fun site _ current_map ->
+              let error, site_map =
+                Cckappa_sig.Site_map_and_set.add_map
+                  parameter
+                  error
+                  site
+                  site
+                  current_map
+              in
+              site_map
+            )
+            site_modif.Cckappa_sig.agent_interface
+            Cckappa_sig.Site_map_and_set.empty_map
+        in
+          (*get old*)
+        let error, old =
+          Covering_classes_type.AgentMap.unsafe_get
+            parameter
+            error
+            agent_type
+            store_modified_map
+        in
+        let old_map = 
+          match old with
+            | None -> Cckappa_sig.Site_map_and_set.empty_map
+            | Some m -> m
+        in
+          (*store*)
+        let error, final_map =
+          Cckappa_sig.Site_map_and_set.union_map
+            parameter
+            error
+            old_map
+            store_site
+        in
+        Covering_classes_type.AgentMap.set
+          parameter
+          error
+          agent_type
+          final_map
+          store_modified_map
+    ) diff_reverse
+    store_modified_map
 
 (*------------------------------------------------------------------------------*)
 
@@ -485,37 +519,6 @@ let add_state_class parameter error agent_type port_set store_port =
     Covering_classes_type.AgentMap.set parameter error agent_type
       set store_port
   in error, store_port
-
-(*------------------------------------------------------------------------------*)
-
-let collect_modified_set parameter error diff_reverse store_modified_set =
-  let error, store_modified_set =
-    Int_storage.Quick_Nearly_inf_Imperatif.fold parameter error
-      (fun parameter error agent_id site_modif store_modified_set ->
-        if Cckappa_sig.Site_map_and_set.is_empty_map
-          site_modif.Cckappa_sig.agent_interface
-        then error, store_modified_set
-        else
-          let agent_type = site_modif.Cckappa_sig.agent_name in
-          let store_site =
-            Cckappa_sig.Site_map_and_set.fold_map
-              (fun site port current_class ->
-                (*get port_min*)
-                let (port_min, port_max) = int_of_port port in
-                let error, set =
-                  Cckappa_sig.Site_map_and_set.add_set parameter error
-                    site current_class in
-                set) site_modif.Cckappa_sig.agent_interface empty_set
-          in
-          (*store modified_set*)
-          let error, store_modified_set =
-            add_modified_set parameter error agent_type
-              store_site store_modified_set
-          in
-          (*result*)
-          error, store_modified_set
-      ) diff_reverse store_modified_set
-  in error, store_modified_set
 
 (*------------------------------------------------------------------------------*)
 (*compute site effect*)
@@ -557,11 +560,26 @@ let collect_half_break parameter error handler store_half_break half_break =
     in
     (*new set*)
     let error, add_set =
-      Cckappa_sig.Site_map_and_set.add_set parameter error site old_set in
+      Cckappa_sig.Site_map_and_set.add_set
+        parameter
+        error
+        site
+        old_set
+    in
     let error, new_set =
-      Cckappa_sig.Site_map_and_set.union parameter error add_set old_set in
+      Cckappa_sig.Site_map_and_set.union
+        parameter
+        error
+        add_set
+        old_set
+    in
     (*store*)
-    Covering_classes_type.AgentMap.set parameter error agent_type new_set store_half_break
+    Covering_classes_type.AgentMap.set
+      parameter
+      error
+      agent_type
+      new_set
+      store_half_break
   )(error, store_half_break) half_break
 
 (*know unbinding*)
@@ -569,14 +587,17 @@ let collect_know_binding error store_unbinding release =
   let error, store_unbinding =
     List.fold_left (fun (error, store_unbinding) (site_add_1, site_add_2) ->
       (*get the first binding information*)
-      let site_1 = site_add_1.Cckappa_sig.site in
+      let agent_index_1 = site_add_1.Cckappa_sig.agent_index in
       let agent_type_1 = site_add_1.Cckappa_sig.agent_type in
+      let site_1 = site_add_1.Cckappa_sig.site in
       (*get the second binding information*)
-      let site_2 = site_add_2.Cckappa_sig.site in
+      let agent_index_2 = site_add_2.Cckappa_sig.agent_index in
       let agent_type_2 = site_add_2.Cckappa_sig.agent_type in
+      let site_2 = site_add_2.Cckappa_sig.site in
       (*store unbinding information*)
       let unbinding_list =
-        (agent_type_1, site_1, agent_type_2, site_2) :: store_unbinding
+        (agent_index_1, agent_type_1, site_1, 
+         agent_index_2, agent_type_2, site_2) :: store_unbinding
       in error, unbinding_list
     )(error, store_unbinding) release
   in
@@ -711,14 +732,14 @@ let add_covering_class parameter error agent_type pair_site store_covering_class
 (*compute the state information*)
 
 let store_port_state parameter error agent_type port_min current_port_min
-    port_max current_port_max snd_cv thrd_cv =
+    port_max current_port_max state_min state_max =
   let error, port_set_min =
     Cckappa_sig.Site_map_and_set.add_set parameter error
       port_min current_port_min
   in
   let error, set_min =
     get_old_port parameter error agent_type
-      port_set_min snd_cv
+      port_set_min state_min
   in
   (*get state max*)
   let error, port_set_max =
@@ -728,7 +749,7 @@ let store_port_state parameter error agent_type port_min current_port_min
   in
   let error, set_max =
     get_old_port parameter error agent_type
-      port_set_max thrd_cv
+      port_set_max state_max
   in (set_min, set_max)
 
 (*------------------------------------------------------------------------------*)
@@ -767,7 +788,7 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
             | Cckappa_sig.Ghost -> error, store_covering_classes
             | Cckappa_sig.Agent agent ->
               let agent_type = agent.Cckappa_sig.agent_name in
-              let (fst_cv, snd_cv, thrd_cv) = store_covering_classes in
+              let (store_cv, state_min, state_max) = store_covering_classes in
               (*get a list of sites from an interface at each rule*)
               let pair_site =
                 Cckappa_sig.Site_map_and_set.fold_map
@@ -778,7 +799,7 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
                       store_port_state parameter error agent_type
                         port_min current_port_min
                         port_max current_port_max
-                        snd_cv thrd_cv
+                        state_min state_max
                     in
                     (*store*) (*FIXME:add agent_type?*)
                     let site_list = (site, set_min, set_max) :: current_class in
@@ -791,9 +812,9 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
               (*store covering class*)
               let error, (covering_classes, store_port_min, store_port_max) =
                 store_covering_port_state_class parameter error agent_type
-                  site_list fst_cv
-                  port_set_min snd_cv
-                  port_set_max thrd_cv
+                  site_list store_cv
+                  port_set_min state_min
+                  port_set_max state_max
               in
               (*store*)
               error, (covering_classes, store_port_min, store_port_max)
@@ -816,11 +837,13 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
 
 let scan_rule parameter error handler rule classes =
   (*------------------------------------------------------------------------------*)
-  (*compute modified set*)
-  let error, store_modified_set =
-    collect_modified_set parameter error
+  (*compute modified map*)
+  let error, store_modified_map =
+    collect_modified_map
+      parameter
+      error
       rule.Cckappa_sig.diff_reverse
-      classes.Covering_classes_type.store_modified_set
+      classes.Covering_classes_type.store_modified_map
   in
   (*------------------------------------------------------------------------------*)
   (*compute site effects - half break actions*)
@@ -858,7 +881,8 @@ let scan_rule parameter error handler rule classes =
   (*result*)
   error,
   {
-    Covering_classes_type.store_modified_set     = store_modified_set;
+    (*Covering_classes_type.store_modified_set     = store_modified_set;*)
+    Covering_classes_type.store_modified_map     = store_modified_map;
     Covering_classes_type.store_half_break       = store_half_break;
     Covering_classes_type.store_unbinding        = store_unbinding;
     Covering_classes_type.store_remove_map       = store_remove_map;
@@ -1074,9 +1098,9 @@ let print_unbinding store_unbinding =
     let rec aux acc =
       match acc with
         | [] -> []
-        | (a,x,b,y) :: tl ->
+        | (i,a,x,u,b,y) :: tl ->
           Printf.fprintf stdout
-            "agent_type:%i:site_type:%i -> agent_type:%i:site_type:%i\n" a x b y;
+            "agent_id:%i:agent_type:%i:site_type:%i -> agent_id:%i:agent_type:%i:site_type:%i\n" i a x u b y;
           aux tl
     in aux store_unbinding
 
@@ -1124,6 +1148,7 @@ let create_map parameter error n_agents =
 let scan_rule_set parameter error handler rules =
   let n_agents = handler.Cckappa_sig.nagents in
   let error, init_modif      = create_map parameter error n_agents in
+  let error, init_modif_map  = create_map parameter error n_agents in
   let error, init_half_break = create_map parameter error n_agents in
   let error, init_remove_doc = create_map parameter error n_agents in
   let error, init_remove_undoc = create_map parameter error n_agents in
@@ -1135,7 +1160,8 @@ let scan_rule_set parameter error handler rules =
   (*init state of covering class*)
   let init_class =
     {
-      Covering_classes_type.store_modified_set     = init_modif;
+      (*Covering_classes_type.store_modified_set     = init_modif;*)
+      Covering_classes_type.store_modified_map     = init_modif_map;
       Covering_classes_type.store_half_break       = init_half_break;
       Covering_classes_type.store_unbinding        = [];
       Covering_classes_type.store_remove_map       = init_remove_map;
@@ -1167,11 +1193,11 @@ let scan_rule_set parameter error handler rules =
         (*get modified site*)
         let error, out_modified =
           Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get parameter error agent_type
-            store_covering_classes.Covering_classes_type.store_modified_set
+            store_covering_classes.Covering_classes_type.store_modified_map
         in
-        let modified_set =
+        let modified_map =
           match out_modified with
-            | None -> empty_set
+            | None -> Cckappa_sig.Site_map_and_set.empty_map
             | Some s -> s
         in
         (*------------------------------------------------------------------------------*)
@@ -1190,7 +1216,7 @@ let scan_rule_set parameter error handler rules =
         let error, store_remanent =
           clean_classes parameters error
             pair_covering_class
-            modified_set
+            modified_map
             effect_set
         in
         (*store the covering classes after cleaning the duplicate class*)
@@ -1208,11 +1234,8 @@ let scan_rule_set parameter error handler rules =
   (*print unbinding information*)
   let _ = print_unbinding store_covering_classes.Covering_classes_type.store_unbinding in
   (*print store remove map*)
-  let _ =
-    print_remove
-      parameter
-      error
-      store_covering_classes.Covering_classes_type.store_remove_map
+  let _ = print_remove parameter error 
+    store_covering_classes.Covering_classes_type.store_remove_map
   in
   error, remanent_dictionary
 
