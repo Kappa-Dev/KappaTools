@@ -41,7 +41,7 @@ type deletion = document_del AgentMap.t * undocument_del AgentMap.t
 
 type covering_classes =
   {
-    store_modified_map     : (int map) AgentMap.t;
+    store_modified_map     : int map AgentMap.t;
     store_half_break       : set AgentMap.t;
     store_unbinding        : know_unbinding;
     store_remove_map       : deletion;

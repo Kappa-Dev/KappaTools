@@ -68,6 +68,7 @@ module type Set_and_Map = sig
   val join_map: Remanent_parameters_sig.parameters->Exception.method_handler -> 'a map -> key -> 'a -> 'a map -> Exception.method_handler * 'a map
   val split_map: Remanent_parameters_sig.parameters->Exception.method_handler-> key -> 'a map -> Exception.method_handler * ('a map * 'a option * 'a map)
   val union_map:Remanent_parameters_sig.parameters->Exception.method_handler-> 'a map -> 'a map ->Exception.method_handler * 'a map
+  val bindings : 'a map -> (key * 'a) list
   val equal_map: ('a -> 'a -> bool) -> 'a map -> 'a map -> bool
   val update_map: Remanent_parameters_sig.parameters ->Exception.method_handler -> 'a map -> 'a map -> Exception.method_handler * 'a map    
   val map2_map: Remanent_parameters_sig.parameters ->Exception.method_handler -> ('a -> 'a -> 'a) -> 'a map -> 'a map -> Exception.method_handler * 'a map 
@@ -663,7 +664,14 @@ module Make(Ord:OrderedType) =
                 let mh''', right' = union_map parameters mh'' right1 right2 in
                 join_map parameters mh''' left' key2 data2 right'
               end
-                
+
+    let rec bindings_aux accu = function
+      | Empty_map -> accu
+      | Node_map (l, v, d, r, _) -> bindings_aux ((v, d) :: bindings_aux accu r) l
+        
+    let bindings s =
+      bindings_aux [] s
+
     let rec forall2iz p fail map1 map2 =
       if map1==map2 then true else 
         match map1 with 

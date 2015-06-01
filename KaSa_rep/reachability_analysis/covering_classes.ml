@@ -177,6 +177,25 @@ let project_modified_site value_list modified_map = (*TODO:add state information
         else [] (*if modified_set is empty then nothing*)
   in aux value_list
 
+(*let project_modified_site value_list modified_map = (*TODO:add state information*)
+  let rec aux acc =
+    match acc with
+      | [] -> []
+      | x :: tl ->
+        if not (Cckappa_sig.Site_map_and_set.is_empty_map modified_map)
+        then
+          if Cckappa_sig.Site_map_and_set.mem_map x modified_map
+          then
+            Cckappa_sig.Site_map_and_set.fold_map
+              (fun k (site, min) _ ->
+                let nth_1 = (position x value_list) + 1 in
+                let l = (nth_1, min) :: aux tl in
+                l
+              ) modified_map []
+          else aux tl
+        else [] (*if modified_set is empty then nothing*)
+  in aux value_list*)
+
 (*------------------------------------------------------------------------------*)
 (*check if in covering class there is a site that belong to site effect set*)
 
@@ -450,7 +469,9 @@ let collect_modified_map parameter error diff_reverse store_modified_map =
         let agent_type = site_modif.Cckappa_sig.agent_name in
         let store_site =
           Cckappa_sig.Site_map_and_set.fold_map
-            (fun site _ current_map ->
+            (fun site port current_map ->
+              let (port_min, port_max) = int_of_port port in
+              (*store site map*)
               let error, site_map =
                 Cckappa_sig.Site_map_and_set.add_map
                   parameter
@@ -464,7 +485,7 @@ let collect_modified_map parameter error diff_reverse store_modified_map =
             site_modif.Cckappa_sig.agent_interface
             Cckappa_sig.Site_map_and_set.empty_map
         in
-          (*get old*)
+        (*get old*)
         let error, old =
           Covering_classes_type.AgentMap.unsafe_get
             parameter
@@ -477,7 +498,7 @@ let collect_modified_map parameter error diff_reverse store_modified_map =
             | None -> Cckappa_sig.Site_map_and_set.empty_map
             | Some m -> m
         in
-          (*store*)
+        (*store*)
         let error, final_map =
           Cckappa_sig.Site_map_and_set.union_map
             parameter
@@ -485,12 +506,15 @@ let collect_modified_map parameter error diff_reverse store_modified_map =
             old_map
             store_site
         in
-        Covering_classes_type.AgentMap.set
-          parameter
-          error
-          agent_type
-          final_map
-          store_modified_map
+        let error, store_modified_map =
+          Covering_classes_type.AgentMap.set
+            parameter
+            error
+            agent_type
+            final_map
+            store_modified_map
+        in
+        error, store_modified_map
     ) diff_reverse
     store_modified_map
 
@@ -881,7 +905,6 @@ let scan_rule parameter error handler rule classes =
   (*result*)
   error,
   {
-    (*Covering_classes_type.store_modified_set     = store_modified_set;*)
     Covering_classes_type.store_modified_map     = store_modified_map;
     Covering_classes_type.store_half_break       = store_half_break;
     Covering_classes_type.store_unbinding        = store_unbinding;
@@ -1092,6 +1115,7 @@ let print_result parameter error result_remanent =
       in
       error) parameter result_remanent
 
+(*------------------------------------------------------------------------------*)
 (*This unbinding information getting no information of covering_class*)
 let print_unbinding store_unbinding =
   Printf.fprintf stdout "Potential dependencies between sites:unbinding:\n";
@@ -1100,10 +1124,12 @@ let print_unbinding store_unbinding =
         | [] -> []
         | (i,a,x,u,b,y) :: tl ->
           Printf.fprintf stdout
-            "agent_id:%i:agent_type:%i:site_type:%i -> agent_id:%i:agent_type:%i:site_type:%i\n" i a x u b y;
+            "agent_id:%i:agent_type:%i:site_type:%i -> agent_id:%i:agent_type:%i:site_type:%i\n"
+            i a x u b y;
           aux tl
     in aux store_unbinding
 
+(*------------------------------------------------------------------------------*)
 (*print remove action*)
 let print_remove parameter error store_remove =
   (*print document*)
@@ -1147,7 +1173,6 @@ let create_map parameter error n_agents =
 
 let scan_rule_set parameter error handler rules =
   let n_agents = handler.Cckappa_sig.nagents in
-  let error, init_modif      = create_map parameter error n_agents in
   let error, init_modif_map  = create_map parameter error n_agents in
   let error, init_half_break = create_map parameter error n_agents in
   let error, init_remove_doc = create_map parameter error n_agents in
@@ -1160,7 +1185,6 @@ let scan_rule_set parameter error handler rules =
   (*init state of covering class*)
   let init_class =
     {
-      (*Covering_classes_type.store_modified_set     = init_modif;*)
       Covering_classes_type.store_modified_map     = init_modif_map;
       Covering_classes_type.store_half_break       = init_half_break;
       Covering_classes_type.store_unbinding        = [];
