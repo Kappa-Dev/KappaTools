@@ -1,0 +1,74 @@
++ Command line is: 'KaSim' '-i' 'distributive.ka' '-seed' '240056667' '-e' '1000' '-d' 'output'
+Parsing distributive.ka...
+done
++ Initialized random number generator with seed 240056667
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -variable declarations
+	 -initial conditions
+	 -rules
+	 -observables
+	 -perturbations
+	 Done
++ Analyzing non local patterns...
++ Building initial simulation state...
+	 -Counting initial local patterns...
+	 Done
+____________________________________________________________
+############################################################
++ Producing causal compressions
+	 - refining events
+	 - Causal flow (without simplification) computation
+		 * Causal flow computation (106)
+
+Stats:
+ number of step   : 1127
+ longest story    : 464
+ average length   : 213.068
+ geometric mean   : 252.366
+
+
+____________________________________________________________
+############################################################
+
+	 - Causal flow (with trivial simplifications) computation
+		 * detecting pseudo inverse events
+		 * Causal flow computation (106)
+
+____________________________________________________________
+############################################################
+Stats:
+ number of step   : 689
+ longest story    : 20
+ average length   : 12.1266
+ geometric mean   : 12.5584
+
+
+____________________________________________________________
+############################################################
+
+
+
+	 - Weak flow compression (1)
+
+____________________________________________________________
+############################################################
+
+	 - Strong flow compression (1)
+
+____________________________________________________________
+############################################################
++ Pretty printing 106 flows
+
++ Pretty printing 1 weakly compressed flow
+
++ Pretty printing 1 strongly compressed flow
+
+Simulation ended (eff.: 0.690131, detail below)
+	Valid embedding but no longer unary when required: 0.000000
+	Valid embedding but not binary when required: 0.000000
+	Clashing instance: 0.000000
+	Lazy negative update: 1.000000
+	Lazy negative update of non local instances: 0.000000
+	Perturbation interrupting time advance: 0.000000

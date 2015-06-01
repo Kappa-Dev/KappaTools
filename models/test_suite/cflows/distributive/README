@@ -1,0 +1,10 @@
+#Command-line:
+${KAPPABIN}KaSim -i distributive.ka -seed 240056667 -e 1000 -d output || exit 0 
+
+#Distributive phosphorilation the sites of a protein A.
+#It is highly unlikely that the same kinase is used to phosphorilate the two sites of the protein A. 
+#Strong compression do not merge the two Ks, because it would add a causal relation. 
+
+
+
+
