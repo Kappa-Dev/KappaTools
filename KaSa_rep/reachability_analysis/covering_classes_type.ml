@@ -28,40 +28,20 @@ type agent_name = Cckappa_sig.agent_name
 type port_min = set AgentMap.t
 type port_max = set AgentMap.t
 
-(*site effects*)
-type orignial_site = site
-type new_index     = site
-type unknow_unbinding = (orignial_site * new_index) list
+(*site effect*)
 type know_unbinding = (agent_name * site * agent_name * site) list
 
-module Unbinding_class =
-  struct
-    type t = know_unbinding
-    let compare = compare
-  end
-
-type deletion = set * set (** set * set*)
-
-module Remove_class =
-  struct
-    type t = deletion
-    let compare = compare
-  end
-
-module Dictionary_of_Unbinding_class  = Dictionary.Dictionary_of_Ord (Unbinding_class)
-module Dictionary_of_Remove_class  = Dictionary.Dictionary_of_Ord (Remove_class)
-
-type unbinding_dic = (unit, unit) Dictionary_of_Unbinding_class.dictionary
-type remove_dic = (unit, unit) Dictionary_of_Remove_class.dictionary
+(*deletion*)
+type document_del = (int * agent_name * site) Cckappa_sig.Site_map_and_set.map
+type undocument_del = (int * agent_name * site) Cckappa_sig.Site_map_and_set.map
+type deletion = document_del AgentMap.t * undocument_del AgentMap.t
 
 type covering_classes =
   {
     store_modified_set     : set AgentMap.t;
     store_half_break       : set AgentMap.t;
     store_unbinding        : know_unbinding;
-    store_unbinding_dic    : unbinding_dic;
-    (*store_remove           : deletion;
-    store_remove_dic       : remove_dic;*)
+    store_remove_map       : deletion;
     store_covering_classes : ((site * set * set) list list) AgentMap.t 
                              * port_min * port_max
   }
@@ -87,21 +67,28 @@ module Modified_class =
     let compare = compare
   end
 
+(*site effects*)
+type orignial_site = site
+type new_index     = site
+type unknow_unbinding = (orignial_site * new_index) list
+
 module Halfbreak_class =
   struct
     type t = unknow_unbinding
     let compare = compare
   end
 
+(*Dictionary*)
+
 module Dictionary_of_Covering_class = Dictionary.Dictionary_of_Ord (Covering_class)
-module Dictionary_of_Halfbreak_class = Dictionary.Dictionary_of_Ord (Halfbreak_class)
 module Dictionary_of_Modified_class = Dictionary.Dictionary_of_Ord (Modified_class)
+module Dictionary_of_Halfbreak_class = Dictionary.Dictionary_of_Ord (Halfbreak_class)
 
 type pair_dic   = (unit, unit) Dictionary_of_Covering_class.dictionary
 type index_dic  = (unit, unit) Dictionary_of_Covering_class.dictionary
 type test_dic   = (unit, unit) Dictionary_of_Covering_class.dictionary
-type halfbreak_dic = (unit, unit) Dictionary_of_Halfbreak_class.dictionary
 type modif_dic  = (unit, unit) Dictionary_of_Modified_class.dictionary
+type halfbreak_dic = (unit, unit) Dictionary_of_Halfbreak_class.dictionary
 
 type remanent =
     {
@@ -111,5 +98,4 @@ type remanent =
       store_test_new_index_dic  : test_dic;
       store_modif_new_index_dic : modif_dic;
       store_halfbreak_dic       : halfbreak_dic;
-      store_unbinding_dic       : unbinding_dic; (*REMOVE*)
     }

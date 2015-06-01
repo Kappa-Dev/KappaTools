@@ -256,6 +256,7 @@ Influence_map:Inhibition_map:rule(3):'r2' B(x~p),C(x!_)->B(x~u),C(x!_) -> rule(1
 Potential dependencies between sites:
 Potential dependencies between sites:unbinding:
 agent_type:0:site_type:0 -> agent_type:1:site_type:1
+Potential dependencies between sites:deletion:
 Potential dependencies between sites:agent_type:0:
 Potential dependencies between sites:Number of covering classes:1
 Potential dependencies between sites:Covering_class_id:0:

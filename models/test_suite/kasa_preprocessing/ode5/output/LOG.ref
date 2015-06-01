@@ -396,6 +396,7 @@ Influence_map:Wake_up_map:rule(2):'r2' B(x!_,y),D(x)->B(x!_,y!1),D(x!1) -> rule(
 Influence_map:Wake_up_map:rule(3):'r3' C(x!_,y),D(y)->C(x!_,y!1),D(y!1) -> rule(4):'r4' D(x!_,y!_,z),A(x!_,y!_,z)->D(x!_,y!_,z!1),A(x!_,y!_,z!1)[1->0]
 Potential dependencies between sites:
 Potential dependencies between sites:unbinding:
+Potential dependencies between sites:deletion:
 Potential dependencies between sites:agent_type:0:
 Potential dependencies between sites:Number of covering classes:3
 Potential dependencies between sites:Covering_class_id:0:
