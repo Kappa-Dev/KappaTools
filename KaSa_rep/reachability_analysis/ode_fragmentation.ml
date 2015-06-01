@@ -532,14 +532,18 @@ let collect_sites_anchor_set parameter error get_rule
               match acc with
                 | [] -> error, (fst store_sites_anchor_set)
                 | x :: tl ->
-                  begin
-                    if SiteSet.mem_set x modified_set &&
-                      SiteSet.mem_set x site_lhs_bond_fst_set
-                    then
-                      let anchor = snd store_sites_bond_pair_set in
-                      error, anchor
-                    else aux tl
-                  end
+                  if not (SiteSet.is_empty_set modified_set &&
+                            SiteSet.is_empty_set site_lhs_bond_fst_set)
+                  then
+                    begin
+                      if SiteSet.mem_set x modified_set &&
+                        SiteSet.mem_set x site_lhs_bond_fst_set
+                      then
+                        let anchor = snd store_sites_bond_pair_set in
+                        error, anchor
+                      else aux tl
+                    end
+                  else error, (fst store_sites_anchor_set) (*if both sets are empty then do nothing*)
             in aux (List.rev site_lhs_list)
           in
           (* second case: at least two sites, one of them belong to an anchor/modified
@@ -552,15 +556,20 @@ let collect_sites_anchor_set parameter error get_rule
                   match to_visit with
                     | [] -> error, (snd store_sites_anchor_set)
                     | y :: tl' ->
-                      begin
-                        if SiteSet.mem_set x anchor_set ||
-                          SiteSet.mem_set x modified_set &&
-                          SiteSet.mem_set y site_lhs_bond_fst_set
-                        then
-                          let anchor = snd store_sites_bond_pair_set in
-                          error, anchor
-                        else aux tl'
-                      end
+                      if not (SiteSet.is_empty_set modified_set || 
+                                SiteSet.is_empty_set anchor_set &&
+                                SiteSet.is_empty_set site_lhs_bond_fst_set)
+                      then
+                        begin
+                          if SiteSet.mem_set x anchor_set ||
+                            SiteSet.mem_set x modified_set &&
+                            SiteSet.mem_set y site_lhs_bond_fst_set
+                          then
+                            let anchor = snd store_sites_bond_pair_set in
+                            error, anchor
+                          else aux tl'
+                        end
+                      else error, (snd store_sites_anchor_set)
                 in aux tl
           in
           (*PRINT*)
@@ -795,10 +804,16 @@ let cartesian_prod_external i anchor_set i' bond_fst_list bond_snd_set =
       | [] -> List.rev acc
       | x :: xs ->
         loop xs (List.rev_append (List.rev (List.fold_left (fun acc y ->
-          if SiteSet.mem_set x anchor_set &&
-            SiteSet.mem_set x bond_snd_set
-          then (i, x, i', y) :: acc
-          else acc
+          if not (SiteSet.is_empty_set anchor_set &&
+                    SiteSet.is_empty_set bond_snd_set)
+          then
+            begin
+              if SiteSet.mem_set x anchor_set &&
+                SiteSet.mem_set x bond_snd_set
+              then (i, x, i', y) :: acc
+              else acc
+            end
+          else List.rev acc (*FIXME*)
         ) [] bond_fst_list)) acc)
   in
   loop anchor_list [] 
