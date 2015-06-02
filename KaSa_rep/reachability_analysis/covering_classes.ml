@@ -22,6 +22,9 @@ let trace = false
 (*UTILITIES FUNCTION*)
 
 let empty_set = Cckappa_sig.Site_map_and_set.empty_set
+let empty_map = Cckappa_sig.Site_map_and_set.empty_map
+let add_set = Cckappa_sig.Site_map_and_set.add_set
+let union = Cckappa_sig.Site_map_and_set.union
 
 let sprintf_string_list l =
   let acc = ref "{" in
@@ -112,7 +115,7 @@ let store_pointer_backward parameter error id pointer_backward covering_class =
     let error, old_id_set = get_id_common_set parameter error old_id pointer_backward in
     (*add the current set of elt into the old set*)
     let error,new_id_set =
-      Cckappa_sig.Site_map_and_set.add_set
+      add_set
         parameter
         error
         id
@@ -186,8 +189,8 @@ let project_modified_site value_list modified_map = (*TODO:add state information
         then
           if Cckappa_sig.Site_map_and_set.mem_map x modified_map
           then
-            Cckappa_sig.Site_map_and_set.fold_map
-              (fun k (site, min) _ ->
+          Cckappa_sig.Site_map_and_set.fold_map
+              (fun k (site, min) current_list ->
                 let nth_1 = (position x value_list) + 1 in
                 let l = (nth_1, min) :: aux tl in
                 l
@@ -268,7 +271,8 @@ let test_new_index_dic parameter error new_id new_dic good_test_dic =
 (*------------------------------------------------------------------------------*)
 (*compute modified dictionary with new_index*)
 
-let modified_index_dic parameter error covering_class modified_map good_new_index_modif_dic =
+let modified_index_dic parameter error covering_class modified_map 
+    good_new_index_modif_dic =
   let modified_value = project_modified_site covering_class modified_map in
   let error, out_modif_dic =
     Covering_classes_type.Dictionary_of_Modified_class.allocate
@@ -347,7 +351,8 @@ let store_remanent parameter error pair_covering_class modified_map effect_set
       (*------------------------------------------------------------------------------*)
       (*PART II: site modified with new_index*)
       let error, (new_modif_id, modif_index_dic) =
-        modified_index_dic parameter error covering_class modified_map good_modif_dic in
+        modified_index_dic parameter error covering_class modified_map
+          good_modif_dic in
       (*------------------------------------------------------------------------------*)
       (*collect site effect in covering class *)
       let error, (new_halfbreak_id, store_halfbreak_dic) =
@@ -458,6 +463,31 @@ let clean_classes parameter error pair_covering_classes modified_map effect_set 
 
 (************************************************************************************)   
 (*RULE*)
+(*------------------------------------------------------------------------------*)
+
+let get_old_port parameter error agent_type port_set store_port =
+  let error, out_port =
+    Covering_classes_type.AgentMap.unsafe_get parameter error agent_type
+      store_port in
+  let old =
+    match out_port with
+      | None -> empty_set
+      | Some s -> s
+  in
+  let error, set = union parameter error port_set old in
+  error, set
+
+(*------------------------------------------------------------------------------*)
+
+let add_state_class parameter error agent_type port_set store_port =
+  let error, set =
+    get_old_port parameter error agent_type port_set store_port in
+  let error, store_port =
+    Covering_classes_type.AgentMap.set parameter error agent_type
+      set store_port
+  in error, store_port
+
+(*------------------------------------------------------------------------------*)
 
 let collect_modified_map parameter error diff_reverse store_modified_map =
   Covering_classes_type.AgentMap.fold parameter error
@@ -482,10 +512,9 @@ let collect_modified_map parameter error diff_reverse store_modified_map =
               in
               site_map
             )
-            site_modif.Cckappa_sig.agent_interface
-            Cckappa_sig.Site_map_and_set.empty_map
+            site_modif.Cckappa_sig.agent_interface  empty_map
         in
-        (*get old*)
+        (*compute site_map*)
         let error, old =
           Covering_classes_type.AgentMap.unsafe_get
             parameter
@@ -495,7 +524,7 @@ let collect_modified_map parameter error diff_reverse store_modified_map =
         in
         let old_map = 
           match old with
-            | None -> Cckappa_sig.Site_map_and_set.empty_map
+            | None -> empty_map
             | Some m -> m
         in
         (*store*)
@@ -517,32 +546,6 @@ let collect_modified_map parameter error diff_reverse store_modified_map =
         error, store_modified_map
     ) diff_reverse
     store_modified_map
-
-(*------------------------------------------------------------------------------*)
-
-let get_old_port parameter error agent_type port_set store_port =
-  let error, out_port =
-    Covering_classes_type.AgentMap.unsafe_get parameter error agent_type
-      store_port in
-  let old =
-    match out_port with
-      | None -> empty_set
-      | Some s -> s
-  in
-  let error, set =
-    Cckappa_sig.Site_map_and_set.union parameter error
-      port_set old                  
-  in error, set
-
-(*------------------------------------------------------------------------------*)
-
-let add_state_class parameter error agent_type port_set store_port =
-  let error, set =
-    get_old_port parameter error agent_type port_set store_port in
-  let error, store_port =
-    Covering_classes_type.AgentMap.set parameter error agent_type
-      set store_port
-  in error, store_port
 
 (*------------------------------------------------------------------------------*)
 (*compute site effect*)
@@ -583,8 +586,8 @@ let collect_half_break parameter error handler store_half_break half_break =
         | Some s -> s
     in
     (*new set*)
-    let error, add_set =
-      Cckappa_sig.Site_map_and_set.add_set
+    let error, set =
+      add_set
         parameter
         error
         site
@@ -594,7 +597,7 @@ let collect_half_break parameter error handler store_half_break half_break =
       Cckappa_sig.Site_map_and_set.union
         parameter
         error
-        add_set
+        set
         old_set
     in
     (*store*)
@@ -645,8 +648,7 @@ let collect_document_site parameter error index agent agent_type store_doc =
         in
         site_map
       )
-      agent.Cckappa_sig.agent_interface
-      Cckappa_sig.Site_map_and_set.empty_map
+      agent.Cckappa_sig.agent_interface empty_map
   in
   let error, old =
     Covering_classes_type.AgentMap.unsafe_get
@@ -657,7 +659,7 @@ let collect_document_site parameter error index agent agent_type store_doc =
   in
   let old_map =
     match old with
-      | None -> Cckappa_sig.Site_map_and_set.empty_map
+      | None -> empty_map
       | Some m -> m
   in
   let error, final_map =
@@ -686,7 +688,7 @@ let collect_undocument_site parameter error index agent_type list_undoc store_un
           (index, agent_type, site)
           current_map
       in site_map
-    ) Cckappa_sig.Site_map_and_set.empty_map list_undoc
+    ) empty_map list_undoc
   in
   let error, old = 
     Covering_classes_type.AgentMap.unsafe_get
@@ -697,7 +699,7 @@ let collect_undocument_site parameter error index agent_type list_undoc store_un
   in
   let old_map =
     match old with
-      | None -> Cckappa_sig.Site_map_and_set.empty_map
+      | None -> empty_map
       | Some m -> m
   in
   let error, final_map =
@@ -757,23 +759,14 @@ let add_covering_class parameter error agent_type pair_site store_covering_class
 
 let store_port_state parameter error agent_type port_min current_port_min
     port_max current_port_max state_min state_max =
-  let error, port_set_min =
-    Cckappa_sig.Site_map_and_set.add_set parameter error
-      port_min current_port_min
-  in
-  let error, set_min =
-    get_old_port parameter error agent_type
+  let error, port_set_min = add_set parameter error port_min current_port_min in
+  let error, set_min = get_old_port parameter error agent_type
       port_set_min state_min
   in
   (*get state max*)
-  let error, port_set_max =
-    Cckappa_sig.Site_map_and_set.add_set parameter error
-      port_max
-      current_port_max
-  in
+  let error, port_set_max = add_set parameter error port_max current_port_max in
   let error, set_max =
-    get_old_port parameter error agent_type
-      port_set_max state_max
+    get_old_port parameter error agent_type port_set_max state_max
   in (set_min, set_max)
 
 (*------------------------------------------------------------------------------*)
@@ -984,7 +977,7 @@ let print_test_new_index_dic parameter error elt_id store_test =
 (*------------------------------------------------------------------------------*)
 (*print modified*)
 
-let print_modified_dic parameter error elt_id store_modif =(*FIXME*)
+let print_modified_dic parameter error elt_id store_modif =(*FIXME:add state*)
   Covering_classes_type.Dictionary_of_Modified_class.print
     parameter
     error
@@ -1117,6 +1110,7 @@ let print_result parameter error result_remanent =
 
 (*------------------------------------------------------------------------------*)
 (*This unbinding information getting no information of covering_class*)
+
 let print_unbinding store_unbinding =
   Printf.fprintf stdout "Potential dependencies between sites:unbinding:\n";
     let rec aux acc =
@@ -1131,6 +1125,7 @@ let print_unbinding store_unbinding =
 
 (*------------------------------------------------------------------------------*)
 (*print remove action*)
+
 let print_remove parameter error store_remove =
   (*print document*)
   let _ =
@@ -1177,7 +1172,7 @@ let scan_rule_set parameter error handler rules =
   let error, init_half_break = create_map parameter error n_agents in
   let error, init_remove_doc = create_map parameter error n_agents in
   let error, init_remove_undoc = create_map parameter error n_agents in
-  let init_remove_map = (init_remove_doc, init_remove_undoc) in
+  let init_remove_map   = (init_remove_doc, init_remove_undoc) in
   let error, init_class = create_map parameter error n_agents in
   let error, init_min   = create_map parameter error n_agents in
   let error, init_max   = create_map parameter error n_agents in
@@ -1221,8 +1216,8 @@ let scan_rule_set parameter error handler rules =
         in
         let modified_map =
           match out_modified with
-            | None -> Cckappa_sig.Site_map_and_set.empty_map
-            | Some s -> s
+            | None -> empty_map
+            | Some m -> m
         in
         (*------------------------------------------------------------------------------*)
         (*get site effect - half break, unknow unbinding*)

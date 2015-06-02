@@ -19,11 +19,11 @@ let local_trace = false
 
 module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
 
-type agent_dic = Ckappa_sig.agent_dic
-type site = int
-type set = Cckappa_sig.Site_map_and_set.set
-type 'a map = 'a Cckappa_sig.Site_map_and_set.map
-type agent_name = Cckappa_sig.agent_name
+type agent_dic   = Ckappa_sig.agent_dic
+type site        = int
+type set         = Cckappa_sig.Site_map_and_set.set
+type 'a map      = 'a Cckappa_sig.Site_map_and_set.map
+type agent_name  = Cckappa_sig.agent_name
 type agent_index = int
 
 (*state information*)
@@ -35,9 +35,9 @@ type know_unbinding = (agent_index * agent_name * site *
                          agent_index * agent_name * site) list
 
 (*deletion*)
-type document_del = (agent_index * agent_name * site) map
-type undocument_del= (agent_index * agent_name * site) map
-type deletion = document_del AgentMap.t * undocument_del AgentMap.t
+type document_del   = (agent_index * agent_name * site) map
+type undocument_del = (agent_index * agent_name * site) map
+type deletion       = document_del AgentMap.t * undocument_del AgentMap.t
 
 type covering_classes =
   {
