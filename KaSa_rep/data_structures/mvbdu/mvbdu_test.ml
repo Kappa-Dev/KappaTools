@@ -12,8 +12,6 @@
    * en Automatique.  All rights reserved.  This file is distributed     
    * under the terms of the GNU Library General Public License *)
 
-
-
 let build_without_and_with_compressing (allocate:('a,'b,'c) Sanity_test_sig.f)
     error handler bdu_skel bdu_val  = 
   let error,output =
@@ -63,7 +61,8 @@ let bdu_test remanent parameters =
   let error = remanent.Sanity_test_sig.error in 
   let allocate = remanent.Sanity_test_sig.allocate_mvbdu in 
   let (handler:('b,'a,'c,bool,int) Memo_sig.handler) =
-    remanent.Sanity_test_sig.mvbdu_handler in 
+    remanent.Sanity_test_sig.mvbdu_handler
+  in 
   let a_val = Mvbdu_sig.Leaf true in
   let b_val = Mvbdu_sig.Leaf false in 
   let error,(handler:('b,'a,'c,bool,int) Memo_sig.handler),a',(a'_id:int),a'',a''_id =
@@ -350,139 +349,220 @@ let bdu_test remanent parameters =
       | error,(handler,None) -> 
         let error, a =
           Exception.warn parameters error (Some "") (Some "")  Exit (fun _ -> a') in 
-        error,handler,a
+        error, handler, a
   in 
-  let error,handler,l',l'_id,l'',l''_id =
+  let error, handler, l', l'_id, l'', l''_id =
     build_without_and_with_compressing
       allocate
       error
       handler
-      l_val l
+      l_val 
+      l
   in     
-  let error,handler,bmvbdu_true0 =
+  let error, handler, bmvbdu_true0 =
     f (Boolean_mvbdu.boolean_mvbdu_true parameters handler error) parameters in
-  let error,handler,bmvbdu_false0 =
+  let error, handler, bmvbdu_false0 =
     f (Boolean_mvbdu.boolean_mvbdu_false parameters handler error) parameters in
-  let error,handler,bmvbdu_true1 =
-    f (Boolean_mvbdu.boolean_mvbdu_constant_true parameters handler error parameters)
-      bmvbdu_true0 in 
-  let error,handler,bmvbdu_true2 =
-    f (Boolean_mvbdu.boolean_mvbdu_constant_true parameters handler error parameters)
-      bmvbdu_false0 in
+  let error, handler, bmvbdu_true1 =
+    f (Boolean_mvbdu.boolean_mvbdu_constant_true
+         parameters handler error parameters)
+      bmvbdu_true0 
+  in 
+  let error, handler, bmvbdu_true2 =
+    f (Boolean_mvbdu.boolean_mvbdu_constant_true 
+         parameters handler error parameters)
+      bmvbdu_false0 
+  in
   let error,handler,bmvbdu_false1 =
-    f (Boolean_mvbdu.boolean_mvbdu_constant_false parameters handler error parameters)
-      bmvbdu_true0 in
+    f (Boolean_mvbdu.boolean_mvbdu_constant_false
+         parameters handler error parameters)
+      bmvbdu_true0 
+  in
   let error,handler,bmvbdu_false2 =
-    f (Boolean_mvbdu.boolean_mvbdu_constant_false parameters handler error parameters)
-      bmvbdu_false0 in
+    f (Boolean_mvbdu.boolean_mvbdu_constant_false
+         parameters handler error parameters)
+      bmvbdu_false0 
+  in
   let error,handler,bmvbdu_false3 =
-    f (Boolean_mvbdu.boolean_mvbdu_or parameters handler error parameters bmvbdu_false0)
-      bmvbdu_false0 in 
+    f (Boolean_mvbdu.boolean_mvbdu_or 
+         parameters handler error parameters bmvbdu_false0)
+      bmvbdu_false0 
+  in 
   let error,handler,bmvbdu_true3 =
-    f (Boolean_mvbdu.boolean_mvbdu_or parameters handler error parameters bmvbdu_false0)
-      bmvbdu_true0 in
+    f (Boolean_mvbdu.boolean_mvbdu_or
+         parameters handler error parameters bmvbdu_false0)
+      bmvbdu_true0
+  in
   let error,handler,bmvbdu_true4 =
-    f (Boolean_mvbdu.boolean_mvbdu_or parameters handler error parameters bmvbdu_true0)
-      bmvbdu_true0 in
+    f (Boolean_mvbdu.boolean_mvbdu_or 
+         parameters handler error parameters bmvbdu_true0)
+      bmvbdu_true0 
+  in
   let error,handler,bmvbdu_true5 =
-    f (Boolean_mvbdu.boolean_mvbdu_or parameters handler error parameters bmvbdu_true0)
-      bmvbdu_false0 in
+    f (Boolean_mvbdu.boolean_mvbdu_or 
+         parameters handler error parameters bmvbdu_true0)
+      bmvbdu_false0 
+  in
   let error,handler,bmvbdu_false4 =
-    f (Boolean_mvbdu.boolean_mvbdu_and parameters handler error parameters bmvbdu_false0)
-      bmvbdu_false0 in 
+    f (Boolean_mvbdu.boolean_mvbdu_and
+         parameters handler error parameters bmvbdu_false0)
+      bmvbdu_false0 
+  in 
   let error,handler,bmvbdu_false5 =
-    f (Boolean_mvbdu.boolean_mvbdu_and parameters handler error parameters bmvbdu_false0)
-      bmvbdu_true0 in
+    f (Boolean_mvbdu.boolean_mvbdu_and
+         parameters handler error parameters bmvbdu_false0)
+      bmvbdu_true0 
+  in
   let error,handler,bmvbdu_true6 =
-    f (Boolean_mvbdu.boolean_mvbdu_and parameters handler error parameters bmvbdu_true0)
-      bmvbdu_true0 in
+    f (Boolean_mvbdu.boolean_mvbdu_and 
+         parameters handler error parameters bmvbdu_true0)
+      bmvbdu_true0 
+  in
   let error,handler,bmvbdu_false6 =
-    f (Boolean_mvbdu.boolean_mvbdu_and parameters handler error parameters bmvbdu_true0)
-      bmvbdu_false0 in
+    f (Boolean_mvbdu.boolean_mvbdu_and 
+         parameters handler error parameters bmvbdu_true0)
+      bmvbdu_false0 
+  in
   let error,handler,bmvbdu_false7 =
-    f (Boolean_mvbdu.boolean_mvbdu_xor parameters handler error parameters bmvbdu_false0)
-      bmvbdu_false0 in 
+    f (Boolean_mvbdu.boolean_mvbdu_xor 
+         parameters handler error parameters bmvbdu_false0)
+      bmvbdu_false0 
+  in 
   let error,handler,bmvbdu_true7 =
-    f (Boolean_mvbdu.boolean_mvbdu_xor parameters handler error parameters bmvbdu_false0)
-      bmvbdu_true0 in
+    f (Boolean_mvbdu.boolean_mvbdu_xor 
+         parameters handler error parameters bmvbdu_false0)
+      bmvbdu_true0 
+  in
   let error,handler,bmvbdu_false8 =
-    f (Boolean_mvbdu.boolean_mvbdu_xor parameters handler error parameters bmvbdu_true0)
-      bmvbdu_true0 in
+    f (Boolean_mvbdu.boolean_mvbdu_xor
+         parameters handler error parameters bmvbdu_true0)
+      bmvbdu_true0 
+  in
   let error,handler,bmvbdu_true8 =
-    f (Boolean_mvbdu.boolean_mvbdu_xor parameters handler error parameters bmvbdu_true0)
-      bmvbdu_false0 in
+    f (Boolean_mvbdu.boolean_mvbdu_xor
+         parameters handler error parameters bmvbdu_true0)
+      bmvbdu_false0 
+  in
   let error,handler,bmvbdu_true9 =
-    f (Boolean_mvbdu.boolean_mvbdu_nand parameters handler error parameters bmvbdu_false0)
-      bmvbdu_false0 in 
+    f (Boolean_mvbdu.boolean_mvbdu_nand 
+         parameters handler error parameters bmvbdu_false0)
+      bmvbdu_false0 
+  in 
   let error,handler,bmvbdu_true10 =
-    f (Boolean_mvbdu.boolean_mvbdu_nand parameters handler error parameters bmvbdu_false0)
-      bmvbdu_true0 in
+    f (Boolean_mvbdu.boolean_mvbdu_nand 
+         parameters handler error parameters bmvbdu_false0)
+      bmvbdu_true0 
+  in
   let error,handler,bmvbdu_false9 =
-    f (Boolean_mvbdu.boolean_mvbdu_nand parameters handler error parameters bmvbdu_true0)
-      bmvbdu_true0 in
+    f (Boolean_mvbdu.boolean_mvbdu_nand 
+         parameters handler error parameters bmvbdu_true0)
+      bmvbdu_true0 
+  in
   let error,(handler:Boolean_mvbdu.handler),bmvbdu_true11 =
-    f (Boolean_mvbdu.boolean_mvbdu_nand parameters handler error parameters bmvbdu_true0)
-      bmvbdu_false0 in
+    f (Boolean_mvbdu.boolean_mvbdu_nand 
+         parameters handler error parameters bmvbdu_true0)
+      bmvbdu_false0 
+  in
   let error,handler,bmvbdu_true12 =
-    f (Boolean_mvbdu.boolean_mvbdu_nsnd parameters handler error parameters bmvbdu_false0)
-      bmvbdu_false0 in 
+    f (Boolean_mvbdu.boolean_mvbdu_nsnd 
+         parameters handler error parameters bmvbdu_false0)
+      bmvbdu_false0 
+  in 
   let error,handler,bmvbdu_false10 =
-    f (Boolean_mvbdu.boolean_mvbdu_nsnd parameters handler error parameters bmvbdu_false0)
-      bmvbdu_true0 in
+    f (Boolean_mvbdu.boolean_mvbdu_nsnd 
+         parameters handler error parameters bmvbdu_false0)
+      bmvbdu_true0 
+  in
   let error,handler,bmvbdu_false11 =
-    f (Boolean_mvbdu.boolean_mvbdu_nsnd parameters handler error parameters bmvbdu_true0)
-      bmvbdu_true0 in
+    f (Boolean_mvbdu.boolean_mvbdu_nsnd
+         parameters handler error parameters bmvbdu_true0)
+      bmvbdu_true0
+  in
   let error,(handler:Boolean_mvbdu.handler),bmvbdu_true13 =
-    f (Boolean_mvbdu.boolean_mvbdu_nsnd parameters handler error parameters bmvbdu_true0)
-      bmvbdu_false0 in
+    f (Boolean_mvbdu.boolean_mvbdu_nsnd 
+         parameters handler error parameters bmvbdu_true0)
+      bmvbdu_false0 
+  in
   let error,handler,bmvbdu_true14 =
-    f (Boolean_mvbdu.boolean_mvbdu_nfst parameters handler error parameters bmvbdu_false0)
-      bmvbdu_false0 in 
+    f (Boolean_mvbdu.boolean_mvbdu_nfst 
+         parameters handler error parameters bmvbdu_false0)
+      bmvbdu_false0 
+  in 
   let error,handler,bmvbdu_true15 =
-    f (Boolean_mvbdu.boolean_mvbdu_nfst parameters handler error parameters bmvbdu_false0)
-      bmvbdu_true0 in
+    f (Boolean_mvbdu.boolean_mvbdu_nfst 
+         parameters handler error parameters bmvbdu_false0)
+      bmvbdu_true0 
+  in
   let error,handler,bmvbdu_false12 =
-    f (Boolean_mvbdu.boolean_mvbdu_nfst parameters handler error parameters bmvbdu_true0)
-      bmvbdu_true0 in
+    f (Boolean_mvbdu.boolean_mvbdu_nfst 
+         parameters handler error parameters bmvbdu_true0)
+      bmvbdu_true0 
+  in
   let error,(handler:Boolean_mvbdu.handler),bmvbdu_false13 =
-    f (Boolean_mvbdu.boolean_mvbdu_nfst parameters handler error parameters bmvbdu_true0)
-      bmvbdu_false0 in
+    f (Boolean_mvbdu.boolean_mvbdu_nfst 
+         parameters handler error parameters bmvbdu_true0)
+      bmvbdu_false0 
+  in
   let error,handler,bmvbdu_false14 =
-    f (Boolean_mvbdu.boolean_mvbdu_snd parameters handler error parameters bmvbdu_false0)
-      bmvbdu_false0 in 
+    f (Boolean_mvbdu.boolean_mvbdu_snd 
+         parameters handler error parameters bmvbdu_false0)
+      bmvbdu_false0
+  in 
   let error,handler,bmvbdu_true16 =
-    f (Boolean_mvbdu.boolean_mvbdu_snd parameters handler error parameters bmvbdu_false0)
-      bmvbdu_true0 in
+    f (Boolean_mvbdu.boolean_mvbdu_snd 
+         parameters handler error parameters bmvbdu_false0)
+      bmvbdu_true0 
+  in
   let error,handler,bmvbdu_true17 =
-    f (Boolean_mvbdu.boolean_mvbdu_snd parameters handler error parameters bmvbdu_true0)
-      bmvbdu_true0 in
+    f (Boolean_mvbdu.boolean_mvbdu_snd 
+         parameters handler error parameters bmvbdu_true0)
+      bmvbdu_true0
+  in
   let error,(handler:Boolean_mvbdu.handler),bmvbdu_false15 =
-    f (Boolean_mvbdu.boolean_mvbdu_snd parameters handler error parameters bmvbdu_true0)
-      bmvbdu_false0 in
+    f (Boolean_mvbdu.boolean_mvbdu_snd 
+         parameters handler error parameters bmvbdu_true0)
+      bmvbdu_false0 
+  in
   let error,handler,bmvbdu_false16 =
-    f (Boolean_mvbdu.boolean_mvbdu_fst parameters handler error parameters bmvbdu_false0)
-      bmvbdu_false0 in 
+    f (Boolean_mvbdu.boolean_mvbdu_fst 
+         parameters handler error parameters bmvbdu_false0)
+      bmvbdu_false0 
+  in 
   let error,handler,bmvbdu_false17 =
-    f (Boolean_mvbdu.boolean_mvbdu_fst parameters handler error parameters bmvbdu_false0)
-      bmvbdu_true0 in
+    f (Boolean_mvbdu.boolean_mvbdu_fst 
+         parameters handler error parameters bmvbdu_false0)
+      bmvbdu_true0 
+  in
   let error,handler,bmvbdu_true18 =
-    f (Boolean_mvbdu.boolean_mvbdu_fst parameters handler error parameters bmvbdu_true0)
-      bmvbdu_true0 in
+    f (Boolean_mvbdu.boolean_mvbdu_fst 
+         parameters handler error parameters bmvbdu_true0)
+      bmvbdu_true0 
+  in
   let error,(handler:Boolean_mvbdu.handler),bmvbdu_true19 =
-    f (Boolean_mvbdu.boolean_mvbdu_fst parameters handler error parameters bmvbdu_true0)
-      bmvbdu_false0 in
+    f (Boolean_mvbdu.boolean_mvbdu_fst 
+         parameters handler error parameters bmvbdu_true0)
+      bmvbdu_false0 
+  in
   let error,handler,bmvbdu_true20 =
-    f (Boolean_mvbdu.boolean_mvbdu_nor parameters handler error parameters bmvbdu_false0)
-      bmvbdu_false0 in 
+    f (Boolean_mvbdu.boolean_mvbdu_nor 
+         parameters handler error parameters bmvbdu_false0)
+      bmvbdu_false0
+  in 
   let error,handler,bmvbdu_false18 =
-    f (Boolean_mvbdu.boolean_mvbdu_nor parameters handler error parameters bmvbdu_false0)
-      bmvbdu_true0 in
+    f (Boolean_mvbdu.boolean_mvbdu_nor 
+         parameters handler error parameters bmvbdu_false0)
+      bmvbdu_true0 
+  in
   let error,handler,bmvbdu_false19 =
-    f (Boolean_mvbdu.boolean_mvbdu_nor parameters handler error parameters bmvbdu_true0)
-      bmvbdu_true0 in
+    f (Boolean_mvbdu.boolean_mvbdu_nor 
+         parameters handler error parameters bmvbdu_true0)
+      bmvbdu_true0 
+  in
   let error,(handler:Boolean_mvbdu.handler),bmvbdu_false20 =
-    f (Boolean_mvbdu.boolean_mvbdu_nor parameters handler error parameters bmvbdu_true0)
-      bmvbdu_false0 in
+    f (Boolean_mvbdu.boolean_mvbdu_nor
+         parameters handler error parameters bmvbdu_true0)
+      bmvbdu_false0
+  in
   let error,handler,bmvbdu_false21 =
     f (Boolean_mvbdu.boolean_constant_bi_false
          parameters handler error parameters bmvbdu_false0) bmvbdu_false0 in 
@@ -642,8 +722,8 @@ let bdu_test remanent parameters =
   },
   ("Mvbdu.001",fun remanent ->
     let b = Mvbdu_core.mvbdu_equal f'' c'' in
-    remanent,b,None) :: 
-    (List.map (fun (a,b,c) -> a, fun remanent -> Mvbdu_sanity.test remanent c b) 
+    remanent, b, None) :: (List.map (fun (a, b, c) -> a,
+      fun remanent -> Mvbdu_sanity.test remanent c b) 
        [
          "Mvbdu.002",a',(true,true,true);
          "Mvbdu.003",b',(true,true,true);
@@ -768,7 +848,7 @@ let bdu_test remanent parameters =
          "Mvbdu.118",l''',(true,true,true);
          
        ])@
-    (List.map (fun (a,b) -> a,(fun remanent -> remanent, b==bmvbdu_true0, None))  
+    (List.map (fun (a,b) -> a,(fun remanent -> remanent, b == bmvbdu_true0, None))  
        ["true00",bmvbdu_true0;
         "true01",bmvbdu_true1;
         "true02",bmvbdu_true2;
@@ -804,7 +884,7 @@ let bdu_test remanent parameters =
         "true32",bmvbdu_true32;
         "true33",bmvbdu_true33;  
        ])@
-    (List.map (fun (a,b) -> a,(fun remanent -> remanent, b==bmvbdu_false0, None))  
+    (List.map (fun (a,b) -> a, (fun remanent -> remanent, b == bmvbdu_false0, None))  
        ["false00",bmvbdu_false0;
         "false01",bmvbdu_false1;
         "false02",bmvbdu_false2;
@@ -848,8 +928,7 @@ let bdu_test remanent parameters =
          "List.005",list_b',(false,true);
          "List.006",list_c',(false,true);
        ])@
-    (List.map (fun (a,b) -> a,(fun remanent -> remanent, b==list_a, None))  
+    (List.map (fun (a,b) -> a, (fun remanent -> remanent, b == list_a, None))  
        ["List.007",list_a;
         "List.008",list_c;
         "List.009",list_a'])
-    

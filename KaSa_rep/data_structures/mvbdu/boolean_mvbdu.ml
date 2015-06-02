@@ -31,7 +31,6 @@ struct
   let (compare:t->t->int) = compare 
 end 
   
-  
 module Hash_key = 
 struct 
   type t = int 
@@ -81,33 +80,33 @@ type unary_memoized_fun =
     (bool,
      mvbdu_dic,
      list_dic,
-     Exception.method_handler -> bool -> Exception.method_handler  * (bool Mvbdu_sig.mvbdu,bool) Mvbdu_sig.premvbdu,memo_tables,
-       memo_tables,
-       int) 
+     Exception.method_handler -> bool -> Exception.method_handler  * 
+     (bool Mvbdu_sig.mvbdu,bool) Mvbdu_sig.premvbdu, memo_tables,
+       memo_tables, int)
       Memo_sig.memoized_fun
 
 let split_memo error handler =
   let x = handler.Memo_sig.data in 
   error,
-  [ "id",x.boolean_mvbdu_identity;
-    "not",x.boolean_mvbdu_not     ;
-    "clean_head",x.boolean_mvbdu_clean_head ;
+  [ "id",         x.boolean_mvbdu_identity;
+    "not",        x.boolean_mvbdu_not;
+    "clean_head", x.boolean_mvbdu_clean_head;
   ],
-  [ "and",x.boolean_mvbdu_and ;
-    "or",x.boolean_mvbdu_or ;
-    "xor",x.boolean_mvbdu_xor ;
-    "nand",x.boolean_mvbdu_nand ; 
-    "<=>",x.boolean_mvbdu_equiv ;
-    "<=",x.boolean_mvbdu_is_implied ;
-    "=>",x.boolean_mvbdu_imply ;
-    "not <=",x.boolean_mvbdu_nis_implied ;
-    "not =>",x.boolean_mvbdu_nimply ;
-    "not",x.boolean_mvbdu_nor ;
-    "fst",x.boolean_mvbdu_fst ;
-    "not fst",x.boolean_mvbdu_nfst ;
-    "snd",x.boolean_mvbdu_snd ;
-    "not snd",x.boolean_mvbdu_nsnd ; 
-    "reset",x.boolean_mvbdu_redefine]
+  [ "and",     x.boolean_mvbdu_and;
+    "or",      x.boolean_mvbdu_or;
+    "xor",     x.boolean_mvbdu_xor;
+    "nand",    x.boolean_mvbdu_nand; 
+    "<=>",     x.boolean_mvbdu_equiv;
+    "<=",      x.boolean_mvbdu_is_implied;
+    "=>",      x.boolean_mvbdu_imply;
+    "not <=",  x.boolean_mvbdu_nis_implied;
+    "not =>",  x.boolean_mvbdu_nimply;
+    "not",     x.boolean_mvbdu_nor;
+    "fst",     x.boolean_mvbdu_fst;
+    "not fst", x.boolean_mvbdu_nfst;
+    "snd",     x.boolean_mvbdu_snd;
+    "not snd", x.boolean_mvbdu_nsnd; 
+    "reset",   x.boolean_mvbdu_redefine]
   
 let rec print_cell log prefix cell = 
   match cell with 
@@ -250,7 +249,7 @@ let build_memoize_binary f get_handler update_handler =
     
 let memo_identity = 
   Mvbdu_algebra.not_recursive_not_memoize_unary 
-    (fun error x -> error, x.Mvbdu_sig.value,Some x)
+    (fun error x -> error, x.Mvbdu_sig.value, Some x)
     (fun parameters error ->
       (fun bool -> error,
         (fun error -> Exception.warn parameters error (Some "Boolean_mvbdu")
@@ -287,7 +286,6 @@ let memo_constant_false =
           (Some "line 109") Exit (fun () -> Mvbdu_sig.Leaf false))))
     mvbdu_allocate 
   
-
 let boolean_mvbdu_true parameters handler = 
   Mvbdu_algebra.generic_zeroary 
     (mvbdu_allocate parameters)
@@ -309,7 +307,7 @@ let boolean_mvbdu_constant_false parameters =
   Mvbdu_algebra.generic_unary
     (mvbdu_allocate parameters) 
     memo_constant_false  
-   
+    
 let boolean_mvbdu_and parameters = 
   Mvbdu_algebra.generic_binary
     (mvbdu_allocate parameters) 
@@ -323,130 +321,129 @@ let boolean_mvbdu_and parameters =
        (fun x h -> {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_and = x}})
     )
     
- let memo_or = 
-   build_memoize_binary
-        (fun parameters error -> 
-          let g x = (error,
-                     if x then memo_constant_true else memo_identity)
-          in 
-          (g,g))
-     (fun x -> x.Memo_sig.data.boolean_mvbdu_or)
-     (fun x h -> {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_or = x}}) 
-  
- let boolean_mvbdu_or parameters = 
-    Mvbdu_algebra.generic_binary 
-      (mvbdu_allocate parameters)
-      memo_or  
-      
- let boolean_mvbdu_xor parameters = 
-   Mvbdu_algebra.generic_binary 
-     (mvbdu_allocate parameters)
-     (build_memoize_binary
-        (fun parameters error ->
-          let g x = (error,
-                     if x then memo_not else memo_identity)
-          in 
-          (g,g))
-        (fun x -> x.Memo_sig.data.boolean_mvbdu_xor)
-        (fun x h -> {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_xor = x}}))
+let memo_or = 
+  build_memoize_binary
+    (fun parameters error -> 
+      let g x = (error,
+                 if x then memo_constant_true else memo_identity)
+      in 
+      (g,g))
+    (fun x -> x.Memo_sig.data.boolean_mvbdu_or)
+    (fun x h -> {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_or = x}}) 
+    
+let boolean_mvbdu_or parameters = 
+  Mvbdu_algebra.generic_binary 
+    (mvbdu_allocate parameters)
+    memo_or  
+    
+let boolean_mvbdu_xor parameters = 
+  Mvbdu_algebra.generic_binary 
+    (mvbdu_allocate parameters)
+    (build_memoize_binary
+       (fun parameters error ->
+         let g x = (error,
+                    if x then memo_not else memo_identity)
+         in 
+         (g,g))
+       (fun x -> x.Memo_sig.data.boolean_mvbdu_xor)
+       (fun x h -> {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_xor = x}}))
+    
+let boolean_mvbdu_nand parameters = 
+  Mvbdu_algebra.generic_binary 
+    (mvbdu_allocate parameters) 
+    (build_memoize_binary
+       (fun parameters error ->
+         let g x = (error,
+                    if x then memo_not else memo_constant_true)
+         in 
+         (g,g))
+       (fun x -> x.Memo_sig.data.boolean_mvbdu_nand)
+       (fun x h -> {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_nand = x}}))
+    
+let boolean_mvbdu_equiv parameters = 
+  Mvbdu_algebra.generic_binary 
+    (mvbdu_allocate parameters )
+    (build_memoize_binary
+       (fun parameters error ->
+         let g x = (error,
+                    if x then memo_identity else memo_not)
+         in (g,g))
+       (fun x -> x.Memo_sig.data.boolean_mvbdu_equiv)
+       (fun x h -> {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_equiv = x}}))
      
- let boolean_mvbdu_nand parameters = 
-   Mvbdu_algebra.generic_binary 
-     (mvbdu_allocate parameters) 
-     (build_memoize_binary
-        (fun parameters error ->
-          let g x = (error,
-                     if x then memo_not else memo_constant_true)
-          in 
-          (g,g))
-        (fun x -> x.Memo_sig.data.boolean_mvbdu_nand)
-        (fun x h -> {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_nand = x}}))
-     
- let boolean_mvbdu_equiv parameters = 
-   Mvbdu_algebra.generic_binary 
-     (mvbdu_allocate parameters )
-     (build_memoize_binary
-        (fun parameters error ->
-          let g x = (error,
-                     if x then memo_identity else memo_not)
-          in (g,g))
-        (fun x -> x.Memo_sig.data.boolean_mvbdu_equiv)
-        (fun x h -> {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_equiv = x}}))
-     
-     
- let boolean_mvbdu_nor parameters = 
-   Mvbdu_algebra.generic_binary 
-     (mvbdu_allocate parameters)
-     (build_memoize_binary
-        (fun parameters error ->
-          let g x = (error,
-                     if x then memo_constant_false else memo_not)
-          in 
-          (g,g))
-        (fun x -> x.Memo_sig.data.boolean_mvbdu_nor)
-        (fun x h -> {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_nor = x}}))
-     
- let boolean_mvbdu_imply parameters = 
-   Mvbdu_algebra.generic_binary
-     (mvbdu_allocate parameters) 
-     (build_memoize_binary
-        (fun parameters error ->
-          let g x = (error,if x then memo_identity else memo_constant_true) in 
-          let h x = (error,if x then memo_constant_true else memo_not) in 
-          (g,h))
-        (fun x -> x.Memo_sig.data.boolean_mvbdu_imply)
-        (fun x h -> {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_imply = x}}))
-  
- let boolean_mvbdu_is_implied parameters = 
-   Mvbdu_algebra.generic_binary 
-     (mvbdu_allocate parameters)
-     (build_memoize_binary
-        (fun parameters error ->
-          let g x = (error,if x then memo_identity else memo_constant_true) in 
-          let h x = (error,if x then memo_constant_true else memo_not) in 
-          (h,g))
-        (fun x -> x.Memo_sig.data.boolean_mvbdu_is_implied)
+let boolean_mvbdu_nor parameters = 
+  Mvbdu_algebra.generic_binary 
+    (mvbdu_allocate parameters)
+    (build_memoize_binary
+       (fun parameters error ->
+         let g x = (error,
+                    if x then memo_constant_false else memo_not)
+         in 
+         (g,g))
+       (fun x -> x.Memo_sig.data.boolean_mvbdu_nor)
+       (fun x h -> {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_nor = x}}))
+    
+let boolean_mvbdu_imply parameters = 
+  Mvbdu_algebra.generic_binary
+    (mvbdu_allocate parameters) 
+    (build_memoize_binary
+       (fun parameters error ->
+         let g x = (error,if x then memo_identity else memo_constant_true) in 
+         let h x = (error,if x then memo_constant_true else memo_not) in 
+         (g,h))
+       (fun x -> x.Memo_sig.data.boolean_mvbdu_imply)
+       (fun x h -> {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_imply = x}}))
+    
+let boolean_mvbdu_is_implied parameters = 
+  Mvbdu_algebra.generic_binary 
+    (mvbdu_allocate parameters)
+    (build_memoize_binary
+       (fun parameters error ->
+         let g x = (error,if x then memo_identity else memo_constant_true) in 
+         let h x = (error,if x then memo_constant_true else memo_not) in 
+         (h,g))
+       (fun x -> x.Memo_sig.data.boolean_mvbdu_is_implied)
         (fun x h ->
           {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_is_implied = x}}))  
-     
- let boolean_mvbdu_nimply parameters = 
-   Mvbdu_algebra.generic_binary
-     (mvbdu_allocate parameters)
-     (build_memoize_binary
-        (fun parameters error ->
-          let g x = (error,if x then memo_not else memo_constant_false) in 
-          let h x = (error,if x then memo_constant_false else memo_identity) in 
-          (g,h))
-        (fun x -> x.Memo_sig.data.boolean_mvbdu_nimply)
-        (fun x h ->
-          {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_nimply = x}})) 
-
- let boolean_mvbdu_nis_implied parameters = 
-   Mvbdu_algebra.generic_binary 
-     (mvbdu_allocate parameters)
-     (build_memoize_binary
-        (fun parameters error ->
-          let g x = (error,if x then memo_not else memo_constant_false) in 
-          let h x = (error,if x then memo_constant_false else memo_identity) in 
-          (h,g))
-        (fun x -> x.Memo_sig.data.boolean_mvbdu_nis_implied)
-        (fun x h ->
-          {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_nis_implied = x}}))  
-  
- let boolean_constant_bi_true parameters = 
-   Mvbdu_algebra.generic_binary 
-     (mvbdu_allocate parameters )
-     (Mvbdu_algebra.not_recursive_binary
-        (fun error x y -> error,Mvbdu_sig.Leaf true, None)
-        (fun parameters error -> 
-          let g (x:bool) =  
-            Exception.warn parameters error (Some "Boolean_mvbdu")
-              (Some "line 361") Exit (fun () -> memo_identity) 
-          in 
-          (g,g))
-        (mvbdu_allocate parameters))
     
- let boolean_constant_bi_false parameters = 
+let boolean_mvbdu_nimply parameters = 
+  Mvbdu_algebra.generic_binary
+    (mvbdu_allocate parameters)
+    (build_memoize_binary
+       (fun parameters error ->
+         let g x = (error,if x then memo_not else memo_constant_false) in 
+         let h x = (error,if x then memo_constant_false else memo_identity) in 
+         (g,h))
+       (fun x -> x.Memo_sig.data.boolean_mvbdu_nimply)
+       (fun x h ->
+         {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_nimply = x}})) 
+    
+let boolean_mvbdu_nis_implied parameters = 
+  Mvbdu_algebra.generic_binary 
+    (mvbdu_allocate parameters)
+    (build_memoize_binary
+       (fun parameters error ->
+         let g x = (error,if x then memo_not else memo_constant_false) in 
+         let h x = (error,if x then memo_constant_false else memo_identity) in 
+         (h,g))
+       (fun x -> x.Memo_sig.data.boolean_mvbdu_nis_implied)
+       (fun x h ->
+         {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_nis_implied = x}}))  
+    
+let boolean_constant_bi_true parameters = 
+  Mvbdu_algebra.generic_binary 
+    (mvbdu_allocate parameters )
+    (Mvbdu_algebra.not_recursive_binary
+       (fun error x y -> error,Mvbdu_sig.Leaf true, None)
+       (fun parameters error -> 
+         let g (x:bool) =  
+           Exception.warn parameters error (Some "Boolean_mvbdu")
+             (Some "line 361") Exit (fun () -> memo_identity) 
+         in 
+         (g,g))
+       (mvbdu_allocate parameters))
+    
+let boolean_constant_bi_false parameters = 
    Mvbdu_algebra.generic_binary 
      (mvbdu_allocate parameters)
      (Mvbdu_algebra.not_recursive_binary
@@ -459,186 +456,186 @@ let boolean_mvbdu_and parameters =
           (g,g))
         (mvbdu_allocate parameters))
     
- let boolean_mvbdu_fst parameters = 
-   Mvbdu_algebra.generic_binary 
-     (mvbdu_allocate parameters)
-     (Mvbdu_algebra.not_recursive_binary 
-        (fun error x y -> error,x.Mvbdu_sig.value,Some x)
-        (fun parameters error -> 
-          let g (x:bool) =  
-            Exception.warn parameters error (Some "Boolean_mvbdu")
-              (Some "line 385") Exit (fun () -> memo_identity) 
-          in 
-          (g,g))
-        (mvbdu_allocate parameters))
-     
-  let boolean_mvbdu_snd parameters = 
-    Mvbdu_algebra.generic_binary 
-      (mvbdu_allocate parameters)
-      (Mvbdu_algebra.not_recursive_binary 
-         (fun error x y -> error,x.Mvbdu_sig.value,Some y)
-         (fun parameters error -> 
-           let g (x:bool) =  
-             Exception.warn parameters error (Some "Boolean_mvbdu")
-               (Some "line 397") Exit (fun () -> memo_identity) 
-           in 
-           (g,g))
-         (mvbdu_allocate parameters))
-      
-  let boolean_mvbdu_nfst parameters = 
-    Mvbdu_algebra.generic_binary 
-      (mvbdu_allocate parameters)
-      (build_memoize_binary
-         (fun parameters error ->
-           let g x = (error,if x then memo_constant_false else memo_constant_true) in 
-           let h x = (error,memo_not) in 
-           (g,h))
-         (fun x -> x.Memo_sig.data.boolean_mvbdu_nfst)
-         (fun x h -> {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_nfst = x}}))
-      
-  let boolean_mvbdu_nsnd parameters = 
-    Mvbdu_algebra.generic_binary 
-      (mvbdu_allocate parameters)
-      (build_memoize_binary
-         (fun parameters error ->
-           let g x = (error,if x then memo_constant_false else memo_constant_true) in
-           let h x = (error,memo_not) in 
-           (h,g))
-         (fun x -> x.Memo_sig.data.boolean_mvbdu_nsnd)
-         (fun x h -> {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_nsnd = x}}))
-      
-  let list_allocate parameters = 
-    (fun error b c d e (old_handler:('a,mvbdu_dic,list_dic,'c,'d) Memo_sig.handler) -> 
-      let old_dictionary = old_handler.Memo_sig.list_dictionary in 
-      let error,output =
-        D_list_skeleton.allocate parameters error b c d e old_dictionary in  
-      match output with 
-        | None -> error,None 
-        | Some ((i:int),a,b,new_dic) -> 
-          let new_handler = List_core.update_dictionary old_handler new_dic in 
-          error, (Some (i,a,b,new_handler)))
-      
-  let memo_clean_head = 
-    Mvbdu_algebra.memoize_no_fun 
-      (fun x -> x.Memo_sig.data.boolean_mvbdu_clean_head)
-      (fun x h ->
-        {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_clean_head = x}})  
-      (fun parameters error handler mvbdu d -> 
-        let a,b = Hash_1.unsafe_get parameters error (Mvbdu_core.id_of_mvbdu mvbdu) d
-        in a,(handler,b)
-      )
-      (fun parameters error h mvbdu -> 
-        Hash_1.set 
-          parameters 
-          error 
-          (Mvbdu_core.id_of_mvbdu mvbdu))
-      
-  let clean_head parameters error handler = 
-    Mvbdu_algebra.clean_head 
-      (mvbdu_allocate parameters)
-      memo_clean_head 
-      boolean_mvbdu_or
-      handler 
-      error 
-      parameters
-      
-  let memo_clean_head = 
-    Mvbdu_algebra.memoize_no_fun 
-      (fun x -> x.Memo_sig.data.boolean_mvbdu_clean_head)
-      (fun x h ->
-        {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_clean_head = x}})  
-      (fun parameters error handler mvbdu d -> 
-        match Hash_1.unsafe_get parameters error (Mvbdu_core.id_of_mvbdu mvbdu) d with 
-          | error,None -> 
-            clean_head parameters error handler mvbdu
-          | error,Some x -> error,(handler,Some x) 
-      )
-      (fun parameters error h mvbdu -> 
-        Hash_1.set 
-          parameters 
-          error 
-          (Mvbdu_core.id_of_mvbdu mvbdu))
-      
-  let reset_handler error = 
-    {
-      Memo_sig.empty_list = error,memo_identity;
-      Memo_sig.leaf = (fun bool -> error,(fun error -> error, Mvbdu_sig.Leaf bool));
-      Memo_sig.clean_head = error,memo_clean_head;
-      Memo_sig.build_false =
-        (fun var bound -> error,(fun error -> error, Mvbdu_sig.Leaf false));
-      Memo_sig.build_true= 
-        (fun var bound mvbdu_false mvbdu_true -> 
+let boolean_mvbdu_fst parameters = 
+  Mvbdu_algebra.generic_binary 
+    (mvbdu_allocate parameters)
+    (Mvbdu_algebra.not_recursive_binary 
+       (fun error x y -> error,x.Mvbdu_sig.value,Some x)
+       (fun parameters error -> 
+         let g (x:bool) =  
+           Exception.warn parameters error (Some "Boolean_mvbdu")
+             (Some "line 385") Exit (fun () -> memo_identity) 
+         in 
+         (g,g))
+       (mvbdu_allocate parameters))
+    
+let boolean_mvbdu_snd parameters = 
+  Mvbdu_algebra.generic_binary 
+    (mvbdu_allocate parameters)
+    (Mvbdu_algebra.not_recursive_binary 
+       (fun error x y -> error,x.Mvbdu_sig.value,Some y)
+       (fun parameters error -> 
+         let g (x:bool) =  
+           Exception.warn parameters error (Some "Boolean_mvbdu")
+             (Some "line 397") Exit (fun () -> memo_identity) 
+         in 
+         (g,g))
+       (mvbdu_allocate parameters))
+    
+let boolean_mvbdu_nfst parameters = 
+  Mvbdu_algebra.generic_binary 
+    (mvbdu_allocate parameters)
+    (build_memoize_binary
+       (fun parameters error ->
+         let g x = (error,if x then memo_constant_false else memo_constant_true) in 
+         let h x = (error,memo_not) in 
+         (g,h))
+       (fun x -> x.Memo_sig.data.boolean_mvbdu_nfst)
+       (fun x h -> {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_nfst = x}}))
+    
+let boolean_mvbdu_nsnd parameters = 
+  Mvbdu_algebra.generic_binary 
+    (mvbdu_allocate parameters)
+    (build_memoize_binary
+       (fun parameters error ->
+         let g x = (error,if x then memo_constant_false else memo_constant_true) in
+         let h x = (error,memo_not) in 
+         (h,g))
+       (fun x -> x.Memo_sig.data.boolean_mvbdu_nsnd)
+       (fun x h -> {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_nsnd = x}}))
+    
+let list_allocate parameters = 
+  (fun error b c d e (old_handler:('a,mvbdu_dic,list_dic,'c,'d) Memo_sig.handler) -> 
+    let old_dictionary = old_handler.Memo_sig.list_dictionary in 
+    let error,output =
+      D_list_skeleton.allocate parameters error b c d e old_dictionary in  
+    match output with 
+      | None -> error,None 
+      | Some ((i:int),a,b,new_dic) -> 
+        let new_handler = List_core.update_dictionary old_handler new_dic in 
+        error, (Some (i,a,b,new_handler)))
+    
+let memo_clean_head = 
+  Mvbdu_algebra.memoize_no_fun 
+    (fun x -> x.Memo_sig.data.boolean_mvbdu_clean_head)
+    (fun x h ->
+      {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_clean_head = x}})  
+    (fun parameters error handler mvbdu d -> 
+      let a,b = Hash_1.unsafe_get parameters error (Mvbdu_core.id_of_mvbdu mvbdu) d
+      in a,(handler,b)
+    )
+    (fun parameters error h mvbdu -> 
+      Hash_1.set 
+        parameters 
+        error 
+        (Mvbdu_core.id_of_mvbdu mvbdu))
+    
+let clean_head parameters error handler = 
+  Mvbdu_algebra.clean_head 
+    (mvbdu_allocate parameters)
+    memo_clean_head 
+    boolean_mvbdu_or
+    handler 
+    error 
+    parameters
+    
+let memo_clean_head = 
+  Mvbdu_algebra.memoize_no_fun 
+    (fun x -> x.Memo_sig.data.boolean_mvbdu_clean_head)
+    (fun x h ->
+      {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_clean_head = x}})  
+    (fun parameters error handler mvbdu d -> 
+      match Hash_1.unsafe_get parameters error (Mvbdu_core.id_of_mvbdu mvbdu) d with 
+        | error,None -> 
+          clean_head parameters error handler mvbdu
+        | error,Some x -> error,(handler,Some x) 
+    )
+    (fun parameters error h mvbdu -> 
+      Hash_1.set 
+        parameters 
+        error 
+        (Mvbdu_core.id_of_mvbdu mvbdu))
+    
+let reset_handler error = 
+  {
+    Memo_sig.empty_list = error,memo_identity;
+    Memo_sig.leaf = (fun bool -> error,(fun error -> error, Mvbdu_sig.Leaf bool));
+    Memo_sig.clean_head = error,memo_clean_head;
+    Memo_sig.build_false =
+      (fun var bound -> error,(fun error -> error, Mvbdu_sig.Leaf false));
+    Memo_sig.build_true= 
+      (fun var bound mvbdu_false mvbdu_true -> 
+        error,
+        (fun error -> 
           error,
-          (fun error -> 
-            error,
-            if Mvbdu_core.mvbdu_equal mvbdu_true mvbdu_false 
-            then 
-              mvbdu_true.Mvbdu_sig.value
-            else 
-              (Mvbdu_sig.Node 
-                 {
-                   Mvbdu_sig.variable = var ;
-                   Mvbdu_sig.upper_bound = bound ;
-                   Mvbdu_sig.branch_true = mvbdu_true ;
-                   Mvbdu_sig.branch_false = mvbdu_false})
-          ))
-    }
-      
-  let redefine parameters error handler mvbdu_input list_input = 
-    let memoized_fun = Mvbdu_algebra.recursive_memoize
-      (fun parameters -> reset_handler) 
-      (fun x -> x.Memo_sig.data.boolean_mvbdu_redefine)
-      (fun x h ->
-        {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_redefine = x}})  
-      (fun parameters error handler (mvbdu,list) d -> 
-        let a,b =
-          Hash_2.unsafe_get parameters error
-            (Mvbdu_core.id_of_mvbdu mvbdu, List_core.id_of_list list) d
-        in 
-        a,(handler,b))
-      (fun parameters error handler (mvbdu,list) -> 
-        Hash_2.set 
-          parameters 
-          error 
-          (Mvbdu_core.id_of_mvbdu mvbdu, List_core.id_of_list list)) 
-    in
-    Mvbdu_algebra.redefine
-      (mvbdu_allocate parameters)
-      memoized_fun
-      error
-      handler
-      mvbdu_input
-      list_input 
-      
-  let print_boolean_mvbdu (error:Exception.method_handler) = 
-    Mvbdu_core.print_mvbdu error  
-      (fun error parameters a -> 
-        let _ =
-          Printf.fprintf parameters.Remanent_parameters_sig.log "%s %s\n"
-            parameters.Remanent_parameters_sig.marshalisable_parameters.prefix
-            (if a then "true" else "false")
-        in error) 
-      (fun i -> "x" ^ (string_of_int i)) 
-      
-  let print_hash1 error parameters  =  
-    Hash_1.print error print_boolean_mvbdu parameters  
-      
-  let print_hash2 error log = 
-    Hash_2.print error print_boolean_mvbdu log 
-      
-  let print_memo (error:Exception.method_handler) handler parameters = 
-    let error,l1,l2 = split_memo error handler in 
-    let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s\n"
-      parameters.Remanent_parameters_sig.marshalisable_parameters.prefix in 
-    let error = 
-      List.fold_left
-        (fun error (pref,x) ->
-          print_hash1 error (Remanent_parameters.update_prefix parameters pref) x)
-        error l1
-    in 
-    let error = 
-      List.fold_left 
-        (fun error (pref,x) ->
-          print_hash2 error (Remanent_parameters.update_prefix parameters pref) x)
-        error l2
-    in error
+          if Mvbdu_core.mvbdu_equal mvbdu_true mvbdu_false 
+          then 
+            mvbdu_true.Mvbdu_sig.value
+          else 
+            (Mvbdu_sig.Node 
+               {
+                 Mvbdu_sig.variable = var ;
+                 Mvbdu_sig.upper_bound = bound ;
+                 Mvbdu_sig.branch_true = mvbdu_true ;
+                 Mvbdu_sig.branch_false = mvbdu_false})
+        ))
+  }
+    
+let redefine parameters error handler mvbdu_input list_input = 
+  let memoized_fun = Mvbdu_algebra.recursive_memoize
+    (fun parameters -> reset_handler) 
+    (fun x -> x.Memo_sig.data.boolean_mvbdu_redefine)
+    (fun x h ->
+      {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_redefine = x}})  
+    (fun parameters error handler (mvbdu,list) d -> 
+      let a,b =
+        Hash_2.unsafe_get parameters error
+          (Mvbdu_core.id_of_mvbdu mvbdu, List_core.id_of_list list) d
+      in 
+      a, (handler, b))
+    (fun parameters error handler (mvbdu,list) -> 
+      Hash_2.set 
+        parameters 
+        error 
+        (Mvbdu_core.id_of_mvbdu mvbdu, List_core.id_of_list list)) 
+  in
+  Mvbdu_algebra.redefine
+    (mvbdu_allocate parameters)
+    memoized_fun
+    error
+    handler
+    mvbdu_input
+    list_input 
+    
+let print_boolean_mvbdu (error:Exception.method_handler) = 
+  Mvbdu_core.print_mvbdu error  
+    (fun error parameters a -> 
+      let _ =
+        Printf.fprintf parameters.Remanent_parameters_sig.log "%s %s\n"
+          parameters.Remanent_parameters_sig.marshalisable_parameters.prefix
+          (if a then "true" else "false")
+      in error) 
+    (fun i -> "x" ^ (string_of_int i)) 
+    
+let print_hash1 error parameters  =  
+  Hash_1.print error print_boolean_mvbdu parameters  
+    
+let print_hash2 error log = 
+  Hash_2.print error print_boolean_mvbdu log 
+    
+let print_memo (error:Exception.method_handler) handler parameters = 
+  let error,l1,l2 = split_memo error handler in 
+  let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s\n"
+    parameters.Remanent_parameters_sig.marshalisable_parameters.prefix in 
+  let error = 
+    List.fold_left
+      (fun error (pref,x) ->
+        print_hash1 error (Remanent_parameters.update_prefix parameters pref) x)
+      error l1
+  in 
+  let error = 
+    List.fold_left 
+      (fun error (pref,x) ->
+        print_hash2 error (Remanent_parameters.update_prefix parameters pref) x)
+      error l2
+  in error

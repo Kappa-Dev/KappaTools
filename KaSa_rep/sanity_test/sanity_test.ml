@@ -12,8 +12,6 @@
    * en Automatique.  All rights reserved.  This file is distributed     
    * under the terms of the GNU Library General Public License *)
 
-
-
 let test remanent p s1 = 
   let remanent,bool,report = p remanent in 
   let _ = 
@@ -46,7 +44,7 @@ let remanent parameters =
             in  
             match output with 
               | None -> error, None 
-              | Some (i,a,b,new_dic) -> error,
+              | Some (i, a, b, new_dic) -> error,
                 Some (i, a, b, Mvbdu_core.update_dictionary old_handler new_dic))
         | false -> 
           (fun error b c d e old_handler -> 
@@ -62,8 +60,8 @@ let remanent parameters =
                 old_dictionary 
             in  
             match output with 
-              | None -> error,None 
-              | Some (i,a,b,new_dic) -> error,
+              | None -> error, None 
+              | Some (i, a, b, new_dic) -> error,
                 Some (i, a, b, Mvbdu_core.update_dictionary old_handler new_dic)))
     (fun x -> 
       match x with 
@@ -82,7 +80,7 @@ let remanent parameters =
             in  
             match output with 
               | None -> error, None 
-              | Some (i,a,b,new_dic) -> error,
+              | Some (i, a, b, new_dic) -> error,
                 Some (i, a, b, List_core.update_dictionary old_handler new_dic))
         | false -> 
           (fun error b c d e old_handler -> 
@@ -98,8 +96,8 @@ let remanent parameters =
                 old_dictionary 
             in  
             match output with 
-              | None -> error,None 
-              | Some (i,a,b,new_dic) -> error,
+              | None -> error, None 
+              | Some (i, a, b, new_dic) -> error,
                 Some (i, a, b, List_core.update_dictionary old_handler new_dic)))           
     
 let main () =
@@ -111,7 +109,8 @@ let main () =
     List.fold_left 
       (fun remanent (s,p) -> test remanent p s)
       remanent 
-      bdu_test_list in 
+      bdu_test_list
+  in 
   ()
 
 let _ = main ()
