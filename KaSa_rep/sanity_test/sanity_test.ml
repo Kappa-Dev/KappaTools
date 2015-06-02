@@ -36,21 +36,35 @@ let remanent parameters =
             let old_dictionary = old_handler.Memo_sig.mvbdu_dictionary in 
             let error,output =
               Boolean_mvbdu.D_mvbdu_skeleton.allocate_uniquely
-                parameters error b c d e old_dictionary in  
+                parameters
+                error
+                b
+                c
+                d
+                e
+                old_dictionary 
+            in  
             match output with 
-              | None -> error,None 
+              | None -> error, None 
               | Some (i,a,b,new_dic) -> error,
-                Some(i,a,b,Mvbdu_core.update_dictionary old_handler new_dic))
+                Some (i, a, b, Mvbdu_core.update_dictionary old_handler new_dic))
         | false -> 
           (fun error b c d e old_handler -> 
             let old_dictionary = old_handler.Memo_sig.mvbdu_dictionary in 
             let error,output =
-              Boolean_mvbdu.D_mvbdu_skeleton.allocate parameters error b c d e
-                old_dictionary in  
+              Boolean_mvbdu.D_mvbdu_skeleton.allocate 
+                parameters
+                error 
+                b
+                c
+                d
+                e
+                old_dictionary 
+            in  
             match output with 
               | None -> error,None 
               | Some (i,a,b,new_dic) -> error,
-                Some(i,a,b,Mvbdu_core.update_dictionary old_handler new_dic)))
+                Some (i, a, b, Mvbdu_core.update_dictionary old_handler new_dic)))
     (fun x -> 
       match x with 
         | true -> 
@@ -58,21 +72,35 @@ let remanent parameters =
             let old_dictionary = old_handler.Memo_sig.list_dictionary in 
             let error,output =
               Boolean_mvbdu.D_list_skeleton.allocate_uniquely
-                parameters error b c d e old_dictionary in  
+                parameters 
+                error
+                b 
+                c
+                d
+                e
+                old_dictionary 
+            in  
             match output with 
-              | None -> error,None 
+              | None -> error, None 
               | Some (i,a,b,new_dic) -> error,
-                Some(i,a,b,List_core.update_dictionary old_handler new_dic))
+                Some (i, a, b, List_core.update_dictionary old_handler new_dic))
         | false -> 
           (fun error b c d e old_handler -> 
             let old_dictionary = old_handler.Memo_sig.list_dictionary in 
             let error,output =
-              Boolean_mvbdu.D_list_skeleton.allocate parameters error b c d e
-                old_dictionary in  
+              Boolean_mvbdu.D_list_skeleton.allocate
+                parameters
+                error 
+                b 
+                c
+                d
+                e
+                old_dictionary 
+            in  
             match output with 
               | None -> error,None 
               | Some (i,a,b,new_dic) -> error,
-                Some(i,a,b,List_core.update_dictionary old_handler new_dic)))           
+                Some (i, a, b, List_core.update_dictionary old_handler new_dic)))           
     
 let main () =
   let error = Exception.empty_error_handler in    
