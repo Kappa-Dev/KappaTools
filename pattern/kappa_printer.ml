@@ -78,7 +78,7 @@ let alg_expr env f alg =
 	    (fun _ f cc ->
 	     Format.fprintf
 	       f "|%a|"
-	       (Connected_component.print false env.Environment.signatures) cc))
+	       (Connected_component.print ~sigs:env.Environment.signatures false) cc))
 	 f ccs
     | Expr.TOKEN_ID i ->
        Format.fprintf f "|%a|" (Environment.print_token env) i
@@ -111,7 +111,7 @@ let elementary_rule env f r =
     let () = Format.pp_print_int f i in
     let () = Format.pp_print_string f ": " in
     let () = Connected_component.print
-	       true env.Environment.signatures f cc in
+	       ~sigs:env.Environment.signatures true f cc in
     Format.pp_close_box f () in
   Format.fprintf
     f "@[%a@]@ -- @[@[%a@]@ @[%a@]@]@ ++ @[@[%a@]@ @[%a@]@]@ @@%a"
@@ -141,7 +141,7 @@ let modification env f = function
 	   let () = Format.pp_print_int f i in
 	   let () = Format.pp_print_string f ": " in
 	   let () = Connected_component.print
-		      false env.Environment.signatures f cc in
+		      ~sigs:env.Environment.signatures false f cc in
 	   Format.pp_close_box f () in
 	 Format.fprintf f "$DEL %a %a" (alg_expr env) n
 			(Pp.array Pp.comma boxed_cc)

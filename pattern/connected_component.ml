@@ -171,7 +171,7 @@ let to_navigation full cc =
   | Some (i,x) ->
      build_for [(Fresh (i,x),0),ToNothing] [] [x]
 
-let print with_id sigs f cc =
+let print ?sigs with_id f cc =
   let print_intf (_,_,ag_i as ag) link_ids internals neigh =
     snd
       (Tools.array_fold_lefti
@@ -182,12 +182,12 @@ let print with_id sigs f cc =
 	      if internals.(p) >= 0
 	      then Format.fprintf f "%t%a"
 				  (if not_empty then Pp.comma else Pp.empty)
-				  (Node.print_internal ~sigs ag p) internals.(p)
+				  (Node.print_internal ?sigs ag p) internals.(p)
 	      else
 		if  el <> UnSpec then
 		  Format.fprintf f "%t%a"
 				 (if not_empty then Pp.comma else Pp.empty)
-				 (Node.print_site ~sigs ag) p in
+				 (Node.print_site ?sigs ag) p in
 	    match el with
 	    | UnSpec ->
 	       if internals.(p) >= 0
@@ -211,7 +211,7 @@ let print with_id sigs f cc =
 	 Format.fprintf
 	   f "%t@[<h>%a("
 	   (if not_empty then Pp.comma else Pp.empty)
-	   (Node.print ~sigs) ag_x in
+	   (Node.print ?sigs) ag_x in
        let out = print_intf ag_x link_ids (IntMap.find x cc.internals) el in
        let () = Format.fprintf f ")@]" in
        true,out) cc.links (false,(1,Int2Map.empty)) in
@@ -291,7 +291,7 @@ let print_sons_dot sigs cc_id f sons =
 let print_point_dot sigs f (id,point) =
   let style = if point.is_obs then "octagon" else "box" in
   Format.fprintf f "@[cc%i [label=\"%a\", shape=\"%s\"];@]@,%a"
-		 point.cc.id (print false sigs) point.cc
+		 point.cc.id (print ~sigs false) point.cc
 		 style (print_sons_dot sigs id) point.sons
 
 module Env : sig
@@ -351,7 +351,7 @@ let print f env =
 	    (fun f (_,p) ->
 	     Format.fprintf f "@[<hov 2>(%a)@ -> @[<h>%a@]@ -> @[(%a)@]@]"
 			    (Pp.list Pp.space Format.pp_print_int) p.fathers
-			    (print true env.sig_decl) p.cc
+			    (print ~sigs:env.sig_decl true) p.cc
 			    (Pp.list Pp.space
 				     (fun f s -> Format.fprintf
 						   f "%a(@[%a@])%i"

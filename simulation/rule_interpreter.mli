@@ -19,3 +19,4 @@ val force_rule :
   (t  * Connected_component.Matching.t list option)
 
 val print : Environment.t -> Format.formatter -> t -> unit
+val debug_print : Format.formatter -> t -> unit

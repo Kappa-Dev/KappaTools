@@ -39,8 +39,8 @@ val new_internal_state : work -> (Node.t * int) -> int -> work
 val finish_new : work -> (Env.t*Dipping.t*t)
 
 (** {5 Use a connected component } *)
-val print : bool -> Signature.s -> Format.formatter -> t -> unit
-(** [print print_id sigs form cc] *)
+val print : ?sigs:Signature.s -> bool -> Format.formatter -> t -> unit
+(** [print ~sigs print_id form cc] *)
 val print_dot : Signature.s -> Format.formatter -> t -> unit
 
 module Matching : sig

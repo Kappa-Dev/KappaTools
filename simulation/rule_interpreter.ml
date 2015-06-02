@@ -173,15 +173,14 @@ let force_rule ~get_alg domain counter state rule =
      | h :: t ->
 	transform_by_a_rule ~get_alg domain counter state rule h, Some t
 
-let print_injections env f roots_of_ccs =
+let print_injections ?sigs f roots_of_ccs =
   Format.fprintf
     f "@[<v>%a@]"
     (Pp.set Connected_component.Map.bindings Pp.space
 	    (fun f (cc,roots) ->
 	     Format.fprintf
 	       f "@[# @[%a@] ==> %a@]"
-	       (Connected_component.print true env.Environment.signatures)
-	       cc print_heap roots
+	       (Connected_component.print ?sigs true) cc print_heap roots
 	    )
     ) roots_of_ccs
 
@@ -194,4 +193,13 @@ let print env f state =
 						       env.Environment.tokens i)
 						    Nbr.print el))
 		 state.tokens
-		 (print_injections env) state.roots_of_ccs
+		 (print_injections ~sigs:env.Environment.signatures) state.roots_of_ccs
+
+let debug_print f state =
+  Format.fprintf f "@[<v>%a@,%a@,%a@]"
+		 Edges.debug_print state.edges
+		 (Pp.array Pp.space (fun i f el ->
+				     Format.fprintf f "token_%i <- %a"
+						    i Nbr.print el))
+		 state.tokens
+		 (print_injections ?sigs:None) state.roots_of_ccs
