@@ -116,7 +116,11 @@ let rec print_cell log prefix cell =
       let _ = Printf.fprintf log "%s%s\n" prefix s in 
       ()
     | Mvbdu_sig.Node x -> 
-      let _ = Printf.fprintf log "%sNode(%i<%i)\n" prefix x.Mvbdu_sig.variable x.Mvbdu_sig.upper_bound in
+      let _ = Printf.fprintf log "%sNode(%i<%i)\n"
+        prefix 
+        x.Mvbdu_sig.variable
+        x.Mvbdu_sig.upper_bound 
+      in
       let prefix' = prefix^" " in 
       let _ = print_mvbdu log prefix' x.Mvbdu_sig.branch_true in 
       let _ = print_mvbdu log prefix' x.Mvbdu_sig.branch_false in
@@ -581,7 +585,7 @@ let boolean_mvbdu_and parameters =
     }
       
   let redefine parameters error handler mvbdu_input list_input = 
-    let memoized_fun =   Mvbdu_algebra.recursive_memoize
+    let memoized_fun = Mvbdu_algebra.recursive_memoize
       (fun parameters -> reset_handler) 
       (fun x -> x.Memo_sig.data.boolean_mvbdu_redefine)
       (fun x h ->
@@ -611,7 +615,7 @@ let boolean_mvbdu_and parameters =
       (fun error parameters a -> 
         let _ =
           Printf.fprintf parameters.Remanent_parameters_sig.log "%s %s\n"
-            parameters.Remanent_parameters_sig.prefix
+            parameters.Remanent_parameters_sig.marshalisable_parameters.prefix
             (if a then "true" else "false")
         in error) 
       (fun i -> "x" ^ (string_of_int i)) 
@@ -624,7 +628,8 @@ let boolean_mvbdu_and parameters =
       
   let print_memo (error:Exception.method_handler) handler parameters = 
     let error,l1,l2 = split_memo error handler in 
-    let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s\n" parameters.Remanent_parameters_sig.prefix in 
+    let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s\n"
+      parameters.Remanent_parameters_sig.marshalisable_parameters.prefix in 
     let error = 
       List.fold_left
         (fun error (pref,x) ->

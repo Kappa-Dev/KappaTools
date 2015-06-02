@@ -16,11 +16,12 @@
 let sanity_check = true
 let test_workbench = false 
   
+
 let invalid_arg parameters mh message exn value = 
   Exception.warn parameters mh (Some "Mvbdu_core") message exn (fun () -> value)
 
 let get_hash_key mvbdu = mvbdu.Mvbdu_sig.id 
-  
+
 let mvbdu_equal a b = a==b
   
 let get_skeleton cell = 
@@ -29,27 +30,34 @@ let get_skeleton cell =
     | Mvbdu_sig.Node x -> 
       Mvbdu_sig.Node 
         {x with 
-          Mvbdu_sig.branch_true = get_hash_key x.Mvbdu_sig.branch_true ; 
+          Mvbdu_sig.branch_true  = get_hash_key x.Mvbdu_sig.branch_true ; 
           Mvbdu_sig.branch_false = get_hash_key x.Mvbdu_sig.branch_false
         }
-        
+
 let print_flag parameters bool = 
   if bool 
   then Printf.fprintf parameters.Remanent_parameters_sig.log "Yes" 
   else Printf.fprintf parameters.Remanent_parameters_sig.log "No"
-    
+
 let build_already_compressed_cell (allocate:('a,'b,'c) Sanity_test_sig.f)
     error handler skeleton cell = 
   allocate
     error
     compare
-    skeleton cell
+    skeleton
+    cell
     (fun key -> {Mvbdu_sig.id=key;Mvbdu_sig.value=cell})
     handler  
-    
+
 let compress_node (allocate:('a,'b,'c) Sanity_test_sig.f) error handler cell = 
   match cell with 
-    | Mvbdu_sig.Leaf a as x -> build_already_compressed_cell allocate error handler x x    
+    | Mvbdu_sig.Leaf a as x ->
+      build_already_compressed_cell
+        allocate
+        error
+        handler
+        x
+        x    
     | Mvbdu_sig.Node x -> 
       let variable = x.Mvbdu_sig.variable in 
       let bound = x.Mvbdu_sig.upper_bound in 
@@ -59,19 +67,20 @@ let compress_node (allocate:('a,'b,'c) Sanity_test_sig.f) error handler cell =
       then error,
         Some (get_hash_key branch_true,
               branch_true.Mvbdu_sig.value,
-              branch_true,handler) 
+              branch_true,
+              handler) 
       else  
-        match branch_false.Mvbdu_sig.value  with 
+        match branch_false.Mvbdu_sig.value with 
           | Mvbdu_sig.Node x when mvbdu_equal x.Mvbdu_sig.branch_true branch_true ->
-            error,
-            Some (get_hash_key branch_false,branch_false.Mvbdu_sig.value,
-                  branch_false,
-                  handler)  
+            error, Some (get_hash_key branch_false,
+                         branch_false.Mvbdu_sig.value,
+                         branch_false,
+                         handler)  
           | _ -> 
             (build_already_compressed_cell 
                allocate 
                error 
-               handler 
+               handler
                (Mvbdu_sig.Node 
                   {
                     Mvbdu_sig.branch_true = branch_true.Mvbdu_sig.id ;
@@ -95,29 +104,31 @@ let rec print_mvbdu error print_leaf string_of_var parameters mvbdu =
       let _ =
         Printf.fprintf parameters.Remanent_parameters_sig.log
           "%s if(%d) %s < %d then \n"
-          parameters.Remanent_parameters_sig.prefix mvbdu.Mvbdu_sig.id
-          (string_of_var x.Mvbdu_sig.variable)
+          parameters.Remanent_parameters_sig.marshalisable_parameters.prefix 
+          mvbdu.Mvbdu_sig.id
+          (string_of_var x.Mvbdu_sig.variable) 
           x.Mvbdu_sig.upper_bound 
       in 
       let error =
         print_mvbdu
           error
-          print_leaf
+          print_leaf 
           string_of_var
-          parameters' 
+          parameters'
           x.Mvbdu_sig.branch_true
       in 
       let _ =
-        Printf.fprintf parameters.Remanent_parameters_sig.log "%s else \n"
-          parameters.Remanent_parameters_sig.prefix
+        Printf.fprintf parameters.Remanent_parameters_sig.log
+          "%s else \n" 
+          parameters.Remanent_parameters_sig.marshalisable_parameters.prefix 
       in 
-      let error =
+      let error  =
         print_mvbdu
-          error
+          error 
           print_leaf
           string_of_var
           parameters' 
-          x.Mvbdu_sig.branch_false
+          x.Mvbdu_sig.branch_false 
       in
       error 
         

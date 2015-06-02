@@ -84,7 +84,7 @@ bin/%: %.native Makefile
 doc: man/KaSim_manual.pdf
 doc_html: man/KaSim_manual.htm
 
-all: bin/KaSim bin/KaSa
+all: bin/KaSim bin/KaSa bin/sanity_test
 
 clean_doc:
 	find man \( -not -name \*.tex -and -name KaSim_manual.\* \) -delete
