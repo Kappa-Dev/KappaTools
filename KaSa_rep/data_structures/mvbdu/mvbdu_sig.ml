@@ -16,28 +16,30 @@
 type variable = int
 type upper_bound = int
 type hash_key = int 
- 
-  
+
 type 'a identified = 
   { 
-    id : hash_key ;
-    value : 'a
+    id   : hash_key ;
+    value: 'a
   }
   
 type ('a,'b) precell = 
-  {
-   variable:variable;
-   upper_bound:upper_bound;
-   branch_true:'a;
-   branch_false:'a
-  }
+    {
+      variable     : variable;
+      upper_bound  : upper_bound;
+      branch_true  : 'a;
+      branch_false : 'a
+    }
+      
 and ('a,'b) premvbdu =  
   | Leaf of 'b 
   | Node of 'a 
+      
 and 'b mvbdu = 
-  {
-    id :hash_key;
-    value : 'b cell}
-  and 'b skeleton = ((hash_key,'b) precell,'b) premvbdu
-and 'b cell = (('b mvbdu,'b) precell,'b) premvbdu
+    {
+      id    : hash_key;
+      value : 'b cell
+    }
 
+and 'b skeleton = ((hash_key, 'b) precell, 'b) premvbdu
+and 'b cell     = (('b mvbdu, 'b) precell, 'b) premvbdu
