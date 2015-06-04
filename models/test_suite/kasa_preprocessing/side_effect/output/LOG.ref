@@ -170,14 +170,15 @@ Influence_map: The notation [i -> j] means an agent at position [i] of the first
 Influence_map:Wake_up_map:rule(2):'r2' A(x?),B(x)->A(x!1),B(x!1) -> rule(1):'r1' A(x!_)->A(x)[0->0]
 Influence_map:Inhibition_map:rule(0):'r0' A(x!1),A(z!1)->A(x),A(z) -> rule(1):'r1' A(x!_)->A(x)[0->0]
 Influence_map:Inhibition_map:rule(1):'r1' A(x!_)->A(x) -> rule(0):'r0' A(x!1),A(z!1)->A(x),A(z)[0*->1];[0->0]
-Potential dependencies between sites:
-Potential dependencies between sites:unbinding:
+Side-effect:
+Side-effect:agent_type:0:
+Side_effect:1/2unbinding:site_type:{0}
+Side-effect:unbinding:
 agent_id:0:agent_type:0:site_type:0 -> agent_id:1:agent_type:0:site_type:1
-Potential dependencies between sites:deletion:
+Side-effect:deletion:
+Potential dependencies between sites:
 Potential dependencies between sites:agent_type:0:
 Potential dependencies between sites:Number of covering classes:2
-Potential dependencies between sites:Covering_classes:class_id:0:1/2unbinding:site_type:0
-Potential dependencies between sites:Covering_classes:class_id:0:New_index:1/2unbinding:site_type:1
 Potential dependencies between sites:Covering_class_id:0:
 site_type:0->state:[state_min:1; state_max:1]
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
@@ -222,4 +223,122 @@ Flow of information in the ODE semantics:agent_type:0:anchor_type:{1}
 Flow of information in the ODE semantics:rule_id:2
 Flow of information in the ODE semantics:agent_type:1:site_modified:0->x(binding state)
 Flow of information in the ODE semantics:agent_type:0:anchor_type:{1}
+BDU:
+rule_id:0
+BDU:agent_type:mvbdu: if(3) x0 < -1 then 
+BDU:agent_type:mvbdu:  false
+BDU:agent_type:mvbdu: else 
+BDU:agent_type:mvbdu:  if(2) x0 < 0 then 
+BDU:agent_type:mvbdu:   true
+BDU:agent_type:mvbdu:  else 
+BDU:agent_type:mvbdu:   false
+BDU:agent_type:Memoization tables:
+BDU:agent_type:Memoization tables:reset0:
+BDU:agent_type:Memoization tables:reset0:1:
+BDU:agent_type:Memoization tables:reset0:1: if(3) x0 < -1 then 
+BDU:agent_type:Memoization tables:reset0:1:  false
+BDU:agent_type:Memoization tables:reset0:1: else 
+BDU:agent_type:Memoization tables:reset0:1:  if(2) x0 < 0 then 
+BDU:agent_type:Memoization tables:reset0:1:   true
+BDU:agent_type:Memoization tables:reset0:1:  else 
+BDU:agent_type:Memoization tables:reset0:1:   false
+BDU:agent_type:Memoization tables:reset3:
+BDU:agent_type:Memoization tables:reset3:0:
+BDU:agent_type:Memoization tables:reset3:0: if(3) x0 < -1 then 
+BDU:agent_type:Memoization tables:reset3:0:  false
+BDU:agent_type:Memoization tables:reset3:0: else 
+BDU:agent_type:Memoization tables:reset3:0:  if(2) x0 < 0 then 
+BDU:agent_type:Memoization tables:reset3:0:   true
+BDU:agent_type:Memoization tables:reset3:0:  else 
+BDU:agent_type:Memoization tables:reset3:0:   false
+Mvbdu.002: ok
+BDU:agent_type:mvbdu: if(3) x1 < 0 then 
+BDU:agent_type:mvbdu:  false
+BDU:agent_type:mvbdu: else 
+BDU:agent_type:mvbdu:  if(2) x1 < 1 then 
+BDU:agent_type:mvbdu:   true
+BDU:agent_type:mvbdu:  else 
+BDU:agent_type:mvbdu:   false
+BDU:agent_type:Memoization tables:
+BDU:agent_type:Memoization tables:reset0:
+BDU:agent_type:Memoization tables:reset0:1:
+BDU:agent_type:Memoization tables:reset0:1: if(3) x1 < 0 then 
+BDU:agent_type:Memoization tables:reset0:1:  false
+BDU:agent_type:Memoization tables:reset0:1: else 
+BDU:agent_type:Memoization tables:reset0:1:  if(2) x1 < 1 then 
+BDU:agent_type:Memoization tables:reset0:1:   true
+BDU:agent_type:Memoization tables:reset0:1:  else 
+BDU:agent_type:Memoization tables:reset0:1:   false
+BDU:agent_type:Memoization tables:reset3:
+BDU:agent_type:Memoization tables:reset3:0:
+BDU:agent_type:Memoization tables:reset3:0: if(3) x1 < 0 then 
+BDU:agent_type:Memoization tables:reset3:0:  false
+BDU:agent_type:Memoization tables:reset3:0: else 
+BDU:agent_type:Memoization tables:reset3:0:  if(2) x1 < 1 then 
+BDU:agent_type:Memoization tables:reset3:0:   true
+BDU:agent_type:Memoization tables:reset3:0:  else 
+BDU:agent_type:Memoization tables:reset3:0:   false
+Mvbdu.002: ok
+rule_id:1
+BDU:agent_type:mvbdu: if(3) x0 < -1 then 
+BDU:agent_type:mvbdu:  false
+BDU:agent_type:mvbdu: else 
+BDU:agent_type:mvbdu:  if(2) x0 < 0 then 
+BDU:agent_type:mvbdu:   true
+BDU:agent_type:mvbdu:  else 
+BDU:agent_type:mvbdu:   false
+BDU:agent_type:Memoization tables:
+BDU:agent_type:Memoization tables:reset0:
+BDU:agent_type:Memoization tables:reset0:1:
+BDU:agent_type:Memoization tables:reset0:1: if(3) x0 < -1 then 
+BDU:agent_type:Memoization tables:reset0:1:  false
+BDU:agent_type:Memoization tables:reset0:1: else 
+BDU:agent_type:Memoization tables:reset0:1:  if(2) x0 < 0 then 
+BDU:agent_type:Memoization tables:reset0:1:   true
+BDU:agent_type:Memoization tables:reset0:1:  else 
+BDU:agent_type:Memoization tables:reset0:1:   false
+BDU:agent_type:Memoization tables:reset3:
+BDU:agent_type:Memoization tables:reset3:0:
+BDU:agent_type:Memoization tables:reset3:0: if(3) x0 < -1 then 
+BDU:agent_type:Memoization tables:reset3:0:  false
+BDU:agent_type:Memoization tables:reset3:0: else 
+BDU:agent_type:Memoization tables:reset3:0:  if(2) x0 < 0 then 
+BDU:agent_type:Memoization tables:reset3:0:   true
+BDU:agent_type:Memoization tables:reset3:0:  else 
+BDU:agent_type:Memoization tables:reset3:0:   false
+Mvbdu.002: ok
+rule_id:2
+BDU:agent_type:mvbdu: true
+BDU:agent_type:Memoization tables:
+BDU:agent_type:Memoization tables:reset0:
+BDU:agent_type:Memoization tables:reset0:0:
+BDU:agent_type:Memoization tables:reset0:0: true
+Mvbdu.002: ok
+BDU:agent_type:mvbdu: if(3) x0 < -1 then 
+BDU:agent_type:mvbdu:  false
+BDU:agent_type:mvbdu: else 
+BDU:agent_type:mvbdu:  if(2) x0 < 0 then 
+BDU:agent_type:mvbdu:   true
+BDU:agent_type:mvbdu:  else 
+BDU:agent_type:mvbdu:   false
+BDU:agent_type:Memoization tables:
+BDU:agent_type:Memoization tables:reset0:
+BDU:agent_type:Memoization tables:reset0:1:
+BDU:agent_type:Memoization tables:reset0:1: if(3) x0 < -1 then 
+BDU:agent_type:Memoization tables:reset0:1:  false
+BDU:agent_type:Memoization tables:reset0:1: else 
+BDU:agent_type:Memoization tables:reset0:1:  if(2) x0 < 0 then 
+BDU:agent_type:Memoization tables:reset0:1:   true
+BDU:agent_type:Memoization tables:reset0:1:  else 
+BDU:agent_type:Memoization tables:reset0:1:   false
+BDU:agent_type:Memoization tables:reset3:
+BDU:agent_type:Memoization tables:reset3:0:
+BDU:agent_type:Memoization tables:reset3:0: if(3) x0 < -1 then 
+BDU:agent_type:Memoization tables:reset3:0:  false
+BDU:agent_type:Memoization tables:reset3:0: else 
+BDU:agent_type:Memoization tables:reset3:0:  if(2) x0 < 0 then 
+BDU:agent_type:Memoization tables:reset3:0:   true
+BDU:agent_type:Memoization tables:reset3:0:  else 
+BDU:agent_type:Memoization tables:reset3:0:   false
+Mvbdu.002: ok
 execution finished without any exception

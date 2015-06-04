@@ -133,9 +133,10 @@ Influence_map:Wake_up_map:rule(2):'"0' A(x~q)->A(x~u) -> rule(0):'veryveryveryve
 Influence_map:Wake_up_map:rule(3):'\0' A(x~q)->A(x~p) -> rule(1):'otherotherveryveryveryverylonglabel' A(x~p)->A(x~q)[0->0]
 Influence_map:Inhibition_map:rule(2):'"0' A(x~q)->A(x~u) -> rule(3):'\0' A(x~q)->A(x~p)[0->0]
 Influence_map:Inhibition_map:rule(3):'\0' A(x~q)->A(x~p) -> rule(2):'"0' A(x~q)->A(x~u)[0->0]
+Side-effect:
+Side-effect:unbinding:
+Side-effect:deletion:
 Potential dependencies between sites:
-Potential dependencies between sites:unbinding:
-Potential dependencies between sites:deletion:
 Potential dependencies between sites:agent_type:0:
 Potential dependencies between sites:Number of covering classes:1
 Potential dependencies between sites:Covering_class_id:0:
@@ -155,4 +156,117 @@ Flow of information in the ODE semantics:rule_id:2
 Flow of information in the ODE semantics:agent_type:0:site_modified:0->x(internal state)
 Flow of information in the ODE semantics:rule_id:3
 Flow of information in the ODE semantics:agent_type:0:site_modified:0->x(internal state)
+BDU:
+rule_id:0
+BDU:agent_type:mvbdu: if(3) x0 < -1 then 
+BDU:agent_type:mvbdu:  false
+BDU:agent_type:mvbdu: else 
+BDU:agent_type:mvbdu:  if(2) x0 < 0 then 
+BDU:agent_type:mvbdu:   true
+BDU:agent_type:mvbdu:  else 
+BDU:agent_type:mvbdu:   false
+BDU:agent_type:Memoization tables:
+BDU:agent_type:Memoization tables:reset0:
+BDU:agent_type:Memoization tables:reset0:1:
+BDU:agent_type:Memoization tables:reset0:1: if(3) x0 < -1 then 
+BDU:agent_type:Memoization tables:reset0:1:  false
+BDU:agent_type:Memoization tables:reset0:1: else 
+BDU:agent_type:Memoization tables:reset0:1:  if(2) x0 < 0 then 
+BDU:agent_type:Memoization tables:reset0:1:   true
+BDU:agent_type:Memoization tables:reset0:1:  else 
+BDU:agent_type:Memoization tables:reset0:1:   false
+BDU:agent_type:Memoization tables:reset3:
+BDU:agent_type:Memoization tables:reset3:0:
+BDU:agent_type:Memoization tables:reset3:0: if(3) x0 < -1 then 
+BDU:agent_type:Memoization tables:reset3:0:  false
+BDU:agent_type:Memoization tables:reset3:0: else 
+BDU:agent_type:Memoization tables:reset3:0:  if(2) x0 < 0 then 
+BDU:agent_type:Memoization tables:reset3:0:   true
+BDU:agent_type:Memoization tables:reset3:0:  else 
+BDU:agent_type:Memoization tables:reset3:0:   false
+Mvbdu.002: ok
+rule_id:1
+BDU:agent_type:mvbdu: if(3) x0 < -1 then 
+BDU:agent_type:mvbdu:  false
+BDU:agent_type:mvbdu: else 
+BDU:agent_type:mvbdu:  if(2) x0 < 0 then 
+BDU:agent_type:mvbdu:   true
+BDU:agent_type:mvbdu:  else 
+BDU:agent_type:mvbdu:   false
+BDU:agent_type:Memoization tables:
+BDU:agent_type:Memoization tables:reset0:
+BDU:agent_type:Memoization tables:reset0:1:
+BDU:agent_type:Memoization tables:reset0:1: if(3) x0 < -1 then 
+BDU:agent_type:Memoization tables:reset0:1:  false
+BDU:agent_type:Memoization tables:reset0:1: else 
+BDU:agent_type:Memoization tables:reset0:1:  if(2) x0 < 0 then 
+BDU:agent_type:Memoization tables:reset0:1:   true
+BDU:agent_type:Memoization tables:reset0:1:  else 
+BDU:agent_type:Memoization tables:reset0:1:   false
+BDU:agent_type:Memoization tables:reset3:
+BDU:agent_type:Memoization tables:reset3:0:
+BDU:agent_type:Memoization tables:reset3:0: if(3) x0 < -1 then 
+BDU:agent_type:Memoization tables:reset3:0:  false
+BDU:agent_type:Memoization tables:reset3:0: else 
+BDU:agent_type:Memoization tables:reset3:0:  if(2) x0 < 0 then 
+BDU:agent_type:Memoization tables:reset3:0:   true
+BDU:agent_type:Memoization tables:reset3:0:  else 
+BDU:agent_type:Memoization tables:reset3:0:   false
+Mvbdu.002: ok
+rule_id:2
+BDU:agent_type:mvbdu: if(3) x0 < -1 then 
+BDU:agent_type:mvbdu:  false
+BDU:agent_type:mvbdu: else 
+BDU:agent_type:mvbdu:  if(2) x0 < 0 then 
+BDU:agent_type:mvbdu:   true
+BDU:agent_type:mvbdu:  else 
+BDU:agent_type:mvbdu:   false
+BDU:agent_type:Memoization tables:
+BDU:agent_type:Memoization tables:reset0:
+BDU:agent_type:Memoization tables:reset0:1:
+BDU:agent_type:Memoization tables:reset0:1: if(3) x0 < -1 then 
+BDU:agent_type:Memoization tables:reset0:1:  false
+BDU:agent_type:Memoization tables:reset0:1: else 
+BDU:agent_type:Memoization tables:reset0:1:  if(2) x0 < 0 then 
+BDU:agent_type:Memoization tables:reset0:1:   true
+BDU:agent_type:Memoization tables:reset0:1:  else 
+BDU:agent_type:Memoization tables:reset0:1:   false
+BDU:agent_type:Memoization tables:reset3:
+BDU:agent_type:Memoization tables:reset3:0:
+BDU:agent_type:Memoization tables:reset3:0: if(3) x0 < -1 then 
+BDU:agent_type:Memoization tables:reset3:0:  false
+BDU:agent_type:Memoization tables:reset3:0: else 
+BDU:agent_type:Memoization tables:reset3:0:  if(2) x0 < 0 then 
+BDU:agent_type:Memoization tables:reset3:0:   true
+BDU:agent_type:Memoization tables:reset3:0:  else 
+BDU:agent_type:Memoization tables:reset3:0:   false
+Mvbdu.002: ok
+rule_id:3
+BDU:agent_type:mvbdu: if(3) x0 < -1 then 
+BDU:agent_type:mvbdu:  false
+BDU:agent_type:mvbdu: else 
+BDU:agent_type:mvbdu:  if(2) x0 < 0 then 
+BDU:agent_type:mvbdu:   true
+BDU:agent_type:mvbdu:  else 
+BDU:agent_type:mvbdu:   false
+BDU:agent_type:Memoization tables:
+BDU:agent_type:Memoization tables:reset0:
+BDU:agent_type:Memoization tables:reset0:1:
+BDU:agent_type:Memoization tables:reset0:1: if(3) x0 < -1 then 
+BDU:agent_type:Memoization tables:reset0:1:  false
+BDU:agent_type:Memoization tables:reset0:1: else 
+BDU:agent_type:Memoization tables:reset0:1:  if(2) x0 < 0 then 
+BDU:agent_type:Memoization tables:reset0:1:   true
+BDU:agent_type:Memoization tables:reset0:1:  else 
+BDU:agent_type:Memoization tables:reset0:1:   false
+BDU:agent_type:Memoization tables:reset3:
+BDU:agent_type:Memoization tables:reset3:0:
+BDU:agent_type:Memoization tables:reset3:0: if(3) x0 < -1 then 
+BDU:agent_type:Memoization tables:reset3:0:  false
+BDU:agent_type:Memoization tables:reset3:0: else 
+BDU:agent_type:Memoization tables:reset3:0:  if(2) x0 < 0 then 
+BDU:agent_type:Memoization tables:reset3:0:   true
+BDU:agent_type:Memoization tables:reset3:0:  else 
+BDU:agent_type:Memoization tables:reset3:0:   false
+Mvbdu.002: ok
 execution finished without any exception

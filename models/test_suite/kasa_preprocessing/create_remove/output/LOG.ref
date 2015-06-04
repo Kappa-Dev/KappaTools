@@ -71,18 +71,34 @@ Quarks:agent_modif-:agent_type:0,rule:0->[0]
 Quarks:agent_modif-:agent_type:1,rule:1->[0]
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Influence_map:Wake_up_map:rule(0):'r0' A()->B() -> rule(1):'r1' B()->C()[0->0]
+Side-effect:
+Side-effect:unbinding:
+Side-effect:deletion:
+Side-effect:agent_type:0:
+Side-effect:deletion:document_site:
+Side-effect:agent_type:1:
+Side-effect:deletion:document_site:
+Side-effect:agent_type:0:
+Side-effect:deletion:undocument_site:
+Side-effect:agent_type:1:
+Side-effect:deletion:undocument_site:
 Potential dependencies between sites:
-Potential dependencies between sites:unbinding:
-Potential dependencies between sites:deletion:
-Potential dependencies between sites:agent_type:0:
-Potential dependencies between sites:document_site:
-Potential dependencies between sites:agent_type:1:
-Potential dependencies between sites:document_site:
-Potential dependencies between sites:agent_type:0:
-Potential dependencies between sites:undocument_site:
-Potential dependencies between sites:agent_type:1:
-Potential dependencies between sites:undocument_site:
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
 Flow of information in the ODE semantics:rule_id:1
+BDU:
+rule_id:0
+BDU:agent_type:mvbdu: true
+BDU:agent_type:Memoization tables:
+BDU:agent_type:Memoization tables:reset0:
+BDU:agent_type:Memoization tables:reset0:0:
+BDU:agent_type:Memoization tables:reset0:0: true
+Mvbdu.002: ok
+rule_id:1
+BDU:agent_type:mvbdu: true
+BDU:agent_type:Memoization tables:
+BDU:agent_type:Memoization tables:reset0:
+BDU:agent_type:Memoization tables:reset0:0:
+BDU:agent_type:Memoization tables:reset0:0: true
+Mvbdu.002: ok
 execution finished without any exception

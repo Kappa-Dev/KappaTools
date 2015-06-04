@@ -31,20 +31,20 @@ type port_min = set AgentMap.t
 type port_max = set AgentMap.t
 
 (*site effect*)
-type know_unbinding = (agent_index * agent_name * site * 
+(*type know_unbinding = (agent_index * agent_name * site * 
                          agent_index * agent_name * site) list
 
 (*deletion*)
 type document_del   = (agent_index * agent_name * site) map
 type undocument_del = (agent_index * agent_name * site) map
-type deletion       = document_del AgentMap.t * undocument_del AgentMap.t
+type deletion       = document_del AgentMap.t * undocument_del AgentMap.t*)
 
 type covering_classes =
   {
     store_modified_map     : int map AgentMap.t;
-    store_half_break       : set AgentMap.t;
+    (*store_half_break       : set AgentMap.t;
     store_unbinding        : know_unbinding;
-    store_remove_map       : deletion;
+    store_remove_map       : deletion;*)
     store_covering_classes : ((site * set * set) list list) AgentMap.t 
                              * port_min * port_max
   }
@@ -71,7 +71,7 @@ module Modified_class =
   end
 
 (*site effects*)
-type orignial_site = site
+(*type orignial_site = site
 type new_index     = site
 type unknow_unbinding = (orignial_site * new_index) list
 
@@ -79,19 +79,19 @@ module Halfbreak_class =
   struct
     type t = unknow_unbinding
     let compare = compare
-  end
+  end*)
 
 (*Dictionary*)
 
 module Dictionary_of_Covering_class = Dictionary.Dictionary_of_Ord (Covering_class)
 module Dictionary_of_Modified_class = Dictionary.Dictionary_of_Ord (Modified_class)
-module Dictionary_of_Halfbreak_class = Dictionary.Dictionary_of_Ord (Halfbreak_class)
+(*module Dictionary_of_Halfbreak_class = Dictionary.Dictionary_of_Ord (Halfbreak_class)*)
 
 type pair_dic   = (unit, unit) Dictionary_of_Covering_class.dictionary
 type index_dic  = (unit, unit) Dictionary_of_Covering_class.dictionary
 type test_dic   = (unit, unit) Dictionary_of_Covering_class.dictionary
 type modif_dic  = (unit, unit) Dictionary_of_Modified_class.dictionary
-type halfbreak_dic = (unit, unit) Dictionary_of_Halfbreak_class.dictionary
+(*type halfbreak_dic = (unit, unit) Dictionary_of_Halfbreak_class.dictionary *)
 
 type remanent =
     {
@@ -100,5 +100,5 @@ type remanent =
       store_new_index_dic       : index_dic;
       store_test_new_index_dic  : test_dic;
       store_modif_new_index_dic : modif_dic;
-      store_halfbreak_dic       : halfbreak_dic;
+      (*store_halfbreak_dic       : halfbreak_dic;*) (*REMOVE*)
     }

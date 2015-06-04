@@ -78,6 +78,16 @@ let main () =
     else
       error 
   in 
+  (*Side effect*)
+  let parameters_se= Remanent_parameters.update_prefix parameters "Side-effect:" in
+  let _ =
+    if (Remanent_parameters.get_trace parameters)
+    then
+      Printf.fprintf (Remanent_parameters.get_log parameters) "Side-effect:\n"
+  in
+  let bdu_test =
+    Side_effect.side_effect parameters_se error handler c_compil
+  in
   let error,covering_classes = 
     if Remanent_parameters.get_do_site_dependencies parameters
     then 
@@ -85,7 +95,7 @@ let main () =
 	Remanent_parameters.update_prefix parameters "Potential dependencies between sites:" in 
       let _ = 
 	if (Remanent_parameters.get_trace parameters_cv)
-	then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "Potential dependencies between sites:\n" 
+	then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "Potential dependencies between sites:\n"
       in
       let error,dep = Covering_classes.covering_classes parameters_cv error handler c_compil 
       in error,Some dep 
@@ -105,8 +115,17 @@ let main () =
       in error,Some ode_fragmentation
     else error,None 
   in
+  (*BDU test*)
+  let parameters_bdu = Remanent_parameters.update_prefix parameters "BDU:" in
+  let _ =
+    if (Remanent_parameters.get_trace parameters)
+    then
+      Printf.fprintf (Remanent_parameters.get_log parameters) "BDU:\n"
+  in
+  let bdu_test =
+    Mvbdu.bdu_test parameters_bdu error c_compil
+  in
   let _ = Exception.print parameters error  in
    ()
 
-let _ = main () 
-
+let _ = main ()
