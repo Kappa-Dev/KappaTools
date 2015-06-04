@@ -31,9 +31,9 @@ type ('a,'b) precell =
       branch_false : 'a
     }
       
-and ('a,'b) premvbdu =  
-  | Leaf of 'b 
-  | Node of 'a 
+and ('a,'b) premvbdu =
+  | Leaf of 'b
+  | Node of 'a
       
 and 'b mvbdu = 
     {

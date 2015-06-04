@@ -100,12 +100,13 @@ let remanent parameters =
               | Some (i, a, b, new_dic) -> error,
                 Some (i, a, b, List_core.update_dictionary old_handler new_dic)))           
     
-let main () =
+(*let main () =
   let error = Exception.empty_error_handler in    
   let error,parameters,files  = Get_option.get_option error in 
   (*let _ = Counting_test.test_counting_procedure parameters in*)
   let remanent,bdu_test_list = Mvbdu_test.bdu_test (remanent parameters) parameters in 
-  let _ = 
+  (*testing from bdu_test_list*)
+  let _ =
     List.fold_left 
       (fun remanent (s,p) -> test remanent p s)
       remanent 
@@ -113,4 +114,4 @@ let main () =
   in 
   ()
 
-let _ = main ()
+let _ = main ()*)

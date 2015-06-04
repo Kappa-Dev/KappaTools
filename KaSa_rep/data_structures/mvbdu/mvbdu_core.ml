@@ -30,23 +30,23 @@ let get_skeleton cell =
     | Mvbdu_sig.Node x -> 
       Mvbdu_sig.Node 
         {x with 
-          Mvbdu_sig.branch_true  = get_hash_key x.Mvbdu_sig.branch_true ; 
+          Mvbdu_sig.branch_true  = get_hash_key x.Mvbdu_sig.branch_true; 
           Mvbdu_sig.branch_false = get_hash_key x.Mvbdu_sig.branch_false
         }
 
-let print_flag parameters bool = 
+let print_flag parameters bool =
   if bool 
   then Printf.fprintf parameters.Remanent_parameters_sig.log "Yes" 
   else Printf.fprintf parameters.Remanent_parameters_sig.log "No"
 
-let build_already_compressed_cell (allocate:('a,'b,'c) Sanity_test_sig.f)
+let build_already_compressed_cell (allocate: ('a,'b,'c) Sanity_test_sig.f)
     error handler skeleton cell = 
   allocate
     error
     compare
     skeleton
     cell
-    (fun key -> {Mvbdu_sig.id=key;Mvbdu_sig.value=cell})
+    (fun key -> {Mvbdu_sig.id=key; Mvbdu_sig.value=cell})
     handler  
 
 let compress_node (allocate:('a,'b,'c) Sanity_test_sig.f) error handler cell = 
@@ -83,17 +83,17 @@ let compress_node (allocate:('a,'b,'c) Sanity_test_sig.f) error handler cell =
                handler
                (Mvbdu_sig.Node 
                   {
-                    Mvbdu_sig.branch_true = branch_true.Mvbdu_sig.id ;
+                    Mvbdu_sig.variable = variable;
+                    Mvbdu_sig.upper_bound = bound;
+                    Mvbdu_sig.branch_true = branch_true.Mvbdu_sig.id;
                     Mvbdu_sig.branch_false = branch_false.Mvbdu_sig.id;
-                    Mvbdu_sig.variable = variable ;
-                    Mvbdu_sig.upper_bound = bound
                   })  
                (Mvbdu_sig.Node 
                   {
+                    Mvbdu_sig.variable = variable;
+                    Mvbdu_sig.upper_bound = bound;
                     Mvbdu_sig.branch_true = branch_true;
                     Mvbdu_sig.branch_false = branch_false ;
-                    Mvbdu_sig.variable = variable ;
-                    Mvbdu_sig.upper_bound = bound
                   }))
               
 let rec print_mvbdu error print_leaf string_of_var parameters mvbdu = 

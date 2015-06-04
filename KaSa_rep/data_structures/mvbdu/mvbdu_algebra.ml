@@ -24,14 +24,16 @@ let downgrade parameters mh message value mvbdu =
       
 let rec generic_zeroary allocate handler f error parameters  = 
   let error,cell = f error in 
-  let error,output = Mvbdu_core.build_already_compressed_cell allocate error handler (Mvbdu_core.get_skeleton cell) cell  in 
-  match output 
-  with 
-    | None -> invalid_arg parameters error (Some "line 28") Exit (handler,None)                   
+  let error,output = 
+    Mvbdu_core.build_already_compressed_cell 
+      allocate error handler (Mvbdu_core.get_skeleton cell) cell in 
+  match output with 
+    | None -> invalid_arg parameters error (Some "line 28") Exit (handler,None)       
     | Some (key,cell,mvbdu,handler) ->
       error,(handler,Some mvbdu)
         
-let rec generic_unary allocate (memoized_fun:('a,'b,'c,'d,'e,'f) Memo_sig.unary_memoized_fun) handler   error parameters mvbdu_input = 
+let rec generic_unary allocate (memoized_fun:('a,'b,'c,'d,'e,'f) Memo_sig.unary_memoized_fun)
+ handler error parameters mvbdu_input = 
   match memoized_fun.Memo_sig.get parameters error handler mvbdu_input with 
     | error,(handler,Some output) -> 
       error,(handler,Some output)
@@ -44,19 +46,26 @@ let rec generic_unary allocate (memoized_fun:('a,'b,'c,'d,'e,'f) Memo_sig.unary_
               generic_zeroary allocate handler depreciated_fun error  parameters  
             | Mvbdu_sig.Node x -> 
               begin 
-                match generic_unary allocate memoized_fun handler error parameters x.Mvbdu_sig.branch_true 
+                match generic_unary
+                  allocate memoized_fun handler error parameters x.Mvbdu_sig.branch_true 
                 with
                   | error,(handler,None) -> 
                     error,(handler,None)
                   | error,(handler,Some(mvbdu_true)) -> 
                     begin
-                      match generic_unary allocate memoized_fun handler error parameters x.Mvbdu_sig.branch_false 
+                      match generic_unary
+                        allocate memoized_fun handler error parameters 
+                        x.Mvbdu_sig.branch_false 
                       with 
                         | error,(handler,None) -> 
                           error,(handler,None)
                         | error,(handler,Some(mvbdu_false)) -> 
                           begin 
-                            match Mvbdu_core.compress_node allocate error handler (Mvbdu_sig.Node {x with Mvbdu_sig.branch_true = mvbdu_true ; Mvbdu_sig.branch_false = mvbdu_false}) 
+                            match Mvbdu_core.compress_node allocate error handler 
+                              (Mvbdu_sig.Node 
+                                 {x with 
+                                   Mvbdu_sig.branch_true = mvbdu_true;
+                                   Mvbdu_sig.branch_false = mvbdu_false}) 
                             with 
                               | error,None ->     
                                 error,(handler,None)
@@ -69,7 +78,9 @@ let rec generic_unary allocate (memoized_fun:('a,'b,'c,'d,'e,'f) Memo_sig.unary_
         match output with 
           | None -> error,(handler,None)
           | Some mvbdu_output -> 
-            let error,handler = memoized_fun.Memo_sig.store parameters error handler mvbdu_input mvbdu_output  in 
+            let error,handler =
+              memoized_fun.Memo_sig.store
+                parameters error handler mvbdu_input mvbdu_output in 
             error,(handler,Some mvbdu_output)
       end 
 
@@ -79,8 +90,7 @@ let less parameters error x y =
     | 0 -> error,compare x.Mvbdu_sig.upper_bound y.Mvbdu_sig.upper_bound  
     | 1 | -1 as x-> error,x  
     | _ ->  invalid_arg parameters error (Some "line 81") Exit 0    
-      
-      
+            
 let rec generic_binary allocate (memoized_fun:('a,'b,'c,'d,'e,'f) Memo_sig.binary_memoized_fun) handler error parameters mvbdu_a mvbdu_b = 
   match memoized_fun.Memo_sig.get parameters error handler (mvbdu_a,mvbdu_b) with 
     | error,(handler,Some output) ->   
@@ -102,26 +112,44 @@ let rec generic_binary allocate (memoized_fun:('a,'b,'c,'d,'e,'f) Memo_sig.binar
                 match cmp 
                 with 
                   | 0 ->
-                    x,x.Mvbdu_sig.branch_true,x.Mvbdu_sig.branch_false,y.Mvbdu_sig.branch_true,y.Mvbdu_sig.branch_false 
+                    x,
+                    x.Mvbdu_sig.branch_true,
+                    x.Mvbdu_sig.branch_false,
+                    y.Mvbdu_sig.branch_true,
+                    y.Mvbdu_sig.branch_false 
                   | -1 -> 
-                    x,x.Mvbdu_sig.branch_true,x.Mvbdu_sig.branch_false,mvbdu_b,mvbdu_b
+                    x,
+                    x.Mvbdu_sig.branch_true,
+                    x.Mvbdu_sig.branch_false,
+                    mvbdu_b,
+                    mvbdu_b
                   | _ -> 
-                    y,mvbdu_a,mvbdu_a,y.Mvbdu_sig.branch_true,y.Mvbdu_sig.branch_false 
+                    y,
+                    mvbdu_a,
+                    mvbdu_a,
+                    y.Mvbdu_sig.branch_true,
+                    y.Mvbdu_sig.branch_false 
               in     
               begin
-                match generic_binary allocate memoized_fun handler error parameters x_true y_true
+                match generic_binary
+                  allocate memoized_fun handler error parameters x_true y_true
                 with
                   | error,(handler,None) ->
                     error,(handler,None)
                   | error,(handler,Some(mvbdu_true)) -> 
                     begin    
-                      match generic_binary allocate memoized_fun handler error parameters x_false y_false
+                      match generic_binary
+                        allocate memoized_fun handler error parameters x_false y_false
                       with 
                         | error,(handler,None) -> 
                           error,(handler,None)
                         | error,(handler,Some(mvbdu_false)) -> 
                           begin 
-                            match Mvbdu_core.compress_node allocate error handler (Mvbdu_sig.Node {cell with Mvbdu_sig.branch_true = mvbdu_true ; Mvbdu_sig.branch_false = mvbdu_false}) 
+                            match Mvbdu_core.compress_node allocate error handler
+                              (Mvbdu_sig.Node
+                                 {cell with 
+                                   Mvbdu_sig.branch_true = mvbdu_true ;
+                                   Mvbdu_sig.branch_false = mvbdu_false}) 
                             with 
                               | error,None ->     
                                 error,(handler,None)
@@ -135,13 +163,16 @@ let rec generic_binary allocate (memoized_fun:('a,'b,'c,'d,'e,'f) Memo_sig.binar
           | None ->    
             error,(handler,None)
           | Some mvbdu_output -> 
-            let error,handler = memoized_fun.Memo_sig.store parameters error handler (mvbdu_a,mvbdu_b) mvbdu_output  in 
-            error,(handler,Some mvbdu_output)
+            let error,handler =
+              memoized_fun.Memo_sig.store parameters error handler 
+                (mvbdu_a,mvbdu_b) mvbdu_output 
+            in 
+            error, (handler,Some mvbdu_output)
       end 
-                
-let rec generic_unary_other allocate memoized_fun handler error parameters other mvbdu_input = 
-  match memoized_fun.Memo_sig.get parameters error handler (other,mvbdu_input) 
-  with 
+        
+let rec generic_unary_other allocate memoized_fun handler error parameters other mvbdu_input 
+    = 
+  match memoized_fun.Memo_sig.get parameters error handler (other,mvbdu_input) with 
     | error,(handler,Some output) -> error,(handler,Some output)
     | error,(handler,None) -> 
       begin
@@ -152,19 +183,24 @@ let rec generic_unary_other allocate memoized_fun handler error parameters other
               generic_zeroary allocate handler depreciated error parameters 
             | Mvbdu_sig.Node x -> 
               begin 
-                match generic_unary_other allocate memoized_fun handler error parameters x.Mvbdu_sig.branch_true other   
+                match generic_unary_other allocate memoized_fun handler error parameters 
+                  x.Mvbdu_sig.branch_true other 
                 with
                   | error,(handler,None) -> 
                     error,(handler,None)
                   | error,(handler,Some(mvbdu_true)) -> 
                     begin
-                      match generic_unary_other allocate memoized_fun handler error parameters x.Mvbdu_sig.branch_false other  
+                      match generic_unary_other allocate memoized_fun handler error
+                        parameters x.Mvbdu_sig.branch_false other  
                       with 
                         | error,(handler,None) -> 
                           error,(handler,None)
                         | error,(handler,Some(mvbdu_false)) -> 
                           begin 
-                            match Mvbdu_core.compress_node allocate error handler (Mvbdu_sig.Node {x with Mvbdu_sig.branch_true = mvbdu_true ; Mvbdu_sig.branch_false = mvbdu_false}) 
+                            match Mvbdu_core.compress_node allocate error handler
+                              (Mvbdu_sig.Node 
+                                 {x with Mvbdu_sig.branch_true = mvbdu_true;
+                                   Mvbdu_sig.branch_false = mvbdu_false}) 
                             with 
                               | error,None ->     
                                 error,(handler,None)
@@ -177,13 +213,16 @@ let rec generic_unary_other allocate memoized_fun handler error parameters other
         match output with 
           | None -> error,(handler,None)
           | Some mvbdu_output -> 
-            let error,handler = memoized_fun.Memo_sig.store parameters error handler (other,mvbdu_input) mvbdu_output  in 
-            error,(handler,Some mvbdu_output)
+            let error,handler =
+              memoized_fun.Memo_sig.store parameters error handler
+                (other,mvbdu_input) mvbdu_output
+            in 
+            error, (handler,Some mvbdu_output)
       end 
         
-let rec clean_head allocate memoized_fun union handler error parameters (mvbdu_input:'mvbdu) = 
-  match memoized_fun.Memo_sig.get parameters error handler mvbdu_input 
-  with 
+let rec clean_head allocate memoized_fun union handler error parameters (mvbdu_input:'mvbdu) 
+    = 
+  match memoized_fun.Memo_sig.get parameters error handler mvbdu_input with 
     | error,(handler,Some output) ->                  
       error,(handler,Some output)
     | error,(handler,None) -> 
@@ -205,7 +244,9 @@ let rec clean_head allocate memoized_fun union handler error parameters (mvbdu_i
                       match t.Mvbdu_sig.value 
                       with 
                         | Mvbdu_sig.Node x when x.Mvbdu_sig.variable = var_ref ->
-                          aux handler error (x.Mvbdu_sig.branch_true::x.Mvbdu_sig.branch_false::q) mvbdu_output
+                          aux handler error 
+                            (x.Mvbdu_sig.branch_true::x.Mvbdu_sig.branch_false::q)
+                            mvbdu_output
                         | Mvbdu_sig.Node _ 
                         | Mvbdu_sig.Leaf _ -> 
                           begin
@@ -214,12 +255,15 @@ let rec clean_head allocate memoized_fun union handler error parameters (mvbdu_i
                               | None -> 
                                 aux handler error q (Some t) 
                               | Some a -> 
-                                let error,(handler,output) = union parameters handler error parameters t a in   
+                                let error,(handler,output) =
+                                  union parameters handler error parameters t a
+                                in   
                                 begin
                                   match output 
                                   with 
                                     |  None -> 
-                                      invalid_arg parameters error (Some "line 227") Exit (handler,None)    
+                                      invalid_arg parameters error (Some "line 227") Exit 
+                                        (handler,None)    
                                     | Some a -> 
                                       aux handler error q (Some (a:'mvbdu))  
                                 end
@@ -233,11 +277,14 @@ let rec clean_head allocate memoized_fun union handler error parameters (mvbdu_i
             | None -> 
               error,(handler,None)
             | Some mvbdu_output ->                                 
-              let error,handler = memoized_fun.Memo_sig.store parameters error handler mvbdu_input mvbdu_output  in 
-              error,(handler,Some (mvbdu_output:'mvbdu))
+              let error,handler = 
+                memoized_fun.Memo_sig.store parameters error handler
+                  mvbdu_input mvbdu_output
+              in 
+              error, (handler,Some (mvbdu_output:'mvbdu))
         end  
       end    
-                
+        
 let rec redefine allocate memoized_fun error parameters handler mvbdu_input list_input = 
   match memoized_fun.Memo_sig.get parameters error handler (mvbdu_input,list_input) 
   with 
@@ -307,7 +354,8 @@ let rec redefine allocate memoized_fun error parameters handler mvbdu_input list
                              Mvbdu_sig.branch_false = mvbdu_false}) 
                       with
                         | error, None -> error, (handler, None)
-                        | error, Some(id,cell,mvbdu,handler) -> error, (handler, Some(mvbdu))
+                        | error, Some(id,cell,mvbdu,handler) ->
+                          error, (handler, Some(mvbdu))
                     end 
                   | _ -> 
                     begin 
@@ -359,7 +407,7 @@ let rec redefine allocate memoized_fun error parameters handler mvbdu_input list
                       in 
                       let error,depreciated =
                         (memoized_fun.Memo_sig.f parameters error).Memo_sig.build_true  
-                        list.List_sig.variable
+                          list.List_sig.variable
                           list.List_sig.association 
                           branch_false
                           branch_true
@@ -382,7 +430,7 @@ let rec redefine allocate memoized_fun error parameters handler mvbdu_input list
                       in 
                       let error,depreciated =
                         (memoized_fun.Memo_sig.f parameters error).Memo_sig.build_true  
-                        list.List_sig.variable
+                          list.List_sig.variable
                           (list.List_sig.association-1) 
                           enriched_branch_true
                           branch_false

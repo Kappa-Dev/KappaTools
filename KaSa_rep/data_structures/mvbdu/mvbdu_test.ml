@@ -14,12 +14,13 @@
 
 let build_without_and_with_compressing (allocate:('a,'b,'c) Sanity_test_sig.f)
     error handler bdu_skel bdu_val  = 
-  let error,output =
+  let error, output =
     Mvbdu_core.build_already_compressed_cell
       allocate
       error
       handler
-      bdu_skel bdu_val
+      bdu_skel
+      bdu_val
   in     
   let error, handler, a', a'_id = 
     match output with 
