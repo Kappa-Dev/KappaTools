@@ -1,0 +1,15 @@
+############ TEST ACTIONS ##############
+
+#### Signatures
+
+%agent: A(x~u~p, y~u~p)
+
+#### Rules
+
+'r0' A(x~u, y~u) -> A(x~p, y~p)
+
+#### Variables
+
+%obs: 'Auu' A(x~u?, y~u?)
+%obs: 'Apu' A(x~p?, y~u?)
+%obs: 'App' A(x~p?, y~p?)

@@ -1,0 +1,16 @@
+
+
+digraph G{ 
+node [shape=box, style=filled, fillcolor=lightskyblue];
+"r0" ; 
+node [shape=ellipse, style=filled, fillcolor=palegreen3];
+"Auu" ; 
+"Apu" ; 
+"App" ; 
+edge [color=green, arrowhead=normal];
+"r0" -> "Apu"[label ="[0->0]"] ; 
+"r0" -> "App"[label ="[0->0]"] ; 
+edge [color=red, arrowhead=tee];
+"r0" -> "Auu"[label ="[0->0]"] ; 
+"r0" -> "Apu"[label ="[0->0]"] ; 
+}

@@ -610,266 +610,17 @@ Flow of information in the ODE semantics:External flow:
 - agent_type:2:anchor_type:3 -> agent_type:0:modified_type:1
 BDU:
 var_id:0
-variable:0:site_state:0
-BDU:agent_type:mvbdu: if(3) x0 < -1 then 
-BDU:agent_type:mvbdu:  false
-BDU:agent_type:mvbdu: else 
-BDU:agent_type:mvbdu:  if(2) x0 < 0 then 
-BDU:agent_type:mvbdu:   true
-BDU:agent_type:mvbdu:  else 
-BDU:agent_type:mvbdu:   false
-BDU:agent_type:Memoization tables:
-BDU:agent_type:Memoization tables:reset0:
-BDU:agent_type:Memoization tables:reset0:1:
-BDU:agent_type:Memoization tables:reset0:1: if(3) x0 < -1 then 
-BDU:agent_type:Memoization tables:reset0:1:  false
-BDU:agent_type:Memoization tables:reset0:1: else 
-BDU:agent_type:Memoization tables:reset0:1:  if(2) x0 < 0 then 
-BDU:agent_type:Memoization tables:reset0:1:   true
-BDU:agent_type:Memoization tables:reset0:1:  else 
-BDU:agent_type:Memoization tables:reset0:1:   false
-BDU:agent_type:Memoization tables:reset3:
-BDU:agent_type:Memoization tables:reset3:0:
-BDU:agent_type:Memoization tables:reset3:0: if(3) x0 < -1 then 
-BDU:agent_type:Memoization tables:reset3:0:  false
-BDU:agent_type:Memoization tables:reset3:0: else 
-BDU:agent_type:Memoization tables:reset3:0:  if(2) x0 < 0 then 
-BDU:agent_type:Memoization tables:reset3:0:   true
-BDU:agent_type:Memoization tables:reset3:0:  else 
-BDU:agent_type:Memoization tables:reset3:0:   false
-Mvbdu.002: ok
-variable:0:site_state:0
-BDU:agent_type:mvbdu: if(3) x0 < -1 then 
-BDU:agent_type:mvbdu:  false
-BDU:agent_type:mvbdu: else 
-BDU:agent_type:mvbdu:  if(2) x0 < 0 then 
-BDU:agent_type:mvbdu:   true
-BDU:agent_type:mvbdu:  else 
-BDU:agent_type:mvbdu:   false
-BDU:agent_type:Memoization tables:
-BDU:agent_type:Memoization tables:reset0:
-BDU:agent_type:Memoization tables:reset0:1:
-BDU:agent_type:Memoization tables:reset0:1: if(3) x0 < -1 then 
-BDU:agent_type:Memoization tables:reset0:1:  false
-BDU:agent_type:Memoization tables:reset0:1: else 
-BDU:agent_type:Memoization tables:reset0:1:  if(2) x0 < 0 then 
-BDU:agent_type:Memoization tables:reset0:1:   true
-BDU:agent_type:Memoization tables:reset0:1:  else 
-BDU:agent_type:Memoization tables:reset0:1:   false
-BDU:agent_type:Memoization tables:reset3:
-BDU:agent_type:Memoization tables:reset3:0:
-BDU:agent_type:Memoization tables:reset3:0: if(3) x0 < -1 then 
-BDU:agent_type:Memoization tables:reset3:0:  false
-BDU:agent_type:Memoization tables:reset3:0: else 
-BDU:agent_type:Memoization tables:reset3:0:  if(2) x0 < 0 then 
-BDU:agent_type:Memoization tables:reset3:0:   true
-BDU:agent_type:Memoization tables:reset3:0:  else 
-BDU:agent_type:Memoization tables:reset3:0:   false
-Mvbdu.002: ok
 var_id:1
-variable:1:site_state:1
-BDU:agent_type:mvbdu: if(3) x1 < 0 then 
-BDU:agent_type:mvbdu:  false
-BDU:agent_type:mvbdu: else 
-BDU:agent_type:mvbdu:  if(2) x1 < 1 then 
-BDU:agent_type:mvbdu:   true
-BDU:agent_type:mvbdu:  else 
-BDU:agent_type:mvbdu:   false
-BDU:agent_type:Memoization tables:
-BDU:agent_type:Memoization tables:reset0:
-BDU:agent_type:Memoization tables:reset0:1:
-BDU:agent_type:Memoization tables:reset0:1: if(3) x1 < 0 then 
-BDU:agent_type:Memoization tables:reset0:1:  false
-BDU:agent_type:Memoization tables:reset0:1: else 
-BDU:agent_type:Memoization tables:reset0:1:  if(2) x1 < 1 then 
-BDU:agent_type:Memoization tables:reset0:1:   true
-BDU:agent_type:Memoization tables:reset0:1:  else 
-BDU:agent_type:Memoization tables:reset0:1:   false
-BDU:agent_type:Memoization tables:reset3:
-BDU:agent_type:Memoization tables:reset3:0:
-BDU:agent_type:Memoization tables:reset3:0: if(3) x1 < 0 then 
-BDU:agent_type:Memoization tables:reset3:0:  false
-BDU:agent_type:Memoization tables:reset3:0: else 
-BDU:agent_type:Memoization tables:reset3:0:  if(2) x1 < 1 then 
-BDU:agent_type:Memoization tables:reset3:0:   true
-BDU:agent_type:Memoization tables:reset3:0:  else 
-BDU:agent_type:Memoization tables:reset3:0:   false
-Mvbdu.002: ok
-variable:1:site_state:1
-BDU:agent_type:mvbdu: if(3) x1 < 0 then 
-BDU:agent_type:mvbdu:  false
-BDU:agent_type:mvbdu: else 
-BDU:agent_type:mvbdu:  if(2) x1 < 1 then 
-BDU:agent_type:mvbdu:   true
-BDU:agent_type:mvbdu:  else 
-BDU:agent_type:mvbdu:   false
-BDU:agent_type:Memoization tables:
-BDU:agent_type:Memoization tables:reset0:
-BDU:agent_type:Memoization tables:reset0:1:
-BDU:agent_type:Memoization tables:reset0:1: if(3) x1 < 0 then 
-BDU:agent_type:Memoization tables:reset0:1:  false
-BDU:agent_type:Memoization tables:reset0:1: else 
-BDU:agent_type:Memoization tables:reset0:1:  if(2) x1 < 1 then 
-BDU:agent_type:Memoization tables:reset0:1:   true
-BDU:agent_type:Memoization tables:reset0:1:  else 
-BDU:agent_type:Memoization tables:reset0:1:   false
-BDU:agent_type:Memoization tables:reset3:
-BDU:agent_type:Memoization tables:reset3:0:
-BDU:agent_type:Memoization tables:reset3:0: if(3) x1 < 0 then 
-BDU:agent_type:Memoization tables:reset3:0:  false
-BDU:agent_type:Memoization tables:reset3:0: else 
-BDU:agent_type:Memoization tables:reset3:0:  if(2) x1 < 1 then 
-BDU:agent_type:Memoization tables:reset3:0:   true
-BDU:agent_type:Memoization tables:reset3:0:  else 
-BDU:agent_type:Memoization tables:reset3:0:   false
-Mvbdu.002: ok
 var_id:2
-variable:2:site_state:1
-variable:2:site_state:0
-BDU:agent_type:mvbdu: if(5) x2 < -1 then 
-BDU:agent_type:mvbdu:  false
-BDU:agent_type:mvbdu: else 
-BDU:agent_type:mvbdu:  if(4) x2 < 0 then 
-BDU:agent_type:mvbdu:   true
-BDU:agent_type:mvbdu:  else 
-BDU:agent_type:mvbdu:   false
-BDU:agent_type:Memoization tables:
-BDU:agent_type:Memoization tables:clean_head3:
-BDU:agent_type:Memoization tables:clean_head3: true
-BDU:agent_type:Memoization tables:or0:
-BDU:agent_type:Memoization tables:or0:1:
-BDU:agent_type:Memoization tables:or0:1: true
-BDU:agent_type:Memoization tables:or1:
-BDU:agent_type:Memoization tables:or1:0:
-BDU:agent_type:Memoization tables:or1:0: true
-BDU:agent_type:Memoization tables:reset0:
-BDU:agent_type:Memoization tables:reset0:2:
-BDU:agent_type:Memoization tables:reset0:2: if(5) x2 < -1 then 
-BDU:agent_type:Memoization tables:reset0:2:  false
-BDU:agent_type:Memoization tables:reset0:2: else 
-BDU:agent_type:Memoization tables:reset0:2:  if(4) x2 < 0 then 
-BDU:agent_type:Memoization tables:reset0:2:   true
-BDU:agent_type:Memoization tables:reset0:2:  else 
-BDU:agent_type:Memoization tables:reset0:2:   false
-BDU:agent_type:Memoization tables:reset3:
-BDU:agent_type:Memoization tables:reset3:1:
-BDU:agent_type:Memoization tables:reset3:1: if(5) x2 < -1 then 
-BDU:agent_type:Memoization tables:reset3:1:  false
-BDU:agent_type:Memoization tables:reset3:1: else 
-BDU:agent_type:Memoization tables:reset3:1:  if(4) x2 < 0 then 
-BDU:agent_type:Memoization tables:reset3:1:   true
-BDU:agent_type:Memoization tables:reset3:1:  else 
-BDU:agent_type:Memoization tables:reset3:1:   false
-BDU:agent_type:Memoization tables:reset5:
-BDU:agent_type:Memoization tables:reset5:0:
-BDU:agent_type:Memoization tables:reset5:0: if(5) x2 < -1 then 
-BDU:agent_type:Memoization tables:reset5:0:  false
-BDU:agent_type:Memoization tables:reset5:0: else 
-BDU:agent_type:Memoization tables:reset5:0:  if(4) x2 < 0 then 
-BDU:agent_type:Memoization tables:reset5:0:   true
-BDU:agent_type:Memoization tables:reset5:0:  else 
-BDU:agent_type:Memoization tables:reset5:0:   false
-Mvbdu.002: ok
-variable:2:site_state:0
-variable:2:site_state:0
-BDU:agent_type:mvbdu: if(3) x2 < -1 then 
-BDU:agent_type:mvbdu:  false
-BDU:agent_type:mvbdu: else 
-BDU:agent_type:mvbdu:  if(2) x2 < 0 then 
-BDU:agent_type:mvbdu:   true
-BDU:agent_type:mvbdu:  else 
-BDU:agent_type:mvbdu:   false
-BDU:agent_type:Memoization tables:
-BDU:agent_type:Memoization tables:clean_head3:
-BDU:agent_type:Memoization tables:clean_head3: true
-BDU:agent_type:Memoization tables:or0:
-BDU:agent_type:Memoization tables:or0:1:
-BDU:agent_type:Memoization tables:or0:1: true
-BDU:agent_type:Memoization tables:or1:
-BDU:agent_type:Memoization tables:or1:0:
-BDU:agent_type:Memoization tables:or1:0: true
-BDU:agent_type:Memoization tables:reset0:
-BDU:agent_type:Memoization tables:reset0:2:
-BDU:agent_type:Memoization tables:reset0:2: if(3) x2 < -1 then 
-BDU:agent_type:Memoization tables:reset0:2:  false
-BDU:agent_type:Memoization tables:reset0:2: else 
-BDU:agent_type:Memoization tables:reset0:2:  if(2) x2 < 0 then 
-BDU:agent_type:Memoization tables:reset0:2:   true
-BDU:agent_type:Memoization tables:reset0:2:  else 
-BDU:agent_type:Memoization tables:reset0:2:   false
-BDU:agent_type:Memoization tables:reset3:
-BDU:agent_type:Memoization tables:reset3:0:
-BDU:agent_type:Memoization tables:reset3:0: if(3) x2 < -1 then 
-BDU:agent_type:Memoization tables:reset3:0:  false
-BDU:agent_type:Memoization tables:reset3:0: else 
-BDU:agent_type:Memoization tables:reset3:0:  if(2) x2 < 0 then 
-BDU:agent_type:Memoization tables:reset3:0:   true
-BDU:agent_type:Memoization tables:reset3:0:  else 
-BDU:agent_type:Memoization tables:reset3:0:   false
-BDU:agent_type:Memoization tables:reset3:1:
-BDU:agent_type:Memoization tables:reset3:1: if(3) x2 < -1 then 
-BDU:agent_type:Memoization tables:reset3:1:  false
-BDU:agent_type:Memoization tables:reset3:1: else 
-BDU:agent_type:Memoization tables:reset3:1:  if(2) x2 < 0 then 
-BDU:agent_type:Memoization tables:reset3:1:   true
-BDU:agent_type:Memoization tables:reset3:1:  else 
-BDU:agent_type:Memoization tables:reset3:1:   false
-Mvbdu.002: ok
 var_id:3
-variable:3:site_state:0
-variable:3:site_state:1
-BDU:agent_type:mvbdu: if(5) x3 < 0 then 
-BDU:agent_type:mvbdu:  false
-BDU:agent_type:mvbdu: else 
-BDU:agent_type:mvbdu:  if(4) x3 < 1 then 
-BDU:agent_type:mvbdu:   true
-BDU:agent_type:mvbdu:  else 
-BDU:agent_type:mvbdu:   false
-BDU:agent_type:Memoization tables:
-BDU:agent_type:Memoization tables:clean_head3:
-BDU:agent_type:Memoization tables:clean_head3: true
-BDU:agent_type:Memoization tables:or0:
-BDU:agent_type:Memoization tables:or0:1:
-BDU:agent_type:Memoization tables:or0:1: true
-BDU:agent_type:Memoization tables:or1:
-BDU:agent_type:Memoization tables:or1:0:
-BDU:agent_type:Memoization tables:or1:0: true
-BDU:agent_type:Memoization tables:reset0:
-BDU:agent_type:Memoization tables:reset0:2:
-BDU:agent_type:Memoization tables:reset0:2: if(5) x3 < 0 then 
-BDU:agent_type:Memoization tables:reset0:2:  false
-BDU:agent_type:Memoization tables:reset0:2: else 
-BDU:agent_type:Memoization tables:reset0:2:  if(4) x3 < 1 then 
-BDU:agent_type:Memoization tables:reset0:2:   true
-BDU:agent_type:Memoization tables:reset0:2:  else 
-BDU:agent_type:Memoization tables:reset0:2:   false
-BDU:agent_type:Memoization tables:reset3:
-BDU:agent_type:Memoization tables:reset3:1:
-BDU:agent_type:Memoization tables:reset3:1: if(5) x3 < 0 then 
-BDU:agent_type:Memoization tables:reset3:1:  false
-BDU:agent_type:Memoization tables:reset3:1: else 
-BDU:agent_type:Memoization tables:reset3:1:  if(4) x3 < 1 then 
-BDU:agent_type:Memoization tables:reset3:1:   true
-BDU:agent_type:Memoization tables:reset3:1:  else 
-BDU:agent_type:Memoization tables:reset3:1:   false
-BDU:agent_type:Memoization tables:reset5:
-BDU:agent_type:Memoization tables:reset5:0:
-BDU:agent_type:Memoization tables:reset5:0: if(5) x3 < 0 then 
-BDU:agent_type:Memoization tables:reset5:0:  false
-BDU:agent_type:Memoization tables:reset5:0: else 
-BDU:agent_type:Memoization tables:reset5:0:  if(4) x3 < 1 then 
-BDU:agent_type:Memoization tables:reset5:0:   true
-BDU:agent_type:Memoization tables:reset5:0:  else 
-BDU:agent_type:Memoization tables:reset5:0:   false
-Mvbdu.002: ok
-variable:3:site_state:1
-BDU:agent_type:mvbdu: if(3) x3 < 0 then 
-BDU:agent_type:mvbdu:  false
-BDU:agent_type:mvbdu: else 
-BDU:agent_type:mvbdu:  if(2) x3 < 1 then 
-BDU:agent_type:mvbdu:   true
-BDU:agent_type:mvbdu:  else 
-BDU:agent_type:mvbdu:   false
+var_id:3:agent_type:0:site_type:0:site_state:1
+BDU:agent_type:mvbdu_redefine: if(3) x3 < 0 then 
+BDU:agent_type:mvbdu_redefine:  false
+BDU:agent_type:mvbdu_redefine: else 
+BDU:agent_type:mvbdu_redefine:  if(2) x3 < 1 then 
+BDU:agent_type:mvbdu_redefine:   true
+BDU:agent_type:mvbdu_redefine:  else 
+BDU:agent_type:mvbdu_redefine:   false
 BDU:agent_type:Memoization tables:
 BDU:agent_type:Memoization tables:reset0:
 BDU:agent_type:Memoization tables:reset0:1:
@@ -891,15 +642,15 @@ BDU:agent_type:Memoization tables:reset3:0:  else
 BDU:agent_type:Memoization tables:reset3:0:   false
 Mvbdu.002: ok
 var_id:4
-variable:4:site_state:0
-variable:4:site_state:0
-BDU:agent_type:mvbdu: if(3) x4 < -1 then 
-BDU:agent_type:mvbdu:  false
-BDU:agent_type:mvbdu: else 
-BDU:agent_type:mvbdu:  if(2) x4 < 0 then 
-BDU:agent_type:mvbdu:   true
-BDU:agent_type:mvbdu:  else 
-BDU:agent_type:mvbdu:   false
+var_id:4:agent_type:2:site_type:0:site_state:0
+var_id:4:agent_type:2:site_type:1:site_state:0
+BDU:agent_type:mvbdu_redefine: if(3) x4 < -1 then 
+BDU:agent_type:mvbdu_redefine:  false
+BDU:agent_type:mvbdu_redefine: else 
+BDU:agent_type:mvbdu_redefine:  if(2) x4 < 0 then 
+BDU:agent_type:mvbdu_redefine:   true
+BDU:agent_type:mvbdu_redefine:  else 
+BDU:agent_type:mvbdu_redefine:   false
 BDU:agent_type:Memoization tables:
 BDU:agent_type:Memoization tables:clean_head3:
 BDU:agent_type:Memoization tables:clean_head3: true
@@ -936,82 +687,16 @@ BDU:agent_type:Memoization tables:reset3:1:   true
 BDU:agent_type:Memoization tables:reset3:1:  else 
 BDU:agent_type:Memoization tables:reset3:1:   false
 Mvbdu.002: ok
-variable:4:site_state:1
-variable:4:site_state:0
-variable:4:site_state:0
-variable:4:site_state:0
-BDU:agent_type:mvbdu: if(5) x4 < -1 then 
-BDU:agent_type:mvbdu:  false
-BDU:agent_type:mvbdu: else 
-BDU:agent_type:mvbdu:  if(4) x4 < 0 then 
-BDU:agent_type:mvbdu:   true
-BDU:agent_type:mvbdu:  else 
-BDU:agent_type:mvbdu:   false
-BDU:agent_type:Memoization tables:
-BDU:agent_type:Memoization tables:clean_head3:
-BDU:agent_type:Memoization tables:clean_head3: true
-BDU:agent_type:Memoization tables:clean_head5:
-BDU:agent_type:Memoization tables:clean_head5: true
-BDU:agent_type:Memoization tables:or0:
-BDU:agent_type:Memoization tables:or0:1:
-BDU:agent_type:Memoization tables:or0:1: true
-BDU:agent_type:Memoization tables:or1:
-BDU:agent_type:Memoization tables:or1:0:
-BDU:agent_type:Memoization tables:or1:0: true
-BDU:agent_type:Memoization tables:reset0:
-BDU:agent_type:Memoization tables:reset0:4:
-BDU:agent_type:Memoization tables:reset0:4: if(5) x4 < -1 then 
-BDU:agent_type:Memoization tables:reset0:4:  false
-BDU:agent_type:Memoization tables:reset0:4: else 
-BDU:agent_type:Memoization tables:reset0:4:  if(4) x4 < 0 then 
-BDU:agent_type:Memoization tables:reset0:4:   true
-BDU:agent_type:Memoization tables:reset0:4:  else 
-BDU:agent_type:Memoization tables:reset0:4:   false
-BDU:agent_type:Memoization tables:reset3:
-BDU:agent_type:Memoization tables:reset3:3:
-BDU:agent_type:Memoization tables:reset3:3: if(5) x4 < -1 then 
-BDU:agent_type:Memoization tables:reset3:3:  false
-BDU:agent_type:Memoization tables:reset3:3: else 
-BDU:agent_type:Memoization tables:reset3:3:  if(4) x4 < 0 then 
-BDU:agent_type:Memoization tables:reset3:3:   true
-BDU:agent_type:Memoization tables:reset3:3:  else 
-BDU:agent_type:Memoization tables:reset3:3:   false
-BDU:agent_type:Memoization tables:reset5:
-BDU:agent_type:Memoization tables:reset5:0:
-BDU:agent_type:Memoization tables:reset5:0: if(5) x4 < -1 then 
-BDU:agent_type:Memoization tables:reset5:0:  false
-BDU:agent_type:Memoization tables:reset5:0: else 
-BDU:agent_type:Memoization tables:reset5:0:  if(4) x4 < 0 then 
-BDU:agent_type:Memoization tables:reset5:0:   true
-BDU:agent_type:Memoization tables:reset5:0:  else 
-BDU:agent_type:Memoization tables:reset5:0:   false
-BDU:agent_type:Memoization tables:reset5:1:
-BDU:agent_type:Memoization tables:reset5:1: if(5) x4 < -1 then 
-BDU:agent_type:Memoization tables:reset5:1:  false
-BDU:agent_type:Memoization tables:reset5:1: else 
-BDU:agent_type:Memoization tables:reset5:1:  if(4) x4 < 0 then 
-BDU:agent_type:Memoization tables:reset5:1:   true
-BDU:agent_type:Memoization tables:reset5:1:  else 
-BDU:agent_type:Memoization tables:reset5:1:   false
-BDU:agent_type:Memoization tables:reset5:2:
-BDU:agent_type:Memoization tables:reset5:2: if(5) x4 < -1 then 
-BDU:agent_type:Memoization tables:reset5:2:  false
-BDU:agent_type:Memoization tables:reset5:2: else 
-BDU:agent_type:Memoization tables:reset5:2:  if(4) x4 < 0 then 
-BDU:agent_type:Memoization tables:reset5:2:   true
-BDU:agent_type:Memoization tables:reset5:2:  else 
-BDU:agent_type:Memoization tables:reset5:2:   false
-Mvbdu.002: ok
 var_id:5
-variable:5:site_state:0
-variable:5:site_state:2
-BDU:agent_type:mvbdu: if(5) x5 < 1 then 
-BDU:agent_type:mvbdu:  false
-BDU:agent_type:mvbdu: else 
-BDU:agent_type:mvbdu:  if(4) x5 < 2 then 
-BDU:agent_type:mvbdu:   true
-BDU:agent_type:mvbdu:  else 
-BDU:agent_type:mvbdu:   false
+var_id:5:agent_type:2:site_type:0:site_state:1
+var_id:5:agent_type:2:site_type:1:site_state:0
+BDU:agent_type:mvbdu_redefine: if(5) x5 < -1 then 
+BDU:agent_type:mvbdu_redefine:  false
+BDU:agent_type:mvbdu_redefine: else 
+BDU:agent_type:mvbdu_redefine:  if(4) x5 < 0 then 
+BDU:agent_type:mvbdu_redefine:   true
+BDU:agent_type:mvbdu_redefine:  else 
+BDU:agent_type:mvbdu_redefine:   false
 BDU:agent_type:Memoization tables:
 BDU:agent_type:Memoization tables:clean_head3:
 BDU:agent_type:Memoization tables:clean_head3: true
@@ -1023,48 +708,45 @@ BDU:agent_type:Memoization tables:or1:0:
 BDU:agent_type:Memoization tables:or1:0: true
 BDU:agent_type:Memoization tables:reset0:
 BDU:agent_type:Memoization tables:reset0:2:
-BDU:agent_type:Memoization tables:reset0:2: if(5) x5 < 1 then 
+BDU:agent_type:Memoization tables:reset0:2: if(5) x5 < -1 then 
 BDU:agent_type:Memoization tables:reset0:2:  false
 BDU:agent_type:Memoization tables:reset0:2: else 
-BDU:agent_type:Memoization tables:reset0:2:  if(4) x5 < 2 then 
+BDU:agent_type:Memoization tables:reset0:2:  if(4) x5 < 0 then 
 BDU:agent_type:Memoization tables:reset0:2:   true
 BDU:agent_type:Memoization tables:reset0:2:  else 
 BDU:agent_type:Memoization tables:reset0:2:   false
 BDU:agent_type:Memoization tables:reset3:
 BDU:agent_type:Memoization tables:reset3:1:
-BDU:agent_type:Memoization tables:reset3:1: if(5) x5 < 1 then 
+BDU:agent_type:Memoization tables:reset3:1: if(5) x5 < -1 then 
 BDU:agent_type:Memoization tables:reset3:1:  false
 BDU:agent_type:Memoization tables:reset3:1: else 
-BDU:agent_type:Memoization tables:reset3:1:  if(4) x5 < 2 then 
+BDU:agent_type:Memoization tables:reset3:1:  if(4) x5 < 0 then 
 BDU:agent_type:Memoization tables:reset3:1:   true
 BDU:agent_type:Memoization tables:reset3:1:  else 
 BDU:agent_type:Memoization tables:reset3:1:   false
 BDU:agent_type:Memoization tables:reset5:
 BDU:agent_type:Memoization tables:reset5:0:
-BDU:agent_type:Memoization tables:reset5:0: if(5) x5 < 1 then 
+BDU:agent_type:Memoization tables:reset5:0: if(5) x5 < -1 then 
 BDU:agent_type:Memoization tables:reset5:0:  false
 BDU:agent_type:Memoization tables:reset5:0: else 
-BDU:agent_type:Memoization tables:reset5:0:  if(4) x5 < 2 then 
+BDU:agent_type:Memoization tables:reset5:0:  if(4) x5 < 0 then 
 BDU:agent_type:Memoization tables:reset5:0:   true
 BDU:agent_type:Memoization tables:reset5:0:  else 
 BDU:agent_type:Memoization tables:reset5:0:   false
 Mvbdu.002: ok
-variable:5:site_state:1
-variable:5:site_state:0
-variable:5:site_state:0
-variable:5:site_state:1
-BDU:agent_type:mvbdu: if(3) x5 < 0 then 
-BDU:agent_type:mvbdu:  false
-BDU:agent_type:mvbdu: else 
-BDU:agent_type:mvbdu:  if(2) x5 < 1 then 
-BDU:agent_type:mvbdu:   true
-BDU:agent_type:mvbdu:  else 
-BDU:agent_type:mvbdu:   false
+var_id:6
+var_id:6:agent_type:2:site_type:0:site_state:1
+var_id:6:agent_type:2:site_type:1:site_state:1
+BDU:agent_type:mvbdu_redefine: if(3) x6 < 0 then 
+BDU:agent_type:mvbdu_redefine:  false
+BDU:agent_type:mvbdu_redefine: else 
+BDU:agent_type:mvbdu_redefine:  if(2) x6 < 1 then 
+BDU:agent_type:mvbdu_redefine:   true
+BDU:agent_type:mvbdu_redefine:  else 
+BDU:agent_type:mvbdu_redefine:   false
 BDU:agent_type:Memoization tables:
 BDU:agent_type:Memoization tables:clean_head3:
 BDU:agent_type:Memoization tables:clean_head3: true
-BDU:agent_type:Memoization tables:clean_head5:
-BDU:agent_type:Memoization tables:clean_head5: true
 BDU:agent_type:Memoization tables:or0:
 BDU:agent_type:Memoization tables:or0:1:
 BDU:agent_type:Memoization tables:or0:1: true
@@ -1072,47 +754,32 @@ BDU:agent_type:Memoization tables:or1:
 BDU:agent_type:Memoization tables:or1:0:
 BDU:agent_type:Memoization tables:or1:0: true
 BDU:agent_type:Memoization tables:reset0:
-BDU:agent_type:Memoization tables:reset0:4:
-BDU:agent_type:Memoization tables:reset0:4: if(3) x5 < 0 then 
-BDU:agent_type:Memoization tables:reset0:4:  false
-BDU:agent_type:Memoization tables:reset0:4: else 
-BDU:agent_type:Memoization tables:reset0:4:  if(2) x5 < 1 then 
-BDU:agent_type:Memoization tables:reset0:4:   true
-BDU:agent_type:Memoization tables:reset0:4:  else 
-BDU:agent_type:Memoization tables:reset0:4:   false
+BDU:agent_type:Memoization tables:reset0:2:
+BDU:agent_type:Memoization tables:reset0:2: if(3) x6 < 0 then 
+BDU:agent_type:Memoization tables:reset0:2:  false
+BDU:agent_type:Memoization tables:reset0:2: else 
+BDU:agent_type:Memoization tables:reset0:2:  if(2) x6 < 1 then 
+BDU:agent_type:Memoization tables:reset0:2:   true
+BDU:agent_type:Memoization tables:reset0:2:  else 
+BDU:agent_type:Memoization tables:reset0:2:   false
 BDU:agent_type:Memoization tables:reset3:
 BDU:agent_type:Memoization tables:reset3:0:
-BDU:agent_type:Memoization tables:reset3:0: if(3) x5 < 0 then 
+BDU:agent_type:Memoization tables:reset3:0: if(3) x6 < 0 then 
 BDU:agent_type:Memoization tables:reset3:0:  false
 BDU:agent_type:Memoization tables:reset3:0: else 
-BDU:agent_type:Memoization tables:reset3:0:  if(2) x5 < 1 then 
+BDU:agent_type:Memoization tables:reset3:0:  if(2) x6 < 1 then 
 BDU:agent_type:Memoization tables:reset3:0:   true
 BDU:agent_type:Memoization tables:reset3:0:  else 
 BDU:agent_type:Memoization tables:reset3:0:   false
-BDU:agent_type:Memoization tables:reset3:3:
-BDU:agent_type:Memoization tables:reset3:3: if(3) x5 < 0 then 
-BDU:agent_type:Memoization tables:reset3:3:  false
-BDU:agent_type:Memoization tables:reset3:3: else 
-BDU:agent_type:Memoization tables:reset3:3:  if(2) x5 < 1 then 
-BDU:agent_type:Memoization tables:reset3:3:   true
-BDU:agent_type:Memoization tables:reset3:3:  else 
-BDU:agent_type:Memoization tables:reset3:3:   false
-BDU:agent_type:Memoization tables:reset5:
-BDU:agent_type:Memoization tables:reset5:1:
-BDU:agent_type:Memoization tables:reset5:1: if(3) x5 < 0 then 
-BDU:agent_type:Memoization tables:reset5:1:  false
-BDU:agent_type:Memoization tables:reset5:1: else 
-BDU:agent_type:Memoization tables:reset5:1:  if(2) x5 < 1 then 
-BDU:agent_type:Memoization tables:reset5:1:   true
-BDU:agent_type:Memoization tables:reset5:1:  else 
-BDU:agent_type:Memoization tables:reset5:1:   false
-BDU:agent_type:Memoization tables:reset5:2:
-BDU:agent_type:Memoization tables:reset5:2: if(3) x5 < 0 then 
-BDU:agent_type:Memoization tables:reset5:2:  false
-BDU:agent_type:Memoization tables:reset5:2: else 
-BDU:agent_type:Memoization tables:reset5:2:  if(2) x5 < 1 then 
-BDU:agent_type:Memoization tables:reset5:2:   true
-BDU:agent_type:Memoization tables:reset5:2:  else 
-BDU:agent_type:Memoization tables:reset5:2:   false
+BDU:agent_type:Memoization tables:reset3:1:
+BDU:agent_type:Memoization tables:reset3:1: if(3) x6 < 0 then 
+BDU:agent_type:Memoization tables:reset3:1:  false
+BDU:agent_type:Memoization tables:reset3:1: else 
+BDU:agent_type:Memoization tables:reset3:1:  if(2) x6 < 1 then 
+BDU:agent_type:Memoization tables:reset3:1:   true
+BDU:agent_type:Memoization tables:reset3:1:  else 
+BDU:agent_type:Memoization tables:reset3:1:   false
 Mvbdu.002: ok
+var_id:7
+var_id:8
 execution finished without any exception
