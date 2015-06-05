@@ -20,7 +20,6 @@ let trace = false
 
 (************************************************************************************)
 (*TYPES*)
-(*type of agent variable and site variable: plus and minus*)
 
 module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
 
@@ -36,20 +35,6 @@ type store_var =
     }
 
 (************************************************************************************)
-
-let sprintf_list l =
-  let acc = ref "{" in
-  List.iteri (fun i x ->
-    acc := !acc ^
-      if i <> 0
-      then Printf.sprintf "; %i" x
-      else Printf.sprintf "%i" x
-  ) l;
-  !acc ^ "}"
-    
-let print_list l =
-  let output = sprintf_list l in
-  Printf.fprintf stdout "%s\n" output
 
 let int_of_port port = port.Cckappa_sig.site_state.Cckappa_sig.min
 
@@ -112,7 +97,7 @@ let scan_rule parameter error kappa_handler rule store_result =
 
 let scan_mixture_in_var bool parameter error kappa_handler var_id mixture
     result_rules =
-  (*check if it is an agant variable or a site variable *)
+  (*check if it is a site variable plus/minus*)
   let store_pair_result =
     if bool
     then
@@ -215,7 +200,7 @@ let scan_var parameter error kappa_handler var_id var result_rules =
       list_pos
   in
   (*get list_neg*)
-  let erro, result_rules =
+  let error, result_rules =
     List.fold_left (fun (error, result_rules) mixture ->
       scan_neg_mixture
         parameter
@@ -248,6 +233,7 @@ let scan_rule_set parameter error kappa_handler rules =
       store_pair_minus = init_var_minus
     }
   in
+  (*-----------------------------------------------------------------------------------*)
   let error, store_result =
     Int_storage.Nearly_inf_Imperatif.fold
       parameter
@@ -347,14 +333,36 @@ let scan_var_set parameter error kappa_handler vars result_rules =
             b_val
             b_val
         in
-        (*compute bdu from bdu_a and bdu_b*)
+        (*TODO: build NODE? *)
+        (*define a copy bdu*)
+        let copy bdu =
+          {
+            bdu with Mvbdu_sig.value =
+              match bdu.Mvbdu_sig.value with
+                | Mvbdu_sig.Node x -> Mvbdu_sig.Node x
+                | Mvbdu_sig.Leaf a -> Mvbdu_sig.Leaf a
+          }
+        in
+        (*---------------------------------------------------------------------------*)
+        (*compute bdu relation*)
         let error, handler, bmvbdu_true0 =
           f (Boolean_mvbdu.boolean_mvbdu_true parameter handler error) parameter
         in
         let error, handler, bmvbdu_false0 =
           f (Boolean_mvbdu.boolean_mvbdu_false parameter handler error) parameter
         in
-        (*build a list of bdu from a list of pair (var_id, site_state) computed above*)
+        let error, handler, bmvbdu_true1 =
+          f (Boolean_mvbdu.boolean_mvbdu_constant_true parameter handler error parameter)
+            bmvbdu_true0
+        in
+        let error, handler, bmvbdu_true2 =
+          f (Boolean_mvbdu.boolean_mvbdu_constant_true parameter handler error parameter)
+            bmvbdu_false0
+        in
+        (*TODO?*)
+        (*---------------------------------------------------------------------------*)
+        (*build tree lists for bdu from a list of pair (var_id, site_state) computed above*)
+        (*build list_a, list_b is a sorted list, list_c is a reversed sorted list*)
         let error, (handler, list_a) =
           List_algebra.build_list
             (Boolean_mvbdu.list_allocate parameter)
@@ -363,15 +371,48 @@ let scan_var_set parameter error kappa_handler vars result_rules =
             handler
             pair_list
         in
+        let error, (handler, list_b) =
+          List_algebra.build_sorted_list
+            (Boolean_mvbdu.list_allocate parameter)
+            parameter
+            error
+            handler
+            pair_list
+        in
+        let error, (handler, list_c) =
+          List_algebra.build_reversed_sorted_list
+            (Boolean_mvbdu.list_allocate parameter)
+            parameter
+            error
+            handler
+            pair_list
+        in
+        (*---------------------------------------------------------------------------*)
         (*compute mvbdu of redefine of list_a*)
-        let error, handler, mvbdu_redefine =
+        let error, handler, mvbdu_redefine = (*FIXME: a' is a leaf*)
           f (Boolean_mvbdu.redefine parameter error parameter handler a') list_a
+        in
+        let error, handler, a''' =
+          f (Boolean_mvbdu.clean_head parameter error handler) a''
+        in
+        (*PRINT a'', a'''*)
+        let error = 
+          Boolean_mvbdu.print_boolean_mvbdu
+            error
+            (Remanent_parameters.update_prefix parameter "a':")
+            a''
+        in
+        let error =
+          Boolean_mvbdu.print_boolean_mvbdu
+            error
+            (Remanent_parameters.update_prefix parameter "a'':")
+            a'''
         in
         (*PRINT bdu redefine*)
         let error =
           Boolean_mvbdu.print_boolean_mvbdu
             error
-            (Remanent_parameters.update_prefix parameter "mvbdu_redefine:")
+            (Remanent_parameters.update_prefix parameter "mvbdu_redefine_list_a:")
             mvbdu_redefine
         in
         (*PRINT memoization tables*)
@@ -381,7 +422,8 @@ let scan_var_set parameter error kappa_handler vars result_rules =
             handler
             (Remanent_parameters.update_prefix parameter "Memoization tables:")
         in
-        (*store bdu handler*)
+        (*---------------------------------------------------------------------------*)
+        (*store bdu it is a pair (remanent, and list of bdu test)*)
         let store_pair_remanent =
           {
             remanent_bdu with
@@ -389,15 +431,87 @@ let scan_var_set parameter error kappa_handler vars result_rules =
               Sanity_test_sig.mvbdu_handler = handler
           },
           ("Mvbdu.001", fun remanent ->
-            let b = Mvbdu_core.mvbdu_equal a'' b'' in
+            let b = Mvbdu_core.mvbdu_equal a'' b'' in (*TEST*)
             remanent, b, None) ::
             (List.map (fun (a, b, c) ->
               a,
               fun remanent -> Mvbdu_sanity.test remanent c b)
                [
-                 "Mvbdu.002", a', (true, true, true)
-               ])
+                 "Mvbdu.002", a', (true, true, true);
+                 "Mvbdu.003", b',(true,true,true);
+
+                 "Mvbdu.004",a'',(true,true,true);
+                 "Mvbdu.005",b'',(true,true,true);
+                 
+                 "Mvbdu.006",copy a',(true,false,true);
+                 "Mvbdu.007",copy b',(true,false,true);
+                 
+                 "Mvbdu.008",copy a'',(true,false,true);
+                 "Mvbdu.009",copy b'',(true,false,true);
+
+                 (*information of bmvbdu_true*)
+                 "Mvbdu.010", bmvbdu_true0, (true, true,true);
+                 "Mvbdu.011", bmvbdu_true1, (true, true, true);
+                 "Mvbdu.012", bmvbdu_true2, (true, true, true);
+
+                 (*information of bmvbdu_false*)
+                 "Mvbdu.013", bmvbdu_false0, (true, true, true)
+               ])@
+            (*---------------------------------------------------------------------------*)
+            (*list of true information*)
+            (List.map (fun (a, b) ->
+              a,
+              (fun remanent ->
+                remanent,
+                b == bmvbdu_true0,
+                None))
+               [
+                 "true00", bmvbdu_true0;
+                 "true01", bmvbdu_true1;
+                 "true02", bmvbdu_true2; (*TODO?*)
+               ]
+            )@
+            (*---------------------------------------------------------------------------*)
+            (*list of false information*)
+            (List.map (fun (a,b) ->
+              a,
+              (fun remanent -> 
+                remanent,
+                b == bmvbdu_false0,
+                None))
+               [
+                 "false00", bmvbdu_false0 (*TODO?*)
+               ]
+            )
+            @
+            (*---------------------------------------------------------------------------*)
+            (*list_a, list_b, list_c*)
+            (List.map (fun (a, b, c) ->
+              a,
+              fun remanent ->
+                List_sanity.test remanent c b)
+               [
+                 "List.001", list_a, (true, true);
+                 "List.002", list_b, (false, true);
+                 "List.003", list_c, (true, true)
+               ]
+             )
+            @
+            (*---------------------------------------------------------------------------*)
+            (*list_a,list_c*)
+            (List.map (fun (a,b) ->
+              a, 
+              (fun remanent ->
+                remanent, 
+                b == list_a,
+                None))
+               [
+                 "List.004", list_a;
+                 "List.005", list_c
+               ]
+            )             
         in
+        (*---------------------------------------------------------------------------*)
         let (remanent, bdu_test_list) = store_pair_remanent in
         let store_bdu_list =
           List.fold_left (fun remanent (s, p) ->
@@ -424,7 +538,7 @@ let scan_var_set parameter error kappa_handler vars result_rules =
 (*MAIN*)
 
 let bdu_test parameter error kappa_handler cc_compil =
-  let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
+  let parameter = Remanent_parameters.update_prefix parameter ":" in
   let error, result_rules = scan_rule_set parameter error kappa_handler 
     cc_compil.Cckappa_sig.rules in
   scan_var_set parameter error kappa_handler cc_compil.Cckappa_sig.variables result_rules
