@@ -110,7 +110,7 @@ let scan_rule parameter error kappa_handler rule store_result =
 
 (*-----------------------------------------------------------------------------------*)
 
-let scan_mixture_in_var bool parameter error kappa_handler var_id mixture remanent_bdu
+let scan_mixture_in_var bool parameter error kappa_handler var_id mixture
     result_rules =
   (*check if it is an agant variable or a site variable *)
   let store_pair_result =
@@ -145,103 +145,6 @@ let scan_mixture_in_var bool parameter error kappa_handler var_id mixture remane
                   pair_list
                 )
                 agent.Cckappa_sig.agent_interface []
-            in
-            (*---------------------------------------------------------------------------*)
-            (*compute BDU*)
-            let error = remanent_bdu.Sanity_test_sig.error in
-            let allocate = remanent_bdu.Sanity_test_sig.allocate_mvbdu in
-            let (handler: ('b, 'a, 'c, bool, int) Memo_sig.handler) =
-              remanent_bdu.Sanity_test_sig.mvbdu_handler
-            in
-            let a_val = Mvbdu_sig.Leaf true in
-            let b_val = Mvbdu_sig.Leaf false in
-            (*build bdu_a from a_val*)
-            let error, (handler: ('b, 'a, 'c, bool, int) Memo_sig.handler),
-              a', a'_id, a'', a''_id =
-              Mvbdu_test.build_without_and_with_compressing
-                allocate
-                error
-                handler
-                a_val
-                a_val
-            in
-            (*define function f getting handler and its value *)
-            let f x y =
-              match x y with
-                | error, (handler, Some a) -> error, handler, a
-                | error, (handler, None) -> 
-                  let error, a =
-                    Exception.warn parameter error (Some "") (Some "") Exit (fun _ -> a')
-                  in
-                  error, handler, a 
-            in
-            (*build bdu_b from b_val*)
-            let error, handler, b', b'_id, b'', b''_id =
-              Mvbdu_test.build_without_and_with_compressing
-                allocate
-                error
-                handler
-                b_val
-                b_val
-            in
-            (*compute bdu from bdu_a and bdu_b*)
-            let error, handler, bmvbdu_true0 =
-              f (Boolean_mvbdu.boolean_mvbdu_true parameter handler error) parameter
-            in
-            let error, handler, bmvbdu_false0 =
-              f (Boolean_mvbdu.boolean_mvbdu_false parameter handler error) parameter
-            in
-            (*build a list of bdu from a list of pair (var_id, site_state) computed above*)
-            let error, (handler, list_a) =
-              List_algebra.build_list
-                (Boolean_mvbdu.list_allocate parameter)
-                error
-                parameter
-                handler
-                pair_var_state_list
-            in
-            (*compute mvbdu of redefine of list_a*)
-            let error, handler, mvbdu_redefine =
-              f (Boolean_mvbdu.redefine parameter error parameter handler a') list_a
-            in
-            (*PRINT bdu redefine*)
-            let error =
-              Boolean_mvbdu.print_boolean_mvbdu
-                error
-                (Remanent_parameters.update_prefix parameter "mvbdu_redefine:")
-                mvbdu_redefine
-            in
-            (*PRINT memoization tables*)
-            let error =
-              Boolean_mvbdu.print_memo
-                error
-                handler
-                (Remanent_parameters.update_prefix parameter "Memoization tables:")
-            in
-            (*store bdu handler*)
-            let store_pair_remanent =
-              {
-                remanent_bdu with
-                  Sanity_test_sig.error = error;
-                  Sanity_test_sig.mvbdu_handler = handler
-              },
-              ("Mvbdu.001", fun remanent ->
-                let b = Mvbdu_core.mvbdu_equal a'' b'' in
-                remanent, b, None) ::
-                (List.map (fun (a, b, c) ->
-                  a,
-                  fun remanent -> Mvbdu_sanity.test remanent c b)
-                   [
-                     "Mvbdu.002", a', (true, true, true)
-                   ])
-            in
-            let (remanent, bdu_test_list) = store_pair_remanent in
-            let store_bdu_list =
-              List.fold_left (fun remanent (s, p) ->
-                Sanity_test.test remanent p s
-              )
-                remanent
-                bdu_test_list
             in
             (*---------------------------------------------------------------------------*)
             (*get the old information*)
@@ -306,7 +209,6 @@ let scan_var parameter error kappa_handler var_id var result_rules =
           kappa_handler
           var_id
           mixture
-          (Sanity_test.remanent parameter)
           result_rules
       )
       (error, result_rules)
@@ -321,7 +223,6 @@ let scan_var parameter error kappa_handler var_id var result_rules =
         kappa_handler
         var_id
         mixture
-        (Sanity_test.remanent parameter)
         result_rules
     )
       (error, result_rules)
@@ -368,22 +269,156 @@ let scan_rule_set parameter error kappa_handler rules =
 (*-----------------------------------------------------------------------------------*)
 
 let scan_var_set parameter error kappa_handler vars result_rules =
-  Int_storage.Nearly_inf_Imperatif.fold
-    parameter
-    error
-    (fun parameter error var_id var store_result ->
-      let (_, (var, _)) = var.Cckappa_sig.e_variable in
-      let _ = Printf.fprintf stdout "var_id:%i\n" var_id in
-      scan_var
-        parameter
-        error
-        kappa_handler
-        var_id
-        var
-        store_result
-    )
-    vars
-    result_rules
+  let error, store_var_set =
+    Int_storage.Nearly_inf_Imperatif.fold
+      parameter
+      error
+      (fun parameter error var_id var store_result ->
+        let (_, (var, _)) = var.Cckappa_sig.e_variable in
+        let _ = Printf.fprintf stdout "var_id:%i\n" var_id in
+        scan_var
+          parameter
+          error
+          kappa_handler
+          var_id
+          var
+          store_result
+      )
+      vars
+      result_rules
+  in
+  (*---------------------------------------------------------------------------*)
+  (*build bdu here*)
+  let error, init = AgentMap.create parameter error 0 in
+  let error, store_bdu =
+    AgentMap.fold
+      parameter
+      error
+      (fun parameter error agent_type pair_list store_result ->
+        (*get a list of pair site (var_id,site_state)*)
+        let error, out =
+          AgentMap.unsafe_get
+            parameter
+            error
+            agent_type
+            store_var_set.store_pair_plus
+        in
+        let pair_list =
+          match out with
+            | None -> []
+            | Some l -> l
+        in
+        (*---------------------------------------------------------------------------*)
+        (*compute BDU*)
+        let remanent_bdu = (Sanity_test.remanent parameter) in        
+        let error = remanent_bdu.Sanity_test_sig.error in
+        let allocate = remanent_bdu.Sanity_test_sig.allocate_mvbdu in
+        let (handler: ('b, 'a, 'c, bool, int) Memo_sig.handler) =
+          remanent_bdu.Sanity_test_sig.mvbdu_handler
+        in
+        let a_val = Mvbdu_sig.Leaf true in
+        let b_val = Mvbdu_sig.Leaf false in
+        (*build bdu_a from a_val*)
+        let error, (handler: ('b, 'a, 'c, bool, int) Memo_sig.handler),
+          a', a'_id, a'', a''_id =
+          Mvbdu_test.build_without_and_with_compressing
+            allocate
+            error
+            handler
+            a_val
+            a_val
+        in
+        (*define function f getting handler and its value *)
+        let f x y =
+          match x y with
+            | error, (handler, Some a) -> error, handler, a
+            | error, (handler, None) -> 
+              let error, a =
+                Exception.warn parameter error (Some "") (Some "") Exit (fun _ -> a')
+              in
+              error, handler, a 
+        in
+        (*build bdu_b from b_val*)
+        let error, handler, b', b'_id, b'', b''_id =
+          Mvbdu_test.build_without_and_with_compressing
+            allocate
+            error
+            handler
+            b_val
+            b_val
+        in
+        (*compute bdu from bdu_a and bdu_b*)
+        let error, handler, bmvbdu_true0 =
+          f (Boolean_mvbdu.boolean_mvbdu_true parameter handler error) parameter
+        in
+        let error, handler, bmvbdu_false0 =
+          f (Boolean_mvbdu.boolean_mvbdu_false parameter handler error) parameter
+        in
+        (*build a list of bdu from a list of pair (var_id, site_state) computed above*)
+        let error, (handler, list_a) =
+          List_algebra.build_list
+            (Boolean_mvbdu.list_allocate parameter)
+            error
+            parameter
+            handler
+            pair_list
+        in
+        (*compute mvbdu of redefine of list_a*)
+        let error, handler, mvbdu_redefine =
+          f (Boolean_mvbdu.redefine parameter error parameter handler a') list_a
+        in
+        (*PRINT bdu redefine*)
+        let error =
+          Boolean_mvbdu.print_boolean_mvbdu
+            error
+            (Remanent_parameters.update_prefix parameter "mvbdu_redefine:")
+            mvbdu_redefine
+        in
+        (*PRINT memoization tables*)
+        let error =
+          Boolean_mvbdu.print_memo
+            error
+            handler
+            (Remanent_parameters.update_prefix parameter "Memoization tables:")
+        in
+        (*store bdu handler*)
+        let store_pair_remanent =
+          {
+            remanent_bdu with
+              Sanity_test_sig.error = error;
+              Sanity_test_sig.mvbdu_handler = handler
+          },
+          ("Mvbdu.001", fun remanent ->
+            let b = Mvbdu_core.mvbdu_equal a'' b'' in
+            remanent, b, None) ::
+            (List.map (fun (a, b, c) ->
+              a,
+              fun remanent -> Mvbdu_sanity.test remanent c b)
+               [
+                 "Mvbdu.002", a', (true, true, true)
+               ])
+        in
+        let (remanent, bdu_test_list) = store_pair_remanent in
+        let store_bdu_list =
+          List.fold_left (fun remanent (s, p) ->
+            Sanity_test.test remanent p s
+          )
+            remanent
+            bdu_test_list
+        in
+        (*---------------------------------------------------------------------------*)
+        (*store result of list bdu*)
+        AgentMap.set
+          parameter
+          error
+          agent_type
+          store_bdu_list
+          store_result
+      )
+      store_var_set.store_pair_plus
+      init
+  in
+  error, store_bdu
 
 (************************************************************************************)
 (*MAIN*)
