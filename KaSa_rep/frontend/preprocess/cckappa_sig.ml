@@ -157,7 +157,7 @@ type mixture =
       
 type enriched_variable = 
     { 
-      e_id       : string; 
+      e_id       : string;
       e_id_dot   : string;
       c_variable : Ckappa_sig.mixture Ast.ast_alg_expr; 
       e_variable : mixture Ast.variable_def 

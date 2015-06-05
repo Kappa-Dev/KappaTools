@@ -24,7 +24,7 @@ struct
   type t = bool Mvbdu_sig.skeleton
   let (compare:t->t -> int) = compare 
 end 
-  
+     
 module List_Skeleton = 
 struct 
   type t = int List_sig.skeleton
