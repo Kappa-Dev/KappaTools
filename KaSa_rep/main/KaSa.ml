@@ -123,7 +123,7 @@ let main () =
       Printf.fprintf (Remanent_parameters.get_log parameters) "BDU:\n"
   in
   let bdu_test =
-    Mvbdu.bdu_test parameters_bdu error c_compil
+    Mvbdu.bdu_test parameters_bdu error handler c_compil
   in
   let _ = Exception.print parameters error  in
    ()

@@ -32,9 +32,12 @@ let print_list l =
   let output = sprintf_list l in
   Printf.fprintf stdout "%s\n" output
 
+let int_of_port port = port.Cckappa_sig.site_state.Cckappa_sig.min
+
 (************************************************************************************)
 (*compute the list of site in the lhs at each rule *)
-let scan_rule parameters error remanent_bdu rule store_result =
+let scan_rule parameters error kappa_handler remanent_bdu variable rule
+    store_result =
   Int_storage.Quick_Nearly_inf_Imperatif.fold
     parameters
     error
@@ -46,9 +49,13 @@ let scan_rule parameters error remanent_bdu rule store_result =
           (*Getting a list of site in the lhs*)
           let site_list =
             Cckappa_sig.Site_map_and_set.fold_map
-              (fun site _ current_list ->
-                let variable = site in (*FIXME*)
-                let site_list = (variable, site) :: current_list in
+              (fun site port current_list ->
+                (*let var_id = (int_of_string variable) in*)
+                let site_state = int_of_port port in
+                let _ = Printf.fprintf stdout "variable:%i:site_state:%i\n"
+                  variable site_state
+                in
+                let site_list = (variable, site_state) :: current_list in
                 site_list
               )
               agent.Cckappa_sig.agent_interface []
@@ -166,30 +173,35 @@ let scan_rule parameters error remanent_bdu rule store_result =
     rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
     store_result
   
-(*in a set of rules*)
-let scan_rules parameter error rules =
+(*in a set of rules*)(*FIXME: one function taking the variable set instead of rule set*)
+let scan_rules parameter error kappa_handler variables rules =
   let error, init = Int_storage.Nearly_inf_Imperatif.create parameter error 0 in
   let error, store_result =
-    Int_storage.Nearly_inf_Imperatif.fold
+    Int_storage.Nearly_inf_Imperatif.fold2_common
       parameter
       error
-      (fun parameter error rule_id rule store_result ->
-        let _ = Printf.fprintf stdout "rule_id:%i\n" rule_id in
+      (fun parameter error var_id variable rule store_result ->
+        let _ = Printf.fprintf stdout "var_id:%i\n" var_id in
         scan_rule
           parameter
           error
+          kappa_handler
           (Sanity_test.remanent parameter)
+          var_id
           rule.Cckappa_sig.e_rule_c_rule
           store_result
       )
-      rules
+      variables rules
       init     
   in
   error, store_result
 
 (*compute bdu, taking the list of lhs *)
 
-let bdu_test parameter error cc_compil =
+let bdu_test parameter error kappa_handler cc_compil =
   let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
-  let error, result = scan_rules parameter error cc_compil.Cckappa_sig.rules in
+  let error, result = scan_rules parameter error kappa_handler 
+    cc_compil.Cckappa_sig.variables
+    cc_compil.Cckappa_sig.rules
+  in
   error, result

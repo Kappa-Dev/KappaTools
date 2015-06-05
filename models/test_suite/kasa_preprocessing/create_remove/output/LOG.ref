@@ -87,18 +87,4 @@ Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
 Flow of information in the ODE semantics:rule_id:1
 BDU:
-rule_id:0
-BDU:agent_type:mvbdu: true
-BDU:agent_type:Memoization tables:
-BDU:agent_type:Memoization tables:reset0:
-BDU:agent_type:Memoization tables:reset0:0:
-BDU:agent_type:Memoization tables:reset0:0: true
-Mvbdu.002: ok
-rule_id:1
-BDU:agent_type:mvbdu: true
-BDU:agent_type:Memoization tables:
-BDU:agent_type:Memoization tables:reset0:
-BDU:agent_type:Memoization tables:reset0:0:
-BDU:agent_type:Memoization tables:reset0:0: true
-Mvbdu.002: ok
 execution finished without any exception
