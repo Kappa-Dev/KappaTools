@@ -20,6 +20,10 @@ type rule_agent =
     { ra_type: int;
       ra_ports: rule_link array;
       ra_ints: rule_internal array;
+      ra_side_effect_sites: (bool array * bool array) option;
+      (** None means not present in original rule, first array is ports
+      whose link state changes by side effect, second one is ports
+      whose internal state changes by side effect *)
     }
 type rule_mixture = rule_agent list
 
@@ -102,6 +106,12 @@ let annotate_dropped_agent sigs ((agent_name, _ as ag_ty),intf) =
                (fun i ->
 		match Signature.default_internal_state ag_id i sigs with
 		| None -> I_ANY | Some _ -> I_ANY_ERASED) in
+  let side_effect_ports = Array.make arity false in
+  let side_effect_internals =
+    Array.init arity
+	       (fun i ->
+		match Signature.default_internal_state ag_id i sigs with
+		| None -> false | Some _ -> true) in
   let () =
     List.iter
       (fun p ->
@@ -110,18 +120,23 @@ let annotate_dropped_agent sigs ((agent_name, _ as ag_ty),intf) =
        let () = match p.Ast.port_int with
 	 | [] -> ()
 	 | [ va ] ->
+	    side_effect_internals.(p_id) <- false;
 	    internals.(p_id) <-
 	      I_VAL_ERASED (Signature.num_of_internal_state p_id va sign)
 	 | _ :: (_, pos) :: _ -> several_internal_states pos in
        match p.Ast.port_lnk with
-       | (Ast.LNK_ANY, _) -> ports.(p_id) <- L_ANY Erased
-       | (Ast.LNK_SOME, _) -> ports.(p_id) <- L_SOME Erased
+       | (Ast.LNK_ANY, _) ->
+	  side_effect_ports.(p_id) <- true; ports.(p_id) <- L_ANY Erased
+       | (Ast.LNK_SOME, _) ->
+	  side_effect_ports.(p_id) <- true; ports.(p_id) <- L_SOME Erased
        | (Ast.LNK_TYPE (dst_p, dst_ty),_) ->
+	  side_effect_ports.(p_id) <- true;
 	  ports.(p_id) <- build_l_type sigs dst_ty dst_p Erased
        | (Ast.LNK_VALUE i, pos) -> ports.(p_id) <- L_VAL ((i,pos),Erased)
        | (Ast.FREE, _) -> ports.(p_id) <- L_FREE Erased
       ) intf in
-  { ra_type = ag_id; ra_ports = ports; ra_ints = internals; }
+  { ra_type = ag_id; ra_ports = ports; ra_ints = internals;
+    ra_side_effect_sites = Some (side_effect_ports,side_effect_internals);}
 
 let annotate_created_agent id sigs ((agent_name, _ as ag_ty),intf) =
   let ag_id = Signature.num_of_agent ag_ty sigs in
@@ -161,6 +176,8 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
     Array.init
       arity (fun i -> if i = 0 then L_FREE Maintained else L_ANY Maintained) in
   let internals = Array.make arity I_ANY in
+  let side_effect_ports = Array.make arity false in
+  let side_effect_internals = Array.make arity false in
   let register_port_modif p_id lnk1 p' =
     match lnk1,p'.Ast.port_lnk with
     | (Ast.LNK_ANY,_), (Ast.LNK_ANY,_) -> ()
@@ -171,18 +188,22 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
        ports.(p_id) <- build_l_type sigs dst_ty dst_p Maintained
     | _, (Ast.LNK_ANY,_ | Ast.LNK_SOME,_ | Ast.LNK_TYPE _,_) ->
        too_much_or_not_enough false agent_name p'.Ast.port_nme
-    | (Ast.LNK_ANY,_), (Ast.FREE,_) -> ports.(p_id) <- L_ANY Freed
-    | (Ast.LNK_SOME,_), (Ast.FREE,_) -> ports.(p_id) <- L_SOME Freed
+    | (Ast.LNK_ANY,_), (Ast.FREE,_) ->
+       side_effect_ports.(p_id) <- true; ports.(p_id) <- L_ANY Freed
+    | (Ast.LNK_SOME,_), (Ast.FREE,_) ->
+       side_effect_ports.(p_id) <- true; ports.(p_id) <- L_SOME Freed
     | (Ast.LNK_TYPE (dst_p,dst_ty),_), (Ast.FREE,_) ->
+       side_effect_ports.(p_id) <- true;
        ports.(p_id) <- build_l_type sigs dst_ty dst_p Freed
     | (Ast.FREE,_), (Ast.FREE,_) -> ports.(p_id) <- L_FREE Maintained
     | (Ast.LNK_VALUE i,pos), (Ast.FREE,_) ->
        ports.(p_id) <- L_VAL ((i,pos),Freed)
     | (Ast.LNK_ANY,_), (Ast.LNK_VALUE i,pos) ->
-       ports.(p_id) <- L_ANY (Linked (i,pos))
+       side_effect_ports.(p_id) <- true; ports.(p_id) <- L_ANY (Linked (i,pos))
     | (Ast.LNK_SOME,_), (Ast.LNK_VALUE i,pos) ->
-       ports.(p_id) <- L_SOME (Linked (i,pos))
+       side_effect_ports.(p_id) <- true; ports.(p_id) <- L_SOME (Linked (i,pos))
     | (Ast.LNK_TYPE (dst_p,dst_ty),_), (Ast.LNK_VALUE i,pos) ->
+       side_effect_ports.(p_id) <- true;
        ports.(p_id) <- build_l_type sigs dst_ty dst_p (Linked (i,pos))
     | (Ast.FREE,_), (Ast.LNK_VALUE i,pos) ->
        ports.(p_id) <- L_FREE (Linked (i,pos))
@@ -196,6 +217,7 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
 	 I_VAL_CHANGED (Signature.num_of_internal_state p_id va sign,
 			Signature.num_of_internal_state p_id va' sign)
     | [], [ va ] ->
+       side_effect_internals.(p_id) <- true;
        internals.(p_id) <-
 	 I_ANY_CHANGED (Signature.num_of_internal_state p_id va sign)
     | [ _ ], [] ->
@@ -228,7 +250,8 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
        let p_id = Signature.num_of_site ~agent_name p_na sign in
        let () = register_internal_modif p_id [] p in
        register_port_modif p_id (Term.with_dummy_pos Ast.LNK_ANY) p) rp_r in
-  { ra_type = ag_id; ra_ports = ports; ra_ints = internals; }
+  { ra_type = ag_id; ra_ports = ports; ra_ints = internals;
+    ra_side_effect_sites = Some (side_effect_ports,side_effect_internals);}
 
 let rec annotate_lhs_with_diff sigs acc lhs rhs =
   match lhs,rhs with
@@ -343,7 +366,8 @@ let find_implicit_infos sigs contact_map ags =
 	 (fun (free_id,ports,ags,cor) ->
 	  List.map (fun ints ->
 		    (free_id,
-		     {ra_type = ag.ra_type; ra_ports = ports; ra_ints = ints}::ags,
+		     {ra_type = ag.ra_type; ra_ports = ports; ra_ints = ints;
+		      ra_side_effect_sites = ag.ra_side_effect_sites}::ags,
 		     cor))
 		   (aux_internals ag.ra_type ag.ra_ints [ag.ra_ints] 0)
 	 )
@@ -363,7 +387,15 @@ let complete_with_candidate ag id todo p_id p_switch =
 	    | (Freed | Erased | Linked _) -> Freed in
 	  let ports' = Array.copy ag.ra_ports in
 	  let () = ports'.(i) <- L_VAL (Term.with_dummy_pos id,s') in
-	  ({ ra_type = ag.ra_type; ra_ports = ports'; ra_ints = ag.ra_ints; }, todo)
+	  let side_effect_sites' =
+	    match ag.ra_side_effect_sites with
+	    | None -> ag.ra_side_effect_sites
+	    | Some (se_ports,se_ints) ->
+	       let side_effect_ports = Array.copy se_ports in
+	       let () = side_effect_ports.(i) <- true in
+	       Some (side_effect_ports,se_ints) in
+	  ({ ra_type = ag.ra_type; ra_ports = ports'; ra_ints = ag.ra_ints;
+	     ra_side_effect_sites = side_effect_sites'}, todo)
 	  :: acc
        | L_VAL ((k,_),s) when k > id ->
 	  begin
@@ -374,7 +406,8 @@ let complete_with_candidate ag id todo p_id p_switch =
 	    | [ _ ], todo' ->
 	       let ports' = Array.copy ag.ra_ports in
 	       let () = ports'.(i) <- L_VAL (Term.with_dummy_pos id,s) in
-	       ({ ra_type = ag.ra_type; ra_ports = ports'; ra_ints = ag.ra_ints; },
+	       ({ ra_type = ag.ra_type; ra_ports = ports'; ra_ints = ag.ra_ints;
+		  ra_side_effect_sites = ag.ra_side_effect_sites},
 		todo') :: acc
 	    |_ -> acc
 	  end
@@ -388,7 +421,8 @@ let new_agent_with_one_link sigs ty_id port link switch =
       arity (fun i -> if i = 0 then L_FREE Maintained else L_ANY Maintained) in
   let internals = Array.make arity I_ANY in
   let () = ports.(port) <- L_VAL (Term.with_dummy_pos link,switch) in
-  { ra_type = ty_id; ra_ports = ports; ra_ints = internals; }
+  { ra_type = ty_id; ra_ports = ports;
+    ra_ints = internals; ra_side_effect_sites = None;}
 
 let rec add_one_implicit_info sigs id ((ty_id,port),s as info) todo = function
   | [] -> [[new_agent_with_one_link sigs ty_id port id s],todo]
@@ -470,19 +504,19 @@ let define_positive_transformation (removed,added as transf) links_transf
        (transf,links_transf')
 
 
-let rec add_agents_in_cc id wk registered_links transf links_transf remains =
+let rec add_agents_in_cc id wk registered_links transf compile_info links_transf remains =
   function
   | [] ->
      begin match IntMap.root registered_links with
-	   | None -> (wk,transf,links_transf,remains)
+	   | None -> (wk,transf,compile_info,links_transf,remains)
 	   | Some (key,_) -> dangling_link "left" key
      end
   | ag :: ag_l ->
      let (node,wk) = Connected_component.new_node wk ag.ra_type in
      let place = Transformations.Existing (node,id) in
-     let rec handle_ports wk r_l (removed,added) l_t re acc site_id =
+     let rec handle_ports wk r_l (removed,added) compile_info l_t re acc site_id =
        if site_id = Array.length ag.ra_ports
-       then add_agents_in_cc id wk r_l (removed,added) l_t re acc
+       then add_agents_in_cc id wk r_l (removed,added) compile_info l_t re acc
        else
 	 let transf,wk' = match ag.ra_ints.(site_id) with
 	   | I_ANY -> (removed,added),wk
@@ -501,13 +535,13 @@ let rec add_agents_in_cc id wk registered_links transf links_transf remains =
 	 in
 	 match ag.ra_ports.(site_id) with
 	 | L_ANY Maintained ->
-	    handle_ports wk' r_l transf l_t re acc (succ site_id)
+	    handle_ports wk' r_l transf compile_info l_t re acc (succ site_id)
 	 | L_FREE s ->
 	    let wk'' = if site_id = 0 then wk'
 		       else Connected_component.new_free wk' (node,site_id) in
 	    let transf',l_t' =
 	      define_full_transformation transf l_t place site_id None s in
-	    handle_ports wk'' r_l transf' l_t' re acc (succ site_id)
+	    handle_ports wk'' r_l transf' compile_info l_t' re acc (succ site_id)
 	 | (L_SOME _ | L_TYPE _ | L_ANY ( Erased | Linked _ | Freed))->
 	    raise (ExceptionDefn.Internal_Error
 		     (Term.with_dummy_pos
@@ -520,7 +554,7 @@ let rec add_agents_in_cc id wk registered_links transf links_transf remains =
 	      let transf',l_t' =
 		define_full_transformation
 		  transf l_t place site_id (Some dst_place) s in
-	      handle_ports wk'' (IntMap.remove i r_l) transf' l_t'
+	      handle_ports wk'' (IntMap.remove i r_l) transf' compile_info l_t'
 			   re acc (succ site_id)
 	    with Not_found ->
 		 match Tools.array_filter (is_linked_on_port site_id i) ag.ra_ports with
@@ -538,7 +572,7 @@ let rec add_agents_in_cc id wk registered_links transf links_transf remains =
 		    let transf'',l_t'' =
 		      define_full_transformation
 			transf' l_t' place site_id' (Some (place,site_id)) s in
-		    handle_ports wk'' r_l transf'' l_t'' re acc (succ site_id)
+		    handle_ports wk'' r_l transf'' compile_info l_t'' re acc (succ site_id)
 		 | _ :: _ ->
 		    raise (ExceptionDefn.Malformed_Decl
 			     ("There are more than two sites using link "^
@@ -550,15 +584,18 @@ let rec add_agents_in_cc id wk registered_links transf links_transf remains =
 		    match List.partition (is_linked_on i) re with
 		    | [], re'
 			 when Tools.list_exists_uniq (is_linked_on i) acc ->
-		       handle_ports wk' r_l' transf' l_t' re' acc (succ site_id)
+		       handle_ports wk' r_l' transf' compile_info l_t' re' acc (succ site_id)
 		    | [n], re' when List.for_all
 				      (fun x -> not(is_linked_on i x)) acc ->
-		       handle_ports wk' r_l' transf' l_t' re' (n::acc) (succ site_id)
+		       handle_ports wk' r_l' transf' compile_info l_t' re' (n::acc) (succ site_id)
 		    | _, _ ->
 		       raise (ExceptionDefn.Malformed_Decl
 				("There are more than two agents using link "^
 				   string_of_int i,pos))
-     in handle_ports wk registered_links transf links_transf remains ag_l 0
+     in
+     let compile_info' =
+       Compilation_info.add_agent compile_info (node,id) ag.ra_side_effect_sites in
+     handle_ports wk registered_links transf compile_info' links_transf remains ag_l 0
 
 let rec complete_with_creation (removed,added) links_transf fresh = function
   | [] ->
@@ -593,16 +630,17 @@ let rec complete_with_creation (removed,added) links_transf fresh = function
      handle_ports added links_transf 0
 
 let connected_components_of_mixture created env mix =
-  let rec aux env transformations links_transf acc id = function
+  let rec aux env transformations compile_info links_transf acc id = function
     | [] ->
        let removed,added = transformations in
        let transformations' = (List.rev removed, List.rev added) in
-       (env,(Tools.array_rev_of_list acc,
+       (env,(Tools.array_rev_of_list acc,compile_info,
 	     complete_with_creation transformations' links_transf 0 created))
     | h :: t ->
        let wk = Connected_component.begin_new env in
-     let (wk_out,(removed,added),l_t,remains) =
-       add_agents_in_cc id wk IntMap.empty transformations links_transf t [h] in
+       let (wk_out,(removed,added),compile_info',l_t,remains) =
+	 add_agents_in_cc id wk IntMap.empty transformations
+			  compile_info links_transf t [h] in
      let (env',inj, cc) = Connected_component.finish_new wk_out in
      let added' = List.map (Transformations.rename wk_out id cc inj) added in
      let removed' =
@@ -611,8 +649,9 @@ let connected_components_of_mixture created env mix =
 		  (fun (p,s as x) ->
 		   let p' = Transformations.rename_place wk id cc inj p in
 		   if p == p' then x else (p',s)) l_t in
-     aux env' (removed',added') l_t' (cc::acc) (succ id) remains
-  in aux env ([],[]) IntMap.empty [] 0 mix
+     let compile_info'' = Compilation_info.rename wk id cc inj compile_info' in
+     aux env' (removed',added') compile_info'' l_t' (cc::acc) (succ id) remains
+  in aux env ([],[]) Compilation_info.of_empty_rule IntMap.empty [] 0 mix
 
 let rule_mixtures_of_ambiguous_rule contact_map sigs lhs rhs =
   let precomp_mixs,created = annotate_lhs_with_diff sigs [] lhs rhs in
@@ -650,4 +689,4 @@ let connected_components_sum_of_ambiguous_mixture contact_map env mix =
   let cc_env,rules =
     connected_components_sum_of_ambiguous_rule contact_map env mix mix in
   (cc_env, List.map
-	     (function l, ([],[]) -> l | _ -> assert false) rules)
+	     (function l, _, ([],[]) -> l | _ -> assert false) rules)

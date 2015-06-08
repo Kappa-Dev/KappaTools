@@ -37,6 +37,7 @@ type elementary_rule = {
   inserted : Transformations.t list;
   consumed_tokens : (Expr.alg_expr * int) list;
   injected_tokens : (Expr.alg_expr * int) list;
+  infos : Compilation_info.t;
 }
 
 type rule = {

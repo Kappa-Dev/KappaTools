@@ -53,6 +53,7 @@ type elementary_rule = {
   inserted : Transformations.t list;
   consumed_tokens : (Expr.alg_expr * int) list;
   injected_tokens : (Expr.alg_expr * int) list;
+  infos : Compilation_info.t;
 }
 
 type rule = {
@@ -86,7 +87,7 @@ type modification =
   | UPDATE of Term.dep_type * Expr.alg_expr Term.with_pos
   | SNAPSHOT of Expr.alg_expr Ast.print_expr Term.with_pos list
   | STOP of Expr.alg_expr Ast.print_expr Term.with_pos list
-  | CFLOW of int
+  | CFLOW of int (*Connected_component.t list list*)
   | FLUX of Expr.alg_expr Ast.print_expr Term.with_pos list
   | FLUXOFF of Expr.alg_expr Ast.print_expr Term.with_pos list
   | CFLOWOFF of int
