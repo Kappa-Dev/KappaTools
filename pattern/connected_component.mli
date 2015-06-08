@@ -1,7 +1,7 @@
 type cc
-type t = cc
+type t = cc (*type for domain points*)
 
-type work
+type work (*type for partial domain*)
 
 module Node  : sig
   type t
@@ -14,7 +14,7 @@ module Node  : sig
   val print_internal :
     ?sigs:Signature.s -> t -> int -> Format.formatter -> int -> unit
 
-  val rename : work -> cc -> Dipping.t -> t -> t
+  val rename : work -> cc -> Renaming.t -> t -> t
 end
 
 module Env : sig
@@ -36,7 +36,7 @@ val new_link :
 val new_free : work -> (Node.t * int) -> work
 val new_internal_state : work -> (Node.t * int) -> int -> work
 (** [new_link_type work (node,site) type] *)
-val finish_new : work -> (Env.t*Dipping.t*t)
+val finish_new : work -> (Env.t*Renaming.t*t)
 
 (** {5 Use a connected component } *)
 val print : ?sigs:Signature.s -> bool -> Format.formatter -> t -> unit

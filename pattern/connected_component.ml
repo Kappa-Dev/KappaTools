@@ -9,8 +9,8 @@ negative number means UnSpec. *)
 type cc = {
   id: int;
   nodes_by_type: int list array;
-  links: link array IntMap.t;
-  internals: int array IntMap.t;
+  links: link array IntMap.t; (*pattern graph*)
+  internals: int array IntMap.t; (*internal state*)
 }
 type t = cc
 
@@ -23,7 +23,7 @@ type edge = ToNode of int raw_place * int | ToNothing | ToInternal of int
 type son = {
   extra_edge: ((int raw_place*int)*edge);
   dst: int (** t.id *);
-  inj: Dipping.t; (* From dst To ("this" cc + extra edge) *)
+  inj: Renaming.t; (* From dst To ("this" cc + extra edge) *)
   above_obs: int list;
 }
 
@@ -54,7 +54,7 @@ module Node = struct
     if c = 0 then int_compare n n' else c
 
   let rename wk cc inj (n_cc,n_ty,n_id as node) =
-    if wk.cc_id = n_cc then (cc.id,n_ty, Dipping.apply inj n_id)
+    if wk.cc_id = n_cc then (cc.id,n_ty, Renaming.apply inj n_id)
     else node
 
   let get_sort (_,ty,_) = ty
@@ -102,7 +102,7 @@ let dangling_node ~sigs tys x =
 	  Format.pp_print_string " is not linked to its connected component."))
 
 let identity_injection cc =
-  Dipping.identity
+  Renaming.identity
     (Array.fold_left (fun x y -> List.rev_append y x) [] cc.nodes_by_type)
 
 let print_node_id sigs f = function
@@ -285,7 +285,7 @@ let print_sons_dot sigs cc_id f sons =
   Pp.list Pp.space ~trailing:Pp.space
 	  (fun f son -> Format.fprintf f "@[cc%i -> cc%i [label=\"%a %a\"];@]"
 				       cc_id son.dst pp_edge son.extra_edge
-				       Dipping.print son.inj)
+				       Renaming.print son.inj)
 	  f sons
 
 let print_point_dot sigs f (id,point) =
@@ -300,9 +300,9 @@ module Env : sig
   val fresh : Signature.s -> int list array -> int -> point IntMap.t -> t
   val empty : Signature.s -> t
   val sigs : t -> Signature.s
-  val find : t -> cc -> (int * Dipping.t * point) option
+  val find : t -> cc -> (int * Renaming.t * point) option
   val navigate :
-    t -> ((int raw_place*int)*edge) list -> (int * Dipping.t * point) option
+    t -> ((int raw_place*int)*edge) list -> (int * Renaming.t * point) option
   val get : t -> int -> point
   val check_vitality : t -> unit
   val cc_map : t -> cc IntMap.t
@@ -357,7 +357,7 @@ let print f env =
 						   f "%a(@[%a@])%i"
 						   (print_edge env.sig_decl)
 						   s.extra_edge
-						   Dipping.print s.inj s.dst))
+						   Renaming.print s.inj s.dst))
 			    p.sons))
     env.domain
 
@@ -394,18 +394,18 @@ let to_work env =
 let navigate env nav =
   let compatible_point inj = function
     | ((Existing id,site), ToNothing), e ->
-       if e = ((Existing (Dipping.apply inj id),site),ToNothing)
+       if e = ((Existing (Renaming.apply inj id),site),ToNothing)
        then Some inj else None
     | ((Existing id,site), ToInternal i), e ->
-       if e = ((Existing (Dipping.apply inj id),site),ToInternal i)
+       if e = ((Existing (Renaming.apply inj id),site),ToInternal i)
        then Some inj else None
     | ((Existing id,site), ToNode (Existing id',site')), e ->
        if e =
-	    ((Existing (Dipping.apply inj id),site),
-	     ToNode (Existing (Dipping.apply inj id'),site'))
+	    ((Existing (Renaming.apply inj id),site),
+	     ToNode (Existing (Renaming.apply inj id'),site'))
 	  || e =
-	       ((Existing (Dipping.apply inj id'),site'),
-		ToNode (Existing (Dipping.apply inj id),site))
+	       ((Existing (Renaming.apply inj id'),site'),
+		ToNode (Existing (Renaming.apply inj id),site))
        then Some inj else None
     | (
       ((Existing id,site),ToNode (Fresh (ty,id'),site')),
@@ -417,25 +417,25 @@ let navigate env nav =
     | ((Fresh (ty,id'),site),ToNode (Existing id,site')),
       ((Fresh(ty',sid'),ssite), ToNode (Existing sid,ssite'))
     ) ->
-       if sid = Dipping.apply inj id && ssite = site
+       if sid = Renaming.apply inj id && ssite = site
 	  && ty' = ty && ssite' = site'
-       then Some (Dipping.add id' sid' inj) else None
+       then Some (Renaming.add id' sid' inj) else None
     | ((Existing _,_), ToNode (Fresh _,_)),
       (((Fresh _ | Existing _), _), _) -> None
     | ((Fresh (ty,id),site), ToNothing), ((Fresh (ty',id'),site'),x) ->
-       if ty = ty' && site = site' && x = ToNothing && not (Dipping.mem id inj)
-       then Some (Dipping.add id id' inj) else None
+       if ty = ty' && site = site' && x = ToNothing && not (Renaming.mem id inj)
+       then Some (Renaming.add id id' inj) else None
     | ((Fresh (ty,id),site), ToInternal i), ((Fresh (ty',id'),site'),x) ->
        if ty = ty' && site = site' &&
-	    x = ToInternal i && not (Dipping.mem id inj)
-       then Some (Dipping.add id id' inj) else None
+	    x = ToInternal i && not (Renaming.mem id inj)
+       then Some (Renaming.add id id' inj) else None
     | ((Fresh (ty,id),site), ToNode (Fresh (ty',id'),site')),
       ((Fresh (sty,sid),ssite), ToNode (Fresh (sty',sid'),ssite')) ->
-       if not (Dipping.mem id inj) && not (Dipping.mem id inj) then
+       if not (Renaming.mem id inj) && not (Renaming.mem id inj) then
 	 if ty = sty && site = ssite && ty' = sty' && site' = ssite'
-	 then Some (Dipping.add id' sid' (Dipping.add id sid inj))
+	 then Some (Renaming.add id' sid' (Renaming.add id sid inj))
 	 else if ty = sty && site = ssite && ty' = sty' && site' = ssite'
-	 then Some (Dipping.add id' sid (Dipping.add id sid' inj))
+	 then Some (Renaming.add id' sid (Renaming.add id sid' inj))
 	 else None
        else None
     | ((Fresh _,_), _), ((Fresh _,_),_) -> None
@@ -447,10 +447,10 @@ let navigate env nav =
 	 | [] -> None
 	 | s :: tail ->
 	    match compatible_point inj_dst2nav (s.extra_edge,e) with
-	    | Some inj' -> aux (Dipping.compose s.inj inj') s.dst t
+	    | Some inj' -> aux (Renaming.compose s.inj inj') s.dst t
 	    | None -> find_good_edge tail in
        find_good_edge (IntMap.find i env.domain).sons
-  in aux Dipping.empty 0 nav
+  in aux Renaming.empty 0 nav
 
 let find env cc =
   let nav = to_navigation true cc in
@@ -500,13 +500,13 @@ let remove_ag_cc cc_id cc ag_id =
   | [] -> assert false
   | max :: tail ->
      let rec build_subst subst pre = function
-       | _ when pre = ag_id -> Dipping.add pre max subst
+       | _ when pre = ag_id -> Renaming.add pre max subst
        | [] -> assert false
-       | h :: t -> build_subst (Dipping.add pre h subst) h t in
+       | h :: t -> build_subst (Renaming.add pre h subst) h t in
      let to_subst = build_subst (identity_injection cc) max tail in
      let new_nbt =
        Array.mapi (fun i l -> if i = ty then tail else l) cc.nodes_by_type in
-     if Dipping.is_identity to_subst then
+     if Renaming.is_identity to_subst then
        { id = cc_id;
 	 nodes_by_type = new_nbt;
 	 links = IntMap.remove ag_id cc.links;
@@ -519,7 +519,7 @@ let remove_ag_cc cc_id cc ag_id =
 	      if s = max || s = d then map else
 		let tmp = IntMap.find max map in
 		let map' = IntMap.add max (IntMap.find s map) map in
-		IntMap.add s tmp map') (Dipping.to_list to_subst) map in
+		IntMap.add s tmp map') (Renaming.to_list to_subst) map in
 	 IntMap.remove max map' in
        let new_ints = swip cc.internals in
        let prelinks = swip cc.links in
@@ -528,7 +528,7 @@ let remove_ag_cc cc_id cc ag_id =
 	   (fun a -> Array.map (function
 				 | (UnSpec | Free) as x -> x
 				 | Link (n,s) as x ->
-				    try Link (Dipping.apply to_subst n,s)
+				    try Link (Renaming.apply to_subst n,s)
 				    with Not_found -> x) a) prelinks in
        { id = cc_id; nodes_by_type = new_nbt;
 	 links = new_links; internals = new_ints;},to_subst
@@ -633,9 +633,9 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
 	    let pack,ans =
 	      complete_domain_with
 		obs_id dst env' (succ f_id) cc'
-		((Existing (Dipping.apply inj2cc' n'),i'),
+		((Existing (Renaming.apply inj2cc' n'),i'),
 		 ToNode
-		   (Fresh(find_ty cc ag_id,Dipping.apply inj2cc' ag_id),i))
+		   (Fresh(find_ty cc ag_id,Renaming.apply inj2cc' ag_id),i))
 		inj2cc' in
 	    (pack,ans::out))
       (remove_one_internal acc ag_id links internals) links in
@@ -656,7 +656,7 @@ let rec complete_domain_with obs_id dst env free_id cc edge inj_dst2cc =
   let new_son inj_found2cc =
     { dst = dst;
       extra_edge = edge;
-      inj = Dipping.compose inj_dst2cc (Dipping.inverse inj_found2cc);
+      inj = Renaming.compose inj_dst2cc (Renaming.inverse inj_found2cc);
       above_obs = [obs_id];} in
   let known_cc = Env.find env cc in
   match known_cc with
@@ -797,31 +797,33 @@ let check_edge graph = function
   | ((Existing id,site),ToNode (Fresh (_,id'),site')) ->
      Edges.link_exists id site id' site' graph
 
+(*inj is the partial injection built so far: inj:abs->concrete*)
 let injection_for_one_more_edge inj graph = function
   | ((Fresh _,_),_) -> None
   | ((Existing id,site),ToNothing) ->
-     if Edges.is_free (Dipping.apply inj id) site graph then Some inj else None
+     if Edges.is_free (Renaming.apply inj id) site graph then Some inj else None
   | ((Existing id,site),ToInternal i) ->
-     if Edges.is_internal i (Dipping.apply inj id) site graph
+     if Edges.is_internal i (Renaming.apply inj id) site graph
      then Some inj else None
   | ((Existing id,site),ToNode (Existing id',site')) ->
-     if Edges.link_exists (Dipping.apply inj id) site
-			  (Dipping.apply inj id') site' graph
+     if Edges.link_exists (Renaming.apply inj id) site
+			  (Renaming.apply inj id') site' graph
      then Some inj else None
   | ((Existing id,site),ToNode (Fresh (ty,id'),site')) ->
-     match Edges.exists_fresh (Dipping.apply inj id) site ty site' graph with
+     match Edges.exists_fresh (Renaming.apply inj id) site ty site' graph with
      | None -> None
-     | Some node -> Some (Dipping.add id' node inj)
+     | Some node -> Some (Renaming.add id' node inj)
 
 module Matching = struct
-  type t = int NodeMap.t IntMap.t * IntSet.t
+  type t = int NodeMap.t IntMap.t * IntSet.t (* (map,set) map: point_i -> (node_j(i) -> id_node_graph_in_current_matching)  set:codomain of current matching*)
 
   let empty = (IntMap.empty, IntSet.empty)
 
-  let from_dipping cc =
-    Dipping.fold
+  (**)
+  let from_renaming cc =
+    Renaming.fold
       (fun src dst -> function
-      | None -> None
+      | None -> None (*in case of clash*)
       | Some (acc,co) ->
 	 if IntSet.mem dst co then None
 	 else
@@ -831,23 +833,24 @@ module Matching = struct
     match find_root cc with
     | None -> Some inj
     | Some (_,node) ->
-       let dip = Dipping.add node root Dipping.empty in
-       let full_dip =
+       let rename = Renaming.add node root Renaming.empty in
+       let full_rename =
 	 List.fold_left
 	   (fun inj_op nav ->
 	    match inj_op with
 	    | None -> None
 	    | Some inj -> injection_for_one_more_edge inj graph nav)
-	   (Some dip) (List.tl (to_navigation false cc)) in
-       match full_dip with
+	   (Some rename) (List.tl (to_navigation false cc)) in
+       match full_rename with
        | None -> failwith "Matching.reconstruct error"
-       | Some dip ->
-	  match from_dipping cc dip (Some (NodeMap.empty, snd inj)) with
+       | Some rename ->
+	  match from_renaming cc rename (Some (NodeMap.empty, snd inj)) with
 	  | None -> None
 	  | Some (inj',co) -> Some (IntMap.add id inj' (fst inj),co)
 
   let get (node,id) (t,_) = NodeMap.find node (IntMap.find id t)
 
+(*edges: list of concrete edges, returns the roots of observables that are above in the domain*)
   let from_edge domain graph edges =
     let rec aux cache acc = function
       | [] -> acc
@@ -857,7 +860,7 @@ module Matching = struct
 	   then match find_root point.cc with
 		| None -> assert false
 		| Some (_,root) ->
-		   (point.cc,Dipping.apply inj_point2graph root) :: acc
+		   (point.cc,Renaming.apply inj_point2graph root) :: acc
 	   else acc in
 	 let remains',cache' =
 	   List.fold_left
@@ -866,7 +869,7 @@ module Matching = struct
 	      | None -> acc
 	      | Some inj' ->
 		 if
-		   try Dipping.equal (IntMap.find son.dst cache) inj'
+		   try Renaming.equal (IntMap.find son.dst cache) inj'
 		   with Not_found -> false
 		 then acc
 		 else

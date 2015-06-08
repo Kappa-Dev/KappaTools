@@ -185,6 +185,8 @@ let a_loop form env domain counter graph state =
   let activity = activity state in
   let rd = Random.float 1.0 in
   let dt = abs_float (log rd /. activity) in
+  
+(*Activity is null or dt is infinite*)
   if not (activity > 0.) || dt = infinity then
     match !(state.stopping_times) with
     | [] -> (true,graph,state)
@@ -193,6 +195,7 @@ let a_loop form env domain counter graph state =
        let () = counter.Mods.Counter.time <- Nbr.to_float ti in
        perturbate env domain counter graph state
   else
+(*activity is positive*)
     match !(state.stopping_times) with
     | (ti,_) :: tail
 	 when Nbr.is_smaller ti (Nbr.F (Mods.Counter.time counter +. dt)) ->
@@ -230,5 +233,7 @@ let loop_cps form hook return env domain counter graph state =
 let finalize form counter =
   Plot.close form counter
 
+let go f = f ()
+
 let loop form env domain counter graph state =
-  loop_cps form (fun f -> f ()) finalize env domain counter graph state
+  loop_cps form go finalize env domain counter graph state

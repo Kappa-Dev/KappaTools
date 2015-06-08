@@ -34,17 +34,17 @@ let from_place (inj_nodes,inj_fresh,free_id as inj2graph) = function
      with Not_found ->
        ty,free_id,(inj_nodes,Mods.IntMap.add id free_id inj_fresh,succ free_id)
 
-let deal_transformation is_add domain inj2graph edges roots transf =
-  let inj,graph,obs =
+let deal_transformation is_add domain inj2graph edges roots transf = (*transf: abstract edge to be added or removed*)
+  let inj,graph,obs = (*inj: inj2graph', graph: edges', obs: delta_roots -NB inj should not change if [is_add] is false*)
     match transf with
-    | Transformations.Freed (n,s) ->
-       let ty, id, inj2graph' = from_place inj2graph n in
+    | Transformations.Freed (n,s) -> (*(n,s)-bottom*)
+       let ty, id, inj2graph' = from_place inj2graph n in (*(A,23,phi)*)
        let edges' =
 	 if is_add then Edges.add_free ty id s edges
 	 else Edges.remove_free id s edges in
        let new_obs =
 	 Connected_component.Matching.observables_from_free
-	   domain (if is_add then edges' else edges) ty id s in
+	   domain (if is_add then edges' else edges) ty id s in (*this hack should disappear when chekcing O\H only*)
        (inj2graph',edges',new_obs)
     | Transformations.Linked ((n,s),(n',s')) ->
        let ty, id, inj2graph' = from_place inj2graph n in
@@ -78,18 +78,24 @@ let deal_transformation is_add domain inj2graph edges roots transf =
 
 let update_edges domain inj_nodes state removed added =
   (* let () = Format.printf "@[%a@]@." (Edges.debug_print) state.edges in *)
+
+(*Negative update*)
   let aux =
     List.fold_left
-      (fun (inj2graph,edges,roots) transf ->
+      (fun (inj2graph,edges,roots) transf -> (*inj2graph: abs -> conc, roots define the injection that is used*)
        deal_transformation false domain inj2graph edges roots transf)
-      ((inj_nodes,Mods.IntMap.empty,state.free_id),
+      ((inj_nodes,Mods.IntMap.empty,state.free_id), (*initial inj2graph: (existing,new,fresh_id) *)
        state.edges,state.roots_of_ccs)
-      removed in
+      removed (*removed: statically defined edges*)
+  in
+(*Positive update*)
   let ((_,_,free_id'),edges',roots') =
     List.fold_left
       (fun (inj2graph,edges,roots) transf ->
        deal_transformation true domain inj2graph edges roots transf)
-      aux added in
+      aux 
+      added (*statically defined edges*) 
+  in
   { roots_of_ccs = roots'; edges = edges';
     tokens = state.tokens; free_id = free_id'; }
 
