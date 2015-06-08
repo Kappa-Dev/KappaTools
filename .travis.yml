@@ -41,4 +41,5 @@ script:
   - sh -c "if [ '$CHECKED' = native ] ; then make -j2 check ; fi"
   - sh -c "if [ '$CHECKED' = js ] ; then make js/JaSim.js ; fi"
 
-after_success: dev/update-web.sh $CHECKED
+after_success:
+ sh -c "if [ '$TRAVIS_BRANCH' = master ] ; then dev/update-web.sh $CHECKED ; fi"
