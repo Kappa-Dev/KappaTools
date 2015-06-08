@@ -604,11 +604,12 @@ let connected_components_of_mixture created env mix =
      let (wk_out,(removed,added),l_t,remains) =
        add_agents_in_cc id wk IntMap.empty transformations links_transf t [h] in
      let (env',inj, cc) = Connected_component.finish_new wk_out in
-     let added' = List.map (Transformations.rename wk_out cc inj) added in
-     let removed' = List.map (Transformations.rename wk_out cc inj) removed in
+     let added' = List.map (Transformations.rename wk_out id cc inj) added in
+     let removed' =
+       List.map (Transformations.rename wk_out id cc inj) removed in
      let l_t' = IntMap.map
 		  (fun (p,s as x) ->
-		   let p' = Transformations.rename_place wk cc inj p in
+		   let p' = Transformations.rename_place wk id cc inj p in
 		   if p == p' then x else (p',s)) l_t in
      aux env' (removed',added') l_t' (cc::acc) (succ id) remains
   in aux env ([],[]) IntMap.empty [] 0 mix

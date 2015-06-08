@@ -8,10 +8,11 @@ type t =
   | Internalized of place * int * int
 
 val rename_place :
-  Connected_component.work -> Connected_component.cc ->
+  Connected_component.work -> int -> Connected_component.cc ->
   Dipping.t -> place -> place
 
 val rename :
-  Connected_component.work -> Connected_component.cc -> Dipping.t -> t -> t
+  Connected_component.work -> int ->
+  Connected_component.cc -> Dipping.t -> t -> t
 
 val print : Signature.s -> Format.formatter -> t -> unit
