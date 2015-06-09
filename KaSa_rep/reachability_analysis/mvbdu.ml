@@ -376,7 +376,7 @@ let scan_var_set parameter error kappa_handler vars result_rules =
           f (Boolean_mvbdu.boolean_mvbdu_constant_true parameter handler error parameter)
             bmvbdu_true0
         in
-        (*constant of leaf is false*)
+        (*constant of leaf is true*)
         let error, handler, bmvbdu_true2 =
           f (Boolean_mvbdu.boolean_mvbdu_constant_true parameter handler error parameter)
             bmvbdu_false0
@@ -391,6 +391,7 @@ let scan_var_set parameter error kappa_handler vars result_rules =
                parameter handler error parameter)
             bmvbdu_false0 
         in
+        (*OR*)
         let error,handler,bmvbdu_false3 =
           f (Boolean_mvbdu.boolean_mvbdu_or 
                parameter handler error parameter bmvbdu_false0)
@@ -411,6 +412,7 @@ let scan_var_set parameter error kappa_handler vars result_rules =
                parameter handler error parameter bmvbdu_true0)
             bmvbdu_false0 
         in
+        (*AND*)
         let error,handler,bmvbdu_false4 =
           f (Boolean_mvbdu.boolean_mvbdu_and
                parameter handler error parameter bmvbdu_false0)
@@ -431,6 +433,7 @@ let scan_var_set parameter error kappa_handler vars result_rules =
                parameter handler error parameter bmvbdu_true0)
             bmvbdu_false0 
         in
+        (*CLEAN HEAD*)
         let error,handler,bmvbdu_true33 = (*a': mvbdu_input*)
           f (Boolean_mvbdu.clean_head parameter error handler) a' in
         (*---------------------------------------------------------------------------*)

@@ -1,0 +1,279 @@
+Parsing sanity1.ka...
+done
+Scan rules!
+Signature:
+Signature:agents: 
+Signature:agents:agent_type:0:A
+Signature:sites: 
+Signature:sites:agent_type:0:
+Signature:sites:agent_type:0:site_type:0->x(internal state)
+Signature:sites:agent_type:0:site_type:1->y(internal state)
+Signature:states: 
+Signature:states:0:
+Signature:states:0:0:
+Signature:states:0:0:state_id:0->u
+Signature:states:0:0:state_id:1->p
+Signature:states:0:1:
+Signature:states:0:1:state_id:0->u
+Signature:states:0:1:state_id:1->p
+Signature:duals: 
+Compilation:
+Compilation:variables:0:Auu: 
+Compilation:variables:1:Apu: 
+Compilation:rules:0:lhs:
+Compilation:rules:0:lhs:agent_id_0:
+Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:0:lhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:0:rhs:
+Compilation:rules:0:rhs:agent_id_0:
+Compilation:rules:0:rhs:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:0:rhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:0:direct:
+Compilation:rules:0:direct:agent_id_0:
+Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_0->state:[state_min:1;state_max:1]
+Compilation:rules:0:direct:agent_id_0:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:0:reverse:
+Compilation:rules:0:reverse:agent_id_0:
+Compilation:rules:0:reverse:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
+Compilation:rules:0:reverse:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+
+Compilation:rules:1:lhs:
+Compilation:rules:1:lhs:agent_id_0:
+Compilation:rules:1:lhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+Compilation:rules:1:rhs:
+Compilation:rules:1:rhs:agent_id_0:
+Compilation:rules:1:rhs:agent_id_0:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:1:direct:
+Compilation:rules:1:direct:agent_id_0:
+Compilation:rules:1:direct:agent_id_0:agent_type_0:site_type_1->state:[state_min:1;state_max:1]
+Compilation:rules:1:reverse:
+Compilation:rules:1:reverse:agent_id_0:
+Compilation:rules:1:reverse:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+Quarks:Quarkify
+Quarks:Rule 0
+Quarks:TEST
+Quarks:rule_id:0,agent_type:0
+Quarks:rule_id:0,agent_type:0,site_type:0,state:0
+Quarks:rule_id:0,agent_type:0,site_type:1,state:0
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:0,agent_type:0,site_type:0,state:1
+Quarks:rule_id:0,agent_type:0,site_type:1,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:0,agent_type:0,site_type:0,state:0
+Quarks:rule_id:0,agent_type:0,site_type:1,state:0
+Quarks:Rule 1
+Quarks:TEST
+Quarks:rule_id:1,agent_type:0
+Quarks:rule_id:1,agent_type:0,site_type:1,state:0
+Quarks:CREATION
+Quarks:REMOVAL
+Quarks:MODIFICATION+
+Quarks:rule_id:1,agent_type:0,site_type:1,state:1
+Quarks:MODIFICATION-
+Quarks:rule_id:1,agent_type:0,site_type:1,state:0
+Quarks:Var 0
+Quarks:var_id:0,agent_type:0
+Quarks:var_id:0,agent_type:0,site_type:0,state:0
+Quarks:var_id:0,agent_type:0,site_type:1,state:0
+Quarks:Var 1
+Quarks:var_id:1,agent_type:0
+Quarks:var_id:1,agent_type:0,site_type:1,state:0
+
+REMARKS: The notation [i] is a position of an agent in a rule/var. If a position is a negative number [-i], then it refers an agent that is connected to the agent at position (i-1) that is modified by side effects.
+Quarks:agent_var++**:agent_type:0,var:0->[0]
+Quarks:agent_var++**:agent_type:0,var:1->[0]
+Quarks:agent_test**:agent_type:0,rule:0->[0]
+Quarks:agent_test**:agent_type:0,rule:1->[0]
+Quarks:site_vars++**:agent_type:0,site_type:0,state:0,var:0->[0]
+Quarks:site_vars++**:agent_type:0,site_type:1,state:0,var:0->[0]
+Quarks:site_vars++**:agent_type:0,site_type:1,state:0,var:1->[0]
+Quarks:site_test**:agent_type:0,site_type:0,state:0,rule:0->[0]
+Quarks:site_test**:agent_type:0,site_type:1,state:0,rule:0->[0]
+Quarks:site_test**:agent_type:0,site_type:1,state:0,rule:1->[0]
+Quarks:site_modif+:agent_type:0,site_type:0,state:1,rule:0->[0]
+Quarks:site_modif+:agent_type:0,site_type:1,state:1,rule:0->[0]
+Quarks:site_modif+:agent_type:0,site_type:1,state:1,rule:1->[0]
+Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:0->[0]
+Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:0->[0]
+Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:1->[0]
+Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
+Influence_map:Inhibition_map:rule(0):'r0' A(x~u,y~u)->A(x~p,y~p) -> rule(1):'r1' A(y~u)->A(y~p)[0->0]
+Influence_map:Inhibition_map:rule(0):'r0' A(x~u,y~u)->A(x~p,y~p) -> var(0):'Auu' A(x~u?,y~u?)[0->0]
+Influence_map:Inhibition_map:rule(0):'r0' A(x~u,y~u)->A(x~p,y~p) -> var(1):'Apu' A(y~u?)[0->0]
+Influence_map:Inhibition_map:rule(1):'r1' A(y~u)->A(y~p) -> rule(0):'r0' A(x~u,y~u)->A(x~p,y~p)[0->0]
+Influence_map:Inhibition_map:rule(1):'r1' A(y~u)->A(y~p) -> var(0):'Auu' A(x~u?,y~u?)[0->0]
+Influence_map:Inhibition_map:rule(1):'r1' A(y~u)->A(y~p) -> var(1):'Apu' A(y~u?)[0->0]
+Side-effect:
+Side-effect:unbinding:
+Side-effect:deletion:
+Potential dependencies between sites:
+Potential dependencies between sites:agent_type:0:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+site_type:0->state:[state_min:0; state_max:0]
+site_type:1->state:[state_min:0; state_max:0]
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1->state:[state_min:0; state_max:0]
+site_type:2->state:[state_min:0; state_max:0]
+Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
+site_type:1->state:[state_min:0; state_max:0]
+site_type:2->state:[state_min:0; state_max:0]
+Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
+{1; 2}
+Flow of information in the ODE semantics:
+Flow of information in the ODE semantics:rule_id:0
+Flow of information in the ODE semantics:agent_type:0:site_modified:0->x(internal state)
+Flow of information in the ODE semantics:agent_type:0:site_modified:1->y(internal state)
+Flow of information in the ODE semantics:Internal flow:
+- agent_type:0:site_type:1 -> agent_type:0:modified_type:0
+Flow of information in the ODE semantics:Internal flow:
+- agent_type:0:site_type:0 -> agent_type:0:modified_type:1
+Flow of information in the ODE semantics:rule_id:1
+Flow of information in the ODE semantics:agent_type:0:site_modified:1->y(internal state)
+BDU:
+var_id:0
+var_id:0:agent_type:0:site_type:0:site_state:0
+var_id:0:agent_type:0:site_type:1:site_state:0
+var_id:1
+var_id:1:agent_type:0:site_type:1:site_state:0
+Build list(list_a):
+list_id:3:value:variable:0:site_state:0]
+list_id:2:value:variable:0:site_state:0]
+list_id:1:value:variable:1:site_state:0]
+list_id:0:value:
+
+
+BDU::mvbdu_redefine_list_a: if(mvbdu_id:7) x0 < -1 then 
+BDU::mvbdu_redefine_list_a:  false
+BDU::mvbdu_redefine_list_a: else 
+BDU::mvbdu_redefine_list_a:  if(mvbdu_id:6) x0 < 0 then 
+BDU::mvbdu_redefine_list_a:   if(mvbdu_id:5) x1 < -1 then 
+BDU::mvbdu_redefine_list_a:    false
+BDU::mvbdu_redefine_list_a:   else 
+BDU::mvbdu_redefine_list_a:    if(mvbdu_id:4) x1 < 0 then 
+BDU::mvbdu_redefine_list_a:     true
+BDU::mvbdu_redefine_list_a:    else 
+BDU::mvbdu_redefine_list_a:     false
+BDU::mvbdu_redefine_list_a:  else 
+BDU::mvbdu_redefine_list_a:   false
+BDU::Memoization tables:
+Print Hash_1:
+BDU::Memoization tables:clean_head:mvbdu_id:0:
+BDU::Memoization tables:clean_head:mvbdu_id:0: true
+BDU::Memoization tables:clean_head:mvbdu_id:3:
+BDU::Memoization tables:clean_head:mvbdu_id:3: true
+Print Hash_2:
+BDU::Memoization tables:and:mvbdu_id:0:
+BDU::Memoization tables:and:mvbdu_id:0:0:
+BDU::Memoization tables:and:mvbdu_id:0:0: true
+BDU::Memoization tables:and:mvbdu_id:0:1:
+BDU::Memoization tables:and:mvbdu_id:0:1: false
+BDU::Memoization tables:and:mvbdu_id:1:
+BDU::Memoization tables:and:mvbdu_id:1:0:
+BDU::Memoization tables:and:mvbdu_id:1:0: false
+BDU::Memoization tables:and:mvbdu_id:1:1:
+BDU::Memoization tables:and:mvbdu_id:1:1: false
+BDU::Memoization tables:or:mvbdu_id:0:
+BDU::Memoization tables:or:mvbdu_id:0:0:
+BDU::Memoization tables:or:mvbdu_id:0:0: true
+BDU::Memoization tables:or:mvbdu_id:0:1:
+BDU::Memoization tables:or:mvbdu_id:0:1: true
+BDU::Memoization tables:or:mvbdu_id:1:
+BDU::Memoization tables:or:mvbdu_id:1:0:
+BDU::Memoization tables:or:mvbdu_id:1:0: true
+BDU::Memoization tables:or:mvbdu_id:1:1:
+BDU::Memoization tables:or:mvbdu_id:1:1: false
+BDU::Memoization tables:reset:mvbdu_id:0:
+BDU::Memoization tables:reset:mvbdu_id:0:1:
+BDU::Memoization tables:reset:mvbdu_id:0:1: if(mvbdu_id:5) x1 < -1 then 
+BDU::Memoization tables:reset:mvbdu_id:0:1:  false
+BDU::Memoization tables:reset:mvbdu_id:0:1: else 
+BDU::Memoization tables:reset:mvbdu_id:0:1:  if(mvbdu_id:4) x1 < 0 then 
+BDU::Memoization tables:reset:mvbdu_id:0:1:   true
+BDU::Memoization tables:reset:mvbdu_id:0:1:  else 
+BDU::Memoization tables:reset:mvbdu_id:0:1:   false
+BDU::Memoization tables:reset:mvbdu_id:0:3:
+BDU::Memoization tables:reset:mvbdu_id:0:3: if(mvbdu_id:7) x0 < -1 then 
+BDU::Memoization tables:reset:mvbdu_id:0:3:  false
+BDU::Memoization tables:reset:mvbdu_id:0:3: else 
+BDU::Memoization tables:reset:mvbdu_id:0:3:  if(mvbdu_id:6) x0 < 0 then 
+BDU::Memoization tables:reset:mvbdu_id:0:3:   if(mvbdu_id:5) x1 < -1 then 
+BDU::Memoization tables:reset:mvbdu_id:0:3:    false
+BDU::Memoization tables:reset:mvbdu_id:0:3:   else 
+BDU::Memoization tables:reset:mvbdu_id:0:3:    if(mvbdu_id:4) x1 < 0 then 
+BDU::Memoization tables:reset:mvbdu_id:0:3:     true
+BDU::Memoization tables:reset:mvbdu_id:0:3:    else 
+BDU::Memoization tables:reset:mvbdu_id:0:3:     false
+BDU::Memoization tables:reset:mvbdu_id:0:3:  else 
+BDU::Memoization tables:reset:mvbdu_id:0:3:   false
+BDU::Memoization tables:reset:mvbdu_id:1:
+BDU::Memoization tables:reset:mvbdu_id:1:0:
+BDU::Memoization tables:reset:mvbdu_id:1:0: false
+BDU::Memoization tables:reset:mvbdu_id:1:1:
+BDU::Memoization tables:reset:mvbdu_id:1:1: false
+BDU::Memoization tables:reset:mvbdu_id:2:
+BDU::Memoization tables:reset:mvbdu_id:2:1:
+BDU::Memoization tables:reset:mvbdu_id:2:1: if(mvbdu_id:6) x0 < 0 then 
+BDU::Memoization tables:reset:mvbdu_id:2:1:  if(mvbdu_id:5) x1 < -1 then 
+BDU::Memoization tables:reset:mvbdu_id:2:1:   false
+BDU::Memoization tables:reset:mvbdu_id:2:1:  else 
+BDU::Memoization tables:reset:mvbdu_id:2:1:   if(mvbdu_id:4) x1 < 0 then 
+BDU::Memoization tables:reset:mvbdu_id:2:1:    true
+BDU::Memoization tables:reset:mvbdu_id:2:1:   else 
+BDU::Memoization tables:reset:mvbdu_id:2:1:    false
+BDU::Memoization tables:reset:mvbdu_id:2:1: else 
+BDU::Memoization tables:reset:mvbdu_id:2:1:  false
+BDU::Memoization tables:reset:mvbdu_id:3:
+BDU::Memoization tables:reset:mvbdu_id:3:1:
+BDU::Memoization tables:reset:mvbdu_id:3:1: if(mvbdu_id:7) x0 < -1 then 
+BDU::Memoization tables:reset:mvbdu_id:3:1:  false
+BDU::Memoization tables:reset:mvbdu_id:3:1: else 
+BDU::Memoization tables:reset:mvbdu_id:3:1:  if(mvbdu_id:6) x0 < 0 then 
+BDU::Memoization tables:reset:mvbdu_id:3:1:   if(mvbdu_id:5) x1 < -1 then 
+BDU::Memoization tables:reset:mvbdu_id:3:1:    false
+BDU::Memoization tables:reset:mvbdu_id:3:1:   else 
+BDU::Memoization tables:reset:mvbdu_id:3:1:    if(mvbdu_id:4) x1 < 0 then 
+BDU::Memoization tables:reset:mvbdu_id:3:1:     true
+BDU::Memoization tables:reset:mvbdu_id:3:1:    else 
+BDU::Memoization tables:reset:mvbdu_id:3:1:     false
+BDU::Memoization tables:reset:mvbdu_id:3:1:  else 
+BDU::Memoization tables:reset:mvbdu_id:3:1:   false
+BDU::Memoization tables:reset:mvbdu_id:3:2:
+BDU::Memoization tables:reset:mvbdu_id:3:2: if(mvbdu_id:7) x0 < -1 then 
+BDU::Memoization tables:reset:mvbdu_id:3:2:  false
+BDU::Memoization tables:reset:mvbdu_id:3:2: else 
+BDU::Memoization tables:reset:mvbdu_id:3:2:  if(mvbdu_id:6) x0 < 0 then 
+BDU::Memoization tables:reset:mvbdu_id:3:2:   if(mvbdu_id:5) x1 < -1 then 
+BDU::Memoization tables:reset:mvbdu_id:3:2:    false
+BDU::Memoization tables:reset:mvbdu_id:3:2:   else 
+BDU::Memoization tables:reset:mvbdu_id:3:2:    if(mvbdu_id:4) x1 < 0 then 
+BDU::Memoization tables:reset:mvbdu_id:3:2:     true
+BDU::Memoization tables:reset:mvbdu_id:3:2:    else 
+BDU::Memoization tables:reset:mvbdu_id:3:2:     false
+BDU::Memoization tables:reset:mvbdu_id:3:2:  else 
+BDU::Memoization tables:reset:mvbdu_id:3:2:   false
+BDU::Memoization tables:reset:mvbdu_id:5:
+BDU::Memoization tables:reset:mvbdu_id:5:0:
+BDU::Memoization tables:reset:mvbdu_id:5:0: if(mvbdu_id:5) x1 < -1 then 
+BDU::Memoization tables:reset:mvbdu_id:5:0:  false
+BDU::Memoization tables:reset:mvbdu_id:5:0: else 
+BDU::Memoization tables:reset:mvbdu_id:5:0:  if(mvbdu_id:4) x1 < 0 then 
+BDU::Memoization tables:reset:mvbdu_id:5:0:   true
+BDU::Memoization tables:reset:mvbdu_id:5:0:  else 
+BDU::Memoization tables:reset:mvbdu_id:5:0:   false
+Mvbdu.002: ok
+Mvbdu.003: ok
+Mvbdu.004: ok
+Mvbdu.005: ok
+Mvbdu.006: ok
+Mvbdu.007: ok
+Mvbdu.008: ok
+Mvbdu.009: ok
+true00: ok
+true01: ok
+true02: ok
+false00: ok
+List.001: ok
+execution finished without any exception
