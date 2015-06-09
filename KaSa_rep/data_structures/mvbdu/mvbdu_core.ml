@@ -103,7 +103,7 @@ let rec print_mvbdu error print_leaf string_of_var parameters mvbdu =
       let parameters' = Remanent_parameters.update_prefix parameters " " in
       let _ =
         Printf.fprintf parameters.Remanent_parameters_sig.log
-          "%s if(%d) %s < %d then \n"
+          "%s if(mvbdu_id:%d) %s < %d then \n"
           parameters.Remanent_parameters_sig.marshalisable_parameters.prefix 
           mvbdu.Mvbdu_sig.id
           (string_of_var x.Mvbdu_sig.variable) 
