@@ -26,7 +26,7 @@ let update_roots is_add map cc root =
 
 let from_place (inj_nodes,inj_fresh,free_id as inj2graph) = function
   | Transformations.Existing (n,id) ->
-     (Connected_component.Node.get_sort n,
+     (Connected_component.ContentAgent.get_sort n,
       Connected_component.Matching.get (n,id) inj_nodes,
       inj2graph)
   | Transformations.Fresh (ty,id) ->

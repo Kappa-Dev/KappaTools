@@ -3,7 +3,7 @@ type t = cc (*type for domain points*)
 
 type work (*type for partial domain*)
 
-module Node  : sig
+module ContentAgent  : sig
   type t
 
   val get_sort : t -> int
@@ -30,11 +30,11 @@ end
 
 (** {5 Create a connected component } *)
 val begin_new : Env.t -> work
-val new_node : work -> int (** node_type *) -> (Node.t*work)
+val new_node : work -> int (** node_type *) -> (ContentAgent.t*work)
 val new_link :
-  work -> (Node.t * int) (** node * site id *) -> (Node.t * int) -> work
-val new_free : work -> (Node.t * int) -> work
-val new_internal_state : work -> (Node.t * int) -> int -> work
+  work -> (ContentAgent.t * int) (** node * site id *) -> (ContentAgent.t * int) -> work
+val new_free : work -> (ContentAgent.t * int) -> work
+val new_internal_state : work -> (ContentAgent.t * int) -> int -> work
 (** [new_link_type work (node,site) type] *)
 val finish_new : work -> (Env.t*Renaming.t*t)
 
@@ -46,7 +46,7 @@ val print_dot : Signature.s -> Format.formatter -> t -> unit
 module Matching : sig
   type t
   val empty : t
-  val get : (Node.t * int) -> t -> int
+  val get : (ContentAgent.t * int) -> t -> int
   val reconstruct : Edges.t -> t -> int -> cc -> int -> t option
 
   val observables_from_free :

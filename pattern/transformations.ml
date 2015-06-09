@@ -1,5 +1,5 @@
 type place =
-    Existing of Connected_component.Node.t * int
+    Existing of Connected_component.ContentAgent.t * int
   | Fresh of int * int (* type, id *)
 
 type t =
@@ -10,7 +10,7 @@ type t =
 let rename_place wk id cc inj = function
   | Existing (n, id') as x ->
      if id <> id' then x else
-       let n' = Connected_component.Node.rename wk cc inj n in
+       let n' = Connected_component.ContentAgent.rename wk cc inj n in
        if n == n' then x else Existing (n',id')
   | Fresh _ as x -> x
 
@@ -28,19 +28,19 @@ let rename wk id cc inj = function
 
 let print_place sigs f = function
   | Existing (n,id) ->
-     Format.fprintf f "%a/*%i*/" (Connected_component.Node.print ~sigs) n id
+     Format.fprintf f "%a/*%i*/" (Connected_component.ContentAgent.print ~sigs) n id
   | Fresh (ty,i) ->
      Format.fprintf f "%a/*%t %i*/" (Signature.print_agent sigs) ty Pp.nu i
 
 let print_place_site sigs place f site =
   match place with
-  | Existing (n,_) -> Connected_component.Node.print_site ~sigs n f site
+  | Existing (n,_) -> Connected_component.ContentAgent.print_site ~sigs n f site
   | Fresh (ty,_) ->
      Signature.print_site sigs ty f site
 
 let print_place_internal sigs place site f id =
   match place with
-  | Existing (n,_) -> Connected_component.Node.print_internal ~sigs n site f id
+  | Existing (n,_) -> Connected_component.ContentAgent.print_internal ~sigs n site f id
   | Fresh (ty,_) ->
      Signature.print_site_internal_state sigs ty site f (Some id)
 

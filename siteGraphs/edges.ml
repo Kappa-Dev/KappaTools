@@ -2,7 +2,7 @@ open Mods
 
 module Edge = struct
   type t = ToFree
-	 | Link of (int * int * int) (** type * id * site *)
+	 | Link of (int * int * int) (** sort * id * site *)
 
   let compare x y = match x,y with
     | ToFree, Link _ -> -2

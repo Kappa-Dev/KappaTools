@@ -12,23 +12,27 @@ type cc = {
   links: link array IntMap.t; (*pattern graph*)
   internals: int array IntMap.t; (*internal state*)
 }
+
 type t = cc
 
-type 'id raw_place =
-    Existing of 'id
+
+type id_upto_alpha =
+    Existing of int
   | Fresh of int * int (* type, id *)
 
-type edge = ToNode of int raw_place * int | ToNothing | ToInternal of int
+type nav_port = id_upto_alpha * int
+
+type arrow = ToNode of nav_port | ToNothing | ToInternal of int
 
 type son = {
-  extra_edge: ((int raw_place*int)*edge);
+  extra_arrow: nav_port * arrow;
   dst: int (** t.id *);
   inj: Renaming.t; (* From dst To ("this" cc + extra edge) *)
   above_obs: int list;
 }
 
 type point = {
-  cc: t;
+  content: cc;
   is_obs: bool;
   fathers: int (** t.id *) list;
   sons: son list;
@@ -46,7 +50,7 @@ type work = {
   dangling: int; (* node_id *)
 }
 
-module Node = struct
+module ContentAgent = struct
   type t = int * int * int (** (cc_id,type_id,node_id) *)
 
   let compare (cc,_,n) (cc',_,n') =
@@ -91,7 +95,7 @@ let already_specified ?sigs x i =
   ExceptionDefn.Malformed_Decl
     (Term.with_dummy_pos
        (Format.asprintf "Site %a of agent %a already specified"
-			(Node.print_site ?sigs x) i (Node.print ?sigs) x))
+			(ContentAgent.print_site ?sigs x) i (ContentAgent.print ?sigs) x))
 
 let dangling_node ~sigs tys x =
   ExceptionDefn.Malformed_Decl
@@ -100,6 +104,8 @@ let dangling_node ~sigs tys x =
 	  "Cannot proceed because last declared agent %a/*%i*/%a"
 	  (Signature.print_agent sigs) (raw_find_ty tys x) x
 	  Format.pp_print_string " is not linked to its connected component."))
+
+
 
 let identity_injection cc =
   Renaming.identity
@@ -130,7 +136,8 @@ let find_root cc =
 	    Some(ty,x)
   in aux 0
 
-let to_navigation full cc =
+(*turns a cc into a path(:list) in the domain*)
+let to_navigation (full:bool) cc =
   let rec build_for out don = function
     | [] -> List.rev out
     | h ::  t ->
@@ -140,7 +147,8 @@ let to_navigation full cc =
 	     (fun i acc v ->
 	      if v < 0 then acc else ((Existing h,i),ToInternal v)::acc)
 	     out (IntMap.find h cc.internals)
-	 else out in
+	 else out 
+       in
        let news,out_lnk,todo =
 	 Tools.array_fold_lefti
 	   (fun i (news,ans,re as acc) ->
@@ -165,11 +173,12 @@ let to_navigation full cc =
 			(List.sort (fun (_,(a,_)) (_,(b,_)) ->
 				    Mods.int_compare a b) news) in
        let out'' = List.rev_append out_lnk out' in
-       build_for out'' (h::don) todo in
+       build_for out'' (h::don) todo 
+  in
   match find_root cc with
-  | None -> []
-  | Some (i,x) ->
-     build_for [(Fresh (i,x),0),ToNothing] [] [x]
+  | None -> [] (*empty path for x0*)
+  | Some (i,x) -> (*(ag_sort,ag_id)*)
+     build_for [(Fresh (i,x),0),ToNothing] (*wip*) [] (*already_done*) [x] (*todo*)
 
 let print ?sigs with_id f cc =
   let print_intf (_,_,ag_i as ag) link_ids internals neigh =
@@ -182,12 +191,12 @@ let print ?sigs with_id f cc =
 	      if internals.(p) >= 0
 	      then Format.fprintf f "%t%a"
 				  (if not_empty then Pp.comma else Pp.empty)
-				  (Node.print_internal ?sigs ag p) internals.(p)
+				  (ContentAgent.print_internal ?sigs ag p) internals.(p)
 	      else
 		if  el <> UnSpec then
 		  Format.fprintf f "%t%a"
 				 (if not_empty then Pp.comma else Pp.empty)
-				 (Node.print_site ?sigs ag) p in
+				 (ContentAgent.print_site ?sigs ag) p in
 	    match el with
 	    | UnSpec ->
 	       if internals.(p) >= 0
@@ -211,7 +220,7 @@ let print ?sigs with_id f cc =
 	 Format.fprintf
 	   f "%t@[<h>%a("
 	   (if not_empty then Pp.comma else Pp.empty)
-	   (Node.print ?sigs) ag_x in
+	   (ContentAgent.print ?sigs) ag_x in
        let out = print_intf ag_x link_ids (IntMap.find x cc.internals) el in
        let () = Format.fprintf f ")@]" in
        true,out) cc.links (false,(1,Int2Map.empty)) in
@@ -225,16 +234,16 @@ let print_dot sigs f cc =
        if i <> 0 then
 	 let () = Format.fprintf
 		    f "@[%a@ [label=\"%t\",@ height=\".1\",@ width=\".1\""
-		    (Node.print_site ?sigs:None n) i Pp.bottom in
+		    (ContentAgent.print_site ?sigs:None n) i Pp.bottom in
 	 let () =
 	   Format.fprintf f ",@ margin=\".05,.02\",@ fontsize=\"11\"];@]@," in
 	 let () = Format.fprintf
 		    f "@[<b>%a ->@ %a@ @[[headlabel=\"%a\",@ weight=\"25\""
-		    (Node.print_site ?sigs:None n) i (Node.print ?sigs:None) n
-		    (Node.print_site ~sigs n) i in
+		    (ContentAgent.print_site ?sigs:None n) i (ContentAgent.print ?sigs:None) n
+		    (ContentAgent.print_site ~sigs n) i in
 	 Format.fprintf f",@ arrowhead=\"odot\",@ minlen=\".1\"]@];@]@,"
        else Format.fprintf f "@[%a [label=\"%a\"]@];@,"
-			   (Node.print ?sigs:None) n (Node.print ~sigs) n
+			   (ContentAgent.print ?sigs:None) n (ContentAgent.print ~sigs) n
     | Link (y,j) ->
        let n = (cc.id,find_ty cc x,x) in
        let n' = (cc.id,find_ty cc y,y) in
@@ -242,8 +251,8 @@ let print_dot sigs f cc =
 	 let () = Format.fprintf
 		    f
 		    "@[<b>%a ->@ %a@ @[[taillabel=\"%a\",@ headlabel=\"%a\""
-		    (Node.print ?sigs:None) n (Node.print ?sigs:None) n'
-		    (Node.print_site ~sigs n) i (Node.print_site ~sigs n') j in
+		    (ContentAgent.print ?sigs:None) n (ContentAgent.print ?sigs:None) n'
+		    (ContentAgent.print_site ~sigs n) i (ContentAgent.print_site ~sigs n') j in
 	 Format.fprintf
 	   f ",@ arrowhead=\"odot\",@ arrowtail=\"odot\",@ dir=\"both\"]@];@]@,"
   in
@@ -252,14 +261,14 @@ let print_dot sigs f cc =
     if k >= 0 then
       let () = Format.fprintf
 		 f "@[%ai@ [label=\"%a\",@ height=\".1\",@ width=\".1\""
-		 (Node.print_site ?sigs:None n) i
-		 (Node.print_internal ~sigs n i) k in
+		 (ContentAgent.print_site ?sigs:None n) i
+		 (ContentAgent.print_internal ~sigs n i) k in
       let () =
 	Format.fprintf f ",@ margin=\".05,.02\",@ fontsize=\"11\"];@]@," in
       let () = Format.fprintf
 		 f "@[<b>%ai ->@ %a@ @[[headlabel=\"%a\",@ weight=25"
-		 (Node.print_site ?sigs:None n) i (Node.print ?sigs:None) n
-		 (Node.print_site ~sigs n) i in
+		 (ContentAgent.print_site ?sigs:None n) i (ContentAgent.print ?sigs:None) n
+		 (ContentAgent.print_site ~sigs n) i in
       Format.fprintf f ",@ arrowhead=\"odot\",@ minlen=\".1\"]@];@]@," in
   let pp_slot pp_el f (x,a) =
     Pp.array (fun _ -> ()) (pp_el x) f a in
@@ -284,14 +293,14 @@ let print_sons_dot sigs cc_id f sons =
        Format.fprintf f "(%a,%i)~%i" (print_node_id sigs) n p i in
   Pp.list Pp.space ~trailing:Pp.space
 	  (fun f son -> Format.fprintf f "@[cc%i -> cc%i [label=\"%a %a\"];@]"
-				       cc_id son.dst pp_edge son.extra_edge
+				       cc_id son.dst pp_edge son.extra_arrow
 				       Renaming.print son.inj)
 	  f sons
 
 let print_point_dot sigs f (id,point) =
   let style = if point.is_obs then "octagon" else "box" in
   Format.fprintf f "@[cc%i [label=\"%a\", shape=\"%s\"];@]@,%a"
-		 point.cc.id (print ~sigs false) point.cc
+		 point.content.id (print ~sigs false) point.content
 		 style (print_sons_dot sigs id) point.sons
 
 module Env : sig
@@ -302,7 +311,7 @@ module Env : sig
   val sigs : t -> Signature.s
   val find : t -> cc -> (int * Renaming.t * point) option
   val navigate :
-    t -> ((int raw_place*int)*edge) list -> (int * Renaming.t * point) option
+    t -> (nav_port*arrow) list -> (int * Renaming.t * point) option
   val get : t -> int -> point
   val check_vitality : t -> unit
   val cc_map : t -> cc IntMap.t
@@ -336,13 +345,13 @@ let empty sigs =
   let empty_cc = {id = 0; nodes_by_type = nbt;
 		  links = IntMap.empty; internals = IntMap.empty;} in
   let empty_point =
-    {cc = empty_cc; is_obs = false; fathers = []; sons = [];} in
+    {content = empty_cc; is_obs = false; fathers = []; sons = [];} in
   fresh sigs nbt' 1 (IntMap.add 0 empty_point IntMap.empty)
 
 let check_vitality env = assert (env.used_by_a_begin_new = false)
 
 let cc_map env = IntMap.fold (fun i x out ->
-			      if x.is_obs then IntMap.add i x.cc out else out)
+			      if x.is_obs then IntMap.add i x.content out else out)
 			     env.domain IntMap.empty
 let print f env =
   Format.fprintf
@@ -351,12 +360,12 @@ let print f env =
 	    (fun f (_,p) ->
 	     Format.fprintf f "@[<hov 2>(%a)@ -> @[<h>%a@]@ -> @[(%a)@]@]"
 			    (Pp.list Pp.space Format.pp_print_int) p.fathers
-			    (print ~sigs:env.sig_decl true) p.cc
+			    (print ~sigs:env.sig_decl true) p.content
 			    (Pp.list Pp.space
 				     (fun f s -> Format.fprintf
 						   f "%a(@[%a@])%i"
 						   (print_edge env.sig_decl)
-						   s.extra_edge
+						   s.extra_arrow
 						   Renaming.print s.inj s.dst))
 			    p.sons))
     env.domain
@@ -446,7 +455,7 @@ let navigate env nav =
        let rec find_good_edge = function
 	 | [] -> None
 	 | s :: tail ->
-	    match compatible_point inj_dst2nav (s.extra_edge,e) with
+	    match compatible_point inj_dst2nav (s.extra_arrow,e) with
 	    | Some inj' -> aux (Renaming.compose s.inj inj') s.dst t
 	    | None -> find_good_edge tail in
        find_good_edge (IntMap.find i env.domain).sons
@@ -655,7 +664,7 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
 let rec complete_domain_with obs_id dst env free_id cc edge inj_dst2cc =
   let new_son inj_found2cc =
     { dst = dst;
-      extra_edge = edge;
+      extra_arrow = edge;
       inj = Renaming.compose inj_dst2cc (Renaming.inverse inj_found2cc);
       above_obs = [obs_id];} in
   let known_cc = Env.find env cc in
@@ -674,7 +683,7 @@ and add_new_point obs_id env free_id sons cc =
   let completed =
     Env.add_point
       cc.id
-      {cc = cc; is_obs = cc.id = obs_id; sons=sons; fathers = fathers;}
+      {content = cc; is_obs = cc.id = obs_id; sons=sons; fathers = fathers;}
       env' in
   ((free_id'',completed),cc.id)
 
@@ -683,7 +692,7 @@ let add_domain env cc =
   match known_cc with
   | Some (id,inj,point) ->
      (if point.is_obs then env
-      else propagate_add_obs id env id),inj,point.cc
+      else propagate_add_obs id env id),inj,point.content
   | None ->
      let (_,env'),_ = add_new_point cc.id env (succ cc.id) [] cc in
      (env',identity_injection cc, cc)
@@ -781,7 +790,7 @@ let new_node wk type_id =
 	    IntMap.add wk.free_id (Array.make arity (-1)) wk.cc_internals;
 	} (node,0))
 
-module NodeMap = MapExt.Make(Node)
+module NodeMap = MapExt.Make(ContentAgent)
 
 let check_edge graph = function
   | ((Fresh (_,id),site),ToNothing) -> Edges.is_free id site graph
@@ -857,15 +866,15 @@ module Matching = struct
       | (point,inj_point2graph) :: remains ->
 	 let acc' =
 	   if point.is_obs
-	   then match find_root point.cc with
+	   then match find_root point.content with
 		| None -> assert false
 		| Some (_,root) ->
-		   (point.cc,Renaming.apply inj_point2graph root) :: acc
+		   (point.content,Renaming.apply inj_point2graph root) :: acc
 	   else acc in
 	 let remains',cache' =
 	   List.fold_left
 	     (fun (re,ca as acc) son ->
-	      match injection_for_one_more_edge inj_point2graph graph son.extra_edge with
+	      match injection_for_one_more_edge inj_point2graph graph son.extra_arrow with
 	      | None -> acc
 	      | Some inj' ->
 		 if

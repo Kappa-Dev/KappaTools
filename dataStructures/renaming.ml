@@ -2,27 +2,44 @@ open Mods
 
 exception Undefined
 exception NotBijective
-type t = int IntMap.t
+type t = {sigma:int IntMap.t ; is_identity:bool} 
 
-let empty = IntMap.empty
-let is_identity i = IntMap.fold (fun x y b -> b && x = y) i true
-let to_list = IntMap.bindings
-let add = IntMap.add
-let mem = IntMap.mem
-let fold = IntMap.fold
-let identity l =
-  List.fold_left (fun out x -> IntMap.add x x out) IntMap.empty l
-let apply i x = try IntMap.find x i with Not_found -> raise Undefined
-let compose  i i' =
-  IntMap.fold (fun x y out ->
-	       if mem y i' then IntMap.add x (apply i' y) out else out) i i
+let empty = {sigma = IntMap.empty ; is_identity=true} 
+let is_identity i = i.is_identity
+
+let to_list i = IntMap.bindings i.sigma
+
+let add x y i = {sigma = IntMap.add x y i.sigma ; is_identity = i.is_identity && x==y}
+        
+let mem x i = IntMap.mem x i.sigma
+let fold f i = IntMap.fold f i.sigma 
+
+let identity l = {sigma = List.fold_left (fun out x -> IntMap.add x x out) IntMap.empty l ; is_identity = true}
+
+let apply i x = try IntMap.find x i.sigma with Not_found -> raise Undefined
+
+let compose i i' =
+  let sigma,is_id =
+          IntMap.fold (fun x y (out,is_id) ->
+	       if mem y i' then
+                  let z =  apply i' y in
+                  (IntMap.add x z out,is_id && x==z) 
+               else (out,is_id && x==y)
+               ) i.sigma (i.sigma,true)
+  in
+  {sigma=sigma ; is_identity=is_id}
 
 let inverse i =
-  IntMap.fold (fun x y out ->
-	       if IntMap.mem y out then raise NotBijective
-	       else IntMap.add y x out) i IntMap.empty
+   if i.is_identity then i
+   else
+   let sigma = 
+       IntMap.fold (fun x y out ->
+        if IntMap.mem y out then raise NotBijective
+        else IntMap.add y x out) i.sigma IntMap.empty
+   in
+   {sigma = sigma ; is_identity = i.is_identity}
 
-let compare i i' = IntMap.compare int_compare i i'
+let compare i i' = IntMap.compare int_compare i.sigma i'.sigma
 let equal i i' = (compare i i') = 0
 
 let print f i =
@@ -35,11 +52,11 @@ let print f i =
 			   src dst in
 	  true
 	else b
-       ) i false)
+       ) i.sigma false)
 
 let print_full f i =
   Format.fprintf
     f "@[(%a)@]"
     (Pp.set IntMap.bindings Pp.comma
 	    (fun f (src,dst) -> if src<>dst then Format.fprintf f "%i->%i" src dst
-				else Format.pp_print_int f src)) i
+				else Format.pp_print_int f src)) i.sigma
