@@ -115,7 +115,7 @@ let rec print_cell log prefix cell =
       let _ = Printf.fprintf log "%s%s\n" prefix s in 
       ()
     | Mvbdu_sig.Node x -> 
-      let _ = Printf.fprintf log "%sNode(%i<%i)\n"
+      let _ = Printf.fprintf log "%sNode(var:%i<%i)\n"
         prefix 
         x.Mvbdu_sig.variable
         x.Mvbdu_sig.upper_bound 
@@ -137,7 +137,7 @@ and print_skeleton log prefix skel =
       let _ = Printf.fprintf log "%s%s\n" prefix s in 
       ()
     | Mvbdu_sig.Node x -> 
-      let _ = Printf.fprintf log "%sNode(%i<%i,%i,%i)\n"
+      let _ = Printf.fprintf log "%sNode(var:%i<%i,branch_true:%i,branch_false:%i)\n"
         prefix 
         x.Mvbdu_sig.variable x.Mvbdu_sig.upper_bound 
         x.Mvbdu_sig.branch_true x.Mvbdu_sig.branch_false
