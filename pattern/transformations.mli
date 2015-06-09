@@ -15,4 +15,4 @@ val rename :
   Connected_component.work -> int ->
   Connected_component.cc -> Renaming.t -> t -> t
 
-val print : Signature.s -> Format.formatter -> t -> unit
+val print : ?sigs:Signature.s -> Format.formatter -> t -> unit

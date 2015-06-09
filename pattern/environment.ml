@@ -11,7 +11,6 @@ type t = {
   rules : Primitives.elementary_rule NamedDecls.t;
   perturbations : Primitives.perturbation array;
 
-	fresh_kappa : int ;
 	num_of_kappa : int StringMap.t ; 
 	kappa_of_num : string IntMap.t ;
 	
@@ -52,7 +51,6 @@ let empty =
 	num_of_unary_rule = StringMap.empty ;
 	rule_of_num = IntMap.empty ;
 	unary_rule_of_num = IntMap.empty ; 
-	fresh_kappa = 0 ;
 	rule_indices = IntSet.empty ;
 	dependencies = Term.DepMap.empty ;
 	empty_lhs = IntSet.empty ;
@@ -176,33 +174,6 @@ let num_of_token = fun str env ->
   StringMap.find str env.tokens.NamedDecls.finder
 let token_of_num = fun id env -> fst (fst env.tokens.NamedDecls.decls.(id))
 
-let artificialy_name env = function
-  | Some (label,pos) -> (label,pos)
-  | None ->
-     Term.with_dummy_pos ("%anonymous"^(string_of_int env.fresh_kappa)) (*geek*)
-
-let declare_var_kappa ?(from_rule=false) label_pos_opt env =
-  let (label,pos) = artificialy_name env label_pos_opt in
-  let already_defined =
-    (try let _ = num_of_kappa label env in true with Not_found -> false)
-    ||
-      (try let _ = num_of_alg label env in true with Not_found -> false)
-  in
-  if already_defined then
-    raise (Malformed_Decl ("Label "^label^"' already defined",pos))
-  else
-    let np = StringMap.add label env.fresh_kappa env.num_of_kappa
-    and pn = IntMap.add env.fresh_kappa label env.kappa_of_num
-    and fp = env.fresh_kappa+1
-    in
-    ({env with
-       rule_indices = if from_rule
-		      then IntSet.add env.fresh_kappa env.rule_indices
-		      else env.rule_indices ;
-       num_of_kappa = np ;
-       kappa_of_num = pn ;
-       fresh_kappa = fp},fp-1)
-
 let get_sig agent_id env =
   if agent_id = -1
   then invalid_arg "Environment.get_sig: Empty agent has no signature"
@@ -216,6 +187,18 @@ let check agent site_name int_state env =
 let default_state name_id site_id env =
   Signature.default_internal_state name_id site_id env.signatures
 
-let print_rule env f id = Format.fprintf f "%s" (rule_of_num id env)
-let print_alg env f id = Format.fprintf f "%s" (fst (alg_of_num id env))
-let print_token env f id = Format.fprintf f "%s" (token_of_num id env)
+let print_rule ?env f id =
+  match env with
+  | None -> Format.fprintf f "__rule_%i" id
+  | Some env ->
+     Format.fprintf f "%s" (rule_of_num id env)
+let print_alg ?env f id =
+  match env with
+  | None -> Format.fprintf f "'__alg_%i'" id
+  | Some env ->
+     Format.fprintf f "'%s'" (fst (alg_of_num id env))
+let print_token ?env f id =
+    match env with
+    | None -> Format.fprintf f "__token_%i" id
+  | Some env ->
+     Format.fprintf f "%s" (token_of_num id env)

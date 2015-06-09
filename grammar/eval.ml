@@ -603,7 +603,7 @@ let initialize logger overwrite result =
 	(Pp.list
 	   Pp.space
 	   (fun f (_,r) ->
-	    Format.fprintf f "@[%a@]" (Kappa_printer.elementary_rule env) r))
+	    Format.fprintf f "@[%a@]" (Kappa_printer.elementary_rule ~env) r))
 	compiled_rules in
 
   Debug.tag logger "\t -observables";

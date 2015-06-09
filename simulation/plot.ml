@@ -56,7 +56,7 @@ let set_up filename env init_va =
   let head =
     Array.map
       (fun (ex,_) ->
-       Format.asprintf "%a" (Kappa_printer.alg_expr env) ex)
+       Format.asprintf "%a" (Kappa_printer.alg_expr ~env) ex)
       env.Environment.observables in
   let title =
     if !Parameter.marshalizedInFile <> ""

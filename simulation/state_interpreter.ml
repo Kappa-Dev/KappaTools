@@ -5,19 +5,26 @@ type t = {
   variables_overwrite: Expr.alg_expr option array;
 }
 
+let update_activity get_alg env counter graph activities =
+  Array.iteri
+    (fun i (_,rule) ->
+     let rate = Rule_interpreter.value_alg counter graph ~get_alg
+					   rule.Primitives.rate in
+     let cc_exp =
+       Expr.KAPPA_INSTANCE [rule.Primitives.connected_components] in
+     let act =
+       Nbr.mult
+	 rate (Rule_interpreter.value_alg counter graph ~get_alg cc_exp) in
+     Random_tree.add i (Nbr.to_float act) activities)
+    env.Environment.rules.NamedDecls.decls
+
 let initial env counter graph stopping_times =
   let activity_tree =
     Random_tree.create (NamedDecls.size env.Environment.rules) in
-  let initial_value e =
-    Nbr.to_float
-      (Rule_interpreter.value_alg
-	 ~get_alg:(fun i -> fst (snd env.Environment.algs.NamedDecls.decls.(i)))
-	 counter graph e) in
   let () =
-    Array.iteri
-      (fun i (_,r) ->
-       Random_tree.add i (initial_value r.Primitives.rate) activity_tree)
-      env.Environment.rules.NamedDecls.decls in
+    update_activity
+      (fun i -> fst (snd env.Environment.algs.NamedDecls.decls.(i)))
+      env counter graph activity_tree in
   let stops =
     ref (List.sort (fun (a,_) (b,_) -> Nbr.compare a b) stopping_times) in
   {
@@ -63,15 +70,15 @@ let do_it env domain counter graph state = function
      let file =
        Format.asprintf
 	 "@[<h>%a@]" (Kappa_printer.print_expr_val
-			env (fun _ ->
-			     Rule_interpreter.value_alg counter graph ~get_alg))
+			~env (fun ?env ->
+			      Rule_interpreter.value_alg counter graph ~get_alg))
 	 pexpr in
      let () =
        Kappa_files.with_snapshot
 	 file (Mods.Counter.event counter) "ka"
 	 (fun f -> Rule_interpreter.print env f graph) in
      (true,graph,state)
-(*     raise (ExceptionDefn.StopReached
+  (*     raise (ExceptionDefn.StopReached
 	      (Format.sprintf
 		 "STOP instruction was satisfied at (%d e,%f t.u)"
 		 (Mods.Counter.event counter) (Mods.Counter.time counter))) *)
@@ -80,8 +87,8 @@ let do_it env domain counter graph state = function
      let file =
        Format.asprintf
 	 "@[<h>%a@]" (Kappa_printer.print_expr_val
-			env (fun _ ->
-			     Rule_interpreter.value_alg counter graph ~get_alg))
+			~env (fun ?env ->
+			      Rule_interpreter.value_alg counter graph ~get_alg))
 	 pe_file in
      let desc =
        match file with "" -> Format.std_formatter
@@ -89,8 +96,8 @@ let do_it env domain counter graph state = function
      let () =
        Format.fprintf
 	 desc "%a@." (Kappa_printer.print_expr_val
-			env (fun _ ->
-			     Rule_interpreter.value_alg counter graph ~get_alg))
+			~env (fun ?env ->
+			      Rule_interpreter.value_alg counter graph ~get_alg))
 	 pe_expr in
      (false, graph, state)
   | Primitives.PLOTENTRY ->
@@ -101,8 +108,8 @@ let do_it env domain counter graph state = function
      let file =
        Format.asprintf
 	 "@[<h>%a@]" (Kappa_printer.print_expr_val
-			env (fun _ ->
-			     Rule_interpreter.value_alg counter graph ~get_alg))
+			~env (fun ?env ->
+			      Rule_interpreter.value_alg counter graph ~get_alg))
 	 pexpr in
      let () =
        Kappa_files.with_snapshot
@@ -114,26 +121,13 @@ let do_it env domain counter graph state = function
   | Primitives.FLUX _ -> (false, graph, state)
   | Primitives.FLUXOFF _ -> (false, graph, state)
 
-let update_activity get_alg env counter graph state =
-  Array.iteri
-    (fun i (_,rule) ->
-     let rate = Rule_interpreter.value_alg counter graph ~get_alg
-					   rule.Primitives.rate in
-     let cc_exp =
-       Expr.KAPPA_INSTANCE [rule.Primitives.connected_components] in
-     let act =
-       Nbr.mult
-	 rate (Rule_interpreter.value_alg counter graph ~get_alg cc_exp) in
-     Random_tree.add i (Nbr.to_float act) state.activities)
-    env.Environment.rules.NamedDecls.decls
-
 let perturbate env domain counter graph state =
   let not_done_yet =
     Array.make (Array.length env.Environment.perturbations) true in
   let get_alg i = get_alg env state i in
   let rec do_until_noop i graph state stop =
     if stop || i >= Array.length env.Environment.perturbations then
-     let () = update_activity get_alg env counter graph state in
+     let () = update_activity get_alg env counter graph state.activities in
       (stop,graph,state)
     else
       let pert = env.Environment.perturbations.(i) in
@@ -164,14 +158,14 @@ let one_rule env domain counter graph state =
   let () =
     if !Parameter.debugModeOn then
       Format.printf "@[<v>Applied@ @[%a@]@]@."
-		    (Kappa_printer.elementary_rule env) rule in
+		    (Kappa_printer.elementary_rule ~env) rule in
   let get_alg i = get_alg env state i in
   (* let () = *)
   (*   Format.eprintf "%a@." (Rule_interpreter.print_injections env) graph in *)
   match Rule_interpreter.apply_rule ~get_alg domain counter graph rule with
   | None -> None
   | Some graph' ->
-     let () = update_activity get_alg env counter graph state in
+     let () = update_activity get_alg env counter graph state.activities in
      let () =
        if !Parameter.debugModeOn then
 	 Format.printf "@[<v>Obtained@ %a@]@."
@@ -185,7 +179,7 @@ let a_loop form env domain counter graph state =
   let activity = activity state in
   let rd = Random.float 1.0 in
   let dt = abs_float (log rd /. activity) in
-  
+
 (*Activity is null or dt is infinite*)
   if not (activity > 0.) || dt = infinity then
     match !(state.stopping_times) with

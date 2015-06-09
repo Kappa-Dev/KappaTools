@@ -1,16 +1,12 @@
-val lnk_t : Environment.t -> Format.formatter -> Mixture.lnk_t -> unit
-
-val mixture : bool -> Environment.t -> Format.formatter -> Mixture.t -> unit
-
-val alg_expr : Environment.t -> Format.formatter -> Expr.alg_expr -> unit
+val alg_expr : ?env:Environment.t -> Format.formatter -> Expr.alg_expr -> unit
 
 val print_expr_val :
-  Environment.t -> (Environment.t -> 'a -> Nbr.t) -> Format.formatter ->
-  'a Ast.print_expr Term.with_pos list -> unit
+  ?env:Environment.t -> (?env:Environment.t -> 'a -> Nbr.t) ->
+  Format.formatter -> 'a Ast.print_expr Term.with_pos list -> unit
 
 val elementary_rule :
-  Environment.t -> Format.formatter -> Primitives.elementary_rule -> unit
+  ?env:Environment.t -> Format.formatter -> Primitives.elementary_rule -> unit
 val modification :
-  Environment.t -> Format.formatter -> Primitives.modification -> unit
+  ?env:Environment.t -> Format.formatter -> Primitives.modification -> unit
 val perturbation :
-  Environment.t -> Format.formatter -> Primitives.perturbation -> unit
+  ?env:Environment.t -> Format.formatter -> Primitives.perturbation -> unit

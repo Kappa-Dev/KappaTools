@@ -1,10 +1,16 @@
 load_printer "str.cma"
 load_printer "db_printers.cma"
 
-install_printer Dipping.print_full
+install_printer Renaming.print_full
 install_printer Expr.print_ast_mix
 install_printer Expr.print_ast_alg
+install_printer Raw_printers.print_alg
+install_printer Raw_printers.print_bool
 install_printer Raw_printers.print_cc
+install_printer Raw_printers.print_transformation
+install_printer Raw_printers.print_rule
+install_printer Raw_printers.print_modification
+install_printer Raw_printers.print_perturbation
 install_printer Connected_component.Env.print
 install_printer Edges.debug_print
 install_printer Rule_interpreter.print_heap

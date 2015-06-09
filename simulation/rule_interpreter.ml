@@ -105,8 +105,8 @@ let instance_number state ccs_l =
       ValMap.total (Connected_component.Map.find cc state.roots_of_ccs)
     with Not_found -> 0 in
   let rect_approx ccs =
-    Array.fold_left (fun acc cc -> ( *) acc (size cc)) 1 ccs in
-  Nbr.I (List.fold_left (fun acc ccs -> (+) acc (rect_approx ccs)) 0 ccs_l)
+    Array.fold_left (fun acc cc ->  acc * (size cc)) 1 ccs in
+  Nbr.I (List.fold_left (fun acc ccs -> acc + (rect_approx ccs)) 0 ccs_l)
 
 let value_bool ~get_alg counter state expr =
   Expr_interpreter.value_bool

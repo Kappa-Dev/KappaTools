@@ -692,7 +692,9 @@ let add_domain env cc =
   match known_cc with
   | Some (id,inj,point) ->
      (if point.is_obs then env
-      else propagate_add_obs id env id),inj,point.content
+      else
+	let point' = { point with is_obs = true } in
+	propagate_add_obs id (Env.add_point id point' env) id),inj,point.content
   | None ->
      let (_,env'),_ = add_new_point cc.id env (succ cc.id) [] cc in
      (env',identity_injection cc, cc)

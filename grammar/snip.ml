@@ -63,8 +63,8 @@ let print_rule_intf sigs ag_ty f (ports,ints) =
 	let () = Format.fprintf
 		   f "%t%a%a%a" (if empty then Pp.empty else Pp.comma)
 		   (Signature.print_site sigs ag_ty) i
-		   (print_rule_internal sigs ag_ty i) ints.(i)
-							     print_rule_link ports.(i) in
+		   (print_rule_internal sigs ag_ty i)
+		   ints.(i) print_rule_link ports.(i) in
 	aux false (succ i)
       else aux empty (succ i) in
   aux true 0

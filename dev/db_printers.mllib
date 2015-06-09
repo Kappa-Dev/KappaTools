@@ -7,10 +7,11 @@ Set_patched
 MapExt
 Mods
 Tools
-Dipping
+Renaming
 
 Pp
 Parameter
+Kappa_files
 Nbr
 Term
 ExceptionDefn
@@ -20,6 +21,8 @@ Expr
 Signature
 NamedDecls
 Primitives
+Environment
+Kappa_printer
 
 Set_and_map
 Hash
