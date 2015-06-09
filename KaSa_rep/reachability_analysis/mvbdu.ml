@@ -254,6 +254,21 @@ let scan_rule_set parameter error kappa_handler rules =
 
 (*-----------------------------------------------------------------------------------*)
 
+let rec print_a_list (l: int List_sig.list) =
+  Printf.fprintf stdout "list_id:%i:" l.List_sig.id;
+  Printf.fprintf stdout "value:";
+  let v = l.List_sig.value in
+  match v with
+    | List_sig.Empty -> ()
+    | List_sig.Cons precell ->
+      print_precell precell;
+        Printf.fprintf stdout "\n"
+      
+and print_precell p =
+  Printf.fprintf stdout "variable:%i:site_state:%i]\n" 
+    p.List_sig.variable  p.List_sig.association;
+  print_a_list p.List_sig.tail
+
 let scan_var_set parameter error kappa_handler vars result_rules =
   let error, store_var_set =
     Int_storage.Nearly_inf_Imperatif.fold
@@ -304,15 +319,18 @@ let scan_var_set parameter error kappa_handler vars result_rules =
         in
         let a_val = Mvbdu_sig.Leaf true in
         let b_val = Mvbdu_sig.Leaf false in
-        (*build bdu_a from a_val*)
+        (*build bdu_a from a_val;
+          a', a'_id: output of build_already_compressed_cell;
+          a'', a''_id: output of compress_node
+        *)
         let error, (handler: ('b, 'a, 'c, bool, int) Memo_sig.handler),
           a', a'_id, a'', a''_id =
           Mvbdu_test.build_without_and_with_compressing
             allocate
             error
             handler
-            a_val
-            a_val
+            a_val (*bdu_skel*)
+            a_val (*bdu_val*)
         in
         (*define function f getting handler and its value *)
         let f x y =
@@ -330,36 +348,91 @@ let scan_var_set parameter error kappa_handler vars result_rules =
             allocate
             error
             handler
-            b_val
-            b_val
+            b_val (*bdu_skel*)
+            b_val (*bdu_val*)
         in
         (*TODO: build NODE? *)
         (*define a copy bdu*)
-        let copy bdu =
+        (*let copy bdu =
           {
             bdu with Mvbdu_sig.value =
               match bdu.Mvbdu_sig.value with
                 | Mvbdu_sig.Node x -> Mvbdu_sig.Node x
                 | Mvbdu_sig.Leaf a -> Mvbdu_sig.Leaf a
           }
-        in
+        in*)
         (*---------------------------------------------------------------------------*)
         (*compute bdu relation*)
+        (*check the Leaf is true*)
         let error, handler, bmvbdu_true0 =
           f (Boolean_mvbdu.boolean_mvbdu_true parameter handler error) parameter
         in
+        (*Leaf is false*)
         let error, handler, bmvbdu_false0 =
           f (Boolean_mvbdu.boolean_mvbdu_false parameter handler error) parameter
         in
+        (*constant of leaf is true*)
         let error, handler, bmvbdu_true1 =
           f (Boolean_mvbdu.boolean_mvbdu_constant_true parameter handler error parameter)
             bmvbdu_true0
         in
+        (*constant of leaf is false*)
         let error, handler, bmvbdu_true2 =
           f (Boolean_mvbdu.boolean_mvbdu_constant_true parameter handler error parameter)
             bmvbdu_false0
         in
-        (*TODO?*)
+        let error,handler,bmvbdu_false1 =
+          f (Boolean_mvbdu.boolean_mvbdu_constant_false
+               parameter handler error parameter)
+            bmvbdu_true0 
+        in
+        let error,handler,bmvbdu_false2 =
+          f (Boolean_mvbdu.boolean_mvbdu_constant_false
+               parameter handler error parameter)
+            bmvbdu_false0 
+        in
+        let error,handler,bmvbdu_false3 =
+          f (Boolean_mvbdu.boolean_mvbdu_or 
+               parameter handler error parameter bmvbdu_false0)
+            bmvbdu_false0 
+        in 
+        let error,handler,bmvbdu_true3 =
+          f (Boolean_mvbdu.boolean_mvbdu_or
+               parameter handler error parameter bmvbdu_false0)
+            bmvbdu_true0
+        in
+        let error,handler,bmvbdu_true4 =
+          f (Boolean_mvbdu.boolean_mvbdu_or 
+               parameter handler error parameter bmvbdu_true0)
+            bmvbdu_true0 
+        in
+        let error,handler,bmvbdu_true5 =
+          f (Boolean_mvbdu.boolean_mvbdu_or 
+               parameter handler error parameter bmvbdu_true0)
+            bmvbdu_false0 
+        in
+        let error,handler,bmvbdu_false4 =
+          f (Boolean_mvbdu.boolean_mvbdu_and
+               parameter handler error parameter bmvbdu_false0)
+            bmvbdu_false0 
+        in 
+        let error,handler,bmvbdu_false5 =
+          f (Boolean_mvbdu.boolean_mvbdu_and
+               parameter handler error parameter bmvbdu_false0)
+            bmvbdu_true0 
+        in
+        let error,handler,bmvbdu_true6 =
+          f (Boolean_mvbdu.boolean_mvbdu_and 
+               parameter handler error parameter bmvbdu_true0)
+            bmvbdu_true0 
+        in
+        let error,handler,bmvbdu_false6 =
+          f (Boolean_mvbdu.boolean_mvbdu_and 
+               parameter handler error parameter bmvbdu_true0)
+            bmvbdu_false0 
+        in
+        let error,handler,bmvbdu_true33 = (*a': mvbdu_input*)
+          f (Boolean_mvbdu.clean_head parameter error handler) a' in
         (*---------------------------------------------------------------------------*)
         (*build tree lists for bdu from a list of pair (var_id, site_state) computed above*)
         (*build list_a, list_b is a sorted list, list_c is a reversed sorted list*)
@@ -371,7 +444,7 @@ let scan_var_set parameter error kappa_handler vars result_rules =
             handler
             pair_list
         in
-        let error, (handler, list_b) =
+        (*let error, (handler, list_b) =
           List_algebra.build_sorted_list
             (Boolean_mvbdu.list_allocate parameter)
             parameter
@@ -386,27 +459,20 @@ let scan_var_set parameter error kappa_handler vars result_rules =
             error
             handler
             pair_list
+        in*)
+        (*PRINT*)
+        let _ =
+          Printf.fprintf stdout "Build list(list_a):\n";
+          print_a_list list_a
+            (*Printf.fprintf stdout "Build sorted list(list_b):\n";
+          print_a_list list_b;
+          Printf.fprintf stdout "Build reversed sorted list(list_c):\n";
+          print_a_list list_c*)
         in
         (*---------------------------------------------------------------------------*)
-        (*compute mvbdu of redefine of list_a*)
-        let error, handler, mvbdu_redefine = (*FIXME: a' is a leaf*)
+        (*compute mvbdu of redefine of list_a: is a list_input, a': mvbdu_input*)
+        let error, handler, mvbdu_redefine =
           f (Boolean_mvbdu.redefine parameter error parameter handler a') list_a
-        in
-        let error, handler, a''' =
-          f (Boolean_mvbdu.clean_head parameter error handler) a''
-        in
-        (*PRINT a'', a'''*)
-        let error = 
-          Boolean_mvbdu.print_boolean_mvbdu
-            error
-            (Remanent_parameters.update_prefix parameter "a':")
-            a''
-        in
-        let error =
-          Boolean_mvbdu.print_boolean_mvbdu
-            error
-            (Remanent_parameters.update_prefix parameter "a'':")
-            a'''
         in
         (*PRINT bdu redefine*)
         let error =
@@ -431,7 +497,7 @@ let scan_var_set parameter error kappa_handler vars result_rules =
               Sanity_test_sig.mvbdu_handler = handler
           },
           ("Mvbdu.001", fun remanent ->
-            let b = Mvbdu_core.mvbdu_equal a'' b'' in (*TEST*)
+            let b = Mvbdu_core.mvbdu_equal a'' b'' in (*TEST, they are not equal*)
             remanent, b, None) ::
             (List.map (fun (a, b, c) ->
               a,
@@ -443,19 +509,13 @@ let scan_var_set parameter error kappa_handler vars result_rules =
                  "Mvbdu.004",a'',(true,true,true);
                  "Mvbdu.005",b'',(true,true,true);
                  
-                 "Mvbdu.006",copy a',(true,false,true);
-                 "Mvbdu.007",copy b',(true,false,true);
-                 
-                 "Mvbdu.008",copy a'',(true,false,true);
-                 "Mvbdu.009",copy b'',(true,false,true);
-
                  (*information of bmvbdu_true*)
-                 "Mvbdu.010", bmvbdu_true0, (true, true,true);
-                 "Mvbdu.011", bmvbdu_true1, (true, true, true);
-                 "Mvbdu.012", bmvbdu_true2, (true, true, true);
+                 "Mvbdu.006", bmvbdu_true0, (true, true,true);
+                 "Mvbdu.007", bmvbdu_true1, (true, true, true);
+                 "Mvbdu.008", bmvbdu_true2, (true, true, true);
 
                  (*information of bmvbdu_false*)
-                 "Mvbdu.013", bmvbdu_false0, (true, true, true)
+                 "Mvbdu.009", bmvbdu_false0, (true, true, true)
                ])@
             (*---------------------------------------------------------------------------*)
             (*list of true information*)
@@ -486,17 +546,17 @@ let scan_var_set parameter error kappa_handler vars result_rules =
             @
             (*---------------------------------------------------------------------------*)
             (*list_a, list_b, list_c*)
-            (List.map (fun (a, b, c) ->
+            (*(List.map (fun (a, b, c) ->
               a,
               fun remanent ->
                 List_sanity.test remanent c b)
                [
                  "List.001", list_a, (true, true);
-                 "List.002", list_b, (false, true);
-                 "List.003", list_c, (true, true)
+                 (*"List.002", list_b, (false, true);*)
+               (*"List.003", list_c, (true, true)*)
                ]
              )
-            @
+              @*)
             (*---------------------------------------------------------------------------*)
             (*list_a,list_c*)
             (List.map (fun (a,b) ->
@@ -506,8 +566,8 @@ let scan_var_set parameter error kappa_handler vars result_rules =
                 b == list_a,
                 None))
                [
-                 "List.004", list_a;
-                 "List.005", list_c
+                 "List.001", list_a;
+                 (*"List.003", list_c*)
                ]
             )             
         in
@@ -526,7 +586,7 @@ let scan_var_set parameter error kappa_handler vars result_rules =
           parameter
           error
           agent_type
-          store_bdu_list
+          store_pair_remanent
           store_result
       )
       store_var_set.store_pair_plus
