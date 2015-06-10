@@ -1,10 +1,14 @@
 exception Undefined
 exception NotBijective
+exception Clashing
+
 type t
 
 val empty : t
 val is_identity : t -> bool
 val identity : int list -> t
+
+(** @raise Clashing in debug mode *)
 val add : int -> int -> t -> t
 val compose : t -> t -> t
 (** @raise Undefined *)

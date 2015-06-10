@@ -2,6 +2,8 @@ open Mods
 
 exception Undefined
 exception NotBijective
+exception Clashing
+
 type t = {sigma:int IntMap.t ; is_identity:bool} 
 
 let empty = {sigma = IntMap.empty ; is_identity=true} 
@@ -9,14 +11,24 @@ let is_identity i = i.is_identity
 
 let to_list i = IntMap.bindings i.sigma
 
-let add x y i = {sigma = IntMap.add x y i.sigma ; is_identity = i.is_identity && x==y}
+let add x y i = 
+        let ok = if !Parameter.debugModeOn then not (IntMap.mem x i.sigma) else true 
+        in 
+        if not ok then raise Clashing
+        else
+        {sigma = IntMap.add x y i.sigma ; is_identity = i.is_identity && x==y}
         
 let mem x i = IntMap.mem x i.sigma
 let fold f i = IntMap.fold f i.sigma 
 
 let identity l = {sigma = List.fold_left (fun out x -> IntMap.add x x out) IntMap.empty l ; is_identity = true}
 
-let apply i x = try IntMap.find x i.sigma with Not_found -> raise Undefined
+let apply i x = 
+        let app () = try IntMap.find x i.sigma with Not_found -> raise Undefined
+        in
+        if not i.is_identity then app ()
+        else
+           if !Parameter.debugModeOn then app () else x
 
 let compose i i' =
   let sigma,is_id =

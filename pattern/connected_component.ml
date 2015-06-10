@@ -9,12 +9,11 @@ negative number means UnSpec. *)
 type cc = {
   id: int;
   nodes_by_type: int list array;
-  links: link array IntMap.t; (*pattern graph*)
-  internals: int array IntMap.t; (*internal state*)
+  links: link array IntMap.t; (*pattern graph id -> [|... link_j...|] i.e agent_id on site_j has a link*)
+  internals: int array IntMap.t; (*internal state id -> [|... state_j...|] i.e agent_id on site_j has internal state state_j*)
 }
 
 type t = cc
-
 
 type id_upto_alpha =
     Existing of int
@@ -24,9 +23,9 @@ type nav_port = id_upto_alpha * int
 
 type arrow = ToNode of nav_port | ToNothing | ToInternal of int
 
-type son = {
-  extra_arrow: nav_port * arrow;
-  dst: int (** t.id *);
+type transition = {
+  next: nav_port * arrow;
+  dst: int (* id of cc and also address in the Env.domain map*);
   inj: Renaming.t; (* From dst To ("this" cc + extra edge) *)
   above_obs: int list;
 }
@@ -35,7 +34,7 @@ type point = {
   content: cc;
   is_obs: bool;
   fathers: int (** t.id *) list;
-  sons: son list;
+  sons: transition list;
 }
 
 type work = {
@@ -104,8 +103,6 @@ let dangling_node ~sigs tys x =
 	  "Cannot proceed because last declared agent %a/*%i*/%a"
 	  (Signature.print_agent sigs) (raw_find_ty tys x) x
 	  Format.pp_print_string " is not linked to its connected component."))
-
-
 
 let identity_injection cc =
   Renaming.identity
@@ -293,7 +290,7 @@ let print_sons_dot sigs cc_id f sons =
        Format.fprintf f "(%a,%i)~%i" (print_node_id sigs) n p i in
   Pp.list Pp.space ~trailing:Pp.space
 	  (fun f son -> Format.fprintf f "@[cc%i -> cc%i [label=\"%a %a\"];@]"
-				       cc_id son.dst pp_edge son.extra_arrow
+				       cc_id son.dst pp_edge son.next
 				       Renaming.print son.inj)
 	  f sons
 
@@ -365,7 +362,7 @@ let print f env =
 				     (fun f s -> Format.fprintf
 						   f "%a(@[%a@])%i"
 						   (print_edge env.sig_decl)
-						   s.extra_arrow
+						   s.next
 						   Renaming.print s.inj s.dst))
 			    p.sons))
     env.domain
@@ -449,16 +446,17 @@ let navigate env nav =
        else None
     | ((Fresh _,_), _), ((Fresh _,_),_) -> None
     | ((Fresh _,_), _), ((Existing _,_),_) -> None in
-  let rec aux inj_dst2nav i = function
-    | [] -> Some (i,inj_dst2nav,IntMap.find i env.domain)
+  let rec aux inj_dst2nav pt_i = function
+    | [] -> Some (pt_i,inj_dst2nav,IntMap.find pt_i env.domain)
     | e :: t ->
-       let rec find_good_edge = function
-	 | [] -> None
-	 | s :: tail ->
-	    match compatible_point inj_dst2nav (s.extra_arrow,e) with
-	    | Some inj' -> aux (Renaming.compose s.inj inj') s.dst t
-	    | None -> find_good_edge tail in
-       find_good_edge (IntMap.find i env.domain).sons
+       let rec find_good_edge = function (*one should use a hash here*)
+	         | [] -> None
+	         | s :: tail ->
+        	    match compatible_point inj_dst2nav (s.next,e) with
+        	    | Some inj' -> aux (Renaming.compose s.inj inj') s.dst t
+        	    | None -> find_good_edge tail 
+       in
+          find_good_edge (IntMap.find pt_i env.domain).sons
   in aux Renaming.empty 0 nav
 
 let find env cc =
@@ -664,7 +662,7 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
 let rec complete_domain_with obs_id dst env free_id cc edge inj_dst2cc =
   let new_son inj_found2cc =
     { dst = dst;
-      extra_arrow = edge;
+      next = edge;
       inj = Renaming.compose inj_dst2cc (Renaming.inverse inj_found2cc);
       above_obs = [obs_id];} in
   let known_cc = Env.find env cc in
@@ -846,18 +844,18 @@ module Matching = struct
     | Some (_,node) ->
        let rename = Renaming.add node root Renaming.empty in
        let full_rename =
-	 List.fold_left
-	   (fun inj_op nav ->
-	    match inj_op with
-	    | None -> None
-	    | Some inj -> injection_for_one_more_edge inj graph nav)
-	   (Some rename) (List.tl (to_navigation false cc)) in
-       match full_rename with
-       | None -> failwith "Matching.reconstruct error"
-       | Some rename ->
-	  match from_renaming cc rename (Some (NodeMap.empty, snd inj)) with
-	  | None -> None
-	  | Some (inj',co) -> Some (IntMap.add id inj' (fst inj),co)
+	         List.fold_left
+        	   (fun inj_op nav ->
+        	    match inj_op with
+        	    | None -> None
+        	    | Some inj -> injection_for_one_more_edge inj graph nav)
+        	   (Some rename) (List.tl (to_navigation false cc)) in
+               match full_rename with
+               | None -> failwith "Matching.reconstruct error"
+               | Some rename ->
+        	  match from_renaming cc rename (Some (NodeMap.empty, snd inj)) with
+        	  | None -> None
+        	  | Some (inj',co) -> Some (IntMap.add id inj' (fst inj),co)
 
   let get (node,id) (t,_) = NodeMap.find node (IntMap.find id t)
 
@@ -876,7 +874,7 @@ module Matching = struct
 	 let remains',cache' =
 	   List.fold_left
 	     (fun (re,ca as acc) son ->
-	      match injection_for_one_more_edge inj_point2graph graph son.extra_arrow with
+	      match injection_for_one_more_edge inj_point2graph graph son.next with
 	      | None -> acc
 	      | Some inj' ->
 		 if
