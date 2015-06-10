@@ -8,13 +8,14 @@ type t = {
 let update_activity get_alg env counter graph activities =
   Array.iteri
     (fun i (_,rule) ->
-     let rate = Rule_interpreter.value_alg counter graph ~get_alg
-					   rule.Primitives.rate in
-     let cc_exp =
-       Expr.KAPPA_INSTANCE [rule.Primitives.connected_components] in
+     let rate = Rule_interpreter.value_alg
+		  counter graph ~get_alg rule.Primitives.rate in
+     let cc_va =
+       Rule_interpreter.value_alg
+	 counter graph ~get_alg
+	 (Expr.KAPPA_INSTANCE [rule.Primitives.connected_components]) in
      let act =
-       Nbr.mult
-	 rate (Rule_interpreter.value_alg counter graph ~get_alg cc_exp) in
+       if Nbr.is_zero cc_va then Nbr.zero else Nbr.mult rate cc_va in
      Random_tree.add i (Nbr.to_float act) activities)
     env.Environment.rules.NamedDecls.decls
 

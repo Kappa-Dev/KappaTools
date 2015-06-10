@@ -176,3 +176,25 @@ let total t =
     t.weight_of_subtrees.(1)
   else
     infinity
+
+(* TODO
+  weight_of_subtrees: float array ;
+  unbalanced_events_by_layer: int list array ;
+ *)
+let debug_print f t =
+  let () =
+    Format.fprintf f "@[%sconsistent:@ [" (if t.consistent then "" else "un") in
+  let () =
+    Hashtbl.iter
+      (fun i k ->
+       let bal = if t.unbalanced_events.(k) then "!" else "" in
+       let inv = if Hashtbl.find t.mask k = i then "" else " not involutive" in
+       let inf =
+	 match classify_float t.weight_of_nodes.(k) with
+	 | FP_infinite when IntSet.mem k t.inf_list -> ""
+	 | FP_infinite -> " not in inf_list"
+	 | _ when not (IntSet.mem k t.inf_list) -> ""
+	 | (FP_normal | FP_zero | FP_nan | FP_subnormal) -> " in inf_list" in
+       Format.fprintf f "%s%i:%f%s%s,@," bal i t.weight_of_nodes.(k) inf inv)
+      t.unmask in
+  Format.fprintf f "]@]"
