@@ -2,9 +2,6 @@
 
 type t (**Abstract graph*)
 
-(**Debugging*)
-val print_heap : Format.formatter -> ValMap.tree -> unit
-
 (**Initialisation*)
 val empty : Environment.t -> t
 
@@ -29,4 +26,8 @@ val force_rule :
 
 val print : Environment.t -> Format.formatter -> t -> unit
 
+(**Debugging*)
+val print_injections :
+  ?sigs:Signature.s -> Format.formatter ->
+  ValMap.tree Connected_component.Map.t -> unit
 val debug_print : Format.formatter -> t -> unit

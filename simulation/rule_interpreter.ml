@@ -13,10 +13,7 @@ let empty env = {
 }
 
 let print_heap f h =
-  let () = Format.pp_open_box f 0 in
-  let () = ValMap.iter
-	     (fun c -> Format.fprintf f "%i%t" c Pp.comma) h in
-  Format.pp_close_box f ()
+  ValMap.iter (fun c -> Format.fprintf f "%i%t" c Pp.comma) h
 
 let update_roots is_add map cc root =
   let va = try Connected_component.Map.find cc map
@@ -185,7 +182,7 @@ let print_injections ?sigs f roots_of_ccs =
     (Pp.set Connected_component.Map.bindings Pp.space
 	    (fun f (cc,roots) ->
 	     Format.fprintf
-	       f "@[# @[%a@] ==> %a@]"
+	       f "@[# @[%a@] ==>@ @[%a@]@]"
 	       (Connected_component.print ?sigs true) cc print_heap roots
 	    )
     ) roots_of_ccs

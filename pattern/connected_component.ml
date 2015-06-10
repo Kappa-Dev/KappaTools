@@ -113,14 +113,26 @@ let print_node_id sigs f = function
   | Fresh (ty,id) ->
      Format.fprintf f "!%a-%i" (Signature.print_agent sigs) ty id
 
-let print_edge sigs f = function
+let print_node_site sigs cc n =
+  Signature.print_site
+    sigs (match n with Existing id -> find_ty cc id | Fresh (ty,_) -> ty)
+
+let print_node_internal sigs cc n =
+  Signature.print_site_internal_state
+    sigs (match n with Existing id -> find_ty cc id | Fresh (ty,_) -> ty)
+
+let print_edge sigs cc f = function
   | (source,site), ToNothing ->
-     Format.fprintf f "-%a_%i-%t->" (print_node_id sigs) source site Pp.bottom
+     Format.fprintf f "-%a_%a-%t->" (print_node_id sigs) source
+		    (print_node_site sigs cc source) site Pp.bottom
   | (source,site), ToNode (id,port) ->
-     Format.fprintf f "-%a_%i-%a_%i->" (print_node_id sigs) source site
-		    (print_node_id sigs) id port
+     Format.fprintf f "-%a_%a-%a_%a->" (print_node_id sigs) source
+		    (print_node_site sigs cc source) site
+		    (print_node_id sigs) id
+		    (print_node_site sigs cc id) port
   | (source,site), ToInternal i ->
-     Format.fprintf f "-%a_%i-~%i->" (print_node_id sigs) source site i
+     Format.fprintf f "-%a_%a->" (print_node_id sigs) source
+		    (print_node_internal sigs cc source site) (Some i)
 
 let find_root cc =
   let rec aux ty =
@@ -361,7 +373,7 @@ let print f env =
 			    (Pp.list Pp.space
 				     (fun f s -> Format.fprintf
 						   f "%a(@[%a@])%i"
-						   (print_edge env.sig_decl)
+						   (print_edge env.sig_decl p.content)
 						   s.next
 						   Renaming.print s.inj s.dst))
 			    p.sons))
@@ -824,9 +836,23 @@ let injection_for_one_more_edge inj graph = function
      | Some node -> Some (Renaming.add id' node inj)
 
 module Matching = struct
-  type t = int NodeMap.t IntMap.t * IntSet.t (* (map,set) map: point_i -> (node_j(i) -> id_node_graph_in_current_matching)  set:codomain of current matching*)
+  type t = int NodeMap.t IntMap.t * IntSet.t
+  (* (map,set)
+      map: point_i -> (node_j(i) -> id_node_graph_in_current_matching)
+      set:codomain of current matching *)
 
   let empty = (IntMap.empty, IntSet.empty)
+
+  let debug_print f (m,co) =
+    Format.fprintf
+      f "@[(%a)@]"
+      (Pp.set IntMap.bindings Pp.comma
+	      (fun f (ccid,nm) ->
+	       Pp.set NodeMap.bindings Pp.comma
+		      (fun f (node,dst) ->
+		       Format.fprintf f "%i:%a->%i" ccid
+				      (ContentAgent.print ?sigs:None) node dst
+		      ) f nm)) m
 
   (**)
   let from_renaming cc =
@@ -844,18 +870,18 @@ module Matching = struct
     | Some (_,node) ->
        let rename = Renaming.add node root Renaming.empty in
        let full_rename =
-	         List.fold_left
-        	   (fun inj_op nav ->
-        	    match inj_op with
-        	    | None -> None
-        	    | Some inj -> injection_for_one_more_edge inj graph nav)
-        	   (Some rename) (List.tl (to_navigation false cc)) in
-               match full_rename with
-               | None -> failwith "Matching.reconstruct error"
-               | Some rename ->
-        	  match from_renaming cc rename (Some (NodeMap.empty, snd inj)) with
-        	  | None -> None
-        	  | Some (inj',co) -> Some (IntMap.add id inj' (fst inj),co)
+	 List.fold_left
+           (fun inj_op nav ->
+            match inj_op with
+            | None -> None
+            | Some inj -> injection_for_one_more_edge inj graph nav)
+           (Some rename) (List.tl (to_navigation false cc)) in
+       match full_rename with
+       | None -> failwith "Matching.reconstruct error"
+       | Some rename ->
+          match from_renaming cc rename (Some (NodeMap.empty, snd inj)) with
+          | None -> None
+          | Some (inj',co) -> Some (IntMap.add id inj' (fst inj),co)
 
   let get (node,id) (t,_) = NodeMap.find node (IntMap.find id t)
 

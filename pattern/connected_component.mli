@@ -46,6 +46,7 @@ val print_dot : Signature.s -> Format.formatter -> t -> unit
 module Matching : sig
   type t
   val empty : t
+  val debug_print : Format.formatter -> t -> unit
   val get : (ContentAgent.t * int) -> t -> int
   val reconstruct : Edges.t -> t -> int -> cc -> int -> t option
 
