@@ -26,7 +26,7 @@ type arrow = ToNode of nav_port | ToNothing | ToInternal of int
 type transition = {
   next: nav_port * arrow;
   dst: int (* id of cc and also address in the Env.domain map*);
-  inj: Renaming.t; (* From dst To ("this" cc + extra edge) *)
+  inj: Renaming.t list; (* From dst To ("this" cc + extra edge) *)
   above_obs: int list;
 }
 
@@ -303,7 +303,7 @@ let print_sons_dot sigs cc_id f sons =
   Pp.list Pp.space ~trailing:Pp.space
 	  (fun f son -> Format.fprintf f "@[cc%i -> cc%i [label=\"%a %a\"];@]"
 				       cc_id son.dst pp_edge son.next
-				       Renaming.print son.inj)
+				       (Pp.list Pp.space Renaming.print) son.inj)
 	  f sons
 
 let print_point_dot sigs f (id,point) =
@@ -318,9 +318,9 @@ module Env : sig
   val fresh : Signature.s -> int list array -> int -> point IntMap.t -> t
   val empty : Signature.s -> t
   val sigs : t -> Signature.s
-  val find : t -> cc -> (int * Renaming.t * point) option
+  val find : t -> cc -> (int * Renaming.t list * point) option
   val navigate :
-    t -> (nav_port*arrow) list -> (int * Renaming.t * point) option
+    t -> (nav_port*arrow) list -> (int * Renaming.t list * point) option
   val get : t -> int -> point
   val check_vitality : t -> unit
   val cc_map : t -> cc IntMap.t
@@ -370,12 +370,17 @@ let print f env =
 	     Format.fprintf f "@[<hov 2>(%a)@ -> @[<h>%a@]@ -> @[(%a)@]@]"
 			    (Pp.list Pp.space Format.pp_print_int) p.fathers
 			    (print ~sigs:env.sig_decl true) p.content
-			    (Pp.list Pp.space
-				     (fun f s -> Format.fprintf
-						   f "%a(@[%a@])%i"
-						   (print_edge env.sig_decl p.content)
-						   s.next
-						   Renaming.print s.inj s.dst))
+			    (Pp.list
+			       Pp.space
+			       (fun f s ->
+				let () =
+				  print_edge env.sig_decl p.content f s.next in
+				let () =
+				  Pp.list
+				    Pp.space
+				    (fun f -> Format.fprintf f "(@[%a@])" Renaming.print)
+				    f s.inj in
+				Format.pp_print_int f s.dst))
 			    p.sons))
     env.domain
 
@@ -410,21 +415,25 @@ let to_work env =
   }
 
 let navigate env nav =
-  let compatible_point inj = function
+  let compatible_point injs = function
     | ((Existing id,site), ToNothing), e ->
-       if e = ((Existing (Renaming.apply inj id),site),ToNothing)
-       then Some inj else None
+       List.filter
+	 (fun inj -> e = ((Existing (Renaming.apply inj id),site),ToNothing))
+	 injs
     | ((Existing id,site), ToInternal i), e ->
-       if e = ((Existing (Renaming.apply inj id),site),ToInternal i)
-       then Some inj else None
+       List.filter
+	 (fun inj -> e = ((Existing (Renaming.apply inj id),site),ToInternal i))
+	 injs
     | ((Existing id,site), ToNode (Existing id',site')), e ->
-       if e =
+       List.filter
+	 (fun inj ->
+	  e =
 	    ((Existing (Renaming.apply inj id),site),
 	     ToNode (Existing (Renaming.apply inj id'),site'))
 	  || e =
 	       ((Existing (Renaming.apply inj id'),site'),
-		ToNode (Existing (Renaming.apply inj id),site))
-       then Some inj else None
+		ToNode (Existing (Renaming.apply inj id),site)))
+	 injs
     | (
       ((Existing id,site),ToNode (Fresh (ty,id'),site')),
       ((Existing sid,ssite), ToNode (Fresh(ty',sid'),ssite'))
@@ -435,41 +444,51 @@ let navigate env nav =
     | ((Fresh (ty,id'),site),ToNode (Existing id,site')),
       ((Fresh(ty',sid'),ssite), ToNode (Existing sid,ssite'))
     ) ->
-       if sid = Renaming.apply inj id && ssite = site
-	  && ty' = ty && ssite' = site'
-       then Some (Renaming.add id' sid' inj) else None
+       List.map (Renaming.add id' sid')
+		(List.filter
+		   (fun inj -> sid = Renaming.apply inj id && ssite = site
+			       && ty' = ty && ssite' = site') injs)
     | ((Existing _,_), ToNode (Fresh _,_)),
-      (((Fresh _ | Existing _), _), _) -> None
+      (((Fresh _ | Existing _), _), _) -> []
     | ((Fresh (ty,id),site), ToNothing), ((Fresh (ty',id'),site'),x) ->
-       if ty = ty' && site = site' && x = ToNothing && not (Renaming.mem id inj)
-       then Some (Renaming.add id id' inj) else None
+       List.map (Renaming.add id id')
+		(List.filter
+		   (fun inj ->
+		    ty = ty' && site = site' && x = ToNothing
+		    && not (Renaming.mem id inj)) injs)
     | ((Fresh (ty,id),site), ToInternal i), ((Fresh (ty',id'),site'),x) ->
-       if ty = ty' && site = site' &&
-	    x = ToInternal i && not (Renaming.mem id inj)
-       then Some (Renaming.add id id' inj) else None
+       List.map (Renaming.add id id')
+		(List.filter
+		   (fun inj -> ty = ty' && site = site' &&
+				 x = ToInternal i && not (Renaming.mem id inj))
+		   injs)
     | ((Fresh (ty,id),site), ToNode (Fresh (ty',id'),site')),
       ((Fresh (sty,sid),ssite), ToNode (Fresh (sty',sid'),ssite')) ->
-       if not (Renaming.mem id inj) && not (Renaming.mem id inj) then
-	 if ty = sty && site = ssite && ty' = sty' && site' = ssite'
-	 then Some (Renaming.add id' sid' (Renaming.add id sid inj))
-	 else if ty = sty && site = ssite && ty' = sty' && site' = ssite'
-	 then Some (Renaming.add id' sid (Renaming.add id sid' inj))
-	 else None
-       else None
-    | ((Fresh _,_), _), ((Fresh _,_),_) -> None
-    | ((Fresh _,_), _), ((Existing _,_),_) -> None in
-  let rec aux inj_dst2nav pt_i = function
-    | [] -> Some (pt_i,inj_dst2nav,IntMap.find pt_i env.domain)
+       List.fold_left
+	 (fun acc inj ->
+	  if not (Renaming.mem id inj) && not (Renaming.mem id inj) then
+	    if ty = sty && site = ssite && ty' = sty' && site' = ssite'
+	    then (Renaming.add id' sid' (Renaming.add id sid inj))::acc
+	    else if ty = sty && site = ssite && ty' = sty' && site' = ssite'
+	    then (Renaming.add id' sid (Renaming.add id sid' inj))::acc
+	 else acc
+       else acc) [] injs
+    | ((Fresh _,_), _), ((Fresh _,_),_) -> []
+    | ((Fresh _,_), _), ((Existing _,_),_) -> [] in
+  let rec aux injs_dst2nav pt_i = function
+    | [] -> Some (pt_i,injs_dst2nav,IntMap.find pt_i env.domain)
     | e :: t ->
        let rec find_good_edge = function (*one should use a hash here*)
-	         | [] -> None
-	         | s :: tail ->
-        	    match compatible_point inj_dst2nav (s.next,e) with
-        	    | Some inj' -> aux (Renaming.compose s.inj inj') s.dst t
-        	    | None -> find_good_edge tail 
+	 | [] -> None
+	 | s :: tail ->
+	    match compatible_point injs_dst2nav (s.next,e) with
+	    | [] ->  find_good_edge tail
+	    | inj' ->
+	       aux (Tools.list_map_flatten
+		      (fun x -> List.map (Renaming.compose x) inj') s.inj) s.dst t
        in
-          find_good_edge (IntMap.find pt_i env.domain).sons
-  in aux Renaming.empty 0 nav
+       find_good_edge (IntMap.find pt_i env.domain).sons
+  in aux [Renaming.empty] 0 nav
 
 let find env cc =
   let nav = to_navigation true cc in
@@ -672,21 +691,26 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
 	      (remove_cycle_edges complete_domain_with obs_id dst env free_id cc)
 
 let rec complete_domain_with obs_id dst env free_id cc edge inj_dst2cc =
-  let new_son inj_found2cc =
-    { dst = dst;
-      next = edge;
-      inj = Renaming.compose inj_dst2cc (Renaming.inverse inj_found2cc);
-      above_obs = [obs_id];} in
+  let rec new_son inj_found2cc = function
+    | [] ->
+       [{ dst = dst;
+	  next = edge;
+	  inj = [Renaming.compose inj_dst2cc (Renaming.inverse inj_found2cc)];
+	  above_obs = [obs_id];}]
+    | h :: t when h.dst = dst ->
+       let () = assert (h.next = edge) in
+       {h with inj = (Renaming.compose inj_dst2cc (Renaming.inverse inj_found2cc)) :: h.inj} :: t
+    | h :: t -> h :: new_son inj_found2cc t in
   let known_cc = Env.find env cc in
   match known_cc with
   | Some (cc_id, inj_cc_id2cc, point') ->
-     let point'' = {point' with sons = new_son inj_cc_id2cc :: point'.sons} in
+     let point'' = {point' with sons = new_son (List.hd inj_cc_id2cc) point'.sons} in
      let completed =
        propagate_add_obs obs_id (Env.add_point cc_id point'' env) cc_id in
      (free_id,completed), cc_id
   | None ->
-     let son = new_son (identity_injection cc) in
-     add_new_point obs_id env free_id [son] cc
+     let son = new_son (identity_injection cc) [] in
+     add_new_point obs_id env free_id son cc
 and add_new_point obs_id env free_id sons cc =
   let (free_id'',env'),fathers =
     compute_father_candidates complete_domain_with obs_id cc.id env free_id cc in
@@ -704,7 +728,8 @@ let add_domain env cc =
      (if point.is_obs then env
       else
 	let point' = { point with is_obs = true } in
-	propagate_add_obs id (Env.add_point id point' env) id),inj,point.content
+	propagate_add_obs id (Env.add_point id point' env) id),
+     List.hd inj,point.content
   | None ->
      let (_,env'),_ = add_new_point cc.id env (succ cc.id) [] cc in
      (env',identity_injection cc, cc)
@@ -843,7 +868,7 @@ module Matching = struct
 
   let empty = (IntMap.empty, IntSet.empty)
 
-  let debug_print f (m,co) =
+  let debug_print f (m,_co) =
     Format.fprintf
       f "@[(%a)@]"
       (Pp.set IntMap.bindings Pp.comma
@@ -903,19 +928,22 @@ module Matching = struct
 	      match injection_for_one_more_edge inj_point2graph graph son.next with
 	      | None -> acc
 	      | Some inj' ->
-		 if
-		   try Renaming.equal (IntMap.find son.dst cache) inj'
-		   with Not_found -> false
-		 then acc
+		 if IntSet.mem son.dst cache then acc
 		 else
-		   (Env.get domain son.dst,inj')::re,IntMap.add son.dst inj' ca)
+		   let p' = Env.get domain son.dst in
+		   (List.fold_left
+		      (fun remains renaming ->
+		       (p',Renaming.compose renaming inj')::remains) re son.inj),
+		    IntSet.add son.dst ca)
 	     (remains,cache) point.sons in
 	 aux cache' acc' remains' in
     if List.for_all (check_edge graph) edges then
       match Env.navigate domain edges with
       | None -> []
-      | Some (cc_id,inj,point) ->
-	 aux (IntMap.add cc_id inj IntMap.empty) [] [(point,inj)]
+      | Some (cc_id,injs,point) ->
+	 Tools.list_map_flatten
+	   (fun inj -> aux (IntSet.add cc_id IntSet.empty) [] [(point,inj)])
+	   injs
     else []
 
   let observables_from_free domain graph ty node_id site =

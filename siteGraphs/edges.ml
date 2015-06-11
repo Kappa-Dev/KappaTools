@@ -120,23 +120,22 @@ let print sigs f graph =
 	  f (build_snapshot sigs graph)
 
 let debug_print f (links,ints,sorts) =
-  Format.fprintf
-    f "%a@])"
-    (Pp.set
-       Int2Map.bindings (fun f -> Format.fprintf f ",")
-       (fun f ((ag,s),l) ->
-	let () =
-	  if s=0 then
-	    let ty = try IntMap.find ag sorts with Not_found -> -42 in
-	    let () = if ag <> 1 then Format.fprintf f "@])%t" Pp.space in
-	    Format.fprintf f "%i:%i(@[" ag ty in
-	Format.fprintf
-	  f "%i%t%t" s
-	  (try let int = Int2Map.find (ag,s) ints in
-	       fun f -> Format.fprintf f "~%i" int
-	   with Not_found -> fun _ -> ())
-	  (match l with
-	   | Edge.ToFree -> fun _ -> ()
-	   | Edge.Link (ty',ag',s') ->
-	      fun f -> Format.fprintf f "->%i:%i.%i" ag' ty' s')))
-    links
+  Pp.set
+    ~trailing:(fun f -> Format.fprintf f "@])")
+    Int2Map.bindings (fun f -> Format.fprintf f ",")
+    (fun f ((ag,s),l) ->
+     let () =
+       if s=0 then
+	 let ty = try IntMap.find ag sorts with Not_found -> -42 in
+	 let () = if ag <> 1 then Format.fprintf f "@])%t" Pp.space in
+	 Format.fprintf f "%i:%i(@[" ag ty in
+     Format.fprintf
+       f "%i%t%t" s
+       (try let int = Int2Map.find (ag,s) ints in
+	    fun f -> Format.fprintf f "~%i" int
+	with Not_found -> fun _ -> ())
+       (match l with
+	| Edge.ToFree -> fun _ -> ()
+	| Edge.Link (ty',ag',s') ->
+	   fun f -> Format.fprintf f "->%i:%i.%i" ag' ty' s'))
+    f links
