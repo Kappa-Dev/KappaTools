@@ -178,7 +178,7 @@ let () =
       (fun d -> State.dot_of_influence_map d state env);
     if !Parameter.compileModeOn
     then (State.dump_rules Format.err_formatter state env; exit 0);
-    let profiling = Compression_main.D.S.PH.B.PB.CI.Po.K.P.init_log_info () in
+    let profiling = Compression_main.init_secret_log_info () in
     let _grid,profiling,event_list =
       if Environment.tracking_enabled env then
 	let () =
@@ -195,7 +195,7 @@ let () =
 	let grid = Causal.empty_grid() in
         let event_list = [] in
         let profiling,event_list =
-          Compression_main.D.S.PH.B.PB.CI.Po.K.store_init profiling state event_list in
+          Compression_main.secret_store_init profiling state event_list in
         grid,profiling,event_list
       else (Causal.empty_grid(),profiling,[])
     in

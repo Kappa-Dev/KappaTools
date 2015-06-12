@@ -18,7 +18,14 @@
   * et en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
-module D = Dag.Dag 
+module D = Dag.Dag
+type secret_log_info = D.S.PH.B.PB.CI.Po.K.P.log_info
+type secret_step = D.S.PH.B.PB.CI.Po.K.step
+let init_secret_log_info = D.S.PH.B.PB.CI.Po.K.P.init_log_info
+let secret_store_event x y =
+  D.S.PH.B.PB.CI.Po.K.store_event x (D.S.PH.B.PB.CI.Po.K.import_event y)
+let secret_store_obs = D.S.PH.B.PB.CI.Po.K.store_obs
+let secret_store_init = D.S.PH.B.PB.CI.Po.K.store_init
 
 let old_version = false
 let log_step = true
