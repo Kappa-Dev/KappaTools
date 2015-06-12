@@ -88,25 +88,25 @@ type unary_memoized_fun =
 let split_memo error handler =
   let x = handler.Memo_sig.data in 
   error,
-  [ "id:mvbdu_id:",         x.boolean_mvbdu_identity;
-    "not:mvbdu_id:",        x.boolean_mvbdu_not;
-    "clean_head:mvbdu_id:", x.boolean_mvbdu_clean_head;
+  [ "id:",         x.boolean_mvbdu_identity;
+    "not:",        x.boolean_mvbdu_not;
+    "clean_head:", x.boolean_mvbdu_clean_head;
   ],
-  [ "and:mvbdu_id:",     x.boolean_mvbdu_and;
-    "or:mvbdu_id:",      x.boolean_mvbdu_or;
-    "xor:mvbdu_id:",     x.boolean_mvbdu_xor;
-    "nand:mvbdu_id:",    x.boolean_mvbdu_nand; 
-    "<=>:mvbdu_id:",     x.boolean_mvbdu_equiv;
-    "<=:mvbdu_id:",      x.boolean_mvbdu_is_implied;
-    "=>:mvbdu_id:",      x.boolean_mvbdu_imply;
-    "not <=:mvbdu_id:",  x.boolean_mvbdu_nis_implied;
-    "not =>:mvbdu_id:",  x.boolean_mvbdu_nimply;
-    "not:mvbdu_id:",     x.boolean_mvbdu_nor;
-    "fst:mvbdu_id:",     x.boolean_mvbdu_fst;
-    "not fst:mvbdu_id:", x.boolean_mvbdu_nfst;
-    "snd:mvbdu_id:",     x.boolean_mvbdu_snd;
-    "not snd:mvbdu_id:", x.boolean_mvbdu_nsnd; 
-    "reset:mvbdu_id:",   x.boolean_mvbdu_redefine]
+  [ "and:",     x.boolean_mvbdu_and;
+    "or:",      x.boolean_mvbdu_or;
+    "xor:",     x.boolean_mvbdu_xor;
+    "nand:",    x.boolean_mvbdu_nand; 
+    "<=>:",     x.boolean_mvbdu_equiv;
+    "<=:",      x.boolean_mvbdu_is_implied;
+    "=>:",      x.boolean_mvbdu_imply;
+    "not <=:",  x.boolean_mvbdu_nis_implied;
+    "not =>:",  x.boolean_mvbdu_nimply;
+    "not:",     x.boolean_mvbdu_nor;
+    "fst:",     x.boolean_mvbdu_fst;
+    "not fst:", x.boolean_mvbdu_nfst;
+    "snd:",     x.boolean_mvbdu_snd;
+    "not snd:", x.boolean_mvbdu_nsnd; 
+    "reset:",   x.boolean_mvbdu_redefine]
   
 let rec print_cell log prefix cell = 
   match cell with 

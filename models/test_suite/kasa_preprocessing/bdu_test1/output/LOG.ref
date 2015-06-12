@@ -112,14 +112,14 @@ Potential dependencies between sites:
 Potential dependencies between sites:agent_type:0:
 Potential dependencies between sites:Number of covering classes:1
 Potential dependencies between sites:Covering_class_id:0:
-site_type:0->state:[state_min:0; state_max:0]
-site_type:1->state:[state_min:0; state_max:0]
+site_type:0->state_min:{0}
+site_type:1->state_min:{0}
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
-site_type:1->state:[state_min:0; state_max:0]
-site_type:2->state:[state_min:0; state_max:0]
+site_type:1->state_min:{0}
+site_type:2->state_min:{0}
 Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
-site_type:1->state:[state_min:0; state_max:0]
-site_type:2->state:[state_min:0; state_max:0]
+site_type:1->state_min:{0}
+site_type:2->state_min:{0}
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
 {1; 2}
 Flow of information in the ODE semantics:
@@ -138,464 +138,20 @@ var_id:0:agent_type:0:site_type:0:site_state:0
 var_id:0:agent_type:0:site_type:1:site_state:0
 var_id:1
 var_id:1:agent_type:0:site_type:1:site_state:0
-Print cell list (c):
-Node(var:1<0)
- Id=0
-  Leaf True 
-
- Id=1
-  Leaf False 
-
-Print cell list (c):
-Node(var:0<0)
- Id=0
-  Leaf True 
-
- Id=1
-  Leaf False 
-
-Print cell list (c):
-Node(var:0<0)
- Id=0
-  Leaf True 
-
- Id=1
-  Leaf False 
-
-Print skeleton list(c_val):
-Node(var:1<0,branch_true:0,branch_false:1)
-Print skeleton list(c_val):
-Node(var:0<0,branch_true:0,branch_false:1)
-Print skeleton list(c_val):
-Node(var:0<0,branch_true:0,branch_false:1)
-Print cell list (e):
-Node(var:1<0)
- Id=0
-  Leaf True 
-
- Id=0
-  Leaf True 
-
-Print cell list (e):
-Node(var:0<0)
- Id=0
-  Leaf True 
-
- Id=0
-  Leaf True 
-
-Print cell list (e):
-Node(var:0<0)
- Id=0
-  Leaf True 
-
- Id=0
-  Leaf True 
-
-Print skeleton list(e_val):
-Node(var:1<0,branch_true:0,branch_false:0)
-Print skeleton list(e_val):
-Node(var:0<0,branch_true:0,branch_false:0)
-Print skeleton list(e_val):
-Node(var:0<0,branch_true:0,branch_false:0)
 
 Build list(list_a):
 list_id:3:value:[variable:0:site_state:0]
 list_id:2:value:[variable:0:site_state:0]
 list_id:1:value:[variable:1:site_state:0]
-list_id:0:value:[
-EMPTY:
-REDEFINE at a node (c, c_val):
-BDU::mvbdu_redefine: if(mvbdu_id:7) x0 < -1 then 
-BDU::mvbdu_redefine:  false
-BDU::mvbdu_redefine: else 
-BDU::mvbdu_redefine:  if(mvbdu_id:6) x0 < 0 then 
-BDU::mvbdu_redefine:   if(mvbdu_id:5) x1 < -1 then 
-BDU::mvbdu_redefine:    false
-BDU::mvbdu_redefine:   else 
-BDU::mvbdu_redefine:    if(mvbdu_id:4) x1 < 0 then 
-BDU::mvbdu_redefine:     true
-BDU::mvbdu_redefine:    else 
-BDU::mvbdu_redefine:     false
-BDU::mvbdu_redefine:  else 
-BDU::mvbdu_redefine:   false
-BDU::Memoization tables:
-Print Hash_1:
-BDU::Memoization tables:clean_head:mvbdu_id:3:
-BDU::Memoization tables:clean_head:mvbdu_id:3: true
-BDU::Memoization tables:clean_head:mvbdu_id:4:
-BDU::Memoization tables:clean_head:mvbdu_id:4: true
-BDU::Memoization tables:clean_head:mvbdu_id:9:
-BDU::Memoization tables:clean_head:mvbdu_id:9: if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:clean_head:mvbdu_id:9:  true
-BDU::Memoization tables:clean_head:mvbdu_id:9: else 
-BDU::Memoization tables:clean_head:mvbdu_id:9:  false
-Print Hash_2:
-BDU::Memoization tables:or:mvbdu_id:0:
-BDU::Memoization tables:or:mvbdu_id:0:1:
-BDU::Memoization tables:or:mvbdu_id:0:1: true
-BDU::Memoization tables:or:mvbdu_id:1:
-BDU::Memoization tables:or:mvbdu_id:1:0:
-BDU::Memoization tables:or:mvbdu_id:1:0: true
-BDU::Memoization tables:or:mvbdu_id:1:4:
-BDU::Memoization tables:or:mvbdu_id:1:4: if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:or:mvbdu_id:1:4:  true
-BDU::Memoization tables:or:mvbdu_id:1:4: else 
-BDU::Memoization tables:or:mvbdu_id:1:4:  false
-BDU::Memoization tables:or:mvbdu_id:4:
-BDU::Memoization tables:or:mvbdu_id:4:1:
-BDU::Memoization tables:or:mvbdu_id:4:1: if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:or:mvbdu_id:4:1:  true
-BDU::Memoization tables:or:mvbdu_id:4:1: else 
-BDU::Memoization tables:or:mvbdu_id:4:1:  false
-BDU::Memoization tables:reset:mvbdu_id:0:
-BDU::Memoization tables:reset:mvbdu_id:0:1:
-BDU::Memoization tables:reset:mvbdu_id:0:1: if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:0:1:  false
-BDU::Memoization tables:reset:mvbdu_id:0:1: else 
-BDU::Memoization tables:reset:mvbdu_id:0:1:  if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:0:1:   true
-BDU::Memoization tables:reset:mvbdu_id:0:1:  else 
-BDU::Memoization tables:reset:mvbdu_id:0:1:   false
-BDU::Memoization tables:reset:mvbdu_id:0:3:
-BDU::Memoization tables:reset:mvbdu_id:0:3: if(mvbdu_id:7) x0 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:0:3:  false
-BDU::Memoization tables:reset:mvbdu_id:0:3: else 
-BDU::Memoization tables:reset:mvbdu_id:0:3:  if(mvbdu_id:6) x0 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:0:3:   if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:0:3:    false
-BDU::Memoization tables:reset:mvbdu_id:0:3:   else 
-BDU::Memoization tables:reset:mvbdu_id:0:3:    if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:0:3:     true
-BDU::Memoization tables:reset:mvbdu_id:0:3:    else 
-BDU::Memoization tables:reset:mvbdu_id:0:3:     false
-BDU::Memoization tables:reset:mvbdu_id:0:3:  else 
-BDU::Memoization tables:reset:mvbdu_id:0:3:   false
-BDU::Memoization tables:reset:mvbdu_id:1:
-BDU::Memoization tables:reset:mvbdu_id:1:0:
-BDU::Memoization tables:reset:mvbdu_id:1:0: false
-BDU::Memoization tables:reset:mvbdu_id:1:1:
-BDU::Memoization tables:reset:mvbdu_id:1:1: false
-BDU::Memoization tables:reset:mvbdu_id:2:
-BDU::Memoization tables:reset:mvbdu_id:2:1:
-BDU::Memoization tables:reset:mvbdu_id:2:1: if(mvbdu_id:6) x0 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:2:1:  if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:2:1:   false
-BDU::Memoization tables:reset:mvbdu_id:2:1:  else 
-BDU::Memoization tables:reset:mvbdu_id:2:1:   if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:2:1:    true
-BDU::Memoization tables:reset:mvbdu_id:2:1:   else 
-BDU::Memoization tables:reset:mvbdu_id:2:1:    false
-BDU::Memoization tables:reset:mvbdu_id:2:1: else 
-BDU::Memoization tables:reset:mvbdu_id:2:1:  false
-BDU::Memoization tables:reset:mvbdu_id:3:
-BDU::Memoization tables:reset:mvbdu_id:3:1:
-BDU::Memoization tables:reset:mvbdu_id:3:1: if(mvbdu_id:7) x0 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:3:1:  false
-BDU::Memoization tables:reset:mvbdu_id:3:1: else 
-BDU::Memoization tables:reset:mvbdu_id:3:1:  if(mvbdu_id:6) x0 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:3:1:   if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:3:1:    false
-BDU::Memoization tables:reset:mvbdu_id:3:1:   else 
-BDU::Memoization tables:reset:mvbdu_id:3:1:    if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:3:1:     true
-BDU::Memoization tables:reset:mvbdu_id:3:1:    else 
-BDU::Memoization tables:reset:mvbdu_id:3:1:     false
-BDU::Memoization tables:reset:mvbdu_id:3:1:  else 
-BDU::Memoization tables:reset:mvbdu_id:3:1:   false
-BDU::Memoization tables:reset:mvbdu_id:3:2:
-BDU::Memoization tables:reset:mvbdu_id:3:2: if(mvbdu_id:7) x0 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:3:2:  false
-BDU::Memoization tables:reset:mvbdu_id:3:2: else 
-BDU::Memoization tables:reset:mvbdu_id:3:2:  if(mvbdu_id:6) x0 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:3:2:   if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:3:2:    false
-BDU::Memoization tables:reset:mvbdu_id:3:2:   else 
-BDU::Memoization tables:reset:mvbdu_id:3:2:    if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:3:2:     true
-BDU::Memoization tables:reset:mvbdu_id:3:2:    else 
-BDU::Memoization tables:reset:mvbdu_id:3:2:     false
-BDU::Memoization tables:reset:mvbdu_id:3:2:  else 
-BDU::Memoization tables:reset:mvbdu_id:3:2:   false
-BDU::Memoization tables:reset:mvbdu_id:4:
-BDU::Memoization tables:reset:mvbdu_id:4:1:
-BDU::Memoization tables:reset:mvbdu_id:4:1: if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:4:1:  false
-BDU::Memoization tables:reset:mvbdu_id:4:1: else 
-BDU::Memoization tables:reset:mvbdu_id:4:1:  if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:4:1:   true
-BDU::Memoization tables:reset:mvbdu_id:4:1:  else 
-BDU::Memoization tables:reset:mvbdu_id:4:1:   false
-BDU::Memoization tables:reset:mvbdu_id:4:3:
-BDU::Memoization tables:reset:mvbdu_id:4:3: if(mvbdu_id:7) x0 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:4:3:  false
-BDU::Memoization tables:reset:mvbdu_id:4:3: else 
-BDU::Memoization tables:reset:mvbdu_id:4:3:  if(mvbdu_id:6) x0 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:4:3:   if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:4:3:    false
-BDU::Memoization tables:reset:mvbdu_id:4:3:   else 
-BDU::Memoization tables:reset:mvbdu_id:4:3:    if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:4:3:     true
-BDU::Memoization tables:reset:mvbdu_id:4:3:    else 
-BDU::Memoization tables:reset:mvbdu_id:4:3:     false
-BDU::Memoization tables:reset:mvbdu_id:4:3:  else 
-BDU::Memoization tables:reset:mvbdu_id:4:3:   false
-BDU::Memoization tables:reset:mvbdu_id:5:
-BDU::Memoization tables:reset:mvbdu_id:5:0:
-BDU::Memoization tables:reset:mvbdu_id:5:0: if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:5:0:  false
-BDU::Memoization tables:reset:mvbdu_id:5:0: else 
-BDU::Memoization tables:reset:mvbdu_id:5:0:  if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:5:0:   true
-BDU::Memoization tables:reset:mvbdu_id:5:0:  else 
-BDU::Memoization tables:reset:mvbdu_id:5:0:   false
-BDU::Memoization tables:reset:mvbdu_id:8:
-BDU::Memoization tables:reset:mvbdu_id:8:1:
-BDU::Memoization tables:reset:mvbdu_id:8:1: if(mvbdu_id:6) x0 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:8:1:  if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:8:1:   false
-BDU::Memoization tables:reset:mvbdu_id:8:1:  else 
-BDU::Memoization tables:reset:mvbdu_id:8:1:   if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:8:1:    true
-BDU::Memoization tables:reset:mvbdu_id:8:1:   else 
-BDU::Memoization tables:reset:mvbdu_id:8:1:    false
-BDU::Memoization tables:reset:mvbdu_id:8:1: else 
-BDU::Memoization tables:reset:mvbdu_id:8:1:  false
-BDU::Memoization tables:reset:mvbdu_id:9:
-BDU::Memoization tables:reset:mvbdu_id:9:1:
-BDU::Memoization tables:reset:mvbdu_id:9:1: if(mvbdu_id:7) x0 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:9:1:  false
-BDU::Memoization tables:reset:mvbdu_id:9:1: else 
-BDU::Memoization tables:reset:mvbdu_id:9:1:  if(mvbdu_id:6) x0 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:9:1:   if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:9:1:    false
-BDU::Memoization tables:reset:mvbdu_id:9:1:   else 
-BDU::Memoization tables:reset:mvbdu_id:9:1:    if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:9:1:     true
-BDU::Memoization tables:reset:mvbdu_id:9:1:    else 
-BDU::Memoization tables:reset:mvbdu_id:9:1:     false
-BDU::Memoization tables:reset:mvbdu_id:9:1:  else 
-BDU::Memoization tables:reset:mvbdu_id:9:1:   false
-BDU::Memoization tables:reset:mvbdu_id:9:2:
-BDU::Memoization tables:reset:mvbdu_id:9:2: if(mvbdu_id:7) x0 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:9:2:  false
-BDU::Memoization tables:reset:mvbdu_id:9:2: else 
-BDU::Memoization tables:reset:mvbdu_id:9:2:  if(mvbdu_id:6) x0 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:9:2:   if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:9:2:    false
-BDU::Memoization tables:reset:mvbdu_id:9:2:   else 
-BDU::Memoization tables:reset:mvbdu_id:9:2:    if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:9:2:     true
-BDU::Memoization tables:reset:mvbdu_id:9:2:    else 
-BDU::Memoization tables:reset:mvbdu_id:9:2:     false
-BDU::Memoization tables:reset:mvbdu_id:9:2:  else 
-BDU::Memoization tables:reset:mvbdu_id:9:2:   false
-
-EMPTY:
-REDEFINE at a node (e, e_val):
-BDU::mvbdu_redefine: if(mvbdu_id:7) x0 < -1 then 
-BDU::mvbdu_redefine:  false
-BDU::mvbdu_redefine: else 
-BDU::mvbdu_redefine:  if(mvbdu_id:6) x0 < 0 then 
-BDU::mvbdu_redefine:   if(mvbdu_id:5) x1 < -1 then 
-BDU::mvbdu_redefine:    false
-BDU::mvbdu_redefine:   else 
-BDU::mvbdu_redefine:    if(mvbdu_id:4) x1 < 0 then 
-BDU::mvbdu_redefine:     true
-BDU::mvbdu_redefine:    else 
-BDU::mvbdu_redefine:     false
-BDU::mvbdu_redefine:  else 
-BDU::mvbdu_redefine:   false
-BDU::Memoization tables:
-Print Hash_1:
-BDU::Memoization tables:clean_head:mvbdu_id:3:
-BDU::Memoization tables:clean_head:mvbdu_id:3: true
-BDU::Memoization tables:clean_head:mvbdu_id:8:
-BDU::Memoization tables:clean_head:mvbdu_id:8: true
-BDU::Memoization tables:clean_head:mvbdu_id:10:
-BDU::Memoization tables:clean_head:mvbdu_id:10: if(mvbdu_id:8) x1 < 0 then 
-BDU::Memoization tables:clean_head:mvbdu_id:10:  true
-BDU::Memoization tables:clean_head:mvbdu_id:10: else 
-BDU::Memoization tables:clean_head:mvbdu_id:10:  true
-Print Hash_2:
-BDU::Memoization tables:or:mvbdu_id:0:
-BDU::Memoization tables:or:mvbdu_id:0:0:
-BDU::Memoization tables:or:mvbdu_id:0:0: true
-BDU::Memoization tables:or:mvbdu_id:0:1:
-BDU::Memoization tables:or:mvbdu_id:0:1: true
-BDU::Memoization tables:or:mvbdu_id:1:
-BDU::Memoization tables:or:mvbdu_id:1:0:
-BDU::Memoization tables:or:mvbdu_id:1:0: true
-BDU::Memoization tables:or:mvbdu_id:1:8:
-BDU::Memoization tables:or:mvbdu_id:1:8: if(mvbdu_id:8) x1 < 0 then 
-BDU::Memoization tables:or:mvbdu_id:1:8:  true
-BDU::Memoization tables:or:mvbdu_id:1:8: else 
-BDU::Memoization tables:or:mvbdu_id:1:8:  true
-BDU::Memoization tables:or:mvbdu_id:8:
-BDU::Memoization tables:or:mvbdu_id:8:1:
-BDU::Memoization tables:or:mvbdu_id:8:1: if(mvbdu_id:8) x1 < 0 then 
-BDU::Memoization tables:or:mvbdu_id:8:1:  true
-BDU::Memoization tables:or:mvbdu_id:8:1: else 
-BDU::Memoization tables:or:mvbdu_id:8:1:  true
-BDU::Memoization tables:reset:mvbdu_id:0:
-BDU::Memoization tables:reset:mvbdu_id:0:1:
-BDU::Memoization tables:reset:mvbdu_id:0:1: if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:0:1:  false
-BDU::Memoization tables:reset:mvbdu_id:0:1: else 
-BDU::Memoization tables:reset:mvbdu_id:0:1:  if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:0:1:   true
-BDU::Memoization tables:reset:mvbdu_id:0:1:  else 
-BDU::Memoization tables:reset:mvbdu_id:0:1:   false
-BDU::Memoization tables:reset:mvbdu_id:0:3:
-BDU::Memoization tables:reset:mvbdu_id:0:3: if(mvbdu_id:7) x0 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:0:3:  false
-BDU::Memoization tables:reset:mvbdu_id:0:3: else 
-BDU::Memoization tables:reset:mvbdu_id:0:3:  if(mvbdu_id:6) x0 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:0:3:   if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:0:3:    false
-BDU::Memoization tables:reset:mvbdu_id:0:3:   else 
-BDU::Memoization tables:reset:mvbdu_id:0:3:    if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:0:3:     true
-BDU::Memoization tables:reset:mvbdu_id:0:3:    else 
-BDU::Memoization tables:reset:mvbdu_id:0:3:     false
-BDU::Memoization tables:reset:mvbdu_id:0:3:  else 
-BDU::Memoization tables:reset:mvbdu_id:0:3:   false
-BDU::Memoization tables:reset:mvbdu_id:1:
-BDU::Memoization tables:reset:mvbdu_id:1:0:
-BDU::Memoization tables:reset:mvbdu_id:1:0: false
-BDU::Memoization tables:reset:mvbdu_id:1:1:
-BDU::Memoization tables:reset:mvbdu_id:1:1: false
-BDU::Memoization tables:reset:mvbdu_id:2:
-BDU::Memoization tables:reset:mvbdu_id:2:1:
-BDU::Memoization tables:reset:mvbdu_id:2:1: if(mvbdu_id:6) x0 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:2:1:  if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:2:1:   false
-BDU::Memoization tables:reset:mvbdu_id:2:1:  else 
-BDU::Memoization tables:reset:mvbdu_id:2:1:   if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:2:1:    true
-BDU::Memoization tables:reset:mvbdu_id:2:1:   else 
-BDU::Memoization tables:reset:mvbdu_id:2:1:    false
-BDU::Memoization tables:reset:mvbdu_id:2:1: else 
-BDU::Memoization tables:reset:mvbdu_id:2:1:  false
-BDU::Memoization tables:reset:mvbdu_id:3:
-BDU::Memoization tables:reset:mvbdu_id:3:1:
-BDU::Memoization tables:reset:mvbdu_id:3:1: if(mvbdu_id:7) x0 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:3:1:  false
-BDU::Memoization tables:reset:mvbdu_id:3:1: else 
-BDU::Memoization tables:reset:mvbdu_id:3:1:  if(mvbdu_id:6) x0 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:3:1:   if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:3:1:    false
-BDU::Memoization tables:reset:mvbdu_id:3:1:   else 
-BDU::Memoization tables:reset:mvbdu_id:3:1:    if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:3:1:     true
-BDU::Memoization tables:reset:mvbdu_id:3:1:    else 
-BDU::Memoization tables:reset:mvbdu_id:3:1:     false
-BDU::Memoization tables:reset:mvbdu_id:3:1:  else 
-BDU::Memoization tables:reset:mvbdu_id:3:1:   false
-BDU::Memoization tables:reset:mvbdu_id:3:2:
-BDU::Memoization tables:reset:mvbdu_id:3:2: if(mvbdu_id:7) x0 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:3:2:  false
-BDU::Memoization tables:reset:mvbdu_id:3:2: else 
-BDU::Memoization tables:reset:mvbdu_id:3:2:  if(mvbdu_id:6) x0 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:3:2:   if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:3:2:    false
-BDU::Memoization tables:reset:mvbdu_id:3:2:   else 
-BDU::Memoization tables:reset:mvbdu_id:3:2:    if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:3:2:     true
-BDU::Memoization tables:reset:mvbdu_id:3:2:    else 
-BDU::Memoization tables:reset:mvbdu_id:3:2:     false
-BDU::Memoization tables:reset:mvbdu_id:3:2:  else 
-BDU::Memoization tables:reset:mvbdu_id:3:2:   false
-BDU::Memoization tables:reset:mvbdu_id:4:
-BDU::Memoization tables:reset:mvbdu_id:4:1:
-BDU::Memoization tables:reset:mvbdu_id:4:1: if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:4:1:  false
-BDU::Memoization tables:reset:mvbdu_id:4:1: else 
-BDU::Memoization tables:reset:mvbdu_id:4:1:  if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:4:1:   true
-BDU::Memoization tables:reset:mvbdu_id:4:1:  else 
-BDU::Memoization tables:reset:mvbdu_id:4:1:   false
-BDU::Memoization tables:reset:mvbdu_id:5:
-BDU::Memoization tables:reset:mvbdu_id:5:0:
-BDU::Memoization tables:reset:mvbdu_id:5:0: if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:5:0:  false
-BDU::Memoization tables:reset:mvbdu_id:5:0: else 
-BDU::Memoization tables:reset:mvbdu_id:5:0:  if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:5:0:   true
-BDU::Memoization tables:reset:mvbdu_id:5:0:  else 
-BDU::Memoization tables:reset:mvbdu_id:5:0:   false
-BDU::Memoization tables:reset:mvbdu_id:8:
-BDU::Memoization tables:reset:mvbdu_id:8:1:
-BDU::Memoization tables:reset:mvbdu_id:8:1: if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:8:1:  false
-BDU::Memoization tables:reset:mvbdu_id:8:1: else 
-BDU::Memoization tables:reset:mvbdu_id:8:1:  if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:8:1:   true
-BDU::Memoization tables:reset:mvbdu_id:8:1:  else 
-BDU::Memoization tables:reset:mvbdu_id:8:1:   false
-BDU::Memoization tables:reset:mvbdu_id:8:3:
-BDU::Memoization tables:reset:mvbdu_id:8:3: if(mvbdu_id:7) x0 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:8:3:  false
-BDU::Memoization tables:reset:mvbdu_id:8:3: else 
-BDU::Memoization tables:reset:mvbdu_id:8:3:  if(mvbdu_id:6) x0 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:8:3:   if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:8:3:    false
-BDU::Memoization tables:reset:mvbdu_id:8:3:   else 
-BDU::Memoization tables:reset:mvbdu_id:8:3:    if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:8:3:     true
-BDU::Memoization tables:reset:mvbdu_id:8:3:    else 
-BDU::Memoization tables:reset:mvbdu_id:8:3:     false
-BDU::Memoization tables:reset:mvbdu_id:8:3:  else 
-BDU::Memoization tables:reset:mvbdu_id:8:3:   false
-BDU::Memoization tables:reset:mvbdu_id:9:
-BDU::Memoization tables:reset:mvbdu_id:9:1:
-BDU::Memoization tables:reset:mvbdu_id:9:1: if(mvbdu_id:6) x0 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:9:1:  if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:9:1:   false
-BDU::Memoization tables:reset:mvbdu_id:9:1:  else 
-BDU::Memoization tables:reset:mvbdu_id:9:1:   if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:9:1:    true
-BDU::Memoization tables:reset:mvbdu_id:9:1:   else 
-BDU::Memoization tables:reset:mvbdu_id:9:1:    false
-BDU::Memoization tables:reset:mvbdu_id:9:1: else 
-BDU::Memoization tables:reset:mvbdu_id:9:1:  false
-BDU::Memoization tables:reset:mvbdu_id:10:
-BDU::Memoization tables:reset:mvbdu_id:10:1:
-BDU::Memoization tables:reset:mvbdu_id:10:1: if(mvbdu_id:7) x0 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:10:1:  false
-BDU::Memoization tables:reset:mvbdu_id:10:1: else 
-BDU::Memoization tables:reset:mvbdu_id:10:1:  if(mvbdu_id:6) x0 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:10:1:   if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:10:1:    false
-BDU::Memoization tables:reset:mvbdu_id:10:1:   else 
-BDU::Memoization tables:reset:mvbdu_id:10:1:    if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:10:1:     true
-BDU::Memoization tables:reset:mvbdu_id:10:1:    else 
-BDU::Memoization tables:reset:mvbdu_id:10:1:     false
-BDU::Memoization tables:reset:mvbdu_id:10:1:  else 
-BDU::Memoization tables:reset:mvbdu_id:10:1:   false
-BDU::Memoization tables:reset:mvbdu_id:10:2:
-BDU::Memoization tables:reset:mvbdu_id:10:2: if(mvbdu_id:7) x0 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:10:2:  false
-BDU::Memoization tables:reset:mvbdu_id:10:2: else 
-BDU::Memoization tables:reset:mvbdu_id:10:2:  if(mvbdu_id:6) x0 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:10:2:   if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:10:2:    false
-BDU::Memoization tables:reset:mvbdu_id:10:2:   else 
-BDU::Memoization tables:reset:mvbdu_id:10:2:    if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:10:2:     true
-BDU::Memoization tables:reset:mvbdu_id:10:2:    else 
-BDU::Memoization tables:reset:mvbdu_id:10:2:     false
-BDU::Memoization tables:reset:mvbdu_id:10:2:  else 
-BDU::Memoization tables:reset:mvbdu_id:10:2:   false
-BDU::mvbdu_redefine_list_a: if(mvbdu_id:7) x0 < -1 then 
+list_id:0:
+BDU::mvbdu_redefine_list_a: if(mvbdu_id:7) x0 < 0 then 
 BDU::mvbdu_redefine_list_a:  false
 BDU::mvbdu_redefine_list_a: else 
-BDU::mvbdu_redefine_list_a:  if(mvbdu_id:6) x0 < 0 then 
-BDU::mvbdu_redefine_list_a:   if(mvbdu_id:5) x1 < -1 then 
+BDU::mvbdu_redefine_list_a:  if(mvbdu_id:6) x0 < 1 then 
+BDU::mvbdu_redefine_list_a:   if(mvbdu_id:5) x1 < 0 then 
 BDU::mvbdu_redefine_list_a:    false
 BDU::mvbdu_redefine_list_a:   else 
-BDU::mvbdu_redefine_list_a:    if(mvbdu_id:4) x1 < 0 then 
+BDU::mvbdu_redefine_list_a:    if(mvbdu_id:4) x1 < 1 then 
 BDU::mvbdu_redefine_list_a:     true
 BDU::mvbdu_redefine_list_a:    else 
 BDU::mvbdu_redefine_list_a:     false
@@ -603,104 +159,93 @@ BDU::mvbdu_redefine_list_a:  else
 BDU::mvbdu_redefine_list_a:   false
 BDU::Memoization tables:
 Print Hash_1:
-BDU::Memoization tables:clean_head:mvbdu_id:3:
-BDU::Memoization tables:clean_head:mvbdu_id:3: true
+BDU::Memoization tables:clean_head:3:
+BDU::Memoization tables:clean_head:3: true
 Print Hash_2:
-BDU::Memoization tables:or:mvbdu_id:0:
-BDU::Memoization tables:or:mvbdu_id:0:0:
-BDU::Memoization tables:or:mvbdu_id:0:0: true
-BDU::Memoization tables:or:mvbdu_id:0:1:
-BDU::Memoization tables:or:mvbdu_id:0:1: true
-BDU::Memoization tables:or:mvbdu_id:1:
-BDU::Memoization tables:or:mvbdu_id:1:0:
-BDU::Memoization tables:or:mvbdu_id:1:0: true
-BDU::Memoization tables:reset:mvbdu_id:0:
-BDU::Memoization tables:reset:mvbdu_id:0:1:
-BDU::Memoization tables:reset:mvbdu_id:0:1: if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:0:1:  false
-BDU::Memoization tables:reset:mvbdu_id:0:1: else 
-BDU::Memoization tables:reset:mvbdu_id:0:1:  if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:0:1:   true
-BDU::Memoization tables:reset:mvbdu_id:0:1:  else 
-BDU::Memoization tables:reset:mvbdu_id:0:1:   false
-BDU::Memoization tables:reset:mvbdu_id:0:3:
-BDU::Memoization tables:reset:mvbdu_id:0:3: if(mvbdu_id:7) x0 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:0:3:  false
-BDU::Memoization tables:reset:mvbdu_id:0:3: else 
-BDU::Memoization tables:reset:mvbdu_id:0:3:  if(mvbdu_id:6) x0 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:0:3:   if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:0:3:    false
-BDU::Memoization tables:reset:mvbdu_id:0:3:   else 
-BDU::Memoization tables:reset:mvbdu_id:0:3:    if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:0:3:     true
-BDU::Memoization tables:reset:mvbdu_id:0:3:    else 
-BDU::Memoization tables:reset:mvbdu_id:0:3:     false
-BDU::Memoization tables:reset:mvbdu_id:0:3:  else 
-BDU::Memoization tables:reset:mvbdu_id:0:3:   false
-BDU::Memoization tables:reset:mvbdu_id:1:
-BDU::Memoization tables:reset:mvbdu_id:1:0:
-BDU::Memoization tables:reset:mvbdu_id:1:0: false
-BDU::Memoization tables:reset:mvbdu_id:1:1:
-BDU::Memoization tables:reset:mvbdu_id:1:1: false
-BDU::Memoization tables:reset:mvbdu_id:2:
-BDU::Memoization tables:reset:mvbdu_id:2:1:
-BDU::Memoization tables:reset:mvbdu_id:2:1: if(mvbdu_id:6) x0 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:2:1:  if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:2:1:   false
-BDU::Memoization tables:reset:mvbdu_id:2:1:  else 
-BDU::Memoization tables:reset:mvbdu_id:2:1:   if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:2:1:    true
-BDU::Memoization tables:reset:mvbdu_id:2:1:   else 
-BDU::Memoization tables:reset:mvbdu_id:2:1:    false
-BDU::Memoization tables:reset:mvbdu_id:2:1: else 
-BDU::Memoization tables:reset:mvbdu_id:2:1:  false
-BDU::Memoization tables:reset:mvbdu_id:3:
-BDU::Memoization tables:reset:mvbdu_id:3:1:
-BDU::Memoization tables:reset:mvbdu_id:3:1: if(mvbdu_id:7) x0 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:3:1:  false
-BDU::Memoization tables:reset:mvbdu_id:3:1: else 
-BDU::Memoization tables:reset:mvbdu_id:3:1:  if(mvbdu_id:6) x0 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:3:1:   if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:3:1:    false
-BDU::Memoization tables:reset:mvbdu_id:3:1:   else 
-BDU::Memoization tables:reset:mvbdu_id:3:1:    if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:3:1:     true
-BDU::Memoization tables:reset:mvbdu_id:3:1:    else 
-BDU::Memoization tables:reset:mvbdu_id:3:1:     false
-BDU::Memoization tables:reset:mvbdu_id:3:1:  else 
-BDU::Memoization tables:reset:mvbdu_id:3:1:   false
-BDU::Memoization tables:reset:mvbdu_id:3:2:
-BDU::Memoization tables:reset:mvbdu_id:3:2: if(mvbdu_id:7) x0 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:3:2:  false
-BDU::Memoization tables:reset:mvbdu_id:3:2: else 
-BDU::Memoization tables:reset:mvbdu_id:3:2:  if(mvbdu_id:6) x0 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:3:2:   if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:3:2:    false
-BDU::Memoization tables:reset:mvbdu_id:3:2:   else 
-BDU::Memoization tables:reset:mvbdu_id:3:2:    if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:3:2:     true
-BDU::Memoization tables:reset:mvbdu_id:3:2:    else 
-BDU::Memoization tables:reset:mvbdu_id:3:2:     false
-BDU::Memoization tables:reset:mvbdu_id:3:2:  else 
-BDU::Memoization tables:reset:mvbdu_id:3:2:   false
-BDU::Memoization tables:reset:mvbdu_id:4:
-BDU::Memoization tables:reset:mvbdu_id:4:1:
-BDU::Memoization tables:reset:mvbdu_id:4:1: if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:4:1:  false
-BDU::Memoization tables:reset:mvbdu_id:4:1: else 
-BDU::Memoization tables:reset:mvbdu_id:4:1:  if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:4:1:   true
-BDU::Memoization tables:reset:mvbdu_id:4:1:  else 
-BDU::Memoization tables:reset:mvbdu_id:4:1:   false
-BDU::Memoization tables:reset:mvbdu_id:5:
-BDU::Memoization tables:reset:mvbdu_id:5:0:
-BDU::Memoization tables:reset:mvbdu_id:5:0: if(mvbdu_id:5) x1 < -1 then 
-BDU::Memoization tables:reset:mvbdu_id:5:0:  false
-BDU::Memoization tables:reset:mvbdu_id:5:0: else 
-BDU::Memoization tables:reset:mvbdu_id:5:0:  if(mvbdu_id:4) x1 < 0 then 
-BDU::Memoization tables:reset:mvbdu_id:5:0:   true
-BDU::Memoization tables:reset:mvbdu_id:5:0:  else 
-BDU::Memoization tables:reset:mvbdu_id:5:0:   false
+BDU::Memoization tables:or:0:
+BDU::Memoization tables:or:0:1:
+BDU::Memoization tables:or:0:1: true
+BDU::Memoization tables:or:1:
+BDU::Memoization tables:or:1:0:
+BDU::Memoization tables:or:1:0: true
+BDU::Memoization tables:reset:0:
+BDU::Memoization tables:reset:0:1:
+BDU::Memoization tables:reset:0:1: if(mvbdu_id:5) x1 < 0 then 
+BDU::Memoization tables:reset:0:1:  false
+BDU::Memoization tables:reset:0:1: else 
+BDU::Memoization tables:reset:0:1:  if(mvbdu_id:4) x1 < 1 then 
+BDU::Memoization tables:reset:0:1:   true
+BDU::Memoization tables:reset:0:1:  else 
+BDU::Memoization tables:reset:0:1:   false
+BDU::Memoization tables:reset:0:3:
+BDU::Memoization tables:reset:0:3: if(mvbdu_id:7) x0 < 0 then 
+BDU::Memoization tables:reset:0:3:  false
+BDU::Memoization tables:reset:0:3: else 
+BDU::Memoization tables:reset:0:3:  if(mvbdu_id:6) x0 < 1 then 
+BDU::Memoization tables:reset:0:3:   if(mvbdu_id:5) x1 < 0 then 
+BDU::Memoization tables:reset:0:3:    false
+BDU::Memoization tables:reset:0:3:   else 
+BDU::Memoization tables:reset:0:3:    if(mvbdu_id:4) x1 < 1 then 
+BDU::Memoization tables:reset:0:3:     true
+BDU::Memoization tables:reset:0:3:    else 
+BDU::Memoization tables:reset:0:3:     false
+BDU::Memoization tables:reset:0:3:  else 
+BDU::Memoization tables:reset:0:3:   false
+BDU::Memoization tables:reset:1:
+BDU::Memoization tables:reset:1:0:
+BDU::Memoization tables:reset:1:0: false
+BDU::Memoization tables:reset:1:1:
+BDU::Memoization tables:reset:1:1: false
+BDU::Memoization tables:reset:2:
+BDU::Memoization tables:reset:2:1:
+BDU::Memoization tables:reset:2:1: if(mvbdu_id:6) x0 < 1 then 
+BDU::Memoization tables:reset:2:1:  if(mvbdu_id:5) x1 < 0 then 
+BDU::Memoization tables:reset:2:1:   false
+BDU::Memoization tables:reset:2:1:  else 
+BDU::Memoization tables:reset:2:1:   if(mvbdu_id:4) x1 < 1 then 
+BDU::Memoization tables:reset:2:1:    true
+BDU::Memoization tables:reset:2:1:   else 
+BDU::Memoization tables:reset:2:1:    false
+BDU::Memoization tables:reset:2:1: else 
+BDU::Memoization tables:reset:2:1:  false
+BDU::Memoization tables:reset:3:
+BDU::Memoization tables:reset:3:1:
+BDU::Memoization tables:reset:3:1: if(mvbdu_id:7) x0 < 0 then 
+BDU::Memoization tables:reset:3:1:  false
+BDU::Memoization tables:reset:3:1: else 
+BDU::Memoization tables:reset:3:1:  if(mvbdu_id:6) x0 < 1 then 
+BDU::Memoization tables:reset:3:1:   if(mvbdu_id:5) x1 < 0 then 
+BDU::Memoization tables:reset:3:1:    false
+BDU::Memoization tables:reset:3:1:   else 
+BDU::Memoization tables:reset:3:1:    if(mvbdu_id:4) x1 < 1 then 
+BDU::Memoization tables:reset:3:1:     true
+BDU::Memoization tables:reset:3:1:    else 
+BDU::Memoization tables:reset:3:1:     false
+BDU::Memoization tables:reset:3:1:  else 
+BDU::Memoization tables:reset:3:1:   false
+BDU::Memoization tables:reset:3:2:
+BDU::Memoization tables:reset:3:2: if(mvbdu_id:7) x0 < 0 then 
+BDU::Memoization tables:reset:3:2:  false
+BDU::Memoization tables:reset:3:2: else 
+BDU::Memoization tables:reset:3:2:  if(mvbdu_id:6) x0 < 1 then 
+BDU::Memoization tables:reset:3:2:   if(mvbdu_id:5) x1 < 0 then 
+BDU::Memoization tables:reset:3:2:    false
+BDU::Memoization tables:reset:3:2:   else 
+BDU::Memoization tables:reset:3:2:    if(mvbdu_id:4) x1 < 1 then 
+BDU::Memoization tables:reset:3:2:     true
+BDU::Memoization tables:reset:3:2:    else 
+BDU::Memoization tables:reset:3:2:     false
+BDU::Memoization tables:reset:3:2:  else 
+BDU::Memoization tables:reset:3:2:   false
+BDU::Memoization tables:reset:5:
+BDU::Memoization tables:reset:5:0:
+BDU::Memoization tables:reset:5:0: if(mvbdu_id:5) x1 < 0 then 
+BDU::Memoization tables:reset:5:0:  false
+BDU::Memoization tables:reset:5:0: else 
+BDU::Memoization tables:reset:5:0:  if(mvbdu_id:4) x1 < 1 then 
+BDU::Memoization tables:reset:5:0:   true
+BDU::Memoization tables:reset:5:0:  else 
+BDU::Memoization tables:reset:5:0:   false
 Mvbdu.002: ok
 Mvbdu.003: ok
 Mvbdu.004: ok

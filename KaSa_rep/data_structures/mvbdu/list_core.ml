@@ -32,7 +32,11 @@ let get_skeleton prelist =
           List_sig.tail = get_hash_key x.List_sig.tail}
         
 let build_list (allocate:('a,'b,'c) Sanity_test_sig.g) error handler skeleton cell = 
-  allocate error compare skeleton cell
+  allocate 
+    error
+    compare 
+    skeleton
+    cell
     (fun key -> {List_sig.id = key; List_sig.value = cell})
     handler  
 

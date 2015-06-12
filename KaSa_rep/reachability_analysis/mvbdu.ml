@@ -256,11 +256,11 @@ let scan_rule_set parameter error kappa_handler rules =
 
 let rec print_a_list (l: int List_sig.list) =
   Printf.fprintf stdout "list_id:%i:" l.List_sig.id;
-  Printf.fprintf stdout "value:[";
   let v = l.List_sig.value in
   match v with
-    | List_sig.Empty -> ()
+    | List_sig.Empty -> print_string "\n"
     | List_sig.Cons precell ->
+      Printf.fprintf stdout "value:[";
       print_precell precell
       (*Printf.fprintf stdout "\n"*)
       
@@ -320,6 +320,7 @@ let scan_var_set parameter error kappa_handler vars result_rules =
         let a_val = Mvbdu_sig.Leaf true in
         let b_val = Mvbdu_sig.Leaf false in
         (*build bdu_a from a_val;
+          'b: memo_tables; 'a: mvbdu_dic; 'c: list_dic; bool, int.
           a', a'_id: output of build_already_compressed_cell;
           a'', a''_id: output of compress_node
         *)
@@ -350,102 +351,6 @@ let scan_var_set parameter error kappa_handler vars result_rules =
             handler
             b_val (*bdu_skel*)
             b_val (*bdu_val*)
-        in
-        (*---------------------------------------------------------------------------*)
-        (*Build a list of node (each variable-state) in a list of pair,
-          where branch_true = leaf a (true); branch_false= leaf b (false)*)
-        let build_node_c_list =
-          let rec aux acc =
-            match acc with
-              | [] -> []
-              | (x, y) :: tl ->
-                let node =
-                  Mvbdu_sig.Node
-                    {
-                      Mvbdu_sig.variable = x;
-                      Mvbdu_sig.upper_bound = y;
-                      Mvbdu_sig.branch_true = a';
-                      Mvbdu_sig.branch_false = b'
-                    }
-                in
-                let _ =
-                  Printf.fprintf stdout "Print cell list (c):\n";
-                  Boolean_mvbdu.print_cell stdout "" node
-                in
-                node :: aux tl
-          in
-          aux pair_list
-        in
-        (*Build a list of list_val*)
-        let build_node_list_c_val =
-          let rec aux acc =
-            match acc with
-              | [] -> []
-              | (x, y) :: tl ->
-                let node = 
-                  Mvbdu_sig.Node
-                    {
-                      Mvbdu_sig.variable = x;
-                      Mvbdu_sig.upper_bound = y;
-                      Mvbdu_sig.branch_true = a'_id;
-                      Mvbdu_sig.branch_false = b'_id
-                    }
-                in
-                let _ =
-                  Printf.fprintf stdout "Print skeleton list(c_val):\n";
-                  Boolean_mvbdu.print_skeleton stdout "" node
-                in
-                node :: aux tl
-          in
-          aux pair_list
-        in
-        (*---------------------------------------------------------------------------*)
-        (*Build a list of node (each variable-state) in a list of pair,
-          where branch_true = leaf a (true); branch_false= leaf a (true)*)
-        let build_node_e_list =
-          let rec aux acc =
-            match acc with
-              | [] -> []
-              | (x, y) :: tl ->
-                let node =
-                  Mvbdu_sig.Node
-                    {
-                      Mvbdu_sig.variable = x;
-                      Mvbdu_sig.upper_bound = y;
-                      Mvbdu_sig.branch_true = a';
-                      Mvbdu_sig.branch_false = a'
-                    }
-                in
-                let _ =
-                  Printf.fprintf stdout "Print cell list (e):\n";
-                  Boolean_mvbdu.print_cell stdout "" node
-                in
-                node :: aux tl
-          in
-          aux pair_list
-        in
-        (*Build a list of list_val*)
-        let build_node_list_e_val =
-          let rec aux acc =
-            match acc with
-              | [] -> []
-              | (x, y) :: tl ->
-                let node = 
-                  Mvbdu_sig.Node
-                    {
-                      Mvbdu_sig.variable = x;
-                      Mvbdu_sig.upper_bound = y;
-                      Mvbdu_sig.branch_true = a'_id;
-                      Mvbdu_sig.branch_false = a'_id
-                    }
-                in
-                let _ =
-                  Printf.fprintf stdout "Print skeleton list(e_val):\n";
-                  Boolean_mvbdu.print_skeleton stdout "" node
-                in
-                node :: aux tl
-          in
-          aux pair_list
         in
         (*---------------------------------------------------------------------------*)
         (*compute bdu relation*)
@@ -519,106 +424,6 @@ let scan_var_set parameter error kappa_handler vars result_rules =
           f (Boolean_mvbdu.redefine parameter error parameter handler a') list_a
         in
         (*---------------------------------------------------------------------------*)
-        (*Build a list of redefine from list_a*)
-        let result_c_list =
-          let rec aux acc acc' =
-            match acc, acc' with
-              | [], [] -> Printf.fprintf stdout "\nEMPTY:\n"; []
-              | c :: tl, c_val :: tl_val ->
-                let error, handler, c', c'_id, c'', c''_id =
-                  Mvbdu_test.build_without_and_with_compressing
-                    allocate
-                    error
-                    handler
-                    c_val (*bdu_skel*)
-                    c (*bdu_val*)
-                in
-                (*Build for the whole list*)
-                (handler, c', c'_id, c'', c''_id) :: aux tl tl_val
-          in
-          aux build_node_c_list build_node_list_c_val
-        in
-        (*PRINT bdu redefine at each node (list_id)*)
-        let print_result_c_list =
-          let rec aux acc =
-            match acc with
-              | [] -> ()
-              | (handler, c', c'_id, c'', c''_id) :: _ ->
-                (*compute redefine of l' in list_a*)
-                let error, handler, mvbdu_redefine_c =
-                  f (Boolean_mvbdu.redefine parameter error parameter handler c') list_a
-                in
-                (*PRINT*)
-                let error =
-                  Printf.fprintf stdout "REDEFINE at a node (c, c_val):\n";
-                  Boolean_mvbdu.print_boolean_mvbdu
-                    error
-                    (Remanent_parameters.update_prefix parameter "mvbdu_redefine:")
-                    mvbdu_redefine_c
-                in
-                (*PRINT memoization tables*)
-                let error =
-                  Boolean_mvbdu.print_memo
-                    error
-                    handler
-                    (Remanent_parameters.update_prefix parameter "Memoization tables:")
-                in
-                ()
-                (*aux tl*) 
-          in
-          aux result_c_list          
-        in
-        (*---------------------------------------------------------------------------*)
-        (*Build a list of redefine e from list_a*)
-        let result_e_list =
-          let rec aux acc acc' =
-            match acc, acc' with
-              | [], [] -> Printf.fprintf stdout "\nEMPTY:\n"; []
-              | e :: tl, e_val :: tl_val ->
-                let error, handler, e', e'_id, e'', e''_id =
-                  Mvbdu_test.build_without_and_with_compressing
-                    allocate
-                    error
-                    handler
-                    e_val (*bdu_skel*)
-                    e (*bdu_val*)
-                in
-                (*Build for the whole list*)
-                (handler, e', e'_id, e'', e''_id) :: aux tl tl_val
-          in
-          aux build_node_e_list build_node_list_e_val
-        in
-        (*PRINT bdu redefine at each node (list_id)*)
-        let print_result_e_list =
-          let rec aux acc =
-            match acc with
-              | [] -> ()
-              | (handler, e', e'_id, e'', e''_id) :: _ ->
-                (*compute redefine of l' in list_a*)
-                let error, handler, mvbdu_redefine_e =
-                  f (Boolean_mvbdu.redefine parameter error parameter handler e') list_a
-                in
-                (*PRINT*)
-                let error =
-                  Printf.fprintf stdout "REDEFINE at a node (e, e_val):\n";
-                  Boolean_mvbdu.print_boolean_mvbdu
-                    error
-                    (Remanent_parameters.update_prefix parameter "mvbdu_redefine:")
-                    mvbdu_redefine_e
-                in
-                (*PRINT memoization tables*)
-                let error =
-                  Boolean_mvbdu.print_memo
-                    error
-                    handler
-                    (Remanent_parameters.update_prefix parameter "Memoization tables:")
-                in
-                ()
-          (*aux tl*) 
-          in
-          aux result_e_list          
-        in
-        (*---------------------------------------------------------------------------*)
         (*PRINT bdu redefine*)
         let error =
           Boolean_mvbdu.print_boolean_mvbdu
@@ -642,7 +447,7 @@ let scan_var_set parameter error kappa_handler vars result_rules =
               Sanity_test_sig.mvbdu_handler = handler
           },
           ("Mvbdu.001", fun remanent ->
-            let b = Mvbdu_core.mvbdu_equal a'' b'' in (*TEST, they are not equal*)
+            let b = Mvbdu_core.mvbdu_equal a'' b'' in (*test: are they equal?*)
             remanent, b, None) ::
             (List.map (fun (a, b, c) ->
               a,
@@ -673,7 +478,7 @@ let scan_var_set parameter error kappa_handler vars result_rules =
                [
                  "true00", bmvbdu_true0;
                  "true01", bmvbdu_true1;
-                 "true02", bmvbdu_true2; (*TODO?*)
+                 "true02", bmvbdu_true2; 
                ]
             )@
             (*---------------------------------------------------------------------------*)
@@ -685,23 +490,10 @@ let scan_var_set parameter error kappa_handler vars result_rules =
                 b == bmvbdu_false0,
                 None))
                [
-                 "false00", bmvbdu_false0 (*TODO?*)
+                 "false00", bmvbdu_false0
                ]
             )
             @
-            (*---------------------------------------------------------------------------*)
-            (*list_a, list_b, list_c*)
-            (*(List.map (fun (a, b, c) ->
-              a,
-              fun remanent ->
-                List_sanity.test remanent c b)
-               [
-                 "List.001", list_a, (true, true);
-                 (*"List.002", list_b, (false, true);*)
-               (*"List.003", list_c, (true, true)*)
-               ]
-             )
-              @*)
             (*---------------------------------------------------------------------------*)
             (*list_a,list_c*)
             (List.map (fun (a,b) ->
@@ -712,13 +504,12 @@ let scan_var_set parameter error kappa_handler vars result_rules =
                 None))
                [
                  "List.001", list_a;
-                 (*"List.003", list_c*)
                ]
             )             
         in
         (*---------------------------------------------------------------------------*)
         let (remanent, bdu_test_list) = store_pair_remanent in
-        let store_bdu_list =
+        let _store_bdu_list =
           List.fold_left (fun remanent (s, p) ->
             Sanity_test.test remanent p s
           )

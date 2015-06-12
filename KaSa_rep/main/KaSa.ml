@@ -85,9 +85,7 @@ let main () =
     then
       Printf.fprintf (Remanent_parameters.get_log parameters) "Side-effect:\n"
   in
-  let bdu_test =
-    Side_effect.side_effect parameters_se error handler c_compil
-  in
+  let _ = Side_effect.side_effect parameters_se error handler c_compil in
   let error,covering_classes = 
     if Remanent_parameters.get_do_site_dependencies parameters
     then 
@@ -122,10 +120,8 @@ let main () =
     then
       Printf.fprintf (Remanent_parameters.get_log parameters) "BDU:\n"
   in
-  let bdu_test =
-    Mvbdu.bdu_test parameters_bdu error handler c_compil
-  in
-  let _ = Exception.print parameters error  in
-   ()
+  let _ = Mvbdu.bdu_test parameters_bdu error handler c_compil in
+  let _ = Exception.print parameters error in
+  ()
 
 let _ = main ()

@@ -45,7 +45,12 @@ let rec build_reversed_sorted_list_aux allocate parameters error handler list al
 
 let build_reversed_sorted_list allocate parameters error handler list = 
   let error,output = 
-    List_core.build_list allocate error handler (List_sig.Empty) (List_sig.Empty) 
+    List_core.build_list
+      allocate 
+      error
+      handler
+      (List_sig.Empty)
+      (List_sig.Empty)
   in 
   match output with 
     | Some (key,cell,empty_list,handler) ->

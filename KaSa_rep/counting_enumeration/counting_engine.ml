@@ -65,7 +65,9 @@ module Count =
           Counting_print.dependences=(fun a -> a.dependences);
           Counting_print.dependence_graph=(fun a -> a.dependence_graph);
           Counting_print.print_hole=hole_handler.print_hole; 
-          Counting_print.print_short=(fun sdtout -> E.print_short error_handler kappa_handler stdout hole_handler.print_hole) ;
+          Counting_print.print_short=
+            (fun sdtout -> 
+              E.print_short error_handler kappa_handler stdout hole_handler.print_hole) ;
           Counting_print.interfaces=(fun a -> a.interfaces);
           Counting_print.species=(fun a -> a.species);
           Counting_print.to_visit=(fun a -> a.to_visit); 
