@@ -1,6 +1,5 @@
 open Mods
 
-type atom_state = FREE | BND of int*int | INT of int | UNDEF
 type event_kind = OBS of int | RULE of int | INIT of int | PERT of int
 type atom =
     {
