@@ -12,6 +12,10 @@
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
+open Int_storage
+open Cckappa_sig
+open Printf
+
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Side effect") message exn
                  (fun () -> default)                
@@ -21,11 +25,10 @@ let trace = false
 (************************************************************************************)
 (*TYPE*)
 
-module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
+module AgentMap = Quick_Nearly_inf_Imperatif
 type site = int
-type set = Cckappa_sig.Site_map_and_set.set
-type 'a map      = 'a Cckappa_sig.Site_map_and_set.map
-type agent_name  = Cckappa_sig.agent_name
+type set = Site_map_and_set.set
+type 'a map      = 'a Site_map_and_set.map
 type agent_index = int
 
 (*site effect*)
@@ -47,24 +50,24 @@ type side_effect =
 
 (************************************************************************************)
 
-let empty_set = Cckappa_sig.Site_map_and_set.empty_set
-let empty_map = Cckappa_sig.Site_map_and_set.empty_map
-let add_set = Cckappa_sig.Site_map_and_set.add_set
-let union = Cckappa_sig.Site_map_and_set.union
+let empty_set = Site_map_and_set.empty_set
+let empty_map = Site_map_and_set.empty_map
+let add_set = Site_map_and_set.add_set
+let union = Site_map_and_set.union
 
 let sprintf_list l =
   let acc = ref "{" in
   List.iteri (fun i x ->
     acc := !acc ^
       if i <> 0
-      then Printf.sprintf "; %i" x
-      else Printf.sprintf "%i" x
+      then sprintf "; %i" x
+      else sprintf "%i" x
   ) l;
   !acc ^ "}"
     
 let print_list l =
   let output = sprintf_list l in
-  Printf.fprintf stdout "%s\n" output
+  fprintf stdout "%s\n" output
 
 (************************************************************************************)
 (*compute site effect*)
@@ -73,27 +76,27 @@ let print_list l =
 let collect_half_break parameter error handler store_half_break half_break =
   List.fold_left (fun (error, store_half_break) (site_add, state) ->
     (*get information of site and agent_type in site_address*)
-    let site = site_add.Cckappa_sig.site in
-    let agent_type = site_add.Cckappa_sig.agent_type in
+    let site = site_add.site in
+    let agent_type = site_add.agent_type in
     let error, (min, max) = (*TO BE USED*)
       match state with
         | None ->
           begin
             let error, value_state =
               Misc_sa.unsome
-                (Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+                (Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
                    parameter
                    error
                    (agent_type, site)
-                   handler.Cckappa_sig.states_dic)
+                   handler.states_dic)
                 (fun error -> warn parameter error (Some "line 782")
-                  Exit (Cckappa_sig.Dictionary_of_States.init ()))
+                  Exit (Dictionary_of_States.init ()))
             in
             let error, last_entry =
-              Cckappa_sig.Dictionary_of_States.last_entry parameter error value_state in
+              Dictionary_of_States.last_entry parameter error value_state in
             error, (1, last_entry)
           end
-        | Some interval -> error, (interval.Cckappa_sig.min, interval.Cckappa_sig.max)
+        | Some interval -> error, (interval.min, interval.max)
     in
     (*get the old one*)
     let error, out_old =
@@ -113,7 +116,7 @@ let collect_half_break parameter error handler store_half_break half_break =
         old_set
     in
     let error, new_set =
-      Cckappa_sig.Site_map_and_set.union
+      Site_map_and_set.union
         parameter
         error
         set
@@ -135,13 +138,13 @@ let collect_know_binding error store_unbinding release =
   let error, store_unbinding =
     List.fold_left (fun (error, store_unbinding) (site_add_1, site_add_2) ->
       (*get the first binding information*)
-      let agent_index_1 = site_add_1.Cckappa_sig.agent_index in
-      let agent_type_1 = site_add_1.Cckappa_sig.agent_type in
-      let site_1 = site_add_1.Cckappa_sig.site in
+      let agent_index_1 = site_add_1.agent_index in
+      let agent_type_1 = site_add_1.agent_type in
+      let site_1 = site_add_1.site in
       (*get the second binding information*)
-      let agent_index_2 = site_add_2.Cckappa_sig.agent_index in
-      let agent_type_2 = site_add_2.Cckappa_sig.agent_type in
-      let site_2 = site_add_2.Cckappa_sig.site in
+      let agent_index_2 = site_add_2.agent_index in
+      let agent_type_2 = site_add_2.agent_type in
+      let site_2 = site_add_2.site in
       (*store unbinding information*)
       let unbinding_list =
         (agent_index_1, agent_type_1, site_1, 
@@ -157,10 +160,10 @@ let collect_know_binding error store_unbinding release =
 (*collect document site*)
 let collect_document_site parameter error index agent agent_type store_doc =
   let site_map =
-    Cckappa_sig.Site_map_and_set.fold_map
+    Site_map_and_set.fold_map
       (fun site _ current_map ->
         let error, site_map =
-          Cckappa_sig.Site_map_and_set.add_map
+          Site_map_and_set.add_map
             parameter
             error
             site
@@ -169,7 +172,7 @@ let collect_document_site parameter error index agent agent_type store_doc =
         in
         site_map
       )
-      agent.Cckappa_sig.agent_interface empty_map
+      agent.agent_interface empty_map
   in
   let error, old =
     AgentMap.unsafe_get
@@ -184,7 +187,7 @@ let collect_document_site parameter error index agent agent_type store_doc =
       | Some m -> m
   in
   let error, final_map =
-    Cckappa_sig.Site_map_and_set.union_map
+    Site_map_and_set.union_map
       parameter
       error
       old_map
@@ -204,7 +207,7 @@ let collect_undocument_site parameter error index agent_type list_undoc store_un
   let undoc_map =
     List.fold_left (fun current_map site ->
       let error, site_map =
-        Cckappa_sig.Site_map_and_set.add_map
+        Site_map_and_set.add_map
           parameter
           error
           site
@@ -226,7 +229,7 @@ let collect_undocument_site parameter error index agent_type list_undoc store_un
       | Some m -> m
   in
   let error, final_map =
-    Cckappa_sig.Site_map_and_set.union_map
+    Site_map_and_set.union_map
       parameter
       error
       old_map
@@ -243,7 +246,7 @@ let collect_undocument_site parameter error index agent_type list_undoc store_un
 
 let collect_remove parameter error store_remove_map remove =
   List.fold_left (fun (error, store_remove_map) (index, agent, list_undoc) ->
-    let agent_type = agent.Cckappa_sig.agent_name in
+    let agent_type = agent.agent_name in
     let error, document_site =
       collect_document_site
         parameter
@@ -268,14 +271,14 @@ let scan_rule parameter error handler rule store_side_effect =
     collect_half_break parameter error
       handler
       store_side_effect.store_half_break
-      rule.Cckappa_sig.actions.Cckappa_sig.half_break
+      rule.actions.half_break
   in
   (*------------------------------------------------------------------------------*)
   (*compute site effects - whole break, release actions*)
   let error, store_unbinding =
     collect_know_binding error 
       store_side_effect.store_unbinding
-      rule.Cckappa_sig.actions.Cckappa_sig.release
+      rule.actions.release
   in
   (*------------------------------------------------------------------------------*)
   (*compute site effects - remove action*)
@@ -284,7 +287,7 @@ let scan_rule parameter error handler rule store_side_effect =
       parameter
       error
       store_side_effect.store_remove_map
-      rule.Cckappa_sig.actions.Cckappa_sig.remove
+      rule.actions.remove
   in
   (*------------------------------------------------------------------------------*)
   (*result*)
@@ -302,7 +305,7 @@ let create_map parameter error n_agents =
   AgentMap.create parameter error n_agents
 
 let scan_rule_set parameter error handler rules =
-  let n_agents = handler.Cckappa_sig.nagents in
+  let n_agents = handler.nagents in
   let error, init_half_break = create_map parameter error n_agents in
   let error, init_remove_doc = create_map parameter error n_agents in
   let error, init_remove_undoc = create_map parameter error n_agents in
@@ -319,14 +322,14 @@ let scan_rule_set parameter error handler rules =
   (*------------------------------------------------------------------------------*)
   (*map each agent to a covering classes*)
   let error, store_side_effect =
-    Int_storage.Nearly_inf_Imperatif.fold
+    Nearly_inf_Imperatif.fold
       parameter error
       (fun parameter error rule_id rule store_result ->
         scan_rule
           parameter
           error
           handler
-          rule.Cckappa_sig.e_rule_c_rule
+          rule.e_rule_c_rule
           store_result
       )
       rules
@@ -341,8 +344,8 @@ let print_halfbreak parameter error store_half_break =
     error
     (fun error parameter set ->
       let _ =
-        let l = Cckappa_sig.Site_map_and_set.elements set in
-        Printf.fprintf stdout "Side_effect:1/2unbinding:site_type:";
+        let l = Site_map_and_set.elements set in
+        fprintf stdout "Side_effect:1/2unbinding:site_type:";
         print_list l
       in
       error
@@ -353,12 +356,12 @@ let print_halfbreak parameter error store_half_break =
 (*------------------------------------------------------------------------------*)
 
 let print_unbinding store_unbinding =
-  Printf.fprintf stdout "Side-effect:unbinding:\n";
+  fprintf stdout "Side-effect:unbinding:\n";
   let rec aux acc =
     match acc with
       | [] -> []
       | (i,a,x,u,b,y) :: tl ->
-        Printf.fprintf stdout
+        fprintf stdout
           "agent_id:%i:agent_type:%i:site_type:%i -> agent_id:%i:agent_type:%i:site_type:%i\n"
           i a x u b y;
         aux tl
@@ -369,14 +372,14 @@ let print_unbinding store_unbinding =
 let print_remove parameter error store_remove =
   (*print document*)
   let _ =
-    Printf.fprintf stdout "Side-effect:deletion:\n";
+    fprintf stdout "Side-effect:deletion:\n";
     AgentMap.print error
       (fun error parameter map  ->
         let _ =
-          Printf.fprintf stdout "Side-effect:deletion:document_site:\n";
-          Cckappa_sig.Site_map_and_set.iter_map (fun k (i,a,s) ->
+          fprintf stdout "Side-effect:deletion:document_site:\n";
+          Site_map_and_set.iter_map (fun k (i,a,s) ->
             let _ =
-              Printf.fprintf stdout "agent_id:%i:agent_type:%i:site_type:%i\n"
+              fprintf stdout "agent_id:%i:agent_type:%i:site_type:%i\n"
                 i a s
             in
             ()
@@ -389,10 +392,10 @@ let print_remove parameter error store_remove =
   AgentMap.print error
     (fun error parameter map  ->
       let _ =
-        Printf.fprintf stdout "Side-effect:deletion:undocument_site:\n";
-        Cckappa_sig.Site_map_and_set.iter_map (fun k (i,a,s) ->
+        fprintf stdout "Side-effect:deletion:undocument_site:\n";
+        Site_map_and_set.iter_map (fun k (i,a,s) ->
           let _ =
-            Printf.fprintf stdout "agent_id:%i:agent_type:%i:site_type:%i\n"
+            fprintf stdout "agent_id:%i:agent_type:%i:site_type:%i\n"
               i a s
           in
           ()) map
@@ -420,6 +423,6 @@ let print_result parameter error result =
 let side_effect parameter error handler cc_compil =
   let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
   let error, result = 
-    scan_rule_set parameter error handler cc_compil.Cckappa_sig.rules in
+    scan_rule_set parameter error handler cc_compil.rules in
   let _ = print_result parameter error result in
   error, result

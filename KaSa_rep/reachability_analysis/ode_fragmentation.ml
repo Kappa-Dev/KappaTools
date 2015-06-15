@@ -13,6 +13,10 @@
     * en Automatique.  All rights reserved.  This file is distributed     
     *  under the terms of the GNU Library General Public License *)
 
+open Int_storage
+open Cckappa_sig
+open Printf
+
 let warn parameter mh message exn default =
   Exception.warn parameter mh (Some "ODE fragmentation") message exn
                  (fun () -> default)
@@ -25,20 +29,20 @@ let sprintf_list l =
       List.iteri (fun i x ->
         acc := !acc ^
           if i <> 0
-          then Printf.sprintf "; %d" x
-          else Printf.sprintf "%d" x
+          then sprintf "; %d" x
+          else sprintf "%d" x
       ) l';
       !acc ^ "}"
            
 let print_list l =
   let output = sprintf_list l in
-  Printf.fprintf stdout "%s\n" output
+  fprintf stdout "%s\n" output
    
 (************************************************************************************)
 (*TYPE*)
 
-module AgentMap = Int_storage.Nearly_inf_Imperatif
-module SiteSet  = Cckappa_sig.Site_map_and_set
+module AgentMap = Nearly_inf_Imperatif
+module SiteSet  = Site_map_and_set
 
 type set = SiteSet.set
 type elt_set = SiteSet.elt
@@ -46,10 +50,10 @@ type elt_set = SiteSet.elt
 type sites_ode = (set AgentMap.t * set AgentMap.t)
 
 type pair_int_flow =
-    ((Cckappa_sig.agent_name * elt_set * elt_set) list) AgentMap.t
+    ((agent_name * elt_set * elt_set) list) AgentMap.t
 
 type pair_ext_flow =
-    ((Cckappa_sig.agent_name * int * Cckappa_sig.agent_name * int) list)
+    ((agent_name * int * agent_name * int) list)
 
 type ode_frag =
     {
@@ -159,13 +163,13 @@ let fold_anchor_set parameter error store_sites_anchor_set1 store_sites_anchor_s
 
 let collect_sites_modified_set parameter error rule handler store_sites_modified_set =
   let error, store_sites_modified_set =
-    Int_storage.Quick_Nearly_inf_Imperatif.fold
+    Quick_Nearly_inf_Imperatif.fold
       parameter
       error
       (fun parameter error agent_id site_modif store_sites_modified_set ->
-        let agent_type = site_modif.Cckappa_sig.agent_name in
+        let agent_type = site_modif.agent_name in
         if SiteSet.is_empty_map
-          site_modif.Cckappa_sig.agent_interface
+          site_modif.agent_interface
         then
           error, store_sites_modified_set
         else
@@ -176,7 +180,7 @@ let collect_sites_modified_set parameter error rule handler store_sites_modified
 	         parameter
 	         error
 	         agent_type
-	         handler.Cckappa_sig.sites)
+	         handler.sites)
 	      (fun error -> warn parameter error (Some "line 204") Exit
                 (Ckappa_sig.Dictionary_of_sites.init()))
 	  in
@@ -204,17 +208,17 @@ let collect_sites_modified_set parameter error rule handler store_sites_modified
 	      in
               (*PRINT*)
 	      let print_value = 
-                Printf.fprintf stdout
+                fprintf stdout
                   "Flow of information in the ODE semantics:agent_type:%i:" agent_type;
                 match value with
 	          | Ckappa_sig.Internal s ->
-		    Printf.fprintf stdout "site_modified:%i->%s(internal state)\n" site s
+		    fprintf stdout "site_modified:%i->%s(internal state)\n" site s
 	          | Ckappa_sig.Binding s ->
-		    Printf.fprintf stdout "site_modified:%i->%s(binding state)\n" site s
+		    fprintf stdout "site_modified:%i->%s(binding state)\n" site s
               in
               (set, error)
             )
-              site_modif.Cckappa_sig.agent_interface
+              site_modif.agent_interface
               (SiteSet.empty_set, error)
           in
           (*store only site_set*)
@@ -228,7 +232,7 @@ let collect_sites_modified_set parameter error rule handler store_sites_modified
           in
           error, store_sites_modified_set
       )
-      rule.Cckappa_sig.diff_reverse
+      rule.diff_reverse
       store_sites_modified_set
   in error, store_sites_modified_set
   
@@ -241,10 +245,10 @@ let collect_sites_modified_set parameter error rule handler store_sites_modified
 (*without adding the old result*)
 let collect_store_bond_set_each_rule parameter error bond_lhs
     site_address store_sites_bond_set =
-  let agent_id = site_address.Cckappa_sig.agent_index in
-  let agent_type = site_address.Cckappa_sig.agent_type in
+  let agent_id = site_address.agent_index in
+  let agent_type = site_address.agent_type in
    let error, site_address_map =
-    Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get
+     Quick_Nearly_inf_Imperatif.unsafe_get
       parameter
       error
       agent_id
@@ -281,15 +285,15 @@ let collect_store_bond_set_each_rule parameter error bond_lhs
 
 (*combine with the old_result*)
 let collect_store_bond_set parameter error bond_lhs site_address store_sites_bond_set =
-  let agent_id = site_address.Cckappa_sig.agent_index in
-  let agent_type = site_address.Cckappa_sig.agent_type in
-   let error, site_address_map =
-    Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get
+  let agent_id = site_address.agent_index in
+  let agent_type = site_address.agent_type in
+  let error, site_address_map =
+    Quick_Nearly_inf_Imperatif.unsafe_get
       parameter
       error
       agent_id
       bond_lhs
-   in
+  in
   let site_address =
     match site_address_map with
       | None -> SiteSet.empty_map
@@ -447,19 +451,19 @@ let result_sites_bond_pair_set_external parameter error bond_lhs release
 
 let store_sites_lhs parameter error rule store_sites_lhs =
   let error, store_sites_lhs =
-    Int_storage.Quick_Nearly_inf_Imperatif.fold
+    Quick_Nearly_inf_Imperatif.fold
       parameter
       error
       (fun parameter error agent_id agent store_sites_lhs ->
         match agent with
-       | Cckappa_sig.Ghost -> error, store_sites_lhs
-       | Cckappa_sig.Agent agent ->
-          let agent_type = agent.Cckappa_sig.agent_name in
+       | Ghost -> error, store_sites_lhs
+       | Agent agent ->
+          let agent_type = agent.agent_name in
           let site_list =
             SiteSet.fold_map
               (fun site _ current_list ->
                 site :: current_list)
-              agent.Cckappa_sig.agent_interface []
+              agent.agent_interface []
           in
           (*store*)
           let error, sites_list =
@@ -472,7 +476,7 @@ let store_sites_lhs parameter error rule store_sites_lhs =
           in
           error, sites_list
       )
-      rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
+      rule.rule_lhs.views
       store_sites_lhs
   in error, store_sites_lhs
 
@@ -484,14 +488,14 @@ let collect_sites_anchor_set parameter error get_rule
     store_sites_bond_pair_set
     store_sites_lhs
     store_sites_anchor_set =
-  Int_storage.Quick_Nearly_inf_Imperatif.fold
+  Quick_Nearly_inf_Imperatif.fold
     parameter
     error
     (fun parameter error agent_id agent store_sites_anchor_set ->
       match agent with
-        | Cckappa_sig.Ghost -> error, store_sites_anchor_set
-        | Cckappa_sig.Agent agent ->
-          let agent_type = agent.Cckappa_sig.agent_name in
+        | Ghost -> error, store_sites_anchor_set
+        | Agent agent ->
+          let agent_type = agent.agent_name in
           (*get a set of modified site in the rule lhs*)
           let modified_set =
             get_site_common_set
@@ -620,7 +624,7 @@ let collect_sites_anchor_set parameter error get_rule
           in
           (*result*)
           error, (anchor_set1, anchor_set2)
-     ) get_rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
+     ) get_rule.rule_lhs.views
           store_sites_anchor_set
 
 (************************************************************************************)
@@ -697,14 +701,14 @@ let collect_internal_flow parameter error get_rule
     store_sites_modified_set
     store_sites_anchor_set
     store_internal_flow =
-  Int_storage.Quick_Nearly_inf_Imperatif.fold
+  Quick_Nearly_inf_Imperatif.fold
     parameter
     error
     (fun parameter error agent_id agent store_internal_flow ->
       match agent with
-        | Cckappa_sig.Ghost -> error, store_internal_flow
-        | Cckappa_sig.Agent agent ->
-          let agent_type = agent.Cckappa_sig.agent_name in
+        | Ghost -> error, store_internal_flow
+        | Agent agent ->
+          let agent_type = agent.agent_name in
           let modified_set =
             get_site_common_set
               parameter
@@ -744,7 +748,7 @@ let collect_internal_flow parameter error get_rule
               match acc with
                 | [] -> acc
                 | (agent_type, x, y) :: tl ->
-                  Printf.fprintf stdout
+                  fprintf stdout
                     "Flow of information in the ODE semantics:Internal flow:\n- agent_type:%i:site_type:%i -> agent_type:%i:modified_type:%i\n"
                     agent_type x agent_type y;
                   aux tl                    
@@ -775,7 +779,7 @@ let collect_internal_flow parameter error get_rule
               match acc with
                 | [] -> acc
                 | (agent_type, x, y) :: tl ->
-                  Printf.fprintf stdout
+                  fprintf stdout
                     "Flow of information in the ODE semantics:Internal flow:\n- agent_type:%i:site_type:%i -> agent_type:%i:anchor_type:%i\n"
                     agent_type x agent_type y;
                   aux tl                    
@@ -783,7 +787,7 @@ let collect_internal_flow parameter error get_rule
           in
           (*result*)
           error, (internal_flow1, internal_flow2)
-    ) get_rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
+    ) get_rule.rule_lhs.views
     store_internal_flow
 
 (************************************************************************************)   
@@ -824,8 +828,8 @@ let collect_external_flow parameter error release
     store_sites_anchor_set2
     store_external_flow =
   List.fold_left (fun (error, store_external_flow) (site_address_1, site_address_2) ->
-    let agent_type_1 = site_address_1.Cckappa_sig.agent_type in
-    let agent_type_2 = site_address_2.Cckappa_sig.agent_type in
+    let agent_type_1 = site_address_1.agent_type in
+    let agent_type_2 = site_address_2.agent_type in
     (*collect site that are bond in the lhs; the first element in a pair*)
     let bond_fst_set =
       get_site_common_set
@@ -865,7 +869,7 @@ let collect_external_flow parameter error release
         match acc with
           | [] -> acc
           | (agent_type,x,agent_type',y) :: tl ->
-            Printf.fprintf stdout
+            fprintf stdout
               "Flow of information in the ODE semantics:External flow:\n- agent_type:%i:anchor_type:%i -> agent_type:%i:modified_type:%i\n"
               agent_type x agent_type' y;
             aux tl
@@ -879,8 +883,8 @@ let collect_external_flow parameter error release
 (*RULE*)
 
 let scan_rule parameter error handler get_rule ode_class =
-  let release = get_rule.Cckappa_sig.actions.Cckappa_sig.release in
-  let bond_lhs = get_rule.Cckappa_sig.rule_lhs.Cckappa_sig.bonds in
+  let release = get_rule.actions.release in
+  let bond_lhs = get_rule.rule_lhs.bonds in
   (*------------------------------------------------------------------------------*)
   (*a) collect modified sites*)
   let error, store_sites_modified_set =
@@ -998,12 +1002,13 @@ let scan_rule_set parameter error handler rules =
     AgentMap.fold
       parameter error
       (fun parameter error rule_id rule ode_class ->
-	let _ = Printf.fprintf stdout "Flow of information in the ODE semantics:rule_id:%i\n" rule_id in
+	let _ =
+          fprintf stdout "Flow of information in the ODE semantics:rule_id:%i\n" rule_id in
         scan_rule
           parameter
           error
           handler
-          rule.Cckappa_sig.e_rule_c_rule
+          rule.e_rule_c_rule
           ode_class
       ) rules init_ode
   in
@@ -1013,5 +1018,5 @@ let scan_rule_set parameter error handler rules =
 (*MAIN*)
 
 let ode_fragmentation parameter error handler cc_compil =
-  let error, result = scan_rule_set parameter error handler cc_compil.Cckappa_sig.rules in
+  let error, result = scan_rule_set parameter error handler cc_compil.rules in
   error, result

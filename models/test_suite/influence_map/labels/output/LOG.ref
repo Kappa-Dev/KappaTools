@@ -156,5 +156,72 @@ Flow of information in the ODE semantics:rule_id:2
 Flow of information in the ODE semantics:agent_type:0:site_modified:0->x(internal state)
 Flow of information in the ODE semantics:rule_id:3
 Flow of information in the ODE semantics:agent_type:0:site_modified:0->x(internal state)
-BDU:
+BDU of potential dependencies between sites:
+PRINT PAIR VALUE in COVERING_CLASS:
+site_type:0:site_state:0
+site_type:0:site_state:1
+site_type:0:site_state:2
+
+Build BDU from covering_class pair value:
+list_id:3:value:[site_type:0:site_state:0]
+list_id:2:value:[site_type:0:site_state:1]
+list_id:1:value:[site_type:0:site_state:2]
+list_id:0:
+BDU of potential dependencies between sites:mvbdu_redefine: if(mvbdu_id:7) x0 < 2 then 
+BDU of potential dependencies between sites:mvbdu_redefine:  false
+BDU of potential dependencies between sites:mvbdu_redefine: else 
+BDU of potential dependencies between sites:mvbdu_redefine:  if(mvbdu_id:6) x0 < 3 then 
+BDU of potential dependencies between sites:mvbdu_redefine:   true
+BDU of potential dependencies between sites:mvbdu_redefine:  else 
+BDU of potential dependencies between sites:mvbdu_redefine:   false
+BDU of potential dependencies between sites:Memoization tables:
+Print Hash_1:
+BDU of potential dependencies between sites:Memoization tables:clean_head:3:
+BDU of potential dependencies between sites:Memoization tables:clean_head:3: true
+BDU of potential dependencies between sites:Memoization tables:clean_head:5:
+BDU of potential dependencies between sites:Memoization tables:clean_head:5: true
+Print Hash_2:
+BDU of potential dependencies between sites:Memoization tables:or:0:
+BDU of potential dependencies between sites:Memoization tables:or:0:1:
+BDU of potential dependencies between sites:Memoization tables:or:0:1: true
+BDU of potential dependencies between sites:Memoization tables:or:1:
+BDU of potential dependencies between sites:Memoization tables:or:1:0:
+BDU of potential dependencies between sites:Memoization tables:or:1:0: true
+BDU of potential dependencies between sites:Memoization tables:reset:0:
+BDU of potential dependencies between sites:Memoization tables:reset:0:3:
+BDU of potential dependencies between sites:Memoization tables:reset:0:3: if(mvbdu_id:7) x0 < 2 then 
+BDU of potential dependencies between sites:Memoization tables:reset:0:3:  false
+BDU of potential dependencies between sites:Memoization tables:reset:0:3: else 
+BDU of potential dependencies between sites:Memoization tables:reset:0:3:  if(mvbdu_id:6) x0 < 3 then 
+BDU of potential dependencies between sites:Memoization tables:reset:0:3:   true
+BDU of potential dependencies between sites:Memoization tables:reset:0:3:  else 
+BDU of potential dependencies between sites:Memoization tables:reset:0:3:   false
+BDU of potential dependencies between sites:Memoization tables:reset:3:
+BDU of potential dependencies between sites:Memoization tables:reset:3:2:
+BDU of potential dependencies between sites:Memoization tables:reset:3:2: if(mvbdu_id:7) x0 < 2 then 
+BDU of potential dependencies between sites:Memoization tables:reset:3:2:  false
+BDU of potential dependencies between sites:Memoization tables:reset:3:2: else 
+BDU of potential dependencies between sites:Memoization tables:reset:3:2:  if(mvbdu_id:6) x0 < 3 then 
+BDU of potential dependencies between sites:Memoization tables:reset:3:2:   true
+BDU of potential dependencies between sites:Memoization tables:reset:3:2:  else 
+BDU of potential dependencies between sites:Memoization tables:reset:3:2:   false
+BDU of potential dependencies between sites:Memoization tables:reset:5:
+BDU of potential dependencies between sites:Memoization tables:reset:5:1:
+BDU of potential dependencies between sites:Memoization tables:reset:5:1: if(mvbdu_id:7) x0 < 2 then 
+BDU of potential dependencies between sites:Memoization tables:reset:5:1:  false
+BDU of potential dependencies between sites:Memoization tables:reset:5:1: else 
+BDU of potential dependencies between sites:Memoization tables:reset:5:1:  if(mvbdu_id:6) x0 < 3 then 
+BDU of potential dependencies between sites:Memoization tables:reset:5:1:   true
+BDU of potential dependencies between sites:Memoization tables:reset:5:1:  else 
+BDU of potential dependencies between sites:Memoization tables:reset:5:1:   false
+BDU of potential dependencies between sites:Memoization tables:reset:7:
+BDU of potential dependencies between sites:Memoization tables:reset:7:0:
+BDU of potential dependencies between sites:Memoization tables:reset:7:0: if(mvbdu_id:7) x0 < 2 then 
+BDU of potential dependencies between sites:Memoization tables:reset:7:0:  false
+BDU of potential dependencies between sites:Memoization tables:reset:7:0: else 
+BDU of potential dependencies between sites:Memoization tables:reset:7:0:  if(mvbdu_id:6) x0 < 3 then 
+BDU of potential dependencies between sites:Memoization tables:reset:7:0:   true
+BDU of potential dependencies between sites:Memoization tables:reset:7:0:  else 
+BDU of potential dependencies between sites:Memoization tables:reset:7:0:   false
+Mvbdu.002: ok
 execution finished without any exception

@@ -12,6 +12,10 @@
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
+open Cckappa_sig
+open Printf
+open Int_storage
+
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "BDU") message exn
                  (fun () -> default)
@@ -36,7 +40,7 @@ type store_var =
 
 (************************************************************************************)
 
-let int_of_port port = port.Cckappa_sig.site_state.Cckappa_sig.min
+let int_of_port port = port.site_state.min
 
 (************************************************************************************)
 (*RULE - VAR*)
@@ -49,17 +53,17 @@ let scan_rule parameter error kappa_handler rule store_result =
       error
       (fun parameter error agent_id agent store_result ->
         match agent with
-          | Cckappa_sig.Ghost -> error, store_result
-          | Cckappa_sig.Agent agent ->
-            let agent_type = agent.Cckappa_sig.agent_name in
+          | Ghost -> error, store_result
+          | Agent agent ->
+            let agent_type = agent.agent_name in
             (*get a list of site in the lhs in an interface*)
             let site_list =
-              Cckappa_sig.Site_map_and_set.fold_map
+              Site_map_and_set.fold_map
                 (fun site _ current_list ->
                   let site_list = site :: current_list in
                   site_list
                 )
-                agent.Cckappa_sig.agent_interface []
+                agent.agent_interface []
             in
             (*get old result list*)
             let error, out_old =
@@ -83,7 +87,7 @@ let scan_rule parameter error kappa_handler rule store_result =
               new_list
               store_result
       )
-      rule.Cckappa_sig.rule_lhs.Cckappa_sig.views
+      rule.rule_lhs.views
       store_result.store_site_lhs
   in
   (*store result*)
@@ -112,13 +116,13 @@ let scan_mixture_in_var bool parameter error kappa_handler var_id mixture
       error
       (fun parameter errror agent_id agent store_pair_result ->
         match agent with
-          | Cckappa_sig.Ghost -> error, store_pair_result
-          | Cckappa_sig.Agent agent ->
-            let agent_type = agent.Cckappa_sig.agent_name in
+          | Ghost -> error, store_pair_result
+          | Agent agent ->
+            let agent_type = agent.agent_name in
             (*---------------------------------------------------------------------------*)
             (*get a list later build bdu, it is a pair (variable, site_state) *)
             let pair_var_state_list =
-              Cckappa_sig.Site_map_and_set.fold_map
+              Site_map_and_set.fold_map
                 (fun site port current_list ->
                   let site_state = int_of_port port in
                   let pair_list = (var_id, site_state) :: current_list in
@@ -129,7 +133,7 @@ let scan_mixture_in_var bool parameter error kappa_handler var_id mixture
                   in
                   pair_list
                 )
-                agent.Cckappa_sig.agent_interface []
+                agent.agent_interface []
             in
             (*---------------------------------------------------------------------------*)
             (*get the old information*)
@@ -154,7 +158,7 @@ let scan_mixture_in_var bool parameter error kappa_handler var_id mixture
               new_pair
               store_pair_result
       )
-      mixture.Cckappa_sig.views
+      mixture.views
       result_rules.store_pair_plus (*FIXME*)
   in
   (*store result*)
@@ -221,7 +225,7 @@ let scan_var parameter error kappa_handler var_id var result_rules =
 let create_init parameter error n_agents = AgentMap.create parameter error n_agents 
 
 let scan_rule_set parameter error kappa_handler rules =
-  let n_agents = kappa_handler.Cckappa_sig.nagents in
+  let n_agents = kappa_handler.nagents in
   let error, init_lhs = create_init parameter error n_agents in
   let error, init_var_plus = create_init parameter error n_agents in
   let error, init_var_minus = create_init parameter error n_agents in
@@ -235,7 +239,7 @@ let scan_rule_set parameter error kappa_handler rules =
   in
   (*-----------------------------------------------------------------------------------*)
   let error, store_result =
-    Int_storage.Nearly_inf_Imperatif.fold
+    Nearly_inf_Imperatif.fold
       parameter
       error
       (fun parameter error rule_id rule store_result ->
@@ -244,7 +248,7 @@ let scan_rule_set parameter error kappa_handler rules =
           parameter
           error
           kappa_handler
-          rule.Cckappa_sig.e_rule_c_rule
+          rule.e_rule_c_rule
           store_result
       )
       rules
@@ -255,7 +259,7 @@ let scan_rule_set parameter error kappa_handler rules =
 (*-----------------------------------------------------------------------------------*)
 
 let rec print_a_list (l: int List_sig.list) =
-  Printf.fprintf stdout "list_id:%i:" l.List_sig.id;
+  fprintf stdout "list_id:%i:" l.List_sig.id;
   let v = l.List_sig.value in
   match v with
     | List_sig.Empty -> print_string "\n"
@@ -265,18 +269,18 @@ let rec print_a_list (l: int List_sig.list) =
       (*Printf.fprintf stdout "\n"*)
       
 and print_precell p =
-  Printf.fprintf stdout "variable:%i:site_state:%i]\n" 
+  fprintf stdout "variable:%i:site_state:%i]\n" 
     p.List_sig.variable  p.List_sig.association;
   print_a_list p.List_sig.tail
 
 let scan_var_set parameter error kappa_handler vars result_rules =
   let error, store_var_set =
-    Int_storage.Nearly_inf_Imperatif.fold
+    Nearly_inf_Imperatif.fold
       parameter
       error
       (fun parameter error var_id var store_result ->
-        let (_, (var, _)) = var.Cckappa_sig.e_variable in
-        let _ = Printf.fprintf stdout "var_id:%i\n" var_id in
+        let (_, (var, _)) = var.e_variable in
+        let _ = fprintf stdout "var_id:%i\n" var_id in
         scan_var
           parameter
           error
@@ -536,5 +540,5 @@ let scan_var_set parameter error kappa_handler vars result_rules =
 let bdu_test parameter error kappa_handler cc_compil =
   let parameter = Remanent_parameters.update_prefix parameter ":" in
   let error, result_rules = scan_rule_set parameter error kappa_handler 
-    cc_compil.Cckappa_sig.rules in
-  scan_var_set parameter error kappa_handler cc_compil.Cckappa_sig.variables result_rules
+    cc_compil.rules in
+  scan_var_set parameter error kappa_handler cc_compil.variables result_rules

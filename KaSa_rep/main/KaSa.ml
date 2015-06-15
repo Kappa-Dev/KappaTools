@@ -113,14 +113,30 @@ let main () =
       in error,Some ode_fragmentation
     else error,None 
   in
+  (*BDU covering class*)
+  let error, bdu_covering_classes =
+    if Remanent_parameters.get_do_site_dependencies parameters
+    then
+      let parameters_bdu =
+        Remanent_parameters.update_prefix parameters "BDU of potential dependencies between sites:"
+      in
+      let _ =
+        if (Remanent_parameters.get_trace parameters_bdu)
+        then Printf.fprintf (Remanent_parameters.get_log parameters_bdu) "BDU of potential dependencies between sites:\n"
+      in
+      let error, dep = Covering_classes.bdu_covering_class parameters_bdu error handler c_compil
+      in
+      error, Some dep
+    else error, None
+  in
   (*BDU test*)
-  let parameters_bdu = Remanent_parameters.update_prefix parameters "BDU:" in
+  (*let parameters_bdu = Remanent_parameters.update_prefix parameters "BDU:" in
   let _ =
     if (Remanent_parameters.get_trace parameters)
     then
       Printf.fprintf (Remanent_parameters.get_log parameters) "BDU:\n"
   in
-  let _ = Mvbdu.bdu_test parameters_bdu error handler c_compil in
+  let _ = Mvbdu.bdu_test parameters_bdu error handler c_compil in*)
   let _ = Exception.print parameters error in
   ()
 
