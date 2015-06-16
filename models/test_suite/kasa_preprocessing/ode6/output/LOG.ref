@@ -416,70 +416,225 @@ Potential dependencies between sites:
 Potential dependencies between sites:agent_type:0:
 Potential dependencies between sites:Number of covering classes:1
 Potential dependencies between sites:Covering_class_id:0:
-site_type:0->state_min:{0}
+site_type:0
+site:0->state:0
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
-site_type:1->state_min:{0}
+site_type:1
+site:0->state:0
 Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
-site_type:1->state_min:{0}
+site_type:1
+site:0->state:0
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
 {1}
 Potential dependencies between sites:agent_type:1:
 Potential dependencies between sites:Number of covering classes:1
 Potential dependencies between sites:Covering_class_id:0:
-site_type:0->state_min:{0}
-site_type:1->state_min:{0}
-site_type:2->state_min:{0}
+site_type:0
+site_type:1
+site_type:2
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:0->state:0
+site:1->state:0
+site:2->state:0
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
-site_type:1->state_min:{0}
-site_type:2->state_min:{0}
-site_type:3->state_min:{0}
+site_type:1
+site_type:2
+site_type:3
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:0->state:0
+site:1->state:0
+site:2->state:0
 Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
-site_type:1->state_min:{0}
-site_type:2->state_min:{0}
-site_type:3->state_min:{0}
+site_type:1
+site_type:2
+site_type:3
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:0->state:0
+site:1->state:0
+site:2->state:0
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
 {1; 2; 3}
 Potential dependencies between sites:agent_type:2:
 Potential dependencies between sites:Number of covering classes:2
 Potential dependencies between sites:Covering_class_id:0:
-site_type:0->state_min:{0}
-site_type:1->state_min:{0}
-site_type:4->state_min:{0}
+site_type:0
+site_type:1
+site_type:4
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
-site_type:1->state_min:{0}
-site_type:2->state_min:{0}
-site_type:3->state_min:{0}
+site_type:1
+site_type:2
+site_type:3
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:1:
-site_type:1->state_min:{0}
-site_type:2->state_min:{0}
+site_type:1
+site_type:2
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
 Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
-site_type:1->state_min:{0}
-site_type:2->state_min:{0}
-site_type:3->state_min:{0}
+site_type:1
+site_type:2
+site_type:3
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
 Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:1:
-site_type:1->state_min:{0}
-site_type:2->state_min:{0}
+site_type:1
+site_type:2
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
 {1; 2; 3}
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:1:
 {1; 2}
 Potential dependencies between sites:Covering_class_id:1:
-site_type:2->state_min:{0}
-site_type:3->state_min:{0}
+site_type:2
+site_type:3
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
 Potential dependencies between sites:New-index:Covering_class_id:1:class_id:0:
-site_type:1->state_min:{0}
-site_type:2->state_min:{0}
-site_type:3->state_min:{0}
+site_type:1
+site_type:2
+site_type:3
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
 Potential dependencies between sites:New-index:Covering_class_id:1:class_id:1:
-site_type:1->state_min:{0}
-site_type:2->state_min:{0}
+site_type:1
+site_type:2
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
 Potential dependencies between sites:New-index:TEST:Covering_class_id:1:class_id:0:
-site_type:1->state_min:{0}
-site_type:2->state_min:{0}
-site_type:3->state_min:{0}
+site_type:1
+site_type:2
+site_type:3
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
 Potential dependencies between sites:New-index:TEST:Covering_class_id:1:class_id:1:
-site_type:1->state_min:{0}
-site_type:2->state_min:{0}
+site_type:1
+site_type:2
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:1:class_id:0:
 {1; 2; 3}
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:1:class_id:1:
@@ -487,19 +642,42 @@ Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:1
 Potential dependencies between sites:agent_type:3:
 Potential dependencies between sites:Number of covering classes:2
 Potential dependencies between sites:Covering_class_id:0:
-site_type:1->state_min:{0}
+site_type:1
+site:0->state:0
+site:1->state:0
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
-site_type:1->state_min:{0}
+site_type:1
+site:0->state:0
+site:1->state:0
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:1:
+site_type:1
+site:0->state:0
 Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
-site_type:1->state_min:{0}
+site_type:1
+site:0->state:0
+site:1->state:0
+Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:1:
+site_type:1
+site:0->state:0
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
 {1}
 Potential dependencies between sites:Covering_class_id:1:
-site_type:0->state_min:{0}
+site_type:0
+site:0->state:0
 Potential dependencies between sites:New-index:Covering_class_id:1:class_id:0:
-site_type:1->state_min:{0}
+site_type:1
+site:0->state:0
+site:1->state:0
+Potential dependencies between sites:New-index:Covering_class_id:1:class_id:1:
+site_type:1
+site:0->state:0
 Potential dependencies between sites:New-index:TEST:Covering_class_id:1:class_id:0:
-site_type:1->state_min:{0}
+site_type:1
+site:0->state:0
+site:1->state:0
+Potential dependencies between sites:New-index:TEST:Covering_class_id:1:class_id:1:
+site_type:1
+site:0->state:0
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:1:class_id:0:
 {1}
 Flow of information in the ODE semantics:
@@ -551,321 +729,178 @@ Flow of information in the ODE semantics:Internal flow:
 Flow of information in the ODE semantics:Internal flow:
 - agent_type:2:site_type:0 -> agent_type:2:modified_type:4
 BDU of potential dependencies between sites:
-PRINT PAIR VALUE in COVERING_CLASS:
-site_type:0:site_state:0
-site_type:1:site_state:0
-site_type:2:site_state:0
+PRINT PAIR VALUE in COVERING_CLASS:class_id:1:
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:0->state:0
+site:1->state:0
+site:2->state:0
 
-Build BDU from covering_class pair value:
-list_id:3:value:[site_type:0:site_state:0]
+Build list(list_a):
+list_id:9:value:[site_type:2:site_state:0]
+list_id:8:value:[site_type:1:site_state:0]
+list_id:7:value:[site_type:0:site_state:0]
+list_id:6:value:[site_type:2:site_state:0]
+list_id:5:value:[site_type:1:site_state:0]
+list_id:4:value:[site_type:0:site_state:0]
+list_id:3:value:[site_type:2:site_state:0]
 list_id:2:value:[site_type:1:site_state:0]
-list_id:1:value:[site_type:2:site_state:0]
-list_id:0:
-BDU of potential dependencies between sites:mvbdu_redefine: if(mvbdu_id:11) x0 < 0 then 
-BDU of potential dependencies between sites:mvbdu_redefine:  false
-BDU of potential dependencies between sites:mvbdu_redefine: else 
-BDU of potential dependencies between sites:mvbdu_redefine:  if(mvbdu_id:10) x0 < 1 then 
-BDU of potential dependencies between sites:mvbdu_redefine:   if(mvbdu_id:9) x1 < 0 then 
-BDU of potential dependencies between sites:mvbdu_redefine:    false
-BDU of potential dependencies between sites:mvbdu_redefine:   else 
-BDU of potential dependencies between sites:mvbdu_redefine:    if(mvbdu_id:8) x1 < 1 then 
-BDU of potential dependencies between sites:mvbdu_redefine:     if(mvbdu_id:7) x2 < 0 then 
-BDU of potential dependencies between sites:mvbdu_redefine:      false
-BDU of potential dependencies between sites:mvbdu_redefine:     else 
-BDU of potential dependencies between sites:mvbdu_redefine:      if(mvbdu_id:6) x2 < 1 then 
-BDU of potential dependencies between sites:mvbdu_redefine:       true
-BDU of potential dependencies between sites:mvbdu_redefine:      else 
-BDU of potential dependencies between sites:mvbdu_redefine:       false
-BDU of potential dependencies between sites:mvbdu_redefine:    else 
-BDU of potential dependencies between sites:mvbdu_redefine:     false
-BDU of potential dependencies between sites:mvbdu_redefine:  else 
-BDU of potential dependencies between sites:mvbdu_redefine:   false
-BDU of potential dependencies between sites:Memoization tables:
-Print Hash_1:
-Print Hash_2:
-BDU of potential dependencies between sites:Memoization tables:reset:0:
-BDU of potential dependencies between sites:Memoization tables:reset:0:1:
-BDU of potential dependencies between sites:Memoization tables:reset:0:1: if(mvbdu_id:7) x2 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:0:1:  false
-BDU of potential dependencies between sites:Memoization tables:reset:0:1: else 
-BDU of potential dependencies between sites:Memoization tables:reset:0:1:  if(mvbdu_id:6) x2 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:0:1:   true
-BDU of potential dependencies between sites:Memoization tables:reset:0:1:  else 
-BDU of potential dependencies between sites:Memoization tables:reset:0:1:   false
-BDU of potential dependencies between sites:Memoization tables:reset:0:2:
-BDU of potential dependencies between sites:Memoization tables:reset:0:2: if(mvbdu_id:9) x1 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:0:2:  false
-BDU of potential dependencies between sites:Memoization tables:reset:0:2: else 
-BDU of potential dependencies between sites:Memoization tables:reset:0:2:  if(mvbdu_id:8) x1 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:0:2:   if(mvbdu_id:7) x2 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:0:2:    false
-BDU of potential dependencies between sites:Memoization tables:reset:0:2:   else 
-BDU of potential dependencies between sites:Memoization tables:reset:0:2:    if(mvbdu_id:6) x2 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:0:2:     true
-BDU of potential dependencies between sites:Memoization tables:reset:0:2:    else 
-BDU of potential dependencies between sites:Memoization tables:reset:0:2:     false
-BDU of potential dependencies between sites:Memoization tables:reset:0:2:  else 
-BDU of potential dependencies between sites:Memoization tables:reset:0:2:   false
-BDU of potential dependencies between sites:Memoization tables:reset:0:3:
-BDU of potential dependencies between sites:Memoization tables:reset:0:3: if(mvbdu_id:11) x0 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:0:3:  false
-BDU of potential dependencies between sites:Memoization tables:reset:0:3: else 
-BDU of potential dependencies between sites:Memoization tables:reset:0:3:  if(mvbdu_id:10) x0 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:0:3:   if(mvbdu_id:9) x1 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:0:3:    false
-BDU of potential dependencies between sites:Memoization tables:reset:0:3:   else 
-BDU of potential dependencies between sites:Memoization tables:reset:0:3:    if(mvbdu_id:8) x1 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:0:3:     if(mvbdu_id:7) x2 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:0:3:      false
-BDU of potential dependencies between sites:Memoization tables:reset:0:3:     else 
-BDU of potential dependencies between sites:Memoization tables:reset:0:3:      if(mvbdu_id:6) x2 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:0:3:       true
-BDU of potential dependencies between sites:Memoization tables:reset:0:3:      else 
-BDU of potential dependencies between sites:Memoization tables:reset:0:3:       false
-BDU of potential dependencies between sites:Memoization tables:reset:0:3:    else 
-BDU of potential dependencies between sites:Memoization tables:reset:0:3:     false
-BDU of potential dependencies between sites:Memoization tables:reset:0:3:  else 
-BDU of potential dependencies between sites:Memoization tables:reset:0:3:   false
-BDU of potential dependencies between sites:Memoization tables:reset:1:
-BDU of potential dependencies between sites:Memoization tables:reset:1:0:
-BDU of potential dependencies between sites:Memoization tables:reset:1:0: false
-BDU of potential dependencies between sites:Memoization tables:reset:1:1:
-BDU of potential dependencies between sites:Memoization tables:reset:1:1: false
-BDU of potential dependencies between sites:Memoization tables:reset:1:2:
-BDU of potential dependencies between sites:Memoization tables:reset:1:2: false
-BDU of potential dependencies between sites:Memoization tables:reset:2:
-BDU of potential dependencies between sites:Memoization tables:reset:2:2:
-BDU of potential dependencies between sites:Memoization tables:reset:2:2: if(mvbdu_id:10) x0 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:2:2:  if(mvbdu_id:9) x1 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:2:2:   false
-BDU of potential dependencies between sites:Memoization tables:reset:2:2:  else 
-BDU of potential dependencies between sites:Memoization tables:reset:2:2:   if(mvbdu_id:8) x1 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:2:2:    if(mvbdu_id:7) x2 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:2:2:     false
-BDU of potential dependencies between sites:Memoization tables:reset:2:2:    else 
-BDU of potential dependencies between sites:Memoization tables:reset:2:2:     if(mvbdu_id:6) x2 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:2:2:      true
-BDU of potential dependencies between sites:Memoization tables:reset:2:2:     else 
-BDU of potential dependencies between sites:Memoization tables:reset:2:2:      false
-BDU of potential dependencies between sites:Memoization tables:reset:2:2:   else 
-BDU of potential dependencies between sites:Memoization tables:reset:2:2:    false
-BDU of potential dependencies between sites:Memoization tables:reset:2:2: else 
-BDU of potential dependencies between sites:Memoization tables:reset:2:2:  false
-BDU of potential dependencies between sites:Memoization tables:reset:3:
-BDU of potential dependencies between sites:Memoization tables:reset:3:2:
-BDU of potential dependencies between sites:Memoization tables:reset:3:2: if(mvbdu_id:11) x0 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:3:2:  false
-BDU of potential dependencies between sites:Memoization tables:reset:3:2: else 
-BDU of potential dependencies between sites:Memoization tables:reset:3:2:  if(mvbdu_id:10) x0 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:3:2:   if(mvbdu_id:9) x1 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:3:2:    false
-BDU of potential dependencies between sites:Memoization tables:reset:3:2:   else 
-BDU of potential dependencies between sites:Memoization tables:reset:3:2:    if(mvbdu_id:8) x1 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:3:2:     if(mvbdu_id:7) x2 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:3:2:      false
-BDU of potential dependencies between sites:Memoization tables:reset:3:2:     else 
-BDU of potential dependencies between sites:Memoization tables:reset:3:2:      if(mvbdu_id:6) x2 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:3:2:       true
-BDU of potential dependencies between sites:Memoization tables:reset:3:2:      else 
-BDU of potential dependencies between sites:Memoization tables:reset:3:2:       false
-BDU of potential dependencies between sites:Memoization tables:reset:3:2:    else 
-BDU of potential dependencies between sites:Memoization tables:reset:3:2:     false
-BDU of potential dependencies between sites:Memoization tables:reset:3:2:  else 
-BDU of potential dependencies between sites:Memoization tables:reset:3:2:   false
-BDU of potential dependencies between sites:Memoization tables:reset:4:
-BDU of potential dependencies between sites:Memoization tables:reset:4:1:
-BDU of potential dependencies between sites:Memoization tables:reset:4:1: if(mvbdu_id:8) x1 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:4:1:  if(mvbdu_id:7) x2 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:4:1:   false
-BDU of potential dependencies between sites:Memoization tables:reset:4:1:  else 
-BDU of potential dependencies between sites:Memoization tables:reset:4:1:   if(mvbdu_id:6) x2 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:4:1:    true
-BDU of potential dependencies between sites:Memoization tables:reset:4:1:   else 
-BDU of potential dependencies between sites:Memoization tables:reset:4:1:    false
-BDU of potential dependencies between sites:Memoization tables:reset:4:1: else 
-BDU of potential dependencies between sites:Memoization tables:reset:4:1:  false
-BDU of potential dependencies between sites:Memoization tables:reset:5:
-BDU of potential dependencies between sites:Memoization tables:reset:5:1:
-BDU of potential dependencies between sites:Memoization tables:reset:5:1: if(mvbdu_id:9) x1 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:5:1:  false
-BDU of potential dependencies between sites:Memoization tables:reset:5:1: else 
-BDU of potential dependencies between sites:Memoization tables:reset:5:1:  if(mvbdu_id:8) x1 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:5:1:   if(mvbdu_id:7) x2 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:5:1:    false
-BDU of potential dependencies between sites:Memoization tables:reset:5:1:   else 
-BDU of potential dependencies between sites:Memoization tables:reset:5:1:    if(mvbdu_id:6) x2 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:5:1:     true
-BDU of potential dependencies between sites:Memoization tables:reset:5:1:    else 
-BDU of potential dependencies between sites:Memoization tables:reset:5:1:     false
-BDU of potential dependencies between sites:Memoization tables:reset:5:1:  else 
-BDU of potential dependencies between sites:Memoization tables:reset:5:1:   false
-BDU of potential dependencies between sites:Memoization tables:reset:7:
-BDU of potential dependencies between sites:Memoization tables:reset:7:0:
-BDU of potential dependencies between sites:Memoization tables:reset:7:0: if(mvbdu_id:7) x2 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:7:0:  false
-BDU of potential dependencies between sites:Memoization tables:reset:7:0: else 
-BDU of potential dependencies between sites:Memoization tables:reset:7:0:  if(mvbdu_id:6) x2 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:7:0:   true
-BDU of potential dependencies between sites:Memoization tables:reset:7:0:  else 
-BDU of potential dependencies between sites:Memoization tables:reset:7:0:   false
-Mvbdu.002: ok
-PRINT PAIR VALUE in COVERING_CLASS:
-site_type:0:site_state:0
-
-Build BDU from covering_class pair value:
 list_id:1:value:[site_type:0:site_state:0]
 list_id:0:
-BDU of potential dependencies between sites:mvbdu_redefine: if(mvbdu_id:3) x0 < 0 then 
-BDU of potential dependencies between sites:mvbdu_redefine:  false
-BDU of potential dependencies between sites:mvbdu_redefine: else 
-BDU of potential dependencies between sites:mvbdu_redefine:  if(mvbdu_id:2) x0 < 1 then 
-BDU of potential dependencies between sites:mvbdu_redefine:   true
-BDU of potential dependencies between sites:mvbdu_redefine:  else 
-BDU of potential dependencies between sites:mvbdu_redefine:   false
-BDU of potential dependencies between sites:Memoization tables:
-Print Hash_1:
-Print Hash_2:
-BDU of potential dependencies between sites:Memoization tables:reset:0:
-BDU of potential dependencies between sites:Memoization tables:reset:0:1:
-BDU of potential dependencies between sites:Memoization tables:reset:0:1: if(mvbdu_id:3) x0 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:0:1:  false
-BDU of potential dependencies between sites:Memoization tables:reset:0:1: else 
-BDU of potential dependencies between sites:Memoization tables:reset:0:1:  if(mvbdu_id:2) x0 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:0:1:   true
-BDU of potential dependencies between sites:Memoization tables:reset:0:1:  else 
-BDU of potential dependencies between sites:Memoization tables:reset:0:1:   false
-BDU of potential dependencies between sites:Memoization tables:reset:3:
-BDU of potential dependencies between sites:Memoization tables:reset:3:0:
-BDU of potential dependencies between sites:Memoization tables:reset:3:0: if(mvbdu_id:3) x0 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:3:0:  false
-BDU of potential dependencies between sites:Memoization tables:reset:3:0: else 
-BDU of potential dependencies between sites:Memoization tables:reset:3:0:  if(mvbdu_id:2) x0 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:3:0:   true
-BDU of potential dependencies between sites:Memoization tables:reset:3:0:  else 
-BDU of potential dependencies between sites:Memoization tables:reset:3:0:   false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine: if(mvbdu_id:15) x0 < 0 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:  false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine: else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:  if(mvbdu_id:14) x0 < 1 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:   if(mvbdu_id:13) x1 < 0 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:    false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:   else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:    if(mvbdu_id:12) x1 < 1 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:     if(mvbdu_id:11) x0 < 0 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:      false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:     else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:      if(mvbdu_id:10) x0 < 1 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:       if(mvbdu_id:9) x1 < 0 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:        false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:       else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:        if(mvbdu_id:8) x1 < 1 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:         if(mvbdu_id:7) x0 < 0 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:          false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:         else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:          if(mvbdu_id:6) x0 < 1 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:           if(mvbdu_id:5) x1 < 0 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:            false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:           else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:            if(mvbdu_id:4) x1 < 1 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:             if(mvbdu_id:3) x2 < 0 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:              false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:             else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:              if(mvbdu_id:2) x2 < 1 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:               true
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:              else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:               false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:            else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:             false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:          else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:           false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:        else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:         false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:      else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:       false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:    else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:     false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:  else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:   false
 Mvbdu.002: ok
-PRINT PAIR VALUE in COVERING_CLASS:
-site_type:2:site_state:0
-site_type:3:site_state:0
+PRINT PAIR VALUE in COVERING_CLASS:class_id:0:
+site:0->state:0
 
-Build BDU from covering_class pair value:
-list_id:2:value:[site_type:2:site_state:0]
-list_id:1:value:[site_type:3:site_state:0]
-list_id:0:
-BDU of potential dependencies between sites:mvbdu_redefine: if(mvbdu_id:7) x2 < 0 then 
-BDU of potential dependencies between sites:mvbdu_redefine:  false
-BDU of potential dependencies between sites:mvbdu_redefine: else 
-BDU of potential dependencies between sites:mvbdu_redefine:  if(mvbdu_id:6) x2 < 1 then 
-BDU of potential dependencies between sites:mvbdu_redefine:   if(mvbdu_id:5) x3 < 0 then 
-BDU of potential dependencies between sites:mvbdu_redefine:    false
-BDU of potential dependencies between sites:mvbdu_redefine:   else 
-BDU of potential dependencies between sites:mvbdu_redefine:    if(mvbdu_id:4) x3 < 1 then 
-BDU of potential dependencies between sites:mvbdu_redefine:     true
-BDU of potential dependencies between sites:mvbdu_redefine:    else 
-BDU of potential dependencies between sites:mvbdu_redefine:     false
-BDU of potential dependencies between sites:mvbdu_redefine:  else 
-BDU of potential dependencies between sites:mvbdu_redefine:   false
-BDU of potential dependencies between sites:Memoization tables:
-Print Hash_1:
-Print Hash_2:
-BDU of potential dependencies between sites:Memoization tables:reset:0:
-BDU of potential dependencies between sites:Memoization tables:reset:0:1:
-BDU of potential dependencies between sites:Memoization tables:reset:0:1: if(mvbdu_id:5) x3 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:0:1:  false
-BDU of potential dependencies between sites:Memoization tables:reset:0:1: else 
-BDU of potential dependencies between sites:Memoization tables:reset:0:1:  if(mvbdu_id:4) x3 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:0:1:   true
-BDU of potential dependencies between sites:Memoization tables:reset:0:1:  else 
-BDU of potential dependencies between sites:Memoization tables:reset:0:1:   false
-BDU of potential dependencies between sites:Memoization tables:reset:0:2:
-BDU of potential dependencies between sites:Memoization tables:reset:0:2: if(mvbdu_id:7) x2 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:0:2:  false
-BDU of potential dependencies between sites:Memoization tables:reset:0:2: else 
-BDU of potential dependencies between sites:Memoization tables:reset:0:2:  if(mvbdu_id:6) x2 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:0:2:   if(mvbdu_id:5) x3 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:0:2:    false
-BDU of potential dependencies between sites:Memoization tables:reset:0:2:   else 
-BDU of potential dependencies between sites:Memoization tables:reset:0:2:    if(mvbdu_id:4) x3 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:0:2:     true
-BDU of potential dependencies between sites:Memoization tables:reset:0:2:    else 
-BDU of potential dependencies between sites:Memoization tables:reset:0:2:     false
-BDU of potential dependencies between sites:Memoization tables:reset:0:2:  else 
-BDU of potential dependencies between sites:Memoization tables:reset:0:2:   false
-BDU of potential dependencies between sites:Memoization tables:reset:1:
-BDU of potential dependencies between sites:Memoization tables:reset:1:0:
-BDU of potential dependencies between sites:Memoization tables:reset:1:0: false
-BDU of potential dependencies between sites:Memoization tables:reset:1:1:
-BDU of potential dependencies between sites:Memoization tables:reset:1:1: false
-BDU of potential dependencies between sites:Memoization tables:reset:2:
-BDU of potential dependencies between sites:Memoization tables:reset:2:1:
-BDU of potential dependencies between sites:Memoization tables:reset:2:1: if(mvbdu_id:6) x2 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:2:1:  if(mvbdu_id:5) x3 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:2:1:   false
-BDU of potential dependencies between sites:Memoization tables:reset:2:1:  else 
-BDU of potential dependencies between sites:Memoization tables:reset:2:1:   if(mvbdu_id:4) x3 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:2:1:    true
-BDU of potential dependencies between sites:Memoization tables:reset:2:1:   else 
-BDU of potential dependencies between sites:Memoization tables:reset:2:1:    false
-BDU of potential dependencies between sites:Memoization tables:reset:2:1: else 
-BDU of potential dependencies between sites:Memoization tables:reset:2:1:  false
-BDU of potential dependencies between sites:Memoization tables:reset:3:
-BDU of potential dependencies between sites:Memoization tables:reset:3:1:
-BDU of potential dependencies between sites:Memoization tables:reset:3:1: if(mvbdu_id:7) x2 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:3:1:  false
-BDU of potential dependencies between sites:Memoization tables:reset:3:1: else 
-BDU of potential dependencies between sites:Memoization tables:reset:3:1:  if(mvbdu_id:6) x2 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:3:1:   if(mvbdu_id:5) x3 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:3:1:    false
-BDU of potential dependencies between sites:Memoization tables:reset:3:1:   else 
-BDU of potential dependencies between sites:Memoization tables:reset:3:1:    if(mvbdu_id:4) x3 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:3:1:     true
-BDU of potential dependencies between sites:Memoization tables:reset:3:1:    else 
-BDU of potential dependencies between sites:Memoization tables:reset:3:1:     false
-BDU of potential dependencies between sites:Memoization tables:reset:3:1:  else 
-BDU of potential dependencies between sites:Memoization tables:reset:3:1:   false
-BDU of potential dependencies between sites:Memoization tables:reset:5:
-BDU of potential dependencies between sites:Memoization tables:reset:5:0:
-BDU of potential dependencies between sites:Memoization tables:reset:5:0: if(mvbdu_id:5) x3 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:5:0:  false
-BDU of potential dependencies between sites:Memoization tables:reset:5:0: else 
-BDU of potential dependencies between sites:Memoization tables:reset:5:0:  if(mvbdu_id:4) x3 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:5:0:   true
-BDU of potential dependencies between sites:Memoization tables:reset:5:0:  else 
-BDU of potential dependencies between sites:Memoization tables:reset:5:0:   false
-Mvbdu.002: ok
-PRINT PAIR VALUE in COVERING_CLASS:
-site_type:0:site_state:0
-
-Build BDU from covering_class pair value:
+Build list(list_a):
 list_id:1:value:[site_type:0:site_state:0]
 list_id:0:
-BDU of potential dependencies between sites:mvbdu_redefine: if(mvbdu_id:3) x0 < 0 then 
-BDU of potential dependencies between sites:mvbdu_redefine:  false
-BDU of potential dependencies between sites:mvbdu_redefine: else 
-BDU of potential dependencies between sites:mvbdu_redefine:  if(mvbdu_id:2) x0 < 1 then 
-BDU of potential dependencies between sites:mvbdu_redefine:   true
-BDU of potential dependencies between sites:mvbdu_redefine:  else 
-BDU of potential dependencies between sites:mvbdu_redefine:   false
-BDU of potential dependencies between sites:Memoization tables:
-Print Hash_1:
-Print Hash_2:
-BDU of potential dependencies between sites:Memoization tables:reset:0:
-BDU of potential dependencies between sites:Memoization tables:reset:0:1:
-BDU of potential dependencies between sites:Memoization tables:reset:0:1: if(mvbdu_id:3) x0 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:0:1:  false
-BDU of potential dependencies between sites:Memoization tables:reset:0:1: else 
-BDU of potential dependencies between sites:Memoization tables:reset:0:1:  if(mvbdu_id:2) x0 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:0:1:   true
-BDU of potential dependencies between sites:Memoization tables:reset:0:1:  else 
-BDU of potential dependencies between sites:Memoization tables:reset:0:1:   false
-BDU of potential dependencies between sites:Memoization tables:reset:3:
-BDU of potential dependencies between sites:Memoization tables:reset:3:0:
-BDU of potential dependencies between sites:Memoization tables:reset:3:0: if(mvbdu_id:3) x0 < 0 then 
-BDU of potential dependencies between sites:Memoization tables:reset:3:0:  false
-BDU of potential dependencies between sites:Memoization tables:reset:3:0: else 
-BDU of potential dependencies between sites:Memoization tables:reset:3:0:  if(mvbdu_id:2) x0 < 1 then 
-BDU of potential dependencies between sites:Memoization tables:reset:3:0:   true
-BDU of potential dependencies between sites:Memoization tables:reset:3:0:  else 
-BDU of potential dependencies between sites:Memoization tables:reset:3:0:   false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine: if(mvbdu_id:3) x0 < 0 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:  false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine: else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:  if(mvbdu_id:2) x0 < 1 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:   true
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:  else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:   false
+Mvbdu.002: ok
+PRINT PAIR VALUE in COVERING_CLASS:class_id:2:
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
+site:0->state:0
+site:1->state:0
+site:2->state:0
+site:3->state:0
+site:4->state:0
+
+Build list(list_a):
+list_id:10:value:[site_type:4:site_state:0]
+list_id:9:value:[site_type:3:site_state:0]
+list_id:8:value:[site_type:2:site_state:0]
+list_id:7:value:[site_type:1:site_state:0]
+list_id:6:value:[site_type:0:site_state:0]
+list_id:5:value:[site_type:4:site_state:0]
+list_id:4:value:[site_type:3:site_state:0]
+list_id:3:value:[site_type:2:site_state:0]
+list_id:2:value:[site_type:1:site_state:0]
+list_id:1:value:[site_type:0:site_state:0]
+list_id:0:
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine: if(mvbdu_id:19) x0 < 0 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:  false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine: else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:  if(mvbdu_id:18) x0 < 1 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:   if(mvbdu_id:17) x1 < 0 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:    false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:   else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:    if(mvbdu_id:16) x1 < 1 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:     if(mvbdu_id:15) x2 < 0 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:      false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:     else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:      if(mvbdu_id:14) x2 < 1 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:       if(mvbdu_id:13) x3 < 0 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:        false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:       else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:        if(mvbdu_id:12) x3 < 1 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:         if(mvbdu_id:11) x0 < 0 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:          false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:         else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:          if(mvbdu_id:10) x0 < 1 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:           if(mvbdu_id:9) x1 < 0 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:            false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:           else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:            if(mvbdu_id:8) x1 < 1 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:             if(mvbdu_id:7) x2 < 0 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:              false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:             else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:              if(mvbdu_id:6) x2 < 1 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:               if(mvbdu_id:5) x3 < 0 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:                false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:               else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:                if(mvbdu_id:4) x3 < 1 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:                 if(mvbdu_id:3) x4 < 0 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:                  false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:                 else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:                  if(mvbdu_id:2) x4 < 1 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:                   true
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:                  else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:                   false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:                else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:                 false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:              else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:               false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:            else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:             false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:          else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:           false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:        else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:         false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:      else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:       false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:    else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:     false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:  else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:   false
+Mvbdu.002: ok
+PRINT PAIR VALUE in COVERING_CLASS:class_id:3:
+site:0->state:0
+
+Build list(list_a):
+list_id:1:value:[site_type:0:site_state:0]
+list_id:0:
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine: if(mvbdu_id:3) x0 < 0 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:  false
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine: else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:  if(mvbdu_id:2) x0 < 1 then 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:   true
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:  else 
+BDU of potential dependencies between sites:agent_type:mvbdu_redefine:   false
 Mvbdu.002: ok
 execution finished without any exception

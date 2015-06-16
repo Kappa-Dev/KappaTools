@@ -12,28 +12,30 @@
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
+open Int_storage
+open Cckappa_sig
+open Dictionary
+
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Covering_classes_type") message exn (fun () -> default)
 
 let local_trace = false
 
-module AgentMap = Int_storage.Quick_Nearly_inf_Imperatif
+module AgentMap = Quick_Nearly_inf_Imperatif
 
-type agent_dic   = Ckappa_sig.agent_dic
+type 'a map      = 'a Site_map_and_set.map
 type site        = int
-type set         = Cckappa_sig.Site_map_and_set.set
-type 'a map      = 'a Cckappa_sig.Site_map_and_set.map
-type agent_name  = Cckappa_sig.agent_name
-type agent_index = int
+type set         = Site_map_and_set.set
 
 (*state information*)
-type port_min = set AgentMap.t
+type state = (int * int) map
+type port_min = state AgentMap.t
 
 type covering_classes =
   {
     store_modified_map     : int map AgentMap.t;
-    store_covering_classes : ((site * set) list list) AgentMap.t 
-                             * port_min;
+    store_covering_classes : ((site * state) list list) AgentMap.t * port_min;
+
   }
 
 (************************************************************************************)
@@ -43,11 +45,11 @@ type covering_classes =
 (* TYPE REMANENT:
    key(t): int; 'a t = infinite array of list(#id) *)
 
-module Inf_array = Int_storage.Nearly_inf_Imperatif
+module Inf_array = Nearly_inf_Imperatif
 
 module Covering_class =
   struct
-    type t = (site * set) list
+    type t = (site * state) list
     let compare = compare
   end
 
@@ -59,8 +61,8 @@ module Modified_class =
 
 (*Dictionary*)
 
-module Dictionary_of_Covering_class = Dictionary.Dictionary_of_Ord (Covering_class)
-module Dictionary_of_Modified_class = Dictionary.Dictionary_of_Ord (Modified_class)
+module Dictionary_of_Covering_class = Dictionary_of_Ord (Covering_class)
+module Dictionary_of_Modified_class = Dictionary_of_Ord (Modified_class)
 
 type pair_dic   = (unit, unit) Dictionary_of_Covering_class.dictionary
 type index_dic  = (unit, unit) Dictionary_of_Covering_class.dictionary
