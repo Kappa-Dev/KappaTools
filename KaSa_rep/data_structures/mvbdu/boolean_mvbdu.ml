@@ -612,7 +612,7 @@ let print_boolean_mvbdu (error:Exception.method_handler) =
     (fun error parameters a -> 
       let _ =
         Printf.fprintf parameters.Remanent_parameters_sig.log "%s %s\n"
-          parameters.Remanent_parameters_sig.marshalisable_parameters.prefix
+          parameters.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix
           (if a then "true" else "false")
       in error) 
     (fun i -> "x" ^ (string_of_int i)) 
@@ -626,7 +626,7 @@ let print_hash2 error log =
 let print_memo (error:Exception.method_handler) handler parameters = 
   let error,l1,l2 = split_memo error handler in 
   let _ = Printf.fprintf parameters.Remanent_parameters_sig.log "%s\n"
-    parameters.Remanent_parameters_sig.marshalisable_parameters.prefix in 
+    parameters.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix in
   let error = 
     Printf.fprintf stdout "Print Hash_1:\n";
     List.fold_left

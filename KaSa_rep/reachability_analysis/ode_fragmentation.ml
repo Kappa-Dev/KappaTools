@@ -207,7 +207,7 @@ let collect_sites_modified_set parameter error rule handler store_sites_modified
                     (Ckappa_sig.Internal "", (), ()))
 	      in
               (*PRINT*)
-	      let _ = 
+	      let () =
                 fprintf stdout
                   "Flow of information in the ODE semantics:agent_type:%i:" agent_type;
                 match value with

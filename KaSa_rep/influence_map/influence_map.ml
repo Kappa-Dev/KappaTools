@@ -42,7 +42,9 @@ let generic_add fold2_common agent_diag rule_diag parameters error handler n a b
                             | None -> Quark_type.Labels.empty_couple  
                             | Some old -> old 
                           in 
-			  let error,couple = Quark_type.Labels.add_couple parameters error (agent_diag or not (rule = rule')) a a' old in
+			  let error,couple =
+			    Quark_type.Labels.add_couple
+			      parameters error (agent_diag || not (rule = rule')) a a' old in
 			  if Quark_type.Labels.is_empty_couple couple
 			  then 
 			    error,map
