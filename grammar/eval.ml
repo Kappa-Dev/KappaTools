@@ -31,11 +31,11 @@ let eval_intf ast_intf =
 	 "_" ([], Term.with_dummy_pos Ast.FREE,(Lexing.dummy_pos,Lexing.dummy_pos)) map
   in (*Adding default existential port*) iter ast_intf StringMap.empty
 
-let initial_value_alg counter env (ast, _) =
+let initial_value_alg counter algs (ast, _) =
   Expr_interpreter.value_alg
     counter
     ~get_alg:(fun i ->
-	      fst (snd env.Environment.algs.NamedDecls.decls.(i)))
+	      fst (snd algs.NamedDecls.decls.(i)))
     ~get_mix:(fun _ -> Nbr.zero) ~get_tok:(fun _ -> Nbr.zero) ast
 
 let tokenify algs tokens contact_map domain l =
@@ -101,58 +101,48 @@ let rules_of_ast algs tokens contact_map domain
   in
   one_side label rev ast_rule.k_def ast_rule.lhs ast_rule.rhs rm_toks add_toks
 
-let obs_of_result env domain res =
-  let (domain',cont) =
-    List.fold_left
-      (fun (domain,cont) alg_expr ->
-       let (domain',(alg_pos)) =
-	 Expr.compile_alg env.Environment.algs.NamedDecls.finder
-			  env.Environment.tokens.NamedDecls.finder
-			  env.Environment.contact_map domain
-			  alg_expr in
-       domain',alg_pos :: cont)
-      (domain,[]) res.observables in
-  (env,domain',cont)
+let obs_of_result algs tokens contact_map domain res =
+  List.fold_left
+    (fun (domain,cont) alg_expr ->
+     let (domain',alg_pos) =
+       Expr.compile_alg algs.NamedDecls.finder tokens.NamedDecls.finder
+			contact_map domain alg_expr in
+     domain',alg_pos :: cont)
+    (domain,[]) res.observables
 
-let compile_print_expr env domain ex =
+let compile_print_expr algs tokens contact_map domain ex =
   List.fold_right
     (fun (el,pos) (domain,out) ->
      match el with
      | Ast.Str_pexpr s -> (domain,(Ast.Str_pexpr s,pos)::out)
      | Ast.Alg_pexpr ast_alg ->
 	let (domain', (alg,_pos)) =
-	  Expr.compile_alg env.Environment.algs.NamedDecls.finder
-			   env.Environment.tokens.NamedDecls.finder
-			   env.Environment.contact_map domain
-			   (ast_alg,pos) in
+	  Expr.compile_alg algs.NamedDecls.finder tokens.NamedDecls.finder
+			   contact_map domain (ast_alg,pos) in
 	(domain',(Ast.Alg_pexpr alg,pos)::out))
     ex (domain,[])
 
-let effects_of_modif env domain ast_list =
-  let rec iter rev_effects env domain ast_list =
+let effects_of_modif algs tokens rules contact_map domain ast_list =
+  let rec iter rev_effects domain ast_list =
     let rule_effect alg_expr ast_rule mix_pos =
       let (domain',alg_pos) =
-	Expr.compile_alg env.Environment.algs.NamedDecls.finder
-			 env.Environment.tokens.NamedDecls.finder
-			 env.Environment.contact_map domain
-			 alg_expr in
+	Expr.compile_alg algs.NamedDecls.finder tokens.NamedDecls.finder
+			 contact_map domain alg_expr in
       let domain'',elem_rules =
-	rules_of_ast env.Environment.algs.NamedDecls.finder
-			env.Environment.tokens.NamedDecls.finder
-			env.Environment.contact_map domain'
-			None (ast_rule,mix_pos) in
+	rules_of_ast algs.NamedDecls.finder tokens.NamedDecls.finder
+		     contact_map domain' None (ast_rule,mix_pos) in
       let elem_rule = match elem_rules with
 	| [ _, r ] -> r
 	| _ ->
 	   raise
 	     (ExceptionDefn.Malformed_Decl
 		("Ambiguous rule in perturbation is impossible",mix_pos)) in
-      (env,domain'',
+      (domain'',
        (Primitives.ITER_RULE (alg_pos, elem_rule))::rev_effects) in
     match ast_list with
-    | [] -> (env,domain,List.rev rev_effects)
+    | [] -> (domain,List.rev rev_effects)
     | ast::tl ->
-       let (env,domain,rev_effects) =
+       let (domain,rev_effects) =
 	 match ast with
 	 | INTRO (alg_expr, (ast_mix,mix_pos)) ->
 	    let ast_rule =
@@ -171,22 +161,20 @@ let effects_of_modif env domain ast_list =
 	    rule_effect alg_expr ast_rule mix_pos
 	 | UPDATE ((nme, pos_rule), alg_expr) ->
 	    let i,is_rule =
-	      (try (Environment.num_of_rule nme env,true)
+	      (try (StringMap.find nme rules.NamedDecls.finder,true)
 	       with
 	       | Not_found ->
 		  try
-		    (Environment.num_of_alg nme env, false)
+		    (StringMap.find nme algs.NamedDecls.finder, false)
 		  with Not_found ->
 		    raise (ExceptionDefn.Malformed_Decl
 			     ("Variable " ^ (nme ^ " is neither a constant nor a rule")
 			     ,pos_rule))
 	      ) in
 	    let (domain', alg_pos) =
-	      Expr.compile_alg env.Environment.algs.NamedDecls.finder
-			       env.Environment.tokens.NamedDecls.finder
-			       env.Environment.contact_map domain
-			       alg_expr in
-	    (env,domain',
+	      Expr.compile_alg algs.NamedDecls.finder tokens.NamedDecls.finder
+			       contact_map domain alg_expr in
+	    (domain',
 	     (Primitives.UPDATE ((if is_rule then Term.RULE i
 	      else Term.ALG i), alg_pos))::rev_effects)
 	 | UPDATE_TOK ((tk_nme,tk_pos),alg_expr) ->
@@ -201,21 +189,19 @@ let effects_of_modif env domain ast_list =
 			ast_rule tk_pos
 	 | SNAPSHOT (pexpr,_) ->
 	    let (domain',pexpr') =
-	      compile_print_expr env domain pexpr in
+	      compile_print_expr algs tokens contact_map domain pexpr in
 	    (*when specializing snapshots to particular mixtures, add variables below*)
-	    (env,domain',
-	     (Primitives.SNAPSHOT pexpr')::rev_effects)
+	    (domain', (Primitives.SNAPSHOT pexpr')::rev_effects)
 	 | STOP (pexpr,_) ->
 	    let (domain',pexpr') =
-	      compile_print_expr env domain pexpr in
-	    (env,domain',
-	     (Primitives.STOP pexpr')::rev_effects)
+	      compile_print_expr algs tokens contact_map domain pexpr in
+	    (domain', (Primitives.STOP pexpr')::rev_effects)
 	 | CFLOW ((lab,pos_lab),_) ->
 	    let id =
-	      try Environment.num_of_rule lab env
+	      try StringMap.find lab rules.NamedDecls.finder
 	      with Not_found ->
-		try let var = Environment.num_of_alg lab env in
-		    match env.Environment.algs.NamedDecls.decls.(var) with
+		try let var = StringMap.find lab algs.NamedDecls.finder in
+		    match algs.NamedDecls.decls.(var) with
 		    |(_,(Expr.KAPPA_INSTANCE _,_)) -> -1 (* TODO Later *)
 		    | (_,((Expr.CONST _ | Expr.BIN_ALG_OP _ | Expr.TOKEN_ID _ |
 			   Expr.STATE_ALG_OP _ | Expr.UN_ALG_OP _ |
@@ -225,14 +211,13 @@ let effects_of_modif env domain ast_list =
 			   ("Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"
 			   ,pos_lab))
 	    in
-	    (env,domain,
-	     (Primitives.CFLOW id)::rev_effects)
+	    (domain, (Primitives.CFLOW id)::rev_effects)
 	 | CFLOWOFF ((lab,pos_lab),_) ->
 	    let id =
-	      try Environment.num_of_rule lab env
+	      try StringMap.find lab rules.NamedDecls.finder
 	      with Not_found ->
-		try let var = Environment.num_of_alg lab env in
-		    match env.Environment.algs.NamedDecls.decls.(var) with
+		try let var = StringMap.find lab algs.NamedDecls.finder in
+		    match algs.NamedDecls.decls.(var) with
 		    |(_,(Expr.KAPPA_INSTANCE _,_)) -> -1 (* TODO Later *)
 		    | (_,((Expr.CONST _ | Expr.BIN_ALG_OP _ | Expr.TOKEN_ID _ |
 			   Expr.STATE_ALG_OP _ | Expr.UN_ALG_OP _ |
@@ -242,38 +227,36 @@ let effects_of_modif env domain ast_list =
 			   ("Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"
 			   ,pos_lab))
 	    in
-	    (env,domain,
-	     (Primitives.CFLOWOFF id)::rev_effects)
+	    (domain, (Primitives.CFLOWOFF id)::rev_effects)
 	 | FLUX (pexpr,_) ->
-	    let (domain',pexpr') = compile_print_expr env domain pexpr in
-	    (env,domain',
-	     (Primitives.FLUX pexpr')::rev_effects)
+	    let (domain',pexpr') =
+	      compile_print_expr algs tokens contact_map domain pexpr in
+	    (domain', (Primitives.FLUX pexpr')::rev_effects)
 	 | FLUXOFF (pexpr,_) ->
-	    let (domain',pexpr') = compile_print_expr env domain pexpr in
-	    (env,domain',
-	     (Primitives.FLUXOFF pexpr')::rev_effects)
+	    let (domain',pexpr') =
+	      compile_print_expr algs tokens contact_map domain pexpr in
+	    (domain', (Primitives.FLUXOFF pexpr')::rev_effects)
 	 | PRINT (pexpr,print,_) ->
-	    let (domain',pexpr') = compile_print_expr env domain pexpr in
-	    let (domain'',print') = compile_print_expr env domain' print in
-	    (env,domain'',
-	     (Primitives.PRINT (pexpr',print'))::rev_effects)
+	    let (domain',pexpr') =
+	      compile_print_expr algs tokens contact_map domain pexpr in
+	    let (domain'',print') =
+	      compile_print_expr algs tokens contact_map domain' print in
+	    (domain'', (Primitives.PRINT (pexpr',print'))::rev_effects)
 	 | PLOTENTRY ->
-	    (env,domain,
-	     (Primitives.PLOTENTRY)::rev_effects)
+	    (domain, (Primitives.PLOTENTRY)::rev_effects)
        in
-       iter rev_effects env domain tl
+       iter rev_effects domain tl
   in
-  iter [] env domain ast_list
+  iter [] domain ast_list
 
-let pert_of_result env domain res =
-  let (env, domain, _, lpert, stop_times) =
+let pert_of_result algs tokens rules contact_map domain res =
+  let (domain, _, lpert, stop_times,tracking_enabled) =
     List.fold_left
-      (fun (env, domain, p_id, lpert, stop_times)
+      (fun (domain, p_id, lpert, stop_times, tracking_enabled)
 	   ((pre_expr, modif_expr_list, opt_post),pos) ->
        let (domain',(pre,pos_pre)) =
-	 Expr.compile_bool env.Environment.algs.NamedDecls.finder
-			   env.Environment.tokens.NamedDecls.finder
-			   env.Environment.contact_map domain pre_expr in
+	 Expr.compile_bool algs.NamedDecls.finder tokens.NamedDecls.finder
+			   contact_map domain pre_expr in
        let (dep, stopping_time) =
 	 try Expr.deps_of_bool_expr pre
 	 with ExceptionDefn.Unsatisfiable ->
@@ -282,17 +265,15 @@ let pert_of_result env domain res =
 		("Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"
 		,pos_pre))
        in
-       let (env,domain, effects) =
-	 effects_of_modif env domain' modif_expr_list in
-       let env,domain,opt_abort =
+       let (domain, effects) =
+	 effects_of_modif algs tokens rules contact_map domain' modif_expr_list in
+       let domain,opt,stopping_time =
 	 match opt_post with
-	 | None ->
-	    (env,domain,None)
+	 | None -> (domain,None,stopping_time)
 	 | Some post_expr ->
 	    let (domain',(post,_pos)) =
-	      Expr.compile_bool env.Environment.algs.NamedDecls.finder
-				env.Environment.tokens.NamedDecls.finder
-				env.Environment.contact_map domain post_expr in
+	      Expr.compile_bool algs.NamedDecls.finder tokens.NamedDecls.finder
+				contact_map domain post_expr in
 	    let (dep,stopping_time') =
 	      try Expr.deps_of_bool_expr post with
 		ExceptionDefn.Unsatisfiable ->
@@ -301,9 +282,9 @@ let pert_of_result env domain res =
 		     ("Precondition of perturbation is using an invalid equality test on time, I was expecting a preconditon of the form [T]=n"
 		     ,pos))
 	    in
-	    (env,domain',Some (post,dep,stopping_time'))
+	    (domain',Some post,stopping_time'@stopping_time)
        in
-       let has_tracking = env.Environment.tracking_enabled
+       let has_tracking = tracking_enabled
 			  || List.exists
 			       (function
 				 | Primitives.CFLOW _ -> true
@@ -312,25 +293,6 @@ let pert_of_result env domain res =
 				    | Primitives.FLUX _ | Primitives.FLUXOFF _ |
 				    Primitives.PLOTENTRY | Primitives.STOP _ |
 				    Primitives.ITER_RULE _) -> false) effects in
-       let env =
-	 Term.DepSet.fold
-	   (fun dep -> Environment.add_dependencies dep (Term.PERT p_id))
-	   dep
-	   { env with Environment.tracking_enabled = has_tracking } in
-       (*let env = List.fold_left (fun env (r_opt,effect) -> Environment.bind_pert_rule p_id r.r_id env) env effect_list in *)
-       let opt,env,stopping_time =
-	 match opt_abort with
-	 | None -> (None,env,stopping_time)
-	 | Some (post,dep,stopping_time') ->
-	    let env =
-	      Term.DepSet.fold
-		(fun dep_type env ->
-		 Environment.add_dependencies dep_type (Term.ABORT p_id) env
-		)
-		dep env
-	    in
-	    (Some post,env,stopping_time'@stopping_time)
-       in
        let pert =
 	 { Primitives.precondition = pre;
 	   Primitives.effect = effects;
@@ -338,10 +300,11 @@ let pert_of_result env domain res =
 	   Primitives.stopping_time = stopping_time
 	 }
        in
-       (env, domain, succ p_id, pert::lpert,
-	List.fold_left (fun acc el -> (el,p_id)::acc) stop_times stopping_time)
+       (domain, succ p_id, pert::lpert,
+	List.fold_left (fun acc el -> (el,p_id)::acc) stop_times stopping_time,
+       has_tracking)
       )
-      (env, domain, 0, [],[]) res.perturbations
+      (domain, 0, [],[],false) res.perturbations
   in
   (*making sure that perturbations containing a stopping time precondition are tested first*)
   let lpert = List.rev lpert in
@@ -350,29 +313,26 @@ let pert_of_result env domain res =
   let lpert_stopping_time = List.filter pred lpert in
   let lpert_ineq = List.filter (fun p -> not (pred p)) lpert in
   let lpert = lpert_stopping_time@lpert_ineq in
-  (env, domain, lpert,stop_times)
+  ( domain, lpert,stop_times,tracking_enabled)
 
-let init_graph_of_result counter env domain res =
+let init_graph_of_result algs tokens contact_map counter env domain res =
   let domain',init_state =
     List.fold_left
       (fun (domain,state) (opt_vol,init_t,_) -> (*TODO dealing with volumes*)
        match init_t with
        | INIT_MIX (alg, (ast,mix_pos)) ->
 	  let (domain',alg') =
-	    Expr.compile_alg env.Environment.algs.NamedDecls.finder
-			     env.Environment.tokens.NamedDecls.finder
-			     env.Environment.contact_map domain alg in
-	  let value = initial_value_alg counter env alg' in
+	    Expr.compile_alg algs.NamedDecls.finder tokens.NamedDecls.finder
+			     contact_map domain alg in
+	  let value = initial_value_alg counter algs alg' in
 	  let fake_rule =
 	    { lhs = []; rm_token = []; arrow = RAR; rhs = ast; add_token = [];
 	      k_def = Term.with_dummy_pos (CONST Nbr.zero);
 	      k_un = None; k_op = None; } in
 	  let domain'',state' =
 	    match
-	      rules_of_ast env.Environment.algs.NamedDecls.finder
-			      env.Environment.tokens.NamedDecls.finder
-			      env.Environment.contact_map domain' None
-			      (fake_rule,mix_pos)
+	      rules_of_ast algs.NamedDecls.finder tokens.NamedDecls.finder
+			   contact_map domain' None (fake_rule,mix_pos)
 	    with
 	    | domain'',[ _, compiled_rule ] ->
 	       domain'',
@@ -381,7 +341,7 @@ let init_graph_of_result counter env domain res =
 		  fst
 		    (Rule_interpreter.force_rule
 		       ~get_alg:(fun i ->
-				 fst (snd env.Environment.algs.NamedDecls.decls.(i)))
+				 fst (snd algs.NamedDecls.decls.(i)))
 		       domain'' counter s compiled_rule))
 		 state value
 	    | domain'',[] -> domain'',state
@@ -399,16 +359,14 @@ let init_graph_of_result counter env domain res =
 	      k_un = None; k_op = None; } in
 	  let domain',state' =
 	    match
-	      rules_of_ast env.Environment.algs.NamedDecls.finder
-			      env.Environment.tokens.NamedDecls.finder
-			      env.Environment.contact_map domain None
-			      (Term.with_dummy_pos fake_rule)
+	      rules_of_ast algs.NamedDecls.finder tokens.NamedDecls.finder
+			   contact_map domain None (Term.with_dummy_pos fake_rule)
 	    with
 	    | domain'',[ _, compiled_rule ] ->
 	       domain'',
 	       fst (Rule_interpreter.force_rule
 		      ~get_alg:(fun i ->
-				fst (snd env.Environment.algs.NamedDecls.decls.(i)))
+				fst (snd algs.NamedDecls.decls.(i)))
 		      domain'' counter state compiled_rule)
 	    | _,_ -> assert false in
 	  domain',state'
@@ -595,8 +553,16 @@ let initialize logger overwrite result =
 		  domain' result.Ast.rules in
   let rule_nd = NamedDecls.create (Array.of_list compiled_rules) in
 
+  Debug.tag logger "\t -observables";
+  let domain,obs =
+    obs_of_result alg_nd tk_nd contact_map domain' result in
+  Debug.tag logger "\t -perturbations" ;
+  let (domain,pert,stops,tracking_enabled) =
+    pert_of_result alg_nd tk_nd rule_nd contact_map domain result in
+
   let env =
-    Environment.init sigs_nd contact_map tk_nd alg_nd rule_nd in
+    Environment.init sigs_nd tk_nd alg_nd rule_nd
+		     (Array.of_list (List.rev obs)) (Array.of_list pert) in
   let () =
     if !Parameter.compileModeOn then
       Format.eprintf
@@ -607,19 +573,10 @@ let initialize logger overwrite result =
 	    Format.fprintf f "@[%a@]" (Kappa_printer.elementary_rule ~env) r))
 	compiled_rules in
 
-  Debug.tag logger "\t -observables";
-  let env,domain,observables =
-    obs_of_result env domain' result in
-  Debug.tag logger "\t -perturbations" ;
-  let (env, domain,pert,stops) =
-    pert_of_result env domain result in
 
-  let env = { env with
-	      Environment.observables = Array.of_list (List.rev observables);
-	      Environment.perturbations = Array.of_list pert;} in
   Debug.tag logger "\t -initial conditions";
   let domain,graph =
-    init_graph_of_result counter env domain result in
+    init_graph_of_result alg_nd tk_nd contact_map counter env domain result in
   let () =
     if !Parameter.compileModeOn then
       Format.eprintf "@[<v>Domain:@,@[%a@]@,Intial graph;@,@]%a@."

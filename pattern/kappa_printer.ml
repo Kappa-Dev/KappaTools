@@ -1,7 +1,7 @@
 let alg_expr ?env f alg =
   let sigs = match env with
     | None -> None
-    | Some e -> Some e.Environment.signatures in
+    | Some e -> Some (Environment.signatures e) in
   let rec aux f = function
     | Expr.BIN_ALG_OP (op, (a,_), (b,_)) ->
        Format.fprintf f "(%a %a %a)" aux a Term.print_bin_alg_op op aux b
@@ -41,7 +41,7 @@ let print_expr_val ?env alg_val f e =
 let elementary_rule ?env f r =
   let sigs = match env with
     | None -> None
-    | Some e -> Some e.Environment.signatures in
+    | Some e -> Some (Environment.signatures e) in
   let pr_alg f a = alg_expr ?env f a in
   let pr_tok f (va,tok) =
     Format.fprintf
@@ -82,7 +82,7 @@ let modification ?env f = function
        else
 	 let sigs = match env with
 	   | None -> None
-	   | Some e -> Some e.Environment.signatures in
+	   | Some e -> Some (Environment.signatures e) in
 	 let boxed_cc i f cc =
 	   let () = Format.pp_open_box f 2 in
 	   let () = Format.pp_print_int f i in

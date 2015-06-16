@@ -54,10 +54,9 @@ let print_values_raw f (time,l) =
 
 let set_up filename env init_va =
   let head =
-    Array.map
-      (fun (ex,_) ->
-       Format.asprintf "%a" (Kappa_printer.alg_expr ~env) ex)
-      env.Environment.observables in
+    Environment.map_observables
+      (Format.asprintf "%a" (Kappa_printer.alg_expr ~env))
+      env in
   let title =
     if !Parameter.marshalizedInFile <> ""
     then !Parameter.marshalizedInFile ^" output"

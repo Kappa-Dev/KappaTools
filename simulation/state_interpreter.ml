@@ -6,8 +6,8 @@ type t = {
 }
 
 let update_activity get_alg env counter graph activities =
-  Array.iteri
-    (fun i (_,rule) ->
+  Environment.iteri_rules
+    (fun i rule ->
      let rate = Rule_interpreter.value_alg
 		  counter graph ~get_alg rule.Primitives.rate in
      let cc_va =
@@ -17,37 +17,36 @@ let update_activity get_alg env counter graph activities =
      let act =
        if Nbr.is_zero cc_va then Nbr.zero else Nbr.mult rate cc_va in
      Random_tree.add i (Nbr.to_float act) activities)
-    env.Environment.rules.NamedDecls.decls
+    env
 
 let initial env counter graph stopping_times =
   let activity_tree =
-    Random_tree.create (NamedDecls.size env.Environment.rules) in
+    Random_tree.create (Environment.nb_rules env) in
   let () =
-    update_activity
-      (fun i -> fst (snd env.Environment.algs.NamedDecls.decls.(i)))
-      env counter graph activity_tree in
+    update_activity (Environment.get_alg env)
+		    env counter graph activity_tree in
   let stops =
     ref (List.sort (fun (a,_) (b,_) -> Nbr.compare a b) stopping_times) in
   {
     stopping_times = stops;
     perturbations_alive =
-      Array.make (Array.length env.Environment.perturbations) true;
+      Array.make (Environment.nb_perturbations env) true;
     activities = activity_tree;
     variables_overwrite =
-      Array.make (NamedDecls.size env.Environment.algs) None;
+      Array.make (Environment.nb_algs env) None;
 }
 
 let get_alg env state i =
   match state.variables_overwrite.(i) with
-  | None -> fst (snd env.Environment.algs.NamedDecls.decls.(i))
+  | None -> Environment.get_alg env i
   | Some expr -> expr
 
 let observables_values env counter graph state =
   let get_alg i = get_alg env state i in
   (counter.Mods.Counter.time,
-   Array.map
-     (fun (obs,_) -> Rule_interpreter.value_alg counter graph ~get_alg obs)
-     env.Environment.observables)
+   Environment.map_observables
+     (Rule_interpreter.value_alg counter graph ~get_alg)
+     env)
 
 let do_it env domain counter graph state = function
   | Primitives.ITER_RULE ((v,_),r) ->
@@ -124,14 +123,14 @@ let do_it env domain counter graph state = function
 
 let perturbate env domain counter graph state =
   let not_done_yet =
-    Array.make (Array.length env.Environment.perturbations) true in
+    Array.make (Environment.nb_perturbations env) true in
   let get_alg i = get_alg env state i in
   let rec do_until_noop i graph state stop =
-    if stop || i >= Array.length env.Environment.perturbations then
+    if stop || i >= Environment.nb_perturbations env then
      let () = update_activity get_alg env counter graph state.activities in
       (stop,graph,state)
     else
-      let pert = env.Environment.perturbations.(i) in
+      let pert = Environment.get_perturbation env i in
       if state.perturbations_alive.(i) && not_done_yet.(i) &&
 	   Rule_interpreter.value_bool
 	     counter graph ~get_alg pert.Primitives.precondition
@@ -155,7 +154,7 @@ let perturbate env domain counter graph state =
 
 let one_rule env domain counter graph state =
   let rule_id,_ = Random_tree.random state.activities in
-  let _,rule = env.Environment.rules.NamedDecls.decls.(rule_id) in
+  let rule = Environment.get_rule env rule_id in
   let () =
     if !Parameter.debugModeOn then
       Format.printf "@[<v>Applied@ @[%a@]@]@."

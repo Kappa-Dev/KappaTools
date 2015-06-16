@@ -8,7 +8,7 @@ type t = {
 let empty env = {
   roots_of_ccs = Connected_component.Map.empty;
   edges = Edges.empty;
-  tokens = Array.make (NamedDecls.size env.Environment.tokens) Nbr.zero;
+  tokens = Array.make (Environment.nb_tokens env) Nbr.zero;
   free_id = 1;
 }
 
@@ -189,14 +189,15 @@ let print_injections ?sigs f roots_of_ccs =
 
 let print env f state =
   Format.fprintf f "@[<v>%a@,%a@,%a@]"
-		 (Edges.print env.Environment.signatures) state.edges
+		 (Edges.print (Environment.signatures env)) state.edges
 		 (Pp.array Pp.space (fun i f el ->
-				     Format.fprintf f "%%init: %s <- %a"
-						    (NamedDecls.elt_name
-						       env.Environment.tokens i)
-						    Nbr.print el))
+				     Format.fprintf
+				       f "%%init: %a <- %a"
+				       (Environment.print_token ~env) i
+				       Nbr.print el))
 		 state.tokens
-		 (print_injections ~sigs:env.Environment.signatures) state.roots_of_ccs
+		 (print_injections ~sigs:(Environment.signatures env))
+		 state.roots_of_ccs
 
 let debug_print f state =
   Format.fprintf f "@[<v>%a@,%a@,%a@]"
