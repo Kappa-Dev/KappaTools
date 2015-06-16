@@ -193,7 +193,7 @@ let record ?decorate_with rule side_effects (embedding,fresh_map)
   in
   let kind = RULE r_id in
   
-  let im embedding fresh_map id =
+  let im id =
     match id with
     | Primitives.FRESH j -> IntMap.find j fresh_map
     | Primitives.KEPT j -> IntMap.find j embedding in
@@ -203,7 +203,7 @@ let record ?decorate_with rule side_effects (embedding,fresh_map)
     let grid =
       Primitives.PortMap.fold
 	(fun (id,site_id) c grid ->
-	 let node_id = im embedding fresh_map id in
+	 let node_id = im id in
 	 add (node_id,site_id) c grid event_number kind obs
 	) pre_causal grid in
     (*adding side effects modifications*)

@@ -8,41 +8,41 @@ let value_state_alg_op counter ?(time=Counter.time counter) = function
   | Term.PROD_EVENT_VAR ->Nbr.I (Counter.event counter)
 
 type alg_stack_element =
-  | TO_EXEC_ALG of Term.bin_alg_op * Expr.alg_expr
-  | TO_EXEC_COMP of Term.compare_op * Expr.alg_expr
-  | TO_EXEC_BOOL of Term.bool_op * Expr.alg_expr Ast.bool_expr
+  | TO_EXEC_ALG of Term.bin_alg_op * Alg_expr.t
+  | TO_EXEC_COMP of Term.compare_op * Alg_expr.t
+  | TO_EXEC_BOOL of Term.bool_op * Alg_expr.t Ast.bool_expr
   | TO_COMPUTE_ALG of Term.bin_alg_op * Nbr.t
   | TO_COMPUTE_COMP of Term.compare_op * Nbr.t
   | TO_COMPUTE_UN of Term.un_alg_op
 
 let rec exec_alg :
-type a. Counter.t -> ?time:float -> get_alg:(int -> Expr.alg_expr) ->
+type a. Counter.t -> ?time:float -> get_alg:(int -> Alg_expr.t) ->
      get_mix:(Connected_component.t array list -> Nbr.t) -> get_tok:(int -> Nbr.t) ->
-     (Counter.t -> ?time:float -> get_alg:(int -> Expr.alg_expr) ->
+     (Counter.t -> ?time:float -> get_alg:(int -> Alg_expr.t) ->
       get_mix:(Connected_component.t array list -> Nbr.t) -> get_tok:(int -> Nbr.t) ->
       Nbr.t -> alg_stack_element list -> a) ->
-     Expr.alg_expr -> alg_stack_element list -> a =
+     Alg_expr.t -> alg_stack_element list -> a =
     fun counter ?time ~get_alg ~get_mix ~get_tok with_value alg sk ->
     match alg with
-    | Expr.BIN_ALG_OP (op,(a,_),(b,_)) ->
+    | Alg_expr.BIN_ALG_OP (op,(a,_),(b,_)) ->
        exec_alg counter ?time ~get_alg ~get_mix ~get_tok with_value
 		a (TO_EXEC_ALG (op,b)::sk)
-    | Expr.UN_ALG_OP (op,(a,_)) ->
+    | Alg_expr.UN_ALG_OP (op,(a,_)) ->
        exec_alg counter ?time ~get_alg ~get_mix ~get_tok with_value
 		a (TO_COMPUTE_UN op::sk)
-    | Expr.STATE_ALG_OP (op) ->
+    | Alg_expr.STATE_ALG_OP (op) ->
        with_value counter ?time ~get_alg ~get_mix ~get_tok
 		  (value_state_alg_op counter ?time op) sk
-    | Expr.ALG_VAR i ->
+    | Alg_expr.ALG_VAR i ->
        exec_alg counter ?time ~get_alg ~get_mix ~get_tok with_value
 		(get_alg i) sk
-    | Expr.KAPPA_INSTANCE ccs ->
+    | Alg_expr.KAPPA_INSTANCE ccs ->
        with_value counter ?time ~get_alg ~get_mix ~get_tok
 		  (get_mix ccs) sk
-    | Expr.TOKEN_ID i ->
+    | Alg_expr.TOKEN_ID i ->
        with_value counter ?time ~get_alg ~get_mix ~get_tok
 		  (get_tok i) sk
-    | Expr.CONST n ->
+    | Alg_expr.CONST n ->
        with_value counter ?time ~get_alg ~get_mix ~get_tok n sk
 
 let rec with_value_alg counter ?time ~get_alg ~get_mix ~get_tok n = function

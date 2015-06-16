@@ -6,21 +6,20 @@ type t (**Abstract graph*)
 val empty : Environment.t -> t
 
 val value_alg :
-  get_alg:(int -> Expr.alg_expr) -> Mods.Counter.t -> t ->
-  Expr.alg_expr -> Nbr.t
+  get_alg:(int -> Alg_expr.t) -> Mods.Counter.t -> t -> Alg_expr.t -> Nbr.t
 
 val value_bool :
-  get_alg:(int -> Expr.alg_expr) -> Mods.Counter.t -> t ->
-  Expr.alg_expr Ast.bool_expr -> bool
+  get_alg:(int -> Alg_expr.t) -> Mods.Counter.t -> t ->
+  Alg_expr.t Ast.bool_expr -> bool
 
 
 (*Connected_component.Env.t: Domain*)
 val apply_rule :
-  get_alg:(int -> Expr.alg_expr) -> Connected_component.Env.t -> Mods.Counter.t
+  get_alg:(int -> Alg_expr.t) -> Connected_component.Env.t -> Mods.Counter.t
   -> t -> Primitives.elementary_rule -> t option
 
 val force_rule :
-  get_alg:(int -> Expr.alg_expr) -> Connected_component.Env.t -> Mods.Counter.t
+  get_alg:(int -> Alg_expr.t) -> Connected_component.Env.t -> Mods.Counter.t
   -> t -> Primitives.elementary_rule ->
   (t  * Connected_component.Matching.t list option)
 

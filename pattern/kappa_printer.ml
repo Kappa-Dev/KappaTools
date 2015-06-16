@@ -3,15 +3,15 @@ let alg_expr ?env f alg =
     | None -> None
     | Some e -> Some (Environment.signatures e) in
   let rec aux f = function
-    | Expr.BIN_ALG_OP (op, (a,_), (b,_)) ->
+    | Alg_expr.BIN_ALG_OP (op, (a,_), (b,_)) ->
        Format.fprintf f "(%a %a %a)" aux a Term.print_bin_alg_op op aux b
-    | Expr.UN_ALG_OP (op, (a,_)) ->
+    | Alg_expr.UN_ALG_OP (op, (a,_)) ->
        Format.fprintf f "(%a %a)" Term.print_un_alg_op op aux a
-    | Expr.STATE_ALG_OP op -> Term.print_state_alg_op f op
-    | Expr.CONST n -> Nbr.print f n
-    | Expr.ALG_VAR i ->
+    | Alg_expr.STATE_ALG_OP op -> Term.print_state_alg_op f op
+    | Alg_expr.CONST n -> Nbr.print f n
+    | Alg_expr.ALG_VAR i ->
        Environment.print_alg ?env f i
-    | Expr.KAPPA_INSTANCE ccs ->
+    | Alg_expr.KAPPA_INSTANCE ccs ->
        Pp.list
 	 (fun f -> Format.fprintf f " +@ ")
 	 (Pp.array
@@ -21,7 +21,7 @@ let alg_expr ?env f alg =
 	       f "|%a|"
 	       (Connected_component.print ?sigs false) cc))
 	 f ccs
-    | Expr.TOKEN_ID i ->
+    | Alg_expr.TOKEN_ID i ->
        Format.fprintf f "|%a|" (Environment.print_token ?env) i
   in aux f alg
 
@@ -49,7 +49,7 @@ let elementary_rule ?env f r =
       (Environment.print_token ?env) tok
       pr_alg va in
   let pr_trans f t =
-    Transformations.print ?sigs f t in
+    Primitives.Transformation.print ?sigs f t in
   let boxed_cc i f cc =
     let () = Format.pp_open_box f 2 in
     let () = Format.pp_print_int f i in

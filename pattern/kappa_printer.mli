@@ -1,4 +1,4 @@
-val alg_expr : ?env:Environment.t -> Format.formatter -> Expr.alg_expr -> unit
+val alg_expr : ?env:Environment.t -> Format.formatter -> Alg_expr.t -> unit
 
 val print_expr_val :
   ?env:Environment.t -> (?env:Environment.t -> 'a -> Nbr.t) ->

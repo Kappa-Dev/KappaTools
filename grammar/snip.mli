@@ -8,5 +8,5 @@ val connected_components_sum_of_ambiguous_rule :
   Connected_component.Env.t -> Ast.mixture -> Ast.mixture ->
   Connected_component.Env.t *
     (Connected_component.t array * Compilation_info.t *
-       (Transformations.t list * Transformations.t list))
+       (Primitives.Transformation.t list * Primitives.Transformation.t list))
       list

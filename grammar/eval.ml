@@ -8,29 +8,6 @@ type context =
     { pairing : link IntMap.t; curr_id : int;
       new_edges : (int * int) Int2Map.t }
 
-let eval_intf ast_intf =
-  let rec iter ast_intf map =
-    match ast_intf with
-    | p :: ast_interface ->
-       let int_state_list = p.Ast.port_int
-       and lnk_state = p.Ast.port_lnk
-       in
-       if StringMap.mem (fst p.Ast.port_nme) map then
-	 raise
-	   (ExceptionDefn.Malformed_Decl
-	      ("Site '" ^ (fst p.Ast.port_nme) ^ "' is used multiple times",
-	       snd p.Ast.port_nme))
-       else
-	 iter ast_interface
-	      (StringMap.add
-		 (fst p.Ast.port_nme)
-		 (int_state_list, lnk_state, (snd p.Ast.port_nme))
-		 map)
-    | [] ->
-       StringMap.add
-	 "_" ([], Term.with_dummy_pos Ast.FREE,(Lexing.dummy_pos,Lexing.dummy_pos)) map
-  in (*Adding default existential port*) iter ast_intf StringMap.empty
-
 let initial_value_alg counter algs (ast, _) =
   Expr_interpreter.value_alg
     counter
@@ -202,10 +179,10 @@ let effects_of_modif algs tokens rules contact_map domain ast_list =
 	      with Not_found ->
 		try let var = StringMap.find lab algs.NamedDecls.finder in
 		    match algs.NamedDecls.decls.(var) with
-		    |(_,(Expr.KAPPA_INSTANCE _,_)) -> -1 (* TODO Later *)
-		    | (_,((Expr.CONST _ | Expr.BIN_ALG_OP _ | Expr.TOKEN_ID _ |
-			   Expr.STATE_ALG_OP _ | Expr.UN_ALG_OP _ |
-			   Expr.ALG_VAR _),_)) -> raise Not_found
+		    |(_,(Alg_expr.KAPPA_INSTANCE _,_)) -> -1 (* TODO Later *)
+		    | (_,((Alg_expr.CONST _ | Alg_expr.BIN_ALG_OP _ | Alg_expr.TOKEN_ID _ |
+			   Alg_expr.STATE_ALG_OP _ | Alg_expr.UN_ALG_OP _ |
+			   Alg_expr.ALG_VAR _),_)) -> raise Not_found
 		with Not_found ->
 		  raise	(ExceptionDefn.Malformed_Decl
 			   ("Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"
@@ -218,10 +195,10 @@ let effects_of_modif algs tokens rules contact_map domain ast_list =
 	      with Not_found ->
 		try let var = StringMap.find lab algs.NamedDecls.finder in
 		    match algs.NamedDecls.decls.(var) with
-		    |(_,(Expr.KAPPA_INSTANCE _,_)) -> -1 (* TODO Later *)
-		    | (_,((Expr.CONST _ | Expr.BIN_ALG_OP _ | Expr.TOKEN_ID _ |
-			   Expr.STATE_ALG_OP _ | Expr.UN_ALG_OP _ |
-			   Expr.ALG_VAR _),_)) -> raise Not_found
+		    |(_,(Alg_expr.KAPPA_INSTANCE _,_)) -> -1 (* TODO Later *)
+		    | (_,((Alg_expr.CONST _ | Alg_expr.BIN_ALG_OP _ | Alg_expr.TOKEN_ID _ |
+			   Alg_expr.STATE_ALG_OP _ | Alg_expr.UN_ALG_OP _ |
+			   Alg_expr.ALG_VAR _),_)) -> raise Not_found
 		with Not_found ->
 		  raise	(ExceptionDefn.Malformed_Decl
 			   ("Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"

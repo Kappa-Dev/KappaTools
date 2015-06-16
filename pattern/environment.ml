@@ -3,8 +3,8 @@ open Mods
 type t = {
   signatures : Signature.s;
   tokens : unit NamedDecls.t;
-  algs : (Expr.alg_expr Term.with_pos) NamedDecls.t;
-  observables : Expr.alg_expr Term.with_pos array;
+  algs : (Alg_expr.t Term.with_pos) NamedDecls.t;
+  observables : Alg_expr.t Term.with_pos array;
   rules : Primitives.elementary_rule NamedDecls.t;
   perturbations : Primitives.perturbation array;
   desc_table : (string,out_channel * Format.formatter) Hashtbl.t;

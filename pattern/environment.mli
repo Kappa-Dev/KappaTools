@@ -1,8 +1,8 @@
 type t
 
 val init :
-  Signature.s -> unit NamedDecls.t -> Expr.alg_expr Term.with_pos NamedDecls.t
-  -> Primitives.elementary_rule NamedDecls.t -> Expr.alg_expr Term.with_pos array
+  Signature.s -> unit NamedDecls.t -> Alg_expr.t Term.with_pos NamedDecls.t
+  -> Primitives.elementary_rule NamedDecls.t -> Alg_expr.t Term.with_pos array
   -> Primitives.perturbation array -> t
 (** [init sigs contact_map tokens algs rules obs perts] *)
 
@@ -12,10 +12,10 @@ val nb_rules : t -> int
 val nb_perturbations : t -> int
 val signatures : t -> Signature.s
 
-val get_alg : t -> int -> Expr.alg_expr
+val get_alg : t -> int -> Alg_expr.t
 val get_perturbation : t -> int -> Primitives.perturbation
 val get_rule : t -> int -> Primitives.elementary_rule
-val map_observables : (Expr.alg_expr -> 'a) -> t -> 'a array
+val map_observables : (Alg_expr.t -> 'a) -> t -> 'a array
 val iteri_rules : (int -> Primitives.elementary_rule -> unit) -> t -> unit
 
 val num_of_agent : string Term.with_pos -> t -> int

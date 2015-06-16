@@ -460,15 +460,16 @@ let dangling_link side key =
 let define_full_transformation (removed,added as transf) links_transf
 			  place site dst switch =
   let cand = match dst with
-    | None -> Transformations.Freed (place,site)
-    | Some dst -> Transformations.Linked ((place,site),dst) in
+    | None -> Primitives.Transformation.Freed (place,site)
+    | Some dst -> Primitives.Transformation.Linked ((place,site),dst) in
   let cands l = match dst with
-    | None -> Transformations.Freed (place,site)::l
+    | None -> Primitives.Transformation.Freed (place,site)::l
     | Some dst ->
-       Transformations.Linked ((place,site),dst) ::
-	 Transformations.Linked (dst,(place,site)) :: l in
+       Primitives.Transformation.Linked ((place,site),dst) ::
+	 Primitives.Transformation.Linked (dst,(place,site)) :: l in
   match switch with
-  | Freed -> ((cand::removed,(Transformations.Freed(place,site)::added)),
+  | Freed -> ((cand::removed,
+	       (Primitives.Transformation.Freed(place,site)::added)),
 	      links_transf)
   | Maintained -> (transf,links_transf)
   | Erased ->
@@ -480,7 +481,7 @@ let define_full_transformation (removed,added as transf) links_transf
        if Some dst' = dst then (transf,links_transf')
        else
 	 ((cands removed,
-	   Transformations.Linked((place,site),dst')::added),
+	   Primitives.Transformation.Linked((place,site),dst')::added),
 	  links_transf')
      with Not_found ->
 	  let links_transf' = IntMap.add i ((place,site)) links_transf in
@@ -490,14 +491,14 @@ let define_positive_transformation (removed,added as transf) links_transf
 				   place site switch =
   match switch with
   | Freed ->
-     ((removed,Transformations.Freed (place,site)::added),links_transf)
+     ((removed,Primitives.Transformation.Freed (place,site)::added),links_transf)
   | (Erased | Maintained) -> (transf,links_transf)
   | Linked (i,_) ->
      try
        let dst' = IntMap.find i links_transf in
        let links_transf' = IntMap.remove i links_transf in
        ((removed,
-	 Transformations.Linked((place,site),dst')::added),
+	 Primitives.Transformation.Linked((place,site),dst')::added),
 	links_transf')
      with Not_found ->
        let links_transf' = IntMap.add i ((place,site)) links_transf in
@@ -513,7 +514,7 @@ let rec add_agents_in_cc id wk registered_links transf compile_info links_transf
      end
   | ag :: ag_l ->
      let (node,wk) = Connected_component.new_node wk ag.ra_type in
-     let place = Transformations.Existing (node,id) in
+     let place = Primitives.Place.Existing (node,id) in
      let rec handle_ports wk r_l (removed,added) compile_info l_t re acc site_id =
        if site_id = Array.length ag.ra_ports
        then add_agents_in_cc id wk r_l (removed,added) compile_info l_t re acc
@@ -522,11 +523,11 @@ let rec add_agents_in_cc id wk registered_links transf compile_info links_transf
 	   | I_ANY -> (removed,added),wk
 	   | I_VAL_CHANGED (i,j) ->
 	      (if i = j then (removed,added)
-	       else Transformations.Internalized (place,site_id,i)::removed,
-		    Transformations.Internalized (place,site_id,j)::added),
+	       else Primitives.Transformation.Internalized (place,site_id,i)::removed,
+		    Primitives.Transformation.Internalized (place,site_id,j)::added),
 		Connected_component.new_internal_state wk (node,site_id) i
 	   | I_VAL_ERASED i ->
-	      (Transformations.Internalized (place,site_id,i)::removed,added),
+	      (Primitives.Transformation.Internalized (place,site_id,i)::removed,added),
 	      Connected_component.new_internal_state wk (node,site_id) i
 	   | (I_ANY_ERASED | I_ANY_CHANGED _) ->
 	      raise (ExceptionDefn.Internal_Error
@@ -549,7 +550,7 @@ let rec add_agents_in_cc id wk registered_links transf compile_info links_transf
 	 | L_VAL ((i,pos),s) ->
 	    try
 	      let (node',site' as dst) = IntMap.find i r_l in
-	      let dst_place = (Transformations.Existing (node',id),site') in
+	      let dst_place = Primitives.Place.Existing (node',id),site' in
 	      let wk'' = Connected_component.new_link wk' (node,site_id) dst in
 	      let transf',l_t' =
 		define_full_transformation
@@ -604,7 +605,7 @@ let rec complete_with_creation (removed,added) links_transf fresh = function
 	   | Some (i,_) -> dangling_link "right" i
      end
   | ag :: ag_l ->
-     let place = Transformations.Fresh (ag.Raw_mixture.a_type,fresh) in
+     let place = Primitives.Place.Fresh (ag.Raw_mixture.a_type,fresh) in
      let rec handle_ports added l_t site_id =
        if site_id = Array.length ag.Raw_mixture.a_ports
        then complete_with_creation (removed,added) l_t (succ fresh) ag_l
@@ -612,16 +613,16 @@ let rec complete_with_creation (removed,added) links_transf fresh = function
 	 let added' = match ag.Raw_mixture.a_ints.(site_id) with
 	   | None -> added
 	   | Some i ->
-	      Transformations.Internalized (place,site_id,i)::added in
+	      Primitives.Transformation.Internalized (place,site_id,i)::added in
 	 let added'',l_t' =
 	   match ag.Raw_mixture.a_ports.(site_id) with
 	   | Raw_mixture.FREE ->
-	      Transformations.Freed (place,site_id)::added',l_t
+	      Primitives.Transformation.Freed (place,site_id)::added',l_t
 	   | Raw_mixture.VAL i ->
 	      try
 		let dst = IntMap.find i l_t in
 		let l_t' = IntMap.remove i l_t in
-		Transformations.Linked((place,site_id),dst)::added',
+		Primitives.Transformation.Linked((place,site_id),dst)::added',
 		l_t'
 	      with Not_found ->
 		let l_t' = IntMap.add i ((place,site_id)) l_t in
@@ -642,12 +643,12 @@ let connected_components_of_mixture created env mix =
 	 add_agents_in_cc id wk IntMap.empty transformations
 			  compile_info links_transf t [h] in
      let (env',inj, cc) = Connected_component.finish_new wk_out in
-     let added' = List.map (Transformations.rename wk_out id cc inj) added in
+     let added' = List.map (Primitives.Transformation.rename wk_out id cc inj) added in
      let removed' =
-       List.map (Transformations.rename wk_out id cc inj) removed in
+       List.map (Primitives.Transformation.rename wk_out id cc inj) removed in
      let l_t' = IntMap.map
 		  (fun (p,s as x) ->
-		   let p' = Transformations.rename_place wk id cc inj p in
+		   let p' = Primitives.Place.rename wk id cc inj p in
 		   if p == p' then x else (p',s)) l_t in
      let compile_info'' = Compilation_info.rename wk id cc inj compile_info' in
      aux env' (removed',added') compile_info'' l_t' (cc::acc) (succ id) remains

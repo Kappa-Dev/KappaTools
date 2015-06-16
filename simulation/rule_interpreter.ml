@@ -22,11 +22,11 @@ let update_roots is_add map cc root =
     cc ((if is_add then ValMap.add else ValMap.remove) root va) map
 
 let from_place (inj_nodes,inj_fresh,free_id as inj2graph) = function
-  | Transformations.Existing (n,id) ->
+  | Primitives.Place.Existing (n,id) ->
      (Connected_component.ContentAgent.get_sort n,
       Connected_component.Matching.get (n,id) inj_nodes,
       inj2graph)
-  | Transformations.Fresh (ty,id) ->
+  | Primitives.Place.Fresh (ty,id) ->
      try (ty,Mods.IntMap.find id inj_fresh,inj2graph)
      with Not_found ->
        ty,free_id,(inj_nodes,Mods.IntMap.add id free_id inj_fresh,succ free_id)
@@ -34,7 +34,7 @@ let from_place (inj_nodes,inj_fresh,free_id as inj2graph) = function
 let deal_transformation is_add domain inj2graph edges roots transf = (*transf: abstract edge to be added or removed*)
   let inj,graph,obs = (*inj: inj2graph', graph: edges', obs: delta_roots -NB inj should not change if [is_add] is false*)
     match transf with
-    | Transformations.Freed (n,s) -> (*(n,s)-bottom*)
+    | Primitives.Transformation.Freed (n,s) -> (*(n,s)-bottom*)
        let ty, id, inj2graph' = from_place inj2graph n in (*(A,23,phi)*)
        let edges' =
 	 if is_add then Edges.add_free ty id s edges
@@ -43,7 +43,7 @@ let deal_transformation is_add domain inj2graph edges roots transf = (*transf: a
 	 Connected_component.Matching.observables_from_free
 	   domain (if is_add then edges' else edges) ty id s in (*this hack should disappear when chekcing O\H only*)
        (inj2graph',edges',new_obs)
-    | Transformations.Linked ((n,s),(n',s')) ->
+    | Primitives.Transformation.Linked ((n,s),(n',s')) ->
        let ty, id, inj2graph' = from_place inj2graph n in
        let ty', id', inj2graph'' = from_place inj2graph' n' in
        let edges' =
@@ -53,7 +53,7 @@ let deal_transformation is_add domain inj2graph edges roots transf = (*transf: a
 	 Connected_component.Matching.observables_from_link
 	   domain (if is_add then edges' else edges) ty id s ty' id' s' in
        (inj2graph'',edges',new_obs)
-    | Transformations.Internalized (n,s,i) ->
+    | Primitives.Transformation.Internalized (n,s,i) ->
        let ty, id, inj2graph' = from_place inj2graph n in
        let edges' =
 	 if is_add then Edges.add_internal id s i edges

@@ -1,3 +1,5 @@
+open Alg_expr
+
 let print_ast_link f = function
   | Ast.FREE -> ()
   | Ast.LNK_TYPE ((p,_), (a,_)) -> Format.fprintf f "!%s.%s" p a
@@ -46,16 +48,6 @@ let rec print_bool p_alg f = function
 		    p_alg a Term.print_compare_op op p_alg b
 
 let print_ast_bool = print_bool print_ast_alg
-
-type alg_expr =
-    BIN_ALG_OP of
-      Term.bin_alg_op * alg_expr Term.with_pos * alg_expr Term.with_pos
-  | UN_ALG_OP of Term.un_alg_op * alg_expr Term.with_pos
-  | STATE_ALG_OP of Term.state_alg_op
-  | ALG_VAR of int
-  | KAPPA_INSTANCE of Connected_component.cc array list
-  | TOKEN_ID of int
-  | CONST of Nbr.t
 
 type ('a,'b) contractible = NO of 'a
 			  | MAYBE of 'a * Term.bin_alg_op * 'a * 'b

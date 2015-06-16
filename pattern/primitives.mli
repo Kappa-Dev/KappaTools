@@ -1,84 +1,75 @@
-(** binding or modifying a port that has been added or kept from the lhs *)
-type id = FRESH of int | KEPT of int
-type port = id * int
-type action =
-    BND of (port * port)
-  | FREE of (port * bool) (** FREE(p,is_side_effect_free) *)
-  | MOD of (port * int)
-  | DEL of int
-  | ADD of (int * int) (**(id in mixture, name_id)*)
+module Place :
+sig
+  type t =
+      Existing of Connected_component.ContentAgent.t * int (* node, id *)
+    | Fresh of int * int (* type, id *)
 
-module IdMap : MapExt.S with type key = id
-module PortMap : MapExt.S with type key = port
-module ActionSet : Set.S with type elt = action
+  val rename :
+    Connected_component.work -> int -> Connected_component.cc ->
+    Renaming.t -> t -> t
+end
+
+module Transformation :
+sig
+  type t =
+      Freed of Place.t * int
+    | Linked of (Place.t * int) * (Place.t * int)
+    | Internalized of Place.t * int * int
+
+  val rename :
+    Connected_component.work -> int ->
+    Connected_component.cc -> Renaming.t -> t -> t
+
+  val print : ?sigs:Signature.s -> Format.formatter -> t -> unit
+end
 
 module Causality :
 sig
   type t
+  val empty : t
   val is_link_tested : t -> bool
   val is_link_modif : t -> bool
+  val is_link_modif_side : t -> bool
   val is_link_something : t -> bool
   val is_internal_tested : t -> bool
   val is_internal_modif : t -> bool
+  val is_internal_modif_side : t -> bool
   val is_internal_something : t -> bool
-
-  (** [create internal_tested link_tested] *)
-  val create : bool -> bool -> t
+  val add_internal_tested : t -> t
   val add_internal_modif : t -> t
+  val add_internal_modif_side : t -> t
+  val add_link_tested : t -> t
   val add_link_modif : t -> t
-
-  val to_int : t -> int
+  val add_link_modif_side : t -> t
 end
 
 type elementary_rule = {
-  rate : Expr.alg_expr;
+  rate : Alg_expr.t;
   connected_components : Connected_component.t array;
-  removed : Transformations.t list;
-  inserted : Transformations.t list;
-  consumed_tokens : (Expr.alg_expr * int) list;
-  injected_tokens : (Expr.alg_expr * int) list;
+  removed : Transformation.t list;
+  inserted : Transformation.t list;
+  consumed_tokens : (Alg_expr.t * int) list;
+  injected_tokens : (Alg_expr.t * int) list;
   infos : Compilation_info.t;
 }
 
-type rule = {
-  k_def : Expr.alg_expr; (** standard kinetic constant *)
-  k_alt : Expr.alg_expr option * Expr.alg_expr option;
-  (** Possible unary kinetic rate *)
-  over_sampling : float option;
-  (** Boosted kinetic rate for Bologna technique *)
-  script : action list;
-  balance : (int * int * int);	(** #deleted,#preserved,#removed *)
-  lhs : Mixture.t;
-  rhs : Mixture.t;
-  r_id : int;
-  added : Mods.IntSet.t;
-  modif_sites : Mods.Int2Set.t IdMap.t;
-  pre_causal : Causality.t PortMap.t;
-  is_pert: bool;
-  cc_impact :
-    (Mods.IntSet.t Mods.IntMap.t * Mods.IntSet.t Mods.IntMap.t *
-       Mods.IntSet.t Mods.IntMap.t) option;
-  add_token : (Expr.alg_expr * int) list;
-  rm_token : (Expr.alg_expr * int) list
-}
-
 type modification =
-    ITER_RULE of Expr.alg_expr Term.with_pos * elementary_rule
-  | UPDATE of Term.dep_type * Expr.alg_expr Term.with_pos
-  | SNAPSHOT of Expr.alg_expr Ast.print_expr Term.with_pos list
-  | STOP of Expr.alg_expr Ast.print_expr Term.with_pos list
+    ITER_RULE of Alg_expr.t Term.with_pos * elementary_rule
+  | UPDATE of Term.dep_type * Alg_expr.t Term.with_pos
+  | SNAPSHOT of Alg_expr.t Ast.print_expr Term.with_pos list
+  | STOP of Alg_expr.t Ast.print_expr Term.with_pos list
   | CFLOW of int
-  | FLUX of Expr.alg_expr Ast.print_expr Term.with_pos list
-  | FLUXOFF of Expr.alg_expr Ast.print_expr Term.with_pos list
+  | FLUX of Alg_expr.t Ast.print_expr Term.with_pos list
+  | FLUXOFF of Alg_expr.t Ast.print_expr Term.with_pos list
   | CFLOWOFF of int
   | PLOTENTRY
   | PRINT of
-      (Expr.alg_expr Ast.print_expr Term.with_pos list *
-	 Expr.alg_expr Ast.print_expr Term.with_pos list)
+      (Alg_expr.t Ast.print_expr Term.with_pos list *
+	 Alg_expr.t Ast.print_expr Term.with_pos list)
 
 type perturbation =
-    { precondition: Expr.alg_expr Ast.bool_expr;
+    { precondition: Alg_expr.t Ast.bool_expr;
       effect : modification list;
-      abort : Expr.alg_expr Ast.bool_expr option;
+      abort : Alg_expr.t Ast.bool_expr option;
       stopping_time : Nbr.t list
     }
