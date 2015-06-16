@@ -342,13 +342,13 @@ site:0->state:0
 Build list(list_a):
 list_id:1:value:[site_type:0:site_state:0]
 list_id:0:
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine: if(mvbdu_id:3) x0 < 0 then 
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:  false
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine: else 
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:  if(mvbdu_id:2) x0 < 1 then 
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:   true
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:  else 
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:   false
+BDU of potential dependencies between sites:mvbdu_redefine: if(mvbdu_id:3) x0 < 0 then 
+BDU of potential dependencies between sites:mvbdu_redefine:  false
+BDU of potential dependencies between sites:mvbdu_redefine: else 
+BDU of potential dependencies between sites:mvbdu_redefine:  if(mvbdu_id:2) x0 < 1 then 
+BDU of potential dependencies between sites:mvbdu_redefine:   true
+BDU of potential dependencies between sites:mvbdu_redefine:  else 
+BDU of potential dependencies between sites:mvbdu_redefine:   false
 Mvbdu.002: ok
 PRINT PAIR VALUE in COVERING_CLASS:class_id:1:
 site:0->state:0
@@ -357,30 +357,24 @@ site:0->state:0
 site:1->state:0
 
 Build list(list_a):
-list_id:4:value:[site_type:1:site_state:1]
+list_id:4:value:[site_type:0:site_state:0]
 list_id:3:value:[site_type:0:site_state:0]
 list_id:2:value:[site_type:1:site_state:0]
-list_id:1:value:[site_type:0:site_state:0]
+list_id:1:value:[site_type:1:site_state:1]
 list_id:0:
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine: if(mvbdu_id:11) x0 < 0 then 
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:  false
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine: else 
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:  if(mvbdu_id:10) x0 < 1 then 
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:   if(mvbdu_id:9) x0 < 0 then 
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:    false
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:   else 
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:    if(mvbdu_id:8) x0 < 1 then 
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:     if(mvbdu_id:7) x1 < 0 then 
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:      false
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:     else 
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:      if(mvbdu_id:6) x1 < 1 then 
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:       true
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:      else 
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:       false
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:    else 
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:     false
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:  else 
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:   false
+BDU of potential dependencies between sites:mvbdu_redefine: if(mvbdu_id:9) x0 < 0 then 
+BDU of potential dependencies between sites:mvbdu_redefine:  false
+BDU of potential dependencies between sites:mvbdu_redefine: else 
+BDU of potential dependencies between sites:mvbdu_redefine:  if(mvbdu_id:8) x0 < 1 then 
+BDU of potential dependencies between sites:mvbdu_redefine:   if(mvbdu_id:7) x1 < 1 then 
+BDU of potential dependencies between sites:mvbdu_redefine:    false
+BDU of potential dependencies between sites:mvbdu_redefine:   else 
+BDU of potential dependencies between sites:mvbdu_redefine:    if(mvbdu_id:6) x1 < 2 then 
+BDU of potential dependencies between sites:mvbdu_redefine:     true
+BDU of potential dependencies between sites:mvbdu_redefine:    else 
+BDU of potential dependencies between sites:mvbdu_redefine:     false
+BDU of potential dependencies between sites:mvbdu_redefine:  else 
+BDU of potential dependencies between sites:mvbdu_redefine:   false
 Mvbdu.002: ok
 PRINT PAIR VALUE in COVERING_CLASS:class_id:2:
 site:0->state:0
@@ -388,12 +382,12 @@ site:0->state:0
 Build list(list_a):
 list_id:1:value:[site_type:0:site_state:0]
 list_id:0:
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine: if(mvbdu_id:3) x0 < 0 then 
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:  false
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine: else 
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:  if(mvbdu_id:2) x0 < 1 then 
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:   true
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:  else 
-BDU of potential dependencies between sites:agent_type:mvbdu_redefine:   false
+BDU of potential dependencies between sites:mvbdu_redefine: if(mvbdu_id:3) x0 < 0 then 
+BDU of potential dependencies between sites:mvbdu_redefine:  false
+BDU of potential dependencies between sites:mvbdu_redefine: else 
+BDU of potential dependencies between sites:mvbdu_redefine:  if(mvbdu_id:2) x0 < 1 then 
+BDU of potential dependencies between sites:mvbdu_redefine:   true
+BDU of potential dependencies between sites:mvbdu_redefine:  else 
+BDU of potential dependencies between sites:mvbdu_redefine:   false
 Mvbdu.002: ok
 execution finished without any exception

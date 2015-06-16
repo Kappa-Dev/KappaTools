@@ -506,14 +506,6 @@ let add_covering_class parameter error agent_type site_list store_covering_class
         store_covering_classes
 
 (*------------------------------------------------------------------------------*)
-let print_pair l =
-  let rec aux acc =
-    match acc with
-      | [] -> ()
-      | (s,x) :: tl ->
-        fprintf stdout "site_type:%i:site_state:%i\n" s x;
-        aux tl
-  in aux l
 
 let collect_covering_classes parameter error views diff_reverse store_covering_classes =
   let error, store_covering_classes =
@@ -534,7 +526,7 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
                 Site_map_and_set.fold_map
 	          (fun site port (store_current_class, store_port_min) ->
                     (*get state min*)
-                    let port_min = int_of_port port in
+                    let state = int_of_port port in
                     (*let _ =
                       fprintf stdout "*agent_type:%i:site_type:%i:site_state:%i\n" 
                         agent_type site port_min
@@ -545,7 +537,7 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
                         parameter
                         error
                         site
-                        (site, port_min)
+                        (site, state)
                         store_port_min
                     in
                     let old_state =
@@ -1063,10 +1055,10 @@ let bdu_covering_classes parameter error handler cc_compil =
         (*---------------------------------------------------------------------------*)    
         (*build bdu_list from a list of pair [site, state] computed above in cv*)
         let error, (handler, list_a) =
-          List_algebra.build_sorted_list
+          List_algebra.build_list
             (Boolean_mvbdu.list_allocate parameter)
-            parameter
             error
+            parameter
             handler
             (List.flatten pair_list)
         in
@@ -1146,7 +1138,6 @@ let covering_classes parameter error handler cc_compil =
   error, result
 
 let bdu_covering_class parameter error handler cc_compil =
-  let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
   (*call the function compute bdu for covering classes*)
   let error, bdu_cv = bdu_covering_classes parameter error handler cc_compil in
   error, bdu_cv
