@@ -82,7 +82,9 @@ Side-effect:agent_type:0:
 Side-effect:deletion:undocument_site:
 Side-effect:agent_type:1:
 Side-effect:deletion:undocument_site:
+Relation between sites:
 Potential dependencies between sites:
+BDU of potential dependencies between sites:
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
 Flow of information in the ODE semantics:rule_id:1

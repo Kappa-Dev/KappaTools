@@ -28,27 +28,17 @@ type site        = int
 type set         = Site_map_and_set.set
 
 (*state information*)
-type state = (int * int) map
+type state = (int * int) list
 type pair_map = state AgentMap.t
 type state_set = set AgentMap.t
 
 (*BDU*)
-type bdu = ((Boolean_mvbdu.memo_tables, 
-             Boolean_mvbdu.mvbdu_dic,
-             Boolean_mvbdu.list_dic, 
-             bool, 
-             int) Memo_sig.handler,
-            Boolean_mvbdu.mvbdu_dic,
-            Boolean_mvbdu.list_dic,
-            Boolean_mvbdu.memo_tables)
-    Sanity_test_sig.remanent
-
 type bdu_redefine =  bool Mvbdu_sig.mvbdu AgentMap.t
 
 type covering_classes =
   {
     store_modified_map     : int map AgentMap.t;
-    store_covering_classes : ((site * state) list list) AgentMap.t * state AgentMap.t
+    store_covering_classes : (site list list) AgentMap.t * state AgentMap.t
                              * bdu_redefine
   }
 
@@ -63,7 +53,7 @@ module Inf_array = Nearly_inf_Imperatif
 
 module Covering_class =
   struct
-    type t = (site * state) list
+    type t = site list
     let compare = compare
   end
 

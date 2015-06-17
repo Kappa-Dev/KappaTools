@@ -134,58 +134,50 @@ Side-effect:deletion:document_site:
 agent_id:0:agent_type:1:site_type:0
 Side-effect:agent_type:1:
 Side-effect:deletion:undocument_site:
+Relation between sites:
+Relation between sites:agent_type:0:
+TEST:[site_type:0:state:0]
+Relation between sites:agent_type:1:
+TEST:[site_type:0:state:0]
+TEST:[site_type:0:state:1]
 Potential dependencies between sites:
-Mvbdu.002: ok
-Mvbdu.002: ok
-Mvbdu.002: ok
 Potential dependencies between sites:agent_type:0:
 Potential dependencies between sites:Number of covering classes:1
 Potential dependencies between sites:Covering_class_id:0:
 site_type:0
-Relation between site and state:
-site:0->state:0
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
 site_type:1
-Relation between site and state:
-site:0->state:0
 Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
 site_type:1
-Relation between site and state:
-site:0->state:0
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
-{1}
+site_type:1
 Potential dependencies between sites:agent_type:1:
 Potential dependencies between sites:Number of covering classes:1
 Potential dependencies between sites:Covering_class_id:0:
 site_type:0
-Relation between site and state:
-site:0->state:1
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
 site_type:1
-Relation between site and state:
-site:0->state:1
 Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
 site_type:1
-Relation between site and state:
-site:0->state:1
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
-{1}
-Potential dependencies between sites:agent_type:0:
-Potential dependencies between sites:agent_type:0:mvbdu_redefine: if(mvbdu_id:3) x0 < 0 then 
-Potential dependencies between sites:agent_type:0:mvbdu_redefine:  false
-Potential dependencies between sites:agent_type:0:mvbdu_redefine: else 
-Potential dependencies between sites:agent_type:0:mvbdu_redefine:  if(mvbdu_id:2) x0 < 1 then 
-Potential dependencies between sites:agent_type:0:mvbdu_redefine:   true
-Potential dependencies between sites:agent_type:0:mvbdu_redefine:  else 
-Potential dependencies between sites:agent_type:0:mvbdu_redefine:   false
-Potential dependencies between sites:agent_type:1:
-Potential dependencies between sites:agent_type:1:mvbdu_redefine: if(mvbdu_id:3) x0 < 1 then 
-Potential dependencies between sites:agent_type:1:mvbdu_redefine:  false
-Potential dependencies between sites:agent_type:1:mvbdu_redefine: else 
-Potential dependencies between sites:agent_type:1:mvbdu_redefine:  if(mvbdu_id:2) x0 < 2 then 
-Potential dependencies between sites:agent_type:1:mvbdu_redefine:   true
-Potential dependencies between sites:agent_type:1:mvbdu_redefine:  else 
-Potential dependencies between sites:agent_type:1:mvbdu_redefine:   false
+site_type:1
+BDU of potential dependencies between sites:
+BDU of potential dependencies between sites:agent_type:0:
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine: if(mvbdu_id:3) x0 < 0 then 
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:  false
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine: else 
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:  if(mvbdu_id:2) x0 < 1 then 
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:   true
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:  else 
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:   false
+BDU of potential dependencies between sites:agent_type:1:
+BDU of potential dependencies between sites:agent_type:1:mvbdu_redefine: if(mvbdu_id:3) x0 < 1 then 
+BDU of potential dependencies between sites:agent_type:1:mvbdu_redefine:  false
+BDU of potential dependencies between sites:agent_type:1:mvbdu_redefine: else 
+BDU of potential dependencies between sites:agent_type:1:mvbdu_redefine:  if(mvbdu_id:2) x0 < 2 then 
+BDU of potential dependencies between sites:agent_type:1:mvbdu_redefine:   true
+BDU of potential dependencies between sites:agent_type:1:mvbdu_redefine:  else 
+BDU of potential dependencies between sites:agent_type:1:mvbdu_redefine:   false
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
 Flow of information in the ODE semantics:agent_type:0:site_modified:0->x(binding state)
