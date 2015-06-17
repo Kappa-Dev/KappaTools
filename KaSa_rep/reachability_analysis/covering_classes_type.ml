@@ -29,13 +29,13 @@ type set         = Site_map_and_set.set
 
 (*state information*)
 type state = (int * int) map
-type port_min = state AgentMap.t
+type pair_map = state AgentMap.t
+type state_set = set AgentMap.t
 
 type covering_classes =
   {
     store_modified_map     : int map AgentMap.t;
-    store_covering_classes : ((site * state) list list) AgentMap.t * port_min;
-
+    store_covering_classes : ((site * state) list list) AgentMap.t * state AgentMap.t
   }
 
 (************************************************************************************)

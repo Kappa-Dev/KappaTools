@@ -413,22 +413,28 @@ Potential dependencies between sites:Number of covering classes:1
 Potential dependencies between sites:Covering_class_id:0:
 site_type:0
 site_type:1
+Relation between site and state:
 site:0->state:0
 site:1->state:1
+Relation between site and state:
 site:0->state:1
 site:1->state:0
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
 site_type:1
 site_type:2
+Relation between site and state:
 site:0->state:0
 site:1->state:1
+Relation between site and state:
 site:0->state:1
 site:1->state:0
 Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
 site_type:1
 site_type:2
+Relation between site and state:
 site:0->state:0
 site:1->state:1
+Relation between site and state:
 site:0->state:1
 site:1->state:0
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
@@ -438,22 +444,28 @@ Potential dependencies between sites:Number of covering classes:1
 Potential dependencies between sites:Covering_class_id:0:
 site_type:0
 site_type:1
+Relation between site and state:
 site:0->state:0
 site:1->state:2
+Relation between site and state:
 site:0->state:2
 site:1->state:1
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
 site_type:1
 site_type:2
+Relation between site and state:
 site:0->state:0
 site:1->state:2
+Relation between site and state:
 site:0->state:2
 site:1->state:1
 Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
 site_type:1
 site_type:2
+Relation between site and state:
 site:0->state:0
 site:1->state:2
+Relation between site and state:
 site:0->state:2
 site:1->state:1
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
@@ -465,18 +477,22 @@ site_type:0
 site_type:1
 site_type:2
 site_type:3
+Relation between site and state:
 site:0->state:0
 site:1->state:0
 site:2->state:0
 site:3->state:1
+Relation between site and state:
 site:0->state:0
 site:1->state:0
 site:2->state:0
 site:3->state:0
+Relation between site and state:
 site:0->state:0
 site:1->state:0
 site:2->state:0
 site:3->state:0
+Relation between site and state:
 site:0->state:0
 site:1->state:0
 site:2->state:0
@@ -486,18 +502,22 @@ site_type:1
 site_type:2
 site_type:3
 site_type:4
+Relation between site and state:
 site:0->state:0
 site:1->state:0
 site:2->state:0
 site:3->state:1
+Relation between site and state:
 site:0->state:0
 site:1->state:0
 site:2->state:0
 site:3->state:0
+Relation between site and state:
 site:0->state:0
 site:1->state:0
 site:2->state:0
 site:3->state:0
+Relation between site and state:
 site:0->state:0
 site:1->state:0
 site:2->state:0
@@ -507,18 +527,22 @@ site_type:1
 site_type:2
 site_type:3
 site_type:4
+Relation between site and state:
 site:0->state:0
 site:1->state:0
 site:2->state:0
 site:3->state:1
+Relation between site and state:
 site:0->state:0
 site:1->state:0
 site:2->state:0
 site:3->state:0
+Relation between site and state:
 site:0->state:0
 site:1->state:0
 site:2->state:0
 site:3->state:0
+Relation between site and state:
 site:0->state:0
 site:1->state:0
 site:2->state:0
@@ -662,19 +686,19 @@ site:0->state:0
 site:1->state:1
 
 Build list(list_a):
-list_id:4:value:[site_type:0:site_state:0]
-list_id:3:value:[site_type:0:site_state:1]
-list_id:2:value:[site_type:1:site_state:1]
-list_id:1:value:[site_type:1:site_state:0]
+list_id:4:value:[site_type:0:site_state:1]
+list_id:3:value:[site_type:0:site_state:0]
+list_id:2:value:[site_type:1:site_state:0]
+list_id:1:value:[site_type:1:site_state:1]
 list_id:0:
-BDU of potential dependencies between sites:mvbdu_redefine: if(mvbdu_id:11) x0 < 1 then 
+BDU of potential dependencies between sites:mvbdu_redefine: if(mvbdu_id:11) x0 < 0 then 
 BDU of potential dependencies between sites:mvbdu_redefine:  false
 BDU of potential dependencies between sites:mvbdu_redefine: else 
-BDU of potential dependencies between sites:mvbdu_redefine:  if(mvbdu_id:10) x0 < 2 then 
-BDU of potential dependencies between sites:mvbdu_redefine:   if(mvbdu_id:9) x1 < 0 then 
+BDU of potential dependencies between sites:mvbdu_redefine:  if(mvbdu_id:10) x0 < 1 then 
+BDU of potential dependencies between sites:mvbdu_redefine:   if(mvbdu_id:9) x1 < 1 then 
 BDU of potential dependencies between sites:mvbdu_redefine:    false
 BDU of potential dependencies between sites:mvbdu_redefine:   else 
-BDU of potential dependencies between sites:mvbdu_redefine:    if(mvbdu_id:8) x1 < 1 then 
+BDU of potential dependencies between sites:mvbdu_redefine:    if(mvbdu_id:8) x1 < 2 then 
 BDU of potential dependencies between sites:mvbdu_redefine:     true
 BDU of potential dependencies between sites:mvbdu_redefine:    else 
 BDU of potential dependencies between sites:mvbdu_redefine:     false
@@ -688,19 +712,19 @@ site:0->state:0
 site:1->state:2
 
 Build list(list_a):
-list_id:4:value:[site_type:0:site_state:0]
-list_id:3:value:[site_type:0:site_state:2]
-list_id:2:value:[site_type:1:site_state:2]
-list_id:1:value:[site_type:1:site_state:1]
+list_id:4:value:[site_type:0:site_state:2]
+list_id:3:value:[site_type:0:site_state:0]
+list_id:2:value:[site_type:1:site_state:1]
+list_id:1:value:[site_type:1:site_state:2]
 list_id:0:
-BDU of potential dependencies between sites:mvbdu_redefine: if(mvbdu_id:11) x0 < 2 then 
+BDU of potential dependencies between sites:mvbdu_redefine: if(mvbdu_id:11) x0 < 0 then 
 BDU of potential dependencies between sites:mvbdu_redefine:  false
 BDU of potential dependencies between sites:mvbdu_redefine: else 
-BDU of potential dependencies between sites:mvbdu_redefine:  if(mvbdu_id:10) x0 < 3 then 
-BDU of potential dependencies between sites:mvbdu_redefine:   if(mvbdu_id:9) x1 < 1 then 
+BDU of potential dependencies between sites:mvbdu_redefine:  if(mvbdu_id:10) x0 < 1 then 
+BDU of potential dependencies between sites:mvbdu_redefine:   if(mvbdu_id:9) x1 < 2 then 
 BDU of potential dependencies between sites:mvbdu_redefine:    false
 BDU of potential dependencies between sites:mvbdu_redefine:   else 
-BDU of potential dependencies between sites:mvbdu_redefine:    if(mvbdu_id:8) x1 < 2 then 
+BDU of potential dependencies between sites:mvbdu_redefine:    if(mvbdu_id:8) x1 < 3 then 
 BDU of potential dependencies between sites:mvbdu_redefine:     true
 BDU of potential dependencies between sites:mvbdu_redefine:    else 
 BDU of potential dependencies between sites:mvbdu_redefine:     false
@@ -738,10 +762,10 @@ list_id:8:value:[site_type:2:site_state:0]
 list_id:7:value:[site_type:2:site_state:0]
 list_id:6:value:[site_type:2:site_state:0]
 list_id:5:value:[site_type:2:site_state:0]
-list_id:4:value:[site_type:3:site_state:1]
+list_id:4:value:[site_type:3:site_state:0]
 list_id:3:value:[site_type:3:site_state:0]
 list_id:2:value:[site_type:3:site_state:0]
-list_id:1:value:[site_type:3:site_state:0]
+list_id:1:value:[site_type:3:site_state:1]
 list_id:0:
 BDU of potential dependencies between sites:mvbdu_redefine: if(mvbdu_id:17) x0 < 0 then 
 BDU of potential dependencies between sites:mvbdu_redefine:  false
@@ -755,10 +779,10 @@ BDU of potential dependencies between sites:mvbdu_redefine:     if(mvbdu_id:13) 
 BDU of potential dependencies between sites:mvbdu_redefine:      false
 BDU of potential dependencies between sites:mvbdu_redefine:     else 
 BDU of potential dependencies between sites:mvbdu_redefine:      if(mvbdu_id:12) x2 < 1 then 
-BDU of potential dependencies between sites:mvbdu_redefine:       if(mvbdu_id:11) x3 < 0 then 
+BDU of potential dependencies between sites:mvbdu_redefine:       if(mvbdu_id:11) x3 < 1 then 
 BDU of potential dependencies between sites:mvbdu_redefine:        false
 BDU of potential dependencies between sites:mvbdu_redefine:       else 
-BDU of potential dependencies between sites:mvbdu_redefine:        if(mvbdu_id:10) x3 < 1 then 
+BDU of potential dependencies between sites:mvbdu_redefine:        if(mvbdu_id:10) x3 < 2 then 
 BDU of potential dependencies between sites:mvbdu_redefine:         true
 BDU of potential dependencies between sites:mvbdu_redefine:        else 
 BDU of potential dependencies between sites:mvbdu_redefine:         false
