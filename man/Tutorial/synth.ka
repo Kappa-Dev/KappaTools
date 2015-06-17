@@ -1,0 +1,31 @@
+%token: Cpt
+%agent: N(e3,e5,o,i~A~T~G~C~U~AP)
+
+#Grow rules
+'growAT' N(i!0,e5),N(i!0,e3) -> N(i!0,e5!1),N(i!0,e3!2),N(e3!1,i~A!3),N(e5!2,i~T!3) @ 'kAT'
+'growTA' N(i!0,e5),N(i!0,e3) -> N(i!0,e5!1),N(i!0,e3!2),N(e3!1,i~T!3),N(e5!2,i~A!3) @ 'kAT'
+'growGC' N(i!0,e5),N(i!0,e3) -> N(i!0,e5!1),N(i!0,e3!2),N(e3!1,i~G!3),N(e5!2,i~C!3) @ 'kGC'
+'growCG' N(i!0,e5),N(i!0,e3) -> N(i!0,e5!1),N(i!0,e3!2),N(e3!1,i~C!3),N(e5!2,i~G!3) @ 'kGC'
+
+#seeds
+
+'seedAT' -> N(i~A!0),N(i~T!0) | 1:Cpt @ 'sAT'
+'seedGC' -> N(i~G!0),N(i~C!0) | 1:Cpt @ 'sGC'
+
+%var: 'kGC' 10
+%var: 'kAT' 1.5 * 'kGC'
+%var: 'sGC' 1
+%var: 'sAT' 1.5 * 'sGC'
+
+%mod: |Cpt| = 1 do $UPDATE 'sGC' 0.
+
+%var: 'C' N(i~C?)
+%var: 'G' N(i~G?)
+%var: 'N' N()
+
+%obs: 'GC content' ('C'+'G')/'N'
+
+%mod: 'N'=10000 do $SNAPSHOT "dna.ka"
+
+## Uncomment this line to have snapshot in a dot format
+#%def: "dotSnapshots" "true"	

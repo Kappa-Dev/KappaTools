@@ -1,0 +1,74 @@
+%agent: SUBSTRATE(s~0~1~2,e1,e2,x)
+%agent: E1(s,x)
+%agent: E2(s,x)
+%agent: SCAFFOLD(e1,e2,x,s)
+
+%init: 100 E1()
+%init: 100 E2()
+%init: 1000 SUBSTRATE()
+%init: 100 SCAFFOLD()
+%token: t
+
+%obs: '2' SUBSTRATE(s~2?)
+%obs: 'toxic' SUBSTRATE(s~1,e1,e2)
+%var: 'kon' 1.0E-4 ## per molecule per second
+%var: 'koff(ns)' 1 ##High off rate for non specific substrate
+%var: 'koff(s)' 0.01 ##low off rate for specific substrate
+
+%var: 'fastCat' 0.1 ##fast initial setp (as APE1)
+%var: 'slowCat' 0.01 ##limiting step in the pathway 0-->2 (as ligation step)
+
+%var: 'unary' 1.0E+4 ## Steric effect
+
+
+##E1 and E2 conflict on substrate
+'e1.SUBSTRATE' E1(s),SUBSTRATE(e1,e2) -> E1(s!1),SUBSTRATE(e1!1,e2) @ 'kon'
+'e1.SUBSTRATE (via SCAFFOLD)' \
+	      E1(s  ,x!2),SUBSTRATE(e1  ,e2,x!1),SCAFFOLD(e1!2,s!1) -> \
+	      E1(s!0,x!2),SUBSTRATE(e1!0,e2,x!1),SCAFFOLD(e1!2,s!1) @ 'unary'
+
+'e2.SUBSTRATE' E2(s),SUBSTRATE(e1,e2) -> E2(s!1),SUBSTRATE(e1,e2!1) @ 'kon'
+'e2.SUBSTRATE (via SCAFFOLD)' \
+	      E2(s  ,x!2),SUBSTRATE(e2  ,e1,x!1),SCAFFOLD(e2!2,s!1) -> \
+	      E2(s!0,x!2),SUBSTRATE(e2!0,e1,x!1),SCAFFOLD(e2!2,s!1) @ 'unary'
+
+'e1..SUBSTRATE(ns)' SUBSTRATE(s~2,e1!1),E1(s!1) -> SUBSTRATE(s~2,e1),E1(s) @ 'koff(ns)'
+'e1..SUBSTRATE(0)' SUBSTRATE(s~0,e1!1),E1(s!1) -> SUBSTRATE(s~0,e1),E1(s) @ 'koff(s)'
+'e1..SUBSTRATE(1)' SUBSTRATE(s~1,e1!1),E1(s!1) -> SUBSTRATE(s~1,e1),E1(s) @ 'koff(s)'
+
+'e2..SUBSTRATE(ns)' SUBSTRATE(s~0,e2!1),E2(s!1) -> SUBSTRATE(s~0,e2),E2(s) @ 'koff(ns)'
+'e2..SUBSTRATE(1)' SUBSTRATE(s~1,e2!1),E2(s!1) -> SUBSTRATE(s~1,e2),E2(s) @ 'koff(s)'
+'e2..SUBSTRATE(2)' SUBSTRATE(s~2,e2!1),E2(s!1) -> SUBSTRATE(s~2,e2),E2(s) @ 'koff(s)'
+
+'e1.SCAFFOLD' E1(x),SCAFFOLD(e1) -> E1(x!1),SCAFFOLD(e1!1) @ 'kon'
+'e1.SCAFFOLD (via SUBSTRATE)' \
+	     E1(x  ,s!1),SCAFFOLD(e1  ,s!2),SUBSTRATE(e1!1,x!2) -> \
+	     E1(x!0,s!1),SCAFFOLD(e1!0,s!2),SUBSTRATE(e1!1,x!2) @ 'unary'
+
+'e2.SCAFFOLD' E2(x),SCAFFOLD(e2) -> E2(x!1),SCAFFOLD(e2!1) @ 'kon'
+'e2.SCAFFOLD (via SUBSTRATE)' \
+	     E2(x  ,s!1),SCAFFOLD(e2  ,s!2),SUBSTRATE(e2!1,x!2) -> \
+	     E2(x!0,s!1),SCAFFOLD(e2!0,s!2),SUBSTRATE(e2!1,x!2) @ 'unary'
+
+'e1..SCAFFOLD' SCAFFOLD(e1!_) -> SCAFFOLD(e1) @ 'koff(ns)'
+'e2..SCAFFOLD' SCAFFOLD(e2!_) -> SCAFFOLD(e2) @ 'koff(ns)'
+
+'SCAFFOLD.SUBSTRATE' SCAFFOLD(x),SUBSTRATE(x) -> SCAFFOLD(x!1),SUBSTRATE(x!1) @ 'kon' 
+'SCAFFOLD.SUBSTRATE (via E1)' \
+		    SCAFFOLD(x,  e1!1),SUBSTRATE(e1!2,x  ),E1(x!1,s!2) ->\
+		    SCAFFOLD(x!0,e1!1),SUBSTRATE(e1!2,x!0),E1(x!1,s!2) @ 'unary' 
+'SCAFFOLD.SUBSTRATE (via E2)' \
+		    SCAFFOLD(x,  e2!1),SUBSTRATE(e2!2,x  ),E2(x!1,s!2) ->\
+		    SCAFFOLD(x!0,e2!1),SUBSTRATE(e2!2,x!0),E2(x!1,s!2) @ 'unary' 
+
+
+'SCAFFOLD...SUBSTRATE' SCAFFOLD(x!_) -> SCAFFOLD(x) @ 'koff(ns)' 
+
+'0->1' SUBSTRATE(s~0,e1!1),E1(s!1)->SUBSTRATE(s~1,e1!1),E1(s!1) @ 'fastCat'
+'1->2' SUBSTRATE(s~1,e2!1),E2(s!1)->SUBSTRATE(s~2,e2!1),E2(s!1)|1:t @ 'slowCat'
+
+### Causal flows
+#%mod: [true] do $TRACK '1->2' [true]
+#%mod: '2'=3 do ($TRACK '1->2' [false] ; $STOP)
+
+#%def: "displayCompression" "none"

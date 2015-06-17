@@ -1,0 +1,65 @@
+###Signatures
+%agent: N(e3,e5,o,i~A~T~G~C~U~AP)
+%agent: UDG(dbd)
+%token: Cpt
+
+###Rules
+
+'deamination' N(i~C?) -> N(i~U) @ 'kdeam'
+
+'binding' UDG(dbd),N(o) <-> UDG(dbd!1),N(o!1) @ ('kon'/'V'),'koff'
+
+'slide35' UDG(dbd!1),N(o!1,e3!2),N(o,e5!2) <-> UDG(dbd!1),N(o,e3!2),N(o!1,e5!2) @ 'kslide','kslide'
+
+'recognition' UDG(dbd!1),N(o!1,i~U) -> UDG(dbd!1),N(o,i~U!1) @ 'kreco' 
+
+'U removal' UDG(dbd!1),N(o,i~U!1) -> UDG(dbd!1),N(o,i~AP!1) @ 'krepair'
+
+'BER' N(i~AP!_,e5!1),N(e3!1,i!2),\
+      N(i~G ,e3!3),N(e5!3,i!2) ->\
+      N(i~C!0,e5!1),N(e3!1,i!2),\
+      N(i~G!0,e3!3),N(e5!3,i!2) @ 'kber'
+
+###Variables and observables
+
+## Arbitrary volume
+%var: 'V' 1
+
+%var: 'C' N(i~C?) #Number of cytosine bases
+%var: 'AP' N(i~AP?) #Number of apurinic sites
+%var: 'U' N(i~U?) #Number of uracil bases
+%var: 'Nc' N(i~G?) #Total number of initial cytosine bases
+
+%obs: 'damage' ('U'+'AP')/'Nc' #Damage ratio
+%obs: 'apurinic' 'AP'/'Nc'
+%obs: 'uracil' 'U'/'Nc'
+%obs: 'correct' 'C'/'Nc' #Correct bases ratio
+
+%var: 'kdeam' 0.0 #deamination per second 
+%var: 'kon' 0.001
+%var: 'koff' 0.1
+
+%var: 'kslide' 100 #bp per second
+%var: 'kreco' 10*'kslide'
+
+%var: 'krepair' 1 #AP repair per second
+%var: 'kber' 1 - ('AP'/'Nc') #decreases with the ratio of AP sites to model BER occupancy
+
+%var: 'free UDG' UDG(dbd)
+%var: 'bound UDG' UDG(dbd!_)
+%var: 'N' N()
+
+%var: 'ss' ('bound UDG' * 'koff') /  ('free UDG' * 'N' * 'kon')   
+
+
+%var: 'UDG.N' UDG(dbd!1),N(o!1)
+%var: 'UDG' UDG()
+%obs: 'UDG sliding' 'UDG.N'/'UDG'
+
+###Deamination pulse
+
+%mod: ('ss' > 1) do $UPDATE 'deamination' [inf] #start the pulse the first time 'ss' becomes greater than 1
+%mod: 'damage' > 0.05 do $UPDATE 'deamination' 0.0
+
+### initial condition
+%init: 10 UDG()
