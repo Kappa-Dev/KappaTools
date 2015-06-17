@@ -29,8 +29,6 @@ type set         = Site_map_and_set.set
 
 (*state information*)
 type state = (int * int) list
-type pair_map = state AgentMap.t
-type state_set = set AgentMap.t
 
 (*BDU*)
 type bdu_redefine =  bool Mvbdu_sig.mvbdu AgentMap.t
