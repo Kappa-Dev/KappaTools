@@ -76,6 +76,106 @@ module Transformation =
 	   (Place.print_internal ?sigs p s) i
   end
 
+module Compilation_info =
+  struct
+    type t = {
+      sites_tested_unmodified : (Place.t * int) list;
+      sites_tested_modified : (Place.t * int) list;
+      sites_untested_modified : (Place.t * int) list;
+      internal_states_tested_unmodified : (Place.t * int) list;
+      internal_states_tested_modified : (Place.t * int) list;
+      internal_states_untested_modified : (Place.t * int) list;
+    }
+
+    let of_empty_rule =
+      {
+	sites_tested_unmodified = [];
+	sites_tested_modified = [];
+	sites_untested_modified = [];
+	internal_states_tested_unmodified = [];
+	internal_states_tested_modified = [];
+	internal_states_untested_modified = [];
+      }
+
+    let rename_place wk id cc inj (pl,i as x) =
+      let aux = Place.rename wk id cc inj pl in
+      if aux == pl then x else (aux,i)
+
+    let add_site_tested_only p i info =
+      {
+	sites_tested_unmodified = (p,i)::info.sites_tested_unmodified;
+	sites_tested_modified = info.sites_tested_modified;
+	sites_untested_modified = info.sites_untested_modified;
+	internal_states_tested_unmodified =
+	  info.internal_states_tested_unmodified;
+	internal_states_tested_modified = info.internal_states_tested_modified;
+	internal_states_untested_modified =
+	  info.internal_states_untested_modified;
+      }
+    let add_site_modified ~tested p i info =
+      {
+	sites_tested_unmodified = info.sites_tested_unmodified;
+	sites_tested_modified =
+	  if tested then (p,i)::info.sites_tested_modified
+	  else info.sites_tested_modified;
+	sites_untested_modified =
+	  if tested then info.sites_untested_modified
+	  else (p,i)::info.sites_untested_modified;
+	internal_states_tested_unmodified =
+	  info.internal_states_tested_unmodified;
+	internal_states_tested_modified = info.internal_states_tested_modified;
+	internal_states_untested_modified =
+	  info.internal_states_untested_modified;
+      }
+    let add_internal_state_tested_only p i info =
+      {
+	sites_tested_unmodified = info.sites_tested_unmodified;
+	sites_tested_modified = info.sites_tested_modified;
+	sites_untested_modified = info.sites_untested_modified;
+	internal_states_tested_unmodified =
+	  (p,i)::info.internal_states_tested_unmodified;
+	internal_states_tested_modified = info.internal_states_tested_modified;
+	internal_states_untested_modified =
+	  info.internal_states_untested_modified;
+      }
+    let add_internal_state_modified ~tested p i info =
+      {
+	sites_tested_unmodified = info.sites_tested_unmodified;
+	sites_tested_modified = info.sites_tested_modified;
+	sites_untested_modified = info.sites_untested_modified;
+	internal_states_tested_unmodified =
+	  info.internal_states_tested_unmodified;
+	internal_states_tested_modified =
+	  if tested then (p,i)::info.internal_states_tested_modified
+	  else info.internal_states_tested_modified;
+	internal_states_untested_modified =
+	  if tested then info.internal_states_untested_modified
+	  else (p,i)::info.internal_states_untested_modified;
+      }
+
+    let rename wk id cc inj info =
+      {
+	sites_tested_unmodified =
+	  Tools.list_smart_map
+	    (rename_place wk id cc inj) info.sites_tested_unmodified;
+	sites_tested_modified =
+	  Tools.list_smart_map
+	    (rename_place wk id cc inj) info.sites_tested_modified;
+	sites_untested_modified =
+	  Tools.list_smart_map
+	    (rename_place wk id cc inj) info.sites_untested_modified;
+	internal_states_tested_unmodified =
+	  Tools.list_smart_map
+	    (rename_place wk id cc inj) info.internal_states_tested_unmodified;
+	internal_states_tested_modified =
+	  Tools.list_smart_map
+	    (rename_place wk id cc inj) info.internal_states_tested_modified;
+	internal_states_untested_modified =
+	  Tools.list_smart_map
+	    (rename_place wk id cc inj) info.internal_states_untested_modified;
+      }
+  end
+
 module Causality :
 sig
   type t

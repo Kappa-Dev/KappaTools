@@ -23,6 +23,28 @@ sig
   val print : ?sigs:Signature.s -> Format.formatter -> t -> unit
 end
 
+module Compilation_info :
+sig
+  type t = {
+    sites_tested_unmodified : (Place.t * int) list;
+    sites_tested_modified : (Place.t * int) list;
+    sites_untested_modified : (Place.t * int) list;
+    internal_states_tested_unmodified : (Place.t * int) list;
+    internal_states_tested_modified : (Place.t * int) list;
+    internal_states_untested_modified : (Place.t * int) list;
+  }
+
+  val of_empty_rule : t
+  val add_site_tested_only : Place.t -> int -> t -> t
+  val add_site_modified : tested:bool -> Place.t -> int -> t -> t
+  val add_internal_state_tested_only : Place.t -> int -> t -> t
+  val add_internal_state_modified : tested:bool -> Place.t -> int -> t -> t
+
+  val rename :
+    Connected_component.work -> int ->
+    Connected_component.cc -> Renaming.t -> t -> t
+end
+
 module Causality :
 sig
   type t
