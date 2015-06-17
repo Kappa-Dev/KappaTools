@@ -32,10 +32,24 @@ type state = (int * int) map
 type pair_map = state AgentMap.t
 type state_set = set AgentMap.t
 
+(*BDU*)
+type bdu = ((Boolean_mvbdu.memo_tables, 
+             Boolean_mvbdu.mvbdu_dic,
+             Boolean_mvbdu.list_dic, 
+             bool, 
+             int) Memo_sig.handler,
+            Boolean_mvbdu.mvbdu_dic,
+            Boolean_mvbdu.list_dic,
+            Boolean_mvbdu.memo_tables)
+    Sanity_test_sig.remanent
+
+type bdu_redefine =  bool Mvbdu_sig.mvbdu AgentMap.t
+
 type covering_classes =
   {
     store_modified_map     : int map AgentMap.t;
     store_covering_classes : ((site * state) list list) AgentMap.t * state AgentMap.t
+                             * bdu_redefine
   }
 
 (************************************************************************************)

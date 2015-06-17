@@ -114,7 +114,7 @@ let main () =
     else error,None 
   in
   (*BDU covering class*)
-  let error, bdu_covering_classes =
+  (*let error, bdu_covering_classes =
     if Remanent_parameters.get_do_site_dependencies parameters
     then
       let parameters_bdu =
@@ -128,7 +128,7 @@ let main () =
       in
       error, Some dep
     else error, None
-  in
+  in*)
   (*BDU test*)
   (*let parameters_bdu = Remanent_parameters.update_prefix parameters "BDU:" in
   let _ =

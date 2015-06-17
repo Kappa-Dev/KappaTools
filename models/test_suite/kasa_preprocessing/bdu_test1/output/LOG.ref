@@ -109,6 +109,9 @@ Side-effect:
 Side-effect:unbinding:
 Side-effect:deletion:
 Potential dependencies between sites:
+Mvbdu.002: ok
+Mvbdu.002: ok
+Mvbdu.002: ok
 Potential dependencies between sites:agent_type:0:
 Potential dependencies between sites:Number of covering classes:1
 Potential dependencies between sites:Covering_class_id:0:
@@ -137,6 +140,14 @@ Relation between site and state:
 site:0->state:0
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
 {1; 2}
+Potential dependencies between sites:agent_type:0:
+Potential dependencies between sites:agent_type:0:mvbdu_redefine: if(mvbdu_id:3) x1 < 0 then 
+Potential dependencies between sites:agent_type:0:mvbdu_redefine:  false
+Potential dependencies between sites:agent_type:0:mvbdu_redefine: else 
+Potential dependencies between sites:agent_type:0:mvbdu_redefine:  if(mvbdu_id:2) x1 < 1 then 
+Potential dependencies between sites:agent_type:0:mvbdu_redefine:   true
+Potential dependencies between sites:agent_type:0:mvbdu_redefine:  else 
+Potential dependencies between sites:agent_type:0:mvbdu_redefine:   false
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
 Flow of information in the ODE semantics:agent_type:0:site_modified:0->x(internal state)
@@ -147,29 +158,4 @@ Flow of information in the ODE semantics:Internal flow:
 - agent_type:0:site_type:0 -> agent_type:0:modified_type:1
 Flow of information in the ODE semantics:rule_id:1
 Flow of information in the ODE semantics:agent_type:0:site_modified:1->y(internal state)
-BDU of potential dependencies between sites:
-PRINT PAIR VALUE in COVERING_CLASS:class_id:0:
-site:0->state:0
-site:0->state:0
-site:1->state:0
-
-Build list(list_a):
-list_id:3:value:[site_type:0:site_state:0]
-list_id:2:value:[site_type:0:site_state:0]
-list_id:1:value:[site_type:1:site_state:0]
-list_id:0:
-BDU of potential dependencies between sites:mvbdu_redefine: if(mvbdu_id:7) x0 < 0 then 
-BDU of potential dependencies between sites:mvbdu_redefine:  false
-BDU of potential dependencies between sites:mvbdu_redefine: else 
-BDU of potential dependencies between sites:mvbdu_redefine:  if(mvbdu_id:6) x0 < 1 then 
-BDU of potential dependencies between sites:mvbdu_redefine:   if(mvbdu_id:5) x1 < 0 then 
-BDU of potential dependencies between sites:mvbdu_redefine:    false
-BDU of potential dependencies between sites:mvbdu_redefine:   else 
-BDU of potential dependencies between sites:mvbdu_redefine:    if(mvbdu_id:4) x1 < 1 then 
-BDU of potential dependencies between sites:mvbdu_redefine:     true
-BDU of potential dependencies between sites:mvbdu_redefine:    else 
-BDU of potential dependencies between sites:mvbdu_redefine:     false
-BDU of potential dependencies between sites:mvbdu_redefine:  else 
-BDU of potential dependencies between sites:mvbdu_redefine:   false
-Mvbdu.002: ok
 execution finished without any exception
