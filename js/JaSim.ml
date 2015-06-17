@@ -32,7 +32,7 @@ let run stop out_div s =
      let () = Plot.create "foo.svg" in
      let () = if !Parameter.pointNumberValue > 0 then
 		Plot.plot_now env counter state in
-     let profiling = Compression_main.D.S.PH.B.PB.CI.Po.K.P.init_log_info () in
+     let profiling = Compression_main.init_secret_log_info () in
      let () = Feedback.show_warnings out_div in
      catch
        (fun () ->
@@ -80,7 +80,7 @@ let run stop out_div s =
 	 return ""
       | e -> fail e)
 
-let launch_simulation go_button stop_button out_div graph program =
+let launch_simulation go_button stop_button out_div graph =
   let () = Buffer.reset log_buffer in
   let () = go_button##disabled <- Js._true in
   let () = stop_button##disabled <- Js._false in
@@ -89,7 +89,7 @@ let launch_simulation go_button stop_button out_div graph program =
     stop_button##onclick <- Dom_html.handler
 			       (fun _ -> let () = Lwt.wakeup stopper () in
 					 Js._false) in
-  run stoppe out_div (Js.to_string program##value) >>=
+  run stoppe out_div (Js.to_string (Ace.get_editor_value ())) >>=
     fun plot ->
     let () = Feedback.show_warnings out_div in
     let () = go_button##disabled <- Js._false in
@@ -107,7 +107,7 @@ let onload _ =
   let raw_stop_button =
     <:html5<<button class="btn btn-danger btn-block" disabled="disabled">Stop</button> >> in
   let raw_input =
-    <:html5<<div class="col-md-6">
+    <:html5<<div class="col-lg-6">
 	    $list:Input.raw_html$
 	    $raw_go_button$$raw_stop_button$</div> >> in
   let raw_graph = <:html5<<div id="graph"></div> >> in
@@ -115,17 +115,18 @@ let onload _ =
   let raw_log = <:html5<<div id="log" class="alert alert-info"></div> >> in
   let log = Tyxml_js.To_dom.of_div raw_log in
   let raw_output =
-    <:html5<<div class="col-md-6">$raw_graph$$raw_log$</div> >> in
+    <:html5<<div class="col-lg-6 visible-lg-block">$raw_graph$$raw_log$</div> >> in
   let output = Tyxml_js.To_dom.of_div raw_output in
   let go_button = Tyxml_js.To_dom.of_button raw_go_button in
   let stop_button = Tyxml_js.To_dom.of_button raw_stop_button in
   let () = Lwt_js_events.async (write_out log) in
   let _ = Lwt_js_events.clicks go_button
 			       (fun _ _ ->
-				launch_simulation go_button stop_button output graph Input.program) in
+				launch_simulation go_button stop_button output graph) in
   let skeleton = Tyxml_js.To_dom.of_div
 		 <:html5<<div class="row">$raw_input$$raw_output$</div> >> in
   let () = Dom.appendChild main skeleton in
+  let () = Dom.appendChild document##body Ace.starter in
   Js._false
 
 let _ = Dom_html.window##onload <- Dom_html.handler onload

@@ -6,12 +6,9 @@ let document = Dom_html.window##document
 let opened_filename, set_opened_filename = React.S.create "model.ka"
 
 let has_been_modified = ref (false)
-let raw_program =
-  <:html5<<textarea class="form-control" rows="25"></textarea> >>
-let program = Tyxml_js.To_dom.of_textarea raw_program
-let _ = Lwt_js_events.changes
+(*let _ = Lwt_js_events.changes
 	  program (fun _ _ -> let () = has_been_modified := true in return_unit)
-
+ *)
 let load_file = Dom_html.createInput ~_type:(Js.string "file") document
 let () = load_file##placeholder <- Js.string "Load file"
 let () = load_file##className <- Js.string "form-control"
@@ -29,7 +26,7 @@ let _ = Lwt_js_events.changes
 		     Js.to_bool
 		       (Dom_html.window##confirm
 				       (Js.string "Load with loosing modifications?"))
-		then program##value <- va in
+		then Ace.set_editor_value va in
 	      let () = has_been_modified := false in
 	      return_unit))
 
@@ -45,7 +42,7 @@ let () = save_file##onclick <-
 			  Js.string "data:text/plain;charset=utf-8," in
 			let () =
 			  save_file##href <-
-			    header##concat (Js.escape program##value) in
+			    header##concat (Js.escape (Ace.get_editor_value ())) in
 			let () = has_been_modified := false in
 			Js._true)
 
@@ -72,7 +69,7 @@ let raw_html =
 	      <span class="input-group-addon">Load File</span>
 	      $Tyxml_js.Of_dom.of_input load_file$
 	      </div>$raw_save_file$</form>
-	      <div class="form-group"><label>Model Code</label>$raw_program$</div>
+	      <div id="editor">toto pour rire</div>
 	      <div class="form-group"><label class="sr-only">Maximum number of events</label>
 	      <div class="input-group">$Tyxml_js.Of_dom.of_input event_number$
 	      <span class="input-group-addon">events</span></div></div> >>
