@@ -157,6 +157,36 @@ BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine: if(mvbd
 BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:  false
 BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine: else 
 BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:  if(mvbdu_id:6) x0 < 1 then 
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:   if(mvbdu_id:5) x1 < 0 then 
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:    false
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:   else 
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:    if(mvbdu_id:4) x1 < 1 then 
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:     true
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:    else 
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:     false
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:  else 
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:   false
+
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine: if(mvbdu_id:3) x0 < 0 then 
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:  false
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine: else 
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:  if(mvbdu_id:2) x0 < 1 then 
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:   true
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:  else 
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:   false
+
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine: if(mvbdu_id:3) x0 < 0 then 
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:  false
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine: else 
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:  if(mvbdu_id:2) x0 < 1 then 
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:   true
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:  else 
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:   false
+
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine: if(mvbdu_id:7) x0 < 0 then 
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:  false
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine: else 
+BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:  if(mvbdu_id:6) x0 < 1 then 
 BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:   if(mvbdu_id:5) x2 < 0 then 
 BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:    false
 BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:   else 
@@ -166,6 +196,7 @@ BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:    else
 BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:     false
 BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:  else 
 BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:   false
+
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
 Flow of information in the ODE semantics:agent_type:0:site_modified:1->y(internal state)

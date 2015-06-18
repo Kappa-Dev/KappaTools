@@ -31,13 +31,13 @@ type set         = Site_map_and_set.set
 type state = (int * int) list
 
 (*BDU*)
-type bdu_redefine =  bool Mvbdu_sig.mvbdu AgentMap.t
+type bdu_redefine =  (bool Mvbdu_sig.mvbdu) list
 
 type covering_classes =
   {
     store_modified_map     : int map AgentMap.t;
     store_covering_classes : (site list list) AgentMap.t * state AgentMap.t
-                             * bdu_redefine
+                             * bdu_redefine AgentMap.t
   }
 
 (************************************************************************************)

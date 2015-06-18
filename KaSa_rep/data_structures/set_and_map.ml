@@ -663,7 +663,7 @@ module Make(Ord:OrderedType) =
                 let mh'', left' = union_map parameters mh' left1 left2 in
                 let mh''', right' = union_map parameters mh'' right1 right2 in
                 join_map parameters mh''' left' key2 data2 right'
-              end
+              end        
 
     let rec bindings_aux accu = function
       | Empty_map -> accu

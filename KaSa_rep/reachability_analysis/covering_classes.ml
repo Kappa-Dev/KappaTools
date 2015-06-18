@@ -52,7 +52,7 @@ let print_list l =
 
 let length_sorted (l: int list list): int list list =
   let list_length = List.rev_map (fun list -> list, List.length list) l in
-  let lists = List.sort (fun a b -> compare (snd a) (snd b)) list_length in
+  let lists       = List.sort (fun a b -> compare (snd a) (snd b)) list_length in
   List.rev_map fst lists
 
 (************************************************************************************)
@@ -335,10 +335,10 @@ let init_dic = Dictionary_of_Covering_class.init ()
 
 let clean_classes parameter error covering_classes modified_map =
   let error, init_pointer = Nearly_inf_Imperatif.create parameter error 0 in
-  let init_index       = init_dic in
-  let init_store_dic   = init_dic in
-  let init_test_index  = init_dic in
-  let init_modif_index = Dictionary_of_Modified_class.init() in
+  let init_index          = init_dic in
+  let init_store_dic      = init_dic in
+  let init_test_index     = init_dic in
+  let init_modif_index    = Dictionary_of_Modified_class.init() in
   (*------------------------------------------------------------------------------*)
   (*init state of dictionary*)
   let init_remanent = 
@@ -507,11 +507,11 @@ and print_precell p =
 
 (*---------------------------------------------------------------------------*)
 
-let bdu_covering parameter error agent_type pair_list store_bdu_covering_class =
+let bdu_covering parameter error agent_type pair_list =
   (*build bdu for this list*)
-  let remanent_bdu = (Sanity_test.remanent parameter) in
-  let error = remanent_bdu.Sanity_test_sig.error in
-  let allocate = remanent_bdu.Sanity_test_sig.allocate_mvbdu in
+  let remanent_bdu = Sanity_test.remanent parameter in
+  let error        = remanent_bdu.Sanity_test_sig.error in
+  let allocate     = remanent_bdu.Sanity_test_sig.allocate_mvbdu in
   (*'b: memo_tables; 'a: mvbdu_dic; 'c: list_dic*)
   let (handler: ('b, 'a, 'c, bool, int) Memo_sig.handler) =
     remanent_bdu.Sanity_test_sig.mvbdu_handler
@@ -564,7 +564,7 @@ let bdu_covering parameter error agent_type pair_list store_bdu_covering_class =
       handler
       pair_list
   in
-  (*let _ =
+  (*let () =
     Printf.fprintf stdout "\nBuild list(list_a):\n";
     print_a_list list_a
   in*)
@@ -572,14 +572,16 @@ let bdu_covering parameter error agent_type pair_list store_bdu_covering_class =
   let error, handler, mvbdu_redefine =
     f (Boolean_mvbdu.redefine parameter error parameter handler a') list_a
   in
+  (*TEST*)
+  (*let error =
+    Boolean_mvbdu.print_boolean_mvbdu
+      error
+      (Remanent_parameters.update_prefix parameter "Each mvbdu_redefine:")
+      mvbdu_redefine
+  in*)
   (*---------------------------------------------------------------------------*)
-  (*store redefine*)
-  AgentMap.set
-    parameter
-    error
-    agent_type
-    mvbdu_redefine
-    store_bdu_covering_class 
+  (*return redefine*)
+  error, mvbdu_redefine
 
 (*------------------------------------------------------------------------------*)
 (*compute covering_class*)
@@ -632,8 +634,33 @@ let add_site_test parameter error agent_type pair_list store_state =
         error
         agent_type
         (List.rev new_list)
-        store_state      
-      
+        store_state
+
+(*------------------------------------------------------------------------------*)
+(*compute bdu*)
+
+let add_bdu parameter error agent_type bdu_list store_bdu =
+  match bdu_list with
+    | [] -> error, store_bdu
+    | _ ->
+      let error, old_bdu =
+        match AgentMap.unsafe_get
+          parameter
+          error
+          agent_type
+          store_bdu
+        with
+          | error, None -> error, []
+          | error, Some b -> error, b
+      in
+      let new_bdu = List.concat [bdu_list; old_bdu] in
+      AgentMap.set
+        parameter
+        error
+        agent_type
+        (List.rev new_bdu)
+        store_bdu
+
 (*------------------------------------------------------------------------------*)
 (*compute covering classes, site test and bdu*)
 
@@ -655,26 +682,29 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
               let error, init = AgentMap.create parameter error 0 in
               let store_triple =
                 Site_map_and_set.fold_map
-	          (fun site port (current_class, current_list, _) ->
+	          (fun site port (current_class, current_list, current_bdu) ->
                     (*get state min*)
                     let state = int_of_port port in
                     (*---------------------------------------------------------*)
                     (*BDU*)
                     let pair_list = (site, state) :: current_list in
                     let error, bdu =
-                      bdu_covering parameter error agent_type
-                        pair_list
-                        store_bdu                        
+                      bdu_covering
+                        parameter 
+                        error
+                        agent_type
+                        pair_list                 
                     in
                     (*---------------------------------------------------------*)
                     (*store*)
                     let site_list = site :: current_class in
-                    (site_list, pair_list, bdu)
-                  ) agent.agent_interface ([], [], init)
+                    let bdu_list = bdu :: current_bdu in
+                    (site_list, pair_list, bdu_list)
+                  ) agent.agent_interface ([], [], [])
               in
               (* store new_covering_class in the classes of the agent type
                  agent_type *)
-              let (site_list, pair_list, store_bdu) = store_triple in
+              let (site_list, pair_list, bdu_list) = store_triple in
               (*compute covering_class*)
               let error, covering_classes =
                 add_covering_class
@@ -692,6 +722,15 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
                   agent_type
                   pair_list
                   store_state
+              in
+              (*compute bdu*)
+              let error, store_bdu =
+                add_bdu
+                  parameter
+                  error
+                  agent_type
+                  bdu_list
+                  store_bdu
               in
               (*store*)
               error, (covering_classes, store_state, store_bdu)
@@ -937,13 +976,23 @@ let print_test_site parameter error result_test =
 
 let print_bdu parameter error result_bdu =
   AgentMap.print error
-    (fun error parameter mvbdu_redefine ->
+    (fun error parameter mvbdu_redefine_list ->
       let _ =
-        Boolean_mvbdu.print_boolean_mvbdu
-          error
-          (Remanent_parameters.update_prefix parameter "mvbdu_redefine:")
-          mvbdu_redefine
-      in
+        let rec aux acc =
+          match acc with
+            | [] -> []
+            | mvbdu_redefine :: tl ->
+              let _ =
+                Boolean_mvbdu.print_boolean_mvbdu
+                  error
+                  (Remanent_parameters.update_prefix parameter "mvbdu_redefine:")
+                  mvbdu_redefine
+              in
+              print_string "\n";
+              aux tl
+        in
+        aux mvbdu_redefine_list
+        in        
       error
     )
     parameter
@@ -956,10 +1005,10 @@ let create_map parameter error n_agents = AgentMap.create parameter error n_agen
 
 let scan_rule_set parameter error handler rules =
   let n_agents = handler.nagents in
-  let error, init_modif_map  = create_map parameter error n_agents in
-  let error, init_class = create_map parameter error n_agents in
-  let error, init_map   = create_map parameter error n_agents in
-  let error, init_bdu   = create_map parameter error n_agents in
+  let error, init_modif_map = create_map parameter error n_agents in
+  let error, init_class     = create_map parameter error n_agents in
+  let error, init_map       = create_map parameter error n_agents in
+  let error, init_bdu       = create_map parameter error n_agents in
   (*------------------------------------------------------------------------------*)
   (*init state of covering class*)
   let init_class =
