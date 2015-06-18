@@ -149,7 +149,7 @@ let apply_rule ~get_alg domain counter state rule =
       rule.Primitives.connected_components in
   match inj with
   | Some inj ->
-     Some (transform_by_a_rule ~get_alg domain counter state rule inj)
+     Some (transform_by_a_rule ~get_alg domain counter state rule inj) (*add_causal_info rule.infos inj*)
   | None -> None
 
 let all_injections state rule =
