@@ -393,8 +393,10 @@ let rec modif_map f error alg =
      in 
 	error,Ast.PRINT (list1',list2',pos)
    | Ast.PLOTENTRY -> error,Ast.PLOTENTRY
-   | Ast.CFLOW (a,b) -> error,Ast.CFLOW(a,b)
-   | Ast.CFLOWOFF (a,b) -> error,Ast.CFLOWOFF(a,b)
+   | Ast.CFLOWLABEL (a,b) -> error,Ast.CFLOWLABEL(a,b)
+   | Ast.CFLOWMIX (a,(mix,pos)) ->
+      let error,mix' = f error mix in
+      error,Ast.CFLOWMIX(a,(mix',pos))
    | Ast.FLUX(list,pos) -> 
      let error,list' = 
        List.fold_left 

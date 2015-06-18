@@ -92,8 +92,8 @@ type 'mixture modif_expr =
       (('mixture ast_alg_expr print_expr with_pos list) *
 	  ('mixture  ast_alg_expr print_expr with_pos list) * Tools.pos)
   | PLOTENTRY
-  | CFLOW of (string Term.with_pos * Tools.pos)
-  | CFLOWOFF of (string Term.with_pos * Tools.pos)
+  | CFLOWLABEL of (bool * string Term.with_pos)
+  | CFLOWMIX of (bool * 'mixture Term.with_pos)
   | FLUX of 'mixture ast_alg_expr print_expr with_pos list * Tools.pos
   | FLUXOFF of 'mixture ast_alg_expr print_expr with_pos list * Tools.pos
 

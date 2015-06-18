@@ -99,6 +99,28 @@ let compile_print_expr algs tokens contact_map domain ex =
 	(domain',(Ast.Alg_pexpr alg,pos)::out))
     ex (domain,[])
 
+let cflows_of_label on algs rules (label,pos) rev_effects =
+  let adds l x =
+    (if on then Primitives.CFLOW x else Primitives.CFLOWOFF x) :: l in
+  try
+    let rule_id = StringMap.find label rules.NamedDecls.finder in
+    Array.fold_left
+      adds rev_effects
+      (snd rules.NamedDecls.decls.(rule_id)).Primitives.connected_components
+  with Not_found ->
+    try let var = StringMap.find label algs.NamedDecls.finder in
+	match algs.NamedDecls.decls.(var) with
+	|(_,(Alg_expr.KAPPA_INSTANCE ccs,_)) ->
+	  List.fold_left (Array.fold_left adds) rev_effects ccs
+	| (_,((Alg_expr.CONST _ | Alg_expr.BIN_ALG_OP _ | Alg_expr.TOKEN_ID _ |
+	       Alg_expr.STATE_ALG_OP _ | Alg_expr.UN_ALG_OP _ |
+	       Alg_expr.ALG_VAR _ ),_)) -> raise Not_found
+    with Not_found ->
+      raise (ExceptionDefn.Malformed_Decl
+	       ("Label '" ^ label ^
+		  "' does not refer to a non ambiguous Kappa expression"
+	       ,pos))
+
 let effects_of_modif algs tokens rules contact_map domain ast_list =
   let rec iter rev_effects domain ast_list =
     let rule_effect alg_expr ast_rule mix_pos =
@@ -173,38 +195,16 @@ let effects_of_modif algs tokens rules contact_map domain ast_list =
 	    let (domain',pexpr') =
 	      compile_print_expr algs tokens contact_map domain pexpr in
 	    (domain', (Primitives.STOP pexpr')::rev_effects)
-	 | CFLOW ((lab,pos_lab),_) ->
-	    let id =
-	      try StringMap.find lab rules.NamedDecls.finder
-	      with Not_found ->
-		try let var = StringMap.find lab algs.NamedDecls.finder in
-		    match algs.NamedDecls.decls.(var) with
-		    |(_,(Alg_expr.KAPPA_INSTANCE _,_)) -> -1 (* TODO Later *)
-		    | (_,((Alg_expr.CONST _ | Alg_expr.BIN_ALG_OP _ | Alg_expr.TOKEN_ID _ |
-			   Alg_expr.STATE_ALG_OP _ | Alg_expr.UN_ALG_OP _ |
-			   Alg_expr.ALG_VAR _),_)) -> raise Not_found
-		with Not_found ->
-		  raise	(ExceptionDefn.Malformed_Decl
-			   ("Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"
-			   ,pos_lab))
-	    in
-	    (domain, (Primitives.CFLOW id)::rev_effects)
-	 | CFLOWOFF ((lab,pos_lab),_) ->
-	    let id =
-	      try StringMap.find lab rules.NamedDecls.finder
-	      with Not_found ->
-		try let var = StringMap.find lab algs.NamedDecls.finder in
-		    match algs.NamedDecls.decls.(var) with
-		    |(_,(Alg_expr.KAPPA_INSTANCE _,_)) -> -1 (* TODO Later *)
-		    | (_,((Alg_expr.CONST _ | Alg_expr.BIN_ALG_OP _ | Alg_expr.TOKEN_ID _ |
-			   Alg_expr.STATE_ALG_OP _ | Alg_expr.UN_ALG_OP _ |
-			   Alg_expr.ALG_VAR _),_)) -> raise Not_found
-		with Not_found ->
-		  raise	(ExceptionDefn.Malformed_Decl
-			   ("Label '" ^ lab ^ "' is neither a rule nor a Kappa expression"
-			   ,pos_lab))
-	    in
-	    (domain, (Primitives.CFLOWOFF id)::rev_effects)
+	 | CFLOWLABEL (on,lab) ->
+	    (domain, cflows_of_label on algs rules lab rev_effects)
+	 | CFLOWMIX (on,(ast,_)) ->
+	    let adds l x =
+	      (if on then Primitives.CFLOW x else Primitives.CFLOWOFF x) :: l in
+	    let domain',ccs =
+	      Snip.connected_components_sum_of_ambiguous_mixture
+		contact_map domain ast in
+	    (domain',
+	     List.fold_left (Array.fold_left adds) rev_effects ccs)
 	 | FLUX (pexpr,_) ->
 	    let (domain',pexpr') =
 	      compile_print_expr algs tokens contact_map domain pexpr in
@@ -292,7 +292,7 @@ let pert_of_result algs tokens rules contact_map domain res =
   let lpert = lpert_stopping_time@lpert_ineq in
   ( domain, lpert,stop_times,tracking_enabled)
 
-let init_graph_of_result algs tokens contact_map counter env domain res =
+let init_graph_of_result algs tokens has_tracking contact_map counter env domain res =
   let domain',init_state =
     List.fold_left
       (fun (domain,state) (opt_vol,init_t,_) -> (*TODO dealing with volumes*)
@@ -347,7 +347,7 @@ let init_graph_of_result algs tokens contact_map counter env domain res =
 		      domain'' counter state compiled_rule)
 	    | _,_ -> assert false in
 	  domain',state'
-      )	(domain,Rule_interpreter.empty env)
+      )	(domain,Rule_interpreter.empty ~has_tracking env)
       res.Ast.init
   in
   (domain',init_state)
@@ -553,7 +553,8 @@ let initialize logger overwrite result =
 
   Debug.tag logger "\t -initial conditions";
   let domain,graph =
-    init_graph_of_result alg_nd tk_nd contact_map counter env domain result in
+    init_graph_of_result
+      alg_nd tk_nd tracking_enabled contact_map counter env domain result in
   let () =
     if !Parameter.compileModeOn then
       Format.eprintf "@[<v>Domain:@,@[%a@]@,Intial graph;@,@]%a@."

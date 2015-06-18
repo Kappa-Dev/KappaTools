@@ -3,13 +3,18 @@ type t = {
   edges: Edges.t;
   tokens: Nbr.t array;
   free_id: int;
+  story_machinery : (unit Connected_component.Map.t * unit) option;
 }
 
-let empty env = {
+let empty ~has_tracking env = {
   roots_of_ccs = Connected_component.Map.empty;
   edges = Edges.empty;
   tokens = Array.make (Environment.nb_tokens env) Nbr.zero;
   free_id = 1;
+  story_machinery =
+    if has_tracking
+    then Some (Connected_component.Map.empty,())
+    else None;
 }
 
 let print_heap f h =
@@ -86,15 +91,20 @@ let update_edges domain inj_nodes state removed added =
       removed (*removed: statically defined edges*)
   in
 (*Positive update*)
-  let ((_,_,free_id'),edges',roots') =
+  let ((_final_inj2graph,_,free_id'),edges',roots') =
     List.fold_left
       (fun (inj2graph,edges,roots) transf ->
        deal_transformation true domain inj2graph edges roots transf)
-      aux 
-      added (*statically defined edges*) 
+      aux
+      added (*statically defined edges*)
   in
+  (*Store event*)
+  let story_machinery' = match state.story_machinery with
+    | None -> state.story_machinery
+    | Some x -> Some x (*Compression_main.store rule final_inj2graph counter *) in
   { roots_of_ccs = roots'; edges = edges';
-    tokens = state.tokens; free_id = free_id'; }
+    tokens = state.tokens; free_id = free_id';
+    story_machinery = story_machinery'; }
 
 let instance_number state ccs_l =
   let size cc =
@@ -207,3 +217,21 @@ let debug_print f state =
 						    i Nbr.print el))
 		 state.tokens
 		 (print_injections ?sigs:None) state.roots_of_ccs
+
+let add_tracked cc state =
+  match state.story_machinery with
+  | None ->
+     raise (ExceptionDefn.Internal_Error
+	      (Term.with_dummy_pos "TRACK in non tracking mode"))
+  | Some (tcc,x) ->
+     { state with
+       story_machinery = Some (Connected_component.Map.add cc () tcc,x) }
+
+let remove_tracked cc state =
+  match state.story_machinery with
+  | None ->
+     raise (ExceptionDefn.Internal_Error
+	      (Term.with_dummy_pos "TRACK in non tracking mode"))
+  | Some (tcc,x) ->
+     { state with
+       story_machinery = Some (Connected_component.Map.remove cc tcc,x) }

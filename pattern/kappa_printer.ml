@@ -65,7 +65,11 @@ let elementary_rule ?env f r =
     (Pp.list Pp.space pr_tok) r.Primitives.injected_tokens
     (alg_expr ?env) r.Primitives.rate
 
-let modification ?env f = function
+let modification ?env f m =
+  let sigs = match env with
+    | None -> None
+    | Some e -> Some (Environment.signatures e) in
+  match m with
   | Primitives.PRINT (nme,va) ->
      Format.fprintf f "$PRINTF %a <%a>"
 		    (print_expr ?env) nme (print_expr ?env) va
@@ -80,9 +84,6 @@ let modification ?env f = function
 			   (alg_expr ?env) va
 	 | _ -> assert false
        else
-	 let sigs = match env with
-	   | None -> None
-	   | Some e -> Some (Environment.signatures e) in
 	 let boxed_cc i f cc =
 	   let () = Format.pp_open_box f 2 in
 	   let () = Format.pp_print_int f i in
@@ -115,16 +116,12 @@ let modification ?env f = function
      Format.fprintf f "$FLUX %a [true]" (print_expr ?env) fn
   | Primitives.FLUXOFF fn ->
      Format.fprintf f "$FLUX %a [false]" (print_expr ?env) fn
-  | Primitives.CFLOW id ->
-     let nme = (*try Environment.rule_of_num id env
-	       with Not_found -> Environment.kappa_of_num id env*)
-       string_of_int id
-     in Format.fprintf f "$TRACK '%s' [true]" nme
-  | Primitives.CFLOWOFF id ->
-     let nme = (*try Environment.rule_of_num id env
-	       with Not_found -> Environment.kappa_of_num id env*)
-       string_of_int id
-     in Format.fprintf f "$TRACK '%s' [false]" nme
+  | Primitives.CFLOW cc ->
+     Format.fprintf f "$TRACK %a [true]"
+		    (Connected_component.print ?sigs false) cc
+  | Primitives.CFLOWOFF cc ->
+     Format.fprintf f "$TRACK %a [false]"
+		    (Connected_component.print ?sigs false) cc
 
 let perturbation ?env f pert =
   let aux f =

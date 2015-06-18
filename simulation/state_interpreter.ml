@@ -116,8 +116,9 @@ let do_it env domain counter graph state = function
 	 file (Mods.Counter.event counter) "ka"
 	 (fun f -> Rule_interpreter.print env f graph) in
      (false, graph, state)
-  | Primitives.CFLOW _ -> (false, graph, state)
-  | Primitives.CFLOWOFF _ -> (false, graph, state)
+  | Primitives.CFLOW cc -> (false, Rule_interpreter.add_tracked cc graph, state)
+  | Primitives.CFLOWOFF cc ->
+     (false, Rule_interpreter.remove_tracked cc graph, state)
   | Primitives.FLUX _ -> (false, graph, state)
   | Primitives.FLUXOFF _ -> (false, graph, state)
 

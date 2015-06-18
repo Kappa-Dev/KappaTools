@@ -52,7 +52,7 @@ rule token = parse
 		      | "$SNAPSHOT" -> (SNAPSHOT pos)
 		      | "$STOP" -> (STOP pos)
 		      | "$FLUX" -> (FLUX pos)
-		      | "$TRACK" -> (TRACK pos)
+		      | "$TRACK" -> TRACK
 		      | "$UPDATE" -> (ASSIGN2 pos)
 		      | "$PRINT" -> (PRINT pos)
 		      | "$PRINTF" -> (PRINTF pos)

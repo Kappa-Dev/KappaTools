@@ -250,19 +250,19 @@ let scan_declarations parameters  =
 let scan_observables parameters remanent variable = (*TODO*) 
   remanent 
 
-let scan_perts parameters = 
-  List.fold_left 
-    (fun remanent ((_,m,_),_) -> 
-          List.fold_left 
-            (fun remanent m -> 
-              match m with 
-              | Ast.INTRO (_,(m,_)) | Ast.DELETE(_,(m,_)) ->   
-                scan_mixture parameters remanent m 
-              | Ast.UPDATE _ | Ast.STOP _ | Ast.SNAPSHOT _ | Ast.PLOTENTRY
-	      | Ast.UPDATE_TOK _ | Ast.PRINT _ | Ast.CFLOW _ 
-	      | Ast.CFLOWOFF _ | Ast.FLUXOFF _ | Ast.FLUX _ -> remanent 
-            ) remanent m)
-              
+let scan_perts parameters =
+  List.fold_left
+    (fun remanent ((_,m,_),_) ->
+     List.fold_left
+       (fun remanent m ->
+        match m with
+        | (Ast.INTRO (_,(m,_)) | Ast.DELETE(_,(m,_)) | Ast.CFLOWMIX (_,(m,_))) ->
+	   scan_mixture parameters remanent m
+        | Ast.UPDATE _ | Ast.STOP _ | Ast.SNAPSHOT _ | Ast.PLOTENTRY
+	| Ast.UPDATE_TOK _ | Ast.PRINT _ | Ast.CFLOWLABEL _
+	| Ast.FLUXOFF _ | Ast.FLUX _ -> remanent
+       ) remanent m)
+
 let scan_rules parameters a b =  
   let _ = 
     if Remanent_parameters.get_trace parameters

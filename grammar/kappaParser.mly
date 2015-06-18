@@ -6,11 +6,11 @@
 %}
 
 %token EOF NEWLINE SEMICOLON COMMA DOT OP_PAR CL_PAR OP_CUR CL_CUR
-%token AT TYPE LAR CPUTIME EMAX TMAX PLOTNUM PLOTENTRY DELETE INTRO
+%token AT TYPE LAR CPUTIME EMAX TMAX PLOTNUM PLOTENTRY DELETE INTRO TRACK
 %token DO SET REPEAT UNTIL LOG PLUS MULT MINUS MAX MIN DIV SINUS COSINUS TAN
 %token POW ABS MODULO SQRT EXPONENT INFINITY TIME EVENT NULL_EVENT PROD_EVENT
 %token EQUAL AND OR GREATER SMALLER TRUE FALSE DIFF KAPPA_RAR KAPPA_LRAR
-%token <Tools.pos> PERT OBS TRACK CONFIG
+%token <Tools.pos> PERT OBS CONFIG
 %token <Tools.pos> KAPPA_WLD KAPPA_SEMI SIGNATURE INIT LET PLOT
 %token <Tools.pos> FLUX ASSIGN ASSIGN2 TOKEN KAPPA_LNK PIPE
 %token <Tools.pos> PRINT PRINTF
@@ -116,7 +116,7 @@ instruction:
 	    let () = if List.exists
 			  (fun effect ->
 			   match effect with
-			   | (Ast.CFLOW _ | Ast.CFLOWOFF _
+			   | (Ast.CFLOWLABEL _ | Ast.CFLOWMIX _
 			      | Ast.FLUX _ | Ast.FLUXOFF _) -> true
 			   | _ -> false
 			  ) mod_expr_list
@@ -184,9 +184,9 @@ effect:
     | ASSIGN2 LABEL alg_expr /*updating the rate of a rule*/
 						      {Ast.UPDATE (($2,rhs_pos 2),$3)}
     | TRACK LABEL boolean
-	    {let ast = if $3 then (fun x -> Ast.CFLOW x)
-		       else (fun x -> Ast.CFLOWOFF x) in
-	     ast (($2,rhs_pos 2),$1)}
+	    {Ast.CFLOWLABEL ($3,($2,rhs_pos 2))}
+    | TRACK non_empty_mixture boolean
+	    {Ast.CFLOWMIX ($3,($2,rhs_pos 2))}
     | FLUX print_expr boolean
 	   {if $3 then Ast.FLUX ($2,$1) else Ast.FLUXOFF ($2,$1)}
     | INTRO multiple_mixture

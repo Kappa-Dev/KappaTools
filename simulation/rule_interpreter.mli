@@ -3,7 +3,7 @@
 type t (**Abstract graph*)
 
 (**Initialisation*)
-val empty : Environment.t -> t
+val empty : has_tracking:bool -> Environment.t -> t
 
 val value_alg :
   get_alg:(int -> Alg_expr.t) -> Mods.Counter.t -> t -> Alg_expr.t -> Nbr.t
@@ -24,6 +24,10 @@ val force_rule :
   (t  * Connected_component.Matching.t list option)
 
 val print : Environment.t -> Format.formatter -> t -> unit
+
+(** Stories *)
+val add_tracked : Connected_component.t -> t -> t
+val remove_tracked : Connected_component.t -> t -> t
 
 (**Debugging*)
 val print_injections :

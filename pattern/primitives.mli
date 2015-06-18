@@ -80,10 +80,10 @@ type modification =
   | UPDATE of Term.dep_type * Alg_expr.t Term.with_pos
   | SNAPSHOT of Alg_expr.t Ast.print_expr Term.with_pos list
   | STOP of Alg_expr.t Ast.print_expr Term.with_pos list
-  | CFLOW of int
+  | CFLOW of Connected_component.t
   | FLUX of Alg_expr.t Ast.print_expr Term.with_pos list
   | FLUXOFF of Alg_expr.t Ast.print_expr Term.with_pos list
-  | CFLOWOFF of int
+  | CFLOWOFF of Connected_component.t
   | PLOTENTRY
   | PRINT of
       (Alg_expr.t Ast.print_expr Term.with_pos list *
