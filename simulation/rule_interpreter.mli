@@ -28,6 +28,7 @@ val print : Environment.t -> Format.formatter -> t -> unit
 (** Stories *)
 val add_tracked : Connected_component.t -> t -> t
 val remove_tracked : Connected_component.t -> t -> t
+val generate_stories : Environment.t -> t -> unit
 
 (**Debugging*)
 val print_injections :

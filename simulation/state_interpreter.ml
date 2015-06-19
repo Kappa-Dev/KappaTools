@@ -220,12 +220,13 @@ let loop_cps form hook return env domain counter graph state =
 	Plot.fill form counter env 0.0
 		  (observables_values env counter graph' state') in
       let (_,_,_) = perturbate env domain counter graph' state' in
-      return form counter
+      return form env counter graph
     else
       hook (fun () -> iter graph' state')
   in iter graph state
 
-let finalize form counter =
+let finalize form env counter graph =
+  let () = Rule_interpreter.generate_stories env graph in
   Plot.close form counter
 
 let go f = f ()

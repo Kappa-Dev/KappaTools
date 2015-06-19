@@ -41,7 +41,7 @@ let run stop out_div s =
 		      (fun f -> if Lwt.is_sleeping stop
 				then Lwt.bind (Lwt_js.yield ()) f
 				else Lwt.return_unit)
-		      (fun _ _ -> Lwt.return_unit)
+		      (fun _ _ _ _ -> Lwt.return_unit)
 		      env domain counter graph state)
 	>>= fun () -> return (Plot.value 555))
        (function

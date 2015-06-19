@@ -249,3 +249,5 @@ let remove_tracked cc state =
   | Some (tcc,x) ->
      { state with
        story_machinery = Some (Connected_component.Map.remove cc tcc,x) }
+
+let generate_stories env state = () (* Compression_main.chepokoi *)
