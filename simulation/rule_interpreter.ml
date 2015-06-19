@@ -13,7 +13,7 @@ let empty ~has_tracking env = {
   free_id = 1;
   story_machinery =
     if has_tracking
-    then Some (Connected_component.Map.empty,())
+    then Some (Connected_component.Map.empty,()) (*Compression_main.init*)
     else None;
 }
 
@@ -76,32 +76,46 @@ let deal_transformation is_add domain inj2graph edges roots transf = (*transf: a
        (* 	   "@[add:%b %a in %i@]@." is_add *)
        (* 	   (Connected_component.print true !Debug.global_sigs) cc root in *)
        update_roots is_add r' cc root) roots obs in
-  (inj,graph,roots')
+  ((inj,graph,roots'),obs)
 
-let update_edges domain inj_nodes state removed added =
-  (* let () = Format.printf "@[%a@]@." (Edges.debug_print) state.edges in *)
+let store_event event_number inj2graph new_tracked_obs_instances rule = function
+  | None as x -> x
+  | Some x -> Some x (*Compression_main.store rule final_inj2graph counter *)
 
-(*Negative update*)
+let store_obs obs acc = function
+  | None -> acc
+  | Some (tracked,_) ->
+     List.fold_left
+       (fun acc (cc,_root as x) ->
+	if Connected_component.Map.mem cc tracked then x::acc else acc)
+       acc obs
+
+let update_edges event_number domain inj_nodes state rule =
+  (*Negative update*)
   let aux =
     List.fold_left
       (fun (inj2graph,edges,roots) transf -> (*inj2graph: abs -> conc, roots define the injection that is used*)
-       deal_transformation false domain inj2graph edges roots transf)
+       fst (deal_transformation false domain inj2graph edges roots transf))
       ((inj_nodes,Mods.IntMap.empty,state.free_id), (*initial inj2graph: (existing,new,fresh_id) *)
        state.edges,state.roots_of_ccs)
-      removed (*removed: statically defined edges*)
+      rule.Primitives.removed (*removed: statically defined edges*)
   in
-(*Positive update*)
-  let ((_final_inj2graph,_,free_id'),edges',roots') =
+  (*Positive update*)
+  let (((final_inj2graph,_,free_id'),edges',roots'),new_tracked_obs_instances) =
     List.fold_left
-      (fun (inj2graph,edges,roots) transf ->
-       deal_transformation true domain inj2graph edges roots transf)
-      aux
-      added (*statically defined edges*)
+      (fun ((inj2graph,edges,roots),tracked_inst) transf ->
+       let aux',new_obs =
+	 deal_transformation true domain inj2graph edges roots transf in
+       (aux',store_obs new_obs tracked_inst state.story_machinery))
+      (aux,[])
+      rule.Primitives.inserted (*statically defined edges*)
   in
   (*Store event*)
-  let story_machinery' = match state.story_machinery with
-    | None -> state.story_machinery
-    | Some x -> Some x (*Compression_main.store rule final_inj2graph counter *) in
+  let story_machinery' =
+    store_event
+      event_number final_inj2graph new_tracked_obs_instances rule
+      state.story_machinery in
+
   { roots_of_ccs = roots'; edges = edges';
     tokens = state.tokens; free_id = free_id';
     story_machinery = story_machinery'; }
@@ -142,7 +156,7 @@ let transform_by_a_rule ~get_alg domain counter state rule inj =
     update_tokens
       ~get_alg counter state rule.Primitives.consumed_tokens
       rule.Primitives.injected_tokens in
-  update_edges domain inj state rule.Primitives.removed rule.Primitives.inserted
+  update_edges (Mods.Counter.event counter) domain inj state rule
 
 let apply_rule ~get_alg domain counter state rule =
   let inj =
@@ -159,7 +173,7 @@ let apply_rule ~get_alg domain counter state rule =
       rule.Primitives.connected_components in
   match inj with
   | Some inj ->
-     Some (transform_by_a_rule ~get_alg domain counter state rule inj) (*add_causal_info rule.infos inj*)
+     Some (transform_by_a_rule ~get_alg domain counter state rule inj)
   | None -> None
 
 let all_injections state rule =
