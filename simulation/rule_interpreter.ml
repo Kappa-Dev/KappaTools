@@ -1,9 +1,13 @@
+type jf_data = unit
+
 type t = {
   roots_of_ccs: ValMap.tree Connected_component.Map.t;
   edges: Edges.t;
   tokens: Nbr.t array;
   free_id: int;
-  story_machinery : (unit Connected_component.Map.t * unit) option;
+  story_machinery :
+    (unit Connected_component.Map.t (*currently tracked ccs *)
+     * jf_data) option;
 }
 
 let empty ~has_tracking env = {
@@ -78,9 +82,45 @@ let deal_transformation is_add domain inj2graph edges roots transf = (*transf: a
        update_roots is_add r' cc root) roots obs in
   ((inj,graph,roots'),obs)
 
-let store_event event_number inj2graph new_tracked_obs_instances rule = function
+let quark_list_from_event inj2graph ci =
+  let elem (p,s) = (let (_,x,_) = (from_place inj2graph p) in x,s) in
+  let tsites =
+    List.map elem ci.Primitives.Compilation_info.sites_tested_unmodified in
+  let msites =
+    List.map elem ci.Primitives.Compilation_info.sites_untested_modified in
+  let tsites',msites' =
+    List.fold_right
+      (fun e (t,m) -> let o = elem e in o::t,o::m)
+      ci.Primitives.Compilation_info.sites_tested_modified (tsites,msites) in
+  let tints =
+    List.map
+      elem ci.Primitives.Compilation_info.internal_states_tested_unmodified in
+  let mints =
+    List.map
+      elem ci.Primitives.Compilation_info.internal_states_untested_modified in
+  let tints',mints' =
+    List.fold_right
+      (fun e (t,m) -> let o = elem e in o::t,o::m)
+      ci.Primitives.Compilation_info.internal_states_tested_modified
+      (tints,mints) in
+  { Causal.site_tested = tsites';
+    Causal.site_modified = msites';
+    Causal.internal_state_tested = tints';
+    Causal.internal_state_modified = mints'; }
+
+let store_event
+      event_number (*NB event counter*) inj2graph new_tracked_obs_instances
+      edges rule = function
   | None as x -> x
-  | Some x -> Some x (*Compression_main.store rule final_inj2graph counter *)
+  | Some x ->
+     let quarks_obs =
+       List.map
+	 (Connected_component.Matching.quark_lists_of_cc_instance edges)
+	 new_tracked_obs_instances in
+     let quark_event =
+        quark_list_from_event inj2graph rule.Primitives.infos in
+     Some x
+(*Compression_main.store rule final_inj2graph counter quarks_obs quark_event*)
 
 let store_obs obs acc = function
   | None -> acc
@@ -101,7 +141,7 @@ let update_edges event_number domain inj_nodes state rule =
       rule.Primitives.removed (*removed: statically defined edges*)
   in
   (*Positive update*)
-  let (((final_inj2graph,_,free_id'),edges',roots'),new_tracked_obs_instances) =
+  let (((_,_,free_id' as final_inj2graph),edges',roots'),new_tracked_obs_instances) =
     List.fold_left
       (fun ((inj2graph,edges,roots),tracked_inst) transf ->
        let aux',new_obs =
@@ -113,7 +153,7 @@ let update_edges event_number domain inj_nodes state rule =
   (*Store event*)
   let story_machinery' =
     store_event
-      event_number final_inj2graph new_tracked_obs_instances rule
+      event_number final_inj2graph new_tracked_obs_instances edges' rule
       state.story_machinery in
 
   { roots_of_ccs = roots'; edges = edges';

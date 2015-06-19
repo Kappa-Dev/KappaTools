@@ -1,4 +1,12 @@
-type event_kind = OBS of int | RULE of int | INIT of int | PERT of int
+type event_kind = OBS of int | RULE of int | INIT | PERT of int
+
+type quark_lists = {
+  site_tested : (int * int) list;
+  site_modified : (int * int) list;
+  internal_state_tested : (int * int) list;
+  internal_state_modified : (int * int) list;
+}
+
 type atom =
     {
       causal_impact : int ; (*(1) tested (2) modified, (3) tested + modified*)
@@ -37,31 +45,13 @@ type enriched_grid =
 
 val empty_grid : unit -> grid
 
-val record :
-  ?decorate_with:(int * 'a) list -> Primitives.rule -> Mods.Int2Set.t ->
-  int Mods.IntMap.t * int Mods.IntMap.t -> bool -> int -> grid ->
-  Environment.t -> grid
-(** [record ?decorate_with rule side_effects (embedding,fresh_map)
-	   is_weak event_number grid env] *)
-val record_init :
-  ((int * int) * (int * ('a option * 'b)) list) * 'c list ->
-  bool -> int -> grid -> Environment.t -> grid
-(** [record_init init is_weak event_number grid env] *)
-val record_obs :
-  Mods.Int2Set.t -> (int * Mixture.t * int Mods.IntMap.t * 'a) * 'b ->
-  bool -> int -> grid -> Environment.t -> grid
-(** [record_obs side_effects ((r_id,state,embedding,_),test)
-	       is_weak event_number grid env] *)
-
-val label : Environment.t -> State.t -> event_kind -> string
 val cut : (int * int * int) list -> grid -> config
 val enrich_grid :
   Format.formatter -> Graph_closure.config -> grid -> enriched_grid
 
 val pretty_print :
   Format.formatter -> Graph_closure.config -> string -> string ->
-  (grid * 'a Mods.simulation_info option list) list -> State.t ->
-  Environment.t -> unit
+  (grid * 'a Mods.simulation_info option list) list -> unit
 (** [pretty_print err_fmt config_closure compression_type label story_list
                   state env] *)
 val print_stat :

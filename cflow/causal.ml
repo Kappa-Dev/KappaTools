@@ -1,6 +1,14 @@
 open Mods
 
-type event_kind = OBS of int | RULE of int | INIT of int | PERT of int
+type event_kind = OBS of int | RULE of int | INIT | PERT of int
+
+type quark_lists = {
+  site_tested : (int * int) list;
+  site_modified : (int * int) list;
+  internal_state_tested : (int * int) list;
+  internal_state_modified : (int * int) list;
+}
+
 type atom =
     {
       causal_impact : int ; (*(1) tested (2) modified, (3) tested + modified*)
@@ -120,16 +128,6 @@ let grid_add quark eid (attribute:attribute) grid =
   Hashtbl.replace grid.flow quark attribute ;
   grid
 
-let impact is_link c =
-  if is_link then
-    if Primitives.Causality.is_link_modif c then
-      if Primitives.Causality.is_link_tested c then 3 else 2
-    else 1
-  else (*internal state*)
-    if Primitives.Causality.is_internal_modif c then
-      if Primitives.Causality.is_internal_tested c then 3 else 2
-    else 1
-
 let last_event attribute =
   match attribute with
   | [] -> None
@@ -146,110 +144,11 @@ let push (a:atom) (att:atom list) =
 	       (*if rule has multiple effect on the same attribute, only the last one is recorded*) 
      else a::att
 
-let add (node_id,site_id) c grid event_number kind =
-  (* make this function more compact *)
-  (*adding a link modification*)
-  let grid =
-    if Primitives.Causality.is_link_something c then
-      let att = try grid_find (node_id,site_id,1) grid with Not_found -> [] in
-      let att =
-	push {causal_impact = impact true c ; eid = event_number ;
-	      kind = kind (*; observation = obs*)} att
-      in
-      let grid = grid_add (node_id,site_id,1) event_number att grid in
-      add_init_pid event_number (node_id,site_id,1) grid
-    else
-      grid
-  in
-  if Primitives.Causality.is_internal_something c then
-    (*adding an internal state modification*)
-    let att = try grid_find (node_id,site_id,0) grid with Not_found -> [] in
-    let att =
-      push {causal_impact = impact false c ; eid = event_number ;
-	    kind = kind (*; observation = obs*)} att
-    in
-    let grid = grid_add (node_id,site_id,0) event_number att grid in
-    add_init_pid event_number (node_id,site_id,0) grid
-  else
-    grid
 
 (**side_effect Int2Set.t: pairs (agents,ports) that have been freed as a side effect --via a DEL or a FREE action*)
 (*NB no internal state modif as side effect*)
 let store_is_weak is_weak eid grid =
   if is_weak then {grid with weak_list = eid::(grid.weak_list)} else grid
-
-let causality_of_link =
-  (Primitives.Causality.add_link_modif (Primitives.Causality.create false true))
-
-let record rule side_effects (embedding,fresh_map) is_weak event_number grid =
-  
-  let pre_causal = rule.Primitives.pre_causal in
-  let r_id = rule.Primitives.r_id in
-  let kind = RULE r_id in
-  
-  let im id =
-    match id with
-    | Primitives.FRESH j -> IntMap.find j fresh_map
-    | Primitives.KEPT j -> IntMap.find j embedding in
-  let grid = store_is_weak is_weak event_number grid in
-  let grid =
-    (*adding side-effect free modifications and tests*)
-    let grid =
-      Primitives.PortMap.fold
-	(fun (id,site_id) c grid ->
-	 let node_id = im id in
-	 add (node_id,site_id) c grid event_number kind
-	) pre_causal grid in
-    (*adding side effects modifications*)
-    Int2Set.fold
-      (fun (node_id,site_id) grid ->
-       add (node_id,site_id) causality_of_link grid event_number kind)
-      side_effects grid in
-  grid
-
-let record_obs side_effects ((r_id,state,embedding,_),test)
-	       is_weak event_number grid env =
-  let grid = add_obs_eid event_number grid in
-  let grid = store_is_weak is_weak event_number grid in
-  let im embedding id =
-    match id with
-    | Primitives.FRESH _ -> raise (Invalid_argument "Causal.record_obs")
-    | Primitives.KEPT j -> IntMap.find j embedding
-  in
-  let causal = Dynamics.compute_causal_obs state env in
-  (*adding tests*)
-  let grid =
-    Primitives.PortMap.fold
-      (fun (id,site_id) c grid ->
-       let node_id = im embedding id in
-       add (node_id,site_id) c grid event_number (OBS r_id)
-      )
-      causal grid
-  in
-  let grid =
-    (*adding side effects modifications*)
-    Int2Set.fold
-      (fun (node_id,site_id) grid ->
-       add (node_id,site_id) causality_of_link grid event_number (OBS r_id))
-      side_effects grid
-  in
-  grid
-
-let record_init init is_weak event_number grid env =
-(*  if !Parameter.showIntroEvents then *)
-  (*adding tests*)
-  let (((node_id,agent_name),interface),_) = init in
-  let causal = Dynamics.compute_causal_init init env in
-  let grid = store_is_weak is_weak event_number grid in
-  let grid =
-    Mods.Int2Map.fold
-      (fun (node_id,site_id) c grid ->
-       add
-         (node_id,site_id) c
-	 (*(_INTERNAL_MODIF lor _INTERNAL_TESTED lor _LINK_TESTED lor _LINK_MODIF) (* HACK, TO DO CLEANER *)*)
-	 grid event_number (INIT agent_name) []
-      ) causal grid
-  in grid
 
 let add_pred eid atom config =
   let events = IntMap.add atom.eid atom config.events in
@@ -331,7 +230,7 @@ let pp_atom f atom =
       | _ -> invalid_arg "Causal.string_of_atom" in
   Format.fprintf f "%s_%d" imp_str atom.eid
 
-let dump grid fic state env =
+let dump grid fic =
   let d_chan = open_out ((Filename.chop_extension fic)^".txt") in
   let d = Format.formatter_of_out_channel d_chan in
   let () = Format.pp_open_vbox d 0 in
@@ -343,11 +242,11 @@ let dump grid fic state env =
   let () = Format.fprintf d "@]@." in
   close_out d_chan
 
-let label env state = function
-  | OBS mix_id -> Environment.kappa_of_num mix_id env
-  | PERT p_id -> assert false
-  | RULE r_id -> Dynamics.to_kappa (State.rule_of_id r_id state) env
-  | INIT agent -> Format.asprintf "Intro %a" (Environment.print_agent env) agent
+let label = function
+  | OBS mix_id -> ""
+  | PERT p_id -> ""
+  | RULE r_id -> ""
+  | INIT -> "initial introduction"
 
 let ids_of_grid grid = Hashtbl.fold (fun key _ l -> key::l) grid.flow []
 let config_of_grid = cut
@@ -425,13 +324,12 @@ let enrich_grid err_fmt config_closure grid =
     depth_of_event = depth_of_event
   }
 
-let dot_of_grid profiling desc enriched_grid state env =
+let dot_of_grid profiling desc enriched_grid =
   (*dump grid fic state env ; *)
   let t = Sys.time () in
   let config = enriched_grid.config in
   let prec_star = enriched_grid.prec_star in
   let depth_of_event = enriched_grid.depth_of_event in
-  let label = label env state in
   let sorted_events =
     IntMap.fold
       (fun eid d dmap ->
@@ -459,7 +357,7 @@ let dot_of_grid profiling desc enriched_grid state env =
 	     Format.fprintf
 	       form "node_%d [label=\"%s\", style=filled, fillcolor=red] ;@,"
 	       eid (label atom.kind)
-        | INIT _  ->
+        | INIT  ->
 	   if !Parameter.showIntroEvents then
 	     Format.fprintf
 	       form
@@ -487,7 +385,7 @@ let dot_of_grid profiling desc enriched_grid state env =
 	    else
 	      let atom = IntMap.find eid' config.events in
 	      match atom.kind with
-	      | INIT _ -> ()
+	      | INIT -> ()
 	      | PERT _ | RULE _ | OBS _ -> Format.fprintf form "node_%d -> node_%d@," eid' eid
 	 ) pred_set
     ) config.prec_1 ;
@@ -521,8 +419,7 @@ let dot_of_grid profiling desc enriched_grid state env =
   close_out desc
 
 (*story_list:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_id:int story_time: float ; story_event: int}*)
-let pretty_print err_fmt config_closure compression_type
-		 label story_list state env =
+let pretty_print err_fmt config_closure compression_type label story_list =
   let n = List.length story_list in
   let () =
     if compression_type = "" then
@@ -558,7 +455,7 @@ let pretty_print err_fmt config_closure compression_type
 	in
 	let desc = Kappa_files.fresh_cflow_filename
 		     [compression_type;string_of_int cpt] "dot" in
-        let () = dot_of_grid profiling desc enriched_config state env in
+        let () = dot_of_grid profiling desc enriched_config in
 	close_out desc;
 	cpt+1
       ) 0 story_list

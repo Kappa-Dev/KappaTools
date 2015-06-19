@@ -176,53 +176,6 @@ module Compilation_info =
       }
   end
 
-module Causality :
-sig
-  type t
-  val empty : t
-  val is_link_tested : t -> bool
-  val is_link_modif : t -> bool
-  val is_link_modif_side : t -> bool
-  val is_link_something : t -> bool
-  val is_internal_tested : t -> bool
-  val is_internal_modif : t -> bool
-  val is_internal_modif_side : t -> bool
-  val is_internal_something : t -> bool
-  val add_internal_tested : t -> t
-  val add_internal_modif : t -> t
-  val add_internal_modif_side : t -> t
-  val add_link_tested : t -> t
-  val add_link_modif : t -> t
-  val add_link_modif_side : t -> t
-end = struct
-  type t = int
-  let _INTERNAL_SIDE_EFFECT = 32
-  let _INTERNAL_TESTED = 16
-  let _INTERNAL_MODIF = 8
-  let _LINK_SIDE_EFFECT = 4
-  let _LINK_TESTED = 2
-  let _LINK_MODIF = 1
-
-  let empty = 0
-  let is i c = (i land c <> 0)
-  let is_link_tested = is _LINK_TESTED
-  let is_link_modif = is _LINK_MODIF
-  let is_link_modif_side = is _LINK_SIDE_EFFECT
-  let is_link_something =
-    is (_LINK_MODIF lor _LINK_TESTED lor _LINK_SIDE_EFFECT)
-  let is_internal_tested = is _INTERNAL_TESTED
-  let is_internal_modif = is _INTERNAL_MODIF
-  let is_internal_modif_side = is _INTERNAL_SIDE_EFFECT
-  let is_internal_something =
-    is (_INTERNAL_MODIF lor _INTERNAL_TESTED lor _INTERNAL_SIDE_EFFECT)
-  let add_internal_tested c = c lor _INTERNAL_TESTED
-  let add_internal_modif c = c lor _INTERNAL_MODIF
-  let add_internal_modif_side c = c lor _INTERNAL_SIDE_EFFECT
-  let add_link_tested c = c lor _LINK_TESTED
-  let add_link_modif c = c lor _LINK_MODIF
-  let add_link_modif_side c = c lor _LINK_SIDE_EFFECT
-end
-
 type elementary_rule = {
   rate : Alg_expr.t;
   connected_components : Connected_component.t array;

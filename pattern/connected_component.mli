@@ -50,6 +50,8 @@ module Matching : sig
   val get : (ContentAgent.t * int) -> t -> int
   val reconstruct : Edges.t -> t -> int -> cc -> int -> t option
 
+  val quark_lists_of_cc_instance : Edges.t -> (cc * int) -> Causal.quark_lists
+
   val observables_from_free :
     Env.t -> Edges.t -> int -> int -> int -> (cc * int) list
   (** [observables_from_free domain graph sort agent site] *)

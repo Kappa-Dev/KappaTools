@@ -45,26 +45,6 @@ sig
     Connected_component.cc -> Renaming.t -> t -> t
 end
 
-module Causality :
-sig
-  type t
-  val empty : t
-  val is_link_tested : t -> bool
-  val is_link_modif : t -> bool
-  val is_link_modif_side : t -> bool
-  val is_link_something : t -> bool
-  val is_internal_tested : t -> bool
-  val is_internal_modif : t -> bool
-  val is_internal_modif_side : t -> bool
-  val is_internal_something : t -> bool
-  val add_internal_tested : t -> t
-  val add_internal_modif : t -> t
-  val add_internal_modif_side : t -> t
-  val add_link_tested : t -> t
-  val add_link_modif : t -> t
-  val add_link_modif_side : t -> t
-end
-
 type elementary_rule = {
   rate : Alg_expr.t;
   connected_components : Connected_component.t array;
