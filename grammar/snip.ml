@@ -125,10 +125,8 @@ let annotate_dropped_agent sigs ((agent_name, _ as ag_ty),intf) =
        match p.Ast.port_lnk with
        | (Ast.LNK_ANY, _) ->
 	  side_effect_ports.(p_id) <- true; ports.(p_id) <- L_ANY Erased
-       | (Ast.LNK_SOME, _) ->
-	  side_effect_ports.(p_id) <- true; ports.(p_id) <- L_SOME Erased
+       | (Ast.LNK_SOME, _) -> ports.(p_id) <- L_SOME Erased
        | (Ast.LNK_TYPE (dst_p, dst_ty),_) ->
-	  side_effect_ports.(p_id) <- true;
 	  ports.(p_id) <- build_l_type sigs dst_ty dst_p Erased
        | (Ast.LNK_VALUE i, pos) -> ports.(p_id) <- L_VAL ((i,pos),Erased)
        | (Ast.FREE, _) -> ports.(p_id) <- L_FREE Erased
@@ -189,10 +187,8 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
        too_much_or_not_enough false agent_name p'.Ast.port_nme
     | (Ast.LNK_ANY,_), (Ast.FREE,_) ->
        side_effect_ports.(p_id) <- true; ports.(p_id) <- L_ANY Freed
-    | (Ast.LNK_SOME,_), (Ast.FREE,_) ->
-       side_effect_ports.(p_id) <- true; ports.(p_id) <- L_SOME Freed
+    | (Ast.LNK_SOME,_), (Ast.FREE,_) -> ports.(p_id) <- L_SOME Freed
     | (Ast.LNK_TYPE (dst_p,dst_ty),_), (Ast.FREE,_) ->
-       side_effect_ports.(p_id) <- true;
        ports.(p_id) <- build_l_type sigs dst_ty dst_p Freed
     | (Ast.FREE,_), (Ast.FREE,_) -> ports.(p_id) <- L_FREE Maintained
     | (Ast.LNK_VALUE i,pos), (Ast.FREE,_) ->
@@ -200,9 +196,8 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
     | (Ast.LNK_ANY,_), (Ast.LNK_VALUE i,pos) ->
        side_effect_ports.(p_id) <- true; ports.(p_id) <- L_ANY (Linked (i,pos))
     | (Ast.LNK_SOME,_), (Ast.LNK_VALUE i,pos) ->
-       side_effect_ports.(p_id) <- true; ports.(p_id) <- L_SOME (Linked (i,pos))
+       ports.(p_id) <- L_SOME (Linked (i,pos))
     | (Ast.LNK_TYPE (dst_p,dst_ty),_), (Ast.LNK_VALUE i,pos) ->
-       side_effect_ports.(p_id) <- true;
        ports.(p_id) <- build_l_type sigs dst_ty dst_p (Linked (i,pos))
     | (Ast.FREE,_), (Ast.LNK_VALUE i,pos) ->
        ports.(p_id) <- L_FREE (Linked (i,pos))
@@ -421,6 +416,7 @@ let new_agent_with_one_link sigs ty_id port link switch =
   let side_effect_ports = Array.make arity false in
   let side_effect_internals = Array.make arity false in
   let () = ports.(port) <- L_VAL (Term.with_dummy_pos link,switch) in
+  let () = side_effect_ports.(port) <- true in
   { ra_type = ty_id; ra_ports = ports; ra_ints = internals;
     ra_side_effect_ports = side_effect_ports;
     ra_side_effect_ints = side_effect_internals;}
@@ -545,7 +541,8 @@ let rec add_agents_in_cc id wk registered_links transf compile_info links_transf
 		   place site_id compile_info
 	       else
 		 Primitives.Compilation_info.add_internal_state_modified
-		   ~tested:ag.ra_side_effect_ints.(site_id) place site_id compile_info
+		   ~tested:(not ag.ra_side_effect_ints.(site_id))
+		   place site_id compile_info
 	      ),
 	      (if i = j then (removed,added)
 	       else Primitives.Transformation.Internalized (place,site_id,i)::removed,
@@ -553,7 +550,8 @@ let rec add_agents_in_cc id wk registered_links transf compile_info links_transf
 		Connected_component.new_internal_state wk (node,site_id) i
 	   | I_VAL_ERASED i ->
 	      (Primitives.Compilation_info.add_internal_state_modified
-		 ~tested:ag.ra_side_effect_ints.(site_id) place site_id compile_info),
+		 ~tested:(not ag.ra_side_effect_ints.(site_id))
+		 place site_id compile_info),
 	      (Primitives.Transformation.Internalized (place,site_id,i)::removed,added),
 	      Connected_component.new_internal_state wk (node,site_id) i
 	   | (I_ANY_ERASED | I_ANY_CHANGED _) ->
@@ -561,7 +559,7 @@ let rec add_agents_in_cc id wk registered_links transf compile_info links_transf
 		       (Term.with_dummy_pos
 			  "Try to create the connected components of an ambiguous mixture."))
 	 in
-	 let tested = ag.ra_side_effect_ports.(site_id) in
+	 let tested = not ag.ra_side_effect_ports.(site_id) in
 	 match ag.ra_ports.(site_id) with
 	 | L_ANY Maintained ->
 	    handle_ports wk' r_l transf compile_info' l_t re acc (succ site_id)
