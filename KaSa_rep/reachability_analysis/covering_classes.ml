@@ -331,6 +331,16 @@ let store_remanent parameter error covering_class modified_map remanent =
   (0) inter (0,1) -> 0
 *)
 
+let print_list_list l =
+  let rec aux acc =
+    match acc with
+      | [] -> ()
+      | x :: tl ->
+        print_list x;
+        aux tl
+  in
+  aux l
+
 let init_dic = Dictionary_of_Covering_class.init ()
 
 let clean_classes parameter error covering_classes modified_map =
@@ -581,7 +591,7 @@ let bdu_covering parameter error agent_type pair_list =
   in*)
   (*---------------------------------------------------------------------------*)
   (*return redefine*)
-  error, mvbdu_redefine
+  error, (handler, mvbdu_redefine)
 
 (*------------------------------------------------------------------------------*)
 (*compute covering_class*)
@@ -601,7 +611,7 @@ let add_covering_class parameter error agent_type site_list store_covering_class
           | error, None -> error, []
           | error, Some sites -> error, sites
        in
-       (* store the new list of covering classes *)
+      (* store the new list of covering classes *)
       let new_site_list = (List.rev site_list) :: old_pair in
       AgentMap.set 
         parameter
@@ -679,7 +689,6 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
               let agent_type = agent.agent_name in
               let (store_cv, store_state, store_bdu) = store_covering_classes in
               (*get a list of sites from an interface at each rule*)
-              let error, init = AgentMap.create parameter error 0 in
               let store_triple =
                 Site_map_and_set.fold_map
 	          (fun site port (current_class, current_list, current_bdu) ->
@@ -738,6 +747,97 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
   in error, store_covering_classes
 
 (*------------------------------------------------------------------------------*)
+(*Define enable rules *)
+
+let store_enable_set parameter error views diff_reverse store_result_set =
+  Quick_Nearly_inf_Imperatif.fold2_common parameter error
+    (fun parameter error agent_id agent site_modif store_result_set ->
+      if Site_map_and_set.is_empty_map
+        site_modif.agent_interface
+      then
+        error, store_result_set
+      else
+        match agent with
+          | Ghost -> error, store_result_set
+          | Agent agent ->
+            let agent_type = agent.agent_name in
+            let site_set =
+              Site_map_and_set.fold_map
+                (fun site port current_set ->
+                  let _state = int_of_port port in
+                  let error, set =
+                    Site_map_and_set.add_set
+                      parameter
+                      error
+                      site
+                      current_set
+                  in
+                  set
+                ) agent.agent_interface empty_set
+            in
+            (*----------------------------------------------------------------------*)
+            (*do the intersection with result set*)
+            let old_result_set =
+              match AgentMap.unsafe_get
+                parameter
+                error
+                agent_type
+                store_result_set with
+                  | error, None -> empty_set
+                  | error, Some s -> s
+            in
+            (*Dijoint set*)
+            let error, new_site_set =
+              Site_map_and_set.inter
+                parameter
+                error
+                site_set
+                old_result_set
+            in
+            if Site_map_and_set.is_empty_set new_site_set
+            then
+              let error, x1 =
+                Site_map_and_set.union
+                  parameter
+                  error
+                  new_site_set
+                  site_set
+              in
+              let error, x1_inter_rule =
+                Site_map_and_set.inter
+                  parameter
+                  error
+                  x1
+                  site_set
+              in
+              let result = (*FIXME*)
+                Site_map_and_set.fold_set (fun elt _ ->
+                  if Site_map_and_set.mem_map elt site_modif.agent_interface
+                  then
+                    let error, result =
+                      Site_map_and_set.union
+                        parameter
+                        error
+                        x1
+                        x1_inter_rule
+                    in
+                    result
+                  else
+                    x1
+                ) x1_inter_rule empty_set
+              in
+              AgentMap.set
+                parameter
+                error
+                agent_type
+                result
+                store_result_set
+            else
+              error, store_result_set
+    )
+    views diff_reverse store_result_set
+
+(*------------------------------------------------------------------------------*)
 (*compute covering class: it is a covering class whenever there is a
   modified site in that agent. (CHECK on their left-hand side)
 
@@ -770,11 +870,22 @@ let scan_rule parameter error handler rule classes =
       classes.store_covering_classes
   in
   (*------------------------------------------------------------------------------*)
+  (*compute enable set*)
+  let error, store_enable_set =
+    store_enable_set
+      parameter
+      error
+      rule.rule_lhs.views
+      rule.diff_reverse
+      classes.store_enable_set
+  in
+  (*------------------------------------------------------------------------------*)
   (*result*)
   error,
   {
     store_modified_map     = store_modified_map;
     store_covering_classes = store_covering_classes;
+    store_enable_set       = store_enable_set
   }           
 
 (************************************************************************************)   
@@ -966,15 +1077,16 @@ let print_pair l =
 let print_test_site parameter error result_test =
   AgentMap.print
     error
-    (fun error parameter l -> let _ = print_pair l in
-                              error)
+    (fun error parameter l ->
+      let _ = print_pair l in
+      error)
     parameter
     result_test
 
 (*------------------------------------------------------------------------------*)
 (*PRINT BDU*)
 
-let print_bdu parameter error result_bdu =
+let print_bdu_redefine parameter error result_bdu = (*REMOVE*)
   AgentMap.print error
     (fun error parameter mvbdu_redefine_list ->
       let _ =
@@ -998,6 +1110,48 @@ let print_bdu parameter error result_bdu =
     parameter
     result_bdu
 
+let print_bdu_handler parameter error result_bdu =
+  AgentMap.print error
+    (fun error parameter bdu_handler_list ->
+      let _ =
+        let rec aux acc =
+          match acc with
+            | [] -> []
+            | (handler, mvbdu_redefine) :: tl ->
+              let mvbdu_dic =
+                handler.Memo_sig.print_mvbdu stdout "" mvbdu_redefine in
+              mvbdu_dic;
+              aux tl
+        in
+        aux bdu_handler_list
+      in
+      error
+    )
+    parameter
+    result_bdu
+
+(*------------------------------------------------------------------------------*)
+(*PRINT enable set*)
+
+let print_enable_set parameter error store_enable_set =
+  AgentMap.print error
+    (fun error parameter site_set ->
+      let _ =
+        let l = Site_map_and_set.elements site_set in
+        let rec aux acc =
+          match acc with
+            | [] -> ()
+            | x :: tl ->
+              fprintf stdout "site_type:%i\n" x;
+              aux tl
+        in
+        aux l
+      in
+      error
+    )
+    parameter
+    store_enable_set
+
 (************************************************************************************)   
 (*RULES - VARS*)
 
@@ -1009,12 +1163,14 @@ let scan_rule_set parameter error handler rules =
   let error, init_class     = create_map parameter error n_agents in
   let error, init_map       = create_map parameter error n_agents in
   let error, init_bdu       = create_map parameter error n_agents in
+  let error, init_enable    = create_map parameter error n_agents in
   (*------------------------------------------------------------------------------*)
   (*init state of covering class*)
   let init_class =
     {
       store_modified_map     = init_modif_map;
-      store_covering_classes = init_class, init_map, init_bdu
+      store_covering_classes = init_class, init_map, init_bdu;
+      store_enable_set       = init_enable
     }
   in
   (*------------------------------------------------------------------------------*)
@@ -1060,7 +1216,7 @@ let scan_rule_set parameter error handler rules =
           clean_classes
             parameters 
             error
-            pair_covering_class
+              pair_covering_class
             modified_map
         in
         (*------------------------------------------------------------------------------*)
@@ -1080,7 +1236,8 @@ let scan_rule_set parameter error handler rules =
       result_covering_classes
       init_result
   in
-  error, (remanent_dictionary, result_state, result_bdu)
+  error, (remanent_dictionary, store_covering_classes.store_enable_set,
+          result_state, result_bdu)
 
 (************************************************************************************)   
 (*MAIN*)
@@ -1093,20 +1250,27 @@ let common_result parameter error handler cc_compil =
 let covering_classes parameter error handler cc_compil =
   let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
   let error, result = common_result parameter error handler cc_compil in
-  let (result_covering_class, _, _) = result in
+  let (result_covering_class, _, _, _) = result in
   let _ = print_result parameter error result_covering_class in
   error, result_covering_class
+
+let enable_set parameter error handler cc_compil =
+  let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
+  let error, result = common_result parameter error handler cc_compil in
+  let (_, store_enable, _, _) = result in
+  let _ = print_enable_set parameter error store_enable in
+  error, store_enable
 
 let result_test parameter error handler cc_compil =
   let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
   let error, result = common_result parameter error handler cc_compil in
-  let (_, result_test, _) = result in
+  let (_, _, result_test, _) = result in
   let _ = print_test_site parameter error result_test in
   error, result_test
 
 let result_bdu parameter error handler cc_compil =
   let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
   let error, result = common_result parameter error handler cc_compil in
-  let (_, _, result_bdu) = result in
-  let _ = print_bdu parameter error result_bdu in
+  let (_, _, _, result_bdu) = result in
+  let _ = print_bdu_handler parameter error result_bdu in
   error, result_bdu  

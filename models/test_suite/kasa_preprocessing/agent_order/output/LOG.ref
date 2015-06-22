@@ -177,32 +177,52 @@ Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id
 site_type:1
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
 site_type:1
+Enable set:
+Enable set:agent_type:0:
+site_type:0
+Enable set:agent_type:1:
+site_type:0
 BDU of potential dependencies between sites:
 BDU of potential dependencies between sites:agent_type:0:
-BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine: if(mvbdu_id:3) x0 < 0 then 
-BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:  false
-BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine: else 
-BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:  if(mvbdu_id:2) x0 < 1 then 
-BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:   true
-BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:  else 
-BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:   false
+Id=3
+ Node(site_type:0<0)
+  Id=1
+   Leaf False 
 
-BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine: if(mvbdu_id:3) x0 < 0 then 
-BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:  false
-BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine: else 
-BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:  if(mvbdu_id:2) x0 < 1 then 
-BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:   true
-BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:  else 
-BDU of potential dependencies between sites:agent_type:0:mvbdu_redefine:   false
+  Id=2
+   Node(site_type:0<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Id=3
+ Node(site_type:0<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:0<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
 
 BDU of potential dependencies between sites:agent_type:1:
-BDU of potential dependencies between sites:agent_type:1:mvbdu_redefine: if(mvbdu_id:3) x0 < 0 then 
-BDU of potential dependencies between sites:agent_type:1:mvbdu_redefine:  false
-BDU of potential dependencies between sites:agent_type:1:mvbdu_redefine: else 
-BDU of potential dependencies between sites:agent_type:1:mvbdu_redefine:  if(mvbdu_id:2) x0 < 1 then 
-BDU of potential dependencies between sites:agent_type:1:mvbdu_redefine:   true
-BDU of potential dependencies between sites:agent_type:1:mvbdu_redefine:  else 
-BDU of potential dependencies between sites:agent_type:1:mvbdu_redefine:   false
+Id=3
+ Node(site_type:0<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:0<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
 
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
