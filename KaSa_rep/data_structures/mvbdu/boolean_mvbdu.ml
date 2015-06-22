@@ -38,12 +38,12 @@ struct
 end 
                                                              
 module D_mvbdu_skeleton =
-  (Dictionary.Dictionary_of_Ord (Mvbdu_Skeleton):
-     Dictionary.Dictionary with type value = bool Mvbdu_sig.skeleton)
+  (Dictionary.Dictionary_of_Ord (Mvbdu_Skeleton):Dictionary.Dictionary 
+   with type value = bool Mvbdu_sig.skeleton)
 
 module D_list_skeleton =
-  (Dictionary.Dictionary_of_Ord (List_Skeleton):
-     Dictionary.Dictionary with type value = int List_sig.skeleton) 
+  (Dictionary.Dictionary_of_Ord (List_Skeleton):Dictionary.Dictionary 
+   with type value = int List_sig.skeleton) 
                                                                         
 module Hash_1 = Int_storage.Nearly_inf_Imperatif
 module Hash_2 = Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif
@@ -115,10 +115,10 @@ let rec print_cell log prefix cell =
       let _ = Printf.fprintf log "%s%s\n" prefix s in 
       ()
     | Mvbdu_sig.Node x -> 
-      let _ = Printf.fprintf log "%sNode(var:%i<%i)\n"
+      let _ = Printf.fprintf log "%sNode(site_type:%i<%i)\n"
         prefix 
         x.Mvbdu_sig.variable
-        x.Mvbdu_sig.upper_bound 
+        (x.Mvbdu_sig.upper_bound + 1)
       in
       let prefix' = prefix^" " in 
       let _ = print_mvbdu log prefix' x.Mvbdu_sig.branch_true in 
@@ -137,10 +137,12 @@ and print_skeleton log prefix skel =
       let _ = Printf.fprintf log "%s%s\n" prefix s in 
       ()
     | Mvbdu_sig.Node x -> 
-      let _ = Printf.fprintf log "%sNode(var:%i<%i,branch_true:%i,branch_false:%i)\n"
+      let _ = Printf.fprintf log "%sNode(site_type:%i<%i,branch_true:%i,branch_false:%i)\n"
         prefix 
-        x.Mvbdu_sig.variable x.Mvbdu_sig.upper_bound 
-        x.Mvbdu_sig.branch_true x.Mvbdu_sig.branch_false
+        x.Mvbdu_sig.variable 
+        (x.Mvbdu_sig.upper_bound + 1)
+        x.Mvbdu_sig.branch_true
+        x.Mvbdu_sig.branch_false
       in
       ()
            
@@ -212,9 +214,13 @@ let mvbdu_allocate =
     in  
     match output with 
       | None -> error,None 
-      | Some ((i:int),a,b,new_dic) -> 
-        let new_handler = Mvbdu_core.update_dictionary old_handler new_dic in 
-        error, (Some (i,a,b,new_handler)))
+      | Some ((i:int), a, b, new_dic) -> 
+        let new_handler =
+          Mvbdu_core.update_dictionary 
+            old_handler
+            new_dic 
+        in 
+        error, (Some (i, a, b, new_handler)))
 
 let build_memoize_unary f get_handler update_handler = 
   Mvbdu_algebra.recursive_memoize 
@@ -508,12 +514,24 @@ let list_allocate parameters =
   (fun error b c d e (old_handler:('a,mvbdu_dic,list_dic,'c,'d) Memo_sig.handler) -> 
     let old_dictionary = old_handler.Memo_sig.list_dictionary in 
     let error,output =
-      D_list_skeleton.allocate parameters error b c d e old_dictionary in  
+      D_list_skeleton.allocate 
+        parameters 
+        error
+        b
+        c
+        d
+        e
+        old_dictionary
+    in  
     match output with 
-      | None -> error,None 
-      | Some ((i:int),a,b,new_dic) -> 
-        let new_handler = List_core.update_dictionary old_handler new_dic in 
-        error, (Some (i,a,b,new_handler)))
+      | None -> error, None 
+      | Some ((i:int), a, b, new_dic) -> 
+        let new_handler = 
+          List_core.update_dictionary
+            old_handler
+            new_dic
+        in 
+        error, (Some (i, a, b, new_handler)))
     
 let memo_clean_head = 
   Mvbdu_algebra.memoize_no_fun 
@@ -589,8 +607,11 @@ let redefine parameters error handler mvbdu_input list_input =
       {h with Memo_sig.data = {h.Memo_sig.data with boolean_mvbdu_redefine = x}})  
     (fun parameters error handler (mvbdu,list) d -> 
       let a,b =
-        Hash_2.unsafe_get parameters error
-          (Mvbdu_core.id_of_mvbdu mvbdu, List_core.id_of_list list) d
+        Hash_2.unsafe_get 
+          parameters
+          error
+          (Mvbdu_core.id_of_mvbdu mvbdu, List_core.id_of_list list) 
+          d
       in 
       a, (handler, b))
     (fun parameters error handler (mvbdu,list) -> 
