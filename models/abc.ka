@@ -7,7 +7,7 @@
 
 #### Rules 
 'a.b' A(x),B(x) <-> A(x!1),B(x!1) @ 'on_rate','off_rate' #A binds B 
-'a..b' A(x!1),B(x!1) -> A(x),B(x) @ 'off_rate' #AB dissociation
+#'a..b' A(x!1),B(x!1) -> A(x),B(x) @ 'off_rate' #AB dissociation
 'ab.c' A(x!_,c),C(x1~u) ->A(x!_,c!2),C(x1~u!2) @ 'on_rate' #AB binds C 
 'mod x1' C(x1~u!1),A(c!1) ->C(x1~p),A(c) @ 'mod_rate' #AB modifies x1
 'a.c' A(x,c),C(x1~p,x2~u) -> A(x,c!1),C(x1~p,x2~u!1) @ 'on_rate' #A binds C on x2 
