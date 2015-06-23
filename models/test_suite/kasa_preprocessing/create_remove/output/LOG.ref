@@ -86,7 +86,13 @@ Relation between sites:
 Potential dependencies between sites:
 Creation and BDU of creation:
 Creation and BDU of creation:agent_type:1:
+Id=0
+ Leaf True 
+
 Creation and BDU of creation:agent_type:2:
+Id=0
+ Leaf True 
+
 BDU at each rule:
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0

@@ -31,14 +31,14 @@ type state_list = (int * int) list
 
 (*BDU*)
 type bdu_redefine =  bool Mvbdu_sig.mvbdu
-type bdu_handler  = 
+type bdu_handler_list  = 
     ((Boolean_mvbdu.memo_tables, 
      Boolean_mvbdu.mvbdu_dic,
      Boolean_mvbdu.list_dic,
      bool, 
      int) Memo_sig.handler * bdu_redefine) list 
 
-type bdu_handler'  = 
+type bdu_handler  =
     ((Boolean_mvbdu.memo_tables, 
      Boolean_mvbdu.mvbdu_dic,
      Boolean_mvbdu.list_dic,
@@ -50,7 +50,7 @@ type covering_classes =
     store_modified_map     : int map AgentMap.t;
     store_covering_classes : (int * state_list) list list AgentMap.t
                              * state_list AgentMap.t
-                             * bdu_handler AgentMap.t;
+                             * bdu_handler_list AgentMap.t;
     store_creation         : ((int * int) list * bdu_handler) AgentMap.t
 
   }

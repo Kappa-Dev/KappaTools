@@ -195,6 +195,9 @@ Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0
 site_type:1
 Creation and BDU of creation:
 Creation and BDU of creation:agent_type:2:
+Id=0
+ Leaf True 
+
 BDU at each rule:
 BDU of each rule:agent_type:0:
 Id=3

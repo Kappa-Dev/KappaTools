@@ -718,7 +718,7 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
                     (*store*)
                     let site_list = (site, new_pair) :: current_class in
                     let bdu_list = bdu :: current_bdu in
-                    (site_list, pair_list, bdu_list)
+                    (site_list, pair_list, bdu_list) (*FIXME: pair_list or new_pair?*)
                   ) agent.agent_interface ([], [], [])
               in
               (* store new_covering_class in the classes of the agent type
@@ -773,38 +773,33 @@ let collect_creation parameter error viewsrhs creation store_creation =
       | Some Ghost -> error, store_creation
       | Some Agent agent ->
         (*get the site and state on the rhs*)
-        let pair_list =
+        let site_list =
           Site_map_and_set.fold_map 
-            (fun site port (current_list, current_bdu_list) ->
+            (fun site port current_list ->
               let state = int_of_port port in
               let list_a = (site, state) :: current_list in
-              let error, bdu = bdu_covering parameter error list_a in
-              let bdu_list = bdu :: current_bdu_list in
-              list_a, bdu_list
+              list_a
             )
-            agent.agent_interface ([], [])
+            agent.agent_interface []
         in
-        (*get old*)
-        let (site_list, bdu_list) = pair_list in
-        let error, old_pair =
+        let error, old_list =
           match AgentMap.unsafe_get
             parameter
             error
             agent_type
             store_creation
           with
-              | error, None -> error, ([], [])
-              | error, Some (s,b) -> error, (s, b)
+              | error, None -> error, []
+              | error, Some (s,_) -> error, s
         in
-        let (old_list, old_bdu) = old_pair in
         let new_site = List.concat [site_list; old_list] in
-        let new_bdu = List.concat [bdu_list; old_bdu] in
+        let error, bdu = bdu_covering parameter error new_site in
         let error, store_creation =
           AgentMap.set
             parameter
             error
             agent_type
-            (new_site, new_bdu)
+            (new_site, bdu)
             store_creation
         in
         error, store_creation
@@ -882,7 +877,7 @@ let print_covering_class l =
   let rec aux acc =
     match acc with
       | [] -> ()
-      | (x,l) :: tl -> (*FIXME*)
+      | (x,_) :: tl ->
         fprintf stdout "site_type:%i\n" x;
         aux tl
   in
@@ -961,7 +956,7 @@ let print_modified l =
   let rec aux acc =
     match acc with
       | [] -> ()
-      | x :: tl -> (*FIXME*)
+      | x :: tl ->
         fprintf stdout "site_type:%i\n" x;
         aux tl
   in
@@ -1159,9 +1154,10 @@ let print_result_creation parameter error result_creation =
     error
     (fun error parameter p ->
       let _ =
-        let (creation_list, bdu_list) = p in
+        let (creation_list, bdu) = p in
         let _ = print_pair creation_list in
-        print_list_bdu bdu_list
+        let (handler, mvbdu_redefine) = bdu in
+        handler.Memo_sig.print_mvbdu stdout "" mvbdu_redefine 
       in
       error
     )
