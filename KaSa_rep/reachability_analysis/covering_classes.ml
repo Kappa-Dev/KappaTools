@@ -50,7 +50,8 @@ let print_list l =
 (************************************************************************************)
 (*sorted and ordered a covering classes in an descreasing order *)
 
-let length_sorted (l: int list list): int list list =
+let length_sorted (l: (int * Covering_classes_type.state_list) list list):
+    (int * Covering_classes_type.state_list) list list =
   let list_length = List.rev_map (fun list -> list, List.length list) l in
   let lists       = List.sort (fun a b -> compare (snd a) (snd b)) list_length in
   List.rev_map fst lists
@@ -125,17 +126,18 @@ let is_empty_list l =
     | [] -> true
     | _ -> false
 
-let re_index_value_list list =
+let re_index_value_list pair_list =
   let rec aux acc =
     match acc with
       | [] -> acc
-      | x :: tl ->
+      | (x,s) :: tl ->
+        let list = fst (List.split pair_list) in
         if not (is_empty_list list)
         then
         let nth = position x list in
-        (nth + 1) :: aux tl
+        ((nth + 1),s) :: aux tl
         else []
-  in aux list
+  in aux pair_list
 
 (*------------------------------------------------------------------------------*)
 (*projection site that are modified with new index*)
@@ -249,7 +251,7 @@ let modified_index_dic parameter error covering_class modified_map
 (*------------------------------------------------------------------------------*)
 (*store remanent*)
 
-let store_remanent parameter error covering_class modified_map remanent =
+let store_remanent parameter error pair_covering_class modified_map remanent =
   (* current state of remanent*)
   let pointer_backward    = remanent.store_pointer_backward in
   let good_covering_class = remanent.store_dic in
@@ -257,7 +259,7 @@ let store_remanent parameter error covering_class modified_map remanent =
   let good_test_dic       = remanent.store_test_new_index_dic in
   let good_modif_dic      = remanent.store_modif_new_index_dic in
   (*------------------------------------------------------------------------------*)
-  match covering_class with
+  match pair_covering_class with
     | [] -> error, remanent
     | _ ->
       (*------------------------------------------------------------------------------*)
@@ -266,11 +268,12 @@ let store_remanent parameter error covering_class modified_map remanent =
         covering_class_dic 
           parameter 
           error 
-          covering_class
+          pair_covering_class
           good_covering_class 
       in
       (*------------------------------------------------------------------------------*)
       (*store pointer backward*)
+      let covering_class = fst (List.split pair_covering_class) in
       let error, pointer_backward =
         store_pointer_backward 
           parameter
@@ -281,7 +284,7 @@ let store_remanent parameter error covering_class modified_map remanent =
       in
       (*------------------------------------------------------------------------------*)
       (*PART II: compute new_index in covering_class*)
-      let new_index_covering_class = re_index_value_list covering_class in
+      let new_index_covering_class = re_index_value_list pair_covering_class in
       let error, (new_id, new_dic) =
         new_index_dic 
           parameter 
@@ -365,9 +368,9 @@ let clean_classes parameter error covering_classes modified_map =
   let current_covering_classes = length_sorted covering_classes in
   let is_empty_set = Site_map_and_set.is_empty_set in
   List.fold_left (fun (error, remanent) covering_class ->
-    match covering_class with (*TODO: add state in length*)
+    match covering_class with
       | [] -> error, remanent
-      | t :: tl ->
+      | (t, p) :: tl ->
         let pointer_backward = remanent.store_pointer_backward in
         (* return the set of list(id) containing t.
            For example: current_covering_classes: [[0;1];[0]]
@@ -385,7 +388,7 @@ let clean_classes parameter error covering_classes modified_map =
         let rec aux to_visit potential_supersets =
           match to_visit with
 	    | [] -> error, remanent
-	    | t' :: tl' ->
+	    | (t', p') :: tl' ->
               (* get the set of list(id) containing t' *)
               let error, potential_supersets' =
 		get_id_common_set
@@ -517,7 +520,7 @@ and print_precell p =
 
 (*---------------------------------------------------------------------------*)
 
-let bdu_covering parameter error agent_type pair_list =
+let bdu_covering parameter error pair_list =
   (*build bdu for this list*)
   let remanent_bdu = Sanity_test.remanent parameter in
   let error        = remanent_bdu.Sanity_test_sig.error in
@@ -596,8 +599,8 @@ let bdu_covering parameter error agent_type pair_list =
 (*------------------------------------------------------------------------------*)
 (*compute covering_class*)
 
-let add_covering_class parameter error agent_type site_list store_covering_classes =
-  match site_list with
+let add_covering_class parameter error agent_type pair_list store_covering_classes =
+  match pair_list with
     | [] -> error, store_covering_classes
     | _ ->
       let error, old_pair =
@@ -610,14 +613,14 @@ let add_covering_class parameter error agent_type site_list store_covering_class
         with
           | error, None -> error, []
           | error, Some sites -> error, sites
-       in
+      in
       (* store the new list of covering classes *)
-      let new_site_list = (List.rev site_list) :: old_pair in
+      let new_pair_list = (List.rev pair_list) :: old_pair in
       AgentMap.set 
         parameter
         error
         agent_type
-        new_site_list
+        new_pair_list
         store_covering_classes
 
 (*------------------------------------------------------------------------------*)
@@ -627,7 +630,7 @@ let add_site_test parameter error agent_type pair_list store_state =
   match pair_list with
     | [] -> error, store_state
     | _ ->
-      let error, old_list =
+      let old_list =
         match 
           AgentMap.unsafe_get
             parameter
@@ -635,8 +638,8 @@ let add_site_test parameter error agent_type pair_list store_state =
             agent_type
             store_state
         with
-          | error, None -> error, []
-          | error, Some s -> error, s
+          | error, None -> []
+          | error, Some s -> s
       in
       let new_list = List.concat [pair_list; old_list] in
       AgentMap.set
@@ -697,16 +700,23 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
                     (*---------------------------------------------------------*)
                     (*BDU*)
                     let pair_list = (site, state) :: current_list in
+                    let old_pair =
+                      match AgentMap.unsafe_get parameter error
+                        agent_type store_state with
+                        | error, None -> []
+                        | error, Some p -> p
+                    in
+                    let new_pair = List.concat [pair_list; old_pair] in
                     let error, bdu =
                       bdu_covering
                         parameter 
                         error
-                        agent_type
-                        pair_list                 
+                        (*agent_type*)
+                        pair_list
                     in
                     (*---------------------------------------------------------*)
                     (*store*)
-                    let site_list = site :: current_class in
+                    let site_list = (site, new_pair) :: current_class in
                     let bdu_list = bdu :: current_bdu in
                     (site_list, pair_list, bdu_list)
                   ) agent.agent_interface ([], [], [])
@@ -747,95 +757,60 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
   in error, store_covering_classes
 
 (*------------------------------------------------------------------------------*)
-(*Define enable rules *)
+(*compute bdu for initial state or creation actions*)
 
-let store_enable_set parameter error views diff_reverse store_result_set =
-  Quick_Nearly_inf_Imperatif.fold2_common parameter error
-    (fun parameter error agent_id agent site_modif store_result_set ->
-      if Site_map_and_set.is_empty_map
-        site_modif.agent_interface
-      then
-        error, store_result_set
-      else
-        match agent with
-          | Ghost -> error, store_result_set
-          | Agent agent ->
-            let agent_type = agent.agent_name in
-            let site_set =
-              Site_map_and_set.fold_map
-                (fun site port current_set ->
-                  let _state = int_of_port port in
-                  let error, set =
-                    Site_map_and_set.add_set
-                      parameter
-                      error
-                      site
-                      current_set
-                  in
-                  set
-                ) agent.agent_interface empty_set
-            in
-            (*----------------------------------------------------------------------*)
-            (*do the intersection with result set*)
-            let old_result_set =
-              match AgentMap.unsafe_get
-                parameter
-                error
-                agent_type
-                store_result_set with
-                  | error, None -> empty_set
-                  | error, Some s -> s
-            in
-            (*Dijoint set*)
-            let error, new_site_set =
-              Site_map_and_set.inter
-                parameter
-                error
-                site_set
-                old_result_set
-            in
-            if Site_map_and_set.is_empty_set new_site_set
-            then
-              let error, x1 =
-                Site_map_and_set.union
-                  parameter
-                  error
-                  new_site_set
-                  site_set
-              in
-              let error, x1_inter_rule =
-                Site_map_and_set.inter
-                  parameter
-                  error
-                  x1
-                  site_set
-              in
-              let result = (*FIXME*)
-                Site_map_and_set.fold_set (fun elt _ ->
-                  if Site_map_and_set.mem_map elt site_modif.agent_interface
-                  then
-                    let error, result =
-                      Site_map_and_set.union
-                        parameter
-                        error
-                        x1
-                        x1_inter_rule
-                    in
-                    result
-                  else
-                    x1
-                ) x1_inter_rule empty_set
-              in
-              AgentMap.set
-                parameter
-                error
-                agent_type
-                result
-                store_result_set
-            else
-              error, store_result_set
-    )
-    views diff_reverse store_result_set
+let collect_creation parameter error viewsrhs creation store_creation =
+  List.fold_left (fun (error, store_creation) (agent_id, agent_type) ->
+    let error, agent =
+      AgentMap.get
+        parameter
+        error
+        agent_id
+        viewsrhs
+    in
+    match agent with
+      | None -> warn parameter error (Some "line 772") Exit store_creation
+      | Some Ghost -> error, store_creation
+      | Some Agent agent ->
+        (*get the site and state on the rhs*)
+        let pair_list =
+          Site_map_and_set.fold_map 
+            (fun site port (current_list, current_bdu_list) ->
+              let state = int_of_port port in
+              let list_a = (site, state) :: current_list in
+              let error, bdu = bdu_covering parameter error list_a in
+              let bdu_list = bdu :: current_bdu_list in
+              list_a, bdu_list
+            )
+            agent.agent_interface ([], [])
+        in
+        (*get old*)
+        let (site_list, bdu_list) = pair_list in
+        let error, old_pair =
+          match AgentMap.unsafe_get
+            parameter
+            error
+            agent_type
+            store_creation
+          with
+              | error, None -> error, ([], [])
+              | error, Some (s,b) -> error, (s, b)
+        in
+        let (old_list, old_bdu) = old_pair in
+        let new_site = List.concat [site_list; old_list] in
+        let new_bdu = List.concat [bdu_list; old_bdu] in
+        let error, store_creation =
+          AgentMap.set
+            parameter
+            error
+            agent_type
+            (new_site, new_bdu)
+            store_creation
+        in
+        error, store_creation
+  )
+    (error, store_creation)
+    creation
 
 (*------------------------------------------------------------------------------*)
 (*compute covering class: it is a covering class whenever there is a
@@ -870,14 +845,14 @@ let scan_rule parameter error handler rule classes =
       classes.store_covering_classes
   in
   (*------------------------------------------------------------------------------*)
-  (*compute enable set*)
-  let error, store_enable_set =
-    store_enable_set
+  (*compute creation*)
+  let error, store_creation =
+    collect_creation
       parameter
       error
-      rule.rule_lhs.views
-      rule.diff_reverse
-      classes.store_enable_set
+      rule.rule_rhs.views
+      rule.actions.creation
+      classes.store_creation
   in
   (*------------------------------------------------------------------------------*)
   (*result*)
@@ -885,7 +860,7 @@ let scan_rule parameter error handler rule classes =
   {
     store_modified_map     = store_modified_map;
     store_covering_classes = store_covering_classes;
-    store_enable_set       = store_enable_set
+    store_creation         = store_creation;
   }           
 
 (************************************************************************************)   
@@ -907,8 +882,41 @@ let print_covering_class l =
   let rec aux acc =
     match acc with
       | [] -> ()
-      | x :: tl ->
+      | (x,l) :: tl -> (*FIXME*)
         fprintf stdout "site_type:%i\n" x;
+        aux tl
+  in
+  aux l
+  
+let combine x l =
+  let rec aux acc =
+    match acc with
+      | [] -> []
+      | (x', s) :: tl ->
+        if x = x'
+        then
+          (x,s) :: aux tl
+        else
+          []
+  in aux l
+
+let print_pair p =
+  let rec aux acc =
+    match acc with
+      | [] -> ()
+      | (x,s) :: tl ->
+        fprintf stdout "site_type:%i:state:%i\n" x s;
+        aux tl
+  in
+  aux p
+ 
+let print_covering_class' parameter error l =
+  let rec aux acc =
+    match acc with
+      | [] -> []
+      | (x,l) :: tl ->
+        let c = combine x l in
+        print_pair c;
         aux tl
   in
   aux l
@@ -949,7 +957,17 @@ let print_test_new_index_dic parameter error elt_id store_test =
 (*------------------------------------------------------------------------------*)
 (*print modified site (action) with new index*)
 
-let print_modified_dic parameter error elt_id store_modif =(*FIXME:add state*)
+let print_modified l =
+  let rec aux acc =
+    match acc with
+      | [] -> ()
+      | x :: tl -> (*FIXME*)
+        fprintf stdout "site_type:%i\n" x;
+        aux tl
+  in
+  aux l
+
+let print_modified_dic parameter error elt_id store_modif =
   Dictionary_of_Modified_class.print
     parameter
     error
@@ -958,7 +976,7 @@ let print_modified_dic parameter error elt_id store_modif =(*FIXME:add state*)
         fprintf stdout 
           "Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:%i:class_id:%i:\n"
           elt_id elt;
-        print_covering_class l
+        print_modified l
       in
       error
     ) store_modif
@@ -966,8 +984,18 @@ let print_modified_dic parameter error elt_id store_modif =(*FIXME:add state*)
 (*------------------------------------------------------------------------------*)
 (*print remove action*)
 
+let build_list_a_value pair_list =
+  let rec aux acc =
+    match acc with
+      | [] -> []
+      | (x, l) :: tl ->
+        let c = combine x l in
+        c :: aux tl
+  in
+  aux pair_list
+
 let print_dic_and_new_index parameter error store_index store_test 
-    store_modif store_dic =
+    store_modif store_dic = (*TEST*)
   Dictionary_of_Covering_class.print
     parameter
     error
@@ -977,7 +1005,14 @@ let print_dic_and_new_index parameter error store_index store_test
         (*print covering class in dictionary*)
           printf "Potential dependencies between sites:Covering_class_id:%i:\n"
             elt_id; 
-          print_covering_class pair_list
+          print_covering_class' parameter error pair_list (*TEST*)
+        in
+        (*print bdu*)
+        let list_a = build_list_a_value pair_list in
+        let _ = print_string "list_a:\n"; print_pair (List.flatten list_a) in
+        let error, bdu = bdu_covering parameter error (List.flatten list_a) in
+        let (handler, mvbdu_redefine) = bdu in
+        let _ = handler.Memo_sig.print_mvbdu stdout "" mvbdu_redefine 
         in
         (*print new_index for covering class*)
         let _ = print_new_index_dic
@@ -999,7 +1034,7 @@ let print_dic_and_new_index parameter error store_index store_test
           error 
           elt_id 
           store_modif
-      in error)
+        in error)
     store_dic
 
 (*------------------------------------------------------------------------------*)
@@ -1086,30 +1121,6 @@ let print_test_site parameter error result_test =
 (*------------------------------------------------------------------------------*)
 (*PRINT BDU*)
 
-let print_bdu_redefine parameter error result_bdu = (*REMOVE*)
-  AgentMap.print error
-    (fun error parameter mvbdu_redefine_list ->
-      let _ =
-        let rec aux acc =
-          match acc with
-            | [] -> []
-            | mvbdu_redefine :: tl ->
-              let _ =
-                Boolean_mvbdu.print_boolean_mvbdu
-                  error
-                  (Remanent_parameters.update_prefix parameter "mvbdu_redefine:")
-                  mvbdu_redefine
-              in
-              print_string "\n";
-              aux tl
-        in
-        aux mvbdu_redefine_list
-        in        
-      error
-    )
-    parameter
-    result_bdu
-
 let print_bdu_handler parameter error result_bdu =
   AgentMap.print error
     (fun error parameter bdu_handler_list ->
@@ -1131,26 +1142,31 @@ let print_bdu_handler parameter error result_bdu =
     result_bdu
 
 (*------------------------------------------------------------------------------*)
-(*PRINT enable set*)
+(*print creation and bdu of creation*)
 
-let print_enable_set parameter error store_enable_set =
-  AgentMap.print error
-    (fun error parameter site_set ->
+let print_list_bdu bdu_list =
+  let rec aux acc =
+    match acc with
+      | [] -> ()
+      | bdu :: tl ->
+        let (handler, mvbdu_redefine) = bdu in
+        let _ = handler.Memo_sig.print_mvbdu stdout "" mvbdu_redefine in
+        aux tl
+  in aux bdu_list
+
+let print_result_creation parameter error result_creation =
+  AgentMap.print
+    error
+    (fun error parameter p ->
       let _ =
-        let l = Site_map_and_set.elements site_set in
-        let rec aux acc =
-          match acc with
-            | [] -> ()
-            | x :: tl ->
-              fprintf stdout "site_type:%i\n" x;
-              aux tl
-        in
-        aux l
+        let (creation_list, bdu_list) = p in
+        let _ = print_pair creation_list in
+        print_list_bdu bdu_list
       in
       error
     )
     parameter
-    store_enable_set
+    result_creation
 
 (************************************************************************************)   
 (*RULES - VARS*)
@@ -1163,14 +1179,14 @@ let scan_rule_set parameter error handler rules =
   let error, init_class     = create_map parameter error n_agents in
   let error, init_map       = create_map parameter error n_agents in
   let error, init_bdu       = create_map parameter error n_agents in
-  let error, init_enable    = create_map parameter error n_agents in
+  let error, init_creation  = create_map parameter error n_agents in
   (*------------------------------------------------------------------------------*)
   (*init state of covering class*)
   let init_class =
     {
       store_modified_map     = init_modif_map;
       store_covering_classes = init_class, init_map, init_bdu;
-      store_enable_set       = init_enable
+      store_creation         = init_creation
     }
   in
   (*------------------------------------------------------------------------------*)
@@ -1216,7 +1232,7 @@ let scan_rule_set parameter error handler rules =
           clean_classes
             parameters 
             error
-              pair_covering_class
+            pair_covering_class
             modified_map
         in
         (*------------------------------------------------------------------------------*)
@@ -1236,7 +1252,7 @@ let scan_rule_set parameter error handler rules =
       result_covering_classes
       init_result
   in
-  error, (remanent_dictionary, store_covering_classes.store_enable_set,
+  error, (remanent_dictionary, store_covering_classes.store_creation, 
           result_state, result_bdu)
 
 (************************************************************************************)   
@@ -1254,13 +1270,6 @@ let covering_classes parameter error handler cc_compil =
   let _ = print_result parameter error result_covering_class in
   error, result_covering_class
 
-let enable_set parameter error handler cc_compil =
-  let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
-  let error, result = common_result parameter error handler cc_compil in
-  let (_, store_enable, _, _) = result in
-  let _ = print_enable_set parameter error store_enable in
-  error, store_enable
-
 let result_test parameter error handler cc_compil =
   let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
   let error, result = common_result parameter error handler cc_compil in
@@ -1273,4 +1282,11 @@ let result_bdu parameter error handler cc_compil =
   let error, result = common_result parameter error handler cc_compil in
   let (_, _, _, result_bdu) = result in
   let _ = print_bdu_handler parameter error result_bdu in
-  error, result_bdu  
+  error, result_bdu
+
+let result_creation_bdu parameter error handler cc_compil =
+  let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
+  let error, result = common_result parameter error handler cc_compil in
+  let (_, result_creation, _, _) = result in
+  let _ = print_result_creation parameter error result_creation in
+  error, result_creation

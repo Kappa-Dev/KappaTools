@@ -67,7 +67,8 @@ module type Set_and_Map = sig
   val fold_map: (key -> 'a -> 'b -> 'b) -> 'a map -> 'b -> 'b 
   val join_map: Remanent_parameters_sig.parameters->Exception.method_handler -> 'a map -> key -> 'a -> 'a map -> Exception.method_handler * 'a map
   val split_map: Remanent_parameters_sig.parameters->Exception.method_handler-> key -> 'a map -> Exception.method_handler * ('a map * 'a option * 'a map)
-  val union_map:Remanent_parameters_sig.parameters->Exception.method_handler-> 'a map -> 'a map ->Exception.method_handler * 'a map
+  val union_map: Remanent_parameters_sig.parameters->Exception.method_handler-> 'a map -> 'a map -> Exception.method_handler * 'a map
+(*  val inter_map: Remanent_parameters_sig.parameters->Exception.method_handler-> 'a map -> 'a map -> Exception.method_handler * 'a map*)
   val bindings : 'a map -> (key * 'a) list
   val equal_map: ('a -> 'a -> bool) -> 'a map -> 'a map -> bool
   val update_map: Remanent_parameters_sig.parameters ->Exception.method_handler -> 'a map -> 'a map -> Exception.method_handler * 'a map    
@@ -616,7 +617,8 @@ module Make(Ord:OrderedType) =
                   
     let rec join_map parameters rh left key value right =
       match balance_map parameters rh left key value right with 
-        | rh',Empty_map -> invalid_arg_map parameters rh (Some "join_map, line 580") (invalid_arg "Set_and_map.join_map")
+        | rh',Empty_map -> invalid_arg_map parameters rh (Some "join_map, line 580")
+          (invalid_arg "Set_and_map.join_map")
         | rh',(Node_map (left2,key2,data2,right2,_) as map2) -> 
           let h = height_map left2 - height_map right2 in 
           if h > 2 || h< -2 
@@ -671,6 +673,41 @@ module Make(Ord:OrderedType) =
         
     let bindings s =
       bindings_aux [] s
+        
+    (*Added*)
+    (*let rec min_elt_map map =
+      match map with
+        | Empty_map -> raise Not_found
+        | Node_map (Empty_map, key1, data1, right1, _) -> data1
+        | Node_map (left, _, _, _, _) -> min_elt_map map
+
+    let concat_map parameters mh map1 map2 =
+      match map1, map2 with
+        | Empty_map, _ -> mh, map2
+        | _, Empty_map -> mh, map1
+        | Node_map (left1, key1, data1, right1,_), _ ->
+          let mh', left2' =
+            remove_min_binding parameters mh map1 key1 data1 map2 in
+          join_map parameters mh' map1 key1 (min_elt_map map2) left2'
+
+    let suture_map parameters mh (left1, key1, value1, right1) (left2, b, right2) f =
+      match b with
+        | None -> raise Not_found
+        | Some bool ->
+          let mh', left' = f parameters mh left1 left2 in
+          let mh'', right' = f parameters mh' right1 right2 in
+          if bool then
+            join_map parameters mh'' left' key1 value1 right'
+          else
+            concat_map parameters mh'' left' right'
+              
+    let rec inter_map parameters mh map1 map2 =
+      match map1, map2 with
+        | Empty_map, _ 
+        | _, Empty_map -> mh, empty_map
+        | Node_map (left1, key1, data1, right1, _), _ ->
+          let mh', triple = split_map parameters mh key1 map2 in
+          suture_map parameters mh'  (left1, key1, data1, right1) triple inter_map*)
 
     let rec forall2iz p fail map1 map2 =
       if map1==map2 then true else 

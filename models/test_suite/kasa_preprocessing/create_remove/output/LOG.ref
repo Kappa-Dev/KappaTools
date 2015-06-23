@@ -84,8 +84,10 @@ Side-effect:agent_type:1:
 Side-effect:deletion:undocument_site:
 Relation between sites:
 Potential dependencies between sites:
-Enable set:
-BDU of potential dependencies between sites:
+Creation and BDU of creation:
+Creation and BDU of creation:agent_type:1:
+Creation and BDU of creation:agent_type:2:
+BDU at each rule:
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
 Flow of information in the ODE semantics:rule_id:1

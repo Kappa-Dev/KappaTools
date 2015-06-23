@@ -117,31 +117,31 @@ let main () =
     else 
       error,None 
   in
-  (*enable set*)
-  let error,enable_set = 
+  (*Creation and BDU of creation*)
+  let error,bdu_creation = 
     if Remanent_parameters.get_do_site_dependencies parameters
     then 
       let parameters_cv =
-	Remanent_parameters.update_prefix parameters "Enable set:" in 
+	Remanent_parameters.update_prefix parameters "Creation and BDU of creation:" in 
       let _ = 
 	if (Remanent_parameters.get_trace parameters_cv)
-	then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "Enable set:\n"
+	then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "Creation and BDU of creation:\n"
       in
-      let error,dep = Covering_classes.enable_set parameters_cv error handler c_compil 
+      let error,dep = Covering_classes.result_creation_bdu parameters_cv error handler c_compil 
       in error,Some dep 
     else 
       error,None 
   in
-  (*BDU covering class*)
-  let error, bdu_covering_classes =
+  (*BDU covering class each rule*)
+  let error, bdu_rule =
     if Remanent_parameters.get_do_site_dependencies parameters
     then
       let parameters_bdu =
-        Remanent_parameters.update_prefix parameters "BDU of potential dependencies between sites:"
+        Remanent_parameters.update_prefix parameters "BDU of each rule:"
       in
       let _ =
         if (Remanent_parameters.get_trace parameters_bdu)
-        then Printf.fprintf (Remanent_parameters.get_log parameters_bdu) "BDU of potential dependencies between sites:\n"
+        then Printf.fprintf (Remanent_parameters.get_log parameters_bdu) "BDU at each rule:\n"
       in
       let error, dep = Covering_classes.result_bdu parameters_bdu error handler c_compil
       in

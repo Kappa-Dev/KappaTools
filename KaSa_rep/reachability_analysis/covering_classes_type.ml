@@ -24,11 +24,10 @@ let local_trace = false
 module AgentMap = Quick_Nearly_inf_Imperatif
 
 type 'a map      = 'a Site_map_and_set.map
-type site        = int
 type set         = Site_map_and_set.set
 
 (*state information*)
-type state = (int * int) list
+type state_list = (int * int) list
 
 (*BDU*)
 type bdu_redefine =  bool Mvbdu_sig.mvbdu
@@ -39,12 +38,21 @@ type bdu_handler  =
      bool, 
      int) Memo_sig.handler * bdu_redefine) list 
 
+type bdu_handler'  = 
+    ((Boolean_mvbdu.memo_tables, 
+     Boolean_mvbdu.mvbdu_dic,
+     Boolean_mvbdu.list_dic,
+     bool, 
+     int) Memo_sig.handler * bdu_redefine)
+
 type covering_classes =
   {
     store_modified_map     : int map AgentMap.t;
-    store_covering_classes : site list list AgentMap.t * state AgentMap.t
+    store_covering_classes : (int * state_list) list list AgentMap.t
+                             * state_list AgentMap.t
                              * bdu_handler AgentMap.t;
-    store_enable_set       : set AgentMap.t
+    store_creation         : ((int * int) list * bdu_handler) AgentMap.t
+
   }
 
 (************************************************************************************)
@@ -58,13 +66,13 @@ module Inf_array = Nearly_inf_Imperatif
 
 module Covering_class =
   struct
-    type t = site list
+    type t = (int * state_list) list
     let compare = compare
   end
 
 module Modified_class =
   struct
-    type t = site list
+    type t = int list
     let compare = compare
   end
 
