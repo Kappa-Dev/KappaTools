@@ -108,7 +108,7 @@ let rec print_mvbdu error print_leaf string_of_var parameters mvbdu =
           parameters.Remanent_parameters_sig.marshalisable_parameters.Remanent_parameters_sig.prefix 
           mvbdu.Mvbdu_sig.id
           (string_of_var x.Mvbdu_sig.variable)
-          (x.Mvbdu_sig.upper_bound + 1) (*FIXED: bug u<p*)
+          (x.Mvbdu_sig.upper_bound + 1)
       in 
       let error =
         print_mvbdu

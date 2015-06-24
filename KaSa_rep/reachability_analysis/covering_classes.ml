@@ -377,7 +377,7 @@ let store_remanent parameter error pair_covering_class modified_map remanent =
   (0) inter (0,1) -> 0
 *)
 
-let print_list_list l =
+let print_list_list l = (*REMOVE*)
   let rec aux acc =
     match acc with
       | [] -> ()
@@ -629,6 +629,29 @@ let build_bdu parameter error pair_list =
   error, (handler, mvbdu_redefine)
 
 (*------------------------------------------------------------------------------*)
+(*Build BDU false*) (*TEST*)
+
+let bdu_init_false parameter =
+  (*build bdu for this list*)
+  let remanent_bdu = Sanity_test.remanent parameter in
+  let error        = remanent_bdu.Sanity_test_sig.error in
+  let allocate     = remanent_bdu.Sanity_test_sig.allocate_mvbdu in
+  (*'b: memo_tables; 'a: mvbdu_dic; 'c: list_dic*)
+  let (handler: ('b, 'a, 'c, bool, int) Memo_sig.handler) =
+    remanent_bdu.Sanity_test_sig.mvbdu_handler
+  in
+  let a_val = Mvbdu_sig.Leaf false in
+  let error, handler, a', a'_id, a'', a''_id =
+    Mvbdu_test.build_without_and_with_compressing
+      allocate
+      error
+      handler
+      a_val (*bdu_skel*)
+      a_val (*bdu_val*)
+  in
+  error, (handler, a')
+
+(*------------------------------------------------------------------------------*)
 (*compute covering_class*)
 
 let add_covering_class parameter error agent_type pair_list store_covering_classes =
@@ -682,31 +705,6 @@ let add_site_test parameter error agent_type pair_list store_state =
         store_state
 
 (*------------------------------------------------------------------------------*)
-(*compute bdu*)
-
-let add_bdu parameter error agent_type bdu_list store_bdu =
-  match bdu_list with
-    | [] -> error, store_bdu
-    | _ ->
-      let error, old_bdu =
-        match AgentMap.unsafe_get
-          parameter
-          error
-          agent_type
-          store_bdu
-        with
-          | error, None -> error, []
-          | error, Some b -> error, b
-      in
-      let new_bdu = List.concat [bdu_list; old_bdu] in
-      AgentMap.set
-        parameter
-        error
-        agent_type
-        (List.rev new_bdu)
-        store_bdu
-
-(*------------------------------------------------------------------------------*)
 (*compute covering classes, site test and bdu*)
 
 let collect_covering_classes parameter error views diff_reverse store_covering_classes =
@@ -722,15 +720,14 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
             | Ghost -> error, store_covering_classes
             | Agent agent ->
               let agent_type = agent.agent_name in
-              let (store_cv, store_state, store_bdu) = store_covering_classes in
+              let (store_cv, store_state) = store_covering_classes in
               (*get a list of sites from an interface at each rule*)
-              let store_triple =
+              let store_pair =
                 Site_map_and_set.fold_map
-	          (fun site port (current_class, current_list, current_bdu) ->
+	          (fun site port (current_class, current_list) ->
                     (*get state min*)
                     let state = int_of_port port in
                     (*---------------------------------------------------------*)
-                    (*BDU*)
                     let pair_list = (site, state) :: current_list in
                     let old_pair =
                       match AgentMap.unsafe_get parameter error
@@ -739,22 +736,15 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
                         | error, Some p -> p
                     in
                     let new_pair = List.concat [pair_list; old_pair] in
-                    let error, bdu =
-                      build_bdu
-                        parameter 
-                        error
-                        pair_list
-                    in
+                    let site_list = (site, new_pair) :: current_class in
                     (*---------------------------------------------------------*)
                     (*store*)
-                    let site_list = (site, new_pair) :: current_class in
-                    let bdu_list = bdu :: current_bdu in
-                    (site_list, pair_list, bdu_list)
-                  ) agent.agent_interface ([], [], [])
+                    (site_list, pair_list)
+                  ) agent.agent_interface ([], [])
               in
               (* store new_covering_class in the classes of the agent type
                  agent_type *)
-              let (site_list, pair_list, bdu_list) = store_triple in
+              let (site_list, pair_list) = store_pair in
               (*compute covering_class*)
               let error, covering_classes =
                 add_covering_class
@@ -773,19 +763,53 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
                   pair_list
                   store_state
               in
-              (*compute bdu*)
-              let error, store_bdu =
-                add_bdu
-                  parameter
-                  error
-                  agent_type
-                  bdu_list
-                  store_bdu
-              in
               (*store*)
-              error, (covering_classes, store_state, store_bdu)
+              error, (covering_classes, store_state)
       ) views diff_reverse store_covering_classes
   in error, store_covering_classes
+
+(*------------------------------------------------------------------------------*)
+(*compute bdu for each rule in the lhs*)
+
+let collect_test_bdu parameter error views store_bdu =
+  AgentMap.fold
+    parameter
+    error
+    (fun parameter error agent_id agent store_bdu ->
+      match agent with
+        | Ghost -> error, store_bdu
+        | Agent agent ->
+          let agent_type = agent.agent_name in
+          let pair_list = 
+            Site_map_and_set.fold_map
+              (fun site port current_list ->
+                let state = int_of_port port in
+                (site, state) :: current_list
+              ) agent.agent_interface []
+          in
+          (*build bdu*)
+          let error, bdu =
+            build_bdu
+              parameter 
+              error
+              pair_list
+          in          
+          let error, old_pair =
+            match AgentMap.unsafe_get parameter error
+              agent_type store_bdu with
+                | error, None -> error, ([], [])
+                | error, Some (l,bdu) -> error, (l,bdu)
+          in
+          let (old_list, old_bdu) = old_pair in
+          let new_pair = List.concat [pair_list; old_list] in
+          let new_bdu = bdu :: old_bdu in
+          AgentMap.set
+            parameter
+            error
+            agent_type
+            (new_pair, new_bdu)
+            store_bdu
+    ) views store_bdu
 
 (*------------------------------------------------------------------------------*)
 (*compute bdu for initial state or creation actions*)
@@ -880,6 +904,15 @@ let scan_rule parameter error handler rule classes =
       rule.actions.creation
       classes.store_creation
   in
+ (*------------------------------------------------------------------------------*)
+  (*compute bdu test*)
+  let error, store_bdu_test =
+    collect_test_bdu
+      parameter
+      error
+      rule.rule_lhs.views
+      classes.store_bdu_test
+  in
   (*------------------------------------------------------------------------------*)
   (*result*)
   error,
@@ -887,6 +920,7 @@ let scan_rule parameter error handler rule classes =
     store_modified_map     = store_modified_map;
     store_covering_classes = store_covering_classes;
     store_creation         = store_creation;
+    store_bdu_test         = store_bdu_test
   }           
 
 (************************************************************************************)   
@@ -997,12 +1031,6 @@ let print_dic_and_new_index parameter error store_index store_test store_modif s
             elt_id; 
           print_pair parameter error pair_list
         in
-        (*print bdu*)
-        (*let _ = print_string "list_a:\n"; print_pair parameter error pair_list in*)
-        let error, bdu = build_bdu parameter error pair_list in
-        let (handler, mvbdu_redefine) = bdu in
-        let _ = handler.Memo_sig.print_mvbdu stdout "" mvbdu_redefine 
-        in
         (*print new_index for covering class*)
         let _ = print_new_index_dic
           parameter
@@ -1028,7 +1056,7 @@ let print_dic_and_new_index parameter error store_index store_test store_modif s
 
 (*------------------------------------------------------------------------------*)
 
-let print_value_site parameter error elt site value_site =
+let print_value_site parameter error elt site value_site = (*REMOVE*)
   Quick_Nearly_inf_Imperatif.print
     error
     (fun error parameter value_site_list ->
@@ -1090,7 +1118,7 @@ let print_result parameter error result_remanent =
 (*------------------------------------------------------------------------------*)
 (*print test: state of site at each rule*)
 
-let print_pair_test l = (*REMOVE*)
+(*let print_pair_test l = (*REMOVE*)
   let rec aux acc =
     match acc with
       | [] -> ()
@@ -1106,43 +1134,10 @@ let print_test_site parameter error result_test = (*REMOVE*)
       let _ = print_pair_test l in
       error)
     parameter
-    result_test
-
-(*------------------------------------------------------------------------------*)
-(*PRINT BDU*)
-
-let print_bdu_handler parameter error result_bdu =
-  AgentMap.print error
-    (fun error parameter bdu_handler_list ->
-      let _ =
-        let rec aux acc =
-          match acc with
-            | [] -> []
-            | (handler, mvbdu_redefine) :: tl ->
-              let mvbdu_dic =
-                handler.Memo_sig.print_mvbdu stdout "" mvbdu_redefine in
-              mvbdu_dic;
-              aux tl
-        in
-        aux bdu_handler_list
-      in
-      error
-    )
-    parameter
-    result_bdu
+    result_test*)
 
 (*------------------------------------------------------------------------------*)
 (*print creation and bdu of creation*)
-
-let print_list_bdu bdu_list =
-  let rec aux acc =
-    match acc with
-      | [] -> ()
-      | bdu :: tl ->
-        let (handler, mvbdu_redefine) = bdu in
-        let _ = handler.Memo_sig.print_mvbdu stdout "" mvbdu_redefine in
-        aux tl
-  in aux bdu_list
 
 let print_result_creation parameter error result_creation =
   AgentMap.print
@@ -1152,7 +1147,11 @@ let print_result_creation parameter error result_creation =
         let (creation_list, bdu) = p in
         let _ = print_pair creation_list in
         let (handler, mvbdu_redefine) = bdu in
-        handler.Memo_sig.print_mvbdu stdout "" mvbdu_redefine 
+        let _ = handler.Memo_sig.print_mvbdu stdout "" mvbdu_redefine in
+        (*TEST*)
+        print_string "BDU false:\n";
+        let error, (handler, a) = bdu_init_false parameter in
+        handler.Memo_sig.print_mvbdu stdout "" a
       in
       error
     )
@@ -1169,15 +1168,16 @@ let scan_rule_set parameter error handler rules =
   let error, init_modif_map = create_map parameter error n_agents in
   let error, init_class     = create_map parameter error n_agents in
   let error, init_map       = create_map parameter error n_agents in
-  let error, init_bdu       = create_map parameter error n_agents in
   let error, init_creation  = create_map parameter error n_agents in
+  let error, init_bdu_test  = create_map parameter error n_agents in
   (*------------------------------------------------------------------------------*)
   (*init state of covering class*)
   let init_class =
     {
       store_modified_map     = init_modif_map;
-      store_covering_classes = init_class, init_map, init_bdu;
-      store_creation         = init_creation
+      store_covering_classes = init_class, init_map;
+      store_creation         = init_creation;
+      store_bdu_test         = init_bdu_test;
     }
   in
   (*------------------------------------------------------------------------------*)
@@ -1195,12 +1195,18 @@ let scan_rule_set parameter error handler rules =
           classes
       ) rules init_class
   in
-  let (result_covering_classes, result_state, result_bdu) =
-    store_covering_classes.store_covering_classes
-  in
-  (*------------------------------------------------------------------------------*)
+  error, store_covering_classes
+
+(*------------------------------------------------------------------------------*)
+(*compute covering classes in the set of rules*)
+
+let scan_rule_set_cv parameter error handler rules =
   (*create a new initial state to store after cleaning the covering classes*)
   let error, init_result = AgentMap.create parameter error 0 in
+  let error, store_covering_classes = 
+    scan_rule_set parameter error handler rules
+  in
+  let (result_covering_classes, _) = store_covering_classes.store_covering_classes in
   let error, remanent_dictionary =
     AgentMap.fold parameter error
       (fun parameters error agent_type pair_covering_class init_remanent ->
@@ -1243,44 +1249,109 @@ let scan_rule_set parameter error handler rules =
       result_covering_classes
       init_result
   in
-  error, 
-  (remanent_dictionary,
-   store_covering_classes.store_creation,
-   result_state,
-   result_bdu)
+  error, remanent_dictionary
+
+(************************************************************************************)
+
+(*------------------------------------------------------------------------------*)
+(*compute covering classes in the set of rules*)
+
+let build_bdu_covering_classes parameter error handler rules =
+  let error, init = AgentMap.create parameter error 0 in
+  let error, remanent = scan_rule_set_cv parameter error handler rules in
+  AgentMap.fold parameter error 
+    (fun parameter error agent_type remanent' init ->
+      let error, bdu =
+        let l =
+          Dictionary_of_Covering_class.fold
+            (fun value _ class_id current_list ->
+              let error, bdu = build_bdu parameter error value in
+              let l = (bdu, class_id) :: current_list in
+              l
+            ) remanent'.store_dic []
+        in
+        (*Store bdu of covering class*)
+        AgentMap.set
+          parameter
+          error
+          agent_type
+          l
+          init
+      in
+      error, bdu
+    ) remanent init
+    
+(*------------------------------------------------------------------------------*)
+(*PRINT*)
+
+let print_bdu_covering_class parameter error bdu =
+  AgentMap.print error
+    (fun error parameter bdu_list ->
+      let _ =
+        let rec aux acc =
+          match acc with
+            | [] -> ()
+            | (bdu, class_id) :: tl ->
+              fprintf stdout "class_id:%i\n" class_id;
+              let (handler, mvbdu_redefine) = bdu in
+              let _ = handler.Memo_sig.print_mvbdu stdout "" mvbdu_redefine in
+              aux tl
+        in
+        aux bdu_list
+      in
+      error
+    )
+    parameter
+    bdu
+
+let print_bdu_test parameter error bdu_test =
+  AgentMap.print error
+    (fun error parameter pair ->
+      let _ =
+        let (l, handler_list) = pair in
+        let rec aux acc =
+          match acc with
+            | [] -> ()
+            | bdu :: tl ->
+              let (handler, mvbdu_redefine) = bdu in
+              let _ = handler.Memo_sig.print_mvbdu stdout "" mvbdu_redefine in
+              aux tl
+        in
+        aux handler_list in
+      error
+    )
+    parameter bdu_test
 
 (************************************************************************************)   
 (*MAIN*)
 
-let common_result parameter error handler cc_compil =
-  let error, result = 
-    scan_rule_set parameter error handler cc_compil.rules in
-  error, result
-  
 let covering_classes parameter error handler cc_compil =
   let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
-  let error, result = common_result parameter error handler cc_compil in
-  let (result_covering_class, _, _, _) = result in
-  let _ = print_result parameter error result_covering_class in
-  error, result_covering_class
+  let error, result = scan_rule_set_cv parameter error handler cc_compil.rules in
+  let _ = print_result parameter error result in
+  error, result
 
-let result_test parameter error handler cc_compil =
+let bdu_covering_classes parameter error handler cc_compil =
   let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
-  let error, result = common_result parameter error handler cc_compil in
-  let (_, _, result_test, _) = result in
+  let error, bdu = build_bdu_covering_classes parameter error handler cc_compil.rules in
+  let _ = print_bdu_covering_class parameter error bdu in
+  error, bdu
+
+let bdu_test parameter error handler cc_compil =
+  let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
+  let error, result = scan_rule_set parameter error handler cc_compil.rules in
+  let _ = print_bdu_test parameter error result.store_bdu_test in
+  error, result
+
+(*let result_test parameter error handler cc_compil = (*REMOVE*)
+  let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
+  let error, result = scan_rule_set parameter error handler cc_compil.rules in
+  let (_, result_test) = result.store_covering_classes in
   let _ = print_test_site parameter error result_test in
-  error, result_test
-
-let result_bdu parameter error handler cc_compil =
-  let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
-  let error, result = common_result parameter error handler cc_compil in
-  let (_, _, _, result_bdu) = result in
-  let _ = print_bdu_handler parameter error result_bdu in
-  error, result_bdu
+  error, result*)
 
 let result_creation_bdu parameter error handler cc_compil =
   let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
-  let error, result = common_result parameter error handler cc_compil in
-  let (_, result_creation, _, _) = result in
-  let _ = print_result_creation parameter error result_creation in
-  error, result_creation
+  let error, result = scan_rule_set parameter error handler cc_compil.rules in
+  let _ = print_result_creation parameter error result.store_creation in
+  error, result

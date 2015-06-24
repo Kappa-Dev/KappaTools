@@ -87,7 +87,7 @@ let main () =
   in
   let _ = Side_effect.side_effect parameters_se error handler c_compil in
   (*Side test*)
-  let error, side_test =
+  (*let error, side_test =
     if Remanent_parameters.get_do_site_dependencies parameters
     then
       let parameters_test =
@@ -101,7 +101,7 @@ let main () =
       in
       error, Some dep
     else error, None
-  in
+  in*)
   (*covering classes*)
   let error,covering_classes = 
     if Remanent_parameters.get_do_site_dependencies parameters
@@ -113,6 +113,21 @@ let main () =
 	then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "Potential dependencies between sites:\n"
       in
       let error,dep = Covering_classes.covering_classes parameters_cv error handler c_compil 
+      in error,Some dep 
+    else 
+      error,None 
+  in
+  (*BDU of covering classes*)
+  let error,bdu_covering_classes = 
+    if Remanent_parameters.get_do_site_dependencies parameters
+    then 
+      let parameters_cv =
+	Remanent_parameters.update_prefix parameters "BDU of potential dependencies between sites:" in 
+      let _ = 
+	if (Remanent_parameters.get_trace parameters_cv)
+	then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "BDU of potential dependencies between sites:\n"
+      in
+      let error,dep = Covering_classes.bdu_covering_classes parameters_cv error handler c_compil 
       in error,Some dep 
     else 
       error,None 
@@ -132,18 +147,18 @@ let main () =
     else 
       error,None 
   in
-  (*BDU covering class each rule*)
+  (*BDU at each rule*)
   let error, bdu_rule =
     if Remanent_parameters.get_do_site_dependencies parameters
     then
       let parameters_bdu =
-        Remanent_parameters.update_prefix parameters "BDU of each rule:"
+        Remanent_parameters.update_prefix parameters "BDU at each rule:"
       in
       let _ =
         if (Remanent_parameters.get_trace parameters_bdu)
         then Printf.fprintf (Remanent_parameters.get_log parameters_bdu) "BDU at each rule:\n"
       in
-      let error, dep = Covering_classes.result_bdu parameters_bdu error handler c_compil
+      let error, dep = Covering_classes.bdu_test parameters_bdu error handler c_compil
       in
       error, Some dep
     else error, None

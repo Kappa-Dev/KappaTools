@@ -432,7 +432,7 @@ let rec redefine allocate memoized_fun error parameters handler mvbdu_input list
                       let error,depreciated =
                         (memoized_fun.Memo_sig.f parameters error).Memo_sig.build_true  
                           list.List_sig.variable
-                          list.List_sig.association  (*FIXME*)
+                          list.List_sig.association
                           branch_false
                           branch_true
                       in 
@@ -455,8 +455,7 @@ let rec redefine allocate memoized_fun error parameters handler mvbdu_input list
                       let error,depreciated =
                         (memoized_fun.Memo_sig.f parameters error).Memo_sig.build_true  
                           list.List_sig.variable
-                          (*(list.List_sig.association - 1) *)
-                          (list.List_sig.association -1)(*FIXME*)
+                          (list.List_sig.association - 1)
                           enriched_branch_true
                           branch_false
                       in 

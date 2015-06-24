@@ -417,40 +417,11 @@ Side-effect:agent_type:5:
 Side-effect:deletion:undocument_site:
 agent_id:0:agent_type:5:site_type:0
 agent_id:0:agent_type:5:site_type:1
-Relation between sites:
-Relation between sites:agent_type:0:
-TEST:[site_type:1:state:0]
-TEST:[site_type:0:state:0]
-TEST:[site_type:2:state:0]
-Relation between sites:agent_type:2:
-TEST:[site_type:0:state:0]
-TEST:[site_type:1:state:0]
-Relation between sites:agent_type:4:
-TEST:[site_type:1:state:1]
-TEST:[site_type:0:state:0]
-TEST:[site_type:1:state:0]
-TEST:[site_type:2:state:0]
-Relation between sites:agent_type:5:
-TEST:[site_type:0:state:0]
-TEST:[site_type:1:state:0]
 Potential dependencies between sites:
 Potential dependencies between sites:agent_type:0:
 Potential dependencies between sites:Number of covering classes:3
 Potential dependencies between sites:Covering_class_id:0:
 site_type:2:state:0
-Id=3
- Node(site_type:2<0)
-  Id=1
-   Leaf False 
-
-  Id=2
-   Node(site_type:2<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
 site_type:1
 Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
@@ -459,19 +430,6 @@ Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0
 site_type:1
 Potential dependencies between sites:Covering_class_id:1:
 site_type:1:state:0
-Id=3
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
 Potential dependencies between sites:New-index:Covering_class_id:1:class_id:0:
 site_type:1
 Potential dependencies between sites:New-index:TEST:Covering_class_id:1:class_id:0:
@@ -480,19 +438,6 @@ Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:1
 site_type:1
 Potential dependencies between sites:Covering_class_id:2:
 site_type:0:state:0
-Id=3
- Node(site_type:0<0)
-  Id=1
-   Leaf False 
-
-  Id=2
-   Node(site_type:0<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
 Potential dependencies between sites:New-index:Covering_class_id:2:class_id:0:
 site_type:1
 Potential dependencies between sites:New-index:TEST:Covering_class_id:2:class_id:0:
@@ -504,29 +449,6 @@ Potential dependencies between sites:Number of covering classes:1
 Potential dependencies between sites:Covering_class_id:0:
 site_type:0:state:0
 site_type:1:state:0
-Id=7
- Node(site_type:0<0)
-  Id=1
-   Leaf False 
-
-  Id=6
-   Node(site_type:0<1)
-    Id=5
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=4
-       Node(site_type:1<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
 site_type:1
 site_type:2
@@ -540,29 +462,6 @@ Potential dependencies between sites:Number of covering classes:2
 Potential dependencies between sites:Covering_class_id:0:
 site_type:0:state:0
 site_type:1:state:0
-Id=7
- Node(site_type:0<0)
-  Id=1
-   Leaf False 
-
-  Id=6
-   Node(site_type:0<1)
-    Id=5
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=4
-       Node(site_type:1<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
 site_type:1
 site_type:2
@@ -580,19 +479,6 @@ Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0
 site_type:1
 Potential dependencies between sites:Covering_class_id:1:
 site_type:2:state:0
-Id=3
- Node(site_type:2<0)
-  Id=1
-   Leaf False 
-
-  Id=2
-   Node(site_type:2<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
 Potential dependencies between sites:New-index:Covering_class_id:1:class_id:0:
 site_type:1
 site_type:2
@@ -612,6 +498,37 @@ Potential dependencies between sites:agent_type:5:
 Potential dependencies between sites:Number of covering classes:2
 Potential dependencies between sites:Covering_class_id:0:
 site_type:1:state:0
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
+Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
+site_type:1
+Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
+site_type:1
+Potential dependencies between sites:Covering_class_id:1:
+site_type:0:state:0
+Potential dependencies between sites:New-index:Covering_class_id:1:class_id:0:
+site_type:1
+Potential dependencies between sites:New-index:TEST:Covering_class_id:1:class_id:0:
+site_type:1
+Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:1:class_id:0:
+site_type:1
+BDU of potential dependencies between sites:
+BDU of potential dependencies between sites:agent_type:0:
+class_id:0
+Id=3
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:2<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+class_id:1
 Id=3
  Node(site_type:1<0)
   Id=1
@@ -625,14 +542,7 @@ Id=3
     Id=1
      Leaf False 
 
-Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
-site_type:1
-Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
-site_type:1
-Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
-site_type:1
-Potential dependencies between sites:Covering_class_id:1:
-site_type:0:state:0
+class_id:2
 Id=3
  Node(site_type:0<0)
   Id=1
@@ -646,12 +556,99 @@ Id=3
     Id=1
      Leaf False 
 
-Potential dependencies between sites:New-index:Covering_class_id:1:class_id:0:
-site_type:1
-Potential dependencies between sites:New-index:TEST:Covering_class_id:1:class_id:0:
-site_type:1
-Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:1:class_id:0:
-site_type:1
+BDU of potential dependencies between sites:agent_type:2:
+class_id:0
+Id=7
+ Node(site_type:0<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:0<1)
+    Id=5
+     Node(site_type:1<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:1<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+BDU of potential dependencies between sites:agent_type:4:
+class_id:1
+Id=3
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:2<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+class_id:0
+Id=7
+ Node(site_type:0<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:0<1)
+    Id=5
+     Node(site_type:1<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:1<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+BDU of potential dependencies between sites:agent_type:5:
+class_id:0
+Id=3
+ Node(site_type:1<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+class_id:1
+Id=3
+ Node(site_type:0<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:0<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
 Creation and BDU of creation:
 Creation and BDU of creation:agent_type:1:
 Id=7
@@ -677,6 +674,10 @@ Id=7
     Id=1
      Leaf False 
 
+BDU false:
+Id=0
+ Leaf False 
+
 Creation and BDU of creation:agent_type:3:
 Id=7
  Node(site_type:0<0)
@@ -701,8 +702,38 @@ Id=7
     Id=1
      Leaf False 
 
+BDU false:
+Id=0
+ Leaf False 
+
 BDU at each rule:
-BDU of each rule:agent_type:0:
+BDU at each rule:agent_type:0:
+Id=3
+ Node(site_type:3<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:3<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Id=3
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:2<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
 Id=3
  Node(site_type:1<0)
   Id=1
@@ -729,33 +760,7 @@ Id=3
     Id=1
      Leaf False 
 
-Id=3
- Node(site_type:2<0)
-  Id=1
-   Leaf False 
-
-  Id=2
-   Node(site_type:2<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
-BDU of each rule:agent_type:2:
-Id=3
- Node(site_type:0<0)
-  Id=1
-   Leaf False 
-
-  Id=2
-   Node(site_type:0<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
+BDU at each rule:agent_type:2:
 Id=7
  Node(site_type:0<0)
   Id=1
@@ -779,7 +784,20 @@ Id=7
     Id=1
      Leaf False 
 
-BDU of each rule:agent_type:4:
+BDU at each rule:agent_type:4:
+Id=3
+ Node(site_type:2<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:2<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
 Id=3
  Node(site_type:1<1)
   Id=1
@@ -793,19 +811,6 @@ Id=3
     Id=1
      Leaf False 
 
-Id=3
- Node(site_type:0<0)
-  Id=1
-   Leaf False 
-
-  Id=2
-   Node(site_type:0<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
 Id=7
  Node(site_type:0<0)
   Id=1
@@ -829,33 +834,7 @@ Id=7
     Id=1
      Leaf False 
 
-Id=3
- Node(site_type:2<0)
-  Id=1
-   Leaf False 
-
-  Id=2
-   Node(site_type:2<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
-BDU of each rule:agent_type:5:
-Id=3
- Node(site_type:0<0)
-  Id=1
-   Leaf False 
-
-  Id=2
-   Node(site_type:0<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
+BDU at each rule:agent_type:5:
 Id=3
  Node(site_type:1<0)
   Id=1
@@ -863,6 +842,19 @@ Id=3
 
   Id=2
    Node(site_type:1<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Id=3
+ Node(site_type:0<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:0<1)
     Id=0
      Leaf True 
 

@@ -40,6 +40,7 @@ sig
   val stabilize: ('a,'b) dictionary -> ('a,'b) dictionary
   val print: Remanent_parameters_sig.parameters -> Exception.method_handler  -> (Remanent_parameters_sig.parameters -> Exception.method_handler -> int -> value -> 'a -> 'b -> Exception.method_handler) -> ('a,'b) dictionary -> Exception.method_handler 
   val last_entry: Remanent_parameters_sig.parameters -> Exception.method_handler -> ('a,'b) dictionary -> Exception.method_handler * int
+  val fold : (value -> 'a * 'b -> int -> 'c -> 'c) -> ('a, 'b) dictionary -> 'c -> 'c 
 end
 
 exception Association_is_existing_already_with_a_different_value 
@@ -233,8 +234,13 @@ module Dictionary =
 		| Some (value, a, b) -> print parameters error key value a b
             in aux (key+1) error  
 	in aux 0 error 
-	
-      let last_entry parameters error dic = error,dic.in_construction.fresh - 1  
+        
+      let fold f dictionary = 
+        let in_construction = dictionary.in_construction in 
+        Hash.fold f in_construction.hash_table
+
+      let last_entry parameters error dic = error, dic.in_construction.fresh - 1
+
      end: Dictionary with type value = Hash.key))
     
 module Dictionary_of_Ord =

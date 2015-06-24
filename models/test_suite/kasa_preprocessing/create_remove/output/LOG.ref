@@ -82,18 +82,34 @@ Side-effect:agent_type:0:
 Side-effect:deletion:undocument_site:
 Side-effect:agent_type:1:
 Side-effect:deletion:undocument_site:
-Relation between sites:
 Potential dependencies between sites:
+BDU of potential dependencies between sites:
 Creation and BDU of creation:
 Creation and BDU of creation:agent_type:1:
 Id=0
  Leaf True 
 
+BDU false:
+Id=0
+ Leaf False 
+
 Creation and BDU of creation:agent_type:2:
 Id=0
  Leaf True 
 
+BDU false:
+Id=0
+ Leaf False 
+
 BDU at each rule:
+BDU at each rule:agent_type:0:
+Id=0
+ Leaf True 
+
+BDU at each rule:agent_type:1:
+Id=0
+ Leaf True 
+
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
 Flow of information in the ODE semantics:rule_id:1

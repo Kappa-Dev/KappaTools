@@ -50,11 +50,15 @@ type covering_classes =
   {
     store_modified_map     : int map AgentMap.t;
     store_covering_classes : (int * state_list) list list AgentMap.t
-                             * state_list AgentMap.t
-                             * bdu_handler_list AgentMap.t;
-    store_creation         : ((int * int) list * bdu_handler) AgentMap.t
-
+                             * state_list AgentMap.t;
+    store_creation         : ((int * int) list * bdu_handler) AgentMap.t;
+    store_bdu_test         : ((int * int) list * bdu_handler_list) AgentMap.t
   }
+
+type bdu_collection = (*TODO*)
+    {
+      store_bdu_covering_classes : (bdu_handler * int) list AgentMap.t
+    }
 
 (************************************************************************************)
 (* DICTIONARY for covering classes *)

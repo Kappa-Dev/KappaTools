@@ -136,12 +136,6 @@ Influence_map:Inhibition_map:rule(3):'\0' A(x~q)->A(x~p) -> rule(2):'"0' A(x~q)-
 Side-effect:
 Side-effect:unbinding:
 Side-effect:deletion:
-Relation between sites:
-Relation between sites:agent_type:0:
-TEST:[site_type:0:state:2]
-TEST:[site_type:0:state:0]
-TEST:[site_type:0:state:1]
-TEST:[site_type:0:state:2]
 Potential dependencies between sites:
 Potential dependencies between sites:agent_type:0:
 Potential dependencies between sites:Number of covering classes:1
@@ -149,6 +143,19 @@ Potential dependencies between sites:Covering_class_id:0:
 site_type:0:state:2
 site_type:0:state:1
 site_type:0:state:0
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
+site_type:1
+site_type:1
+Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
+site_type:1
+site_type:1
+site_type:1
+Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
+site_type:1
+BDU of potential dependencies between sites:
+BDU of potential dependencies between sites:agent_type:0:
+class_id:0
 Id=7
  Node(site_type:0<2)
   Id=1
@@ -162,19 +169,9 @@ Id=7
     Id=1
      Leaf False 
 
-Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
-site_type:1
-site_type:1
-site_type:1
-Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
-site_type:1
-site_type:1
-site_type:1
-Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
-site_type:1
 Creation and BDU of creation:
 BDU at each rule:
-BDU of each rule:agent_type:0:
+BDU at each rule:agent_type:0:
 Id=3
  Node(site_type:0<2)
   Id=1
@@ -189,12 +186,12 @@ Id=3
      Leaf False 
 
 Id=3
- Node(site_type:0<0)
+ Node(site_type:0<2)
   Id=1
    Leaf False 
 
   Id=2
-   Node(site_type:0<1)
+   Node(site_type:0<3)
     Id=0
      Leaf True 
 
@@ -215,12 +212,12 @@ Id=3
      Leaf False 
 
 Id=3
- Node(site_type:0<2)
+ Node(site_type:0<0)
   Id=1
    Leaf False 
 
   Id=2
-   Node(site_type:0<3)
+   Node(site_type:0<1)
     Id=0
      Leaf True 
 
