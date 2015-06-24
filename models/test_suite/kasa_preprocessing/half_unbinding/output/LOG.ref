@@ -131,8 +131,6 @@ Potential dependencies between sites:agent_type:0:
 Potential dependencies between sites:Number of covering classes:1
 Potential dependencies between sites:Covering_class_id:0:
 site_type:0:state:0
-list_a:
-site_type:0:state:0
 Id=3
  Node(site_type:0<0)
   Id=1
@@ -156,8 +154,6 @@ Potential dependencies between sites:agent_type:2:
 Potential dependencies between sites:Number of covering classes:1
 Potential dependencies between sites:Covering_class_id:0:
 site_type:0:state:0
-list_a:
-site_type:0:state:0
 Id=3
  Node(site_type:0<0)
   Id=1
@@ -179,7 +175,6 @@ Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0
 site_type:1
 Creation and BDU of creation:
 Creation and BDU of creation:agent_type:0:
-TEST:[site_type:0:state:0]
 Id=3
  Node(site_type:0<0)
   Id=1

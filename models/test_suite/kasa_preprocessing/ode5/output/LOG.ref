@@ -427,32 +427,28 @@ Potential dependencies between sites:Covering_class_id:0:
 site_type:2:state:1
 site_type:2:state:0
 site_type:3:state:1
+site_type:3:state:0
 site_type:4:state:0
-list_a:
-site_type:2:state:1
-site_type:2:state:0
-site_type:3:state:1
-site_type:4:state:0
-Id=13
+Id=15
  Node(site_type:2<1)
   Id=1
    Leaf False 
 
-  Id=12
+  Id=14
    Node(site_type:2<2)
-    Id=11
+    Id=13
      Node(site_type:3<1)
       Id=1
        Leaf False 
 
-      Id=10
+      Id=12
        Node(site_type:3<2)
-        Id=9
+        Id=11
          Node(site_type:4<0)
           Id=1
            Leaf False 
 
-          Id=8
+          Id=10
            Node(site_type:4<1)
             Id=0
              Leaf True 
@@ -468,22 +464,20 @@ Id=13
 
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
 site_type:1
-site_type:2
-site_type:3
-Potential dependencies between sites:New-index:Covering_class_id:0:class_id:1:
 site_type:1
-site_type:2
-Potential dependencies between sites:New-index:Covering_class_id:0:class_id:2:
+site_type:3
+site_type:3
+site_type:5
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:1:
 site_type:1
 site_type:2
 Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
 site_type:1
-site_type:2
-site_type:3
-Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:1:
 site_type:1
-site_type:2
-Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:2:
+site_type:3
+site_type:3
+site_type:5
+Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:1:
 site_type:1
 site_type:2
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
@@ -494,9 +488,6 @@ Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0
 site_type:1
 site_type:2
 Potential dependencies between sites:Covering_class_id:1:
-site_type:1:state:0
-site_type:3:state:0
-list_a:
 site_type:1:state:0
 site_type:3:state:0
 Id=7
@@ -524,22 +515,20 @@ Id=7
 
 Potential dependencies between sites:New-index:Covering_class_id:1:class_id:0:
 site_type:1
-site_type:2
-site_type:3
-Potential dependencies between sites:New-index:Covering_class_id:1:class_id:1:
 site_type:1
-site_type:2
-Potential dependencies between sites:New-index:Covering_class_id:1:class_id:2:
+site_type:3
+site_type:3
+site_type:5
+Potential dependencies between sites:New-index:Covering_class_id:1:class_id:1:
 site_type:1
 site_type:2
 Potential dependencies between sites:New-index:TEST:Covering_class_id:1:class_id:0:
 site_type:1
-site_type:2
-site_type:3
-Potential dependencies between sites:New-index:TEST:Covering_class_id:1:class_id:1:
 site_type:1
-site_type:2
-Potential dependencies between sites:New-index:TEST:Covering_class_id:1:class_id:2:
+site_type:3
+site_type:3
+site_type:5
+Potential dependencies between sites:New-index:TEST:Covering_class_id:1:class_id:1:
 site_type:1
 site_type:2
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:1:class_id:0:
@@ -550,9 +539,6 @@ Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:1
 site_type:1
 site_type:2
 Potential dependencies between sites:Covering_class_id:2:
-site_type:0:state:0
-site_type:2:state:0
-list_a:
 site_type:0:state:0
 site_type:2:state:0
 Id=7
@@ -580,22 +566,20 @@ Id=7
 
 Potential dependencies between sites:New-index:Covering_class_id:2:class_id:0:
 site_type:1
-site_type:2
-site_type:3
-Potential dependencies between sites:New-index:Covering_class_id:2:class_id:1:
 site_type:1
-site_type:2
-Potential dependencies between sites:New-index:Covering_class_id:2:class_id:2:
+site_type:3
+site_type:3
+site_type:5
+Potential dependencies between sites:New-index:Covering_class_id:2:class_id:1:
 site_type:1
 site_type:2
 Potential dependencies between sites:New-index:TEST:Covering_class_id:2:class_id:0:
 site_type:1
-site_type:2
-site_type:3
-Potential dependencies between sites:New-index:TEST:Covering_class_id:2:class_id:1:
 site_type:1
-site_type:2
-Potential dependencies between sites:New-index:TEST:Covering_class_id:2:class_id:2:
+site_type:3
+site_type:3
+site_type:5
+Potential dependencies between sites:New-index:TEST:Covering_class_id:2:class_id:1:
 site_type:1
 site_type:2
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:2:class_id:0:
@@ -611,10 +595,6 @@ Potential dependencies between sites:Covering_class_id:0:
 site_type:0:state:1
 site_type:0:state:0
 site_type:1:state:0
-list_a:
-site_type:0:state:1
-site_type:0:state:0
-site_type:1:state:0
 Id=9
  Node(site_type:0<1)
   Id=1
@@ -640,10 +620,12 @@ Id=9
 
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
 site_type:1
-site_type:2
+site_type:1
+site_type:3
 Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
 site_type:1
-site_type:2
+site_type:1
+site_type:3
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
 site_type:1
 site_type:2
@@ -653,10 +635,6 @@ Potential dependencies between sites:Covering_class_id:0:
 site_type:0:state:1
 site_type:0:state:0
 site_type:1:state:0
-list_a:
-site_type:0:state:1
-site_type:0:state:0
-site_type:1:state:0
 Id=9
  Node(site_type:0<1)
   Id=1
@@ -682,10 +660,12 @@ Id=9
 
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
 site_type:1
-site_type:2
+site_type:1
+site_type:3
 Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
 site_type:1
-site_type:2
+site_type:1
+site_type:3
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
 site_type:1
 site_type:2
@@ -695,32 +675,28 @@ Potential dependencies between sites:Covering_class_id:0:
 site_type:0:state:1
 site_type:0:state:0
 site_type:1:state:1
+site_type:1:state:0
 site_type:2:state:0
-list_a:
-site_type:0:state:1
-site_type:0:state:0
-site_type:1:state:1
-site_type:2:state:0
-Id=13
+Id=15
  Node(site_type:0<1)
   Id=1
    Leaf False 
 
-  Id=12
+  Id=14
    Node(site_type:0<2)
-    Id=11
+    Id=13
      Node(site_type:1<1)
       Id=1
        Leaf False 
 
-      Id=10
+      Id=12
        Node(site_type:1<2)
-        Id=9
+        Id=11
          Node(site_type:2<0)
           Id=1
            Leaf False 
 
-          Id=8
+          Id=10
            Node(site_type:2<1)
             Id=0
              Leaf True 
@@ -736,12 +712,16 @@ Id=13
 
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
 site_type:1
-site_type:2
+site_type:1
 site_type:3
+site_type:3
+site_type:5
 Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
 site_type:1
-site_type:2
+site_type:1
 site_type:3
+site_type:3
+site_type:5
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
 site_type:1
 site_type:2

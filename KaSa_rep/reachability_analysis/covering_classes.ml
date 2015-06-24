@@ -251,6 +251,47 @@ let modified_index_dic parameter error covering_class modified_map
 (*------------------------------------------------------------------------------*)
 (*store remanent*)
 
+let remove_duplicates_hashtable l =
+  let open List in
+  let tbl = Hashtbl.create (length l) in
+  let f l (e,e') = 
+    try 
+      let _ = Hashtbl.find tbl (e,e') in l
+    with
+    | Not_found -> 
+      Hashtbl.add tbl (e,e') ();
+      (e,e') :: l
+  in
+  List.rev (List.fold_left f [] l)
+
+let combine x l =
+  let rec aux acc =
+    match acc with
+      | [] -> []
+      | (x', s) :: tl ->
+        if x = x'
+        then
+          (x,s) :: aux tl
+        else
+          aux tl
+  in aux l
+
+let combine_site_state pair_list =
+  let rec aux acc =
+    match acc with
+      | [] -> []
+      | (x, l) :: tl ->
+        let comb = combine x l in
+        comb :: aux tl
+  in
+  aux pair_list
+    
+let pair_site_state pair_list =
+  let l = List.flatten (combine_site_state pair_list) in
+  remove_duplicates_hashtable l
+
+(*------------------------------------------------------------------------------*)
+
 let store_remanent parameter error pair_covering_class modified_map remanent =
   (* current state of remanent*)
   let pointer_backward    = remanent.store_pointer_backward in
@@ -258,8 +299,9 @@ let store_remanent parameter error pair_covering_class modified_map remanent =
   let good_index          = remanent.store_new_index_dic in
   let good_test_dic       = remanent.store_test_new_index_dic in
   let good_modif_dic      = remanent.store_modif_new_index_dic in
+  let new_pair_covering_class = pair_site_state pair_covering_class in
   (*------------------------------------------------------------------------------*)
-  match pair_covering_class with
+  match new_pair_covering_class with
     | [] -> error, remanent
     | _ ->
       (*------------------------------------------------------------------------------*)
@@ -268,11 +310,12 @@ let store_remanent parameter error pair_covering_class modified_map remanent =
         covering_class_dic 
           parameter 
           error 
-          pair_covering_class
+          new_pair_covering_class
           good_covering_class 
       in
       (*------------------------------------------------------------------------------*)
       (*store pointer backward*)
+      
       let covering_class = fst (List.split pair_covering_class) in
       let error, pointer_backward =
         store_pointer_backward 
@@ -284,7 +327,7 @@ let store_remanent parameter error pair_covering_class modified_map remanent =
       in
       (*------------------------------------------------------------------------------*)
       (*PART II: compute new_index in covering_class*)
-      let new_index_covering_class = re_index_value_list pair_covering_class in
+      let new_index_covering_class = re_index_value_list new_pair_covering_class in
       let error, (new_id, new_dic) =
         new_index_dic 
           parameter 
@@ -382,7 +425,7 @@ let clean_classes parameter error covering_classes modified_map =
           get_id_common_set
             parameter
             error
-            t 
+            t
             pointer_backward 
         in
         let rec aux to_visit potential_supersets =
@@ -520,7 +563,7 @@ and print_precell p =
 
 (*---------------------------------------------------------------------------*)
 
-let bdu_covering parameter error pair_list =
+let build_bdu parameter error pair_list =
   (*build bdu for this list*)
   let remanent_bdu = Sanity_test.remanent parameter in
   let error        = remanent_bdu.Sanity_test_sig.error in
@@ -577,21 +620,10 @@ let bdu_covering parameter error pair_list =
       handler
       pair_list
   in
-  (*let () =
-    Printf.fprintf stdout "\nBuild list(list_a):\n";
-    print_a_list list_a
-  in*)
   (*compute redefine in a list_a, a': mvbdu_input*)
   let error, handler, mvbdu_redefine =
     f (Boolean_mvbdu.redefine parameter error parameter handler a') list_a
   in
-  (*TEST*)
-  (*let error =
-    Boolean_mvbdu.print_boolean_mvbdu
-      error
-      (Remanent_parameters.update_prefix parameter "Each mvbdu_redefine:")
-      mvbdu_redefine
-  in*)
   (*---------------------------------------------------------------------------*)
   (*return redefine*)
   error, (handler, mvbdu_redefine)
@@ -708,17 +740,16 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
                     in
                     let new_pair = List.concat [pair_list; old_pair] in
                     let error, bdu =
-                      bdu_covering
+                      build_bdu
                         parameter 
                         error
-                        (*agent_type*)
                         pair_list
                     in
                     (*---------------------------------------------------------*)
                     (*store*)
                     let site_list = (site, new_pair) :: current_class in
                     let bdu_list = bdu :: current_bdu in
-                    (site_list, pair_list, bdu_list) (*FIXME: pair_list or new_pair?*)
+                    (site_list, pair_list, bdu_list)
                   ) agent.agent_interface ([], [], [])
               in
               (* store new_covering_class in the classes of the agent type
@@ -793,7 +824,7 @@ let collect_creation parameter error viewsrhs creation store_creation =
               | error, Some (s,_) -> error, s
         in
         let new_site = List.concat [site_list; old_list] in
-        let error, bdu = bdu_covering parameter error new_site in
+        let error, bdu = build_bdu parameter error new_site in
         let error, store_creation =
           AgentMap.set
             parameter
@@ -873,45 +904,12 @@ let number_of_covering_classes parameter error store_dic =
 (************************************************************************************)   
 (*PRINT*)
 
-let print_covering_class l =
+let print_site_type l =
   let rec aux acc =
     match acc with
       | [] -> ()
       | (x,_) :: tl ->
         fprintf stdout "site_type:%i\n" x;
-        aux tl
-  in
-  aux l
-  
-let combine x l =
-  let rec aux acc =
-    match acc with
-      | [] -> []
-      | (x', s) :: tl ->
-        if x = x'
-        then
-          (x,s) :: aux tl
-        else
-          []
-  in aux l
-
-let print_pair p =
-  let rec aux acc =
-    match acc with
-      | [] -> ()
-      | (x,s) :: tl ->
-        fprintf stdout "site_type:%i:state:%i\n" x s;
-        aux tl
-  in
-  aux p
- 
-let print_covering_class' parameter error l =
-  let rec aux acc =
-    match acc with
-      | [] -> []
-      | (x,l) :: tl ->
-        let c = combine x l in
-        print_pair c;
         aux tl
   in
   aux l
@@ -928,7 +926,7 @@ let print_new_index_dic parameter error elt_id store_index =
         fprintf stdout
           "Potential dependencies between sites:New-index:Covering_class_id:%i:class_id:%i:\n"
           elt_id elt;
-        print_covering_class pair_index
+        print_site_type pair_index
       in
       error
     ) store_index
@@ -944,7 +942,7 @@ let print_test_new_index_dic parameter error elt_id store_test =
       let _ = fprintf stdout
         "Potential dependencies between sites:New-index:TEST:Covering_class_id:%i:class_id:%i:\n"
           elt_id elt;
-        print_covering_class value_index
+        print_site_type value_index
       in
       error
     ) store_test
@@ -959,8 +957,7 @@ let print_modified l =
       | x :: tl ->
         fprintf stdout "site_type:%i\n" x;
         aux tl
-  in
-  aux l
+  in aux l
 
 let print_modified_dic parameter error elt_id store_modif =
   Dictionary_of_Modified_class.print
@@ -979,18 +976,16 @@ let print_modified_dic parameter error elt_id store_modif =
 (*------------------------------------------------------------------------------*)
 (*print remove action*)
 
-let build_list_a_value pair_list =
+let print_pair parameter error ps =
   let rec aux acc =
     match acc with
       | [] -> []
-      | (x, l) :: tl ->
-        let c = combine x l in
-        c :: aux tl
-  in
-  aux pair_list
+      | (x,i) :: tl ->
+        fprintf stdout "site_type:%i:state:%i\n" x i;
+        aux tl
+  in aux ps
 
-let print_dic_and_new_index parameter error store_index store_test 
-    store_modif store_dic = (*TEST*)
+let print_dic_and_new_index parameter error store_index store_test store_modif store_dic =
   Dictionary_of_Covering_class.print
     parameter
     error
@@ -1000,12 +995,11 @@ let print_dic_and_new_index parameter error store_index store_test
         (*print covering class in dictionary*)
           printf "Potential dependencies between sites:Covering_class_id:%i:\n"
             elt_id; 
-          print_covering_class' parameter error pair_list (*TEST*)
+          print_pair parameter error pair_list
         in
         (*print bdu*)
-        let list_a = build_list_a_value pair_list in
-        let _ = print_string "list_a:\n"; print_pair (List.flatten list_a) in
-        let error, bdu = bdu_covering parameter error (List.flatten list_a) in
+        (*let _ = print_string "list_a:\n"; print_pair parameter error pair_list in*)
+        let error, bdu = build_bdu parameter error pair_list in
         let (handler, mvbdu_redefine) = bdu in
         let _ = handler.Memo_sig.print_mvbdu stdout "" mvbdu_redefine 
         in
@@ -1045,7 +1039,8 @@ let print_value_site parameter error elt site value_site =
             | vsite :: tl' ->
               let _ =
                 fprintf stdout 
-                  "Potential dependencies between sites:New-index:Covering_class_id:%i:" elt;
+                  "Potential dependencies between sites:New-index:Covering_class_id:%i:"
+                  elt;
                 match vsite with
                   | Ckappa_sig.Internal s ->
 		    fprintf stdout "site_modified:%i->%s(internal state)\n"
@@ -1095,7 +1090,7 @@ let print_result parameter error result_remanent =
 (*------------------------------------------------------------------------------*)
 (*print test: state of site at each rule*)
 
-let print_pair l =
+let print_pair_test l = (*REMOVE*)
   let rec aux acc =
     match acc with
       | [] -> ()
@@ -1104,11 +1099,11 @@ let print_pair l =
           x s; aux tl
   in aux l
 
-let print_test_site parameter error result_test =
+let print_test_site parameter error result_test = (*REMOVE*)
   AgentMap.print
     error
     (fun error parameter l ->
-      let _ = print_pair l in
+      let _ = print_pair_test l in
       error)
     parameter
     result_test
@@ -1223,7 +1218,7 @@ let scan_rule_set parameter error handler rules =
             | error, Some m -> error, m
         in
         (*------------------------------------------------------------------------------*)
-        (*clean the covering classes, removed duplicate of covering classes: TODO example*)
+        (*clean the covering classes, removed duplicate of covering classes*)
         let error, store_remanent_dic =
           clean_classes
             parameters 
@@ -1232,7 +1227,7 @@ let scan_rule_set parameter error handler rules =
             modified_map
         in
         (*------------------------------------------------------------------------------*)
-        (*store the covering classes after cleaning theirs duplicate class*)
+        (*store the covering classes after cleaning theirs duplicate classes*)
         let error, store_remanent =
           AgentMap.set 
             parameters
@@ -1248,8 +1243,11 @@ let scan_rule_set parameter error handler rules =
       result_covering_classes
       init_result
   in
-  error, (remanent_dictionary, store_covering_classes.store_creation, 
-          result_state, result_bdu)
+  error, 
+  (remanent_dictionary,
+   store_covering_classes.store_creation,
+   result_state,
+   result_bdu)
 
 (************************************************************************************)   
 (*MAIN*)

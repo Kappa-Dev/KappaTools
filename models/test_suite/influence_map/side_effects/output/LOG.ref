@@ -243,9 +243,6 @@ Potential dependencies between sites:Number of covering classes:1
 Potential dependencies between sites:Covering_class_id:0:
 site_type:0:state:1
 site_type:0:state:0
-list_a:
-site_type:0:state:1
-site_type:0:state:0
 Id=5
  Node(site_type:0<1)
   Id=1
@@ -261,18 +258,15 @@ Id=5
 
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
 site_type:1
+site_type:1
 Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
+site_type:1
 site_type:1
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
 site_type:1
 Potential dependencies between sites:agent_type:1:
 Potential dependencies between sites:Number of covering classes:1
 Potential dependencies between sites:Covering_class_id:0:
-site_type:0:state:0
-site_type:0:state:0
-site_type:0:state:1
-list_a:
-site_type:0:state:0
 site_type:0:state:0
 site_type:0:state:1
 Id=5
@@ -290,7 +284,9 @@ Id=5
 
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
 site_type:1
+site_type:1
 Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
+site_type:1
 site_type:1
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
 site_type:1

@@ -26,16 +26,17 @@ module AgentMap = Quick_Nearly_inf_Imperatif
 type 'a map      = 'a Site_map_and_set.map
 type set         = Site_map_and_set.set
 
-(*state information*)
+(*state information: (site, state)*)
 type state_list = (int * int) list
 
 (*BDU*)
 type bdu_redefine =  bool Mvbdu_sig.mvbdu
+
 type bdu_handler_list  = 
     ((Boolean_mvbdu.memo_tables, 
      Boolean_mvbdu.mvbdu_dic,
      Boolean_mvbdu.list_dic,
-     bool, 
+     bool,
      int) Memo_sig.handler * bdu_redefine) list 
 
 type bdu_handler  =
@@ -66,7 +67,7 @@ module Inf_array = Nearly_inf_Imperatif
 
 module Covering_class =
   struct
-    type t = (int * state_list) list
+    type t = (int * int) list
     let compare = compare
   end
 
