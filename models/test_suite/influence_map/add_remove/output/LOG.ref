@@ -243,10 +243,6 @@ Id=3
     Id=1
      Leaf False 
 
-BDU false:
-Id=0
- Leaf False 
-
 BDU at each rule:
 BDU at each rule:agent_type:0:
 Id=3
@@ -315,6 +311,154 @@ Id=3
     Id=1
      Leaf False 
 
+Enabled rules:
+TEST UNION:
+Id=0
+ Node(site_type:0<1)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:0<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+TEST INTER:
+Id=0
+ Node(site_type:0<1)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:0<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+TEST UNION:
+Id=0
+ Node(site_type:0<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:0<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+TEST INTER:
+Id=0
+ Node(site_type:0<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:0<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+TEST UNION:
+Id=0
+ Node(site_type:0<1)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:0<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+TEST INTER:
+Id=0
+ Node(site_type:0<1)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:0<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+TEST UNION:
+Id=0
+ Node(site_type:0<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:0<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+TEST INTER:
+Id=0
+ Node(site_type:0<0)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:0<1)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+TEST UNION:
+Id=0
+ Node(site_type:0<1)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:0<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+TEST INTER:
+Id=0
+ Node(site_type:0<1)
+  Id=1
+   Leaf False 
+
+  Id=2
+   Node(site_type:0<2)
+    Id=0
+     Leaf True 
+
+    Id=1
+     Leaf False 
+
+Enabled rules:agent_type:0:
+No
+No
+Enabled rules:agent_type:1:
+No
+No
+No
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
 Flow of information in the ODE semantics:agent_type:1:site_modified:0->x(internal state)

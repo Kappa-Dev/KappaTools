@@ -86,22 +86,6 @@ let main () =
       Printf.fprintf (Remanent_parameters.get_log parameters) "Side-effect:\n"
   in
   let _ = Side_effect.side_effect parameters_se error handler c_compil in
-  (*Side test*)
-  (*let error, side_test =
-    if Remanent_parameters.get_do_site_dependencies parameters
-    then
-      let parameters_test =
-        Remanent_parameters.update_prefix parameters "Relation between sites:"
-      in
-      let _ =
-        if (Remanent_parameters.get_trace parameters_test)
-        then Printf.fprintf (Remanent_parameters.get_log parameters_test) "Relation between sites:\n"
-      in
-      let error, dep = Covering_classes.result_test parameters_test error handler c_compil
-      in
-      error, Some dep
-    else error, None
-  in*)
   (*covering classes*)
   let error,covering_classes = 
     if Remanent_parameters.get_do_site_dependencies parameters
@@ -159,6 +143,22 @@ let main () =
         then Printf.fprintf (Remanent_parameters.get_log parameters_bdu) "BDU at each rule:\n"
       in
       let error, dep = Covering_classes.bdu_test parameters_bdu error handler c_compil
+      in
+      error, Some dep
+    else error, None
+  in
+  (*BDU enable*)
+  let error, enabled_rule =
+    if Remanent_parameters.get_do_site_dependencies parameters
+    then
+      let parameters_test =
+        Remanent_parameters.update_prefix parameters "Enabled rules:"
+      in
+      let _ =
+        if (Remanent_parameters.get_trace parameters_test)
+        then Printf.fprintf (Remanent_parameters.get_log parameters_test) "Enabled rules:\n"
+      in
+      let error, dep = Covering_classes.result_enable parameters_test error handler c_compil
       in
       error, Some dep
     else error, None

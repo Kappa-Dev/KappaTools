@@ -89,17 +89,9 @@ Creation and BDU of creation:agent_type:1:
 Id=0
  Leaf True 
 
-BDU false:
-Id=0
- Leaf False 
-
 Creation and BDU of creation:agent_type:2:
 Id=0
  Leaf True 
-
-BDU false:
-Id=0
- Leaf False 
 
 BDU at each rule:
 BDU at each rule:agent_type:0:
@@ -110,6 +102,27 @@ BDU at each rule:agent_type:1:
 Id=0
  Leaf True 
 
+Enabled rules:
+TEST UNION:
+Id=0
+ Leaf False 
+
+TEST INTER:
+Id=0
+ Leaf True 
+
+TEST UNION:
+Id=0
+ Leaf False 
+
+TEST INTER:
+Id=0
+ Leaf True 
+
+Enabled rules:agent_type:0:
+No
+Enabled rules:agent_type:1:
+No
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
 Flow of information in the ODE semantics:rule_id:1

@@ -16,31 +16,31 @@ let invalid_arg parameters mh message exn value =
   Exception.warn parameters mh (Some "Mvbdu_sanity") message exn (fun () -> value)
     
 let rec safety_equal_mvbdu_working_list working_list mvbdu_x mvbdu_y  = 
-  match mvbdu_x.Mvbdu_sig.value,mvbdu_y.Mvbdu_sig.value  with 
-    | Mvbdu_sig.Leaf a,Mvbdu_sig.Leaf b when a = b -> 
+  match mvbdu_x.Mvbdu_sig.value, mvbdu_y.Mvbdu_sig.value  with 
+    | Mvbdu_sig.Leaf a, Mvbdu_sig.Leaf b when a = b -> 
       begin
-        match working_list 
-        with 
-          |  [] -> 
-            true 
-          | (a,b)::tail -> 
-            safety_equal_mvbdu_working_list tail a b  
+        match working_list with 
+          | [] -> true 
+          | (a,b) :: tail -> safety_equal_mvbdu_working_list tail a b  
       end 
-    | Mvbdu_sig.Node x,Mvbdu_sig.Node y -> 
-      x.Mvbdu_sig.variable = y.Mvbdu_sig.variable 
-      && x.Mvbdu_sig.upper_bound = y.Mvbdu_sig.upper_bound
-        && safety_equal_mvbdu_working_list ((x.Mvbdu_sig.branch_false,y.Mvbdu_sig.branch_false)::working_list) x.Mvbdu_sig.branch_true y.Mvbdu_sig.branch_true 
+    | Mvbdu_sig.Node x, Mvbdu_sig.Node y -> 
+      x.Mvbdu_sig.variable = y.Mvbdu_sig.variable && 
+      x.Mvbdu_sig.upper_bound = y.Mvbdu_sig.upper_bound && 
+      safety_equal_mvbdu_working_list 
+      ((x.Mvbdu_sig.branch_false, y.Mvbdu_sig.branch_false) :: working_list)
+      x.Mvbdu_sig.branch_true 
+      y.Mvbdu_sig.branch_true 
     | _ -> false 
 
 let safety_equal_mvbdu a b = safety_equal_mvbdu_working_list [] a b 
   
 let rec safety_equal_list list_x list_y  = 
-  match list_x.List_sig.value,list_y.List_sig.value  with 
-    | List_sig.Empty,List_sig.Empty ->  true 
-    | List_sig.Cons x,List_sig.Cons y -> 
-      x.List_sig.variable = y.List_sig.variable 
-      && x.List_sig.association = y.List_sig.association
-        && safety_equal_list x.List_sig.tail y.List_sig.tail 
+  match list_x.List_sig.value, list_y.List_sig.value  with 
+    | List_sig.Empty, List_sig.Empty ->  true 
+    | List_sig.Cons x, List_sig.Cons y -> 
+      x.List_sig.variable = y.List_sig.variable &&
+      x.List_sig.association = y.List_sig.association &&
+      safety_equal_list x.List_sig.tail y.List_sig.tail 
     | _ -> false 
 
 let rec safety_compare_nodes_working_list working_list =
@@ -63,15 +63,18 @@ let rec safety_compare_nodes_working_list working_list =
           if cmp3 = 0 
           then 
             safety_compare_nodes_working_list 
-              ((x.Mvbdu_sig.branch_true.Mvbdu_sig.value,y.Mvbdu_sig.branch_false.Mvbdu_sig.value)::
-                  (x.Mvbdu_sig.branch_false.Mvbdu_sig.value,y.Mvbdu_sig.branch_false.Mvbdu_sig.value)::working_list) 
+              ((x.Mvbdu_sig.branch_true.Mvbdu_sig.value,
+                y.Mvbdu_sig.branch_false.Mvbdu_sig.value) ::
+                  (x.Mvbdu_sig.branch_false.Mvbdu_sig.value,
+                   y.Mvbdu_sig.branch_false.Mvbdu_sig.value) :: working_list) 
           else 
             cmp3
         end       
       else  
         cmp2
           
-let safety_compare_nodes a b = safety_compare_nodes_working_list [a.Mvbdu_sig.value,b.Mvbdu_sig.value]
+let safety_compare_nodes a b = safety_compare_nodes_working_list
+  [a.Mvbdu_sig.value, b.Mvbdu_sig.value]
   
 let rec safety_check_maximal_sharing_working_list (allocate_uniquely:('a,'b,'c) Sanity_test_sig.f) error working_list handler = 
   match working_list with 
@@ -89,47 +92,57 @@ let rec safety_check_maximal_sharing_working_list (allocate_uniquely:('a,'b,'c) 
             handler
         with 
             _ -> error,None
-              
       in 
       match output with 
         | None -> error,false,handler 
-        | Some (i,asso,asso_id,handler) -> 
+        | Some (i, asso, asso_id, handler) -> 
           begin
             match mvbdu.Mvbdu_sig.value with 
-              | Mvbdu_sig.Leaf _ -> safety_check_maximal_sharing_working_list allocate_uniquely error tail handler   
+              | Mvbdu_sig.Leaf _ ->
+                safety_check_maximal_sharing_working_list 
+                  allocate_uniquely error tail handler   
               | Mvbdu_sig.Node x ->
-                safety_check_maximal_sharing_working_list allocate_uniquely error (x.Mvbdu_sig.branch_true::x.Mvbdu_sig.branch_false::tail) handler               
-          end    
+                safety_check_maximal_sharing_working_list
+                  allocate_uniquely error 
+                  (x.Mvbdu_sig.branch_true::x.Mvbdu_sig.branch_false::tail) handler
+          end
             
-let safety_check_maximal_sharing (allocate_uniquely:('a,'b,'c) Sanity_test_sig.f) error mvbdu = 
+let safety_check_maximal_sharing 
+    (allocate_uniquely:('a,'b,'c) Sanity_test_sig.f) error mvbdu = 
   safety_check_maximal_sharing_working_list allocate_uniquely error [mvbdu]  
     
 let rec safety_check_maximaly_compressed_working_list error working_list = 
   match working_list with 
-    | [] -> error,true
-    | head::tail -> 
+    | [] -> error, true
+    | head :: tail -> 
       begin 
         match head.Mvbdu_sig.value with
           | Mvbdu_sig.Leaf _ -> safety_check_maximaly_compressed_working_list error tail
           | Mvbdu_sig.Node x -> 
             (** check that mvbdu is maximally compressed *)
-            if x.Mvbdu_sig.branch_true == x.Mvbdu_sig.branch_false (**sibbling should be different*)
-            then error,false
+            if x.Mvbdu_sig.branch_true == x.Mvbdu_sig.branch_false
+            (**sibbling should be different*)
+            then error, false
             else 
               match x.Mvbdu_sig.branch_false.Mvbdu_sig.value with 
-                | Mvbdu_sig.Leaf _ -> safety_check_maximaly_compressed_working_list error tail  
+                | Mvbdu_sig.Leaf _ -> 
+                  safety_check_maximaly_compressed_working_list error tail  
                 | Mvbdu_sig.Node y -> 
-                  if x.Mvbdu_sig.branch_true == y.Mvbdu_sig.branch_true (**successive true_sibbling should be different*)
-                  then error,false                    
-                  else safety_check_maximaly_compressed_working_list error (x.Mvbdu_sig.branch_false::x.Mvbdu_sig.branch_true::tail)
+                  if x.Mvbdu_sig.branch_true == y.Mvbdu_sig.branch_true
+                  (**successive true_sibbling should be different*)
+                  then error, false                    
+                  else
+                    safety_check_maximaly_compressed_working_list
+                      error (x.Mvbdu_sig.branch_false :: x.Mvbdu_sig.branch_true::tail)
       end
         
-let safety_check_maximaly_compressed error mvbdu = safety_check_maximaly_compressed_working_list error [mvbdu]   
+let safety_check_maximaly_compressed error mvbdu =
+  safety_check_maximaly_compressed_working_list error [mvbdu]   
   
 let rec safety_check_increasing_nodes_working_list error working_list = 
   match working_list with 
-    | [] -> error,true
-    | (mvbdu,bool,var,bound)::tail -> 
+    | [] -> error, true
+    | (mvbdu, bool, var, bound) :: tail -> 
       begin 
         match mvbdu.Mvbdu_sig.value with
           | Mvbdu_sig.Leaf _ -> safety_check_increasing_nodes_working_list error tail
@@ -140,14 +153,14 @@ let rec safety_check_increasing_nodes_working_list error working_list =
               with 
                 | a when a<0 -> 
                   safety_check_increasing_nodes_working_list error 
-                    ((x.Mvbdu_sig.branch_false,false,new_var,x.Mvbdu_sig.upper_bound)::
-                        (x.Mvbdu_sig.branch_true,true,new_var,x.Mvbdu_sig.upper_bound)::
+                    ((x.Mvbdu_sig.branch_false, false, new_var,x.Mvbdu_sig.upper_bound)::
+                        (x.Mvbdu_sig.branch_true, true, new_var,x.Mvbdu_sig.upper_bound)::
                         tail) 
                 | a when a>0 -> 
                   error,false
                 | _  -> 
                   if bool 
-                  then error,false 
+                  then error, false 
                   else 
                     let new_bound = x.Mvbdu_sig.upper_bound in 
                     if compare bound new_bound >= 0
@@ -167,8 +180,8 @@ let safety_check_increasing_nodes error mvbdu =
       let new_bound = x.Mvbdu_sig.upper_bound in 
       safety_check_increasing_nodes_working_list 
         error 
-        [x.Mvbdu_sig.branch_false,false,new_var,new_bound;
-         x.Mvbdu_sig.branch_true,true,new_var,new_bound] 
+        [x.Mvbdu_sig.branch_false, false, new_var,new_bound;
+         x.Mvbdu_sig.branch_true, true, new_var, new_bound] 
         
 let print_flag log bool = 
   if bool 
