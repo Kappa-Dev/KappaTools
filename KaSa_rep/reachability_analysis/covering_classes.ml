@@ -1323,48 +1323,7 @@ let rec union_bdu parameter mvbdu_x mvbdu_y =
                branch_false = y.branch_false
              }
         )
-        (*let variable_x = x.variable in
-        let bound_x = x.upper_bound in
-        let branch_true_x = x.branch_true in
-        let branch_false_x = x.branch_false in
-        let variable_y = y.variable in
-        let bound_y = y.upper_bound in
-        let branch_true_y = y.branch_true in
-        let branch_false_y = y.branch_false in
-        let z_val =
-          Node {
-            variable = variable_x;
-            upper_bound = bound_x;
-            branch_true = branch_true_x.id;
-            branch_false = branch_false_x.id
-          }          
-        in
-        let k_val =
-          Node {
-            variable = variable_y;
-            upper_bound = bound_y;
-            branch_true = branch_true_y.id;
-            branch_false = branch_false_y.id
-          }          
-        in
-        let error, handler, mvbdu_z, z'_id, z'', z''_id =
-          Mvbdu_test.build_without_and_with_compressing
-            allocate
-            error
-            handler
-            z_val
-            (Node x)
-        in
-        let error, handler, mvbdu_k, k'_id, k'', k''_id =
-          Mvbdu_test.build_without_and_with_compressing
-            allocate
-            error
-            handler
-            k_val
-            (Node y)
-        in
-        union_bdu parameter mvbdu_z mvbdu_k*)
-          
+
 let inter_bdu parameter mvbdu_x mvbdu_y =
   let remanent_bdu = Sanity_test.remanent parameter in
   let error = remanent_bdu.Sanity_test_sig.error in
@@ -1458,7 +1417,7 @@ let build_bdu_covering_classes parameter error handler rules =
   - BDU is OK when the result is not empty, vice versa.
  TODO*)
 
-let enable parameter error agent_type bdu_test bdu_false store_result =
+let enable parameter error bdu_test bdu_false =
   let bool = Mvbdu_sanity.safety_equal_mvbdu bdu_test bdu_false in
   if bool
   then
@@ -1468,47 +1427,38 @@ let enable parameter error agent_type bdu_test bdu_false store_result =
 
 let enabled_rules parameter error kappa_handler rules =
   let error, init_result = AgentMap.create parameter error 0 in
-  (*initial bdu from the beginning is false: update?*)
   let error, (handler, bdu_false) = bdu_init_false parameter in
-  let error, (handler, bdu_true) = bdu_init_true parameter in
   (*getting bdu_test at each rule*)
   let error, bdu_test_type = scan_rule_set parameter error kappa_handler rules in
   let error, result_enable =
   AgentMap.fold parameter error
     (fun parameter error agent_type pair_bdu store_result ->
       let (_, bdu_list) = pair_bdu in
-      let r =
+      let result =
         let rec aux acc =
           match acc with
             | [] -> []
-            | (handler, bdu_test) :: tl ->              
-              (*TEST: union*)
-              let _ =
-                fprintf stdout "TEST UNION:\n";
-                let error, handler, mvbdu, _, _, _ =
-                  union_bdu parameter bdu_test bdu_false in
-                handler.Memo_sig.print_mvbdu stdout "" mvbdu
-              in
-              (*TEST: inter*)
-              let _ =
-                fprintf stdout "TEST INTER:\n";
-                let error, handler, mvbdu, _, _, _ =
-                  inter_bdu parameter bdu_test bdu_test in
-                handler.Memo_sig.print_mvbdu stdout "" mvbdu
-              in
-              (**)
+            | (handler, bdu_test) :: tl ->
+              let result =
+                inter_bdu parameter bdu_test bdu_false in
               let enable_rule =
-                enable parameter error agent_type bdu_test bdu_false store_result
+                enable 
+                  parameter 
+                  error 
+                  bdu_test 
+                  bdu_false 
               in
-              enable_rule :: aux tl
+              (enable_rule, result) :: aux tl
         in aux bdu_list
       in
       let old_list =
-        match AgentMap.unsafe_get parameter error agent_type store_result with
+        match AgentMap.unsafe_get
+          parameter error agent_type store_result 
+        with
           | error, None -> []
           | error, Some s -> s
       in
-      let new_list = List.concat [r; old_list] in
+      let new_list = List.concat [result; old_list] in
       AgentMap.set
         parameter
         error
@@ -1562,16 +1512,18 @@ let print_bdu_test parameter error bdu_test =
 
 let print_enable_rules parameter error result_enable =
   AgentMap.print error
-    (fun error parameter enable_list ->
+    (fun error parameter pair_enable_list ->
       let _ = 
       let rec aux acc =
           match acc with
             | [] -> ()
-            | b :: tl ->
+            | (b, bdu) :: tl ->
               Mvbdu_sanity.print_flag stdout b; print_newline();
+              let error, handler, mvbdu, _, _, _ = bdu in
+              let _ = handler.Memo_sig.print_mvbdu stdout "" mvbdu in (*FIXME*)
               aux tl
         in
-        aux enable_list
+        aux pair_enable_list
       in
       error
     )

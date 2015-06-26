@@ -931,460 +931,50 @@ Id=3
      Leaf False 
 
 Enabled rules:
-TEST UNION:
-Id=0
- Node(site_type:2<1)
-  Id=1
-   Leaf False 
-
-  Id=10
-   Node(site_type:2<2)
-    Id=9
-     Node(site_type:3<1)
-      Id=1
-       Leaf False 
-
-      Id=8
-       Node(site_type:3<2)
-        Id=7
-         Node(site_type:4<0)
-          Id=1
-           Leaf False 
-
-          Id=6
-           Node(site_type:4<1)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
-TEST INTER:
-Id=0
- Node(site_type:2<1)
-  Id=1
-   Leaf False 
-
-  Id=10
-   Node(site_type:2<2)
-    Id=9
-     Node(site_type:3<1)
-      Id=1
-       Leaf False 
-
-      Id=8
-       Node(site_type:3<2)
-        Id=7
-         Node(site_type:4<0)
-          Id=1
-           Leaf False 
-
-          Id=6
-           Node(site_type:4<1)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
-TEST UNION:
-Id=0
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=6
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:3<0)
-      Id=1
-       Leaf False 
-
-      Id=4
-       Node(site_type:3<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
-TEST INTER:
-Id=0
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=6
-   Node(site_type:1<1)
-    Id=5
-     Node(site_type:3<0)
-      Id=1
-       Leaf False 
-
-      Id=4
-       Node(site_type:3<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
-TEST UNION:
-Id=0
- Node(site_type:0<0)
-  Id=1
-   Leaf False 
-
-  Id=6
-   Node(site_type:0<1)
-    Id=5
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
-TEST INTER:
-Id=0
- Node(site_type:0<0)
-  Id=1
-   Leaf False 
-
-  Id=6
-   Node(site_type:0<1)
-    Id=5
-     Node(site_type:2<0)
-      Id=1
-       Leaf False 
-
-      Id=4
-       Node(site_type:2<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
-TEST UNION:
-Id=0
- Node(site_type:0<1)
-  Id=1
-   Leaf False 
-
-  Id=6
-   Node(site_type:0<2)
-    Id=5
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=4
-       Node(site_type:1<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
-TEST INTER:
-Id=0
- Node(site_type:0<1)
-  Id=1
-   Leaf False 
-
-  Id=6
-   Node(site_type:0<2)
-    Id=5
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=4
-       Node(site_type:1<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
-TEST UNION:
-Id=0
- Node(site_type:0<0)
-  Id=1
-   Leaf False 
-
-  Id=2
-   Node(site_type:0<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
-TEST INTER:
-Id=0
- Node(site_type:0<0)
-  Id=1
-   Leaf False 
-
-  Id=2
-   Node(site_type:0<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
-TEST UNION:
-Id=0
- Node(site_type:0<1)
-  Id=1
-   Leaf False 
-
-  Id=6
-   Node(site_type:0<2)
-    Id=5
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=4
-       Node(site_type:1<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
-TEST INTER:
-Id=0
- Node(site_type:0<1)
-  Id=1
-   Leaf False 
-
-  Id=6
-   Node(site_type:0<2)
-    Id=5
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=4
-       Node(site_type:1<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
-TEST UNION:
-Id=0
- Node(site_type:0<0)
-  Id=1
-   Leaf False 
-
-  Id=2
-   Node(site_type:0<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
-TEST INTER:
-Id=0
- Node(site_type:0<0)
-  Id=1
-   Leaf False 
-
-  Id=2
-   Node(site_type:0<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
-TEST UNION:
-Id=0
- Node(site_type:0<1)
-  Id=1
-   Leaf False 
-
-  Id=10
-   Node(site_type:0<2)
-    Id=9
-     Node(site_type:1<1)
-      Id=1
-       Leaf False 
-
-      Id=8
-       Node(site_type:1<2)
-        Id=7
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=6
-           Node(site_type:2<1)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
-TEST INTER:
-Id=0
- Node(site_type:0<1)
-  Id=1
-   Leaf False 
-
-  Id=10
-   Node(site_type:0<2)
-    Id=9
-     Node(site_type:1<1)
-      Id=1
-       Leaf False 
-
-      Id=8
-       Node(site_type:1<2)
-        Id=7
-         Node(site_type:2<0)
-          Id=1
-           Leaf False 
-
-          Id=6
-           Node(site_type:2<1)
-            Id=0
-             Leaf True 
-
-            Id=1
-             Leaf False 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
-TEST UNION:
-Id=0
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
-TEST INTER:
-Id=0
- Node(site_type:1<0)
-  Id=1
-   Leaf False 
-
-  Id=2
-   Node(site_type:1<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
-TEST UNION:
-Id=0
- Node(site_type:0<0)
-  Id=1
-   Leaf False 
-
-  Id=2
-   Node(site_type:0<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
-TEST INTER:
-Id=0
- Node(site_type:0<0)
-  Id=1
-   Leaf False 
-
-  Id=2
-   Node(site_type:0<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
 Enabled rules:agent_type:0:
 No
+Id=0
+ Leaf False 
+
 No
+Id=0
+ Leaf False 
+
 No
+Id=0
+ Leaf False 
+
 Enabled rules:agent_type:1:
 No
+Id=0
+ Leaf False 
+
 No
+Id=0
+ Leaf False 
+
 Enabled rules:agent_type:2:
 No
+Id=0
+ Leaf False 
+
 No
+Id=0
+ Leaf False 
+
 Enabled rules:agent_type:3:
 No
+Id=0
+ Leaf False 
+
 No
+Id=0
+ Leaf False 
+
 No
+Id=0
+ Leaf False 
+
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
 Flow of information in the ODE semantics:agent_type:0:site_modified:0->x(internal state)

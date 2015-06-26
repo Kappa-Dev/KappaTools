@@ -103,26 +103,16 @@ Id=0
  Leaf True 
 
 Enabled rules:
-TEST UNION:
-Id=0
- Leaf False 
-
-TEST INTER:
-Id=0
- Leaf True 
-
-TEST UNION:
-Id=0
- Leaf False 
-
-TEST INTER:
-Id=0
- Leaf True 
-
 Enabled rules:agent_type:0:
 No
+Id=0
+ Leaf False 
+
 Enabled rules:agent_type:1:
 No
+Id=0
+ Leaf False 
+
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
 Flow of information in the ODE semantics:rule_id:1
