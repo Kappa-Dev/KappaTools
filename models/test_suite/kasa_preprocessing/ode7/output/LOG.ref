@@ -199,8 +199,10 @@ Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id
 site_type:1
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
 site_type:1
+BDU analysis:
+BDU of creation rules
 BDU of potential dependencies between sites:
-BDU of potential dependencies between sites:agent_type:0:
+BDU analysis:agent_type:0:
 class_id:0
 Id=7
  Node(site_type:0<0)
@@ -225,7 +227,7 @@ Id=7
     Id=1
      Leaf False 
 
-BDU of potential dependencies between sites:agent_type:1:
+BDU analysis:agent_type:1:
 class_id:0
 Id=5
  Node(site_type:0<2)
@@ -240,7 +242,7 @@ Id=5
     Id=1
      Leaf False 
 
-BDU of potential dependencies between sites:agent_type:2:
+BDU analysis:agent_type:2:
 class_id:0
 Id=3
  Node(site_type:0<1)
@@ -255,9 +257,8 @@ Id=3
     Id=1
      Leaf False 
 
-Creation and BDU of creation:
-BDU at each rule:
-BDU at each rule:agent_type:0:
+BDU of test rules
+BDU analysis:agent_type:0:
 Id=7
  Node(site_type:0<0)
   Id=1
@@ -281,7 +282,7 @@ Id=7
     Id=1
      Leaf False 
 
-BDU at each rule:agent_type:1:
+BDU analysis:agent_type:1:
 Id=3
  Node(site_type:0<2)
   Id=1
@@ -308,7 +309,7 @@ Id=3
     Id=1
      Leaf False 
 
-BDU at each rule:agent_type:2:
+BDU analysis:agent_type:2:
 Id=3
  Node(site_type:0<1)
   Id=1
@@ -322,13 +323,8 @@ Id=3
     Id=1
      Leaf False 
 
-Enabled rules:
-Enabled rules:agent_type:0:
-No
-Id=0
- Leaf False 
-
-Enabled rules:agent_type:1:
+BDU of enabled rules
+BDU analysis:agent_type:0:
 No
 Id=0
  Leaf False 
@@ -337,7 +333,20 @@ No
 Id=0
  Leaf False 
 
-Enabled rules:agent_type:2:
+BDU analysis:agent_type:1:
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+BDU analysis:agent_type:2:
 No
 Id=0
  Leaf False 

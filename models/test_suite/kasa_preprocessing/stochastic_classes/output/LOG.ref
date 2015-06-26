@@ -512,8 +512,58 @@ Potential dependencies between sites:New-index:TEST:Covering_class_id:1:class_id
 site_type:1
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:1:class_id:0:
 site_type:1
+BDU analysis:
+BDU of creation rules
+BDU analysis:agent_type:1:
+Id=7
+ Node(site_type:0<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:0<1)
+    Id=5
+     Node(site_type:1<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:1<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
+BDU analysis:agent_type:3:
+Id=7
+ Node(site_type:0<0)
+  Id=1
+   Leaf False 
+
+  Id=6
+   Node(site_type:0<1)
+    Id=5
+     Node(site_type:1<0)
+      Id=1
+       Leaf False 
+
+      Id=4
+       Node(site_type:1<1)
+        Id=0
+         Leaf True 
+
+        Id=1
+         Leaf False 
+
+    Id=1
+     Leaf False 
+
 BDU of potential dependencies between sites:
-BDU of potential dependencies between sites:agent_type:0:
+BDU analysis:agent_type:0:
 class_id:0
 Id=3
  Node(site_type:2<0)
@@ -556,7 +606,7 @@ Id=3
     Id=1
      Leaf False 
 
-BDU of potential dependencies between sites:agent_type:2:
+BDU analysis:agent_type:2:
 class_id:0
 Id=7
  Node(site_type:0<0)
@@ -581,7 +631,7 @@ Id=7
     Id=1
      Leaf False 
 
-BDU of potential dependencies between sites:agent_type:4:
+BDU analysis:agent_type:4:
 class_id:1
 Id=3
  Node(site_type:2<0)
@@ -620,7 +670,7 @@ Id=7
     Id=1
      Leaf False 
 
-BDU of potential dependencies between sites:agent_type:5:
+BDU analysis:agent_type:5:
 class_id:0
 Id=3
  Node(site_type:1<0)
@@ -649,57 +699,8 @@ Id=3
     Id=1
      Leaf False 
 
-Creation and BDU of creation:
-Creation and BDU of creation:agent_type:1:
-Id=7
- Node(site_type:0<0)
-  Id=1
-   Leaf False 
-
-  Id=6
-   Node(site_type:0<1)
-    Id=5
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=4
-       Node(site_type:1<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
-Creation and BDU of creation:agent_type:3:
-Id=7
- Node(site_type:0<0)
-  Id=1
-   Leaf False 
-
-  Id=6
-   Node(site_type:0<1)
-    Id=5
-     Node(site_type:1<0)
-      Id=1
-       Leaf False 
-
-      Id=4
-       Node(site_type:1<1)
-        Id=0
-         Leaf True 
-
-        Id=1
-         Leaf False 
-
-    Id=1
-     Leaf False 
-
-BDU at each rule:
-BDU at each rule:agent_type:0:
+BDU of test rules
+BDU analysis:agent_type:0:
 Id=3
  Node(site_type:3<0)
   Id=1
@@ -752,7 +753,7 @@ Id=3
     Id=1
      Leaf False 
 
-BDU at each rule:agent_type:2:
+BDU analysis:agent_type:2:
 Id=7
  Node(site_type:0<0)
   Id=1
@@ -776,7 +777,7 @@ Id=7
     Id=1
      Leaf False 
 
-BDU at each rule:agent_type:4:
+BDU analysis:agent_type:4:
 Id=3
  Node(site_type:2<0)
   Id=1
@@ -826,7 +827,7 @@ Id=7
     Id=1
      Leaf False 
 
-BDU at each rule:agent_type:5:
+BDU analysis:agent_type:5:
 Id=3
  Node(site_type:1<0)
   Id=1
@@ -853,8 +854,8 @@ Id=3
     Id=1
      Leaf False 
 
-Enabled rules:
-Enabled rules:agent_type:0:
+BDU of enabled rules
+BDU analysis:agent_type:0:
 No
 Id=0
  Leaf False 
@@ -871,12 +872,6 @@ No
 Id=0
  Leaf False 
 
-Enabled rules:agent_type:2:
-No
-Id=0
- Leaf False 
-
-Enabled rules:agent_type:4:
 No
 Id=0
  Leaf False 
@@ -889,7 +884,153 @@ No
 Id=0
  Leaf False 
 
-Enabled rules:agent_type:5:
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+BDU analysis:agent_type:2:
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+BDU analysis:agent_type:4:
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+BDU analysis:agent_type:5:
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
+No
+Id=0
+ Leaf False 
+
 No
 Id=0
  Leaf False 

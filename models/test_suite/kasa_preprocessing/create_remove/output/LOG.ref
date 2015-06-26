@@ -83,32 +83,37 @@ Side-effect:deletion:undocument_site:
 Side-effect:agent_type:1:
 Side-effect:deletion:undocument_site:
 Potential dependencies between sites:
+BDU analysis:
+BDU of creation rules
+BDU analysis:agent_type:1:
+Id=0
+ Leaf True 
+
+BDU analysis:agent_type:2:
+Id=0
+ Leaf True 
+
 BDU of potential dependencies between sites:
-Creation and BDU of creation:
-Creation and BDU of creation:agent_type:1:
+BDU of test rules
+BDU analysis:agent_type:0:
 Id=0
  Leaf True 
 
-Creation and BDU of creation:agent_type:2:
+BDU analysis:agent_type:1:
 Id=0
  Leaf True 
 
-BDU at each rule:
-BDU at each rule:agent_type:0:
-Id=0
- Leaf True 
-
-BDU at each rule:agent_type:1:
-Id=0
- Leaf True 
-
-Enabled rules:
-Enabled rules:agent_type:0:
+BDU of enabled rules
+BDU analysis:agent_type:0:
 No
 Id=0
  Leaf False 
 
-Enabled rules:agent_type:1:
+No
+Id=0
+ Leaf False 
+
+BDU analysis:agent_type:1:
 No
 Id=0
  Leaf False 
