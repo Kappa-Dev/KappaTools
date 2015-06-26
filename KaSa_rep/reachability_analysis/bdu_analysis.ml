@@ -29,13 +29,6 @@ let trace = false
 
 type bdu =  bool Mvbdu_sig.mvbdu
 
-type bdu_handler  =
-    (Boolean_mvbdu.memo_tables,
-     (bool Mvbdu_sig.cell, bool Mvbdu_sig.mvbdu) Boolean_mvbdu.D_mvbdu_skeleton.dictionary,
-     (int List_sig.cell, int List_sig.list) Boolean_mvbdu.D_list_skeleton.dictionary,
-     bool,
-     int) Memo_sig.handler * bool Mvbdu_sig.mvbdu 
-
 type bdu_pair_handler_list  = 
     ((Boolean_mvbdu.memo_tables, 
      Boolean_mvbdu.mvbdu_dic,
@@ -56,7 +49,8 @@ type bdu_analysic =
       store_bdu_test             : (state_list * bdu_pair_handler_list) AgentMap.t;
       store_bdu_creation         : (state_list * bdu_pair_handler) AgentMap.t;
       store_bdu_remanent         : bdu_pair_handler;
-      store_enabled_rules        : (bool * bdu_handler) list AgentMap.t
+      store_enabled_rules        : (bool * bdu_pair_handler) list AgentMap.t;
+      (*store_test_rules           : (bool * bdu_pair_handler) list AgentMap.t*)
     }
 
 (************************************************************************************)    
@@ -379,6 +373,54 @@ let enabled_rules parameter error kappa_handler rules bdu_test_type store_result
   in error, result_enable
 
 (************************************************************************************)
+(*BDU for test rule*)
+
+(*let bdu_test_rules parameter error enabled_rules bdu_test store_result =
+  AgentMap.fold2_common parameter error
+    (fun parameter error agent_type pair_enable_list pair_bdu_test_list store_result ->
+      let rec aux acc acc' =
+        match acc, acc' with
+          | [], [] -> error, store_result
+          | [], pair_bdu_tests ->
+            let rec aux' l =
+              match l with
+                | [] ->
+                | (b, p) :: tl ->
+                  let x1 =
+                    
+                  in
+            in
+            aux' pair_bdu_tests
+            let error, result =
+              AgentMap.set
+              parameter
+                error
+                agent_type
+                pair_bdu_tests
+                store_result
+            in
+            error, result
+          | pair_enables, [] ->
+            let x1 =
+            in
+            let error, result =
+              AgentMap.set
+                parameter
+                error
+                agent_type
+                pair_enables
+                store_result
+            in
+            error, result
+          | enable:: tl, bdu_test :: tl' ->
+            
+      in
+      aux pair_enable_list pair_bdu_test
+    )
+    enable_rules bdu_test store_result*)
+
+
+(************************************************************************************)
 (*compute bdu in covering classes*)
 
 let build_bdu_covering_classes parameter error handler rules store_bdu =
@@ -658,6 +700,8 @@ let print_result_creation parameter error result_creation =
     )
     parameter
     result_creation
+
+(*------------------------------------------------------------------------------*)
 
 let print_enabled_rules parameter error result_enable =
   AgentMap.print error
