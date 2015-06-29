@@ -174,6 +174,7 @@ site_type:1
 BDU analysis:
 BDU of creation rules
 BDU analysis:agent_type:0:
+rule_id:1:site_type:0:state:0
 Id=3
  Node(site_type:0<0)
   Id=1
@@ -188,6 +189,7 @@ Id=3
      Leaf False 
 
 BDU analysis:agent_type:1:
+rule_id:1:site_type:0:state:0
 Id=3
  Node(site_type:0<0)
   Id=1
@@ -234,82 +236,62 @@ Id=3
 
 BDU of test rules
 BDU analysis:agent_type:0:
-Id=3
- Node(site_type:0<0)
+rule_id:1
+Id=2
+ Node(site_type:0<1)
+  Id=0
+   Leaf True 
+
   Id=1
    Leaf False 
 
-  Id=2
-   Node(site_type:0<1)
-    Id=0
-     Leaf True 
+rule_id:0
+Id=2
+ Node(site_type:0<1)
+  Id=0
+   Leaf True 
 
-    Id=1
-     Leaf False 
-
-Id=3
- Node(site_type:0<0)
   Id=1
    Leaf False 
 
-  Id=2
-   Node(site_type:0<1)
-    Id=0
-     Leaf True 
+rule_id:1
+Id=2
+ Node(site_type:0<1)
+  Id=0
+   Leaf True 
 
-    Id=1
-     Leaf False 
-
-Id=3
- Node(site_type:0<0)
   Id=1
    Leaf False 
-
-  Id=2
-   Node(site_type:0<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
 
 BDU analysis:agent_type:1:
-Id=3
- Node(site_type:0<0)
+rule_id:0
+Id=2
+ Node(site_type:0<1)
+  Id=0
+   Leaf True 
+
   Id=1
    Leaf False 
-
-  Id=2
-   Node(site_type:0<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
 
 BDU of enabled rules
 BDU analysis:agent_type:0:
+rule_id:1
 No
 Id=0
  Leaf False 
 
+rule_id:0
 No
 Id=0
  Leaf False 
 
-No
-Id=0
- Leaf False 
-
+rule_id:1
 No
 Id=0
  Leaf False 
 
 BDU analysis:agent_type:1:
-No
-Id=0
- Leaf False 
-
+rule_id:0
 No
 Id=0
  Leaf False 

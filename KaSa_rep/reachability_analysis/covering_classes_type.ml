@@ -32,8 +32,7 @@ type state_list = (int * int) list
 type covering_classes =
   {
     store_modified_map     : int map AgentMap.t;
-    store_covering_classes : (int * state_list) list list AgentMap.t
-                             * state_list AgentMap.t;
+    store_covering_classes : (int * state_list) list list AgentMap.t * state_list AgentMap.t;
   }
 
 (************************************************************************************)

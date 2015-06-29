@@ -17,6 +17,7 @@ open Covering_classes_type
 open Printf
 open Cckappa_sig
 open Int_storage
+open Mvbdu_sig
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Covering classes") message exn
@@ -29,13 +30,6 @@ let trace = false
 
 type bdu =  bool Mvbdu_sig.mvbdu
 
-type bdu_pair_handler_list  = 
-    ((Boolean_mvbdu.memo_tables, 
-     Boolean_mvbdu.mvbdu_dic,
-     Boolean_mvbdu.list_dic,
-     bool,
-     int) Memo_sig.handler * bdu) list 
-
 type bdu_pair_handler  =
     ((Boolean_mvbdu.memo_tables, 
      Boolean_mvbdu.mvbdu_dic,
@@ -43,13 +37,24 @@ type bdu_pair_handler  =
      bool, 
      int) Memo_sig.handler * bdu)
 
+type bdu_pair_handler_list  = 
+     (int * 
+        (Boolean_mvbdu.memo_tables,
+         (bool Mvbdu_sig.cell, bool Mvbdu_sig.mvbdu)
+           Boolean_mvbdu.D_mvbdu_skeleton.dictionary,
+         (int List_sig.cell, int List_sig.list)
+           Boolean_mvbdu.D_list_skeleton.dictionary, bool, int)
+          Memo_sig.handler * bool Mvbdu_sig.mvbdu) list
+
 type bdu_analysic =
     {
       store_bdu_covering_classes : (bdu_pair_handler * int) list AgentMap.t;
-      store_bdu_test             : (state_list * bdu_pair_handler_list) AgentMap.t;
-      store_bdu_creation         : (state_list * bdu_pair_handler) AgentMap.t;
+      store_bdu_test             : ((int * (int * int)) list *
+                                    bdu_pair_handler_list) AgentMap.t;
+      store_bdu_creation         : ((int * (int * int)) list * bdu_pair_handler)
+                                   AgentMap.t;
       store_bdu_remanent         : bdu_pair_handler;
-      store_enabled_rules        : (bool * bdu_pair_handler) list AgentMap.t;
+      store_enabled_rules        : (int * bool * bdu_pair_handler) list AgentMap.t
       (*store_test_rules           : (bool * bdu_pair_handler) list AgentMap.t*)
     }
 
@@ -162,8 +167,6 @@ let bdu_remanent parameter =
 (************************************************************************************)    
 (*Union between two bdus*)
 
-open Mvbdu_sig
-
 let rec union_bdu parameter mvbdu_x mvbdu_y =
   let remanent_bdu = Sanity_test.remanent parameter in
   let error = remanent_bdu.Sanity_test_sig.error in
@@ -173,28 +176,36 @@ let rec union_bdu parameter mvbdu_x mvbdu_y =
     | Leaf a, Leaf b ->
       if a = b
       then
-        Mvbdu_test.build_without_and_with_compressing
-          allocate
-          error
-          handler
-          (Leaf a)
-          (Leaf a)
+        let error, handler, a', a'_id, a'', a''_id =
+          Mvbdu_test.build_without_and_with_compressing
+            allocate
+            error
+            handler
+            (Leaf a)
+            (Leaf a)
+        in error, (handler, a')
       else
-        Mvbdu_test.build_without_and_with_compressing
-          allocate
-          error
-          handler
-          (Leaf a)
-          (Leaf b)
+        let error, handler, a', a'_id, a'', a''_id =
+          Mvbdu_test.build_without_and_with_compressing
+            allocate
+            error
+            handler
+            (Leaf a)
+            (Leaf b)
+        in
+        error, (handler, a')
     | Node x, Leaf a 
     | Leaf a, Node x ->
       (*Build node*)
-      Mvbdu_test.build_without_and_with_compressing
-        allocate
-        error
-        handler
-        (Leaf a)
-        (Node x)
+      let error, handler, a', a'_id, a'', a''_id =
+        Mvbdu_test.build_without_and_with_compressing
+          allocate
+          error
+          handler
+          (Leaf a)
+          (Node x)
+      in
+      error, (handler, a')
     | Node x, Node y ->
       let b =
         x.variable = y.variable &&
@@ -205,51 +216,124 @@ let rec union_bdu parameter mvbdu_x mvbdu_y =
       if b
       then
         (*Build node*)
-        Mvbdu_test.build_without_and_with_compressing
-          allocate
-          error
-          handler
-          (Node 
-             {
-               variable = x.variable;
-               upper_bound = x.upper_bound;
-               branch_true = x.branch_true.id;
-               branch_false = x.branch_false.id
-             }
-          )
-          (Node x)
-      else (*FIXME*)
-        (*Build node*)
-        Mvbdu_test.build_without_and_with_compressing
-          allocate
-          error
-          handler
-          (Node 
-             {
-               variable = x.variable;
-               upper_bound = x.upper_bound;
-               branch_true = x.branch_true.id;
-               branch_false = x.branch_false.id
-             }
-          )
-          (Node 
-             {
-               variable = y.variable;
-               upper_bound = y.upper_bound;
-               branch_true = y.branch_true;
-               branch_false = y.branch_false
-             }
-        )
+        let error, handler, a', a'_id, a'', a''_id = 
+          Mvbdu_test.build_without_and_with_compressing
+            allocate
+            error
+            handler
+            (Node 
+               {
+                 variable = x.variable;
+                 upper_bound = x.upper_bound;
+                 branch_true = x.branch_true.id;
+                 branch_false = x.branch_false.id
+               }
+            )
+            (Node x)
+        in
+        error, (handler, a')
+      else
+        (*build node x*)
+        let a =
+          Mvbdu_sig.Node
+            {
+              variable = x.variable;
+              upper_bound = x.upper_bound;
+              branch_true = x.branch_true;
+              branch_false = x.branch_false
+            }
+        in
+        let a_val =
+          Mvbdu_sig.Node
+            {
+              variable = x.variable;
+              upper_bound = x.upper_bound;
+              branch_true = x.branch_true.id;
+              branch_false = x.branch_false.id
+            }
+        in
+        let error, handler, a', a'_id, a'', a''_id =
+          Mvbdu_test.build_without_and_with_compressing
+            allocate
+            error
+            handler
+            a_val
+            a
+        in
+        (*build node y*)
+        let b =
+          Mvbdu_sig.Node
+            {
+              variable = y.variable;
+              upper_bound = y.upper_bound;
+              branch_true = y.branch_true;
+              branch_false = y.branch_false
+            }
+        in
+        let b_val =
+          Mvbdu_sig.Node
+            {
+              variable = y.variable;
+              upper_bound = y.upper_bound;
+              branch_true = y.branch_true.id;
+              branch_false = y.branch_false.id
+            }
+        in
+        let error, handler, b', b'_id, b'', b''_id =
+          Mvbdu_test.build_without_and_with_compressing
+            allocate
+            error
+            handler
+            b_val
+            b
+        in
+        (*build copy*)
+          let copy bdu = 
+          { bdu with Mvbdu_sig.value =
+              match bdu.Mvbdu_sig.value with
+                | Mvbdu_sig.Node x -> Mvbdu_sig.Node x
+                | Mvbdu_sig.Leaf a -> Mvbdu_sig.Leaf a
+          }
+        in 
+        let copy_c = copy b' in
+        let r = 
+          Mvbdu_sig.Node
+            {
+              variable = x.variable;
+              upper_bound = x.upper_bound;
+              branch_false = x.branch_false;
+              branch_true = copy_c;
+            }
+        in
+        let r_val =
+          Mvbdu_sig.Node
+            {
+              variable = x.variable;
+              upper_bound = x.upper_bound;
+              branch_false = x.branch_false.id;
+              branch_true = copy_c.id
+            }
+        in
+        let error, handler, r', r'_id, r'', r''_id =
+          Mvbdu_test.build_without_and_with_compressing
+            allocate
+            error
+            handler
+            r_val
+            r
+        in
+        error, (handler, r')
+
 
 (************************************************************************************)
 (*intersection between two bdus*)
 
 let inter_bdu parameter mvbdu_x mvbdu_y =
   let remanent_bdu = Sanity_test.remanent parameter in
-  let error = remanent_bdu.Sanity_test_sig.error in
-  let allocate = remanent_bdu.Sanity_test_sig.allocate_mvbdu in
-  let handler = remanent_bdu.Sanity_test_sig.mvbdu_handler in
-  let a_val = Mvbdu_sig.Leaf false in
+  let error        = remanent_bdu.Sanity_test_sig.error in
+  let allocate     = remanent_bdu.Sanity_test_sig.allocate_mvbdu in
+  let handler      = remanent_bdu.Sanity_test_sig.mvbdu_handler in
+  let a_val        = Mvbdu_sig.Leaf false in
   match mvbdu_x.value, mvbdu_y.value with
     | Leaf a, Leaf b ->
       if a = b
@@ -331,46 +415,34 @@ let enable parameter error bdu_test bdu_false =
   else
     false
 
-let enabled_rules parameter error kappa_handler rules bdu_test_type store_result =
+let enabled_rules parameter error kappa_handler rules store_bdu_test store_result =
   let error, (handler, bdu_false) = bdu_remanent parameter in
   let error, result_enable =
   AgentMap.fold parameter error
-    (fun parameter error agent_type pair_bdu store_result ->
-      let (_, bdu_list) = pair_bdu in
+    (fun parameter error agent_type (_, pair_bdu) store_result ->
       let result =
         let rec aux acc =
           match acc with
             | [] -> []
-            | (handler, bdu_test) :: tl ->
-              let error, result =
-                inter_bdu parameter bdu_test bdu_false in
-              let enable_rule =
-                enable 
-                  parameter 
-                  error 
-                  bdu_test 
-                  bdu_false 
+            | (r, _, bdu_x) :: tl ->
+              let error, inter =
+                inter_bdu parameter bdu_x bdu_false
               in
-              (enable_rule, result) :: aux tl
-        in aux bdu_list
+              let b = enable parameter error bdu_x bdu_false in
+              let l = (r, b, inter) :: aux tl in
+              l
+        in
+        aux pair_bdu
       in
-      let old_list =
-        match AgentMap.unsafe_get
-          parameter error agent_type store_result 
-        with
-          | error, None -> []
-          | error, Some s -> s
-      in
-      let new_list = List.concat [result; old_list] in
       AgentMap.set
         parameter
         error
         agent_type
-        new_list
+        result
         store_result
-    ) 
-    bdu_test_type store_result 
-  in error, result_enable
+    ) store_bdu_test store_result
+  in
+  error, result_enable
 
 (************************************************************************************)
 (*BDU for test rule*)
@@ -450,7 +522,78 @@ let build_bdu_covering_classes parameter error handler rules store_bdu =
 (************************************************************************************)    
 (*compute bdu for each rule in the lhs*)
 
-let collect_test_bdu parameter error views store_bdu =
+let build_second_bdu allocate error ru handler c' s state a' b' a'_id b'_id tl =
+  let rec aux to_visit =
+    match to_visit with
+      | [] -> []
+      | (ru', (s', state')) :: tl' ->
+        let copy bdu = 
+          { bdu with Mvbdu_sig.value =
+              match bdu.Mvbdu_sig.value with
+                | Mvbdu_sig.Node x -> Mvbdu_sig.Node x
+                | Mvbdu_sig.Leaf a -> Mvbdu_sig.Leaf a
+          }
+        in 
+        let d =
+          Mvbdu_sig.Node
+            {
+              variable = s';
+              upper_bound = state';
+              branch_true = a';
+              branch_false = b'
+            }
+        in
+        let d_val =
+          Mvbdu_sig.Node
+            {
+              variable = s';
+              upper_bound = state';
+              branch_true = a'_id;
+              branch_false = b'_id
+            }
+        in
+        let error, handler, d', d'_id, d'', d''_id =
+          Mvbdu_test.build_without_and_with_compressing
+            allocate
+            error
+            handler
+            d_val
+            d
+        in
+        let copy_d = copy d' in
+        let r =
+          Mvbdu_sig.Node
+            {
+              variable = s;
+              upper_bound = state;
+              branch_false = b';
+              branch_true = copy_d;
+            }
+        in
+        let r_val =
+          Mvbdu_sig.Node
+            {
+              variable = s;
+              upper_bound = state;
+              branch_false = b'_id;
+              branch_true = copy_d.Mvbdu_sig.id;
+            }
+        in
+        let error, handler, r', r'_id, r'', r''_id =
+          Mvbdu_test.build_without_and_with_compressing
+            allocate
+            error
+            handler
+            r_val
+            r
+        in
+        (ru, handler, r') :: aux tl' 
+  in
+  aux tl
+
+(*------------------------------------------------------------------------------*)
+
+let collect_test_bdu parameter error rule_id views store_bdu = (*TEST*)
   AgentMap.fold
     parameter
     error
@@ -459,41 +602,125 @@ let collect_test_bdu parameter error views store_bdu =
         | Ghost -> error, store_bdu
         | Agent agent ->
           let agent_type = agent.agent_name in
-          let pair_list = 
+          let triple_list = 
             Site_map_and_set.fold_map
               (fun site port current_list ->
                 let state = int_of_port port in
-                (site, state) :: current_list
+                (rule_id, (site, state)) :: current_list
               ) agent.agent_interface []
           in
-          (*build bdu*)
-          let error, bdu =
-            build_bdu
-              parameter 
+          (**)
+          let remanent_bdu = Sanity_test.remanent parameter in
+          let error = remanent_bdu.Sanity_test_sig.error in
+          let allocate = remanent_bdu.Sanity_test_sig.allocate_mvbdu in
+          let handler = remanent_bdu.Sanity_test_sig.mvbdu_handler in
+          let a_val = Mvbdu_sig.Leaf true in
+          let b_val = Mvbdu_sig.Leaf false in
+          let error, handler, a', a'_id, a'', a''_id =
+            Mvbdu_test.build_without_and_with_compressing
+              allocate
               error
-              pair_list
-          in          
+              handler
+              a_val
+              a_val
+          in
+          let error, handler, b', b'_id, b'', b''_id =
+            Mvbdu_test.build_without_and_with_compressing
+              allocate
+              error
+              handler
+              b_val
+              b_val
+          in
+          let result =
+            let rec aux acc =
+              match acc with
+                | [] -> []
+                | [(ru, (s, state))] ->
+                    let c =
+                    Mvbdu_sig.Node
+                      {
+                        variable = s;
+                        branch_true = a';
+                        branch_false = b';
+                        upper_bound = state                          
+                      }
+                  in
+                  let c_val =
+                    Mvbdu_sig.Node
+                      {
+                      variable = s;
+                      branch_true = a'_id;
+                      branch_false = b'_id;
+                      upper_bound = state
+                    }
+                  in
+                  let error, handler, c', c'_id, c'', c''_id =
+                    Mvbdu_test.build_without_and_with_compressing
+                      allocate
+                      error
+                      handler
+                      c_val
+                      c
+                  in
+                  [ru, handler, c']
+                | (ru, (s, state)) :: tl ->
+                  let c =
+                    Mvbdu_sig.Node
+                      {
+                        variable = s;
+                        branch_true = a';
+                        branch_false = b';
+                        upper_bound = state                          
+                      }
+                  in
+                  let c_val =
+                    Mvbdu_sig.Node
+                      {
+                      variable = s;
+                      branch_true = a'_id;
+                      branch_false = b'_id;
+                      upper_bound = state
+                    }
+                  in
+                  let error, handler, c', c'_id, c'', c''_id =
+                    Mvbdu_test.build_without_and_with_compressing
+                      allocate
+                      error
+                      handler
+                      c_val
+                      c
+                  in
+                  let build_second =
+                    build_second_bdu allocate error 
+                      ru handler c' s state a' b' a'_id b'_id tl
+                  in
+                  build_second
+            in
+            aux (List.rev triple_list)
+          in
+          (*get old*)
           let error, old_pair =
             match AgentMap.unsafe_get parameter error
               agent_type store_bdu with
                 | error, None -> error, ([], [])
-                | error, Some (l,bdu) -> error, (l,bdu)
+                | error, Some (r, b) -> error, (r, b)
           in
-          let (old_list, old_bdu) = old_pair in
-          let new_pair = List.concat [pair_list; old_list] in
-          let new_bdu = bdu :: old_bdu in
+          let (old_site, old_bdu) = old_pair in
+          let new_pair = List.concat [triple_list; old_site] in
+          let new_result = List.concat [result; old_bdu] in
           AgentMap.set
             parameter
             error
             agent_type
-            (new_pair, new_bdu)
+            (new_pair, List.rev new_result)
             store_bdu
     ) views store_bdu
 
 (************************************************************************************)    
 (*compute bdu for initial state or creation actions*)
 
-let collect_creation parameter error viewsrhs creation store_creation =
+let collect_creation parameter error rule_id viewsrhs creation store_creation =
   List.fold_left (fun (error, store_creation) (agent_id, agent_type) ->
     let error, agent =
       AgentMap.get
@@ -511,11 +738,12 @@ let collect_creation parameter error viewsrhs creation store_creation =
           Site_map_and_set.fold_map 
             (fun site port current_list ->
               let state = int_of_port port in
-              let list_a = (site, state) :: current_list in
+              let list_a = (rule_id, (site, state)) :: current_list in
               list_a
             )
             agent.agent_interface []
         in
+        let (rule_list, pair_site_list) = List.split site_list in
         let error, old_list =
           match AgentMap.unsafe_get
             parameter
@@ -526,14 +754,21 @@ let collect_creation parameter error viewsrhs creation store_creation =
               | error, None -> error, []
               | error, Some (s,_) -> error, s
         in
-        let new_site = List.concat [site_list; old_list] in
+        let (_, old_site) = List.split old_list in
+        let new_site = List.concat [pair_site_list; old_site] in
+        let new_list = List.concat [site_list; old_list] in
         let error, bdu = build_bdu parameter error new_site in
+        (*let error, bdu = build_bdu parameter error pair_site_list in
+        let new_bdu = bdu :: old_bdu_list in*)
+        (*FIXME: build at each rule;
+          then store the old and the current one
+        *)
         let error, store_creation =
           AgentMap.set
             parameter
             error
             agent_type
-            (new_site, bdu)
+            (new_list, bdu)
             store_creation
         in
         error, store_creation
@@ -544,7 +779,7 @@ let collect_creation parameter error viewsrhs creation store_creation =
 (************************************************************************************)
 (*RULE*)
 
-let scan_rule parameter error handler rule rules store_result =
+let scan_rule parameter error handler rule_id rule rules store_result =
   (*------------------------------------------------------------------------------*)
   (*compute bdu covering classes*)
   let error, store_bdu_covering_classes =
@@ -561,6 +796,7 @@ let scan_rule parameter error handler rule rules store_result =
     collect_test_bdu
       parameter
       error
+      rule_id
       rule.rule_lhs.views
       store_result.store_bdu_test
   in
@@ -570,6 +806,7 @@ let scan_rule parameter error handler rule rules store_result =
     collect_creation
       parameter
       error
+      rule_id
       rule.rule_rhs.views
       rule.actions.creation
       store_result.store_bdu_creation
@@ -631,6 +868,7 @@ let scan_rule_set parameter error handler rules =
             parameter
             error
             handler
+            rule_id
             rule.e_rule_c_rule
             rules
             store_result
@@ -674,9 +912,9 @@ let print_result_test parameter error bdu_test =
         let rec aux acc =
           match acc with
             | [] -> ()
-            | bdu :: tl ->
-              let (handler, mvbdu_redefine) = bdu in
-              let _ = handler.Memo_sig.print_mvbdu stdout "" mvbdu_redefine in
+            | (r, handler, bdu) :: tl ->
+              let _ = fprintf stdout "rule_id:%i\n" r in
+              let _ = handler.Memo_sig.print_mvbdu stdout "" bdu in
               aux tl
         in
         aux handler_list in
@@ -686,15 +924,24 @@ let print_result_test parameter error bdu_test =
 
 (*------------------------------------------------------------------------------*)
 
-let print_result_creation parameter error result_creation =
+let print_result_creation parameter error result_creation = (*FIXME*)
   AgentMap.print
     error
     (fun error parameter p ->
       let _ =
-        let (creation_list, bdu) = p in
-        let _ = Print_covering_classes.print_pair creation_list in
-        let (handler, mvbdu_redefine) = bdu in
-        handler.Memo_sig.print_mvbdu stdout "" mvbdu_redefine
+        let (triple_list, bdu) = p in
+        let (handler, mvbdu) = bdu in
+        let r =
+          let rec aux acc =
+            match acc with
+              | [] -> ()
+              | (r,(s,t)) :: tl ->
+                fprintf stdout "rule_id:%i:site_type:%i:state:%i\n" r s t; 
+                aux tl
+          in
+          aux triple_list
+        in
+        r; handler.Memo_sig.print_mvbdu stdout "" mvbdu
       in
       error
     )
@@ -710,10 +957,10 @@ let print_enabled_rules parameter error result_enable =
       let rec aux acc =
           match acc with
             | [] -> ()
-            | (b, bdu) :: tl ->
+            | (r, b, (handler, bdu)) :: tl ->
+              fprintf stdout "rule_id:%i\n" r;
               Mvbdu_sanity.print_flag stdout b; print_newline();
-              let handler, mvbdu = bdu in
-              let _ = handler.Memo_sig.print_mvbdu stdout "" mvbdu in (*FIXME*)
+              let _ = handler.Memo_sig.print_mvbdu stdout "" bdu in 
               aux tl
         in
         aux pair_enable_list

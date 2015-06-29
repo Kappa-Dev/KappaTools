@@ -96,28 +96,10 @@ Id=0
 BDU of potential dependencies between sites:
 BDU of test rules
 BDU analysis:agent_type:0:
-Id=0
- Leaf True 
-
 BDU analysis:agent_type:1:
-Id=0
- Leaf True 
-
 BDU of enabled rules
 BDU analysis:agent_type:0:
-No
-Id=0
- Leaf False 
-
-No
-Id=0
- Leaf False 
-
 BDU analysis:agent_type:1:
-No
-Id=0
- Leaf False 
-
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
 Flow of information in the ODE semantics:rule_id:1
