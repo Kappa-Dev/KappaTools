@@ -495,7 +495,7 @@ let enabled_rules parameter error kappa_handler rules store_bdu_test store_resul
 (************************************************************************************)
 (*compute bdu in covering classes*)
 
-let build_bdu_covering_classes parameter error handler rules store_bdu =
+let build_bdu_covering_classes parameter error handler rules store_bdu = (*FIXME*)
   let error, remanent_type = scan_rule_set_cv parameter error handler rules in
   AgentMap.fold parameter error 
     (fun parameter error agent_type remanent init ->
@@ -758,11 +758,6 @@ let collect_creation parameter error rule_id viewsrhs creation store_creation =
         let new_site = List.concat [pair_site_list; old_site] in
         let new_list = List.concat [site_list; old_list] in
         let error, bdu = build_bdu parameter error new_site in
-        (*let error, bdu = build_bdu parameter error pair_site_list in
-        let new_bdu = bdu :: old_bdu_list in*)
-        (*FIXME: build at each rule;
-          then store the old and the current one
-        *)
         let error, store_creation =
           AgentMap.set
             parameter
