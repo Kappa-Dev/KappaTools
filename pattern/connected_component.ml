@@ -492,9 +492,9 @@ let navigate env nav =
 
 let find env cc =
   let nav = to_navigation true cc in
-(*  let () = Format.eprintf
-	     "@[[%a]@]@,%a@." (Pp.list Pp.space (print_edge (sigs env))) nav
-	     print env in*)
+  (* let () = Format.eprintf *)
+  (* 	     "@[[%a]@]@,%a@." (Pp.list Pp.space (print_edge (sigs env) cc)) nav *)
+  (* 	     print env in *)
   navigate env nav
 
 let get env cc_id = IntMap.find cc_id env.domain
@@ -690,21 +690,31 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
 	      cc.links
 	      (remove_cycle_edges complete_domain_with obs_id dst env free_id cc)
 
+let rename_nav_place inj2cc = function
+  | Fresh _ as x -> x
+  | Existing n -> Existing (Renaming.apply inj2cc n)
+
+let rename_edge inj2cc = function
+  | ((x,i), (ToNothing | ToInternal _ as a)) ->
+     ((rename_nav_place inj2cc x,i),a)
+  | ((x,i),ToNode (y,j)) ->
+	   ((rename_nav_place inj2cc x,i),ToNode (rename_nav_place inj2cc y,j))
+
 let rec complete_domain_with obs_id dst env free_id cc edge inj_dst2cc =
-  let rec new_son inj_found2cc = function
+  let rec new_son inj_cc2found = function
     | [] ->
        [{ dst = dst;
-	  next = edge;
-	  inj = [Renaming.compose inj_dst2cc (Renaming.inverse inj_found2cc)];
+	  next = rename_edge inj_cc2found edge;
+	  inj = [Renaming.compose inj_dst2cc inj_cc2found];
 	  above_obs = [obs_id];}]
-    | h :: t when h.dst = dst ->
-       let () = assert (h.next = edge) in
-       {h with inj = (Renaming.compose inj_dst2cc (Renaming.inverse inj_found2cc)) :: h.inj} :: t
-    | h :: t -> h :: new_son inj_found2cc t in
+    | h :: t when h.dst = dst && (h.next = edge) ->
+       {h with inj = (Renaming.compose inj_dst2cc inj_cc2found) :: h.inj} :: t
+    | h :: t -> h :: new_son inj_cc2found t in
   let known_cc = Env.find env cc in
   match known_cc with
   | Some (cc_id, inj_cc_id2cc, point') ->
-     let point'' = {point' with sons = new_son (List.hd inj_cc_id2cc) point'.sons} in
+     let point'' =
+       {point' with sons = new_son (Renaming.inverse (List.hd inj_cc_id2cc)) point'.sons} in
      let completed =
        propagate_add_obs obs_id (Env.add_point cc_id point'' env) cc_id in
      (free_id,completed), cc_id

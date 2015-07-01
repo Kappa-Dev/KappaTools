@@ -289,6 +289,9 @@ let internals_from_contact_map sigs contact_map ty_id p_id =
     cand
 
 let find_implicit_infos sigs contact_map ags =
+  let max_s m = function
+    | Linked (i,_) -> max i m
+    | Freed | Maintained | Erased -> m in
   let rec aux_internals ty_id ints acc i =
     if i = Array.length ints then acc
     else
@@ -314,9 +317,12 @@ let find_implicit_infos sigs contact_map ags =
 		       (internals_from_contact_map sigs contact_map ty_id i))
 	     acc in
       aux_internals ty_id ints acc' (succ i) in
-  let new_switch = function
-    | Maintained | Freed as s  -> s
-    | Linked _ | Erased -> Freed in
+  let new_switch free_id = function
+    | Maintained -> Linked (Term.with_dummy_pos free_id)
+    | Freed | Linked _ | Erased -> Freed in
+  let old_switch free_id = function
+    | Maintained -> Linked (Term.with_dummy_pos free_id)
+    | Freed | Linked _ | Erased as s -> s in
   let rec aux_one ag_tail ty_id max_id ports i =
     if i = Array.length ports
     then List.map (fun (f,a,c) -> (f,ports,a,c)) (aux_ags max_id ag_tail)
@@ -325,22 +331,22 @@ let find_implicit_infos sigs contact_map ags =
      | L_TYPE (a,p,s) ->
 	List.map (fun (free_id,ports,ags,cor) ->
 		  let () =
-		    ports.(i) <- L_VAL (Term.with_dummy_pos free_id,s) in
-		  (succ free_id, ports, ags, (free_id,(a,p),new_switch s)::cor))
-		 (aux_one ag_tail ty_id max_id ports (succ i))
+		    ports.(i) <- L_VAL (Term.with_dummy_pos free_id,old_switch free_id s) in
+		  (succ free_id, ports, ags, (free_id,(a,p),new_switch free_id s)::cor))
+		 (aux_one ag_tail ty_id (max_s max_id s) ports (succ i))
      | L_SOME s ->
 	Tools.list_map_flatten
 	  (fun (free_id,ports,ags,cor) ->
 	   List.map (fun x ->
 		     let ports' = Array.copy ports in
 		     let () =
-		       ports'.(i) <- L_VAL (Term.with_dummy_pos free_id,s) in
-		     (succ free_id, ports', ags, (free_id,x,new_switch s)::cor))
+		       ports'.(i) <- L_VAL (Term.with_dummy_pos free_id,old_switch free_id s) in
+		     (succ free_id, ports', ags, (free_id,x,new_switch free_id s)::cor))
 		    (ports_from_contact_map sigs contact_map ty_id i))
-	  (aux_one ag_tail ty_id max_id ports (succ i))
-     | L_VAL ((j,_),_) ->
-	  aux_one ag_tail ty_id (max j max_id) ports (succ i)
-     | L_FREE _ -> aux_one ag_tail ty_id max_id ports (succ i)
+	  (aux_one ag_tail ty_id (max_s max_id s) ports (succ i))
+     | L_VAL ((j,_),s) ->
+	  aux_one ag_tail ty_id (max_s (max j max_id) s) ports (succ i)
+     | L_FREE s -> aux_one ag_tail ty_id (max_s max_id s) ports (succ i)
      | L_ANY Maintained -> aux_one ag_tail ty_id max_id ports (succ i)
      | L_ANY (Erased | Linked _ | Freed as s) ->
 	Tools.list_map_flatten
@@ -350,10 +356,10 @@ let find_implicit_infos sigs contact_map ags =
 	     List.map (fun x ->
 		       let ports' = Array.copy ports in
 		       let () =
-			 ports'.(i) <- L_VAL (Term.with_dummy_pos free_id,s) in
-		       (succ free_id, ports', ags, (free_id,x,new_switch s)::cor))
+			 ports'.(i) <- L_VAL (Term.with_dummy_pos free_id,old_switch free_id s) in
+		       (succ free_id, ports', ags, (free_id,x,new_switch free_id s)::cor))
 		      (ports_from_contact_map sigs contact_map ty_id i))
-	  (aux_one ag_tail ty_id max_id ports (succ i))
+	  (aux_one ag_tail ty_id (max_s max_id s) ports (succ i))
   and aux_ags max_id = function
     | [] -> [succ max_id,[],[]]
     | ag :: ag_tail ->
@@ -377,12 +383,8 @@ let complete_with_candidate ag id todo p_id p_switch =
        match port with
        | L_ANY s ->
 	  assert (s = Maintained);
-	  let s' =
-	    match p_switch with
-	      Maintained -> s
-	    | (Freed | Erased | Linked _) -> Freed in
 	  let ports' = Array.copy ag.ra_ports in
-	  let () = ports'.(i) <- L_VAL (Term.with_dummy_pos id,s') in
+	  let () = ports'.(i) <- L_VAL (Term.with_dummy_pos id,p_switch) in
 	  let side_effect_ports = Array.copy ag.ra_side_effect_ports in
 	  let () = side_effect_ports.(i) <- true in
 	  ({ ra_type = ag.ra_type; ra_ports = ports'; ra_ints = ag.ra_ints;
@@ -471,8 +473,9 @@ let define_full_transformation
       (cand::removed, (Primitives.Transformation.Freed(place,site)::added)),
       links_transf)
   | Maintained ->
-     let () = assert tested in
-     (Primitives.Compilation_info.add_site_tested_only place site compile_info,
+     ((if tested
+       then Primitives.Compilation_info.add_site_tested_only place site compile_info
+       else compile_info),
       transf,links_transf)
   | Erased ->
      (Primitives.Compilation_info.add_site_modified ~tested place site compile_info,
@@ -482,8 +485,9 @@ let define_full_transformation
        let dst' = IntMap.find i links_transf in
        let links_transf' = IntMap.remove i links_transf in
        if Some dst' = dst then
-	 let () = assert tested in
-	 (Primitives.Compilation_info.add_site_tested_only place site compile_info,
+	 ((if tested
+	   then Primitives.Compilation_info.add_site_tested_only place site compile_info
+	   else compile_info),
 	  transf,links_transf')
        else
 	 (Primitives.Compilation_info.add_site_modified ~tested place site compile_info,
@@ -537,8 +541,10 @@ let rec add_agents_in_cc id wk registered_links transf compile_info links_transf
 	   | I_ANY -> compile_info,(removed,added),wk
 	   | I_VAL_CHANGED (i,j) ->
 	      (if i = j then
-		 Primitives.Compilation_info.add_internal_state_tested_only
-		   place site_id compile_info
+		 if ag.ra_side_effect_ints.(site_id)
+		 then compile_info
+		 else Primitives.Compilation_info.add_internal_state_tested_only
+			place site_id compile_info
 	       else
 		 Primitives.Compilation_info.add_internal_state_modified
 		   ~tested:(not ag.ra_side_effect_ints.(site_id))
