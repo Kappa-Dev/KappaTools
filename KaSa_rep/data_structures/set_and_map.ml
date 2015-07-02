@@ -531,8 +531,8 @@ module Make(Ord:OrderedType) =
       match map with 
         | Empty_map -> rh,map'
         | Node_map (left2,key2,data2,right2,_) ->
-          let rh', left'  = remove_min_binding parameters rh left2 key2 data right2 in 
-          balance_map parameters rh' left' key2 data2 right2
+          let rh', left'  = remove_min_binding parameters rh left2 key2 data2 right2 in 
+          balance_map parameters rh' left' key data map'
             
     let merge_map parameters rh map1 map2 = 
       match map1 with 
