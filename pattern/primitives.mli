@@ -23,26 +23,43 @@ sig
   val print : ?sigs:Signature.s -> Format.formatter -> t -> unit
 end
 
-module Compilation_info :
+module Instantiation :
 sig
-  type t = {
-    sites_tested_unmodified : (Place.t * int) list;
-    sites_tested_modified : (Place.t * int) list;
-    sites_untested_modified : (Place.t * int) list;
-    internal_states_tested_unmodified : (Place.t * int) list;
-    internal_states_tested_modified : (Place.t * int) list;
-    internal_states_untested_modified : (Place.t * int) list;
-  }
+  type agent_name = int
+  type site_name = int
+  type internal_state  = int
 
-  val of_empty_rule : t
-  val add_site_tested_only : Place.t -> int -> t -> t
-  val add_site_modified : tested:bool -> Place.t -> int -> t -> t
-  val add_internal_state_tested_only : Place.t -> int -> t -> t
-  val add_internal_state_modified : tested:bool -> Place.t -> int -> t -> t
+  type binding_type = agent_name * site_name
 
-  val rename :
+  type abstract = Place.t
+  type concrete = int (*agent_id*) * agent_name
+
+  type 'a site = 'a * site_name
+
+  type 'a test =
+    | Is_Here of 'a
+    | Has_Internal of 'a site * internal_state
+    | Is_Free of 'a site
+    | Is_Bound of 'a site
+    | Has_Binding_type of 'a site * binding_type
+    | Is_Bound_to of 'a site * 'a site
+
+  type 'a action =
+    | Create of 'a * (site_name * internal_state option) list
+    | Mod_internal of 'a site * internal_state
+    | Bind of 'a site * 'a site
+    | Free of 'a site
+    | Remove of 'a
+
+  val rename_abstract_test :
     Connected_component.work -> int ->
-    Connected_component.cc -> Renaming.t -> t -> t
+    Connected_component.cc -> Renaming.t -> abstract test -> abstract test
+  val rename_abstract_action :
+    Connected_component.work -> int ->
+    Connected_component.cc -> Renaming.t -> abstract action -> abstract action
+  val abstract_action_of_transformation : Transformation.t -> abstract action
+  val concretize_test : (Place.t -> int) -> abstract test -> concrete test
+  val concretize_action : (Place.t -> int) -> abstract action -> concrete action
 end
 
 type elementary_rule = {
@@ -52,7 +69,9 @@ type elementary_rule = {
   inserted : Transformation.t list;
   consumed_tokens : (Alg_expr.t * int) list;
   injected_tokens : (Alg_expr.t * int) list;
-  infos : Compilation_info.t;
+  instantiations :
+    Instantiation.abstract Instantiation.test list *
+      Instantiation.abstract Instantiation.action list;
 }
 
 type modification =

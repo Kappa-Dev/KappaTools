@@ -20,8 +20,7 @@ type rule_agent =
     { ra_type: int;
       ra_ports: rule_link array;
       ra_ints: rule_internal array;
-      ra_side_effect_ports: bool array;
-      ra_side_effect_ints: bool array;
+      ra_syntax: (rule_link array * rule_internal array) option;
     }
 type rule_mixture = rule_agent list
 
@@ -104,12 +103,6 @@ let annotate_dropped_agent sigs ((agent_name, _ as ag_ty),intf) =
                (fun i ->
 		match Signature.default_internal_state ag_id i sigs with
 		| None -> I_ANY | Some _ -> I_ANY_ERASED) in
-  let side_effect_ports = Array.make arity false in
-  let side_effect_internals =
-    Array.init arity
-	       (fun i ->
-		match Signature.default_internal_state ag_id i sigs with
-		| None -> false | Some _ -> true) in
   let () =
     List.iter
       (fun p ->
@@ -118,13 +111,11 @@ let annotate_dropped_agent sigs ((agent_name, _ as ag_ty),intf) =
        let () = match p.Ast.port_int with
 	 | [] -> ()
 	 | [ va ] ->
-	    side_effect_internals.(p_id) <- false;
 	    internals.(p_id) <-
 	      I_VAL_ERASED (Signature.num_of_internal_state p_id va sign)
 	 | _ :: (_, pos) :: _ -> several_internal_states pos in
        match p.Ast.port_lnk with
-       | (Ast.LNK_ANY, _) ->
-	  side_effect_ports.(p_id) <- true; ports.(p_id) <- L_ANY Erased
+       | (Ast.LNK_ANY, _) -> ports.(p_id) <- L_ANY Erased
        | (Ast.LNK_SOME, _) -> ports.(p_id) <- L_SOME Erased
        | (Ast.LNK_TYPE (dst_p, dst_ty),_) ->
 	  ports.(p_id) <- build_l_type sigs dst_ty dst_p Erased
@@ -132,8 +123,7 @@ let annotate_dropped_agent sigs ((agent_name, _ as ag_ty),intf) =
        | (Ast.FREE, _) -> ports.(p_id) <- L_FREE Erased
       ) intf in
   { ra_type = ag_id; ra_ports = ports; ra_ints = internals;
-    ra_side_effect_ports = side_effect_ports;
-    ra_side_effect_ints = side_effect_internals;}
+    ra_syntax = Some (ports, internals);}
 
 let annotate_created_agent id sigs ((agent_name, _ as ag_ty),intf) =
   let ag_id = Signature.num_of_agent ag_ty sigs in
@@ -173,8 +163,6 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
     Array.init
       arity (fun i -> if i = 0 then L_FREE Maintained else L_ANY Maintained) in
   let internals = Array.make arity I_ANY in
-  let side_effect_ports = Array.make arity false in
-  let side_effect_internals = Array.make arity false in
   let register_port_modif p_id lnk1 p' =
     match lnk1,p'.Ast.port_lnk with
     | (Ast.LNK_ANY,_), (Ast.LNK_ANY,_) -> ()
@@ -185,8 +173,7 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
        ports.(p_id) <- build_l_type sigs dst_ty dst_p Maintained
     | _, (Ast.LNK_ANY,_ | Ast.LNK_SOME,_ | Ast.LNK_TYPE _,_) ->
        too_much_or_not_enough false agent_name p'.Ast.port_nme
-    | (Ast.LNK_ANY,_), (Ast.FREE,_) ->
-       side_effect_ports.(p_id) <- true; ports.(p_id) <- L_ANY Freed
+    | (Ast.LNK_ANY,_), (Ast.FREE,_) -> ports.(p_id) <- L_ANY Freed
     | (Ast.LNK_SOME,_), (Ast.FREE,_) -> ports.(p_id) <- L_SOME Freed
     | (Ast.LNK_TYPE (dst_p,dst_ty),_), (Ast.FREE,_) ->
        ports.(p_id) <- build_l_type sigs dst_ty dst_p Freed
@@ -194,7 +181,7 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
     | (Ast.LNK_VALUE i,pos), (Ast.FREE,_) ->
        ports.(p_id) <- L_VAL ((i,pos),Freed)
     | (Ast.LNK_ANY,_), (Ast.LNK_VALUE i,pos) ->
-       side_effect_ports.(p_id) <- true; ports.(p_id) <- L_ANY (Linked (i,pos))
+       ports.(p_id) <- L_ANY (Linked (i,pos))
     | (Ast.LNK_SOME,_), (Ast.LNK_VALUE i,pos) ->
        ports.(p_id) <- L_SOME (Linked (i,pos))
     | (Ast.LNK_TYPE (dst_p,dst_ty),_), (Ast.LNK_VALUE i,pos) ->
@@ -211,7 +198,6 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
 	 I_VAL_CHANGED (Signature.num_of_internal_state p_id va sign,
 			Signature.num_of_internal_state p_id va' sign)
     | [], [ va ] ->
-       side_effect_internals.(p_id) <- true;
        internals.(p_id) <-
 	 I_ANY_CHANGED (Signature.num_of_internal_state p_id va sign)
     | [ _ ], [] ->
@@ -245,8 +231,7 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
        let () = register_internal_modif p_id [] p in
        register_port_modif p_id (Term.with_dummy_pos Ast.LNK_ANY) p) rp_r in
   { ra_type = ag_id; ra_ports = ports; ra_ints = internals;
-    ra_side_effect_ports = side_effect_ports;
-    ra_side_effect_ints = side_effect_internals;}
+    ra_syntax = Some (ports, internals);}
 
 let rec annotate_lhs_with_diff sigs acc lhs rhs =
   match lhs,rhs with
@@ -368,8 +353,7 @@ let find_implicit_infos sigs contact_map ags =
 	  List.map (fun ints ->
 		    (free_id,
 		     {ra_type = ag.ra_type; ra_ports = ports; ra_ints = ints;
-		      ra_side_effect_ports = ag.ra_side_effect_ports;
-		      ra_side_effect_ints = ag.ra_side_effect_ints}::ags,
+		      ra_syntax = ag.ra_syntax}::ags,
 		     cor))
 		   (aux_internals ag.ra_type ag.ra_ints [ag.ra_ints] 0)
 	 )
@@ -385,11 +369,8 @@ let complete_with_candidate ag id todo p_id p_switch =
 	  assert (s = Maintained);
 	  let ports' = Array.copy ag.ra_ports in
 	  let () = ports'.(i) <- L_VAL (Term.with_dummy_pos id,p_switch) in
-	  let side_effect_ports = Array.copy ag.ra_side_effect_ports in
-	  let () = side_effect_ports.(i) <- true in
 	  ({ ra_type = ag.ra_type; ra_ports = ports'; ra_ints = ag.ra_ints;
-	     ra_side_effect_ports = side_effect_ports;
-	     ra_side_effect_ints = ag.ra_side_effect_ints}, todo)
+	     ra_syntax = ag.ra_syntax;}, todo)
 	  :: acc
        | L_VAL ((k,_),s) when k > id ->
 	  begin
@@ -401,8 +382,7 @@ let complete_with_candidate ag id todo p_id p_switch =
 	       let ports' = Array.copy ag.ra_ports in
 	       let () = ports'.(i) <- L_VAL (Term.with_dummy_pos id,s) in
 	       ({ ra_type = ag.ra_type; ra_ports = ports'; ra_ints = ag.ra_ints;
-		  ra_side_effect_ports = ag.ra_side_effect_ports;
-		  ra_side_effect_ints = ag.ra_side_effect_ints},
+		  ra_syntax = ag.ra_syntax;},
 		todo') :: acc
 	    |_ -> acc
 	  end
@@ -415,13 +395,9 @@ let new_agent_with_one_link sigs ty_id port link switch =
     Array.init
       arity (fun i -> if i = 0 then L_FREE Maintained else L_ANY Maintained) in
   let internals = Array.make arity I_ANY in
-  let side_effect_ports = Array.make arity false in
-  let side_effect_internals = Array.make arity false in
   let () = ports.(port) <- L_VAL (Term.with_dummy_pos link,switch) in
-  let () = side_effect_ports.(port) <- true in
   { ra_type = ty_id; ra_ports = ports; ra_ints = internals;
-    ra_side_effect_ports = side_effect_ports;
-    ra_side_effect_ints = side_effect_internals;}
+    ra_syntax = None;}
 
 let rec add_one_implicit_info sigs id ((ty_id,port),s as info) todo = function
   | [] -> [[new_agent_with_one_link sigs ty_id port id s],todo]
@@ -457,7 +433,7 @@ let dangling_link side key =
 				   " is dangling on the " ^side)))
 
 let define_full_transformation
-      (removed,added as transf) links_transf compile_info tested
+      (removed,added as transf) links_transf
       place site dst switch =
   let cand = match dst with
     | None -> Primitives.Transformation.Freed (place,site)
@@ -469,95 +445,108 @@ let define_full_transformation
 	 Primitives.Transformation.Linked (dst,(place,site)) :: l in
   match switch with
   | Freed ->
-     (Primitives.Compilation_info.add_site_modified ~tested place site compile_info,
-      (cand::removed, (Primitives.Transformation.Freed(place,site)::added)),
+     ((cand::removed, (Primitives.Transformation.Freed(place,site)::added)),
       links_transf)
   | Maintained ->
-     ((if tested
-       then Primitives.Compilation_info.add_site_tested_only place site compile_info
-       else compile_info),
-      transf,links_transf)
+     (transf,links_transf)
   | Erased ->
-     (Primitives.Compilation_info.add_site_modified ~tested place site compile_info,
-      (cand::removed,added),links_transf)
+     ((cand::removed,added),links_transf)
   | Linked (i,_) ->
      try
        let dst' = IntMap.find i links_transf in
        let links_transf' = IntMap.remove i links_transf in
        if Some dst' = dst then
-	 ((if tested
-	   then Primitives.Compilation_info.add_site_tested_only place site compile_info
-	   else compile_info),
-	  transf,links_transf')
+	 (transf,links_transf')
        else
-	 (Primitives.Compilation_info.add_site_modified ~tested place site compile_info,
-	  (cands removed,
+	 ((cands removed,
 	   Primitives.Transformation.Linked((place,site),dst')::added),
 	  links_transf')
      with Not_found ->
        let links_transf' = IntMap.add i ((place,site)) links_transf in
-       (Primitives.Compilation_info.add_site_modified ~tested place site compile_info,
-	(cands removed,added),links_transf')
+       ((cands removed,added),links_transf')
 
 let define_positive_transformation (removed,added as transf) links_transf
-				   compile_info tested place site switch =
+				   place site switch =
   match switch with
   | Freed ->
-     (Primitives.Compilation_info.add_site_modified ~tested place site compile_info,
-      (removed,Primitives.Transformation.Freed (place,site)::added),links_transf)
+     ((removed,Primitives.Transformation.Freed (place,site)::added),links_transf)
   | Erased ->
-     (Primitives.Compilation_info.add_site_modified ~tested place site compile_info,
-      transf,links_transf)
+     (transf,links_transf)
   | Maintained -> assert false
   | Linked (i,_) ->
      try
        let dst' = IntMap.find i links_transf in
        let links_transf' = IntMap.remove i links_transf in
-       (Primitives.Compilation_info.add_site_modified ~tested place site compile_info,
-	(removed,
+       ((removed,
 	 Primitives.Transformation.Linked((place,site),dst')::added),
 	links_transf')
      with Not_found ->
        let links_transf' = IntMap.add i ((place,site)) links_transf in
-       (Primitives.Compilation_info.add_site_modified ~tested place site compile_info,
-	transf,links_transf')
+       (transf,links_transf')
+
+let make_instantiation place links acc = function
+  | None -> acc,None
+  | Some (ports, ints) ->
+     let rec aux site_id acc links =
+       if site_id < 0
+       then Primitives.Instantiation.Is_Here place :: acc
+       else
+	 let test =
+	   match ints.(site_id) with
+	   | (I_ANY | I_ANY_ERASED | I_ANY_CHANGED _) -> acc
+	   | (I_VAL_CHANGED (i,_) | I_VAL_ERASED i) ->
+	      Primitives.Instantiation.Has_Internal ((place,site_id),i) :: acc
+	 in
+	 let test',links' =
+	   match ports.(site_id) with
+	   | L_ANY _ -> test,links
+	   | L_FREE _ ->
+	      Primitives.Instantiation.Is_Free (place,site_id) :: test,links
+	   | L_SOME _ ->
+	      Primitives.Instantiation.Is_Bound (place,site_id) :: test,links
+	   | L_TYPE (a,b,_) ->
+	      Primitives.Instantiation.Has_Binding_type ((place,site_id),(a,b))
+	      :: test,links
+	   | L_VAL ((i,_),_) ->
+	      try IntMap.find i links :: test, IntMap.remove i links
+	      with Not_found -> test, links in
+	 aux (pred site_id) test' links' in
+     (aux (pred (Array.length ports)) acc links,
+      match ports.(0) with
+      | L_FREE Erased -> Some place
+      | L_FREE (Maintained | Linked _ | Freed)
+      | L_ANY _ | L_SOME _ | L_TYPE _ | L_VAL _ -> None)
 
 
-let rec add_agents_in_cc id wk registered_links transf compile_info links_transf remains =
+let rec add_agents_in_cc id wk registered_links transf links_transf
+			 instantiations remains =
   function
   | [] ->
      begin match IntMap.root registered_links with
-	   | None -> (wk,transf,compile_info,links_transf,remains)
+	   | None -> (wk,transf,links_transf,instantiations,remains)
 	   | Some (key,_) -> dangling_link "left" key
      end
   | ag :: ag_l ->
      let (node,wk) = Connected_component.new_node wk ag.ra_type in
      let place = Primitives.Place.Existing (node,id) in
-     let rec handle_ports wk r_l (removed,added) compile_info l_t re acc site_id =
+     let rec handle_ports wk r_l c_l (removed,added) l_t re acc site_id =
        if site_id = Array.length ag.ra_ports
-       then add_agents_in_cc id wk r_l (removed,added) compile_info l_t re acc
+       then
+	 let tests,actions = instantiations in
+	 let tests',delete = make_instantiation place c_l tests ag.ra_syntax in
+	 let actions' = match delete with
+	     None -> actions
+	   | Some p -> Primitives.Instantiation.Remove p :: actions in
+	 add_agents_in_cc id wk r_l (removed,added) l_t (tests',actions') re acc
        else
-	 let compile_info',transf,wk' = match ag.ra_ints.(site_id) with
-	   | I_ANY -> compile_info,(removed,added),wk
+	 let transf,wk' = match ag.ra_ints.(site_id) with
+	   | I_ANY -> (removed,added),wk
 	   | I_VAL_CHANGED (i,j) ->
-	      (if i = j then
-		 if ag.ra_side_effect_ints.(site_id)
-		 then compile_info
-		 else Primitives.Compilation_info.add_internal_state_tested_only
-			place site_id compile_info
-	       else
-		 Primitives.Compilation_info.add_internal_state_modified
-		   ~tested:(not ag.ra_side_effect_ints.(site_id))
-		   place site_id compile_info
-	      ),
 	      (if i = j then (removed,added)
 	       else Primitives.Transformation.Internalized (place,site_id,i)::removed,
 		    Primitives.Transformation.Internalized (place,site_id,j)::added),
 		Connected_component.new_internal_state wk (node,site_id) i
 	   | I_VAL_ERASED i ->
-	      (Primitives.Compilation_info.add_internal_state_modified
-		 ~tested:(not ag.ra_side_effect_ints.(site_id))
-		 place site_id compile_info),
 	      (Primitives.Transformation.Internalized (place,site_id,i)::removed,added),
 	      Connected_component.new_internal_state wk (node,site_id) i
 	   | (I_ANY_ERASED | I_ANY_CHANGED _) ->
@@ -565,18 +554,16 @@ let rec add_agents_in_cc id wk registered_links transf compile_info links_transf
 		       (Term.with_dummy_pos
 			  "Try to create the connected components of an ambiguous mixture."))
 	 in
-	 let tested = not ag.ra_side_effect_ports.(site_id) in
 	 match ag.ra_ports.(site_id) with
 	 | L_ANY Maintained ->
-	    handle_ports wk' r_l transf compile_info' l_t re acc (succ site_id)
+	    handle_ports wk' r_l c_l transf l_t re acc (succ site_id)
 	 | L_FREE s ->
 	    let wk'' = if site_id = 0 then wk'
 		       else Connected_component.new_free wk' (node,site_id) in
-	    let compile_info'',transf',l_t' =
-	      define_full_transformation
-		transf l_t compile_info' tested place site_id None s in
+	    let transf',l_t' =
+	      define_full_transformation transf l_t place site_id None s in
 	    handle_ports
-	      wk'' r_l transf' compile_info'' l_t' re acc (succ site_id)
+	      wk'' r_l c_l transf' l_t' re acc (succ site_id)
 	 | (L_SOME _ | L_TYPE _ | L_ANY ( Erased | Linked _ | Freed))->
 	    raise (ExceptionDefn.Internal_Error
 		     (Term.with_dummy_pos
@@ -586,10 +573,14 @@ let rec add_agents_in_cc id wk registered_links transf compile_info links_transf
 	      let (node',site' as dst) = IntMap.find i r_l in
 	      let dst_place = Primitives.Place.Existing (node',id),site' in
 	      let wk'' = Connected_component.new_link wk' (node,site_id) dst in
-	      let compile_info'',transf',l_t' =
+	      let c_l' =
+		IntMap.add
+		  i (Primitives.Instantiation.Is_Bound_to ((place,site_id),dst_place))
+		  c_l in
+	      let transf',l_t' =
 		define_full_transformation
-		  transf l_t compile_info' tested place site_id (Some dst_place) s in
-	      handle_ports wk'' (IntMap.remove i r_l) transf' compile_info''
+		  transf l_t place site_id (Some dst_place) s in
+	      handle_ports wk'' (IntMap.remove i r_l) c_l' transf'
 			   l_t' re acc (succ site_id)
 	    with Not_found ->
 		 match Tools.array_filter (is_linked_on_port site_id i) ag.ra_ports with
@@ -601,105 +592,119 @@ let rec add_agents_in_cc id wk registered_links transf compile_info links_transf
 			Connected_component.new_link
 			  wk' (node,site_id) (node,site_id')
 		      else wk' in
-		    let compile_info'',transf',l_t' =
+		    let transf',l_t' =
 		      define_full_transformation
-			transf l_t compile_info' tested place site_id (Some (place,site_id')) s in
-		    let compile_info''',transf'',l_t'' =
+			transf l_t place site_id (Some (place,site_id')) s in
+		    let transf'',l_t'' =
 		      define_full_transformation
-			transf' l_t' compile_info''
-			ag.ra_side_effect_ports.(site_id')
-			place site_id' (Some (place,site_id)) s in
+			transf' l_t' place site_id' (Some (place,site_id)) s in
+		    let c_l' =
+		      IntMap.add
+			i (Primitives.Instantiation.Is_Bound_to ((place,site_id),(place,site_id')))
+			c_l in
 		    handle_ports
-		      wk'' r_l transf'' compile_info''' l_t'' re acc (succ site_id)
+		      wk'' r_l c_l' transf'' l_t'' re acc (succ site_id)
 		 | _ :: _ ->
 		    raise (ExceptionDefn.Malformed_Decl
 			     ("There are more than two sites using link "^
 				string_of_int i,pos))
 		 | [] -> (* link between 2 agents *)
 		    let r_l' = IntMap.add i (node,site_id) r_l in
-		    let compile_info'',transf',l_t' =
+		    let transf',l_t' =
 		      define_positive_transformation
-			transf l_t compile_info' tested place site_id s in
+			transf l_t place site_id s in
 		    match List.partition (is_linked_on i) re with
 		    | [], re'
 			 when Tools.list_exists_uniq (is_linked_on i) acc ->
-		       handle_ports wk' r_l' transf' compile_info'' l_t' re' acc (succ site_id)
+		       handle_ports wk' r_l' c_l transf' l_t' re' acc (succ site_id)
 		    | [n], re' when List.for_all
 				      (fun x -> not(is_linked_on i x)) acc ->
-		       handle_ports wk' r_l' transf' compile_info'' l_t' re' (n::acc) (succ site_id)
+		       handle_ports wk' r_l' c_l transf' l_t' re' (n::acc) (succ site_id)
 		    | _, _ ->
 		       raise (ExceptionDefn.Malformed_Decl
 				("There are more than two agents using link "^
 				   string_of_int i,pos))
-     in handle_ports wk registered_links transf compile_info
-		     links_transf remains ag_l 0
+     in handle_ports wk registered_links IntMap.empty transf links_transf remains ag_l 0
 
-let rec complete_with_creation (removed,added) links_transf compile_info fresh =
+let rec complete_with_creation (removed,added) links_transf actions fresh =
   function
   | [] ->
      begin match IntMap.root links_transf with
-	   | None -> compile_info,(List.rev removed, List.rev added)
+	   | None -> actions,(List.rev removed, List.rev added)
 	   | Some (i,_) -> dangling_link "right" i
      end
   | ag :: ag_l ->
      let place = Primitives.Place.Fresh (ag.Raw_mixture.a_type,fresh) in
-     let rec handle_ports added l_t compile_info site_id =
+     let rec handle_ports added l_t actions site_id =
        if site_id = Array.length ag.Raw_mixture.a_ports then
-	 complete_with_creation (removed,added) l_t compile_info (succ fresh) ag_l
+	 let actions' = Primitives.Instantiation.Create (place,[]) :: actions in
+	 complete_with_creation (removed,added) l_t actions' (succ fresh) ag_l
        else
-	 let compile_info',added' =
+	 let added' =
 	   match ag.Raw_mixture.a_ints.(site_id) with
-	   | None -> compile_info,added
+	   | None -> added
 	   | Some i ->
-	      Primitives.Compilation_info.add_internal_state_modified
-		~tested:false place site_id compile_info,
 	      Primitives.Transformation.Internalized (place,site_id,i)::added in
-	 let added'',l_t' =
+	 let added'',actions',l_t' =
 	   match ag.Raw_mixture.a_ports.(site_id) with
 	   | Raw_mixture.FREE ->
-	      Primitives.Transformation.Freed (place,site_id)::added',l_t
+	      Primitives.Transformation.Freed (place,site_id)::added',actions,
+	      l_t
 	   | Raw_mixture.VAL i ->
 	      try
 		let dst = IntMap.find i l_t in
 		let l_t' = IntMap.remove i l_t in
 		Primitives.Transformation.Linked((place,site_id),dst)::added',
+		(Primitives.Instantiation.Bind((place,site_id),dst)::actions),
 		l_t'
 	      with Not_found ->
 		let l_t' = IntMap.add i ((place,site_id)) l_t in
-		(added',l_t') in
-	 let compile_info'' =
-	   Primitives.Compilation_info.add_site_modified
-	     ~tested:false place site_id compile_info' in
-	 handle_ports added'' l_t' compile_info'' (succ site_id) in
-     handle_ports added links_transf compile_info 0
+		(added',actions,l_t') in
+	 handle_ports added'' l_t' actions' (succ site_id) in
+     handle_ports added links_transf actions 0
 
 let connected_components_of_mixture created env mix =
-  let rec aux env transformations compile_info links_transf acc id = function
+  let rec aux env transformations instantiations links_transf acc id = function
     | [] ->
        let removed,added = transformations in
+       let tests,del_actions = instantiations in
+       let actions =
+	 List.map Primitives.Instantiation.abstract_action_of_transformation
+		  added in
        let transformations' = (List.rev removed, List.rev added) in
-       let compile_info',transformations'' =
+       let actions',transformations'' =
 	 complete_with_creation
-	   transformations' links_transf compile_info 0 created in
-       (env,(Tools.array_rev_of_list acc,compile_info',transformations''))
+	   transformations' links_transf actions 0 created in
+       (env,(Tools.array_rev_of_list acc,
+	     (tests,List.rev_append del_actions actions'),
+	     transformations''))
     | h :: t ->
        let wk = Connected_component.begin_new env in
-       let (wk_out,(removed,added),compile_info',l_t,remains) =
+       let (wk_out,(removed,added),l_t,(tests,actions),remains) =
 	 add_agents_in_cc id wk IntMap.empty transformations
-			  compile_info links_transf t [h] in
+			  links_transf instantiations t [h] in
      let (env',inj, cc) = Connected_component.finish_new wk_out in
      let added' =
-       List.map (Primitives.Transformation.rename wk_out id cc inj) added in
+       Tools.list_smart_map
+	 (Primitives.Transformation.rename wk_out id cc inj) added in
      let removed' =
-       List.map (Primitives.Transformation.rename wk_out id cc inj) removed in
+       Tools.list_smart_map
+	 (Primitives.Transformation.rename wk_out id cc inj) removed in
+     let tests' =
+       Tools.list_smart_map
+	 (Primitives.Instantiation.rename_abstract_test wk_out id cc inj)
+	 tests in
+     let actions' =
+       Tools.list_smart_map
+	 (Primitives.Instantiation.rename_abstract_action wk_out id cc inj)
+	 actions in
      let l_t' = IntMap.map
 		  (fun (p,s as x) ->
 		   let p' = Primitives.Place.rename wk id cc inj p in
 		   if p == p' then x else (p',s)) l_t in
-     let compile_info'' =
-       Primitives.Compilation_info.rename wk id cc inj compile_info' in
-     aux env' (removed',added') compile_info'' l_t' (cc::acc) (succ id) remains
-  in aux env ([],[]) Primitives.Compilation_info.of_empty_rule
+     aux env' (removed',added') (tests',actions')
+	 l_t' (cc::acc) (succ id) remains
+  in aux env ([],[]) ([],[])
 	 IntMap.empty [] 0 mix
 
 let rule_mixtures_of_ambiguous_rule contact_map sigs lhs rhs =

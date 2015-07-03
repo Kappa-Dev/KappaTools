@@ -82,43 +82,26 @@ let deal_transformation is_add domain inj2graph edges roots transf = (*transf: a
        update_roots is_add r' cc root) roots obs in
   ((inj,graph,roots'),obs)
 
-let quark_list_from_event inj2graph ci =
-  let elem (p,s) = (let (_,x,_) = (from_place inj2graph p) in x,s) in
-  let tsites =
-    List.map elem ci.Primitives.Compilation_info.sites_tested_unmodified in
-  let msites =
-    List.map elem ci.Primitives.Compilation_info.sites_untested_modified in
-  let tsites',msites' =
-    List.fold_right
-      (fun e (t,m) -> let o = elem e in o::t,o::m)
-      ci.Primitives.Compilation_info.sites_tested_modified (tsites,msites) in
-  let tints =
-    List.map
-      elem ci.Primitives.Compilation_info.internal_states_tested_unmodified in
-  let mints =
-    List.map
-      elem ci.Primitives.Compilation_info.internal_states_untested_modified in
-  let tints',mints' =
-    List.fold_right
-      (fun e (t,m) -> let o = elem e in o::t,o::m)
-      ci.Primitives.Compilation_info.internal_states_tested_modified
-      (tints,mints) in
-  { Causal.site_tested = tsites';
-    Causal.site_modified = msites';
-    Causal.internal_state_tested = tints';
-    Causal.internal_state_modified = mints'; }
+let instantiation_from_event inj2graph (tests,actions) =
+  (List.map
+     (Primitives.Instantiation.concretize_test
+	(fun p -> let (_,x,_) = from_place inj2graph p in x)) tests,
+   List.map
+     (Primitives.Instantiation.concretize_action
+	(fun p -> let (_,x,_) = from_place inj2graph p in x)) actions
+  )
 
 let store_event
       event_number (*NB event counter*) inj2graph new_tracked_obs_instances
       edges rule = function
   | None as x -> x
   | Some x ->
-     let quarks_obs =
+(*     let quarks_obs =
        List.map
 	 (Connected_component.Matching.quark_lists_of_cc_instance edges)
 	 new_tracked_obs_instances in
      let quark_event =
-        quark_list_from_event inj2graph rule.Primitives.infos in
+        quark_list_from_event inj2graph rule.Primitives.instantiations in*)
      Some x
 (*Compression_main.store rule final_inj2graph counter quarks_obs quark_event*)
 

@@ -44,7 +44,7 @@ let rules_of_ast algs tokens contact_map domain
       Expr.compile_alg algs tokens contact_map domain rate in
     let count = let x = ref 0 in fun (lab,pos) ->
 				 incr x; (lab^"__"^string_of_int !x,pos) in
-    let build (ccs,compile_info,(neg,pos)) =
+    let build (ccs,syntax,(neg,pos)) =
       {
 	Primitives.rate = crate;
 	Primitives.connected_components = ccs;
@@ -52,7 +52,7 @@ let rules_of_ast algs tokens contact_map domain
 	Primitives.inserted = pos;
 	Primitives.consumed_tokens = rm;
 	Primitives.injected_tokens = add;
-	Primitives.infos = compile_info;
+	Primitives.instantiations = syntax;
       } in
     let domain'',rule_mixtures =
       Snip.connected_components_sum_of_ambiguous_rule

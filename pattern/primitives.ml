@@ -39,6 +39,10 @@ module Place =
 	 | None -> Format.pp_print_int f id
 	 | Some sigs ->
 	    Signature.print_site_internal_state sigs ty site f (Some id)
+
+    let get_type = function
+      | Existing (n,_) -> Connected_component.ContentAgent.get_sort n
+      | Fresh (i,_) -> i
   end
 
 module Transformation =
@@ -76,105 +80,97 @@ module Transformation =
 	   (Place.print_internal ?sigs p s) i
   end
 
-module Compilation_info =
+module Instantiation =
   struct
-    type t = {
-      sites_tested_unmodified : (Place.t * int) list;
-      sites_tested_modified : (Place.t * int) list;
-      sites_untested_modified : (Place.t * int) list;
-      internal_states_tested_unmodified : (Place.t * int) list;
-      internal_states_tested_modified : (Place.t * int) list;
-      internal_states_untested_modified : (Place.t * int) list;
-    }
+    type agent_name = int
+    type site_name = int
+    type internal_state  = int
 
-    let of_empty_rule =
-      {
-	sites_tested_unmodified = [];
-	sites_tested_modified = [];
-	sites_untested_modified = [];
-	internal_states_tested_unmodified = [];
-	internal_states_tested_modified = [];
-	internal_states_untested_modified = [];
-      }
+    type binding_type = agent_name * site_name
 
-    let rename_place wk id cc inj (pl,i as x) =
-      let aux = Place.rename wk id cc inj pl in
-      if aux == pl then x else (aux,i)
+    type abstract = Place.t
+    type concrete = int (*agent_id*) * agent_name
 
-    let add_site_tested_only p i info =
-      {
-	sites_tested_unmodified = (p,i)::info.sites_tested_unmodified;
-	sites_tested_modified = info.sites_tested_modified;
-	sites_untested_modified = info.sites_untested_modified;
-	internal_states_tested_unmodified =
-	  info.internal_states_tested_unmodified;
-	internal_states_tested_modified = info.internal_states_tested_modified;
-	internal_states_untested_modified =
-	  info.internal_states_untested_modified;
-      }
-    let add_site_modified ~tested p i info =
-      {
-	sites_tested_unmodified = info.sites_tested_unmodified;
-	sites_tested_modified =
-	  if tested then (p,i)::info.sites_tested_modified
-	  else info.sites_tested_modified;
-	sites_untested_modified =
-	  if tested then info.sites_untested_modified
-	  else (p,i)::info.sites_untested_modified;
-	internal_states_tested_unmodified =
-	  info.internal_states_tested_unmodified;
-	internal_states_tested_modified = info.internal_states_tested_modified;
-	internal_states_untested_modified =
-	  info.internal_states_untested_modified;
-      }
-    let add_internal_state_tested_only p i info =
-      {
-	sites_tested_unmodified = info.sites_tested_unmodified;
-	sites_tested_modified = info.sites_tested_modified;
-	sites_untested_modified = info.sites_untested_modified;
-	internal_states_tested_unmodified =
-	  (p,i)::info.internal_states_tested_unmodified;
-	internal_states_tested_modified = info.internal_states_tested_modified;
-	internal_states_untested_modified =
-	  info.internal_states_untested_modified;
-      }
-    let add_internal_state_modified ~tested p i info =
-      {
-	sites_tested_unmodified = info.sites_tested_unmodified;
-	sites_tested_modified = info.sites_tested_modified;
-	sites_untested_modified = info.sites_untested_modified;
-	internal_states_tested_unmodified =
-	  info.internal_states_tested_unmodified;
-	internal_states_tested_modified =
-	  if tested then (p,i)::info.internal_states_tested_modified
-	  else info.internal_states_tested_modified;
-	internal_states_untested_modified =
-	  if tested then info.internal_states_untested_modified
-	  else (p,i)::info.internal_states_untested_modified;
-      }
+    type 'a site = 'a * site_name
 
-    let rename wk id cc inj info =
-      {
-	sites_tested_unmodified =
-	  Tools.list_smart_map
-	    (rename_place wk id cc inj) info.sites_tested_unmodified;
-	sites_tested_modified =
-	  Tools.list_smart_map
-	    (rename_place wk id cc inj) info.sites_tested_modified;
-	sites_untested_modified =
-	  Tools.list_smart_map
-	    (rename_place wk id cc inj) info.sites_untested_modified;
-	internal_states_tested_unmodified =
-	  Tools.list_smart_map
-	    (rename_place wk id cc inj) info.internal_states_tested_unmodified;
-	internal_states_tested_modified =
-	  Tools.list_smart_map
-	    (rename_place wk id cc inj) info.internal_states_tested_modified;
-	internal_states_untested_modified =
-	  Tools.list_smart_map
-	    (rename_place wk id cc inj) info.internal_states_untested_modified;
-      }
-  end
+    type 'a test =
+      | Is_Here of 'a
+      | Has_Internal of 'a site * internal_state
+      | Is_Free of 'a site
+      | Is_Bound of 'a site
+      | Has_Binding_type of 'a site * binding_type
+      | Is_Bound_to of 'a site * 'a site
+
+    type 'a action =
+      | Create of 'a * (site_name * internal_state option) list
+      | Mod_internal of 'a site * internal_state
+      | Bind of 'a site * 'a site
+      | Free of 'a site
+      | Remove of 'a
+
+    let rename_abstract_test wk id cc inj = function
+      | Is_Here pl as x ->
+	 let aux = Place.rename wk id cc inj pl in
+	 if aux == pl then x else Is_Here aux
+      | Has_Internal ((pl,s),i) as x ->
+	 let aux = Place.rename wk id cc inj pl in
+	 if aux == pl then x else Has_Internal ((aux,s),i)
+      | Is_Free (pl,s) as x ->
+	 let aux = Place.rename wk id cc inj pl in
+	 if aux == pl then x else Is_Free (aux,s)
+      | Is_Bound (pl,s) as x ->
+	 let aux = Place.rename wk id cc inj pl in
+	 if aux == pl then x else Is_Bound (aux,s)
+      | Has_Binding_type ((pl,s),t) as x ->
+	 let aux = Place.rename wk id cc inj pl in
+	 if aux == pl then x else Has_Binding_type ((aux,s),t)
+      | Is_Bound_to ((pl,s),(pl',s')) as x ->
+	 let aux = Place.rename wk id cc inj pl in
+	 let aux' = Place.rename wk id cc inj pl' in
+	 if aux == pl && aux' == pl' then x else Is_Bound_to ((aux,s),(aux',s'))
+
+    let rename_abstract_action wk id cc inj = function
+      | Create (pl,i) as x ->
+	 let aux = Place.rename wk id cc inj pl in
+	 if aux == pl then x else Create (aux,i)
+      | Mod_internal ((pl,s),i) as x ->
+	 let aux = Place.rename wk id cc inj pl in
+	 if aux == pl then x else Mod_internal ((aux,s),i)
+      | Bind ((pl,s),(pl',s')) as x ->
+	 let aux = Place.rename wk id cc inj pl in
+	 let aux' = Place.rename wk id cc inj pl' in
+	 if aux == pl && aux' == pl' then x else Bind ((aux,s),(aux',s'))
+      | Free (pl,s) as x ->
+	 let aux = Place.rename wk id cc inj pl in
+	 if aux == pl then x else Free (aux,s)
+      | Remove pl as x ->
+	 let aux = Place.rename wk id cc inj pl in
+	 if aux == pl then x else Remove aux
+
+    let concretize_test f = function
+      | Is_Here pl -> Is_Here (f pl,Place.get_type pl)
+      | Has_Internal ((pl,s),i) -> Has_Internal(((f pl,Place.get_type pl),s),i)
+      | Is_Free (pl,s) -> Is_Free ((f pl,Place.get_type pl),s)
+      | Is_Bound (pl,s) -> Is_Bound ((f pl,Place.get_type pl),s)
+      | Has_Binding_type ((pl,s),t) ->
+	 Has_Binding_type (((f pl,Place.get_type pl),s),t)
+      | Is_Bound_to ((pl,s),(pl',s')) ->
+	 Is_Bound_to (((f pl,Place.get_type pl),s),
+		      ((f pl',Place.get_type pl'),s'))
+
+    let concretize_action f = function
+      | Create (pl,i) -> Create ((f pl,Place.get_type pl),i)
+      | Mod_internal ((pl,s),i) -> Mod_internal (((f pl,Place.get_type pl),s),i)
+      | Bind ((pl,s),(pl',s')) ->
+	 Bind (((f pl,Place.get_type pl),s),((f pl',Place.get_type pl'),s'))
+      | Free (pl,s) -> Free ((f pl,Place.get_type pl),s)
+      | Remove pl -> Remove (f pl,Place.get_type pl)
+
+    let abstract_action_of_transformation = function
+      | Transformation.Freed (pl,s) -> Free (pl,s)
+      | Transformation.Linked (x,y) -> Bind (x,y)
+      | Transformation.Internalized (p,s,i) -> Mod_internal ((p,s),i)
+end
 
 type elementary_rule = {
   rate : Alg_expr.t;
@@ -183,7 +179,9 @@ type elementary_rule = {
   inserted : Transformation.t list;
   consumed_tokens : (Alg_expr.t * int) list;
   injected_tokens : (Alg_expr.t * int) list;
-  infos : Compilation_info.t;
+  instantiations :
+    Instantiation.abstract Instantiation.test list *
+      Instantiation.abstract Instantiation.action list;
 }
 
 type modification =

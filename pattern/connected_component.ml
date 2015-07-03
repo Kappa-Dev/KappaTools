@@ -920,32 +920,6 @@ module Matching = struct
 
   let get (node,id) (t,_) = NodeMap.find node (IntMap.find id t)
 
-  let quark_lists_of_cc_instance graph (cc,root) =
-    let inj = match reconstruct graph empty 1 cc root with
-      | None -> assert false
-      | Some (i,_) -> IntMap.find 1 i in
-    let (tested_sites,tested_internals) =
-      Tools.array_fold_lefti
-	(fun ty ->
-	 List.fold_left
-	   (fun (tsites,tints) id ->
-	    let agent = NodeMap.find (cc.id,ty,id) inj in
-	    let tsites' =
-	      Tools.array_fold_lefti
-		(fun site acc ->
-		 function  UnSpec -> acc | (Free | Link _) -> (agent,site)::acc)
-		tsites (IntMap.find id cc.links) in
-	  let tints' =
-	    Tools.array_fold_lefti
-	      (fun site acc int -> if int >= 0 then (agent,site)::acc else acc)
-	      tints (IntMap.find id cc.internals) in
-	  (tsites',tints')))
-	([],[]) cc.nodes_by_type in
-    { Causal.site_tested = tested_sites;
-      Causal.site_modified = [];
-      Causal.internal_state_tested = tested_internals;
-      Causal.internal_state_modified = []; }
-
 (*edges: list of concrete edges, returns the roots of observables that are above in the domain*)
   let from_edge domain graph edges =
     let rec aux cache acc = function
