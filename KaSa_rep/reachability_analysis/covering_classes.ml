@@ -300,7 +300,6 @@ let store_remanent parameter error pair_covering_class modified_map remanent =
       in
       (*------------------------------------------------------------------------------*)
       (*store pointer backward*)
-      
       let covering_class = fst (List.split pair_covering_class) in
       let error, pointer_backward =
         store_pointer_backward 

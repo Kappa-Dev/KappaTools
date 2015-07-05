@@ -215,11 +215,19 @@ Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id
 site_type:1
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
 site_type:1
-BDU analysis:
-BDU of creation rules
-BDU of potential dependencies between sites:
-BDU analysis:agent_type:0:
-class_id:0
+
+--------------------------------------------
+BDU INIT
+Id=0
+ Leaf False 
+
+--------------------------------------------
+BDU CREATION - CREATION rules
+--------------------------------------------
+BDU HALF_BREAK - HALF_BREAK rules
+--------------------------------------------
+BDU TEST_MODIF rules
+agent_type:0:
 Id=7
  Node(site_type:0<0)
   Id=1
@@ -243,21 +251,43 @@ Id=7
     Id=1
      Leaf False 
 
-BDU analysis:agent_type:1:
-class_id:0
+LHS-MODIFIED rules
+site_type:0:state:0
+site_type:1:state:0
+agent_type:1:
 Id=9
- Node(site_type:0<1)
-  Id=1
-   Leaf False 
+ Node(site_type:0<0)
+  Id=7
+   Node(site_type:0<1)
+    Id=1
+     Leaf False 
+
+    Id=6
+     Node(site_type:0<2)
+      Id=5
+       Node(site_type:1<0)
+        Id=1
+         Leaf False 
+
+        Id=4
+         Node(site_type:1<1)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
 
   Id=8
-   Node(site_type:0<2)
-    Id=7
+   Node(site_type:0<1)
+    Id=5
      Node(site_type:1<0)
       Id=1
        Leaf False 
 
-      Id=6
+      Id=4
        Node(site_type:1<1)
         Id=0
          Leaf True 
@@ -265,11 +295,30 @@ Id=9
         Id=1
          Leaf False 
 
-    Id=1
-     Leaf False 
+    Id=6
+     Node(site_type:0<2)
+      Id=5
+       Node(site_type:1<0)
+        Id=1
+         Leaf False 
 
-BDU analysis:agent_type:2:
-class_id:0
+        Id=4
+         Node(site_type:1<1)
+          Id=0
+           Leaf True 
+
+          Id=1
+           Leaf False 
+
+      Id=1
+       Leaf False 
+
+LHS-MODIFIED rules
+site_type:1:state:0
+site_type:0:state:0
+site_type:0:state:1
+site_type:1:state:0
+agent_type:2:
 Id=3
  Node(site_type:0<0)
   Id=1
@@ -283,85 +332,12 @@ Id=3
     Id=1
      Leaf False 
 
-BDU of test rules
-BDU analysis:agent_type:0:
-rule_id:0
-Id=4
- Node(site_type:0<1)
-  Id=3
-   Node(site_type:1<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
-  Id=1
-   Leaf False 
-
-BDU analysis:agent_type:1:
-rule_id:0
-Id=4
- Node(site_type:0<1)
-  Id=3
-   Node(site_type:1<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
-  Id=1
-   Leaf False 
-
-rule_id:1
-Id=4
- Node(site_type:0<2)
-  Id=3
-   Node(site_type:1<1)
-    Id=0
-     Leaf True 
-
-    Id=1
-     Leaf False 
-
-  Id=1
-   Leaf False 
-
-BDU analysis:agent_type:2:
-rule_id:1
-Id=2
- Node(site_type:0<1)
-  Id=0
-   Leaf True 
-
-  Id=1
-   Leaf False 
-
-BDU of enabled rules
-BDU analysis:agent_type:0:
-rule_id:0
-No
-Id=0
- Leaf False 
-
-BDU analysis:agent_type:1:
-rule_id:0
-No
-Id=0
- Leaf False 
-
-rule_id:1
-No
-Id=0
- Leaf False 
-
-BDU analysis:agent_type:2:
-rule_id:1
-No
-Id=0
- Leaf False 
-
+LHS-MODIFIED rules
+site_type:0:state:0
+--------------------------------------------
+ITERATE CREATION - CV rules
+--------------------------------------------
+ITERATE HALF_BREAK - CREATION - CV rules
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
 Flow of information in the ODE semantics:agent_type:0:site_modified:0->x(internal state)

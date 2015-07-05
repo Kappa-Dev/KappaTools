@@ -106,64 +106,17 @@ let main () =
     if Remanent_parameters.get_do_site_dependencies parameters
     then 
       let parameters_cv =
-	Remanent_parameters.update_prefix parameters "BDU analysis:" in 
+	Remanent_parameters.update_prefix parameters "" in 
       let _ = 
 	if (Remanent_parameters.get_trace parameters_cv)
-	then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "BDU analysis:\n"
+	then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n"
       in
       let error,dep = Bdu_analysis.bdu_main parameters_cv error handler c_compil 
       in error,Some dep 
     else 
       error,None 
   in
-  (*Creation and BDU of creation*)
-  (*let error,bdu_creation = 
-    if Remanent_parameters.get_do_site_dependencies parameters
-    then 
-      let parameters_cv =
-	Remanent_parameters.update_prefix parameters "Creation and BDU of creation:" in 
-      let _ = 
-	if (Remanent_parameters.get_trace parameters_cv)
-	then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "Creation and BDU of creation:\n"
-      in
-      let error,dep = Covering_classes.result_creation_bdu parameters_cv error handler c_compil 
-      in error,Some dep 
-    else 
-      error,None 
-  in*)
-  (*BDU at each rule*)
-  (*let error, bdu_rule =
-    if Remanent_parameters.get_do_site_dependencies parameters
-    then
-      let parameters_bdu =
-        Remanent_parameters.update_prefix parameters "BDU at each rule:"
-      in
-      let _ =
-        if (Remanent_parameters.get_trace parameters_bdu)
-        then Printf.fprintf (Remanent_parameters.get_log parameters_bdu) "BDU at each rule:\n"
-      in
-      let error, dep = Covering_classes.bdu_test parameters_bdu error handler c_compil
-      in
-      error, Some dep
-    else error, None
-  in*)
-  (*BDU enable*)
-  (*let error, enabled_rule =
-    if Remanent_parameters.get_do_site_dependencies parameters
-    then
-      let parameters_test =
-        Remanent_parameters.update_prefix parameters "Enabled rules:"
-      in
-      let _ =
-        if (Remanent_parameters.get_trace parameters_test)
-        then Printf.fprintf (Remanent_parameters.get_log parameters_test) "Enabled rules:\n"
-      in
-      let error, dep = Covering_classes.result_enable parameters_test error handler c_compil
-      in
-      error, Some dep
-    else error, None
-  in*)
- (*ODE*)
+  (*ODE*)
   let error,ode_flow = 
     if Remanent_parameters.get_do_ODE_flow_of_information parameters
     then 

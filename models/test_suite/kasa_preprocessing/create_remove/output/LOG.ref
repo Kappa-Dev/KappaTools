@@ -83,23 +83,32 @@ Side-effect:deletion:undocument_site:
 Side-effect:agent_type:1:
 Side-effect:deletion:undocument_site:
 Potential dependencies between sites:
-BDU analysis:
-BDU of creation rules
-BDU analysis:agent_type:1:
-Id=0
- Leaf True 
 
-BDU analysis:agent_type:2:
+--------------------------------------------
+BDU INIT
 Id=0
- Leaf True 
+ Leaf False 
 
-BDU of potential dependencies between sites:
-BDU of test rules
-BDU analysis:agent_type:0:
-BDU analysis:agent_type:1:
-BDU of enabled rules
-BDU analysis:agent_type:0:
-BDU analysis:agent_type:1:
+--------------------------------------------
+BDU CREATION - CREATION rules
+agent_type:1:
+Id=0
+ Leaf False 
+
+CREATION rules
+agent_type:2:
+Id=0
+ Leaf False 
+
+CREATION rules
+--------------------------------------------
+BDU HALF_BREAK - HALF_BREAK rules
+--------------------------------------------
+BDU TEST_MODIF rules
+--------------------------------------------
+ITERATE CREATION - CV rules
+--------------------------------------------
+ITERATE HALF_BREAK - CREATION - CV rules
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
 Flow of information in the ODE semantics:rule_id:1
