@@ -60,6 +60,11 @@ sig
   val abstract_action_of_transformation : Transformation.t -> abstract action
   val concretize_test : (Place.t -> int) -> abstract test -> concrete test
   val concretize_action : (Place.t -> int) -> abstract action -> concrete action
+
+  val print_concrete_test :
+    ?sigs:Signature.s -> Format.formatter -> concrete test -> unit
+  val print_concrete_action :
+    ?sigs:Signature.s -> Format.formatter -> concrete action -> unit
 end
 
 type elementary_rule = {

@@ -170,7 +170,72 @@ module Instantiation =
       | Transformation.Freed (pl,s) -> Free (pl,s)
       | Transformation.Linked (x,y) -> Bind (x,y)
       | Transformation.Internalized (p,s,i) -> Mod_internal ((p,s),i)
-end
+
+    let with_sigs f = function
+      | None -> Format.pp_print_int
+      | Some sigs -> f sigs
+    let print_concrete_agent ?sigs f (id,ty) =
+      Format.fprintf
+	f "%a_%i" (with_sigs Signature.print_agent sigs) ty id
+    let print_concrete_agent_site ?sigs f ((_,ty as agent),id) =
+      Format.fprintf f "%a.%a" (print_concrete_agent ?sigs) agent
+		     (with_sigs (fun s -> Signature.print_site s ty) sigs) id
+    let print_concrete_test ?sigs f = function
+      | Is_Here agent ->
+	 Format.fprintf f "Is_Here(%a)" (print_concrete_agent ?sigs) agent
+      | Has_Internal (((_,ty),id as site),int) ->
+	 Format.fprintf f "Has_Internal(%a~%a)"
+			(print_concrete_agent_site ?sigs) site
+			(with_sigs
+			   (fun s -> Signature.print_internal_state s ty id)
+			   sigs) int
+      | Is_Free site ->
+	 Format.fprintf f "Is_Free(%a)" (print_concrete_agent_site ?sigs) site
+      | Is_Bound site ->
+	 Format.fprintf f "Is_Bound(%a)" (print_concrete_agent_site ?sigs) site
+      | Has_Binding_type (site,(ty,sid)) ->
+	 Format.fprintf f "Btype(%a,%t)"
+			(print_concrete_agent_site ?sigs) site
+			(fun f ->
+			 match sigs with
+			 | None -> Format.fprintf f "%i.%i" ty sid
+			 | Some sigs ->
+			    Format.fprintf
+			      f "%a.%a" (Signature.print_agent sigs) ty
+			      (Signature.print_site sigs ty) sid)
+      | Is_Bound_to (site1,site2) ->
+	 Format.fprintf f "Is_Bound(%a,%a)"
+			(print_concrete_agent_site ?sigs) site1
+			(print_concrete_agent_site ?sigs) site2
+    let print_concrete_action ?sigs f = function
+      | Create ((_,ty as agent),list) ->
+	 Format.fprintf
+	   f "Create(%a[@[<h>%a@]])" (print_concrete_agent ?sigs) agent
+	   (Pp.list Pp.comma
+		    (fun f (x,y) ->
+		     match sigs with
+		     | Some sigs ->
+			Signature.print_site_internal_state sigs ty x f y
+		     | None ->
+			match y with
+			| None -> Format.pp_print_int f x
+			| Some y ->
+			   Format.fprintf f "%i.%i" x y))
+	   list
+      | Mod_internal (((_,ty),id as site),int) ->
+	 Format.fprintf f "Mod(%a~%a)" (print_concrete_agent_site ?sigs) site
+			(with_sigs
+			   (fun s -> Signature.print_internal_state s ty id)
+			   sigs) int
+      | Bind (site1,site2) ->
+	 Format.fprintf f "Bind(%a,%a)" (print_concrete_agent_site ?sigs) site1
+			(print_concrete_agent_site ?sigs) site2
+      | Free site ->
+	 Format.fprintf f "Free(%a)" (print_concrete_agent_site ?sigs) site
+      | Remove agent ->
+	 Format.fprintf f "Remove(%a)" (print_concrete_agent ?sigs) agent
+
+  end
 
 type elementary_rule = {
   rate : Alg_expr.t;
