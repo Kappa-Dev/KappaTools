@@ -81,7 +81,7 @@ type elementary_rule = {
 
 type modification =
     ITER_RULE of Alg_expr.t Term.with_pos * elementary_rule
-  | UPDATE of Term.dep_type * Alg_expr.t Term.with_pos
+  | UPDATE of Term.rev_dep * Alg_expr.t Term.with_pos
   | SNAPSHOT of Alg_expr.t Ast.print_expr Term.with_pos list
   | STOP of Alg_expr.t Ast.print_expr Term.with_pos list
   | CFLOW of Connected_component.t

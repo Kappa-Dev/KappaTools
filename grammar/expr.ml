@@ -170,40 +170,49 @@ let rec compile_bool var_map tk_map contact_map domain = function
 	  | KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _),_), _ ->
 	(domain'',(Ast.COMPARE_OP (op,a',b'), pos))
 
-let add_dep el s = Term.DepSet.add el s
+(*let add_dep el s = Term.DepSet.add el s
 let rec aux_dep s = function
   | BIN_ALG_OP (_, (a,_), (b,_)) -> aux_dep (aux_dep s a) b
   | UN_ALG_OP (_, (a,_)) -> aux_dep s a
   | STATE_ALG_OP op -> add_dep (Term.dep_of_state_alg_op op) s
   | ALG_VAR i -> add_dep (Term.ALG i) s
-  | KAPPA_INSTANCE _ -> (*add_dep (Term.KAPPA i)*) s
-  | TOKEN_ID i -> add_dep (Term.TOK i) s
+  | KAPPA_INSTANCE _ -> s
+  | TOKEN_ID i -> s
   | CONST _ -> s
 let deps_of_alg_expr alg = aux_dep Term.DepSet.empty alg
+ *)
+let rec has_time_dep = function
+  | (BIN_ALG_OP (_, a, b),_) ->
+     has_time_dep a&&has_time_dep b
+  | (UN_ALG_OP (_, a),_) -> has_time_dep a
+  | ((KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _),_) -> false
+  | (STATE_ALG_OP Term.TIME_VAR,_) -> true
+  | (STATE_ALG_OP (Term.CPUTIME | Term.EVENT_VAR| Term.NULL_EVENT_VAR
+		  | Term.PROD_EVENT_VAR),_) -> false
+  | (ALG_VAR _,pos) ->
+     raise (ExceptionDefn.Internal_Error ("has_time_dep problem",pos))
 
-let rec deps_of_bool_expr = function
-    | Ast.TRUE | Ast.FALSE -> Term.DepSet.empty,[]
+let rec stops_of_bool_expr = function
+    | Ast.TRUE | Ast.FALSE -> []
     | Ast.BOOL_OP (op,(a,_),(b,_)) ->
-       let (s1,st1) = deps_of_bool_expr a in
-       let (s2,st2) = deps_of_bool_expr b in
-       (Term.DepSet.union s1 s2,
-	match op,st1,st2 with
+       let st1 = stops_of_bool_expr a in
+       let st2 = stops_of_bool_expr b in
+       (match op,st1,st2 with
 	| _, [], _ -> st2
 	| _, _, [] -> st1
 	| Term.OR, n1, n2 -> n1 @ n2
 	| Term.AND, _, _ -> raise ExceptionDefn.Unsatisfiable
        )
-    | Ast.COMPARE_OP (op,(a,_),(b,_)) ->
-       let s = aux_dep (aux_dep Term.DepSet.empty a) b in
+    | Ast.COMPARE_OP (op,(a1,_ as a),(b1,_ as b)) ->
        match op with
-       | Term.EQUAL when Term.DepSet.mem Term.TIME s ->
-	  begin match a,b with
+       | Term.EQUAL when has_time_dep a&&has_time_dep b ->
+	  begin match a1,b1 with
 		| STATE_ALG_OP (Term.TIME_VAR), CONST n
-		| CONST n, STATE_ALG_OP (Term.TIME_VAR) -> (s, [n])
+		| CONST n, STATE_ALG_OP (Term.TIME_VAR) -> [n]
 		| ( BIN_ALG_OP _ | UN_ALG_OP _ | ALG_VAR _
 		    | STATE_ALG_OP (Term.CPUTIME | Term.EVENT_VAR | Term.TIME_VAR
 				    | Term.NULL_EVENT_VAR | Term.PROD_EVENT_VAR)
 		    | KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _), _ ->
 		   raise ExceptionDefn.Unsatisfiable
 	  end
-       | (Term.EQUAL | Term.SMALLER | Term.GREATER | Term.DIFF) -> (s, [])
+       | (Term.EQUAL | Term.SMALLER | Term.GREATER | Term.DIFF) -> []

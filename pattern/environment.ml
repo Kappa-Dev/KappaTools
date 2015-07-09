@@ -10,7 +10,6 @@ type t = {
   desc_table : (string,out_channel * Format.formatter) Hashtbl.t;
 
   (* legacy *)
-  dependencies :  Term.DepSet.t Term.DepMap.t ; (*ALG i or KAPPA i -> {ALG j, RULE j} = modifying i implies recomputing j --closure is done*)  
   num_of_unary_rule : int StringMap.t ;
   unary_rule_of_num : string IntMap.t ;
   tracking_enabled : bool ;
@@ -30,7 +29,6 @@ let empty =
    (*legacy *)
    num_of_unary_rule = StringMap.empty ;
    unary_rule_of_num = IntMap.empty ;
-   dependencies = Term.DepMap.empty ;
    tracking_enabled = false ;
    active_cflows = 0 ;
    track = IntSet.empty ;

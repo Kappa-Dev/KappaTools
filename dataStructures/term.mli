@@ -25,15 +25,9 @@ val print_compare_op : Format.formatter -> compare_op -> unit
 
 (** {6 Dependencies management} *)
 
-type dep_type = ALG of int | KAPPA of int | TOK of int | EVENT |
-		TIME | RULE of int | PERT of int | ABORT of int
-module DepMap : Map.S with type key = dep_type
-module DepSet : Set.S with type elt = dep_type
-
-val dep_of_state_alg_op : state_alg_op -> dep_type
-val dep_to_string : unit -> dep_type -> string
+type rev_dep = ALG of int | RULE of int | PERT of int
+module DepSet : Set.S with type elt = rev_dep
+val print_rev_dep : Format.formatter -> rev_dep -> unit
 
 val with_dummy_pos : 'a -> 'a with_pos
 val has_dummy_pos : 'a with_pos -> bool
-
-val print_dep_type : Format.formatter -> dep_type -> unit

@@ -5,7 +5,7 @@ type t = {
   variables_overwrite: Alg_expr.t option array;
 }
 
-let update_activity get_alg env counter graph activities =
+let initial_activity get_alg env counter graph activities =
   Environment.iteri_rules
     (fun i rule ->
      let rate = Rule_interpreter.value_alg
@@ -23,7 +23,7 @@ let initial env counter graph stopping_times =
   let activity_tree =
     Random_tree.create (Environment.nb_rules env) in
   let () =
-    update_activity (Environment.get_alg env)
+    initial_activity (Environment.get_alg env)
 		    env counter graph activity_tree in
   let stops =
     ref (List.sort (fun (a,_) (b,_) -> Nbr.compare a b) stopping_times) in
@@ -61,8 +61,7 @@ let do_it env domain counter graph state = function
      let () =
        match va with
        | Term.ALG i -> state.variables_overwrite.(i) <- Some expr
-       | (Term.TIME | Term.EVENT | Term. KAPPA _ | Term.TOK _ | Term.RULE _
-	  | Term.PERT _ | Term.ABORT _) ->
+       | (Term.RULE _ | Term.PERT _) ->
 	  failwith "Problematic update perturbation" in
      (false, graph, state)
   | Primitives.STOP pexpr ->
@@ -116,7 +115,8 @@ let do_it env domain counter graph state = function
 	 file (Mods.Counter.event counter) "ka"
 	 (fun f -> Rule_interpreter.print env f graph) in
      (false, graph, state)
-  | Primitives.CFLOW cc -> (false, Rule_interpreter.add_tracked cc graph, state)
+  | Primitives.CFLOW cc ->
+     (false, Rule_interpreter.add_tracked cc graph, state)
   | Primitives.CFLOWOFF cc ->
      (false, Rule_interpreter.remove_tracked cc graph, state)
   | Primitives.FLUX _ -> (false, graph, state)
@@ -128,8 +128,10 @@ let perturbate env domain counter graph state =
   let get_alg i = get_alg env state i in
   let rec do_until_noop i graph state stop =
     if stop || i >= Environment.nb_perturbations env then
-     let () = update_activity get_alg env counter graph state.activities in
-      (stop,graph,state)
+      let graph' =
+	Rule_interpreter.update_outdated_activities
+	  ~get_alg Random_tree.add env counter graph state.activities in
+      (stop,graph',state)
     else
       let pert = Environment.get_perturbation env i in
       if state.perturbations_alive.(i) && not_done_yet.(i) &&
@@ -166,12 +168,14 @@ let one_rule env domain counter graph state =
   match Rule_interpreter.apply_rule ~get_alg domain counter graph rule with
   | None -> None
   | Some graph' ->
-     let () = update_activity get_alg env counter graph state.activities in
+     let graph'' =
+       Rule_interpreter.update_outdated_activities
+	 ~get_alg Random_tree.add env counter graph' state.activities in
      let () =
        if !Parameter.debugModeOn then
 	 Format.printf "@[<v>Obtained@ %a@]@."
 		       (Rule_interpreter.print env) graph' in
-     Some (graph',state)
+     Some (graph'',state)
 
 let activity state =
   Random_tree.total state.activities

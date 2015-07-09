@@ -29,7 +29,7 @@ let tokenify algs tokens contact_map domain l =
      (domain',(alg,id)::out)
     ) l (domain,[])
 
-let rules_of_ast algs tokens contact_map domain
+let rules_of_ast ?free_rid algs tokens contact_map domain
 		    label_opt (ast_rule,rule_pos) =
   let label = match label_opt with
     | None -> Term.with_dummy_pos ("%anonymous"^(string_of_float (Sys.time ())))
@@ -39,7 +39,7 @@ let rules_of_ast algs tokens contact_map domain
     tokenify algs tokens contact_map domain ast_rule.rm_token in
   let domain'',add_toks =
     tokenify algs tokens contact_map domain' ast_rule.add_token in
-  let one_side label (domain,acc) rate lhs rhs rm add =
+  let one_side label (domain,free_rid,acc) rate lhs rhs rm add =
     let domain',(crate,_) =
       Expr.compile_alg algs tokens contact_map domain rate in
     let count = let x = ref 0 in fun (lab,pos) ->
@@ -54,10 +54,10 @@ let rules_of_ast algs tokens contact_map domain
 	Primitives.injected_tokens = add;
 	Primitives.instantiations = syntax;
       } in
-    let domain'',rule_mixtures =
+    let (domain'',free_rid'),rule_mixtures =
       Snip.connected_components_sum_of_ambiguous_rule
-	contact_map domain' lhs rhs in
-    domain'',
+	contact_map domain' ?rule_id:free_rid lhs rhs in
+    domain'',free_rid',
     match rule_mixtures with
     | [] -> acc
     | [ r ] -> (label, build r) :: acc
@@ -66,9 +66,9 @@ let rules_of_ast algs tokens contact_map domain
 	 (fun out r ->
 	  (count label,build r)::out) acc rule_mixtures in
   let rev = match ast_rule.arrow, ast_rule.k_op with
-    | RAR, None -> domain'',[]
+    | RAR, None -> domain'',free_rid,[]
     | LRAR, Some rate ->
-       one_side (opposite label) (domain'',[]) rate
+       one_side (opposite label) (domain'',free_rid,[]) rate
 		ast_rule.rhs ast_rule.lhs add_toks rm_toks
     | (RAR, Some _ | LRAR, None) ->
        raise
@@ -127,7 +127,7 @@ let effects_of_modif algs tokens rules contact_map domain ast_list =
       let (domain',alg_pos) =
 	Expr.compile_alg algs.NamedDecls.finder tokens.NamedDecls.finder
 			 contact_map domain alg_expr in
-      let domain'',elem_rules =
+      let domain'',_,elem_rules =
 	rules_of_ast algs.NamedDecls.finder tokens.NamedDecls.finder
 		     contact_map domain' None (ast_rule,mix_pos) in
       let elem_rule = match elem_rules with
@@ -234,8 +234,8 @@ let pert_of_result algs tokens rules contact_map domain res =
        let (domain',(pre,pos_pre)) =
 	 Expr.compile_bool algs.NamedDecls.finder tokens.NamedDecls.finder
 			   contact_map domain pre_expr in
-       let (dep, stopping_time) =
-	 try Expr.deps_of_bool_expr pre
+       let stopping_time =
+	 try Expr.stops_of_bool_expr pre
 	 with ExceptionDefn.Unsatisfiable ->
 	   raise
 	     (ExceptionDefn.Malformed_Decl
@@ -251,8 +251,8 @@ let pert_of_result algs tokens rules contact_map domain res =
 	    let (domain',(post,_pos)) =
 	      Expr.compile_bool algs.NamedDecls.finder tokens.NamedDecls.finder
 				contact_map domain post_expr in
-	    let (dep,stopping_time') =
-	      try Expr.deps_of_bool_expr post with
+	    let (stopping_time') =
+	      try Expr.stops_of_bool_expr post with
 		ExceptionDefn.Unsatisfiable ->
 		raise
 		  (ExceptionDefn.Malformed_Decl
@@ -311,7 +311,7 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 	      rules_of_ast algs.NamedDecls.finder tokens.NamedDecls.finder
 			   contact_map domain' None (fake_rule,mix_pos)
 	    with
-	    | domain'',[ _, compiled_rule ] ->
+	    | domain'',_,[ _, compiled_rule ] ->
 	       domain'',
 	       Nbr.iteri
 		 (fun _ s ->
@@ -321,8 +321,8 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 				 fst (snd algs.NamedDecls.decls.(i)))
 		       domain'' counter s compiled_rule))
 		 state value
-	    | domain'',[] -> domain'',state
-	    | _,_ ->
+	    | domain'',_,[] -> domain'',state
+	    | _,_,_ ->
 	       raise (ExceptionDefn.Malformed_Decl
 			(Format.asprintf
 			   "initial mixture %a is partially defined"
@@ -334,18 +334,18 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 	      add_token = [(alg, (tk_nme,pos_tk))];
 	      k_def = Term.with_dummy_pos (CONST Nbr.zero);
 	      k_un = None; k_op = None; } in
-	  let domain',state' =
+	  let domain',(state',_) =
 	    match
 	      rules_of_ast algs.NamedDecls.finder tokens.NamedDecls.finder
 			   contact_map domain None (Term.with_dummy_pos fake_rule)
 	    with
-	    | domain'',[ _, compiled_rule ] ->
+	    | domain'',_,[ _, compiled_rule ] ->
 	       domain'',
-	       fst (Rule_interpreter.force_rule
+	       Rule_interpreter.force_rule
 		      ~get_alg:(fun i ->
 				fst (snd algs.NamedDecls.decls.(i)))
-		      domain'' counter state compiled_rule)
-	    | _,_ -> assert false in
+		      domain'' counter state compiled_rule
+	    | _,_,_ -> assert false in
 	  domain',state'
       )	(domain,Rule_interpreter.empty ~has_tracking env)
       res.Ast.init
@@ -491,12 +491,14 @@ let compile_alg_vars tokens contact_map domain overwrite vars =
 		       vars_nd.NamedDecls.decls
 
 let compile_rules algs tokens contact_map domain rules =
-  List.fold_left
-    (fun (domain,acc) (rule_label,rule) ->
-     let (domain',cr) =
-       rules_of_ast algs tokens contact_map domain rule_label rule in
-    domain',List.append cr acc)
-    (domain,[]) rules
+  let fdomain,_,frules =
+    List.fold_left
+      (fun (domain,free_rid,acc) (rule_label,rule) ->
+       let (domain',free_rid',cr) =
+	 rules_of_ast algs tokens ?free_rid contact_map domain rule_label rule in
+       domain',free_rid',List.append cr acc)
+      (domain,Some 0,[]) rules in
+  fdomain,List.rev frules
 
 let initialize logger overwrite result =
   Debug.tag logger "+ Building initial simulation conditions...";

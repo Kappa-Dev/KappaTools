@@ -12,6 +12,9 @@ val value_bool :
   get_alg:(int -> Alg_expr.t) -> Mods.Counter.t -> t ->
   Alg_expr.t Ast.bool_expr -> bool
 
+val update_outdated_activities :
+  get_alg:(int -> Alg_expr.t) -> (int -> float -> 'a -> unit) ->
+  Environment.t -> Mods.Counter.t -> t -> 'a -> t
 
 (*Connected_component.Env.t: Domain*)
 val apply_rule :
@@ -21,7 +24,7 @@ val apply_rule :
 val force_rule :
   get_alg:(int -> Alg_expr.t) -> Connected_component.Env.t -> Mods.Counter.t
   -> t -> Primitives.elementary_rule ->
-  (t  * Connected_component.Matching.t list option)
+  (t * Connected_component.Matching.t list option)
 
 val print : Environment.t -> Format.formatter -> t -> unit
 

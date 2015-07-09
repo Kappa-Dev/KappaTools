@@ -663,7 +663,7 @@ let rec complete_with_creation (removed,added) links_transf actions fresh =
 	 handle_ports added'' l_t' actions' (succ site_id) in
      handle_ports added links_transf actions 0
 
-let connected_components_of_mixture created env mix =
+let connected_components_of_mixture created id_incr (env,rule_id) mix =
   let rec aux env transformations instantiations links_transf acc id = function
     | [] ->
        let removed,added = transformations in
@@ -675,7 +675,7 @@ let connected_components_of_mixture created env mix =
        let actions',transformations'' =
 	 complete_with_creation
 	   transformations' links_transf actions 0 created in
-       (env,(Tools.array_rev_of_list acc,
+       ((env,Tools.option_map id_incr rule_id),(Tools.array_rev_of_list acc,
 	     (tests,List.rev_append del_actions actions'),
 	     transformations''))
     | h :: t ->
@@ -683,7 +683,9 @@ let connected_components_of_mixture created env mix =
        let (wk_out,(removed,added),l_t,(tests,actions),remains) =
 	 add_agents_in_cc id wk IntMap.empty transformations
 			  links_transf instantiations t [h] in
-     let (env',inj, cc) = Connected_component.finish_new wk_out in
+       let origin = Tools.option_map (fun i -> Term.RULE i) rule_id in
+       let (env',inj, cc) =
+	 Connected_component.finish_new ?origin wk_out in
      let added' =
        Tools.list_smart_map
 	 (Primitives.Transformation.rename wk_out id cc inj) added in
@@ -713,7 +715,7 @@ let rule_mixtures_of_ambiguous_rule contact_map sigs lhs rhs =
     sigs (find_implicit_infos sigs contact_map (List.rev precomp_mixs)),
   created
 
-let connected_components_sum_of_ambiguous_rule contact_map env lhs rhs =
+let aux_connected_components_sum_of_ambiguous_rule id_incr contact_map env ?rule_id lhs rhs =
   let () =
     if !Parameter.compileModeOn then
       Format.eprintf "@[<v>_____@,"(*"@[<2>%a@]@," Expr.print_ast_mix lhs*) in
@@ -736,11 +738,14 @@ let connected_components_sum_of_ambiguous_rule contact_map env lhs rhs =
 				     f "@ (+%t) %a" Pp.nu
 				     (Raw_mixture.print sigs) created)))
 		     all_mixs in
-  Tools.list_fold_right_map (connected_components_of_mixture created)
-			    env all_mixs
+  Tools.list_fold_right_map (connected_components_of_mixture created id_incr)
+			    (env,rule_id) all_mixs
 
-let connected_components_sum_of_ambiguous_mixture contact_map env mix =
-  let cc_env,rules =
-    connected_components_sum_of_ambiguous_rule contact_map env mix mix in
+let connected_components_sum_of_ambiguous_rule contact_map env ?rule_id lhs rhs =
+  aux_connected_components_sum_of_ambiguous_rule succ contact_map env ?rule_id lhs rhs
+let connected_components_sum_of_ambiguous_mixture contact_map env ?rule_id mix =
+  let (cc_env,_),rules =
+    aux_connected_components_sum_of_ambiguous_rule
+      (fun x -> x) contact_map env ?rule_id mix mix in
   (cc_env, List.map
 	     (function l, _, ([],[]) -> l | _ -> assert false) rules)

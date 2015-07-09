@@ -28,6 +28,4 @@ val compile_bool :
   Ast.mixture Ast.ast_alg_expr Ast.bool_expr Term.with_pos ->
   Connected_component.Env.t * Alg_expr.t Ast.bool_expr Term.with_pos
 
-val deps_of_alg_expr : Alg_expr.t -> Term.DepSet.t
-val deps_of_bool_expr :
-  Alg_expr.t Ast.bool_expr -> (Term.DepSet.t * Nbr.t list)
+val stops_of_bool_expr : Alg_expr.t Ast.bool_expr -> Nbr.t list

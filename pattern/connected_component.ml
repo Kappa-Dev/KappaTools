@@ -32,7 +32,7 @@ type transition = {
 
 type point = {
   content: cc;
-  is_obs: bool;
+  is_obs_of: Term.DepSet.t option;
   fathers: int (** t.id *) list;
   sons: transition list;
 }
@@ -307,7 +307,7 @@ let print_sons_dot sigs cc_id f sons =
 	  f sons
 
 let print_point_dot sigs f (id,point) =
-  let style = if point.is_obs then "octagon" else "box" in
+  let style = match point.is_obs_of with | Some _ -> "octagon" | None -> "box" in
   Format.fprintf f "@[cc%i [label=\"%a\", shape=\"%s\"];@]@,%a"
 		 point.content.id (print ~sigs false) point.content
 		 style (print_sons_dot sigs id) point.sons
@@ -354,22 +354,32 @@ let empty sigs =
   let empty_cc = {id = 0; nodes_by_type = nbt;
 		  links = IntMap.empty; internals = IntMap.empty;} in
   let empty_point =
-    {content = empty_cc; is_obs = false; fathers = []; sons = [];} in
+    {content = empty_cc; is_obs_of = None; fathers = []; sons = [];} in
   fresh sigs nbt' 1 (IntMap.add 0 empty_point IntMap.empty)
 
 let check_vitality env = assert (env.used_by_a_begin_new = false)
 
 let cc_map env = IntMap.fold (fun i x out ->
-			      if x.is_obs then IntMap.add i x.content out else out)
+			      match x.is_obs_of with
+			      | Some _ -> IntMap.add i x.content out
+			      | None -> out)
 			     env.domain IntMap.empty
 let print f env =
   Format.fprintf
     f "@[<v>%a@]"
     (Pp.set ~trailing:Pp.space IntMap.bindings Pp.space
 	    (fun f (_,p) ->
-	     Format.fprintf f "@[<hov 2>(%a)@ -> @[<h>%a@]@ -> @[(%a)@]@]"
+	     Format.fprintf f "@[<hov 2>(%a)@ -> @[<h>%a@]@ %t-> @[(%a)@]@]"
 			    (Pp.list Pp.space Format.pp_print_int) p.fathers
 			    (print ~sigs:env.sig_decl true) p.content
+			    (fun f ->
+			     match p.is_obs_of with
+			     | None -> ()
+			     | Some deps ->
+				Format.fprintf
+				  f "@[[%a]@]@ "
+				  (Pp.set Term.DepSet.elements Pp.space Term.print_rev_dep)
+				  deps)
 			    (Pp.list
 			       Pp.space
 			       (fun f s ->
@@ -700,6 +710,10 @@ let rename_edge inj2cc = function
   | ((x,i),ToNode (y,j)) ->
 	   ((rename_nav_place inj2cc x,i),ToNode (rename_nav_place inj2cc y,j))
 
+let add_origin deps = function
+  | None -> deps
+  | Some x -> Term.DepSet.add x deps
+
 let rec complete_domain_with obs_id dst env free_id cc edge inj_dst2cc =
   let rec new_son inj_cc2found = function
     | [] ->
@@ -714,34 +728,44 @@ let rec complete_domain_with obs_id dst env free_id cc edge inj_dst2cc =
   match known_cc with
   | Some (cc_id, inj_cc_id2cc, point') ->
      let point'' =
-       {point' with sons = new_son (Renaming.inverse (List.hd inj_cc_id2cc)) point'.sons} in
+       {point' with
+	 sons = new_son (Renaming.inverse (List.hd inj_cc_id2cc)) point'.sons} in
      let completed =
        propagate_add_obs obs_id (Env.add_point cc_id point'' env) cc_id in
      (free_id,completed), cc_id
   | None ->
      let son = new_son (identity_injection cc) [] in
-     add_new_point obs_id env free_id son cc
-and add_new_point obs_id env free_id sons cc =
+     add_new_point ~origin:None obs_id env free_id son cc
+and add_new_point ~origin obs_id env free_id sons cc =
   let (free_id'',env'),fathers =
     compute_father_candidates complete_domain_with obs_id cc.id env free_id cc in
   let completed =
     Env.add_point
       cc.id
-      {content = cc; is_obs = cc.id = obs_id; sons=sons; fathers = fathers;}
+      {content = cc;sons=sons; fathers = fathers;
+       is_obs_of =
+	 if cc.id = obs_id then Some (add_origin Term.DepSet.empty origin) else None;}
       env' in
   ((free_id'',completed),cc.id)
 
-let add_domain env cc =
+let add_domain ?origin env cc =
   let known_cc = Env.find env cc in
   match known_cc with
   | Some (id,inj,point) ->
-     (if point.is_obs then env
-      else
-	let point' = { point with is_obs = true } in
+     (match point.is_obs_of with
+      | Some deps ->
+	 let point' =
+	   { point with
+	     is_obs_of = Some (add_origin deps origin)} in
+	 Env.add_point id point' env
+      | None ->
+	 let point' =
+	   { point with
+	     is_obs_of = Some (add_origin Term.DepSet.empty origin)} in
 	propagate_add_obs id (Env.add_point id point' env) id),
      List.hd inj,point.content
   | None ->
-     let (_,env'),_ = add_new_point cc.id env (succ cc.id) [] cc in
+     let (_,env'),_ = add_new_point ~origin cc.id env (succ cc.id) [] cc in
      (env',identity_injection cc, cc)
 
 (** Operation to create cc *)
@@ -758,7 +782,7 @@ let check_node_adequacy ~pos wk cc_id =
 
 let begin_new env = Env.to_work env
 
-let finish_new wk =
+let finish_new ?origin wk =
   let () = check_dangling wk in
   (** rebuild env **)
   let () =
@@ -770,7 +794,7 @@ let finish_new wk =
     { id = wk.cc_id; nodes_by_type = wk.used_id;
       links = wk.cc_links; internals = wk.cc_internals; } in
   let env = Env.fresh wk.sigs wk.reserved_id wk.free_id wk.cc_env in
-  add_domain env cc_candidate
+  add_domain ?origin env cc_candidate
 
 
 let new_link wk ((cc1,_,x as n1),i) ((cc2,_,y as n2),j) =
@@ -922,16 +946,18 @@ module Matching = struct
 
 (*edges: list of concrete edges, returns the roots of observables that are above in the domain*)
   let from_edge domain graph edges =
-    let rec aux cache acc = function
+    let rec aux cache (obs,rev_deps as acc) = function
       | [] -> acc
       | (point,inj_point2graph) :: remains ->
 	 let acc' =
-	   if point.is_obs
-	   then match find_root point.content with
-		| None -> assert false
-		| Some (_,root) ->
-		   (point.content,Renaming.apply inj_point2graph root) :: acc
-	   else acc in
+	   match point.is_obs_of with
+	   | None -> acc
+	   | Some ndeps ->
+	      match find_root point.content with
+	      | None -> assert false
+	      | Some (_,root) ->
+		 ((point.content,Renaming.apply inj_point2graph root) :: obs,
+		  Term.DepSet.union rev_deps ndeps) in
 	 let remains',cache' =
 	   List.fold_left
 	     (fun (re,ca as acc) son ->
@@ -949,12 +975,13 @@ module Matching = struct
 	 aux cache' acc' remains' in
     if List.for_all (check_edge graph) edges then
       match Env.navigate domain edges with
-      | None -> []
+      | None -> ([],Term.DepSet.empty)
       | Some (cc_id,injs,point) ->
-	 Tools.list_map_flatten
-	   (fun inj -> aux (IntSet.add cc_id IntSet.empty) [] [(point,inj)])
-	   injs
-    else []
+	 List.fold_left
+	   (fun out inj ->
+	    aux (IntSet.add cc_id IntSet.empty) out [(point,inj)])
+	   ([],Term.DepSet.empty) injs
+    else ([],Term.DepSet.empty)
 
   let observables_from_free domain graph ty node_id site =
     if site = 0 then

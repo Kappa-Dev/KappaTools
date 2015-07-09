@@ -4,6 +4,7 @@ type t = {
   roots_of_ccs: ValMap.tree Connected_component.Map.t;
   edges: Edges.t;
   tokens: Nbr.t array;
+  outdated_elements: Term.DepSet.t;
   free_id: int;
   story_machinery :
     (unit Connected_component.Map.t (*currently tracked ccs *)
@@ -14,6 +15,7 @@ let empty ~has_tracking env = {
   roots_of_ccs = Connected_component.Map.empty;
   edges = Edges.empty;
   tokens = Array.make (Environment.nb_tokens env) Nbr.zero;
+  outdated_elements = Term.DepSet.empty;
   free_id = 1;
   story_machinery =
     if has_tracking
@@ -41,7 +43,7 @@ let from_place (inj_nodes,inj_fresh,free_id as inj2graph) = function
        ty,free_id,(inj_nodes,Mods.IntMap.add id free_id inj_fresh,succ free_id)
 
 let deal_transformation is_add domain inj2graph edges roots transf = (*transf: abstract edge to be added or removed*)
-  let inj,graph,obs = (*inj: inj2graph', graph: edges', obs: delta_roots -NB inj should not change if [is_add] is false*)
+  let inj,graph,(obs,deps) = (*inj: inj2graph', graph: edges', obs: delta_roots -NB inj should not change if [is_add] is false*)
     match transf with
     | Primitives.Transformation.Freed (n,s) -> (*(n,s)-bottom*)
        let ty, id, inj2graph' = from_place inj2graph n in (*(A,23,phi)*)
@@ -80,7 +82,7 @@ let deal_transformation is_add domain inj2graph edges roots transf = (*transf: a
        (* 	   "@[add:%b %a in %i@]@." is_add *)
        (* 	   (Connected_component.print true !Debug.global_sigs) cc root in *)
        update_roots is_add r' cc root) roots obs in
-  ((inj,graph,roots'),obs)
+  ((inj,graph,roots',deps),obs)
 
 let instantiation_from_event inj2graph (tests,actions) =
   (List.map
@@ -117,19 +119,22 @@ let update_edges event_number domain inj_nodes state rule =
   (*Negative update*)
   let aux =
     List.fold_left
-      (fun (inj2graph,edges,roots) transf -> (*inj2graph: abs -> conc, roots define the injection that is used*)
-       fst (deal_transformation false domain inj2graph edges roots transf))
+      (fun (inj2graph,edges,roots,deps) transf -> (*inj2graph: abs -> conc, roots define the injection that is used*)
+       let ((a,b,c,new_deps),_) =
+	 deal_transformation false domain inj2graph edges roots transf in
+       (a,b,c,Term.DepSet.union new_deps deps))
       ((inj_nodes,Mods.IntMap.empty,state.free_id), (*initial inj2graph: (existing,new,fresh_id) *)
-       state.edges,state.roots_of_ccs)
+       state.edges,state.roots_of_ccs,state.outdated_elements)
       rule.Primitives.removed (*removed: statically defined edges*)
   in
   (*Positive update*)
-  let (((_,_,free_id' as final_inj2graph),edges',roots'),new_tracked_obs_instances) =
+  let (((_,_,free_id' as final_inj2graph),edges',roots',rev_deps'),new_tracked_obs_instances) =
     List.fold_left
-      (fun ((inj2graph,edges,roots),tracked_inst) transf ->
-       let aux',new_obs =
+      (fun ((inj2graph,edges,roots,deps),tracked_inst) transf ->
+       let (a,b,c,new_deps),new_obs =
 	 deal_transformation true domain inj2graph edges roots transf in
-       (aux',store_obs new_obs tracked_inst state.story_machinery))
+       ((a,b,c,Term.DepSet.union deps new_deps),
+	store_obs new_obs tracked_inst state.story_machinery))
       (aux,[])
       rule.Primitives.inserted (*statically defined edges*)
   in
@@ -140,17 +145,19 @@ let update_edges event_number domain inj_nodes state rule =
       state.story_machinery in
 
   { roots_of_ccs = roots'; edges = edges';
-    tokens = state.tokens; free_id = free_id';
-    story_machinery = story_machinery'; }
+    tokens = state.tokens; outdated_elements = rev_deps';
+    free_id = free_id'; story_machinery = story_machinery'; }
 
-let instance_number state ccs_l =
+let raw_instance_number state ccs_l =
   let size cc =
     try
       ValMap.total (Connected_component.Map.find cc state.roots_of_ccs)
     with Not_found -> 0 in
   let rect_approx ccs =
     Array.fold_left (fun acc cc ->  acc * (size cc)) 1 ccs in
-  Nbr.I (List.fold_left (fun acc ccs -> acc + (rect_approx ccs)) 0 ccs_l)
+  List.fold_left (fun acc ccs -> acc + (rect_approx ccs)) 0 ccs_l
+let instance_number state ccs_l =
+  Nbr.I (raw_instance_number state ccs_l)
 
 let value_bool ~get_alg counter state expr =
   Expr_interpreter.value_bool
@@ -164,6 +171,25 @@ let value_alg ~get_alg counter state alg =
     ~get_mix:(fun ccs -> instance_number state ccs)
     ~get_tok:(fun i -> state.tokens.(i))
     alg
+
+let update_outdated_activities ~get_alg store env counter state activities =
+  let () =
+    Term.DepSet.iter
+      (function
+	| Term.RULE i ->
+	   let rule = Environment.get_rule env i in
+	   let rate =
+	     Nbr.to_float @@
+	       value_alg
+		 counter state ~get_alg rule.Primitives.rate in
+	   let cc_va =
+	     raw_instance_number state [rule.Primitives.connected_components] in
+	   let act =
+	     if cc_va = 0 then 0. else rate *. float_of_int cc_va in
+	   store i act activities
+	| Term.ALG _ | Term.PERT _ -> assert false)
+      state.outdated_elements in
+  {state with outdated_elements = Term.DepSet.empty }
 
 let update_tokens ~get_alg counter state consumed injected =
   let do_op op l =

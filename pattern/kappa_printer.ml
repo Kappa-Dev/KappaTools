@@ -104,9 +104,8 @@ let modification ?env f m =
 			 (Environment.print_alg ?env) id
        | Term.RULE id ->
 	  Format.fprintf f "$UPDATE '%a' %a" (Environment.print_rule ?env) id
-       | (Term.KAPPA _ | Term.TIME | Term.EVENT
-	  | Term.ABORT _ | Term.PERT _ | Term.TOK _) ->
-	  Format.fprintf f "$UPDATE '%a' %a" Term.print_dep_type d_id
+       | Term.PERT _ ->
+	  Format.fprintf f "$UPDATE '%a' %a" Term.print_rev_dep d_id
      end (alg_expr ?env) va
   | Primitives.SNAPSHOT fn ->
      Format.fprintf f "SNAPSHOT %a" (print_expr ?env) fn
