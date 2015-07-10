@@ -331,20 +331,32 @@ let find_implicit_infos sigs contact_map ags =
 	  (aux_one ag_tail ty_id (max_s max_id s) ports (succ i))
      | L_VAL ((j,_),s) ->
 	  aux_one ag_tail ty_id (max_s (max j max_id) s) ports (succ i)
-     | L_FREE s -> aux_one ag_tail ty_id (max_s max_id s) ports (succ i)
+     | L_FREE Maintained ->
+	let () = (* Do not make test is being free is the only possibility *)
+	  match ports_from_contact_map sigs contact_map ty_id i with
+	  | [] -> ports.(i) <- L_ANY Maintained
+	  | _ :: _ -> () in
+	aux_one ag_tail ty_id max_id ports (succ i)
+     | L_FREE (Erased | Linked _ | Freed as s) -> aux_one ag_tail ty_id (max_s max_id s) ports (succ i)
      | L_ANY Maintained -> aux_one ag_tail ty_id max_id ports (succ i)
      | L_ANY (Erased | Linked _ | Freed as s) ->
-	Tools.list_map_flatten
-	  (fun (free_id,ports,ags,cor) ->
-	   let () = ports.(i) <- L_FREE (if s = Freed then Maintained else s) in
-	   (free_id, ports, ags, cor) ::
-	     List.map (fun x ->
-		       let ports' = Array.copy ports in
-		       let () =
-			 ports'.(i) <- L_VAL (Term.with_dummy_pos free_id,old_switch free_id s) in
-		       (succ free_id, ports', ags, (free_id,x,new_switch free_id s)::cor))
-		      (ports_from_contact_map sigs contact_map ty_id i))
-	  (aux_one ag_tail ty_id (max_s max_id s) ports (succ i))
+	match ports_from_contact_map sigs contact_map ty_id i with
+	| [] when s = Freed ->
+	   (* Do not make test is being free is the only possibility *)
+	   let () = ports.(i) <- L_ANY Maintained in
+	   aux_one ag_tail ty_id max_id ports (succ i)
+	| pfcm ->
+	   Tools.list_map_flatten
+	     (fun (free_id,ports,ags,cor) ->
+	      let () = ports.(i) <- L_FREE (if s = Freed then Maintained else s) in
+	      (free_id, ports, ags, cor) ::
+		List.map (fun x ->
+			  let ports' = Array.copy ports in
+			  let () =
+			    ports'.(i) <- L_VAL (Term.with_dummy_pos free_id,old_switch free_id s) in
+			  (succ free_id, ports', ags, (free_id,x,new_switch free_id s)::cor))
+			 pfcm)
+	     (aux_one ag_tail ty_id (max_s max_id s) ports (succ i))
   and aux_ags max_id = function
     | [] -> [succ max_id,[],[]]
     | ag :: ag_tail ->
