@@ -1,3 +1,5 @@
+(** Concrete graph implementation *)
+
 type t
 
 val empty : t
