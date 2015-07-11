@@ -1,3 +1,6 @@
+(** Compiled kappa model unit *)
+
+(** An agent in a connected component *)
 module Place :
 sig
   type t =
@@ -9,6 +12,7 @@ sig
     Renaming.t -> t -> t
 end
 
+(** Elementary rule transformations *)
 module Transformation :
 sig
   type t =
@@ -23,6 +27,8 @@ sig
   val print : ?sigs:Signature.s -> Format.formatter -> t -> unit
 end
 
+(** Trace of a rule exactly as the user wrote it (before
+compilation) *)
 module Instantiation :
 sig
   type agent_name = int

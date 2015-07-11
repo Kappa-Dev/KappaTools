@@ -1,3 +1,5 @@
+(** Compiled representation of a full Kappa model *)
+
 type t
 
 val init :

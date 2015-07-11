@@ -22,9 +22,9 @@ val is_strictly_positive : t -> bool
 val print : Format.formatter -> t -> unit
 val to_string : t -> string
 
-(** [iter f x n]
-returns f (n - k) (... (f (n - 1) (f n x))) where k < n <= k+1 *)
 val iteri : (t -> 'a -> 'a) -> 'a -> t -> 'a
+(** [iter f x n]
+@return f (n - k) (... (f (n - 1) (f n x))) where k < n <= k+1 *)
 
 val of_string : string -> t (** @raise Failure "float_of_string" *)
 val of_un_alg_op : Term.un_alg_op -> t -> t

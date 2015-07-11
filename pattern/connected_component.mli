@@ -1,7 +1,9 @@
-type cc
-type t = cc (*type for domain points*)
+(** Domain to navigate in the graph *)
 
-type work (*type for partial domain*)
+type cc
+type t = cc (**type for domain points*)
+
+type work (**type for partial domain*)
 
 module ContentAgent  : sig
   type t
@@ -28,8 +30,10 @@ module Env : sig
 
 end
 
-(** {5 Create a connected component } *)
+(** {6 Create a connected component} *)
+
 val begin_new : Env.t -> work
+(** Starts creation *)
 val new_node : work -> int (** node_type *) -> (ContentAgent.t*work)
 val new_link :
   work -> (ContentAgent.t * int) (** node * site id *) -> (ContentAgent.t * int) -> work
@@ -38,7 +42,8 @@ val new_internal_state : work -> (ContentAgent.t * int) -> int -> work
 (** [new_link_type work (node,site) type] *)
 val finish_new : ?origin:Term.rev_dep -> work -> (Env.t*Renaming.t*t)
 
-(** {5 Use a connected component } *)
+(** {6 Use a connected component } *)
+
 val print : ?sigs:Signature.s -> bool -> Format.formatter -> t -> unit
 (** [print ~sigs print_id form cc] *)
 val print_dot : Signature.s -> Format.formatter -> t -> unit

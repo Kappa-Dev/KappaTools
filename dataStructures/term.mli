@@ -1,4 +1,4 @@
-(** Compiled representation of Kappa programs *)
+(** Compiled algebraic expression *)
 
 type 'a with_pos = 'a * (Lexing.position * Lexing.position)
 type 'a maybe_pos = ?pos:(Lexing.position * Lexing.position) -> 'a

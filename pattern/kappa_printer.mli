@@ -1,3 +1,5 @@
+(** Printers (user readable) of Kappa compiled units *)
+
 val alg_expr : ?env:Environment.t -> Format.formatter -> Alg_expr.t -> unit
 
 val print_expr_val :

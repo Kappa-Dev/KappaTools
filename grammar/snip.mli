@@ -1,3 +1,5 @@
+(** Kappa pattern compiler *)
+
 val connected_components_sum_of_ambiguous_mixture :
   (string list * (string * string) list) Export_to_KaSim.String2Map.t ->
   Connected_component.Env.t -> ?rule_id:int -> Ast.mixture ->

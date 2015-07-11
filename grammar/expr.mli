@@ -1,4 +1,4 @@
-(** Algebraic and boolean term management *)
+(** Algebraic and boolean expression manager *)
 
 (** {6 Printers} *)
 
