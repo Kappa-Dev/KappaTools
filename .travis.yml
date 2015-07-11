@@ -7,12 +7,15 @@ env:
     - CHECKED=js
     - CHECKED=native
 
-before_install:
-  - sudo add-apt-repository ppa:avsm/ppa -y
-  - sudo apt-get update -qq
+addons:
+  apt:
+    sources:
+    - avsm
+    packages:
+    - ocaml-nox
+    - opam
 
 install:
-  - sudo apt-get install -qq ocaml-nox opam
   - sh -c "if [ '$CHECKED' = js ] ; then sudo apt-get install -qq camlp4-extra ; fi"
   - opam init -a git://github.com/ocaml/opam-repository && eval $(opam config env)
   - opam install ocamlfind
