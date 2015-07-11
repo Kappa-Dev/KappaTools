@@ -205,7 +205,7 @@ let rec stops_of_bool_expr = function
        )
     | Ast.COMPARE_OP (op,(a1,_ as a),(b1,_ as b)) ->
        match op with
-       | Term.EQUAL when has_time_dep a&&has_time_dep b ->
+       | Term.EQUAL when has_time_dep a||has_time_dep b ->
 	  begin match a1,b1 with
 		| STATE_ALG_OP (Term.TIME_VAR), CONST n
 		| CONST n, STATE_ALG_OP (Term.TIME_VAR) -> [n]
