@@ -2,6 +2,10 @@
 
 {!modules: Nbr NamedDecls Term}
 
-{!modules: Primitives}
+{!modules: Primitives Signature Environment Kappa_printer Connected_component }
 
-{!modules: Expr}
+{!modules:Expr Snip}
+
+{!modules: Edges}
+
+{!modules: Expr_interpreter Rule_interpreter State_interpreter}
