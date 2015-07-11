@@ -11,6 +11,7 @@ case $1 in
 	cp man/*.htm man/*.css man/*.png ${PLAYGROUND}/docs/KaSim-manual-master/
 	cp -r man/img ${PLAYGROUND}/docs/KaSim-manual-master/
 	cp man/generated_img/*.png ${PLAYGROUND}/docs/KaSim-manual-master/generated_img/
+	cp _build/dev/KaSim.docdir/* ${PLAYGROUND}/docs/KaSim-API-master/
 	;;
     js )
 	[ -d ${PLAYGROUND}/try ] || \

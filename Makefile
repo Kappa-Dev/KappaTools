@@ -18,9 +18,9 @@ KASAREP = KaSa_rep/
 
 TERM = $(shell echo $$TERM)
 ifeq ($(TERM), dumb) # An approximation of "am I launched from emacs ?" :-)
- OCAMLBUILDFLAGS = -classic-display -use-ocamlfind
+ OCAMLBUILDFLAGS = -classic-display
 else
- OCAMLBUILDFLAGS = -use-ocamlfind
+ OCAMLBUILDFLAGS =
 endif
 
 USE_TK?=0
@@ -44,7 +44,7 @@ $(MANGENREP): $(SCRIPTSSOURCE) $(MODELS)
 	rm -rf $@
 	mkdir $@
 
-%.native %.byte: $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*)
+%.native %.byte %.docdir/index.html: $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*)
 	$(OCAMLBINPATH)ocamlbuild $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) $@
 
 JaSim.byte: $(filter-out _build/,$(wildcard */*.ml*))
@@ -82,7 +82,7 @@ bin/%: %.native Makefile
 	|| { cat $(notdir $@); rm $(notdir $@); exit 2; }
 
 doc: man/KaSim_manual.pdf
-doc_html: man/KaSim_manual.htm
+doc_html: dev/KaSim.docdir/index.html man/KaSim_manual.htm
 
 all: bin/KaSim bin/KaSa bin/sanity_test
 
