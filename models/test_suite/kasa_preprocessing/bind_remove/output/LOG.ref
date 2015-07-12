@@ -190,7 +190,7 @@ Id=3
 HALF_BREAK rules
 site_type:0:state:1
 --------------------------------------------
-BDU TEST_MODIF rules
+BDU ITERATION OF TEST_MODIF rules
 agent_type:0:
 Id=3
  Node(site_type:0<0)
@@ -205,7 +205,7 @@ Id=3
     Id=1
      Leaf False 
 
-LHS-MODIFIED rules
+ITERATION OF LHS-MODIFIED rules
 site_type:0:state:0
 agent_type:1:
 Id=5
@@ -236,13 +236,13 @@ Id=5
       Id=1
        Leaf False 
 
-LHS-MODIFIED rules
+ITERATION OF LHS-MODIFIED rules
 site_type:0:state:0
 site_type:0:state:1
 --------------------------------------------
-ITERATE CREATION - CV rules
+BDU ITERATION OF CREATION - CV rules
 --------------------------------------------
-ITERATE HALF_BREAK - CREATION - CV rules
+BDU ITERATION OF ITERATE HALF_BREAK - CREATION - CV rules
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
 Flow of information in the ODE semantics:agent_type:0:site_modified:0->x(binding state)

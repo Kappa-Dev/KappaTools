@@ -206,7 +206,7 @@ Id=3
 HALF_BREAK rules
 site_type:0:state:0
 --------------------------------------------
-BDU TEST_MODIF rules
+BDU ITERATION OF TEST_MODIF rules
 agent_type:0:
 Id=3
  Node(site_type:0<0)
@@ -221,7 +221,7 @@ Id=3
     Id=1
      Leaf False 
 
-LHS-MODIFIED rules
+ITERATION OF LHS-MODIFIED rules
 site_type:0:state:0
 agent_type:2:
 Id=3
@@ -237,12 +237,12 @@ Id=3
     Id=1
      Leaf False 
 
-LHS-MODIFIED rules
+ITERATION OF LHS-MODIFIED rules
 site_type:0:state:0
 --------------------------------------------
-ITERATE CREATION - CV rules
+BDU ITERATION OF CREATION - CV rules
 agent_type:0:
-ITERATE CREATION-COVERING CLASS
+ITERATION OF CREATION-COVERING CLASS
 Id=3
  Node(site_type:0<0)
   Id=1
@@ -257,9 +257,9 @@ Id=3
      Leaf False 
 
 --------------------------------------------
-ITERATE HALF_BREAK - CREATION - CV rules
+BDU ITERATION OF ITERATE HALF_BREAK - CREATION - CV rules
 agent_type:0:
-ITERATE HALF_BREAK-CREATION-COVERING CLASS
+ITERATION OF HALF_BREAK-CREATION-COVERING CLASS
 Id=3
  Node(site_type:0<0)
   Id=1
