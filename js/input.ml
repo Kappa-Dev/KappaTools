@@ -53,7 +53,6 @@ let event_number =
 
 let get_initial_content () =
   let args = Url.Current.arguments in
-  let () = Dom_html.window##alert (Js.string (string_of_int @@ List.length args)) in
   let () =
     try
       Parameter.maxEventValue :=
