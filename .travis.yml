@@ -3,9 +3,6 @@ language: OCaml
 env:
   global:
     secure: bZcUIoyDu8tL8xyO6FL8JjfpRQe2QzzdKav7/V68NVjRxVNuc6FPc+VTchaVtKAfo7iVxjk0krUpyOeQujY3j8uL+ePs7dswGDHY/9trTyGws7NvcCzH+UrR5Yn2TM6I6ill5eHiBiW9W1/eX+K8UiSd/Usk9gZeBjJyz76tZh4=
-  matrix:
-    - CHECKED=js
-    - CHECKED=native
 
 addons:
   apt:
@@ -15,13 +12,16 @@ addons:
     - ocaml-nox
     - opam
 
+matrix:
+  include:
+  - env: CHECKED=js
+  - env: CHECKED=native
+    addons.apt.packages: gnuplot-nox graphviz texlive-latex-recommended tex4ht
+
 install:
-  - sh -c "if [ '$CHECKED' = js ] ; then sudo apt-get install -qq camlp4-extra ; fi"
   - opam init -a git://github.com/ocaml/opam-repository && eval $(opam config env)
   - opam install ocamlfind
   - sh -c "if [ '$CHECKED' = js ] ; then opam install -y reactiveData tyxml js_of_ocaml ; fi"
-  - sh -c "if [ '$CHECKED' = native ] ; then sudo apt-get install -qq gnuplot-nox graphviz ; fi"
-  - sh -c "if [ '$CHECKED' = native ] ; then sudo apt-get install -qq texlive-latex-recommended tex4ht ; fi"
 
 script:
   - make all
