@@ -186,6 +186,10 @@ site_type:1:state:0
 --------------------------------------------
 BDU ITERATION OF CREATION - CV rules
 --------------------------------------------
+BDU ITERATION OF ITERATE HALF_BREAK - CV rules
+--------------------------------------------
+BDU ITERATION OF ITERATE HALF_BREAK - CREATION rules
+--------------------------------------------
 BDU ITERATION OF ITERATE HALF_BREAK - CREATION - CV rules
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
