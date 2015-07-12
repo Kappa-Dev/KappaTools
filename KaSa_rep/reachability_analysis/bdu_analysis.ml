@@ -645,7 +645,7 @@ let print_result parameter error result =
    let error =
     fprintf stdout "--------------------------------------------\n";
     fprintf stdout "BDU ITERATION OF ITERATE HALF_BREAK - CV rules\n";
-cv parameter error result.store_iterate_half_break_cv
+    print_iterate_half_cv parameter error result.store_iterate_half_break_cv
   in
   let error =
     fprintf stdout "--------------------------------------------\n";
