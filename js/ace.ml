@@ -1,4 +1,3 @@
-
 let get_editor_value () =
   let res = Js.Unsafe.fun_call
     (Js.Unsafe.variable

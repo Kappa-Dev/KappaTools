@@ -16,6 +16,7 @@ val array_fold_left_mapi :
   (int -> 'a -> 'b -> 'a * 'c) -> 'a -> 'b array -> 'a * 'c array
 val array_fold_left2i :
   (int -> 'a -> 'b -> 'c -> 'a) -> 'a -> 'b array -> 'c array -> 'a
+val list_last : 'a list -> 'a
 val list_exists_uniq :
   ('a -> bool) -> 'a list -> bool
 val list_rev_map_append : ('a -> 'b) -> 'a list -> 'b list -> 'b list

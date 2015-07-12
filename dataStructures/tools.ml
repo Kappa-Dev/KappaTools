@@ -53,6 +53,11 @@ let option_map f = function
   | Some x -> Some (f x)
   | None -> None
 
+let rec list_last = function
+  | [] -> failwith "list_last"
+  | [ x ] -> x
+  | _ :: l -> list_last l
+
 let rec list_smart_filter f = function
   | t :: q as l ->
      let q' = list_smart_filter f q in

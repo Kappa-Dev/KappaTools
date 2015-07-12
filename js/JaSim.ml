@@ -120,6 +120,7 @@ let onload _ =
   let go_button = Tyxml_js.To_dom.of_button raw_go_button in
   let stop_button = Tyxml_js.To_dom.of_button raw_stop_button in
   let () = Lwt_js_events.async (write_out log) in
+  let () = Lwt_js_events.async (Input.get_initial_content) in
   let _ = Lwt_js_events.clicks go_button
 			       (fun _ _ ->
 				launch_simulation go_button stop_button output graph) in
