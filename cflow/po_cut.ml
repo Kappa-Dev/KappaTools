@@ -43,7 +43,7 @@
            let ag_id = K.agent_id_of_agent ag in
            List.fold_left 
              (fun list (s_id,opt) -> 
-               let list = [Bound_site(ag_id,s_id)] in 
+               let list = [Bound_site(ag_id,s_id)]::list  in 
                match opt 
                with 
                  | None -> list 
