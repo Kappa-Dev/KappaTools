@@ -102,7 +102,7 @@ module Instantiation =
       | Is_Bound_to of 'a site * 'a site
 
     type 'a action =
-      | Create of 'a * (site_name * internal_state option) list
+      | Create of 'a * (site_name * internal_state option) list (* pourquoi ça *)
       | Mod_internal of 'a site * internal_state
       | Bind of 'a site * 'a site
       | Free of 'a site
@@ -165,11 +165,6 @@ module Instantiation =
 	 Bind (((f pl,Place.get_type pl),s),((f pl',Place.get_type pl'),s'))
       | Free (pl,s) -> Free ((f pl,Place.get_type pl),s)
       | Remove pl -> Remove (f pl,Place.get_type pl)
-
-    let abstract_action_of_transformation = function
-      | Transformation.Freed (pl,s) -> Free (pl,s)
-      | Transformation.Linked (x,y) -> Bind (x,y)
-      | Transformation.Internalized (p,s,i) -> Mod_internal ((p,s),i)
 
     let with_sigs f = function
       | None -> Format.pp_print_int

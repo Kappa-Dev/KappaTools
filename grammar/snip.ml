@@ -496,38 +496,55 @@ let define_positive_transformation (removed,added as transf) links_transf
        let links_transf' = IntMap.add i ((place,site)) links_transf in
        (transf,links_transf')
 
-let make_instantiation place links acc = function
-  | None -> acc,None
+let add_instantiation_free actions pl s = function
+  | Freed -> Primitives.Instantiation.Free (pl,s) :: actions
+  | (Linked _ | Maintained | Erased) -> actions
+
+(* Deals with tests, erasure internal state change and release (but
+not binding)*)
+let make_instantiation place links (tests,actions as acc) = function
+  | None -> acc
   | Some (ports, ints) ->
-     let rec aux site_id acc links =
+     let rec aux site_id tests actions links =
        if site_id < 0
-       then Primitives.Instantiation.Is_Here place :: acc
+       then (Primitives.Instantiation.Is_Here place :: tests,
+	     match ports.(0) with
+	     | L_FREE Erased ->
+		Primitives.Instantiation.Remove place :: actions
+	     | L_FREE (Maintained | Linked _ | Freed)
+	     | L_ANY _ | L_SOME _ | L_TYPE _ | L_VAL _ -> actions)
        else
-	 let test =
+	 let tests',actions' =
 	   match ints.(site_id) with
-	   | (I_ANY | I_ANY_ERASED | I_ANY_CHANGED _) -> acc
-	   | (I_VAL_CHANGED (i,_) | I_VAL_ERASED i) ->
-	      Primitives.Instantiation.Has_Internal ((place,site_id),i) :: acc
+	   | (I_ANY | I_ANY_ERASED | I_ANY_CHANGED _) -> tests,actions
+	   | I_VAL_CHANGED (i,j) ->
+	      Primitives.Instantiation.Has_Internal ((place,site_id),i) :: tests,
+	      Primitives.Instantiation.Mod_internal ((place,site_id),j) :: actions
+	   | I_VAL_ERASED i ->
+	      Primitives.Instantiation.Has_Internal ((place,site_id),i) :: tests,
+	      actions
 	 in
-	 let test',links' =
+	 let tests'',actions'',links' =
 	   match ports.(site_id) with
-	   | L_ANY _ -> test,links
-	   | L_FREE _ ->
-	      Primitives.Instantiation.Is_Free (place,site_id) :: test,links
-	   | L_SOME _ ->
-	      Primitives.Instantiation.Is_Bound (place,site_id) :: test,links
-	   | L_TYPE (a,b,_) ->
+	   | L_ANY s ->
+	      tests',add_instantiation_free actions' place site_id s,links
+	   | L_FREE s ->
+	      Primitives.Instantiation.Is_Free (place,site_id) :: tests',
+	      add_instantiation_free actions' place site_id s,links
+	   | L_SOME s ->
+	      Primitives.Instantiation.Is_Bound (place,site_id) :: tests',
+	      add_instantiation_free actions' place site_id s,links
+	   | L_TYPE (a,b,s) ->
 	      Primitives.Instantiation.Has_Binding_type ((place,site_id),(a,b))
-	      :: test,links
-	   | L_VAL ((i,_),_) ->
-	      try IntMap.find i links :: test, IntMap.remove i links
-	      with Not_found -> test, links in
-	 aux (pred site_id) test' links' in
-     (aux (pred (Array.length ports)) acc links,
-      match ports.(0) with
-      | L_FREE Erased -> Some place
-      | L_FREE (Maintained | Linked _ | Freed)
-      | L_ANY _ | L_SOME _ | L_TYPE _ | L_VAL _ -> None)
+	      :: tests',
+	      add_instantiation_free actions' place site_id s,links
+	   | L_VAL ((i,_),s) ->
+	      try IntMap.find i links :: tests',
+		  add_instantiation_free actions' place site_id s,
+		  IntMap.remove i links
+	      with Not_found -> tests', actions', links in
+	 aux (pred site_id) tests'' actions'' links' in
+     aux (pred (Array.length ports)) tests actions links
 
 
 let rec add_agents_in_cc id wk registered_links transf links_transf
@@ -544,12 +561,9 @@ let rec add_agents_in_cc id wk registered_links transf links_transf
      let rec handle_ports wk r_l c_l (removed,added) l_t re acc site_id =
        if site_id = Array.length ag.ra_ports
        then
-	 let tests,actions = instantiations in
-	 let tests',delete = make_instantiation place c_l tests ag.ra_syntax in
-	 let actions' = match delete with
-	     None -> actions
-	   | Some p -> Primitives.Instantiation.Remove p :: actions in
-	 add_agents_in_cc id wk r_l (removed,added) l_t (tests',actions') re acc
+	 let instantiations' =
+	   make_instantiation place c_l instantiations ag.ra_syntax in
+	 add_agents_in_cc id wk r_l (removed,added) l_t instantiations' re acc
        else
 	 let transf,wk' = match ag.ra_ints.(site_id) with
 	   | I_ANY -> (removed,added),wk
@@ -679,17 +693,21 @@ let connected_components_of_mixture created id_incr (env,rule_id) mix =
   let rec aux env transformations instantiations links_transf acc id = function
     | [] ->
        let removed,added = transformations in
-       let tests,del_actions = instantiations in
-       let actions =
-	 List.map Primitives.Instantiation.abstract_action_of_transformation
-		  added in
+       let tests,actions = instantiations in
+       let actions' =
+	 List.fold_left
+	   (fun acs -> function
+		      | Primitives.Transformation.Linked (x,y) ->
+			 Primitives.Instantiation.Bind (x,y) :: acs
+		      | (Primitives.Transformation.Freed _ |
+			 Primitives.Transformation.Internalized _) -> acs)
+	   actions added in
        let transformations' = (List.rev removed, List.rev added) in
-       let actions',transformations'' =
+       let actions'',transformations'' =
 	 complete_with_creation
-	   transformations' links_transf actions 0 created in
+	   transformations' links_transf actions' 0 created in
        ((env,Tools.option_map id_incr rule_id),(Tools.array_rev_of_list acc,
-	     (tests,List.rev_append del_actions actions'),
-	     transformations''))
+	(tests,actions''), transformations''))
     | h :: t ->
        let wk = Connected_component.begin_new env in
        let (wk_out,(removed,added),l_t,(tests,actions),remains) =

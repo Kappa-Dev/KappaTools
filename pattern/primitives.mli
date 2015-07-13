@@ -63,7 +63,6 @@ sig
   val rename_abstract_action :
     Connected_component.work -> int ->
     Connected_component.cc -> Renaming.t -> abstract action -> abstract action
-  val abstract_action_of_transformation : Transformation.t -> abstract action
   val concretize_test : (Place.t -> int) -> abstract test -> concrete test
   val concretize_action : (Place.t -> int) -> abstract action -> concrete action
 
