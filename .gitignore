@@ -8,11 +8,16 @@ KaSim
 KaSa.native
 KaSa.byte
 KaSa
+sanity_test
 bin/
 *~
 _build/
 ._d/
 ._ncdi/
+
+#js
+JaSim.byte
+js/JaSim.js
 
 # doc
 *.log
@@ -25,6 +30,7 @@ man/KaSim_manual.idx
 man/KaSim_manual.lot
 man/KaSim_manual.toc
 *.witness
+man/zzKaSim_manual.ps
 
 # test suite
 models/test_suite/*/*/output/*.diff
