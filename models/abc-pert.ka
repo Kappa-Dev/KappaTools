@@ -31,4 +31,4 @@
 %init: 'n_ab' A(),B()
 %init: 'n_c' C()
 
-%mod: [T]=10 || [false] do $ADD 10000 C()
+%mod: [T]=10 || [false] do $ADD 1000 C()
