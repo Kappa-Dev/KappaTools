@@ -1177,7 +1177,7 @@ module Blackboard =
 	      in 
               let string_eid error = 
                 try 
-                  PB.CI.Po.K.print_step parameter handler error (PB.A.get blackboard.event eid)
+                  PB.CI.Po.K.print_refined_step parameter handler error (PB.A.get blackboard.event eid)
                 with 
                 | Not_found -> let _ = Format.fprintf desc "Event:%s" (string_of_int eid) in error 
               in
@@ -1186,17 +1186,13 @@ module Blackboard =
               let _  = print_case desc row_precondition 2 None color "PRECONDITION" in 
               let _ = print_case desc row_postcondition 2 None color "POSTCONDITION" in 
               let error = aux2 print_test print_action list error in
-              let bool = 
-                try 
-                  begin 
-                    match PB.CI.Po.K.type_of_refined_step (PB.A.get blackboard.event eid:PB.CI.Po.K.refined_step)
-                    with 
-                    | PB.CI.Po.K.Event _ | PB.CI.Po.K.Obs _ | PB.CI.Po.K.Init _ -> true
-                    | _ -> false
-                  end
-                with 
-                | Not_found -> false
-              in 
+              let bool =
+                try
+                  let cand = PB.A.get blackboard.event eid in
+		  PB.CI.Po.K.is_event_of_refined_step cand ||
+		    PB.CI.Po.K.is_obs_of_refined_step cand ||
+		      PB.CI.Po.K.is_init_of_refined_step cand
+                with Not_found -> false in
               let error,stack = 
                 if bool 
                 then 

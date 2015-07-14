@@ -1,4 +1,4 @@
-type jf_data = unit
+type jf_data = Compression_main.secret_log_info * Compression_main.secret_step list
 
 type t = {
   roots_of_ccs: ValMap.tree Connected_component.Map.t;
@@ -19,7 +19,8 @@ let empty ~has_tracking env = {
   free_id = 1;
   story_machinery =
     if has_tracking
-    then Some (Connected_component.Map.empty,()) (*Compression_main.init*)
+    then Some (Connected_component.Map.empty,
+	       (Compression_main.init_secret_log_info (), [])) (*Compression_main.init*)
     else None;
 }
 

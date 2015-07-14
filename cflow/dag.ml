@@ -37,13 +37,29 @@ module type Dag =
       
     val print_prehash: (prehash -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler
     val print_canonical_form: (canonical_form -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler
-    val print_graph: (graph -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler 
-     
-    val hash_list: ((prehash * (Causal.grid * graph * canonical_form option * (S.PH.B.PB.step_id list * S.PH.update_order list * S.PH.B.PB.CI.Po.K.refined_step list) * S.PH.B.PB.CI.Po.K.step list  (** S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option*)* S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list ) list) list -> S.PH.B.PB.CI.Po.K.H.error_channel * (prehash * (Causal.grid * graph * canonical_form option * (S.PH.B.PB.step_id list * S.PH.update_order list * S.PH.B.PB.CI.Po.K.refined_step list)  * S.PH.B.PB.CI.Po.K.step list  (** S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option*)* S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list ) list) list) S.PH.B.PB.CI.Po.K.H.with_handler  
+    val print_graph: (graph -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler
 
-    val sort_list: (prehash * (Causal.grid * graph * canonical_form option * (S.PH.B.PB.step_id list * S.PH.update_order list * S.PH.B.PB.CI.Po.K.refined_step list (** S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option*))* S.PH.B.PB.CI.Po.K.step list * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list ) list) list -> (Causal.grid * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list ) list
+    val hash_list:
+      ((prehash *
+	  (Causal.grid * graph * canonical_form option *
+	     (S.PH.B.PB.step_id list * S.PH.update_order list *
+		S.PH.B.PB.CI.Po.K.refined_step list) *
+	       S.PH.B.PB.CI.Po.K.refined_step list  (** S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option*)*
+		 S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list)
+	    list) list ->
+       S.PH.B.PB.CI.Po.K.H.error_channel *
+	 (prehash *
+	    (Causal.grid * graph * canonical_form option *
+	       (S.PH.B.PB.step_id list * S.PH.update_order list *
+		  S.PH.B.PB.CI.Po.K.refined_step list) *
+		 S.PH.B.PB.CI.Po.K.refined_step list  (** S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option*)*
+		   S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list)
+	      list) list) S.PH.B.PB.CI.Po.K.H.with_handler
 
-  end 
+    val sort_list:
+      (prehash * (Causal.grid * graph * canonical_form option * (S.PH.B.PB.step_id list * S.PH.update_order list * S.PH.B.PB.CI.Po.K.refined_step list (** S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option*))* S.PH.B.PB.CI.Po.K.refined_step list * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list ) list) list ->
+      (Causal.grid * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list) list
+  end
 
 
 module Dag = 
@@ -159,11 +175,12 @@ module Dag =
         let _ = Format.fprintf parameter.H.out_channel_err "@." in 
         error 
 
-      let label handler = Causal.label handler.H.env handler.H.state
+      let label handler = Causal.label handler.H.env
+
       let kind node = 
         match node 
         with 
-          | Causal.INIT _ -> INIT
+          | Causal.INIT -> INIT
           | Causal.RULE _ -> RULE
           | Causal.PERT _ -> PERT
           | Causal.OBS _ -> OBS
@@ -433,8 +450,7 @@ module Dag =
           with 
             | [],_ | _,None -> 
               Some to_beat  (* candidate is a prefix of to_beat, we output the suffix *) 
-            | t::q, Some [] -> 
-              None (* the candidate is worse *)
+            | _::_, Some [] -> None (* the candidate is worse *)
             | t::q,Some (tr::qr) -> 
               let cmp = compare_elt t tr in 
               if cmp < 0 

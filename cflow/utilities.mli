@@ -26,7 +26,7 @@ type ('a,'b,'c) remanent =
          (Causal.grid * D.graph * 'a option *
             ('b * D.S.PH.update_order list *
                D.S.PH.B.PB.CI.Po.K.refined_step list) *
-              D.S.PH.B.PB.CI.Po.K.step list *
+              D.S.PH.B.PB.CI.Po.K.refined_step list *
 		'c Mods.simulation_info option list)
            list)
         list * int

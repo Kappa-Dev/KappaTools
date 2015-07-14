@@ -21,10 +21,9 @@
 module U = Utilities 
 module D = U.D
 type secret_log_info = D.S.PH.B.PB.CI.Po.K.P.log_info
-type secret_step = D.S.PH.B.PB.CI.Po.K.step
+type secret_step = D.S.PH.B.PB.CI.Po.K.refined_step
 let init_secret_log_info = D.S.PH.B.PB.CI.Po.K.P.init_log_info
-let secret_store_event x y =
-  D.S.PH.B.PB.CI.Po.K.store_event x (D.S.PH.B.PB.CI.Po.K.import_event y)
+let secret_store_event = D.S.PH.B.PB.CI.Po.K.store_event
 let secret_store_obs = D.S.PH.B.PB.CI.Po.K.store_obs
 let secret_store_init = D.S.PH.B.PB.CI.Po.K.store_init
 
@@ -45,9 +44,7 @@ let th_of_int n =
 
 let dummy_weak = false
 
-			       
-
-let compress logger env state log_info step_list =
+let compress logger env log_info step_list =
   let parameter = D.S.PH.B.PB.CI.Po.K.H.build_parameter () in
   let mode = parameter.D.S.PH.B.PB.CI.Po.K.H.compression_mode in
   let causal_trace_on = Parameter.get_causal_trace mode in
@@ -56,7 +53,6 @@ let compress logger env state log_info step_list =
   let handler =
     {
       D.S.PH.B.PB.CI.Po.K.H.env = env ;
-      D.S.PH.B.PB.CI.Po.K.H.state = state
     } in
   let causal,trivial,weak,strong =
     if (not causal_trace_on)
@@ -66,7 +62,7 @@ let compress logger env state log_info step_list =
     else
       begin (* causal compression *)
         let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_none parameter in
-        if D.S.PH.B.PB.CI.Po.K.no_obs_found step_list
+        if not @@ List.exists D.S.PH.B.PB.CI.Po.K.is_obs_of_refined_step step_list
         then
           let () = Debug.tag logger "+ No causal flow found" in
           [],[],[],[]
@@ -76,8 +72,8 @@ let compress logger env state log_info step_list =
             then Debug.tag logger "+ Producing causal compressions"
             else Debug.tag logger "+ Producing causal traces"
           in
-          let error = D.S.PH.B.PB.CI.Po.K.H.error_init in          
-	  let step_list = D.S.PH.B.PB.CI.Po.K.disambiguate step_list handler in
+          let error = D.S.PH.B.PB.CI.Po.K.H.error_init in
+          let refined_event_list = D.S.PH.B.PB.CI.Po.K.disambiguate step_list in
           let () = if log_step then Debug.tag logger"\t - refining events" in
           let refined_event_list = 
             List.rev_map 
@@ -90,18 +86,8 @@ let compress logger env state log_info step_list =
 	      Graph_closure.ignore_flow_from_outgoing_siphon 
 	    then
 	      let () = if log_step then Debug.tag logger"\t - detecting siphons" in
-	      let error,step_list = D.S.PH.B.PB.CI.Po.K.fill_siphon parameter handler error refined_event_list in 
-	      let step_list = D.S.PH.B.PB.CI.Po.K.disambiguate step_list handler in
-	      let refined_event_list = 
-		List.rev_map 
-		  (fun x -> 
-                    snd (D.S.PH.B.PB.CI.Po.K.refine_step parameter handler error x))
-		  step_list 
-              in
-	      error,refined_event_list 
-	    else 
-	      error,refined_event_list 
-	  in 
+	      D.S.PH.B.PB.CI.Po.K.fill_siphon refined_event_list
+	    else refined_event_list in
           let _ = 
             if debug_mode
             then 
@@ -420,18 +406,15 @@ let compress logger env state log_info step_list =
                   List.fold_left 
                     (fun (error,counter,tick,blackboard,strong_compression_faillure,strongly_compressed_story_array) (_,a) ->
                       List.fold_left 
-                        (fun (error,counter,tick,blackboard,strong_compression_faillure,strongly_compressed_story_array) (_,grid,graph,(event_id_list,list_order,event_list),step_list,list_info) -> 
+                        (fun (error,counter,tick,blackboard,strong_compression_faillure,strongly_compressed_story_array) (_,grid,graph,(event_id_list,list_order,event_list),refined_event_list,list_info) -> 
                           let info = List.hd list_info in 
-                          let refined_event_list = 
-                            List.rev_map (fun x -> snd (D.S.PH.B.PB.CI.Po.K.refine_step parameter handler error x)) step_list 
-                          in       
                           let error,log_info,blackboard_tmp = D.S.PH.B.import parameter handler error log_info refined_event_list in 
                           let error,list = D.S.PH.forced_events parameter handler error blackboard_tmp in     
                           let list_order = 
                             match list 
                             with 
                             | [] -> []
-                            | (list_order,_,_)::q -> list_order
+                            | (list_order,_,_)::_ -> list_order
                           in 
                           let error,log_info,blackboard_tmp,output,list = 
                             D.S.compress parameter handler error log_info blackboard_tmp list_order 

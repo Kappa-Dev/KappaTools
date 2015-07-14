@@ -28,34 +28,34 @@
  module Po_cut = 
    (struct 
 
-     module K=Kappa_instantiation.Cflow_linker 
+     module K=Kappa_instantiation.Cflow_linker
 
      type predicate_info = 
        | Here of K.agent_id  
-       | Bound_site of K.agent_id * K.site_name
-       | Internal_state of K.agent_id * K.site_name
+       | Bound_site of K.agent_id * K.PI.site_name
+       | Internal_state of K.agent_id * K.PI.site_name
 
      module PS = Set.Make (struct type t = predicate_info let compare = compare end)
 
      let created_predicates_of_action action = 
        match action with 
-         | K.Create (ag,interface) -> 
+         | K.PI.Create (ag,interface) -> 
            let ag_id = K.agent_id_of_agent ag in
            List.fold_left 
              (fun list (s_id,opt) -> 
-               let list = (Bound_site(ag_id,s_id))::list  in 
+               let list = Bound_site(ag_id,s_id) :: list in 
                match opt 
                with 
                  | None -> list 
-                 | Some x ->  (Internal_state (ag_id,s_id))::list 
+                 | Some _ ->  (Internal_state (ag_id,s_id))::list 
              )
              [Here ag_id]
              interface
-         | _ -> []
+         | K.PI.Bind _ | K.PI.Bind_to _ | K.PI.Remove _ | K.PI.Free _ | K.PI.Mod_internal _ -> []
 
      let predicates_of_action action = 
        match action with 
-         | K.Create (ag,interface) -> 
+         | K.PI.Create (ag,interface) -> 
            let ag_id = K.agent_id_of_agent ag in
              List.fold_left 
                (fun list (s_id,opt) -> 
@@ -63,28 +63,28 @@
                  match opt 
                  with 
                    | None -> list 
-                   | Some x ->  (Internal_state (ag_id,s_id))::list 
+                   | Some _ ->  (Internal_state (ag_id,s_id))::list 
                )
                [Here ag_id]
                interface
-         | K.Mod_internal (site,int)  -> 
+         | K.PI.Mod_internal (site,_)  -> 
            [Internal_state (K.agent_id_of_site site,K.site_name_of_site site)]
-         | K.Bind_to (s1,s2)  | K.Bind (s1,s2) | K.Unbind(s1,s2) -> 
+         | K.PI.Bind_to (s1,s2)  | K.PI.Bind (s1,s2) ->
            [Bound_site (K.agent_id_of_site s1,K.site_name_of_site s1);Bound_site (K.agent_id_of_site s2,K.site_name_of_site s2)]
-         | K.Free s ->
+         | K.PI.Free s ->
            [Bound_site (K.agent_id_of_site s,K.site_name_of_site s)]
-         | K.Remove ag -> []
+         | K.PI.Remove _ -> []
 
      let predicates_of_test test = 
        match test
        with 
-         | K.Is_Here (agent) ->
+         | K.PI.Is_Here (agent) ->
            [Here (K.agent_id_of_agent agent)]
-         | K.Has_Internal(site,int) -> 
+         | K.PI.Has_Internal(site,_) -> 
            [Internal_state (K.agent_id_of_site site,K.site_name_of_site site)]
-         | K.Is_Free s | K.Is_Bound s | K.Has_Binding_type (s,_) -> 
+         | K.PI.Is_Free s | K.PI.Is_Bound s | K.PI.Has_Binding_type (s,_) -> 
            [Bound_site (K.agent_id_of_site s,K.site_name_of_site s)]
-         | K.Is_Bound_to  (s1,s2) -> 
+         | K.PI.Is_Bound_to  (s1,s2) -> 
            [Bound_site (K.agent_id_of_site s1,K.site_name_of_site s1);Bound_site (K.agent_id_of_site s2,K.site_name_of_site s2)]
 
      let predicates_of_side_effects sides = 

@@ -23,77 +23,50 @@ let compose_with_handler f g parameter handler error x =
   let error,y = g parameter handler error x in 
   f parameter handler error y 
 
-let compose f g = (fun x -> f @@ g x)
-
 module type Cflow_signature =
 sig
-  module H:Cflow_handler.Cflow_handler 
-  module P:StoryProfiling.StoryStats 
-  type agent_name = int
-  type site_name = int 
+  module H:Cflow_handler.Cflow_handler
+  module P:StoryProfiling.StoryStats
+  module PI = Primitives.Instantiation
+
   type agent_id = int 
   module AgentIdSet:Set.S with type elt = agent_id
-  type agent 
-  type site 
+
   type internal_state = int 
-  type binding_type 
-  type binding_state = 
-    | ANY 
-    | FREE 
-    | BOUND 
-    | BOUND_TYPE of binding_type 
-    | BOUND_to of site 
 
-  type ('a,'b,'c,'d) choice = 
-    | Subs of ('c*'d)
-    | Event of 'a 
-    | Obs of 'b
-    | Dummy of string  
-    
-
-  type test = 
-    | Is_Here of agent
-    | Has_Internal of site * internal_state 
-    | Is_Free of site 
-    | Is_Bound of site
-    | Has_Binding_type of site * binding_type 
-    | Is_Bound_to of site * site 
-
-  type action = 
-    | Create of agent * (site_name * internal_state option) list 
-    | Mod_internal of site * internal_state 
-    | Bind of site * site 
-    | Free of site 
-    | Remove of agent 
-
+  (*
   type event 
   type embedding
   type fresh_map 
   type obs  
-  type step 
-  type side_effect 
-  type kasim_side_effect = Mods.Int2Set.t 
-  type kappa_rule 
-  type refined_event 
+  type step *)
+  type side_effect
+  type kasim_side_effect = Mods.Int2Set.t
+(*  type kappa_rule *)
+  type refined_event =
+      int * PI.concrete PI.event
+  type refined_obs =
+      int * PI.concrete PI.test list * unit Mods.simulation_info
   type refined_step
-  type obs_from_rule_app = (int * int Mods.IntMap.t) list 
+(*  type obs_from_rule_app = (int * int Mods.IntMap.t) list 
   type r = Primitives.elementary_rule 
   type counter = int 
-  type rule_info = obs_from_rule_app * r * counter * kasim_side_effect
-                   
+  type rule_info = obs_from_rule_app * r * counter * kasim_side_effect*)
+
   val empty_side_effect: side_effect
   val dummy_refined_step: string -> refined_step
-  val type_of_refined_step: refined_step -> (unit,unit,unit,unit) choice 
-  val agent_of_binding_type: binding_type -> agent_name 
-  val site_of_binding_type: binding_type -> site_name
-  val agent_id_of_agent: agent -> agent_id 
-  val agent_name_of_agent: agent -> agent_name
-  val agent_of_site: site -> agent 
-  val agent_id_of_site: site -> agent_id 
-  val agent_name_of_site: site -> agent_name 
-  val site_name_of_site: site -> site_name 
-  val agent_name_of_binding_type: binding_type -> agent_name
-  val site_name_of_binding_type: binding_type -> site_name 
+  (*  val type_of_refined_step: refined_step -> (unit,unit,unit,unit) choice*)
+  val agent_name_of_binding_type: PI.binding_type -> PI.agent_name
+  val site_name_of_binding_type: PI.binding_type -> PI.site_name
+  val agent_id_of_agent:
+    PI.concrete -> int
+  val agent_name_of_agent: PI.concrete -> PI.agent_name
+  val agent_of_site: PI.concrete PI.site -> PI.concrete
+  val agent_id_of_site: PI.concrete PI.site -> int
+  val agent_name_of_site: PI.concrete PI.site -> PI.agent_name
+  val site_name_of_site: PI.concrete PI.site -> PI.site_name
+(*  val agent_name_of_binding_type: binding_type -> PI.agent_name
+  val site_name_of_binding_type: binding_type -> PI.site_name
   val build_agent: agent_id -> agent_name -> agent 
   val build_site: agent -> site_name -> site 
   val get_binding_sites: (agent_name -> H.error_channel * site_name list) H.with_handler 
@@ -102,100 +75,103 @@ sig
   val btype_of_names : agent_name -> site_name -> binding_type 
   val embedding_of_event: event -> embedding
   val fresh_map_of_event: event -> fresh_map
-  val refine_step: (step -> H.error_channel * refined_step) H.with_handler 
-  val build_subs_refined_step: int -> int -> refined_step 
-  val step_of_refined_step: (refined_step -> H.error_channel * step) H.with_handler 
-  val rule_of_refined_event: (refined_event -> H.error_channel * kappa_rule) H.with_handler
-  val tests_of_refined_step: (refined_step -> H.error_channel * test list) H.with_handler 
-  val actions_of_refined_step: (refined_step -> H.error_channel * (action list * (site*binding_state) list)) H.with_handler  
-  val is_obs_of_refined_step: refined_step -> bool 
-  val simulation_info_of_refined_step: refined_step -> unit Mods.simulation_info option 
-
+  val refine_step: (step -> H.error_channel * refined_step) H.with_handler *)
+  val build_subs_refined_step: int -> int -> refined_step
+(*  val step_of_refined_step: (refined_step -> H.error_channel * step) H.with_handler
+  val rule_of_refined_event: (refined_event -> H.error_channel * kappa_rule) H.with_handler*)
+  val tests_of_refined_step: (refined_step -> H.error_channel * PI.concrete PI.test list) H.with_handler
+  val actions_of_refined_step:
+    (refined_step ->
+     H.error_channel *
+       (PI.concrete PI.action list *
+	  (PI.concrete PI.site*PI.concrete PI.binding_state) list)) H.with_handler
+  val is_obs_of_refined_step: refined_step -> bool
+  val is_init_of_refined_step: refined_step -> bool
+  val is_subs_of_refined_step: refined_step -> bool
+  val is_event_of_refined_step: refined_step -> bool
+  val simulation_info_of_refined_step:
+    refined_step -> unit Mods.simulation_info option
+(*
   val print_test: (string -> test -> H.error_channel) H.with_handler
-  val print_action: (string -> action -> H.error_channel) H.with_handler 
+  val print_action: (string -> action -> H.error_channel) H.with_handler *)
   val print_side:
-    Format.formatter -> H.handler -> string  -> (site*binding_state) -> unit
+    Format.formatter -> H.handler -> string  ->
+    (PI.concrete PI.site*PI.concrete PI.binding_state) -> unit
 
-  val print_refined_step: (refined_step -> H.error_channel) H.with_handler 
+  val print_refined_step: (refined_step -> H.error_channel) H.with_handler
 
+  val store_init: P.log_info -> PI.concrete PI.action list -> refined_step list -> P.log_info * refined_step list
+  val store_event:
+    P.log_info -> refined_event -> refined_step list -> P.log_info * refined_step list
+  val store_obs :
+    P.log_info -> refined_obs  -> refined_step list -> P.log_info * refined_step list
 
-  val import_event:  (Primitives.elementary_rule * int Mods.IntMap.t * int Mods.IntMap.t) * rule_info -> event 
-  val store_event: P.log_info -> event -> step list -> P.log_info * step list 
-  val store_obs :  P.log_info -> int * Mixture.t * int Mods.IntMap.t * unit Mods.simulation_info -> step list -> P.log_info * step list 
-  val build_grid: (refined_step * side_effect * bool)  list -> bool -> H.handler -> Causal.grid 
+  val build_grid:
+    (refined_step * side_effect * bool)  list -> bool -> H.handler -> Causal.grid
   val print_side_effect: Format.formatter -> side_effect -> unit
-  val side_effect_of_list: (int*int) list -> side_effect 
-  val no_obs_found: step list -> bool 
+  val side_effect_of_list: (int*int) list -> side_effect
+(*  val no_obs_found: step list -> bool 
 
   val subs_agent_in_test: agent_id -> agent_id -> test -> test
-  val subs_agent_in_action: agent_id -> agent_id -> action -> action 
-  val subs_agent_in_side_effect: agent_id -> agent_id -> (site*binding_state) -> (site*binding_state) 
+  val subs_agent_in_action: agent_id -> agent_id -> action -> action
+  val subs_agent_in_side_effect:
+    agent_id -> agent_id -> (PI.concrete PI.site*binding_state) ->
+    (PI.concrete PI.site*binding_state)
 
   val subs_map_agent_in_test: (agent_id -> agent_id) -> test -> test
-  val subs_map_agent_in_action: (agent_id -> agent_id) -> action -> action 
-  val subs_map_agent_in_side_effect: (agent_id -> agent_id) -> (site*binding_state) -> (site*binding_state) 
+  val subs_map_agent_in_action: (agent_id -> agent_id) -> action -> action
+  val subs_map_agent_in_side_effect:
+    (agent_id -> agent_id) -> (PI.concrete PI.site*binding_state) ->
+    (PI.concrete PI.site*binding_state)*)
 
   val get_kasim_side_effects: refined_step -> kasim_side_effect 
 
   val level_of_event: (refined_step -> (agent_id -> bool) -> H.error_channel * Priority.level) H.with_handler
-  val disambiguate: step list -> H.handler -> step list 
-  val clean_events: (refined_step list -> H.error_channel * step list) H.with_handler 
-
-  val print_step: (refined_step -> H.error_channel) H.with_handler 
+  val disambiguate: refined_step list -> refined_step list
+  val clean_events: refined_step list -> refined_step list
   val agent_id_in_obs: (refined_step -> H.error_channel * AgentIdSet.t) H.with_handler 
 
-  val fill_siphon: (refined_step list -> H.error_channel * step list) H.with_handler 
-end 
+  val fill_siphon: refined_step list -> refined_step list
+
+(*  val print_step: (refined_step -> H.error_channel) H.with_handler *)
+  val agent_id_in_obs: (refined_step -> H.error_channel * AgentIdSet.t) H.with_handler
+end
 
 
 
-module Cflow_linker = 
-(struct 
-  module H = Cflow_handler.Cflow_handler 
-  module P = StoryProfiling.StoryStats 
+module Cflow_linker =
+  (struct
+    module H = Cflow_handler.Cflow_handler
+    module P = StoryProfiling.StoryStats
+    module PI = Primitives.Instantiation
 
-  type agent_name = int
- 
-  type site_name = int 
+  type site_name = int
 
-  type agent_id = int 
+  type agent_id = int
 
   module AgIdSet = Set.Make (struct type t = agent_id let compare = compare end)
- 
-  type agent = agent_id * agent_name 
-
-  type site = agent * site_name 
-
+(*
   type kappa_rule = Primitives.elementary_rule
 
-  type embedding = agent_id Mods.IntMap.t 
-  type side_effect = (agent_id*int) list 
-  type kasim_side_effect = Mods.Int2Set.t 
-  type fresh_map = int Mods.IntMap.t 
+  type embedding = agent_id Mods.IntMap.t *)
+  type side_effect = (agent_id*int) list
+  type kasim_side_effect = Mods.Int2Set.t
+(*  type fresh_map = int Mods.IntMap.t 
   type obs_from_rule_app = (int * int Mods.IntMap.t) list 
   type r = Primitives.elementary_rule 
   type counter = int  
   type rule_info = (obs_from_rule_app * r  * counter * kasim_side_effect) 
-  type event = (kappa_rule * embedding * fresh_map) * (rule_info)
-  type obs = int * Mixture.t * embedding * unit Mods.simulation_info 
+  type obs = int * Mixture.t * embedding 
       
-  let get_causal (_,d) = d 
+  let get_causal (_,d) = d *)
 
-  module AgentIdSet = Set.Make (struct type t = agent_id let compare=compare end)
   module AgentIdMap = Map.Make (struct type t = agent_id let compare=compare end)
+  module AgentIdSet = Set.Make (struct type t = agent_id let compare=compare end)
   module SiteMap = Map.Make (struct type t = site_name let compare=compare end)
   module SiteSet = Set.Make (struct type t = site_name let compare = compare end) 
   type internal_state  = int 
 
-  type binding_type = agent_name * site_name 
-
-  type binding_state = 
-    | ANY 
-    | FREE 
-    | BOUND 
-    | BOUND_TYPE of binding_type 
-    | BOUND_to of site 
-
+(*
   type test = 
     | Is_Here of agent
     | Has_Internal of site * internal_state 
@@ -209,42 +185,41 @@ module Cflow_linker =
     | Mod_internal of site * internal_state 
     | Bind of site * site 
     | Free of site 
-    | Remove of agent 
+    | Remove of agent *)
 
-
-  type ('a,'b,'c,'d) choice =
-  | Subs of ('c * 'd)
-  | Event of 'a
-  | Obs of 'b
+  type refined_event =
+      int * PI.concrete PI.event
+  type refined_obs =
+      int *
+	PI.concrete PI.test list *
+	  unit Mods.simulation_info
+  type refined_step =
+  | Subs of (agent_id * agent_id)
+  | Event of refined_event
+  | Init of PI.concrete PI.action list
+  | Obs of refined_obs
   | Dummy  of string
 
-  type refined_event = event * test list * (action list * ((site * binding_state) list))
-  type refined_obs =  obs * test list
-
-  type step = (event,obs,agent_id,agent_id) choice
-  type refined_step = (refined_event,refined_obs,agent_id,agent_id) choice
-
-  let btype_of_names a b = (a,b)
+(*
+  let btype_of_names a b = (a,b)*)
   let build_subs_refined_step a b = Subs (a,b)
-  let get_kasim_side_effects a = 
-    match a 
-    with 
-      | Event ((_,(_,_,_,a)),_,_) -> a
-      | Subs _ | Obs _ | Dummy _ -> Mods.Int2Set.empty 
-      
+  let get_kasim_side_effects = function
+    | Event ((_,(_,(_,_,a)))) -> a
+    | Subs _ | Obs _ | Dummy _ | Init _ -> Mods.Int2Set.empty
+
   let dummy_refined_step x = Dummy x
   let empty_side_effect = []
-  let type_of_refined_step c = 
+(*  let type_of_refined_step c = 
     match c 
     with 
       | Event _ -> Event ()
       | Subs (_,_) -> Subs ((),())
       | Obs _ -> Obs () 
-      | Dummy x -> Dummy x 
+      | Dummy x -> Dummy x *)
 
-  let site_of_binding_type = snd
-  let agent_of_binding_type = fst
-  let map_sites parameter handler error f map x = 
+  let site_name_of_binding_type = snd
+  let agent_name_of_binding_type = fst
+(*  let map_sites parameter handler error f map x = 
       try 
         let rec aux k list = 
           if k=0 
@@ -276,104 +251,61 @@ module Cflow_linker =
   let embedding_of_event ((_,x,_),_) = x 
   
   let rule_of_event ((x,_,_),_) = x
+ *)
+  let agent_id_of_agent = fst
 
-  let agent_id_of_agent = fst 
-  
-  let agent_name_of_agent = snd 
-  
-  let agent_of_site = fst 
-  
+  let agent_name_of_agent = snd
+
+  let agent_of_site = fst
+
   let agent_id_of_site x = agent_id_of_agent @@ agent_of_site x
-  
+
   let agent_name_of_site x = agent_name_of_agent @@ agent_of_site x
-  
-  let site_name_of_site = snd 
-  
-  let agent_name_of_binding_type = fst
-  
-  let site_name_of_binding_type = snd 
-    
+
+  let site_name_of_site = snd
+
+(*  let agent_name_of_binding_type = fst
+
+  let site_name_of_binding_type = snd
+
   let string_of_agent env agent =
     Format.asprintf "%a_%i" (Environment.print_agent ~env:env.H.env)
 		    (agent_name_of_agent agent) (agent_id_of_agent agent)
  
   let string_of_site_name _env = string_of_int 
-  
-  let string_of_site env site = (string_of_agent env (agent_of_site site))^"."^(string_of_site_name env (site_name_of_site site))
-  
-  let string_of_internal_state _env int = string_of_int int 
+				 *)
+  let print_site env f ((ag_id,ag),s) =
+    Format.fprintf f "%a_%i.%a"
+		   (Environment.print_agent ~env) ag ag_id
+		   (Signature.print_site (Environment.signatures env) ag) s
+
+(*  let string_of_internal_state _env int = string_of_int int 
   
   let string_of_btype _env (agent_name,site_name) = (string_of_int agent_name)^"!"^(string_of_int site_name)
-
-  let string_of_binding_state env state = 
+ *)
+  let print_binding_state env f state =
     match state with
-      | ANY -> "*"
-      | FREE -> ""
-      | BOUND -> "!_"
-      | BOUND_TYPE btype -> "!"^(string_of_btype env btype)
-      | BOUND_to site -> "!"^(string_of_site env site)
-
+      | PI.ANY -> Format.fprintf f"*"
+      | PI.FREE -> ()
+      | PI.BOUND -> Format.fprintf f "!_"
+      | PI.BOUND_TYPE (s,a) ->
+	 Format.fprintf f "!%a.%a"
+			(Signature.print_site (Environment.signatures env) a) s
+			(Environment.print_agent ~env) a
+      | PI.BOUND_to site ->
+	 Format.fprintf f "!%a" (print_site env) site
+  (*
   let print_event log env ((rule,emb,fresh),(rule_info)) =
     Kappa_printer.elementary_rule ~env log rule
 
   let print_obs log env obs = ()
+   *)
+  let print_side log hand prefix (s,binding_state) =
+    let env = hand.H.env in
+    Format.fprintf log "%s(%a,%a)\n" prefix (print_site env) s
+		   (print_binding_state env) binding_state
 
-  let print_test parameter handler error prefix test =
-    let log = parameter.H.out_channel in
-    let _ =
-      match test with
-      | Is_Here agent ->
-	 Format.fprintf log "%sIs_Here(%s)\n" prefix (string_of_agent handler agent)
-      | Has_Internal (site,int) ->
-	 Format.fprintf log "%sHas_Internal(%s~%s)\n" prefix
-			(string_of_site handler site) (string_of_internal_state handler int)
-      | Is_Free site ->
-	 Format.fprintf log "%sIs_Free(%s)\n" prefix (string_of_site handler site)
-      | Is_Bound site ->
-	 Format.fprintf log "%sIs_Bound(%s)\n" prefix (string_of_site handler site)
-      | Has_Binding_type (site,btype) ->
-	 Format.fprintf log "%sBtype(%s,%s)\n" prefix
-			(string_of_site handler site) (string_of_btype handler btype)
-      | Is_Bound_to (site1,site2) ->
-	 Format.fprintf log "%sIs_Bound(%s,%s)\n" prefix
-			(string_of_site handler site1) (string_of_site handler site2)
-    in error
-  let print_action parameter handler error prefix action =
-    let log = parameter.H.out_channel in 
-    let _ = 
-      match action with 
-      | Create (agent,list) -> 
-	let _ = Format.fprintf log "%sCreate(%s[" prefix (string_of_agent handler agent) in 
-	let _ = 
-	    List.fold_left 
-              (fun bool (x,y) -> 
-		let _ = 
-		  Format.fprintf 
-		    log 
-		    "%s%s%s" 
-		    (if bool then "," else "")
-		    (string_of_site_name handler x)
-		     (match y with 
-		     | None -> ""
-		     | Some y -> "~"^(string_of_int y))
-		in true)
-	      false list in
-	let _ = Format.fprintf log "])\n" in
-	()
-      | Mod_internal (site,int) ->
-	 Format.fprintf log "%sMod(%s~%s)\n" prefix (string_of_site handler site) (string_of_internal_state handler int)
-      | Bind (site1,site2) ->
-	 Format.fprintf log "%sBind(%s,%s)\n" prefix (string_of_site handler site1) (string_of_site handler site2)
-      | Free site ->
-	 Format.fprintf log "%sFree(%s)\n" prefix (string_of_site handler site)
-      | Remove agent ->
-	 Format.fprintf log "%sRemove(%s)\n" prefix (string_of_agent handler agent)
-    in error
-
-  let print_side log env prefix (s,binding_state) = 
-    Format.fprintf log "%s(%s,%s)\n" prefix (string_of_site env s) (string_of_binding_state env binding_state)
-
-  let lhs_of_rule rule = rule.Primitives.lhs 
+(*  let lhs_of_rule rule = rule.Primitives.lhs 
   let lhs_of_event = compose lhs_of_rule rule_of_event
     
   let get_agent parameter handler error agent_id lhs fresh_map = 
@@ -481,10 +413,8 @@ module Cflow_linker =
     | Bind (s1,s2) -> Bind(subs_map_site f s1,subs_map_site f s2)
     | Free site -> Free (subs_map_site f site)
     | Remove agent -> Remove (subs_map_agent f agent)
-
-  let subs_agent_in_side_effect id1 id2 (site,bstate) = (subs_site id1 id2 site,bstate)
-  let subs_map_agent_in_side_effect f (site,bstate) = (subs_map_site f site,bstate)
-
+ *)
+(*
   let apply_map id phi = 
     try 
       Mods.IntMap.find id phi 
@@ -746,61 +676,69 @@ module Cflow_linker =
 
   let tests_of_obs (i,mixture,phi) = 
     tests_of_lhs mixture phi 
-
-  let tests_of_refined_obs parameter handler error x = error,snd x 
-
-  let tests_of_refined_event _ _ error (_,y,_) =  error,y
+ *)
+  let tests_of_refined_obs _ _ error (_,x,_) = error, x
+  let tests_of_refined_event _ _ error (_,(y,(_,_,_))) =  error,y
+  let tests_of_refined_init _ _ error _ =  error,[]
   let tests_of_refined_subs _ _ error _ _ = error,[]
-  let actions_of_refined_event _ _ error (_,_,y) = error,y
+  let actions_of_refined_event _ _ error (_,(_,(x,y,_))) = error,(x,y)
+  let actions_of_refined_init _ _ error y = error,(y,[])
   let actions_of_refined_obs _ _ error _ = error,([],[])
   let actions_of_refined_subs _ _ error _ _ = error,([],[])
-  let rule_of_refined_event parameter handler error r_event = 
+(*  let rule_of_refined_event parameter handler error r_event = 
     let error,event = event_of_refined_event parameter handler error r_event in 
-    error,rule_of_event event 
+    error,rule_of_event event *)
 
-  let print_side_effects parameter handler error prefix (site,state) = 
-    let _ = 
-      Format.fprintf 
-        parameter.H.out_channel
-        "%sSide_effects(%s:%s)\n" 
-        prefix 
-        (string_of_site handler site)
-        (string_of_binding_state handler state)
-    in error 
+  let print_side_effects env =
+    Pp.list Pp.space
+	    (fun f (site,state) ->
+	     Format.fprintf
+	       f "Side_effects(%a:%a)@,"
+	       (print_site env) site (print_binding_state env) state)
 
-  let print_refined_obs parameter handler error refined_obs = 
-    let _ = Format.fprintf parameter.H.out_channel "***Refined obs***" 
-    in error 
+  let print_refined_obs parameter _handler error _refined_obs =
+    let _ = Format.fprintf parameter.H.out_channel "***Refined obs***"
+    in error
 
-  let print_refined_subs parameter handler error a b  = error
+  let print_refined_subs _parameter _handler error _a _b  = error
 
-  let print_refined_event parameter handler error refined_event = 
-    let log = parameter.H.out_channel in 
-    let _ = Format.fprintf log "***Refined event:***\n" in 
-    let _ = Format.fprintf log "* Kappa_rule \n" in 
-    let error,rule = rule_of_refined_event parameter handler error refined_event in 
-    let _ = Dynamics.dump Format.err_formatter rule  handler.H.env in
-    let _ = Format.fprintf log "\n" in 
-    let error = 
-      let _ = Format.fprintf log "Story encoding: \n" in 
-      let error,tests = tests_of_refined_event parameter handler error refined_event in 
-      let error = List.fold_left (fun error -> print_test parameter handler error " ") error (List.rev tests) in 
-      let error,actions = actions_of_refined_event parameter handler error refined_event in 
-      let error = List.fold_left (fun error -> print_action parameter handler error " ") error (fst actions) in 
-      let error = List.fold_left (fun error -> print_side_effects parameter handler error " ") error (List.rev (snd actions)) in 
-      let _ = Format.fprintf log "***\n"  in 
-      error
-    in 
+  let print_refined_init parameter handler error actions =
+    let log = parameter.H.out_channel in
+    let sigs = Environment.signatures handler.H.env in
+    let () =
+      Format.fprintf log "@[<v>INIT:@,@[<v 1>%a@]@,@]@."
+		     (Pp.list Pp.space (PI.print_concrete_action ~sigs)) actions
+    in
     error
 
-  let gen f0 f1 f2 f3 (p:H.parameter) h e step =
+  let print_refined_event parameter handler error refined_event =
+    let log = parameter.H.out_channel in
+    let sigs = Environment.signatures handler.H.env in
+    let () = Format.fprintf log "@[<v>***Refined event:***@,* Kappa_rule@," in
+(*    let error,rule = rule_of_refined_event parameter handler error refined_event in
+    let _ = Dynamics.dump Format.err_formatter rule  handler.H.env in (*TODO*)*)
+    let _ = Format.fprintf log "@," in
+    let error,tests = tests_of_refined_event parameter handler error refined_event in
+    let error,actions =
+      actions_of_refined_event parameter handler error refined_event in
+    let () =
+      Format.fprintf log "Story encoding:@[<v 1>@,%a%a%a@]@,***@]@."
+		     (Pp.list ~trailing:Pp.space Pp.space (PI.print_concrete_test ~sigs))
+		     tests
+		     (Pp.list ~trailing:Pp.space Pp.space (PI.print_concrete_action ~sigs))
+		     (fst actions)
+		     (print_side_effects handler.H.env) (snd actions) in
+    error
+
+  let gen f0 f1 f2 f3 f4 (p:H.parameter) h e step =
     match step with
     | Subs (a,b) -> f0 p h e a b
     | Event a -> f1 p h e a
-    | Obs a -> f2 p h e a
-    | Dummy x  -> f3 p h e x
+    | Init a -> f2 p h e a
+    | Obs a -> f3 p h e a
+    | Dummy x  -> f4 p h e x
 
-  let genbis f0 f1 f2 f3 =
+(*  let genbis f0 f1 f2 f3 =
     gen
       (fun p h e a b ->
        let e,output = f0 p h e a b in
@@ -809,33 +747,50 @@ module Cflow_linker =
        let e,output = f1 p h e a in
         e,Event output)
       (fun p h e a ->
+       let e,output = f1 p h e a in
+        e,Init output)
+      (fun p h e a ->
        let e,output = f2 p h e a in
        e,Obs output)
       (fun p h e a ->
        let e,output = f3 p h e a in
        e,Dummy output)
-
+    *)
   let print_refined_step  =
-    gen print_refined_subs print_refined_event print_refined_obs (fun _ _ error _   -> error) 
+    gen print_refined_subs print_refined_event print_refined_init print_refined_obs
+	(fun _ _ error _   -> error)
 
   let tests_of_refined_step =
     gen
       tests_of_refined_subs
       tests_of_refined_event
+      tests_of_refined_init
       tests_of_refined_obs
       (fun _ _ error _ -> error,[])
 
   let is_obs_of_refined_step x =
     match x with
     | Obs _ -> true
-    | Event _ | Subs _ | Dummy _ -> false
+    | Event _ | Subs _ | Dummy _ | Init _ -> false
+  let is_init_of_refined_step x =
+    match x with
+    | Init _ -> true
+    | Event _ | Subs _ | Dummy _ | Obs _ -> false
+  let is_subs_of_refined_step x =
+    match x with
+    | Subs _ -> true
+    | Event _ | Init _ | Dummy _ | Obs _ -> false
+  let is_event_of_refined_step x =
+    match x with
+    | Event _ -> true
+    | Init _ | Subs _ | Dummy _ | Obs _ -> false
 
   let simulation_info_of_refined_step x =
     match x with
-    | Obs ((_,_,_,info),_) -> Some info
-    | Event _ | Subs _ | Dummy _ -> None
+    | Obs (_,_,info) -> Some info
+    | Event _ | Subs _ | Dummy _ | Init _ -> None
 
-  let (refine_step:(step->H.error_channel * refined_step) H.with_handler) =
+(*  let (refine_step:(step->H.error_channel * refined_step) H.with_handler) =
     genbis
       refine_subs
       refine_event
@@ -848,213 +803,174 @@ module Cflow_linker =
       event_of_refined_event
       obs_of_refined_obs
       (fun _ _ error x -> error,x)
-
+ *)
   let actions_of_refined_step =
     gen
       actions_of_refined_subs
       actions_of_refined_event
+      actions_of_refined_init
       actions_of_refined_obs
       (fun _ _ error _ -> error,([],[]))
+(*
+  let import_event x = x
+  let import_env x = x*)
+  let store_init log_info actions (step_list:refined_step list) =
+    P.inc_n_kasim_events log_info,(Init actions)::step_list
+  let store_event log_info (event:refined_event) (step_list:refined_step list) =
+    P.inc_n_kasim_events log_info,(Event event)::step_list
+  let store_obs log_info (i,x,c) step_list =
+    P.inc_n_obs_events log_info,Obs(i,x,c)::step_list
 
-  let import_event x = x 
-  let import_env x = x
-  let store_event log_info (event:event) (step_list:step list) = 
-    P.inc_n_kasim_events log_info,(Event event)::step_list    
-  let store_obs log_info (i,a,x,c) step_list = 
-    P.inc_n_obs_events log_info,Obs(i,a,x,c)::step_list 
-
-  let build_grid list bool handler = 
-    let env = handler.H.env in 
-    let empty_set = Mods.Int2Set.empty in 
-    let grid = Causal.empty_grid () in 
-    let grid,_,_,_ = 
-      List.fold_left 
+  let build_grid list bool handler =
+    let env = handler.H.env in
+    let empty_set = Mods.Int2Set.empty in
+    let grid = Causal.empty_grid () in
+    let grid,_,_,_ =
+      List.fold_left
         (fun (grid,side_effect,counter,subs) (k,(side:side_effect),is_weak) ->
-          match (k:refined_step) 
-          with 
-            | Event (a,_,_) -> 
-              begin 
-                let obs_from_rule_app,r,_,kappa_side = get_causal a in 
-                let side_effect =
-                  if bool 
-                  then 
-                    kappa_side 
-                  else 
-                    List.fold_left
-                      (fun set i -> Mods.Int2Set.add i set)
-                      side_effect 
-                      side 
-                in 
-                let phi = embedding_of_event a in 
-                let psi = fresh_map_of_event a in
-                let phi = 
-                  Mods.IntMap.map 
-                    (fun y -> 
-                      try 
-                        Mods.IntMap.find y subs 
-                      with 
-                      | Not_found -> y)
-                    phi 
-                in 
-                Causal.record ~decorate_with:obs_from_rule_app r side_effect (phi,psi) is_weak counter grid env,
-                Mods.Int2Set.empty,counter+1,Mods.IntMap.empty
-              end
-            | Obs c  -> 
-              let ((r_id,state,embedding,x),test) = c in 
-              let embedding = 
-                Mods.IntMap.map 
-                  (fun y -> 
-                    try 
-                      Mods.IntMap.find y subs 
-                    with 
-                    | Not_found -> y)
-                  embedding 
-              in 
-              let c = ((r_id,state,embedding,x),test) in 
-              let side_effect =
-                if bool 
-                then 
-                  Mods.Int2Set.empty 
-                else 
-                  List.fold_left
-                    (fun set i -> Mods.Int2Set.add i set)
-                    side_effect 
-                    side 
-              in 
-              Causal.record_obs side_effect c is_weak counter grid env,side_effect,counter+1,Mods.IntMap.empty
-            | Subs (a,b) -> 
-              grid, 
-              side_effect,
-              counter,
-              Mods.IntMap.add a b subs 
-            | Dummy _ -> 
-              grid,
-              (if bool 
-               then 
-                  empty_set 
-               else 
-                  (
-                    List.fold_left 
-                      (fun side_effect x -> Mods.Int2Set.add x side_effect)
-                      side_effect side)),
-              counter,
-              subs 
-        ) 
-        (grid,Mods.Int2Set.empty,1,Mods.IntMap.empty) list 
-    in grid 
-    
-  let clean_events (parameter:H.parameter) handler error list = 
-    List.fold_left 
-      (fun (error,list) a -> 
-        match a
-        with 
-        | Event _ | Obs _ -> 
-          let error,head = step_of_refined_step parameter 
-            handler 
-            error 
-            a 
-          in 
-          error,head::list
-        | _ -> error,list)
-      (error,[]) 
-      (List.rev list) 
+	 let maybe_side_effect =
+	   if bool then fun se -> se
+	   else fun _ ->
+		List.fold_left
+		  (fun set i -> Mods.Int2Set.add i set) side_effect side in
+	 let translate y = try Mods.IntMap.find y subs with Not_found -> y in
+         match (k:refined_step) with
+         | Event (id,(tests,(actions,side_effects,kappa_side))) ->
+            let side_effect = maybe_side_effect kappa_side in
+	    let tests' =
+	      Tools.list_smart_map
+		(PI.subst_map_agent_in_concrete_test translate) tests in
+	    let actions' =
+	      Tools.list_smart_map
+		(PI.subst_map_agent_in_concrete_action translate) actions in
+	    let side_effects' =
+	      Tools.list_smart_map
+		(PI.subst_map_agent_in_concrete_side_effect translate)
+		side_effects in
+            Causal.record
+	      (id,(tests',(actions',side_effects',kappa_side)))
+	      side_effect is_weak counter grid,
+            Mods.Int2Set.empty,counter+1,Mods.IntMap.empty
+         | Obs (id,tests,info) ->
+	    let tests' =
+	      Tools.list_smart_map
+		(PI.subst_map_agent_in_concrete_test translate) tests in
+	    Causal.record_obs
+	      (id,tests',info) side_effect is_weak counter grid env,
+	    maybe_side_effect empty_set,counter+1,Mods.IntMap.empty
+         | Subs (a,b) ->
+            grid, side_effect, counter, Mods.IntMap.add a b subs
+	 | Init actions ->
+	    let actions' =
+	      Tools.list_smart_map
+		(PI.subst_map_agent_in_concrete_action translate) actions in
+            Causal.record_init actions' is_weak counter grid env,
+	    side_effect,counter+1,Mods.IntMap.empty
+         | Dummy _ ->
+            grid, maybe_side_effect empty_set, counter, subs
+        )
+        (grid,Mods.Int2Set.empty,1,Mods.IntMap.empty) list
+    in grid
 
-  let print_side_effect log l = 
-    List.iter (fun (a,b) -> Format.fprintf log "(%i,%i)," a b) l 
-  let side_effect_of_list l = l 
+  let clean_events =
+    List.filter
+      (function Event _ | Obs _ -> true | Dummy _ | Init _ | Subs _ -> false)
 
-  let rec no_obs_found l = 
+  let print_side_effect =
+    Pp.list Pp.comma (fun f (a,b) -> Format.fprintf f "(%i,%i)," a b)
+  let side_effect_of_list l = l
+
+(*  let rec no_obs_found l = 
     match l 
     with 
       | Obs(_)::_ -> false
       | _::q -> no_obs_found q
       | [] -> true 
 
- 
-  
-  let level_of_event parameter handler error e set = 
-    let priorities = H.get_priorities parameter in 
-    match 
-      priorities 
-    with 
+ *)
+  let level_of_event parameter handler error e set =
+    match H.get_priorities parameter with
     | None -> error,0
-    | Some priorities -> 
-      begin 
-        match e 
-        with 
-        | Obs _ -> error,priorities.Priority.other_events
-        | Event _ -> 
-          begin 
-            let error,actions = actions_of_refined_step parameter handler error e in 
-            let priority = 
-              List.fold_left 
-                (fun priority action -> 
-                  match 
-                    action 
-                  with 
-                  | Create (ag,_)  -> 
-                    let ag_id = agent_id_of_agent ag in 
-                    if 
-                    set ag_id 
-                    then 
-                      priority
-                    else 
+    | Some priorities ->
+       match e with
+       | Obs _ -> error,priorities.Priority.other_events
+       | Event _ ->
+          begin
+            let error,actions =
+	      actions_of_refined_step parameter handler error e in
+            let priority =
+              List.fold_left
+                (fun priority ->
+		 function
+		 | PI.Create (ag,_)  ->
+                    let ag_id = agent_id_of_agent ag in
+                    if set ag_id then priority
+                    else
                       Priority.min_level priority priorities.Priority.creation
-                  | Remove _ -> Priority.min_level priority priorities.Priority.removal 
-                  | Mod_internal _ -> priority 
-                  | Free _ -> Priority.min_level priority priorities.Priority.unbinding 
-                  | Bind(site1,site2) -> priority
+                 | PI.Remove _ ->
+		    Priority.min_level priority priorities.Priority.removal
+                 | PI.Mod_internal _ -> priority
+                 | PI.Free _ ->
+		    Priority.min_level priority priorities.Priority.unbinding
+                 | PI.Bind(_,_) | PI.Bind_to(_,_) -> priority
                 )
-                priorities.Priority.other_events 
+                priorities.Priority.other_events
                 (fst (actions))
-            in 
+            in
             error,priority
-          end 
-        | Dummy _ | Subs _ -> error,priorities.Priority.substitution
-      end 
+          end
+       | (Dummy _ | Subs _ | Init _) ->
+	  error,priorities.Priority.substitution
 
-  let creation_of_event event handler = 
-    match 
-      event 
-    with 
-    | Event ((_,_,f),_) -> 
-        Mods.IntMap.fold 
-          (fun a b list -> 
-            b::list)
-          f []
-    | _ -> []
+  let creation_of_event = function
+    | Event (_,(_,(actions,_,_))) ->
+       List.fold_left
+	 (fun l -> function
+		| PI.Create (x,_) -> fst x :: l
+		| PI.Mod_internal _ | PI.Bind _ | PI.Bind_to _ | PI.Free _
+		| PI.Remove _ -> l) [] actions
+    | Obs _ | Dummy _ | Init _ | Subs _ -> []
 
-  let compose f g = 
-    Mods.IntMap.map 
-      (fun x -> 
-        (try AgentIdMap.find x f
-       with Not_found -> x))
-      g
+  let subs_agent_in_event mapping = function
+    | Event (a,(b,(c,d,e))) ->
+       Event
+	 (a,
+	  (Tools.list_smart_map
+	     (PI.subst_map_agent_in_concrete_test
+		(fun x -> try AgentIdMap.find x mapping with Not_found -> x)) b,
+	   (Tools.list_smart_map
+	      (PI.subst_map_agent_in_concrete_action
+		 (fun x -> try AgentIdMap.find x mapping with Not_found -> x)) c,
+	    Tools.list_smart_map
+	      (PI.subst_map_agent_in_concrete_side_effect
+		 (fun x -> try AgentIdMap.find x mapping with Not_found -> x)) d,
+	    e)))
+    | Obs (a,b,c) ->
+       Obs(a,
+	   Tools.list_smart_map
+	     (PI.subst_map_agent_in_concrete_test
+		(fun x -> try AgentIdMap.find x mapping with Not_found -> x)) b,
+	   c)
+    | Init _ | Dummy _ | Subs _ as event -> event
 
-  let subs_rule_info mapping (a,b,c,d) = 
-    (a,b,c,
-     Mods.Int2Set.fold 
-       (fun (agent_id,y) -> 
-         Mods.Int2Set.add 
-           ((try 
-               AgentIdMap.find agent_id mapping 
-             with 
-               Not_found -> agent_id),
-            y))
-       d
-       Mods.Int2Set.empty 
-       )
-
-
-  let subs_agent_in_event mapping event = 
-    match 
-      event 
-    with 
-    | Event ((a,f,g),b) -> Event ((a,compose mapping f,compose mapping g),
-                                  subs_rule_info mapping b)
-      
-    | Obs (a,b,f,c) -> Obs(a,b,compose mapping f,c)
-    | _ -> event
+  let disambiguate event_list =
+    let _,_,_,event_list_rev =
+      List.fold_left
+        (fun (max_id,used,mapping,event_list) event ->
+         let max_id,used,mapping =
+           List.fold_left
+             (fun (max_id,used,mapping) x ->
+              if AgentIdSet.mem x used
+              then
+                (max_id+1,AgentIdSet.add (max_id+1) used,
+		 AgentIdMap.add x (max_id+1) mapping)
+              else (max x max_id,AgentIdSet.add x used,mapping))
+             (max_id,used,mapping) (creation_of_event event) in
+         let list = (subs_agent_in_event mapping event)::event_list in
+         max_id,used,mapping,list)
+        (0,AgentIdSet.empty,AgentIdMap.empty,[])
+        (List.rev event_list)
+    in event_list_rev
 
   type agent_info = 
     {
@@ -1064,41 +980,29 @@ module Cflow_linker =
       sites_with_wrong_internal_state: SiteSet.t 
     }
 
-  let convert_init x = 
-    let ((agent,site_list),action_list) = x in
-    let b = 
-      List.for_all 
-	(fun action -> 
-	  match 
-	    action 
-	  with 
-	  | Create _ 
-	  | Free _ -> true
-	  | _ -> false)
-	action_list 
-    in 
-    if b then
-      let map = 
-	List.fold_left
-	  (fun map (s,(i,_)) -> 
-	    match i 
-	    with 
-	    | Some u -> SiteMap.add s u map
-	    | None -> map)
-	  SiteMap.empty 
-	  site_list
-      in 
-      let agent_info = 
-	{
-	  initial_step=Init x;
-	  internal_states=map;
-	  bound_sites=SiteSet.empty;
-	  sites_with_wrong_internal_state=SiteSet.empty
-	}
-      in
-      Some ((agent_id_of_agent agent),agent_info)
-    else
-      None 
+  let convert_init action_list =
+    let rec aux acc = function
+      | [] -> if acc = None then failwith "I miss something too" else acc
+      | PI.Free _ :: t -> aux acc t
+      | (PI.Bind _ | PI.Remove _ | PI.Bind_to _ | PI.Mod_internal _) :: _ -> None
+      | PI.Create ((id,_),site_list) :: t ->
+	 if acc = None then
+	   let map =
+	     List.fold_left
+	       (fun map -> function
+			| s, Some u -> SiteMap.add s u map
+			| _, None -> map)
+	       SiteMap.empty site_list in
+	   let agent_info =
+	     {
+	       initial_step=Init action_list;
+	       internal_states=map;
+	       bound_sites=SiteSet.empty;
+	       sites_with_wrong_internal_state=SiteSet.empty
+	     }
+	   in aux (Some (id,agent_info)) t
+	 else failwith "I miss something"
+    in aux None action_list
 
   let as_init agent_info = 
     SiteSet.is_empty agent_info.bound_sites 
@@ -1223,94 +1127,50 @@ module Cflow_linker =
       Not_found -> 
 	remanent,set 
 
-  let add_step parameter handler refined_step (step_list,remanent,error) = 
-      let error,step = step_of_refined_step parameter handler error refined_step in 
-      (step::step_list,remanent,error)
-	  
-  let fill_siphon parameter handler error refined_step_list  = 
+  let fill_siphon refined_step_list =
     let remanent = AgentIdMap.empty in 
-    let a,_,c = 
+    let a,_ =
       List.fold_left
-	(fun ((step_list:step list),remanent,error) refined_step -> 
-	  match
-	    (refined_step:refined_step)
-	  with 
-	  | Init init -> 
-	    let remanent = 
-	      match 
-		convert_init init 
-	      with
+	(fun (step_list,remanent) refined_step -> 
+	 match refined_step with
+	 | Init init -> 
+	    let remanent =
+	      match convert_init init with
 	      | None -> remanent
-	      | Some (id,info) -> 
-		AgentIdMap.add id info remanent
-	    in 
-	    add_step parameter handler refined_step (step_list,remanent,error) 
-	  | Event (_,_,(action,side)) -> 
-	    let remanent,set = 
-	      List.fold_left 
-		(fun recur action -> 
-		    match action
-		    with 
-		    | Create _ -> recur
-		    | Mod_internal (site,state) -> 
-		      mod_site site state recur
-		    | Bind (site1,site2) | Bind_to (site1,site2)-> 
-		      bind site1 (bind site2 recur)
-		    | Unbind (site1,site2) -> 
-		      unbind site1 (unbind site2 recur)
-		    | Free site -> 
-		      unbind site recur
-		    | Remove agent -> recur )
-		(remanent,AgentIdSet.empty) action 
-	    in 
-	    let remanent,set = 
-	      Mods.Int2Set.fold 
+	      | Some (id,info) ->
+		 AgentIdMap.add id info remanent in
+	    (refined_step::step_list,remanent)
+	 | Event (_,(_,(action,_,_))) ->
+	    let remanent,set =
+	      List.fold_left
+		(fun recur ->
+		 function
+		 | PI.Create _ -> recur
+		 | PI.Mod_internal (site,state) ->
+		    mod_site site state recur
+		 | (PI.Bind (site1,site2) | PI.Bind_to (site1,site2)) ->
+		    bind site1 (bind site2 recur)
+		 | PI.Free site -> unbind site recur
+		 | PI.Remove _ -> recur )
+		(remanent,AgentIdSet.empty) action in
+	    let remanent,set =
+	      Mods.Int2Set.fold
 		unbind_side
 		(get_kasim_side_effects refined_step)
 		(remanent,set)
-	    in 
-	    AgentIdSet.fold 
-	      (fun id list -> 
-		try
-		  let list = add_step parameter handler (AgentIdMap.find id remanent).initial_step list
-		  in 
-		  list
-		with 
-		  Not_found -> list)
-	      set
-	      (add_step parameter handler refined_step (step_list,remanent,error))
-	  | Subs _ | Obs _ | Dummy _ -> 
-	    add_step parameter handler refined_step (step_list,remanent,error))
-	([],remanent,error) 
-	refined_step_list
-    in 
-    c,a 
-      
-  let disambiguate event_list handler = 
-    let max_id = 0 in 
-    let used = AgentIdSet.empty in 
-    let mapping = AgentIdMap.empty in 
-      (let _,_,_,event_list_rev = 
-         List.fold_left 
-           (fun (max_id,used,mapping,event_list) event -> 
-             let max_id,used,mapping = 
-               List.fold_left 
-                 (fun (max_id,used,mapping) x -> 
-                   if AgentIdSet.mem x used
-                   then
-                      (max_id+1,AgentIdSet.add (max_id+1) used, AgentIdMap.add x (max_id+1) mapping)
-                   else (max x max_id,AgentIdSet.add x used,mapping)
-                 )
-                 (max_id,used,mapping) (creation_of_event event handler )
-             in 
-             let list = (subs_agent_in_event mapping event)::event_list in 
-             max_id,used,mapping,list)
-           (max_id,used,mapping,[]) 
-           (List.rev event_list)
-       in event_list_rev)
+	    in
+	    ((AgentIdSet.fold
+		(fun id list ->
+		 try (AgentIdMap.find id remanent).initial_step::list
+		 with Not_found -> list)
+		set
+		(refined_step::step_list)),remanent)
+	 | Subs _ | Obs _ | Dummy _ -> (refined_step::step_list,remanent))
+	([],remanent)
+	refined_step_list in
+    a
 
-
-  let print_step parameter handler error refined_event = 
+(*  let print_step parameter handler error refined_event = 
     let log = parameter.H.out_channel in 
     match 
       step_of_refined_step 
@@ -1330,24 +1190,18 @@ module Cflow_linker =
       error 
     | error,Dummy x -> 
       let _ = Format.fprintf log "%s" x in error 
-
-  let agent_id_in_obs parameter handler error step = 
-    match step 
-    with 
-    | Subs _ | Event _ | Dummy _ -> error,AgentIdSet.empty
-    | Obs (x,_) -> 
-      begin 
-        let error,tests = tests_of_refined_step parameter handler error step in 
-          
-        error,
-        List.fold_left 
-          (fun l x -> 
-            match x with 
-            | Is_Here x -> 
-              AgentIdSet.add (agent_id_of_agent x) l
-            | _ -> l)
-          AgentIdSet.empty 
-          tests
-      end
-        
+ *)
+  let agent_id_in_obs _parameter _handler error = function
+    | Subs _ | Event _ | Init _ | Dummy _ -> error,AgentIdSet.empty
+    | Obs (_,tests,_) ->
+       error,
+       List.fold_left
+         (fun l x ->
+          match x with
+          | PI.Is_Here x ->
+             AgentIdSet.add (agent_id_of_agent x) l
+          | PI.Is_Bound _ | PI.Is_Free _ | PI.Has_Binding_type _
+	  | PI.Is_Bound_to _ | PI.Has_Internal _ -> l)
+         AgentIdSet.empty
+         tests
 end:Cflow_signature)

@@ -43,7 +43,19 @@ type enriched_grid =
       size:int;
     }
 
+val label : Environment.t -> event_kind -> string
 val empty_grid : unit -> grid
+
+val record :
+  (int * Primitives.Instantiation.concrete Primitives.Instantiation.event) ->
+  Mods.Int2Set.t -> bool -> int -> grid -> grid
+val record_obs :
+  (int * Primitives.Instantiation.concrete Primitives.Instantiation.test list
+   * unit Mods.simulation_info) ->
+  Mods.Int2Set.t -> bool -> int -> grid -> Environment.t -> grid
+val record_init :
+  Primitives.Instantiation.concrete Primitives.Instantiation.action list ->
+  bool -> int -> grid -> Environment.t -> grid
 
 val cut : (int * int * int) list -> grid -> config
 val enrich_grid :
@@ -51,7 +63,7 @@ val enrich_grid :
 
 val pretty_print :
   Format.formatter -> Graph_closure.config -> string -> string ->
-  (grid * 'a Mods.simulation_info option list) list -> unit
+  (grid * 'a Mods.simulation_info option list) list -> Environment.t -> unit
 (** [pretty_print err_fmt config_closure compression_type label story_list
                   state env] *)
 val print_stat :

@@ -43,6 +43,10 @@ module Place =
     let get_type = function
       | Existing (n,_) -> Connected_component.ContentAgent.get_sort n
       | Fresh (i,_) -> i
+
+    let is_site_from_fresh = function
+      | (Existing _,_) -> false
+      | (Fresh _, _) -> true
   end
 
 module Transformation =
@@ -105,10 +109,22 @@ module Instantiation =
       | Create of 'a * (site_name * internal_state option) list (* pourquoi ça *)
       | Mod_internal of 'a site * internal_state
       | Bind of 'a site * 'a site
+      | Bind_to of 'a site * 'a site
       | Free of 'a site
       | Remove of 'a
 
-    let rename_abstract_test wk id cc inj = function
+  type 'a binding_state =
+    | ANY
+    | FREE
+    | BOUND
+    | BOUND_TYPE of binding_type
+    | BOUND_to of 'a site
+
+  type 'a event =
+      'a test list *
+	('a action list * ('a site * 'a binding_state) list * Mods.Int2Set.t)
+
+  let rename_abstract_test wk id cc inj = function
       | Is_Here pl as x ->
 	 let aux = Place.rename wk id cc inj pl in
 	 if aux == pl then x else Is_Here aux
@@ -140,6 +156,10 @@ module Instantiation =
 	 let aux = Place.rename wk id cc inj pl in
 	 let aux' = Place.rename wk id cc inj pl' in
 	 if aux == pl && aux' == pl' then x else Bind ((aux,s),(aux',s'))
+      | Bind_to ((pl,s),(pl',s')) as x ->
+	 let aux = Place.rename wk id cc inj pl in
+	 let aux' = Place.rename wk id cc inj pl' in
+	 if aux == pl && aux' == pl' then x else Bind_to ((aux,s),(aux',s'))
       | Free (pl,s) as x ->
 	 let aux = Place.rename wk id cc inj pl in
 	 if aux == pl then x else Free (aux,s)
@@ -163,8 +183,75 @@ module Instantiation =
       | Mod_internal ((pl,s),i) -> Mod_internal (((f pl,Place.get_type pl),s),i)
       | Bind ((pl,s),(pl',s')) ->
 	 Bind (((f pl,Place.get_type pl),s),((f pl',Place.get_type pl'),s'))
+      | Bind_to ((pl,s),(pl',s')) ->
+	 Bind_to (((f pl,Place.get_type pl),s),((f pl',Place.get_type pl'),s'))
       | Free (pl,s) -> Free ((f pl,Place.get_type pl),s)
       | Remove pl -> Remove (f pl,Place.get_type pl)
+
+    let subst_map_concrete_agent f (id,na as agent) =
+      try if f id == id then agent else (f id,na)
+      with Not_found -> agent
+
+    let subst_map_concrete_site f (ag,s as site) =
+      let ag' = subst_map_concrete_agent f ag in
+      if ag==ag' then site else (ag',s)
+
+    let subst_map_agent_in_concrete_test f = function
+      | Is_Here agent as x ->
+	 let agent' = subst_map_concrete_agent f agent in
+	 if agent == agent' then x else Is_Here agent'
+      | Has_Internal (site,internal_state) as x ->
+	 let site' = subst_map_concrete_site f site in
+	 if site == site' then x else Has_Internal (site',internal_state)
+      | Is_Free site as x ->
+	 let site' = subst_map_concrete_site f site in
+	 if site == site' then x else Is_Free site'
+      | Is_Bound site as x ->
+	 let site' = subst_map_concrete_site f site in
+	 if site == site' then x else Is_Bound site'
+      | Has_Binding_type (site,binding_type) as x ->
+	 let site' = subst_map_concrete_site f site in
+	 if site == site' then x else Has_Binding_type (site',binding_type)
+      | Is_Bound_to (site1,site2) as x ->
+	 let site1' = subst_map_concrete_site f site1 in
+	 let site2' = subst_map_concrete_site f site2 in
+	 if site1 == site1' && site2 == site2' then x
+	 else Is_Bound_to (site1',site2')
+    let subst_agent_in_concrete_test id id' x =
+      subst_map_agent_in_concrete_test
+	(fun j -> if j = id then id' else j) x
+
+    let subst_map_agent_in_concrete_action f = function
+      | Create (agent,list) as x ->
+	 let agent' = subst_map_concrete_agent f agent in
+	 if agent == agent' then x else Create(agent',list)
+      | Mod_internal (site,i) as x ->
+	 let site' = subst_map_concrete_site f site in
+	 if site == site' then x else Mod_internal(site',i)
+      | Bind (s1,s2) as x ->
+	 let s1' = subst_map_concrete_site f s1 in
+	 let s2' = subst_map_concrete_site f s2 in
+	 if s1==s1' && s2==s2' then x else Bind(s1',s2')
+      | Bind_to (s1,s2) as x ->
+	 let s1' = subst_map_concrete_site f s1 in
+	 let s2' = subst_map_concrete_site f s2 in
+	 if s1==s1' && s2==s2' then x else Bind_to(s1',s2')
+      | Free site as x ->
+	 let site' = subst_map_concrete_site f site in
+	 if site == site' then x else Free site'
+      | Remove agent as x ->
+	 let agent' = subst_map_concrete_agent f agent in
+	 if agent==agent' then x else Remove agent'
+    let subst_agent_in_concrete_action id id' x =
+      subst_map_agent_in_concrete_action
+	(fun j -> if j = id then id' else j) x
+
+    let subst_map_agent_in_concrete_side_effect f (site,bstate as x) =
+      let site' = subst_map_concrete_site f site in
+       if site == site' then x else (site',bstate)
+    let subst_agent_in_concrete_side_effect id id' x =
+      subst_map_agent_in_concrete_side_effect
+	(fun j -> if j = id then id' else j) x
 
     let with_sigs f = function
       | None -> Format.pp_print_int
@@ -224,6 +311,9 @@ module Instantiation =
 			   sigs) int
       | Bind (site1,site2) ->
 	 Format.fprintf f "Bind(%a,%a)" (print_concrete_agent_site ?sigs) site1
+			(print_concrete_agent_site ?sigs) site2
+      | Bind_to (site1,site2) ->
+	 Format.fprintf f "Bind_to(%a,%a)" (print_concrete_agent_site ?sigs) site1
 			(print_concrete_agent_site ?sigs) site2
       | Free site ->
 	 Format.fprintf f "Free(%a)" (print_concrete_agent_site ?sigs) site

@@ -10,6 +10,8 @@ sig
   val rename :
     Connected_component.work -> int -> Connected_component.cc ->
     Renaming.t -> t -> t
+
+  val is_site_from_fresh : (t * int) -> bool
 end
 
 (** Elementary rule transformations *)
@@ -54,8 +56,20 @@ sig
     | Create of 'a * (site_name * internal_state option) list
     | Mod_internal of 'a site * internal_state
     | Bind of 'a site * 'a site
+    | Bind_to of 'a site * 'a site
     | Free of 'a site
     | Remove of 'a
+
+  type 'a binding_state =
+    | ANY
+    | FREE
+    | BOUND
+    | BOUND_TYPE of binding_type
+    | BOUND_to of 'a site
+
+  type 'a event =
+      'a test list *
+	('a action list * ('a site * 'a binding_state) list * Mods.Int2Set.t)
 
   val rename_abstract_test :
     Connected_component.work -> int ->
@@ -65,6 +79,21 @@ sig
     Connected_component.cc -> Renaming.t -> abstract action -> abstract action
   val concretize_test : (Place.t -> int) -> abstract test -> concrete test
   val concretize_action : (Place.t -> int) -> abstract action -> concrete action
+
+  val subst_map_agent_in_concrete_test :
+    (int -> int) -> concrete test -> concrete test
+  val subst_agent_in_concrete_test :
+    int -> int -> concrete test -> concrete test
+  val subst_map_agent_in_concrete_action :
+    (int -> int) -> concrete action -> concrete action
+  val subst_agent_in_concrete_action :
+    int -> int -> concrete action -> concrete action
+  val subst_map_agent_in_concrete_side_effect:
+    (int -> int) -> (concrete site*concrete binding_state) ->
+    (concrete site*concrete binding_state)
+  val subst_agent_in_concrete_side_effect:
+    int -> int -> (concrete site*concrete binding_state) ->
+    (concrete site*concrete binding_state)
 
   val print_concrete_test :
     ?sigs:Signature.s -> Format.formatter -> concrete test -> unit

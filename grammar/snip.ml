@@ -689,6 +689,7 @@ let rec complete_with_creation (removed,added) links_transf actions fresh =
 	 handle_ports added'' l_t' actions' (succ site_id) in
      handle_ports added links_transf actions 0
 
+
 let connected_components_of_mixture created id_incr (env,rule_id) mix =
   let rec aux env transformations instantiations links_transf acc id = function
     | [] ->
@@ -697,7 +698,11 @@ let connected_components_of_mixture created id_incr (env,rule_id) mix =
        let actions' =
 	 List.fold_left
 	   (fun acs -> function
-		      | Primitives.Transformation.Linked (x,y) ->
+		    | Primitives.Transformation.Linked (x,y)
+			 when Primitives.Place.is_site_from_fresh x ||
+				Primitives.Place.is_site_from_fresh y ->
+			 Primitives.Instantiation.Bind_to (x,y) :: acs
+		    | Primitives.Transformation.Linked (x,y) ->
 			 Primitives.Instantiation.Bind (x,y) :: acs
 		      | (Primitives.Transformation.Freed _ |
 			 Primitives.Transformation.Internalized _) -> acs)

@@ -28,7 +28,7 @@ type ('a,'b,'c) remanent =
          (Causal.grid * D.graph * 'a option *
             ('b * D.S.PH.update_order list *
                D.S.PH.B.PB.CI.Po.K.refined_step list) *
-              D.S.PH.B.PB.CI.Po.K.step list *
+              D.S.PH.B.PB.CI.Po.K.refined_step list *
 		'c Mods.simulation_info option list)
            list)
         list * int
@@ -74,7 +74,7 @@ let from_none_to_weak parameter handler log_info logger (error,counter,tick,blac
        error,weakly_compressed_story_array,weakly_compression_faillure+1,None
     | Some list -> 
          let weak_event_list = D.S.translate_result list in 
-         let error,weak_event_list = D.S.PH.B.PB.CI.Po.K.clean_events parameter handler error weak_event_list in 
+         let weak_event_list = D.S.PH.B.PB.CI.Po.K.clean_events weak_event_list in 
          let grid = D.S.PH.B.PB.CI.Po.K.build_grid (List.rev_map (fun (x,y) -> x,y,dummy_weak) (List.rev list)) false handler in
          let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
          let error,graph = D.graph_of_grid parameter handler error grid in 

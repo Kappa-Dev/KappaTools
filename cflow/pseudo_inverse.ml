@@ -25,8 +25,10 @@
      module Po:Po_cut.Po_cut 
      module A:LargeArray.GenArray 
 
-     val cut: (Po.K.refined_step list -> Po.K.H.error_channel * ((Po.K.refined_step*bool) list) * int) Po.K.H.with_handler 
-     val do_not_cut: (Po.K.refined_step list -> Po.K.H.error_channel * ((Po.K.refined_step*bool) list) * int) Po.K.H.with_handler 
+     val cut:
+       (Po.K.refined_step list -> Po.K.H.error_channel * ((Po.K.refined_step*bool) list) * int) Po.K.H.with_handler
+     val do_not_cut:
+       (Po.K.refined_step list -> Po.K.H.error_channel * ((Po.K.refined_step*bool) list) * int) Po.K.H.with_handler
    end
 
  module Pseudo_inv = 
@@ -37,8 +39,8 @@
 
      type predicate_info = 
        | Here of Po.K.agent_id  
-       | Bound_site of Po.K.agent_id * Po.K.site_name
-       | Internal_state of Po.K.agent_id * Po.K.site_name 
+       | Bound_site of Po.K.agent_id * Po.K.PI.site_name
+       | Internal_state of Po.K.agent_id * Po.K.PI.site_name 
 
      let string_of_predicate_info pi = 
        match 
@@ -57,7 +59,7 @@
        | Undefined (** the wire does not exist yet *)
        | Present   (** for agent presence *)
        | Free      (** for binding sites *)
-        | Bound_to of Po.K.agent_id * Po.K.agent_name * Po.K.site_name   (** for binding sites *)
+        | Bound_to of Po.K.agent_id * Po.K.PI.agent_name * Po.K.PI.site_name   (** for binding sites *)
 
       let string_of_predicate_value pi = 
         match 
@@ -137,7 +139,8 @@
                   begin 
                     try 
                       let _ = Format.fprintf parameter.Po.K.H.out_channel_err "Event %i\n" k in 
-                      let error  = Po.K.print_refined_step parameter handler error event in 
+                      let error =
+			Po.K.print_refined_step parameter handler error event in 
                       let _ = Format.fprintf parameter.Po.K.H.out_channel_err "Predicates: " in 
                       let list = A.get blackboard.predicates_of_event k in 
                       let _ = List.iter (fun pid -> Format.fprintf parameter.Po.K.H.out_channel_err "%s," (string_of_predicate_info pid)) list in 
@@ -158,16 +161,9 @@
         let error = aux 0 in 
         error 
 
-      let p b = 
-        let _ = 
-          if b then Format.eprintf "TRUE\n"
-          else Format.eprintf "FALSE\n"
-        in 
-        b 
-
       let predicates_of_action parameter handler error blackboard action = 
         match action with 
-          | Po.K.Create (ag,interface) -> 
+          | Po.K.PI.Create (ag,interface) -> 
             let ag_id = Po.K.agent_id_of_agent ag in
             let predicate_id = Here ag_id in   
             let list1,list2 = 
@@ -188,10 +184,10 @@
                 interface
             in 
             list1,list2,false,true
-          | Po.K.Mod_internal (site,int)  -> 
+          | Po.K.PI.Mod_internal (site,int)  -> 
             let predicate_id = Internal_state (Po.K.agent_id_of_site site,Po.K.site_name_of_site site) in 
             [predicate_id,Internal_state_is int],[],false,false
-          | Po.K.Bind_to (s1,s2) -> 
+          | Po.K.PI.Bind_to (s1,s2) -> 
             let ag_id1 = Po.K.agent_id_of_site s1 in 
             let ag_id2 = Po.K.agent_id_of_site s2 in 
             let agent_name2 = Po.K.agent_name_of_site s2 in 
@@ -199,7 +195,7 @@
             let site_id2 = Po.K.site_name_of_site s2 in 
             let predicate_id1 = Bound_site (ag_id1,site_id1) in 
             [predicate_id1,Bound_to (ag_id2,agent_name2,site_id2)],[],false,false
-          | Po.K.Bind (s1,s2) -> 
+          | Po.K.PI.Bind (s1,s2) -> 
             let ag_id1 = Po.K.agent_id_of_site s1 in 
             let ag_id2 = Po.K.agent_id_of_site s2 in 
             let agent_name1 = Po.K.agent_name_of_site s1 in 
@@ -210,20 +206,12 @@
             let predicate_id2 = Bound_site (ag_id2,site_id2) in 
             [predicate_id1,Bound_to (ag_id2,agent_name2,site_id2);
              predicate_id2,Bound_to (ag_id1,agent_name1,site_id1)],[],false,false
-          | Po.K.Unbind (s1,s2) ->
-            let ag_id1 = Po.K.agent_id_of_site s1 in 
-            let ag_id2 = Po.K.agent_id_of_site s2 in 
-            let site_id1 = Po.K.site_name_of_site s1 in 
-            let site_id2 = Po.K.site_name_of_site s2 in 
-            let predicate_id1 = Bound_site (ag_id1,site_id1) in 
-            let predicate_id2 = Bound_site (ag_id2,site_id2) in 
-            [predicate_id1,Free;predicate_id2,Free],[],false,false
-          | Po.K.Free s -> 
+          | Po.K.PI.Free s -> 
             let ag_id = Po.K.agent_id_of_site s in 
             let site_id = Po.K.site_name_of_site s in 
             let predicate_id = Bound_site (ag_id,site_id) in     
             [predicate_id,Free],[],false,false
-          | Po.K.Remove ag -> 
+          | Po.K.PI.Remove ag -> 
             let ag_id = Po.K.agent_id_of_agent ag in 
             let predicate_id = Here ag_id in 
             let set = 
@@ -307,7 +295,7 @@
               match 
                 column 
               with 
-                | (a,_,false)::_ -> scan q 
+                | (_,_,false)::_ -> scan q 
                 | (a,x,true)::(b,_,true)::(_,y,_)::_ -> 
                   if a=eid && x=y
                   then 
@@ -387,19 +375,19 @@
       let predicates_of_test parameter handler error blackboard test = 
         match test
         with 
-          | Po.K.Is_Here (agent) ->
+          | Po.K.PI.Is_Here (agent) ->
             let ag_id = Po.K.agent_id_of_agent agent in 
             let predicate_id = Here ag_id in 
             [predicate_id]
-          | Po.K.Has_Internal(site,int) -> 
+          | Po.K.PI.Has_Internal(site,int) -> 
             let predicate_id = Internal_state (Po.K.agent_id_of_site site,Po.K.site_name_of_site site) in 
             [predicate_id]
-          | Po.K.Is_Free s -> 
+          | Po.K.PI.Is_Free s -> 
             let ag_id = Po.K.agent_id_of_site s in 
             let site_id = Po.K.site_name_of_site s in 
             let predicate_id = Bound_site (ag_id,site_id) in     
             [predicate_id]
-          | Po.K.Is_Bound_to  (s1,s2) -> 
+          | Po.K.PI.Is_Bound_to  (s1,s2) -> 
             let ag_id1 = Po.K.agent_id_of_site s1 in 
             let ag_id2 = Po.K.agent_id_of_site s2 in 
             let site_id1 = Po.K.site_name_of_site s1 in 
@@ -407,12 +395,12 @@
             let predicate_id1 = Bound_site (ag_id1,site_id1) in 
             let predicate_id2 = Bound_site (ag_id2,site_id2) in 
             [predicate_id1;predicate_id2]
-          | Po.K.Is_Bound s -> 
+          | Po.K.PI.Is_Bound s -> 
             let ag_id = Po.K.agent_id_of_site s in 
             let site_id = Po.K.site_name_of_site s in 
             let predicate_id = Bound_site (ag_id,site_id) in 
             [predicate_id]   
-          | Po.K.Has_Binding_type (s,btype) ->
+          | Po.K.PI.Has_Binding_type (s,_) ->
             let ag_id = Po.K.agent_id_of_site s in 
             let site_id = Po.K.site_name_of_site s in
             let predicate_id = Bound_site (ag_id,site_id) in 
@@ -508,7 +496,7 @@
              match action 
              with 
              | None | Some Undefined -> list 
-             | _ -> pid::list)
+             | Some (Present | Free | Internal_state_is _ | Bound_to _) -> pid::list)
          merged_map (false,[])
      in 
      let is_strong_action = 
