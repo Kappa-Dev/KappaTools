@@ -141,7 +141,8 @@ let collect_creation parameter error viewsrhs creation store_creation =
         in
 	let new_list = List.concat [pair_list; old_list] in
 	let error, handler, new_bdu =
-	  f parameter error old_bdu (Boolean_mvbdu.boolean_mvbdu_or
+	  f parameter error old_bdu
+            (Boolean_mvbdu.boolean_mvbdu_or
 	       parameter handler error parameter old_bdu) bdu
 	in
 	(*--------------------------------------------------------------------------*)
@@ -217,7 +218,158 @@ let collect_half_break parameter error kappa_handler store_half_break half_break
       store_half_break
   ) (error, store_half_break) half_break
 
-(*remove actions (deletion)*)
+(*------------------------------------------------------------------------------*)
+(*remove actions (deletion): document site*)
+
+let collect_remove_know_site parameter error kappa_handler 
+    index agent agent_type store_result =
+  let error, (handler, bdu_init) = bdu_init parameter in
+  let (pair_list, (handler, bdu)) =
+    Site_map_and_set.fold_map (fun site _ (current_list,_) ->
+      (*get state from state_dic*)
+      let error, state_dic =
+        Misc_sa.unsome
+          (Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+             parameter
+             error
+             (agent_type, site)
+             kappa_handler.states_dic
+          )
+          (fun error -> warn parameter error (Some "line 237") Exit
+            (Cckappa_sig.Dictionary_of_States.init()))
+      in
+      let error, last_entry = Cckappa_sig.Dictionary_of_States.last_entry parameter
+        error state_dic
+      in
+      let l = (site, last_entry - 1) :: current_list in (*TEST*)
+      let error, (handler, bdu_remove) = build_bdu parameter error l in
+      l, (handler, bdu_remove)
+    ) agent.agent_interface ([], (handler, bdu_init))
+  in
+  (*get old*)
+  let error, (old_list, (handler, old_bdu)) =
+    match AgentMap.unsafe_get parameter error agent_type store_result with
+      | error, None -> error, ([], (handler, bdu_init))
+      | error, Some (l, (handler, bdu)) -> error, (l, (handler, bdu))
+  in
+  let new_list = List.concat [pair_list; old_list] in
+  let error, handler, new_bdu =
+    f parameter error old_bdu
+      (Boolean_mvbdu.boolean_mvbdu_or
+         parameter handler error parameter old_bdu) bdu
+  in
+  (*store*)
+  AgentMap.set
+    parameter
+    error
+    agent_type
+    (List.rev new_list, (handler, new_bdu))
+    store_result
+
+(*------------------------------------------------------------------------------*)
+(*remove action (deletion): undocument, the state is the total state - 1 *)
+
+let collect_remove_undocument_site parameter error kappa_handler
+    index agent_type list_undoc store_result =
+  let error, (handler, bdu_init) = bdu_init parameter in
+  let (list, (handler, bdu)) =
+    List.fold_left (fun (current_list, _) site -> 
+      (*get state from state_dic*)
+      let error, state_dic =
+        Misc_sa.unsome
+          (Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+             parameter
+             error
+             (agent_type, site)
+             kappa_handler.states_dic
+          )
+          (fun error -> warn parameter error (Some "line 237") Exit
+            (Cckappa_sig.Dictionary_of_States.init()))
+      in
+      let error, last_entry = Cckappa_sig.Dictionary_of_States.last_entry parameter
+        error state_dic
+      in
+      let l = (site, last_entry - 1) :: current_list in (*TEST*)
+      let error, (handler, bdu) = build_bdu parameter error l in
+      l, (handler, bdu)
+    ) ([], (handler, bdu_init)) list_undoc
+  in
+  (*get old*)
+  let error, (old_list, (handler, old_bdu)) =
+    match AgentMap.unsafe_get parameter error agent_type store_result with
+      | error, None -> error, ([], (handler, bdu_init))
+      | error, Some (l, (handler, bdu)) -> error, (l, (handler, bdu))
+  in
+  let new_list = List.concat [list; old_list] in
+  let error, handler, new_bdu =
+    f parameter error old_bdu
+      (Boolean_mvbdu.boolean_mvbdu_or
+         parameter handler error parameter old_bdu) bdu
+  in
+  (*store*)
+  AgentMap.set
+    parameter
+    error
+    agent_type
+    (List.rev new_list, (handler, new_bdu))
+    store_result
+
+(*------------------------------------------------------------------------------*)
+(*bdu of remove action is an union of bdu know_site and bdu undoc site*)
+
+let collect_remove parameter error kappa_handler store_result remove =
+  let error, (handler, bdu_init) = bdu_init parameter in
+  List.fold_left (fun (error, store_result) (index, agent, list_undoc) ->
+    let agent_type = agent.agent_name in
+    let (store_know, store_undoc, store_union) = store_result in
+    let error, know_site =
+      collect_remove_know_site
+        parameter
+        error
+        kappa_handler
+        index
+        agent
+        agent_type
+        store_know
+    in
+    let error, undoc_site =
+      collect_remove_undocument_site
+        parameter
+        error
+        kappa_handler
+        index
+        agent_type
+        list_undoc
+        store_undoc
+    in
+    (*get bdu*)
+    let error, (l, (handler, bdu_know)) =
+      match AgentMap.unsafe_get parameter error agent_type know_site with
+        | error, None -> error, ([], (handler, bdu_init))
+        | error, Some (l, (handler, bdu)) -> error, (l, (handler, bdu))
+    in
+    let error, (l, (handler, bdu_undoc)) =
+      match AgentMap.unsafe_get parameter error agent_type undoc_site with
+        | error, None -> error, ([], (handler, bdu_init))
+        | error, Some (l, (handler, bdu)) -> error, (l, (handler, bdu))
+    in
+    (*remove actions is a union of know_site and undoc site*)
+    let error, handler, union_remove =
+      f parameter error bdu_know
+        (Boolean_mvbdu.boolean_mvbdu_or
+           parameter handler error parameter bdu_know) bdu_undoc
+    in
+    let error, result_remove =
+      AgentMap.set
+        parameter
+        error
+        agent_type
+        (handler, union_remove)
+        store_union
+    in
+    error, (know_site, undoc_site, result_remove)
+  ) (error, store_result) remove
+
     
 (************************************************************************************)
 (*Covering class*)
@@ -314,18 +466,19 @@ let iteration_half_cv parameter error store_cv store_half_break store_result =
     ) store_cv store_half_break store_result
 
 (************************************************************************************)
-(*iteration function of side effect half_break and creation*)
+(*iteration function of remove and covering class*)
 
-let iteration_half_created parameter error store_created store_half_break store_result =
+let iteration_remove_cv parameter error store_cv store_remove store_result =
   let error, (handler, bdu_init) = bdu_init parameter in
   AgentMap.fold2_common parameter error
     (fun parameter error agent_type
-      (_, (handler, bdu_created))
-      (_, (handler, bdu_half_break)) store_result ->
+      (_, (handler, bdu_cv))
+      (handler, bdu_remove)
+      store_result ->
       let error, handler, bdu_iterate =
-	f parameter error bdu_created
+	f parameter error bdu_cv 
           (Boolean_mvbdu.boolean_mvbdu_or
-	     parameter handler error parameter bdu_created) bdu_half_break
+	     parameter handler error parameter bdu_cv) bdu_remove
       in
       AgentMap.set
 	parameter
@@ -333,7 +486,30 @@ let iteration_half_created parameter error store_created store_half_break store_
 	agent_type
 	(handler, bdu_iterate)
 	store_result
-    ) store_created store_half_break store_result
+    ) store_cv store_remove store_result
+  
+(************************************************************************************)
+(*iteration function of half_break, remove and covering class*)
+
+let iteration_half_remove_cv parameter error store_remove_cv store_half store_result =
+  let error, (handler, bdu_init) = bdu_init parameter in
+  AgentMap.fold2_common parameter error
+    (fun parameter error agent_type
+      (handler, bdu_remove_cv)
+      (_, (handler, bdu_half))
+      store_result ->
+      let error, handler, bdu_iterate =
+	f parameter error bdu_remove_cv 
+          (Boolean_mvbdu.boolean_mvbdu_or
+	     parameter handler error parameter bdu_remove_cv) bdu_half
+      in
+      AgentMap.set
+	parameter
+	error
+	agent_type
+	(handler, bdu_iterate)
+	store_result
+    ) store_remove_cv store_half store_result
     
 (************************************************************************************)
 (*iteration function of side effect (half_break), creation and covering class*)
@@ -358,6 +534,31 @@ let iteration_half_created_cv parameter error store_iterate_created_cv store_hal
 	  (handler, bdu_iterate)
 	  store_result
     ) store_iterate_created_cv store_half_break store_result
+
+(************************************************************************************)
+(*iteration function of half_break, remove, creation and covering class*)
+
+let iteration_half_remove_created_cv parameter error store_half_created_cv store_remove
+    store_result =
+  let error, (handler, bdu_init) = bdu_init parameter in
+  AgentMap.fold2_common parameter error
+    (fun parameter error agent_type
+      (handler, bdu_iterate_half_created_cv)
+      (handler, bdu_remove)
+      store_result ->
+        let error, handler, bdu =
+          f parameter error bdu_iterate_half_created_cv
+            (Boolean_mvbdu.boolean_mvbdu_or
+               parameter handler error parameter bdu_iterate_half_created_cv) bdu_remove
+        in
+        (*store*)
+        AgentMap.set
+          parameter
+          error
+          agent_type
+          (handler, bdu)
+          store_result
+    ) store_half_created_cv store_remove store_result
 
 (************************************************************************************)
 (*RULE*)
@@ -385,13 +586,14 @@ let scan_rule parameter error handler rule rules store_result =
   in
   (*------------------------------------------------------------------------------*)
   (*side effect - deletion*)
-  (*let error, store_remove_bdu =
-    collect_remove_bdu
+  let error, store_remove =
+    collect_remove
       parameter
       error
-      store_result.store_remove_bdu
+      handler
+      store_result.store_remove
       rule.actions.remove
-  in*)
+  in
   (*------------------------------------------------------------------------------*)
   (*test and modification: covering class*)
   let error, store_test_modif =
@@ -423,14 +625,25 @@ let scan_rule parameter error handler rule rules store_result =
       store_result.store_iterate_half_cv
   in
   (*------------------------------------------------------------------------------*)
-  (*iteration: half_break and creation*)
-  let error, store_iterate_half_created =
-    iteration_half_created
+  (*iteration: remove and covering class*)
+  let (_, _, bdu_remove) = store_remove in
+  let error, store_iterate_remove_cv =
+    iteration_remove_cv
       parameter
       error
-      store_creation
+      store_test_modif
+      bdu_remove
+      store_result.store_iterate_remove_cv
+  in
+  (*------------------------------------------------------------------------------*)
+  (*iteration: half_break, remove and covering class*)
+  let error, store_iterate_half_remove_cv =
+    iteration_half_remove_cv
+      parameter
+      error
+      store_iterate_remove_cv
       store_half_break
-      store_result.store_iterate_half_created
+      store_result.store_iterate_remove_cv
   in
   (*------------------------------------------------------------------------------*)
   (*iteration: half_break, creation and cv*)
@@ -443,38 +656,58 @@ let scan_rule parameter error handler rule rules store_result =
       store_result.store_iterate_half_created_cv
   in
   (*------------------------------------------------------------------------------*)
+  let error, store_iterate_half_remove_created_cv =
+    iteration_half_remove_created_cv
+      parameter
+      error
+      store_iterate_half_created_cv
+      bdu_remove
+      store_result.store_iterate_half_remove_created_cv
+  in
+  (*------------------------------------------------------------------------------*)
   (*store*)
   error,
   {
     store_creation   = store_creation;
     store_half_break = store_half_break;
+    store_remove     = store_remove;
     store_test_modif = store_test_modif;
     store_iterate_created_cv      = store_iterate_created_cv;
     store_iterate_half_cv         = store_iterate_half_cv;
-    store_iterate_half_created    = store_iterate_half_created;
+    store_iterate_remove_cv       = store_iterate_remove_cv;
+    store_iterate_half_remove_cv  = store_iterate_half_remove_cv;
     store_iterate_half_created_cv = store_iterate_half_created_cv;
+    store_iterate_half_remove_created_cv = store_iterate_half_remove_created_cv
   }   
   
 (************************************************************************************)
 (*RULES*)
 
 let scan_rule_set parameter error handler rules =
-  let error, init_creation   = AgentMap.create parameter error 0 in
-  let error, init_half_break = AgentMap.create parameter error 0 in
-  let error, init_test_modif = AgentMap.create parameter error 0 in
+  let error, init_creation     = AgentMap.create parameter error 0 in
+  let error, init_half_break   = AgentMap.create parameter error 0 in
+  let error, init_remove_know  = AgentMap.create parameter error 0 in
+  let error, init_remove_undoc = AgentMap.create parameter error 0 in
+  let error, init_remove       = AgentMap.create parameter error 0 in
+  let error, init_test_modif   = AgentMap.create parameter error 0 in
   let error, init_iterate_created_cv      = AgentMap.create parameter error 0 in
   let error, init_iterate_half_cv         = AgentMap.create parameter error 0 in
-  let error, init_iterate_half_created    = AgentMap.create parameter error 0 in
+  let error, init_iterate_remove_cv       = AgentMap.create parameter error 0 in
+  let error, init_iterate_half_remove_cv  = AgentMap.create parameter error 0 in
   let error, init_iterate_half_created_cv = AgentMap.create parameter error 0 in
+  let error, init_iterate_half_remove_created_cv = AgentMap.create parameter error 0 in
   let init_bdu =
     {
       store_creation   = init_creation;
       store_half_break = init_half_break;
+      store_remove     = (init_remove_know, init_remove_undoc, init_remove);
       store_test_modif = init_test_modif;
       store_iterate_created_cv      = init_iterate_created_cv;
       store_iterate_half_cv         = init_iterate_half_cv;
-      store_iterate_half_created    = init_iterate_half_created;
+      store_iterate_remove_cv       = init_iterate_remove_cv;
+      store_iterate_half_remove_cv  = init_iterate_half_remove_cv;
       store_iterate_half_created_cv = init_iterate_half_created_cv;
+      store_iterate_half_remove_created_cv = init_iterate_half_remove_created_cv;
     }
   in
   (*------------------------------------------------------------------------------*)

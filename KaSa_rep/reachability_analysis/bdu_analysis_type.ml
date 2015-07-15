@@ -31,13 +31,22 @@ type pair_bdu =
 	  Boolean_mvbdu.list_dic, bool, int)
 	    Memo_sig.handler * bool Mvbdu_sig.mvbdu))
       
+type list_bdu =
+    (int list *
+       ((Boolean_mvbdu.memo_tables, Boolean_mvbdu.mvbdu_dic,
+	 Boolean_mvbdu.list_dic, bool, int)
+	   Memo_sig.handler * bool Mvbdu_sig.mvbdu))
+
 type bdu_analysic =
     {
       store_creation   : pair_bdu AgentMap.t;
       store_half_break : pair_bdu AgentMap.t;
+      store_remove     : (pair_bdu AgentMap.t * pair_bdu AgentMap.t * bdu AgentMap.t);
       store_test_modif : pair_bdu AgentMap.t;
       store_iterate_created_cv : bdu AgentMap.t;
       store_iterate_half_cv    : bdu AgentMap.t;
-      store_iterate_half_created    : bdu AgentMap.t;
+      store_iterate_remove_cv  : bdu AgentMap.t;
+      store_iterate_half_remove_cv  : bdu AgentMap.t;
       store_iterate_half_created_cv : bdu AgentMap.t;
+      store_iterate_half_remove_created_cv : bdu AgentMap.t
     }

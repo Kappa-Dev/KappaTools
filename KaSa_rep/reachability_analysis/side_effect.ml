@@ -155,7 +155,7 @@ let collect_know_binding error store_unbinding release =
   error, store_unbinding
 
 (*------------------------------------------------------------------------------*)
-(*collect remove actions-it is one of the property of site effect*)
+(*collect remove actions-it is one of the property of side effect*)
 
 (*collect document site*)
 let collect_document_site parameter error index agent agent_type store_doc =
@@ -266,7 +266,7 @@ let collect_remove parameter error store_remove_map remove =
 
 let scan_rule parameter error handler rule store_side_effect =
   (*------------------------------------------------------------------------------*)
-  (*compute site effects - half break actions*)
+  (*compute side effects - half break actions*)
   let error, store_half_break =
     collect_half_break parameter error
       handler
@@ -274,14 +274,14 @@ let scan_rule parameter error handler rule store_side_effect =
       rule.actions.half_break
   in
   (*------------------------------------------------------------------------------*)
-  (*compute site effects - whole break, release actions*)
+  (*compute side effects - whole break, release actions*)
   let error, store_unbinding =
     collect_know_binding error 
       store_side_effect.store_unbinding
       rule.actions.release
   in
   (*------------------------------------------------------------------------------*)
-  (*compute site effects - remove action*)
+  (*compute side effects - remove action*)
   let error, store_remove_map =
     collect_remove
       parameter

@@ -525,6 +525,8 @@ BDU CREATION rules
 --------------------------------------------
 BDU HALF_BREAK rules
 --------------------------------------------
+BDU REMOVE rules
+--------------------------------------------
 BDU TEST_MODIFICATION rules
 agent_type:0:
 Id=25
@@ -1339,9 +1341,13 @@ ITERATION OF CREATION - COVERING CLASS rules
 --------------------------------------------
 ITERATION OF HALF_BREAK - COVERING CLASS rules
 --------------------------------------------
-ITERATION OF HALF_BREAK - CREATION rules
+ITERATION OF REMOVE - COVERING CLASS rules
+--------------------------------------------
+ITERATION OF HALF_BREAK - REMOVE - COVERING CLASS rules
 --------------------------------------------
 ITERATION OF HALF_BREAK - CREATION - COVERING CLASS rules
+--------------------------------------------
+ITERATION OF HALF_BREAK - REMOVE - CREATION - COVERING CLASS rules
 --------------------------------------------
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
