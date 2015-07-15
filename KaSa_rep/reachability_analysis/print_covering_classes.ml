@@ -18,25 +18,20 @@ open Int_storage
 
 (*------------------------------------------------------------------------------*)
 
-let sprintf_list l =
-  let acc = ref "{" in
-  List.iteri (fun i x ->
-    acc := !acc ^
-      if i <> 0
-      then sprintf "; %i" x
-      else sprintf "%i" x
-  ) l;
-  !acc ^ "}"
-    
-let print_list l =
-  let output = sprintf_list l in
-  fprintf stdout "%s\n" output
-
 let print_site_type l =
   let rec aux acc =
     match acc with
       | [] -> ()
       | (x,_) :: tl ->
+        fprintf stdout "site_type:%i\n" x;
+        aux tl
+  in aux l
+
+let print_site_list l =
+  let rec aux acc =
+    match acc with
+      | [] -> ()
+      | x :: tl ->
         fprintf stdout "site_type:%i\n" x;
         aux tl
   in aux l
@@ -48,12 +43,12 @@ let print_new_index_dic parameter error elt_id store_index =
   Dictionary_of_Covering_class.print
     parameter
     error
-    (fun parameter error elt pair_index _ _ ->
+    (fun parameter error elt index _ _ ->
       let _ = 
         fprintf stdout
           "Potential dependencies between sites:New-index:Covering_class_id:%i:class_id:%i:\n"
           elt_id elt;
-        print_site_type pair_index
+        print_site_list index
       in
       error
     ) store_index
@@ -69,22 +64,13 @@ let print_test_new_index_dic parameter error elt_id store_test =
       let _ = fprintf stdout
         "Potential dependencies between sites:New-index:TEST:Covering_class_id:%i:class_id:%i:\n"
           elt_id elt;
-        print_site_type value_index
+        print_site_list value_index
       in
       error
     ) store_test
 
 (*------------------------------------------------------------------------------*)
 (*print modified site (action) with new index*)
-
-let print_modified l =
-  let rec aux acc =
-    match acc with
-      | [] -> ()
-      | x :: tl ->
-        fprintf stdout "site_type:%i\n" x;
-        aux tl
-  in aux l
 
 let print_modified_dic parameter error elt_id store_modif =
   Dictionary_of_Modified_class.print
@@ -95,34 +81,24 @@ let print_modified_dic parameter error elt_id store_modif =
         fprintf stdout 
           "Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:%i:class_id:%i:\n"
           elt_id elt;
-        print_modified l
+        print_site_list l
       in
       error
     ) store_modif
 
 (*------------------------------------------------------------------------------*)
-(*print remove action*)
-
-let print_pair parameter error ps =
-  let rec aux acc =
-    match acc with
-      | [] -> []
-      | (x,i) :: tl ->
-        fprintf stdout "site_type:%i:state:%i\n" x i;
-        aux tl
-  in aux ps
 
 let print_dic_and_new_index parameter error store_index store_test store_modif store_dic =
   Dictionary_of_Covering_class.print
     parameter
     error
-    (fun parameter error elt_id pair_list _ _ ->
+    (fun parameter error elt_id list _ _ ->
       let _ =
         let _ =
         (*print covering class in dictionary*)
           printf "Potential dependencies between sites:Covering_class_id:%i:\n"
             elt_id; 
-          print_pair parameter error pair_list
+          print_site_list list
         in
         (*print new_index for covering class*)
         let _ = print_new_index_dic

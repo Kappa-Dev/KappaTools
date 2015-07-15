@@ -35,8 +35,7 @@ let union = Site_map_and_set.union
 (************************************************************************************)
 (*sorted and ordered a covering classes in an descreasing order *)
 
-let length_sorted (l: (int * Covering_classes_type.state_list) list list):
-    (int * Covering_classes_type.state_list) list list =
+let length_sorted (l: int list list): int list list =
   let list_length = List.rev_map (fun list -> list, List.length list) l in
   let lists       = List.sort (fun a b -> compare (snd a) (snd b)) list_length in
   List.rev_map fst lists
@@ -111,18 +110,14 @@ let is_empty_list l =
     | [] -> true
     | _ -> false
 
-let re_index_value_list pair_list =
+let re_index_value_list list =
   let rec aux acc =
     match acc with
       | [] -> acc
-      | (x,s) :: tl ->
-        let list = fst (List.split pair_list) in
-        if not (is_empty_list list)
-        then
+      | x :: tl ->
         let nth = position x list in
-        ((nth + 1),s) :: aux tl
-        else []
-  in aux pair_list
+        (nth + 1) :: aux tl
+  in aux list
 
 (*------------------------------------------------------------------------------*)
 (*projection site that are modified with new index*)
@@ -236,7 +231,7 @@ let modified_index_dic parameter error covering_class modified_map
 (*------------------------------------------------------------------------------*)
 (*store remanent*)
 
-let remove_duplicates_hashtable l =
+(*let remove_duplicates_hashtable l =
   let open List in
   let tbl = Hashtbl.create (length l) in
   let f l (e,e') = 
@@ -273,20 +268,19 @@ let combine_site_state pair_list =
     
 let pair_site_state pair_list =
   let l = List.flatten (combine_site_state pair_list) in
-  remove_duplicates_hashtable l
+  remove_duplicates_hashtable l*)
 
 (*------------------------------------------------------------------------------*)
 
-let store_remanent parameter error pair_covering_class modified_map remanent =
+let store_remanent parameter error covering_class modified_map remanent =
   (* current state of remanent*)
   let pointer_backward    = remanent.store_pointer_backward in
   let good_covering_class = remanent.store_dic in
   let good_index          = remanent.store_new_index_dic in
   let good_test_dic       = remanent.store_test_new_index_dic in
   let good_modif_dic      = remanent.store_modif_new_index_dic in
-  let new_pair_covering_class = pair_site_state pair_covering_class in
   (*------------------------------------------------------------------------------*)
-  match new_pair_covering_class with
+  match covering_class with
     | [] -> error, remanent
     | _ ->
       (*------------------------------------------------------------------------------*)
@@ -295,12 +289,11 @@ let store_remanent parameter error pair_covering_class modified_map remanent =
         covering_class_dic 
           parameter 
           error 
-          new_pair_covering_class
+          covering_class
           good_covering_class 
       in
       (*------------------------------------------------------------------------------*)
       (*store pointer backward*)
-      let covering_class = fst (List.split pair_covering_class) in
       let error, pointer_backward =
         store_pointer_backward 
           parameter
@@ -311,7 +304,7 @@ let store_remanent parameter error pair_covering_class modified_map remanent =
       in
       (*------------------------------------------------------------------------------*)
       (*PART II: compute new_index in covering_class*)
-      let new_index_covering_class = re_index_value_list new_pair_covering_class in
+      let new_index_covering_class = re_index_value_list covering_class in
       let error, (new_id, new_dic) =
         new_index_dic 
           parameter 
@@ -387,7 +380,7 @@ let clean_classes parameter error covering_classes modified_map =
   List.fold_left (fun (error, remanent) covering_class ->
     match covering_class with
       | [] -> error, remanent
-      | (t, p) :: tl ->
+      | t :: tl ->
         let pointer_backward = remanent.store_pointer_backward in
         (* return the set of list(id) containing t.
            For example: current_covering_classes: [[0;1];[0]]
@@ -405,7 +398,7 @@ let clean_classes parameter error covering_classes modified_map =
         let rec aux to_visit potential_supersets =
           match to_visit with
 	    | [] -> error, remanent
-	    | (t', p') :: tl' ->
+	    | t' :: tl' ->
               (* get the set of list(id) containing t' *)
               let error, potential_supersets' =
 		get_id_common_set
@@ -460,7 +453,7 @@ let clean_classes parameter error covering_classes modified_map =
 (************************************************************************************)   
 (*RULE*)
 
-(*compute modified (actions) site: TODO: bdu*)
+(*compute modified (actions) site*)
 
 let collect_modified_map parameter error diff_reverse store_modified_map =
   AgentMap.fold parameter error
@@ -521,11 +514,11 @@ let collect_modified_map parameter error diff_reverse store_modified_map =
 (*------------------------------------------------------------------------------*)
 (*compute covering_class*)
 
-let add_covering_class parameter error agent_type pair_list store_covering_classes =
-  match pair_list with
+let add_covering_class parameter error agent_type list store_covering_classes =
+  match list with
     | [] -> error, store_covering_classes
     | _ ->
-      let error, old_pair =
+      let error, old_list =
         match 
           AgentMap.unsafe_get
             parameter 
@@ -537,39 +530,13 @@ let add_covering_class parameter error agent_type pair_list store_covering_class
           | error, Some sites -> error, sites
       in
       (* store the new list of covering classes *)
-      let new_pair_list = (List.rev pair_list) :: old_pair in
+      let new_pair_list = (List.rev list) :: old_list in
       AgentMap.set 
         parameter
         error
         agent_type
         new_pair_list
         store_covering_classes
-
-(*------------------------------------------------------------------------------*)
-(*compute site test*)
-
-let add_site_test parameter error agent_type pair_list store_state =
-  match pair_list with
-    | [] -> error, store_state
-    | _ ->
-      let old_list =
-        match 
-          AgentMap.unsafe_get
-            parameter
-            error
-            agent_type
-            store_state
-        with
-          | error, None -> []
-          | error, Some s -> s
-      in
-      let new_list = List.concat [pair_list; old_list] in
-      AgentMap.set
-        parameter
-        error
-        agent_type
-        (List.rev new_list)
-        store_state
 
 (*------------------------------------------------------------------------------*)
 (*compute covering classes, site test and bdu*)
@@ -587,31 +554,13 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
             | Ghost -> error, store_covering_classes
             | Agent agent ->
               let agent_type = agent.agent_name in
-              let (store_cv, store_state) = store_covering_classes in
               (*get a list of sites from an interface at each rule*)
-              let store_pair =
+              let site_list =
                 Site_map_and_set.fold_map
-	          (fun site port (current_class, current_list) ->
-                    (*get state min*)
-                    let state = int_of_port port in
-                    (*---------------------------------------------------------*)
-                    let pair_list = (site, state) :: current_list in
-                    let old_pair =
-                      match AgentMap.unsafe_get parameter error
-                        agent_type store_state with
-                        | error, None -> []
-                        | error, Some p -> p
-                    in
-                    let new_pair = List.concat [pair_list; old_pair] in
-                    let site_list = (site, new_pair) :: current_class in
-                    (*---------------------------------------------------------*)
-                    (*store*)
-                    (site_list, pair_list)
-                  ) agent.agent_interface ([], [])
+	          (fun site _ current_list ->
+                    site :: current_list
+                  ) agent.agent_interface []
               in
-              (* store new_covering_class in the classes of the agent type
-                 agent_type *)
-              let (site_list, pair_list) = store_pair in
               (*compute covering_class*)
               let error, covering_classes =
                 add_covering_class
@@ -619,19 +568,10 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
                   error
                   agent_type
                   site_list
-                  store_cv
-              in
-              (*compute site test*)
-              let error, store_state =
-                add_site_test
-                  parameter
-                  error
-                  agent_type
-                  pair_list
-                  store_state
+                  store_covering_classes
               in
               (*store*)
-              error, (covering_classes, store_state)
+              error, covering_classes
       ) views diff_reverse store_covering_classes
   in error, store_covering_classes
 
@@ -688,7 +628,7 @@ let number_of_covering_classes parameter error store_dic =
   in num + 1
 
 (************************************************************************************)   
-(*RULES - VARS*)
+(*RULES*)
 
 let create_map parameter error n_agents = AgentMap.create parameter error n_agents
 
@@ -696,13 +636,12 @@ let scan_rule_set parameter error handler rules =
   let n_agents = handler.nagents in
   let error, init_modif_map = create_map parameter error n_agents in
   let error, init_class     = create_map parameter error n_agents in
-  let error, init_map       = create_map parameter error n_agents in
   (*------------------------------------------------------------------------------*)
   (*init state of covering class*)
   let init_class =
     {
       store_modified_map     = init_modif_map;
-      store_covering_classes = init_class, init_map;
+      store_covering_classes = init_class;
     }
   in
   (*------------------------------------------------------------------------------*)
@@ -734,11 +673,10 @@ let scan_rule_set_cv parameter error handler rules =
   let error, store_covering_classes = 
     scan_rule_set parameter error handler rules
   in
-  let (result_covering_classes, _) =
-    store_covering_classes.store_covering_classes in
+  let result_covering_classes = store_covering_classes.store_covering_classes in
   let error, remanent_dictionary =
     AgentMap.fold parameter error
-      (fun parameters error agent_type pair_covering_class init_remanent ->
+      (fun parameters error agent_type covering_class init_remanent ->
         (*------------------------------------------------------------------------------*)
         (*get modified site*)
         let error, modified_map =
@@ -758,7 +696,7 @@ let scan_rule_set_cv parameter error handler rules =
           clean_classes
             parameters 
             error
-            pair_covering_class
+            covering_class
             modified_map
         in
         (*------------------------------------------------------------------------------*)

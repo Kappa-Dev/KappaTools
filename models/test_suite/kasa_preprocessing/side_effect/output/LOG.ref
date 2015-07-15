@@ -180,7 +180,7 @@ Potential dependencies between sites:
 Potential dependencies between sites:agent_type:0:
 Potential dependencies between sites:Number of covering classes:2
 Potential dependencies between sites:Covering_class_id:0:
-site_type:0:state:1
+site_type:0
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
 site_type:1
 Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
@@ -188,7 +188,7 @@ site_type:1
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
 site_type:1
 Potential dependencies between sites:Covering_class_id:1:
-site_type:1:state:1
+site_type:1
 Potential dependencies between sites:New-index:Covering_class_id:1:class_id:0:
 site_type:1
 Potential dependencies between sites:New-index:TEST:Covering_class_id:1:class_id:0:
@@ -198,7 +198,7 @@ site_type:1
 Potential dependencies between sites:agent_type:1:
 Potential dependencies between sites:Number of covering classes:1
 Potential dependencies between sites:Covering_class_id:0:
-site_type:0:state:0
+site_type:0
 Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
 site_type:1
 Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
@@ -207,14 +207,9 @@ Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0
 site_type:1
 
 --------------------------------------------
-BDU INIT
-Id=0
- Leaf False 
-
+BDU CREATION rules
 --------------------------------------------
-BDU CREATION - CREATION rules
---------------------------------------------
-BDU HALF_BREAK - HALF_BREAK rules
+BDU HALF_BREAK rules
 agent_type:0:
 Id=3
  Node(site_type:0<1)
@@ -232,7 +227,7 @@ Id=3
 HALF_BREAK rules
 site_type:0:state:1
 --------------------------------------------
-BDU ITERATION OF TEST_MODIF rules
+BDU TEST_MODIFICATION rules
 agent_type:0:
 Id=7
  Node(site_type:0<1)
@@ -267,7 +262,7 @@ Id=7
         Id=1
          Leaf False 
 
-ITERATION OF LHS-MODIFIED rules
+TEST-MODIFIED rules
 site_type:1:state:1
 site_type:0:state:1
 site_type:0:state:1
@@ -285,14 +280,13 @@ Id=3
     Id=1
      Leaf False 
 
-ITERATION OF LHS-MODIFIED rules
+TEST-MODIFIED rules
 site_type:0:state:0
 --------------------------------------------
-BDU ITERATION OF CREATION - CV rules
+ITERATION OF CREATION - COVERING CLASS rules
 --------------------------------------------
-BDU ITERATION OF ITERATE HALF_BREAK - CV rules
+ITERATION OF HALF_BREAK - COVERING CLASS rules
 agent_type:0:
-ITERATION OF HALF_BREAK-COVERING CLASS
 Id=5
  Node(site_type:0<1)
   Id=3
@@ -327,9 +321,10 @@ Id=5
          Leaf False 
 
 --------------------------------------------
-BDU ITERATION OF ITERATE HALF_BREAK - CREATION rules
+ITERATION OF HALF_BREAK - CREATION rules
 --------------------------------------------
-BDU ITERATION OF ITERATE HALF_BREAK - CREATION - CV rules
+ITERATION OF HALF_BREAK - CREATION - COVERING CLASS rules
+--------------------------------------------
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
 Flow of information in the ODE semantics:agent_type:0:site_modified:0->x(binding state)

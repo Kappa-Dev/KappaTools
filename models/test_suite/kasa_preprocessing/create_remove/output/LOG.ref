@@ -85,12 +85,7 @@ Side-effect:deletion:undocument_site:
 Potential dependencies between sites:
 
 --------------------------------------------
-BDU INIT
-Id=0
- Leaf False 
-
---------------------------------------------
-BDU CREATION - CREATION rules
+BDU CREATION rules
 agent_type:1:
 Id=0
  Leaf False 
@@ -102,17 +97,18 @@ Id=0
 
 CREATION rules
 --------------------------------------------
-BDU HALF_BREAK - HALF_BREAK rules
+BDU HALF_BREAK rules
 --------------------------------------------
-BDU ITERATION OF TEST_MODIF rules
+BDU TEST_MODIFICATION rules
 --------------------------------------------
-BDU ITERATION OF CREATION - CV rules
+ITERATION OF CREATION - COVERING CLASS rules
 --------------------------------------------
-BDU ITERATION OF ITERATE HALF_BREAK - CV rules
+ITERATION OF HALF_BREAK - COVERING CLASS rules
 --------------------------------------------
-BDU ITERATION OF ITERATE HALF_BREAK - CREATION rules
+ITERATION OF HALF_BREAK - CREATION rules
 --------------------------------------------
-BDU ITERATION OF ITERATE HALF_BREAK - CREATION - CV rules
+ITERATION OF HALF_BREAK - CREATION - COVERING CLASS rules
+--------------------------------------------
 Flow of information in the ODE semantics:
 Flow of information in the ODE semantics:rule_id:0
 Flow of information in the ODE semantics:rule_id:1

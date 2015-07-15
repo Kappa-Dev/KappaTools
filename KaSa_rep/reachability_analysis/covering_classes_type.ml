@@ -23,16 +23,13 @@ let local_trace = false
 
 module AgentMap = Quick_Nearly_inf_Imperatif
 
-type 'a map      = 'a Site_map_and_set.map
-type set         = Site_map_and_set.set
-
-(*state information: (site, state)*)
-type state_list = (int * int) list
+type 'a map = 'a Site_map_and_set.map
+type set    = Site_map_and_set.set
 
 type covering_classes =
   {
     store_modified_map     : int map AgentMap.t;
-    store_covering_classes : (int * state_list) list list AgentMap.t * state_list AgentMap.t;
+    store_covering_classes : int list list AgentMap.t;
   }
 
 (************************************************************************************)
@@ -46,7 +43,7 @@ module Inf_array = Nearly_inf_Imperatif
 
 module Covering_class =
   struct
-    type t = (int * int) list
+    type t = int list
     let compare = compare
   end
 
