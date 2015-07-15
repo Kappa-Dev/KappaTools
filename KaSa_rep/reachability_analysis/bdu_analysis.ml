@@ -112,7 +112,7 @@ let bdu_init parameter =
 
 let int_of_port port = port.site_state.min
 
-let collect_pair_creation parameter error viewsrhs creation store_creation =
+let collect_creation parameter error viewsrhs creation store_creation =
   let error, (handler, bdu_init) = bdu_init parameter in
   List.fold_left (fun (error, store_creation) (agent_id, agent_type) ->
     let error, agent = AgentMap.get parameter error agent_id viewsrhs in
@@ -162,7 +162,7 @@ let collect_pair_creation parameter error viewsrhs creation store_creation =
 
 (*unknow binding*)
 
-let collect_half_break_bdu parameter error kappa_handler store_half_break half_break =
+let collect_half_break parameter error kappa_handler store_half_break half_break =
   let error, (handler, bdu_init) = bdu_init parameter in
   List.fold_left (fun (error, store_half_break) (site_add, state) ->
     let site = site_add.site in
@@ -271,7 +271,7 @@ let collect_test_modif parameter error viewslhs diff_reverse store_result =
 (*iteration function of bdu creation union with bdu of test and
   modification (covering class)*)
 
-let iteration_creation_cv parameter error store_creation store_cv store_result =
+let iteration_created_cv parameter error store_creation store_cv store_result =
   let error, (handler, bdu_init) = bdu_init parameter in
   AgentMap.fold2_common parameter error
     (fun parameter error agent_type
@@ -292,33 +292,9 @@ let iteration_creation_cv parameter error store_creation store_cv store_result =
     ) store_creation store_cv store_result
 
 (************************************************************************************)
-(*iteration function of side effect (half_break), creation and covering class*)
-    
-let iterate_half_break_created_cv parameter error store_iterate_created_cv store_half_break
-    store_result =
-  let error, (handler, bdu_init) = bdu_init parameter in
-  AgentMap.fold2_common parameter error
-    (fun parameter error agent_type
-      (handler, bdu_iterate)
-      (_, (handler, bdu_half_break)) store_result ->
-	let error, handler, bdu_iterate =
-	  f parameter error bdu_iterate
-            (Boolean_mvbdu.boolean_mvbdu_or
-	       parameter handler error parameter bdu_iterate) bdu_half_break
-	in
-	(*store*)
-	AgentMap.set
-	  parameter
-	  error
-	  agent_type
-	  (handler, bdu_iterate)
-	  store_result
-    ) store_iterate_created_cv store_half_break store_result
-
-(************************************************************************************)
 (*iteration function of side effect (half_break) and covering class*)
 
-let iterate_half_break_cv parameter error store_cv store_half_break store_result =
+let iteration_half_cv parameter error store_cv store_half_break store_result =
   let error, (handler, bdu_init) = bdu_init parameter in
   AgentMap.fold2_common parameter error
     (fun parameter error agent_type
@@ -340,7 +316,7 @@ let iterate_half_break_cv parameter error store_cv store_half_break store_result
 (************************************************************************************)
 (*iteration function of side effect half_break and creation*)
 
-let iterate_half_break_created parameter error store_created store_half_break store_result =
+let iteration_half_created parameter error store_created store_half_break store_result =
   let error, (handler, bdu_init) = bdu_init parameter in
   AgentMap.fold2_common parameter error
     (fun parameter error agent_type
@@ -360,13 +336,37 @@ let iterate_half_break_created parameter error store_created store_half_break st
     ) store_created store_half_break store_result
     
 (************************************************************************************)
+(*iteration function of side effect (half_break), creation and covering class*)
+    
+let iteration_half_created_cv parameter error store_iterate_created_cv store_half_break
+    store_result =
+  let error, (handler, bdu_init) = bdu_init parameter in
+  AgentMap.fold2_common parameter error
+    (fun parameter error agent_type
+      (handler, bdu_iterate)
+      (_, (handler, bdu_half_break)) store_result ->
+	let error, handler, bdu_iterate =
+	  f parameter error bdu_iterate
+            (Boolean_mvbdu.boolean_mvbdu_or
+	       parameter handler error parameter bdu_iterate) bdu_half_break
+	in
+	(*store*)
+	AgentMap.set
+	  parameter
+	  error
+	  agent_type
+	  (handler, bdu_iterate)
+	  store_result
+    ) store_iterate_created_cv store_half_break store_result
+
+(************************************************************************************)
 (*RULE*)
 
 let scan_rule parameter error handler rule rules store_result =
   (*------------------------------------------------------------------------------*)
   (*creation rules*)
   let error, store_creation =
-    collect_pair_creation
+    collect_creation
       parameter
       error
       rule.rule_rhs.views
@@ -376,7 +376,7 @@ let scan_rule parameter error handler rule rules store_result =
   (*------------------------------------------------------------------------------*)
   (*side effect - half_break*)
   let error, store_half_break =
-    collect_half_break_bdu
+    collect_half_break
       parameter
       error
       handler
@@ -405,7 +405,7 @@ let scan_rule parameter error handler rule rules store_result =
   (*------------------------------------------------------------------------------*)
   (*iteration: creation and covering class*)
   let error, store_iterate_created_cv =
-    iteration_creation_cv
+    iteration_created_cv
       parameter
       error
       store_creation
@@ -415,7 +415,7 @@ let scan_rule parameter error handler rule rules store_result =
   (*------------------------------------------------------------------------------*)
   (*iteration: half_break and covering class*)
   let error, store_iterate_half_cv =
-    iterate_half_break_cv
+    iteration_half_cv
       parameter
       error
       store_test_modif
@@ -425,7 +425,7 @@ let scan_rule parameter error handler rule rules store_result =
   (*------------------------------------------------------------------------------*)
   (*iteration: half_break and creation*)
   let error, store_iterate_half_created =
-    iterate_half_break_created
+    iteration_half_created
       parameter
       error
       store_creation
@@ -435,7 +435,7 @@ let scan_rule parameter error handler rule rules store_result =
   (*------------------------------------------------------------------------------*)
   (*iteration: half_break, creation and cv*)
   let error, store_iterate_half_created_cv =
-    iterate_half_break_created_cv
+    iteration_half_created_cv
       parameter
       error
       store_iterate_created_cv
