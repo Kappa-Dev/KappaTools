@@ -204,7 +204,7 @@ let effects_of_modif algs tokens rules contact_map domain ast_list =
 	      Snip.connected_components_sum_of_ambiguous_mixture
 		contact_map domain ast in
 	    (domain',
-	     List.fold_left (Array.fold_left adds) rev_effects ccs)
+	     List.fold_left (fun x y -> Array.fold_left adds x (fst y)) rev_effects ccs)
 	 | FLUX (pexpr,_) ->
 	    let (domain',pexpr') =
 	      compile_print_expr algs tokens contact_map domain pexpr in

@@ -681,7 +681,7 @@ let rec complete_with_creation (removed,added) links_transf actions fresh =
 		let dst = IntMap.find i l_t in
 		let l_t' = IntMap.remove i l_t in
 		Primitives.Transformation.Linked((place,site_id),dst)::added',
-		(Primitives.Instantiation.Bind((place,site_id),dst)::actions),
+		(Primitives.Instantiation.Bind_to((place,site_id),dst)::actions),
 		l_t'
 	      with Not_found ->
 		let l_t' = IntMap.add i ((place,site_id)) l_t in
@@ -711,8 +711,9 @@ let connected_components_of_mixture created id_incr (env,rule_id) mix =
        let actions'',transformations'' =
 	 complete_with_creation
 	   transformations' links_transf actions' 0 created in
-       ((env,Tools.option_map id_incr rule_id),(Tools.array_rev_of_list acc,
-	(tests,actions''), transformations''))
+       ((env,Tools.option_map id_incr rule_id),
+	(Tools.array_rev_of_list acc,
+	 (tests,(actions'',[],[](*TODO*))), transformations''))
     | h :: t ->
        let wk = Connected_component.begin_new env in
        let (wk_out,(removed,added),l_t,(tests,actions),remains) =
@@ -783,4 +784,5 @@ let connected_components_sum_of_ambiguous_mixture contact_map env ?rule_id mix =
     aux_connected_components_sum_of_ambiguous_rule
       (fun x -> x) contact_map env ?rule_id mix mix in
   (cc_env, List.map
-	     (function l, _, ([],[]) -> l | _ -> assert false) rules)
+	     (function l, (tests,_), ([],[]) -> l,tests
+		     | _ -> assert false) rules)

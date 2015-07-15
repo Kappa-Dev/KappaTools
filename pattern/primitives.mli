@@ -69,7 +69,7 @@ sig
 
   type 'a event =
       'a test list *
-	('a action list * ('a site * 'a binding_state) list * Mods.Int2Set.t)
+	('a action list * ('a site * 'a binding_state) list * 'a site list)
 
   val rename_abstract_test :
     Connected_component.work -> int ->
@@ -77,8 +77,12 @@ sig
   val rename_abstract_action :
     Connected_component.work -> int ->
     Connected_component.cc -> Renaming.t -> abstract action -> abstract action
+  val rename_abstract_event :
+    Connected_component.work -> int ->
+    Connected_component.cc -> Renaming.t -> abstract event -> abstract event
   val concretize_test : (Place.t -> int) -> abstract test -> concrete test
   val concretize_action : (Place.t -> int) -> abstract action -> concrete action
+  val concretize_event : (Place.t -> int) -> abstract event -> concrete event
 
   val subst_map_agent_in_concrete_test :
     (int -> int) -> concrete test -> concrete test
@@ -89,11 +93,15 @@ sig
   val subst_agent_in_concrete_action :
     int -> int -> concrete action -> concrete action
   val subst_map_agent_in_concrete_side_effect:
-    (int -> int) -> (concrete site*concrete binding_state) ->
-    (concrete site*concrete binding_state)
+    (int -> int) -> (concrete site * concrete binding_state) ->
+    (concrete site * concrete binding_state)
   val subst_agent_in_concrete_side_effect:
-    int -> int -> (concrete site*concrete binding_state) ->
-    (concrete site*concrete binding_state)
+    int -> int -> (concrete site * concrete binding_state) ->
+    (concrete site * concrete binding_state)
+  val subst_map_agent_in_concrete_event:
+    (int -> int) -> concrete event -> concrete event
+  val subst_agent_in_concrete_event:
+    int -> int -> concrete event -> concrete event
 
   val print_concrete_test :
     ?sigs:Signature.s -> Format.formatter -> concrete test -> unit
@@ -108,9 +116,7 @@ type elementary_rule = {
   inserted : Transformation.t list;
   consumed_tokens : (Alg_expr.t * int) list;
   injected_tokens : (Alg_expr.t * int) list;
-  instantiations :
-    Instantiation.abstract Instantiation.test list *
-      Instantiation.abstract Instantiation.action list;
+  instantiations : Instantiation.abstract Instantiation.event;
 }
 
 type modification =

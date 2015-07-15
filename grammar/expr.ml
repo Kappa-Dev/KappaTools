@@ -69,7 +69,8 @@ let rec compile_alg ?label var_map tk_map ?max_allowed_var
      let domain',ccs =
        Snip.connected_components_sum_of_ambiguous_mixture
 	 contact_map domain ast in
-     (domain', (KAPPA_INSTANCE ccs,pos))
+     let ccs' = List.map fst ccs in
+     (domain', (KAPPA_INSTANCE ccs',pos))
   | Ast.OBS_VAR lab ->
      let i =
        try Mods.StringMap.find lab var_map with

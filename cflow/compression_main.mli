@@ -17,9 +17,6 @@ val secret_store_init :
   Primitives.Instantiation.concrete Primitives.Instantiation.action list ->
   secret_step list -> secret_log_info * secret_step list
 
-val compress :
+val compress_and_print :
   Format.formatter -> Environment.t -> secret_log_info ->
-  secret_step list ->
-  (Causal.grid * secret_log_info Mods.simulation_info option list) list option *
-    (Causal.grid * secret_log_info Mods.simulation_info option list) list option *
-      (Causal.grid * secret_log_info Mods.simulation_info option list) list option
+  secret_step list -> unit

@@ -40,8 +40,7 @@ sig
   type fresh_map 
   type obs  
   type step *)
-  type side_effect
-  type kasim_side_effect = Mods.Int2Set.t
+  type side_effect = PI.concrete PI.site list
 (*  type kappa_rule *)
   type refined_event =
       int * PI.concrete PI.event
@@ -107,9 +106,10 @@ sig
     P.log_info -> refined_obs  -> refined_step list -> P.log_info * refined_step list
 
   val build_grid:
-    (refined_step * side_effect * bool)  list -> bool -> H.handler -> Causal.grid
+    (refined_step * PI.concrete PI.site list * bool)  list -> bool ->
+    H.handler -> Causal.grid
   val print_side_effect: Format.formatter -> side_effect -> unit
-  val side_effect_of_list: (int*int) list -> side_effect
+  val side_effect_of_list: PI.concrete PI.site list -> side_effect
 (*  val no_obs_found: step list -> bool 
 
   val subs_agent_in_test: agent_id -> agent_id -> test -> test
@@ -124,7 +124,7 @@ sig
     (agent_id -> agent_id) -> (PI.concrete PI.site*binding_state) ->
     (PI.concrete PI.site*binding_state)*)
 
-  val get_kasim_side_effects: refined_step -> kasim_side_effect 
+  val get_kasim_side_effects: refined_step -> side_effect
 
   val level_of_event: (refined_step -> (agent_id -> bool) -> H.error_channel * Priority.level) H.with_handler
   val disambiguate: refined_step list -> refined_step list
@@ -154,8 +154,7 @@ module Cflow_linker =
   type kappa_rule = Primitives.elementary_rule
 
   type embedding = agent_id Mods.IntMap.t *)
-  type side_effect = (agent_id*int) list
-  type kasim_side_effect = Mods.Int2Set.t
+  type side_effect = PI.concrete PI.site list
 (*  type fresh_map = int Mods.IntMap.t 
   type obs_from_rule_app = (int * int Mods.IntMap.t) list 
   type r = Primitives.elementary_rule 
@@ -205,7 +204,7 @@ module Cflow_linker =
   let build_subs_refined_step a b = Subs (a,b)
   let get_kasim_side_effects = function
     | Event ((_,(_,(_,_,a)))) -> a
-    | Subs _ | Obs _ | Dummy _ | Init _ -> Mods.Int2Set.empty
+    | Subs _ | Obs _ | Dummy _ | Init _ -> []
 
   let dummy_refined_step x = Dummy x
   let empty_side_effect = []
@@ -823,34 +822,24 @@ module Cflow_linker =
 
   let build_grid list bool handler =
     let env = handler.H.env in
-    let empty_set = Mods.Int2Set.empty in
+    let empty_set = [] in
     let grid = Causal.empty_grid () in
     let grid,_,_,_ =
       List.fold_left
-        (fun (grid,side_effect,counter,subs) (k,(side:side_effect),is_weak) ->
+        (fun (grid,side_effect,counter,subs) (k,side,is_weak) ->
 	 let maybe_side_effect =
 	   if bool then fun se -> se
-	   else fun _ ->
-		List.fold_left
-		  (fun set i -> Mods.Int2Set.add i set) side_effect side in
+	   else fun _ -> List.rev_append side_effect side in
 	 let translate y = try Mods.IntMap.find y subs with Not_found -> y in
          match (k:refined_step) with
-         | Event (id,(tests,(actions,side_effects,kappa_side))) ->
-            let side_effect = maybe_side_effect kappa_side in
-	    let tests' =
-	      Tools.list_smart_map
-		(PI.subst_map_agent_in_concrete_test translate) tests in
-	    let actions' =
-	      Tools.list_smart_map
-		(PI.subst_map_agent_in_concrete_action translate) actions in
-	    let side_effects' =
-	      Tools.list_smart_map
-		(PI.subst_map_agent_in_concrete_side_effect translate)
-		side_effects in
+         | Event (id,event) ->
+	    let (tests,(actions,side_effects,kappa_side)) =
+	      PI.subst_map_agent_in_concrete_event translate event in
+            let kasim_side_effect = maybe_side_effect kappa_side in
             Causal.record
-	      (id,(tests',(actions',side_effects',kappa_side)))
-	      side_effect is_weak counter grid,
-            Mods.Int2Set.empty,counter+1,Mods.IntMap.empty
+	      (id,(tests,(actions,side_effects,kasim_side_effect)))
+	      is_weak counter grid,
+            empty_set,counter+1,Mods.IntMap.empty
          | Obs (id,tests,info) ->
 	    let tests' =
 	      Tools.list_smart_map
@@ -869,7 +858,7 @@ module Cflow_linker =
          | Dummy _ ->
             grid, maybe_side_effect empty_set, counter, subs
         )
-        (grid,Mods.Int2Set.empty,1,Mods.IntMap.empty) list
+        (grid,empty_set,1,Mods.IntMap.empty) list
     in grid
 
   let clean_events =
@@ -877,7 +866,7 @@ module Cflow_linker =
       (function Event _ | Obs _ -> true | Dummy _ | Init _ | Subs _ -> false)
 
   let print_side_effect =
-    Pp.list Pp.comma (fun f (a,b) -> Format.fprintf f "(%i,%i)," a b)
+    Pp.list Pp.comma (fun f ((a,_),b) -> Format.fprintf f "(%i,%i)," a b)
   let side_effect_of_list l = l
 
 (*  let rec no_obs_found l = 
@@ -932,19 +921,12 @@ module Cflow_linker =
     | Obs _ | Dummy _ | Init _ | Subs _ -> []
 
   let subs_agent_in_event mapping = function
-    | Event (a,(b,(c,d,e))) ->
+    | Event (a,event) ->
        Event
 	 (a,
-	  (Tools.list_smart_map
-	     (PI.subst_map_agent_in_concrete_test
-		(fun x -> try AgentIdMap.find x mapping with Not_found -> x)) b,
-	   (Tools.list_smart_map
-	      (PI.subst_map_agent_in_concrete_action
-		 (fun x -> try AgentIdMap.find x mapping with Not_found -> x)) c,
-	    Tools.list_smart_map
-	      (PI.subst_map_agent_in_concrete_side_effect
-		 (fun x -> try AgentIdMap.find x mapping with Not_found -> x)) d,
-	    e)))
+	  PI.subst_map_agent_in_concrete_event
+	    (fun x -> try AgentIdMap.find x mapping with Not_found -> x)
+	    event)
     | Obs (a,b,c) ->
        Obs(a,
 	   Tools.list_smart_map

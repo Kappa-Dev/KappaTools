@@ -473,14 +473,11 @@
          test_map
          action_map 
      in 
-     let merged_map = 
-       Mods.Int2Set.fold 
-         (fun (a,b)  map  -> 
-           let pid = Bound_site(a,b) in 
-           add_state pid (false,Some Free) map)
-         unambiguous_side_effects
-         merged_map 
-     in 
+     let merged_map =
+       List.fold_right
+         (fun ((a,_),b) map ->
+          let pid = Bound_site(a,b) in add_state pid (false,Some Free) map)
+         unambiguous_side_effects merged_map in
      let is_strong_action,pid_list = 
        PredicateMap.fold
          (fun pid (test,action) (bool,list) -> 

@@ -85,27 +85,22 @@ let deal_transformation is_add domain inj2graph edges roots transf = (*transf: a
        update_roots is_add r' cc root) roots obs in
   ((inj,graph,roots',deps),obs)
 
-let instantiation_from_event inj2graph (tests,actions) =
-  (List.map
-     (Primitives.Instantiation.concretize_test
-	(fun p -> let (_,x,_) = from_place inj2graph p in x)) tests,
-   List.map
-     (Primitives.Instantiation.concretize_action
-	(fun p -> let (_,x,_) = from_place inj2graph p in x)) actions
-  )
-
 let store_event
       event_number (*NB event counter*) inj2graph new_tracked_obs_instances
-      edges rule = function
+      edges rid rule = function
   | None as x -> x
-  | Some x ->
+  | Some (x,(info,steps)) ->
 (*     let quarks_obs =
        List.map
 	 (Connected_component.Matching.quark_lists_of_cc_instance edges)
 	 new_tracked_obs_instances in
      let quark_event =
         quark_list_from_event inj2graph rule.Primitives.instantiations in*)
-     Some x
+     let concrete_event =
+       Primitives.Instantiation.concretize_event
+	 (fun p -> let (_,x,_) = from_place inj2graph p in x)
+    rule.Primitives.instantiations in
+    Some (x,Compression_main.secret_store_event info (rid,concrete_event) steps)
 (*Compression_main.store rule final_inj2graph counter quarks_obs quark_event*)
 
 let store_obs obs acc = function
@@ -142,7 +137,7 @@ let update_edges event_number domain inj_nodes state rule =
   (*Store event*)
   let story_machinery' =
     store_event
-      event_number final_inj2graph new_tracked_obs_instances edges' rule
+      event_number final_inj2graph new_tracked_obs_instances edges' 0(*TODO*) rule
       state.story_machinery in
 
   { roots_of_ccs = roots'; edges = edges';
@@ -300,4 +295,8 @@ let remove_tracked cc state =
      { state with
        story_machinery = Some (Connected_component.Map.remove cc tcc,x) }
 
-let generate_stories env state = () (* Compression_main.chepokoi *)
+let generate_stories logger env state =
+  match state.story_machinery with
+  | None -> ()
+  | Some (_,(infos,steps)) ->
+     Compression_main.compress_and_print logger env infos steps

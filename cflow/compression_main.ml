@@ -34,17 +34,16 @@ let dump_profiling_info = true
 
 let store_uncompressed_stories = false
 
-let th_of_int n = 
-  match n mod 10  
-  with 
-    | 1 -> (string_of_int n)^"st"
-    | 2 -> (string_of_int n)^"nd"
-    | 3 -> (string_of_int n)^"rd"
-    | _ -> (string_of_int n)^"th"
+let th_of_int n =
+  match n mod 10 with
+  | 1 -> (string_of_int n)^"st"
+  | 2 -> (string_of_int n)^"nd"
+  | 3 -> (string_of_int n)^"rd"
+  | _ -> (string_of_int n)^"th"
 
 let dummy_weak = false
 
-let compress logger env log_info step_list =
+let compress_and_print logger env log_info step_list =
   let parameter = D.S.PH.B.PB.CI.Po.K.H.build_parameter () in
   let mode = parameter.D.S.PH.B.PB.CI.Po.K.H.compression_mode in
   let causal_trace_on = Parameter.get_causal_trace mode in
@@ -198,9 +197,9 @@ let compress logger env log_info step_list =
               let refined_list = 
                 if cut && Parameter.do_detect_separable_components 
                 then 
-                  (List.rev_map (fun (x,bool) -> (x,D.S.PH.B.PB.CI.Po.K.empty_side_effect,bool)) (List.rev refined_event_list_without_pseudo_inverse))
+                  (List.rev_map (fun (x,bool) -> (x,[],bool)) (List.rev refined_event_list_without_pseudo_inverse))
                 else 
-                  (List.rev_map (fun (x,_) -> (x,D.S.PH.B.PB.CI.Po.K.empty_side_effect,dummy_weak)) (List.rev refined_event_list_without_pseudo_inverse))
+                  (List.rev_map (fun (x,_) -> (x,[],dummy_weak)) (List.rev refined_event_list_without_pseudo_inverse))
               in 
               let grid = D.S.PH.B.PB.CI.Po.K.build_grid refined_list true handler in
               let config_init = 
@@ -270,9 +269,9 @@ let compress logger env log_info step_list =
                   let refined_list = 
                     if cut && Parameter.do_detect_separable_components 
                     then 
-                      (List.rev_map (fun (x,bool) -> (x,D.S.PH.B.PB.CI.Po.K.empty_side_effect,bool)) (List.rev refined_event_list_without_pseudo_inverse))
+                      (List.rev_map (fun (x,bool) -> (x,[],bool)) (List.rev refined_event_list_without_pseudo_inverse))
                     else 
-                      (List.rev_map (fun (x,_) -> (x,D.S.PH.B.PB.CI.Po.K.empty_side_effect,dummy_weak)) (List.rev refined_event_list_without_pseudo_inverse))
+                      (List.rev_map (fun (x,_) -> (x,[],dummy_weak)) (List.rev refined_event_list_without_pseudo_inverse))
                   in 
 		  let grid = D.S.PH.B.PB.CI.Po.K.build_grid refined_list true handler in
                   let enriched_grid = Causal.enrich_grid logger Graph_closure.config_intermediary grid in 
@@ -493,11 +492,14 @@ let compress logger env log_info step_list =
           causal,causal_story_array,weakly_compressed_story_array,strongly_compressed_story_array
         end 
   in 
-  let lift bool x = 
-    if bool 
-    then Some (D.sort_list x)
-    else None
-  in 
-  lift causal_trace_on causal,
-  lift weak_compression_on weak,
-  lift strong_compression_on strong 
+  let () =
+    if causal_trace_on then
+      Causal.pretty_print logger env Graph_closure.config_std "" ""
+			  (D.sort_list causal) in
+  let () =
+    if weak_compression_on then
+      Causal.pretty_print logger env Graph_closure.config_std "" ""
+			  (D.sort_list weak) in
+  if strong_compression_on then
+      Causal.pretty_print logger env Graph_closure.config_std "" ""
+			  (D.sort_list strong)

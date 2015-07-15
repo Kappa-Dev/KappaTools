@@ -784,9 +784,9 @@ module Preblackboard =
                CI.Po.K.H.raise_error parameter handler error error_list []
              | Free -> 
                error,[predicate_target_id,None,(Free,Unknown)]
-             | Bound_to (pid,ag,_,sname) -> 
+             | Bound_to (pid,ag,ag_na,sname) -> 
                error,[predicate_target_id,None,(s,Unknown);
-                      pid,Some (ag,sname),(Bound_to (predicate_target_id,CI.Po.K.agent_id_of_site site,CI.Po.K.agent_name_of_site site,CI.Po.K.site_name_of_site site),Free)]
+                      pid,Some ((ag,ag_na),sname),(Bound_to (predicate_target_id,CI.Po.K.agent_id_of_site site,CI.Po.K.agent_name_of_site site,CI.Po.K.site_name_of_site site),Free)]
                  
                  
          let predicate_value_of_binding_state parameter handler error = function
@@ -825,7 +825,7 @@ module Preblackboard =
                    else 
                      error,blackboard,[]
              end
-           | _ -> 
+           | Some _ -> 
              begin 
                let error,bt = predicate_value_of_binding_state parameter handler error binding_state in 
                let error,list = 

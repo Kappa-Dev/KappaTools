@@ -87,8 +87,8 @@
          | K.PI.Is_Bound_to  (s1,s2) -> 
            [Bound_site (K.agent_id_of_site s1,K.site_name_of_site s1);Bound_site (K.agent_id_of_site s2,K.site_name_of_site s2)]
 
-     let predicates_of_side_effects sides = 
-       Mods.Int2Set.fold (fun (ag_id,s_id) list -> Bound_site(ag_id,s_id)::list) sides [] 
+     let predicates_of_side_effects sides =
+       List.map (fun ((ag_id,_),s_id) -> Bound_site(ag_id,s_id)) sides
 
      let cut parameter handler error event_list = 
        let seen_predicates = PS.empty in 

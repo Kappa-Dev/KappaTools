@@ -230,7 +230,7 @@ let loop_cps form hook return env domain counter graph state =
   in iter graph state
 
 let finalize form env counter graph =
-  let () = Rule_interpreter.generate_stories env graph in
+  let () = Rule_interpreter.generate_stories form env graph in
   Plot.close form counter
 
 let go f = f ()

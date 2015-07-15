@@ -183,8 +183,8 @@ let add (node_id,site_id) c grid event_number kind =
     add_init_pid event_number (node_id,site_id,0) grid
   else*) grid
 
-let record (r_id,(tests,(actions,side_effects',kasa_side_effects)))
-	   side_effects is_weak event_number grid =
+let record (r_id,(tests,(actions,kasa_side_effects,kasim_side_effects)))
+	   is_weak event_number grid =
 (*  let pre_causal = rule.Primitives.pre_causal in
   let kind = RULE r_id in
 
@@ -435,7 +435,7 @@ let dot_of_grid profiling desc env enriched_grid =
   let () = Kappa_files.add_out_desc desc in
   let form  = Format.formatter_of_out_channel desc in
   let _ = profiling form in
-  Format.fprintf form "@[<v>digraph G{\n ranksep=.5 ;@," ;
+  Format.fprintf form "@[<v>digraph G{@, ranksep=.5 ;@," ;
   IntMap.iter
     (fun d eids_at_d ->
      Format.fprintf form "@[<hv>{ rank = same ; \"%d\" [shape=plaintext] ;@," d;
@@ -515,7 +515,7 @@ let dot_of_grid profiling desc env enriched_grid =
   close_out desc
 
 (*story_list:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_id:int story_time: float ; story_event: int}*)
-let pretty_print err_fmt config_closure compression_type label story_list env =
+let pretty_print err_fmt env config_closure compression_type label story_list =
   let n = List.length story_list in
   let () =
     if compression_type = "" then

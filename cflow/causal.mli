@@ -48,11 +48,12 @@ val empty_grid : unit -> grid
 
 val record :
   (int * Primitives.Instantiation.concrete Primitives.Instantiation.event) ->
-  Mods.Int2Set.t -> bool -> int -> grid -> grid
+  bool -> int -> grid -> grid
 val record_obs :
   (int * Primitives.Instantiation.concrete Primitives.Instantiation.test list
    * unit Mods.simulation_info) ->
-  Mods.Int2Set.t -> bool -> int -> grid -> Environment.t -> grid
+  Primitives.Instantiation.concrete Primitives.Instantiation.site list ->
+  bool -> int -> grid -> Environment.t -> grid
 val record_init :
   Primitives.Instantiation.concrete Primitives.Instantiation.action list ->
   bool -> int -> grid -> Environment.t -> grid
@@ -62,9 +63,9 @@ val enrich_grid :
   Format.formatter -> Graph_closure.config -> grid -> enriched_grid
 
 val pretty_print :
-  Format.formatter -> Graph_closure.config -> string -> string ->
-  (grid * 'a Mods.simulation_info option list) list -> Environment.t -> unit
-(** [pretty_print err_fmt config_closure compression_type label story_list
+  Format.formatter -> Environment.t -> Graph_closure.config -> string ->
+  string -> (grid * 'a Mods.simulation_info option list) list -> unit
+(** [pretty_print err_fmt env config_closure compression_type label story_list
                   state env] *)
 val print_stat :
   Format.formatter -> 'a -> 'b -> enriched_grid -> unit
