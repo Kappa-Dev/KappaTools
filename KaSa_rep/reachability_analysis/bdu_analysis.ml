@@ -267,7 +267,7 @@ let collect_remove_know_site parameter error kappa_handler
     store_result
 
 (*------------------------------------------------------------------------------*)
-(*remove action (deletion): undocument, the state is the total state - 1 *)
+(*remove action (deletion): undocument, the state is the total state *)
 
 let collect_remove_undocument_site parameter error kappa_handler
     index agent_type list_undoc store_result =
@@ -369,7 +369,6 @@ let collect_remove parameter error kappa_handler store_result remove =
     in
     error, (know_site, undoc_site, result_remove)
   ) (error, store_result) remove
-
     
 (************************************************************************************)
 (*Covering class*)
@@ -407,7 +406,8 @@ let collect_test_modif parameter error viewslhs diff_reverse store_result =
 	    (*new*)
 	    let new_list = List.concat [pair_list; old_list] in
 	    let error, handler, new_bdu =
-	      f parameter error old_bdu (Boolean_mvbdu.boolean_mvbdu_or
+	      f parameter error old_bdu
+		(Boolean_mvbdu.boolean_mvbdu_or
 		   parameter handler error parameter old_bdu) bdu
 	    in
             (*------------------------------------------------------------------------*)
