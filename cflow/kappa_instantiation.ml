@@ -836,14 +836,14 @@ module Cflow_linker =
             let kasim_side_effect = maybe_side_effect kappa_side in
             Causal.record
 	      (id,(tests,(actions,side_effects,kasim_side_effect)))
-	      is_weak counter grid,
+	      is_weak counter env grid,
             empty_set,counter+1,Mods.IntMap.empty
          | Obs (id,tests,info) ->
 	    let tests' =
 	      Tools.list_smart_map
 		(PI.subst_map_agent_in_concrete_test translate) tests in
 	    Causal.record_obs
-	      (id,tests',info) side_effect is_weak counter grid env,
+	      (id,tests',info) side_effect is_weak counter grid,
 	    maybe_side_effect empty_set,counter+1,Mods.IntMap.empty
          | Subs (a,b) ->
             grid, side_effect, counter, Mods.IntMap.add a b subs
@@ -851,7 +851,7 @@ module Cflow_linker =
 	    let actions' =
 	      Tools.list_smart_map
 		(PI.subst_map_agent_in_concrete_action translate) actions in
-            Causal.record_init actions' is_weak counter grid env,
+            Causal.record_init actions' is_weak counter env grid,
 	    side_effect,counter+1,Mods.IntMap.empty
          | Dummy _ ->
             grid, maybe_side_effect empty_set, counter, subs

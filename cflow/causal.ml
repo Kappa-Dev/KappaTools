@@ -135,12 +135,14 @@ let last_event attribute =
 
 (*adds atom a to attribute att.
  Collapses last atom if if bears the same id as a --in the case of a non atomic action*)
-(*let push (a:atom) (att:atom list) =
+let push (a:atom) (att:atom list) =
   match att with
   | [] -> [a]
   | a'::att' ->
-     if a'.eid = a.eid then a::att' else a::att
- *)
+     if a'.eid = a.eid then
+       let () = assert (a'.kind = a.kind) in
+       { a' with causal_impact = a.causal_impact lor a'.causal_impact }::att'
+     else a::att
 
 (**side_effect Int2Set.t: pairs (agents,ports) that have been freed as a side effect --via a DEL or a FREE action*)
 (*NB no internal state modif as side effect*)
@@ -157,94 +159,81 @@ let store_is_weak is_weak eid grid =
       if Primitives.Causality.is_internal_tested c then 3 else 2
     else 1
  *)
-let add (node_id,site_id) c grid event_number kind =
-  (* make this function more compact *)
-  (*adding a link modification*)
-(*  let grid =
-    if Primitives.Causality.is_link_something c then
-      let att = try grid_find (node_id,site_id,1) grid with Not_found -> [] in
-      let att =
-	push {causal_impact = impact true c ; eid = event_number ;
-	      kind = kind (*; observation = obs*)} att
-      in
-      let grid = grid_add (node_id,site_id,1) event_number att grid in
-      add_init_pid event_number (node_id,site_id,1) grid
-    else
-      grid
-  in
-  if Primitives.Causality.is_internal_something c then
-    (*adding an internal state modification*)
-    let att = try grid_find (node_id,site_id,0) grid with Not_found -> [] in
-    let att =
-      push {causal_impact = impact false c ; eid = event_number ;
-	    kind = kind (*; observation = obs*)} att
-    in
-    let grid = grid_add (node_id,site_id,0) event_number att grid in
-    add_init_pid event_number (node_id,site_id,0) grid
-  else*) grid
+let add ((node_id,_),site_id) is_link va grid event_number kind =
+  let att =
+    try grid_find (node_id,site_id,if is_link then 1 else 0) grid
+    with Not_found -> [] in
+  let att =
+    push {causal_impact = va ; eid = event_number ;
+	  kind = kind (*; observation = obs*)} att in
+  let grid = grid_add (node_id,site_id,1) event_number att grid in
+  add_init_pid event_number (node_id,site_id,1) grid
 
-let record (r_id,(tests,(actions,kasa_side_effects,kasim_side_effects)))
-	   is_weak event_number grid =
-(*  let pre_causal = rule.Primitives.pre_causal in
+let add_actions env grid event_number kind actions =
+  let rec aux grid = function
+    | [] -> grid
+    | Primitives.Instantiation.Mod_internal (site,_) :: q ->
+       aux (add site false 1 grid event_number kind) q
+    | (Primitives.Instantiation.Bind (site1,site2)
+      | Primitives.Instantiation.Bind_to (site1,site2)) :: q ->
+       let grid' = add site2 true 1 grid event_number kind in
+       aux (add site1 true 1 grid' event_number kind) q
+    | Primitives.Instantiation.Free site :: q ->
+       aux (add site true 1 grid event_number kind) q
+    | (Primitives.Instantiation.Create ((_,na as ag),_)
+      | Primitives.Instantiation.Remove (_,na as ag)) :: q ->
+       let sigs = Environment.signatures env in
+       let ag_intf = Signature.get sigs na in
+       let grid =
+	 Signature.fold
+	   (fun site _ grid ->
+	    let grid' =
+	      match Signature.default_internal_state na site sigs with
+	      | None -> grid
+	      | Some _ -> add (ag,site) false 1 grid event_number kind in
+	    add (ag,site) true 1 grid' event_number kind)
+	   ag_intf grid in
+       aux grid q
+  in aux grid actions
+
+let add_tests grid event_number kind tests =
+  let rec aux grid = function
+    | [] -> grid
+    | Primitives.Instantiation.Is_Here _ :: q -> aux grid q
+    | Primitives.Instantiation.Has_Internal (site,_) :: q ->
+       aux (add site false 2 grid event_number kind) q
+    | (Primitives.Instantiation.Is_Free site
+      | Primitives.Instantiation.Is_Bound site
+      | Primitives.Instantiation.Has_Binding_type (site,_)) :: q ->
+       aux (add site true 2 grid event_number kind) q
+    | Primitives.Instantiation.Is_Bound_to (site1,site2) :: q ->
+       let grid' = add site2 true 2 grid event_number kind in
+       aux (add site1 true 2 grid' event_number kind) q
+  in aux grid tests
+
+let record (r_id,(tests,(actions,_,side_effects)))
+	   is_weak event_number env grid =
   let kind = RULE r_id in
 
   let grid = store_is_weak is_weak event_number grid in
-  let grid =
-    (*adding side-effect free modifications and tests*)
-    let grid =
-      Primitives.PortMap.fold
-        (fun (id,site_id) c grid ->
-	 let node_id = im id in
-	 add (node_id,site_id) c grid event_number kind
-	) pre_causal grid in
-    (*adding side effects modifications*)
-    Int2Set.fold
-      (fun (node_id,site_id) grid ->
-       add (node_id,site_id) causality_of_link grid event_number kind)
-      side_effects grid in*)
-  grid
+  let grid = add_tests grid event_number kind tests in
+  let grid = add_actions env grid event_number kind actions in
+  List.fold_left
+    (fun grid site -> add site true 1 grid event_number kind) grid side_effects
 
-let record_obs (id,test,info) side_effects is_weak event_number grid env =
-(*  let grid = add_obs_eid event_number grid in
+let record_obs (id,tests,_) side_effects is_weak event_number grid =
+  let kind = OBS id in
+  let grid = add_obs_eid event_number grid in
   let grid = store_is_weak is_weak event_number grid in
-  let im embedding id =
-    match id with
-    | Primitives.FRESH _ -> raise (Invalid_argument "Causal.record_obs")
-    | Primitives.KEPT j -> IntMap.find j embedding
-  in
-  let causal = Dynamics.compute_causal_obs state env in
-  (*adding tests*)
-  let grid =
-    Primitives.PortMap.fold
-      (fun (id,site_id) c grid ->
-       let node_id = im embedding id in
-       add (node_id,site_id) c grid event_number (OBS r_id)
-      )
-      causal grid
-  in
-  let grid =
-    (*adding side effects modifications*)
-    Int2Set.fold
-      (fun (node_id,site_id) grid ->
-       add (node_id,site_id) causality_of_link grid event_number (OBS r_id))
-      side_effects grid
-  in*) grid
+  let grid = add_tests grid event_number kind tests in
+  List.fold_left
+    (fun grid site -> add site true 1 grid event_number kind) grid side_effects
 
-let record_init actions is_weak event_number grid env =
-  (*  if !Parameter.showIntroEvents then *)
+let record_init actions is_weak event_number env grid =
+  (* if !Parameter.showIntroEvents then *)
   (*adding tests*)
-(*  let (((node_id,agent_name),interface),_) = init in
-  let causal = Dynamics.compute_causal_init init env in
   let grid = store_is_weak is_weak event_number grid in
-  let grid =
-    Mods.Int2Map.fold
-      (fun (node_id,site_id) c grid ->
-       add
-         (node_id,site_id) c
-       (*(_INTERNAL_MODIF lor _INTERNAL_TESTED lor _LINK_TESTED lor _LINK_MODIF) (* HACK, TO DO CLEANER *)*)
-         grid event_number (INIT agent_name) []
-      ) causal grid
-  in*) grid
+  add_actions env grid event_number INIT actions
 
 let add_pred eid atom config =
   let events = IntMap.add atom.eid atom config.events in
@@ -341,7 +330,7 @@ let dump grid fic =
 let label env = function
   | OBS mix_id -> Format.asprintf "%a" (Environment.print_alg ~env) mix_id
   | PERT p_id -> ""
-  | RULE r_id -> ""
+  | RULE r_id -> Format.asprintf "%a" (Environment.print_rule ~env) r_id
   | INIT -> "initial introduction"
 
 let ids_of_grid grid = Hashtbl.fold (fun key _ l -> key::l) grid.flow []

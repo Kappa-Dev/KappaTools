@@ -703,16 +703,17 @@ let rec complete_with_creation (removed,added) links_transf actions fresh =
      end
   | ag :: ag_l ->
      let place = Primitives.Place.Fresh (ag.Raw_mixture.a_type,fresh) in
-     let rec handle_ports added l_t actions site_id =
+     let rec handle_ports added l_t actions intf site_id =
        if site_id = Array.length ag.Raw_mixture.a_ports then
-	 let actions' = Primitives.Instantiation.Create (place,[]) :: actions in
+	 let actions' = Primitives.Instantiation.Create (place,intf) :: actions in
 	 complete_with_creation (removed,added) l_t actions' (succ fresh) ag_l
        else
-	 let added' =
+	 let added',point =
 	   match ag.Raw_mixture.a_ints.(site_id) with
-	   | None -> added
+	   | None -> added,(site_id,None)
 	   | Some i ->
-	      Primitives.Transformation.Internalized (place,site_id,i)::added in
+	      Primitives.Transformation.Internalized (place,site_id,i)::added,
+	      (site_id,Some i) in
 	 let added'',actions',l_t' =
 	   match ag.Raw_mixture.a_ports.(site_id) with
 	   | Raw_mixture.FREE ->
@@ -728,8 +729,8 @@ let rec complete_with_creation (removed,added) links_transf actions fresh =
 	      with Not_found ->
 		let l_t' = IntMap.add i ((place,site_id)) l_t in
 		(added',actions,l_t') in
-	 handle_ports added'' l_t' actions' (succ site_id) in
-     handle_ports added links_transf actions 0
+	 handle_ports added'' l_t' actions' (point::intf) (succ site_id) in
+     handle_ports added links_transf actions [] 0
 
 
 let connected_components_of_mixture created id_incr (env,rule_id) mix =
