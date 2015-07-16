@@ -343,12 +343,18 @@ let print_halfbreak parameter error store_half_break =
   AgentMap.print
     error
     (fun error parameter set ->
-      let _ =
-        let l = Site_map_and_set.elements set in
-        fprintf stdout "Side_effect:1/2unbinding:site_type:";
-        print_list l
-      in
-      error
+      let is_empty = Site_map_and_set.is_empty_set set in
+      if not is_empty
+      then
+	let _ =
+	  fprintf stdout "Side-effect:half_break:\n";
+          let l = Site_map_and_set.elements set in
+          fprintf stdout "Side_effect:half_break:site_type:";
+          print_list l
+	in
+	error
+      else
+	error
     )
     parameter
     store_half_break
@@ -359,7 +365,7 @@ let print_unbinding store_unbinding =
   fprintf stdout "Side-effect:unbinding:\n";
   let rec aux acc =
     match acc with
-      | [] -> []
+      | [] -> ()
       | (i,a,x,u,b,y) :: tl ->
         fprintf stdout
           "agent_id:%i:agent_type:%i:site_type:%i -> agent_id:%i:agent_type:%i:site_type:%i\n"
@@ -372,34 +378,47 @@ let print_unbinding store_unbinding =
 let print_remove parameter error store_remove =
   (*print document*)
   let _ =
-    fprintf stdout "Side-effect:deletion:\n";
     AgentMap.print error
-      (fun error parameter map  ->
-        let _ =
-          fprintf stdout "Side-effect:deletion:document_site:\n";
-          Site_map_and_set.iter_map (fun k (i,a,s) ->
-            let _ =
-              fprintf stdout "agent_id:%i:agent_type:%i:site_type:%i\n"
-                i a s
-            in
-            ()
-          ) map
-        in error)
+      (fun error parameter map ->
+	let is_empty = Site_map_and_set.is_empty_map map in
+	if not is_empty
+	then
+          let _ =
+	    fprintf stdout "Side-effect:deletion:\n";
+            fprintf stdout "Side-effect:deletion:document_site:\n";
+            Site_map_and_set.iter_map (fun k (i,a,s) ->
+              let _ =
+		fprintf stdout "agent_id:%i:agent_type:%i:site_type:%i\n"
+                  i a s
+              in
+              ()
+            ) map
+	  in error
+	else
+	  error
+      )
       parameter
       (fst store_remove)
   in
   (*print undocument*)
   AgentMap.print error
-    (fun error parameter map  ->
-      let _ =
-        fprintf stdout "Side-effect:deletion:undocument_site:\n";
-        Site_map_and_set.iter_map (fun k (i,a,s) ->
-          let _ =
-            fprintf stdout "agent_id:%i:agent_type:%i:site_type:%i\n"
+    (fun error parameter map ->
+      let is_empty = Site_map_and_set.is_empty_map map in
+      if not is_empty
+      then
+	let _ =
+	  fprintf stdout "Side-effect:deletion:\n";
+          fprintf stdout "Side-effect:deletion:undocument_site:\n";
+          Site_map_and_set.iter_map (fun k (i,a,s) ->
+            let _ =
+              fprintf stdout "agent_id:%i:agent_type:%i:site_type:%i\n"
               i a s
-          in
-          ()) map
-      in error)
+            in
+            ()) map
+	in error
+      else
+	error
+    )
     parameter
     (snd store_remove)
 

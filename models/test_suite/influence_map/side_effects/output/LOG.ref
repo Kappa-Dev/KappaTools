@@ -212,23 +212,24 @@ Influence_map:Inhibition_map:rule(3):'' A()-> -> rule(1):'' A(x!_)->A(x)[0->0]
 Influence_map:Inhibition_map:rule(3):'' A()-> -> rule(2):'' B(x!_)->B(x)[0*->0]
 Influence_map:Inhibition_map:rule(4):'' B(x)-> -> rule(0):'' A(x),B(x)->A(x!1),B(x!1)[0->1]
 Influence_map:Inhibition_map:rule(4):'' B(x)-> -> rule(2):'' B(x!_)->B(x)[0->0]
-Side-effect:
-Side-effect:agent_type:0:
-Side_effect:1/2unbinding:site_type:{0}
-Side-effect:agent_type:1:
-Side_effect:1/2unbinding:site_type:{0}
+Side-effects:
+Side-effects:agent_type:0:
+Side-effect:half_break:
+Side_effect:half_break:site_type:{0}
+Side-effects:agent_type:1:
+Side-effect:half_break:
+Side_effect:half_break:site_type:{0}
 Side-effect:unbinding:
+Side-effects:agent_type:0:
+Side-effects:agent_type:1:
 Side-effect:deletion:
-Side-effect:agent_type:0:
-Side-effect:deletion:document_site:
-Side-effect:agent_type:1:
 Side-effect:deletion:document_site:
 agent_id:0:agent_type:1:site_type:0
-Side-effect:agent_type:0:
+Side-effects:agent_type:0:
+Side-effect:deletion:
 Side-effect:deletion:undocument_site:
 agent_id:0:agent_type:0:site_type:0
-Side-effect:agent_type:1:
-Side-effect:deletion:undocument_site:
+Side-effects:agent_type:1:
 Potential dependencies between sites:
 Potential dependencies between sites:agent_type:0:
 Potential dependencies between sites:Number of covering classes:1

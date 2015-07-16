@@ -71,17 +71,12 @@ Quarks:agent_modif-:agent_type:0,rule:0->[0]
 Quarks:agent_modif-:agent_type:1,rule:1->[0]
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Influence_map:Wake_up_map:rule(0):'r0' A()->B() -> rule(1):'r1' B()->C()[0->0]
-Side-effect:
+Side-effects:
 Side-effect:unbinding:
-Side-effect:deletion:
-Side-effect:agent_type:0:
-Side-effect:deletion:document_site:
-Side-effect:agent_type:1:
-Side-effect:deletion:document_site:
-Side-effect:agent_type:0:
-Side-effect:deletion:undocument_site:
-Side-effect:agent_type:1:
-Side-effect:deletion:undocument_site:
+Side-effects:agent_type:0:
+Side-effects:agent_type:1:
+Side-effects:agent_type:0:
+Side-effects:agent_type:1:
 Potential dependencies between sites:
 
 --------------------------------------------

@@ -392,28 +392,33 @@ Influence_map:Inhibition_map:rule(5):'r5' E(y~p),E(z~p)-> -> rule(4):'r4' E(x~u,
 Influence_map:Inhibition_map:rule(5):'r5' E(y~p),E(z~p)-> -> rule(5):'r5' E(y~p),E(z~p)->[0->1];[1->0]
 Influence_map:Inhibition_map:rule(6):'r6' F(x~u)-> -> rule(7):'r7' F(y~p)->[0->0]
 Influence_map:Inhibition_map:rule(7):'r7' F(y~p)-> -> rule(6):'r6' F(x~u)->[0->0]
-Side-effect:
-Side-effect:agent_type:4:
-Side_effect:1/2unbinding:site_type:{0; 1; 2}
-Side-effect:agent_type:5:
-Side_effect:1/2unbinding:site_type:{0; 1}
+Side-effects:
+Side-effects:agent_type:4:
+Side-effect:half_break:
+Side_effect:half_break:site_type:{0; 1; 2}
+Side-effects:agent_type:5:
+Side-effect:half_break:
+Side_effect:half_break:site_type:{0; 1}
 Side-effect:unbinding:
+Side-effects:agent_type:4:
 Side-effect:deletion:
-Side-effect:agent_type:4:
 Side-effect:deletion:document_site:
 agent_id:0:agent_type:4:site_type:0
 agent_id:0:agent_type:4:site_type:1
 agent_id:1:agent_type:4:site_type:2
-Side-effect:agent_type:5:
+Side-effects:agent_type:5:
+Side-effect:deletion:
 Side-effect:deletion:document_site:
 agent_id:0:agent_type:5:site_type:0
 agent_id:0:agent_type:5:site_type:1
-Side-effect:agent_type:4:
+Side-effects:agent_type:4:
+Side-effect:deletion:
 Side-effect:deletion:undocument_site:
 agent_id:1:agent_type:4:site_type:0
 agent_id:1:agent_type:4:site_type:1
 agent_id:0:agent_type:4:site_type:2
-Side-effect:agent_type:5:
+Side-effects:agent_type:5:
+Side-effect:deletion:
 Side-effect:deletion:undocument_site:
 agent_id:0:agent_type:5:site_type:0
 agent_id:0:agent_type:5:site_type:1

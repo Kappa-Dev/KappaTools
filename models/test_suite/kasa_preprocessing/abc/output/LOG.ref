@@ -487,12 +487,11 @@ Influence_map:Inhibition_map:rule(4):'a.c' A(x,c),C(x1~p,x2~u)->A(x,c!1),C(x1~p,
 Influence_map:Inhibition_map:rule(5):'mod x2' A(x,c!1),C(x1~p,x2~u!1)->A(x,c),C(x1~p,x2~p) -> rule(4):'a.c' A(x,c),C(x1~p,x2~u)->A(x,c!1),C(x1~p,x2~u!1)[1->1]
 Influence_map:Inhibition_map:rule(5):'mod x2' A(x,c!1),C(x1~p,x2~u!1)->A(x,c),C(x1~p,x2~p) -> var(4):'Cuu' C(x1~u?,x2~u?)[1->0]
 Influence_map:Inhibition_map:rule(5):'mod x2' A(x,c!1),C(x1~p,x2~u!1)->A(x,c),C(x1~p,x2~p) -> var(5):'Cpu' C(x1~p?,x2~u?)[1->0]
-Side-effect:
+Side-effects:
 Side-effect:unbinding:
 agent_id:0:agent_type:0:site_type:1 -> agent_id:1:agent_type:2:site_type:3
 agent_id:0:agent_type:2:site_type:2 -> agent_id:1:agent_type:0:site_type:1
 agent_id:0:agent_type:0:site_type:0 -> agent_id:1:agent_type:1:site_type:0
-Side-effect:deletion:
 Potential dependencies between sites:
 Potential dependencies between sites:agent_type:0:
 Potential dependencies between sites:Number of covering classes:1

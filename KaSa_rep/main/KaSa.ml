@@ -79,13 +79,20 @@ let main () =
       error 
   in 
   (*Side effect*)
-  let parameters_se= Remanent_parameters.update_prefix parameters "Side-effect:" in
   let _ =
-    if (Remanent_parameters.get_trace parameters)
-    then
-      Printf.fprintf (Remanent_parameters.get_log parameters) "Side-effect:\n"
+    if Remanent_parameters.get_do_site_dependencies parameters
+    then 
+      let parameters_se =
+	Remanent_parameters.update_prefix parameters "Side-effects:" in 
+      let _ = 
+	if (Remanent_parameters.get_trace parameters_se)
+	then Printf.fprintf (Remanent_parameters.get_log parameters_se) "Side-effects:\n"
+      in
+      let error,dep = Side_effect.side_effect parameters_se error handler c_compil 
+      in error, Some dep 
+    else 
+      error, None 
   in
-  let _ = Side_effect.side_effect parameters_se error handler c_compil in
   (*covering classes*)
   let error,covering_classes = 
     if Remanent_parameters.get_do_site_dependencies parameters
