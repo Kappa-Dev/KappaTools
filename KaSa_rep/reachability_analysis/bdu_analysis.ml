@@ -241,7 +241,7 @@ let collect_remove_know_site parameter error kappa_handler
       let error, last_entry = Cckappa_sig.Dictionary_of_States.last_entry parameter
         error state_dic
       in
-      let l = (site, last_entry - 1) :: current_list in (*TEST*)
+      let l = (site, last_entry) :: current_list in (*TEST*)
       let error, (handler, bdu_remove) = build_bdu parameter error l in
       l, (handler, bdu_remove)
     ) agent.agent_interface ([], (handler, bdu_init))
@@ -273,7 +273,7 @@ let collect_remove_undocument_site parameter error kappa_handler
     index agent_type list_undoc store_result =
   let error, (handler, bdu_init) = bdu_init parameter in
   let (list, (handler, bdu)) =
-    List.fold_left (fun (current_list, _) site -> 
+    List.fold_left (fun (current_list, _) site ->
       (*get state from state_dic*)
       let error, state_dic =
         Misc_sa.unsome
@@ -289,7 +289,7 @@ let collect_remove_undocument_site parameter error kappa_handler
       let error, last_entry = Cckappa_sig.Dictionary_of_States.last_entry parameter
         error state_dic
       in
-      let l = (site, last_entry - 1) :: current_list in (*TEST*)
+      let l = (site, last_entry) :: current_list in (*TEST*)
       let error, (handler, bdu) = build_bdu parameter error l in
       l, (handler, bdu)
     ) ([], (handler, bdu_init)) list_undoc

@@ -204,12 +204,12 @@ site_type:0:state:0
 BDU REMOVE rules
 agent_type:0:
 Id=3
- Node(site_type:0<-1)
+ Node(site_type:0<0)
   Id=1
    Leaf False 
 
   Id=2
-   Node(site_type:0<0)
+   Node(site_type:0<1)
     Id=0
      Leaf True 
 
@@ -218,12 +218,12 @@ Id=3
 
 agent_type:2:
 Id=3
- Node(site_type:1<-1)
+ Node(site_type:1<0)
   Id=1
    Leaf False 
 
   Id=2
-   Node(site_type:1<0)
+   Node(site_type:1<1)
     Id=0
      Leaf True 
 
@@ -314,41 +314,26 @@ Id=3
 ITERATION OF REMOVE - COVERING CLASS rules
 agent_type:0:
 Id=2
- Node(site_type:0<-1)
-  Id=3
-   Node(site_type:0<0)
+ Node(site_type:0<0)
+  Id=1
+   Leaf False 
+
+  Id=1
+   Node(site_type:0<1)
+    Id=0
+     Leaf False 
+
     Id=1
      Leaf False 
 
-    Id=2
-     Node(site_type:0<1)
-      Id=0
-       Leaf True 
-
-      Id=1
-       Leaf False 
-
-  Id=1
-   Node(site_type:0<0)
-    Id=0
-     Leaf True 
-
-    Id=2
-     Node(site_type:0<1)
-      Id=0
-       Leaf True 
-
-      Id=1
-       Leaf False 
-
 agent_type:2:
 Id=3
- Node(site_type:1<-1)
+ Node(site_type:1<0)
   Id=1
    Leaf False 
 
   Id=2
-   Node(site_type:1<0)
+   Node(site_type:1<1)
     Id=0
      Leaf True 
 
@@ -358,20 +343,10 @@ Id=3
 --------------------------------------------
 ITERATION OF HALF_BREAK - REMOVE - COVERING CLASS rules
 agent_type:0:
-Id=4
- Node(site_type:0<-1)
-  Id=3
-   Node(site_type:0<0)
-    Id=1
-     Leaf False 
-
-    Id=2
-     Node(site_type:0<1)
-      Id=0
-       Leaf True 
-
-      Id=1
-       Leaf False 
+Id=3
+ Node(site_type:0<0)
+  Id=1
+   Leaf False 
 
   Id=2
    Node(site_type:0<1)
@@ -385,12 +360,12 @@ agent_type:2:
 Id=5
  Node(site_type:0<0)
   Id=3
-   Node(site_type:1<-1)
+   Node(site_type:1<0)
     Id=1
      Leaf False 
 
     Id=2
-     Node(site_type:1<0)
+     Node(site_type:1<1)
       Id=0
        Leaf True 
 
@@ -403,12 +378,12 @@ Id=5
      Leaf True 
 
     Id=3
-     Node(site_type:1<-1)
+     Node(site_type:1<0)
       Id=1
        Leaf False 
 
       Id=2
-       Node(site_type:1<0)
+       Node(site_type:1<1)
         Id=0
          Leaf True 
 
@@ -435,32 +410,17 @@ Id=3
 ITERATION OF HALF_BREAK - REMOVE - CREATION - COVERING CLASS rules
 agent_type:0:
 Id=2
- Node(site_type:0<-1)
-  Id=3
-   Node(site_type:0<0)
-    Id=1
-     Leaf False 
-
-    Id=2
-     Node(site_type:0<1)
-      Id=0
-       Leaf True 
-
-      Id=1
-       Leaf False 
+ Node(site_type:0<0)
+  Id=1
+   Leaf False 
 
   Id=1
-   Node(site_type:0<0)
+   Node(site_type:0<1)
     Id=0
-     Leaf True 
+     Leaf False 
 
-    Id=2
-     Node(site_type:0<1)
-      Id=0
-       Leaf True 
-
-      Id=1
-       Leaf False 
+    Id=1
+     Leaf False 
 
 --------------------------------------------
 Flow of information in the ODE semantics:

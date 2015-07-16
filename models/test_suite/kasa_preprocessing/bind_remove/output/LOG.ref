@@ -185,12 +185,12 @@ site_type:0:state:1
 BDU REMOVE rules
 agent_type:1:
 Id=3
- Node(site_type:0<0)
+ Node(site_type:0<1)
   Id=1
    Leaf False 
 
   Id=2
-   Node(site_type:0<1)
+   Node(site_type:0<2)
     Id=0
      Leaf True 
 
@@ -278,30 +278,30 @@ Id=4
 --------------------------------------------
 ITERATION OF REMOVE - COVERING CLASS rules
 agent_type:1:
-Id=2
+Id=5
  Node(site_type:0<0)
-  Id=3
+  Id=2
    Node(site_type:0<1)
     Id=1
      Leaf False 
 
-    Id=2
+    Id=1
      Node(site_type:0<2)
       Id=0
-       Leaf True 
+       Leaf False 
 
       Id=1
        Leaf False 
 
-  Id=1
+  Id=4
    Node(site_type:0<1)
-    Id=0
-     Leaf False 
+    Id=3
+     Leaf True 
 
-    Id=2
+    Id=1
      Node(site_type:0<2)
       Id=0
-       Leaf True 
+       Leaf False 
 
       Id=1
        Leaf False 

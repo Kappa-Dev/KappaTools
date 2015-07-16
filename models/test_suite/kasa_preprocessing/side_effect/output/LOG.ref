@@ -291,12 +291,12 @@ site_type:0:state:1
 BDU REMOVE rules
 agent_type:0:
 Id=3
- Node(site_type:0<0)
+ Node(site_type:0<1)
   Id=1
    Leaf False 
 
   Id=2
-   Node(site_type:0<1)
+   Node(site_type:0<2)
     Id=0
      Leaf True 
 
@@ -305,12 +305,12 @@ Id=3
 
 agent_type:1:
 Id=3
- Node(site_type:0<0)
+ Node(site_type:0<1)
   Id=1
    Leaf False 
 
   Id=2
-   Node(site_type:0<1)
+   Node(site_type:0<2)
     Id=0
      Leaf True 
 
@@ -439,66 +439,6 @@ Id=4
 --------------------------------------------
 ITERATION OF REMOVE - COVERING CLASS rules
 agent_type:0:
-Id=5
- Node(site_type:0<0)
-  Id=3
-   Node(site_type:0<1)
-    Id=1
-     Leaf False 
-
-    Id=2
-     Node(site_type:0<2)
-      Id=0
-       Leaf True 
-
-      Id=1
-       Leaf False 
-
-  Id=4
-   Node(site_type:0<1)
-    Id=0
-     Leaf True 
-
-    Id=2
-     Node(site_type:0<2)
-      Id=0
-       Leaf True 
-
-      Id=1
-       Leaf False 
-
-agent_type:1:
-Id=2
- Node(site_type:0<0)
-  Id=3
-   Node(site_type:0<1)
-    Id=1
-     Leaf False 
-
-    Id=2
-     Node(site_type:0<2)
-      Id=0
-       Leaf True 
-
-      Id=1
-       Leaf False 
-
-  Id=1
-   Node(site_type:0<1)
-    Id=0
-     Leaf False 
-
-    Id=2
-     Node(site_type:0<2)
-      Id=0
-       Leaf True 
-
-      Id=1
-       Leaf False 
-
---------------------------------------------
-ITERATION OF HALF_BREAK - REMOVE - COVERING CLASS rules
-agent_type:0:
 Id=4
  Node(site_type:0<0)
   Id=3
@@ -521,6 +461,71 @@ Id=4
 
     Id=1
      Leaf False 
+
+agent_type:1:
+Id=5
+ Node(site_type:0<0)
+  Id=2
+   Node(site_type:0<1)
+    Id=1
+     Leaf False 
+
+    Id=1
+     Node(site_type:0<2)
+      Id=0
+       Leaf False 
+
+      Id=1
+       Leaf False 
+
+  Id=4
+   Node(site_type:0<1)
+    Id=3
+     Leaf True 
+
+    Id=1
+     Node(site_type:0<2)
+      Id=0
+       Leaf False 
+
+      Id=1
+       Leaf False 
+
+--------------------------------------------
+ITERATION OF HALF_BREAK - REMOVE - COVERING CLASS rules
+agent_type:0:
+Id=5
+ Node(site_type:0<0)
+  Id=3
+   Node(site_type:0<1)
+    Id=1
+     Leaf False 
+
+    Id=2
+     Node(site_type:0<2)
+      Id=0
+       Leaf True 
+
+      Id=1
+       Leaf False 
+
+  Id=4
+   Node(site_type:0<1)
+    Id=2
+     Node(site_type:0<2)
+      Id=0
+       Leaf True 
+
+      Id=1
+       Leaf False 
+
+    Id=2
+     Node(site_type:0<2)
+      Id=0
+       Leaf True 
+
+      Id=1
+       Leaf False 
 
 agent_type:1:
 Id=4
