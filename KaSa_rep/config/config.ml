@@ -55,7 +55,7 @@ let make_labels_compatible_with_dot =
 
 
 (** contact map*)
-let do_contact_map = ref true 
+let do_contact_map = ref true
 let contact_map_file = ref "contact.dot"
 let binding_site_shape = ref "circle"
 let binding_site_color = ref "yellow"
@@ -72,5 +72,5 @@ let influence_arrow = ref "normal"
 
 (**flow of information*)
 let do_ODE_flow_of_information = ref true
-let do_stochastic_flow_of_information = ref true 
-let do_site_dependencies = ref true 
+let do_stochastic_flow_of_information = ref true
+let do_site_dependencies = ref true
