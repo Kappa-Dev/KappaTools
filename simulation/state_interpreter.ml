@@ -48,14 +48,15 @@ let observables_values env counter graph state =
      (Rule_interpreter.value_alg counter graph ~get_alg)
      env)
 
-let do_it env domain counter graph state = function
+let do_it env domain counter graph state p_id = function
   | Primitives.ITER_RULE ((v,_),r) ->
      let get_alg i = get_alg env state i in
      let n = Rule_interpreter.value_alg counter graph ~get_alg v in
      (false,
       Nbr.iteri
 	(fun _ g ->
-	 fst (Rule_interpreter.force_rule ~get_alg domain counter g r))
+	 fst (Rule_interpreter.force_rule
+		~get_alg domain counter g (Causal.PERT p_id) r))
 	graph n,state)
   | Primitives.UPDATE (va,(expr,_)) ->
      let () =
@@ -115,8 +116,8 @@ let do_it env domain counter graph state = function
 	 file (Mods.Counter.event counter) "ka"
 	 (fun f -> Rule_interpreter.print env f graph) in
      (false, graph, state)
-  | Primitives.CFLOW cc ->
-     (false, Rule_interpreter.add_tracked cc graph, state)
+  | Primitives.CFLOW (cc,tests) ->
+     (false, Rule_interpreter.add_tracked cc tests graph, state)
   | Primitives.CFLOWOFF cc ->
      (false, Rule_interpreter.remove_tracked cc graph, state)
   | Primitives.FLUX _ -> (false, graph, state)
@@ -141,7 +142,7 @@ let perturbate env domain counter graph state =
 	let stop,graph,state =
 	  List.fold_left (fun (stop,graph,state as acc) effect ->
 			  if stop then acc else
-			    do_it env domain counter graph state effect)
+			    do_it env domain counter graph state i effect)
 			 (stop,graph,state) pert.Primitives.effect in
 	let () = not_done_yet.(i) <- false in
 	let () =
@@ -165,7 +166,8 @@ let one_rule env domain counter graph state =
   let get_alg i = get_alg env state i in
   (* let () = *)
   (*   Format.eprintf "%a@." (Rule_interpreter.print_injections env) graph in *)
-  match Rule_interpreter.apply_rule ~get_alg domain counter graph rule with
+  match Rule_interpreter.apply_rule
+	  ~get_alg domain counter graph (Causal.RULE rule_id) rule with
   | None -> None
   | Some graph' ->
      let graph'' =

@@ -21,13 +21,13 @@ val value_bool :
 
 val apply_rule :
   get_alg:(int -> Alg_expr.t) -> Connected_component.Env.t -> Mods.Counter.t
-  -> t -> Primitives.elementary_rule -> t option
+  -> t -> Causal.event_kind -> Primitives.elementary_rule -> t option
 (** Returns the graph obtained by applying the rule. [None] means
 null_event *)
 
 val force_rule :
   get_alg:(int -> Alg_expr.t) -> Connected_component.Env.t -> Mods.Counter.t
-  -> t -> Primitives.elementary_rule ->
+  -> t -> Causal.event_kind -> Primitives.elementary_rule ->
   (t * Connected_component.Matching.t list option)
 (** Apply the rule for sure if it is possible. Try [apply_rule] but in
 case of null_event, it computes the exact injections of the left hand
@@ -46,7 +46,10 @@ val print : Environment.t -> Format.formatter -> t -> unit
 
 (** {6 Stories} *)
 
-val add_tracked : Connected_component.t -> t -> t
+val add_tracked :
+  Connected_component.t ->
+  Primitives.Instantiation.abstract Primitives.Instantiation.test list ->
+  t -> t
 val remove_tracked : Connected_component.t -> t -> t
 val generate_stories : Format.formatter -> Environment.t -> t -> unit
 

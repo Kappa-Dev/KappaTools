@@ -42,8 +42,7 @@ sig
   type step *)
   type side_effect = PI.concrete PI.site list
 (*  type kappa_rule *)
-  type refined_event =
-      int * PI.concrete PI.event
+  type refined_event = Causal.event_kind * PI.concrete PI.event
   type refined_obs =
       int * PI.concrete PI.test list * unit Mods.simulation_info
   type refined_step
@@ -99,7 +98,6 @@ sig
 
   val print_refined_step: (refined_step -> H.error_channel) H.with_handler
 
-  val store_init: P.log_info -> PI.concrete PI.action list -> refined_step list -> P.log_info * refined_step list
   val store_event:
     P.log_info -> refined_event -> refined_step list -> P.log_info * refined_step list
   val store_obs :
@@ -187,14 +185,14 @@ module Cflow_linker =
     | Remove of agent *)
 
   type refined_event =
-      int * PI.concrete PI.event
+      Causal.event_kind * PI.concrete PI.event
   type refined_obs =
       int *
 	PI.concrete PI.test list *
 	  unit Mods.simulation_info
   type refined_step =
   | Subs of (agent_id * agent_id)
-  | Event of refined_event
+  | Event of int * PI.concrete PI.event
   | Init of PI.concrete PI.action list
   | Obs of refined_obs
   | Dummy  of string
@@ -732,7 +730,7 @@ module Cflow_linker =
   let gen f0 f1 f2 f3 f4 (p:H.parameter) h e step =
     match step with
     | Subs (a,b) -> f0 p h e a b
-    | Event a -> f1 p h e a
+    | Event (x,y) -> f1 p h e (x,y)
     | Init a -> f2 p h e a
     | Obs a -> f3 p h e a
     | Dummy x  -> f4 p h e x
@@ -810,13 +808,13 @@ module Cflow_linker =
       actions_of_refined_init
       actions_of_refined_obs
       (fun _ _ error _ -> error,([],[]))
-(*
-  let import_event x = x
-  let import_env x = x*)
-  let store_init log_info actions (step_list:refined_step list) =
-    P.inc_n_kasim_events log_info,(Init actions)::step_list
   let store_event log_info (event:refined_event) (step_list:refined_step list) =
-    P.inc_n_kasim_events log_info,(Event event)::step_list
+    match event with
+    | Causal.INIT,(_,(actions,_,_)) ->
+       P.inc_n_kasim_events log_info,(Init actions)::step_list
+    | Causal.OBS _,_ -> assert false
+    | (Causal.RULE i | Causal.PERT i),x ->
+       P.inc_n_kasim_events log_info,(Event (i,x))::step_list
   let store_obs log_info (i,x,c) step_list =
     P.inc_n_obs_events log_info,Obs(i,x,c)::step_list
 

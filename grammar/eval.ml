@@ -100,18 +100,19 @@ let compile_print_expr algs tokens contact_map domain ex =
     ex (domain,[])
 
 let cflows_of_label on algs rules (label,pos) rev_effects =
-  let adds l x =
-    (if on then Primitives.CFLOW x else Primitives.CFLOWOFF x) :: l in
+  let adds tests l x =
+    (if on then Primitives.CFLOW (x,tests) else Primitives.CFLOWOFF x) :: l in
   try
     let rule_id = StringMap.find label rules.NamedDecls.finder in
+    let rule = snd rules.NamedDecls.decls.(rule_id) in
+    let tests = fst rule.Primitives.instantiations in
     Array.fold_left
-      adds rev_effects
-      (snd rules.NamedDecls.decls.(rule_id)).Primitives.connected_components
+      (adds tests) rev_effects rule.Primitives.connected_components
   with Not_found ->
     try let var = StringMap.find label algs.NamedDecls.finder in
 	match algs.NamedDecls.decls.(var) with
 	|(_,(Alg_expr.KAPPA_INSTANCE ccs,_)) ->
-	  List.fold_left (Array.fold_left adds) rev_effects ccs
+	  List.fold_left (Array.fold_left (adds [])) rev_effects ccs
 	| (_,((Alg_expr.CONST _ | Alg_expr.BIN_ALG_OP _ | Alg_expr.TOKEN_ID _ |
 	       Alg_expr.STATE_ALG_OP _ | Alg_expr.UN_ALG_OP _ |
 	       Alg_expr.ALG_VAR _ ),_)) -> raise Not_found
@@ -198,13 +199,15 @@ let effects_of_modif algs tokens rules contact_map domain ast_list =
 	 | CFLOWLABEL (on,lab) ->
 	    (domain, cflows_of_label on algs rules lab rev_effects)
 	 | CFLOWMIX (on,(ast,_)) ->
-	    let adds l x =
-	      (if on then Primitives.CFLOW x else Primitives.CFLOWOFF x) :: l in
+	    let adds tests l x =
+	      (if on then Primitives.CFLOW (x,tests)
+	       else Primitives.CFLOWOFF x) :: l in
 	    let domain',ccs =
 	      Snip.connected_components_sum_of_ambiguous_mixture
 		contact_map domain ast in
 	    (domain',
-	     List.fold_left (fun x y -> Array.fold_left adds x (fst y)) rev_effects ccs)
+	     List.fold_left (fun x (y,t) -> Array.fold_left (adds t) x y)
+			    rev_effects ccs)
 	 | FLUX (pexpr,_) ->
 	    let (domain',pexpr') =
 	      compile_print_expr algs tokens contact_map domain pexpr in
@@ -319,7 +322,7 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 		    (Rule_interpreter.force_rule
 		       ~get_alg:(fun i ->
 				 fst (snd algs.NamedDecls.decls.(i)))
-		       domain'' counter s compiled_rule))
+		       domain'' counter s Causal.INIT compiled_rule))
 		 state value
 	    | domain'',_,[] -> domain'',state
 	    | _,_,_ ->
@@ -344,7 +347,7 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 	       Rule_interpreter.force_rule
 		      ~get_alg:(fun i ->
 				fst (snd algs.NamedDecls.decls.(i)))
-		      domain'' counter state compiled_rule
+		      domain'' counter state Causal.INIT compiled_rule
 	    | _,_,_ -> assert false in
 	  domain',state'
       )	(domain,Rule_interpreter.empty ~has_tracking env)

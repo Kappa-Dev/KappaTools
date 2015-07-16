@@ -115,7 +115,7 @@ let modification ?env f m =
      Format.fprintf f "$FLUX %a [true]" (print_expr ?env) fn
   | Primitives.FLUXOFF fn ->
      Format.fprintf f "$FLUX %a [false]" (print_expr ?env) fn
-  | Primitives.CFLOW cc ->
+  | Primitives.CFLOW (cc,_) ->
      Format.fprintf f "$TRACK %a [true]"
 		    (Connected_component.print ?sigs false) cc
   | Primitives.CFLOWOFF cc ->

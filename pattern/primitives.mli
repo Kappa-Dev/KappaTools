@@ -124,7 +124,8 @@ type modification =
   | UPDATE of Term.rev_dep * Alg_expr.t Term.with_pos
   | SNAPSHOT of Alg_expr.t Ast.print_expr Term.with_pos list
   | STOP of Alg_expr.t Ast.print_expr Term.with_pos list
-  | CFLOW of Connected_component.t
+  | CFLOW of
+      Connected_component.t * Instantiation.abstract Instantiation.test list
   | FLUX of Alg_expr.t Ast.print_expr Term.with_pos list
   | FLUXOFF of Alg_expr.t Ast.print_expr Term.with_pos list
   | CFLOWOFF of Connected_component.t

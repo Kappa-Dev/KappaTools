@@ -18,11 +18,20 @@ module StringIntMap =
 
 module DynArray = DynamicArray.DynArray(LargeArray.GenArray)
 
+type 'a simulation_info = (* type of data to be given with observables for story compression (such as date when the obs is triggered*)
+    {
+      story_id: int ;
+      story_time: float ;
+      story_event: int ;
+      profiling_info: 'a;
+    }
+
 module Counter =
   struct
     type t = {
       mutable time:float ;
       mutable events:int ;
+      mutable stories:int ;
       mutable null_events:int ;
       mutable cons_null_events:int;
       mutable perturbation_events:int ;
@@ -48,6 +57,7 @@ module Counter =
     let null_action c = c.null_action
     let is_initial c = c.time = c.init_time
     let inc_time c dt = c.time <- (c.time +. dt)
+    let inc_stories c =c.stories <- (c.stories + 1)
     let inc_events c =c.events <- (c.events + 1)
     let inc_null_events c = c.null_events <- (c.null_events + 1)
     let inc_consecutive_null_events c =
@@ -70,7 +80,10 @@ module Counter =
       let () = inc_consecutive_null_events c in
       let () = inc_time c dt in
       check_time c && check_events c
-
+    let next_story c =
+      let () = inc_stories c in
+      { story_id = c.stories; story_time = time c;
+	story_event = event c; profiling_info = (); }
     let dT c = c.dT
     let dE c = c.dE
     let last_tick c = c.last_tick
@@ -146,6 +159,7 @@ module Counter =
       in
       {time = init_t ;
        events = init_e ;
+       stories = -1 ;
        null_events = 0 ;
        cons_null_events = 0;
        stat_null = Array.init 6 (fun _ -> 0) ;
@@ -213,14 +227,6 @@ let tick_stories f n_stories (init,last,counter) =
   let () =  Format.pp_print_flush f () in
   let () = if counter = n_stories then Format.pp_print_newline f () in
   (true,counter,counter+1)
-
-type 'a simulation_info = (* type of data to be given with obersables for story compression (such as date when the obs is triggered*)
-    {
-      story_id: int ; 
-      story_time: float ;
-      story_event: int ;
-      profiling_info: 'a; 
-    }
 
 let update_profiling_info a info = 
   { 

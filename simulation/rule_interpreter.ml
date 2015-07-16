@@ -7,7 +7,8 @@ type t = {
   outdated_elements: Term.DepSet.t;
   free_id: int;
   story_machinery :
-    (unit Connected_component.Map.t (*currently tracked ccs *)
+    (Primitives.Instantiation.abstract Primitives.Instantiation.test list
+				       Connected_component.Map.t (*currently tracked ccs *)
      * jf_data) option;
 }
 
@@ -20,7 +21,7 @@ let empty ~has_tracking env = {
   story_machinery =
     if has_tracking
     then Some (Connected_component.Map.empty,
-	       (Compression_main.init_secret_log_info (), [])) (*Compression_main.init*)
+	       (Compression_main.init_secret_log_info (), []))
     else None;
 }
 
@@ -86,8 +87,7 @@ let deal_transformation is_add domain inj2graph edges roots transf = (*transf: a
   ((inj,graph,roots',deps),obs)
 
 let store_event
-      event_number (*NB event counter*) inj2graph new_tracked_obs_instances
-      edges rid rule = function
+      counter inj2graph new_tracked_obs_instances event_kind rule = function
   | None as x -> x
   | Some (x,(info,steps)) ->
 (*     let quarks_obs =
@@ -99,19 +99,49 @@ let store_event
      let concrete_event =
        Primitives.Instantiation.concretize_event
 	 (fun p -> let (_,x,_) = from_place inj2graph p in x)
-    rule.Primitives.instantiations in
-    Some (x,Compression_main.secret_store_event info (rid,concrete_event) steps)
+	 rule.Primitives.instantiations in
+     let infos',steps' =
+       Compression_main.secret_store_event
+	 info (event_kind,concrete_event) steps in
+     let infos'',steps'' =
+       List.fold_left
+	 (fun (infos,steps) obs_tests ->
+	  let obs =
+	    (0(*TODO*),
+	     obs_tests,
+	    Mods.Counter.next_story counter) in
+	  Compression_main.secret_store_obs infos obs steps)
+	 (infos',steps')
+	 new_tracked_obs_instances
+     in
+       Some (x,(infos'',steps''))
 (*Compression_main.store rule final_inj2graph counter quarks_obs quark_event*)
 
-let store_obs obs acc = function
+let store_obs edges obs acc = function
   | None -> acc
   | Some (tracked,_) ->
      List.fold_left
-       (fun acc (cc,_root as x) ->
-	if Connected_component.Map.mem cc tracked then x::acc else acc)
+       (fun acc (cc,root) ->
+	try
+	  let tests = Connected_component.Map.find cc tracked in
+	  match Connected_component.Matching.reconstruct
+		  edges Connected_component.Matching.empty 0 cc root with
+	  | None ->
+	     raise (ExceptionDefn.Internal_Error
+		      (Term.with_dummy_pos
+			 "Problem with Rule_interpreter.store_obs"))
+	  | Some inj ->
+	     let tests' =
+	       List.map (Primitives.Instantiation.concretize_test
+			   (fun p ->
+			    let (_,x,_) =
+			      from_place (inj,Mods.IntMap.empty,0) p in x))
+			tests in
+	      tests' :: acc
+	with Not_found -> acc)
        acc obs
 
-let update_edges event_number domain inj_nodes state rule =
+let update_edges counter domain inj_nodes state event_kind rule =
   (*Negative update*)
   let aux =
     List.fold_left
@@ -130,14 +160,14 @@ let update_edges event_number domain inj_nodes state rule =
        let (a,b,c,new_deps),new_obs =
 	 deal_transformation true domain inj2graph edges roots transf in
        ((a,b,c,Term.DepSet.union deps new_deps),
-	store_obs new_obs tracked_inst state.story_machinery))
+	store_obs b new_obs tracked_inst state.story_machinery))
       (aux,[])
       rule.Primitives.inserted (*statically defined edges*)
   in
   (*Store event*)
   let story_machinery' =
     store_event
-      event_number final_inj2graph new_tracked_obs_instances edges' 0(*TODO*) rule
+      counter final_inj2graph new_tracked_obs_instances event_kind rule
       state.story_machinery in
 
   { roots_of_ccs = roots'; edges = edges';
@@ -196,14 +226,14 @@ let update_tokens ~get_alg counter state consumed injected =
       l in
   let () = do_op Nbr.sub consumed in do_op Nbr.add injected
 
-let transform_by_a_rule ~get_alg domain counter state rule inj =
+let transform_by_a_rule ~get_alg domain counter state event_kind rule inj =
   let () =
     update_tokens
       ~get_alg counter state rule.Primitives.consumed_tokens
       rule.Primitives.injected_tokens in
-  update_edges (Mods.Counter.event counter) domain inj state rule
+  update_edges counter domain inj state event_kind rule
 
-let apply_rule ~get_alg domain counter state rule =
+let apply_rule ~get_alg domain counter state event_kind rule =
   let inj =
     Tools.array_fold_lefti
       (fun id inj cc ->
@@ -218,7 +248,8 @@ let apply_rule ~get_alg domain counter state rule =
       rule.Primitives.connected_components in
   match inj with
   | Some inj ->
-     Some (transform_by_a_rule ~get_alg domain counter state rule inj)
+     Some
+       (transform_by_a_rule ~get_alg domain counter state event_kind rule inj)
   | None -> None
 
 let all_injections state rule =
@@ -236,14 +267,15 @@ let all_injections state rule =
        (Connected_component.Map.find cc state.roots_of_ccs) [])
     [] rule.Primitives.connected_components
 
-let force_rule ~get_alg domain counter state rule =
-  match apply_rule ~get_alg domain counter state rule with
+let force_rule ~get_alg domain counter state event_kind rule =
+  match apply_rule ~get_alg domain counter state event_kind rule with
   | Some state -> state,None
   | None ->
      match all_injections state rule with
      | [] -> state,Some []
      | h :: t ->
-	transform_by_a_rule ~get_alg domain counter state rule h, Some t
+	transform_by_a_rule ~get_alg domain counter state event_kind rule h,
+	Some t
 
 let print_injections ?sigs f roots_of_ccs =
   Format.fprintf
@@ -277,14 +309,14 @@ let debug_print f state =
 		 state.tokens
 		 (print_injections ?sigs:None) state.roots_of_ccs
 
-let add_tracked cc state =
+let add_tracked cc tests state =
   match state.story_machinery with
   | None ->
      raise (ExceptionDefn.Internal_Error
 	      (Term.with_dummy_pos "TRACK in non tracking mode"))
   | Some (tcc,x) ->
      { state with
-       story_machinery = Some (Connected_component.Map.add cc () tcc,x) }
+       story_machinery = Some (Connected_component.Map.add cc tests tcc,x) }
 
 let remove_tracked cc state =
   match state.story_machinery with
