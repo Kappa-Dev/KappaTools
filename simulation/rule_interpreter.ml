@@ -7,8 +7,9 @@ type t = {
   outdated_elements: Term.DepSet.t;
   free_id: int;
   story_machinery :
-    (Primitives.Instantiation.abstract Primitives.Instantiation.test list
-				       Connected_component.Map.t (*currently tracked ccs *)
+    ((Causal.event_kind *
+	Primitives.Instantiation.abstract Primitives.Instantiation.test list)
+       Connected_component.Map.t (*currently tracked ccs *)
      * jf_data) option;
 }
 
@@ -105,9 +106,9 @@ let store_event
 	 info (event_kind,concrete_event) steps in
      let infos'',steps'' =
        List.fold_left
-	 (fun (infos,steps) obs_tests ->
+	 (fun (infos,steps) (ev,obs_tests) ->
 	  let obs =
-	    (0(*TODO*),
+	    (ev,
 	     obs_tests,
 	    Mods.Counter.next_story counter) in
 	  Compression_main.secret_store_obs infos obs steps)
@@ -123,7 +124,7 @@ let store_obs edges obs acc = function
      List.fold_left
        (fun acc (cc,root) ->
 	try
-	  let tests = Connected_component.Map.find cc tracked in
+	  let ev,tests = Connected_component.Map.find cc tracked in
 	  match Connected_component.Matching.reconstruct
 		  edges Connected_component.Matching.empty 0 cc root with
 	  | None ->
@@ -137,7 +138,7 @@ let store_obs edges obs acc = function
 			    let (_,x,_) =
 			      from_place (inj,Mods.IntMap.empty,0) p in x))
 			tests in
-	      tests' :: acc
+	      (ev,tests') :: acc
 	with Not_found -> acc)
        acc obs
 
@@ -309,14 +310,15 @@ let debug_print f state =
 		 state.tokens
 		 (print_injections ?sigs:None) state.roots_of_ccs
 
-let add_tracked cc tests state =
+let add_tracked cc event_kind tests state =
   match state.story_machinery with
   | None ->
      raise (ExceptionDefn.Internal_Error
 	      (Term.with_dummy_pos "TRACK in non tracking mode"))
   | Some (tcc,x) ->
      { state with
-       story_machinery = Some (Connected_component.Map.add cc tests tcc,x) }
+       story_machinery =
+	 Some (Connected_component.Map.add cc (event_kind,tests) tcc,x) }
 
 let remove_tracked cc state =
   match state.story_machinery with

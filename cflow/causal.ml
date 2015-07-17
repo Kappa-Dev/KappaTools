@@ -211,18 +211,15 @@ let add_tests grid event_number kind tests =
        aux (add site1 true 2 grid' event_number kind) q
   in aux grid tests
 
-let record (r_id,(tests,(actions,_,side_effects)))
+let record (kind,(tests,(actions,_,side_effects)))
 	   is_weak event_number env grid =
-  let kind = RULE r_id in
-
   let grid = store_is_weak is_weak event_number grid in
   let grid = add_tests grid event_number kind tests in
   let grid = add_actions env grid event_number kind actions in
   List.fold_left
     (fun grid site -> add site true 1 grid event_number kind) grid side_effects
 
-let record_obs (id,tests,_) side_effects is_weak event_number grid =
-  let kind = OBS id in
+let record_obs (kind,tests,_) side_effects is_weak event_number grid =
   let grid = add_obs_eid event_number grid in
   let grid = store_is_weak is_weak event_number grid in
   let grid = add_tests grid event_number kind tests in

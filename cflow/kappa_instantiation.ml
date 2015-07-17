@@ -44,7 +44,7 @@ sig
 (*  type kappa_rule *)
   type refined_event = Causal.event_kind * PI.concrete PI.event
   type refined_obs =
-      int * PI.concrete PI.test list * unit Mods.simulation_info
+      Causal.event_kind * PI.concrete PI.test list * unit Mods.simulation_info
   type refined_step
 (*  type obs_from_rule_app = (int * int Mods.IntMap.t) list 
   type r = Primitives.elementary_rule 
@@ -96,7 +96,7 @@ sig
     Format.formatter -> H.handler -> string  ->
     (PI.concrete PI.site*PI.concrete PI.binding_state) -> unit
 
-  val print_refined_step: (refined_step -> H.error_channel) H.with_handler
+  val print_refined_step: H.handler -> Format.formatter -> refined_step -> unit
 
   val store_event:
     P.log_info -> refined_event -> refined_step list -> P.log_info * refined_step list
@@ -187,12 +187,12 @@ module Cflow_linker =
   type refined_event =
       Causal.event_kind * PI.concrete PI.event
   type refined_obs =
-      int *
+      Causal.event_kind *
 	PI.concrete PI.test list *
 	  unit Mods.simulation_info
   type refined_step =
   | Subs of (agent_id * agent_id)
-  | Event of int * PI.concrete PI.event
+  | Event of Causal.event_kind * PI.concrete PI.event
   | Init of PI.concrete PI.action list
   | Obs of refined_obs
   | Dummy  of string
@@ -693,39 +693,26 @@ module Cflow_linker =
 	       f "Side_effects(%a:%a)@,"
 	       (print_site env) site (print_binding_state env) state)
 
-  let print_refined_obs parameter _handler error _refined_obs =
-    let _ = Format.fprintf parameter.H.out_channel "***Refined obs***"
-    in error
+  let print_refined_obs _handler f _refined_obs =
+    Format.fprintf f "***Refined obs***"
 
-  let print_refined_subs _parameter _handler error _a _b  = error
+  let print_refined_subs _handler _f (_a,_b)  = ()
 
-  let print_refined_init parameter handler error actions =
-    let log = parameter.H.out_channel in
+  let print_refined_init handler log actions =
     let sigs = Environment.signatures handler.H.env in
-    let () =
-      Format.fprintf log "@[<v>INIT:@,@[<v 1>%a@]@,@]@."
-		     (Pp.list Pp.space (PI.print_concrete_action ~sigs)) actions
-    in
-    error
+    Format.fprintf log "@[<1>INIT:%a@]"
+		   (Pp.list Pp.space (PI.print_concrete_action ~sigs)) actions
 
-  let print_refined_event parameter handler error refined_event =
-    let log = parameter.H.out_channel in
+  let print_refined_event handler log (ev_kind,(tests,(actions,side_sites,_))) =
     let sigs = Environment.signatures handler.H.env in
-    let () = Format.fprintf log "@[<v>***Refined event:***@,* Kappa_rule@," in
-(*    let error,rule = rule_of_refined_event parameter handler error refined_event in
-    let _ = Dynamics.dump Format.err_formatter rule  handler.H.env in (*TODO*)*)
-    let _ = Format.fprintf log "@," in
-    let error,tests = tests_of_refined_event parameter handler error refined_event in
-    let error,actions =
-      actions_of_refined_event parameter handler error refined_event in
-    let () =
-      Format.fprintf log "Story encoding:@[<v 1>@,%a%a%a@]@,***@]@."
-		     (Pp.list ~trailing:Pp.space Pp.space (PI.print_concrete_test ~sigs))
-		     tests
-		     (Pp.list ~trailing:Pp.space Pp.space (PI.print_concrete_action ~sigs))
-		     (fst actions)
-		     (print_side_effects handler.H.env) (snd actions) in
-    error
+    let () = Format.fprintf log "@[***Refined event:***@,* Kappa_rule %s@,"
+			    (Causal.label handler.H.env ev_kind) in
+    Format.fprintf log "Story encoding:@[<1>@,%a%a%a@]@,***@]"
+		   (Pp.list ~trailing:Pp.space Pp.space (PI.print_concrete_test ~sigs))
+		   tests
+		   (Pp.list ~trailing:Pp.space Pp.space (PI.print_concrete_action ~sigs))
+		   actions
+		   (print_side_effects handler.H.env) side_sites
 
   let gen f0 f1 f2 f3 f4 (p:H.parameter) h e step =
     match step with
@@ -735,27 +722,12 @@ module Cflow_linker =
     | Obs a -> f3 p h e a
     | Dummy x  -> f4 p h e x
 
-(*  let genbis f0 f1 f2 f3 =
-    gen
-      (fun p h e a b ->
-       let e,output = f0 p h e a b in
-       e,Subs output)
-      (fun p h e a ->
-       let e,output = f1 p h e a in
-        e,Event output)
-      (fun p h e a ->
-       let e,output = f1 p h e a in
-        e,Init output)
-      (fun p h e a ->
-       let e,output = f2 p h e a in
-       e,Obs output)
-      (fun p h e a ->
-       let e,output = f3 p h e a in
-       e,Dummy output)
-    *)
-  let print_refined_step  =
-    gen print_refined_subs print_refined_event print_refined_init print_refined_obs
-	(fun _ _ error _   -> error)
+  let print_refined_step h f = function
+    | Subs (a,b) -> print_refined_subs h f (a,b)
+    | Event (x,y) -> print_refined_event h f (x,y)
+    | Init a -> print_refined_init h f a
+    | Obs a -> print_refined_obs h f a
+    | Dummy _  -> ()
 
   let tests_of_refined_step =
     gen
@@ -813,8 +785,8 @@ module Cflow_linker =
     | Causal.INIT,(_,(actions,_,_)) ->
        P.inc_n_kasim_events log_info,(Init actions)::step_list
     | Causal.OBS _,_ -> assert false
-    | (Causal.RULE i | Causal.PERT i),x ->
-       P.inc_n_kasim_events log_info,(Event (i,x))::step_list
+    | (Causal.RULE _ | Causal.PERT _ as k),x ->
+       P.inc_n_kasim_events log_info,(Event (k,x))::step_list
   let store_obs log_info (i,x,c) step_list =
     P.inc_n_obs_events log_info,Obs(i,x,c)::step_list
 
@@ -1120,7 +1092,7 @@ module Cflow_linker =
 	      | Some (id,info) ->
 		 AgentIdMap.add id info remanent in
 	    (refined_step::step_list,remanent)
-	 | Event (_,(_,(action,_,_))) ->
+	 | Event (_,(_,(action,_,kasim_side))) ->
 	    let remanent,set =
 	      List.fold_left
 		(fun recur ->
@@ -1134,10 +1106,7 @@ module Cflow_linker =
 		 | PI.Remove _ -> recur )
 		(remanent,AgentIdSet.empty) action in
 	    let remanent,set =
-	      Mods.Int2Set.fold
-		unbind_side
-		(get_kasim_side_effects refined_step)
-		(remanent,set)
+	      List.fold_right unbind kasim_side (remanent,set)
 	    in
 	    ((AgentIdSet.fold
 		(fun id list ->

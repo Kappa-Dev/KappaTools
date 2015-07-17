@@ -47,10 +47,12 @@ val label : Environment.t -> event_kind -> string
 val empty_grid : unit -> grid
 
 val record :
-  (int * Primitives.Instantiation.concrete Primitives.Instantiation.event) ->
+  (event_kind *
+     Primitives.Instantiation.concrete Primitives.Instantiation.event) ->
   bool -> int -> Environment.t -> grid -> grid
 val record_obs :
-  (int * Primitives.Instantiation.concrete Primitives.Instantiation.test list
+  (event_kind *
+     Primitives.Instantiation.concrete Primitives.Instantiation.test list
    * unit Mods.simulation_info) ->
   Primitives.Instantiation.concrete Primitives.Instantiation.site list ->
   bool -> int -> grid -> grid

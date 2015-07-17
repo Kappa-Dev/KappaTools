@@ -1047,7 +1047,7 @@ module Blackboard =
         let row_of_precondition eid = nrows_head + 3*eid in 
         let row_of_postcondition eid = 1+(row_of_precondition eid) in 
         let column_of_pid pid = pid + ncolumns_left in 
-        let _ = Format.fprintf desc "REM  *****  BASIC  *****\n" in 
+        let _ = Format.fprintf desc "REM  *****  BASIC  *****@." in 
         let colors = PB.A.make blackboard.n_eid None in 
         let backcolor log color = 
           match 
@@ -1055,7 +1055,7 @@ module Blackboard =
           with 
           | Some color -> 
             let r,g,b=Color.triple_of_color color in 
-            Format.fprintf log "C.CellBackColor = RGB(%i,%i,%i)\n" r g b 
+            Format.fprintf log "C.CellBackColor = RGB(%i,%i,%i)@." r g b 
           | None -> ()
         in 
         let textcolor log color  = 
@@ -1064,15 +1064,15 @@ module Blackboard =
           with 
           | Some color -> 
             let r,g,b=Color.triple_of_color color in 
-            Format.fprintf log "C.CharColor = RGB(%i,%i,%i)\n" r g b 
+            Format.fprintf log "C.CharColor = RGB(%i,%i,%i)@." r g b 
           | None -> ()
         in 
         let getcell log row col = 
-          Format.fprintf log "C = S.getCellByPosition(%i,%i)\n" col row 
+          Format.fprintf log "C = S.getCellByPosition(%i,%i)@." col row 
         in 
         let overline_case log row col color = 
-          let _ = Format.fprintf desc "R=S.Rows(%i)\n" row in 
-          let _ = Format.fprintf desc "R.TopBorder = withBord\n" in 
+          let _ = Format.fprintf desc "R=S.Rows(%i)@." row in 
+          let _ = Format.fprintf desc "R.TopBorder = withBord@." in 
           ()
         in 
         let print_case log row col color_font color_back string = 
@@ -1081,25 +1081,25 @@ module Blackboard =
             let _ = getcell log row col in 
             let _ = textcolor log color_font in 
             let _ = backcolor log color_back in 
-            let _ = Format.fprintf log "C.setFormula(\"%s\")\n" string
+            let _ = Format.fprintf log "C.setFormula(\"%s\")@." string
             in () 
         in 
         let print_case_fun log row col color_font color_back f error = 
           let _ = getcell log row col in 
           let _ = textcolor log color_font in 
           let _ = backcolor log color_back in 
-          let _ = Format.fprintf log "C.setFormula(\""in 
+          let _ = Format.fprintf log "C.setFormula(\"@[<h>"in 
           let error = f error in 
-          let _ = Format.fprintf log "\")\n" in 
+          let _ = Format.fprintf log "\"@])@." in 
           error
         in 
-        let _ = Format.fprintf desc "Sub Main\n\n" in 
+        let _ = Format.fprintf desc "Sub Main@.@." in 
         let r,g,b = Color.triple_of_color Color.Black in 
-        let _ = Format.fprintf desc "Dim withBord As New com.sun.star.table.BorderLine\n" in 
-        let _ = Format.fprintf desc "With withBord withBord.Color = RGB(%i,%i,%i)\n" r g b in 
-        let _ = Format.fprintf desc "withBord.OuterLineWidth = 60\n" in 
-        let _ = Format.fprintf desc "End With\n" in 
-        let _ = Format.fprintf desc "S = ThisComponent.Sheets(0)\n" in 
+        let _ = Format.fprintf desc "Dim withBord As New com.sun.star.table.BorderLine@\n" in 
+        let _ = Format.fprintf desc "With withBord withBord.Color = RGB(%i,%i,%i)@\n" r g b in 
+        let _ = Format.fprintf desc "withBord.OuterLineWidth = 60@\n" in 
+        let _ = Format.fprintf desc "End With@\n" in 
+        let _ = Format.fprintf desc "S = ThisComponent.Sheets(0)@\n" in 
         let _ = 
           match forced_events blackboard
           with 
@@ -1175,12 +1175,12 @@ module Blackboard =
 		  let case = PB.A.get column t.row_short_event_id in 
 		  PB.string_of_predicate_value case.static.action 
 	      in 
-              let string_eid error = 
-                try 
-                  PB.CI.Po.K.print_refined_step parameter handler error (PB.A.get blackboard.event eid)
-                with 
-                | Not_found -> let _ = Format.fprintf desc "Event:%s" (string_of_int eid) in error 
-              in
+              let string_eid error =
+		let () =
+                  try PB.CI.Po.K.print_refined_step
+			handler desc (PB.A.get blackboard.event eid)
+		  with Not_found -> Format.fprintf desc "Event:%i" eid in
+		error in
               let error = print_case_fun  desc row_precondition 1 None color string_eid error in 
               let error = print_case_fun  desc row_postcondition 1 None color string_eid error in 
               let _  = print_case desc row_precondition 2 None color "PRECONDITION" in 
@@ -1208,8 +1208,7 @@ module Blackboard =
         let _ = Format.fprintf  desc "End Sub@." in 
         let _ = close_out desc_chan in
         error
-           
-   
+
      let record_modif parameter handler error case_address case_value blackboard = 
        error,
        {blackboard

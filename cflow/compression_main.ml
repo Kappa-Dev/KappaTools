@@ -86,43 +86,29 @@ let compress_and_print logger env log_info step_list =
 	      let () = if log_step then Debug.tag logger"\t - detecting siphons" in
 	      D.S.PH.B.PB.CI.Po.K.fill_siphon refined_event_list
 	    else refined_event_list in
-          let _ = 
-            if debug_mode
-            then 
-              let _ = 
-                List.iter 
-                  (fun x -> let _ = D.S.PH.B.PB.CI.Po.K.print_refined_step parameter handler error x in ()) 
-                  refined_event_list_wo_siphon  
-              in Format.pp_print_flush
-		   parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel ()
-          in 
-          
-          let refined_event_list_cut,int = 
-            if (weak_compression_on || strong_compression_on)  && Parameter.do_global_cut 
-            then 
-              begin 
-                let _ = 
-                  if log_step
-                  then 
-                    Debug.tag logger "\t - cutting concurrent events"
-                in 
-                let error,(refined_event_list_cut,int) = D.S.PH.B.PB.CI.Po.cut parameter handler error refined_event_list_wo_siphon in 
-                let _ = 
-                  if debug_mode
-                  then 
-                    let _ = 
-                      List.iter 
-                        (fun x -> 
-                          let _ = D.S.PH.B.PB.CI.Po.K.print_refined_step parameter handler error x in ()) 
-                        refined_event_list_cut
-                    in Format.pp_print_flush
-			 parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err ()
-                in 
-                refined_event_list_cut,int 
-	      end
-            else 
-	      refined_event_list_wo_siphon,0 
-          in 
+          let () =
+            if debug_mode then
+	      Format.fprintf
+		parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel "@[<v>%a@]@."
+		(Pp.list Pp.space (D.S.PH.B.PB.CI.Po.K.print_refined_step handler))
+                refined_event_list_wo_siphon in
+          let refined_event_list_cut,int =
+            if (weak_compression_on || strong_compression_on)
+	       && Parameter.do_global_cut then
+              let () =
+                if log_step then
+                  Debug.tag logger "\t - cutting concurrent events" in
+              let error,(refined_event_list_cut,int) =
+		D.S.PH.B.PB.CI.Po.cut parameter handler error refined_event_list_wo_siphon in
+	      let () =
+		if debug_mode then
+		  Format.fprintf
+		    parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel "@[<v>%a@]@."
+		    (Pp.list Pp.space (D.S.PH.B.PB.CI.Po.K.print_refined_step handler))
+                    refined_event_list_cut in
+              refined_event_list_cut,int
+            else refined_event_list_wo_siphon,0
+          in
           
           let deal_with error cut  log_info = 
             let refined_event_list_without_pseudo_inverse,int_pseudo_inverse = 
@@ -134,23 +120,22 @@ let compress_and_print logger env log_info step_list =
                     then 
                       Debug.tag logger "\t - detecting pseudo inverse events" 
                   in 
-                  let error,refined_event_list_without_pseudo_inverse,int_pseudo_inverse  = D.S.PH.B.PB.CI.cut parameter handler error refined_event_list_cut  in 
-                  let _ = 
-                    if debug_mode
-                    then 
-                      let _ = 
-                        List.iter 
-                          (fun (x,bool) ->
-                           let _ = D.S.PH.B.PB.CI.Po.K.print_refined_step parameter handler error x in
-                           if bool then
-                             Format.fprintf
-			       parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err
-			       "@[<v>Weak event @,@,@]"
-                          )
-                          refined_event_list_without_pseudo_inverse
-                      in Format.pp_print_flush
-			   parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err ()
-                  in 
+                  let error,refined_event_list_without_pseudo_inverse,int_pseudo_inverse  = D.S.PH.B.PB.CI.cut parameter handler error refined_event_list_cut  in
+		  let () =
+		    if debug_mode then
+		      Format.fprintf
+			parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel "@[<v>%a@]@."
+			(Pp.list
+			   Pp.space
+			   (fun f (x,bool) ->
+			    Format.fprintf
+			      f "%a@,%t"
+			      (D.S.PH.B.PB.CI.Po.K.print_refined_step handler) x
+			      (fun f ->
+			       if bool then
+				 Format.fprintf f "Weak event @,@,")))
+                        refined_event_list_without_pseudo_inverse
+                  in
                   refined_event_list_without_pseudo_inverse,int_pseudo_inverse 
                 end
               else 

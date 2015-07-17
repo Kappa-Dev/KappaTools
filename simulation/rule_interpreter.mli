@@ -47,7 +47,7 @@ val print : Environment.t -> Format.formatter -> t -> unit
 (** {6 Stories} *)
 
 val add_tracked :
-  Connected_component.t ->
+  Connected_component.t -> Causal.event_kind ->
   Primitives.Instantiation.abstract Primitives.Instantiation.test list ->
   t -> t
 val remove_tracked : Connected_component.t -> t -> t

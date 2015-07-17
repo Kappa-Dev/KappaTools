@@ -10,7 +10,8 @@ val secret_store_event :
   secret_step list -> secret_log_info * secret_step list
 val secret_store_obs :
   secret_log_info ->
-  (int * Primitives.Instantiation.concrete Primitives.Instantiation.test list *
+  (Causal.event_kind *
+     Primitives.Instantiation.concrete Primitives.Instantiation.test list *
      unit Mods.simulation_info) ->
   secret_step list -> secret_log_info * secret_step list
 

@@ -117,7 +117,9 @@ let do_it env domain counter graph state p_id = function
 	 (fun f -> Rule_interpreter.print env f graph) in
      (false, graph, state)
   | Primitives.CFLOW (cc,tests) ->
-     (false, Rule_interpreter.add_tracked cc tests graph, state)
+     (false,
+      Rule_interpreter.add_tracked cc (Causal.RULE 0(*TODO*)) tests graph,
+      state)
   | Primitives.CFLOWOFF cc ->
      (false, Rule_interpreter.remove_tracked cc graph, state)
   | Primitives.FLUX _ -> (false, graph, state)
