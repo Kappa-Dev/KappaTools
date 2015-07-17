@@ -71,7 +71,7 @@ let compress_and_print logger env log_info step_list =
             else Debug.tag logger "+ Producing causal traces"
           in
           let error = D.S.PH.B.PB.CI.Po.K.H.error_init in
-          let refined_event_list = D.S.PH.B.PB.CI.Po.K.disambiguate step_list in
+          let refined_event_list = List.rev (D.S.PH.B.PB.CI.Po.K.disambiguate step_list) in
           let () = if log_step then Debug.tag logger"\t - refining events" in
           let refined_event_list = 
             List.rev_map 
@@ -497,8 +497,8 @@ let compress_and_print logger env log_info step_list =
 			  (D.sort_list causal) in
   let () =
     if weak_compression_on then
-      Causal.pretty_print logger env Graph_closure.config_std "" ""
+      Causal.pretty_print logger env Graph_closure.config_std "Weakly" "weakly "
 			  (D.sort_list weak) in
   if strong_compression_on then
-      Causal.pretty_print logger env Graph_closure.config_std "" ""
-			  (D.sort_list strong)
+    Causal.pretty_print logger env Graph_closure.config_std "Strongly" "strongly "
+			(D.sort_list strong)

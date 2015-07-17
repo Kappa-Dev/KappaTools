@@ -542,7 +542,9 @@ let make_instantiation
 	      Primitives.Instantiation.Mod_internal ((place,site_id),j) :: actions
 	   | I_VAL_CHANGED (i,j) ->
 	      Primitives.Instantiation.Has_Internal ((place,site_id),i) :: tests,
-	      Primitives.Instantiation.Mod_internal ((place,site_id),j) :: actions
+	      if i <> j then
+		Primitives.Instantiation.Mod_internal ((place,site_id),j) :: actions
+	      else actions
 	   | I_VAL_ERASED i ->
 	      Primitives.Instantiation.Has_Internal ((place,site_id),i) :: tests,
 	      actions in

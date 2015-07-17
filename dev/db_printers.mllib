@@ -1,3 +1,5 @@
+Cache
+Color
 SafeHeap
 ValMap
 Heap
@@ -49,6 +51,21 @@ Prepreprocess
 Preprocess
 Print_ckappa
 Export_to_KaSim
+
+Priority
+StoryProfiling
+Cflow_handler
+Kappa_instantiation
+Po_cut
+Pseudo_inverse
+Blackboard_generation
+Blackboard
+Propagation_heuristics
+Generic_branch_and_cut_solver
+Dag
+Graph_closure
+Causal
+Compression_main
 
 Raw_mixture
 Edges
