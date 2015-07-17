@@ -64,6 +64,7 @@ val cut : (int * int * int) list -> grid -> config
 val enrich_grid :
   Format.formatter -> Graph_closure.config -> grid -> enriched_grid
 
+val debug_print_grid : Format.formatter -> grid -> unit
 val pretty_print :
   Format.formatter -> Environment.t -> Graph_closure.config -> string ->
   string -> (grid * 'a Mods.simulation_info option list) list -> unit

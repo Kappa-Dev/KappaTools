@@ -51,6 +51,35 @@ let empty_config =
    prec_1 = IntMap.empty ;
    top = IntSet.empty}
 
+let debug_print_event_kind f = function
+  | OBS i -> Format.fprintf f "OBS(%i)" i
+  | RULE i -> Format.fprintf f "RULE(%i)" i
+  | INIT -> Format.fprintf f "INIT"
+  | PERT i -> Format.fprintf f "PERT(%i)" i
+
+let debug_print_causal f i =
+  Format.pp_print_string
+    f (if i = 1 then "tested"
+       else if i = 2 then "modified"
+       else if i = 3 then "tested&modified"
+       else "CAUSAL IMPACT UNDEFINED")
+
+let debug_print_atom f a =
+  Format.fprintf f "{#%i: %a %a}" a.eid debug_print_causal a.causal_impact
+		 debug_print_event_kind a.kind
+
+let debug_print_grid f g =
+  let () =
+    Format.fprintf f "@[<v>Flow:@," in
+  let () = Hashtbl.iter
+	     (fun (node_id,site_id,q) l ->
+	      Format.fprintf
+		f "@[<2>%i.%i%s:@,%a@]@," node_id site_id
+		(if q = 0 then "~" else if q = 1 then "" else "UNDEFINED")
+		(Pp.list Pp.space debug_print_atom) l)
+	     g.flow in
+  Format.fprintf f "@]@."
+
 let empty_grid () =
   {
     flow = Hashtbl.create !Parameter.defaultExtArraySize ;
@@ -160,14 +189,15 @@ let store_is_weak is_weak eid grid =
     else 1
  *)
 let add ((node_id,_),site_id) is_link va grid event_number kind =
+  let q = if is_link then 1 else 0 in
   let att =
-    try grid_find (node_id,site_id,if is_link then 1 else 0) grid
+    try grid_find (node_id,site_id,q) grid
     with Not_found -> [] in
   let att =
     push {causal_impact = va ; eid = event_number ;
 	  kind = kind (*; observation = obs*)} att in
-  let grid = grid_add (node_id,site_id,1) event_number att grid in
-  add_init_pid event_number (node_id,site_id,1) grid
+  let grid = grid_add (node_id,site_id,q) event_number att grid in
+  add_init_pid event_number (node_id,site_id,q) grid
 
 let add_actions env grid event_number kind actions =
   let rec aux grid = function
