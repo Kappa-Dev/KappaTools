@@ -1,0 +1,9 @@
+############ TEST ACTIONS ##############
+
+#### Signatures
+%agent: A(x~u~p,y~u~p)
+
+#### Rules
+'create' -> A(x~u)	
+'x' A(x~u) -> A(x~p)
+'y' A(x~p, y~u) -> A(x~p,y~p)
