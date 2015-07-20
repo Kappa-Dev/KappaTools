@@ -106,6 +106,7 @@ let get_parameters () =
 	Remanent_parameters_sig.do_ODE_flow_of_information = !Config.do_ODE_flow_of_information ; 
 	Remanent_parameters_sig.do_stochastic_flow_of_information = !Config.do_stochastic_flow_of_information ; 
 	Remanent_parameters_sig.do_site_dependencies = !Config.do_site_dependencies ;
+	Remanent_parameters_sig.do_iteration_dependencies = !Config.do_iteration_dependencies ;
 	Remanent_parameters_sig.file = !Config.file ;
 	Remanent_parameters_sig.symbols = get_symbols () ; 
 	Remanent_parameters_sig.influence_map_output = get_influence_map () ;
@@ -182,9 +183,10 @@ let get_link_mode_1                        marshalisable = marshalisable.Remanen
 let get_kasa_state_1                       marshalisable = marshalisable.Remanent_parameters_sig.kasa_state 
 let get_do_contact_map_1                   marshalisable = marshalisable.Remanent_parameters_sig.do_contact_map 
 let get_do_influence_map_1                 marshalisable = marshalisable.Remanent_parameters_sig.do_influence_map 
-let get_do_ODE_flow_of_information_1                   marshalisable = marshalisable.Remanent_parameters_sig.do_ODE_flow_of_information
-let get_do_stochastic_flow_of_information_1                 marshalisable = marshalisable.Remanent_parameters_sig.do_stochastic_flow_of_information 
-let get_do_site_dependencies_1                              marshalisable = marshalisable.Remanent_parameters_sig.do_site_dependencies
+let get_do_ODE_flow_of_information_1       marshalisable = marshalisable.Remanent_parameters_sig.do_ODE_flow_of_information
+let get_do_stochastic_flow_of_information_1  marshalisable = marshalisable.Remanent_parameters_sig.do_stochastic_flow_of_information 
+let get_do_site_dependencies_1             marshalisable = marshalisable.Remanent_parameters_sig.do_site_dependencies
+let get_do_iteration_dependencies_1        marshalisable = marshalisable.Remanent_parameters_sig.do_iteration_dependencies
 
 
 let get_marshalisable parameter = parameter.Remanent_parameters_sig.marshalisable_parameters
@@ -199,6 +201,7 @@ let get_do_influence_map = upgrade_from_marshal_field get_do_influence_map_1
 let get_do_ODE_flow_of_information = upgrade_from_marshal_field get_do_ODE_flow_of_information_1
 let get_do_stochastic_flow_of_information = upgrade_from_marshal_field get_do_stochastic_flow_of_information_1
 let get_do_site_dependencies = upgrade_from_marshal_field get_do_site_dependencies_1
+let get_do_iteration_dependencies = upgrade_from_marshal_field get_do_iteration_dependencies_1
 
 let get_symbols = upgrade_from_marshal_field get_symbols_1 
 let get_file = upgrade_from_marshal_field get_file_1 
@@ -269,10 +272,11 @@ let set_call_stack_1 marshalisable call_stack =
 let set_trace_1 marshalisable bool = 
   {marshalisable with Remanent_parameters_sig.trace = bool}
 
-
-
 let upgrade_to_marshalisable f parameters prefix = 
-  {parameters with Remanent_parameters_sig.marshalisable_parameters = f (get_marshalisable parameters) prefix}
+  {parameters with 
+    Remanent_parameters_sig.marshalisable_parameters = 
+      f (get_marshalisable parameters) prefix}
+
 let set_prefix = upgrade_to_marshalisable set_prefix_1
 let set_call_stack = upgrade_to_marshalisable set_call_stack_1
 let set_trace = upgrade_to_marshalisable set_trace_1

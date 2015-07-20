@@ -83,7 +83,8 @@ type marshalisable_parameters =
    do_influence_map : bool ; 
    do_ODE_flow_of_information : bool ; 
    do_stochastic_flow_of_information : bool ; 
-   do_site_dependencies : bool ; 
+   do_site_dependencies : bool ;
+   do_iteration_dependencies : bool ;
    dump_error_as_soon_as_they_occur : bool ;
    file : string option ; 
    prefix : string ; 

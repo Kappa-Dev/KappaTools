@@ -110,7 +110,7 @@ let main () =
   in
   (*BDU of covering classes*)
   let error,bdu_analysic = 
-    if Remanent_parameters.get_do_site_dependencies parameters
+    if Remanent_parameters.get_do_iteration_dependencies parameters
     then 
       let parameters_cv =
 	Remanent_parameters.update_prefix parameters "" in 

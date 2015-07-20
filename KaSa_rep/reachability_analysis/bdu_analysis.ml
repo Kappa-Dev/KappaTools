@@ -117,7 +117,7 @@ let collect_creation parameter error viewsrhs creation store_creation =
   List.fold_left (fun (error, store_creation) (agent_id, agent_type) ->
     let error, agent = AgentMap.get parameter error agent_id viewsrhs in
     match agent with
-      | None -> warn parameter error (Some "line 143") Exit store_creation
+      | None -> warn parameter error (Some "line 120") Exit store_creation
       | Some Ghost -> error, store_creation
       | Some Agent agent ->
         (*get the site and state on the rhs*)
@@ -181,7 +181,7 @@ let collect_half_break parameter error kappa_handler store_half_break half_break
 		   error
 		   (agent_type, site)
 		   kappa_handler.states_dic)
-		(fun error -> warn parameter error (Some "line 296")
+		(fun error -> warn parameter error (Some "line 184")
 		  Exit (Dictionary_of_States.init ()))
 	    in
 	    let error, last_entry =
@@ -235,7 +235,7 @@ let collect_remove_know_site parameter error kappa_handler
              (agent_type, site)
              kappa_handler.states_dic
           )
-          (fun error -> warn parameter error (Some "line 237") Exit
+          (fun error -> warn parameter error (Some "line 238") Exit
             (Cckappa_sig.Dictionary_of_States.init()))
       in
       let error, last_entry = Cckappa_sig.Dictionary_of_States.last_entry parameter
@@ -283,7 +283,7 @@ let collect_remove_undocument_site parameter error kappa_handler
              (agent_type, site)
              kappa_handler.states_dic
           )
-          (fun error -> warn parameter error (Some "line 237") Exit
+          (fun error -> warn parameter error (Some "line 286") Exit
             (Cckappa_sig.Dictionary_of_States.init()))
       in
       let error, last_entry = Cckappa_sig.Dictionary_of_States.last_entry parameter
