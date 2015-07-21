@@ -40,6 +40,8 @@ type list_bdu =
 type bdu_analysic =
     {
       store_creation   : pair_bdu AgentMap.t;
+      store_iteration  : pair_bdu AgentMap.t;
+
       store_half_break : pair_bdu AgentMap.t;
       store_remove     : (pair_bdu AgentMap.t * pair_bdu AgentMap.t * bdu AgentMap.t);
       store_test_modif : pair_bdu AgentMap.t;

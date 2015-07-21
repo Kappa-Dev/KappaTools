@@ -34,7 +34,7 @@ let print_creation parameter error result =
       in
       error
     ) parameter result
-    
+   
 let print_half_break parameter error result =
   AgentMap.print error
     (fun error parameter (l, (handler, bdu)) ->
@@ -51,7 +51,7 @@ let print_half_break parameter error result =
       in
       error
     ) parameter result
-
+   
 let print_remove parameter error result =
   let (result_know, result_undoc, result_remove) = result in
   (*let _ =
@@ -114,7 +114,7 @@ let print_test_modif parameter error result =
     ) parameter result
     
 
-let print_iterate parameter error result =
+let print_iteration parameter error result =
   AgentMap.print error
     (fun error parameter (handler, bdu) ->
       let _ =
@@ -123,15 +123,80 @@ let print_iterate parameter error result =
       error
     ) parameter result
 
+let print_pair_iteration parameter error result =
+  AgentMap.print error
+    (fun error parameter (_, (handler, bdu)) ->
+      let _ =
+	handler.Memo_sig.print_mvbdu stdout "" bdu
+      in
+      error
+    ) parameter result
+
+let print_pair_iteration' parameter error result =
+  let (store_test, store_direct, store_iteration) = result in
+  let _ =
+    AgentMap.print error
+      (fun error parameter (l,(handler, bdu)) ->
+        let _ =
+          let _ =
+            fprintf stdout "BDU TEST\n";
+	    handler.Memo_sig.print_mvbdu stdout "" bdu
+          in
+          let rec aux acc =
+	    match acc with
+	      | [] -> ()
+	      | (s, st) :: tl ->
+	        fprintf stdout "site_type:%i:state:%i\n" s st; aux tl
+          in
+	  aux l
+        in
+        error
+      ) parameter store_test
+  in
+  let _ =
+    AgentMap.print error
+      (fun error parameter (l,(handler, bdu)) ->
+        let _ =
+          let _ =
+            fprintf stdout "BDU DIRECT\n";
+	    handler.Memo_sig.print_mvbdu stdout "" bdu
+          in
+          let rec aux acc =
+	    match acc with
+	      | [] -> ()
+	      | (s, st) :: tl ->
+	        fprintf stdout "site_type:%i:state:%i\n" s st; aux tl
+	  in
+          aux l
+        in
+        error
+      ) parameter store_direct
+  in
+  AgentMap.print error
+    (fun error parameter ((handler, bdu)) ->
+      let _ =
+        fprintf stdout "BDU ITERATION\n";
+	handler.Memo_sig.print_mvbdu stdout "" bdu
+      in
+      error
+    ) parameter store_iteration
+
+
 (************************************************************************************)
 (*MAIN PRINT*)
 
 let print_result parameter error result =
-  let error =
+  (*let error =
     fprintf stdout "--------------------------------------------\n";
     fprintf stdout "BDU CREATION rules\n";
     print_creation parameter error result.store_creation
+  in*)
+  let error =
+    fprintf stdout "--------------------------------------------\n";
+    fprintf stdout "BDU ITERATION rules\n";
+    print_pair_iteration parameter error result.store_iteration
   in
+  (*
   let error =
     fprintf stdout "--------------------------------------------\n";
     fprintf stdout "BDU HALF_BREAK rules\n";
@@ -150,33 +215,33 @@ let print_result parameter error result =
   let error =
     fprintf stdout "--------------------------------------------\n";
     fprintf stdout "ITERATION OF CREATION - COVERING CLASS rules\n";
-    print_iterate parameter error result.store_iterate_created_cv
+    print_iteration parameter error result.store_iterate_created_cv
   in
   let error =
     fprintf stdout "--------------------------------------------\n";
     fprintf stdout "ITERATION OF HALF_BREAK - COVERING CLASS rules\n";
-    print_iterate parameter error result.store_iterate_half_cv
+    print_iteration parameter error result.store_iterate_half_cv
   in
   let error =
     fprintf stdout "--------------------------------------------\n";
     fprintf stdout "ITERATION OF REMOVE - COVERING CLASS rules\n";
-    print_iterate parameter error result.store_iterate_remove_cv
+    print_iteration parameter error result.store_iterate_remove_cv
   in
   let error =
     fprintf stdout "--------------------------------------------\n";
     fprintf stdout "ITERATION OF HALF_BREAK - REMOVE - COVERING CLASS rules\n";
-    print_iterate parameter error result.store_iterate_half_remove_cv
+    print_iteration parameter error result.store_iterate_half_remove_cv
   in
   let error =
     fprintf stdout "--------------------------------------------\n";
     fprintf stdout "ITERATION OF HALF_BREAK - CREATION - COVERING CLASS rules\n";
-    print_iterate parameter error result.store_iterate_half_created_cv
+    print_iteration parameter error result.store_iterate_half_created_cv
   in
   let error =
     fprintf stdout "--------------------------------------------\n";
     fprintf stdout "ITERATION OF HALF_BREAK - REMOVE - CREATION - COVERING CLASS rules\n";
-    print_iterate parameter error result.store_iterate_half_remove_created_cv
-  in
+    print_iteration parameter error result.store_iterate_half_remove_created_cv
+  in*)
   let () =
     fprintf stdout "--------------------------------------------\n"
   in

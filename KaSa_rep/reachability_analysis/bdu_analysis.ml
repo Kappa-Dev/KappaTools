@@ -158,6 +158,216 @@ let collect_creation parameter error viewsrhs creation store_creation =
         error, store_creation
   ) (error, store_creation) creation
 
+(************************************************************************************)    
+(*iteration first step*)
+
+let is_belong bdu bdu_init =
+  let is_eq = Mvbdu_sanity.safety_equal_mvbdu bdu bdu_init  in
+  if is_eq
+  then
+    true
+  else
+    false
+
+(*let collect_test_rule parameter error =
+  let (pair_list, (handler, bdu_test)) =
+    Site_map_and_set.fold_map
+      (fun site port (current_list, _) ->
+        let state = int_of_port port in
+        let l = (site, state) :: current_list in
+        let error, (handler, bdu) =
+          build_bdu parameter error l
+        in
+        l, (handler, bdu))
+      agent.agent_interface ([], (handler, bdu_init))
+  in
+  let error, (old_list, (handler, old_bdu)) =
+    match AgentMap.unsafe_get parameter error agent_type store_result_test with
+      | error, None -> error, ([], (handler, bdu_init))
+      | error, Some (l, (handler, b)) -> error, (l, (handler, b))
+  in
+  let new_list = List.concat [pair_list; old_list] in
+  let error, handler, new_bdu =
+    f parameter error old_bdu
+      (Boolean_mvbdu.boolean_mvbdu_or
+	 parameter handler error parameter old_bdu) bdu_test
+  in
+  let error, result_test =
+    AgentMap.set
+      parameter
+      error
+      agent_type
+      (List.rev new_list, (handler, new_bdu))
+      store_result_test
+  in
+  let _ =
+    let _ = 
+      fprintf stdout "TEST:\n";
+      handler.Memo_sig.print_mvbdu stdout "" new_bdu
+    in
+    let rec aux acc =
+      match acc with
+	| [] -> ()
+	| (s, st) :: tl ->
+	  fprintf stdout "site_type:%i:state:%i\n" s st; aux tl
+    in
+    aux new_list
+  in*)
+
+(*let collect_direct =
+  let (pair_list2, (handler2, bdu_direct)) =
+    Site_map_and_set.fold_map
+      (fun site port (current_list, _) ->
+        let state = int_of_port port in
+        let l = (site, state) :: current_list in
+        let error, (handler, bdu) =
+          build_bdu parameter error l
+        in
+        l, (handler, bdu)
+      ) site_modif.agent_interface ([], (handler, bdu_init))
+  in
+  (*--------------------------------------------------------------------------*)
+  (*get old*)
+  let error, (old_list2, (handler2, old_bdu2)) =
+    match AgentMap.unsafe_get parameter error agent_type store_result_direct with
+      | error, None -> error, ([], (handler, bdu_init))
+      | error, Some (l, (handler, b)) -> error, (l, (handler, b))
+  in
+  let new_list2 = List.concat [pair_list2; old_list2] in
+  let error, handler2, new_bdu2 =
+    f parameter error old_bdu2
+      (Boolean_mvbdu.boolean_mvbdu_or
+	 parameter handler2 error parameter old_bdu2) bdu_direct
+  in
+  let _ =
+    let _ = 
+      fprintf stdout "DIRECT\n";
+      handler2.Memo_sig.print_mvbdu stdout "" new_bdu2
+    in
+    let rec aux acc =
+      match acc with
+	| [] -> ()
+	| (s, st) :: tl ->
+	  fprintf stdout "site_type:%i:state:%i\n" s st; aux tl
+    in
+    aux new_list2
+  in
+  let error, result_direct =
+    AgentMap.set
+      parameter
+      error
+      agent_type
+      (List.rev new_list2, (handler2, new_bdu2))
+      store_result_direct
+  in*)
+
+let iteration_aux parameter error viewslhs diff_direct bdu_creation store_result =
+  let error, (handler, bdu_init) = bdu_init parameter in
+  AgentMap.fold2_common parameter error
+    (fun parameter error agent_id agent site_modif
+      store_iteration ->
+        match agent with
+          | Ghost ->
+            let agent_type = site_modif.agent_name in
+            let (l, (handler, bdu_init)) =
+              Site_map_and_set.fold_map
+                (fun _ _ _ -> [], (handler, bdu_init)
+                ) site_modif.agent_interface ([], (handler, bdu_init))
+            in
+            let error, handler, bdu_iteration =
+              f parameter error bdu_init
+                (Boolean_mvbdu.boolean_mvbdu_or
+                   parameter handler error parameter bdu_init) bdu_creation
+            in            
+            let error, store_iteration =
+              AgentMap.set
+                parameter
+                error
+                agent_type
+                (l, (handler, bdu_iteration))
+                store_iteration
+            in
+            let _ =
+              fprintf stdout "Ghost\n";
+              fprintf stdout "ITERATION\n";
+              handler.Memo_sig.print_mvbdu stdout "" bdu_iteration
+            in
+            error, store_iteration
+          (*-------------------------------------------------------------------------*)
+          | Agent agent ->
+            let agent_type = agent.agent_name in
+            let (pair_list, (handler, bdu_test)) =
+              Site_map_and_set.fold_map
+                (fun site port (current_list, _) ->
+                  let state = int_of_port port in
+                  let l = (site, state) :: current_list in
+                  let error, (handler, bdu) =
+                    build_bdu parameter error l
+                  in
+                  l, (handler, bdu))
+                agent.agent_interface ([], (handler, bdu_init))
+            in
+            (*-----------------------------------------------------------------------*)
+            let (pair_list2, (handler2, bdu_direct)) =
+              Site_map_and_set.fold_map
+                (fun site port (current_list, _) ->
+                  let state = int_of_port port in
+                  let l = (site, state) :: current_list in
+                  let error, (handler, bdu) =
+                    build_bdu parameter error l
+                  in
+                  l, (handler, bdu)
+                ) site_modif.agent_interface ([], (handler, bdu_init))
+            in
+            (*--------------------------------------------------------------------------*)
+            (*store iteration*)
+            let error, handler, bdu_belong =
+              f parameter error bdu_test
+                (Boolean_mvbdu.boolean_mvbdu_and
+                   parameter handler error parameter bdu_test) bdu_creation
+            in
+            if not (is_belong bdu_belong bdu_init)
+            then
+              let error, handler, bdu_iteration =
+                f parameter error bdu_direct
+                  (Boolean_mvbdu.boolean_mvbdu_or
+                     parameter handler error parameter bdu_direct) bdu_creation
+              in
+              let error, store_iteration =
+                AgentMap.set
+                  parameter
+                  error
+                  agent_type
+                  (pair_list, (handler, bdu_iteration))
+                  store_iteration
+              in
+              let _ =
+                fprintf stdout "ITERATION\n";
+                handler.Memo_sig.print_mvbdu stdout "" bdu_iteration
+              in
+              error, store_iteration
+            else
+              let _ =
+                fprintf stdout "FALSE\n";
+                handler.Memo_sig.print_mvbdu stdout "" bdu_belong
+              in
+              let error, store_iteration =
+                AgentMap.set
+                  parameter
+                  error
+                  agent_type
+                  (pair_list, (handler, bdu_belong))
+                  store_iteration
+              in
+              error, store_iteration
+    ) viewslhs diff_direct store_result
+
+let iteration parameter error viewslhs diff_direct bdu_creation store_result =
+  AgentMap.fold parameter error
+    (fun parameter error agent_type (l, (handler, bdu_creation)) store_result ->
+      iteration_aux parameter error viewslhs diff_direct bdu_creation store_result
+    ) bdu_creation store_result
+
 (************************************************************************************)
 (*side effects: unknow binding - know binding - deletion*)
 
@@ -575,6 +785,17 @@ let scan_rule parameter error handler rule rules store_result =
       store_result.store_creation
   in
   (*------------------------------------------------------------------------------*)
+  (*iteration fixpoint*)
+  let error, store_iteration =
+    iteration
+      parameter
+      error
+      rule.rule_lhs.views
+      rule.diff_direct
+      store_creation
+      store_result.store_iteration
+  in
+  (*------------------------------------------------------------------------------*)
   (*side effect - half_break*)
   let error, store_half_break =
     collect_half_break
@@ -669,6 +890,7 @@ let scan_rule parameter error handler rule rules store_result =
   error,
   {
     store_creation   = store_creation;
+    store_iteration  = store_iteration;
     store_half_break = store_half_break;
     store_remove     = store_remove;
     store_test_modif = store_test_modif;
@@ -685,6 +907,9 @@ let scan_rule parameter error handler rule rules store_result =
 
 let scan_rule_set parameter error handler rules =
   let error, init_creation     = AgentMap.create parameter error 0 in
+  let error, init_test         = AgentMap.create parameter error 0 in
+  let error, init_assign       = AgentMap.create parameter error 0 in
+  let error, init_iteration    = AgentMap.create parameter error 0 in
   let error, init_half_break   = AgentMap.create parameter error 0 in
   let error, init_remove_know  = AgentMap.create parameter error 0 in
   let error, init_remove_undoc = AgentMap.create parameter error 0 in
@@ -699,6 +924,7 @@ let scan_rule_set parameter error handler rules =
   let init_bdu =
     {
       store_creation   = init_creation;
+      store_iteration  = init_iteration;
       store_half_break = init_half_break;
       store_remove     = (init_remove_know, init_remove_undoc, init_remove);
       store_test_modif = init_test_modif;
@@ -716,7 +942,7 @@ let scan_rule_set parameter error handler rules =
     Nearly_inf_Imperatif.fold
       parameter error
       (fun parameter error rule_id rule store_result ->
-        (*let _ = Printf.fprintf stdout "rule_id:%i:\n" rule_id in*)
+        let _ = Printf.fprintf stdout "rule_id:%i:\n" rule_id in
         let error, result =
           scan_rule
             parameter

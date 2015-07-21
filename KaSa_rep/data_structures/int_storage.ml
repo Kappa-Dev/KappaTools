@@ -250,7 +250,6 @@ module Int_storage_imperatif =
       in 
       aux 0  (error,init)
         
-        
    end:Storage with type key = int and type dimension = int)
     
 module Nearly_infinite_arrays =
@@ -425,7 +424,8 @@ module Extend =
                 | Some b -> f parameter error k a b c)
             a
             c
-            
+
+
        end:Storage with type key = Extension.key * Underlying.key and type dimension = Extension.dimension * Underlying.dimension ) 
         
         
