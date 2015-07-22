@@ -79,12 +79,12 @@ let print_remove parameter error result =
     ) parameter result_remove
   
     
-let print_test_modif parameter error result =
+let print_test parameter error result =
   AgentMap.print error
     (fun error parameter (l, (handler, bdu)) ->
       let _ =
 	let _ = handler.Memo_sig.print_mvbdu stdout "" bdu in
-	fprintf stdout "TEST-MODIFIED rules\n";
+	fprintf stdout "TEST rules\n";
 	let rec aux acc =
 	  match acc with
 	    | [] -> ()
@@ -119,11 +119,16 @@ let print_pair_iteration parameter error result =
 (*MAIN PRINT*)
 
 let print_result parameter error result =
-  let error =
+  (*let error =
+    fprintf stdout "--------------------------------------------\n";
+    fprintf stdout "BDU TEST rules\n";
+    print_test parameter error result.store_test
+  in*)
+  (*let error =
     fprintf stdout "--------------------------------------------\n";
     fprintf stdout "BDU ITERATION rules\n";
     print_pair_iteration parameter error result.store_iteration
-  in
+  in*)
   (*
   let error =
     fprintf stdout "--------------------------------------------\n";
