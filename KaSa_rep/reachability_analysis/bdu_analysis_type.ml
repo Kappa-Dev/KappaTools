@@ -30,12 +30,6 @@ type pair_bdu =
 	((Boolean_mvbdu.memo_tables, Boolean_mvbdu.mvbdu_dic,
 	  Boolean_mvbdu.list_dic, bool, int)
 	    Memo_sig.handler * bool Mvbdu_sig.mvbdu))
-      
-type list_bdu =
-    (int list *
-       ((Boolean_mvbdu.memo_tables, Boolean_mvbdu.mvbdu_dic,
-	 Boolean_mvbdu.list_dic, bool, int)
-	   Memo_sig.handler * bool Mvbdu_sig.mvbdu))
 
 type bdu_analysic =
     {
