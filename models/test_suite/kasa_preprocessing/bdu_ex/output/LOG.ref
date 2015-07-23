@@ -104,4 +104,8 @@ Influence_map: The notation [i -> j] means an agent at position [i] of the first
 Influence_map:Wake_up_map:rule(0):'create' ->A(x~u) -> rule(1):'x' A(x~u)->A(x~p)[0->0]
 Influence_map:Wake_up_map:rule(0):'create' ->A(x~u) -> rule(2):'y' A(x~p,y~u)->A(x~p,y~p)[0->0]
 Influence_map:Wake_up_map:rule(1):'x' A(x~u)->A(x~p) -> rule(2):'y' A(x~p,y~u)->A(x~p,y~p)[0->0]
+
+rule_id:0:
+rule_id:1:
+rule_id:2:
 execution finished without any exception
