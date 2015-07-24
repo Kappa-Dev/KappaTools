@@ -243,9 +243,6 @@ let iteration_creation_aux parameter error viewslhs diff_direct bdu_creation sto
               f parameter error bdu_test
                 (Boolean_mvbdu.boolean_mvbdu_and
                    parameter handler_test error parameter bdu_test) bdu_old_X
-              (*f parameter error bdu_old_X
-                (Boolean_mvbdu.boolean_mvbdu_and
-                   parameter old_X_handler error parameter bdu_old_X) bdu_test*)
             in
             if not (is_belong bdu_is_test_in_old_X bdu_init)
             then
@@ -260,7 +257,7 @@ let iteration_creation_aux parameter error viewslhs diff_direct bdu_creation sto
                 in
                 if not (is_belong bdu_is_test_in_X bdu_init)
                 then
-                  (*update bdu_X and bdu_direct. ex: X0 U r0(X0)*)
+                  (*update bdu_X and bdu_direct. ex: X0 U r0_direct(X0)*)
                   (*REMARK: it is different than the function in influence*)
                   let error, iteration_handler, bdu_iteration =
                     f parameter error bdu_old_X
