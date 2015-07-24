@@ -35,8 +35,8 @@ type bdu_analysic =
     {
       store_creation            : pair_bdu AgentMap.t;
       store_iteration_fixpoint  : pair_bdu AgentMap.t;
-      store_iteration_fixpoint_influence : pair_bdu AgentMap.t * 
-                                  pair_bdu AgentMap.t * pair_bdu AgentMap.t;
+      (*store_iteration_fixpoint_influence : pair_bdu AgentMap.t * 
+                                  pair_bdu AgentMap.t * pair_bdu AgentMap.t;*)
 
       store_half_break : pair_bdu AgentMap.t;
       store_remove     : (pair_bdu AgentMap.t * pair_bdu AgentMap.t * bdu AgentMap.t);
