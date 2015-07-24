@@ -172,7 +172,7 @@ let is_belong bdu bdu_init =
     false
 
 let iteration_creation_aux parameter error viewslhs diff_direct bdu_creation store_result =
-  let error, (handler, bdu_init) = bdu_init parameter in
+  let error, (init_handler, bdu_init) = bdu_init parameter in
   AgentMap.fold2_common parameter error
     (fun parameter error agent_id agent site_modif store_iteration ->
       (*there is no modification*)
@@ -187,7 +187,7 @@ let iteration_creation_aux parameter error viewslhs diff_direct bdu_creation sto
             let agent_type = site_modif.agent_name in
             let error, (old_list, (handler, old_bdu)) =
               match AgentMap.unsafe_get parameter error agent_type store_iteration with
-                | error, None -> error, ([], (handler, bdu_init))
+                | error, None -> error, ([], (init_handler, bdu_init))
                 | error, Some (l, (handler, bdu)) -> error, (l, (handler, bdu))
             in
             (*PRINT*)
@@ -200,7 +200,7 @@ let iteration_creation_aux parameter error viewslhs diff_direct bdu_creation sto
           | Agent agent ->
             let agent_type = agent.agent_name in
             (*compute bdu of test rule*)
-            let (site_test_list, (handler, bdu_test)) =
+            let (site_test_list, (handler_test, bdu_test)) =
               Site_map_and_set.fold_map
                 (fun site port (current_list, _) ->
                   let state = int_of_port port in
@@ -209,11 +209,11 @@ let iteration_creation_aux parameter error viewslhs diff_direct bdu_creation sto
                     build_bdu parameter error l
                   in
                   l, (handler, bdu))
-                agent.agent_interface ([], (handler, bdu_init))
+                agent.agent_interface ([], (init_handler, bdu_init))
             in
             (*-----------------------------------------------------------------------*)
             (*compute bdu of direct rule*)
-            let (site_direct_list, (handler2, bdu_direct)) =
+            let (site_direct_list, (handler_direct, bdu_direct)) =
               Site_map_and_set.fold_map
                 (fun site port (current_list, _) ->
                   let state = int_of_port port in
@@ -222,58 +222,58 @@ let iteration_creation_aux parameter error viewslhs diff_direct bdu_creation sto
                     build_bdu parameter error l
                   in
                   l, (handler, bdu)
-                ) site_modif.agent_interface ([], (handler, bdu_init))
+                ) site_modif.agent_interface ([], (init_handler, bdu_init))
             in
             (*--------------------------------------------------------------------------*)
             (*check the enabled rule; it is enabled if the intersection of X
               and bdu_test is different than empty*)
             (*X0 is an old_bdu (started at bdu_init) union with bdu_creation*)
-            let error, (old_list, (handler, old_bdu)) =
+            let error, (old_list, (old_handler, old_bdu)) =
               match AgentMap.unsafe_get parameter error agent_type store_iteration with
-                | error, None -> error, ([], (handler, bdu_init))
+                | error, None -> error, ([], (init_handler, bdu_init))
                 | error, Some (l, (handler, bdu)) -> error, (l, (handler, bdu))
             in
-            let error, handler, bdu_X =
+            let error, old_X_handler, bdu_old_X =
               f parameter error old_bdu
                 (Boolean_mvbdu.boolean_mvbdu_or
-                   parameter handler error parameter old_bdu) bdu_creation
+                   parameter old_handler error parameter old_bdu) bdu_creation
             in
             (*check enabled rule: intersection of bdu_X and bdu_test*)
-            let error, handler, bdu_X_test =
-              f parameter error bdu_X
+            let error, x_test_handler, bdu_X_test =
+              f parameter error bdu_old_X
                 (Boolean_mvbdu.boolean_mvbdu_and
-                   parameter handler error parameter bdu_X) bdu_test
+                   parameter old_X_handler error parameter bdu_old_X) bdu_test
             in
             if not (is_belong bdu_X_test bdu_init)
             then
               (*------------------------------------------------------------------------*)
               begin
                 (*check if bdu_test belong to bdu_X. ex: r0(X0)*)
-                let error, handler, bdu_is_test_in_X =
+                let error, is_test_handler, bdu_is_test_in_X =
                   f parameter error bdu_X_test
                     (Boolean_mvbdu.boolean_mvbdu_and
-                       parameter handler error parameter bdu_X_test) bdu_test
+                       parameter x_test_handler error parameter bdu_X_test) bdu_test
                 in
                 if not (is_belong bdu_is_test_in_X bdu_init)
                 then
                   (*update bdu_X and bdu_direct. ex: X0 U r0(X0)*)
-                  let error, handler, bdu_X_direct =
-                    f parameter error bdu_X
+                  let error, iteration_handler, bdu_iteration =
+                    f parameter error bdu_old_X
                       (Boolean_mvbdu.boolean_mvbdu_or
-                         parameter handler error parameter bdu_X) bdu_direct
+                         parameter old_X_handler error parameter bdu_old_X) bdu_direct
                   in
                   let error, store_iteration =
                     AgentMap.set
                       parameter
                       error
                       agent_type
-                      ([], (handler, bdu_X_direct))
+                      ([], (iteration_handler, bdu_iteration))
                       store_iteration
                   in
                   (*PRINT*)
                   let _ =
                     fprintf stdout "iteration_creation_fixpoint\n";
-                    handler.Memo_sig.print_mvbdu stdout "" bdu_X_direct
+                    iteration_handler.Memo_sig.print_mvbdu stdout "" bdu_iteration
                   in
                   error, store_iteration
                 else
