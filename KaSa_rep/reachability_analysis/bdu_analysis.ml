@@ -239,24 +239,29 @@ let iteration_creation_aux parameter error viewslhs diff_direct bdu_creation sto
                    parameter old_handler error parameter old_bdu) bdu_creation
             in
             (*check enabled rule: intersection of bdu_X and bdu_test*)
-            let error, x_test_handler, bdu_X_test =
-              f parameter error bdu_old_X
+            let error, old_is_handler, bdu_is_test_in_old_X =
+              f parameter error bdu_test
                 (Boolean_mvbdu.boolean_mvbdu_and
-                   parameter old_X_handler error parameter bdu_old_X) bdu_test
+                   parameter handler_test error parameter bdu_test) bdu_old_X
+              (*f parameter error bdu_old_X
+                (Boolean_mvbdu.boolean_mvbdu_and
+                   parameter old_X_handler error parameter bdu_old_X) bdu_test*)
             in
-            if not (is_belong bdu_X_test bdu_init)
+            if not (is_belong bdu_is_test_in_old_X bdu_init)
             then
               (*------------------------------------------------------------------------*)
               begin
                 (*check if bdu_test belong to bdu_X. ex: r0(X0)*)
                 let error, is_test_handler, bdu_is_test_in_X =
-                  f parameter error bdu_X_test
+                  f parameter error bdu_is_test_in_old_X
                     (Boolean_mvbdu.boolean_mvbdu_and
-                       parameter x_test_handler error parameter bdu_X_test) bdu_test
+                       parameter old_is_handler error parameter 
+                       bdu_is_test_in_old_X) bdu_test
                 in
                 if not (is_belong bdu_is_test_in_X bdu_init)
                 then
                   (*update bdu_X and bdu_direct. ex: X0 U r0(X0)*)
+                  (*REMARK: it is different than the function in influence*)
                   let error, iteration_handler, bdu_iteration =
                     f parameter error bdu_old_X
                       (Boolean_mvbdu.boolean_mvbdu_or
@@ -433,7 +438,7 @@ let iteration_fixpoint_influence_aux parameter error viewslhs diff_direct
             in*)
             if not (is_belong bdu_is_test_in_old_X bdu_init)
             then
-              (*update direct *)
+              (*update direct: direct_r1 U (X0 U r0(X0)) *)
               let error, iteration_handler, bdu_iteration =
                 f parameter error bdu_direct
                   (Boolean_mvbdu.boolean_mvbdu_or
