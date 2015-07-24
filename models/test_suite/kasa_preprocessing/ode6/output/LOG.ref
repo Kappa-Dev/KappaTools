@@ -409,10 +409,4 @@ Influence_map:Inhibition_map:rule(2):'r2' R(x,y,z),R(k,t)->R(x,y!1,z),R(k!1,t) -
 Influence_map:Inhibition_map:rule(3):'r3' R(k,t),E(y)->R(k,t!1),E(y!1) -> rule(2):'r2' R(x,y,z),R(k,t)->R(x,y!1,z),R(k!1,t)[0->1]
 Influence_map:Inhibition_map:rule(4):'r4' R(x,y,z),E(x)->R(x!1,y,z),E(x!1) -> rule(1):'r1' Sh(x~u,y),R(x,y,z)->Sh(x~p,y!1),R(x,y,z!1)[0->1]
 Influence_map:Inhibition_map:rule(4):'r4' R(x,y,z),E(x)->R(x!1,y,z),E(x!1) -> rule(2):'r2' R(x,y,z),R(k,t)->R(x,y!1,z),R(k!1,t)[0->0]
-
-rule_id:0:
-rule_id:1:
-rule_id:2:
-rule_id:3:
-rule_id:4:
 execution finished without any exception

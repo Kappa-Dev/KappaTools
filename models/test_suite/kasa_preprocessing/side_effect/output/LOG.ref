@@ -212,10 +212,4 @@ Influence_map:Inhibition_map:rule(3):'' A()-> -> rule(1):'' A(x!_)->A(x)[0->0]
 Influence_map:Inhibition_map:rule(3):'' A()-> -> rule(2):'' B(x!_)->B(x)[0*->0]
 Influence_map:Inhibition_map:rule(4):'' B(x)-> -> rule(0):'' A(x),B(x)->A(x!1),B(x!1)[0->1]
 Influence_map:Inhibition_map:rule(4):'' B(x)-> -> rule(2):'' B(x!_)->B(x)[0->0]
-
-rule_id:0:
-rule_id:1:
-rule_id:2:
-rule_id:3:
-rule_id:4:
 execution finished without any exception

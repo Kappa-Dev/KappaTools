@@ -17,7 +17,7 @@ help:
 	@echo 'make clean:     recursively clean everything but the reference files'
 	@echo 'make clean_all: recursively clean everything including the reference files'
 
-%/$(OUTPUT_PATH)/LOG: %/README $(shell which $(KAPPABIN)KaSim) $(shell which $(KAPPABIN)KaSa) 
+%/$(OUTPUT_PATH)/LOG: %/README #$(shell which $(KAPPABIN)KaSim) $(shell which $(KAPPABIN)KaSa) 
 	@[ -d $(dir $<)$(OUTPUT_PATH) ] || mkdir $(dir $<)$(OUTPUT_PATH)
 	@find $(dir $<)$(OUTPUT_PATH) -mindepth 1 \( -not -name \*.ref \) -delete
 	cd $(dir $<) && sh $(notdir $<) > $(OUTPUT_PATH)/LOG 2> $(OUTPUT_PATH)/error.log
