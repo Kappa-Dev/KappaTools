@@ -13,6 +13,7 @@
   * under the terms of the GNU Library General Public License *)
 
 open Int_storage
+open Fifo
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Bdu_analysis_type") message exn (fun () -> default)
@@ -22,8 +23,8 @@ let local_trace = false
 module AgentMap = Quick_Nearly_inf_Imperatif
 
 type bdu = ((Boolean_mvbdu.memo_tables, Boolean_mvbdu.mvbdu_dic,
-		  Boolean_mvbdu.list_dic, bool, int)
-		    Memo_sig.handler * bool Mvbdu_sig.mvbdu) 
+	     Boolean_mvbdu.list_dic, bool, int)
+	       Memo_sig.handler * bool Mvbdu_sig.mvbdu) 
     
 type pair_bdu =
     ((int * int) list *
@@ -31,20 +32,13 @@ type pair_bdu =
 	  Boolean_mvbdu.list_dic, bool, int)
 	    Memo_sig.handler * bool Mvbdu_sig.mvbdu))
 
+type pair_list =
+    ((int * int) list * bool Mvbdu_sig.mvbdu list)
+
 type bdu_analysic =
     {
-      store_creation            : pair_bdu AgentMap.t;
-      store_iteration_creation_fixpoint  : pair_bdu AgentMap.t;
-      store_iteration_fixpoint_influence : pair_bdu AgentMap.t * 
-                                  pair_bdu AgentMap.t * pair_bdu AgentMap.t;
-
-      store_half_break : pair_bdu AgentMap.t;
-      store_remove     : (pair_bdu AgentMap.t * pair_bdu AgentMap.t * bdu AgentMap.t);
-      store_test_modif : pair_bdu AgentMap.t;
-      store_iterate_created_cv : bdu AgentMap.t;
-      store_iterate_half_cv    : bdu AgentMap.t;
-      store_iterate_remove_cv  : bdu AgentMap.t;
-      store_iterate_half_remove_cv  : bdu AgentMap.t;
-      store_iterate_half_created_cv : bdu AgentMap.t;
-      store_iterate_half_remove_created_cv : bdu AgentMap.t
+      store_creation    : pair_bdu AgentMap.t;
+      store_test        : pair_list AgentMap.t;
+      store_diff_direct : pair_list AgentMap.t;
+      store_iteration   : bdu AgentMap.t
     }
