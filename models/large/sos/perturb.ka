@@ -1,0 +1,15 @@
+%def: "showIntroEvents" "true"
+%def: "displayCompression" "weak" "strong"
+
+%mod: [T]>5 do $TRACK 'sos recruited' [true]
+%mod: [T]>7 do $TRACK 'sos recruited' [false]
+%mod: [T]>30 do $TRACK 'sos recruited' [true] 
+%mod: [T]>32 do $TRACK 'sos recruited' [false]
+
+
+%init:  5000            EGF(r)
+%init:  5000            EGFR(CR,C,N,L,Y1016~u,Y1092~u,Y1172~u)
+%init:  10000   SoS(PR,S~u)
+%init:  8000            Shc(Y~u,PTB~u)
+%init:  5000            Grb2(SH3c,SH3n,SH2~u)
+
