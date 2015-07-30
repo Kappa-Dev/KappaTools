@@ -21,7 +21,7 @@ module A = Array
 module S = Mods.IntSet 
 module M = Mods.IntMap
 
-let ignore_flow_from_outgoing_siphon = true
+let ignore_flow_from_outgoing_siphon = false
 					 
 type config = 
   { 

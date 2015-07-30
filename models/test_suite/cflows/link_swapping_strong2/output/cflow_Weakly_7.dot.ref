@@ -73,8 +73,8 @@ node_23 [label="A(x,y)->C(x,y)", shape=invhouse, style=filled, fillcolor = light
 node_24 [label="C(x,y)->A(x,y)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "23" [shape=plaintext] ;
-node_25 [label="A(y),B(y)->A(y!0),B(y!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_26 [label="A(x),B(x)->A(x!0),B(x!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_25 [label="A(x),B(x)->A(x!0),B(x!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_26 [label="A(y),B(y)->A(y!0),B(y!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "24" [shape=plaintext] ;
 node_27 [label="A(x!0,y!1),B(x!0,y!1)->A(x!0,y!1),B(x!1,y!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;

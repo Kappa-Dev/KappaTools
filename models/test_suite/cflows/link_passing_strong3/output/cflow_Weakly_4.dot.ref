@@ -1,5 +1,5 @@
-/* Compression of 5 causal flows obtained in average at 1.201426E+01 t.u */
-/* Compressed causal flows were: [25;28;30;39;41] */
+/* Compression of 6 causal flows obtained in average at 1.528439E+01 t.u */
+/* Compressed causal flows were: [29;33;42;44;51;52] */
 digraph G{
  ranksep=.5 ;
 { rank = same ; "0" [shape=plaintext] ;
@@ -13,11 +13,11 @@ node_6 [label="A(x)->B(x)", shape=invhouse, style=filled, fillcolor = lightblue]
 }
 { rank = same ; "2" [shape=plaintext] ;
 node_5 [label="B(x)->C(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_7 [label="B(x)->C(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_8 [label="B(x)->C(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "3" [shape=plaintext] ;
-node_8 [label="C(x)->A(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_11 [label="E(x),C(x)->E(x!0),C(x!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_7 [label="C(x)->A(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_12 [label="C(x)->A(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "4" [shape=plaintext] ;
 node_9 [label="A(x)->B(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
@@ -26,7 +26,7 @@ node_9 [label="A(x)->B(x)", shape=invhouse, style=filled, fillcolor = lightblue]
 node_10 [label="B(x)->C(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "6" [shape=plaintext] ;
-node_12 [label="C(x)->A(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_11 [label="E(x),C(x)->E(x!0),C(x!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "7" [shape=plaintext] ;
 node_13 [label="A(x),E(x!0),C(x!0)->A(x!0),E(x!0),C(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
@@ -42,16 +42,16 @@ node_14 [label="GOAL", style=filled, fillcolor=red] ;
 "5" -> "6" [style="invis"];
 "6" -> "7" [style="invis"];
 "7" -> "8" [style="invis"];
-node_1 -> node_4
+node_2 -> node_4
 node_4 -> node_5
-node_2 -> node_6
-node_6 -> node_7
-node_7 -> node_8
-node_8 -> node_9
+node_1 -> node_6
+node_5 -> node_7
+node_6 -> node_8
+node_7 -> node_9
 node_9 -> node_10
 node_3 -> node_11
-node_5 -> node_11
-node_10 -> node_12
+node_10 -> node_11
+node_8 -> node_12
 node_11 -> node_13
 node_12 -> node_13
 node_13 -> node_14

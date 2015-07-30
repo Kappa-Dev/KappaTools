@@ -5,4 +5,3 @@ File "create.ka", line 6, characters 6-47:
 Warning: internal state of site 'x' of agent 'A' is modified although it is left unpecified in the left hand side
 File "create.ka", line 6, characters 6-47:
 Warning: application of this rule will induce a null event when applied to an agent 'A' that is free on 'x'
-Fatal error: exception Failure("wrong list, compression_main, 325")

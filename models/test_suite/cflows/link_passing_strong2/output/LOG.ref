@@ -28,9 +28,9 @@ ____________________________________________________________
 ############################################################
 Stats:
  number of step   : 343
- longest story    : 188
- average length   : 66.4345
- geometric mean   : 83.8639
+ longest story    : 280
+ average length   : 124.161
+ geometric mean   : 147.389
 
 
 ____________________________________________________________
@@ -38,16 +38,16 @@ ____________________________________________________________
 
 
 
-	 - Weak flow compression (52)
+	 - Weak flow compression (54)
 
 ____________________________________________________________
 ############################################################
 
-	 - Strong flow compression (10)
+	 - Strong flow compression (9)
 
 ____________________________________________________________
 ############################################################
-+ Pretty printing 10 weakly compressed flows
++ Pretty printing 9 weakly compressed flows
 
 + Pretty printing 1 strongly compressed flow
 
