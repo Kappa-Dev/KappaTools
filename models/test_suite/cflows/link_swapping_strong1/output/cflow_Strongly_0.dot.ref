@@ -12,8 +12,8 @@ node_2 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 node_3 [label="A(x,y)->B(x,y)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "2" [shape=plaintext] ;
-node_4 [label="A(y),B(y)->A(y!0),B(y!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_5 [label="A(x),B(x)->A(x!0),B(x!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_4 [label="A(x),B(x)->A(x!0),B(x!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_5 [label="A(y),B(y)->A(y!0),B(y!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "3" [shape=plaintext] ;
 node_6 [label="A(x!0,y!1),B(x!0,y!1)->A(x!0,y!1),B(x!1,y!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;

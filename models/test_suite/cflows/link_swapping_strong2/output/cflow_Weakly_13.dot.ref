@@ -127,8 +127,8 @@ node_41 [label="A(x,y)->C(x,y)", shape=invhouse, style=filled, fillcolor = light
 node_42 [label="C(x,y)->A(x,y)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "41" [shape=plaintext] ;
-node_43 [label="A(x),B(x)->A(x!0),B(x!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_44 [label="A(y),B(y)->A(y!0),B(y!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_43 [label="A(y),B(y)->A(y!0),B(y!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_44 [label="A(x),B(x)->A(x!0),B(x!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "42" [shape=plaintext] ;
 node_45 [label="A(x!0,y!1),B(x!0,y!1)->A(x!0,y!1),B(x!1,y!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;

@@ -19,19 +19,7 @@ ____________________________________________________________
 ############################################################
 + Producing causal compressions
 	 - refining events
-	 - Causal flow (without simplification) computation
-		 * Causal flow computation (1023)
-
-Stats:
- number of step   : 7024
- longest story    : 202
- average length   : 24.4169
- geometric mean   : 36.4454
-
-
-____________________________________________________________
-############################################################
-
+	 - cutting concurrent events
 	 - Causal flow (with trivial simplifications) computation
 		 * detecting pseudo inverse events
 		 * Causal flow computation (1023)
@@ -39,36 +27,10 @@ ____________________________________________________________
 ____________________________________________________________
 ############################################################
 Stats:
- number of step   : 4952
- longest story    : 124
- average length   : 19.1642
- geometric mean   : 26.091
+ number of step   : 3847
+ longest story    : 60
+ average length   : 6.80374
+ geometric mean   : 9.42018
 
 
 ____________________________________________________________
-############################################################
-
-
-
-	 - Weak flow compression (359)
-
-____________________________________________________________
-############################################################
-
-	 - Strong flow compression (44)
-
-____________________________________________________________
-############################################################
-+ Pretty printing 549 flows
-
-+ Pretty printing 44 weakly compressed flows
-
-+ Pretty printing 1 strongly compressed flow
-
-Simulation ended (eff.: 0.996413, detail below)
-	Valid embedding but no longer unary when required: 0.000000
-	Valid embedding but not binary when required: 0.000000
-	Clashing instance: 0.055556
-	Lazy negative update: 0.944444
-	Lazy negative update of non local instances: 0.000000
-	Perturbation interrupting time advance: 0.000000

@@ -19,6 +19,7 @@ ____________________________________________________________
 ############################################################
 + Producing causal compressions
 	 - refining events
+	 - cutting concurrent events
 	 - Causal flow (with trivial simplifications) computation
 		 * detecting pseudo inverse events
 		 * Causal flow computation (56)
@@ -26,10 +27,10 @@ ____________________________________________________________
 ____________________________________________________________
 ############################################################
 Stats:
- number of step   : 357
- longest story    : 280
- average length   : 126.596
- geometric mean   : 150.186
+ number of step   : 343
+ longest story    : 188
+ average length   : 66.4345
+ geometric mean   : 83.8639
 
 
 ____________________________________________________________
@@ -37,16 +38,16 @@ ____________________________________________________________
 
 
 
-	 - Weak flow compression (54)
+	 - Weak flow compression (52)
 
 ____________________________________________________________
 ############################################################
 
-	 - Strong flow compression (9)
+	 - Strong flow compression (10)
 
 ____________________________________________________________
 ############################################################
-+ Pretty printing 9 weakly compressed flows
++ Pretty printing 10 weakly compressed flows
 
 + Pretty printing 1 strongly compressed flow
 

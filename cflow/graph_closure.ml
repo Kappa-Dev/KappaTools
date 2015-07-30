@@ -21,6 +21,8 @@ module A = Array
 module S = Mods.IntSet 
 module M = Mods.IntMap
 
+let ignore_flow_from_outgoing_siphon = true
+					 
 type config = 
   { 
     do_tick: bool ;
@@ -183,14 +185,16 @@ let closure err_fmt config prec is_obs init_to_eidmax weak_events init =
           A.get redirect_tab i 
         in 
         let _ = A.iteri (fun i _ -> A.set max_succ i (init_to_eidmax i)) max_succ in 
-        let _ = 
-          M.iter
-            (fun succ -> 
-              S.iter 
-                (fun pred -> 
+        let _ =
+	  if not ignore_flow_from_outgoing_siphon
+          then
+	    M.iter
+              (fun succ -> 
+               S.iter 
+                 (fun pred -> 
                   let _ = A.set max_succ pred (max succ (A.get max_succ pred)) in 
                   let _ = A.set set_succ pred (S.add succ (A.get set_succ pred)) in  ()))
-            prec
+              prec
         in 
         let is_last_succ_of = A.make (max_index+1) [] in 
         let add node max_succ = 

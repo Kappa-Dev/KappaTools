@@ -40,9 +40,9 @@ ____________________________________________________________
 ############################################################
 Stats:
  number of step   : 25451
- longest story    : 16
- average length   : 6.207
- geometric mean   : 6.65695
+ longest story    : 7
+ average length   : 3.10204
+ geometric mean   : 3.36246
 
 
 ____________________________________________________________
@@ -53,22 +53,4 @@ ____________________________________________________________
 	 - Weak flow compression (3)
 
 ____________________________________________________________
-############################################################
-
-	 - Strong flow compression (3)
-
-____________________________________________________________
-############################################################
-+ Pretty printing 5 flows
-
-+ Pretty printing 3 weakly compressed flows
-
-+ Pretty printing 1 strongly compressed flow
-
-Simulation ended (eff.: 0.953713, detail below)
-	Valid embedding but no longer unary when required: 0.000000
-	Valid embedding but not binary when required: 0.000000
-	Clashing instance: 0.000000
-	Lazy negative update: 1.000000
-	Lazy negative update of non local instances: 0.000000
-	Perturbation interrupting time advance: 0.000000
+####################

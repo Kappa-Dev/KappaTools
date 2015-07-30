@@ -19,6 +19,7 @@ ____________________________________________________________
 ############################################################
 + Producing causal compressions
 	 - refining events
+	 - cutting concurrent events
 	 - Causal flow (with trivial simplifications) computation
 		 * detecting pseudo inverse events
 		 * Causal flow computation (2)
@@ -26,8 +27,8 @@ ____________________________________________________________
 Stats:
  number of step   : 8
  longest story    : 5
- average length   : 5.
- geometric mean   : 5.
+ average length   : 3.6
+ geometric mean   : 3.84708
 
 
 ____________________________________________________________
