@@ -30,17 +30,9 @@ let print_bdu_list handler l =
   in aux l
 
 let print_iteration parameter error result =
+  let (_, _, result) = result in
   AgentMap.print error
     (fun error parameter (handler, bdu) ->
-      let _ =
-	handler.Memo_sig.print_mvbdu stdout "" bdu
-      in
-      error
-    ) parameter result
-
-let print_pair_iteration parameter error result =
-  AgentMap.print error
-    (fun error parameter (_, (handler, bdu)) ->
       let _ =
 	handler.Memo_sig.print_mvbdu stdout "" bdu
       in

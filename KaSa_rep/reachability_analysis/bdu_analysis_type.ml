@@ -38,7 +38,5 @@ type pair_list =
 type bdu_analysic =
     {
       store_creation    : pair_bdu AgentMap.t;
-      store_test        : pair_list AgentMap.t;
-      store_diff_direct : pair_list AgentMap.t;
-      store_iteration   : bdu AgentMap.t
+      store_iteration   : (pair_list AgentMap.t * pair_list AgentMap.t * bdu AgentMap.t)
     }
