@@ -19,39 +19,33 @@ ____________________________________________________________
 ############################################################
 + Producing causal compressions
 	 - refining events
-	 - Causal flow (without simplification) computation
-		 * Causal flow computation (3)
+	 - detecting siphons
+	 - computing causal past of each observed events (3)
 
 Stats:
- number of step   : 215
- longest story    : 137
- average length   : 73.062
- geometric mean   : 82.2056
+ number of step   : 272
+ longest story    : 185
+ average length   : 93.5039
+ geometric mean   : 107.065
 
+	 - causal & weak flow compression (3)
 
 ____________________________________________________________
-############################################################
-
-	 - Causal flow (with trivial simplifications) computation
-		 * detecting pseudo inverse events
-		 * Causal flow computation (3)
+############################################################	 - detecting pseudo inverse events
+	 - computing causal past of each observed events (3)
 
 Stats:
- number of step   : 215
- longest story    : 137
- average length   : 83.75
- geometric mean   : 89.2595
+ number of step   : 272
+ longest story    : 185
+ average length   : 107.
+ geometric mean   : 116.144
 
-
-____________________________________________________________
-############################################################
-
-
-
-	 - Weak flow compression (3)
+	 - causal & weak flow compression (3)
 
 ____________________________________________________________
 ############################################################
+
+
 
 
 + Pretty printing 3 flows

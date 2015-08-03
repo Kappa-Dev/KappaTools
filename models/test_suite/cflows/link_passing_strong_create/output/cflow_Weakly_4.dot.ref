@@ -4,18 +4,18 @@ digraph G{
  ranksep=.5 ;
 { rank = same ; "0" [shape=plaintext] ;
 node_1 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
-node_2 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_5 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 }
 { rank = same ; "1" [shape=plaintext] ;
-node_3 [label="A(x)->B(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_2 [label="A(x)->B(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_6 [label="A(x)->B(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "2" [shape=plaintext] ;
-node_4 [label="B(x)->C(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_3 [label="B(x)->C(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_8 [label="B(x)->C(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "3" [shape=plaintext] ;
-node_5 [label="C(x)->A(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_4 [label="C(x)->A(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_9 [label="C(x)->A(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "4" [shape=plaintext] ;
@@ -46,11 +46,11 @@ node_15 [label="GOAL", style=filled, fillcolor=red] ;
 "6" -> "7" [style="invis"];
 "7" -> "8" [style="invis"];
 "8" -> "9" [style="invis"];
-node_1 -> node_3
+node_1 -> node_2
+node_2 -> node_3
 node_3 -> node_4
-node_4 -> node_5
-node_2 -> node_6
-node_5 -> node_7
+node_5 -> node_6
+node_4 -> node_7
 node_6 -> node_8
 node_8 -> node_9
 node_9 -> node_10

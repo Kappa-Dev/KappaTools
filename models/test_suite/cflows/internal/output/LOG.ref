@@ -19,8 +19,8 @@ ____________________________________________________________
 ############################################################
 + Producing causal compressions
 	 - refining events
-	 - Causal flow (without simplification) computation
-		 * Causal flow computation (15050)
+	 - detecting siphons
+	 - computing causal past of each observed events (15050)
 
 Stats:
  number of step   : 45052
@@ -28,13 +28,11 @@ Stats:
  average length   : 1.66593
  geometric mean   : 1.73141
 
+	 - causal & weak flow compression (15050)
 
 ____________________________________________________________
-############################################################
-
-	 - Causal flow (with trivial simplifications) computation
-		 * detecting pseudo inverse events
-		 * Causal flow computation (15050)
+############################################################	 - detecting pseudo inverse events
+	 - computing causal past of each observed events (15050)
 
 ____________________________________________________________
 ############################################################
@@ -44,18 +42,14 @@ Stats:
  average length   : 2.
  geometric mean   : 2.
 
+	 - causal & weak flow compression (15050)
 
 ____________________________________________________________
 ############################################################
 
 
 
-	 - Weak flow compression (1)
-
-____________________________________________________________
-############################################################
-
-	 - Strong flow compression (1)
+	 - strong flow compression (1)
 
 ____________________________________________________________
 ############################################################

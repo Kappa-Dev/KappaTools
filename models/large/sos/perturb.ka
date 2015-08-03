@@ -2,9 +2,9 @@
 %def: "displayCompression" "weak" "strong"
 
 %mod: [T]>5 do $TRACK 'sos recruited' [true]
-%mod: [T]>10 do $TRACK 'sos recruited' [false]
-%mod: [T]>27 do $TRACK 'sos recruited' [true] 
-%mod: [T]>32 do $TRACK 'sos recruited' [false]
+%mod: [T]>7 do $TRACK 'sos recruited' [false]
+#%mod: [T]>30.5 do $TRACK 'sos recruited' [true] 
+#%mod: [T]>31 do $TRACK 'sos recruited' [false]
 
 
 %init:  5000            EGF(r)

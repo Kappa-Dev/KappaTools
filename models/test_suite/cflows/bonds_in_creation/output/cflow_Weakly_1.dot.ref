@@ -6,7 +6,7 @@ digraph G{
 node_11 [label="C", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "1" [shape=plaintext] ;
-node_4 [label="Signal", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_3 [label="Signal", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_5 [label="Signal", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "2" [shape=plaintext] ;
@@ -43,7 +43,7 @@ node_5 -> node_6
 node_6 -> node_7
 node_5 -> node_8
 node_6 -> node_8
-node_4 -> node_9
+node_3 -> node_9
 node_8 -> node_9
 node_9 -> node_10
 node_7 -> node_12

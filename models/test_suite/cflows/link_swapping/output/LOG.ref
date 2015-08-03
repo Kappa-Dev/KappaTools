@@ -19,10 +19,10 @@ ____________________________________________________________
 ############################################################
 + Producing causal compressions
 	 - refining events
+	 - detecting siphons
 	 - cutting concurrent events
-	 - Causal flow (with trivial simplifications) computation
-		 * detecting pseudo inverse events
-		 * Causal flow computation (2)
+	 - detecting pseudo inverse events
+	 - computing causal past of each observed events (2)
 
 Stats:
  number of step   : 8
@@ -30,16 +30,12 @@ Stats:
  average length   : 5.
  geometric mean   : 5.
 
+	 - causal & weak flow compression (2)
 
 ____________________________________________________________
 ############################################################
 
 
-
-	 - Weak flow compression (1)
-
-____________________________________________________________
-############################################################
 
 
 + Pretty printing 1 weakly compressed flow

@@ -10,8 +10,8 @@ node_5 [label="Signal", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_6 [label="K.S", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "3" [shape=plaintext] ;
-node_7 [label="KpSx", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_8 [label="KpSy", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_7 [label="KpSy", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_8 [label="KpSx", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "4" [shape=plaintext] ;
 node_9 [label="S.L.Z", shape=invhouse, style=filled, fillcolor = lightblue] ;

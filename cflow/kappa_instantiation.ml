@@ -9,7 +9,7 @@
   * Jean Krivine, Université Paris-Diderot, CNRS 
   *  
   * Creation: 29/08/2011
-  * Last modification: 10/09/2013
+  * Last modification: 02/08/2015
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -149,6 +149,8 @@ sig
 
   val print_step: (refined_step -> H.error_channel) H.with_handler 
   val agent_id_in_obs: (refined_step -> H.error_channel * AgentIdSet.t) H.with_handler 
+
+  val fill_siphon: (refined_step list -> H.error_channel * step list) H.with_handler 
 end 
 
 
@@ -188,7 +190,8 @@ module Cflow_linker =
 
   module AgentIdSet = Set.Make (struct type t = agent_id let compare=compare end)
   module AgentIdMap = Map.Make (struct type t = agent_id let compare=compare end)
-
+  module SiteMap = Map.Make (struct type t = site_name let compare=compare end)
+  module SiteSet = Set.Make (struct type t = site_name let compare = compare end) 
   type internal_state  = int 
 
   type binding_type = agent_name * site_name 
@@ -1193,7 +1196,237 @@ module Cflow_linker =
             in 
             agent,interface)
     | _ -> event
- 
+
+  type agent_info = 
+    {
+      initial_step: refined_step ;
+      internal_states: internal_state SiteMap.t ;
+      bound_sites: SiteSet.t ;
+      sites_with_wrong_internal_state: SiteSet.t 
+    }
+
+  let convert_init x = 
+    let ((agent,site_list),action_list) = x in
+    let b = 
+      List.for_all 
+	(fun action -> 
+	  match 
+	    action 
+	  with 
+	  | Create _ 
+	  | Free _ -> true
+	  | _ -> false)
+	action_list 
+    in 
+    if b then
+      let map = 
+	List.fold_left
+	  (fun map (s,(i,_)) -> 
+	    match i 
+	    with 
+	    | Some u -> SiteMap.add s u map
+	    | None -> map)
+	  SiteMap.empty 
+	  site_list
+      in 
+      let agent_info = 
+	{
+	  initial_step=Init x;
+	  internal_states=map;
+	  bound_sites=SiteSet.empty;
+	  sites_with_wrong_internal_state=SiteSet.empty
+	}
+      in
+      Some ((agent_id_of_agent agent),agent_info)
+    else
+      None 
+
+  let as_init agent_info = 
+    SiteSet.is_empty agent_info.bound_sites 
+      && SiteSet.is_empty agent_info.sites_with_wrong_internal_state 
+
+  let mod_site site state (remanent,set) = 
+    let agid = agent_id_of_site site in 
+    let s_name = site_name_of_site site in 
+    try 
+      let ag_info = AgentIdMap.find agid remanent in 
+      let state_ref =  SiteMap.find s_name ag_info.internal_states in 
+      if state_ref = state 
+      then 
+	begin
+	  if SiteSet.mem s_name ag_info.sites_with_wrong_internal_state 
+	  then 
+	    let ag_info = 
+	      { 
+		ag_info with 
+		  sites_with_wrong_internal_state = 
+		  SiteSet.remove s_name ag_info.sites_with_wrong_internal_state}
+	    in 
+	    let remanent = AgentIdMap.add agid ag_info remanent in 
+	    begin
+	      if as_init ag_info 
+	      then 
+		remanent,
+		AgentIdSet.add agid set
+	      else 
+		remanent, 
+		set
+	    end 
+	  else remanent,set 
+	end 
+      else 
+	begin
+	  if SiteSet.mem s_name ag_info.sites_with_wrong_internal_state 
+	  then
+	    remanent,set 
+	  else 
+	    let ag_info = 
+	      { 
+		ag_info with 
+		  sites_with_wrong_internal_state = 
+		  SiteSet.add s_name ag_info.sites_with_wrong_internal_state}
+	    in 
+	    let remanent = AgentIdMap.add agid ag_info remanent in 
+	    begin
+	      if as_init ag_info 
+	      then 
+		remanent,set 
+	      else 
+		remanent, 
+		AgentIdSet.remove agid set
+	    end 
+	end 
+    with 
+  Not_found -> 
+    remanent,set 
+	
+  let unbind_side (agid,s_name) (remanent,set) = 
+     try 
+      let ag_info = AgentIdMap.find agid remanent in 
+      begin
+	if SiteSet.mem s_name ag_info.bound_sites 
+	then 
+	  let ag_info = 
+	    { 
+	      ag_info with 
+		bound_sites = 
+		SiteSet.remove s_name ag_info.bound_sites}
+	  in 
+	  let remanent = AgentIdMap.add agid ag_info remanent in 
+	  begin
+	    if as_init ag_info 
+	    then 
+	      remanent,
+		AgentIdSet.add agid set
+	    else 
+	      remanent, 
+	      set
+	  end 
+	else remanent,set 
+      end 
+     with
+  Not_found -> 
+    remanent,set 
+
+
+  let unbind site rem  = 
+    let agid = agent_id_of_site site in 
+    let s_name = site_name_of_site site in 
+     unbind_side (agid,s_name) rem 
+
+  let bind site (remanent,set) = 
+    let agid = agent_id_of_site site in 
+    let s_name = site_name_of_site site in 
+    try 
+      let ag_info = AgentIdMap.find agid remanent in 
+      begin
+	if SiteSet.mem s_name ag_info.bound_sites
+	then
+	  remanent,set 
+	else 
+	  let ag_info = 
+	    { 
+	      ag_info with 
+		bound_sites = 
+		SiteSet.add s_name ag_info.bound_sites}
+	  in 
+	  let remanent = AgentIdMap.add agid ag_info remanent in 
+	    begin
+	      if as_init ag_info 
+	      then 
+		remanent,set 
+	      else 
+		remanent, 
+		AgentIdSet.remove agid set
+	    end 
+      end 
+    with 
+      Not_found -> 
+	remanent,set 
+
+  let add_step parameter handler refined_step (step_list,remanent,error) = 
+      let error,step = step_of_refined_step parameter handler error refined_step in 
+      (step::step_list,remanent,error)
+	  
+  let fill_siphon parameter handler error refined_step_list  = 
+    let remanent = AgentIdMap.empty in 
+    let a,_,c = 
+      List.fold_left
+	(fun ((step_list:step list),remanent,error) refined_step -> 
+	  match
+	    (refined_step:refined_step)
+	  with 
+	  | Init init -> 
+	    let remanent = 
+	      match 
+		convert_init init 
+	      with
+	      | None -> remanent
+	      | Some (id,info) -> 
+		AgentIdMap.add id info remanent
+	    in 
+	    add_step parameter handler refined_step (step_list,remanent,error) 
+	  | Event (_,_,(action,side)) -> 
+	    let remanent,set = 
+	      List.fold_left 
+		(fun recur action -> 
+		    match action
+		    with 
+		    | Create _ -> recur
+		    | Mod_internal (site,state) -> 
+		      mod_site site state recur
+		    | Bind (site1,site2) | Bind_to (site1,site2)-> 
+		      bind site1 (bind site2 recur)
+		    | Unbind (site1,site2) -> 
+		      unbind site1 (unbind site2 recur)
+		    | Free site -> 
+		      unbind site recur
+		    | Remove agent -> recur )
+		(remanent,AgentIdSet.empty) action 
+	    in 
+	    let remanent,set = 
+	      Mods.Int2Set.fold 
+		unbind_side
+		(get_kasim_side_effects refined_step)
+		(remanent,set)
+	    in 
+	    AgentIdSet.fold 
+	      (fun id list -> 
+		try
+		  let list = add_step parameter handler (AgentIdMap.find id remanent).initial_step list
+		  in 
+		  list
+		with 
+		  Not_found -> list)
+	      set
+	      (add_step parameter handler refined_step (step_list,remanent,error))
+	  | Subs _ | Obs _ | Dummy _ -> 
+	    add_step parameter handler refined_step (step_list,remanent,error))
+	([],remanent,error) 
+	refined_step_list
+    in 
+    c,a 
+      
   let disambiguate event_list handler = 
     let max_id = 0 in 
     let used = AgentIdSet.empty in 

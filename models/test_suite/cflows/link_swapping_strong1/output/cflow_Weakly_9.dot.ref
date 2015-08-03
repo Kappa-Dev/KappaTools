@@ -4,18 +4,18 @@ digraph G{
  ranksep=.5 ;
 { rank = same ; "0" [shape=plaintext] ;
 node_1 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
-node_2 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_5 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 }
 { rank = same ; "1" [shape=plaintext] ;
-node_3 [label="A(x,y)->B(x,y)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_2 [label="A(x,y)->B(x,y)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_8 [label="A(x,y)->B(x,y)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "2" [shape=plaintext] ;
-node_4 [label="B(x,y)->A(x,y)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_3 [label="B(x,y)->A(x,y)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_9 [label="B(x,y)->A(x,y)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "3" [shape=plaintext] ;
-node_5 [label="A(x,y)->B(x,y)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_4 [label="A(x,y)->B(x,y)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_10 [label="A(x,y)->B(x,y)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "4" [shape=plaintext] ;
@@ -106,12 +106,12 @@ node_39 [label="GOAL", style=filled, fillcolor=red] ;
 "18" -> "19" [style="invis"];
 "19" -> "20" [style="invis"];
 "20" -> "21" [style="invis"];
-node_1 -> node_3
+node_1 -> node_2
+node_2 -> node_3
 node_3 -> node_4
-node_4 -> node_5
-node_5 -> node_6
+node_4 -> node_6
 node_6 -> node_7
-node_2 -> node_8
+node_5 -> node_8
 node_8 -> node_9
 node_9 -> node_10
 node_10 -> node_11

@@ -19,15 +19,16 @@ ____________________________________________________________
 ############################################################
 + Producing causal traces
 	 - refining events
-	 - Causal flow (without simplification) computation
-		 * Causal flow computation (10)
+	 - detecting siphons
+	 - computing causal past of each observed events (10)
 
 Stats:
- number of step   : 11031
- longest story    : 873
- average length   : 340.313
- geometric mean   : 421.939
+ number of step   : 11275
+ longest story    : 137
+ average length   : 30.9822
+ geometric mean   : 42.4273
 
+	 - causal & weak flow compression (10)
 
 ____________________________________________________________
 ############################################################
@@ -35,9 +36,7 @@ ____________________________________________________________
 
 
 
-
-
-+ Pretty printing 10 flows
++ Pretty printing 5 flows
 
 Simulation ended (eff.: 0.708215, detail below)
 	Valid embedding but no longer unary when required: 0.000000
