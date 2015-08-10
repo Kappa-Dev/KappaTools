@@ -25,7 +25,23 @@ let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "BDU analysis") message exn (fun () -> default)  
 
 let trace = false
-  
+
+(*let t parameter error =
+  let wl = IntWlist.empty in
+  let wl = IntWlist.push parameter error 1 wl in
+  Format.printf "%s\n" (IntWlist.print_work_list wl);
+  let wl = IntWlist.push parameter error 2 wl in
+  Format.printf "%s\n" (IntWlist.print_work_list wl);
+  let wl = IntWlist.push parameter error 3 wl in
+  Format.printf "%s\n" (IntWlist.print_work_list wl);
+  let wl = IntWlist.push parameter error 2 wl in
+  Format.printf "%s\n" (IntWlist.print_work_list wl);
+  let out, wl = IntWlist.pop parameter error wl in
+  Format.printf "%s\n" (IntWlist.print_work_list wl);
+  match out with
+    | None -> Format.printf "Out is none\n"
+    | Some o -> Format.printf "Out is %d\n" o*)
+
 (*---------------------------------------------------------------------------------*)
 (*common function for building bdu from a list of pair (site, state)*)
 
@@ -136,10 +152,6 @@ let collect_creation parameter error viewsrhs creation store_creation =
 	      l, (handler, bdu)
             ) agent.agent_interface ([], (handler, bdu_init))
         in
-        (*let _ =
-          fprintf stdout "bdu_creation\n";
-          handler.print_mvbdu stdout "" bdu
-        in*)
 	(*---------------------------------------------------------------------------*)
         (*get old*)
         let error, (old_list, (handler, old_bdu)) =

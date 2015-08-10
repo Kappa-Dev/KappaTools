@@ -673,41 +673,6 @@ module Make(Ord:OrderedType) =
         
     let bindings s =
       bindings_aux [] s
-        
-    (*Added*)
-    (*let rec min_elt_map map =
-      match map with
-        | Empty_map -> raise Not_found
-        | Node_map (Empty_map, key1, data1, right1, _) -> data1
-        | Node_map (left, _, _, _, _) -> min_elt_map map
-
-    let concat_map parameters mh map1 map2 =
-      match map1, map2 with
-        | Empty_map, _ -> mh, map2
-        | _, Empty_map -> mh, map1
-        | Node_map (left1, key1, data1, right1,_), _ ->
-          let mh', left2' =
-            remove_min_binding parameters mh map1 key1 data1 map2 in
-          join_map parameters mh' map1 key1 (min_elt_map map2) left2'
-
-    let suture_map parameters mh (left1, key1, value1, right1) (left2, b, right2) f =
-      match b with
-        | None -> raise Not_found
-        | Some bool ->
-          let mh', left' = f parameters mh left1 left2 in
-          let mh'', right' = f parameters mh' right1 right2 in
-          if bool then
-            join_map parameters mh'' left' key1 value1 right'
-          else
-            concat_map parameters mh'' left' right'
-              
-    let rec inter_map parameters mh map1 map2 =
-      match map1, map2 with
-        | Empty_map, _ 
-        | _, Empty_map -> mh, empty_map
-        | Node_map (left1, key1, data1, right1, _), _ ->
-          let mh', triple = split_map parameters mh key1 map2 in
-          suture_map parameters mh'  (left1, key1, data1, right1) triple inter_map*)
 
     let rec forall2iz p fail map1 map2 =
       if map1==map2 then true else 
