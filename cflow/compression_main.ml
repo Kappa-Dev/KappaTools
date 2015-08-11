@@ -18,7 +18,8 @@
   * et en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
-module D = Dag.Dag
+module U = Utilities 
+module D = U.D
 type secret_log_info = D.S.PH.B.PB.CI.Po.K.P.log_info
 type secret_step = D.S.PH.B.PB.CI.Po.K.step
 let init_secret_log_info = D.S.PH.B.PB.CI.Po.K.P.init_log_info
@@ -44,79 +45,8 @@ let th_of_int n =
 
 let dummy_weak = false
 
-let from_none_to_weak parameter handler log_info logger (error,counter,tick,blackboard,weakly_compressed_story_array,weakly_compression_faillure) ((event_id_list,list_order,event_list),step_list,list_info) = 
-  let info = List.hd list_info in 
-  let error,log_info,blackboard_tmp,list_order = 
-    let error,log_info,blackboard_tmp = D.S.sub parameter handler error log_info blackboard event_list in 
-    let error,list = D.S.PH.forced_events parameter handler error blackboard_tmp in 
-    let list_order = 
-      match list 
-      with 
-      | (list_order,_,_)::q -> list_order 
-      | _ -> [] 
-    in 
-    error,log_info,blackboard_tmp,list_order
-  in 
-  let error,log_info,blackboard_tmp,output,list = 
-    D.S.compress parameter handler error log_info blackboard_tmp list_order 
-  in
-  let log_info = D.S.PH.B.PB.CI.Po.K.P.set_story_research_time log_info in 
-  let error = 
-    if debug_mode
-    then 
-      let _ =  Debug.tag logger "\t\t * result"  in
-      let _ =
-        if D.S.PH.B.is_failed output 
-        then 
-          let _ = Format.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err "Fail_to_compress" in  error
-        else 
-          let _ = Format.fprintf parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel_err "Succeed_to_compress" in 
-          error
-      in 
-      error 
-    else 
-      error
-  in 
-  let error,weakly_compressed_story_array,weakly_compression_faillure,info = 
-    match 
-      list
-    with 
-    | None -> 
-       error,weakly_compressed_story_array,weakly_compression_faillure+1,None
-    | Some list -> 
-         let weak_event_list = D.S.translate_result list in 
-         let error,weak_event_list = D.S.PH.B.PB.CI.Po.K.clean_events parameter handler error weak_event_list in 
-         let grid = D.S.PH.B.PB.CI.Po.K.build_grid (List.rev_map (fun (x,y) -> x,y,dummy_weak) (List.rev list)) false handler in
-         let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
-         let error,graph = D.graph_of_grid parameter handler error grid in 
-         let error,prehash = D.prehash parameter handler error graph in 
-         let log_info = D.S.PH.B.PB.CI.Po.K.P.set_canonicalisation log_info in 
-         let info = 
-           match info 
-           with 
-           | None -> None 
-           | Some info -> 
-              let info = 
-                {info with Mods.story_id = counter }
-              in 
-              let info = Mods.update_profiling_info (D.S.PH.B.PB.CI.Po.K.P.copy log_info)  info 
-              in 
-              Some info
-         in 
-         error,(prehash,[grid,graph,None,(event_id_list,list_order,event_list),weak_event_list,list_info])::weakly_compressed_story_array,weakly_compression_faillure,info
-  in 
-  let error,log_info,blackboard = D.S.PH.B.reset_init parameter handler error log_info blackboard in 
-  error,counter,tick,blackboard,weakly_compressed_story_array,weakly_compression_faillure
+			       
 
-let from_none_to_weak_with_tick parameter handler log_info logger n_stories x y =
-  let error,counter,tick,blackboard,w1,w2 = from_none_to_weak parameter handler log_info logger x y in
-  let tick = Mods.tick_stories logger n_stories tick in 
-  error,counter+1,tick,blackboard,w1,w2
-
-let from_none_to_weak_with_tick_ext parameter handler log_info logger n_stories x (_,_,_,y,z,t) =
-  let error,counter,tick,blackboard,w1,w2 = from_none_to_weak parameter handler log_info logger x (y,z,t) in
-  let tick = Mods.tick_stories logger n_stories tick in 
-  error,counter+1,tick,blackboard,w1,w2				       
 let compress logger env state log_info step_list =
   let parameter = D.S.PH.B.PB.CI.Po.K.H.build_parameter () in
   let mode = parameter.D.S.PH.B.PB.CI.Po.K.H.compression_mode in
@@ -390,7 +320,7 @@ let compress logger env state log_info step_list =
 		      (prehash,[grid,graph,None,(event_id_list,list_order,event_list),[],[info]])::causal_story_array in 
                     error,counter+1,tick,blackboard,causal_story_array,causal_story_faillure
 		  else
-		    from_none_to_weak_with_tick  parameter handler log_info logger n_stories
+		    U.from_none_to_weak_with_tick  parameter handler log_info logger n_stories
 						 (error,counter,tick,blackboard,causal_story_array,causal_story_faillure)
 						 ((event_id_list,list_order,event_list),[],[info])
 		)
@@ -446,7 +376,7 @@ let compress logger env state log_info step_list =
                     List.fold_left 
                       (fun x (_,a) ->
                        List.fold_left 
-                         (from_none_to_weak_with_tick_ext parameter handler log_info logger n_stories)
+                         (U.from_none_to_weak_with_tick_ext parameter handler log_info logger n_stories)
 			 x
 			 a)
                     (error,1,tick,blackboard,[],0) 
