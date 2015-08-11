@@ -30,7 +30,7 @@ sig
   val push : Remanent_parameters_sig.parameters -> Exception.method_handler -> elt -> t -> t
   val pop : Remanent_parameters_sig.parameters -> Exception.method_handler -> t -> elt option * t
   val fold_left : ('a -> elt -> 'a) -> 'a -> t -> 'a
-  val print_work_list : t -> string
+  val union : Remanent_parameters_sig.parameters -> Exception.method_handler -> set -> set -> set
 end
     
 module WlMake (Ord: OrderedType) =
@@ -47,6 +47,12 @@ module WlMake (Ord: OrderedType) =
         let _, _, pool = x in
         WSet.is_empty_set pool
           
+      let union parameter error x y =
+        let error, result =
+          WSet.union parameter error x y
+        in
+        result
+        
       let push parameter error e x =
         let in_list, out_list, pool = x in
         if WSet.mem_set e pool
@@ -78,15 +84,12 @@ module WlMake (Ord: OrderedType) =
         let in_list, out_list, _ = x in
         List.fold_left f (List.fold_left f acc out_list) (List.rev in_list)
 
-      let print_work_list x =
-        fold_left (fun acc e -> Printf.sprintf "%s %d" acc e) "" x
-
      end)
 
-module IntOrd =
+module BduOrd =
 struct
-  type t = int
+  type t = bool Mvbdu_sig.mvbdu
   let compare = compare
 end
 
-module IntWlist = WlMake (IntOrd)
+module BduWlist = WlMake (BduOrd)

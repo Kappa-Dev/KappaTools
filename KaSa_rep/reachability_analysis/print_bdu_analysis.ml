@@ -14,30 +14,29 @@
 
 open Printf
 open Bdu_analysis_type
+open Memo_sig
 
 (************************************************************************************)
 (*PRINT*)   
 
-let print_bdu_list handler l = 
+let print_bdu_list handler l = (*REMOVE*)
   let rec aux acc =
     match acc with
       | [] -> ()
       | bdu :: tl ->
         let _ =
-          handler.Memo_sig.print_mvbdu stdout "" bdu
+          handler.print_mvbdu stdout "" bdu
         in
         aux tl
   in aux l
 
 let print_iteration parameter error result =
-  let (_, _, result) = result in
-  AgentMap.print error
-    (fun error parameter (handler, bdu) ->
-      let _ =
-	handler.Memo_sig.print_mvbdu stdout "" bdu
-      in
-      error
-    ) parameter result
+  AgentMap.print error (fun error parameter (handler, bdu) ->
+    let _ = handler.print_mvbdu stdout "" bdu
+    in
+    error
+  ) parameter result
+
 
 (************************************************************************************)
 (*MAIN PRINT*)

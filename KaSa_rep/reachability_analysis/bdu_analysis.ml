@@ -15,11 +15,12 @@
 open Printf
 open Cckappa_sig
 open Int_storage
-open Mvbdu_sig
 open Bdu_analysis_type
 open Print_bdu_analysis
-open Fifo
 open Boolean_mvbdu
+open Memo_sig
+open Mvbdu_sig
+open Fifo
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "BDU analysis") message exn (fun () -> default)  
@@ -62,8 +63,8 @@ let build_bdu parameter error pair_list =
   let (handler: ('b, 'a, 'c, bool, int) Memo_sig.handler) =
     remanent_bdu.Sanity_test_sig.mvbdu_handler
   in
-  let a_val = Mvbdu_sig.Leaf true in
-  let b_val = Mvbdu_sig.Leaf false in
+  let a_val = Leaf true in
+  let b_val = Leaf false in
   (*build bdu from a_val: 
     a',a'_id: output of build_already_compressed_cell;
     a'', a''_id: output of compress_node
@@ -130,14 +131,12 @@ let bdu_init parameter =
 
 let int_of_port port = port.site_state.min
 
-open Memo_sig
-
 let collect_creation parameter error viewsrhs creation store_creation =
   let error, (handler, bdu_init) = bdu_init parameter in
   List.fold_left (fun (error, store_creation) (agent_id, agent_type) ->
     let error, agent = AgentMap.get parameter error agent_id viewsrhs in
     match agent with
-      | None -> warn parameter error (Some "line 120") Exit store_creation
+      | None -> warn parameter error (Some "line 138") Exit store_creation
       | Some Ghost -> error, store_creation
       | Some Agent agent ->
         (*get the site and state on the rhs*)
@@ -181,203 +180,191 @@ let collect_creation parameter error viewsrhs creation store_creation =
 (************************************************************************************)    
 (*iteration fixpoint with creation rule: round-robin algorithm.
   Ex: X_0 U r_0(X_0) U r_1(X_0) U ...
+  - It is a enabled rule when the intersection between bdu_test and
+  remanent_bdu is different than empty set (is_belong).
+
 *)
 
 let is_belong bdu bdu_init =
-  let is_eq = Mvbdu_sanity.safety_equal_mvbdu bdu bdu_init  in
+  let is_eq = Mvbdu_sanity.safety_equal_mvbdu bdu bdu_init in
   if is_eq
   then
     true
   else
-    false 
+    false
 
-let iteration_aux parameter error viewslhs diff_direct bdu_creation store_result =
+(* Build a working list for test rule*)
+
+let work_list_lhs parameter error viewslhs store_result =
+  let error, (handler, bdu_init) = bdu_init parameter in
+  AgentMap.fold parameter error
+    (fun parameter error agent_id agent store_result ->
+      match agent with
+        | Ghost -> error, store_result
+        | Agent agent ->
+          let agent_type = agent.agent_name in
+          let site_list, bdu_test =
+            Site_map_and_set.fold_map 
+              (fun site port (current_list, _) ->
+                let state = int_of_port port in
+                let l = (site, state) :: current_list in
+                let error, (handler, bdu) =
+                  build_bdu parameter error l
+                in
+                l, bdu
+              ) agent.agent_interface ([], bdu_init)
+          in
+          (*create an empty work list*)
+          let wl = BduWlist.empty in
+          (*push bdu_test inside this work list*)
+          let in_list, out_list, pool = BduWlist.push parameter error bdu_test wl in
+          (*get old site list and work list*)
+          let error, (old_list, (old_in_list, old_out_list, old_pool)) =
+            match AgentMap.unsafe_get parameter error agent_type store_result with
+              | error, None -> error, ([], wl)
+              | error, Some (l, wl) -> error, (l, wl)
+          in
+          (*new*)
+          let new_list = List.concat [site_list; old_list] in
+          let new_pool = BduWlist.union parameter error pool old_pool in
+          let new_wl = 
+            (List.concat [in_list; old_in_list], List.concat [out_list; old_out_list], new_pool)
+          in
+          (*store*)
+          let error, store_result =
+            AgentMap.set
+              parameter
+              error
+              agent_type
+              (new_list, new_wl)
+              store_result
+          in
+          error, store_result
+    ) viewslhs store_result
+
+(*one step of checking it is an enabled rule*)
+let first_step parameter error agent_type handler bdu_creation bdu_remanent bdu_test bdu_direct store_result =
+  (*X is a union of bdu_creation and bdu_remanent started at bdu_init*)
+  let error, handler, bdu_X0 =
+    f parameter error bdu_creation
+      (boolean_mvbdu_or parameter handler error parameter bdu_creation) bdu_remanent
+  in
+  (*compute intersection of bdu_test and bdu_remanent*)
+  let error, handler, bdu_X = 
+    f parameter error bdu_X0
+      (boolean_mvbdu_and parameter handler error parameter bdu_X0) bdu_test
+  in
+  (*check if bdu_X is enable rule, if not then update bdu_X and store to
+    bdu_remanent else return bdu_remanent*)
+  if not (is_belong bdu_X bdu_remanent)
+  then
+    let error, handler, bdu_update =
+      f parameter error bdu_X0
+        (boolean_mvbdu_or parameter handler error parameter bdu_X0) bdu_direct
+    in
+    (*store to bdu_remanent*)
+    let error, store_result =
+      AgentMap.set
+        parameter
+        error
+        agent_type
+        (handler, bdu_update)
+        store_result
+    in
+    error, store_result
+  else
+    error, store_result
+
+let enable_rules parameter error agent_type in_list bdu_creation bdu_remanent bdu_direct
+    store_result =
+  let error, (handler, bdu_init) = bdu_init parameter in
+  List.fold_left (fun acc h ->
+    let error, store_result_enable = 
+      first_step parameter error agent_type handler bdu_creation bdu_remanent h bdu_direct 
+        store_result
+    in
+    store_result_enable
+  ) store_result in_list
+
+(*fixpoint iteration function*)
+let iteration_aux parameter error viewslhs result_lhs diff_direct bdu_creation store_result =
   let error, (handler, bdu_init) = bdu_init parameter in
   AgentMap.fold2_common parameter error
     (fun parameter error agent_id agent site_modif store_result ->
-      let (store_test, store_direct, store_iteration) = store_result in
-      (*if there is no modification*)
+      (*check if there is no modification*)
       if Site_map_and_set.is_empty_map site_modif.agent_interface
       then error, store_result
       else
         match agent with
           | Ghost -> error, store_result
           | Agent agent ->
-            (*compute bdu_test*)     
             let agent_type = agent.agent_name in
-            let (site_test_list, bdu_test_list) =
-              Site_map_and_set.fold_map 
+            (*put test rule inside work list*)
+            let error, wl = work_list_lhs parameter error viewslhs result_lhs in
+            let error, (_, (in_list, _, _)) =
+              match AgentMap.unsafe_get parameter error agent_type wl with
+                | error, None -> error, ([], BduWlist.empty)
+                | error, Some (l, wl) -> error, (l, wl)
+            in
+            (*getting bdu_direct*)
+            let (_, bdu_direct) =
+              Site_map_and_set.fold_map
                 (fun site port (current_list, _) ->
                   let state = int_of_port port in
                   let l = (site, state) :: current_list in
                   let error, (handler, bdu) =
                     build_bdu parameter error l
                   in
-                  l, [bdu]
-                ) agent.agent_interface ([], [])
+                  l, bdu
+                ) site_modif.agent_interface ([], bdu_init)
             in
-            let error, (old_test_list, old_bdu_test_list) =
-              match AgentMap.unsafe_get parameter error agent_type store_test with
-                | error, None -> error, ([], [])
-                | error, Some (l, ls) -> error, (l, ls)
+            (*bdu_remanent - is the old result*)
+            let error, handler, bdu_remanent =
+              match AgentMap.unsafe_get parameter error agent_type store_result with
+                | error, None -> error, handler, bdu_init
+                | error, Some (handler, bdu) -> error, handler, bdu
             in
-            let new_test_list = List.concat [List.rev site_test_list; old_test_list] in
-            let new_bdu_test_list = 
-              List.concat [List.rev bdu_test_list; old_bdu_test_list] in
-            let error, store_test =
-              AgentMap.set
-                parameter
-                error
+            (*go through the work list of test rule*)
+            let enable = 
+              enable_rules parameter error 
                 agent_type
-                (new_test_list, new_bdu_test_list)
-                store_test
+                in_list 
+                bdu_creation
+                bdu_remanent 
+                bdu_direct
+                store_result
             in
-            (*let bdu_test_queue =
-              List.fold_left (fun a b -> Queue.push b a) Queue.empty new_bdu_test_list
-            in
-            let _ =
-              Queue.iter (fun q ->
-                let _ = 
-                  fprintf stdout "bdu_test_queue:\n";
-                  handler.print_mvbdu stdout "" q
-                in
-                ()
-              ) bdu_test_queue
-            in*)
-            (*-------------------------------------------------------------------*)
-            (*compute bdu_direct*)
-             let (site_direct_list, bdu_direct_list) =
-              Site_map_and_set.fold_map 
-                (fun site port (current_list, _) ->
-                  let state = int_of_port port in
-                  let l = (site, state) :: current_list in
-                  let error, (handler, bdu) =
-                    build_bdu parameter error l
-                  in
-                  l, [bdu]
-                ) site_modif.agent_interface ([], [])
-            in
-            let error, (old_direct_list, old_bdu_direct_list) =
-              match AgentMap.unsafe_get parameter error agent_type store_direct with
-                | error, None -> error, ([], [])
-                | error, Some (l, ls) -> error, (l, ls)
-            in
-            let new_direct_list = List.concat [List.rev site_direct_list; old_direct_list] in
-            let new_bdu_direct_list = 
-              List.concat [List.rev bdu_direct_list; old_bdu_direct_list] in
-            let error, store_direct =
-              AgentMap.set
-                parameter
-                error
-                agent_type
-                (new_direct_list, new_bdu_direct_list)
-                store_direct
-            in
-            (*let bdu_direct_queue =
-              List.fold_left (fun a b -> Queue.push b a) Queue.empty new_bdu_direct_list
-            in
-            let _ =
-              Queue.iter (fun q ->
-                let _ = 
-                  fprintf stdout "bdu_direct_queue:\n";
-                  handler.print_mvbdu stdout "" q
-                in
-                ()
-              ) bdu_direct_queue
-            in*)
-
-            (*let t =
-              Queue.fold (fun a bdu_test ->
-                Queue.fold (fun b bdu_direct ->
-                  
-                ) (handler, bdu_init) bdu_direct_queue
-              ) (handler, bdu_init) bdu_test_queue
-            in*)
-
-            let (site_list, (handler, bdu_direct)) =
-              Site_map_and_set.fold_map 
-                (fun site port (current_list, _) ->
-                  let state = int_of_port port in
-                  let l = (site, state) :: current_list in
-                  let error, (handler, bdu) =
-                    build_bdu parameter error l
-                  in
-                  l, (handler, bdu)
-                ) site_modif.agent_interface ([], (handler, bdu_init))
-            in
-            (*-------------------------------------------------------------------*)
-            (*iteration*)
-            let error, (handler, old_bdu) =
-              match AgentMap.unsafe_get parameter error agent_type store_iteration with
+            (*get bdu_enable*)(*TO BE TEST*)
+            let error, (handler, bdu_enable) =
+              match AgentMap.unsafe_get parameter error agent_type enable with
                 | error, None -> error, (handler, bdu_init)
                 | error, Some (handler, bdu) -> error, (handler, bdu)
             in
-            let error, handler, bdu_X =
-              f parameter error bdu_init
-                (boolean_mvbdu_or parameter handler error parameter bdu_init) bdu_creation
-            in
-            (*Testing first then do the iteration*)
-            let _ =
-              fprintf stdout "bdu_X\n";
-              handler.Memo_sig.print_mvbdu stdout "" bdu_X;
-            in
-            (*iteration in a bdu_test working list*)
-            (*let handler, bdu_iteration =
-              Queue.fold (fun a bdu_test ->
-                (*test if this bdu is an enabled rule or not*)
-                let error, handler, bdu_X_test =
-                  f parameter error bdu_X
-                    (boolean_mvbdu_and parameter handler error parameter bdu_X) bdu_test
-                in
-               
-                (*-------------------------------------------------------------------*)
-                if not (is_belong bdu_X_test bdu_init)
-                then
-                  let error, handler, bdu_update =
-                    f parameter error bdu_X
-                      (boolean_mvbdu_or parameter handler error parameter bdu_X) bdu_direct
-                  in
-                  (*union the result*)
-                  (*let error, handler, bdu_iteration =
-                    f parameter error bdu_update
-                      (boolean_mvbdu_or parameter handler error parameter bdu_update)
-                      old_bdu
-                  in*)
-                  (*let _ =
-                    fprintf stdout "update\n";
-                    handler.Memo_sig.print_mvbdu stdout "" bdu_update;
-                    fprintf stdout "old_bdu\n";
-                    handler.Memo_sig.print_mvbdu stdout "" old_bdu
-                  in*)
-                  (handler, bdu_update)
-                else
-                  let _ = fprintf stdout "false\n" in
-                  (*taking old_bdu union with iteration before?TODO*)
-                  handler, old_bdu
-              ) (handler, bdu_X) bdu_test_queue
+            (*new bdu_remanent update *)
+            (*let error, handler, bdu_new_remanent =
+              f parameter error bdu_remanent
+                (boolean_mvbdu_or parameter handler error parameter bdu_remanent) bdu_enable
             in*)
-            let error, store_iteration =
+            (*store*)
+            let error, store_result =
               AgentMap.set
                 parameter
                 error
                 agent_type
-                (handler, bdu_X)
-                store_iteration
-            in
-            error, (store_test, store_direct, store_iteration)
+                (handler, bdu_enable)
+                store_result
+            in            
+            error, store_result
     ) viewslhs diff_direct store_result
 
-let iteration_fixpoint parameter error viewslhs diff_direct bdu_creation store_result =
+let iteration parameter error viewslhs result_lhs diff_direct creation store_result =
   AgentMap.fold parameter error
     (fun parameter error agent_type (_, (handler, bdu_creation)) store_result ->
-      iteration_aux
-        parameter
-        error
-        viewslhs
-        diff_direct
-        bdu_creation
-        store_result
-    )  bdu_creation store_result
+      let error, store_result =
+        iteration_aux parameter error viewslhs result_lhs diff_direct bdu_creation store_result
+      in
+      error, store_result
+    ) creation store_result
 
 (************************************************************************************)
 (*RULE*)
@@ -394,11 +381,22 @@ let scan_rule parameter error handler rule rules store_result =
       store_result.store_creation
   in
   (*------------------------------------------------------------------------------*)
-  let error, store_iteration =
-    iteration_fixpoint
+  (*work list of test rule*)
+  let error, store_wl_lhs =
+    work_list_lhs
       parameter
       error
       rule.rule_lhs.views
+      store_result.store_wl_lhs
+  in
+  (*------------------------------------------------------------------------------*)
+  (*fixpoint iteration*)
+  let error, store_iteration =
+    iteration
+      parameter
+      error
+      rule.rule_lhs.views
+      store_wl_lhs
       rule.diff_direct
       store_creation
       store_result.store_iteration
@@ -407,7 +405,8 @@ let scan_rule parameter error handler rule rules store_result =
   (*store*)
   error,
   {
-    store_creation  = store_creation;
+    store_creation = store_creation;
+    store_wl_lhs   = store_wl_lhs;
     store_iteration = store_iteration;
   }   
   
@@ -416,13 +415,13 @@ let scan_rule parameter error handler rule rules store_result =
 
 let scan_rule_set parameter error handler rules =
   let error, init_creation  = AgentMap.create parameter error 0 in
-  let error, init_test      = AgentMap.create parameter error 0 in
-  let error, init_direct    = AgentMap.create parameter error 0 in
+  let error, init_test_wl   = AgentMap.create parameter error 0 in
   let error, init_iteration = AgentMap.create parameter error 0 in
   let init_bdu =
     {
-      store_creation  = init_creation;
-      store_iteration = (init_test, init_direct, init_iteration);
+      store_creation = init_creation;
+      store_wl_lhs   = init_test_wl;
+      store_iteration = init_iteration;
     }
   in
   (*------------------------------------------------------------------------------*)
@@ -454,4 +453,3 @@ let bdu_main parameter error handler cc_compil =
   let error, result = scan_rule_set parameter error handler cc_compil.rules in
   let _ = print_result parameter error result in
   error, result
-
