@@ -24,23 +24,21 @@ module AgentMap = Quick_Nearly_inf_Imperatif
 
 type pair_site = (int * int) list
 
-type bdu = ((Boolean_mvbdu.memo_tables, Boolean_mvbdu.mvbdu_dic,
-	     Boolean_mvbdu.list_dic, bool, int)
-	       Memo_sig.handler * bool Mvbdu_sig.mvbdu) 
- 
-type bdu_list = ((Boolean_mvbdu.memo_tables, Boolean_mvbdu.mvbdu_dic,
-	          Boolean_mvbdu.list_dic, bool, int)
-	            Memo_sig.handler * bool Mvbdu_sig.mvbdu list)
+type bdu = bool Mvbdu_sig.mvbdu
+
+type handler = (Boolean_mvbdu.memo_tables, Boolean_mvbdu.mvbdu_dic,
+	        Boolean_mvbdu.list_dic, bool, int) Memo_sig.handler
+
+type handler_bdu = handler * bdu
    
-type pair_bdu  = pair_site * bdu
+type site_bdu  = pair_site * handler_bdu
       
 type triple_wl = BduWlist.WSet.elt list * BduWlist.WSet.elt list * BduWlist.WSet.set
 
-type test_wl = pair_site * triple_wl
+type test_wl = pair_site * handler * triple_wl
 
 type bdu_analysic =
     {
-      store_creation  : pair_bdu AgentMap.t;
-      store_wl_lhs    : test_wl AgentMap.t;
-      store_iteration : bdu AgentMap.t;
+      store_creation  : site_bdu AgentMap.t;
+      store_iteration : test_wl AgentMap.t * handler_bdu AgentMap.t;
     }

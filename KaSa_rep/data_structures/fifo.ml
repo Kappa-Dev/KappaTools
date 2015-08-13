@@ -23,14 +23,12 @@ module type Work_list =
 sig
   type elt
   type t
-  type set
 
-  val empty : elt list -> elt list -> set
-  val is_empty : set -> bool
+  val empty : t
+  val is_empty : t -> bool
   val push : Remanent_parameters_sig.parameters -> Exception.method_handler -> elt -> t -> t
   val pop : Remanent_parameters_sig.parameters -> Exception.method_handler -> t -> elt option * t
   val fold_left : ('a -> elt -> 'a) -> 'a -> t -> 'a
-  val union : Remanent_parameters_sig.parameters -> Exception.method_handler -> set -> set -> set
 end
     
 module WlMake (Ord: OrderedType) =
@@ -46,13 +44,7 @@ module WlMake (Ord: OrderedType) =
       let is_empty x =
         let _, _, pool = x in
         WSet.is_empty_set pool
-          
-      let union parameter error x y =
-        let error, result =
-          WSet.union parameter error x y
-        in
-        result
-        
+
       let push parameter error e x =
         let in_list, out_list, pool = x in
         if WSet.mem_set e pool
