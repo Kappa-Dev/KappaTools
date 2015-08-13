@@ -27,22 +27,6 @@ let warn parameters mh message exn default =
 
 let trace = false
 
-(*let t parameter error =
-  let wl = IntWlist.empty in
-  let wl = IntWlist.push parameter error 1 wl in
-  Format.printf "%s\n" (IntWlist.print_work_list wl);
-  let wl = IntWlist.push parameter error 2 wl in
-  Format.printf "%s\n" (IntWlist.print_work_list wl);
-  let wl = IntWlist.push parameter error 3 wl in
-  Format.printf "%s\n" (IntWlist.print_work_list wl);
-  let wl = IntWlist.push parameter error 2 wl in
-  Format.printf "%s\n" (IntWlist.print_work_list wl);
-  let out, wl = IntWlist.pop parameter error wl in
-  Format.printf "%s\n" (IntWlist.print_work_list wl);
-  match out with
-    | None -> Format.printf "Out is none\n"
-    | Some o -> Format.printf "Out is %d\n" o*)
-
 (*---------------------------------------------------------------------------------*)
 (*common function for building bdu from a list of pair (site, state)*)
 
@@ -277,7 +261,7 @@ let is_enable parameter error bdu_creation bdu_test bdu_direct =
 (************************************************************************************)
 (*iteration function*)
 
-let iteration_aux parameter error viewslhs diff_direct bdu_creation store_result =
+let fixpoint_iteration parameter error viewslhs diff_direct result_creation store_result =
   let error, (handler, bdu_init) = bdu_init parameter in
   AgentMap.fold2_common parameter error 
     (fun parameter error agent_id agent site_modif store_result ->
@@ -286,6 +270,11 @@ let iteration_aux parameter error viewslhs diff_direct bdu_creation store_result
         | Agent agent ->
           let store_wl_lhs, store_iteration = store_result in
           let agent_type = agent.agent_name in
+          let error, (l, (handler, bdu_creation)) =
+            match AgentMap.unsafe_get parameter error agent_type result_creation with
+              | error, None -> error, ([], (handler, bdu_init))
+              | error, Some (l, (handler, bdu)) -> error, (l, (handler, bdu))
+          in
           (*------------------------------------------------------------------------------*)
           (*compute test rule*)
           let site_list, bdu_test = common_site_bdu parameter error agent bdu_init in
@@ -312,21 +301,6 @@ let iteration_aux parameter error viewslhs diff_direct bdu_creation store_result
           error, (store_wl_lhs, store_iteration)
     ) viewslhs diff_direct store_result
 
-let iteration parameter error viewslhs result_wl diff_direct result_creation store_iteration =
-  AgentMap.fold parameter error
-    (fun parameter error agent_type (_, (handler, bdu_creation)) store_iteration ->
-      let error, store_iteration =
-        iteration_aux
-          parameter
-          error
-          viewslhs
-          diff_direct
-          bdu_creation
-          store_iteration
-      in
-      error, store_iteration
-    ) result_creation store_iteration
-
 (************************************************************************************)
 (*RULE*)
 
@@ -344,7 +318,7 @@ let scan_rule parameter error handler rule rules store_result =
   (*------------------------------------------------------------------------------*)
   (*fixpoint iteration*)
   let error, store_iteration =
-    iteration_aux
+    fixpoint_iteration 
       parameter
       error
       rule.rule_lhs.views

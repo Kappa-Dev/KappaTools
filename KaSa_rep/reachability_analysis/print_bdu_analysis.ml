@@ -19,7 +19,17 @@ open Memo_sig
 (************************************************************************************)
 (*PRINT*)   
 
-let print_bdu_list handler l = (*REMOVE*)
+let rec print_bdu_list handler l =
+  match l with
+    | [] -> ()
+    | bdu :: tl ->
+      let _ =
+        fprintf stdout "element of list\n";
+        handler.print_mvbdu stdout "" bdu
+      in
+      print_bdu_list handler tl
+
+(*let print_bdu_list handler l =
   let rec aux acc =
     match acc with
       | [] -> ()
@@ -29,7 +39,7 @@ let print_bdu_list handler l = (*REMOVE*)
           handler.print_mvbdu stdout "" bdu
         in
         aux tl
-  in aux l
+  in aux l*)
 
 let print_wl handler wl =
   let in_list, out_list, pool = wl in
@@ -45,6 +55,14 @@ let print_wl handler wl =
     ()
   ) pool
 
+let print_creation parameter error result =
+  AgentMap.print error (fun error parameter (l, (handler, bdu)) ->
+    let _ =
+      handler.print_mvbdu stdout "" bdu
+    in
+    error
+  ) parameter result
+
 let print_iteration parameter error result =
   let wl_lhs, iteration = result in
   let _ =
@@ -53,8 +71,7 @@ let print_iteration parameter error result =
         print_wl handler wl
       in
       error
-    )
-      parameter wl_lhs
+    ) parameter wl_lhs
   in
   let _ = fprintf stdout "BDU DIRECT\n" in
   AgentMap.print error (fun error parameter (handler, bdu) ->
@@ -71,6 +88,8 @@ let print_iteration parameter error result =
 let print_result parameter error result =
   let error =
     fprintf stdout "--------------------------------------------\n";
+    fprintf stdout "BDU creation rules\n";
+    print_creation parameter error result.store_creation;
     fprintf stdout "BDU iteration rules\n";
     print_iteration parameter error result.store_iteration
   in
