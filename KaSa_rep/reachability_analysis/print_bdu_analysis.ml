@@ -29,18 +29,6 @@ let rec print_bdu_list handler l =
       in
       print_bdu_list handler tl
 
-(*let print_bdu_list handler l =
-  let rec aux acc =
-    match acc with
-      | [] -> ()
-      | bdu :: tl ->
-        let _ =
-          fprintf stdout "element of list\n";
-          handler.print_mvbdu stdout "" bdu
-        in
-        aux tl
-  in aux l*)
-
 let print_wl handler wl =
   let in_list, out_list, pool = wl in
   fprintf stdout "In_list:\n";
@@ -63,34 +51,55 @@ let print_creation parameter error result =
     error
   ) parameter result
 
-let print_iteration parameter error result =
-  let wl_lhs, iteration = result in
-  let _ =
-    AgentMap.print error (fun error parameter (_, handler, wl) ->
-      let _ =
-        print_wl handler wl
-      in
-      error
-    ) parameter wl_lhs
-  in
-  let _ = fprintf stdout "BDU DIRECT\n" in
-  AgentMap.print error (fun error parameter (handler, bdu) ->
+let print_wl_lhs parameter error result =
+  AgentMap.print error (fun error parameter (_, handler, wl) ->
     let _ =
-      handler.print_mvbdu stdout "" bdu
+      print_wl handler wl
     in
     error
-  ) parameter iteration
+  ) parameter result
+
+let print_wl_direct parameter error result =
+  AgentMap.print error (fun error parameter (_, handler, wl) ->
+    let _ =
+      print_wl handler wl
+    in
+    error
+  ) parameter result
+
+let print_iteration parameter error result =
+  AgentMap.print error (fun error parameter (handler, set) ->
+    let _ =
+      Bdu_iterate.iter_set (fun elt ->
+        let _ =
+          handler.print_mvbdu stdout "" elt
+        in
+        ()
+      ) set
+    in
+    error
+  ) parameter result
+
+let print_result parameter error result =
+  let wl_lhs, wl_direct, iteration = result in
+  let _ = fprintf stdout "BDU LHS\n" in
+  let _ = print_wl_lhs parameter error wl_lhs in
+  let _ = fprintf stdout "BDU DIRECT\n" in
+  let _ = print_wl_direct parameter error wl_direct in
+  let _ = fprintf stdout "BDU Iteration\n" in
+  print_iteration parameter error iteration
 
 
 (************************************************************************************)
 (*MAIN PRINT*)
 
 let print_result parameter error result =
+  (*t wl_lhs, wl_direct, bdu_iteration = result.store_iteration in*)
   let error =
     fprintf stdout "--------------------------------------------\n";
     fprintf stdout "BDU creation rules\n";
     print_creation parameter error result.store_creation;
     fprintf stdout "BDU iteration rules\n";
-    print_iteration parameter error result.store_iteration
+    print_result parameter error result.store_iteration
   in
-    error
+  error

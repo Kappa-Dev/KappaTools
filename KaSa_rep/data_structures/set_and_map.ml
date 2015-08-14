@@ -24,8 +24,7 @@ module type Set_and_Map = sig
   type elt
   type set
   type key
-  type 'a map 
-    
+  type 'a map    
     
   val empty_set:set
   val is_empty_set:set -> bool
@@ -52,6 +51,10 @@ module type Set_and_Map = sig
   val max_elt: set -> elt 
   val choose: set -> elt
   val split: Remanent_parameters_sig.parameters ->Exception.method_handler -> elt -> set -> Exception.method_handler * (set * bool * set)
+
+  (*------------------------------------------------------------------------------*)
+  (*map interface*)
+
   val empty_map: 'a map
   val is_empty_map: 'a map -> bool
   val add_map: Remanent_parameters_sig.parameters ->Exception.method_handler -> key -> 'a -> 'a map -> Exception.method_handler * 'a map
@@ -61,14 +64,12 @@ module type Set_and_Map = sig
   val remove_map: Remanent_parameters_sig.parameters ->Exception.method_handler -> key -> 'a map -> Exception.method_handler * 'a map
   val mem_map:  key -> 'a map -> bool
   val iter_map: (key -> 'a -> unit) -> 'a map -> unit
-
   val map_map: ('a -> 'b) -> 'a map -> 'b map
   val mapi_map: (key -> 'a -> 'b) -> 'a map -> 'b map
   val fold_map: (key -> 'a -> 'b -> 'b) -> 'a map -> 'b -> 'b 
   val join_map: Remanent_parameters_sig.parameters->Exception.method_handler -> 'a map -> key -> 'a -> 'a map -> Exception.method_handler * 'a map
   val split_map: Remanent_parameters_sig.parameters->Exception.method_handler-> key -> 'a map -> Exception.method_handler * ('a map * 'a option * 'a map)
   val union_map: Remanent_parameters_sig.parameters->Exception.method_handler-> 'a map -> 'a map -> Exception.method_handler * 'a map
-(*  val inter_map: Remanent_parameters_sig.parameters->Exception.method_handler-> 'a map -> 'a map -> Exception.method_handler * 'a map*)
   val bindings : 'a map -> (key * 'a) list
   val equal_map: ('a -> 'a -> bool) -> 'a map -> 'a map -> bool
   val update_map: Remanent_parameters_sig.parameters ->Exception.method_handler -> 'a map -> 'a map -> Exception.method_handler * 'a map    
@@ -112,13 +113,15 @@ module Make(Ord:OrderedType) =
       let height_right = height_set right in 
       if height_left > height_right + 2 then begin
         match left with 
-          |   Empty_set -> invalid_arg_set parameters mh (Some "balance_set,line 94") (invalid_arg "Set_and_map.balance_set")
+          |   Empty_set -> invalid_arg_set parameters mh 
+            (Some "balance_set,line 94") (invalid_arg "Set_and_map.balance_set")
           | Node_set(leftleft,leftvalue,leftright,_) -> 
             if height_set leftleft >= height_set leftright then 
               mh,node_set leftleft leftvalue (node_set leftright value right)
             else begin
               match leftright with 
-                | Empty_set -> invalid_arg_set parameters mh (Some "balance_set,line 100") (invalid_arg "Set_and_Map.balance_set")
+                | Empty_set -> invalid_arg_set parameters mh 
+                  (Some "balance_set,line 100") (invalid_arg "Set_and_Map.balance_set")
                 | Node_set(leftrightleft,leftrightvalue,leftrightright,_) ->
                   (mh,
                    node_set 
@@ -128,13 +131,15 @@ module Make(Ord:OrderedType) =
             end
       end else if height_right > height_left + 2 then begin 
         match right with 
-          | Empty_set -> invalid_arg_set parameters mh (Some  "balance_set,line 110") (invalid_arg "Set_and_Map.balance_set")
+          | Empty_set -> invalid_arg_set parameters mh 
+            (Some  "balance_set,line 110") (invalid_arg "Set_and_Map.balance_set")
           | Node_set(rightleft,rightvalue,rightright,_) -> 
             if height_set rightright >= height_set rightleft then 
               mh,node_set (node_set left value rightleft) rightvalue rightright
             else begin
               match rightleft with 
-                | Empty_set -> invalid_arg_set parameters mh (Some "balance_set,line 116") (invalid_arg "Set_and_Map.balance_set")
+                | Empty_set -> invalid_arg_set parameters mh 
+                  (Some "balance_set,line 116") (invalid_arg "Set_and_Map.balance_set")
                 | Node_set(rightleftleft,rightleftvalue,rightleftright,_) -> 
                   mh,node_set 
                     (node_set left value rightleftleft)
@@ -161,7 +166,8 @@ module Make(Ord:OrderedType) =
       match left,right with 
         | Empty_set,_ -> add_set parameters mh value right 
         | _,Empty_set -> add_set parameters mh value left
-        | Node_set(leftleft,leftvalue,leftright,leftheight),Node_set(rightleft,rightvalue,rightright,rightheight) -> 
+        | Node_set(leftleft,leftvalue,leftright,leftheight),
+          Node_set(rightleft,rightvalue,rightright,rightheight) -> 
           if leftheight > rightheight + 2 
           then 
             let mh', right' = join_set parameters mh leftright value right in  
@@ -187,7 +193,8 @@ module Make(Ord:OrderedType) =
 
     let rec remove_min_elt_set parameters mh set =
       match set with 
-        | Empty_set -> invalid_arg_set parameters mh (Some "remove_min_elt_set,line 169") (invalid_arg "Set_and_Map.remove_min_elt_set")
+        | Empty_set -> invalid_arg_set parameters mh 
+          (Some "remove_min_elt_set,line 169") (invalid_arg "Set_and_Map.remove_min_elt_set")
         | Node_set(Empty_set,_,right,_) -> mh,right
         | Node_set(left,value,right,_) -> 
           let mh', left' = remove_min_elt_set parameters mh left in 
@@ -403,9 +410,11 @@ module Make(Ord:OrderedType) =
           | Node_set(left,value,right,_) -> elements_aux (value::(elements_aux accu right)) left
       in elements_aux [] set
       
-      
-    let choose = min_elt          
-      
+    let choose = min_elt
+
+    (************************************************************************************)
+    (* Map implementation*)
+
     type key = Ord.t
     type 'data map =  
         Empty_map 
@@ -429,7 +438,9 @@ module Make(Ord:OrderedType) =
         
     let rec find_map parameters rh key map = 
       match map with  
-        | Empty_map -> Exception.warn parameters rh (Some "Set_and_map.ml") (Some "find_map, line 405") Not_found (fun () -> raise Not_found)
+        | Empty_map -> Exception.warn parameters rh 
+          (Some "Set_and_map.ml") (Some "find_map, line 405") 
+          Not_found (fun () -> raise Not_found)
         | Node_map (left,key_map,data,right,_) -> 
           let cmp = compare key key_map in 
           if cmp = 0 then rh,data
@@ -461,7 +472,9 @@ module Make(Ord:OrderedType) =
             else 
               begin
                 match right with 
-                    Empty_map -> invalid_arg_map parameters rh (Some "balance_map, line 424") (invalid_arg "Set_and_map.balance_map")
+                    Empty_map -> invalid_arg_map parameters rh 
+                      (Some "balance_map, line 424")
+                      (invalid_arg "Set_and_map.balance_map")
                   | Node_map (left0,key0,data0,right0,_) -> 
                     begin
                       if height_map left0 <= height_map right0 
@@ -470,7 +483,9 @@ module Make(Ord:OrderedType) =
                       else
                         begin
                           match left0 with 
-                            | Empty_map -> invalid_arg_map parameters rh (Some "Set_and_map.balance_map, line 433") (invalid_arg "Set_and_map.balance_map")
+                            | Empty_map -> invalid_arg_map parameters rh 
+                              (Some "Set_and_map.balance_map, line 433")
+                              (invalid_arg "Set_and_map.balance_map")
                             | Node_map (left1,key1,data1,right1,_) -> 
                               rh,  
                               create_map
@@ -485,7 +500,8 @@ module Make(Ord:OrderedType) =
         else
           begin
             match left with 
-              | Empty_map -> invalid_arg_map parameters rh (Some "balance_map,448") (invalid_arg "Set_and_map.balance_map") 
+              | Empty_map -> invalid_arg_map parameters rh 
+                (Some "balance_map,448") (invalid_arg "Set_and_map.balance_map") 
               | Node_map (left0,key0,data0,right0,_) -> 
                 begin
                   if height_map right0 <= height_map left0 
@@ -494,7 +510,8 @@ module Make(Ord:OrderedType) =
                   else 
                     begin
                       match right0 with 
-                        | Empty_map -> invalid_arg_map parameters rh (Some "balance_map,457") (invalid_arg "Set_and_map.balance_map")
+                        | Empty_map -> invalid_arg_map parameters rh 
+                          (Some "balance_map,457") (invalid_arg "Set_and_map.balance_map")
                         | Node_map (left1,key1,data1,right1,_) -> 
                           rh,
                           create_map
@@ -739,7 +756,8 @@ module Make(Ord:OrderedType) =
     let rec fold2z_map parameters rh f map1 map2 res =
       match map1,map2 with 
         | Empty_map,Empty_map -> rh,res 
-        | Empty_map , _ | _ , Empty_map -> invalid_arg_def parameters rh (Some "fold2_map,line 683") Exit res
+        | Empty_map , _ | _ , Empty_map -> 
+          invalid_arg_def parameters rh (Some "fold2_map,line 683") Exit res
         | Node_map(left1,key1,data1,right1,_),_ -> 
           let rh',(left2,data2,right2) = split_map parameters rh key1 map2 in 
           begin 
@@ -820,9 +838,4 @@ module Make(Ord:OrderedType) =
                 error,o1,o2 
           end 
             
-            
    end:Set_and_Map with type key = Ord.t and type elt = Ord.t)
-    
-    
-    
-    
