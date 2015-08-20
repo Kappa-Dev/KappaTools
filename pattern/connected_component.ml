@@ -367,7 +367,7 @@ let cc_map env = IntMap.fold (fun i x out ->
 let print f env =
   Format.fprintf
     f "@[<v>%a@]"
-    (Pp.set ~trailing:Pp.space IntMap.bindings Pp.space
+    (Pp.set IntMap.bindings Pp.space
 	    (fun f (_,p) ->
 	     Format.fprintf f "@[<hov 2>(%a)@ -> @[<h>%a@]@ %t-> @[(%a)@]@]"
 			    (Pp.list Pp.space Format.pp_print_int) p.fathers

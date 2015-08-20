@@ -25,7 +25,10 @@ let elt_id ?(kind="element") nd (s,pos) =
     raise (ExceptionDefn.Malformed_Decl
 	     (Format.asprintf "\"%s\" is not a declared %s." s kind,pos))
 
-let print pr f nd =
-  Pp.array Pp.space (fun i f ((n,_),el) ->
-		     Format.fprintf f "@[%i>%s: @[<2>%a@]@]"
-				    i n pr el) f nd.decls
+let print ~sep pp f nd =
+  Pp.array sep (fun i f ((n,_),el) -> pp i n f el) f nd.decls
+let debug_print pr f nd =
+  print ~sep:Pp.space (fun i n f el ->
+		       Format.fprintf f "@[%i>%s: @[<2>%a@]@]"
+				      i n pr el)
+	f nd

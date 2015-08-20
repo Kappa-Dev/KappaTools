@@ -211,6 +211,10 @@ let update_outdated_activities ~get_alg store env counter state activities =
 		 counter state ~get_alg rule.Primitives.rate in
 	   let cc_va =
 	     raw_instance_number state [rule.Primitives.connected_components] in
+	   let () =
+	     if !Parameter.debugModeOn then
+	       Format.printf "@[Rule %a has now %i instances.@]@."
+			     (Environment.print_rule ~env) i cc_va in
 	   let act =
 	     if cc_va = 0 then 0. else rate *. float_of_int cc_va in
 	   store i act activities

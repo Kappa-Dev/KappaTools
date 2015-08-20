@@ -14,4 +14,10 @@ val size : 'a t -> int
 val elt_name : 'a t -> int -> string
 val elt_id : ?kind:string -> 'a t -> string Term.with_pos -> int
 
-val print : (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
+val print :
+  sep:(Format.formatter -> unit) ->
+  (int -> string -> Format.formatter -> 'a -> unit) ->
+  Format.formatter -> 'a t -> unit
+
+val debug_print :
+  (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit

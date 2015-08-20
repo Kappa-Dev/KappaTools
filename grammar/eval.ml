@@ -499,7 +499,7 @@ let compile_rules algs tokens contact_map domain rules =
       (fun (domain,free_rid,acc) (rule_label,rule) ->
        let (domain',free_rid',cr) =
 	 rules_of_ast algs tokens ?free_rid contact_map domain rule_label rule in
-       domain',free_rid',List.append cr acc)
+       domain',free_rid',List.rev_append cr acc)
       (domain,Some 0,[]) rules in
   fdomain,List.rev frules
 
@@ -545,25 +545,17 @@ let initialize logger overwrite result =
   let env =
     Environment.init sigs_nd tk_nd alg_nd rule_nd
 		     (Array.of_list (List.rev obs)) (Array.of_list pert) in
-  let () =
-    if !Parameter.compileModeOn then
-      Format.eprintf
-	"@[<v>%a@]@."
-	(Pp.list
-	   Pp.space
-	   (fun f (_,r) ->
-	    Format.fprintf f "@[%a@]" (Kappa_printer.elementary_rule ~env) r))
-	compiled_rules in
-
 
   Debug.tag logger "\t -initial conditions";
   let domain,graph =
     init_graph_of_result
       alg_nd tk_nd tracking_enabled contact_map counter env domain result in
   let () =
-    if !Parameter.compileModeOn then
-      Format.eprintf "@[<v>Domain:@,@[%a@]@,Intial graph;@,@]%a@."
-		     Connected_component.Env.print domain
-		     (Rule_interpreter.print env) graph in
+    if !Parameter.compileModeOn || !Parameter.debugModeOn then
+      Format.eprintf
+	"@[<v>@[<v 2>Environment:@,%a@]@,@[<v 2>Domain:@,@[%a@]@]@,@[<v 2>Intial graph;@,%a@]@]@."
+	Kappa_printer.env env
+	Connected_component.Env.print domain
+	(Rule_interpreter.print env) graph in
   let state = State_interpreter.initial env counter graph stops in
   (Debug.tag logger "\t Done"; (env, domain, counter, graph, state))

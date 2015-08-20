@@ -32,3 +32,9 @@ val print_token : ?env:t -> Format.formatter -> int -> unit
 
 val get_desc : string -> t -> Format.formatter
 val close_desc : t -> unit
+
+val print :
+  (t -> Format.formatter -> Alg_expr.t -> unit) ->
+  (t -> Format.formatter -> Primitives.elementary_rule -> unit) ->
+  (t -> Format.formatter -> Primitives.perturbation -> unit) ->
+  Format.formatter -> t -> unit

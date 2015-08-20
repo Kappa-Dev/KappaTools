@@ -105,3 +105,32 @@ let map_observables f env =
   Array.map (fun (x,_) -> f x) env.observables
 let iteri_rules f env =
     Array.iteri (fun i (_,rule) -> f i rule) env.rules.NamedDecls.decls
+
+let print pr_alg pr_rule pr_pert f env =
+  let () =
+    Format.fprintf
+      f "@[<v>@[<v 2>Signatures:@,%a@]@,@[<2>Tokens:@ %a@]@,"
+      Signature.print env.signatures
+      (NamedDecls.print ~sep:Pp.space (fun _ n f () -> Format.pp_print_string f n))
+      env.tokens in
+  let () =
+    Format.fprintf
+      f "@[<v 2>Alg_expr:@,%a@]@,@[<2>Plot:@ %a@]@,"
+      (NamedDecls.print
+	 ~sep:Pp.space
+	 (fun i n f (e,_) -> Format.fprintf f "@[<2>%i:%s:@ %a@]" i n (pr_alg env) e))
+      env.algs
+      (Pp.array Pp.space (fun _ f (e,_) -> pr_alg env f e))
+      env.observables in
+  Format.fprintf
+    f"@[<v 2>Rules:@,%a@]@,@[<v 2>Perturbations:@,%a@]@]"
+    (NamedDecls.print
+       ~sep:Pp.space
+       (fun i n f r -> Format.fprintf f "@[<2>%i:%s:@ %a@]" i n (pr_rule env) r))
+    env.rules
+    (Pp.array Pp.space (fun i f p ->
+			Format.fprintf f "@[<2>/*%i*/%a@]" i (pr_pert env) p))
+    env.perturbations
+(*
+  desc_table : (string,out_channel * Format.formatter) Hashtbl.t;
+ *)

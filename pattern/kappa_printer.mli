@@ -12,3 +12,6 @@ val modification :
   ?env:Environment.t -> Format.formatter -> Primitives.modification -> unit
 val perturbation :
   ?env:Environment.t -> Format.formatter -> Primitives.perturbation -> unit
+
+val env :
+  Format.formatter -> Environment.t -> unit

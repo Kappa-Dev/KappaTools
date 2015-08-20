@@ -10,8 +10,6 @@ val num_of_internal_state : int -> string Term.with_pos -> t -> int
 (** [num_of_internal_state site_id state_name sign] *)
 val internal_state_of_num : int -> int -> t -> string
 
-val print : Format.formatter -> t -> unit
-
 type s (** Store of all the agents *)
 
 val create : Ast.agent list -> s
@@ -42,3 +40,6 @@ val print_site_internal_state :
   s -> int -> int -> Format.formatter -> int option -> unit
 (** [print_site_internal_state sigs agent_type site_id f state_id]
 prints both the site and its internal state if it is not [None]. *)
+
+val print : Format.formatter -> s -> unit
+

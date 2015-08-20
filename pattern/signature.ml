@@ -57,21 +57,24 @@ let create_t ast_intf =
 	  Ast.port_lnk =Term.with_dummy_pos Ast.FREE;}
 	 :: ast_intf))
 
-let print f sign =
+let print_one f sign =
   Format.fprintf
-    f "(%a)"
-    (Pp.array
-       (fun f -> Format.pp_print_string f ",")
-       (fun i f ((name,_),_) ->
+    f "@[%a@]"
+    (NamedDecls.print
+       ~sep:(fun f -> Format.fprintf f ",@,")
+       (fun _ name f ints ->
 	if name = "_" then ()
 	else
-	  let int =
-	    match sign.NamedDecls.decls.(i) with
-	    | _, None -> ""
-	    | _, Some _ ->  "~"^(internal_state_of_num i 0 sign)
+	  let pp_int f =
+	    match ints with
+	    | None -> ()
+	    | Some nd ->
+	       NamedDecls.print
+		 ~sep:(fun _ -> ())
+		 (fun _ na f () -> Format.pp_print_string f na) f nd
 	  in
-	  Format.fprintf f "%s%s" name int))
-    sign.NamedDecls.decls
+	  Format.fprintf f "%s%t" name pp_int))
+    sign
 
 type s = t NamedDecls.t
 
@@ -134,3 +137,10 @@ let print_site_internal_state sigs ag_ty site f = function
   | Some id ->
      Format.fprintf f "%s~%s" (site_of_id ag_ty site sigs)
 		    (internal_state_of_id ag_ty site id sigs)
+
+let print f sigs =
+  Format.fprintf
+    f "@[<v>%a@]"
+    (NamedDecls.print ~sep:Pp.space
+		      (fun _ n f si -> Format.fprintf f "%s(%a)" n print_one si))
+    sigs
