@@ -11,19 +11,24 @@ let is_identity i = i.is_identity
 
 let to_list i = IntMap.bindings i.sigma
 
-let add x y i = 
-        let ok = if !Parameter.debugModeOn then not (IntMap.mem x i.sigma) else true 
-        in 
-        if not ok then raise Clashing
-        else
-        {sigma = IntMap.add x y i.sigma ; is_identity = i.is_identity && x==y}
-        
+let unsafe_add x y i =
+  {sigma = IntMap.add x y i.sigma ; is_identity = i.is_identity && x==y}
+let add x y i =
+  let not_ok = !Parameter.debugModeOn && IntMap.mem x i.sigma in
+  if not_ok then raise Clashing else unsafe_add x y i
+
+let rec cyclic_permutation_from_identity max id subst pre = function
+  | _ when pre = id -> unsafe_add pre max subst
+  | [] -> assert false
+  | h :: t ->
+     cyclic_permutation_from_identity max id (unsafe_add pre h subst) h t
+
 let mem x i = IntMap.mem x i.sigma
 let fold f i = IntMap.fold f i.sigma 
 
 let identity l = {sigma = List.fold_left (fun out x -> IntMap.add x x out) IntMap.empty l ; is_identity = true}
 
-let apply i x = 
+let apply i x =
         let app () = try IntMap.find x i.sigma with Not_found -> raise Undefined
         in
         if not i.is_identity then app ()

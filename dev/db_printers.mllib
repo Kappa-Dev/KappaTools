@@ -64,6 +64,7 @@ Propagation_heuristics
 Generic_branch_and_cut_solver
 Dag
 Graph_closure
+Utilities
 Causal
 Compression_main
 

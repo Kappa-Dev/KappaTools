@@ -547,11 +547,9 @@ let remove_ag_cc cc_id cc ag_id =
   match cc.nodes_by_type.(ty) with
   | [] -> assert false
   | max :: tail ->
-     let rec build_subst subst pre = function
-       | _ when pre = ag_id -> Renaming.add pre max subst
-       | [] -> assert false
-       | h :: t -> build_subst (Renaming.add pre h subst) h t in
-     let to_subst = build_subst (identity_injection cc) max tail in
+     let to_subst =
+       Renaming.cyclic_permutation_from_identity
+	 max ag_id (identity_injection cc) max tail in
      let new_nbt =
        Array.mapi (fun i l -> if i = ty then tail else l) cc.nodes_by_type in
      if Renaming.is_identity to_subst then
