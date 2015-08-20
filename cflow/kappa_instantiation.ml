@@ -932,13 +932,12 @@ module Cflow_linker =
       sites_with_wrong_internal_state: SiteSet.t 
     }
 
-  let convert_init action_list =
-    let rec aux acc = function
-      | [] -> if acc = None then failwith "I miss something too" else acc
-      | PI.Free _ :: t -> aux acc t
-      | (PI.Bind _ | PI.Remove _ | PI.Bind_to _ | PI.Mod_internal _) :: _ -> None
+  let convert_init remanent action_list =
+    let rec aux recur = function
+      | [] -> recur
+      | PI.Free _ :: t -> aux recur t
+      | (PI.Bind _ | PI.Remove _ | PI.Bind_to _ | PI.Mod_internal _) :: _ -> remanent
       | PI.Create ((id,_),site_list) :: t ->
-	 if acc = None then
 	   let map =
 	     List.fold_left
 	       (fun map -> function
@@ -952,9 +951,8 @@ module Cflow_linker =
 	       bound_sites=SiteSet.empty;
 	       sites_with_wrong_internal_state=SiteSet.empty
 	     }
-	   in aux (Some (id,agent_info)) t
-	 else failwith "I miss something"
-    in aux None action_list
+	   in aux (AgentIdMap.add id agent_info remanent) t
+    in aux remanent action_list
 
   let as_init agent_info = 
     SiteSet.is_empty agent_info.bound_sites 
@@ -1085,13 +1083,7 @@ module Cflow_linker =
       List.fold_left
 	(fun (step_list,remanent) refined_step -> 
 	 match refined_step with
-	 | Init init -> 
-	    let remanent =
-	      match convert_init init with
-	      | None -> remanent
-	      | Some (id,info) ->
-		 AgentIdMap.add id info remanent in
-	    (refined_step::step_list,remanent)
+	 | Init init -> (refined_step::step_list, convert_init remanent init)
 	 | Event (_,(_,(action,_,kasim_side))) ->
 	    let remanent,set =
 	      List.fold_left
