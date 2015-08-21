@@ -71,7 +71,7 @@ let print_one f sign =
 	    | Some nd ->
 	       NamedDecls.print
 		 ~sep:(fun _ -> ())
-		 (fun _ na f () -> Format.pp_print_string f na) f nd
+		 (fun _ na f () -> Format.fprintf f "~%s" na) f nd
 	  in
 	  Format.fprintf f "%s%t" name pp_int))
     sign
