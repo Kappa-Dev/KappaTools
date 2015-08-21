@@ -26,9 +26,10 @@ sig
 
   val empty : t
   val is_empty : t -> bool
-  val push : Remanent_parameters_sig.parameters -> Exception.method_handler -> elt -> t -> t
-  val pop : Remanent_parameters_sig.parameters -> Exception.method_handler -> t -> elt option * t
+  val push : Remanent_parameters_sig.parameters -> Exception.method_handler -> elt -> t -> Exception.method_handler * t
+  val pop : Remanent_parameters_sig.parameters -> Exception.method_handler -> t -> Exception.method_handler * (elt option * t)
   val fold_left : ('a -> elt -> 'a) -> 'a -> t -> 'a
+  val print_wl : t -> unit
 end
     
 module WlMake (Ord: OrderedType) =
@@ -49,18 +50,18 @@ module WlMake (Ord: OrderedType) =
         let in_list, out_list, pool = x in
         if WSet.mem_set e pool
         then
-          x
+          error, x
         else
           let error, add_elt =
             WSet.add_set parameter error e pool
           in
-          (e :: in_list), out_list, add_elt
+          error, ((e :: in_list), out_list, add_elt)
             
       let rec pop parameter error x =
         let in_list, out_list, pool = x in
-        if WSet.cardinal pool = 0
+        if is_empty x
         then
-          None, x
+          error, (None, x)
         else
           begin
             match out_list with
@@ -69,19 +70,50 @@ module WlMake (Ord: OrderedType) =
                 let error, remove_elt =
                   WSet.remove parameter error h pool
                 in
-                (Some h), (in_list, tl, remove_elt)
+                error, ((Some h), (in_list, tl, remove_elt))
           end
 
       let fold_left f acc x =
         let in_list, out_list, _ = x in
         List.fold_left f (List.fold_left f acc out_list) (List.rev in_list)
 
+      let print_wl wl = 
+        let _ = fold_left 
+          (fun  unit a -> Printf.fprintf stdout "%i " a)
+          () wl
+        in 
+        print_newline () 
+
      end)
 
-module BduOrd =
-struct
-  type t = bool Mvbdu_sig.mvbdu
-  let compare = compare
-end
+module Int = struct type t = int let compare = compare end
+module IntWL = WlMake(Int)
 
-module BduWlist = WlMake (BduOrd)
+(*
+let parameter = Remanent_parameters.get_parameters () 
+let error = Exception.empty_error_handler 
+let wl = IntWL.empty 
+let error, wl = IntWL.push parameter error 2 wl
+let error, wl = IntWL.push parameter error 2 wl
+
+let _ = 
+  Printf.fprintf stdout "Push: ";
+  print_wl wl
+
+let error, wl = IntWL.push parameter error 3 wl
+
+let _ = 
+  Printf.fprintf stdout "Push: ";
+  print_wl wl
+
+let error, wl = IntWL.push parameter error 2 wl
+
+let error,(_, wl) = IntWL.pop parameter error wl
+let _ = 
+  Printf.fprintf stdout "Pop: "; 
+  print_wl wl
+
+let error,(_, wl) = IntWL.pop parameter error wl
+let _ = 
+  Printf.fprintf stdout "Pop: "; 
+  print_wl wl*)

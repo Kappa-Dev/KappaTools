@@ -32,23 +32,14 @@ type handler = (Boolean_mvbdu.memo_tables, Boolean_mvbdu.mvbdu_dic,
 type handler_bdu = handler * bdu
    
 type site_bdu  = pair_site * handler_bdu
-      
-type triple_wl = BduWlist.WSet.elt list * BduWlist.WSet.elt list * BduWlist.WSet.set
 
-type test_wl = pair_site * handler * triple_wl
-
-(*create type set for bdu_iteration*)
-
-module Bdu_iterate = Set_and_map.Make
-  (struct
-    type t = bdu 
-    let compare = compare
-   end)
-
-type set = Bdu_iterate.set
+type wl_int = IntWL.WSet.elt list * IntWL.WSet.elt list * IntWL.WSet.set
 
 type bdu_analysic =
     {
-      store_creation  : site_bdu AgentMap.t;
-      store_iteration : test_wl AgentMap.t * test_wl AgentMap.t * (handler * set) AgentMap.t;
+      store_creation    : site_bdu AgentMap.t;
+      store_rule        : Cckappa_sig.rule array AgentMap.t;
+      store_succ_list   : (int * int) list;
+      store_rule_wl     : wl_int list;
+      store_iteration   : (handler * bdu array) AgentMap.t
     }
