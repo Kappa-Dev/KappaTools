@@ -71,7 +71,7 @@ let compress_and_print logger env log_info step_list =
             else Debug.tag logger "+ Producing causal traces"
           in
           let error = D.S.PH.B.PB.CI.Po.K.H.error_init in
-          let refined_event_list = List.rev (D.S.PH.B.PB.CI.Po.K.disambiguate step_list) in
+          let refined_event_list = D.S.PH.B.PB.CI.Po.K.disambiguate step_list in
           let () = if log_step then Debug.tag logger"\t - refining events" in
           let refined_event_list = 
             List.rev_map 

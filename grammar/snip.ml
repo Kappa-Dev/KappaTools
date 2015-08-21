@@ -585,7 +585,8 @@ let make_instantiation
 		  add_instantiation_free actions' place site_id s,
 		  side_sites, side_effects, IntMap.remove i links
 	      with Not_found ->
-		tests', actions', side_sites, side_effects, links in
+		tests', add_instantiation_free actions' place site_id s,
+		side_sites, side_effects, links in
 	 aux (pred site_id) tests'' actions'' side_sites' side_effects' links' in
      aux (pred (Array.length ports)) tests actions side_sites side_effects links
 
@@ -707,7 +708,8 @@ let rec complete_with_creation (removed,added) links_transf actions fresh =
      let place = Primitives.Place.Fresh (ag.Raw_mixture.a_type,fresh) in
      let rec handle_ports added l_t actions intf site_id =
        if site_id = Array.length ag.Raw_mixture.a_ports then
-	 let actions' = Primitives.Instantiation.Create (place,intf) :: actions in
+	 let actions' =
+	   Primitives.Instantiation.Create (place,List.tl @@ List.rev intf) :: actions in
 	 complete_with_creation (removed,added) l_t actions' (succ fresh) ag_l
        else
 	 let added',point =
@@ -719,7 +721,9 @@ let rec complete_with_creation (removed,added) links_transf actions fresh =
 	 let added'',actions',l_t' =
 	   match ag.Raw_mixture.a_ports.(site_id) with
 	   | Raw_mixture.FREE ->
-	      Primitives.Transformation.Freed (place,site_id)::added',actions,
+	      Primitives.Transformation.Freed (place,site_id)::added',
+	      (if site_id = 0 then actions
+	       else Primitives.Instantiation.Free (place,site_id) :: actions),
 	      l_t
 	   | Raw_mixture.VAL i ->
 	      try
@@ -746,11 +750,11 @@ let connected_components_of_mixture created id_incr (env,rule_id) mix =
 		    | Primitives.Transformation.Linked (x,y)
 			 when Primitives.Place.is_site_from_fresh x ||
 				Primitives.Place.is_site_from_fresh y ->
-			 Primitives.Instantiation.Bind_to (x,y) :: acs
+		       Primitives.Instantiation.Bind_to (x,y) :: acs
 		    | Primitives.Transformation.Linked (x,y) ->
-			 Primitives.Instantiation.Bind (x,y) :: acs
-		      | (Primitives.Transformation.Freed _ |
-			 Primitives.Transformation.Internalized _) -> acs)
+		       Primitives.Instantiation.Bind (x,y) :: acs
+		    | (Primitives.Transformation.Freed _ |
+		       Primitives.Transformation.Internalized _) -> acs)
 	   actions added in
        let transformations' = (List.rev removed, List.rev added) in
        let actions'',transformations'' =
