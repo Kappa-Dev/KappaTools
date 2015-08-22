@@ -9,6 +9,9 @@ type quark_lists = {
   internal_state_modified : (int * int) list;
 }
 
+let atom_tested = 1
+let atom_modified = 2
+let atom_testedmodified = 3
 type atom =
     {
       causal_impact : int ; (*(1) tested (2) modified, (3) tested + modified*)
@@ -59,9 +62,9 @@ let debug_print_event_kind f = function
 
 let debug_print_causal f i =
   Format.pp_print_string
-    f (if i = 1 then "tested"
-       else if i = 2 then "modified"
-       else if i = 3 then "tested&modified"
+    f (if i = atom_tested then "tested"
+       else if i = atom_modified then "modified"
+       else if i = atom_tested lor atom_modified then "tested&modified"
        else "CAUSAL IMPACT UNDEFINED")
 
 let debug_print_atom f a =
@@ -203,13 +206,13 @@ let add_actions env grid event_number kind actions =
   let rec aux grid = function
     | [] -> grid
     | Primitives.Instantiation.Mod_internal (site,_) :: q ->
-       aux (add site false 1 grid event_number kind) q
+       aux (add site false atom_modified grid event_number kind) q
     | (Primitives.Instantiation.Bind (site1,site2)
       | Primitives.Instantiation.Bind_to (site1,site2)) :: q ->
-       let grid' = add site2 true 1 grid event_number kind in
-       aux (add site1 true 1 grid' event_number kind) q
+       let grid' = add site2 true atom_modified grid event_number kind in
+       aux (add site1 true atom_modified grid' event_number kind) q
     | Primitives.Instantiation.Free site :: q ->
-       aux (add site true 1 grid event_number kind) q
+       aux (add site true atom_modified grid event_number kind) q
     | (Primitives.Instantiation.Create ((_,na as ag),_)
       | Primitives.Instantiation.Remove (_,na as ag)) :: q ->
        let sigs = Environment.signatures env in
@@ -220,7 +223,7 @@ let add_actions env grid event_number kind actions =
 	    let grid' =
 	      match Signature.default_internal_state na site sigs with
 	      | None -> grid
-	      | Some _ -> add (ag,site) false 1 grid event_number kind in
+	      | Some _ -> add (ag,site) false atom_modified grid event_number kind in
 	    add (ag,site) true 1 grid' event_number kind)
 	   ag_intf grid in
        aux grid q
@@ -231,14 +234,14 @@ let add_tests grid event_number kind tests =
     | [] -> grid
     | Primitives.Instantiation.Is_Here _ :: q -> aux grid q
     | Primitives.Instantiation.Has_Internal (site,_) :: q ->
-       aux (add site false 2 grid event_number kind) q
+       aux (add site false atom_tested grid event_number kind) q
     | (Primitives.Instantiation.Is_Free site
       | Primitives.Instantiation.Is_Bound site
       | Primitives.Instantiation.Has_Binding_type (site,_)) :: q ->
-       aux (add site true 2 grid event_number kind) q
+       aux (add site true atom_tested grid event_number kind) q
     | Primitives.Instantiation.Is_Bound_to (site1,site2) :: q ->
-       let grid' = add site2 true 2 grid event_number kind in
-       aux (add site1 true 2 grid' event_number kind) q
+       let grid' = add site2 true atom_tested grid event_number kind in
+       aux (add site1 true atom_tested grid' event_number kind) q
   in aux grid tests
 
 let record (kind,(tests,(actions,_,side_effects)))
@@ -247,14 +250,14 @@ let record (kind,(tests,(actions,_,side_effects)))
   let grid = add_tests grid event_number kind tests in
   let grid = add_actions env grid event_number kind actions in
   List.fold_left
-    (fun grid site -> add site true 1 grid event_number kind) grid side_effects
+    (fun grid site -> add site true atom_modified grid event_number kind) grid side_effects
 
 let record_obs (kind,tests,_) side_effects is_weak event_number grid =
   let grid = add_obs_eid event_number grid in
   let grid = store_is_weak is_weak event_number grid in
   let grid = add_tests grid event_number kind tests in
   List.fold_left
-    (fun grid site -> add site true 1 grid event_number kind) grid side_effects
+    (fun grid site -> add site true atom_modified grid event_number kind) grid side_effects
 
 let record_init actions is_weak event_number env grid =
   (* if !Parameter.showIntroEvents then *)
@@ -287,12 +290,13 @@ let rec parse_attribute last_modif last_tested attribute config =
        IntMap.add atom.eid preds config.prec_1 in
      let config = {config with events =  events ; prec_1 = prec_1} in
      (*atom has a modification*)
-     if (atom.causal_impact = 2) || (atom.causal_impact = 3) then
+     if (atom.causal_impact = atom_tested) || (atom.causal_impact = 3) then
        let config =
 	 List.fold_left (fun config pred_id -> add_pred pred_id atom config)
 			config last_tested in
        let tested =
-	 if (atom.causal_impact = 1)||(atom.causal_impact = 3)
+	 if (atom.causal_impact = atom_tested)
+	    ||(atom.causal_impact = atom_tested lor atom_modified)
 	 then [atom.eid] else [] in
        parse_attribute (Some atom.eid) tested att config
      else
@@ -324,10 +328,10 @@ let cut attribute_ids grid =
 	      IntMap.add atom.eid preds cfg.prec_1 in
 	    let top = IntSet.add atom.eid cfg.top in
 	    let tested =
-	      if (atom.causal_impact = 1) || (atom.causal_impact = 3)
+	      if (atom.causal_impact = atom_tested) || (atom.causal_impact = 3)
 	      then [atom.eid] else [] in
 	    let modif =
-	      if (atom.causal_impact = 2) || (atom.causal_impact = 3)
+	      if (atom.causal_impact = atom_modified) || (atom.causal_impact = 3)
 	      then Some atom.eid else None in
 	    parse_attribute
 	      modif tested att
