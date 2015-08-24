@@ -184,7 +184,7 @@ let deps_of_alg_expr alg = aux_dep Term.DepSet.empty alg
  *)
 let rec has_time_dep = function
   | (BIN_ALG_OP (_, a, b),_) ->
-     has_time_dep a&&has_time_dep b
+     has_time_dep a||has_time_dep b
   | (UN_ALG_OP (_, a),_) -> has_time_dep a
   | ((KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _),_) -> false
   | (STATE_ALG_OP Term.TIME_VAR,_) -> true
