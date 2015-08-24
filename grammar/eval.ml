@@ -2,12 +2,6 @@ open Mods
 open Tools
 open Ast
 
-type link = Closed | Semi of (int * int) Term.with_pos
-
-type context =
-    { pairing : link IntMap.t; curr_id : int;
-      new_edges : (int * int) Int2Map.t }
-
 let initial_value_alg counter algs (ast, _) =
   Expr_interpreter.value_alg
     counter
@@ -29,7 +23,7 @@ let tokenify algs tokens contact_map domain l =
      (domain',(alg,id)::out)
     ) l (domain,[])
 
-let rules_of_ast ?free_rid algs tokens contact_map domain
+let rules_of_ast ?origin algs tokens contact_map domain
 		    label_opt (ast_rule,rule_pos) =
   let label = match label_opt with
     | None -> Term.with_dummy_pos ("%anonymous"^(string_of_float (Sys.time ())))
@@ -39,7 +33,7 @@ let rules_of_ast ?free_rid algs tokens contact_map domain
     tokenify algs tokens contact_map domain ast_rule.rm_token in
   let domain'',add_toks =
     tokenify algs tokens contact_map domain' ast_rule.add_token in
-  let one_side label (domain,free_rid,acc) rate lhs rhs rm add =
+  let one_side label (domain,origin,acc) rate lhs rhs rm add =
     let domain',(crate,_) =
       Expr.compile_alg algs tokens contact_map domain rate in
     let count = let x = ref 0 in fun (lab,pos) ->
@@ -54,10 +48,10 @@ let rules_of_ast ?free_rid algs tokens contact_map domain
 	Primitives.injected_tokens = add;
 	Primitives.instantiations = syntax;
       } in
-    let (domain'',free_rid'),rule_mixtures =
+    let (domain'',origin'),rule_mixtures =
       Snip.connected_components_sum_of_ambiguous_rule
-	contact_map domain' ?rule_id:free_rid lhs rhs in
-    domain'',free_rid',
+	contact_map domain' ?origin lhs rhs in
+    domain'',origin',
     match rule_mixtures with
     | [] -> acc
     | [ r ] -> (label, build r) :: acc
@@ -66,9 +60,9 @@ let rules_of_ast ?free_rid algs tokens contact_map domain
 	 (fun out r ->
 	  (count label,build r)::out) acc rule_mixtures in
   let rev = match ast_rule.arrow, ast_rule.k_op with
-    | RAR, None -> domain'',free_rid,[]
+    | RAR, None -> domain'',origin,[]
     | LRAR, Some rate ->
-       one_side (opposite label) (domain'',free_rid,[]) rate
+       one_side (opposite label) (domain'',origin,[]) rate
 		ast_rule.rhs ast_rule.lhs add_toks rm_toks
     | (RAR, Some _ | LRAR, None) ->
        raise
@@ -204,7 +198,7 @@ let effects_of_modif algs tokens rules contact_map domain ast_list =
 	       else Primitives.CFLOWOFF x) :: l in
 	    let domain',ccs =
 	      Snip.connected_components_sum_of_ambiguous_mixture
-		contact_map domain ast in
+		contact_map domain ~origin:(Term.PERT(-1)) ast in
 	    (domain',
 	     List.fold_left (fun x (y,t) -> Array.fold_left (adds t) x y)
 			    rev_effects ccs)
@@ -485,22 +479,22 @@ let compile_alg_vars tokens contact_map domain overwrite vars =
 	 (fun ((x,_),_) ->
 	  List.for_all (fun (x',_) -> x <> x') overwrite) vars) in
   let vars_nd = NamedDecls.create (Array.of_list alg_vars_over) in
-  array_fold_left_mapi (fun i domain ((label,_ as lbl_pos),ast) ->
-			let (domain',alg) =
-			  Expr.compile_alg ~label vars_nd.NamedDecls.finder
-					   tokens ~max_allowed_var:(pred i)
-					   contact_map domain ast
-			in (domain',(lbl_pos,alg))) domain
-		       vars_nd.NamedDecls.decls
+  array_fold_left_mapi
+    (fun i domain (lbl_pos,ast) ->
+     let (domain',alg) =
+       Expr.compile_alg ~origin:(Term.ALG i) vars_nd.NamedDecls.finder tokens
+			~max_allowed_var:(pred i) contact_map domain ast
+     in (domain',(lbl_pos,alg))) domain
+    vars_nd.NamedDecls.decls
 
 let compile_rules algs tokens contact_map domain rules =
   let fdomain,_,frules =
     List.fold_left
-      (fun (domain,free_rid,acc) (rule_label,rule) ->
-       let (domain',free_rid',cr) =
-	 rules_of_ast algs tokens ?free_rid contact_map domain rule_label rule in
-       domain',free_rid',List.rev_append cr acc)
-      (domain,Some 0,[]) rules in
+      (fun (domain,origin,acc) (rule_label,rule) ->
+       let (domain',origin',cr) =
+	 rules_of_ast algs tokens ?origin contact_map domain rule_label rule in
+       domain',origin',List.rev_append cr acc)
+      (domain,Some (Term.RULE 0),[]) rules in
   fdomain,List.rev frules
 
 let initialize logger overwrite result =

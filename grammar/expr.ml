@@ -53,7 +53,7 @@ type ('a,'b) contractible = NO of 'a
 			  | MAYBE of 'a * Term.bin_alg_op * 'a * 'b
 			  | YES of 'b
 
-let rec compile_alg ?label var_map tk_map ?max_allowed_var
+let rec compile_alg ?origin var_map tk_map ?max_allowed_var
 		    contact_map domain (alg,pos) =
   let rec_call domain x =
     match compile_alg var_map tk_map ?max_allowed_var contact_map domain x with
@@ -68,7 +68,7 @@ let rec compile_alg ?label var_map tk_map ?max_allowed_var
   | Ast.KAPPA_INSTANCE ast ->
      let domain',ccs =
        Snip.connected_components_sum_of_ambiguous_mixture
-	 contact_map domain ast in
+	 contact_map domain ?origin ast in
      let ccs' = List.map fst ccs in
      (domain', (KAPPA_INSTANCE ccs',pos))
   | Ast.OBS_VAR lab ->

@@ -15,7 +15,7 @@ val print_ast_bool :
 
 (** [compile_alg variable_map token_map (fresh_mix_id, mix_list) alg_pos] *)
 val compile_alg :
-  ?label:string -> int Mods.StringMap.t -> int Mods.StringMap.t ->
+  ?origin:Term.rev_dep -> int Mods.StringMap.t -> int Mods.StringMap.t ->
   ?max_allowed_var:int ->
   (string list * (string * string) list) Export_to_KaSim.String2Map.t ->
   Connected_component.Env.t ->
