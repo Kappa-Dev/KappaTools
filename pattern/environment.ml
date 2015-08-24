@@ -7,6 +7,8 @@ type t = {
   observables : Alg_expr.t Term.with_pos array;
   rules : Primitives.elementary_rule NamedDecls.t;
   perturbations : Primitives.perturbation array;
+  need_update_each_loop : Term.DepSet.t;
+  reverse_dependencies : Term.DepSet.t array;
   desc_table : (string,out_channel * Format.formatter) Hashtbl.t;
 
   (* legacy *)
@@ -24,6 +26,8 @@ let empty =
    algs = NamedDecls.create [||];
    observables = [||];
    perturbations = [||];
+   need_update_each_loop =  Term.DepSet.empty;
+   reverse_dependencies = [||];
    desc_table = Hashtbl.create 2;
 
    (*legacy *)
@@ -34,10 +38,11 @@ let empty =
    track = IntSet.empty ;
 }
 
-let init sigs tokens algs rules obs perts =
+let init sigs tokens algs (deps_in_t,deps_in_e,rd) rules obs perts =
   { empty with signatures = sigs; tokens = tokens;
 	       rules = rules; algs = algs; observables = obs;
-	       perturbations = perts;}
+	       perturbations = perts; reverse_dependencies = rd;
+	       need_update_each_loop = Term.DepSet.union deps_in_t deps_in_e; }
 
 let signatures env = env.signatures
 
@@ -79,6 +84,9 @@ let nb_tokens env =
 
 let get_perturbation env i = env.perturbations.(i)
 let nb_perturbations env = Array.length env.perturbations
+
+let get_reverse_dependencies env i = env.reverse_dependencies.(i)
+let get_always_outdated env = env.need_update_each_loop
 
 let print_agent ?env f i =
   match env with

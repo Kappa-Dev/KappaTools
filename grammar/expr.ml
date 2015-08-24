@@ -60,12 +60,12 @@ type ('a,'b) contractible = NO of 'a
 			  | MAYBE of 'a * Term.bin_alg_op * 'a * 'b
 			  | YES of 'b
 
-let rec compile_alg ?origin var_map tk_map ?max_allowed_var
-		    contact_map domain (alg,pos) =
+let rec compile_alg var_map tk_map ?max_allowed_var
+		    domain (alg,pos) =
   let rec_call domain x =
-    match compile_alg var_map tk_map ?max_allowed_var contact_map domain x with
+    match compile_alg var_map tk_map ?max_allowed_var domain x with
     | (domain',(ALG_VAR _ | TOKEN_ID _ | UN_ALG_OP _ | STATE_ALG_OP _
-		       | KAPPA_INSTANCE _ as alg,_)) -> (domain', NO alg)
+		| KAPPA_INSTANCE _ as alg,_)) -> (domain', NO alg)
     | (domain',(CONST n,_)) -> (domain',YES n)
     | (domain',(BIN_ALG_OP (op, (x,_), (CONST y,_)) as alg,_)) ->
        (domain',MAYBE(alg,op,x,y))
@@ -73,11 +73,18 @@ let rec compile_alg ?origin var_map tk_map ?max_allowed_var
   in
   match alg with
   | Ast.KAPPA_INSTANCE ast ->
-     let domain',ccs =
-       Snip.connected_components_sum_of_ambiguous_mixture
-	 contact_map domain ?origin ast in
-     let ccs' = List.map fst ccs in
-     (domain', (KAPPA_INSTANCE ccs',pos))
+     begin
+       match domain with
+       | Some (origin,contact_map,domain) ->
+	  let domain',ccs =
+	    Snip.connected_components_sum_of_ambiguous_mixture
+	    contact_map domain ?origin ast in
+	  let ccs' = List.map fst ccs in
+	  (Some (origin,contact_map,domain'), (KAPPA_INSTANCE ccs',pos))
+       | None ->
+	  raise (ExceptionDefn.Internal_Error
+		   ("Theoritically pure alg_expr has a misture",pos))
+     end
   | Ast.OBS_VAR lab ->
      let i =
        try Mods.StringMap.find lab var_map with
@@ -144,6 +151,16 @@ let rec compile_alg ?origin var_map tk_map ?max_allowed_var
 	      (domain',(UN_ALG_OP (op,(x,pos1)),pos))
      end
 
+let compile_pure_alg var_map tk_map (alg,pos) =
+  snd @@ compile_alg var_map tk_map None (alg,pos)
+
+let compile_alg ?origin var_map tk_map ?max_allowed_var
+		contact_map domain (alg,pos) =
+  match compile_alg var_map tk_map ?max_allowed_var
+		    (Some (origin,contact_map,domain)) (alg,pos) with
+  | Some (_, _,domain),alg -> domain,alg
+  | None, _ -> failwith "domain has been lost in Expr.compile_alg"
+
 let rec compile_bool var_map tk_map contact_map domain = function
   | Ast.TRUE,pos -> (domain,(Ast.TRUE,pos))
   | Ast.FALSE,pos -> (domain,(Ast.FALSE,pos))
@@ -178,33 +195,27 @@ let rec compile_bool var_map tk_map contact_map domain = function
 	  | KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _),_), _ ->
 	(domain'',(Ast.COMPARE_OP (op,a',b'), pos))
 
-(*let add_dep el s = Term.DepSet.add el s
-let rec aux_dep s = function
-  | BIN_ALG_OP (_, (a,_), (b,_)) -> aux_dep (aux_dep s a) b
-  | UN_ALG_OP (_, (a,_)) -> aux_dep s a
-  | STATE_ALG_OP op -> add_dep (Term.dep_of_state_alg_op op) s
-  | ALG_VAR i -> add_dep (Term.ALG i) s
-  | KAPPA_INSTANCE _ -> s
-  | TOKEN_ID i -> s
-  | CONST _ -> s
-let deps_of_alg_expr alg = aux_dep Term.DepSet.empty alg
- *)
-let rec has_time_dep = function
+let rec has_time_dep (in_t,_,deps as vars_deps) = function
   | (BIN_ALG_OP (_, a, b),_) ->
-     has_time_dep a||has_time_dep b
-  | (UN_ALG_OP (_, a),_) -> has_time_dep a
+     has_time_dep vars_deps a||has_time_dep vars_deps b
+  | (UN_ALG_OP (_, a),_) -> has_time_dep vars_deps a
   | ((KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _),_) -> false
   | (STATE_ALG_OP Term.TIME_VAR,_) -> true
   | (STATE_ALG_OP (Term.CPUTIME | Term.EVENT_VAR| Term.NULL_EVENT_VAR
 		  | Term.PROD_EVENT_VAR),_) -> false
-  | (ALG_VAR _,pos) ->
-     raise (ExceptionDefn.Internal_Error ("has_time_dep problem",pos))
+  | (ALG_VAR i,_) ->
+     let rec aux j =
+       Term.DepSet.mem (Term.ALG j) in_t ||
+	 Term.DepSet.exists
+	   (function Term.ALG k -> aux k
+		   | (Term.RULE _ | Term.PERT _) -> false) deps.(j) in
+     aux i
 
-let rec stops_of_bool_expr = function
+let rec stops_of_bool_expr vars_deps = function
     | Ast.TRUE | Ast.FALSE -> []
     | Ast.BOOL_OP (op,(a,_),(b,_)) ->
-       let st1 = stops_of_bool_expr a in
-       let st2 = stops_of_bool_expr b in
+       let st1 = stops_of_bool_expr vars_deps a in
+       let st2 = stops_of_bool_expr vars_deps b in
        (match op,st1,st2 with
 	| _, [], _ -> st2
 	| _, _, [] -> st1
@@ -213,7 +224,7 @@ let rec stops_of_bool_expr = function
        )
     | Ast.COMPARE_OP (op,(a1,_ as a),(b1,_ as b)) ->
        match op with
-       | Term.EQUAL when has_time_dep a||has_time_dep b ->
+       | Term.EQUAL when has_time_dep vars_deps a||has_time_dep vars_deps b ->
 	  begin match a1,b1 with
 		| STATE_ALG_OP (Term.TIME_VAR), CONST n
 		| CONST n, STATE_ALG_OP (Term.TIME_VAR) -> [n]

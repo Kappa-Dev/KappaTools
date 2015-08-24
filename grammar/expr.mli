@@ -24,6 +24,9 @@ val compile_alg :
   Connected_component.Env.t ->
   Ast.mixture Ast.ast_alg_expr Term.with_pos ->
   Connected_component.Env.t * Alg_expr.t Term.with_pos
+val compile_pure_alg :
+  int Mods.StringMap.t -> int Mods.StringMap.t ->
+  Ast.mixture Ast.ast_alg_expr Term.with_pos -> Alg_expr.t Term.with_pos
 val compile_bool :
   int Mods.StringMap.t -> int Mods.StringMap.t ->
   (string list * (string * string) list) Export_to_KaSim.String2Map.t ->
@@ -31,4 +34,6 @@ val compile_bool :
   Ast.mixture Ast.ast_alg_expr Ast.bool_expr Term.with_pos ->
   Connected_component.Env.t * Alg_expr.t Ast.bool_expr Term.with_pos
 
-val stops_of_bool_expr : Alg_expr.t Ast.bool_expr -> Nbr.t list
+val stops_of_bool_expr :
+  (Term.DepSet.t * Term.DepSet.t * Term.DepSet.t array) ->
+  Alg_expr.t Ast.bool_expr -> Nbr.t list

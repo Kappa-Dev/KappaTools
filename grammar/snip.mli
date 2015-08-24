@@ -13,7 +13,7 @@ val connected_components_sum_of_ambiguous_rule :
   Connected_component.Env.t -> ?origin:Term.rev_dep -> Ast.mixture ->
   Ast.mixture ->
   (Connected_component.Env.t * Term.rev_dep option) *
-    (Connected_component.t array *
+    (Term.rev_dep option * Connected_component.t array *
        (Primitives.Instantiation.abstract Primitives.Instantiation.event) *
 	 (Primitives.Transformation.t list * Primitives.Transformation.t list))
       list

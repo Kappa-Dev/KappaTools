@@ -200,7 +200,10 @@ let value_alg ~get_alg counter state alg =
     alg
 
 let update_outdated_activities ~get_alg store env counter state activities =
-  let () =
+  (* I don't know if this is more efficient than computing the
+  transitive closure of what should be updated and then updating them
+  only once or not *)
+  let rec aux deps =
     Term.DepSet.iter
       (function
 	| Term.RULE i ->
@@ -218,8 +221,10 @@ let update_outdated_activities ~get_alg store env counter state activities =
 	   let act =
 	     if cc_va = 0 then 0. else rate *. float_of_int cc_va in
 	   store i act activities
-	| Term.ALG _ | Term.PERT _ -> assert false)
-      state.outdated_elements in
+	| Term.ALG j -> aux (Environment.get_reverse_dependencies env j)
+	| Term.PERT _ -> assert false) deps in
+  let () = aux (Environment.get_always_outdated env) in
+  let () = aux state.outdated_elements in
   {state with outdated_elements = Term.DepSet.empty }
 
 let update_tokens ~get_alg counter state consumed injected =

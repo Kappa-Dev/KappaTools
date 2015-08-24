@@ -47,19 +47,27 @@ let tokenify algs tokens contact_map domain l =
      (domain',(alg,id)::out)
     ) l (domain,[])
 
-let rules_of_ast ?origin algs tokens contact_map domain
+let rules_of_ast ?deps_machinery algs tokens contact_map domain
 		    label (ast_rule,rule_pos) =
   let opposite (lab,pos) = (Ast.flip_label lab,pos) in
   let domain',rm_toks =
     tokenify algs tokens contact_map domain ast_rule.rm_token in
   let domain'',add_toks =
     tokenify algs tokens contact_map domain' ast_rule.add_token in
-  let one_side label (domain,origin,acc) rate lhs rhs rm add =
-    let domain',(crate,_) =
-      Expr.compile_alg algs tokens contact_map domain rate in
+  let one_side label (domain,deps_machinery,acc) rate lhs rhs rm add =
+    let origin,deps_algs =
+      match deps_machinery with
+      | None -> None,None
+      | Some (o,d) -> Some o, Some d in
+    let (crate,_ as crp) = Expr.compile_pure_alg algs tokens rate in
     let count = let x = ref 0 in fun (lab,pos) ->
 				 incr x; (lab^"__"^string_of_int !x,pos) in
-    let build (ccs,syntax,(neg,pos)) =
+    let build deps_algs (origin,ccs,syntax,(neg,pos)) =
+      Tools.option_map
+	(fun x ->
+	 let origin =
+	   match origin with Some o -> o | None -> failwith "ugly Eval.rule_of_ast" in
+	 Alg_expr.add_dep x origin crp) deps_algs,
       {
 	Primitives.rate = crate;
 	Primitives.connected_components = ccs;
@@ -69,21 +77,31 @@ let rules_of_ast ?origin algs tokens contact_map domain
 	Primitives.injected_tokens = add;
 	Primitives.instantiations = syntax;
       } in
-    let (domain'',origin'),rule_mixtures =
+    let (domain',origin'),rule_mixtures =
       Snip.connected_components_sum_of_ambiguous_rule
-	contact_map domain' ?origin lhs rhs in
-    domain'',origin',
-    match rule_mixtures with
-    | [] -> acc
-    | [ r ] -> (label, build r) :: acc
+	contact_map domain ?origin lhs rhs in
+    let deps_algs',rules_l =
+      match rule_mixtures with
+    | [] -> deps_algs,acc
+    | [ r ] ->
+       let deps_algs',r' = build deps_algs r in
+       deps_algs', ((label, r') :: acc)
     | _ ->
        List.fold_left
-	 (fun out r ->
-	  (count label,build r)::out) acc rule_mixtures in
+	 (fun (deps_algs,out) r ->
+	  let deps_algs',r' = build deps_algs r in
+	  deps_algs',(count label,r')::out) (deps_algs,acc) rule_mixtures in
+    domain',(match origin' with
+	    | None -> None
+	    | Some o -> Some (o,
+			      match deps_algs' with
+			      | Some d -> d
+			      | None -> failwith "ugly Eval.rule_of_ast")),
+    rules_l in
   let rev = match ast_rule.arrow, ast_rule.k_op with
-    | RAR, None -> domain'',origin,[]
+    | RAR, None -> domain'',deps_machinery,[]
     | LRAR, Some rate ->
-       one_side (opposite label) (domain'',origin,[]) rate
+       one_side (opposite label) (domain'',deps_machinery,[]) rate
 		ast_rule.rhs ast_rule.lhs add_toks rm_toks
     | (RAR, Some _ | LRAR, None) ->
        raise
@@ -245,7 +263,7 @@ let effects_of_modif algs tokens rules contact_map domain ast_list =
   in
   iter [] domain ast_list
 
-let pert_of_result algs tokens rules contact_map domain res =
+let pert_of_result algs algs_deps tokens rules contact_map domain res =
   let (domain, _, lpert, stop_times,tracking_enabled) =
     List.fold_left
       (fun (domain, p_id, lpert, stop_times, tracking_enabled)
@@ -254,7 +272,7 @@ let pert_of_result algs tokens rules contact_map domain res =
 	 Expr.compile_bool algs.NamedDecls.finder tokens.NamedDecls.finder
 			   contact_map domain pre_expr in
        let stopping_time =
-	 try Expr.stops_of_bool_expr pre
+	 try Expr.stops_of_bool_expr algs_deps pre
 	 with ExceptionDefn.Unsatisfiable ->
 	   raise
 	     (ExceptionDefn.Malformed_Decl
@@ -271,7 +289,7 @@ let pert_of_result algs tokens rules contact_map domain res =
 	      Expr.compile_bool algs.NamedDecls.finder tokens.NamedDecls.finder
 				contact_map domain post_expr in
 	    let (stopping_time') =
-	      try Expr.stops_of_bool_expr post with
+	      try Expr.stops_of_bool_expr algs_deps post with
 		ExceptionDefn.Unsatisfiable ->
 		raise
 		  (ExceptionDefn.Malformed_Decl
@@ -511,15 +529,17 @@ let compile_alg_vars tokens contact_map domain overwrite vars =
      in (domain',(lbl_pos,alg))) domain
     vars_nd.NamedDecls.decls
 
-let compile_rules algs tokens contact_map domain rules =
-  let fdomain,_,frules =
+let compile_rules algs alg_deps tokens contact_map domain rules =
+  match
     List.fold_left
-      (fun (domain,origin,acc) (rule_label,rule) ->
+      (fun (domain,deps_machinery,acc) (rule_label,rule) ->
        let (domain',origin',cr) =
-	 rules_of_ast algs tokens ?origin contact_map domain rule_label rule in
+	 rules_of_ast algs tokens ?deps_machinery contact_map domain rule_label rule in
        domain',origin',List.rev_append cr acc)
-      (domain,Some (Term.RULE 0),[]) rules in
-  fdomain,List.rev frules
+      (domain,Some (Term.RULE 0,alg_deps),[]) rules with
+  | fdomain,Some (_,falg_deps),frules -> fdomain,falg_deps,List.rev frules
+  | _, None, _ ->
+     failwith "The origin of Eval.compile_rules has been lost"
 
 let initialize logger overwrite result =
   Debug.tag logger "+ Building initial simulation conditions...";
@@ -548,11 +568,12 @@ let initialize logger overwrite result =
     compile_alg_vars tk_nd.NamedDecls.finder contact_map domain
 		     overwrite (result.Ast.variables@extra_vars) in
   let alg_nd = NamedDecls.create alg_a in
+  let alg_deps = Alg_expr.setup_alg_vars_rev_dep alg_a in
 
   Debug.tag logger "\t -rules";
-  let (domain',compiled_rules) =
-    compile_rules alg_nd.NamedDecls.finder tk_nd.NamedDecls.finder contact_map
-		  domain' cleaned_rules in
+  let (domain',alg_deps',compiled_rules) =
+    compile_rules alg_nd.NamedDecls.finder alg_deps tk_nd.NamedDecls.finder
+		  contact_map domain' cleaned_rules in
   let rule_nd = NamedDecls.create (Array.of_list compiled_rules) in
 
   Debug.tag logger "\t -observables";
@@ -560,10 +581,10 @@ let initialize logger overwrite result =
     obs_of_result alg_nd tk_nd contact_map domain' result in
   Debug.tag logger "\t -perturbations" ;
   let (domain,pert,stops,tracking_enabled) =
-    pert_of_result alg_nd tk_nd rule_nd contact_map domain result in
+    pert_of_result alg_nd alg_deps' tk_nd rule_nd contact_map domain result in
 
   let env =
-    Environment.init sigs_nd tk_nd alg_nd rule_nd
+    Environment.init sigs_nd tk_nd alg_nd alg_deps' rule_nd
 		     (Array.of_list (List.rev obs)) (Array.of_list pert) in
 
   Debug.tag logger "\t -initial conditions";

@@ -764,7 +764,7 @@ let connected_components_of_mixture created (env,origin) mix =
 	 complete_with_creation
 	   transformations' links_transf actions' 0 created in
        ((env,Tools.option_map incr_origin origin),
-	(Tools.array_rev_of_list acc,
+	(origin,Tools.array_rev_of_list acc,
 	 (tests,(actions'',side_sites,side_effects)), transformations''))
     | h :: t ->
        let wk = Connected_component.begin_new env in
@@ -827,5 +827,5 @@ let connected_components_sum_of_ambiguous_mixture contact_map env ?origin mix =
   let (cc_env,_),rules =
     aux_connected_components_sum_of_ambiguous_rule contact_map env ?origin mix mix in
   (cc_env, List.map
-	     (function l, (tests,_), ([],[]) -> l,tests
+	     (function _, l, (tests,_), ([],[]) -> l,tests
 		     | _ -> assert false) rules)
