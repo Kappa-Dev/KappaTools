@@ -11,6 +11,9 @@ val print_bool :
 val print_ast_bool :
   Format.formatter -> Ast.mixture Ast.ast_alg_expr Ast.bool_expr -> unit
 
+(** {6 Utilities } *)
+val ast_alg_has_mix : 'a Ast.ast_alg_expr Term.with_pos -> bool
+
 (** {6 Compilers } *)
 
 (** [compile_alg variable_map token_map (fresh_mix_id, mix_list) alg_pos] *)

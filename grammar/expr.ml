@@ -49,6 +49,13 @@ let rec print_bool p_alg f = function
 
 let print_ast_bool = print_bool print_ast_alg
 
+let rec ast_alg_has_mix = function
+  | Ast.BIN_ALG_OP (_, a, b), _ -> ast_alg_has_mix a || ast_alg_has_mix b
+  | Ast.UN_ALG_OP (_, a), _  -> ast_alg_has_mix a
+  | (Ast.STATE_ALG_OP _ | Ast.OBS_VAR _ | Ast.TOKEN_ID _ | Ast.CONST _ |
+     Ast.TMAX | Ast.EMAX | Ast.PLOTNUM), _ -> false
+  | Ast.KAPPA_INSTANCE _, _ -> true
+
 type ('a,'b) contractible = NO of 'a
 			  | MAYBE of 'a * Term.bin_alg_op * 'a * 'b
 			  | YES of 'b

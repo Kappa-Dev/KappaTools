@@ -29,7 +29,7 @@ type 'mixt ast_alg_expr =
   | TOKEN_ID of string
   | KAPPA_INSTANCE of 'mixt
   | CONST of Nbr.t
-  | TMAX 
+  | TMAX
   | EMAX
   | PLOTNUM
 
@@ -56,27 +56,8 @@ type rule = {
 
 let flip_label str = str^"_op"
 
-let flip (rule_label,rule) =
-  let lbl = match rule_label with
-      None -> None
-    | Some (str,pos) -> Some (flip_label str,pos) 
-  in
-  let rule =
-    {rule with
-      lhs = rule.rhs ;
-      rhs = rule.lhs ;
-      add_token = rule.rm_token ;
-      rm_token = rule.add_token ;
-      k_def = (match rule.k_op with
-	  None -> Term.with_dummy_pos (CONST (Nbr.F 0.))
-	| Some k -> k);
-      k_op = None
-    }
-  in
-  (lbl,rule)
-
 type 'alg_expr print_expr =
-    Str_pexpr of string 
+    Str_pexpr of string
   | Alg_pexpr of 'alg_expr
 
 type 'mixture modif_expr =

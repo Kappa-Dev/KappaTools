@@ -9,6 +9,30 @@ let initial_value_alg counter algs (ast, _) =
 	      fst (snd algs.NamedDecls.decls.(i)))
     ~get_mix:(fun _ -> Nbr.zero) ~get_tok:(fun _ -> Nbr.zero) ast
 
+let name_and_purify_rule acc (label_opt,(r,r_pos)) =
+  let (label,_ as label_pos) = match label_opt with
+    | None -> Term.with_dummy_pos ("__anonymous_"^(string_of_float (Sys.time ())))
+    | Some (lab,pos) -> (lab,pos) in
+  let acc',k_def =
+    if Expr.ast_alg_has_mix r.k_def then
+      let rate_var = label^"_rate" in
+      ((Term.with_dummy_pos rate_var,r.k_def)::acc,
+       Term.with_dummy_pos (Ast.OBS_VAR rate_var))
+    else (acc,r.k_def) in
+  let acc'',k_op =
+    match r.k_op with
+    | Some k when Expr.ast_alg_has_mix k ->
+       let rate_var = (Ast.flip_label label)^"_rate" in
+       ((Term.with_dummy_pos rate_var,k)::acc',
+	Some (Term.with_dummy_pos (Ast.OBS_VAR rate_var)))
+    | (Some _ | None) -> (acc',r.k_op) in
+  let () = match r.k_un with
+    | None -> ()
+    | Some ((_,pos),_) ->
+       raise (ExceptionDefn.Internal_Error
+		("KaSim does not deal with unary rule yet",pos))in
+  acc'',(label_pos, ({r with k_def = k_def; k_op = k_op},r_pos))
+
 let tokenify algs tokens contact_map domain l =
   List.fold_right
     (fun (alg_expr,(nme,pos)) (domain,out) ->
@@ -24,11 +48,8 @@ let tokenify algs tokens contact_map domain l =
     ) l (domain,[])
 
 let rules_of_ast ?origin algs tokens contact_map domain
-		    label_opt (ast_rule,rule_pos) =
-  let label = match label_opt with
-    | None -> Term.with_dummy_pos ("%anonymous"^(string_of_float (Sys.time ())))
-    | Some (lab,pos) -> (lab,pos) in
-  let opposite (lab,pos) = (lab^"_op",pos) in
+		    label (ast_rule,rule_pos) =
+  let opposite (lab,pos) = (Ast.flip_label lab,pos) in
   let domain',rm_toks =
     tokenify algs tokens contact_map domain ast_rule.rm_token in
   let domain'',add_toks =
@@ -123,8 +144,9 @@ let effects_of_modif algs tokens rules contact_map domain ast_list =
 	Expr.compile_alg algs.NamedDecls.finder tokens.NamedDecls.finder
 			 contact_map domain alg_expr in
       let domain'',_,elem_rules =
-	rules_of_ast algs.NamedDecls.finder tokens.NamedDecls.finder
-		     contact_map domain' None (ast_rule,mix_pos) in
+	rules_of_ast algs.NamedDecls.finder tokens.NamedDecls.finder contact_map
+		     domain' (Term.with_dummy_pos "__perturbation_modification")
+		     (ast_rule,mix_pos) in
       let elem_rule = match elem_rules with
 	| [ _, r ] -> r
 	| _ ->
@@ -306,7 +328,8 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 	  let domain'',state' =
 	    match
 	      rules_of_ast algs.NamedDecls.finder tokens.NamedDecls.finder
-			   contact_map domain' None (fake_rule,mix_pos)
+			   contact_map domain' (Term.with_dummy_pos "__init_mix")
+			   (fake_rule,mix_pos)
 	    with
 	    | domain'',_,[ _, compiled_rule ] ->
 	       domain'',
@@ -334,7 +357,8 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 	  let domain',(state',_) =
 	    match
 	      rules_of_ast algs.NamedDecls.finder tokens.NamedDecls.finder
-			   contact_map domain None (Term.with_dummy_pos fake_rule)
+			   contact_map domain (Term.with_dummy_pos "__init_tok")
+			   (Term.with_dummy_pos fake_rule)
 	    with
 	    | domain'',_,[ _, compiled_rule ] ->
 	       domain'',
@@ -518,15 +542,17 @@ let initialize logger overwrite result =
 
   let domain = Connected_component.Env.empty sigs_nd in
   Debug.tag logger "\t -variable declarations";
+  let (extra_vars,cleaned_rules) =
+    Tools.list_fold_right_map name_and_purify_rule [] result.rules in
   let domain',alg_a =
     compile_alg_vars tk_nd.NamedDecls.finder contact_map domain
-		     overwrite result.Ast.variables in
+		     overwrite (result.Ast.variables@extra_vars) in
   let alg_nd = NamedDecls.create alg_a in
 
   Debug.tag logger "\t -rules";
   let (domain',compiled_rules) =
     compile_rules alg_nd.NamedDecls.finder tk_nd.NamedDecls.finder contact_map
-		  domain' result.Ast.rules in
+		  domain' cleaned_rules in
   let rule_nd = NamedDecls.create (Array.of_list compiled_rules) in
 
   Debug.tag logger "\t -observables";
