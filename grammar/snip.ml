@@ -123,7 +123,7 @@ let annotate_dropped_agent sigs ((agent_name, _ as ag_ty),intf) =
        | (Ast.FREE, _) -> ports.(p_id) <- L_FREE Erased
       ) intf in
   { ra_type = ag_id; ra_ports = ports; ra_ints = internals;
-    ra_syntax = Some (ports, internals);}
+    ra_syntax = Some (Array.copy ports, Array.copy internals);}
 
 let annotate_created_agent id sigs ((agent_name, _ as ag_ty),intf) =
   let ag_id = Signature.num_of_agent ag_ty sigs in
@@ -563,7 +563,8 @@ let make_instantiation
 	      side_effects',
 	      links
 	   | L_FREE s ->
-	      Primitives.Instantiation.Is_Free (place,site_id) :: tests',
+	      (if site_id = 0 then tests'
+	       else Primitives.Instantiation.Is_Free (place,site_id) :: tests'),
 	      add_instantiation_free actions' place site_id s,side_sites,
 	      side_effects, links
 	   | L_SOME s ->
