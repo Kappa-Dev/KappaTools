@@ -88,32 +88,3 @@ module WlMake (Ord: OrderedType) =
 
 module Int = struct type t = int let compare = compare end
 module IntWL = WlMake(Int)
-
-(*
-let parameter = Remanent_parameters.get_parameters () 
-let error = Exception.empty_error_handler 
-let wl = IntWL.empty 
-let error, wl = IntWL.push parameter error 2 wl
-let error, wl = IntWL.push parameter error 2 wl
-
-let _ = 
-  Printf.fprintf stdout "Push: ";
-  print_wl wl
-
-let error, wl = IntWL.push parameter error 3 wl
-
-let _ = 
-  Printf.fprintf stdout "Push: ";
-  print_wl wl
-
-let error, wl = IntWL.push parameter error 2 wl
-
-let error,(_, wl) = IntWL.pop parameter error wl
-let _ = 
-  Printf.fprintf stdout "Pop: "; 
-  print_wl wl
-
-let error,(_, wl) = IntWL.pop parameter error wl
-let _ = 
-  Printf.fprintf stdout "Pop: "; 
-  print_wl wl*)
