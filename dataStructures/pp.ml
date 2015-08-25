@@ -44,22 +44,8 @@ let plain_array pr_el f a =
 	Format.fprintf f ";@,%t" (aux (succ i))
   in Format.fprintf f "[|%t|]" (aux 0)
 
-let position f (beg_pos,end_pos) =
-  let () = assert (beg_pos.Lexing.pos_fname = end_pos.Lexing.pos_fname) in
-  let pr_f f =
-    if beg_pos.Lexing.pos_fname <> "" then
-      fprintf f "File \"%s\", " beg_pos.Lexing.pos_fname in
-  let pr_l f =
-    if beg_pos.Lexing.pos_lnum = end_pos.Lexing.pos_lnum
-    then fprintf f "line %i" beg_pos.Lexing.pos_lnum
-    else fprintf f "lines %i-%i" beg_pos.Lexing.pos_lnum end_pos.Lexing.pos_lnum
-  in
-  fprintf f "%t%t, characters %i-%i:" pr_f pr_l
-	  (beg_pos.Lexing.pos_cnum - beg_pos.Lexing.pos_bol)
-	  (end_pos.Lexing.pos_cnum - end_pos.Lexing.pos_bol)
-
-let error pr (x,pos) =
-  eprintf "%a:@ %a@." position pos pr x
+let error pr x =
+  eprintf "%a@." (Location.print pr) x
 
 let list_to_string pr_sep pr_el () l =
   let rec aux () = function
