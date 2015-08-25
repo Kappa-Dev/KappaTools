@@ -153,18 +153,18 @@ let rec print_alg parameter error alg =
   | Ast.BIN_ALG_OP (op,(alg1,_),(alg2,_)) -> 
     let _ = Printf.fprintf (Remanent_parameters.get_log parameter)  "(" in 
     let _ = print_alg parameter error alg1 in 
-    let _ = Term.print_bin_alg_op (Remanent_parameters.get_formatter parameter) op in 
+    let _ = Operator.print_bin_alg_op (Remanent_parameters.get_formatter parameter) op in 
     let _ = print_alg parameter error alg2 in 
     let _ =  Printf.fprintf (Remanent_parameters.get_log parameter) ")" in 
     error
   | Ast.UN_ALG_OP (op,(alg,_)) -> 
     let _ = Printf.fprintf (Remanent_parameters.get_log parameter)  "(" in 
-    let _ = Term.print_un_alg_op (Remanent_parameters.get_formatter parameter) op in 
+    let _ = Operator.print_un_alg_op (Remanent_parameters.get_formatter parameter) op in 
     let _ = print_alg parameter error alg in 
     let _ =  Printf.fprintf (Remanent_parameters.get_log parameter)  ")" in 
     error
   | Ast.STATE_ALG_OP state_alg_op -> 
-    let _ = Term.print_state_alg_op (Remanent_parameters.get_formatter parameter) state_alg_op in 
+    let _ = Operator.print_state_alg_op (Remanent_parameters.get_formatter parameter) state_alg_op in 
     error 
   | Ast.OBS_VAR string -> 
     let _ = Printf.fprintf (Remanent_parameters.get_log parameter)  "%s" string 

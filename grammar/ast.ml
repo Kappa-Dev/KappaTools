@@ -1,4 +1,4 @@
-open Term
+open Operator
 
 type str_pos = string * Tools.pos
 

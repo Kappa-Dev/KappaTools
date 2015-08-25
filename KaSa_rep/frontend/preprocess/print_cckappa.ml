@@ -106,74 +106,74 @@ let print_diffview parameters error handler diff =
   
  let rec print_short_alg parameters error handler alg = 
     match alg with 
-     |Ast.BIN_ALG_OP(Term.MULT,a1,a2),_ -> 
+     |Ast.BIN_ALG_OP(Operator.MULT,a1,a2),_ -> 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(" in
         let error = print_short_alg parameters error handler a1 in 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "*" in
         let error = print_short_alg parameters error handler a2 in 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) ")" in
          error  
-     | Ast.BIN_ALG_OP(Term.SUM,a1,a2),_ -> 
+     | Ast.BIN_ALG_OP(Operator.SUM,a1,a2),_ -> 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(" in
         let error = print_short_alg parameters error handler a1 in 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "+" in
         let error = print_short_alg parameters error handler a2 in 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) ")" in
          error  
-     | Ast.BIN_ALG_OP(Term.DIV,a1,a2),_ -> 
+     | Ast.BIN_ALG_OP(Operator.DIV,a1,a2),_ -> 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(" in
         let error = print_short_alg parameters error handler a1 in 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "/" in
         let error = print_short_alg parameters error handler a2 in 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) ")" in
          error   
-     | Ast.BIN_ALG_OP(Term.MINUS,a1,a2),_ -> 
+     | Ast.BIN_ALG_OP(Operator.MINUS,a1,a2),_ -> 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(" in
         let error = print_short_alg parameters error handler a1 in 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "-" in
         let error = print_short_alg parameters error handler a2 in 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) ")" in
          error   
-     | Ast.BIN_ALG_OP(Term.POW,a1,a2),_ -> 
+     | Ast.BIN_ALG_OP(Operator.POW,a1,a2),_ -> 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(" in
         let error = print_short_alg parameters error handler a1 in 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "**" in
         let error = print_short_alg parameters error handler a2 in 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) ")" in
          error   
-     | Ast.BIN_ALG_OP(Term.MODULO,a1,a2),_ -> 
+     | Ast.BIN_ALG_OP(Operator.MODULO,a1,a2),_ -> 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(" in
         let error = print_short_alg parameters error handler a1 in 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "mod" in
         let error = print_short_alg parameters error handler a2 in 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) ")" in
          error  
-     | Ast.UN_ALG_OP(Term.LOG,a1),_ -> 
+     | Ast.UN_ALG_OP(Operator.LOG,a1),_ -> 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(log(" in
         let error = print_short_alg parameters error handler a1 in 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "))" in
          error  
-     | Ast.UN_ALG_OP(Term.SQRT,a1),_ -> 
+     | Ast.UN_ALG_OP(Operator.SQRT,a1),_ -> 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(sqrt(" in
         let error = print_short_alg parameters error handler a1 in 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "))" in
          error 
-     | Ast.UN_ALG_OP(Term.EXP,a1),_ -> 
+     | Ast.UN_ALG_OP(Operator.EXP,a1),_ -> 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(exp(" in
         let error = print_short_alg parameters error handler a1 in 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "))" in
          error 
-     | Ast.UN_ALG_OP(Term.SINUS,a1),_ -> 
+     | Ast.UN_ALG_OP(Operator.SINUS,a1),_ -> 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(sin(" in
         let error = print_short_alg parameters error handler a1 in 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "))" in
          error 
-     | Ast.UN_ALG_OP(Term.COSINUS,a1),_ -> 
+     | Ast.UN_ALG_OP(Operator.COSINUS,a1),_ -> 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(cos(" in
         let error = print_short_alg parameters error handler a1 in 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "))" in
          error 
-   (*  | Ast.UN_ALG_OP(Term.ABS,a1),_ -> 
+   (*  | Ast.UN_ALG_OP(Operator.ABS,a1),_ -> 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(abs(" in
         let error = print_short_alg parameters error handler a1 in 
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "))" in
@@ -184,15 +184,15 @@ let print_diffview parameters error handler diff =
      | Ast.TMAX,_ -> 
          let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "#Time_MAX#" in
            error
-     | Ast.UN_ALG_OP(Term.TAN,a1),_ -> 
+     | Ast.UN_ALG_OP(Operator.TAN,a1),_ -> 
           let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "(tan(" in
           let error = print_short_alg parameters error handler a1 in 
           let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "))" in
          error  
-     | Ast.STATE_ALG_OP Term.TIME_VAR,_ ->   
+     | Ast.STATE_ALG_OP Operator.TIME_VAR,_ ->   
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "#TIME#" in
         error 
-     | Ast.STATE_ALG_OP Term.EVENT_VAR,_ ->   
+     | Ast.STATE_ALG_OP Operator.EVENT_VAR,_ ->   
         let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "#EVENT#" in
         error 
    

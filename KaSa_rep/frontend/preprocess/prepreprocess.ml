@@ -315,30 +315,30 @@ let rec bool_map f error alg =
   with 
   | Ast.TRUE -> error,Ast.TRUE
   | Ast.FALSE -> error,Ast.FALSE
-  | Ast.BOOL_OP(Term.AND,(b1,pos1),(b2,pos2)) -> 
+  | Ast.BOOL_OP(Operator.AND,(b1,pos1),(b2,pos2)) -> 
     let error,b1' = bool_map f error b1 in 
     let error,b2' = bool_map f error b2 in 
-    error,Ast.BOOL_OP(Term.AND,(b1',pos1),(b2',pos2))
-  | Ast.BOOL_OP(Term.OR,(b1,pos1),(b2,pos2)) -> 
+    error,Ast.BOOL_OP(Operator.AND,(b1',pos1),(b2',pos2))
+  | Ast.BOOL_OP(Operator.OR,(b1,pos1),(b2,pos2)) -> 
     let error,b1' = bool_map f error b1 in 
     let error,b2' = bool_map f error b2 in 
-    error,Ast.BOOL_OP(Term.OR,(b1',pos1),(b2',pos2))
-  | Ast.COMPARE_OP(Term.GREATER,(m1,pos1),(m2,pos2)) -> 
+    error,Ast.BOOL_OP(Operator.OR,(b1',pos1),(b2',pos2))
+  | Ast.COMPARE_OP(Operator.GREATER,(m1,pos1),(m2,pos2)) -> 
     let error,m1' = alg_map f error m1 in 
     let error,m2' = alg_map f error m2 in 
-    error,Ast.COMPARE_OP(Term.GREATER,(m1',pos1),(m2',pos2))
-  | Ast.COMPARE_OP(Term.SMALLER,(m1,pos1),(m2,pos2)) -> 
+    error,Ast.COMPARE_OP(Operator.GREATER,(m1',pos1),(m2',pos2))
+  | Ast.COMPARE_OP(Operator.SMALLER,(m1,pos1),(m2,pos2)) -> 
     let error,m1' = alg_map f error m1 in 
     let error,m2' = alg_map f error m2 in 
-    error,Ast.COMPARE_OP(Term.SMALLER,(m1',pos1),(m2',pos2))
-  | Ast.COMPARE_OP(Term.EQUAL,(m1,pos1),(m2,pos2)) -> 
+    error,Ast.COMPARE_OP(Operator.SMALLER,(m1',pos1),(m2',pos2))
+  | Ast.COMPARE_OP(Operator.EQUAL,(m1,pos1),(m2,pos2)) -> 
     let error,m1' = alg_map f error m1 in 
     let error,m2' = alg_map f error m2 in 
-    error,Ast.COMPARE_OP(Term.EQUAL,(m1',pos1),(m2',pos2))
-  | Ast.COMPARE_OP(Term.DIFF,(m1,pos1),(m2,pos2)) -> 
+    error,Ast.COMPARE_OP(Operator.EQUAL,(m1',pos1),(m2',pos2))
+  | Ast.COMPARE_OP(Operator.DIFF,(m1,pos1),(m2,pos2)) -> 
     let error,m1' = alg_map f error m1 in 
     let error,m2' = alg_map f error m2 in 
-    error,Ast.COMPARE_OP(Term.DIFF,(m1',pos1),(m2',pos2))
+    error,Ast.COMPARE_OP(Operator.DIFF,(m1',pos1),(m2',pos2))
 
 let rec modif_map f error alg = 
   match 
