@@ -1,7 +1,7 @@
 load_printer "str.cma"
 load_printer "db_printers.cma"
 
-install_printer Pp.position
+install_printer Location.print
 install_printer Random_tree.debug_print
 install_printer Renaming.print_full
 install_printer Expr.print_ast_mix

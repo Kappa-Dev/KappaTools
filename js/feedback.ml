@@ -12,7 +12,8 @@ let show_warnings div =
       (fun (pos,msg) ->
        let pstr =
 	   match pos with
-	   | Some pos -> Format.asprintf "%a@," Pp.position pos
+	   | Some pos -> Format.asprintf
+			   "%a@," (Location.print (fun _ () -> ())) ((),pos)
 	   | None -> ""
 	 in
        let str = Format.asprintf "%t" msg in
@@ -29,11 +30,11 @@ let show_warnings div =
     let () = ExceptionDefn.warning_buffer := [] in
     Dom.appendChild div (Tyxml_js.To_dom.of_div raw)
 
-let show_error pr div (x,pos) =
+let show_error pr div x =
   let raw =
   <:html5<<div class="alert alert-danger alert-dismisible">
 	  $raw_alert_close_button ()$
-	  <p>$str:Format.asprintf "%a %a@." Pp.position pos pr x$</p>
+	  <p>$str:Format.asprintf "%a@." (Location.print pr) x$</p>
 	  </div> >> in
   Dom.appendChild div (Tyxml_js.To_dom.of_div raw)
 
