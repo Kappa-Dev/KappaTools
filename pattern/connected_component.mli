@@ -40,7 +40,7 @@ val new_link :
 val new_free : work -> (ContentAgent.t * int) -> work
 val new_internal_state : work -> (ContentAgent.t * int) -> int -> work
 (** [new_link_type work (node,site) type] *)
-val finish_new : ?origin:Term.rev_dep -> work -> (Env.t*Renaming.t*t)
+val finish_new : ?origin:Operator.rev_dep -> work -> (Env.t*Renaming.t*t)
 
 (** {6 Use a connected component } *)
 
@@ -56,14 +56,14 @@ module Matching : sig
   val reconstruct : Edges.t -> t -> int -> cc -> int -> t option
 
   val observables_from_free :
-    Env.t -> Edges.t -> int -> int -> int -> ((cc * int) list * Term.DepSet.t)
+    Env.t -> Edges.t -> int -> int -> int -> ((cc * int) list * Operator.DepSet.t)
   (** [observables_from_free domain graph sort agent site] *)
   val observables_from_internal :
-    Env.t -> Edges.t -> int -> int -> int -> int -> ((cc * int) list * Term.DepSet.t)
+    Env.t -> Edges.t -> int -> int -> int -> int -> ((cc * int) list * Operator.DepSet.t)
   (** [observables_from_internal domain graph sort agent site internal_state] *)
   val observables_from_link :
     Env.t -> Edges.t -> int -> int -> int -> int -> int -> int ->
-    ((cc * int) list * Term.DepSet.t)
+    ((cc * int) list * Operator.DepSet.t)
   (** [observables_from_link domain graph sort ag site sort' ag' site'] *)
 end
 

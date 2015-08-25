@@ -4,7 +4,7 @@ type t
 
 val init :
   Signature.s -> unit NamedDecls.t -> Alg_expr.t Location.annot NamedDecls.t
-  -> (Term.DepSet.t * Term.DepSet.t * Term.DepSet.t array)
+  -> (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array)
   -> Primitives.elementary_rule NamedDecls.t -> Alg_expr.t Location.annot array
   -> Primitives.perturbation array -> t
 (** [init sigs contact_map tokens algs rules obs perts] *)
@@ -21,8 +21,8 @@ val get_rule : t -> int -> Primitives.elementary_rule
 val map_observables : (Alg_expr.t -> 'a) -> t -> 'a array
 val iteri_rules : (int -> Primitives.elementary_rule -> unit) -> t -> unit
 
-val get_reverse_dependencies : t -> int -> Term.DepSet.t
-val get_always_outdated : t -> Term.DepSet.t
+val get_reverse_dependencies : t -> int -> Operator.DepSet.t
+val get_always_outdated : t -> Operator.DepSet.t
 
 val num_of_agent : string Location.annot -> t -> int
 val num_of_rule : string Location.annot -> t -> int

@@ -1,19 +1,19 @@
 open Mods
 
 let value_state_alg_op counter ?(time=Counter.time counter) = function
-  | Term.CPUTIME -> Nbr.F (Sys.time ())
-  | Term.TIME_VAR -> Nbr.F time
-  | Term.EVENT_VAR -> Nbr.I (Counter.event counter+Counter.null_event counter)
-  | Term.NULL_EVENT_VAR -> Nbr.I (Counter.null_event counter)
-  | Term.PROD_EVENT_VAR ->Nbr.I (Counter.event counter)
+  | Operator.CPUTIME -> Nbr.F (Sys.time ())
+  | Operator.TIME_VAR -> Nbr.F time
+  | Operator.EVENT_VAR -> Nbr.I (Counter.event counter+Counter.null_event counter)
+  | Operator.NULL_EVENT_VAR -> Nbr.I (Counter.null_event counter)
+  | Operator.PROD_EVENT_VAR ->Nbr.I (Counter.event counter)
 
 type alg_stack_element =
-  | TO_EXEC_ALG of Term.bin_alg_op * Alg_expr.t
-  | TO_EXEC_COMP of Term.compare_op * Alg_expr.t
-  | TO_EXEC_BOOL of Term.bool_op * Alg_expr.t Ast.bool_expr
-  | TO_COMPUTE_ALG of Term.bin_alg_op * Nbr.t
-  | TO_COMPUTE_COMP of Term.compare_op * Nbr.t
-  | TO_COMPUTE_UN of Term.un_alg_op
+  | TO_EXEC_ALG of Operator.bin_alg_op * Alg_expr.t
+  | TO_EXEC_COMP of Operator.compare_op * Alg_expr.t
+  | TO_EXEC_BOOL of Operator.bool_op * Alg_expr.t Ast.bool_expr
+  | TO_COMPUTE_ALG of Operator.bin_alg_op * Nbr.t
+  | TO_COMPUTE_COMP of Operator.compare_op * Nbr.t
+  | TO_COMPUTE_UN of Operator.un_alg_op
 
 let rec exec_alg :
 type a. Counter.t -> ?time:float -> get_alg:(int -> Alg_expr.t) ->
@@ -89,11 +89,11 @@ and exec_bool counter ?time ~get_alg ~get_mix ~get_tok expr sk =
 	      a (TO_EXEC_COMP (op,b) :: sk)
 and with_value_bool counter ?time ~get_alg ~get_mix ~get_tok b = function
   | [] -> b
-  | TO_EXEC_BOOL (Term.OR,_) :: sk when b ->
+  | TO_EXEC_BOOL (Operator.OR,_) :: sk when b ->
      with_value_bool counter ?time ~get_alg ~get_mix ~get_tok true sk
-  | TO_EXEC_BOOL (Term.AND,_) :: sk when not b ->
+  | TO_EXEC_BOOL (Operator.AND,_) :: sk when not b ->
      with_value_bool counter ?time ~get_alg ~get_mix ~get_tok false sk
-  | TO_EXEC_BOOL ((Term.OR | Term.AND),expr) :: sk ->
+  | TO_EXEC_BOOL ((Operator.OR | Operator.AND),expr) :: sk ->
      exec_bool counter ?time ~get_alg ~get_mix ~get_tok expr sk
   | (TO_EXEC_ALG _ | TO_EXEC_COMP _ | TO_COMPUTE_ALG _ | TO_COMPUTE_COMP _
      | TO_COMPUTE_UN _) :: _ -> failwith "type error in with_value_bool"

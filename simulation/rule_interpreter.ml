@@ -4,7 +4,7 @@ type t = {
   roots_of_ccs: ValMap.tree Connected_component.Map.t;
   edges: Edges.t;
   tokens: Nbr.t array;
-  outdated_elements: Term.DepSet.t;
+  outdated_elements: Operator.DepSet.t;
   free_id: int;
   story_machinery :
     ((Causal.event_kind *
@@ -17,7 +17,7 @@ let empty ~has_tracking env = {
   roots_of_ccs = Connected_component.Map.empty;
   edges = Edges.empty;
   tokens = Array.make (Environment.nb_tokens env) Nbr.zero;
-  outdated_elements = Term.DepSet.empty;
+  outdated_elements = Operator.DepSet.empty;
   free_id = 1;
   story_machinery =
     if has_tracking
@@ -149,7 +149,7 @@ let update_edges counter domain inj_nodes state event_kind rule =
       (fun (inj2graph,edges,roots,deps) transf -> (*inj2graph: abs -> conc, roots define the injection that is used*)
        let ((a,b,c,new_deps),_) =
 	 deal_transformation false domain inj2graph edges roots transf in
-       (a,b,c,Term.DepSet.union new_deps deps))
+       (a,b,c,Operator.DepSet.union new_deps deps))
       ((inj_nodes,Mods.IntMap.empty,state.free_id), (*initial inj2graph: (existing,new,fresh_id) *)
        state.edges,state.roots_of_ccs,state.outdated_elements)
       rule.Primitives.removed (*removed: statically defined edges*)
@@ -160,7 +160,7 @@ let update_edges counter domain inj_nodes state event_kind rule =
       (fun ((inj2graph,edges,roots,deps),tracked_inst) transf ->
        let (a,b,c,new_deps),new_obs =
 	 deal_transformation true domain inj2graph edges roots transf in
-       ((a,b,c,Term.DepSet.union deps new_deps),
+       ((a,b,c,Operator.DepSet.union deps new_deps),
 	store_obs b new_obs tracked_inst state.story_machinery))
       (aux,[])
       rule.Primitives.inserted (*statically defined edges*)
@@ -204,9 +204,9 @@ let update_outdated_activities ~get_alg store env counter state activities =
   transitive closure of what should be updated and then updating them
   only once or not *)
   let rec aux deps =
-    Term.DepSet.iter
+    Operator.DepSet.iter
       (function
-	| Term.RULE i ->
+	| Operator.RULE i ->
 	   let rule = Environment.get_rule env i in
 	   let rate =
 	     Nbr.to_float @@
@@ -221,11 +221,11 @@ let update_outdated_activities ~get_alg store env counter state activities =
 	   let act =
 	     if cc_va = 0 then 0. else rate *. float_of_int cc_va in
 	   store i act activities
-	| Term.ALG j -> aux (Environment.get_reverse_dependencies env j)
-	| Term.PERT _ -> assert false) deps in
+	| Operator.ALG j -> aux (Environment.get_reverse_dependencies env j)
+	| Operator.PERT _ -> assert false) deps in
   let () = aux (Environment.get_always_outdated env) in
   let () = aux state.outdated_elements in
-  {state with outdated_elements = Term.DepSet.empty }
+  {state with outdated_elements = Operator.DepSet.empty }
 
 let update_tokens ~get_alg counter state consumed injected =
   let do_op op l =

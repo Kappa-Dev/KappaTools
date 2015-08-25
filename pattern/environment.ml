@@ -7,8 +7,8 @@ type t = {
   observables : Alg_expr.t Location.annot array;
   rules : Primitives.elementary_rule NamedDecls.t;
   perturbations : Primitives.perturbation array;
-  need_update_each_loop : Term.DepSet.t;
-  reverse_dependencies : Term.DepSet.t array;
+  need_update_each_loop : Operator.DepSet.t;
+  reverse_dependencies : Operator.DepSet.t array;
   desc_table : (string,out_channel * Format.formatter) Hashtbl.t;
 
   (* legacy *)
@@ -26,7 +26,7 @@ let empty =
    algs = NamedDecls.create [||];
    observables = [||];
    perturbations = [||];
-   need_update_each_loop =  Term.DepSet.empty;
+   need_update_each_loop =  Operator.DepSet.empty;
    reverse_dependencies = [||];
    desc_table = Hashtbl.create 2;
 
@@ -42,7 +42,7 @@ let init sigs tokens algs (deps_in_t,deps_in_e,rd) rules obs perts =
   { empty with signatures = sigs; tokens = tokens;
 	       rules = rules; algs = algs; observables = obs;
 	       perturbations = perts; reverse_dependencies = rd;
-	       need_update_each_loop = Term.DepSet.union deps_in_t deps_in_e; }
+	       need_update_each_loop = Operator.DepSet.union deps_in_t deps_in_e; }
 
 let signatures env = env.signatures
 

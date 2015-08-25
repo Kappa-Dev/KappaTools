@@ -32,7 +32,7 @@ type transition = {
 
 type point = {
   content: cc;
-  is_obs_of: Term.DepSet.t option;
+  is_obs_of: Operator.DepSet.t option;
   fathers: int (** t.id *) list;
   sons: transition list;
 }
@@ -378,7 +378,7 @@ let print f env =
 			     | Some deps ->
 				Format.fprintf
 				  f "@[[%a]@]@ "
-				  (Pp.set Term.DepSet.elements Pp.space Term.print_rev_dep)
+				  (Pp.set Operator.DepSet.elements Pp.space Operator.print_rev_dep)
 				  deps)
 			    (Pp.list
 			       Pp.space
@@ -710,7 +710,7 @@ let rename_edge inj2cc = function
 
 let add_origin deps = function
   | None -> deps
-  | Some x -> Term.DepSet.add x deps
+  | Some x -> Operator.DepSet.add x deps
 
 let rec complete_domain_with obs_id dst env free_id cc edge inj_dst2cc =
   let rec new_son inj_cc2found = function
@@ -742,7 +742,7 @@ and add_new_point ~origin obs_id env free_id sons cc =
       cc.id
       {content = cc;sons=sons; fathers = fathers;
        is_obs_of =
-	 if cc.id = obs_id then Some (add_origin Term.DepSet.empty origin) else None;}
+	 if cc.id = obs_id then Some (add_origin Operator.DepSet.empty origin) else None;}
       env' in
   ((free_id'',completed),cc.id)
 
@@ -759,7 +759,7 @@ let add_domain ?origin env cc =
       | None ->
 	 let point' =
 	   { point with
-	     is_obs_of = Some (add_origin Term.DepSet.empty origin)} in
+	     is_obs_of = Some (add_origin Operator.DepSet.empty origin)} in
 	propagate_add_obs id (Env.add_point id point' env) id),
      List.hd inj,point.content
   | None ->
@@ -955,7 +955,7 @@ module Matching = struct
 	      | None -> assert false
 	      | Some (_,root) ->
 		 ((point.content,Renaming.apply inj_point2graph root) :: obs,
-		  Term.DepSet.union rev_deps ndeps) in
+		  Operator.DepSet.union rev_deps ndeps) in
 	 let remains',cache' =
 	   List.fold_left
 	     (fun (re,ca as acc) son ->
@@ -973,13 +973,13 @@ module Matching = struct
 	 aux cache' acc' remains' in
     if List.for_all (check_edge graph) edges then
       match Env.navigate domain edges with
-      | None -> ([],Term.DepSet.empty)
+      | None -> ([],Operator.DepSet.empty)
       | Some (cc_id,injs,point) ->
 	 List.fold_left
 	   (fun out inj ->
 	    aux (IntSet.add cc_id IntSet.empty) out [(point,inj)])
-	   ([],Term.DepSet.empty) injs
-    else ([],Term.DepSet.empty)
+	   ([],Operator.DepSet.empty) injs
+    else ([],Operator.DepSet.empty)
 
   let observables_from_free domain graph ty node_id site =
     if site = 0 then

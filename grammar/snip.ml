@@ -740,8 +740,8 @@ let rec complete_with_creation (removed,added) links_transf actions fresh =
      handle_ports added links_transf actions [] 0
 
 let incr_origin = function
-  | ( Term.ALG _ | Term.PERT _  as x) -> x
-  | Term.RULE i -> Term.RULE (succ i)
+  | ( Operator.ALG _ | Operator.PERT _  as x) -> x
+  | Operator.RULE i -> Operator.RULE (succ i)
 
 let connected_components_of_mixture created (env,origin) mix =
   let rec aux env transformations instantiations links_transf acc id = function

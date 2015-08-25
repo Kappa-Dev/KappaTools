@@ -4,10 +4,10 @@ let alg_expr ?env f alg =
     | Some e -> Some (Environment.signatures e) in
   let rec aux f = function
     | Alg_expr.BIN_ALG_OP (op, (a,_), (b,_)) ->
-       Format.fprintf f "(%a %a %a)" aux a Term.print_bin_alg_op op aux b
+       Format.fprintf f "(%a %a %a)" aux a Operator.print_bin_alg_op op aux b
     | Alg_expr.UN_ALG_OP (op, (a,_)) ->
-       Format.fprintf f "(%a %a)" Term.print_un_alg_op op aux a
-    | Alg_expr.STATE_ALG_OP op -> Term.print_state_alg_op f op
+       Format.fprintf f "(%a %a)" Operator.print_un_alg_op op aux a
+    | Alg_expr.STATE_ALG_OP op -> Operator.print_state_alg_op f op
     | Alg_expr.CONST n -> Nbr.print f n
     | Alg_expr.ALG_VAR i ->
        Environment.print_alg ?env f i
@@ -103,13 +103,13 @@ let modification ?env f m =
   | Primitives.UPDATE (d_id,(va,_)) ->
      begin
        match d_id with
-       | Term.ALG id ->
+       | Operator.ALG id ->
 	  Format.fprintf f "$UPDATE %a %a"
 			 (Environment.print_alg ?env) id
-       | Term.RULE id ->
+       | Operator.RULE id ->
 	  Format.fprintf f "$UPDATE '%a' %a" (Environment.print_rule ?env) id
-       | Term.PERT _ ->
-	  Format.fprintf f "$UPDATE '%a' %a" Term.print_rev_dep d_id
+       | Operator.PERT _ ->
+	  Format.fprintf f "$UPDATE '%a' %a" Operator.print_rev_dep d_id
      end (alg_expr ?env) va
   | Primitives.SNAPSHOT fn ->
      Format.fprintf f "SNAPSHOT %a" (print_expr ?env) fn

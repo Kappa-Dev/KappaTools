@@ -125,38 +125,38 @@ let of_string x =
   with Failure _ -> F (float_of_string x)
 
 let of_bin_alg_op = function
-  | Term.MULT -> mult
-  | Term.SUM -> add
-  | Term.DIV -> fun x y -> cast_bin_op ~op_f:(/.) x y
-  | Term.MINUS -> sub
-  | Term.POW ->
+  | Operator.MULT -> mult
+  | Operator.SUM -> add
+  | Operator.DIV -> fun x y -> cast_bin_op ~op_f:(/.) x y
+  | Operator.MINUS -> sub
+  | Operator.POW ->
      fun x n ->
      let f =
        cast_bin_op ~op_f:( ** ) ~op_i:Tools.pow ~op_i64:Tools.pow64 in
      if is_zero n || is_strictly_positive n
      then f x n
      else f (F (1. /. to_float x)) (neg n)
-  | Term.MODULO ->
+  | Operator.MODULO ->
      cast_bin_op ~op_i:(mod)  ~op_i64:Int64.rem
 		 ~op_f:(fun a b ->
 			float_of_int
 			  (int_of_float a mod int_of_float b))
-  | Term.MIN -> min
-  | Term.MAX -> max
+  | Operator.MIN -> min
+  | Operator.MAX -> max
 
 let of_un_alg_op = function
-  | Term.LOG -> fun x -> cast_un_op ~op_f:log x
-  | Term.SQRT -> fun x -> cast_un_op ~op_f:sqrt x
-  | Term.EXP -> fun x -> cast_un_op ~op_f:exp x
-  | Term.SINUS -> fun x -> cast_un_op ~op_f:sin x
-  | Term.COSINUS -> fun x -> cast_un_op ~op_f:cos x
-  | Term.TAN -> fun x -> cast_un_op ~op_f:tan x
-  | Term.INT ->
+  | Operator.LOG -> fun x -> cast_un_op ~op_f:log x
+  | Operator.SQRT -> fun x -> cast_un_op ~op_f:sqrt x
+  | Operator.EXP -> fun x -> cast_un_op ~op_f:exp x
+  | Operator.SINUS -> fun x -> cast_un_op ~op_f:sin x
+  | Operator.COSINUS -> fun x -> cast_un_op ~op_f:cos x
+  | Operator.TAN -> fun x -> cast_un_op ~op_f:tan x
+  | Operator.INT ->
      fun x -> cast_un_op ~op_i:(fun n -> n) ~op_i64:(fun n -> n) x
-  | Term.UMINUS -> neg
+  | Operator.UMINUS -> neg
 
 let of_compare_op = function
-  | Term.GREATER -> is_greater
-  | Term.SMALLER -> is_smaller
-  | Term.EQUAL -> is_equal
-  | Term.DIFF -> fun v v' -> not (is_equal v v')
+  | Operator.GREATER -> is_greater
+  | Operator.SMALLER -> is_smaller
+  | Operator.EQUAL -> is_equal
+  | Operator.DIFF -> fun v v' -> not (is_equal v v')

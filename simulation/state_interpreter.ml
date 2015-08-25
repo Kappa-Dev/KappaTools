@@ -61,8 +61,8 @@ let do_it env domain counter graph state p_id = function
   | Primitives.UPDATE (va,(expr,_)) ->
      let () =
        match va with
-       | Term.ALG i -> state.variables_overwrite.(i) <- Some expr
-       | (Term.RULE _ | Term.PERT _) ->
+       | Operator.ALG i -> state.variables_overwrite.(i) <- Some expr
+       | (Operator.RULE _ | Operator.PERT _) ->
 	  failwith "Problematic update perturbation" in
      (false, graph, state)
   | Primitives.STOP pexpr ->

@@ -30,22 +30,22 @@ let rec print_ast_alg f = function
   | Ast.KAPPA_INSTANCE ast ->
      Format.fprintf f "|%a|" print_ast_mix ast
   | Ast.TOKEN_ID tk -> Format.fprintf f "|%s|" tk
-  | Ast.STATE_ALG_OP op -> Term.print_state_alg_op f op
+  | Ast.STATE_ALG_OP op -> Operator.print_state_alg_op f op
   | Ast.BIN_ALG_OP (op, (a,_), (b,_)) ->
      Format.fprintf f "(%a %a %a)"
-		    print_ast_alg a Term.print_bin_alg_op op print_ast_alg b
+		    print_ast_alg a Operator.print_bin_alg_op op print_ast_alg b
   |Ast.UN_ALG_OP (op, (a,_)) ->
-    Format.fprintf f "(%a %a)" Term.print_un_alg_op op print_ast_alg a
+    Format.fprintf f "(%a %a)" Operator.print_un_alg_op op print_ast_alg a
 
 let rec print_bool p_alg f = function
   | Ast.TRUE -> Format.fprintf f "[true]"
   | Ast.FALSE -> Format.fprintf f "[false]"
   | Ast.BOOL_OP (op,(a,_), (b,_)) ->
      Format.fprintf f "(%a %a %a)" (print_bool p_alg) a
-		    Term.print_bool_op op (print_bool p_alg) b
+		    Operator.print_bool_op op (print_bool p_alg) b
   | Ast.COMPARE_OP (op,(a,_), (b,_)) ->
      Format.fprintf f "(%a %a %a)"
-		    p_alg a Term.print_compare_op op p_alg b
+		    p_alg a Operator.print_compare_op op p_alg b
 
 let print_ast_bool = print_bool print_ast_alg
 
@@ -57,7 +57,7 @@ let rec ast_alg_has_mix = function
   | Ast.KAPPA_INSTANCE _, _ -> true
 
 type ('a,'b) contractible = NO of 'a
-			  | MAYBE of 'a * Term.bin_alg_op * 'a * 'b
+			  | MAYBE of 'a * Operator.bin_alg_op * 'a * 'b
 			  | YES of 'b
 
 let rec compile_alg var_map tk_map ?max_allowed_var
@@ -166,18 +166,18 @@ let rec compile_bool var_map tk_map contact_map domain = function
   | Ast.FALSE,pos -> (domain,(Ast.FALSE,pos))
   | Ast.BOOL_OP (op,a,b), pos ->
      begin match compile_bool var_map tk_map contact_map domain a, op with
-	   | (_,(Ast.TRUE,_)), Term.OR -> (domain,(Ast.TRUE,pos))
-	   | (_,(Ast.FALSE,_)), Term.AND -> (domain,(Ast.FALSE,pos))
-	   | (_,(Ast.TRUE,_)), Term.AND
-	   | (_,(Ast.FALSE,_)), Term.OR ->
+	   | (_,(Ast.TRUE,_)), Operator.OR -> (domain,(Ast.TRUE,pos))
+	   | (_,(Ast.FALSE,_)), Operator.AND -> (domain,(Ast.FALSE,pos))
+	   | (_,(Ast.TRUE,_)), Operator.AND
+	   | (_,(Ast.FALSE,_)), Operator.OR ->
 	      compile_bool var_map tk_map contact_map domain b
 	   | (domain',
 	      ((Ast.BOOL_OP _ | Ast.COMPARE_OP _) ,_ as a') as out1),_ ->
 	      match compile_bool var_map tk_map contact_map domain' b, op with
-	      | (_,(Ast.TRUE,_)), Term.OR -> (domain,(Ast.TRUE,pos))
-	      | (_,(Ast.FALSE,_)), Term.AND -> (domain,(Ast.FALSE,pos))
-	      | (_,(Ast.TRUE,_)), Term.AND
-	      | (_,(Ast.FALSE,_)), Term.OR -> out1
+	      | (_,(Ast.TRUE,_)), Operator.OR -> (domain,(Ast.TRUE,pos))
+	      | (_,(Ast.FALSE,_)), Operator.AND -> (domain,(Ast.FALSE,pos))
+	      | (_,(Ast.TRUE,_)), Operator.AND
+	      | (_,(Ast.FALSE,_)), Operator.OR -> out1
 	      | (domain'',
 		 ((Ast.BOOL_OP _ | Ast.COMPARE_OP _),_ as b')),_ ->
 		 (domain'',(Ast.BOOL_OP (op,a',b'),pos))
@@ -200,15 +200,15 @@ let rec has_time_dep (in_t,_,deps as vars_deps) = function
      has_time_dep vars_deps a||has_time_dep vars_deps b
   | (UN_ALG_OP (_, a),_) -> has_time_dep vars_deps a
   | ((KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _),_) -> false
-  | (STATE_ALG_OP Term.TIME_VAR,_) -> true
-  | (STATE_ALG_OP (Term.CPUTIME | Term.EVENT_VAR| Term.NULL_EVENT_VAR
-		  | Term.PROD_EVENT_VAR),_) -> false
+  | (STATE_ALG_OP Operator.TIME_VAR,_) -> true
+  | (STATE_ALG_OP (Operator.CPUTIME | Operator.EVENT_VAR| Operator.NULL_EVENT_VAR
+		  | Operator.PROD_EVENT_VAR),_) -> false
   | (ALG_VAR i,_) ->
      let rec aux j =
-       Term.DepSet.mem (Term.ALG j) in_t ||
-	 Term.DepSet.exists
-	   (function Term.ALG k -> aux k
-		   | (Term.RULE _ | Term.PERT _) -> false) deps.(j) in
+       Operator.DepSet.mem (Operator.ALG j) in_t ||
+	 Operator.DepSet.exists
+	   (function Operator.ALG k -> aux k
+		   | (Operator.RULE _ | Operator.PERT _) -> false) deps.(j) in
      aux i
 
 let rec stops_of_bool_expr vars_deps = function
@@ -219,19 +219,19 @@ let rec stops_of_bool_expr vars_deps = function
        (match op,st1,st2 with
 	| _, [], _ -> st2
 	| _, _, [] -> st1
-	| Term.OR, n1, n2 -> n1 @ n2
-	| Term.AND, _, _ -> raise ExceptionDefn.Unsatisfiable
+	| Operator.OR, n1, n2 -> n1 @ n2
+	| Operator.AND, _, _ -> raise ExceptionDefn.Unsatisfiable
        )
     | Ast.COMPARE_OP (op,(a1,_ as a),(b1,_ as b)) ->
        match op with
-       | Term.EQUAL when has_time_dep vars_deps a||has_time_dep vars_deps b ->
+       | Operator.EQUAL when has_time_dep vars_deps a||has_time_dep vars_deps b ->
 	  begin match a1,b1 with
-		| STATE_ALG_OP (Term.TIME_VAR), CONST n
-		| CONST n, STATE_ALG_OP (Term.TIME_VAR) -> [n]
+		| STATE_ALG_OP (Operator.TIME_VAR), CONST n
+		| CONST n, STATE_ALG_OP (Operator.TIME_VAR) -> [n]
 		| ( BIN_ALG_OP _ | UN_ALG_OP _ | ALG_VAR _
-		    | STATE_ALG_OP (Term.CPUTIME | Term.EVENT_VAR | Term.TIME_VAR
-				    | Term.NULL_EVENT_VAR | Term.PROD_EVENT_VAR)
+		    | STATE_ALG_OP (Operator.CPUTIME | Operator.EVENT_VAR | Operator.TIME_VAR
+				    | Operator.NULL_EVENT_VAR | Operator.PROD_EVENT_VAR)
 		    | KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _), _ ->
 		   raise ExceptionDefn.Unsatisfiable
 	  end
-       | (Term.EQUAL | Term.SMALLER | Term.GREATER | Term.DIFF) -> []
+       | (Operator.EQUAL | Operator.SMALLER | Operator.GREATER | Operator.DIFF) -> []

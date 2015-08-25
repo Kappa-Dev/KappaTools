@@ -18,7 +18,7 @@ val ast_alg_has_mix : 'a Ast.ast_alg_expr Location.annot -> bool
 
 (** [compile_alg variable_map token_map (fresh_mix_id, mix_list) alg_pos] *)
 val compile_alg :
-  ?origin:Term.rev_dep -> int Mods.StringMap.t -> int Mods.StringMap.t ->
+  ?origin:Operator.rev_dep -> int Mods.StringMap.t -> int Mods.StringMap.t ->
   ?max_allowed_var:int ->
   (string list * (string * string) list) Export_to_KaSim.String2Map.t ->
   Connected_component.Env.t ->
@@ -35,5 +35,5 @@ val compile_bool :
   Connected_component.Env.t * Alg_expr.t Ast.bool_expr Location.annot
 
 val stops_of_bool_expr :
-  (Term.DepSet.t * Term.DepSet.t * Term.DepSet.t array) ->
+  (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array) ->
   Alg_expr.t Ast.bool_expr -> Nbr.t list

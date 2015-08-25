@@ -209,8 +209,8 @@ let effects_of_modif algs tokens rules contact_map domain ast_list =
 	      Expr.compile_alg algs.NamedDecls.finder tokens.NamedDecls.finder
 			       contact_map domain alg_expr in
 	    (domain',
-	     (Primitives.UPDATE ((if is_rule then Term.RULE i
-	      else Term.ALG i), alg_pos))::rev_effects)
+	     (Primitives.UPDATE ((if is_rule then Operator.RULE i
+	      else Operator.ALG i), alg_pos))::rev_effects)
 	 | UPDATE_TOK ((tk_nme,tk_pos),alg_expr) ->
 	    let ast_rule =
 	      { add_token=[(alg_expr,(tk_nme,tk_pos))];
@@ -238,7 +238,7 @@ let effects_of_modif algs tokens rules contact_map domain ast_list =
 	       else Primitives.CFLOWOFF x) :: l in
 	    let domain',ccs =
 	      Snip.connected_components_sum_of_ambiguous_mixture
-		contact_map domain ~origin:(Term.PERT(-1)) ast in
+		contact_map domain ~origin:(Operator.PERT(-1)) ast in
 	    (domain',
 	     List.fold_left (fun x (y,t) -> Array.fold_left (adds t) x y)
 			    rev_effects ccs)
@@ -524,7 +524,7 @@ let compile_alg_vars tokens contact_map domain overwrite vars =
   array_fold_left_mapi
     (fun i domain (lbl_pos,ast) ->
      let (domain',alg) =
-       Expr.compile_alg ~origin:(Term.ALG i) vars_nd.NamedDecls.finder tokens
+       Expr.compile_alg ~origin:(Operator.ALG i) vars_nd.NamedDecls.finder tokens
 			~max_allowed_var:(pred i) contact_map domain ast
      in (domain',(lbl_pos,alg))) domain
     vars_nd.NamedDecls.decls
@@ -536,7 +536,7 @@ let compile_rules algs alg_deps tokens contact_map domain rules =
        let (domain',origin',cr) =
 	 rules_of_ast algs tokens ?deps_machinery contact_map domain rule_label rule in
        domain',origin',List.rev_append cr acc)
-      (domain,Some (Term.RULE 0,alg_deps),[]) rules with
+      (domain,Some (Operator.RULE 0,alg_deps),[]) rules with
   | fdomain,Some (_,falg_deps),frules -> fdomain,falg_deps,List.rev frules
   | _, None, _ ->
      failwith "The origin of Eval.compile_rules has been lost"
