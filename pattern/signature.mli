@@ -2,11 +2,11 @@
 
 type t (** Store of one agent *)
 
-val num_of_site : ?agent_name:string -> string Term.with_pos -> t -> int
+val num_of_site : ?agent_name:string -> string Location.annot -> t -> int
 val site_of_num : int -> t -> string
 val fold : (int -> string -> 'a -> 'a) -> t -> 'a -> 'a
 
-val num_of_internal_state : int -> string Term.with_pos -> t -> int
+val num_of_internal_state : int -> string Location.annot -> t -> int
 (** [num_of_internal_state site_id state_name sign] *)
 val internal_state_of_num : int -> int -> t -> string
 
@@ -20,13 +20,13 @@ val get : s -> int -> t
 val arity : s -> int -> int
 (** [arity sigs agent_id] *)
 
-val num_of_agent : string Term.with_pos -> s -> int
+val num_of_agent : string Location.annot -> s -> int
 
-val id_of_site : string Term.with_pos -> string Term.with_pos -> s -> int
+val id_of_site : string Location.annot -> string Location.annot -> s -> int
 (** [id_of_site agent_type site_name sigs] *)
 val id_of_internal_state :
-  string Term.with_pos -> string Term.with_pos ->
-  string Term.with_pos -> s -> int
+  string Location.annot -> string Location.annot ->
+  string Location.annot -> s -> int
 (** [id_of_internal_state agent_type site_name state_name sigs] *)
 val internal_states_number : int -> int -> s -> int
 (** [internal_state_number agent_id site_id sigs] *)

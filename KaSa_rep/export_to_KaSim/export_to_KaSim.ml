@@ -41,7 +41,8 @@ module type Export_to_KaSim =
   sig
     type state
     val init:
-      ((string Term.with_pos) * Ast.port list,Ast.mixture, Ast.rule) Ast.compil -> state
+      ((string Location.annot) * Ast.port list,Ast.mixture, Ast.rule) Ast.compil
+      -> state
     val get_influence_map: state -> state * influence_map
     val get_contact_map:
       state -> state * (string list * (string*string) list) String2Map.t
@@ -297,17 +298,17 @@ module Export_to_KaSim =
       let l = 
 	StringMap.fold 
 	  (fun a interface list -> 
-	    (Term.with_dummy_pos a ,
+	    (Location.dummy_annot a ,
 	     
 	     List.rev_map 
 	       (fun (x,(states,binding)) -> 
 		 { 
-		   Ast.port_nme = Term.with_dummy_pos x ;
+		   Ast.port_nme = Location.dummy_annot x ;
 		   Ast.port_int = 
 		     List.rev_map
-		       (fun s -> Term.with_dummy_pos s)
+		       (fun s -> Location.dummy_annot s)
 		       (List.rev states);
-		   Ast.port_lnk = Term.with_dummy_pos Ast.FREE})
+		   Ast.port_lnk = Location.dummy_annot Ast.FREE})
 	       (List.rev interface))::list)
 	  l 
 	  []

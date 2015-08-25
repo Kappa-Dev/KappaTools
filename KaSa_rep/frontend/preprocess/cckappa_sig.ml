@@ -217,7 +217,7 @@ type enriched_init =
     {
       e_init_factor     : Ckappa_sig.mixture Ast.ast_alg_expr;
       e_init_c_factor   : mixture Ast.ast_alg_expr;
-      e_init_string_pos : string Term.with_pos option; 
+      e_init_string_pos : string Location.annot option;
       e_init_mixture    : Ckappa_sig.mixture;
       e_init_c_mixture  : mixture; 
       e_init_pos        : Tools.pos
@@ -248,7 +248,7 @@ type compil =
       variables : enriched_variable Int_storage.Nearly_inf_Imperatif.t ; (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
       signatures : (agent_sig (** position*)) Int_storage.Nearly_inf_Imperatif.t  ; (*agent signature declaration*)
       rules : enriched_rule Int_storage.Nearly_inf_Imperatif.t  ; (*rules (possibly named)*)
-      observables : mixture Ast.ast_alg_expr Term.with_pos Int_storage.Nearly_inf_Imperatif.t  ; (*list of patterns to plot*) 
+      observables : mixture Ast.ast_alg_expr Location.annot Int_storage.Nearly_inf_Imperatif.t  ; (*list of patterns to plot*) 
       init : enriched_init Int_storage.Nearly_inf_Imperatif.t  ; (*initial graph declaration*)
       perturbations : mixture Ckappa_sig.perturbation Int_storage.Nearly_inf_Imperatif.t 
     }

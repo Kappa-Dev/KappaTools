@@ -92,13 +92,13 @@ let find_ty cc id = raw_find_ty cc.nodes_by_type id
 (** Errors *)
 let already_specified ?sigs x i =
   ExceptionDefn.Malformed_Decl
-    (Term.with_dummy_pos
+    (Location.dummy_annot
        (Format.asprintf "Site %a of agent %a already specified"
 			(ContentAgent.print_site ?sigs x) i (ContentAgent.print ?sigs) x))
 
 let dangling_node ~sigs tys x =
   ExceptionDefn.Malformed_Decl
-    (Term.with_dummy_pos
+    (Location.dummy_annot
        (Format.asprintf
 	  "Cannot proceed because last declared agent %a/*%i*/%a"
 	  (Signature.print_agent sigs) (raw_find_ty tys x) x

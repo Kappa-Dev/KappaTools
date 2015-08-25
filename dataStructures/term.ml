@@ -1,6 +1,3 @@
-type 'a with_pos = 'a * (Lexing.position * Lexing.position)
-type 'a maybe_pos = ?pos:(Lexing.position * Lexing.position) -> 'a
-
 type bin_alg_op = MULT | SUM | DIV | MINUS | POW | MODULO | MIN | MAX
 type un_alg_op = LOG | SQRT | EXP | SINUS | COSINUS | TAN | INT | UMINUS
 type state_alg_op = CPUTIME | TIME_VAR | EVENT_VAR | NULL_EVENT_VAR |
@@ -62,11 +59,6 @@ let compare_op_to_string () = function
 
 let print_compare_op f op =
   Format.fprintf f "%s" (compare_op_to_string () op)
-
-let with_dummy_pos x = (x, (Lexing.dummy_pos, Lexing.dummy_pos))
-let has_dummy_pos (_,(b_pos,e_pos)) =
-  b_pos = Lexing.dummy_pos &&
-    (e_pos = Lexing.dummy_pos || failwith "half dummy_pos")
 
 let print_rev_dep f = function
   | RULE id ->

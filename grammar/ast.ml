@@ -7,23 +7,24 @@ type link =
   | FREE
   | LNK_ANY
   | LNK_SOME
-  | LNK_TYPE of string Term.with_pos (* port *)
-    * string Term.with_pos (*agent_type*)
+  | LNK_TYPE of string Location.annot (* port *)
+    * string Location.annot (*agent_type*)
 
-type internal = string Term.with_pos list
+type internal = string Location.annot list
 
-type port = {port_nme:string Term.with_pos;
+type port = {port_nme:string Location.annot;
 	     port_int:internal;
-	     port_lnk:link with_pos;}
+	     port_lnk:link Location.annot;}
 
-type agent = (string with_pos * port list)
+type agent = (string Location.annot * port list)
 
 type mixture = agent list
 
 type 'mixt ast_alg_expr =
     BIN_ALG_OP of
-        bin_alg_op * 'mixt ast_alg_expr with_pos * 'mixt ast_alg_expr with_pos
-  | UN_ALG_OP of un_alg_op * 'mixt ast_alg_expr with_pos
+      bin_alg_op * 'mixt ast_alg_expr Location.annot
+      * 'mixt ast_alg_expr Location.annot
+  | UN_ALG_OP of un_alg_op * 'mixt ast_alg_expr Location.annot
   | STATE_ALG_OP of state_alg_op
   | OBS_VAR of string
   | TOKEN_ID of string
@@ -36,22 +37,24 @@ type 'mixt ast_alg_expr =
 type 'a bool_expr =
   | TRUE
   | FALSE
-  | BOOL_OP    of bool_op * 'a bool_expr with_pos * 'a bool_expr with_pos
-  | COMPARE_OP of compare_op * 'a with_pos * 'a with_pos
+  | BOOL_OP of
+      bool_op * 'a bool_expr Location.annot * 'a bool_expr Location.annot
+  | COMPARE_OP of compare_op * 'a Location.annot * 'a Location.annot
 
 type arrow = RAR | LRAR
 
 type rule = {
   lhs: mixture ;
-  rm_token: (mixture ast_alg_expr with_pos * string with_pos) list ;
+  rm_token: (mixture ast_alg_expr Location.annot * string Location.annot) list ;
   arrow:arrow ;
   rhs: mixture ;
-  add_token: (mixture ast_alg_expr with_pos * string with_pos) list ;
-  k_def: mixture ast_alg_expr with_pos ;
+  add_token: (mixture ast_alg_expr Location.annot * string Location.annot) list;
+  k_def: mixture ast_alg_expr Location.annot ;
   k_un:
-    (mixture ast_alg_expr with_pos*mixture ast_alg_expr with_pos option) option;
+    (mixture ast_alg_expr Location.annot *
+       mixture ast_alg_expr Location.annot option) option;
   (*k_1:radius_opt*)
-  k_op: mixture ast_alg_expr with_pos option ; (*rate for backward rule*)
+  k_op: mixture ast_alg_expr Location.annot option ; (*rate for backward rule*)
 }
 
 let flip_label str = str^"_op"
@@ -61,69 +64,86 @@ type 'alg_expr print_expr =
   | Alg_pexpr of 'alg_expr
 
 type 'mixture modif_expr =
-  | INTRO of ('mixture ast_alg_expr with_pos * 'mixture with_pos)
-  | DELETE of ('mixture ast_alg_expr with_pos * 'mixture with_pos)
+  | INTRO of ('mixture ast_alg_expr Location.annot * 'mixture Location.annot)
+  | DELETE of ('mixture ast_alg_expr Location.annot * 'mixture Location.annot)
   | UPDATE of
-      (string Term.with_pos * 'mixture ast_alg_expr with_pos) (*TODO: pause*)
-  | UPDATE_TOK of (string with_pos * 'mixture ast_alg_expr with_pos) (*TODO: pause*)
-  | STOP of ('mixture ast_alg_expr print_expr with_pos list * Tools.pos)
-  | SNAPSHOT of ('mixture ast_alg_expr print_expr with_pos list * Tools.pos)
+      (string Location.annot * 'mixture ast_alg_expr Location.annot) (*TODO: pause*)
+  | UPDATE_TOK of
+      (string Location.annot * 'mixture ast_alg_expr Location.annot) (*TODO: pause*)
+  | STOP of ('mixture ast_alg_expr print_expr Location.annot list * Tools.pos)
+  | SNAPSHOT of
+      ('mixture ast_alg_expr print_expr Location.annot list * Tools.pos)
   (*maybe later of mixture too*)
   | PRINT of
-      (('mixture ast_alg_expr print_expr with_pos list) *
-	  ('mixture  ast_alg_expr print_expr with_pos list) * Tools.pos)
+      (('mixture ast_alg_expr print_expr Location.annot list) *
+	  ('mixture  ast_alg_expr print_expr Location.annot list) * Tools.pos)
   | PLOTENTRY
-  | CFLOWLABEL of (bool * string Term.with_pos)
-  | CFLOWMIX of (bool * 'mixture Term.with_pos)
-  | FLUX of 'mixture ast_alg_expr print_expr with_pos list * Tools.pos
-  | FLUXOFF of 'mixture ast_alg_expr print_expr with_pos list * Tools.pos
+  | CFLOWLABEL of (bool * string Location.annot)
+  | CFLOWMIX of (bool * 'mixture Location.annot)
+  | FLUX of 'mixture ast_alg_expr print_expr Location.annot list * Tools.pos
+  | FLUXOFF of 'mixture ast_alg_expr print_expr Location.annot list * Tools.pos
 
 type 'mixture perturbation =
-    ('mixture ast_alg_expr bool_expr with_pos * ('mixture modif_expr list) *
-       'mixture ast_alg_expr bool_expr with_pos option) Term.with_pos
+    ('mixture ast_alg_expr bool_expr Location.annot * ('mixture modif_expr list) *
+       'mixture ast_alg_expr bool_expr Location.annot option) Location.annot
 
-type configuration = string Term.with_pos * (str_pos list)
+type configuration = string Location.annot * (str_pos list)
 
-type 'mixture variable_def = string with_pos * 'mixture ast_alg_expr with_pos
+type 'mixture variable_def =
+    string Location.annot * 'mixture ast_alg_expr Location.annot
 
 type 'mixture init_t =
-  | INIT_MIX of 'mixture ast_alg_expr with_pos * 'mixture with_pos
-  | INIT_TOK of 'mixture ast_alg_expr with_pos * string with_pos
+  | INIT_MIX of 'mixture ast_alg_expr Location.annot * 'mixture Location.annot
+  | INIT_TOK of 'mixture ast_alg_expr Location.annot * string Location.annot
 
 type 'mixture instruction =
   | SIG      of agent
-  | TOKENSIG of string Term.with_pos
+  | TOKENSIG of string Location.annot
   | VOLSIG   of str_pos * float * str_pos (* type, volume, parameter*)
-  | INIT     of string with_pos option * 'mixture init_t * Tools.pos (*volume, init, position *)
+  | INIT     of string Location.annot option * 'mixture init_t * Tools.pos
+  (*volume, init, position *)
   | DECLARE  of 'mixture variable_def
   | OBS      of 'mixture variable_def (*for backward compatibility*)
-  | PLOT     of 'mixture ast_alg_expr with_pos
+  | PLOT     of 'mixture ast_alg_expr Location.annot
   | PERT     of 'mixture perturbation
   | CONFIG   of configuration
 
 type ('agent,'mixture,'rule) compil =
     {
-      variables      : 'mixture variable_def list; (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
-      signatures     : 'agent list; (*agent signature declaration*)
-      rules          : (string with_pos option * 'rule with_pos) list; (*rules (possibly named)*)
-      observables    : 'mixture ast_alg_expr with_pos list; (*list of patterns to plot*)
-      init           : (string with_pos option * 'mixture init_t * Tools.pos) list; (*initial graph declaration*)
-      perturbations  : 'mixture perturbation list;
-      configurations : configuration list;
-      tokens         :  string Term.with_pos list;
-      volumes        : (str_pos * float * str_pos) list
+      variables :
+	'mixture variable_def list;
+      (*pattern declaration for reusing as variable in perturbations or kinetic rate*)
+      signatures :
+	'agent list; (*agent signature declaration*)
+      rules :
+	(string Location.annot option * 'rule Location.annot) list;
+      (*rules (possibly named)*)
+      observables :
+	'mixture ast_alg_expr Location.annot list;
+      (*list of patterns to plot*)
+      init :
+	(string Location.annot option * 'mixture init_t * Tools.pos) list;
+      (*initial graph declaration*)
+      perturbations :
+	'mixture perturbation list;
+      configurations :
+	configuration list;
+      tokens :
+	string Location.annot list;
+      volumes :
+	(str_pos * float * str_pos) list
     }
 
 let result:(agent,mixture,rule) compil ref =
   ref {
     variables      = [];
     signatures     = [];
-    rules          = []; 
-    init           = []; 
+    rules          = [];
+    init           = [];
     observables    = [];
     perturbations  = [];
-    configurations = []; 
-    tokens         = []; 
+    configurations = [];
+    tokens         = [];
     volumes        = []
   }
 
@@ -136,8 +156,8 @@ let init_compil () =
       init           = [];
       observables    = [];
       perturbations  = [];
-      configurations = []; 
-      tokens         = []; 
+      configurations = [];
+      tokens         = [];
       volumes        = []
     }
 

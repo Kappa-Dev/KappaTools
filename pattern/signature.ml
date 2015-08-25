@@ -52,9 +52,9 @@ let create_t ast_intf =
 	   Ast.LNK_TYPE _ | Ast.LNK_VALUE _), pos) ->
 	  raise (ExceptionDefn.Malformed_Decl
 		("Link status inside a definition of signature", pos))
-      ) ({Ast.port_nme =Term.with_dummy_pos "_";
+      ) ({Ast.port_nme =Location.dummy_annot "_";
 	  Ast.port_int=[];
-	  Ast.port_lnk =Term.with_dummy_pos Ast.FREE;}
+	  Ast.port_lnk =Location.dummy_annot Ast.FREE;}
 	 :: ast_intf))
 
 let print_one f sign =

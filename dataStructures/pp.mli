@@ -30,7 +30,7 @@ val array :
   formatter -> 'a array -> unit
 val plain_array : (formatter -> 'a -> unit) -> formatter -> 'a array -> unit
 
-val error : (formatter -> 'a -> unit) -> 'a Term.with_pos -> unit
+val error : (formatter -> 'a -> unit) -> 'a Location.annot -> unit
 val position : formatter -> (Lexing.position * Lexing.position) -> unit
 
 val list_to_string : (unit -> string) ->

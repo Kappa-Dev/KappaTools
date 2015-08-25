@@ -11,20 +11,20 @@ let initial_value_alg counter algs (ast, _) =
 
 let name_and_purify_rule acc (label_opt,(r,r_pos)) =
   let (label,_ as label_pos) = match label_opt with
-    | None -> Term.with_dummy_pos ("__anonymous_"^(string_of_float (Sys.time ())))
+    | None -> Location.dummy_annot ("__anonymous_"^(string_of_float (Sys.time ())))
     | Some (lab,pos) -> (lab,pos) in
   let acc',k_def =
     if Expr.ast_alg_has_mix r.k_def then
       let rate_var = label^"_rate" in
-      ((Term.with_dummy_pos rate_var,r.k_def)::acc,
-       Term.with_dummy_pos (Ast.OBS_VAR rate_var))
+      ((Location.dummy_annot rate_var,r.k_def)::acc,
+       Location.dummy_annot (Ast.OBS_VAR rate_var))
     else (acc,r.k_def) in
   let acc'',k_op =
     match r.k_op with
     | Some k when Expr.ast_alg_has_mix k ->
        let rate_var = (Ast.flip_label label)^"_rate" in
-       ((Term.with_dummy_pos rate_var,k)::acc',
-	Some (Term.with_dummy_pos (Ast.OBS_VAR rate_var)))
+       ((Location.dummy_annot rate_var,k)::acc',
+	Some (Location.dummy_annot (Ast.OBS_VAR rate_var)))
     | (Some _ | None) -> (acc',r.k_op) in
   let () = match r.k_un with
     | None -> ()
@@ -163,7 +163,7 @@ let effects_of_modif algs tokens rules contact_map domain ast_list =
 			 contact_map domain alg_expr in
       let domain'',_,elem_rules =
 	rules_of_ast algs.NamedDecls.finder tokens.NamedDecls.finder contact_map
-		     domain' (Term.with_dummy_pos "__perturbation_modification")
+		     domain' (Location.dummy_annot "__perturbation_modification")
 		     (ast_rule,mix_pos) in
       let elem_rule = match elem_rules with
 	| [ _, r ] -> r
@@ -181,7 +181,7 @@ let effects_of_modif algs tokens rules contact_map domain ast_list =
 	 | INTRO (alg_expr, (ast_mix,mix_pos)) ->
 	    let ast_rule =
 	      { add_token=[]; rm_token=[]; lhs = []; arrow = Ast.RAR;
-		rhs = ast_mix; k_def=Term.with_dummy_pos (Ast.CONST Nbr.zero);
+		rhs = ast_mix; k_def=Location.dummy_annot (Ast.CONST Nbr.zero);
 		k_un=None;k_op=None;
 	      } in
 	    rule_effect alg_expr ast_rule mix_pos
@@ -189,7 +189,7 @@ let effects_of_modif algs tokens rules contact_map domain ast_list =
 	    let ast_rule =
 	      { add_token=[]; rm_token=[]; lhs = ast_mix; arrow = Ast.RAR;
 		rhs = [];
-		k_def=Term.with_dummy_pos (Ast.CONST Nbr.zero);
+		k_def=Location.dummy_annot (Ast.CONST Nbr.zero);
 		k_un=None;k_op=None;
 	      } in
 	    rule_effect alg_expr ast_rule mix_pos
@@ -214,12 +214,12 @@ let effects_of_modif algs tokens rules contact_map domain ast_list =
 	 | UPDATE_TOK ((tk_nme,tk_pos),alg_expr) ->
 	    let ast_rule =
 	      { add_token=[(alg_expr,(tk_nme,tk_pos))];
-		rm_token=[Term.with_dummy_pos (Ast.TOKEN_ID tk_nme),
+		rm_token=[Location.dummy_annot (Ast.TOKEN_ID tk_nme),
 			  (tk_nme,tk_pos)];
 		arrow = Ast.RAR; lhs=[]; rhs=[];
-		k_def=Term.with_dummy_pos (Ast.CONST Nbr.zero);
+		k_def=Location.dummy_annot (Ast.CONST Nbr.zero);
 		k_un=None; k_op= None; } in
-	    rule_effect (Term.with_dummy_pos (Ast.CONST (Nbr.one)))
+	    rule_effect (Location.dummy_annot (Ast.CONST (Nbr.one)))
 			ast_rule tk_pos
 	 | SNAPSHOT (pexpr,_) ->
 	    let (domain',pexpr') =
@@ -341,12 +341,12 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 	  let value = initial_value_alg counter algs alg' in
 	  let fake_rule =
 	    { lhs = []; rm_token = []; arrow = RAR; rhs = ast; add_token = [];
-	      k_def = Term.with_dummy_pos (CONST Nbr.zero);
+	      k_def = Location.dummy_annot (CONST Nbr.zero);
 	      k_un = None; k_op = None; } in
 	  let domain'',state' =
 	    match
 	      rules_of_ast algs.NamedDecls.finder tokens.NamedDecls.finder
-			   contact_map domain' (Term.with_dummy_pos "__init_mix")
+			   contact_map domain' (Location.dummy_annot "__init_mix")
 			   (fake_rule,mix_pos)
 	    with
 	    | domain'',_,[ _, compiled_rule ] ->
@@ -370,13 +370,13 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 	  let fake_rule =
 	    { lhs = []; rm_token = []; arrow = RAR; rhs = [];
 	      add_token = [(alg, (tk_nme,pos_tk))];
-	      k_def = Term.with_dummy_pos (CONST Nbr.zero);
+	      k_def = Location.dummy_annot (CONST Nbr.zero);
 	      k_un = None; k_op = None; } in
 	  let domain',(state',_) =
 	    match
 	      rules_of_ast algs.NamedDecls.finder tokens.NamedDecls.finder
-			   contact_map domain (Term.with_dummy_pos "__init_tok")
-			   (Term.with_dummy_pos fake_rule)
+			   contact_map domain (Location.dummy_annot "__init_tok")
+			   (Location.dummy_annot fake_rule)
 	    with
 	    | domain'',_,[ _, compiled_rule ] ->
 	       domain'',
@@ -515,8 +515,8 @@ let configurations_of_result result =
 let compile_alg_vars tokens contact_map domain overwrite vars =
   let alg_vars_over =
     Tools.list_rev_map_append
-      (fun (x,v) -> (Term.with_dummy_pos x,
-		     Term.with_dummy_pos (Ast.CONST v))) overwrite
+      (fun (x,v) -> (Location.dummy_annot x,
+		     Location.dummy_annot (Ast.CONST v))) overwrite
       (List.filter
 	 (fun ((x,_),_) ->
 	  List.for_all (fun (x',_) -> x <> x') overwrite) vars) in

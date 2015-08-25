@@ -1,7 +1,7 @@
 open Mods
 
 type switching =
-  | Linked of int Term.with_pos | Freed | Maintained
+  | Linked of int Location.annot | Freed | Maintained
   | Erased
 
 type rule_internal =
@@ -15,7 +15,7 @@ type rule_link =
   | L_FREE of switching
   | L_SOME of switching
   | L_TYPE of int * int * switching (** ty_id,p_id,switch *)
-  | L_VAL of int Term.with_pos * switching
+  | L_VAL of int Location.annot * switching
 type rule_agent =
     { ra_type: int;
       ra_ports: rule_link array;
@@ -229,7 +229,7 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
        let p_na = p.Ast.port_nme in
        let p_id = Signature.num_of_site ~agent_name p_na sign in
        let () = register_internal_modif p_id [] p in
-       register_port_modif p_id (Term.with_dummy_pos Ast.LNK_ANY) p) rp_r in
+       register_port_modif p_id (Location.dummy_annot Ast.LNK_ANY) p) rp_r in
   { ra_type = ag_id; ra_ports = ports; ra_ints = internals;
     ra_syntax = Some (ports, internals);}
 
@@ -256,9 +256,9 @@ let ports_from_contact_map sigs contact_map ty_id p_id =
     with Not_found -> [] in
   List.map (fun (ty_na,p_na) ->
 	    let ty_id =
-	      Signature.num_of_agent (Term.with_dummy_pos ty_na) sigs in
-	    (ty_id,Signature.id_of_site (Term.with_dummy_pos ty_na)
-					(Term.with_dummy_pos p_na) sigs))
+	      Signature.num_of_agent (Location.dummy_annot ty_na) sigs in
+	    (ty_id,Signature.id_of_site (Location.dummy_annot ty_na)
+					(Location.dummy_annot p_na) sigs))
 	   cand
 
 let internals_from_contact_map sigs contact_map ty_id p_id =
@@ -270,7 +270,7 @@ let internals_from_contact_map sigs contact_map ty_id p_id =
     with Not_found -> [] in
   List.map
     (fun i_na ->
-     Signature.num_of_internal_state p_id (Term.with_dummy_pos i_na) sign)
+     Signature.num_of_internal_state p_id (Location.dummy_annot i_na) sign)
     cand
 
 let find_implicit_infos sigs contact_map ags =
@@ -303,10 +303,10 @@ let find_implicit_infos sigs contact_map ags =
 	     acc in
       aux_internals ty_id ints acc' (succ i) in
   let new_switch free_id = function
-    | Maintained -> Linked (Term.with_dummy_pos free_id)
+    | Maintained -> Linked (Location.dummy_annot free_id)
     | Freed | Linked _ | Erased -> Freed in
   let old_switch free_id = function
-    | Maintained -> Linked (Term.with_dummy_pos free_id)
+    | Maintained -> Linked (Location.dummy_annot free_id)
     | Freed | Linked _ | Erased as s -> s in
   let rec aux_one ag_tail ty_id max_id ports i =
     if i = Array.length ports
@@ -316,7 +316,7 @@ let find_implicit_infos sigs contact_map ags =
      | L_TYPE (a,p,s) ->
 	List.map (fun (free_id,ports,ags,cor) ->
 		  let () =
-		    ports.(i) <- L_VAL (Term.with_dummy_pos free_id,old_switch free_id s) in
+		    ports.(i) <- L_VAL (Location.dummy_annot free_id,old_switch free_id s) in
 		  (succ free_id, ports, ags, (free_id,(a,p),new_switch free_id s)::cor))
 		 (aux_one ag_tail ty_id (max_s max_id s) ports (succ i))
      | L_SOME s ->
@@ -325,7 +325,7 @@ let find_implicit_infos sigs contact_map ags =
 	   List.map (fun x ->
 		     let ports' = Array.copy ports in
 		     let () =
-		       ports'.(i) <- L_VAL (Term.with_dummy_pos free_id,old_switch free_id s) in
+		       ports'.(i) <- L_VAL (Location.dummy_annot free_id,old_switch free_id s) in
 		     (succ free_id, ports', ags, (free_id,x,new_switch free_id s)::cor))
 		    (ports_from_contact_map sigs contact_map ty_id i))
 	  (aux_one ag_tail ty_id (max_s max_id s) ports (succ i))
@@ -353,7 +353,7 @@ let find_implicit_infos sigs contact_map ags =
 		List.map (fun x ->
 			  let ports' = Array.copy ports in
 			  let () =
-			    ports'.(i) <- L_VAL (Term.with_dummy_pos free_id,old_switch free_id s) in
+			    ports'.(i) <- L_VAL (Location.dummy_annot free_id,old_switch free_id s) in
 			  (succ free_id, ports', ags, (free_id,x,new_switch free_id s)::cor))
 			 pfcm)
 	     (aux_one ag_tail ty_id (max_s max_id s) ports (succ i))
@@ -380,7 +380,7 @@ let complete_with_candidate ag id todo p_id p_switch =
        | L_ANY s ->
 	  assert (s = Maintained);
 	  let ports' = Array.copy ag.ra_ports in
-	  let () = ports'.(i) <- L_VAL (Term.with_dummy_pos id,p_switch) in
+	  let () = ports'.(i) <- L_VAL (Location.dummy_annot id,p_switch) in
 	  ({ ra_type = ag.ra_type; ra_ports = ports'; ra_ints = ag.ra_ints;
 	     ra_syntax = ag.ra_syntax;}, todo)
 	  :: acc
@@ -392,7 +392,7 @@ let complete_with_candidate ag id todo p_id p_switch =
 		 j=k && i=p' && a'= ag.ra_type && sw' = p_switch) todo with
 	    | [ _ ], todo' ->
 	       let ports' = Array.copy ag.ra_ports in
-	       let () = ports'.(i) <- L_VAL (Term.with_dummy_pos id,s) in
+	       let () = ports'.(i) <- L_VAL (Location.dummy_annot id,s) in
 	       ({ ra_type = ag.ra_type; ra_ports = ports'; ra_ints = ag.ra_ints;
 		  ra_syntax = ag.ra_syntax;},
 		todo') :: acc
@@ -407,7 +407,7 @@ let new_agent_with_one_link sigs ty_id port link switch =
     Array.init
       arity (fun i -> if i = 0 then L_FREE Maintained else L_ANY Maintained) in
   let internals = Array.make arity I_ANY in
-  let () = ports.(port) <- L_VAL (Term.with_dummy_pos link,switch) in
+  let () = ports.(port) <- L_VAL (Location.dummy_annot link,switch) in
   { ra_type = ty_id; ra_ports = ports; ra_ints = internals;
     ra_syntax = None;}
 
@@ -441,7 +441,7 @@ let is_linked_on i ag =
 
 let dangling_link side key =
   raise (ExceptionDefn.Malformed_Decl
-	   (Term.with_dummy_pos ("At least link "^string_of_int key^
+	   (Location.dummy_annot ("At least link "^string_of_int key^
 				   " is dangling on the " ^side)))
 
 let define_full_transformation
@@ -623,7 +623,7 @@ let rec add_agents_in_cc id wk registered_links transf links_transf
 	      Connected_component.new_internal_state wk (node,site_id) i
 	   | (I_ANY_ERASED | I_ANY_CHANGED _) ->
 	      raise (ExceptionDefn.Internal_Error
-		       (Term.with_dummy_pos
+		       (Location.dummy_annot
 			  "Try to create the connected components of an ambiguous mixture."))
 	 in
 	 match ag.ra_ports.(site_id) with
@@ -638,7 +638,7 @@ let rec add_agents_in_cc id wk registered_links transf links_transf
 	      wk'' r_l c_l transf' l_t' re acc (succ site_id)
 	 | (L_SOME _ | L_TYPE _ | L_ANY ( Erased | Linked _ | Freed))->
 	    raise (ExceptionDefn.Internal_Error
-		     (Term.with_dummy_pos
+		     (Location.dummy_annot
 			"Try to create the connected components of an ambiguous mixture."))
 	 | L_VAL ((i,pos),s) ->
 	    try

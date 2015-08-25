@@ -1,6 +1,6 @@
 type t =
-    BIN_ALG_OP of Term.bin_alg_op * t Term.with_pos * t Term.with_pos
-  | UN_ALG_OP of Term.un_alg_op * t Term.with_pos
+    BIN_ALG_OP of Term.bin_alg_op * t Location.annot * t Location.annot
+  | UN_ALG_OP of Term.un_alg_op * t Location.annot
   | STATE_ALG_OP of Term.state_alg_op
   | ALG_VAR of int
   | KAPPA_INSTANCE of Connected_component.cc array list
@@ -10,7 +10,7 @@ type t =
 (** depend in time, depend in event number, depend in given var *)
 val add_dep :
   (Term.DepSet.t * Term.DepSet.t * Term.DepSet.t array) -> Term.rev_dep ->
-  t Term.with_pos -> (Term.DepSet.t * Term.DepSet.t * Term.DepSet.t array)
+  t Location.annot -> (Term.DepSet.t * Term.DepSet.t * Term.DepSet.t array)
 val setup_alg_vars_rev_dep :
-  (string Term.with_pos * t Term.with_pos) array ->
+  (string Location.annot * t Location.annot) array ->
   (Term.DepSet.t * Term.DepSet.t * Term.DepSet.t array)

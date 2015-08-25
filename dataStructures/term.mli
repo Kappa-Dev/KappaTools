@@ -1,8 +1,5 @@
 (** Compiled algebraic expression *)
 
-type 'a with_pos = 'a * (Lexing.position * Lexing.position)
-type 'a maybe_pos = ?pos:(Lexing.position * Lexing.position) -> 'a
-
 type bin_alg_op = MULT | SUM | DIV | MINUS | POW | MODULO | MIN | MAX
 type un_alg_op = LOG | SQRT | EXP | SINUS | COSINUS | TAN | INT | UMINUS
 type state_alg_op = CPUTIME | TIME_VAR | EVENT_VAR | NULL_EVENT_VAR |
@@ -28,6 +25,3 @@ val print_compare_op : Format.formatter -> compare_op -> unit
 type rev_dep = ALG of int | RULE of int | PERT of int
 module DepSet : Set.S with type elt = rev_dep
 val print_rev_dep : Format.formatter -> rev_dep -> unit
-
-val with_dummy_pos : 'a -> 'a with_pos
-val has_dummy_pos : 'a with_pos -> bool

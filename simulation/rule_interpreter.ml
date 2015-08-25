@@ -129,7 +129,7 @@ let store_obs edges obs acc = function
 		  edges Connected_component.Matching.empty 0 cc root with
 	  | None ->
 	     raise (ExceptionDefn.Internal_Error
-		      (Term.with_dummy_pos
+		      (Location.dummy_annot
 			 "Problem with Rule_interpreter.store_obs"))
 	  | Some inj ->
 	     let tests' =
@@ -323,7 +323,7 @@ let add_tracked cc event_kind tests state =
   match state.story_machinery with
   | None ->
      raise (ExceptionDefn.Internal_Error
-	      (Term.with_dummy_pos "TRACK in non tracking mode"))
+	      (Location.dummy_annot "TRACK in non tracking mode"))
   | Some (tcc,x) ->
      { state with
        story_machinery =
@@ -333,7 +333,7 @@ let remove_tracked cc state =
   match state.story_machinery with
   | None ->
      raise (ExceptionDefn.Internal_Error
-	      (Term.with_dummy_pos "TRACK in non tracking mode"))
+	      (Location.dummy_annot "TRACK in non tracking mode"))
   | Some (tcc,x) ->
      { state with
        story_machinery = Some (Connected_component.Map.remove cc tcc,x) }

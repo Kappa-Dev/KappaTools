@@ -120,19 +120,19 @@ type elementary_rule = {
 }
 
 type modification =
-    ITER_RULE of Alg_expr.t Term.with_pos * elementary_rule
-  | UPDATE of Term.rev_dep * Alg_expr.t Term.with_pos
-  | SNAPSHOT of Alg_expr.t Ast.print_expr Term.with_pos list
-  | STOP of Alg_expr.t Ast.print_expr Term.with_pos list
+    ITER_RULE of Alg_expr.t Location.annot * elementary_rule
+  | UPDATE of Term.rev_dep * Alg_expr.t Location.annot
+  | SNAPSHOT of Alg_expr.t Ast.print_expr Location.annot list
+  | STOP of Alg_expr.t Ast.print_expr Location.annot list
   | CFLOW of
       Connected_component.t * Instantiation.abstract Instantiation.test list
-  | FLUX of Alg_expr.t Ast.print_expr Term.with_pos list
-  | FLUXOFF of Alg_expr.t Ast.print_expr Term.with_pos list
+  | FLUX of Alg_expr.t Ast.print_expr Location.annot list
+  | FLUXOFF of Alg_expr.t Ast.print_expr Location.annot list
   | CFLOWOFF of Connected_component.t
   | PLOTENTRY
   | PRINT of
-      (Alg_expr.t Ast.print_expr Term.with_pos list *
-	 Alg_expr.t Ast.print_expr Term.with_pos list)
+      (Alg_expr.t Ast.print_expr Location.annot list *
+	 Alg_expr.t Ast.print_expr Location.annot list)
 
 type perturbation =
     { precondition: Alg_expr.t Ast.bool_expr;

@@ -6,6 +6,8 @@ S dataStructures
 B _build/dataStructures
 S grammar
 B _build/grammar
+S term
+B _build/term
 S pattern
 B _build/pattern
 S simulation

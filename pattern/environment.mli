@@ -3,9 +3,9 @@
 type t
 
 val init :
-  Signature.s -> unit NamedDecls.t -> Alg_expr.t Term.with_pos NamedDecls.t
+  Signature.s -> unit NamedDecls.t -> Alg_expr.t Location.annot NamedDecls.t
   -> (Term.DepSet.t * Term.DepSet.t * Term.DepSet.t array)
-  -> Primitives.elementary_rule NamedDecls.t -> Alg_expr.t Term.with_pos array
+  -> Primitives.elementary_rule NamedDecls.t -> Alg_expr.t Location.annot array
   -> Primitives.perturbation array -> t
 (** [init sigs contact_map tokens algs rules obs perts] *)
 
@@ -24,10 +24,10 @@ val iteri_rules : (int -> Primitives.elementary_rule -> unit) -> t -> unit
 val get_reverse_dependencies : t -> int -> Term.DepSet.t
 val get_always_outdated : t -> Term.DepSet.t
 
-val num_of_agent : string Term.with_pos -> t -> int
-val num_of_rule : string Term.with_pos -> t -> int
-val num_of_alg : string Term.with_pos -> t -> int
-val num_of_token : string Term.with_pos -> t -> int
+val num_of_agent : string Location.annot -> t -> int
+val num_of_rule : string Location.annot -> t -> int
+val num_of_alg : string Location.annot -> t -> int
+val num_of_token : string Location.annot -> t -> int
 
 val print_agent : ?env:t -> Format.formatter -> int -> unit
 val print_rule : ?env:t -> Format.formatter -> int -> unit

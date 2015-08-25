@@ -73,11 +73,11 @@ let run stop out_div s =
 	   Feedback.show_error
 	     (fun f msg ->
 	      Format.fprintf f "Runtime error %s" msg)
-	     out_div (Term.with_dummy_pos msg) in
+	     out_div (Location.dummy_annot msg) in
 	 return ""
       | Sys_error msg ->
 	 let () = Feedback.show_error
-		    Format.pp_print_string out_div (Term.with_dummy_pos msg) in
+		    Format.pp_print_string out_div (Location.dummy_annot msg) in
 	 return ""
       | e -> fail e)
 

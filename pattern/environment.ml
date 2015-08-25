@@ -3,8 +3,8 @@ open Mods
 type t = {
   signatures : Signature.s;
   tokens : unit NamedDecls.t;
-  algs : (Alg_expr.t Term.with_pos) NamedDecls.t;
-  observables : Alg_expr.t Term.with_pos array;
+  algs : (Alg_expr.t Location.annot) NamedDecls.t;
+  observables : Alg_expr.t Location.annot array;
   rules : Primitives.elementary_rule NamedDecls.t;
   perturbations : Primitives.perturbation array;
   need_update_each_loop : Term.DepSet.t;

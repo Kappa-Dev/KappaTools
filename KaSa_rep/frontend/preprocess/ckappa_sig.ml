@@ -62,7 +62,7 @@ and link =
     | FREE 
     | LNK_ANY   of position
     | LNK_SOME  of position
-    | LNK_TYPE  of (string Term.with_pos * string Term.with_pos)
+    | LNK_TYPE  of (string Location.annot * string Location.annot)
 
 type 'mixture rule = 
   {
@@ -71,8 +71,8 @@ type 'mixture rule =
       lhs   : 'mixture; 
       arrow : Ast.arrow; 
       rhs   : 'mixture; 
-      k_def : 'mixture Ast.ast_alg_expr Term.with_pos; 
-      k_un  : 'mixture Ast.ast_alg_expr Term.with_pos option
+      k_def : 'mixture Ast.ast_alg_expr Location.annot;
+      k_un  : 'mixture Ast.ast_alg_expr Location.annot option
     }
 
 type 'mixture perturbation = 'mixture Ast.perturbation 
@@ -247,7 +247,7 @@ type c_compil =
       c_rules : enriched_rule Int_storage.Nearly_inf_Imperatif.t; (*rules (possibly named)*)
       c_observables : c_mixture Ast.ast_alg_expr Int_storage.Nearly_inf_Imperatif.t; (*list of patterns to plot*) 
       c_init : enriched_init Int_storage.Nearly_inf_Imperatif.t  ; (*initial graph declaration*)
-      c_perturbations : c_mixture Term.with_pos perturbation Int_storage.Nearly_inf_Imperatif.t 
+      c_perturbations : c_mixture Location.annot perturbation Int_storage.Nearly_inf_Imperatif.t 
     }
   
 

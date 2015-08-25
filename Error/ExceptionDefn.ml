@@ -16,9 +16,9 @@ exception Deadlock
 exception UserInterrupted of (float -> int -> string)
 exception StopReached of string
 
-exception Syntax_Error of string Term.with_pos
-exception Malformed_Decl of string Term.with_pos
-exception Internal_Error of string Term.with_pos
+exception Syntax_Error of string Location.annot
+exception Malformed_Decl of string Location.annot
+exception Internal_Error of string Location.annot
 exception Unsatisfiable
 
 let warning_buffer:

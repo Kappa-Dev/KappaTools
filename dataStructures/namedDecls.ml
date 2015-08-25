@@ -1,7 +1,7 @@
 open Mods
 
 type 'a t =
-    { decls : (string Term.with_pos *'a) array;
+    { decls : (string Location.annot *'a) array;
       finder : int StringMap.t }
 
 let name_map_of_array a =
