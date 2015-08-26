@@ -1,12 +1,16 @@
 Nbr
 NamedDecls
-Term
+Location
 
-Primitives
+Operator
+Place
 Signature
+Connected_component
+Instantiation
+Alg_expr
+Primitives
 Environment
 Kappa_printer
-Connected_component
 
 Expr
 Snip
