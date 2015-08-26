@@ -61,8 +61,8 @@ rule token = parse
 			 raise
 			   (Syntax_Error
 			      ("Perturbation effect \""^s^"\" is not defined",
-			       (Lexing.lexeme_start_p lexbuf,
-				Lexing.lexeme_end_p lexbuf)))
+			       Location.of_pos (Lexing.lexeme_start_p lexbuf)
+				(Lexing.lexeme_end_p lexbuf)))
 		     }
 	 | '[' {let lab = read_label [] [']'] lexbuf in
 		match lab with
@@ -90,8 +90,8 @@ rule token = parse
 		| _ as s ->
 		   raise (Syntax_Error
 			    ("Symbol \""^s^"\" is not defined",
-			     (Lexing.lexeme_start_p lexbuf,
-			      Lexing.lexeme_end_p lexbuf)))
+			     Location.of_pos (Lexing.lexeme_start_p lexbuf)
+			      (Lexing.lexeme_end_p lexbuf)))
 	       }
 	 | ':' {TYPE}
 	 | ';' {SEMICOLON}
@@ -133,8 +133,9 @@ rule token = parse
 		| "token" -> (TOKEN pos)
 		| _ as s ->
 		   raise (Syntax_Error ("Instruction \""^s^"\" not recognized",
-					(Lexing.lexeme_start_p lexbuf,
-					 Lexing.lexeme_end_p lexbuf)))
+					Location.of_pos
+					(Lexing.lexeme_start_p lexbuf)
+					 (Lexing.lexeme_end_p lexbuf)))
 	       }
 	 | '!' {let pos = position lexbuf in KAPPA_LNK pos}
 	 | internal_state as s {let i = String.index s '~' in
@@ -148,8 +149,8 @@ rule token = parse
 	 | _ as c {
 		    raise (Syntax_Error
 			     ("invalid use of character "^ String.make 1 c,
-			      (Lexing.lexeme_start_p lexbuf,
-			       Lexing.lexeme_end_p lexbuf)))
+			      Location.of_pos (Lexing.lexeme_start_p lexbuf)
+			       (Lexing.lexeme_end_p lexbuf)))
 		  }
 
 and read_label acc char_list =

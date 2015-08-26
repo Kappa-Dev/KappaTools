@@ -22,7 +22,7 @@ exception Internal_Error of string Location.annot
 exception Unsatisfiable
 
 let warning_buffer:
-      ((Lexing.position * Lexing.position) option*(Format.formatter -> unit)) list ref = ref []
+      (Location.t option*(Format.formatter -> unit)) list ref = ref []
 
 let warning ?pos msg =
   warning_buffer :=(pos,msg)::!warning_buffer
@@ -37,5 +37,5 @@ let flush_warning f =
 	     let pr f () = Format.fprintf f "@,Warning: @[%t@]" msg in
 	     match pos with
 	     | Some pos ->
-		Format.fprintf f "@[<v>%a@]@." (Location.print pr) ((),pos)
+		Format.fprintf f "@[<v>%a@]@." (Location.print_annot pr) ((),pos)
 	     | None -> Format.fprintf f "@[%a@]@." pr ()) l

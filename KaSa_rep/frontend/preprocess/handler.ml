@@ -105,7 +105,7 @@ let string_of_rule parameters error handler compiled rule_id =
          | Some rule ->
              let label = rule.Cckappa_sig.e_rule_label in 
              let error, (m1, _) = Misc_sa.unsome (error,label)
-	       (fun error -> error,("",(Lexing.dummy_pos,Lexing.dummy_pos))) in 
+	       (fun error -> error,Location.dummy_annot "") in 
              let m1 = 
 	       if m1 = "" then m1
 	       else 
@@ -234,7 +234,7 @@ let print_rule_dot parameters error rule_id m1 m2 rule =
          | Some rule ->
              let error,label = get_label_of_rule parameters error rule in 
 	     let error, (m1,_) = 
-               Misc_sa.unsome (error,label) (fun error -> error,("",(Lexing.dummy_pos,Lexing.dummy_pos))) in 
+               Misc_sa.unsome (error,label) (fun error -> error,(Location.dummy_annot "")) in
 	     let m1 = 
 	       if m1 = "" 
                then m1

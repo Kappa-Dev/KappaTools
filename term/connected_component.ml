@@ -796,7 +796,7 @@ let finish_new ?origin wk =
 
 
 let new_link wk ((cc1,_,x as n1),i) ((cc2,_,y as n2),j) =
-  let pos = (Lexing.dummy_pos,Lexing.dummy_pos) in
+  let pos = Location.dummy in
   let () = check_node_adequacy ~pos wk cc1 in
   let () = check_node_adequacy ~pos wk cc2 in
   let x_n = IntMap.find x wk.cc_links in
@@ -813,7 +813,7 @@ let new_link wk ((cc1,_,x as n1),i) ((cc2,_,y as n2),j) =
     else wk
 
 let new_free wk ((cc,_,x as n),i) =
-  let () = check_node_adequacy ~pos:(Lexing.dummy_pos,Lexing.dummy_pos) wk cc in
+  let () = check_node_adequacy ~pos:Location.dummy wk cc in
   let x_n = IntMap.find x wk.cc_links in
   if x_n.(i) <> UnSpec then
     raise (already_specified ~sigs:wk.sigs n i)
@@ -822,7 +822,7 @@ let new_free wk ((cc,_,x as n),i) =
     wk
 
 let new_internal_state wk ((cc,_,x as n), i) va =
-  let () = check_node_adequacy ~pos:(Lexing.dummy_pos,Lexing.dummy_pos) wk cc in
+  let () = check_node_adequacy ~pos:Location.dummy wk cc in
   let x_n = IntMap.find x wk.cc_internals in
   if x_n.(i) >= 0 then
     raise (already_specified ~sigs:wk.sigs n i)

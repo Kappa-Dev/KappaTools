@@ -19,7 +19,7 @@ module Int_Set_and_Map = Set_and_map.Make (struct type t = int let compare = com
 
 let local_trace = true 
 
-type position       = (Lexing.position * Lexing.position)
+type position       = Location.t
 type agent_name     = string
 type site_name      = string 
 type internal_state = string 

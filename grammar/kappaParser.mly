@@ -1,8 +1,10 @@
 %{
   open Mods
 
-  let add_pos x = (x,(Parsing.symbol_start_pos (), Parsing.symbol_end_pos ()))
-  let rhs_pos i = (Parsing.rhs_start_pos i, Parsing.rhs_end_pos i)
+  let add_pos x =
+    (x,Location.of_pos (Parsing.symbol_start_pos ()) (Parsing.symbol_end_pos ()))
+  let rhs_pos i =
+  Location.of_pos (Parsing.rhs_start_pos i) (Parsing.rhs_end_pos i)
 %}
 
 %token EOF NEWLINE SEMICOLON COMMA DOT OP_PAR CL_PAR OP_CUR CL_CUR
@@ -122,7 +124,8 @@ instruction:
 			  ) mod_expr_list
 		     then
 		       ExceptionDefn.warning
-			 ~pos:(Parsing.symbol_start_pos (), Parsing.symbol_end_pos ())
+			 ~pos:(Location.of_pos (Parsing.symbol_start_pos ())
+					       (Parsing.symbol_end_pos ()))
 			 (fun f ->
 			  Format.pp_print_string
 			    f "Perturbation need not be applied repeatedly") in
@@ -132,7 +135,8 @@ instruction:
     | PERT bool_expr DO effect_list UNTIL bool_expr
       /* backward compatibility */
 	   {ExceptionDefn.deprecated
-	      ~pos:(Parsing.symbol_start_pos (), Parsing.symbol_end_pos ())
+	      ~pos:(Location.of_pos (Parsing.symbol_start_pos ())
+				    (Parsing.symbol_end_pos ()))
 	      "perturbation"
 	      (fun f -> Format.pp_print_string
 			  f "use the 'repeat ... until' construction");
@@ -157,7 +161,8 @@ perturbation_declaration:
     | bool_expr DO effect_list {($1,$3)}
     | bool_expr SET effect_list
 		{ExceptionDefn.deprecated
-		   ~pos:(Parsing.symbol_start_pos (), Parsing.symbol_end_pos ())
+		   ~pos:(Location.of_pos (Parsing.symbol_start_pos ())
+					 (Parsing.symbol_end_pos ()))
 		   "perturbation"
 		   (fun f -> Format.pp_print_string
 			       f "'set' keyword is replaced by 'do'");
@@ -175,7 +180,8 @@ effect:
       /*updating the rate of a rule -backward compatibility*/
 				{
 				  ExceptionDefn.deprecated
-				    ~pos:(Parsing.symbol_start_pos (), Parsing.symbol_end_pos ())
+				    ~pos:(Location.of_pos (Parsing.symbol_start_pos ())
+							  (Parsing.symbol_end_pos ()))
 				    "perturbation effect"
 				    (fun f ->
 				     Format.pp_print_string
@@ -225,7 +231,8 @@ variable_declaration:
     | LABEL non_empty_mixture
 	    {let () =
 	       ExceptionDefn.deprecated
-		 ~pos:(Parsing.symbol_start_pos (), Parsing.symbol_end_pos ())
+		~pos:(Location.of_pos (Parsing.symbol_start_pos ())
+				      (Parsing.symbol_end_pos ()))
 		 "variable"
 		 (fun f -> Format.pp_print_string
 			     f "use |kappa instance| instead.")
@@ -282,7 +289,8 @@ mixture:
 rule_expression:
     | rule_label lhs_rhs arrow lhs_rhs AT rate
 		 { let pos =
-		     (Parsing.rhs_start_pos 2, Parsing.symbol_end_pos ()) in
+		     Location.of_pos (Parsing.rhs_start_pos 2)
+				     (Parsing.symbol_end_pos ()) in
 		   let (k2,k1,kback) = $6 in
 		   let _ =
 		     match kback,$3 with
@@ -298,7 +306,8 @@ rule_expression:
 		 }
     | rule_label lhs_rhs arrow lhs_rhs
 		 {let pos =
-		    (Parsing.rhs_start_pos 2, Parsing.symbol_end_pos ()) in
+		    Location.of_pos (Parsing.rhs_start_pos 2)
+				    (Parsing.symbol_end_pos ()) in
 		  let lhs,token_l = $2 and rhs,token_r = $4 in
 		  ExceptionDefn.warning
 		    ~pos
@@ -306,8 +315,7 @@ rule_expression:
 				f "Rule has no kinetics. Default rate of 0.0 is assumed.");
 		  ($1,({Ast.lhs = lhs; Ast.rm_token = token_l; Ast.arrow=$3;
 			Ast.rhs=rhs; Ast.add_token = token_r;
-			Ast.k_def=(Ast.CONST (Nbr.F 0.),
-				   (Lexing.dummy_pos, Lexing.dummy_pos));
+			Ast.k_def=Location.dummy_annot (Ast.CONST (Nbr.F 0.));
 			Ast.k_un=None; Ast.k_op=None},pos))}
     ;
 
@@ -378,7 +386,7 @@ multiple_mixture:
     | alg_expr non_empty_mixture {($1,($2, rhs_pos 2))}
       /*conflict here because ID (blah) could be token non_empty mixture or mixture...*/
     | non_empty_mixture
-	{((Ast.CONST (Nbr.one),(Lexing.dummy_pos,Lexing.dummy_pos)),add_pos $1)}
+	{(Location.dummy_annot (Ast.CONST (Nbr.one)),add_pos $1)}
     ;
 
 non_empty_mixture:

@@ -228,7 +228,8 @@ let print_diffview parameters error handler diff =
      if s <> "" 
      then Printf.fprintf (Remanent_parameters.get_log parameters) "%s: " var.Cckappa_sig.e_id 
    in 
-     print_short_alg parameters error handler (var.Cckappa_sig.c_variable,(Lexing.dummy_pos,Lexing.dummy_pos))
+   print_short_alg
+     parameters error handler (Location.dummy_annot var.Cckappa_sig.c_variable)
 
         
  let print_variables parameters error handler var =
