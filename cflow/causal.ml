@@ -358,10 +358,10 @@ let dump grid fic =
   let () = Format.fprintf d "@]@." in
   close_out d_chan
 
-let label env = function
-  | OBS mix_id -> Format.asprintf "%a" (Environment.print_alg ~env) mix_id
+let label ?env = function
+  | OBS mix_id -> Format.asprintf "%a" (Environment.print_alg ?env) mix_id
   | PERT p_id -> ""
-  | RULE r_id -> Format.asprintf "%a" (Environment.print_rule ~env) r_id
+  | RULE r_id -> Format.asprintf "%a" (Environment.print_rule ?env) r_id
   | INIT -> "initial introduction"
 
 let ids_of_grid grid = Hashtbl.fold (fun key _ l -> key::l) grid.flow []
@@ -468,17 +468,17 @@ let dot_of_grid profiling desc env enriched_grid =
 	     Format.fprintf
 	       form
 	       "node_%d [label=\"%s\", shape=%s, style=%s, fillcolor = %s] ;@,"
-	       eid (label env atom.kind) "invhouse" "filled" "lightblue"
+	       eid (label ~env atom.kind) "invhouse" "filled" "lightblue"
           | OBS _  ->
 	     Format.fprintf
 	       form "node_%d [label=\"%s\", style=filled, fillcolor=red] ;@,"
-	       eid (label env atom.kind)
+	       eid (label ~env atom.kind)
         | INIT  ->
 	   if !Parameter.showIntroEvents then
 	     Format.fprintf
 	       form
 	       "node_%d [label=\"%s\", shape=%s, style=%s, fillcolor=%s] ;@,"
-	       eid (label env atom.kind) "house" "filled" "green"
+	       eid (label ~env atom.kind) "house" "filled" "green"
 	| PERT _ -> invalid_arg "Event type not handled"
        (* List.iter (fun obs -> fprintf desc "obs_%d [label =\"%s\", style=filled, fillcolor=red] ;\n node_%d -> obs_%d [arrowhead=vee];\n" eid obs eid eid) atom.observation ;*) 
        ) eids_at_d ;

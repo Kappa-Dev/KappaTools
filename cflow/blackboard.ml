@@ -1178,7 +1178,7 @@ module Blackboard =
               let string_eid error =
 		let () =
                   try PB.CI.Po.K.print_refined_step
-			handler desc (PB.A.get blackboard.event eid)
+			~handler desc (PB.A.get blackboard.event eid)
 		  with Not_found -> Format.fprintf desc "Event:%i" eid in
 		error in
               let error = print_case_fun  desc row_precondition 1 None color string_eid error in 

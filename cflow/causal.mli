@@ -43,7 +43,7 @@ type enriched_grid =
       size:int;
     }
 
-val label : Environment.t -> event_kind -> string
+val label : ?env:Environment.t -> event_kind -> string
 val empty_grid : unit -> grid
 
 val record :

@@ -14,12 +14,13 @@ let alg_expr ?env f alg =
     | Alg_expr.KAPPA_INSTANCE ccs ->
        Pp.list
 	 (fun f -> Format.fprintf f " +@ ")
-	 (Pp.array
+	 (fun f (ccs,_) ->
+	  Pp.array
 	    (fun f -> Format.fprintf f "*")
 	    (fun _ f cc ->
 	     Format.fprintf
 	       f "|%a|"
-	       (Connected_component.print ?sigs false) cc))
+	       (Connected_component.print ?sigs false) cc) f ccs)
 	 f ccs
     | Alg_expr.TOKEN_ID i ->
        Format.fprintf f "|%a|" (Environment.print_token ?env) i

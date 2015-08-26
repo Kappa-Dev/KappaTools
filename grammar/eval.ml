@@ -145,7 +145,7 @@ let cflows_of_label on algs rules (label,pos) rev_effects =
     try let var = StringMap.find label algs.NamedDecls.finder in
 	match algs.NamedDecls.decls.(var) with
 	|(_,(Alg_expr.KAPPA_INSTANCE ccs,_)) ->
-	  List.fold_left (Array.fold_left (adds [])) rev_effects ccs
+	  List.fold_left (fun acc (cc,tests) -> Array.fold_left (adds tests) acc cc) rev_effects ccs
 	| (_,((Alg_expr.CONST _ | Alg_expr.BIN_ALG_OP _ | Alg_expr.TOKEN_ID _ |
 	       Alg_expr.STATE_ALG_OP _ | Alg_expr.UN_ALG_OP _ |
 	       Alg_expr.ALG_VAR _ ),_)) -> raise Not_found

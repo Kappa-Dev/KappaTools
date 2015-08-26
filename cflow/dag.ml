@@ -175,7 +175,7 @@ module Dag =
         let _ = Format.fprintf parameter.H.out_channel_err "@." in 
         error 
 
-      let label handler = Causal.label handler.H.env
+      let label handler = Causal.label ~env:handler.H.env
 
       let kind node = 
         match node 

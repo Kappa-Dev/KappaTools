@@ -13,7 +13,6 @@ Renaming
 Random_tree
 
 Location
-
 Pp
 Parameter
 Kappa_files
@@ -25,6 +24,9 @@ Ast
 Expr
 Signature
 NamedDecls
+Place
+Instantiation
+Alg_expr
 Primitives
 Environment
 Kappa_printer

@@ -90,7 +90,7 @@ let compress_and_print logger env log_info step_list =
             if debug_mode then
 	      Format.fprintf
 		parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel "@[<v>%a@]@."
-		(Pp.list Pp.space (D.S.PH.B.PB.CI.Po.K.print_refined_step handler))
+		(Pp.list Pp.space (D.S.PH.B.PB.CI.Po.K.print_refined_step ~handler))
                 refined_event_list_wo_siphon in
           let refined_event_list_cut,int =
             if (weak_compression_on || strong_compression_on)
@@ -104,7 +104,7 @@ let compress_and_print logger env log_info step_list =
 		if debug_mode then
 		  Format.fprintf
 		    parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel "@[<v>%a@]@."
-		    (Pp.list Pp.space (D.S.PH.B.PB.CI.Po.K.print_refined_step handler))
+		    (Pp.list Pp.space (D.S.PH.B.PB.CI.Po.K.print_refined_step ~handler))
                     refined_event_list_cut in
               refined_event_list_cut,int
             else refined_event_list_wo_siphon,0
@@ -130,7 +130,7 @@ let compress_and_print logger env log_info step_list =
 			   (fun f (x,bool) ->
 			    Format.fprintf
 			      f "%a@,%t"
-			      (D.S.PH.B.PB.CI.Po.K.print_refined_step handler) x
+			      (D.S.PH.B.PB.CI.Po.K.print_refined_step ~handler) x
 			      (fun f ->
 			       if bool then
 				 Format.fprintf f "Weak event @,@,")))
@@ -278,12 +278,9 @@ let compress_and_print logger env log_info step_list =
 		  then
 		    let error,event_list,result_wo_compression = D.S.translate parameter handler error blackboard_cflow event_id_list in 
                     let grid = D.S.PH.B.PB.CI.Po.K.build_grid (List.rev_map (fun (x,y) -> x,y,dummy_weak) (List.rev result_wo_compression)) true handler in
-                    let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
-                    let error,graph = D.graph_of_grid parameter handler error grid in 
-                    let error,prehash = D.prehash parameter handler error graph in 
-                    let log_info = D.S.PH.B.PB.CI.Po.K.P.set_canonicalisation log_info in 
-                   
-	            let tick = Mods.tick_stories logger n_stories tick in 
+                    let error,graph = D.graph_of_grid parameter handler error grid in
+                    let error,prehash = D.prehash parameter handler error graph in
+		    let tick = Mods.tick_stories logger n_stories tick in
                     let causal_story_array =
 		      (prehash,[grid,graph,None,(event_id_list,list_order,event_list),[],[info]])::causal_story_array in 
                     error,counter+1,tick,blackboard,causal_story_array,causal_story_faillure

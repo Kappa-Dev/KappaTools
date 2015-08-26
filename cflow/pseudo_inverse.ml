@@ -141,7 +141,7 @@
                       let () = Format.fprintf
 				 parameter.Po.K.H.out_channel_err
 				 "@[<v>Event %i@,%a@]@." k
-				 (Po.K.print_refined_step handler) event in
+				 (Po.K.print_refined_step ~handler) event in
                       let _ = Format.fprintf parameter.Po.K.H.out_channel_err "Predicates: " in 
                       let list = A.get blackboard.predicates_of_event k in 
                       let _ = List.iter (fun pid -> Format.fprintf parameter.Po.K.H.out_channel_err "%s," (string_of_predicate_info pid)) list in 

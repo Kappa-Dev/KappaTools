@@ -96,7 +96,8 @@ sig
     Format.formatter -> H.handler -> string  ->
     (PI.concrete PI.site*PI.concrete PI.binding_state) -> unit
 
-  val print_refined_step: H.handler -> Format.formatter -> refined_step -> unit
+  val print_refined_step:
+    ?handler:H.handler -> Format.formatter -> refined_step -> unit
 
   val store_event:
     P.log_info -> refined_event -> refined_step list -> P.log_info * refined_step list
@@ -271,26 +272,32 @@ module Cflow_linker =
  
   let string_of_site_name _env = string_of_int 
 				 *)
-  let print_site env f ((ag_id,ag),s) =
+  let print_site ?env f ((ag_id,ag),s) =
     Format.fprintf f "%a_%i.%a"
-		   (Environment.print_agent ~env) ag ag_id
-		   (Signature.print_site (Environment.signatures env) ag) s
+		   (Environment.print_agent ?env) ag ag_id
+		   (match env with
+		    | Some env ->
+		       Signature.print_site (Environment.signatures env) ag
+		    | None -> Format.pp_print_int) s
 
 (*  let string_of_internal_state _env int = string_of_int int 
   
   let string_of_btype _env (agent_name,site_name) = (string_of_int agent_name)^"!"^(string_of_int site_name)
  *)
-  let print_binding_state env f state =
+  let print_binding_state ?env f state =
     match state with
       | PI.ANY -> Format.fprintf f"*"
       | PI.FREE -> ()
       | PI.BOUND -> Format.fprintf f "!_"
       | PI.BOUND_TYPE (s,a) ->
 	 Format.fprintf f "!%a.%a"
-			(Signature.print_site (Environment.signatures env) a) s
-			(Environment.print_agent ~env) a
+		   (match env with
+		    | Some env ->
+		       Signature.print_site (Environment.signatures env) a
+		    | None -> Format.pp_print_int) s
+			(Environment.print_agent ?env) a
       | PI.BOUND_to site ->
-	 Format.fprintf f "!%a" (print_site env) site
+	 Format.fprintf f "!%a" (print_site ?env) site
   (*
   let print_event log env ((rule,emb,fresh),(rule_info)) =
     Kappa_printer.elementary_rule ~env log rule
@@ -299,8 +306,8 @@ module Cflow_linker =
    *)
   let print_side log hand prefix (s,binding_state) =
     let env = hand.H.env in
-    Format.fprintf log "%s(%a,%a)\n" prefix (print_site env) s
-		   (print_binding_state env) binding_state
+    Format.fprintf log "%s(%a,%a)\n" prefix (print_site ~env) s
+		   (print_binding_state ~env) binding_state
 
 (*  let lhs_of_rule rule = rule.Primitives.lhs 
   let lhs_of_event = compose lhs_of_rule rule_of_event
@@ -686,33 +693,38 @@ module Cflow_linker =
     let error,event = event_of_refined_event parameter handler error r_event in 
     error,rule_of_event event *)
 
-  let print_side_effects env =
+  let print_side_effects ?handler =
+    let env = Tools.option_map (fun x -> x.H.env) handler in
     Pp.list Pp.space
 	    (fun f (site,state) ->
 	     Format.fprintf
 	       f "Side_effects(%a:%a)@,"
-	       (print_site env) site (print_binding_state env) state)
+	       (print_site ?env) site (print_binding_state ?env) state)
 
-  let print_refined_obs _handler f _refined_obs =
+  let print_refined_obs ?handler f _refined_obs =
     Format.fprintf f "***Refined obs***"
 
-  let print_refined_subs _handler _f (_a,_b)  = ()
+  let print_refined_subs _f (_a,_b)  = ()
 
-  let print_refined_init handler log actions =
-    let sigs = Environment.signatures handler.H.env in
+  let print_refined_init ?handler log actions =
+    let sigs = match handler with
+      | None -> None
+      | Some handler -> Some (Environment.signatures handler.H.env) in
     Format.fprintf log "@[<1>INIT:%a@]"
-		   (Pp.list Pp.space (PI.print_concrete_action ~sigs)) actions
+		   (Pp.list Pp.space (PI.print_concrete_action ?sigs)) actions
 
-  let print_refined_event handler log (ev_kind,(tests,(actions,side_sites,_))) =
-    let sigs = Environment.signatures handler.H.env in
+  let print_refined_event ?handler log (ev_kind,(tests,(actions,side_sites,_))) =
+    let sigs = match handler with
+      | None -> None
+      | Some handler -> Some (Environment.signatures handler.H.env) in
     let () = Format.fprintf log "@[***Refined event:***@,* Kappa_rule %s@,"
-			    (Causal.label handler.H.env ev_kind) in
+			    (Causal.label ?env:(Tools.option_map (fun x -> x.H.env) handler) ev_kind) in
     Format.fprintf log "Story encoding:@[<1>@,%a%a%a@]@,***@]"
-		   (Pp.list ~trailing:Pp.space Pp.space (PI.print_concrete_test ~sigs))
+		   (Pp.list ~trailing:Pp.space Pp.space (PI.print_concrete_test?sigs))
 		   tests
-		   (Pp.list ~trailing:Pp.space Pp.space (PI.print_concrete_action ~sigs))
+		   (Pp.list ~trailing:Pp.space Pp.space (PI.print_concrete_action ?sigs))
 		   actions
-		   (print_side_effects handler.H.env) side_sites
+		   (print_side_effects ?handler) side_sites
 
   let gen f0 f1 f2 f3 f4 (p:H.parameter) h e step =
     match step with
@@ -722,11 +734,11 @@ module Cflow_linker =
     | Obs a -> f3 p h e a
     | Dummy x  -> f4 p h e x
 
-  let print_refined_step h f = function
-    | Subs (a,b) -> print_refined_subs h f (a,b)
-    | Event (x,y) -> print_refined_event h f (x,y)
-    | Init a -> print_refined_init h f a
-    | Obs a -> print_refined_obs h f a
+  let print_refined_step ?handler f = function
+    | Subs (a,b) -> print_refined_subs f (a,b)
+    | Event (x,y) -> print_refined_event ?handler f (x,y)
+    | Init a -> print_refined_init ?handler f a
+    | Obs a -> print_refined_obs ?handler f a
     | Dummy _  -> ()
 
   let tests_of_refined_step =
