@@ -1,19 +1,5 @@
 (** Compiled kappa model unit *)
 
-(** An agent in a connected component *)
-module Place :
-sig
-  type t =
-      Existing of Connected_component.ContentAgent.t * int (* node, id *)
-    | Fresh of int * int (* type, id *)
-
-  val rename :
-    Connected_component.work -> int -> Connected_component.cc ->
-    Renaming.t -> t -> t
-
-  val is_site_from_fresh : (t * int) -> bool
-end
-
 (** Elementary rule transformations *)
 module Transformation :
 sig

@@ -36,11 +36,11 @@ let update_roots is_add map cc root =
     cc ((if is_add then ValMap.add else ValMap.remove) root va) map
 
 let from_place (inj_nodes,inj_fresh,free_id as inj2graph) = function
-  | Primitives.Place.Existing (n,id) ->
+  | Place.Existing (n,id) ->
      (Connected_component.ContentAgent.get_sort n,
       Connected_component.Matching.get (n,id) inj_nodes,
       inj2graph)
-  | Primitives.Place.Fresh (ty,id) ->
+  | Place.Fresh (ty,id) ->
      try (ty,Mods.IntMap.find id inj_fresh,inj2graph)
      with Not_found ->
        ty,free_id,(inj_nodes,Mods.IntMap.add id free_id inj_fresh,succ free_id)

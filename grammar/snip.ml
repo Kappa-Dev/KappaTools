@@ -602,7 +602,7 @@ let rec add_agents_in_cc id wk registered_links transf links_transf
      end
   | ag :: ag_l ->
      let (node,wk) = Connected_component.new_node wk ag.ra_type in
-     let place = Primitives.Place.Existing (node,id) in
+     let place = Place.Existing (node,id) in
      let rec handle_ports wk r_l c_l (removed,added) l_t re acc site_id =
        if site_id = Array.length ag.ra_ports
        then
@@ -643,7 +643,7 @@ let rec add_agents_in_cc id wk registered_links transf links_transf
 	 | L_VAL ((i,pos),s) ->
 	    try
 	      let (node',site' as dst) = IntMap.find i r_l in
-	      let dst_place = Primitives.Place.Existing (node',id),site' in
+	      let dst_place = Place.Existing (node',id),site' in
 	      let wk'' = Connected_component.new_link wk' (node,site_id) dst in
 	      let c_l' =
 		IntMap.add
@@ -706,7 +706,7 @@ let rec complete_with_creation (removed,added) links_transf actions fresh =
 	   | Some (i,_) -> dangling_link "right" i
      end
   | ag :: ag_l ->
-     let place = Primitives.Place.Fresh (ag.Raw_mixture.a_type,fresh) in
+     let place = Place.Fresh (ag.Raw_mixture.a_type,fresh) in
      let rec handle_ports added l_t actions intf site_id =
        if site_id = Array.length ag.Raw_mixture.a_ports then
 	 let actions' =
@@ -752,8 +752,8 @@ let connected_components_of_mixture created (env,origin) mix =
 	 List.fold_left
 	   (fun acs -> function
 		    | Primitives.Transformation.Linked (x,y)
-			 when Primitives.Place.is_site_from_fresh x ||
-				Primitives.Place.is_site_from_fresh y ->
+			 when Place.is_site_from_fresh x ||
+				Place.is_site_from_fresh y ->
 		       Primitives.Instantiation.Bind_to (x,y) :: acs
 		    | Primitives.Transformation.Linked (x,y) ->
 		       Primitives.Instantiation.Bind (x,y) :: acs
@@ -784,7 +784,7 @@ let connected_components_of_mixture created (env,origin) mix =
        Primitives.Instantiation.rename_abstract_event wk_out id cc inj event in
      let l_t' = IntMap.map
 		  (fun (p,s as x) ->
-		   let p' = Primitives.Place.rename wk id cc inj p in
+		   let p' = Place.rename wk id cc inj p in
 		   if p == p' then x else (p',s)) l_t in
      aux env' (removed',added') event' l_t' (cc::acc) (succ id) remains
   in aux env ([],[]) ([],([],[],[]))
