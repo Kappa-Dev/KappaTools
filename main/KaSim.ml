@@ -216,7 +216,7 @@ let () =
 	   let msg = f (Counter.time counter) (Counter.event counter) in
 	   let () =
 	     Format.eprintf
-	       "@.***%s: would you like to record the current state? (y/N)***"
+	       "@.***%s: would you like to record the current state? (y/N)***@."
 	       msg in
 	   let () = close_desc (Some env) in
 	   (*closes all other opened descriptors*)

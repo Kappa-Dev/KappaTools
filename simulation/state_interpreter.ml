@@ -59,9 +59,12 @@ let do_it env domain counter graph state p_id = function
 		~get_alg domain counter g (Causal.PERT p_id) r))
 	graph n,state)
   | Primitives.UPDATE (va,(expr,_)) ->
+     let get_alg i = get_alg env state i in
      let () =
        match va with
-       | Operator.ALG i -> state.variables_overwrite.(i) <- Some expr
+       | Operator.ALG i ->
+	  state.variables_overwrite.(i) <-
+	    Some (Alg_expr.CONST (Rule_interpreter.value_alg counter graph ~get_alg expr))
        | (Operator.RULE _ | Operator.PERT _) ->
 	  failwith "Problematic update perturbation" in
      (false, graph, state)
