@@ -497,7 +497,7 @@ let define_positive_transformation (removed,added as transf) links_transf
        (transf,links_transf')
 
 let add_instantiation_free actions pl s = function
-  | Freed -> Primitives.Instantiation.Free (pl,s) :: actions
+  | Freed -> Instantiation.Free (pl,s) :: actions
   | (Linked _ | Maintained | Erased) -> actions
 let add_side_site side_sites bt pl s = function
   | (Freed | Linked _ | Erased) -> ((pl,s),bt)::side_sites
@@ -526,10 +526,10 @@ let make_instantiation
   | Some (ports, ints) ->
      let rec aux site_id tests actions side_sites side_effects links =
        if site_id < 0
-       then (Primitives.Instantiation.Is_Here place :: tests,
+       then (Instantiation.Is_Here place :: tests,
 	     ((match ports.(0) with
 	       | L_FREE Erased ->
-		  Primitives.Instantiation.Remove place :: actions
+		  Instantiation.Remove place :: actions
 	       | L_FREE (Maintained | Linked _ | Freed)
 	       | L_ANY _ | L_SOME _ | L_TYPE _ | L_VAL _ -> actions),
 	      side_sites,side_effects))
@@ -539,14 +539,14 @@ let make_instantiation
 	   | (I_ANY | I_ANY_ERASED) -> tests,actions
 	   | I_ANY_CHANGED j ->
 	      tests,
-	      Primitives.Instantiation.Mod_internal ((place,site_id),j) :: actions
+	      Instantiation.Mod_internal ((place,site_id),j) :: actions
 	   | I_VAL_CHANGED (i,j) ->
-	      Primitives.Instantiation.Has_Internal ((place,site_id),i) :: tests,
+	      Instantiation.Has_Internal ((place,site_id),i) :: tests,
 	      if i <> j then
-		Primitives.Instantiation.Mod_internal ((place,site_id),j) :: actions
+		Instantiation.Mod_internal ((place,site_id),j) :: actions
 	      else actions
 	   | I_VAL_ERASED i ->
-	      Primitives.Instantiation.Has_Internal ((place,site_id),i) :: tests,
+	      Instantiation.Has_Internal ((place,site_id),i) :: tests,
 	      actions in
 	 let tests'',actions'',side_sites',side_effects',links' =
 	   match ports.(site_id) with
@@ -558,27 +558,27 @@ let make_instantiation
 		     side_effects place site_id ref_ports.(site_id)
 		| Erased | Linked _ | Freed -> side_effects in
 	      tests', add_instantiation_free actions' place site_id s,
-	      add_side_site side_sites Primitives.Instantiation.ANY
+	      add_side_site side_sites Instantiation.ANY
 			    place site_id s,
 	      side_effects',
 	      links
 	   | L_FREE s ->
 	      (if site_id = 0 then tests'
-	       else Primitives.Instantiation.Is_Free (place,site_id) :: tests'),
+	       else Instantiation.Is_Free (place,site_id) :: tests'),
 	      add_instantiation_free actions' place site_id s,side_sites,
 	      side_effects, links
 	   | L_SOME s ->
-	      Primitives.Instantiation.Is_Bound (place,site_id) :: tests',
+	      Instantiation.Is_Bound (place,site_id) :: tests',
 	      add_instantiation_free actions' place site_id s,
-	      add_side_site side_sites Primitives.Instantiation.BOUND
+	      add_side_site side_sites Instantiation.BOUND
 			    place site_id s,
 	      side_effects, links
 	   | L_TYPE (a,b,s) ->
-	      Primitives.Instantiation.Has_Binding_type ((place,site_id),(a,b))
+	      Instantiation.Has_Binding_type ((place,site_id),(a,b))
 	      :: tests',
 	      add_instantiation_free actions' place site_id s,
 	      add_side_site
-		side_sites (Primitives.Instantiation.BOUND_TYPE (a,b))
+		side_sites (Instantiation.BOUND_TYPE (a,b))
 			    place site_id s,
 	      side_effects, links
 	   | L_VAL ((i,_),s) ->
@@ -647,7 +647,7 @@ let rec add_agents_in_cc id wk registered_links transf links_transf
 	      let wk'' = Connected_component.new_link wk' (node,site_id) dst in
 	      let c_l' =
 		IntMap.add
-		  i (Primitives.Instantiation.Is_Bound_to ((place,site_id),dst_place))
+		  i (Instantiation.Is_Bound_to ((place,site_id),dst_place))
 		  c_l in
 	      let transf',l_t' =
 		define_full_transformation
@@ -672,7 +672,7 @@ let rec add_agents_in_cc id wk registered_links transf links_transf
 			transf' l_t' place site_id' (Some (place,site_id)) s in
 		    let c_l' =
 		      IntMap.add
-			i (Primitives.Instantiation.Is_Bound_to ((place,site_id),(place,site_id')))
+			i (Instantiation.Is_Bound_to ((place,site_id),(place,site_id')))
 			c_l in
 		    handle_ports
 		      wk'' r_l c_l' transf'' l_t'' re acc (succ site_id)
@@ -710,7 +710,7 @@ let rec complete_with_creation (removed,added) links_transf actions fresh =
      let rec handle_ports added l_t actions intf site_id =
        if site_id = Array.length ag.Raw_mixture.a_ports then
 	 let actions' =
-	   Primitives.Instantiation.Create (place,List.tl @@ List.rev intf) :: actions in
+	   Instantiation.Create (place,List.tl @@ List.rev intf) :: actions in
 	 complete_with_creation (removed,added) l_t actions' (succ fresh) ag_l
        else
 	 let added',point =
@@ -724,14 +724,14 @@ let rec complete_with_creation (removed,added) links_transf actions fresh =
 	   | Raw_mixture.FREE ->
 	      Primitives.Transformation.Freed (place,site_id)::added',
 	      (if site_id = 0 then actions
-	       else Primitives.Instantiation.Free (place,site_id) :: actions),
+	       else Instantiation.Free (place,site_id) :: actions),
 	      l_t
 	   | Raw_mixture.VAL i ->
 	      try
 		let dst = IntMap.find i l_t in
 		let l_t' = IntMap.remove i l_t in
 		Primitives.Transformation.Linked((place,site_id),dst)::added',
-		(Primitives.Instantiation.Bind_to((place,site_id),dst)::actions),
+		(Instantiation.Bind_to((place,site_id),dst)::actions),
 		l_t'
 	      with Not_found ->
 		let l_t' = IntMap.add i ((place,site_id)) l_t in
@@ -754,9 +754,9 @@ let connected_components_of_mixture created (env,origin) mix =
 		    | Primitives.Transformation.Linked (x,y)
 			 when Place.is_site_from_fresh x ||
 				Place.is_site_from_fresh y ->
-		       Primitives.Instantiation.Bind_to (x,y) :: acs
+		       Instantiation.Bind_to (x,y) :: acs
 		    | Primitives.Transformation.Linked (x,y) ->
-		       Primitives.Instantiation.Bind (x,y) :: acs
+		       Instantiation.Bind (x,y) :: acs
 		    | (Primitives.Transformation.Freed _ |
 		       Primitives.Transformation.Internalized _) -> acs)
 	   actions added in
@@ -781,7 +781,7 @@ let connected_components_of_mixture created (env,origin) mix =
        Tools.list_smart_map
 	 (Primitives.Transformation.rename wk_out id cc inj) removed in
      let event' =
-       Primitives.Instantiation.rename_abstract_event wk_out id cc inj event in
+       Instantiation.rename_abstract_event wk_out id cc inj event in
      let l_t' = IntMap.map
 		  (fun (p,s as x) ->
 		   let p' = Place.rename wk id cc inj p in

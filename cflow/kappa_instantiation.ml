@@ -27,7 +27,7 @@ module type Cflow_signature =
 sig
   module H:Cflow_handler.Cflow_handler
   module P:StoryProfiling.StoryStats
-  module PI = Primitives.Instantiation
+  module PI = Instantiation
 
   type agent_id = int 
   module AgentIdSet:Set.S with type elt = agent_id
@@ -141,7 +141,7 @@ module Cflow_linker =
   (struct
     module H = Cflow_handler.Cflow_handler
     module P = StoryProfiling.StoryStats
-    module PI = Primitives.Instantiation
+    module PI = Instantiation
 
   type site_name = int
 

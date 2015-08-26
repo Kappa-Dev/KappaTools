@@ -8,7 +8,7 @@ type t = {
   free_id: int;
   story_machinery :
     ((Causal.event_kind *
-	Primitives.Instantiation.abstract Primitives.Instantiation.test list)
+	Instantiation.abstract Instantiation.test list)
        Connected_component.Map.t (*currently tracked ccs *)
      * jf_data) option;
 }
@@ -98,7 +98,7 @@ let store_event
      let quark_event =
         quark_list_from_event inj2graph rule.Primitives.instantiations in*)
      let concrete_event =
-       Primitives.Instantiation.concretize_event
+       Instantiation.concretize_event
 	 (fun p -> let (_,x,_) = from_place inj2graph p in x)
 	 rule.Primitives.instantiations in
      let infos',steps' =
@@ -133,7 +133,7 @@ let store_obs edges obs acc = function
 			 "Problem with Rule_interpreter.store_obs"))
 	  | Some inj ->
 	     let tests' =
-	       List.map (Primitives.Instantiation.concretize_test
+	       List.map (Instantiation.concretize_test
 			   (fun p ->
 			    let (_,x,_) =
 			      from_place (inj,Mods.IntMap.empty,0) p in x))

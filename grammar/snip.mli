@@ -5,7 +5,7 @@ val connected_components_sum_of_ambiguous_mixture :
   Connected_component.Env.t -> ?origin:Operator.rev_dep -> Ast.mixture ->
   Connected_component.Env.t *
     (Connected_component.t array *
-       Primitives.Instantiation.abstract Primitives.Instantiation.test list)
+       Instantiation.abstract Instantiation.test list)
       list
 
 val connected_components_sum_of_ambiguous_rule :
@@ -14,6 +14,6 @@ val connected_components_sum_of_ambiguous_rule :
   Ast.mixture ->
   (Connected_component.Env.t * Operator.rev_dep option) *
     (Operator.rev_dep option * Connected_component.t array *
-       (Primitives.Instantiation.abstract Primitives.Instantiation.event) *
+       (Instantiation.abstract Instantiation.event) *
 	 (Primitives.Transformation.t list * Primitives.Transformation.t list))
       list

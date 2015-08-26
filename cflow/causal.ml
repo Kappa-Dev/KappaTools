@@ -205,16 +205,16 @@ let add ((node_id,_),site_id) is_link va grid event_number kind =
 let add_actions env grid event_number kind actions =
   let rec aux grid = function
     | [] -> grid
-    | Primitives.Instantiation.Mod_internal (site,_) :: q ->
+    | Instantiation.Mod_internal (site,_) :: q ->
        aux (add site false atom_modified grid event_number kind) q
-    | (Primitives.Instantiation.Bind (site1,site2)
-      | Primitives.Instantiation.Bind_to (site1,site2)) :: q ->
+    | (Instantiation.Bind (site1,site2)
+      | Instantiation.Bind_to (site1,site2)) :: q ->
        let grid' = add site2 true atom_modified grid event_number kind in
        aux (add site1 true atom_modified grid' event_number kind) q
-    | Primitives.Instantiation.Free site :: q ->
+    | Instantiation.Free site :: q ->
        aux (add site true atom_modified grid event_number kind) q
-    | (Primitives.Instantiation.Create ((_,na as ag),_)
-      | Primitives.Instantiation.Remove (_,na as ag)) :: q ->
+    | (Instantiation.Create ((_,na as ag),_)
+      | Instantiation.Remove (_,na as ag)) :: q ->
        let sigs = Environment.signatures env in
        let ag_intf = Signature.get sigs na in
        let grid =
@@ -232,14 +232,14 @@ let add_actions env grid event_number kind actions =
 let add_tests grid event_number kind tests =
   let rec aux grid = function
     | [] -> grid
-    | Primitives.Instantiation.Is_Here _ :: q -> aux grid q
-    | Primitives.Instantiation.Has_Internal (site,_) :: q ->
+    | Instantiation.Is_Here _ :: q -> aux grid q
+    | Instantiation.Has_Internal (site,_) :: q ->
        aux (add site false atom_tested grid event_number kind) q
-    | (Primitives.Instantiation.Is_Free site
-      | Primitives.Instantiation.Is_Bound site
-      | Primitives.Instantiation.Has_Binding_type (site,_)) :: q ->
+    | (Instantiation.Is_Free site
+      | Instantiation.Is_Bound site
+      | Instantiation.Has_Binding_type (site,_)) :: q ->
        aux (add site true atom_tested grid event_number kind) q
-    | Primitives.Instantiation.Is_Bound_to (site1,site2) :: q ->
+    | Instantiation.Is_Bound_to (site1,site2) :: q ->
        let grid' = add site2 true atom_tested grid event_number kind in
        aux (add site1 true atom_tested grid' event_number kind) q
   in aux grid tests

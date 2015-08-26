@@ -48,16 +48,16 @@ val empty_grid : unit -> grid
 
 val record :
   (event_kind *
-     Primitives.Instantiation.concrete Primitives.Instantiation.event) ->
+     Instantiation.concrete Instantiation.event) ->
   bool -> int -> Environment.t -> grid -> grid
 val record_obs :
   (event_kind *
-     Primitives.Instantiation.concrete Primitives.Instantiation.test list
+     Instantiation.concrete Instantiation.test list
    * unit Mods.simulation_info) ->
-  Primitives.Instantiation.concrete Primitives.Instantiation.site list ->
+  Instantiation.concrete Instantiation.site list ->
   bool -> int -> grid -> grid
 val record_init :
-  Primitives.Instantiation.concrete Primitives.Instantiation.action list ->
+  Instantiation.concrete Instantiation.action list ->
   bool -> int -> Environment.t -> grid -> grid
 
 val cut : (int * int * int) list -> grid -> config
