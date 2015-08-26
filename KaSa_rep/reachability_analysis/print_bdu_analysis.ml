@@ -29,14 +29,7 @@ let print_index_list parameter error store_result =
         aux tl          
   in aux store_result
 
-let rec print_wl_list l =
-  match l with
-    | [] -> []
-    | wl :: tl ->
-      IntWL.print_wl wl;
-      print_wl_list tl
-        
-let print_iteration parameter error result =
+let print_bdu_array parameter error result =
   AgentMap.print error 
     (fun error parameter (handler, bdu_array) ->
       let _ =
@@ -50,13 +43,10 @@ let print_iteration parameter error result =
       error
     ) parameter result
 
-let print_array handler bdu_array =
-  Array.iter (fun bdu ->
-    let _ =
-      handler.print_mvbdu stdout "" bdu
-    in
-    ()
-  ) bdu_array
+let print_iteration parameter error result =
+  let _, store_bdu_array = result in
+  print_bdu_array parameter error store_bdu_array
+    
 
 (************************************************************************************)
 (*MAIN PRINT*)
@@ -65,14 +55,7 @@ let print_result parameter error result =
   let error =
     fprintf stdout "--------------------------------------------\n";
     fprintf stdout "Succ_list\n";
-    let _ = 
-      print_index_list parameter error result.store_succ_list
-    in
-    fprintf stdout "--------------------------------------------\n";
-    fprintf stdout "rule wl\n";
-    let _ =
-      print_wl_list result.store_rule_wl
-    in
+    let _ = print_index_list parameter error result.store_succ_list in
     fprintf stdout "--------------------------------------------\n";
     print_iteration parameter error result.store_iteration
   in

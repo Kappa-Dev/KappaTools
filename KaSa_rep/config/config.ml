@@ -75,3 +75,4 @@ let do_ODE_flow_of_information = ref false
 let do_stochastic_flow_of_information = ref false
 let do_site_dependencies = ref false
 let do_iteration_dependencies = ref false
+let do_range_bdu = ref false

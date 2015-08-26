@@ -38,8 +38,6 @@ type wl_int = IntWL.WSet.elt list * IntWL.WSet.elt list * IntWL.WSet.set
 type bdu_analysic =
     {
       store_creation    : site_bdu AgentMap.t;
-      store_rule        : Cckappa_sig.rule array AgentMap.t;
       store_succ_list   : (int * int) list;
-      store_rule_wl     : wl_int list;
-      store_iteration   : (handler * bdu array) AgentMap.t
+      store_iteration   : Cckappa_sig.rule array AgentMap.t * (handler * bdu array) AgentMap.t
     }

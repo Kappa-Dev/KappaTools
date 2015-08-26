@@ -232,24 +232,6 @@ let empty_rule parameter error =
     actions      = empty_actions      
   }
 
-(*collect an array of rule *)
-
-let collect_rule parameter error handler rule_id rule store_result =
-  let nrules = Handler.nrules parameter error handler in
-  let array = Array.make nrules (empty_rule parameter error) in
-  let array =
-    array.(rule_id) <- rule;
-    array
-  in
-  let error, old =
-    match AgentMap.unsafe_get parameter error rule_id store_result with
-      | error, None -> error, [||]
-      | error, Some a -> error, a
-  in
-  let new_array = Array.append array old in
-  AgentMap.set
-    parameter error rule_id new_array store_result
-
 (*wake_up_map rule_index*)
 
 let collect_wake_up_rule parameter error handler compiled map =
@@ -262,24 +244,16 @@ let collect_wake_up_rule parameter error handler compiled map =
 (*push index of an array of rule into working list*)
 
 let index_rule_wl parameter error array_rule =
-  let ref_list = ref [] in
   let wl = IntWL.empty in
-  Array.iteri 
-    begin
-      fun index _ ->
-        let error, wl = IntWL.push parameter error index wl in
-        ref_list := wl :: !ref_list
-    end array_rule;
-  !ref_list
-
-let collect_rule_wl parameter error rule_id store_rule =
-  let error, get_array =
-    match AgentMap.unsafe_get parameter error rule_id store_rule with
-      | error, None -> error, [||]
-      | error, Some a -> error, a
+  let l  = Array.length array_rule in
+  let rec aux k (error, wl) =
+    if k >= l
+    then
+      error, wl
+    else
+      aux (k+1) (IntWL.push parameter error k wl)
   in
-  let wl = index_rule_wl parameter error get_array in
-  error, wl
+    aux 1 (error, wl)
 
 (************************************************************************************)
 (*fixpoint interation with wake_up_map*)
@@ -334,156 +308,176 @@ let comp_is_enable parameter error handler bdu_init bdu_test bdu_iter =
   else
     error, false
 
-let compute_update parameter error rule_id' handler bdu_direct bdu_iter bdu_array =
+let compute_update parameter error rule_id handler bdu_direct bdu_iter bdu_array =
   let error, handler, bdu_update =
-    f parameter error bdu_iter
-      (boolean_mvbdu_or parameter handler error parameter bdu_iter) bdu_direct
+    f parameter error bdu_direct
+      (boolean_mvbdu_or parameter handler error parameter bdu_direct) bdu_iter
   in
   let bdu_array =
-    bdu_array.(rule_id'+1) <- bdu_update;
+    bdu_array.(rule_id) <- bdu_update;
     bdu_array
   in
   error, bdu_array
 
-let get_old parameter error agent_type handler store_result = 
-  let error, (handler, bdu_array) =
-    match AgentMap.unsafe_get parameter error agent_type store_result with
+(*common function return array for the pair of array *)
+let get_old_array parameter error id store_result =
+  let error, old =
+    match AgentMap.unsafe_get parameter error id store_result with
+      | error, None -> error, [||]
+      | error, Some a -> error, a
+  in
+  error, old
+
+let get_old_handler_array parameter error id handler store_result =
+  let error, (handler, old) =
+    match AgentMap.unsafe_get parameter error id store_result with
       | error, None -> error, (handler, [||])
       | error, Some (handler, a) -> error, (handler, a)
   in
-  error, (handler, bdu_array)
+  error, (handler, old)
 
-let add_wl parameter error i' tl =
-  let rec aux acc =
-    match acc with
-      | [] -> []
-      | wl :: tl_wl ->
-        let error, wl = IntWL.push parameter error i' wl in
-        wl :: aux tl_wl
-  in aux tl
-
-let add_succ parameter error rule_id' succ_list tl_wl =
-  let rec aux acc =
-    match acc with
-      | [] -> error, None
-      | (i, i') :: tl ->
-        if rule_id' = i
-        then
-          let op = add_wl parameter error i' tl_wl in
-          error, Some op
-        else
-          aux tl
-  in aux succ_list
-
-let add_succ_wl parameter error rule_id' succ_list tl_wl =
-  let error, op =
-    add_succ parameter error rule_id' succ_list tl_wl
-  in
-  let succ_tl =
-    match op with
-      | None -> []
-      | Some succ_tl -> succ_tl
-  in
-  error, succ_tl
-
-let iterate parameter error rule_id' agent_type
-    handler bdu_init bdu_test bdu_direct bdu_array succ_list aux tl_wl store_acc =
-  Array.fold_left (fun (error, store_result) bdu_iter ->
-    (*is not enable*)
-    let error, is_enable =
-      comp_is_enable parameter error handler bdu_init bdu_test bdu_iter 
-    in
-    if is_enable
-    then
-      (*update*)
-      let error, bdu_update = 
-        compute_update parameter error rule_id' handler bdu_direct bdu_iter bdu_array
-      in
-      let error, store_new =
-        AgentMap.set
-          parameter error agent_type (handler, bdu_update) store_result
-      in
-      (*add succ_h*)
-      let error, succ_tl = add_succ_wl parameter error rule_id' succ_list tl_wl in
-      aux succ_tl store_new
-    else
-      aux tl_wl store_result
-  ) (error, store_acc) bdu_array
-
-let fixpoint_aux parameter error agent_type 
-    handler bdu_init rule_id rule_array rule_wl_list succ_list store_result =
-  let rec aux acc store_acc =
-    match acc with
-      | [] -> error, store_acc        
-      | wl :: tl ->
-        let error, (rule_id_op, wl_tl) = IntWL.pop parameter error wl in
-        match rule_id_op with
-          | None -> error, store_acc
-          | Some rule_id' ->
-            let rule = Array.get rule_array rule_id' in
-            let error, (bdu_test, bdu_direct) = 
-              get_test_direct parameter error rule agent_type handler bdu_init
-            in
-            let error, (handler, bdu_array) =
-              get_old parameter error agent_type handler store_acc
-            in
-            let error, iter =
-              iterate
-                parameter
-                error
-                rule_id'
-                agent_type
-                handler bdu_init
-                bdu_test bdu_direct
-                bdu_array
-                succ_list
-                aux 
-                tl
-                store_acc
-            in
-            error, iter
-  in aux rule_wl_list store_result
-
-let fixpoint parameter error rule_id handler_sig store_rule rule_wl_list 
-    succ_list store_creation store_result =
+(*collect a pair of array: rule array and bdu array(the result of iteration)*)
+let collect_pair_array parameter error 
+    agent_type handler_sig 
+    rule_id rule 
+    handler bdu_init 
+      bdu_creation 
+      store_rule_array 
+      store_bdu_array  =
+  (*create a pair of array: rule_array and the result of iteration*)
   let nrules = Handler.nrules parameter error handler_sig in
+  let rule_array = Array.make (nrules + 1) (empty_rule parameter error) in
+  let bdu_array  = Array.make (nrules + 1) bdu_init in
+  let rule_array =
+    rule_array.(rule_id + 1) <- rule;
+    rule_array
+  in
+  let bdu_array =
+    bdu_array.(0) <- bdu_creation;
+    bdu_array
+  in
+  (*get old rule_array*)
+  let error, old_rule_array = get_old_array parameter error rule_id store_rule_array in
+  let error, (handler, old_bdu_array) = 
+    get_old_handler_array parameter error agent_type handler store_bdu_array in
+  let new_rule_array = Array.append rule_array old_rule_array in
+  let new_bdu_array = Array.append bdu_array old_bdu_array in
+  (*store this pair into set*)
+  let error, store_rule_array =
+    AgentMap.set
+      parameter error rule_id new_rule_array store_rule_array
+  in
+  let error, store_bdu_array =
+    AgentMap.set
+      parameter error agent_type (handler, new_bdu_array) store_bdu_array
+  in
+  error, (store_rule_array, store_bdu_array)
+  
+(*adding succ(h) into the tail of a working list*)
+let add_succ_wl parameter error rule_id succ_list wl_tl =
+  let rec aux acc (error, wl) =
+    match acc with
+      | [] -> error, wl
+      | (i, i') :: tl ->
+        if rule_id != i
+        then
+          error, wl
+        else
+          aux tl (IntWL.push parameter error i' wl)
+  in
+  aux succ_list (error, wl_tl)
+
+let fixpoint_aux parameter error 
+    agent_type 
+    rule 
+      handler bdu_init 
+        rule_array 
+        wl
+        succ_list
+        store_bdu_array =
+  let error, (handler, bdu_array) = 
+    get_old_handler_array parameter error agent_type handler store_bdu_array in
+  let rec aux acc_wl (error, bdu_remanent_array) =
+    (*if wl is empty then return store_bdu_array*)
+    if IntWL.is_empty acc_wl
+    then error, bdu_remanent_array
+    else
+      (*pop the first element in wl*)
+      let error, (rule_id_op, wl_tl) = IntWL.pop parameter error acc_wl in
+      match rule_id_op with
+        | None -> error, bdu_remanent_array
+        | Some rule_id ->
+          (*get rule type from the array*)
+          let rule = Array.get rule_array rule_id in
+          (*get bdu_test, action*)
+          let error, (bdu_test, bdu_direct) =
+            get_test_direct parameter error rule agent_type handler bdu_init
+          in
+          let error, iterate_array =
+            Array.fold_left (fun _ bdu_iter ->
+              (*is not enable*)
+              let error, is_enable =
+                comp_is_enable parameter error handler bdu_init bdu_test bdu_iter 
+              in
+              (*call iterate function*)
+              if is_enable 
+              then
+                let error, bdu_update_array = 
+                  compute_update parameter error rule_id handler bdu_direct bdu_iter bdu_array
+                in
+                (*add succ_h*)
+                let error, wl_succ_tl = add_succ_wl parameter error rule_id succ_list wl_tl in
+                aux wl_succ_tl (error, bdu_update_array)
+              else
+                aux wl_tl (error, bdu_remanent_array)
+            ) (error, [||]) bdu_remanent_array
+          in
+          error, iterate_array
+  in aux wl (error, bdu_array)
+
+let fixpoint parameter error 
+    handler_sig
+    rule_id rule
+        succ_list
+          store_creation 
+          store_pair_array =
   let error, (handler, bdu_init) = bdu_init parameter in
   AgentMap.fold parameter error
-    (fun parameter error agent_type (_, (handler, bdu_creation)) store_result ->
-      (*add bdu_creation into the first index of store_array*)
-      (*creation the empty array with the length is the length of rules + 1*)
-      let array = Array.make (nrules + 1) bdu_init in
-      let add_creation = 
-        array.(0) <- bdu_creation;
-        array
+    (fun parameter error agent_type (_, (handler, bdu_creation)) store_pair_array ->
+      let store_rule_array, store_bdu_array = store_pair_array in
+      let error, (store_rule_array, store_bdu_array) =
+        collect_pair_array
+          parameter error
+          agent_type handler_sig 
+          rule_id rule 
+              handler bdu_init 
+                bdu_creation
+                store_rule_array 
+                store_bdu_array
       in
-      (*store this into the result*)
-      let error, result =
-        AgentMap.set
-          parameter
-          error
+      (*get rule_array to use in the iteration*)
+      let error, old_rule_array = get_old_array parameter error rule_id store_rule_array in
+      (*build an index of rule and add them into a working list*)
+      let error, wl = index_rule_wl parameter error old_rule_array in
+      (*call iteration function*)
+      let error, bdu_iterate_array =
+        fixpoint_aux
+          parameter error
           agent_type
-          (handler, add_creation)
-          store_result
+          rule
+            handler bdu_init
+              old_rule_array
+              wl
+              succ_list
+              store_bdu_array
       in
-      (*get rule array from store_rule*)
-      let error, rule_array =
-        match AgentMap.unsafe_get parameter error rule_id store_rule with
-          | error, None -> error, [||]
-          | error, Some a -> error, a
+      (*set*)
+      let error, store_bdu_array =
+        AgentMap.set
+          parameter error agent_type (handler, bdu_iterate_array) store_bdu_array
       in
-      fixpoint_aux
-        parameter 
-        error
-        agent_type
-        handler
-        bdu_init
-        rule_id
-        rule_array
-        rule_wl_list
-        succ_list
-        result        
-    ) store_creation store_result
+      error, (store_rule_array, store_bdu_array)
+    ) store_creation store_pair_array
 
 (************************************************************************************)
 (*RULE*)
@@ -500,26 +494,6 @@ let scan_rule parameter error handler map rule_id rule compiled store_result =
       store_result.store_creation
   in
   (*------------------------------------------------------------------------------*)
-  (*store a list of rule in an array*)
-  let error, store_rule =
-    collect_rule
-      parameter
-      error
-      handler
-      rule_id
-      rule
-      store_result.store_rule
-  in
-  (*------------------------------------------------------------------------------*)
-  (*working list of rule test; store index of an array rules*)
-  let error, rule_wl =
-    collect_rule_wl 
-      parameter 
-      error 
-      rule_id 
-      store_rule
-  in
-  (*------------------------------------------------------------------------------*)
   (*store a pair of wake_up_map in a list*)
   let store_succ_list =
     collect_wake_up_rule
@@ -532,25 +506,19 @@ let scan_rule parameter error handler map rule_id rule compiled store_result =
   (*------------------------------------------------------------------------------*)
   (*fixpoint iteration with wake_up_map*)
   let error, store_iteration =
-    fixpoint
-      parameter
-      error
-      rule_id
+    fixpoint parameter error
       handler
-      store_rule
-      rule_wl
-      store_succ_list
-      store_creation
-      store_result.store_iteration
+      rule_id rule
+          store_succ_list
+            store_creation
+            store_result.store_iteration
   in
   (*------------------------------------------------------------------------------*)
   (*store*)
   error,
   {
     store_creation  = store_creation;
-    store_rule      = store_rule;
     store_succ_list = store_succ_list;
-    store_rule_wl   = rule_wl;
     store_iteration = store_iteration
   }   
   
@@ -558,16 +526,14 @@ let scan_rule parameter error handler map rule_id rule compiled store_result =
 (*RULES*)
 
 let scan_rule_set parameter error handler compiled map rules =
-  let error, init_rule      = AgentMap.create parameter error 0 in
   let error, init_creation  = AgentMap.create parameter error 0 in
+  let error, init_rule      = AgentMap.create parameter error 0 in
   let error, init_iteration = AgentMap.create parameter error 0 in
   let init_bdu =
     {
       store_creation  = init_creation;
-      store_rule      = init_rule;
       store_succ_list = [];
-      store_rule_wl   = [];
-      store_iteration = init_iteration
+      store_iteration = init_rule, init_iteration
     }
   in
   (*------------------------------------------------------------------------------*)

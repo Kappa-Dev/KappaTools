@@ -85,6 +85,7 @@ type marshalisable_parameters =
    do_stochastic_flow_of_information : bool ; 
    do_site_dependencies : bool ;
    do_iteration_dependencies : bool ;
+   do_range_bdu : bool ;
    dump_error_as_soon_as_they_occur : bool ;
    file : string option ; 
    prefix : string ; 

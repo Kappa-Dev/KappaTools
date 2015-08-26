@@ -127,6 +127,21 @@ let main () =
     else 
       error,None 
   in
+  (*BDU range*)
+  let error, bdu_range =
+    if Remanent_parameters.get_do_range_bdu parameters
+    then
+      let parameters_cv =
+	Remanent_parameters.update_prefix parameters "" in 
+      let _ = 
+	if (Remanent_parameters.get_trace parameters_cv)
+	then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n"
+      in
+      let error, range = Range_bdu.main parameters_cv error handler c_compil 
+      in error,Some range 
+    else
+      error, None
+  in
   (*ODE*)
   let error,ode_flow = 
     if Remanent_parameters.get_do_ODE_flow_of_information parameters
