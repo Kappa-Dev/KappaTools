@@ -358,7 +358,7 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 		       ~get_alg:(fun i ->
 				 fst (snd algs.NamedDecls.decls.(i)))
 		       domain'' counter s
-		       (Causal.INIT (Format.asprintf "%a" Expr.print_ast_mix ast))
+		       (Causal.INIT (Format.asprintf "@[<h>%a@]" Expr.print_ast_mix ast))
 		       compiled_rule))
 		 state value
 	    | domain'',_,[] -> domain'',state
@@ -387,7 +387,7 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 				fst (snd algs.NamedDecls.decls.(i)))
 		      domain'' counter state
 		      (Causal.INIT
-			 (Format.asprintf "%a %s" Expr.print_ast_alg (fst alg) tk_nme))
+			 (Format.asprintf "@[<h>%a %s@]" Expr.print_ast_alg (fst alg) tk_nme))
 		      compiled_rule
 	    | _,_,_ -> assert false in
 	  domain',state'
