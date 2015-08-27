@@ -169,7 +169,6 @@ let collect_creation parameter error viewsrhs creation store_result =
   Ex: X_0 U r_0(X_0) U r_1(X_0) U ...
   - It is an enabled rule when the intersection between bdu_test and
   bdu_remanent is different than empty set.
-
 *)
 
 let is_belong bdu bdu_init =
@@ -187,7 +186,7 @@ let is_belong bdu bdu_init =
   succ(r2) = empty
 *)
 
-(*return only the result of succ(h).*)
+(*return rule type of wake up map.*)
 
 let get_rule_aux parameter error handler compiled rule_id =
   let rules = compiled.Cckappa_sig.rules in
@@ -373,7 +372,7 @@ let collect_pair_array parameter error
   in
   error, (store_rule_array, store_bdu_array)
   
-(*adding succ(h) into the tail of a working list*)
+(*add succ(h) into the tail of a working list*)
 let add_succ_wl parameter error rule_id succ_list wl_tl =
   let rec aux acc (error, wl) =
     match acc with
@@ -387,6 +386,7 @@ let add_succ_wl parameter error rule_id succ_list wl_tl =
   in
   aux succ_list (error, wl_tl)
 
+(*auxiliary function for fixpoint iteration function*)
 let fixpoint_aux parameter error 
     agent_type 
     rule 
@@ -455,7 +455,7 @@ let fixpoint parameter error
                 store_rule_array 
                 store_bdu_array
       in
-      (*get rule_array to use in the iteration*)
+      (*get rule_array to be used in the iteration*)
       let error, old_rule_array = get_old_array parameter error rule_id store_rule_array in
       (*build an index of rule and add them into a working list*)
       let error, wl = index_rule_wl parameter error old_rule_array in

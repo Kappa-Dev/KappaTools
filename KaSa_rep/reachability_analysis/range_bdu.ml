@@ -14,211 +14,238 @@
 
 open Mvbdu_sig
 open Mvbdu_sanity
-open Bdu_analysis
-open Int_storage
-open Cckappa_sig
 open Memo_sig
 open Boolean_mvbdu
 open Printf
+open Sanity_test_sig
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "RANGE BDU") message exn
-                 (fun () -> default)
-
+    (fun () -> default)
+    
 let trace = false
 
-(************************************************************************************)
-(*TYPE*)
+(************************************************************************************) 
+(*Range bdu: finding which variable in BDU is not independent.
+  - It is not indepenent when it has two different outgoing.
+*)
 
-module AgentMap = Quick_Nearly_inf_Imperatif
-
-type pair_site = (int * int) list
-
-type bdu = bool Mvbdu_sig.mvbdu
-
-type handler = (Boolean_mvbdu.memo_tables, Boolean_mvbdu.mvbdu_dic,
-	        Boolean_mvbdu.list_dic, bool, int) Memo_sig.handler
-
-type handler_bdu = handler * bdu
-
-type site_bdu  = pair_site * handler_bdu
-
-type bdu_range =
-    {
-      store_test : site_bdu AgentMap.t
-    }
-
-(************************************************************************************)
-(*is an independent bdu?*)
-(*
-let is_independent mvbdu =
-  match mvbdu.value with
-    | Leaf a -> false
-    | Node x ->
-      let a = x.branch_false.value in
-      let b = x.branch_true.value in
-      let _ = 
-        fprintf stdout "value_branch_false\n";
-        print_cell stdout "" a in
-      let _ = 
-        fprintf stdout "value_branch_true\n";
-        print_cell stdout "" b in
-      true*)
-
-let get_common x =
-  let var = x.variable in
-  let up_bound = x.upper_bound in
-  let b_false = x.branch_false in
-  let b_true = x.branch_true in
-  var, up_bound, b_false, b_true
-
-(*it is not indepenent when it has two different outgoing*)
-let rec is_not_independent_aux error list =
-  match list with
-    | [] -> error, true
+let rec dependent_aux error working_list list_result =
+  match working_list with
+    | [] -> error, list_result
     | head :: tail ->
       begin
-        (*taking the value in the head*)
+        (*taking the value in the head: first level t*)
         match head.value with
-          | Leaf _ ->
-            (*if it is a leaf then continue to the tail*)
-            is_not_independent_aux error tail
+          | Leaf _ -> dependent_aux error tail list_result
           | Node x ->
-            let _ =
-              fprintf stdout "x_branch_true:\n";
-              print_mvbdu stdout "" x.branch_true;
-              fprintf stdout "x_branch_false:\n";
-              print_mvbdu stdout "" x.branch_false
-            in
-            (*getting branch_false == branch_true, the sibbling should be different*)
+            (*checking the two branches: false and true.
+              If bfalse != btrue then they are having a different sibbling.
+            *)
             if x.branch_true == x.branch_false
             then
-              error, false
+              error, list_result
             else
-              (*continue to get the value of branch_false*)
-              match x.branch_false.value with
-                | Leaf _ ->
-                  (*if it is a not then continue with the tail*)
-                  is_not_independent_aux error tail
+              (*the sibbling is different. Then continue to check in the branch false of this node*)
+              match x.branch_false.value with         
+                | Leaf _ -> dependent_aux error tail list_result
                 | Node y ->
-                  let _ =
-                    fprintf stdout "y_branch_true:\n";
-                    print_mvbdu stdout "" y.branch_true;
-                    fprintf stdout "y_branch_false:\n";
-                    print_mvbdu stdout "" y.branch_false
-                  in
-                  (*TODO*)
-                  error, false
+                  error, (
+                    (x.branch_false.value,
+                     x.branch_true.value,
+                     y.branch_false.value,
+                     y.branch_true.value
+                    ) 
+                    :: list_result)
+                  (*continue to check the two branches*)
+                  (*if y.branch_true == y.branch_false
+                  then
+                    error, list_result
+                  else
+                    match y.branch_false.value with
+                      | Leaf _ -> is_not_independent_aux error tail list_result
+                      | Node z ->
+                        if y.branch_true == z.branch_true
+                        then
+                          error, (y.branch_true.value :: list_result)
+                        else
+                          is_not_independent_aux error (x.branch_false :: x.branch_true :: tail) list_result*)
       end
 
-    (*| (Leaf a, Leaf b) :: tail ->
-      let cmp = compare a b in
-      if cmp = 0
-      then
-        is_not_independent_aux tail
-      else
-        (*two branches have different value*)
-        true
-    | (Leaf _, _) :: _  | (_, Leaf _) :: _ -> 
-      (*if one of the outgoing is a leaf then it is not indepenent*)
-      true
-    | (Node x, Node y) :: tail ->      
-      let var_x, up_bound_x, b_false_x, b_true_x = get_common x in
-      let var_y, up_bound_y, b_false_y, b_true_y = get_common y in
-      (*first compare variable of x and y*)
-      let cmp_var = compare var_x var_y in
-      if cmp_var = 0
-      then
-      (*then continue compare upper_bound of x and y*)
-        begin
-          let cmp_up = compare up_bound_x up_bound_y in
-          (*if their upper_bound is equal then continue value of its branches*)
-          if cmp_up = 0
-          then
-            is_not_independent_aux
-              ((b_true_x.value, b_false_y.value) ::
-                  (b_false_x.value, b_false_y.value) ::
-                  working_list)
-          else
-            false
-        end
-      else
-        false*)
+let dependent error mvbdu = dependent_aux error [mvbdu][]
 
-let is_not_independent error mvbdu = is_not_independent_aux error [mvbdu]
-
-let collect_bdu_test parameter error viewslhs store_result =
-  let error, (handler, bdu_init) = bdu_init parameter in
-  AgentMap.fold parameter error
-    (fun parameter error agent_id agent store_result ->
-      match agent with
-        | Ghost -> error, store_result
-        | Agent agent ->
-          let agent_type = agent.agent_name in
-          let l, (handler, bdu_test) = 
-            common_site_bdu parameter error agent handler bdu_init
-          in
-          let _ =
-            is_not_independent error bdu_test
-          in
-          store_common
-            parameter error
-            agent_type
-            handler
-            bdu_init
-            l
-            bdu_test
-            store_result
-    ) viewslhs store_result
-
-let scan_rule parameter error handler rule store_result =
-  let error, store_test =
-    collect_bdu_test
-      parameter
-      error
-      rule.rule_lhs.views
-      store_result.store_test
-  in
-  error,
-  {
-    store_test = store_test
-  }
-
-let scan_rule_set parameter error handler rules =
-  let error, init_test = AgentMap.create parameter error 0 in
-  let init_bdu =
-    {
-      store_test = init_test
-    }
-  in
-  let error, store_result =
-    Nearly_inf_Imperatif.fold parameter error
-      (fun parameter error rule_id rule store_result ->
-        let _ = fprintf stdout "rule_id_%i:\n" rule_id in
-        let error, result =
-          scan_rule
-            parameter
-            error
-            handler
-            rule.e_rule_c_rule
-            store_result
-        in
-        error, result
-      ) rules init_bdu      
-  in
-  error, store_result
-
-let print_result parameter error result =
-  AgentMap.print error
-    (fun error parameter (_, (handler, bdu_test)) ->
-      let _ =
-        handler.print_mvbdu stdout "" bdu_test
+let rec print_dependent l =
+  match l with
+    | [] -> []
+    | (x_false, x_true, y_false, y_true) :: tl ->
+      let _ = 
+        fprintf stdout "x_false:\n";
+        print_cell stdout "" x_false;
+        fprintf stdout "x_true:\n";
+        print_cell stdout "" x_true;
+        fprintf stdout "y_false:\n";
+        print_cell stdout "" y_false;
+        fprintf stdout "y_true:\n";
+        print_cell stdout "" y_true
       in
-      error
-    ) parameter result
+      print_dependent tl
 
-let main parameter error handler cc_compil =
-  let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
-  let error, result = scan_rule_set parameter error handler cc_compil.rules in
-  let _ = print_result parameter error result.store_test in
-  error, result
+(************************************************************************************) 
+(*TEST, build bdu use code from mvbdu_test*)
+
+let bdu_test remanent parameter =
+  let error = remanent.error in
+  let allocate = remanent.allocate_mvbdu in
+  let (handler: ('b, 'a, 'c, bool, int) Memo_sig.handler) =
+    remanent.mvbdu_handler in
+  let a_val = Leaf true in
+  let b_val = Leaf false in
+  let error,(handler:('b,'a,'c,bool,int) Memo_sig.handler),a',(a'_id:int),a'',a''_id =
+    Mvbdu_test.build_without_and_with_compressing
+      allocate
+      error
+      handler
+      a_val
+      a_val 
+  in
+  (*a': is mvbdu*)
+  let error,handler,b',b'_id,b'',b''_id =
+    Mvbdu_test.build_without_and_with_compressing
+      allocate
+      error
+      handler
+      b_val
+      b_val
+  in 
+  (*----------------------------------------------------------------------------------*)
+  (*Build the first node*)
+  let c = 
+    Node 
+      {
+        variable = 0;
+        branch_true = a';
+        branch_false = b';
+        upper_bound = 1
+      }
+  in
+  let c_val =
+    Node
+      {
+        variable = 0;
+        branch_true = a'_id;
+        branch_false = b'_id;
+        upper_bound = 1
+      }
+  in
+  let error,handler,c',c'_id,c'',c''_id =
+    Mvbdu_test.build_without_and_with_compressing
+      allocate
+      error
+      handler
+      c_val
+      c
+  in
+ (*----------------------------------------------------------------------------------*)
+  (*Build second node*)
+  let g = 
+    Mvbdu_sig.Node 
+      {
+        Mvbdu_sig.variable = 0;
+        Mvbdu_sig.branch_true = a';
+        Mvbdu_sig.branch_false = b';
+        Mvbdu_sig.upper_bound = 1
+      }
+  in 
+  let g_val = 
+    Mvbdu_sig.Node 
+      {
+        Mvbdu_sig.variable = 0;
+        Mvbdu_sig.branch_true = a'_id;
+        Mvbdu_sig.branch_false = b'_id;
+        Mvbdu_sig.upper_bound = 1
+      }
+  in 
+  let error,handler,g',g'_id,g'',g''_id =
+    Mvbdu_test.build_without_and_with_compressing
+      allocate
+      error
+      handler
+      g_val
+      g
+  in
+  (*----------------------------------------------------------------------------------*)
+  (*Build list (var, up)*)
+  let list = [(1,1); (0,0)] in
+  let error,(handler,list_a) =
+    List_algebra.build_list
+      (Boolean_mvbdu.list_allocate parameter)
+      error
+      parameter
+      handler
+      list
+  in
+  let list' = [(1, 1); (0,1)] in
+  let error,(handler,list_b) =
+    List_algebra.build_list
+      (Boolean_mvbdu.list_allocate parameter)
+      error
+      parameter
+      handler
+      list'
+  in
+  let f x y = 
+    match x y with 
+      | error,(handler,Some a) -> error,handler,a 
+      | error,(handler,None) -> 
+        let error, a =
+          Exception.warn parameter error (Some "") (Some "")  Exit (fun _ -> a') in 
+        error, handler, a
+  in
+  (*----------------------------------------------------------------------------------*)
+  (*redefine*)
+  let error,handler,mvbdu1 =
+    f (Boolean_mvbdu.redefine parameter error parameter handler c') list_a in
+  let error,handler,mvbdu2 =
+    f (Boolean_mvbdu.redefine parameter error parameter handler g') list_b in
+  let error,handler,mvbdu =
+    f (Boolean_mvbdu.boolean_mvbdu_or
+         parameter handler error parameter mvbdu1) mvbdu2
+  in
+  let _ =
+    handler.print_mvbdu stdout "" mvbdu
+  in
+  (*----------------------------------------------------------------------------------*)
+  let error, dep =
+    dependent error mvbdu
+  in
+  let _ =
+    fprintf stdout "-----------------------------------------\n";
+    print_dependent dep
+  in
+  (*----------------------------------------------------------------------------------*)
+  (*remanent*)
+  {
+    remanent with 
+      Sanity_test_sig.error = error ; 
+      Sanity_test_sig.mvbdu_handler = handler
+  },
+  ("Mvbdu.001",fun remanent ->
+    let b = Mvbdu_core.mvbdu_equal c'' c'' in
+    remanent, b, None) :: (List.map (fun (a, b, c) -> a,
+      fun remanent -> Mvbdu_sanity.test remanent c b) [])
+    
+(*****************************************************************************************)
+
+let main () =
+  let error = Exception.empty_error_handler in
+  let error,parameters,_  = Get_option.get_option error in 
+  let remanent,bdu_test_list = bdu_test (Sanity_test.remanent parameters) parameters in 
+  let _ =
+    List.fold_left 
+      (fun remanent (s,p) -> Sanity_test.test remanent p s)
+      remanent 
+      bdu_test_list
+  in 
+  ()
+
+let _ = main ()
