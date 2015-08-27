@@ -48,7 +48,7 @@ let observables_values env counter graph state =
      (Rule_interpreter.value_alg counter graph ~get_alg)
      env)
 
-let do_it env domain counter graph state p_id = function
+let do_it env domain counter graph state = function
   | Primitives.ITER_RULE ((v,_),r) ->
      let get_alg i = get_alg env state i in
      let n = Rule_interpreter.value_alg counter graph ~get_alg v in
@@ -56,7 +56,7 @@ let do_it env domain counter graph state p_id = function
       Nbr.iteri
 	(fun _ g ->
 	 fst (Rule_interpreter.force_rule
-		~get_alg domain counter g (Causal.PERT p_id) r))
+		~get_alg domain counter g (Causal.PERT "pert") r))
 	graph n,state)
   | Primitives.UPDATE (va,(expr,_)) ->
      let get_alg i = get_alg env state i in
@@ -147,7 +147,7 @@ let perturbate env domain counter graph state =
 	let stop,graph,state =
 	  List.fold_left (fun (stop,graph,state as acc) effect ->
 			  if stop then acc else
-			    do_it env domain counter graph state i effect)
+			    do_it env domain counter graph state effect)
 			 (stop,graph,state) pert.Primitives.effect in
 	let () = not_done_yet.(i) <- false in
 	let () =

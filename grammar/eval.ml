@@ -343,6 +343,8 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 	    { lhs = []; rm_token = []; arrow = RAR; rhs = ast; add_token = [];
 	      k_def = Location.dummy_annot (CONST Nbr.zero);
 	      k_un = None; k_op = None; } in
+	  let causality =
+	    Causal.INIT (Format.asprintf "@[<h>%a@]" Expr.print_ast_mix ast) in
 	  let domain'',state' =
 	    match
 	      rules_of_ast algs.NamedDecls.finder tokens.NamedDecls.finder
@@ -357,9 +359,7 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 		    (Rule_interpreter.force_rule
 		       ~get_alg:(fun i ->
 				 fst (snd algs.NamedDecls.decls.(i)))
-		       domain'' counter s
-		       (Causal.INIT (Format.asprintf "@[<h>%a@]" Expr.print_ast_mix ast))
-		       compiled_rule))
+		       domain'' counter s causality compiled_rule))
 		 state value
 	    | domain'',_,[] -> domain'',state
 	    | _,_,_ ->

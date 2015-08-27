@@ -4,7 +4,7 @@ type event_kind =
   | OBS of Connected_component.t
   | RULE of int
   | INIT of string (* the mixture *)
-  | PERT of int
+  | PERT of string (* the rule *)
 
 type quark_lists = {
   site_tested : (int * int) list;
@@ -62,7 +62,7 @@ let debug_print_event_kind f = function
   | OBS i -> Format.fprintf f "OBS(%a)" (Connected_component.print false) i
   | RULE i -> Format.fprintf f "RULE(%i)" i
   | INIT s -> Format.fprintf f "INIT(%s)" s
-  | PERT i -> Format.fprintf f "PERT(%i)" i
+  | PERT s -> Format.fprintf f "PERT(%s)" s
 
 let debug_print_causal f i =
   Format.pp_print_string
@@ -367,7 +367,7 @@ let label ?env = function
   | OBS mix_id ->
      let sigs = Tools.option_map Environment.signatures env in
      Format.asprintf "%a" (Connected_component.print ?sigs false) mix_id
-  | PERT p_id -> ""
+  | PERT s -> s
   | RULE r_id -> Format.asprintf "%a" (Environment.print_rule ?env) r_id
   | INIT s -> Format.asprintf "Intro %s" s
 
@@ -490,7 +490,7 @@ let dot_of_grid profiling desc env enriched_grid =
 	   Format.fprintf
 	     form
 	     "node_%d [label=\"%s\", shape=%s, style=%s, fillcolor = %s] ;@,"
-	     eid (label ~env atom.kind) "house" "filled" "lightblue"
+	     eid (label ~env atom.kind) "invhouse" "filled" "green"
        (* List.iter (fun obs -> fprintf desc "obs_%d [label =\"%s\", style=filled, fillcolor=red] ;\n node_%d -> obs_%d [arrowhead=vee];\n" eid obs eid eid) atom.observation ;*) 
        ) eids_at_d ;
      Format.fprintf form "}@]@," ;

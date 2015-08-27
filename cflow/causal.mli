@@ -2,7 +2,7 @@ type event_kind =
   | OBS of Connected_component.t
   | RULE of int
   | INIT of string (** the mixture *)
-  | PERT of int
+  | PERT of string (** the rule *)
 
 type quark_lists = {
   site_tested : (int * int) list;
