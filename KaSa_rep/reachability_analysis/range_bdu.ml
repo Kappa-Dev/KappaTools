@@ -44,32 +44,21 @@ let rec dependent_aux error working_list list_result =
             *)
             if x.branch_true == x.branch_false
             then
-              error, list_result
+              let _ = fprintf stdout "1\n" in
+              error, (x.branch_true.value :: list_result)
             else
               (*the sibbling is different. Then continue to check in the branch false of this node*)
-              match x.branch_false.value with         
+              match x.branch_true.value with         
                 | Leaf _ -> dependent_aux error tail list_result
                 | Node y ->
-                  error, (
-                    (x.branch_false.value,
-                     x.branch_true.value,
-                     y.branch_false.value,
-                     y.branch_true.value
-                    ) 
-                    :: list_result)
-                  (*continue to check the two branches*)
-                  (*if y.branch_true == y.branch_false
+                  if x.branch_false == y.branch_true
                   then
-                    error, list_result
+                    let _ = fprintf stdout "2\n" in
+                    error, (x.branch_true.value :: list_result)
                   else
-                    match y.branch_false.value with
-                      | Leaf _ -> is_not_independent_aux error tail list_result
-                      | Node z ->
-                        if y.branch_true == z.branch_true
-                        then
-                          error, (y.branch_true.value :: list_result)
-                        else
-                          is_not_independent_aux error (x.branch_false :: x.branch_true :: tail) list_result*)
+                    dependent_aux error 
+                      (x.branch_false :: x.branch_true :: tail)
+                      list_result
       end
 
 let dependent error mvbdu = dependent_aux error [mvbdu][]
@@ -77,16 +66,10 @@ let dependent error mvbdu = dependent_aux error [mvbdu][]
 let rec print_dependent l =
   match l with
     | [] -> []
-    | (x_false, x_true, y_false, y_true) :: tl ->
+    | x :: tl ->
       let _ = 
-        fprintf stdout "x_false:\n";
-        print_cell stdout "" x_false;
-        fprintf stdout "x_true:\n";
-        print_cell stdout "" x_true;
-        fprintf stdout "y_false:\n";
-        print_cell stdout "" y_false;
-        fprintf stdout "y_true:\n";
-        print_cell stdout "" y_true
+        fprintf stdout "x_branch_true\n";
+        print_cell stdout "" x
       in
       print_dependent tl
 
