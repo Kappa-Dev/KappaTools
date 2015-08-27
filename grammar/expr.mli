@@ -4,6 +4,7 @@
 
 val print_ast_mix : Format.formatter -> Ast.mixture -> unit
 val print_ast_alg : Format.formatter -> Ast.mixture Ast.ast_alg_expr -> unit
+val print_ast_rule : Format.formatter -> Ast.rule -> unit
 
 val print_bool :
   (Format.formatter -> 'a -> unit) ->

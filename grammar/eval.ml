@@ -11,7 +11,7 @@ let initial_value_alg counter algs (ast, _) =
 
 let name_and_purify_rule acc (label_opt,(r,r_pos)) =
   let (label,_ as label_pos) = match label_opt with
-    | None -> Location.dummy_annot ("__anonymous_"^(string_of_float (Sys.time ())))
+    | None -> Location.dummy_annot (Format.asprintf "%a" Expr.print_ast_rule r)
     | Some (lab,pos) -> (lab,pos) in
   let acc',k_def =
     if Expr.ast_alg_has_mix r.k_def then
@@ -357,7 +357,9 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 		    (Rule_interpreter.force_rule
 		       ~get_alg:(fun i ->
 				 fst (snd algs.NamedDecls.decls.(i)))
-		       domain'' counter s Causal.INIT compiled_rule))
+		       domain'' counter s
+		       (Causal.INIT (Format.asprintf "%a" Expr.print_ast_mix ast))
+		       compiled_rule))
 		 state value
 	    | domain'',_,[] -> domain'',state
 	    | _,_,_ ->
@@ -383,7 +385,10 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 	       Rule_interpreter.force_rule
 		      ~get_alg:(fun i ->
 				fst (snd algs.NamedDecls.decls.(i)))
-		      domain'' counter state Causal.INIT compiled_rule
+		      domain'' counter state
+		      (Causal.INIT
+			 (Format.asprintf "%a %s" Expr.print_ast_alg (fst alg) tk_nme))
+		      compiled_rule
 	    | _,_,_ -> assert false in
 	  domain',state'
       )	(domain,Rule_interpreter.empty ~has_tracking env)

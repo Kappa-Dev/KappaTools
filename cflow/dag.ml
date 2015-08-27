@@ -180,7 +180,7 @@ module Dag =
       let kind node = 
         match node 
         with 
-          | Causal.INIT -> INIT
+          | Causal.INIT _ -> INIT
           | Causal.RULE _ -> RULE
           | Causal.PERT _ -> PERT
           | Causal.OBS _ -> OBS

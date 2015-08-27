@@ -1,6 +1,10 @@
 open Mods
 
-type event_kind = OBS of int | RULE of int | INIT | PERT of int
+type event_kind =
+  | OBS of int
+  | RULE of int
+  | INIT of string (* the mixture *)
+  | PERT of int
 
 type quark_lists = {
   site_tested : (int * int) list;
@@ -57,7 +61,7 @@ let empty_config =
 let debug_print_event_kind f = function
   | OBS i -> Format.fprintf f "OBS(%i)" i
   | RULE i -> Format.fprintf f "RULE(%i)" i
-  | INIT -> Format.fprintf f "INIT"
+  | INIT s -> Format.fprintf f "INIT(%s)" s
   | PERT i -> Format.fprintf f "PERT(%i)" i
 
 let debug_print_causal f i =
@@ -232,7 +236,8 @@ let add_actions env grid event_number kind actions =
 let add_tests grid event_number kind tests =
   let rec aux grid = function
     | [] -> grid
-    | Instantiation.Is_Here _ :: q -> aux grid q
+    | Instantiation.Is_Here ag :: q ->
+       aux (add (ag,0) true atom_tested grid event_number kind) q
     | Instantiation.Has_Internal (site,_) :: q ->
        aux (add site false atom_tested grid event_number kind) q
     | (Instantiation.Is_Free site
@@ -259,11 +264,11 @@ let record_obs (kind,tests,_) side_effects is_weak event_number grid =
   List.fold_left
     (fun grid site -> add site true atom_modified grid event_number kind) grid side_effects
 
-let record_init actions is_weak event_number env grid =
+let record_init (lbl,actions) is_weak event_number env grid =
   (* if !Parameter.showIntroEvents then *)
   (*adding tests*)
   let grid = store_is_weak is_weak event_number grid in
-  add_actions env grid event_number INIT actions
+  add_actions env grid event_number (INIT lbl)  actions
 
 let add_pred eid atom config =
   let events = IntMap.add atom.eid atom config.events in
@@ -362,7 +367,7 @@ let label ?env = function
   | OBS mix_id -> Format.asprintf "%a" (Environment.print_alg ?env) mix_id
   | PERT p_id -> ""
   | RULE r_id -> Format.asprintf "%a" (Environment.print_rule ?env) r_id
-  | INIT -> "initial introduction"
+  | INIT s -> Format.asprintf "Intro %s" s
 
 let ids_of_grid grid = Hashtbl.fold (fun key _ l -> key::l) grid.flow []
 let config_of_grid = cut
@@ -473,7 +478,7 @@ let dot_of_grid profiling desc env enriched_grid =
 	     Format.fprintf
 	       form "node_%d [label=\"%s\", style=filled, fillcolor=red] ;@,"
 	       eid (label ~env atom.kind)
-        | INIT  ->
+        | INIT _ ->
 	   if !Parameter.showIntroEvents then
 	     Format.fprintf
 	       form
@@ -505,7 +510,7 @@ let dot_of_grid profiling desc env enriched_grid =
 	    else
 	      let atom = IntMap.find eid' config.events in
 	      match atom.kind with
-	      | INIT -> ()
+	      | INIT _ -> ()
 	      | PERT _ | RULE _ | OBS _ -> Format.fprintf form "node_%d -> node_%d@," eid' eid
 	 ) pred_set
     ) config.prec_1 ;

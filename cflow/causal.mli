@@ -1,4 +1,8 @@
-type event_kind = OBS of int | RULE of int | INIT | PERT of int
+type event_kind =
+  | OBS of int
+  | RULE of int
+  | INIT of string (** the mixture *)
+  | PERT of int
 
 type quark_lists = {
   site_tested : (int * int) list;
@@ -57,7 +61,7 @@ val record_obs :
   Instantiation.concrete Instantiation.site list ->
   bool -> int -> grid -> grid
 val record_init :
-  Instantiation.concrete Instantiation.action list ->
+  string * Instantiation.concrete Instantiation.action list ->
   bool -> int -> Environment.t -> grid -> grid
 
 val cut : (int * int * int) list -> grid -> config

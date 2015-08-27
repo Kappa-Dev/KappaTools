@@ -34,7 +34,7 @@ let flush_warning f =
   let () = Format.pp_print_newline f () in
   let l = List.rev !warning_buffer in
   List.iter (fun (pos,msg) ->
-	     let pr f () = Format.fprintf f "@,Warning: @[%t@]" msg in
+	     let pr f () = Format.fprintf f "Warning: @[%t@]" msg in
 	     match pos with
 	     | Some pos ->
 		Format.fprintf f "@[<v>%a@]@." (Location.print_annot pr) ((),pos)

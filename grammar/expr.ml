@@ -37,6 +37,35 @@ let rec print_ast_alg f = function
   |Ast.UN_ALG_OP (op, (a,_)) ->
     Format.fprintf f "(%a %a)" Operator.print_un_alg_op op print_ast_alg a
 
+let print_tok f ((nb,_),(n,_)) = Format.fprintf f "%a:%s" print_ast_alg nb n
+let print_one_size tk f mix =
+  Format.fprintf
+    f "%a%t%a" print_ast_mix mix
+    (fun f -> match tk with [] -> () | _::_ -> Format.pp_print_string f " | ")
+    (Pp.list (fun f -> Format.pp_print_string f " + ") print_tok) tk
+let print_arrow f = function
+  | Ast.RAR -> Format.pp_print_string f "->"
+  | Ast.LRAR -> Format.pp_print_string f "<->"
+let print_raw_rate op f (def,_) =
+  Format.fprintf
+    f "%a%t" print_ast_alg def
+    (fun f ->
+     match op with None -> ()
+		 | Some (d,_) -> Format.fprintf f ", %a" print_ast_alg d)
+let print_rates un op f def =
+  Format.fprintf
+    f "%a%t" (print_raw_rate op) def
+    (fun f ->
+     match un with None -> ()
+		 | Some (d,o) -> Format.fprintf f " (%a)" (print_raw_rate o) d)
+let print_ast_rule f r =
+  Format.fprintf
+    f "@[<h>%a %a %a @@ %a@]"
+    (print_one_size r.Ast.rm_token) r.Ast.lhs
+    print_arrow r.Ast.arrow
+    (print_one_size r.Ast.add_token) r.Ast.rhs
+    (print_rates r.Ast.k_un r.Ast.k_op) r.Ast.k_def
+
 let rec print_bool p_alg f = function
   | Ast.TRUE -> Format.fprintf f "[true]"
   | Ast.FALSE -> Format.fprintf f "[false]"
