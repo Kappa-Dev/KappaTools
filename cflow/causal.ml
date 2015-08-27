@@ -1,7 +1,7 @@
 open Mods
 
 type event_kind =
-  | OBS of int
+  | OBS of Connected_component.t
   | RULE of int
   | INIT of string (* the mixture *)
   | PERT of int
@@ -59,7 +59,7 @@ let empty_config =
    top = IntSet.empty}
 
 let debug_print_event_kind f = function
-  | OBS i -> Format.fprintf f "OBS(%i)" i
+  | OBS i -> Format.fprintf f "OBS(%a)" (Connected_component.print false) i
   | RULE i -> Format.fprintf f "RULE(%i)" i
   | INIT s -> Format.fprintf f "INIT(%s)" s
   | PERT i -> Format.fprintf f "PERT(%i)" i
@@ -364,7 +364,9 @@ let dump grid fic =
   close_out d_chan
 
 let label ?env = function
-  | OBS mix_id -> Format.asprintf "%a" (Environment.print_alg ?env) mix_id
+  | OBS mix_id ->
+     let sigs = Tools.option_map Environment.signatures env in
+     Format.asprintf "%a" (Connected_component.print ?sigs false) mix_id
   | PERT p_id -> ""
   | RULE r_id -> Format.asprintf "%a" (Environment.print_rule ?env) r_id
   | INIT s -> Format.asprintf "Intro %s" s
