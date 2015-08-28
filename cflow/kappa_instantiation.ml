@@ -980,7 +980,7 @@ module Cflow_linker =
 	       bound_sites=SiteSet.empty;
 	       sites_with_wrong_internal_state=SiteSet.empty
 	     }
-	   in aux (AgentIdMap.add id agent_info remanent) t
+	   in aux (AgentIdMap.add id agent_info recur) t
     in aux remanent action_list
 
   let as_init agent_info = 
@@ -1138,7 +1138,7 @@ module Cflow_linker =
 	 | Subs _ | Obs _ | Dummy _ -> (refined_step::step_list,remanent))
 	([],remanent)
 	refined_step_list in
-    a
+    List.rev a
 
 (*  let print_step parameter handler error refined_event = 
     let log = parameter.H.out_channel in 

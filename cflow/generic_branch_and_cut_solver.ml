@@ -162,7 +162,7 @@ struct
     error,list,list'
     
   let translate_result result = 
-    List.map fst result 
+    List.rev_map fst @@ List.rev result 
 
   let clean parameter handler error log_info blackboard = 
     PH.B.reset_init parameter handler error log_info blackboard 
