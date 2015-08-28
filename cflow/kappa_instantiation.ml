@@ -701,8 +701,14 @@ module Cflow_linker =
 	       f "Side_effects(%a:%a)@,"
 	       (print_site ?env) site (print_binding_state ?env) state)
 
-  let print_refined_obs ?handler f _refined_obs =
-    Format.fprintf f "***Refined obs***"
+  let print_refined_obs ?handler f (ev_kind,tests,_) =
+    let sigs = match handler with
+      | None -> None
+      | Some handler -> Some (Environment.signatures handler.H.env) in
+    Format.fprintf
+      f "***@[<1>OBS %s:%a@]***"
+      (Causal.label ?env:(Tools.option_map (fun x -> x.H.env) handler) ev_kind)
+      (Pp.list Pp.space (PI.print_concrete_test ?sigs)) tests
 
   let print_refined_subs _f (_a,_b)  = ()
 
@@ -710,7 +716,7 @@ module Cflow_linker =
     let sigs = match handler with
       | None -> None
       | Some handler -> Some (Environment.signatures handler.H.env) in
-    Format.fprintf log "@[<1>INIT:%a@]"
+    Format.fprintf log "***@[<1>INIT:%a@]***"
 		   (Pp.list Pp.space (PI.print_concrete_action ?sigs)) actions
 
   let print_refined_event ?handler log (ev_kind,(tests,(actions,side_sites,_))) =
@@ -845,7 +851,7 @@ module Cflow_linker =
 
   let clean_events =
     List.filter
-      (function Event _ | Obs _ -> true | Dummy _ | Init _ | Subs _ -> false)
+      (function Event _ | Obs _ | Init _ -> true | Dummy _ | Subs _ -> false)
 
   let print_side_effect =
     Pp.list Pp.comma (fun f ((a,_),b) -> Format.fprintf f "(%i,%i)," a b)
@@ -900,7 +906,13 @@ module Cflow_linker =
 		| PI.Create (x,_) -> fst x :: l
 		| PI.Mod_internal _ | PI.Bind _ | PI.Bind_to _ | PI.Free _
 		| PI.Remove _ -> l) [] actions
-    | Obs _ | Dummy _ | Init _ | Subs _ -> []
+    | Init (_,actions) ->
+       List.fold_left
+	 (fun l -> function
+		| PI.Create (x,_) -> fst x :: l
+		| PI.Mod_internal _ | PI.Bind _ | PI.Bind_to _ | PI.Free _
+		| PI.Remove _ -> l) [] actions
+    | Obs _ | Dummy _ | Subs _ -> []
 
   let subs_agent_in_event mapping = function
     | Event (a,event) ->
@@ -915,7 +927,12 @@ module Cflow_linker =
 	     (PI.subst_map_agent_in_concrete_test
 		(fun x -> try AgentIdMap.find x mapping with Not_found -> x)) b,
 	   c)
-    | Init _ | Dummy _ | Subs _ as event -> event
+    | Init (a,b) ->
+       Init(a,
+	    Tools.list_smart_map
+	      (PI.subst_map_agent_in_concrete_action
+		 (fun x -> try AgentIdMap.find x mapping with Not_found -> x)) b)
+    | Dummy _ | Subs _ as event -> event
 
   let disambiguate event_list =
     let _,_,_,event_list_rev =

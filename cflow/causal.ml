@@ -295,7 +295,7 @@ let rec parse_attribute last_modif last_tested attribute config =
        IntMap.add atom.eid preds config.prec_1 in
      let config = {config with events =  events ; prec_1 = prec_1} in
      (*atom has a modification*)
-     if (atom.causal_impact = atom_tested) || (atom.causal_impact = 3) then
+     if (atom.causal_impact = atom_modified) || (atom.causal_impact = 3) then
        let config =
 	 List.fold_left (fun config pred_id -> add_pred pred_id atom config)
 			config last_tested in
