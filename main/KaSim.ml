@@ -231,12 +231,7 @@ let () =
 		Parameter.debugModeOn:=true;
 	     (*State.dump state counter env*)
 	     | _ -> ()
-	 end
-      | ExceptionDefn.Deadlock ->
-	 Format.printf
-	   "?@.A deadlock was reached after %d events and %Es (Activity = %.5f)@."
-	   (Counter.event counter) (Counter.time counter)
-	   (State_interpreter.activity new_state) in
+	 end in
     Format.printf "Simulation ended";
     if Counter.null_event counter = 0 then Format.print_newline()
     else

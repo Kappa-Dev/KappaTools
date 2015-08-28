@@ -12,7 +12,6 @@ exception Break of int
 (* 4:invalid injection clash *)
 (* 5: perturbation interrupting time*)
 exception Null_event of int
-exception Deadlock
 exception UserInterrupted of (float -> int -> string)
 exception StopReached of string
 

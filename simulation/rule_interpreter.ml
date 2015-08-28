@@ -299,16 +299,14 @@ let print_injections ?sigs f roots_of_ccs =
     ) roots_of_ccs
 
 let print env f state =
-  Format.fprintf f "@[<v>%a@,%a@,%a@]"
-		 (Edges.print (Environment.signatures env)) state.edges
-		 (Pp.array Pp.space (fun i f el ->
-				     Format.fprintf
-				       f "%%init: %a <- %a"
-				       (Environment.print_token ~env) i
-				       Nbr.print el))
-		 state.tokens
-		 (print_injections ~sigs:(Environment.signatures env))
-		 state.roots_of_ccs
+  Format.fprintf
+    f "@[<v>%a@,%a@]"
+    (Edges.print (Environment.signatures env)) state.edges
+    (Pp.array Pp.space (fun i f el ->
+			Format.fprintf
+			  f "%%init: %a <- %a"
+			  (Environment.print_token ~env) i Nbr.print el))
+    state.tokens
 
 let debug_print f state =
   Format.fprintf f "@[<v>%a@,%a@,%a@]"

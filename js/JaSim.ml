@@ -35,26 +35,14 @@ let run stop out_div s =
 	 Plot.plot_now
 	   env (State_interpreter.observables_values env counter graph state) in
      let () = Feedback.show_warnings out_div in
-     catch
-       (fun () ->
-	(State_interpreter.loop_cps log_form
-		      (fun f -> if Lwt.is_sleeping stop
-				then Lwt.bind (Lwt_js.yield ()) f
-				else Lwt.return_unit)
-		      (fun _ _ _ _ -> Lwt.return_unit)
-		      env domain counter graph state)
-	>>= fun () -> return (Plot.value 555))
-       (function
-	 | ExceptionDefn.Deadlock ->
-	    let () =
-	      Feedback.show_info
-		(fun f ->
-		 Format.fprintf
-		   f "A deadlock was reached after %d events and %Es (Activity = %.5f)"
-		   (Mods.Counter.event counter) (Mods.Counter.time counter)
-		   (State_interpreter.activity state)) out_div in
-	    return ""
-	 | e -> fail e))
+     State_interpreter.loop_cps
+       log_form
+       (fun f -> if Lwt.is_sleeping stop
+		 then Lwt.bind (Lwt_js.yield ()) f
+		 else Lwt.return_unit)
+       (fun _ _ _ _ -> Lwt.return_unit)
+       env domain counter graph state
+     >>= fun () -> return (Plot.value 555))
     (function
       | ExceptionDefn.Syntax_Error er ->
 	 let () = Feedback.show_error Format.pp_print_string out_div er in

@@ -48,6 +48,12 @@ let observables_values env counter graph state =
      (Rule_interpreter.value_alg counter graph ~get_alg)
      env)
 
+let snapshot env counter file graph =
+  Kappa_files.with_snapshot
+    file (Mods.Counter.event counter)
+    (if !Parameter.dotOutput then failwith "dot snapshot not implemented yet" else "ka")
+    (fun f -> Rule_interpreter.print env f graph)
+
 let do_it env domain counter graph state = function
   | Primitives.ITER_RULE ((v,_),r) ->
      let get_alg i = get_alg env state i in
@@ -76,10 +82,7 @@ let do_it env domain counter graph state = function
 			~env (fun ?env ->
 			      Rule_interpreter.value_alg counter graph ~get_alg))
 	 pexpr in
-     let () =
-       Kappa_files.with_snapshot
-	 file (Mods.Counter.event counter) "ka"
-	 (fun f -> Rule_interpreter.print env f graph) in
+     let () = snapshot env counter file graph in
      (true,graph,state)
   (*     raise (ExceptionDefn.StopReached
 	      (Format.sprintf
@@ -114,10 +117,7 @@ let do_it env domain counter graph state = function
 			~env (fun ?env ->
 			      Rule_interpreter.value_alg counter graph ~get_alg))
 	 pexpr in
-     let () =
-       Kappa_files.with_snapshot
-	 file (Mods.Counter.event counter) "ka"
-	 (fun f -> Rule_interpreter.print env f graph) in
+     let () = snapshot env counter file graph in
      (false, graph, state)
   | Primitives.CFLOW (cc,tests) ->
      (false,
@@ -195,7 +195,16 @@ let a_loop form env domain counter graph state =
 (*Activity is null or dt is infinite*)
   if not (activity > 0.) || dt = infinity then
     match !(state.stopping_times) with
-    | [] -> (true,graph,state)
+    | [] ->
+       let () =
+	 if !Parameter.dumpIfDeadlocked then
+	   snapshot env counter "deadlock" graph in
+       let () =
+	 Format.fprintf
+	   form
+	   "?@.A deadlock was reached after %d events and %Es (Activity = %.5f)"
+	   (Mods.Counter.event counter) (Mods.Counter.time counter) activity in
+       (true,graph,state)
     | (ti,_) :: tail ->
        let () = state.stopping_times := tail in
        let () = counter.Mods.Counter.time <- Nbr.to_float ti in
