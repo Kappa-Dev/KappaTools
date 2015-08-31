@@ -1,8 +1,9 @@
 #!/bin/sh
 
+HISTORYFILE=/tmp/ocamldebug-KaSim_history
 BUILDROOT=${KAPPABIN}../_build/
 
-ledit ocamldebug -I ${BUILDROOT}dev -I ${BUILDROOT}grammar \
+ledit -x -h ${HISTORYFILE} ocamldebug -I ${BUILDROOT}dev -I ${BUILDROOT}grammar \
       -I ${BUILDROOT}pattern -I ${BUILDROOT}simulation -I ${BUILDROOT}term \
       -I ${BUILDROOT}siteGraphs -I ${BUILDROOT}dataStructures \
       -I ${BUILDROOT}cflow ${BUILDROOT}main/KaSim.byte $@

@@ -962,6 +962,11 @@ module Cflow_linker =
     }
 
   let convert_init remanent action_list =
+    let extract_agent id =
+      List.filter (function
+		    | (PI.Free ((id',_),_) | PI.Create ((id',_),_)) -> id = id'
+		    | (PI.Bind _ | PI.Remove _ | PI.Bind_to _ | PI.Mod_internal _ ) -> false)
+		   action_list in
     let rec aux recur = function
       | [] -> recur
       | PI.Free _ :: t -> aux recur t
@@ -975,7 +980,7 @@ module Cflow_linker =
 	       SiteMap.empty site_list in
 	   let agent_info =
 	     {
-	       initial_step=Init (Format.asprintf "Intro #%i" sort,action_list);
+	       initial_step=Init (Format.asprintf "Intro #%i" sort,extract_agent id);
 	       internal_states=map;
 	       bound_sites=SiteSet.empty;
 	       sites_with_wrong_internal_state=SiteSet.empty
@@ -1045,7 +1050,6 @@ module Cflow_linker =
   let unbind_side (agid,s_name) (remanent,set) = 
      try 
       let ag_info = AgentIdMap.find agid remanent in 
-      begin
 	if SiteSet.mem s_name ag_info.bound_sites 
 	then 
 	  let ag_info = 
@@ -1065,7 +1069,6 @@ module Cflow_linker =
 	      set
 	  end 
 	else remanent,set 
-      end 
      with
   Not_found -> 
     remanent,set 
