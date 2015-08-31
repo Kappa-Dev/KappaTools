@@ -84,7 +84,7 @@ bin/%: %.native Makefile
 doc: man/KaSim_manual.pdf
 doc_html: dev/KaSim.docdir/index.html man/KaSim_manual.htm
 
-all: bin/KaSim bin/KaSa bin/sanity_test
+all: bin/KaSim bin/KaSa
 
 clean_doc:
 	find man \( -not -name \*.tex -and -name KaSim_manual.\* \) -delete
@@ -94,11 +94,12 @@ clean_doc:
 
 clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch clean_doc
 	$(OCAMLBINPATH)ocamlbuild -clean
+	rm -f sanity_test bin/sanity_test
 	rm -f KaSim bin/KaSim KaSa bin/KaSa
 	find . -name \*~ -delete
 	+$(MAKE) KAPPABIN=$(CURDIR)/bin/ -C models/test_suite clean
 
-check:
+check: bin/sanity_test
 	@+$(MAKE) KAPPABIN=$(CURDIR)/bin/ -C models/test_suite all
 
 build-tests:
