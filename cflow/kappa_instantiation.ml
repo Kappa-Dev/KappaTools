@@ -950,8 +950,8 @@ module Cflow_linker =
          let list = (subs_agent_in_event mapping event)::event_list in
          max_id,used,mapping,list)
         (0,AgentIdSet.empty,AgentIdMap.empty,[])
-        (List.rev event_list)
-    in event_list_rev
+        event_list
+    in List.rev event_list_rev
 
   type agent_info = 
     {

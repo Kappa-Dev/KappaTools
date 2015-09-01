@@ -21,3 +21,4 @@ install_printer Causal.debug_print_grid
 install_printer Raw_printers.print_injections
 install_printer Rule_interpreter.debug_print
 install_printer Raw_printers.print_refined_step
+install_printer Raw_printers.print_refined_step'

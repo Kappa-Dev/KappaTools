@@ -8,3 +8,5 @@ let print_perturbation = Kappa_printer.perturbation ?env:None
 let print_injections = Rule_interpreter.print_injections ?sigs:None
 let print_refined_step =
   Utilities.D.S.PH.B.PB.CI.Po.K.print_refined_step ?handler:None
+let print_refined_step' =
+  Dag.Dag.S.PH.B.PB.CI.Po.K.print_refined_step ?handler:None
