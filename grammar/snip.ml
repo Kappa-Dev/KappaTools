@@ -698,20 +698,24 @@ let rec add_agents_in_cc id wk registered_links transf links_transf
 				   string_of_int i,pos))
      in handle_ports wk registered_links IntMap.empty transf links_transf remains ag_l 0
 
-let rec complete_with_creation (removed,added) links_transf actions fresh =
+let rec complete_with_creation
+	  (removed,added) links_transf create_actions actions fresh =
   function
   | [] ->
      begin match IntMap.root links_transf with
-	   | None -> actions,(List.rev removed, List.rev added)
+	   | None -> List.rev_append create_actions actions,
+		     (List.rev removed, List.rev added)
 	   | Some (i,_) -> dangling_link "right" i
      end
   | ag :: ag_l ->
      let place = Place.Fresh (ag.Raw_mixture.a_type,fresh) in
      let rec handle_ports added l_t actions intf site_id =
        if site_id = Array.length ag.Raw_mixture.a_ports then
-	 let actions' =
-	   Instantiation.Create (place,List.tl @@ List.rev intf) :: actions in
-	 complete_with_creation (removed,added) l_t actions' (succ fresh) ag_l
+	 let create_actions' =
+	   Instantiation.Create (place,List.tl @@ List.rev intf)
+	   :: create_actions in
+	 complete_with_creation
+	   (removed,added) l_t create_actions' actions (succ fresh) ag_l
        else
 	 let added',point =
 	   match ag.Raw_mixture.a_ints.(site_id) with
@@ -731,7 +735,8 @@ let rec complete_with_creation (removed,added) links_transf actions fresh =
 		let dst = IntMap.find i l_t in
 		let l_t' = IntMap.remove i l_t in
 		Primitives.Transformation.Linked((place,site_id),dst)::added',
-		(Instantiation.Bind_to((place,site_id),dst)::actions),
+		(Instantiation.Bind_to((place,site_id),dst)
+		 ::(Instantiation.Bind_to((dst,(place,site_id))))::actions),
 		l_t'
 	      with Not_found ->
 		let l_t' = IntMap.add i ((place,site_id)) l_t in
@@ -763,7 +768,7 @@ let connected_components_of_mixture created (env,origin) mix =
        let transformations' = (List.rev removed, List.rev added) in
        let actions'',transformations'' =
 	 complete_with_creation
-	   transformations' links_transf actions' 0 created in
+	   transformations' links_transf [] actions' 0 created in
        ((env,Tools.option_map incr_origin origin),
 	(origin,Tools.array_rev_of_list acc,
 	 (tests,(actions'',side_sites,side_effects)), transformations''))
