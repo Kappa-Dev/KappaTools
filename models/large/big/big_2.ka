@@ -8,10 +8,10 @@
 
 ## add DNA damage: turn a certain percentage of C resp. 5mc into U resp. T
 
-%obs: 'DNA_tot' DNA()
+%obs: 'DNA_tot' |DNA()|
 %var: 'bp' 'DNA_tot'/2
 
-%var: 'damaged' DNA(base_state~damaged?)
+%var: 'damaged' |DNA(base_state~damaged?)|
 %var: 'correct' 'bp' - ('damaged' / 2)
 
 %var: 'k_deam' 0
@@ -25,8 +25,8 @@
 
 
 %var: 'deam_percent' 2 / 100
-%var: 'nCG' DNA(base~C!_)
-%var: 'n5mCG' DNA(init~mC!_, base~C!_)
+%var: 'nCG' |DNA(base~C!_)|
+%var: 'n5mCG' |DNA(init~mC!_, base~C!_)|
 
 %mod: [T]>2 do ($UPDATE 'k_deam' 10000000000000 ; $PRINT <".">)
 
@@ -524,74 +524,74 @@
        XRCC1(dbd  ), DNA(e5~lig!_, base_state~OK, xrc  , e3~PUA!_) @ 'XRCC1_DNA_unbind_nicked' 
 
 %obs: 'Cpu' [Tsim]
-%obs: 'free XRCC1 w APE1' XRCC1(dbd,ape!_)
-%obs: 'free XRCC1 w POLb' XRCC1(dbd,pol!_)
-%obs: 'free XRCC1 w LIG3' XRCC1(dbd,lig!_)
-%obs: 'free repairosome' XRCC1(dbd,pol!_, lig!_, ape!_)
+%obs: 'free XRCC1 w APE1' |XRCC1(dbd,ape!_)|
+%obs: 'free XRCC1 w POLb' |XRCC1(dbd,pol!_)|
+%obs: 'free XRCC1 w LIG3' |XRCC1(dbd,lig!_)|
+%obs: 'free repairosome' |XRCC1(dbd,pol!_, lig!_, ape!_)|
 
 
-%obs: 'XRCC1 on AP' DNA(xrc!_,base~AP?)
-%obs: 'XRCC1 on nicked' DNA(xrc!_,e3~OH?)
+%obs: 'XRCC1 on AP' |DNA(xrc!_,base~AP?)|
+%obs: 'XRCC1 on nicked' |DNA(xrc!_,e3~OH?)|
 
-%obs: 'XRCC1.APE1 on AP' DNA(xrc!_,ape!_,base~AP?)
-%obs: 'XRCC1.APE1 on nicked' DNA(xrc!_,ape!_,e3~OH?)
+%obs: 'XRCC1.APE1 on AP' |DNA(xrc!_,ape!_,base~AP?)|
+%obs: 'XRCC1.APE1 on nicked' |DNA(xrc!_,ape!_,e3~OH?)|
 
-%obs: 'XRCC1.POLb on AP' DNA(xrc!_,ape,pol!_,base~AP?)
-%obs: 'XRCC1.POLb on nicked' DNA(xrc!_,ape,pol!_,e3~OH?)
+%obs: 'XRCC1.POLb on AP' |DNA(xrc!_,ape,pol!_,base~AP?)|
+%obs: 'XRCC1.POLb on nicked' |DNA(xrc!_,ape,pol!_,e3~OH?)|
 
-%obs: 'XRCC1.APE1.POLb on AP' DNA(xrc!_,ape!_,pol!_,base~AP?)
-%obs: 'XRCC1.APE1.POLb on nicked' DNA(xrc!_,ape!_,pol!_,e3~OH?)
+%obs: 'XRCC1.APE1.POLb on AP' |DNA(xrc!_,ape!_,pol!_,base~AP?)|
+%obs: 'XRCC1.APE1.POLb on nicked' |DNA(xrc!_,ape!_,pol!_,e3~OH?)|
 
-%obs: 'XRCC1.LIG3 on AP' DNA(xrc!_,lig!_,base~AP?)
-%obs: 'XRCC1.LIG3 on nicked' DNA(xrc!_,lig!_,e3~OH?)
+%obs: 'XRCC1.LIG3 on AP' |DNA(xrc!_,lig!_,base~AP?)|
+%obs: 'XRCC1.LIG3 on nicked' |DNA(xrc!_,lig!_,e3~OH?)|
 
-%obs: 'XRCC1.POLb.LIG3 on AP' DNA(xrc!_,pol!_,lig!_,base~AP?)
-%obs: 'XRCC1.POLb.LIG3 on nicked' DNA(xrc!_,pol!_,lig!_,e3~OH?)
+%obs: 'XRCC1.POLb.LIG3 on AP' |DNA(xrc!_,pol!_,lig!_,base~AP?)|
+%obs: 'XRCC1.POLb.LIG3 on nicked' |DNA(xrc!_,pol!_,lig!_,e3~OH?)|
 
-%obs: 'XRCC1.full on AP' DNA(xrc!_,ape!_,pol!_,lig!_,base~AP?)
-%obs: 'XRCC1.full on nicked' DNA(xrc!_,ape!_,pol!_,lig!_,e3~OH?)
+%obs: 'XRCC1.full on AP' |DNA(xrc!_,ape!_,pol!_,lig!_,base~AP?)|
+%obs: 'XRCC1.full on nicked' |DNA(xrc!_,ape!_,pol!_,lig!_,e3~OH?)|
 
 ## For computing causality analysis only
 #%mod: [T]>50 do $TRACK 'LIG3 ligase action' [true]
 #%mod: [T]>100 do $TRACK 'LIG3 ligase action' [false]  
 #%def: "displayCompression" "weak"
 
-%obs: 'bp_tot' DNA(base!1), DNA(base!1)
+%obs: 'bp_tot' |DNA(base!1), DNA(base!1)|
 
-%var: 'true_damaged' DNA(base!_, base_state~damaged)
+%var: 'true_damaged' |DNA(base!_, base_state~damaged)|
 %obs: 'damage (mismatches)' 'true_damaged'
-%obs: 'damage (AP sites)' DNA(base~AP!_)
+%obs: 'damage (AP sites)' |DNA(base~AP!_)|
 
-%var: 'free_AP' DNA(base~AP!_, ape, pol, xrc)
-%obs: 'free_AP (Gapped)' DNA(e3~NA?,base~AP!_, ape, pol, xrc)
+%var: 'free_AP' |DNA(base~AP!_, ape, pol, xrc)|
+%obs: 'free_AP (Gapped)' |DNA(e3~NA?,base~AP!_, ape, pol, xrc)|
 
-%obs: 'damage (free AP-X)' DNA(base~AP!_, ape, pol)
+%obs: 'damage (free AP-X)' |DNA(base~AP!_, ape, pol)|
 %obs: 'damage (cytotoxic)' 'free_AP'
 
-%obs: 'free_excised'  DNA(ape, pol, xrc, base_state~excised)
-%obs: 'free_gapped'  DNA(ape, pol, xrc, base_state~gapped)
-%obs: 'free_nicked_P' DNA(e3~OH!2, base_state~OK, xrc, ape, pol), DNA(e5~P!2)
+%obs: 'free_excised'  |DNA(ape, pol, xrc, base_state~excised)|
+%obs: 'free_gapped'  |DNA(ape, pol, xrc, base_state~gapped)|
+%obs: 'free_nicked_P' |DNA(e3~OH!2, base_state~OK, xrc, ape, pol), DNA(e5~P!2)|
 %obs: 'full_cytotoxic' 'free_excised' + 'free_gapped' + 'free_nicked_P'  
 
 %obs: 'damage (total)' 'true_damaged' + 'free_AP'
 
-%var: 'free_AP dgless' DNA(base~AP!_, dg, ape, pol, xrc)
-%obs: 'free_AP (Gapped) dgless' DNA(e3~NA?,base~AP!_, dg,ape, pol, xrc)
+%var: 'free_AP dgless' |DNA(base~AP!_, dg, ape, pol, xrc)|
+%obs: 'free_AP (Gapped) dgless' |DNA(e3~NA?,base~AP!_, dg,ape, pol, xrc)|
 
-%obs: 'damage (free AP-X) dgless' DNA(base~AP!_, dg, ape, pol)
+%obs: 'damage (free AP-X) dgless' |DNA(base~AP!_, dg, ape, pol)|
 %obs: 'damage (cytotoxic) dgless' 'free_AP dgless'
 
-%var: 'healthy_1' DNA(e5~lig?, base_state~OK, e3~lig?)
-%var: 'healthy_2' DNA(e5~lig?, base_state~OK, base!_, e3~OH!0), DNA(e5~NA!0)
-%var: 'healthy_3' DNA(e5~dRP!0, base_state~OK, base!_, e3~lig?), DNA(e3~NA!0)
-%var: 'healthy_4' DNA(e5~P!0  , base_state~OK, base!_, e3~lig?), DNA(e3~OH!0)
+%var: 'healthy_1' |DNA(e5~lig?, base_state~OK, e3~lig?)|
+%var: 'healthy_2' |DNA(e5~lig?, base_state~OK, base!_, e3~OH!0), DNA(e5~NA!0)|
+%var: 'healthy_3' |DNA(e5~dRP!0, base_state~OK, base!_, e3~lig?), DNA(e3~NA!0)|
+%var: 'healthy_4' |DNA(e5~P!0  , base_state~OK, base!_, e3~lig?), DNA(e3~OH!0)|
 
 %obs: 'healthy' 'healthy_1' + 'healthy_2' + 'healthy_3' + 'healthy_4'
-%obs: 'healed'  DNA(e3~lig?, base_state~OK, init~damaged, e5~lig?)
+%obs: 'healed'  |DNA(e3~lig?, base_state~OK, init~damaged, e5~lig?)|
 %obs: 'healthy_ratio' 'healthy'/'DNA_tot'
 
-%obs: 'bound DG on mismtach' DG(dbd!1),DNA(dg!1,base~U?)
-%obs: 'bound APE1' APE1(dbd!_)
-%obs: 'bound POLb' POLb(dbd!_)
-%obs: 'LIG3 on AP' DNA(lig!_,base~AP?)
-%obs: 'LIG3 on ligatable' DNA(lig!_,e3~OH!1),DNA(e5~P!1)
+%obs: 'bound DG on mismtach' |DG(dbd!1),DNA(dg!1,base~U?)|
+%obs: 'bound APE1' |APE1(dbd!_)|
+%obs: 'bound POLb' |POLb(dbd!_)|
+%obs: 'LIG3 on AP' |DNA(lig!_,base~AP?)|
+%obs: 'LIG3 on ligatable' |DNA(lig!_,e3~OH!1),DNA(e5~P!1)|

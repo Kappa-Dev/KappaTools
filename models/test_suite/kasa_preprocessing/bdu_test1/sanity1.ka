@@ -11,6 +11,6 @@
 
 #### Variables
 
-%obs: 'Auu' A(x~u?, y~u?)
-%obs: 'Apu' A(y~u?)
+%obs: 'Auu' |A(x~u?, y~u?)|
+%obs: 'Apu' |A(y~u?)|
 
