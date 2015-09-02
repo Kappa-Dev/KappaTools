@@ -726,7 +726,7 @@ module Cflow_linker =
     let () = Format.fprintf log "@[***Refined event:***@,* Kappa_rule %s@,"
 			    (Causal.label ?env:(Tools.option_map (fun x -> x.H.env) handler) ev_kind) in
     Format.fprintf log "Story encoding:@[<1>@,%a%a%a@]@,***@]"
-		   (Pp.list ~trailing:Pp.space Pp.space (PI.print_concrete_test?sigs))
+		   (Pp.list ~trailing:Pp.space Pp.space (PI.print_concrete_test ?sigs))
 		   tests
 		   (Pp.list ~trailing:Pp.space Pp.space (PI.print_concrete_action ?sigs))
 		   actions

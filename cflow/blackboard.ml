@@ -1177,8 +1177,13 @@ module Blackboard =
 	      in 
               let string_eid error =
 		let () =
-                  try PB.CI.Po.K.print_refined_step
-			~handler desc (PB.A.get blackboard.event eid)
+                  try
+		    let str =
+		      Format.asprintf
+			"@[<h>%a@]" (PB.CI.Po.K.print_refined_step ~handler)
+			(PB.A.get blackboard.event eid) in
+		    let line = Str.global_replace (Str.regexp "\n *") " " str in
+		    Format.pp_print_string desc line
 		  with Not_found -> Format.fprintf desc "Event:%i" eid in
 		error in
               let error = print_case_fun  desc row_precondition 1 None color string_eid error in 
