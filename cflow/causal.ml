@@ -222,6 +222,7 @@ let add_actions env grid event_number kind actions =
       | Instantiation.Remove (_,na as ag)) :: q ->
        let sigs = Environment.signatures env in
        let ag_intf = Signature.get sigs na in
+       let grid = add (ag,0) true atom_modified grid event_number kind in 
        let grid =
 	 Signature.fold
 	   (fun site _ grid ->
