@@ -1,7 +1,7 @@
 type event_kind =
   | OBS of Connected_component.t
   | RULE of int
-  | INIT of string (** the mixture *)
+  | INIT of int list (** the agents *)
   | PERT of string (** the rule *)
 
 type quark_lists = {
@@ -61,7 +61,7 @@ val record_obs :
   Instantiation.concrete Instantiation.site list ->
   bool -> int -> grid -> grid
 val record_init :
-  string * Instantiation.concrete Instantiation.action list ->
+  int list * Instantiation.concrete Instantiation.action list ->
   bool -> int -> Environment.t -> grid -> grid
 
 val cut : (int * int * int) list -> grid -> config

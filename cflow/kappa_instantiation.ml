@@ -194,7 +194,7 @@ module Cflow_linker =
   type refined_step =
   | Subs of (agent_id * agent_id)
   | Event of refined_event
-  | Init of string * PI.concrete PI.action list
+  | Init of PI.concrete PI.action list
   | Obs of refined_obs
   | Dummy  of string
 
@@ -736,14 +736,14 @@ module Cflow_linker =
     match step with
     | Subs (a,b) -> f0 p h e a b
     | Event (x,y) -> f1 p h e (x,y)
-    | Init (_,a) -> f2 p h e a
+    | Init a -> f2 p h e a
     | Obs a -> f3 p h e a
     | Dummy x  -> f4 p h e x
 
   let print_refined_step ?handler f = function
     | Subs (a,b) -> print_refined_subs f (a,b)
     | Event (x,y) -> print_refined_event ?handler f (x,y)
-    | Init (_,a) -> print_refined_init ?handler f a
+    | Init a -> print_refined_init ?handler f a
     | Obs a -> print_refined_obs ?handler f a
     | Dummy _  -> ()
 
@@ -800,13 +800,23 @@ module Cflow_linker =
       (fun _ _ error _ -> error,([],[]))
   let store_event log_info (event:refined_event) (step_list:refined_step list) =
     match event with
-    | Causal.INIT sort,(_,(actions,_,_)) ->
-       P.inc_n_kasim_events log_info,(Init (sort,actions))::step_list
+    | Causal.INIT _,(_,(actions,_,_)) ->
+       P.inc_n_kasim_events log_info,(Init actions)::step_list
     | Causal.OBS _,_ -> assert false
     | (Causal.RULE _ | Causal.PERT _ as k),x ->
        P.inc_n_kasim_events log_info,(Event (k,x))::step_list
   let store_obs log_info (i,x,c) step_list =
     P.inc_n_obs_events log_info,Obs(i,x,c)::step_list
+
+  let creation_of_actions op actions =
+    List.fold_left
+      (fun l -> function
+	     | PI.Create (x,_) -> op x :: l
+	     | PI.Mod_internal _ | PI.Bind _ | PI.Bind_to _ | PI.Free _
+	     | PI.Remove _ -> l) [] actions
+  let creation_of_event = function
+    | (Event (_,(_,(ac,_,_))) | Init ac) -> creation_of_actions fst ac
+    | Obs _ | Dummy _ | Subs _ -> []
 
   let build_grid list bool handler =
     let env = handler.H.env in
@@ -837,11 +847,12 @@ module Cflow_linker =
 	    maybe_side_effect empty_set,counter+1,Mods.IntMap.empty
          | Subs (a,b) ->
             grid, side_effect, counter, Mods.IntMap.add a b subs
-	 | Init (so,actions) ->
+	 | Init actions ->
 	    let actions' =
 	      Tools.list_smart_map
 		(PI.subst_map_agent_in_concrete_action translate) actions in
-            Causal.record_init (so,actions') is_weak counter env grid,
+            Causal.record_init (creation_of_actions snd actions',actions')
+			       is_weak counter env grid,
 	    side_effect,counter+1,Mods.IntMap.empty
          | Dummy _ ->
             grid, maybe_side_effect empty_set, counter, subs
@@ -899,21 +910,6 @@ module Cflow_linker =
        | (Dummy _ | Subs _ | Init _) ->
 	  error,priorities.Priority.substitution
 
-  let creation_of_event = function
-    | Event (_,(_,(actions,_,_))) ->
-       List.fold_left
-	 (fun l -> function
-		| PI.Create (x,_) -> fst x :: l
-		| PI.Mod_internal _ | PI.Bind _ | PI.Bind_to _ | PI.Free _
-		| PI.Remove _ -> l) [] actions
-    | Init (_,actions) ->
-       List.fold_left
-	 (fun l -> function
-		| PI.Create (x,_) -> fst x :: l
-		| PI.Mod_internal _ | PI.Bind _ | PI.Bind_to _ | PI.Free _
-		| PI.Remove _ -> l) [] actions
-    | Obs _ | Dummy _ | Subs _ -> []
-
   let subs_agent_in_event mapping = function
     | Event (a,event) ->
        Event
@@ -927,11 +923,11 @@ module Cflow_linker =
 	     (PI.subst_map_agent_in_concrete_test
 		(fun x -> try AgentIdMap.find x mapping with Not_found -> x)) b,
 	   c)
-    | Init (a,b) ->
-       Init(a,
-	    Tools.list_smart_map
-	      (PI.subst_map_agent_in_concrete_action
-		 (fun x -> try AgentIdMap.find x mapping with Not_found -> x)) b)
+    | Init b ->
+       Init
+	 (Tools.list_smart_map
+	    (PI.subst_map_agent_in_concrete_action
+	       (fun x -> try AgentIdMap.find x mapping with Not_found -> x)) b)
     | Dummy _ | Subs _ as event -> event
 
   let disambiguate event_list =
@@ -973,14 +969,14 @@ module Cflow_linker =
 	     id <> id' || raise ExceptionDefn.False)
 	soup in
     let rec aux recur acc soup = function
-      | [] -> (if soup <> [] then Init ("",soup)::acc else acc),recur
+      | [] -> (if soup <> [] then Init soup::acc else acc),recur
       | PI.Free _ :: t -> aux recur acc soup t
       | (PI.Bind _ | PI.Remove _ | PI.Bind_to _ | PI.Mod_internal _) :: t ->
 	 aux recur acc soup t
-      | PI.Create ((id,sort),site_list) :: t ->
+      | PI.Create ((id,_),site_list) :: t ->
 	 try
 	   let this,soup' = extract_agent id soup in
-	   let this = Init (Format.asprintf "#%i" sort,this) in
+	   let this = Init this in
 	   let map =
 	     List.fold_left
 	       (fun map -> function
@@ -1125,7 +1121,7 @@ module Cflow_linker =
       List.fold_left
 	(fun (step_list,remanent) refined_step -> 
 	 match refined_step with
-	 | Init (_,init) -> convert_init remanent step_list init
+	 | Init init -> convert_init remanent step_list init
 	 | Event (_,(_,(action,_,kasim_side))) ->
 	    let remanent,set =
 	      List.fold_left

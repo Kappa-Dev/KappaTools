@@ -343,8 +343,6 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 	    { lhs = []; rm_token = []; arrow = RAR; rhs = ast; add_token = [];
 	      k_def = Location.dummy_annot (CONST Nbr.zero);
 	      k_un = None; k_op = None; } in
-	  let causality =
-	    Causal.INIT (Format.asprintf "@[<h>%a@]" Expr.print_ast_mix ast) in
 	  let domain'',state' =
 	    match
 	      rules_of_ast algs.NamedDecls.finder tokens.NamedDecls.finder
@@ -352,6 +350,14 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 			   (fake_rule,mix_pos)
 	    with
 	    | domain'',_,[ _, compiled_rule ] ->
+	       let actions,_,_ = snd compiled_rule.Primitives.instantiations in
+	       let creations_sort =
+		 List.fold_left
+		   (fun l -> function
+			  | Instantiation.Create (x,_) -> Place.get_type x :: l
+			  | Instantiation.Mod_internal _ | Instantiation.Bind _
+			  | Instantiation.Bind_to _ | Instantiation.Free _
+			  | Instantiation.Remove _ -> l) [] actions in
 	       domain'',
 	       Nbr.iteri
 		 (fun _ s ->
@@ -359,7 +365,7 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 		    (Rule_interpreter.force_rule
 		       ~get_alg:(fun i ->
 				 fst (snd algs.NamedDecls.decls.(i)))
-		       domain'' counter s causality compiled_rule))
+		       domain'' counter s (Causal.INIT creations_sort) compiled_rule))
 		 state value
 	    | domain'',_,[] -> domain'',state
 	    | _,_,_ ->
@@ -385,10 +391,7 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 	       Rule_interpreter.force_rule
 		      ~get_alg:(fun i ->
 				fst (snd algs.NamedDecls.decls.(i)))
-		      domain'' counter state
-		      (Causal.INIT
-			 (Format.asprintf "@[<h>%a %s@]" Expr.print_ast_alg (fst alg) tk_nme))
-		      compiled_rule
+		      domain'' counter state (Causal.INIT []) compiled_rule
 	    | _,_,_ -> assert false in
 	  domain',state'
       )	(domain,Rule_interpreter.empty ~has_tracking env)

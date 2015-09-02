@@ -3,7 +3,7 @@ open Mods
 type event_kind =
   | OBS of Connected_component.t
   | RULE of int
-  | INIT of string (* the mixture *)
+  | INIT of int list (* the agents *)
   | PERT of string (* the rule *)
 
 type quark_lists = {
@@ -61,7 +61,8 @@ let empty_config =
 let debug_print_event_kind f = function
   | OBS i -> Format.fprintf f "OBS(%a)" (Connected_component.print false) i
   | RULE i -> Format.fprintf f "RULE(%i)" i
-  | INIT s -> Format.fprintf f "INIT(%s)" s
+  | INIT l ->
+     Format.fprintf f "INIT(%a)" (Pp.list Pp.comma Format.pp_print_int) l
   | PERT s -> Format.fprintf f "PERT(%s)" s
 
 let debug_print_causal f i =
@@ -369,7 +370,9 @@ let label ?env = function
      Format.asprintf "%a" (Connected_component.print ?sigs false) mix_id
   | PERT s -> s
   | RULE r_id -> Format.asprintf "%a" (Environment.print_rule ?env) r_id
-  | INIT s -> Format.asprintf "Intro %s" s
+  | INIT s ->
+     Format.asprintf
+       "Intro @[<h>%a@]" (Pp.list Pp.comma (Environment.print_agent ?env)) s
 
 let ids_of_grid grid = Hashtbl.fold (fun key _ l -> key::l) grid.flow []
 let config_of_grid = cut
@@ -405,7 +408,7 @@ let prec_star_of_config err_fmt config_closure config to_keep init_to_eidmax
 
 let depth_and_size_of_event config =
   IntMap.fold
-    (fun eid prec_eids (emap,size,depth) ->
+    (fun eid prec_eids (emap,size,_depth) ->
       let d =
 	IntSet.fold
 	  (fun eid' d ->
