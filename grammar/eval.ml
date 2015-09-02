@@ -87,10 +87,10 @@ let rules_of_ast ?deps_machinery algs tokens contact_map domain
        let deps_algs',r' = build deps_algs r in
        deps_algs', ((label, r') :: acc)
     | _ ->
-       List.fold_left
-	 (fun (deps_algs,out) r ->
+       List.fold_right
+	 (fun r (deps_algs,out) ->
 	  let deps_algs',r' = build deps_algs r in
-	  deps_algs',(count label,r')::out) (deps_algs,acc) rule_mixtures in
+	  deps_algs',(count label,r')::out) rule_mixtures (deps_algs,acc) in
     domain',(match origin' with
 	    | None -> None
 	    | Some o -> Some (o,
@@ -543,7 +543,7 @@ let compile_rules algs alg_deps tokens contact_map domain rules =
       (fun (domain,deps_machinery,acc) (rule_label,rule) ->
        let (domain',origin',cr) =
 	 rules_of_ast algs tokens ?deps_machinery contact_map domain rule_label rule in
-       domain',origin',List.rev_append cr acc)
+       domain',origin',List.append cr acc)
       (domain,Some (Operator.RULE 0,alg_deps),[]) rules with
   | fdomain,Some (_,falg_deps),frules -> fdomain,falg_deps,List.rev frules
   | _, None, _ ->
