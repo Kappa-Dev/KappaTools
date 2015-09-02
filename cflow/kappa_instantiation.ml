@@ -961,17 +961,26 @@ module Cflow_linker =
       sites_with_wrong_internal_state: SiteSet.t 
     }
 
-  let convert_init remanent action_list =
-    let extract_agent id =
-      List.filter (function
-		    | (PI.Free ((id',_),_) | PI.Create ((id',_),_)) -> id = id'
-		    | (PI.Bind _ | PI.Remove _ | PI.Bind_to _ | PI.Mod_internal _ ) -> false)
-		   action_list in
-    let rec aux recur = function
-      | [] -> recur
-      | PI.Free _ :: t -> aux recur t
-      | (PI.Bind _ | PI.Remove _ | PI.Bind_to _ | PI.Mod_internal _) :: _ -> remanent
+  let convert_init remanent step_list action_list =
+    let extract_agent id soup =
+      List.partition
+	(function
+	  | (PI.Free ((id',_),_) | PI.Create ((id',_),_)) -> id = id'
+	  | (PI.Bind (((id',_),_),((id'',_),_))
+	    | PI.Bind_to (((id',_),_),((id'',_),_)) ) ->
+	     (id <> id' && id <> id'') || raise ExceptionDefn.False
+	  | (PI.Remove (id',_) | PI.Mod_internal (((id',_),_),_) ) ->
+	     id <> id' || raise ExceptionDefn.False)
+	soup in
+    let rec aux recur acc soup = function
+      | [] -> (if soup <> [] then Init ("",soup)::acc else acc),recur
+      | PI.Free _ :: t -> aux recur acc soup t
+      | (PI.Bind _ | PI.Remove _ | PI.Bind_to _ | PI.Mod_internal _) :: t ->
+	 aux recur acc soup t
       | PI.Create ((id,sort),site_list) :: t ->
+	 try
+	   let this,soup' = extract_agent id soup in
+	   let this = Init (Format.asprintf "#%i" sort,this) in
 	   let map =
 	     List.fold_left
 	       (fun map -> function
@@ -980,13 +989,14 @@ module Cflow_linker =
 	       SiteMap.empty site_list in
 	   let agent_info =
 	     {
-	       initial_step=Init (Format.asprintf "Intro #%i" sort,extract_agent id);
+	       initial_step=this;
 	       internal_states=map;
 	       bound_sites=SiteSet.empty;
 	       sites_with_wrong_internal_state=SiteSet.empty
 	     }
-	   in aux (AgentIdMap.add id agent_info recur) t
-    in aux remanent action_list
+	   in aux (AgentIdMap.add id agent_info recur) (this::acc) soup' t
+	 with ExceptionDefn.False -> aux recur acc soup t
+    in aux remanent step_list action_list action_list
 
   let as_init agent_info = 
     SiteSet.is_empty agent_info.bound_sites 
@@ -1115,7 +1125,7 @@ module Cflow_linker =
       List.fold_left
 	(fun (step_list,remanent) refined_step -> 
 	 match refined_step with
-	 | Init (_,init) -> (refined_step::step_list, convert_init remanent init)
+	 | Init (_,init) -> convert_init remanent step_list init
 	 | Event (_,(_,(action,_,kasim_side))) ->
 	    let remanent,set =
 	      List.fold_left
