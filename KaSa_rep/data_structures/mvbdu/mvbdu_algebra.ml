@@ -96,6 +96,15 @@ let less parameters error x y =
     | 0 -> error, compare x.Mvbdu_sig.upper_bound y.Mvbdu_sig.upper_bound  
     | 1 | -1 as x-> error, x  
     | _ ->  invalid_arg parameters error (Some "line 81") Exit 0    
+
+
+let cut x t1  = 
+  match t1.Mvbdu_sig.value 
+  with 
+    Mvbdu_sig.Node y when compare x y.Mvbdu_sig.variable = 0 -> y.Mvbdu_sig.branch_true
+  | _ -> t1 
+      
+  
             
 let rec generic_binary allocate (memoized_fun:('a,'b,'c,'d,'e,'f) Memo_sig.binary_memoized_fun) handler error parameters mvbdu_a mvbdu_b = 
   match memoized_fun.Memo_sig.get parameters error handler (mvbdu_a,mvbdu_b) with 
@@ -141,13 +150,13 @@ let rec generic_binary allocate (memoized_fun:('a,'b,'c,'d,'e,'f) Memo_sig.binar
                     x,
                     x.Mvbdu_sig.branch_true,
                     x.Mvbdu_sig.branch_false,
-                    mvbdu_b,
+                    cut x.Mvbdu_sig.variable  mvbdu_b,
                     mvbdu_b
                   | _ -> 
                     y,
+                    cut y.Mvbdu_sig.variable mvbdu_a,
                     mvbdu_a,
-                    mvbdu_a,
-                    y.Mvbdu_sig.branch_true,
+		    y.Mvbdu_sig.branch_true,
                     y.Mvbdu_sig.branch_false 
               in     
               begin
