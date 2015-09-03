@@ -1851,9 +1851,9 @@ module Preblackboard =
            in 
           
            (*** deal with substitutable agents ***)
-           let error,log_info,blackboard,init_step = 
+           let error,log_info,blackboard,init_step,nlist = 
              AgentIdMap.fold 
-               (fun rule_ag_id l (error,log_info,blackboard,init_step) -> 
+               (fun rule_ag_id l (error,log_info,blackboard,init_step,nlist) -> 
                  let test_list,action_list,side_effect = 
                    begin 
                      try 
@@ -1873,7 +1873,7 @@ module Preblackboard =
                          Not_found -> []
                  in 
                  List.fold_left 
-                   (fun (error,log_info,blackboard,init_step) mixture_ag_id -> 
+                   (fun (error,log_info,blackboard,init_step,nlist) mixture_ag_id -> 
                      let (step:CI.Po.K.refined_step) = CI.Po.K.build_subs_refined_step rule_ag_id mixture_ag_id in 
                      let test_list = 
                        List.rev_map 
@@ -2044,10 +2044,11 @@ module Preblackboard =
                          test_map
                          action_map 
                      in 
-                     let merged_map = 
+                     let merged_map,nlist = 
                        List.fold_left 
-                         (fun map pid -> PredicateidMap.add pid (Counter 1,Undefined) map)
-                         merged_map
+                         (fun (map,nlist) pid ->
+			  (PredicateidMap.add pid (Counter 1,Counter 0) map),pid::nlist)
+                         (merged_map,nlist)
                          fictitious_local_list 
                      in 
                      let merged_map = 
@@ -2087,7 +2088,7 @@ module Preblackboard =
                      if side_effect = []
                      && PredicateidMap.is_empty  merged_map 
                      then 
-                       error,log_info,blackboard,init_step
+                       error,log_info,blackboard,init_step,nlist
                      else 
                        begin 
                          let nsid = blackboard.pre_nsteps + 1 in 
@@ -2116,12 +2117,12 @@ module Preblackboard =
                                pre_nsteps = nsid;
                            }
                          in 
-                         error,log_info,blackboard,init_step 
+                         error,log_info,blackboard,init_step,nlist 
                        end )
-                   (error,log_info,blackboard,init_step) l 
+                   (error,log_info,blackboard,init_step,nlist) l 
                ) 
                data_structure.old_agents_potential_substitution
-               (error,log_info,blackboard,init_step)
+               (error,log_info,blackboard,init_step,[])
 
            in 
           
@@ -2439,7 +2440,13 @@ module Preblackboard =
                (fun map (pid,_,(test,action)) -> add_state pid (test,action) map)
                merged_map
                unambiguous_side_effects
-           in 
+           in
+	   let merged_map =
+	     List.fold_left
+	       (fun map pid -> add_state pid (Counter 0,Undefined) map)
+	       merged_map
+	       nlist
+	   in 
            let side_effect = 
              List.fold_left 
                (fun list (_,a,_) -> 
