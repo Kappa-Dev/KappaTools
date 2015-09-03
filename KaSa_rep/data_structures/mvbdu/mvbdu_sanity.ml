@@ -147,17 +147,16 @@ let rec safety_check_increasing_nodes_working_list error working_list =
         match mvbdu.Mvbdu_sig.value with
           | Mvbdu_sig.Leaf _ -> safety_check_increasing_nodes_working_list error tail
           | Mvbdu_sig.Node x -> 
-            let new_var = x.Mvbdu_sig.variable in 
+            let new_var = x.Mvbdu_sig.variable in
             begin
               match compare var new_var 
               with 
-                | a when a<0 -> 
+                | a when a<0 ->
                   safety_check_increasing_nodes_working_list error 
                     ((x.Mvbdu_sig.branch_false, false, new_var,x.Mvbdu_sig.upper_bound)::
                         (x.Mvbdu_sig.branch_true, true, new_var,x.Mvbdu_sig.upper_bound)::
                         tail) 
-                | a when a>0 -> 
-                  error,false
+                | a when a>0 -> error,false
                 | _  -> 
                   if bool 
                   then error, false 

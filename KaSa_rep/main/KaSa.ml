@@ -128,7 +128,7 @@ let main () =
       error,None 
   in
   (*BDU range*)
-  (*let error, bdu_range =
+  let error, bdu_range =
     if Remanent_parameters.get_do_range_bdu parameters
     then
       let parameters =
@@ -141,7 +141,7 @@ let main () =
       in error, Some range 
     else
       error, None
-  in*)
+  in
   (*ODE*)
   let error,ode_flow = 
     if Remanent_parameters.get_do_ODE_flow_of_information parameters

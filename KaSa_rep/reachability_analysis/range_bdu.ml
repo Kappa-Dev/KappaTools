@@ -30,51 +30,77 @@ let trace = false
   - It is not indepenent when it has two different outgoing.
 *)
 
-let rec dependent_aux error working_list list_result =
-  match working_list with
-    | [] -> error, list_result
-    | head :: tail ->
-      begin
-        (*taking the value in the head: first level t*)
-        match head.value with
-          | Leaf _ -> dependent_aux error tail list_result
-          | Node x ->
-            (*checking the two branches: false and true.
-              If bfalse != btrue then they are having a different sibbling.
-            *)
-            if x.branch_true == x.branch_false
-            then
-              let _ = fprintf stdout "1\n" in
-              error, (x.branch_true.value :: list_result)
-            else
-              (*the sibbling is different. Then continue to check in the branch false of this node*)
-              match x.branch_true.value with         
-                | Leaf _ -> dependent_aux error tail list_result
-                | Node y ->
-                  if x.branch_false == y.branch_true
-                  then
-                    let _ = fprintf stdout "2\n" in
-                    error, (x.branch_true.value :: list_result)
-                  else
-                    dependent_aux error 
-                      (x.branch_false :: x.branch_true :: tail)
-                      list_result
-      end
+let branch_combine l = (*TODO*)
+  let rec aux acc result =
+    match acc with
+      | [] -> result
+      | (var,bound,new_bound) :: []  -> result
+      | (var, bound, new_bound) :: ((var', bound', new_bound') :: tl) ->
+        if var != var' 
+        then
+          result
+        else
+          aux tl ((var', bound', new_bound') :: result)
+  in aux l []
 
-let dependent error mvbdu = dependent_aux error [mvbdu][]
+let combine_two_list l l' = (*TODO*)
+  let rec aux acc acc' (result: (int * int * int) list) =
+    match acc, acc' with
+      | [], [] | _, [] | [], _ -> result
+      | (v, b, n) :: tl, (v', b', n') :: tl' ->
+        if v != v'
+        then
+          aux tl tl' ((v', b', n') :: result)
+        else
+          result
+  in
+  aux l l' []
 
-let rec print_dependent l =
+let rec print l =
   match l with
     | [] -> []
-    | x :: tl ->
-      let _ = 
-        fprintf stdout "x_branch_true\n";
-        print_cell stdout "" x
-      in
-      print_dependent tl
+    | (var, bound, new_bound) :: tail ->
+      fprintf stdout "Range of var:%i is {bound:%i, new_bound:%i}\n" var bound new_bound;
+      print tail
+        
+let rec aux working_list =
+  match working_list with
+    | [] -> []
+    | (cell, bool, var, bound) :: tail ->
+      match cell.value with
+        | Leaf _ -> aux tail
+        | Node x ->
+          let new_var   = x.variable    in
+          let new_bound = x.upper_bound in
+          (*we want the structure x < y *)
+          match compare var new_var with
+            | a when a < 0 -> 
+              aux ((x.branch_false, false, new_var, new_bound) ::
+                      (x.branch_true, true, new_var, new_bound) :: tail)
+            | a when a > 0 -> []
+            | _ ->
+              if bool
+              then
+                let triple = (new_var, bound, new_bound) in
+                let l = triple :: 
+                  (aux ((x.branch_false, false, new_var, new_bound) ::
+                           (x.branch_true, true, new_var, new_bound) :: tail)) in
+                l
+              else
+                let triple = (new_var, bound, new_bound) in
+                let l = triple :: (aux ((x.branch_false, false, new_var, new_bound) ::
+                                           (x.branch_true, true, new_var, new_bound) :: tail)) in
+                l
+                  
+let dependent error mvbdu =
+  match mvbdu.value with
+    | Leaf _ -> error, []
+    | Node x ->
+      error, aux [x.branch_false, false, x.variable, x.upper_bound;
+                 x.branch_true, true, x.variable, x.upper_bound]
 
 (************************************************************************************) 
-(*TEST, build bdu use code from mvbdu_test*)
+(*TEST, build bdu used code from mvbdu_test*)
 
 let bdu_test remanent parameter =
   let error = remanent.error in
@@ -105,7 +131,7 @@ let bdu_test remanent parameter =
   let c = 
     Node 
       {
-        variable = 0;
+        variable = 1;
         branch_true = a';
         branch_false = b';
         upper_bound = 1
@@ -114,7 +140,7 @@ let bdu_test remanent parameter =
   let c_val =
     Node
       {
-        variable = 0;
+        variable = 1;
         branch_true = a'_id;
         branch_false = b'_id;
         upper_bound = 1
@@ -128,37 +154,12 @@ let bdu_test remanent parameter =
       c_val
       c
   in
- (*----------------------------------------------------------------------------------*)
-  (*Build second node*)
-  let g = 
-    Mvbdu_sig.Node 
-      {
-        Mvbdu_sig.variable = 0;
-        Mvbdu_sig.branch_true = a';
-        Mvbdu_sig.branch_false = b';
-        Mvbdu_sig.upper_bound = 1
-      }
-  in 
-  let g_val = 
-    Mvbdu_sig.Node 
-      {
-        Mvbdu_sig.variable = 0;
-        Mvbdu_sig.branch_true = a'_id;
-        Mvbdu_sig.branch_false = b'_id;
-        Mvbdu_sig.upper_bound = 1
-      }
-  in 
-  let error,handler,g',g'_id,g'',g''_id =
-    Mvbdu_test.build_without_and_with_compressing
-      allocate
-      error
-      handler
-      g_val
-      g
-  in
   (*----------------------------------------------------------------------------------*)
   (*Build list (var, up)*)
-  let list = [(1,1); (0,0)] in
+  let list = [2,1; 1,0] in
+  let list' = [1,1] in
+  (*let list = [3,0; 2,1; 1,0] in
+  let list' = [3,1; 2,1; 1,1] in*)
   let error,(handler,list_a) =
     List_algebra.build_list
       (Boolean_mvbdu.list_allocate parameter)
@@ -167,7 +168,6 @@ let bdu_test remanent parameter =
       handler
       list
   in
-  let list' = [(1, 1); (0,1)] in
   let error,(handler,list_b) =
     List_algebra.build_list
       (Boolean_mvbdu.list_allocate parameter)
@@ -189,21 +189,25 @@ let bdu_test remanent parameter =
   let error,handler,mvbdu1 =
     f (Boolean_mvbdu.redefine parameter error parameter handler c') list_a in
   let error,handler,mvbdu2 =
-    f (Boolean_mvbdu.redefine parameter error parameter handler g') list_b in
-  let error,handler,mvbdu =
-    f (Boolean_mvbdu.boolean_mvbdu_or
-         parameter handler error parameter mvbdu1) mvbdu2
+    f (Boolean_mvbdu.redefine parameter error parameter handler c') list_b in
+  let error, handler, mvbdu =
+    f (boolean_mvbdu_or parameter handler error parameter mvbdu1) mvbdu2
   in
-  let _ =
-    handler.print_mvbdu stdout "" mvbdu
+  let error =    
+    (*handler.print_mvbdu stdout "" mvbdu*)
+    Boolean_mvbdu.print_boolean_mvbdu error (Remanent_parameters.update_prefix parameter " ")
+      mvbdu;
+    fprintf stdout "---------------------------------\n";
+    Boolean_mvbdu.print_boolean_mvbdu error (Remanent_parameters.update_prefix parameter " ")
+      mvbdu1;
+    fprintf stdout "---------------------------------\n";
+    Boolean_mvbdu.print_boolean_mvbdu error (Remanent_parameters.update_prefix parameter " ")
+      mvbdu2
   in
-  (*----------------------------------------------------------------------------------*)
-  let error, dep =
-    dependent error mvbdu
-  in
-  let _ =
-    fprintf stdout "-----------------------------------------\n";
-    print_dependent dep
+  let error, l = dependent error mvbdu in
+  let _ = 
+    fprintf stdout "---------------------------------\n";
+    print l
   in
   (*----------------------------------------------------------------------------------*)
   (*remanent*)
@@ -213,7 +217,7 @@ let bdu_test remanent parameter =
       Sanity_test_sig.mvbdu_handler = handler
   },
   ("Mvbdu.001",fun remanent ->
-    let b = Mvbdu_core.mvbdu_equal c'' c'' in
+    let b = Mvbdu_core.mvbdu_equal c' c'' in
     remanent, b, None) :: (List.map (fun (a, b, c) -> a,
       fun remanent -> Mvbdu_sanity.test remanent c b) [])
     
