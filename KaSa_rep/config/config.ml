@@ -73,6 +73,7 @@ let influence_arrow = ref "normal"
 (**flow of information*)
 let do_ODE_flow_of_information = ref false
 let do_stochastic_flow_of_information = ref false
+(*covering classes, side effects, etc.*)
 let do_site_dependencies = ref false
+(*fixpoint iteration*)
 let do_iteration_dependencies = ref false
-let do_range_bdu = ref false

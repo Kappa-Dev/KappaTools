@@ -108,7 +108,7 @@ let main () =
     else 
       error,None 
   in
-  (*BDU of covering classes*)
+  (*BDU of fixpoint iteration function*)
   let error,bdu_analysic = 
     if Remanent_parameters.get_do_iteration_dependencies parameters
     then 
@@ -128,20 +128,7 @@ let main () =
       error,None 
   in
   (*BDU range*)
-  (*let error, bdu_range =
-    if Remanent_parameters.get_do_range_bdu parameters
-    then
-      let parameters =
-	Remanent_parameters.update_prefix parameters "" in 
-      let _ = 
-	if (Remanent_parameters.get_trace parameters)
-	then Printf.fprintf (Remanent_parameters.get_log parameters) "\n"
-      in
-      let range = Range_bdu.main
-      in error, Some range 
-    else
-      error, None
-  in*)
+  (*let _ = Range_bdu.main in*)
   (*Stochastic flow of information*)
   let error, stochastic_flow =
     if Remanent_parameters.get_do_stochastic_flow_of_information parameters
