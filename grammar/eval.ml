@@ -9,10 +9,12 @@ let initial_value_alg counter algs (ast, _) =
 	      fst (snd algs.NamedDecls.decls.(i)))
     ~get_mix:(fun _ -> Nbr.zero) ~get_tok:(fun _ -> Nbr.zero) ast
 
-let name_and_purify_rule acc (label_opt,(r,r_pos)) =
-  let (label,_ as label_pos) = match label_opt with
-    | None -> Location.dummy_annot (Format.asprintf "%a" Expr.print_ast_rule r)
-    | Some (lab,pos) -> (lab,pos) in
+let name_and_purify_rule (id,acc) (label_opt,(r,r_pos)) =
+  let id',(label,_ as label_pos) = match label_opt with
+    | None ->
+       succ id, Location.dummy_annot
+		  (Format.asprintf "r%i: %a" id Expr.print_ast_rule r)
+    | Some (lab,pos) -> id,(lab,pos) in
   let acc',k_def =
     if Expr.ast_alg_has_mix r.k_def then
       let rate_var = label^"_rate" in
@@ -31,7 +33,7 @@ let name_and_purify_rule acc (label_opt,(r,r_pos)) =
     | Some ((_,pos),_) ->
        raise (ExceptionDefn.Internal_Error
 		("KaSim does not deal with unary rule yet",pos))in
-  acc'',(label_pos, ({r with k_def = k_def; k_op = k_op},r_pos))
+  (id',acc''),(label_pos, ({r with k_def = k_def; k_op = k_op},r_pos))
 
 let tokenify algs tokens contact_map domain l =
   List.fold_right
@@ -570,8 +572,8 @@ let initialize logger overwrite result =
 
   let domain = Connected_component.Env.empty sigs_nd in
   Debug.tag logger "\t -variable declarations";
-  let (extra_vars,cleaned_rules) =
-    Tools.list_fold_right_map name_and_purify_rule [] result.rules in
+  let ((_,extra_vars),cleaned_rules) =
+    Tools.list_fold_right_map name_and_purify_rule (0,[]) result.rules in
   let domain',alg_a =
     compile_alg_vars tk_nd.NamedDecls.finder contact_map domain
 		     overwrite (result.Ast.variables@extra_vars) in
