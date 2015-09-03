@@ -231,7 +231,7 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
        let () = register_internal_modif p_id [] p in
        register_port_modif p_id (Location.dummy_annot Ast.LNK_ANY) p) rp_r in
   { ra_type = ag_id; ra_ports = ports; ra_ints = internals;
-    ra_syntax = Some (ports, internals);}
+    ra_syntax = Some (Array.copy ports, Array.copy internals);}
 
 let rec annotate_lhs_with_diff sigs acc lhs rhs =
   match lhs,rhs with
