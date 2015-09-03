@@ -25,8 +25,8 @@ ____________________________________________________________
 Stats:
  number of step   : 831
  longest story    : 620
- average length   : 231.654450262
- geometric mean   : 300.850822298
+ average length   : 231.654
+ geometric mean   : 300.851
 
 	 - causal & weak flow compression (42)
 
@@ -38,7 +38,7 @@ Stats:
  number of step   : 253
  longest story    : 27
  average length   : 15.66
- geometric mean   : 16.412799883
+ geometric mean   : 16.4128
 
 	 - causal & weak flow compression (42)
 

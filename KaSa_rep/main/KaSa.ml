@@ -128,7 +128,7 @@ let main () =
       error,None 
   in
   (*BDU range*)
-  let error, bdu_range =
+  (*let error, bdu_range =
     if Remanent_parameters.get_do_range_bdu parameters
     then
       let parameters =
@@ -141,6 +141,20 @@ let main () =
       in error, Some range 
     else
       error, None
+  in*)
+  (*Stochastic flow of information*)
+  let error, stochastic_flow =
+    if Remanent_parameters.get_do_stochastic_flow_of_information parameters
+    then
+      let parameters_stoch = Remanent_parameters.update_prefix parameters "Stochastic flow of information:" in
+      let _ =
+        if Remanent_parameters.get_trace parameters
+        then Printf.fprintf (Remanent_parameters.get_log parameters_stoch) "Stochastic flow of information:\n" 
+      in
+      let error, stochastic_flow =
+        Stochastic_classes.stochastic_classes parameters_stoch error handler c_compil
+      in error, Some stochastic_flow
+    else error, None
   in
   (*ODE*)
   let error,ode_flow = 
