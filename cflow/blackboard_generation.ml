@@ -2043,9 +2043,17 @@ module Preblackboard =
                          (fun _ test action -> Some(g test,g action))
                          test_map
                          action_map 
-                     in 
-                     let merged_map,nlist = 
-                       List.fold_left 
+                     in
+                     let merged_map,nlist =
+		       (* enumeration of potential binding state, according to a substitution *)
+		       (* If the event is selected, check that the wire end in the state 0*)
+		       (* Undef->Counter 0 : opening event *)
+		       (* Counter 0 -> Counter 1 : potential binding type *)
+		       (* => Counter 1 -> Counter 0 : the corresponding substitution is applied *)
+		       (* Counter 0 -> Undef : closing event, check that if the event has been selected (open and closed), then exactely one binding state has been selected, 
+according to the corresponding substitution *)
+		       (* If the event is selected & the according substitution taken, then mutual exclusion among the potential binding state*)	     
+		       List.fold_left 
                          (fun (map,nlist) pid ->
 			  (PredicateidMap.add pid (Counter 1,Counter 0) map),pid::nlist)
                          (merged_map,nlist)
@@ -2442,9 +2450,16 @@ module Preblackboard =
                unambiguous_side_effects
            in
 	   let merged_map =
+	     (* If the event is selected, check that the wire end in the state 0*)
+              (* Undef->Counter 0 : opening event *)
+              (* Counter 0 -> Counter 1 : potential binding type *)
+              (* Counter 1 -> Counter 0 : the corresponding substitution is applied *)
+              (* => Counter 0 -> Undef : closing event, check that if the event has been selected (open and closed), then exactely one binding state has been selected, 
+according to the corresponding substitution *)
+	      (* If the event is selected & the according substitution taken, then mutual exclusion among the potential binding state*)
 	     List.fold_left
-	       (fun map pid -> add_state pid (Counter 0,Undefined) map)
-	       merged_map
+	       (fun map pid -> add_state pid (Counter 0,Undefined) map) 
+	       Merged_map
 	       nlist
 	   in 
            let side_effect = 
