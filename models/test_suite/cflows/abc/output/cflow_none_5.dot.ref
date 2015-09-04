@@ -1,49 +1,34 @@
-/* Compression of 302 causal flows obtained in average at 1.333307E+01 t.u */
-/* Compressed causal flows were: [145;160;175;191;234;237;244;251;292;293;
-294;310;351;352;391;469;471;485;486;487;497;514;531;561;562;594;611;616;623;
-646;654;678;679;687;694;701;710;729;749;782;814;823;829;840;858;866;867;878;
-883;893;895;910;915;922;930;943;978;999;1001;1022;1027;1032;1051;1054;1061;
-1068;1128;1131;1136;1168;1188;1200;1201;1207;1236;1265;1297;1315;1348;1349;
-1353;1359;1365;1385;1400;1407;1413;1441;1445;1471;1494;1528;1531;1549;1551;
-1579;1584;1591;1602;1605;1614;1649;1651;1654;1682;1697;1699;1720;1736;1752;
-1761;1763;1770;1776;1793;1797;1798;1804;1806;1808;1836;1837;1843;1885;1904;
-1906;1918;1921;1923;1929;1933;1939;1960;1962;1967;1988;2020;2025;2040;2044;
-2056;2061;2065;2081;2082;2084;2095;2105;2109;2115;2131;2143;2155;2157;2160;
-2161;2165;2177;2178;2182;2186;2221;2244;2272;2282;2302;2309;2328;2342;2351;
-2362;2366;2383;2393;2407;2412;2420;2423;2446;2448;2458;2459;2463;2464;2473;
-2476;2488;2498;2500;2503;2520;2523;2526;2530;2532;2547;2548;2558;2583;2600;
-2604;2642;2649;2650;2657;2669;2682;2685;2686;2690;2715;2721;2736;2774;2795;
-2807;2838;2861;2891;2894;2898;2908;2933;2934;2949;2952;2973;3010;3021;3024;
-3032;3043;3050;3072;3153;3156;3164;3166;3173;3187;3198;3216;3236;3243;3270;
-3273;3282;3290;3296;3300;3305;3310;3327;3338;3349;3368;3401;3425;3429;3431;
-3434;3438;3464;3469;3470;3472;3473;3486;3491;3509;3519;3548;3557;3558;3577;
-3579;3625;3626;3674;3685;3696;3702;3711;3723;3734;3756;3773;3787;3788;3831;
-3835;3839;3854;3875;3900;3932;3940;3949;3951;3977;3981;3984] */
+/* Compression of 64 causal flows obtained in average at 1.217842E+01 t.u */
+/* Compressed causal flows were: [135;283;472;481;575;605;606;617;703;952;
+975;976;1021;1026;1063;1133;1138;1193;1243;1249;1362;1393;1446;1460;1486;
+1497;1502;1513;1542;1650;1729;1759;1766;1834;1872;1893;1938;1965;1982;2008;
+2067;2101;2171;2181;2210;2326;2337;2390;2535;2540;2591;2618;2694;2787;2843;
+2901;2958;3396;3419;3653;3705;3736;3838;3960] */
 digraph G{
  ranksep=.5 ;
 { rank = same ; "0" [shape=plaintext] ;
 node_1 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 node_2 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
-node_3 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
-node_7 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_3 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_4 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
 }
 { rank = same ; "1" [shape=plaintext] ;
-node_4 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_5 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "2" [shape=plaintext] ;
-node_5 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_6 [label="a.b_op", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "3" [shape=plaintext] ;
-node_6 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_7 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "4" [shape=plaintext] ;
-node_8 [label="a.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_8 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "5" [shape=plaintext] ;
-node_9 [label="mod x2", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_9 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "6" [shape=plaintext] ;
-node_10 [label="Cpp", style=filled, fillcolor=red] ;
+node_10 [label="Cpu", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];
@@ -51,21 +36,17 @@ node_10 [label="Cpp", style=filled, fillcolor=red] ;
 "3" -> "4" [style="invis"];
 "4" -> "5" [style="invis"];
 "5" -> "6" [style="invis"];
-node_1 -> node_4
-node_2 -> node_4
 node_1 -> node_5
-node_3 -> node_5
-node_4 -> node_5
-node_3 -> node_6
+node_2 -> node_5
 node_5 -> node_6
+node_3 -> node_7
+node_6 -> node_7
 node_3 -> node_8
-node_6 -> node_8
+node_4 -> node_8
 node_7 -> node_8
-node_3 -> node_9
-node_6 -> node_9
-node_7 -> node_9
+node_4 -> node_9
 node_8 -> node_9
-node_6 -> node_10
+node_4 -> node_10
 node_9 -> node_10
 }
 /*

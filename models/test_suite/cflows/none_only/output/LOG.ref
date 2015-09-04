@@ -23,10 +23,10 @@ ____________________________________________________________
 	 - computing causal past of each observed events (10)
 
 Stats:
- number of step   : 11275
- longest story    : 137
- average length   : 30.9821782178
- geometric mean   : 42.4273403352
+ number of step   : 11031
+ longest story    : 873
+ average length   : 340.312871287
+ geometric mean   : 421.938966071
 
 	 - causal & weak flow compression (10)
 
@@ -36,7 +36,7 @@ ____________________________________________________________
 
 
 
-+ Pretty printing 5 flows
++ Pretty printing 10 flows
 
 Simulation ended (eff.: 0.708215, detail below)
 	Valid embedding but no longer unary when required: 0.000000

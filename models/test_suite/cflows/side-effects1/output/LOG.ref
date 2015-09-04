@@ -20,6 +20,7 @@ ____________________________________________________________
 + Producing causal compressions
 	 - refining events
 	 - detecting siphons
+	 - cutting concurrent events
 	 - computing causal past of each observed events (7)
 
 Stats:
@@ -34,13 +35,11 @@ ____________________________________________________________
 ############################################################	 - detecting pseudo inverse events
 	 - computing causal past of each observed events (7)
 
-____________________________________________________________
-############################################################
 Stats:
- number of step   : 10012
+ number of step   : 20
  longest story    : 4
- average length   : 1.00804769001
- geometric mean   : 1.01992080579
+ average length   : 4.
+ geometric mean   : 4.
 
 	 - causal & weak flow compression (7)
 

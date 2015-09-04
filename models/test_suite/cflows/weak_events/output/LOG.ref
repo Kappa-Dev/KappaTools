@@ -20,13 +20,14 @@ ____________________________________________________________
 + Producing causal compressions
 	 - refining events
 	 - detecting siphons
+	 - cutting concurrent events
 	 - computing causal past of each observed events (344)
 
 Stats:
- number of step   : 2689
- longest story    : 3
- average length   : 2.66634335597
- geometric mean   : 2.70771430912
+ number of step   : 2346
+ longest story    : 1032
+ average length   : 516.667313288
+ geometric mean   : 596.259452442
 
 	 - causal & weak flow compression (344)
 
@@ -37,7 +38,7 @@ ____________________________________________________________
 ____________________________________________________________
 ############################################################
 Stats:
- number of step   : 2689
+ number of step   : 1377
  longest story    : 3
  average length   : 3.
  geometric mean   : 3.
@@ -50,7 +51,7 @@ ____________________________________________________________
 
 
 
-+ Pretty printing 2 flows
++ Pretty printing 344 flows
 
 + Pretty printing 2 weakly compressed flows
 

@@ -20,6 +20,7 @@ ____________________________________________________________
 + Producing causal compressions
 	 - refining events
 	 - detecting siphons
+	 - cutting concurrent events
 	 - computing causal past of each observed events (15050)
 
 Stats:
@@ -37,7 +38,7 @@ ____________________________________________________________
 ____________________________________________________________
 ############################################################
 Stats:
- number of step   : 45052
+ number of step   : 30102
  longest story    : 2
  average length   : 2.
  geometric mean   : 2.

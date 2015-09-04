@@ -1,20 +1,17 @@
-/* Compression of 84 causal flows obtained in average at 1.554251E+01 t.u */
-/* Compressed causal flows were: [347;515;808;818;921;937;968;1148;1258;1286;
-1312;1351;1424;1425;1532;1630;1658;1787;1850;2045;2066;2076;2142;2159;2200;
-2212;2254;2286;2295;2318;2322;2340;2369;2386;2469;2477;2584;2608;2671;2676;
-2681;2726;2733;2824;2870;2893;2902;2907;2948;3019;3056;3063;3135;3138;3162;
-3219;3255;3298;3334;3346;3347;3348;3409;3477;3494;3517;3532;3575;3583;3584;
-3621;3635;3692;3737;3748;3781;3804;3809;3826;3827;3829;3897;3921;3959] */
+/* Compression of 52 causal flows obtained in average at 1.148827E+01 t.u */
+/* Compressed causal flows were: [256;587;612;693;697;702;705;737;757;811;
+845;849;868;932;1005;1055;1098;1176;1181;1224;1247;1254;1279;1317;1343;1363;
+1431;1455;1495;1545;1577;1632;1996;2097;2147;2167;2192;2219;2321;2353;2437;
+2482;2543;2546;2589;2928;2943;3006;3169;3721;3730;3998] */
 digraph G{
  ranksep=.5 ;
 { rank = same ; "0" [shape=plaintext] ;
 node_1 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
-node_2 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
-node_3 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_2 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_3 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
 node_4 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
 node_5 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
-node_6 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
-node_16 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_6 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
 }
 { rank = same ; "1" [shape=plaintext] ;
 node_7 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
@@ -38,19 +35,13 @@ node_12 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_13 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "8" [shape=plaintext] ;
-node_14 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_14 [label="a.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "9" [shape=plaintext] ;
-node_15 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_15 [label="mod x2", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "10" [shape=plaintext] ;
-node_17 [label="a.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
-}
-{ rank = same ; "11" [shape=plaintext] ;
-node_18 [label="mod x2", shape=invhouse, style=filled, fillcolor = lightblue] ;
-}
-{ rank = same ; "12" [shape=plaintext] ;
-node_19 [label="Cpp", style=filled, fillcolor=red] ;
+node_16 [label="Cpp", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];
@@ -62,39 +53,32 @@ node_19 [label="Cpp", style=filled, fillcolor=red] ;
 "7" -> "8" [style="invis"];
 "8" -> "9" [style="invis"];
 "9" -> "10" [style="invis"];
-"10" -> "11" [style="invis"];
-"11" -> "12" [style="invis"];
 node_1 -> node_7
-node_6 -> node_7
+node_3 -> node_7
 node_1 -> node_8
-node_2 -> node_8
+node_4 -> node_8
 node_7 -> node_8
-node_2 -> node_9
+node_4 -> node_9
 node_8 -> node_9
-node_4 -> node_10
+node_6 -> node_10
 node_7 -> node_10
 node_9 -> node_10
-node_4 -> node_11
+node_6 -> node_11
 node_10 -> node_11
 node_5 -> node_12
 node_7 -> node_12
 node_11 -> node_12
 node_5 -> node_13
 node_12 -> node_13
-node_3 -> node_14
-node_7 -> node_14
+node_2 -> node_14
+node_5 -> node_14
 node_13 -> node_14
-node_3 -> node_15
+node_2 -> node_15
+node_5 -> node_15
+node_13 -> node_15
 node_14 -> node_15
-node_3 -> node_17
-node_15 -> node_17
-node_16 -> node_17
-node_3 -> node_18
-node_15 -> node_18
-node_16 -> node_18
-node_17 -> node_18
-node_15 -> node_19
-node_18 -> node_19
+node_13 -> node_16
+node_15 -> node_16
 }
 /*
 */
