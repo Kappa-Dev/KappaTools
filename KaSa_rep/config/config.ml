@@ -68,12 +68,11 @@ let agent_color_def = ref "red"
 let link_color = ref "black"
 let influence_color = ref "red"
 let influence_arrow = ref "normal" 
-   
 
-(**flow of information*)
+(**flow of information: internal; external flow*)
 let do_ODE_flow_of_information = ref false
 let do_stochastic_flow_of_information = ref false
 (*covering classes, side effects, etc.*)
 let do_site_dependencies = ref false
-(*fixpoint iteration*)
+(*fixpoint iteration in bdu structure*)
 let do_iteration_dependencies = ref false

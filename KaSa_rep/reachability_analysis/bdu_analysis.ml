@@ -113,9 +113,11 @@ let bdu_init parameter =
 let int_of_port port = port.site_state.min
 
 (************************************************************************************)    
-(*compute bdu for initial state or creation actions*)
+(*compute bdu for initial state or creation action*)
 
 (*common function of agent interface*)
+
+(*TO BE CHECKED*)
 
 let common_site_bdu parameter error agent handler bdu_init =
   Site_map_and_set.fold_map
@@ -163,7 +165,25 @@ let collect_creation parameter error viewsrhs creation store_result =
         in
         error, store_result
   ) (error, store_result) creation
-    
+
+(************************************************************************************)    
+(*getting side effect information:
+  Given a set of rule:
+  r1: A(x), C(z) -> A(x!1), C(z!1)
+  r2: A(x), B(y) -> A(x!1), B(y!1)
+  r3: A(x!_) -> A(x)
+  ================================
+  r3 is a rule that has side effect. Getting all the potential connection of r3
+  A(x!_). (They are: C(z!x.A) -> C(z); B(y!x.A) -> B(y))
+  - A(x!1), C(z!1) -> A(x), C(z) and
+  - A(x!1), B(y!1) -> A(x), B(y)
+  Put those new rules inside if they have (do the intersection) and then do the iteration 
+*)
+(*TODO*)
+
+
+
+
 (************************************************************************************)    
 (*fixpoint iteration with creation rule: round-robin algorithm.
   Ex: X_0 U r_0(X_0) U r_1(X_0) U ...

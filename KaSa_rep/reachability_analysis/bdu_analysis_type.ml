@@ -22,6 +22,7 @@ let local_trace = false
 
 module AgentMap = Quick_Nearly_inf_Imperatif
 
+(*pair of (site, state) *)
 type pair_site = (int * int) list
 
 type bdu = bool Mvbdu_sig.mvbdu
