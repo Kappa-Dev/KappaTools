@@ -2459,7 +2459,7 @@ according to the corresponding substitution *)
 	      (* If the event is selected & the according substitution taken, then mutual exclusion among the potential binding state*)
 	     List.fold_left
 	       (fun map pid -> add_state pid (Counter 0,Undefined) map) 
-	       Merged_map
+	       merged_map
 	       nlist
 	   in 
            let side_effect = 
