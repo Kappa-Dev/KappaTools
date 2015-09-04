@@ -961,12 +961,9 @@ module Cflow_linker =
     let extract_agent id soup =
       List.partition
 	(function
-	  | (PI.Free ((id',_),_) | PI.Create ((id',_),_)) -> id = id'
-	  | (PI.Bind (((id',_),_),((id'',_),_))
-	    | PI.Bind_to (((id',_),_),((id'',_),_)) ) ->
-	     (id <> id' && id <> id'') || raise ExceptionDefn.False
-	  | (PI.Remove (id',_) | PI.Mod_internal (((id',_),_),_) ) ->
-	     id <> id' || raise ExceptionDefn.False)
+	  | (PI.Create ((id',_),_) | PI.Mod_internal (((id',_),_),_) |
+	     PI.Free ((id',_),_) | PI.Bind_to (((id',_),_),_)) -> id = id'
+	  | (PI.Bind _ | PI.Remove _) -> failwith "Problematic initial event")
 	soup in
     let rec aux recur acc soup = function
       | [] -> (if soup <> [] then Init soup::acc else acc),recur
@@ -974,9 +971,15 @@ module Cflow_linker =
       | (PI.Bind _ | PI.Remove _ | PI.Bind_to _ | PI.Mod_internal _) :: t ->
 	 aux recur acc soup t
       | PI.Create ((id,_),site_list) :: t ->
-	 try
-	   let this,soup' = extract_agent id soup in
-	   let this = Init this in
+	 let this,soup' = extract_agent id soup in
+	 let standalone =
+	   List.for_all
+	     (function
+	       | (PI.Create _ | PI.Free _) -> true
+	       | (PI.Mod_internal _ |PI.Bind_to _ | PI.Bind _ | PI.Remove _) -> false)
+	     this in
+	 let this = Init this in
+	 if standalone then
 	   let map =
 	     List.fold_left
 	       (fun map -> function
@@ -991,7 +994,7 @@ module Cflow_linker =
 	       sites_with_wrong_internal_state=SiteSet.empty
 	     }
 	   in aux (AgentIdMap.add id agent_info recur) (this::acc) soup' t
-	 with ExceptionDefn.False -> aux recur acc soup t
+	 else aux recur (this::acc) soup' t
     in aux remanent step_list action_list action_list
 
   let as_init agent_info = 
