@@ -134,30 +134,35 @@ let compile_print_expr algs tokens contact_map domain ex =
 	(domain',(Ast.Alg_pexpr alg,pos)::out))
     ex (domain,[])
 
-let cflows_of_label on algs rules (label,pos) rev_effects =
+let cflows_of_label contact_map domain on algs rules (label,pos) rev_effects =
   let adds tests l x =
     (if on then Primitives.CFLOW (x,tests) else Primitives.CFLOWOFF x) :: l in
-  try
-    let rule_id = StringMap.find label rules.NamedDecls.finder in
-    let rule = snd rules.NamedDecls.decls.(rule_id) in
-    let tests = fst rule.Primitives.instantiations in
-    Array.fold_left
-      (adds tests) rev_effects rule.Primitives.connected_components
+  let mix =
+    try
+      let (_,(rule,_)) =
+	List.find (function None,_ -> false | Some (l,_),_ -> l=label) rules in
+      rule.lhs
   with Not_found ->
-    try let var = StringMap.find label algs.NamedDecls.finder in
-	match algs.NamedDecls.decls.(var) with
-	|(_,(Alg_expr.KAPPA_INSTANCE ccs,_)) ->
-	  List.fold_left (fun acc (cc,tests) -> Array.fold_left (adds tests) acc cc) rev_effects ccs
-	| (_,((Alg_expr.CONST _ | Alg_expr.BIN_ALG_OP _ | Alg_expr.TOKEN_ID _ |
-	       Alg_expr.STATE_ALG_OP _ | Alg_expr.UN_ALG_OP _ |
-	       Alg_expr.ALG_VAR _ ),_)) -> raise Not_found
+    try let (_,(var,_)) = List.find (fun ((l,_),_) -> l = label) algs in
+	match var with
+	| Ast.KAPPA_INSTANCE mix -> mix
+	| (Ast.BIN_ALG_OP _ | Ast.UN_ALG_OP _ | Ast.STATE_ALG_OP _ |
+	   Ast.OBS_VAR _ | Ast.TOKEN_ID _ | Ast.CONST _ | Ast.TMAX | Ast.EMAX |
+	   Ast.PLOTNUM ) -> raise Not_found
     with Not_found ->
       raise (ExceptionDefn.Malformed_Decl
 	       ("Label '" ^ label ^
 		  "' does not refer to a non ambiguous Kappa expression"
-	       ,pos))
+	       ,pos)) in
+  let domain',ccs =
+    Snip.connected_components_sum_of_ambiguous_mixture
+      contact_map domain ~origin:(Operator.PERT(-1)) mix in
+  (domain',
+   List.fold_left (fun x (y,t) -> Array.fold_left (adds t) x y)
+		  rev_effects ccs)
 
-let effects_of_modif algs tokens rules contact_map domain ast_list =
+let effects_of_modif
+      algs tokens rules ast_algs ast_rules contact_map domain ast_list =
   let rec iter rev_effects domain ast_list =
     let rule_effect alg_expr ast_rule mix_pos =
       let (domain',alg_pos) =
@@ -233,7 +238,8 @@ let effects_of_modif algs tokens rules contact_map domain ast_list =
 	      compile_print_expr algs tokens contact_map domain pexpr in
 	    (domain', (Primitives.STOP pexpr')::rev_effects)
 	 | CFLOWLABEL (on,lab) ->
-	    (domain, cflows_of_label on algs rules lab rev_effects)
+	    cflows_of_label
+	      contact_map domain on ast_algs ast_rules lab rev_effects
 	 | CFLOWMIX (on,(ast,_)) ->
 	    let adds tests l x =
 	      (if on then Primitives.CFLOW (x,tests)
@@ -265,7 +271,8 @@ let effects_of_modif algs tokens rules contact_map domain ast_list =
   in
   iter [] domain ast_list
 
-let pert_of_result algs algs_deps tokens rules contact_map domain res =
+let pert_of_result
+      algs algs_deps tokens rules ast_algs ast_rules contact_map domain res =
   let (domain, _, lpert, stop_times,tracking_enabled) =
     List.fold_left
       (fun (domain, p_id, lpert, stop_times, tracking_enabled)
@@ -282,7 +289,8 @@ let pert_of_result algs algs_deps tokens rules contact_map domain res =
 		,pos_pre))
        in
        let (domain, effects) =
-	 effects_of_modif algs tokens rules contact_map domain' modif_expr_list in
+	 effects_of_modif algs tokens rules ast_algs ast_rules
+			  contact_map domain' modif_expr_list in
        let domain,opt,stopping_time =
 	 match opt_post with
 	 | None -> (domain,None,stopping_time)
@@ -591,7 +599,8 @@ let initialize logger overwrite result =
     obs_of_result alg_nd tk_nd contact_map domain' result in
   Debug.tag logger "\t -perturbations" ;
   let (domain,pert,stops,tracking_enabled) =
-    pert_of_result alg_nd alg_deps' tk_nd rule_nd contact_map domain result in
+    pert_of_result alg_nd alg_deps' tk_nd rule_nd
+		   result.variables result.rules contact_map domain result in
 
   let env =
     Environment.init sigs_nd tk_nd alg_nd alg_deps' rule_nd

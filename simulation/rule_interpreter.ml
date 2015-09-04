@@ -222,6 +222,7 @@ let update_outdated_activities ~get_alg store env counter state activities =
 	     if cc_va = 0 then 0. else rate *. float_of_int cc_va in
 	   store i act activities
 	| Operator.ALG j -> aux (Environment.get_reverse_dependencies env j)
+	| Operator.PERT (-1) -> () (* TODO *)
 	| Operator.PERT _ -> assert false) deps in
   let () = aux (Environment.get_always_outdated env) in
   let () = aux state.outdated_elements in
