@@ -35,7 +35,10 @@ let print_bdu_array parameter error result =
       let _ =
         Array.iter (fun bdu ->
           let _ =
-            handler.print_mvbdu stdout "" bdu
+            fprintf stdout "-------------------------------------\n";
+            (*handler.print_mvbdu stdout "" bdu*)
+            Boolean_mvbdu.print_boolean_mvbdu error
+              (Remanent_parameters.update_prefix parameter " ") bdu
           in
           ()
         ) bdu_array        

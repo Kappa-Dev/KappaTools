@@ -18,6 +18,7 @@ open Memo_sig
 open Boolean_mvbdu
 open Printf
 open Sanity_test_sig
+open Quark_type
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "RANGE BDU") message exn
@@ -26,77 +27,78 @@ let warn parameters mh message exn default =
 let trace = false
 
 (************************************************************************************) 
+(*TYPE*)
+
+(*module Int2Set_and_map =
+  Set_and_map.Make
+    (struct 
+        type t = int * int (*var, bound*)
+        let compare = compare
+     end)*)
+
+(************************************************************************************) 
 (*Range bdu: finding which variable in BDU is not independent.
   - It is not indepenent when it has two different outgoing.
 *)
+  
 
-let branch_combine l = (*TODO*)
+(*let branch_combine l = (*TODO*)
   let rec aux acc result =
     match acc with
       | [] -> result
-      | (var,bound,new_bound) :: []  -> result
-      | (var, bound, new_bound) :: ((var', bound', new_bound') :: tl) ->
+      | (var, new_bound) :: []  -> result
+      | (var, new_bound) :: ((var', new_bound') :: tl) ->
         if var != var' 
         then
           result
         else
-          aux tl ((var', bound', new_bound') :: result)
-  in aux l []
-
-let combine_two_list l l' = (*TODO*)
-  let rec aux acc acc' (result: (int * int * int) list) =
-    match acc, acc' with
-      | [], [] | _, [] | [], _ -> result
-      | (v, b, n) :: tl, (v', b', n') :: tl' ->
-        if v != v'
-        then
-          aux tl tl' ((v', b', n') :: result)
-        else
-          result
-  in
-  aux l l' []
+          aux tl ((var', new_bound') :: result)
+  in aux l []*)
 
 let rec print l =
   match l with
     | [] -> []
-    | (var, bound, new_bound) :: tail ->
-      fprintf stdout "Range of var:%i is {bound:%i, new_bound:%i}\n" var bound new_bound;
-      print tail
+    | s :: tail ->
+      Int2Set_and_map.iter_set (fun (var, bound) ->
+        let () =
+          fprintf stdout "Range of var x%i is: %i\n" var bound;
+        in
+        ()
+      ) s; print tail
         
-let rec aux working_list =
+let rec aux parameter error working_list =
   match working_list with
-    | [] -> []
+    | [] -> (*return a list of set*) []      
     | (cell, bool, var, bound) :: tail ->
       match cell.value with
-        | Leaf _ -> aux tail
+        | Leaf _ -> aux parameter error tail
         | Node x ->
           let new_var   = x.variable    in
           let new_bound = x.upper_bound in
+          let new_branch_false = x.branch_false, false, new_var, new_bound in
+          let new_branch_true = x.branch_true, true, new_var, new_bound in
+          let new_tail = aux parameter error (new_branch_false :: new_branch_true :: tail) in
           (*we want the structure x < y *)
           match compare var new_var with
-            | a when a < 0 -> 
-              aux ((x.branch_false, false, new_var, new_bound) ::
-                      (x.branch_true, true, new_var, new_bound) :: tail)
+            | a when a < 0 -> new_tail
             | a when a > 0 -> []
             | _ ->
               if bool
               then
-                let triple = (new_var, bound, new_bound) in
-                let l = triple :: 
-                  (aux ((x.branch_false, false, new_var, new_bound) ::
-                           (x.branch_true, true, new_var, new_bound) :: tail)) in
-                l
+                []
               else
-                let triple = (new_var, bound, new_bound) in
-                let l = triple :: (aux ((x.branch_false, false, new_var, new_bound) ::
-                                           (x.branch_true, true, new_var, new_bound) :: tail)) in
+                let new_set = Int2Set_and_map.empty_set in
+                let pair = new_var, new_bound in
+                let error, add_pair = Int2Set_and_map.add_set parameter error pair new_set in
+                
+                let l = add_pair :: new_tail in
                 l
-                  
-let dependent error mvbdu =
+                    
+let dependent parameter error mvbdu =
   match mvbdu.value with
     | Leaf _ -> error, []
     | Node x ->
-      error, aux [x.branch_false, false, x.variable, x.upper_bound;
+      error, aux parameter error [x.branch_false, false, x.variable, x.upper_bound;
                  x.branch_true, true, x.variable, x.upper_bound]
 
 (************************************************************************************) 
@@ -194,7 +196,6 @@ let bdu_test remanent parameter =
     f (boolean_mvbdu_or parameter handler error parameter mvbdu1) mvbdu2
   in
   let error =    
-    (*handler.print_mvbdu stdout "" mvbdu*)
     Boolean_mvbdu.print_boolean_mvbdu error (Remanent_parameters.update_prefix parameter " ")
       mvbdu;
     fprintf stdout "---------------------------------\n";
@@ -204,7 +205,7 @@ let bdu_test remanent parameter =
     Boolean_mvbdu.print_boolean_mvbdu error (Remanent_parameters.update_prefix parameter " ")
       mvbdu2
   in
-  let error, l = dependent error mvbdu in
+  let error, l = dependent parameter error mvbdu in
   let _ = 
     fprintf stdout "---------------------------------\n";
     print l

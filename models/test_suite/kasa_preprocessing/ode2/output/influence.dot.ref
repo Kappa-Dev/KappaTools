@@ -1,0 +1,7 @@
+
+
+digraph G{ 
+node [shape=box, style=filled, fillcolor=lightskyblue];
+"r0" ; 
+"r1" ; 
+}

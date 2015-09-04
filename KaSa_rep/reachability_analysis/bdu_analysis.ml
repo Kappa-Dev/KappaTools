@@ -221,7 +221,8 @@ let empty_mixture parameter error =
 
 (*empty rule*)
 let empty_rule parameter error =
-  let error, empty_diff_views = Int_storage.Quick_Nearly_inf_Imperatif.create parameter error 0 in
+  let error, empty_diff_views =
+    Int_storage.Quick_Nearly_inf_Imperatif.create parameter error 0 in
   {
     rule_lhs     = empty_mixture parameter error;
     rule_arrow   = Ast.RAR;
@@ -231,6 +232,7 @@ let empty_rule parameter error =
     actions      = empty_actions      
   }
 
+(*----------------------------------------------------------------------------------*)
 (*wake_up_map rule_index*)
 
 let collect_wake_up_rule parameter error handler compiled map =
@@ -240,6 +242,7 @@ let collect_wake_up_rule parameter error handler compiled map =
       l
     ) map []
 
+(*----------------------------------------------------------------------------------*)
 (*push index of an array of rule into working list*)
 
 let index_rule_wl parameter error array_rule =
@@ -256,17 +259,23 @@ let index_rule_wl parameter error array_rule =
 
 (************************************************************************************)
 (*fixpoint interation with wake_up_map*)
-    
-let test_direct parameter error agent site_modif handler bdu_init =
+
+(*build bdu for test rule*)    
+let build_test parameter error agent handler bdu_init =
   let _, (handler, bdu_test) =
     common_site_bdu parameter error agent handler bdu_init
   in
-  let _, (handler, bdu_direct) =
-    common_site_bdu parameter error site_modif handler bdu_init
-  in
-  (handler, bdu_test, bdu_direct)
-  
-let get_test_direct_aux parameter error handler bdu_init rule =
+  (handler, bdu_test)
+
+(*getting a list of modified rule: var and state*)
+let get_modif_list site_modif =
+  Site_map_and_set.fold_map
+    (fun site port current_list ->
+      let state = int_of_port port in
+      (site, state) :: current_list
+    ) site_modif.agent_interface []
+
+let get_test_aux parameter error handler bdu_init rule =
   let error, init_result = AgentMap.create parameter error 0 in
   AgentMap.fold2_common parameter error
     (fun parameter error agent_id agent site_modif store_result ->
@@ -274,27 +283,32 @@ let get_test_direct_aux parameter error handler bdu_init rule =
         | Ghost -> error, store_result
         | Agent agent ->
           let agent_type = agent.agent_name in
-          let handler, bdu_test, bdu_direct =
-            test_direct parameter error agent site_modif handler bdu_init
+          let handler, bdu_test =
+            build_test parameter error agent handler bdu_init
           in
+          (*return a list of modif site*)
+          let modif_list = get_modif_list site_modif in
           (*return test and site modif of a rule*)
           AgentMap.set
             parameter
             error
             agent_type
-            (bdu_test, bdu_direct)
+            (bdu_test, modif_list)
             store_result
     ) rule.rule_lhs.views rule.diff_direct init_result
 
 let get_test_direct parameter error rule agent_type handler bdu_init =
   (*get test and bdu_direct of this rule*)
-  let error, store_test_direct = get_test_direct_aux parameter error handler bdu_init rule in
-  let error, (bdu_test, bdu_direct) =
+  let error, store_test_direct = get_test_aux parameter error handler bdu_init rule in
+  let error, (bdu_test, modif_list) =
     match AgentMap.unsafe_get parameter error agent_type store_test_direct with
-      | error, None -> error, (bdu_init, bdu_init)
-      | error, Some (bdu_test, bdu_direct) -> error, (bdu_test, bdu_direct)
+      | error, None -> error, (bdu_init, [])
+      | error, Some (bdu_test, modif_list) -> error, (bdu_test, modif_list)
   in
-  error, (bdu_test, bdu_direct)
+  error, (bdu_test, modif_list)
+
+(*----------------------------------------------------------------------------------*)
+(*it is an enable rule if the result of intersection is not empty*)
 
 let comp_is_enable parameter error handler bdu_init bdu_test bdu_iter =
   let error, handler, bdu_X = 
@@ -307,10 +321,23 @@ let comp_is_enable parameter error handler bdu_init bdu_test bdu_iter =
   else
     error, false
 
-let compute_update parameter error rule_id handler bdu_direct bdu_iter bdu_array =
+(*----------------------------------------------------------------------------------*)
+(*main computation for iteration function*)
+
+let compute_update parameter error rule_id handler bdu_test modif_list bdu_iter bdu_array =
+  (*bdu_creation intersection with test, then redefine with the list of modif*)
+  let error, handler, bdu_inter_test_creation =
+    f parameter error bdu_test
+      (boolean_mvbdu_and parameter handler error parameter bdu_test) bdu_iter
+  in
+  let error, handler, bdu_assigment =
+    f parameter error bdu_inter_test_creation
+      (redefine parameter error parameter handler bdu_inter_test_creation) modif_list
+  in
+  (*do the union of bdu_assigment and bdu_creation*)
   let error, handler, bdu_update =
-    f parameter error bdu_direct
-      (boolean_mvbdu_or parameter handler error parameter bdu_direct) bdu_iter
+    f parameter error bdu_assigment
+      (boolean_mvbdu_or parameter handler error parameter bdu_assigment) bdu_iter
   in
   let bdu_array =
     bdu_array.(rule_id) <- bdu_update;
@@ -318,7 +345,9 @@ let compute_update parameter error rule_id handler bdu_direct bdu_iter bdu_array
   in
   error, bdu_array
 
+(*----------------------------------------------------------------------------------*)
 (*common function return array for the pair of array *)
+
 let get_old_array parameter error id store_result =
   let error, old =
     match AgentMap.unsafe_get parameter error id store_result with
@@ -335,7 +364,9 @@ let get_old_handler_array parameter error id handler store_result =
   in
   error, (handler, old)
 
+(*----------------------------------------------------------------------------------*)
 (*collect a pair of array: rule array and bdu array(the result of iteration)*)
+
 let collect_pair_array parameter error 
     agent_type handler_sig 
     rule_id rule 
@@ -351,28 +382,57 @@ let collect_pair_array parameter error
     rule_array.(rule_id + 1) <- rule;
     rule_array
   in
+  (*put bdu_creation at the first element of the iteration array*)
   let bdu_array =
     bdu_array.(0) <- bdu_creation;
     bdu_array
   in
+  (*----------------------------------------------------------------------------------*)
   (*get old rule_array*)
-  let error, old_rule_array = get_old_array parameter error rule_id store_rule_array in
+  let error, old_rule_array =
+    get_old_array 
+      parameter 
+      error 
+      rule_id
+      store_rule_array
+  in
   let error, (handler, old_bdu_array) = 
-    get_old_handler_array parameter error agent_type handler store_bdu_array in
-  let new_rule_array = Array.append rule_array old_rule_array in
-  let new_bdu_array = Array.append bdu_array old_bdu_array in
+    get_old_handler_array 
+      parameter 
+      error 
+      agent_type
+      handler
+      store_bdu_array 
+  in
+  let new_rule_array = 
+    Array.append rule_array old_rule_array
+  in
+  let new_bdu_array = 
+    Array.append bdu_array old_bdu_array 
+  in
+  (*----------------------------------------------------------------------------------*)
   (*store this pair into set*)
   let error, store_rule_array =
     AgentMap.set
-      parameter error rule_id new_rule_array store_rule_array
+      parameter
+      error
+      rule_id
+      new_rule_array
+      store_rule_array
   in
   let error, store_bdu_array =
     AgentMap.set
-      parameter error agent_type (handler, new_bdu_array) store_bdu_array
+      parameter 
+      error 
+      agent_type
+      (handler, new_bdu_array)
+      store_bdu_array
   in
   error, (store_rule_array, store_bdu_array)
   
+(*----------------------------------------------------------------------------------*)
 (*add succ(h) into the tail of a working list*)
+
 let add_succ_wl parameter error rule_id succ_list wl_tl =
   let rec aux acc (error, wl) =
     match acc with
@@ -386,7 +446,9 @@ let add_succ_wl parameter error rule_id succ_list wl_tl =
   in
   aux succ_list (error, wl_tl)
 
+(*----------------------------------------------------------------------------------*)
 (*auxiliary function for fixpoint iteration function*)
+
 let fixpoint_aux parameter error 
     agent_type 
     rule 
@@ -396,37 +458,80 @@ let fixpoint_aux parameter error
         succ_list
         store_bdu_array =
   let error, (handler, bdu_array) = 
-    get_old_handler_array parameter error agent_type handler store_bdu_array in
+    get_old_handler_array
+      parameter
+      error 
+      agent_type
+      handler 
+      store_bdu_array 
+  in
   let rec aux acc_wl (error, bdu_remanent_array) =
-    (*if wl is empty then return store_bdu_array*)
+    (*if work list is empty then return bdu_remanent_array*)
     if IntWL.is_empty acc_wl
     then error, bdu_remanent_array
     else
-      (*pop the first element in wl*)
+      (*pop the first element in work list*)
       let error, (rule_id_op, wl_tl) = IntWL.pop parameter error acc_wl in
       match rule_id_op with
         | None -> error, bdu_remanent_array
         | Some rule_id ->
           (*get rule type from the array*)
           let rule = Array.get rule_array rule_id in
-          (*get bdu_test, action*)
-          let error, (bdu_test, bdu_direct) =
-            get_test_direct parameter error rule agent_type handler bdu_init
+          (*get bdu_test, and a list of action*)
+          let error, (bdu_test, modif_list) =
+            get_test_direct
+              parameter
+              error
+              rule
+              agent_type 
+              handler 
+              bdu_init
           in
+          (*build a list of type List_sig.list for modif_list*)
+          let error, (handler, list_a) =
+            List_algebra.build_list
+              (list_allocate parameter)
+              error
+              parameter
+              handler
+              modif_list
+          in
+          (*-------------------------------------------------------------------*)
           let error, iterate_array =
             Array.fold_left (fun _ bdu_iter ->
               (*is not enable*)
               let error, is_enable =
-                comp_is_enable parameter error handler bdu_init bdu_test bdu_iter 
+                comp_is_enable 
+                  parameter 
+                  error
+                  handler 
+                  bdu_init
+                  bdu_test
+                  bdu_iter 
               in
               (*call iterate function*)
               if is_enable 
               then
                 let error, bdu_update_array = 
-                  compute_update parameter error rule_id handler bdu_direct bdu_iter bdu_array
+                  compute_update 
+                    parameter
+                    error 
+                    rule_id
+                    handler 
+                    bdu_test 
+                    list_a
+                    bdu_iter
+                    bdu_array
                 in
                 (*add succ_h*)
-                let error, wl_succ_tl = add_succ_wl parameter error rule_id succ_list wl_tl in
+                let error, wl_succ_tl = 
+                  add_succ_wl 
+                    parameter
+                    error 
+                    rule_id
+                    succ_list
+                    wl_tl
+                in
                 aux wl_succ_tl (error, bdu_update_array)
               else
                 aux wl_tl (error, bdu_remanent_array)
@@ -434,6 +539,8 @@ let fixpoint_aux parameter error
           in
           error, iterate_array
   in aux wl (error, bdu_array)
+
+(*----------------------------------------------------------------------------------*)
 
 let fixpoint parameter error 
     handler_sig
@@ -456,9 +563,20 @@ let fixpoint parameter error
                 store_bdu_array
       in
       (*get rule_array to be used in the iteration*)
-      let error, old_rule_array = get_old_array parameter error rule_id store_rule_array in
+      let error, old_rule_array = 
+        get_old_array 
+          parameter 
+          error 
+          rule_id 
+          store_rule_array
+      in
       (*build an index of rule and add them into a working list*)
-      let error, wl = index_rule_wl parameter error old_rule_array in
+      let error, wl = 
+        index_rule_wl 
+          parameter
+          error
+          old_rule_array 
+      in
       (*call iteration function*)
       let error, bdu_iterate_array =
         fixpoint_aux
@@ -474,7 +592,11 @@ let fixpoint parameter error
       (*set*)
       let error, store_bdu_array =
         AgentMap.set
-          parameter error agent_type (handler, bdu_iterate_array) store_bdu_array
+          parameter
+          error 
+          agent_type 
+          (handler, bdu_iterate_array) 
+          store_bdu_array
       in
       error, (store_rule_array, store_bdu_array)
     ) store_creation store_pair_array
@@ -563,7 +685,7 @@ let scan_rule_set parameter error handler compiled map rules =
 (*MAIN*)
 
 let bdu_main parameter error handler map cc_compil =
-  let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
+  let parameter = Remanent_parameters.update_prefix parameter "" in
   let error, result = scan_rule_set parameter error handler cc_compil map cc_compil.rules in
   let _ = print_result parameter error result in
   error, result
