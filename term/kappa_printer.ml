@@ -14,7 +14,7 @@ let alg_expr ?env f alg =
     | Alg_expr.KAPPA_INSTANCE ccs ->
        Pp.list
 	 (fun f -> Format.fprintf f " +@ ")
-	 (fun f (ccs,_) ->
+	 (fun f ccs ->
 	  Pp.array
 	    (fun f -> Format.fprintf f "*")
 	    (fun _ f cc ->

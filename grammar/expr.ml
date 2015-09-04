@@ -108,7 +108,8 @@ let rec compile_alg var_map tk_map ?max_allowed_var
 	  let domain',ccs =
 	    Snip.connected_components_sum_of_ambiguous_mixture
 	    contact_map domain ?origin ast in
-	  (Some (origin,contact_map,domain'), (KAPPA_INSTANCE ccs,pos))
+	  (Some (origin,contact_map,domain'),
+	   (KAPPA_INSTANCE (List.map fst ccs),pos))
        | None ->
 	  raise (ExceptionDefn.Internal_Error
 		   ("Theoritically pure alg_expr has a misture",pos))

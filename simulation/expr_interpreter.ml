@@ -17,12 +17,10 @@ type alg_stack_element =
 
 let rec exec_alg :
 type a. Counter.t -> ?time:float -> get_alg:(int -> Alg_expr.t) ->
-     get_mix:((Connected_component.t array *
-		 Instantiation.abstract Instantiation.test list) list -> Nbr.t) ->
+     get_mix:(Connected_component.t array list -> Nbr.t) ->
      get_tok:(int -> Nbr.t) ->
      (Counter.t -> ?time:float -> get_alg:(int -> Alg_expr.t) ->
-      get_mix:((Connected_component.t array *
-		  Instantiation.abstract Instantiation.test list) list -> Nbr.t) ->
+      get_mix:(Connected_component.t array list -> Nbr.t) ->
       get_tok:(int -> Nbr.t) ->
       Nbr.t -> alg_stack_element list -> a) ->
      Alg_expr.t -> alg_stack_element list -> a =

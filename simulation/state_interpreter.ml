@@ -13,7 +13,7 @@ let initial_activity get_alg env counter graph activities =
      let cc_va =
        Rule_interpreter.value_alg
 	 counter graph ~get_alg
-	 (Alg_expr.KAPPA_INSTANCE [rule.Primitives.connected_components,[]]) in
+	 (Alg_expr.KAPPA_INSTANCE [rule.Primitives.connected_components]) in
      let act =
        if Nbr.is_zero cc_va then Nbr.zero else Nbr.mult rate cc_va in
      Random_tree.add i (Nbr.to_float act) activities)

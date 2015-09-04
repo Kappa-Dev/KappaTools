@@ -3,9 +3,7 @@ type t =
   | UN_ALG_OP of Operator.un_alg_op * t Location.annot
   | STATE_ALG_OP of Operator.state_alg_op
   | ALG_VAR of int
-  | KAPPA_INSTANCE of
-      (Connected_component.cc array *
-	Instantiation.abstract Instantiation.test list) list
+  | KAPPA_INSTANCE of Connected_component.cc array list
   | TOKEN_ID of int
   | CONST of Nbr.t
 
