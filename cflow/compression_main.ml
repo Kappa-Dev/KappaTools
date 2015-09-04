@@ -86,7 +86,7 @@ let compress logger env state log_info step_list =
                 snd (D.S.PH.B.PB.CI.Po.K.refine_step parameter handler error x))
               step_list 
           in
-	  let error,refined_event_list = 
+	  let error,refined_event_list_wo_siphon = 
 	    if 
 	      Graph_closure.ignore_flow_from_outgoing_siphon 
 	    then
@@ -109,13 +109,13 @@ let compress logger env state log_info step_list =
               let _ = 
                 List.iter 
                   (fun x -> let _ = D.S.PH.B.PB.CI.Po.K.print_refined_step parameter handler error x in ()) 
-                  refined_event_list  
+                  refined_event_list_wo_siphon  
               in Format.pp_print_flush
 		   parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel ()
           in 
           
           let refined_event_list_cut,int = 
-            if (not causal_trace_on) && Parameter.do_global_cut 
+            if (weak_compression_on || strong_compression_on)  && Parameter.do_global_cut 
             then 
               begin 
                 let _ = 
@@ -123,7 +123,7 @@ let compress logger env state log_info step_list =
                   then 
                     Debug.tag logger "\t - cutting concurrent events"
                 in 
-                let error,(refined_event_list_cut,int) = D.S.PH.B.PB.CI.Po.cut parameter handler error refined_event_list in 
+                let error,(refined_event_list_cut,int) = D.S.PH.B.PB.CI.Po.cut parameter handler error refined_event_list_wo_siphon in 
                 let _ = 
                   if debug_mode
                   then 
@@ -138,7 +138,7 @@ let compress logger env state log_info step_list =
                 refined_event_list_cut,int 
 	      end
             else 
-              refined_event_list,0 
+	      refined_event_list_wo_siphon,0 
           in 
           
           let deal_with error cut  log_info = 
@@ -171,7 +171,7 @@ let compress logger env state log_info step_list =
                   refined_event_list_without_pseudo_inverse,int_pseudo_inverse 
                 end
               else 
-                List.rev_map (fun x -> x,dummy_weak) (List.rev refined_event_list_cut),0 
+                List.rev_map (fun x -> x,dummy_weak) (List.rev refined_event_list),0 
             in 
             let () = 
               if log_step 
@@ -308,7 +308,7 @@ let compress logger env state log_info step_list =
 		  if
 		    store_uncompressed_stories || not cut
 		  then
-	            let error,event_list,result_wo_compression = D.S.translate parameter handler error blackboard_cflow event_id_list in 
+		    let error,event_list,result_wo_compression = D.S.translate parameter handler error blackboard_cflow event_id_list in 
                     let grid = D.S.PH.B.PB.CI.Po.K.build_grid (List.rev_map (fun (x,y) -> x,y,dummy_weak) (List.rev result_wo_compression)) true handler in
                     let log_info  = D.S.PH.B.PB.CI.Po.K.P.set_grid_generation  log_info in 
                     let error,graph = D.graph_of_grid parameter handler error grid in 
