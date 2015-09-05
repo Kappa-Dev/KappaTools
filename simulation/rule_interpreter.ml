@@ -199,6 +199,9 @@ let value_alg ~get_alg counter state alg =
     ~get_tok:(fun i -> state.tokens.(i))
     alg
 
+let extra_outdated_var i state =
+  {state with outdated_elements =
+		Operator.DepSet.add (Operator.ALG i) state.outdated_elements}
 let update_outdated_activities ~get_alg store env counter state activities =
   (* I don't know if this is more efficient than computing the
   transitive closure of what should be updated and then updating them

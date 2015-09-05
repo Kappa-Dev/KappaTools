@@ -48,10 +48,9 @@ C(b!3,a),B(c!3,a) -> C(a,b),B(a,c) @ 'koff'
 %var: 'AB' |A(b!1,c),B(a!1,c)|
 %var: 'BC' |B(a,c!3),C(a,b!3)|
 %var: 'AC' |A(b,c!2),C(b,a!2)|
-%var: 'Trimers' 3*('ABC')/('nA'+'nB'+'nC')
-#%obs: 'Monomers' ('A'+'B'+'C')/('nA'+'nB'+'nC')
-#%obs: 'Dimers' 2*('AB'+'BC'+'AC')/('nA'+'nB'+'nC')
-#%obs: 'Trimers' 3*('ABC')/('nA'+'nB'+'nC')
+%obs: 'Monomers' ('A'+'B'+'C')/('nA'+'nB'+'nC')
+%obs: 'Dimers' 2*('AB'+'BC'+'AC')/('nA'+'nB'+'nC')
+%obs: 'Trimers' 3*('ABC')/('nA'+'nB'+'nC')
 #%mod: [E+]=18000 do $SNAPSHOT "dotsnap"
 
 #%def: "dotSnapshots" "yes"

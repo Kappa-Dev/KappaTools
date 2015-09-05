@@ -66,14 +66,17 @@ let do_it env domain counter graph state = function
 	graph n,state)
   | Primitives.UPDATE (va,(expr,_)) ->
      let get_alg i = get_alg env state i in
-     let () =
+     begin
        match va with
        | Operator.ALG i ->
-	  state.variables_overwrite.(i) <-
-	    Some (Alg_expr.CONST (Rule_interpreter.value_alg counter graph ~get_alg expr))
+	  let () =
+	    state.variables_overwrite.(i) <-
+	      Some (Alg_expr.CONST (Rule_interpreter.value_alg
+				      counter graph ~get_alg expr)) in
+	  (false, Rule_interpreter.extra_outdated_var i graph, state)
        | (Operator.RULE _ | Operator.PERT _) ->
-	  failwith "Problematic update perturbation" in
-     (false, graph, state)
+	  failwith "Problematic update perturbation"
+     end 
   | Primitives.STOP pexpr ->
      let get_alg i = get_alg env state i in
      let file =

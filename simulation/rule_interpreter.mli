@@ -33,6 +33,7 @@ val force_rule :
 case of null_event, it computes the exact injections of the left hand
 side to do apply the rule and returns the remaining exact injections. *)
 
+val extra_outdated_var : int -> t -> t
 val update_outdated_activities :
   get_alg:(int -> Alg_expr.t) -> (int -> float -> 'a -> unit) ->
   Environment.t -> Mods.Counter.t -> t -> 'a -> t
