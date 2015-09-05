@@ -77,7 +77,7 @@ let min n1 n2 = cast_bin_op ~op_f:min ~op_i:min ~op_i64:min n1 n2
 let max n1 n2 = cast_bin_op ~op_f:max ~op_i:max ~op_i64:max n1 n2
 
 let succ n = cast_un_op ~op_f:((+.) 1.) ~op_i:succ ~op_i64:Int64.succ n
-let pred n = cast_un_op ~op_f:((-.) 1.) ~op_i:pred ~op_i64:Int64.pred n
+let pred n = cast_un_op ~op_f:(fun x -> x -. 1.) ~op_i:pred ~op_i64:Int64.pred n
 let neg n = cast_un_op ~op_f:(~-.) ~op_i:(~-) ~op_i64:Int64.neg n
 
 let to_float n =
