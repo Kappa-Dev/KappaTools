@@ -165,6 +165,13 @@ let () =
 	    exit 1
     in
 
+    let () = Kappa_files.with_marshalized
+	       (fun d -> Marshal.to_channel
+			   d (env,cc_env,counter) [Marshal.Closures]) in
+    let () = Kappa_files.with_ccFile
+	       (fun f -> Connected_component.Env.print_dot f cc_env) in
+    if !Parameter.compileModeOn then exit 0 else ();
+
     Kappa_files.setCheckFileExists() ;
 
     let () = Plot.create (Kappa_files.get_data ()) in
@@ -174,37 +181,9 @@ let () =
 	  env
 	  (State_interpreter.observables_values env counter graph new_state) in
 
-    let () = Kappa_files.with_marshalized
-	       (fun d -> Marshal.to_channel
-			   d (env,cc_env,counter) [Marshal.Closures]) in
-  let () = Kappa_files.with_ccFile
-	     (fun f -> Connected_component.Env.print_dot f cc_env) in
-
 (*    Kappa_files.with_influence
       (fun d -> State.dot_of_influence_map d state env); *)
-    if !Parameter.compileModeOn then exit 0 else ();
 
-(*    let profiling = Compression_main.init_secret_log_info () in
-    let _grid,profiling,event_list =
-      if Environment.tracking_enabled env then
-	let () =
-	  if !Parameter.mazCompression
-	     || !Parameter.weakCompression
-	     || !Parameter.strongCompression then ()
-	  else (
-	    ExceptionDefn.warning
-	      (fun f ->
-	       Format.pp_print_string
-		 f "Causal flow compution is required but no compression is specified, will output flows with no compresion");
-	    Parameter.mazCompression := true)
-	in
-	let grid = Causal.empty_grid() in
-        let event_list = [] in
-        let profiling,event_list =
-          Compression_main.secret_store_init profiling state event_list in
-        grid,profiling,event_list
-      else (Causal.empty_grid(),profiling,[])
-    in *)
     ExceptionDefn.flush_warning Format.err_formatter ;
     Parameter.initSimTime () ;
     let () =
@@ -220,16 +199,11 @@ let () =
 	       msg in
 	   let () = close_desc (Some env) in
 	   (*closes all other opened descriptors*)
-	   if !Parameter.batchmode
-	   then raise (ExceptionDefn.UserInterrupted f)
-	   else
+	   if not !Parameter.batchmode then
 	     match String.lowercase (Tools.read_input ()) with
 	     | ("y" | "yes") ->
-		let () =
-		  Kappa_files.with_dump
-		    (fun f -> Rule_interpreter.print env f graph) in
-		Parameter.debugModeOn:=true;
-	     (*State.dump state counter env*)
+		Kappa_files.with_dump
+		  (fun f -> Rule_interpreter.print env f graph)
 	     | _ -> ()
 	 end in
     Format.printf "Simulation ended";
@@ -261,8 +235,6 @@ let () =
 			      ((float_of_int n) /. (float_of_int (Counter.null_event counter)))
 	 |_ -> Format.printf "\tna@."
 	) counter.Counter.stat_null ;
-(*      if !Parameter.fluxModeOn then
-	Kappa_files.with_flux "" (fun d -> State.dot_of_flux d state env)*)
   with
   | ExceptionDefn.Malformed_Decl er ->
      let () = close_desc None in
