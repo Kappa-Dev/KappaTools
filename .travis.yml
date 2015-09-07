@@ -16,13 +16,18 @@ matrix:
   include:
   - env: CHECKED=js
   - env: CHECKED=native
-    addons.apt.packages: gnuplot-nox graphviz texlive-latex-recommended tex4ht
+    addons:
+      apt:
+        packages:
+          - gnuplot-nox
+          - graphviz
+          - texlive-latex-recommended
+          - tex4ht
 
 install:
   - opam init -a git://github.com/ocaml/opam-repository && eval $(opam config env)
   - opam install ocamlfind
   - sh -c "if [ '$CHECKED' = js ] ; then opam install -y reactiveData tyxml js_of_ocaml ; fi"
-  - sh -c "if [ '$CHECKED' = native ] ; then sudo apt-get install -qq gnuplot-nox graphviz texlive-latex-recommended tex4ht ; fi"
 
 script:
   - make all
