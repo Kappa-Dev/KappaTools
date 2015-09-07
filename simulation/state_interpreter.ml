@@ -169,7 +169,7 @@ let one_rule env domain counter graph state =
   let rule = Environment.get_rule env rule_id in
   let () =
     if !Parameter.debugModeOn then
-      Format.printf "@[<v>Applied@ @[%a@]@]@."
+      Format.printf "@[<v>@[Applied@ %i:@]@ @[%a@]@]@." rule_id
 		    (Kappa_printer.elementary_rule ~env) rule in
   let get_alg i = get_alg env state i in
   (* let () = *)

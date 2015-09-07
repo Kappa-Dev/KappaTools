@@ -947,37 +947,38 @@ module Matching = struct
     let rec aux cache (obs,rev_deps as acc) = function
       | [] -> acc
       | (point,inj_point2graph) :: remains ->
-	 let acc' =
-	   match point.is_obs_of with
-	   | None -> acc
-	   | Some ndeps ->
-	      match find_root point.content with
-	      | None -> assert false
-	      | Some (_,root) ->
-		 ((point.content,Renaming.apply inj_point2graph root) :: obs,
-		  Operator.DepSet.union rev_deps ndeps) in
-	 let remains',cache' =
-	   List.fold_left
-	     (fun (re,ca as acc) son ->
-	      match injection_for_one_more_edge inj_point2graph graph son.next with
-	      | None -> acc
-	      | Some inj' ->
-		 if IntSet.mem son.dst cache then acc
-		 else
+	 let concrete_root =
+	   match find_root point.content with
+	   | None -> assert false
+	   | Some (_,root) -> Renaming.apply inj_point2graph root in
+	 if Int2Set.mem (point.content.id,concrete_root) cache
+	 then aux cache acc remains
+	 else
+	   let acc' =
+	     match point.is_obs_of with
+	     | None -> acc
+	     | Some ndeps ->
+		((point.content,concrete_root) :: obs,
+		 Operator.DepSet.union rev_deps ndeps) in
+	   let remains' =
+	     List.fold_left
+	       (fun re son ->
+		match injection_for_one_more_edge inj_point2graph graph son.next with
+		| None -> re
+		| Some inj' ->
 		   let p' = Env.get domain son.dst in
-		   (List.fold_left
-		      (fun remains renaming ->
-		       (p',Renaming.compose renaming inj')::remains) re son.inj),
-		    IntSet.add son.dst ca)
-	     (remains,cache) point.sons in
-	 aux cache' acc' remains' in
+		   List.fold_left
+		     (fun remains renaming ->
+		      (p',Renaming.compose renaming inj')::remains) re son.inj)
+	       remains point.sons in
+	   aux (Int2Set.add (point.content.id,concrete_root) cache) acc' remains' in
     if List.for_all (check_edge graph) edges then
       match Env.navigate domain edges with
       | None -> ([],Operator.DepSet.empty)
-      | Some (cc_id,injs,point) ->
+      | Some (_,injs,point) ->
 	 List.fold_left
 	   (fun out inj ->
-	    aux (IntSet.add cc_id IntSet.empty) out [(point,inj)])
+	    aux (Int2Set.empty) out [(point,inj)])
 	   ([],Operator.DepSet.empty) injs
     else ([],Operator.DepSet.empty)
 
