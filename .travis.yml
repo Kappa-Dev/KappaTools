@@ -18,7 +18,11 @@ matrix:
   - env: CHECKED=native
     addons:
       apt:
+        sources:
+          - avsm
         packages:
+          - ocaml-nox
+          - opam
           - gnuplot-nox
           - graphviz
           - texlive-latex-recommended
