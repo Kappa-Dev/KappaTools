@@ -945,7 +945,7 @@ module Matching = struct
 (*edges: list of concrete edges, returns the roots of observables that are above in the domain*)
   let from_edge domain graph edges =
     let rec aux cache (obs,rev_deps as acc) = function
-      | [] -> acc
+      | [] -> cache,acc
       | (point,inj_point2graph) :: remains ->
 	 let concrete_root =
 	   match find_root point.content with
@@ -976,10 +976,10 @@ module Matching = struct
       match Env.navigate domain edges with
       | None -> ([],Operator.DepSet.empty)
       | Some (_,injs,point) ->
-	 List.fold_left
-	   (fun out inj ->
-	    aux (Int2Set.empty) out [(point,inj)])
-	   ([],Operator.DepSet.empty) injs
+	 snd @@
+	   List.fold_left
+	     (fun (cache,out) inj -> aux cache out [(point,inj)])
+	     (Mods.Int2Set.empty,([],Operator.DepSet.empty)) injs
     else ([],Operator.DepSet.empty)
 
   let observables_from_free domain graph ty node_id site =
