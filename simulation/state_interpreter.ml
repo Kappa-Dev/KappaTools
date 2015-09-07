@@ -3,6 +3,7 @@ type t = {
   perturbations_alive : bool array;
   activities : Random_tree.tree;
   variables_overwrite: Alg_expr.t option array;
+  flux: (string * float array array) list;
 }
 
 let initial_activity get_alg env counter graph activities =
@@ -34,6 +35,7 @@ let initial env counter graph stopping_times =
     activities = activity_tree;
     variables_overwrite =
       Array.make (Environment.nb_algs env) None;
+    flux = [];
 }
 
 let get_alg env state i =
@@ -76,7 +78,7 @@ let do_it env domain counter graph state = function
 	  (false, Rule_interpreter.extra_outdated_var i graph, state)
        | (Operator.RULE _ | Operator.PERT _) ->
 	  failwith "Problematic update perturbation"
-     end 
+     end
   | Primitives.STOP pexpr ->
      let get_alg i = get_alg env state i in
      let file =
@@ -128,8 +130,36 @@ let do_it env domain counter graph state = function
       state)
   | Primitives.CFLOWOFF cc ->
      (false, Rule_interpreter.remove_tracked cc graph, state)
-  | Primitives.FLUX _ -> (false, graph, state)
-  | Primitives.FLUXOFF _ -> (false, graph, state)
+  | Primitives.FLUX s ->
+     let get_alg i = get_alg env state i in
+     let file =
+       Format.asprintf
+	 "@[<h>%a@]"
+	 (Kappa_printer.print_expr_val
+	    ~env (fun ?env ->
+		  Rule_interpreter.value_alg counter graph ~get_alg)) s in
+     let size = Environment.nb_rules env in
+     let () =
+       if List.exists (fun (x,_) -> x = file) state.flux
+       then ExceptionDefn.warning
+	      (fun f ->
+	       Format.fprintf
+		 f "At t=%f, e=%i: tracking FLUX into \"%s\" was already on"
+		 (Mods.Counter.time counter) (Mods.Counter.event counter) file)
+     in
+     let el = file,Array.make_matrix size size 0. in
+     (false, graph, {state with flux = el::state.flux})
+  | Primitives.FLUXOFF s ->
+     let get_alg i = get_alg env state i in
+     let file =
+       Format.asprintf
+	 "@[<h>%a@]"
+	 (Kappa_printer.print_expr_val
+	    ~env (fun ?env ->
+		  Rule_interpreter.value_alg counter graph ~get_alg)) s in
+     let (these,others) = List.partition (fun (x,_) -> x = file) state.flux in
+     let () = List.iter (Outputs.dot_of_flux env) these in
+     (false, graph, {state with flux = others})
 
 let perturbate env domain counter graph state =
   let not_done_yet =
@@ -166,6 +196,14 @@ let perturbate env domain counter graph state =
 
 let one_rule env domain counter graph state =
   let rule_id,_ = Random_tree.random state.activities in
+  let register_new_activity rd_id new_act tree =
+    let () =
+      if state.flux <> [] then
+	let old_act = Random_tree.find rd_id state.activities in
+	List.iter (fun (_,flux) ->
+		   flux.(rule_id).(rd_id) <-
+		     flux.(rule_id).(rd_id) +. (new_act -. old_act)) state.flux
+    in Random_tree.add rd_id new_act tree in
   let rule = Environment.get_rule env rule_id in
   let () =
     if !Parameter.debugModeOn then
@@ -180,7 +218,7 @@ let one_rule env domain counter graph state =
   | Some graph' ->
      let graph'' =
        Rule_interpreter.update_outdated_activities
-	 ~get_alg Random_tree.add env counter graph' state.activities in
+	 ~get_alg register_new_activity  env counter graph' state.activities in
      let () =
        if !Parameter.debugModeOn then
 	 Format.printf "@[<v>Obtained@ %a@]@."
@@ -243,12 +281,23 @@ let loop_cps form hook return env domain counter graph state =
 	Plot.fill form counter env 0.0
 		  (observables_values env counter graph' state') in
       let (_,_,_) = perturbate env domain counter graph' state' in
-      return form env counter graph
+      return form env counter graph state
     else
       hook (fun () -> iter graph' state')
   in iter graph state
 
-let finalize form env counter graph =
+let finalize form env counter graph state =
+  let () =
+    List.iter
+      (fun (file,fluxs as e) ->
+       let () =
+	 ExceptionDefn.warning
+	   (fun f ->
+	    Format.fprintf
+	      f "Tracking FLUX into \"%s\" was not stopped before end of simulation"
+	      file) in
+       Outputs.dot_of_flux env e) state.flux in
+  let () = ExceptionDefn.flush_warning form in
   let () = Rule_interpreter.generate_stories form env graph in
   Plot.close form counter
 
