@@ -31,6 +31,7 @@ let deprecated ~pos entry msg =
 
 let flush_warning f =
   let l = List.rev !warning_buffer in
+  let () = warning_buffer := [] in
   List.iter (fun (pos,msg) ->
 	     let pr f () = Format.fprintf f "Warning: @[%t@]" msg in
 	     match pos with
