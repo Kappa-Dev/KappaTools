@@ -364,7 +364,8 @@ let tick_stories f n_stories (init,last,counter) =
       aux (n-1)
   in
   let () = aux n in
-  let _ =  Format.pp_print_flush f () in
+  let () =  Format.pp_print_flush f () in
+  let () = if counter = n_stories then Format.pp_print_newline f () in
   (true,counter,counter+1)
 
 type 'a simulation_info = (* type of data to be given with obersables for story compression (such as date when the obs is triggered*)

@@ -64,7 +64,6 @@ let compress logger env state log_info step_list =
        && (not strong_compression_on)
     then [],[],[],[]
     else
-      let () = Format.pp_print_newline logger () in
       begin (* causal compression *)
         let parameter = D.S.PH.B.PB.CI.Po.K.H.set_compression_none parameter in
         if D.S.PH.B.PB.CI.Po.K.no_obs_found step_list
@@ -396,7 +395,6 @@ let compress logger env state log_info step_list =
               0 
               weakly_compressed_story_array
           in 
-          let _ = print_newline () in 
           let _ = print_newline () in 
           let _ = 
             match 

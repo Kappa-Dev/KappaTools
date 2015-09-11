@@ -44,9 +44,7 @@ ____________________________________________________________
 ____________________________________________________________
 ############################################################
 + Pretty printing 13 weakly compressed flows
-
 + Pretty printing 1 strongly compressed flow
-
 Simulation ended (eff.: 0.725389, detail below)
 	Valid embedding but no longer unary when required: 0.000000
 	Valid embedding but not binary when required: 0.000000

@@ -18,11 +18,8 @@ done
 ____________________________________________________________
 ############################################################
 + No causal flow found
-
 + Pretty printing 0 flow
-
 + Pretty printing 0 weakly compressed flow
-
 Simulation ended (eff.: 0.510204, detail below)
 	Valid embedding but no longer unary when required: 0.000000
 	Valid embedding but not binary when required: 0.000000

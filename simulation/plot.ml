@@ -28,14 +28,15 @@ let value width =
      | Svg s -> Pp_svg.to_string ~width s
 
 let close form counter =
+  let n = ref (!Parameter.progressBarSize - counter.Counter.ticks) in
+  let () = while !n > 0 do
+	     Format.fprintf form "%c" !Parameter.progressBarSymbol ;
+	     n := !n-1
+	   done in
+  let () = Format.pp_print_newline form () in
   match !plotDescr with
   | Wait _ -> ()
   | Ready plot ->
-     let n = ref (!Parameter.progressBarSize - counter.Counter.ticks) in
-     let () = while !n > 0 do
-		Format.fprintf form "%c" !Parameter.progressBarSymbol ;
-		n := !n-1
-	      done in
      match plot.format with
      | Raw plot ->  close_out plot.desc
      | Svg s -> Pp_svg.to_file s

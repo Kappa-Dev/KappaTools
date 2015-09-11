@@ -23,7 +23,6 @@ ____________________________________________________________
 	 - cutting concurrent events
 	 - detecting pseudo inverse events
 	 - computing causal past of each observed events (11)
-
 Stats:
  number of step   : 99
  longest story    : 57
@@ -42,9 +41,7 @@ ____________________________________________________________
 ____________________________________________________________
 ############################################################
 + Pretty printing 5 weakly compressed flows
-
 + Pretty printing 1 strongly compressed flow
-
 Simulation ended (eff.: 0.746269, detail below)
 	Valid embedding but no longer unary when required: 0.000000
 	Valid embedding but not binary when required: 0.000000

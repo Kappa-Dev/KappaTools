@@ -16,13 +16,12 @@ done
 	 -Counting initial local patterns...
 	 Done
 ____________________________________________________________
-#######################################################
+############################################################
 + Producing causal compressions
 	 - refining events
 	 - detecting siphons
 	 - cutting concurrent events
 	 - computing causal past of each observed events (10)
-
 Stats:
  number of step   : 721
  longest story    : 622
@@ -32,9 +31,9 @@ Stats:
 	 - causal & weak flow compression (10)
 
 ____________________________________________________________
-############################################################	 - detecting pseudo inverse events
+############################################################
+	 - detecting pseudo inverse events
 	 - computing causal past of each observed events (10)
-
 Stats:
  number of step   : 81
  longest story    : 22
@@ -53,11 +52,8 @@ ____________________________________________________________
 ____________________________________________________________
 ############################################################
 + Pretty printing 6 flows
-
 + Pretty printing 1 weakly compressed flow
-
 + Pretty printing 1 strongly compressed flow
-
 Simulation ended (eff.: 0.815085, detail below)
 	Valid embedding but no longer unary when required: 0.000000
 	Valid embedding but not binary when required: 0.000000

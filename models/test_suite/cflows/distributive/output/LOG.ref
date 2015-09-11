@@ -22,7 +22,6 @@ ____________________________________________________________
 	 - detecting siphons
 	 - cutting concurrent events
 	 - computing causal past of each observed events (106)
-
 Stats:
  number of step   : 1127
  longest story    : 464
@@ -32,7 +31,8 @@ Stats:
 	 - causal & weak flow compression (106)
 
 ____________________________________________________________
-############################################################	 - detecting pseudo inverse events
+############################################################
+	 - detecting pseudo inverse events
 	 - computing causal past of each observed events (106)
 
 ____________________________________________________________
@@ -55,11 +55,8 @@ ____________________________________________________________
 ____________________________________________________________
 ############################################################
 + Pretty printing 106 flows
-
 + Pretty printing 1 weakly compressed flow
-
 + Pretty printing 1 strongly compressed flow
-
 Simulation ended (eff.: 0.690131, detail below)
 	Valid embedding but no longer unary when required: 0.000000
 	Valid embedding but not binary when required: 0.000000

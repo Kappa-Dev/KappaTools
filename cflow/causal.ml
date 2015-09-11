@@ -532,10 +532,10 @@ let pretty_print err_fmt config_closure compression_type
   let n = List.length story_list in
   let () =
     if compression_type = "" then
-      Format.fprintf err_fmt "@.+ Pretty printing %d flow%s@."
+      Format.fprintf err_fmt "+ Pretty printing %d flow%s@."
 		     n (if n>1 then "s" else "")
     else
-      Format.fprintf err_fmt "@.+ Pretty printing %d %scompressed flow%s@."
+      Format.fprintf err_fmt "+ Pretty printing %d %scompressed flow%s@."
 		     n label (if n>1 then "s" else "")
   in
   let compression_type =
@@ -603,8 +603,7 @@ let print_stat f parameter handler enriched_grid =
         (length_sum+cc) (length_square_sum+cc*cc) in
   let n_step,longest_story,n_nonempty,length_sum,length_square_sum =
     aux 0 0 0 0 0 0 in
-  let () = Format.fprintf f "@[<v>@," in
-  let () = Format.fprintf f  "Stats:@," in
+  let () = Format.fprintf f  "@[<v>Stats:@," in
   let () = Format.fprintf f " number of step   : %i@," n_step in
 (*  let () = Format.fprintf f " number of stories: %i@," n_nonempty in *)
   let () = Format.fprintf f " longest story    : %i@," longest_story in

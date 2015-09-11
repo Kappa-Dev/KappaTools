@@ -230,10 +230,9 @@ let () =
 	 end
       | ExceptionDefn.Deadlock ->
 	 Format.printf
-	   "?@.A deadlock was reached after %d events and %Es (Activity = %.5f)"
+	   "?@.A deadlock was reached after %d events and %Es (Activity = %.5f)@."
 	   (Counter.event counter) (Counter.time counter)
 	   (State.total_activity state) in
-    Format.print_newline() ;
     Format.printf "Simulation ended";
     if Counter.null_event counter = 0 then Format.print_newline()
     else

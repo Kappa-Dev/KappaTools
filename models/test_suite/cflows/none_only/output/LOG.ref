@@ -21,7 +21,6 @@ ____________________________________________________________
 	 - refining events
 	 - detecting siphons
 	 - computing causal past of each observed events (10)
-
 Stats:
  number of step   : 11031
  longest story    : 873
@@ -35,9 +34,7 @@ ____________________________________________________________
 
 
 
-
 + Pretty printing 10 flows
-
 Simulation ended (eff.: 0.708215, detail below)
 	Valid embedding but no longer unary when required: 0.000000
 	Valid embedding but not binary when required: 0.000000
