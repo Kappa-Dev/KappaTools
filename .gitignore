@@ -38,6 +38,7 @@ models/test_suite/*/*/output/*.diff
 models/test_suite/*/*/output/*.dot
 models/test_suite/*/*/output/*.dat
 models/test_suite/*/*/output/data.out
+models/test_suite/*/*/output/data.svg
 models/test_suite/*/*/output/LOG
 models/test_suite/*/*/output/example
 models/test_suite/*/*/output/error.log
