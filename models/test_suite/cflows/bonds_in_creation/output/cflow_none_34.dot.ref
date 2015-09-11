@@ -1,11 +1,12 @@
-/* Compression of 1 causal flows obtained in average at 3.390475E+01 t.u */
-/* Compressed causal flows were: [33] */
+/* Compression of 1 causal flows obtained in average at 3.901947E+01 t.u */
+/* Compressed causal flows were: [38] */
 digraph G{
  ranksep=.5 ;
 { rank = same ; "0" [shape=plaintext] ;
 node_54 [label="C", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_57 [label="C", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_60 [label="C", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_63 [label="C", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "1" [shape=plaintext] ;
 node_9 [label="Signal", shape=invhouse, style=filled, fillcolor = lightblue] ;
@@ -97,7 +98,13 @@ node_61 [label="S.L.Z", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_62 [label="S..L..Z", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "20" [shape=plaintext] ;
-node_63 [label="L/*1*/(z)", style=filled, fillcolor=red] ;
+node_64 [label="S.L.Z", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "21" [shape=plaintext] ;
+node_65 [label="S..L..Z", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "22" [shape=plaintext] ;
+node_66 [label="L/*1*/(z)", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];
@@ -119,6 +126,8 @@ node_63 [label="L/*1*/(z)", style=filled, fillcolor=red] ;
 "17" -> "18" [style="invis"];
 "18" -> "19" [style="invis"];
 "19" -> "20" [style="invis"];
+"20" -> "21" [style="invis"];
+"21" -> "22" [style="invis"];
 node_10 -> node_11
 node_9 -> node_12
 node_9 -> node_13
@@ -210,8 +219,14 @@ node_59 -> node_61
 node_60 -> node_61
 node_60 -> node_62
 node_61 -> node_62
-node_60 -> node_63
-node_62 -> node_63
+node_44 -> node_64
+node_53 -> node_64
+node_62 -> node_64
+node_63 -> node_64
+node_63 -> node_65
+node_64 -> node_65
+node_63 -> node_66
+node_65 -> node_66
 node_45 -> node_44 [style=dotted, arrowhead = tee]
 }
 /*
