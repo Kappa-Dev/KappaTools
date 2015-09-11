@@ -30,7 +30,6 @@ let deprecated ~pos entry msg =
   warning ~pos (fun f -> Format.fprintf f "Deprecated %s syntax:@ %t" entry msg)
 
 let flush_warning f =
-  let () = Format.pp_print_newline f () in
   let l = List.rev !warning_buffer in
   List.iter (fun (pos,msg) ->
 	     let pr f () = Format.fprintf f "Warning: @[%t@]" msg in

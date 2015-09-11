@@ -287,9 +287,10 @@ let loop_cps form hook return env domain counter graph state =
   in iter graph state
 
 let finalize form env counter graph state =
+  let () = Plot.close form counter in
   let () =
     List.iter
-      (fun (file,fluxs as e) ->
+      (fun (file,_ as e) ->
        let () =
 	 ExceptionDefn.warning
 	   (fun f ->
@@ -298,8 +299,7 @@ let finalize form env counter graph state =
 	      file) in
        Outputs.dot_of_flux env e) state.flux in
   let () = ExceptionDefn.flush_warning form in
-  let () = Rule_interpreter.generate_stories form env graph in
-  Plot.close form counter
+  Rule_interpreter.generate_stories form env graph
 
 let go f = f ()
 

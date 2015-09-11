@@ -161,7 +161,7 @@ let () =
 	 | _exn ->
 	    Debug.tag
 	      Format.std_formatter
-	      "!Simulation package seems to have been created with a different version of KaSim, aborting...";
+	      "!Simulation package seems to have been created with a different version of KaSim, aborting...@.";
 	    exit 1
     in
 
