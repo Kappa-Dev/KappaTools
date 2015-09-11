@@ -1,37 +1,47 @@
-/* Compression of 11 causal flows obtained in average at 1.216270E+01 t.u */
-/* Compressed causal flows were: [352;895;1136;1494;1549;1584;2157;2366;2420;
-2650;3548] */
+/* Compression of 46 causal flows obtained in average at 1.272578E+01 t.u */
+/* Compressed causal flows were: [438;551;635;638;647;869;877;883;917;923;
+995;1002;1133;1420;1434;1471;1531;1533;1535;1559;1572;1581;1607;1697;1767;
+1889;1903;1951;1962;1984;2414;2457;2555;2580;2842;2843;2892;2945;3081;3220;
+3259;3268;3278;3415;3633;3847] */
 digraph G{
  ranksep=.5 ;
 { rank = same ; "0" [shape=plaintext] ;
-node_1 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
-node_2 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
-node_3 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
-node_4 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_1 [label="Intro A, B", shape=house, style=filled, fillcolor=green] ;
+node_2 [label="Intro A, B", shape=house, style=filled, fillcolor=green] ;
+node_3 [label="Intro A, B", shape=house, style=filled, fillcolor=green] ;
+node_4 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
 node_5 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
 node_6 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
 }
 { rank = same ; "1" [shape=plaintext] ;
 node_7 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_8 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "2" [shape=plaintext] ;
-node_9 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_11 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_12 [label="a.b_op", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_8 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "3" [shape=plaintext] ;
-node_10 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_13 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_9 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "4" [shape=plaintext] ;
-node_14 [label="a.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_10 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "5" [shape=plaintext] ;
-node_15 [label="mod x2", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_11 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "6" [shape=plaintext] ;
-node_16 [label="Cpp", style=filled, fillcolor=red] ;
+node_12 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "7" [shape=plaintext] ;
+node_13 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "8" [shape=plaintext] ;
+node_14 [label="a.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "9" [shape=plaintext] ;
+node_15 [label="mod x2", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "10" [shape=plaintext] ;
+node_16 [label="C/*3*/(x1~p?, x2~p?)", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];
@@ -39,32 +49,42 @@ node_16 [label="Cpp", style=filled, fillcolor=red] ;
 "3" -> "4" [style="invis"];
 "4" -> "5" [style="invis"];
 "5" -> "6" [style="invis"];
-node_2 -> node_7
+"6" -> "7" [style="invis"];
+"7" -> "8" [style="invis"];
+"8" -> "9" [style="invis"];
+"9" -> "10" [style="invis"];
+node_1 -> node_7
 node_3 -> node_7
 node_1 -> node_8
-node_4 -> node_8
-node_3 -> node_9
-node_6 -> node_9
-node_7 -> node_9
-node_6 -> node_10
+node_5 -> node_8
+node_7 -> node_8
+node_1 -> node_9
+node_5 -> node_9
+node_8 -> node_9
+node_1 -> node_10
+node_4 -> node_10
+node_7 -> node_10
 node_9 -> node_10
 node_1 -> node_11
-node_5 -> node_11
-node_8 -> node_11
+node_4 -> node_11
+node_10 -> node_11
+node_1 -> node_12
+node_6 -> node_12
 node_7 -> node_12
-node_5 -> node_13
-node_11 -> node_13
-node_5 -> node_14
-node_10 -> node_14
-node_12 -> node_14
+node_11 -> node_12
+node_1 -> node_13
+node_6 -> node_13
+node_12 -> node_13
+node_2 -> node_14
+node_6 -> node_14
 node_13 -> node_14
-node_5 -> node_15
-node_12 -> node_15
+node_2 -> node_15
+node_6 -> node_15
 node_13 -> node_15
 node_14 -> node_15
+node_6 -> node_16
 node_13 -> node_16
 node_15 -> node_16
-node_12 -> node_9 [style=dotted, arrowhead = tee]
 }
 /*
 */
