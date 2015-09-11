@@ -1,48 +1,24 @@
-open Mods
-
 type t = {
   signatures : Signature.s;
   tokens : unit NamedDecls.t;
   algs : (Alg_expr.t Location.annot) NamedDecls.t;
   observables : Alg_expr.t Location.annot array;
-  rules : Primitives.elementary_rule NamedDecls.t;
+  rules  :Primitives.elementary_rule NamedDecls.t;
+  unary_rules : Alg_expr.t Mods.IntMap.t;
   perturbations : Primitives.perturbation array;
   need_update_each_loop : Operator.DepSet.t;
   reverse_dependencies : Operator.DepSet.t array;
   desc_table : (string,out_channel * Format.formatter) Hashtbl.t;
-
-  (* legacy *)
-  num_of_unary_rule : int StringMap.t ;
-  unary_rule_of_num : string IntMap.t ;
-  tracking_enabled : bool ;
-  active_cflows : int ;
-  track : IntSet.t ;
 }
 
-let empty =
-  {signatures = Signature.create [] ;
-   tokens = NamedDecls.create [||];
-   rules = NamedDecls.create [||] ;
-   algs = NamedDecls.create [||];
-   observables = [||];
-   perturbations = [||];
-   need_update_each_loop =  Operator.DepSet.empty;
-   reverse_dependencies = [||];
-   desc_table = Hashtbl.create 2;
+let init sigs tokens algs (deps_in_t,deps_in_e,rd) rules urules obs perts =
+  { signatures = sigs; tokens = tokens;
+    rules = rules; unary_rules = urules; algs = algs; observables = obs;
+    perturbations = perts; reverse_dependencies = rd;
+    need_update_each_loop = Operator.DepSet.union deps_in_t deps_in_e;
 
-   (*legacy *)
-   num_of_unary_rule = StringMap.empty ;
-   unary_rule_of_num = IntMap.empty ;
-   tracking_enabled = false ;
-   active_cflows = 0 ;
-   track = IntSet.empty ;
-}
-
-let init sigs tokens algs (deps_in_t,deps_in_e,rd) rules obs perts =
-  { empty with signatures = sigs; tokens = tokens;
-	       rules = rules; algs = algs; observables = obs;
-	       perturbations = perts; reverse_dependencies = rd;
-	       need_update_each_loop = Operator.DepSet.union deps_in_t deps_in_e; }
+    desc_table = Hashtbl.create 2;
+  }
 
 let signatures env = env.signatures
 
@@ -57,14 +33,6 @@ let close_desc env =
 	Hashtbl.iter (fun _file (d_chan,d) ->
 		      let () = Format.pp_print_newline d () in
 		      close_out d_chan) env.desc_table
-
-let tracking_enabled env = env.tracking_enabled
-let inc_active_cflows env = {env with active_cflows = env.active_cflows + 1}
-let dec_active_cflows env = {env with active_cflows = env.active_cflows - 1}
-let active_cflows env = env.active_cflows
-let track id env = {env with track = IntSet.add id env.track}
-let untrack id env = {env with track = IntSet.remove id env.track}
-let is_tracked id env = IntSet.mem id env.track
 
 let num_of_agent nme env =
   Signature.num_of_agent nme env.signatures

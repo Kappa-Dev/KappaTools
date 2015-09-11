@@ -28,12 +28,29 @@ let name_and_purify_rule (id,acc) (label_opt,(r,r_pos)) =
        ((Location.dummy_annot rate_var,k)::acc',
 	Some (Location.dummy_annot (Ast.OBS_VAR rate_var)))
     | (Some _ | None) -> (acc',r.k_op) in
-  let () = match r.k_un with
-    | None -> ()
-    | Some ((_,pos),_) ->
-       raise (ExceptionDefn.Internal_Error
-		("KaSim does not deal with unary rule yet",pos))in
-  (id',acc''),(label_pos, ({r with k_def = k_def; k_op = k_op},r_pos))
+  let acc''',k_un = match r.k_un with
+    | None -> (acc'',r.k_un)
+    | Some (k,k_op_op) ->
+       let acc_un,k' =
+	 if Expr.ast_alg_has_mix k then
+	   let rate_var = label^"_un_rate" in
+	   ((Location.dummy_annot rate_var,k)::acc'',
+	    Location.dummy_annot (Ast.OBS_VAR rate_var))
+	 else (acc'',k) in
+       let acc_un',k_op' =
+	 match k_op_op,r.k_op with
+	 | Some k_op, Some _ when Expr.ast_alg_has_mix k_op ->
+	    let rate_var = (Ast.flip_label label)^"_un_rate" in
+	    ((Location.dummy_annot rate_var,k_op)::acc_un,
+	     Some (Location.dummy_annot (Ast.OBS_VAR rate_var)))
+	 | (Some _, Some _) | (None, None) -> (acc_un,k_op_op)
+	 | (Some (_,pos), None)
+	 | (None, Some (_,pos)) ->
+	    raise (ExceptionDefn.Malformed_Decl
+		     ("Missing rate for reverse rule",pos)) in
+       (acc_un',Some (k',k_op')) in
+  (id',acc'''),
+  (label_pos, ({r with k_def = k_def; k_op = k_op; k_un = k_un},r_pos))
 
 let tokenify algs tokens contact_map domain l =
   List.fold_right
@@ -56,20 +73,30 @@ let rules_of_ast ?deps_machinery algs tokens contact_map domain
     tokenify algs tokens contact_map domain ast_rule.rm_token in
   let domain'',add_toks =
     tokenify algs tokens contact_map domain' ast_rule.add_token in
-  let one_side label (domain,deps_machinery,acc) rate lhs rhs rm add =
-    let origin,deps_algs =
+  let one_side label (domain,deps_machinery,acc) rate unary_rate lhs rhs rm add=
+    let origin,deps_and_unaries =
       match deps_machinery with
       | None -> None,None
       | Some (o,d) -> Some o, Some d in
     let (crate,_ as crp) = Expr.compile_pure_alg algs tokens rate in
     let count = let x = ref 0 in fun (lab,pos) ->
 				 incr x; (lab^"__"^string_of_int !x,pos) in
-    let build deps_algs (origin,ccs,syntax,(neg,pos)) =
+    let register_unary =
+      match unary_rate with
+      | None -> fun x y -> y
+      | Some rate ->
+	 let (crate,_ as crp) = Expr.compile_pure_alg algs tokens rate in
+	 fun o s -> Mods.IntMap.add o crate s in
+    let build deps_and_unaries (origin,ccs,syntax,(neg,pos)) =
       Tools.option_map
-	(fun x ->
+	(fun (x,y) ->
 	 let origin =
 	   match origin with Some o -> o | None -> failwith "ugly Eval.rule_of_ast" in
-	 Alg_expr.add_dep x origin crp) deps_algs,
+	 let origin_rule_id = match origin with
+	   | Operator.RULE i -> i
+	   | Operator.ALG _ | Operator.PERT _ -> assert false in
+	 (Alg_expr.add_dep x origin crp,register_unary origin_rule_id y))
+	deps_and_unaries,
       {
 	Primitives.rate = crate;
 	Primitives.connected_components = ccs;
@@ -84,34 +111,38 @@ let rules_of_ast ?deps_machinery algs tokens contact_map domain
 	contact_map domain ?origin lhs rhs in
     let deps_algs',rules_l =
       match rule_mixtures with
-    | [] -> deps_algs,acc
-    | [ r ] ->
-       let deps_algs',r' = build deps_algs r in
-       deps_algs', ((label, r') :: acc)
-    | _ ->
-       List.fold_right
-	 (fun r (deps_algs,out) ->
-	  let deps_algs',r' = build deps_algs r in
-	  deps_algs',(count label,r')::out) rule_mixtures (deps_algs,acc) in
+      | [] -> deps_and_unaries,acc
+      | [ r ] ->
+	 let deps_algs',r' = build deps_and_unaries r in
+	 deps_algs', ((label, r') :: acc)
+      | _ ->
+	 List.fold_right
+	   (fun r (deps_algs,out) ->
+	    let deps_algs',r' = build deps_algs r in
+	    deps_algs',(count label,r')::out)
+	   rule_mixtures (deps_and_unaries,acc) in
     domain',(match origin' with
-	    | None -> None
-	    | Some o -> Some (o,
-			      match deps_algs' with
-			      | Some d -> d
-			      | None -> failwith "ugly Eval.rule_of_ast")),
+	     | None -> None
+	     | Some o -> Some (o,
+			       match deps_algs' with
+			       | Some d -> d
+			       | None -> failwith "ugly Eval.rule_of_ast")),
     rules_l in
   let rev = match ast_rule.arrow, ast_rule.k_op with
     | RAR, None -> domain'',deps_machinery,[]
     | LRAR, Some rate ->
+       let un_rate = match ast_rule.k_un with None -> None | Some (_,x) -> x in
        one_side (opposite label) (domain'',deps_machinery,[]) rate
-		ast_rule.rhs ast_rule.lhs add_toks rm_toks
+		un_rate ast_rule.rhs ast_rule.lhs add_toks rm_toks
     | (RAR, Some _ | LRAR, None) ->
        raise
 	 (ExceptionDefn.Malformed_Decl
 	    ("Incompatible arrow and kinectic rate for inverse definition",
 	     rule_pos))
   in
-  one_side label rev ast_rule.k_def ast_rule.lhs ast_rule.rhs rm_toks add_toks
+  let un_rate = match ast_rule.k_un with None -> None | Some (x,_) -> Some x in
+  one_side label rev ast_rule.k_def un_rate
+	   ast_rule.lhs ast_rule.rhs rm_toks add_toks
 
 let obs_of_result algs tokens contact_map domain res =
   List.fold_left
@@ -589,8 +620,8 @@ let initialize logger overwrite result =
   let alg_deps = Alg_expr.setup_alg_vars_rev_dep alg_a in
 
   Debug.tag logger "\t -rules";
-  let (domain',alg_deps',compiled_rules) =
-    compile_rules alg_nd.NamedDecls.finder alg_deps tk_nd.NamedDecls.finder
+  let (domain',(alg_deps',unary_rules),compiled_rules) =
+    compile_rules alg_nd.NamedDecls.finder (alg_deps,Mods.IntMap.empty) tk_nd.NamedDecls.finder
 		  contact_map domain' cleaned_rules in
   let rule_nd = NamedDecls.create (Array.of_list compiled_rules) in
 
@@ -603,7 +634,7 @@ let initialize logger overwrite result =
 		   result.variables result.rules contact_map domain result in
 
   let env =
-    Environment.init sigs_nd tk_nd alg_nd alg_deps' rule_nd
+    Environment.init sigs_nd tk_nd alg_nd alg_deps' rule_nd unary_rules
 		     (Array.of_list (List.rev obs)) (Array.of_list pert) in
 
   Debug.tag logger "\t -initial conditions";

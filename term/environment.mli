@@ -5,8 +5,8 @@ type t
 val init :
   Signature.s -> unit NamedDecls.t -> Alg_expr.t Location.annot NamedDecls.t
   -> (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array)
-  -> Primitives.elementary_rule NamedDecls.t -> Alg_expr.t Location.annot array
-  -> Primitives.perturbation array -> t
+  -> Primitives.elementary_rule NamedDecls.t -> Alg_expr.t Mods.IntMap.t
+  -> Alg_expr.t Location.annot array -> Primitives.perturbation array -> t
 (** [init sigs contact_map tokens algs rules obs perts] *)
 
 val nb_tokens : t -> int
