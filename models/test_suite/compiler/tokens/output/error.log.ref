@@ -1,26 +1,20 @@
 _____
 
-___
-
----
-
-+++
-
 _____
 
-___
-
----
-
-+++
-
+Environment:
+  Signatures:
+    A(,x)
+  Tokens: tt
+  Alg_expr:
+    
+  Plot: 
+  Rules:
+    
+  Perturbations:
+    /*0*/%mod: ([E+] = 5) do tt <- 22
+Domain:
+  () -> /*cc0*/  -> ()
 Intial graph;
-
-%init: tt <- 33
-****Rule '->' [->]****
-
-Apply ->
-if pattern 0 is matched
-Modif sites: []
-
-
+  
+  %init: tt <- 33
