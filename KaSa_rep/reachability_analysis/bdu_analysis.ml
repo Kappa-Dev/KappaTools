@@ -179,9 +179,14 @@ let collect_creation parameter error viewsrhs creation store_result =
   - A(x!1), B(y!1) -> A(x), B(y)
   Put those new rules inside if they have (do the intersection) and then do the iteration 
 *)
-(*TODO*)
+(*Check the function set_bound_sites in preprocess.ml, to get the site and state for the bond sites, 
+  then use it to build bdu, use the actions.bind
+*)
 
-
+  (*let error, bind = Site_map_and_set.fold_map(fun site target (error, bind)->
+  
+ )*)
+  
 
 
 (************************************************************************************)    
@@ -228,6 +233,7 @@ let get_rule_aux parameter error handler compiled rule_id =
 (************************************************************************************)
 (*empty mixture*)
 
+(*REMOVE: use those function already defined inside preprocess.ml*)
 let empty_mixture parameter error =
   let error, empty_views = Int_storage.Quick_Nearly_inf_Imperatif.create parameter error 0 in
   let error, empty_bonds = Int_storage.Quick_Nearly_inf_Imperatif.create parameter error 0 in
@@ -308,7 +314,7 @@ let get_test_aux parameter error handler bdu_init rule =
           in
           (*return a list of modif site*)
           let modif_list = get_modif_list site_modif in
-          (*return test and site modif of a rule*)
+          (*return test and site modif of a rule, not a set of rule*)
           AgentMap.set
             parameter
             error
@@ -317,6 +323,7 @@ let get_test_aux parameter error handler bdu_init rule =
             store_result
     ) rule.rule_lhs.views rule.diff_direct init_result
 
+(*common function for getting bdu_test and direct list from a set that store them*)
 let get_test_direct parameter error rule agent_type handler bdu_init =
   (*get test and bdu_direct of this rule*)
   let error, store_test_direct = get_test_aux parameter error handler bdu_init rule in
@@ -326,7 +333,7 @@ let get_test_direct parameter error rule agent_type handler bdu_init =
       | error, Some (bdu_test, modif_list) -> error, (bdu_test, modif_list)
   in
   error, (bdu_test, modif_list)
-
+    
 (*----------------------------------------------------------------------------------*)
 (*it is an enable rule if the result of intersection is not empty*)
 
@@ -341,6 +348,8 @@ let comp_is_enable parameter error handler bdu_init bdu_test bdu_iter =
   else
     error, false
 
+(*TODO: do another function checking the enable of side effect with bdu_iter*)
+      
 (*----------------------------------------------------------------------------------*)
 (*main computation for iteration function*)
 
@@ -507,6 +516,9 @@ let fixpoint_aux parameter error
               handler 
               bdu_init
           in
+	  (*TODO: get the side effect information of bdu here*)
+	  (**)
+	  
           (*build a list of type List_sig.list for modif_list*)
           let error, (handler, list_a) =
             List_algebra.build_list

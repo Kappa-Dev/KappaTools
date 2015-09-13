@@ -443,5 +443,7 @@ let side_effect parameter error handler cc_compil =
   let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
   let error, result = 
     scan_rule_set parameter error handler cc_compil.rules in
+  (*TEST: contact map*)
+  (*let _ = Compute_contact_map.compute_contact_map parameter error handler in*)
   let _ = print_result parameter error result in
   error, result
