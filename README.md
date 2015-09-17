@@ -11,13 +11,13 @@ the latex sources are available in the man/ directory.
 
 ## Installation
 
-To compile KaSim, you need the ocaml native compiler versoin 4.01 or
+To compile KaSim, you need the OCaml native compiler version 4.02.3 or
 above and the findib library. To check whether you have them, type
 
 `ocamlfind ocamlopt -version`
 
-If you use a package manager (or opam, the Ocaml package manager), Ocaml
-compilers and findlib are really likely provided by it. Else, Ocaml native
+If you use a package manager (or opam, the OCaml package manager), OCaml
+compilers and findlib are really likely provided by it. Else, OCaml native
 compilers can be downloaded on [INRIA's website](http://caml.inria.fr/). The
 Windows bundle contains findlib. Findlib sources are available on
 [camlcity.org](http://projects.camlcity.org/projects/findlib.html).
