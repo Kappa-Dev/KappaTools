@@ -31,6 +31,7 @@ matrix:
 install:
   - opam init -a git://github.com/ocaml/opam-repository && eval $(opam config env)
   - opam install ocamlfind
+  - sh -c "if [ '$CHECKED' = native ] ; then sudo apt-get install -qq gnuplot-nox ; fi"
   - sh -c "if [ '$CHECKED' = js ] ; then opam install -y reactiveData tyxml js_of_ocaml ; fi"
 
 script:
