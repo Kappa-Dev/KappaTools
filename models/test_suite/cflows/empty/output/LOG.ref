@@ -1,7 +1,7 @@
-+ Command line is: 'KaSim' '-i' 'empty.ka' '-e' '18' '-d' 'output' '-seed' '397654988' '-p' '50'
++ Command line is: 'KaSim' '-i' 'empty.ka' '-e' '18' '-d' 'output' '-seed' '126704914' '-p' '50'
 Parsing empty.ka...
 done
-+ Initialized random number generator with seed 397654988
++ Initialized random number generator with seed 126704914
 + Building initial simulation conditions...
 + Compiling...
 	 -simulation parameters
@@ -12,9 +12,6 @@ done
 	 -perturbations
 	 -initial conditions
 	 Done
-+ Analyzing non local patterns...
-	 -Counting initial local patterns...
-	 Done
 ____________________________________________________________
 ############################################################
 + Producing causal compressions
@@ -24,10 +21,10 @@ ____________________________________________________________
 	 - blackboard generation
 	 - computing causal past of each observed events (4)
 Stats:
- number of step   : 34
- longest story    : 7
- average length   : 3.94444444444
- geometric mean   : 4.22295315311
+ number of step   : 33
+ longest story    : 4
+ average length   : 2.75
+ geometric mean   : 2.91547594742
 
 	 - causal & weak flow compression (4)
 
@@ -37,7 +34,7 @@ ____________________________________________________________
 	 - blackboard generation
 	 - computing causal past of each observed events (4)
 Stats:
- number of step   : 21
+ number of step   : 15
  longest story    : 4
  average length   : 4.
  geometric mean   : 4.
@@ -53,13 +50,7 @@ ____________________________________________________________
 
 ____________________________________________________________
 ############################################################
-+ Pretty printing 3 flows
++ Pretty printing 2 flows
 + Pretty printing 2 weakly compressed flows
 + Pretty printing 2 strongly compressed flows
-Simulation ended (eff.: 0.692308, detail below)
-	Valid embedding but no longer unary when required: 0.000000
-	Valid embedding but not binary when required: 0.000000
-	Clashing instance: 0.000000
-	Lazy negative update: 1.000000
-	Lazy negative update of non local instances: 0.000000
-	Perturbation interrupting time advance: 0.000000
+Simulation ended
