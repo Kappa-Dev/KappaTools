@@ -1,11 +1,8 @@
 open Mods
 
-let version = "4.0-refactoring"
-
 let usage_msg =
-  "KaSim "^version^":\n"^
+  "KaSim "^Version.version_string^":\n"^
     "Usage is KaSim [-i] input_file [-e events | -t time] [-p points] [-o output_file]\n"
-let version_msg = "Kappa Simulator: "^version^"\n"
 
 let close_desc opt_env =
   let () = Kappa_files.close_all_out_desc () in
@@ -17,7 +14,8 @@ let close_desc opt_env =
 let () =
   let options = [
     ("--version",
-     Arg.Unit (fun () -> print_string (version_msg^"\n") ; flush stdout ; exit 0),
+     Arg.Unit (fun () -> Format.print_string Version.version_msg;
+			 Format.print_newline () ; exit 0),
      "display KaSim version");
     ("-i",
      Arg.String (fun fic ->

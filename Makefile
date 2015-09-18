@@ -44,7 +44,10 @@ $(MANGENREP): $(SCRIPTSSOURCE) $(MODELS)
 	rm -rf $@
 	mkdir $@
 
-%.native %.byte %.docdir/index.html: $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*)
+main/version.ml: main/version.ml.skel
+	sed -e s/'\$$Format:%D\$$'/"tag: $$(git describe --always --dirty || echo unkown)"/ $^ > $@
+
+%.native %.byte %.docdir/index.html: main/version.ml $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*)
 	$(OCAMLBINPATH)ocamlbuild $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) $@
 
 JaSim.byte: $(filter-out _build/,$(wildcard */*.ml*))
@@ -94,6 +97,7 @@ clean_doc:
 
 clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch clean_doc
 	$(OCAMLBINPATH)ocamlbuild -clean
+	rm -f main/version.ml
 	rm -f sanity_test bin/sanity_test
 	rm -f KaSim bin/KaSim KaSa bin/KaSa
 	find . -name \*~ -delete

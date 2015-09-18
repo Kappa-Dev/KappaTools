@@ -1,0 +1,6 @@
+let all_tags = "$Format:%D$"
+
+let version_string =
+  Str.global_replace (Str.regexp "^.*tag: \\([^,]+\\)\\(,.*\\)?$") "\\1" all_tags
+
+let version_msg = "Kappa Simulator: "^version_string
