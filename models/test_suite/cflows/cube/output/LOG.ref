@@ -12,9 +12,6 @@ done
 	 -perturbations
 	 -initial conditions
 	 Done
-+ Analyzing non local patterns...
-	 -Counting initial local patterns...
-	 Done
 ____________________________________________________________
 ############################################################
 + Producing causal compressions
@@ -22,30 +19,30 @@ ____________________________________________________________
 	 - detecting siphons
 	 - cutting concurrent events
 	 - blackboard generation
-	 - computing causal past of each observed events (5855)
+	 - computing causal past of each observed events (6009)
 Stats:
- number of step   : 45856
+ number of step   : 46009
  longest story    : 7
- average length   : 2.35571050063
- geometric mean   : 2.85604995333
+ average length   : 2.37605532104
+ geometric mean   : 2.88252651682
 
-	 - causal & weak flow compression (5855)
+	 - causal & weak flow compression (6009)
 
 ____________________________________________________________
 ############################################################
 	 - detecting pseudo inverse events
 	 - blackboard generation
-	 - computing causal past of each observed events (5855)
+	 - computing causal past of each observed events (6009)
 
 ____________________________________________________________
 ############################################################
 Stats:
- number of step   : 28069
+ number of step   : 28953
  longest story    : 7
- average length   : 3.79385140905
- geometric mean   : 4.11564260967
+ average length   : 3.81810617407
+ geometric mean   : 4.14500443193
 
-	 - causal & weak flow compression (5855)
+	 - causal & weak flow compression (6009)
 
 ____________________________________________________________
 ############################################################
@@ -54,10 +51,4 @@ ____________________________________________________________
 
 + Pretty printing 2 flows
 + Pretty printing 1 weakly compressed flow
-Simulation ended (eff.: 0.991703, detail below)
-	Valid embedding but no longer unary when required: 0.000000
-	Valid embedding but not binary when required: 0.000000
-	Clashing instance: 0.000000
-	Lazy negative update: 1.000000
-	Lazy negative update of non local instances: 0.000000
-	Perturbation interrupting time advance: 0.000000
+Simulation ended
