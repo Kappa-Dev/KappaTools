@@ -67,9 +67,9 @@
 \def\dd{-\hspace{0.001cm}-}
 \def\imp#1{\emph{#1}\index{#1}}
 %%%%
-\def\version{3}
+\def\version{3.90}
 
-\title{KaSim\version~\& KaSa\version~reference manual\\ \small (release 4-dev)}
+\title{KaSim~\& KaSa~reference manual\\ \small (release \version)}
 \author{Pierre Boutillier, J\'er\^ome Feret, Jean Krivine\thanks{corresponding author: jean.krivine@pps.univ-paris-diderot.fr} and L\'y Kim Quy\^en \\\href{http://www.kappalanguage.org}{KappaLanguage.org}}
 
 \date{}
@@ -1003,35 +1003,10 @@ parameter & possible values & description \\
 \textit{Simulation options} &\\
 \ttt{"dumpIfDeadlocked"} & \ttt{"no","yes"} & \small Snapshot when simulation \\&&\small is stalled\\
 \ttt{"maxConsecutiveClash"} & \ttt{"2"} or any integer & \small number of consecutive clashes \\ && \small before giving up \\ && \small square approximation\\
-\textit{Miscellaneous} &\\
-\ttt{"dumpInfluenceMap"} & \ttt{"no","yes"} & \small Output the influence map \\ &&\small of the model\\
-\ttt{"influenceMapFileName"} & \ttt{"im.dot", any string} & \small file name for the influence map\\
-
 \end{tabular}
 \label{tab:parameters}
 \end{table}
 %%
-
-\subsection{The Influence map}
-The influence map of a model is an object that may help modelers checking the consistency of the rule set they use. It is generated if the modeler has required it using the parameter \ttt{"dumpInfluenceMap"} which will generate the so called \emph{influence map}\index{influence map} of the model.
-
-Unlike the flux map, the influence map is \emph{statically} computed and does not depend on kinetic rates nor initial conditions. It describes how rules \emph{with no side effect}\index{side effect} may potentially influence each other during a simulation. \KaSim~will produce a dot format file containing the influence relation over all rules and observables of the model. The produced graph visualized using a circular rendering\footnote{One may use for instance the \ttt{circo} program that is part of the \textit{graphviz} suite.} is given in Figure~\ref{fig:abc-im}. Observables are represented as circular nodes\footnote{Observable can be viewed as identity rules for computing influence.} and rules as rectangular nodes. Edges are decorated with the list of embeddings (separated by a semi-colon) allowing rules{\textquotesingle}s right hand sides to be mapped to left hand sides. Note that the influence map will not display relations between rules that are induced by side effects (see Section~\ref{sec:side-effect}).
-
-\begin{figure}[htbp] %  figure placement: here, top, bottom, or page
-   \centering
-   \includegraphics[width=15cm]{img/abc-im.png} 
-   \caption{The influence map of the \ttt{abc.ka} model defined in Chapter~\ref{chap:abc}. Note that observable \ttt{C(x1\intstate u?,x2\intstate u?)} is not activated by any other rule. This implies that its number of occurrences does not change during a simulation. Edge labels denote embeddings with the convention that $[i\rar j]$ denotes the embedding of agent number $i$ of the origin{\textquotesingle}s rhs, into agent $j$ of the target{\textquotesingle}s lhs.}
-   \label{fig:abc-im}
-\end{figure}
-
-More formally, consider the rules $r:L\rar R$ and $s:L'\rar R'$. One wishes to know whether it is possible that the application of rule $r$ over a graph $G$ creates a new instance of rule $s$. To do so, \KaSim~will try to generate a term $T$ containing a match for $R$ and $L'$ that overlap on some sites that are modified by $r$ (see Figure~\ref{fig:im} for illustration).
-
-\begin{figure}[htbp] %  figure placement: here, top, bottom, or page
-   \centering
-\includegraphics[width=8cm,natwidth=1462pt,natheight=756pt]{img/im.png}
-   \caption{Computation of the influence of the top rule on the rule below: the right hand side of the first rules embeds in a common term with the left hand side of the second rule. It results that the first rule has a positive influence on the second.}
-   \label{fig:im}
-\end{figure}
 
 \chapter{The \KaSa~static analyser}
 
