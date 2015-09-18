@@ -2,18 +2,15 @@
 Parsing bonds_in_creation.ka...
 done
 + Initialized random number generator with seed 611463625
++ Building initial simulation condition...
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
 	 -variable declarations
-	 -initial conditions
 	 -rules
 	 -observables
 	 -perturbations
-	 Done
-+ Analyzing non local patterns...
-+ Building initial simulation state...
-	 -Counting initial local patterns...
+	 -initial conditions
 	 Done
 ____________________________________________________________
 ############################################################
@@ -22,27 +19,27 @@ ____________________________________________________________
 	 - detecting siphons
 	 - cutting concurrent events
 	 - blackboard generation
-	 - computing causal past of each observed events (42)
+	 - computing causal past of each observed events (38)
 Stats:
- number of step   : 827
- longest story    : 616
- average length   : 229.123036649
- geometric mean   : 297.900836482
+ number of step   : 791
+ longest story    : 574
+ average length   : 221.645466847
+ geometric mean   : 285.753586704
 
-	 - causal & weak flow compression (42)
+	 - causal & weak flow compression (38)
 
 ____________________________________________________________
 ############################################################
 	 - detecting pseudo inverse events
 	 - blackboard generation
-	 - computing causal past of each observed events (42)
+	 - computing causal past of each observed events (38)
 Stats:
- number of step   : 240
- longest story    : 27
- average length   : 15.2
- geometric mean   : 16.2808681177
+ number of step   : 235
+ longest story    : 36
+ average length   : 19.0238095238
+ geometric mean   : 20.3218156294
 
-	 - causal & weak flow compression (42)
+	 - causal & weak flow compression (38)
 
 ____________________________________________________________
 ############################################################
@@ -53,13 +50,7 @@ ____________________________________________________________
 
 ____________________________________________________________
 ############################################################
-+ Pretty printing 32 flows
++ Pretty printing 35 flows
 + Pretty printing 3 weakly compressed flows
 + Pretty printing 1 strongly compressed flow
-Simulation ended (eff.: 0.806758, detail below)
-	Valid embedding but no longer unary when required: 0.000000
-	Valid embedding but not binary when required: 0.000000
-	Clashing instance: 0.000000
-	Lazy negative update: 1.000000
-	Lazy negative update of non local instances: 0.000000
-	Perturbation interrupting time advance: 0.000000
+Simulation ended
