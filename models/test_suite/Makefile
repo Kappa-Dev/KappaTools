@@ -24,7 +24,8 @@ help:
 
 %.diff:
 	@touch $(basename $@).ref $(basename $@)
-	@sed '/generation/d' $(basename $@) | diff -u $(basename $@).ref - > $@ || true
+	@sed '/generation time/d' $(basename $@) | diff -q $(basename $@).ref - || true
+	@sed '/generation time/d' $(basename $@) | diff -u $(basename $@).ref - > $@ || true
 
 %/$(ERROR): %/$(OUTPUT_PATH)/LOG
 	@rm -f $@
@@ -39,27 +40,29 @@ error: $(DIRS_OF_TEST:=/$(ERROR))
 	@cat $^ > $@
 
 all: error
-	@if [ -s $< ] ; then cat $< && exit 2 ; else echo "No difference has been found" ; fi
+	@if [ -s $< ] ; then \
+	if [ $$(cat $< | wc -l) -gt 1500 ] ; then echo "Error file too big" ; else cat $< ; fi && exit 2 ; \
+	else echo "No difference has been found" ; fi
 
 build:
 	@+$(MAKE) clean_all
 	@+$(MAKE) $(DIRS_OF_TEST:=/$(OUTPUT_PATH)/LOG)
 	find $(CURDIR) \( -path \*/\*/$(OUTPUT_PATH)/\* -and -not -name \*.diff \
 		-and -not -name \*.ref \) -exec mv \{\} \{\}.ref \;
-	find $(CURDIR) -name \*.ref -exec sed -i"" -e '/generation/d' \{\} \;
+	find $(CURDIR) -name \*.ref -exec sed -i"" -e '/generation time/d' \{\} \;
 	@+$(MAKE) clean
 
-.PHONY: clean_light clean clean_all
+.PHONY: clean clean_all
 
-clean: clean_light
+clean:
 	find $(CURDIR) \( -name \#\* -or -name \*~ -or -name \*.sxw \) -delete
 	for i in $(DIRS_OF_TEST:=/$(OUTPUT_PATH)) ;\
 	  do [ -d $${i} ] && find $${i} -mindepth 1 \( -not -name \*.ref \) -delete || true;\
 	done
-	rm -f $(DIRS_OF_TEST:=/$(ERROR))
+	rm -f $(DIRS_OF_TEST:=/$(ERROR)) error
 
 clean_all: clean
-	rm -rf $(DIRS_OF_TEST:=/$(OUTPUT_PATH)) error
+	rm -rf $(DIRS_OF_TEST:=/$(OUTPUT_PATH))
 
 %.pdf: %.dot
 	@dot -Tpdf $< -o $@
