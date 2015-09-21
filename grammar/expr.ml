@@ -65,6 +65,11 @@ let print_ast_rule f r =
     print_arrow r.Ast.arrow
     (print_one_size r.Ast.add_token) r.Ast.rhs
     (print_rates r.Ast.k_un r.Ast.k_op) r.Ast.k_def
+let print_ast_rule_no_rate ~reverse f r =
+    Format.fprintf
+    f "@[<h>%a -> %a@]"
+    (print_one_size r.Ast.rm_token) (if reverse then r.Ast.rhs else r.Ast.lhs)
+    (print_one_size r.Ast.add_token) (if reverse then r.Ast.lhs else r.Ast.rhs)
 
 let rec print_bool p_alg f = function
   | Ast.TRUE -> Format.fprintf f "[true]"

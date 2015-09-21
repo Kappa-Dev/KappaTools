@@ -212,8 +212,9 @@ let one_rule env domain counter graph state =
   let get_alg i = get_alg env state i in
   (* let () = *)
   (*   Format.eprintf "%a@." (Rule_interpreter.print_injections env) graph in *)
+  let cause = Causal.RULE rule.Primitives.syntactic_rule in
   match Rule_interpreter.apply_rule
-	  ~get_alg domain counter graph (Causal.RULE rule_id) rule with
+	  ~get_alg domain counter graph cause rule with
   | None -> None
   | Some graph' ->
      let graph'' =

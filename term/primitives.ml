@@ -40,6 +40,9 @@ type elementary_rule = {
   inserted : Transformation.t list;
   consumed_tokens : (Alg_expr.t * int) list;
   injected_tokens : (Alg_expr.t * int) list;
+  syntactic_rule : int;
+  (** negative number [n] means opposite of rule |[n]|,
+[0] means generated for perturbation. *)
   instantiations : Instantiation.abstract Instantiation.event;
 }
 

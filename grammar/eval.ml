@@ -67,13 +67,14 @@ let tokenify algs tokens contact_map domain l =
     ) l (domain,[])
 
 let rules_of_ast ?deps_machinery algs tokens contact_map domain
-		 label (ast_rule,rule_pos) =
+		 ~syntax_ref label (ast_rule,rule_pos) =
   let opposite (lab,pos) = (Ast.flip_label lab,pos) in
   let domain',rm_toks =
     tokenify algs tokens contact_map domain ast_rule.rm_token in
   let domain'',add_toks =
     tokenify algs tokens contact_map domain' ast_rule.add_token in
-  let one_side label (domain,deps_machinery,acc) rate unary_rate lhs rhs rm add=
+  let one_side syntax_ref label (domain,deps_machinery,acc)
+	       rate unary_rate lhs rhs rm add =
     let origin,deps_and_unaries =
       match deps_machinery with
       | None -> None,None
@@ -103,14 +104,14 @@ let rules_of_ast ?deps_machinery algs tokens contact_map domain
 	   | Operator.RULE i -> i
 	   | Operator.ALG _ | Operator.PERT _ -> assert false in
 	 (Alg_expr.add_dep x origin crp,register_unary ccs origin_rule_id y))
-	deps_and_unaries,
-      {
+	deps_and_unaries,{
 	Primitives.rate = crate;
 	Primitives.connected_components = ccs;
 	Primitives.removed = neg;
 	Primitives.inserted = pos;
 	Primitives.consumed_tokens = rm;
 	Primitives.injected_tokens = add;
+	Primitives.syntactic_rule = syntax_ref;
 	Primitives.instantiations = syntax;
       } in
     let (domain',origin'),rule_mixtures =
@@ -139,8 +140,9 @@ let rules_of_ast ?deps_machinery algs tokens contact_map domain
     | RAR, None -> domain'',deps_machinery,[]
     | LRAR, Some rate ->
        let un_rate = match ast_rule.k_un with None -> None | Some (_,x) -> x in
-       one_side (opposite label) (domain'',deps_machinery,[]) rate
-		un_rate ast_rule.rhs ast_rule.lhs add_toks rm_toks
+       one_side (~- syntax_ref)
+		(opposite label) (domain'',deps_machinery,[]) rate un_rate
+		ast_rule.rhs ast_rule.lhs add_toks rm_toks
     | (RAR, Some _ | LRAR, None) ->
        raise
 	 (ExceptionDefn.Malformed_Decl
@@ -148,7 +150,7 @@ let rules_of_ast ?deps_machinery algs tokens contact_map domain
 	     rule_pos))
   in
   let un_rate = match ast_rule.k_un with None -> None | Some (x,_) -> Some x in
-  one_side label rev ast_rule.k_def un_rate
+  one_side syntax_ref label rev ast_rule.k_def un_rate
 	   ast_rule.lhs ast_rule.rhs rm_toks add_toks
 
 let obs_of_result algs tokens contact_map domain res =
@@ -208,7 +210,8 @@ let effects_of_modif
 			 contact_map domain alg_expr in
       let domain'',_,elem_rules =
 	rules_of_ast algs.NamedDecls.finder tokens.NamedDecls.finder contact_map
-		     domain' (Location.dummy_annot "__perturbation_modification")
+		     domain' ~syntax_ref:0
+		     (Location.dummy_annot "__perturbation_modification")
 		     (ast_rule,mix_pos) in
       let elem_rule = match elem_rules with
 	| [ _, r ] -> r
@@ -393,9 +396,10 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 	      k_un = None; k_op = None; } in
 	  let domain'',state' =
 	    match
-	      rules_of_ast algs.NamedDecls.finder tokens.NamedDecls.finder
-			   contact_map domain' (Location.dummy_annot "__init_mix")
-			   (fake_rule,mix_pos)
+	      rules_of_ast
+		algs.NamedDecls.finder tokens.NamedDecls.finder contact_map
+		domain' ~syntax_ref:0 (Location.dummy_annot "__init_mix")
+		(fake_rule,mix_pos)
 	    with
 	    | domain'',_,[ _, compiled_rule ] ->
 	       let actions,_,_ = snd compiled_rule.Primitives.instantiations in
@@ -430,9 +434,10 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 	      k_un = None; k_op = None; } in
 	  let domain',(state',_) =
 	    match
-	      rules_of_ast algs.NamedDecls.finder tokens.NamedDecls.finder
-			   contact_map domain (Location.dummy_annot "__init_tok")
-			   (Location.dummy_annot fake_rule)
+	      rules_of_ast
+		algs.NamedDecls.finder tokens.NamedDecls.finder contact_map
+		domain ~syntax_ref:0 (Location.dummy_annot "__init_tok")
+		(Location.dummy_annot fake_rule)
 	    with
 	    | domain'',_,[ _, compiled_rule ] ->
 	       domain'',
@@ -588,13 +593,14 @@ let compile_alg_vars tokens contact_map domain overwrite vars =
 let compile_rules algs alg_deps tokens contact_map domain rules =
   match
     List.fold_left
-      (fun (domain,deps_machinery,acc) (rule_label,rule) ->
+      (fun (domain,syntax_ref,deps_machinery,acc) (rule_label,rule) ->
        let (domain',origin',cr) =
-	 rules_of_ast algs tokens ?deps_machinery contact_map domain rule_label rule in
-       domain',origin',List.append cr acc)
-      (domain,Some (Operator.RULE 0,alg_deps),[]) rules with
-  | fdomain,Some (_,falg_deps),frules -> fdomain,falg_deps,List.rev frules
-  | _, None, _ ->
+	 rules_of_ast algs tokens ?deps_machinery contact_map domain
+		      ~syntax_ref rule_label rule in
+       domain',succ syntax_ref,origin',List.append cr acc)
+      (domain,1,Some (Operator.RULE 0,alg_deps),[]) rules with
+  | fdomain,_,Some (_,falg_deps),frules -> fdomain,falg_deps,List.rev frules
+  | _, _, None, _ ->
      failwith "The origin of Eval.compile_rules has been lost"
 
 let initialize logger overwrite result =
@@ -641,7 +647,8 @@ let initialize logger overwrite result =
 		   result.variables result.rules contact_map domain result in
 
   let env =
-    Environment.init sigs_nd tk_nd alg_nd alg_deps' rule_nd unary_rules
+    Environment.init sigs_nd tk_nd alg_nd alg_deps'
+		     (Array.of_list result.rules,rule_nd,unary_rules)
 		     (Array.of_list (List.rev obs)) (Array.of_list pert) in
 
   Debug.tag logger "\t -initial conditions";

@@ -3,7 +3,8 @@ type t = {
   tokens : unit NamedDecls.t;
   algs : (Alg_expr.t Location.annot) NamedDecls.t;
   observables : Alg_expr.t Location.annot array;
-  rules  :Primitives.elementary_rule NamedDecls.t;
+  ast_rules : (string Location.annot option * Ast.rule Location.annot) array;
+  rules : Primitives.elementary_rule NamedDecls.t;
   unary_rules : Alg_expr.t Mods.IntMap.t;
   perturbations : Primitives.perturbation array;
   need_update_each_loop : Operator.DepSet.t;
@@ -11,8 +12,9 @@ type t = {
   desc_table : (string,out_channel * Format.formatter) Hashtbl.t;
 }
 
-let init sigs tokens algs (deps_in_t,deps_in_e,rd) rules urules obs perts =
-  { signatures = sigs; tokens = tokens;
+let init sigs tokens algs (deps_in_t,deps_in_e,rd)
+	 (ast_rules,rules,urules) obs perts =
+  { signatures = sigs; tokens = tokens; ast_rules = ast_rules;
     rules = rules; unary_rules = urules; algs = algs; observables = obs;
     perturbations = perts; reverse_dependencies = rd;
     need_update_each_loop = Operator.DepSet.union deps_in_t deps_in_e;
@@ -41,6 +43,8 @@ let num_of_rule s env = NamedDecls.elt_id ~kind:"rule" env.rules s
 let get_rule env i = snd env.rules.NamedDecls.decls.(i)
 let nb_rules env = NamedDecls.size env.rules
 
+let nb_syntactic_rules env = Array.length env.ast_rules
+
 let num_of_alg s env = NamedDecls.elt_id ~kind:"variable" env.rules s
 let get_alg env i = fst @@ snd env.algs.NamedDecls.decls.(i)
 let nb_algs env = NamedDecls.size env.algs
@@ -55,6 +59,21 @@ let nb_perturbations env = Array.length env.perturbations
 
 let get_reverse_dependencies env i = env.reverse_dependencies.(i)
 let get_always_outdated env = env.need_update_each_loop
+
+let print_ast_rule ?env f i =
+  match env with
+  | None -> Format.fprintf f "__ast_rule_%i" i
+  | Some env ->
+     if i = 0 then Format.pp_print_string f "A generated rule for perturbations"
+     else
+       if i < 0 then
+	 match env.ast_rules.(pred (~- i)) with
+	 | (Some (na,_),_) -> Format.pp_print_string f (Ast.flip_label na)
+	 | (None,(r,_)) -> Expr.print_ast_rule_no_rate ~reverse:true f r
+       else
+	 match env.ast_rules.(pred i) with
+	 | (Some (na,_),_) -> Format.pp_print_string f na
+	 | (None,(r,_)) -> Expr.print_ast_rule_no_rate ~reverse:false f r
 
 let print_agent ?env f i =
   match env with

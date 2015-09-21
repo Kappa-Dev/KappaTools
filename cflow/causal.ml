@@ -370,7 +370,7 @@ let label ?env = function
      let sigs = Tools.option_map Environment.signatures env in
      Format.asprintf "%a" (Connected_component.print ?sigs false) mix_id
   | PERT s -> s
-  | RULE r_id -> Format.asprintf "%a" (Environment.print_rule ?env) r_id
+  | RULE r_id -> Format.asprintf "%a" (Environment.print_ast_rule ?env) r_id
   | INIT s ->
      Format.asprintf
        "Intro @[<h>%a@]" (Pp.list Pp.comma (Environment.print_agent ?env)) s
