@@ -67,7 +67,7 @@ let tokenify algs tokens contact_map domain l =
     ) l (domain,[])
 
 let rules_of_ast ?deps_machinery algs tokens contact_map domain
-		    label (ast_rule,rule_pos) =
+		 label (ast_rule,rule_pos) =
   let opposite (lab,pos) = (Ast.flip_label lab,pos) in
   let domain',rm_toks =
     tokenify algs tokens contact_map domain ast_rule.rm_token in
@@ -83,10 +83,17 @@ let rules_of_ast ?deps_machinery algs tokens contact_map domain
 				 incr x; (lab^"__"^string_of_int !x,pos) in
     let register_unary =
       match unary_rate with
-      | None -> fun x y -> y
-      | Some rate ->
-	 let (crate,_ as crp) = Expr.compile_pure_alg algs tokens rate in
-	 fun o s -> Mods.IntMap.add o crate s in
+      | None -> fun _ _  y -> y
+      | Some (_,pos as rate) ->
+	 let (crate,_) = Expr.compile_pure_alg algs tokens rate in
+	 fun ccs o s ->
+	 match Array.length ccs with
+	 | (0 | 1) -> s
+	 | 2 -> Mods.IntMap.add o crate s
+	 | n ->
+	    raise (ExceptionDefn.Malformed_Decl
+		     ("Unary rule does not deal with "^
+			string_of_int n^" connected components.",pos)) in
     let build deps_and_unaries (origin,ccs,syntax,(neg,pos)) =
       Tools.option_map
 	(fun (x,y) ->
@@ -95,7 +102,7 @@ let rules_of_ast ?deps_machinery algs tokens contact_map domain
 	 let origin_rule_id = match origin with
 	   | Operator.RULE i -> i
 	   | Operator.ALG _ | Operator.PERT _ -> assert false in
-	 (Alg_expr.add_dep x origin crp,register_unary origin_rule_id y))
+	 (Alg_expr.add_dep x origin crp,register_unary ccs origin_rule_id y))
 	deps_and_unaries,
       {
 	Primitives.rate = crate;
