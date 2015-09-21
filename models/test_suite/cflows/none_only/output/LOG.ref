@@ -20,6 +20,7 @@ ____________________________________________________________
 + Producing causal traces
 	 - refining events
 	 - detecting siphons
+	 - blackboard generation
 	 - computing causal past of each observed events (10)
 Stats:
  number of step   : 11031

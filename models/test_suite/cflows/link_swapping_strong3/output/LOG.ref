@@ -22,6 +22,7 @@ ____________________________________________________________
 	 - detecting siphons
 	 - cutting concurrent events
 	 - detecting pseudo inverse events
+	 - blackboard generation
 	 - computing causal past of each observed events (12)
 Stats:
  number of step   : 45
