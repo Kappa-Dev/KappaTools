@@ -12,9 +12,6 @@ done
 	 -perturbations
 	 -initial conditions
 	 Done
-+ Analyzing non local patterns...
-	 -Counting initial local patterns...
-	 Done
 ____________________________________________________________
 ############################################################
 + Producing causal compressions
@@ -23,17 +20,17 @@ ____________________________________________________________
 	 - cutting concurrent events
 	 - detecting pseudo inverse events
 	 - blackboard generation
-	 - computing causal past of each observed events (2159)
+	 - computing causal past of each observed events (2277)
 
 ____________________________________________________________
 ############################################################
 Stats:
- number of step   : 3870
+ number of step   : 3808
  longest story    : 5
  average length   : 5.
  geometric mean   : 5.
 
-	 - causal & weak flow compression (2159)
+	 - causal & weak flow compression (2277)
 
 ____________________________________________________________
 ############################################################
@@ -46,10 +43,4 @@ ____________________________________________________________
 ############################################################
 + Pretty printing 1 weakly compressed flow
 + Pretty printing 1 strongly compressed flow
-Simulation ended (eff.: 0.566219, detail below)
-	Valid embedding but no longer unary when required: 0.000000
-	Valid embedding but not binary when required: 0.000000
-	Clashing instance: 0.000000
-	Lazy negative update: 1.000000
-	Lazy negative update of non local instances: 0.000000
-	Perturbation interrupting time advance: 0.000000
+Simulation ended
