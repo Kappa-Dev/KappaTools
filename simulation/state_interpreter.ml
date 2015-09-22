@@ -289,10 +289,9 @@ let loop_cps form hook return env domain counter graph state =
 	   let () = Format.print_newline() in
 	   let msg = f (Mods.Counter.time counter) (Mods.Counter.event counter) in
 	   let () =
-	     Format.eprintf
+	     Format.fprintf form
 	       "@.***%s: would you like to record the current state? (y/N)***@."
 	       msg in
-	   let () = Environment.close_desc env in
 	   (*closes all other opened descriptors*)
 	   let () = if not !Parameter.batchmode then
 		      match String.lowercase (Tools.read_input ()) with
