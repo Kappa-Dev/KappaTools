@@ -23,17 +23,17 @@ ____________________________________________________________
 	 - cutting concurrent events
 	 - detecting pseudo inverse events
 	 - blackboard generation
-	 - computing causal past of each observed events (67)
+	 - computing causal past of each observed events (68)
 
 ____________________________________________________________
 ############################################################
 Stats:
- number of step   : 322
+ number of step   : 335
  longest story    : 7
- average length   : 4.22388059701
- geometric mean   : 4.29682284568
+ average length   : 4.19117647059
+ geometric mean   : 4.25129737983
 
-	 - causal & weak flow compression (67)
+	 - causal & weak flow compression (68)
 
 ____________________________________________________________
 ############################################################

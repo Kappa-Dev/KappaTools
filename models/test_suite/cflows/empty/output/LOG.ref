@@ -21,25 +21,25 @@ ____________________________________________________________
 	 - blackboard generation
 	 - computing causal past of each observed events (4)
 Stats:
- number of step   : 33
+ number of step   : 35
  longest story    : 4
- average length   : 2.75
- geometric mean   : 2.91547594742
+ average length   : 2.83333333333
+ geometric mean   : 2.99072640749
 
-	 - causal & weak flow compression (4)
+	 - causal & weak flow compression (5)
 
 ____________________________________________________________
 ############################################################
 	 - detecting pseudo inverse events
 	 - blackboard generation
-	 - computing causal past of each observed events (4)
+	 - computing causal past of each observed events (5)
 Stats:
- number of step   : 15
+ number of step   : 17
  longest story    : 4
  average length   : 4.
  geometric mean   : 4.
 
-	 - causal & weak flow compression (4)
+	 - causal & weak flow compression (5)
 
 ____________________________________________________________
 ############################################################

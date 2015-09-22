@@ -1,10 +1,10 @@
-/* Compression of 79 causal flows obtained in average at 1.532040E+01 t.u */
+/* Compression of 80 causal flows obtained in average at 1.540126E+01 t.u */
 /* Compressed causal flows were: [801;1083;1301;1378;1643;1683;1733;1757;
 1781;1787;1799;1864;1869;1922;1929;2003;2023;2026;2028;2051;2056;2063;2067;
 2120;2122;2124;2134;2154;2165;2218;2220;2227;2241;2262;2268;2323;2325;2339;
 2369;2372;2432;2440;2460;2464;2480;2481;2488;2489;2512;2536;2592;2597;2653;
 2659;2673;2712;2716;2725;2775;2814;2832;2990;3021;3031;3077;3091;3092;3119;
-3208;3210;3266;3329;3337;3352;3554;3595;3831;3939;3942] */
+3208;3210;3266;3329;3337;3352;3554;3595;3831;3939;3942;3966] */
 digraph G{
  ranksep=.5 ;
 { rank = same ; "0" [shape=plaintext] ;
@@ -84,55 +84,55 @@ node_25 [label="C/*3*/(x1~p?, x2~u?)", style=filled, fillcolor=red] ;
 "15" -> "16" [style="invis"];
 node_1 -> node_10
 node_2 -> node_10
-node_2 -> node_11
-node_3 -> node_11
+node_1 -> node_11
+node_6 -> node_11
 node_10 -> node_11
-node_2 -> node_12
-node_3 -> node_12
+node_1 -> node_12
+node_6 -> node_12
 node_11 -> node_12
-node_2 -> node_13
-node_9 -> node_13
+node_1 -> node_13
+node_8 -> node_13
 node_10 -> node_13
 node_12 -> node_13
-node_2 -> node_14
-node_9 -> node_14
+node_1 -> node_14
+node_8 -> node_14
 node_13 -> node_14
-node_2 -> node_15
-node_4 -> node_15
+node_1 -> node_15
+node_7 -> node_15
 node_10 -> node_15
 node_14 -> node_15
-node_2 -> node_16
-node_4 -> node_16
+node_1 -> node_16
+node_7 -> node_16
 node_15 -> node_16
-node_2 -> node_17
-node_5 -> node_17
+node_1 -> node_17
+node_4 -> node_17
 node_10 -> node_17
 node_16 -> node_17
-node_2 -> node_18
-node_5 -> node_18
+node_1 -> node_18
+node_4 -> node_18
 node_17 -> node_18
-node_2 -> node_19
-node_8 -> node_19
+node_1 -> node_19
+node_9 -> node_19
 node_10 -> node_19
 node_18 -> node_19
-node_2 -> node_20
-node_8 -> node_20
+node_1 -> node_20
+node_9 -> node_20
 node_19 -> node_20
-node_2 -> node_21
-node_6 -> node_21
+node_1 -> node_21
+node_3 -> node_21
 node_10 -> node_21
 node_20 -> node_21
-node_2 -> node_22
-node_6 -> node_22
+node_1 -> node_22
+node_3 -> node_22
 node_21 -> node_22
-node_2 -> node_23
-node_7 -> node_23
+node_1 -> node_23
+node_5 -> node_23
 node_10 -> node_23
 node_22 -> node_23
-node_2 -> node_24
-node_7 -> node_24
+node_1 -> node_24
+node_5 -> node_24
 node_23 -> node_24
-node_7 -> node_25
+node_5 -> node_25
 node_24 -> node_25
 }
 /*

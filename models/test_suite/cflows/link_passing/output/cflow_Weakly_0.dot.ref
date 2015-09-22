@@ -170,5 +170,4 @@ node_1 -> node_6
 node_5 -> node_6
 }
 /*
- Dot generation time: 0.002854
 */
