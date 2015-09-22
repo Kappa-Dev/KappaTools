@@ -12,9 +12,6 @@ done
 	 -perturbations
 	 -initial conditions
 	 Done
-+ Analyzing non local patterns...
-	 -Counting initial local patterns...
-	 Done
 ____________________________________________________________
 ############################################################
 + Producing causal traces
@@ -23,10 +20,10 @@ ____________________________________________________________
 	 - blackboard generation
 	 - computing causal past of each observed events (10)
 Stats:
- number of step   : 11031
- longest story    : 873
- average length   : 340.312871287
- geometric mean   : 421.938966071
+ number of step   : 11020
+ longest story    : 875
+ average length   : 316.854311199
+ geometric mean   : 408.552012937
 
 	 - causal & weak flow compression (10)
 
@@ -36,10 +33,4 @@ ____________________________________________________________
 
 
 + Pretty printing 10 flows
-Simulation ended (eff.: 0.708215, detail below)
-	Valid embedding but no longer unary when required: 0.000000
-	Valid embedding but not binary when required: 0.000000
-	Clashing instance: 0.000000
-	Lazy negative update: 1.000000
-	Lazy negative update of non local instances: 0.000000
-	Perturbation interrupting time advance: 0.000000
+Simulation ended
