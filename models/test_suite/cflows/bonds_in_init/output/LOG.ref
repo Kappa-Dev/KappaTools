@@ -2,7 +2,7 @@
 Parsing bonds_in_init.ka...
 done
 + Initialized random number generator with seed 611463625
-+ Building initial simulation state...
++ Building initial simulation conditions...
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
@@ -21,10 +21,10 @@ ____________________________________________________________
 	 - blackboard generation
 	 - computing causal past of each observed events (10)
 Stats:
- number of step   : 721
- longest story    : 622
- average length   : 265.969117647
- geometric mean   : 326.720637548
+ number of step   : 692
+ longest story    : 595
+ average length   : 259.04845815
+ geometric mean   : 318.869884023
 
 	 - causal & weak flow compression (10)
 
@@ -34,10 +34,10 @@ ____________________________________________________________
 	 - blackboard generation
 	 - computing causal past of each observed events (10)
 Stats:
- number of step   : 81
+ number of step   : 100
  longest story    : 22
- average length   : 13.5
- geometric mean   : 14.0178457689
+ average length   : 12.
+ geometric mean   : 12.8487707229
 
 	 - causal & weak flow compression (10)
 
@@ -46,11 +46,11 @@ ____________________________________________________________
 
 
 
-	 - strong flow compression (1)
+	 - strong flow compression (2)
 
 ____________________________________________________________
 ############################################################
-+ Pretty printing 6 flows
-+ Pretty printing 1 weakly compressed flow
++ Pretty printing 7 flows
++ Pretty printing 2 weakly compressed flows
 + Pretty printing 1 strongly compressed flow
 Simulation ended
