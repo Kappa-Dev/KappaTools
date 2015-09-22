@@ -197,27 +197,7 @@ let () =
 		      ((float_of_int (Counter.event counter)) /.
 			 (float_of_int
 			    (Counter.null_event counter + Counter.event counter))) in
-      Array.iteri
-	(fun i n ->
-	 match i with
-	 | 0 ->
-	    Format.printf "\tValid embedding but no longer unary when required: %f@."
-			  ((float_of_int n) /. (float_of_int (Counter.null_event counter)))
-	 | 1 ->
-	    Format.printf "\tValid embedding but not binary when required: %f@."
-			  ((float_of_int n) /. (float_of_int (Counter.null_event counter)))
-	 | 2 ->
-	    Format.printf "\tClashing instance: %f@."
-			  ((float_of_int n) /. (float_of_int (Counter.null_event counter)))
-	 | 3 ->
-	    Format.printf "\tLazy negative update: %f@."
-			  ((float_of_int n) /. (float_of_int (Counter.null_event counter)))
-	 | 4 -> Format.printf "\tLazy negative update of non local instances: %f@."
-			      ((float_of_int n) /. (float_of_int (Counter.null_event counter)))
-	 | 5 -> Format.printf "\tPerturbation interrupting time advance: %f@."
-			      ((float_of_int n) /. (float_of_int (Counter.null_event counter)))
-	 |_ -> Format.printf "\tna@."
-	) counter.Counter.stat_null ;
+      Counter.print_efficiency Format.std_formatter counter ;
   with
   | ExceptionDefn.Malformed_Decl er ->
      let () = close_desc None in

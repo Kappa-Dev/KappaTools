@@ -258,13 +258,14 @@ let a_loop form env domain counter graph state =
 	 when Nbr.is_smaller ti (Nbr.F (Mods.Counter.time counter +. dt)) ->
        let () = state.stopping_times := tail in
        let () = counter.Mods.Counter.time <- Nbr.to_float ti in
-       perturbate env domain counter graph state
+       let stop,graph',state' = perturbate env domain counter graph state in
+       (not (Mods.Counter.one_time_correction_event counter 0.)||stop,graph',state')
     | _ ->
        let (stop,graph',state') =
 	 perturbate env domain counter graph state in
        match one_rule env domain counter graph' state' with
        | None ->
-	  (not (Mods.Counter.one_null_event counter dt)||stop,graph',state')
+	  (not (Mods.Counter.one_clashing_instance_event counter dt)||stop,graph',state')
        | Some (graph'',state'') ->
 	  let () =
 	    Plot.fill form counter env dt
