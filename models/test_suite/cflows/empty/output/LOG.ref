@@ -19,7 +19,7 @@ ____________________________________________________________
 	 - detecting siphons
 	 - cutting concurrent events
 	 - blackboard generation
-	 - computing causal past of each observed events (4)
+	 - computing causal past of each observed events (5)
 Stats:
  number of step   : 35
  longest story    : 4
