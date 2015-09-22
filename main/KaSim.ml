@@ -187,25 +187,8 @@ let () =
     ExceptionDefn.flush_warning Format.err_formatter ;
     Parameter.initSimTime () ;
     let () =
-      try State_interpreter.loop Format.std_formatter env cc_env counter graph new_state
-      with
-      | ExceptionDefn.UserInterrupted f ->
-	 begin
-	   let () = Format.print_newline() in
-	   let msg = f (Counter.time counter) (Counter.event counter) in
-	   let () =
-	     Format.eprintf
-	       "@.***%s: would you like to record the current state? (y/N)***@."
-	       msg in
-	   let () = close_desc (Some env) in
-	   (*closes all other opened descriptors*)
-	   if not !Parameter.batchmode then
-	     match String.lowercase (Tools.read_input ()) with
-	     | ("y" | "yes") ->
-		Kappa_files.with_dump
-		  (fun f -> Rule_interpreter.print env f graph)
-	     | _ -> ()
-	 end in
+      State_interpreter.loop Format.std_formatter env cc_env counter graph new_state
+    in
     Format.printf "Simulation ended";
     if Counter.null_event counter = 0 then Format.print_newline()
     else

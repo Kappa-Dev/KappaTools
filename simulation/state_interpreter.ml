@@ -276,17 +276,39 @@ let loop_cps form hook return env domain counter graph state =
     Mods.Counter.tick
       form counter counter.Mods.Counter.time counter.Mods.Counter.events in
   let rec iter graph state =
-    let stop,graph',state' = a_loop form env domain counter graph state in
+    let stop,graph',state' = 
+      try
+	let (stop,graph',state') as out = a_loop form env domain counter graph state in
+	let () = if stop then
+		   let () =
+		     Plot.fill form counter env 0.0
+			       (observables_values env counter graph' state') in
+		   ignore (perturbate env domain counter graph' state') in
+	out
+      with ExceptionDefn.UserInterrupted f ->
+	   let () = Format.print_newline() in
+	   let msg = f (Mods.Counter.time counter) (Mods.Counter.event counter) in
+	   let () =
+	     Format.eprintf
+	       "@.***%s: would you like to record the current state? (y/N)***@."
+	       msg in
+	   let () = Environment.close_desc env in
+	   (*closes all other opened descriptors*)
+	   let () = if not !Parameter.batchmode then
+		      match String.lowercase (Tools.read_input ()) with
+		      | ("y" | "yes") ->
+			 Kappa_files.with_dump
+			   (fun f -> Rule_interpreter.print env f graph)
+		      | _ -> () in
+	   (true,graph,state)
+	 in
     if stop then
-      let () =
-	Plot.fill form counter env 0.0
-		  (observables_values env counter graph' state') in
-      let (_,_,_) = perturbate env domain counter graph' state' in
-      return form env counter graph state
+      return form env counter graph' state'
     else
       hook (fun () -> iter graph' state')
-  in iter graph state
-
+  in
+    iter graph state
+    
 let finalize form env counter graph state =
   let () = Plot.close form counter in
   let () =
