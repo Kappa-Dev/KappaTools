@@ -138,7 +138,7 @@ let do_it env domain counter graph state = function
 	 (Kappa_printer.print_expr_val
 	    ~env (fun ?env ->
 		  Rule_interpreter.value_alg counter graph ~get_alg)) s in
-     let size = Environment.nb_rules env in
+     let size = Environment.nb_syntactic_rules env in
      let () =
        if List.exists (fun (x,_) -> x = file) state.flux
        then ExceptionDefn.warning
@@ -169,7 +169,8 @@ let perturbate env domain counter graph state =
     if stop || i >= Environment.nb_perturbations env then
       let graph' =
 	Rule_interpreter.update_outdated_activities
-	  ~get_alg Random_tree.add env counter graph state.activities in
+	  ~get_alg (fun x _ y -> Random_tree.add x y state.activities)
+	  env counter graph in
       (stop,graph',state)
     else
       let pert = Environment.get_perturbation env i in
@@ -196,15 +197,16 @@ let perturbate env domain counter graph state =
 
 let one_rule env domain counter graph state =
   let rule_id,_ = Random_tree.random state.activities in
-  let register_new_activity rd_id new_act tree =
+  let rule = Environment.get_rule env rule_id in
+  let register_new_activity rd_id syntax_rd_id new_act =
     let () =
       if state.flux <> [] then
 	let old_act = Random_tree.find rd_id state.activities in
 	List.iter (fun (_,flux) ->
-		   flux.(rule_id).(rd_id) <-
-		     flux.(rule_id).(rd_id) +. (new_act -. old_act)) state.flux
-    in Random_tree.add rd_id new_act tree in
-  let rule = Environment.get_rule env rule_id in
+		   flux.(rule.Primitives.syntactic_rule).(syntax_rd_id) <-
+		     flux.(rule.Primitives.syntactic_rule).(syntax_rd_id) +.
+		       (new_act -. old_act)) state.flux
+    in Random_tree.add rd_id new_act state.activities in
   let () =
     if !Parameter.debugModeOn then
       Format.printf "@[<v>@[Applied@ %i:@]@ @[%a@]@]@." rule_id
@@ -215,16 +217,33 @@ let one_rule env domain counter graph state =
   let cause = Causal.RULE rule.Primitives.syntactic_rule in
   match Rule_interpreter.apply_rule
 	  ~get_alg domain counter graph cause rule with
-  | None -> None
   | Some graph' ->
      let graph'' =
        Rule_interpreter.update_outdated_activities
-	 ~get_alg register_new_activity  env counter graph' state.activities in
+	 ~get_alg register_new_activity  env counter graph' in
      let () =
        if !Parameter.debugModeOn then
 	 Format.printf "@[<v>Obtained@ %a@]@."
 		       (Rule_interpreter.print env) graph' in
      Some (graph'',state)
+  | None ->
+     if Mods.Counter.consecutive_null_event counter < !Parameter.maxConsecutiveClash
+     then None
+     else
+       let graph' =
+	 match Rule_interpreter.force_rule
+		 ~get_alg domain counter graph cause rule with
+	 | graph',Some [] ->
+	    let () = Random_tree.add rule_id 0.0 state.activities in graph'
+	 | graph',(None | Some (_::_)) -> graph' in
+       let graph'' =
+	 Rule_interpreter.update_outdated_activities
+	   ~get_alg register_new_activity  env counter graph' in
+       let () =
+	 if !Parameter.debugModeOn then
+	   Format.printf "@[<v>Obtained after forcing rule@ %a@]@."
+			 (Rule_interpreter.print env) graph' in
+       Some (graph'',state)
 
 let activity state =
   Random_tree.total state.activities
@@ -277,9 +296,10 @@ let loop_cps form hook return env domain counter graph state =
     Mods.Counter.tick
       form counter counter.Mods.Counter.time counter.Mods.Counter.events in
   let rec iter graph state =
-    let stop,graph',state' = 
+    let stop,graph',state' =
       try
-	let (stop,graph',state') as out = a_loop form env domain counter graph state in
+	let (stop,graph',state') as out =
+	  a_loop form env domain counter graph state in
 	let () = if stop then
 		   let () =
 		     Plot.fill form counter env 0.0
@@ -287,28 +307,24 @@ let loop_cps form hook return env domain counter graph state =
 		   ignore (perturbate env domain counter graph' state') in
 	out
       with ExceptionDefn.UserInterrupted f ->
-	   let () = Format.print_newline() in
-	   let msg = f (Mods.Counter.time counter) (Mods.Counter.event counter) in
-	   let () =
-	     Format.fprintf form
-	       "@.***%s: would you like to record the current state? (y/N)***@."
-	       msg in
-	   (*closes all other opened descriptors*)
-	   let () = if not !Parameter.batchmode then
-		      match String.lowercase (Tools.read_input ()) with
-		      | ("y" | "yes") ->
-			 Kappa_files.with_dump
-			   (fun f -> Rule_interpreter.print env f graph)
-		      | _ -> () in
-	   (true,graph,state)
-	 in
-    if stop then
-      return form env counter graph' state'
-    else
-      hook (fun () -> iter graph' state')
-  in
-    iter graph state
-    
+	let () = Format.print_newline() in
+	let msg = f (Mods.Counter.time counter) (Mods.Counter.event counter) in
+	let () =
+	  Format.fprintf
+	    form
+	    "@.***%s: would you like to record the current state? (y/N)***@."
+	    msg in
+	let () = if not !Parameter.batchmode then
+		   match String.lowercase (Tools.read_input ()) with
+		   | ("y" | "yes") ->
+		      Kappa_files.with_dump
+			(fun f -> Rule_interpreter.print env f graph)
+		   | _ -> () in
+	(true,graph,state) in
+    if stop then return form env counter graph' state'
+    else hook (fun () -> iter graph' state')
+  in iter graph state
+
 let finalize form env counter graph state =
   let () = Plot.close form counter in
   let () =

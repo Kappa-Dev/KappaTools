@@ -35,9 +35,12 @@ side to do apply the rule and returns the remaining exact injections. *)
 
 val extra_outdated_var : int -> t -> t
 val update_outdated_activities :
-  get_alg:(int -> Alg_expr.t) -> (int -> float -> 'a -> unit) ->
-  Environment.t -> Mods.Counter.t -> t -> 'a -> t
+  get_alg:(int -> Alg_expr.t) -> (int -> int -> float -> unit) ->
+  Environment.t -> Mods.Counter.t -> t -> t
 (** Resynchronize the state after a rule application.
+
+It takes the function to store the new activities as an argument whose
+ signature is [store rule_id syntactic_rule_id new_activity].
 
 As long as you don't use any algebraic variable (that include don't
 pick a rule randomly), you can apply several rules in row before

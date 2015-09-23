@@ -7,8 +7,8 @@ let dot_of_flux env (file,flux) =
     let () =
       Pp.array Pp.space
 	       (fun i f _ ->
-		Format.fprintf f "\"%a\" ;" (Environment.print_rule ~env) i)
-	       desc flux in
+		Format.fprintf
+		  f "\"%a\" ;" (Environment.print_ast_rule ~env) i) desc flux in
     let () =
       Pp.array
 	(fun _ -> ())

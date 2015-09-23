@@ -202,7 +202,7 @@ let value_alg ~get_alg counter state alg =
 let extra_outdated_var i state =
   {state with outdated_elements =
 		Operator.DepSet.add (Operator.ALG i) state.outdated_elements}
-let update_outdated_activities ~get_alg store env counter state activities =
+let update_outdated_activities ~get_alg store env counter state =
   (* I don't know if this is more efficient than computing the
   transitive closure of what should be updated and then updating them
   only once or not *)
@@ -223,7 +223,7 @@ let update_outdated_activities ~get_alg store env counter state activities =
 			     (Environment.print_rule ~env) i cc_va in
 	   let act =
 	     if cc_va = 0 then 0. else rate *. float_of_int cc_va in
-	   store i act activities
+	   store i rule.Primitives.syntactic_rule act
 	| Operator.ALG j -> aux (Environment.get_reverse_dependencies env j)
 	| Operator.PERT (-1) -> () (* TODO *)
 	| Operator.PERT _ -> assert false) deps in
