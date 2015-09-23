@@ -84,7 +84,7 @@ end =
 	Format.fprintf f "\tLazy negative update of non local instances: %f@,"
 		       ((float_of_int n) /. (float_of_int t.(all))) in*)
       Format.fprintf
-	f "\tPerturbation interrupting time advance: %f@,@]@."
+	f "\tPerturbation interrupting time advance: %f@]@."
 	((float_of_int t.(time_correction)) /. (float_of_int t.(all)))
   end
 
