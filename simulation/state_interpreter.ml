@@ -54,7 +54,7 @@ let snapshot env counter file graph =
   Kappa_files.with_snapshot
     file (Mods.Counter.event counter)
     (if !Parameter.dotOutput then failwith "dot snapshot not implemented yet" else "ka")
-    (fun f -> Rule_interpreter.print env f graph)
+    (fun f -> Format.fprintf f "%a@." (Rule_interpreter.print env) graph)
 
 let do_it env domain counter graph state = function
   | Primitives.ITER_RULE ((v,_),r) ->
@@ -308,7 +308,7 @@ let loop_cps form hook return env domain counter graph state =
 		   ignore (perturbate env domain counter graph' state') in
 	out
       with ExceptionDefn.UserInterrupted f ->
-	let () = Format.print_newline() in
+	let () = Format.pp_print_newline form () in
 	let msg = f (Mods.Counter.time counter) (Mods.Counter.event counter) in
 	let () =
 	  Format.fprintf
@@ -317,9 +317,7 @@ let loop_cps form hook return env domain counter graph state =
 	    msg in
 	let () = if not !Parameter.batchmode then
 		   match String.lowercase (Tools.read_input ()) with
-		   | ("y" | "yes") ->
-		      Kappa_files.with_dump
-			(fun f -> Rule_interpreter.print env f graph)
+		   | ("y" | "yes") -> snapshot env counter "dump" graph
 		   | _ -> () in
 	(true,graph,state) in
     if stop then return form env counter graph' state'

@@ -2,7 +2,6 @@ let outputDirName = ref ""
 let marshalizedOutFile = ref ""
 let snapshotFileName = ref "snap"
 let ccFileName = ref ""
-let dumpFileName = ref "dump.ka"
 let cflowFileName = ref "cflow.dot"
 let profilingName = ref "profiling.txt"
 let influenceFileName = ref ""
@@ -59,7 +58,6 @@ let set name ext_opt =
 
 let setOutputName () =
   set snapshotFileName (Some "dot");
-  set dumpFileName (Some "ka");
   set influenceFileName (Some "dot") ;
   set ccFileName (Some "dot") ;
   set fluxFileName (Some "dot") ;
@@ -90,6 +88,7 @@ let with_formatter str f =
     let desc = open_out str in
     let fr = Format.formatter_of_out_channel desc in
     let () = f fr in
+    let () = Format.pp_print_flush fr () in
     close_out desc
 
 let (openOutDescriptors:out_channel list ref) = ref []
@@ -145,7 +144,7 @@ let with_snapshot str event ext f =
       str [] (string_of_int event) ext in
     let fr = Format.formatter_of_out_channel desc in
     let () =
-      Format.fprintf fr "# Snapshot [Event: %d]@.%t" (*", Time: %f"*) event f in
+      Format.fprintf fr "# Snapshot [Event: %d]@.%t@?"(*", Time: %f"*)event f in
     close_out desc
 
 let set_influence s = influenceFileName := s
@@ -153,12 +152,6 @@ let set_up_influence () =
   set_influence
     (if !influenceFileName = "" then "im.dot" else !influenceFileName)
 let with_influence f = with_formatter !influenceFileName f
-
-let with_dump f =
-  let desc = open_out !dumpFileName in
-  let () = f (Format.formatter_of_out_channel desc) in
-  let () = close_out desc in
-  Format.eprintf "Final state dumped (%s)@." !dumpFileName
 
 let set_ccFile f = ccFileName := f
 let with_ccFile f = with_formatter !ccFileName f
