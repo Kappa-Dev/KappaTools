@@ -1,7 +1,7 @@
-+ Command line is: 'KaSim' '-i' 'side-effects.ka' '-seed' '924556145' '-e' '199' '-d' 'output'
++ Command line is: 'KaSim' '-i' 'side-effects.ka' '-seed' '501792230' '-e' '199' '-d' 'output'
 Parsing side-effects.ka...
 done
-+ Initialized random number generator with seed 924556145
++ Initialized random number generator with seed 501792230
 + Building initial simulation conditions...
 + Compiling...
 	 -simulation parameters
@@ -12,9 +12,6 @@ done
 	 -perturbations
 	 -initial conditions
 	 Done
-+ Analyzing non local patterns...
-	 -Counting initial local patterns...
-	 Done
 ____________________________________________________________
 ############################################################
 + Producing causal compressions
@@ -22,39 +19,33 @@ ____________________________________________________________
 	 - detecting siphons
 	 - cutting concurrent events
 	 - blackboard generation
-	 - computing causal past of each observed events (3)
+	 - computing causal past of each observed events (2)
 Stats:
- number of step   : 215
- longest story    : 137
- average length   : 73.0620155039
- geometric mean   : 82.2055940306
+ number of step   : 213
+ longest story    : 64
+ average length   : 34.6666666667
+ geometric mean   : 39.3856327888
 
-	 - causal & weak flow compression (3)
+	 - causal & weak flow compression (2)
 
 ____________________________________________________________
 ############################################################
 	 - detecting pseudo inverse events
 	 - blackboard generation
-	 - computing causal past of each observed events (3)
+	 - computing causal past of each observed events (2)
 Stats:
- number of step   : 90
- longest story    : 86
- average length   : 81.
- geometric mean   : 81.1028154053
+ number of step   : 83
+ longest story    : 80
+ average length   : 62.5
+ geometric mean   : 64.9037749287
 
-	 - causal & weak flow compression (3)
+	 - causal & weak flow compression (2)
 
 ____________________________________________________________
 ############################################################
 
 
 
-+ Pretty printing 3 flows
++ Pretty printing 2 flows
 + Pretty printing 1 weakly compressed flow
-Simulation ended (eff.: 0.759542, detail below)
-	Valid embedding but no longer unary when required: 0.000000
-	Valid embedding but not binary when required: 0.000000
-	Clashing instance: 0.000000
-	Lazy negative update: 1.000000
-	Lazy negative update of non local instances: 0.000000
-	Perturbation interrupting time advance: 0.000000
+Simulation ended
