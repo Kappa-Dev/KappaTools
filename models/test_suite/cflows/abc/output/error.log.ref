@@ -70,6 +70,8 @@ Environment:
     /*0*/%mod: [true] do $TRACK C/*3*/(x1~u?, x2~u?) [true]
     /*1*/%mod: [true] do $TRACK C/*3*/(x1~p?, x2~u?) [true]
     /*2*/%mod: [true] do $TRACK C/*3*/(x1~p?, x2~p?) [true]
+    /*3*/%mod: [true] do $FLUX "flux_map.dot" [true]
+    /*4*/%mod: ([E] = INF) do $FLUX "flux_map.dot" [false]
 Domain:
   () -> /*cc0*/  -> (-!B-2__-⊥->()2 -!A-1__-⊥->()4 -!C-3__-⊥->()7)
   (4 2) -> /*cc1*/ A/*1*/(x!1), B/*2*/(x!1)
@@ -160,3 +162,5 @@ Intial graph;
   %init: 1000 A(x, c)
   %init: 1000 B(x)
   
+File "abc.ka", line 40, characters 17-18:
+Warning: [Emax] constant is evaluated to infinity

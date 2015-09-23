@@ -170,6 +170,7 @@ let () =
 			   d (env,cc_env,counter) [Marshal.Closures]) in
     let () = Kappa_files.with_ccFile
 	       (fun f -> Connected_component.Env.print_dot f cc_env) in
+    ExceptionDefn.flush_warning Format.err_formatter ;
     if !Parameter.compileModeOn then exit 0 else ();
 
     Kappa_files.setCheckFileExists() ;
@@ -181,10 +182,6 @@ let () =
 	  env
 	  (State_interpreter.observables_values env counter graph new_state) in
 
-(*    Kappa_files.with_influence
-      (fun d -> State.dot_of_influence_map d state env); *)
-
-    ExceptionDefn.flush_warning Format.err_formatter ;
     Parameter.initSimTime () ;
     let () =
       State_interpreter.loop Format.std_formatter env cc_env counter graph new_state

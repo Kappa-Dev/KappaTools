@@ -146,14 +146,20 @@ let rec compile_alg var_map tk_map ?max_allowed_var
      let getMaxEventValue =
        match !Parameter.maxEventValue with
        | Some n -> Nbr.I n
-       | None -> Format.eprintf "[emax] constant is evaluated to infinity@.";
-		 Nbr.F infinity in
+       | None ->
+	  ExceptionDefn.warning
+	    ~pos (fun f -> Format.pp_print_string
+			     f "[Emax] constant is evaluated to infinity");
+	  Nbr.F infinity in
      (domain,(CONST getMaxEventValue,pos))
   | Ast.TMAX ->
      let getMaxTimeValue = match !Parameter.maxTimeValue with
        | Some t -> Nbr.F t
-       | None -> Format.eprintf "[tmax] constant is evaluated to infinity@.";
-		 Nbr.F infinity in
+       | None ->
+	  ExceptionDefn.warning
+	    ~pos (fun f -> Format.pp_print_string
+			     f "[Tmax] constant is evaluated to infinity");
+		  Nbr.F infinity in
      (domain,(CONST getMaxTimeValue,pos))
   | Ast.PLOTNUM ->
 	  let getPointNumberValue = Nbr.I !Parameter.pointNumberValue in

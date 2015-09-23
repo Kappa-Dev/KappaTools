@@ -138,7 +138,7 @@ let do_it env domain counter graph state = function
 	 (Kappa_printer.print_expr_val
 	    ~env (fun ?env ->
 		  Rule_interpreter.value_alg counter graph ~get_alg)) s in
-     let size = Environment.nb_syntactic_rules env in
+     let size = 2 * Environment.nb_syntactic_rules env + 1 in
      let () =
        if List.exists (fun (x,_) -> x = file) state.flux
        then ExceptionDefn.warning
@@ -199,12 +199,13 @@ let one_rule env domain counter graph state =
   let rule_id,_ = Random_tree.random state.activities in
   let rule = Environment.get_rule env rule_id in
   let register_new_activity rd_id syntax_rd_id new_act =
+    let p i = i + Environment.nb_syntactic_rules env in
     let () =
       if state.flux <> [] then
 	let old_act = Random_tree.find rd_id state.activities in
 	List.iter (fun (_,flux) ->
-		   flux.(rule.Primitives.syntactic_rule).(syntax_rd_id) <-
-		     flux.(rule.Primitives.syntactic_rule).(syntax_rd_id) +.
+		   flux.(p rule.Primitives.syntactic_rule).(p syntax_rd_id) <-
+		     flux.(p rule.Primitives.syntactic_rule).(p syntax_rd_id) +.
 		       (new_act -. old_act)) state.flux
     in Random_tree.add rd_id new_act state.activities in
   let () =
