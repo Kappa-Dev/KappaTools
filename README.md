@@ -3,13 +3,15 @@ src="https://rawgithub.com/Kappa-Dev/KaSim/master/man/img/KaSim-Logo.svg"
 alt="KaSim logo" title="Stochastic Kappa Simulator" align="right" height="90"/>
 # KaSim
 
-KaSim is a stochastic simulator for rule-based models written in Kappa. A pdf of
-the reference manual is available
-[here](https://github.com/Kappa-Dev/KaSim/releases);
+KaSim is a stochastic simulator for rule-based models written in Kappa. KaSa is a static analyser for Kappa models.
 
-the latex sources are available in the man/ directory. To compile the manuel, in addition of a descent LaTeX distribution you need [graphviz](http://www.graphviz.org/) to generate images (make sure that dot is in the PATH of your OS). To generate the pdf of the manuel type
+## User manual
 
-`make doc
+A pdf of the reference manual is available [here](https://github.com/Kappa-Dev/KaSim/releases);
+
+The latex sources are available in the man/ directory. To compile the manuel, in addition of a descent LaTeX distribution you need [graphviz](http://www.graphviz.org/) to generate images (make sure that dot is in the PATH of your OS). To generate the pdf of the manuel type
+
+`make doc`
 
 ## Installation
 
