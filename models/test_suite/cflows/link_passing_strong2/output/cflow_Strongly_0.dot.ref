@@ -36,5 +36,4 @@ node_3 -> node_7
 node_6 -> node_7
 }
 /*
- Dot generation time: 0.000183
 */
