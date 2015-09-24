@@ -131,7 +131,7 @@ sig
   val agent_id_in_obs: (refined_step -> H.error_channel * AgentIdSet.t) H.with_handler 
 
   val fill_siphon: refined_step list -> refined_step list
-
+  val split_init: refined_step list -> refined_step list 
 (*  val print_step: (refined_step -> H.error_channel) H.with_handler *)
   val agent_id_in_obs: (refined_step -> H.error_channel * AgentIdSet.t) H.with_handler
 end
@@ -1116,7 +1116,18 @@ module Cflow_linker =
       end 
     with 
       Not_found -> 
-	remanent,set 
+      remanent,set
+
+  let split_init refined_step_list =
+    let remanent = AgentIdMap.empty in 
+    fst (List.fold_left
+      (fun (step_list,remanent) refined_step ->
+       match refined_step
+       with
+       | Init init -> convert_init remanent step_list init
+       | _ -> (refined_step::step_list,remanent))
+      ([],remanent)
+      (List.rev refined_step_list))
 
   let fill_siphon refined_step_list =
     let remanent = AgentIdMap.empty in 

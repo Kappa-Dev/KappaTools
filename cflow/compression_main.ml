@@ -71,7 +71,7 @@ let compress_and_print logger env log_info step_list =
             else Debug.tag logger "+ Producing causal traces"
           in
           let error = D.S.PH.B.PB.CI.Po.K.H.error_init in
-          let refined_event_list = D.S.PH.B.PB.CI.Po.K.disambiguate step_list in
+          let refined_event_list = D.S.PH.B.PB.CI.Po.K.disambiguate (D.S.PH.B.PB.CI.Po.K.split_init step_list) in
           let () = if log_step then Debug.tag logger"\t - refining events" in
 	  let refined_event_list_wo_siphon =
 	    if Graph_closure.ignore_flow_from_outgoing_siphon then
