@@ -230,7 +230,7 @@ let add_actions env grid event_number kind actions =
 	      match Signature.default_internal_state na site sigs with
 	      | None -> grid
 	      | Some _ -> add (ag,site) false atom_modified grid event_number kind in
-	    add (ag,site) true 1 grid' event_number kind)
+	    add (ag,site) true atom_modified grid' event_number kind)
 	   ag_intf grid in
        aux grid q
   in aux grid actions
