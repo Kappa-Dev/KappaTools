@@ -12,7 +12,7 @@ done
 	 -perturbations
 	 -initial conditions
 	 Done
-+ Command line is: 'KaSim' '-i' 'abc.ka' '-seed' '924556145' '-var' 'on_rate' '1.0E-4' '-e' '10000' '-d' 'output' '-p' '500'
++ Command line is: 'KaSim' '-i' 'abc.ka' '-seed' '924556145' '-var' 'on_rate' '1.0E-4' '-e' '2000' '-d' 'output' '-p' '500'
 Parsing abc.ka...
 done
 + Initialized random number generator with seed 924556145
@@ -33,36 +33,36 @@ ____________________________________________________________
 	 - detecting siphons
 	 - cutting concurrent events
 	 - blackboard generation
-	 - computing causal past of each observed events (3966)
+	 - computing causal past of each observed events (639)
 Stats:
- number of step   : 24967
- longest story    : 130
- average length   : 17.6181440642
- geometric mean   : 22.7212639525
+ number of step   : 14640
+ longest story    : 24
+ average length   : 6.62561576355
+ geometric mean   : 7.52177589022
 
-	 - causal & weak flow compression (3966)
+	 - causal & weak flow compression (639)
 
 ____________________________________________________________
 ############################################################
 	 - detecting pseudo inverse events
 	 - blackboard generation
-	 - computing causal past of each observed events (3966)
+	 - computing causal past of each observed events (639)
 
 ____________________________________________________________
 ############################################################
 Stats:
- number of step   : 18443
- longest story    : 54
- average length   : 13.0529500756
- geometric mean   : 14.7115996717
+ number of step   : 3427
+ longest story    : 18
+ average length   : 8.52582159624
+ geometric mean   : 8.98198510008
 
-	 - causal & weak flow compression (3966)
+	 - causal & weak flow compression (639)
 
 ____________________________________________________________
 ############################################################
 
 
 
-+ Pretty printing 941 flows
++ Pretty printing 23 flows
 + Pretty printing 2 weakly compressed flows
 Simulation ended

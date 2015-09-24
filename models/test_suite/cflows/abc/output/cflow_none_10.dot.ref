@@ -1,14 +1,11 @@
-/* Compression of 39 causal flows obtained in average at 1.362439E+01 t.u */
-/* Compressed causal flows were: [386;621;631;657;873;879;1195;1389;1410;
-1411;1591;1596;1686;1706;1739;1745;1827;1978;2109;2127;2180;2202;2237;2400;
-2466;2497;2553;2682;2777;2810;2812;2930;3008;3196;3209;3320;3357;3538;
-3767] */
+/* Compression of 3 causal flows obtained in average at 5.986683E+00 t.u */
+/* Compressed causal flows were: [386;621;631] */
 digraph G{
  ranksep=.5 ;
 { rank = same ; "0" [shape=plaintext] ;
-node_1 [label="Intro A, B", shape=house, style=filled, fillcolor=green] ;
-node_2 [label="Intro A, B", shape=house, style=filled, fillcolor=green] ;
-node_3 [label="Intro A, B", shape=house, style=filled, fillcolor=green] ;
+node_1 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_2 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_3 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 node_4 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
 node_5 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
 }
@@ -53,19 +50,19 @@ node_1 -> node_8
 node_2 -> node_8
 node_7 -> node_8
 node_2 -> node_9
-node_4 -> node_9
+node_5 -> node_9
 node_8 -> node_9
 node_2 -> node_10
-node_4 -> node_10
+node_5 -> node_10
 node_9 -> node_10
 node_2 -> node_11
-node_5 -> node_11
+node_4 -> node_11
 node_8 -> node_11
 node_10 -> node_11
 node_2 -> node_12
-node_5 -> node_12
+node_4 -> node_12
 node_11 -> node_12
-node_5 -> node_13
+node_4 -> node_13
 node_12 -> node_13
 }
 /*

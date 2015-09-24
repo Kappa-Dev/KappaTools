@@ -1,16 +1,12 @@
-/* Compression of 73 causal flows obtained in average at 1.075254E+01 t.u */
+/* Compression of 14 causal flows obtained in average at 5.671709E+00 t.u */
 /* Compressed causal flows were: [227;373;420;444;453;459;479;512;562;574;
-593;595;603;620;659;662;726;751;771;795;797;805;839;891;900;903;907;1021;
-1022;1049;1154;1172;1189;1201;1297;1329;1358;1400;1404;1407;1447;1466;1490;
-1505;1510;1550;1557;1573;1628;1632;1823;1865;1927;1928;2000;2005;2080;2181;
-2194;2246;2320;2368;2403;2753;2820;2839;3129;3174;3228;3253;3726;3793;
-3809] */
+593;595;603;620] */
 digraph G{
  ranksep=.5 ;
 { rank = same ; "0" [shape=plaintext] ;
-node_1 [label="Intro A, B", shape=house, style=filled, fillcolor=green] ;
-node_2 [label="Intro A, B", shape=house, style=filled, fillcolor=green] ;
-node_3 [label="Intro A, B", shape=house, style=filled, fillcolor=green] ;
+node_1 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_2 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_3 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 node_4 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
 node_5 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
 }
@@ -46,25 +42,25 @@ node_13 [label="C/*3*/(x1~p?, x2~p?)", style=filled, fillcolor=red] ;
 "5" -> "6" [style="invis"];
 "6" -> "7" [style="invis"];
 "7" -> "8" [style="invis"];
+node_1 -> node_6
 node_2 -> node_6
-node_3 -> node_6
-node_2 -> node_7
+node_1 -> node_7
 node_5 -> node_7
 node_6 -> node_7
-node_2 -> node_8
+node_1 -> node_8
 node_5 -> node_8
 node_7 -> node_8
-node_2 -> node_9
+node_1 -> node_9
 node_4 -> node_9
 node_6 -> node_9
 node_8 -> node_9
-node_2 -> node_10
+node_1 -> node_10
 node_4 -> node_10
 node_9 -> node_10
-node_1 -> node_11
+node_3 -> node_11
 node_4 -> node_11
 node_10 -> node_11
-node_1 -> node_12
+node_3 -> node_12
 node_4 -> node_12
 node_10 -> node_12
 node_11 -> node_12

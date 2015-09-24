@@ -1,22 +1,10 @@
-/* Compression of 185 causal flows obtained in average at 1.299633E+01 t.u */
-/* Compressed causal flows were: [313;337;428;443;507;540;550;690;704;709;
-720;724;822;827;833;887;896;899;926;942;943;967;977;981;1008;1036;1037;1052;
-1057;1086;1092;1095;1137;1158;1160;1166;1169;1182;1187;1200;1250;1251;1256;
-1257;1259;1279;1281;1288;1290;1292;1293;1296;1302;1313;1334;1335;1359;1361;
-1363;1376;1398;1409;1484;1486;1494;1496;1527;1538;1560;1561;1567;1600;1629;
-1635;1644;1650;1656;1657;1662;1663;1667;1703;1711;1716;1717;1720;1724;1751;
-1769;1782;1785;1807;1809;1820;1828;1832;1844;1854;1867;1872;1873;1895;1899;
-1901;1923;1930;1938;1955;1961;1976;1987;1997;2002;2018;2048;2074;2077;2085;
-2125;2129;2131;2143;2168;2176;2198;2199;2207;2260;2261;2267;2277;2293;2307;
-2335;2446;2468;2505;2567;2602;2607;2612;2633;2635;2660;2667;2685;2707;2720;
-2736;2786;2866;2873;2880;2965;2971;3045;3100;3193;3218;3229;3254;3279;3305;
-3319;3370;3381;3390;3455;3490;3492;3499;3505;3508;3543;3575;3635;3661;3680;
-3715;3728;3735;3759;3775;3887;3917] */
+/* Compression of 7 causal flows obtained in average at 5.380568E+00 t.u */
+/* Compressed causal flows were: [313;337;428;443;507;540;550] */
 digraph G{
  ranksep=.5 ;
 { rank = same ; "0" [shape=plaintext] ;
-node_1 [label="Intro A, B", shape=house, style=filled, fillcolor=green] ;
-node_2 [label="Intro A, B", shape=house, style=filled, fillcolor=green] ;
+node_1 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_2 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
 node_3 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
 node_4 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
 node_5 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
@@ -73,41 +61,41 @@ node_19 [label="C/*3*/(x1~p?, x2~u?)", style=filled, fillcolor=red] ;
 "11" -> "12" [style="invis"];
 node_1 -> node_8
 node_2 -> node_8
-node_2 -> node_9
+node_1 -> node_9
 node_7 -> node_9
 node_8 -> node_9
-node_2 -> node_10
+node_1 -> node_10
 node_7 -> node_10
 node_9 -> node_10
-node_2 -> node_11
-node_4 -> node_11
+node_1 -> node_11
+node_3 -> node_11
 node_8 -> node_11
 node_10 -> node_11
-node_2 -> node_12
-node_4 -> node_12
+node_1 -> node_12
+node_3 -> node_12
 node_11 -> node_12
-node_2 -> node_13
-node_6 -> node_13
+node_1 -> node_13
+node_4 -> node_13
 node_8 -> node_13
 node_12 -> node_13
-node_2 -> node_14
-node_6 -> node_14
+node_1 -> node_14
+node_4 -> node_14
 node_13 -> node_14
-node_2 -> node_15
-node_3 -> node_15
+node_1 -> node_15
+node_5 -> node_15
 node_8 -> node_15
 node_14 -> node_15
-node_2 -> node_16
-node_3 -> node_16
+node_1 -> node_16
+node_5 -> node_16
 node_15 -> node_16
-node_2 -> node_17
-node_5 -> node_17
+node_1 -> node_17
+node_6 -> node_17
 node_8 -> node_17
 node_16 -> node_17
-node_2 -> node_18
-node_5 -> node_18
+node_1 -> node_18
+node_6 -> node_18
 node_17 -> node_18
-node_5 -> node_19
+node_6 -> node_19
 node_18 -> node_19
 }
 /*
