@@ -3,12 +3,12 @@
 digraph G{
  ranksep=.5 ;
 { rank = same ; "0" [shape=plaintext] ;
-node_1 [label="Intro A, B", shape=house, style=filled, fillcolor=green] ;
-node_2 [label="Intro A, B", shape=house, style=filled, fillcolor=green] ;
-node_3 [label="Intro A, B", shape=house, style=filled, fillcolor=green] ;
-node_4 [label="Intro A, B", shape=house, style=filled, fillcolor=green] ;
-node_5 [label="Intro A, B", shape=house, style=filled, fillcolor=green] ;
-node_6 [label="Intro A, B", shape=house, style=filled, fillcolor=green] ;
+node_1 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_2 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_3 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_4 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_5 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_6 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 node_13 [label="pert", shape=invhouse, style=filled, fillcolor = green] ;
 node_14 [label="pert", shape=invhouse, style=filled, fillcolor = green] ;
 node_15 [label="pert", shape=invhouse, style=filled, fillcolor = green] ;
