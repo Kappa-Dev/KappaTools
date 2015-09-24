@@ -124,9 +124,17 @@ let do_it env domain counter graph state = function
 	 pexpr in
      let () = snapshot env counter file graph in
      (false, graph, state)
-  | Primitives.CFLOW (cc,tests) ->
+  | Primitives.CFLOW (name,cc,tests) ->
+     let name = match name with
+       | Some s -> s
+       | None ->
+	  let sigs = Environment.signatures env in
+	  Format.asprintf
+	    "@[<h>%a@]"
+	    (Pp.array Pp.comma (fun _ -> Connected_component.print ~sigs false))
+	    cc in
      (false,
-      Rule_interpreter.add_tracked cc (Causal.OBS cc) tests graph,
+      Rule_interpreter.add_tracked cc (Causal.OBS name) tests graph,
       state)
   | Primitives.CFLOWOFF cc ->
      (false, Rule_interpreter.remove_tracked cc graph, state)

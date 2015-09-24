@@ -51,10 +51,10 @@ val print : Environment.t -> Format.formatter -> t -> unit
 (** {6 Stories} *)
 
 val add_tracked :
-  Connected_component.t -> Causal.event_kind ->
+  Connected_component.t array -> Causal.event_kind ->
   Instantiation.abstract Instantiation.test list ->
   t -> t
-val remove_tracked : Connected_component.t -> t -> t
+val remove_tracked : Connected_component.t array -> t -> t
 val generate_stories : Format.formatter -> Environment.t -> t -> unit
 
 (** {6 Debugging} *)

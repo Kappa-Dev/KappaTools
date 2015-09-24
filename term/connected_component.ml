@@ -997,9 +997,12 @@ module Matching = struct
 		    (Existing n_id,site),ToNode (Fresh (ty',n_id'),site')]
 end
 
+let compare_canonicals cc cc' = Mods.int_compare cc.id cc'.id
+let is_equal_canonicals cc cc' = compare_canonicals cc cc' = 0
+
 module ForState = struct
-  type t = cc
-  let compare cc cc' = Mods.int_compare cc.id cc'.id
+    type t = cc
+    let compare = compare_canonicals
 end
 
 module Map = MapExt.Make(ForState)

@@ -120,12 +120,14 @@ let modification ?env f m =
      Format.fprintf f "$FLUX %a [true]" (print_expr ?env) fn
   | Primitives.FLUXOFF fn ->
      Format.fprintf f "$FLUX %a [false]" (print_expr ?env) fn
-  | Primitives.CFLOW (cc,_) ->
-     Format.fprintf f "$TRACK %a [true]"
-		    (Connected_component.print ?sigs false) cc
+  | Primitives.CFLOW (_name,cc,_) ->
+     Format.fprintf
+       f "$TRACK @[%a@] [true]"
+       (Pp.array Pp.comma (fun _ -> Connected_component.print ?sigs false)) cc
   | Primitives.CFLOWOFF cc ->
-     Format.fprintf f "$TRACK %a [false]"
-		    (Connected_component.print ?sigs false) cc
+     Format.fprintf
+       f "$TRACK %a [false]"
+       (Pp.array Pp.comma (fun _ -> Connected_component.print ?sigs false)) cc
 
 let perturbation ?env f pert =
   let aux f =

@@ -33,11 +33,11 @@ type modification =
   | UPDATE of Operator.rev_dep * Alg_expr.t Location.annot
   | SNAPSHOT of Alg_expr.t Ast.print_expr Location.annot list
   | STOP of Alg_expr.t Ast.print_expr Location.annot list
-  | CFLOW of
-      Connected_component.t * Instantiation.abstract Instantiation.test list
+  | CFLOW of string option * Connected_component.t array *
+	       Instantiation.abstract Instantiation.test list
   | FLUX of Alg_expr.t Ast.print_expr Location.annot list
   | FLUXOFF of Alg_expr.t Ast.print_expr Location.annot list
-  | CFLOWOFF of Connected_component.t
+  | CFLOWOFF of Connected_component.t array
   | PLOTENTRY
   | PRINT of
       (Alg_expr.t Ast.print_expr Location.annot list *

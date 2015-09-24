@@ -176,7 +176,8 @@ let compile_print_expr algs tokens contact_map domain ex =
 
 let cflows_of_label contact_map domain on algs rules (label,pos) rev_effects =
   let adds tests l x =
-    (if on then Primitives.CFLOW (x,tests) else Primitives.CFLOWOFF x) :: l in
+    if on then Primitives.CFLOW (Some label,x,tests) :: l
+    else Primitives.CFLOWOFF x :: l in
   let mix =
     try
       let (_,(rule,_)) =
@@ -198,8 +199,7 @@ let cflows_of_label contact_map domain on algs rules (label,pos) rev_effects =
     Snip.connected_components_sum_of_ambiguous_mixture
       contact_map domain ~origin:(Operator.PERT(-1)) mix in
   (domain',
-   List.fold_left (fun x (y,t) -> Array.fold_left (adds t) x y)
-		  rev_effects ccs)
+   List.fold_left (fun x (y,t) -> adds t x y) rev_effects ccs)
 
 let effects_of_modif
       algs tokens rules ast_algs ast_rules contact_map domain ast_list =
@@ -283,14 +283,13 @@ let effects_of_modif
 	      contact_map domain on ast_algs ast_rules lab rev_effects
 	 | CFLOWMIX (on,(ast,_)) ->
 	    let adds tests l x =
-	      (if on then Primitives.CFLOW (x,tests)
-	       else Primitives.CFLOWOFF x) :: l in
+	      if on then Primitives.CFLOW (None,x,tests) :: l
+	      else Primitives.CFLOWOFF x :: l in
 	    let domain',ccs =
 	      Snip.connected_components_sum_of_ambiguous_mixture
 		contact_map domain ~origin:(Operator.PERT(-1)) ast in
 	    (domain',
-	     List.fold_left (fun x (y,t) -> Array.fold_left (adds t) x y)
-			    rev_effects ccs)
+	     List.fold_left (fun x (y,t) -> adds t x y) rev_effects ccs)
 	 | FLUX (pexpr,_) ->
 	    let (domain',pexpr') =
 	      compile_print_expr algs tokens contact_map domain pexpr in

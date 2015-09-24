@@ -7,8 +7,8 @@ type t = {
   outdated_elements: Operator.DepSet.t;
   free_id: int;
   story_machinery :
-    ((Causal.event_kind *
-	Instantiation.abstract Instantiation.test list)
+    ((Causal.event_kind * Connected_component.t array *
+	Instantiation.abstract Instantiation.test list) list
        Connected_component.Map.t (*currently tracked ccs *)
      * jf_data) option;
 }
@@ -44,6 +44,26 @@ let from_place (inj_nodes,inj_fresh,free_id as inj2graph) = function
      try (ty,Mods.IntMap.find id inj_fresh,inj2graph)
      with Not_found ->
        ty,free_id,(inj_nodes,Mods.IntMap.add id free_id inj_fresh,succ free_id)
+
+let all_injections ?excp edges roots cca =
+  Tools.array_fold_lefti
+    (fun id inj_list cc ->
+     ValMap.fold
+       (fun root new_injs ->
+	List.fold_left
+	  (fun corrects inj ->
+	   match Connected_component.Matching.reconstruct
+		   edges inj id cc root with
+	   | None -> corrects
+	   | Some new_inj -> new_inj :: corrects)
+	new_injs inj_list)
+       (match excp with
+	| Some (cc',root)
+	     when Connected_component.is_equal_canonicals cc cc' ->
+	   ValMap.add root ValMap.empty
+	| (Some _ | None) ->
+	   Connected_component.Map.find cc roots) [])
+    [Connected_component.Matching.empty] cca
 
 let deal_transformation is_add domain inj2graph edges roots transf = (*transf: abstract edge to be added or removed*)
   let inj,graph,(obs,deps) = (*inj: inj2graph', graph: edges', obs: delta_roots -NB inj should not change if [is_add] is false*)
@@ -118,27 +138,25 @@ let store_event
        Some (x,(infos'',steps''))
 (*Compression_main.store rule final_inj2graph counter quarks_obs quark_event*)
 
-let store_obs edges obs acc = function
+let store_obs edges roots obs acc = function
   | None -> acc
   | Some (tracked,_) ->
      List.fold_left
        (fun acc (cc,root) ->
 	try
-	  let ev,tests = Connected_component.Map.find cc tracked in
-	  match Connected_component.Matching.reconstruct
-		  edges Connected_component.Matching.empty 0 cc root with
-	  | None ->
-	     raise (ExceptionDefn.Internal_Error
-		      (Location.dummy_annot
-			 "Problem with Rule_interpreter.store_obs"))
-	  | Some inj ->
-	     let tests' =
-	       List.map (Instantiation.concretize_test
-			   (fun p ->
-			    let (_,x,_) =
-			      from_place (inj,Mods.IntMap.empty,0) p in x))
-			tests in
-	      (ev,tests') :: acc
+	  List.fold_left
+	    (fun acc (ev,ccs,tests) ->
+	     List.fold_left
+	       (fun acc inj ->
+		let tests' =
+		  List.map (Instantiation.concretize_test
+			      (fun p ->
+			       let (_,x,_) =
+				 from_place (inj,Mods.IntMap.empty,0) p in x))
+			   tests in
+		(ev,tests') :: acc)
+	       acc (all_injections ~excp:(cc,root) edges roots ccs))
+	    acc (Connected_component.Map.find cc tracked)
 	with Not_found -> acc)
        acc obs
 
@@ -161,7 +179,7 @@ let update_edges counter domain inj_nodes state event_kind rule =
        let (a,b,c,new_deps),new_obs =
 	 deal_transformation true domain inj2graph edges roots transf in
        ((a,b,c,Operator.DepSet.union deps new_deps),
-	store_obs b new_obs tracked_inst state.story_machinery))
+	store_obs b c new_obs tracked_inst state.story_machinery))
       (aux,[])
       rule.Primitives.inserted (*statically defined edges*)
   in
@@ -266,26 +284,11 @@ let apply_rule ~get_alg domain counter state event_kind rule =
        (transform_by_a_rule ~get_alg domain counter state event_kind rule inj)
   | None -> None
 
-let all_injections state rule =
-  Tools.array_fold_lefti
-    (fun id inj_list cc ->
-     ValMap.fold
-       (fun root new_injs ->
-	List.fold_left
-	  (fun corrects inj ->
-	   match Connected_component.Matching.reconstruct
-		   state.edges inj id cc root with
-	   | None -> corrects
-	   | Some new_inj -> new_inj :: corrects)
-	new_injs inj_list)
-       (Connected_component.Map.find cc state.roots_of_ccs) [])
-    [] rule.Primitives.connected_components
-
 let force_rule ~get_alg domain counter state event_kind rule =
   match apply_rule ~get_alg domain counter state event_kind rule with
   | Some state -> state,None
   | None ->
-     match all_injections state rule with
+     match all_injections state.edges state.roots_of_ccs rule.Primitives.connected_components with
      | [] -> state,Some []
      | h :: t ->
 	transform_by_a_rule ~get_alg domain counter state event_kind rule h,
@@ -321,24 +324,42 @@ let debug_print f state =
 		 state.tokens
 		 (print_injections ?sigs:None) state.roots_of_ccs
 
-let add_tracked cc event_kind tests state =
+let add_tracked ccs event_kind tests state =
   match state.story_machinery with
   | None ->
      raise (ExceptionDefn.Internal_Error
 	      (Location.dummy_annot "TRACK in non tracking mode"))
   | Some (tcc,x) ->
-     { state with
-       story_machinery =
-	 Some (Connected_component.Map.add cc (event_kind,tests) tcc,x) }
+     let tcc' =
+     Array.fold_left
+       (fun tcc cc ->
+	let acc =
+	  try Connected_component.Map.find cc tcc
+	  with Not_found -> [] in
+	Connected_component.Map.add cc ((event_kind,ccs,tests)::acc) tcc)
+       tcc ccs in
+     { state with story_machinery = Some (tcc',x) }
 
-let remove_tracked cc state =
+let remove_tracked ccs state =
   match state.story_machinery with
   | None ->
      raise (ExceptionDefn.Internal_Error
 	      (Location.dummy_annot "TRACK in non tracking mode"))
   | Some (tcc,x) ->
-     { state with
-       story_machinery = Some (Connected_component.Map.remove cc tcc,x) }
+     let tester (_,el,_) =
+       not @@
+	 Tools.array_fold_lefti
+	   (fun i b x -> b && Connected_component.is_equal_canonicals x el.(i))
+	   true ccs in
+     let tcc' =
+     Array.fold_left
+       (fun tcc cc ->
+	let acc = Connected_component.Map.find cc tcc in
+	match List.filter tester acc with
+	| [] -> Connected_component.Map.remove cc tcc
+	| l -> Connected_component.Map.add cc l tcc)
+       tcc ccs in
+     { state with story_machinery = Some (tcc',x) }
 
 let generate_stories logger env state =
   match state.story_machinery with

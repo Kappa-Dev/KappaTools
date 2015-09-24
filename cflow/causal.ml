@@ -1,7 +1,7 @@
 open Mods
 
 type event_kind =
-  | OBS of Connected_component.t
+  | OBS of string
   | RULE of int
   | INIT of int list (* the agents *)
   | PERT of string (* the rule *)
@@ -59,7 +59,7 @@ let empty_config =
    top = IntSet.empty}
 
 let debug_print_event_kind f = function
-  | OBS i -> Format.fprintf f "OBS(%a)" (Connected_component.print false) i
+  | OBS i -> Format.fprintf f "OBS(%s)" i
   | RULE i -> Format.fprintf f "RULE(%i)" i
   | INIT l ->
      Format.fprintf f "INIT(%a)" (Pp.list Pp.comma Format.pp_print_int) l
@@ -366,9 +366,7 @@ let dump grid fic =
   close_out d_chan
 
 let label ?env = function
-  | OBS mix_id ->
-     let sigs = Tools.option_map Environment.signatures env in
-     Format.asprintf "%a" (Connected_component.print ?sigs false) mix_id
+  | OBS name -> name
   | PERT s -> s
   | RULE r_id -> Format.asprintf "%a" (Environment.print_ast_rule ?env) r_id
   | INIT s ->

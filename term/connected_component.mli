@@ -44,6 +44,7 @@ val finish_new : ?origin:Operator.rev_dep -> work -> (Env.t*Renaming.t*t)
 
 (** {6 Use a connected component } *)
 
+val is_equal_canonicals : t -> t -> bool
 val print : ?sigs:Signature.s -> bool -> Format.formatter -> t -> unit
 (** [print ~sigs print_id form cc] *)
 val print_dot : Signature.s -> Format.formatter -> t -> unit

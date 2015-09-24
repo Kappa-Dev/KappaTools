@@ -1,5 +1,5 @@
 type event_kind =
-  | OBS of Connected_component.t
+  | OBS of string
   | RULE of int
   | INIT of int list (** the agents *)
   | PERT of string (** the rule *)
