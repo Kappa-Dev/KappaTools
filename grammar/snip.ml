@@ -116,8 +116,25 @@ let annotate_dropped_agent sigs ((agent_name, _ as ag_ty),intf) =
 	 | _ :: (_, pos) :: _ -> several_internal_states pos in
        match p.Ast.port_lnk with
        | (Ast.LNK_ANY, _) -> ports.(p_id) <- L_ANY Erased
-       | (Ast.LNK_SOME, _) -> ports.(p_id) <- L_SOME Erased
+       | (Ast.LNK_SOME, _) ->
+	  let (na,pos) = p.Ast.port_nme in
+	  let () =
+	    ExceptionDefn.warning
+	      ~pos
+	      (fun f ->
+	       Format.fprintf
+		 f "breaking a semi-link on site '%s' will induce a side effect"
+		 na) in
+	  ports.(p_id) <- L_SOME Erased
        | (Ast.LNK_TYPE (dst_p, dst_ty),_) ->
+	  let (na,pos) = p.Ast.port_nme in
+	  let () =
+	    ExceptionDefn.warning
+	      ~pos
+	      (fun f ->
+	       Format.fprintf
+		 f "breaking a semi-link on site '%s' will induce a side effect"
+		 na) in
 	  ports.(p_id) <- build_l_type sigs dst_ty dst_p Erased
        | (Ast.LNK_VALUE i, pos) -> ports.(p_id) <- L_VAL ((i,pos),Erased)
        | (Ast.FREE, _) -> ports.(p_id) <- L_FREE Erased
@@ -125,7 +142,7 @@ let annotate_dropped_agent sigs ((agent_name, _ as ag_ty),intf) =
   { ra_type = ag_id; ra_ports = ports; ra_ints = internals;
     ra_syntax = Some (Array.copy ports, Array.copy internals);}
 
-let annotate_created_agent id sigs ((agent_name, _ as ag_ty),intf) =
+let annotate_created_agent id sigs ((agent_name, pos as ag_ty),intf) =
   let ag_id = Signature.num_of_agent ag_ty sigs in
   let sign = Signature.get sigs ag_id in
   let arity = Signature.arity sigs ag_id in
@@ -152,8 +169,9 @@ let annotate_created_agent id sigs ((agent_name, _ as ag_ty),intf) =
        | (Ast.LNK_VALUE i, _) ->  ports.(p_id) <- Raw_mixture.VAL i
        | (Ast.FREE, _) -> ()
       ) intf in
-  { Raw_mixture.a_id = id; Raw_mixture.a_type = ag_id;
-    Raw_mixture.a_ports = ports; Raw_mixture.a_ints = internals; }
+  ({ Raw_mixture.a_id = id; Raw_mixture.a_type = ag_id;
+     Raw_mixture.a_ports = ports; Raw_mixture.a_ints = internals; },
+   pos)
 
 let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
   let ag_id = Signature.num_of_agent ag_ty sigs in
@@ -174,18 +192,51 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
     | _, (Ast.LNK_ANY,_ | Ast.LNK_SOME,_ | Ast.LNK_TYPE _,_) ->
        too_much_or_not_enough false agent_name p'.Ast.port_nme
     | (Ast.LNK_ANY,_), (Ast.FREE,_) -> ports.(p_id) <- L_ANY Freed
-    | (Ast.LNK_SOME,_), (Ast.FREE,_) -> ports.(p_id) <- L_SOME Freed
+    | (Ast.LNK_SOME,_), (Ast.FREE,_) ->
+       let (na,pos) = p'.Ast.port_nme in
+       let () =
+	 ExceptionDefn.warning
+	   ~pos
+	   (fun f ->
+	    Format.fprintf
+	      f "breaking a semi-link on site '%s' will induce a side effect"
+	      na) in
+       ports.(p_id) <- L_SOME Freed
     | (Ast.LNK_TYPE (dst_p,dst_ty),_), (Ast.FREE,_) ->
+       let (na,pos) = p'.Ast.port_nme in
+       let () =
+	 ExceptionDefn.warning
+	   ~pos
+	   (fun f ->
+	    Format.fprintf
+	      f "breaking a semi-link on site '%s' will induce a side effect"
+	      na) in
        ports.(p_id) <- build_l_type sigs dst_ty dst_p Freed
     | (Ast.FREE,_), (Ast.FREE,_) -> ports.(p_id) <- L_FREE Maintained
     | (Ast.LNK_VALUE i,pos), (Ast.FREE,_) ->
        ports.(p_id) <- L_VAL ((i,pos),Freed)
     | (Ast.LNK_ANY,_), (Ast.LNK_VALUE i,pos) ->
        ports.(p_id) <- L_ANY (Linked (i,pos))
-    | (Ast.LNK_SOME,_), (Ast.LNK_VALUE i,pos) ->
-       ports.(p_id) <- L_SOME (Linked (i,pos))
-    | (Ast.LNK_TYPE (dst_p,dst_ty),_), (Ast.LNK_VALUE i,pos) ->
-       ports.(p_id) <- build_l_type sigs dst_ty dst_p (Linked (i,pos))
+    | (Ast.LNK_SOME,_), (Ast.LNK_VALUE i,pos') ->
+       let (na,pos) = p'.Ast.port_nme in
+       let () =
+	 ExceptionDefn.warning
+	   ~pos
+	   (fun f ->
+	    Format.fprintf
+	      f "breaking a semi-link on site '%s' will induce a side effect"
+	      na) in
+       ports.(p_id) <- L_SOME (Linked (i,pos'))
+    | (Ast.LNK_TYPE (dst_p,dst_ty),_), (Ast.LNK_VALUE i,pos') ->
+       let (na,pos) = p'.Ast.port_nme in
+       let () =
+	 ExceptionDefn.warning
+	   ~pos
+	   (fun f ->
+	    Format.fprintf
+	      f "breaking a semi-link on site '%s' will induce a side effect"
+	      na) in
+       ports.(p_id) <- build_l_type sigs dst_ty dst_p (Linked (i,pos'))
     | (Ast.FREE,_), (Ast.LNK_VALUE i,pos) ->
        ports.(p_id) <- L_FREE (Linked (i,pos))
     | (Ast.LNK_VALUE i,pos_i), (Ast.LNK_VALUE j,pos_j) ->
@@ -198,6 +249,14 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
 	 I_VAL_CHANGED (Signature.num_of_internal_state p_id va sign,
 			Signature.num_of_internal_state p_id va' sign)
     | [], [ va ] ->
+       let (na,pos) = p'.Ast.port_nme in
+       let () =
+	 ExceptionDefn.warning
+	   ~pos
+	   (fun f ->
+	    Format.fprintf
+	      f "internal state of site '%s' of agent '%s' is modified although it is left unpecified in the left hand side"
+	      na agent_name) in
        internals.(p_id) <-
 	 I_ANY_CHANGED (Signature.num_of_internal_state p_id va sign)
     | [ _ ], [] ->
@@ -445,14 +504,22 @@ let dangling_link side key =
 				   " is dangling on the " ^side)))
 
 let define_full_transformation
-      (removed,added as transf) links_transf
-      place site dst switch =
+      sigs (removed,added as transf) links_transf place site dst switch =
   let cand = match dst with
     | None -> Primitives.Transformation.Freed (place,site)
-    | Some dst -> Primitives.Transformation.Linked ((place,site),dst) in
+    | Some (dst,_) -> Primitives.Transformation.Linked ((place,site),dst) in
   let cands l = match dst with
     | None -> Primitives.Transformation.Freed (place,site)::l
-    | Some dst ->
+    | Some (dst,pos) ->
+       let sort = Place.get_type place in
+       let () =
+	 ExceptionDefn.warning
+	   ~pos
+	   (fun f ->
+	    Format.fprintf
+	      f "rule induces a link permutation on site '%a' of agent '%a'"
+	      (Signature.print_site sigs sort) site
+	      (Signature.print_agent sigs) sort) in
        Primitives.Transformation.Linked ((place,site),dst) ::
 	 Primitives.Transformation.Linked (dst,(place,site)) :: l in
   match switch with
@@ -463,37 +530,61 @@ let define_full_transformation
      (transf,links_transf)
   | Erased ->
      ((cand::removed,added),links_transf)
-  | Linked (i,_) ->
+  | Linked (i,pos) ->
      try
-       let dst' = IntMap.find i links_transf in
+       let (place',site' as dst'),safe = IntMap.find i links_transf in
        let links_transf' = IntMap.remove i links_transf in
-       if Some dst' = dst then
-	 (transf,links_transf')
-       else
-	 ((cands removed,
-	   Primitives.Transformation.Linked((place,site),dst')::added),
-	  links_transf')
+       match dst with
+       | Some (dst,_) when dst = dst' -> (transf,links_transf')
+       | Some (_) ->
+	  let () =
+	    if not safe then
+	      let sort = Place.get_type place' in
+	      ExceptionDefn.warning
+		~pos
+		(fun f ->
+		 Format.fprintf
+		   f "rule induces a link permutation on site '%a' of agent '%a'"
+		   (Signature.print_site sigs sort) site'
+		   (Signature.print_agent sigs) sort) in
+	  ((cands removed,
+	    Primitives.Transformation.Linked((place,site),dst')::added),
+	   links_transf')
+       | None ->
+	  ((cands removed,
+	    Primitives.Transformation.Linked((place,site),dst')::added),
+	   links_transf')
      with Not_found ->
-       let links_transf' = IntMap.add i ((place,site)) links_transf in
+       let links_transf' = IntMap.add i ((place,site),dst=None) links_transf in
        ((cands removed,added),links_transf')
 
-let define_positive_transformation (removed,added as transf) links_transf
-				   place site switch =
+let define_positive_transformation
+      sigs (removed,added as transf) links_transf place site switch =
   match switch with
   | Freed ->
-     ((removed,Primitives.Transformation.Freed (place,site)::added),links_transf)
+     ((removed,
+       Primitives.Transformation.Freed (place,site)::added),links_transf)
   | Erased ->
      (transf,links_transf)
   | Maintained -> assert false
-  | Linked (i,_) ->
+  | Linked (i,pos) ->
      try
-       let dst' = IntMap.find i links_transf in
+       let dst',_ = IntMap.find i links_transf in
        let links_transf' = IntMap.remove i links_transf in
+       let sort = Place.get_type place in
+       let () =
+	 ExceptionDefn.warning
+	   ~pos
+	   (fun f ->
+	    Format.fprintf
+	      f "rule induces a link permutation on site '%a' of agent '%a'"
+	      (Signature.print_site sigs sort) site
+	      (Signature.print_agent sigs) sort) in
        ((removed,
 	 Primitives.Transformation.Linked((place,site),dst')::added),
 	links_transf')
      with Not_found ->
-       let links_transf' = IntMap.add i ((place,site)) links_transf in
+       let links_transf' = IntMap.add i ((place,site),false) links_transf in
        (transf,links_transf')
 
 let add_instantiation_free actions pl s = function
@@ -592,7 +683,7 @@ let make_instantiation
      aux (pred (Array.length ports)) tests actions side_sites side_effects links
 
 
-let rec add_agents_in_cc id wk registered_links transf links_transf
+let rec add_agents_in_cc sigs id wk registered_links transf links_transf
 			 instantiations remains =
   function
   | [] ->
@@ -609,14 +700,16 @@ let rec add_agents_in_cc id wk registered_links transf links_transf
 	 let instantiations' =
 	   make_instantiation
 	     place c_l instantiations ag.ra_ports ag.ra_syntax in
-	 add_agents_in_cc id wk r_l (removed,added) l_t instantiations' re acc
+	 add_agents_in_cc
+	   sigs id wk r_l (removed,added) l_t instantiations' re acc
        else
 	 let transf,wk' = match ag.ra_ints.(site_id) with
 	   | I_ANY -> (removed,added),wk
 	   | I_VAL_CHANGED (i,j) ->
 	      (if i = j then (removed,added)
-	       else Primitives.Transformation.Internalized (place,site_id,i)::removed,
-		    Primitives.Transformation.Internalized (place,site_id,j)::added),
+	       else
+		 Primitives.Transformation.Internalized (place,site_id,i)::removed,
+		 Primitives.Transformation.Internalized (place,site_id,j)::added),
 		Connected_component.new_internal_state wk (node,site_id) i
 	   | I_VAL_ERASED i ->
 	      (Primitives.Transformation.Internalized (place,site_id,i)::removed,added),
@@ -633,7 +726,7 @@ let rec add_agents_in_cc id wk registered_links transf links_transf
 	    let wk'' = if site_id = 0 then wk'
 		       else Connected_component.new_free wk' (node,site_id) in
 	    let transf',l_t' =
-	      define_full_transformation transf l_t place site_id None s in
+	      define_full_transformation sigs transf l_t place site_id None s in
 	    handle_ports
 	      wk'' r_l c_l transf' l_t' re acc (succ site_id)
 	 | (L_SOME _ | L_TYPE _ | L_ANY ( Erased | Linked _ | Freed))->
@@ -651,7 +744,7 @@ let rec add_agents_in_cc id wk registered_links transf links_transf
 		  c_l in
 	      let transf',l_t' =
 		define_full_transformation
-		  transf l_t place site_id (Some dst_place) s in
+		  sigs transf l_t place site_id (Some (dst_place,pos)) s in
 	      handle_ports wk'' (IntMap.remove i r_l) c_l' transf'
 			   l_t' re acc (succ site_id)
 	    with Not_found ->
@@ -666,10 +759,12 @@ let rec add_agents_in_cc id wk registered_links transf links_transf
 		      else wk' in
 		    let transf',l_t' =
 		      define_full_transformation
-			transf l_t place site_id (Some (place,site_id')) s in
+			sigs transf l_t place site_id
+			(Some ((place,site_id'),pos)) s in
 		    let transf'',l_t'' =
 		      define_full_transformation
-			transf' l_t' place site_id' (Some (place,site_id)) s in
+			sigs transf' l_t' place site_id'
+			(Some ((place,site_id),pos)) s in
 		    let c_l' =
 		      IntMap.add
 			i (Instantiation.Is_Bound_to ((place,site_id),(place,site_id')))
@@ -684,7 +779,7 @@ let rec add_agents_in_cc id wk registered_links transf links_transf
 		    let r_l' = IntMap.add i (node,site_id) r_l in
 		    let transf',l_t' =
 		      define_positive_transformation
-			transf l_t place site_id s in
+			sigs transf l_t place site_id s in
 		    match List.partition (is_linked_on i) re with
 		    | [], re'
 			 when Tools.list_exists_uniq (is_linked_on i) acc ->
@@ -699,7 +794,7 @@ let rec add_agents_in_cc id wk registered_links transf links_transf
      in handle_ports wk registered_links IntMap.empty transf links_transf remains ag_l 0
 
 let rec complete_with_creation
-	  (removed,added) links_transf create_actions actions fresh =
+	  sigs (removed,added) links_transf create_actions actions fresh =
   function
   | [] ->
      begin match IntMap.root links_transf with
@@ -707,7 +802,7 @@ let rec complete_with_creation
 		     (List.rev removed, List.rev added)
 	   | Some (i,_) -> dangling_link "right" i
      end
-  | ag :: ag_l ->
+  | (ag,pos) :: ag_l ->
      let place = Place.Fresh (ag.Raw_mixture.a_type,fresh) in
      let rec handle_ports added l_t actions intf site_id =
        if site_id = Array.length ag.Raw_mixture.a_ports then
@@ -715,7 +810,7 @@ let rec complete_with_creation
 	   Instantiation.Create (place,List.tl @@ List.rev intf)
 	   :: create_actions in
 	 complete_with_creation
-	   (removed,added) l_t create_actions' actions (succ fresh) ag_l
+	   sigs (removed,added) l_t create_actions' actions (succ fresh) ag_l
        else
 	 let added',point =
 	   match ag.Raw_mixture.a_ints.(site_id) with
@@ -732,14 +827,24 @@ let rec complete_with_creation
 	      l_t
 	   | Raw_mixture.VAL i ->
 	      try
-		let dst = IntMap.find i l_t in
+		let (place',site' as dst),safe = IntMap.find i l_t in
 		let l_t' = IntMap.remove i l_t in
+		let () =
+		  if not safe then
+		    let sort = Place.get_type place' in
+		    ExceptionDefn.warning
+		      ~pos
+		      (fun f ->
+		       Format.fprintf
+			 f "rule induces a link permutation on site '%a' of agent '%a'"
+			 (Signature.print_site sigs sort) site'
+			 (Signature.print_agent sigs) sort) in
 		Primitives.Transformation.Linked((place,site_id),dst)::added',
 		(Instantiation.Bind_to((place,site_id),dst)
 		 ::(Instantiation.Bind_to((dst,(place,site_id))))::actions),
 		l_t'
 	      with Not_found ->
-		let l_t' = IntMap.add i ((place,site_id)) l_t in
+		let l_t' = IntMap.add i ((place,site_id),true) l_t in
 		(added',actions,l_t') in
 	 handle_ports added'' l_t' actions' (point::intf) (succ site_id) in
      handle_ports added links_transf actions [] 0
@@ -749,6 +854,7 @@ let incr_origin = function
   | Operator.RULE i -> Operator.RULE (succ i)
 
 let connected_components_of_mixture created (env,origin) mix =
+  let sigs = Connected_component.Env.sigs env in
   let rec aux env transformations instantiations links_transf acc id = function
     | [] ->
        let removed,added = transformations in
@@ -768,15 +874,16 @@ let connected_components_of_mixture created (env,origin) mix =
        let transformations' = (List.rev removed, List.rev added) in
        let actions'',transformations'' =
 	 complete_with_creation
-	   transformations' links_transf [] actions' 0 created in
+	   sigs transformations' links_transf [] actions' 0 created in
        ((env,Tools.option_map incr_origin origin),
 	(origin,Tools.array_rev_of_list acc,
 	 (tests,(actions'',side_sites,side_effects)), transformations''))
     | h :: t ->
        let wk = Connected_component.begin_new env in
        let (wk_out,(removed,added),l_t,event, remains) =
-	 add_agents_in_cc id wk IntMap.empty transformations
-			  links_transf instantiations t [h] in
+	 add_agents_in_cc
+	   sigs id wk IntMap.empty transformations
+	   links_transf instantiations t [h] in
        let (env',inj, cc) =
 	 Connected_component.finish_new ?origin wk_out in
      let added' =
@@ -788,9 +895,9 @@ let connected_components_of_mixture created (env,origin) mix =
      let event' =
        Instantiation.rename_abstract_event wk_out id cc inj event in
      let l_t' = IntMap.map
-		  (fun (p,s as x) ->
+		  (fun (((p,s),b) as x) ->
 		   let p' = Place.rename wk id cc inj p in
-		   if p == p' then x else (p',s)) l_t in
+		   if p == p' then x else ((p',s),b)) l_t in
      aux env' (removed',added') event' l_t' (cc::acc) (succ id) remains
   in aux env ([],[]) ([],([],[],[]))
 	 IntMap.empty [] 0 mix
@@ -822,7 +929,8 @@ let aux_connected_components_sum_of_ambiguous_rule contact_map env ?origin lhs r
 			    | [] -> ()
 			    | _ -> Format.fprintf
 				     f "@ (+%t) %a" Pp.nu
-				     (Raw_mixture.print sigs) created)))
+				     (Raw_mixture.print sigs)
+				     (List.map fst created))))
 		     all_mixs in
   Tools.list_fold_right_map (connected_components_of_mixture created)
 			    (env,origin) all_mixs

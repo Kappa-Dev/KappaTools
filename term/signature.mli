@@ -42,4 +42,3 @@ val print_site_internal_state :
 prints both the site and its internal state if it is not [None]. *)
 
 val print : Format.formatter -> s -> unit
-
