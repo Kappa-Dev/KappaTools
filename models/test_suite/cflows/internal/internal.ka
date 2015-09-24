@@ -5,9 +5,9 @@
 
 %init: 1 A()
 
-#A(x) -> A(x~a) @3
-#%A(x) -> A(x~b) @3
-#%A(x) -> A(x~c) @3
+A(x) -> A(x~a) @3
+A(x) -> A(x~b) @3
+A(x) -> A(x~c) @3
 A(x) -> A(x~d) @1
 'GOAL' A(x~d)->A(x~d) @1
 
