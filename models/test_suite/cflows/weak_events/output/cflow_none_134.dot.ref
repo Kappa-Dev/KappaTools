@@ -948,7 +948,7 @@ node_404 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_405 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "270" [shape=plaintext] ;
-node_406 [label="A/*1*/(x!1), B/*2*/(x!1)", style=filled, fillcolor=red] ;
+node_406 [label="B-", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];

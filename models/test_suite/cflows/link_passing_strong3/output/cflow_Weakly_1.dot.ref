@@ -24,7 +24,7 @@ node_9 [label="E(x), C(x) -> E(x!1), C(x!1)", shape=invhouse, style=filled, fill
 node_10 [label="A(x), E(x!1), C(x!1) -> A(x!1), E(x!1), C(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "5" [shape=plaintext] ;
-node_11 [label="A/*1*/(x!1), E/*4*/(x!1)", style=filled, fillcolor=red] ;
+node_11 [label="GOAL", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];

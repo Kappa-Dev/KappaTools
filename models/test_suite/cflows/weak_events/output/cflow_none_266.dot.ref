@@ -1872,7 +1872,7 @@ node_800 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_801 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "534" [shape=plaintext] ;
-node_802 [label="A/*1*/(x!1), B/*2*/(x!1)", style=filled, fillcolor=red] ;
+node_802 [label="B-", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];

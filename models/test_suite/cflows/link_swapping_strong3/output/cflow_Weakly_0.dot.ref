@@ -16,7 +16,7 @@ node_4 [label="A(y,x!1), A(y,x!1) -> A(y!1,x!2), A(y!1,x!2)", shape=invhouse, st
 node_5 [label="A(x!1,y!2), A(x!1,y!2) -> A(x!1,y!2), A(x!2,y!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "4" [shape=plaintext] ;
-node_6 [label="A/*1*/(x!1), A/*2*/(y!1)", style=filled, fillcolor=red] ;
+node_6 [label="GOAL", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];

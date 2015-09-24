@@ -36,7 +36,7 @@ node_10 [label="R1", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_11 [label="R3", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "11" [shape=plaintext] ;
-node_12 [label="A/*1*/(x~c?)", style=filled, fillcolor=red] ;
+node_12 [label="c", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];

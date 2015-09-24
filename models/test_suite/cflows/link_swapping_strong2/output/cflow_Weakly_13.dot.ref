@@ -170,7 +170,7 @@ node_56 [label="A(x), B(x) -> A(x!1), B(x!1)", shape=invhouse, style=filled, fil
 node_57 [label="A(x!1,y!2), B(x!1,y!2) -> A(x!1,y!2), B(x!2,y!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "55" [shape=plaintext] ;
-node_58 [label="A/*1*/(x!1), B/*3*/(y!1)", style=filled, fillcolor=red] ;
+node_58 [label="GOAL", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];

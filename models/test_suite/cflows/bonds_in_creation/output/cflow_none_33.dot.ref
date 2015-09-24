@@ -63,7 +63,7 @@ node_26 [label="S.L.Z", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_27 [label="S..L..Z", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "18" [shape=plaintext] ;
-node_28 [label="L/*1*/(z)", style=filled, fillcolor=red] ;
+node_28 [label="L", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];

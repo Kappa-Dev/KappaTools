@@ -28,7 +28,7 @@ node_11 [label="S.L.Z", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_12 [label="S..L..Z", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "8" [shape=plaintext] ;
-node_13 [label="L/*1*/(z)", style=filled, fillcolor=red] ;
+node_13 [label="L", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];

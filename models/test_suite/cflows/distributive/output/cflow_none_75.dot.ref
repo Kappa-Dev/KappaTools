@@ -403,7 +403,7 @@ node_293 [label="A(z), K(x) -> A(z!1), K(x!1)", shape=invhouse, style=filled, fi
 node_294 [label="K(x!_) -> K(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "53" [shape=plaintext] ;
-node_295 [label="A/*1*/(y~p, z~p)", style=filled, fillcolor=red] ;
+node_295 [label="GOAL", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];

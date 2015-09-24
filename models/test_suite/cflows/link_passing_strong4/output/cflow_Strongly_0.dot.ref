@@ -152,7 +152,7 @@ node_4 [label="A(x!1,y), K(x!1) -> A(x,y!1), K(x!1)", shape=invhouse, style=fill
 node_5 [label="A(y!1,z), K(x!1) -> A(y,z!1), K(x!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "4" [shape=plaintext] ;
-node_6 [label="A/*1*/(z!1), K/*2*/(x!1)", style=filled, fillcolor=red] ;
+node_6 [label="GOAL", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];

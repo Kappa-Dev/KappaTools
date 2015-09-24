@@ -1200,7 +1200,7 @@ node_512 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_513 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "342" [shape=plaintext] ;
-node_514 [label="A/*1*/(x!1), B/*2*/(x!1)", style=filled, fillcolor=red] ;
+node_514 [label="B-", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];

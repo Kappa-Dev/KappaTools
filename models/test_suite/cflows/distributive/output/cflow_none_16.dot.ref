@@ -66,7 +66,7 @@ node_36 [label="A(z~u!1), K(x!1) -> A(z~p!1), K(x!1)", shape=invhouse, style=fil
 node_37 [label="K(x!_) -> K(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "13" [shape=plaintext] ;
-node_38 [label="A/*1*/(y~p, z~p)", style=filled, fillcolor=red] ;
+node_38 [label="GOAL", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];

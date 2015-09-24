@@ -65,7 +65,7 @@ node_29 [label="A(x), B(x) -> A(x!1), B(x!1)", shape=invhouse, style=filled, fil
 node_30 [label="D(x), B(x!1), A(x!1) -> D(x!1), B(x!1), A(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "16" [shape=plaintext] ;
-node_31 [label="B/*2*/(x!1), D/*4*/(x!1)", style=filled, fillcolor=red] ;
+node_31 [label="GOAL", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];

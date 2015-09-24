@@ -99,7 +99,7 @@ node_63 [label="K(x!_) -> K(x)", shape=invhouse, style=filled, fillcolor = light
 node_66 [label="K(x!_) -> K(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "15" [shape=plaintext] ;
-node_67 [label="A/*1*/(y~p, z~p)", style=filled, fillcolor=red] ;
+node_67 [label="GOAL", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];

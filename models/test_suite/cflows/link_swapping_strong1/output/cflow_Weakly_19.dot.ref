@@ -181,7 +181,7 @@ node_85 [label="A(x), B(x) -> A(x!1), B(x!1)", shape=invhouse, style=filled, fil
 node_86 [label="A(x!1,y!2), B(x!1,y!2) -> A(x!1,y!2), B(x!2,y!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "46" [shape=plaintext] ;
-node_87 [label="A/*1*/(x!1), B/*2*/(y!1)", style=filled, fillcolor=red] ;
+node_87 [label="GOAL", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];

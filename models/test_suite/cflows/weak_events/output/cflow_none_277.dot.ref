@@ -1949,7 +1949,7 @@ node_833 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_834 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "556" [shape=plaintext] ;
-node_835 [label="A/*1*/(x!1), B/*2*/(x!1)", style=filled, fillcolor=red] ;
+node_835 [label="B-", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];

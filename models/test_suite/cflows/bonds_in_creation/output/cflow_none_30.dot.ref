@@ -97,7 +97,7 @@ node_67 [label="S.L.Z", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_68 [label="S..L..Z", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "20" [shape=plaintext] ;
-node_69 [label="L/*1*/(z)", style=filled, fillcolor=red] ;
+node_69 [label="L", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];

@@ -17,7 +17,7 @@ node_3 [label="A(x), K(x) -> A(x!1), K(x!1)", shape=invhouse, style=filled, fill
 node_4 [label="A(x!x.K,y~u) -> A(x!x.K,y~p)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "3" [shape=plaintext] ;
-node_5 [label="A/*1*/(y~p?)", style=filled, fillcolor=red] ;
+node_5 [label="GOAL", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];
