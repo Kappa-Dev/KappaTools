@@ -393,11 +393,16 @@ Sticking with \ttt{A}'s signature\index{agent signature}, the rule
 indicates that an agent \ttt{A} free on site \ttt{z}, no matter what its internal state is, may beget a new copy of \ttt{A} bound to it \via site \ttt{x}. Note that in the RHS, the interface of the new copy is not completely described. Following the DCDW convention\index{don't care don't write}, \KaSim~will then assume that the sites that are not mentioned are created in the \emph{default state}\index{default state}, \ie they appear free of any bond and their internal state (if any) is the first of the list shown in the signature\index{agent signature} (here state \ttt{u} for \ttt{y} and \ttt{0} for \ttt{z}).
 
 Importantly, \KaSim~respects the \emph{longest prefix convention}\index{longest prefix convention} to determine which agent in the RHS stems from an agent in the LHS. 
-In a word, from a rule of the form $a_1,\dots,a_n\rar b_1,\dots,b_k$, with $a_i$s and $b_j$s being agents, one computes the largest $i\leq n,k$ such that the agents $a_1,\dots,a_i$ are pairwise consistent with $b_1,\dots,b_i$, \ie the $a_j$s and $b_j$s have the same name and the same number of sites. In which case we say that for all $j\leq i$, $a_j$ is \emph{preserved} by the transition and for all $j>i$, $a_j$ is \emph{deleted} by the transition and $b_j$ is \emph{created} by the transition. This convention allows us to write a deletion rule as:
+In a word, from a rule of the form $a_1,\dots,a_n\rar b_1,\dots,b_k$, with $a_i$s and $b_j$s being agents, one computes the largest $i\leq n,k$ such that the agents $a_1,\dots,a_i$ are pairwise consistent with $b_1,\dots,b_i$, \ie the $a_j$s and $b_j$s have the same name and the same sites. In which case we say that for all $j\leq i$, $a_j$ is \emph{preserved} by the transition and for all $j>i$, $a_j$ is \emph{deleted} by the transition and $b_j$ is \emph{created} by the transition. This convention allows us to write a deletion rule as:
 \ITE{
 \item[] \ttt{{\textquotesingle}deleting A\textquotesingle\  A(x!1),A(z!1)} $\rar$ \ttt{A(x) @ $\ga$} 
 }
 which will remove the \ttt{A} agent in the mixture\index{mixture} that will match the second occurrence of \ttt{A} in this rule.
+Note that the rule:
+\ITE{
+\item[] \ttt{{\textquotesingle}weird\textquotesingle\  A(x!1),A(z!1)} $\rar$ \ttt{A(z) @ $\ga$} 
+}
+will delete both \ttt{A}s and create a new one with a free \ttt{z} site.
 
 \subsubsection*{Side effects}\label{sec:side-effect}
 
