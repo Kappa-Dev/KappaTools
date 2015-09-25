@@ -139,3 +139,39 @@ let debug_print f (links,ints,sorts) =
 	| Edge.Link (ty',ag',s') ->
 	   fun f -> Format.fprintf f "->%i:%i.%i" ag' ty' s'))
     f links
+
+type path = (int * int * int * int) list
+let is_valid_path graph l =
+  List.for_all (fun (a,s,a',s') -> link_exists a s a' s' graph) l
+
+let pathes_of_interest stop_on_find is_interresting (links,_,_) origin =
+  let rec infinite_search (id,path as x) site (stop,don,out,next as acc) =
+    try
+      match Int2Map.find (id,site) links with
+      | Edge.ToFree  -> infinite_search x (succ site) acc
+      | Edge.Link (_,id',site') ->
+	 if (stop&&stop_on_find)||IntSet.mem id' don
+	 then infinite_search x (succ site) acc
+	 else
+	   let don' = IntSet.add id' don in
+	   let path' = (id,site,site',id')::path in
+	   let store = is_interresting id' in
+	   let out' = if store then path'::out else out in
+	   let next' = (id',path')::next in
+	   infinite_search x (succ site) (stop||store,don',out',next')
+    with Not_found -> acc in
+  let rec traversal don out next = function
+    | x::todos ->
+       let stop,don',out',next' = infinite_search x 0 (false,don,out,next) in
+       if stop&&stop_on_find then out else traversal don' out' next' todos
+    | [] -> match next with [] -> out | _ -> traversal don out [] next
+  in traversal IntSet.empty [] [] [origin,[]]
+
+let are_connected ?candidate graph x y =
+  match candidate with
+  | Some p when is_valid_path graph p -> Some p
+  | (Some _ | None) ->
+     match pathes_of_interest true (fun z -> z = y) graph x with
+     | [] -> None
+     | [ p ] -> Some p
+     | _ :: _ -> failwith "Edges.are_they_connected completely broken"

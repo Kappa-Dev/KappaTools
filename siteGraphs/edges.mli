@@ -24,5 +24,9 @@ val link_exists : int -> int -> int -> int -> t -> bool
 val exists_fresh : int -> int -> int -> int -> t -> int option
 (** [exists_fresh ag1 site1 type_of_ag2 site2 graph] *)
 
+type path = (int * int * int * int) list (** id,site,site',id' *)
+val are_connected : ?candidate:path -> t -> int -> int -> path option
+val pathes_of_interest : bool -> (int -> bool) -> t -> int -> path list
+
 val print : Signature.s -> Format.formatter -> t -> unit
 val debug_print : Format.formatter -> t -> unit
