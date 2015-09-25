@@ -1,0 +1,3 @@
+#Command-line:
+${KAPPABIN}KaSim lpc2.ka -seed 924556145 -e 2 -p 2 -d output || exit 0
+

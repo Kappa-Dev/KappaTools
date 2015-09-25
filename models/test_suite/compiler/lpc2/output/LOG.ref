@@ -1,0 +1,27 @@
++ Command line is: 'KaSim' 'lpc2.ka' '-seed' '924556145' '-e' '2' '-p' '2' '-d' 'output'
+Parsing lpc2.ka...
+done
++ Initialized random number generator with seed 924556145
++ Compiling...
+	 -simulation parameters
+	 -agent signatures
+	 -variable declarations
+	 -initial conditions
+	 -rules
+	 -observables
+	 -perturbations
+	 Done
++ Analyzing non local patterns...
++ Building initial simulation state...
+	 -Counting initial local patterns...
+	 Done
+____________________________________________________________
+##############################?
+A deadlock was reached after 1 events and 1.755639E+00s (Activity = 0.00000)
+Simulation ended (eff.: 0.500000, detail below)
+	Valid embedding but no longer unary when required: 0.000000
+	Valid embedding but not binary when required: 0.000000
+	Clashing instance: 0.000000
+	Lazy negative update: 1.000000
+	Lazy negative update of non local instances: 0.000000
+	Perturbation interrupting time advance: 0.000000

@@ -108,7 +108,13 @@ let diff pos m0 m1 env =
   let compile_error pos msg = raise (ExceptionDefn.Malformed_Decl (msg,pos)) in
   let id_preserving ag1 ag2 =
     (*check whether ag2 can be the residual of ag1 for (same name)*)
-    Mixture.name ag1 = Mixture.name ag2
+    let intf1 = Mixture.interface ag1 in
+    let intf2 = Mixture.interface ag2 in
+    if (Mixture.name ag1 = Mixture.name ag2) && (IntMap.size intf1 = IntMap.size intf2) then
+      IntMap.fold (fun site_id _ b ->
+		   (IntMap.mem site_id intf2) && b
+		  ) intf1 true
+    else false				    
   in
   let prefix, deleted, add_index =
     IntMap.fold
@@ -119,7 +125,7 @@ let diff pos m0 m1 env =
 	   if id_preserving ag0 ag1 then (id:: prefix, deleted, ind)
 	   else (prefix, id:: deleted, if id<ind then id else ind)
 	 with Not_found -> (prefix, id:: deleted, ind)
-       (*id is bigger than the max id in m1 so id is deleted*)
+			     (*id is bigger than the max id in m1 so id is deleted*)
        else (prefix,id::deleted,ind)
       )
       (Mixture.agents m0) ([],[], IntMap.size (Mixture.agents m0))
@@ -258,7 +264,7 @@ let diff pos m0 m1 env =
 	       match opt with
 	       | Some (id', site_id') -> (*generating a FREE instruction only for the smallest port*)
 		  let kept = List.exists (fun id -> id=id') prefix
-		  (*try let _ = (Mixture.agent_of_id id' m1) in true with Not_found -> false*)
+					 (*try let _ = (Mixture.agent_of_id id' m1) in true with Not_found -> false*)
 		  in
 		  let apply_anyway = (*generate the FREE instruction without testing whether a FREE instruction will be generated for (id',site_id')*)
 		    if not kept then true
@@ -306,7 +312,7 @@ let diff pos m0 m1 env =
 		 add_map (KEPT id) (site_id,1) (add_map id1' (i1,1) idmap) in
 	       let inst =
 		 if id1 < id || (id1 = id && i1 < site_id)
-		 (*generating an instruction only for one of both sites*)
+				  (*generating an instruction only for one of both sites*)
 		 then BND((KEPT id, site_id), (id1',i1)):: inst
 		 else inst in
 	       (inst,idmap')
@@ -380,7 +386,7 @@ let diff pos m0 m1 env =
 	     else compile_error
 		    pos (Format.asprintf
 			   "The link status of agent '%t', site '%t' on the right hand side is inconsistent"
-					ag_name site_name)
+			   ag_name site_name)
 	  | Mixture.WLD, Mixture.FREE ->  (*wildcard -> free*)
 	     let _ =
 	       pp_warning
@@ -552,7 +558,7 @@ let enable r mix env =
       with Not_found ->
 	invalid_arg
 	  (Format.asprintf "Dynamics.enable: agent %d not found in %a"
-			  root (Kappa_printer.mixture true env) pat1) in
+			   root (Kappa_printer.mixture true env) pat1) in
     let name_id_root = Mixture.name root_ag in
     let candidates = (*agent id in lhs --all cc-- that have the name name_id_root*)
       let cpt = ref 0
@@ -640,7 +646,7 @@ let to_kappa r env =
   try Environment.rule_of_num r.r_id env
   with Not_found ->
     Format.asprintf "%a->%a" (Kappa_printer.mixture false env) r.lhs
-		   (Kappa_printer.mixture false env) r.rhs
+		    (Kappa_printer.mixture false env) r.rhs
 
 let dump err_fmt r env =
   let () = Format.pp_open_vbox err_fmt 0 in
@@ -705,24 +711,24 @@ let dump err_fmt r env =
   | None -> Format.fprintf err_fmt "No CC impact@,"
   | Some (con,dis,se) ->
      Format.fprintf err_fmt
-       "@[<v>%a%a%a@]@,"
-       (Pp.set IntMap.bindings (fun f -> Format.pp_print_cut f ())
-	       (fun f (i,s) -> Format.fprintf
-				 f "@[CC[%d] and CCs {%a} in the left hand side will merge@]"
-				 i (Pp.set IntSet.elements Pp.comma
-					   Format.pp_print_int) s))
-       con
-       (Pp.set IntMap.bindings (fun f -> Format.pp_print_cut f ())
-	       (fun f (i,s) -> Format.fprintf
-				 f "@[CC[%d] and CCs {%a} in the rhs are freshly disconnected@]"
-				 i (Pp.set IntSet.elements Pp.comma
-					   Format.pp_print_int) s))
-       dis
-       (Pp.set IntMap.bindings (fun f -> Format.pp_print_cut f ())
-	       (fun f (i,s) -> Format.fprintf
-				 f "@[agent #%d might have side effect disconnection on sites {%a}@]"
-				 i (Pp.set IntSet.elements Pp.comma
-					   Format.pp_print_int) s))
-       se;
+		    "@[<v>%a%a%a@]@,"
+		    (Pp.set IntMap.bindings (fun f -> Format.pp_print_cut f ())
+			    (fun f (i,s) -> Format.fprintf
+					      f "@[CC[%d] and CCs {%a} in the left hand side will merge@]"
+					      i (Pp.set IntSet.elements Pp.comma
+							Format.pp_print_int) s))
+		    con
+		    (Pp.set IntMap.bindings (fun f -> Format.pp_print_cut f ())
+			    (fun f (i,s) -> Format.fprintf
+					      f "@[CC[%d] and CCs {%a} in the rhs are freshly disconnected@]"
+					      i (Pp.set IntSet.elements Pp.comma
+							Format.pp_print_int) s))
+		    dis
+		    (Pp.set IntMap.bindings (fun f -> Format.pp_print_cut f ())
+			    (fun f (i,s) -> Format.fprintf
+					      f "@[agent #%d might have side effect disconnection on sites {%a}@]"
+					      i (Pp.set IntSet.elements Pp.comma
+							Format.pp_print_int) s))
+		    se;
      let () = Format.pp_close_box err_fmt () in
      Format.pp_print_newline err_fmt ()
