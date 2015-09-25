@@ -1,4 +1,3 @@
-# Snapshot [Event: 1, Time: 1.742795]
-%init: 1\
-A(x, y!0, z),B(x!0)
-# End snapshot
+# Snapshot [Event: 1]
+%init: 1 A(x, y!1, z), B(x!1)
+

@@ -292,10 +292,17 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
   { ra_type = ag_id; ra_ports = ports; ra_ints = internals;
     ra_syntax = Some (Array.copy ports, Array.copy internals);}
 
+let no_more_site_on_right left right =
+  List.for_all
+    (fun p ->
+     List.exists (fun p' -> fst p.Ast.port_nme = fst p'.Ast.port_nme) left)
+    right
+
 let rec annotate_lhs_with_diff sigs acc lhs rhs =
   match lhs,rhs with
   | ((lag_na,_ as ag_ty),lag_p)::lt, ((rag_na,_),rag_p)::rt
-       when String.compare lag_na rag_na = 0 ->
+       when String.compare lag_na rag_na = 0 &&
+	      no_more_site_on_right lag_p rag_p ->
      annotate_lhs_with_diff
        sigs (annotate_agent_with_diff sigs ag_ty lag_p rag_p::acc) lt rt
   | erased, added ->
