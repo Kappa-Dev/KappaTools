@@ -157,3 +157,8 @@ let iteri f i =
   let rec aux j =
   if j < i then let () = f j in aux (succ j)
   in aux 0
+
+let recti f x i =
+  let rec aux j =
+    if j < i then f j (aux (succ j)) else x
+  in aux 0

@@ -8,6 +8,8 @@ val cn : pos -> int
 (** {5 Combinators on primitive types *)
 val option_map : ('a -> 'b) -> 'a option -> 'b option
 val iteri : (int -> unit) -> int -> unit
+val recti : (int -> 'a -> 'a) -> 'a -> int -> 'a
+(** [recti f n x] = f 0 (f 1 (.. (f (n-1) x))) *)
 val array_map_of_list : ('a -> 'b) -> 'a list -> 'b array
 val array_rev_of_list : 'a list -> 'a array
 val array_fold_lefti :
