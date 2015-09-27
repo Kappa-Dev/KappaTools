@@ -63,6 +63,9 @@ let main () =
     then 
       let parameters_influence_map = Remanent_parameters.update_prefix parameters "Influence_map:" in 
       let error,wake_up_map,inhibition_map = Influence_map.compute_influence_map parameters_influence_map error handler quark_map nrules in 
+      let parameters_refine_influence_map = Remanent_parameters.update_prefix parameters "Refine_influence_map:" in       
+      let error,wake_up_map = Algebraic_construction.filter_influence parameters_refine_influence_map error handler c_compil wake_up_map true in 
+      let error,inhibition_map = Algebraic_construction.filter_influence parameters error handler c_compil inhibition_map false in 
       let error = 
 	if (Remanent_parameters.get_trace parameters_influence_map) || Print_quarks.trace 
 	then Print_quarks.print_wake_up_map parameters_influence_map error handler c_compil Handler.print_rule_txt Handler.print_var_txt Handler.get_label_of_rule_txt Handler.get_label_of_var_txt Handler.print_labels_txt "\n" wake_up_map  

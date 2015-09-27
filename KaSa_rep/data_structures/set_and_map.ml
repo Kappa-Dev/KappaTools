@@ -76,6 +76,11 @@ module type Set_and_Map = sig
   val map2_map: Remanent_parameters_sig.parameters ->Exception.method_handler -> ('a -> 'a -> 'a) -> 'a map -> 'a map -> Exception.method_handler * 'a map 
   val fold2z_map: Remanent_parameters_sig.parameters -> Exception.method_handler -> (key -> 'a  -> 'b  -> (Exception.method_handler * 'c)  -> (Exception.method_handler * 'c)) -> 'a map -> 'b map -> 'c -> Exception.method_handler * 'c 
   val fold2_map: Remanent_parameters_sig.parameters -> Exception.method_handler -> (key -> 'a  -> 'b  -> (Exception.method_handler * 'c)  -> (Exception.method_handler * 'c)) -> (key -> 'a   -> (Exception.method_handler * 'c)  -> (Exception.method_handler * 'c)) -> (key -> 'b  -> (Exception.method_handler * 'c)  -> (Exception.method_handler * 'c)) ->  'a map -> 'b map -> 'c -> Exception.method_handler * 'c 
+  
+  val fold2_map_sparse: Remanent_parameters_sig.parameters -> Exception.method_handler -> (key -> 'a  -> 'b  -> (Exception.method_handler * 'c)  -> (Exception.method_handler * 'c)) ->  'a map -> 'b map -> 'c -> Exception.method_handler * 'c
+ 
+  val iter2_map_sparse: Remanent_parameters_sig.parameters -> Exception.method_handler -> (key -> 'a  -> 'b  -> Exception.method_handler   -> Exception.method_handler)->  'a map -> 'b map -> Exception.method_handler
+ 																																																																				     
   val forall_map: (key -> 'a -> bool) -> 'a map -> bool 
   val min_elt_map: (key -> 'a -> bool) -> 'a map -> key option  
   val diff_map: Remanent_parameters_sig.parameters ->Exception.method_handler -> 'a map -> 'a map -> Exception.method_handler * 'a map * 'a map 
@@ -788,7 +793,28 @@ module Make(Ord:OrderedType) =
                 let rh''',res'' = f key1 data1 data2 (rh'',res') in
                 fold2_map parameters rh''' f g h right1 right2 res''
           end
-            
+	    
+    let rec fold2_map_sparse parameters rh f map1 map2 res =
+      match map1,map2 with 
+        | Empty_map , _ 
+	| _ , Empty_map -> (rh,res) 
+        | Node_map(left1,key1,data1,right1,_),_ -> 
+          let rh',(left2,data2,right2) = split_map parameters rh key1 map2 in 
+          begin 
+            match data2 with 
+              | None -> 
+		let rh'', res' = fold2_map_sparse parameters rh' f left1 left2 res in 
+                fold2_map_sparse parameters rh'' f right1 right2 res'
+              | Some data2 -> 
+                let rh'', res' = fold2_map_sparse parameters rh' f left1 left2 res in 
+                let rh''',res'' = f key1 data1 data2 (rh'',res') in
+                fold2_map_sparse parameters rh''' f right1 right2 res''
+          end
+
+    let iter2_map_sparse parameters rh f map1 map2 =
+      let error,_ = fold2_map_sparse parameters rh (fun k a b (error,_) -> (f k a b error,())) map1 map2 () in
+      error 
+	    	    
     let rec diff_map parameters rh map1 map2 =
       match map1 with 
         | Empty_map -> 

@@ -20,6 +20,7 @@ let local_trace = false
  
 module Label = Influence_labels.Int_labels 
 module Labels = Influence_labels.Extensive(Label)
+module IntSet_and_map = Set_and_map.Make (struct type t=int let compare = compare end)
 module Int2Set_and_map = Set_and_map.Make (struct type t = int*int let compare = compare end)
   
 type agent_quark = Cckappa_sig.agent_name

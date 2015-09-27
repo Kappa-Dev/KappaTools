@@ -43,7 +43,7 @@ module Int_labels =
     let _ = Printf.fprintf (Remanent_parameters.get_log h) "%s" s in 
       error
     
-end:Labels)
+end:Labels with type label=int)
 
 module type Label_handler = 
 sig
@@ -59,6 +59,7 @@ sig
   val add_couple:  Remanent_parameters_sig.parameters -> Exception.method_handler -> bool -> label_set -> label_set -> label_set_couple -> Exception.method_handler * label_set_couple
   val dump:        Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.kappa_handler -> label_set  -> Exception.method_handler 
   val dump_couple: Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.kappa_handler ->label_set_couple -> Exception.method_handler 
+  val filter_couple: Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.kappa_handler -> (Exception.method_handler ->label -> label -> Exception.method_handler *  bool) -> label_set_couple -> Exception.method_handler * label_set_couple
   val to_string :  Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.kappa_handler ->label_set -> Exception.method_handler * string list 
   val to_string_couple : Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.kappa_handler ->label_set_couple  -> Exception.method_handler * string list 
 end
@@ -72,12 +73,13 @@ module Empty =
   let label_of_int handler error _ = error,() 
   let empty = () 
   let empty_couple = ()
-  let is_empty_couple _ = true
+  let is_empty_couple _ = false
   let add_set _ error _ _ = error,() 
   let add_couple _ error _ _ _ _ = error,() 
   let dump _ error _ _ = error 
   let to_string _ error _ _ = error,[]
-  let dump_couple _ error _ _ = error 
+  let dump_couple _ error _ _ = error
+  let filter_couple _ error _ _ a = error,a 
   let to_string_couple _ error _ _ = error,[]
 end:Label_handler with type label=unit)
 
@@ -171,9 +173,21 @@ module Extensive =
             a 
             (false,error)
         in 
-          error
-  
-        let to_string_couple parameter error handler a = 
+        error
+
+      let filter_couple parameter error handler f a =
+        Pair_Set.fold_set
+          (fun (a,b) (error,set')->
+	   let error,bool = f error a b in
+	   if bool
+	   then
+	     Pair_Set.add_set parameter error (a,b) set'
+	   else
+	     error,set')
+	  a
+	  (error,Pair_Set.empty_set) 
+	  
+      let to_string_couple parameter error handler a = 
           let sol = [] in  
           let _,sol,error = 
             Pair_Set.fold_set 
@@ -192,7 +206,7 @@ module Extensive =
           in 
           let sol = List.rev sol in 
             error,sol     
-end:Label_handler))
+end:Label_handler with type label = L.label))
 
 module Implicit = 
   (functor (L:Labels) -> 
@@ -272,8 +286,11 @@ module Implicit =
             a
         in 
           error
-  
-      let to_string_couple parameter error handler a =
+
+    let filter_couple parameter error handler f list  = error,list (* to do *)
+	    
+	    
+    let to_string_couple parameter error handler a =
         let sol = ["["] in  
         let _,sol = 
           List.fold_left

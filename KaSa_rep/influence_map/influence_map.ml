@@ -215,5 +215,5 @@ let compute_influence_map parameters error handler quark_maps nrules =
       quark_maps.Quark_type.site_var_minus
       wake_up_map
   in
-    error,wake_up_map,inhibition_map  
+  error,wake_up_map,inhibition_map  
   
