@@ -2,18 +2,15 @@
 Parsing weak_events.ka...
 done
 + Initialized random number generator with seed 924556145
++ Building initial simulation conditions...
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
 	 -variable declarations
-	 -initial conditions
 	 -rules
 	 -observables
 	 -perturbations
-	 Done
-+ Analyzing non local patterns...
-+ Building initial simulation state...
-	 -Counting initial local patterns...
+	 -initial conditions
 	 Done
 ____________________________________________________________
 ############################################################
@@ -22,42 +19,36 @@ ____________________________________________________________
 	 - detecting siphons
 	 - cutting concurrent events
 	 - blackboard generation
-	 - computing causal past of each observed events (344)
+	 - computing causal past of each observed events (322)
 Stats:
- number of step   : 2346
- longest story    : 1032
- average length   : 516.667313288
- geometric mean   : 596.259452442
+ number of step   : 2324
+ longest story    : 966
+ average length   : 483.667357513
+ geometric mean   : 558.154400426
 
-	 - causal & weak flow compression (344)
+	 - causal & weak flow compression (322)
 
 ____________________________________________________________
 ############################################################
 	 - detecting pseudo inverse events
 	 - blackboard generation
-	 - computing causal past of each observed events (344)
+	 - computing causal past of each observed events (322)
 
 ____________________________________________________________
 ############################################################
 Stats:
- number of step   : 1377
+ number of step   : 1289
  longest story    : 3
  average length   : 3.
  geometric mean   : 3.
 
-	 - causal & weak flow compression (344)
+	 - causal & weak flow compression (322)
 
 ____________________________________________________________
 ############################################################
 
 
 
-+ Pretty printing 344 flows
++ Pretty printing 322 flows
 + Pretty printing 2 weakly compressed flows
-Simulation ended (eff.: 0.744048, detail below)
-	Valid embedding but no longer unary when required: 0.000000
-	Valid embedding but not binary when required: 0.000000
-	Clashing instance: 0.000000
-	Lazy negative update: 1.000000
-	Lazy negative update of non local instances: 0.000000
-	Perturbation interrupting time advance: 0.000000
+Simulation ended

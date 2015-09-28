@@ -7,6 +7,5 @@ node [shape=box, style=filled, fillcolor=lightskyblue];
 "y" ; 
 edge [color=green, arrowhead=normal];
 "create" -> "x"[label ="[0->0]"] ; 
-"create" -> "y"[label ="[0->0]"] ; 
 "x" -> "y"[label ="[0->0]"] ; 
 }

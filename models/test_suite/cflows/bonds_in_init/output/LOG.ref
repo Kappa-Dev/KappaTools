@@ -2,18 +2,15 @@
 Parsing bonds_in_init.ka...
 done
 + Initialized random number generator with seed 611463625
++ Building initial simulation conditions...
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
 	 -variable declarations
-	 -initial conditions
 	 -rules
 	 -observables
 	 -perturbations
-	 Done
-+ Analyzing non local patterns...
-+ Building initial simulation state...
-	 -Counting initial local patterns...
+	 -initial conditions
 	 Done
 ____________________________________________________________
 ############################################################
@@ -24,10 +21,10 @@ ____________________________________________________________
 	 - blackboard generation
 	 - computing causal past of each observed events (10)
 Stats:
- number of step   : 721
- longest story    : 622
- average length   : 265.969117647
- geometric mean   : 326.720637548
+ number of step   : 723
+ longest story    : 605
+ average length   : 263.572254335
+ geometric mean   : 325.042527231
 
 	 - causal & weak flow compression (10)
 
@@ -37,10 +34,10 @@ ____________________________________________________________
 	 - blackboard generation
 	 - computing causal past of each observed events (10)
 Stats:
- number of step   : 81
+ number of step   : 100
  longest story    : 22
- average length   : 13.5
- geometric mean   : 14.0178457689
+ average length   : 6.7619047619
+ geometric mean   : 9.32482605481
 
 	 - causal & weak flow compression (10)
 
@@ -49,17 +46,11 @@ ____________________________________________________________
 
 
 
-	 - strong flow compression (1)
+	 - strong flow compression (2)
 
 ____________________________________________________________
 ############################################################
-+ Pretty printing 6 flows
-+ Pretty printing 1 weakly compressed flow
++ Pretty printing 7 flows
++ Pretty printing 2 weakly compressed flows
 + Pretty printing 1 strongly compressed flow
-Simulation ended (eff.: 0.815085, detail below)
-	Valid embedding but no longer unary when required: 0.000000
-	Valid embedding but not binary when required: 0.000000
-	Clashing instance: 0.000000
-	Lazy negative update: 1.000000
-	Lazy negative update of non local instances: 0.000000
-	Perturbation interrupting time advance: 0.000000
+Simulation ended

@@ -2,18 +2,15 @@
 Parsing side-effects.ka...
 done
 + Initialized random number generator with seed 924556145
++ Building initial simulation conditions...
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
 	 -variable declarations
-	 -initial conditions
 	 -rules
 	 -observables
 	 -perturbations
-	 Done
-+ Analyzing non local patterns...
-+ Building initial simulation state...
-	 -Counting initial local patterns...
+	 -initial conditions
 	 Done
 ____________________________________________________________
 ############################################################
@@ -22,39 +19,33 @@ ____________________________________________________________
 	 - detecting siphons
 	 - cutting concurrent events
 	 - blackboard generation
-	 - computing causal past of each observed events (3)
+	 - computing causal past of each observed events (1)
 Stats:
- number of step   : 215
- longest story    : 137
- average length   : 73.0620155039
- geometric mean   : 82.2055940306
+ number of step   : 213
+ longest story    : 21
+ average length   : 12.1764705882
+ geometric mean   : 13.8415402067
 
-	 - causal & weak flow compression (3)
+	 - causal & weak flow compression (1)
 
 ____________________________________________________________
 ############################################################
 	 - detecting pseudo inverse events
 	 - blackboard generation
-	 - computing causal past of each observed events (3)
+	 - computing causal past of each observed events (1)
 Stats:
- number of step   : 90
- longest story    : 86
- average length   : 81.
- geometric mean   : 81.1028154053
+ number of step   : 24
+ longest story    : 22
+ average length   : 11.5
+ geometric mean   : 15.5724115024
 
-	 - causal & weak flow compression (3)
+	 - causal & weak flow compression (1)
 
 ____________________________________________________________
 ############################################################
 
 
 
-+ Pretty printing 3 flows
++ Pretty printing 1 flow
 + Pretty printing 1 weakly compressed flow
-Simulation ended (eff.: 0.759542, detail below)
-	Valid embedding but no longer unary when required: 0.000000
-	Valid embedding but not binary when required: 0.000000
-	Clashing instance: 0.000000
-	Lazy negative update: 1.000000
-	Lazy negative update of non local instances: 0.000000
-	Perturbation interrupting time advance: 0.000000
+Simulation ended

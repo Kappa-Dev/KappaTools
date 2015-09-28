@@ -17,5 +17,4 @@ edge [color=red, arrowhead=tee];
 "r0" -> "r2"[label ="[1->0]"] ; 
 "r1" -> "r0"[label ="[0->0]"] ; 
 "r2" -> "r0"[label ="[0->1]"] ; 
-"r2" -> "r0_op"[label ="[0->1]"] ; 
 }

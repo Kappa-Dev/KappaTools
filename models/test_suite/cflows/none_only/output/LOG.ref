@@ -2,18 +2,15 @@
 Parsing none_only.ka...
 done
 + Initialized random number generator with seed 924556145
++ Building initial simulation conditions...
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
 	 -variable declarations
-	 -initial conditions
 	 -rules
 	 -observables
 	 -perturbations
-	 Done
-+ Analyzing non local patterns...
-+ Building initial simulation state...
-	 -Counting initial local patterns...
+	 -initial conditions
 	 Done
 ____________________________________________________________
 ############################################################
@@ -21,25 +18,19 @@ ____________________________________________________________
 	 - refining events
 	 - detecting siphons
 	 - blackboard generation
-	 - computing causal past of each observed events (10)
+	 - computing causal past of each observed events (185)
 Stats:
- number of step   : 11031
- longest story    : 873
- average length   : 340.312871287
- geometric mean   : 421.938966071
+ number of step   : 11206
+ longest story    : 905
+ average length   : 365.170464135
+ geometric mean   : 444.641378275
 
-	 - causal & weak flow compression (10)
+	 - causal & weak flow compression (185)
 
 ____________________________________________________________
 ############################################################
 
 
 
-+ Pretty printing 10 flows
-Simulation ended (eff.: 0.708215, detail below)
-	Valid embedding but no longer unary when required: 0.000000
-	Valid embedding but not binary when required: 0.000000
-	Clashing instance: 0.000000
-	Lazy negative update: 1.000000
-	Lazy negative update of non local instances: 0.000000
-	Perturbation interrupting time advance: 0.000000
++ Pretty printing 185 flows
+Simulation ended

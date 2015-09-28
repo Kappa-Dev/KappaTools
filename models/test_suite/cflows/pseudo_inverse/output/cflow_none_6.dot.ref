@@ -1,5 +1,5 @@
-/* Compression of 3 causal flows obtained in average at 3.755742E+00 t.u */
-/* Compressed causal flows were: [65;72;89] */
+/* Compression of 9 causal flows obtained in average at 4.524531E+00 t.u */
+/* Compressed causal flows were: [71;75;78;80;82;91;92;93;94] */
 digraph G{
  ranksep=.5 ;
 { rank = same ; "0" [shape=plaintext] ;
@@ -39,16 +39,10 @@ node_11 [label="R2", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_12 [label="R1", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "12" [shape=plaintext] ;
-node_13 [label="R2", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_13 [label="R3", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "13" [shape=plaintext] ;
-node_14 [label="R1", shape=invhouse, style=filled, fillcolor = lightblue] ;
-}
-{ rank = same ; "14" [shape=plaintext] ;
-node_15 [label="R3", shape=invhouse, style=filled, fillcolor = lightblue] ;
-}
-{ rank = same ; "15" [shape=plaintext] ;
-node_16 [label="c", style=filled, fillcolor=red] ;
+node_14 [label="A/*1*/(x~c?)", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];
@@ -63,8 +57,6 @@ node_16 [label="c", style=filled, fillcolor=red] ;
 "10" -> "11" [style="invis"];
 "11" -> "12" [style="invis"];
 "12" -> "13" [style="invis"];
-"13" -> "14" [style="invis"];
-"14" -> "15" [style="invis"];
 node_1 -> node_2
 node_1 -> node_3
 node_2 -> node_3
@@ -90,10 +82,6 @@ node_1 -> node_13
 node_12 -> node_13
 node_1 -> node_14
 node_13 -> node_14
-node_1 -> node_15
-node_14 -> node_15
-node_1 -> node_16
-node_15 -> node_16
 }
 /*
 */

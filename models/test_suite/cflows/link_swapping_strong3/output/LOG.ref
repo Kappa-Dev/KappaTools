@@ -2,18 +2,15 @@
 Parsing link_swapping_strong3.ka...
 done
 + Initialized random number generator with seed 924556145
++ Building initial simulation conditions...
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
 	 -variable declarations
-	 -initial conditions
 	 -rules
 	 -observables
 	 -perturbations
-	 Done
-+ Analyzing non local patterns...
-+ Building initial simulation state...
-	 -Counting initial local patterns...
+	 -initial conditions
 	 Done
 ____________________________________________________________
 ############################################################
@@ -25,10 +22,10 @@ ____________________________________________________________
 	 - blackboard generation
 	 - computing causal past of each observed events (12)
 Stats:
- number of step   : 45
- longest story    : 9
- average length   : 6.33333333333
- geometric mean   : 6.6080758672
+ number of step   : 43
+ longest story    : 5
+ average length   : 5.
+ geometric mean   : 5.
 
 	 - causal & weak flow compression (12)
 
@@ -43,10 +40,8 @@ ____________________________________________________________
 ############################################################
 + Pretty printing 1 weakly compressed flow
 + Pretty printing 1 strongly compressed flow
-Simulation ended (eff.: 0.612245, detail below)
+Simulation ended (eff.: 0.731707, detail below)
 	Valid embedding but no longer unary when required: 0.000000
 	Valid embedding but not binary when required: 0.000000
-	Clashing instance: 0.263158
-	Lazy negative update: 0.736842
-	Lazy negative update of non local instances: 0.000000
+	Clashing instance: 1.000000
 	Perturbation interrupting time advance: 0.000000

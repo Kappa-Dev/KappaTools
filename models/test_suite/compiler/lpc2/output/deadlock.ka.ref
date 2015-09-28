@@ -1,6 +1,0 @@
-# Snapshot [Event: 1, Time: 1.755639]
-%init: 1\
-B(x)
-%init: 1\
-A(x, y, z)
-# End snapshot

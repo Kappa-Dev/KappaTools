@@ -2,18 +2,15 @@
 Parsing create.ka...
 done
 + Initialized random number generator with seed 611463625
++ Building initial simulation conditions...
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
 	 -variable declarations
-	 -initial conditions
 	 -rules
 	 -observables
 	 -perturbations
-	 Done
-+ Analyzing non local patterns...
-+ Building initial simulation state...
-	 -Counting initial local patterns...
+	 -initial conditions
 	 Done
 ____________________________________________________________
 ############################################################
@@ -23,17 +20,17 @@ ____________________________________________________________
 	 - cutting concurrent events
 	 - detecting pseudo inverse events
 	 - blackboard generation
-	 - computing causal past of each observed events (67)
+	 - computing causal past of each observed events (68)
 
 ____________________________________________________________
 ############################################################
 Stats:
- number of step   : 334
+ number of step   : 335
  longest story    : 7
- average length   : 4.0447761194
- geometric mean   : 4.06110050521
+ average length   : 4.19117647059
+ geometric mean   : 4.25129737983
 
-	 - causal & weak flow compression (67)
+	 - causal & weak flow compression (68)
 
 ____________________________________________________________
 ############################################################
@@ -46,10 +43,4 @@ ____________________________________________________________
 ############################################################
 + Pretty printing 2 weakly compressed flows
 + Pretty printing 1 strongly compressed flow
-Simulation ended (eff.: 0.994036, detail below)
-	Valid embedding but no longer unary when required: 0.000000
-	Valid embedding but not binary when required: 0.000000
-	Clashing instance: 0.000000
-	Lazy negative update: 1.000000
-	Lazy negative update of non local instances: 0.000000
-	Perturbation interrupting time advance: 0.000000
+Simulation ended
