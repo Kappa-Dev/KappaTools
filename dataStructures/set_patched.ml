@@ -55,6 +55,7 @@ module type S =
     val destruct_max: t -> elt*t
   end
 
+
 module Make(Ord: OrderedType) : S with type elt = Ord.t =
   struct
     type elt = Ord.t

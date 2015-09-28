@@ -3,7 +3,7 @@
 type t (** Abstract state *)
 
 val initial : Environment.t -> Mods.Counter.t -> Rule_interpreter.t ->
-	      (Nbr.t * int) list -> t
+	      (Nbr.t * int) list -> Rule_interpreter.t * t
 (** [initial env c graph stopping_times] builds up the initial state *)
 
 val observables_values :

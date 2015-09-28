@@ -73,75 +73,77 @@ let rules_of_ast ?deps_machinery algs tokens contact_map domain
     tokenify algs tokens contact_map domain ast_rule.rm_token in
   let domain'',add_toks =
     tokenify algs tokens contact_map domain' ast_rule.add_token in
-  let one_side syntax_ref label (domain,deps_machinery,acc)
+  let one_side syntax_ref label (domain,deps_machinery,unary_ccs,acc)
 	       rate unary_rate lhs rhs rm add =
-    let origin,deps_and_unaries =
+    let origin,deps =
       match deps_machinery with
       | None -> None,None
       | Some (o,d) -> Some o, Some d in
     let (crate,_ as crp) = Expr.compile_pure_alg algs tokens rate in
     let count = let x = ref 0 in fun (lab,pos) ->
 				 incr x; (lab^"__"^string_of_int !x,pos) in
-    let register_unary =
+    let unary_infos =
       match unary_rate with
-      | None -> fun _ _  y -> y
+      | None -> fun _ uncc -> crate,None,uncc
       | Some (_,pos as rate) ->
-	 let (crate,_) = Expr.compile_pure_alg algs tokens rate in
-	 fun ccs o s ->
+	 let (unrate,_) = Expr.compile_pure_alg algs tokens rate in
+	 fun ccs uncc ->
 	 match Array.length ccs with
-	 | (0 | 1) -> s
-	 | 2 -> Mods.IntMap.add o crate s
+	 | (0 | 1) -> unrate,None,uncc
+	 | 2 ->
+	    crate,Some unrate,
+	    Connected_component.Set.add ccs.(0) (Connected_component.Set.add ccs.(1) uncc)
 	 | n ->
 	    raise (ExceptionDefn.Malformed_Decl
 		     ("Unary rule does not deal with "^
 			string_of_int n^" connected components.",pos)) in
-    let build deps_and_unaries (origin,ccs,syntax,(neg,pos)) =
+    let build deps un_ccs (origin,ccs,syntax,(neg,pos)) =
+      let rate,unrate,un_ccs' = unary_infos ccs un_ccs in
       Tools.option_map
-	(fun (x,y) ->
+	(fun x ->
 	 let origin =
 	   match origin with Some o -> o | None -> failwith "ugly Eval.rule_of_ast" in
-	 let origin_rule_id = match origin with
-	   | Operator.RULE i -> i
-	   | Operator.ALG _ | Operator.PERT _ -> assert false in
-	 (Alg_expr.add_dep x origin crp,register_unary ccs origin_rule_id y))
-	deps_and_unaries,{
-	Primitives.rate = crate;
-	Primitives.connected_components = ccs;
-	Primitives.removed = neg;
-	Primitives.inserted = pos;
-	Primitives.consumed_tokens = rm;
-	Primitives.injected_tokens = add;
-	Primitives.syntactic_rule = syntax_ref;
-	Primitives.instantiations = syntax;
-      } in
+	 Alg_expr.add_dep x origin crp)
+	deps,un_ccs',{
+	  Primitives.unary_rate = unrate;
+	  Primitives.rate = rate;
+	  Primitives.connected_components = ccs;
+	  Primitives.removed = neg;
+	  Primitives.inserted = pos;
+	  Primitives.consumed_tokens = rm;
+	  Primitives.injected_tokens = add;
+	  Primitives.syntactic_rule = syntax_ref;
+	  Primitives.instantiations = syntax;
+	} in
     let (domain',origin'),rule_mixtures =
       Snip.connected_components_sum_of_ambiguous_rule
 	contact_map domain ?origin lhs rhs in
-    let deps_algs',rules_l =
+    let deps_algs',unary_ccs',rules_l =
       match rule_mixtures with
-      | [] -> deps_and_unaries,acc
+      | [] -> deps,unary_ccs,acc
       | [ r ] ->
-	 let deps_algs',r' = build deps_and_unaries r in
-	 deps_algs', ((label, r') :: acc)
+	 let deps_algs',un_ccs',r' =
+	   build deps unary_ccs r in
+	 deps_algs', un_ccs',((label, r') :: acc)
       | _ ->
 	 List.fold_right
-	   (fun r (deps_algs,out) ->
-	    let deps_algs',r' = build deps_algs r in
-	    deps_algs',(count label,r')::out)
-	   rule_mixtures (deps_and_unaries,acc) in
+	   (fun r (deps_algs,un_ccs,out) ->
+	    let deps_algs',un_ccs',r' = build deps_algs un_ccs r in
+	    deps_algs',un_ccs',(count label,r')::out)
+	   rule_mixtures (deps,unary_ccs,acc) in
     domain',(match origin' with
 	     | None -> None
 	     | Some o -> Some (o,
 			       match deps_algs' with
 			       | Some d -> d
 			       | None -> failwith "ugly Eval.rule_of_ast")),
-    rules_l in
+    unary_ccs',rules_l in
   let rev = match ast_rule.arrow, ast_rule.k_op with
-    | RAR, None -> domain'',deps_machinery,[]
+    | RAR, None -> domain'',deps_machinery,Connected_component.Set.empty,[]
     | LRAR, Some rate ->
        let un_rate = match ast_rule.k_un with None -> None | Some (_,x) -> x in
        one_side (~- syntax_ref)
-		(opposite label) (domain'',deps_machinery,[]) rate un_rate
+		(opposite label) (domain'',deps_machinery,Connected_component.Set.empty,[]) rate un_rate
 		ast_rule.rhs ast_rule.lhs add_toks rm_toks
     | (RAR, Some _ | LRAR, None) ->
        raise
@@ -208,7 +210,7 @@ let effects_of_modif
       let (domain',alg_pos) =
 	Expr.compile_alg algs.NamedDecls.finder tokens.NamedDecls.finder
 			 contact_map domain alg_expr in
-      let domain'',_,elem_rules =
+      let domain'',_,_,elem_rules =
 	rules_of_ast algs.NamedDecls.finder tokens.NamedDecls.finder contact_map
 		     domain' ~syntax_ref:0
 		     (Location.dummy_annot "__perturbation_modification")
@@ -400,7 +402,7 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 		domain' ~syntax_ref:0 (Location.dummy_annot "__init_mix")
 		(fake_rule,mix_pos)
 	    with
-	    | domain'',_,[ _, compiled_rule ] ->
+	    | domain'',_,_,[ _, compiled_rule ] ->
 	       let actions,_,_ = snd compiled_rule.Primitives.instantiations in
 	       let creations_sort =
 		 List.fold_left
@@ -412,14 +414,19 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 	       domain'',
 	       Nbr.iteri
 		 (fun _ s ->
-		  fst
-		    (Rule_interpreter.force_rule
-		       ~get_alg:(fun i ->
-				 fst (snd algs.NamedDecls.decls.(i)))
-		       domain'' counter s (Causal.INIT creations_sort) compiled_rule))
+		  match Rule_interpreter.apply_rule
+			  ~get_alg:(fun i ->
+				    fst (snd algs.NamedDecls.decls.(i)))
+			  domain'' counter s (Causal.INIT creations_sort)
+			  compiled_rule with
+		  | Rule_interpreter.Success s -> s
+		  | (Rule_interpreter.Clash | Rule_interpreter.Corrected _) ->
+		     raise (ExceptionDefn.Internal_Error
+			      ("Bugged initial rule",mix_pos))
+      )
 		 state value
-	    | domain'',_,[] -> domain'',state
-	    | _,_,_ ->
+	    | domain'',_,_,[] -> domain'',state
+	    | _,_,_,_ ->
 	       raise (ExceptionDefn.Malformed_Decl
 			(Format.asprintf
 			   "initial mixture %a is partially defined"
@@ -431,20 +438,25 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 	      add_token = [(alg, (tk_nme,pos_tk))];
 	      k_def = Location.dummy_annot (CONST Nbr.zero);
 	      k_un = None; k_op = None; } in
-	  let domain',(state',_) =
+	  let domain',state' =
 	    match
 	      rules_of_ast
 		algs.NamedDecls.finder tokens.NamedDecls.finder contact_map
 		domain ~syntax_ref:0 (Location.dummy_annot "__init_tok")
 		(Location.dummy_annot fake_rule)
 	    with
-	    | domain'',_,[ _, compiled_rule ] ->
-	       domain'',
-	       Rule_interpreter.force_rule
-		      ~get_alg:(fun i ->
-				fst (snd algs.NamedDecls.decls.(i)))
-		      domain'' counter state (Causal.INIT []) compiled_rule
-	    | _,_,_ -> assert false in
+	    | domain'',_,_,[ _, compiled_rule ] ->
+	       (domain'',
+	       match
+		 Rule_interpreter.apply_rule
+		   ~get_alg:(fun i ->
+			     fst (snd algs.NamedDecls.decls.(i)))
+		   domain'' counter state (Causal.INIT []) compiled_rule with
+	       | Rule_interpreter.Success s -> s
+	       | (Rule_interpreter.Clash | Rule_interpreter.Corrected _) ->
+		  raise (ExceptionDefn.Internal_Error
+			   ("Bugged initial tokens",pos_tk)))
+	    | _,_,_,_ -> assert false in
 	  domain',state'
       )	(domain,Rule_interpreter.empty ~has_tracking env)
       res.Ast.init
@@ -592,14 +604,18 @@ let compile_alg_vars tokens contact_map domain overwrite vars =
 let compile_rules algs alg_deps tokens contact_map domain rules =
   match
     List.fold_left
-      (fun (domain,syntax_ref,deps_machinery,acc) (rule_label,rule) ->
-       let (domain',origin',cr) =
+      (fun (domain,syntax_ref,deps_machinery,unary_cc,acc) (rule_label,rule) ->
+       let (domain',origin',extra_unary_cc,cr) =
 	 rules_of_ast algs tokens ?deps_machinery contact_map domain
 		      ~syntax_ref rule_label rule in
-       domain',succ syntax_ref,origin',List.append cr acc)
-      (domain,1,Some (Operator.RULE 0,alg_deps),[]) rules with
-  | fdomain,_,Some (_,falg_deps),frules -> fdomain,falg_deps,List.rev frules
-  | _, _, None, _ ->
+       (domain',succ syntax_ref,origin',
+	Connected_component.Set.union unary_cc extra_unary_cc,
+	List.append cr acc))
+      (domain,1,Some (Operator.RULE 0,alg_deps),Connected_component.Set.empty,[])
+      rules with
+  | fdomain,_,Some (_,falg_deps),unary_cc,frules ->
+     fdomain,falg_deps,List.rev frules,unary_cc
+  | _, _, None, _, _ ->
      failwith "The origin of Eval.compile_rules has been lost"
 
 let initialize logger overwrite result =
@@ -632,8 +648,8 @@ let initialize logger overwrite result =
   let alg_deps = Alg_expr.setup_alg_vars_rev_dep alg_a in
 
   Debug.tag logger "\t -rules";
-  let (domain',(alg_deps',unary_rules),compiled_rules) =
-    compile_rules alg_nd.NamedDecls.finder (alg_deps,Mods.IntMap.empty) tk_nd.NamedDecls.finder
+  let (domain',alg_deps',compiled_rules,cc_unaries) =
+    compile_rules alg_nd.NamedDecls.finder alg_deps tk_nd.NamedDecls.finder
 		  contact_map domain' cleaned_rules in
   let rule_nd = NamedDecls.create (Array.of_list compiled_rules) in
 
@@ -647,7 +663,7 @@ let initialize logger overwrite result =
 
   let env =
     Environment.init sigs_nd tk_nd alg_nd alg_deps'
-		     (Array.of_list result.rules,rule_nd,unary_rules)
+		     (Array.of_list result.rules,rule_nd,cc_unaries)
 		     (Array.of_list (List.rev obs)) (Array.of_list pert) in
 
   Debug.tag logger "\t -initial conditions";
@@ -661,5 +677,5 @@ let initialize logger overwrite result =
 	Kappa_printer.env env
 	Connected_component.Env.print domain
 	(Rule_interpreter.print env) graph in
-  let state = State_interpreter.initial env counter graph stops in
-  (Debug.tag logger "\t Done"; (env, domain, counter, graph, state))
+  let graph',state = State_interpreter.initial env counter graph stops in
+  (Debug.tag logger "\t Done"; (env, domain, counter, graph', state))

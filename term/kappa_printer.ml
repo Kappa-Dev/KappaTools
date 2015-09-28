@@ -58,7 +58,7 @@ let elementary_rule ?env f r =
     let () = Connected_component.print ?sigs true f cc in
     Format.pp_close_box f () in
   Format.fprintf
-    f "@[%a@]@ -- @[@[%a@]%t@[%a@]@]@ ++ @[@[%a@]%t@[%a@]@]@ @@%a"
+    f "@[%a@]@ -- @[@[%a@]%t@[%a@]@]@ ++ @[@[%a@]%t@[%a@]@]@ @@%a%t"
     (Pp.array Pp.comma boxed_cc) r.Primitives.connected_components
     (Pp.list Pp.comma pr_trans) r.Primitives.removed
     (if r.Primitives.removed <> [] && r.Primitives.consumed_tokens <> []
@@ -69,6 +69,9 @@ let elementary_rule ?env f r =
      then Pp.space else Pp.empty)
     (Pp.list Pp.space pr_tok) r.Primitives.injected_tokens
     (alg_expr ?env) r.Primitives.rate
+    (fun f -> match r.Primitives.unary_rate with
+	      | None -> ()
+	      | Some rate -> Format.fprintf f " (%a)" (alg_expr ?env) rate)
 
 let modification ?env f m =
   let sigs = match env with

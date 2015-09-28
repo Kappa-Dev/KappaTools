@@ -6,9 +6,10 @@ val init :
   Signature.s -> unit NamedDecls.t -> Alg_expr.t Location.annot NamedDecls.t ->
   (Operator.DepSet.t * Operator.DepSet.t * Operator.DepSet.t array) ->
   ((string Location.annot option * Ast.rule Location.annot) array *
-     Primitives.elementary_rule NamedDecls.t * Alg_expr.t Mods.IntMap.t) ->
+     Primitives.elementary_rule NamedDecls.t *
+       Connected_component.Set.t) ->
   Alg_expr.t Location.annot array -> Primitives.perturbation array -> t
-(** [init sigs tokens algs dependencies (ast_rules,rules,unary_rules) obs perts]
+(** [init sigs tokens algs dependencies (ast_rules,rules) obs perts]
  *)
 
 val nb_tokens : t -> int
@@ -17,6 +18,7 @@ val nb_rules : t -> int
 val nb_syntactic_rules : t -> int
 val nb_perturbations : t -> int
 val signatures : t -> Signature.s
+val connected_components_of_unary_rules : t -> Connected_component.Set.t
 
 val get_alg : t -> int -> Alg_expr.t
 val get_perturbation : t -> int -> Primitives.perturbation

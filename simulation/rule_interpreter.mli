@@ -1,6 +1,7 @@
 (**Graph rewriting module*)
 
 type t (**Abstract graph*)
+type result = Clash | Success of t | Corrected of t
 
 (** {6 Initialisation} *)
 
@@ -20,10 +21,18 @@ val value_bool :
 (** {6 Core} *)
 
 val apply_rule :
+  ?rule_id:int ->
   get_alg:(int -> Alg_expr.t) -> Connected_component.Env.t -> Mods.Counter.t
-  -> t -> Causal.event_kind -> Primitives.elementary_rule -> t option
-(** Returns the graph obtained by applying the rule. [None] means
-null_event *)
+  -> t -> Causal.event_kind -> Primitives.elementary_rule -> result
+(** Returns the graph obtained by applying the rule.
+ [rule_id] is mandatory if the rula has an unary rate.*)
+
+val apply_unary_rule :
+  rule_id:int ->
+  get_alg:(int -> Alg_expr.t) -> Connected_component.Env.t -> Mods.Counter.t
+  -> t -> Causal.event_kind -> Primitives.elementary_rule -> result
+(** Returns the graph obtained by applying the rule.
+ [rule_id] is mandatory if the rula has an unary rate.*)
 
 val force_rule :
   get_alg:(int -> Alg_expr.t) -> Connected_component.Env.t -> Mods.Counter.t
@@ -61,5 +70,5 @@ val generate_stories : Format.formatter -> Environment.t -> t -> unit
 
 val print_injections :
   ?sigs:Signature.s -> Format.formatter ->
-  ValMap.tree Connected_component.Map.t -> unit
+  int ValMap.tree Connected_component.Map.t -> unit
 val debug_print : Format.formatter -> t -> unit

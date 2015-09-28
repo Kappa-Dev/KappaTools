@@ -1,14 +1,13 @@
-type key = int
-type tree =
+type 'a tree =
   Empty
-| Node of tree * key * tree * int * int
+| Node of 'a tree * 'a * 'a tree * int * int
     (*Node(left,key,right,height,size)*)
 
-let rec print f = function
+let rec print pr f = function
   | Empty -> Format.pp_print_string f "Empty"
   | Node (l,k,r,_,acc) ->
-    Format.fprintf f "<%d,%i>[%a|%a]@," k acc
-      print l print r
+    Format.fprintf f "<%a,%i>[%a|%a]@," pr k acc
+      (print pr) l (print pr) r
 
 let height = function
 Empty -> 0
@@ -134,7 +133,7 @@ let rec fold f m accu =
     fold f r (f v (fold f l accu))
 
 (**Returns (key,value) at random in the tree*)
-let random_val (m:tree) =
+let random_val m =
   try
 (*    let r = Random.int (size m) in
     find_acc (Random.int r) m *)

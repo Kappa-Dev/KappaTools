@@ -144,7 +144,7 @@ type path = (int * int * int * int) list
 let is_valid_path graph l =
   List.for_all (fun (a,s,a',s') -> link_exists a s a' s' graph) l
 
-let pathes_of_interest stop_on_find is_interresting (links,_,_) origin =
+let pathes_of_interrest stop_on_find is_interresting (links,_,_) origin =
   let rec infinite_search (id,path as x) site (stop,don,out,next as acc) =
     try
       match Int2Map.find (id,site) links with
@@ -156,7 +156,7 @@ let pathes_of_interest stop_on_find is_interresting (links,_,_) origin =
 	   let don' = IntSet.add id' don in
 	   let path' = (id,site,site',id')::path in
 	   let store = is_interresting id' in
-	   let out' = if store then path'::out else out in
+	   let out' = if store then (id',path')::out else out in
 	   let next' = (id',path')::next in
 	   infinite_search x (succ site) (stop||store,don',out',next')
     with Not_found -> acc in
@@ -171,7 +171,7 @@ let are_connected ?candidate graph x y =
   match candidate with
   | Some p when is_valid_path graph p -> Some p
   | (Some _ | None) ->
-     match pathes_of_interest true (fun z -> z = y) graph x with
+     match pathes_of_interrest true (fun z -> z = y) graph x with
      | [] -> None
-     | [ p ] -> Some p
+     | [ _,p ] -> Some p
      | _ :: _ -> failwith "Edges.are_they_connected completely broken"

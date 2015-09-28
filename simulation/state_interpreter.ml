@@ -1,7 +1,7 @@
 type t = {
   stopping_times : (Nbr.t * int) list ref;
   perturbations_alive : bool array;
-  activities : Random_tree.tree;
+  activities : Random_tree.tree;(* pair numbers are binary rule, odd unary *)
   variables_overwrite: Alg_expr.t option array;
   flux: (string * float array array) list;
 }
@@ -9,26 +9,26 @@ type t = {
 let initial_activity get_alg env counter graph activities =
   Environment.iteri_rules
     (fun i rule ->
-     let rate = Rule_interpreter.value_alg
-		  counter graph ~get_alg rule.Primitives.rate in
-     let cc_va =
-       Rule_interpreter.value_alg
-	 counter graph ~get_alg
-	 (Alg_expr.KAPPA_INSTANCE [rule.Primitives.connected_components]) in
-     let act =
-       if Nbr.is_zero cc_va then Nbr.zero else Nbr.mult rate cc_va in
-     Random_tree.add i (Nbr.to_float act) activities)
+     if Array.length rule.Primitives.connected_components = 0 then
+       let rate = Rule_interpreter.value_alg
+		    counter graph ~get_alg rule.Primitives.rate in
+       Random_tree.add (2*i) (Nbr.to_float rate) activities)
     env
 
 let initial env counter graph stopping_times =
   let activity_tree =
-    Random_tree.create (Environment.nb_rules env) in
+    Random_tree.create (2*Environment.nb_rules env) in
   let () =
     initial_activity (Environment.get_alg env)
-		    env counter graph activity_tree in
+		     env counter graph activity_tree in
+  let graph' =
+    Rule_interpreter.update_outdated_activities
+      ~get_alg:(fun i -> Environment.get_alg env i)
+      (fun x _ y -> Random_tree.add x y activity_tree)
+      env counter graph in
   let stops =
     ref (List.sort (fun (a,_) (b,_) -> Nbr.compare a b) stopping_times) in
-  {
+  graph',{
     stopping_times = stops;
     perturbations_alive =
       Array.make (Environment.nb_perturbations env) true;
@@ -203,8 +203,9 @@ let perturbate env domain counter graph state =
 	do_until_noop (succ i) graph state stop in
   do_until_noop 0 graph state false
 
-let one_rule env domain counter graph state =
-  let rule_id,_ = Random_tree.random state.activities in
+let one_rule form dt stop env domain counter graph state =
+  let choice,_ = Random_tree.random state.activities in
+  let rule_id = choice/2 in
   let rule = Environment.get_rule env rule_id in
   let register_new_activity rd_id syntax_rd_id new_act =
     let p i = i + Environment.nb_syntactic_rules env in
@@ -224,35 +225,53 @@ let one_rule env domain counter graph state =
   (* let () = *)
   (*   Format.eprintf "%a@." (Rule_interpreter.print_injections env) graph in *)
   let cause = Causal.RULE rule.Primitives.syntactic_rule in
-  match Rule_interpreter.apply_rule
-	  ~get_alg domain counter graph cause rule with
-  | Some graph' ->
+  let apply_rule ~rule_id =
+    if choice mod 2 = 1
+    then Rule_interpreter.apply_unary_rule ~rule_id
+    else Rule_interpreter.apply_rule ~rule_id in
+  match apply_rule ~rule_id ~get_alg domain counter graph cause rule with
+  | Rule_interpreter.Success graph' ->
      let graph'' =
        Rule_interpreter.update_outdated_activities
-	 ~get_alg register_new_activity  env counter graph' in
+	 ~get_alg register_new_activity env counter graph' in
      let () =
        if !Parameter.debugModeOn then
 	 Format.printf "@[<v>Obtained@ %a@]@."
 		       (Rule_interpreter.print env) graph' in
-     Some (graph'',state)
-  | None ->
-     if Mods.Counter.consecutive_null_event counter < !Parameter.maxConsecutiveClash
-     then None
+     let () =
+       Plot.fill form counter env dt
+		 (observables_values env counter graph state) in
+     (not (Mods.Counter.one_constructive_event counter dt)||stop,graph'',state)
+  | Rule_interpreter.Clash ->
+     if Mods.Counter.consecutive_null_event counter <
+	  !Parameter.maxConsecutiveClash
+     then
+       (not (Mods.Counter.one_clashing_instance_event counter dt)||stop,graph,state)
      else
-       let graph' =
-	 match Rule_interpreter.force_rule
-		 ~get_alg domain counter graph cause rule with
-	 | graph',Some [] ->
-	    let () = Random_tree.add rule_id 0.0 state.activities in graph'
-	 | graph',(None | Some (_::_)) -> graph' in
-       let graph'' =
-	 Rule_interpreter.update_outdated_activities
-	   ~get_alg register_new_activity  env counter graph' in
-       let () =
-	 if !Parameter.debugModeOn then
-	   Format.printf "@[<v>Obtained after forcing rule@ %a@]@."
-			 (Rule_interpreter.print env) graph' in
-       Some (graph'',state)
+       (*let graph' =
+	   match Rule_interpreter.force_rule
+		   ~get_alg domain counter graph cause rule with
+	   | graph',Some [] ->
+	      let () = Random_tree.add (2*rule_id) 0.0 state.activities in graph'
+	   | graph',(None | Some (_::_)) -> graph' in
+	 let graph'' =
+	   Rule_interpreter.update_outdated_activities
+	     ~get_alg register_new_activity  env counter graph' in
+	 let () =
+	   if !Parameter.debugModeOn then
+	     Format.printf "@[<v>Obtained after forcing rule@ %a@]@."
+			   (Rule_interpreter.print env) graph' in
+	 Some (graph'',state)*)
+       (not (Mods.Counter.one_clashing_instance_event counter dt)||stop,graph,state)
+  | Rule_interpreter.Corrected graph' ->
+     let graph'' =
+       Rule_interpreter.update_outdated_activities
+	 ~get_alg register_new_activity env counter graph' in
+     let continue =
+       if choice mod 2 = 1
+       then Mods.Counter.one_no_more_unary_event counter dt
+       else Mods.Counter.one_no_more_binary_event counter dt in
+     (not continue||stop,graph'',state)
 
 let activity state =
   Random_tree.total state.activities
@@ -291,14 +310,7 @@ let a_loop form env domain counter graph state =
     | _ ->
        let (stop,graph',state') =
 	 perturbate env domain counter graph state in
-       match one_rule env domain counter graph' state' with
-       | None ->
-	  (not (Mods.Counter.one_clashing_instance_event counter dt)||stop,graph',state')
-       | Some (graph'',state'') ->
-	  let () =
-	    Plot.fill form counter env dt
-		      (observables_values env counter graph state) in
-	  (not (Mods.Counter.one_constructive_event counter dt)||stop,graph'',state'')
+       one_rule form dt stop env domain counter graph' state'
 
 let loop_cps form hook return env domain counter graph state =
   let () =

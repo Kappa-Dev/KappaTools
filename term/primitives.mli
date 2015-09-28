@@ -17,6 +17,7 @@ end
 
 type elementary_rule = {
   rate : Alg_expr.t;
+  unary_rate : Alg_expr.t option;
   connected_components : Connected_component.t array;
   removed : Transformation.t list;
   inserted : Transformation.t list;

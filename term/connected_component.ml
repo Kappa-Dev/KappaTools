@@ -1005,4 +1005,5 @@ module ForState = struct
     let compare = compare_canonicals
 end
 
+module Set = Set_patched.Make(ForState)
 module Map = MapExt.Make(ForState)

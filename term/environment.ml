@@ -5,7 +5,7 @@ type t = {
   observables : Alg_expr.t Location.annot array;
   ast_rules : (string Location.annot option * Ast.rule Location.annot) array;
   rules : Primitives.elementary_rule NamedDecls.t;
-  unary_rules : Alg_expr.t Mods.IntMap.t;
+  cc_of_unaries : Connected_component.Set.t;
   perturbations : Primitives.perturbation array;
   need_update_each_loop : Operator.DepSet.t;
   reverse_dependencies : Operator.DepSet.t array;
@@ -13,10 +13,10 @@ type t = {
 }
 
 let init sigs tokens algs (deps_in_t,deps_in_e,rd)
-	 (ast_rules,rules,urules) obs perts =
+	 (ast_rules,rules,cc_of_unaries) obs perts =
   { signatures = sigs; tokens = tokens; ast_rules = ast_rules;
-    rules = rules; unary_rules = urules; algs = algs; observables = obs;
-    perturbations = perts; reverse_dependencies = rd;
+    rules = rules; cc_of_unaries = cc_of_unaries; algs = algs;
+    observables = obs; perturbations = perts; reverse_dependencies = rd;
     need_update_each_loop = Operator.DepSet.union deps_in_t deps_in_e;
 
     desc_table = Hashtbl.create 2;
@@ -44,6 +44,8 @@ let get_rule env i = snd env.rules.NamedDecls.decls.(i)
 let nb_rules env = NamedDecls.size env.rules
 
 let nb_syntactic_rules env = Array.length env.ast_rules
+
+let connected_components_of_unary_rules env = env.cc_of_unaries
 
 let num_of_alg s env = NamedDecls.elt_id ~kind:"variable" env.rules s
 let get_alg env i = fst @@ snd env.algs.NamedDecls.decls.(i)
