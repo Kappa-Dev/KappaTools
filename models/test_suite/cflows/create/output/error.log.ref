@@ -1,2 +1,6 @@
 File "create.ka", line 5, characters 12-13:
 Warning: breaking a semi-link on site 'x' will induce a side effect
+File "create.ka", line 6, characters 36-37:
+Warning: Site 'x' was not mentionned in the left-hand side.This agent and the
+         following will be removed and recreated (probably causing side
+         effects).

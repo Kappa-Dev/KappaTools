@@ -295,7 +295,19 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
 let no_more_site_on_right left right =
   List.for_all
     (fun p ->
-     List.exists (fun p' -> fst p.Ast.port_nme = fst p'.Ast.port_nme) left)
+     List.exists (fun p' -> fst p.Ast.port_nme = fst p'.Ast.port_nme) left
+     || let () =
+	  ExceptionDefn.warning
+	    ~pos:(snd p.Ast.port_nme)
+	   (fun f ->
+	    Format.fprintf
+	      f "@[Site@ '%s'@ was@ not@ mentionned in@ the@ left-hand@ side."
+	      (fst p.Ast.port_nme);
+	    Format.fprintf
+	      f "This@ agent@ and@ the@ following@ will@ be@ removed@ and@ ";
+	    Format.fprintf
+	      f "recreated@ (probably@ causing@ side@ effects).@]")
+	in false)
     right
 
 let rec annotate_lhs_with_diff sigs acc lhs rhs =
