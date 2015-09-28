@@ -506,6 +506,8 @@ let translate_compil parameters error compil =
         let error,direct = 
           error,
           {
+	    Ckappa_sig.prefix = prefix ;
+	    Ckappa_sig.delta = tail_lhs ;
             Ckappa_sig.lhs = lhs ;
             Ckappa_sig.rhs =  rhs ;
             Ckappa_sig.arrow = rule.Ast.arrow ;

@@ -45,7 +45,7 @@ let check parameters error handler mixture1 mixture2 (i,j) =
        let error,view1 = Int_storage.Quick_Nearly_inf_Imperatif.get parameters error h1 mixture1.Cckappa_sig.views in
        let error,view2 = Int_storage.Quick_Nearly_inf_Imperatif.get parameters error h2 mixture2.Cckappa_sig.views in
        let error,bonds1 = Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get parameters error h1 mixture1.Cckappa_sig.bonds in 
-       let error,bonds2 = Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get parameters error h2 mixture2.Cckappa_sig.bonds in 
+       let error,bonds2 = Int_storage.Quick_Nearly_inf_Imperatif.unsafe_get parameters error h2 mixture2.Cckappa_sig.bonds in
        check_interface error view1 view2 bonds1 bonds2 t already_done 
      end
   and check_interface error ag1 ag2 bonds1 bonds2 to_do already_done =
@@ -53,15 +53,12 @@ let check parameters error handler mixture1 mixture2 (i,j) =
       match
 	ag1,ag2
       with
-      | None,_ | _,None ->
-		  let _ = Printf.fprintf stderr "EMPTY AGENT\n" in
-		  warn parameters error (Some "Should not scan empty agents...") Exit (true,(to_do,already_done))
+      | None,_ | _,None -> warn parameters error (Some ("Should not scan empty agents...")) Exit (true,(to_do,already_done))
       | Some ag1,Some ag2 ->
 	 begin
 	   match ag1,ag2
 	   with 
-	   | Cckappa_sig.Ghost,_ | _,Cckappa_sig.Ghost ->
-				    warn parameters error (Some "Should not scan ghost agents...") Exit (true,(to_do,already_done))
+	   | Cckappa_sig.Ghost,_| _,Cckappa_sig.Ghost -> warn parameters error (Some "Should not scan ghost agents...") Exit (true,(to_do,already_done))
 	   | Cckappa_sig.Agent ag1 , Cckappa_sig.Agent ag2 ->
 	      begin 
 		let bonds1 =
@@ -141,11 +138,19 @@ let filter_influence parameters error handler compilation map bool =
     | Ast.KAPPA_INSTANCE(mixture),_ -> error,mixture
     | _ -> warn parameters error (Some "Composite observable") Exit (raise Exit)
   in 
-  let get_lhs r = r.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs in
-  let get_rhs r = r.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_rhs in
+  let get_lhs r =
+    r.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_lhs
+  in
+  let get_rhs r =
+    r.Cckappa_sig.e_rule_c_rule.Cckappa_sig.rule_rhs
+  in
   let get_bool = if bool then get_rhs else get_lhs in 
   let check_influence_rule_mixt error rule1 mixt  pos =
-    check parameters error handler (get_bool rule1) mixt pos
+    let updt_pos (x,y) =
+      (if bool && x>=rule1.Cckappa_sig.e_rule_c_rule.Cckappa_sig.prefix then x+rule1.Cckappa_sig.e_rule_c_rule.Cckappa_sig.delta else x),
+      y
+    in
+    check parameters error handler (get_bool rule1) mixt (updt_pos pos)
   in
   Quark_type.Int2Set_and_map.fold_map
     (fun (a,b) couple (error,map') ->
@@ -164,7 +169,7 @@ let filter_influence parameters error handler compilation map bool =
 	 let error,rule2 = Int_storage.Nearly_inf_Imperatif.get parameters error b compilation.Cckappa_sig.rules in 
 	 match rule2 with
 	 | None -> warn parameters error (Some "Missing rule") Exit (raise Exit)
-	 | Some r -> error,get_lhs r
+	 | Some r -> error,get_lhs r 
 	 end
        else
 	 begin
@@ -182,7 +187,10 @@ let filter_influence parameters error handler compilation map bool =
 	     error
 	     handler 
 	     (fun error a b  ->
-	      check_influence_rule_mixt error r1 mixt (a,b) )
+	      check_influence_rule_mixt error
+					r1
+					mixt
+					(a,b) )
 	     couple
 	 in
 	 error,couple'

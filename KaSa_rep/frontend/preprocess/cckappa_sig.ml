@@ -182,7 +182,9 @@ let empty_actions =
   }
     
 type rule = 
-    {
+  {
+    prefix         : int;
+    delta        : int;
       rule_lhs     : mixture; 
       rule_arrow   : Ast.arrow; 
       rule_rhs     : mixture; 

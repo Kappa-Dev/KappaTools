@@ -65,7 +65,9 @@ and link =
     | LNK_TYPE  of (string Term.with_pos * string Term.with_pos)
 
 type 'mixture rule = 
-    {
+  {
+    prefix: int;
+    delta: int;
       lhs   : 'mixture; 
       arrow : Ast.arrow; 
       rhs   : 'mixture; 

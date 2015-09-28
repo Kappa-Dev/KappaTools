@@ -250,6 +250,8 @@ let empty_rule parameter error =
   let error, empty_diff_views =
     Int_storage.Quick_Nearly_inf_Imperatif.create parameter error 0 in
   {
+    prefix       = 0 ;
+    delta        = 0 ; 
     rule_lhs     = empty_mixture parameter error;
     rule_arrow   = Ast.RAR;
     rule_rhs     = empty_mixture parameter error;
