@@ -2,15 +2,18 @@
 Parsing link_swapping_strong1.ka...
 done
 + Initialized random number generator with seed 924556145
-+ Building initial simulation conditions...
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
 	 -variable declarations
+	 -initial conditions
 	 -rules
 	 -observables
 	 -perturbations
-	 -initial conditions
+	 Done
++ Analyzing non local patterns...
++ Building initial simulation state...
+	 -Counting initial local patterns...
 	 Done
 ____________________________________________________________
 ############################################################
@@ -20,27 +23,33 @@ ____________________________________________________________
 	 - cutting concurrent events
 	 - detecting pseudo inverse events
 	 - blackboard generation
-	 - computing causal past of each observed events (39)
+	 - computing causal past of each observed events (49)
 
 ____________________________________________________________
 ############################################################
 Stats:
- number of step   : 338
- longest story    : 298
- average length   : 156.025641026
- geometric mean   : 175.487526038
+ number of step   : 353
+ longest story    : 303
+ average length   : 152.448979592
+ geometric mean   : 175.187596243
 
-	 - causal & weak flow compression (39)
-
-____________________________________________________________
-############################################################
-
-
-
-	 - strong flow compression (25)
+	 - causal & weak flow compression (49)
 
 ____________________________________________________________
 ############################################################
-+ Pretty printing 25 weakly compressed flows
+
+
+
+	 - strong flow compression (16)
+
+____________________________________________________________
+############################################################
++ Pretty printing 16 weakly compressed flows
 + Pretty printing 1 strongly compressed flow
-Simulation ended
+Simulation ended (eff.: 0.492611, detail below)
+	Valid embedding but no longer unary when required: 0.000000
+	Valid embedding but not binary when required: 0.000000
+	Clashing instance: 0.000000
+	Lazy negative update: 1.000000
+	Lazy negative update of non local instances: 0.000000
+	Perturbation interrupting time advance: 0.000000

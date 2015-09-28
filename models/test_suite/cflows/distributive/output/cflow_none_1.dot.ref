@@ -1,4 +1,4 @@
-/* Compression of 1 causal flows obtained in average at 4.340659E+00 t.u */
+/* Compression of 1 causal flows obtained in average at 2.086369E+00 t.u */
 /* Compressed causal flows were: [2] */
 digraph G{
  ranksep=.5 ;
@@ -9,45 +9,41 @@ node_3 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 node_4 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 node_5 [label="Intro K", shape=house, style=filled, fillcolor=green] ;
 node_6 [label="Intro K", shape=house, style=filled, fillcolor=green] ;
-node_7 [label="Intro K", shape=house, style=filled, fillcolor=green] ;
-node_8 [label="Intro K", shape=house, style=filled, fillcolor=green] ;
 }
 { rank = same ; "1" [shape=plaintext] ;
-node_9 [label="A(y), K(x) -> A(y!1), K(x!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_10 [label="A(y), K(x) -> A(y!1), K(x!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_11 [label="A(z), K(x) -> A(z!1), K(x!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_12 [label="A(y), K(x) -> A(y!1), K(x!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_7 [label="A(z),K(x)->A(z!0),K(x!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_8 [label="A(z),K(x)->A(z!0),K(x!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "2" [shape=plaintext] ;
-node_13 [label="A(y~u!1), K(x!1) -> A(y~p!1), K(x!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_14 [label="K(x!_) -> K(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_17 [label="K(x!_) -> K(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_20 [label="K(x!_) -> K(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_21 [label="K(x!_) -> K(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_9 [label="K(x!_)->K(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_13 [label="K(x!_)->K(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "3" [shape=plaintext] ;
-node_15 [label="A(y), K(x) -> A(y!1), K(x!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_18 [label="A(z), K(x) -> A(z!1), K(x!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_10 [label="A(z),K(x)->A(z!0),K(x!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_14 [label="A(z),K(x)->A(z!0),K(x!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "4" [shape=plaintext] ;
-node_16 [label="K(x!_) -> K(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_19 [label="A(z~u!1), K(x!1) -> A(z~p!1), K(x!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_25 [label="K(x!_) -> K(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_11 [label="K(x!_)->K(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_16 [label="K(x!_)->K(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "5" [shape=plaintext] ;
-node_22 [label="A(y), K(x) -> A(y!1), K(x!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_12 [label="A(z),K(x)->A(z!0),K(x!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_17 [label="A(y),K(x)->A(y!0),K(x!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "6" [shape=plaintext] ;
-node_23 [label="K(x!_) -> K(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_15 [label="A(z~u!0),K(x!0)->A(z~p!0),K(x!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_18 [label="A(y~u!0),K(x!0)->A(y~p!0),K(x!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_19 [label="K(x!_)->K(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_22 [label="K(x!_)->K(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "7" [shape=plaintext] ;
-node_24 [label="A(y), K(x) -> A(y!1), K(x!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_20 [label="A(y),K(x)->A(y!0),K(x!0)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "8" [shape=plaintext] ;
-node_26 [label="K(x!_) -> K(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_21 [label="K(x!_)->K(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "9" [shape=plaintext] ;
-node_27 [label="A/*1*/(y~p, z~p)", style=filled, fillcolor=red] ;
+node_23 [label="GOAL", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];
@@ -58,57 +54,36 @@ node_27 [label="A/*1*/(y~p, z~p)", style=filled, fillcolor=red] ;
 "6" -> "7" [style="invis"];
 "7" -> "8" [style="invis"];
 "8" -> "9" [style="invis"];
-node_3 -> node_9
+node_3 -> node_7
+node_5 -> node_7
+node_1 -> node_8
+node_6 -> node_8
 node_7 -> node_9
 node_4 -> node_10
-node_5 -> node_10
-node_1 -> node_11
-node_6 -> node_11
+node_9 -> node_10
+node_10 -> node_11
 node_2 -> node_12
-node_8 -> node_12
-node_2 -> node_13
+node_11 -> node_12
 node_8 -> node_13
-node_12 -> node_13
-node_5 -> node_14
-node_10 -> node_14
-node_4 -> node_15
-node_5 -> node_15
-node_14 -> node_15
-node_5 -> node_16
-node_15 -> node_16
-node_6 -> node_17
-node_11 -> node_17
+node_9 -> node_14
+node_13 -> node_14
+node_2 -> node_15
+node_12 -> node_15
+node_14 -> node_16
+node_2 -> node_17
+node_16 -> node_17
 node_2 -> node_18
-node_6 -> node_18
 node_17 -> node_18
-node_2 -> node_19
-node_6 -> node_19
-node_18 -> node_19
-node_8 -> node_20
-node_12 -> node_20
-node_7 -> node_21
-node_9 -> node_21
-node_4 -> node_22
-node_7 -> node_22
-node_16 -> node_22
-node_21 -> node_22
-node_7 -> node_23
+node_17 -> node_19
+node_19 -> node_20
+node_20 -> node_21
+node_12 -> node_22
+node_15 -> node_23
+node_18 -> node_23
+node_21 -> node_23
 node_22 -> node_23
-node_2 -> node_24
-node_7 -> node_24
-node_20 -> node_24
-node_23 -> node_24
-node_6 -> node_25
-node_18 -> node_25
-node_7 -> node_26
-node_24 -> node_26
-node_2 -> node_27
-node_13 -> node_27
-node_19 -> node_27
-node_25 -> node_27
-node_26 -> node_27
-node_20 -> node_13 [style=dotted, arrowhead = tee]
-node_25 -> node_19 [style=dotted, arrowhead = tee]
+node_19 -> node_18 [style=dotted, arrowhead = tee]
+node_22 -> node_15 [style=dotted, arrowhead = tee]
 }
 /*
 */

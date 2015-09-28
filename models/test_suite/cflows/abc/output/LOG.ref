@@ -2,29 +2,35 @@
 Parsing abc.ka...
 done
 + Initialized random number generator with seed 785872661
-+ Building initial simulation conditions...
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
 	 -variable declarations
+	 -initial conditions
 	 -rules
 	 -observables
 	 -perturbations
-	 -initial conditions
+	 Done
++ Analyzing non local patterns...
++ Building initial simulation state...
+	 -Counting initial local patterns...
 	 Done
 + Command line is: 'KaSim' '-i' 'abc.ka' '-seed' '924556145' '-var' 'on_rate' '1.0E-4' '-e' '10000' '-d' 'output' '-p' '500'
 Parsing abc.ka...
 done
 + Initialized random number generator with seed 924556145
-+ Building initial simulation conditions...
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
 	 -variable declarations
+	 -initial conditions
 	 -rules
 	 -observables
 	 -perturbations
-	 -initial conditions
+	 Done
++ Analyzing non local patterns...
++ Building initial simulation state...
+	 -Counting initial local patterns...
 	 Done
 ____________________________________________________________
 ############################################################
@@ -33,36 +39,42 @@ ____________________________________________________________
 	 - detecting siphons
 	 - cutting concurrent events
 	 - blackboard generation
-	 - computing causal past of each observed events (3966)
+	 - computing causal past of each observed events (3998)
 Stats:
- number of step   : 25967
- longest story    : 130
- average length   : 17.6198625233
- geometric mean   : 22.724399321
+ number of step   : 25999
+ longest story    : 103
+ average length   : 16.7918988427
+ geometric mean   : 21.2563480681
 
-	 - causal & weak flow compression (3966)
+	 - causal & weak flow compression (3998)
 
 ____________________________________________________________
 ############################################################
 	 - detecting pseudo inverse events
 	 - blackboard generation
-	 - computing causal past of each observed events (3966)
+	 - computing causal past of each observed events (3998)
 
 ____________________________________________________________
 ############################################################
 Stats:
- number of step   : 18443
- longest story    : 54
- average length   : 13.0529500756
- geometric mean   : 14.7115996717
+ number of step   : 18479
+ longest story    : 48
+ average length   : 13.1053026513
+ geometric mean   : 14.6763226737
 
-	 - causal & weak flow compression (3966)
+	 - causal & weak flow compression (3998)
 
 ____________________________________________________________
 ############################################################
 
 
 
-+ Pretty printing 938 flows
++ Pretty printing 851 flows
 + Pretty printing 2 weakly compressed flows
-Simulation ended
+Simulation ended (eff.: 0.993937, detail below)
+	Valid embedding but no longer unary when required: 0.000000
+	Valid embedding but not binary when required: 0.000000
+	Clashing instance: 0.000000
+	Lazy negative update: 1.000000
+	Lazy negative update of non local instances: 0.000000
+	Perturbation interrupting time advance: 0.000000

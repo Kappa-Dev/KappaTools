@@ -2,15 +2,18 @@
 Parsing create.ka...
 done
 + Initialized random number generator with seed 611463625
-+ Building initial simulation conditions...
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
 	 -variable declarations
+	 -initial conditions
 	 -rules
 	 -observables
 	 -perturbations
-	 -initial conditions
+	 Done
++ Analyzing non local patterns...
++ Building initial simulation state...
+	 -Counting initial local patterns...
 	 Done
 ____________________________________________________________
 ############################################################
@@ -20,27 +23,33 @@ ____________________________________________________________
 	 - cutting concurrent events
 	 - detecting pseudo inverse events
 	 - blackboard generation
-	 - computing causal past of each observed events (68)
+	 - computing causal past of each observed events (67)
 
 ____________________________________________________________
 ############################################################
 Stats:
- number of step   : 335
+ number of step   : 322
  longest story    : 7
- average length   : 4.19117647059
- geometric mean   : 4.25129737983
+ average length   : 4.22388059701
+ geometric mean   : 4.29682284568
 
-	 - causal & weak flow compression (68)
-
-____________________________________________________________
-############################################################
-
-
-
-	 - strong flow compression (2)
+	 - causal & weak flow compression (67)
 
 ____________________________________________________________
 ############################################################
-+ Pretty printing 2 weakly compressed flows
+
+
+
+	 - strong flow compression (3)
+
+____________________________________________________________
+############################################################
++ Pretty printing 3 weakly compressed flows
 + Pretty printing 1 strongly compressed flow
-Simulation ended
+Simulation ended (eff.: 0.994036, detail below)
+	Valid embedding but no longer unary when required: 0.000000
+	Valid embedding but not binary when required: 0.000000
+	Clashing instance: 0.000000
+	Lazy negative update: 1.000000
+	Lazy negative update of non local instances: 0.000000
+	Perturbation interrupting time advance: 0.000000

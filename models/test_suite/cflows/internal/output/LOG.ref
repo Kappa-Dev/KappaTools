@@ -2,15 +2,18 @@
 Parsing internal.ka...
 done
 + Initialized random number generator with seed 240056667
-+ Building initial simulation conditions...
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
 	 -variable declarations
+	 -initial conditions
 	 -rules
 	 -observables
 	 -perturbations
-	 -initial conditions
+	 Done
++ Analyzing non local patterns...
++ Building initial simulation state...
+	 -Counting initial local patterns...
 	 Done
 ____________________________________________________________
 ############################################################
@@ -19,27 +22,30 @@ ____________________________________________________________
 	 - detecting siphons
 	 - cutting concurrent events
 	 - blackboard generation
-	 - computing causal past of each observed events (1)
+	 - computing causal past of each observed events (15050)
 Stats:
- number of step   : 30003
+ number of step   : 45052
  longest story    : 2
- average length   : 1.50351654945
- geometric mean   : 1.58447140976
+ average length   : 1.66592674806
+ geometric mean   : 1.73140990068
 
-	 - causal & weak flow compression (1)
+	 - causal & weak flow compression (15050)
 
 ____________________________________________________________
 ############################################################
 	 - detecting pseudo inverse events
 	 - blackboard generation
-	 - computing causal past of each observed events (1)
+	 - computing causal past of each observed events (15050)
+
+____________________________________________________________
+############################################################
 Stats:
- number of step   : 4
+ number of step   : 30102
  longest story    : 2
  average length   : 2.
  geometric mean   : 2.
 
-	 - causal & weak flow compression (1)
+	 - causal & weak flow compression (15050)
 
 ____________________________________________________________
 ############################################################

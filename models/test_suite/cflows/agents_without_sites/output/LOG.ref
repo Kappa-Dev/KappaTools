@@ -2,15 +2,18 @@
 Parsing agents_without_sites.ka...
 done
 + Initialized random number generator with seed 924556145
-+ Building initial simulation conditions...
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
 	 -variable declarations
+	 -initial conditions
 	 -rules
 	 -observables
 	 -perturbations
-	 -initial conditions
+	 Done
++ Analyzing non local patterns...
++ Building initial simulation state...
+	 -Counting initial local patterns...
 	 Done
 ____________________________________________________________
 ############################################################
@@ -20,17 +23,17 @@ ____________________________________________________________
 	 - cutting concurrent events
 	 - detecting pseudo inverse events
 	 - blackboard generation
-	 - computing causal past of each observed events (3185)
+	 - computing causal past of each observed events (3192)
 
 ____________________________________________________________
 ############################################################
 Stats:
- number of step   : 12741
+ number of step   : 12769
  longest story    : 3
  average length   : 3.
  geometric mean   : 3.
 
-	 - causal & weak flow compression (3185)
+	 - causal & weak flow compression (3192)
 
 ____________________________________________________________
 ############################################################
@@ -38,4 +41,10 @@ ____________________________________________________________
 
 
 + Pretty printing 1 weakly compressed flow
-Simulation ended
+Simulation ended (eff.: 0.992556, detail below)
+	Valid embedding but no longer unary when required: 0.000000
+	Valid embedding but not binary when required: 0.000000
+	Clashing instance: 0.000000
+	Lazy negative update: 1.000000
+	Lazy negative update of non local instances: 0.000000
+	Perturbation interrupting time advance: 0.000000

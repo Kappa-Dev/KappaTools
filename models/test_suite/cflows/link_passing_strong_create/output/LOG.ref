@@ -2,15 +2,18 @@
 Parsing link_passing_strong_create.ka...
 done
 + Initialized random number generator with seed 611463625
-+ Building initial simulation conditions...
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
 	 -variable declarations
+	 -initial conditions
 	 -rules
 	 -observables
 	 -perturbations
-	 -initial conditions
+	 Done
++ Analyzing non local patterns...
++ Building initial simulation state...
+	 -Counting initial local patterns...
 	 Done
 ____________________________________________________________
 ############################################################
@@ -20,14 +23,14 @@ ____________________________________________________________
 	 - cutting concurrent events
 	 - detecting pseudo inverse events
 	 - blackboard generation
-	 - computing causal past of each observed events (20)
+	 - computing causal past of each observed events (19)
 Stats:
- number of step   : 129
- longest story    : 58
- average length   : 20.85
- geometric mean   : 27.3541587332
+ number of step   : 131
+ longest story    : 42
+ average length   : 17.4736842105
+ geometric mean   : 22.0382442705
 
-	 - causal & weak flow compression (20)
+	 - causal & weak flow compression (19)
 
 ____________________________________________________________
 ############################################################
@@ -40,4 +43,10 @@ ____________________________________________________________
 ############################################################
 + Pretty printing 6 weakly compressed flows
 + Pretty printing 1 strongly compressed flow
-Simulation ended
+Simulation ended (eff.: 0.781250, detail below)
+	Valid embedding but no longer unary when required: 0.000000
+	Valid embedding but not binary when required: 0.000000
+	Clashing instance: 0.000000
+	Lazy negative update: 1.000000
+	Lazy negative update of non local instances: 0.000000
+	Perturbation interrupting time advance: 0.000000

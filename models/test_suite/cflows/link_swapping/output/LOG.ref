@@ -2,15 +2,18 @@
 Parsing link_swapping.ka...
 done
 + Initialized random number generator with seed 924556145
-+ Building initial simulation conditions...
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
 	 -variable declarations
+	 -initial conditions
 	 -rules
 	 -observables
 	 -perturbations
-	 -initial conditions
+	 Done
++ Analyzing non local patterns...
++ Building initial simulation state...
+	 -Counting initial local patterns...
 	 Done
 ____________________________________________________________
 ############################################################
@@ -35,8 +38,10 @@ ____________________________________________________________
 
 
 + Pretty printing 1 weakly compressed flow
-Simulation ended (eff.: 0.600000, detail below)
+Simulation ended (eff.: 0.375000, detail below)
 	Valid embedding but no longer unary when required: 0.000000
 	Valid embedding but not binary when required: 0.000000
-	Clashing instance: 1.000000
+	Clashing instance: 0.600000
+	Lazy negative update: 0.400000
+	Lazy negative update of non local instances: 0.000000
 	Perturbation interrupting time advance: 0.000000
