@@ -22,10 +22,10 @@ ____________________________________________________________
 	 - blackboard generation
 	 - computing causal past of each observed events (12)
 Stats:
- number of step   : 43
- longest story    : 5
- average length   : 5.
- geometric mean   : 5.
+ number of step   : 45
+ longest story    : 11
+ average length   : 7.
+ geometric mean   : 7.54983443527
 
 	 - causal & weak flow compression (12)
 
@@ -40,7 +40,7 @@ ____________________________________________________________
 ############################################################
 + Pretty printing 1 weakly compressed flow
 + Pretty printing 1 strongly compressed flow
-Simulation ended (eff.: 0.731707, detail below)
+Simulation ended (eff.: 0.833333, detail below)
 	Valid embedding but no longer unary when required: 0.000000
 	Valid embedding but not binary when required: 0.000000
 	Clashing instance: 1.000000

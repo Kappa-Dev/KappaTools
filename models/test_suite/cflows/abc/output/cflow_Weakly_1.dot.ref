@@ -1,24 +1,23 @@
-/* Compression of 58 causal flows obtained in average at 5.174413E+00 t.u */
-/* Compressed causal flows were: [50;73;75;115;151;174;191;227;241;247;270;
-290;295;296;304;317;329;359;361;370;373;381;420;435;438;440;444;453;459;467;
-471;477;479;484;491;511;512;516;529;551;552;554;562;574;583;591;593;595;598;
-600;603;611;615;620;630;635;637;638] */
+/* Compression of 43 causal flows obtained in average at 5.020408E+00 t.u */
+/* Compressed causal flows were: [70;74;144;155;174;177;207;225;233;234;258;
+291;308;325;327;332;388;399;401;411;422;427;432;433;441;447;453;457;458;469;
+497;506;516;521;529;542;554;559;568;578;609;613;624] */
 digraph G{
  ranksep=.5 ;
 { rank = same ; "0" [shape=plaintext] ;
 node_1 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
 node_2 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
-node_3 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
-node_4 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_3 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_7 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
 }
 { rank = same ; "1" [shape=plaintext] ;
-node_5 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_4 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "2" [shape=plaintext] ;
-node_6 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_5 [label="ab.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "3" [shape=plaintext] ;
-node_7 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_6 [label="mod x1", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "4" [shape=plaintext] ;
 node_8 [label="a.c", shape=invhouse, style=filled, fillcolor = lightblue] ;
@@ -35,23 +34,23 @@ node_10 [label="Cpp", style=filled, fillcolor=red] ;
 "3" -> "4" [style="invis"];
 "4" -> "5" [style="invis"];
 "5" -> "6" [style="invis"];
-node_1 -> node_5
+node_1 -> node_4
+node_2 -> node_4
 node_2 -> node_5
+node_3 -> node_5
+node_4 -> node_5
 node_2 -> node_6
-node_4 -> node_6
+node_3 -> node_6
 node_5 -> node_6
-node_2 -> node_7
-node_4 -> node_7
-node_6 -> node_7
 node_3 -> node_8
-node_4 -> node_8
+node_6 -> node_8
 node_7 -> node_8
 node_3 -> node_9
-node_4 -> node_9
+node_6 -> node_9
 node_7 -> node_9
 node_8 -> node_9
-node_4 -> node_10
-node_7 -> node_10
+node_3 -> node_10
+node_6 -> node_10
 node_9 -> node_10
 }
 /*

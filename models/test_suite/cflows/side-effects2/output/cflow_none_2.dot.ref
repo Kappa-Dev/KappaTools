@@ -1,34 +1,54 @@
-/* Compression of 2 causal flows obtained in average at 6.458131E-01 t.u */
-/* Compressed causal flows were: [3;7] */
+/* Compression of 1 causal flows obtained in average at 5.000894E-01 t.u */
+/* Compressed causal flows were: [5] */
 digraph G{
  ranksep=.5 ;
 { rank = same ; "0" [shape=plaintext] ;
-node_1 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
-node_2 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
-node_3 [label=" -> A(a!1,b), B(a!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_1 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
+node_2 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
+node_3 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_4 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_5 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
+node_6 [label="Intro C", shape=house, style=filled, fillcolor=green] ;
 }
 { rank = same ; "1" [shape=plaintext] ;
-node_4 [label="C(a!_) -> C(a)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_5 [label="A(b) -> ", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_7 [label="C(a!_) -> C(a)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_8 [label="A(b) -> ", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_11 [label="C(a!_) -> C(a)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "2" [shape=plaintext] ;
-node_6 [label="B(a), C(a~u) -> B(a!1), C(a~p!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_9 [label="B(a), C(a~u) -> B(a!1), C(a~p!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "3" [shape=plaintext] ;
-node_7 [label="D", style=filled, fillcolor=red] ;
+node_10 [label="C(a!_) -> C(a)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "4" [shape=plaintext] ;
+node_12 [label="B(a), C(a~u) -> B(a!1), C(a~p!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+}
+{ rank = same ; "5" [shape=plaintext] ;
+node_13 [label="D", style=filled, fillcolor=red] ;
 }
 "0" -> "1" [style="invis"];
 "1" -> "2" [style="invis"];
 "2" -> "3" [style="invis"];
-node_2 -> node_4
-node_3 -> node_5
-node_1 -> node_6
-node_3 -> node_6
-node_4 -> node_6
-node_5 -> node_6
-node_1 -> node_7
-node_3 -> node_7
+"3" -> "4" [style="invis"];
+"4" -> "5" [style="invis"];
 node_6 -> node_7
+node_1 -> node_8
+node_2 -> node_9
+node_5 -> node_9
+node_7 -> node_9
+node_8 -> node_9
+node_5 -> node_10
+node_9 -> node_10
+node_3 -> node_11
+node_4 -> node_11
+node_2 -> node_12
+node_3 -> node_12
+node_10 -> node_12
+node_11 -> node_12
+node_2 -> node_13
+node_3 -> node_13
+node_12 -> node_13
 }
 /*
 */

@@ -1,7 +1,7 @@
-+ Command line is: 'KaSim' 'none_only.ka' '-seed' '924556145' '-e' '1000' '-d' 'output' '-p' '50'
++ Command line is: 'KaSim' 'none_only.ka' '-seed' '627933151' '-e' '1000' '-d' 'output' '-p' '50'
 Parsing none_only.ka...
 done
-+ Initialized random number generator with seed 924556145
++ Initialized random number generator with seed 627933151
 + Building initial simulation conditions...
 + Compiling...
 	 -simulation parameters
@@ -21,9 +21,9 @@ ____________________________________________________________
 	 - computing causal past of each observed events (10)
 Stats:
  number of step   : 11031
- longest story    : 885
- average length   : 320.926732673
- geometric mean   : 413.910302619
+ longest story    : 960
+ average length   : 337.93960396
+ geometric mean   : 434.189299183
 
 	 - causal & weak flow compression (10)
 

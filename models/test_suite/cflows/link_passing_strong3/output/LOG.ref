@@ -13,35 +13,34 @@ done
 	 -initial conditions
 	 Done
 ____________________________________________________________
-################################################?
-A deadlock was reached after 225 events and 2.210624E+01s (Activity = 0.00000)############
+############################################################
 + Producing causal compressions
 	 - refining events
 	 - detecting siphons
 	 - cutting concurrent events
 	 - detecting pseudo inverse events
 	 - blackboard generation
-	 - computing causal past of each observed events (49)
+	 - computing causal past of each observed events (66)
 
 ____________________________________________________________
 ############################################################
 Stats:
- number of step   : 312
- longest story    : 251
- average length   : 112.285714286
- geometric mean   : 133.378852774
+ number of step   : 421
+ longest story    : 343
+ average length   : 172.333333333
+ geometric mean   : 199.488436666
 
-	 - causal & weak flow compression (49)
-
-____________________________________________________________
-############################################################
-
-
-
-	 - strong flow compression (10)
+	 - causal & weak flow compression (66)
 
 ____________________________________________________________
 ############################################################
-+ Pretty printing 10 weakly compressed flows
+
+
+
+	 - strong flow compression (16)
+
+____________________________________________________________
+############################################################
++ Pretty printing 16 weakly compressed flows
 + Pretty printing 1 strongly compressed flow
 Simulation ended

@@ -1,5 +1,5 @@
-/* Compression of 4 causal flows obtained in average at 1.181773E+01 t.u */
-/* Compressed causal flows were: [26;28;37;41] */
+/* Compression of 9 causal flows obtained in average at 2.266860E+01 t.u */
+/* Compressed causal flows were: [17;21;26;31;33;35;37;46;50] */
 digraph G{
  ranksep=.5 ;
 { rank = same ; "0" [shape=plaintext] ;
@@ -17,16 +17,16 @@ node_6 [label="B(x) -> C(x)", shape=invhouse, style=filled, fillcolor = lightblu
 }
 { rank = same ; "3" [shape=plaintext] ;
 node_7 [label="C(x) -> A(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_12 [label="E(x), C(x) -> E(x!1), C(x!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_8 [label="C(x) -> A(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "4" [shape=plaintext] ;
-node_8 [label="A(x) -> B(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_9 [label="A(x) -> B(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "5" [shape=plaintext] ;
-node_9 [label="B(x) -> C(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_11 [label="B(x) -> C(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "6" [shape=plaintext] ;
-node_11 [label="C(x) -> A(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_12 [label="E(x), C(x) -> E(x!1), C(x!1)", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "7" [shape=plaintext] ;
 node_13 [label="A(x), E(x!1), C(x!1) -> A(x!1), E(x!1), C(x)", shape=invhouse, style=filled, fillcolor = lightblue] ;
@@ -42,22 +42,22 @@ node_14 [label="GOAL", style=filled, fillcolor=red] ;
 "5" -> "6" [style="invis"];
 "6" -> "7" [style="invis"];
 "7" -> "8" [style="invis"];
-node_1 -> node_3
-node_2 -> node_4
-node_3 -> node_5
-node_4 -> node_6
+node_2 -> node_3
+node_1 -> node_4
+node_4 -> node_5
+node_3 -> node_6
 node_6 -> node_7
-node_7 -> node_8
-node_8 -> node_9
+node_5 -> node_8
+node_7 -> node_9
 node_9 -> node_11
-node_5 -> node_12
 node_10 -> node_12
-node_5 -> node_13
+node_11 -> node_12
+node_8 -> node_13
 node_10 -> node_13
 node_11 -> node_13
 node_12 -> node_13
+node_8 -> node_14
 node_10 -> node_14
-node_11 -> node_14
 node_13 -> node_14
 }
 /*

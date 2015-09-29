@@ -19,33 +19,33 @@ ____________________________________________________________
 	 - detecting siphons
 	 - cutting concurrent events
 	 - blackboard generation
-	 - computing causal past of each observed events (10)
+	 - computing causal past of each observed events (8)
 Stats:
- number of step   : 10015
+ number of step   : 10013
  longest story    : 4
- average length   : 1.01133989854
- geometric mean   : 1.02737812862
+ average length   : 1.00955223881
+ geometric mean   : 1.0230186529
 
-	 - causal & weak flow compression (10)
+	 - causal & weak flow compression (8)
 
 ____________________________________________________________
 ############################################################
 	 - detecting pseudo inverse events
 	 - blackboard generation
-	 - computing causal past of each observed events (10)
+	 - computing causal past of each observed events (8)
 Stats:
- number of step   : 23
+ number of step   : 19
  longest story    : 4
- average length   : 3.5
- geometric mean   : 3.67423461417
+ average length   : 3.4
+ geometric mean   : 3.60555127546
 
-	 - causal & weak flow compression (10)
+	 - causal & weak flow compression (8)
 
 ____________________________________________________________
 ############################################################
 
 
 
-+ Pretty printing 1 flow
-+ Pretty printing 1 weakly compressed flow
++ Pretty printing 2 flows
++ Pretty printing 2 weakly compressed flows
 Simulation ended

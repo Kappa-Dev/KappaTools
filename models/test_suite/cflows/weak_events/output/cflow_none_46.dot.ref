@@ -1,4 +1,4 @@
-/* Compression of 1 causal flows obtained in average at 4.922894E+01 t.u */
+/* Compression of 1 causal flows obtained in average at 5.147834E+01 t.u */
 /* Compressed causal flows were: [47] */
 digraph G{
  ranksep=.5 ;
@@ -49,8 +49,8 @@ node_43 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
 node_44 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
 node_45 [label="Intro B", shape=house, style=filled, fillcolor=green] ;
 node_46 [label="Intro A", shape=house, style=filled, fillcolor=green] ;
-node_70 [label="B+", shape=invhouse, style=filled, fillcolor = lightblue] ;
-node_85 [label="B+", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_76 [label="B+", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_99 [label="B+", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "1" [shape=plaintext] ;
 node_47 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
@@ -122,22 +122,22 @@ node_68 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_69 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "24" [shape=plaintext] ;
-node_71 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_70 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "25" [shape=plaintext] ;
-node_72 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_71 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "26" [shape=plaintext] ;
-node_73 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_72 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "27" [shape=plaintext] ;
-node_74 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_73 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "28" [shape=plaintext] ;
-node_75 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_74 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "29" [shape=plaintext] ;
-node_76 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_75 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "30" [shape=plaintext] ;
 node_77 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
@@ -164,46 +164,46 @@ node_83 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
 node_84 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "38" [shape=plaintext] ;
-node_86 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_85 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "39" [shape=plaintext] ;
-node_87 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_86 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "40" [shape=plaintext] ;
-node_88 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_87 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "41" [shape=plaintext] ;
-node_89 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_88 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "42" [shape=plaintext] ;
-node_90 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_89 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "43" [shape=plaintext] ;
-node_91 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_90 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "44" [shape=plaintext] ;
-node_92 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_91 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "45" [shape=plaintext] ;
-node_93 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_92 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "46" [shape=plaintext] ;
-node_94 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_93 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "47" [shape=plaintext] ;
-node_95 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_94 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "48" [shape=plaintext] ;
-node_96 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_95 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "49" [shape=plaintext] ;
-node_97 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_96 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "50" [shape=plaintext] ;
-node_98 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_97 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "51" [shape=plaintext] ;
-node_99 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
+node_98 [label="a.b", shape=invhouse, style=filled, fillcolor = lightblue] ;
 }
 { rank = same ; "52" [shape=plaintext] ;
 node_100 [label="B-", shape=invhouse, style=filled, fillcolor = lightblue] ;
@@ -428,239 +428,239 @@ node_142 [label="B-", style=filled, fillcolor=red] ;
 "91" -> "92" [style="invis"];
 "92" -> "93" [style="invis"];
 "93" -> "94" [style="invis"];
-node_9 -> node_47
+node_6 -> node_47
 node_46 -> node_47
-node_9 -> node_48
+node_6 -> node_48
 node_47 -> node_48
-node_5 -> node_49
+node_25 -> node_49
 node_46 -> node_49
 node_48 -> node_49
-node_5 -> node_50
+node_25 -> node_50
 node_49 -> node_50
-node_36 -> node_51
+node_39 -> node_51
 node_46 -> node_51
 node_50 -> node_51
-node_36 -> node_52
+node_39 -> node_52
 node_51 -> node_52
-node_42 -> node_53
+node_28 -> node_53
 node_46 -> node_53
 node_52 -> node_53
-node_42 -> node_54
+node_28 -> node_54
 node_53 -> node_54
-node_18 -> node_55
+node_22 -> node_55
 node_46 -> node_55
 node_54 -> node_55
-node_18 -> node_56
+node_22 -> node_56
 node_55 -> node_56
-node_41 -> node_57
+node_17 -> node_57
 node_46 -> node_57
 node_56 -> node_57
-node_41 -> node_58
+node_17 -> node_58
 node_57 -> node_58
-node_17 -> node_59
+node_7 -> node_59
 node_46 -> node_59
 node_58 -> node_59
-node_17 -> node_60
+node_7 -> node_60
 node_59 -> node_60
-node_31 -> node_61
+node_23 -> node_61
 node_46 -> node_61
 node_60 -> node_61
-node_31 -> node_62
+node_23 -> node_62
 node_61 -> node_62
-node_40 -> node_63
+node_20 -> node_63
 node_46 -> node_63
 node_62 -> node_63
-node_40 -> node_64
+node_20 -> node_64
 node_63 -> node_64
-node_23 -> node_65
+node_10 -> node_65
 node_46 -> node_65
 node_64 -> node_65
-node_23 -> node_66
+node_10 -> node_66
 node_65 -> node_66
-node_8 -> node_67
+node_44 -> node_67
 node_46 -> node_67
 node_66 -> node_67
-node_8 -> node_68
+node_44 -> node_68
 node_67 -> node_68
-node_37 -> node_69
+node_12 -> node_69
 node_46 -> node_69
 node_68 -> node_69
-node_37 -> node_71
-node_69 -> node_71
-node_6 -> node_72
-node_46 -> node_72
+node_12 -> node_70
+node_69 -> node_70
+node_32 -> node_71
+node_46 -> node_71
+node_70 -> node_71
+node_32 -> node_72
 node_71 -> node_72
-node_6 -> node_73
+node_3 -> node_73
+node_46 -> node_73
 node_72 -> node_73
-node_46 -> node_74
-node_70 -> node_74
+node_3 -> node_74
 node_73 -> node_74
-node_70 -> node_75
+node_43 -> node_75
+node_46 -> node_75
 node_74 -> node_75
-node_4 -> node_76
-node_46 -> node_76
-node_75 -> node_76
-node_4 -> node_77
-node_76 -> node_77
-node_28 -> node_78
+node_43 -> node_77
+node_75 -> node_77
+node_11 -> node_78
 node_46 -> node_78
 node_77 -> node_78
-node_28 -> node_79
+node_11 -> node_79
 node_78 -> node_79
-node_13 -> node_80
+node_5 -> node_80
 node_46 -> node_80
 node_79 -> node_80
-node_13 -> node_81
+node_5 -> node_81
 node_80 -> node_81
-node_25 -> node_82
+node_37 -> node_82
 node_46 -> node_82
 node_81 -> node_82
-node_25 -> node_83
+node_37 -> node_83
 node_82 -> node_83
-node_7 -> node_84
+node_36 -> node_84
 node_46 -> node_84
 node_83 -> node_84
-node_7 -> node_86
-node_84 -> node_86
-node_33 -> node_87
-node_46 -> node_87
+node_36 -> node_85
+node_84 -> node_85
+node_40 -> node_86
+node_46 -> node_86
+node_85 -> node_86
+node_40 -> node_87
 node_86 -> node_87
-node_33 -> node_88
+node_21 -> node_88
+node_46 -> node_88
 node_87 -> node_88
-node_2 -> node_89
-node_46 -> node_89
+node_21 -> node_89
 node_88 -> node_89
-node_2 -> node_90
+node_42 -> node_90
+node_46 -> node_90
 node_89 -> node_90
-node_34 -> node_91
-node_46 -> node_91
+node_42 -> node_91
 node_90 -> node_91
-node_34 -> node_92
+node_35 -> node_92
+node_46 -> node_92
 node_91 -> node_92
-node_46 -> node_93
-node_85 -> node_93
+node_35 -> node_93
 node_92 -> node_93
-node_85 -> node_94
+node_19 -> node_94
+node_46 -> node_94
 node_93 -> node_94
-node_38 -> node_95
-node_46 -> node_95
+node_19 -> node_95
 node_94 -> node_95
-node_38 -> node_96
+node_8 -> node_96
+node_46 -> node_96
 node_95 -> node_96
-node_14 -> node_97
-node_46 -> node_97
+node_8 -> node_97
 node_96 -> node_97
-node_14 -> node_98
+node_13 -> node_98
+node_46 -> node_98
 node_97 -> node_98
-node_21 -> node_99
-node_46 -> node_99
-node_98 -> node_99
-node_21 -> node_100
-node_99 -> node_100
-node_35 -> node_101
+node_13 -> node_100
+node_98 -> node_100
+node_15 -> node_101
 node_46 -> node_101
 node_100 -> node_101
-node_35 -> node_102
+node_15 -> node_102
 node_101 -> node_102
-node_10 -> node_103
 node_46 -> node_103
+node_76 -> node_103
 node_102 -> node_103
-node_10 -> node_104
+node_76 -> node_104
 node_103 -> node_104
-node_44 -> node_105
+node_31 -> node_105
 node_46 -> node_105
 node_104 -> node_105
-node_44 -> node_106
+node_31 -> node_106
 node_105 -> node_106
-node_29 -> node_107
+node_45 -> node_107
 node_46 -> node_107
 node_106 -> node_107
-node_29 -> node_108
+node_45 -> node_108
 node_107 -> node_108
-node_27 -> node_109
+node_34 -> node_109
 node_46 -> node_109
 node_108 -> node_109
-node_27 -> node_110
+node_34 -> node_110
 node_109 -> node_110
-node_20 -> node_111
+node_29 -> node_111
 node_46 -> node_111
 node_110 -> node_111
-node_20 -> node_112
+node_29 -> node_112
 node_111 -> node_112
-node_32 -> node_113
+node_1 -> node_113
 node_46 -> node_113
 node_112 -> node_113
-node_32 -> node_114
+node_1 -> node_114
 node_113 -> node_114
-node_39 -> node_115
+node_24 -> node_115
 node_46 -> node_115
 node_114 -> node_115
-node_39 -> node_116
+node_24 -> node_116
 node_115 -> node_116
-node_22 -> node_117
+node_18 -> node_117
 node_46 -> node_117
 node_116 -> node_117
-node_22 -> node_118
+node_18 -> node_118
 node_117 -> node_118
-node_15 -> node_119
+node_41 -> node_119
 node_46 -> node_119
 node_118 -> node_119
-node_15 -> node_120
+node_41 -> node_120
 node_119 -> node_120
-node_45 -> node_121
+node_2 -> node_121
 node_46 -> node_121
 node_120 -> node_121
-node_45 -> node_122
+node_2 -> node_122
 node_121 -> node_122
-node_24 -> node_123
 node_46 -> node_123
+node_99 -> node_123
 node_122 -> node_123
-node_24 -> node_124
+node_99 -> node_124
 node_123 -> node_124
-node_11 -> node_125
+node_30 -> node_125
 node_46 -> node_125
 node_124 -> node_125
-node_11 -> node_126
+node_30 -> node_126
 node_125 -> node_126
-node_1 -> node_127
+node_33 -> node_127
 node_46 -> node_127
 node_126 -> node_127
-node_1 -> node_128
+node_33 -> node_128
 node_127 -> node_128
-node_26 -> node_129
+node_27 -> node_129
 node_46 -> node_129
 node_128 -> node_129
-node_26 -> node_130
+node_27 -> node_130
 node_129 -> node_130
-node_16 -> node_131
+node_38 -> node_131
 node_46 -> node_131
 node_130 -> node_131
-node_16 -> node_132
+node_38 -> node_132
 node_131 -> node_132
-node_12 -> node_133
+node_9 -> node_133
 node_46 -> node_133
 node_132 -> node_133
-node_12 -> node_134
+node_9 -> node_134
 node_133 -> node_134
-node_19 -> node_135
+node_14 -> node_135
 node_46 -> node_135
 node_134 -> node_135
-node_19 -> node_136
+node_14 -> node_136
 node_135 -> node_136
-node_30 -> node_137
+node_4 -> node_137
 node_46 -> node_137
 node_136 -> node_137
-node_30 -> node_138
+node_4 -> node_138
 node_137 -> node_138
-node_3 -> node_139
+node_16 -> node_139
 node_46 -> node_139
 node_138 -> node_139
-node_3 -> node_140
+node_16 -> node_140
 node_139 -> node_140
-node_43 -> node_141
+node_26 -> node_141
 node_46 -> node_141
 node_140 -> node_141
-node_43 -> node_142
+node_26 -> node_142
 node_141 -> node_142
 }
 /*
