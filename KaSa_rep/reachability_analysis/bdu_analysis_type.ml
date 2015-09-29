@@ -22,23 +22,17 @@ let local_trace = false
 
 module AgentMap = Quick_Nearly_inf_Imperatif
 
-(*pair of (site, state) *)
-type pair_site = (int * int) list
-
-type bdu = bool Mvbdu_sig.mvbdu
-
-type handler = (Boolean_mvbdu.memo_tables, Boolean_mvbdu.mvbdu_dic,
-	        Boolean_mvbdu.list_dic, bool, int) Memo_sig.handler
-
-type handler_bdu = handler * bdu
-   
-type site_bdu  = pair_site * handler_bdu
+type site_bdu  = (List_sig.variable * Cckappa_sig.state_index) list *
+  ((Boolean_mvbdu.memo_tables, Boolean_mvbdu.mvbdu_dic,
+    Boolean_mvbdu.list_dic, bool, int)
+      Memo_sig.handler * bool Mvbdu_sig.mvbdu array)
 
 type wl_int = IntWL.WSet.elt list * IntWL.WSet.elt list * IntWL.WSet.set
 
 type bdu_analysic =
     {
-      store_creation    : site_bdu AgentMap.t;
-      store_succ_list   : (int * int) list;
-      store_iteration   : Cckappa_sig.rule array AgentMap.t * (handler * bdu array) AgentMap.t
+      store_creation_rule    : (int list * Cckappa_sig.rule array * wl_int) AgentMap.t;
+      store_creation         : site_bdu AgentMap.t;
+      (*store_succ_list   : (int * int) list;
+      store_iteration   : Cckappa_sig.rule array AgentMap.t * (handler * bdu array) AgentMap.t*)
     }
