@@ -84,9 +84,10 @@ let collect_creation parameter error viewsrhs creation store_result =
   ) (error, store_result) creation
 
 (************************************************************************************)
-(*return a list of creation rule*)
+(*return a list of creation rule; add rules with empty lhs into a working list.*)
 
-let collect_rule_creation parameter error handler rule rule_id viewsrhs creation store_result =
+let collect_rule_creation parameter error handler rule rule_id viewsrhs creation
+    store_result =
   let error, store = AgentMap.create parameter error 0 in
   List.fold_left (fun (error, store_result) (agent_id, agent_type) ->
     let error, agent = AgentMap.get parameter error agent_id viewsrhs in
@@ -94,16 +95,17 @@ let collect_rule_creation parameter error handler rule rule_id viewsrhs creation
     | None -> warn parameter error (Some "line 94") Exit store_result 
     | Some Ghost -> error, store_result
     | Some Agent agent ->
-      let error, (old_list, old_array, old_wl) =
+      let error, (old_list, old_wl, old_array) =
         match AgentMap.unsafe_get parameter error agent_type store_result with
-        | error, None -> error, ([], [||], IntWL.empty)
-        | error, Some (l, a, wl) -> error, (l, a, wl)
+        | error, None -> error, ([], IntWL.empty, [||])
+        | error, Some (l, wl, a) -> error, (l, wl, a)
       in
       let new_list = List.concat [[rule_id]; old_list] in
-      (*Put rule_id into the working list*)
+      (*-------------------------------------------------------------------------*)
+      (*Put rule_id into a working list*)
       let wl = IntWL.empty in
       let error, wl = IntWL.push parameter error rule_id wl in
-      (*store new wl*)
+      (*new working list*)
       let old_wl, old_out, old_set = old_wl in
       let in_list, out_list, set = wl in
       let error, new_set =
@@ -112,6 +114,7 @@ let collect_rule_creation parameter error handler rule rule_id viewsrhs creation
       let new_wl =
         List.concat [in_list; old_wl], List.concat [out_list; old_out], new_set
       in
+      (*-------------------------------------------------------------------------*)
       (*from wl contain rule_id, create an array to take rule_type *)
       let nrules = Handler.nrules parameter error handler in
       let error, empty_rule = Preprocess.empty_rule parameter error in
@@ -126,13 +129,14 @@ let collect_rule_creation parameter error handler rule rule_id viewsrhs creation
         ) rule_array wl
       in
       let new_array = Array.append rule_array old_array in
+      (*-------------------------------------------------------------------------*)
       (*store*)
       let error, store_result =
         AgentMap.set
           parameter
           error
           agent_type
-          ((List.rev new_list), rev_array new_array, new_wl)
+          (List.rev new_list, new_wl, rev_array new_array)
           store_result
       in
       error, store_result)

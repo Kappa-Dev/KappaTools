@@ -29,10 +29,16 @@ type site_bdu  = (List_sig.variable * Cckappa_sig.state_index) list *
 
 type wl_int = IntWL.WSet.elt list * IntWL.WSet.elt list * IntWL.WSet.set
 
+type half_break_action =
+  (IntWL.WSet.elt * Cckappa_sig.site_name * Cckappa_sig.state_index) list AgentMap.t
+
+type remove_action =
+  (Fifo.IntWL.WSet.elt * Cckappa_sig.Site_map_and_set.key * bool option) list AgentMap.t *
+    (Fifo.IntWL.WSet.elt * Cckappa_sig.Site_map_and_set.key) list AgentMap.t
+
 type bdu_analysic =
     {
-      store_creation_rule    : (int list * Cckappa_sig.rule array * wl_int) AgentMap.t;
+      store_creation_rule    : (int list * wl_int * Cckappa_sig.rule array) AgentMap.t;
       store_creation         : site_bdu AgentMap.t;
-      (*store_succ_list   : (int * int) list;
-      store_iteration   : Cckappa_sig.rule array AgentMap.t * (handler * bdu array) AgentMap.t*)
+      store_side_effects     : half_break_action * remove_action;
     }

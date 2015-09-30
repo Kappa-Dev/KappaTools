@@ -19,6 +19,7 @@ open Bdu_build
 open Bdu_analysis_type
 open Bdu_creation
 open Print_bdu_analysis
+open Bdu_side_effects
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "BDU analysis") message exn (fun () -> default)  
@@ -43,7 +44,8 @@ let scan_rule parameter error handler rule_id rule compiled store_result =
       store_result.store_creation_rule
   in
   (*------------------------------------------------------------------------------*)
-  (*bdu structure of creation rules*)
+  (*bdu structure of creation rules-this function uses for testing the
+    result of the list of creation rules in the working list.*)
   let error, store_creation =
     collect_creation
       parameter
@@ -51,6 +53,18 @@ let scan_rule parameter error handler rule_id rule compiled store_result =
       rule.rule_rhs.views
       rule.actions.creation
       store_result.store_creation
+  in
+  (*------------------------------------------------------------------------------*)
+  (*side effects*)
+  let error, store_side_effects =
+    collect_side_effects
+      parameter
+      error
+      handler
+      rule_id
+      rule.actions.half_break
+      rule.actions.remove
+      store_result.store_side_effects
   in
   (*------------------------------------------------------------------------------*)
   (*TEST*)
@@ -65,20 +79,25 @@ let scan_rule parameter error handler rule_id rule compiled store_result =
   (*store*)
   error,
   {
-    store_creation  = store_creation;
-    store_creation_rule = store_creation_rule;
+    store_creation       = store_creation;
+    store_creation_rule  = store_creation_rule;
+    store_side_effects   = store_side_effects;
   }   
  
 (************************************************************************************)
 (*RULES*)
 
 let scan_rule_set parameter error handler compiled rules =
-  let error, init_creation  = AgentMap.create parameter error 0 in
-  let error, init_creation_rule  = AgentMap.create parameter error 0 in
+  let error, init_creation      = AgentMap.create parameter error 0 in
+  let error, init_creation_rule = AgentMap.create parameter error 0 in
+  let error, init_half_break    = AgentMap.create parameter error 0 in
+  let error, init_remove1       = AgentMap.create parameter error 0 in
+  let error, init_remove2       = AgentMap.create parameter error 0 in
   let init_bdu =
     {
-      store_creation  = init_creation;
+      store_creation      = init_creation;
       store_creation_rule = init_creation_rule;
+      store_side_effects  = init_half_break, (init_remove1, init_remove2);
     }
   in
   (*------------------------------------------------------------------------------*)
@@ -107,7 +126,7 @@ let scan_rule_set parameter error handler compiled rules =
 (*MAIN*)
 
 let bdu_main parameter error handler cc_compil =
-  let parameter = Remanent_parameters.update_prefix parameter "agent_type_" in
+  (*let parameter = Remanent_parameters.update_prefix parameter "agent_type/rule_id_" in*)
   let error, result = scan_rule_set parameter error handler cc_compil cc_compil.rules in
   let _ = print_result parameter error result in
   error, result
