@@ -7,13 +7,13 @@ type t = {
 }
 
 let initial_activity get_alg env counter graph activities =
-  Environment.iteri_rules
-    (fun i rule ->
+  Environment.fold_rules
+    (fun i () rule ->
      if Array.length rule.Primitives.connected_components = 0 then
        let rate = Rule_interpreter.value_alg
 		    counter graph ~get_alg rule.Primitives.rate in
        Random_tree.add (2*i) (Nbr.to_float rate) activities)
-    env
+    () env
 
 let initial env counter graph stopping_times =
   let activity_tree =
@@ -64,7 +64,9 @@ let do_it env domain counter graph state = function
       Nbr.iteri
 	(fun _ g ->
 	 fst (Rule_interpreter.force_rule
-		~get_alg domain counter g (Causal.PERT "pert") r))
+		~get_alg domain
+		(Environment.connected_components_of_unary_rules env)
+		counter g (Causal.PERT "pert") r))
 	graph n,state)
   | Primitives.UPDATE (va,(expr,_)) ->
      let get_alg i = get_alg env state i in
@@ -229,7 +231,10 @@ let one_rule form dt stop env domain counter graph state =
     if choice mod 2 = 1
     then Rule_interpreter.apply_unary_rule ~rule_id
     else Rule_interpreter.apply_rule ~rule_id in
-  match apply_rule ~rule_id ~get_alg domain counter graph cause rule with
+  match apply_rule
+	  ~rule_id ~get_alg domain
+	  (Environment.connected_components_of_unary_rules env)
+	  counter graph cause rule with
   | Rule_interpreter.Success graph' ->
      let graph'' =
        Rule_interpreter.update_outdated_activities

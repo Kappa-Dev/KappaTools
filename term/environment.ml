@@ -100,8 +100,9 @@ let print_token ?env f id =
 
 let map_observables f env =
   Array.map (fun (x,_) -> f x) env.observables
-let iteri_rules f env =
-    Array.iteri (fun i (_,rule) -> f i rule) env.rules.NamedDecls.decls
+let fold_rules f x env =
+  Tools.array_fold_lefti
+    (fun i x(_,rule) -> f i x rule) x env.rules.NamedDecls.decls
 
 let print pr_alg pr_rule pr_pert f env =
   let () =

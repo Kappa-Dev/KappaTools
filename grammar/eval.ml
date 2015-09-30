@@ -417,7 +417,9 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 		  match Rule_interpreter.apply_rule
 			  ~get_alg:(fun i ->
 				    fst (snd algs.NamedDecls.decls.(i)))
-			  domain'' counter s (Causal.INIT creations_sort)
+			  domain''
+			  (Environment.connected_components_of_unary_rules env)
+			  counter s (Causal.INIT creations_sort)
 			  compiled_rule with
 		  | Rule_interpreter.Success s -> s
 		  | (Rule_interpreter.Clash | Rule_interpreter.Corrected _) ->
@@ -451,7 +453,9 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 		 Rule_interpreter.apply_rule
 		   ~get_alg:(fun i ->
 			     fst (snd algs.NamedDecls.decls.(i)))
-		   domain'' counter state (Causal.INIT []) compiled_rule with
+		   domain''
+		   (Environment.connected_components_of_unary_rules env)
+		   counter state (Causal.INIT []) compiled_rule with
 	       | Rule_interpreter.Success s -> s
 	       | (Rule_interpreter.Clash | Rule_interpreter.Corrected _) ->
 		  raise (ExceptionDefn.Internal_Error

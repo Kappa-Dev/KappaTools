@@ -42,6 +42,12 @@ let get_type = function
   | Existing (n,_) -> Connected_component.ContentAgent.get_sort n
   | Fresh (i,_) -> i
 
+let same_connected_component p p' =
+  match p,p' with
+  | (Existing _, Fresh _ | Fresh _, Existing _) -> false
+  | Fresh (_,i), Fresh (_,i') -> i=i'
+  | Existing (_,id), Existing (_,id') -> id=id'
+
 let is_site_from_fresh = function
   | (Existing _,_) -> false
   | (Fresh _, _) -> true

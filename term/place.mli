@@ -9,6 +9,7 @@ val rename :
   Renaming.t -> t -> t
 
 val get_type : t -> int
+val same_connected_component : t -> t -> bool
 val is_site_from_fresh : (t * int) -> bool
 
 val print : ?sigs:Signature.s -> Format.formatter -> t -> unit

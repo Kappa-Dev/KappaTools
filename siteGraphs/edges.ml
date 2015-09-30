@@ -141,37 +141,55 @@ let debug_print f (links,ints,sorts) =
     f links
 
 type path = (int * int * int * int) list
+let rec print_path ?sigs ?graph f = function
+  | [] -> Pp.empty_set f
+  | [p,s,s',p'] -> Format.fprintf f "%i.%i@,-%i.%i" p s s' p'
+  | (p,s,s',p')::((p'',_,_,_)::_ as l) ->
+     Format.fprintf f "%i.%i@,-%i.%t%a" p s s'
+		    (fun f -> if p' <> p'' then Format.fprintf f "%i##" p')
+		    (print_path ?sigs ?graph) l
+let empty_path = []
+let rev_path l = List.rev l
 let is_valid_path graph l =
   List.for_all (fun (a,s,a',s') -> link_exists a s a' s' graph) l
 
-let pathes_of_interrest stop_on_find is_interresting (links,_,_) origin =
-  let rec infinite_search (id,path as x) site (stop,don,out,next as acc) =
-    try
-      match Int2Map.find (id,site) links with
-      | Edge.ToFree  -> infinite_search x (succ site) acc
-      | Edge.Link (_,id',site') ->
-	 if (stop&&stop_on_find)||IntSet.mem id' don
-	 then infinite_search x (succ site) acc
-	 else
-	   let don' = IntSet.add id' don in
-	   let path' = (id,site,site',id')::path in
-	   let store = is_interresting id' in
-	   let out' = if store then (id',path')::out else out in
-	   let next' = (id',path')::next in
-	   infinite_search x (succ site) (stop||store,don',out',next')
-    with Not_found -> acc in
-  let rec traversal don out next = function
+let breath_first_traversal stop_on_find is_interresting links =
+  let rec look_each_site (id,path as x) site (stop,don,out,next as acc) =
+    match Int2Map.pop (id,site) links with
+    | None,_ -> acc
+    | Some Edge.ToFree,_ -> look_each_site x (succ site) acc
+    | Some (Edge.Link (_,id',site')),_ ->
+       if (stop&&stop_on_find) then acc
+       else if IntSet.mem id' don then look_each_site x (succ site) acc
+       else
+	 let don' = IntSet.add id' don in
+	 let path' = (id',site',site,id)::path in
+	 let out',store =
+	   match is_interresting id' with
+	   | Some x -> ((x,id'),path')::out,true
+	   | None -> out,false in
+	 let next' = (id',path')::next in
+	 look_each_site x (succ site) (stop||store,don',out',next') in
+  let rec aux don out next = function
     | x::todos ->
-       let stop,don',out',next' = infinite_search x 0 (false,don,out,next) in
-       if stop&&stop_on_find then out else traversal don' out' next' todos
-    | [] -> match next with [] -> out | _ -> traversal don out [] next
-  in traversal IntSet.empty [] [] [origin,[]]
+       let stop,don',out',next' = look_each_site x 0 (false,don,out,next) in
+       if stop&&stop_on_find then out else aux don' out' next' todos
+    | [] -> match next with [] -> out | _ -> aux don out [] next in
+  aux
 
-let are_connected ?candidate graph x y =
+let pathes_of_interrest is_interresting (links,_,_) start_point done_path =
+  let don = List.fold_left (fun s (_,_,_,x) -> IntSet.add x s)
+			   (IntSet.singleton start_point) done_path in
+  breath_first_traversal
+    false is_interresting links don [] [] [start_point,done_path]
+
+let are_connected ?candidate (links,_,_ as graph) x y =
   match candidate with
   | Some p when is_valid_path graph p -> Some p
   | (Some _ | None) ->
-     match pathes_of_interrest true (fun z -> z = y) graph x with
+     match breath_first_traversal
+	     true (fun z -> if z = y then Some () else None)
+	     links (IntSet.singleton x) [] [] [x,[]] with
      | [] -> None
      | [ _,p ] -> Some p
      | _ :: _ -> failwith "Edges.are_they_connected completely broken"

@@ -18,6 +18,7 @@ val hashtbl : (formatter -> unit) -> (formatter -> 'a * 'b -> unit) ->
 val option : (formatter -> 'a -> unit) -> formatter -> 'a option -> unit
 val bottom : formatter -> unit
 val nu : formatter -> unit
+val empty_set : formatter -> unit
 val comma : formatter -> unit
 val colon : formatter -> unit
 val space : formatter -> unit

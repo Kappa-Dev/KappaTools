@@ -8,7 +8,7 @@ type t = {
   edges: Edges.t;
   tokens: Nbr.t array;
   outdated_elements:
-    Operator.DepSet.t * (Connected_component.t * int) list list;
+    Operator.DepSet.t * ((Connected_component.Set.t *int) * Edges.path) list list;
   free_id: int;
   story_machinery :
     ((Causal.event_kind * Connected_component.t array *
@@ -87,8 +87,20 @@ let all_injections ?excp edges roots cca =
 	   Connected_component.Map.find cc roots) [])
     [Connected_component.Matching.empty] cca
 
-let deal_transformation is_add domain inj2graph edges roots transf = (*transf: abstract edge to be added or removed*)
-  let inj,graph,(obs,deps) = (*inj: inj2graph', graph: edges', obs: delta_roots -NB inj should not change if [is_add] is false*)
+let potential_root_of_unary_ccs unary_ccs roots i =
+  let ccs =
+    Connected_component.Set.filter
+      (fun cc ->
+       try ValMap.mem i (Connected_component.Map.find cc roots)
+       with Not_found -> false)
+      unary_ccs in
+  if Connected_component.Set.is_empty ccs then None else Some ccs
+
+let deal_transformation is_add domain to_explore_unaries inj2graph edges roots transf =
+  (*transf: abstract edge to be added or removed*)
+  let inj,graph,(obs,deps) =
+    (*inj: inj2graph', graph: edges', obs: delta_roots
+NB inj should not change if [is_add] is false*)
     match transf with
     | Primitives.Transformation.Freed (n,s) -> (*(n,s)-bottom*)
        let ty, id, inj2graph' = from_place inj2graph n in (*(A,23,phi)*)
@@ -127,7 +139,19 @@ let deal_transformation is_add domain inj2graph edges roots transf = (*transf: a
        (* 	   "@[add:%b %a in %i@]@." is_add *)
        (* 	   (Connected_component.print true !Debug.global_sigs) cc root in *)
        update_roots is_add r' cc root) roots obs in
-  ((inj,graph,roots',deps),obs)
+  let to_explore' =
+    if not is_add then to_explore_unaries
+    else
+      match transf with
+      | (Primitives.Transformation.Freed _
+	| Primitives.Transformation.Internalized _) -> to_explore_unaries
+      | Primitives.Transformation.Linked ((n,_),(n',_)) ->
+	 if Place.same_connected_component n n'
+	 then to_explore_unaries
+	 else
+	   let _, id, _ = from_place inj n in
+	   id::to_explore_unaries in
+  ((inj,graph,to_explore',roots',deps),obs)
 
 let store_event
       counter inj2graph new_tracked_obs_instances event_kind rule = function
@@ -175,32 +199,40 @@ let store_obs edges roots obs acc = function
 	with Not_found -> acc)
        acc obs
 
-let update_edges counter domain inj_nodes state event_kind rule =
+let update_edges counter domain unary_ccs inj_nodes state event_kind rule =
+  let former_deps,unary_cands = state.outdated_elements in
   (*Negative update*)
   let aux =
     List.fold_left
-      (fun (inj2graph,edges,roots,(deps,created_obs)) transf ->
+      (fun (inj2graph,edges,roots,(deps,unaries_to_expl)) transf ->
        (*inj2graph: abs -> conc, roots define the injection that is used*)
-       let ((a,b,c,new_deps),_) =
-	 deal_transformation false domain inj2graph edges roots transf in
-       (a,b,c,(Operator.DepSet.union new_deps deps,created_obs)))
+       let ((a,b,_,c,new_deps),_) =
+	 deal_transformation false domain unaries_to_expl inj2graph edges roots transf in
+       (a,b,c,(Operator.DepSet.union new_deps deps,unaries_to_expl)))
       ((inj_nodes,Mods.IntMap.empty,state.free_id), (*initial inj2graph: (existing,new,fresh_id) *)
-       state.edges,state.roots_of_ccs,state.outdated_elements)
+       state.edges,state.roots_of_ccs,(former_deps,[]))
       rule.Primitives.removed (*removed: statically defined edges*)
   in
   (*Positive update*)
-  let (((_,_,free_id' as final_inj2graph),edges',roots',rev_deps'),new_tracked_obs_instances) =
+  let (((_,_,free_id' as final_inj2graph),edges',roots',
+	(rev_deps',unaries_to_explore)),new_tracked_obs_instances) =
     List.fold_left
-      (fun ((inj2graph,edges,roots,(deps,created_obs)),tracked_inst) transf ->
-       let (a,b,c,new_deps),new_obs =
-	 deal_transformation true domain inj2graph edges roots transf in
-       let created_obs' =
-	 match new_obs with [] -> created_obs | l -> l::created_obs in
-       ((a,b,c,(Operator.DepSet.union deps new_deps,created_obs')),
+      (fun ((inj2graph,edges,roots,(deps,unaries_to_expl)),tracked_inst) transf ->
+       let (a,b,unaries_to_expl',c,new_deps),new_obs =
+	 deal_transformation true domain unaries_to_expl inj2graph edges roots transf in
+       ((a,b,c,(Operator.DepSet.union deps new_deps,unaries_to_expl')),
 	store_obs b c new_obs tracked_inst state.story_machinery))
       (aux,[])
-      rule.Primitives.inserted (*statically defined edges*)
-  in
+      rule.Primitives.inserted (*statically defined edges*) in
+  let unary_cands' =
+    List.fold_left
+      (fun unary_cands id ->
+       match
+	 Edges.pathes_of_interrest
+	   (potential_root_of_unary_ccs unary_ccs roots')
+		state.edges id Edges.empty_path with
+       | [] -> unary_cands
+       | l -> l :: unary_cands) unary_cands unaries_to_explore in
   (*Store event*)
   let story_machinery' =
     store_event
@@ -209,7 +241,7 @@ let update_edges counter domain inj_nodes state event_kind rule =
 
   { roots_of_ccs = roots';
     unary_candidates = state.unary_candidates; unary_pathes = state.unary_pathes;
-    edges = edges'; tokens = state.tokens; outdated_elements = rev_deps';
+    edges = edges'; tokens = state.tokens; outdated_elements = (rev_deps',unary_cands');
     free_id = free_id'; story_machinery = story_machinery'; }
 
 let raw_instance_number state ccs_l =
@@ -245,66 +277,77 @@ let new_unary_instances rule_id cc1 cc2 created_obs state =
   let (unary_candidates,unary_pathes) =
     List.fold_left
       (List.fold_left
-	 (fun (cands,pathes as acc) (cc,id) ->
-	  if Connected_component.is_equal_canonicals cc cc1 then
-	    try
-	      let goals = Connected_component.Map.find cc2 state.roots_of_ccs in
-	      List.fold_left
-		(fun (cands,pathes) (d,p) ->
-		 add_candidate cands pathes rule_id id d p)
-		acc
-		(Edges.pathes_of_interrest
-		   false (fun x -> ValMap.mem x goals) state.edges id)
-	    with Not_found -> acc
-	  else if Connected_component.is_equal_canonicals cc cc1 then
-	    (cands,pathes)
-	 else acc)
+	 (fun acc ((ccs,id),path) ->
+	  let path = Edges.rev_path path in
+	  Connected_component.Set.fold
+	    (fun cc acc ->
+	     try
+	       let goals =
+		 if Connected_component.is_equal_canonicals cc cc1
+		 then Connected_component.Map.find cc2 state.roots_of_ccs
+		 else if Connected_component.is_equal_canonicals cc cc2
+		 then Connected_component.Map.find cc1 state.roots_of_ccs
+		 else raise Not_found in
+	       List.fold_left
+		 (fun (cands,pathes) (((),d),p) ->
+		  add_candidate cands pathes rule_id id d p)
+		 acc
+		 (Edges.pathes_of_interrest
+		    (fun x -> if ValMap.mem x goals then Some () else None)
+		    state.edges id path)
+	     with Not_found -> acc)
+	    ccs acc)
       ) (state.unary_candidates,state.unary_pathes) created_obs in
   {state with unary_candidates = unary_candidates;
 	      unary_pathes = unary_pathes }
 
 let update_outdated_activities ~get_alg store env counter state =
-  let deps,created_obs = state.outdated_elements in
-  let rec aux deps state =
-    Operator.DepSet.fold
-      (fun dep state ->
+  let deps,unary_cands = state.outdated_elements in
+  let store_activity id syntax_id rate cc_va =
+    let rate =
+      Nbr.to_float @@ value_alg counter state ~get_alg rate in
+    let () =
+      if !Parameter.debugModeOn then
+	Format.printf "@[%sule %a has now %i instances.@]@."
+		      (if id mod 2 = 1 then "Unary r" else "R")
+		      (Environment.print_rule ~env) (id/2) cc_va in
+    let act =
+      if cc_va = 0 then 0. else rate *. float_of_int cc_va in
+    store id syntax_id act in
+  let rec aux deps =
+    Operator.DepSet.iter
+      (fun dep ->
        match dep with
 	| Operator.ALG j ->
-	   aux (Environment.get_reverse_dependencies env j) state
-	| Operator.PERT (-1) -> state (* TODO *)
+	   aux (Environment.get_reverse_dependencies env j)
+	| Operator.PERT (-1) -> () (* TODO *)
 	| Operator.PERT _ -> assert false
 	| Operator.RULE i ->
 	   let rule = Environment.get_rule env i in
-	   let store_activity id rate cc_va =
-	     let rate =
-	       Nbr.to_float @@ value_alg counter state ~get_alg rate in
-	     let () =
-	       if !Parameter.debugModeOn then
-		 Format.printf "@[%sule %a has now %i instances.@]@."
-			       (if id mod 2 = 1 then "Unary r" else "R")
-			       (Environment.print_rule ~env) (id/2) cc_va in
-	     let act =
-	       if cc_va = 0 then 0. else rate *. float_of_int cc_va in
-	     store id rule.Primitives.syntactic_rule act in
 	   let cc_va =
 	     raw_instance_number state [rule.Primitives.connected_components] in
-	   let () = store_activity (2*i) rule.Primitives.rate cc_va in
-	   match rule.Primitives.unary_rate with
-	   | None -> state
-	   | Some unrate ->
-	      let state' =
-		new_unary_instances
-		  i rule.Primitives.connected_components.(0)
-		  rule.Primitives.connected_components.(1) created_obs state in
-	      let va =
-		try
-		  ValMap.total (Mods.IntMap.find i state'.unary_candidates)
-		with Not_found -> 0 in
-	      let () = store_activity (2*i+1) unrate va in
-	      state') deps state in
-  let state' = aux (Environment.get_always_outdated env) state in
-  let state'' = aux deps state' in
-  {state'' with outdated_elements = (Operator.DepSet.empty,[]) }
+	   store_activity (2*i) rule.Primitives.syntactic_rule rule.Primitives.rate cc_va) deps in
+  let () = aux (Environment.get_always_outdated env) in
+  let () = aux deps in
+  let state' =
+    if unary_cands = [] then state else
+      Environment.fold_rules
+	(fun i state rule ->
+	 match rule.Primitives.unary_rate with
+	 | None -> state
+	 | Some unrate ->
+	    let state' =
+	      new_unary_instances
+		i rule.Primitives.connected_components.(0)
+		rule.Primitives.connected_components.(1) unary_cands state in
+	    let va =
+	      try
+		ValMap.total (Mods.IntMap.find i state'.unary_candidates)
+	      with Not_found -> 0 in
+	    let () =
+	      store_activity (2*i+1) rule.Primitives.syntactic_rule unrate va in
+	    state') state env in
+  {state' with outdated_elements = (Operator.DepSet.empty,[]) }
 
 let update_tokens ~get_alg counter state consumed injected =
   let do_op op l =
@@ -315,14 +358,16 @@ let update_tokens ~get_alg counter state consumed injected =
       l in
   let () = do_op Nbr.sub consumed in do_op Nbr.add injected
 
-let transform_by_a_rule ~get_alg domain counter state event_kind rule inj =
+let transform_by_a_rule
+      ~get_alg domain unary_ccs counter state event_kind rule inj =
   let () =
     update_tokens
       ~get_alg counter state rule.Primitives.consumed_tokens
       rule.Primitives.injected_tokens in
-  update_edges counter domain inj state event_kind rule
+  update_edges counter domain unary_ccs inj state event_kind rule
 
-let apply_unary_rule ~rule_id ~get_alg domain counter state event_kind rule =
+let apply_unary_rule
+      ~rule_id ~get_alg domain unary_ccs counter state event_kind rule =
   let root1,root2 =
     ValMap.random_val (Mods.IntMap.find rule_id state.unary_candidates) in
   let pair = (min root1 root2,max root1 root2) in
@@ -353,9 +398,10 @@ let apply_unary_rule ~rule_id ~get_alg domain counter state event_kind rule =
      | None -> Clash
      | Some inj ->
 	Success
-	  (transform_by_a_rule ~get_alg domain counter state event_kind rule inj)
+	  (transform_by_a_rule
+	     ~get_alg domain unary_ccs counter state event_kind rule inj)
 
-let apply_rule ?rule_id ~get_alg domain counter state event_kind rule =
+let apply_rule ?rule_id ~get_alg domain unary_ccs counter state event_kind rule =
   let inj,roots =
     Tools.array_fold_left_mapi
       (fun id inj cc ->
@@ -372,7 +418,8 @@ let apply_rule ?rule_id ~get_alg domain counter state event_kind rule =
   | None -> Clash
   | Some inj ->
      let out =
-       transform_by_a_rule ~get_alg domain counter state event_kind rule inj
+       transform_by_a_rule
+	 ~get_alg domain unary_ccs counter state event_kind rule inj
      in
      match rule.Primitives.unary_rate with
      | None -> Success out
@@ -391,7 +438,8 @@ let apply_rule ?rule_id ~get_alg domain counter state event_kind rule =
 	     let state' =
 	       {state with unary_candidates = cands; unary_pathes = pathes} in
 	     Success (transform_by_a_rule
-			~get_alg domain counter state' event_kind rule inj)
+			~get_alg domain unary_ccs counter state'
+			event_kind rule inj)
 	  | Some p ->
 	     let state' =
 	       if p == candidate then state
@@ -400,8 +448,8 @@ let apply_rule ?rule_id ~get_alg domain counter state event_kind rule =
 	     in Corrected state'
 	with Not_found -> Success out
 
-let force_rule ~get_alg domain counter state event_kind rule =
-  match apply_rule ~get_alg domain counter state event_kind rule with
+let force_rule ~get_alg domain unary_ccs counter state event_kind rule =
+  match apply_rule ~get_alg domain unary_ccs counter state event_kind rule with
   | (Success out | Corrected out) -> out,None
   | Clash ->
      match all_injections
@@ -409,7 +457,8 @@ let force_rule ~get_alg domain counter state event_kind rule =
      with
      | [] -> state,Some []
      | h :: t ->
-	  (transform_by_a_rule ~get_alg domain counter state event_kind rule h),
+	(transform_by_a_rule
+	   ~get_alg domain unary_ccs counter state event_kind rule h),
 	Some t
 
 let print_injections ?sigs f roots_of_ccs =

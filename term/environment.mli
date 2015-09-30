@@ -24,7 +24,8 @@ val get_alg : t -> int -> Alg_expr.t
 val get_perturbation : t -> int -> Primitives.perturbation
 val get_rule : t -> int -> Primitives.elementary_rule
 val map_observables : (Alg_expr.t -> 'a) -> t -> 'a array
-val iteri_rules : (int -> Primitives.elementary_rule -> unit) -> t -> unit
+val fold_rules :
+  (int -> 'a -> Primitives.elementary_rule -> 'a) -> 'a -> t -> 'a
 
 val get_reverse_dependencies : t -> int -> Operator.DepSet.t
 val get_always_outdated : t -> Operator.DepSet.t
