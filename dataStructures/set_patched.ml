@@ -29,7 +29,6 @@ module type S =
     val is_empty: t -> bool
     val mem: elt -> t -> bool
     val add: elt -> t -> t
-    val add_if_not_mem: elt -> t -> t
     val singleton: elt -> t
     val remove: elt -> t -> t
     val union: t -> t -> t
@@ -40,8 +39,8 @@ module type S =
     val subset: t -> t -> bool
     val iter: (elt -> unit) -> t -> unit
     val fold: (elt -> 'a -> 'a) -> t -> 'a -> 'a
-    val fold_inv: (elt -> 'a -> 'a) -> t -> 'a -> 'a 
-    val iter_inv: (elt -> 'a -> 'a) -> t -> 'a -> 'a 
+    val fold_inv: (elt -> 'a -> 'a) -> t -> 'a -> 'a
+    val iter_inv: (elt -> unit) -> t -> unit
     val for_all: (elt -> bool) -> t -> bool
     val exists: (elt -> bool) -> t -> bool
     val filter: (elt -> bool) -> t -> t
@@ -56,7 +55,7 @@ module type S =
     val destruct_max: t -> elt*t
   end
 
-module Make(Ord: OrderedType) =
+module Make(Ord: OrderedType) : S with type elt = Ord.t =
   struct
     type elt = Ord.t
     type t = Empty | Node of t * elt * t * int
@@ -118,18 +117,10 @@ module Make(Ord: OrderedType) =
     let rec add x = function
         Empty -> Node(Empty, x, Empty, 1)
       | Node(l, v, r, _) as t ->
-          let c = Ord.compare x v in
-          if c = 0 then t else
-          if c < 0 then bal (add x l) v r else bal l v (add x r)
-
-    let add_if_not_mem x t0 =
-      let rec aux x = function
-        | Empty -> Node(Empty, x, Empty, 1)
-        | Node(l, v, r, _) ->
-          let c = Ord.compare x v in
-          if c = 0 then t0 else
-          if c < 0 then bal (aux x l) v r else bal l v (aux x r)
-      in aux x t0
+	 let c = compare x v in
+	 if c = 0 then t else
+	   if c < 0 then let o = add x l in if o == l then t else bal o v r
+           else let o = add x r in if o == r then t else bal l v o
 
     (* Same as create and bal, but no assumptions are made on the
        relative heights of l and r. *)
@@ -354,7 +345,6 @@ module Make(Ord: OrderedType) =
       let elt = f a in 
       elt,remove elt a 
 
-    let destruct = destruct_gen choose
     let destruct_max = destruct_gen max_elt
     let destruct_min = destruct_gen min_elt 
 

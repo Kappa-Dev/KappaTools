@@ -1573,7 +1573,7 @@ module Preblackboard =
                  let error,log_info,blackboard,mixture_agent_id_mutex,set,init_step = 
                    List.fold_left 
                      (fun (error,log_info,blackboard,mixture_agent_id_mutex,set,init_step) id -> 
-                       let set' = AgentIdSet.add_if_not_mem id set in 
+                       let set' = AgentIdSet.add id set in
                        if set == set'
                        then 
                          try 
