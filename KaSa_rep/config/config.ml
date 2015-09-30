@@ -23,8 +23,7 @@ let version = "4.01"
 
 let output_directory = ref "" 
 
-
-let unsafe = ref true 
+let unsafe = ref true
 let trace = ref false
 let dump_error_as_soon_as_they_occur = ref false 
 let log = ref stdout 

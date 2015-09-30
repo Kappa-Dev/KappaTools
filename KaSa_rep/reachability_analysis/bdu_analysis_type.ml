@@ -41,4 +41,6 @@ type bdu_analysic =
       store_creation_rule    : (int list * wl_int * Cckappa_sig.rule array) AgentMap.t;
       store_creation         : site_bdu AgentMap.t;
       store_side_effects     : half_break_action * remove_action;
+      store_modification_sites :
+        (IntWL.WSet.elt * Cckappa_sig.site_name * Cckappa_sig.state_index) list AgentMap.t
     }

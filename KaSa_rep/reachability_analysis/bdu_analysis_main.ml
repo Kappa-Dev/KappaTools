@@ -20,6 +20,7 @@ open Bdu_analysis_type
 open Bdu_creation
 open Print_bdu_analysis
 open Bdu_side_effects
+open Bdu_modification_sites
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "BDU analysis") message exn (fun () -> default)  
@@ -67,6 +68,16 @@ let scan_rule parameter error handler rule_id rule compiled store_result =
       store_result.store_side_effects
   in
   (*------------------------------------------------------------------------------*)
+  (*modification sites*)
+  let error, store_modification_sites =
+    collect_modification_sites
+      parameter
+      error
+      rule_id
+      rule.diff_direct
+      store_result.store_modification_sites
+  in
+  (*------------------------------------------------------------------------------*)
   (*TEST*)
   (*let error, wl =
     fixpoint
@@ -82,7 +93,8 @@ let scan_rule parameter error handler rule_id rule compiled store_result =
     store_creation       = store_creation;
     store_creation_rule  = store_creation_rule;
     store_side_effects   = store_side_effects;
-  }   
+    store_modification_sites = store_modification_sites
+  }
  
 (************************************************************************************)
 (*RULES*)
@@ -93,11 +105,13 @@ let scan_rule_set parameter error handler compiled rules =
   let error, init_half_break    = AgentMap.create parameter error 0 in
   let error, init_remove1       = AgentMap.create parameter error 0 in
   let error, init_remove2       = AgentMap.create parameter error 0 in
+  let error, init_modification  = AgentMap.create parameter error 0 in
   let init_bdu =
     {
       store_creation      = init_creation;
       store_creation_rule = init_creation_rule;
       store_side_effects  = init_half_break, (init_remove1, init_remove2);
+      store_modification_sites = init_modification
     }
   in
   (*------------------------------------------------------------------------------*)

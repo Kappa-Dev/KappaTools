@@ -85,7 +85,7 @@ let print_triple l =
     match acc with
     | [] -> []
     | (rule_id, site, state_min) :: tl ->
-      fprintf stdout "rule_id:%i:site_type:%i:state_min:%i\n"
+      fprintf stdout "rule_id:%i:site_type:%i:state:%i\n"
         rule_id site state_min;
       aux tl
   in
@@ -151,26 +151,60 @@ let print_side_effects parameter error result =
   error
 
 (************************************************************************************)
+(*modification sites*)
+
+let print_modification_sites parameter error result =
+  AgentMap.print error
+    (fun error parameter l ->
+      let _ =
+        print_triple l
+      in
+      error      
+    ) parameter result
+
+(************************************************************************************)
 (*MAIN PRINT*)
 
 let print_result parameter error result =
-  let error =
+  let _ =
+    fprintf stdout "============================================================\n";
+    fprintf stdout "* BDU Analysis:\n";
+    fprintf stdout "============================================================\n";
+  in
+  let _ =
     fprintf stdout "------------------------------------------------------------\n";
     fprintf stdout "* Side effects action:\n";
     fprintf stdout "------------------------------------------------------------\n";
     let parameter_side =
       Remanent_parameters.update_prefix parameter "agent_type_" in
-    let _ =
+    let error =
       print_side_effects parameter_side error result.store_side_effects
     in
+    error
+  in    
+  let _ =
+    fprintf stdout "------------------------------------------------------------\n";
+    fprintf stdout "* Modification sites:\n";
+    fprintf stdout "------------------------------------------------------------\n";
+    let parameter_modif =
+      Remanent_parameters.update_prefix parameter "agent_type_" in
+    let error =
+      print_modification_sites parameter_modif error result.store_modification_sites
+    in
+    error
+  in
+  let _ =
     fprintf stdout "\n------------------------------------------------------------\n";
     fprintf stdout "* List of rules has creation action:\n";
     fprintf stdout "------------------------------------------------------------\n";
     let parameter_a_rule =
       Remanent_parameters.update_prefix parameter "agent_type/rule_id_" in
-    let _ =
+    let error =
       print_creation_rule parameter_a_rule error result.store_creation_rule
     in
+    error
+  in
+  let _ =
     let parameter_agent = Remanent_parameters.update_prefix parameter "agent_type_" in
     fprintf stdout "\n------------------------------------------------------------\n";
     fprintf stdout "* BDU creation in general:\n";
