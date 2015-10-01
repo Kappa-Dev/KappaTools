@@ -1,7 +1,7 @@
 let dot_comment = "#" 
 
 		    
-let head parameters = ["This file has been computed py KaSa: a Static Analyzer for Kappa ("^(Remanent_parameters.get_short_version parameters)^")";
+let head parameters = ["This file has been computed by KaSa: a Static Analyzer for Kappa ("^(Remanent_parameters.get_short_version parameters)^")";
 		       "Download sources/binaries at https://github.com/Kappa-Dev/KaSim"; 
 		       "";	    
 		       Remanent_parameters.get_launched_when_and_where parameters;

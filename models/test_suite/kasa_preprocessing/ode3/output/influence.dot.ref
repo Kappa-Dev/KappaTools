@@ -1,7 +1,5 @@
-#This file has been computed py KaSa: a Static Analyzer for Kappa (Kappa Static Analyzer (last-KaSim3-25-g6844911-dirty))
 #Download sources/binaries at https://github.com/Kappa-Dev/KaSim
 #
-#Analysis launched at 2015/10/01 17:15:56 (GMT+2) on applecell.home
 #Command line is: KaSa ode3.ka --debugging-mode --output-directory output
 #
 #This file contains the description of the influence map in dot.
