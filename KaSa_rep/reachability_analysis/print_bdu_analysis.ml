@@ -162,6 +162,15 @@ let print_modification_sites parameter error result =
       error      
     ) parameter result
 
+let print_covering_classes_modified_sites parameter error result =
+  AgentMap.print error
+    (fun error parameter l ->
+      let _ =
+        print_triple l
+      in
+      error
+    ) parameter result
+
 (************************************************************************************)
 (*MAIN PRINT*)
 
@@ -190,6 +199,18 @@ let print_result parameter error result =
       Remanent_parameters.update_prefix parameter "agent_type_" in
     let error =
       print_modification_sites parameter_modif error result.store_modification_sites
+    in
+    error
+  in
+  let _ =
+    fprintf stdout "------------------------------------------------------------\n";
+    fprintf stdout "* Covering classes and Modification sites:\n";
+    fprintf stdout "------------------------------------------------------------\n";
+    let parameter_cv_m =
+      Remanent_parameters.update_prefix parameter "agent_type_" in
+    let error =
+      print_covering_classes_modified_sites parameter_cv_m error
+        result.store_covering_classes_modified_sites
     in
     error
   in

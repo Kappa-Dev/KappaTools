@@ -42,5 +42,7 @@ type bdu_analysic =
       store_creation         : site_bdu AgentMap.t;
       store_side_effects     : half_break_action * remove_action;
       store_modification_sites :
+        (IntWL.WSet.elt * Cckappa_sig.site_name * Cckappa_sig.state_index) list AgentMap.t;
+      store_covering_classes_modified_sites:
         (IntWL.WSet.elt * Cckappa_sig.site_name * Cckappa_sig.state_index) list AgentMap.t
     }

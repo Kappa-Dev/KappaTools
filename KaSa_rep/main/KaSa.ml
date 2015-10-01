@@ -121,11 +121,12 @@ let main () =
 	if (Remanent_parameters.get_trace parameters_cv)
 	then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n"
       in
-      (*REMOVE:compute wake_up_map*)
-      let error, wake_up_map, _ = Influence_map.compute_influence_map parameters_cv error handler quark_map 
-        nrules
+      (*getting covering classes*)
+      let error, covering_classes =
+        Covering_classes.covering_classes parameters_cv error handler c_compil
       in
-      let error,dep = Bdu_analysis_main.bdu_main parameters_cv error handler c_compil 
+      let error,dep =
+        Bdu_analysis_main.bdu_main parameters_cv error handler covering_classes c_compil 
       in error,Some dep 
     else 
       error,None 
