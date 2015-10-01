@@ -51,7 +51,7 @@ main/version.ml: main/version.ml.skel $(wildcard .git/refs/heads/*)
 	$(OCAMLBINPATH)ocamlbuild $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) $@
 
 JaSim.byte: $(filter-out _build/,$(wildcard */*.ml*))
-	ocamlbuild $(OCAMLbuiLDFLAGS) $(OCAMLBUILDFLAGS) -I js \
+	$(OCAMLBINPATH)ocamlbuild $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) -I js \
 	-tag-line "<js/**> : thread, package(js_of_ocaml.tyxml), package(js_of_ocaml.syntax), package(tyxml.syntax), package(lwt), syntax(camlp4o)" \
 	$@
 
