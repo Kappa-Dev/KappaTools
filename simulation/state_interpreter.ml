@@ -51,10 +51,15 @@ let observables_values env counter graph state =
      env)
 
 let snapshot env counter file graph =
-  Kappa_files.with_snapshot
-    file (Mods.Counter.event counter)
-    (if !Parameter.dotOutput then failwith "dot snapshot not implemented yet" else "ka")
-    (fun f -> Format.fprintf f "%a@." (Rule_interpreter.print env) graph)
+  if !Parameter.dotOutput then
+    Kappa_files.with_snapshot
+      file (Mods.Counter.event counter) "dot"
+      (fun f -> Format.fprintf f "%a@." (Rule_interpreter.print_dot env) graph)
+  else
+    Kappa_files.with_snapshot
+      file (Mods.Counter.event counter) "ka"
+      (fun f -> Format.fprintf f "%a@." (Rule_interpreter.print env) graph)
+
 
 let do_it env domain counter graph state = function
   | Primitives.ITER_RULE ((v,_),r) ->

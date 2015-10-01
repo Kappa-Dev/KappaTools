@@ -8,22 +8,63 @@ let print_link f = function
   | FREE -> ()
   | VAL i -> Format.fprintf f "!%i" i
 
-let print_intf sigs ag_ty f (ports,ints) =
+let print_intf with_link sigs ag_ty f (ports,ints) =
   let rec aux empty i =
     if i < Array.length ports then
       let () = Format.fprintf
 		 f "%t%a%a" (if empty then Pp.empty else Pp.comma)
 		 (Signature.print_site_internal_state sigs ag_ty i)
-		 ints.(i) print_link ports.(i) in
+		 ints.(i) (if with_link then print_link else (fun _ _ -> ()))
+			  ports.(i) in
       aux false (succ i) in
   aux true 1
 
-let print_agent sigs f ag =
+let print_agent with_link sigs f ag =
   Format.fprintf f "%a(@[<h>%a@])" (Signature.print_agent sigs) ag.a_type
-		 (print_intf sigs ag.a_type) (ag.a_ports,ag.a_ints)
+		 (print_intf with_link sigs ag.a_type) (ag.a_ports,ag.a_ints)
+
+let get_color =
+  let store = Hashtbl.create 10 in
+  fun i ->
+  try Hashtbl.find store i
+  with Not_found ->
+    let v = Format.sprintf "#%x%x%x" (Random.int 255)
+			   (Random.int 255) (Random.int 255) in
+    let () = Hashtbl.add store i v in v
+
+let print_dot sigs nb_cc f mix =
+  Pp.listi
+    Pp.empty
+    (fun i f ag ->
+     Format.fprintf
+       f "node%d_%d [label = \"@[<h>%a@]\", color = \"%s\", style=filled];@,"
+	      nb_cc i (print_agent false sigs) ag (get_color ag.a_type);
+     Format.fprintf
+       f "node%d_%d -> counter%d [style=invis];@," nb_cc i nb_cc) f mix;
+  ignore @@
+    List.fold_left
+      (fun (a,acc) ag ->
+       let acc' =
+	 Tools.array_fold_lefti
+	   (fun s acc ->
+	    function
+	    | FREE -> acc
+	    | VAL i ->
+	       match Mods.IntMap.pop i acc with
+	       | None,acc -> Mods.IntMap.add i (a,s) acc
+	       | Some (a',s'),acc' ->
+		  Format.fprintf
+		    f
+		    "node%d_%d -> node%d_%d [taillabel=\"%a\", headlabel=\"%a\", dir=none];@,"
+		    nb_cc a nb_cc a' (Signature.print_site sigs ag.a_type) s
+		    (Signature.print_site sigs ag.a_type) s';
+		  acc')
+	   acc ag.a_ports in
+       (succ a,acc'))
+      (0,Mods.IntMap.empty) mix
 
 let print sigs f mix =
-  Pp.list Pp.comma (print_agent sigs) f mix
+  Pp.list Pp.comma (print_agent true sigs) f mix
 
 let agent_is_linked_on_port me i id = function
   | VAL j when i = j -> id <> me

@@ -35,4 +35,5 @@ val pathes_of_interrest :
   (int -> 'a option) -> t -> int -> path -> (('a*int) * path) list
 
 val print : Signature.s -> Format.formatter -> t -> unit
+val print_dot : Signature.s -> Format.formatter -> t -> unit
 val debug_print : Format.formatter -> t -> unit

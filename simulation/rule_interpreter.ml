@@ -500,6 +500,17 @@ let print env f state =
 			  (Environment.print_token ~env) i Nbr.print el))
     state.tokens
 
+let print_dot env f state =
+  Format.fprintf
+    f "@[<v>digraph G{@,%a@,%a}@]"
+    (Edges.print_dot (Environment.signatures env)) state.edges
+    (Pp.array Pp.cut (fun i f el ->
+		      Format.fprintf
+			f
+			"token_%d [label = \"%a (%a)\" , shape=none]"
+			i (Environment.print_token ~env) i Nbr.print el))
+    state.tokens
+
 let debug_print f state =
   Format.fprintf f "@[<v>%a@,%a@,%a@,%a@]"
 		 Edges.debug_print state.edges

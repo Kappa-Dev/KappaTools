@@ -59,6 +59,7 @@ pick a rule randomly), you can apply several rules in row before
 resynchronizing. (This is what initial state and perturbations do.) *)
 
 val print : Environment.t -> Format.formatter -> t -> unit
+val print_dot : Environment.t -> Format.formatter -> t -> unit
 
 (** {6 Stories} *)
 

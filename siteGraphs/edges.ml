@@ -118,6 +118,16 @@ let print sigs f graph =
 				   (Raw_mixture.print sigs) mix)
 	  f (build_snapshot sigs graph)
 
+let print_dot sigs f graph =
+  Pp.listi
+    Pp.cut
+    (fun i f (nb,mix) ->
+     Format.fprintf f "@[<v 2>subgraph cluster%d{@," i;
+     Format.fprintf
+       f "counter%d [label = \"%d instance(s)\", shape=none];@,%a}@]"
+       i nb (Raw_mixture.print_dot sigs i) mix)
+    f (build_snapshot sigs graph)
+
 let debug_print f (links,ints,sorts) =
   Pp.set
     ~trailing:(fun f -> Format.fprintf f "@])")
