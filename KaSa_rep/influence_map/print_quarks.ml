@@ -156,10 +156,14 @@ let dot_of_influence_map parameters error handler compilation (wake_up_map,inhib
     in 
     let _ = 
       List.iter 
-        (fun x -> Printf.fprintf (Remanent_parameters.get_log parameters_dot) "%s%s\n" Headers.dot_comment x)
-        Headers.head 
+        (Printf.fprintf (Remanent_parameters.get_log parameters_dot) "%s%s\n" Headers.dot_comment)
+        (Headers.head parameters_dot) 
     in 
-    let _ = Printf.fprintf (Remanent_parameters.get_log parameters_dot) "%s%s\n" Headers.dot_comment Headers.head_influence_map_in_dot in 
+    let _ =
+      List.iter
+	(Printf.fprintf (Remanent_parameters.get_log parameters_dot) "%s%s\n" Headers.dot_comment)
+	Headers.head_influence_map_in_dot
+    in 
     let _ = Printf.fprintf (Remanent_parameters.get_log parameters_dot) "digraph G{ \n" in 
     let nrules =  Handler.nrules parameters error handler in 
     let nvars =  Handler.nvars parameters error handler in 

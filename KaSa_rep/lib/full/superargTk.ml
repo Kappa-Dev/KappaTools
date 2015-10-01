@@ -379,7 +379,7 @@ exception Exit of string list
 let gui (a:Superarg.t) (args:string list) : string list =
 
   let top = openTk () in
-  appname_set "Kappa Static Analyzer";
+  appname_set Version.version_kasa_full_name;
   Balloon.init ();
   (* option list *)
   let up = Frame.create top in

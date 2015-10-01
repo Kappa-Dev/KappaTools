@@ -94,7 +94,14 @@ type marshalisable_parameters =
    influence_map_output : influence_map_output ;
    contact_map_output : contact_map_output ;
    kasa_state : Remanent_state_signature.engine_state ;
- } 
+   launching_date: Unix.tm ;
+   time_shift: int ; 
+   hostname: string ;
+   command_line: string array ;
+   version: string ;
+   short_version: string ; 
+   tk_interface: bool 
+  } 
 
 type parameters = 
   {

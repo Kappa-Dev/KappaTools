@@ -10,6 +10,8 @@
 
 module StringMap  = Set_and_map.Make (struct type t = string let compare=compare end) 
 
+let tk = "(with Tk interface)"
+	   
 let expert_mode = ref false  (* shows expert options *)
 let dev_mode = ref false    (* accept _ALL_ options *)
 
@@ -240,6 +242,7 @@ let print_help parameters (header:bool) (verbose:bool) f (a:t) =
   if header then Format.fprintf f "@.General options@.";
   Format.fprintf f "  --help            Verbose help@."; incr nb;
   Format.fprintf f "   -h               Short help@."; incr nb;
+  Format.fprintf f "  --version         Show version number@."; incr nb;
   Format.fprintf f "  --gui             GUI to select@."; incr nb;
   Format.fprintf f "  --(no-)expert     Expert mode (more options)@."; incr nb;
   if verbose && header then Format.fprintf f "@.";
@@ -264,7 +267,9 @@ let print_help parameters (header:bool) (verbose:bool) f (a:t) =
  *)
 let parse_list parameters (a:t) (l:string list) : string list =
   let long_help = ref false
-  and short_help = ref false in
+  and short_help = ref false
+  and show_version = ref false
+  in
 
   let rec doit accum = function
       [] -> accum
@@ -278,7 +283,9 @@ let parse_list parameters (a:t) (l:string list) : string list =
 	  (long_help := true; doit accum rem)
 	else if opt="-h" then  (* shorter list *)
 	  (short_help := true; doit accum rem)
-
+	    (* version number *)
+	else if opt="--version" then
+	  (show_version := true ; doit accum rem)
         (* expert *)
 	else if opt="--expert" then (expert_mode := true; doit accum rem)
 	else if opt="--no-expert" then (expert_mode := false; doit accum rem)
@@ -351,7 +358,8 @@ let parse_list parameters (a:t) (l:string list) : string list =
 	    
   in 
   let filenames = doit [] l in
-  if !long_help then (Format.printf "%a" (print_help parameters true true) a; exit 0)
+  if !show_version then (Format.printf "%s @.(with%s Tk interface) @." Version.version_kasa_full_name (if Tk_version.tk then "" else "out"); exit 0)
+  else if !long_help then (Format.printf "%a" (print_help parameters true true) a; exit 0)
   else if !short_help then (Format.printf "%a" (print_help parameters true false) a; exit 0);
  (* List.concat*) filenames (*(List.map Wordexp.wordexp filenames)*)
 

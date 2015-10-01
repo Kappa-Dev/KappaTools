@@ -14,6 +14,8 @@
 let main () =
   let error = Exception.empty_error_handler in    
   let error,parameters,files  = Get_option.get_option error in 
+  let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%s\n" (Remanent_parameters.get_full_version parameters) in 
+  let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%s\n" (Remanent_parameters.get_launched_when_and_where parameters) in
   let compil =
     let _ = Ast.init_compil() in 
     let _ =  
@@ -124,10 +126,10 @@ let main () =
       (*getting covering classes*)
       let error, covering_classes =
         Covering_classes.covering_classes parameters_cv error handler c_compil
-      in
-      let error,dep =
-        Bdu_analysis_main.bdu_main parameters_cv error handler covering_classes c_compil 
-      in error,Some dep 
+       in
+       let error,dep =
+	 Bdu_analysis_main.bdu_main parameters_cv error handler covering_classes c_compil 
+       in error,Some dep 
     else 
       error,None 
   in

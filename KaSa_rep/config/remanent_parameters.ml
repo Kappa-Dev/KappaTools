@@ -117,9 +117,19 @@ let get_parameters () =
 	Remanent_parameters_sig.prefix = "" ;
 	Remanent_parameters_sig.call_stack = []; 
 	Remanent_parameters_sig.link_mode = !Config.link_mode ;
-	Remanent_parameters_sig.kasa_state = Remanent_state_signature.empty_engine_state  } ;
-        Remanent_parameters_sig.log    = !Config.log ;
-	Remanent_parameters_sig.formatter = !Config.formatter ;
+	Remanent_parameters_sig.kasa_state = Remanent_state_signature.empty_engine_state ;
+	Remanent_parameters_sig.launching_date = Unix.localtime (Unix.gettimeofday ()) ;
+	Remanent_parameters_sig.time_shift=(
+	  let x = Unix.gettimeofday () in
+	  (Unix.localtime x).Unix.tm_hour - (Unix.gmtime x).Unix.tm_hour)  ;
+	Remanent_parameters_sig.hostname= Unix.gethostname () ;
+	Remanent_parameters_sig.command_line=Sys.argv;
+	Remanent_parameters_sig.short_version=Version.version_string;
+	Remanent_parameters_sig.version=Version.version_kasa_full_name;
+	Remanent_parameters_sig.tk_interface=Tk_version.tk;
+      } ;
+    Remanent_parameters_sig.log    = !Config.log ;
+    Remanent_parameters_sig.formatter = !Config.formatter ;    
   } 
     
 let get_btype_sep_symbol_1         symbol = symbol.Remanent_parameters_sig.btype_sep 
@@ -188,7 +198,24 @@ let get_do_stochastic_flow_of_information_1  marshalisable = marshalisable.Reman
 let get_do_site_dependencies_1             marshalisable = marshalisable.Remanent_parameters_sig.do_site_dependencies
 let get_do_iteration_dependencies_1        marshalisable = marshalisable.Remanent_parameters_sig.do_iteration_dependencies
 
-
+let get_launching_date_1                             marshalisable =
+  let t = marshalisable.Remanent_parameters_sig.launching_date in
+  let gmt = marshalisable.Remanent_parameters_sig.time_shift in 
+  Printf.sprintf "Analysis launched at %04i/%02i/%02i %02i:%02i:%02i (GMT%+i)"
+		   (t.Unix.tm_year+1900)
+		   (t.Unix.tm_mon+1)
+		   (t.Unix.tm_mday)
+		   t.Unix.tm_hour
+		   t.Unix.tm_min t.Unix.tm_sec gmt
+let get_short_version_1                              marshalisable =
+  marshalisable.Remanent_parameters_sig.version 
+let get_full_version_1                               marshalisable =
+  Printf.sprintf "%s (with%s Tk interface)" marshalisable.Remanent_parameters_sig.version (if marshalisable.Remanent_parameters_sig.tk_interface then "" else "out")
+let get_launched_where_1                             marshalisable =
+  marshalisable.Remanent_parameters_sig.hostname
+let get_command_line_1                               marshalisable =
+  marshalisable.Remanent_parameters_sig.command_line
+    
 let get_marshalisable parameter = parameter.Remanent_parameters_sig.marshalisable_parameters
 let get_log parameter = parameter.Remanent_parameters_sig.log   
 let get_formatter parameter = parameter.Remanent_parameters_sig.formatter 
@@ -196,6 +223,12 @@ let get_formatter parameter = parameter.Remanent_parameters_sig.formatter
 
 let upgrade_from_marshal_field f = compose f get_marshalisable 
 
+let get_command_line = upgrade_from_marshal_field get_command_line_1 
+let get_short_version = upgrade_from_marshal_field get_short_version_1
+let get_launched_where = upgrade_from_marshal_field get_launched_where_1
+let get_full_version = upgrade_from_marshal_field get_full_version_1
+let get_launching_date = upgrade_from_marshal_field get_launching_date_1
+let get_launched_when_and_where parameters = Printf.sprintf "%s on %s" (get_launching_date parameters) (get_launched_where parameters)
 let get_do_contact_map = upgrade_from_marshal_field get_do_contact_map_1
 let get_do_influence_map = upgrade_from_marshal_field get_do_influence_map_1
 let get_do_ODE_flow_of_information = upgrade_from_marshal_field get_do_ODE_flow_of_information_1

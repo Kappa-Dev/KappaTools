@@ -24,8 +24,8 @@ help:
 
 %.diff:
 	@touch $(basename $@).ref $(basename $@)
-	@sed '/generation time/d' $(basename $@) | diff -q $(basename $@).ref - || true
-	@sed '/generation time/d' $(basename $@) | diff -u $(basename $@).ref - > $@ || true
+	@sed '/generation time/d;/Kappa Static Analyzer/d;/Analysis launched at/d' $(basename $@) | diff -q $(basename $@).ref - || true
+	@sed '/generation time/d;/Kappa Static Analyzer/d;/Analysis launched at/d' $(basename $@) | diff -u $(basename $@).ref - > $@ || true
 
 %/$(ERROR): %/$(OUTPUT_PATH)/LOG
 	@rm -f $@

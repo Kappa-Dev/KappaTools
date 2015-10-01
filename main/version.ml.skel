@@ -4,3 +4,6 @@ let version_string =
   Str.global_replace (Str.regexp "^.*tag: \\([^,]+\\)\\(,.*\\)?$") "\\1" all_tags
 
 let version_msg = "Kappa Simulator: "^version_string
+
+let version_kasa_full_name = "Kappa Static Analyzer ("^version_string^")"
+									

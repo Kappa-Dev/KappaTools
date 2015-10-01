@@ -95,8 +95,9 @@ let print_handler parameters error handler =
 let dot_of_contact_map parameters (error:Exception.method_handler) handler = 
     let error,parameters_dot = 
           Remanent_parameters.open_contact_map_file parameters error
-    in 
-    let _ = Printf.fprintf (Remanent_parameters.get_log parameters_dot) "%s%s\n" Headers.dot_comment Headers.head_contact_map_in_dot in 
+    in
+    let _ = List.iter (Printf.fprintf (Remanent_parameters.get_log parameters_dot) "%s%s\n" Headers.dot_comment) (Headers.head parameters_dot) in 
+    let _ = List.iter (Printf.fprintf (Remanent_parameters.get_log parameters_dot) "%s%s\n" Headers.dot_comment) Headers.head_contact_map_in_dot in 
     let _ = Printf.fprintf (Remanent_parameters.get_log parameters_dot) "graph G{ \n" in 
     let _ = 
       Ckappa_sig.Dictionary_of_agents.print 
