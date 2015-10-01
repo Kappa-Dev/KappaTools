@@ -61,8 +61,7 @@ let one_connected_component sigs free_id node graph =
     | [] -> acc,free_id,graph
     | node :: todos ->
        match IntMap.pop node sorts with
-       | None, _ ->
-	  failwith ("Node "^string_of_int node^" of graph has no entry in sorts")
+       | None, _ -> build acc free_id dangling graph todos
        | Some ty, sorts' ->
 	  let arity = Signature.arity sigs ty in
 	  let ports = Array.make arity Raw_mixture.FREE in
@@ -149,9 +148,9 @@ let rec print_path ?sigs ?graph f = function
 		    (fun f -> if p' <> p'' then Format.fprintf f "%i##" p')
 		    (print_path ?sigs ?graph) l
 let empty_path = []
-let rev_path l = List.rev l
+let rev_path l = List.rev_map (fun (a,s,s',a') -> (a',s',s,a)) l
 let is_valid_path graph l =
-  List.for_all (fun (a,s,a',s') -> link_exists a s a' s' graph) l
+  List.for_all (fun (a,s,s',a') -> link_exists a s a' s' graph) l
 
 let breath_first_traversal stop_on_find is_interresting links =
   let rec look_each_site (id,path as x) site (stop,don,out,next as acc) =
@@ -173,15 +172,18 @@ let breath_first_traversal stop_on_find is_interresting links =
   let rec aux don out next = function
     | x::todos ->
        let stop,don',out',next' = look_each_site x 0 (false,don,out,next) in
-       if stop&&stop_on_find then out else aux don' out' next' todos
+       if stop&&stop_on_find then out' else aux don' out' next' todos
     | [] -> match next with [] -> out | _ -> aux don out [] next in
   aux
 
 let pathes_of_interrest is_interresting (links,_,_) start_point done_path =
   let don = List.fold_left (fun s (_,_,_,x) -> IntSet.add x s)
 			   (IntSet.singleton start_point) done_path in
+  let acc = match is_interresting start_point with
+    | None -> []
+    | Some x -> [(x,start_point),done_path] in
   breath_first_traversal
-    false is_interresting links don [] [] [start_point,done_path]
+    false is_interresting links don acc [] [start_point,done_path]
 
 let are_connected ?candidate (links,_,_ as graph) x y =
   match candidate with

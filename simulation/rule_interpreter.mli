@@ -72,6 +72,6 @@ val generate_stories : Format.formatter -> Environment.t -> t -> unit
 (** {6 Debugging} *)
 
 val print_injections :
-  ?sigs:Signature.s -> Format.formatter ->
-  int ValMap.tree Connected_component.Map.t -> unit
+  ?sigs:Signature.s -> (Format.formatter -> 'a -> unit) -> Format.formatter ->
+  'a ValMap.tree Connected_component.Map.t -> unit
 val debug_print : Format.formatter -> t -> unit

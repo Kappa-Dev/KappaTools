@@ -8,7 +8,7 @@ type t = {
   edges: Edges.t;
   tokens: Nbr.t array;
   outdated_elements:
-    Operator.DepSet.t * ((Connected_component.Set.t *int) * Edges.path) list list;
+    Operator.DepSet.t * (int * ((Connected_component.Set.t *int) * Edges.path) list) list * bool;
   free_id: int;
   story_machinery :
     ((Causal.event_kind * Connected_component.t array *
@@ -25,7 +25,7 @@ let empty ~has_tracking env = {
     unary_pathes = Mods.Int2Map.empty;
     edges = Edges.empty;
     tokens = Array.make (Environment.nb_tokens env) Nbr.zero;
-    outdated_elements = Operator.DepSet.empty,[];
+    outdated_elements = Operator.DepSet.empty,[],true;
     free_id = 1;
     story_machinery =
       if has_tracking
@@ -34,8 +34,19 @@ let empty ~has_tracking env = {
       else None;
 }
 
-let print_heap f h =
-  ValMap.iter (fun c -> Format.fprintf f "%i%t" c Pp.comma) h
+let print_heap pr f h =
+  ValMap.iter (fun c -> Format.fprintf f "%a%t" pr c Pp.comma) h
+
+let print_injections ?sigs pr f roots_of_ccs =
+  Format.fprintf
+    f "@[<v>%a@]"
+    (Pp.set Connected_component.Map.bindings Pp.space
+	    (fun f (cc,roots) ->
+	     Format.fprintf
+	       f "@[# @[%a@] ==>@ @[%a@]@]"
+	       (Connected_component.print ?sigs true) cc (print_heap pr) roots
+	    )
+    ) roots_of_ccs
 
 let update_roots is_add map cc root =
   let va = try Connected_component.Map.find cc map
@@ -47,12 +58,12 @@ let add_candidate cands pathes rule_id x y p =
   let a = min x y in
   let b = max x y in
   let va = try Mods.IntMap.find rule_id cands with Not_found -> ValMap.empty in
-  (Mods.IntMap.add rule_id (ValMap.add (a,b) va) cands,
+  (Mods.IntMap.add rule_id (ValMap.add (x,y) va) cands,
    Mods.Int2Map.add (a,b) p pathes)
 let remove_candidate cands pathes rule_id x y =
   let a = min x y in
   let b = max x y in
-  let va = ValMap.remove (a,b) (Mods.IntMap.find rule_id cands) in
+  let va = ValMap.remove (x,y) (Mods.IntMap.find rule_id cands) in
   ((if ValMap.is_empty va then Mods.IntMap.remove rule_id cands
     else Mods.IntMap.add rule_id va cands),
    Mods.Int2Map.remove (a,b) pathes)
@@ -86,15 +97,6 @@ let all_injections ?excp edges roots cca =
 	| (Some _ | None) ->
 	   Connected_component.Map.find cc roots) [])
     [Connected_component.Matching.empty] cca
-
-let potential_root_of_unary_ccs unary_ccs roots i =
-  let ccs =
-    Connected_component.Set.filter
-      (fun cc ->
-       try ValMap.mem i (Connected_component.Map.find cc roots)
-       with Not_found -> false)
-      unary_ccs in
-  if Connected_component.Set.is_empty ccs then None else Some ccs
 
 let deal_transformation is_add domain to_explore_unaries inj2graph edges roots transf =
   (*transf: abstract edge to be added or removed*)
@@ -137,7 +139,7 @@ NB inj should not change if [is_add] is false*)
        (* let () = *)
        (* 	 Format.eprintf *)
        (* 	   "@[add:%b %a in %i@]@." is_add *)
-       (* 	   (Connected_component.print true !Debug.global_sigs) cc root in *)
+       (* 	   (Connected_component.print true ~sigs:!Debug.global_sigs) cc root in *)
        update_roots is_add r' cc root) roots obs in
   let to_explore' =
     if not is_add then to_explore_unaries
@@ -199,8 +201,17 @@ let store_obs edges roots obs acc = function
 	with Not_found -> acc)
        acc obs
 
+let potential_root_of_unary_ccs unary_ccs roots i =
+  let ccs =
+    Connected_component.Set.filter
+      (fun cc ->
+       try ValMap.mem i (Connected_component.Map.find cc roots)
+       with Not_found -> false)
+      unary_ccs in
+  if Connected_component.Set.is_empty ccs then None else Some ccs
+
 let update_edges counter domain unary_ccs inj_nodes state event_kind rule =
-  let former_deps,unary_cands = state.outdated_elements in
+  let former_deps,unary_cands,no_unary = state.outdated_elements in
   (*Negative update*)
   let aux =
     List.fold_left
@@ -215,33 +226,41 @@ let update_edges counter domain unary_ccs inj_nodes state event_kind rule =
   in
   (*Positive update*)
   let (((_,_,free_id' as final_inj2graph),edges',roots',
-	(rev_deps',unaries_to_explore)),new_tracked_obs_instances) =
+	(rev_deps',unaries_to_explore)),new_tracked_obs_instances,all_new_obs) =
     List.fold_left
-      (fun ((inj2graph,edges,roots,(deps,unaries_to_expl)),tracked_inst) transf ->
+      (fun ((inj2graph,edges,roots,(deps,unaries_to_expl)),tracked_inst,all_nobs) transf ->
        let (a,b,unaries_to_expl',c,new_deps),new_obs =
 	 deal_transformation true domain unaries_to_expl inj2graph edges roots transf in
        ((a,b,c,(Operator.DepSet.union deps new_deps,unaries_to_expl')),
-	store_obs b c new_obs tracked_inst state.story_machinery))
-      (aux,[])
+	store_obs b c new_obs tracked_inst state.story_machinery,
+       match new_obs with [] -> all_nobs | l -> l::all_nobs))
+      (aux,[],[])
       rule.Primitives.inserted (*statically defined edges*) in
-  let unary_cands' =
+  let unary_pack =
     List.fold_left
-      (fun unary_cands id ->
+      (List.fold_left
+	 (fun (unary_cands,_ as acc) (cc,root) ->
+	  if Connected_component.Set.mem cc unary_ccs then
+	    (root,[(Connected_component.Set.singleton cc,root),Edges.empty_path])::unary_cands,false
+	  else acc)) (unary_cands,no_unary) all_new_obs in
+  let unary_cands',no_unary' =
+    List.fold_left
+      (fun (unary_cands,_ as acc) id ->
        match
 	 Edges.pathes_of_interrest
 	   (potential_root_of_unary_ccs unary_ccs roots')
-		state.edges id Edges.empty_path with
-       | [] -> unary_cands
-       | l -> l :: unary_cands) unary_cands unaries_to_explore in
+	   state.edges id Edges.empty_path with
+       | [] -> acc
+       | l -> (id,l) :: unary_cands,false) unary_pack unaries_to_explore in
   (*Store event*)
   let story_machinery' =
     store_event
       counter final_inj2graph new_tracked_obs_instances event_kind rule
       state.story_machinery in
 
-  { roots_of_ccs = roots';
-    unary_candidates = state.unary_candidates; unary_pathes = state.unary_pathes;
-    edges = edges'; tokens = state.tokens; outdated_elements = (rev_deps',unary_cands');
+  { roots_of_ccs = roots'; unary_candidates = state.unary_candidates;
+    unary_pathes = state.unary_pathes; edges = edges';
+    tokens = state.tokens; outdated_elements = (rev_deps',unary_cands',no_unary');
     free_id = free_id'; story_machinery = story_machinery'; }
 
 let raw_instance_number state ccs_l =
@@ -269,40 +288,43 @@ let value_alg ~get_alg counter state alg =
     alg
 
 let extra_outdated_var i state =
-  let deps,created_obs = state.outdated_elements in
+  let deps,unary_cands,no_unary = state.outdated_elements in
   {state with outdated_elements =
-		(Operator.DepSet.add (Operator.ALG i) deps,created_obs)}
+		(Operator.DepSet.add (Operator.ALG i) deps,unary_cands,no_unary)}
 
 let new_unary_instances rule_id cc1 cc2 created_obs state =
   let (unary_candidates,unary_pathes) =
     List.fold_left
-      (List.fold_left
+      (fun acc (restart,l) ->
+       List.fold_left
 	 (fun acc ((ccs,id),path) ->
 	  let path = Edges.rev_path path in
 	  Connected_component.Set.fold
 	    (fun cc acc ->
 	     try
-	       let goals =
+	       let goals,reverse =
 		 if Connected_component.is_equal_canonicals cc cc1
-		 then Connected_component.Map.find cc2 state.roots_of_ccs
+		 then Connected_component.Map.find cc2 state.roots_of_ccs,false
 		 else if Connected_component.is_equal_canonicals cc cc2
-		 then Connected_component.Map.find cc1 state.roots_of_ccs
+		 then Connected_component.Map.find cc1 state.roots_of_ccs,true
 		 else raise Not_found in
 	       List.fold_left
 		 (fun (cands,pathes) (((),d),p) ->
-		  add_candidate cands pathes rule_id id d p)
+		  if reverse
+		  then add_candidate cands pathes rule_id d id p
+		  else add_candidate cands pathes rule_id id d p)
 		 acc
 		 (Edges.pathes_of_interrest
 		    (fun x -> if ValMap.mem x goals then Some () else None)
-		    state.edges id path)
+		    state.edges restart path)
 	     with Not_found -> acc)
-	    ccs acc)
-      ) (state.unary_candidates,state.unary_pathes) created_obs in
+	    ccs acc) acc l)
+      (state.unary_candidates,state.unary_pathes) created_obs in
   {state with unary_candidates = unary_candidates;
 	      unary_pathes = unary_pathes }
 
 let update_outdated_activities ~get_alg store env counter state =
-  let deps,unary_cands = state.outdated_elements in
+  let deps,unary_cands,no_unary = state.outdated_elements in
   let store_activity id syntax_id rate cc_va =
     let rate =
       Nbr.to_float @@ value_alg counter state ~get_alg rate in
@@ -330,7 +352,7 @@ let update_outdated_activities ~get_alg store env counter state =
   let () = aux (Environment.get_always_outdated env) in
   let () = aux deps in
   let state' =
-    if unary_cands = [] then state else
+    if no_unary then state else
       Environment.fold_rules
 	(fun i state rule ->
 	 match rule.Primitives.unary_rate with
@@ -347,7 +369,7 @@ let update_outdated_activities ~get_alg store env counter state =
 	    let () =
 	      store_activity (2*i+1) rule.Primitives.syntactic_rule unrate va in
 	    state') state env in
-  {state' with outdated_elements = (Operator.DepSet.empty,[]) }
+  {state' with outdated_elements = (Operator.DepSet.empty,[],true) }
 
 let update_tokens ~get_alg counter state consumed injected =
   let do_op op l =
@@ -370,36 +392,43 @@ let apply_unary_rule
       ~rule_id ~get_alg domain unary_ccs counter state event_kind rule =
   let root1,root2 =
     ValMap.random_val (Mods.IntMap.find rule_id state.unary_candidates) in
+  let cc1 = rule.Primitives.connected_components.(0) in
+  let cc2 = rule.Primitives.connected_components.(1) in
   let pair = (min root1 root2,max root1 root2) in
   let candidate = Mods.Int2Map.find pair state.unary_pathes in
   let cands,pathes = remove_candidate state.unary_candidates state.unary_pathes
 				      rule_id root1 root2 in
+  let deps,unary_cands,_ = state.outdated_elements in
+  let state' =
+    {state with
+      unary_candidates = cands; unary_pathes = pathes;
+      outdated_elements =
+	(Operator.DepSet.add (Operator.RULE rule_id) deps,unary_cands,false)} in
+  let missing_ccs =
+    try
+      not @@
+	ValMap.mem root1 (Connected_component.Map.find cc1 state.roots_of_ccs) &&
+	ValMap.mem root2 (Connected_component.Map.find cc2 state.roots_of_ccs)
+    with Not_found -> true in
   match Edges.are_connected ~candidate state.edges root1 root2 with
-  | None ->
-     let deps,created_obs = state.outdated_elements in
-     let state' =
-       {state with
-	 unary_candidates = cands; unary_pathes = pathes;
-	 outdated_elements =
-	   (Operator.DepSet.add (Operator.RULE rule_id) deps,created_obs)} in
-     Corrected state'
+  | None -> Corrected state'
+  | Some _ when missing_ccs -> Corrected state'
   | Some _path' ->
      let inj1 =
        Connected_component.Matching.reconstruct
-	 state.edges Connected_component.Matching.empty 0
-	 rule.Primitives.connected_components.(0) root1 in
+	 state'.edges Connected_component.Matching.empty 0 cc1 root1 in
      let inj =
        match inj1 with
        | None -> None
-       | Some inj ->
-	  Connected_component.Matching.reconstruct
-	    state.edges inj 1 rule.Primitives.connected_components.(1) root2 in
+       | Some inj -> Connected_component.Matching.reconstruct
+		       state'.edges inj 1 cc2 root2 in
      match inj with
      | None -> Clash
      | Some inj ->
 	Success
 	  (transform_by_a_rule
-	     ~get_alg domain unary_ccs counter state event_kind rule inj)
+	     ~get_alg domain unary_ccs counter state' event_kind rule inj)
+
 
 let apply_rule ?rule_id ~get_alg domain unary_ccs counter state event_kind rule =
   let inj,roots =
@@ -461,17 +490,6 @@ let force_rule ~get_alg domain unary_ccs counter state event_kind rule =
 	   ~get_alg domain unary_ccs counter state event_kind rule h),
 	Some t
 
-let print_injections ?sigs f roots_of_ccs =
-  Format.fprintf
-    f "@[<v>%a@]"
-    (Pp.set Connected_component.Map.bindings Pp.space
-	    (fun f (cc,roots) ->
-	     Format.fprintf
-	       f "@[# @[%a@] ==>@ @[%a@]@]"
-	       (Connected_component.print ?sigs true) cc print_heap roots
-	    )
-    ) roots_of_ccs
-
 let print env f state =
   Format.fprintf
     f "@[<v>%a@,%a@]"
@@ -483,13 +501,19 @@ let print env f state =
     state.tokens
 
 let debug_print f state =
-  Format.fprintf f "@[<v>%a@,%a@,%a@]"
+  Format.fprintf f "@[<v>%a@,%a@,%a@,%a@]"
 		 Edges.debug_print state.edges
 		 (Pp.array Pp.space (fun i f el ->
 				     Format.fprintf f "token_%i <- %a"
 						    i Nbr.print el))
 		 state.tokens
-		 (print_injections ?sigs:None) state.roots_of_ccs
+		 (print_injections ?sigs:None Format.pp_print_int) state.roots_of_ccs
+		 (Pp.set Mods.IntMap.bindings Pp.cut
+			 (fun f (rule,roots) ->
+			  Format.fprintf f "@[rule_%i ==> %a@]" rule
+					 (print_heap (fun f (x,y) -> Format.fprintf f "(%i,%i)" x y))
+					 roots))
+		 state.unary_candidates
 
 let add_tracked ccs event_kind tests state =
   match state.story_machinery with

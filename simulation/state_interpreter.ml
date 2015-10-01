@@ -221,8 +221,9 @@ let one_rule form dt stop env domain counter graph state =
     in Random_tree.add rd_id new_act state.activities in
   let () =
     if !Parameter.debugModeOn then
-      Format.printf "@[<v>@[Applied@ %i:@]@ @[%a@]@]@." rule_id
-		    (Kappa_printer.elementary_rule ~env) rule in
+      Format.printf "@[<v>@[Applied@ %t%i:@]@ @[%a@]@]@."
+		    (fun f -> if choice mod 2 = 1 then Format.fprintf f "unary@ ")
+		    rule_id (Kappa_printer.elementary_rule ~env) rule in
   let get_alg i = get_alg env state i in
   (* let () = *)
   (*   Format.eprintf "%a@." (Rule_interpreter.print_injections env) graph in *)
@@ -242,10 +243,10 @@ let one_rule form dt stop env domain counter graph state =
      let () =
        if !Parameter.debugModeOn then
 	 Format.printf "@[<v>Obtained@ %a@]@."
-		       (Rule_interpreter.print env) graph' in
+		       (Rule_interpreter.print env) graph'' in
      let () =
        Plot.fill form counter env dt
-		 (observables_values env counter graph state) in
+		 (observables_values env counter graph'' state) in
      (not (Mods.Counter.one_constructive_event counter dt)||stop,graph'',state)
   | Rule_interpreter.Clash ->
      if Mods.Counter.consecutive_null_event counter <
