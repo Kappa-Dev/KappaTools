@@ -28,7 +28,7 @@ let trace = false
 module Int2Map =
   MapExt.Make (
     struct
-      type t = int * int * int
+      type t = Cckappa_sig.agent_name * Cckappa_sig.site_name * Cckappa_sig.state_index
       let compare = compare
     end
   )

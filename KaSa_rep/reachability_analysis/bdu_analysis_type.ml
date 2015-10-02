@@ -22,6 +22,24 @@ let local_trace = false
 
 module AgentMap = Quick_Nearly_inf_Imperatif
 
+(*contact map with state*)
+module Int2Map =
+  MapExt.Make (
+    struct
+      type t = Cckappa_sig.agent_name * Cckappa_sig.site_name * Cckappa_sig.state_index
+      let compare = compare
+    end
+  )
+
+(*contact map without state*)
+module Int2Map_pair =
+  MapExt.Make (
+    struct
+      type t = Cckappa_sig.agent_name * Cckappa_sig.site_name
+      let compare = compare
+    end
+  )
+
 type site_bdu  = (List_sig.variable * Cckappa_sig.state_index) list *
   ((Boolean_mvbdu.memo_tables, Boolean_mvbdu.mvbdu_dic,
     Boolean_mvbdu.list_dic, bool, int)
@@ -44,5 +62,19 @@ type bdu_analysic =
       store_modification_sites :
         (IntWL.WSet.elt * Cckappa_sig.site_name * Cckappa_sig.state_index) list AgentMap.t;
       store_covering_classes_modified_sites:
-        (IntWL.WSet.elt * Cckappa_sig.site_name * Cckappa_sig.state_index) list AgentMap.t
+        (IntWL.WSet.elt * Cckappa_sig.site_name * Cckappa_sig.state_index) list AgentMap.t;
+      (*contact map*)
+      store_contact_map      :
+        ((Cckappa_sig.agent_name list) *
+            (Cckappa_sig.agent_name * Cckappa_sig.site_name) list)
+        Int2Map_pair.t;
+      store_binding_rhs      :
+        ((Cckappa_sig.agent_name list) *
+            (Cckappa_sig.agent_name * Cckappa_sig.site_name) list)
+        Int2Map_pair.t;
+      store_binding_dual     :
+        (Cckappa_sig.agent_name list *
+           (Cckappa_sig.agent_name * Cckappa_sig.site_name *
+              Cckappa_sig.state_index)
+          list) Int2Map.t;
     }

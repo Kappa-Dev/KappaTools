@@ -94,11 +94,9 @@ let covering_classes_modified_sites parameter error covering_classes store_resul
       (*from result_covering_class get site dictionary, then get a list
         of site in the covering class.*)
       let site_dic = remanent.store_dic in
-      let num =
-        let error, num =
-          Dictionary_of_Covering_class.last_entry
-            parameter error site_dic
-        in num
+      let error, num =
+        Dictionary_of_Covering_class.last_entry
+          parameter error site_dic
       in
       let error, (value_dic, _, _) =
         Misc_sa.unsome

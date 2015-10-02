@@ -21,6 +21,7 @@ open Bdu_creation
 open Print_bdu_analysis
 open Bdu_side_effects
 open Bdu_modification_sites
+open Bdu_contact_map
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "BDU analysis") message exn (fun () -> default)  
@@ -88,6 +89,30 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       store_result.store_covering_classes_modified_sites
   in
   (*------------------------------------------------------------------------------*)
+  (*contact map*)
+  let error, store_contact_map =
+    compute_contact_map
+      parameter
+      error
+      handler
+      (*store_result.store_contact_map*)
+  in
+  let error, store_binding_rhs =
+    collect_binding_rhs
+      parameter
+      error
+      rule
+      store_result.store_binding_rhs
+  in
+  let store_binding_dual =
+    precise_binding_dual
+      parameter
+      error
+      handler
+      rule
+      store_result.store_binding_dual
+  in
+  (*------------------------------------------------------------------------------*)
   (*TEST*)
   (*let error, wl =
     fixpoint
@@ -103,8 +128,11 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
     store_creation       = store_creation;
     store_creation_rule  = store_creation_rule;
     store_side_effects   = store_side_effects;
-    store_modification_sites = store_modification_sites;
-    store_covering_classes_modified_sites = store_covering_classes_modified_sites
+    store_modification_sites              = store_modification_sites;
+    store_covering_classes_modified_sites = store_covering_classes_modified_sites;
+    store_contact_map    = store_contact_map;
+    store_binding_rhs    = store_binding_rhs;
+    store_binding_dual   = store_binding_dual
   }
  
 (************************************************************************************)
@@ -118,13 +146,19 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
   let error, init_remove2       = AgentMap.create parameter error 0 in
   let error, init_modification  = AgentMap.create parameter error 0 in
   let error, init_cv_modified   = AgentMap.create parameter error 0 in
+  let init_contact_map = Int2Map_pair.empty in
+  let init_binding_rhs = Int2Map_pair.empty in
+  let init_binding_dual = Int2Map.empty in
   let init_bdu =
     {
       store_creation      = init_creation;
       store_creation_rule = init_creation_rule;
       store_side_effects  = init_half_break, (init_remove1, init_remove2);
-      store_modification_sites = init_modification;
-      store_covering_classes_modified_sites = init_cv_modified
+      store_modification_sites              = init_modification;
+      store_covering_classes_modified_sites = init_cv_modified;
+      store_contact_map  = init_contact_map;
+      store_binding_rhs  = init_binding_rhs;
+      store_binding_dual = init_binding_dual;
     }
   in
   (*------------------------------------------------------------------------------*)

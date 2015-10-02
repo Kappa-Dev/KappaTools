@@ -172,6 +172,93 @@ let print_covering_classes_modified_sites parameter error result =
     ) parameter result
 
 (************************************************************************************)
+(*contact map*)
+
+let print_contact_map_with_state parameter error result =
+  Int2Map.iter
+    (fun (x, y, s) (l1, l2) ->
+      if l1 <> []
+      then
+        begin 
+          let _ = fprintf parameter.Remanent_parameters_sig.log 
+            "agent_type:%i@site_type:%i:state:%i" x y s in
+          let _ = List.fold_left
+            (fun bool x ->
+              (if bool
+               then
+                  fprintf parameter.Remanent_parameters_sig.log ", ");
+              fprintf parameter.Remanent_parameters_sig.log "agent_type:%i" x;
+              true)
+            false l1
+          in
+          fprintf stdout "\n"
+        end
+      else ();
+      List.iter
+	(fun (z, t, s') ->
+	  Printf.fprintf parameter.Remanent_parameters_sig.log
+            "agent_type:%i@site_type:%i:state:%i--agent_type':%i@site_type':%i:state':%i\n"
+            x y s z t s'
+	) l2
+    ) result
+
+let print_contact_map parameter error result =
+  Int2Map_pair.iter
+    (fun (x, y) (l1, l2) ->
+      if l1 <> []
+      then
+        begin 
+          let _ = fprintf parameter.Remanent_parameters_sig.log 
+            "agent_type:%i@site_type:%i" x y in
+          let _ = List.fold_left
+            (fun bool x ->
+              (if bool
+               then
+                  fprintf parameter.Remanent_parameters_sig.log ", ");
+              fprintf parameter.Remanent_parameters_sig.log "agent_type:%i" x;
+              true)
+            false l1
+          in
+          fprintf stdout "\n"
+        end
+      else ();
+      List.iter
+	(fun (z,t) ->
+	  Printf.fprintf parameter.Remanent_parameters_sig.log
+            "agent_type:%i@site_type:%i--agent_type':%i@site_type':%i\n"
+            x y z t 
+	) l2
+    ) result
+    
+let print_contact_map_binding_only_on_rhs parameter error result =
+  Int2Map_pair.iter
+    (fun (x, y) (l1, l2) ->
+      if l1 <> []
+      then
+        begin 
+          let _ = fprintf parameter.Remanent_parameters_sig.log 
+            "agent_type:%i@site_type:%i" x y in
+          let _ = List.fold_left
+            (fun bool x ->
+              (if bool
+               then
+                  fprintf parameter.Remanent_parameters_sig.log ", ");
+              fprintf parameter.Remanent_parameters_sig.log "agent_type:%i" x;
+              true)
+            false l1
+          in
+          fprintf stdout "\n"
+        end
+      else ();
+      List.iter
+	(fun (z,t) ->
+	  Printf.fprintf parameter.Remanent_parameters_sig.log
+            "agent_type:%i@site_type:%i--agent_type':%i@site_type':%i\n"
+            x y z t 
+	) l2
+    ) result
+
+(************************************************************************************)
 (*MAIN PRINT*)
 
 let print_result parameter error result =
@@ -213,6 +300,42 @@ let print_result parameter error result =
         result.store_covering_classes_modified_sites
     in
     error
+  in
+  let _ =
+    fprintf stdout "------------------------------------------------------------\n";
+    fprintf stdout "* Contact map with binding both on the lhs and rhs (without state):\n";
+    fprintf stdout "------------------------------------------------------------\n";
+    let parameter_cm =
+      Remanent_parameters.update_prefix parameter "agent_type_" in
+    let error =
+      print_contact_map parameter_cm error
+        result.store_contact_map
+    in
+    error
+  in
+  let _ =
+    fprintf stdout "------------------------------------------------------------\n";
+    fprintf stdout "* Contact map with binding only on the rhs (without state):\n";
+    fprintf stdout "------------------------------------------------------------\n";
+    let parameter_cm =
+      Remanent_parameters.update_prefix parameter "agent_type_" in
+    let error =
+      print_contact_map_binding_only_on_rhs parameter_cm error
+        result.store_binding_rhs
+    in
+    error
+  in
+  let _ =
+    fprintf stdout "------------------------------------------------------------\n";
+    fprintf stdout "* Contact map ____ (state):\n";
+    fprintf stdout "------------------------------------------------------------\n";
+    let parameter_cm =
+      Remanent_parameters.update_prefix parameter "agent_type_" in
+    let error =
+      print_contact_map_with_state parameter_cm error
+        result.store_binding_dual
+    in
+    error    
   in
   let _ =
     fprintf stdout "\n------------------------------------------------------------\n";
