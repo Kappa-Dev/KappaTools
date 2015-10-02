@@ -50,8 +50,9 @@ type wl_int = IntWL.WSet.elt list * IntWL.WSet.elt list * IntWL.WSet.set
 type half_break_action =
   (IntWL.WSet.elt * Cckappa_sig.site_name * Cckappa_sig.state_index) list AgentMap.t
 
+(*do not consider the case where site has state free.*)
 type remove_action =
-  (Fifo.IntWL.WSet.elt * Cckappa_sig.Site_map_and_set.key * bool option) list AgentMap.t *
+  (*(Fifo.IntWL.WSet.elt * Cckappa_sig.Site_map_and_set.key * bool option) list AgentMap.t **)
     (Fifo.IntWL.WSet.elt * Cckappa_sig.Site_map_and_set.key) list AgentMap.t
 
 type bdu_analysic =

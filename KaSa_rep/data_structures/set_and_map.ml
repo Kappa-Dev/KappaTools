@@ -80,7 +80,7 @@ module type Set_and_Map = sig
   val fold2_map_sparse: Remanent_parameters_sig.parameters -> Exception.method_handler -> (key -> 'a  -> 'b  -> (Exception.method_handler * 'c)  -> (Exception.method_handler * 'c)) ->  'a map -> 'b map -> 'c -> Exception.method_handler * 'c
  
   val iter2_map_sparse: Remanent_parameters_sig.parameters -> Exception.method_handler -> (key -> 'a  -> 'b  -> Exception.method_handler   -> Exception.method_handler)->  'a map -> 'b map -> Exception.method_handler
- 																																																																				     
+	     
   val forall_map: (key -> 'a -> bool) -> 'a map -> bool 
   val min_elt_map: (key -> 'a -> bool) -> 'a map -> key option  
   val diff_map: Remanent_parameters_sig.parameters ->Exception.method_handler -> 'a map -> 'a map -> Exception.method_handler * 'a map * 'a map 

@@ -91,7 +91,7 @@ let print_triple l =
   in
   aux l
 
-let print_triple_option l =
+(*let print_triple_option l =
   let rec aux acc =
     match acc with
     | [] -> []
@@ -105,7 +105,7 @@ let print_triple_option l =
           rule_id site b;
         aux tl
   in
-  aux l
+  aux l*)
 
 let print_pair l =
   let rec aux acc =
@@ -120,7 +120,7 @@ let print_pair l =
 
 let print_side_effects parameter error result =
   let result_half_break, result_remove = result in
-  let result_remove_with_info, result_remove_without_info = result_remove in
+  (*let result_remove_with_info, result_remove_without_info = result_remove in*)
   let error =
     AgentMap.print error
       (fun error parameter l ->
@@ -130,7 +130,8 @@ let print_side_effects parameter error result =
         error
       ) parameter result_half_break
   in
-  let error =
+  (*do not consider where site has state free*)
+  (*let error =
     AgentMap.print error
       (fun error parameter l ->
         let _ =
@@ -138,7 +139,7 @@ let print_side_effects parameter error result =
         in
         error
       ) parameter result_remove_with_info
-  in
+  in*)
   let error =
     AgentMap.print error
       (fun error parameter l ->
@@ -146,7 +147,7 @@ let print_side_effects parameter error result =
           print_pair l
         in
         error
-      ) parameter result_remove_without_info
+      ) parameter result_remove
   in
   error
 
@@ -202,34 +203,6 @@ let print_contact_map parameter error result =
 	) l2
     ) result
 
-(*let print_contact_map parameter error result =
-  Int2Map_pair.iter
-    (fun (x, y) (l1, l2) ->
-      if l1 <> []
-      then
-        begin 
-          let _ = fprintf parameter.Remanent_parameters_sig.log 
-            "agent_type:%i@site_type:%i" x y in
-          let _ = List.fold_left
-            (fun bool x ->
-              (if bool
-               then
-                  fprintf parameter.Remanent_parameters_sig.log ", ");
-              fprintf parameter.Remanent_parameters_sig.log "agent_type:%i" x;
-              true)
-            false l1
-          in
-          fprintf stdout "\n"
-        end
-      else ();
-      List.iter
-	(fun (z,t) ->
-	  Printf.fprintf parameter.Remanent_parameters_sig.log
-            "agent_type:%i@site_type:%i--agent_type':%i@site_type':%i\n"
-            x y z t 
-	) l2
-    ) result*)
-    
 let print_contact_map_binding_only_on_rhs parameter error result =
   Int2Map_pair.iter
     (fun (x, y) (l1, l2) ->
@@ -303,7 +276,7 @@ let print_result parameter error result =
   in
   let _ =
     fprintf stdout "------------------------------------------------------------\n";
-    fprintf stdout "* Contact map with binding both on the lhs and rhs (with state):\n";
+    fprintf stdout "* Contact map with binding both directions (with state):\n";
     fprintf stdout "------------------------------------------------------------\n";
     let parameter_cm =
       Remanent_parameters.update_prefix parameter "agent_type_" in
@@ -326,7 +299,7 @@ let print_result parameter error result =
   in
   let _ =
     fprintf stdout "------------------------------------------------------------\n";
-    fprintf stdout "* Contact map matching full binding (lhs and rhs) and binding on the rhs (with state):\n";
+    fprintf stdout "* Contact map with binding in the initial state and binding on the rhs (with state):\n";
     fprintf stdout "------------------------------------------------------------\n";
     let parameter_cm =
       Remanent_parameters.update_prefix parameter "agent_type_" in

@@ -15,6 +15,7 @@
 open Cckappa_sig
 open Int_storage
 open Bdu_analysis_type
+open Bdu_contact_map
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "BDU side effects") message exn (fun () -> default)  
@@ -87,10 +88,11 @@ let half_break_action parameter error handler rule_id half_break store_result =
 
 let site_free_of_port port = port.site_free
 
-let remove_action parameter error rule_id remove store_result =
+(*let remove_action parameter error rule_id remove store_result =
   List.fold_left (fun (error, store_result) (agent_index, agent, list_undoc) ->
     let store_remove_with_info, store_remove_without_info = store_result in
     let agent_type = agent.agent_name in
+    (*FIXME: if it is a site_free then do not consider this case.*)
     (*-------------------------------------------------------------------------*)
     (*remove with document site: r1 is the rule with this property*)
     let triple_list =
@@ -144,10 +146,70 @@ let remove_action parameter error rule_id remove store_result =
         store_remove_without_info
     in
     error, (store_remove_with_info, store_remove_without_info)
+  ) (error, store_result) remove*)
+
+let remove_action parameter error rule_id remove store_result =
+  List.fold_left (fun (error, store_result) (agent_index, agent, list_undoc) ->
+    (*let store_remove_with_info, store_remove_without_info = store_result in*)
+    let agent_type = agent.agent_name in
+    (*FIXME: if it is a site_free then do not consider this case.*)
+    (*-------------------------------------------------------------------------*)
+    (*remove with document site: r1 is the rule with this property*)
+    (*let triple_list =
+      Site_map_and_set.fold_map
+        (fun site port current_list ->
+          let site_free = site_free_of_port port in
+          let list = (rule_id, site, site_free) :: current_list in
+          list
+        ) agent.agent_interface []
+    in
+    (*old*)
+    let error, old_list =
+      match AgentMap.unsafe_get parameter error agent_type store_remove_with_info with
+      | error, None -> error, []
+      | error, Some l -> error, l
+    in
+    (*new*)
+    let new_list = List.concat [triple_list; old_list] in*)
+    (*-------------------------------------------------------------------------*)
+    (*remove with no information: r0 is the rule with this property*)
+    let pair_list =
+      List.fold_left (fun current_list site ->
+        let list = (rule_id, site) :: current_list in
+        list
+      ) [] list_undoc
+    in
+    (*old*)
+    let error, old_pair_list =
+      match AgentMap.unsafe_get parameter error agent_type store_result with
+      | error, None -> error, []
+      | error, Some l -> error, l
+    in
+    (*new*)
+    let new_pair_list = List.concat [pair_list; old_pair_list] in
+    (*-------------------------------------------------------------------------*)
+    (*store*)
+    (*let error, store_remove_with_info =
+      AgentMap.set
+        parameter
+        error
+        agent_type
+        (List.rev new_list)
+        store_remove_with_info
+    in*)
+    let error, store_result =
+      AgentMap.set
+        parameter
+        error
+        agent_type
+        (List.rev new_pair_list)
+        store_result
+    in
+    error, store_result
   ) (error, store_result) remove
 
 (************************************************************************************)
-(*compute side effects*)
+(*compute side effects: this is an update before discover bond function *)
 
 let collect_side_effects parameter error handler rule_id half_break remove store_result =
   let store_half_break_action, store_remove_action = store_result in
@@ -171,3 +233,52 @@ let collect_side_effects parameter error handler rule_id half_break remove store
       store_remove_action
   in
   error, (store_half_break_action, store_remove_action)
+
+(************************************************************************************)
+(*a bond is discovered for the first time:
+  For example:
+  'r0' A() ->
+  'r1' A(x) ->
+  'r2' A(x!B.x) -> A(x)
+  'r3' A(x), B(x) -> A(x!1), B(x!1)
+  'r4' A(x,y), C(y) -> A(x,y!1), C(y!1)
+  
+  'r3' has a bond on the rhs, for any (rule_id, state) belong to side
+  effects of A(x); state is compatible with B(x!1), add rule_id into update
+  function.
+*)
+
+(*let update_bond_side_effects parameter error handler 
+    store_contact_map store_binding_rhs store_side_effects store_result =
+  (*check if there is any binding on the rhs*)
+  if Int2Map_pair.is_empty store_binding_rhs
+  then
+    error, store_result
+  else
+    (*call function has binding on the rhs*)
+    let binding_rhs =
+      Int2Map_pair.fold
+        (fun (x,y) (l1,l2) _ ->
+        (*(x,y) is agent_type, site_name of the first binding agent.
+          l1 store a list of the first binding agent; l2 store a list of the
+          second binding agent.
+          For instance: A(x!1), B(x!1)
+          l1: [A(x!1)]
+          l2: [B(x!1)]*)
+          
+
+          
+        ) store_binding_rhs _
+    in
+    (*call function compute contact map*)
+    let contact_map =
+      Int2Map.fold
+        (fun key triple_list _ ->
+          
+        ) store_contact_map _
+    in
+    (*call function with side effects*)
+    let error, store_side_effects =
+
+
+    in*)

@@ -78,13 +78,13 @@ let compute_contact_map parameter error handler =
   in
   error, store_result
 
-
 (*****************************************************************************************)
 (* - Only take the binding information of the rhs; Ex: A(x), B(x) -> A(x!1), B(x!1)
    and not the binding in the lhs; Ex: A(x!1), B(x!1) -> A(x), B(x)
    - Getting information of binding state, then search if these binding belong to dual.
 *)
 
+(*TEST this function in the case of %init *)
 let collect_binding_rhs parameter error rule store_result =
   let add_link (a, b) (c, d) store_result =
     let l, old =
@@ -111,6 +111,7 @@ let collect_binding_rhs parameter error rule store_result =
 (*****************************************************************************************)
 (*compute the binding information with precise information with state information*)
 
+(*FIXME: check the state*)
 let precise_binding_dual parameter error handler rule (*result_binding*) store_result =
   let result_binding = Int2Map.empty in (*FIXME*)
   (*add_link*)
