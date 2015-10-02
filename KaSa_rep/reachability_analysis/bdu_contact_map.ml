@@ -25,7 +25,7 @@ let trace = false
 (*contact map without state information: this computation consider both
   binding in the lhs and rhs.*)
 
-let compute_contact_map parameter error handler =
+(*let compute_contact_map parameter error handler =
   let store_result = Int2Map_pair.empty in
   (*add_link*)
   let add_link (a, b) (c, d) store_result =
@@ -49,7 +49,35 @@ let compute_contact_map parameter error handler =
   (*Return the result of this contact map*)
   let store_result = Int2Map_pair.map (fun (l, x) -> List.rev l, x) store_result
   in
+  error, store_result*)
+
+let compute_contact_map parameter error handler =
+  let store_result = Int2Map.empty in
+  (*add_link*)
+  let add_link (a, b, s) (c, d, s') store_result =
+    let l, old =
+      try Int2Map.find (a, b, s) store_result
+      with Not_found -> [],[]
+    in
+    Int2Map.add (a, b, s) (l, ((c, d, s') :: old)) store_result
+  in  
+  (*return the site name of site: this of type string*)
+  (*folding this solution with the information in dual*)
+  let error, store_result =
+    Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
+      parameter error
+      (fun parameter error (agent, (site, state)) (agent', site', state') store_result ->
+	let store_result =
+          add_link (agent, site, state) (agent', site', state') store_result
+	in
+	error, store_result
+      ) handler.dual store_result
+  in
+  (*Return the result of this contact map*)
+  let store_result = Int2Map.map (fun (l, x) -> List.rev l, x) store_result
+  in
   error, store_result
+
 
 (*****************************************************************************************)
 (* - Only take the binding information of the rhs; Ex: A(x), B(x) -> A(x!1), B(x!1)
@@ -99,14 +127,16 @@ let precise_binding_dual parameter error handler rule (*result_binding*) store_r
     Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
       parameter error
       (fun parameter error (agent, (site, state)) (agent', site', state') result_binding ->
-        List.fold_left (fun (error, sol2) (add1, add2) ->
-          let agent_type1 = add1.agent_type in
-          let site1       = add1.site in
+        (*binding on the rhs*)
+        List.fold_left (fun (error, sol2) (site_address1, site_address2) ->
+          let agent_type1 = site_address1.agent_type in
+          let site1       = site_address1.site in
           (*second*)
-          let agent_type2 = add2.agent_type in
-          let site2       = add2.site in
-          if agent_type1 = agent && site1 = site &&
-            agent_type2 = agent' && site2 = site'
+          let agent_type2 = site_address2.agent_type in
+          let site2       = site_address2.site in
+          (*matching binding on the rhs and relation in a contact map*)
+          if agent_type1 = agent  && site1 = site &&
+             agent_type2 = agent' && site2 = site'
           then
             (*if true return the solution*)
             error, sol2

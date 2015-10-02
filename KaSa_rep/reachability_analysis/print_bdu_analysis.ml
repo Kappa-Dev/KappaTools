@@ -174,7 +174,7 @@ let print_covering_classes_modified_sites parameter error result =
 (************************************************************************************)
 (*contact map*)
 
-let print_contact_map_with_state parameter error result =
+let print_contact_map parameter error result =
   Int2Map.iter
     (fun (x, y, s) (l1, l2) ->
       if l1 <> []
@@ -202,7 +202,7 @@ let print_contact_map_with_state parameter error result =
 	) l2
     ) result
 
-let print_contact_map parameter error result =
+(*let print_contact_map parameter error result =
   Int2Map_pair.iter
     (fun (x, y) (l1, l2) ->
       if l1 <> []
@@ -228,7 +228,7 @@ let print_contact_map parameter error result =
             "agent_type:%i@site_type:%i--agent_type':%i@site_type':%i\n"
             x y z t 
 	) l2
-    ) result
+    ) result*)
     
 let print_contact_map_binding_only_on_rhs parameter error result =
   Int2Map_pair.iter
@@ -303,19 +303,18 @@ let print_result parameter error result =
   in
   let _ =
     fprintf stdout "------------------------------------------------------------\n";
-    fprintf stdout "* Contact map with binding both on the lhs and rhs (without state):\n";
+    fprintf stdout "* Contact map with binding both on the lhs and rhs (with state):\n";
     fprintf stdout "------------------------------------------------------------\n";
     let parameter_cm =
       Remanent_parameters.update_prefix parameter "agent_type_" in
     let error =
-      print_contact_map parameter_cm error
-        result.store_contact_map
+      print_contact_map parameter_cm error result.store_contact_map
     in
     error
   in
   let _ =
     fprintf stdout "------------------------------------------------------------\n";
-    fprintf stdout "* Contact map with binding only on the rhs (without state):\n";
+    fprintf stdout "* Contact map with binding only on the rhs (there is no state information):\n";
     fprintf stdout "------------------------------------------------------------\n";
     let parameter_cm =
       Remanent_parameters.update_prefix parameter "agent_type_" in
@@ -327,13 +326,12 @@ let print_result parameter error result =
   in
   let _ =
     fprintf stdout "------------------------------------------------------------\n";
-    fprintf stdout "* Contact map ____ (state):\n";
+    fprintf stdout "* Contact map matching full binding (lhs and rhs) and binding on the rhs (with state):\n";
     fprintf stdout "------------------------------------------------------------\n";
     let parameter_cm =
       Remanent_parameters.update_prefix parameter "agent_type_" in
     let error =
-      print_contact_map_with_state parameter_cm error
-        result.store_binding_dual
+      print_contact_map parameter_cm error result.store_binding_dual
     in
     error    
   in

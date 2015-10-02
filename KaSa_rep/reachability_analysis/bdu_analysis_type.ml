@@ -66,15 +66,13 @@ type bdu_analysic =
       (*contact map*)
       store_contact_map      :
         ((Cckappa_sig.agent_name list) *
-            (Cckappa_sig.agent_name * Cckappa_sig.site_name) list)
-        Int2Map_pair.t;
+            (Cckappa_sig.agent_name * Cckappa_sig.site_name *
+               Cckappa_sig.state_index) list) Int2Map.t;
       store_binding_rhs      :
         ((Cckappa_sig.agent_name list) *
-            (Cckappa_sig.agent_name * Cckappa_sig.site_name) list)
-        Int2Map_pair.t;
+            (Cckappa_sig.agent_name * Cckappa_sig.site_name) list) Int2Map_pair.t;
       store_binding_dual     :
         (Cckappa_sig.agent_name list *
            (Cckappa_sig.agent_name * Cckappa_sig.site_name *
-              Cckappa_sig.state_index)
-          list) Int2Map.t;
+              Cckappa_sig.state_index) list) Int2Map.t;
     }

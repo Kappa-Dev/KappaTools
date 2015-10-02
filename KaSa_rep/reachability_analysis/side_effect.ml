@@ -46,11 +46,6 @@ type side_effect =
       store_half_break : set AgentMap.t;
       store_unbinding  : know_unbinding;
       store_remove_map : deletion;
-      store_binding    :  
-        (int list * (Cckappa_sig.agent_name * Cckappa_sig.site_name) list) Compute_contact_map.Int2Map_pair.t;
-      store_binding_dual    :  
-        (int list * (Cckappa_sig.agent_name * Cckappa_sig.site_name * Cckappa_sig.state_index) list)
-        Compute_contact_map.Int2Map.t
     }
 
 (************************************************************************************)
@@ -294,16 +289,6 @@ let scan_rule parameter error handler rule store_side_effect =
       store_side_effect.store_remove_map
       rule.actions.remove
   in
-  (*TEST: binding*)
-  let store_binding = 
-    Compute_contact_map.collect_binding_rhs parameter error rule
-      store_side_effect.store_binding
-  in
-  (*TEST: Binding and dual*)
-  let store_binding_dual = 
-    Compute_contact_map.precise_binding_dual parameter error handler rule
-      store_side_effect.store_binding_dual
-  in
   (*------------------------------------------------------------------------------*)
   (*result*)
   error,
@@ -311,8 +296,6 @@ let scan_rule parameter error handler rule store_side_effect =
     store_half_break = store_half_break;
     store_unbinding  = store_unbinding;
     store_remove_map = store_remove_map;
-    store_binding    = store_binding;
-    store_binding_dual = store_binding_dual
   }
 
 (************************************************************************************)
@@ -326,8 +309,6 @@ let scan_rule_set parameter error handler rules =
   let error, init_half_break = create_map parameter error n_agents in
   let error, init_remove_doc = create_map parameter error n_agents in
   let error, init_remove_undoc = create_map parameter error n_agents in
-  let init_binding = Compute_contact_map.Int2Map_pair.empty in
-  let init_binding_dual = Compute_contact_map.Int2Map.empty in
   let init_remove_map   = (init_remove_doc, init_remove_undoc) in
  (*------------------------------------------------------------------------------*)
   (*init state of covering class*)
@@ -336,8 +317,6 @@ let scan_rule_set parameter error handler rules =
       store_half_break = init_half_break;
       store_unbinding  = [];
       store_remove_map = init_remove_map;
-      store_binding = init_binding;
-      store_binding_dual = init_binding_dual
     }
   in
   (*------------------------------------------------------------------------------*)
@@ -446,15 +425,6 @@ let print_remove parameter error store_remove =
 (*------------------------------------------------------------------------------*)
 
 let print_result parameter error result =
-  (*TEST: binding*)
-  let _ =
-    fprintf stdout "Binding:\n";
-    Compute_contact_map.print_collect_binding_rhs parameter error result.store_binding
-  in
-  let _ =
-    fprintf stdout "Binding and dual:\n";
-    Compute_contact_map.print_precise parameter error result.store_binding_dual
-  in
   let _ =
     print_halfbreak parameter error result.store_half_break
   in
@@ -473,8 +443,5 @@ let side_effect parameter error handler cc_compil =
   let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
   let error, result = 
     scan_rule_set parameter error handler cc_compil.rules in
-  (*TEST: contact map*)
-  let contact_map = Compute_contact_map.compute_contact_map parameter error handler in
-  let _ = Compute_contact_map.print_contact_map parameter error contact_map in
   let _ = print_result parameter error result in
   error, result
