@@ -26,7 +26,7 @@ compilers can be downloaded on [INRIA's website](http://caml.inria.fr/). The
 Windows bundle contains findlib. Findlib sources are available on
 [camlcity.org](http://projects.camlcity.org/projects/findlib.html).
 
-To create kaSim binaries, simply type
+To create KaSim binaries, simply type
 
 `make bin/KaSim`
 
