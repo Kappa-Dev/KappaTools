@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   * 
   * Creation: 2010, the 19th of December
-  * Last modification: Time-stamp: <2015-04-17 20:52:50 feret>
+  * Last modification: Time-stamp: <2015-10-02 13:42:11 feret>
   * * 
   * Configuration parameters which are passed through functions computation
 
@@ -212,7 +212,12 @@ let get_short_version_1                              marshalisable =
 let get_full_version_1                               marshalisable =
   Printf.sprintf "%s (with%s Tk interface)" marshalisable.Remanent_parameters_sig.version (if marshalisable.Remanent_parameters_sig.tk_interface then "" else "out")
 let get_launched_where_1                             marshalisable =
-  marshalisable.Remanent_parameters_sig.hostname
+  begin
+    try 
+      marshalisable.Remanent_parameters_sig.hostname
+    with 
+      Assert_failure _ -> "javascript"
+  end
 let get_command_line_1                               marshalisable =
   marshalisable.Remanent_parameters_sig.command_line
     
