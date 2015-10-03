@@ -364,7 +364,7 @@ class pager bparent fparent =
 let build_spec (a:Superarg.t) bparent fparent =
   let opts = new pager bparent fparent in
   Superarg.StringMap.iter_map 
-    (fun  _ l ->
+    (fun  _ (l,cat_lvl) ->
       List.iter
 	(fun (key,spec,msg,cat,lvl) -> 
 	  List.iter (fun cat -> 
