@@ -74,10 +74,10 @@ let do_stochastic_flow_of_information = ref false
 (*covering classes, side effects, etc.*)
 let do_site_dependencies = ref false
 (*fixpoint iteration in bdu structure*)
-let do_iteration_dependencies = ref false
+let do_reachability_analysis = ref true
 
 (** accuracy *)
-let static_analysis_accuracy_level = ref Remanent_parameters_sig.Medium
-let influence_map_accuracy_level = ref Remanent_parameters_sig.Medium
-let contact_map_accuracy_level = ref Remanent_parameters_sig.Low
+let view_accuracy_level = ref "High"
+let influence_map_accuracy_level = ref "Medium"
+let contact_map_accuracy_level = ref "Low"
 			    

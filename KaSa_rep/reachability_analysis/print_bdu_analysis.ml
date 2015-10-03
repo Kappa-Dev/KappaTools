@@ -36,12 +36,12 @@ let print_bdu_array_creation parameter error result =
       error
     ) parameter result
 
-let print_list_rule l =
+let print_list_rule parameter l =
   let rec aux acc =
     match acc with
     | [] -> []
     | h :: tl -> 
-      fprintf stdout "rule_id: %i \n" h;
+      fprintf (Remanent_parameters.get_log parameter) "rule_id: %i \n" h;
       aux tl;
   in aux l
 
@@ -66,11 +66,11 @@ let print_creation_rule parameter error result =
   AgentMap.print error
     (fun error parameter (l, wl, rule_array) ->
       let _ =
-        fprintf stdout "- List of rule_id:\n";
-        let _ = print_list_rule l in
-        fprintf stdout "- List of rule_id store inside a working list:\n";
-        IntWL.print_wl wl;
-        fprintf stdout
+        fprintf (Remanent_parameters.get_log parameter) "- List of rule_id:\n";
+        let _ = print_list_rule parameter l in
+        fprintf (Remanent_parameters.get_log parameter) "- List of rule_id store inside a working list:\n";
+        IntWL.print_wl parameter wl;
+        fprintf (Remanent_parameters.get_log parameter)
           "- List of bdu_creation build from rule_id inside the working list:\n";
         print_rule_array parameter error rule_array
       in
@@ -80,12 +80,12 @@ let print_creation_rule parameter error result =
 (************************************************************************************)
 (*side effects*)
 
-let print_triple l =
+let print_triple parameter l =
   let rec aux acc =
     match acc with
     | [] -> []
     | (rule_id, site, state_min) :: tl ->
-      fprintf stdout "rule_id:%i:site_type:%i:state:%i\n"
+      fprintf (Remanent_parameters.get_log parameter) "rule_id:%i:site_type:%i:state:%i\n"
         rule_id site state_min;
       aux tl
   in
@@ -107,12 +107,12 @@ let print_triple l =
   in
   aux l*)
 
-let print_pair l =
+let print_pair parameter l =
   let rec aux acc =
     match acc with
     | [] -> []
     | (rule_id, site) :: tl ->
-      fprintf stdout "rule_id:%i:site_type:%i:state:no_information\n"
+      fprintf (Remanent_parameters.get_log parameter) "rule_id:%i:site_type:%i:state:no_information\n"
         rule_id site;
       aux tl
   in
@@ -125,7 +125,7 @@ let print_side_effects parameter error result =
     AgentMap.print error
       (fun error parameter l ->
         let _ =
-          print_triple l
+          print_triple parameter l
         in
         error
       ) parameter result_half_break
@@ -144,7 +144,7 @@ let print_side_effects parameter error result =
     AgentMap.print error
       (fun error parameter l ->
         let _ =
-          print_pair l
+          print_pair parameter l
         in
         error
       ) parameter result_remove
@@ -158,7 +158,7 @@ let print_modification_sites parameter error result =
   AgentMap.print error
     (fun error parameter l ->
       let _ =
-        print_triple l
+        print_triple parameter l
       in
       error      
     ) parameter result
@@ -167,7 +167,7 @@ let print_covering_classes_modified_sites parameter error result =
   AgentMap.print error
     (fun error parameter l ->
       let _ =
-        print_triple l
+        print_triple parameter l
       in
       error
     ) parameter result
@@ -236,14 +236,14 @@ let print_contact_map_binding_only_on_rhs parameter error result =
 
 let print_result parameter error result =
   let _ =
-    fprintf stdout "============================================================\n";
-    fprintf stdout "* BDU Analysis:\n";
-    fprintf stdout "============================================================\n";
+    fprintf (Remanent_parameters.get_log parameter) "============================================================\n";
+    fprintf (Remanent_parameters.get_log parameter) "* BDU Analysis:\n";
+    fprintf (Remanent_parameters.get_log parameter) "============================================================\n";
   in
   let _ =
-    fprintf stdout "------------------------------------------------------------\n";
-    fprintf stdout "* Side effects action:\n";
-    fprintf stdout "------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter) "------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter) "* Side effects action:\n";
+    fprintf (Remanent_parameters.get_log parameter) "------------------------------------------------------------\n";
     let parameter_side =
       Remanent_parameters.update_prefix parameter "agent_type_" in
     let error =
@@ -252,9 +252,9 @@ let print_result parameter error result =
     error
   in    
   let _ =
-    fprintf stdout "------------------------------------------------------------\n";
-    fprintf stdout "* Modification sites:\n";
-    fprintf stdout "------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter) "------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter) "* Modification sites:\n";
+    fprintf (Remanent_parameters.get_log parameter) "------------------------------------------------------------\n";
     let parameter_modif =
       Remanent_parameters.update_prefix parameter "agent_type_" in
     let error =
@@ -263,9 +263,9 @@ let print_result parameter error result =
     error
   in
   let _ =
-    fprintf stdout "------------------------------------------------------------\n";
-    fprintf stdout "* Covering classes and Modification sites:\n";
-    fprintf stdout "------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter) "------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter) "* Covering classes and Modification sites:\n";
+    fprintf (Remanent_parameters.get_log parameter) "------------------------------------------------------------\n";
     let parameter_cv_m =
       Remanent_parameters.update_prefix parameter "agent_type_" in
     let error =
@@ -275,9 +275,9 @@ let print_result parameter error result =
     error
   in
   let _ =
-    fprintf stdout "------------------------------------------------------------\n";
-    fprintf stdout "* Contact map with binding both directions (with state):\n";
-    fprintf stdout "------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter) "------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter) "* Contact map with binding both directions (with state):\n";
+    fprintf (Remanent_parameters.get_log parameter) "------------------------------------------------------------\n";
     let parameter_cm =
       Remanent_parameters.update_prefix parameter "agent_type_" in
     let error =
@@ -286,9 +286,9 @@ let print_result parameter error result =
     error
   in
   let _ =
-    fprintf stdout "------------------------------------------------------------\n";
-    fprintf stdout "* Contact map with binding only on the rhs (there is no state information):\n";
-    fprintf stdout "------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter) "------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter) "* Contact map with binding only on the rhs (there is no state information):\n";
+    fprintf (Remanent_parameters.get_log parameter) "------------------------------------------------------------\n";
     let parameter_cm =
       Remanent_parameters.update_prefix parameter "agent_type_" in
     let error =
@@ -298,9 +298,9 @@ let print_result parameter error result =
     error
   in
   let _ =
-    fprintf stdout "------------------------------------------------------------\n";
-    fprintf stdout "* Contact map with binding in the initial state and binding on the rhs (with state):\n";
-    fprintf stdout "------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter) "------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter) "* Contact map with binding in the initial state and binding on the rhs (with state):\n";
+    fprintf (Remanent_parameters.get_log parameter) "------------------------------------------------------------\n";
     let parameter_cm =
       Remanent_parameters.update_prefix parameter "agent_type_" in
     let error =
@@ -309,9 +309,9 @@ let print_result parameter error result =
     error    
   in
   let _ =
-    fprintf stdout "\n------------------------------------------------------------\n";
-    fprintf stdout "* List of rules has creation action:\n";
-    fprintf stdout "------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter) "\n------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter) "* List of rules has creation action:\n";
+    fprintf (Remanent_parameters.get_log parameter) "------------------------------------------------------------\n";
     let parameter_a_rule =
       Remanent_parameters.update_prefix parameter "agent_type/rule_id_" in
     let error =
@@ -321,9 +321,9 @@ let print_result parameter error result =
   in
   let _ =
     let parameter_agent = Remanent_parameters.update_prefix parameter "agent_type_" in
-    fprintf stdout "\n------------------------------------------------------------\n";
-    fprintf stdout "* BDU creation in general:\n";
-    fprintf stdout "------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter) "\n------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter) "* BDU creation in general:\n";
+    fprintf (Remanent_parameters.get_log parameter) "------------------------------------------------------------\n";
     print_bdu_array_creation parameter_agent error result.store_creation
   in
   error

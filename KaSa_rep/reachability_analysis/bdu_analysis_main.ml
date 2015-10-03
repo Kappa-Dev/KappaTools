@@ -192,5 +192,9 @@ let bdu_main parameter error handler covering_classes cc_compil =
   let error, result =
     scan_rule_set parameter error handler covering_classes cc_compil cc_compil.rules 
   in
-  let _ = print_result parameter error result in
+  let error =
+    if  (Remanent_parameters.get_trace parameter) || trace
+    then print_result parameter error result
+    else error
+  in
   error, result

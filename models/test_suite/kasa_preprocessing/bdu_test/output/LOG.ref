@@ -37,6 +37,9 @@ Compilation:rules:0:reverse:
 Compilation:rules:0:reverse:agent_id_0:
 Compilation:rules:0:reverse:agent_id_0:agent_type_0:site_type_0->state:[state_min:0;state_max:0]
 Compilation:rules:0:reverse:agent_id_0:agent_type_0:site_type_1->state:[state_min:0;state_max:0]
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
 Quarks:Quarkify
 Quarks:Rule 0
 Quarks:TEST
@@ -81,7 +84,59 @@ Quarks:site_modif+:agent_type:0,site_type:0,state:1,rule:0->[0]
 Quarks:site_modif+:agent_type:0,site_type:1,state:1,rule:0->[0]
 Quarks:site_modif-:agent_type:0,site_type:0,state:0,rule:0->[0]
 Quarks:site_modif-:agent_type:0,site_type:1,state:0,rule:0->[0]
+Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Influence_map:Wake_up_map:rule(0):'r0' A(x~u,y~u)->A(x~p,y~p) -> var(2):'App' A(x~p?,y~p?)[0->0]
 Influence_map:Inhibition_map:rule(0):'r0' A(x~u,y~u)->A(x~p,y~p) -> var(0):'Auu' A(x~u?,y~u?)[0->0]
+Reachability analysis...
+
+agent_type:0:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+site_type:0
+site_type:1
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
+site_type:2
+Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
+site_type:1
+site_type:2
+Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
+site_type:1
+site_type:2
+============================================================
+* BDU Analysis:
+============================================================
+------------------------------------------------------------
+* Side effects action:
+------------------------------------------------------------
+------------------------------------------------------------
+* Modification sites:
+------------------------------------------------------------
+agent_type_0:
+rule_id:0:site_type:0:state:1
+rule_id:0:site_type:1:state:1
+------------------------------------------------------------
+* Covering classes and Modification sites:
+------------------------------------------------------------
+agent_type_0:
+rule_id:0:site_type:0:state:1
+rule_id:0:site_type:1:state:1
+------------------------------------------------------------
+* Contact map with binding both directions (with state):
+------------------------------------------------------------
+------------------------------------------------------------
+* Contact map with binding only on the rhs (there is no state information):
+------------------------------------------------------------
+------------------------------------------------------------
+* Contact map with binding in the initial state and binding on the rhs (with state):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* List of rules has creation action:
+------------------------------------------------------------
+
+------------------------------------------------------------
+* BDU creation in general:
+------------------------------------------------------------
 execution finished without any exception

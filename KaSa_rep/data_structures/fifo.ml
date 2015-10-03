@@ -29,7 +29,7 @@ sig
   val push : Remanent_parameters_sig.parameters -> Exception.method_handler -> elt -> t -> Exception.method_handler * t
   val pop : Remanent_parameters_sig.parameters -> Exception.method_handler -> t -> Exception.method_handler * (elt option * t)
   val fold_left : ('a -> elt -> 'a) -> 'a -> t -> 'a
-  val print_wl : t -> unit
+  val print_wl : Remanent_parameters_sig.parameters -> t -> unit
 end
     
 module WlMake (Ord: OrderedType) =
@@ -77,9 +77,9 @@ module WlMake (Ord: OrderedType) =
         let in_list, out_list, _ = x in
         List.fold_left f (List.fold_left f acc out_list) (List.rev in_list)
 
-      let print_wl wl = 
+      let print_wl parameters wl = 
         let _ = fold_left 
-          (fun  unit a -> Printf.fprintf stdout "%i " a)
+          (fun  unit a -> Printf.fprintf (Remanent_parameters.get_log parameters) "%i " a)
           () wl
         in 
         print_newline () 

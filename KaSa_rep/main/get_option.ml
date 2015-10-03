@@ -25,8 +25,7 @@ let options =
 	  "--compute-influence-map";
 	  "--compute-ODE-flow-of-information";
 	  "--compute-stochastic-flow-of-information";
-	  "--compute-site-dependencies";
-	  "--compute-iteration-dependencies";
+	  "--compute-reachability-analysis";
 	],[]),"launch everything",["0_Actions"],Normal;
       "--reset-all",
       Multi(
@@ -35,68 +34,94 @@ let options =
 	  "--no-compute-influence-map";
 	  "--no-compute-ODE-flow-of-information";
 	  "--no-compute-stochastic-flow-of-information";
-	  "--no-compute-site-dependencies";
-	  "--no-compute-iteration-dependencies";
+	  "--no-compute-reachability-analysis";
 	],[]),"reset everything",["0_Actions"],Normal;
 
       "--compute-contact-map",
       Bool Config.do_contact_map, 
       "compute the contact map",
-      ["0_Actions";"2_Reachability_analysis"],
+      ["0_Actions";"3_Contact_map"],
       Normal;
       
       "--compute-influence-map",
       Bool Config.do_influence_map,
       "compute the influence map",
-      ["0_Actions";"3_Influence_map"],
+      ["0_Actions";"4_Influence_map"],
       Normal; 
 
+       "--influence-map-accuracy-level",
+        (Choice 
+           (["Low","Ignore relations among site";
+             "Medium","Ignore reachable states";
+             "High",""],
+            Config.influence_map_accuracy_level)),
+        "Tune the accuracy level of the influence map",
+	["4_Influence_map"],
+	Normal;
+       
       "--compute-ODE-flow-of-information", 
       Bool Config.do_ODE_flow_of_information,
       "Compute an approximation of the flow of information in the ODE semantics",
-      ["0_Actions";"3b_Flow_of_information"],
-      Hidden;
+      ["0_Actions";"5_Flow_of_information"],
+      Expert;
       
       "--compute-stochastic-flow-of-information",
       Bool Config.do_stochastic_flow_of_information,
       "Compute an approximation of the flow of information in the stochastic semantics",
-      ["0_Actions";"3b_Flow_of_information"],
-      Hidden;
+      ["0_Actions";"5_Flow_of_information"],
+      Expert;
 
-      "--compute-site-dependencies",
-      Bool Config.do_site_dependencies,
-      "Compute potential relations between the sites of agents",
-      ["0_Actions";"3b_Flow_of_information"],
-      Hidden;
-
-      "--compute-iteration-dependencies",
-      Bool Config.do_iteration_dependencies,
+      "--compute-reachability-analysis",
+      Bool Config.do_reachability_analysis,
       "Compute iteration between the sites of agents",
-      ["0_Actions";"3b_Flow_of_information"],
-      Hidden;
+      ["0_Actions";"2_Reachability_analysis"],
+      Normal;
+
+      "--view-analysis",
+      (Choice 
+         ([(*"None","No view analysis";*)
+	   (*"Low","Non relational site analysis";*)
+	   "High","Relational view analysis"],
+          Config.view_accuracy_level)),
+        "Tune the accuracy level of the view analysis",
+	["2_Reachability_analysis"],
+	Normal;
+      
             
       "--output-directory",
       String Config.output_directory,
       "put output files in this directory",
-      ["1_Output";"2_Reachability_analysis";"3_Influence_map"], 
+      ["1_Output";"2_Reachability_analysis";"3_Contact_map";"4_Influence_map"], 
       Normal;
+
+      "--contact-map-accuracy-level",
+        (Choice 
+           (["Low","Collect info from rhs of rules and initial state";
+             "High","Only consider reachable rules";
+             ],
+            Config.contact_map_accuracy_level)),
+        "Tune the accuracy level of the influence map",
+	["3_Contact_map"],
+	Normal;
+       
+      
       
       "--output-contact-map",
       String Config.contact_map_file,
       "file name for the contact map output",
-      ["1_Output";"2_Reachability_analysis"],
+      ["1_Output";"3_Contact_map"],
       Normal;
       
       "--output-influence-map", 
       String Config.influence_map_file,
       "file name for the influence map",
-      ["1_Output";"3_Influence_map"],
+      ["1_Output";"4_Influence_map"],
       Normal;
       
       "--debugging-mode",
       Bool Config.trace,
       "dump debugging information",
-      ["4_debugging_info"],
+      ["6_debugging_info"],
       Expert;
     ]
 

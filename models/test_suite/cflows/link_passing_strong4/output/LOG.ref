@@ -6,6 +6,7 @@ done
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
++ Compute the contact map
 	 -variable declarations
 	 -rules
 	 -observables

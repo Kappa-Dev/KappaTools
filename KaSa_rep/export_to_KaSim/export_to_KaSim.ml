@@ -163,6 +163,7 @@ module Export_to_KaSim =
       let handler = state.handler in
       let parameters = state.parameters in
       let error = state.errors in
+      let _ = Format.printf "+ Compute the contact map\n" in 
       let add_link (a,b) (c,d) sol =
 	let l,old =
 	  try String2Map.find (a,b) sol

@@ -38,10 +38,13 @@ let main () =
       error
   in 
   let parameters_c_compil = Remanent_parameters.update_call_stack parameters Preprocess.local_trace (Some "Preprocess.translate_c_compil") in 
+  let _ = Format.printf "Compiling...\n" in 
   let error,handler,c_compil = Preprocess.translate_c_compil parameters_c_compil error handler refined_compil in 
   let error = 
     if Remanent_parameters.get_do_contact_map parameters
-    then Print_handler.dot_of_contact_map parameters error handler 
+    then
+      let _ = Format.printf "Generating the raw contact map...\n" in
+      Print_handler.dot_of_contact_map parameters error handler 
     else error 
   in 
   let nrules = Handler.nrules parameters error handler in 
@@ -51,23 +54,32 @@ let main () =
     then Print_cckappa.print_compil parameters_compil error handler c_compil 
     else error
   in 
-  let parameters_quark = Remanent_parameters.update_call_stack parameters Quark.local_trace (Some "Quark.quarkify") in 
-  let parameters_quark = Remanent_parameters.update_prefix parameters_quark "Quarks:" in 
-  let error,quark_map = Quark.quarkify parameters_quark error  handler c_compil  in 
-  let parameters_quark = Remanent_parameters.update_prefix parameters "Quarks:" in 
-  let error = 
-    if (Remanent_parameters.get_trace parameters_quark) || Print_quarks.trace 
-    then Print_quarks.print_quarks parameters_quark error handler quark_map  
-    else error 
-  in 
-  let error = 
+   let error = 
     if Remanent_parameters.get_do_influence_map parameters 
-    then 
+    then
+      let _ = Format.printf "Generating the raw influence map...\n" in 
+      let parameters_quark = Remanent_parameters.update_call_stack parameters Quark.local_trace (Some "Quark.quarkify") in 
+      let parameters_quark = Remanent_parameters.update_prefix parameters_quark "Quarks:" in 
+      let error,quark_map = Quark.quarkify parameters_quark error  handler c_compil  in 
+      let parameters_quark = Remanent_parameters.update_prefix parameters "Quarks:" in 
+      let error = 
+	if (Remanent_parameters.get_trace parameters_quark) || Print_quarks.trace 
+	then Print_quarks.print_quarks parameters_quark error handler quark_map  
+	else error 
+      in       
       let parameters_influence_map = Remanent_parameters.update_prefix parameters "Influence_map:" in 
       let error,wake_up_map,inhibition_map = Influence_map.compute_influence_map parameters_influence_map error handler quark_map nrules in 
-      let parameters_refine_influence_map = Remanent_parameters.update_prefix parameters "Refine_influence_map:" in       
-      let error,wake_up_map = Algebraic_construction.filter_influence parameters_refine_influence_map error handler c_compil wake_up_map true in 
-      let error,inhibition_map = Algebraic_construction.filter_influence parameters error handler c_compil inhibition_map false in 
+      let error,wake_up_map,inhibition_map =
+	match Remanent_parameters.get_influence_map_accuracy_level parameters_influence_map
+	with
+	| Remanent_parameters_sig.None | Remanent_parameters_sig.Low -> error,wake_up_map,inhibition_map 
+	| Remanent_parameters_sig.Medium | Remanent_parameters_sig.High -> 
+	  let parameters_refine_influence_map = Remanent_parameters.update_prefix parameters "Refine_influence_map:" in       
+	  let _ = Format.printf "Refining the influence map...\n" in 
+	  let error,wake_up_map = Algebraic_construction.filter_influence parameters_refine_influence_map error handler c_compil wake_up_map true in 
+	  let error,inhibition_map = Algebraic_construction.filter_influence parameters error handler c_compil inhibition_map false in 
+	  error,wake_up_map,inhibition_map
+      in 	
       let error = 
 	if (Remanent_parameters.get_trace parameters_influence_map) || Print_quarks.trace 
 	then Print_quarks.print_wake_up_map parameters_influence_map error handler c_compil Handler.print_rule_txt Handler.print_var_txt Handler.get_label_of_rule_txt Handler.get_label_of_var_txt Handler.print_labels_txt "\n" wake_up_map  
@@ -115,8 +127,9 @@ let main () =
   in
   (*BDU of fixpoint iteration function*)
   let error,bdu_analysic = 
-    if Remanent_parameters.get_do_iteration_dependencies parameters
-    then 
+    if Remanent_parameters.get_do_reachability_analysis parameters
+    then
+      let _ = Format.printf "Reachability analysis...\n" in 
       let parameters_cv =
 	Remanent_parameters.update_prefix parameters "" in 
       let _ = 

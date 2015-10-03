@@ -757,5 +757,11 @@ let print_result parameter error result_remanent =
 let covering_classes parameter error handler cc_compil =
   let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
   let error, result = scan_rule_set_cv parameter error handler cc_compil.rules in
-  let _ = print_result parameter error result in
+  let error =
+    if (Remanent_parameters.get_trace parameter) || trace
+    then 
+      print_result parameter error result
+    else
+      error
+  in
   error, result

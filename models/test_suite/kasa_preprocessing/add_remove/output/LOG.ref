@@ -86,6 +86,9 @@ Compilation:rules:3:direct:agent_id_0:agent_type_1:site_type_0->state:[state_min
 Compilation:rules:3:reverse:
 Compilation:rules:3:reverse:agent_id_0:
 Compilation:rules:3:reverse:agent_id_0:agent_type_1:site_type_0->state:[state_min:1;state_max:1]
+Compiling...
+Generating the raw contact map...
+Generating the raw influence map...
 Quarks:Quarkify
 Quarks:Rule 0
 Quarks:TEST
@@ -153,6 +156,7 @@ Quarks:site_modif-:agent_type:1,site_type:0,state:1,rule:0->[1]
 Quarks:site_modif-:agent_type:1,site_type:0,state:1,rule:3->[0]
 Quarks:site_modif-:agent_type:1,site_type:0,state:0,rule:2->[0]
 Quarks:site_modif-:agent_type:0,site_type:0,state:1,rule:1->[0]
+Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Influence_map:Wake_up_map:rule(0):'' A(x~u),B(x~p)->A(x~u),A(x~p) -> rule(1):'' A(x~p)->A(x~u)[1->0]
 Influence_map:Wake_up_map:rule(1):'' A(x~p)->A(x~u) -> rule(0):'' A(x~u),B(x~p)->A(x~u),A(x~p)[0->0]
@@ -161,4 +165,94 @@ Influence_map:Wake_up_map:rule(2):'' B(x~u)->B(x~p) -> rule(3):'' B(x~p)->B(x~u)
 Influence_map:Wake_up_map:rule(3):'' B(x~p)->B(x~u) -> rule(2):'' B(x~u)->B(x~p)[0->0]
 Influence_map:Inhibition_map:rule(0):'' A(x~u),B(x~p)->A(x~u),A(x~p) -> rule(3):'' B(x~p)->B(x~u)[1->0]
 Influence_map:Inhibition_map:rule(3):'' B(x~p)->B(x~u) -> rule(0):'' A(x~u),B(x~p)->A(x~u),A(x~p)[0->1]
+Reachability analysis...
+
+agent_type:0:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+site_type:0
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
+Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
+site_type:1
+Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
+site_type:1
+agent_type:1:
+Potential dependencies between sites:Number of covering classes:1
+Potential dependencies between sites:Covering_class_id:0:
+site_type:0
+Potential dependencies between sites:New-index:Covering_class_id:0:class_id:0:
+site_type:1
+Potential dependencies between sites:New-index:TEST:Covering_class_id:0:class_id:0:
+site_type:1
+Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
+site_type:1
+============================================================
+* BDU Analysis:
+============================================================
+------------------------------------------------------------
+* Side effects action:
+------------------------------------------------------------
+agent_type_1:
+rule_id:0:site_type:0:state:1
+agent_type_1:
+------------------------------------------------------------
+* Modification sites:
+------------------------------------------------------------
+agent_type_0:
+rule_id:0:site_type:0:state:1
+rule_id:1:site_type:0:state:0
+agent_type_1:
+rule_id:2:site_type:0:state:1
+rule_id:3:site_type:0:state:0
+------------------------------------------------------------
+* Covering classes and Modification sites:
+------------------------------------------------------------
+agent_type_0:
+rule_id:0:site_type:0:state:1
+rule_id:1:site_type:0:state:0
+agent_type_1:
+rule_id:2:site_type:0:state:1
+rule_id:3:site_type:0:state:0
+------------------------------------------------------------
+* Contact map with binding both directions (with state):
+------------------------------------------------------------
+------------------------------------------------------------
+* Contact map with binding only on the rhs (there is no state information):
+------------------------------------------------------------
+------------------------------------------------------------
+* Contact map with binding in the initial state and binding on the rhs (with state):
+------------------------------------------------------------
+
+------------------------------------------------------------
+* List of rules has creation action:
+------------------------------------------------------------
+agent_type/rule_id_0:
+- List of rule_id:
+rule_id: 0 
+- List of rule_id store inside a working list:
+0 
+- List of bdu_creation build from rule_id inside the working list:
+agent_type/rule_id_0:0:
+-------------------------------------
+agent_type/rule_id_0:0: if(mvbdu_id:3) x0 < 1 then 
+agent_type/rule_id_0:0:  false
+agent_type/rule_id_0:0: else 
+agent_type/rule_id_0:0:  if(mvbdu_id:2) x0 < 2 then 
+agent_type/rule_id_0:0:   true
+agent_type/rule_id_0:0:  else 
+agent_type/rule_id_0:0:   false
+
+------------------------------------------------------------
+* BDU creation in general:
+------------------------------------------------------------
+agent_type_0:
+-------------------------------------
+agent_type_0: if(mvbdu_id:3) x0 < 1 then 
+agent_type_0:  false
+agent_type_0: else 
+agent_type_0:  if(mvbdu_id:2) x0 < 2 then 
+agent_type_0:   true
+agent_type_0:  else 
+agent_type_0:   false
 execution finished without any exception
