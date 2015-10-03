@@ -30,6 +30,13 @@ type level =
   | Developper  (* only shown & accepted in developper mode *)
   | Hidden      (* never shown *)
 
+let min_level a b =
+  match a,b with
+  | Normal,_ | _,Normal -> Normal
+  | Expert,_ | _,Expert -> Expert
+  | Developper,_ | _,Developper -> Developper
+  | Hidden,Hidden -> Hidden
+		       
 type category = string
 
 type spec =
@@ -125,12 +132,23 @@ let order parameters (a:t) =
   List.iter (fun (a,b,c,cat,lvl) ->
     if accept_level_display lvl then
       List.iter 
-	(fun cat -> 
-	  ordered := snd (StringMap.add_map parameters error cat
-	      ((a,b,c,[cat],lvl)::(try snd (StringMap.find_map parameters error cat !ordered) with Not_found -> [])) !ordered)) 
-    cat)
-    a;
+	(fun cat ->
+	 let asso,old_lvl =
+	   try
+	     snd (StringMap.find_map parameters error cat !ordered)
+	   with
+	     Not_found -> [],Hidden
+	 in 
+	 ordered := snd (StringMap.add_map parameters error cat
+					    (((a,b,c,[cat],lvl)::asso),
+					     (min_level lvl old_lvl))
+					    (!ordered))
+			
+	)
+	cat)
+   a;
   !ordered
+   
 
 (* sanity checking *)
 let check parameters (a:t) =
@@ -249,13 +267,20 @@ let print_help parameters (header:bool) (verbose:bool) f (a:t) =
   
   (* dump *)
   StringMap.iter_map 
-    (fun cat l ->
-      if header then Format.fprintf f "%s@." cat;
-      List.iter 
-	(fun ((_,_,_,_,lvl) as x) ->
-	  if show_level lvl then (incr nb; print_option verbose f x) 
-	) l;
-      if header && verbose then Format.fprintf f "@."
+    (fun cat (l,lvl) ->
+     if
+       show_level lvl
+     then
+       begin 
+	 if header
+	 then
+	   Format.fprintf f "%s@." cat;
+	 List.iter 
+	   (fun ((_,_,_,_,lvl) as x) ->
+	    if show_level lvl then (incr nb; print_option verbose f x) 
+	   ) l;
+	 if header && verbose then Format.fprintf f "@."
+       end
     ) (order parameters a);
   
   Format.fprintf f "(%i options)@." !nb
