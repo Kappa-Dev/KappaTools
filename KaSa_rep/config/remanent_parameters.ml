@@ -127,6 +127,9 @@ let get_parameters () =
 	Remanent_parameters_sig.short_version=Version.version_string;
 	Remanent_parameters_sig.version=Version.version_kasa_full_name;
 	Remanent_parameters_sig.tk_interface=Tk_version.tk;
+	Remanent_parameters_sig.influence_map_accuracy_level = !Config.influence_map_accuracy_level ;
+	Remanent_parameters_sig.contact_map_accuracy_level = !Config.contact_map_accuracy_level ;
+	Remanent_parameters_sig.static_analysis_accuracy_level = !Config.static_analysis_accuracy_level ; 
       } ;
     Remanent_parameters_sig.log    = !Config.log ;
     Remanent_parameters_sig.formatter = !Config.formatter ;    
@@ -197,7 +200,9 @@ let get_do_ODE_flow_of_information_1       marshalisable = marshalisable.Remanen
 let get_do_stochastic_flow_of_information_1  marshalisable = marshalisable.Remanent_parameters_sig.do_stochastic_flow_of_information 
 let get_do_site_dependencies_1             marshalisable = marshalisable.Remanent_parameters_sig.do_site_dependencies
 let get_do_iteration_dependencies_1        marshalisable = marshalisable.Remanent_parameters_sig.do_iteration_dependencies
-
+let get_influence_map_accuracy_level_1     marshalisable = marshalisable.Remanent_parameters_sig.influence_map_accuracy_level
+let get_contact_map_accuracy_level_1      marshalisable = marshalisable.Remanent_parameters_sig.contact_map_accuracy_level
+let get_static_analysis_accuracy_level_1     marshalisable = marshalisable.Remanent_parameters_sig.static_analysis_accuracy_level
 let get_launching_date_1                             marshalisable =
   let t = marshalisable.Remanent_parameters_sig.launching_date in
   let gmt = marshalisable.Remanent_parameters_sig.time_shift in 
@@ -251,7 +256,10 @@ let get_dump_error_as_soon_as_they_occur = upgrade_from_marshal_field get_dump_e
 let get_prefix = upgrade_from_marshal_field get_prefix_1
 let get_call_stack = upgrade_from_marshal_field get_call_stack_1
 let get_link_mode = upgrade_from_marshal_field get_link_mode_1
-
+let get_contact_map_accuracy_level = upgrade_from_marshal_field get_contact_map_accuracy_level_1
+let get_influence_map_accuracy_level = upgrade_from_marshal_field get_influence_map_accuracy_level_1
+let get_static_analysis_accuracy_level = upgrade_from_marshal_field get_static_analysis_accuracy_level_1
+								    
 let upgrade_from_influence_map_field f = compose f get_influence_map
 let upgrade_from_contact_map_field f = compose f get_contact_map
 let upgrade_from_symbols_field f = compose f get_symbols

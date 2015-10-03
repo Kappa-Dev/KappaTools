@@ -17,6 +17,7 @@
 
 module CharMap = Map.Make (struct type t = char let compare = compare end)
 
+type accuracy_level = Low | Medium | High
 type link_mode = Bound_indices | Site_address | Bound_type 
   
 type symbol_table = 
@@ -93,6 +94,9 @@ type marshalisable_parameters =
    symbols : symbol_table ; 
    influence_map_output : influence_map_output ;
    contact_map_output : contact_map_output ;
+   influence_map_accuracy_level: accuracy_level ;
+   contact_map_accuracy_level: accuracy_level ;
+   static_analysis_accuracy_level: accuracy_level ; 
    kasa_state : Remanent_state_signature.engine_state ;
    launching_date: Unix.tm ;
    time_shift: int ; 

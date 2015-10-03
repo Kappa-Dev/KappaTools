@@ -75,3 +75,9 @@ let do_stochastic_flow_of_information = ref false
 let do_site_dependencies = ref false
 (*fixpoint iteration in bdu structure*)
 let do_iteration_dependencies = ref false
+
+(** accuracy *)
+let static_analysis_accuracy_level = ref Remanent_parameters_sig.Medium
+let influence_map_accuracy_level = ref Remanent_parameters_sig.Medium
+let contact_map_accuracy_level = ref Remanent_parameters_sig.Low
+			    
