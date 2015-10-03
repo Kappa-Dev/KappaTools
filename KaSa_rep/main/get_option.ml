@@ -53,7 +53,7 @@ let options =
         (Choice 
            (["Low","Ignore relations among site";
              "Medium","Ignore reachable states";
-             "High",""],
+(*    "High",""*) ],
             Config.influence_map_accuracy_level)),
         "Tune the accuracy level of the influence map",
 	["4_Influence_map"],
@@ -97,7 +97,7 @@ let options =
       "--contact-map-accuracy-level",
         (Choice 
            (["Low","Collect info from rhs of rules and initial state";
-             "High","Only consider reachable rules";
+             (*    "High","Only consider reachable rules";*)
              ],
             Config.contact_map_accuracy_level)),
         "Tune the accuracy level of the influence map",

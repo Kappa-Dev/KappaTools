@@ -24,7 +24,18 @@ let set_visibility (a:Superarg.t) =
       with Not_found -> ()
     ) a
 
+let set_visibility_bis a  =
+  List.iter
+    (fun (f,lvl) -> if Superarg.show_level lvl
+		    then
+		      	pack ~side:`Left ~padx:1 ~pady:1 [coe f]
+		    else Pack.forget [coe f])
+    a
 
+let set_visibility (a,b) =
+  set_visibility a;
+  set_visibility_bis b
+		     
 (* option value => widget value *)
 let widget_update_from_spec (a:Superarg.t) =
   let set n v =
@@ -61,9 +72,9 @@ let widget_update_from_cmd (a:Superarg.t) l =
       [] -> accum
     | ("-help" | "--help" | "-h" | "--gui")::rem -> doit accum rem
     | "--expert"::rem -> 
-	Superarg.expert_mode := true; set_visibility a; doit accum rem
+	Superarg.expert_mode := true; set_visibility (a,[]); doit accum rem
     | "--no-expert"::rem -> 
-	Superarg.expert_mode := false; set_visibility a; doit accum rem
+	Superarg.expert_mode := false; set_visibility (a,[]); doit accum rem
     | opt::rem ->
 	if opt="-" then List.rev_append rem accum else
 	try 
@@ -314,8 +325,9 @@ class pager bparent fparent =
   and maxbarwidth = 65               (* split bar at this column (in chars) *)
   and cont = Frame.create fparent    (* current page *)
   and cur = ref ""                   (* current page name *)
-  and pages = ref StringMap.empty_map in (* all pages *)
-
+  and pages = ref StringMap.empty_map  (* all pages *)
+  and pages_lvl = ref [] in 
+		      
   object (self)
     
     initializer 
@@ -340,7 +352,7 @@ class pager bparent fparent =
 
 
     (* gets a page (create if non existing) *)
-    method get_page name : Widget.frame Widget.widget =
+    method get_page name (lvl:Superarg.level) : Widget.frame Widget.widget =
       try let _,p,_ = snd (StringMap.find_map parameters error name !pages) in p
       with Not_found ->
 	if !barsize/maxbarwidth <> (!barsize+String.length name)/maxbarwidth
@@ -355,9 +367,11 @@ class pager bparent fparent =
 	Grid.configure ~column:0 ~row:0 [coe p];
 	barsize := !barsize + String.length name;
 	pages := snd (StringMap.add_map parameters error name (fr,p,lbl) !pages);
+	pages_lvl:= (lbl,lvl)::(!pages_lvl);
 	if !cur = "" then self#set_page name;
 	p
 
+    method get_pages_lvl () = !pages_lvl
   end
 
 
@@ -368,9 +382,10 @@ let build_spec (a:Superarg.t) bparent fparent =
       List.iter
 	(fun (key,spec,msg,cat,lvl) -> 
 	  List.iter (fun cat -> 
-	    widget_of_spec a key spec msg lvl (opts#get_page cat)
+	    widget_of_spec a key spec msg lvl (opts#get_page cat cat_lvl)
              ) cat) l ) (Superarg.order parameters a);
-  widget_update_from_spec a
+  let _ = widget_update_from_spec a in
+  opts#get_pages_lvl ()
 
 
 exception Exit of string list
@@ -389,13 +404,13 @@ let gui (a:Superarg.t) (args:string list) : string list =
   pack ~side:`Top [up];
   pack ~side:`Top ~expand:true ~fill:`Both [middle];  
   pack ~side:`Left ~padx:20 [left; right];
-  build_spec a right middle;
+  let pages_lvl = build_spec a right middle in 
 
   (* expert mode *)
   let expyes = Radiobutton.create ~text:"Expert" ~value:"1"
-      ~command:(fun () -> Superarg.expert_mode := true; set_visibility a) left
+      ~command:(fun () -> Superarg.expert_mode := true; set_visibility (a,pages_lvl)) left
   and expno = Radiobutton.create ~text:"Normal" ~value:"0"
-      ~command:(fun () -> Superarg.expert_mode := false; set_visibility a) left in
+      ~command:(fun () -> Superarg.expert_mode := false; set_visibility (a,pages_lvl)) left in
   pack ~side:`Top ~anchor:`W [expno;expyes];
 
   (* file list *)
@@ -521,7 +536,7 @@ let gui (a:Superarg.t) (args:string list) : string list =
   let rem = widget_update_from_cmd a args in
   Textvariable.set v ((Textvariable.get v)^" "^(Superarg.cat_list rem " "));
   Radiobutton.select (if !Superarg.expert_mode then expyes else expno);
-  set_visibility a;
+  set_visibility (a,pages_lvl);
 
   (* tk loop *)
   mainLoop ();
