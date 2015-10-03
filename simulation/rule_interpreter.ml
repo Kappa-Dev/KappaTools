@@ -69,11 +69,11 @@ let remove_candidate cands pathes rule_id x y =
    Mods.Int2Map.remove (a,b) pathes)
 
 let from_place (inj_nodes,inj_fresh,free_id as inj2graph) = function
-  | Place.Existing (n,id) ->
+  | Agent_place.Existing (n,id) ->
      (Connected_component.ContentAgent.get_sort n,
       Connected_component.Matching.get (n,id) inj_nodes,
       inj2graph)
-  | Place.Fresh (ty,id) ->
+  | Agent_place.Fresh (ty,id) ->
      try (ty,Mods.IntMap.find id inj_fresh,inj2graph)
      with Not_found ->
        ty,free_id,(inj_nodes,Mods.IntMap.add id free_id inj_fresh,succ free_id)
@@ -148,7 +148,7 @@ NB inj should not change if [is_add] is false*)
       | (Primitives.Transformation.Freed _
 	| Primitives.Transformation.Internalized _) -> to_explore_unaries
       | Primitives.Transformation.Linked ((n,_),(n',_)) ->
-	 if Place.same_connected_component n n'
+	 if Agent_place.same_connected_component n n'
 	 then to_explore_unaries
 	 else
 	   let _, id, _ = from_place inj n in

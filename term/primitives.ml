@@ -1,36 +1,36 @@
 module Transformation =
   struct
     type t =
-	Freed of Place.t * int
-      | Linked of (Place.t * int) * (Place.t * int)
-      | Internalized of Place.t * int * int
+	Freed of Agent_place.t * int
+      | Linked of (Agent_place.t * int) * (Agent_place.t * int)
+      | Internalized of Agent_place.t * int * int
 
     let rename wk id cc inj = function
       | Freed (p,s) as x ->
-	 let p' = Place.rename wk id cc inj p in
+	 let p' = Agent_place.rename wk id cc inj p in
 	 if p == p' then x else Freed (p',s)
       | Linked ((p1,s1),(p2,s2)) as x ->
-	 let p1' = Place.rename wk id cc inj p1 in
-	 let p2' = Place.rename wk id cc inj p2 in
+	 let p1' = Agent_place.rename wk id cc inj p1 in
+	 let p2' = Agent_place.rename wk id cc inj p2 in
 	 if p1 == p1' && p2 == p2' then x else Linked ((p1',s1),(p2',s2))
       | Internalized (p,s,i) as x ->
-	 let p' = Place.rename wk id cc inj p in
+	 let p' = Agent_place.rename wk id cc inj p in
 	 if p == p' then x else Internalized (p',s,i)
 
     let print ?sigs f = function
       | Freed (p,s) ->
 	 Format.fprintf
-	   f "@[%a.%a = %t@]" (Place.print ?sigs) p
-	   (Place.print_site ?sigs p) s Pp.bottom
+	   f "@[%a.%a = %t@]" (Agent_place.print ?sigs) p
+	   (Agent_place.print_site ?sigs p) s Pp.bottom
       | Linked ((p1,s1),(p2,s2)) ->
 	 Format.fprintf
 	   f "@[%a.%a = %a.%a@]"
-	   (Place.print ?sigs) p1 (Place.print_site ?sigs p1) s1
-	   (Place.print ?sigs) p2 (Place.print_site ?sigs p2) s2
+	   (Agent_place.print ?sigs) p1 (Agent_place.print_site ?sigs p1) s1
+	   (Agent_place.print ?sigs) p2 (Agent_place.print_site ?sigs p2) s2
       | Internalized (p,s,i) ->
 	 Format.fprintf
-	   f "@[%a.%a =@]" (Place.print ?sigs) p
-	   (Place.print_internal ?sigs p s) i
+	   f "@[%a.%a =@]" (Agent_place.print ?sigs) p
+	   (Agent_place.print_internal ?sigs p s) i
   end
 
 type elementary_rule = {

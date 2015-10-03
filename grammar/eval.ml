@@ -407,7 +407,7 @@ let init_graph_of_result algs tokens has_tracking contact_map counter env domain
 	       let creations_sort =
 		 List.fold_left
 		   (fun l -> function
-			  | Instantiation.Create (x,_) -> Place.get_type x :: l
+			  | Instantiation.Create (x,_) -> Agent_place.get_type x :: l
 			  | Instantiation.Mod_internal _ | Instantiation.Bind _
 			  | Instantiation.Bind_to _ | Instantiation.Free _
 			  | Instantiation.Remove _ -> l) [] actions in

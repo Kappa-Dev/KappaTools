@@ -530,7 +530,7 @@ let define_full_transformation
   let cands l = match dst with
     | None -> Primitives.Transformation.Freed (place,site)::l
     | Some (dst,pos) ->
-       let sort = Place.get_type place in
+       let sort = Agent_place.get_type place in
        let () =
 	 ExceptionDefn.warning
 	   ~pos
@@ -558,7 +558,7 @@ let define_full_transformation
        | Some (_) ->
 	  let () =
 	    if not safe then
-	      let sort = Place.get_type place' in
+	      let sort = Agent_place.get_type place' in
 	      ExceptionDefn.warning
 		~pos
 		(fun f ->
@@ -590,7 +590,7 @@ let define_positive_transformation
      try
        let dst',_ = IntMap.find i links_transf in
        let links_transf' = IntMap.remove i links_transf in
-       let sort = Place.get_type place in
+       let sort = Agent_place.get_type place in
        let () =
 	 ExceptionDefn.warning
 	   ~pos
@@ -712,7 +712,7 @@ let rec add_agents_in_cc sigs id wk registered_links transf links_transf
      end
   | ag :: ag_l ->
      let (node,wk) = Connected_component.new_node wk ag.ra_type in
-     let place = Place.Existing (node,id) in
+     let place = Agent_place.Existing (node,id) in
      let rec handle_ports wk r_l c_l (removed,added) l_t re acc site_id =
        if site_id = Array.length ag.ra_ports
        then
@@ -755,7 +755,7 @@ let rec add_agents_in_cc sigs id wk registered_links transf links_transf
 	 | L_VAL ((i,pos),s) ->
 	    try
 	      let (node',site' as dst) = IntMap.find i r_l in
-	      let dst_place = Place.Existing (node',id),site' in
+	      let dst_place = Agent_place.Existing (node',id),site' in
 	      let wk'' = Connected_component.new_link wk' (node,site_id) dst in
 	      let c_l' =
 		IntMap.add
@@ -822,7 +822,7 @@ let rec complete_with_creation
 	   | Some (i,_) -> dangling_link "right" i
      end
   | (ag,pos) :: ag_l ->
-     let place = Place.Fresh (ag.Raw_mixture.a_type,fresh) in
+     let place = Agent_place.Fresh (ag.Raw_mixture.a_type,fresh) in
      let rec handle_ports added l_t actions intf site_id =
        if site_id = Array.length ag.Raw_mixture.a_ports then
 	 let create_actions' =
@@ -850,7 +850,7 @@ let rec complete_with_creation
 		let l_t' = IntMap.remove i l_t in
 		let () =
 		  if not safe then
-		    let sort = Place.get_type place' in
+		    let sort = Agent_place.get_type place' in
 		    ExceptionDefn.warning
 		      ~pos
 		      (fun f ->
@@ -882,8 +882,8 @@ let connected_components_of_mixture created (env,origin) mix =
 	 List.fold_left
 	   (fun acs -> function
 		    | Primitives.Transformation.Linked (x,y)
-			 when Place.is_site_from_fresh x ||
-				Place.is_site_from_fresh y ->
+			 when Agent_place.is_site_from_fresh x ||
+				Agent_place.is_site_from_fresh y ->
 		       Instantiation.Bind_to (x,y) :: acs
 		    | Primitives.Transformation.Linked (x,y) ->
 		       Instantiation.Bind (x,y) :: acs
@@ -915,7 +915,7 @@ let connected_components_of_mixture created (env,origin) mix =
        Instantiation.rename_abstract_event wk_out id cc inj event in
      let l_t' = IntMap.map
 		  (fun (((p,s),b) as x) ->
-		   let p' = Place.rename wk id cc inj p in
+		   let p' = Agent_place.rename wk id cc inj p in
 		   if p == p' then x else ((p',s),b)) l_t in
      aux env' (removed',added') event' l_t' (cc::acc) (succ id) remains
   in aux env ([],[]) ([],([],[],[]))

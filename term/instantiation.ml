@@ -4,7 +4,7 @@ type internal_state  = int
 
 type binding_type = agent_name * site_name
 
-type abstract = Place.t
+type abstract = Agent_place.t
 type concrete = int (*agent_id*) * agent_name
 
 type 'a site = 'a * site_name
@@ -41,36 +41,36 @@ let concretize_binding_state f = function
   | FREE -> FREE
   | BOUND -> BOUND
   | BOUND_TYPE bt -> BOUND_TYPE bt
-  | BOUND_to (pl,s) -> BOUND_to ((f pl,Place.get_type pl),s)
+  | BOUND_to (pl,s) -> BOUND_to ((f pl,Agent_place.get_type pl),s)
 
 let concretize_test f = function
-  | Is_Here pl -> Is_Here (f pl,Place.get_type pl)
-  | Has_Internal ((pl,s),i) -> Has_Internal(((f pl,Place.get_type pl),s),i)
-  | Is_Free (pl,s) -> Is_Free ((f pl,Place.get_type pl),s)
-  | Is_Bound (pl,s) -> Is_Bound ((f pl,Place.get_type pl),s)
+  | Is_Here pl -> Is_Here (f pl,Agent_place.get_type pl)
+  | Has_Internal ((pl,s),i) -> Has_Internal(((f pl,Agent_place.get_type pl),s),i)
+  | Is_Free (pl,s) -> Is_Free ((f pl,Agent_place.get_type pl),s)
+  | Is_Bound (pl,s) -> Is_Bound ((f pl,Agent_place.get_type pl),s)
   | Has_Binding_type ((pl,s),t) ->
-     Has_Binding_type (((f pl,Place.get_type pl),s),t)
+     Has_Binding_type (((f pl,Agent_place.get_type pl),s),t)
   | Is_Bound_to ((pl,s),(pl',s')) ->
-     Is_Bound_to (((f pl,Place.get_type pl),s),
-		  ((f pl',Place.get_type pl'),s'))
+     Is_Bound_to (((f pl,Agent_place.get_type pl),s),
+		  ((f pl',Agent_place.get_type pl'),s'))
 
 let concretize_action f = function
-  | Create (pl,i) -> Create ((f pl,Place.get_type pl),i)
-  | Mod_internal ((pl,s),i) -> Mod_internal (((f pl,Place.get_type pl),s),i)
+  | Create (pl,i) -> Create ((f pl,Agent_place.get_type pl),i)
+  | Mod_internal ((pl,s),i) -> Mod_internal (((f pl,Agent_place.get_type pl),s),i)
   | Bind ((pl,s),(pl',s')) ->
-     Bind (((f pl,Place.get_type pl),s),((f pl',Place.get_type pl'),s'))
+     Bind (((f pl,Agent_place.get_type pl),s),((f pl',Agent_place.get_type pl'),s'))
   | Bind_to ((pl,s),(pl',s')) ->
-     Bind_to (((f pl,Place.get_type pl),s),((f pl',Place.get_type pl'),s'))
-  | Free (pl,s) -> Free ((f pl,Place.get_type pl),s)
-  | Remove pl -> Remove (f pl,Place.get_type pl)
+     Bind_to (((f pl,Agent_place.get_type pl),s),((f pl',Agent_place.get_type pl'),s'))
+  | Free (pl,s) -> Free ((f pl,Agent_place.get_type pl),s)
+  | Remove pl -> Remove (f pl,Agent_place.get_type pl)
 
 let concretize_event f (tests,(actions,kasa_side,kasim_side)) =
   (List.map (concretize_test f) tests,
    (List.map (concretize_action f) actions,
     List.map (fun ((pl,s),b) ->
-	      (((f pl, Place.get_type pl),s),concretize_binding_state f b))
+	      (((f pl, Agent_place.get_type pl),s),concretize_binding_state f b))
 	     kasa_side,
-    List.map (fun (pl,s) -> ((f pl, Place.get_type pl),s)) kasim_side))
+    List.map (fun (pl,s) -> ((f pl, Agent_place.get_type pl),s)) kasim_side))
 
 let subst_map_concrete_agent f (id,na as agent) =
   try if f id == id then agent else (f id,na)
@@ -107,7 +107,7 @@ let subst_agent_in_concrete_test id id' x =
   subst_map_agent_in_concrete_test
     (fun j -> if j = id then id' else j) x
 let rename_abstract_test wk id cc inj x =
-  subst_map_agent_in_test (Place.rename wk id cc inj) x
+  subst_map_agent_in_test (Agent_place.rename wk id cc inj) x
 
 let subst_map_agent_in_action f = function
   | Create (agent,list) as x ->
@@ -136,7 +136,7 @@ let subst_agent_in_concrete_action id id' x =
   subst_map_agent_in_concrete_action
     (fun j -> if j = id then id' else j) x
 let rename_abstract_action wk id cc inj x =
-  subst_map_agent_in_action (Place.rename wk id cc inj) x
+  subst_map_agent_in_action (Agent_place.rename wk id cc inj) x
 
 let subst_map_binding_state f = function
   | (ANY | FREE | BOUND | BOUND_TYPE _ as x) -> x
@@ -152,7 +152,7 @@ let subst_agent_in_concrete_side_effect id id' x =
   subst_map_agent_in_concrete_side_effect
     (fun j -> if j = id then id' else j) x
 let rename_abstract_side_effect wk id cc inj x =
-  subst_map_agent_in_side_effect (Place.rename wk id cc inj) x
+  subst_map_agent_in_side_effect (Agent_place.rename wk id cc inj) x
 
 let subst_map_agent_in_event f (tests,(acs,kasa_side,kasim_side)) =
   (Tools.list_smart_map (subst_map_agent_in_test f) tests,
@@ -165,7 +165,7 @@ let subst_agent_in_concrete_event id id' x =
   subst_map_agent_in_concrete_event
     (fun j -> if j = id then id' else j) x
 let rename_abstract_event wk id cc inj x =
-  subst_map_agent_in_event (Place.rename wk id cc inj) x
+  subst_map_agent_in_event (Agent_place.rename wk id cc inj) x
 
 let with_sigs f = function
   | None -> Format.pp_print_int

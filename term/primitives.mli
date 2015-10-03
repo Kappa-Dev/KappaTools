@@ -4,9 +4,9 @@
 module Transformation :
 sig
   type t =
-      Freed of Place.t * int
-    | Linked of (Place.t * int) * (Place.t * int)
-    | Internalized of Place.t * int * int
+      Freed of Agent_place.t * int
+    | Linked of (Agent_place.t * int) * (Agent_place.t * int)
+    | Internalized of Agent_place.t * int * int
 
   val rename :
     Connected_component.work -> int ->
