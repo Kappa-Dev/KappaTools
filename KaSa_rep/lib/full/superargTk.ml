@@ -19,8 +19,10 @@ let set_visibility (a:Superarg.t) =
       try
 	let f = snd (StringMap.find_map parameters error key !fmap) in
 	if Superarg.show_level lvl
-	then pack ~side:`Top ~anchor:`W [coe f] 
-	else Pack.forget [coe f]
+	then 
+	  List.iter (fun f -> pack ~side:`Top ~anchor:`W [coe f]) f
+	else 
+	  List.iter (fun f -> Pack.forget [coe f]) f 
       with Not_found -> ()
     ) a
 
@@ -194,8 +196,19 @@ let balloon_delay = 100
 (* create an option widget, add the defined variables to the map *)
 let widget_of_spec (a:Superarg.t) key spec msg lvl parent = 
   let f = Frame.create parent in
-  let _ = fmap := snd (StringMap.add_map parameters error key f !fmap) in 
-
+  let error = 
+    let error,old = 
+      match 
+	StringMap.find_map_option parameters error key !fmap 
+      with 
+	error,None -> error,[]
+      | error,Some l -> error,l 
+    in 
+    let error,fmap' = StringMap.add_map parameters error key (f::old) !fmap in
+    let _ = fmap:=fmap' 
+    in 
+    error
+  in 
   let v = 
     try (snd (StringMap.find_map parameters error key (!map)))
     with Not_found 
@@ -371,7 +384,7 @@ class pager bparent fparent =
 	if !cur = "" then self#set_page name;
 	p
 
-    method get_pages_lvl () = !pages_lvl
+    method get_pages_lvl () = List.rev (!pages_lvl)
   end
 
 
@@ -405,7 +418,6 @@ let gui (a:Superarg.t) (args:string list) : string list =
   pack ~side:`Top ~expand:true ~fill:`Both [middle];  
   pack ~side:`Left ~padx:20 [left; right];
   let pages_lvl = build_spec a right middle in 
-
   (* expert mode *)
   let expyes = Radiobutton.create ~text:"Expert" ~value:"1"
       ~command:(fun () -> Superarg.expert_mode := true; set_visibility (a,pages_lvl)) left
