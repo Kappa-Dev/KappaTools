@@ -23,7 +23,17 @@ let warn parameters mh message exn default =
 let trace = false
 (*****************************************************************************************)
 (*contact map without state information: this computation consider both
-  binding in the lhs and rhs.*)
+  binding in the lhs and rhs.
+  For instance:
+
+  r1: A(x), B(x) -> A(x!1), B(x!1)
+  r2: A(y!1), C(x!1) -> A(y), C(x)
+
+  The result is:
+  - A bond to B; B bond to A
+  and 
+  - A bond to C; C bond to A.
+*)
 
 (*let compute_contact_map parameter error handler =
   let store_result = Int2Map_pair.empty in
@@ -82,9 +92,13 @@ let compute_contact_map parameter error handler =
 (* - Only take the binding information of the rhs; Ex: A(x), B(x) -> A(x!1), B(x!1)
    and not the binding in the lhs; Ex: A(x!1), B(x!1) -> A(x), B(x)
    - Getting information of binding state, then search if these binding belong to dual.
+   The result is:
+   - A bond to B. 
+   and
+   - B bond to A.
 *)
 
-(*TEST this function in the case of %init *)
+(*TODO: TEST this function in the case of %init *)
 let collect_binding_rhs parameter error rule store_result =
   let add_link (a, b) (c, d) store_result =
     let l, old =
@@ -100,20 +114,53 @@ let collect_binding_rhs parameter error rule store_result =
       (*second*)
       let agent_type2 = site_address2.agent_type in
       let site2       = site_address2.site in
-      (*new*)
-      let store_result = add_link (agent_type1, site1) (agent_type2, site2) store_result in
-      error, store_result
+      (*new: A bond to B, B bond to A*)
+      (*let store_result = 
+        add_link (agent_type1, site1) (agent_type2, site2) store_result in*)
+      let store_result_forward, store_result_reverse = store_result in
+      (*A bond to B*)
+      let store_result_forward =
+        add_link (agent_type1, site1) (agent_type2, site2) store_result_forward
+      in
+      (*B bond to A*)
+      let store_result_reverse =
+        add_link (agent_type2, site2) (agent_type1, site1) store_result_reverse
+      in
+      error, (store_result_forward, store_result_reverse)
     ) (error, store_result) rule.actions.bind
   in
-  let store_result = Int2Map_pair.map (fun (l, x) -> List.rev l, x) store_result in
-  error, store_result
+  let store_result_forward, store_result_reverse = store_result in
+  (*let store_result = Int2Map_pair.map (fun (l, x) -> List.rev l, x) store_result in*)
+  let store_result_forward =
+    Int2Map_pair.map (fun (l, x) -> List.rev l, x) store_result_forward
+  in
+  let store_result_reverse =
+    Int2Map_pair.map (fun (l, x) -> List.rev l, x) store_result_reverse
+  in
+  error, (store_result_forward, store_result_reverse)
 
 (*****************************************************************************************)
-(*compute the binding information with precise information with state information*)
+(*compute the binding information with precise information with state information.
+
+  More precisely it will search in the contact map and the binding rhs and
+  return the result of binding on the rhs.
+
+  For instance:
+  r1: A(x), B(x) -> A(x!1), B(x!1)
+  r2: A(y!1), C(x!1) -> A(y), C(x)
+
+  The result of 
+  - Contact map is: (with state information)
+  [A bond to B; B bond to A], and [A bond to C; C bond to A]
+  - Binding on rhs is: (without state information)
+  [A bond to B; B bond to A]
+  - Precise binding dual is: (with state information)
+  [A bond to B; B bond to A]
+*)
 
 (*FIXME: check the state*)
-let precise_binding_dual parameter error handler rule (*result_binding*) store_result =
-  let result_binding = Int2Map.empty in (*FIXME*)
+let precise_binding_dual parameter error handler rule store_result =
+  let result_binding = Int2Map.empty, Int2Map.empty in (*FIXME*)
   (*add_link*)
   let add_link (a, b, s) (c, d, s') store_result =
     let l, old =
@@ -127,7 +174,7 @@ let precise_binding_dual parameter error handler rule (*result_binding*) store_r
   let error, result_binding =
     Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
       parameter error
-      (fun parameter error (agent, (site, state)) (agent', site', state') result_binding ->
+      (fun parameter error (agent, (site, state)) (agent', site', state') _result_binding ->
         (*binding on the rhs*)
         List.fold_left (fun (error, sol2) (site_address1, site_address2) ->
           let agent_type1 = site_address1.agent_type in
@@ -143,14 +190,32 @@ let precise_binding_dual parameter error handler rule (*result_binding*) store_r
             error, sol2
           else
             (*if not true, add those links*)
-            let result_binding =
-              add_link (agent_type1, site1, state) (agent_type2, site2, state') sol2
+            let sol2_forward, sol2_reverse = sol2 in
+            (*A bond to B*)
+            let result_binding_forward =
+              add_link 
+                (agent_type1, site1, state)
+                (agent_type2, site2, state')
+                sol2_forward
             in
-            error, result_binding
+            (*B bond to A*)
+            let result_binding_reverse =
+              add_link
+                (agent_type2, site2, state')
+                (agent_type1, site1, state)
+                sol2_reverse
+            in
+            (*store*)
+            error, (result_binding_forward, result_binding_reverse)
         ) (error, store_result) rule.actions.bind
       ) handler.dual result_binding
   in
+  let result_binding_forward, result_binding_reverse = result_binding in
   (*Return the result of this contact map*)
-  let result_binding = Int2Map.map (fun (l, x) -> List.rev l, x) result_binding
+  let result_binding_forward =
+    Int2Map.map (fun (l, x) -> List.rev l, x) result_binding_forward
   in
-  result_binding
+  let result_binding_reverse =
+    Int2Map.map (fun (l, x) -> List.rev l, x) result_binding_reverse
+  in
+  (result_binding_forward, result_binding_reverse)

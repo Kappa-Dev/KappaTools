@@ -249,36 +249,41 @@ let collect_side_effects parameter error handler rule_id half_break remove store
 *)
 
 (*let update_bond_side_effects parameter error handler 
-    store_contact_map store_binding_rhs store_side_effects store_result =
+    store_binding_dual (*store_side_effects*) store_result =
   (*check if there is any binding on the rhs*)
-  if Int2Map_pair.is_empty store_binding_rhs
+  if Int2Map.is_empty store_binding_dual
   then
     error, store_result
   else
-    (*call function has binding on the rhs*)
-    let binding_rhs =
-      Int2Map_pair.fold
-        (fun (x,y) (l1,l2) _ ->
-        (*(x,y) is agent_type, site_name of the first binding agent.
+    (*call function has binding on the rhs after filter from the contact map*)
+    let store_result =
+      Int2Map.fold
+        (fun (x,y,s) (l1,l2) current_result ->
+        (*(x,y,s) is agent_type, site_name and state_index of the first binding agent.
           l1 store a list of the first binding agent; l2 store a list of the
           second binding agent.
           For instance: A(x!1), B(x!1)
           l1: [A(x!1)]
           l2: [B(x!1)]*)
-          
-
-          
-        ) store_binding_rhs _
+          (**)
+          if l1 <> []
+          then
+            let _ =
+              Printf.fprintf stdout "l1 only"
+            in
+            []
+          else
+            [];
+          List.fold_left (fun current_result (z, t, s') ->
+            let l = (z,t,s') :: current_result in
+            let _ =
+              Printf.fprintf stdout "agent_type':%i:site_type':%i:state':%i\n" z t s' 
+            in
+            let _ =
+              Printf.fprintf stdout "agent_type:%i:site_type:%i:state:%i\n" x y s
+            in
+            l
+          ) current_result l2
+        ) store_binding_dual []
     in
-    (*call function compute contact map*)
-    let contact_map =
-      Int2Map.fold
-        (fun key triple_list _ ->
-          
-        ) store_contact_map _
-    in
-    (*call function with side effects*)
-    let error, store_side_effects =
-
-
-    in*)
+    error, store_result*)

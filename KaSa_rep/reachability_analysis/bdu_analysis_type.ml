@@ -69,11 +69,19 @@ type bdu_analysic =
         ((Cckappa_sig.agent_name list) *
             (Cckappa_sig.agent_name * Cckappa_sig.site_name *
                Cckappa_sig.state_index) list) Int2Map.t;
+      (*for instance if agent A bond to agent B; then return A bond to B and B bond to A.*)
       store_binding_rhs      :
+        ((Cckappa_sig.agent_name list) *
+            (Cckappa_sig.agent_name * Cckappa_sig.site_name) list) Int2Map_pair.t *
         ((Cckappa_sig.agent_name list) *
             (Cckappa_sig.agent_name * Cckappa_sig.site_name) list) Int2Map_pair.t;
       store_binding_dual     :
-        (Cckappa_sig.agent_name list *
-           (Cckappa_sig.agent_name * Cckappa_sig.site_name *
-              Cckappa_sig.state_index) list) Int2Map.t;
+        ((Cckappa_sig.agent_name list) *
+            (Cckappa_sig.agent_name * Cckappa_sig.site_name *
+               Cckappa_sig.state_index) list) Int2Map.t *
+        ((Cckappa_sig.agent_name list) *
+            (Cckappa_sig.agent_name * Cckappa_sig.site_name *
+               Cckappa_sig.state_index) list) Int2Map.t;
+    (*store_update_bond_side_effects :
+        (Cckappa_sig.agent_name * Cckappa_sig.site_name * Cckappa_sig.state_index) list*)
     }

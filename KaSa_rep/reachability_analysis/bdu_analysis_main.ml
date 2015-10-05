@@ -95,8 +95,8 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       parameter
       error
       handler
-      (*store_result.store_contact_map*)
   in
+  (*if agent A bond to agent B; then return A bond to B and B bond to A*)
   let error, store_binding_rhs =
     collect_binding_rhs
       parameter
@@ -104,6 +104,7 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       rule
       store_result.store_binding_rhs
   in
+  (*if agent A bond to agent B; then return A bond to B and B bond to A*)
   let store_binding_dual =
     precise_binding_dual
       parameter
@@ -143,12 +144,13 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
   let error, init_creation_rule = AgentMap.create parameter error 0 in
   let error, init_half_break    = AgentMap.create parameter error 0 in
   let error, init_remove        = AgentMap.create parameter error 0 in
-  (*let error, init_remove2       = AgentMap.create parameter error 0 in*)
   let error, init_modification  = AgentMap.create parameter error 0 in
   let error, init_cv_modified   = AgentMap.create parameter error 0 in
-  let init_contact_map = Int2Map.empty in
-  let init_binding_rhs = Int2Map_pair.empty in
-  let init_binding_dual = Int2Map.empty in
+  let init_contact_map          = Int2Map.empty in
+  let init_binding_rhs_forward  = Int2Map_pair.empty in
+  let init_binding_rhs_reverse  = Int2Map_pair.empty in
+  let init_binding_dual_forward = Int2Map.empty in
+  let init_binding_dual_reverse = Int2Map.empty in
   let init_bdu =
     {
       store_creation      = init_creation;
@@ -157,8 +159,8 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
       store_modification_sites              = init_modification;
       store_covering_classes_modified_sites = init_cv_modified;
       store_contact_map  = init_contact_map;
-      store_binding_rhs  = init_binding_rhs;
-      store_binding_dual = init_binding_dual;
+      store_binding_rhs  = init_binding_rhs_forward, init_binding_rhs_reverse;
+      store_binding_dual = init_binding_dual_forward, init_binding_dual_reverse;
     }
   in
   (*------------------------------------------------------------------------------*)
