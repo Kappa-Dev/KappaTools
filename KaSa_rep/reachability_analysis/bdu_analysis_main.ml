@@ -114,6 +114,16 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       store_result.store_binding_dual
   in
   (*------------------------------------------------------------------------------*)
+  let error, store_update_bond_side_effects =
+    update_bond_side_effects
+      parameter
+      error
+      handler
+      store_binding_dual
+      store_side_effects
+      store_result.store_update_bond_side_effects
+  in
+  (*------------------------------------------------------------------------------*)
   (*TEST*)
   (*let error, wl =
     fixpoint
@@ -133,7 +143,8 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
     store_covering_classes_modified_sites = store_covering_classes_modified_sites;
     store_contact_map    = store_contact_map;
     store_binding_rhs    = store_binding_rhs;
-    store_binding_dual   = store_binding_dual
+    store_binding_dual   = store_binding_dual;
+    store_update_bond_side_effects = store_update_bond_side_effects
   }
  
 (************************************************************************************)
@@ -151,6 +162,7 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
   let init_binding_rhs_reverse  = Int2Map_pair.empty in
   let init_binding_dual_forward = Int2Map.empty in
   let init_binding_dual_reverse = Int2Map.empty in
+  let init_update_bond_side_effects = [], [] in
   let init_bdu =
     {
       store_creation      = init_creation;
@@ -161,6 +173,7 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
       store_contact_map  = init_contact_map;
       store_binding_rhs  = init_binding_rhs_forward, init_binding_rhs_reverse;
       store_binding_dual = init_binding_dual_forward, init_binding_dual_reverse;
+      store_update_bond_side_effects = init_update_bond_side_effects
     }
   in
   (*------------------------------------------------------------------------------*)

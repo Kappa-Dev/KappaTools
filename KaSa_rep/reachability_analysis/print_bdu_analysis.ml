@@ -412,6 +412,22 @@ let print_result parameter error result =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
+      "* List of rules has binding sites and side effects (TODO):\n";
+    fprintf (Remanent_parameters.get_log parameter)
+      "------------------------------------------------------------\n";
+    let parameter_a =
+      Remanent_parameters.update_prefix parameter "agent_type" in
+    let error =
+      print_list_rule parameter_a (fst result.store_update_bond_side_effects);
+      fprintf stdout "list of rule of remove action:\n";
+      print_list_rule parameter_a (snd result.store_update_bond_side_effects)
+    in
+    error
+  in
+  let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "\n------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter)
       "* List of rules has creation action:\n";
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";

@@ -248,42 +248,126 @@ let collect_side_effects parameter error handler rule_id half_break remove store
   function.
 *)
 
-(*let update_bond_side_effects parameter error handler 
-    store_binding_dual (*store_side_effects*) store_result =
+(*get a list of binding information*)
+let get_list_of_binding parameter error store_binding_forward =
+  Int2Map.fold
+    (fun (agent_type_1,site_type_1,state_1) (l1,l2) current_result_1 ->
+      if l1 <> []
+      then
+	[]
+      else
+	[];
+      List.fold_left (fun current_result_2 (agent_type_2, site_type_2, state_2) ->
+	let l =
+	  (agent_type_1, site_type_1, state_1, agent_type_2, site_type_2, state_2)
+	  :: current_result_2 in
+	(*let _ =
+          Printf.fprintf stdout "agent_type:%i:site_type:%i:state:%i -> agent_type':%i:site_type':%i:state':%i\n"
+	    agent_type_1 site_type_1 state_1
+	    agent_type_2 site_type_2 state_2
+        in*)
+        l
+      ) current_result_1 l2
+    ) store_binding_forward []
+
+(*testing the binding of the first agent if it belongs to side effect or not*)
+let get_binding_half_break parameter error agent_type_1 site_type_1 state_1
+    store_half_break =
+  AgentMap.fold parameter error
+    (fun parameter error agent_type_effect l store_current_result ->
+      let result =
+	List.fold_left (fun current_result
+	  (rule_id_effect, site_effect, state_effect) ->
+	  begin
+	    if agent_type_1 = agent_type_effect &&
+	      site_type_1 = site_effect &&
+	      state_1 = state_effect
+	    then
+	      let rule_list =
+		rule_id_effect :: current_result
+	      in
+	      rule_list
+	    else
+	      current_result
+	  end
+	) store_current_result l
+      in
+      error, result
+    ) store_half_break []
+
+(*testing the binding of the first agent (without state information) 
+  if it belongs to side effect or not - remove action in general*)
+let get_binding_remove parameter error agent_type_1 site_type_1
+    store_remove =
+  AgentMap.fold parameter error
+    (fun parameter error agent_type_effect l store_current_result ->
+      let result =
+	List.fold_left (fun current_result (rule_id_effect, site_effect) ->
+	  begin
+	    if agent_type_1 = agent_type_effect &&
+	      site_type_1 = site_effect
+	    then
+	      let rule_list =
+		rule_id_effect :: current_result
+	      in
+	      rule_list
+	    else
+	      current_result
+	  end
+	) store_current_result l
+      in
+      error, result
+    ) store_remove []
+  
+let update_bond_side_effects parameter error handler 
+    store_binding_dual store_side_effects store_result =
+  (*binding: A bond to B and B bond to A*)
+  let store_binding_forward, store_binding_reverse = store_binding_dual in
+  (*side effects: half-break action and remove action*)
+  let store_half_break, store_remove = store_side_effects in
   (*check if there is any binding on the rhs*)
-  if Int2Map.is_empty store_binding_dual
+  if Int2Map.is_empty store_binding_forward (*TODO:another side as well*)
   then
     error, store_result
   else
     (*call function has binding on the rhs after filter from the contact map*)
-    let store_result =
-      Int2Map.fold
-        (fun (x,y,s) (l1,l2) current_result ->
-        (*(x,y,s) is agent_type, site_name and state_index of the first binding agent.
-          l1 store a list of the first binding agent; l2 store a list of the
-          second binding agent.
-          For instance: A(x!1), B(x!1)
-          l1: [A(x!1)]
-          l2: [B(x!1)]*)
-          (**)
-          if l1 <> []
-          then
-            let _ =
-              Printf.fprintf stdout "l1 only"
-            in
-            []
-          else
-            [];
-          List.fold_left (fun current_result (z, t, s') ->
-            let l = (z,t,s') :: current_result in
-            let _ =
-              Printf.fprintf stdout "agent_type':%i:site_type':%i:state':%i\n" z t s' 
-            in
-            let _ =
-              Printf.fprintf stdout "agent_type:%i:site_type:%i:state:%i\n" x y s
-            in
-            l
-          ) current_result l2
-        ) store_binding_dual []
+    let binding_list =
+      get_list_of_binding parameter error store_binding_forward
     in
-    error, store_result*)
+    (*fold a list of binding, 
+      test each the first binding agent with site and state, 
+      if it belongs to side effects*)
+    let store_result =
+      List.fold_left (fun (current_result_half_break, current_result_remove)
+	(agent_type_1, site_type_1, state_1,
+	 agent_type_2, site_type_2, state_2) ->
+	  (*side effects information: half_break action*)
+	  let error, half_break_rule_list =
+	    get_binding_half_break
+	      parameter
+	      error
+	      agent_type_1
+	      site_type_1
+	      state_1
+	      store_half_break
+	  in
+	  (*side effects information: remove action*)
+	  let error, remove_rule_list =
+	    get_binding_remove
+	      parameter
+	      error
+	      agent_type_1
+	      site_type_1
+	      store_remove
+	  in
+	  (*result*)
+	  let new_half_break_rule_list =
+	    List.concat [half_break_rule_list; current_result_half_break]
+	  in
+	  let new_remove_rule_list =
+	    List.concat [remove_rule_list; current_result_remove]
+	  in
+	  (new_half_break_rule_list, new_remove_rule_list)
+      ) ([], []) binding_list
+    in
+    error, store_result

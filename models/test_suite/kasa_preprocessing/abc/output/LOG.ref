@@ -607,6 +607,11 @@ agent_type':2@site_type':2:state':2--agent_type:0@site_type:1:state:1
 agent_type':2@site_type':3:state':2--agent_type:0@site_type:1:state:1
 
 ------------------------------------------------------------
+* List of rules has binding sites and side effects (TODO):
+------------------------------------------------------------
+list of rule of remove action:
+
+------------------------------------------------------------
 * List of rules has creation action:
 ------------------------------------------------------------
 
