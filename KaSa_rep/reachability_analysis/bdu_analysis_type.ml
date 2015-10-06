@@ -83,7 +83,7 @@ type bdu_analysic =
             (Cckappa_sig.agent_name * Cckappa_sig.site_name *
                Cckappa_sig.state_index) list) Int2Map.t;
       store_update_bond_side_effects :
-	(int) list * int list
+	int list * int list * int list * int list
         (*(Cckappa_sig.agent_name * Cckappa_sig.site_name * Cckappa_sig.state_index *
 	   Cckappa_sig.agent_name * Cckappa_sig.site_name * Cckappa_sig.state_index)
 	   list*)

@@ -185,6 +185,8 @@ rule_id:3:site_type:0:state:1
 * List of rules has binding sites and side effects (TODO):
 ------------------------------------------------------------
 list of rule of remove action:
+list of rule of covering classes:
+combind rule_id covering classes and side effects:
 
 ------------------------------------------------------------
 * List of rules has creation action:

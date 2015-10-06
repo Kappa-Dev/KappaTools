@@ -121,6 +121,7 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       handler
       store_binding_dual
       store_side_effects
+      store_covering_classes_modified_sites
       store_result.store_update_bond_side_effects
   in
   (*------------------------------------------------------------------------------*)
@@ -162,7 +163,7 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
   let init_binding_rhs_reverse  = Int2Map_pair.empty in
   let init_binding_dual_forward = Int2Map.empty in
   let init_binding_dual_reverse = Int2Map.empty in
-  let init_update_bond_side_effects = [], [] in
+  let init_update_bond_side_effects = [], [], [], [] in
   let init_bdu =
     {
       store_creation      = init_creation;

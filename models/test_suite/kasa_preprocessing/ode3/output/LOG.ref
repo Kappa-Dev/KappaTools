@@ -275,6 +275,11 @@ agent_type':2@site_type':0:state':1--agent_type:0@site_type:2:state:1
 * List of rules has binding sites and side effects (TODO):
 ------------------------------------------------------------
 list of rule of remove action:
+list of rule of covering classes:
+rule_id: 0 
+combind rule_id covering classes and side effects:
+rule_id: 0 
+rule_id: 1 
 
 ------------------------------------------------------------
 * List of rules has creation action:

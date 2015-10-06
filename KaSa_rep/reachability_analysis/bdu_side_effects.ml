@@ -261,12 +261,7 @@ let get_list_of_binding parameter error store_binding_forward =
 	let l =
 	  (agent_type_1, site_type_1, state_1, agent_type_2, site_type_2, state_2)
 	  :: current_result_2 in
-	(*let _ =
-          Printf.fprintf stdout "agent_type:%i:site_type:%i:state:%i -> agent_type':%i:site_type':%i:state':%i\n"
-	    agent_type_1 site_type_1 state_1
-	    agent_type_2 site_type_2 state_2
-        in*)
-        l
+	l
       ) current_result_1 l2
     ) store_binding_forward []
 
@@ -318,9 +313,40 @@ let get_binding_remove parameter error agent_type_1 site_type_1
       in
       error, result
     ) store_remove []
+
+let get_covering_classes_modified_binding parameter error agent_type_2
+    site_type_2 state_2 store_covering_classes_modified_sites =
+  AgentMap.fold parameter error
+    (fun parameter error agent_type_cv l store_current_result ->
+      let result =
+	List.fold_left (fun current_result (rule_id_cv, site_cv, state_cv) ->
+	  begin
+	    if agent_type_2 = agent_type_cv &&
+	      site_type_2 = site_cv &&
+	      state_2 = state_cv
+	    then
+	      let rule_list = (*TODO: return the old rule_id_cv and the rule in side effects*)
+		rule_id_cv :: current_result
+	      in
+	      rule_list
+	    else
+	      current_result
+	  end
+	) store_current_result l
+      in
+      error, result  
+    ) store_covering_classes_modified_sites []
+
+let get_rule_covering_classes_side_effects_list rule_half_break_list
+    rule_remove_list rule_covering_classes_list =
+  let first_concat = List.concat [rule_half_break_list; rule_remove_list] in
+  let final_concat = List.concat [first_concat; rule_covering_classes_list] in
+  final_concat
+
   
 let update_bond_side_effects parameter error handler 
-    store_binding_dual store_side_effects store_result =
+    store_binding_dual store_side_effects store_covering_classes_modified_sites
+    store_result =
   (*binding: A bond to B and B bond to A*)
   let store_binding_forward, store_binding_reverse = store_binding_dual in
   (*side effects: half-break action and remove action*)
@@ -338,7 +364,8 @@ let update_bond_side_effects parameter error handler
       test each the first binding agent with site and state, 
       if it belongs to side effects*)
     let store_result =
-      List.fold_left (fun (current_result_half_break, current_result_remove)
+      List.fold_left (fun (current_result_half_break, current_result_remove,
+			   current_result_covering_classes, _)
 	(agent_type_1, site_type_1, state_1,
 	 agent_type_2, site_type_2, state_2) ->
 	  (*side effects information: half_break action*)
@@ -360,14 +387,42 @@ let update_bond_side_effects parameter error handler
 	      site_type_1
 	      store_remove
 	  in
-	  (*result*)
+	  (*covering classes and modified sites. 
+	    Test if the binding of the second agent belongs to covering classes,
+	    then add the rule_id of side effect to 
+	    a list of the current rule_id in covering classes.*)
+	  let error, covering_classes_rule_list =
+	    get_covering_classes_modified_binding
+	      parameter
+	      error
+	      agent_type_2
+	      site_type_2
+	      state_2
+	      store_covering_classes_modified_sites
+	  in
+	  (*new list*)
 	  let new_half_break_rule_list =
 	    List.concat [half_break_rule_list; current_result_half_break]
 	  in
 	  let new_remove_rule_list =
 	    List.concat [remove_rule_list; current_result_remove]
 	  in
-	  (new_half_break_rule_list, new_remove_rule_list)
-      ) ([], []) binding_list
+	  let new_covering_classes_rule_list =
+	    List.concat [covering_classes_rule_list; current_result_covering_classes]
+	  in
+	  (*result is a list of rule of covering classes and side effects.
+	    Test if list of rule in half break is not empty, 
+	    and if remove rule list is not empty, etc.
+	  *)
+	  (*TODO: store them according to its agent*)
+	  let result_rule_list =
+	    get_rule_covering_classes_side_effects_list
+	      new_half_break_rule_list
+	      new_remove_rule_list
+	      new_covering_classes_rule_list
+	  in
+	  (new_half_break_rule_list, new_remove_rule_list,
+	   covering_classes_rule_list, result_rule_list)
+      ) ([], [], [], []) binding_list
     in
     error, store_result

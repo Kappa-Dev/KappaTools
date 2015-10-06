@@ -417,10 +417,17 @@ let print_result parameter error result =
       "------------------------------------------------------------\n";
     let parameter_a =
       Remanent_parameters.update_prefix parameter "agent_type" in
+    let result_half_break_bind, result_remove_bind, result_covering_classes_bind,
+      result_rule_list = result.store_update_bond_side_effects
+    in
     let error =
-      print_list_rule parameter_a (fst result.store_update_bond_side_effects);
+      print_list_rule parameter_a result_half_break_bind;
       fprintf stdout "list of rule of remove action:\n";
-      print_list_rule parameter_a (snd result.store_update_bond_side_effects)
+      print_list_rule parameter_a result_remove_bind;
+      fprintf stdout "list of rule of covering classes:\n";
+      print_list_rule parameter_a result_covering_classes_bind;
+      fprintf stdout "combind rule_id covering classes and side effects:\n";
+      print_list_rule parameter_a result_rule_list
     in
     error
   in
