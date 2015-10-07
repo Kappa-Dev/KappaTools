@@ -86,7 +86,7 @@ let collect_creation parameter error viewsrhs creation store_result =
 (************************************************************************************)
 (*return a list of creation rule; add rules with empty lhs into a working list.*)
 
-let collect_rule_creation parameter error handler rule rule_id viewsrhs creation
+(*let collect_rule_creation parameter error handler rule rule_id viewsrhs creation
     store_result =
   let error, store = AgentMap.create parameter error 0 in
   List.fold_left (fun (error, store_result) (agent_id, agent_type) ->
@@ -140,8 +140,81 @@ let collect_rule_creation parameter error handler rule rule_id viewsrhs creation
           store_result
       in
       error, store_result)
-    (error, store_result) creation
+    (error, store_result) creation*)
 
+let collect_rule_creation parameter error handler rule rule_id viewsrhs creation
+    (*update_bond_side_effects*)
+    store_result =
+  let error, store = AgentMap.create parameter error 0 in
+  List.fold_left (fun (error, store_result) (agent_id, agent_type) ->
+    let error, agent = AgentMap.get parameter error agent_id viewsrhs in
+    match agent with
+    | None -> warn parameter error (Some "line 94") Exit store_result 
+    | Some Ghost -> error, store_result
+    | Some Agent agent ->
+      let error, (old_list, old_wl, old_array) =
+        match AgentMap.unsafe_get parameter error agent_type store_result with
+        | error, None -> error, ([], IntWL.empty, [||])
+        | error, Some (l, wl, a) -> error, (l, wl, a)
+      in
+      let new_list = List.concat [[rule_id]; old_list] in
+      (*-------------------------------------------------------------------------*)
+      (*Put rule_id into a working list*)
+      let wl = IntWL.empty in
+      let error, wl = IntWL.push parameter error rule_id wl in
+      (*TODO: add list of rule_id of half_break action into wl*)
+      (*let error, rule_list =
+	match AgentMap.unsafe_get parameter error agent_type
+	  update_bond_side_effects with
+	    | error, None -> error, []
+	    | error, Some l -> error, l
+      in
+      (*fold this rule_id_list and add it into the wl that already content rule_id*)
+      let wl =
+	List.fold_left (fun current_wl rule_id_effect ->
+	  let error, wl =
+	    IntWL.push parameter error rule_id_effect current_wl
+	  in
+	  wl
+	) wl rule_list
+      in*)
+      (*new working list*)
+      let old_wl, old_out, old_set = old_wl in
+      let in_list, out_list, set = wl in
+      let error, new_set =
+        IntWL.WSet.union parameter error set old_set
+      in
+      let new_wl =
+        List.concat [in_list; old_wl], List.concat [out_list; old_out], new_set
+      in
+      (*-------------------------------------------------------------------------*)
+      (*from wl contain rule_id, create an array to take rule_type *)
+      let nrules = Handler.nrules parameter error handler in
+      let error, empty_rule = Preprocess.empty_rule parameter error in
+      let rule_array = Array.make nrules empty_rule in
+      let rule_array =
+        IntWL.fold_left (fun rule_array rule_id' ->
+          let rule_array =
+            rule_array.(rule_id') <- rule;
+            rule_array
+          in
+          rule_array
+        ) rule_array wl
+      in
+      let new_array = Array.append rule_array old_array in
+      (*-------------------------------------------------------------------------*)
+      (*store*)
+      let error, store_result =
+        AgentMap.set
+          parameter
+          error
+          agent_type
+          (List.rev new_list, new_wl, rev_array new_array)
+          store_result
+      in
+      error, store_result)
+    (error, store_result) creation
+    
 (************************************************************************************)
 (*fixpoint iteration events:
   - first: add rules with empty lhs into a working list.

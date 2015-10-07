@@ -52,7 +52,6 @@ type half_break_action =
 
 (*do not consider the case where site has state free.*)
 type remove_action =
-  (*(Fifo.IntWL.WSet.elt * Cckappa_sig.Site_map_and_set.key * bool option) list AgentMap.t **)
     (Fifo.IntWL.WSet.elt * Cckappa_sig.Site_map_and_set.key) list AgentMap.t
 
 type bdu_analysic =
@@ -61,15 +60,18 @@ type bdu_analysic =
       store_creation         : site_bdu AgentMap.t;
       store_side_effects     : half_break_action * remove_action;
       store_modification_sites :
-        (IntWL.WSet.elt * Cckappa_sig.site_name * Cckappa_sig.state_index) list AgentMap.t;
+        (IntWL.WSet.elt * Cckappa_sig.site_name * Cckappa_sig.state_index)
+	list AgentMap.t;
       store_covering_classes_modified_sites:
-        (IntWL.WSet.elt * Cckappa_sig.site_name * Cckappa_sig.state_index) list AgentMap.t;
+        (IntWL.WSet.elt * Cckappa_sig.site_name * Cckappa_sig.state_index)
+	list AgentMap.t;
       (*contact map*)
       store_contact_map      :
         ((Cckappa_sig.agent_name list) *
             (Cckappa_sig.agent_name * Cckappa_sig.site_name *
                Cckappa_sig.state_index) list) Int2Map.t;
-      (*for instance if agent A bond to agent B; then return A bond to B and B bond to A.*)
+      (*for instance if agent A bond to agent B; 
+	then return A bond to B and B bond to A.*)
       store_binding_rhs      :
         ((Cckappa_sig.agent_name list) *
             (Cckappa_sig.agent_name * Cckappa_sig.site_name) list) Int2Map_pair.t *
@@ -83,8 +85,6 @@ type bdu_analysic =
             (Cckappa_sig.agent_name * Cckappa_sig.site_name *
                Cckappa_sig.state_index) list) Int2Map.t;
       store_update_bond_side_effects :
-	int list * int list * int list * int list
-        (*(Cckappa_sig.agent_name * Cckappa_sig.site_name * Cckappa_sig.state_index *
-	   Cckappa_sig.agent_name * Cckappa_sig.site_name * Cckappa_sig.state_index)
-	   list*)
+	IntWL.WSet.elt list AgentMap.t * IntWL.WSet.elt list AgentMap.t *
+	IntWL.WSet.elt list AgentMap.t * IntWL.WSet.elt list AgentMap.t 
     }

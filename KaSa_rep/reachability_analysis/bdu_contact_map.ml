@@ -174,7 +174,8 @@ let precise_binding_dual parameter error handler rule store_result =
   let error, result_binding =
     Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
       parameter error
-      (fun parameter error (agent, (site, state)) (agent', site', state') _result_binding ->
+      (fun parameter error (agent, (site, state)) (agent', site', state')
+	_result_binding ->
         (*binding on the rhs*)
         List.fold_left (fun (error, sol2) (site_address1, site_address2) ->
           let agent_type1 = site_address1.agent_type in

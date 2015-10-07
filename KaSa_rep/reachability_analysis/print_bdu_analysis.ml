@@ -312,6 +312,17 @@ let print_precise_binding_dual parameter error result =
 	) l2
     ) result_reverse
 
+(************************************************************************************)
+(*update rule_id: side effects and covering classes and modified sites*)
+
+let print_rule_id_list parameter error result =
+  AgentMap.print error
+    (fun error parameter rule_list ->
+      let _ =
+	print_list_rule parameter rule_list
+      in
+      error
+    ) parameter result
 
 (************************************************************************************)
 (*MAIN PRINT*)
@@ -409,6 +420,7 @@ let print_result parameter error result =
     error    
   in
   let _ =
+    let store_half_break, store_remove, store_cv, store_final = result.store_update_bond_side_effects in
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
@@ -416,18 +428,16 @@ let print_result parameter error result =
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
     let parameter_a =
-      Remanent_parameters.update_prefix parameter "agent_type" in
-    let result_half_break_bind, result_remove_bind, result_covering_classes_bind,
-      result_rule_list = result.store_update_bond_side_effects
-    in
+      Remanent_parameters.update_prefix parameter "agent_type_" in
     let error =
-      print_list_rule parameter_a result_half_break_bind;
-      fprintf stdout "list of rule of remove action:\n";
-      print_list_rule parameter_a result_remove_bind;
-      fprintf stdout "list of rule of covering classes:\n";
-      print_list_rule parameter_a result_covering_classes_bind;
-      fprintf stdout "combind rule_id covering classes and side effects:\n";
-      print_list_rule parameter_a result_rule_list
+      fprintf stdout "Half break:\n";
+      print_rule_id_list parameter_a error store_half_break;
+      fprintf stdout "Remove:\n";
+      print_rule_id_list parameter_a error store_remove;
+      fprintf stdout "Covering Classes:\n";
+      print_rule_id_list parameter_a error store_cv;
+      fprintf stdout "Update rule_id list (final result):\n";
+      print_rule_id_list parameter_a error store_final
     in
     error
   in

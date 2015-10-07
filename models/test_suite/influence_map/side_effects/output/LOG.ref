@@ -287,15 +287,20 @@ agent_type':1@site_type':0:state':1--agent_type:0@site_type:0:state:1
 ------------------------------------------------------------
 * List of rules has binding sites and side effects (TODO):
 ------------------------------------------------------------
+Half break:
+agent_type_0:
 rule_id: 1 
-list of rule of remove action:
+Remove:
+agent_type_0:
 rule_id: 3 
-list of rule of covering classes:
+Covering Classes:
+agent_type_1:
 rule_id: 0 
-combind rule_id covering classes and side effects:
+Update rule_id list (final result):
+agent_type_1:
+rule_id: 0 
 rule_id: 1 
 rule_id: 3 
-rule_id: 0 
 
 ------------------------------------------------------------
 * List of rules has creation action:
