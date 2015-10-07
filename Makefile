@@ -45,7 +45,8 @@ $(MANGENREP): $(SCRIPTSSOURCE) $(MODELS)
 	mkdir $@
 
 main/version.ml: main/version.ml.skel $(wildcard .git/refs/heads/*)
-	sed -e s/'\$$Format:%D\$$'/"tag: $$(git describe --always --dirty || echo unkown)"/ $< > $@
+	sed -e s/'\(.*\)\".*tag: \([^,\"]*\)[,\"].*/\1\"\2\"'/g $< > $@.tmp
+	sed -e 's/\$$Format:%D\$$'/"$$(git describe --always --dirty || echo unkown)"/ $@.tmp > $@
 
 %.cma %.native %.byte %.docdir/index.html: main/version.ml $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*)
 	$(OCAMLBINPATH)ocamlbuild $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) $@
