@@ -133,7 +133,7 @@ let get_parameters () =
 	Remanent_parameters_sig.time_shift=(
 	  let x = Unix.gettimeofday () in
 	  (Unix.localtime x).Unix.tm_hour - (Unix.gmtime x).Unix.tm_hour)  ;
-	Remanent_parameters_sig.hostname= Unix.gethostname () ;
+	Remanent_parameters_sig.hostname=begin try Unix.gethostname () with Failure _ -> "javascript" end;
 	Remanent_parameters_sig.command_line=Sys.argv;
 	Remanent_parameters_sig.short_version=Version.version_string;
 	Remanent_parameters_sig.version=Version.version_kasa_full_name;
@@ -228,12 +228,7 @@ let get_short_version_1                              marshalisable =
 let get_full_version_1                               marshalisable =
   Printf.sprintf "%s (with%s Tk interface)" marshalisable.Remanent_parameters_sig.version (if marshalisable.Remanent_parameters_sig.tk_interface then "" else "out")
 let get_launched_where_1                             marshalisable =
-  begin
-    try 
       marshalisable.Remanent_parameters_sig.hostname
-    with 
-      Assert_failure _ -> "javascript"
-  end
 let get_command_line_1                               marshalisable =
   marshalisable.Remanent_parameters_sig.command_line
     
