@@ -1,0 +1,17 @@
+############ TEST ACTIONS ##############
+
+#### Signatures
+
+%agent: A(x,y) 
+%agent: B(x)
+%agent: C(x)
+
+# -> A(x~u, y~u)
+# -> A(x!1), B(x!1)
+# -> A(x,y!1), C(x!1)
+
+A() ->
+A(x) ->
+A(x!x.B) -> A(x)
+A(x), B(x) -> A(x!1),B(x!1)
+A(x, y), C(x) -> A(x,y!1), C(x!1)

@@ -225,12 +225,13 @@ rule_id:3:site_type:0:state:0
 ------------------------------------------------------------
 
 ------------------------------------------------------------
-* List of rules has binding sites and side effects (TODO):
+* List of rules has binding sites and side effects set (TODO):
 ------------------------------------------------------------
-Half break:
-Remove:
-Covering Classes (cv1):
-Update rule_id list (cv1):
+Update rule_id list (cv) set:
+
+------------------------------------------------------------
+* Set:
+------------------------------------------------------------
 
 ------------------------------------------------------------
 * List of rules has creation action:

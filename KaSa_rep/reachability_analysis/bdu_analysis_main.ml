@@ -114,15 +114,24 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       store_result.store_binding_dual
   in
   (*------------------------------------------------------------------------------*)
-  let error, store_update_bond_side_effects =
-    update_bond_side_effects
+  let error, store_update_bond_side_effects_set =
+    update_bond_side_effects_set
       parameter
       error
       handler
       store_binding_dual
       store_side_effects
       store_covering_classes_modified_sites
-      store_result.store_update_bond_side_effects
+      store_result.store_update_bond_side_effects_set
+  in
+  let _, _, _, store_update_rule_id = store_update_bond_side_effects_set in
+  let error, store_update =
+    update
+      parameter
+      error
+      store_covering_classes_modified_sites
+      store_update_rule_id
+      store_result.store_update
   in
   (*------------------------------------------------------------------------------*)
   (*TEST*)
@@ -145,7 +154,8 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
     store_contact_map    = store_contact_map;
     store_binding_rhs    = store_binding_rhs;
     store_binding_dual   = store_binding_dual;
-    store_update_bond_side_effects = store_update_bond_side_effects
+    store_update_bond_side_effects_set = store_update_bond_side_effects_set;
+    store_update = store_update
   }
  
 (************************************************************************************)
@@ -163,11 +173,12 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
   let init_binding_rhs_reverse  = Int2Map_pair.empty in
   let init_binding_dual_forward = Int2Map.empty in
   let init_binding_dual_reverse = Int2Map.empty in
-  (*TODO*)
-  let error, init_update_half_break = AgentMap.create parameter error 0 in
-  let error, init_update_remove     = AgentMap.create parameter error 0 in
-  let error, init_update_cv         = AgentMap.create parameter error 0 in
-  let error, init_update_result_cv  = AgentMap.create parameter error 0 in
+  (*set*)
+  let error, init_update_half_break_set = AgentMap.create parameter error 0 in
+  let error, init_update_remove_set     = AgentMap.create parameter error 0 in
+  let error, init_update_cv_set         = AgentMap.create parameter error 0 in
+  let error, init_update_result_cv_set  = AgentMap.create parameter error 0 in
+  let error, init_update  = AgentMap.create parameter error 0 in
   let init_bdu =
     {
       store_creation      = init_creation;
@@ -178,11 +189,13 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
       store_contact_map  = init_contact_map;
       store_binding_rhs  = (init_binding_rhs_forward, init_binding_rhs_reverse);
       store_binding_dual = (init_binding_dual_forward, init_binding_dual_reverse);
-      store_update_bond_side_effects =
-	(init_update_half_break,
-	 init_update_remove,
-	 init_update_cv,
-	 init_update_result_cv)
+      store_update_bond_side_effects_set =
+	(init_update_half_break_set,
+	 init_update_remove_set,
+	 init_update_cv_set,
+	 init_update_result_cv_set
+	);
+      store_update = init_update
     }
   in
   (*------------------------------------------------------------------------------*)

@@ -239,12 +239,13 @@ agent_type:2@site_type:0:state:1--agent_type':1@site_type':0:state':2
 ------------------------------------------------------------
 
 ------------------------------------------------------------
-* List of rules has binding sites and side effects (TODO):
+* List of rules has binding sites and side effects set (TODO):
 ------------------------------------------------------------
-Half break:
-Remove:
-Covering Classes (cv1):
-Update rule_id list (cv1):
+Update rule_id list (cv) set:
+
+------------------------------------------------------------
+* Set:
+------------------------------------------------------------
 
 ------------------------------------------------------------
 * List of rules has creation action:

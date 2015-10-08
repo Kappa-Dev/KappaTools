@@ -14,6 +14,9 @@
 
 open Int_storage
 open Fifo
+open Cckappa_sig
+
+type set = Site_map_and_set.set
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Bdu_analysis_type") message exn (fun () -> default)
@@ -84,9 +87,10 @@ type bdu_analysic =
         ((Cckappa_sig.agent_name list) *
             (Cckappa_sig.agent_name * Cckappa_sig.site_name *
                Cckappa_sig.state_index) list) Int2Map.t;
-      store_update_bond_side_effects :
-        IntWL.WSet.elt list AgentMap.t *
-        IntWL.WSet.elt list AgentMap.t *
-        IntWL.WSet.elt list AgentMap.t *
-        IntWL.WSet.elt list AgentMap.t
+      store_update_bond_side_effects_set :
+	set AgentMap.t *
+        set AgentMap.t *
+        set AgentMap.t *
+        set AgentMap.t;
+      store_update : set AgentMap.t
     }

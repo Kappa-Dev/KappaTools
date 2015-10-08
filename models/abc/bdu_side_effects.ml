@@ -16,7 +16,6 @@ open Cckappa_sig
 open Int_storage
 open Bdu_analysis_type
 open Bdu_contact_map
-open Set_and_map
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "BDU side effects") message exn (fun () -> default)  
@@ -255,9 +254,9 @@ let get_list_of_binding parameter error store_binding_forward =
     (fun (agent_type_1,site_type_1,state_1) (l1,l2) current_result_1 ->
       if l1 <> []
       then
-	()
+	[]
       else
-	();
+	[];
       List.fold_left (fun current_result_2 (agent_type_2, site_type_2, state_2) ->
 	let l =
 	  (agent_type_1, site_type_1, state_1, agent_type_2, site_type_2, state_2)
@@ -268,240 +267,128 @@ let get_list_of_binding parameter error store_binding_forward =
 
 (*------------------------------------------------------------------------*)
 (*testing the binding of the first agent if it belongs to side effect or not*)
-    
-let get_binding_half_break_set parameter error agent_type_1 site_type_1 state_1
+
+let get_binding_half_break parameter error agent_type_1 site_type_1 state_1
     store_half_break store_result =
   AgentMap.fold parameter error
     (fun parameter error agent_type_effect l store_current_result ->
       let result_list, store_rule_list =
-	List.fold_left (fun (current_result, store_rule_set)
+	List.fold_left (fun (current_result, store_rule_list)
 	  (rule_id_effect, site_effect, state_effect) ->
 	    begin
 	      if agent_type_1 = agent_type_effect &&
 		site_type_1 = site_effect &&
 		state_1 = state_effect
 	      then
-		let error, rule_set =
-		  Site_map_and_set.add_set
-		    parameter
-		    error
-		    rule_id_effect
-		    current_result
+		let rule_list =
+		  rule_id_effect :: current_result
 		in
-		(*store result with its agent_type*)
-		let error, store_rule_set =
+		let error, store_rule_list =
 		  AgentMap.set
 		    parameter
 		    error
 		    agent_type_1
-		    rule_set
-		    store_rule_set
+		    rule_list
+		    store_rule_list
 		in
-		(rule_set, store_rule_set)
+		(rule_list, store_rule_list)
 	      else
-		(current_result, store_rule_set)
+		(current_result, store_rule_list)
 	    end	    
-	) (Site_map_and_set.empty_set, store_current_result) l
+	) ([], store_current_result) l
       in
-      (*store*)
+      (*store result with its agent_type*)
       error, store_rule_list
     ) store_half_break store_result
 
 (*------------------------------------------------------------------------*)    
 (*testing the binding of the first agent (without state information) 
   if it belongs to side effect or not - remove action in general*)
-    
-let get_binding_remove_set parameter error agent_type_1 site_type_1
+
+let get_binding_remove parameter error agent_type_1 site_type_1
     store_remove store_result =
   AgentMap.fold parameter error
     (fun parameter error agent_type_effect l store_current_result ->
       let result_list, store_rule_list =
-	List.fold_left (fun (current_result, store_rule_set)
+	List.fold_left (fun (current_result, store_rule_list)
 	  (rule_id_effect, site_effect) ->
 	  begin
 	    if agent_type_1 = agent_type_effect &&
 	      site_type_1 = site_effect
 	    then
-	      let error, rule_set =
-		Site_map_and_set.add_set
-		  parameter
-		  error
-		  rule_id_effect
-		  current_result
+	      let rule_list =
+		rule_id_effect :: current_result
 	      in
-	      let error, store_rule_set =
+	      let error, store_rule_list =
 		AgentMap.set
 		  parameter
 		  error
 		  agent_type_1
-		  rule_set
-		  store_rule_set
+		  rule_list
+		  store_rule_list
 	      in
-		(rule_set, store_rule_set)
+		(rule_list, store_rule_list)
 	    else
-	      (current_result, store_rule_set)
+	      (current_result, store_rule_list)
 	  end
-	) (Site_map_and_set.empty_set, store_current_result) l
+	) ([], store_current_result) l
       in
       error, store_rule_list
     ) store_remove store_result
+
 (*------------------------------------------------------------------------*)
 
-let rec split_triple = function
-  | [] -> ([], [], [])
-  | (x, y, z) :: l ->
-    let (rx, ry, rz) = split_triple l in
-    (x :: rx, y :: ry, z :: rz)
-
-let get_covering_classes_modified_binding_set parameter error agent_type_2
+let get_covering_classes_modified_binding parameter error agent_type_2
     site_type_2 state_2 store_covering_classes_modified_sites store_result =
   AgentMap.fold parameter error
     (fun parameter error agent_type_cv l store_current_result ->
       let result_list, store_rule_list =
-	List.fold_left (fun (current_result, store_rule_set)
+	List.fold_left (fun (current_result, (store_rule_list_1, store_rule_list_2))
 	  (rule_id_cv, site_cv, state_cv) ->
 	  begin
 	    if agent_type_2 = agent_type_cv &&
 	      site_type_2 = site_cv &&
 	      state_2 = state_cv
 	    then
-	      let error, rule_set =
-		Site_map_and_set.add_set
+	      let rule_list =
+		rule_id_cv :: current_result
+	      in
+	      let error, store_rule_list_1 =
+		AgentMap.set
 		  parameter
 		  error
-		  rule_id_cv
-		  current_result
+		  agent_type_2
+		  (List.rev rule_list)
+		  store_rule_list_1
 	      in
-	      let error, store_rule_set =
+	      (rule_list, (store_rule_list_1, store_rule_list_2))
+	    else
+	      (*return a list of rule_id of agent_type_0*)
+	      let rule_list = rule_id_cv :: current_result in
+	      let error, store_rule_list_2 =
 		AgentMap.set
 		  parameter
 		  error
 		  agent_type_cv
-		  rule_set
-		  store_rule_set
+		  (List.rev rule_list)
+		  store_rule_list_2
 	      in
-	      (rule_set, store_rule_set)
-	    else
-	      (current_result, store_rule_set)
+	      (rule_list, (store_rule_list_1, store_rule_list_2))
+	      (*(current_result, store_rule_list)*)
 	  end
-	) (Site_map_and_set.empty_set, store_current_result) l
+	) ([], store_current_result) l
       in
       error, store_rule_list
     ) store_covering_classes_modified_sites store_result
 
 (*------------------------------------------------------------------------*)
-(*combine with binding agents,
-  get a list of half_break_rule from side effect with half_break action*)
     
-let get_half_break_rule_set parameter error agent_type_1 site_type_1
-    state_1 store_half_break store_result_half_break =
-  let error, store_result_half_break_rule =
-    get_binding_half_break_set
-      parameter
-      error
-      agent_type_1
-      site_type_1
-      state_1
-      store_half_break
-      store_result_half_break
-  in
-  let error, half_break_rule_set =
-    match AgentMap.unsafe_get parameter error agent_type_1 store_result_half_break_rule
-    with
-      | error, None -> error, Site_map_and_set.empty_set
-      | error, Some s -> error, s
-  in
-  error, (store_result_half_break_rule, half_break_rule_set)
-
-(*------------------------------------------------------------------------*)
-(*combine with binding agents, 
-  get a list of remove_rule from side effect with remove action*)
-    
-let get_remove_set parameter error agent_type_1 site_type_1 store_remove
-    store_result_remove =
-  let error, store_result_remove_rule =
-    get_binding_remove_set
-      parameter
-      error
-      agent_type_1
-      site_type_1
-      store_remove
-      store_result_remove
-  in
-  let error, remove_rule_set =
-    match AgentMap.unsafe_get parameter error agent_type_1 store_result_remove_rule
-    with
-      | error, None -> error, Site_map_and_set.empty_set
-      | error, Some s -> error, s
-  in
-  error, (store_result_remove_rule, remove_rule_set)
-    
-(*------------------------------------------------------------------------*)
-(*combine with covering classes, modified sites,
-  get the final rule_id list for update function*)
-    
-let get_rule_id_update_set parameter error agent_type_2 site_type_2
-    state_2 half_break_rule_set remove_rule_set
-    store_covering_classes_modified_sites store_result_cv_modified
-    store_result_rule_id
-    =
-  let error, store_rule_id_update =
-    get_covering_classes_modified_binding_set
-      parameter
-      error
-      agent_type_2
-      site_type_2
-      state_2
-      store_covering_classes_modified_sites
-      store_result_cv_modified
-  in
-  (*get the first list*)
-  let error, rule_id_update_set =
-    match AgentMap.unsafe_get parameter error agent_type_2 store_rule_id_update
-    with
-      | error, None -> error, Site_map_and_set.empty_set
-      | error, Some s -> error, s
-  in
-  (*combine with side effects action: half_break and remove*)
-  let error, side_effects_rule_set =
-    Site_map_and_set.union
-      parameter
-      error
-      half_break_rule_set
-      remove_rule_set
-  in
-  let error, rule_id_set =
-    Site_map_and_set.union
-      parameter
-      error
-      side_effects_rule_set
-      rule_id_update_set
-  in
-  (*store the result of first_rule_id_list with its agent_type_2*)
-  let error, store_result_rule_id =
-    AgentMap.set
-      parameter
-      error
-      agent_type_2
-      rule_id_set
-      store_result_rule_id
-  in
-  (*return result*)
-  error, (store_rule_id_update, store_result_rule_id)
-
-(*------------------------------------------------------------------------*)
-      
-let update_bond_side_effects_set parameter error handler 
+let update_bond_side_effects parameter error handler 
     store_binding_dual store_side_effects store_covering_classes_modified_sites
     store_result =
   (*------------------------------------------------------------------------*)
-  let store_init_half_break,
-    store_init_remove,
-    store_init_cv,
-    store_init_result
-    (*store_init_result_1*)
-    = store_result
-  in
+  let store_init_half_break, store_init_remove, store_init_cv, store_init_result_1,
+    store_init_result_2 = store_result in
   (*------------------------------------------------------------------------*)
   (*binding: A bond to B and B bond to A*)
   let store_binding_forward, store_binding_reverse = store_binding_dual in
@@ -522,19 +409,20 @@ let update_bond_side_effects_set parameter error handler
     (*fold a list of binding, 
       test each the first binding agent with site and state, 
       if it belongs to side effects*)
-    let error, store_result =
+    let store_result =
       List.fold_left (fun
-	(error, (store_result_half_break,
-		 store_result_remove,
-		 store_result_cv_modified,
-		 store_result_rule_id
-	 ))
+	(store_result_half_break,
+	 store_result_remove,
+	 store_result_cv_modified,
+	 
+	 store_result_rule_id_1,
+	 store_result_rule_id_2)
 	(agent_type_1, site_type_1, state_1,
 	 agent_type_2, site_type_2, state_2) ->
 	  (*------------------------------------------------------------------------*)
 	  (*side effects information: half_break action*)
-	  let error, (store_result_half_break_rule, half_break_rule_set) =
-	    get_half_break_rule_set
+	  let error, store_result_half_break_rule =
+	    get_binding_half_break
 	      parameter
 	      error
 	      agent_type_1
@@ -543,10 +431,17 @@ let update_bond_side_effects_set parameter error handler
 	      store_half_break
 	      store_result_half_break
 	  in
+	  (*get a list of rule_id inside half_break*)
+	  let error, half_break_rule_list =
+	    match AgentMap.unsafe_get parameter error agent_type_1
+	      store_result_half_break_rule with
+	      | error, None -> error, []
+	      | error, Some l -> error, l
+	  in
 	  (*------------------------------------------------------------------------*)
 	  (*side effects information: remove action*)
-	  let error, (store_result_remove_rule, remove_rule_set) =
-	    get_remove_set
+	  let error, store_result_remove_rule =
+	    get_binding_remove
 	      parameter
 	      error
 	      agent_type_1
@@ -554,70 +449,89 @@ let update_bond_side_effects_set parameter error handler
 	      store_remove
 	      store_result_remove
 	  in
+	  (*get a list of rule_id inside remove*)
+	  let error, remove_rule_list =
+	    match AgentMap.unsafe_get parameter error agent_type_1
+	      store_result_remove_rule with
+	      | error, None -> error, []
+	      | error, Some l -> error, l
+	  in
 	  (*------------------------------------------------------------------------*)
 	  (*final rule_id: combine rule_id list inside covering classes
 	    and added a list of rule_id inside side effects 
 	    (half_break action and remove action)*)
-	  let error, (store_rule_id_update, store_result_rule_id) =
-	    get_rule_id_update_set
+	  let error, (store_rule_id_update_1, store_rule_id_update_2) =
+	    get_covering_classes_modified_binding
 	      parameter
 	      error
 	      agent_type_2
 	      site_type_2
 	      state_2
-	      half_break_rule_set
-	      remove_rule_set
 	      store_covering_classes_modified_sites
 	      store_result_cv_modified
-	      store_result_rule_id
+	  in
+	  (*get list of rule_id_update*)
+	  let error, rule_id_update_list_1 =
+	    match AgentMap.unsafe_get parameter error agent_type_2
+	      store_rule_id_update_1 with
+	      | error, None -> error, []
+	      | error, Some l -> error, l
+	  in
+	  (*get list of rule_id agent_type_0*)
+	  let error, rule_id_update_list_2 = (*FIXME*)
+	    match AgentMap.unsafe_get parameter error agent_type_2
+	      store_rule_id_update_2 with
+		| error, None -> error, []
+		| error, Some l -> error, l
 	  in
 	  (*------------------------------------------------------------------------*)
-	  (*return result*)
-	  error,
-	  (store_result_half_break_rule,
-	   store_result_remove_rule,
-	   store_rule_id_update,
-	   store_result_rule_id
-	  )
-      ) (error,
-	 (store_init_half_break,
-	  store_init_remove,
-	  store_init_cv,
-	  store_init_result)
-      )	binding_list
-    in
-    error, store_result
-
-let update parameter error store_covering_classes_modified_sites store_result_rule_id
-    store_result =
-  AgentMap.fold parameter error
-    (fun parameter error agent_type_cv l store_result_1 ->
-      AgentMap.fold parameter error
-	(fun parameter error agent_type set store_result_2 ->
-	  let result_set =
-	    List.fold_left (fun current_set (rule_id_cv, _, _) ->
-	      if agent_type = agent_type_cv
-	      then
-		set
-	      else
-		let error, result_set =
-		  Site_map_and_set.add_set
-		    parameter
-		    error
-		    rule_id_cv
-		    current_set
-		in
-		result_set
-	    ) Site_map_and_set.empty_set l
-	  in
-	  let error, store_result =
+	  (*combine side effects rule_id and rule_id_update_list*)
+	  let first_concat = List.concat [half_break_rule_list; remove_rule_list] in
+	  let final_rule_id_list = List.concat [rule_id_update_list_1; first_concat] in
+	  (*------------------------------------------------------------------------*)
+	  (*store this final rule_id inside agent_type*)
+	  let error, store_result_rule_id_1 =
 	    AgentMap.set
 	      parameter
 	      error
-	      agent_type
-	      set
-	      store_result_2
+	      agent_type_2
+	      final_rule_id_list
+	      store_result_rule_id_1
 	  in
-	  error, store_result
-	) store_result_rule_id store_result_1
-    ) store_covering_classes_modified_sites store_result
+	  (*TODO:*)
+	  let error, store_result_rule_id_2 =
+	    AgentMap.fold parameter error
+	      (fun parameter error agent_type_cv _ current_result ->
+		let error, store_result =
+		  AgentMap.set
+		    parameter
+		    error
+		    agent_type_cv
+		    rule_id_update_list_2
+		    current_result
+		in
+		error, store_result
+	      ) store_covering_classes_modified_sites store_result_rule_id_2
+	  in
+	  
+	  (*let error, store_result_rule_id_2 =
+	    AgentMap.set
+	      parameter
+	      error
+	      agent_type_2 (*agent_type_cv*)
+	      rule_id_update_list_2
+	      store_result_rule_id_2
+	  in*)
+	  (store_result_half_break_rule,
+	   store_result_remove_rule,
+	   (store_rule_id_update_1, store_rule_id_update_2),
+	   store_result_rule_id_1,
+	   store_result_rule_id_2)
+      ) (store_init_half_break,
+	 store_init_remove,
+	 store_init_cv,
+	 store_init_result_1,
+	 store_init_result_2)
+	binding_list
+    in
+    error, store_result

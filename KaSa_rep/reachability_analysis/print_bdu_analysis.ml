@@ -315,15 +315,29 @@ let print_precise_binding_dual parameter error result =
 (************************************************************************************)
 (*update rule_id: side effects and covering classes and modified sites*)
 
-let print_rule_id_list parameter error result =
+let print_rule_id_set parameter error result =
   AgentMap.print error
-    (fun error parameter rule_list ->
+    (fun error parameter rule_set ->
       let _ =
-	print_list_rule parameter rule_list
+	Site_map_and_set.iter_set (fun elt ->
+	  let _ =
+	    fprintf stdout "rule_id:%i\n" elt
+	  in
+	  ()
+	) rule_set
       in
       error
     ) parameter result
 
+let print_rule_set result =
+  Site_map_and_set.iter_set (fun elt ->
+    let _ =
+      fprintf stdout "rule_id:%i\n" elt
+    in
+    ()
+  ) result
+    
+    
 (************************************************************************************)
 (*MAIN PRINT*)
 
@@ -420,28 +434,39 @@ let print_result parameter error result =
     error    
   in
   let _ =
-    let store_half_break, store_remove, store_cv, store_result_cv =
-      result.store_update_bond_side_effects
+    let store_half_break_set, store_remove_set, store_cv_set, store_result_cv_set
+      = result.store_update_bond_side_effects_set
     in
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
-      "* List of rules has binding sites and side effects (TODO):\n";
+      "* List of rules has binding sites and side effects set (TODO):\n";
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
     let parameter_a =
       Remanent_parameters.update_prefix parameter "agent_type_" in
     let error =
-      fprintf stdout "Half break:\n";
-      let _ = print_rule_id_list parameter_a error store_half_break in
-      fprintf stdout "Remove:\n";
-      let _ = print_rule_id_list parameter_a error store_remove  in
-      fprintf stdout "Covering Classes (cv1):\n";
-      let _ = print_rule_id_list parameter_a error store_cv in
-      fprintf stdout "Update rule_id list (cv1):\n";
-      print_rule_id_list parameter_a error store_result_cv
+      (*fprintf stdout "Half break set:\n";
+      let _ = print_rule_id_set parameter_a error store_half_break_set in
+      fprintf stdout "Remove set:\n";
+      let _ = print_rule_id_set parameter_a error store_remove_set  in
+      fprintf stdout "Covering Classes (cv1) set:\n";
+      let _ = print_rule_id_set parameter_a error store_cv_set in*)
+      fprintf stdout "Update rule_id list (cv) set:\n";
+      print_rule_id_set parameter_a error store_result_cv_set
     in
     error
+  in
+  let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "\n------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter)
+      "* Set:\n";
+    fprintf (Remanent_parameters.get_log parameter)
+      "------------------------------------------------------------\n";
+    let parameter_a =
+      Remanent_parameters.update_prefix parameter "agent_type_" in
+      print_rule_id_set parameter_a error result.store_update
   in
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
