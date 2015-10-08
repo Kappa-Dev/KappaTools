@@ -92,7 +92,7 @@ let covering_classes_modified_sites parameter error covering_classes store_resul
       in
       (*------------------------------------------------------------------------------*)
       (*from result_covering_class get site dictionary, then get a list
-        of site in the covering class.*)
+        of sites in the covering class.*)
       let site_dic = remanent.store_dic in
       let error, num =
         Dictionary_of_Covering_class.last_entry
@@ -109,7 +109,7 @@ let covering_classes_modified_sites parameter error covering_classes store_resul
           (fun error -> warn parameter error (Some "") Exit ([], (), ()))
       in
       (*------------------------------------------------------------------------------*)
-      (*maping sites that are in covering class, to a list of sites that are modified.*)
+      (*maping sites that are in covering class to a list of sites that are modified.*)
       let rule_list =
         List.fold_left (fun current_list (rule_id, site_modif, state) ->
           List.fold_left (fun current_list site_cv ->

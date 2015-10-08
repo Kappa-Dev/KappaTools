@@ -214,10 +214,10 @@ agent_type':1@site_type':0:state':1--agent_type:0@site_type:0:state:1
 ------------------------------------------------------------
 Half break:
 Remove:
-Covering Classes:
+Covering Classes (cv1):
 agent_type_1:
 rule_id: 0 
-Update rule_id list (final result):
+Update rule_id list (cv1):
 agent_type_1:
 rule_id: 0 
 

@@ -163,10 +163,11 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
   let init_binding_rhs_reverse  = Int2Map_pair.empty in
   let init_binding_dual_forward = Int2Map.empty in
   let init_binding_dual_reverse = Int2Map.empty in
+  (*TODO*)
   let error, init_update_half_break = AgentMap.create parameter error 0 in
-  let error, init_update_remove = AgentMap.create parameter error 0 in
-  let error, init_update_cv = AgentMap.create parameter error 0 in
-  let error, init_update_final = AgentMap.create parameter error 0 in
+  let error, init_update_remove     = AgentMap.create parameter error 0 in
+  let error, init_update_cv         = AgentMap.create parameter error 0 in
+  let error, init_update_result_cv  = AgentMap.create parameter error 0 in
   let init_bdu =
     {
       store_creation      = init_creation;
@@ -177,7 +178,11 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
       store_contact_map  = init_contact_map;
       store_binding_rhs  = (init_binding_rhs_forward, init_binding_rhs_reverse);
       store_binding_dual = (init_binding_dual_forward, init_binding_dual_reverse);
-      store_update_bond_side_effects = (init_update_half_break, init_update_remove, init_update_cv, init_update_final)
+      store_update_bond_side_effects =
+	(init_update_half_break,
+	 init_update_remove,
+	 init_update_cv,
+	 init_update_result_cv)
     }
   in
   (*------------------------------------------------------------------------------*)

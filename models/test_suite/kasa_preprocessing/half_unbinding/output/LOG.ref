@@ -168,8 +168,8 @@ agent_type_2:
 ------------------------------------------------------------
 Half break:
 Remove:
-Covering Classes:
-Update rule_id list (final result):
+Covering Classes (cv1):
+Update rule_id list (cv1):
 
 ------------------------------------------------------------
 * List of rules has creation action:

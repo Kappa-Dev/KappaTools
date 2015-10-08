@@ -420,7 +420,9 @@ let print_result parameter error result =
     error    
   in
   let _ =
-    let store_half_break, store_remove, store_cv, store_final = result.store_update_bond_side_effects in
+    let store_half_break, store_remove, store_cv, store_result_cv =
+      result.store_update_bond_side_effects
+    in
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
@@ -431,13 +433,13 @@ let print_result parameter error result =
       Remanent_parameters.update_prefix parameter "agent_type_" in
     let error =
       fprintf stdout "Half break:\n";
-      print_rule_id_list parameter_a error store_half_break;
+      let _ = print_rule_id_list parameter_a error store_half_break in
       fprintf stdout "Remove:\n";
-      print_rule_id_list parameter_a error store_remove;
-      fprintf stdout "Covering Classes:\n";
-      print_rule_id_list parameter_a error store_cv;
-      fprintf stdout "Update rule_id list (final result):\n";
-      print_rule_id_list parameter_a error store_final
+      let _ = print_rule_id_list parameter_a error store_remove  in
+      fprintf stdout "Covering Classes (cv1):\n";
+      let _ = print_rule_id_list parameter_a error store_cv in
+      fprintf stdout "Update rule_id list (cv1):\n";
+      print_rule_id_list parameter_a error store_result_cv
     in
     error
   in

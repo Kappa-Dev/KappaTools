@@ -293,10 +293,10 @@ rule_id: 1
 Remove:
 agent_type_0:
 rule_id: 3 
-Covering Classes:
+Covering Classes (cv1):
 agent_type_1:
 rule_id: 0 
-Update rule_id list (final result):
+Update rule_id list (cv1):
 agent_type_1:
 rule_id: 0 
 rule_id: 1 
