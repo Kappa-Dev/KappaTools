@@ -89,89 +89,11 @@ let half_break_action parameter error handler rule_id half_break store_result =
 
 let site_free_of_port port = port.site_free
 
-(*let remove_action parameter error rule_id remove store_result =
-  List.fold_left (fun (error, store_result) (agent_index, agent, list_undoc) ->
-    let store_remove_with_info, store_remove_without_info = store_result in
-    let agent_type = agent.agent_name in
-    (*FIXME: if it is a site_free then do not consider this case.*)
-    (*-------------------------------------------------------------------------*)
-    (*remove with document site: r1 is the rule with this property*)
-    let triple_list =
-      Site_map_and_set.fold_map
-        (fun site port current_list ->
-          let site_free = site_free_of_port port in
-          let list = (rule_id, site, site_free) :: current_list in
-          list
-        ) agent.agent_interface []
-    in
-    (*old*)
-    let error, old_list =
-      match AgentMap.unsafe_get parameter error agent_type store_remove_with_info with
-      | error, None -> error, []
-      | error, Some l -> error, l
-    in
-    (*new*)
-    let new_list = List.concat [triple_list; old_list] in
-    (*-------------------------------------------------------------------------*)
-    (*remove with no information: r0 is the rule with this property*)
-    let pair_list =
-      List.fold_left (fun current_list site ->
-        let list = (rule_id, site) :: current_list in
-        list
-      ) [] list_undoc
-    in
-    (*old*)
-    let error, old_pair_list =
-      match AgentMap.unsafe_get parameter error agent_type store_remove_without_info with
-      | error, None -> error, []
-      | error, Some l -> error, l
-    in
-    (*new*)
-    let new_pair_list = List.concat [pair_list; old_pair_list] in
-    (*-------------------------------------------------------------------------*)
-    (*store*)
-    let error, store_remove_with_info =
-      AgentMap.set
-        parameter
-        error
-        agent_type
-        (List.rev new_list)
-        store_remove_with_info
-    in
-    let error, store_remove_without_info =
-      AgentMap.set
-        parameter
-        error
-        agent_type
-        (List.rev new_pair_list)
-        store_remove_without_info
-    in
-    error, (store_remove_with_info, store_remove_without_info)
-  ) (error, store_result) remove*)
-
 let remove_action parameter error rule_id remove store_result =
   List.fold_left (fun (error, store_result) (agent_index, agent, list_undoc) ->
     (*let store_remove_with_info, store_remove_without_info = store_result in*)
     let agent_type = agent.agent_name in
-    (*FIXME: if it is a site_free then do not consider this case.*)
-    (*-------------------------------------------------------------------------*)
-    (*remove with document site: r1 is the rule with this property*)
-    (*let triple_list =
-      Site_map_and_set.fold_map
-        (fun site port current_list ->
-          let site_free = site_free_of_port port in
-          let list = (rule_id, site, site_free) :: current_list in
-          list
-        ) agent.agent_interface []
-    in
-    (*old*)
-    let error, old_list =
-      match AgentMap.unsafe_get parameter error agent_type store_remove_with_info with
-      | error, None -> error, []
-      | error, Some l -> error, l
-    in
-    (*new*)
-    let new_list = List.concat [triple_list; old_list] in*)
+    (*NOTE: if it is a site_free then do not consider this case.*)
     (*-------------------------------------------------------------------------*)
     (*remove with no information: r0 is the rule with this property*)
     let pair_list =
@@ -190,14 +112,6 @@ let remove_action parameter error rule_id remove store_result =
     let new_pair_list = List.concat [pair_list; old_pair_list] in
     (*-------------------------------------------------------------------------*)
     (*store*)
-    (*let error, store_remove_with_info =
-      AgentMap.set
-        parameter
-        error
-        agent_type
-        (List.rev new_list)
-        store_remove_with_info
-    in*)
     let error, store_result =
       AgentMap.set
         parameter
@@ -580,6 +494,8 @@ let update_bond_side_effects_set parameter error handler
       )	binding_list
     in
     error, store_result
+
+(*------------------------------------------------------------------------*)
 
 let store_update parameter error store_covering_classes_modified_sites
     store_result_rule_id store_result =

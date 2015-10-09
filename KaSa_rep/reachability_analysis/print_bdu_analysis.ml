@@ -115,16 +115,7 @@ let print_side_effects parameter error result =
         error
       ) parameter result_half_break
   in
-  (*do not consider where site has state free*)
-  (*let error =
-    AgentMap.print error
-      (fun error parameter l ->
-        let _ =
-          print_triple_option l
-        in
-        error
-      ) parameter result_remove_with_info
-  in*)
+  (*NOTE: do not consider where site has state free*)
   let error =
     AgentMap.print error
       (fun error parameter l ->

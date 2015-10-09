@@ -96,6 +96,7 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       error
       handler
   in
+  (*------------------------------------------------------------------------------*)
   (*if agent A bond to agent B; then return A bond to B and B bond to A*)
   let error, store_binding_rhs =
     collect_binding_rhs
@@ -104,6 +105,7 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       rule
       store_result.store_binding_rhs
   in
+  (*------------------------------------------------------------------------------*)
   (*if agent A bond to agent B; then return A bond to B and B bond to A*)
   let store_binding_dual =
     precise_binding_dual
@@ -124,6 +126,7 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       store_covering_classes_modified_sites
       store_result.store_update_bond_side_effects_set
   in
+  (*------------------------------------------------------------------------------*)
   let _, _, _, store_update_rule_id = store_update_bond_side_effects_set in
   let error, store_update =
     store_update
@@ -173,7 +176,7 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
   let init_binding_rhs_reverse  = Int2Map_pair.empty in
   let init_binding_dual_forward = Int2Map.empty in
   let init_binding_dual_reverse = Int2Map.empty in
-  (*set*)
+  (*update covering classes and binding sites.*)
   let error, init_update_half_break_set = AgentMap.create parameter error 0 in
   let error, init_update_remove_set     = AgentMap.create parameter error 0 in
   let error, init_update_cv_set         = AgentMap.create parameter error 0 in
