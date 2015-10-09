@@ -1,0 +1,33 @@
+#Download sources/binaries at https://github.com/Kappa-Dev/KaSim
+#
+#Command line is: KaSa bdu_analysis.ka --debugging-mode --output-directory output
+#
+#This file contains the description of the influence map in dot.
+#Please use graphviz (http://www.graphviz.org) or OmniGraffle to export it to a PDF
+#
+digraph G{ 
+node [shape=box, style=filled, fillcolor=lightskyblue];
+"0:A()->" ; 
+"1:A(x)->" ; 
+"2:A(x!x.B)->A(x)" ; 
+"3:A(x),B(x)->A(x!1),B(x!1)" ; 
+"4:A(x,y),C(x)->A(x,y!1),C(x!1)" ; 
+edge [color=green, arrowhead=normal];
+"0:A()->" -> "3:A(x),B(x)->A(x!1),B(x!1)"[label ="[0*->1]"] ; 
+"0:A()->" -> "4:A(x,y),C(x)->A(x,y!1),C(x!1)"[label ="[0*->1]"] ; 
+"1:A(x)->" -> "4:A(x,y),C(x)->A(x,y!1),C(x!1)"[label ="[0*->1]"] ; 
+"2:A(x!x.B)->A(x)" -> "1:A(x)->"[label ="[0->0]"] ; 
+"2:A(x!x.B)->A(x)" -> "3:A(x),B(x)->A(x!1),B(x!1)"[label ="[0*->1];[0->0]"] ; 
+"2:A(x!x.B)->A(x)" -> "4:A(x,y),C(x)->A(x,y!1),C(x!1)"[label ="[0->0]"] ; 
+"3:A(x),B(x)->A(x!1),B(x!1)" -> "2:A(x!x.B)->A(x)"[label ="[0->0]"] ; 
+edge [color=red, arrowhead=tee];
+"0:A()->" -> "1:A(x)->"[label ="[0->0]"] ; 
+"0:A()->" -> "2:A(x!x.B)->A(x)"[label ="[0->0]"] ; 
+"0:A()->" -> "3:A(x),B(x)->A(x!1),B(x!1)"[label ="[0->0]"] ; 
+"0:A()->" -> "4:A(x,y),C(x)->A(x,y!1),C(x!1)"[label ="[0->0]"] ; 
+"1:A(x)->" -> "0:A()->"[label ="[0->0]"] ; 
+"1:A(x)->" -> "3:A(x),B(x)->A(x!1),B(x!1)"[label ="[0->0]"] ; 
+"1:A(x)->" -> "4:A(x,y),C(x)->A(x,y!1),C(x!1)"[label ="[0->0]"] ; 
+"3:A(x),B(x)->A(x!1),B(x!1)" -> "1:A(x)->"[label ="[0->0]"] ; 
+"3:A(x),B(x)->A(x!1),B(x!1)" -> "4:A(x,y),C(x)->A(x,y!1),C(x!1)"[label ="[0->0]"] ; 
+}
