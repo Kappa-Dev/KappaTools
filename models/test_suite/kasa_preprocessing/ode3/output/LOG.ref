@@ -272,16 +272,7 @@ agent_type':1@site_type':0:state':1--agent_type:0@site_type:1:state:1
 agent_type':2@site_type':0:state':1--agent_type:0@site_type:2:state:1
 
 ------------------------------------------------------------
-* List of rules has binding sites and side effects set (TODO):
-------------------------------------------------------------
-Update rule_id list (cv) set:
-agent_type_1:
-rule_id:0
-agent_type_2:
-rule_id:1
-
-------------------------------------------------------------
-* Set:
+* Update function:
 ------------------------------------------------------------
 agent_type_0:
 rule_id:1

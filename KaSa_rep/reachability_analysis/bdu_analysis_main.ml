@@ -126,7 +126,7 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
   in
   let _, _, _, store_update_rule_id = store_update_bond_side_effects_set in
   let error, store_update =
-    update
+    store_update
       parameter
       error
       store_covering_classes_modified_sites

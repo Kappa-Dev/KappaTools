@@ -346,24 +346,6 @@ let get_binding_remove_set parameter error agent_type_1 site_type_1
       error, store_rule_list
     ) store_remove store_result
 (*------------------------------------------------------------------------*)
-
-let rec split_triple = function
-  | [] -> ([], [], [])
-  | (x, y, z) :: l ->
-    let (rx, ry, rz) = split_triple l in
-    (x :: rx, y :: ry, z :: rz)
-      
-let set_of_list parameter error li =
-  List.fold_left (fun set elem ->
-    let error, current_set =
-      Site_map_and_set.add_set
-	parameter
-	error
-	elem
-	set
-    in
-    current_set
-  ) Site_map_and_set.empty_set li
     
 let get_covering_classes_modified_binding_set parameter error agent_type_2
     site_type_2 state_2 store_covering_classes_modified_sites store_result =
@@ -599,25 +581,26 @@ let update_bond_side_effects_set parameter error handler
     in
     error, store_result
 
-let update parameter error store_covering_classes_modified_sites store_result_rule_id
-    store_result =
+let store_update parameter error store_covering_classes_modified_sites
+    store_result_rule_id store_result =
   AgentMap.fold parameter error
     (fun parameter error agent_type_cv l store_result_1 ->
       AgentMap.fold parameter error
 	(fun parameter error agent_type set store_result_2 ->
-	  let result_set =
-	    List.fold_left (fun current_set (rule_id_cv, _, _) ->
+	  let error, store_result =
+	    List.fold_left (fun (error, store_current_result) (rule_id_cv, _, _) ->
 	      if agent_type = agent_type_cv
 	      then
-		let error, result =
+		(*agent type 2*)
+		let error, store_result =
 		  AgentMap.set
 		    parameter
 		    error
 		    agent_type_cv
 		    set
-		    current_set
+		    store_current_result
 		in
-		result
+		error, store_result
 	      else
 		let error, result_set =
 		  Site_map_and_set.add_set
@@ -627,7 +610,9 @@ let update parameter error store_covering_classes_modified_sites store_result_ru
 		    Site_map_and_set.empty_set
 		in
 		let error, old_set =
-		  match AgentMap.unsafe_get parameter error agent_type_cv current_set with
+		  match AgentMap.unsafe_get parameter error agent_type_cv
+		    store_current_result
+		  with
 		    | error, None -> error, Site_map_and_set.empty_set
 		    | error, Some s -> error, s
 		in
@@ -638,17 +623,17 @@ let update parameter error store_covering_classes_modified_sites store_result_ru
 		    old_set
 		    result_set
 		in
-		let error, result =
+		let error, store_result =
 		  AgentMap.set
 		    parameter
 		    error
 		    agent_type_cv
 		    new_set
-		    current_set
+		    store_current_result
 		in
-		result
-	    ) store_result_1 l
+		error, store_result
+	    ) (error, store_result_2) l
 	  in
-	  error, result_set
+	  error, store_result
 	) store_result_rule_id store_result_1
     ) store_covering_classes_modified_sites store_result

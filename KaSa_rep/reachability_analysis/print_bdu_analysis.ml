@@ -433,7 +433,7 @@ let print_result parameter error result =
     in
     error    
   in
-  let _ =
+  (*let _ =
     let store_half_break_set, store_remove_set, store_cv_set, store_result_cv_set
       = result.store_update_bond_side_effects_set
     in
@@ -456,12 +456,12 @@ let print_result parameter error result =
       print_rule_id_set parameter_a error store_result_cv_set
     in
     error
-  in
+  in*)
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
-      "* Set:\n";
+      "* Update function:\n";
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
     let parameter_a =
