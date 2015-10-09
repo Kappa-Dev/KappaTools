@@ -352,7 +352,19 @@ let rec split_triple = function
   | (x, y, z) :: l ->
     let (rx, ry, rz) = split_triple l in
     (x :: rx, y :: ry, z :: rz)
-
+      
+let set_of_list parameter error li =
+  List.fold_left (fun set elem ->
+    let error, current_set =
+      Site_map_and_set.add_set
+	parameter
+	error
+	elem
+	set
+    in
+    current_set
+  ) Site_map_and_set.empty_set li
+    
 let get_covering_classes_modified_binding_set parameter error agent_type_2
     site_type_2 state_2 store_covering_classes_modified_sites store_result =
   AgentMap.fold parameter error
@@ -499,7 +511,6 @@ let update_bond_side_effects_set parameter error handler
     store_init_remove,
     store_init_cv,
     store_init_result
-    (*store_init_result_1*)
     = store_result
   in
   (*------------------------------------------------------------------------*)
@@ -598,26 +609,46 @@ let update parameter error store_covering_classes_modified_sites store_result_ru
 	    List.fold_left (fun current_set (rule_id_cv, _, _) ->
 	      if agent_type = agent_type_cv
 	      then
-		set
+		let error, result =
+		  AgentMap.set
+		    parameter
+		    error
+		    agent_type_cv
+		    set
+		    current_set
+		in
+		result
 	      else
 		let error, result_set =
 		  Site_map_and_set.add_set
 		    parameter
 		    error
 		    rule_id_cv
+		    Site_map_and_set.empty_set
+		in
+		let error, old_set =
+		  match AgentMap.unsafe_get parameter error agent_type_cv current_set with
+		    | error, None -> error, Site_map_and_set.empty_set
+		    | error, Some s -> error, s
+		in
+		let error, new_set =
+		  Site_map_and_set.union
+		    parameter
+		    error
+		    old_set
+		    result_set
+		in
+		let error, result =
+		  AgentMap.set
+		    parameter
+		    error
+		    agent_type_cv
+		    new_set
 		    current_set
 		in
-		result_set
-	    ) Site_map_and_set.empty_set l
+		result
+	    ) store_result_1 l
 	  in
-	  let error, store_result =
-	    AgentMap.set
-	      parameter
-	      error
-	      agent_type
-	      set
-	      store_result_2
-	  in
-	  error, store_result
+	  error, result_set
 	) store_result_rule_id store_result_1
     ) store_covering_classes_modified_sites store_result
