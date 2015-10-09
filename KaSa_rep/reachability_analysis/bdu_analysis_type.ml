@@ -92,5 +92,7 @@ type bdu_analysic =
         set AgentMap.t *
         set AgentMap.t *
         set AgentMap.t;
-      store_update : set AgentMap.t
+      store_update : set AgentMap.t;
+      (*bdu fixpoint iteration*)
+      store_fixpoint : (wl_int * Cckappa_sig.rule array) AgentMap.t
     }

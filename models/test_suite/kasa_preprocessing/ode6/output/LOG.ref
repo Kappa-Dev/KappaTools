@@ -607,6 +607,22 @@ agent_type_3:
 rule_id:3
 
 ------------------------------------------------------------
+* Fixpoint iteration (TODO):
+------------------------------------------------------------
+agent_type_0:
+Working list:
+0 
+agent_type_1:
+Working list:
+0 1 
+agent_type_2:
+Working list:
+2 3 
+agent_type_3:
+Working list:
+3 
+
+------------------------------------------------------------
 * List of rules has creation action:
 ------------------------------------------------------------
 

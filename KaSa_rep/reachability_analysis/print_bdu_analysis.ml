@@ -327,7 +327,18 @@ let print_rule_set result =
     in
     ()
   ) result
-    
+
+(************************************************************************************)
+
+let print_fixpoint_iteration parameter error result =
+  AgentMap.print error
+    (fun error parameter (wl, rule_array) ->
+      let _ =
+	fprintf stdout "Working list:\n";
+	IntWL.print_wl parameter wl
+      in
+      error
+    ) parameter result
     
 (************************************************************************************)
 (*MAIN PRINT*)
@@ -458,6 +469,20 @@ let print_result parameter error result =
     let parameter_a =
       Remanent_parameters.update_prefix parameter "agent_type_" in
       print_rule_id_set parameter_a error result.store_update
+  in
+  let _ =
+     fprintf (Remanent_parameters.get_log parameter)
+      "\n------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter)
+      "* Fixpoint iteration (TODO):\n";
+    fprintf (Remanent_parameters.get_log parameter)
+      "------------------------------------------------------------\n";
+    let parameter_a =
+      Remanent_parameters.update_prefix parameter "agent_type_" in
+    let error =
+      print_fixpoint_iteration parameter_a error result.store_fixpoint
+    in
+    error
   in
   let _ =
     fprintf (Remanent_parameters.get_log parameter)

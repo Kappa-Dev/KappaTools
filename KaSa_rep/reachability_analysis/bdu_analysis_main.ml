@@ -22,6 +22,7 @@ open Print_bdu_analysis
 open Bdu_side_effects
 open Bdu_modification_sites
 open Bdu_contact_map
+open Bdu_fixpoint_iteration
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "BDU analysis") message exn (fun () -> default)  
@@ -137,14 +138,16 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       store_result.store_update
   in
   (*------------------------------------------------------------------------------*)
-  (*TEST*)
-  (*let error, wl =
-    fixpoint
+  (*fixpoint iteration function: TODO*)
+  let error, store_fixpoint =
+    collect_wl_rule_id_update
       parameter
       error
-      store_creation_rule
-      store_result.store_wl
-  in*)
+      handler
+      rule
+      store_update
+      store_result.store_fixpoint
+  in
   (*------------------------------------------------------------------------------*)
   (*store*)
   error,
@@ -158,7 +161,8 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
     store_binding_rhs    = store_binding_rhs;
     store_binding_dual   = store_binding_dual;
     store_update_bond_side_effects_set = store_update_bond_side_effects_set;
-    store_update = store_update
+    store_update = store_update;
+    store_fixpoint = store_fixpoint
   }
  
 (************************************************************************************)
@@ -182,6 +186,7 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
   let error, init_update_cv_set         = AgentMap.create parameter error 0 in
   let error, init_update_result_cv_set  = AgentMap.create parameter error 0 in
   let error, init_update  = AgentMap.create parameter error 0 in
+  let error, init_fixpoint = AgentMap.create parameter error 0 in
   let init_bdu =
     {
       store_creation      = init_creation;
@@ -198,7 +203,8 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
 	 init_update_cv_set,
 	 init_update_result_cv_set
 	);
-      store_update = init_update
+      store_update = init_update;
+      store_fixpoint = init_fixpoint
     }
   in
   (*------------------------------------------------------------------------------*)
