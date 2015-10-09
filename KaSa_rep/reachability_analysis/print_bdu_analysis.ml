@@ -79,6 +79,34 @@ let print_creation_rule parameter error result =
     ) parameter result
 
 (************************************************************************************)
+(*print rule test; test inside the rule_array of update function*)
+
+(*let print_bdu_array_test parameter error result =
+  AgentMap.print error
+    (fun error parameter (l, bdu_test, modif_list) ->
+      
+    ) parameter result
+
+  
+let print_rule_array_test parameter error rule_array = 
+  let error, store = AgentMap.create parameter error 0 in
+  Array.iteri (fun index rule ->
+    let _ =
+      let error, store =
+	Bdu_fixpoint_iteration.build_bdu_test_list_direct
+	  parameter
+	  error
+	  rule.rule_lhs.views
+	  rule.diff_direct
+	  store
+      in
+      print_bdu_array_test parameter error store
+    in
+    ()
+  ) rule_array*)
+    
+    
+(************************************************************************************)
 (*side effects*)
 
 let print_triple parameter l =

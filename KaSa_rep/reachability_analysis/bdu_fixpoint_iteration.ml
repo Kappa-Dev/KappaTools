@@ -17,12 +17,78 @@ open Bdu_analysis_type
 open Fifo
 open Bdu_side_effects
 open Set_and_map
+open Bdu_build
+open Bdu_creation
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "BDU fixpoint iteration") message exn
     (fun () -> default)  
 
 let trace = false
+
+(************************************************************************************)
+(*build bdu for test (rule on the lhs) and modified sites list*)
+
+let build_bdu_test_list_direct parameter error rule_lhs_views rule_diff_direct
+    store_result =
+  let error, (bdu_handler, bdu_init) = bdu_init parameter in
+  AgentMap.fold2_common parameter error
+    (fun parameter error agent_id agent site_modif store_result ->
+      match agent with
+	| Ghost -> error, store_result
+	| Agent agent ->
+	  (*if there is no modified site then return the result*)
+	  if Site_map_and_set.is_empty_map site_modif.agent_interface
+	  then
+	    error, store_result
+	  else
+	    let agent_type = agent.agent_name in
+	    (*build a list of pair (site, state); build bdu from this pair*)
+	    let site_list, (bdu_handler, bdu_test) =
+	      Site_map_and_set.fold_map
+		(fun site port (current_list, _) ->
+		  let state = int_of_port port in
+		  let l = (site, state) :: current_list in
+		  let error, (bdu_handler, bdu) =
+		    build_bdu parameter error l
+		  in
+		  l, (bdu_handler, bdu)
+		) agent.agent_interface ([], (bdu_handler, bdu_init))
+	    in
+	    (*build modif list TODO: agent_type of site_modif*)
+	    let modif_list =
+	      Site_map_and_set.fold_map
+		(fun site port current_list ->
+		  let state = int_of_port port in
+		  (site, state) :: current_list
+		) site_modif.agent_interface []
+	    in
+	    (*REMARK: get these information at each rule and not a set of rule, because 
+	      will fold inside an array of rule*)
+	    let error, store_result =
+	      AgentMap.set
+		parameter
+		error
+		agent_type
+		(site_list, bdu_test, modif_list)
+		store_result
+	    in
+	    error, store_result
+	    (*get old*)
+	    (*let error, (bdu_test, modif_list) =
+	      match AgentMap.unsafe_get parameter error agent_type store_result with
+		| error, None -> error, (bdu_init, [])
+		| error, Some (bdu_test, modif_list) -> error, (bdu_test, modif_list)
+	    in
+	    (*get new*)
+	    let
+	    in
+	    (*store*)
+	    let
+	    in*)
+    ) rule_lhs_views rule_diff_direct store_result
+
+    
 
 (************************************************************************************)    
 (*added a list of rule_id in an update function into working list.*)
