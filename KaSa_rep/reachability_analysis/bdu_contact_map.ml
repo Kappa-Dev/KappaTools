@@ -62,14 +62,14 @@ let trace = false
   error, store_result*)
 
 let compute_contact_map parameter error handler =
-  let store_result = Int2Map.empty in
+  let store_result = Int2Map_CM_state.empty in
   (*add_link*)
   let add_link (a, b, s) (c, d, s') store_result =
     let l, old =
-      try Int2Map.find (a, b, s) store_result
+      try Int2Map_CM_state.find (a, b, s) store_result
       with Not_found -> [],[]
     in
-    Int2Map.add (a, b, s) (l, ((c, d, s') :: old)) store_result
+    Int2Map_CM_state.add (a, b, s) (l, ((c, d, s') :: old)) store_result
   in  
   (*return the site name of site: this of type string*)
   (*folding this solution with the information in dual*)
@@ -84,7 +84,7 @@ let compute_contact_map parameter error handler =
       ) handler.dual store_result
   in
   (*Return the result of this contact map*)
-  let store_result = Int2Map.map (fun (l, x) -> List.rev l, x) store_result
+  let store_result = Int2Map_CM_state.map (fun (l, x) -> List.rev l, x) store_result
   in
   error, store_result
 
@@ -102,10 +102,10 @@ let compute_contact_map parameter error handler =
 let collect_binding_rhs parameter error rule store_result =
   let add_link (a, b) (c, d) store_result =
     let l, old =
-      try Int2Map_pair.find (a, b) store_result
+      try Int2Map_CM.find (a, b) store_result
       with Not_found -> [], []
     in
-    Int2Map_pair.add (a, b) (l, ((c, d) :: old)) store_result
+    Int2Map_CM.add (a, b) (l, ((c, d) :: old)) store_result
   in
   let error, store_result =
     List.fold_left (fun (error, store_result) (site_address1, site_address2) ->
@@ -132,10 +132,10 @@ let collect_binding_rhs parameter error rule store_result =
   let store_result_forward, store_result_reverse = store_result in
   (*let store_result = Int2Map_pair.map (fun (l, x) -> List.rev l, x) store_result in*)
   let store_result_forward =
-    Int2Map_pair.map (fun (l, x) -> List.rev l, x) store_result_forward
+    Int2Map_CM.map (fun (l, x) -> List.rev l, x) store_result_forward
   in
   let store_result_reverse =
-    Int2Map_pair.map (fun (l, x) -> List.rev l, x) store_result_reverse
+    Int2Map_CM.map (fun (l, x) -> List.rev l, x) store_result_reverse
   in
   error, (store_result_forward, store_result_reverse)
 
@@ -160,14 +160,14 @@ let collect_binding_rhs parameter error rule store_result =
 
 (*FIXME: check the state*)
 let precise_binding_dual parameter error handler rule store_result =
-  let result_binding = Int2Map.empty, Int2Map.empty in (*FIXME*)
+  let result_binding = Int2Map_CM_state.empty, Int2Map_CM_state.empty in (*FIXME*)
   (*add_link*)
   let add_link (a, b, s) (c, d, s') store_result =
     let l, old =
-      try Int2Map.find (a, b, s) store_result
+      try Int2Map_CM_state.find (a, b, s) store_result
       with Not_found -> [],[]
     in
-    Int2Map.add (a, b, s) (l, ((c, d, s') :: old)) store_result
+    Int2Map_CM_state.add (a, b, s) (l, ((c, d, s') :: old)) store_result
   in  
   (*return the site name of site: this of type string*)
   (*folding this solution with the information in dual*)
@@ -214,9 +214,9 @@ let precise_binding_dual parameter error handler rule store_result =
   let result_binding_forward, result_binding_reverse = result_binding in
   (*Return the result of this contact map*)
   let result_binding_forward =
-    Int2Map.map (fun (l, x) -> List.rev l, x) result_binding_forward
+    Int2Map_CM_state.map (fun (l, x) -> List.rev l, x) result_binding_forward
   in
   let result_binding_reverse =
-    Int2Map.map (fun (l, x) -> List.rev l, x) result_binding_reverse
+    Int2Map_CM_state.map (fun (l, x) -> List.rev l, x) result_binding_reverse
   in
   (result_binding_forward, result_binding_reverse)

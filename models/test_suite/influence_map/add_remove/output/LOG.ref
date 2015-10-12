@@ -190,46 +190,35 @@ site_type:1
 ============================================================
 * BDU Analysis:
 ============================================================
-------------------------------------------------------------
-* Side effects action:
-------------------------------------------------------------
-agent_type_1:
-rule_id:0:site_type:0:state:1
-agent_type_1:
-------------------------------------------------------------
-* Modification sites:
-------------------------------------------------------------
-agent_type_0:
-rule_id:0:site_type:0:state:1
-rule_id:1:site_type:0:state:0
-agent_type_1:
-rule_id:2:site_type:0:state:1
-rule_id:3:site_type:0:state:0
-------------------------------------------------------------
-* Covering classes and Modification sites:
-------------------------------------------------------------
-agent_type_0:
-rule_id:0:site_type:0:state:1
-rule_id:1:site_type:0:state:0
-agent_type_1:
-rule_id:2:site_type:0:state:1
-rule_id:3:site_type:0:state:0
-------------------------------------------------------------
-* Contact map with binding both directions (with state):
-------------------------------------------------------------
-------------------------------------------------------------
-* Contact map with binding only on the rhs (there is no state information):
-------------------------------------------------------------
-------------------------------------------------------------
-* Contact map with binding in the initial state and binding on the rhs (with state):
-------------------------------------------------------------
+** Static information:
 
 ------------------------------------------------------------
-* Update function:
+Covering classes:
 ------------------------------------------------------------
+agent_type:0@site_type:0:covering_class_id:0
+agent_type:1@site_type:0:covering_class_id:0
+------------------------------------------------------------
+Side effects action:
+------------------------------------------------------------
+agent_type:1@site_type:0:(rule_id:0 * state:1)
+------------------------------------------------------------
+Modification sites:
+------------------------------------------------------------
+agent_type:0@site_type:0:rule_id:1
+agent_type:0@site_type:0:rule_id:0
+agent_type:1@site_type:0:rule_id:3
+agent_type:1@site_type:0:rule_id:2
+
+** Dynamic information:
 
 ------------------------------------------------------------
-* Fixpoint iteration (TODO):
+Contact map with binding both directions (with state):
+------------------------------------------------------------
+------------------------------------------------------------
+Contact map with binding only on the rhs (there is no state information):
+------------------------------------------------------------
+------------------------------------------------------------
+Contact map with binding in the initial state and binding on the rhs (with state):
 ------------------------------------------------------------
 
 ------------------------------------------------------------

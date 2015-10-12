@@ -17,6 +17,7 @@ open Bdu_analysis_type
 open Memo_sig
 open Fifo
 open Cckappa_sig
+open Remanent_parameters_sig
 
 (************************************************************************************)
 (*PRINT*)
@@ -79,6 +80,39 @@ let print_creation_rule parameter error result =
     ) parameter result
 
 (************************************************************************************)
+(*static information of covering classes id*)
+
+let print_covering_classes_id parameter error result =
+  Int2Map_CV.iter
+    ( fun (x, y) (l1, l2) ->
+      if l1 <> []
+      then
+        begin
+          let _ =
+            fprintf parameter.log "agent_type:%i@site_type:%i" x y
+          in
+          let _ = List.fold_left
+            (fun bool x ->
+              (if bool
+               then
+                  fprintf parameter.log ", ");
+              fprintf parameter.log "agent_type:%i" x;
+              true
+            ) false l1
+            
+          in
+          fprintf stdout "\n"
+        end
+      else ();
+      List.iter
+        (fun id ->
+          fprintf parameter.log
+            "agent_type:%i@site_type:%i:covering_class_id:%i\n"
+            x y id
+        ) l2
+    ) result
+
+(************************************************************************************)
 (*print rule test; test inside the rule_array of update function*)
 
 (*let print_bdu_array_test parameter error result =
@@ -114,7 +148,8 @@ let print_triple parameter l =
     match acc with
     | [] -> []
     | (rule_id, site, state_min) :: tl ->
-      fprintf (Remanent_parameters.get_log parameter) "rule_id:%i:site_type:%i:state:%i\n"
+      fprintf (Remanent_parameters.get_log parameter)
+        "rule_id:%i:site_type:%i:state:%i\n"
         rule_id site state_min;
       aux tl
   in
@@ -125,35 +160,81 @@ let print_pair parameter l =
     match acc with
     | [] -> []
     | (rule_id, site) :: tl ->
-      fprintf (Remanent_parameters.get_log parameter) "rule_id:%i:site_type:%i:state:no_information\n"
+      fprintf (Remanent_parameters.get_log parameter) 
+        "rule_id:%i:site_type:%i:state:no_information\n"
         rule_id site;
       aux tl
   in
   aux l
 
+(*FIXED: half break action*)
+let print_half_break_effect parameter error result =
+  Int2Map_HalfBreak_effect.iter
+    ( fun (x, y) (l1, l2) ->
+      if l1 <> []
+      then
+        begin
+          let _ =
+            fprintf parameter.log "agent_type:%i@site_type:%i" x y
+          in
+          let _ = List.fold_left
+            (fun bool x ->
+              (if bool
+               then
+                  fprintf parameter.log ", ");
+              fprintf parameter.log "agent_type:%i" x;
+              true
+            ) false l1
+            
+          in
+          fprintf stdout "\n"
+        end
+      else ();
+      List.iter
+        (fun (r, s) ->
+          fprintf parameter.log
+            "agent_type:%i@site_type:%i:(rule_id:%i * state:%i)\n"
+            x y r s
+        ) l2
+    ) result
+
+let print_remove_effect parameter error result =
+  Int2Map_Remove_effect.iter
+    ( fun (x, y) (l1, l2) ->
+      if l1 <> []
+      then
+        begin
+          let _ =
+            fprintf parameter.log "agent_type:%i@site_type:%i" x y
+          in
+          let _ = List.fold_left
+            (fun bool x ->
+              (if bool
+               then
+                  fprintf parameter.log ", ");
+              fprintf parameter.log "agent_type:%i" x;
+              true
+            ) false l1
+            
+          in
+          fprintf stdout "\n"
+        end
+      else ();
+      List.iter
+        (fun r ->
+          fprintf parameter.log
+            "agent_type:%i@site_type:%i:(rule_id:%i * state:no_information)\n"
+            x y r
+        ) l2
+    ) result
+
 let print_side_effects parameter error result =
   let result_half_break, result_remove = result in
-  (*let result_remove_with_info, result_remove_without_info = result_remove in*)
-  let error =
-    AgentMap.print error
-      (fun error parameter l ->
-        let _ =
-          print_triple parameter l
-        in
-        error
-      ) parameter result_half_break
+  let _ =
+    print_half_break_effect parameter error result_half_break
   in
-  (*NOTE: do not consider where site has state free*)
-  let error =
-    AgentMap.print error
-      (fun error parameter l ->
-        let _ =
-          print_pair parameter l
-        in
-        error
-      ) parameter result_remove
-  in
-  error
+  print_remove_effect parameter error result_remove
+
 
 (************************************************************************************)
 (*modification sites*)
@@ -176,11 +257,43 @@ let print_covering_classes_modified_sites parameter error result =
       error
     ) parameter result
 
+(*TEST*)
+
+let print_modification_sites parameter error result =
+  Int2Map_Modif.iter
+    ( fun (x, y) (l1, l2) ->
+      if l1 <> []
+      then
+        begin
+          let _ =
+            fprintf parameter.log "agent_type:%i@site_type:%i" x y
+          in
+          let _ = List.fold_left
+            (fun bool x ->
+              (if bool
+               then
+                  fprintf parameter.log ", ");
+              fprintf parameter.log "agent_type:%i" x;
+              true
+            ) false l1
+            
+          in
+          fprintf stdout "\n"
+        end
+      else ();
+      List.iter
+        (fun r ->
+          fprintf parameter.log
+            "agent_type:%i@site_type:%i:rule_id:%i\n"
+            x y r
+        ) l2
+     ) result
+
 (************************************************************************************)
 (*contact map*)
 
 let print_contact_map parameter error result =
-  Int2Map.iter
+  Int2Map_CM_state.iter
     (fun (x, y, s) (l1, l2) ->
       if l1 <> []
       then
@@ -214,13 +327,15 @@ let print_contact_map_binding_only_on_rhs parameter error result =
   let result_forward, result_reverse = result in
   (*A bond to B*)
   let _ =
-    Int2Map_pair.iter
+    Int2Map_CM.iter
       (fun (x, y) (l1, l2) ->
         if l1 <> []
         then
           begin 
-            let _ = fprintf parameter.Remanent_parameters_sig.log 
-              "agent_type:%i@site_type:%i" x y in
+            let _ =
+              fprintf parameter.Remanent_parameters_sig.log 
+              "agent_type:%i@site_type:%i" x y 
+            in
             let _ = List.fold_left
               (fun bool x ->
                 (if bool
@@ -243,13 +358,15 @@ let print_contact_map_binding_only_on_rhs parameter error result =
   in
   (*------------------------------------------------------------------------------*)
   (*B bond to A*)
-  Int2Map_pair.iter
+  Int2Map_CM.iter
     (fun (x, y) (l1, l2) ->
       if l1 <> []
       then
         begin 
-          let _ = fprintf parameter.Remanent_parameters_sig.log 
-            "agent_type':%i@site_type':%i" x y in
+          let _ = 
+            fprintf parameter.Remanent_parameters_sig.log 
+              "agent_type':%i@site_type':%i" x y 
+          in
           let _ = List.fold_left
             (fun bool x ->
               (if bool
@@ -275,13 +392,15 @@ let print_contact_map_binding_only_on_rhs parameter error result =
 let print_precise_binding_dual parameter error result =
   let result_forward, result_reverse = result in
   let _ =
-    Int2Map.iter
+    Int2Map_CM_state.iter
       (fun (x, y, s) (l1, l2) ->
         if l1 <> []
         then
           begin 
-            let _ = fprintf parameter.Remanent_parameters_sig.log 
-              "agent_type:%i@site_type:%i:state:%i" x y s in
+            let _ = 
+              fprintf parameter.Remanent_parameters_sig.log 
+              "agent_type:%i@site_type:%i:state:%i" x y s
+            in
             let _ = List.fold_left
               (fun bool x ->
                 (if bool
@@ -304,13 +423,15 @@ let print_precise_binding_dual parameter error result =
   in
   (*------------------------------------------------------------------------------*)
   (*B bond to A*)
-  Int2Map.iter
+  Int2Map_CM_state.iter
     (fun (x, y, s) (l1, l2) ->
       if l1 <> []
       then
         begin 
-          let _ = fprintf parameter.Remanent_parameters_sig.log 
-            "agent_type':%i@site_type':%i:state':%i" x y s in
+          let _ = 
+            fprintf parameter.Remanent_parameters_sig.log 
+            "agent_type':%i@site_type':%i:state':%i" x y s 
+          in
           let _ = List.fold_left
             (fun bool x ->
               (if bool
@@ -340,7 +461,7 @@ let print_rule_id_set parameter error result =
       let _ =
 	Site_map_and_set.iter_set (fun elt ->
 	  let _ =
-	    fprintf stdout "rule_id:%i\n" elt
+	    fprintf parameter.log "rule_id:%i\n" elt
 	  in
 	  ()
 	) rule_set
@@ -378,34 +499,46 @@ let print_result parameter error result =
     fprintf (Remanent_parameters.get_log parameter) "* BDU Analysis:\n";
     fprintf (Remanent_parameters.get_log parameter)
       "============================================================\n";
+    fprintf (Remanent_parameters.get_log parameter)
+      "** Static information:\n";
   in
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter) "* Side effects action:\n";
+      "\n------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter)
+      "Covering classes:\n";
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
-    let parameter_side =
-      Remanent_parameters.update_prefix parameter "agent_type_" in
     let error =
-      print_side_effects parameter_side error result.store_side_effects
-    in
-    error
-  in    
-  let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter) "* Modification sites:\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
-    let parameter_modif =
-      Remanent_parameters.update_prefix parameter "agent_type_" in
-    let error =
-      print_modification_sites parameter_modif error result.store_modification_sites
+      print_covering_classes_id parameter error result.store_covering_classes_id
     in
     error
   in
   let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter) 
+      "Side effects action:\n";
+    fprintf (Remanent_parameters.get_log parameter)
+      "------------------------------------------------------------\n";
+    let error =
+      print_side_effects parameter error result.store_side_effects'
+    in
+    error
+  in
+  let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "------------------------------------------------------------\n";
+    fprintf (Remanent_parameters.get_log parameter)
+      "Modification sites:\n";
+    fprintf (Remanent_parameters.get_log parameter)
+      "------------------------------------------------------------\n";
+    let error =
+      print_modification_sites parameter error result.store_modification_sites'
+    in
+    error
+  in
+  (*let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
@@ -419,12 +552,16 @@ let print_result parameter error result =
         result.store_covering_classes_modified_sites
     in
     error
+  in*)
+  let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "\n** Dynamic information:\n";
   in
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
+      "\n------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
-      "* Contact map with binding both directions (with state):\n";
+      "Contact map with binding both directions (with state):\n";
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
     let parameter_cm =
@@ -438,7 +575,7 @@ let print_result parameter error result =
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
-      "* Contact map with binding only on the rhs (there is no state information):\n";
+      "Contact map with binding only on the rhs (there is no state information):\n";
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
     let parameter_cm =
@@ -453,7 +590,7 @@ let print_result parameter error result =
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
-      "* Contact map with binding in the initial state and binding on the rhs (with state):\n";
+      "Contact map with binding in the initial state and binding on the rhs (with state):\n";
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
     let parameter_cm =
@@ -464,30 +601,6 @@ let print_result parameter error result =
     error    
   in
   (*let _ =
-    let store_half_break_set, store_remove_set, store_cv_set, store_result_cv_set
-      = result.store_update_bond_side_effects_set
-    in
-    fprintf (Remanent_parameters.get_log parameter)
-      "\n------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "* List of rules has binding sites and side effects set (TODO):\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
-    let parameter_a =
-      Remanent_parameters.update_prefix parameter "agent_type_" in
-    let error =
-      (*fprintf stdout "Half break set:\n";
-      let _ = print_rule_id_set parameter_a error store_half_break_set in
-      fprintf stdout "Remove set:\n";
-      let _ = print_rule_id_set parameter_a error store_remove_set  in
-      fprintf stdout "Covering Classes (cv1) set:\n";
-      let _ = print_rule_id_set parameter_a error store_cv_set in*)
-      fprintf stdout "Update rule_id list (cv) set:\n";
-      print_rule_id_set parameter_a error store_result_cv_set
-    in
-    error
-  in*)
-  let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
@@ -511,7 +624,7 @@ let print_result parameter error result =
       print_fixpoint_iteration parameter_a error result.store_fixpoint
     in
     error
-  in
+  in*)
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";

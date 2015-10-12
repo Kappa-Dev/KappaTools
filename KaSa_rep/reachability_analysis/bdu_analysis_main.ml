@@ -58,8 +58,17 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       store_result.store_creation
   in
   (*------------------------------------------------------------------------------*)
+  (*static information of covering classes: from sites -> covering_class id list*)
+  let error, store_covering_classes_id =
+    site_covering_classes
+      parameter
+      error
+      covering_classes
+      store_result.store_covering_classes_id
+  in
+  (*------------------------------------------------------------------------------*)
   (*side effects*)
-  let error, store_side_effects =
+  (*let error, store_side_effects =
     collect_side_effects
       parameter
       error
@@ -68,27 +77,47 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       rule.actions.half_break
       rule.actions.remove
       store_result.store_side_effects
-  in
+  in*)
+  (*FIXED*)
+  let error, store_side_effects' =
+    collect_side_effects'
+      parameter
+      error
+      handler
+      rule_id
+      rule.actions.half_break
+      rule.actions.remove
+      store_result.store_side_effects'
+  in 
   (*------------------------------------------------------------------------------*)
   (*modification sites*)
-  let error, store_modification_sites =
+  (*let error, store_modification_sites =
     collect_modification_sites
       parameter
       error
       rule_id
       rule.diff_direct
       store_result.store_modification_sites
+  in*)
+  (*TEST*)
+  let error, store_modification_sites' =
+    collect_modification_sites'
+      parameter
+      error
+      rule_id
+      rule.diff_direct
+      store_result.store_modification_sites'
   in
   (*-------------------------------------------------------------------------------*)
   (*return a mapping of covering classes to a list of rules that has modified sites*)
-  let error, store_covering_classes_modified_sites =
+  (*let error, store_covering_classes_modified_sites =
     covering_classes_modified_sites
       parameter
       error
       covering_classes
       store_modification_sites
       store_result.store_covering_classes_modified_sites
-  in
+  in*)
   (*------------------------------------------------------------------------------*)
   (*contact map*)
   let error, store_contact_map =
@@ -117,7 +146,7 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       store_result.store_binding_dual
   in
   (*------------------------------------------------------------------------------*)
-  let error, store_update_bond_side_effects_set =
+  (*let error, store_update_bond_side_effects_set =
     update_bond_side_effects_set
       parameter
       error
@@ -126,9 +155,9 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       store_side_effects
       store_covering_classes_modified_sites
       store_result.store_update_bond_side_effects_set
-  in
+  in*)
   (*------------------------------------------------------------------------------*)
-  let _, _, _, store_update_rule_id = store_update_bond_side_effects_set in
+  (*let _, _, _, store_update_rule_id = store_update_bond_side_effects_set in
   let error, store_update =
     store_update
       parameter
@@ -136,10 +165,10 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       store_covering_classes_modified_sites
       store_update_rule_id
       store_result.store_update
-  in
+  in*)
   (*------------------------------------------------------------------------------*)
   (*fixpoint iteration function: TODO*)
-  let error, store_fixpoint =
+  (*let error, store_fixpoint =
     collect_wl_rule_id_update
       parameter
       error
@@ -147,22 +176,25 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       rule
       store_update
       store_result.store_fixpoint
-  in
+  in*)
   (*------------------------------------------------------------------------------*)
   (*store*)
   error,
   {
     store_creation       = store_creation;
     store_creation_rule  = store_creation_rule;
-    store_side_effects   = store_side_effects;
-    store_modification_sites              = store_modification_sites;
-    store_covering_classes_modified_sites = store_covering_classes_modified_sites;
+    store_covering_classes_id = store_covering_classes_id;
+    (*store_side_effects   = store_side_effects;*)
+    store_side_effects'   = store_side_effects';
+    (*store_modification_sites  = store_modification_sites;*)
+    store_modification_sites' = store_modification_sites';
+    (*store_covering_classes_modified_sites = store_covering_classes_modified_sites;*)
     store_contact_map    = store_contact_map;
     store_binding_rhs    = store_binding_rhs;
     store_binding_dual   = store_binding_dual;
-    store_update_bond_side_effects_set = store_update_bond_side_effects_set;
+    (*store_update_bond_side_effects_set = store_update_bond_side_effects_set;
     store_update = store_update;
-    store_fixpoint = store_fixpoint
+    store_fixpoint = store_fixpoint*)
   }
  
 (************************************************************************************)
@@ -171,15 +203,20 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
 let scan_rule_set parameter error handler covering_classes compiled rules =
   let error, init_creation      = AgentMap.create parameter error 0 in
   let error, init_creation_rule = AgentMap.create parameter error 0 in
-  let error, init_half_break    = AgentMap.create parameter error 0 in
-  let error, init_remove        = AgentMap.create parameter error 0 in
-  let error, init_modification  = AgentMap.create parameter error 0 in
+  let init_covering_classes_id = Int2Map_CV.empty in
+  (*let error, init_half_break    = AgentMap.create parameter error 0 in*)
+  let init_half_break'   = Int2Map_HalfBreak_effect.empty  in
+  let init_remove'   = Int2Map_Remove_effect.empty  in
+  (*let error, init_remove        = AgentMap.create parameter error 0 in
+  let error, init_modification  = AgentMap.create parameter error 0 in*)
+  (*TEST*)
+  let init_modification'  = Int2Map_Modif.empty in
   let error, init_cv_modified   = AgentMap.create parameter error 0 in
-  let init_contact_map          = Int2Map.empty in
-  let init_binding_rhs_forward  = Int2Map_pair.empty in
-  let init_binding_rhs_reverse  = Int2Map_pair.empty in
-  let init_binding_dual_forward = Int2Map.empty in
-  let init_binding_dual_reverse = Int2Map.empty in
+  let init_contact_map          = Int2Map_CM_state.empty in
+  let init_binding_rhs_forward  = Int2Map_CM.empty in
+  let init_binding_rhs_reverse  = Int2Map_CM.empty in
+  let init_binding_dual_forward = Int2Map_CM_state.empty in
+  let init_binding_dual_reverse = Int2Map_CM_state.empty in
   (*update covering classes and binding sites.*)
   let error, init_update_half_break_set = AgentMap.create parameter error 0 in
   let error, init_update_remove_set     = AgentMap.create parameter error 0 in
@@ -191,20 +228,23 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
     {
       store_creation      = init_creation;
       store_creation_rule = init_creation_rule;
-      store_side_effects  = init_half_break, init_remove;
-      store_modification_sites              = init_modification;
-      store_covering_classes_modified_sites = init_cv_modified;
+      store_covering_classes_id = init_covering_classes_id;
+      (*store_side_effects  = init_half_break, init_remove;*)
+      store_side_effects'  = init_half_break' , init_remove';
+      (*store_modification_sites = init_modification;**)
+      store_modification_sites' = init_modification';
+      (*store_covering_classes_modified_sites = init_cv_modified;*)
       store_contact_map  = init_contact_map;
       store_binding_rhs  = (init_binding_rhs_forward, init_binding_rhs_reverse);
       store_binding_dual = (init_binding_dual_forward, init_binding_dual_reverse);
-      store_update_bond_side_effects_set =
+      (*store_update_bond_side_effects_set =
 	(init_update_half_break_set,
 	 init_update_remove_set,
 	 init_update_cv_set,
 	 init_update_result_cv_set
 	);
       store_update = init_update;
-      store_fixpoint = init_fixpoint
+      store_fixpoint = init_fixpoint*)
     }
   in
   (*------------------------------------------------------------------------------*)

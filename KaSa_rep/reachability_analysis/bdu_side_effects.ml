@@ -84,6 +84,57 @@ let half_break_action parameter error handler rule_id half_break store_result =
     error, store_result    
   ) (error, store_result) half_break
 
+(*FIX*)
+
+let half_break_action' parameter error handler rule_id half_break store_result =
+  (*module (agent_type, site) -> (rule_id, binding_state) list*)
+  let add_link (a, b) (r, state) store_result =
+    let l, old =
+      try Int2Map_HalfBreak_effect.find (a, b) store_result
+      with Not_found -> [], []
+    in
+    Int2Map_HalfBreak_effect.add (a, b) (l, (r, state) :: old) store_result
+  in
+  let error, store_result =
+    List.fold_left (fun (error, store_result) (site_address, state_op) ->
+      (*site_address: {agent_index, site, agent_type}*)
+      let agent_type = site_address.agent_type in
+      let site = site_address.site in
+      (*state*)
+      let error, (state_min, state_max) =
+        match state_op with
+        | None ->
+          begin
+            let error, state_value =
+              Misc_sa.unsome
+                (Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get
+                   parameter
+                   error
+                   (agent_type, site)
+                   handler.states_dic)
+                (fun error -> warn parameter error (Some "line 54") Exit
+                  (Dictionary_of_States.init()))
+            in
+            let error, last_entry =
+              Dictionary_of_States.last_entry parameter error state_value in
+            error, (1, last_entry)
+          end
+        | Some interval -> error, (interval.min, interval.max)
+      in
+      (*return result*)
+      let store_result =
+        add_link (agent_type, site) (rule_id, state_min) store_result
+      in
+      error, store_result  
+  ) (error, store_result) half_break
+  in
+  (*Map function*)
+  let store_result =
+    Int2Map_HalfBreak_effect.map (fun (l, x) -> List.rev l, x) store_result
+  in
+  error, store_result
+
+
 (************************************************************************************)
 (*compute remove action: r0 and r1 are remove action *)
 
@@ -123,6 +174,33 @@ let remove_action parameter error rule_id remove store_result =
     error, store_result
   ) (error, store_result) remove
 
+(*FIXED*)
+let remove_action' parameter error rule_id remove store_result =
+  let add_link (a, b) r store_result =
+    let l, old =
+      try Int2Map_Remove_effect.find (a, b) store_result
+      with Not_found -> [], []
+    in
+    Int2Map_Remove_effect.add (a, b) (l, r :: old) store_result
+  in
+  let error, store_result =
+    List.fold_left (fun (error, store_result) (agent_index, agent, list_undoc) ->
+      let agent_type = agent.agent_name in
+      (*NOTE: if it is a site_free then do not consider this case.*)
+      (*result*)
+      let store_result =
+        List.fold_left (fun store_result site ->
+          add_link (agent_type, site) rule_id store_result
+        ) store_result list_undoc
+      in
+      error, store_result
+    ) (error, store_result) remove
+  in
+  let store_result =
+    Int2Map_Remove_effect.map (fun (l, x) -> List.rev l, x) store_result
+  in
+  error, store_result
+
 (************************************************************************************)
 (*compute side effects: this is an update before discover bond function *)
 
@@ -149,6 +227,30 @@ let collect_side_effects parameter error handler rule_id half_break remove store
   in
   error, (store_half_break_action, store_remove_action)
 
+(*FIXED*)
+let collect_side_effects' parameter error handler rule_id half_break remove store_result =
+  let store_half_break_action, store_remove_action = store_result in
+  (*if there is a half_break action*)
+  let error, store_half_break_action =
+    half_break_action'
+      parameter
+      error
+      handler
+      rule_id
+      half_break
+      store_half_break_action
+  in
+  (*if there is a remove action*)
+  let error, store_remove_action =
+    remove_action'
+      parameter
+      error
+      rule_id
+      remove
+      store_remove_action
+  in
+  error, (store_half_break_action, store_remove_action)
+
 (************************************************************************************)
 (*a bond is discovered for the first time:
   For example:
@@ -165,7 +267,7 @@ let collect_side_effects parameter error handler rule_id half_break remove store
 
 (*get a list of binding information*)
 let get_list_of_binding parameter error store_binding_forward =
-  Int2Map.fold
+  Int2Map_CM_state.fold
     (fun (agent_type_1,site_type_1,state_1) (l1,l2) current_result_1 ->
       if l1 <> []
       then
@@ -259,6 +361,7 @@ let get_binding_remove_set parameter error agent_type_1 site_type_1
       in
       error, store_rule_list
     ) store_remove store_result
+
 (*------------------------------------------------------------------------*)
     
 let get_covering_classes_modified_binding_set parameter error agent_type_2
@@ -406,8 +509,7 @@ let update_bond_side_effects_set parameter error handler
   let store_init_half_break,
     store_init_remove,
     store_init_cv,
-    store_init_result
-    = store_result
+    store_init_result = store_result
   in
   (*------------------------------------------------------------------------*)
   (*binding: A bond to B and B bond to A*)
@@ -416,7 +518,7 @@ let update_bond_side_effects_set parameter error handler
   let store_half_break, store_remove = store_side_effects in
   (*------------------------------------------------------------------------*)
   (*check if there is any binding on the rhs*)
-  if Int2Map.is_empty store_binding_forward (*TODO:another side as well*)
+  if Int2Map_CM_state.is_empty store_binding_forward (*TODO:another side as well*)
   then
     error, store_result
   else
@@ -434,8 +536,7 @@ let update_bond_side_effects_set parameter error handler
 	(error, (store_result_half_break,
 		 store_result_remove,
 		 store_result_cv_modified,
-		 store_result_rule_id
-	 ))
+		 store_result_rule_id))
 	(agent_type_1, site_type_1, state_1,
 	 agent_type_2, site_type_2, state_2) ->
 	  (*------------------------------------------------------------------------*)
@@ -507,7 +608,7 @@ let store_update parameter error store_covering_classes_modified_sites
 	    List.fold_left (fun (error, store_current_result) (rule_id_cv, _, _) ->
 	      if agent_type = agent_type_cv
 	      then
-		(*agent type 2*)
+		(*NOTE: agent type 2*)
 		let error, store_result =
 		  AgentMap.set
 		    parameter
@@ -525,6 +626,7 @@ let store_update parameter error store_covering_classes_modified_sites
 		    rule_id_cv
 		    Site_map_and_set.empty_set
 		in
+                (*get old*)
 		let error, old_set =
 		  match AgentMap.unsafe_get parameter error agent_type_cv
 		    store_current_result
@@ -532,6 +634,7 @@ let store_update parameter error store_covering_classes_modified_sites
 		    | error, None -> error, Site_map_and_set.empty_set
 		    | error, Some s -> error, s
 		in
+                (*new*)
 		let error, new_set =
 		  Site_map_and_set.union
 		    parameter
@@ -539,6 +642,7 @@ let store_update parameter error store_covering_classes_modified_sites
 		    old_set
 		    result_set
 		in
+                (*store*)
 		let error, store_result =
 		  AgentMap.set
 		    parameter
