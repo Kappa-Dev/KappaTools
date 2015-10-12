@@ -68,7 +68,7 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
   in
   (*------------------------------------------------------------------------------*)
   (*side effects*)
-  (*let error, store_side_effects =
+  let error, store_side_effects =
     collect_side_effects
       parameter
       error
@@ -77,36 +77,16 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       rule.actions.half_break
       rule.actions.remove
       store_result.store_side_effects
-  in*)
-  (*FIXED*)
-  let error, store_side_effects' =
-    collect_side_effects'
-      parameter
-      error
-      handler
-      rule_id
-      rule.actions.half_break
-      rule.actions.remove
-      store_result.store_side_effects'
   in 
   (*------------------------------------------------------------------------------*)
   (*modification sites*)
-  (*let error, store_modification_sites =
+  let error, store_modification_sites =
     collect_modification_sites
       parameter
       error
       rule_id
       rule.diff_direct
       store_result.store_modification_sites
-  in*)
-  (*TEST*)
-  let error, store_modification_sites' =
-    collect_modification_sites'
-      parameter
-      error
-      rule_id
-      rule.diff_direct
-      store_result.store_modification_sites'
   in
   (*-------------------------------------------------------------------------------*)
   (*return a mapping of covering classes to a list of rules that has modified sites*)
@@ -184,10 +164,8 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
     store_creation       = store_creation;
     store_creation_rule  = store_creation_rule;
     store_covering_classes_id = store_covering_classes_id;
-    (*store_side_effects   = store_side_effects;*)
-    store_side_effects'   = store_side_effects';
-    (*store_modification_sites  = store_modification_sites;*)
-    store_modification_sites' = store_modification_sites';
+    store_side_effects   = store_side_effects;
+    store_modification_sites = store_modification_sites;
     (*store_covering_classes_modified_sites = store_covering_classes_modified_sites;*)
     store_contact_map    = store_contact_map;
     store_binding_rhs    = store_binding_rhs;
@@ -203,37 +181,35 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
 let scan_rule_set parameter error handler covering_classes compiled rules =
   let error, init_creation      = AgentMap.create parameter error 0 in
   let error, init_creation_rule = AgentMap.create parameter error 0 in
+  (*static information*)
   let init_covering_classes_id = Int2Map_CV.empty in
-  (*let error, init_half_break    = AgentMap.create parameter error 0 in*)
-  let init_half_break'   = Int2Map_HalfBreak_effect.empty  in
-  let init_remove'   = Int2Map_Remove_effect.empty  in
-  (*let error, init_remove        = AgentMap.create parameter error 0 in
-  let error, init_modification  = AgentMap.create parameter error 0 in*)
-  (*TEST*)
-  let init_modification'  = Int2Map_Modif.empty in
-  let error, init_cv_modified   = AgentMap.create parameter error 0 in
+  let init_half_break          = Int2Map_HalfBreak_effect.empty  in
+  let init_remove              = Int2Map_Remove_effect.empty  in
+  let init_modification        = Int2Map_Modif.empty in
+  let error, init_cv_modified  = AgentMap.create parameter error 0 in
+  (*dynamic information*)
   let init_contact_map          = Int2Map_CM_state.empty in
   let init_binding_rhs_forward  = Int2Map_CM.empty in
   let init_binding_rhs_reverse  = Int2Map_CM.empty in
   let init_binding_dual_forward = Int2Map_CM_state.empty in
   let init_binding_dual_reverse = Int2Map_CM_state.empty in
   (*update covering classes and binding sites.*)
-  let error, init_update_half_break_set = AgentMap.create parameter error 0 in
+  (*let error, init_update_half_break_set = AgentMap.create parameter error 0 in
   let error, init_update_remove_set     = AgentMap.create parameter error 0 in
   let error, init_update_cv_set         = AgentMap.create parameter error 0 in
   let error, init_update_result_cv_set  = AgentMap.create parameter error 0 in
   let error, init_update  = AgentMap.create parameter error 0 in
-  let error, init_fixpoint = AgentMap.create parameter error 0 in
+  let error, init_fixpoint = AgentMap.create parameter error 0 in*)
   let init_bdu =
     {
       store_creation      = init_creation;
       store_creation_rule = init_creation_rule;
+      (*static information*)
       store_covering_classes_id = init_covering_classes_id;
-      (*store_side_effects  = init_half_break, init_remove;*)
-      store_side_effects'  = init_half_break' , init_remove';
-      (*store_modification_sites = init_modification;**)
-      store_modification_sites' = init_modification';
+      store_side_effects  = init_half_break , init_remove;
+      store_modification_sites = init_modification;
       (*store_covering_classes_modified_sites = init_cv_modified;*)
+      (*dynamic information*)
       store_contact_map  = init_contact_map;
       store_binding_rhs  = (init_binding_rhs_forward, init_binding_rhs_reverse);
       store_binding_dual = (init_binding_dual_forward, init_binding_dual_reverse);

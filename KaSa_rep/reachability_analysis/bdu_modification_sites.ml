@@ -40,44 +40,6 @@ let trace = false
 *)
 
 let collect_modification_sites parameter error rule_id diff_direct store_result =
-  AgentMap.fold parameter error
-    (fun parameter error agent_id site_modif store_result ->
-      if Site_map_and_set.is_empty_map site_modif.agent_interface
-      then error, store_result
-      else
-        let agent_type = site_modif.agent_name in
-        let triple_list =
-          Site_map_and_set.fold_map
-            (fun site port current_list ->
-              let state = Bdu_creation.int_of_port port in
-              let list =
-                (rule_id, site, state) :: current_list
-              in
-              list
-            ) site_modif.agent_interface []
-        in
-        (*old*)
-        let error, old_list =
-          match AgentMap.unsafe_get parameter error agent_type store_result with
-          | error, None -> error, []
-          | error, Some l -> error, l
-        in
-        (*new*)
-        let new_list = List.concat [triple_list; old_list] in
-        (*store*)
-        let error, store_result =
-          AgentMap.set
-            parameter
-            error
-            agent_type
-            (List.rev new_list)
-            store_result
-        in
-        error, store_result 
-    ) diff_direct store_result
-
-(*FIXED*)
-let collect_modification_sites' parameter error rule_id diff_direct store_result =
   (*from a pair of Map (agent_type, site) -> rule_id :: old_result)*)
   let add_link (a, b) r store_result =
     let l, old =
@@ -114,7 +76,7 @@ let collect_modification_sites' parameter error rule_id diff_direct store_result
 (************************************************************************************)
 (*compute update function: covering_class_id -> list of rule_id that may modify.*)
     
-let covering_classes_modified_sites parameter error covering_classes store_result_modif
+(*let covering_classes_modified_sites parameter error covering_classes store_result_modif
     store_result =
   AgentMap.fold parameter error
     (fun parameter error agent_type remanent store_result ->
@@ -167,9 +129,10 @@ let covering_classes_modified_sites parameter error covering_classes store_resul
           store_result
       in
       error, store_result
-    ) covering_classes store_result
+    ) covering_classes store_result*)
 
-(*FIXED*)
+(*a pair (agent_type_cv, site_cv) in covering classes
+  return a list of covering_classes_id*)
 let site_covering_classes parameter error covering_classes store_result =
   let add_link (a, b) cv_id store_result =
     let l, old =
@@ -189,11 +152,11 @@ let site_covering_classes parameter error covering_classes store_result =
         (*fold a dictionary*)
         let store_result =
           Dictionary_of_Covering_class.fold
-            (fun value ((),()) index store_result ->
-              (*get site in value*)
+            (fun value_list ((),()) cv_id store_result ->
+              (*get site_cv in value*)
               List.fold_left (fun store_result site_cv ->
-                add_link (agent_type_cv, site_cv) index store_result
-              ) store_result value
+                add_link (agent_type_cv, site_cv) cv_id store_result
+              ) store_result value_list
             ) cv_dic store_result
         in
         error, store_result

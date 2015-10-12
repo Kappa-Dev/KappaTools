@@ -22,7 +22,7 @@ open Remanent_parameters_sig
 (************************************************************************************)
 (*PRINT*)
 
-let print_bdu_array_creation parameter error result =
+let print_bdu_array_creation_aux parameter error result =
   AgentMap.print error 
     (fun error parameter (l, (handler, bdu_array)) ->
       let _ =
@@ -58,12 +58,12 @@ let print_rule_array parameter error rule_array =
           rule.actions.creation
           store
       in
-      print_bdu_array_creation parameter error store
+      print_bdu_array_creation_aux parameter error store
     in 
     ()
   ) rule_array
 
-let print_creation_rule parameter error result =
+let print_creation_rule_aux parameter error result =
   AgentMap.print error
     (fun error parameter (l, wl, rule_array) ->
       let _ =
@@ -82,7 +82,7 @@ let print_creation_rule parameter error result =
 (************************************************************************************)
 (*static information of covering classes id*)
 
-let print_covering_classes_id parameter error result =
+let print_covering_classes_aux parameter error result =
   Int2Map_CV.iter
     ( fun (x, y) (l1, l2) ->
       if l1 <> []
@@ -143,7 +143,7 @@ let print_rule_array_test parameter error rule_array =
 (************************************************************************************)
 (*side effects*)
 
-let print_triple parameter l =
+(*let print_triple parameter l =
   let rec aux acc =
     match acc with
     | [] -> []
@@ -165,7 +165,7 @@ let print_pair parameter l =
         rule_id site;
       aux tl
   in
-  aux l
+  aux l*)
 
 (*FIXED: half break action*)
 let print_half_break_effect parameter error result =
@@ -228,7 +228,7 @@ let print_remove_effect parameter error result =
         ) l2
     ) result
 
-let print_side_effects parameter error result =
+let print_side_effects_aux parameter error result =
   let result_half_break, result_remove = result in
   let _ =
     print_half_break_effect parameter error result_half_break
@@ -239,7 +239,7 @@ let print_side_effects parameter error result =
 (************************************************************************************)
 (*modification sites*)
 
-let print_modification_sites parameter error result =
+(*let print_modification_sites parameter error result =
   AgentMap.print error
     (fun error parameter l ->
       let _ =
@@ -255,11 +255,9 @@ let print_covering_classes_modified_sites parameter error result =
         print_triple parameter l
       in
       error
-    ) parameter result
+    ) parameter result*)
 
-(*TEST*)
-
-let print_modification_sites parameter error result =
+let print_modification_sites_aux parameter error result =
   Int2Map_Modif.iter
     ( fun (x, y) (l1, l2) ->
       if l1 <> []
@@ -292,7 +290,7 @@ let print_modification_sites parameter error result =
 (************************************************************************************)
 (*contact map*)
 
-let print_contact_map parameter error result =
+let print_contact_map_aux parameter error result =
   Int2Map_CM_state.iter
     (fun (x, y, s) (l1, l2) ->
       if l1 <> []
@@ -323,7 +321,7 @@ let print_contact_map parameter error result =
 (*------------------------------------------------------------------------------*)
 (*if agent A bond to B, then return A bond to B and B bond to A*)
 
-let print_contact_map_binding_only_on_rhs parameter error result =
+let print_contact_map_binding_only_on_rhs_aux parameter error result =
   let result_forward, result_reverse = result in
   (*A bond to B*)
   let _ =
@@ -389,7 +387,7 @@ let print_contact_map_binding_only_on_rhs parameter error result =
 
 (*------------------------------------------------------------------------------*)
 
-let print_precise_binding_dual parameter error result =
+let print_precise_binding_dual_aux parameter error result =
   let result_forward, result_reverse = result in
   let _ =
     Int2Map_CM_state.iter
@@ -455,7 +453,7 @@ let print_precise_binding_dual parameter error result =
 (************************************************************************************)
 (*update rule_id: side effects and covering classes and modified sites*)
 
-let print_rule_id_set parameter error result =
+(*let print_rule_id_set parameter error result =
   AgentMap.print error
     (fun error parameter rule_set ->
       let _ =
@@ -475,11 +473,10 @@ let print_rule_set result =
       fprintf stdout "rule_id:%i\n" elt
     in
     ()
-  ) result
+  ) result*)
 
 (************************************************************************************)
-
-let print_fixpoint_iteration parameter error result =
+(*let print_fixpoint_iteration parameter error result =
   AgentMap.print error
     (fun error parameter (wl, rule_array) ->
       let _ =
@@ -487,8 +484,106 @@ let print_fixpoint_iteration parameter error result =
 	IntWL.print_wl parameter wl
       in
       error
-    ) parameter result
+    ) parameter result*)
     
+(************************************************************************************)
+(**)
+
+let print_covering_classes parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "\n------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "Covering classes:\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  let error =
+    print_covering_classes_aux parameter error result
+  in
+  error
+
+let print_side_effects parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter) 
+    "Side effects action:\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  let error =
+    print_side_effects_aux parameter error result
+  in
+  error
+
+let print_modification_sites parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "Modification sites:\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  let error =
+    print_modification_sites_aux parameter error result
+  in
+  error
+
+let print_contact_map parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "\n------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "Contact map with binding both directions (with state):\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  let error =
+    print_contact_map_aux parameter error result
+  in
+  error
+
+let print_contact_map_binding_only_on_rhs parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "Contact map with binding only on the rhs (there is no state information):\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  let error =
+    print_contact_map_binding_only_on_rhs_aux parameter error result
+  in
+  error
+
+let print_precise_binding_dual parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "Contact map with binding in the initial state and binding on the rhs (with state):\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  let error =
+    print_precise_binding_dual_aux parameter error result
+  in
+  error
+
+let print_creation_rule parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "\n------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "* List of rules has creation action:\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  let parameter_a_rule =
+    Remanent_parameters.update_prefix parameter "agent_type/rule_id_" in
+  let error =
+    print_creation_rule_aux parameter_a_rule error result
+  in
+  error
+
+let print_bdu_array_creation parameter error result =
+  let parameter_agent = Remanent_parameters.update_prefix parameter "agent_type_" in
+  fprintf (Remanent_parameters.get_log parameter)
+    "\n------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter) "* BDU creation in general:\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  print_bdu_array_creation_aux parameter_agent error result
+
 (************************************************************************************)
 (*MAIN PRINT*)
 
@@ -500,152 +595,33 @@ let print_result parameter error result =
     fprintf (Remanent_parameters.get_log parameter)
       "============================================================\n";
     fprintf (Remanent_parameters.get_log parameter)
-      "** Static information:\n";
+      "\n** Static information:\n";
   in
   let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "\n------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "Covering classes:\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
-    let error =
-      print_covering_classes_id parameter error result.store_covering_classes_id
-    in
-    error
+    print_covering_classes parameter error result.store_covering_classes_id
   in
   let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter) 
-      "Side effects action:\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
-    let error =
-      print_side_effects parameter error result.store_side_effects'
-    in
-    error
+    print_side_effects parameter error result.store_side_effects
   in
   let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "Modification sites:\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
-    let error =
-      print_modification_sites parameter error result.store_modification_sites'
-    in
-    error
-  in
-  (*let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "* Covering classes and Modification sites:\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
-    let parameter_cv_m =
-      Remanent_parameters.update_prefix parameter "agent_type_" in
-    let error =
-      print_covering_classes_modified_sites parameter_cv_m error
-        result.store_covering_classes_modified_sites
-    in
-    error
-  in*)
-  let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "\n** Dynamic information:\n";
+      print_modification_sites parameter error result.store_modification_sites
   in
   let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "\n------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "Contact map with binding both directions (with state):\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
-    let parameter_cm =
-      Remanent_parameters.update_prefix parameter "agent_type_" in
-    let error =
-      print_contact_map parameter_cm error result.store_contact_map
-    in
-    error
+    fprintf (Remanent_parameters.get_log parameter) "\n** Dynamic information:\n";
   in
   let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "Contact map with binding only on the rhs (there is no state information):\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
-    let parameter_cm =
-      Remanent_parameters.update_prefix parameter "agent_type_" in
-    let error =
-      print_contact_map_binding_only_on_rhs parameter_cm error
-        result.store_binding_rhs
-    in
-    error
+    print_contact_map parameter error result.store_contact_map
   in
   let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "Contact map with binding in the initial state and binding on the rhs (with state):\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
-    let parameter_cm =
-      Remanent_parameters.update_prefix parameter "agent_type_" in
-    let error =
-      print_precise_binding_dual parameter_cm error result.store_binding_dual
-    in
-    error    
-  in
-  (*let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "\n------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "* Update function:\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
-    let parameter_a =
-      Remanent_parameters.update_prefix parameter "agent_type_" in
-      print_rule_id_set parameter_a error result.store_update
+    print_contact_map_binding_only_on_rhs parameter error result.store_binding_rhs
   in
   let _ =
-     fprintf (Remanent_parameters.get_log parameter)
-      "\n------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "* Fixpoint iteration (TODO):\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
-    let parameter_a =
-      Remanent_parameters.update_prefix parameter "agent_type_" in
-    let error =
-      print_fixpoint_iteration parameter_a error result.store_fixpoint
-    in
-    error
-  in*)
-  let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "\n------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "* List of rules has creation action:\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
-    let parameter_a_rule =
-      Remanent_parameters.update_prefix parameter "agent_type/rule_id_" in
-    let error =
-      print_creation_rule parameter_a_rule error result.store_creation_rule
-    in
-    error
+    print_precise_binding_dual parameter error result.store_binding_dual
   in
   let _ =
-    let parameter_agent = Remanent_parameters.update_prefix parameter "agent_type_" in
-    fprintf (Remanent_parameters.get_log parameter)
-      "\n------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter) "* BDU creation in general:\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
-    print_bdu_array_creation parameter_agent error result.store_creation
+    print_creation_rule parameter error result.store_creation_rule
+  in
+  let _ =
+    print_bdu_array_creation parameter error result.store_creation
   in
   error

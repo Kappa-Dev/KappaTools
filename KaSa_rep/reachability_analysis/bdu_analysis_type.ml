@@ -29,15 +29,17 @@ let local_trace = false
 module AgentMap = Quick_Nearly_inf_Imperatif
 
 (*module of covering classes*)
+
 module Int2Map_CV =
   MapExt.Make (
     struct
-      type t = int * int
+      type t = Cckappa_sig.agent_name * Cckappa_sig.site_name
       let compare = compare
     end)
 
 
 (*module type of contact map with state*)
+
 module Int2Map_CM_state =
   MapExt.Make (
     struct
@@ -47,6 +49,7 @@ module Int2Map_CM_state =
   )
 
 (*module type of contact map without state*)
+
 module Int2Map_CM =
   MapExt.Make (
     struct
@@ -55,25 +58,27 @@ module Int2Map_CM =
     end)
 
 (*module type of modification site*)
+
 module Int2Map_Modif =
   MapExt.Make (
     struct
-      type t = int * int
+      type t = Cckappa_sig.agent_name * Cckappa_sig.site_name
       let compare = compare
     end)
 
 (*half break side effect module*)
+
 module Int2Map_HalfBreak_effect =
   MapExt.Make (
     struct
-      type t = int * int
+      type t = Cckappa_sig.agent_name * Cckappa_sig.site_name
       let compare = compare
     end)
 
 module Int2Map_Remove_effect =
   MapExt.Make (
     struct
-      type t = int * int
+      type t = Cckappa_sig.agent_name * Cckappa_sig.site_name
       let compare = compare
     end)
 
@@ -86,41 +91,30 @@ type site_bdu  = (List_sig.variable * Cckappa_sig.state_index) list *
 
 type wl_int = IntWL.WSet.elt list * IntWL.WSet.elt list * IntWL.WSet.set
 
-type half_break_action =
-  (IntWL.WSet.elt * Cckappa_sig.site_name * Cckappa_sig.state_index) list AgentMap.t
-
-type half_break_action' = (int list * (int * int) list) Int2Map_HalfBreak_effect.t
+type half_break_action = 
+  (Cckappa_sig.agent_name list * 
+     (IntWL.WSet.elt * Cckappa_sig.state_index) list) Int2Map_HalfBreak_effect.t
 
 (*do not consider the case where site has state free.*)
 type remove_action =
-    (Fifo.IntWL.WSet.elt * Cckappa_sig.Site_map_and_set.key) list AgentMap.t
-
-type remove_action' =
-    (int list * int list) Int2Map_Remove_effect.t
+    (Cckappa_sig.agent_name list * Cckappa_sig.site_name list) Int2Map_Remove_effect.t
 
 type bdu_analysic =
     {
       store_creation_rule    : (int list * wl_int * Cckappa_sig.rule array) AgentMap.t;
       store_creation         : site_bdu AgentMap.t;
-      (*store_side_effects     : half_break_action * remove_action;*)
-      store_side_effects'    : half_break_action' * remove_action';
-      (*TEST*)
-      store_covering_classes_id : (int list * int list) Int2Map_CV.t;
-      store_modification_sites' : 
-        (int list * int list) Int2Map_Modif.t; 
-      (*store_modification_sites :
-        (IntWL.WSet.elt * Cckappa_sig.site_name * Cckappa_sig.state_index)
-	list AgentMap.t;*)
-      (*store_covering_classes_modified_sites:
-        (IntWL.WSet.elt * Cckappa_sig.site_name * Cckappa_sig.state_index)
-	list AgentMap.t;*)
-      (*contact map*)
+      (*static information*)
+      store_side_effects    : half_break_action * remove_action;
+      store_covering_classes_id : 
+        (Cckappa_sig.agent_name list * Cckappa_sig.site_name list) Int2Map_CV.t;
+      store_modification_sites : 
+        (Cckappa_sig.agent_name list * Cckappa_sig.site_name list) Int2Map_Modif.t; 
+      (*------------------------------------------------------------------------------*)
+      (*dynamic information*)
       store_contact_map      :
         ((Cckappa_sig.agent_name list) *
             (Cckappa_sig.agent_name * Cckappa_sig.site_name *
                Cckappa_sig.state_index) list) Int2Map_CM_state.t;
-      (*for instance if agent A bond to agent B; 
-	then return A bond to B and B bond to A.*)
       store_binding_rhs      :
         ((Cckappa_sig.agent_name list) *
             (Cckappa_sig.agent_name * Cckappa_sig.site_name) list) Int2Map_CM.t *
@@ -133,6 +127,9 @@ type bdu_analysic =
         ((Cckappa_sig.agent_name list) *
             (Cckappa_sig.agent_name * Cckappa_sig.site_name *
                Cckappa_sig.state_index) list) Int2Map_CM_state.t;
+      (*store_covering_classes_modified_sites:
+        (IntWL.WSet.elt * Cckappa_sig.site_name * Cckappa_sig.state_index)
+	list AgentMap.t;*)
       (*store_update_bond_side_effects_set :
 	set AgentMap.t *
         set AgentMap.t *

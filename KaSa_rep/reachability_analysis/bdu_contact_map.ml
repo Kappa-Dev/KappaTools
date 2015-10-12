@@ -35,32 +35,6 @@ let trace = false
   - A bond to C; C bond to A.
 *)
 
-(*let compute_contact_map parameter error handler =
-  let store_result = Int2Map_pair.empty in
-  (*add_link*)
-  let add_link (a, b) (c, d) store_result =
-    let l, old =
-      try Int2Map_pair.find (a, b) store_result
-      with Not_found -> [],[]
-    in
-    Int2Map_pair.add (a, b) (l, ((c, d) :: old)) store_result
-  in  
-  (*return the site name of site: this of type string*)
-  (*folding this solution with the information in dual*)
-  let error, store_result =
-    Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
-      parameter error
-      (fun parameter error (agent, (site, state)) (agent', site', state') store_result ->
-	let store_result = add_link (agent, site) (agent', site') store_result
-	in
-	error, store_result
-      ) handler.dual store_result
-  in
-  (*Return the result of this contact map*)
-  let store_result = Int2Map_pair.map (fun (l, x) -> List.rev l, x) store_result
-  in
-  error, store_result*)
-
 let compute_contact_map parameter error handler =
   let store_result = Int2Map_CM_state.empty in
   (*add_link*)
