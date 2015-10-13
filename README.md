@@ -37,7 +37,7 @@ This should produce KaSim binaries. You will need your own plotting program
 
 In order to run a simulation of 1000 rule applications, type
 
-`bin/KaSim -i kappa_file -e 1000 -p 1000 -o data_file`
+`bin/KaSim kappa_file_1 ... kappa_file_n -e 1000 -p 1000 -o data_file`
 
 This will produce a data file of 1000 point (-p option) containing the
 trajectory that was produced during the simulation.
