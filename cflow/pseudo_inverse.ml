@@ -39,8 +39,8 @@
 
      type predicate_info = 
        | Here of Po.K.agent_id  
-       | Bound_site of Po.K.agent_id * Po.K.PI.site_name
-       | Internal_state of Po.K.agent_id * Po.K.PI.site_name 
+       | Bound_site of Po.K.agent_id * Instantiation.site_name
+       | Internal_state of Po.K.agent_id * Instantiation.site_name 
 
      let string_of_predicate_info pi = 
        match 
@@ -59,7 +59,7 @@
        | Undefined (** the wire does not exist yet *)
        | Present   (** for agent presence *)
        | Free      (** for binding sites *)
-        | Bound_to of Po.K.agent_id * Po.K.PI.agent_name * Po.K.PI.site_name   (** for binding sites *)
+        | Bound_to of Po.K.agent_id * Instantiation.agent_name * Instantiation.site_name   (** for binding sites *)
 
       let string_of_predicate_value pi = 
         match 
@@ -164,7 +164,7 @@
 
       let predicates_of_action parameter handler error blackboard action = 
         match action with 
-          | Po.K.PI.Create (ag,interface) -> 
+          | Instantiation.Create (ag,interface) -> 
             let ag_id = Po.K.agent_id_of_agent ag in
             let predicate_id = Here ag_id in   
             let list1,list2 = 
@@ -185,10 +185,10 @@
                 interface
             in 
             list1,list2,false,true
-          | Po.K.PI.Mod_internal (site,int)  -> 
+          | Instantiation.Mod_internal (site,int)  -> 
             let predicate_id = Internal_state (Po.K.agent_id_of_site site,Po.K.site_name_of_site site) in 
             [predicate_id,Internal_state_is int],[],false,false
-          | Po.K.PI.Bind_to (s1,s2) -> 
+          | Instantiation.Bind_to (s1,s2) -> 
             let ag_id1 = Po.K.agent_id_of_site s1 in 
             let ag_id2 = Po.K.agent_id_of_site s2 in 
             let agent_name2 = Po.K.agent_name_of_site s2 in 
@@ -196,7 +196,7 @@
             let site_id2 = Po.K.site_name_of_site s2 in 
             let predicate_id1 = Bound_site (ag_id1,site_id1) in 
             [predicate_id1,Bound_to (ag_id2,agent_name2,site_id2)],[],false,false
-          | Po.K.PI.Bind (s1,s2) -> 
+          | Instantiation.Bind (s1,s2) -> 
             let ag_id1 = Po.K.agent_id_of_site s1 in 
             let ag_id2 = Po.K.agent_id_of_site s2 in 
             let agent_name1 = Po.K.agent_name_of_site s1 in 
@@ -207,12 +207,12 @@
             let predicate_id2 = Bound_site (ag_id2,site_id2) in 
             [predicate_id1,Bound_to (ag_id2,agent_name2,site_id2);
              predicate_id2,Bound_to (ag_id1,agent_name1,site_id1)],[],false,false
-          | Po.K.PI.Free s -> 
+          | Instantiation.Free s -> 
             let ag_id = Po.K.agent_id_of_site s in 
             let site_id = Po.K.site_name_of_site s in 
             let predicate_id = Bound_site (ag_id,site_id) in     
             [predicate_id,Free],[],false,false
-          | Po.K.PI.Remove ag -> 
+          | Instantiation.Remove ag -> 
             let ag_id = Po.K.agent_id_of_agent ag in 
             let predicate_id = Here ag_id in 
             let set = 
@@ -376,19 +376,19 @@
       let predicates_of_test parameter handler error blackboard test = 
         match test
         with 
-          | Po.K.PI.Is_Here (agent) ->
+          | Instantiation.Is_Here (agent) ->
             let ag_id = Po.K.agent_id_of_agent agent in 
             let predicate_id = Here ag_id in 
             [predicate_id]
-          | Po.K.PI.Has_Internal(site,int) -> 
+          | Instantiation.Has_Internal(site,int) -> 
             let predicate_id = Internal_state (Po.K.agent_id_of_site site,Po.K.site_name_of_site site) in 
             [predicate_id]
-          | Po.K.PI.Is_Free s -> 
+          | Instantiation.Is_Free s -> 
             let ag_id = Po.K.agent_id_of_site s in 
             let site_id = Po.K.site_name_of_site s in 
             let predicate_id = Bound_site (ag_id,site_id) in     
             [predicate_id]
-          | Po.K.PI.Is_Bound_to  (s1,s2) -> 
+          | Instantiation.Is_Bound_to  (s1,s2) -> 
             let ag_id1 = Po.K.agent_id_of_site s1 in 
             let ag_id2 = Po.K.agent_id_of_site s2 in 
             let site_id1 = Po.K.site_name_of_site s1 in 
@@ -396,12 +396,12 @@
             let predicate_id1 = Bound_site (ag_id1,site_id1) in 
             let predicate_id2 = Bound_site (ag_id2,site_id2) in 
             [predicate_id1;predicate_id2]
-          | Po.K.PI.Is_Bound s -> 
+          | Instantiation.Is_Bound s -> 
             let ag_id = Po.K.agent_id_of_site s in 
             let site_id = Po.K.site_name_of_site s in 
             let predicate_id = Bound_site (ag_id,site_id) in 
             [predicate_id]   
-          | Po.K.PI.Has_Binding_type (s,_) ->
+          | Instantiation.Has_Binding_type (s,_) ->
             let ag_id = Po.K.agent_id_of_site s in 
             let site_id = Po.K.site_name_of_site s in
             let predicate_id = Bound_site (ag_id,site_id) in 

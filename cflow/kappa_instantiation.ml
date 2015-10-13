@@ -27,37 +27,36 @@ module type Cflow_signature =
 sig
   module H:Cflow_handler.Cflow_handler
   module P:StoryProfiling.StoryStats
-  module PI = Instantiation
 
   type agent_id = int 
   module AgentIdSet:Set.S with type elt = agent_id
 
   type internal_state = int 
 
-  type side_effect = PI.concrete PI.site list
-  type refined_event = Causal.event_kind * PI.concrete PI.event
+  type side_effect = Instantiation.concrete Instantiation.site list
+  type refined_event = Causal.event_kind * Instantiation.concrete Instantiation.event
   type refined_obs =
-      Causal.event_kind * PI.concrete PI.test list * unit Mods.simulation_info
+      Causal.event_kind * Instantiation.concrete Instantiation.test list * unit Mods.simulation_info
   type refined_step
 
   val empty_side_effect: side_effect
   val dummy_refined_step: string -> refined_step
-  val agent_name_of_binding_type: PI.binding_type -> PI.agent_name
-  val site_name_of_binding_type: PI.binding_type -> PI.site_name
+  val agent_name_of_binding_type: Instantiation.binding_type -> Instantiation.agent_name
+  val site_name_of_binding_type: Instantiation.binding_type -> Instantiation.site_name
   val agent_id_of_agent:
-    PI.concrete -> int
-  val agent_name_of_agent: PI.concrete -> PI.agent_name
-  val agent_of_site: PI.concrete PI.site -> PI.concrete
-  val agent_id_of_site: PI.concrete PI.site -> int
-  val agent_name_of_site: PI.concrete PI.site -> PI.agent_name
-  val site_name_of_site: PI.concrete PI.site -> PI.site_name
+    Instantiation.concrete -> int
+  val agent_name_of_agent: Instantiation.concrete -> Instantiation.agent_name
+  val agent_of_site: Instantiation.concrete Instantiation.site -> Instantiation.concrete
+  val agent_id_of_site: Instantiation.concrete Instantiation.site -> int
+  val agent_name_of_site: Instantiation.concrete Instantiation.site -> Instantiation.agent_name
+  val site_name_of_site: Instantiation.concrete Instantiation.site -> Instantiation.site_name
   val build_subs_refined_step: int -> int -> refined_step
-  val tests_of_refined_step: (refined_step -> H.error_channel * PI.concrete PI.test list) H.with_handler
+  val tests_of_refined_step: (refined_step -> H.error_channel * Instantiation.concrete Instantiation.test list) H.with_handler
   val actions_of_refined_step:
     (refined_step ->
      H.error_channel *
-       (PI.concrete PI.action list *
-	  (PI.concrete PI.site*PI.concrete PI.binding_state) list)) H.with_handler
+       (Instantiation.concrete Instantiation.action list *
+	  (Instantiation.concrete Instantiation.site*Instantiation.concrete Instantiation.binding_state) list)) H.with_handler
   val is_obs_of_refined_step: refined_step -> bool
   val is_init_of_refined_step: refined_step -> bool
   val is_subs_of_refined_step: refined_step -> bool
@@ -66,7 +65,7 @@ sig
     refined_step -> unit Mods.simulation_info option
   val print_side:
     Format.formatter -> H.handler -> string  ->
-    (PI.concrete PI.site*PI.concrete PI.binding_state) -> unit
+    (Instantiation.concrete Instantiation.site*Instantiation.concrete Instantiation.binding_state) -> unit
 
   val print_refined_step:
     ?handler:H.handler -> Format.formatter -> refined_step -> unit
@@ -77,10 +76,10 @@ sig
     P.log_info -> refined_obs  -> refined_step list -> P.log_info * refined_step list
 
   val build_grid:
-    (refined_step * PI.concrete PI.site list * bool)  list -> bool ->
+    (refined_step * Instantiation.concrete Instantiation.site list * bool)  list -> bool ->
     H.handler -> Causal.grid
   val print_side_effect: Format.formatter -> side_effect -> unit
-  val side_effect_of_list: PI.concrete PI.site list -> side_effect
+  val side_effect_of_list: Instantiation.concrete Instantiation.site list -> side_effect
 
   val get_kasim_side_effects: refined_step -> side_effect
 

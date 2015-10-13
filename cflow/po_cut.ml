@@ -32,14 +32,14 @@
 
      type predicate_info = 
        | Here of K.agent_id  
-       | Bound_site of K.agent_id * K.PI.site_name
-       | Internal_state of K.agent_id * K.PI.site_name
+       | Bound_site of K.agent_id * Instantiation.site_name
+       | Internal_state of K.agent_id * Instantiation.site_name
 
      module PS = Set.Make (struct type t = predicate_info let compare = compare end)
 
      let created_predicates_of_action action = 
        match action with 
-         | K.PI.Create (ag,interface) -> 
+         | Instantiation.Create (ag,interface) -> 
            let ag_id = K.agent_id_of_agent ag in
            List.fold_left 
              (fun list (s_id,opt) -> 
@@ -51,11 +51,11 @@
              )
              [Here ag_id]
              interface
-         | K.PI.Bind _ | K.PI.Bind_to _ | K.PI.Remove _ | K.PI.Free _ | K.PI.Mod_internal _ -> []
+         | Instantiation.Bind _ | Instantiation.Bind_to _ | Instantiation.Remove _ | Instantiation.Free _ | Instantiation.Mod_internal _ -> []
 
      let predicates_of_action action = 
        match action with 
-         | K.PI.Create (ag,interface) -> 
+         | Instantiation.Create (ag,interface) -> 
            let ag_id = K.agent_id_of_agent ag in
              List.fold_left 
                (fun list (s_id,opt) -> 
@@ -67,24 +67,24 @@
                )
                [Here ag_id]
                interface
-         | K.PI.Mod_internal (site,_)  -> 
+         | Instantiation.Mod_internal (site,_)  -> 
            [Internal_state (K.agent_id_of_site site,K.site_name_of_site site)]
-         | K.PI.Bind_to (s1,s2)  | K.PI.Bind (s1,s2) ->
+         | Instantiation.Bind_to (s1,s2)  | Instantiation.Bind (s1,s2) ->
            [Bound_site (K.agent_id_of_site s1,K.site_name_of_site s1);Bound_site (K.agent_id_of_site s2,K.site_name_of_site s2)]
-         | K.PI.Free s ->
+         | Instantiation.Free s ->
            [Bound_site (K.agent_id_of_site s,K.site_name_of_site s)]
-         | K.PI.Remove _ -> []
+         | Instantiation.Remove _ -> []
 
      let predicates_of_test test = 
        match test
        with 
-         | K.PI.Is_Here (agent) ->
+         | Instantiation.Is_Here (agent) ->
            [Here (K.agent_id_of_agent agent)]
-         | K.PI.Has_Internal(site,_) -> 
+         | Instantiation.Has_Internal(site,_) -> 
            [Internal_state (K.agent_id_of_site site,K.site_name_of_site site)]
-         | K.PI.Is_Free s | K.PI.Is_Bound s | K.PI.Has_Binding_type (s,_) -> 
+         | Instantiation.Is_Free s | Instantiation.Is_Bound s | Instantiation.Has_Binding_type (s,_) -> 
            [Bound_site (K.agent_id_of_site s,K.site_name_of_site s)]
-         | K.PI.Is_Bound_to  (s1,s2) -> 
+         | Instantiation.Is_Bound_to  (s1,s2) -> 
            [Bound_site (K.agent_id_of_site s1,K.site_name_of_site s1);Bound_site (K.agent_id_of_site s2,K.site_name_of_site s2)]
 
      let predicates_of_side_effects sides =

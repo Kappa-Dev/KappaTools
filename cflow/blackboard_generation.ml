@@ -98,11 +98,11 @@ module Preblackboard =
      | Init 
      | Observable
      | Rule 
-     | Side_effect_of of (step_id * (CI.Po.K.agent_id * CI.Po.K.PI.site_name) list)
+     | Side_effect_of of (step_id * (CI.Po.K.agent_id * Instantiation.site_name) list)
      
      type predicate_id = int (** wire identifiers *)
      type mutex = 
-     | Lock_side_effect of step_id * CI.Po.K.agent_id * CI.Po.K.agent_id * CI.Po.K.PI.site_name 
+     | Lock_side_effect of step_id * CI.Po.K.agent_id * CI.Po.K.agent_id * Instantiation.site_name 
      | Lock_agent of step_id * CI.Po.K.agent_id
      | Lock_rectangular of step_id * CI.Po.K.agent_id 
      | Lock_links of step_id * (CI.Po.K.agent_id * CI.Po.K.agent_id)
@@ -110,8 +110,8 @@ module Preblackboard =
      type predicate_info = (** wire labels *)
      | Fictitious 
      | Here of CI.Po.K.agent_id  
-     | Bound_site of CI.Po.K.agent_id * CI.Po.K.PI.site_name
-     | Internal_state of CI.Po.K.agent_id * CI.Po.K.PI.site_name 
+     | Bound_site of CI.Po.K.agent_id * Instantiation.site_name
+     | Internal_state of CI.Po.K.agent_id * Instantiation.site_name 
      | Pointer of step_id * CI.Po.K.agent_id 
      | Link of step_id * CI.Po.K.agent_id * CI.Po.K.agent_id 
      | Mutex of mutex
@@ -120,16 +120,16 @@ module Preblackboard =
 
      type predicate_value = 
        | Counter of int 
-       | Pointer_to_agent of CI.Po.K.PI.agent_name 
+       | Pointer_to_agent of Instantiation.agent_name 
        | Internal_state_is of CI.Po.K.internal_state
        | Defined   (** the wire does exist, but we do not know what the value is *)
        | Undefined (** the wire does not exist yet *)
        | Present   (** for agent presence *)
        | Free      (** for binding sites *)
        | Bound     (** for binding sites (partial information) *)
-       | Bound_to of predicate_id * CI.Po.K.agent_id * CI.Po.K.PI.agent_name * CI.Po.K.PI.site_name
+       | Bound_to of predicate_id * CI.Po.K.agent_id * Instantiation.agent_name * Instantiation.site_name
            (** for bindinf sites (complete information) *)
-       | Bound_to_type of CI.Po.K.PI.agent_name * CI.Po.K.PI.site_name (** for binding sites (partial information *)
+       | Bound_to_type of Instantiation.agent_name * Instantiation.site_name (** for binding sites (partial information *)
        | Unknown (**  for agent presence, internal states, binding states (partial information *) 
 
      module C = (Cache.Cache(struct type t = predicate_value let compare = compare end):Cache.Cache with type O.t = predicate_value) 
@@ -161,8 +161,8 @@ module Preblackboard =
      module AgentId2Map = Map.Make (struct type t = CI.Po.K.agent_id*CI.Po.K.agent_id let compare=compare end)
      module AgentIdSet = Set_patched.Make (struct type t = CI.Po.K.agent_id let compare = compare end)
      module AgentId2Set = Set.Make (struct type t = CI.Po.K.agent_id*CI.Po.K.agent_id let compare=compare end)
-     module SiteIdSet = Set.Make (struct type t = (CI.Po.K.agent_id*CI.Po.K.PI.site_name) let compare=compare end)
-     module SiteIdMap = Map.Make (struct type t = (CI.Po.K.agent_id*CI.Po.K.PI.site_name) let compare=compare end)
+     module SiteIdSet = Set.Make (struct type t = (CI.Po.K.agent_id*Instantiation.site_name) let compare=compare end)
+     module SiteIdMap = Map.Make (struct type t = (CI.Po.K.agent_id*Instantiation.site_name) let compare=compare end)
 
      type pre_blackboard = 
 	 {
@@ -506,7 +506,7 @@ module Preblackboard =
              
          let predicates_of_action_no_subs parameter handler error blackboard init action = 
            match action with 
-             | CI.Po.K.PI.Create (ag,interface) -> 
+             | Instantiation.Create (ag,interface) -> 
                let ag_id = CI.Po.K.agent_id_of_agent ag in
                let agent_name = CI.Po.K.agent_name_of_agent ag in 
                let error,blackboard = create_agent parameter handler error blackboard agent_name ag_id in 
@@ -534,10 +534,10 @@ module Preblackboard =
                  )
                  (error,blackboard,[predicate_id,Present],[predicate_id,Undefined])
                  interface
-             | CI.Po.K.PI.Mod_internal (site,int)  -> 
+             | Instantiation.Mod_internal (site,int)  -> 
                let error,blackboard,predicate_id = allocate parameter handler error blackboard (Internal_state (CI.Po.K.agent_id_of_site site,CI.Po.K.site_name_of_site site)) in 
                error,blackboard,[predicate_id,Internal_state_is int],[]
-             | CI.Po.K.PI.Bind_to (s1,s2) -> 
+             | Instantiation.Bind_to (s1,s2) -> 
                let ag_id1 = CI.Po.K.agent_id_of_site s1 in 
                let ag_id2 = CI.Po.K.agent_id_of_site s2 in 
                let agent_name2 = CI.Po.K.agent_name_of_site s2 in 
@@ -547,7 +547,7 @@ module Preblackboard =
                let error,blackboard,predicate_id2 = allocate parameter handler error blackboard (Bound_site (ag_id2,site_id2)) in 
                error,blackboard,
                [predicate_id1,Bound_to (predicate_id2,ag_id2,agent_name2,site_id2)],[]
-             | CI.Po.K.PI.Bind (s1,s2) -> 
+             | Instantiation.Bind (s1,s2) -> 
                let ag_id1 = CI.Po.K.agent_id_of_site s1 in 
                let ag_id2 = CI.Po.K.agent_id_of_site s2 in 
                let agent_name1 = CI.Po.K.agent_name_of_site s1 in 
@@ -559,12 +559,12 @@ module Preblackboard =
                error,blackboard,
                [predicate_id1,Bound_to (predicate_id2,ag_id2,agent_name2,site_id2);
                 predicate_id2,Bound_to (predicate_id1,ag_id1,agent_name1,site_id1)],[]
-             | CI.Po.K.PI.Free s -> 
+             | Instantiation.Free s -> 
                let ag_id = CI.Po.K.agent_id_of_site s in 
                let site_id = CI.Po.K.site_name_of_site s in 
                let error,blackboard,predicate_id = allocate parameter handler error blackboard (Bound_site (ag_id,site_id)) in     
                error,blackboard,[predicate_id,Free],[]
-             | CI.Po.K.PI.Remove ag -> 
+             | Instantiation.Remove ag -> 
                let ag_id = CI.Po.K.agent_id_of_agent ag in 
                let error,blackboard,predicate_id = allocate parameter handler error blackboard (Here ag_id) in 
                let error,blackboard = free_agent parameter handler error blackboard ag_id in 
@@ -584,7 +584,7 @@ module Preblackboard =
 
           let predicates_of_action_subs parameter handler error blackboard init action = 
            match action with 
-             | CI.Po.K.PI.Create (ag,interface) -> 
+             | Instantiation.Create (ag,interface) -> 
                let ag_id = CI.Po.K.agent_id_of_agent ag in
                let agent_name = CI.Po.K.agent_name_of_agent ag in 
                let error,blackboard = create_agent parameter handler error blackboard agent_name ag_id in 
@@ -612,10 +612,10 @@ module Preblackboard =
                  )
                  (error,blackboard,[predicate_id,Present],[predicate_id,Undefined])
                  interface
-             | CI.Po.K.PI.Mod_internal (site,int)  -> 
+             | Instantiation.Mod_internal (site,int)  -> 
                let error,blackboard,predicate_id = allocate parameter handler error blackboard (Internal_state (CI.Po.K.agent_id_of_site site,CI.Po.K.site_name_of_site site)) in 
                error,blackboard,[predicate_id,Internal_state_is int],[]
-             | CI.Po.K.PI.Bind_to (s1,s2) -> 
+             | Instantiation.Bind_to (s1,s2) -> 
                let ag_id1 = CI.Po.K.agent_id_of_site s1 in 
                let ag_id2 = CI.Po.K.agent_id_of_site s2 in 
                let agent_name2 = CI.Po.K.agent_name_of_site s2 in 
@@ -625,7 +625,7 @@ module Preblackboard =
                let error,blackboard,predicate_id2 = allocate parameter handler error blackboard (Bound_site (ag_id2,site_id2)) in 
                error,blackboard,
                [predicate_id1,Bound_to (predicate_id2,ag_id2,agent_name2,site_id2)],[]
-             | CI.Po.K.PI.Bind (s1,s2) -> 
+             | Instantiation.Bind (s1,s2) -> 
                let ag_id1 = CI.Po.K.agent_id_of_site s1 in 
                let ag_id2 = CI.Po.K.agent_id_of_site s2 in 
                let agent_name1 = CI.Po.K.agent_name_of_site s1 in 
@@ -637,12 +637,12 @@ module Preblackboard =
                error,blackboard,
                [predicate_id1,Bound_to (predicate_id2,ag_id2,agent_name2,site_id2);
                 predicate_id2,Bound_to (predicate_id1,ag_id1,agent_name1,site_id1)],[]
-             | CI.Po.K.PI.Free s -> 
+             | Instantiation.Free s -> 
                let ag_id = CI.Po.K.agent_id_of_site s in 
                let site_id = CI.Po.K.site_name_of_site s in 
                let error,blackboard,predicate_id = allocate parameter handler error blackboard (Bound_site (ag_id,site_id)) in     
                error,blackboard,[predicate_id,Free],[]
-             | CI.Po.K.PI.Remove ag -> 
+             | Instantiation.Remove ag -> 
                let ag_id = CI.Po.K.agent_id_of_agent ag in 
                let error,blackboard,predicate_id = allocate parameter handler error blackboard (Here ag_id) in 
 (*               let error,blackboard = free_agent parameter handler error blackboard ag_id in *)
@@ -667,19 +667,19 @@ module Preblackboard =
          let predicates_of_test  parameter handler error blackboard test = 
            match test
            with 
-             | CI.Po.K.PI.Is_Here (agent) ->
+             | Instantiation.Is_Here (agent) ->
                let ag_id = CI.Po.K.agent_id_of_agent agent in 
                let error,blackboard,predicate_id = allocate parameter handler error blackboard (Here ag_id) in 
                error,blackboard,[predicate_id,Present]
-             | CI.Po.K.PI.Has_Internal(site,int) -> 
+             | Instantiation.Has_Internal(site,int) -> 
                let error,blackboard,predicate_id = allocate parameter handler error blackboard (Internal_state (CI.Po.K.agent_id_of_site site,CI.Po.K.site_name_of_site site)) in 
                error,blackboard,[predicate_id,Internal_state_is int]
-             | CI.Po.K.PI.Is_Free s -> 
+             | Instantiation.Is_Free s -> 
                let ag_id = CI.Po.K.agent_id_of_site s in 
                let site_id = CI.Po.K.site_name_of_site s in 
                let error,blackboard,predicate_id = allocate parameter handler error blackboard (Bound_site (ag_id,site_id)) in     
                error,blackboard,[predicate_id,Free]
-             | CI.Po.K.PI.Is_Bound_to  (s1,s2) -> 
+             | Instantiation.Is_Bound_to  (s1,s2) -> 
                let ag_id1 = CI.Po.K.agent_id_of_site s1 in 
                let ag_id2 = CI.Po.K.agent_id_of_site s2 in 
                let agent_name1 = CI.Po.K.agent_name_of_site s1 in 
@@ -691,13 +691,13 @@ module Preblackboard =
                error,blackboard,
                [predicate_id1,Bound_to (predicate_id2,ag_id2,agent_name2,site_id2);
                 predicate_id2,Bound_to (predicate_id1,ag_id1,agent_name1,site_id1)]
-             | CI.Po.K.PI.Is_Bound s -> 
+             | Instantiation.Is_Bound s -> 
                let ag_id = CI.Po.K.agent_id_of_site s in 
                let site_id = CI.Po.K.site_name_of_site s in 
                let error,blackboard,predicate_id = allocate parameter handler error blackboard (Bound_site (ag_id,site_id)) in 
                error,blackboard,
                [predicate_id,Bound]   
-             | CI.Po.K.PI.Has_Binding_type (s,(agent_name,site_name)) ->
+             | Instantiation.Has_Binding_type (s,(agent_name,site_name)) ->
                let ag_id = CI.Po.K.agent_id_of_site s in 
                let site_id = CI.Po.K.site_name_of_site s in
                let error,blackboard,predicate_id = allocate parameter handler error blackboard (Bound_site (ag_id,site_id)) in 
@@ -790,12 +790,12 @@ module Preblackboard =
                  
                  
          let predicate_value_of_binding_state parameter handler error = function
-             | CI.Po.K.PI.ANY -> error,Unknown
-             | CI.Po.K.PI.FREE -> error,Free
-             | CI.Po.K.PI.BOUND -> error,Bound
-             | CI.Po.K.PI.BOUND_TYPE bt ->
+             | Instantiation.ANY -> error,Unknown
+             | Instantiation.FREE -> error,Free
+             | Instantiation.BOUND -> error,Bound
+             | Instantiation.BOUND_TYPE bt ->
 		error,Bound_to_type (CI.Po.K.agent_name_of_binding_type bt,CI.Po.K.site_name_of_binding_type bt)
-             | CI.Po.K.PI.BOUND_to _ ->
+             | Instantiation.BOUND_to _ ->
 		let error_list,error =
                   CI.Po.K.H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "predicate_value_of_binding_state") (Some "620") (Some "Illegal binding state in predicate_value_of_binding_state") (failwith "predicate_value_of_binding_state") in
 		CI.Po.K.H.raise_error parameter handler error_list error Unknown
@@ -847,7 +847,7 @@ module Preblackboard =
          type data_structure_strong = 
            {
              new_agents: AgentIdSet.t ;
-             old_agents: CI.Po.K.PI.agent_name AgentIdMap.t;
+             old_agents: Instantiation.agent_name AgentIdMap.t;
              old_agents_potential_substitution: CI.Po.K.agent_id list AgentIdMap.t;
              sure_agents: AgentIdSet.t; 
              sure_links: AgentId2Set.t;
@@ -856,16 +856,16 @@ module Preblackboard =
              sites_in_other_action_links: SiteIdSet.t; 
              other_links_test_sites: (CI.Po.K.agent_id) SiteIdMap.t;
              other_links_action_sites: (CI.Po.K.agent_id) SiteIdMap.t; 
-             sure_tests: CI.Po.K.PI.concrete CI.Po.K.PI.test list ;
-             sure_actions: CI.Po.K.PI.concrete CI.Po.K.PI.action list ; 
-             create_actions: CI.Po.K.PI.concrete CI.Po.K.PI.action list ; 
-             sure_side_effects: (CI.Po.K.PI.concrete CI.Po.K.PI.site*CI.Po.K.PI.concrete CI.Po.K.PI.binding_state) list;
-             other_agents_tests: CI.Po.K.PI.concrete CI.Po.K.PI.test list AgentIdMap.t ; 
-             other_agents_actions: CI.Po.K.PI.concrete CI.Po.K.PI.action list AgentIdMap.t ;
-             other_links_tests: CI.Po.K.PI.concrete CI.Po.K.PI.test list AgentId2Map.t; 
-             other_links_actions: CI.Po.K.PI.concrete CI.Po.K.PI.action list AgentId2Map.t ;
+             sure_tests: Instantiation.concrete Instantiation.test list ;
+             sure_actions: Instantiation.concrete Instantiation.action list ; 
+             create_actions: Instantiation.concrete Instantiation.action list ; 
+             sure_side_effects: (Instantiation.concrete Instantiation.site*Instantiation.concrete Instantiation.binding_state) list;
+             other_agents_tests: Instantiation.concrete Instantiation.test list AgentIdMap.t ; 
+             other_agents_actions: Instantiation.concrete Instantiation.action list AgentIdMap.t ;
+             other_links_tests: Instantiation.concrete Instantiation.test list AgentId2Map.t; 
+             other_links_actions: Instantiation.concrete Instantiation.action list AgentId2Map.t ;
              other_links_priority: AgentId2Set.t ; 
-             other_agents_side_effects: (CI.Po.K.PI.concrete CI.Po.K.PI.site*CI.Po.K.PI.concrete CI.Po.K.PI.binding_state) list AgentIdMap.t ;
+             other_agents_side_effects: (Instantiation.concrete Instantiation.site*Instantiation.concrete Instantiation.binding_state) list AgentIdMap.t ;
              subs_agents_involved_in_links: AgentIdSet.t;
              rule_agent_id_mutex: predicate_id AgentIdMap.t;
              rule_agent_id_subs: predicate_id AgentIdMap.t;
@@ -944,7 +944,7 @@ module Preblackboard =
            in
            let () =
 	     Format.fprintf stderr "Sure tests:@[<v 1>%a@]@."
-			    (Pp.list Pp.space (CI.Po.K.PI.print_concrete_test ~sigs))
+			    (Pp.list Pp.space (Instantiation.print_concrete_test ~sigs))
 			    data.sure_tests in
            let () =
 	     Format.fprintf stderr "Tests to be substituted:@[<v 1>@,%a%a@]@."
@@ -952,7 +952,7 @@ module Preblackboard =
 				    (fun f (id,l) ->
 				     Format.fprintf
 				       f"%i@,%a" id
-				       (Pp.list Pp.space (CI.Po.K.PI.print_concrete_test ~sigs))
+				       (Pp.list Pp.space (Instantiation.print_concrete_test ~sigs))
 				       l
 				    ))
 			    data.other_agents_tests
@@ -960,12 +960,12 @@ module Preblackboard =
 				    (fun f ((id1,id2),l) ->
 				     Format.fprintf
 				       f "(%i,%i)@,%a" id1 id2
-				       (Pp.list Pp.space (CI.Po.K.PI.print_concrete_test ~sigs))
+				       (Pp.list Pp.space (Instantiation.print_concrete_test ~sigs))
 				       l))
 			    data.other_links_tests in
            let () =
 	     Format.fprintf stderr "Sure actions:@[<v 1>%a@]@."
-			    (Pp.list Pp.space (CI.Po.K.PI.print_concrete_action ~sigs))
+			    (Pp.list Pp.space (Instantiation.print_concrete_action ~sigs))
 			    data.sure_actions in
            let () =
 	     Format.fprintf stderr "Actions to be substituted:@[<v 1>@,%a%a@]@."
@@ -973,7 +973,7 @@ module Preblackboard =
 				    (fun f (id,l) ->
 				     Format.fprintf
 				       f"%i@,%a" id
-				       (Pp.list Pp.space (CI.Po.K.PI.print_concrete_action ~sigs))
+				       (Pp.list Pp.space (Instantiation.print_concrete_action ~sigs))
 				       l
 				    ))
 			    data.other_agents_actions
@@ -981,7 +981,7 @@ module Preblackboard =
 				    (fun f ((id1,id2),l) ->
 				     Format.fprintf
 				       f "(%i,%i)@,%a" id1 id2
-				       (Pp.list Pp.space (CI.Po.K.PI.print_concrete_action ~sigs))
+				       (Pp.list Pp.space (Instantiation.print_concrete_action ~sigs))
 				       l))
 			    data.other_links_actions in
            let _ = Format.fprintf stderr "Sure side_effects \n" in 
@@ -1141,11 +1141,11 @@ module Preblackboard =
                  match 
                    action
                  with 
-                 | CI.Po.K.PI.Create(ag,interface) -> 
+                 | Instantiation.Create(ag,interface) -> 
                      {data_structure 
                       with new_agents = AgentIdSet.add (CI.Po.K.agent_id_of_agent ag) data_structure.new_agents}
                  
-                 | CI.Po.K.PI.Bind(site1,site2)
+                 | Instantiation.Bind(site1,site2)
                      -> 
                    let ag1_id = CI.Po.K.agent_id_of_site site1 in 
                    let ag2_id = CI.Po.K.agent_id_of_site site2 in 
@@ -1156,7 +1156,7 @@ module Preblackboard =
                       other_links_action_sites = 
                        SiteIdMap.add site1_id ag2_id
                          (SiteIdMap.add site2_id ag1_id data_structure.other_links_action_sites)}
-                 | CI.Po.K.PI.Remove agent -> 
+                 | Instantiation.Remove agent -> 
                    {data_structure 
                     with removed_agents = AgentIdSet.add (CI.Po.K.agent_id_of_agent agent) data_structure.removed_agents}
                  | _ -> data_structure)
@@ -1169,10 +1169,10 @@ module Preblackboard =
                  match 
                    test
                  with 
-                 | CI.Po.K.PI.Is_Here (ag) -> 
+                 | Instantiation.Is_Here (ag) -> 
                    {data_structure 
                     with old_agents = AgentIdMap.add (CI.Po.K.agent_id_of_agent ag) (CI.Po.K.agent_name_of_agent ag) data_structure.old_agents}
-                  | CI.Po.K.PI.Is_Bound_to(site1,site2)
+                  | Instantiation.Is_Bound_to(site1,site2)
                      -> 
                     let ag1_id = CI.Po.K.agent_id_of_site site1 in 
                     let ag2_id = CI.Po.K.agent_id_of_site site2 in 
@@ -1202,8 +1202,8 @@ module Preblackboard =
                        SiteIdMap.add site1_id ag2_id
                          (SiteIdMap.add site2_id ag1_id data_structure.other_links_test_sites)}
 
-		  | CI.Po.K.PI.Is_Free _ | CI.Po.K.PI.Has_Binding_type _
-		  | CI.Po.K.PI.Has_Internal _ | CI.Po.K.PI.Is_Bound _ -> data_structure)
+		  | Instantiation.Is_Free _ | Instantiation.Has_Binding_type _
+		  | Instantiation.Has_Internal _ | Instantiation.Is_Bound _ -> data_structure)
                data_structure 
                test_list 
            in
@@ -1268,10 +1268,10 @@ module Preblackboard =
                (fun data_structure test -> 
                  match test
                  with 
-                 | CI.Po.K.PI.Is_Here _ | CI.Po.K.PI.Has_Internal _
-                 | CI.Po.K.PI.Is_Free _  | CI.Po.K.PI.Is_Bound _
-		 | CI.Po.K.PI.Has_Binding_type _  -> data_structure
-                 | CI.Po.K.PI.Is_Bound_to  (site1,site2) -> 
+                 | Instantiation.Is_Here _ | Instantiation.Has_Internal _
+                 | Instantiation.Is_Free _  | Instantiation.Is_Bound _
+		 | Instantiation.Has_Binding_type _  -> data_structure
+                 | Instantiation.Is_Bound_to  (site1,site2) -> 
                    let agent1 = CI.Po.K.agent_of_site site1 in 
                    let ag_id1 = CI.Po.K.agent_id_of_agent agent1 in 
                    let agent2 = CI.Po.K.agent_of_site site2 in 
@@ -1313,12 +1313,12 @@ module Preblackboard =
                (fun data_structure action -> 
                  match action
                  with 
-                 | CI.Po.K.PI.Create _
-                 | CI.Po.K.PI.Remove _
-                 | CI.Po.K.PI.Mod_internal _
-                 | CI.Po.K.PI.Free _ -> data_structure
-                 | CI.Po.K.PI.Bind(site1,site2)
-		 | CI.Po.K.PI.Bind_to (site1,site2) ->
+                 | Instantiation.Create _
+                 | Instantiation.Remove _
+                 | Instantiation.Mod_internal _
+                 | Instantiation.Free _ -> data_structure
+                 | Instantiation.Bind(site1,site2)
+		 | Instantiation.Bind_to (site1,site2) ->
                    let agent1 = CI.Po.K.agent_of_site site1 in 
                    let ag_id1 = CI.Po.K.agent_id_of_agent agent1 in 
                    let agent2 = CI.Po.K.agent_of_site site2 in 
@@ -1341,14 +1341,14 @@ module Preblackboard =
                (fun data_structure test -> 
                  match test
                  with 
-                 | CI.Po.K.PI.Is_Here (agent) ->
+                 | Instantiation.Is_Here (agent) ->
                    let ag_id = CI.Po.K.agent_id_of_agent agent in 
                    if sure_agent ag_id 
                    then 
                      add_sure_test test data_structure 
                    else 
                      add_subs_test test ag_id data_structure 
-                 | CI.Po.K.PI.Has_Internal(site,_) -> 
+                 | Instantiation.Has_Internal(site,_) -> 
                    let agent = CI.Po.K.agent_of_site site in 
                    let ag_id = CI.Po.K.agent_id_of_agent agent in 
                    if sure_agent ag_id 
@@ -1356,8 +1356,8 @@ module Preblackboard =
                      add_sure_test test data_structure 
                    else 
                      add_subs_test test ag_id data_structure 
-                 | CI.Po.K.PI.Is_Free site | CI.Po.K.PI.Is_Bound site
-		 | CI.Po.K.PI.Has_Binding_type (site,_) ->
+                 | Instantiation.Is_Free site | Instantiation.Is_Bound site
+		 | Instantiation.Has_Binding_type (site,_) ->
                    let agent = CI.Po.K.agent_of_site site in 
                    let ag_id = CI.Po.K.agent_id_of_agent agent in 
                    if sure_agent ag_id && not (SiteIdSet.mem (ag_id,CI.Po.K.site_name_of_site site) data_structure.sites_in_other_links)
@@ -1375,7 +1375,7 @@ module Preblackboard =
                          add_subs_test test ag_id data_structure 
                     end 
                   
-                 | CI.Po.K.PI.Is_Bound_to (site1,site2) ->
+                 | Instantiation.Is_Bound_to (site1,site2) ->
                    let agent1 = CI.Po.K.agent_of_site site1 in 
                    let ag_id1 = CI.Po.K.agent_id_of_agent agent1 in 
                    let ag_name1 = CI.Po.K.agent_name_of_agent agent1 in 
@@ -1384,8 +1384,8 @@ module Preblackboard =
                    let ag_id2 = CI.Po.K.agent_id_of_agent agent2 in 
                    let ag_name2 = CI.Po.K.agent_name_of_agent agent2 in 
                    let site_name2 = CI.Po.K.site_name_of_site site2 in 
-                   let weak1 = CI.Po.K.PI.Has_Binding_type (site1,(ag_name2,site_name2)) in
-                   let weak2 = CI.Po.K.PI.Has_Binding_type (site2,(ag_name1,site_name1)) in
+                   let weak1 = Instantiation.Has_Binding_type (site1,(ag_name2,site_name2)) in
+                   let weak2 = Instantiation.Has_Binding_type (site2,(ag_name1,site_name1)) in
                    match sure_agent ag_id1 && not (SiteIdSet.mem  (ag_id1,site_name1) priority_sites),
                      sure_agent ag_id2 && not (SiteIdSet.mem (ag_id2,site_name2) priority_sites)
                    with 
@@ -1411,15 +1411,15 @@ module Preblackboard =
                (fun data_structure action -> 
                  match action
                  with 
-                 | CI.Po.K.PI.Create _ -> add_create_action action data_structure 
-                 | CI.Po.K.PI.Remove agent -> 
+                 | Instantiation.Create _ -> add_create_action action data_structure 
+                 | Instantiation.Remove agent -> 
                    let ag_id = CI.Po.K.agent_id_of_agent agent in 
                    if sure_agent ag_id 
                    then 
                      add_sure_action action data_structure
                    else 
                      add_subs_action action ag_id data_structure 
-                 | CI.Po.K.PI.Mod_internal (site,_) 
+                 | Instantiation.Mod_internal (site,_) 
                    -> 
                    let agent = CI.Po.K.agent_of_site site in 
                    let ag_id = CI.Po.K.agent_id_of_agent agent in 
@@ -1428,7 +1428,7 @@ module Preblackboard =
                      add_sure_action action data_structure 
                    else 
                      add_subs_action action ag_id data_structure 
-                 | CI.Po.K.PI.Free(site) -> 
+                 | Instantiation.Free(site) -> 
                    let agent = CI.Po.K.agent_of_site site in 
                    let ag_id = CI.Po.K.agent_id_of_agent agent in 
                    let site_id1 = ag_id,CI.Po.K.site_name_of_site site in 
@@ -1451,7 +1451,7 @@ module Preblackboard =
                                 add_subs_action action ag_id data_structure 
                           end 
                           
-                 | CI.Po.K.PI.Bind(site1,site2) | CI.Po.K.PI.Bind_to (site1,site2) ->
+                 | Instantiation.Bind(site1,site2) | Instantiation.Bind_to (site1,site2) ->
                    let agent1 = CI.Po.K.agent_of_site site1 in 
                    let ag_id1 = CI.Po.K.agent_id_of_agent agent1 in 
                    let agent2 = CI.Po.K.agent_of_site site2 in 
@@ -1827,17 +1827,17 @@ module Preblackboard =
                      let (step:CI.Po.K.refined_step) = CI.Po.K.build_subs_refined_step rule_ag_id mixture_ag_id in 
                      let test_list = 
                        Tools.list_smart_map
-                         (CI.Po.K.PI.subst_agent_in_concrete_test rule_ag_id mixture_ag_id)
+                         (Instantiation.subst_agent_in_concrete_test rule_ag_id mixture_ag_id)
                          test_list
                      in 
                      let action_list =
                        Tools.list_smart_map
-                         (CI.Po.K.PI.subst_agent_in_concrete_action rule_ag_id mixture_ag_id)
+                         (Instantiation.subst_agent_in_concrete_action rule_ag_id mixture_ag_id)
                          action_list
                      in 
                      let side_effect =
                        Tools.list_smart_map
-                         (CI.Po.K.PI.subst_agent_in_concrete_side_effect rule_ag_id mixture_ag_id)
+                         (Instantiation.subst_agent_in_concrete_side_effect rule_ag_id mixture_ag_id)
                          side_effect in
                      let fictitious_local_list = [] in 
                      let error,blackboard,fictitious_list,fictitious_local_list,unambiguous_side_effects,init_step = 
@@ -2150,10 +2150,10 @@ according to the corresponding substitution *)
                                    | Not_found -> x 
                                  in 
                                  Tools.list_smart_map
-				   (CI.Po.K.PI.subst_map_agent_in_concrete_test f)
+				   (Instantiation.subst_map_agent_in_concrete_test f)
 				   test_list,
                                  Tools.list_smart_map
-				   (CI.Po.K.PI.subst_map_agent_in_concrete_action f)
+				   (Instantiation.subst_map_agent_in_concrete_action f)
 				   action_list
                              in
                              let error,blackboard,test_map = 
