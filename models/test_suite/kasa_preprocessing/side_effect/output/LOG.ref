@@ -289,6 +289,23 @@ agent_type:1@site_type_cv:0:covering_class_id:0:rule_id:0
 agent_type:1@site_type_cv:0:covering_class_id:0:rule_id:2
 
 ------------------------------------------------------------
+Update function binding aux:
+------------------------------------------------------------
+agent_type:1@site_type:0:covering_class_id:0:rule_id_:2
+agent_type:1@site_type:0:covering_class_id:0:rule_id_:0
+agent_type:1@site_type:0:covering_class_id:0:rule_id_:1
+agent_type:1@site_type:0:covering_class_id:0:rule_id_:2
+agent_type:1@site_type:0:covering_class_id:0:rule_id_:0
+agent_type:1@site_type:0:covering_class_id:0:rule_id_:1
+remove:
+agent_type:1@site_type:0:covering_class_id:0:rule_id_effect:2
+agent_type:1@site_type:0:covering_class_id:0:rule_id_effect:0
+agent_type:1@site_type:0:covering_class_id:0:rule_id_effect:3
+agent_type:1@site_type:0:covering_class_id:0:rule_id_effect:2
+agent_type:1@site_type:0:covering_class_id:0:rule_id_effect:0
+agent_type:1@site_type:0:covering_class_id:0:rule_id_effect:3
+
+------------------------------------------------------------
 * List of rules has creation action:
 ------------------------------------------------------------
 

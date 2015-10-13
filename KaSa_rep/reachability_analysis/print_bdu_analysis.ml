@@ -22,16 +22,6 @@ open Remanent_parameters_sig
 (************************************************************************************)
 (*PRINT*)
 
-(*TEST*)
-let print_list l =
-  let rec aux acc =
-    match acc with
-    | [] -> []
-    | h :: tl -> 
-      fprintf stdout "%i\n" h;
-      aux tl;
-  in aux l
-
 let print_bdu_array_creation_aux parameter error result =
   AgentMap.print error 
     (fun error parameter (l, (handler, bdu_array)) ->
@@ -47,7 +37,7 @@ let print_bdu_array_creation_aux parameter error result =
       error
     ) parameter result
 
-let print_list_rule parameter l =
+let print_rule_list parameter l =
   let rec aux acc =
     match acc with
     | [] -> []
@@ -78,7 +68,7 @@ let print_creation_rule_aux parameter error result =
     (fun error parameter (l, wl, rule_array) ->
       let _ =
         fprintf (Remanent_parameters.get_log parameter) "- List of rule_id:\n";
-        let _ = print_list_rule parameter l in
+        let _ = print_rule_list parameter l in
         fprintf (Remanent_parameters.get_log parameter)
           "- List of rule_id store inside a working list:\n";
         IntWL.print_wl parameter wl;
@@ -92,7 +82,7 @@ let print_creation_rule_aux parameter error result =
 (************************************************************************************)
 (*static information of covering classes id*)
 
-let print_covering_classes_aux parameter error result =
+let print_covering_classes_id_aux parameter error result =
   Int2Map_CV.iter
     ( fun (x, y) (l1, l2) ->
       if l1 <> []
@@ -418,31 +408,6 @@ let print_precise_binding_dual_aux parameter error result =
     ) result_reverse
 
 (************************************************************************************)
-(*update rule_id: side effects and covering classes and modified sites*)
-
-(*let print_rule_id_set parameter error result =
-  AgentMap.print error
-    (fun error parameter rule_set ->
-      let _ =
-	Site_map_and_set.iter_set (fun elt ->
-	  let _ =
-	    fprintf parameter.log "rule_id:%i\n" elt
-	  in
-	  ()
-	) rule_set
-      in
-      error
-    ) parameter result
-
-let print_rule_set result =
-  Site_map_and_set.iter_set (fun elt ->
-    let _ =
-      fprintf stdout "rule_id:%i\n" elt
-    in
-    ()
-  ) result*)
-
-(************************************************************************************)
 (*let print_fixpoint_iteration parameter error result =
   AgentMap.print error
     (fun error parameter (wl, rule_array) ->
@@ -487,10 +452,76 @@ let print_covering_classes_modification_aux parameter error result =
         ) l2
     ) result
 
+let print_binding_update_hb_aux parameter error result =
+    Int2Map_CV_Modif.iter
+    ( fun (x, y, z) (l1, l2) ->
+      if l1 <> []
+      then
+        begin
+          let _ =
+            fprintf parameter.log
+              "agent_type:%i@site_type:%i:covering_class_id:%i" x y z
+          in
+          let _ = List.fold_left
+            (fun bool x ->
+              (if bool
+               then
+                  fprintf parameter.log ", ");
+              fprintf parameter.log "agent_type:%i" x;
+              true
+            ) false l1
+          in
+          fprintf stdout "\n"
+        end
+      else ();
+      List.iter
+        (fun r ->
+          fprintf parameter.log
+            "agent_type:%i@site_type:%i:covering_class_id:%i:rule_id_:%i\n"
+            x y z r
+        ) l2
+    ) result
+
+let print_binding_update_remove_aux parameter error result =
+    Int2Map_CV_Modif.iter
+    ( fun (x, y, z) (l1, l2) ->
+      if l1 <> []
+      then
+        begin
+          let _ =
+            fprintf parameter.log
+              "agent_type:%i@site_type:%i:covering_class_id:%i" x y z
+          in
+          let _ = List.fold_left
+            (fun bool x ->
+              (if bool
+               then
+                  fprintf parameter.log ", ");
+              fprintf parameter.log "agent_type:%i" x;
+              true
+            ) false l1
+          in
+          fprintf stdout "\n"
+        end
+      else ();
+      List.iter
+        (fun r ->
+          fprintf parameter.log
+            "agent_type:%i@site_type:%i:covering_class_id:%i:rule_id_effect:%i\n"
+            x y z r
+        ) l2
+    ) result
+
+let print_binding_update_aux parameter error result =
+  let result_hb, result_remove = result in
+  print_binding_update_hb_aux parameter error result_hb;
+  fprintf stdout "remove:\n";
+  print_binding_update_remove_aux parameter error result_remove
+  
 (************************************************************************************)
 (**)
 
-let print_covering_classes parameter error result =
+let print_covering_classes_id parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
     "\n------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
@@ -498,7 +529,7 @@ let print_covering_classes parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   let error =
-    print_covering_classes_aux parameter error result
+    print_covering_classes_id_aux parameter error result
   in
   error
 
@@ -571,6 +602,17 @@ let print_covering_classes_modification parameter error result =
     "------------------------------------------------------------\n";
   print_covering_classes_modification_aux parameter error result
 
+(*TEST*)
+let print_binding_update parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "\n------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "Update function binding aux:\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  print_binding_update_aux parameter error result
+  
+
 let print_creation_rule parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
     "\n------------------------------------------------------------\n";
@@ -608,7 +650,7 @@ let print_result parameter error result =
       "\n** Static information:\n";
   in
   let _ =
-    print_covering_classes parameter error result.store_covering_classes_id
+    print_covering_classes_id parameter error result.store_covering_classes_id
   in
   let _ =
     print_side_effects parameter error result.store_side_effects
@@ -630,7 +672,10 @@ let print_result parameter error result =
   in
   let _ =
     print_covering_classes_modification parameter error
-      result.store_covering_classes_modification
+      result.store_covering_classes_modification_update
+  in
+  let _ =
+    print_binding_update parameter error result.store_update
   in
   let _ =
     print_creation_rule parameter error result.store_creation_rule

@@ -169,6 +169,11 @@ Update function aux:
 agent_type:0@site_type_cv:0:covering_class_id:0:rule_id:1
 
 ------------------------------------------------------------
+Update function binding aux:
+------------------------------------------------------------
+remove:
+
+------------------------------------------------------------
 * List of rules has creation action:
 ------------------------------------------------------------
 agent_type/rule_id_0:

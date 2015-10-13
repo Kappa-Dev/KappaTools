@@ -82,14 +82,13 @@ module Int2Map_Remove_effect =
       let compare = compare
     end)
 
-(*update function*)
+(*update function of covering classes and modification sites*)
 module Int2Map_CV_Modif =
   MapExt.Make (
     struct
       type t = int * int * int
       let compare = compare
-    end) 
-
+    end)
 
 (************************************************************************************)
 
@@ -125,17 +124,10 @@ type bdu_analysic =
       store_binding_dual     :
         (int list * (int * int * int) list) Int2Map_CM_state.t *
         (int list * (int * int * int) list) Int2Map_CM_state.t;
-      store_covering_classes_modification :
+      store_covering_classes_modification_update :
         (int list * int list) Int2Map_CV_Modif.t;
-      (*store_covering_classes_modified_sites:
-        (IntWL.WSet.elt * Cckappa_sig.site_name * Cckappa_sig.state_index)
-	list AgentMap.t;*)
-      (*store_update_bond_side_effects_set :
-	set AgentMap.t *
-        set AgentMap.t *
-        set AgentMap.t *
-        set AgentMap.t;
-      store_update : set AgentMap.t;
+      store_update : (int list * int list) Int2Map_CV_Modif.t *
+        (int list * int list) Int2Map_CV_Modif.t;
       (*bdu fixpoint iteration*)
-      store_fixpoint : (wl_int * Cckappa_sig.rule array) AgentMap.t*)
+      (*store_fixpoint : (wl_int * Cckappa_sig.rule array) AgentMap.t*)
     }

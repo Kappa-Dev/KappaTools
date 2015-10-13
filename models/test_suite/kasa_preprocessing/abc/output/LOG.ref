@@ -618,6 +618,11 @@ agent_type:2@site_type_cv:3:covering_class_id:0:rule_id:4
 agent_type:2@site_type_cv:3:covering_class_id:0:rule_id:5
 
 ------------------------------------------------------------
+Update function binding aux:
+------------------------------------------------------------
+remove:
+
+------------------------------------------------------------
 * List of rules has creation action:
 ------------------------------------------------------------
 
