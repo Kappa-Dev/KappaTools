@@ -22,6 +22,7 @@ open Print_bdu_analysis
 open Bdu_side_effects
 open Bdu_modification_sites
 open Bdu_contact_map
+open Bdu_update
 open Bdu_fixpoint_iteration
 
 let warn parameters mh message exn default =
@@ -64,7 +65,6 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       parameter
       error
       covering_classes
-      store_result.store_covering_classes_id
   in
   (*------------------------------------------------------------------------------*)
   (*side effects*)
@@ -88,16 +88,6 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       rule.diff_direct
       store_result.store_modification_sites
   in
-  (*-------------------------------------------------------------------------------*)
-  (*return a mapping of covering classes to a list of rules that has modified sites*)
-  (*let error, store_covering_classes_modified_sites =
-    covering_classes_modified_sites
-      parameter
-      error
-      covering_classes
-      store_modification_sites
-      store_result.store_covering_classes_modified_sites
-  in*)
   (*------------------------------------------------------------------------------*)
   (*contact map*)
   let error, store_contact_map =
@@ -124,6 +114,15 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       handler
       rule
       store_result.store_binding_dual
+  in
+  (*-------------------------------------------------------------------------------*)
+  (*return a mapping of covering classes to a list of rules that has modified sites*)
+  let error, store_covering_classes_modification =
+    store_covering_classes_modification_update
+      parameter
+      error
+      store_modification_sites
+      store_covering_classes_id
   in
   (*------------------------------------------------------------------------------*)
   (*let error, store_update_bond_side_effects_set =
@@ -163,13 +162,15 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
   {
     store_creation       = store_creation;
     store_creation_rule  = store_creation_rule;
+    (*static information*)
     store_covering_classes_id = store_covering_classes_id;
-    store_side_effects   = store_side_effects;
-    store_modification_sites = store_modification_sites;
-    (*store_covering_classes_modified_sites = store_covering_classes_modified_sites;*)
+    store_side_effects        = store_side_effects;
+    store_modification_sites  = store_modification_sites;
+    (*dynamic information*)
     store_contact_map    = store_contact_map;
     store_binding_rhs    = store_binding_rhs;
     store_binding_dual   = store_binding_dual;
+    store_covering_classes_modification = store_covering_classes_modification;
     (*store_update_bond_side_effects_set = store_update_bond_side_effects_set;
     store_update = store_update;
     store_fixpoint = store_fixpoint*)
@@ -186,13 +187,13 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
   let init_half_break          = Int2Map_HalfBreak_effect.empty  in
   let init_remove              = Int2Map_Remove_effect.empty  in
   let init_modification        = Int2Map_Modif.empty in
-  let error, init_cv_modified  = AgentMap.create parameter error 0 in
   (*dynamic information*)
   let init_contact_map          = Int2Map_CM_state.empty in
   let init_binding_rhs_forward  = Int2Map_CM.empty in
   let init_binding_rhs_reverse  = Int2Map_CM.empty in
   let init_binding_dual_forward = Int2Map_CM_state.empty in
   let init_binding_dual_reverse = Int2Map_CM_state.empty in
+  let init_cv_modification      = Int2Map_CV_Modif.empty in
   (*update covering classes and binding sites.*)
   (*let error, init_update_half_break_set = AgentMap.create parameter error 0 in
   let error, init_update_remove_set     = AgentMap.create parameter error 0 in
@@ -206,13 +207,14 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
       store_creation_rule = init_creation_rule;
       (*static information*)
       store_covering_classes_id = init_covering_classes_id;
-      store_side_effects  = init_half_break , init_remove;
-      store_modification_sites = init_modification;
-      (*store_covering_classes_modified_sites = init_cv_modified;*)
+      store_side_effects        = (init_half_break , init_remove);
+      store_modification_sites  = init_modification;
       (*dynamic information*)
       store_contact_map  = init_contact_map;
       store_binding_rhs  = (init_binding_rhs_forward, init_binding_rhs_reverse);
       store_binding_dual = (init_binding_dual_forward, init_binding_dual_reverse);
+      store_covering_classes_modification = init_cv_modification;
+      (*store_covering_classes_modified_sites = init_cv_modified;*)
       (*store_update_bond_side_effects_set =
 	(init_update_half_break_set,
 	 init_update_remove_set,

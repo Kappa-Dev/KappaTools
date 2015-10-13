@@ -33,7 +33,7 @@ module AgentMap = Quick_Nearly_inf_Imperatif
 module Int2Map_CV =
   MapExt.Make (
     struct
-      type t = Cckappa_sig.agent_name * Cckappa_sig.site_name
+      type t = int * int
       let compare = compare
     end)
 
@@ -43,7 +43,7 @@ module Int2Map_CV =
 module Int2Map_CM_state =
   MapExt.Make (
     struct
-      type t = Cckappa_sig.agent_name * Cckappa_sig.site_name * Cckappa_sig.state_index
+      type t = int * int * int
       let compare = compare
     end
   )
@@ -53,7 +53,7 @@ module Int2Map_CM_state =
 module Int2Map_CM =
   MapExt.Make (
     struct
-      type t = Cckappa_sig.agent_name * Cckappa_sig.site_name
+      type t = int * int
       let compare = compare
     end)
 
@@ -62,7 +62,7 @@ module Int2Map_CM =
 module Int2Map_Modif =
   MapExt.Make (
     struct
-      type t = Cckappa_sig.agent_name * Cckappa_sig.site_name
+      type t = int * int
       let compare = compare
     end)
 
@@ -71,16 +71,25 @@ module Int2Map_Modif =
 module Int2Map_HalfBreak_effect =
   MapExt.Make (
     struct
-      type t = Cckappa_sig.agent_name * Cckappa_sig.site_name
+      type t = int * int
       let compare = compare
     end)
 
 module Int2Map_Remove_effect =
   MapExt.Make (
     struct
-      type t = Cckappa_sig.agent_name * Cckappa_sig.site_name
+      type t = int * int
       let compare = compare
     end)
+
+(*update function*)
+module Int2Map_CV_Modif =
+  MapExt.Make (
+    struct
+      type t = int * int * int
+      let compare = compare
+    end) 
+
 
 (************************************************************************************)
 
@@ -92,41 +101,32 @@ type site_bdu  = (List_sig.variable * Cckappa_sig.state_index) list *
 type wl_int = IntWL.WSet.elt list * IntWL.WSet.elt list * IntWL.WSet.set
 
 type half_break_action = 
-  (Cckappa_sig.agent_name list * 
-     (IntWL.WSet.elt * Cckappa_sig.state_index) list) Int2Map_HalfBreak_effect.t
+  (int list * (int * int) list) Int2Map_HalfBreak_effect.t
 
 (*do not consider the case where site has state free.*)
 type remove_action =
-    (Cckappa_sig.agent_name list * Cckappa_sig.site_name list) Int2Map_Remove_effect.t
+  (int list * int list) Int2Map_Remove_effect.t
 
 type bdu_analysic =
     {
       store_creation_rule    : (int list * wl_int * Cckappa_sig.rule array) AgentMap.t;
       store_creation         : site_bdu AgentMap.t;
       (*static information*)
-      store_side_effects    : half_break_action * remove_action;
-      store_covering_classes_id : 
-        (Cckappa_sig.agent_name list * Cckappa_sig.site_name list) Int2Map_CV.t;
-      store_modification_sites : 
-        (Cckappa_sig.agent_name list * Cckappa_sig.site_name list) Int2Map_Modif.t; 
+      store_side_effects     : half_break_action * remove_action;
+      store_covering_classes_id : (int list * int list) Int2Map_CV.t;
+      store_modification_sites  : (int list * int list) Int2Map_Modif.t; 
       (*------------------------------------------------------------------------------*)
       (*dynamic information*)
       store_contact_map      :
-        ((Cckappa_sig.agent_name list) *
-            (Cckappa_sig.agent_name * Cckappa_sig.site_name *
-               Cckappa_sig.state_index) list) Int2Map_CM_state.t;
+        (int list * (int * int * int) list) Int2Map_CM_state.t;
       store_binding_rhs      :
-        ((Cckappa_sig.agent_name list) *
-            (Cckappa_sig.agent_name * Cckappa_sig.site_name) list) Int2Map_CM.t *
-        ((Cckappa_sig.agent_name list) *
-            (Cckappa_sig.agent_name * Cckappa_sig.site_name) list) Int2Map_CM.t;
+        (int list * (int * int) list) Int2Map_CM.t *
+        (int list * (int * int) list) Int2Map_CM.t;
       store_binding_dual     :
-        ((Cckappa_sig.agent_name list) *
-            (Cckappa_sig.agent_name * Cckappa_sig.site_name *
-               Cckappa_sig.state_index) list) Int2Map_CM_state.t *
-        ((Cckappa_sig.agent_name list) *
-            (Cckappa_sig.agent_name * Cckappa_sig.site_name *
-               Cckappa_sig.state_index) list) Int2Map_CM_state.t;
+        (int list * (int * int * int) list) Int2Map_CM_state.t *
+        (int list * (int * int * int) list) Int2Map_CM_state.t;
+      store_covering_classes_modification :
+        (int list * int list) Int2Map_CV_Modif.t;
       (*store_covering_classes_modified_sites:
         (IntWL.WSet.elt * Cckappa_sig.site_name * Cckappa_sig.state_index)
 	list AgentMap.t;*)

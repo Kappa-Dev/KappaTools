@@ -22,6 +22,16 @@ open Remanent_parameters_sig
 (************************************************************************************)
 (*PRINT*)
 
+(*TEST*)
+let print_list l =
+  let rec aux acc =
+    match acc with
+    | [] -> []
+    | h :: tl -> 
+      fprintf stdout "%i\n" h;
+      aux tl;
+  in aux l
+
 let print_bdu_array_creation_aux parameter error result =
   AgentMap.print error 
     (fun error parameter (l, (handler, bdu_array)) ->
@@ -143,31 +153,6 @@ let print_rule_array_test parameter error rule_array =
 (************************************************************************************)
 (*side effects*)
 
-(*let print_triple parameter l =
-  let rec aux acc =
-    match acc with
-    | [] -> []
-    | (rule_id, site, state_min) :: tl ->
-      fprintf (Remanent_parameters.get_log parameter)
-        "rule_id:%i:site_type:%i:state:%i\n"
-        rule_id site state_min;
-      aux tl
-  in
-  aux l
-
-let print_pair parameter l =
-  let rec aux acc =
-    match acc with
-    | [] -> []
-    | (rule_id, site) :: tl ->
-      fprintf (Remanent_parameters.get_log parameter) 
-        "rule_id:%i:site_type:%i:state:no_information\n"
-        rule_id site;
-      aux tl
-  in
-  aux l*)
-
-(*FIXED: half break action*)
 let print_half_break_effect parameter error result =
   Int2Map_HalfBreak_effect.iter
     ( fun (x, y) (l1, l2) ->
@@ -238,24 +223,6 @@ let print_side_effects_aux parameter error result =
 
 (************************************************************************************)
 (*modification sites*)
-
-(*let print_modification_sites parameter error result =
-  AgentMap.print error
-    (fun error parameter l ->
-      let _ =
-        print_triple parameter l
-      in
-      error      
-    ) parameter result
-
-let print_covering_classes_modified_sites parameter error result =
-  AgentMap.print error
-    (fun error parameter l ->
-      let _ =
-        print_triple parameter l
-      in
-      error
-    ) parameter result*)
 
 let print_modification_sites_aux parameter error result =
   Int2Map_Modif.iter
@@ -487,6 +454,40 @@ let print_rule_set result =
     ) parameter result*)
     
 (************************************************************************************)
+(*update function*)
+
+let print_covering_classes_modification_aux parameter error result =
+  Int2Map_CV_Modif.iter
+    ( fun (x, y, z) (l1, l2) ->
+      if l1 <> []
+      then
+        begin
+          let _ =
+            fprintf parameter.log
+              "agent_type:%i@site_type_cv:%i:covering_class_id:%i" x y z
+          in
+          let _ = List.fold_left
+            (fun bool x ->
+              (if bool
+               then
+                  fprintf parameter.log ", ");
+              fprintf parameter.log "agent_type:%i" x;
+              true
+            ) false l1
+            
+          in
+          fprintf stdout "\n"
+        end
+      else ();
+      List.iter
+        (fun r ->
+          fprintf parameter.log
+            "agent_type:%i@site_type_cv:%i:covering_class_id:%i:rule_id:%i\n"
+            x y z r
+        ) l2
+    ) result
+
+(************************************************************************************)
 (**)
 
 let print_covering_classes parameter error result =
@@ -561,6 +562,15 @@ let print_precise_binding_dual parameter error result =
   in
   error
 
+let print_covering_classes_modification parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "\n------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "Update function aux:\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  print_covering_classes_modification_aux parameter error result
+
 let print_creation_rule parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
     "\n------------------------------------------------------------\n";
@@ -617,6 +627,10 @@ let print_result parameter error result =
   in
   let _ =
     print_precise_binding_dual parameter error result.store_binding_dual
+  in
+  let _ =
+    print_covering_classes_modification parameter error
+      result.store_covering_classes_modification
   in
   let _ =
     print_creation_rule parameter error result.store_creation_rule
