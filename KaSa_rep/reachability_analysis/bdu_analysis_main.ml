@@ -171,9 +171,10 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
   let init_binding_dual_reverse = Int2Map_CM_state.empty in
   let init_cv_modification      = Int2Map_CV_Modif.empty in
   (*update function*)
-  let init_store_hb_update     = Int2Map_CV_Modif.empty in
-  let init_store_remove_update = Int2Map_CV_Modif.empty in
-  let init_store_update_cv_id  = Int2Map_CV_Modif.empty in
+  let init_store_hb               = Int2Map_CV_Modif.empty in
+  let init_store_remove           = Int2Map_CV_Modif.empty in
+  let init_store_hb_remove        = Int2Map_CV_Modif.empty in
+  let init_store_update_aux       = Int2Map_CV_Modif.empty in
   let init_bdu =
     {
       store_creation      = init_creation;
@@ -187,7 +188,12 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
       store_binding_rhs  = (init_binding_rhs_forward, init_binding_rhs_reverse);
       store_binding_dual = (init_binding_dual_forward, init_binding_dual_reverse);
       store_covering_classes_modification_update = init_cv_modification;
-      store_update = init_store_hb_update, init_store_remove_update     
+      store_update =
+        (init_store_hb,
+         init_store_remove,
+         init_store_hb_remove,
+         init_store_update_aux
+        )
     }
   in
   (*------------------------------------------------------------------------------*)

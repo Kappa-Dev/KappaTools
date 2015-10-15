@@ -210,7 +210,6 @@ let print_side_effects_aux parameter error result =
   in
   print_remove_effect parameter error result_remove
 
-
 (************************************************************************************)
 (*modification sites*)
 
@@ -429,7 +428,7 @@ let print_covering_classes_modification_aux parameter error result =
         begin
           let _ =
             fprintf parameter.log
-              "agent_type:%i@site_type_cv:%i:covering_class_id:%i" x y z
+              "agent_type:%i@site_type:%i:covering_class_id:%i" x y z
           in
           let _ = List.fold_left
             (fun bool x ->
@@ -439,7 +438,6 @@ let print_covering_classes_modification_aux parameter error result =
               fprintf parameter.log "agent_type:%i" x;
               true
             ) false l1
-            
           in
           fprintf stdout "\n"
         end
@@ -447,13 +445,16 @@ let print_covering_classes_modification_aux parameter error result =
       List.iter
         (fun r ->
           fprintf parameter.log
-            "agent_type:%i@site_type_cv:%i:covering_class_id:%i:rule_id:%i\n"
+            "agent_type:%i@site_type:%i:covering_class_id:%i:rule_id:%i\n"
             x y z r
         ) l2
     ) result
 
-let print_binding_update_hb_aux parameter error result =
-    Int2Map_CV_Modif.iter
+(************************************************************************************)
+(*update function adding binding when discovered it*)
+
+let print_update_aux parameter error result =
+  Int2Map_CV_Modif.iter
     ( fun (x, y, z) (l1, l2) ->
       if l1 <> []
       then
@@ -477,46 +478,27 @@ let print_binding_update_hb_aux parameter error result =
       List.iter
         (fun r ->
           fprintf parameter.log
-            "agent_type:%i@site_type:%i:covering_class_id:%i:rule_id_:%i\n"
-            x y z r
-        ) l2
-    ) result
-
-let print_binding_update_remove_aux parameter error result =
-    Int2Map_CV_Modif.iter
-    ( fun (x, y, z) (l1, l2) ->
-      if l1 <> []
-      then
-        begin
-          let _ =
-            fprintf parameter.log
-              "agent_type:%i@site_type:%i:covering_class_id:%i" x y z
-          in
-          let _ = List.fold_left
-            (fun bool x ->
-              (if bool
-               then
-                  fprintf parameter.log ", ");
-              fprintf parameter.log "agent_type:%i" x;
-              true
-            ) false l1
-          in
-          fprintf stdout "\n"
-        end
-      else ();
-      List.iter
-        (fun r ->
-          fprintf parameter.log
-            "agent_type:%i@site_type:%i:covering_class_id:%i:rule_id_effect:%i\n"
+            "agent_type:%i@site_type:%i:covering_class_id:%i:rule_id:%i\n"
             x y z r
         ) l2
     ) result
 
 let print_binding_update_aux parameter error result =
-  let result_hb, result_remove = result in
-  print_binding_update_hb_aux parameter error result_hb;
-  fprintf stdout "remove:\n";
-  print_binding_update_remove_aux parameter error result_remove
+  let result_hb,
+    result_remove,
+    result_hb_remove,
+    result_update_aux
+    = result
+  in
+  print_update_aux parameter error result_hb;
+  fprintf stdout "remove side effect:\n";
+  print_update_aux parameter error result_remove;
+  fprintf stdout "half break and remove side effect:\n";
+  print_update_aux parameter error result_hb_remove;
+  fprintf stdout "update function:\n";
+  print_update_aux parameter error result_update_aux
+
+  
   
 (************************************************************************************)
 (**)

@@ -126,8 +126,12 @@ type bdu_analysic =
         (int list * (int * int * int) list) Int2Map_CM_state.t;
       store_covering_classes_modification_update :
         (int list * int list) Int2Map_CV_Modif.t;
-      store_update : (int list * int list) Int2Map_CV_Modif.t *
-        (int list * int list) Int2Map_CV_Modif.t;
+      store_update :
+        (int list * int list) Int2Map_CV_Modif.t *
+        (int list * int list) Int2Map_CV_Modif.t *
+        (int list * int list) Int2Map_CV_Modif.t *
+        (int list * int list) Int2Map_CV_Modif.t
+
       (*bdu fixpoint iteration*)
       (*store_fixpoint : (wl_int * Cckappa_sig.rule array) AgentMap.t*)
     }

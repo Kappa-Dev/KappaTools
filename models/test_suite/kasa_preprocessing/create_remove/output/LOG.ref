@@ -112,7 +112,9 @@ Update function aux:
 ------------------------------------------------------------
 Update function binding aux:
 ------------------------------------------------------------
-remove:
+remove side effect:
+half break and remove side effect:
+update function:
 
 ------------------------------------------------------------
 * List of rules has creation action:
