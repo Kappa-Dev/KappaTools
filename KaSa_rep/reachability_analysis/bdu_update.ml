@@ -264,8 +264,8 @@ let store_binding_update parameter error
               (*combine half_break and remove with previous binding function*)
               let store_update_aux =
                 Int2Map_CV_Modif.merge
-                  store_binding_hb_remove
                   store_covering_classes_modification_update
+                  store_binding_hb_remove
               in
               (store_binding_hb,
                store_binding_remove,
