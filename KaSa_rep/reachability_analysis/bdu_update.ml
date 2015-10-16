@@ -223,11 +223,7 @@ let store_binding_update parameter error
           else
             ();
           List.fold_left (fun 
-            (store_current_result_hb, 
-             store_current_result_remove,
-             store_current_result_hb_remove,
-             store_current_result_update_aux
-            )
+            (store_current_result_hb, store_current_result_remove, _, _)
             (agent_type_2, site_type_2, state_2) ->
               (*binding with half break side effect*)
               let store_binding_hb =

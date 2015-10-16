@@ -341,6 +341,22 @@ let print_contact_map_binding_only_on_rhs_aux parameter error result =
 	) l2
     ) result_reverse
 
+(*TEST*)
+
+let print_binding_rhs_set_aux parameter error result =
+  (*A bond B*)
+  Int2Map_CM_Set.iter
+    (fun agent_type (l1, s2) ->
+      if l1 <> []
+      then 
+        ()
+      else ();
+      BSet.iter_set (fun site_type ->
+        fprintf parameter.log "agent_type:%i@site_type:%i\n"
+          agent_type site_type
+      ) s2
+    ) result
+    
 (*------------------------------------------------------------------------------*)
 
 let print_precise_binding_dual_aux parameter error result =
@@ -405,6 +421,37 @@ let print_precise_binding_dual_aux parameter error result =
             x y s z t s'
 	) l2
     ) result_reverse
+
+(*let print_binding_dual_without_creation parameter error result =
+    Int2Map_CM_state.iter
+    (fun (x, y, s) (l1, l2) ->
+      if l1 <> []
+      then
+        begin 
+          let _ = 
+            fprintf parameter.Remanent_parameters_sig.log 
+              "agent_type:%i@site_type:%i:state:%i" x y s
+          in
+          let _ = List.fold_left
+            (fun bool x ->
+              (if bool
+               then
+                  fprintf parameter.Remanent_parameters_sig.log ", ");
+              fprintf parameter.Remanent_parameters_sig.log "agent_type:%i" x;
+              true)
+            false l1
+          in
+          fprintf stdout "\n"
+        end
+      else ();
+      List.iter
+	(fun z ->
+	  Printf.fprintf parameter.Remanent_parameters_sig.log
+            "agent_type:%i@site_type:%i:state:%i %i\n"
+            x y s z
+	) l2
+    ) result*)
+  
 
 (************************************************************************************)
 (*let print_fixpoint_iteration parameter error result =
@@ -497,8 +544,6 @@ let print_binding_update_aux parameter error result =
   print_update_aux parameter error result_hb_remove;
   fprintf stdout "update function:\n";
   print_update_aux parameter error result_update_aux
-
-  
   
 (************************************************************************************)
 (**)
@@ -562,6 +607,21 @@ let print_contact_map_binding_only_on_rhs parameter error result =
     print_contact_map_binding_only_on_rhs_aux parameter error result
   in
   error
+
+(*TEST*)
+
+let print_binding_rhs_set parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "Contact map with binding only on the rhs set (there is no state information):\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  let error =
+    print_binding_rhs_set_aux parameter error result
+  in
+  error
+  
 
 let print_precise_binding_dual parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
@@ -648,6 +708,9 @@ let print_result parameter error result =
   in
   let _ =
     print_contact_map_binding_only_on_rhs parameter error result.store_binding_rhs
+  in
+  let _ =
+    print_binding_rhs_set parameter error result.store_binding_rhs_set
   in
   let _ =
     print_precise_binding_dual parameter error result.store_binding_dual

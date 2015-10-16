@@ -84,6 +84,43 @@ let collect_creation parameter error viewsrhs creation store_result =
   ) (error, store_result) creation
 
 (************************************************************************************)
+(*collect creation return the information if there is a binding site*)
+
+(*let collect_creation_pair parameter error viewsrhs creation store_result =
+  List.fold_left (fun (error, store_result) (agent_id, agent_type) ->
+    let error, agent = AgentMap.get parameter error agent_id viewsrhs in
+    match agent with
+    | None -> warn parameter error (Some "line 92") Exit store_result
+    | Some Ghost -> error, store_result
+    | Some Agent agent ->
+      let pair_list =
+        Site_map_and_set.fold_map
+          (fun site port current_list ->
+            let state = int_of_port port in
+            (site, state) :: current_list
+          ) agent.agent_interface []
+      in
+      (*get old*)
+      let error, old_list =
+        match AgentMap.unsafe_get parameter error agent_type store_result with
+        | error, None -> error, []
+        | error, Some l -> error, l
+      in
+      (*new*)
+      let new_pair_list = List.concat [pair_list; old_list] in
+      (*store*)
+      let error, store_result =
+        AgentMap.set
+          parameter
+          error
+          agent_type
+          new_pair_list
+          store_result
+      in
+      error, store_result
+  ) (error, store_result) creation*)
+
+(************************************************************************************)
 (*return a list of creation rule; add rules with empty lhs into a working list.*)
 
 let collect_rule_creation parameter error handler rule rule_id viewsrhs creation
