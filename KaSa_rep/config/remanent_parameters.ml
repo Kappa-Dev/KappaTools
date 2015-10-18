@@ -95,7 +95,7 @@ let get_contact_map () =
 	with 
 	| "" -> Some ""
       | x -> Some (x^"/")) ; 
-     
+    Remanent_parameters_sig.pure_contact = !Config.pure_contact ;  
     Remanent_parameters_sig.binding_site_shape = !Config.binding_site_shape ;
     Remanent_parameters_sig.binding_site_color = !Config.binding_site_color ;
     Remanent_parameters_sig.internal_site_shape = !Config.internal_site_shape ;
@@ -179,6 +179,7 @@ let get_prompt_full_var_def_1  influence = influence.Remanent_parameters_sig.pro
 let get_prompt_full_rule_def_1 influence = influence.Remanent_parameters_sig.prompt_full_rule_def
 let get_make_labels_compatible_1 influence = influence.Remanent_parameters_sig.make_labels_compatible 
 
+let get_pure_contact_1        cm = cm.Remanent_parameters_sig.pure_contact
 let get_cm_file_1             cm = cm.Remanent_parameters_sig.cm_file 
 let get_cm_directory_1        cm = cm.Remanent_parameters_sig.cm_directory 
 let get_binding_site_shape_1  cm = cm.Remanent_parameters_sig.binding_site_shape 
@@ -193,7 +194,7 @@ let get_link_color_1          cm = cm.Remanent_parameters_sig.link_color
 let get_influence_color_1     cm = cm.Remanent_parameters_sig.influence_color 
 let get_influence_arrow_1     cm = cm.Remanent_parameters_sig.influence_arrow 
 
-    
+
 let get_symbols_1                          marshalisable = marshalisable.Remanent_parameters_sig.symbols
 let get_file_1                             marshalisable = marshalisable.Remanent_parameters_sig.file 
 let get_influence_map_1                    marshalisable = marshalisable.Remanent_parameters_sig.influence_map_output 
@@ -303,6 +304,7 @@ let get_prompt_full_var_def = upgrade_from_influence_map_field get_prompt_full_v
 let get_prompt_full_rule_def = upgrade_from_influence_map_field get_prompt_full_rule_def_1
 let get_make_labels_compatible_with_dot = upgrade_from_influence_map_field get_make_labels_compatible_1 
 
+let get_pure_contact = upgrade_from_contact_map_field get_pure_contact_1
 let get_cm_file = upgrade_from_contact_map_field get_cm_file_1 
 let get_cm_directory = upgrade_from_contact_map_field get_cm_directory_1
 let get_binding_site_shape = upgrade_from_contact_map_field get_binding_site_shape_1

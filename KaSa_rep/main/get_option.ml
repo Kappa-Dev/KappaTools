@@ -104,7 +104,11 @@ let options =
 	["3_Contact_map"],
 	Normal;
        
-      
+      "--pure-contact",
+      Bool Config.pure_contact,
+      "show in the contact map  only the sites with a binding state",
+      ["3_Contact_map"],
+      Expert;
       
       "--output-contact-map",
       String Config.contact_map_file,

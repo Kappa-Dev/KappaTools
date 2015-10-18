@@ -119,7 +119,8 @@ let dot_of_contact_map parameters (error:Exception.method_handler) handler =
                   match site 
                   with 
                       | Ckappa_sig.Internal site_name -> 
-                          Printf.fprintf 
+                         if not (Remanent_parameters.get_pure_contact parameters_dot)
+			 then Printf.fprintf 
                               (Remanent_parameters.get_log parameters_dot) 
                               "   %d.%d [style = filled label = \"%s\" shape =%s color = %s size = \"5\"]\n"
                               i
@@ -127,6 +128,8 @@ let dot_of_contact_map parameters (error:Exception.method_handler) handler =
                               site_name
                               (Remanent_parameters.get_internal_site_shape parameters_dot)
                               (Remanent_parameters.get_internal_site_color parameters_dot)
+			 else
+			   () 
                       | Ckappa_sig.Binding site_name ->
                         Printf.fprintf 
                               (Remanent_parameters.get_log parameters_dot) 

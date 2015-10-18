@@ -55,6 +55,7 @@ let make_labels_compatible_with_dot =
 
 (** contact map*)
 let do_contact_map = ref true
+let pure_contact = ref false 
 let contact_map_file = ref "contact.dot"
 let binding_site_shape = ref "circle"
 let binding_site_color = ref "yellow"

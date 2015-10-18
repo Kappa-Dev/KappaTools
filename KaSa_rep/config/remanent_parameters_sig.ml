@@ -63,6 +63,7 @@ type contact_map_output =
   {
     cm_directory : string option ;
     cm_file : string option ;
+    pure_contact : bool ; 
     binding_site_shape : string ;
     binding_site_color : string ; 
     internal_site_shape : string ; 
