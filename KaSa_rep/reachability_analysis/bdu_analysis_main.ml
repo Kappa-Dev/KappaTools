@@ -95,26 +95,9 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       parameter
       error
       handler
-  in
-  (*------------------------------------------------------------------------------*)
-  (*if agent A bond to agent B; then return A bond to B and B bond to A*)
-  let error, store_binding_rhs_set =
-    collect_binding_set_rhs
-      parameter
-      error
       rule
-      store_result.store_binding_rhs_set
   in
-  (*------------------------------------------------------------------------------*)
-  (*if agent A bond to agent B; then return A bond to B and B bond to A*)
-  let error, store_binding_dual_rhs =
-    dual_precise_rhs
-      parameter
-      error
-      handler
-      store_binding_rhs_set
-  in
-  (*-------------------------------------------------------------------------------*)
+   (*-------------------------------------------------------------------------------*)
   (*return a mapping of covering classes to a list of rules that has modified sites*)
   let error, store_covering_classes_modification_update =
     store_covering_classes_modification_update
@@ -145,8 +128,6 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
     store_modification_sites                   = store_modification_sites;
     (*dynamic information*)
     store_contact_map                          = store_contact_map;
-    store_binding_rhs_set                      = store_binding_rhs_set;
-    store_binding_dual_rhs                     = store_binding_dual_rhs;
     store_covering_classes_modification_update =
       store_covering_classes_modification_update;
     (*store_update                               = store_update;*)
@@ -165,10 +146,6 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
   let init_modification            = Int2Map_Modif.empty in
   (*dynamic information*)
   let init_contact_map             = Int2Map_CM_state.empty in
-  let init_rhs_binding_set_forward = Int2Map_CM_Set.empty in
-  let init_rhs_binding_set_reverse = Int2Map_CM_Set.empty in
-  let init_binding_rhs1            = Int2Map_CM_state.empty in
-  let init_binding_rhs2            = Int2Map_CM_state.empty in
   let init_cv_modification         = Int2Map_CV_Modif.empty in
   (*update function*)
   let init_store_hb                = Int2Map_CV_Modif.empty in
@@ -185,9 +162,6 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
       store_modification_sites  = init_modification;
       (*dynamic information*)
       store_contact_map         = init_contact_map;
-      store_binding_rhs_set     = (init_rhs_binding_set_forward,
-                                   init_rhs_binding_set_reverse);
-      store_binding_dual_rhs    = (init_binding_rhs1, init_binding_rhs2);
       store_covering_classes_modification_update = init_cv_modification;
       (*store_update =
         (init_store_hb,

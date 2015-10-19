@@ -47,22 +47,6 @@ module Int2Map_CM_state =
     end
   )
 
-(*module type of contact map without state*)
-
-module BSet =
-  Set_and_map.Make (
-    struct
-      type t = int
-      let compare = compare
-    end)
-
-module Int2Map_CM_Set =
-  MapExt.Make (
-    struct
-      type t = int * BSet.set * int (*agent * site set * agent'*)
-      let compare = compare
-    end)
- 
 (*module type of modification site*)
 
 module Int2Map_Modif =
@@ -124,12 +108,6 @@ type bdu_analysic =
       (*dynamic information*)
       store_contact_map      :
         (int list * (int * int * int) list) Int2Map_CM_state.t;
-      store_binding_rhs_set :
-        (int list * BSet.set) Int2Map_CM_Set.t * 
-        (int list * BSet.set) Int2Map_CM_Set.t;
-      store_binding_dual_rhs :
-        (int list * (int * int * int) list) Int2Map_CM_state.t *
-        (int list * (int * int * int) list) Int2Map_CM_state.t ;
       store_covering_classes_modification_update :
         (int list * int list) Int2Map_CV_Modif.t;
       (*store_update :

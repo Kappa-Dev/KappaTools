@@ -274,109 +274,6 @@ let print_contact_map_aux parameter error result =
 	) l2
     ) result
 
-(*------------------------------------------------------------------------------*)
-(*if agent A bond to B, then return A bond to B and B bond to A*)
-
-let print_binding_rhs_set_aux parameter error result =
-  let result_forward, result_reverse = result in
-  (*A bond to B*)
-  let _ =
-    Int2Map_CM_Set.iter
-      (fun (agent_type, site_type_set, agent_type') (l1, s2) ->
-        if l1 <> []
-        then 
-          ()
-        else ();
-        BSet.iter_set (fun site_type' ->
-          BSet.iter_set (fun site_type ->
-            fprintf parameter.log 
-              "agent_type:%i@site_type:%i -- agent_type':%i@site_type':%i\n"
-              agent_type site_type agent_type' site_type'
-          ) site_type_set
-        ) s2
-      ) result_forward
-  in
-  (*B bond to A*)
-  Int2Map_CM_Set.iter
-    (fun (agent_type, site_type_set, agent_type') (l1, s2) ->
-      if l1 <> []
-      then 
-        ()
-      else ();
-      BSet.iter_set (fun site_type' ->
-        BSet.iter_set (fun site_type ->
-          fprintf parameter.log
-            "agent_type:%i@site_type:%i -- agent_type':%i@site_type':%i\n"
-            agent_type site_type agent_type' site_type'
-        ) site_type_set
-      ) s2
-    ) result_reverse   
-
-(*------------------------------------------------------------------------------*)
-
-let print_precise_binding_dual_aux parameter error result =
-  let result_forward, result_reverse = result in
-  let _ =
-    Int2Map_CM_state.iter
-      (fun (x, y, s) (l1, l2) ->
-        if l1 <> []
-        then
-          begin 
-            let _ = 
-              fprintf parameter.Remanent_parameters_sig.log 
-              "agent_type:%i@site_type:%i:state:%i" x y s
-            in
-            let _ = List.fold_left
-              (fun bool x ->
-                (if bool
-                 then
-                    fprintf parameter.Remanent_parameters_sig.log ", ");
-                fprintf parameter.Remanent_parameters_sig.log "agent_type:%i" x;
-                true)
-              false l1
-            in
-            fprintf stdout "\n"
-          end
-        else ();
-        List.iter
-	  (fun (z, t, s') ->
-	    Printf.fprintf parameter.Remanent_parameters_sig.log
-              "agent_type:%i@site_type:%i:state:%i--agent_type':%i@site_type':%i:state':%i\n"
-              x y s z t s'
-	  ) l2
-      ) result_forward
-  in
-  (*------------------------------------------------------------------------------*)
-  (*B bond to A*)
-  Int2Map_CM_state.iter
-    (fun (x, y, s) (l1, l2) ->
-      if l1 <> []
-      then
-        begin 
-          let _ = 
-            fprintf parameter.Remanent_parameters_sig.log 
-            "agent_type':%i@site_type':%i:state':%i" x y s 
-          in
-          let _ = List.fold_left
-            (fun bool x ->
-              (if bool
-               then
-                  fprintf parameter.Remanent_parameters_sig.log ", ");
-              fprintf parameter.Remanent_parameters_sig.log "agent_type':%i" x;
-              true)
-            false l1
-          in
-          fprintf stdout "\n"
-        end
-      else ();
-      List.iter
-	(fun (z, t, s') ->
-	  Printf.fprintf parameter.Remanent_parameters_sig.log
-            "agent_type':%i@site_type':%i:state':%i--agent_type:%i@site_type:%i:state:%i\n"
-            x y s z t s'
-	) l2
-    ) result_reverse
-
 (************************************************************************************)
 (*TODO*)
 
@@ -522,30 +419,6 @@ let print_contact_map parameter error result =
   in
   error
 
-let print_binding_rhs_set parameter error result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "Contact map with binding only on the rhs set (there is no state information):\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  let error =
-    print_binding_rhs_set_aux parameter error result
-  in
-  error
-
-let print_precise_binding_dual parameter error result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "Contact map with binding in the initial state and binding on the rhs (with state):\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  let error =
-    print_precise_binding_dual_aux parameter error result
-  in
-  error
-
 let print_covering_classes_modification parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
     "\n------------------------------------------------------------\n";
@@ -616,12 +489,6 @@ let print_result parameter error result =
   in
   let _ =
     print_contact_map parameter error result.store_contact_map
-  in
-  let _ =
-    print_binding_rhs_set parameter error result.store_binding_rhs_set
-  in
-  let _ =
-    print_precise_binding_dual parameter error result.store_binding_dual_rhs
   in
   let _ =
     print_covering_classes_modification parameter error
