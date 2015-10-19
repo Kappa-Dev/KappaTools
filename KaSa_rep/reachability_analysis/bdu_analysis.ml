@@ -69,7 +69,7 @@ let store_common parameter error agent_type handler bdu_init list bdu store_resu
     store_result
 
 let collect_creation parameter error viewsrhs creation store_result =
-  let error, (handler, bdu_init) = bdu_init parameter in
+  let error, (handler, bdu_init) = bdu_init parameter error in
   List.fold_left (fun (error, store_result) (agent_id, agent_type) ->
     let error, agent = AgentMap.get parameter error agent_id viewsrhs in
     match agent with

@@ -1,10 +1,10 @@
 (**
   * bdu_build.ml
   * openkappa
-  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
+  * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   * 
   * Creation: 2015, the 28th of September
-  * Last modification: 
+  * Last modification: Time-stamp: <2015-10-19 17:38:11 feret>
   * 
   * Compute the relations between sites in the BDU data structures
   * 
@@ -35,7 +35,7 @@ let f parameter error a' x y =
 let build_bdu parameter error pair_list =
   (*build bdu for this list*)
   let remanent_bdu = Sanity_test.remanent parameter in
-  let error        = remanent_bdu.Sanity_test_sig.error in
+(*  let error        = remanent_bdu.Sanity_test_sig.error in*)
   let allocate     = remanent_bdu.Sanity_test_sig.allocate_mvbdu in
   (*'b: memo_tables; 'a: mvbdu_dic; 'c: list_dic*)
   let (handler: ('b, 'a, 'c, bool, int) Memo_sig.handler) =
@@ -86,9 +86,9 @@ let build_bdu parameter error pair_list =
 (************************************************************************************)    
 (*build initial bdu: false branch*)
 
-let bdu_init parameter =
+let bdu_init parameter error =
   let remanent_bdu = Sanity_test.remanent parameter in
-  let error        = remanent_bdu.Sanity_test_sig.error in
+(*  let error        = remanent_bdu.Sanity_test_sig.error in*)
   let allocate     = remanent_bdu.Sanity_test_sig.allocate_mvbdu in
   let (handler: ('b, 'a, 'c, bool, int) Memo_sig.handler) =
     remanent_bdu.Sanity_test_sig.mvbdu_handler

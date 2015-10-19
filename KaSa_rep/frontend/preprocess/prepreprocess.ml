@@ -4,19 +4,20 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   * 
   * Creation: 01/17/2011
-  * Last modification: 09/12/2014
+  * Last modification: Time-stamp: <2015-10-19 17:32:07 feret>
   * * 
   * Translation from kASim ast to ckappa representation,
   *  
-  * Copyright 2010,2011,2012,2013,2014 Institut National de Recherche en Informatique et   
-  * en Automatique.  All rights reserved.  This file is distributed     
+  * Copyright 2010,2011,2012,2013,2014, 2015 Institut National 
+  * de Recherche en Informatique et en Automatique.  
+  * All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
 let warn parameters mh message exn default = 
-     Exception.warn parameters mh (Some "Translate") message exn (fun () -> default) 
+     Exception.warn parameters mh (Some "Prepreprocess") message exn (fun () -> default) 
   
 
-let local_trace = true 
+let local_trace = false 
 
 let check_freshness parameters error str id id_set = 
   let error,id_set = 
@@ -54,17 +55,19 @@ let rev_ast = List.rev
   in aux mixture []*)
   
 let pop_entry parameters error id map = 
-  let error,list = Ckappa_sig.Int_Set_and_Map.find_map parameters error id map 
+  try 
+    let error,list = Ckappa_sig.Int_Set_and_Map.find_map parameters error id map 
     in 
     match list with 
-      | [a] ->
-        let error,map = Ckappa_sig.Int_Set_and_Map.remove_map parameters error id map in 
-        error,(a,map)
-      | [b;a] -> 
-        let error,map = Ckappa_sig.Int_Set_and_Map.add_map parameters error id [a] map in 
-        error,(b,map) 
-      | _ -> 
-        warn parameters error (Some "line 44") Exit (("","",0),map)
+    | [a] ->
+      let error,map = Ckappa_sig.Int_Set_and_Map.remove_map parameters error id map in 
+      error,(a,map)
+    | [b;a] -> 
+      let error,map = Ckappa_sig.Int_Set_and_Map.add_map parameters error id [a] map in 
+      error,(b,map) 
+    | _ -> 
+      warn parameters error (Some "line 69") Exit (("","",0),map)
+  with Not_found -> warn parameters error (Some "line 70") Exit (("","",0),map)
 
 let rec scan_interface parameters k agent interface remanent = 
       match interface with 
@@ -90,12 +93,33 @@ let rec collect_binding_label parameters mixture f k remanent =
      collect_binding_label parameters mixture f (k+1) (scan_agent parameters (f k) agent remanent)
   | [] -> remanent
 
+let collect_binding_label parameters mixture f k remanent = 
+  let error,map = collect_binding_label parameters mixture f k remanent in 
+  Ckappa_sig.Int_Set_and_Map.fold_map 
+    (fun x l (error,map) -> 
+     if (List.length l = 1)
+      then 
+	let error,map = Ckappa_sig.Int_Set_and_Map.remove_map parameters error x map in 
+	warn parameters error (Some "line 100") Exit map 
+      else 
+	(error,map))
+    map 
+    (error,map)
+
 let translate_lnk_state parameters lnk_state remanent = 
     match lnk_state with 
      | Ast.LNK_VALUE (id),position ->  
          let error,map = remanent  in 
          let error,((agent,site,index),map) = pop_entry parameters error id map  in 
-         Ckappa_sig.LNK_VALUE (index,agent,site,id,position),(error,map)
+	 if (agent,site,index) = ("","",0) 
+	 then 
+	   let site = Ckappa_sig.FREE in 
+	   let remanent = 
+	     warn parameters error (Some "line 119") Exit map
+	   in 
+	   site,remanent
+	 else
+	   Ckappa_sig.LNK_VALUE (index,agent,site,id,position),(error,map)
      | Ast.FREE,_ -> Ckappa_sig.FREE,remanent
      | Ast.LNK_ANY,position -> Ckappa_sig.LNK_ANY position,remanent 
      | Ast.LNK_SOME,position -> Ckappa_sig.LNK_SOME position,remanent

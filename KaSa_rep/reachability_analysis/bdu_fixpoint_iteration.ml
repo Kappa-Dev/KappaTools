@@ -31,7 +31,7 @@ let trace = false
 
 let build_bdu_test_list_direct parameter error rule_lhs_views rule_diff_direct
     store_result =
-  let error, (bdu_handler, bdu_init) = bdu_init parameter in
+  let error, (bdu_handler, bdu_init) = bdu_init parameter error in
   AgentMap.fold2_common parameter error
     (fun parameter error agent_id agent site_modif store_result ->
       match agent with

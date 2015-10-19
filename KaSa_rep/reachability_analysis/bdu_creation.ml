@@ -1,10 +1,10 @@
 (**
   * bdu_analysis.ml
   * openkappa
-  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
+  * Jérôme Feret & Kim Ly Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   * 
-  * Creation: 2015, the 29th of September
-  * Last modification: 
+  * Creation: 2015, the 29th of September 
+  * Last modification: Time-stamp: <2015-10-19 17:37:14 feret>
   * 
   * Compute the relations between sites in the BDU data structures
   * 
@@ -44,7 +44,7 @@ let rev_array xs =
 let int_of_port port = port.site_state.min
 
 let collect_creation parameter error viewsrhs creation store_result =
-  let error, (handler, bdu_init) = bdu_init parameter in
+  let error, (handler, bdu_init) = bdu_init parameter error in
   List.fold_left (fun (error, store_result) (agent_id, agent_type) ->
     let error, agent = AgentMap.get parameter error agent_id viewsrhs in
     match agent with
