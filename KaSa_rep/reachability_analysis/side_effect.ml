@@ -1,7 +1,7 @@
  (**
   * side_effect.ml
   * openkappa
-  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
+  * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   * 
   * Creation: 2015, the 23th of Feburary
   * Last modification: 

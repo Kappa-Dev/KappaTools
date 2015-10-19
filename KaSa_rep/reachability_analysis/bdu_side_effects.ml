@@ -1,7 +1,7 @@
 (**
   * bdu_side_effects.ml
   * openkappa
-  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
+  * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   * 
   * Creation: 2015, the 30th of September
   * Last modification: 

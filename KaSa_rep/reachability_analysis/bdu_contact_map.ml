@@ -1,7 +1,7 @@
  (**
   * bdu_contact_map.ml
   * openkappa
-  * Jérôme Feret, projet Abstraction, INRIA Paris-Rocquencourt
+  * Jérôme Feret & Ly Kim Quyen, projet Abstraction, INRIA Paris-Rocquencourt
   * 
   * Creation: 2015, the 11th of September
   * Last modification: 
