@@ -175,9 +175,6 @@ agent_type:0@site_type:2:rule_id:1
 Contact map with binding both directions (with state):
 ------------------------------------------------------------
 ------------------------------------------------------------
-Contact map with binding only on the rhs (there is no state information):
-------------------------------------------------------------
-------------------------------------------------------------
 Contact map with binding only on the rhs set (there is no state information):
 ------------------------------------------------------------
 ------------------------------------------------------------

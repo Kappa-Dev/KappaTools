@@ -49,14 +49,6 @@ module Int2Map_CM_state =
 
 (*module type of contact map without state*)
 
-module Int2Map_CM =
-  MapExt.Make (
-    struct
-      type t = int * int
-      let compare = compare
-    end)
-
-(*TEST*)
 module BSet =
   Set_and_map.Make (
     struct
@@ -67,7 +59,7 @@ module BSet =
 module Int2Map_CM_Set =
   MapExt.Make (
     struct
-      type t = int
+      type t = int * BSet.set * int (*agent * site set * agent'*)
       let compare = compare
     end)
  
@@ -124,7 +116,6 @@ type bdu_analysic =
     {
       store_creation_rule    : (int list * wl_int * Cckappa_sig.rule array) AgentMap.t;
       store_creation         : site_bdu AgentMap.t;
-      (*store_creation_pair    : (int * int) list AgentMap.t;*)
       (*static information*)
       store_side_effects     : half_break_action * remove_action;
       store_covering_classes_id : (int list * int list) Int2Map_CV.t;
@@ -133,17 +124,12 @@ type bdu_analysic =
       (*dynamic information*)
       store_contact_map      :
         (int list * (int * int * int) list) Int2Map_CM_state.t;
-      store_binding_rhs      :
-        (int list * (int * int) list) Int2Map_CM.t *
-        (int list * (int * int) list) Int2Map_CM.t;
-      (*TEST*)
       store_binding_rhs_set :
+        (int list * BSet.set) Int2Map_CM_Set.t * 
         (int list * BSet.set) Int2Map_CM_Set.t;
       store_binding_dual     :
         (int list * (int * int * int) list) Int2Map_CM_state.t *
         (int list * (int * int * int) list) Int2Map_CM_state.t;
-      (*store_binding_dual_without_creation :
-        (int list * int list) Int2Map_CM_state.t;*)
       store_covering_classes_modification_update :
         (int list * int list) Int2Map_CV_Modif.t;
       store_update :

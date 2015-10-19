@@ -74,100 +74,53 @@ let compute_contact_map parameter error handler =
    - B bond to A.
 *)
 
-(*TODO: TEST this function in the case of %init *)
-let collect_binding_rhs parameter error rule store_result =
-  let add_link (a, b) (c, d) store_result =
-    let l, old =
-      try Int2Map_CM.find (a, b) store_result
-      with Not_found -> [], []
-    in
-    Int2Map_CM.add (a, b) (l, ((c, d) :: old)) store_result
-  in
-  let error, store_result =
-    List.fold_left (fun (error, store_result) (site_address1, site_address2) ->
-      let agent_type1 = site_address1.agent_type in
-      let site1       = site_address1.site in
-      (*second agent*)
-      let agent_type2 = site_address2.agent_type in
-      let site2       = site_address2.site in
-      (*new: A bond to B, B bond to A*)
-      let store_result_forward, store_result_reverse = store_result in
-      (*A bond to B*)
-      let store_result_forward =
-        add_link (agent_type1, site1) (agent_type2, site2) store_result_forward
-      in
-      (*B bond to A*)
-      let store_result_reverse =
-        add_link (agent_type2, site2) (agent_type1, site1) store_result_reverse
-      in
-      error, (store_result_forward, store_result_reverse)
-    ) (error, store_result) rule.actions.bind
-  in
-  (*result*)
-  let store_result_forward, store_result_reverse = store_result in
-  let store_result_forward =
-    Int2Map_CM.map (fun (l, x) -> List.rev l, x) store_result_forward
-  in
-  let store_result_reverse =
-    Int2Map_CM.map (fun (l, x) -> List.rev l, x) store_result_reverse
-  in
-  error, (store_result_forward, store_result_reverse)
-
-(*****************************************************************************************)
-(*change it to set instead of list*)
+(*TODO: test with %init*)
 
 let collect_binding_set_rhs parameter error rule store_result =
-  let add_link a  b store_result =
-    let l, old =
-      try Int2Map_CM_Set.find a store_result
+  let add_link (agent_type, site_set, agent_type') site_set' store_result =
+    let l, old_set =
+      try Int2Map_CM_Set.find (agent_type, site_set, agent_type') store_result
       with Not_found -> [], BSet.empty_set
     in
-    let error, union =
-      BSet.union parameter error b old
+    let error, union_site =
+      BSet.union parameter error site_set' old_set
     in
-    (*Int2Map_CM.add (a, b) (l, ((c, d) :: old)) store_result*)
-    Int2Map_CM_Set.add a (l, union) store_result
+    Int2Map_CM_Set.add (agent_type, site_set, agent_type') (l, union_site) store_result
   in
-  let error, store_result =
+  let error, (store_binding1, store_binding2) =
     List.fold_left (fun (error, store_result) (site_address1, site_address2) ->
       let agent_type1 = site_address1.agent_type in
       let site1       = site_address1.site in
       (*second agent*)
       let agent_type2 = site_address2.agent_type in
       let site2       = site_address2.site in
+      let store_binding1, store_binding2 = store_result in
       (*new: A bond to B, B bond to A*)
-      (*let store_result_forward, store_result_reverse = store_result in*)
-      (*A bond to B*)
       (*add site1 into set*)
       let error, set_site1 =
         BSet.add_set parameter error site1 BSet.empty_set
       in
-      let store_result_forward =
-        add_link agent_type1 set_site1 store_result
+        let error, set_site2 =
+        BSet.add_set parameter error site2 BSet.empty_set
+      in
+      let store_binding1 =
+        add_link (agent_type1, set_site1, agent_type2) set_site2 store_binding1
       in
       (*B bond to A*)
-      (*let error, set_site1 =
-        BSet.add_set parameter error site1 BSet.empty_set
+      let store_binding2 =
+        add_link (agent_type2, set_site2, agent_type1) set_site1 store_binding2
       in
-      let error, set_site2 =
-        BSet.add_set parameter error site2 BSet.empty_set
-      in*)
-      (*let store_result_reverse =
-        add_link (set_agent_type2, set_site2) (set_agent_type1, set_site1)
-          store_result_reverse
-      in*)
-      error, store_result_forward
+      error, (store_binding1, store_binding2)
     ) (error, store_result) rule.actions.bind
   in
   (*result*)
-  (*let store_result_forward, store_result_reverse = store_result in*)
-  let store_result_forward =
-    Int2Map_CM_Set.map (fun (l, x) -> l, x) store_result
+  let store_binding1 =
+    Int2Map_CM_Set.map (fun (l, x) -> l, x) store_binding1
   in
-  (*let store_result_reverse =
-    Int2Map_CM_Set.map (fun (l, x) -> l, x) store_result_reverse
-  in*)
-  error, store_result_forward
+  let store_binding2 =
+    Int2Map_CM_Set.map (fun (l, x) -> l, x) store_binding2
+  in
+  error, (store_binding1, store_binding2)
 
 (*****************************************************************************************)
 (*compute the binding information with precise information with state information.
@@ -189,6 +142,8 @@ let collect_binding_set_rhs parameter error rule store_result =
 *)
 
 (*FIXME: check the state*)
+(*TODO*)
+
 let precise_binding_dual parameter error handler rule store_result =
   let result_binding = Int2Map_CM_state.empty, Int2Map_CM_state.empty in (*FIXME*)
   (*add_link*)
@@ -242,7 +197,7 @@ let precise_binding_dual parameter error handler rule store_result =
       ) handler.dual result_binding
   in
   let result_binding_forward, result_binding_reverse = result_binding in
-  (*Return the result of this contact map*)
+  (*return the result of this contact map*)
   let result_binding_forward =
     Int2Map_CM_state.map (fun (l, x) -> List.rev l, x) result_binding_forward
   in
@@ -250,52 +205,3 @@ let precise_binding_dual parameter error handler rule store_result =
     Int2Map_CM_state.map (fun (l, x) -> List.rev l, x) result_binding_reverse
   in
   (result_binding_forward, result_binding_reverse)
-
-(*****************************************************************************************)
-(*if the binding belongs to the creation action, then do not consider this
-  binding in the contact map.*)
-
-(*let collect_binding_rhs_no_creation parameter error store_binding_dual
-    store_creation_pair store_result =
-  let add_link (a, b, s) (c, d, s') store_result =
-    let l, old =
-      try Int2Map_CM_state.find (a, b, s) store_result
-      with Not_found -> [],[]
-    in
-    Int2Map_CM_state.add (a, b, s) (l, ((c, d, s') :: old)) store_result
-  in
-  (*forward direction of binding*)
-  let store_binding_dual_forward, store_binding_dual_reverse = store_binding_dual in
-  (*let store_result_1= store_result in*)
-  (*fold inside binding dual in forward direction*)
-  (*Int2Map_CM_state.fold
-    (fun (agent_type_1, site_type_1, state_1) (l1, l2) store_result ->
-    if l1 <> []
-      then ()
-      else ();*)
-  (*List.fold_left (fun store_current_result (agent_type_2, site_type_2, state_2) ->*)
-  AgentMap.fold parameter error
-    (fun parameter error agent_type pair_list store_result ->
-      let result =
-        List.fold_left (fun current_result (site_type, state) ->
-          let remove =
-            Int2Map_CM_state.remove (agent_type, site_type, state) store_binding_dual_forward
-          in
-          
-          (*if Int2Map_CM_state.mem (agent_type, site_type, state) store_binding_dual_forward
-          then
-            let _ =
-              Printf.fprintf stdout "agent_type:%i:site_type:%i:state:%i\n" 
-                agent_type site_type state
-            in
-            remove_link (agent_type, site_type, state) current_result
-          else
-            current_result*)
-        ) store_result pair_list
-      in
-      error, result
-    ) store_creation_pair store_result*)
-
-(*        store_result l2
-      ) store_result l2
-    ) store_binding_dual_forward store_result_1*)  
