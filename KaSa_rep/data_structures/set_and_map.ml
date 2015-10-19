@@ -187,14 +187,14 @@ module Make(Ord:OrderedType) =
       match set with 
         |   Empty_set -> raise Not_found 
         | Node_set(Empty_set,v,r,_) -> v 
-        | Node_set(left,_,_,_) -> min_elt set 
+        | Node_set(left,_,_,_) -> min_elt left
           
           
     let rec max_elt set = 
       match set with 
         |   Empty_set -> raise Not_found 
         | Node_set(_,v,Empty_set,_) -> v 
-        | Node_set(_,_,right,_) -> max_elt set 
+        | Node_set(_,_,right,_) -> max_elt right 
 
     let rec remove_min_elt_set parameters mh set =
       match set with 
