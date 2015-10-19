@@ -288,7 +288,7 @@ let print_contact_map_aux parameter error result =
     ) parameter result*)
     
 (************************************************************************************)
-(*update function*)
+(*update function before adding rule with side effects*)
 
 let print_covering_classes_modification_aux parameter error result =
   Int2Map_CV_Modif.iter
@@ -321,7 +321,7 @@ let print_covering_classes_modification_aux parameter error result =
     ) result
 
 (************************************************************************************)
-(*update function adding binding when discovered it*)
+(*update function adding rule with side effect when discovered the binding*)
 
 let print_update_aux parameter error result =
   Int2Map_CV_Modif.iter
@@ -411,7 +411,7 @@ let print_contact_map parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
     "\n------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
-    "Contact map with binding both directions (with state):\n";
+    "Contact map with state (there is no lhs binding):\n";
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   let error =
@@ -423,7 +423,7 @@ let print_covering_classes_modification parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
     "\n------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
-    "Update function aux:\n";
+    "Update function before adding the side effects rules:\n";
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   print_covering_classes_modification_aux parameter error result
@@ -453,11 +453,12 @@ let print_creation_rule parameter error result =
   in
   error
 
+(*REMOVE*)
 let print_bdu_array_creation parameter error result =
   let parameter_agent = Remanent_parameters.update_prefix parameter "agent_type_" in
   fprintf (Remanent_parameters.get_log parameter)
     "\n------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter) "* BDU creation in general:\n";
+  fprintf (Remanent_parameters.get_log parameter) "* BDU creation in general (this function used for testing) will be removed:\n";
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   print_bdu_array_creation_aux parameter_agent error result

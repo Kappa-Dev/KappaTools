@@ -353,13 +353,13 @@ agent_type:2@site_type:0:rule_id:3
 ** Dynamic information:
 
 ------------------------------------------------------------
-Contact map with binding both directions (with state):
+Contact map with state (there is no lhs binding):
 ------------------------------------------------------------
 agent_type:0@site_type:0:state:1--agent_type':1@site_type':0:state':1
 agent_type:1@site_type:0:state:1--agent_type':0@site_type':0:state':1
 
 ------------------------------------------------------------
-Update function aux:
+Update function before adding the side effects rules:
 ------------------------------------------------------------
 agent_type:0@site_type:0:covering_class_id:1:rule_id:1
 agent_type:1@site_type:0:covering_class_id:0:rule_id:1
@@ -401,7 +401,7 @@ agent_type/rule_id_2:2:  else
 agent_type/rule_id_2:2:   false
 
 ------------------------------------------------------------
-* BDU creation in general:
+* BDU creation in general (this function used for testing) will be removed:
 ------------------------------------------------------------
 agent_type_1:
 -------------------------------------
