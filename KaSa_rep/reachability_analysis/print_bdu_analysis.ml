@@ -377,39 +377,6 @@ let print_precise_binding_dual_aux parameter error result =
 	) l2
     ) result_reverse
 
-
-(*TEST*)
-
-let print_precise_binding_dual_aux' parameter error result =
-  Int2Map_CM_state.iter
-    (fun (x, y, s) (l1, l2) ->
-      if l1 <> []
-      then
-        begin 
-          let _ = 
-            fprintf parameter.Remanent_parameters_sig.log 
-              "agent_type:%i@site_type:%i:state:%i" x y s
-          in
-          let _ = List.fold_left
-            (fun bool x ->
-              (if bool
-               then
-                  fprintf parameter.Remanent_parameters_sig.log ", ");
-              fprintf parameter.Remanent_parameters_sig.log "agent_type:%i" x;
-              true)
-            false l1
-          in
-          fprintf stdout "\n"
-        end
-      else ();
-      List.iter
-	(fun (z, t, s') ->
-	  Printf.fprintf parameter.Remanent_parameters_sig.log
-            "agent_type:%i@site_type:%i:state:%i--agent_type':%i@site_type':%i:state':%i\n"
-            x y s z t s'
-	) l2
-    ) result
-
 (************************************************************************************)
 (*TODO*)
 
@@ -579,19 +546,6 @@ let print_precise_binding_dual parameter error result =
   in
   error
 
-(*TEST*)
-(*let print_precise_binding_dual' parameter error result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "Contact map with binding in the initial state and binding on the rhs (with state):\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  let error =
-    print_precise_binding_dual_aux parameter error result
-  in
-  error*)
-
 let print_covering_classes_modification parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
     "\n------------------------------------------------------------\n";
@@ -667,19 +621,16 @@ let print_result parameter error result =
     print_binding_rhs_set parameter error result.store_binding_rhs_set
   in
   let _ =
-    print_precise_binding_dual parameter error result.store_binding_dual
-  in
-  (*TEST*)
-  let _ =
     print_precise_binding_dual parameter error result.store_binding_dual_rhs
   in
   let _ =
     print_covering_classes_modification parameter error
       result.store_covering_classes_modification_update
   in
-  let _ =
+  (*let _ =
     print_binding_update parameter error result.store_update
-  in
+  in*)
+  (*TEST*)
   let _ =
     print_creation_rule parameter error result.store_creation_rule
   in

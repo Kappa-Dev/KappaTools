@@ -107,22 +107,12 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
   in
   (*------------------------------------------------------------------------------*)
   (*if agent A bond to agent B; then return A bond to B and B bond to A*)
-  let store_binding_dual =
-    precise_binding_dual
-      parameter
-      error
-      handler
-      rule
-      store_result.store_binding_dual
-  in
-  (*TEST*)
-  let store_binding_rhs_set1, _ = store_binding_rhs_set in
   let error, store_binding_dual_rhs =
     dual_precise_rhs
       parameter
       error
       handler
-      store_binding_rhs_set1
+      store_binding_rhs_set
   in
   (*-------------------------------------------------------------------------------*)
   (*return a mapping of covering classes to a list of rules that has modified sites*)
@@ -135,84 +125,76 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
   in
   (*------------------------------------------------------------------------------*)
   (*TEST*)
-  let error, store_update =
+  (*let error, store_update =
     store_binding_update
       parameter
       error
       store_covering_classes_modification_update
       store_side_effects
       store_binding_dual
-  in
+  in*)
   (*------------------------------------------------------------------------------*)
   (*store*)
   error,
   {
-    store_creation       = store_creation;
-    store_creation_rule  = store_creation_rule;
+    store_creation                             = store_creation;
+    store_creation_rule                        = store_creation_rule;
     (*static information*)
-    store_covering_classes_id = store_covering_classes_id;
-    store_side_effects        = store_side_effects;
-    store_modification_sites  = store_modification_sites;
+    store_covering_classes_id                  = store_covering_classes_id;
+    store_side_effects                         = store_side_effects;
+    store_modification_sites                   = store_modification_sites;
     (*dynamic information*)
-    store_contact_map    = store_contact_map;
-    store_binding_rhs_set = store_binding_rhs_set;
-    store_binding_dual   = store_binding_dual;
-    store_binding_dual_rhs = store_binding_dual_rhs;
+    store_contact_map                          = store_contact_map;
+    store_binding_rhs_set                      = store_binding_rhs_set;
+    store_binding_dual_rhs                     = store_binding_dual_rhs;
     store_covering_classes_modification_update =
       store_covering_classes_modification_update;
-    store_update = store_update;
+    (*store_update                               = store_update;*)
   }
  
 (************************************************************************************)
 (*RULES*)
 
 let scan_rule_set parameter error handler covering_classes compiled rules =
-  let error, init_creation      = AgentMap.create parameter error 0 in
-  let error, init_creation_rule = AgentMap.create parameter error 0 in
+  let error, init_creation         = AgentMap.create parameter error 0 in
+  let error, init_creation_rule    = AgentMap.create parameter error 0 in
   (*static information*)
-  let init_covering_classes_id  = Int2Map_CV.empty in
-  let init_half_break           = Int2Map_HalfBreak_effect.empty  in
-  let init_remove               = Int2Map_Remove_effect.empty  in
-  let init_modification         = Int2Map_Modif.empty in
+  let init_covering_classes_id     = Int2Map_CV.empty in
+  let init_half_break              = Int2Map_HalfBreak_effect.empty  in
+  let init_remove                  = Int2Map_Remove_effect.empty  in
+  let init_modification            = Int2Map_Modif.empty in
   (*dynamic information*)
-  let init_contact_map          = Int2Map_CM_state.empty in
+  let init_contact_map             = Int2Map_CM_state.empty in
   let init_rhs_binding_set_forward = Int2Map_CM_Set.empty in
   let init_rhs_binding_set_reverse = Int2Map_CM_Set.empty in
-  (**)
-  let init_binding_dual_forward    = Int2Map_CM_state.empty in
-  let init_binding_dual_reverse = Int2Map_CM_state.empty in
-  let init_binding_rhs1          = Int2Map_CM_state.empty in
-  let init_binding_rhs2          = Int2Map_CM_state.empty in
-  let init_cv_modification      = Int2Map_CV_Modif.empty in
+  let init_binding_rhs1            = Int2Map_CM_state.empty in
+  let init_binding_rhs2            = Int2Map_CM_state.empty in
+  let init_cv_modification         = Int2Map_CV_Modif.empty in
   (*update function*)
-  let init_store_hb               = Int2Map_CV_Modif.empty in
-  let init_store_remove           = Int2Map_CV_Modif.empty in
-  let init_store_hb_remove        = Int2Map_CV_Modif.empty in
-  let init_store_update_aux       = Int2Map_CV_Modif.empty in
+  let init_store_hb                = Int2Map_CV_Modif.empty in
+  let init_store_remove            = Int2Map_CV_Modif.empty in
+  let init_store_hb_remove         = Int2Map_CV_Modif.empty in
+  let init_store_update_aux        = Int2Map_CV_Modif.empty in
   let init_bdu =
     {
-      store_creation      = init_creation;
-      store_creation_rule = init_creation_rule;
+      store_creation            = init_creation;
+      store_creation_rule       = init_creation_rule;
       (*static information*)
       store_covering_classes_id = init_covering_classes_id;
       store_side_effects        = (init_half_break, init_remove);
       store_modification_sites  = init_modification;
       (*dynamic information*)
-      store_contact_map  = init_contact_map;
-      store_binding_rhs_set  = 
-        (init_rhs_binding_set_forward,
-         init_rhs_binding_set_reverse);
-      store_binding_dual =
-        (init_binding_dual_forward,
-         init_binding_dual_reverse);
-      store_binding_dual_rhs = init_binding_rhs1, init_binding_rhs2;
+      store_contact_map         = init_contact_map;
+      store_binding_rhs_set     = (init_rhs_binding_set_forward,
+                                   init_rhs_binding_set_reverse);
+      store_binding_dual_rhs    = (init_binding_rhs1, init_binding_rhs2);
       store_covering_classes_modification_update = init_cv_modification;
-      store_update =
+      (*store_update =
         (init_store_hb,
          init_store_remove,
          init_store_hb_remove,
          init_store_update_aux
-        )
+        )*)
     }
   in
   (*------------------------------------------------------------------------------*)

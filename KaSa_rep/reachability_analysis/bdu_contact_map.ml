@@ -141,74 +141,11 @@ let collect_binding_set_rhs parameter error rule store_result =
   [A bond to B; B bond to A]
 *)
 
-(*FIXME: check the state*)
-(*TODO*)
-
-let precise_binding_dual parameter error handler rule store_result =
-  let result_binding = Int2Map_CM_state.empty, Int2Map_CM_state.empty in (*FIXME*)
-  (*add_link*)
-  let add_link (a, b, s) (c, d, s') store_result =
-    let l, old =
-      try Int2Map_CM_state.find (a, b, s) store_result
-      with Not_found -> [],[]
-    in
-    Int2Map_CM_state.add (a, b, s) (l, ((c, d, s') :: old)) store_result
-  in  
-  (*return the site name of site: this of type string*)
-  (*folding this solution with the information in dual*)
-  let error, result_binding =
-    Int_storage.Nearly_Inf_Int_Int_Int_storage_Imperatif_Imperatif_Imperatif.fold
-      parameter error
-      (fun parameter error (agent, (site, state)) (agent', site', state')
-	_result_binding ->
-        (*binding on the rhs*)
-        List.fold_left (fun (error, sol2) (site_address1, site_address2) ->
-          let agent_type1 = site_address1.agent_type in
-          let site1       = site_address1.site in
-          (*second*)
-          let agent_type2 = site_address2.agent_type in
-          let site2       = site_address2.site in
-          (*matching binding on the rhs and relation in a contact map*)
-          if agent_type1 = agent  && site1 = site &&
-             agent_type2 = agent' && site2 = site'
-          then
-            (*if true return the solution*)
-            error, sol2
-          else
-            (*if not true, add those links*)
-            let sol2_forward, sol2_reverse = sol2 in
-            (*A bond to B*)
-            let result_binding_forward =
-              add_link 
-                (agent_type1, site1, state)
-                (agent_type2, site2, state')
-                sol2_forward
-            in
-            (*B bond to A*)
-            let result_binding_reverse =
-              add_link
-                (agent_type2, site2, state')
-                (agent_type1, site1, state)
-                sol2_reverse
-            in
-            (*store*)
-            error, (result_binding_forward, result_binding_reverse)
-        ) (error, store_result) rule.actions.bind
-      ) handler.dual result_binding
-  in
-  let result_binding_forward, result_binding_reverse = result_binding in
-  (*return the result of this contact map*)
-  let result_binding_forward =
-    Int2Map_CM_state.map (fun (l, x) -> List.rev l, x) result_binding_forward
-  in
-  let result_binding_reverse =
-    Int2Map_CM_state.map (fun (l, x) -> List.rev l, x) result_binding_reverse
-  in
-  (result_binding_forward, result_binding_reverse)
-
 (*matching contact map and binding on rhs; get the state for binding rhs*)
 
 let dual_precise_rhs parameter error handler store_binding_set_rhs =
+  (*Note: only need the information of one way is enough*)
+  let store_binding_set_1, store_binding_set_2 = store_binding_set_rhs in
   let store_result = Int2Map_CM_state.empty, Int2Map_CM_state.empty in
   let add_link (a, b, s) (c, d, s') store_result =
     let l, old =
@@ -237,19 +174,19 @@ let dual_precise_rhs parameter error handler store_binding_set_rhs =
                     let sol2_forward, sol2_reverse = sol2 in
                     (*A bond to B*)
                     let result_binding_forward =
-                      add_link (agent_type1, site_type1, state)
-                        (agent_type2, site_type2, state')
+                      add_link (agent, site, state)
+                        (agent', site', state')
                         sol2_forward
                     in
                     (*B bond to A*)
                     let result_binding_reverse =
-                      add_link (agent_type2, site_type2, state')
-                        (agent_type1, site_type1, state) sol2_reverse
+                      add_link (agent', site', state')
+                        (agent, site, state) sol2_reverse
                     in
                     (result_binding_forward, result_binding_reverse)
                 ) site_type_set store_current_result1
               ) s2 sol2
-          ) store_binding_set_rhs store_result
+          ) store_binding_set_1 store_result
         (*return*)
         in error, (result1, result2)
       ) handler.dual store_result

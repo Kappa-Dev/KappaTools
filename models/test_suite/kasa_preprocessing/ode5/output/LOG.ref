@@ -594,50 +594,18 @@ agent_type:3@site_type:1 -- agent_type':2@site_type':1
 ------------------------------------------------------------
 Contact map with binding in the initial state and binding on the rhs (with state):
 ------------------------------------------------------------
-agent_type:0@site_type:2:state:1--agent_type':1@site_type':0:state':1
-agent_type:0@site_type:3:state:1--agent_type':2@site_type':0:state':1
-agent_type:1@site_type:1:state:1--agent_type':3@site_type':0:state':1
-agent_type:2@site_type:1:state:1--agent_type':3@site_type':1:state':1
-agent_type':1@site_type':0:state':1--agent_type:0@site_type:2:state:1
-agent_type':2@site_type':0:state':1--agent_type:0@site_type:3:state:1
-agent_type':3@site_type':0:state':1--agent_type:1@site_type:1:state:1
-agent_type':3@site_type':1:state':1--agent_type:2@site_type:1:state:1
-------------------------------------------------------------
-Contact map with binding in the initial state and binding on the rhs (with state):
-------------------------------------------------------------
-agent_type:0@site_type:2:state:1--agent_type':1@site_type':0:state':1
-agent_type:0@site_type:3:state:1--agent_type':2@site_type':0:state':1
-agent_type:1@site_type:1:state:1--agent_type':3@site_type':0:state':1
-agent_type:2@site_type:1:state:1--agent_type':3@site_type':1:state':1
-agent_type':1@site_type':0:state':1--agent_type:0@site_type:2:state:1
-agent_type':2@site_type':0:state':1--agent_type:0@site_type:3:state:1
-agent_type':3@site_type':0:state':1--agent_type:1@site_type:1:state:1
-agent_type':3@site_type':1:state':1--agent_type:2@site_type:1:state:1
+agent_type:3@site_type:2:state:1--agent_type':0@site_type':4:state':1
+agent_type:3@site_type:2:state:1--agent_type':0@site_type':4:state':1
+agent_type:3@site_type:2:state:1--agent_type':0@site_type':4:state':1
+agent_type:3@site_type:2:state:1--agent_type':0@site_type':4:state':1
+agent_type':0@site_type':4:state':1--agent_type:3@site_type:2:state:1
+agent_type':0@site_type':4:state':1--agent_type:3@site_type:2:state:1
+agent_type':0@site_type':4:state':1--agent_type:3@site_type:2:state:1
+agent_type':0@site_type':4:state':1--agent_type:3@site_type:2:state:1
 
 ------------------------------------------------------------
 Update function aux:
 ------------------------------------------------------------
-agent_type:0@site_type:0:covering_class_id:2:rule_id:0
-agent_type:0@site_type:1:covering_class_id:1:rule_id:1
-agent_type:0@site_type:2:covering_class_id:0:rule_id:0
-agent_type:0@site_type:2:covering_class_id:2:rule_id:0
-agent_type:0@site_type:3:covering_class_id:0:rule_id:1
-agent_type:0@site_type:3:covering_class_id:1:rule_id:1
-agent_type:0@site_type:4:covering_class_id:0:rule_id:4
-agent_type:1@site_type:0:covering_class_id:0:rule_id:0
-agent_type:1@site_type:1:covering_class_id:0:rule_id:2
-agent_type:2@site_type:0:covering_class_id:0:rule_id:1
-agent_type:2@site_type:1:covering_class_id:0:rule_id:3
-agent_type:3@site_type:0:covering_class_id:0:rule_id:2
-agent_type:3@site_type:1:covering_class_id:0:rule_id:3
-agent_type:3@site_type:2:covering_class_id:0:rule_id:4
-
-------------------------------------------------------------
-Update function binding aux:
-------------------------------------------------------------
-remove side effect:
-half break and remove side effect:
-update function:
 agent_type:0@site_type:0:covering_class_id:2:rule_id:0
 agent_type:0@site_type:1:covering_class_id:1:rule_id:1
 agent_type:0@site_type:2:covering_class_id:0:rule_id:0

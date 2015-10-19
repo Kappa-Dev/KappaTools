@@ -185,26 +185,12 @@ agent_type:1@site_type:0 -- agent_type':0@site_type':0
 ------------------------------------------------------------
 Contact map with binding in the initial state and binding on the rhs (with state):
 ------------------------------------------------------------
-agent_type:0@site_type:0:state:1--agent_type':1@site_type':0:state':1
-agent_type':1@site_type':0:state':1--agent_type:0@site_type:0:state:1
-------------------------------------------------------------
-Contact map with binding in the initial state and binding on the rhs (with state):
-------------------------------------------------------------
-agent_type:0@site_type:0:state:1--agent_type':1@site_type':0:state':1
-agent_type':1@site_type':0:state':1--agent_type:0@site_type:0:state:1
+agent_type:1@site_type:0:state:1--agent_type':0@site_type':0:state':1
+agent_type':0@site_type':0:state':1--agent_type:1@site_type:0:state:1
 
 ------------------------------------------------------------
 Update function aux:
 ------------------------------------------------------------
-agent_type:0@site_type:0:covering_class_id:0:rule_id:0
-agent_type:1@site_type:0:covering_class_id:0:rule_id:0
-
-------------------------------------------------------------
-Update function binding aux:
-------------------------------------------------------------
-remove side effect:
-half break and remove side effect:
-update function:
 agent_type:0@site_type:0:covering_class_id:0:rule_id:0
 agent_type:1@site_type:0:covering_class_id:0:rule_id:0
 

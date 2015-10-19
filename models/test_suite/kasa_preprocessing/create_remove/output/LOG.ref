@@ -104,20 +104,10 @@ Contact map with binding only on the rhs set (there is no state information):
 ------------------------------------------------------------
 Contact map with binding in the initial state and binding on the rhs (with state):
 ------------------------------------------------------------
-------------------------------------------------------------
-Contact map with binding in the initial state and binding on the rhs (with state):
-------------------------------------------------------------
 
 ------------------------------------------------------------
 Update function aux:
 ------------------------------------------------------------
-
-------------------------------------------------------------
-Update function binding aux:
-------------------------------------------------------------
-remove side effect:
-half break and remove side effect:
-update function:
 
 ------------------------------------------------------------
 * List of rules has creation action:
