@@ -113,7 +113,7 @@ let translate_lnk_state parameters lnk_state remanent =
          let error,((agent,site,index),map) = pop_entry parameters error id map  in 
 	 if (agent,site,index) = ("","",0) 
 	 then 
-	   let site = Ckappa_sig.FREE in 
+	   let site = Ckappa_sig.LNK_ANY position in 
 	   let remanent = 
 	     warn parameters error (Some "line 119") Exit map
 	   in 
