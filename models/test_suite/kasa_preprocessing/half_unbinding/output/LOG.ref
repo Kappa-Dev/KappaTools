@@ -162,6 +162,9 @@ Contact map with binding only on the rhs set (there is no state information):
 ------------------------------------------------------------
 Contact map with binding in the initial state and binding on the rhs (with state):
 ------------------------------------------------------------
+------------------------------------------------------------
+Contact map with binding in the initial state and binding on the rhs (with state):
+------------------------------------------------------------
 
 ------------------------------------------------------------
 Update function aux:

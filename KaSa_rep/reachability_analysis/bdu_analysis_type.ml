@@ -130,6 +130,10 @@ type bdu_analysic =
       store_binding_dual     :
         (int list * (int * int * int) list) Int2Map_CM_state.t *
         (int list * (int * int * int) list) Int2Map_CM_state.t;
+      (*TEST*)
+      store_binding_dual_rhs :
+        (int list * (int * int * int) list) Int2Map_CM_state.t *
+        (int list * (int * int * int) list) Int2Map_CM_state.t ;
       store_covering_classes_modification_update :
         (int list * int list) Int2Map_CV_Modif.t;
       store_update :
