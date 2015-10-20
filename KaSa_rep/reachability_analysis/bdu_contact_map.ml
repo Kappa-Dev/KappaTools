@@ -38,14 +38,16 @@ let trace = false
 *)
 
 let compute_contact_map parameter error handler rule =
-  let store_result = Int2Map_CM_state.empty in
-  (*add_link*)
+  let store_result = Int2Map_CM_state.empty_map in
   let add_link (a, b, s) (c, d, s') store_result =
-    let l, old =
-      try Int2Map_CM_state.find (a, b, s) store_result
-      with Not_found -> [],[]
+    let error, (l, old) =
+      try Int2Map_CM_state.find_map parameter error (a, b, s) store_result
+      with Not_found -> error, ([],[])
     in
-    Int2Map_CM_state.add (a, b, s) (l, ((c, d, s') :: [])) store_result
+    let error, add_map =
+      Int2Map_CM_state.add_map parameter error (a, b, s) (l, ((c, d, s') :: [])) store_result
+    in
+    error, add_map
   in  
   (*folding this solution with the information in dual*)
   let error, store_result =
@@ -63,13 +65,17 @@ let compute_contact_map parameter error handler rule =
                 Site_map_and_set.fold_map
                   (fun site_lhs port store_result ->
                     let state_lhs = int_of_port port in
-                    if Int2Map_CM_state.mem (agent_type, site_lhs, state_lhs)
+                    if Int2Map_CM_state.mem_map (agent_type, site_lhs, state_lhs)
                       store_result
                     then 
-                      Int2Map_CM_state.remove (agent_type, site_lhs, state_lhs)
-                        store_result
+                      let error, result =
+                        Int2Map_CM_state.remove_map parameter error
+                          (agent_type, site_lhs, state_lhs)
+                          store_result
+                      in
+                      result
                     else
-	            let store_result =
+	            let error, store_result =
                     add_link (agent1, site, state) (agent', site', state') store_result
 	            in
 	            store_result

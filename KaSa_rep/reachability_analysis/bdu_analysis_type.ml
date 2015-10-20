@@ -30,51 +30,55 @@ module AgentMap = Quick_Nearly_inf_Imperatif
 (*module of covering classes*)
 
 module Int2Map_CV =
-  MapExt.Make (
+  Set_and_map.Make (
     struct
       type t = int * int
       let compare = compare
     end)
 
-
+(*------------------------------------------------------------------------------*)
 (*module type of contact map with state*)
 
 module Int2Map_CM_state =
-  MapExt.Make (
+  Set_and_map.Make (
     struct
       type t = int * int * int
       let compare = compare
     end
   )
 
+(*------------------------------------------------------------------------------*)
 (*module type of modification site*)
 
 module Int2Map_Modif =
-  MapExt.Make (
+  Set_and_map.Make (
     struct
       type t = int * int
       let compare = compare
     end)
 
+(*------------------------------------------------------------------------------*)
 (*half break side effect module*)
 
 module Int2Map_HalfBreak_effect =
-  MapExt.Make (
+  Set_and_map.Make (
     struct
       type t = int * int
       let compare = compare
     end)
 
 module Int2Map_Remove_effect =
-  MapExt.Make (
+  Set_and_map.Make (
     struct
       type t = int * int
       let compare = compare
     end)
 
+(*------------------------------------------------------------------------------*)
 (*update function of covering classes and modification sites*)
+
 module Int2Map_CV_Modif =
-  MapExt.Make (
+  Set_and_map.Make (
     struct
       type t = int * int * int
       let compare = compare
@@ -90,31 +94,33 @@ type site_bdu  = (List_sig.variable * Cckappa_sig.state_index) list *
 type wl_int = IntWL.WSet.elt list * IntWL.WSet.elt list * IntWL.WSet.set
 
 type half_break_action = 
-  (int list * (int * int) list) Int2Map_HalfBreak_effect.t
+  (int list * (int * int) list) Int2Map_HalfBreak_effect.map
 
 (*do not consider the case where site has state free.*)
 type remove_action =
-  (int list * int list) Int2Map_Remove_effect.t
+  (int list * int list) Int2Map_Remove_effect.map
 
 type bdu_analysic =
     {
-      store_creation_rule    : (int list * wl_int * Cckappa_sig.rule array) AgentMap.t;
-      store_creation         : site_bdu AgentMap.t;
+      store_creation_rule       : (int list * wl_int * Cckappa_sig.rule array) AgentMap.t;
+      store_creation            : site_bdu AgentMap.t;
       (*static information*)
-      store_side_effects     : half_break_action * remove_action;
-      store_covering_classes_id : (int list * int list) Int2Map_CV.t;
-      store_modification_sites  : (int list * int list) Int2Map_Modif.t; 
+      store_covering_classes_id : (int list * int list) Int2Map_CV.map;
+      store_side_effects        : half_break_action * remove_action;
+      store_modification_sites  : 
+      (int list * Site_map_and_set.set) Int2Map_Modif.map; 
+        
       (*------------------------------------------------------------------------------*)
       (*dynamic information*)
       store_contact_map      :
-        (int list * (int * int * int) list) Int2Map_CM_state.t;
+        (int list * (int * int * int) list) Int2Map_CM_state.map;
       store_covering_classes_modification_update :
-        (int list * int list) Int2Map_CV_Modif.t;
-      (*store_update :
-        (int list * int list) Int2Map_CV_Modif.t *
-        (int list * int list) Int2Map_CV_Modif.t *
-        (int list * int list) Int2Map_CV_Modif.t *
-        (int list * int list) Int2Map_CV_Modif.t;*)
+        (int list * Site_map_and_set.set) Int2Map_CV_Modif.map;
+      store_update :
+        (int list * Site_map_and_set.set) Int2Map_CV_Modif.map *
+        (int list * Site_map_and_set.set) Int2Map_CV_Modif.map *
+        (int list * Site_map_and_set.set) Int2Map_CV_Modif.map *
+        (int list * Site_map_and_set.set) Int2Map_CV_Modif.map;
     (*bdu fixpoint iteration*)
       (*store_fixpoint : (wl_int * Cckappa_sig.rule array) AgentMap.t*)
     }

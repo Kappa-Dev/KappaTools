@@ -83,7 +83,7 @@ let print_creation_rule_aux parameter error result =
 (*static information of covering classes id*)
 
 let print_covering_classes_id_aux parameter error result =
-  Int2Map_CV.iter
+  Int2Map_CV.iter_map
     ( fun (x, y) (l1, l2) ->
       if l1 <> []
       then
@@ -144,7 +144,7 @@ let print_rule_array_test parameter error rule_array =
 (*side effects*)
 
 let print_half_break_effect parameter error result =
-  Int2Map_HalfBreak_effect.iter
+  Int2Map_HalfBreak_effect.iter_map
     ( fun (x, y) (l1, l2) ->
       if l1 <> []
       then
@@ -174,7 +174,7 @@ let print_half_break_effect parameter error result =
     ) result
 
 let print_remove_effect parameter error result =
-  Int2Map_Remove_effect.iter
+  Int2Map_Remove_effect.iter_map
     ( fun (x, y) (l1, l2) ->
       if l1 <> []
       then
@@ -213,8 +213,8 @@ let print_side_effects_aux parameter error result =
 (************************************************************************************)
 (*modification sites*)
 
-let print_modification_sites_aux parameter error result =
-  Int2Map_Modif.iter
+(*let print_modification_sites_aux parameter error result =
+  Int2Map_Modif.iter_map
     ( fun (x, y) (l1, l2) ->
       if l1 <> []
       then
@@ -241,13 +241,44 @@ let print_modification_sites_aux parameter error result =
             "agent_type:%i@site_type:%i:rule_id:%i\n"
             x y r
         ) l2
+     ) result*)
+
+
+let print_modification_sites_aux parameter error result =
+  Int2Map_Modif.iter_map
+    ( fun (x, y) (l1, s2) ->
+      if l1 <> []
+      then
+        begin
+          let _ =
+            fprintf parameter.log "agent_type:%i@site_type:%i" x y
+          in
+          let _ = List.fold_left
+            (fun bool x ->
+              (if bool
+               then
+                  fprintf parameter.log ", ");
+              fprintf parameter.log "agent_type:%i" x;
+              true
+            ) false l1
+            
+          in
+          fprintf stdout "\n"
+        end
+      else ();
+      Site_map_and_set.iter_set
+        (fun r ->
+          fprintf parameter.log
+            "agent_type:%i@site_type:%i:rule_id:%i\n"
+            x y r
+        ) s2
      ) result
 
 (************************************************************************************)
 (*contact map*)
 
 let print_contact_map_aux parameter error result =
-  Int2Map_CM_state.iter
+  Int2Map_CM_state.iter_map
     (fun (x, y, s) (l1, l2) ->
       if l1 <> []
       then
@@ -291,7 +322,7 @@ let print_contact_map_aux parameter error result =
 (*update function before adding rule with side effects*)
 
 let print_covering_classes_modification_aux parameter error result =
-  Int2Map_CV_Modif.iter
+  Int2Map_CV_Modif.iter_map
     ( fun (x, y, z) (l1, l2) ->
       if l1 <> []
       then
@@ -312,7 +343,7 @@ let print_covering_classes_modification_aux parameter error result =
           fprintf stdout "\n"
         end
       else ();
-      List.iter
+      Site_map_and_set.iter_set
         (fun r ->
           fprintf parameter.log
             "agent_type:%i@site_type:%i:covering_class_id:%i:rule_id:%i\n"
@@ -324,7 +355,7 @@ let print_covering_classes_modification_aux parameter error result =
 (*update function adding rule with side effect when discovered the binding*)
 
 let print_update_aux parameter error result =
-  Int2Map_CV_Modif.iter
+  Int2Map_CV_Modif.iter_map
     ( fun (x, y, z) (l1, l2) ->
       if l1 <> []
       then
@@ -353,6 +384,37 @@ let print_update_aux parameter error result =
         ) l2
     ) result
 
+(*Set*)
+let print_update_set_aux parameter error result =
+  Int2Map_CV_Modif.iter_map
+    ( fun (x, y, z) (l1, s2) ->
+      if l1 <> []
+      then
+        begin
+          let _ =
+            fprintf parameter.log
+              "agent_type:%i@site_type:%i:covering_class_id:%i" x y z
+          in
+          let _ = List.fold_left
+            (fun bool x ->
+              (if bool
+               then
+                  fprintf parameter.log ", ");
+              fprintf parameter.log "agent_type:%i" x;
+              true
+            ) false l1
+          in
+          fprintf stdout "\n"
+        end
+      else ();
+      Site_map_and_set.iter_set
+        (fun r ->
+          fprintf parameter.log
+            "agent_type:%i@site_type:%i:covering_class_id:%i:rule_id:%i\n"
+            x y z r
+        ) s2
+    ) result
+
 let print_binding_update_aux parameter error result =
   let result_hb,
     result_remove,
@@ -360,13 +422,14 @@ let print_binding_update_aux parameter error result =
     result_update_aux
     = result
   in
-  print_update_aux parameter error result_hb;
+  fprintf stdout "half_break side effect:\n";
+  print_update_set_aux parameter error result_hb;
   fprintf stdout "remove side effect:\n";
-  print_update_aux parameter error result_remove;
+  print_update_set_aux parameter error result_remove;
   fprintf stdout "half break and remove side effect:\n";
-  print_update_aux parameter error result_hb_remove;
+  print_update_set_aux parameter error result_hb_remove;
   fprintf stdout "update function:\n";
-  print_update_aux parameter error result_update_aux
+  print_update_set_aux parameter error result_update_aux
   
 (************************************************************************************)
 (**)
@@ -495,9 +558,9 @@ let print_result parameter error result =
     print_covering_classes_modification parameter error
       result.store_covering_classes_modification_update
   in
-  (*let _ =
+  let _ =
     print_binding_update parameter error result.store_update
-  in*)
+  in
   (*TEST*)
   let _ =
     print_creation_rule parameter error result.store_creation_rule

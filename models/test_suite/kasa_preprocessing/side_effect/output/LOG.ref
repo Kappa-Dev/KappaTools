@@ -257,10 +257,10 @@ agent_type:0@site_type:0:(rule_id:3 * state:no_information)
 ------------------------------------------------------------
 Modification sites:
 ------------------------------------------------------------
-agent_type:0@site_type:0:rule_id:1
 agent_type:0@site_type:0:rule_id:0
-agent_type:1@site_type:0:rule_id:2
+agent_type:0@site_type:0:rule_id:1
 agent_type:1@site_type:0:rule_id:0
+agent_type:1@site_type:0:rule_id:2
 
 ** Dynamic information:
 
@@ -277,6 +277,24 @@ agent_type:0@site_type:0:covering_class_id:0:rule_id:0
 agent_type:0@site_type:0:covering_class_id:0:rule_id:1
 agent_type:1@site_type:0:covering_class_id:0:rule_id:0
 agent_type:1@site_type:0:covering_class_id:0:rule_id:2
+
+------------------------------------------------------------
+Update function binding aux:
+------------------------------------------------------------
+half_break side effect:
+agent_type:1@site_type:0:covering_class_id:0:rule_id:1
+remove side effect:
+agent_type:1@site_type:0:covering_class_id:0:rule_id:3
+half break and remove side effect:
+agent_type:1@site_type:0:covering_class_id:0:rule_id:1
+agent_type:1@site_type:0:covering_class_id:0:rule_id:3
+update function:
+agent_type:0@site_type:0:covering_class_id:0:rule_id:0
+agent_type:0@site_type:0:covering_class_id:0:rule_id:1
+agent_type:1@site_type:0:covering_class_id:0:rule_id:0
+agent_type:1@site_type:0:covering_class_id:0:rule_id:2
+agent_type:1@site_type:0:covering_class_id:0:rule_id:1
+agent_type:1@site_type:0:covering_class_id:0:rule_id:3
 
 ------------------------------------------------------------
 * List of rules has creation action:

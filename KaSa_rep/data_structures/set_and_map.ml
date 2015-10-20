@@ -69,7 +69,11 @@ module type Set_and_Map = sig
   val fold_map: (key -> 'a -> 'b -> 'b) -> 'a map -> 'b -> 'b 
   val join_map: Remanent_parameters_sig.parameters->Exception.method_handler -> 'a map -> key -> 'a -> 'a map -> Exception.method_handler * 'a map
   val split_map: Remanent_parameters_sig.parameters->Exception.method_handler-> key -> 'a map -> Exception.method_handler * ('a map * 'a option * 'a map)
-  val union_map: Remanent_parameters_sig.parameters->Exception.method_handler-> 'a map -> 'a map -> Exception.method_handler * 'a map
+
+  (*val union_map: Remanent_parameters_sig.parameters->Exception.method_handler-> 'a map -> 'a map -> Exception.method_handler * 'a map*)
+  val union_map : Remanent_parameters_sig.parameters->Exception.method_handler ->
+    'a map -> 'a map -> Exception.method_handler * 'a map
+
   val bindings : 'a map -> (key * 'a) list
   val equal_map: ('a -> 'a -> bool) -> 'a map -> 'a map -> bool
   val update_map: Remanent_parameters_sig.parameters ->Exception.method_handler -> 'a map -> 'a map -> Exception.method_handler * 'a map    
@@ -568,7 +572,7 @@ module Make(Ord:OrderedType) =
                 let rh', left' = remove_min_binding parameters rh left2 key2 data2 right2 in     
                 balance_map parameters rh' map1 key3 data3 left' 
           end  
-            
+           
     let rec remove_map parameters rh key map = 
       match map with 
         | Empty_map -> rh,empty_map
@@ -661,33 +665,27 @@ module Make(Ord:OrderedType) =
           else 
             let rh',(left2,data2,right2) = split_map parameters rh value right1 in
             let rh'',left2' = join_map parameters rh' left1 key1 data1 left2 in  
-            rh'',(left2',data2,right2)
+            rh'',(left2',data2,right2)   
 
-    (*Added*)
-    let rec union_map parameters mh (map1:'a map) (map2:'a map) =
+     (*added*)
+     let rec union_map parameters mh map1 map2 =
       match map1, map2 with
         | Empty_map, _ -> mh, map2
         | _, Empty_map -> mh, map1
-        | Node_map (left1, key1, data1, right1, height1),
-          Node_map (left2, key2, data2, right2, height2) ->
-          if height1 > height2 then
-            if height2 = 1 then add_map parameters mh key2 data2 map1
-            else
-              begin
-                let mh', (left2, _, right2) = split_map parameters mh key1 map2 in
-                let mh'', left' = union_map parameters mh' left1 left2 in
-                let mh''', right' = union_map parameters mh'' right1 right2 in
-                join_map parameters mh''' left' key1 data1 right'
-              end
+        | Node_map (left1, value1, data1, right1, height1),
+          Node_map (left2, value2, data2, right2, height2) ->
+          if height1 >= height2 then
+            let mh', (left2, _, right2) =
+              split_map parameters mh value1 map2 in
+            let mh'', l = union_map parameters mh' left1 left2 in
+            let mh''', r = union_map parameters mh'' right1 right2 in
+            join_map parameters mh''' l value1 data1 r
           else
-            if height1 = 1 then add_map parameters mh key1 data1 map2
-            else
-              begin
-                let mh', (left1, _, right1) = split_map parameters mh key2 map1 in
-                let mh'', left' = union_map parameters mh' left1 left2 in
-                let mh''', right' = union_map parameters mh'' right1 right2 in
-                join_map parameters mh''' left' key2 data2 right'
-              end        
+            let mh', (l1, _, r1) =
+              split_map parameters mh value2 map1 in
+            let mh'', l = union_map parameters mh'  left1 left2 in
+            let mh''', r = union_map parameters mh'' right1 right2 in
+            join_map parameters mh''' l value2 data2 r
 
     let rec bindings_aux accu = function
       | Empty_map -> accu

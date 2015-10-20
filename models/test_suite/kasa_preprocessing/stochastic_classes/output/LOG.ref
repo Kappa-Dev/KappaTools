@@ -554,6 +554,14 @@ agent_type:0@site_type:2:covering_class_id:0:rule_id:8
 agent_type:2@site_type:0:covering_class_id:0:rule_id:2
 
 ------------------------------------------------------------
+Update function binding aux:
+------------------------------------------------------------
+half_break side effect:
+remove side effect:
+half break and remove side effect:
+update function:
+
+------------------------------------------------------------
 * List of rules has creation action:
 ------------------------------------------------------------
 agent_type/rule_id_1:

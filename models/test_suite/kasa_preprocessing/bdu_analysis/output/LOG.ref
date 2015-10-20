@@ -462,18 +462,18 @@ Modification sites:
 ------------------------------------------------------------
 agent_type:0@site_type:0:rule_id:0
 agent_type:0@site_type:1:rule_id:0
-agent_type:0@site_type:2:rule_id:6
-agent_type:0@site_type:2:rule_id:5
-agent_type:0@site_type:2:rule_id:2
-agent_type:0@site_type:2:rule_id:1
 agent_type:0@site_type:2:rule_id:0
-agent_type:0@site_type:3:rule_id:7
-agent_type:0@site_type:3:rule_id:2
+agent_type:0@site_type:2:rule_id:1
+agent_type:0@site_type:2:rule_id:2
+agent_type:0@site_type:2:rule_id:5
+agent_type:0@site_type:2:rule_id:6
 agent_type:0@site_type:3:rule_id:0
-agent_type:1@site_type:0:rule_id:6
+agent_type:0@site_type:3:rule_id:2
+agent_type:0@site_type:3:rule_id:7
 agent_type:1@site_type:0:rule_id:1
-agent_type:2@site_type:0:rule_id:7
+agent_type:1@site_type:0:rule_id:6
 agent_type:2@site_type:0:rule_id:2
+agent_type:2@site_type:0:rule_id:7
 
 ** Dynamic information:
 
@@ -500,6 +500,35 @@ agent_type:1@site_type:0:covering_class_id:0:rule_id:1
 agent_type:1@site_type:0:covering_class_id:0:rule_id:6
 agent_type:2@site_type:0:covering_class_id:0:rule_id:2
 agent_type:2@site_type:0:covering_class_id:0:rule_id:7
+
+------------------------------------------------------------
+Update function binding aux:
+------------------------------------------------------------
+half_break side effect:
+remove side effect:
+agent_type:1@site_type:0:covering_class_id:0:rule_id:3
+agent_type:2@site_type:0:covering_class_id:0:rule_id:3
+agent_type:2@site_type:0:covering_class_id:0:rule_id:4
+half break and remove side effect:
+agent_type:1@site_type:0:covering_class_id:0:rule_id:3
+agent_type:2@site_type:0:covering_class_id:0:rule_id:3
+agent_type:2@site_type:0:covering_class_id:0:rule_id:4
+update function:
+agent_type:0@site_type:2:covering_class_id:0:rule_id:0
+agent_type:0@site_type:2:covering_class_id:0:rule_id:1
+agent_type:0@site_type:2:covering_class_id:0:rule_id:2
+agent_type:0@site_type:2:covering_class_id:0:rule_id:5
+agent_type:0@site_type:2:covering_class_id:0:rule_id:6
+agent_type:0@site_type:3:covering_class_id:0:rule_id:0
+agent_type:0@site_type:3:covering_class_id:0:rule_id:2
+agent_type:0@site_type:3:covering_class_id:0:rule_id:7
+agent_type:1@site_type:0:covering_class_id:0:rule_id:1
+agent_type:1@site_type:0:covering_class_id:0:rule_id:6
+agent_type:2@site_type:0:covering_class_id:0:rule_id:2
+agent_type:2@site_type:0:covering_class_id:0:rule_id:7
+agent_type:1@site_type:0:covering_class_id:0:rule_id:3
+agent_type:2@site_type:0:covering_class_id:0:rule_id:3
+agent_type:2@site_type:0:covering_class_id:0:rule_id:4
 
 ------------------------------------------------------------
 * List of rules has creation action:

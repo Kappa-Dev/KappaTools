@@ -41,11 +41,15 @@ let trace = false
 let half_break_action parameter error handler rule_id half_break store_result =
   (*module (agent_type, site) -> (rule_id, binding_state) list*)
   let add_link (a, b) (r, state) store_result =
-    let l, old =
-      try Int2Map_HalfBreak_effect.find (a, b) store_result
-      with Not_found -> [], []
+    let error, (l, old) =
+      try Int2Map_HalfBreak_effect.find_map parameter error (a, b) store_result
+      with Not_found -> error, ([], [])
     in
-    Int2Map_HalfBreak_effect.add (a, b) (l, (r, state) :: old) store_result
+    let error, result =
+      Int2Map_HalfBreak_effect.add_map parameter error
+        (a, b) (l, (r, state) :: old) store_result
+    in
+    error, result
   in
   let error, store_result =
     List.fold_left (fun (error, store_result) (site_address, state_op) ->
@@ -74,7 +78,7 @@ let half_break_action parameter error handler rule_id half_break store_result =
         | Some interval -> error, (interval.min, interval.max)
       in
       (*return result*)
-      let store_result =
+      let error, store_result =
         add_link (agent_type, site) (rule_id, state_min) store_result
       in
       error, store_result  
@@ -82,7 +86,7 @@ let half_break_action parameter error handler rule_id half_break store_result =
   in
   (*map function*)
   let store_result =
-    Int2Map_HalfBreak_effect.map (fun (l, x) -> List.rev l, x) store_result
+    Int2Map_HalfBreak_effect.map_map (fun (l, x) -> List.rev l, x) store_result
   in
   error, store_result
 
@@ -91,11 +95,14 @@ let half_break_action parameter error handler rule_id half_break store_result =
 
 let remove_action parameter error rule_id remove store_result =
   let add_link (a, b) r store_result =
-    let l, old =
-      try Int2Map_Remove_effect.find (a, b) store_result
-      with Not_found -> [], []
+    let error, (l, old) =
+      try Int2Map_Remove_effect.find_map parameter error (a, b) store_result
+      with Not_found -> error, ([], [])
     in
-    Int2Map_Remove_effect.add (a, b) (l, r :: old) store_result
+    let error, result =
+      Int2Map_Remove_effect.add_map parameter error (a, b) (l, r :: old) store_result
+    in
+    error, result (*TODO: return error *)
   in
   let error, store_result =
     List.fold_left (fun (error, store_result) (agent_index, agent, list_undoc) ->
@@ -104,14 +111,17 @@ let remove_action parameter error rule_id remove store_result =
       (*result*)
       let store_result =
         List.fold_left (fun store_result site ->
-          add_link (agent_type, site) rule_id store_result
+          let error, result =
+            add_link (agent_type, site) rule_id store_result
+          in
+          result
         ) store_result list_undoc
       in
       error, store_result
     ) (error, store_result) remove
   in
   let store_result =
-    Int2Map_Remove_effect.map (fun (l, x) -> List.rev l, x) store_result
+    Int2Map_Remove_effect.map_map (fun (l, x) -> List.rev l, x) store_result
   in
   error, store_result
 
