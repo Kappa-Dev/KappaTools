@@ -38,12 +38,12 @@ let main () =
       error
   in 
   let parameters_c_compil = Remanent_parameters.update_call_stack parameters Preprocess.local_trace (Some "Preprocess.translate_c_compil") in 
-  let _ = Format.printf "Compiling...\n" in 
+  let _ = Format.printf "Compiling...@." in 
   let error,handler,c_compil = Preprocess.translate_c_compil parameters_c_compil error handler refined_compil in 
   let error = 
     if Remanent_parameters.get_do_contact_map parameters
     then
-      let _ = Format.printf "Generating the raw contact map...\n" in
+      let _ = Format.printf "Generating the raw contact map...@." in
       Print_handler.dot_of_contact_map parameters error handler 
     else error 
   in 
@@ -57,7 +57,7 @@ let main () =
    let error = 
     if Remanent_parameters.get_do_influence_map parameters 
     then
-      let _ = Format.printf "Generating the raw influence map...\n" in 
+      let _ = Format.printf "Generating the raw influence map...@." in 
       let parameters_quark = Remanent_parameters.update_call_stack parameters Quark.local_trace (Some "Quark.quarkify") in 
       let parameters_quark = Remanent_parameters.update_prefix parameters_quark "Quarks:" in 
       let error,quark_map = Quark.quarkify parameters_quark error  handler c_compil  in 
@@ -129,7 +129,7 @@ let main () =
   let error,bdu_analysic = 
     if Remanent_parameters.get_do_reachability_analysis parameters
     then
-      let _ = Format.printf "Reachability analysis...\n" in 
+      let _ = Format.printf "Reachability analysis...@." in 
       let parameters_cv =
 	Remanent_parameters.update_prefix parameters "" in 
       let _ = 
