@@ -64,6 +64,8 @@ Signature:duals:2:2:1:agent_type:0,site_type:1,state_id:1
 Signature:duals:2:3:
 Signature:duals:2:3:1:
 Signature:duals:2:3:1:agent_type:0,site_type:1,state_id:2
+Compiling...
+Generating the raw contact map...
 Compilation:
 Compilation:variables:0:on_rate: 0.000100 
 Compilation:variables:1:off_rate: 0.100000 
@@ -262,8 +264,6 @@ Compilation:initial_states:0:mixture:agent_id_1:
 Compilation:initial_states:1:
 Compilation:initial_states:1:mixture:
 Compilation:initial_states:1:mixture:agent_id_0:
-Compiling...
-Generating the raw contact map...
 Generating the raw influence map...
 Quarks:Quarkify
 Quarks:Rule 0
@@ -461,7 +461,6 @@ Quarks:site_modif-:agent_type:2,site_type:0,state:0,rule:3->[0]
 Quarks:site_modif-:agent_type:2,site_type:3,state:0,rule:4->[1]
 Quarks:site_modif-:agent_type:2,site_type:3,state:1,rule:5->[1]
 Quarks:site_modif-:agent_type:2,site_type:1,state:0,rule:5->[1]
-Refining the influence map...
 Influence_map: The notation [i -> j] means an agent at position [i] of the first rule/var has an influence to an agent at position [j] of the second rule/var.
 Influence_map:Wake_up_map:rule(0):'a.b' A(x),B(x)->A(x!1),B(x!1) -> rule(1):'a.b_op' A(x!1),B(x!1)->A(x),B(x)[0->0];[1->1]
 Influence_map:Wake_up_map:rule(0):'a.b' A(x),B(x)->A(x!1),B(x!1) -> rule(2):'ab.c' A(x!_,c),C(x1~u)->A(x!_,c!2),C(x1~u!2)[0->0]
@@ -484,6 +483,7 @@ Influence_map:Inhibition_map:rule(1):'a.b_op' A(x!1),B(x!1)->A(x),B(x) -> rule(2
 Influence_map:Inhibition_map:rule(1):'a.b_op' A(x!1),B(x!1)->A(x),B(x) -> var(3):'AB' A(x!x.B)[0->0]
 Influence_map:Inhibition_map:rule(3):'mod x1' C(x1~u!1),A(c!1)->C(x1~p),A(c) -> var(4):'Cuu' C(x1~u?,x2~u?)[0->0]
 Influence_map:Inhibition_map:rule(5):'mod x2' A(x,c!1),C(x1~p,x2~u!1)->A(x,c),C(x1~p,x2~p) -> var(5):'Cpu' C(x1~p?,x2~u?)[1->0]
+Refining the influence map...
 Reachability analysis...
 
 agent_type:0:
