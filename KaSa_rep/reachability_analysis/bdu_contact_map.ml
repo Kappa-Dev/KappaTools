@@ -61,9 +61,9 @@ let compute_contact_map parameter error handler rule =
             | Ghost -> error, store_result
             | Agent agent ->
               let agent_type = agent.agent_name in
-              let store_result =
+              let error, store_result =
                 Site_map_and_set.fold_map
-                  (fun site_lhs port store_result ->
+                  (fun site_lhs port (error, store_result) ->
                     let state_lhs = int_of_port port in
                     if Int2Map_CM_state.mem_map (agent_type, site_lhs, state_lhs)
                       store_result
@@ -73,16 +73,16 @@ let compute_contact_map parameter error handler rule =
                           (agent_type, site_lhs, state_lhs)
                           store_result
                       in
-                      result
+                      error, result
                     else
 	            let error, store_result =
                     add_link (agent1, site, state) (agent', site', state') store_result
 	            in
-	            store_result
-                  ) agent.agent_interface store_result
+	            error, store_result
+                  ) agent.agent_interface (error, store_result)
               in
               error, store_result
-          )  rule.rule_lhs.views store_result
+          ) rule.rule_lhs.views store_result
       ) handler.dual store_result
   in
   error, store_result

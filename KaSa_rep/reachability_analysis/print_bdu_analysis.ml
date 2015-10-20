@@ -213,37 +213,6 @@ let print_side_effects_aux parameter error result =
 (************************************************************************************)
 (*modification sites*)
 
-(*let print_modification_sites_aux parameter error result =
-  Int2Map_Modif.iter_map
-    ( fun (x, y) (l1, l2) ->
-      if l1 <> []
-      then
-        begin
-          let _ =
-            fprintf parameter.log "agent_type:%i@site_type:%i" x y
-          in
-          let _ = List.fold_left
-            (fun bool x ->
-              (if bool
-               then
-                  fprintf parameter.log ", ");
-              fprintf parameter.log "agent_type:%i" x;
-              true
-            ) false l1
-            
-          in
-          fprintf stdout "\n"
-        end
-      else ();
-      List.iter
-        (fun r ->
-          fprintf parameter.log
-            "agent_type:%i@site_type:%i:rule_id:%i\n"
-            x y r
-        ) l2
-     ) result*)
-
-
 let print_modification_sites_aux parameter error result =
   Int2Map_Modif.iter_map
     ( fun (x, y) (l1, s2) ->
@@ -354,37 +323,6 @@ let print_covering_classes_modification_aux parameter error result =
 (************************************************************************************)
 (*update function adding rule with side effect when discovered the binding*)
 
-let print_update_aux parameter error result =
-  Int2Map_CV_Modif.iter_map
-    ( fun (x, y, z) (l1, l2) ->
-      if l1 <> []
-      then
-        begin
-          let _ =
-            fprintf parameter.log
-              "agent_type:%i@site_type:%i:covering_class_id:%i" x y z
-          in
-          let _ = List.fold_left
-            (fun bool x ->
-              (if bool
-               then
-                  fprintf parameter.log ", ");
-              fprintf parameter.log "agent_type:%i" x;
-              true
-            ) false l1
-          in
-          fprintf stdout "\n"
-        end
-      else ();
-      List.iter
-        (fun r ->
-          fprintf parameter.log
-            "agent_type:%i@site_type:%i:covering_class_id:%i:rule_id:%i\n"
-            x y z r
-        ) l2
-    ) result
-
-(*Set*)
 let print_update_set_aux parameter error result =
   Int2Map_CV_Modif.iter_map
     ( fun (x, y, z) (l1, s2) ->
@@ -527,6 +465,30 @@ let print_bdu_array_creation parameter error result =
   print_bdu_array_creation_aux parameter_agent error result
 
 (************************************************************************************)
+(*Fixpoint iteration function*)
+
+let print_fixpoint_aux parameter error result =
+  AgentMap.print error
+    (fun error parameter (wl, rule_array) ->
+      let _ =
+        fprintf (Remanent_parameters.get_log parameter)
+          "- List of rule_id in working list:\n";
+        IntWL.print_wl parameter wl
+      in
+      error
+    ) parameter result
+
+let print_fixpoint parameter error result =
+  let parameter_agent = Remanent_parameters.update_prefix parameter "agent_type_" in
+  fprintf (Remanent_parameters.get_log parameter)
+    "\n------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "* Fixpoint iteration:\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  print_fixpoint_aux parameter_agent error result
+
+(************************************************************************************)
 (*MAIN PRINT*)
 
 let print_result parameter error result =
@@ -560,6 +522,9 @@ let print_result parameter error result =
   in
   let _ =
     print_binding_update parameter error result.store_update
+  in
+  let _ =
+    print_fixpoint parameter error result.store_fixpoint
   in
   (*TEST*)
   let _ =

@@ -88,11 +88,76 @@ let build_bdu_test_list_direct parameter error rule_lhs_views rule_diff_direct
 	    in*)
     ) rule_lhs_views rule_diff_direct store_result
 
-    
-
 (************************************************************************************)    
-(*added a list of rule_id in an update function into working list.*)
+(*added a list of rule_id in [creation action ++ update function] into working list.*)
 
+(*test update function first*)
+
+let collect_wl_update parameter error handler rule store_update (*store_result*) =
+  let error, init = AgentMap.create parameter error 0 in
+  let (_, _, _, store_final_update) = store_update in
+  Int2Map_CV_Modif.fold_map 
+    (fun (agent_type, site_type, cv_id) (l1, s2) (error, store_result) ->
+      (*-------------------------------------------------------------------------*)
+      (*put rule_id into a working list*)
+      let wl = IntWL.empty in
+      let error, wl =
+        Site_map_and_set.fold_set (fun rule_id (error, wl) ->
+          let error, wl =
+            IntWL.push parameter error rule_id wl
+          in
+          error, wl      
+        ) s2 (error, wl)
+      in
+    (*-------------------------------------------------------------------------*)
+    (*from wl contain rule_id, create an array, then from rule_id get rule_type*)
+      let nrules = Handler.nrules parameter error handler in
+      let error, empty_rule = Preprocess.empty_rule parameter error in
+      let rule_array = Array.make nrules empty_rule in
+      let rule_array =
+	IntWL.fold_left (fun rule_array rule_id' ->
+	  let rule_array =
+	    rule_array.(rule_id') <- rule;
+	    rule_array
+	  in
+	  rule_array
+	) rule_array wl
+      in
+      (*-------------------------------------------------------------------------*)
+      (*FIXME: REMOVE? get old*)
+      let error, (old_wl, old_array) =
+	match AgentMap.unsafe_get parameter error agent_type store_result with
+	  | error, None -> error, (IntWL.empty, [||])
+	  | error, Some (wl, array) -> error, (wl, array)
+      in
+      (*new wl*)
+      let in_list, out_list, set = wl in
+      let old_in_list, old_out_list, old_set = old_wl in
+      let error, new_set =
+	IntWL.WSet.union parameter error set old_set
+      in
+      (*-------------------------------------------------------------------------*)
+      (*FIXME: REMOVE? get new*)
+      let new_wl =
+	List.concat [in_list; old_in_list], List.concat [out_list; old_out_list], new_set
+      in
+      (*FIXME: REMOVE? new array*)
+      let new_array = Array.append rule_array old_array in
+      (*-------------------------------------------------------------------------*)
+      (*store*)
+      let error, store_result =
+	AgentMap.set
+	  parameter
+	  error
+	  agent_type
+	  (new_wl, new_array) (*FIXME: array or new_array?*)
+	  store_result
+      in
+      error, store_result
+    ) store_final_update (error, init (*store_result*))
+
+
+(*
 let collect_wl_rule_id_update parameter error handler rule store_update store_result =
   AgentMap.fold parameter error
     (fun parameter error agent_type set _ ->
@@ -152,4 +217,4 @@ let collect_wl_rule_id_update parameter error handler rule store_update store_re
 	  store_result
       in
       error, store_result
-    ) store_update store_result
+    ) store_update store_result*)

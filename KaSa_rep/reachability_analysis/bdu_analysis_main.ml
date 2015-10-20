@@ -107,7 +107,7 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       store_covering_classes_id
   in
   (*------------------------------------------------------------------------------*)
-  (*TEST*)
+  (*update function*)
   let error, store_update =
     store_binding_update
       parameter
@@ -115,6 +115,17 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       store_covering_classes_modification_update
       store_side_effects
       store_contact_map
+  in
+  (*------------------------------------------------------------------------------*)
+  (*fixpoint iteration*)
+  let error, store_fixpoint_iteration =
+    collect_wl_update
+      parameter
+      error
+      handler
+      rule
+      store_update
+      (*store_result.store_fixpoint*)
   in
   (*------------------------------------------------------------------------------*)
   (*store*)
@@ -131,6 +142,7 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
     store_covering_classes_modification_update =
       store_covering_classes_modification_update;
     store_update                               = store_update;
+    store_fixpoint                             = store_fixpoint_iteration
   }
  
 (************************************************************************************)
@@ -152,6 +164,7 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
   let init_store_remove            = Int2Map_CV_Modif.empty_map in
   let init_store_hb_remove         = Int2Map_CV_Modif.empty_map in
   let init_store_update_aux        = Int2Map_CV_Modif.empty_map in
+  let error, init_fixpoint         = AgentMap.create parameter error 0 in
   let init_bdu =
     {
       store_creation            = init_creation;
@@ -167,8 +180,8 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
         (init_store_hb,
          init_store_remove,
          init_store_hb_remove,
-         init_store_update_aux
-        )
+         init_store_update_aux);
+      store_fixpoint            = init_fixpoint
     }
   in
   (*------------------------------------------------------------------------------*)

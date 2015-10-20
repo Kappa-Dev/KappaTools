@@ -388,6 +388,19 @@ agent_type:1@site_type:0:covering_class_id:0:rule_id:1
 agent_type:1@site_type:0:covering_class_id:0:rule_id:3
 
 ------------------------------------------------------------
+* Fixpoint iteration:
+------------------------------------------------------------
+agent_type_0:
+- List of rule_id in working list:
+1 
+agent_type_1:
+- List of rule_id in working list:
+1 2 0 1 3 
+agent_type_2:
+- List of rule_id in working list:
+3 
+
+------------------------------------------------------------
 * List of rules has creation action:
 ------------------------------------------------------------
 agent_type/rule_id_1:
