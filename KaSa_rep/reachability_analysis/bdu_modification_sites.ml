@@ -87,6 +87,40 @@ let collect_modification_sites parameter error rule_id diff_direct store_result 
   in
   error, store_result
 
+(*TEST: if it is a creation rule and it belongs to modification rule,
+  then do not add those rules inside this list*)
+
+(*let collect_creation_site parameter error rule_id viewsrhs creation store_result =
+  (*map (agent, site) -> rule_id list*)
+  List.fold_left (fun (error
+
+  
+let collect_modification_sites_without_creation parameter error
+    rule_id diff_direct viewsrhs creation store_result =
+  let error, store_result =
+    AgentMap.fold parameter error
+      (fun parameter error agent_id agent_modif store_result ->
+	if Site_map_and_set.is_empty_map agent_modif.agent_interface
+	then error, store_result
+	else
+	  let agent_type_modif = agent_modif.agent_name in
+	  let error, store_result =
+	    Site_map_and_set.fold_map
+	      (fun site_modif _ (error, store_result) ->
+		
+
+		
+
+	      ) agent_modif.agent_interface (error, store_result)
+	  in
+
+	
+      ) diff_direct store_result
+  in
+  
+  *)
+
+    
 (************************************************************************************)
 (*a pair (agent_type_cv, site_cv) in covering classes
   return a list of covering_classes_id*)
