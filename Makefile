@@ -49,10 +49,10 @@ main/version.ml: main/version.ml.skel $(wildcard .git/refs/heads/*)
 	sed -e 's/\$$Format:%D\$$'/"$$(git describe --always --dirty || echo unkown)"/ $@.tmp > $@
 
 %.cma %.native %.byte %.docdir/index.html: main/version.ml $(filter-out _build/,$(wildcard */*.ml*)) $(wildcard $(KASAREP)*/*.ml*) $(wildcard $(KASAREP)*/*/*.ml*)
-	$(OCAMLBINPATH)ocamlbuild $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) $@
+	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) $@
 
 JaSim.byte: $(filter-out _build/,$(wildcard */*.ml*))
-	$(OCAMLBINPATH)ocamlbuild $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) -I js \
+	"$(OCAMLBINPATH)ocamlbuild" $(OCAMLBUILDFLAGS) $(OCAMLINCLUDES) -I js \
 	-tag-line "<js/**> : thread, package(js_of_ocaml.tyxml), package(js_of_ocaml.syntax), package(tyxml.syntax), package(lwt), syntax(camlp4o)" \
 	$@
 
@@ -80,11 +80,11 @@ bin/%: %.native Makefile
 	rm $${LOG} || { cat $${LOG}; rm $${LOG}; exit 2; }
 
 %.witness: %.sh $(MANGENREP) bin/KaSim bin/KaSa $(MODELS) %.gplot
-	cd $(dir $@) && KAPPABIN=$(CURDIR)/bin/ sh $(notdir $<) > $(notdir $@) 2>&1 \
+	cd $(dir $@) && KAPPABIN="$(CURDIR)/bin/" sh $(notdir $<) > $(notdir $@) 2>&1 \
 	|| { cat $(notdir $@); rm $(notdir $@); exit 2; }
 
 %.witness: %.sh $(MANGENREP) bin/KaSim bin/KaSa $(MODELS)
-	cd $(dir $@) && KAPPABIN=$(CURDIR)/bin/ sh $(notdir $<) > $(notdir $@) 2>&1 \
+	cd $(dir $@) && KAPPABIN="$(CURDIR)/bin/" sh $(notdir $<) > $(notdir $@) 2>&1 \
 	|| { cat $(notdir $@); rm $(notdir $@); exit 2; }
 
 doc: man/KaSim_manual.pdf
@@ -99,31 +99,31 @@ clean_doc:
 	rm -rf $(MANGENREP)
 
 clean: temp-clean-for-ignorant-that-clean-must-be-done-before-fetch clean_doc
-	$(OCAMLBINPATH)ocamlbuild -clean
+	"$(OCAMLBINPATH)ocamlbuild" -clean
 	rm -f main/version.ml
 	rm -f sanity_test bin/sanity_test
 	rm -f KaSim bin/KaSim KaSa bin/KaSa
 	rm -f js/JaSim.js
 	find . -name \*~ -delete
-	+$(MAKE) KAPPABIN=$(CURDIR)/bin/ -C models/test_suite clean
+	+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite clean
 
 check: bin/sanity_test
-	@+$(MAKE) KAPPABIN=$(CURDIR)/bin/ -C models/test_suite all
+	@+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite all
 
 build-tests:
-	@+$(MAKE) KAPPABIN=$(CURDIR)/bin/ -C models/test_suite build
+	@+$(MAKE) KAPPABIN="$(CURDIR)/bin/" -C models/test_suite build
 
 temp-clean-for-ignorant-that-clean-must-be-done-before-fetch:
 	find . \( -name \*.cm\* -or -name \*.o -or -name \*.annot \) -delete
 	rm -f grammar/kappaLexer.ml grammar/kappaParser.ml grammar/kappaParser.mli
 
 full: 
-	make clean
-	make USE_TK=1 || echo 0 
+	$(MAKE) clean
+	$(MAKE) USE_TK=1 || echo 0
 
 light: 
-	make clean
-	make USE_TK=0 || echo 0 
+	$(MAKE) clean
+	$(MAKE) USE_TK=0 || echo 0
 
 commit: fetch_version 
 	echo -n `expr $(VN) + 1` > tag/number 

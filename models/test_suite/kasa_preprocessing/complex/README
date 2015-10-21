@@ -1,3 +1,3 @@
 #Command-line:
-${KAPPABIN}KaSa complex.ka --debugging-mode --output-directory output || exit 0 
+"${KAPPABIN}"KaSa complex.ka --debugging-mode --output-directory output || exit 0 
 

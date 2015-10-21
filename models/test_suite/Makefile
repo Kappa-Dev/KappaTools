@@ -1,7 +1,7 @@
 OUTPUT_PATH:=output
 ERROR:=error
 
-DIRS_OF_TEST:=$(shell find $(CURDIR) -mindepth 2 -maxdepth 2 -type d -print)
+DIRS_OF_TEST:=$(shell find "$(CURDIR)" -mindepth 2 -maxdepth 2 -type d -print)
 
 DOT=$(wildcard */*/$(OUTPUT_PATH)/*.dot)
 PDF=$(DOT:.dot=.pdf)
@@ -18,7 +18,7 @@ help:
 	@echo 'make clean:     recursively clean everything but the reference files'
 	@echo 'make clean_all: recursively clean everything including the reference files'
 
-%/$(OUTPUT_PATH)/LOG: %/README #$(shell which $(KAPPABIN)KaSim) $(shell which $(KAPPABIN)KaSa) 
+%/$(OUTPUT_PATH)/LOG: %/README #$(shell which "$(KAPPABIN)KaSim") $(shell which "$(KAPPABIN)KaSa")
 	@[ -d $(dir $<)$(OUTPUT_PATH) ] || mkdir $(dir $<)$(OUTPUT_PATH)
 	@find $(dir $<)$(OUTPUT_PATH) -mindepth 1 \( -not -name \*.ref \) -delete
 	cd $(dir $<) && sh $(notdir $<) > $(OUTPUT_PATH)/LOG 2> $(OUTPUT_PATH)/error.log
@@ -48,15 +48,15 @@ all: error
 build:
 	@+$(MAKE) clean_all
 	@+$(MAKE) $(DIRS_OF_TEST:=/$(OUTPUT_PATH)/LOG)
-	find $(CURDIR) \( -path \*/\*/$(OUTPUT_PATH)/\* -and -not -name \*.diff \
+	find "$(CURDIR)" \( -path \*/\*/$(OUTPUT_PATH)/\* -and -not -name \*.diff \
 		-and -not -name \*.ref \) -exec mv \{\} \{\}.ref \;
-	find $(CURDIR) -name \*.ref -exec sed -i"" -e '/generation time/d;/Kappa Static Analyzer/d;/Analysis launched at/d' \{\} \;
+	find "$(CURDIR)" -name \*.ref -exec sed -i"" -e '/generation time/d;/Kappa Static Analyzer/d;/Analysis launched at/d' \{\} \;
 	@+$(MAKE) clean
 
 .PHONY: clean clean_all
 
 clean:
-	find $(CURDIR) \( -name \#\* -or -name \*~ -or -name \*.sxw \) -delete
+	find "$(CURDIR)" \( -name \#\* -or -name \*~ -or -name \*.sxw \) -delete
 	for i in $(DIRS_OF_TEST:=/$(OUTPUT_PATH)) ;\
 	  do [ -d $${i} ] && find $${i} -mindepth 1 \( -not -name \*.ref \) -delete || true;\
 	done
