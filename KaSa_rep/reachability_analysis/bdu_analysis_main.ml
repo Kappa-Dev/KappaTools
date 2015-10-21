@@ -127,6 +127,23 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       store_update
       (*store_result.store_fixpoint*)
   in
+  (*test*)
+  let error, store_wl_creation =
+    collect_wl_creation
+      parameter
+      error
+      rule_id
+      rule.rule_rhs.views
+      rule.actions.creation
+      store_result.store_wl_creation
+  in
+  let error, store_wl_creation_update =
+    collect_wl_creation_update
+      parameter
+      error
+      store_wl_creation
+      store_update
+  in
   (*------------------------------------------------------------------------------*)
   (*store*)
   error,
@@ -142,7 +159,9 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
     store_covering_classes_modification_update =
       store_covering_classes_modification_update;
     store_update                               = store_update;
-    store_fixpoint                             = store_fixpoint_iteration
+    store_fixpoint                             = store_fixpoint_iteration;
+    store_wl_creation = store_wl_creation;
+    store_wl_creation_update = store_wl_creation_update
   }
  
 (************************************************************************************)
@@ -165,6 +184,8 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
   let init_store_hb_remove         = Int2Map_CV_Modif.empty_map in
   let init_store_update_aux        = Int2Map_CV_Modif.empty_map in
   let error, init_fixpoint         = AgentMap.create parameter error 0 in
+  let error, init_wl_creation = AgentMap.create parameter error 0 in
+  let error, init_wl_creation_update = AgentMap.create parameter error 0 in
   let init_bdu =
     {
       store_creation            = init_creation;
@@ -181,7 +202,9 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
          init_store_remove,
          init_store_hb_remove,
          init_store_update_aux);
-      store_fixpoint            = init_fixpoint
+      store_fixpoint            = init_fixpoint;
+      store_wl_creation = init_wl_creation;
+      store_wl_creation_update = init_wl_creation_update
     }
   in
   (*------------------------------------------------------------------------------*)

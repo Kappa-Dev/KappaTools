@@ -227,6 +227,20 @@ agent_type_0:
 agent_type_1:
 - List of rule_id in working list:
 0 1 
+WL creation:
+agent_type_0:
+-List of rule_id in working list of creation:
+1 
+agent_type_1:
+-List of rule_id in working list of creation:
+1 
+WL update and creation:
+agent_type_0:
+-List of rule_id in working list of creation_update:
+1 0 
+agent_type_1:
+-List of rule_id in working list of creation_update:
+1 0 
 
 ------------------------------------------------------------
 * List of rules has creation action:

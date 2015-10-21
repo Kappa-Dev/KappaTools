@@ -153,3 +153,92 @@ let collect_wl_update parameter error handler rule store_update (*store_result*)
       in
       error, store_result
     ) store_final_update (error, init (*store_result*))
+
+(*test creation rule working list only.*)
+let collect_wl_creation parameter error rule_id viewsrhs creation
+    store_result =
+  List.fold_left (fun (error, store_result) (agent_id, agent_type) ->
+    let error, agent = AgentMap.get parameter error agent_id viewsrhs in
+    match agent with
+      | None -> warn parameter error (Some "line 162") Exit store_result
+      | Some Ghost -> error, store_result
+      | Some Agent agent ->
+	(*creation a working list*)
+	let wl = IntWL.empty in
+	(*push rule_id of creation into this working list first*)
+	let error, wl_creation = IntWL.push parameter error rule_id wl in
+	(*store this working list associate with its agent_type*)
+	let error, old_wl =
+	  match AgentMap.unsafe_get parameter error agent_type store_result with
+	    | error, None -> error, IntWL.empty
+	    | error, Some wl -> error, wl
+	in
+	let in_list, out_list, set_wl = wl_creation in
+	let old_in_list, old_out_list, old_set_wl = old_wl in
+	let error, new_set_wl =
+	  IntWL.WSet.union parameter error set_wl old_set_wl
+	in
+	let new_wl =
+	  List.concat [in_list; old_in_list],
+	  List.concat [out_list; old_out_list], new_set_wl
+	in
+	(*store*)
+	let error, store_result =
+	  AgentMap.set
+	    parameter
+	    error
+	    agent_type
+	    new_wl
+	    store_result
+	in
+	error, store_result
+  ) (error, store_result) creation
+
+(*test update function with only working list combine with wl in creation*)
+let collect_wl_creation_update parameter error store_wl_creation store_update =
+  let error, init = AgentMap.create parameter error 0 in
+  let (_, _, _, store_final_update) = store_update in
+  Int2Map_CV_Modif.fold_map
+    (fun (agent_type, site_type, cv_id) (l1, s2) (error, store_result) ->
+    (*get wl in creation*)
+      let error, wl_creation =
+	match AgentMap.unsafe_get parameter error agent_type store_wl_creation with
+	  | error, None -> error, IntWL.empty
+	  | error, Some wl -> error, wl
+      in
+      (*push rule_id in update into wl creation*)
+      let error, wl_update_creation =
+	Site_map_and_set.fold_set (fun rule_id (error, wl) ->
+	  let error, wl =
+	    IntWL.push parameter error rule_id wl
+	  in
+	  (error, wl)
+	) s2 (error, wl_creation)
+      in
+      (*get old*)
+      let error, old_wl =
+	match AgentMap.unsafe_get parameter error agent_type store_result with
+	  | error, None -> error, IntWL.empty
+	  | error, Some wl -> error, wl
+      in
+      (*new*)
+      let in_list, out_list, set_wl = wl_update_creation in
+      let old_in_list, old_out_list, old_set_wl = old_wl in
+      let error, new_set_wl =
+	IntWL.WSet.union parameter error set_wl old_set_wl
+      in
+      let new_wl =
+	List.concat [in_list; old_in_list],
+	List.concat [out_list; old_out_list], new_set_wl
+      in
+      (*store*)
+      let error, store_result =
+	AgentMap.set
+	  parameter
+	  error
+	  agent_type
+	  new_wl
+	  store_result
+      in
+      error, store_result
+    ) store_final_update (error, init)

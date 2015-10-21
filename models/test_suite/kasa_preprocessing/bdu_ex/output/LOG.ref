@@ -168,6 +168,11 @@ update function:
 ------------------------------------------------------------
 * Fixpoint iteration:
 ------------------------------------------------------------
+WL creation:
+agent_type_0:
+-List of rule_id in working list of creation:
+0 
+WL update and creation:
 
 ------------------------------------------------------------
 * List of rules has creation action:

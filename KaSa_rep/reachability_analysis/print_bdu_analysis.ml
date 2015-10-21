@@ -488,6 +488,27 @@ let print_fixpoint parameter error result =
     "------------------------------------------------------------\n";
   print_fixpoint_aux parameter_agent error result
 
+(*test creation wl*)
+let print_wl_creation parameter error result =
+  AgentMap.print error
+    (fun error parameter wl ->
+      let _ =
+	fprintf stdout "-List of rule_id in working list of creation:\n";
+	IntWL.print_wl parameter wl
+      in
+      error
+    ) parameter result
+
+let print_wl_creation_update parameter error result =
+  AgentMap.print error
+    (fun error parameter wl ->
+      let _ =
+	fprintf stdout "-List of rule_id in working list of creation_update:\n";
+	IntWL.print_wl parameter wl
+      in
+      error
+    ) parameter result
+    
 (************************************************************************************)
 (*MAIN PRINT*)
 
@@ -526,6 +547,15 @@ let print_result parameter error result =
   let _ =
     print_fixpoint parameter error result.store_fixpoint
   in
+  (*test*)
+  let _ =
+    let parameter_agent = Remanent_parameters.update_prefix parameter "agent_type_" in
+    fprintf stdout "WL creation:\n";
+    print_wl_creation parameter_agent error result.store_wl_creation;
+    fprintf stdout "WL update and creation:\n";
+    print_wl_creation_update parameter_agent error result.store_wl_creation_update
+  in
+      
   (*TEST*)
   let _ =
     print_creation_rule parameter error result.store_creation_rule

@@ -121,5 +121,7 @@ type bdu_analysic =
         (int list * Site_map_and_set.set) Int2Map_CV_Modif.map *
         (int list * Site_map_and_set.set) Int2Map_CV_Modif.map *
         (int list * Site_map_and_set.set) Int2Map_CV_Modif.map;
-      store_fixpoint : (wl_int * Cckappa_sig.rule array) AgentMap.t
+      store_fixpoint : (wl_int * Cckappa_sig.rule array) AgentMap.t;
+      store_wl_creation : wl_int AgentMap.t;
+      store_wl_creation_update : wl_int AgentMap.t
     }
