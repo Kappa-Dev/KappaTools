@@ -70,14 +70,14 @@ let collect_modification_sites parameter error rule_id diff_direct store_result 
         else
           let agent_type = agent_modif.agent_name in
           (*return*)
-          let store_result =
+          let error, store_result =
             Site_map_and_set.fold_map
-              (fun site_type _ store_result ->
+              (fun site_type _ (error, store_result) ->
                 let error, store_result =
                   add_link (agent_type, site_type) rule_id store_result
                 in
-                store_result
-              ) agent_modif.agent_interface store_result
+                error, store_result
+              ) agent_modif.agent_interface (error, store_result)
           in
           error, store_result
       ) diff_direct store_result
@@ -110,17 +110,17 @@ let site_covering_classes parameter error covering_classes (*store_result*) =
         (*get a list of covering_class_id from remanent*)
         let cv_dic = remanent.store_dic in
         (*fold a dictionary*)
-        let store_result =
+        let error, store_result =
           Dictionary_of_Covering_class.fold
-            (fun value_list ((),()) cv_id store_result ->
+            (fun value_list ((),()) cv_id (error, store_result) ->
               (*get site_cv in value*)
-              List.fold_left (fun store_result site_type_cv ->
+              List.fold_left (fun (error, store_result) site_type_cv ->
                 let error, result =
                   add_link (agent_type_cv, site_type_cv) cv_id store_result
                 in 
-                result
-              ) store_result value_list
-            ) cv_dic store_result
+                error, result
+              ) (error, store_result) value_list
+            ) cv_dic (error, store_result)
         in
         error, store_result
       (*REMARK: when it is folding inside a list, start with empty result,
