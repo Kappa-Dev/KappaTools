@@ -102,8 +102,8 @@ type remove_action =
 
 type bdu_analysic =
     {
-      store_creation_rule       : (int list * wl_int * Cckappa_sig.rule array) AgentMap.t;
-      store_creation            : site_bdu AgentMap.t;
+      (*store_creation_rule       : (int list * wl_int * Cckappa_sig.rule array) AgentMap.t;
+      store_creation            : site_bdu AgentMap.t;*)
       (*static information*)
       store_covering_classes_id : (int list * int list) Int2Map_CV.map;
       store_side_effects        : half_break_action * remove_action;
@@ -121,7 +121,8 @@ type bdu_analysic =
         (int list * Site_map_and_set.set) Int2Map_CV_Modif.map *
         (int list * Site_map_and_set.set) Int2Map_CV_Modif.map *
         (int list * Site_map_and_set.set) Int2Map_CV_Modif.map;
-      store_fixpoint : (wl_int * Cckappa_sig.rule array) AgentMap.t;
-      store_wl_creation : wl_int AgentMap.t;
+      (*adding rule_id inside working list*)
+      store_wl_update          : wl_int AgentMap.t;
+      store_wl_creation        : wl_int AgentMap.t;
       store_wl_creation_update : wl_int AgentMap.t
     }

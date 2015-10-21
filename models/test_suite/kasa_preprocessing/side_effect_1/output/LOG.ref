@@ -367,7 +367,7 @@ agent_type:1@site_type:0:covering_class_id:0:rule_id:2
 agent_type:2@site_type:0:covering_class_id:0:rule_id:3
 
 ------------------------------------------------------------
-Update function binding aux:
+Update function after discovered binding sites, adding the side effects rules:
 ------------------------------------------------------------
 half_break side effect:
 agent_type:1@site_type:0:covering_class_id:0:rule_id:0
@@ -390,23 +390,24 @@ agent_type:1@site_type:0:covering_class_id:0:rule_id:3
 ------------------------------------------------------------
 * Fixpoint iteration:
 ------------------------------------------------------------
+- Working list update:
 agent_type_0:
-- List of rule_id in working list:
+- List of rule_id in working list of update function:
 1 
 agent_type_1:
-- List of rule_id in working list:
+- List of rule_id in working list of update function:
 1 2 0 1 3 
 agent_type_2:
-- List of rule_id in working list:
+- List of rule_id in working list of update function:
 3 
-WL creation:
+- Working list creation:
 agent_type_1:
 -List of rule_id in working list of creation:
 2 
 agent_type_2:
 -List of rule_id in working list of creation:
 3 
-WL update and creation:
+- Working list update and creation:
 agent_type_0:
 -List of rule_id in working list of creation_update:
 1 
@@ -416,60 +417,4 @@ agent_type_1:
 agent_type_2:
 -List of rule_id in working list of creation_update:
 3 
-
-------------------------------------------------------------
-* List of rules has creation action:
-------------------------------------------------------------
-agent_type/rule_id_1:
-- List of rule_id:
-rule_id: 2 
-- List of rule_id store inside a working list:
-2 
-- List of bdu_creation build from rule_id inside the working list:
-agent_type/rule_id_1:1:
--------------------------------------
-agent_type/rule_id_1:1: if(mvbdu_id:3) x0 < 0 then 
-agent_type/rule_id_1:1:  false
-agent_type/rule_id_1:1: else 
-agent_type/rule_id_1:1:  if(mvbdu_id:2) x0 < 1 then 
-agent_type/rule_id_1:1:   true
-agent_type/rule_id_1:1:  else 
-agent_type/rule_id_1:1:   false
-agent_type/rule_id_2:
-- List of rule_id:
-rule_id: 3 
-- List of rule_id store inside a working list:
-3 
-- List of bdu_creation build from rule_id inside the working list:
-agent_type/rule_id_2:2:
--------------------------------------
-agent_type/rule_id_2:2: if(mvbdu_id:3) x0 < 0 then 
-agent_type/rule_id_2:2:  false
-agent_type/rule_id_2:2: else 
-agent_type/rule_id_2:2:  if(mvbdu_id:2) x0 < 1 then 
-agent_type/rule_id_2:2:   true
-agent_type/rule_id_2:2:  else 
-agent_type/rule_id_2:2:   false
-
-------------------------------------------------------------
-* BDU creation in general (this function used for testing) will be removed:
-------------------------------------------------------------
-agent_type_1:
--------------------------------------
-agent_type_1: if(mvbdu_id:3) x0 < 0 then 
-agent_type_1:  false
-agent_type_1: else 
-agent_type_1:  if(mvbdu_id:2) x0 < 1 then 
-agent_type_1:   true
-agent_type_1:  else 
-agent_type_1:   false
-agent_type_2:
--------------------------------------
-agent_type_2: if(mvbdu_id:3) x0 < 0 then 
-agent_type_2:  false
-agent_type_2: else 
-agent_type_2:  if(mvbdu_id:2) x0 < 1 then 
-agent_type_2:   true
-agent_type_2:  else 
-agent_type_2:   false
 execution finished without any exception

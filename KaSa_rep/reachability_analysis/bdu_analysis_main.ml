@@ -36,7 +36,7 @@ let trace = false
 let scan_rule parameter error handler rule_id rule covering_classes compiled store_result =
   (*------------------------------------------------------------------------------*)
   (*list of rules has a creation action *)
-  let error, store_creation_rule =
+  (*let error, store_creation_rule =
     collect_rule_creation
       parameter
       error
@@ -46,18 +46,18 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       rule.rule_rhs.views
       rule.actions.creation
       store_result.store_creation_rule
-  in
+  in*)
   (*------------------------------------------------------------------------------*)
   (*bdu structure of creation rules-this function uses for testing the
     result of the list of creation rules in the working list.*)
-  let error, store_creation =
+  (*let error, store_creation =
     collect_creation
       parameter
       error
       rule.rule_rhs.views
       rule.actions.creation
       store_result.store_creation
-  in
+  in*)
   (*------------------------------------------------------------------------------*)
   (*static information of covering classes: from sites -> covering_class id list*)
   let error, store_covering_classes_id =
@@ -117,17 +117,14 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       store_contact_map
   in
   (*------------------------------------------------------------------------------*)
-  (*fixpoint iteration*)
-  let error, store_fixpoint_iteration =
+  (*adding rule_id inside a working list*)
+  let error, store_wl_update =
     collect_wl_update
       parameter
       error
-      handler
-      rule
       store_update
-      (*store_result.store_fixpoint*)
   in
-  (*test*)
+  (*rule_id of creation inside working list*)
   let error, store_wl_creation =
     collect_wl_creation
       parameter
@@ -137,6 +134,7 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       rule.actions.creation
       store_result.store_wl_creation
   in
+  (*rule_id of both update function and creation inside working list*)
   let error, store_wl_creation_update =
     collect_wl_creation_update
       parameter
@@ -148,8 +146,8 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
   (*store*)
   error,
   {
-    store_creation                             = store_creation;
-    store_creation_rule                        = store_creation_rule;
+    (*store_creation                             = store_creation;
+    store_creation_rule                        = store_creation_rule;*)
     (*static information*)
     store_covering_classes_id                  = store_covering_classes_id;
     store_side_effects                         = store_side_effects;
@@ -159,17 +157,18 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
     store_covering_classes_modification_update =
       store_covering_classes_modification_update;
     store_update                               = store_update;
-    store_fixpoint                             = store_fixpoint_iteration;
-    store_wl_creation = store_wl_creation;
-    store_wl_creation_update = store_wl_creation_update
+    (*working list*)
+    store_wl_update                            = store_wl_update;
+    store_wl_creation                          = store_wl_creation;
+    store_wl_creation_update                   = store_wl_creation_update
   }
  
 (************************************************************************************)
 (*RULES*)
 
 let scan_rule_set parameter error handler covering_classes compiled rules =
-  let error, init_creation         = AgentMap.create parameter error 0 in
-  let error, init_creation_rule    = AgentMap.create parameter error 0 in
+  (*let error, init_creation         = AgentMap.create parameter error 0 in
+  let error, init_creation_rule    = AgentMap.create parameter error 0 in*)
   (*static information*)
   let init_covering_classes_id     = Int2Map_CV.empty_map in
   let init_half_break              = Int2Map_HalfBreak_effect.empty_map  in
@@ -183,13 +182,13 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
   let init_store_remove            = Int2Map_CV_Modif.empty_map in
   let init_store_hb_remove         = Int2Map_CV_Modif.empty_map in
   let init_store_update_aux        = Int2Map_CV_Modif.empty_map in
-  let error, init_fixpoint         = AgentMap.create parameter error 0 in
-  let error, init_wl_creation = AgentMap.create parameter error 0 in
+  let error, init_wl_update        = AgentMap.create parameter error 0 in
+  let error, init_wl_creation      = AgentMap.create parameter error 0 in
   let error, init_wl_creation_update = AgentMap.create parameter error 0 in
   let init_bdu =
     {
-      store_creation            = init_creation;
-      store_creation_rule       = init_creation_rule;
+      (*store_creation            = init_creation;
+      store_creation_rule       = init_creation_rule;*)
       (*static information*)
       store_covering_classes_id = init_covering_classes_id;
       store_side_effects        = (init_half_break, init_remove);
@@ -202,8 +201,8 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
          init_store_remove,
          init_store_hb_remove,
          init_store_update_aux);
-      store_fixpoint            = init_fixpoint;
-      store_wl_creation = init_wl_creation;
+      store_wl_update          = init_wl_update;
+      store_wl_creation        = init_wl_creation;
       store_wl_creation_update = init_wl_creation_update
     }
   in

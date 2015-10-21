@@ -91,7 +91,10 @@ let build_bdu_test_list_direct parameter error rule_lhs_views rule_diff_direct
 (************************************************************************************)    
 (*added a list of rule_id in [creation action ++ update function] into working list.*)
 
-let collect_wl_update parameter error handler rule store_update (*store_result*) =
+(*this function used for testing rule_id inside update function when store inside 
+  working list*)
+    
+let collect_wl_update parameter error store_update =
   let error, init = AgentMap.create parameter error 0 in
   let (_, _, _, store_final_update) = store_update in
   Int2Map_CV_Modif.fold_map 
@@ -107,26 +110,11 @@ let collect_wl_update parameter error handler rule store_update (*store_result*)
           error, wl      
         ) s2 (error, wl)
       in
-    (*-------------------------------------------------------------------------*)
-    (*from wl contain rule_id, create an array, then from rule_id get rule_type*)
-      let nrules = Handler.nrules parameter error handler in
-      let error, empty_rule = Preprocess.empty_rule parameter error in
-      let rule_array = Array.make nrules empty_rule in
-      let rule_array =
-	IntWL.fold_left (fun rule_array rule_id' ->
-	  let rule_array =
-	    rule_array.(rule_id') <- rule;
-	    rule_array
-	  in
-	  rule_array
-	) rule_array wl
-      in
-      (*-------------------------------------------------------------------------*)
-      (*FIXME: REMOVE? get old*)
-      let error, (old_wl, old_array) =
+      (*old*)
+      let error, old_wl =
 	match AgentMap.unsafe_get parameter error agent_type store_result with
-	  | error, None -> error, (IntWL.empty, [||])
-	  | error, Some (wl, array) -> error, (wl, array)
+	  | error, None -> error, IntWL.empty
+	  | error, Some wl -> error, wl
       in
       (*new wl*)
       let in_list, out_list, set = wl in
@@ -134,25 +122,21 @@ let collect_wl_update parameter error handler rule store_update (*store_result*)
       let error, new_set =
 	IntWL.WSet.union parameter error set old_set
       in
-      (*-------------------------------------------------------------------------*)
-      (*FIXME: REMOVE? get new*)
       let new_wl =
-	List.concat [in_list; old_in_list], List.concat [out_list; old_out_list], new_set
+	List.concat [in_list; old_in_list],
+	List.concat [out_list; old_out_list], new_set
       in
-      (*FIXME: REMOVE? new array*)
-      let new_array = Array.append rule_array old_array in
-      (*-------------------------------------------------------------------------*)
       (*store*)
       let error, store_result =
 	AgentMap.set
 	  parameter
 	  error
 	  agent_type
-	  (new_wl, new_array) (*FIXME: array or new_array?*)
+	  new_wl
 	  store_result
       in
       error, store_result
-    ) store_final_update (error, init (*store_result*))
+    ) store_final_update (error, init)
 
 (*test creation rule working list only.*)
 let collect_wl_creation parameter error rule_id viewsrhs creation

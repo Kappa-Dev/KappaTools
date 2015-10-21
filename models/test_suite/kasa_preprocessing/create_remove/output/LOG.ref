@@ -104,7 +104,7 @@ Update function before adding the side effects rules:
 ------------------------------------------------------------
 
 ------------------------------------------------------------
-Update function binding aux:
+Update function after discovered binding sites, adding the side effects rules:
 ------------------------------------------------------------
 half_break side effect:
 remove side effect:
@@ -114,36 +114,13 @@ update function:
 ------------------------------------------------------------
 * Fixpoint iteration:
 ------------------------------------------------------------
-WL creation:
+- Working list update:
+- Working list creation:
 agent_type_1:
 -List of rule_id in working list of creation:
 0 
 agent_type_2:
 -List of rule_id in working list of creation:
 1 
-WL update and creation:
-
-------------------------------------------------------------
-* List of rules has creation action:
-------------------------------------------------------------
-agent_type/rule_id_1:
-- List of rule_id:
-rule_id: 0 
-- List of rule_id store inside a working list:
-0 
-- List of bdu_creation build from rule_id inside the working list:
-agent_type/rule_id_1:1:
-agent_type/rule_id_2:
-- List of rule_id:
-rule_id: 1 
-- List of rule_id store inside a working list:
-1 
-- List of bdu_creation build from rule_id inside the working list:
-agent_type/rule_id_2:2:
-
-------------------------------------------------------------
-* BDU creation in general (this function used for testing) will be removed:
-------------------------------------------------------------
-agent_type_1:
-agent_type_2:
+- Working list update and creation:
 execution finished without any exception

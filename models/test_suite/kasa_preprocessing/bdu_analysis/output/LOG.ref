@@ -502,7 +502,7 @@ agent_type:2@site_type:0:covering_class_id:0:rule_id:2
 agent_type:2@site_type:0:covering_class_id:0:rule_id:7
 
 ------------------------------------------------------------
-Update function binding aux:
+Update function after discovered binding sites, adding the side effects rules:
 ------------------------------------------------------------
 half_break side effect:
 remove side effect:
@@ -533,16 +533,17 @@ agent_type:2@site_type:0:covering_class_id:0:rule_id:4
 ------------------------------------------------------------
 * Fixpoint iteration:
 ------------------------------------------------------------
+- Working list update:
 agent_type_0:
-- List of rule_id in working list:
+- List of rule_id in working list of update function:
 0 1 2 5 6 0 2 7 
 agent_type_1:
-- List of rule_id in working list:
+- List of rule_id in working list of update function:
 1 6 3 
 agent_type_2:
-- List of rule_id in working list:
+- List of rule_id in working list of update function:
 2 7 3 4 
-WL creation:
+- Working list creation:
 agent_type_0:
 -List of rule_id in working list of creation:
 0 1 2 
@@ -552,7 +553,7 @@ agent_type_1:
 agent_type_2:
 -List of rule_id in working list of creation:
 2 
-WL update and creation:
+- Working list update and creation:
 agent_type_0:
 -List of rule_id in working list of creation_update:
 0 1 2 5 6 0 1 2 7 
@@ -562,210 +563,4 @@ agent_type_1:
 agent_type_2:
 -List of rule_id in working list of creation_update:
 2 7 2 3 4 
-
-------------------------------------------------------------
-* List of rules has creation action:
-------------------------------------------------------------
-agent_type/rule_id_0:
-- List of rule_id:
-rule_id: 1 
-rule_id: 0 
-rule_id: 2 
-- List of rule_id store inside a working list:
-0 1 2 
-- List of bdu_creation build from rule_id inside the working list:
-agent_type/rule_id_0:0:
--------------------------------------
-agent_type/rule_id_0:0: if(mvbdu_id:3) x2 < 1 then 
-agent_type/rule_id_0:0:  false
-agent_type/rule_id_0:0: else 
-agent_type/rule_id_0:0:  if(mvbdu_id:2) x2 < 2 then 
-agent_type/rule_id_0:0:   true
-agent_type/rule_id_0:0:  else 
-agent_type/rule_id_0:0:   false
-agent_type/rule_id_0:1:
--------------------------------------
-agent_type/rule_id_0:1: if(mvbdu_id:3) x0 < 1 then 
-agent_type/rule_id_0:1:  false
-agent_type/rule_id_0:1: else 
-agent_type/rule_id_0:1:  if(mvbdu_id:2) x0 < 2 then 
-agent_type/rule_id_0:1:   true
-agent_type/rule_id_0:1:  else 
-agent_type/rule_id_0:1:   false
-agent_type/rule_id_0:0:
--------------------------------------
-agent_type/rule_id_0:0: if(mvbdu_id:15) x0 < 0 then 
-agent_type/rule_id_0:0:  false
-agent_type/rule_id_0:0: else 
-agent_type/rule_id_0:0:  if(mvbdu_id:14) x0 < 1 then 
-agent_type/rule_id_0:0:   if(mvbdu_id:13) x1 < 0 then 
-agent_type/rule_id_0:0:    false
-agent_type/rule_id_0:0:   else 
-agent_type/rule_id_0:0:    if(mvbdu_id:12) x1 < 1 then 
-agent_type/rule_id_0:0:     if(mvbdu_id:11) x2 < 0 then 
-agent_type/rule_id_0:0:      false
-agent_type/rule_id_0:0:     else 
-agent_type/rule_id_0:0:      if(mvbdu_id:10) x2 < 1 then 
-agent_type/rule_id_0:0:       if(mvbdu_id:9) x3 < 0 then 
-agent_type/rule_id_0:0:        false
-agent_type/rule_id_0:0:       else 
-agent_type/rule_id_0:0:        if(mvbdu_id:8) x3 < 1 then 
-agent_type/rule_id_0:0:         true
-agent_type/rule_id_0:0:        else 
-agent_type/rule_id_0:0:         false
-agent_type/rule_id_0:0:      else 
-agent_type/rule_id_0:0:       false
-agent_type/rule_id_0:0:    else 
-agent_type/rule_id_0:0:     false
-agent_type/rule_id_0:0:  else 
-agent_type/rule_id_0:0:   false
-agent_type/rule_id_0:0:
--------------------------------------
-agent_type/rule_id_0:0: if(mvbdu_id:7) x2 < 0 then 
-agent_type/rule_id_0:0:  false
-agent_type/rule_id_0:0: else 
-agent_type/rule_id_0:0:  if(mvbdu_id:6) x2 < 1 then 
-agent_type/rule_id_0:0:   if(mvbdu_id:5) x3 < 1 then 
-agent_type/rule_id_0:0:    false
-agent_type/rule_id_0:0:   else 
-agent_type/rule_id_0:0:    if(mvbdu_id:4) x3 < 2 then 
-agent_type/rule_id_0:0:     true
-agent_type/rule_id_0:0:    else 
-agent_type/rule_id_0:0:     false
-agent_type/rule_id_0:0:  else 
-agent_type/rule_id_0:0:   false
-agent_type/rule_id_0:2:
--------------------------------------
-agent_type/rule_id_0:2: if(mvbdu_id:3) x0 < 1 then 
-agent_type/rule_id_0:2:  false
-agent_type/rule_id_0:2: else 
-agent_type/rule_id_0:2:  if(mvbdu_id:2) x0 < 2 then 
-agent_type/rule_id_0:2:   true
-agent_type/rule_id_0:2:  else 
-agent_type/rule_id_0:2:   false
-agent_type/rule_id_1:
-- List of rule_id:
-rule_id: 1 
-- List of rule_id store inside a working list:
-1 
-- List of bdu_creation build from rule_id inside the working list:
-agent_type/rule_id_1:0:
--------------------------------------
-agent_type/rule_id_1:0: if(mvbdu_id:3) x2 < 1 then 
-agent_type/rule_id_1:0:  false
-agent_type/rule_id_1:0: else 
-agent_type/rule_id_1:0:  if(mvbdu_id:2) x2 < 2 then 
-agent_type/rule_id_1:0:   true
-agent_type/rule_id_1:0:  else 
-agent_type/rule_id_1:0:   false
-agent_type/rule_id_1:1:
--------------------------------------
-agent_type/rule_id_1:1: if(mvbdu_id:3) x0 < 1 then 
-agent_type/rule_id_1:1:  false
-agent_type/rule_id_1:1: else 
-agent_type/rule_id_1:1:  if(mvbdu_id:2) x0 < 2 then 
-agent_type/rule_id_1:1:   true
-agent_type/rule_id_1:1:  else 
-agent_type/rule_id_1:1:   false
-agent_type/rule_id_2:
-- List of rule_id:
-rule_id: 2 
-- List of rule_id store inside a working list:
-2 
-- List of bdu_creation build from rule_id inside the working list:
-agent_type/rule_id_2:0:
--------------------------------------
-agent_type/rule_id_2:0: if(mvbdu_id:7) x2 < 0 then 
-agent_type/rule_id_2:0:  false
-agent_type/rule_id_2:0: else 
-agent_type/rule_id_2:0:  if(mvbdu_id:6) x2 < 1 then 
-agent_type/rule_id_2:0:   if(mvbdu_id:5) x3 < 1 then 
-agent_type/rule_id_2:0:    false
-agent_type/rule_id_2:0:   else 
-agent_type/rule_id_2:0:    if(mvbdu_id:4) x3 < 2 then 
-agent_type/rule_id_2:0:     true
-agent_type/rule_id_2:0:    else 
-agent_type/rule_id_2:0:     false
-agent_type/rule_id_2:0:  else 
-agent_type/rule_id_2:0:   false
-agent_type/rule_id_2:2:
--------------------------------------
-agent_type/rule_id_2:2: if(mvbdu_id:3) x0 < 1 then 
-agent_type/rule_id_2:2:  false
-agent_type/rule_id_2:2: else 
-agent_type/rule_id_2:2:  if(mvbdu_id:2) x0 < 2 then 
-agent_type/rule_id_2:2:   true
-agent_type/rule_id_2:2:  else 
-agent_type/rule_id_2:2:   false
-
-------------------------------------------------------------
-* BDU creation in general (this function used for testing) will be removed:
-------------------------------------------------------------
-agent_type_0:
--------------------------------------
-agent_type_0: if(mvbdu_id:3) x2 < 1 then 
-agent_type_0:  false
-agent_type_0: else 
-agent_type_0:  if(mvbdu_id:2) x2 < 2 then 
-agent_type_0:   true
-agent_type_0:  else 
-agent_type_0:   false
--------------------------------------
-agent_type_0: if(mvbdu_id:15) x0 < 0 then 
-agent_type_0:  false
-agent_type_0: else 
-agent_type_0:  if(mvbdu_id:14) x0 < 1 then 
-agent_type_0:   if(mvbdu_id:13) x1 < 0 then 
-agent_type_0:    false
-agent_type_0:   else 
-agent_type_0:    if(mvbdu_id:12) x1 < 1 then 
-agent_type_0:     if(mvbdu_id:11) x2 < 0 then 
-agent_type_0:      false
-agent_type_0:     else 
-agent_type_0:      if(mvbdu_id:10) x2 < 1 then 
-agent_type_0:       if(mvbdu_id:9) x3 < 0 then 
-agent_type_0:        false
-agent_type_0:       else 
-agent_type_0:        if(mvbdu_id:8) x3 < 1 then 
-agent_type_0:         true
-agent_type_0:        else 
-agent_type_0:         false
-agent_type_0:      else 
-agent_type_0:       false
-agent_type_0:    else 
-agent_type_0:     false
-agent_type_0:  else 
-agent_type_0:   false
--------------------------------------
-agent_type_0: if(mvbdu_id:7) x2 < 0 then 
-agent_type_0:  false
-agent_type_0: else 
-agent_type_0:  if(mvbdu_id:6) x2 < 1 then 
-agent_type_0:   if(mvbdu_id:5) x3 < 1 then 
-agent_type_0:    false
-agent_type_0:   else 
-agent_type_0:    if(mvbdu_id:4) x3 < 2 then 
-agent_type_0:     true
-agent_type_0:    else 
-agent_type_0:     false
-agent_type_0:  else 
-agent_type_0:   false
-agent_type_1:
--------------------------------------
-agent_type_1: if(mvbdu_id:3) x0 < 1 then 
-agent_type_1:  false
-agent_type_1: else 
-agent_type_1:  if(mvbdu_id:2) x0 < 2 then 
-agent_type_1:   true
-agent_type_1:  else 
-agent_type_1:   false
-agent_type_2:
--------------------------------------
-agent_type_2: if(mvbdu_id:3) x0 < 1 then 
-agent_type_2:  false
-agent_type_2: else 
-agent_type_2:  if(mvbdu_id:2) x0 < 2 then 
-agent_type_2:   true
-agent_type_2:  else 
-agent_type_2:   false
 execution finished without any exception

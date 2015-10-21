@@ -525,7 +525,7 @@ agent_type:2@site_type:3:covering_class_id:0:rule_id:2
 agent_type:2@site_type:3:covering_class_id:0:rule_id:3
 
 ------------------------------------------------------------
-Update function binding aux:
+Update function after discovered binding sites, adding the side effects rules:
 ------------------------------------------------------------
 half_break side effect:
 remove side effect:
@@ -551,17 +551,18 @@ agent_type:2@site_type:3:covering_class_id:0:rule_id:3
 ------------------------------------------------------------
 * Fixpoint iteration:
 ------------------------------------------------------------
+- Working list update:
 agent_type_0:
-- List of rule_id in working list:
+- List of rule_id in working list of update function:
 0 1 0 1 
 agent_type_1:
-- List of rule_id in working list:
+- List of rule_id in working list of update function:
 0 1 2 3 0 1 2 3 
 agent_type_2:
-- List of rule_id in working list:
+- List of rule_id in working list of update function:
 2 3 2 3 
-WL creation:
-WL update and creation:
+- Working list creation:
+- Working list update and creation:
 agent_type_0:
 -List of rule_id in working list of creation_update:
 0 1 0 1 
@@ -571,12 +572,4 @@ agent_type_1:
 agent_type_2:
 -List of rule_id in working list of creation_update:
 2 3 2 3 
-
-------------------------------------------------------------
-* List of rules has creation action:
-------------------------------------------------------------
-
-------------------------------------------------------------
-* BDU creation in general (this function used for testing) will be removed:
-------------------------------------------------------------
 execution finished without any exception
