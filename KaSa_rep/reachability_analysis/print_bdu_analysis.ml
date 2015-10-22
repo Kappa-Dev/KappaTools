@@ -537,6 +537,24 @@ let print_wl_creation_update parameter error result =
   print_wl_update parameter_agent error result;*)
 
 (************************************************************************************)
+(*fixpoint iteration*)
+
+let print_fixpoint parameter error result =
+  AgentMap.print error
+    (fun error parameter bdu_array ->
+      let _ =
+	Array.iter (fun bdu ->
+	  let _ =
+	    fprintf stdout "-------------------------------------\n";
+	    Boolean_mvbdu.print_boolean_mvbdu error parameter bdu
+	  in
+	  ()
+	) bdu_array
+      in
+      error
+    ) parameter result
+
+(************************************************************************************)
 (*MAIN PRINT*)
 
 let print_result parameter error result =
@@ -602,6 +620,12 @@ let print_result parameter error result =
     fprintf (Remanent_parameters.get_log parameter)
       "- Working list update and creation:\n";
     print_wl_creation_update parameter_agent error result.store_wl_creation_update
+  in
+  let _ =
+    let parameter_agent = Remanent_parameters.update_prefix parameter "agent_type_" in
+    fprintf (Remanent_parameters.get_log parameter)
+      "- Bdu of fixpoint iteration:\n";
+    print_fixpoint parameter_agent error result.store_fixpoint_iteration
   in
   (*TEST*)
   (*let _ =

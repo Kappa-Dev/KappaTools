@@ -408,4 +408,6 @@ agent_type_2:
 agent_type_1:
 -List of rule_id in working list of creation_update:
 2 0 1 3 2 
+- Bdu of fixpoint iteration:
+agent_type_1:
 execution finished without any exception
