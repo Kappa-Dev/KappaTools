@@ -45,7 +45,8 @@ let compute_contact_map parameter error handler rule =
       with Not_found -> error, ([],[])
     in
     let error, add_map =
-      Int2Map_CM_state.add_map parameter error (a, b, s) (l, ((c, d, s') :: [])) store_result
+      Int2Map_CM_state.add_map parameter error (a, b, s) (l, ((c, d, s') :: []))
+	store_result
     in
     error, add_map
   in  

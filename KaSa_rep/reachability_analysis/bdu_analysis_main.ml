@@ -80,6 +80,24 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
   in 
   (*------------------------------------------------------------------------------*)
   (*modification sites*)
+  let error, store_creation_sites =
+    collect_creation_sites
+      parameter
+      error
+      rule_id
+      rule.rule_rhs.views
+      rule.actions.creation
+      store_result.store_creation_sites
+  in
+  let error, store_modification_sites_without_creation =
+    collect_modification_sites_without_creation
+      parameter
+      error
+      rule_id
+      rule.diff_direct
+      store_creation_sites
+      store_result.store_modification_sites_without_creation
+  in
   let error, store_modification_sites =
     collect_modification_sites
       parameter
@@ -151,6 +169,8 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
     (*static information*)
     store_covering_classes_id                  = store_covering_classes_id;
     store_side_effects                         = store_side_effects;
+    store_creation_sites                       = store_creation_sites;
+    store_modification_sites_without_creation  = store_modification_sites_without_creation;
     store_modification_sites                   = store_modification_sites;
     (*dynamic information*)
     store_contact_map                          = store_contact_map;
@@ -173,6 +193,8 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
   let init_covering_classes_id     = Int2Map_CV.empty_map in
   let init_half_break              = Int2Map_HalfBreak_effect.empty_map  in
   let init_remove                  = Int2Map_Remove_effect.empty_map  in
+  let init_creation                = Int2Map_Modif.empty_map in
+  let init_modif_without_creation  = Int2Map_Modif.empty_map in
   let init_modification            = Int2Map_Modif.empty_map in
   (*dynamic information*)
   let init_contact_map             = Int2Map_CM_state.empty_map in
@@ -192,6 +214,8 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
       (*static information*)
       store_covering_classes_id = init_covering_classes_id;
       store_side_effects        = (init_half_break, init_remove);
+      store_creation_sites      = init_creation;
+      store_modification_sites_without_creation = init_modif_without_creation;
       store_modification_sites  = init_modification;
       (*dynamic information*)
       store_contact_map         = init_contact_map;

@@ -493,6 +493,12 @@ agent_type:2@site_type:2:rule_id:2
 agent_type:2@site_type:2:rule_id:3
 agent_type:2@site_type:3:rule_id:2
 agent_type:2@site_type:3:rule_id:3
+------------------------------------------------------------
+Creation sites:
+------------------------------------------------------------
+------------------------------------------------------------
+Modification sites without creation:
+------------------------------------------------------------
 
 ** Dynamic information:
 

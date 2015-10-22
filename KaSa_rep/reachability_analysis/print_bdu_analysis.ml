@@ -408,6 +408,32 @@ let print_modification_sites parameter error result =
   in
   error
 
+(*test*)
+
+let print_creation_sites parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "Creation sites:\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  let error =
+    print_modification_sites_aux parameter error result
+  in
+  error
+
+let print_modification_sites_without_creation parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "Modification sites without creation:\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  let error =
+    print_modification_sites_aux parameter error result
+  in
+  error
+
 let print_contact_map parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
     "\n------------------------------------------------------------\n";
@@ -531,6 +557,15 @@ let print_result parameter error result =
   let _ =
       print_modification_sites parameter error result.store_modification_sites
   in
+  (*test*)
+  let _ =
+      print_creation_sites parameter error result.store_creation_sites
+  in
+  let _ =
+    print_modification_sites_without_creation parameter error
+      result.store_modification_sites_without_creation
+  in
+  
   let _ =
     fprintf (Remanent_parameters.get_log parameter) "\n** Dynamic information:\n";
   in

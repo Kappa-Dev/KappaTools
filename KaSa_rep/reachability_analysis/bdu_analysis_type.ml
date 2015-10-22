@@ -107,6 +107,9 @@ type bdu_analysic =
       (*static information*)
       store_covering_classes_id : (int list * int list) Int2Map_CV.map;
       store_side_effects        : half_break_action * remove_action;
+      store_creation_sites      : (int list * Site_map_and_set.set) Int2Map_Modif.map;
+      store_modification_sites_without_creation : (int list * Site_map_and_set.set)
+	Int2Map_Modif.map;
       store_modification_sites  : 
       (int list * Site_map_and_set.set) Int2Map_Modif.map; 
         

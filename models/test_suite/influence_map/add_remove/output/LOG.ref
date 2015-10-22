@@ -209,6 +209,17 @@ agent_type:0@site_type:0:rule_id:0
 agent_type:0@site_type:0:rule_id:1
 agent_type:1@site_type:0:rule_id:2
 agent_type:1@site_type:0:rule_id:3
+------------------------------------------------------------
+Creation sites:
+------------------------------------------------------------
+agent_type:0@site_type:0:rule_id:0
+------------------------------------------------------------
+Modification sites without creation:
+------------------------------------------------------------
+agent_type:0@site_type:0:rule_id:0
+agent_type:0@site_type:0:rule_id:1
+agent_type:1@site_type:0:rule_id:2
+agent_type:1@site_type:0:rule_id:3
 
 ** Dynamic information:
 
