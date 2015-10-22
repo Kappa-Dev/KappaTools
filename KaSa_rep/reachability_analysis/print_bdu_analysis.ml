@@ -353,6 +353,7 @@ let print_update_set_aux parameter error result =
         ) s2
     ) result
 
+(*REMOVE*)
 let print_binding_update_aux parameter error result =
   let result_hb,
     result_remove,
@@ -360,11 +361,11 @@ let print_binding_update_aux parameter error result =
     result_update_aux
     = result
   in
-  fprintf stdout "half_break side effect:\n";
+  fprintf stdout "half_break side effect (will be removed):\n";
   print_update_set_aux parameter error result_hb;
-  fprintf stdout "remove side effect:\n";
+  fprintf stdout "remove side effect (will be removed):\n";
   print_update_set_aux parameter error result_remove;
-  fprintf stdout "half break and remove side effect:\n";
+  fprintf stdout "half break and remove side effect (will be removed):\n";
   print_update_set_aux parameter error result_hb_remove;
   fprintf stdout "update function:\n";
   print_update_set_aux parameter error result_update_aux
@@ -396,11 +397,12 @@ let print_side_effects parameter error result =
   in
   error
 
+(*REMOVE*)
 let print_modification_sites parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
-    "Modification sites:\n";
+    "Modification sites (will be removed):\n";
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   let error =
@@ -408,13 +410,12 @@ let print_modification_sites parameter error result =
   in
   error
 
-(*test*)
-
+(*REMOVE*)
 let print_creation_sites parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
-    "Creation sites:\n";
+    "Creation sites (will be removed):\n";
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   let error =
@@ -554,10 +555,11 @@ let print_result parameter error result =
   let _ =
     print_side_effects parameter error result.store_side_effects
   in
+  (*will be removed*)
   let _ =
       print_modification_sites parameter error result.store_modification_sites
   in
-  (*test*)
+  (*will be removed*)
   let _ =
       print_creation_sites parameter error result.store_creation_sites
   in
@@ -565,7 +567,6 @@ let print_result parameter error result =
     print_modification_sites_without_creation parameter error
       result.store_modification_sites_without_creation
   in
-  
   let _ =
     fprintf (Remanent_parameters.get_log parameter) "\n** Dynamic information:\n";
   in
@@ -591,10 +592,12 @@ let print_result parameter error result =
   let _ =
     let parameter_agent = Remanent_parameters.update_prefix parameter "agent_type_" in
     fprintf (Remanent_parameters.get_log parameter)
-      "- Working list update:\n";
+      "- Working list update (will be removed):\n";
+    (*REMOVE*)
     let _ = print_wl_update parameter_agent error result.store_wl_update in
     fprintf (Remanent_parameters.get_log parameter)
-      "- Working list creation:\n";
+      "- Working list creation (will be removed):\n";
+    (*REMOVE*)
     let _ = print_wl_creation parameter_agent error result.store_wl_creation in
     fprintf (Remanent_parameters.get_log parameter)
       "- Working list update and creation:\n";

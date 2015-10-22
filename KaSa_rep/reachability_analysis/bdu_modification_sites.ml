@@ -39,6 +39,7 @@ let trace = false
    - C(x): [r4]
 *)
 
+(*REMOVE*)
 let collect_modification_sites parameter error rule_id diff_direct store_result =
   (*from a pair of Map (agent_type, site) -> rule_id :: old_result)*)
   let add_link (agent_type, site_type) rule_id store_result =
@@ -56,10 +57,6 @@ let collect_modification_sites parameter error rule_id diff_direct store_result 
       Int2Map_Modif.add_map parameter error
         (agent_type, site_type) (l, new_set) store_result
     in    
-    (*let error, result =
-      Int2Map_Modif.add_map parameter error
-        (agent_type, site_type) (l, rule_id :: old) store_result
-    in*)
     error, result
   in
   let error, store_result =
@@ -87,8 +84,8 @@ let collect_modification_sites parameter error rule_id diff_direct store_result 
   in
   error, store_result
 
-(*TEST: if it is a creation rule and it belongs to modification rule,
-  then do not add those rules inside this list*)
+(************************************************************************************)
+(*creation rule_id*)
 
 let collect_creation_sites parameter error rule_id viewsrhs creation store_result =
   (*map (agent, site) -> rule_id list*)
@@ -132,7 +129,8 @@ let collect_creation_sites parameter error rule_id viewsrhs creation store_resul
     Int2Map_Modif.map_map (fun (l, x) -> List.rev l, x) store_result
   in
   error, store_result
-
+    
+(************************************************************************************)
 (*the modification sites if it discover there is a creation rule then
   do not add this rule into the result*)
 
@@ -167,7 +165,7 @@ let collect_modification_sites_without_creation parameter error
 	    Site_map_and_set.fold_map
 	      (fun site_type _ (error, store_result) ->
 		let error, store_result =
-		  (*check whether or not creation_sites is empty*)
+		  (*TEST ME: check whether or not creation_sites is empty*)
 		  if Int2Map_Modif.is_empty_map store_creation_sites
 		  then error, store_result
 		  else

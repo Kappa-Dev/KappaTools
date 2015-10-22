@@ -208,67 +208,6 @@ let collect_wl_creation_update parameter error store_wl_creation store_wl_update
 	store_result
     ) store_wl_update init
   
-(*let collect_wl_creation_update parameter error store_wl_creation store_update =
-  let error, init = AgentMap.create parameter error 0 in
-  let (_, _, _, store_final_update) = store_update in
-  Int2Map_CV_Modif.fold_map
-    (fun (agent_type, site_type, cv_id) (l1, s2) (error, store_result) ->
-    (*get wl in creation*)
-      let error, wl_creation =
-	match AgentMap.unsafe_get parameter error agent_type store_wl_creation with
-	  | error, None -> error, IntWL.empty
-	  | error, Some wl -> error, wl
-      in
-      (*------------------------------------------------------------------------------*)
-      (*creation new wl*)
-      let wl = IntWL.empty in
-      let error, wl_update =
-	Site_map_and_set.fold_set (fun rule_id (error, wl) ->
-	  let error, wl =
-	    IntWL.push parameter error rule_id wl
-	  in
-	  (error, wl)
-	) s2 (error, wl)
-      in
-      (*get old of wl in update function*)
-      let error, old_wl =
-	match AgentMap.unsafe_get parameter error agent_type store_result with
-	  | error, None -> error, IntWL.empty
-	  | error, Some wl -> error, wl
-      in
-      (*new wl of update function*)
-      let in_list, out_list, set_wl = wl_update in
-      let old_in_list, old_out_list, old_set_wl = old_wl in
-      let error, new_set_wl =
-	IntWL.WSet.union parameter error set_wl old_set_wl
-      in
-      let new_wl_update =
-	List.concat [in_list; old_in_list],
-	List.concat [out_list; old_out_list], new_set_wl
-      in
-      (*------------------------------------------------------------------------------*)
-      (*add wl creation and wl of update function together*)
-      let in_list_update, out_list_update, set_update = new_wl_update in
-      let in_list_creation, out_list_creation, set_creation = wl_creation in
-      let error, new_set = IntWL.WSet.union parameter error set_creation set_update in
-      (*let new_wl_creation_update =
-	List.concat [in_list_creation; in_list_update],
-	List.concat [out_list_creation; out_list_update],
-	new_set
-      in*)
-      (*------------------------------------------------------------------------------*)
-      (*store*)
-      let error, store_result =
-	AgentMap.set
-	  parameter
-	  error
-	  agent_type
-	  new_wl_update(*test*)
-	  store_result
-      in
-      error, store_result
-    ) store_final_update (error, init)*)
-
 (************************************************************************************)    
 (*from a list of rule_id inside the final working list, return a 'rule' type for its 
   and store them inside an array *)

@@ -40,7 +40,7 @@ let rev_array xs =
 
 (************************************************************************************)    
 (*compute bdu for initial state or creation action*)
-
+(*REMOVE*)
 let int_of_port port = port.site_state.min
 
 let collect_creation parameter error viewsrhs creation store_result =
@@ -122,7 +122,7 @@ let collect_creation parameter error viewsrhs creation store_result =
 
 (************************************************************************************)
 (*return a list of creation rule; add rules with empty lhs into a working list.*)
-
+(*REMOVE*)
 let collect_rule_creation parameter error handler rule rule_id viewsrhs creation
     store_result =
   (*let error, store = AgentMap.create parameter error 0 in*)

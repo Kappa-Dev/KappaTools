@@ -159,8 +159,7 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       error
       store_wl_creation
       store_wl_update
-      (*store_update*)
-  in
+   in
   (*------------------------------------------------------------------------------*)
   (*store*)
   error,

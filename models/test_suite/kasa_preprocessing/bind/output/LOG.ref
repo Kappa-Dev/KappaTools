@@ -309,7 +309,7 @@ agent_type:2@site_type:0:covering_class_id:0
 Side effects action:
 ------------------------------------------------------------
 ------------------------------------------------------------
-Modification sites:
+Modification sites (will be removed):
 ------------------------------------------------------------
 agent_type:0@site_type:0:rule_id:0
 agent_type:0@site_type:0:rule_id:1
@@ -319,7 +319,7 @@ agent_type:1@site_type:1:rule_id:0
 agent_type:1@site_type:1:rule_id:1
 agent_type:2@site_type:0:rule_id:2
 ------------------------------------------------------------
-Creation sites:
+Creation sites (will be removed):
 ------------------------------------------------------------
 ------------------------------------------------------------
 Modification sites without creation:
@@ -341,15 +341,15 @@ Update function before adding the side effects rules:
 ------------------------------------------------------------
 Update function after discovered binding sites, adding the side effects rules:
 ------------------------------------------------------------
-half_break side effect:
-remove side effect:
-half break and remove side effect:
+half_break side effect (will be removed):
+remove side effect (will be removed):
+half break and remove side effect (will be removed):
 update function:
 
 ------------------------------------------------------------
 * Fixpoint iteration:
 ------------------------------------------------------------
-- Working list update:
-- Working list creation:
+- Working list update (will be removed):
+- Working list creation (will be removed):
 - Working list update and creation:
 execution finished without any exception
