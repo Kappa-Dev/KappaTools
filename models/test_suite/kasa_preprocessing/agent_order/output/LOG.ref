@@ -197,6 +197,7 @@ agent_type:1@site_type:0:rule_id:1
 ------------------------------------------------------------
 Modification sites without creation:
 ------------------------------------------------------------
+agent_type:0@site_type:0:rule_id:1
 
 ** Dynamic information:
 
@@ -209,10 +210,7 @@ agent_type:1@site_type:0:state:1--agent_type':0@site_type':0:state':1
 ------------------------------------------------------------
 Update function before adding the side effects rules:
 ------------------------------------------------------------
-agent_type:0@site_type:0:covering_class_id:0:rule_id:0
 agent_type:0@site_type:0:covering_class_id:0:rule_id:1
-agent_type:1@site_type:0:covering_class_id:0:rule_id:0
-agent_type:1@site_type:0:covering_class_id:0:rule_id:1
 
 ------------------------------------------------------------
 Update function after discovered binding sites, adding the side effects rules:
@@ -221,10 +219,7 @@ half_break side effect:
 remove side effect:
 half break and remove side effect:
 update function:
-agent_type:0@site_type:0:covering_class_id:0:rule_id:0
 agent_type:0@site_type:0:covering_class_id:0:rule_id:1
-agent_type:1@site_type:0:covering_class_id:0:rule_id:0
-agent_type:1@site_type:0:covering_class_id:0:rule_id:1
 
 ------------------------------------------------------------
 * Fixpoint iteration:
@@ -232,10 +227,7 @@ agent_type:1@site_type:0:covering_class_id:0:rule_id:1
 - Working list update:
 agent_type_0:
 - List of rule_id in working list of update function:
-0 1 
-agent_type_1:
-- List of rule_id in working list of update function:
-0 1 
+1 
 - Working list creation:
 agent_type_0:
 -List of rule_id in working list of creation:
@@ -246,8 +238,5 @@ agent_type_1:
 - Working list update and creation:
 agent_type_0:
 -List of rule_id in working list of creation_update:
-1 0 
-agent_type_1:
--List of rule_id in working list of creation_update:
-1 0 
+1 1 
 execution finished without any exception

@@ -139,8 +139,6 @@ Contact map with state (there is no lhs binding):
 ------------------------------------------------------------
 Update function before adding the side effects rules:
 ------------------------------------------------------------
-agent_type:0@site_type:0:covering_class_id:0:rule_id:0
-agent_type:0@site_type:1:covering_class_id:0:rule_id:0
 
 ------------------------------------------------------------
 Update function after discovered binding sites, adding the side effects rules:

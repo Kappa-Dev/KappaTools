@@ -508,17 +508,10 @@ agent_type:2@site_type:0:state:1--agent_type':0@site_type':3:state':1
 ------------------------------------------------------------
 Update function before adding the side effects rules:
 ------------------------------------------------------------
-agent_type:0@site_type:2:covering_class_id:0:rule_id:0
-agent_type:0@site_type:2:covering_class_id:0:rule_id:1
-agent_type:0@site_type:2:covering_class_id:0:rule_id:2
 agent_type:0@site_type:2:covering_class_id:0:rule_id:5
 agent_type:0@site_type:2:covering_class_id:0:rule_id:6
-agent_type:0@site_type:3:covering_class_id:0:rule_id:0
-agent_type:0@site_type:3:covering_class_id:0:rule_id:2
 agent_type:0@site_type:3:covering_class_id:0:rule_id:7
-agent_type:1@site_type:0:covering_class_id:0:rule_id:1
 agent_type:1@site_type:0:covering_class_id:0:rule_id:6
-agent_type:2@site_type:0:covering_class_id:0:rule_id:2
 agent_type:2@site_type:0:covering_class_id:0:rule_id:7
 
 ------------------------------------------------------------
@@ -534,17 +527,10 @@ agent_type:1@site_type:0:covering_class_id:0:rule_id:3
 agent_type:2@site_type:0:covering_class_id:0:rule_id:3
 agent_type:2@site_type:0:covering_class_id:0:rule_id:4
 update function:
-agent_type:0@site_type:2:covering_class_id:0:rule_id:0
-agent_type:0@site_type:2:covering_class_id:0:rule_id:1
-agent_type:0@site_type:2:covering_class_id:0:rule_id:2
 agent_type:0@site_type:2:covering_class_id:0:rule_id:5
 agent_type:0@site_type:2:covering_class_id:0:rule_id:6
-agent_type:0@site_type:3:covering_class_id:0:rule_id:0
-agent_type:0@site_type:3:covering_class_id:0:rule_id:2
 agent_type:0@site_type:3:covering_class_id:0:rule_id:7
-agent_type:1@site_type:0:covering_class_id:0:rule_id:1
 agent_type:1@site_type:0:covering_class_id:0:rule_id:6
-agent_type:2@site_type:0:covering_class_id:0:rule_id:2
 agent_type:2@site_type:0:covering_class_id:0:rule_id:7
 agent_type:1@site_type:0:covering_class_id:0:rule_id:3
 agent_type:2@site_type:0:covering_class_id:0:rule_id:3
@@ -556,13 +542,13 @@ agent_type:2@site_type:0:covering_class_id:0:rule_id:4
 - Working list update:
 agent_type_0:
 - List of rule_id in working list of update function:
-0 1 2 5 6 0 2 7 
+5 6 7 
 agent_type_1:
 - List of rule_id in working list of update function:
-1 6 3 
+6 3 
 agent_type_2:
 - List of rule_id in working list of update function:
-2 7 3 4 
+7 3 4 
 - Working list creation:
 agent_type_0:
 -List of rule_id in working list of creation:
@@ -576,11 +562,11 @@ agent_type_2:
 - Working list update and creation:
 agent_type_0:
 -List of rule_id in working list of creation_update:
-0 1 2 5 6 0 1 2 7 
+5 6 7 0 1 2 
 agent_type_1:
 -List of rule_id in working list of creation_update:
-1 6 1 3 
+6 3 1 
 agent_type_2:
 -List of rule_id in working list of creation_update:
-2 7 2 3 4 
+7 3 4 2 
 execution finished without any exception

@@ -166,11 +166,16 @@ let collect_modification_sites_without_creation parameter error
 	  let error, store_result =
 	    Site_map_and_set.fold_map
 	      (fun site_type _ (error, store_result) ->
-		let error, creation_map =
+		let error, store_result =
+		  (*check whether or not creation_sites is empty*)
+		  if Int2Map_Modif.is_empty_map store_creation_sites
+		  then error, store_result
+		  else
+		  (*if agent_type, site_type of creation and rule_id is inside
+		    the result then remove them*)
 		  Int2Map_Modif.fold_map (fun (agent_type', site_type') (l1, s2)
-		    (error, store_result1) ->
-		      (*if *)
-		      if Int2Map_Modif.mem_map (agent_type, site_type) store_result1
+		    (error, store_result) ->
+		      if Int2Map_Modif.mem_map (agent_type', site_type') store_result
 			&& Site_map_and_set.mem_set rule_id s2
 		      then
 			let error, store_result =
@@ -185,7 +190,7 @@ let collect_modification_sites_without_creation parameter error
 			error, store_result
 		  ) store_creation_sites (error, store_result)
 		in
-		error, creation_map
+		error, store_result
 	      ) agent_modif.agent_interface (error, store_result)
 	  in
 	  error, store_result

@@ -42,7 +42,7 @@ let trace = false
 (*map (agent_type_cv, covering_class_id) -> rule_id list of modified sites*)
 
 let store_covering_classes_modification_update_aux parameter error agent_type_cv
-    site_type_cv covering_class_id store_modification_sites store_result =
+    site_type_cv covering_class_id store_modification_sites_without_creation store_result =
   let add_link (agent_type_cv, site_type_cv, cv_id) rule_id store_result =
     (*searching in the result whether or not those signatures are already inside*)
     let error, (l, old) =
@@ -94,12 +94,13 @@ let store_covering_classes_modification_update_aux parameter error agent_type_cv
           else
             error, store_current_result
         ) s2 store_result
-      ) store_modification_sites store_result
+      ) store_modification_sites_without_creation store_result
   in error, result
     
 (************************************************************************************)
 
-let store_covering_classes_modification_update parameter error store_modification_sites
+let store_covering_classes_modification_update parameter error
+    store_modification_sites_without_creation
     store_covering_classes_id =
   let error, store_result =
     Int2Map_CV.fold_map
@@ -112,7 +113,7 @@ let store_covering_classes_modification_update parameter error store_modificatio
               agent_type_cv
               site_type_cv
               cv_id
-              store_modification_sites
+              store_modification_sites_without_creation
               store_current_result
           in
           error, result

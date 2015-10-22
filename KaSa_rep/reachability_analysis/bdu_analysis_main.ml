@@ -121,7 +121,7 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
     store_covering_classes_modification_update
       parameter
       error
-      store_modification_sites
+      store_modification_sites_without_creation
       store_covering_classes_id
   in
   (*------------------------------------------------------------------------------*)
@@ -158,7 +158,8 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       parameter
       error
       store_wl_creation
-      store_update
+      store_wl_update
+      (*store_update*)
   in
   (*------------------------------------------------------------------------------*)
   (*store*)

@@ -370,10 +370,7 @@ agent_type:1@site_type:0:state:1--agent_type':0@site_type':0:state':1
 ------------------------------------------------------------
 Update function before adding the side effects rules:
 ------------------------------------------------------------
-agent_type:0@site_type:0:covering_class_id:1:rule_id:1
-agent_type:1@site_type:0:covering_class_id:0:rule_id:1
 agent_type:1@site_type:0:covering_class_id:0:rule_id:2
-agent_type:2@site_type:0:covering_class_id:0:rule_id:3
 
 ------------------------------------------------------------
 Update function after discovered binding sites, adding the side effects rules:
@@ -388,10 +385,7 @@ agent_type:1@site_type:0:covering_class_id:0:rule_id:0
 agent_type:1@site_type:0:covering_class_id:0:rule_id:1
 agent_type:1@site_type:0:covering_class_id:0:rule_id:3
 update function:
-agent_type:0@site_type:0:covering_class_id:1:rule_id:1
-agent_type:1@site_type:0:covering_class_id:0:rule_id:1
 agent_type:1@site_type:0:covering_class_id:0:rule_id:2
-agent_type:2@site_type:0:covering_class_id:0:rule_id:3
 agent_type:1@site_type:0:covering_class_id:0:rule_id:0
 agent_type:1@site_type:0:covering_class_id:0:rule_id:1
 agent_type:1@site_type:0:covering_class_id:0:rule_id:3
@@ -400,15 +394,9 @@ agent_type:1@site_type:0:covering_class_id:0:rule_id:3
 * Fixpoint iteration:
 ------------------------------------------------------------
 - Working list update:
-agent_type_0:
-- List of rule_id in working list of update function:
-1 
 agent_type_1:
 - List of rule_id in working list of update function:
-1 2 0 1 3 
-agent_type_2:
-- List of rule_id in working list of update function:
-3 
+2 0 1 3 
 - Working list creation:
 agent_type_1:
 -List of rule_id in working list of creation:
@@ -417,13 +405,7 @@ agent_type_2:
 -List of rule_id in working list of creation:
 3 
 - Working list update and creation:
-agent_type_0:
--List of rule_id in working list of creation_update:
-1 
 agent_type_1:
 -List of rule_id in working list of creation_update:
-2 1 2 0 1 2 3 
-agent_type_2:
--List of rule_id in working list of creation_update:
-3 
+2 0 1 3 2 
 execution finished without any exception
