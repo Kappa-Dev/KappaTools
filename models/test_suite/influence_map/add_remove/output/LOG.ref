@@ -252,6 +252,4 @@ agent_type_0:
 -List of rule_id in working list of creation:
 0 
 - Working list update and creation:
-- Bdu of creation iteration:
-- Bdu of fixpoint iteration:
 execution finished without any exception

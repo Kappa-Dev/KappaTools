@@ -257,9 +257,14 @@ let collect_rule_in_wl parameter error handler rule store_wl_creation_update
 	  (wl, rev_array new_array) (*TEST*)
 	  store_result
       in
-      error, store_result
+       error, store_result
     ) store_wl_creation_update store_result
 
+(************************************************************************************)    
+(*TODO: fold inside creation action, and used wl 
+  in update function to generate bdu_creation array *)
+    
+    
 (************************************************************************************)
 (*fixpoint iteration function*)
 (*from an array of rule, build bdu:{of creation rule; test; list of modification}.
@@ -459,6 +464,25 @@ let collect_bdu_iterate_array parameter error handler_sig store_rule_in_wl store
   let error, (handler, bdu_init) = bdu_init parameter error in
   AgentMap.fold parameter error
     (fun parameter error agent_type (wl, rule_array) store_result_array ->
+      (*test*)
+      (* let _ =
+	Printf.fprintf stdout "Creation BDU:\n";
+	let error, store = AgentMap.create parameter error 0 in
+	Array.iteri (fun index rule ->
+	  let _ =
+	    let error, store =
+	      Bdu_creation.collect_creation
+		parameter
+		error
+		rule.rule_rhs.views
+		rule.actions.creation
+		store
+	    in
+	    Print_bdu_analysis.print_bdu_array_creation_aux parameter error store
+	  in
+	  ()
+	) rule_array
+      in*)
       (*auxiliary function *)
       let error, bdu_array =
 	let rec aux acc_wl (error, bdu_remanent_array) =

@@ -22,7 +22,7 @@ open Remanent_parameters_sig
 (************************************************************************************)
 (*PRINT*)
 
-(*let print_bdu_array_creation_aux parameter error result =
+let print_bdu_array_creation_aux parameter error result =
   AgentMap.print error 
     (fun error parameter (l, (handler, bdu_array)) ->
       let _ =
@@ -35,7 +35,7 @@ open Remanent_parameters_sig
         ) bdu_array        
       in
       error
-    ) parameter result*)
+    ) parameter result
 
 let print_rule_list parameter l =
   let rec aux acc =
@@ -634,7 +634,7 @@ let print_result parameter error result =
       "- Working list update and creation:\n";
     print_wl_creation_update parameter_agent error result.store_wl_creation_update
   in
-  let _ =
+  (*let _ =
     let parameter_agent = Remanent_parameters.update_prefix parameter "agent_type_" in
     
     fprintf (Remanent_parameters.get_log parameter)
@@ -644,5 +644,5 @@ let print_result parameter error result =
     fprintf (Remanent_parameters.get_log parameter)
       "- Bdu of fixpoint iteration:\n";
     print_fixpoint parameter_agent error result.store_fixpoint_iteration
-  in
+  in*)
   error
