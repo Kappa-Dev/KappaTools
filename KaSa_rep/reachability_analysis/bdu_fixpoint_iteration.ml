@@ -401,7 +401,59 @@ let compute_update parameter error rule_id handler bdu_test modif_list bdu_creat
     bdu_remanent_array
   in
   error, bdu_remanent_array
-      
+
+(*from this working list get the bdu_array of bdu_creation*)
+let collect_bdu_creation_array parameter error handler_sig store_rule_in_wl store_result =
+  let error, (handler, bdu_init) = bdu_init parameter error in
+  AgentMap.fold parameter error
+    (fun parameter error agent_type (wl, rule_array) store_result ->
+      let nrules = Handler.nrules parameter error handler_sig in
+      let bdu_array = Array.make nrules bdu_init in
+      let error, bdu_array =
+	let rec aux acc_wl (error, store_result) =
+	  if IntWL.is_empty acc_wl
+	  then error, store_result
+	  else
+	  (*pop the first element*)
+	    let error, (rule_id_op, wl_tl) =
+	      IntWL.pop parameter error acc_wl
+	    in
+	    match rule_id_op with
+	      | None -> error, store_result
+	      | Some rule_id ->
+		let rule = Array.get rule_array rule_id in
+		let error, store_bdu_creation =
+		  build_bdu_test_modif_list parameter error rule
+		in
+		let error, ((handler, bdu_creation), modif_list) =
+		  match AgentMap.unsafe_get parameter error agent_type
+		    store_bdu_creation with
+		      | error, None -> error, ((handler, bdu_init), [])
+		      | error, Some ((handler, bdu), l) -> error, ((handler, bdu), l)
+		in
+		(*create empty bdu_creation array*)
+		let bdu_array =
+		  bdu_array.(rule_id) <- bdu_creation;
+		  bdu_array;
+		in
+		(*let _ = Printf.fprintf stdout "rule_id:%i:agent_type:%i:nrules:%i\n"
+		  rule_id agent_type nrules
+		in *)
+		let error, wl_tl_array = aux wl_tl (error, store_result) in
+		error, (Array.append bdu_array wl_tl_array)
+	in aux wl (error, bdu_array) (*empty*)
+      in
+      let error, store_result =
+	AgentMap.set
+	  parameter
+	  error
+	  agent_type
+	  bdu_array
+	  store_result
+      in
+      error, store_result
+    ) store_rule_in_wl store_result
+
 (*test first*)
 let collect_bdu_iterate_array parameter error handler_sig store_rule_in_wl store_result =
   let error, (handler, bdu_init) = bdu_init parameter error in
@@ -410,11 +462,11 @@ let collect_bdu_iterate_array parameter error handler_sig store_rule_in_wl store
       (*auxiliary function *)
       let error, bdu_array =
 	let rec aux acc_wl (error, bdu_remanent_array) =
-	(*if wl is empty then return the result*)
+	  (*if wl is empty then return the result*)
 	  if IntWL.is_empty acc_wl
 	  then error, bdu_remanent_array
 	  else
-	  (*pop the first element inside this work list*)
+	    (*pop the first element inside this work list*)
 	    let error, (rule_id_op, wl_tl) =
 	      IntWL.pop parameter error acc_wl
 	    in
@@ -423,16 +475,17 @@ let collect_bdu_iterate_array parameter error handler_sig store_rule_in_wl store
 	      | Some rule_id ->
 	      (*get 'rule' type inside rule_array by rule_id index*)
 		let rule = Array.get rule_array rule_id in
-              (*build bdu_creation*)
+		(*build bdu_creation*)
 		let error, store_bdu_creation =
 		  build_bdu_creation parameter error rule
 		in
 		let error, (handler, bdu_creation) =
-		  match AgentMap.unsafe_get parameter error agent_type store_bdu_creation with
+		  match AgentMap.unsafe_get parameter error agent_type
+		    store_bdu_creation with
 		    | error, None -> error, (handler, bdu_init)
 		    | error, Some (handler, bdu) -> error, (handler, bdu)
 		in
-	      (*build bdu_test and modif list*)
+		(*build bdu_test and modif list*)
 		let error, store_bdu_test_modif_list =
 		  build_bdu_test_modif_list parameter error rule
 		in
@@ -443,7 +496,7 @@ let collect_bdu_iterate_array parameter error handler_sig store_rule_in_wl store
 		      | error, Some ((handler, bdu_test), l) ->
 			error, ((handler, bdu_test), l)
 		in
-	      (*build List_sig.list for modif_list*)
+		(*build List_sig.list for modif_list*)
 		let error, (handler, list_a) =
 		  List_algebra.build_list
 		    (list_allocate parameter)
@@ -452,8 +505,8 @@ let collect_bdu_iterate_array parameter error handler_sig store_rule_in_wl store
 		    handler
 		    modif_list
 		in
-	      (*iterate function*)
-	      (*check if it is not an enable rule*)
+		(*iterate function*)
+		(*check if it is not an enable rule*)
 		let error, is_enable =
 		  comp_is_enable
 		    parameter

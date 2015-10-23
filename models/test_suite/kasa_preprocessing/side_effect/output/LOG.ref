@@ -267,6 +267,10 @@ Creation sites (will be removed):
 ------------------------------------------------------------
 Modification sites without creation:
 ------------------------------------------------------------
+agent_type:0@site_type:0:rule_id:0
+agent_type:0@site_type:0:rule_id:1
+agent_type:1@site_type:0:rule_id:0
+agent_type:1@site_type:0:rule_id:2
 
 ** Dynamic information:
 
@@ -279,20 +283,131 @@ agent_type:1@site_type:0:state:1--agent_type':0@site_type':0:state':1
 ------------------------------------------------------------
 Update function before adding the side effects rules:
 ------------------------------------------------------------
+agent_type:0@site_type:0:covering_class_id:0:rule_id:0
+agent_type:0@site_type:0:covering_class_id:0:rule_id:1
+agent_type:1@site_type:0:covering_class_id:0:rule_id:0
+agent_type:1@site_type:0:covering_class_id:0:rule_id:2
 
 ------------------------------------------------------------
 Update function after discovered binding sites, adding the side effects rules:
 ------------------------------------------------------------
 half_break side effect (will be removed):
+agent_type:1@site_type:0:covering_class_id:0:rule_id:1
 remove side effect (will be removed):
+agent_type:1@site_type:0:covering_class_id:0:rule_id:3
 half break and remove side effect (will be removed):
+agent_type:1@site_type:0:covering_class_id:0:rule_id:1
+agent_type:1@site_type:0:covering_class_id:0:rule_id:3
 update function:
+agent_type:0@site_type:0:covering_class_id:0:rule_id:0
+agent_type:0@site_type:0:covering_class_id:0:rule_id:1
+agent_type:1@site_type:0:covering_class_id:0:rule_id:0
+agent_type:1@site_type:0:covering_class_id:0:rule_id:2
+agent_type:1@site_type:0:covering_class_id:0:rule_id:1
+agent_type:1@site_type:0:covering_class_id:0:rule_id:3
 
 ------------------------------------------------------------
 * Fixpoint iteration:
 ------------------------------------------------------------
 - Working list update (will be removed):
+agent_type_0:
+- List of rule_id in working list of update function:
+0 1 
+agent_type_1:
+- List of rule_id in working list of update function:
+0 2 1 3 
 - Working list creation (will be removed):
 - Working list update and creation:
+agent_type_0:
+-List of rule_id in working list of creation_update:
+0 1 
+agent_type_1:
+-List of rule_id in working list of creation_update:
+0 2 1 3 
+- Bdu of creation iteration:
+agent_type_0:
+-------------------------------------
+agent_type_0: false
+-------------------------------------
+agent_type_0: false
+-------------------------------------
+agent_type_0: false
+-------------------------------------
+agent_type_0: false
+-------------------------------------
+agent_type_0: false
+-------------------------------------
+agent_type_0: false
+-------------------------------------
+agent_type_0: false
+-------------------------------------
+agent_type_0: false
+-------------------------------------
+agent_type_0: false
+-------------------------------------
+agent_type_0: false
+-------------------------------------
+agent_type_0: false
+-------------------------------------
+agent_type_0: false
+-------------------------------------
+agent_type_0: false
+-------------------------------------
+agent_type_0: false
+-------------------------------------
+agent_type_0: false
+agent_type_1:
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
 - Bdu of fixpoint iteration:
+agent_type_0:
+agent_type_1:
 execution finished without any exception

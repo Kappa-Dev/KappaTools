@@ -239,6 +239,26 @@ agent_type_1:
 agent_type_0:
 -List of rule_id in working list of creation_update:
 1 1 
+- Bdu of creation iteration:
+agent_type_0:
+-------------------------------------
+agent_type_0: false
+-------------------------------------
+agent_type_0: false
+-------------------------------------
+agent_type_0: false
+-------------------------------------
+agent_type_0: false
+agent_type_1:
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
+-------------------------------------
+agent_type_1: false
 - Bdu of fixpoint iteration:
 agent_type_0:
+agent_type_1:
 execution finished without any exception

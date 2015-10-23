@@ -172,6 +172,15 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       store_result.store_rule_in_wl
   in
   (*------------------------------------------------------------------------------*)
+  let error, store_bdu_creation_array =
+    collect_bdu_creation_array
+      parameter
+      error
+      handler
+      store_rule_in_wl
+      store_result.store_bdu_creation_array
+  in
+  (*------------------------------------------------------------------------------*)
   (*fixpoint iteration*)
   let error, store_fixpoint_iteration =
     collect_bdu_iterate_array
@@ -204,6 +213,7 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
     store_wl_creation_update                   = store_wl_creation_update;
     (*fixpoint iteration*)
     store_rule_in_wl                           = store_rule_in_wl;
+    store_bdu_creation_array                   = store_bdu_creation_array;
     store_fixpoint_iteration                   = store_fixpoint_iteration
   }
  
@@ -233,6 +243,7 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
   let error, init_wl_creation_update = AgentMap.create parameter error 0 in
   (*fixpoint iteration*)
   let error, init_rule             = AgentMap.create parameter error 0 in
+  let error, init_bdu_creation_array = AgentMap.create parameter error 0 in
   let error, init_fixpoint         = AgentMap.create parameter error 0 in
   let init_bdu =
     {
@@ -257,6 +268,7 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
       store_wl_creation_update = init_wl_creation_update;
       (*fixpoint*)
       store_rule_in_wl         = init_rule;
+      store_bdu_creation_array = init_bdu_creation_array;
       store_fixpoint_iteration = init_fixpoint;
     }
   in

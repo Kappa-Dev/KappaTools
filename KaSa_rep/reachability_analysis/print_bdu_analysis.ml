@@ -138,8 +138,7 @@ let print_rule_array_test parameter error rule_array =
     in
     ()
   ) rule_array*)
-    
-    
+
 (************************************************************************************)
 (*side effects*)
 
@@ -456,7 +455,6 @@ let print_covering_classes_modification parameter error result =
     "------------------------------------------------------------\n";
   print_covering_classes_modification_aux parameter error result
 
-(*TEST*)
 let print_binding_update parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
     "\n------------------------------------------------------------\n";
@@ -539,6 +537,21 @@ let print_wl_creation_update parameter error result =
 (************************************************************************************)
 (*fixpoint iteration*)
 
+let print_bdu_creation_array parameter error result =
+  AgentMap.print error
+    (fun error parameter bdu_array ->
+      let _ =
+	Array.iter (fun bdu ->
+	  let _ =
+	    fprintf stdout "-------------------------------------\n";
+	    Boolean_mvbdu.print_boolean_mvbdu error parameter bdu
+	  in
+	  ()
+	) bdu_array
+      in
+      error
+    ) parameter result
+    
 let print_fixpoint parameter error result =
   AgentMap.print error
     (fun error parameter bdu_array ->
@@ -623,15 +636,13 @@ let print_result parameter error result =
   in
   let _ =
     let parameter_agent = Remanent_parameters.update_prefix parameter "agent_type_" in
+    
+    fprintf (Remanent_parameters.get_log parameter)
+      "- Bdu of creation iteration:\n";
+    print_bdu_creation_array parameter_agent error result.store_bdu_creation_array;
+    
     fprintf (Remanent_parameters.get_log parameter)
       "- Bdu of fixpoint iteration:\n";
     print_fixpoint parameter_agent error result.store_fixpoint_iteration
   in
-  (*TEST*)
-  (*let _ =
-    print_creation_rule parameter error result.store_creation_rule
-  in
-  let _ =
-    print_bdu_array_creation parameter error result.store_creation
-  in*)
   error

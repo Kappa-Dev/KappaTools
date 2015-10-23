@@ -167,7 +167,11 @@ let collect_modification_sites_without_creation parameter error
 		let error, store_result =
 		  (*TEST ME: check whether or not creation_sites is empty*)
 		  if Int2Map_Modif.is_empty_map store_creation_sites
-		  then error, store_result
+		  then (*error, store_result*)
+		    let error, store_result =
+		      add_link (agent_type, site_type) rule_id store_result
+		    in
+		    error, store_result
 		  else
 		  (*if agent_type, site_type of creation and rule_id is inside
 		    the result then remove them*)
