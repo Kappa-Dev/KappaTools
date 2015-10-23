@@ -130,6 +130,7 @@ type bdu_analysic =
       store_wl_creation_update : wl_int AgentMap.t;
       (*return a type 'rule' inside a working list*)
       store_rule_in_wl         : (wl_int * Cckappa_sig.rule array) AgentMap.t;
+      store_rule_creation_in_wl : Cckappa_sig.rule array AgentMap.t;
       store_bdu_creation_array : bool Mvbdu_sig.mvbdu array AgentMap.t;
       store_fixpoint_iteration : bool Mvbdu_sig.mvbdu array AgentMap.t;
     }

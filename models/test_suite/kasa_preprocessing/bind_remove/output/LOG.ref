@@ -223,4 +223,8 @@ agent_type_0:
 agent_type_1:
 -List of rule_id in working list of creation_update:
 0 
+creation
+2:
+- List of bdu_creation build from rule_id inside the working list:
+2:2:
 execution finished without any exception

@@ -588,4 +588,58 @@ agent_type_3:
 -List of rule_id in working list of creation:
 3 
 - Working list update and creation:
+creation
+1:
+- List of bdu_creation build from rule_id inside the working list:
+1:1:
+-------------------------------------
+1:1: if(mvbdu_id:3) x1 < 0 then 
+1:1:  false
+1:1: else 
+1:1:  if(mvbdu_id:2) x1 < 1 then 
+1:1:   true
+1:1:  else 
+1:1:   false
+-------------------------------------
+1:1: if(mvbdu_id:3) x0 < 0 then 
+1:1:  false
+1:1: else 
+1:1:  if(mvbdu_id:2) x0 < 1 then 
+1:1:   true
+1:1:  else 
+1:1:   false
+1:1:
+-------------------------------------
+1:1: if(mvbdu_id:3) x1 < 0 then 
+1:1:  false
+1:1: else 
+1:1:  if(mvbdu_id:2) x1 < 1 then 
+1:1:   true
+1:1:  else 
+1:1:   false
+-------------------------------------
+1:1: if(mvbdu_id:3) x0 < 0 then 
+1:1:  false
+1:1: else 
+1:1:  if(mvbdu_id:2) x0 < 1 then 
+1:1:   true
+1:1:  else 
+1:1:   false
+3:
+- List of bdu_creation build from rule_id inside the working list:
+3:3:
+-------------------------------------
+3:3: if(mvbdu_id:7) x0 < 0 then 
+3:3:  false
+3:3: else 
+3:3:  if(mvbdu_id:6) x0 < 1 then 
+3:3:   if(mvbdu_id:5) x1 < 0 then 
+3:3:    false
+3:3:   else 
+3:3:    if(mvbdu_id:4) x1 < 1 then 
+3:3:     true
+3:3:    else 
+3:3:     false
+3:3:  else 
+3:3:   false
 execution finished without any exception

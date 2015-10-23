@@ -399,4 +399,27 @@ agent_type_2:
 agent_type_0:
 -List of rule_id in working list of creation_update:
 1 
+creation
+1:
+- List of bdu_creation build from rule_id inside the working list:
+1:1:
+-------------------------------------
+1:1: if(mvbdu_id:3) x0 < 0 then 
+1:1:  false
+1:1: else 
+1:1:  if(mvbdu_id:2) x0 < 1 then 
+1:1:   true
+1:1:  else 
+1:1:   false
+2:
+- List of bdu_creation build from rule_id inside the working list:
+2:2:
+-------------------------------------
+2:2: if(mvbdu_id:3) x0 < 0 then 
+2:2:  false
+2:2: else 
+2:2:  if(mvbdu_id:2) x0 < 1 then 
+2:2:   true
+2:2:  else 
+2:2:   false
 execution finished without any exception

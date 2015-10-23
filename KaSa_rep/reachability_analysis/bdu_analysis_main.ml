@@ -171,6 +171,18 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       store_wl_creation_update	
       store_result.store_rule_in_wl
   in
+  (*test*)
+  let error, store_rule_creation_in_wl =
+    collect_rule_creation_in_wl
+      parameter
+      error
+      handler
+      rule
+	store_wl_creation
+	  rule.rule_rhs.views
+	  rule.actions.creation
+	  store_result.store_rule_creation_in_wl
+  in
   (*------------------------------------------------------------------------------*)
   let error, store_bdu_creation_array =
     collect_bdu_creation_array
@@ -213,6 +225,7 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
     store_wl_creation_update                   = store_wl_creation_update;
     (*fixpoint iteration*)
     store_rule_in_wl                           = store_rule_in_wl;
+    store_rule_creation_in_wl = store_rule_creation_in_wl;
     store_bdu_creation_array                   = store_bdu_creation_array;
     store_fixpoint_iteration                   = store_fixpoint_iteration
   }
@@ -245,6 +258,8 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
   let error, init_rule             = AgentMap.create parameter error 0 in
   let error, init_bdu_creation_array = AgentMap.create parameter error 0 in
   let error, init_fixpoint         = AgentMap.create parameter error 0 in
+  (*test*)
+  let error, init_rule_creation = AgentMap.create parameter error 0 in
   let init_bdu =
     {
       (*store_creation            = init_creation;
@@ -268,6 +283,7 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
       store_wl_creation_update = init_wl_creation_update;
       (*fixpoint*)
       store_rule_in_wl         = init_rule;
+      store_rule_creation_in_wl = init_rule_creation;
       store_bdu_creation_array = init_bdu_creation_array;
       store_fixpoint_iteration = init_fixpoint;
     }

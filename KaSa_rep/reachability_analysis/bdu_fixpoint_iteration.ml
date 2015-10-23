@@ -263,7 +263,47 @@ let collect_rule_in_wl parameter error handler rule store_wl_creation_update
 (************************************************************************************)    
 (*TODO: fold inside creation action, and used wl 
   in update function to generate bdu_creation array *)
-    
+
+let collect_rule_creation_in_wl parameter error handler rule store_wl_creation_update
+    viewsrhs creation store_result =
+  AgentMap.fold parameter error
+    (fun parameter error agent_type' wl_update _ ->
+      List.fold_left (fun (error, store_result) (agent_id, agent_type) ->
+	let error, agent = AgentMap.get parameter error agent_id viewsrhs in
+	match agent with
+	  | None -> warn parameter error (Some "line 94") Exit store_result
+	  | Some Ghost -> error, store_result
+	  | Some Agent agent ->
+	    let nrules = Handler.nrules parameter error handler in
+	    let error, empty_rule = Preprocess.empty_rule parameter error in
+	    let rule_array = Array.make nrules empty_rule in
+	    let rule_array =
+	      IntWL.fold_left (fun rule_array rule_id ->
+		let rule_array =
+		  rule_array.(rule_id) <- rule;
+		  rule_array
+		in
+		rule_array
+	      ) rule_array wl_update
+	    in
+	    (*get old*)
+	    let error, old_array =
+	      match AgentMap.unsafe_get parameter error agent_type store_result with
+		| error, None -> error, [||]
+		| error, Some a -> error, a
+	    in
+	    let new_array = Array.append rule_array old_array in
+	    let error, store_result =
+	      AgentMap.set
+		parameter
+		error
+		agent_type
+		new_array
+		store_result
+	    in
+	    error, store_result
+      ) (error, store_result) creation
+    ) store_wl_creation_update store_result
     
 (************************************************************************************)
 (*fixpoint iteration function*)

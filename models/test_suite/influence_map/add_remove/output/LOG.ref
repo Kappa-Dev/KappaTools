@@ -252,4 +252,16 @@ agent_type_0:
 -List of rule_id in working list of creation:
 0 
 - Working list update and creation:
+creation
+0:
+- List of bdu_creation build from rule_id inside the working list:
+0:0:
+-------------------------------------
+0:0: if(mvbdu_id:3) x0 < 1 then 
+0:0:  false
+0:0: else 
+0:0:  if(mvbdu_id:2) x0 < 2 then 
+0:0:   true
+0:0:  else 
+0:0:   false
 execution finished without any exception

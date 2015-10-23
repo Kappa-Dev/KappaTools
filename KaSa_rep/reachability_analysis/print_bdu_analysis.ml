@@ -46,7 +46,7 @@ let print_rule_list parameter l =
       aux tl;
   in aux l
 
-(*let print_rule_array parameter error rule_array =
+let print_rule_array parameter error rule_array =
   let error, store = AgentMap.create parameter error 0 in
   Array.iteri (fun index rule ->
     let _ =
@@ -61,23 +61,18 @@ let print_rule_list parameter l =
       print_bdu_array_creation_aux parameter error store
     in 
     ()
-  ) rule_array*)
+  ) rule_array
 
-(*let print_creation_rule_aux parameter error result =
+let print_creation_rule_aux parameter error result =
   AgentMap.print error
-    (fun error parameter (l, wl, rule_array) ->
+    (fun error parameter rule_array ->
       let _ =
-        fprintf (Remanent_parameters.get_log parameter) "- List of rule_id:\n";
-        let _ = print_rule_list parameter l in
-        fprintf (Remanent_parameters.get_log parameter)
-          "- List of rule_id store inside a working list:\n";
-        IntWL.print_wl parameter wl;
         fprintf (Remanent_parameters.get_log parameter)
           "- List of bdu_creation build from rule_id inside the working list:\n";
         print_rule_array parameter error rule_array
       in
       error
-    ) parameter result*)
+    ) parameter result
 
 (************************************************************************************)
 (*static information of covering classes id*)
@@ -633,6 +628,10 @@ let print_result parameter error result =
     fprintf (Remanent_parameters.get_log parameter)
       "- Working list update and creation:\n";
     print_wl_creation_update parameter_agent error result.store_wl_creation_update
+  in
+  let _ =
+    fprintf stdout "creation\n";
+    print_creation_rule_aux parameter error result.store_rule_creation_in_wl
   in
   (*let _ =
     let parameter_agent = Remanent_parameters.update_prefix parameter "agent_type_" in
