@@ -382,10 +382,13 @@ let store_binding_update parameter error
     in
     match empty_contact_map with
       | true ->
+	(*TODO*)
+	(*let _ = Printf.fprintf stdout "empty contact map\n" in*)
 	((error, Int2Map_CV_Modif.empty_map),
 	 (error, Int2Map_CV_Modif.empty_map),
 	 Int2Map_CV_Modif.empty_map,
-	 store_covering_classes_modification_update)
+	 Int2Map_CV_Modif.empty_map
+	 (*store_covering_classes_modification_update*))
       | false ->
 	(*check if side effect is empty*)
 	match empty_half_break, empty_remove with
