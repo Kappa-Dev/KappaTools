@@ -594,5 +594,635 @@ agent_type_1:
 agent_type_2:
 -List of rule_id in working list of creation_update:
 2 3 2 3 
-creation
+
+------------------------------------------------------------
+Triple array: [|bdu_creation, bdu_test, modification list|]:
+------------------------------------------------------------
+agent_type_0:
+-------------------------------------
+array_index:0 rule_id:0
+agent_type_0: false
+-------------------------------------
+array_index:1 rule_id:0
+agent_type_0: if(mvbdu_id:7) x0 < 1 then 
+agent_type_0:  false
+agent_type_0: else 
+agent_type_0:  if(mvbdu_id:6) x0 < 2 then 
+agent_type_0:   if(mvbdu_id:5) x1 < 1 then 
+agent_type_0:    false
+agent_type_0:   else 
+agent_type_0:    if(mvbdu_id:4) x1 < 2 then 
+agent_type_0:     true
+agent_type_0:    else 
+agent_type_0:     false
+agent_type_0:  else 
+agent_type_0:   false
+-------------------------------------
+array_index:2 rule_id:0
+agent_type_0: false
+-------------------------------------
+array_index:3 rule_id:0
+agent_type_0: false
+-------------------------------------
+array_index:4 rule_id:0
+agent_type_0: if(mvbdu_id:7) x0 < 0 then 
+agent_type_0:  false
+agent_type_0: else 
+agent_type_0:  if(mvbdu_id:6) x0 < 1 then 
+agent_type_0:   if(mvbdu_id:5) x1 < 0 then 
+agent_type_0:    false
+agent_type_0:   else 
+agent_type_0:    if(mvbdu_id:4) x1 < 1 then 
+agent_type_0:     true
+agent_type_0:    else 
+agent_type_0:     false
+agent_type_0:  else 
+agent_type_0:   false
+-------------------------------------
+array_index:5 rule_id:0
+agent_type_0: false
+-------------------------------------
+array_index:6 rule_id:0
+agent_type_0: false
+-------------------------------------
+array_index:7 rule_id:0
+agent_type_0: false
+-------------------------------------
+array_index:0 rule_id:1
+agent_type_0: false
+-------------------------------------
+array_index:1 rule_id:1
+agent_type_0: if(mvbdu_id:7) x0 < 1 then 
+agent_type_0:  false
+agent_type_0: else 
+agent_type_0:  if(mvbdu_id:6) x0 < 2 then 
+agent_type_0:   if(mvbdu_id:5) x1 < 1 then 
+agent_type_0:    false
+agent_type_0:   else 
+agent_type_0:    if(mvbdu_id:4) x1 < 2 then 
+agent_type_0:     true
+agent_type_0:    else 
+agent_type_0:     false
+agent_type_0:  else 
+agent_type_0:   false
+-------------------------------------
+array_index:2 rule_id:1
+agent_type_0: false
+-------------------------------------
+array_index:3 rule_id:1
+agent_type_0: false
+-------------------------------------
+array_index:4 rule_id:1
+agent_type_0: if(mvbdu_id:7) x0 < 0 then 
+agent_type_0:  false
+agent_type_0: else 
+agent_type_0:  if(mvbdu_id:6) x0 < 1 then 
+agent_type_0:   if(mvbdu_id:5) x1 < 0 then 
+agent_type_0:    false
+agent_type_0:   else 
+agent_type_0:    if(mvbdu_id:4) x1 < 1 then 
+agent_type_0:     true
+agent_type_0:    else 
+agent_type_0:     false
+agent_type_0:  else 
+agent_type_0:   false
+-------------------------------------
+array_index:5 rule_id:1
+agent_type_0: false
+-------------------------------------
+array_index:6 rule_id:1
+agent_type_0: false
+-------------------------------------
+array_index:7 rule_id:1
+agent_type_0: false
+agent_type_1:
+-------------------------------------
+array_index:0 rule_id:2
+agent_type_1: false
+-------------------------------------
+array_index:1 rule_id:2
+agent_type_1: false
+-------------------------------------
+array_index:2 rule_id:2
+agent_type_1: false
+-------------------------------------
+array_index:3 rule_id:2
+agent_type_1: if(mvbdu_id:7) x0 < 2 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:6) x0 < 3 then 
+agent_type_1:   if(mvbdu_id:5) x1 < 2 then 
+agent_type_1:    false
+agent_type_1:   else 
+agent_type_1:    if(mvbdu_id:4) x1 < 3 then 
+agent_type_1:     true
+agent_type_1:    else 
+agent_type_1:     false
+agent_type_1:  else 
+agent_type_1:   false
+-------------------------------------
+array_index:4 rule_id:2
+agent_type_1: false
+-------------------------------------
+array_index:5 rule_id:2
+agent_type_1: false
+-------------------------------------
+array_index:6 rule_id:2
+agent_type_1: if(mvbdu_id:7) x0 < 1 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:6) x0 < 2 then 
+agent_type_1:   if(mvbdu_id:5) x1 < 1 then 
+agent_type_1:    false
+agent_type_1:   else 
+agent_type_1:    if(mvbdu_id:4) x1 < 2 then 
+agent_type_1:     true
+agent_type_1:    else 
+agent_type_1:     false
+agent_type_1:  else 
+agent_type_1:   false
+-------------------------------------
+array_index:7 rule_id:2
+agent_type_1: false
+-------------------------------------
+array_index:8 rule_id:2
+agent_type_1: false
+-------------------------------------
+array_index:9 rule_id:2
+agent_type_1: if(mvbdu_id:7) x0 < 1 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:6) x0 < 2 then 
+agent_type_1:   if(mvbdu_id:5) x1 < 1 then 
+agent_type_1:    false
+agent_type_1:   else 
+agent_type_1:    if(mvbdu_id:4) x1 < 2 then 
+agent_type_1:     true
+agent_type_1:    else 
+agent_type_1:     false
+agent_type_1:  else 
+agent_type_1:   false
+-------------------------------------
+array_index:10 rule_id:2
+agent_type_1: false
+-------------------------------------
+array_index:11 rule_id:2
+agent_type_1: false
+-------------------------------------
+array_index:12 rule_id:2
+agent_type_1: if(mvbdu_id:7) x0 < 0 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:6) x0 < 1 then 
+agent_type_1:   if(mvbdu_id:5) x1 < 0 then 
+agent_type_1:    false
+agent_type_1:   else 
+agent_type_1:    if(mvbdu_id:4) x1 < 1 then 
+agent_type_1:     true
+agent_type_1:    else 
+agent_type_1:     false
+agent_type_1:  else 
+agent_type_1:   false
+-------------------------------------
+array_index:13 rule_id:2
+agent_type_1: false
+-------------------------------------
+array_index:14 rule_id:2
+agent_type_1: false
+-------------------------------------
+array_index:15 rule_id:2
+agent_type_1: false
+-------------------------------------
+array_index:0 rule_id:0
+agent_type_1: false
+-------------------------------------
+array_index:1 rule_id:0
+agent_type_1: false
+-------------------------------------
+array_index:2 rule_id:0
+agent_type_1: false
+-------------------------------------
+array_index:3 rule_id:0
+agent_type_1: if(mvbdu_id:7) x0 < 2 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:6) x0 < 3 then 
+agent_type_1:   if(mvbdu_id:5) x1 < 2 then 
+agent_type_1:    false
+agent_type_1:   else 
+agent_type_1:    if(mvbdu_id:4) x1 < 3 then 
+agent_type_1:     true
+agent_type_1:    else 
+agent_type_1:     false
+agent_type_1:  else 
+agent_type_1:   false
+-------------------------------------
+array_index:4 rule_id:0
+agent_type_1: false
+-------------------------------------
+array_index:5 rule_id:0
+agent_type_1: false
+-------------------------------------
+array_index:6 rule_id:0
+agent_type_1: if(mvbdu_id:7) x0 < 1 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:6) x0 < 2 then 
+agent_type_1:   if(mvbdu_id:5) x1 < 1 then 
+agent_type_1:    false
+agent_type_1:   else 
+agent_type_1:    if(mvbdu_id:4) x1 < 2 then 
+agent_type_1:     true
+agent_type_1:    else 
+agent_type_1:     false
+agent_type_1:  else 
+agent_type_1:   false
+-------------------------------------
+array_index:7 rule_id:0
+agent_type_1: false
+-------------------------------------
+array_index:8 rule_id:0
+agent_type_1: false
+-------------------------------------
+array_index:9 rule_id:0
+agent_type_1: if(mvbdu_id:7) x0 < 1 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:6) x0 < 2 then 
+agent_type_1:   if(mvbdu_id:5) x1 < 1 then 
+agent_type_1:    false
+agent_type_1:   else 
+agent_type_1:    if(mvbdu_id:4) x1 < 2 then 
+agent_type_1:     true
+agent_type_1:    else 
+agent_type_1:     false
+agent_type_1:  else 
+agent_type_1:   false
+-------------------------------------
+array_index:10 rule_id:0
+agent_type_1: false
+-------------------------------------
+array_index:11 rule_id:0
+agent_type_1: false
+-------------------------------------
+array_index:12 rule_id:0
+agent_type_1: if(mvbdu_id:7) x0 < 0 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:6) x0 < 1 then 
+agent_type_1:   if(mvbdu_id:5) x1 < 0 then 
+agent_type_1:    false
+agent_type_1:   else 
+agent_type_1:    if(mvbdu_id:4) x1 < 1 then 
+agent_type_1:     true
+agent_type_1:    else 
+agent_type_1:     false
+agent_type_1:  else 
+agent_type_1:   false
+-------------------------------------
+array_index:13 rule_id:0
+agent_type_1: false
+-------------------------------------
+array_index:14 rule_id:0
+agent_type_1: false
+-------------------------------------
+array_index:15 rule_id:0
+agent_type_1: false
+-------------------------------------
+array_index:0 rule_id:1
+agent_type_1: false
+-------------------------------------
+array_index:1 rule_id:1
+agent_type_1: false
+-------------------------------------
+array_index:2 rule_id:1
+agent_type_1: false
+-------------------------------------
+array_index:3 rule_id:1
+agent_type_1: if(mvbdu_id:7) x0 < 2 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:6) x0 < 3 then 
+agent_type_1:   if(mvbdu_id:5) x1 < 2 then 
+agent_type_1:    false
+agent_type_1:   else 
+agent_type_1:    if(mvbdu_id:4) x1 < 3 then 
+agent_type_1:     true
+agent_type_1:    else 
+agent_type_1:     false
+agent_type_1:  else 
+agent_type_1:   false
+-------------------------------------
+array_index:4 rule_id:1
+agent_type_1: false
+-------------------------------------
+array_index:5 rule_id:1
+agent_type_1: false
+-------------------------------------
+array_index:6 rule_id:1
+agent_type_1: if(mvbdu_id:7) x0 < 1 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:6) x0 < 2 then 
+agent_type_1:   if(mvbdu_id:5) x1 < 1 then 
+agent_type_1:    false
+agent_type_1:   else 
+agent_type_1:    if(mvbdu_id:4) x1 < 2 then 
+agent_type_1:     true
+agent_type_1:    else 
+agent_type_1:     false
+agent_type_1:  else 
+agent_type_1:   false
+-------------------------------------
+array_index:7 rule_id:1
+agent_type_1: false
+-------------------------------------
+array_index:8 rule_id:1
+agent_type_1: false
+-------------------------------------
+array_index:9 rule_id:1
+agent_type_1: if(mvbdu_id:7) x0 < 1 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:6) x0 < 2 then 
+agent_type_1:   if(mvbdu_id:5) x1 < 1 then 
+agent_type_1:    false
+agent_type_1:   else 
+agent_type_1:    if(mvbdu_id:4) x1 < 2 then 
+agent_type_1:     true
+agent_type_1:    else 
+agent_type_1:     false
+agent_type_1:  else 
+agent_type_1:   false
+-------------------------------------
+array_index:10 rule_id:1
+agent_type_1: false
+-------------------------------------
+array_index:11 rule_id:1
+agent_type_1: false
+-------------------------------------
+array_index:12 rule_id:1
+agent_type_1: if(mvbdu_id:7) x0 < 0 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:6) x0 < 1 then 
+agent_type_1:   if(mvbdu_id:5) x1 < 0 then 
+agent_type_1:    false
+agent_type_1:   else 
+agent_type_1:    if(mvbdu_id:4) x1 < 1 then 
+agent_type_1:     true
+agent_type_1:    else 
+agent_type_1:     false
+agent_type_1:  else 
+agent_type_1:   false
+-------------------------------------
+array_index:13 rule_id:1
+agent_type_1: false
+-------------------------------------
+array_index:14 rule_id:1
+agent_type_1: false
+-------------------------------------
+array_index:15 rule_id:1
+agent_type_1: false
+-------------------------------------
+array_index:0 rule_id:3
+agent_type_1: false
+-------------------------------------
+array_index:1 rule_id:3
+agent_type_1: false
+-------------------------------------
+array_index:2 rule_id:3
+agent_type_1: false
+-------------------------------------
+array_index:3 rule_id:3
+agent_type_1: if(mvbdu_id:7) x0 < 2 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:6) x0 < 3 then 
+agent_type_1:   if(mvbdu_id:5) x1 < 2 then 
+agent_type_1:    false
+agent_type_1:   else 
+agent_type_1:    if(mvbdu_id:4) x1 < 3 then 
+agent_type_1:     true
+agent_type_1:    else 
+agent_type_1:     false
+agent_type_1:  else 
+agent_type_1:   false
+-------------------------------------
+array_index:4 rule_id:3
+agent_type_1: false
+-------------------------------------
+array_index:5 rule_id:3
+agent_type_1: false
+-------------------------------------
+array_index:6 rule_id:3
+agent_type_1: if(mvbdu_id:7) x0 < 1 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:6) x0 < 2 then 
+agent_type_1:   if(mvbdu_id:5) x1 < 1 then 
+agent_type_1:    false
+agent_type_1:   else 
+agent_type_1:    if(mvbdu_id:4) x1 < 2 then 
+agent_type_1:     true
+agent_type_1:    else 
+agent_type_1:     false
+agent_type_1:  else 
+agent_type_1:   false
+-------------------------------------
+array_index:7 rule_id:3
+agent_type_1: false
+-------------------------------------
+array_index:8 rule_id:3
+agent_type_1: false
+-------------------------------------
+array_index:9 rule_id:3
+agent_type_1: if(mvbdu_id:7) x0 < 1 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:6) x0 < 2 then 
+agent_type_1:   if(mvbdu_id:5) x1 < 1 then 
+agent_type_1:    false
+agent_type_1:   else 
+agent_type_1:    if(mvbdu_id:4) x1 < 2 then 
+agent_type_1:     true
+agent_type_1:    else 
+agent_type_1:     false
+agent_type_1:  else 
+agent_type_1:   false
+-------------------------------------
+array_index:10 rule_id:3
+agent_type_1: false
+-------------------------------------
+array_index:11 rule_id:3
+agent_type_1: false
+-------------------------------------
+array_index:12 rule_id:3
+agent_type_1: if(mvbdu_id:7) x0 < 0 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:6) x0 < 1 then 
+agent_type_1:   if(mvbdu_id:5) x1 < 0 then 
+agent_type_1:    false
+agent_type_1:   else 
+agent_type_1:    if(mvbdu_id:4) x1 < 1 then 
+agent_type_1:     true
+agent_type_1:    else 
+agent_type_1:     false
+agent_type_1:  else 
+agent_type_1:   false
+-------------------------------------
+array_index:13 rule_id:3
+agent_type_1: false
+-------------------------------------
+array_index:14 rule_id:3
+agent_type_1: false
+-------------------------------------
+array_index:15 rule_id:3
+agent_type_1: false
+agent_type_2:
+-------------------------------------
+array_index:0 rule_id:2
+agent_type_2: false
+-------------------------------------
+array_index:1 rule_id:2
+agent_type_2: false
+-------------------------------------
+array_index:2 rule_id:2
+agent_type_2: false
+-------------------------------------
+array_index:3 rule_id:2
+agent_type_2: if(mvbdu_id:15) x0 < 0 then 
+agent_type_2:  false
+agent_type_2: else 
+agent_type_2:  if(mvbdu_id:14) x0 < 1 then 
+agent_type_2:   if(mvbdu_id:13) x1 < 0 then 
+agent_type_2:    false
+agent_type_2:   else 
+agent_type_2:    if(mvbdu_id:12) x1 < 1 then 
+agent_type_2:     if(mvbdu_id:11) x2 < 1 then 
+agent_type_2:      false
+agent_type_2:     else 
+agent_type_2:      if(mvbdu_id:10) x2 < 2 then 
+agent_type_2:       if(mvbdu_id:9) x3 < 1 then 
+agent_type_2:        false
+agent_type_2:       else 
+agent_type_2:        if(mvbdu_id:8) x3 < 2 then 
+agent_type_2:         true
+agent_type_2:        else 
+agent_type_2:         false
+agent_type_2:      else 
+agent_type_2:       false
+agent_type_2:    else 
+agent_type_2:     false
+agent_type_2:  else 
+agent_type_2:   false
+-------------------------------------
+array_index:4 rule_id:2
+agent_type_2: false
+-------------------------------------
+array_index:5 rule_id:2
+agent_type_2: false
+-------------------------------------
+array_index:6 rule_id:2
+agent_type_2: if(mvbdu_id:15) x0 < 0 then 
+agent_type_2:  false
+agent_type_2: else 
+agent_type_2:  if(mvbdu_id:14) x0 < 1 then 
+agent_type_2:   if(mvbdu_id:13) x1 < 0 then 
+agent_type_2:    false
+agent_type_2:   else 
+agent_type_2:    if(mvbdu_id:12) x1 < 1 then 
+agent_type_2:     if(mvbdu_id:11) x2 < 0 then 
+agent_type_2:      false
+agent_type_2:     else 
+agent_type_2:      if(mvbdu_id:10) x2 < 1 then 
+agent_type_2:       if(mvbdu_id:9) x3 < 0 then 
+agent_type_2:        false
+agent_type_2:       else 
+agent_type_2:        if(mvbdu_id:8) x3 < 1 then 
+agent_type_2:         true
+agent_type_2:        else 
+agent_type_2:         false
+agent_type_2:      else 
+agent_type_2:       false
+agent_type_2:    else 
+agent_type_2:     false
+agent_type_2:  else 
+agent_type_2:   false
+-------------------------------------
+array_index:7 rule_id:2
+agent_type_2: false
+-------------------------------------
+array_index:0 rule_id:3
+agent_type_2: false
+-------------------------------------
+array_index:1 rule_id:3
+agent_type_2: false
+-------------------------------------
+array_index:2 rule_id:3
+agent_type_2: false
+-------------------------------------
+array_index:3 rule_id:3
+agent_type_2: if(mvbdu_id:15) x0 < 0 then 
+agent_type_2:  false
+agent_type_2: else 
+agent_type_2:  if(mvbdu_id:14) x0 < 1 then 
+agent_type_2:   if(mvbdu_id:13) x1 < 0 then 
+agent_type_2:    false
+agent_type_2:   else 
+agent_type_2:    if(mvbdu_id:12) x1 < 1 then 
+agent_type_2:     if(mvbdu_id:11) x2 < 1 then 
+agent_type_2:      false
+agent_type_2:     else 
+agent_type_2:      if(mvbdu_id:10) x2 < 2 then 
+agent_type_2:       if(mvbdu_id:9) x3 < 1 then 
+agent_type_2:        false
+agent_type_2:       else 
+agent_type_2:        if(mvbdu_id:8) x3 < 2 then 
+agent_type_2:         true
+agent_type_2:        else 
+agent_type_2:         false
+agent_type_2:      else 
+agent_type_2:       false
+agent_type_2:    else 
+agent_type_2:     false
+agent_type_2:  else 
+agent_type_2:   false
+-------------------------------------
+array_index:4 rule_id:3
+agent_type_2: false
+-------------------------------------
+array_index:5 rule_id:3
+agent_type_2: false
+-------------------------------------
+array_index:6 rule_id:3
+agent_type_2: if(mvbdu_id:15) x0 < 0 then 
+agent_type_2:  false
+agent_type_2: else 
+agent_type_2:  if(mvbdu_id:14) x0 < 1 then 
+agent_type_2:   if(mvbdu_id:13) x1 < 0 then 
+agent_type_2:    false
+agent_type_2:   else 
+agent_type_2:    if(mvbdu_id:12) x1 < 1 then 
+agent_type_2:     if(mvbdu_id:11) x2 < 0 then 
+agent_type_2:      false
+agent_type_2:     else 
+agent_type_2:      if(mvbdu_id:10) x2 < 1 then 
+agent_type_2:       if(mvbdu_id:9) x3 < 0 then 
+agent_type_2:        false
+agent_type_2:       else 
+agent_type_2:        if(mvbdu_id:8) x3 < 1 then 
+agent_type_2:         true
+agent_type_2:        else 
+agent_type_2:         false
+agent_type_2:      else 
+agent_type_2:       false
+agent_type_2:    else 
+agent_type_2:     false
+agent_type_2:  else 
+agent_type_2:   false
+-------------------------------------
+array_index:7 rule_id:3
+agent_type_2: false
 execution finished without any exception

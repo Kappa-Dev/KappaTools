@@ -161,7 +161,8 @@ let collect_wl_creation_update parameter error store_wl_creation store_wl_update
 (*from a list of rule_id inside the final working list, return a ['rule' type] for its 
   and store them inside an array *)
 
-let collect_rule_in_wl parameter error handler rule store_wl_creation_update
+(*REMOVE*)
+(*let collect_rule_in_wl parameter error handler rule store_wl_creation_update
     store_result =
   AgentMap.fold parameter error
     (fun parameter error agent_type wl store_result ->
@@ -196,13 +197,14 @@ let collect_rule_in_wl parameter error handler rule store_wl_creation_update
 	  store_result
       in
        error, store_result
-    ) store_wl_creation_update store_result
+    ) store_wl_creation_update store_result*)
 
 (************************************************************************************)    
 (*FIXME: fold inside creation action, and used wl 
   in update function to generate bdu_creation array *)
 
-let collect_rule_creation_in_wl parameter error handler rule store_wl_creation_update
+(*REMOVE*)
+(*let collect_rule_creation_in_wl parameter error handler rule store_wl_creation_update
     viewsrhs creation store_result =
   AgentMap.fold parameter error
     (fun parameter error agent_type' wl_update _ ->
@@ -241,7 +243,7 @@ let collect_rule_creation_in_wl parameter error handler rule store_wl_creation_u
 	    in
 	    error, store_result
       ) (error, store_result) creation
-    ) store_wl_creation_update store_result
+    ) store_wl_creation_update store_result*)
     
 (************************************************************************************)
 (*fixpoint iteration function*)
@@ -396,7 +398,7 @@ let compute_update parameter error rule_id handler bdu_test modif_list bdu_creat
 
 (*FIXME*)
 
-let collect_bdu_creation_array parameter error handler_sig store_rule_in_wl store_result =
+(*let collect_bdu_creation_array parameter error handler_sig store_rule_in_wl store_result =
   let error, (handler, bdu_init) = bdu_init parameter error in
   AgentMap.fold parameter error
     (fun parameter error agent_type (wl, rule_array) store_result ->
@@ -442,12 +444,12 @@ let collect_bdu_creation_array parameter error handler_sig store_rule_in_wl stor
 	  store_result
       in
       error, store_result
-    ) store_rule_in_wl store_result
+    ) store_rule_in_wl store_result*)
 
 (************************************************************************************)
 (*TODO: fixpoint iteration function: test first*)
 
-let collect_bdu_iterate_array parameter error handler_sig store_rule_in_wl store_result =
+(*let collect_bdu_iterate_array parameter error handler_sig store_rule_in_wl store_result =
   let error, (handler, bdu_init) = bdu_init parameter error in
   AgentMap.fold parameter error
     (fun parameter error agent_type (wl, rule_array) store_result_array ->
@@ -551,4 +553,71 @@ let collect_bdu_iterate_array parameter error handler_sig store_rule_in_wl store
 	  store_result_array
       in
       error, store_result_array
-    ) store_rule_in_wl store_result
+    ) store_rule_in_wl store_result*)
+
+(************************************************************************************)
+(*build an array of product type store:
+  [bdu_creation * bdu_test * modification action]*)
+
+let collect_triple_product_array parameter error handler_sig rule_id rule store_result =
+  let error, (handler, bdu_init) = bdu_init parameter error in
+  AgentMap.fold2_common parameter error
+    (fun parameter error agent_id agent site_modif store_result ->
+      match agent with
+      | Ghost -> error, store_result
+      | Agent agent ->
+        (*-------------------------------------------------------------------------*)
+        (*build bdu_test*)
+        let agent_type = agent.agent_name in
+	let error, (l, (handler, bdu_test)) =
+	  Site_map_and_set.fold_map
+	    (fun site port (error, (current_list, _)) ->
+	      let state = int_of_port port in
+	      let l = (site, state) :: current_list in
+	      let error, (handler, bdu_test) =
+		build_bdu parameter error l
+	      in
+	      error, (l, (handler, bdu_test))
+	    ) agent.agent_interface (error, ([], (handler, bdu_init)))
+	in
+        (*-------------------------------------------------------------------------*)
+	(*build list of modif*)
+	let error, modif_list =
+	  Site_map_and_set.fold_map
+	    (fun site port (error, current_list) ->
+	      let state = int_of_port port in
+	      let l =
+		(site, state) :: current_list in
+	      error, l
+	    ) site_modif.agent_interface (error, [])
+	in
+        (*-------------------------------------------------------------------------*)
+        (*create an empty array*)
+        let nrules = Handler.nrules parameter error handler_sig in
+        let triple_array = Array.make nrules bdu_init in
+        let triple_array =
+          triple_array.(rule_id) <- bdu_test;
+          triple_array
+        in
+        (*-------------------------------------------------------------------------*)
+        (*old array*)
+        let error, (old_rule_id_list, old_array) =
+          match AgentMap.unsafe_get parameter error agent_type store_result with
+          | error, None -> error, ([], [||])
+          | error, Some (l, a) -> error, (l, a)
+        in
+        (*new array*)
+        let new_array = Array.append triple_array old_array in
+        let new_list = rule_id :: old_rule_id_list in
+        (*-------------------------------------------------------------------------*)
+        (*store*)
+        let error, store_result =
+          AgentMap.set
+            parameter
+            error
+            agent_type
+            (List.rev new_list, new_array)
+            store_result
+        in
+        error, store_result
+    ) rule.rule_lhs.views rule.diff_direct store_result

@@ -252,16 +252,154 @@ agent_type_0:
 -List of rule_id in working list of creation:
 0 
 - Working list update and creation:
-creation
-0:
-- List of bdu_creation build from rule_id inside the working list:
-0:0:
+
+------------------------------------------------------------
+Triple array: [|bdu_creation, bdu_test, modification list|]:
+------------------------------------------------------------
+agent_type_0:
 -------------------------------------
-0:0: if(mvbdu_id:3) x0 < 1 then 
-0:0:  false
-0:0: else 
-0:0:  if(mvbdu_id:2) x0 < 2 then 
-0:0:   true
-0:0:  else 
-0:0:   false
+array_index:0 rule_id:0
+agent_type_0: false
+-------------------------------------
+array_index:1 rule_id:0
+agent_type_0: if(mvbdu_id:3) x0 < 1 then 
+agent_type_0:  false
+agent_type_0: else 
+agent_type_0:  if(mvbdu_id:2) x0 < 2 then 
+agent_type_0:   true
+agent_type_0:  else 
+agent_type_0:   false
+-------------------------------------
+array_index:2 rule_id:0
+agent_type_0: false
+-------------------------------------
+array_index:3 rule_id:0
+agent_type_0: false
+-------------------------------------
+array_index:4 rule_id:0
+agent_type_0: if(mvbdu_id:3) x0 < 0 then 
+agent_type_0:  false
+agent_type_0: else 
+agent_type_0:  if(mvbdu_id:2) x0 < 1 then 
+agent_type_0:   true
+agent_type_0:  else 
+agent_type_0:   false
+-------------------------------------
+array_index:5 rule_id:0
+agent_type_0: false
+-------------------------------------
+array_index:6 rule_id:0
+agent_type_0: false
+-------------------------------------
+array_index:7 rule_id:0
+agent_type_0: false
+-------------------------------------
+array_index:0 rule_id:1
+agent_type_0: false
+-------------------------------------
+array_index:1 rule_id:1
+agent_type_0: if(mvbdu_id:3) x0 < 1 then 
+agent_type_0:  false
+agent_type_0: else 
+agent_type_0:  if(mvbdu_id:2) x0 < 2 then 
+agent_type_0:   true
+agent_type_0:  else 
+agent_type_0:   false
+-------------------------------------
+array_index:2 rule_id:1
+agent_type_0: false
+-------------------------------------
+array_index:3 rule_id:1
+agent_type_0: false
+-------------------------------------
+array_index:4 rule_id:1
+agent_type_0: if(mvbdu_id:3) x0 < 0 then 
+agent_type_0:  false
+agent_type_0: else 
+agent_type_0:  if(mvbdu_id:2) x0 < 1 then 
+agent_type_0:   true
+agent_type_0:  else 
+agent_type_0:   false
+-------------------------------------
+array_index:5 rule_id:1
+agent_type_0: false
+-------------------------------------
+array_index:6 rule_id:1
+agent_type_0: false
+-------------------------------------
+array_index:7 rule_id:1
+agent_type_0: false
+agent_type_1:
+-------------------------------------
+array_index:0 rule_id:2
+agent_type_1: false
+-------------------------------------
+array_index:1 rule_id:2
+agent_type_1: false
+-------------------------------------
+array_index:2 rule_id:2
+agent_type_1: false
+-------------------------------------
+array_index:3 rule_id:2
+agent_type_1: if(mvbdu_id:3) x0 < 1 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:2) x0 < 2 then 
+agent_type_1:   true
+agent_type_1:  else 
+agent_type_1:   false
+-------------------------------------
+array_index:4 rule_id:2
+agent_type_1: false
+-------------------------------------
+array_index:5 rule_id:2
+agent_type_1: false
+-------------------------------------
+array_index:6 rule_id:2
+agent_type_1: if(mvbdu_id:3) x0 < 0 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:2) x0 < 1 then 
+agent_type_1:   true
+agent_type_1:  else 
+agent_type_1:   false
+-------------------------------------
+array_index:7 rule_id:2
+agent_type_1: false
+-------------------------------------
+array_index:0 rule_id:3
+agent_type_1: false
+-------------------------------------
+array_index:1 rule_id:3
+agent_type_1: false
+-------------------------------------
+array_index:2 rule_id:3
+agent_type_1: false
+-------------------------------------
+array_index:3 rule_id:3
+agent_type_1: if(mvbdu_id:3) x0 < 1 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:2) x0 < 2 then 
+agent_type_1:   true
+agent_type_1:  else 
+agent_type_1:   false
+-------------------------------------
+array_index:4 rule_id:3
+agent_type_1: false
+-------------------------------------
+array_index:5 rule_id:3
+agent_type_1: false
+-------------------------------------
+array_index:6 rule_id:3
+agent_type_1: if(mvbdu_id:3) x0 < 0 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:2) x0 < 1 then 
+agent_type_1:   true
+agent_type_1:  else 
+agent_type_1:   false
+-------------------------------------
+array_index:7 rule_id:3
+agent_type_1: false
 execution finished without any exception

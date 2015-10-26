@@ -15,6 +15,7 @@
 open Printf
 open Covering_classes_type
 open Int_storage
+open Covering_classes_new_index
 
 (*------------------------------------------------------------------------------*)
 
@@ -150,3 +151,37 @@ let print_value_site parameter error elt site value_site = (*REMOVE*)
       in
       error
     ) parameter value_site
+
+
+(************************************************************************************)
+(*MAIN PRINT*)
+
+let print_result parameter error result_remanent =
+  AgentMap.print
+    error
+    (fun error parameter remanent ->
+      let _ =
+        (*------------------------------------------------------------------------------*)
+        (* number of covering classes*)
+        let number =
+          number_of_covering_classes 
+            parameter
+            error
+            remanent.store_dic
+        in
+        let _ = fprintf stdout
+          "Potential dependencies between sites:Number of covering classes:%i\n" number
+        in
+        (*------------------------------------------------------------------------------*)
+        (*print covering class and theirs new-index*)
+        let _ =
+          print_dic_and_new_index parameter error
+            remanent.store_new_index_dic
+            remanent.store_test_new_index_dic
+            remanent.store_modif_new_index_dic
+            remanent.store_dic
+        in
+        (*------------------------------------------------------------------------------*)
+        error
+      in
+      error) parameter result_remanent

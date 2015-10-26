@@ -15,22 +15,13 @@
 open Covering_classes_type
 open Cckappa_sig
 open Int_storage
-open Printf
-open Print_covering_classes
+open Site_map_and_set
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Covering classes") message exn
                  (fun () -> default)                
 
 let trace = false
-
-(************************************************************************************)
-(*UTILITIES FUNCTION*)
-
-let empty_set = Site_map_and_set.empty_set
-let empty_map = Site_map_and_set.empty_map
-let add_set = Site_map_and_set.add_set
-let union = Site_map_and_set.union
 
 (************************************************************************************)
 (*sorted and ordered a covering classes in an descreasing order *)
@@ -127,9 +118,9 @@ let project_modified_site value_list modified_map = (*TODO:add state information
     match acc with
       | [] -> []
       | x :: tl ->
-        if not (Site_map_and_set.is_empty_map modified_map)
+        if not (is_empty_map modified_map)
         then
-          if Site_map_and_set.mem_map x modified_map
+          if mem_map x modified_map
           then
             begin
               if not (is_empty_list value_list)
@@ -376,7 +367,6 @@ let clean_classes parameter error covering_classes modified_map =
   (*------------------------------------------------------------------------------*)
   (*cleaning*)
   let current_covering_classes = length_sorted covering_classes in
-  let is_empty_set = Site_map_and_set.is_empty_set in
   List.fold_left (fun (error, remanent) covering_class ->
     match covering_class with
       | [] -> error, remanent
@@ -410,7 +400,7 @@ let clean_classes parameter error covering_classes modified_map =
               (*-------------------------------------------------------------------*)
               (* intersection of two sets *)
               let error, potential_superset =
-                Site_map_and_set.inter
+                inter
                   parameter 
                   error
                   potential_supersets
@@ -459,17 +449,17 @@ let collect_modified_map parameter error diff_reverse store_modified_map =
   AgentMap.fold parameter error
     (fun parameter error agent_id site_modif store_modified_map ->
       (*if there is no modified sites then do nothing*)
-      if Site_map_and_set.is_empty_map
+      if is_empty_map
         site_modif.agent_interface
       then error, store_modified_map
       else
         let agent_type = site_modif.agent_name in
         let store_site =
-          Site_map_and_set.fold_map
+          fold_map
             (fun site port current_map ->
               (*store site map*)
               let error, site_map =
-                Site_map_and_set.add_map
+                add_map
                   parameter
                   error
                   site
@@ -493,7 +483,7 @@ let collect_modified_map parameter error diff_reverse store_modified_map =
         in
         (*store*)
         let error, final_map =
-          Site_map_and_set.union_map
+          union_map
             parameter
             error
             old_map
@@ -546,8 +536,7 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
     Quick_Nearly_inf_Imperatif.fold2_common parameter error
       (fun parameter error agent_id agent site_modif store_covering_classes ->
         (* if in the interface there is no site modified then do nothing *)
-        if Site_map_and_set.is_empty_map
-          site_modif.agent_interface
+        if is_empty_map site_modif.agent_interface
         then error, store_covering_classes
         else
           match agent with
@@ -556,10 +545,9 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
               let agent_type = agent.agent_name in
               (*get a list of sites from an interface at each rule*)
               let site_list =
-                Site_map_and_set.fold_map
-	          (fun site _ current_list ->
-                    site :: current_list
-                  ) agent.agent_interface []
+                fold_map (fun site _ current_list ->
+                  site :: current_list
+                ) agent.agent_interface []
               in
               (*compute covering_class*)
               let error, covering_classes =
@@ -574,194 +562,3 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
               error, covering_classes
       ) views diff_reverse store_covering_classes
   in error, store_covering_classes
-
-(*------------------------------------------------------------------------------*)
-(*compute covering class: it is a covering class whenever there is a
-  modified site in that agent. (CHECK on their left-hand side)
-
-  For example: A(x~u,y~u) -> A(x~u,y~p) (where y is a modified site), then
-  there is one covering class for agent A: CV_1: (x,y)
-  
-  - If the rule is: A(x~u), A(y~u) -> A(x~p), A(y~p), (x,y are modified
-  sites), then agent A has two covering classes: CV_1: x; CV_2: y
-  
-  - If the rule is: A(x~u), A(y~u) -> A(x~u), A(y~p), (y is a modified
-  site), then agent A has only one covering class: CV_1: y
-*)
-
-let scan_rule parameter error handler rule classes =
-  (*------------------------------------------------------------------------------*)
-  (*compute modified map*)
-  let error, store_modified_map =
-    collect_modified_map
-      parameter
-      error
-      rule.diff_reverse
-      classes.store_modified_map
-  in
-  (*------------------------------------------------------------------------------*)
-  (*compute covering_class*)
-  let error, store_covering_classes =
-    collect_covering_classes parameter error
-      rule.rule_lhs.views
-      rule.diff_reverse
-      classes.store_covering_classes
-  in
-  (*------------------------------------------------------------------------------*)
-  (*result*)
-  error,
-  {
-    store_modified_map     = store_modified_map;
-    store_covering_classes = store_covering_classes;
-  }           
-
-(************************************************************************************)   
-(*PART II. COMPUTE properties related to covering classes*)
-
-(*------------------------------------------------------------------------------*)
-(*return the number of covering classes for each agent type*)
-
-let number_of_covering_classes parameter error store_dic =
-  let error, num =
-    Dictionary_of_Covering_class.last_entry
-      parameter error store_dic
-  in num + 1
-
-(************************************************************************************)   
-(*RULES*)
-
-let create_map parameter error n_agents = AgentMap.create parameter error n_agents
-
-let scan_rule_set parameter error handler rules =
-  let n_agents = handler.nagents in
-  let error, init_modif_map = create_map parameter error n_agents in
-  let error, init_class     = create_map parameter error n_agents in
-  (*------------------------------------------------------------------------------*)
-  (*init state of covering class*)
-  let init_class =
-    {
-      store_modified_map     = init_modif_map;
-      store_covering_classes = init_class;
-    }
-  in
-  (*------------------------------------------------------------------------------*)
-  (*map each agent to a covering classes*)
-  let error, store_covering_classes =
-    Nearly_inf_Imperatif.fold
-      parameter error
-      (fun parameter error rule_id rule classes ->
-        (*let _ = Printf.fprintf stdout "rule_id:%i:\n" rule_id in*)
-        let error, result =
-          scan_rule
-            parameter
-            error
-            handler
-            rule.e_rule_c_rule
-            classes
-        in
-        error, result
-      ) rules init_class
-  in
-  error, store_covering_classes
-
-(*------------------------------------------------------------------------------*)
-(*compute covering classes in the set of rules*)
-
-let scan_rule_set_cv parameter error handler rules =
-  (*create a new initial state to store after cleaning the covering classes*)
-  let error, init_result = AgentMap.create parameter error 0 in
-  let error, store_covering_classes = 
-    scan_rule_set parameter error handler rules
-  in
-  let result_covering_classes = store_covering_classes.store_covering_classes in
-  let error, remanent_dictionary =
-    AgentMap.fold parameter error
-      (fun parameters error agent_type covering_class init_remanent ->
-        (*------------------------------------------------------------------------------*)
-        (*get modified site*)
-        let error, modified_map =
-          match
-            Quick_Nearly_inf_Imperatif.unsafe_get
-              parameter 
-              error 
-              agent_type
-              store_covering_classes.store_modified_map
-          with
-            | error, None -> error, empty_map
-            | error, Some m -> error, m
-        in
-        (*------------------------------------------------------------------------------*)
-        (*clean the covering classes, removed duplicate of covering classes*)
-        let error, store_remanent_dic =
-          clean_classes
-            parameters 
-            error
-            covering_class
-            modified_map
-        in
-        (*------------------------------------------------------------------------------*)
-        (*store the covering classes after cleaning theirs duplicate classes*)
-        let error, store_remanent =
-          AgentMap.set 
-            parameters
-            error
-            agent_type
-            store_remanent_dic
-            init_remanent
-        in
-        (*------------------------------------------------------------------------------*)
-        (*result*)
-        error, store_remanent
-      )
-      result_covering_classes
-      init_result
-  in
-  error, remanent_dictionary
-
-(************************************************************************************)
-(*MAIN PRINT*)
-
-let print_result parameter error result_remanent =
-  AgentMap.print
-    error
-    (fun error parameter remanent ->
-      let _ =
-        (*------------------------------------------------------------------------------*)
-        (* number of covering classes*)
-        let number =
-          number_of_covering_classes 
-            parameter
-            error
-            remanent.store_dic
-        in
-        let _ = fprintf stdout
-          "Potential dependencies between sites:Number of covering classes:%i\n" number
-        in
-        (*------------------------------------------------------------------------------*)
-        (*print covering class and theirs new-index*)
-        let _ =
-          print_dic_and_new_index parameter error
-            remanent.store_new_index_dic
-            remanent.store_test_new_index_dic
-            remanent.store_modif_new_index_dic
-            remanent.store_dic
-        in
-        (*------------------------------------------------------------------------------*)
-        error
-      in
-      error) parameter result_remanent
-
-(************************************************************************************)   
-(*MAIN*)
-
-let covering_classes parameter error handler cc_compil =
-  let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
-  let error, result = scan_rule_set_cv parameter error handler cc_compil.rules in
-  let error =
-    if (Remanent_parameters.get_trace parameter) || trace
-    then 
-      print_result parameter error result
-    else
-      error
-  in
-  error, result

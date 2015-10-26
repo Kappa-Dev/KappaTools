@@ -102,8 +102,6 @@ type remove_action =
 
 type bdu_analysic =
     {
-      (*store_creation_rule       : (int list * wl_int * Cckappa_sig.rule array) AgentMap.t;
-      store_creation            : site_bdu AgentMap.t;*)
       (*static information*)
       store_covering_classes_id : (int list * int list) Int2Map_CV.map;
       store_side_effects        : half_break_action * remove_action;
@@ -115,7 +113,8 @@ type bdu_analysic =
         
       (*------------------------------------------------------------------------------*)
       (*dynamic information*)
-      store_contact_map      :
+      store_contact_map      : 
+        (*TODO: combine contact map and modification update into a product type*)
         (int list * (int * int * int) list) Int2Map_CM_state.map;
       store_covering_classes_modification_update :
         (int list * Site_map_and_set.set) Int2Map_CV_Modif.map;
@@ -124,13 +123,19 @@ type bdu_analysic =
         (int list * Site_map_and_set.set) Int2Map_CV_Modif.map *
         (int list * Site_map_and_set.set) Int2Map_CV_Modif.map *
         (int list * Site_map_and_set.set) Int2Map_CV_Modif.map;
-      (*adding rule_id inside a working list*)
+      (*adding rule_id inside a working list*) (*TODO: combine wl into a product type*)
       store_wl_update          : wl_int AgentMap.t;
       store_wl_creation        : wl_int AgentMap.t;
       store_wl_creation_update : wl_int AgentMap.t;
+      (*collect bdu_creation, bdu_test, and modification in an array*)
+      store_triple_product_array :
+       (int list *
+        (bool Mvbdu_sig.mvbdu (** bool Mvbdu_sig.mvbdu * (int * int) list*)) array)
+        AgentMap.t
+        
       (*return a type 'rule' inside a working list*)
-      store_rule_in_wl         : (wl_int * Cckappa_sig.rule array) AgentMap.t;
-      store_rule_creation_in_wl : Cckappa_sig.rule array AgentMap.t;
-      store_bdu_creation_array : bool Mvbdu_sig.mvbdu array AgentMap.t;
-      store_fixpoint_iteration : bool Mvbdu_sig.mvbdu array AgentMap.t;
+      (*store_rule_in_wl         : (wl_int * Cckappa_sig.rule array) AgentMap.t; (*REMOVE*)
+      store_rule_creation_in_wl : Cckappa_sig.rule array AgentMap.t; (*REMOVE*)
+      store_bdu_creation_array : bool Mvbdu_sig.mvbdu array AgentMap.t;*) (*REMOVE*)
+      (*store_fixpoint_iteration : bool Mvbdu_sig.mvbdu array AgentMap.t;*)
     }

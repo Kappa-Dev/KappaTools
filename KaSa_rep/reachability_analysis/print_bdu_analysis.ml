@@ -460,6 +460,42 @@ let print_wl_creation_update parameter error result =
     ) parameter result
 
 (*-------------------------------------------------------------------------*)
+(*triple product array: bdu_creation * bdu_test * modification list*)
+
+let print_product_triple_array_aux parameter error result =
+  AgentMap.print error
+    (fun error parameter (l, bdu_array) ->
+      let _ =
+        let rec aux acc =
+          match acc with
+          | [] -> []
+          | rule_id :: tl ->
+            Array.iteri (fun index bdu_test ->
+	      let _ =
+	        fprintf stdout "-------------------------------------\n";
+                fprintf stdout "array_index:%i rule_id:%i\n" index rule_id;
+	        Boolean_mvbdu.print_boolean_mvbdu error parameter bdu_test
+	      in
+	      ()
+	    ) bdu_array; aux tl
+        in aux l
+      in
+      error
+    ) parameter result
+
+let print_product_triple_array parameter error result =
+  let parameter_agent = 
+    Remanent_parameters.update_prefix parameter "agent_type_"
+  in
+  fprintf (Remanent_parameters.get_log parameter)
+    "\n------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "Triple array: [|bdu_creation, bdu_test, modification list|]:\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  print_product_triple_array_aux parameter_agent error result
+
+(*-------------------------------------------------------------------------*)
 (*fixpoint*)
 
 let print_fixpoint parameter error result =
@@ -573,7 +609,10 @@ let print_result parameter error result =
     print_wl_creation_update parameter_agent error result.store_wl_creation_update
   in
   let _ =
+    print_product_triple_array parameter error result.store_triple_product_array
+  in
+  (*let _ =
     fprintf stdout "creation\n";
     print_creation_rule_aux parameter error result.store_rule_creation_in_wl
-  in
+  in*)
   error

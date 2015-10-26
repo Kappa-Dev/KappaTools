@@ -138,7 +138,7 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
    in
   (*------------------------------------------------------------------------------*)
   (*return 'rule' type inside a working list*)
-  let error, store_rule_in_wl =
+  (*let error, store_rule_in_wl =
     collect_rule_in_wl
       parameter
       error
@@ -167,16 +167,25 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       handler
       store_rule_in_wl
       store_result.store_bdu_creation_array
-  in
+  in*)
   (*------------------------------------------------------------------------------*)
   (*fixpoint iteration*)
-  let error, store_fixpoint_iteration =
+  (*let error, store_fixpoint_iteration =
     collect_bdu_iterate_array
       parameter
       error
       handler
       store_rule_in_wl
       store_result.store_fixpoint_iteration
+  in*)
+  let error, store_triple_product_array =
+    collect_triple_product_array
+      parameter
+      error
+      handler
+      rule_id
+      rule
+      store_result.store_triple_product_array
   in
   (*------------------------------------------------------------------------------*)
   (*store*)
@@ -197,11 +206,13 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
     store_wl_update                            = store_wl_update;
     store_wl_creation                          = store_wl_creation;
     store_wl_creation_update                   = store_wl_creation_update;
+    (*triple product array*)
+    store_triple_product_array                 = store_triple_product_array
     (*fixpoint iteration*)
-    store_rule_in_wl                           = store_rule_in_wl;
+    (*store_rule_in_wl                           = store_rule_in_wl;
     store_rule_creation_in_wl = store_rule_creation_in_wl;
-    store_bdu_creation_array                   = store_bdu_creation_array;
-    store_fixpoint_iteration                   = store_fixpoint_iteration
+    store_bdu_creation_array                   = store_bdu_creation_array;*)
+    (*store_fixpoint_iteration                   = store_fixpoint_iteration*)
   }
  
 (************************************************************************************)
@@ -226,12 +237,13 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
   let error, init_wl_update        = AgentMap.create parameter error 0 in
   let error, init_wl_creation      = AgentMap.create parameter error 0 in
   let error, init_wl_creation_update = AgentMap.create parameter error 0 in
+  let error, init_triple_product_array = AgentMap.create parameter error 0 in
   (*fixpoint iteration*)
-  let error, init_rule             = AgentMap.create parameter error 0 in
-  let error, init_bdu_creation_array = AgentMap.create parameter error 0 in
-  let error, init_fixpoint         = AgentMap.create parameter error 0 in
+  (*let error, init_rule             = AgentMap.create parameter error 0 in
+  let error, init_bdu_creation_array = AgentMap.create parameter error 0 in*)
+  (*let error, init_fixpoint         = AgentMap.create parameter error 0 in*)
   (*test*)
-  let error, init_rule_creation = AgentMap.create parameter error 0 in
+  (*let error, init_rule_creation = AgentMap.create parameter error 0 in*)
   let init_bdu =
     {
       (*static information*)
@@ -251,11 +263,12 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
       store_wl_update          = init_wl_update;
       store_wl_creation        = init_wl_creation;
       store_wl_creation_update = init_wl_creation_update;
+      store_triple_product_array = init_triple_product_array
       (*fixpoint*)
-      store_rule_in_wl         = init_rule;
+      (*store_rule_in_wl         = init_rule;
       store_rule_creation_in_wl = init_rule_creation;
-      store_bdu_creation_array = init_bdu_creation_array;
-      store_fixpoint_iteration = init_fixpoint;
+      store_bdu_creation_array = init_bdu_creation_array;*)
+      (*store_fixpoint_iteration = init_fixpoint;*)
     }
   in
   (*------------------------------------------------------------------------------*)
