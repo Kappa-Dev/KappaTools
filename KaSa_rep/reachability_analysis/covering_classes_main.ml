@@ -19,6 +19,7 @@ open Print_covering_classes
 open Covering_classes
 open Covering_classes_new_index
 open Site_map_and_set
+open Clean_covering_classes
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Covering classes") message exn
