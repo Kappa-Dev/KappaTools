@@ -20,61 +20,6 @@ open Cckappa_sig
 open Remanent_parameters_sig
 
 (************************************************************************************)
-(*PRINT*)
-
-let print_bdu_array_creation_aux parameter error result =
-  AgentMap.print error 
-    (fun error parameter (l, (handler, bdu_array)) ->
-      let _ =
-        Array.iter (fun bdu ->
-          let _ =
-            fprintf stdout "-------------------------------------\n";
-            Boolean_mvbdu.print_boolean_mvbdu error parameter bdu
-          in
-          ()
-        ) bdu_array        
-      in
-      error
-    ) parameter result
-
-let print_rule_list parameter l =
-  let rec aux acc =
-    match acc with
-    | [] -> []
-    | h :: tl -> 
-      fprintf (Remanent_parameters.get_log parameter) "rule_id: %i \n" h;
-      aux tl;
-  in aux l
-
-let print_rule_array parameter error rule_array =
-  let error, store = AgentMap.create parameter error 0 in
-  Array.iteri (fun index rule ->
-    let _ =
-      let error, store =
-        Bdu_creation.collect_creation
-          parameter
-          error
-          rule.rule_rhs.views
-          rule.actions.creation
-          store
-      in
-      print_bdu_array_creation_aux parameter error store
-    in 
-    ()
-  ) rule_array
-
-let print_creation_rule_aux parameter error result =
-  AgentMap.print error
-    (fun error parameter rule_array ->
-      let _ =
-        fprintf (Remanent_parameters.get_log parameter)
-          "- List of bdu_creation build from rule_id inside the working list:\n";
-        print_rule_array parameter error rule_array
-      in
-      error
-    ) parameter result
-
-(************************************************************************************)
 (*static information of covering classes id*)
 
 let print_covering_classes_id_aux parameter error result =
@@ -106,33 +51,6 @@ let print_covering_classes_id_aux parameter error result =
             x y id
         ) l2
     ) result
-
-(************************************************************************************)
-(*print rule test; test inside the rule_array of update function*)
-
-(*let print_bdu_array_test parameter error result =
-  AgentMap.print error
-    (fun error parameter (l, bdu_test, modif_list) ->
-      
-    ) parameter result
-
-  
-let print_rule_array_test parameter error rule_array = 
-  let error, store = AgentMap.create parameter error 0 in
-  Array.iteri (fun index rule ->
-    let _ =
-      let error, store =
-	Bdu_fixpoint_iteration.build_bdu_test_list_direct
-	  parameter
-	  error
-	  rule.rule_lhs.views
-	  rule.diff_direct
-	  store
-      in
-      print_bdu_array_test parameter error store
-    in
-    ()
-  ) rule_array*)
 
 (************************************************************************************)
 (*side effects*)
@@ -267,19 +185,6 @@ let print_contact_map_aux parameter error result =
             x y s z t s'
 	) l2
     ) result
-
-(************************************************************************************)
-(*TODO*)
-
-(*let print_fixpoint_iteration parameter error result =
-  AgentMap.print error
-    (fun error parameter (wl, rule_array) ->
-      let _ =
-	fprintf stdout "Working list:\n";
-	IntWL.print_wl parameter wl
-      in
-      error
-    ) parameter result*)
     
 (************************************************************************************)
 (*update function before adding rule with side effects*)
@@ -347,8 +252,7 @@ let print_update_set_aux parameter error result =
         ) s2
     ) result
 
-(*REMOVE*)
-let print_binding_update_aux parameter error result =
+let print_binding_update_aux parameter error result = (*REMOVE*)
   let result_hb,
     result_remove,
     result_hb_remove,
@@ -363,7 +267,68 @@ let print_binding_update_aux parameter error result =
   print_update_set_aux parameter error result_hb_remove;
   fprintf stdout "update function:\n";
   print_update_set_aux parameter error result_update_aux
-  
+
+(************************************************************************************)
+(*fixpoint iteration*)
+
+let print_bdu_array_creation_aux parameter error result =
+  AgentMap.print error 
+    (fun error parameter (l, (handler, bdu_array)) ->
+      let _ =
+        Array.iter (fun bdu ->
+          let _ =
+            fprintf stdout "-------------------------------------\n";
+            Boolean_mvbdu.print_boolean_mvbdu error parameter bdu
+          in
+          ()
+        ) bdu_array        
+      in
+      error
+    ) parameter result
+
+let print_rule_array parameter error rule_array =
+  let error, store = AgentMap.create parameter error 0 in
+  Array.iteri (fun index rule ->
+    let _ =
+      let error, store =
+        Bdu_creation.collect_creation
+          parameter
+          error
+          rule.rule_rhs.views
+          rule.actions.creation
+          store
+      in
+      print_bdu_array_creation_aux parameter error store
+    in 
+    ()
+  ) rule_array
+
+let print_creation_rule_aux parameter error result =
+  AgentMap.print error
+    (fun error parameter rule_array ->
+      let _ =
+        fprintf (Remanent_parameters.get_log parameter)
+          "- List of bdu_creation build from rule_id inside the working list:\n";
+        print_rule_array parameter error rule_array
+      in
+      error
+    ) parameter result
+
+(*let print_bdu_creation_array parameter error result =
+  AgentMap.print error
+    (fun error parameter bdu_array ->
+      let _ =
+	Array.iter (fun bdu ->
+	  let _ =
+	    fprintf stdout "-------------------------------------\n";
+	    Boolean_mvbdu.print_boolean_mvbdu error parameter bdu
+	  in
+	  ()
+	) bdu_array
+      in
+      error
+    ) parameter result*)
+
 (************************************************************************************)
 (*auxilary functions*)
 
@@ -391,8 +356,7 @@ let print_side_effects parameter error result =
   in
   error
 
-(*REMOVE*)
-let print_modification_sites parameter error result =
+let print_modification_sites parameter error result = (*REMOVE*)
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
@@ -404,8 +368,7 @@ let print_modification_sites parameter error result =
   in
   error
 
-(*REMOVE*)
-let print_creation_sites parameter error result =
+let print_creation_sites parameter error result = (*REMOVE*)
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
   fprintf (Remanent_parameters.get_log parameter)
@@ -428,6 +391,9 @@ let print_modification_sites_without_creation parameter error result =
     print_modification_sites_aux parameter error result
   in
   error
+
+(*-------------------------------------------------------------------------*)
+(*dynamic information*)
 
 let print_contact_map parameter error result =
   fprintf (Remanent_parameters.get_log parameter)
@@ -459,34 +425,8 @@ let print_binding_update parameter error result =
     "------------------------------------------------------------\n";
   print_binding_update_aux parameter error result
   
-
-(*let print_creation_rule parameter error result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "\n------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "* List of rules has creation action:\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  let parameter_a_rule =
-    Remanent_parameters.update_prefix parameter "agent_type/rule_id_" in
-  let error =
-    print_creation_rule_aux parameter_a_rule error result
-  in
-  error*)
-
-(*REMOVE*)
-(*let print_bdu_array_creation parameter error result =
-  let parameter_agent = Remanent_parameters.update_prefix parameter "agent_type_" in
-  fprintf (Remanent_parameters.get_log parameter)
-    "\n------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "* BDU creation in general (this function used for testing) will be removed:\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  print_bdu_array_creation_aux parameter_agent error result*)
-
-(************************************************************************************)
-(*Fixpoint iteration function*)
+(*-------------------------------------------------------------------------*)
+(*working list*)
 
 let print_wl_update parameter error result =
   AgentMap.print error
@@ -518,35 +458,10 @@ let print_wl_creation_update parameter error result =
       in
       error
     ) parameter result
-    
-(*let print_fixpoint parameter error result =
-  let parameter_agent = Remanent_parameters.update_prefix parameter "agent_type_" in
-  fprintf (Remanent_parameters.get_log parameter)
-    "\n------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "* Fixpoint iteration:\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  print_wl_update parameter_agent error result;*)
 
-(************************************************************************************)
-(*fixpoint iteration*)
+(*-------------------------------------------------------------------------*)
+(*fixpoint*)
 
-let print_bdu_creation_array parameter error result =
-  AgentMap.print error
-    (fun error parameter bdu_array ->
-      let _ =
-	Array.iter (fun bdu ->
-	  let _ =
-	    fprintf stdout "-------------------------------------\n";
-	    Boolean_mvbdu.print_boolean_mvbdu error parameter bdu
-	  in
-	  ()
-	) bdu_array
-      in
-      error
-    ) parameter result
-    
 let print_fixpoint parameter error result =
   AgentMap.print error
     (fun error parameter bdu_array ->
@@ -561,6 +476,31 @@ let print_fixpoint parameter error result =
       in
       error
     ) parameter result
+
+(*let print_creation_rule parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "\n------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "* List of rules has creation action:\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  let parameter_a_rule =
+    Remanent_parameters.update_prefix parameter "agent_type/rule_id_" in
+  let error =
+    print_creation_rule_aux parameter_a_rule error result
+  in
+  error*)
+
+(*REMOVE*)
+(*let print_bdu_array_creation parameter error result =
+  let parameter_agent = Remanent_parameters.update_prefix parameter "agent_type_" in
+  fprintf (Remanent_parameters.get_log parameter)
+    "\n------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "* BDU creation in general (this function used for testing) will be removed:\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  print_bdu_array_creation_aux parameter_agent error result*)
 
 (************************************************************************************)
 (*MAIN PRINT*)
@@ -581,12 +521,10 @@ let print_result parameter error result =
   let _ =
     print_side_effects parameter error result.store_side_effects
   in
-  (*will be removed*)
-  let _ =
+  let _ = (*will be removed*)
       print_modification_sites parameter error result.store_modification_sites
   in
-  (*will be removed*)
-  let _ =
+  let _ = (*will be removed*)
       print_creation_sites parameter error result.store_creation_sites
   in
   let _ =
@@ -594,7 +532,8 @@ let print_result parameter error result =
       result.store_modification_sites_without_creation
   in
   let _ =
-    fprintf (Remanent_parameters.get_log parameter) "\n** Dynamic information:\n";
+    fprintf (Remanent_parameters.get_log parameter) 
+      "\n** Dynamic information:\n";
   in
   let _ =
     print_contact_map parameter error result.store_contact_map
@@ -614,17 +553,21 @@ let print_result parameter error result =
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
   in
-  (*working list*)
+  (*TODO: working list*)
   let _ =
-    let parameter_agent = Remanent_parameters.update_prefix parameter "agent_type_" in
+    let parameter_agent = 
+      Remanent_parameters.update_prefix parameter "agent_type_"
+    in
     fprintf (Remanent_parameters.get_log parameter)
       "- Working list update (will be removed):\n";
-    (*REMOVE*)
-    let _ = print_wl_update parameter_agent error result.store_wl_update in
+    let _ = (*REMOVE*)
+      print_wl_update parameter_agent error result.store_wl_update 
+    in
     fprintf (Remanent_parameters.get_log parameter)
       "- Working list creation (will be removed):\n";
-    (*REMOVE*)
-    let _ = print_wl_creation parameter_agent error result.store_wl_creation in
+    let _ = (*REMOVE*)
+      print_wl_creation parameter_agent error result.store_wl_creation 
+    in
     fprintf (Remanent_parameters.get_log parameter)
       "- Working list update and creation:\n";
     print_wl_creation_update parameter_agent error result.store_wl_creation_update
@@ -633,15 +576,4 @@ let print_result parameter error result =
     fprintf stdout "creation\n";
     print_creation_rule_aux parameter error result.store_rule_creation_in_wl
   in
-  (*let _ =
-    let parameter_agent = Remanent_parameters.update_prefix parameter "agent_type_" in
-    
-    fprintf (Remanent_parameters.get_log parameter)
-      "- Bdu of creation iteration:\n";
-    print_bdu_creation_array parameter_agent error result.store_bdu_creation_array;
-    
-    fprintf (Remanent_parameters.get_log parameter)
-      "- Bdu of fixpoint iteration:\n";
-    print_fixpoint parameter_agent error result.store_fixpoint_iteration
-  in*)
   error

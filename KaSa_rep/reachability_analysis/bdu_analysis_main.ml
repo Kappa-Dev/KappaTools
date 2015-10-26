@@ -35,30 +35,6 @@ let trace = false
 
 let scan_rule parameter error handler rule_id rule covering_classes compiled store_result =
   (*------------------------------------------------------------------------------*)
-  (*list of rules has a creation action *)
-  (*let error, store_creation_rule =
-    collect_rule_creation
-      parameter
-      error
-      handler
-      rule
-      rule_id
-      rule.rule_rhs.views
-      rule.actions.creation
-      store_result.store_creation_rule
-  in*)
-  (*------------------------------------------------------------------------------*)
-  (*bdu structure of creation rules-this function uses for testing the
-    result of the list of creation rules in the working list.*)
-  (*let error, store_creation =
-    collect_creation
-      parameter
-      error
-      rule.rule_rhs.views
-      rule.actions.creation
-      store_result.store_creation
-  in*)
-  (*------------------------------------------------------------------------------*)
   (*static information of covering classes: from sites -> covering_class id list*)
   let error, store_covering_classes_id =
     site_covering_classes
@@ -178,10 +154,10 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       error
       handler
       rule
-	store_wl_creation
-	  rule.rule_rhs.views
-	  rule.actions.creation
-	  store_result.store_rule_creation_in_wl
+      store_wl_creation (*FIXME*)
+      rule.rule_rhs.views
+      rule.actions.creation
+      store_result.store_rule_creation_in_wl
   in
   (*------------------------------------------------------------------------------*)
   let error, store_bdu_creation_array =
@@ -206,8 +182,6 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
   (*store*)
   error,
   {
-    (*store_creation                             = store_creation;
-    store_creation_rule                        = store_creation_rule;*)
     (*static information*)
     store_covering_classes_id                  = store_covering_classes_id;
     store_side_effects                         = store_side_effects;
@@ -234,8 +208,6 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
 (*RULES*)
 
 let scan_rule_set parameter error handler covering_classes compiled rules =
-  (*let error, init_creation         = AgentMap.create parameter error 0 in
-  let error, init_creation_rule    = AgentMap.create parameter error 0 in*)
   (*static information*)
   let init_covering_classes_id     = Int2Map_CV.empty_map in
   let init_half_break              = Int2Map_HalfBreak_effect.empty_map  in
@@ -262,8 +234,6 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
   let error, init_rule_creation = AgentMap.create parameter error 0 in
   let init_bdu =
     {
-      (*store_creation            = init_creation;
-      store_creation_rule       = init_creation_rule;*)
       (*static information*)
       store_covering_classes_id = init_covering_classes_id;
       store_side_effects        = (init_half_break, init_remove);
