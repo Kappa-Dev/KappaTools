@@ -111,7 +111,7 @@ let main () =
       error, None 
   in
   (*covering classes*)
-  let error,covering_classes = 
+  let error, covering_classes = 
     if Remanent_parameters.get_do_site_dependencies parameters
     then 
       let parameters_cv =
@@ -120,10 +120,10 @@ let main () =
 	if (Remanent_parameters.get_trace parameters_cv)
 	then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "Potential dependencies between sites:\n"
       in
-      let error,dep = Covering_classes_main.covering_classes parameters_cv error handler c_compil 
-      in error,Some dep 
+      let error, (dep, c) = Covering_classes_main.covering_classes parameters_cv error handler c_compil 
+      in error, Some (dep, c)
     else 
-      error,None 
+      error, None 
   in
   (*BDU of fixpoint iteration function*)
   let error,bdu_analysic = 
@@ -137,12 +137,12 @@ let main () =
 	then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n"
       in
       (*getting covering classes*)
-      let error, covering_classes =
+      let error, (covering_classes, _) =
         Covering_classes_main.covering_classes parameters_cv error handler c_compil
        in
-       let error,dep =
+       let error, dep =
 	 Bdu_analysis_main.bdu_main parameters_cv error handler covering_classes c_compil 
-       in error,Some dep 
+       in error,Some dep
     else 
       error,None 
   in

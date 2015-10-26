@@ -125,6 +125,21 @@ site_type:2
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:0:
 site_type:1
 site_type:2
+------------------------------------------------------
+Covering classes with type set:
+agent_type:0:
+Potential dependencies between sites:
+site_type:0
+site_type:1
+Potential dependencies between sites:new index:
+site_type:1
+site_type:2
+Potential dependencies between sites:TEST:new index:
+site_type:1
+site_type:2
+Potential dependencies between sites:MODIFICATION-:new index:
+site_type:1
+site_type:2
 ============================================================
 * BDU Analysis:
 ============================================================

@@ -532,6 +532,51 @@ site_type:1
 site_type:2
 site_type:3
 site_type:4
+------------------------------------------------------
+Covering classes with type set:
+agent_type:0:
+Potential dependencies between sites:
+site_type:0
+site_type:1
+Potential dependencies between sites:new index:
+site_type:1
+site_type:2
+Potential dependencies between sites:TEST:new index:
+site_type:1
+site_type:2
+Potential dependencies between sites:MODIFICATION-:new index:
+site_type:1
+site_type:2
+agent_type:1:
+Potential dependencies between sites:
+site_type:0
+Potential dependencies between sites:new index:
+site_type:1
+Potential dependencies between sites:TEST:new index:
+site_type:1
+Potential dependencies between sites:MODIFICATION-:new index:
+site_type:1
+agent_type:2:
+Potential dependencies between sites:
+site_type:0
+site_type:1
+site_type:2
+site_type:3
+Potential dependencies between sites:new index:
+site_type:1
+site_type:2
+site_type:3
+site_type:4
+Potential dependencies between sites:TEST:new index:
+site_type:1
+site_type:2
+site_type:3
+site_type:4
+Potential dependencies between sites:MODIFICATION-:new index:
+site_type:1
+site_type:2
+site_type:3
+site_type:4
 ============================================================
 * BDU Analysis:
 ============================================================

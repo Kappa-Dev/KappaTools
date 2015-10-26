@@ -77,6 +77,8 @@ Influence_map:Wake_up_map:rule(0):'r0' A()->B() -> rule(1):'r1' B()->C()[0->0]
 Refining the influence map...
 Reachability analysis...
 
+------------------------------------------------------
+Covering classes with type set:
 ============================================================
 * BDU Analysis:
 ============================================================

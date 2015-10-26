@@ -71,3 +71,5 @@ type remanent =
       store_test_new_index_dic  : test_dic;
       store_modif_new_index_dic : modif_dic;
     }
+
+(*type of remanent with a set of sites*)

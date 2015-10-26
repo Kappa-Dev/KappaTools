@@ -159,6 +159,7 @@ let scan_rule_set_remanent parameter error handler rules =
 (*MAIN*)
 
 let covering_classes parameter error handler cc_compil =
+  let error, init = AgentMap.create parameter error 0 in
   let parameter = Remanent_parameters.update_prefix parameter "agent_type:" in
   let error, result = scan_rule_set_remanent parameter error handler cc_compil.rules in
   let error =
@@ -168,4 +169,20 @@ let covering_classes parameter error handler cc_compil =
     else
       error
   in
-  error, result
+  (*convert a list of site inside result [remanent] to a set of site*)
+  let error, covering_classes_set2list =
+    Covering_classes_list2set.collect_remanent_list2set parameter error
+      result init
+  in
+  let error =
+    if (Remanent_parameters.get_trace parameter) || trace
+    then
+      begin
+        Printf.fprintf stdout "------------------------------------------------------\n";
+        Printf.fprintf stdout "Covering classes with type set:\n";
+        Covering_classes_list2set.print_list2set parameter error covering_classes_set2list
+      end
+    else
+      error
+  in
+  error, (result, covering_classes_set2list)

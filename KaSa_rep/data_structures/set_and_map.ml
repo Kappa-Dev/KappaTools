@@ -679,13 +679,13 @@ module Make(Ord:OrderedType) =
         | Node_map (left1, value1, data1, right1, height1),
           Node_map (left2, value2, data2, right2, height2) ->
           if height1 >= height2 then
-            let mh', (left2, _, right2) =
+            let mh', (left2, op_value, right2) =
               split_map parameters mh value1 map2 in
             let mh'', l = union_map parameters mh' left1 left2 in
             let mh''', r = union_map parameters mh'' right1 right2 in
             join_map parameters mh''' l value1 data1 r
           else
-            let mh', (l1, _, r1) =
+            let mh', (left1, op_value, right1) =
               split_map parameters mh value2 map1 in
             let mh'', l = union_map parameters mh'  left1 left2 in
             let mh''', r = union_map parameters mh'' right1 right2 in

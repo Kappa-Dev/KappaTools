@@ -83,28 +83,6 @@ let store_pointer_backward parameter error id pointer_backward covering_class =
       pointer_backward)
     (error, pointer_backward)
     covering_class
-
-(************************************************************************************)
-(*DICTIONARY*)
-
-let common_allocate_dic parameter error value good_dic =
-  let error, output =
-    Dictionary_of_Covering_class.allocate
-      parameter
-      error
-      Misc_sa.compare_unit
-      value
-      ()
-      Misc_sa.const_unit
-      good_dic
-  in
-  (*return id and result as a dictionary type*)
-  let error, (id_dic, store_dic) =
-    match output with
-      | Some (id, _, _, dic) -> error, (id, dic)
-      | None -> warn parameter error (Some "line 197") Exit (0, good_dic)
-  in
-  error, (id_dic, store_dic)
   
 (*------------------------------------------------------------------------------*)
 (*compute covering class dictionary*)
@@ -127,11 +105,6 @@ let covering_class_dic parameter error covering_class good_covering_class =
       | None -> warn parameter error (Some "line 197") Exit (0, good_covering_class)
   in
   error, (id_dic, store_dic)
-  (*common_allocate_dic
-    parameter
-    error
-    covering_class 
-    good_covering_class*)
 
 (*------------------------------------------------------------------------------*)
 

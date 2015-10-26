@@ -84,7 +84,7 @@ let collect_modified_map parameter error diff_reverse store_modified_map =
     ) diff_reverse
     store_modified_map
 
-(*------------------------------------------------------------------------------*)
+(************************************************************************************)   
 (*compute covering_class*)
 
 let add_covering_class parameter error agent_type list store_covering_classes =
