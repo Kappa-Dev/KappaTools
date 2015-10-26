@@ -90,6 +90,10 @@ module type Set_and_Map = sig
   val diff_map: Remanent_parameters_sig.parameters ->Exception.method_handler -> 'a map -> 'a map -> Exception.method_handler * 'a map * 'a map 
   val diff_map_pred: Remanent_parameters_sig.parameters ->Exception.method_handler -> ('a -> 'a -> bool) -> 'a map -> 'a map -> Exception.method_handler * 'a map * 'a map 
   val merge_map : Remanent_parameters_sig.parameters ->Exception.method_handler -> 'a map -> 'a map -> Exception.method_handler * 'a map
+
+  val fold_map_restriction:  Remanent_parameters_sig.parameters ->Exception.method_handler -> (key -> 'a -> (Exception.method_handler * 'b) -> (Exception.method_handler * 'b)) -> set -> 'a map -> 'b -> Exception.method_handler * 'b 
+ 
+
 end
 
 module Make(Ord:OrderedType) =  
@@ -861,5 +865,21 @@ module Make(Ord:OrderedType) =
                 let error,o2 = merge_map parameters error oleft2 oright2 in
                 error,o1,o2 
           end 
+
+    let rec fold_map_restriction parameters rh f set map res =
+      match set,map with 
+        | Empty_set,_ -> rh,res
+        | Node_set(left1,key1,right1,_),_ -> 
+          let rh',(left2,data2,right2) = split_map parameters rh key1 map in 
+          begin 
+            match data2 with 
+              | None -> 
+		let rh'', res' = fold_map_restriction parameters rh' f left1 left2 res in 
+                fold_map_restriction parameters rh'' f right1 right2 res'
+              | Some data2 -> 
+                let rh'', res' = fold_map_restriction parameters rh' f left1 left2 res in 
+                let rh''',res'' = f key1 data2 (rh'',res') in
+                fold_map_restriction parameters rh''' f right1 right2 res''
+          end
             
    end:Set_and_Map with type key = Ord.t and type elt = Ord.t)
