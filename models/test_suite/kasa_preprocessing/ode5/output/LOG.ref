@@ -425,6 +425,8 @@ site_type:1
 site_type:2
 site_type:3
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:1:
+site_type:2
+Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:0:class_id:2:
 site_type:1
 site_type:2
 Potential dependencies between sites:Covering_class_id:1:
@@ -449,6 +451,8 @@ site_type:1
 site_type:2
 site_type:3
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:1:class_id:1:
+site_type:2
+Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:1:class_id:2:
 site_type:1
 site_type:2
 Potential dependencies between sites:Covering_class_id:2:
@@ -473,6 +477,8 @@ site_type:1
 site_type:2
 site_type:3
 Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:2:class_id:1:
+site_type:2
+Potential dependencies between sites:New-index:MODIFICATION-:Covering_class_id:2:class_id:2:
 site_type:1
 site_type:2
 agent_type:1:
@@ -524,62 +530,60 @@ site_type:3
 ------------------------------------------------------
 Covering classes with type set:
 agent_type:0:
-Potential dependencies between sites:
+Potential dependencies between sites:Covering_class_id:0
 site_type:2
 site_type:3
 site_type:4
-Potential dependencies between sites:new index:
+Potential dependencies between sites:New-index:Covering_class_id:0
 site_type:1
 site_type:2
 site_type:3
-Potential dependencies between sites:TEST:new index:
+Potential dependencies between sites:TEST:New-index:Covering_class_id:0
 site_type:1
 site_type:2
 site_type:3
-Potential dependencies between sites:MODIFICATION-:new index:
-site_type:1
+Potential dependencies between sites:MODIFICATION-:New-index:Covering_class_id:1
 site_type:2
-site_type:3
 agent_type:1:
-Potential dependencies between sites:
+Potential dependencies between sites:Covering_class_id:0
 site_type:0
 site_type:1
-Potential dependencies between sites:new index:
+Potential dependencies between sites:New-index:Covering_class_id:0
 site_type:1
 site_type:2
-Potential dependencies between sites:TEST:new index:
+Potential dependencies between sites:TEST:New-index:Covering_class_id:0
 site_type:1
 site_type:2
-Potential dependencies between sites:MODIFICATION-:new index:
+Potential dependencies between sites:MODIFICATION-:New-index:Covering_class_id:0
 site_type:1
 site_type:2
 agent_type:2:
-Potential dependencies between sites:
+Potential dependencies between sites:Covering_class_id:0
 site_type:0
 site_type:1
-Potential dependencies between sites:new index:
+Potential dependencies between sites:New-index:Covering_class_id:0
 site_type:1
 site_type:2
-Potential dependencies between sites:TEST:new index:
+Potential dependencies between sites:TEST:New-index:Covering_class_id:0
 site_type:1
 site_type:2
-Potential dependencies between sites:MODIFICATION-:new index:
+Potential dependencies between sites:MODIFICATION-:New-index:Covering_class_id:0
 site_type:1
 site_type:2
 agent_type:3:
-Potential dependencies between sites:
+Potential dependencies between sites:Covering_class_id:0
 site_type:0
 site_type:1
 site_type:2
-Potential dependencies between sites:new index:
+Potential dependencies between sites:New-index:Covering_class_id:0
 site_type:1
 site_type:2
 site_type:3
-Potential dependencies between sites:TEST:new index:
+Potential dependencies between sites:TEST:New-index:Covering_class_id:0
 site_type:1
 site_type:2
 site_type:3
-Potential dependencies between sites:MODIFICATION-:new index:
+Potential dependencies between sites:MODIFICATION-:New-index:Covering_class_id:0
 site_type:1
 site_type:2
 site_type:3
@@ -625,6 +629,60 @@ agent_type:3@site_type:0:rule_id:2
 agent_type:3@site_type:1:rule_id:3
 agent_type:3@site_type:2:rule_id:4
 ------------------------------------------------------------
+Test sites (will be removed):
+------------------------------------------------------------
+agent_type:0@site_type:0:rule_id:0
+agent_type:0@site_type:1:rule_id:1
+agent_type:0@site_type:2:rule_id:0
+agent_type:0@site_type:2:rule_id:4
+agent_type:0@site_type:3:rule_id:1
+agent_type:0@site_type:3:rule_id:4
+agent_type:0@site_type:4:rule_id:4
+agent_type:1@site_type:0:rule_id:0
+agent_type:1@site_type:0:rule_id:2
+agent_type:1@site_type:1:rule_id:2
+agent_type:2@site_type:0:rule_id:1
+agent_type:2@site_type:0:rule_id:3
+agent_type:2@site_type:1:rule_id:3
+agent_type:3@site_type:0:rule_id:2
+agent_type:3@site_type:0:rule_id:4
+agent_type:3@site_type:1:rule_id:3
+agent_type:3@site_type:1:rule_id:4
+agent_type:3@site_type:2:rule_id:4
+------------------------------------------------------------
+Test and modification sites (will be removed):
+------------------------------------------------------------
+agent_type:0@site_type:0:rule_id:0
+agent_type:0@site_type:1:rule_id:1
+agent_type:0@site_type:2:rule_id:0
+agent_type:0@site_type:3:rule_id:1
+agent_type:0@site_type:4:rule_id:4
+agent_type:1@site_type:0:rule_id:0
+agent_type:1@site_type:1:rule_id:2
+agent_type:2@site_type:0:rule_id:1
+agent_type:2@site_type:1:rule_id:3
+agent_type:3@site_type:0:rule_id:2
+agent_type:3@site_type:1:rule_id:3
+agent_type:3@site_type:2:rule_id:4
+agent_type:0@site_type:0:rule_id:0
+agent_type:0@site_type:1:rule_id:1
+agent_type:0@site_type:2:rule_id:0
+agent_type:0@site_type:2:rule_id:4
+agent_type:0@site_type:3:rule_id:1
+agent_type:0@site_type:3:rule_id:4
+agent_type:0@site_type:4:rule_id:4
+agent_type:1@site_type:0:rule_id:0
+agent_type:1@site_type:0:rule_id:2
+agent_type:1@site_type:1:rule_id:2
+agent_type:2@site_type:0:rule_id:1
+agent_type:2@site_type:0:rule_id:3
+agent_type:2@site_type:1:rule_id:3
+agent_type:3@site_type:0:rule_id:2
+agent_type:3@site_type:0:rule_id:4
+agent_type:3@site_type:1:rule_id:3
+agent_type:3@site_type:1:rule_id:4
+agent_type:3@site_type:2:rule_id:4
+------------------------------------------------------------
 Creation sites (will be removed):
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -641,6 +699,39 @@ agent_type:2@site_type:0:rule_id:1
 agent_type:2@site_type:1:rule_id:3
 agent_type:3@site_type:0:rule_id:2
 agent_type:3@site_type:1:rule_id:3
+agent_type:3@site_type:2:rule_id:4
+------------------------------------------------------------
+Test and modification sites without creation (will be removed):
+------------------------------------------------------------
+agent_type:0@site_type:0:rule_id:0
+agent_type:0@site_type:1:rule_id:1
+agent_type:0@site_type:2:rule_id:0
+agent_type:0@site_type:3:rule_id:1
+agent_type:0@site_type:4:rule_id:4
+agent_type:1@site_type:0:rule_id:0
+agent_type:1@site_type:1:rule_id:2
+agent_type:2@site_type:0:rule_id:1
+agent_type:2@site_type:1:rule_id:3
+agent_type:3@site_type:0:rule_id:2
+agent_type:3@site_type:1:rule_id:3
+agent_type:3@site_type:2:rule_id:4
+agent_type:0@site_type:0:rule_id:0
+agent_type:0@site_type:1:rule_id:1
+agent_type:0@site_type:2:rule_id:0
+agent_type:0@site_type:2:rule_id:4
+agent_type:0@site_type:3:rule_id:1
+agent_type:0@site_type:3:rule_id:4
+agent_type:0@site_type:4:rule_id:4
+agent_type:1@site_type:0:rule_id:0
+agent_type:1@site_type:0:rule_id:2
+agent_type:1@site_type:1:rule_id:2
+agent_type:2@site_type:0:rule_id:1
+agent_type:2@site_type:0:rule_id:3
+agent_type:2@site_type:1:rule_id:3
+agent_type:3@site_type:0:rule_id:2
+agent_type:3@site_type:0:rule_id:4
+agent_type:3@site_type:1:rule_id:3
+agent_type:3@site_type:1:rule_id:4
 agent_type:3@site_type:2:rule_id:4
 
 ** Dynamic information:

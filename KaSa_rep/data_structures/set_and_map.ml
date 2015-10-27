@@ -69,28 +69,21 @@ module type Set_and_Map = sig
   val fold_map: (key -> 'a -> 'b -> 'b) -> 'a map -> 'b -> 'b 
   val join_map: Remanent_parameters_sig.parameters->Exception.method_handler -> 'a map -> key -> 'a -> 'a map -> Exception.method_handler * 'a map
   val split_map: Remanent_parameters_sig.parameters->Exception.method_handler-> key -> 'a map -> Exception.method_handler * ('a map * 'a option * 'a map)
-
-  (*val union_map: Remanent_parameters_sig.parameters->Exception.method_handler-> 'a map -> 'a map -> Exception.method_handler * 'a map*)
-  val union_map : Remanent_parameters_sig.parameters->Exception.method_handler ->
-    'a map -> 'a map -> Exception.method_handler * 'a map
-
   val bindings : 'a map -> (key * 'a) list
   val equal_map: ('a -> 'a -> bool) -> 'a map -> 'a map -> bool
   val update_map: Remanent_parameters_sig.parameters ->Exception.method_handler -> 'a map -> 'a map -> Exception.method_handler * 'a map    
   val map2_map: Remanent_parameters_sig.parameters ->Exception.method_handler -> ('a -> 'a -> 'a) -> 'a map -> 'a map -> Exception.method_handler * 'a map 
   val fold2z_map: Remanent_parameters_sig.parameters -> Exception.method_handler -> (key -> 'a  -> 'b  -> (Exception.method_handler * 'c)  -> (Exception.method_handler * 'c)) -> 'a map -> 'b map -> 'c -> Exception.method_handler * 'c 
   val fold2_map: Remanent_parameters_sig.parameters -> Exception.method_handler -> (key -> 'a  -> 'b  -> (Exception.method_handler * 'c)  -> (Exception.method_handler * 'c)) -> (key -> 'a   -> (Exception.method_handler * 'c)  -> (Exception.method_handler * 'c)) -> (key -> 'b  -> (Exception.method_handler * 'c)  -> (Exception.method_handler * 'c)) ->  'a map -> 'b map -> 'c -> Exception.method_handler * 'c 
-  
   val fold2_map_sparse: Remanent_parameters_sig.parameters -> Exception.method_handler -> (key -> 'a  -> 'b  -> (Exception.method_handler * 'c)  -> (Exception.method_handler * 'c)) ->  'a map -> 'b map -> 'c -> Exception.method_handler * 'c
- 
-  val iter2_map_sparse: Remanent_parameters_sig.parameters -> Exception.method_handler -> (key -> 'a  -> 'b  -> Exception.method_handler   -> Exception.method_handler)->  'a map -> 'b map -> Exception.method_handler
-	     
+  val iter2_map_sparse: Remanent_parameters_sig.parameters -> Exception.method_handler -> (key -> 'a  -> 'b  -> Exception.method_handler   -> Exception.method_handler)->  'a map -> 'b map -> Exception.method_handler     
   val forall_map: (key -> 'a -> bool) -> 'a map -> bool 
   val min_elt_map: (key -> 'a -> bool) -> 'a map -> key option  
   val diff_map: Remanent_parameters_sig.parameters ->Exception.method_handler -> 'a map -> 'a map -> Exception.method_handler * 'a map * 'a map 
   val diff_map_pred: Remanent_parameters_sig.parameters ->Exception.method_handler -> ('a -> 'a -> bool) -> 'a map -> 'a map -> Exception.method_handler * 'a map * 'a map 
   val merge_map : Remanent_parameters_sig.parameters ->Exception.method_handler -> 'a map -> 'a map -> Exception.method_handler * 'a map
-
+  val union_map : Remanent_parameters_sig.parameters->Exception.method_handler ->
+    'a map -> 'a map -> Exception.method_handler * 'a map
   val fold_map_restriction:  Remanent_parameters_sig.parameters ->Exception.method_handler -> (key -> 'a -> (Exception.method_handler * 'b) -> (Exception.method_handler * 'b)) -> set -> 'a map -> 'b -> Exception.method_handler * 'b 
  
 
@@ -679,19 +672,30 @@ module Make(Ord:OrderedType) =
         | Node_map (left1, value1, data1, right1, height1),
           Node_map (left2, value2, data2, right2, height2) ->
           if height1 >= height2 then
-            let mh', (left2, op_value, right2) =
-              split_map parameters mh value1 map2 in
-            let mh'', l = union_map parameters mh' left1 left2 in
-            let mh''', r = union_map parameters mh'' right1 right2 in
-            join_map parameters mh''' l value1 data1 r
+            begin
+              let mh', (left2, op_data2, right2) =
+                split_map parameters mh value1 map2 in
+              let mh'', left' = union_map parameters mh' left1 left2 in
+              let mh''', right' = union_map parameters mh'' right1 right2 in
+              join_map parameters mh''' left' value1 
+                (match op_data2 with
+                | None -> data1
+                | Some d2 -> d2
+                ) right'
+            end
           else
-            let mh', (left1, op_value, right1) =
-              split_map parameters mh value2 map1 in
-            let mh'', l = union_map parameters mh'  left1 left2 in
-            let mh''', r = union_map parameters mh'' right1 right2 in
-            join_map parameters mh''' l value2 data2 r
-
-    let rec bindings_aux accu = function
+            begin
+              let mh', (left1, op_data1, right1) =
+                split_map parameters mh value2 map1 in
+              let mh'', left' = union_map parameters mh'  left1 left2 in
+              let mh''', right' = union_map parameters mh'' right1 right2 in
+              join_map parameters mh''' left' value1
+                (match op_data1 with
+                | None -> data2
+                | Some d1 -> d1) right'
+            end
+              
+     let rec bindings_aux accu = function
       | Empty_map -> accu
       | Node_map (l, v, d, r, _) -> bindings_aux ((v, d) :: bindings_aux accu r) l
         
@@ -746,7 +750,9 @@ module Make(Ord:OrderedType) =
             let rh'', left' = update_map parameters rh' left1 left2 in 
             let rh''', right' = update_map parameters rh'' right1 right2 in 
             join_map parameters rh''' left' key1 
-              (match data2 with None -> data1 | Some d2 -> d2)
+              (match data2 with 
+                None -> data1 
+              | Some d2 -> d2)
               right' 
               
     let rec map2_map parameters rh f map1 map2 =
@@ -757,8 +763,10 @@ module Make(Ord:OrderedType) =
           let rh'', left' = map2_map parameters rh' f left1 left2 in 
           let rh''', right' = map2_map parameters rh'' f right1 right2 in 
           join_map parameters rh''' left' key1 
-            (match data2 with None -> data1 | Some d2 -> f data1 d2)
-            right'       
+            (match data2 with 
+              None -> data1
+            | Some d2 -> f data1 d2
+            ) right'       
             
     let rec fold2z_map parameters rh f map1 map2 res =
       match map1,map2 with 

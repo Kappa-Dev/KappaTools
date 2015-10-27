@@ -368,6 +368,44 @@ let print_modification_sites parameter error result = (*REMOVE*)
   in
   error
 
+(*test*)
+let print_test_sites parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "Test sites (will be removed):\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  let error =
+    print_modification_sites_aux parameter error result;
+  in
+  error  
+
+(*test*)
+let print_test_modification_sites parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "Test and modification sites (will be removed):\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  let error =
+    print_modification_sites_aux parameter error result;
+  in
+  error
+
+let print_test_modification_without_creation parameter error result =
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "Test and modification sites without creation (will be removed):\n";
+  fprintf (Remanent_parameters.get_log parameter)
+    "------------------------------------------------------------\n";
+  let error =
+    print_modification_sites_aux parameter error result;
+  in
+  error
+
 let print_creation_sites parameter error result = (*REMOVE*)
   fprintf (Remanent_parameters.get_log parameter)
     "------------------------------------------------------------\n";
@@ -561,11 +599,21 @@ let print_result parameter error result =
       print_modification_sites parameter error result.store_modification_sites
   in
   let _ = (*will be removed*)
+    print_test_sites parameter error result.store_test_sites
+  in
+  let _ = (*will be removed*)
+    print_test_modification_sites parameter error result.store_test_modification_sites
+  in
+  let _ = (*will be removed*)
       print_creation_sites parameter error result.store_creation_sites
   in
   let _ =
     print_modification_sites_without_creation parameter error
       result.store_modification_sites_without_creation
+  in
+  let _ = 
+    print_test_modification_without_creation parameter error
+      result.store_test_modification_without_creation
   in
   let _ =
     fprintf (Remanent_parameters.get_log parameter) 

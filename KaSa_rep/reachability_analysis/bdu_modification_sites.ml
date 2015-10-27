@@ -85,6 +85,57 @@ let collect_modification_sites parameter error rule_id diff_direct store_result 
   error, store_result
 
 (************************************************************************************)
+(*collect a set of rule_id of test rule and modification *)
+
+let collect_test_sites parameter error rule_id viewslhs 
+    store_result =
+  let add_link (agent_type, site_type) rule_id store_result =
+    let error, (l, old) =
+      try Int2Map_Modif.find_map parameter error (agent_type, site_type) store_result
+      with Not_found -> error, ([], Site_map_and_set.empty_set)
+    in
+    let error, current_set =
+      Site_map_and_set.add_set parameter error rule_id old
+    in
+    let error, new_set =
+      Site_map_and_set.union parameter error current_set old
+    in
+    let error, result =
+      Int2Map_Modif.add_map parameter error (agent_type, site_type)
+        (l, new_set) store_result
+    in
+    error, result
+  in
+  let error, store_result =
+    AgentMap.fold parameter error
+      (fun parameter error agent_id agent store_result ->
+       match agent with
+       | Ghost -> error, store_result
+       | Agent agent ->
+         let agent_type = agent.agent_name in
+         let error, store_result_test =
+           Site_map_and_set.fold_map
+             (fun site_type _ (error, store_result) ->
+               let error, store_result_test =
+                 add_link (agent_type, site_type) rule_id store_result
+               in
+               error, store_result_test
+             ) agent.agent_interface (error, store_result)
+         in
+         error, store_result_test
+      ) viewslhs store_result
+  in
+  let store_result =
+    Int2Map_Modif.map_map (fun (l, x) -> List.rev l, x) store_result
+  in
+  error, store_result
+
+let collect_test_modification_sites parameter error store_modification_sites
+    store_test_sites =
+  Int2Map_Modif.merge_map parameter error store_modification_sites
+    store_test_sites
+
+(************************************************************************************)
 (*creation rule_id*)
 
 let collect_creation_sites parameter error rule_id viewsrhs creation store_result =
@@ -202,7 +253,15 @@ let collect_modification_sites_without_creation parameter error
     Int2Map_Modif.map_map (fun (l, x) -> List.rev l, x) store_result
   in
   error, store_result
-    
+
+(************************************************************************************)
+(*test + modification without creation *)
+
+let collect_test_modification_without_creation parameter error 
+    store_modification_without_creation store_test_sites =
+  Int2Map_Modif.merge_map parameter error store_modification_without_creation
+    store_test_sites
+
 (************************************************************************************)
 (*a pair (agent_type_cv, site_cv) in covering classes
   return a list of covering_classes_id*)

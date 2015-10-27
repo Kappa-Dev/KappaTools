@@ -108,9 +108,14 @@ type bdu_analysic =
       store_creation_sites      : (int list * Site_map_and_set.set) Int2Map_Modif.map;
       store_modification_sites_without_creation : (int list * Site_map_and_set.set)
 	Int2Map_Modif.map;
-      store_modification_sites  : 
-      (int list * Site_map_and_set.set) Int2Map_Modif.map; 
-        
+      store_modification_sites  : (*REMOVE*)
+      (int list * Site_map_and_set.set) Int2Map_Modif.map;
+      store_test_sites :
+        (int list * Site_map_and_set.set) Int2Map_Modif.map;
+      store_test_modification_sites : 
+        (int list * Site_map_and_set.set) Int2Map_Modif.map;
+      store_test_modification_without_creation : (*update*)
+        (int list * Site_map_and_set.set) Int2Map_Modif.map;
       (*------------------------------------------------------------------------------*)
       (*dynamic information*)
       store_contact_map      : 

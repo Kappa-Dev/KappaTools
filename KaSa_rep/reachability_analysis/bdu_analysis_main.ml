@@ -82,6 +82,31 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       rule.diff_direct
       store_result.store_modification_sites
   in
+  (*test*)
+  let error, store_test_sites =
+    collect_test_sites
+      parameter
+      error
+      rule_id
+      rule.rule_lhs.views
+      store_result.store_test_sites
+  in
+  (*test and modification*)
+  let error, store_test_modification_sites =
+    collect_test_modification_sites
+      parameter
+      error
+      store_modification_sites
+      store_test_sites
+  in
+  (*test and modification without creation*)
+  let error, store_test_modification_without_creation =
+    collect_test_modification_without_creation
+      parameter
+      error
+      store_modification_sites_without_creation
+      store_test_sites
+  in
   (*------------------------------------------------------------------------------*)
   (*contact map*)
   let error, store_contact_map =
@@ -197,6 +222,9 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
     store_creation_sites                       = store_creation_sites;
     store_modification_sites_without_creation  = store_modification_sites_without_creation;
     store_modification_sites                   = store_modification_sites;
+    store_test_sites                           = store_test_sites;
+    store_test_modification_sites              = store_test_modification_sites;
+    store_test_modification_without_creation   = store_test_modification_without_creation;
     (*dynamic information*)
     store_contact_map                          = store_contact_map;
     store_covering_classes_modification_update =
@@ -226,6 +254,9 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
   let init_creation                = Int2Map_Modif.empty_map in
   let init_modif_without_creation  = Int2Map_Modif.empty_map in
   let init_modification            = Int2Map_Modif.empty_map in
+  let init_test                    = Int2Map_Modif.empty_map in
+  let init_test_modification       = Int2Map_Modif.empty_map in
+  let init_test_modification_without_creation = Int2Map_Modif.empty_map in
   (*dynamic information*)
   let init_contact_map             = Int2Map_CM_state.empty_map in
   let init_cv_modification         = Int2Map_CV_Modif.empty_map in
@@ -252,6 +283,9 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
       store_creation_sites      = init_creation;
       store_modification_sites_without_creation = init_modif_without_creation;
       store_modification_sites  = init_modification;
+      store_test_sites = init_test;
+      store_test_modification_sites = init_test_modification;
+      store_test_modification_without_creation = init_test_modification_without_creation;
       (*dynamic information*)
       store_contact_map         = init_contact_map;
       store_covering_classes_modification_update = init_cv_modification;

@@ -216,39 +216,39 @@ site_type:1
 ------------------------------------------------------
 Covering classes with type set:
 agent_type:0:
-Potential dependencies between sites:
+Potential dependencies between sites:Covering_class_id:0
 site_type:0
 site_type:1
-Potential dependencies between sites:new index:
+Potential dependencies between sites:New-index:Covering_class_id:0
 site_type:1
 site_type:2
-Potential dependencies between sites:TEST:new index:
+Potential dependencies between sites:TEST:New-index:Covering_class_id:0
 site_type:1
 site_type:2
-Potential dependencies between sites:MODIFICATION-:new index:
+Potential dependencies between sites:MODIFICATION-:New-index:Covering_class_id:0
 site_type:1
 site_type:2
 agent_type:1:
-Potential dependencies between sites:
+Potential dependencies between sites:Covering_class_id:0
 site_type:0
 site_type:1
-Potential dependencies between sites:new index:
+Potential dependencies between sites:New-index:Covering_class_id:0
 site_type:1
 site_type:2
-Potential dependencies between sites:TEST:new index:
+Potential dependencies between sites:TEST:New-index:Covering_class_id:0
 site_type:1
 site_type:2
-Potential dependencies between sites:MODIFICATION-:new index:
+Potential dependencies between sites:MODIFICATION-:New-index:Covering_class_id:0
 site_type:1
 site_type:2
 agent_type:2:
-Potential dependencies between sites:
+Potential dependencies between sites:Covering_class_id:0
 site_type:0
-Potential dependencies between sites:new index:
+Potential dependencies between sites:New-index:Covering_class_id:0
 site_type:1
-Potential dependencies between sites:TEST:new index:
+Potential dependencies between sites:TEST:New-index:Covering_class_id:0
 site_type:1
-Potential dependencies between sites:MODIFICATION-:new index:
+Potential dependencies between sites:MODIFICATION-:New-index:Covering_class_id:0
 site_type:1
 ============================================================
 * BDU Analysis:
@@ -276,6 +276,31 @@ agent_type:1@site_type:0:rule_id:0
 agent_type:1@site_type:1:rule_id:1
 agent_type:2@site_type:0:rule_id:1
 ------------------------------------------------------------
+Test sites (will be removed):
+------------------------------------------------------------
+agent_type:0@site_type:0:rule_id:0
+agent_type:0@site_type:1:rule_id:0
+agent_type:1@site_type:0:rule_id:0
+agent_type:1@site_type:0:rule_id:1
+agent_type:1@site_type:1:rule_id:0
+agent_type:1@site_type:1:rule_id:1
+agent_type:2@site_type:0:rule_id:1
+------------------------------------------------------------
+Test and modification sites (will be removed):
+------------------------------------------------------------
+agent_type:0@site_type:0:rule_id:0
+agent_type:0@site_type:1:rule_id:0
+agent_type:1@site_type:0:rule_id:0
+agent_type:1@site_type:1:rule_id:1
+agent_type:2@site_type:0:rule_id:1
+agent_type:0@site_type:0:rule_id:0
+agent_type:0@site_type:1:rule_id:0
+agent_type:1@site_type:0:rule_id:0
+agent_type:1@site_type:0:rule_id:1
+agent_type:1@site_type:1:rule_id:0
+agent_type:1@site_type:1:rule_id:1
+agent_type:2@site_type:0:rule_id:1
+------------------------------------------------------------
 Creation sites (will be removed):
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -284,6 +309,21 @@ Modification sites without creation:
 agent_type:0@site_type:0:rule_id:0
 agent_type:0@site_type:1:rule_id:0
 agent_type:1@site_type:0:rule_id:0
+agent_type:1@site_type:1:rule_id:1
+agent_type:2@site_type:0:rule_id:1
+------------------------------------------------------------
+Test and modification sites without creation (will be removed):
+------------------------------------------------------------
+agent_type:0@site_type:0:rule_id:0
+agent_type:0@site_type:1:rule_id:0
+agent_type:1@site_type:0:rule_id:0
+agent_type:1@site_type:1:rule_id:1
+agent_type:2@site_type:0:rule_id:1
+agent_type:0@site_type:0:rule_id:0
+agent_type:0@site_type:1:rule_id:0
+agent_type:1@site_type:0:rule_id:0
+agent_type:1@site_type:0:rule_id:1
+agent_type:1@site_type:1:rule_id:0
 agent_type:1@site_type:1:rule_id:1
 agent_type:2@site_type:0:rule_id:1
 

@@ -25,6 +25,7 @@ let warn parameters mh message exn default =
 let trace = false
 
 (************************************************************************************)
+
 let list2set parameter error list =
   List.fold_left (fun (error, current_set) elt ->
     let error, add_set =
@@ -45,8 +46,8 @@ let collect_remanent_list2set parameter error store_remanent store_result =
             let error, list2set =
               list2set parameter error list
             in
-            error, list2set            
-          ) store_dic (error, empty_set)
+            error, (index, list2set)
+          ) store_dic (error, (0, empty_set))
       in
       (*-------------------------------------------------------------------------*)
       (*get covering classes dictionary with new index*)
@@ -57,8 +58,8 @@ let collect_remanent_list2set parameter error store_remanent store_result =
             let error, list2set =
               list2set parameter error list
             in
-            error, list2set
-          ) store_new_index_dic (error, empty_set)
+            error, (index, list2set)
+          ) store_new_index_dic (error, (0, empty_set))
       in
       (*-------------------------------------------------------------------------*)
       (*get test rule in covering classes dictionary with new index*)
@@ -69,8 +70,8 @@ let collect_remanent_list2set parameter error store_remanent store_result =
             let error, list2set =
               list2set parameter error list
             in
-            error, list2set
-          ) store_test_new_index_dic (error, empty_set)
+            error, (index, list2set)
+          ) store_test_new_index_dic (error, (0, empty_set))
       in
       (*-------------------------------------------------------------------------*)
       (*get modification rule in covering classes dictionary with new index*)
@@ -81,8 +82,8 @@ let collect_remanent_list2set parameter error store_remanent store_result =
             let error, list2set =
               list2set parameter error list
             in
-            error, list2set
-          ) store_modif_new_index_dic (error, empty_set)
+            error, (index, list2set)
+          ) store_modif_new_index_dic (error, (0, empty_set))
       in
       (*-------------------------------------------------------------------------*)
       (*store*)
@@ -113,21 +114,31 @@ let print_set set =
 
 let print_list2set parameter error result =
   AgentMap.print error (fun error parameter
-    (site_set, site_new_index_set, site_test_new_index_set, site_modif_new_index_set) ->
+    ((id_site, site_set),
+     (id_new_index, site_new_index_set),
+     (id_test, site_test_new_index_set),
+     (id_modif, site_modif_new_index_set)
+    ) ->
     let _ =
       let _ =
-        Printf.fprintf stdout "Potential dependencies between sites:\n";
-        print_set site_set
+        Printf.fprintf stdout "Potential dependencies between sites:Covering_class_id:%i\n"
+        id_site; print_set site_set
       in
       let _ =
-        Printf.fprintf stdout "Potential dependencies between sites:new index:\n";
+        Printf.fprintf stdout
+          "Potential dependencies between sites:New-index:Covering_class_id:%i\n"
+        id_new_index;
         print_set site_new_index_set
       in
       let _ =
-        Printf.fprintf stdout "Potential dependencies between sites:TEST:new index:\n";
+        Printf.fprintf stdout
+          "Potential dependencies between sites:TEST:New-index:Covering_class_id:%i\n"
+          id_test;
         print_set site_test_new_index_set
       in
-      Printf.fprintf stdout "Potential dependencies between sites:MODIFICATION-:new index:\n";
+      Printf.fprintf stdout
+        "Potential dependencies between sites:MODIFICATION-:New-index:Covering_class_id:%i\n"
+      id_modif;
       print_set site_modif_new_index_set
     in
     error
