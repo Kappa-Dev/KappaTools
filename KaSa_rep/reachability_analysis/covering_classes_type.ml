@@ -52,7 +52,7 @@ module Modified_class =
     type t = int list
     let compare = compare
   end
-
+  
 (*Dictionary*)
 
 module Dictionary_of_Covering_class = Dictionary_of_Ord (Covering_class)
@@ -71,5 +71,3 @@ type remanent =
       store_test_new_index_dic  : test_dic;
       store_modif_new_index_dic : modif_dic;
     }
-
-(*type of remanent with a set of sites*)

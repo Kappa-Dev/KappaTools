@@ -34,9 +34,8 @@ let trace = false
 (************************************************************************************)
 (*static analysis*)
 
-let scan_rule_static parameter error handler rule_id rule store_covering_classes
+let scan_rule_static parameter error handler rule_id rule covering_classes
     store_result =
-  let covering_classes, _ = store_covering_classes in
   (*------------------------------------------------------------------------------*)
   (*static information of covering classes: from sites -> covering_class id list*)
   let error, store_covering_classes_id =
@@ -199,11 +198,28 @@ let scan_rule_dynamic parameter error handler rule_id rule
   }
 
 (************************************************************************************)
+(*rule bdu build*)
+
+let scan_rule_bdu_build parameter error rule covering_class_set store_result =
+  let error, store_restriction_bdu_test =
+    collect_restriction_bdu_test
+      parameter
+      error
+      rule
+      covering_class_set
+      store_result.store_restriction_bdu_test
+  in
+  error, 
+  {
+    store_restriction_bdu_test = store_restriction_bdu_test
+  }
+
+(************************************************************************************)
 (*rule*)
 
 let scan_rule parameter error handler rule_id rule store_covering_classes
     compiled store_result =
-  (*let covering_classes, _covering_class_set = store_covering_classes in*)
+  let covering_classes, covering_class_set = store_covering_classes in
   let error, store_bdu_analysis_static =
     scan_rule_static 
       parameter
@@ -211,7 +227,7 @@ let scan_rule parameter error handler rule_id rule store_covering_classes
       handler
       rule_id 
       rule 
-      store_covering_classes
+      covering_classes
       store_result.store_bdu_analysis_static
   in
   let error, store_bdu_analysis_dynamic =
@@ -226,24 +242,21 @@ let scan_rule parameter error handler rule_id rule store_covering_classes
       store_bdu_analysis_static.store_side_effects
       store_result.store_bdu_analysis_dynamic
   in
-  (*------------------------------------------------------------------------------*)
-  (*fixpoint iteration*)
-  (*let error, store_fixpoint_iteration =
-    collect_bdu_iterate_array
+  let error, store_bdu_build =
+    scan_rule_bdu_build
       parameter
       error
-      handler
-      store_rule_in_wl
-      store_result.store_fixpoint_iteration
-  in*)
+      rule
+      covering_class_set
+      store_result.store_bdu_build
+  in      
   (*------------------------------------------------------------------------------*)
   (*store*)
   error,
   {
     store_bdu_analysis_static  = store_bdu_analysis_static;
-    store_bdu_analysis_dynamic =  store_bdu_analysis_dynamic;
-    (*fixpoint iteration*)
-    (*store_fixpoint_iteration                   = store_fixpoint_iteration*)
+    store_bdu_analysis_dynamic = store_bdu_analysis_dynamic;
+    store_bdu_build            = store_bdu_build
   }
  
 (************************************************************************************)
@@ -301,17 +314,32 @@ let init_bdu_analysis_dynamic parameter error =
       store_wl_creation_update                   = init_wl_creation_update;
     }
   in
-  init_bdu_analysis_dynamic
+  error, init_bdu_analysis_dynamic
+
+(************************************************************************************)
+(*init of bdu build*)
+
+let init_bdu_build parameter error =
+  (*let error, init_restriction_bdu_test = AgentMap.create parameter error 0 in*)
+  let init_restriction_bdu_test = Site_map_and_set.empty_map in
+  let init_restriction_bdu_test =
+    {
+      store_restriction_bdu_test = init_restriction_bdu_test;
+    }
+  in
+  error, init_restriction_bdu_test
 
 (************************************************************************************)
 (*rules*)
 
-let scan_rule_set parameter error handler covering_classes compiled rules =
+let scan_rule_set parameter error handler store_covering_classes compiled rules =
+  let error, init_bdu_analysis_dynamic = init_bdu_analysis_dynamic parameter error in
+  let error, init_bdu_build            = init_bdu_build parameter error in
   let init_bdu =
     {
       store_bdu_analysis_static  = init_bdu_analysis_static;
-      store_bdu_analysis_dynamic = (init_bdu_analysis_dynamic parameter error);
-    (*store_fixpoint_iteration = init_fixpoint;*)
+      store_bdu_analysis_dynamic = init_bdu_analysis_dynamic;
+      store_bdu_build            = init_bdu_build;
     }
   in
   (*------------------------------------------------------------------------------*)
@@ -327,7 +355,7 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
             handler
             rule_id
             rule.e_rule_c_rule
-            covering_classes
+            store_covering_classes
             compiled
             store_result
         in
@@ -339,9 +367,15 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
 (************************************************************************************)
 (*MAIN*)
 
-let bdu_main parameter error handler covering_classes cc_compil =
+let bdu_main parameter error handler store_covering_classes cc_compil =
   let error, result =
-    scan_rule_set parameter error handler covering_classes cc_compil cc_compil.rules 
+    scan_rule_set
+      parameter
+      error 
+      handler
+      store_covering_classes
+      cc_compil 
+      cc_compil.rules 
   in
   let error =
     if  (Remanent_parameters.get_trace parameter) || trace

@@ -152,6 +152,7 @@ Covering classes with type set:
 agent_type:0:
 Potential dependencies between sites:Covering_class_id:0
 site_type:0
+site_type:1
 site_type:2
 Potential dependencies between sites:New-index:Covering_class_id:0
 site_type:1
@@ -161,6 +162,11 @@ site_type:1
 site_type:2
 Potential dependencies between sites:MODIFICATION-:New-index:Covering_class_id:0
 site_type:2
+Mapping functions from covering class to new_index of its:
+Map1:site_type:0:site_type':1
+Map1:site_type:2:site_type':2
+Map2:site_type':1:site_type:0
+Map2:site_type':2:site_type:2
 ============================================================
 * BDU Analysis:
 ============================================================
@@ -259,4 +265,12 @@ update function:
 - Working list update (will be removed):
 - Working list creation (will be removed):
 - Working list update and creation:
+
+------------------------------------------------------------
+* Build BDU:
+------------------------------------------------------------
+- BDU of test restriction:
+site:0
+site:1
+site:2
 execution finished without any exception

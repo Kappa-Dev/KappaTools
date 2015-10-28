@@ -228,6 +228,11 @@ site_type:2
 Potential dependencies between sites:MODIFICATION-:New-index:Covering_class_id:0
 site_type:1
 site_type:2
+Mapping functions from covering class to new_index of its:
+Map1:site_type:0:site_type':1
+Map1:site_type:1:site_type':2
+Map2:site_type':1:site_type:0
+Map2:site_type':2:site_type:1
 agent_type:1:
 Potential dependencies between sites:Covering_class_id:0
 site_type:0
@@ -241,6 +246,11 @@ site_type:2
 Potential dependencies between sites:MODIFICATION-:New-index:Covering_class_id:0
 site_type:1
 site_type:2
+Mapping functions from covering class to new_index of its:
+Map1:site_type:0:site_type':1
+Map1:site_type:1:site_type':2
+Map2:site_type':1:site_type:0
+Map2:site_type':2:site_type:1
 agent_type:2:
 Potential dependencies between sites:Covering_class_id:0
 site_type:0
@@ -250,6 +260,9 @@ Potential dependencies between sites:TEST:New-index:Covering_class_id:0
 site_type:1
 Potential dependencies between sites:MODIFICATION-:New-index:Covering_class_id:0
 site_type:1
+Mapping functions from covering class to new_index of its:
+Map1:site_type:0:site_type':1
+Map2:site_type':1:site_type:0
 ============================================================
 * BDU Analysis:
 ============================================================
@@ -386,4 +399,11 @@ agent_type_1:
 agent_type_2:
 -List of rule_id in working list of creation_update:
 1 
+
+------------------------------------------------------------
+* Build BDU:
+------------------------------------------------------------
+- BDU of test restriction:
+site:0
+site:1
 execution finished without any exception

@@ -93,34 +93,52 @@ let compute_update parameter error rule_id handler bdu_test modif_list bdu_creat
    - Convert type set of sites into map
 *)
 
-let collect_covering_set_map parameter error store_bdu_test_map covering_class_set
-    store_result =
+(*TODO*)
+let collect_restriction_bdu_test parameter error rule covering_class_set store_result =
   AgentMap.fold parameter error
-    (fun parameter error agent_type_cv product_set store_result ->
-      let (id_site, site_set),
-        (id_new_index, site_new_index_set),
-        (id_test, site_test_new_index_set),
-        (id_modif, site_modif_new_index_set) = product_set
-      in
-      (*convert Site_map_and_set.set into Int2Map_Modif.empty_set*)
-    
-      let _ =
-        Int2Map_Modif.fold_map_restriction
-          parameter
-          error
-          (fun _ a (error, b) ->
-            error, b
-          ) Int2Map_Modif.empty_set store_bdu_test_map []
-      in
-      error, store_result
+    (fun parameter error agent_id agent store_result ->
+      match agent with
+      | Ghost -> error, store_result
+      | Agent agent ->
+        let agent_type = agent.agent_name in
+        let error, map =
+          AgentMap.fold parameter error
+            (fun parameter error agent_type_cv set store_result ->
+              let (id', set), (id, new_index_set), _, _, _ = set in
+              if agent_type_cv = agent_type
+              then
+                let error, map_restriction =
+                  Site_map_and_set.fold_map_restriction
+                    parameter error
+                    (fun site port (error, init) ->
+                      (*find inside the new_map f, if it is not find then error*)
+                      let error, map_restriction =
+                        Site_map_and_set.add_map parameter error
+                          site port init
+                      in
+                      error, map_restriction
+                    ) set agent.agent_interface store_result
+                in
+                error, map_restriction
+              else
+                error, store_result
+            ) covering_class_set store_result
+        in
+        error, map
+    ) rule.rule_lhs.views store_result
 
-      (*build bdu_test inside covering_class_set*)
-      (*let error, fold_map =
-        Site_map_and_set.fold_map_restriction
+(*let collect_restriction_bdu_test parameter error rule covering_class_set store_result =
+  AgentMap.fold parameter error
+    (fun parametere error agent_type set store_result ->
+      let _, (id, new_index_set), _, _ = set in
+      let error, store_result =
+        collect_restriction_bdu_test_aux
           parameter
           error
-          (fun k (l, s) (error, b) ->
-            error, b
-          ) site_new_index_set store_bdu_test_map store_result
-      in*)
-  ) covering_class_set store_result
+          rule
+          agent_type
+          new_index_set
+          store_result
+      in    
+      error, store_result
+    ) covering_class_set store_result*)

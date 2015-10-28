@@ -138,7 +138,16 @@ type bdu_analysis_dynamic =
       (int list * Site_map_and_set.set) Int2Map_CV_Modif.map;
     store_wl_update          : wl_int AgentMap.t;
     store_wl_creation        : wl_int AgentMap.t;
-    store_wl_creation_update : wl_int AgentMap.t;   
+    store_wl_creation_update : wl_int AgentMap.t
+  }
+
+(************************************************************************************)
+(*build bdu type*)
+
+type bdu_build =
+  {
+    store_restriction_bdu_test :  Cckappa_sig.state_index Cckappa_sig.interval 
+    Cckappa_sig.port Site_map_and_set.map
   }
 
 (************************************************************************************)
@@ -146,7 +155,7 @@ type bdu_analysis_dynamic =
 
 type bdu_analysic =
     {
-      store_bdu_analysis_static : bdu_analysis_static;
+      store_bdu_analysis_static  : bdu_analysis_static;
       store_bdu_analysis_dynamic : bdu_analysis_dynamic;
-      (*store_fixpoint_iteration : bool Mvbdu_sig.mvbdu array AgentMap.t;*)
+      store_bdu_build            : bdu_build;
     }

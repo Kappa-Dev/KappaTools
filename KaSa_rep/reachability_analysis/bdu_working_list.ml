@@ -148,3 +148,33 @@ let collect_wl_creation_update parameter error store_wl_creation store_wl_update
       error, store_result
     ) store_wl_update init
   
+(************************************************************************************)
+(*combine working list into one function, store as an 
+  (rule_id, rule_id_creation,...) wl *)
+
+(*let collect_rule_id_working_list parameter error store_update rule_id viewsrhs creation
+    store_result =
+  let _, store_result_creation, _ = store_result in
+  let error, store_wl_update =
+    collect_wl_update
+      parameter
+      error
+      store_update
+  in
+  let error, store_wl_creation =
+    collect_wl_creation
+      parameter
+      error
+      rule_id
+      viewsrhs
+      creation
+      store_result_creation
+  in
+  let error, store_wl_creation_update =
+    collect_wl_creation_update
+      parameter
+      error
+      store_wl_creation
+      store_wl_update
+  in
+  error, (store_wl_update, store_wl_creation, store_wl_creation_update)*)
