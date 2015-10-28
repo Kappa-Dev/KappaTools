@@ -129,7 +129,7 @@ half break and remove side effect (will be removed):
 update function:
 
 ------------------------------------------------------------
-* Fixpoint iteration:
+* Working list:
 ------------------------------------------------------------
 - Working list update (will be removed):
 - Working list creation (will be removed):
@@ -140,8 +140,4 @@ agent_type_2:
 -List of rule_id in working list of creation:
 1 
 - Working list update and creation:
-
-------------------------------------------------------------
-Triple array: [|bdu_creation, bdu_test, modification list|]:
-------------------------------------------------------------
 execution finished without any exception

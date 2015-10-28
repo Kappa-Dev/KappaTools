@@ -86,12 +86,14 @@ module Int2Map_CV_Modif =
 
 (************************************************************************************)
 
-type site_bdu  = (List_sig.variable * Cckappa_sig.state_index) list *
+(*type site_bdu  = (List_sig.variable * Cckappa_sig.state_index) list *
   ((Boolean_mvbdu.memo_tables, Boolean_mvbdu.mvbdu_dic,
     Boolean_mvbdu.list_dic, bool, int)
-      Memo_sig.handler * bool Mvbdu_sig.mvbdu array)
+      Memo_sig.handler * bool Mvbdu_sig.mvbdu array)*)
 
-type wl_int = IntWL.WSet.elt list * IntWL.WSet.elt list * IntWL.WSet.set
+
+(************************************************************************************)
+(*static information*)
 
 type half_break_action = 
   (int list * (int * int) list) Int2Map_HalfBreak_effect.map
@@ -100,47 +102,51 @@ type half_break_action =
 type remove_action =
   (int list * int list) Int2Map_Remove_effect.map
 
+type bdu_analysis_static =
+  {
+    store_covering_classes_id : (int list * int list) Int2Map_CV.map;
+    store_side_effects        : half_break_action * remove_action;
+    store_creation_sites      : (int list * Site_map_and_set.set) Int2Map_Modif.map;
+    store_modification_sites_without_creation : (int list * Site_map_and_set.set)
+      Int2Map_Modif.map;
+    store_modification_sites  :
+      (int list * Site_map_and_set.set) Int2Map_Modif.map;
+    store_test_sites :
+      (int list * Site_map_and_set.set) Int2Map_Modif.map;
+    store_test_modification_sites : 
+      (int list * Site_map_and_set.set) Int2Map_Modif.map;
+    store_test_modification_without_creation : (*use in update*)
+      (int list * Site_map_and_set.set) Int2Map_Modif.map;
+  }
+
+(************************************************************************************)
+(*dynamic*)
+
+type wl_int = IntWL.WSet.elt list * IntWL.WSet.elt list * IntWL.WSet.set
+
+type bdu_analysis_dynamic =
+  {
+    store_contact_map      : 
+    (*TODO: combine contact map and modification update into a product type*)
+    (int list * (int * int * int) list) Int2Map_CM_state.map;
+    store_covering_classes_modification_update :
+      (int list * Site_map_and_set.set) Int2Map_CV_Modif.map;
+    store_update :
+      (int list * Site_map_and_set.set) Int2Map_CV_Modif.map *
+      (int list * Site_map_and_set.set) Int2Map_CV_Modif.map *
+      (int list * Site_map_and_set.set) Int2Map_CV_Modif.map *
+      (int list * Site_map_and_set.set) Int2Map_CV_Modif.map;
+    store_wl_update          : wl_int AgentMap.t;
+    store_wl_creation        : wl_int AgentMap.t;
+    store_wl_creation_update : wl_int AgentMap.t;   
+  }
+
+(************************************************************************************)
+(*main*)
+
 type bdu_analysic =
     {
-      (*static information*)
-      store_covering_classes_id : (int list * int list) Int2Map_CV.map;
-      store_side_effects        : half_break_action * remove_action;
-      store_creation_sites      : (int list * Site_map_and_set.set) Int2Map_Modif.map;
-      store_modification_sites_without_creation : (int list * Site_map_and_set.set)
-	Int2Map_Modif.map;
-      store_modification_sites  : (*REMOVE*)
-      (int list * Site_map_and_set.set) Int2Map_Modif.map;
-      store_test_sites :
-        (int list * Site_map_and_set.set) Int2Map_Modif.map;
-      store_test_modification_sites : 
-        (int list * Site_map_and_set.set) Int2Map_Modif.map;
-      store_test_modification_without_creation : (*update*)
-        (int list * Site_map_and_set.set) Int2Map_Modif.map;
-      (*------------------------------------------------------------------------------*)
-      (*dynamic information*)
-      store_contact_map      : 
-        (*TODO: combine contact map and modification update into a product type*)
-        (int list * (int * int * int) list) Int2Map_CM_state.map;
-      store_covering_classes_modification_update :
-        (int list * Site_map_and_set.set) Int2Map_CV_Modif.map;
-      store_update :
-        (int list * Site_map_and_set.set) Int2Map_CV_Modif.map *
-        (int list * Site_map_and_set.set) Int2Map_CV_Modif.map *
-        (int list * Site_map_and_set.set) Int2Map_CV_Modif.map *
-        (int list * Site_map_and_set.set) Int2Map_CV_Modif.map;
-      (*adding rule_id inside a working list*) (*TODO: combine wl into a product type*)
-      store_wl_update          : wl_int AgentMap.t;
-      store_wl_creation        : wl_int AgentMap.t;
-      store_wl_creation_update : wl_int AgentMap.t;
-      (*collect bdu_creation, bdu_test, and modification in an array*)
-      store_triple_product_array :
-       (int list *
-        (bool Mvbdu_sig.mvbdu (** bool Mvbdu_sig.mvbdu * (int * int) list*)) array)
-        AgentMap.t
-        
-      (*return a type 'rule' inside a working list*)
-      (*store_rule_in_wl         : (wl_int * Cckappa_sig.rule array) AgentMap.t; (*REMOVE*)
-      store_rule_creation_in_wl : Cckappa_sig.rule array AgentMap.t; (*REMOVE*)
-      store_bdu_creation_array : bool Mvbdu_sig.mvbdu array AgentMap.t;*) (*REMOVE*)
+      store_bdu_analysis_static : bdu_analysis_static;
+      store_bdu_analysis_dynamic : bdu_analysis_dynamic;
       (*store_fixpoint_iteration : bool Mvbdu_sig.mvbdu array AgentMap.t;*)
     }

@@ -253,7 +253,9 @@ agent_type:1@site_type:0:state:1--agent_type':0@site_type':0:state':1
 ------------------------------------------------------------
 Update function before adding the side effects rules:
 ------------------------------------------------------------
+agent_type:0@site_type:0:covering_class_id:0:rule_id:0
 agent_type:0@site_type:0:covering_class_id:0:rule_id:1
+agent_type:1@site_type:0:covering_class_id:0:rule_id:0
 
 ------------------------------------------------------------
 Update function after discovered binding sites, adding the side effects rules:
@@ -262,15 +264,20 @@ half_break side effect (will be removed):
 remove side effect (will be removed):
 half break and remove side effect (will be removed):
 update function:
+agent_type:0@site_type:0:covering_class_id:0:rule_id:0
 agent_type:0@site_type:0:covering_class_id:0:rule_id:1
+agent_type:1@site_type:0:covering_class_id:0:rule_id:0
 
 ------------------------------------------------------------
-* Fixpoint iteration:
+* Working list:
 ------------------------------------------------------------
 - Working list update (will be removed):
 agent_type_0:
 - List of rule_id in working list of update function:
-1 
+0 1 
+agent_type_1:
+- List of rule_id in working list of update function:
+0 
 - Working list creation (will be removed):
 agent_type_0:
 -List of rule_id in working list of creation:
@@ -281,71 +288,8 @@ agent_type_1:
 - Working list update and creation:
 agent_type_0:
 -List of rule_id in working list of creation_update:
-1 1 
-
-------------------------------------------------------------
-Triple array: [|bdu_creation, bdu_test, modification list|]:
-------------------------------------------------------------
-agent_type_0:
--------------------------------------
-array_index:0 rule_id:0
-agent_type_0: false
--------------------------------------
-array_index:1 rule_id:0
-agent_type_0: if(mvbdu_id:3) x0 < 0 then 
-agent_type_0:  false
-agent_type_0: else 
-agent_type_0:  if(mvbdu_id:2) x0 < 1 then 
-agent_type_0:   true
-agent_type_0:  else 
-agent_type_0:   false
--------------------------------------
-array_index:2 rule_id:0
-agent_type_0: if(mvbdu_id:3) x0 < 0 then 
-agent_type_0:  false
-agent_type_0: else 
-agent_type_0:  if(mvbdu_id:2) x0 < 1 then 
-agent_type_0:   true
-agent_type_0:  else 
-agent_type_0:   false
--------------------------------------
-array_index:3 rule_id:0
-agent_type_0: false
--------------------------------------
-array_index:0 rule_id:1
-agent_type_0: false
--------------------------------------
-array_index:1 rule_id:1
-agent_type_0: if(mvbdu_id:3) x0 < 0 then 
-agent_type_0:  false
-agent_type_0: else 
-agent_type_0:  if(mvbdu_id:2) x0 < 1 then 
-agent_type_0:   true
-agent_type_0:  else 
-agent_type_0:   false
--------------------------------------
-array_index:2 rule_id:1
-agent_type_0: if(mvbdu_id:3) x0 < 0 then 
-agent_type_0:  false
-agent_type_0: else 
-agent_type_0:  if(mvbdu_id:2) x0 < 1 then 
-agent_type_0:   true
-agent_type_0:  else 
-agent_type_0:   false
--------------------------------------
-array_index:3 rule_id:1
-agent_type_0: false
+0 1 1 
 agent_type_1:
--------------------------------------
-array_index:0 rule_id:0
-agent_type_1: if(mvbdu_id:3) x0 < 0 then 
-agent_type_1:  false
-agent_type_1: else 
-agent_type_1:  if(mvbdu_id:2) x0 < 1 then 
-agent_type_1:   true
-agent_type_1:  else 
-agent_type_1:   false
--------------------------------------
-array_index:1 rule_id:0
-agent_type_1: false
+-List of rule_id in working list of creation_update:
+0 1 
 execution finished without any exception

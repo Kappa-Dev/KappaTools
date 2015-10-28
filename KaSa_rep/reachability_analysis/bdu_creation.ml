@@ -40,7 +40,9 @@ let rev_array xs =
 
 (************************************************************************************)    
 (*compute bdu for initial state or creation action*)
+
 (*REMOVE*)
+
 let int_of_port port = port.site_state.min
 
 let collect_creation parameter error viewsrhs creation store_result =
@@ -122,7 +124,9 @@ let collect_creation parameter error viewsrhs creation store_result =
 
 (************************************************************************************)
 (*return a list of creation rule; add rules with empty lhs into a working list.*)
+
 (*REMOVE*)
+
 let collect_rule_creation parameter error handler rule rule_id viewsrhs creation
     store_result =
   (*let error, store = AgentMap.create parameter error 0 in*)
@@ -207,3 +211,83 @@ let collect_rule_creation parameter error handler rule rule_id viewsrhs creation
       error, wl
     ) store_rule_array store_bdu_result*)
 
+
+(*build [bdu_creation] for a rule*)
+    
+let build_bdu_creation parameter error rule (*store_result*) =  (*REMOVE*)
+  let error, store_result = AgentMap.create parameter error 0 in
+  let error, (handler, bdu_init) = bdu_init parameter error in
+  List.fold_left (fun (error, store_result) (agent_id, agent_type) ->
+    let error, agent = AgentMap.get parameter error agent_id rule.rule_rhs.views in
+    match agent with
+      | None -> warn parameter error (Some "line 29") Exit store_result
+      | Some Ghost -> error, store_result
+      | Some Agent agent ->
+	let error, (l, (handler, bdu_creation)) =
+	  Site_map_and_set.fold_map
+	    (fun site port (error, (current_list, _))->
+	      let state = int_of_port port in
+	      let l = (site, state) :: current_list in
+	      let error, (handler, bdu_creation) =
+		build_bdu parameter error l
+	      in
+	      error, (l, (handler, bdu_creation))
+	    ) agent.agent_interface (error, ([], (handler, bdu_init)))
+	in
+	(*store a creation rule*)
+	let error, store_result =
+	  AgentMap.set
+	    parameter
+	    error
+	    agent_type
+	    (handler, bdu_creation)
+	    store_result
+	in
+	error, store_result
+  ) (error, store_result) rule.actions.creation
+
+(************************************************************************************)
+(*build [bdu_test and list of modif] action of a rule*)
+
+let build_bdu_test_modif_list parameter error rule = (*REMOVE*)
+  let error, (handler, bdu_init) = bdu_init parameter error in
+  let error, store_result = AgentMap.create parameter error 0 in
+  AgentMap.fold2_common parameter error
+    (fun parameter error agent_id agent site_modif store_result ->
+      match agent with
+	| Ghost -> error, store_result
+	| Agent agent ->
+	  let agent_type = agent.agent_name in
+	  (*build bdu_test*)
+	  let error, (l, (handler, bdu_test)) =
+	    Site_map_and_set.fold_map
+	      (fun site port (error, (current_list, _)) ->
+		let state = int_of_port port in
+		let l = (site, state) :: current_list in
+		let error, (handler, bdu_test) =
+		  build_bdu parameter error l
+		in
+		error, (l, (handler, bdu_test))
+	      ) agent.agent_interface (error, ([], (handler, bdu_init)))
+	  in
+	  (*build list of modif*)
+	  let error, modif_list =
+	    Site_map_and_set.fold_map
+	      (fun site port (error, current_list) ->
+		let state = int_of_port port in
+		let l =
+		  (site, state) :: current_list in
+		error, l
+	      ) site_modif.agent_interface (error, [])
+	  in
+          (*store this pair*)
+	  let error, store_result =
+	    AgentMap.set
+	      parameter
+	      error
+	      agent_type
+	      ((handler, bdu_test), modif_list)
+	      store_result
+	  in
+	  error, store_result
+    ) rule.rule_lhs.views rule.diff_direct store_result

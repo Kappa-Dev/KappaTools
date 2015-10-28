@@ -137,7 +137,7 @@ let main () =
 	then Printf.fprintf (Remanent_parameters.get_log parameters_cv) "\n"
       in
       (*getting covering classes*)
-      let error, (covering_classes, _) =
+      let error, covering_classes =
         Covering_classes_main.covering_classes parameters_cv error handler c_compil
        in
        let error, dep =

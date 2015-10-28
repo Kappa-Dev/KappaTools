@@ -339,6 +339,7 @@ agent_type:0@site_type:0:covering_class_id:0:rule_id:0
 agent_type:0@site_type:0:covering_class_id:0:rule_id:1
 agent_type:1@site_type:0:covering_class_id:0:rule_id:0
 agent_type:1@site_type:0:covering_class_id:0:rule_id:2
+agent_type:1@site_type:0:covering_class_id:0:rule_id:4
 
 ------------------------------------------------------------
 Update function after discovered binding sites, adding the side effects rules:
@@ -355,11 +356,12 @@ agent_type:0@site_type:0:covering_class_id:0:rule_id:0
 agent_type:0@site_type:0:covering_class_id:0:rule_id:1
 agent_type:1@site_type:0:covering_class_id:0:rule_id:0
 agent_type:1@site_type:0:covering_class_id:0:rule_id:2
+agent_type:1@site_type:0:covering_class_id:0:rule_id:4
 agent_type:1@site_type:0:covering_class_id:0:rule_id:1
 agent_type:1@site_type:0:covering_class_id:0:rule_id:3
 
 ------------------------------------------------------------
-* Fixpoint iteration:
+* Working list:
 ------------------------------------------------------------
 - Working list update (will be removed):
 agent_type_0:
@@ -367,7 +369,7 @@ agent_type_0:
 0 1 
 agent_type_1:
 - List of rule_id in working list of update function:
-0 2 1 3 
+0 2 4 1 3 
 - Working list creation (will be removed):
 - Working list update and creation:
 agent_type_0:
@@ -375,179 +377,5 @@ agent_type_0:
 0 1 
 agent_type_1:
 -List of rule_id in working list of creation_update:
-0 2 1 3 
-
-------------------------------------------------------------
-Triple array: [|bdu_creation, bdu_test, modification list|]:
-------------------------------------------------------------
-agent_type_0:
--------------------------------------
-array_index:0 rule_id:0
-agent_type_0: false
--------------------------------------
-array_index:1 rule_id:0
-agent_type_0: if(mvbdu_id:3) x0 < 1 then 
-agent_type_0:  false
-agent_type_0: else 
-agent_type_0:  if(mvbdu_id:2) x0 < 2 then 
-agent_type_0:   true
-agent_type_0:  else 
-agent_type_0:   false
--------------------------------------
-array_index:2 rule_id:0
-agent_type_0: false
--------------------------------------
-array_index:3 rule_id:0
-agent_type_0: false
--------------------------------------
-array_index:4 rule_id:0
-agent_type_0: false
--------------------------------------
-array_index:5 rule_id:0
-agent_type_0: if(mvbdu_id:3) x0 < 0 then 
-agent_type_0:  false
-agent_type_0: else 
-agent_type_0:  if(mvbdu_id:2) x0 < 1 then 
-agent_type_0:   true
-agent_type_0:  else 
-agent_type_0:   false
--------------------------------------
-array_index:6 rule_id:0
-agent_type_0: false
--------------------------------------
-array_index:7 rule_id:0
-agent_type_0: false
--------------------------------------
-array_index:8 rule_id:0
-agent_type_0: false
--------------------------------------
-array_index:9 rule_id:0
-agent_type_0: false
--------------------------------------
-array_index:0 rule_id:1
-agent_type_0: false
--------------------------------------
-array_index:1 rule_id:1
-agent_type_0: if(mvbdu_id:3) x0 < 1 then 
-agent_type_0:  false
-agent_type_0: else 
-agent_type_0:  if(mvbdu_id:2) x0 < 2 then 
-agent_type_0:   true
-agent_type_0:  else 
-agent_type_0:   false
--------------------------------------
-array_index:2 rule_id:1
-agent_type_0: false
--------------------------------------
-array_index:3 rule_id:1
-agent_type_0: false
--------------------------------------
-array_index:4 rule_id:1
-agent_type_0: false
--------------------------------------
-array_index:5 rule_id:1
-agent_type_0: if(mvbdu_id:3) x0 < 0 then 
-agent_type_0:  false
-agent_type_0: else 
-agent_type_0:  if(mvbdu_id:2) x0 < 1 then 
-agent_type_0:   true
-agent_type_0:  else 
-agent_type_0:   false
--------------------------------------
-array_index:6 rule_id:1
-agent_type_0: false
--------------------------------------
-array_index:7 rule_id:1
-agent_type_0: false
--------------------------------------
-array_index:8 rule_id:1
-agent_type_0: false
--------------------------------------
-array_index:9 rule_id:1
-agent_type_0: false
-agent_type_1:
--------------------------------------
-array_index:0 rule_id:0
-agent_type_1: false
--------------------------------------
-array_index:1 rule_id:0
-agent_type_1: false
--------------------------------------
-array_index:2 rule_id:0
-agent_type_1: if(mvbdu_id:3) x0 < 1 then 
-agent_type_1:  false
-agent_type_1: else 
-agent_type_1:  if(mvbdu_id:2) x0 < 2 then 
-agent_type_1:   true
-agent_type_1:  else 
-agent_type_1:   false
--------------------------------------
-array_index:3 rule_id:0
-agent_type_1: false
--------------------------------------
-array_index:4 rule_id:0
-agent_type_1: false
--------------------------------------
-array_index:5 rule_id:0
-agent_type_1: if(mvbdu_id:3) x0 < 0 then 
-agent_type_1:  false
-agent_type_1: else 
-agent_type_1:  if(mvbdu_id:2) x0 < 1 then 
-agent_type_1:   true
-agent_type_1:  else 
-agent_type_1:   false
--------------------------------------
-array_index:6 rule_id:0
-agent_type_1: false
--------------------------------------
-array_index:7 rule_id:0
-agent_type_1: false
--------------------------------------
-array_index:8 rule_id:0
-agent_type_1: false
--------------------------------------
-array_index:9 rule_id:0
-agent_type_1: false
--------------------------------------
-array_index:0 rule_id:2
-agent_type_1: false
--------------------------------------
-array_index:1 rule_id:2
-agent_type_1: false
--------------------------------------
-array_index:2 rule_id:2
-agent_type_1: if(mvbdu_id:3) x0 < 1 then 
-agent_type_1:  false
-agent_type_1: else 
-agent_type_1:  if(mvbdu_id:2) x0 < 2 then 
-agent_type_1:   true
-agent_type_1:  else 
-agent_type_1:   false
--------------------------------------
-array_index:3 rule_id:2
-agent_type_1: false
--------------------------------------
-array_index:4 rule_id:2
-agent_type_1: false
--------------------------------------
-array_index:5 rule_id:2
-agent_type_1: if(mvbdu_id:3) x0 < 0 then 
-agent_type_1:  false
-agent_type_1: else 
-agent_type_1:  if(mvbdu_id:2) x0 < 1 then 
-agent_type_1:   true
-agent_type_1:  else 
-agent_type_1:   false
--------------------------------------
-array_index:6 rule_id:2
-agent_type_1: false
--------------------------------------
-array_index:7 rule_id:2
-agent_type_1: false
--------------------------------------
-array_index:8 rule_id:2
-agent_type_1: false
--------------------------------------
-array_index:9 rule_id:2
-agent_type_1: false
+0 2 4 1 3 
 execution finished without any exception

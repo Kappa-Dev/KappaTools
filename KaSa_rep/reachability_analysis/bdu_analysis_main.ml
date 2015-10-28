@@ -23,6 +23,7 @@ open Bdu_side_effects
 open Bdu_modification_sites
 open Bdu_contact_map
 open Bdu_update
+open Bdu_working_list
 open Bdu_fixpoint_iteration
 
 let warn parameters mh message exn default =
@@ -31,9 +32,11 @@ let warn parameters mh message exn default =
 let trace = false
 
 (************************************************************************************)
-(*RULE*)
+(*static analysis*)
 
-let scan_rule parameter error handler rule_id rule covering_classes compiled store_result =
+let scan_rule_static parameter error handler rule_id rule store_covering_classes
+    store_result =
+  let covering_classes, _ = store_covering_classes in
   (*------------------------------------------------------------------------------*)
   (*static information of covering classes: from sites -> covering_class id list*)
   let error, store_covering_classes_id =
@@ -107,6 +110,28 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       store_modification_sites_without_creation
       store_test_sites
   in
+  error, 
+  {
+    store_covering_classes_id                  = store_covering_classes_id;
+    store_side_effects                         = store_side_effects;
+    store_creation_sites                       = store_creation_sites;
+    store_modification_sites_without_creation  = 
+      store_modification_sites_without_creation;
+    store_modification_sites                   = store_modification_sites;
+    store_test_sites                           = store_test_sites;
+    store_test_modification_sites              = store_test_modification_sites;
+    store_test_modification_without_creation   = 
+      store_test_modification_without_creation;
+  }
+
+(************************************************************************************)
+(*dynamic analysis*)
+
+let scan_rule_dynamic parameter error handler rule_id rule 
+    store_test_modification_without_creation
+    store_covering_classes_id
+    store_side_effects
+    store_result =
   (*------------------------------------------------------------------------------*)
   (*contact map*)
   let error, store_contact_map =
@@ -116,13 +141,14 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       handler
       rule
   in
-   (*-------------------------------------------------------------------------------*)
-  (*return a mapping of covering classes to a list of rules that has modified sites*)
+  (*-------------------------------------------------------------------------------*)
+  (*return a mapping of covering classes to a list of rules that has [modified and test]
+    sites*)
   let error, store_covering_classes_modification_update =
     store_covering_classes_modification_update
       parameter
       error
-      store_modification_sites_without_creation
+      store_test_modification_without_creation
       store_covering_classes_id
   in
   (*------------------------------------------------------------------------------*)
@@ -160,39 +186,46 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       error
       store_wl_creation
       store_wl_update
-   in
-  (*------------------------------------------------------------------------------*)
-  (*return 'rule' type inside a working list*)
-  (*let error, store_rule_in_wl =
-    collect_rule_in_wl
-      parameter
-      error
-      handler
-      rule
-      store_wl_creation_update	
-      store_result.store_rule_in_wl
   in
-  (*test*)
-  let error, store_rule_creation_in_wl =
-    collect_rule_creation_in_wl
+  error, 
+  {
+    store_contact_map                          = store_contact_map;
+    store_covering_classes_modification_update =
+      store_covering_classes_modification_update;
+    store_update                               = store_update;
+    store_wl_update                            = store_wl_update;
+    store_wl_creation                          = store_wl_creation;
+    store_wl_creation_update                   = store_wl_creation_update;
+  }
+
+(************************************************************************************)
+(*rule*)
+
+let scan_rule parameter error handler rule_id rule store_covering_classes
+    compiled store_result =
+  (*let covering_classes, _covering_class_set = store_covering_classes in*)
+  let error, store_bdu_analysis_static =
+    scan_rule_static 
       parameter
-      error
+      error 
       handler
-      rule
-      store_wl_creation (*FIXME*)
-      rule.rule_rhs.views
-      rule.actions.creation
-      store_result.store_rule_creation_in_wl
+      rule_id 
+      rule 
+      store_covering_classes
+      store_result.store_bdu_analysis_static
   in
-  (*------------------------------------------------------------------------------*)
-  let error, store_bdu_creation_array =
-    collect_bdu_creation_array
+  let error, store_bdu_analysis_dynamic =
+    scan_rule_dynamic
       parameter
       error
       handler
-      store_rule_in_wl
-      store_result.store_bdu_creation_array
-  in*)
+      rule_id
+      rule 
+      store_bdu_analysis_static.store_test_modification_without_creation
+      store_bdu_analysis_static.store_covering_classes_id
+      store_bdu_analysis_static.store_side_effects
+      store_result.store_bdu_analysis_dynamic
+  in
   (*------------------------------------------------------------------------------*)
   (*fixpoint iteration*)
   (*let error, store_fixpoint_iteration =
@@ -203,51 +236,20 @@ let scan_rule parameter error handler rule_id rule covering_classes compiled sto
       store_rule_in_wl
       store_result.store_fixpoint_iteration
   in*)
-  let error, store_triple_product_array =
-    collect_triple_product_array
-      parameter
-      error
-      handler
-      rule_id
-      rule
-      store_result.store_triple_product_array
-  in
   (*------------------------------------------------------------------------------*)
   (*store*)
   error,
   {
-    (*static information*)
-    store_covering_classes_id                  = store_covering_classes_id;
-    store_side_effects                         = store_side_effects;
-    store_creation_sites                       = store_creation_sites;
-    store_modification_sites_without_creation  = store_modification_sites_without_creation;
-    store_modification_sites                   = store_modification_sites;
-    store_test_sites                           = store_test_sites;
-    store_test_modification_sites              = store_test_modification_sites;
-    store_test_modification_without_creation   = store_test_modification_without_creation;
-    (*dynamic information*)
-    store_contact_map                          = store_contact_map;
-    store_covering_classes_modification_update =
-      store_covering_classes_modification_update;
-    store_update                               = store_update;
-    (*working list*)
-    store_wl_update                            = store_wl_update;
-    store_wl_creation                          = store_wl_creation;
-    store_wl_creation_update                   = store_wl_creation_update;
-    (*triple product array*)
-    store_triple_product_array                 = store_triple_product_array
+    store_bdu_analysis_static  = store_bdu_analysis_static;
+    store_bdu_analysis_dynamic =  store_bdu_analysis_dynamic;
     (*fixpoint iteration*)
-    (*store_rule_in_wl                           = store_rule_in_wl;
-    store_rule_creation_in_wl = store_rule_creation_in_wl;
-    store_bdu_creation_array                   = store_bdu_creation_array;*)
     (*store_fixpoint_iteration                   = store_fixpoint_iteration*)
   }
  
 (************************************************************************************)
-(*RULES*)
+(*intitial state of static analysis*)
 
-let scan_rule_set parameter error handler covering_classes compiled rules =
-  (*static information*)
+let init_bdu_analysis_static =
   let init_covering_classes_id     = Int2Map_CV.empty_map in
   let init_half_break              = Int2Map_HalfBreak_effect.empty_map  in
   let init_remove                  = Int2Map_Remove_effect.empty_map  in
@@ -257,52 +259,59 @@ let scan_rule_set parameter error handler covering_classes compiled rules =
   let init_test                    = Int2Map_Modif.empty_map in
   let init_test_modification       = Int2Map_Modif.empty_map in
   let init_test_modification_without_creation = Int2Map_Modif.empty_map in
-  (*dynamic information*)
+  let init_bdu_analysis_static =
+    {
+      store_covering_classes_id                 = init_covering_classes_id;
+      store_side_effects                        = (init_half_break, init_remove);
+      store_creation_sites                      = init_creation;
+      store_modification_sites_without_creation = init_modif_without_creation;
+      store_modification_sites                  = init_modification;
+      store_test_sites                          = init_test;
+      store_test_modification_sites             = init_test_modification;
+      store_test_modification_without_creation  =
+        init_test_modification_without_creation;
+    }
+  in
+  init_bdu_analysis_static
+      
+(************************************************************************************)
+(*intitial state of dynamic analysis*)
+
+let init_bdu_analysis_dynamic parameter error =
   let init_contact_map             = Int2Map_CM_state.empty_map in
   let init_cv_modification         = Int2Map_CV_Modif.empty_map in
-  (*update function*)
   let init_store_hb                = Int2Map_CV_Modif.empty_map in
   let init_store_remove            = Int2Map_CV_Modif.empty_map in
   let init_store_hb_remove         = Int2Map_CV_Modif.empty_map in
   let init_store_update_aux        = Int2Map_CV_Modif.empty_map in
-  let error, init_wl_update        = AgentMap.create parameter error 0 in
-  let error, init_wl_creation      = AgentMap.create parameter error 0 in
+  let error, init_wl_update          = AgentMap.create parameter error 0 in
+  let error, init_wl_creation        = AgentMap.create parameter error 0 in
   let error, init_wl_creation_update = AgentMap.create parameter error 0 in
-  let error, init_triple_product_array = AgentMap.create parameter error 0 in
-  (*fixpoint iteration*)
-  (*let error, init_rule             = AgentMap.create parameter error 0 in
-  let error, init_bdu_creation_array = AgentMap.create parameter error 0 in*)
-  (*let error, init_fixpoint         = AgentMap.create parameter error 0 in*)
-  (*test*)
-  (*let error, init_rule_creation = AgentMap.create parameter error 0 in*)
-  let init_bdu =
+  let init_bdu_analysis_dynamic =
     {
-      (*static information*)
-      store_covering_classes_id = init_covering_classes_id;
-      store_side_effects        = (init_half_break, init_remove);
-      store_creation_sites      = init_creation;
-      store_modification_sites_without_creation = init_modif_without_creation;
-      store_modification_sites  = init_modification;
-      store_test_sites = init_test;
-      store_test_modification_sites = init_test_modification;
-      store_test_modification_without_creation = init_test_modification_without_creation;
-      (*dynamic information*)
-      store_contact_map         = init_contact_map;
+      store_contact_map                          = init_contact_map;
       store_covering_classes_modification_update = init_cv_modification;
-      store_update =
+      store_update                               =
         (init_store_hb,
          init_store_remove,
          init_store_hb_remove,
          init_store_update_aux);
-      store_wl_update          = init_wl_update;
-      store_wl_creation        = init_wl_creation;
-      store_wl_creation_update = init_wl_creation_update;
-      store_triple_product_array = init_triple_product_array
-      (*fixpoint*)
-      (*store_rule_in_wl         = init_rule;
-      store_rule_creation_in_wl = init_rule_creation;
-      store_bdu_creation_array = init_bdu_creation_array;*)
-      (*store_fixpoint_iteration = init_fixpoint;*)
+      store_wl_update                            = init_wl_update;
+      store_wl_creation                          = init_wl_creation;
+      store_wl_creation_update                   = init_wl_creation_update;
+    }
+  in
+  init_bdu_analysis_dynamic
+
+(************************************************************************************)
+(*rules*)
+
+let scan_rule_set parameter error handler covering_classes compiled rules =
+  let init_bdu =
+    {
+      store_bdu_analysis_static  = init_bdu_analysis_static;
+      store_bdu_analysis_dynamic = (init_bdu_analysis_dynamic parameter error);
+    (*store_fixpoint_iteration = init_fixpoint;*)
     }
   in
   (*------------------------------------------------------------------------------*)

@@ -42,7 +42,7 @@ let trace = false
 (*map (agent_type_cv, covering_class_id) -> rule_id list of modified sites*)
 
 let store_covering_classes_modification_update_aux parameter error agent_type_cv
-    site_type_cv covering_class_id store_modification_sites_without_creation store_result =
+    site_type_cv covering_class_id store_test_modification_without_creation store_result =
   let add_link (agent_type_cv, site_type_cv, cv_id) rule_id store_result =
     (*searching in the result whether or not those signatures are already inside*)
     let error, (l, old) =
@@ -81,26 +81,26 @@ let store_covering_classes_modification_update_aux parameter error agent_type_cv
   *)
   let error, result =
     Int2Map_Modif.fold_map
-      (fun (agent_type_modif, site_modif) (m1, s2) store_result ->
-        Site_map_and_set.fold_set (fun rule_id_modif (error, store_current_result) ->
-          if compare agent_type_cv agent_type_modif = 0 &&
-            compare site_type_cv site_modif = 0
+      (fun (agent_type, site_type) (m1, s2) store_result ->
+        Site_map_and_set.fold_set (fun rule_id (error, store_current_result) ->
+          if compare agent_type_cv agent_type = 0 &&
+            compare site_type_cv site_type = 0
           then
             let error, result =
-              add_link (agent_type_cv, site_type_cv, covering_class_id) rule_id_modif 
+              add_link (agent_type_cv, site_type_cv, covering_class_id) rule_id
                 store_current_result
             in
             error, result
           else
             error, store_current_result
         ) s2 store_result
-      ) store_modification_sites_without_creation store_result
+      ) store_test_modification_without_creation store_result
   in error, result
     
 (************************************************************************************)
 
 let store_covering_classes_modification_update parameter error
-    store_modification_sites_without_creation
+    store_test_modification_without_creation
     store_covering_classes_id =
   let error, store_result =
     Int2Map_CV.fold_map
@@ -113,7 +113,7 @@ let store_covering_classes_modification_update parameter error
               agent_type_cv
               site_type_cv
               cv_id
-              store_modification_sites_without_creation
+              store_test_modification_without_creation
               store_current_result
           in
           error, result
@@ -294,8 +294,8 @@ let store_binding_half_break parameter error
 	    (*store*)
 	    ((error, store_binding_hb),
 	     store_binding_remove,
-	    store_hb_remove,
-	    store_update_aux)
+	     store_hb_remove,
+	     store_update_aux)
 	) store_result l2
     ) store_contact_map
     ((error, Int2Map_CV_Modif.empty_map),
@@ -343,7 +343,7 @@ let store_binding_remove parameter error
 	     store_update_aux)
 	) store_result l2
     ) store_contact_map
-     ((error, Int2Map_CV_Modif.empty_map),
+    ((error, Int2Map_CV_Modif.empty_map),
      (error, Int2Map_CV_Modif.empty_map),
      Int2Map_CV_Modif.empty_map,
      Int2Map_CV_Modif.empty_map
