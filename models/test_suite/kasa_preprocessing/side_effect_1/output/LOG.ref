@@ -492,10 +492,4 @@ agent_type_1:
 agent_type_2:
 -List of rule_id in working list of creation_update:
 3 3 
-
-------------------------------------------------------------
-* Build BDU:
-------------------------------------------------------------
-- BDU of test restriction:
-site:0
 execution finished without any exception

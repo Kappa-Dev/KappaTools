@@ -144,11 +144,12 @@ type bdu_analysis_dynamic =
 (************************************************************************************)
 (*build bdu type*)
 
-type bdu_build =
+(*type bdu_build =
   {
-    store_restriction_bdu_test :  Cckappa_sig.state_index Cckappa_sig.interval 
-    Cckappa_sig.port Site_map_and_set.map
-  }
+    store_restriction_bdu_test :
+    Cckappa_sig.state_index Cckappa_sig.interval Cckappa_sig.port
+    Cckappa_sig.Site_map_and_set.map
+  }*)
 
 (************************************************************************************)
 (*main*)
@@ -157,5 +158,5 @@ type bdu_analysic =
     {
       store_bdu_analysis_static  : bdu_analysis_static;
       store_bdu_analysis_dynamic : bdu_analysis_dynamic;
-      store_bdu_build            : bdu_build;
+      (*store_bdu_build            : bdu_build;*)
     }

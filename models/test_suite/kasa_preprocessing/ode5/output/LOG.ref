@@ -832,13 +832,4 @@ agent_type_2:
 agent_type_3:
 -List of rule_id in working list of creation_update:
 2 4 3 4 4 
-
-------------------------------------------------------------
-* Build BDU:
-------------------------------------------------------------
-- BDU of test restriction:
-site:0
-site:1
-site:2
-site:3
 execution finished without any exception

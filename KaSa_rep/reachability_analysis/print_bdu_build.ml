@@ -37,12 +37,15 @@ let print_restriction_bdu_test parameter error result =
   (*AgentMap.print error
     (fun error parameter map ->
       let _ =*)
-        let _ =
-          Site_map_and_set.iter_map (fun k port ->
-            fprintf stdout "site:%i\n" k;
-          ) result
-        in
-        ()        
+        let rec aux acc =
+          match acc with
+          | [] -> []
+          | h :: tl ->
+            Site_map_and_set.iter_map (fun k port ->
+              fprintf stdout "site:%i\n" k;
+            ) h; aux tl
+        in aux result
+              
     (*  in
       error
     ) parameter result*)
@@ -59,12 +62,12 @@ let print_bdu_build parameter error result =
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
   in
-  let _ =
+  (*let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "- BDU of test restriction:\n";
     print_restriction_bdu_test
       parameter
       error
       result.store_restriction_bdu_test
-  in
+  in*)
   error

@@ -85,7 +85,7 @@ let compute_update parameter error rule_id handler bdu_test modif_list bdu_creat
     bdu_remanent_array
   in
   error, bdu_remanent_array
-
+    
 (************************************************************************************)
 (* From each covering class, with their new index for sites, build 
    (bdu_test, bdu_creation and list of modification).
@@ -93,8 +93,7 @@ let compute_update parameter error rule_id handler bdu_test modif_list bdu_creat
    - Convert type set of sites into map
 *)
 
-(*TODO*)
-let collect_restriction_bdu_test parameter error rule covering_class_set store_result =
+(*let collect_restriction_bdu_test parameter error rule covering_class_set store_result =
   AgentMap.fold parameter error
     (fun parameter error agent_id agent store_result ->
       match agent with
@@ -104,17 +103,20 @@ let collect_restriction_bdu_test parameter error rule covering_class_set store_r
         let error, map =
           AgentMap.fold parameter error
             (fun parameter error agent_type_cv set store_result ->
-              let (id', set_list), _ = set in
-              if agent_type_cv = agent_type
-              then
-                match set_list with
-                | [] -> error, store_result
+              let (id', set_list), (map1, map2) = set in
+              let rec aux acc =
+                match acc with
+                | [] -> Site_map_and_set.empty_map
                 | set :: tl ->
                   let error, map_restriction =
                     Site_map_and_set.fold_map_restriction
                       parameter error
                       (fun site port (error, init) ->
-                      (*find inside the new_map f, if it is not find then error*)
+                        let error, map =
+                          try Site_map_and_set.find_map parameter error site map1
+                          with Not_found -> error, Site_map_and_set.empty_map
+                        in
+                        (*find inside the new_map f, if it is not find then error*)
                         let error, map_restriction =
                           Site_map_and_set.add_map parameter error
                             site port init
@@ -122,10 +124,10 @@ let collect_restriction_bdu_test parameter error rule covering_class_set store_r
                         error, map_restriction
                       ) set agent.agent_interface store_result
                   in
-                  error, map_restriction
-              else
-                error, store_result
+                  map_restriction; aux tl
+              in
+              error, aux set_list
             ) covering_class_set store_result
         in
         error, map
-    ) rule.rule_lhs.views store_result
+    ) rule.rule_lhs.views store_result*)
