@@ -150,19 +150,18 @@ site_type:2
 ------------------------------------------------------
 Covering classes with type set:
 agent_type:0:
-Potential dependencies between sites:Covering_class_id:0
+Potential dependencies between sites:Covering_class_id:1
 site_type:0
 site_type:1
+Potential dependencies between sites:Covering_class_id:0
+site_type:0
 site_type:2
-Potential dependencies between sites:New-index:Covering_class_id:0
-site_type:1
-site_type:2
-Potential dependencies between sites:TEST:New-index:Covering_class_id:0
-site_type:1
-site_type:2
-Potential dependencies between sites:MODIFICATION-:New-index:Covering_class_id:0
-site_type:2
-Mapping functions from covering class to new_index of its:
+Potential dependencies between sites:Map-functions:Covering_class_id:1
+Map1:site_type:0:site_type':1
+Map1:site_type:1:site_type':2
+Map2:site_type':1:site_type:0
+Map2:site_type':2:site_type:1
+Potential dependencies between sites:Map-functions:Covering_class_id:0
 Map1:site_type:0:site_type':1
 Map1:site_type:2:site_type':2
 Map2:site_type':1:site_type:0
@@ -272,5 +271,4 @@ update function:
 - BDU of test restriction:
 site:0
 site:1
-site:2
 execution finished without any exception

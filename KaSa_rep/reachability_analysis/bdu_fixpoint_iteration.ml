@@ -104,41 +104,28 @@ let collect_restriction_bdu_test parameter error rule covering_class_set store_r
         let error, map =
           AgentMap.fold parameter error
             (fun parameter error agent_type_cv set store_result ->
-              let (id', set), (id, new_index_set), _, _, _ = set in
+              let (id', set_list), _ = set in
               if agent_type_cv = agent_type
               then
-                let error, map_restriction =
-                  Site_map_and_set.fold_map_restriction
-                    parameter error
-                    (fun site port (error, init) ->
+                match set_list with
+                | [] -> error, store_result
+                | set :: tl ->
+                  let error, map_restriction =
+                    Site_map_and_set.fold_map_restriction
+                      parameter error
+                      (fun site port (error, init) ->
                       (*find inside the new_map f, if it is not find then error*)
-                      let error, map_restriction =
-                        Site_map_and_set.add_map parameter error
-                          site port init
-                      in
-                      error, map_restriction
-                    ) set agent.agent_interface store_result
-                in
-                error, map_restriction
+                        let error, map_restriction =
+                          Site_map_and_set.add_map parameter error
+                            site port init
+                        in
+                        error, map_restriction
+                      ) set agent.agent_interface store_result
+                  in
+                  error, map_restriction
               else
                 error, store_result
             ) covering_class_set store_result
         in
         error, map
     ) rule.rule_lhs.views store_result
-
-(*let collect_restriction_bdu_test parameter error rule covering_class_set store_result =
-  AgentMap.fold parameter error
-    (fun parametere error agent_type set store_result ->
-      let _, (id, new_index_set), _, _ = set in
-      let error, store_result =
-        collect_restriction_bdu_test_aux
-          parameter
-          error
-          rule
-          agent_type
-          new_index_set
-          store_result
-      in    
-      error, store_result
-    ) covering_class_set store_result*)
