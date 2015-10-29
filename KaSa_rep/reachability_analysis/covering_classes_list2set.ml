@@ -69,8 +69,6 @@ let collect_remanent_list2set parameter error store_remanent store_result =
       (*-------------------------------------------------------------------------*)
       (*get covering classes dictionary*)
       let store_dic = remanent.store_dic in
-      (*fold everything inside store_dic, because the elt_id of 
-        each dictionary is different*)
       let error, (id_list, site_set_list) =
         Dictionary_of_Covering_class.fold
           (fun list _ index (error, (index_list, current_list)) ->
@@ -83,51 +81,9 @@ let collect_remanent_list2set parameter error store_remanent store_result =
           ) store_dic (error, ([], []))
       in
       (*-------------------------------------------------------------------------*)
-      (*get covering classes dictionary with new index*)
-      (*let store_new_index_dic = remanent.store_new_index_dic in (*REMOVE*)
-      let error, pair_site_new_index_set_list =
-        Dictionary_of_Covering_class.fold
-          (fun list _ index (error, (index_list, current_list)) ->
-            let error, list2set =
-              list2set parameter error list
-            in
-            let list_set = list2set :: current_list in
-            let list_index = index :: index_list in
-            error, (List.rev list_index, List.rev list_set)
-          ) store_new_index_dic (error, ([], []))
-      in*)
-      (*-------------------------------------------------------------------------*)
-      (*get test rule in covering classes dictionary with new index*)(*REMOVE*)
-      (* let store_test_new_index_dic = remanent.store_test_new_index_dic in
-      let error, pair_site_test_new_index_set_list =
-        Dictionary_of_Covering_class.fold
-          (fun list _ index (error, (index_list, current_list)) ->
-            let error, list2set =
-              list2set parameter error list
-            in
-            let list_set = list2set :: current_list in
-            let list_index =  index :: index_list in
-            error, (List.rev list_index, List.rev list_set)
-          ) store_test_new_index_dic (error, ([], []))
-      in*)
-      (*-------------------------------------------------------------------------*)
-      (*get modification rule in covering classes dictionary with new index*)
-      (*let store_modif_new_index_dic = remanent.store_modif_new_index_dic in
-      let error, pair_site_modif_new_index_set_list = (*REMOVe*)
-        Dictionary_of_Modified_class.fold
-          (fun list _ index (error, (index_list, current_list)) ->
-            let error, list2set =
-              list2set parameter error list
-            in
-            let list_set = list2set :: current_list in
-            let list_index = index :: index_list in
-            error, (List.rev list_index, List.rev list_set)
-          ) store_modif_new_index_dic (error, ([], []))
-      in*)
-      (*-------------------------------------------------------------------------*)
       (*store a mapping function from a list of covering class into a list
       of new index and a pair of map*)
-      let error, (id_list, list_of_map) = (*TODO*)
+      let error, (id_list, list_of_map) =
         Dictionary_of_Covering_class.fold
           (fun list _ index (error, (index_list, current_list)) ->
             let error, store_map =
@@ -146,9 +102,6 @@ let collect_remanent_list2set parameter error store_remanent store_result =
           error
           agent_type
           ((id_list, site_set_list),
-           (*pair_site_new_index_set_list,
-           pair_site_test_new_index_set_list,
-           pair_site_modif_new_index_set_list,*)
            (id_list, list_of_map)
           )
           store_result
@@ -178,36 +131,31 @@ let print_pair_site_list l l' =
       aux tl tl'
   in aux l l'
 
-(*let print_pair_new_index_site_list l l' =
+let print_map_functions l l' =
   let rec aux acc acc' =
     match acc, acc' with
-    | [], [] | _, [] | [], _ -> []
-    | id :: tl, site :: tl' ->
-      Printf.fprintf stdout 
-        "Potential dependencies between sites:New-index:Covering_class_id:%i\n"
-        id; print_set site :: aux tl tl'
-  in aux l l'
+    | [], [] | _, [] | [], _ -> ()
+    | id :: tl, h :: tl' ->
+      Printf.fprintf stdout
+        "Potential dependencies between sites:Map-functions:Covering_class_id:%i\n" id; 
+      let (map1, map2) = h in
+      let _ =
+        Site_map_and_set.iter_map
+          (fun site site_new ->
+            Printf.fprintf stdout "Map1:site_type:%i:site_type':%i\n" site site_new
+          ) map1
+      in
+      let _ =
+        Site_map_and_set.iter_map
+          (fun site_new site ->
+            Printf.fprintf stdout "Map2:site_type':%i:site_type:%i\n" site_new site
+          ) map2
+      in
+      ();
+      aux tl tl'
+  in
+  aux l l'
 
-let print_pair_new_index_test_list l l' =
-  let rec aux acc acc' =
-    match acc, acc' with
-    | [], [] | _, [] | [], _ -> []
-    | id :: tl, site :: tl' ->
-      Printf.fprintf stdout 
-        "Potential dependencies between sites:TEST:New-index:Covering_class_id:%i\n"
-        id; print_set site :: aux tl tl'
-  in aux l l'
-
-let print_pair_new_index_modif_list l l' =
-  let rec aux acc acc' =
-    match acc, acc' with
-    | [], [] | _, [] | [], _ -> []
-    | id :: tl, site :: tl' ->
-      Printf.fprintf stdout 
-        "Potential dependencies between sites:MODIFICATION-:New-index:Covering_class_id:%i\n"
-        id; print_set site :: aux tl tl'
-  in aux l l'*)
-  
 let print_list2set parameter error result =
   AgentMap.print error (fun error parameter
     ((id_site_list, site_list),
@@ -217,29 +165,7 @@ let print_list2set parameter error result =
         let _ =
           print_pair_site_list id_site_list site_list
         in
-        let rec aux acc acc' =
-          match acc, acc' with
-          | [], [] | _, [] | [], _ -> ()
-          | id :: tl, h :: tl' ->
-            Printf.fprintf stdout
-              "Potential dependencies between sites:Map-functions:Covering_class_id:%i\n" id; 
-            let (map1, map2) = h in
-            let _ =
-              Site_map_and_set.iter_map
-                (fun site site_new ->
-                  Printf.fprintf stdout "Map1:site_type:%i:site_type':%i\n" site site_new
-                ) map1
-            in
-            let _ =
-              Site_map_and_set.iter_map
-            (fun site_new site ->
-              Printf.fprintf stdout "Map2:site_type':%i:site_type:%i\n" site_new site
-            ) map2
-            in
-            ();
-            aux tl tl'
-        in
-        aux id_list list_of_map
+        print_map_functions id_list list_of_map
       in
       error
   ) parameter result
