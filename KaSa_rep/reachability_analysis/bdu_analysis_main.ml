@@ -321,7 +321,7 @@ let init_bdu_analysis_dynamic parameter error =
 
 let init_bdu_build parameter error =
   (*let error, init_restriction_bdu_test = AgentMap.create parameter error 0 in*)
-  let init_restriction_bdu_test = Site_map_and_set.empty_map in
+  let error, init_restriction_bdu_test = AgentMap.create parameter error 0 in
   let init_restriction_bdu_test =
     {
       store_restriction_bdu_test = init_restriction_bdu_test;

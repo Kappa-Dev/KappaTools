@@ -83,7 +83,7 @@ let collect_remanent_list2set parameter error store_remanent store_result =
       (*-------------------------------------------------------------------------*)
       (*store a mapping function from a list of covering class into a list
       of new index and a pair of map*)
-      let error, (id_list, list_of_map) =
+      let error, (id_list_map, list_of_map) =
         Dictionary_of_Covering_class.fold
           (fun list _ index (error, (index_list, current_list)) ->
             let error, store_map =
@@ -102,7 +102,7 @@ let collect_remanent_list2set parameter error store_remanent store_result =
           error
           agent_type
           ((id_list, site_set_list),
-           (id_list, list_of_map)
+           (id_list_map, list_of_map)
           )
           store_result
       in

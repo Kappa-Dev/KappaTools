@@ -25,23 +25,27 @@ let trace = false
 
 (************************************************************************************)
 (*restriction bdu_test*)
-
-let rec print_list l =
-  match l with
-  | [] -> []
-  | (s, state) :: tl ->
-    fprintf stdout "site_type:%i:state:%i\n" s state;
-    print_list tl
     
-let print_restriction_bdu_test parameter error result =
+let print_list_restriction result =
   let rec aux acc =
     match acc with
-      | [] -> []
-      | h :: tl ->
-        Site_map_and_set.iter_map (fun k port ->
-          fprintf stdout "site:%i\n" k;
-        ) h; aux tl
-  in aux result
+    | [] -> []
+    | (id, map) :: tl ->
+      fprintf stdout "Covering_class_id:%i\n" id;
+      Site_map_and_set.iter_map (fun site' state ->
+        fprintf stdout "site':%i:state:%i\n" site' state
+      ) map; aux tl
+  in
+  aux result
+
+let print_restriction parameter error result =
+  AgentMap.print error
+    (fun error parameter l ->
+      let _ =
+        print_list_restriction l
+      in
+      error
+    ) parameter result
               
 (************************************************************************************)
 (*main print*)
@@ -57,7 +61,10 @@ let print_bdu_build parameter error result =
   in
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
-      "- BDU of test restriction:\n"
-    
+      "- BDU of test restriction:\n";
+    print_restriction
+      parameter
+      error
+      result.store_restriction_bdu_test
   in
   error
