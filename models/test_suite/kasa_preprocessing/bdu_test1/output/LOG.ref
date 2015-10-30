@@ -217,4 +217,9 @@ update function:
 - Working list update (will be removed):
 - Working list creation (will be removed):
 - Working list update and creation:
+
+------------------------------------------------------------
+* Build BDU:
+------------------------------------------------------------
+- BDU of test restriction:
 execution finished without any exception
