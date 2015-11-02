@@ -24,14 +24,16 @@ Ast
 Expr
 Signature
 NamedDecls
-Place
+Agent_place
 Instantiation
 Alg_expr
 Primitives
 Environment
 Kappa_printer
 
+Version
 Set_and_map
+Tk_version
 Hash
 Dictionary
 Git_commit_info
