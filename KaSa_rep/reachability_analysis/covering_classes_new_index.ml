@@ -42,7 +42,7 @@ let is_empty_list l =
     | [] -> true
     | _ -> false
 
-let re_index_value_list list =
+let re_index_value_list list = (*TO BE FIXED*)
   let rec aux acc =
     match acc with
       | [] -> acc

@@ -200,7 +200,8 @@ let scan_rule_dynamic parameter error handler rule_id rule
 (************************************************************************************)
 (*rule bdu build*)
 
-let scan_rule_bdu_build parameter error rule covering_class_set store_result =
+let scan_rule_bdu_build parameter error rule covering_classes 
+    covering_class_set store_result =
   let error, store_restriction_bdu_test =
     collect_restriction_bdu_test
       parameter
@@ -209,9 +210,18 @@ let scan_rule_bdu_build parameter error rule covering_class_set store_result =
       covering_class_set
       store_result.store_restriction_bdu_test
   in
+  let error, store_test =
+    collect_bdu_test
+      parameter
+      error
+      rule
+      covering_classes
+      store_result.store_test
+  in
   error, 
   {
-    store_restriction_bdu_test = store_restriction_bdu_test
+    store_restriction_bdu_test = store_restriction_bdu_test;
+    store_test = store_test
   }
 
 (************************************************************************************)
@@ -247,6 +257,7 @@ let scan_rule parameter error handler rule_id rule store_covering_classes
       parameter
       error
       rule
+      covering_classes
       covering_class_set
       store_result.store_bdu_build
   in
@@ -320,11 +331,12 @@ let init_bdu_analysis_dynamic parameter error =
 (*init of bdu build*)
 
 let init_bdu_build parameter error =
-  (*let error, init_restriction_bdu_test = AgentMap.create parameter error 0 in*)
   let error, init_restriction_bdu_test = AgentMap.create parameter error 0 in
+  let error, init_bdu_test = AgentMap.create parameter error 0 in
   let init_restriction_bdu_test =
     {
       store_restriction_bdu_test = init_restriction_bdu_test;
+      store_test = init_bdu_test
     }
   in
   error, init_restriction_bdu_test

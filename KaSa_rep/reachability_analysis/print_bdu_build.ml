@@ -25,18 +25,34 @@ let trace = false
 
 (************************************************************************************)
 (*restriction bdu_test*)
-    
+
 let print_list_restriction result =
+  let rec aux acc =
+    match acc with
+    | [] -> []
+    | map :: tl ->
+      Int2Map_Modif.iter_map (fun (agent_type, site) (l1, set_state) ->
+        if l1 <> []
+        then ()
+        else ();
+        Site_map_and_set.iter_set (fun state -> 
+          fprintf stdout "site:%i:state:%i\n" site state
+        ) set_state;
+      ) map;
+      aux tl
+  in
+  aux result
+
+(*let print_with_id result =
   let rec aux acc =
     match acc with
     | [] -> []
     | (id, map) :: tl ->
       fprintf stdout "Covering_class_id:%i\n" id;
-      Site_map_and_set.iter_map (fun site' state ->
-        fprintf stdout "site':%i:state:%i\n" site' state
-      ) map; aux tl
-  in
-  aux result
+      let _ =
+        print_list_restriction map
+      in aux tl
+  in aux result*)
 
 let print_restriction parameter error result =
   AgentMap.print error
@@ -47,6 +63,49 @@ let print_restriction parameter error result =
       error
     ) parameter result
               
+(*TEST*)
+(*let print_map l l' =
+  let rec aux acc acc' =
+    match acc, acc' with
+    | [], [] | _, [] | [], _ -> []
+    | id :: tl, map :: tl' ->
+      fprintf stdout "Covering_class_id:%i\n" id;
+      Site_map_and_set.iter_map (fun site state ->
+        fprintf stdout "site:%i:state:%i\n" site state
+      ) map; aux tl tl'
+  in
+  aux l l'*)
+
+let print_map parameter error l l' =
+  let rec aux acc acc' =
+    match acc, acc' with
+    | [], [] | _, [] | [], _ -> []
+    | id :: tl, (site, state) :: tl' ->
+      fprintf stdout "Covering_class_id:%i\n" id;
+      fprintf stdout "site:%i:state:%i\n" site state;
+      aux tl tl'
+  in
+  aux l l'
+
+let print_list_pair parameter error result =
+  let rec aux acc =
+    match acc with
+    | [] -> []
+    | (id_list, l) :: tl ->
+      print_map parameter error id_list l;
+      aux tl
+  in
+  aux result
+
+let print_test parameter error result =
+  AgentMap.print error
+    (fun error parameter l ->
+      let _ =
+        print_list_pair parameter error l
+      in
+      error
+    ) parameter result
+
 (************************************************************************************)
 (*main print*)
 
@@ -66,5 +125,13 @@ let print_bdu_build parameter error result =
       parameter
       error
       result.store_restriction_bdu_test
+  in
+  let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "- BDU of test restriction:\n";
+    print_test
+      parameter
+      error
+      result.store_test
   in
   error

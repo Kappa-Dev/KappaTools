@@ -93,101 +93,129 @@ let compute_update parameter error rule_id handler bdu_test modif_list bdu_creat
    - Convert type set of sites into map
 *)
 
-(*let compute_a_map_restriction' parameter error set agent map =
-  let error, map_restriction =
-    Site_map_and_set.fold_map_restriction parameter error
-      (fun site port (error, store_result) ->
-        let state = port.site_state.min in
-        (*find site' with new_index inside map*)
-        let error, site' =
-          try Site_map_and_set.find_map parameter error site map
-          with Not_found -> error, 0
-        in
-        (*add into a restriction map with state of a new site'*)
-        let error, new_pair_map =
-          Site_map_and_set.add_map parameter error site' state store_result
-        in
-        error, new_pair_map
-      ) set agent.agent_interface Site_map_and_set.empty_map
+let a_map_restriction parameter error agent_type id_list set agent map =
+  let add_link (agent_type, site) state store_result =
+    let error, (l, old) =
+      try Int2Map_Modif.find_map parameter error (agent_type, site) store_result
+      with Not_found -> error, ([], Site_map_and_set.empty_set)
+    in
+    let error, current_set =
+      Site_map_and_set.add_set parameter error state old
+    in
+    let error, new_set =
+      Site_map_and_set.union parameter error current_set old
+    in
+    let error, result =
+      Int2Map_Modif.add_map parameter error (agent_type, site)
+        (l, new_set) store_result
+    in
+    error, result
   in
-  error, map_restriction*)
-
-(*fold it in a list of id*)
-let a_map_restriction parameter error id set agent map =
-  let error, map_restriction =
-    Site_map_and_set.fold_map_restriction parameter error
-      (fun site port (error, store_result) ->
-        let state = port.site_state.min in
-        (*find site' with new_index inside map*)
-        let error, site' =
-          try Site_map_and_set.find_map parameter error site map
-          with Not_found -> error, 0
-        in
-        (*add into a restriction map with state of a new site'*)
-        let error, new_pair_map =
-          Site_map_and_set.add_map parameter error site' state store_result
-        in
-        error, new_pair_map
-      ) set agent.agent_interface Site_map_and_set.empty_map
-  in
-  error, (id, map_restriction)
-
-let a_list_of_map_restriction parameter error id list_set agent list_map =
-  (*check inside each covering class id of a list of map*)
-  let rec aux acc acc' =
-    match acc, acc' with
-    | [], [] | _, [] | [], _ -> []
-    | set :: tl, (map, _) :: tl' ->
-      (*compute a map restriction*)
-      let error, (id, map_restriction) =
-        a_map_restriction
-          parameter
-          error
-          id
-          set 
-          agent
-          map
-      in
-      (id, map_restriction) :: aux tl tl'
-  in
-  aux list_set list_map
-
-let compute_map_restriction parameter error id_list list_set agent list_map =
   let rec aux acc =
     match acc with
     | [] -> []
     | id :: tl ->
-      let list =
-        a_list_of_map_restriction
-          parameter
-          error
-          id
-          list_set
-          agent
-          list_map
+      let error, map_restriction =
+        Site_map_and_set.fold_map_restriction parameter error
+          (fun site port (error, store_result) ->
+            let state = port.site_state.min in
+            (*find site' with new_index inside map*)
+            let error, site' =
+              try Site_map_and_set.find_map parameter error site map
+              with Not_found -> error, 0
+            in
+            (*add into a restriction map with state of a new site'*)
+            let error, new_pair_map = (*TEST*)
+              add_link (agent_type, site) state store_result
+            in
+            error, new_pair_map
+          ) set agent.agent_interface Int2Map_Modif.empty_map
       in
-      List.concat [list; aux tl]
+      map_restriction :: aux tl
   in
   aux id_list
 
-(*let compute_a_list_of_map_restriction' parameter error list_set agent list_map =
+let a_list_of_map_restriction parameter error agent_type id_list list_set agent list_map =
   (*check inside each covering class id of a list of map*)
   let rec aux acc acc' =
     match acc, acc' with
     | [], [] | _, [] | [], _ -> []
     | set :: tl, (map, _) :: tl' ->
-      (*compute a map restriction*)
-      let error, map_restriction =
-        compute_a_map_restriction
+      let  map_restriction =
+        a_map_restriction
           parameter
           error
-          set 
+          agent_type
+          id_list
+          set
           agent
           map
       in
-      map_restriction :: aux' tl tl'
+      List.concat [map_restriction; aux tl tl']
   in
-  aux list_set list_map*)
+  aux list_set list_map
+
+let compute_map_restriction parameter error agent_type id_list list_set agent list_map =
+  (*let rec aux acc =
+    match acc with
+    | [] -> []
+    | id :: tl ->
+      let list =*)
+        a_list_of_map_restriction
+          parameter
+          error
+          agent_type
+          id_list
+          list_set
+          agent
+          list_map
+(*in
+      List.concat[list; aux tl]
+  in
+aux id_list*)
+
+(*map restriction of test rules*)
+
+let build_map_restriction parameter error agent_type agent covering_class_set store_result =
+  let error, init = AgentMap.create parameter error 0 in
+  let error,store_result =
+    AgentMap.fold parameter error
+      (fun parameter error agent_type_cv set store_result ->
+        let (id_set_list, list_set), (id_list, list_map) = set in
+        let map_restriction_list =
+          compute_map_restriction
+            parameter
+            error
+            agent_type_cv
+            id_list
+            list_set
+            agent
+            list_map
+        in
+        if agent_type = agent_type_cv
+        then
+          (*get old*)
+          let error, old_list =
+            match AgentMap.unsafe_get parameter error agent_type_cv store_result with
+            | error, None -> error, []
+            | error, Some l -> error, l
+          in
+          let new_list = List.concat [map_restriction_list; old_list] in
+          (*store*)
+          let error, store_result =
+            AgentMap.set
+              parameter
+              error
+              agent_type_cv
+              (List.rev new_list)
+              store_result
+          in
+          error, store_result
+        else 
+        error, store_result
+      ) covering_class_set store_result
+  in
+  error, store_result
 
 (*TODO*)
 let collect_restriction_bdu_test parameter error rule covering_class_set store_result =
@@ -198,36 +226,99 @@ let collect_restriction_bdu_test parameter error rule covering_class_set store_r
       | Agent agent ->
         let agent_type = agent.agent_name in
         let error, store_result =
-          AgentMap.fold parameter error
-            (fun parameter error agent_type_cv set store_result ->
-              let (id_set_list, list_set), (id_list, list_map) = set in
-              let map_restriction_list =
-                compute_map_restriction
-                  parameter
-                  error
-                  id_list
-                  list_set
-                  agent
-                  list_map
-              in
-              (*get old*)
-              let error, old_list =
-                match AgentMap.unsafe_get parameter error agent_type store_result with
-                | error, None -> error, []
-                | error, Some l -> error, l
-              in
-              let new_list = List.concat [map_restriction_list; old_list] in
-              (*store*)
-              let error, store_result =
-                AgentMap.set
-                  parameter
-                  error
-                  agent_type
-                  (List.rev new_list)
-                  store_result
-              in
-              error, store_result
-            ) covering_class_set store_result
+          build_map_restriction
+            parameter
+            error
+            agent_type
+            agent
+            covering_class_set
+            store_result
         in
         error, store_result
     ) rule.rule_lhs.views store_result
+
+(*test build bdu test from remanent of covering class*)
+open Covering_classes_type
+open Covering_classes_list2set
+
+let collect_bdu_test parameter error rule store_remanent store_result =
+  AgentMap.fold parameter error
+    (fun parameter error agent_type remanent store_result ->
+      let error, init = AgentMap.create parameter error 0 in
+      let store_dic = remanent.store_dic in
+      let error, (id_list, site_set_list) =
+        Dictionary_of_Covering_class.fold
+          (fun list _ index (error, (index_list, current_list)) ->
+            let error, list2set =
+              list2set parameter error list
+            in
+            let list_set = list2set :: current_list in
+            let list_index = index :: index_list in
+            error, (List.rev list_index, List.rev list_set)
+          ) store_dic (error, ([], []))
+      in
+      let result =
+        let rec aux acc =
+          match acc with
+          | [] -> []
+          | set :: tl ->
+            let error, result =
+              AgentMap.fold parameter error
+                (fun parameter error agent_id agent store_result ->
+                  match agent with
+                  | Ghost -> error, store_result
+                  | Agent agent ->
+                    let agent_type_test = agent.agent_name in
+                    Dictionary_of_Covering_class.fold
+                      (fun list _ index (error, (index_list, store_result1)) ->
+                        let error, (store_map, _) =
+                          new_index_pair_map parameter error list
+                        in
+                        (*map restriction*)
+                        let map_restriction =
+                          Site_map_and_set.fold_map
+                            (fun site port current_list ->
+                              (site, port.site_state.min) :: current_list
+                            ) agent.agent_interface []
+                        in
+                        (*let error, map_restriction =
+                          Site_map_and_set.fold_map_restriction parameter error
+                            (fun site port (error, store_result) ->
+                              let state = port.site_state.min in
+                              let error, site' =
+                                try Site_map_and_set.find_map parameter error site store_map
+                                with Not_found -> error, 0
+                              in
+                              let error, map_res =
+                                Site_map_and_set.add_map 
+                                  parameter error site state store_result
+                              in
+                              error, map_res
+                            ) set agent.agent_interface Site_map_and_set.empty_map
+                        in*)
+                        let new_list = List.concat [map_restriction; store_result1] in
+                        let index_list = index :: index_list in
+                        error, (List.rev index_list, new_list)
+                      ) store_dic (error, ([], []))
+                ) rule.rule_lhs.views ([], [])
+            in
+           result :: aux tl
+        in
+        aux site_set_list
+      in
+      (*let error, old =
+        match AgentMap.unsafe_get parameter error agent_type store_result with
+        | error, None -> error, []
+        | error, Some l -> error, l
+      in
+      let new_list = List.concat [result; old] in*)
+      let error, store_result =
+        AgentMap.set
+          parameter
+          error
+          agent_type
+          result
+          store_result
+      in
+      error, store_result
+    ) store_remanent store_result
