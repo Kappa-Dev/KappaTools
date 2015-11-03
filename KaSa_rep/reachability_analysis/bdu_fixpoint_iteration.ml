@@ -174,6 +174,7 @@ let collect_test_restriction parameter error rule store_remanent_test store_resu
       match agent with
       | Ghost -> error, store_result
       | Agent agent ->
+        let agent_type_test = agent.agent_name in
         let error, pair_list =
           List.fold_left (fun (error, current_list) (id, list, set) ->
             (*-----------------------------------------------------------------*)
@@ -212,7 +213,7 @@ let collect_test_restriction parameter error rule store_remanent_test store_resu
         (*-----------------------------------------------------------------*)
         (*get old*)
         let error, old_pair =
-          match AgentMap.unsafe_get parameter error agent_type store_result with
+          match AgentMap.unsafe_get parameter error agent_type_test store_result with
           | error, None -> error, []
           | error, Some l -> error, l
         in
@@ -222,7 +223,7 @@ let collect_test_restriction parameter error rule store_remanent_test store_resu
           AgentMap.set
             parameter
             error
-            agent_type
+            agent_type_test
             new_pair_list
             store_result
         in

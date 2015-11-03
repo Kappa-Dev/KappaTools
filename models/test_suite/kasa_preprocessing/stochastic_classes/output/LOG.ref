@@ -746,12 +746,15 @@ Covering_class_id:2
 Covering_class_id:1
 Covering_class_id:0
 Covering_class_id:2
-Covering_class_id:1
 site':1:state:0
+Covering_class_id:1
+agent_type_2:
 Covering_class_id:0
 Covering_class_id:2
 site':1:state:0
 Covering_class_id:1
+site':1:state:0
+agent_type_4:
 Covering_class_id:0
 Covering_class_id:2
 Covering_class_id:1
@@ -761,9 +764,9 @@ Covering_class_id:2
 site':1:state:0
 Covering_class_id:1
 site':1:state:0
+agent_type_5:
 Covering_class_id:0
 Covering_class_id:2
-site':1:state:0
 Covering_class_id:1
 site':1:state:0
 Covering_class_id:0
