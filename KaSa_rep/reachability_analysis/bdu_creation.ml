@@ -14,7 +14,7 @@
 
 open Cckappa_sig
 open Bdu_analysis_type
-open Bdu_build
+open Bdu_build_common
 open Fifo
 
 let warn parameters mh message exn default =

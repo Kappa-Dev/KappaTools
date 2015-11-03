@@ -773,4 +773,156 @@ Covering_class_id:0
 Covering_class_id:2
 site':1:state:0
 Covering_class_id:1
+- Bdu of test restriction:
+agent_type_0:
+Covering_class_id:0
+site':1:state:0
+
+agent_type_0: if(mvbdu_id:3) x1 < 0 then 
+agent_type_0:  false
+agent_type_0: else 
+agent_type_0:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_0:   true
+agent_type_0:  else 
+agent_type_0:   false
+
+Covering_class_id:2
+
+agent_type_0: false
+
+Covering_class_id:1
+
+agent_type_0: false
+
+Covering_class_id:0
+
+agent_type_0: false
+
+Covering_class_id:2
+site':1:state:0
+
+agent_type_0: if(mvbdu_id:3) x1 < 0 then 
+agent_type_0:  false
+agent_type_0: else 
+agent_type_0:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_0:   true
+agent_type_0:  else 
+agent_type_0:   false
+
+Covering_class_id:1
+
+agent_type_0: false
+
+agent_type_2:
+Covering_class_id:0
+
+agent_type_2: false
+
+Covering_class_id:2
+site':1:state:0
+
+agent_type_2: if(mvbdu_id:3) x1 < 0 then 
+agent_type_2:  false
+agent_type_2: else 
+agent_type_2:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_2:   true
+agent_type_2:  else 
+agent_type_2:   false
+
+Covering_class_id:1
+site':1:state:0
+
+agent_type_2: if(mvbdu_id:3) x1 < 0 then 
+agent_type_2:  false
+agent_type_2: else 
+agent_type_2:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_2:   true
+agent_type_2:  else 
+agent_type_2:   false
+
+agent_type_4:
+Covering_class_id:0
+
+agent_type_4: false
+
+Covering_class_id:2
+
+agent_type_4: false
+
+Covering_class_id:1
+site':1:state:1
+
+agent_type_4: if(mvbdu_id:3) x1 < 1 then 
+agent_type_4:  false
+agent_type_4: else 
+agent_type_4:  if(mvbdu_id:2) x1 < 2 then 
+agent_type_4:   true
+agent_type_4:  else 
+agent_type_4:   false
+
+Covering_class_id:0
+
+agent_type_4: false
+
+Covering_class_id:2
+site':1:state:0
+
+agent_type_4: if(mvbdu_id:3) x1 < 0 then 
+agent_type_4:  false
+agent_type_4: else 
+agent_type_4:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_4:   true
+agent_type_4:  else 
+agent_type_4:   false
+
+Covering_class_id:1
+site':1:state:0
+
+agent_type_4: if(mvbdu_id:3) x1 < 0 then 
+agent_type_4:  false
+agent_type_4: else 
+agent_type_4:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_4:   true
+agent_type_4:  else 
+agent_type_4:   false
+
+agent_type_5:
+Covering_class_id:0
+
+agent_type_5: false
+
+Covering_class_id:2
+
+agent_type_5: false
+
+Covering_class_id:1
+site':1:state:0
+
+agent_type_5: if(mvbdu_id:3) x1 < 0 then 
+agent_type_5:  false
+agent_type_5: else 
+agent_type_5:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_5:   true
+agent_type_5:  else 
+agent_type_5:   false
+
+Covering_class_id:0
+
+agent_type_5: false
+
+Covering_class_id:2
+site':1:state:0
+
+agent_type_5: if(mvbdu_id:3) x1 < 0 then 
+agent_type_5:  false
+agent_type_5: else 
+agent_type_5:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_5:   true
+agent_type_5:  else 
+agent_type_5:   false
+
+Covering_class_id:1
+
+agent_type_5: false
+
 execution finished without any exception

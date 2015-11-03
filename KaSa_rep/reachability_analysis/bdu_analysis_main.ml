@@ -15,7 +15,7 @@
 open Cckappa_sig
 open Int_storage
 open Fifo
-open Bdu_build
+open Bdu_build_common
 open Bdu_analysis_type
 open Bdu_creation
 open Print_bdu_analysis
@@ -24,7 +24,7 @@ open Bdu_modification_sites
 open Bdu_contact_map
 open Bdu_update
 open Bdu_working_list
-open Bdu_fixpoint_iteration
+open Bdu_build
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "BDU analysis") message exn (fun () -> default)  
@@ -217,10 +217,18 @@ let scan_rule_bdu_build parameter error rule covering_classes store_result =
       store_remanent_test
       store_result.store_test_restriction
   in
+  let error, store_bdu_test =
+    collect_bdu_test
+      parameter
+      error
+      store_test_restriction
+      store_result.store_bdu_test
+  in
   error, 
   {
     store_remanent_test    = store_remanent_test;
-    store_test_restriction = store_test_restriction
+    store_test_restriction = store_test_restriction;
+    store_bdu_test         = store_bdu_test
   }
 
 (************************************************************************************)
@@ -331,10 +339,12 @@ let init_bdu_analysis_dynamic parameter error =
 let init_bdu_build parameter error =
   let error, init_remanent_test    = AgentMap.create parameter error 0 in
   let error, init_test_restriction = AgentMap.create parameter error 0 in
+  let error, init_bdu_test         = AgentMap.create parameter error 0 in
   let init_restriction_bdu_test =
     {
       store_remanent_test    = init_remanent_test;
-      store_test_restriction = init_test_restriction
+      store_test_restriction = init_test_restriction;
+      store_bdu_test         = init_bdu_test
     }
   in
   error, init_restriction_bdu_test

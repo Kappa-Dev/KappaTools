@@ -17,14 +17,12 @@ open Bdu_analysis_type
 open Set_and_map
 open Cckappa_sig
 
-
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "BDU creation") message exn (fun () -> default)  
 
 let trace = false
 
 (************************************************************************************)
-(*restriction bdu_test*)
 
 let print_triple_list l =
   let rec aux acc =
@@ -37,6 +35,17 @@ let print_triple_list l =
       ) set; aux tl
   in aux l
 
+let print_remanent_test parameter error result =
+  AgentMap.print error
+    (fun error parameter triple_list ->
+      let _ =
+        print_triple_list triple_list
+      in
+      error
+    ) parameter result
+
+(************************************************************************************)
+
 let print_pair_list l =
   let rec aux acc =
     match acc with
@@ -48,15 +57,6 @@ let print_pair_list l =
       ) m; aux tl
   in aux l
 
-let print_remanent_test parameter error result =
-  AgentMap.print error
-    (fun error parameter triple_list ->
-      let _ =
-        print_triple_list triple_list
-      in
-      error
-    ) parameter result
-
 let print_test_restriction parameter error result =
   AgentMap.print error
     (fun error parameter pair_list ->
@@ -65,6 +65,44 @@ let print_test_restriction parameter error result =
       in
       error
     ) parameter result
+
+(************************************************************************************)
+
+let print_bdu parameter error bdu =
+  Boolean_mvbdu.print_boolean_mvbdu error
+    (Remanent_parameters.update_prefix parameter "") bdu
+
+let print_site_state_list l =
+  let rec aux acc =
+    match acc with
+    | [] -> []
+    | (site, state) :: tl ->
+      fprintf stdout "site':%i:state:%i\n" site state;
+      aux tl
+  in aux l
+
+let print_bdu_list parameter error l =
+  let rec aux acc =
+    match acc with
+    | [] -> []
+    | (l, id, (handler, bdu_test)) :: tl ->
+      fprintf stdout "Covering_class_id:%i\n" id;
+      let _ = print_site_state_list l in
+      fprintf stdout "\n";
+      let _ = print_bdu parameter error bdu_test in
+      fprintf stdout "\n";
+      aux tl
+  in aux l
+
+let print_bdu_test parameter error result =
+  AgentMap.print error
+    (fun error parameter pair_list ->
+      let _ =
+        print_bdu_list parameter error pair_list
+      in
+      error
+    ) parameter result
+
 
 (************************************************************************************)
 (*main print*)
@@ -93,5 +131,13 @@ let print_bdu_build parameter error result =
       parameter
       error
       result.store_test_restriction
+  in
+  let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "- Bdu of test restriction:\n";
+    print_bdu_test
+      parameter
+      error
+      result.store_bdu_test
   in
   error

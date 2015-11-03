@@ -236,4 +236,35 @@ site':1:state:1
 site':2:state:0
 Covering_class_id:0
 site':1:state:0
+- Bdu of test restriction:
+agent_type_0:
+Covering_class_id:0
+site':2:state:0
+site':1:state:1
+
+agent_type_0: if(mvbdu_id:7) x1 < 1 then 
+agent_type_0:  false
+agent_type_0: else 
+agent_type_0:  if(mvbdu_id:6) x1 < 2 then 
+agent_type_0:   if(mvbdu_id:5) x2 < 0 then 
+agent_type_0:    false
+agent_type_0:   else 
+agent_type_0:    if(mvbdu_id:4) x2 < 1 then 
+agent_type_0:     true
+agent_type_0:    else 
+agent_type_0:     false
+agent_type_0:  else 
+agent_type_0:   false
+
+Covering_class_id:0
+site':1:state:0
+
+agent_type_0: if(mvbdu_id:3) x1 < 0 then 
+agent_type_0:  false
+agent_type_0: else 
+agent_type_0:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_0:   true
+agent_type_0:  else 
+agent_type_0:   false
+
 execution finished without any exception

@@ -397,4 +397,66 @@ Covering_class_id:0
 site':1:state:1
 Covering_class_id:0
 site':1:state:0
+- Bdu of test restriction:
+agent_type_0:
+Covering_class_id:0
+
+agent_type_0: false
+
+Covering_class_id:0
+site':1:state:1
+
+agent_type_0: if(mvbdu_id:3) x1 < 1 then 
+agent_type_0:  false
+agent_type_0: else 
+agent_type_0:  if(mvbdu_id:2) x1 < 2 then 
+agent_type_0:   true
+agent_type_0:  else 
+agent_type_0:   false
+
+Covering_class_id:0
+site':1:state:0
+
+agent_type_0: if(mvbdu_id:3) x1 < 0 then 
+agent_type_0:  false
+agent_type_0: else 
+agent_type_0:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_0:   true
+agent_type_0:  else 
+agent_type_0:   false
+
+agent_type_1:
+Covering_class_id:0
+site':1:state:0
+
+agent_type_1: if(mvbdu_id:3) x1 < 0 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_1:   true
+agent_type_1:  else 
+agent_type_1:   false
+
+Covering_class_id:0
+site':1:state:1
+
+agent_type_1: if(mvbdu_id:3) x1 < 1 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:2) x1 < 2 then 
+agent_type_1:   true
+agent_type_1:  else 
+agent_type_1:   false
+
+Covering_class_id:0
+site':1:state:0
+
+agent_type_1: if(mvbdu_id:3) x1 < 0 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_1:   true
+agent_type_1:  else 
+agent_type_1:   false
+
 execution finished without any exception

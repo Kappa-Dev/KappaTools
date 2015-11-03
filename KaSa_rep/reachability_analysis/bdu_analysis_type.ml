@@ -144,10 +144,15 @@ type bdu_analysis_dynamic =
 (************************************************************************************)
 (*build bdu type*)
 
+type pair_bdu =
+  (Boolean_mvbdu.memo_tables, Boolean_mvbdu.mvbdu_dic,
+   Boolean_mvbdu.list_dic, bool, int) Memo_sig.handler * bool Mvbdu_sig.mvbdu
+  
 type bdu_build =
   {
     store_remanent_test    : ((int * int list * Site_map_and_set.set) list) AgentMap.t;
-    store_test_restriction : (int * int Site_map_and_set.map) list AgentMap.t
+    store_test_restriction : (int * int Site_map_and_set.map) list AgentMap.t;
+    store_bdu_test         : ((int * int) list * int * pair_bdu) list AgentMap.t;
   }
 
 (************************************************************************************)
