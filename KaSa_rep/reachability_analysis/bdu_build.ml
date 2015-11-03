@@ -280,3 +280,39 @@ let collect_bdu_test parameter error rule_id store_test_restriction store_result
 
 (************************************************************************************)
 (*creation rules*)
+
+let collect_remanent_creation parameter error rule store_remanent store_result =
+  List.fold_left (fun (error, store_result) (agent_id, agent_type) ->
+    let error, agent = AgentMap.get parameter error agent_id rule.rule_rhs.views in
+    match agent with
+      | None -> warn parameter error (Some "line 289") Exit store_result
+      | Some Ghost -> error, store_result
+      | Some Agent agent ->
+	let error, store_result =
+	  AgentMap.fold parameter error
+	    (fun parameter error agent_type_cv remanent store_result ->
+	      let store_dic = remanent.store_dic in
+	      (*---------------------------------------------------------------------*)
+	      (*build inside map restriction?*)
+	      let error, triple_list =
+		Dictionary_of_Covering_class.fold
+		  (fun list _ id (error, current_list) ->
+		    let error, set = list2set parameter error list in
+		    let new_set = (id, list, set) :: current_list in
+		    error, List.rev new_set
+		  ) store_dic (error, [])
+	      in
+	      (*---------------------------------------------------------------------*)
+	      let error, store_result =
+		AgentMap.set
+		  parameter
+		  error
+		  agent_type
+		  triple_list
+		  store_result
+	      in
+	      error, store_result
+	    ) store_remanent store_result
+	in
+	error, store_result
+  ) (error, store_result) rule.actions.creation

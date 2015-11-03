@@ -106,6 +106,17 @@ let print_bdu_test parameter error result =
       error
     ) parameter result
 
+(************************************************************************************)
+(*remanent creation*)
+
+let print_remanent_creation parameter error result =
+  AgentMap.print error
+    (fun error parameter triple_list ->
+      let _ =
+	print_triple_list triple_list
+      in
+      error
+    ) parameter result
 
 (************************************************************************************)
 (*main print*)
@@ -142,5 +153,13 @@ let print_bdu_build parameter error result =
       parameter
       error
       result.store_bdu_test
+  in
+  let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "- Creation restriction:\n";
+    print_remanent_creation
+      parameter
+      error
+      result.store_remanent_creation
   in
   error

@@ -946,4 +946,15 @@ Covering_class_id:1
 
 agent_type_5: false
 
+- Creation restriction:
+agent_type_1:
+Covering_class_id:1
+site_type:0
+Covering_class_id:0
+site_type:1
+agent_type_3:
+Covering_class_id:1
+site_type:0
+Covering_class_id:0
+site_type:1
 execution finished without any exception

@@ -154,6 +154,7 @@ type bdu_build =
     store_test_restriction : (int * int Site_map_and_set.map) list AgentMap.t;
     store_bdu_test         : (int list *
                                 ((int * int) list * int * pair_bdu) list) AgentMap.t;
+    store_remanent_creation : ((int * int list * Site_map_and_set.set) list) AgentMap.t;
   }
 
 (************************************************************************************)

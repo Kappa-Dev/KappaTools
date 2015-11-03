@@ -237,11 +237,21 @@ let scan_rule_bdu_build parameter error rule_id rule covering_classes store_resu
       store_result.store_bdu_test
   in
   (*-------------------------------------------------------------------------------*)
+  let error, store_remanent_creation =
+    collect_remanent_creation
+      parameter
+      error
+      rule
+	covering_classes
+	store_result.store_remanent_creation  
+  in
+  (*-------------------------------------------------------------------------------*)
   error, 
   {
     store_remanent_test    = store_remanent_test;
     store_test_restriction = store_test_restriction;
-    store_bdu_test         = store_bdu_test
+    store_bdu_test         = store_bdu_test;
+    store_remanent_creation = store_remanent_creation
   }
 
 (************************************************************************************)
@@ -357,11 +367,13 @@ let init_bdu_build parameter error =
   let error, init_remanent_test    = AgentMap.create parameter error 0 in
   let error, init_test_restriction = AgentMap.create parameter error 0 in
   let error, init_bdu_test         = AgentMap.create parameter error 0 in
+  let error, init_remanent_creation = AgentMap.create parameter error 0 in
   let init_restriction_bdu_test =
     {
       store_remanent_test    = init_remanent_test;
       store_test_restriction = init_test_restriction;
-      store_bdu_test         = init_bdu_test
+      store_bdu_test         = init_bdu_test;
+      store_remanent_creation = init_remanent_creation
     }
   in
   error, init_restriction_bdu_test

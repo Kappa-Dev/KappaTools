@@ -269,4 +269,9 @@ agent_type_0:   true
 agent_type_0:  else 
 agent_type_0:   false
 
+- Creation restriction:
+agent_type_0:
+Covering_class_id:0
+site_type:0
+site_type:1
 execution finished without any exception
