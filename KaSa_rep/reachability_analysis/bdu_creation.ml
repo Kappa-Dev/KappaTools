@@ -55,7 +55,7 @@ let collect_creation parameter error viewsrhs creation store_result =
       | Some Agent agent ->
         (*build a list of site and an array store bdu from a pair (site,state)*)
         let list, (handler, bdu_array) = 
-          Site_map_and_set.fold_map
+          Site_map_and_set.Map.fold
             (fun site port (current_list, _) ->
               let state = int_of_port port in
               let l = (site, state) :: current_list in
@@ -96,7 +96,7 @@ let collect_creation parameter error viewsrhs creation store_result =
     | Some Ghost -> error, store_result
     | Some Agent agent ->
       let pair_list =
-        Site_map_and_set.fold_map
+        Site_map_and_set.Map.fold
           (fun site port current_list ->
             let state = int_of_port port in
             (site, state) :: current_list
@@ -167,9 +167,7 @@ let collect_rule_creation parameter error handler rule rule_id viewsrhs creation
        (*new working list*)
       let in_list, out_list, set = wl in
       let old_in_list, old_out_list, old_set = old_wl in
-      let error, new_set =
-        IntWL.WSet.union parameter error set old_set
-      in
+      let new_set = IntWL.WSet.union set old_set in
       let new_wl =
         List.concat [in_list; old_in_list], List.concat [out_list; old_out_list], new_set
       in
@@ -224,7 +222,7 @@ let build_bdu_creation parameter error rule (*store_result*) =  (*REMOVE*)
       | Some Ghost -> error, store_result
       | Some Agent agent ->
 	let error, (l, (handler, bdu_creation)) =
-	  Site_map_and_set.fold_map
+	  Site_map_and_set.Map.fold
 	    (fun site port (error, (current_list, _))->
 	      let state = int_of_port port in
 	      let l = (site, state) :: current_list in
@@ -260,7 +258,7 @@ let build_bdu_test_modif_list parameter error rule = (*REMOVE*)
 	  let agent_type = agent.agent_name in
 	  (*build bdu_test*)
 	  let error, (l, (handler, bdu_test)) =
-	    Site_map_and_set.fold_map
+	    Site_map_and_set.Map.fold
 	      (fun site port (error, (current_list, _)) ->
 		let state = int_of_port port in
 		let l = (site, state) :: current_list in
@@ -272,7 +270,7 @@ let build_bdu_test_modif_list parameter error rule = (*REMOVE*)
 	  in
 	  (*build list of modif*)
 	  let error, modif_list =
-	    Site_map_and_set.fold_map
+	    Site_map_and_set.Map.fold
 	      (fun site port (error, current_list) ->
 		let state = int_of_port port in
 		let l =

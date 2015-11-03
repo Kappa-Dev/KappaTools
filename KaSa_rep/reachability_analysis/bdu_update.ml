@@ -16,7 +16,7 @@ open Cckappa_sig
 open Int_storage
 open Bdu_analysis_type
 open Bdu_contact_map
-open Set_and_map
+open SetMap
 
 open Print_bdu_analysis
 
@@ -45,20 +45,19 @@ let store_covering_classes_modification_update_aux parameter error agent_type_cv
     site_type_cv covering_class_id store_test_modification_without_creation store_result =
   let add_link (agent_type_cv, site_type_cv, cv_id) rule_id store_result =
     (*searching in the result whether or not those signatures are already inside*)
-    let error, (l, old) =
-      try Int2Map_CV_Modif.find_map parameter error
-            (agent_type_cv, site_type_cv, cv_id) store_result
-      with Not_found -> error, ([], Site_map_and_set.empty_set)
+    let (l, old) =
+      Int2Map_CV_Modif.Map.find_default
+	([], Site_map_and_set.Set.empty)
+	(agent_type_cv, site_type_cv, cv_id) store_result in
+    let current_set =
+      Site_map_and_set.Set.add rule_id old
     in
-    let error, current_set =
-      Site_map_and_set.add_set parameter error rule_id old
+    let new_set =
+      Site_map_and_set.Set.union current_set old
     in
-    let error, new_set =
-      Site_map_and_set.union parameter error current_set old
-    in
-    let error, result =
-      Int2Map_CV_Modif.add_map parameter error (agent_type_cv, site_type_cv, cv_id)
-        (l, new_set) store_result
+    let result =
+      Int2Map_CV_Modif.Map.add (agent_type_cv, site_type_cv, cv_id)
+			       (l, new_set) store_result
     in
     (*add the fresh signature into the old result and store them*)
     (*let error, result =
@@ -80,9 +79,9 @@ let store_covering_classes_modification_update_aux parameter error agent_type_cv
      agent_type:0@site_type:0:covering_class_id:0:rule_id:1]
   *)
   let error, result =
-    Int2Map_Modif.fold_map
+    Int2Map_Modif.Map.fold
       (fun (agent_type, site_type) (m1, s2) store_result ->
-        Site_map_and_set.fold_set (fun rule_id (error, store_current_result) ->
+        Site_map_and_set.Set.fold (fun rule_id (error, store_current_result) ->
           if compare agent_type_cv agent_type = 0 &&
             compare site_type_cv site_type = 0
           then
@@ -103,7 +102,7 @@ let store_covering_classes_modification_update parameter error
     store_test_modification_without_creation
     store_covering_classes_id =
   let error, store_result =
-    Int2Map_CV.fold_map
+    Int2Map_CV.Map.fold
       (fun (agent_type_cv, site_type_cv) (l1, l2) store_result ->
         List.fold_left (fun store_current_result cv_id ->
           let error, result =
@@ -120,10 +119,10 @@ let store_covering_classes_modification_update parameter error
         ) store_result l2
       (*REMARK: when it is folding inside a list, start with empty result,
         because the add_link function has already called the old result.*)
-      ) store_covering_classes_id (error, Int2Map_CV_Modif.empty_map)
+      ) store_covering_classes_id (error, Int2Map_CV_Modif.Map.empty)
   in
   let store_result =
-    Int2Map_CV_Modif.map_map (fun (l, x) -> List.rev l, x) store_result
+    Int2Map_CV_Modif.Map.map (fun (l, x) -> List.rev l, x) store_result
   in
   error, store_result
 
@@ -135,32 +134,31 @@ let binding_hb_effect_aux parameter error agent_type_1 site_type_1
     state_1 agent_type_2 site_type_2 store_half_break
     store_covering_classes_modification_update store_result =
   let add_link (agent_type, site_type, cv_id) rule_id_effect store_result =
-    let error, (l, old) =
-      try Int2Map_CV_Modif.find_map parameter error
-            (agent_type, site_type, cv_id) store_result
-      with Not_found -> error, ([], Site_map_and_set.empty_set)
+    let (l, old) =
+      Int2Map_CV_Modif.Map.find_default
+	([], Site_map_and_set.Set.empty)
+        (agent_type, site_type, cv_id) store_result in
+    let current_set =
+      Site_map_and_set.Set.add rule_id_effect old
     in
-    let error, current_set =
-      Site_map_and_set.add_set parameter error rule_id_effect old
+    let new_set =
+      Site_map_and_set.Set.union current_set old
     in
-    let error, new_set =
-      Site_map_and_set.union parameter error current_set old
-    in
-    let error, result =
-      Int2Map_CV_Modif.add_map parameter error (agent_type, site_type, cv_id)
+    let result =
+      Int2Map_CV_Modif.Map.add (agent_type, site_type, cv_id)
         (l, new_set) store_result
     in
     error, result
   in
-  Int2Map_HalfBreak_effect.fold_map
+  Int2Map_HalfBreak_effect.Map.fold
     (fun (agent_type_effect, site_type_effect) (l1, l2) store_result ->
       if l1 <> []
       then ()
       else ();
       List.fold_left (fun (error, store_current_result) (rule_id_effect, state_effect)  ->
-        Int2Map_CV_Modif.fold_map (fun (agent_type_cv, site_type_cv, covering_class_id)
+        Int2Map_CV_Modif.Map.fold (fun (agent_type_cv, site_type_cv, covering_class_id)
           (m1, m2) store_result ->
-            Site_map_and_set.fold_set (fun rule_id_update (error, current_result) ->
+            Site_map_and_set.Set.fold (fun rule_id_update (error, current_result) ->
               (*the first binding agent belong to side effect;
                 the second binding agent belong to update_function*)
               if compare agent_type_1 agent_type_effect = 0 &&
@@ -188,33 +186,32 @@ let binding_remove_effect_aux parameter error agent_type_1 site_type_1 agent_typ
     site_type_2 store_remove_effect store_covering_classes_modification_update
     store_result =
   let add_link (agent_type, site_type, cv_id) rule_id_effect store_result =
-    let error, (l, old) =
-      try Int2Map_CV_Modif.find_map parameter error
-            (agent_type, site_type, cv_id) store_result
-      with Not_found -> error, ([], Site_map_and_set.empty_set)
+    let (l, old) =
+      Int2Map_CV_Modif.Map.find_default
+	([], Site_map_and_set.Set.empty)
+        (agent_type, site_type, cv_id) store_result in
+    let current_set =
+      Site_map_and_set.Set.add rule_id_effect old
     in
-    let error, current_set =
-      Site_map_and_set.add_set parameter error rule_id_effect old
+    let new_set =
+      Site_map_and_set.Set.union current_set old
     in
-    let error, new_set =
-      Site_map_and_set.union parameter error current_set old
-    in
-    let error, result =
-      Int2Map_CV_Modif.add_map parameter error (agent_type, site_type, cv_id)
+    let result =
+      Int2Map_CV_Modif.Map.add (agent_type, site_type, cv_id)
       (l, new_set) store_result
     in
     error, result
   in
-  Int2Map_Remove_effect.fold_map
+  Int2Map_Remove_effect.Map.fold
     (fun (agent_type_effect, site_type_effect) (l1, l2) store_result ->
       if l1 <> []
       then ()
       else ();
       List.fold_left (fun (error, store_current_result) rule_id_effect ->
-        Int2Map_CV_Modif.fold_map
+        Int2Map_CV_Modif.Map.fold
           (fun (agent_type_cv, site_type_cv, cv_id) (m1, m2)
             store_result ->
-              Site_map_and_set.fold_set (fun rule_id_update (error, current_result) ->
+              Site_map_and_set.Set.fold (fun rule_id_update (error, current_result) ->
                 if compare agent_type_1 agent_type_effect = 0 &&
                   compare site_type_1 site_type_effect = 0 &&
                   compare agent_type_2 agent_type_cv = 0 &&
@@ -240,7 +237,7 @@ let binding_remove_effect_aux parameter error agent_type_1 site_type_1 agent_typ
 let store_update_without_side_effects parameter error
     store_covering_classes_modification_update
     store_contact_map =
-  Int2Map_CM_state.fold_map
+  Int2Map_CM_state.Map.fold
     (fun (agent_type_1, site_type_1, state_1)
       (l1, l2) store_result ->
 	List.fold_left (fun
@@ -252,10 +249,10 @@ let store_update_without_side_effects parameter error
 	     store_covering_classes_modification_update)
 	) store_result l2
     ) store_contact_map
-    ((error, Int2Map_CV_Modif.empty_map),
-     (error, Int2Map_CV_Modif.empty_map),
-     Int2Map_CV_Modif.empty_map,
-     Int2Map_CV_Modif.empty_map)
+    ((error, Int2Map_CV_Modif.Map.empty),
+     (error, Int2Map_CV_Modif.Map.empty),
+     Int2Map_CV_Modif.Map.empty,
+     Int2Map_CV_Modif.Map.empty)
     
 (************************************************************************************)
 (*there is only half break effect*)
@@ -264,7 +261,7 @@ let store_binding_half_break parameter error
     store_covering_classes_modification_update
     store_half_break
     store_contact_map =
-  Int2Map_CM_state.fold_map
+  Int2Map_CM_state.Map.fold
     (fun (agent_type_1, site_type_1, state_1)
       (l1, l2) store_result ->
 	List.fold_left (fun
@@ -286,8 +283,8 @@ let store_binding_half_break parameter error
 		store_current_result_hb
 	    in
 	      (*merge half break and update before side effects*)
-	    let error, store_update_aux =
-	      Int2Map_CV_Modif.merge_map parameter error
+	    let store_update_aux =
+	      Int2Map_CV_Modif.Map.merge
 		store_covering_classes_modification_update
 		store_binding_hb
 	    in
@@ -298,10 +295,10 @@ let store_binding_half_break parameter error
 	     store_update_aux)
 	) store_result l2
     ) store_contact_map
-    ((error, Int2Map_CV_Modif.empty_map),
-     (error, Int2Map_CV_Modif.empty_map),
-     Int2Map_CV_Modif.empty_map,
-     Int2Map_CV_Modif.empty_map
+    ((error, Int2Map_CV_Modif.Map.empty),
+     (error, Int2Map_CV_Modif.Map.empty),
+     Int2Map_CV_Modif.Map.empty,
+     Int2Map_CV_Modif.Map.empty
     )
 
 (************************************************************************************)    
@@ -311,7 +308,7 @@ let store_binding_remove parameter error
     store_covering_classes_modification_update
     store_remove_effect
     store_contact_map =
-  Int2Map_CM_state.fold_map
+  Int2Map_CM_state.Map.fold
     (fun (agent_type_1, site_type_1, state_1)
       (l1, l2) store_result ->
 	List.fold_left (fun
@@ -332,8 +329,8 @@ let store_binding_remove parameter error
 		store_current_result_remove
 	    in
 	    (*merge with update*)
-	    let error, store_update_aux =
-	      Int2Map_CV_Modif.merge_map parameter error
+	    let store_update_aux =
+	      Int2Map_CV_Modif.Map.merge
 		store_covering_classes_modification_update
 		store_binding_remove
 	    in
@@ -343,10 +340,10 @@ let store_binding_remove parameter error
 	     store_update_aux)
 	) store_result l2
     ) store_contact_map
-    ((error, Int2Map_CV_Modif.empty_map),
-     (error, Int2Map_CV_Modif.empty_map),
-     Int2Map_CV_Modif.empty_map,
-     Int2Map_CV_Modif.empty_map
+    ((error, Int2Map_CV_Modif.Map.empty),
+     (error, Int2Map_CV_Modif.Map.empty),
+     Int2Map_CV_Modif.Map.empty,
+     Int2Map_CV_Modif.Map.empty
      )
  
 (************************************************************************************)
@@ -365,18 +362,18 @@ let store_binding_update parameter error
     =
     (*check if side effect is empty*)
     let empty_half_break =
-      if Int2Map_HalfBreak_effect.is_empty_map store_half_break
+      if Int2Map_HalfBreak_effect.Map.is_empty store_half_break
       then true
       else false
     in
     let empty_remove =
-      if Int2Map_Remove_effect.is_empty_map store_remove_effect
+      if Int2Map_Remove_effect.Map.is_empty store_remove_effect
       then true
       else false
     in
     (*check if contact map is empty*)
     let empty_contact_map =
-      if Int2Map_CM_state.is_empty_map store_contact_map
+      if Int2Map_CM_state.Map.is_empty store_contact_map
       then true
       else false
     in
@@ -420,7 +417,7 @@ let store_binding_update parameter error
 	      store_contact_map
 	  (*there are side effects both half break and remove*)
 	  | false, false ->
-	    Int2Map_CM_state.fold_map
+	    Int2Map_CM_state.Map.fold
 	      (fun (agent_type_1, site_type_1, state_1)
 		(l1, l2) store_result ->
 		  List.fold_left (fun 
@@ -454,13 +451,13 @@ let store_binding_update parameter error
 			  store_current_result_remove
 		      in
 		      (*combine half break and remove side effect*)
-		      let error, store_binding_hb_remove =
-			Int2Map_CV_Modif.merge_map parameter error
+		      let store_binding_hb_remove =
+			Int2Map_CV_Modif.Map.merge
 			  store_binding_hb store_binding_remove
 		      in
 		      (*combine half_break and remove with previous binding function*)
-		      let error, store_update_aux =
-			Int2Map_CV_Modif.merge_map parameter error
+		      let store_update_aux =
+			Int2Map_CV_Modif.Map.merge
 			  store_covering_classes_modification_update
 			  store_binding_hb_remove
 		      in
@@ -471,23 +468,23 @@ let store_binding_update parameter error
 		      )
 		  ) store_result l2
 	      ) store_contact_map 
-	      ((error, Int2Map_CV_Modif.empty_map),
-	       (error, Int2Map_CV_Modif.empty_map),
-	       Int2Map_CV_Modif.empty_map,
-	       Int2Map_CV_Modif.empty_map
+	      ((error, Int2Map_CV_Modif.Map.empty),
+	       (error, Int2Map_CV_Modif.Map.empty),
+	       Int2Map_CV_Modif.Map.empty,
+	       Int2Map_CV_Modif.Map.empty
 	      )
   in
   let store_result_hb =
-    Int2Map_CV_Modif.map_map (fun (l, x) -> List.rev l, x) store_result_hb
+    Int2Map_CV_Modif.Map.map (fun (l, x) -> List.rev l, x) store_result_hb
   in
   let store_result_remove =
-    Int2Map_CV_Modif.map_map (fun (l, x) -> List.rev l, x) store_result_remove
+    Int2Map_CV_Modif.Map.map (fun (l, x) -> List.rev l, x) store_result_remove
   in
   let store_result_hb_remove =
-    Int2Map_CV_Modif.map_map (fun (l, x) -> List.rev l, x) store_result_hb_remove
+    Int2Map_CV_Modif.Map.map (fun (l, x) -> List.rev l, x) store_result_hb_remove
   in
   let store_result_update_aux =
-    Int2Map_CV_Modif.map_map (fun (l, x) -> List.rev l, x) store_result_update_aux
+    Int2Map_CV_Modif.Map.map (fun (l, x) -> List.rev l, x) store_result_update_aux
   in
   error,
   (store_result_hb,

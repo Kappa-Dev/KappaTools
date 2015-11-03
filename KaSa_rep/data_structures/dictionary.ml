@@ -80,31 +80,27 @@ module Dictionary =
           fresh = 0
 	}
       
-      let premember parameters error value in_construction = 
-	match Hash.find_option parameters error value in_construction.hash_table 
-	with 
-          | error, None   -> error,false
-          | error, Some _ -> error,true 
+      let premember parameters error value in_construction =
+	 error, Hash.find_option value in_construction.hash_table != None
             
-      let preallocate parameters error value asso in_construction = 
-	match Hash.find_option parameters error value in_construction.hash_table 
-	with 
-          | error, None ->   
-            begin
-              let fresh = in_construction.fresh in 
-              let error,hash_table =
-		Hash.add parameters error value asso fresh in_construction.hash_table in
-              let hash = 
-		{
-                  hash_table = hash_table; 
+      let preallocate parameters error value asso in_construction =
+	match Hash.find_option value in_construction.hash_table with
+        | None ->
+           begin
+             let fresh = in_construction.fresh in
+             let hash_table =
+	       Hash.add value asso fresh in_construction.hash_table in
+             let hash = 
+	       {
+                 hash_table = hash_table; 
                   fresh = fresh + 1
 		}
               in 
               error,Some (fresh,asso,hash) 
             end  
-          | error, Some (i, asso') when asso'== asso -> error,
+          | Some (i, asso') when asso'== asso -> error,
 	    Some (i, asso',in_construction)
-          | error, _ -> invalid_arg parameters error
+          | _ -> invalid_arg parameters error
 	    (Some "wrong association, line 95")
 	    Association_is_existing_already_with_a_different_value
             
@@ -150,14 +146,14 @@ module Dictionary =
           
       let allocate_uniquely_or_not uniquely parameters error compare (value:value) asso build dictionary = 
 	let in_construction = dictionary.in_construction in 
-	match Hash.find_option parameters error value in_construction.hash_table 
+	match Hash.find_option value in_construction.hash_table 
 	with   
-          | error,None ->   
+          | None ->   
             begin
               let fresh = in_construction.fresh in 
               let asso_id = build fresh in 
-              let error, hash_table =
-		Hash.add parameters error value (asso,asso_id) fresh
+              let hash_table =
+		Hash.add value (asso,asso_id) fresh
 		  in_construction.hash_table in 
               let hash = 
 		{
@@ -177,9 +173,9 @@ module Dictionary =
               in 
               error, (true, Some (fresh, asso, asso_id, dictionary))
             end  
-          | error, Some (i, (asso', asso'_id)) when asso'== asso ->
+          | Some (i, (asso', asso'_id)) when asso'== asso ->
 	    error, (false, Some (i, asso', asso'_id, dictionary))
-          | error, Some (i, (asso', asso'_id)) when compare asso asso' = 0 -> 
+          | Some (i, (asso', asso'_id)) when compare asso asso' = 0 -> 
             if uniquely 
             then 
               invalid_arg_bool parameters error
@@ -187,7 +183,7 @@ module Dictionary =
 		Association_is_existing_with_the_same_value_in_a_different_location_memory
             else
               error, (false, Some (i, asso', asso'_id, dictionary))
-          | error, _ -> invalid_arg_bool parameters error (Some "wrong association (several images for the same key), line 174") Association_is_existing_with_the_same_value_in_a_different_location_memory
+          | _ -> invalid_arg_bool parameters error (Some "wrong association (several images for the same key), line 174") Association_is_existing_with_the_same_value_in_a_different_location_memory
 	    
       let allocate aa e x v a d f =
 	let a,(b,c) = allocate_uniquely_or_not false aa e x v a d f in a,c  
@@ -199,8 +195,8 @@ module Dictionary =
 	let in_construction = dictionary.in_construction in 
 	let fresh = in_construction.fresh in 
 	let asso_id = build fresh in 
-	let error,hash_table =
-	  Hash.add parameters error value (asso,asso_id) fresh
+	let hash_table =
+	  Hash.add value (asso,asso_id) fresh
 	    in_construction.hash_table in 
 	let hash = 
 	  {
@@ -244,5 +240,5 @@ module Dictionary =
      end: Dictionary with type value = Hash.key))
     
 module Dictionary_of_Ord =
-  (functor (O:Set_and_map.OrderedType) -> Dictionary (Hash.Hash_of_Ord(O)))
+  (functor (O:SetMap.OrderedType) -> Dictionary (Hash.Hash_of_Ord(O)))
   

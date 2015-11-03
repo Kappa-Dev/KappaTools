@@ -21,3 +21,13 @@ B _build/main
 
 S KaSa_rep/export_to_KaSim
 B _build/KaSa_rep/export_to_KaSim
+S KaSa_rep/tools
+B _build/KaSa_rep/tools
+S KaSa_rep/data_structures
+B _build/KaSa_rep/data_structures
+S KaSa_rep/config
+B _build/KaSa_rep/config
+S KaSa_rep/error_handlers
+B _build/KaSa_rep/error_handlers
+S KaSa_rep/frontend/preprocess
+B _build/KaSa_rep/frontend/preprocess

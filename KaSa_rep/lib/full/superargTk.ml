@@ -5,9 +5,10 @@
 
 open Tk
 
-module StringMap = Set_and_map.Make (struct type t = string let compare = compare end)
-let map = ref StringMap.empty_map   (* key => entry widget *)
-let fmap = ref StringMap.empty_map  (* key => frame widget *)
+module StringSetMap = SetMap.Make (struct type t = string let compare = compare end)
+module StringMap = StringSetMap.Map
+let map = ref StringMap.empty (* key => entry widget *)
+let fmap = ref StringMap.empty  (* key => frame widget *)
 
 let error = Exception.empty_error_handler 
 let parameters =  Remanent_parameters.get_parameters ()
@@ -17,7 +18,8 @@ let set_visibility (a:Superarg.t) =
   List.iter 
     (fun (key,_,_,_,lvl) ->
       try
-	let f = snd (StringMap.find_map parameters error key !fmap) in
+	let f = Misc_sa.unsome (error,StringMap.find_option key !fmap)
+			       (fun _ -> raise Not_found) in
 	if Superarg.show_level lvl
 	then 
 	  List.iter (fun f -> pack ~side:`Top ~anchor:`W [coe f]) f
@@ -41,7 +43,7 @@ let set_visibility (a,b) =
 (* option value => widget value *)
 let widget_update_from_spec (a:Superarg.t) =
   let set n v =
-    try Textvariable.set (snd (StringMap.find_map parameters error n !map)) v
+    try Textvariable.set (snd (StringSetMap.find_map parameters error n !map)) v
     with Not_found -> ()
   in
   List.iter 
@@ -82,8 +84,8 @@ let widget_update_from_cmd (a:Superarg.t) l =
 	try 
 	  let key,spec,_,_,_ =
 	    List.find (fun (key,_,_,_,_) -> opt=key || opt=(Superarg.nokey key)) a in
-	  let set n v = Textvariable.set (snd (StringMap.find_map parameters error n !map)) v
-	  and get n = Textvariable.get (snd (StringMap.find_map parameters error n !map)) in
+	  let set n v = Textvariable.set (snd (StringSetMap.find_map parameters error n !map)) v
+	  and get n = Textvariable.get (snd (StringSetMap.find_map parameters error n !map)) in
 	  let rem = match spec,rem with
 	  | Superarg.Void , rem -> rem
 	  | Superarg.Bool _, rem -> set key (if opt=key then "1" else "0"); rem
@@ -124,7 +126,7 @@ let widget_update_from_cmd (a:Superarg.t) l =
 (* widget value => command-line argument,
    if [short]=[true] no command is output is the value is the default one *)
 let cmd_of_widget (a:Superarg.t) short =
-  let get n = Textvariable.get (snd (StringMap.find_map parameters error n !map)) in
+  let get n = Textvariable.get (snd (StringSetMap.find_map parameters error n !map)) in
   List.fold_left
     (fun accum (key,spec,msg,cat,lvl) ->
       try match spec with
@@ -196,21 +198,16 @@ let balloon_delay = 100
 (* create an option widget, add the defined variables to the map *)
 let widget_of_spec (a:Superarg.t) key spec msg lvl parent = 
   let f = Frame.create parent in
-  let error = 
-    let error,old = 
-      match 
-	StringMap.find_map_option parameters error key !fmap 
-      with 
-	error,None -> error,[]
-      | error,Some l -> error,l 
-    in 
-    let error,fmap' = StringMap.add_map parameters error key (f::old) !fmap in
+  let error =
+    let old =
+	StringMap.Map.find_default [] key !fmap in
+    let fmap' = StringMap.add key (f::old) !fmap in
     let _ = fmap:=fmap' 
     in 
     error
   in 
   let v = 
-    try (snd (StringMap.find_map parameters error key (!map)))
+    try (snd (StringSetMap.find_map parameters error key (!map)))
     with Not_found 
       -> (Textvariable.create ())
   in 
@@ -219,7 +216,7 @@ let widget_of_spec (a:Superarg.t) key spec msg lvl parent =
       let chk = Checkbutton.create ~variable:v ~text:key f in
       pack ~side:`Left ~anchor:`W [chk];
       Balloon.put ~on:(coe chk) ~ms:balloon_delay msg;
-      map := snd (StringMap.add_map parameters error key v !map)
+      map := StringMap.add key v !map
   | Superarg.Void -> 
       let lbl = Label.create ~text:(" ") ~padx:20 f in 
       pack ~side:`Left ~expand:true ~fill:`X ~anchor:`W [coe lbl];
@@ -238,7 +235,7 @@ let widget_of_spec (a:Superarg.t) key spec msg lvl parent =
       pack ~side:`Left ~expand:true ~fill:`X ~anchor:`W [coe lbl;coe entry];
       Balloon.put ~on:(coe lbl) ~ms:balloon_delay msg;
       Balloon.put ~on:(coe entry) ~ms:balloon_delay msg;
-      map := snd (StringMap.add_map parameters error key v !map)
+      map := snd StringMap.add key v !map
   | Superarg.Choice (l,_) ->
       let lbl = Label.create ~text:key ~padx:20 f in
       let fff = Frame.create f in
@@ -255,7 +252,7 @@ let widget_of_spec (a:Superarg.t) key spec msg lvl parent =
       pack ~side:`Top ~anchor:`W [coe lbl; coe ff];
       pack ~side:`Left ~anchor:`W [coe fff];
       Balloon.put ~on:(coe lbl) ~ms:balloon_delay msg;
-      map := snd (StringMap.add_map parameters error key v !map)
+      map := StringMap.add key v !map
   | Superarg.Choice_list (l,_) ->
       let lbl = Label.create ~text:key ~padx:20 f in
       let fff = Frame.create f in
@@ -270,7 +267,7 @@ let widget_of_spec (a:Superarg.t) key spec msg lvl parent =
 	  Grid.configure ~sticky:"w" ~column:(!p mod nb) ~row:(!p / nb) [chk];
 	  incr p;
 	  Balloon.put ~on:(coe chk) ~ms:balloon_delay (msg^":\n"^msg2);
-	  map := snd (StringMap.add_map parameters error (key^"."^k) v !map)
+	  map := StringMap.add (key^"."^k) v !map
 	) l;
       pack ~side:`Top ~anchor:`W [coe lbl; coe ff];
       pack ~side:`Left ~anchor:`W [coe fff];
@@ -281,7 +278,7 @@ let widget_of_spec (a:Superarg.t) key spec msg lvl parent =
       pack ~side:`Left ~anchor:`W [coe b];
       let msg2 = msg^"\n(equivalent to "^(Superarg.cat_list x " ")^" )" in
       Balloon.put ~on:(coe b) ~ms:balloon_delay msg2;
-      map := snd (StringMap.add_map parameters error key v !map)
+      map := StringMap.add key v !map
    | Superarg.Multi (x,y) ->
       let rec update () = 
 	let s = Textvariable.get v in
@@ -297,7 +294,7 @@ let widget_of_spec (a:Superarg.t) key spec msg lvl parent =
       Balloon.put ~on:(coe lbl) ~ms:balloon_delay msg2;
       Balloon.put ~on:(coe entry) ~ms:balloon_delay msg2;
       Textvariable.handle v ~callback:update;
-      map := snd (StringMap.add_map parameters error key v !map)
+      map := StringMap.add key v !map
    | Superarg.MultiExt l -> 
        let rec update () = 
 	let s = Textvariable.get v in
@@ -313,7 +310,7 @@ let widget_of_spec (a:Superarg.t) key spec msg lvl parent =
        Balloon.put ~on:(coe lbl) ~ms:balloon_delay msg2;
        Balloon.put ~on:(coe entry) ~ms:balloon_delay msg2;
        Textvariable.handle v ~callback:update;
-       map := snd (StringMap.add_map parameters error key v !map)
+       map := StringMap.add key v !map
    );
 
   let text = match lvl with 
@@ -338,7 +335,7 @@ class pager bparent fparent =
   and maxbarwidth = 65               (* split bar at this column (in chars) *)
   and cont = Frame.create fparent    (* current page *)
   and cur = ref ""                   (* current page name *)
-  and pages = ref StringMap.empty_map  (* all pages *)
+  and pages = ref StringMap.empty  (* all pages *)
   and pages_lvl = ref [] in 
 		      
   object (self)
@@ -351,13 +348,13 @@ class pager bparent fparent =
     (* sets the page currently viewed *)
     method set_page name = 
       (try 
-	let fr,_,b = snd (StringMap.find_map parameters error !cur !pages) in
+	let fr,_,b = snd (StringSetMap.find_map parameters error !cur !pages) in
 	cur := "";
 	Button.configure ~relief:`Raised b;
 	Pack.forget [coe fr];
       with Not_found -> ());
       (try 
-	let fr,_,b = snd (StringMap.find_map parameters error name !pages) in
+	let fr,_,b = snd (StringSetMap.find_map parameters error name !pages) in
 	cur := name;
 	Button.configure ~relief:`Sunken b;
 	pack ~expand:true ~fill:`Both ~anchor:`Center [coe fr];

@@ -63,13 +63,13 @@ type 'state port =
     site_state    : 'state
   }
 
-module Site_map_and_set = Set_and_map.Make
+module Site_map_and_set = SetMap.Make
   (struct
     type t      = site_name
     let compare = compare
    end)
  
-type 'state interface = 'state port Site_map_and_set.map
+type 'state interface = 'state port Site_map_and_set.Map.t
                                                                            
 type 'interface proper_agent = 
   { 
@@ -91,7 +91,7 @@ let map_agent f ag =
   upgrade_interface 
     ag  
     begin 
-      Site_map_and_set.map_map
+      Site_map_and_set.Map.map
          (fun port ->
            {
              site_free     = port.site_free; 
@@ -105,7 +105,7 @@ let map_agent f ag =
 let upgrade_some_interface ag =
   upgrade_interface ag 
     begin
-      Site_map_and_set.map_map (fun x -> (*Some*) x) ag.agent_interface
+      Site_map_and_set.Map.map (fun x -> (*Some*) x) ag.agent_interface
     end 
 
 type site_address =
@@ -124,7 +124,7 @@ let build_address k agent site =
     agent_type  = agent
   }
   
-module Address_map_and_set = Set_and_map.Make
+module Address_map_and_set = SetMap.Make
   (struct
     type t = site_address
     let compare = compare
@@ -142,7 +142,7 @@ type diff_views =
     state_index
       interval
       port
-      Site_map_and_set.map
+      Site_map_and_set.Map.t
       proper_agent
       Int_storage.Quick_Nearly_inf_Imperatif.t
 
@@ -150,7 +150,7 @@ type mixture =
     { 
       c_mixture : Ckappa_sig.mixture; 
       views     : views;
-      bonds     : site_address Site_map_and_set.map Int_storage.Quick_Nearly_inf_Imperatif.t; 
+      bonds     : site_address Site_map_and_set.Map.t Int_storage.Quick_Nearly_inf_Imperatif.t; 
       plus      : (int * int) list;
       dot       : (int * int) list
     }

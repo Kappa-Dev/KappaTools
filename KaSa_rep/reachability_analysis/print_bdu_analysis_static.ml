@@ -27,7 +27,7 @@ let trace = false
 (*static information of covering classes id*)
 
 let print_covering_classes_id_aux parameter error result =
-  Int2Map_CV.iter_map
+  Int2Map_CV.Map.iter
     ( fun (x, y) (l1, l2) ->
       if l1 <> []
       then
@@ -75,7 +75,7 @@ let print_covering_classes_id parameter error result =
 (*side effects*)
 
 let print_half_break_effect parameter error result =
-  Int2Map_HalfBreak_effect.iter_map
+  Int2Map_HalfBreak_effect.Map.iter
     ( fun (x, y) (l1, l2) ->
       if l1 <> []
       then
@@ -105,7 +105,7 @@ let print_half_break_effect parameter error result =
     ) result
 
 let print_remove_effect parameter error result =
-  Int2Map_Remove_effect.iter_map
+  Int2Map_Remove_effect.Map.iter
     ( fun (x, y) (l1, l2) ->
       if l1 <> []
       then
@@ -166,7 +166,7 @@ let print_side_effects parameter error result =
 (*modification sites*)
 
 let print_modification_sites_aux parameter error result =
-  Int2Map_Modif.iter_map
+  Int2Map_Modif.Map.iter
     ( fun (x, y) (l1, s2) ->
       if l1 <> []
       then
@@ -187,7 +187,7 @@ let print_modification_sites_aux parameter error result =
           fprintf stdout "\n"
         end
       else ();
-      Site_map_and_set.iter_set
+      Site_map_and_set.Set.iter
         (fun r ->
           fprintf parameter.log
             "agent_type:%i@site_type:%i:rule_id:%i\n"

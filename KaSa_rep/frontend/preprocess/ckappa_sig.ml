@@ -15,7 +15,7 @@
 let warn parameters mh message exn default = 
      Exception.warn parameters mh (Some "ckappa_sig") message exn (fun () -> default) 
   
-module Int_Set_and_Map = Set_and_map.Make (struct type t = int let compare = compare end) 
+module Int_Set_and_Map = SetMap.Make (struct type t = int let compare = compare end) 
 
 let local_trace = true 
 
@@ -160,13 +160,13 @@ type c_port =
       c_site_interval : c_state interval
     }
 
-module C_site_map_and_set = Set_and_map.Make
+module C_site_map_and_set = SetMap.Make
   (struct
     type t = c_site_name
     let compare = compare
    end)
 
-type c_interface = c_port C_site_map_and_set.map
+type c_interface = c_port C_site_map_and_set.Map.t
                                                                            
 type c_proper_agent = 
     { 
@@ -191,7 +191,7 @@ type c_agent =
 type c_mixture = 
     { 
       c_views : c_agent Int_storage.Quick_Nearly_inf_Imperatif.t;
-      c_bonds : site_address C_site_map_and_set.map Int_storage.Nearly_inf_Imperatif.t; 
+      c_bonds : site_address C_site_map_and_set.Map.t Int_storage.Nearly_inf_Imperatif.t; 
       c_plus  : (int * int) list;
       c_dot   : (int * int) list
     }

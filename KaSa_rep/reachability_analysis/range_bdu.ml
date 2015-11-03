@@ -29,8 +29,8 @@ let trace = false
 (************************************************************************************) 
 (*TYPE*)
 
-(*module Int2Set_and_map =
-  Set_and_map.Make
+(*module Int2SetMap =
+  SetMap.Make
     (struct 
         type t = int * int (*var, bound*)
         let compare = compare
@@ -59,7 +59,7 @@ let rec print l =
   match l with
     | [] -> []
     | s :: tail ->
-      Int2Set_and_map.iter_set (fun (var, bound) ->
+      Int2SetMap.iter_set (fun (var, bound) ->
         let () =
           fprintf stdout "Range of var x%i is: %i\n" var bound;
         in
@@ -87,9 +87,9 @@ let rec aux parameter error working_list =
               then
                 []
               else
-                let new_set = Int2Set_and_map.empty_set in
+                let new_set = Int2SetMap.empty_set in
                 let pair = new_var, new_bound in
-                let error, add_pair = Int2Set_and_map.add_set parameter error pair new_set in
+                let error, add_pair = Int2SetMap.add_set parameter error pair new_set in
                 
                 let l = add_pair :: new_tail in
                 l

@@ -182,7 +182,7 @@ let empty_rule parameter error =
 (*wake_up_map rule_index*)
 
 let collect_wake_up_rule parameter error handler compiled map =
-  Quark_type.Int2Set_and_map.fold_map
+  Quark_type.Int2SetMap.fold_map
     (fun (rule_id_a, rule_id_b) _ current_list ->
       let l = (rule_id_a, rule_id_b) :: current_list in
       l

@@ -126,7 +126,7 @@ let print_quarks parameters  error handler quark =
   
 let print_maps parameters error handler compilation print_rule print_var get_label_of_rule get_label_of_var print_labels prefix suffix map =
   let _  = 
-    Quark_type.Int2Set_and_map.fold_map
+    Quark_type.Int2SetMap.Map.fold
       (fun (a,b) couple error -> 
        let error,ruleb = Handler.string_of_rule parameters error handler compilation b in
          let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%s" prefix in 
@@ -219,7 +219,7 @@ let dot_of_influence_map parameters error handler compilation (wake_up_map,inhib
           error 
     in 
     let error = 
-       if Quark_type.Int2Set_and_map.is_empty_map wake_up_map 
+       if Quark_type.Int2SetMap.Map.is_empty wake_up_map 
        then error 
        else 
          let _ = 
@@ -233,7 +233,7 @@ let dot_of_influence_map parameters error handler compilation (wake_up_map,inhib
          error 
     in 
     let error = 
-       if Quark_type.Int2Set_and_map.is_empty_map inhibition_map 
+       if Quark_type.Int2SetMap.Map.is_empty inhibition_map 
        then error 
        else 
          let _ = 

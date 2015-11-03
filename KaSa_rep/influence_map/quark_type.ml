@@ -14,14 +14,14 @@
 
 let warn parameters mh message exn default = 
      Exception.warn parameters mh (Some "Quark_type") message exn (fun () -> default) 
-(*module Int_Set_and_Map = Set_and_map.Make (struct type t = int let compare = compare end)*)
+(*module Int_Set_and_Map = SetMap.Make (struct type t = int let compare = compare end)*)
 
 let local_trace = false
  
 module Label = Influence_labels.Int_labels 
 module Labels = Influence_labels.Extensive(Label)
-module IntSet_and_map = Set_and_map.Make (struct type t=int let compare = compare end)
-module Int2Set_and_map = Set_and_map.Make (struct type t = int*int let compare = compare end)
+module IntSetMap = SetMap.Make (struct type t=int let compare = compare end)
+module Int2SetMap = SetMap.Make (struct type t = int*int let compare = compare end)
   
 type agent_quark = Cckappa_sig.agent_name
 type site_quark = (Cckappa_sig.agent_name*Cckappa_sig.site_name*int)
@@ -46,7 +46,7 @@ type quarks =
     site_var_plus : sites_quarks ; 
   }
 
-type influence_map = Labels.label_set_couple Int2Set_and_map.map
+type influence_map = Labels.label_set_couple Int2SetMap.Map.t
 type influence_maps = 
   {
     wake_up_map: influence_map;

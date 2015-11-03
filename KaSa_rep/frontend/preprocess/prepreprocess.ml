@@ -32,17 +32,10 @@ let check_freshness parameters error str id id_set =
   error,id_set
     
   
-let add_entry parameters id agent site index (error,map) = 
-    let error,old_list = 
-       Ckappa_sig.Int_Set_and_Map.find_map_option parameters error id map 
-    in 
-    let old_list = 
-        match old_list 
-        with
-           | None -> []
-           | Some list -> list 
-    in 
-      Ckappa_sig.Int_Set_and_Map.add_map parameters error id ((agent,site,index)::old_list) map 
+let add_entry parameters id agent site index (error,map) =
+  let old_list =
+    Ckappa_sig.Int_Set_and_Map.Map.find_default [] id map in
+  error,Ckappa_sig.Int_Set_and_Map.Map.add id ((agent,site,index)::old_list) map
 
 let rev_ast = List.rev 
 (*mixture = 
@@ -54,20 +47,17 @@ let rev_ast = List.rev
       | agent :: mixture -> aux mixture (agent :: sol)
   in aux mixture []*)
   
-let pop_entry parameters error id map = 
-  try 
-    let error,list = Ckappa_sig.Int_Set_and_Map.find_map parameters error id map 
-    in 
-    match list with 
-    | [a] ->
-      let error,map = Ckappa_sig.Int_Set_and_Map.remove_map parameters error id map in 
-      error,(a,map)
-    | [b;a] -> 
-      let error,map = Ckappa_sig.Int_Set_and_Map.add_map parameters error id [a] map in 
-      error,(b,map) 
-    | _ -> 
-      warn parameters error (Some "line 69") Exit (("","",0),map)
-  with Not_found -> warn parameters error (Some "line 70") Exit (("","",0),map)
+let pop_entry parameters error id map =
+  match Ckappa_sig.Int_Set_and_Map.Map.find_option id map  with
+  | Some [a] ->
+     let map = Ckappa_sig.Int_Set_and_Map.Map.remove id map in
+     error,(a,map)
+  | Some [b;a] ->
+     let map = Ckappa_sig.Int_Set_and_Map.Map.add id [a] map in
+     error,(b,map)
+  | Some _ ->
+     warn parameters error (Some "line 69") Exit (("","",0),map)
+  | None -> warn parameters error (Some "line 70") Exit (("","",0),map)
 
 let rec scan_interface parameters k agent interface remanent = 
       match interface with 
@@ -95,11 +85,11 @@ let rec collect_binding_label parameters mixture f k remanent =
 
 let collect_binding_label parameters mixture f k remanent = 
   let error,map = collect_binding_label parameters mixture f k remanent in 
-  Ckappa_sig.Int_Set_and_Map.fold_map 
+  Ckappa_sig.Int_Set_and_Map.Map.fold
     (fun x l (error,map) -> 
      if (List.length l = 1)
       then 
-	let error,map = Ckappa_sig.Int_Set_and_Map.remove_map parameters error x map in 
+	let map = Ckappa_sig.Int_Set_and_Map.Map.remove x map in 
 	warn parameters error (Some "line 100") Exit map 
       else 
 	(error,map))
@@ -275,7 +265,7 @@ let longuest_prefix mixture1 mixture2 =
 
 let refine_mixture_in_rule parameters error prefix_size empty_size tail_size mixture = 
      let f i =  if i>prefix_size then i+empty_size else i in 
-     let remanent = collect_binding_label parameters mixture f 0 (error,Ckappa_sig.Int_Set_and_Map.empty_map) in  
+     let remanent = collect_binding_label parameters mixture f 0 (error,Ckappa_sig.Int_Set_and_Map.Map.empty) in  
      let mixture,(error,map) = 
        translate_mixture_in_rule 
 	 parameters 
@@ -288,7 +278,7 @@ let refine_mixture_in_rule parameters error prefix_size empty_size tail_size mix
     error,mixture
 
 let refine_mixture parameters error mixture = 
-     let remanent = collect_binding_label parameters mixture (fun i -> i) 0 (error,Ckappa_sig.Int_Set_and_Map.empty_map) in  
+     let remanent = collect_binding_label parameters mixture (fun i -> i) 0 (error,Ckappa_sig.Int_Set_and_Map.Map.empty) in  
      let mixture,(error,map) = translate_mixture parameters mixture remanent in
     error,mixture
 
@@ -475,7 +465,7 @@ let refine_init_t parameters error init_t =
 
 let refine_agent parameters error agent_set agent =
   let error,agent_set = check_freshness parameters error "Agent" (fst (fst agent)) agent_set in 
-  let remanent = scan_agent parameters 0 agent (error,Ckappa_sig.Int_Set_and_Map.empty_map) in 
+  let remanent = scan_agent parameters 0 agent (error,Ckappa_sig.Int_Set_and_Map.Map.empty) in 
   let agent,(error,map) = translate_agent parameters agent remanent in 
   error,agent_set,agent 
 

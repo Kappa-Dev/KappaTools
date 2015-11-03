@@ -12,7 +12,7 @@
   * en Automatique.  All rights reserved.  This file is distributed     
   * under the terms of the GNU Library General Public License *)
 
-open Set_and_map
+open SetMap
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "FIFO") message exn (fun () -> default)
@@ -35,26 +35,25 @@ end
 module WlMake (Ord: OrderedType) =
     (struct
         
-      module WSet = Set_and_map.Make (Ord)
+	module WSetMap = SetMap.Make (Ord)
+	module WSet = WSetMap.Set
 
       type elt = Ord.t
-      type t = elt list * elt list * WSet.set
+      type t = elt list * elt list * WSet.t
 
-      let empty = [], [], WSet.empty_set
+      let empty = [], [], WSet.empty
 
       let is_empty x =
         let _, _, pool = x in
-        WSet.is_empty_set pool
+        WSet.is_empty pool
 
       let push parameter error e x =
         let in_list, out_list, pool = x in
-        if WSet.mem_set e pool
+        if WSet.mem e pool
         then
           error, x
         else
-          let error, add_elt =
-            WSet.add_set parameter error e pool
-          in
+          let add_elt = WSet.add e pool in
           error, ((e :: in_list), out_list, add_elt)
             
       let rec pop parameter error x =
@@ -67,9 +66,7 @@ module WlMake (Ord: OrderedType) =
             match out_list with
               | [] -> pop parameter error ([], (List.rev in_list), pool)
               | h :: tl ->
-                let error, remove_elt =
-                  WSet.remove parameter error h pool
-                in
+                let remove_elt = WSet.remove h pool in
                 error, ((Some h), (in_list, tl, remove_elt))
           end
 
@@ -79,7 +76,7 @@ module WlMake (Ord: OrderedType) =
 
       let print_wl parameters wl = 
         let _ = fold_left 
-          (fun  unit a -> Printf.fprintf (Remanent_parameters.get_log parameters) "%i " a)
+          (fun  () a -> Printf.fprintf (Remanent_parameters.get_log parameters) "%i " a)
           () wl
         in 
         print_newline () 

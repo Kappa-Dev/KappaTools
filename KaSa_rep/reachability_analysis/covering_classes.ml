@@ -32,25 +32,23 @@ let collect_modified_map parameter error diff_reverse store_modified_map =
   AgentMap.fold parameter error
     (fun parameter error agent_id site_modif store_modified_map ->
       (*if there is no modified sites then do nothing*)
-      if is_empty_map
+      if Map.is_empty
         site_modif.agent_interface
       then error, store_modified_map
       else
         let agent_type = site_modif.agent_name in
         let store_site =
-          fold_map
+          Map.fold
             (fun site port current_map ->
               (*store site map*)
-              let error, site_map =
-                add_map
-                  parameter
-                  error
+              let site_map =
+                Map.add
                   site
                   site
                   current_map
               in
               site_map)
-            site_modif.agent_interface empty_map
+            site_modif.agent_interface Map.empty
         in
         (*compute site_map*)
         let error, old_map =
@@ -61,14 +59,12 @@ let collect_modified_map parameter error diff_reverse store_modified_map =
             agent_type
             store_modified_map
           with
-            | error, None -> error, empty_map
+            | error, None -> error, Map.empty
             | error, Some m -> error, m
         in
         (*store*)
-        let error, final_map =
-          union_map
-            parameter
-            error
+        let final_map =
+          Map.union
             old_map
             store_site
         in
@@ -119,7 +115,7 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
     Quick_Nearly_inf_Imperatif.fold2_common parameter error
       (fun parameter error agent_id agent site_modif store_covering_classes ->
         (* if in the interface there is no site modified then do nothing *)
-        if is_empty_map site_modif.agent_interface
+        if Map.is_empty site_modif.agent_interface
         then error, store_covering_classes
         else
           match agent with
@@ -128,7 +124,7 @@ let collect_covering_classes parameter error views diff_reverse store_covering_c
               let agent_type = agent.agent_name in
               (*get a list of sites from an interface at each rule*)
               let site_list =
-                fold_map (fun site _ current_list ->
+                Map.fold (fun site _ current_list ->
                   site :: current_list
                 ) agent.agent_interface []
               in

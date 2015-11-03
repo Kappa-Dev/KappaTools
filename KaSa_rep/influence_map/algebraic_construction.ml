@@ -19,20 +19,20 @@ exception False of Exception.method_handler
 	    
 let check parameters error handler mixture1 mixture2 (i,j) =
   let add (n1,n2) error to_do (inj1,inj2) =
-    let error,im1 = Quark_type.IntSet_and_map.find_map_option parameters error n1 inj1 in
-    match im1
+    let im1 = Quark_type.IntSetMap.Map.find_option n1 inj1 in
+    error,match im1
     with
-    | Some n2' when n2=n2' -> error,Some (to_do,inj1,inj2)
-    | Some _ -> error,None
+    | Some n2' when n2=n2' -> Some (to_do,inj1,inj2)
+    | Some _ -> None
     | None ->
        begin
-	 let error,im2 = Quark_type.IntSet_and_map.find_map_option parameters error n2 inj2 in
+	 let im2 = Quark_type.IntSetMap.Map.find_option n2 inj2 in
 	 match im2
-	 with Some _ -> error,None
+	 with Some _ -> None
 	    | None ->
-	       let error,inj1 = Quark_type.IntSet_and_map.add_map parameters error n1 n2 inj1 in
-	       let error,inj2 = Quark_type.IntSet_and_map.add_map parameters error n2 n1 inj2 in
-	       error,Some ((n1,n2)::to_do,inj1,inj2)
+	       let inj1 = Quark_type.IntSetMap.Map.add n1 n2 inj1 in
+	       let inj2 = Quark_type.IntSetMap.Map.add n2 n1 inj2 in
+	       Some ((n1,n2)::to_do,inj1,inj2)
        end 
   in
   let rec check_agent error to_do already_done =
@@ -62,25 +62,25 @@ let check parameters error handler mixture1 mixture2 (i,j) =
 	   | Cckappa_sig.Agent ag1 , Cckappa_sig.Agent ag2 ->
 	      begin 
 		let bonds1 =
-		  match bonds1 with Some bonds1 -> bonds1 | None -> Cckappa_sig.Site_map_and_set.empty_map
+		  match bonds1 with Some bonds1 -> bonds1 | None -> Cckappa_sig.Site_map_and_set.Map.empty
 		in 
 		let bonds2 =
-		  match bonds2 with Some bonds2 -> bonds2 | None -> Cckappa_sig.Site_map_and_set.empty_map
+		  match bonds2 with Some bonds2 -> bonds2 | None -> Cckappa_sig.Site_map_and_set.Map.empty
 		in 
 		let error,bool = 
 		  try
 		    let error = 
-		      Cckappa_sig.Site_map_and_set.iter2_map_sparse
+		      Cckappa_sig.Site_map_and_set.Map.monadic_iter2_sparse
 			parameters error
-			(fun _ port1 port2 error ->
+			(fun _ error _ port1 port2 ->
 			 let range1 = port1.Cckappa_sig.site_state in
-			 let range2 = port2.Cckappa_sig.site_state in 
+			 let range2 = port2.Cckappa_sig.site_state in
 			 if not (range1.Cckappa_sig.max < range2.Cckappa_sig.min || range2.Cckappa_sig.max < range1.Cckappa_sig.min)
 			 then error
 			 else raise (False error))
 			ag1.Cckappa_sig.agent_interface
 			ag2.Cckappa_sig.agent_interface
-		    in error,true 
+		    in error,true
 		  with
 		    False error -> error,false
 		in
@@ -89,8 +89,8 @@ let check parameters error handler mixture1 mixture2 (i,j) =
 		  try
 		    let error,(to_do,already_done)
 		      =
-		      Cckappa_sig.Site_map_and_set.fold2_map_sparse parameters error 
-			(fun _ port1 port2 (error,(to_do,already_done)) ->
+		      Cckappa_sig.Site_map_and_set.Map.monadic_fold2_sparse parameters error 
+			(fun _ error _ port1 port2 (to_do,already_done) ->
 			 if port1.Cckappa_sig.site = port2.Cckappa_sig.site
 			 then
 			   match
@@ -123,7 +123,7 @@ let check parameters error handler mixture1 mixture2 (i,j) =
     else
       error,false
   in
-  let error,ouput = add (i,j) error [] (Quark_type.IntSet_and_map.empty_map,Quark_type.IntSet_and_map.empty_map) in
+  let error,ouput = add (i,j) error [] (Quark_type.IntSetMap.Map.empty,Quark_type.IntSetMap.Map.empty) in
   match ouput
   with
      None -> warn parameters error (Some "Missing rule") Exit (raise Exit)
@@ -152,7 +152,7 @@ let filter_influence parameters error handler compilation map bool =
     in
     check parameters error handler (get_bool rule1) mixt (updt_pos pos)
   in
-  Quark_type.Int2Set_and_map.fold_map
+  Quark_type.Int2SetMap.Map.fold
     (fun (a,b) couple (error,map') ->
      let error,rule1 = Int_storage.Nearly_inf_Imperatif.get parameters error a compilation.Cckappa_sig.rules in
      let error,r1 =
@@ -198,8 +198,8 @@ let filter_influence parameters error handler compilation map bool =
      in 
      if Quark_type.Labels.is_empty_couple couple'
      then  error,map'
-     else Quark_type.Int2Set_and_map.add_map parameters error (a,b) couple' map'
+     else error,Quark_type.Int2SetMap.Map.add (a,b) couple' map'
     )
     map 
-    (error,Quark_type.Int2Set_and_map.empty_map)
+    (error,Quark_type.Int2SetMap.Map.empty)
 	      

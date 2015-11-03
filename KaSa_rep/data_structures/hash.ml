@@ -18,29 +18,27 @@ module type Hash =
     type 'a hash 
       
     val create: int -> 'a hash
-    val add: Remanent_parameters_sig.parameters ->Exception.method_handler -> key -> 'a -> int -> 'a hash -> Exception.method_handler * 'a hash 
-    val find: Remanent_parameters_sig.parameters ->Exception.method_handler -> key -> 'a hash -> Exception.method_handler * (int * 'a) 
-    val find_option: Remanent_parameters_sig.parameters -> Exception.method_handler -> key -> 'a hash -> Exception.method_handler * (int*'a)  option 
+    val add: key -> 'a -> int -> 'a hash -> 'a hash
+    val find_option: key -> 'a hash -> (int*'a)  option
     
     val iter: (key -> 'a -> int -> unit) -> 'a hash -> unit 
     val fold: (key -> 'b -> int -> 'a -> 'a) -> 'b hash -> 'a -> 'a  
 end 
 
 module Hash = 
-  (functor (Map:Set_and_map.Set_and_Map) -> 
+  (functor (Map:SetMap.S) -> 
     (struct
-      type key = Map.key 
-      type 'a hash = (int*'a) Map.map
+      type key = Map.elt
+      type 'a hash = (int*'a) Map.Map.t
         
-      let create x = Map.empty_map 
-      let add parameters error key asso int = Map.add_map parameters error key (int,asso)  
-      let find = Map.find_map  
-      let find_option = Map.find_map_option 
+      let create _ = Map.Map.empty
+      let add key asso int = Map.Map.add key (int,asso)
+      let find_option = Map.Map.find_option
           
             
-      let iter f = Map.iter_map (fun (a:key) (b,c) -> f a c b)   
-      let fold f = Map.fold_map (fun a (b,c) d -> f a c b d)    
+      let iter f = Map.Map.iter (fun (a:key) (b,c) -> f a c b)
+      let fold f = Map.Map.fold (fun a (b,c) d -> f a c b d)
 
-end:Hash with type key = Map.key))
+end:Hash with type key = Map.elt))
 
-module Hash_of_Ord = (functor (O:Set_and_map.OrderedType) -> Hash(Set_and_map.Make(O)))
+module Hash_of_Ord = (functor (O:SetMap.OrderedType) -> Hash(SetMap.Make(O)))

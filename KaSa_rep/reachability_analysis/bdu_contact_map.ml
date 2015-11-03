@@ -38,14 +38,12 @@ let trace = false
 *)
 
 let compute_contact_map parameter error handler rule =
-  let store_result = Int2Map_CM_state.empty_map in
+  let store_result = Int2Map_CM_state.Map.empty in
   let add_link (a, b, s) (c, d, s') store_result =
-    let error, (l, old) =
-      try Int2Map_CM_state.find_map parameter error (a, b, s) store_result
-      with Not_found -> error, ([],[])
-    in
-    let error, add_map =
-      Int2Map_CM_state.add_map parameter error (a, b, s) (l, ((c, d, s') :: []))
+    let (l, old) =
+      Int2Map_CM_state.Map.find_default ([],[]) (a, b, s) store_result in
+    let add_map =
+      Int2Map_CM_state.Map.add (a, b, s) (l, ((c, d, s') :: []))
 	store_result
     in
     error, add_map
@@ -63,14 +61,14 @@ let compute_contact_map parameter error handler rule =
             | Agent agent ->
               let agent_type = agent.agent_name in
               let error, store_result =
-                Site_map_and_set.fold_map
+                Site_map_and_set.Map.fold
                   (fun site_lhs port (error, store_result) ->
                     let state_lhs = int_of_port port in
-                    if Int2Map_CM_state.mem_map (agent_type, site_lhs, state_lhs)
+                    if Int2Map_CM_state.Map.mem (agent_type, site_lhs, state_lhs)
                       store_result
                     then 
-                      let error, result =
-                        Int2Map_CM_state.remove_map parameter error
+                      let result =
+                        Int2Map_CM_state.Map.remove
                           (agent_type, site_lhs, state_lhs)
                           store_result
                       in

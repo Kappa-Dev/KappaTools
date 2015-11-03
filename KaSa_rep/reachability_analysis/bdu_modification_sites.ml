@@ -43,32 +43,28 @@ let trace = false
 let collect_modification_sites parameter error rule_id diff_direct store_result =
   (*from a pair of Map (agent_type, site) -> rule_id :: old_result)*)
   let add_link (agent_type, site_type) rule_id store_result =
-    let error, (l, old) =
-      try Int2Map_Modif.find_map parameter error (agent_type, site_type) store_result
-      with Not_found -> error, ([], Site_map_and_set.empty_set)
+    let (l, old) =
+      Int2Map_Modif.Map.find_default
+	([], Site_map_and_set.Set.empty) (agent_type, site_type) store_result in
+    let current_set =
+      Site_map_and_set.Set.add rule_id old
     in
-    let error, current_set =
-      Site_map_and_set.add_set parameter error rule_id old
+    let new_set =
+      Site_map_and_set.Set.union current_set old
     in
-    let error, new_set =
-      Site_map_and_set.union parameter error current_set old 
-    in
-    let error, result =
-      Int2Map_Modif.add_map parameter error
-        (agent_type, site_type) (l, new_set) store_result
-    in    
-    error, result
+    error,
+    Int2Map_Modif.Map.add (agent_type, site_type) (l, new_set) store_result
   in
   let error, store_result =
     AgentMap.fold parameter error
       (fun parameter error agent_id agent_modif store_result ->
-        if Site_map_and_set.is_empty_map agent_modif.agent_interface
+        if Site_map_and_set.Map.is_empty agent_modif.agent_interface
         then error, store_result
         else
           let agent_type = agent_modif.agent_name in
           (*return*)
           let error, store_result =
-            Site_map_and_set.fold_map
+            Site_map_and_set.Map.fold
               (fun site_type _ (error, store_result) ->
                 let error, store_result =
                   add_link (agent_type, site_type) rule_id store_result
@@ -80,7 +76,7 @@ let collect_modification_sites parameter error rule_id diff_direct store_result 
       ) diff_direct store_result
   in
   let store_result =
-    Int2Map_Modif.map_map (fun (l, x) -> List.rev l, x) store_result
+    Int2Map_Modif.Map.map (fun (l, x) -> List.rev l, x) store_result
   in
   error, store_result
 
@@ -90,21 +86,17 @@ let collect_modification_sites parameter error rule_id diff_direct store_result 
 let collect_test_sites parameter error rule_id viewslhs 
     store_result =
   let add_link (agent_type, site_type) rule_id store_result =
-    let error, (l, old) =
-      try Int2Map_Modif.find_map parameter error (agent_type, site_type) store_result
-      with Not_found -> error, ([], Site_map_and_set.empty_set)
+    let (l, old) =
+      Int2Map_Modif.Map.find_default
+	([], Site_map_and_set.Set.empty) (agent_type, site_type) store_result in
+    let current_set =
+      Site_map_and_set.Set.add rule_id old
     in
-    let error, current_set =
-      Site_map_and_set.add_set parameter error rule_id old
+    let new_set =
+      Site_map_and_set.Set.union current_set old
     in
-    let error, new_set =
-      Site_map_and_set.union parameter error current_set old
-    in
-    let error, result =
-      Int2Map_Modif.add_map parameter error (agent_type, site_type)
-        (l, new_set) store_result
-    in
-    error, result
+    error,
+    Int2Map_Modif.Map.add (agent_type, site_type) (l, new_set) store_result
   in
   let error, store_result =
     AgentMap.fold parameter error
@@ -114,7 +106,7 @@ let collect_test_sites parameter error rule_id viewslhs
        | Agent agent ->
          let agent_type = agent.agent_name in
          let error, store_result_test =
-           Site_map_and_set.fold_map
+           Site_map_and_set.Map.fold
              (fun site_type _ (error, store_result) ->
                let error, store_result_test =
                  add_link (agent_type, site_type) rule_id store_result
@@ -126,14 +118,13 @@ let collect_test_sites parameter error rule_id viewslhs
       ) viewslhs store_result
   in
   let store_result =
-    Int2Map_Modif.map_map (fun (l, x) -> List.rev l, x) store_result
+    Int2Map_Modif.Map.map (fun (l, x) -> List.rev l, x) store_result
   in
   error, store_result
 
 let collect_test_modification_sites parameter error store_modification_sites
     store_test_sites =
-  Int2Map_Modif.merge_map parameter error store_modification_sites
-    store_test_sites
+  Int2Map_Modif.Map.merge store_modification_sites store_test_sites
 
 (************************************************************************************)
 (*creation rule_id*)
@@ -141,19 +132,18 @@ let collect_test_modification_sites parameter error store_modification_sites
 let collect_creation_sites parameter error rule_id viewsrhs creation store_result =
   (*map (agent, site) -> rule_id list*)
   let add_link (agent_type, site_type) rule_id store_result =
-    let error, (l, old) =
-      try Int2Map_Modif.find_map parameter error (agent_type, site_type) store_result
-      with Not_found -> error, ([], Site_map_and_set.empty_set)
+    let (l, old) =
+      Int2Map_Modif.Map.find_default
+	([], Site_map_and_set.Set.empty) (agent_type, site_type) store_result in
+    let current_set =
+      Site_map_and_set.Set.add rule_id old
     in
-    let error, current_set =
-      Site_map_and_set.add_set parameter error rule_id old
+    let new_set =
+      Site_map_and_set.Set.union current_set old
     in
-    let error, new_set =
-      Site_map_and_set.union parameter error current_set old
-    in
-    let error, store_result =
-      Int2Map_Modif.add_map parameter error (agent_type, site_type)
-	(l, new_set) store_result
+    let store_result =
+      Int2Map_Modif.Map.add
+	(agent_type, site_type) (l, new_set) store_result
     in
     error, store_result
   in
@@ -165,7 +155,7 @@ let collect_creation_sites parameter error rule_id viewsrhs creation store_resul
 	| Some Ghost -> error, store_result
 	| Some Agent agent ->
 	  let error, store_result =
-	    Site_map_and_set.fold_map
+	    Site_map_and_set.Map.fold
 	      (fun site _ (error, store_result) ->
 		let error, store_result =
 		  add_link (agent_type, site) rule_id store_result
@@ -177,7 +167,7 @@ let collect_creation_sites parameter error rule_id viewsrhs creation store_resul
     ) (error, store_result) creation
   in
   let store_result =
-    Int2Map_Modif.map_map (fun (l, x) -> List.rev l, x) store_result
+    Int2Map_Modif.Map.map (fun (l, x) -> List.rev l, x) store_result
   in
   error, store_result
     
@@ -189,35 +179,31 @@ let collect_modification_sites_without_creation parameter error
     rule_id diff_direct store_creation_sites store_result =
   (*map (agent, site) -> rule_id list*)
   let add_link (agent_type, site_type) rule_id store_result =
-    let error, (l, old) =
-      try Int2Map_Modif.find_map parameter error (agent_type, site_type) store_result
-      with Not_found -> error, ([], Site_map_and_set.empty_set)
-    in
-    let error, current_set =
-      Site_map_and_set.add_set parameter error rule_id old
-    in
-    let error, new_set =
-      Site_map_and_set.union parameter error current_set old
-    in
-    let error, store_result =
-      Int2Map_Modif.add_map parameter error (agent_type, site_type)
-	(l, new_set) store_result
+    let (l, old) =
+      Int2Map_Modif.Map.find_default
+	([], Site_map_and_set.Set.empty) (agent_type, site_type) store_result in
+    let current_set =
+      Site_map_and_set.Set.add rule_id old in
+    let new_set =
+      Site_map_and_set.Set.union current_set old in
+    let store_result =
+      Int2Map_Modif.Map.add (agent_type, site_type) (l, new_set) store_result
     in
     error, store_result
   in
   let error, store_result =
     AgentMap.fold parameter error
       (fun parameter error agent_id agent_modif store_result ->
-	if Site_map_and_set.is_empty_map agent_modif.agent_interface
+	if Site_map_and_set.Map.is_empty agent_modif.agent_interface
 	then error, store_result
 	else
 	  let agent_type = agent_modif.agent_name in
 	  let error, store_result =
-	    Site_map_and_set.fold_map
+	    Site_map_and_set.Map.fold
 	      (fun site_type _ (error, store_result) ->
 		let error, store_result =
 		  (*TEST ME: check whether or not creation_sites is empty*)
-		  if Int2Map_Modif.is_empty_map store_creation_sites
+		  if Int2Map_Modif.Map.is_empty store_creation_sites
 		  then (*error, store_result*)
 		    let error, store_result =
 		      add_link (agent_type, site_type) rule_id store_result
@@ -226,13 +212,13 @@ let collect_modification_sites_without_creation parameter error
 		  else
 		  (*if agent_type, site_type of creation and rule_id is inside
 		    the result then remove them*)
-		  Int2Map_Modif.fold_map (fun (agent_type', site_type') (l1, s2)
+		  Int2Map_Modif.Map.fold (fun (agent_type', site_type') (l1, s2)
 		    (error, store_result) ->
-		      if Int2Map_Modif.mem_map (agent_type', site_type') store_result
-			&& Site_map_and_set.mem_set rule_id s2
+		      if Int2Map_Modif.Map.mem (agent_type', site_type') store_result
+			&& Site_map_and_set.Set.mem rule_id s2
 		      then
-			let error, store_result =
-			  Int2Map_Modif.remove_map parameter error
+			let store_result =
+			  Int2Map_Modif.Map.remove
 			    (agent_type', site_type') store_result
 			in
 			error, store_result
@@ -250,7 +236,7 @@ let collect_modification_sites_without_creation parameter error
       ) diff_direct store_result
   in
   let store_result =
-    Int2Map_Modif.map_map (fun (l, x) -> List.rev l, x) store_result
+    Int2Map_Modif.Map.map (fun (l, x) -> List.rev l, x) store_result
   in
   error, store_result
 
@@ -259,7 +245,7 @@ let collect_modification_sites_without_creation parameter error
 
 let collect_test_modification_without_creation parameter error 
     store_modification_without_creation store_test_sites =
-  Int2Map_Modif.merge_map parameter error store_modification_without_creation
+  Int2Map_Modif.Map.merge store_modification_without_creation
     store_test_sites
 
 (************************************************************************************)
@@ -268,13 +254,11 @@ let collect_test_modification_without_creation parameter error
 
 let site_covering_classes parameter error covering_classes (*store_result*) =
   let add_link (agent_type, site_type) cv_id store_result =
-    let error, (l, old) =
-      try Int2Map_CV.find_map parameter error (agent_type, site_type) store_result
-      with Not_found -> error, ([], [])
-    in
+    let (l, old) =
+      Int2Map_CV.Map.find_default ([],[]) (agent_type, site_type) store_result in
     (*add the fresh signature into the old result and store them*)
-    let error, result =
-      Int2Map_CV.add_map parameter error
+    let result =
+      Int2Map_CV.Map.add
         (agent_type, site_type) (l, cv_id :: old) store_result
     in error, result
   in
@@ -300,9 +284,9 @@ let site_covering_classes parameter error covering_classes (*store_result*) =
         error, store_result
       (*REMARK: when it is folding inside a list, start with empty result,
         because the add_link function has already called the old result.*)
-      ) covering_classes Int2Map_CV.empty_map
+      ) covering_classes Int2Map_CV.Map.empty
   in
   let store_result =
-    Int2Map_CV.map_map (fun (l, x) -> List.rev l, x) store_result
+    Int2Map_CV.Map.map (fun (l, x) -> List.rev l, x) store_result
   in
   error, store_result

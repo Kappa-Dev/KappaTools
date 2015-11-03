@@ -5,6 +5,7 @@ ValMap
 Heap
 DynamicArray
 LargeArray
+SetMap
 Set_patched
 MapExt
 Mods
@@ -32,7 +33,6 @@ Environment
 Kappa_printer
 
 Version
-Set_and_map
 Tk_version
 Hash
 Dictionary

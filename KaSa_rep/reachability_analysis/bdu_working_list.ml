@@ -30,13 +30,13 @@ let trace = false
 let collect_wl_update parameter error store_update =
   let error, init = AgentMap.create parameter error 0 in
   let (_, _, _, store_final_update) = store_update in
-  Int2Map_CV_Modif.fold_map 
+  Int2Map_CV_Modif.Map.fold
     (fun (agent_type, site_type, cv_id) (l1, s2) (error, store_result) ->
       (*-------------------------------------------------------------------------*)
       (*put rule_id into a working list*)
       let wl = IntWL.empty in
       let error, wl =
-        Site_map_and_set.fold_set (fun rule_id (error, wl) ->
+        Site_map_and_set.Set.fold (fun rule_id (error, wl) ->
           let error, wl =
             IntWL.push parameter error rule_id wl
           in
@@ -52,8 +52,8 @@ let collect_wl_update parameter error store_update =
       (*new wl*)
       let in_list, out_list, set = wl in
       let old_in_list, old_out_list, old_set = old_wl in
-      let error, new_set =
-	IntWL.WSet.union parameter error set old_set
+      let new_set =
+	IntWL.WSet.union set old_set
       in
       let new_wl =
 	List.concat [in_list; old_in_list],
@@ -93,8 +93,8 @@ let collect_wl_creation parameter error rule_id viewsrhs creation store_result =
 	in
 	let in_list, out_list, set_wl = wl_creation in
 	let old_in_list, old_out_list, old_set_wl = old_wl in
-	let error, new_set_wl =
-	  IntWL.WSet.union parameter error set_wl old_set_wl
+	let new_set_wl =
+	  IntWL.WSet.union set_wl old_set_wl
 	in
 	let new_wl =
 	  List.concat [in_list; old_in_list],
@@ -128,8 +128,8 @@ let collect_wl_creation_update parameter error store_wl_creation store_wl_update
       (*combine wl of creation and wl of update together*)
       let (in_list_update, out_list_update, set_update) = wl_update in
       let (in_list_creation, out_list_creation, set_creation) = wl_creation in
-      let error, new_set =
-	IntWL.WSet.union parameter error set_update set_creation
+      let new_set =
+	IntWL.WSet.union set_update set_creation
       in
       let new_wl =
 	List.concat [in_list_creation; in_list_update],

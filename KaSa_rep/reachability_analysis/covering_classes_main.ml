@@ -124,7 +124,7 @@ let scan_rule_set_remanent parameter error handler rules =
               agent_type
               store_covering_classes.store_modified_map
           with
-            | error, None -> error, empty_map
+            | error, None -> error, Map.empty
             | error, Some m -> error, m
         in
         (*------------------------------------------------------------------------------*)

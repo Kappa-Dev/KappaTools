@@ -15,7 +15,6 @@
 open Int_storage
 open Fifo
 open Cckappa_sig
-open Set_and_map
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "Bdu_analysis_type") message exn (fun () -> default)
@@ -30,7 +29,7 @@ module AgentMap = Quick_Nearly_inf_Imperatif
 (*module of covering classes*)
 
 module Int2Map_CV =
-  Set_and_map.Make (
+  SetMap.Make (
     struct
       type t = int * int
       let compare = compare
@@ -40,7 +39,7 @@ module Int2Map_CV =
 (*module type of contact map with state*)
 
 module Int2Map_CM_state =
-  Set_and_map.Make (
+  SetMap.Make (
     struct
       type t = int * int * int
       let compare = compare
@@ -51,7 +50,7 @@ module Int2Map_CM_state =
 (*module type of modification site*)
 
 module Int2Map_Modif =
-  Set_and_map.Make (
+  SetMap.Make (
     struct
       type t = int * int
       let compare = compare
@@ -61,14 +60,14 @@ module Int2Map_Modif =
 (*half break side effect module*)
 
 module Int2Map_HalfBreak_effect =
-  Set_and_map.Make (
+  SetMap.Make (
     struct
       type t = int * int
       let compare = compare
     end)
 
 module Int2Map_Remove_effect =
-  Set_and_map.Make (
+  SetMap.Make (
     struct
       type t = int * int
       let compare = compare
@@ -78,7 +77,7 @@ module Int2Map_Remove_effect =
 (*update function of covering classes and modification sites*)
 
 module Int2Map_CV_Modif =
-  Set_and_map.Make (
+  SetMap.Make (
     struct
       type t = int * int * int
       let compare = compare
@@ -96,46 +95,46 @@ module Int2Map_CV_Modif =
 (*static information*)
 
 type half_break_action = 
-  (int list * (int * int) list) Int2Map_HalfBreak_effect.map
+  (int list * (int * int) list) Int2Map_HalfBreak_effect.Map.t
 
 (*do not consider the case where site has state free.*)
 type remove_action =
-  (int list * int list) Int2Map_Remove_effect.map
+  (int list * int list) Int2Map_Remove_effect.Map.t
 
 type bdu_analysis_static =
   {
-    store_covering_classes_id : (int list * int list) Int2Map_CV.map;
+    store_covering_classes_id : (int list * int list) Int2Map_CV.Map.t;
     store_side_effects        : half_break_action * remove_action;
-    store_creation_sites      : (int list * Site_map_and_set.set) Int2Map_Modif.map;
-    store_modification_sites_without_creation : (int list * Site_map_and_set.set)
-      Int2Map_Modif.map;
+    store_creation_sites      : (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t;
+    store_modification_sites_without_creation : (int list * Site_map_and_set.Set.t)
+      Int2Map_Modif.Map.t;
     store_modification_sites  :
-      (int list * Site_map_and_set.set) Int2Map_Modif.map;
+      (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t;
     store_test_sites :
-      (int list * Site_map_and_set.set) Int2Map_Modif.map;
+      (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t;
     store_test_modification_sites : 
-      (int list * Site_map_and_set.set) Int2Map_Modif.map;
+      (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t;
     store_test_modification_without_creation : (*use in update*)
-      (int list * Site_map_and_set.set) Int2Map_Modif.map;
+      (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t;
   }
 
 (************************************************************************************)
 (*dynamic*)
 
-type wl_int = IntWL.WSet.elt list * IntWL.WSet.elt list * IntWL.WSet.set
+type wl_int = IntWL.WSetMap.elt list * IntWL.WSetMap.elt list * IntWL.WSetMap.Set.t
 
 type bdu_analysis_dynamic =
   {
     store_contact_map      : 
     (*TODO: combine contact map and modification update into a product type*)
-    (int list * (int * int * int) list) Int2Map_CM_state.map;
+    (int list * (int * int * int) list) Int2Map_CM_state.Map.t;
     store_covering_classes_modification_update :
-      (int list * Site_map_and_set.set) Int2Map_CV_Modif.map;
+      (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;
     store_update :
-      (int list * Site_map_and_set.set) Int2Map_CV_Modif.map *
-      (int list * Site_map_and_set.set) Int2Map_CV_Modif.map *
-      (int list * Site_map_and_set.set) Int2Map_CV_Modif.map *
-      (int list * Site_map_and_set.set) Int2Map_CV_Modif.map;
+      (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t *
+      (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t *
+      (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t *
+      (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;
     store_wl_update          : wl_int AgentMap.t;
     store_wl_creation        : wl_int AgentMap.t;
     store_wl_creation_update : wl_int AgentMap.t
@@ -150,13 +149,13 @@ type pair_bdu =
   
 type bdu_build =
   {
-    store_remanent_test    : ((int * int list * Site_map_and_set.set) list) AgentMap.t;
-    store_test_restriction : (int * int Site_map_and_set.map) list AgentMap.t;
+    store_remanent_test    : ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
+    store_test_restriction : (int * int Site_map_and_set.Map.t) list AgentMap.t;
     store_bdu_test         : (int list *
                                 ((int * int) list * int * pair_bdu) list) AgentMap.t;
-    store_remanent_creation : ((int * int list * Site_map_and_set.set) list) AgentMap.t;
-    store_remanent_modif    : ((int * int list * Site_map_and_set.set) list) AgentMap.t;
-    store_modif_restriction : (int * int Site_map_and_set.map) list AgentMap.t;
+    store_remanent_creation : ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
+    store_remanent_modif    : ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
+    store_modif_restriction : (int * int Site_map_and_set.Map.t) list AgentMap.t;
     store_modif_restriction_list : (int list * int list) AgentMap.t
   }
 

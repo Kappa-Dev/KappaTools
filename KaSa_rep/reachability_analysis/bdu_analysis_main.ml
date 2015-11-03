@@ -98,7 +98,7 @@ let scan_rule_static parameter error handler rule_id rule covering_classes
   in
   (*-------------------------------------------------------------------------------*)
   (*test and modification*)
-  let error, store_test_modification_sites =
+  let store_test_modification_sites =
     collect_test_modification_sites
       parameter
       error
@@ -107,7 +107,7 @@ let scan_rule_static parameter error handler rule_id rule covering_classes
   in
   (*-------------------------------------------------------------------------------*)
   (*test and modification without creation*)
-  let error, store_test_modification_without_creation =
+  let store_test_modification_without_creation =
     collect_test_modification_without_creation
       parameter
       error
@@ -335,15 +335,15 @@ let scan_rule parameter error handler rule_id rule store_covering_classes
 (*intitial state of static analysis*)
 
 let init_bdu_analysis_static =
-  let init_covering_classes_id     = Int2Map_CV.empty_map in
-  let init_half_break              = Int2Map_HalfBreak_effect.empty_map  in
-  let init_remove                  = Int2Map_Remove_effect.empty_map  in
-  let init_creation                = Int2Map_Modif.empty_map in
-  let init_modif_without_creation  = Int2Map_Modif.empty_map in
-  let init_modification            = Int2Map_Modif.empty_map in
-  let init_test                    = Int2Map_Modif.empty_map in
-  let init_test_modification       = Int2Map_Modif.empty_map in
-  let init_test_modification_without_creation = Int2Map_Modif.empty_map in
+  let init_covering_classes_id     = Int2Map_CV.Map.empty in
+  let init_half_break              = Int2Map_HalfBreak_effect.Map.empty  in
+  let init_remove                  = Int2Map_Remove_effect.Map.empty  in
+  let init_creation                = Int2Map_Modif.Map.empty in
+  let init_modif_without_creation  = Int2Map_Modif.Map.empty in
+  let init_modification            = Int2Map_Modif.Map.empty in
+  let init_test                    = Int2Map_Modif.Map.empty in
+  let init_test_modification       = Int2Map_Modif.Map.empty in
+  let init_test_modification_without_creation = Int2Map_Modif.Map.empty in
   let init_bdu_analysis_static =
     {
       store_covering_classes_id                 = init_covering_classes_id;
@@ -363,12 +363,12 @@ let init_bdu_analysis_static =
 (*intitial state of dynamic analysis*)
 
 let init_bdu_analysis_dynamic parameter error =
-  let init_contact_map             = Int2Map_CM_state.empty_map in
-  let init_cv_modification         = Int2Map_CV_Modif.empty_map in
-  let init_store_hb                = Int2Map_CV_Modif.empty_map in
-  let init_store_remove            = Int2Map_CV_Modif.empty_map in
-  let init_store_hb_remove         = Int2Map_CV_Modif.empty_map in
-  let init_store_update_aux        = Int2Map_CV_Modif.empty_map in
+  let init_contact_map             = Int2Map_CM_state.Map.empty in
+  let init_cv_modification         = Int2Map_CV_Modif.Map.empty in
+  let init_store_hb                = Int2Map_CV_Modif.Map.empty in
+  let init_store_remove            = Int2Map_CV_Modif.Map.empty in
+  let init_store_hb_remove         = Int2Map_CV_Modif.Map.empty in
+  let init_store_update_aux        = Int2Map_CV_Modif.Map.empty in
   let error, init_wl_update          = AgentMap.create parameter error 0 in
   let error, init_wl_creation        = AgentMap.create parameter error 0 in
   let error, init_wl_creation_update = AgentMap.create parameter error 0 in

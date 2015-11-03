@@ -58,7 +58,7 @@ let union x y a =
   a
               
 let eq_classes_map parameter error a =
-  let classes = Cckappa_sig.Site_map_and_set.empty_map in
+  let classes = Cckappa_sig.Site_map_and_set.Map.empty in
   let size = Array.length a in
   let rec aux k (classes,union_list) =
     if  k < 0 
@@ -68,23 +68,11 @@ let eq_classes_map parameter error a =
       (*find the parent of the union*)
       let rep = findSet k a in
       (*check if inside classes has already has this parent*)
-      let error, old =
-        Cckappa_sig.Site_map_and_set.find_map_option
-          parameter
-          error
-          rep
-          classes
-      in
       let get_rep =
-        match old with
-          | None -> []
-          | Some r -> r
-      in
+        Cckappa_sig.Site_map_and_set.Map.find_default [] rep classes in
       (*store the result inside classes*)
-      let error, classes =
-	Cckappa_sig.Site_map_and_set.add_map
-	  parameter
-	  error
+      let classes =
+	Cckappa_sig.Site_map_and_set.Map.add
           rep
 	  (k :: get_rep)
 	  classes

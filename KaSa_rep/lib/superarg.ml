@@ -8,7 +8,9 @@
    Copyright (C) Antoine Mine' 2006
  *)
 
-module StringMap  = Set_and_map.Make (struct type t = string let compare=compare end) 
+module StringSetMap  = SetMap.Make (struct type t = string let compare=compare end)
+module StringMap = StringSetMap.Map
+module StringSet = StringSetMap.Set
 
 let tk = "(with Tk interface)"
 	   
@@ -126,47 +128,41 @@ let cut_list (s:string) : string list =
   List.rev (doit [] 0)
 
 (* order by category *)
-let error = Exception.empty_error_handler 
+let error = Exception.empty_error_handler
 let order parameters (a:t) =
-  let ordered = ref StringMap.empty_map in
-  List.iter (fun (a,b,c,cat,lvl) ->
-    if accept_level_display lvl then
-      List.iter 
-	(fun cat ->
-	 let asso,old_lvl =
-	   try
-	     snd (StringMap.find_map parameters error cat !ordered)
-	   with
-	     Not_found -> [],Hidden
-	 in 
-	 ordered := snd (StringMap.add_map parameters error cat
-					    (((a,b,c,[cat],lvl)::asso),
-					     (min_level lvl old_lvl))
-					    (!ordered))
-			
-	)
-	cat)
-   a;
+  let ordered = ref StringMap.empty in
+  List.iter
+    (fun (a,b,c,cat,lvl) ->
+     if accept_level_display lvl then
+       List.iter
+	 (fun cat ->
+	  let asso,old_lvl =
+	    StringMap.find_default ([],Hidden) cat !ordered in
+	  ordered :=
+	    StringMap.add
+	      cat (((a,b,c,[cat],lvl)::asso), (min_level lvl old_lvl)) (!ordered)
+	 )
+	 cat)
+    a;
   !ordered
-   
 
 (* sanity checking *)
 let check parameters (a:t) =
   (* check duplicates & compute option list *)
-  let opts = ref StringMap.empty_set in
+  let opts = ref StringSet.empty in
   List.iter (fun (key,b,_,_,_) -> 
     if b=Void then () 
-    else if StringMap.mem_set key !opts || StringMap.mem_set (nokey key) !opts
+    else if StringSet.mem key !opts || StringSet.mem (nokey key) !opts
     then failwith ("Duplicate option "^key);
-    opts := snd (StringMap.add_set parameters error key !opts);
-    opts := snd (StringMap.add_set parameters error (nokey key) !opts )) 
+    opts := StringSet.add key !opts;
+    opts := StringSet.add (nokey key) !opts )
       a;
   (* check sub-options in Muli-options *)
   List.iter (fun (key,t,_,_,_) -> match t with
     Multi (a,b) ->
       let f = 
 	List.iter (fun s -> 
-	if iskey s && not (StringMap.mem_set s !opts)
+	if iskey s && not (StringSet.mem s !opts)
 	then failwith ("Unknown option "^s^" in multi-option "^key))
       in f a; f b
   | _ -> () ) a
@@ -266,7 +262,7 @@ let print_help parameters (header:bool) (verbose:bool) f (a:t) =
   if verbose && header then Format.fprintf f "@.";
   
   (* dump *)
-  StringMap.iter_map 
+  StringMap.iter
     (fun cat (l,lvl) ->
      if
        show_level lvl

@@ -23,8 +23,8 @@ let local_trace = false
 
 module AgentMap = Quick_Nearly_inf_Imperatif
 
-type 'a map = 'a Site_map_and_set.map
-type set    = Site_map_and_set.set
+type 'a map = 'a Site_map_and_set.Map.t
+type set    = Site_map_and_set.Set.t
 
 type covering_classes =
   {

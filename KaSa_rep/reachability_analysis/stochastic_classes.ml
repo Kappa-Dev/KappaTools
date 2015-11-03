@@ -37,7 +37,7 @@ type stochastic_class =
 
 let get_sites_list parameter error agent_type agent stochastic_class =
   let sites_list =
-    Cckappa_sig.Site_map_and_set.fold_map
+    Cckappa_sig.Site_map_and_set.Map.fold
       (fun site _ current_list ->
        site :: current_list)
       agent.Cckappa_sig.agent_interface []

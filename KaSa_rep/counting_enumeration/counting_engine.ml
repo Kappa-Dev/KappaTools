@@ -28,7 +28,7 @@ module Count =
     struct      
       
       module Puzzle_hole_map_and_set = 
-        Set_and_map.Make
+        SetMap.Make
           (struct 
             type t = E.puzzle_hole 
             let compare = compare 
@@ -37,31 +37,31 @@ module Count =
       type hole_multiset = int Puzzle_hole_map_and_set.map
           
       module Interfaces = 
-        (Set_and_map.Make
+        (SetMap.Make
            (struct 
              type t = hole_multiset * hole_multiset  
              let compare = compare 
-            end):Set_and_map.Set_and_Map 
+            end):SetMap.Set_and_Map 
          with type elt = hole_multiset * hole_multiset  
          and type key = hole_multiset * hole_multiset) 
           
       type dependence_graph = 
-          {dependences:(hole_multiset*hole_multiset) list Puzzle_hole_map_and_set.map;
+          {dependences:(hole_multiset*hole_multiset) list Puzzle_hole_map_and_set.Map.t;
            interfaces:Interfaces.set}
             
       type induction_state =
           {error_handler:Exception.method_handler;
            dependence_graph:dependence_graph;
-           to_visit: (E.puzzle_hole*E.abstract_species_set*Puzzle_hole_map_and_set.set*hole_multiset) list;
+           to_visit: (E.puzzle_hole*E.abstract_species_set*Puzzle_hole_map_and_set.Set.t*hole_multiset) list;
            species: (E.abstract_species_set*Puzzle_hole_map_and_set.set) Interfaces.map}
             
       let print_handler error_handler kappa_handler hole_handler = 
         {
-          Counting_print.iter_map1=Puzzle_hole_map_and_set.iter_map;
-          Counting_print.iter_map2=Interfaces.iter_map;
-          Counting_print.iter_map3=Puzzle_hole_map_and_set.iter_map;
-          Counting_print.iter_set=Puzzle_hole_map_and_set.iter_set;
-          Counting_print.iter_set2=Interfaces.iter_set;              
+          Counting_print.iter_map1=Puzzle_hole_map_and_set.Map.iter;
+          Counting_print.iter_map2=Interfaces.Map.iter;
+          Counting_print.iter_map3=Puzzle_hole_map_and_set.Map.iter;
+          Counting_print.iter_set=Puzzle_hole_map_and_set.Map.iter;
+          Counting_print.iter_set2=Interfaces.Set.iter;              
           Counting_print.dependences=(fun a -> a.dependences);
           Counting_print.dependence_graph=(fun a -> a.dependence_graph);
           Counting_print.print_hole=hole_handler.print_hole; 
@@ -81,60 +81,52 @@ module Count =
           let _ = Counting_print.dump_state stdout prefix hole_handler state
           in () 
           
-      let find_dependence parameters error hole graph = 
-        match 
-          Puzzle_hole_map_and_set.find_map_option parameters error hole graph 
-        with 
-          | error,Some i -> error,i
-          | error,None -> error,[]
-            
+      let find_dependence parameters error hole graph =
+        error,
+        Puzzle_hole_map_and_set.Map.find_default [] hole graph
+
       let add_dependence parameters error_handler hole interface graph = 
         let error_handler,old_interface_list = 
           find_dependence parameters error_handler hole graph
         in 
-        Puzzle_hole_map_and_set.add_map parameters error_handler hole (interface::old_interface_list) graph 
+        error_handler,Puzzle_hole_map_and_set.Map.add hole (interface::old_interface_list) graph 
           
       let add_species parameters error_handler hole_handler species holeset interface interface_map = 
-        let error_handler,(old,old_holeset) = 
-          match 
-            Interfaces.find_map_option parameters error_handler interface interface_map
-          with 
-            | error_handler,None -> error_handler,(E.nil,Puzzle_hole_map_and_set.empty_set)
-            | error_handler,Some i -> error_handler,i
-        in 
+        let (old,old_holeset) = 
+          Interfaces.Map.find_default
+	    (E.nil,Puzzle_hole_map_and_set.empty_set) interface interface_map in
+
         let new_species = E.sum old species in 
-        let error_handler,new_hole_set = Puzzle_hole_map_and_set.union parameters error_handler old_holeset holeset in 
-        Interfaces.add_map parameters error_handler interface (new_species,new_hole_set) interface_map
+        let error_handler,new_hole_set = Puzzle_hole_map_and_set.Set.union parameters error_handler old_holeset holeset in 
+        error_handler,Interfaces.Map.add interface (new_species,new_hole_set) interface_map
           
       let remove_species parameters hole self state = 
         let species = state.species in 
-        let error_handler,interface_other = Puzzle_hole_map_and_set.add_map parameters state.error_handler hole 1 Puzzle_hole_map_and_set.empty_map in 
-        let error_handler,k = Interfaces.find_map_option parameters error_handler (interface_other,self) species in   
+        let interface_other = Puzzle_hole_map_and_set.Map.add_map hole 1 Puzzle_hole_map_and_set.Map.empty in 
+        let k = Interfaces.Map.find_option (interface_other,self) species in   
         match k with 
-          | None -> state,(E.nil,Puzzle_hole_map_and_set.empty_set)
+          | None -> state,(E.nil,Puzzle_hole_map_and_set.Set.empty)
           | Some k -> 
-            let error_handler,species = 
-              Interfaces.remove_map 
-                parameters 
-                error_handler 
+            let species = 
+              Interfaces.Map.remove
                 (interface_other,self)
                 species 
             in 
-            {state with error_handler=error_handler ; species=species},k
+            {state with species=species},k
               
       let add_interface parameters error_handler hole_handler interface species holeset state =
         let interface_other,interface_self = interface in 
         let empty_interface_other = 
-          Puzzle_hole_map_and_set.forall_map 
+          Puzzle_hole_map_and_set.Map.forall
             (fun _ x -> x=0)
             interface_other 
         in 
         let is_singleton_interface_other = 
-          let min_elt = Puzzle_hole_map_and_set.min_elt_map (fun _ i -> i<>0) interface_other in
+          let min_elt = Puzzle_hole_map_and_set.Map.min_elt (fun _ i -> i<>0) interface_other in
           match min_elt with 
             | None -> false 
             | Some hole -> 
-              Puzzle_hole_map_and_set.forall_map 
+              Puzzle_hole_map_and_set.Map.forall
                 (fun x y -> (y=1 && x=hole) or y=0)
                 interface_other  
         in          
@@ -153,7 +145,7 @@ module Count =
               let state =
                 if is_singleton_interface_other 
                 then 
-                  let hole =  Puzzle_hole_map_and_set.min_elt_map (fun _ i -> i<>0) interface_other in
+                  let hole =  Puzzle_hole_map_and_set.Map.min_elt (fun _ i -> i<>0) interface_other in
                   match hole with 
                     | None -> 
                       let error_handler,state = Exception.warn parameters state.error_handler (Some "Counting_enumeration") (Some "line 91") Exit (fun () -> state) in 
@@ -167,7 +159,7 @@ module Count =
                   state
               in 
               begin (*3*)
-                if Interfaces.mem_set interface state.dependence_graph.interfaces 
+                if Interfaces.Set.mem interface state.dependence_graph.interfaces 
                 then 
                   begin (*4*)
                     let error_handler,species = add_species parameters error_handler hole_handler species holeset interface state.species in 
@@ -179,7 +171,7 @@ module Count =
                 else
                   begin (*4*)
                     let error_handler,dependences = 
-                      Puzzle_hole_map_and_set.fold_map 
+                      Puzzle_hole_map_and_set.Map.fold
                         (fun hole n (error_handler,graph) -> 
                           if n=0 
                           then error_handler,graph 
@@ -187,8 +179,8 @@ module Count =
                         interface_other
                         (error_handler,state.dependence_graph.dependences)
                     in       
-                    let error_handler,interfaces = 
-                      Interfaces.add_set parameters error_handler interface state.dependence_graph.interfaces
+                    let interfaces =
+                      Interfaces.Set.add interface state.dependence_graph.interfaces
                     in 
                     let error_handler,species = add_species parameters error_handler hole_handler species holeset interface state.species in 
                     {state with 
@@ -209,30 +201,26 @@ module Count =
           error_handler=error_handler;
           dependence_graph=
             {
-              dependences =  Puzzle_hole_map_and_set.empty_map;
-              interfaces = Interfaces.empty_set 
+              dependences =  Puzzle_hole_map_and_set.Map.empty;
+              interfaces = Interfaces.Set.empty
             };
           to_visit=[];
-          species=Interfaces.empty_map;
+          species=Interfaces.Map.empty;
         }
 
       let infinite_state parameters error_handler =
-        let empty_state = empty_state error_handler in 
-        let error_handler,species = Interfaces.add_map parameters empty_state.error_handler (Puzzle_hole_map_and_set.empty_map,Puzzle_hole_map_and_set.empty_map) (E.infinity,Puzzle_hole_map_and_set.empty_set) Interfaces.empty_map in 
-        {empty_state with species = species ; error_handler = error_handler}
+        let empty_state = empty_state error_handler in
+        let species = Interfaces.Map.add (Puzzle_hole_map_and_set.Map.empty,Puzzle_hole_map_and_set.Map.empty) (E.infinity,Puzzle_hole_map_and_set.Set.empty) Interfaces.Map.empty in
+        {empty_state with species = species }
           
       let inc parameters error_handler x delta map = 
-        let error_handler,old = 
-          match
-            Puzzle_hole_map_and_set.find_map_option parameters error_handler x map 
-          with 
-            | error,None -> error,0 
-            | error,Some i -> error,i 
-        in 
-        let output = old + delta in 
-        if output = 0 
-        then Puzzle_hole_map_and_set.remove_map parameters error_handler x map
-        else Puzzle_hole_map_and_set.add_map parameters error_handler x output map
+        let old =
+          error,Puzzle_hole_map_and_set.Map.find_default 0 x map in
+        let output = old + delta in
+        error_handler,
+	if output = 0
+        then Puzzle_hole_map_and_set.Map.remove x map
+        else Puzzle_hole_map_and_set.Map.add x output map
           
       let init parameters hole_handler print_handler empty_state linear_combination = 
         let error_handler = empty_state.error_handler in 
@@ -257,7 +245,7 @@ module Count =
                         aux tail error_handler other self_other self 
                       | true,true -> 
                         aux tail error_handler other (elt::self_other) self
-              in aux interface error_handler Puzzle_hole_map_and_set.empty_map [] Puzzle_hole_map_and_set.empty_map
+              in aux interface error_handler Puzzle_hole_map_and_set.Map.empty [] Puzzle_hole_map_and_set.Map.empty
             in 
             match partition with 
               | None -> {state with error_handler = error_handler}
@@ -277,7 +265,7 @@ module Count =
                 in 
                 List.fold_left 
                   (fun state interface -> 
-                    add_interface parameters error_handler hole_handler interface (E.promote [n,i]) Puzzle_hole_map_and_set.empty_set state)
+                    add_interface parameters error_handler hole_handler interface (E.promote [n,i]) Puzzle_hole_map_and_set.Set.empty state)
                   {state with error_handler = error_handler}
                   interface_list)
           empty_state 
@@ -285,12 +273,12 @@ module Count =
           
           
       let conclude state = 
-        Interfaces.fold_map 
+        Interfaces.Map.fold
           (fun (other,x) (new_abstract_species,_) abstract_species -> 
-            if Puzzle_hole_map_and_set.forall_map (fun _ x -> x=0) other 
+            if Puzzle_hole_map_and_set.Map.forall (fun _ x -> x=0) other 
             then 
               let nhole = 
-                Puzzle_hole_map_and_set.fold_map  
+                Puzzle_hole_map_and_set.Map.fold
                   (fun _ x y -> x+y)
                   x
                   0
@@ -332,30 +320,28 @@ module Count =
                               | interface::tail -> 
                                 begin 
                                   match 
-                                    Interfaces.find_map_option parameters error_handler interface state.species 
+                                    Interfaces.Map.find_option interface state.species 
                                   with 
-                                    | error,None -> aux3 tail state 
-                                    | error_handler,Some (abstract_species_set,hole_set) -> 
+                                    | None -> aux3 tail state 
+                                    | Some (abstract_species_set,hole_set) -> 
                                       begin 
-                                        if Puzzle_hole_map_and_set.mem_set hole hole_set 
-                                          or Puzzle_hole_map_and_set.mem_set dual forbidden  
+                                        if Puzzle_hole_map_and_set.Set.mem hole hole_set 
+                                          or Puzzle_hole_map_and_set.Set.mem dual forbidden  
                                         then 
                                           infinite_state parameters error_handler  
                                         else 
                                           let new_abstract_species = E.combine formula hole dual abstract_species_set in 
                                           let error_handler,new_interface = 
                                             let error_handler,new_other = inc parameters error_handler dual (-1) (fst interface) in  
-                                            let error_handler,new_self = 
-                                              Puzzle_hole_map_and_set.map2_map 
-                                                parameters 
-                                                error_handler
+                                            let new_self = 
+                                              Puzzle_hole_map_and_set.Map.map2
                                                 (fun x y -> x+y)
                                                 (snd interface) 
                                                 self
                                             in 
                                             error_handler,(new_other,new_self)
                                           in 
-                                          let error_handler,new_hole_set = Puzzle_hole_map_and_set.add_set parameters error_handler dual hole_set in 
+                                          let new_hole_set = Puzzle_hole_map_and_set.Set.add dual hole_set in
                                           let state =  add_interface parameters error_handler hole_handler new_interface new_abstract_species new_hole_set state in 
                                           aux3 tail state
                                       end end 

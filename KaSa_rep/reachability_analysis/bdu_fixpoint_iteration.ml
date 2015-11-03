@@ -14,7 +14,7 @@
 
 open Cckappa_sig
 open Bdu_analysis_type
-open Set_and_map
+open SetMap
 open Mvbdu_sig
 open Boolean_mvbdu
 open Memo_sig
@@ -118,11 +118,11 @@ let new_index_pair_map parameter error l =
 
 let list2set parameter error list =
   List.fold_left (fun (error, current_set) elt ->
-    let error, add_set =
-      add_set parameter error elt current_set
+    let add_set =
+      Set.add elt current_set
     in
     error, add_set
-  ) (error, empty_set) list
+  ) (error, Set.empty) list
 
 (************************************************************************************)
 (* From each covering class, with their new index for sites, build 
@@ -183,29 +183,21 @@ let collect_test_restriction parameter error rule store_remanent_test store_resu
             in
             (*-----------------------------------------------------------------*)
             let error, map_res =
-              Site_map_and_set.fold_map_restriction parameter error
-                (fun site port (error, store_result) ->
+              Site_map_and_set.Map.monadic_fold_restriction parameter error
+                (fun paramaters error site port store_result ->
                   let state = port.site_state.min in
                   (*-----------------------------------------------------------*)
                   (*search new_index of site inside a map forward*)
-                  let error, site' =
-                    try Site_map_and_set.find_map parameter error
-                          site
-                          map_new_index_forward
-                    with Not_found -> error, 0
-                  in
+                  let site' =
+                    Site_map_and_set.Map.find_default
+                      0 site map_new_index_forward in
                   (*-----------------------------------------------------------*)
                   (*add this new_index site into a map restriction*)
-                  let error, map_res =
-                    Site_map_and_set.add_map
-                      parameter
-                      error
+                    error,Site_map_and_set.Map.add
                       site'
                       state
                       store_result
-                  in
-                  error, map_res
-                ) set agent.agent_interface Site_map_and_set.empty_map
+                ) set agent.agent_interface Site_map_and_set.Map.empty
             in
             error, ((id, map_res) :: current_list)
           ) (error, []) triple_list
@@ -240,7 +232,7 @@ let collect_bdu_test parameter error store_test_restriction store_result =
       let error, list =
         List.fold_left (fun (error, store_list) (id, map_res) ->
           let error, (l, (handler, bdu_test)) =
-            Site_map_and_set.fold_map
+            Site_map_and_set.Map.fold
               (fun site' state (error, (current_list, _)) ->
                 let p = (site', state) :: current_list in
                 let error, (handler, bdu_test) =

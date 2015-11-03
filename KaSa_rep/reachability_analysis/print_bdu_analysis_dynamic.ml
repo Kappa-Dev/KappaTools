@@ -28,7 +28,7 @@ let trace = false
 (*contact map*)
 
 let print_contact_map_aux parameter error result =
-  Int2Map_CM_state.iter_map
+  Int2Map_CM_state.Map.iter
     (fun (x, y, s) (l1, l2) ->
       if l1 <> []
       then
@@ -74,7 +74,7 @@ let print_contact_map parameter error result =
 (*update function [before] adding rule with side effects*)
 
 let print_covering_classes_modification_aux parameter error result =
-  Int2Map_CV_Modif.iter_map
+  Int2Map_CV_Modif.Map.iter
     ( fun (x, y, z) (l1, l2) ->
       if l1 <> []
       then
@@ -95,7 +95,7 @@ let print_covering_classes_modification_aux parameter error result =
           fprintf stdout "\n"
         end
       else ();
-      Site_map_and_set.iter_set
+      Site_map_and_set.Set.iter
         (fun r ->
           fprintf parameter.log
             "agent_type:%i@site_type:%i:covering_class_id:%i:rule_id:%i\n"
@@ -119,7 +119,7 @@ let print_covering_classes_modification parameter error result =
 (*update function [after] adding rule with side effect when discovered the binding*)
 
 let print_update_set_aux parameter error result =
-  Int2Map_CV_Modif.iter_map
+  Int2Map_CV_Modif.Map.iter
     ( fun (x, y, z) (l1, s2) ->
       if l1 <> []
       then
@@ -140,7 +140,7 @@ let print_update_set_aux parameter error result =
           fprintf stdout "\n"
         end
       else ();
-      Site_map_and_set.iter_set
+      Site_map_and_set.Set.iter
         (fun r ->
           fprintf parameter.log
             "agent_type:%i@site_type:%i:covering_class_id:%i:rule_id:%i\n"

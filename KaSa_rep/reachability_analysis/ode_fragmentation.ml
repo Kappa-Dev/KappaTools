@@ -44,7 +44,7 @@ let print_list l =
 module AgentMap = Nearly_inf_Imperatif
 module SiteSet  = Site_map_and_set
 
-type set = SiteSet.set
+type set = SiteSet.Set.t
 type elt_set = SiteSet.elt
 
 type sites_ode = (set AgentMap.t * set AgentMap.t)
@@ -99,7 +99,7 @@ let get_site_common_set parameter error agent_type store_sites_common =
   in
   let set =
     match get_set with
-      | None -> SiteSet.empty_set
+      | None -> SiteSet.Set.empty
       | Some s -> s
   in set
 
@@ -121,13 +121,7 @@ let anchor_set parameter error agent_type store_sites_anchor1 store_sites_anchor
       agent_type
       store_sites_anchor2
   in
-  let error, anchor_set =
-    SiteSet.union
-      parameter
-      error
-      anchor_set1
-      anchor_set2
-  in anchor_set
+  SiteSet.Set.union anchor_set1 anchor_set2
 
 (*------------------------------------------------------------------------------*)
 (* A set of anchors site (combine two cases) fold*)
@@ -137,23 +131,19 @@ let get_anchor_common parameter error store_sites_anchor =
      parameter
      error
      (fun parameter error agent_type site_set old_set ->
-       let error, set =
-         SiteSet.union
-           parameter
-           error
+      let set =
+        SiteSet.Set.union
            site_set
-           old_set                 
+           old_set
        in error, set)
      store_sites_anchor
-     SiteSet.empty_set
+     SiteSet.Set.empty
 
 let fold_anchor_set parameter error store_sites_anchor_set1 store_sites_anchor_set2 =
   let error, anchor_set1 = get_anchor_common parameter error store_sites_anchor_set1 in
   let error, anchor_set2 = get_anchor_common parameter error store_sites_anchor_set2 in
-  let error, anchor_set =
-    SiteSet.union
-      parameter
-      error
+  let anchor_set =
+    SiteSet.Set.union
       anchor_set1
       anchor_set2
   in anchor_set
@@ -168,7 +158,7 @@ let collect_sites_modified_set parameter error rule handler store_sites_modified
       error
       (fun parameter error agent_id site_modif store_sites_modified_set ->
         let agent_type = site_modif.agent_name in
-        if SiteSet.is_empty_map
+        if SiteSet.Map.is_empty
           site_modif.agent_interface
         then
           error, store_sites_modified_set
@@ -186,15 +176,10 @@ let collect_sites_modified_set parameter error rule handler store_sites_modified
 	  in
           (*get a pair of (site_set, value)*)
           let pair_site =
-            SiteSet.fold_map (fun site _ (current_set, error) ->
+            SiteSet.Map.fold (fun site _ (current_set, error) ->
               (*get a set of site*)
-              let error, set =
-                SiteSet.add_set
-                  parameter
-                  error
-                  site
-                  current_set
-              in
+              let set =
+                SiteSet.Set.add site current_set in
               (*get value*)
               let error, (value, _, _) =
 	        Misc_sa.unsome
@@ -219,7 +204,7 @@ let collect_sites_modified_set parameter error rule handler store_sites_modified
               (set, error)
             )
               site_modif.agent_interface
-              (SiteSet.empty_set, error)
+              (SiteSet.Set.empty, error)
           in
           (*store only site_set*)
           let error, store_sites_modified_set =
@@ -256,22 +241,18 @@ let collect_store_bond_set_each_rule parameter error bond_lhs
    in
   let site_address =
     match site_address_map with
-      | None -> SiteSet.empty_map
+      | None -> SiteSet.Map.empty
       | Some s -> s
   in
   (*get a set of site that are bond*)
   let sites_bond_set =
-    SiteSet.fold_map
+    SiteSet.Map.fold
       (fun site _ current_set ->
-        let error, set =
-          SiteSet.add_set
-            parameter
-            error
+          SiteSet.Set.add
             site
-            current_set
-        in set)
+            current_set)
       site_address
-      SiteSet.empty_set
+      SiteSet.Set.empty
   in
   (*store*)
   let error, store_sites_bond_set =
@@ -296,22 +277,18 @@ let collect_store_bond_set parameter error bond_lhs site_address store_sites_bon
   in
   let site_address =
     match site_address_map with
-      | None -> SiteSet.empty_map
+      | None -> SiteSet.Map.empty
       | Some s -> s
   in
   (*get a set of site that are bond*)
   let sites_bond_set =
-    SiteSet.fold_map
+    SiteSet.Map.fold
       (fun site _ current_set ->
-        let error, set =
-          SiteSet.add_set
-            parameter
-            error
-            site
-            current_set
-        in set)
+       SiteSet.Set.add
+         site
+         current_set)
       site_address
-      SiteSet.empty_set
+      SiteSet.Set.empty
   in
   (*get old*)
   let old_set =
@@ -321,10 +298,8 @@ let collect_store_bond_set parameter error bond_lhs site_address store_sites_bon
       agent_type
       store_sites_bond_set
   in
-  let error, result_set =
-    SiteSet.union
-      parameter
-      error
+  let result_set =
+    SiteSet.Set.union
       sites_bond_set
       old_set
   in
@@ -460,7 +435,7 @@ let store_sites_lhs parameter error rule store_sites_lhs =
        | Agent agent ->
           let agent_type = agent.agent_name in
           let site_list =
-            SiteSet.fold_map
+            SiteSet.Map.fold
               (fun site _ current_list ->
                 site :: current_list)
               agent.agent_interface []
@@ -536,12 +511,12 @@ let collect_sites_anchor_set parameter error get_rule
               match acc with
                 | [] -> error, (fst store_sites_anchor_set)
                 | x :: tl ->
-                  if not (SiteSet.is_empty_set modified_set &&
-                            SiteSet.is_empty_set site_lhs_bond_fst_set)
+                  if not (SiteSet.Set.is_empty modified_set &&
+                            SiteSet.Set.is_empty site_lhs_bond_fst_set)
                   then
                     begin
-                      if SiteSet.mem_set x modified_set &&
-                        SiteSet.mem_set x site_lhs_bond_fst_set
+                      if SiteSet.Set.mem x modified_set &&
+                        SiteSet.Set.mem x site_lhs_bond_fst_set
                       then
                         let anchor = snd store_sites_bond_pair_set in
                         error, anchor
@@ -560,14 +535,14 @@ let collect_sites_anchor_set parameter error get_rule
                   match to_visit with
                     | [] -> error, (snd store_sites_anchor_set)
                     | y :: tl' ->
-                      if not (SiteSet.is_empty_set modified_set || 
-                                SiteSet.is_empty_set anchor_set &&
-                                SiteSet.is_empty_set site_lhs_bond_fst_set)
+                      if not (SiteSet.Set.is_empty modified_set || 
+                                SiteSet.Set.is_empty anchor_set &&
+                                SiteSet.Set.is_empty site_lhs_bond_fst_set)
                       then
                         begin
-                          if SiteSet.mem_set x anchor_set ||
-                            SiteSet.mem_set x modified_set &&
-                            SiteSet.mem_set y site_lhs_bond_fst_set
+                          if SiteSet.Set.mem x anchor_set ||
+                            SiteSet.Set.mem x modified_set &&
+                            SiteSet.Set.mem y site_lhs_bond_fst_set
                           then
                             let anchor = snd store_sites_bond_pair_set in
                             error, anchor
@@ -588,7 +563,7 @@ let collect_sites_anchor_set parameter error get_rule
             in
             let get_anchor_set1 =
               match out_anchor_set1 with
-                | None -> SiteSet.empty_set
+                | None -> SiteSet.Set.empty
                 | Some s -> s
             in
             (*get a set of anchor2*)
@@ -601,19 +576,17 @@ let collect_sites_anchor_set parameter error get_rule
             in
             let get_anchor_set2 =
               match out_anchor_set2 with
-                | None -> SiteSet.empty_set
+                | None -> SiteSet.Set.empty
                 | Some s -> s
             in
             (*do the union of two set*)
-            let error, final_anchor_set =
-              SiteSet.union
-                parameter
-                error
+            let final_anchor_set =
+              SiteSet.Set.union
                 get_anchor_set1
                 get_anchor_set2
             in
             (*print the final set*)
-            let l = SiteSet.elements final_anchor_set in
+            let l = SiteSet.Set.elements final_anchor_set in
             match l with
               | [] -> ()
               | _ as l' ->
@@ -657,7 +630,7 @@ let cartesian_prod_eq i a b =
 let internal_flow_lhs_modified parameter error agent_type
     store_sites_lhs
     store_sites_modified_set =
-  let result_modified_list = SiteSet.elements store_sites_modified_set in
+  let result_modified_list = SiteSet.Set.elements store_sites_modified_set in
   let site_lhs =
     get_site_common_list
       parameter
@@ -685,7 +658,7 @@ let internal_flow_lhs_anchor parameter error agent_type
       agent_type
       store_sites_lhs
   in
-  let anchor_list = SiteSet.elements anchor_set in
+  let anchor_list = SiteSet.Set.elements anchor_set in
   match site_lhs with
     | [] | [_] -> []
     | _ -> cartesian_prod_eq
@@ -802,18 +775,18 @@ let collect_internal_flow parameter error get_rule
 (*TODO: define castesian for set type*)
 
 let cartesian_prod_external i anchor_set i' bond_fst_list bond_snd_set =
-  let anchor_list = SiteSet.elements anchor_set in
+  let anchor_list = SiteSet.Set.elements anchor_set in
   let rec loop anchor_list acc =
     match anchor_list with
       | [] -> List.rev acc
       | x :: xs ->
         loop xs (List.rev_append (List.rev (List.fold_left (fun acc y ->
-          if not (SiteSet.is_empty_set anchor_set &&
-                    SiteSet.is_empty_set bond_snd_set)
+          if not (SiteSet.Set.is_empty anchor_set &&
+                    SiteSet.Set.is_empty bond_snd_set)
           then
             begin
-              if SiteSet.mem_set x anchor_set &&
-                SiteSet.mem_set x bond_snd_set
+              if SiteSet.Set.mem x anchor_set &&
+                SiteSet.Set.mem x bond_snd_set
               then (i, x, i', y) :: acc
               else acc
             end
@@ -854,7 +827,7 @@ let collect_external_flow parameter error release
         store_sites_anchor_set1 
         store_sites_anchor_set2 
     in
-    let bond_fst_list = SiteSet.elements bond_fst_set in
+    let bond_fst_list = SiteSet.Set.elements bond_fst_set in
     let collect_external_flow =
       cartesian_prod_external
         agent_type_2

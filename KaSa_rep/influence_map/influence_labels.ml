@@ -55,7 +55,7 @@ sig
   val empty: label_set
   val empty_couple: label_set_couple   
   val is_empty_couple: label_set_couple -> bool 
-  val add_set:     Remanent_parameters_sig.parameters -> Exception.method_handler -> label -> label_set -> Exception.method_handler * label_set 
+  val add_set:     label -> label_set -> label_set
   val add_couple:  Remanent_parameters_sig.parameters -> Exception.method_handler -> bool -> label_set -> label_set -> label_set_couple -> Exception.method_handler * label_set_couple
   val dump:        Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.kappa_handler -> label_set  -> Exception.method_handler 
   val dump_couple: Remanent_parameters_sig.parameters -> Exception.method_handler -> Cckappa_sig.kappa_handler ->label_set_couple -> Exception.method_handler 
@@ -74,7 +74,7 @@ module Empty =
   let empty = () 
   let empty_couple = ()
   let is_empty_couple _ = false
-  let add_set _ error _ _ = error,() 
+  let add_set _ _ = ()
   let add_couple _ error _ _ _ _ = error,() 
   let dump _ error _ _ = error 
   let to_string _ error _ _ = error,[]
@@ -87,26 +87,27 @@ module Extensive =
   (functor (L:Labels) -> 
     (struct 
       type label = L.label 
-      module Set = Set_and_map.Make (struct type t=label let compare = compare end)
-      type label_set = Set.set
-      module Pair_Set = Set_and_map.Make (struct type t=label*label let compare = compare end)
-      type label_set_couple =  Pair_Set.set
+      module LSetMap = SetMap.Make (struct type t=label let compare = compare end)
+      module Set = LSetMap.Set
+      type label_set = Set.t
+      module Pair_Set = SetMap.Make (struct type t=label*label let compare = compare end)
+      type label_set_couple =  Pair_Set.Set.t
 
       let label_of_int = L.label_of_int
-      let empty = Set.empty_set   
-      let empty_couple = Pair_Set.empty_set  
-      let is_empty_couple = Pair_Set.is_empty_set
-      let add_set = Set.add_set
+      let empty = Set.empty
+      let empty_couple = Pair_Set.Set.empty
+      let is_empty_couple = Pair_Set.Set.is_empty
+      let add_set = Set.add
       let add_couple remanent error bool a b sol = 
-        Set.fold_set 
+        Set.fold
           (fun a (error,sol) -> 
-            Set.fold_set
+            Set.fold
               (fun b (error,sol) -> 
 		if not bool && a=b 
 		then 
 		  error,sol 
 		else 
-                  Pair_Set.add_set remanent error (a,b) sol
+                  error,Pair_Set.Set.add (a,b) sol
               )  
               b 
               (error,sol)
@@ -118,7 +119,7 @@ module Extensive =
       let dump parameter error handler  a =
         let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "[" in
         let _,error  = 
-          Set.fold_set 
+          Set.fold
             (fun a (bool,error) -> 
               let error,a' = L.to_string parameter error a in 
               let _ = 
@@ -139,7 +140,7 @@ module Extensive =
       let to_string parameter error handler a =
           let sol = ["["] in  
           let _,sol,error = 
-            Set.fold_set 
+            Set.fold
               (fun a (bool,sol,error) -> 
                  let error,a' = L.to_string parameter error a in 
                  let _ = 
@@ -157,7 +158,7 @@ module Extensive =
           
       let dump_couple parameter error handler a =
         let _,error  = 
-          Pair_Set.fold_set 
+          Pair_Set.Set.fold
             (fun (a,b) (bool,error) -> 
               let error,a' = L.to_string parameter error a in 
               let error,b' = L.to_string parameter error b in 
@@ -176,21 +177,19 @@ module Extensive =
         error
 
       let filter_couple parameter error handler f a =
-        Pair_Set.fold_set
+        Pair_Set.Set.fold
           (fun (a,b) (error,set')->
 	   let error,bool = f error a b in
-	   if bool
-	   then
-	     Pair_Set.add_set parameter error (a,b) set'
-	   else
-	     error,set')
+	   error,if bool
+		 then Pair_Set.Set.add (a,b) set'
+		 else set')
 	  a
-	  (error,Pair_Set.empty_set) 
+	  (error,Pair_Set.Set.empty)
 	  
       let to_string_couple parameter error handler a = 
           let sol = [] in  
           let _,sol,error = 
-            Pair_Set.fold_set 
+            Pair_Set.Set.fold
               (fun (a,b) (bool,sol,error) -> 
                  let error,a' = L.to_string parameter error a in 
                  let error,b' = L.to_string parameter error b in 
@@ -212,21 +211,22 @@ module Implicit =
   (functor (L:Labels) -> 
     (struct 
       type label = L.label 
-      module Set = Set_and_map.Make (struct type t=label let compare = compare end)
-      type label_set = Set.set       
+      module LSetMap = SetMap.Make (struct type t=label let compare = compare end)
+      module Set = LSetMap.Set
+      type label_set = Set.t
       type label_set_couple =  (label_set * label_set) list 
     
       let label_of_int = L.label_of_int
-      let empty = Set.empty_set 
+      let empty = Set.empty
       let empty_couple  = []
       let is_empty_couple x = x=[]
-      let add_set = Set.add_set
+      let add_set = Set.add
       let add_couple remanent error bool a b sol = error,(a,b)::sol 
         
       let dump parameter error handler a =
         let _ = Printf.fprintf (Remanent_parameters.get_log parameter) "[" in
         let _ = 
-          Set.fold_set 
+          Set.fold
                 (fun x bool ->
                      let error,x' = L.to_string parameter error x in 
                      let _ = 
@@ -245,7 +245,7 @@ module Implicit =
     let to_string parameter error handler a = 
         let sol = [] in  
         let _,sol = 
-          Set.fold_set 
+          Set.fold
               (fun x (bool,sol) -> 
                    let error,x' = L.to_string parameter error x in 
                    let sol = 
@@ -265,10 +265,10 @@ module Implicit =
         let _ = 
           List.fold_left 
             (fun bool (a,b) -> 
-              Set.fold_set 
+              Set.fold
                 (fun x bool ->
                    let error,x' = L.to_string parameter error x in 
-                      Set.fold_set 
+                      Set.fold
                       (fun y bool -> 
                          let error,y' = L.to_string parameter error y in 
                           let _ = 
@@ -295,10 +295,10 @@ module Implicit =
         let _,sol = 
           List.fold_left
             (fun (bool,sol) (a,b) -> 
-              Set.fold_set 
+              Set.fold
                 (fun x (bool,sol) -> 
                    let error,x' = L.to_string parameter error x in 
-                  Set.fold_set
+                  Set.fold
                     (fun y (bool,sol) -> 
                       let error,y' = L.to_string parameter error y in 
                       let sol = 

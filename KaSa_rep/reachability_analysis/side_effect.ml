@@ -27,8 +27,8 @@ let trace = false
 
 module AgentMap = Quick_Nearly_inf_Imperatif
 type site = int
-type set = Site_map_and_set.set
-type 'a map      = 'a Site_map_and_set.map
+type set = Site_map_and_set.Set.t
+type 'a map      = 'a Site_map_and_set.Map.t
 type agent_index = int
 
 (*site effect*)
@@ -50,10 +50,10 @@ type side_effect =
 
 (************************************************************************************)
 
-let empty_set = Site_map_and_set.empty_set
-let empty_map = Site_map_and_set.empty_map
-let add_set = Site_map_and_set.add_set
-let union = Site_map_and_set.union
+let empty_set = Site_map_and_set.Set.empty
+let empty_map = Site_map_and_set.Map.empty
+let add_set = Site_map_and_set.Set.add
+let union = Site_map_and_set.Set.union
 
 let sprintf_list l =
   let acc = ref "{" in
@@ -108,17 +108,13 @@ let collect_half_break parameter error handler store_half_break half_break =
         | Some s -> s
     in
     (*new set*)
-    let error, set =
+    let set =
       add_set
-        parameter
-        error
         site
         old_set
     in
-    let error, new_set =
-      Site_map_and_set.union
-        parameter
-        error
+    let new_set =
+      Site_map_and_set.Set.union
         set
         old_set
     in
@@ -160,17 +156,12 @@ let collect_know_binding error store_unbinding release =
 (*collect document site*)
 let collect_document_site parameter error index agent agent_type store_doc =
   let site_map =
-    Site_map_and_set.fold_map
+    Site_map_and_set.Map.fold
       (fun site _ current_map ->
-        let error, site_map =
-          Site_map_and_set.add_map
-            parameter
-            error
-            site
-            (index, agent_type, site)
-            current_map
-        in
-        site_map
+       Site_map_and_set.Map.add
+         site
+         (index, agent_type, site)
+         current_map
       )
       agent.agent_interface empty_map
   in
@@ -186,10 +177,8 @@ let collect_document_site parameter error index agent agent_type store_doc =
       | None -> empty_map
       | Some m -> m
   in
-  let error, final_map =
-    Site_map_and_set.union_map
-      parameter
-      error
+  let final_map =
+    Site_map_and_set.Map.union
       old_map
       site_map  
   in
@@ -206,10 +195,8 @@ let collect_document_site parameter error index agent agent_type store_doc =
 let collect_undocument_site parameter error index agent_type list_undoc store_undoc =
   let undoc_map =
     List.fold_left (fun current_map site ->
-      let error, site_map =
-        Site_map_and_set.add_map
-          parameter
-          error
+      let site_map =
+        Site_map_and_set.Map.add
           site
           (index, agent_type, site)
           current_map
@@ -228,13 +215,10 @@ let collect_undocument_site parameter error index agent_type list_undoc store_un
       | None -> empty_map
       | Some m -> m
   in
-  let error, final_map =
-    Site_map_and_set.union_map
-      parameter
-      error
+  let final_map =
+    Site_map_and_set.Map.union
       old_map
-      undoc_map          
-  in
+      undoc_map in
   AgentMap.set
     parameter
     error
@@ -343,12 +327,12 @@ let print_halfbreak parameter error store_half_break =
   AgentMap.print
     error
     (fun error parameter set ->
-      let is_empty = Site_map_and_set.is_empty_set set in
+      let is_empty = Site_map_and_set.Set.is_empty set in
       if not is_empty
       then
 	let _ =
 	  fprintf stdout "Side-effect:half_break:\n";
-          let l = Site_map_and_set.elements set in
+          let l = Site_map_and_set.Set.elements set in
           fprintf stdout "Side_effect:half_break:site_type:";
           print_list l
 	in
@@ -380,13 +364,13 @@ let print_remove parameter error store_remove =
   let _ =
     AgentMap.print error
       (fun error parameter map ->
-	let is_empty = Site_map_and_set.is_empty_map map in
+	let is_empty = Site_map_and_set.Map.is_empty map in
 	if not is_empty
 	then
           let _ =
 	    fprintf stdout "Side-effect:deletion:\n";
             fprintf stdout "Side-effect:deletion:document_site:\n";
-            Site_map_and_set.iter_map (fun k (i,a,s) ->
+            Site_map_and_set.Map.iter (fun k (i,a,s) ->
               let _ =
 		fprintf stdout "agent_id:%i:agent_type:%i:site_type:%i\n"
                   i a s
@@ -403,13 +387,13 @@ let print_remove parameter error store_remove =
   (*print undocument*)
   AgentMap.print error
     (fun error parameter map ->
-      let is_empty = Site_map_and_set.is_empty_map map in
+      let is_empty = Site_map_and_set.Map.is_empty map in
       if not is_empty
       then
 	let _ =
 	  fprintf stdout "Side-effect:deletion:\n";
           fprintf stdout "Side-effect:deletion:undocument_site:\n";
-          Site_map_and_set.iter_map (fun k (i,a,s) ->
+          Site_map_and_set.Map.iter (fun k (i,a,s) ->
             let _ =
               fprintf stdout "agent_id:%i:agent_type:%i:site_type:%i\n"
               i a s

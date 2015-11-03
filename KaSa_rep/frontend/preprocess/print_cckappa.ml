@@ -24,7 +24,7 @@ let print_agent parameters error handler agent =
      match agent with 
     | Cckappa_sig.Agent agent -> 
        let parameters = Remanent_parameters.update_prefix parameters ("agent_type_"^(string_of_int agent.Cckappa_sig.agent_name)^":") in
-       Cckappa_sig.Site_map_and_set.fold_map
+       Cckappa_sig.Site_map_and_set.Map.fold
          (fun a b error ->  
           let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%ssite_type_%i->state:%s\n" (Remanent_parameters.get_prefix parameters) a (string_of_port b)  in 
           error)
@@ -36,7 +36,7 @@ let print_agent parameters error handler agent =
 
 let print_diffagent parameters error handler agent =
   let parameters = Remanent_parameters.update_prefix parameters ("agent_type_"^(string_of_int agent.Cckappa_sig.agent_name)^":") in
-  Cckappa_sig.Site_map_and_set.fold_map
+  Cckappa_sig.Site_map_and_set.Map.fold
    (fun a b error -> 
     let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%ssite_type_%i->state:%s\n" (Remanent_parameters.get_prefix parameters) a (string_of_port b) in 
     error)
@@ -60,7 +60,7 @@ let print_mixture parameters error handler mixture =
         error
         (fun error parameters a -> 
          let error =
-           Cckappa_sig.Site_map_and_set.fold_map 
+           Cckappa_sig.Site_map_and_set.Map.fold
               (fun k a error -> 
                 let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%ssite_type_%i->agent_id_%i.site_type_%i\n" (Remanent_parameters.get_prefix parameters) k a.Cckappa_sig.agent_index a.Cckappa_sig.site
                 in error
@@ -273,8 +273,8 @@ let print_diffview parameters error handler diff =
      agent.Cckappa_sig.agent_name
    in 
    let parameters_doc =  Remanent_parameters.update_prefix parameters "documented_site:" in
-    let _ = 
-      Cckappa_sig.Site_map_and_set.iter_map
+    let () = 
+      Cckappa_sig.Site_map_and_set.Map.iter
         (fun site _ -> 
             Printf.fprintf 
               (Remanent_parameters.get_log parameters_doc)

@@ -15,7 +15,7 @@
 let warn parameters mh message exn default = 
      Exception.warn parameters mh (Some "Quark") message exn (fun () -> default) 
   
-(*module Int_Set_and_Map = Set_and_map.Make (struct type t = int let compare = compare end)*) 
+(*module Int_Set_and_Map = SetMap.Make (struct type t = int let compare = compare end)*) 
 let local_trace = false
  
 let empty_quarks parameter error handler = 
@@ -59,7 +59,7 @@ let add_generic get set parameter error rule_id agent_id key map =
       | error,None -> error,Quark_type.Labels.empty 
       | error,Some x -> error,x 
   in 
-  let error,new_label_set = Quark_type.Labels.add_set parameter error agent_id old_label_set in 
+  let new_label_set = Quark_type.Labels.add_set agent_id old_label_set in
   if new_label_set == old_label_set 
   then 
     error,map
@@ -122,7 +122,7 @@ let scan_mixture_in_var bool parameter error handler var_id mixture quarks =
           let agent_type = agent.Cckappa_sig.agent_name in 
           let error,agent_var = add_var parameter error var_id kasim_id agent_type agent_var in
           let error,site_var = 
-            Cckappa_sig.Site_map_and_set.fold_map 
+            Cckappa_sig.Site_map_and_set.Map.fold
               (fun site port (error,site_var) -> 
                 let interval = port.Cckappa_sig.site_state in 
                 let max = interval.Cckappa_sig.max in 
@@ -199,7 +199,7 @@ let scan_rule parameter error handler rule_id rule quarks =
                   let agent_type = agent.Cckappa_sig.agent_name in 
                   let error,agent_test = add_agent parameter error rule_id kasim_id agent_type agent_test in 
                   let error,site_test = 
-                       Cckappa_sig.Site_map_and_set.fold_map 
+                       Cckappa_sig.Site_map_and_set.Map.fold
                          (fun site port (error,site_test) -> 
                              let interval = port.Cckappa_sig.site_state in 
                              let max = interval.Cckappa_sig.max in 
@@ -285,7 +285,7 @@ let scan_rule parameter error handler rule_id rule quarks =
         (fun parameter error agent_id agent site_modif_plus -> 
               let error,kasim_id = Quark_type.Labels.label_of_int parameter error (agent.Cckappa_sig.agent_kasim_id) in 
               let agent_type = agent.Cckappa_sig.agent_name in 
-              Cckappa_sig.Site_map_and_set.fold_map 
+              Cckappa_sig.Site_map_and_set.Map.fold
                   (fun site port (error,site_modif_plus) -> 
                        let interval = port.Cckappa_sig.site_state in 
                        let max = interval.Cckappa_sig.max in 
@@ -312,7 +312,7 @@ let scan_rule parameter error handler rule_id rule quarks =
        (fun parameter error agent_id agent site_modif_minus -> 
            let error,kasim_id = Quark_type.Labels.label_of_int parameter error agent.Cckappa_sig.agent_kasim_id in 
            let agent_type = agent.Cckappa_sig.agent_name in 
-                 Cckappa_sig.Site_map_and_set.fold_map 
+                 Cckappa_sig.Site_map_and_set.Map.fold
                     (fun site port (error,site_modif_minus) -> 
                           let interval = port.Cckappa_sig.site_state in 
                           let max = interval.Cckappa_sig.max in 

@@ -16,7 +16,7 @@ open Cckappa_sig
 open Int_storage
 open Bdu_analysis_type
 open Bdu_contact_map
-open Set_and_map
+open SetMap
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "BDU side effects") message exn (fun () -> default)  
@@ -41,12 +41,10 @@ let trace = false
 let half_break_action parameter error handler rule_id half_break store_result =
   (*module (agent_type, site) -> (rule_id, binding_state) list*)
   let add_link (a, b) (r, state) store_result =
-    let error, (l, old) =
-      try Int2Map_HalfBreak_effect.find_map parameter error (a, b) store_result
-      with Not_found -> error, ([], [])
-    in
-    let error, result =
-      Int2Map_HalfBreak_effect.add_map parameter error
+    let (l, old) =
+      Int2Map_HalfBreak_effect.Map.find_default ([],[]) (a, b) store_result in
+    let result =
+      Int2Map_HalfBreak_effect.Map.add
         (a, b) (l, (r, state) :: old) store_result
     in
     error, result
@@ -86,7 +84,7 @@ let half_break_action parameter error handler rule_id half_break store_result =
   in
   (*map function*)
   let store_result =
-    Int2Map_HalfBreak_effect.map_map (fun (l, x) -> List.rev l, x) store_result
+    Int2Map_HalfBreak_effect.Map.map (fun (l, x) -> List.rev l, x) store_result
   in
   error, store_result
 
@@ -95,12 +93,10 @@ let half_break_action parameter error handler rule_id half_break store_result =
 
 let remove_action parameter error rule_id remove store_result =
   let add_link (a, b) r store_result =
-    let error, (l, old) =
-      try Int2Map_Remove_effect.find_map parameter error (a, b) store_result
-      with Not_found -> error, ([], [])
-    in
-    let error, result =
-      Int2Map_Remove_effect.add_map parameter error (a, b) (l, r :: old) store_result
+    let (l, old) =
+      Int2Map_Remove_effect.Map.find_default ([],[]) (a, b) store_result in
+    let result =
+      Int2Map_Remove_effect.Map.add (a, b) (l, r :: old) store_result
     in
     error, result
   in
@@ -121,7 +117,7 @@ let remove_action parameter error rule_id remove store_result =
     ) (error, store_result) remove
   in
   let store_result =
-    Int2Map_Remove_effect.map_map (fun (l, x) -> List.rev l, x) store_result
+    Int2Map_Remove_effect.Map.map (fun (l, x) -> List.rev l, x) store_result
   in
   error, store_result
 

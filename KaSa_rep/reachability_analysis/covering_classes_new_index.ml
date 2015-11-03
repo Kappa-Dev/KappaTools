@@ -59,9 +59,9 @@ let project_modified_site value_list modified_map = (*TODO:add state information
     match acc with
       | [] -> []
       | x :: tl ->
-        if not (is_empty_map modified_map)
+        if not (Map.is_empty modified_map)
         then
-          if mem_map x modified_map
+          if Map.mem x modified_map
           then
             begin
               if not (is_empty_list value_list)

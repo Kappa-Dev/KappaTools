@@ -47,7 +47,7 @@ let get_id_common_set parameter error t set =
     t 
     set
   with
-    | error, None -> error, empty_set      
+    | error, None -> error, Set.empty
     | error, Some id -> error, id
 
 (************************************************************************************)
@@ -67,13 +67,7 @@ let store_pointer_backward parameter error id pointer_backward covering_class =
         pointer_backward
     in
     (*add the current set of elt into the old set*)
-    let error, new_id_set =
-      add_set
-        parameter
-        error
-        id
-        old_id_set
-    in
+    let new_id_set = Set.add id old_id_set in
     (*store the result into pointer backward*)
     Nearly_inf_Imperatif.set
       parameter
@@ -212,7 +206,7 @@ let clean_classes parameter error covering_classes modified_map =
   (*------------------------------------------------------------------------------*)
   (*cleaning*)
   let current_covering_classes = length_sorted covering_classes in
-  let is_empty_set = Site_map_and_set.is_empty_set in
+  let is_empty_set = Site_map_and_set.Set.is_empty in
   List.fold_left (fun (error, remanent) covering_class ->
     match covering_class with
       | [] -> error, remanent
@@ -245,10 +239,8 @@ let clean_classes parameter error covering_classes modified_map =
               in
               (*-------------------------------------------------------------------*)
               (* intersection of two sets *)
-              let error, potential_superset =
-                Site_map_and_set.inter
-                  parameter 
-                  error
+              let potential_superset =
+                Site_map_and_set.Set.inter
                   potential_supersets
                   potential_supersets'
               in

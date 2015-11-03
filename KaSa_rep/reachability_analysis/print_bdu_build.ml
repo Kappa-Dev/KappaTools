@@ -14,7 +14,7 @@
 
 open Printf
 open Bdu_analysis_type
-open Set_and_map
+open SetMap
 open Cckappa_sig
 
 let warn parameters mh message exn default =
@@ -30,7 +30,7 @@ let print_triple_list l =
     | [] -> []
     | (id, _, set) :: tl ->
       fprintf stdout "Covering_class_id:%i\n" id;
-      Site_map_and_set.iter_set (fun site ->
+      Site_map_and_set.Set.iter (fun site ->
         fprintf stdout "site_type:%i\n" site
       ) set; aux tl
   in aux l
@@ -53,7 +53,7 @@ let print_pair_list l =
     | [] -> []
     | (id, m) :: tl ->
       fprintf stdout "Covering_class_id:%i\n" id;
-      Site_map_and_set.iter_map (fun site state ->
+      Site_map_and_set.Map.iter (fun site state ->
         fprintf stdout "site':%i:state:%i\n" site state
       ) m; aux tl
   in aux l

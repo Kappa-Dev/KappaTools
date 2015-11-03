@@ -36,20 +36,16 @@ let generic_add fold2_common agent_diag rule_diag parameters error handler n a b
                           (error,map) 
                         else 
                           let key = rule,rule' in 
-                          let error,old = Quark_type.Int2Set_and_map.find_map_option parameters error key map in                        
-                          let old = 
-                            match old with 
-                            | None -> Quark_type.Labels.empty_couple  
-                            | Some old -> old 
-                          in 
+                          let old =
+			    Quark_type.Int2SetMap.Map.find_default
+			      Quark_type.Labels.empty_couple key map in
 			  let error,couple =
 			    Quark_type.Labels.add_couple
 			      parameters error (agent_diag || not (rule = rule')) a a' old in
-			  if Quark_type.Labels.is_empty_couple couple
-			  then 
-			    error,map
+			  error,if Quark_type.Labels.is_empty_couple couple
+			  then map
 			  else 
-			    Quark_type.Int2Set_and_map.add_map parameters error key couple map)
+			    Quark_type.Int2SetMap.Map.add key couple map)
                  b 
                  map)
           a
@@ -57,8 +53,8 @@ let generic_add fold2_common agent_diag rule_diag parameters error handler n a b
     a b c 
 
 let compute_influence_map parameters error handler quark_maps nrules = 
-  let wake_up_map = Quark_type.Int2Set_and_map.empty_map in 
-  let inhibition_map  = Quark_type.Int2Set_and_map.empty_map in 
+  let wake_up_map = Quark_type.Int2SetMap.Map.empty in 
+  let inhibition_map  = Quark_type.Int2SetMap.Map.empty in 
   let error,wake_up_map = 
     generic_add 
       Quark_type.AgentMap.fold2_common

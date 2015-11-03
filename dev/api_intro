@@ -1,10 +1,10 @@
 {!indexlist}
 
 The folder dataStructures/ has a transparent name. You can find there:
-{!modules: Nbr NamedDecls Location}
+{!modules: SetMap Nbr NamedDecls Location}
 
 In term/ directory stands all definitions the simulator works on.
-{!modules: Operator Place Signature Connected_component Instantiation Alg_expr
+{!modules: Operator Agent_place Signature Connected_component Instantiation Alg_expr
 Primitives Environment Kappa_printer }
 
 {!modules:Expr Snip}

@@ -41,25 +41,21 @@ let new_index_pair_map parameter error l =
     match acc with
     | [] -> error, (map1, map2)
     | h :: tl ->
-      let error, map1 =
-        add_map parameter error h k map1
-      in
-      let error, map2 =
-        add_map parameter error k h map2
-      in
+      let map1 = Map.add h k map1 in
+      let map2 = Map.add k h map2 in
       aux tl (k+1) map1 map2
-  in aux l 1 empty_map empty_map
+  in aux l 1 Map.empty Map.empty
 
 (************************************************************************************)
 (*convert a list to a set*)
 
 let list2set parameter error list =
   List.fold_left (fun (error, current_set) elt ->
-    let error, add_set =
-      add_set parameter error elt current_set
+    let add_set =
+      Set.add elt current_set
     in
     error, add_set
-  ) (error, empty_set) list
+  ) (error, Set.empty) list
 
 (************************************************************************************)
 
@@ -114,7 +110,7 @@ let collect_remanent_list2set parameter error store_remanent store_result =
 
 let print_set set =
   let _ =
-    Site_map_and_set.iter_set (fun elt ->
+    Site_map_and_set.Set.iter (fun elt ->
       Printf.fprintf stdout "site_type:%i\n" elt
     ) set
   in
@@ -139,14 +135,14 @@ let print_map_functions l l' =
       Printf.fprintf stdout
         "Potential dependencies between sites:Map-functions:Covering_class_id:%i\n" id; 
       let (map1, map2) = h in
-      let _ =
-        Site_map_and_set.iter_map
+      let () =
+        Site_map_and_set.Map.iter
           (fun site site_new ->
             Printf.fprintf stdout "Map1:site_type:%i:site_type':%i\n" site site_new
           ) map1
       in
-      let _ =
-        Site_map_and_set.iter_map
+      let () =
+        Site_map_and_set.Map.iter
           (fun site_new site ->
             Printf.fprintf stdout "Map2:site_type':%i:site_type:%i\n" site_new site
           ) map2

@@ -14,7 +14,6 @@
 
 open Cckappa_sig
 open Bdu_analysis_type
-open Set_and_map
 open Mvbdu_sig
 open Boolean_mvbdu
 open Memo_sig
@@ -104,25 +103,18 @@ let new_index_pair_map parameter error l =
     match acc with
     | [] -> error, (map1, map2)
     | h :: tl ->
-      let error, map1 =
-        add_map parameter error h k map1
-      in
-      let error, map2 =
-        add_map parameter error k h map2
-      in
+      let map1 = Map.add h k map1 in
+      let map2 = Map.add k h map2 in
       aux tl (k+1) map1 map2
-  in aux l 1 empty_map empty_map
+  in aux l 1 Map.empty Map.empty
 
 (************************************************************************************)
 (*convert a list to a set*)
 
 let list2set parameter error list =
-  List.fold_left (fun (error, current_set) elt ->
-    let error, add_set =
-      add_set parameter error elt current_set
-    in
-    error, add_set
-  ) (error, empty_set) list
+  error,List.fold_left (fun current_set elt ->
+      Set.add elt current_set
+  ) Set.empty list
 
 (************************************************************************************)
 (* From each covering class, with their new index for sites, build 
@@ -183,29 +175,24 @@ let collect_test_restriction parameter error rule store_remanent_test store_resu
             in
             (*-----------------------------------------------------------------*)
             let error, map_res =
-              Site_map_and_set.fold_map_restriction parameter error
-                (fun site port (error, store_result) ->
+              Site_map_and_set.Map.monadic_fold_restriction parameter error
+                (fun parameters error site port store_result ->
                   let state = port.site_state.min in
                   (*-----------------------------------------------------------*)
                   (*search new_index of site inside a map forward*)
-                  let error, site' =
-                    try Site_map_and_set.find_map parameter error
-                          site
-                          map_new_index_forward
-                    with Not_found -> error, 0
-                  in
+                  let site' =
+                    Site_map_and_set.Map.find_default
+		      0 site map_new_index_forward in
                   (*-----------------------------------------------------------*)
                   (*add this new_index site into a map restriction*)
-                  let error, map_res =
-                    Site_map_and_set.add_map
-                      parameter
-                      error
+                  let map_res =
+                    Site_map_and_set.Map.add
                       site'
                       state
                       store_result
                   in
                   error, map_res
-                ) set agent.agent_interface Site_map_and_set.empty_map
+                ) set agent.agent_interface Site_map_and_set.Map.empty
             in
             error, ((id, map_res) :: current_list)
           ) (error, []) triple_list
@@ -241,7 +228,7 @@ let collect_bdu_test parameter error rule_id store_test_restriction store_result
       let error, (rule_id_list, plist) =
         List.fold_left (fun (error, (rule_id_list, store_list)) (id, map_res) ->
           let error, (l, (handler, bdu_test)) =
-            Site_map_and_set.fold_map
+            Site_map_and_set.Map.fold
               (fun site' state (error, (current_list, _)) ->
                 let p = (site', state) :: current_list in
                 let error, (handler, bdu_test) =
@@ -323,7 +310,7 @@ let collect_remanent_creation parameter error rule store_remanent store_result =
 let collect_remanent_modif parameter error rule store_remanent store_result =
   AgentMap.fold2_common parameter error
     (fun parameter error agent_type_cv remanent agent_modif store_result ->
-      if is_empty_map agent_modif.agent_interface
+      if Map.is_empty agent_modif.agent_interface
       then error, store_result
       else
 	let agent_type_modif = agent_modif.agent_name in
@@ -353,7 +340,7 @@ let collect_remanent_modif parameter error rule store_remanent store_result =
 let collect_modif_restriction parameter error rule store_remanent_modif store_result =
   AgentMap.fold2_common parameter error
     (fun parameter error agent_type triple_list agent_modif store_result ->
-      if is_empty_map agent_modif.agent_interface
+      if Map.is_empty agent_modif.agent_interface
       then error, store_result
       else
 	let agent_type_modif = agent_modif.agent_name in
@@ -363,24 +350,19 @@ let collect_modif_restriction parameter error rule store_remanent_modif store_re
 	      new_index_pair_map parameter error list
 	    in
 	    let error, map_res =
-	      Site_map_and_set.fold_map_restriction parameter error
-		(fun site port (error, store_result) ->
+	      Site_map_and_set.Map.monadic_fold_restriction parameter error
+		(fun parameters error site port store_result ->
 		  let state = port.site_state.min in
-		  let error, site' =
-		    try Site_map_and_set.find_map parameter error
-			  site map_new_index_forward
-		    with Not_found -> error, 0
-		  in
-		  let error, map_res =
-		    Site_map_and_set.add_map
-		      parameter
-		      error
+		  let site' =
+		    Site_map_and_set.Map.find_default 0 site map_new_index_forward in
+		  let map_res =
+		    Site_map_and_set.Map.add
 		      site'
 		      state
 		      store_result
 		  in
 		  error, map_res
-		) set agent_modif.agent_interface Site_map_and_set.empty_map
+		) set agent_modif.agent_interface Site_map_and_set.Map.empty
 	    in
 	    error, ((id, map_res) :: current_list)
 	  ) (error, []) triple_list
@@ -414,7 +396,7 @@ let collect_modif_list parameter error rule_id store_modif_restriction store_res
       let error, (rule_id_list, site_list) =
 	List.fold_left (fun (error, (rule_id_list, store_list)) (id, map_res) ->
 	  let error, site_list =
-	    Site_map_and_set.fold_map
+	    Site_map_and_set.Map.fold
 	      (fun site' state (error, current_list) ->
 		error, (site' :: current_list)
 	      ) map_res (error, [])
