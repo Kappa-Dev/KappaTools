@@ -214,6 +214,7 @@ let scan_rule_bdu_build parameter error rule covering_classes
     collect_test_restriction
       parameter
       error
+      rule
       store_remanent_test
       store_result.store_test_restriction
   in

@@ -386,6 +386,7 @@ site_type:0
 - Covering classes of test restriction:
 agent_type_0:
 Covering_class_id:0
+site':1:state:0
 Covering_class_id:0
 Covering_class_id:0
 site':1:state:1
@@ -394,14 +395,6 @@ site':1:state:1
 Covering_class_id:0
 site':1:state:0
 agent_type_1:
-Covering_class_id:0
-site':1:state:0
-Covering_class_id:0
-site':1:state:1
-Covering_class_id:0
-site':1:state:1
-Covering_class_id:0
-site':1:state:0
 Covering_class_id:0
 site':1:state:0
 execution finished without any exception

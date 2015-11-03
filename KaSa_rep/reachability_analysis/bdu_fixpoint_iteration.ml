@@ -129,7 +129,7 @@ let list2set parameter error list =
 (* From each covering class, with their new index for sites, build 
    (bdu_test, bdu_creation and list of modification).
    Note: not taking sites in the local, because it will be longer.
-   - Convert type set of sites into map
+   - Convert type set of sites into map restriction
 *)
 
 let collect_remanent_test parameter error rule store_remanent store_result =
@@ -142,7 +142,7 @@ let collect_remanent_test parameter error rule store_remanent store_result =
         (*get store_dic*)
         let store_dic = remanent.store_dic in
         (*restriction map*)
-        let error, four_list =
+        let error, triple_list =
           Dictionary_of_Covering_class.fold
             (fun list _ id (error, current_list) ->
               (*-------------------------------------------------------------------------*)
@@ -150,7 +150,7 @@ let collect_remanent_test parameter error rule store_remanent store_result =
               let error, set = list2set parameter error list in
               (*-------------------------------------------------------------------------*)
               (*get the next_set*)
-              let new_set = (agent, id, list, set) :: current_list in
+              let new_set = (id, list, set) :: current_list in
               error, List.rev new_set
             ) store_dic (error, [])
         in
@@ -160,7 +160,7 @@ let collect_remanent_test parameter error rule store_remanent store_result =
             parameter
             error
             agent_type_test
-            four_list
+            triple_list
             store_result
         in
         error, store_result        
@@ -168,60 +168,63 @@ let collect_remanent_test parameter error rule store_remanent store_result =
 
 (************************************************************************************)
 
-let collect_test_restriction parameter error store_remanent_test store_result =
-  AgentMap.fold parameter error
-    (fun parameter error agent_type four_list store_result ->
-      let error, pair_list =
-        List.fold_left (fun (error, current_list) (agent, id, list, set) ->
+let collect_test_restriction parameter error rule store_remanent_test store_result =
+  AgentMap.fold2_common parameter error
+    (fun parameter error agent_type agent triple_list store_result ->
+      match agent with
+      | Ghost -> error, store_result
+      | Agent agent ->
+        let error, pair_list =
+          List.fold_left (fun (error, current_list) (id, list, set) ->
             (*-----------------------------------------------------------------*)
-          let error, (map_new_index_forward, _) =
-            new_index_pair_map parameter error list
-          in
+            let error, (map_new_index_forward, _) =
+              new_index_pair_map parameter error list
+            in
             (*-----------------------------------------------------------------*)
-          let error, map_res =
-            Site_map_and_set.fold_map_restriction parameter error
-              (fun site port (error, store_result) ->
-                let state = port.site_state.min in
-                  (*-----------------------------------------------------------------*)
-                  (*search new_index of site inside a map forward*)
-                let error, site' =
-                  try Site_map_and_set.find_map parameter error
-                        site
-                        map_new_index_forward
-                  with Not_found -> error, 0
-                in
-                  (*-----------------------------------------------------------------*)
-                  (*add this new_index site into a map restriction*)
-                let error, map_res =
-                  Site_map_and_set.add_map
-                    parameter
-                    error
-                    site'
-                    state
-                    store_result
-                in
-                error, map_res
-              ) set agent.agent_interface Site_map_and_set.empty_map
-          in
-          error, ((id, map_res) :: current_list)
-        ) (error, []) four_list
-      in
-      (*-----------------------------------------------------------------*)
-      (*get old*)
-      let error, old_pair =
-        match AgentMap.unsafe_get parameter error agent_type store_result with
-        | error, None -> error, []
-        | error, Some l -> error, l
-      in
-      let new_pair_list = List.concat [pair_list; old_pair] in
+            let error, map_res =
+              Site_map_and_set.fold_map_restriction parameter error
+                (fun site port (error, store_result) ->
+                  let state = port.site_state.min in
+                (*-----------------------------------------------------------------*)
+                (*search new_index of site inside a map forward*)
+                  let error, site' =
+                    try Site_map_and_set.find_map parameter error
+                          site
+                          map_new_index_forward
+                    with Not_found -> error, 0
+                  in
+                (*-----------------------------------------------------------------*)
+                (*add this new_index site into a map restriction*)
+                  let error, map_res =
+                    Site_map_and_set.add_map
+                      parameter
+                      error
+                      site'
+                      state
+                      store_result
+                  in
+                  error, map_res
+                ) set agent.agent_interface Site_map_and_set.empty_map
+            in
+            error, ((id, map_res) :: current_list)
+          ) (error, []) triple_list
+        in
         (*-----------------------------------------------------------------*)
-      let error, store_result =
-        AgentMap.set
-          parameter
-          error
-          agent_type
-          new_pair_list
-          store_result
-      in
-      error, store_result
-    ) store_remanent_test store_result
+        (*get old*)
+        let error, old_pair =
+          match AgentMap.unsafe_get parameter error agent_type store_result with
+          | error, None -> error, []
+          | error, Some l -> error, l
+        in
+        let new_pair_list = List.concat [pair_list; old_pair] in
+        (*-----------------------------------------------------------------*)
+        let error, store_result =
+          AgentMap.set
+            parameter
+            error
+            agent_type
+            new_pair_list
+            store_result
+        in
+        error, store_result
+    ) rule.rule_lhs.views store_remanent_test store_result
