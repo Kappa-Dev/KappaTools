@@ -102,7 +102,7 @@ let remove_action parameter error rule_id remove store_result =
     let error, result =
       Int2Map_Remove_effect.add_map parameter error (a, b) (l, r :: old) store_result
     in
-    error, result (*TODO: return error *)
+    error, result
   in
   let error, store_result =
     List.fold_left (fun (error, store_result) (agent_index, agent, list_undoc) ->

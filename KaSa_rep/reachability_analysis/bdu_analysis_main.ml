@@ -67,6 +67,7 @@ let scan_rule_static parameter error handler rule_id rule covering_classes
       rule.actions.creation
       store_result.store_creation_sites
   in
+  (*-------------------------------------------------------------------------------*)
   let error, store_modification_sites_without_creation =
     collect_modification_sites_without_creation
       parameter
@@ -76,6 +77,7 @@ let scan_rule_static parameter error handler rule_id rule covering_classes
       store_creation_sites
       store_result.store_modification_sites_without_creation
   in
+  (*-------------------------------------------------------------------------------*)
   let error, store_modification_sites =
     collect_modification_sites
       parameter
@@ -84,6 +86,7 @@ let scan_rule_static parameter error handler rule_id rule covering_classes
       rule.diff_direct
       store_result.store_modification_sites
   in
+  (*-------------------------------------------------------------------------------*)
   (*test*)
   let error, store_test_sites =
     collect_test_sites
@@ -93,6 +96,7 @@ let scan_rule_static parameter error handler rule_id rule covering_classes
       rule.rule_lhs.views
       store_result.store_test_sites
   in
+  (*-------------------------------------------------------------------------------*)
   (*test and modification*)
   let error, store_test_modification_sites =
     collect_test_modification_sites
@@ -101,6 +105,7 @@ let scan_rule_static parameter error handler rule_id rule covering_classes
       store_modification_sites
       store_test_sites
   in
+  (*-------------------------------------------------------------------------------*)
   (*test and modification without creation*)
   let error, store_test_modification_without_creation =
     collect_test_modification_without_creation
@@ -109,6 +114,7 @@ let scan_rule_static parameter error handler rule_id rule covering_classes
       store_modification_sites_without_creation
       store_test_sites
   in
+  (*-------------------------------------------------------------------------------*)
   error, 
   {
     store_covering_classes_id                  = store_covering_classes_id;
@@ -168,6 +174,7 @@ let scan_rule_dynamic parameter error handler rule_id rule
       error
       store_update
   in
+  (*-------------------------------------------------------------------------------*)
   (*rule_id of creation inside working list*)
   let error, store_wl_creation =
     collect_wl_creation
@@ -178,6 +185,7 @@ let scan_rule_dynamic parameter error handler rule_id rule
       rule.actions.creation
       store_result.store_wl_creation
   in
+  (*-------------------------------------------------------------------------------*)
   (*rule_id of both update function and creation inside working list*)
   let error, store_wl_creation_update =
     collect_wl_creation_update
@@ -186,6 +194,7 @@ let scan_rule_dynamic parameter error handler rule_id rule
       store_wl_creation
       store_wl_update
   in
+  (*-------------------------------------------------------------------------------*)
   error, 
   {
     store_contact_map                          = store_contact_map;
@@ -200,7 +209,7 @@ let scan_rule_dynamic parameter error handler rule_id rule
 (************************************************************************************)
 (*rule bdu build*)
 
-let scan_rule_bdu_build parameter error rule covering_classes store_result =
+let scan_rule_bdu_build parameter error rule_id rule covering_classes store_result =
   let error, store_remanent_test =
     collect_remanent_test
       parameter
@@ -209,6 +218,7 @@ let scan_rule_bdu_build parameter error rule covering_classes store_result =
       covering_classes
       store_result.store_remanent_test
   in
+  (*-------------------------------------------------------------------------------*)
   let error, store_test_restriction =
     collect_test_restriction
       parameter
@@ -217,13 +227,16 @@ let scan_rule_bdu_build parameter error rule covering_classes store_result =
       store_remanent_test
       store_result.store_test_restriction
   in
+  (*-------------------------------------------------------------------------------*)
   let error, store_bdu_test =
     collect_bdu_test
       parameter
       error
+      rule_id
       store_test_restriction
       store_result.store_bdu_test
   in
+  (*-------------------------------------------------------------------------------*)
   error, 
   {
     store_remanent_test    = store_remanent_test;
@@ -237,6 +250,7 @@ let scan_rule_bdu_build parameter error rule covering_classes store_result =
 let scan_rule parameter error handler rule_id rule store_covering_classes
     compiled store_result =
   let covering_classes, covering_class_set = store_covering_classes in
+  (*-------------------------------------------------------------------------------*)
   let error, store_bdu_analysis_static =
     scan_rule_static 
       parameter
@@ -247,6 +261,7 @@ let scan_rule parameter error handler rule_id rule store_covering_classes
       covering_classes
       store_result.store_bdu_analysis_static
   in
+  (*-------------------------------------------------------------------------------*)
   let error, store_bdu_analysis_dynamic =
     scan_rule_dynamic
       parameter
@@ -259,10 +274,12 @@ let scan_rule parameter error handler rule_id rule store_covering_classes
       store_bdu_analysis_static.store_side_effects
       store_result.store_bdu_analysis_dynamic
   in
+  (*-------------------------------------------------------------------------------*)
   let error, store_bdu_build =
     scan_rule_bdu_build
       parameter
       error
+      rule_id
       rule
       covering_classes
       store_result.store_bdu_build

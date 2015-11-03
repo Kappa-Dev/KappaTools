@@ -265,6 +265,7 @@ Covering_class_id:0
 site':1:state:0
 - Bdu of test restriction:
 agent_type_0:
+rule_id:2
 Covering_class_id:0
 site':1:state:2
 
@@ -276,6 +277,7 @@ agent_type_0:   true
 agent_type_0:  else 
 agent_type_0:   false
 
+rule_id:2
 Covering_class_id:0
 site':1:state:2
 
@@ -287,6 +289,7 @@ agent_type_0:   true
 agent_type_0:  else 
 agent_type_0:   false
 
+rule_id:2
 Covering_class_id:0
 site':1:state:1
 
@@ -298,6 +301,7 @@ agent_type_0:   true
 agent_type_0:  else 
 agent_type_0:   false
 
+rule_id:0
 Covering_class_id:0
 site':1:state:0
 

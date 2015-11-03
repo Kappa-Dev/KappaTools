@@ -231,14 +231,15 @@ let collect_test_restriction parameter error rule store_remanent_test store_resu
     ) rule.rule_lhs.views store_remanent_test store_result
 
 (************************************************************************************)
+(*build bdu for test rules*)
 
-let collect_bdu_test parameter error store_test_restriction store_result =
+let collect_bdu_test parameter error rule_id store_test_restriction store_result =
   let error, (handler, bdu_init) = bdu_init parameter error in
   AgentMap.fold parameter error
     (fun parameter error agent_type pair_list store_result ->
       (*build bdu test*)
-      let error, list =
-        List.fold_left (fun (error, store_list) (id, map_res) ->
+      let error, (rule_id_list, plist) =
+        List.fold_left (fun (error, (rule_id_list, store_list)) (id, map_res) ->
           let error, (l, (handler, bdu_test)) =
             Site_map_and_set.fold_map
               (fun site' state (error, (current_list, _)) ->
@@ -249,18 +250,33 @@ let collect_bdu_test parameter error store_test_restriction store_result =
                 error, (p, (handler, bdu_test))
               ) map_res (error, ([], (handler, bdu_init)))
           in
-          (*store in an array*)
-          error, ((l, id, (handler, bdu_test)) :: store_list)
-        ) (error, []) pair_list
+          (*store*)
+          let new_triple_list = 
+            (l, id, (handler, bdu_test)) :: store_list
+          in
+          (*add_map to get rule_id*)
+          let rule_id_map = rule_id :: rule_id_list in
+          error, (rule_id_map, new_triple_list)
+        ) (error, ([], [])) pair_list
       in
+      (*get old*)
+      let error, (old_list, _) =
+        match AgentMap.unsafe_get parameter error agent_type store_result with
+        | error, None -> error, ([], [])
+        | error, Some (l, l') -> error, (l, l')
+      in
+      let new_rule_id = List.concat [rule_id_list; old_list] in
       (*store*)
       let error, store_result =
         AgentMap.set
           parameter
           error
           agent_type
-          (List.rev list)
+          (List.rev new_rule_id, List.rev plist)
           store_result
       in
       error, store_result
     ) store_test_restriction store_result
+
+(************************************************************************************)
+(*creation rules*)
