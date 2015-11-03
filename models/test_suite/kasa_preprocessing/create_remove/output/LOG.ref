@@ -144,6 +144,6 @@ agent_type_2:
 ------------------------------------------------------------
 * Build BDU:
 ------------------------------------------------------------
-- BDU of test restriction:
-- BDU of test restriction:
+- Covering classes of test:
+- Covering classes of test restriction:
 execution finished without any exception

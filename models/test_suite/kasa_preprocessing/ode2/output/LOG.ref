@@ -367,31 +367,31 @@ agent_type_2:
 ------------------------------------------------------------
 * Build BDU:
 ------------------------------------------------------------
-- BDU of test restriction:
-agent_type_0:
-site:0:state:0
-site:1:state:0
-agent_type_1:
-site:0:state:0
-site:0:state:0
-site:1:state:0
-site:1:state:0
-agent_type_2:
-site:0:state:0
-- BDU of test restriction:
+- Covering classes of test:
 agent_type_0:
 Covering_class_id:0
-site:0:state:0
+site_type:0
+site_type:1
 agent_type_1:
-Covering_class_id:1
-site:0:state:0
 Covering_class_id:0
-site:0:state:0
-Covering_class_id:1
-site:0:state:0
-Covering_class_id:0
-site:0:state:0
+site_type:0
+site_type:1
 agent_type_2:
+Covering_class_id:1
+site_type:0
 Covering_class_id:0
-site:0:state:0
+site_type:1
+- Covering classes of test restriction:
+agent_type_0:
+Covering_class_id:0
+site':2:state:0
+Covering_class_id:0
+site':1:state:0
+site':2:state:0
+agent_type_1:
+Covering_class_id:0
+site':1:state:0
+Covering_class_id:0
+Covering_class_id:1
+site':1:state:0
 execution finished without any exception

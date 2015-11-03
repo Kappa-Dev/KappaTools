@@ -26,82 +26,42 @@ let trace = false
 (************************************************************************************)
 (*restriction bdu_test*)
 
-let print_list_restriction result =
+let print_triple_list l =
   let rec aux acc =
     match acc with
     | [] -> []
-    | map :: tl ->
-      Int2Map_Modif.iter_map (fun (agent_type, site) (l1, set_state) ->
-        if l1 <> []
-        then ()
-        else ();
-        Site_map_and_set.iter_set (fun state -> 
-          fprintf stdout "site:%i:state:%i\n" site state
-        ) set_state;
-      ) map;
-      aux tl
-  in
-  aux result
-
-(*let print_with_id result =
-  let rec aux acc =
-    match acc with
-    | [] -> []
-    | (id, map) :: tl ->
+    | (id, _, set) :: tl ->
       fprintf stdout "Covering_class_id:%i\n" id;
-      let _ =
-        print_list_restriction map
-      in aux tl
-  in aux result*)
+      Site_map_and_set.iter_set (fun site ->
+        fprintf stdout "site_type:%i\n" site
+      ) set; aux tl
+  in aux l
 
-let print_restriction parameter error result =
+let print_pair_list l =
+  let rec aux acc =
+    match acc with
+    | [] -> []
+    | (id, m) :: tl ->
+      fprintf stdout "Covering_class_id:%i\n" id;
+      Site_map_and_set.iter_map (fun site state ->
+        fprintf stdout "site':%i:state:%i\n" site state
+      ) m; aux tl
+  in aux l
+
+let print_remanent_test parameter error result =
   AgentMap.print error
-    (fun error parameter l ->
+    (fun error parameter triple_list ->
       let _ =
-        print_list_restriction l
+        print_triple_list triple_list
       in
       error
     ) parameter result
-              
-(*TEST*)
-(*let print_map l l' =
-  let rec aux acc acc' =
-    match acc, acc' with
-    | [], [] | _, [] | [], _ -> []
-    | id :: tl, map :: tl' ->
-      fprintf stdout "Covering_class_id:%i\n" id;
-      Site_map_and_set.iter_map (fun site state ->
-        fprintf stdout "site:%i:state:%i\n" site state
-      ) map; aux tl tl'
-  in
-  aux l l'*)
 
-let print_map parameter error l l' =
-  let rec aux acc acc' =
-    match acc, acc' with
-    | [], [] | _, [] | [], _ -> []
-    | id :: tl, (site, state) :: tl' ->
-      fprintf stdout "Covering_class_id:%i\n" id;
-      fprintf stdout "site:%i:state:%i\n" site state;
-      aux tl tl'
-  in
-  aux l l'
-
-let print_list_pair parameter error result =
-  let rec aux acc =
-    match acc with
-    | [] -> []
-    | (id_list, l) :: tl ->
-      print_map parameter error id_list l;
-      aux tl
-  in
-  aux result
-
-let print_test parameter error result =
+let print_test_restriction parameter error result =
   AgentMap.print error
-    (fun error parameter l ->
+    (fun error parameter pair_list ->
       let _ =
-        print_list_pair parameter error l
+        print_pair_list pair_list
       in
       error
     ) parameter result
@@ -120,18 +80,18 @@ let print_bdu_build parameter error result =
   in
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
-      "- BDU of test restriction:\n";
-    print_restriction
+      "- Covering classes of test:\n";
+    print_remanent_test
       parameter
       error
-      result.store_restriction_bdu_test
+      result.store_remanent_test
   in
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
-      "- BDU of test restriction:\n";
-    print_test
+      "- Covering classes of test restriction:\n";
+    print_test_restriction
       parameter
       error
-      result.store_test
+      result.store_test_restriction
   in
   error
