@@ -26,11 +26,11 @@ let trace = false
 (************************************************************************************)
 (*restriction bdu_test*)
 
-let print_triple_list l =
+let print_four_list l =
   let rec aux acc =
     match acc with
     | [] -> []
-    | (id, _, set) :: tl ->
+    | (_, id, _, set) :: tl ->
       fprintf stdout "Covering_class_id:%i\n" id;
       Site_map_and_set.iter_set (fun site ->
         fprintf stdout "site_type:%i\n" site
@@ -50,9 +50,9 @@ let print_pair_list l =
 
 let print_remanent_test parameter error result =
   AgentMap.print error
-    (fun error parameter triple_list ->
+    (fun error parameter four_list ->
       let _ =
-        print_triple_list triple_list
+        print_four_list four_list
       in
       error
     ) parameter result
