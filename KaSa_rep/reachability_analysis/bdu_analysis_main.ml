@@ -200,8 +200,7 @@ let scan_rule_dynamic parameter error handler rule_id rule
 (************************************************************************************)
 (*rule bdu build*)
 
-let scan_rule_bdu_build parameter error rule covering_classes 
-    covering_class_set store_result =
+let scan_rule_bdu_build parameter error rule covering_classes store_result =
   let error, store_remanent_test =
     collect_remanent_test
       parameter
@@ -258,7 +257,6 @@ let scan_rule parameter error handler rule_id rule store_covering_classes
       error
       rule
       covering_classes
-      covering_class_set
       store_result.store_bdu_build
   in
   (*------------------------------------------------------------------------------*)
