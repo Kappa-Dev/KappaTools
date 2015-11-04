@@ -119,6 +119,53 @@ let print_remanent_creation parameter error result =
     ) parameter result
 
 (************************************************************************************)
+(*remanent modification*)
+    
+let print_remanent_modif parameter error result =
+  AgentMap.print error
+    (fun error parameter triple_list ->
+      let _ =
+	print_triple_list triple_list
+      in
+      error
+    ) parameter result
+
+(************************************************************************************)
+(*modification restriction*)
+
+let print_modif_restriction parameter error result =
+  AgentMap.print error
+    (fun error parameter pair_list ->
+      let _ =
+	print_pair_list pair_list
+      in
+      error
+    ) parameter result
+    
+(************************************************************************************)
+(*modification restriction list*)
+
+let print_pair_modif l l' =
+  let rec aux acc acc' =
+    match acc, acc' with
+      | [], [] | _, [] | [], _ -> []
+      | rule_id :: tl, site :: tl' ->
+	fprintf stdout "rule_id:%i\n" rule_id;
+	fprintf stdout "site_type':%i\n" site;
+	aux tl tl'
+  in
+  aux l l'
+    
+let print_modif_restriction_list parameter error result =
+  AgentMap.print error
+    (fun error parameter (rule_id_list, site_list) ->
+      let _ =
+	print_pair_modif rule_id_list site_list
+      in
+      error
+    ) parameter result
+    
+(************************************************************************************)
 (*main print*)
 
 let print_bdu_build parameter error result =
@@ -161,5 +208,29 @@ let print_bdu_build parameter error result =
       parameter
       error
       result.store_remanent_creation
+  in
+   let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "- Covering classes of modification:\n";
+    print_remanent_modif
+      parameter
+      error
+      result.store_remanent_modif
+  in
+  let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "- Covering classes of modification restriction:\n";
+    print_modif_restriction
+      parameter
+      error
+      result.store_modif_restriction
+  in
+  let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "- Modification restriction list:\n";
+    print_modif_restriction_list
+      parameter
+      error
+      result.store_modif_restriction_list
   in
   error

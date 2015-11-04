@@ -630,4 +630,43 @@ agent_type_2:  else
 agent_type_2:   false
 
 - Creation restriction:
+- Covering classes of modification:
+agent_type_0:
+Covering_class_id:0
+site_type:0
+agent_type_1:
+Covering_class_id:0
+site_type:0
+agent_type_2:
+Covering_class_id:0
+site_type:0
+site_type:1
+- Covering classes of modification restriction:
+agent_type_0:
+Covering_class_id:0
+site':1:state:2
+Covering_class_id:0
+site':1:state:0
+Covering_class_id:0
+site':1:state:1
+agent_type_1:
+Covering_class_id:0
+site':1:state:1
+Covering_class_id:0
+site':2:state:0
+Covering_class_id:0
+site':2:state:1
+agent_type_2:
+Covering_class_id:0
+site':1:state:1
+- Modification restriction list:
+agent_type_0:
+rule_id:2
+site_type':1
+agent_type_1:
+rule_id:2
+site_type':2
+agent_type_2:
+rule_id:2
+site_type':1
 execution finished without any exception

@@ -246,12 +246,40 @@ let scan_rule_bdu_build parameter error rule_id rule covering_classes store_resu
 	store_result.store_remanent_creation  
   in
   (*-------------------------------------------------------------------------------*)
+  let error, store_remanent_modif =
+    collect_remanent_modif
+      parameter
+      error
+      rule
+	covering_classes
+	  store_result.store_remanent_modif
+  in
+  let error, store_modif_restriction =
+    collect_modif_restriction
+      parameter
+      error
+      rule
+	store_remanent_modif
+	  store_result.store_modif_restriction
+  in
+  let error, store_modif_restriction_list =
+    collect_modif_list
+      parameter
+      error
+      rule_id
+      store_modif_restriction
+      store_result.store_modif_restriction_list
+  in
+  (*-------------------------------------------------------------------------------*)
   error, 
   {
     store_remanent_test    = store_remanent_test;
     store_test_restriction = store_test_restriction;
     store_bdu_test         = store_bdu_test;
-    store_remanent_creation = store_remanent_creation
+    store_remanent_creation = store_remanent_creation;
+    store_remanent_modif   = store_remanent_modif;
+    store_modif_restriction = store_modif_restriction;
+    store_modif_restriction_list = store_modif_restriction_list
   }
 
 (************************************************************************************)
@@ -367,13 +395,19 @@ let init_bdu_build parameter error =
   let error, init_remanent_test    = AgentMap.create parameter error 0 in
   let error, init_test_restriction = AgentMap.create parameter error 0 in
   let error, init_bdu_test         = AgentMap.create parameter error 0 in
-  let error, init_remanent_creation = AgentMap.create parameter error 0 in
+  let error, init_remanent_creation      = AgentMap.create parameter error 0 in
+  let error, init_remanent_modif         = AgentMap.create parameter error 0 in
+  let error, init_modif_restriction      = AgentMap.create parameter error 0 in
+  let error, init_modif_restriction_list = AgentMap.create parameter error 0 in
   let init_restriction_bdu_test =
     {
       store_remanent_test    = init_remanent_test;
       store_test_restriction = init_test_restriction;
       store_bdu_test         = init_bdu_test;
-      store_remanent_creation = init_remanent_creation
+      store_remanent_creation = init_remanent_creation;
+      store_remanent_modif    = init_remanent_modif;
+      store_modif_restriction      = init_modif_restriction;
+      store_modif_restriction_list = init_modif_restriction_list
     }
   in
   error, init_restriction_bdu_test

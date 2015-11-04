@@ -314,4 +314,22 @@ agent_type_0:  else
 agent_type_0:   false
 
 - Creation restriction:
+- Covering classes of modification:
+agent_type_0:
+Covering_class_id:0
+site_type:0
+- Covering classes of modification restriction:
+agent_type_0:
+Covering_class_id:0
+site':1:state:1
+Covering_class_id:0
+site':1:state:0
+Covering_class_id:0
+site':1:state:2
+Covering_class_id:0
+site':1:state:1
+- Modification restriction list:
+agent_type_0:
+rule_id:2
+site_type':1
 execution finished without any exception
