@@ -561,11 +561,11 @@ module Dag =
                       in 
                       let list = [Fresh (label i)] in 
                       begin (*2*)
-                        let g x = 
+                        let g x =
                           match Mods.IntMap.find_option x map with
 			  | Some x -> Former x
                           | None -> Fresh (label x)
-                        in 
+                        in
                         let sibbling1 = List.sort (quick_compare g) sibbling1 in
                         match 
                           aux map fresh_pos sibbling1 list to_beat 
@@ -581,6 +581,11 @@ module Dag =
                                   begin (*4*)
                                     let list = concat list [Stop] in 
                                     begin (*5*)
+				      let g x =
+					match Mods.IntMap.find_option x map with
+					| Some x -> Former x
+					| None -> Fresh (label x)
+				      in
                                       let sibbling2 = List.sort (quick_compare g) sibbling2 in 
                                       match 
                                         aux map fresh_pos sibbling2 list to_beat 
