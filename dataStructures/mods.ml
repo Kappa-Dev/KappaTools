@@ -3,18 +3,17 @@ let int_pair_compare (p,q) (p',q') =
   let o = int_compare p p' in
   if o = 0 then int_compare q q' else o
 
-module StringMap = MapExt.Make (String)
-module IntMap = MapExt.Make (struct type t = int let compare = int_compare end)
-module IntSet =
-  Set_patched.Make (struct type t = int let compare = int_compare end)
-module Int2Map =
-  MapExt.Make (struct type t = int*int let compare = int_pair_compare end)
-module StringSet = Set.Make (String)
-module Int2Set =
-  Set.Make (struct type t = int*int let compare = int_pair_compare end)
-module Int3Set = Set.Make (struct type t = int*int*int let compare= compare end)
-module StringIntMap =
-  MapExt.Make (struct type t = (string * int) let compare = compare end)
+module StringSetMap = SetMap.Make (String)
+module StringSet = StringSetMap.Set
+module StringMap = StringSetMap.Map
+module IntSetMap =
+  SetMap.Make (struct type t = int let compare = int_compare end)
+module IntSet = IntSetMap.Set
+module IntMap = IntSetMap.Map
+module Int2SetMap =
+  SetMap.Make (struct type t = int*int let compare = int_pair_compare end)
+module Int2Set = Int2SetMap.Set
+module Int2Map = Int2SetMap.Map
 
 module DynArray = DynamicArray.DynArray(LargeArray.GenArray)
 
@@ -256,7 +255,8 @@ module Palette:
 	struct
 	  type color = (float*float*float)
 	  type t = color IntMap.t
-	  let find = IntMap.find
+	  let find x p =
+	    match IntMap.find_option x p with Some c -> c | None -> raise Not_found
 	  let add = IntMap.add
 	  let mem = IntMap.mem
 	  let empty = IntMap.empty

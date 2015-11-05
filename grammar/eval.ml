@@ -56,11 +56,11 @@ let tokenify algs tokens contact_map domain l =
   List.fold_right
     (fun (alg_expr,(nme,pos)) (domain,out) ->
      let id =
-       try StringMap.find nme tokens
-       with Not_found ->
+       match StringMap.find_option nme tokens with
+       | Some x -> x
+       | none ->
 	 raise (ExceptionDefn.Malformed_Decl
-		  ("Token "^nme^" is undefined",pos))
-     in
+		  ("Token "^nme^" is undefined",pos)) in
      let (domain',(alg,_pos)) =
        Expr.compile_alg algs tokens contact_map domain alg_expr in
      (domain',(alg,id)::out)
@@ -92,7 +92,8 @@ let rules_of_ast ?deps_machinery algs tokens contact_map domain
 	 | (0 | 1) -> unrate,None,uncc
 	 | 2 ->
 	    crate,Some unrate,
-	    Connected_component.Set.add ccs.(0) (Connected_component.Set.add ccs.(1) uncc)
+	    Connected_component.SetMap.Set.add
+	      ccs.(0) (Connected_component.SetMap.Set.add ccs.(1) uncc)
 	 | n ->
 	    raise (ExceptionDefn.Malformed_Decl
 		     ("Unary rule does not deal with "^
@@ -139,12 +140,12 @@ let rules_of_ast ?deps_machinery algs tokens contact_map domain
 			       | None -> failwith "ugly Eval.rule_of_ast")),
     unary_ccs',rules_l in
   let rev = match ast_rule.arrow, ast_rule.k_op with
-    | RAR, None -> domain'',deps_machinery,Connected_component.Set.empty,[]
+    | RAR, None -> domain'',deps_machinery,Connected_component.SetMap.Set.empty,[]
     | LRAR, Some rate ->
        let un_rate = match ast_rule.k_un with None -> None | Some (_,x) -> x in
-       one_side (~- syntax_ref)
-		(opposite label) (domain'',deps_machinery,Connected_component.Set.empty,[]) rate un_rate
-		ast_rule.rhs ast_rule.lhs add_toks rm_toks
+       one_side (~- syntax_ref) (opposite label)
+	 (domain'',deps_machinery,Connected_component.SetMap.Set.empty,[]) rate un_rate
+	 ast_rule.rhs ast_rule.lhs add_toks rm_toks
     | (RAR, Some _ | LRAR, None) ->
        raise
 	 (ExceptionDefn.Malformed_Decl
@@ -245,16 +246,15 @@ let effects_of_modif
 	    rule_effect alg_expr ast_rule mix_pos
 	 | UPDATE ((nme, pos_rule), alg_expr) ->
 	    let i,is_rule =
-	      (try (StringMap.find nme rules.NamedDecls.finder,true)
-	       with
-	       | Not_found ->
-		  try
-		    (StringMap.find nme algs.NamedDecls.finder, false)
-		  with Not_found ->
-		    raise (ExceptionDefn.Malformed_Decl
-			     ("Variable " ^ (nme ^ " is neither a constant nor a rule")
-			     ,pos_rule))
-	      ) in
+	      match StringMap.find_option nme rules.NamedDecls.finder with
+	      | Some x -> (x,true)
+	      | None ->
+		match StringMap.find_option nme algs.NamedDecls.finder with
+		| Some x -> (x, false)
+		| None ->
+		  raise (ExceptionDefn.Malformed_Decl
+			   ("Variable " ^ (nme ^ " is neither a constant nor a rule")
+			       ,pos_rule)) in
 	    let (domain', alg_pos) =
 	      Expr.compile_alg algs.NamedDecls.finder tokens.NamedDecls.finder
 			       contact_map domain alg_expr in
@@ -613,9 +613,10 @@ let compile_rules algs alg_deps tokens contact_map domain rules =
 	 rules_of_ast algs tokens ?deps_machinery contact_map domain
 		      ~syntax_ref rule_label rule in
        (domain',succ syntax_ref,origin',
-	Connected_component.Set.union unary_cc extra_unary_cc,
+	Connected_component.SetMap.Set.union unary_cc extra_unary_cc,
 	List.append cr acc))
-      (domain,1,Some (Operator.RULE 0,alg_deps),Connected_component.Set.empty,[])
+      (domain,1,Some (Operator.RULE 0,alg_deps),
+       Connected_component.SetMap.Set.empty,[])
       rules with
   | fdomain,_,Some (_,falg_deps),unary_cc,frules ->
      fdomain,falg_deps,List.rev frules,unary_cc

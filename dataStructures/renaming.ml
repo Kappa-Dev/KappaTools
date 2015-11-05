@@ -29,8 +29,9 @@ let fold f i = IntMap.fold f i.sigma
 let identity l = {sigma = List.fold_left (fun out x -> IntMap.add x x out) IntMap.empty l ; is_identity = true}
 
 let apply i x =
-        let app () = try IntMap.find x i.sigma with Not_found -> raise Undefined
-        in
+        let app () = match IntMap.find_option x i.sigma with
+	  | Some x  -> x
+	  | None -> raise Undefined in
         if not i.is_identity then app ()
         else
            if !Parameter.debugModeOn then app () else x

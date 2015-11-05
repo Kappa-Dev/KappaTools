@@ -23,7 +23,7 @@ val value_bool :
 val apply_rule :
   ?rule_id:int ->
   get_alg:(int -> Alg_expr.t) -> Connected_component.Env.t
-  -> Connected_component.Set.t -> Mods.Counter.t
+  -> Connected_component.SetMap.Set.t -> Mods.Counter.t
   -> t -> Causal.event_kind -> Primitives.elementary_rule -> result
 (** Returns the graph obtained by applying the rule.
  [rule_id] is mandatory if the rula has an unary rate.*)
@@ -31,14 +31,14 @@ val apply_rule :
 val apply_unary_rule :
   rule_id:int ->
   get_alg:(int -> Alg_expr.t) -> Connected_component.Env.t
-  -> Connected_component.Set.t -> Mods.Counter.t
+  -> Connected_component.SetMap.Set.t -> Mods.Counter.t
   -> t -> Causal.event_kind -> Primitives.elementary_rule -> result
 (** Returns the graph obtained by applying the rule.
  [rule_id] is mandatory if the rula has an unary rate.*)
 
 val force_rule :
   get_alg:(int -> Alg_expr.t) -> Connected_component.Env.t
-  -> Connected_component.Set.t -> Mods.Counter.t
+  -> Connected_component.SetMap.Set.t -> Mods.Counter.t
   -> t -> Causal.event_kind -> Primitives.elementary_rule ->
   (t * Connected_component.Matching.t list option)
 (** Apply the rule for sure if it is possible. Try [apply_rule] but in
@@ -74,5 +74,5 @@ val generate_stories : Format.formatter -> Environment.t -> t -> unit
 
 val print_injections :
   ?sigs:Signature.s -> (Format.formatter -> 'a -> unit) -> Format.formatter ->
-  'a ValMap.tree Connected_component.Map.t -> unit
+  'a ValMap.tree Connected_component.SetMap.Map.t -> unit
 val debug_print : Format.formatter -> t -> unit

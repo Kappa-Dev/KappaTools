@@ -25,25 +25,25 @@ let trace = false
 (*****************************************************************************************)
 (*TYPE*)
   
-module Int2Map =
-  MapExt.Make (
-    struct
-      type t = Cckappa_sig.agent_name * Cckappa_sig.site_name * Cckappa_sig.state_index
-      let compare = compare
-    end
-  )
+module Int3SetMap = SetMap.Make (
+  struct
+    type t = Cckappa_sig.agent_name * Cckappa_sig.site_name * Cckappa_sig.state_index
+    let compare = compare
+  end
+)
+module Int3Map = Int3SetMap.Map
 
-type binding_dual = ((int list) * (int * int * int) list) Int2Map.t
+type binding_dual = ((int list) * (int * int * int) list) Int3Map.t
 
 let precise_binding_dual parameter error handler rule sol_binding =
-  let sol = Int2Map.empty in
+  let sol = Int3Map.empty in
   (*add_link*)
   let add_link (a, b, s) (c, d, s') sol =
     let l, old =
-      try Int2Map.find (a, b, s) sol
+      try Int3Map.find (a, b, s) sol
       with Not_found -> [],[]
     in
-    Int2Map.add (a, b, s) (l, ((c, d, s') :: old)) sol
+    Int3Map.add (a, b, s) (l, ((c, d, s') :: old)) sol
   in  
   (*return the site name of site: this of type string*)
   (*folding this solution with the information in dual*)
@@ -71,12 +71,12 @@ let precise_binding_dual parameter error handler rule sol_binding =
       ) handler.dual sol
   in
   (*Return the result of this contact map*)
-  let sol = Int2Map.map (fun (l, x) -> List.rev l, x) sol
+  let sol = Int3Map.map (fun (l, x) -> List.rev l, x) sol
   in
   sol
 
 let print_precise parameter error precise =
-  Int2Map.iter
+  Int3Map.iter
     (fun (x, y, s) (l1, l2) ->
       if l1 <> []
       then
@@ -106,26 +106,18 @@ let print_precise parameter error precise =
 (************************************************************************************)   
 (*Dual information and binding information*)
 
-module Int2Map_pair =
-  MapExt.Make (
-    struct
-      type t = int * int
-      let compare = compare
-    end
-  )
-
-type contact_map = ((int list) * (int * int) list) Int2Map_pair.t
+type contact_map = ((int list) * (int * int) list) Mods.Int2Map.t
 
 let compute_contact_map parameter error handler =
   (*create empty map*)
-  let sol = Int2Map_pair.empty in
+  let sol = Mods.Int2Map.empty in
   (*add_link*)
   let add_link (a, b) (c, d) sol =
     let l, old =
-      try Int2Map_pair.find (a, b) sol
+      try Mods.Int2Map.find (a, b) sol
       with Not_found -> [],[]
     in
-    Int2Map_pair.add (a, b) (l, ((c, d) :: old)) sol
+    Mods.Int2Map.add (a, b) (l, ((c, d) :: old)) sol
   in  
   (*return the site name of site: this of type string*)
   (*folding this solution with the information in dual*)
@@ -139,7 +131,7 @@ let compute_contact_map parameter error handler =
       ) handler.dual sol
   in
   (*Return the result of this contact map*)
-  let sol = Int2Map_pair.map (fun (l, x) -> List.rev l, x) sol
+  let sol = Mods.Int2Map.map (fun (l, x) -> List.rev l, x) sol
   in
   Some sol
 
@@ -151,10 +143,10 @@ let compute_contact_map parameter error handler =
 let collect_binding_rhs parameter error rule sol =
   let add_link (a, b) (c, d) sol =
     let l, old =
-      try Int2Map_pair.find (a, b) sol
+      try Mods.Int2Map.find (a, b) sol
       with Not_found -> [], []
     in
-    Int2Map_pair.add (a, b) (l, ((c, d) :: old)) sol
+    Mods.Int2Map.add (a, b) (l, ((c, d) :: old)) sol
   in
   let error, sol =
     List.fold_left (fun (error, sol) (add1, add2) ->
@@ -169,11 +161,11 @@ let collect_binding_rhs parameter error rule sol =
     ) (error, sol)
       rule.actions.bind
   in
-  let sol = Int2Map_pair.map (fun (l, x) -> List.rev l, x) sol in
+  let sol = Mods.Int2Map.map (fun (l, x) -> List.rev l, x) sol in
   sol
 
 let print_collect_binding_rhs parameter error binding =
-  Int2Map_pair.iter
+  Mods.Int2Map.iter
     (fun (x, y) (l1, l2) ->
       if l1 <> []
       then
@@ -204,7 +196,7 @@ let print_contact_map parameter error contact_map =
   let _ = fprintf stdout "Contact map:\n" in
   match contact_map with
   | Some p ->
-    Int2Map_pair.iter
+    Mods.Int2Map.iter
       (fun (x, y) (l1, l2) ->
         if l1 <> []
         then

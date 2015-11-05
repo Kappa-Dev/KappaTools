@@ -307,7 +307,7 @@ module Cflow_linker =
 	 let maybe_side_effect =
 	   if bool then fun se -> se
 	   else fun _ -> List.rev_append side_effect side in
-	 let translate y = try Mods.IntMap.find y subs with Not_found -> y in
+	 let translate y = Mods.IntMap.find_default y y subs in
          match (k:refined_step) with
          | Event (id,event) ->
 	    let (tests,(actions,side_effects,kappa_side)) =

@@ -68,5 +68,4 @@ module Matching : sig
   (** [observables_from_link domain graph sort ag site sort' ag' site'] *)
 end
 
-module Set : Set_patched.S with type elt=t
-module Map : MapExt.S with type key=t
+module SetMap : SetMap.S with type elt=t

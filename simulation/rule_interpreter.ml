@@ -2,25 +2,26 @@ type jf_data =
   Compression_main.secret_log_info * Compression_main.secret_step list
 
 type t = {
-  roots_of_ccs: int ValMap.tree Connected_component.Map.t;
+  roots_of_ccs: int ValMap.tree Connected_component.SetMap.Map.t;
   unary_candidates: (int * int) ValMap.tree Mods.IntMap.t;
   unary_pathes: Edges.path Mods.Int2Map.t;
   edges: Edges.t;
   tokens: Nbr.t array;
   outdated_elements:
-    Operator.DepSet.t * (int * ((Connected_component.Set.t *int) * Edges.path) list) list * bool;
+    Operator.DepSet.t *
+    (int * ((Connected_component.SetMap.Set.t *int) * Edges.path) list) list * bool;
   free_id: int;
   story_machinery :
     ((Causal.event_kind * Connected_component.t array *
 	Instantiation.abstract Instantiation.test list) list
-       Connected_component.Map.t (*currently tracked ccs *)
+       Connected_component.SetMap.Map.t (*currently tracked ccs *)
      * jf_data) option;
 }
 
 type result = Clash | Success of t | Corrected of t
 
 let empty ~has_tracking env = {
-    roots_of_ccs = Connected_component.Map.empty;
+    roots_of_ccs = Connected_component.SetMap.Map.empty;
     unary_candidates = Mods.IntMap.empty;
     unary_pathes = Mods.Int2Map.empty;
     edges = Edges.empty;
@@ -29,7 +30,7 @@ let empty ~has_tracking env = {
     free_id = 1;
     story_machinery =
       if has_tracking
-      then Some (Connected_component.Map.empty,
+      then Some (Connected_component.SetMap.Map.empty,
 		 (Compression_main.init_secret_log_info (), []))
       else None;
 }
@@ -40,7 +41,7 @@ let print_heap pr f h =
 let print_injections ?sigs pr f roots_of_ccs =
   Format.fprintf
     f "@[<v>%a@]"
-    (Pp.set Connected_component.Map.bindings Pp.space
+    (Pp.set Connected_component.SetMap.Map.bindings Pp.space
 	    (fun f (cc,roots) ->
 	     Format.fprintf
 	       f "@[# @[%a@] ==>@ @[%a@]@]"
@@ -49,21 +50,21 @@ let print_injections ?sigs pr f roots_of_ccs =
     ) roots_of_ccs
 
 let update_roots is_add map cc root =
-  let va = try Connected_component.Map.find cc map
-	   with Not_found -> ValMap.empty in
-  Connected_component.Map.add
+  let va =
+    Connected_component.SetMap.Map.find_default ValMap.empty cc map in
+  Connected_component.SetMap.Map.add
     cc ((if is_add then ValMap.add else ValMap.remove) root va) map
 
 let add_candidate cands pathes rule_id x y p =
   let a = min x y in
   let b = max x y in
-  let va = try Mods.IntMap.find rule_id cands with Not_found -> ValMap.empty in
+  let va = Mods.IntMap.find_default ValMap.empty rule_id cands in
   (Mods.IntMap.add rule_id (ValMap.add (x,y) va) cands,
    Mods.Int2Map.add (a,b) p pathes)
 let remove_candidate cands pathes rule_id x y =
   let a = min x y in
   let b = max x y in
-  let va = ValMap.remove (x,y) (Mods.IntMap.find rule_id cands) in
+  let va = ValMap.remove (x,y) (Mods.IntMap.find_default ValMap.empty rule_id cands) in
   ((if ValMap.is_empty va then Mods.IntMap.remove rule_id cands
     else Mods.IntMap.add rule_id va cands),
    Mods.Int2Map.remove (a,b) pathes)
@@ -74,8 +75,9 @@ let from_place (inj_nodes,inj_fresh,free_id as inj2graph) = function
       Connected_component.Matching.get (n,id) inj_nodes,
       inj2graph)
   | Agent_place.Fresh (ty,id) ->
-     try (ty,Mods.IntMap.find id inj_fresh,inj2graph)
-     with Not_found ->
+     match Mods.IntMap.find_option id inj_fresh with
+     | Some x -> (ty,x,inj2graph)
+     | None ->
        ty,free_id,(inj_nodes,Mods.IntMap.add id free_id inj_fresh,succ free_id)
 
 let all_injections ?excp edges roots cca =
@@ -95,7 +97,7 @@ let all_injections ?excp edges roots cca =
 	     when Connected_component.is_equal_canonicals cc cc' ->
 	   ValMap.add root ValMap.empty
 	| (Some _ | None) ->
-	   Connected_component.Map.find cc roots) [])
+	   Connected_component.SetMap.Map.find_default ValMap.empty  cc roots) [])
     [Connected_component.Matching.empty] cca
 
 let deal_transformation is_add domain to_explore_unaries inj2graph edges roots transf =
@@ -197,18 +199,18 @@ let store_obs edges roots obs acc = function
 			   tests in
 		(ev,tests') :: acc)
 	       acc (all_injections ~excp:(cc,root) edges roots ccs))
-	    acc (Connected_component.Map.find cc tracked)
+	    acc (Connected_component.SetMap.Map.find_default [] cc tracked)
 	with Not_found -> acc)
        acc obs
 
 let potential_root_of_unary_ccs unary_ccs roots i =
   let ccs =
-    Connected_component.Set.filter
+    Connected_component.SetMap.Set.filter
       (fun cc ->
-       try ValMap.mem i (Connected_component.Map.find cc roots)
-       with Not_found -> false)
+	ValMap.mem
+	  i (Connected_component.SetMap.Map.find_default ValMap.empty cc roots))
       unary_ccs in
-  if Connected_component.Set.is_empty ccs then None else Some ccs
+  if Connected_component.SetMap.Set.is_empty ccs then None else Some ccs
 
 let update_edges counter domain unary_ccs inj_nodes state event_kind rule =
   let former_deps,unary_cands,no_unary = state.outdated_elements in
@@ -240,8 +242,8 @@ let update_edges counter domain unary_ccs inj_nodes state event_kind rule =
     List.fold_left
       (List.fold_left
 	 (fun (unary_cands,_ as acc) (cc,root) ->
-	  if Connected_component.Set.mem cc unary_ccs then
-	    (root,[(Connected_component.Set.singleton cc,root),Edges.empty_path])::unary_cands,false
+	  if Connected_component.SetMap.Set.mem cc unary_ccs then
+	    (root,[(Connected_component.SetMap.Set.singleton cc,root),Edges.empty_path])::unary_cands,false
 	  else acc)) (unary_cands,no_unary) all_new_obs in
   let unary_cands',no_unary' =
     List.fold_left
@@ -265,9 +267,8 @@ let update_edges counter domain unary_ccs inj_nodes state event_kind rule =
 
 let raw_instance_number state ccs_l =
   let size cc =
-    try
-      ValMap.total (Connected_component.Map.find cc state.roots_of_ccs)
-    with Not_found -> 0 in
+    ValMap.total (Connected_component.SetMap.Map.find_default
+		    ValMap.empty cc state.roots_of_ccs) in
   let rect_approx ccs =
     Array.fold_left (fun acc cc ->  acc * (size cc)) 1 ccs in
   List.fold_left (fun acc ccs -> acc + (rect_approx ccs)) 0 ccs_l
@@ -299,14 +300,22 @@ let new_unary_instances rule_id cc1 cc2 created_obs state =
        List.fold_left
 	 (fun acc ((ccs,id),path) ->
 	  let path = Edges.rev_path path in
-	  Connected_component.Set.fold
+	  Connected_component.SetMap.Set.fold
 	    (fun cc acc ->
 	     try
 	       let goals,reverse =
 		 if Connected_component.is_equal_canonicals cc cc1
-		 then Connected_component.Map.find cc2 state.roots_of_ccs,false
+		 then 
+		   match Connected_component.SetMap.Map.find_option
+		     cc2 state.roots_of_ccs with
+		   | Some x -> x,false
+		   | None -> raise Not_found
 		 else if Connected_component.is_equal_canonicals cc cc2
-		 then Connected_component.Map.find cc1 state.roots_of_ccs,true
+		 then 
+		   match Connected_component.SetMap.Map.find_option
+		     cc1 state.roots_of_ccs with
+		   | Some x -> x,true
+		   | None -> raise Not_found
 		 else raise Not_found in
 	       List.fold_left
 		 (fun (cands,pathes) (((),d),p) ->
@@ -363,9 +372,8 @@ let update_outdated_activities ~get_alg store env counter state =
 		i rule.Primitives.connected_components.(0)
 		rule.Primitives.connected_components.(1) unary_cands state in
 	    let va =
-	      try
-		ValMap.total (Mods.IntMap.find i state'.unary_candidates)
-	      with Not_found -> 0 in
+	      ValMap.total
+		(Mods.IntMap.find_default ValMap.empty i state'.unary_candidates) in
 	    let () =
 	      store_activity (2*i+1) rule.Primitives.syntactic_rule unrate va in
 	    state') state env in
@@ -391,11 +399,15 @@ let transform_by_a_rule
 let apply_unary_rule
       ~rule_id ~get_alg domain unary_ccs counter state event_kind rule =
   let root1,root2 =
-    ValMap.random_val (Mods.IntMap.find rule_id state.unary_candidates) in
+    ValMap.random_val
+      (Mods.IntMap.find_default ValMap.empty rule_id state.unary_candidates) in
   let cc1 = rule.Primitives.connected_components.(0) in
   let cc2 = rule.Primitives.connected_components.(1) in
   let pair = (min root1 root2,max root1 root2) in
-  let candidate = Mods.Int2Map.find pair state.unary_pathes in
+  let candidate = 
+    match Mods.Int2Map.find_option pair state.unary_pathes with
+    | Some x -> x
+    | None -> raise Not_found in
   let cands,pathes = remove_candidate state.unary_candidates state.unary_pathes
 				      rule_id root1 root2 in
   let deps,unary_cands,_ = state.outdated_elements in
@@ -405,11 +417,11 @@ let apply_unary_rule
       outdated_elements =
 	(Operator.DepSet.add (Operator.RULE rule_id) deps,unary_cands,false)} in
   let missing_ccs =
-    try
       not @@
-	ValMap.mem root1 (Connected_component.Map.find cc1 state.roots_of_ccs) &&
-	ValMap.mem root2 (Connected_component.Map.find cc2 state.roots_of_ccs)
-    with Not_found -> true in
+	ValMap.mem root1 (Connected_component.SetMap.Map.find_default
+			    ValMap.empty cc1 state.roots_of_ccs) &&
+	ValMap.mem root2 (Connected_component.SetMap.Map.find_default
+			    ValMap.empty cc2 state.roots_of_ccs) in
   match Edges.are_connected ~candidate state.edges root1 root2 with
   | None -> Corrected state'
   | Some _ when missing_ccs -> Corrected state'
@@ -436,7 +448,8 @@ let apply_rule ?rule_id ~get_alg domain unary_ccs counter state event_kind rule 
       (fun id inj cc ->
        let root =
 	 ValMap.random_val
-	   (Connected_component.Map.find cc state.roots_of_ccs) in
+	   (Connected_component.SetMap.Map.find_default
+	      ValMap.empty cc state.roots_of_ccs) in
        (match inj with
        | Some inj ->
 	  Connected_component.Matching.reconstruct state.edges inj id cc root
@@ -455,7 +468,10 @@ let apply_rule ?rule_id ~get_alg domain unary_ccs counter state event_kind rule 
      | Some _ ->
 	try
 	  let point = (min roots.(0) roots.(1), max roots.(0) roots.(1)) in
-	  let candidate = Mods.Int2Map.find point state.unary_pathes in
+	  let candidate = 
+	    match Mods.Int2Map.find_option point state.unary_pathes with
+	    | Some x -> x
+	    | None -> raise Not_found in
 	  match
 	    Edges.are_connected ~candidate state.edges roots.(0) roots.(1) with
 	  | None ->
@@ -535,10 +551,8 @@ let add_tracked ccs event_kind tests state =
      let tcc' =
      Array.fold_left
        (fun tcc cc ->
-	let acc =
-	  try Connected_component.Map.find cc tcc
-	  with Not_found -> [] in
-	Connected_component.Map.add cc ((event_kind,ccs,tests)::acc) tcc)
+	let acc = Connected_component.SetMap.Map.find_default [] cc tcc in
+	Connected_component.SetMap.Map.add cc ((event_kind,ccs,tests)::acc) tcc)
        tcc ccs in
      { state with story_machinery = Some (tcc',x) }
 
@@ -556,10 +570,10 @@ let remove_tracked ccs state =
      let tcc' =
      Array.fold_left
        (fun tcc cc ->
-	let acc = Connected_component.Map.find cc tcc in
+	let acc = Connected_component.SetMap.Map.find_default [] cc tcc in
 	match List.filter tester acc with
-	| [] -> Connected_component.Map.remove cc tcc
-	| l -> Connected_component.Map.add cc l tcc)
+	| [] -> Connected_component.SetMap.Map.remove cc tcc
+	| l -> Connected_component.SetMap.Map.add cc l tcc)
        tcc ccs in
      { state with story_machinery = Some (tcc',x) }
 

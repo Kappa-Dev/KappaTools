@@ -11,6 +11,8 @@ module Edge = struct
     | Link (_,n,s), Link (_,n',s') ->
        let c = int_compare n n' in
        if c <> 0 then c else int_compare s s'
+
+  let dummy_link = Link (-1,-1,-1)
 end
 
 type t = Edge.t Int2Map.t * int Int2Map.t * int IntMap.t
@@ -40,20 +42,24 @@ let remove_internal ag s i (connect,state,sort) =
 let remove_link ag s ag' s' t = remove ag s t (Edge.Link (-1,ag',s'))
 
 let is_free ag s (t,_,_) =
-  try Int2Map.find (ag,s) t = Edge.ToFree with Not_found -> false
+  match Int2Map.find_default Edge.dummy_link (ag,s) t with
+  | Edge.ToFree -> true
+  | Edge.Link _ -> false
 let is_internal i ag s (_,t,_) =
-  try Int2Map.find (ag,s) t = i with Not_found -> false
+  match Int2Map.find_option (ag,s) t with
+  | Some j -> j = i
+  | None -> false
 let link_exists ag s ag' s' (t,_,_) =
-  try match Int2Map.find (ag,s) t with
-      | Edge.Link (_,ag'',s'') -> ag'=ag'' && s'=s''
-      | Edge. ToFree -> false
-  with Not_found -> false
+  match Int2Map.find_default Edge.ToFree (ag,s) t with
+  | Edge.Link (_,ag'',s'') -> ag'=ag'' && s'=s''
+  | Edge.ToFree -> false
+
 let exists_fresh ag s ty s' (t,_,_) =
-  try match Int2Map.find (ag,s) t with
-      | Edge.Link (ty',ag',s'') ->
-	 if ty'=ty && s'=s'' then Some ag' else None
-      | Edge. ToFree -> None
-  with Not_found -> None
+  match Int2Map.find_option (ag,s) t with
+  | Some (Edge.Link (ty',ag',s'')) ->
+    if ty'=ty && s'=s'' then Some ag' else None
+  | Some Edge.ToFree -> None
+  | None -> None
 
 (** The snapshot machinery *)
 let one_connected_component sigs free_id node graph =
@@ -135,14 +141,14 @@ let debug_print f (links,ints,sorts) =
     (fun f ((ag,s),l) ->
      let () =
        if s=0 then
-	 let ty = try IntMap.find ag sorts with Not_found -> -42 in
+	 let ty = IntMap.find_default (-42) ag sorts in
 	 let () = if ag <> 1 then Format.fprintf f "@])%t" Pp.space in
 	 Format.fprintf f "%i:%i(@[" ag ty in
      Format.fprintf
        f "%i%t%t" s
-       (try let int = Int2Map.find (ag,s) ints in
-	    fun f -> Format.fprintf f "~%i" int
-	with Not_found -> fun _ -> ())
+       (match Int2Map.find_option (ag,s) ints with
+       | Some int -> fun f -> Format.fprintf f "~%i" int
+       | None -> fun _ -> ())
        (match l with
 	| Edge.ToFree -> fun _ -> ()
 	| Edge.Link (ty',ag',s') ->

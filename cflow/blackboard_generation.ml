@@ -157,9 +157,9 @@ module Preblackboard =
      module PredicateidMap = Map.Make (struct type t = predicate_id let compare = compare end)
      module SidMap = Map.Make (struct type t = step_id let compare = compare end
 )
-     module AgentIdMap = Map.Make (struct type t = CI.Po.K.agent_id let compare = compare end)
+     module AgentIdMap = Mods.IntMap
      module AgentId2Map = Map.Make (struct type t = CI.Po.K.agent_id*CI.Po.K.agent_id let compare=compare end)
-     module AgentIdSet = Set_patched.Make (struct type t = CI.Po.K.agent_id let compare = compare end)
+     module AgentIdSet = Mods.IntSet
      module AgentId2Set = Set.Make (struct type t = CI.Po.K.agent_id*CI.Po.K.agent_id let compare=compare end)
      module SiteIdSet = Set.Make (struct type t = (CI.Po.K.agent_id*Instantiation.site_name) let compare=compare end)
      module SiteIdMap = Map.Make (struct type t = (CI.Po.K.agent_id*Instantiation.site_name) let compare=compare end)
@@ -1027,10 +1027,7 @@ module Preblackboard =
            }
          let add_subs_test test ag_id data_structure = 
            let old = 
-             try 
-               AgentIdMap.find ag_id data_structure.other_agents_tests
-             with 
-             | Not_found -> []
+               AgentIdMap.find_default [] ag_id data_structure.other_agents_tests
            in 
            {
              data_structure 
@@ -1070,10 +1067,7 @@ module Preblackboard =
            }
          let add_subs_action action ag_id data_structure = 
            let old = 
-             try 
-               AgentIdMap.find ag_id data_structure.other_agents_actions
-             with 
-             | Not_found -> []
+             AgentIdMap.find_default [] ag_id data_structure.other_agents_actions
            in 
            {
              data_structure 
@@ -1115,10 +1109,8 @@ module Preblackboard =
            let agent = CI.Po.K.agent_of_site site in 
            let agent_id = CI.Po.K.agent_id_of_agent agent in 
            let old = 
-             try 
-               AgentIdMap.find agent_id data_structure.other_agents_side_effects
-             with 
-             | Not_found -> []
+             AgentIdMap.find_default
+	       [] agent_id data_structure.other_agents_side_effects
            in 
            { 
              data_structure 
@@ -1526,11 +1518,9 @@ module Preblackboard =
                        let set' = AgentIdSet.add id set in
                        if set == set'
                        then 
-                         try 
-                           let _ = AgentIdMap.find id mixture_agent_id_mutex in
+                         if AgentIdMap.mem id mixture_agent_id_mutex then
                            (error,log_info,blackboard,mixture_agent_id_mutex,set,init_step)
-                         with
-                           Not_found -> 
+			 else
                              begin 
                                let predicate_info = Mutex (Lock_rectangular (step_id,id)) in 
                                let error,blackboard,predicate_id = allocate parameter handler error blackboard predicate_info in 
@@ -1805,22 +1795,12 @@ module Preblackboard =
              AgentIdMap.fold 
                (fun rule_ag_id l (error,log_info,blackboard,init_step,nlist) -> 
                  let test_list,action_list,side_effect = 
-                   begin 
-                     try 
-                       AgentIdMap.find rule_ag_id data_structure.other_agents_tests 
-                     with 
-                       Not_found -> []
-                   end ,
-                     begin 
-                       try 
-                         AgentIdMap.find rule_ag_id data_structure.other_agents_actions 
-                       with 
-                         Not_found -> []
-                     end ,
-                       try 
-                         AgentIdMap.find rule_ag_id data_structure.other_agents_side_effects
-                       with 
-                         Not_found -> []
+                   AgentIdMap.find_default
+		     [] rule_ag_id data_structure.other_agents_tests,
+                   AgentIdMap.find_default
+		     [] rule_ag_id data_structure.other_agents_actions,
+                   AgentIdMap.find_default
+		     [] rule_ag_id data_structure.other_agents_side_effects
                  in 
                  List.fold_left 
                    (fun (error,log_info,blackboard,init_step,nlist) mixture_ag_id -> 
@@ -1909,12 +1889,12 @@ module Preblackboard =
                          side_effect 
                      in 
                      let pid_rule_agent_mutex = 
-                       try 
-                         AgentIdMap.find 
-                           rule_ag_id 
-                           data_structure.rule_agent_id_mutex 
-                       with 
-                         Not_found ->
+                       match AgentIdMap.find_option
+                         rule_ag_id 
+                         data_structure.rule_agent_id_mutex 
+                       with
+		       | Some x -> x
+		       | None ->
                          (*let () =
 			   Format.fprintf f? "ERROR line 1332: %i@." rule_ag_id in*)
 			 raise Exit
@@ -1947,29 +1927,27 @@ module Preblackboard =
                          action_map
                      in 
                      let test_map,action_map = 
-                       try 
-                         let m_id = 
-                           AgentIdMap.find 
-                             rule_ag_id 
-                             data_structure.rule_agent_id_subs 
-                         in 
-                         PredicateidMap.add 
+                       match 
+			 AgentIdMap.find_option
+                           rule_ag_id 
+                           data_structure.rule_agent_id_subs with
+                           | Some m_id ->
+			     PredicateidMap.add 
                            m_id 
                            (Counter 0)
                            test_map,
                          PredicateidMap.add 
                            m_id 
                            (Pointer_to_agent mixture_ag_id)
-                           action_map 
-                       with Not_found -> test_map,action_map
+                           action_map
+			   | None -> test_map,action_map
                      in
                      let test_map,action_map = 
-                       try 
-                         let m_id = 
-                           AgentIdMap.find 
+                       match
+			 AgentIdMap.find_option
                              mixture_ag_id 
-                             data_structure.mixture_agent_id_mutex 
-                         in 
+                             data_structure.mixture_agent_id_mutex with
+		       | Some m_id ->
                          PredicateidMap.add 
                            m_id 
                            (Counter 0)
@@ -1978,8 +1956,7 @@ module Preblackboard =
                            m_id
                            (Counter 1)
                            action_map 
-                       with 
-                       | Not_found -> test_map,action_map
+                       | None -> test_map,action_map
                      in 
                      let g x = 
                        match x 
@@ -2091,16 +2068,19 @@ according to the corresponding substitution *)
                  let link_mutex = AgentId2Map.find link data_structure.links_mutex in 
                  let rule_ag_id1,rule_ag_id2=link in 
                  let subs_1,l_ag_1 = 
-                   try 
-                     true,AgentIdMap.find rule_ag_id1 data_structure.old_agents_potential_substitution
-                   with 
-                     Not_found -> false,[rule_ag_id1]
+                   match AgentIdMap.find_option
+		     rule_ag_id1 data_structure.old_agents_potential_substitution
+                   with
+		   | Some x -> true, x
+                   | None -> false,[rule_ag_id1]
                  in 
                  let subs_2,l_ag_2 = 
-                    try 
-                     true,AgentIdMap.find rule_ag_id2 data_structure.old_agents_potential_substitution
-                   with 
-                     Not_found -> false,[rule_ag_id2]
+                     
+                     match AgentIdMap.find_option
+		       rule_ag_id2 data_structure.old_agents_potential_substitution
+                     with
+		     | Some x -> true, x 
+                     | None -> false,[rule_ag_id2]
                  in 
                  let test_list = 
                    try 
@@ -2144,10 +2124,7 @@ according to the corresponding substitution *)
                                  test_list,action_list
                                else 
                                  let f x = 
-                                   try 
-                                     AgentIdMap.find x subs 
-                                   with 
-                                   | Not_found -> x 
+                                   AgentIdMap.find_default x x subs 
                                  in 
                                  Tools.list_smart_map
 				   (Instantiation.subst_map_agent_in_concrete_test f)
@@ -2207,26 +2184,24 @@ according to the corresponding substitution *)
                              in 
                          (*** Pointer ->  ***)
                              let merged_map = 
-                               try 
-                                 let m_id = 
-                                   AgentIdMap.find rule_ag_id1 data_structure.rule_agent_id_subs
-                                 in 
+                               match AgentIdMap.find_option
+				 rule_ag_id1 data_structure.rule_agent_id_subs with
+                                 | Some m_id ->
                                  PredicateidMap.add 
                                    m_id 
                                    (Pointer_to_agent mixture_ag_1,Unknown)
                                    merged_map
-                               with Not_found -> merged_map 
+				 | None -> merged_map 
                              in 
                              let merged_map = 
-                               try 
-                                 let m_id = 
-                                   AgentIdMap.find rule_ag_id2 data_structure.rule_agent_id_subs 
-                                 in 
+                               match AgentIdMap.find_option
+				 rule_ag_id2 data_structure.rule_agent_id_subs  with
+				 | Some m_id ->
                                  PredicateidMap.add 
                                    m_id 
                                    (Pointer_to_agent mixture_ag_2,Unknown)
                                    merged_map
-                               with Not_found -> merged_map 
+				 | None -> merged_map 
                              in 
                              if PredicateidMap.is_empty  merged_map 
                              then 

@@ -105,12 +105,15 @@ let build_subs l =
 let submap subs l m default =
   List.fold_left
     (fun m' a ->
-     let new_a = IntMap.find a subs in
-     IntMap.add new_a (
-		  try IntMap.find a m
-		  with Not_found ->
-		       match default with None -> raise Not_found | Some a -> a
-		) m')
+      match IntMap.find_option a subs with
+      | None -> raise Not_found
+      | Some new_a -> 
+	IntMap.add new_a (
+	  match IntMap.find_option a m with
+	  | Some x -> x
+	  | None ->
+	    match default with None -> raise Not_found | Some a -> a
+	) m')
     IntMap.empty l
 
 let add_init_pid eid pid grid =
@@ -126,7 +129,9 @@ let add_init_pid eid pid grid =
 let subset subs l s =
   List.fold_left
     (fun s' a ->
-     if IntSet.mem a s then IntSet.add (IntMap.find a subs) s' else s')
+     if IntSet.mem a s
+     then IntSet.add (IntMap.find_default (-42) a subs) s'
+     else s')
     IntSet.empty l
 
 let subconfig_with_subs subs config l =
@@ -275,14 +280,14 @@ let record_init (lbl,actions) is_weak event_number env grid =
 let add_pred eid atom config =
   let events = IntMap.add atom.eid atom config.events in
   let pred_set =
-    try IntMap.find eid config.prec_1 with Not_found -> IntSet.empty in
+    IntMap.find_default IntSet.empty eid config.prec_1 in
   let prec_1 = IntMap.add eid (IntSet.add atom.eid pred_set) config.prec_1 in
   {config with prec_1 = prec_1 ; events = events}
 
 let add_conflict eid atom config =
   let events = IntMap.add atom.eid atom config.events in
   let cflct_set =
-    try IntMap.find eid config.conflict with Not_found -> IntSet.empty in
+    IntMap.find_default IntSet.empty eid config.conflict in
   let cflct = IntMap.add eid (IntSet.add atom.eid cflct_set) config.conflict in
   {config with conflict = cflct ; events = events }
 
@@ -292,8 +297,7 @@ let rec parse_attribute last_modif last_tested attribute config =
   | atom::att ->
      let events = IntMap.add atom.eid atom config.events in
      let prec_1 =
-       let preds = try IntMap.find atom.eid config.prec_1
-		   with Not_found -> IntSet.empty in
+       let preds = IntMap.find_default IntSet.empty atom.eid config.prec_1 in
        IntMap.add atom.eid preds config.prec_1 in
      let config = {config with events =  events ; prec_1 = prec_1} in
      (*atom has a modification*)
@@ -330,8 +334,8 @@ let cut attribute_ids grid =
 	 | atom::att ->
 	    let events = IntMap.add atom.eid atom cfg.events in
 	    let prec_1 =
-	      let preds = try IntMap.find atom.eid cfg.prec_1
-			  with Not_found -> IntSet.empty in
+	      let preds =
+		IntMap.find_default IntSet.empty atom.eid cfg.prec_1 in
 	      IntMap.add atom.eid preds cfg.prec_1 in
 	    let top = IntSet.add atom.eid cfg.top in
 	    let tested =
@@ -411,7 +415,7 @@ let depth_and_size_of_event config =
       let d =
 	IntSet.fold
 	  (fun eid' d ->
-	   let d' = try IntMap.find eid' emap with Not_found -> 0 in
+	   let d' = IntMap.find_default 0 eid' emap in
 	   max (d'+1) d
 	  ) prec_eids 0
       in
@@ -458,7 +462,7 @@ let dot_of_grid profiling desc env enriched_grid =
   let sorted_events =
     IntMap.fold
       (fun eid d dmap ->
-       let set = try IntMap.find d dmap with Not_found -> IntSet.empty in
+       let set = IntMap.find_default IntSet.empty d dmap in
        IntMap.add d (IntSet.add eid set) dmap
       ) depth_of_event IntMap.empty in
   let () = Kappa_files.add_out_desc desc in
@@ -470,29 +474,31 @@ let dot_of_grid profiling desc env enriched_grid =
      Format.fprintf form "@[<hv>{ rank = same ; \"%d\" [shape=plaintext] ;@," d;
      IntSet.iter
        (fun eid ->
-	let atom = IntMap.find eid config.events in
-	if eid <> 0 then
-	  match atom.kind  with
-	  | RULE _  ->
-	     Format.fprintf
-	       form
-	       "node_%d [label=\"%s\", shape=%s, style=%s, fillcolor = %s] ;@,"
-	       eid (label ~env atom.kind) "invhouse" "filled" "lightblue"
-          | OBS _  ->
-	     Format.fprintf
-	       form "node_%d [label=\"%s\", style=filled, fillcolor=red] ;@,"
-	       eid (label ~env atom.kind)
-        | INIT _ ->
-	   if !Parameter.showIntroEvents then
-	     Format.fprintf
-	       form
-	       "node_%d [label=\"%s\", shape=%s, style=%s, fillcolor=%s] ;@,"
-	       eid (label ~env atom.kind) "house" "filled" "green"
-	| PERT _ ->
-	   Format.fprintf
-	     form
-	     "node_%d [label=\"%s\", shape=%s, style=%s, fillcolor = %s] ;@,"
-	     eid (label ~env atom.kind) "invhouse" "filled" "green"
+	match IntMap.find_option eid config.events with
+	| None -> raise Not_found
+	| Some atom ->
+	  if eid <> 0 then
+	    match atom.kind  with
+	    | RULE _  ->
+	      Format.fprintf
+		form
+		"node_%d [label=\"%s\", shape=%s, style=%s, fillcolor = %s] ;@,"
+		eid (label ~env atom.kind) "invhouse" "filled" "lightblue"
+            | OBS _  ->
+	      Format.fprintf
+		form "node_%d [label=\"%s\", style=filled, fillcolor=red] ;@,"
+		eid (label ~env atom.kind)
+            | INIT _ ->
+	      if !Parameter.showIntroEvents then
+		Format.fprintf
+		  form
+		  "node_%d [label=\"%s\", shape=%s, style=%s, fillcolor=%s] ;@,"
+		  eid (label ~env atom.kind) "house" "filled" "green"
+	    | PERT _ ->
+	      Format.fprintf
+		form
+		"node_%d [label=\"%s\", shape=%s, style=%s, fillcolor = %s] ;@,"
+		eid (label ~env atom.kind) "invhouse" "filled" "green"
        (* List.iter (fun obs -> fprintf desc "obs_%d [label =\"%s\", style=filled, fillcolor=red] ;\n node_%d -> obs_%d [arrowhead=vee];\n" eid obs eid eid) atom.observation ;*) 
        ) eids_at_d ;
      Format.fprintf form "}@]@," ;
@@ -504,19 +510,21 @@ let dot_of_grid profiling desc env enriched_grid =
   done ;
   IntMap.iter
     (fun eid pred_set ->
-     if eid <> 0 then
-       IntSet.iter
-	 (fun eid' ->
-	  if eid' = 0 then ()
-	  else
-	    if !Parameter.showIntroEvents then
-	      Format.fprintf form "node_%d -> node_%d@," eid' eid
+      if eid <> 0 then
+	IntSet.iter
+	  (fun eid' ->
+	    if eid' = 0 then ()
 	    else
-	      let atom = IntMap.find eid' config.events in
-	      match atom.kind with
-	      | INIT _ -> ()
-	      | PERT _ | RULE _ | OBS _ -> Format.fprintf form "node_%d -> node_%d@," eid' eid
-	 ) pred_set
+	      if !Parameter.showIntroEvents then
+		Format.fprintf form "node_%d -> node_%d@," eid' eid
+	      else
+		match IntMap.find_option eid' config.events with
+		| None -> raise Not_found
+		| Some atom ->
+		  match atom.kind with
+		  | INIT _ -> ()
+		  | PERT _ | RULE _ | OBS _ -> Format.fprintf form "node_%d -> node_%d@," eid' eid
+	  ) pred_set
     ) config.prec_1 ;
   IntMap.iter
     (fun eid cflct_set ->

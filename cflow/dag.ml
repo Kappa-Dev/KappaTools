@@ -296,7 +296,7 @@ module Dag =
           error,dummy_graph 
         else 
           error,{ 
-            root = Mods.IntSet.min_elt root ;
+            root = (match Mods.IntSet.min_elt root with Some x -> x | None -> -1);
             labels = labels ;
             succ = succ ;
             pred = pred ;
@@ -380,7 +380,7 @@ module Dag =
           error,dummy_graph 
         else 
           error,{ 
-            root = Mods.IntSet.min_elt root ;
+            root = (match Mods.IntSet.min_elt root with Some x -> x | None -> -1);
             labels = labels ;
             succ = succ ;
             pred = pred ;
@@ -462,14 +462,8 @@ module Dag =
                 None (* the candidate is worse *)
         in 
         let rec visit (i:int) (map:int Mods.IntMap.t) (fresh_pos:int) (to_beat:key list option) = 
-          let pos = 
-            try 
-              Some (Mods.IntMap.find i map)
-            with 
-                Not_found -> None 
-          in 
           match 
-            pos 
+            Mods.IntMap.find_option i map 
           with 
             | Some i -> (* the node has already been seen, we put a pointer *)
               begin (*0*)
@@ -568,10 +562,9 @@ module Dag =
                       let list = [Fresh (label i)] in 
                       begin (*2*)
                         let g x = 
-                          try 
-                            Former (Mods.IntMap.find x map)
-                          with 
-                            | _ -> Fresh (label x)
+                          match Mods.IntMap.find_option x map with
+			  | Some x -> Former x
+                          | None -> Fresh (label x)
                         in 
                         let sibbling1 = List.sort (quick_compare g) sibbling1 in
                         match 
@@ -588,12 +581,6 @@ module Dag =
                                   begin (*4*)
                                     let list = concat list [Stop] in 
                                     begin (*5*)
-                                      let g x = 
-                                        try 
-                                          Former (Mods.IntMap.find x map)
-                                        with 
-                                          | _ -> Fresh (label x)
-                                      in 
                                       let sibbling2 = List.sort (quick_compare g) sibbling2 in 
                                       match 
                                         aux map fresh_pos sibbling2 list to_beat 

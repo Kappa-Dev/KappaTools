@@ -138,11 +138,10 @@ let merge_list_decreasing = merge_list (swap compare_bool)
 let closure err_fmt config prec is_obs init_to_eidmax weak_events init =
   let max_index = M.fold (fun i _ -> max i) prec 0 in
   let is_init x =
-    try
-      let s = M.find x prec in
+    match M.find_option x prec with
+    | Some s ->
       S.is_empty s || (S.equal s (S.singleton x))
-    with _ -> true
-  in
+    | None -> true in
   let () =
     if config.stat_trans_closure_for_big_graphs && config.max_index > 300
     then

@@ -5,7 +5,7 @@ type t = {
   observables : Alg_expr.t Location.annot array;
   ast_rules : (string Location.annot option * Ast.rule Location.annot) array;
   rules : Primitives.elementary_rule NamedDecls.t;
-  cc_of_unaries : Connected_component.Set.t;
+  cc_of_unaries : Connected_component.SetMap.Set.t;
   perturbations : Primitives.perturbation array;
   need_update_each_loop : Operator.DepSet.t;
   reverse_dependencies : Operator.DepSet.t array;

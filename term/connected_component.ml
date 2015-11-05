@@ -155,7 +155,7 @@ let to_navigation (full:bool) cc =
 	   Tools.array_fold_lefti
 	     (fun i acc v ->
 	      if v < 0 then acc else ((Existing h,i),ToInternal v)::acc)
-	     out (IntMap.find h cc.internals)
+	     out (IntMap.find_default [||] h cc.internals)
 	 else out 
        in
        let news,out_lnk,todo =
@@ -175,7 +175,7 @@ let to_navigation (full:bool) cc =
 		 else acc
 	       else
 		 ((Existing h,i),(n,l))::news, ans, n::re)
-	   ([],[],t) (IntMap.find h cc.links) in
+	   ([],[],t) (IntMap.find_default [||] h cc.links) in
        let out' =
 	 List.fold_left (fun acc (x,(n,s)) ->
 			 (x,ToNode(Fresh(find_ty cc n,n),s))::acc) out_ints
@@ -214,8 +214,9 @@ let print ?sigs with_id f cc =
 	    | Free -> true,out
 	    | Link (dst_a,dst_p) ->
 	       let i,out' =
-		 try (Int2Map.find (dst_a,dst_p) link_ids, out)
-		 with Not_found ->
+		 match Int2Map.find_option (dst_a,dst_p) link_ids with
+		 | Some x -> (x, out)
+		 | None ->
 		   (free,(succ free, Int2Map.add (ag_i,p) free link_ids)) in
 	       let () = Format.fprintf f "!%i" i in
 	       true,out') (false,link_ids) neigh) in
@@ -230,7 +231,7 @@ let print ?sigs with_id f cc =
 	   f "%t@[<h>%a("
 	   (if not_empty then Pp.comma else Pp.empty)
 	   (ContentAgent.print ?sigs) ag_x in
-       let out = print_intf ag_x link_ids (IntMap.find x cc.internals) el in
+       let out = print_intf ag_x link_ids (IntMap.find_default [||] x cc.internals) el in
        let () = Format.fprintf f ")@]" in
        true,out) cc.links (false,(1,Int2Map.empty)) in
   Format.pp_close_box f ()
@@ -403,9 +404,15 @@ let add_point id el env =
     used_by_a_begin_new = false;
   }
 
+let get env cc_id =
+  match IntMap.find_option cc_id env.domain with
+  | Some x -> x
+  | None -> raise Not_found
+
 let fresh_id env =
-  if IntMap.is_empty env.domain then 0
-  else succ (IntMap.max_key env.domain)
+  match IntMap.max_key env.domain with
+  | Some i -> succ i
+  | None -> 0
 
 let sigs env = env.sig_decl
 
@@ -486,7 +493,7 @@ let navigate env nav =
     | ((Fresh _,_), _), ((Fresh _,_),_) -> []
     | ((Fresh _,_), _), ((Existing _,_),_) -> [] in
   let rec aux injs_dst2nav pt_i = function
-    | [] -> Some (pt_i,injs_dst2nav,IntMap.find pt_i env.domain)
+    | [] -> Some (pt_i,injs_dst2nav, get env pt_i)
     | e :: t ->
        let rec find_good_edge = function (*one should use a hash here*)
 	 | [] -> None
@@ -497,7 +504,7 @@ let navigate env nav =
 	       aux (Tools.list_map_flatten
 		      (fun x -> List.map (Renaming.compose x) inj') s.inj) s.dst t
        in
-       find_good_edge (IntMap.find pt_i env.domain).sons
+       find_good_edge (get env pt_i).sons
   in aux [Renaming.empty] 0 nav
 
 let find env cc =
@@ -506,8 +513,6 @@ let find env cc =
   (* 	     "@[[%a]@]@,%a@." (Pp.list Pp.space (print_edge (sigs env) cc)) nav *)
   (* 	     print env in *)
   navigate env nav
-
-let get env cc_id = IntMap.find cc_id env.domain
 
 let nb_ag env = env.nb_id
 
@@ -563,8 +568,8 @@ let remove_ag_cc cc_id cc ag_id =
 	   List.fold_right
 	     (fun (s,d) map ->
 	      if s = max || s = d then map else
-		let tmp = IntMap.find max map in
-		let map' = IntMap.add max (IntMap.find s map) map in
+		let tmp = IntMap.find_default [||] max map in
+		let map' = IntMap.add max (IntMap.find_default [||] s map) map in
 		IntMap.add s tmp map') (Renaming.to_list to_subst) map in
 	 IntMap.remove max map' in
        let new_ints = swip cc.internals in
@@ -602,7 +607,7 @@ let compute_cycle_edges cc =
 			 let (don',acc') = aux don acc (edge::path) n' in
 			 (n'::don',acc') in
 		    extract_cycle acc path)
-      (don,acc) (IntMap.find ag_id cc.links) in
+      (don,acc) (IntMap.find_default [||] ag_id cc.links) in
   let rec element i t =
     if i = Array.length t then [] else
       match t.(i) with
@@ -613,13 +618,13 @@ let compute_cycle_edges cc =
 let remove_cycle_edges complete_domain_with obs_id dst env free_id cc =
   let rec aux ((f_id,env'),out as acc) = function
     | ((Existing n,i),ToNode(Existing n',i') as e) :: q ->
-       let links = IntMap.find n cc.links in
-       let int = IntMap.find n cc.internals in
+       let links = IntMap.find_default [||] n cc.links in
+       let int = IntMap.find_default [||] n cc.internals in
        let links' = Array.copy links in
        let () = links'.(i) <- UnSpec in
        let cc_tmp = update_cc f_id cc n links' int in
-       let links_dst = IntMap.find n' cc_tmp.links in
-       let int_dst = IntMap.find n' cc_tmp.internals in
+       let links_dst = IntMap.find_default [||] n' cc_tmp.links in
+       let int_dst = IntMap.find_default [||] n' cc_tmp.internals in
        let links_dst' = Array.copy links_dst in
        let () = links_dst'.(i') <- UnSpec in
        let cc' = update_cc f_id cc_tmp n' links_dst' int_dst in
@@ -669,8 +674,8 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
 	    (pack,ans::out)
        | Link (n',i') ->
 	  if not (agent_is_removable i links internals) then acc else
-	    let links_dst = IntMap.find n' cc.links in
-	    let int_dst = IntMap.find n' cc.internals in
+	    let links_dst = IntMap.find_default [||] n' cc.links in
+	    let int_dst = IntMap.find_default [||] n' cc.internals in
 	    let links_dst' = Array.copy links_dst in
 	    let () = links_dst'.(i') <- UnSpec in
 	    let cc',inj2cc' =
@@ -694,7 +699,7 @@ let compute_father_candidates complete_domain_with obs_id dst env free_id cc =
       (pack,ans::out)
     else remove_one_frontier acc ag_id links internals in
   IntMap.fold (fun i links acc ->
-	       remove_or_remove_one acc i links (IntMap.find i cc.internals))
+	       remove_or_remove_one acc i links (IntMap.find_default [||] i cc.internals))
 	      cc.links
 	      (remove_cycle_edges complete_domain_with obs_id dst env free_id cc)
 
@@ -799,8 +804,8 @@ let new_link wk ((cc1,_,x as n1),i) ((cc2,_,y as n2),j) =
   let pos = Location.dummy in
   let () = check_node_adequacy ~pos wk cc1 in
   let () = check_node_adequacy ~pos wk cc2 in
-  let x_n = IntMap.find x wk.cc_links in
-  let y_n = IntMap.find y wk.cc_links in
+  let x_n = IntMap.find_default [||] x wk.cc_links in
+  let y_n = IntMap.find_default [||] y wk.cc_links in
   if x_n.(i) <> UnSpec then
     raise (already_specified ~sigs:wk.sigs n1 i)
   else if y_n.(j) <> UnSpec then
@@ -814,7 +819,7 @@ let new_link wk ((cc1,_,x as n1),i) ((cc2,_,y as n2),j) =
 
 let new_free wk ((cc,_,x as n),i) =
   let () = check_node_adequacy ~pos:Location.dummy wk cc in
-  let x_n = IntMap.find x wk.cc_links in
+  let x_n = IntMap.find_default [||] x wk.cc_links in
   if x_n.(i) <> UnSpec then
     raise (already_specified ~sigs:wk.sigs n i)
   else
@@ -823,7 +828,7 @@ let new_free wk ((cc,_,x as n),i) =
 
 let new_internal_state wk ((cc,_,x as n), i) va =
   let () = check_node_adequacy ~pos:Location.dummy wk cc in
-  let x_n = IntMap.find x wk.cc_internals in
+  let x_n = IntMap.find_default [||] x wk.cc_internals in
   if x_n.(i) >= 0 then
     raise (already_specified ~sigs:wk.sigs n i)
   else
@@ -859,7 +864,8 @@ let new_node wk type_id =
 	    IntMap.add wk.free_id (Array.make arity (-1)) wk.cc_internals;
 	} (node,0))
 
-module NodeMap = MapExt.Make(ContentAgent)
+module NodeSetMap = SetMap.Make(ContentAgent)
+module NodeMap = NodeSetMap.Map
 
 let check_edge graph = function
   | ((Fresh (_,id),site),ToNothing) -> Edges.is_free id site graph
@@ -940,7 +946,10 @@ module Matching = struct
           | None -> None
           | Some (inj',co) -> Some (IntMap.add id inj' (fst inj),co)
 
-  let get (node,id) (t,_) = NodeMap.find node (IntMap.find id t)
+  let get (node,id) (t,_) =
+    match NodeMap.find_option node (IntMap.find_default NodeMap.empty id t) with
+    | Some x -> x
+    | None -> raise Not_found
 
 (*edges: list of concrete edges, returns the roots of observables that are above in the domain*)
   let from_edge domain graph edges =
@@ -1005,5 +1014,6 @@ module ForState = struct
     let compare = compare_canonicals
 end
 
-module Set = Set_patched.Make(ForState)
-module Map = MapExt.Make(ForState)
+module SetMap = SetMap.Make(ForState)
+module Set = SetMap.Set
+module Map = SetMap.Map

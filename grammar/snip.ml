@@ -329,9 +329,8 @@ let rec annotate_lhs_with_diff sigs acc lhs rhs =
 let ports_from_contact_map sigs contact_map ty_id p_id =
   let ty_na = Format.asprintf "%a" (Signature.print_agent sigs) ty_id in
   let p_na = Format.asprintf "%a" (Signature.print_site sigs ty_id) p_id in
-  let cand =
-    try snd (Export_to_KaSim.String2Map.find (ty_na,p_na) contact_map)
-    with Not_found -> [] in
+  let cand = snd (Export_to_KaSim.String2Map.find_default
+		    ([],[]) (ty_na,p_na) contact_map) in
   List.map (fun (ty_na,p_na) ->
 	    let ty_id =
 	      Signature.num_of_agent (Location.dummy_annot ty_na) sigs in
@@ -343,9 +342,8 @@ let internals_from_contact_map sigs contact_map ty_id p_id =
   let sign = Signature.get sigs ty_id in
   let ty_na = Format.asprintf "%a" (Signature.print_agent sigs) ty_id in
   let p_na = Format.asprintf "%a" (Signature.print_site sigs ty_id) p_id in
-  let cand =
-    try fst (Export_to_KaSim.String2Map.find (ty_na,p_na) contact_map)
-    with Not_found -> [] in
+  let cand = fst (Export_to_KaSim.String2Map.find_default
+		    ([],[]) (ty_na,p_na) contact_map) in
   List.map
     (fun i_na ->
      Signature.num_of_internal_state p_id (Location.dummy_annot i_na) sign)
@@ -550,8 +548,11 @@ let define_full_transformation
   | Erased ->
      ((cand::removed,added),links_transf)
   | Linked (i,pos) ->
-     try
-       let (place',site' as dst'),safe = IntMap.find i links_transf in
+     match IntMap.find_option i links_transf with
+     | None ->
+       let links_transf' = IntMap.add i ((place,site),dst=None) links_transf in
+       ((cands removed,added),links_transf')
+     | Some ((place',site' as dst'),safe) ->
        let links_transf' = IntMap.remove i links_transf in
        match dst with
        | Some (dst,_) when dst = dst' -> (transf,links_transf')
@@ -573,9 +574,6 @@ let define_full_transformation
 	  ((cands removed,
 	    Primitives.Transformation.Linked((place,site),dst')::added),
 	   links_transf')
-     with Not_found ->
-       let links_transf' = IntMap.add i ((place,site),dst=None) links_transf in
-       ((cands removed,added),links_transf')
 
 let define_positive_transformation
       sigs (removed,added as transf) links_transf place site switch =
@@ -587,8 +585,11 @@ let define_positive_transformation
      (transf,links_transf)
   | Maintained -> assert false
   | Linked (i,pos) ->
-     try
-       let dst',_ = IntMap.find i links_transf in
+     match IntMap.find_option i links_transf with
+     | None ->
+       let links_transf' = IntMap.add i ((place,site),false) links_transf in
+       (transf,links_transf')
+     | Some (dst',_) ->
        let links_transf' = IntMap.remove i links_transf in
        let sort = Agent_place.get_type place in
        let () =
@@ -602,9 +603,6 @@ let define_positive_transformation
        ((removed,
 	 Primitives.Transformation.Linked((place,site),dst')::added),
 	links_transf')
-     with Not_found ->
-       let links_transf' = IntMap.add i ((place,site),false) links_transf in
-       (transf,links_transf')
 
 let add_instantiation_free actions pl s = function
   | Freed -> Instantiation.Free (pl,s) :: actions
@@ -692,10 +690,11 @@ let make_instantiation
 			    place site_id s,
 	      side_effects, links
 	   | L_VAL ((i,_),s) ->
-	      try IntMap.find i links :: tests',
-		  add_instantiation_free actions' place site_id s,
-		  side_sites, side_effects, IntMap.remove i links
-	      with Not_found ->
+	      match IntMap.find_option i links with
+	      | Some x -> x :: tests',
+		add_instantiation_free actions' place site_id s,
+		side_sites, side_effects, IntMap.remove i links
+	      | None ->
 		tests', add_instantiation_free actions' place site_id s,
 		side_sites, side_effects, links in
 	 aux (pred site_id) tests'' actions'' side_sites' side_effects' links' in
@@ -753,8 +752,8 @@ let rec add_agents_in_cc sigs id wk registered_links transf links_transf
 		     (Location.dummy_annot
 			"Try to create the connected components of an ambiguous mixture."))
 	 | L_VAL ((i,pos),s) ->
-	    try
-	      let (node',site' as dst) = IntMap.find i r_l in
+	    match IntMap.find_option i r_l with
+	    | Some (node',site' as dst) ->
 	      let dst_place = Agent_place.Existing (node',id),site' in
 	      let wk'' = Connected_component.new_link wk' (node,site_id) dst in
 	      let c_l' =
@@ -766,7 +765,7 @@ let rec add_agents_in_cc sigs id wk registered_links transf links_transf
 		  sigs transf l_t place site_id (Some (dst_place,pos)) s in
 	      handle_ports wk'' (IntMap.remove i r_l) c_l' transf'
 			   l_t' re acc (succ site_id)
-	    with Not_found ->
+	    | None ->
 		 match Tools.array_filter (is_linked_on_port site_id i) ag.ra_ports with
 		 | [site_id'] (* link between 2 sites of 1 agent *)
 		      when List.for_all (fun x -> not(is_linked_on i x)) acc &&
@@ -845,8 +844,8 @@ let rec complete_with_creation
 	       else Instantiation.Free (place,site_id) :: actions),
 	      l_t
 	   | Raw_mixture.VAL i ->
-	      try
-		let (place',site' as dst),safe = IntMap.find i l_t in
+	      match IntMap.find_option i l_t with
+	      | Some ((place',site' as dst),safe) ->
 		let l_t' = IntMap.remove i l_t in
 		let () =
 		  if not safe then
@@ -862,7 +861,7 @@ let rec complete_with_creation
 		(Instantiation.Bind_to((place,site_id),dst)
 		 ::(Instantiation.Bind_to((dst,(place,site_id))))::actions),
 		l_t'
-	      with Not_found ->
+	      | None ->
 		let l_t' = IntMap.add i ((place,site_id),true) l_t in
 		(added',actions,l_t') in
 	 handle_ports added'' l_t' actions' (point::intf) (succ site_id) in

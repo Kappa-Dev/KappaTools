@@ -20,8 +20,9 @@ let size nd = Array.length nd.decls
 let elt_name nd i = fst (fst nd.decls.(i))
 
 let elt_id ?(kind="element") nd (s,pos) =
-  try StringMap.find s nd.finder
-  with Not_found ->
+  match StringMap.find_option s nd.finder with
+  | Some x -> x
+  | None ->
     raise (ExceptionDefn.Malformed_Decl
 	     (Format.asprintf "\"%s\" is not a declared %s." s kind,pos))
 

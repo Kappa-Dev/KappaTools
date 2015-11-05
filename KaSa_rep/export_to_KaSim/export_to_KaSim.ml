@@ -24,12 +24,13 @@ type influence_node =
   | Rule of rule_id
   | Var of var_id
 
-module InfluenceNodeMap =
-  MapExt.Make (struct type t = influence_node let compare = compare end)
-module String2Map =
-  MapExt.Make (struct type t = string*string let compare = compare end)
-module StringMap = 
-  MapExt.Make (struct type t = string let compare = compare end)
+module InfluenceNodeSetMap =
+  SetMap.Make (struct type t = influence_node let compare = compare end)
+module InfluenceNodeMap = InfluenceNodeSetMap.Map
+module String2SetMap =
+  SetMap.Make (struct type t = string*string let compare = compare end)
+module String2Map = String2SetMap.Map
+module StringMap = Mods.StringMap
 
 type influence_map =
     {
@@ -166,8 +167,7 @@ module Export_to_KaSim =
       let _ = Format.printf "+ Compute the contact map\n" in 
       let add_link (a,b) (c,d) sol =
 	let l,old =
-	  try String2Map.find (a,b) sol
-	  with Not_found -> [],[]
+	  String2Map.find_default ([],[]) (a,b) sol
 	in
 	String2Map.add (a,b) (l,((c,d)::old)) sol
       in
@@ -177,8 +177,7 @@ module Export_to_KaSim =
 	| Ckappa_sig.Binding _ -> sol
 	| Ckappa_sig.Internal state ->
 	   let old,l =
-	     try String2Map.find (a,b) sol
-	     with Not_found -> [],[]
+	     String2Map.find_default ([],[]) (a,b) sol
 	   in
 	   String2Map.add (a,b) (state::old,l) sol
       in
@@ -281,10 +280,7 @@ module Export_to_KaSim =
       let state,contact_map = get_contact_map state in 
       let add a x states map = 
 	let old = 
-	  try 
-	    StringMap.find a map 
-	  with 
-	    Not_found -> []
+	    StringMap.find_default [] a map 
 	in 
 	StringMap.add a ((x,states)::old) map
       in 

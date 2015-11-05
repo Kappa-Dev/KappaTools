@@ -121,10 +121,11 @@ let rec compile_alg var_map tk_map ?max_allowed_var
      end
   | Ast.OBS_VAR lab ->
      let i =
-       try Mods.StringMap.find lab var_map with
-       | Not_found ->
-	  raise (ExceptionDefn.Malformed_Decl
-		   (lab ^" is not a declared variable",pos))
+       match Mods.StringMap.find_option lab var_map with
+       | Some x -> x
+       | None ->
+	 raise (ExceptionDefn.Malformed_Decl
+		  (lab ^" is not a declared variable",pos))
      in
      let () = match max_allowed_var with
        | Some j when j < i ->
@@ -135,8 +136,9 @@ let rec compile_alg var_map tk_map ?max_allowed_var
      in (domain,(ALG_VAR i,pos))
   | Ast.TOKEN_ID tk_nme ->
      let i =
-       try Mods.StringMap.find tk_nme tk_map
-       with Not_found ->
+       match Mods.StringMap.find_option tk_nme tk_map with
+       | Some x -> x
+       | None ->
 	 raise (ExceptionDefn.Malformed_Decl
 		  (tk_nme ^ " is not a declared token",pos))
      in (domain,(TOKEN_ID i,pos))

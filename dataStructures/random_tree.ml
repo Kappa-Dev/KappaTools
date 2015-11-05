@@ -145,8 +145,9 @@ let add i w t =
   () (*t.total <- (max 0.0 total) (*not satisfactory*)*)
 
 let random t =
-  try (unmask t (IntSet.choose t.inf_list),infinity)
-  with Not_found ->
+  match IntSet.choose t.inf_list with
+  | Some x -> (unmask t x,infinity)
+  | None ->
     let t = update_structure t in
     let a = t.weight_of_subtrees.(1) in
     if a = 0.0

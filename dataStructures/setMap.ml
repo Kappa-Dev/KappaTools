@@ -56,6 +56,7 @@ module type S = sig
 
       val iter: (elt -> unit) -> t -> unit
       val fold: (elt -> 'a -> 'a) -> t -> 'a -> 'a
+      val fold_inv: (elt -> 'a -> 'a) -> t -> 'a -> 'a
 
       val elements: t -> elt list
       val choose: t -> elt option
@@ -67,14 +68,17 @@ module type S = sig
   (*map interface*)
     module Map:
     sig
-      type 'a t
+      type +'a t
 
       val empty: 'a t
       val is_empty: 'a t -> bool
-      val cardinal : 'a t -> int
+      val size : 'a t -> int
+      val root: 'a t -> (elt * 'a) option
+      val max_key: 'a t -> elt option
 
       val add: elt -> 'a -> 'a t -> 'a t
       val remove: elt -> 'a t -> 'a t
+      val pop: elt -> 'a t -> ('a option * 'a t)
       val merge: 'a t -> 'a t -> 'a t
       val min_elt: (elt -> 'a -> bool) -> 'a t -> elt option
       val find_option: elt -> 'a t -> 'a option
@@ -117,6 +121,7 @@ module type S = sig
       val map2: ('a -> 'a -> 'a) -> 'a t -> 'a t -> 'a t
 
       val for_all: (elt -> 'a -> bool) -> 'a t -> bool
+      val compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
       val equal: ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
       val bindings : 'a t -> (elt * 'a) list
     end
@@ -374,6 +379,11 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  | Node(left,value,right,_) ->
 	     fold f right (f value (fold f left accu))
 
+	let rec fold_inv f s accu = 
+	  match s with 
+            Empty -> accu 
+	  | Node(l, v, r, _) -> fold_inv f l (f v (fold_inv f r accu))
+
 	let rec for_all p = function
 	  | Empty -> true
 	  | Node(left,value,right,_) ->
@@ -411,17 +421,31 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
       struct
 	type 'data t =
 	  | Empty
-	  | Node of 'data t * elt * 'data * 'data t * int
+	  | Node of 'data t * elt * 'data * 'data t * int * int
 
 	let empty = Empty
 	let is_empty x = x==empty
 
+	let root = function
+	  | Empty -> None
+	  | Node (_,x,d,_,_,_) -> Some (x,d)
+
+	let rec max_key = function
+	  | Empty -> None
+	  | Node (_,k,_,Empty,_,_) -> Some k
+	  | Node (_,_,_,m,_,_) -> max_key m
+
 	let height = function
           | Empty -> 0
-          | Node(_,_,_,_,h) -> h
+          | Node(_,_,_,_,h,_) -> h
+
+	let size = function
+          | Empty -> 0
+          | Node(_,_,_,_,_,s) -> s
 
 	let node left key0 data right  =
-	  Node (left,key0,data,right, 1 + max (height left) (height right))
+	  Node (left,key0,data,right, 1 + max (height left) (height right),
+		1 + size left + size right)
 
 	let balance left key data right =
 	  let height_left = height left in
@@ -430,14 +454,14 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	    match left with
             | Empty ->
 	       assert false (* height_left > height_right + 2 >= 2 *)
-            | Node (left0,key0,data0,right0,_) ->
+            | Node (left0,key0,data0,right0,_,_) ->
                if height right0 <= height left0 then
 		 node left0 key0 data0 (node right0 key data right)
                else
 		 match right0 with
 		 | Empty ->
 		    assert false (* height right0 > height left0 >= 0 *)
-		 | Node (left1,key1,data1,right1,_) ->
+		 | Node (left1,key1,data1,right1,_,_) ->
                     node (node left0 key0 data0 left1)
 			 key1 data1
 			 (node right1 key data right)
@@ -446,24 +470,24 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
               match right with
               | Empty ->
 		 assert false (* height_right > height_left + 2 >= 2 *)
-              | Node (left0,key0,data0,right0,_) ->
+              | Node (left0,key0,data0,right0,_,_) ->
 		 if height left0 <= height right0 then
 		   node (node left key data left0) key0 data0 right0
 		 else
 		   match left0 with
 		   | Empty ->
 		      assert false (* height left0 > height right0 >= 0 *)
-		   | Node (left1,key1,data1,right1,_) ->
+		   | Node (left1,key1,data1,right1,_,_) ->
                       node (node left key data left1)
 			   key1 data1
 			   (node right1 key0 data0 right0)
             else node left key data right
 
 	let rec add key data = function
-	  | Empty -> Node (empty,key,data,empty,1)
-	  | Node (left,key_map,data_map,right,height) ->
+	  | Empty -> Node (empty,key,data,empty,1,1)
+	  | Node (left,key_map,data_map,right,height,size) ->
              let cmp = compare key key_map in
-             if cmp = 0 then Node(left,key_map,data,right,height)
+             if cmp = 0 then Node(left,key_map,data,right,height,size)
              else if cmp < 0 then
 	       balance (add key data left) key_map data_map right
              else balance left key_map data_map (add key data right)
@@ -471,7 +495,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	let rec extract_min_binding map key data map' =
 	  match map with
 	  | Empty -> (key,data),map'
-	  | Node (left2,key2,data2,right2,_) ->
+	  | Node (left2,key2,data2,right2,_,_) ->
              let min, left' = extract_min_binding left2 key2 data2 right2 in
              min,balance left' key data map'
 
@@ -481,29 +505,44 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  | Node _ ->
              match map2 with
              | Empty -> map1
-             | Node(left2,key2,data2,right2,_) ->
+             | Node(left2,key2,data2,right2,_,_) ->
 		let (key3,data3), left' =
 		  extract_min_binding left2 key2 data2 right2 in
 		balance map1 key3 data3 left'
 
 	let rec remove key = function
 	  | Empty -> empty
-	  | Node (left,key_map,data,right,_) ->
+	  | Node (left,key_map,data,right,_,_) ->
              let cmp = compare key key_map in
              if cmp = 0 then merge left right
              else if cmp < 0 then balance (remove key left) key_map data right
              else balance left key_map data (remove key right)
 
+	let rec pop x = function
+	  | Empty as m -> (None, m)
+	  | Node(l, v, d, r, _,_) as m ->
+	    let c = Ord.compare x v in
+	    if c = 0 then
+	      (Some d,merge l r)
+	    else if c < 0 then
+	      match pop x l with
+	      | None as o, _ -> (o, m)
+	      | Some _ as o, t -> (o, balance t v d r)
+	    else
+	      match pop x r with
+	      | None as o, _ -> (o, m)
+	      | Some _ as o, t -> (o, balance l v d t)
+          
 	let rec join left key value right =
 	  match balance left key value right with
           | Empty -> assert false (* By case analysis *)
-          | Node (left2,key2,data2,right2,_) as map2 ->
+          | Node (left2,key2,data2,right2,_,_) as map2 ->
              let h = height left2 - height right2 in
              if h > 2 || h< -2 then join left2 key2 data2 right2 else map2
 
 	let rec split value = function
 	  | Empty -> (empty,None,empty)
-	  | Node (left1,key1,data1,right1,_) ->
+	  | Node (left1,key1,data1,right1,_,_) ->
              let cmp = Ord.compare value key1 in
              if cmp = 0 then (left1,Some data1,right1)
              else if cmp < 0 then
@@ -518,7 +557,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	let rec diff map1 map2 =
 	  match map1 with
 	  | Empty -> Empty,map2
-	  | Node(left1,key1,data1,right1,_) ->
+	  | Node(left1,key1,data1,right1,_,_) ->
              let left2,data2,right2 = split key1 map2 in
              let oleft1,oleft2 = diff left1 left2 in
              let oright1,oright2 = diff right1 right2 in
@@ -534,8 +573,8 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  match map1, map2 with
           | Empty, _ -> map2
           | _, Empty -> map1
-          | Node (left1, value1, data1, right1, height1),
-            Node (left2, value2, data2, right2, height2) ->
+          | Node (left1, value1, data1, right1, height1,_),
+            Node (left2, value2, data2, right2, height2,_) ->
              if height1 >= height2 then
 	       let left2, op_data2, right2 = split value1 map2 in
 	       join (union left1 left2)
@@ -552,7 +591,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  else
             match map1 with
             | Empty -> map2
-            | Node(left1,key1,data1,right1,_) ->
+            | Node(left1,key1,data1,right1,_,_) ->
                let left2,data2,right2 = split key1 map2 in
                join (update left1 left2)
 		    key1 (match data2 with None -> data1 | Some d2 -> d2)
@@ -561,7 +600,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	let rec diff_pred pred map1 map2 =
 	  match map1 with
           | Empty -> Empty,map2
-          | Node(left1,key1,data1,right1,_) ->
+          | Node(left1,key1,data1,right1,_,_) ->
              let left2,data2,right2 = split key1 map2 in
              let oleft1,oleft2 = diff_pred pred left1 left2 in
              let oright1,oright2 = diff_pred pred right1 right2 in
@@ -573,20 +612,16 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              | None ->
                 join oleft1 key1 data1 oright1, merge oleft2 oright2
 
-	let rec cardinal = function
-	  | Empty -> 0
-	  | Node (l, _, _, r, _) -> cardinal l + 1 + cardinal r
-
 	let rec min_elt p = function
           | Empty -> None
-          | Node(left,key,data,right,_) ->
+          | Node(left,key,data,right,_,_) ->
              match min_elt p left with
              | None -> if p key data then Some key else min_elt p right
              | some -> some
 
 	let rec find_option key = function
 	  | Empty -> None
-	  | Node (left,key_map,data,right,_) ->
+	  | Node (left,key_map,data,right,_,_) ->
              let cmp = compare key key_map in
              if cmp = 0 then Some data
              else if cmp>0 then find_option key right
@@ -594,7 +629,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 
 	let rec find_default d key = function
 	  | Empty -> d
-	  | Node (left,key_map,data,right,_) ->
+	  | Node (left,key_map,data,right,_,_) ->
              let cmp = compare key key_map in
              if cmp = 0 then data
              else if cmp>0 then find_default d key right
@@ -602,26 +637,26 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 
 	let rec mem key = function
           | Empty -> false
-          | Node (left,key_map,_,right,_) ->
+          | Node (left,key_map,_,right,_,_) ->
              let cmp = compare key key_map in
              cmp == 0 ||
 	       if cmp>0 then mem key right else mem key left
 
 	let rec iter f = function
           | Empty -> ()
-          | Node(left,key,data,right,_) ->
+          | Node(left,key,data,right,_,_) ->
              let () = iter f left in let () = f key data in iter f right
 
 	let rec fold f map value =
 	  match map with
           | Empty -> value
-          | Node(left,key,data,right,_) ->
+          | Node(left,key,data,right,_,_) ->
              fold f right (f key data (fold f left value))
 
 	let rec monadic_fold param err f map value =
 	  match map with
 	  | Empty -> err,value
-	  | Node(left,key,data,right,_) ->
+	  | Node(left,key,data,right,_,_) ->
 	     let err',value' = monadic_fold param err f left value in
 	     let err'',value'' = f param err' key data value' in
 	     monadic_fold param err'' f right value''
@@ -631,7 +666,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
           | Empty,Empty -> rh,res
           | Empty , _ -> monadic_fold parameters rh h map2 res
 	  | _ , Empty -> monadic_fold parameters rh g map1 res
-          | Node(left1,key1,data1,right1,_),_ ->
+          | Node(left1,key1,data1,right1,_,_),_ ->
              let (left2,data2,right2) = split key1 map2 in
              match data2 with
              | None ->
@@ -673,15 +708,15 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 
 	let rec mapi f = function
 	  | Empty -> empty
-	  | Node(left,key,data,right,height) ->
-             Node(mapi f left,key,f key data,mapi f right,height)
+	  | Node(left,key,data,right,height,size) ->
+             Node(mapi f left,key,f key data,mapi f right,height,size)
 
 	let map f s = mapi (fun _ x -> f x) s
 
 	let rec map2 f map map' =
 	  match map with
 	  | Empty -> map'
-	  | Node(left1,key1,data1,right1,_) ->
+	  | Node(left1,key1,data1,right1,_,_) ->
              let left2,data2,right2 = split key1 map' in
              join (map2 f left1 left2)
 		  key1 (match data2 with None -> data1 | Some d2 -> f data1 d2)
@@ -690,7 +725,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	let rec cut_opt value map =
 	  match map with
 	  | Empty -> None
-	  | Node (left1,key1,data1,right1,_) ->
+	  | Node (left1,key1,data1,right1,_,_) ->
              let cmp = Ord.compare value key1 in
              if cmp = 0 then Some (left1,data1,right1)
              else if cmp < 0 then
@@ -706,26 +741,36 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 
 	let rec for_all p = function
           | Empty -> true
-          | Node(left,key,data,right,_) ->
+          | Node(left,key,data,right,_,_) ->
              p key data && for_all p right && for_all p left
 
-	let rec forall2iz p map1 map2 =
-	  map1==map2 ||
-            match map1 with
-            | Empty -> false
-            | Node(left1,key1,data1,right1,_) ->
-               match cut_opt key1 map2 with
-               | Some (left2,data2,right2) ->
-		  (data1==data2 || p key1 data1 data2)
-		  && forall2iz p left1 left2
-		  && forall2iz p right1 right2
-               | None -> false
+	type 'a enumeration = End | More of elt * 'a * 'a t * 'a enumeration
+	    
+	let rec cons_enum m e =
+	  match m with
+	    Empty -> e
+	  | Node(l, v, d, r, _,_) -> cons_enum l (More(v, d, r, e))
+      
+	let compare cmp m1 m2 =
+	  let rec compare_aux e1 e2 =
+	    match (e1, e2) with
+	      (End, End) -> 0
+	    | (End, _) -> - 1
+	    | (_, End) -> 1
+	    | (More(v1, d1, r1, e1), More(v2, d2, r2, e2)) ->
+	      let c = Ord.compare v1 v2 in
+	      if c <> 0 then c else
+		let c = cmp d1 d2 in
+		if c <> 0 then c else
+		  compare_aux (cons_enum r1 e1) (cons_enum r2 e2)
+	  in compare_aux (cons_enum m1 End) (cons_enum m2 End)
 
-	let equal p = forall2iz (fun _ -> p)
+	let equal cmp m1 m2 =
+	  compare (fun x y -> if cmp x y then 0 else 1) m1 m2 == 0
 
 	let rec bindings_aux accu = function
 	  | Empty -> accu
-	  | Node (l, v, d, r, _) -> bindings_aux ((v, d) :: bindings_aux accu r) l
+	  | Node (l, v, d, r, _,_) -> bindings_aux ((v, d) :: bindings_aux accu r) l
 
 	let bindings s = bindings_aux [] s
       end

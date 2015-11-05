@@ -41,6 +41,7 @@ module type S = sig
 
       val iter: (elt -> unit) -> t -> unit
       val fold: (elt -> 'a -> 'a) -> t -> 'a -> 'a
+      val fold_inv: (elt -> 'a -> 'a) -> t -> 'a -> 'a
 
       val elements: t -> elt list
 
@@ -51,14 +52,17 @@ module type S = sig
 
     module Map:
     sig
-      type 'a t
+      type +'a t
 
       val empty: 'a t
       val is_empty: 'a t -> bool
-      val cardinal : 'a t -> int
+      val size: 'a t -> int
+      val root: 'a t -> (elt * 'a) option
+      val max_key: 'a t -> elt option
 
       val add: elt -> 'a -> 'a t -> 'a t
       val remove: elt -> 'a t -> 'a t
+      val pop: elt -> 'a t -> ('a option * 'a t)
       val merge: 'a t -> 'a t -> 'a t
       val min_elt: (elt -> 'a -> bool) -> 'a t -> elt option
       val find_option: elt -> 'a t -> 'a option
@@ -101,6 +105,7 @@ module type S = sig
       val map2: ('a -> 'a -> 'a) -> 'a t -> 'a t -> 'a t
 
       val for_all: (elt -> 'a -> bool) -> 'a t -> bool
+      val compare: ('a -> 'a -> int) -> 'a t -> 'a t -> int
       val equal: ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
       val bindings : 'a t -> (elt * 'a) list
     end
