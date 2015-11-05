@@ -643,7 +643,7 @@ let translate_mixture parameters error handler mixture =
    in 
    let error,(direct,reverse,actions,half_release_set,full_release_set) = aux_agent 0 (error,(direct,reverse,actions,half_release_set,full_release_set)) in
    let half_release_set =
-     Cckappa_sig.Address_map_and_set.Set.diff half_release_set full_release_set in
+     Cckappa_sig.Address_map_and_set.Set.minus half_release_set full_release_set in
    let list = Cckappa_sig.Address_map_and_set.Set.elements half_release_set in
    let error,list = 
      List.fold_left 

@@ -25,7 +25,10 @@ module type S = sig
       val split: elt -> t -> (t * bool * t)
       val union: t -> t -> t
       val inter: t -> t -> t
+      val minus: t -> t -> t
+      (** [minus a b] contains elements of [a] that are not in [b] *)
       val diff: t -> t -> t
+      (** [diff a b] = [minus (union a b) (inter a b)] *)
 
       val cardinal: t -> int
 
