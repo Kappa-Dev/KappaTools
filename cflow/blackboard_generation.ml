@@ -150,19 +150,21 @@ module Preblackboard =
      let is_undefined x = x=Undefined 
 
      (** maps and sets *)
-     module PredicateMap = Map.Make (struct type t = predicate_info let compare = compare end)
-     module PredicateSet = Set.Make (struct type t = predicate_info let compare = compare end)
-     module CaseValueSet = Set.Make (struct type t = predicate_value let compare = compare end)
-     module PredicateidSet = Set.Make (struct type t = predicate_id let compare = compare end)
-     module PredicateidMap = Map.Make (struct type t = predicate_id let compare = compare end)
-     module SidMap = Map.Make (struct type t = step_id let compare = compare end
-)
+     module PredicateSetMap = SetMap.Make (struct type t = predicate_info let compare = compare end)
+     module PredicateSet = PredicateSetMap.Set
+     module PredicateMap = PredicateSetMap.Map
+     module CaseValueSetMap = SetMap.Make (struct type t = predicate_value let compare = compare end)
+     module CaseValueSet = CaseValueSetMap.Set
+     module PredicateidSet = Mods.IntSet
+     module PredicateidMap = Mods.IntMap
+     module SidMap = Mods.IntMap
+
      module AgentIdMap = Mods.IntMap
-     module AgentId2Map = Map.Make (struct type t = CI.Po.K.agent_id*CI.Po.K.agent_id let compare=compare end)
+     module AgentId2Map = Mods.Int2Map
      module AgentIdSet = Mods.IntSet
-     module AgentId2Set = Set.Make (struct type t = CI.Po.K.agent_id*CI.Po.K.agent_id let compare=compare end)
-     module SiteIdSet = Set.Make (struct type t = (CI.Po.K.agent_id*Instantiation.site_name) let compare=compare end)
-     module SiteIdMap = Map.Make (struct type t = (CI.Po.K.agent_id*Instantiation.site_name) let compare=compare end)
+     module AgentId2Set = Mods.Int2Set
+     module SiteIdSet = Mods.Int2Set
+     module SiteIdMap = Mods.Int2Map
 
      type pre_blackboard = 
 	 {
@@ -185,7 +187,7 @@ module Preblackboard =
 
          let levels b = b.pre_level_of_event 
          let get_pre_column_map_inv x = x.pre_column_map_inv 
-         let get_pre_event parameter handler error x = error,x.pre_event 
+         let get_pre_event _parameter _handler error x = error,x.pre_event 
            
          (** pretty printing *)
          let print_predicate_info log x = 
@@ -239,7 +241,7 @@ module Preblackboard =
            let _ = Format.fprintf log "\n" in 
            ()
              
-         let print_preblackboard parameter handler error blackboard = 
+         let print_preblackboard parameter _handler error blackboard = 
            let log = parameter.CI.Po.K.H.out_channel in 
            let _ = Format.fprintf log "**\nPREBLACKBOARD\n**\n" in 
            let _ = Format.fprintf log "*\n agent types \n*\n" in 
@@ -379,7 +381,7 @@ module Preblackboard =
          let compatible x y = 
            x=y || more_refined x y || more_refined y x
            
-         let disjunction parameter handler error x y = 
+         let disjunction _parameter _handler error x y = 
            error,
            if x=y then x 
            else 
@@ -406,7 +408,7 @@ module Preblackboard =
              | Pointer _ | Link _ | Mutex _  | Fictitious -> None 
                
                
-         let rec bind parameter handler error blackboard predicate predicate_id ag_id =
+         let rec bind parameter handler error blackboard _predicate predicate_id ag_id =
            let error,blackboard,sid = allocate parameter handler error blackboard (Here ag_id)
            in 
            let old_set = 
@@ -432,11 +434,9 @@ module Preblackboard =
            let ag_id = agent_id_of_predicate predicate in 
            let map = blackboard.pre_column_map in 
            let map_inv = blackboard.pre_column_map_inv in 
-           try 
-             let sid = PredicateMap.find predicate map in
-             error,blackboard,sid
-           with 
-             | Not_found -> 
+           match PredicateMap.find_option predicate map with
+           | Some sid -> error,blackboard,sid
+	   | None ->
                let sid'= blackboard.pre_ncolumn + 1 in 
                let map' = PredicateMap.add predicate sid' map in 
                let _  = A.set map_inv sid' predicate in 
@@ -460,7 +460,7 @@ module Preblackboard =
                in 
                error,blackboard,sid' 
 
-         let create_agent parameter handler error blackboard agent_name agent_id  = 
+         let create_agent _parameter _handler error blackboard agent_name agent_id  = 
            let old_list = 
              try 
                A.get blackboard.history_of_agent_ids_of_type agent_name 
@@ -497,12 +497,10 @@ module Preblackboard =
            in 
            error,{blackboard with pre_column_map = map}
          
-         let free_agent_if_it_exists parameter handler error blackboard agent_id = 
-           try 
-             let _ = PredicateMap.find (Here agent_id) blackboard.pre_column_map in
-             free_agent parameter handler error blackboard agent_id 
-           with 
-             | _ -> error,blackboard 
+         let free_agent_if_it_exists parameter handler error blackboard agent_id =
+           if PredicateMap.mem (Here agent_id) blackboard.pre_column_map
+           then free_agent parameter handler error blackboard agent_id
+           else error,blackboard
              
          let predicates_of_action_no_subs parameter handler error blackboard init action = 
            match action with 
@@ -712,7 +710,7 @@ module Preblackboard =
 	   else Dummy
 
   (** initialisation*)
-         let init parameter handler error (*log_info*) = 
+         let init _parameter _handler error (*log_info*) = 
            error, 
            {
              pre_side_effect_of_event = A.make 1 CI.Po.K.empty_side_effect;
@@ -1039,10 +1037,9 @@ module Preblackboard =
            let a,b=fst link,snd link in 
            let link = if a < b then link else b,a in 
            let data_structure,old = 
-             try 
-               data_structure,AgentId2Map.find link data_structure.other_links_tests 
-             with 
-             | Not_found -> 
+             match AgentId2Map.find_option link data_structure.other_links_tests with
+             | Some x -> data_structure,x
+	     | None ->
                {data_structure 
                 with 
                   other_links = AgentId2Set.add link data_structure.other_links; 
@@ -1079,11 +1076,9 @@ module Preblackboard =
            let a,b=fst link,snd link in 
            let link = if a < b then link else b,a in 
            let data_structure,old = 
-             try 
-               data_structure,
-               AgentId2Map.find link data_structure.other_links_actions 
-             with 
-             | Not_found -> 
+             match AgentId2Map.find_option link data_structure.other_links_actions with
+             | Some x -> data_structure,x
+	     | None ->
                {
                  data_structure 
                 with 
@@ -1133,7 +1128,7 @@ module Preblackboard =
                  match 
                    action
                  with 
-                 | Instantiation.Create(ag,interface) -> 
+                 | Instantiation.Create(ag,_) ->
                      {data_structure 
                       with new_agents = AgentIdSet.add (CI.Po.K.agent_id_of_agent ag) data_structure.new_agents}
                  
@@ -1151,7 +1146,7 @@ module Preblackboard =
                  | Instantiation.Remove agent -> 
                    {data_structure 
                     with removed_agents = AgentIdSet.add (CI.Po.K.agent_id_of_agent agent) data_structure.removed_agents}
-                 | _ -> data_structure)
+                 | (Instantiation.Bind_to _ | Instantiation.Free _ | Instantiation.Mod_internal _) -> data_structure)
                data_structure
                action_list
            in 
@@ -1356,15 +1351,14 @@ module Preblackboard =
                    then 
                      add_sure_test test data_structure
                    else 
-                    begin 
-                      try 
-                        let site_id1 = ag_id,CI.Po.K.site_name_of_site site in 
-                        let ag_id2 = SiteIdMap.find site_id1 data_structure.other_links_action_sites
-                        in 
-                        add_subs_test_link test (ag_id,ag_id2) data_structure 
-                      with 
-                        Not_found -> 
-                         add_subs_test test ag_id data_structure 
+                    begin
+                      let site_id1 = ag_id,CI.Po.K.site_name_of_site site in
+		      match SiteIdMap.find_option
+			      site_id1 data_structure.other_links_action_sites with
+                      | Some ag_id2 ->
+                         add_subs_test_link test (ag_id,ag_id2) data_structure
+		      | None ->
+                         add_subs_test test ag_id data_structure
                     end 
                   
                  | Instantiation.Is_Bound_to (site1,site2) ->
@@ -1433,15 +1427,13 @@ module Preblackboard =
                         add_sure_action action data_structure
                       else 
                         begin 
-                            try 
-                              
-                              let ag_id2 = SiteIdMap.find site_id1 data_structure.other_links_test_sites
-                              in 
-                              add_subs_action_link action (ag_id,ag_id2) data_structure 
-                            with 
-                              Not_found -> 
-                                add_subs_action action ag_id data_structure 
-                          end 
+                          match SiteIdMap.find_option
+				  site_id1 data_structure.other_links_test_sites with
+                          | Some ag_id2 ->
+                             add_subs_action_link action (ag_id,ag_id2) data_structure
+			  | None ->
+                             add_subs_action action ag_id data_structure
+                        end 
                           
                  | Instantiation.Bind(site1,site2) | Instantiation.Bind_to (site1,site2) ->
                    let agent1 = CI.Po.K.agent_of_site site1 in 
@@ -1576,12 +1568,8 @@ module Preblackboard =
                list 
            in 
            let add_state pid (test,action) map = 
-             let test',action' = 
-               try 
-                 PredicateidMap.find pid map  
-               with 
-                 | Not_found -> Unknown,Unknown 
-             in 
+             let test',action' =
+               PredicateidMap.find_default (Unknown,Unknown) pid map in
              let test = 
                if strictly_more_refined test test' 
                then 
@@ -1711,17 +1699,18 @@ module Preblackboard =
                        error,blackboard,build_map action_list action_map,build_map test_list test_map)
                      (error,blackboard,PredicateidMap.empty,test_map)
                      action_list in 
-                 let g x = 
-                   match x 
-                   with 
-                   | None -> Unknown
-                   | Some x -> x
-                 in 
-                 let merged_map = 
-                   PredicateidMap.merge 
-                     (fun _ test action -> Some(g test,g action))
+                 let error,merged_map =
+                   PredicateidMap.monadic_fold2
+		     parameter error
+                     (fun _ e key test action acc ->
+		      e,PredicateidMap.add key (test,action) acc)
+                     (fun _ e key test acc ->
+		      e,PredicateidMap.add key (test,Unknown) acc)
+                     (fun _ e key action acc ->
+		      e,PredicateidMap.add key (Unknown,action) acc)
                      test_map
-                     action_map 
+                     action_map
+		     PredicateidMap.empty
                  in 
 (*                 let merged_map = 
                    List.fold_left 
@@ -1958,18 +1947,18 @@ module Preblackboard =
                            action_map 
                        | None -> test_map,action_map
                      in 
-                     let g x = 
-                       match x 
-                       with 
-                       | None -> Unknown
-                       | Some x -> x
-                     in 
-                     let merged_map = 
-                       PredicateidMap.merge 
-                         (fun _ test action -> Some(g test,g action))
-                         test_map
-                         action_map 
-                     in
+		     let error,merged_map =
+                       PredicateidMap.monadic_fold2
+			 parameter error
+			 (fun _ e key test action acc ->
+			  e,PredicateidMap.add key (test,action) acc)
+			 (fun _ e key test acc ->
+			  e,PredicateidMap.add key (test,Unknown) acc)
+			 (fun _ e key action acc ->
+			  e,PredicateidMap.add key (Unknown,action) acc)
+			 test_map
+			 action_map
+			 PredicateidMap.empty in
                      let merged_map,nlist =
 		       (* enumeration of potential binding state, according to a substitution *)
 		       (* If the event is selected, check that the wire end in the state 0*)
@@ -2065,35 +2054,18 @@ according to the corresponding substitution *)
            let f error log_info blackboard set = 
               AgentId2Set.fold 
                (fun link (error,log_info,blackboard) -> 
-                 let link_mutex = AgentId2Map.find link data_structure.links_mutex in 
-                 let rule_ag_id1,rule_ag_id2=link in 
-                 let subs_1,l_ag_1 = 
-                   match AgentIdMap.find_option
-		     rule_ag_id1 data_structure.old_agents_potential_substitution
-                   with
-		   | Some x -> true, x
-                   | None -> false,[rule_ag_id1]
-                 in 
-                 let subs_2,l_ag_2 = 
-                     
-                     match AgentIdMap.find_option
-		       rule_ag_id2 data_structure.old_agents_potential_substitution
-                     with
-		     | Some x -> true, x 
-                     | None -> false,[rule_ag_id2]
-                 in 
-                 let test_list = 
-                   try 
-                     AgentId2Map.find link data_structure.other_links_tests 
-                   with 
-                   | Not_found -> []
-                 in 
-                 let action_list = 
-                   try 
-                     AgentId2Map.find link data_structure.other_links_actions 
-                   with 
-                   | Not_found -> []
-                 in 
+                 let link_mutex = AgentId2Map.find_default (-42) link data_structure.links_mutex in
+                 let rule_ag_id1,rule_ag_id2=link in
+                 let l_ag_1 =
+                   AgentIdMap.find_default
+		     [rule_ag_id1] rule_ag_id1 data_structure.old_agents_potential_substitution in
+                 let l_ag_2 =
+                   AgentIdMap.find_default
+		       [rule_ag_id2] rule_ag_id2 data_structure.old_agents_potential_substitution in
+                 let test_list =
+                   AgentId2Map.find_default [] link data_structure.other_links_tests in
+                 let action_list =
+                   AgentId2Map.find_default [] link data_structure.other_links_actions in
                  List.fold_left 
                    (fun (error,log_info,blackboard) mixture_ag_1 -> 
                      let subs = AgentIdMap.empty in 
@@ -2167,19 +2139,19 @@ according to the corresponding substitution *)
                                    error,blackboard,build_map action_list action_map,build_map test_list test_map)
                                  (error,blackboard,PredicateidMap.empty,test_map)
                                  action_list in 
-                             let g x = 
-                               match x 
-                               with 
-                               | None -> Unknown
-                               | Some x -> x
-                             in 
-                             let merged_map = 
-                               PredicateidMap.merge 
-                                 (fun _ test action -> Some(g test,g action))
-                                 test_map
-                                 action_map 
-                             in 
-                             let merged_map = 
+			     let error,merged_map =
+			       PredicateidMap.monadic_fold2
+				 parameter error
+				 (fun _ e key test action acc ->
+				  e,PredicateidMap.add key (test,action) acc)
+				 (fun _ e key test acc ->
+				  e,PredicateidMap.add key (test,Unknown) acc)
+				 (fun _ e key action acc ->
+				  e,PredicateidMap.add key (Unknown,action) acc)
+				 test_map
+				 action_map
+				 PredicateidMap.empty in
+                             let merged_map =
                                PredicateidMap.add link_mutex (Counter 0,Counter 1) merged_map 
                              in 
                          (*** Pointer ->  ***)
@@ -2353,19 +2325,19 @@ according to the corresponding substitution *)
                  let error,blackboard,action_list,test_list = predicates_of_action true parameter handler error blackboard init action in 
                  error,blackboard,build_map action_list action_map,build_map test_list test_map)
                (error,blackboard,PredicateidMap.empty,test_map)
-               action_list in 
-           let g x = 
-             match x 
-             with 
-               | None -> Unknown
-               | Some x -> x
-           in 
-           let merged_map = 
-             PredicateidMap.merge 
-               (fun _ test action -> Some(g test,g action))
+               action_list in
+	   let error,merged_map =
+             PredicateidMap.monadic_fold2
+	       parameter error
+               (fun _ e key test action acc ->
+		e,PredicateidMap.add key (test,action) acc)
+               (fun _ e key test acc ->
+		e,PredicateidMap.add key (test,Unknown) acc)
+               (fun _ e key action acc ->
+		e,PredicateidMap.add key (Unknown,action) acc)
                test_map
-               action_map 
-           in 
+               action_map
+	       PredicateidMap.empty in
            let merged_map = 
              List.fold_left 
                (fun map pid -> PredicateidMap.add pid (Counter 1,Undefined) map)
@@ -2460,12 +2432,8 @@ according to the corresponding substitution *)
                list 
            in 
            let add_state pid (test,action) map = 
-             let test',action' = 
-               try 
-                 PredicateidMap.find pid map  
-               with 
-                 | Not_found -> Unknown,Unknown 
-             in 
+             let test',action' =
+               PredicateidMap.find_default (Unknown,Unknown) pid map in
              let test = 
                if strictly_more_refined test test' 
                then 
@@ -2573,19 +2541,19 @@ according to the corresponding substitution *)
                  let error,blackboard,action_list,test_list = predicates_of_action false parameter handler error blackboard init action in 
                  error,blackboard,build_map action_list action_map,build_map test_list test_map)
                (error,blackboard,PredicateidMap.empty,test_map)
-               action_list in 
-           let g x = 
-             match x 
-             with 
-               | None -> Unknown
-               | Some x -> x
-           in 
-           let merged_map = 
-             PredicateidMap.merge 
-               (fun _ test action -> Some(g test,g action))
+               action_list in
+	   let error,merged_map =
+             PredicateidMap.monadic_fold2
+	       parameter error
+               (fun _ e key test action acc ->
+		e,PredicateidMap.add key (test,action) acc)
+               (fun _ e key test acc ->
+		e,PredicateidMap.add key (test,Unknown) acc)
+               (fun _ e key action acc ->
+		e,PredicateidMap.add key (Unknown,action) acc)
                test_map
-               action_map 
-           in 
+               action_map
+	       PredicateidMap.empty in
            let merged_map = 
              List.fold_left 
                (fun map pid -> PredicateidMap.add pid (Counter 1,Undefined) map)
@@ -2714,7 +2682,7 @@ according to the corresponding substitution *)
          let add_step_up_to_iso = add_step_strong
                  
   (**interface*)
-         let n_predicates parameter handler error blackboard = 
+         let n_predicates _parameter _handler error blackboard = 
            error,blackboard.pre_ncolumn+1
              
          let event_list_of_predicate parameter handler error blackboard predicate_id = 
@@ -2733,16 +2701,16 @@ according to the corresponding substitution *)
                let error_list,error = CI.Po.K.H.create_error parameter handler error (Some "blackboard_generation.ml") None (Some "n_events_per_predicate") (Some "889") (Some "Unknown predicate id") (failwith "n_events_per_predicate") in 
                CI.Po.K.H.raise_error parameter handler error_list error 0
                  
-         let n_events parameter handler error blackboard = 
+         let n_events _parameter _handler error blackboard = 
            error,blackboard.pre_nsteps+1 
              
-         let mandatory_events parameter handler error blackboard = 
+         let mandatory_events _parameter _handler error blackboard = 
            error,blackboard.pre_observable_list 
              
-         let get_fictitious_observable parameter handler error blackboard = 
+         let get_fictitious_observable _parameter _handler error blackboard = 
            error,blackboard.pre_fictitious_observable
              
-         let get_side_effect parameter handler error blackboard = 
+         let get_side_effect _parameter _handler error blackboard = 
            error,blackboard.pre_side_effect_of_event
              
 

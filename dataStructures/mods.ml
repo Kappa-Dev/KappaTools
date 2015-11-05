@@ -14,6 +14,9 @@ module Int2SetMap =
   SetMap.Make (struct type t = int*int let compare = int_pair_compare end)
 module Int2Set = Int2SetMap.Set
 module Int2Map = Int2SetMap.Map
+module CharSetMap = SetMap.Make (struct type t = char let compare = compare end)
+module CharSet = CharSetMap.Set
+module CharMap = CharSetMap.Map
 
 module DynArray = DynamicArray.DynArray(LargeArray.GenArray)
 

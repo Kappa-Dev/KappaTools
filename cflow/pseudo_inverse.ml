@@ -50,7 +50,9 @@
          | Bound_site (ag,s) -> "Bound_state "^(string_of_int ag)^" "^(string_of_int s)
          | Internal_state (ag,s) -> "Internal_state "^(string_of_int ag)^" "^(string_of_int s)
            
-     module PredicateMap = Map.Make (struct type t = predicate_info let compare = compare end) 
+     module PredicateSetMap =
+       SetMap.Make (struct type t = predicate_info let compare = compare end)
+     module PredicateMap = PredicateSetMap.Map
 
      type step_id = int 
 
@@ -215,14 +217,10 @@
           | Instantiation.Remove ag -> 
             let ag_id = Po.K.agent_id_of_agent ag in 
             let predicate_id = Here ag_id in 
-            let set = 
-              try 
-                PredicateMap.find
-                  predicate_id 
-                  blackboard.predicate_id_list_related_to_predicate_id
-              with 
-                | Not_found -> [] 
-            in 
+            let set =
+              PredicateMap.find_default
+                [] predicate_id
+                blackboard.predicate_id_list_related_to_predicate_id in
             let list = 
               List.fold_left 
                 (fun list predicateid -> 
@@ -286,12 +284,9 @@
             | [] -> error,None,blackboard,[] 
             | t::q -> 
             begin
-              let column = 
-                try 
-                  PredicateMap.find t blackboard.steps_by_column 
-                with 
-                  | Not_found -> []
-              in 
+              let column =
+                PredicateMap.find_default
+		  [] t blackboard.steps_by_column in
               let column,blackboard = clean t column blackboard in 
               match 
                 column 
@@ -318,12 +313,9 @@
               && 
                 List.for_all 
                 (fun pid -> 
-                  let column = 
-                    try 
-                      PredicateMap.find pid  blackboard.steps_by_column  
-                    with 
-                      | Not_found -> []
-                  in 
+                 let column =
+                   PredicateMap.find_default
+		     [] pid blackboard.steps_by_column in
                   let column,blackboard = clean pid column blackboard in 
                   match 
                     column 
@@ -347,12 +339,10 @@
           with 
             | [] -> error,blackboard
             | pid::tail -> 
-              let list = 
-                try 
-                  PredicateMap.find pid blackboard.steps_by_column 
-                with 
-                  | Not_found -> raise Exit
-              in 
+               let list =
+                 match PredicateMap.find_option pid blackboard.steps_by_column with
+		 | Some x -> x
+		 | None -> raise Exit in
               begin 
                 let list = 
                   match 
@@ -409,10 +399,7 @@
 
 
 
-   let add_step parameter handler error step blackboard = 
-     let get_init_state pid = 
-       PredicateMap.find pid blackboard.init_state 
-     in 
+   let add_step parameter handler error step blackboard =
      let pre_event = blackboard.event in 
      let error,test_list = Po.K.tests_of_refined_step parameter handler error step in 
      let error,(action_list,_) = Po.K.actions_of_refined_step parameter handler error step in
@@ -430,12 +417,8 @@
          list
      in 
      let add_state pid (test,action) map = 
-       let test',action' = 
-         try 
-           PredicateMap.find pid map  
-         with 
-           | Not_found -> false,None 
-       in 
+       let test',action' =
+         PredicateMap.find_default (false,None) pid map in
        let test = test || test' in 
        let action = 
          match action' 
@@ -462,18 +445,18 @@
            error,blackboard,build_map action_list action_map,build_map_test test_list test_map,bool || bool',bool_creation || bool_creation')
          (error,blackboard,PredicateMap.empty,test_map,false,false)
          (action_list) in 
-     let merged_map = 
-       PredicateMap.merge 
-         (fun _ test action -> 
-           let test = 
-             match test 
-             with 
-               | None -> false 
-               | Some x -> x 
-           in Some (test,action))
+     let error,merged_map = 
+       PredicateMap.monadic_fold2
+	 parameter error
+         (fun _ e key test action acc ->
+	  e,PredicateMap.add key (test,Some action) acc)
+         (fun _ e key test acc ->
+	  e,PredicateMap.add key (test,None) acc)
+         (fun _ e key action acc ->
+	  e,PredicateMap.add key (false,Some action) acc)
          test_map
-         action_map 
-     in 
+         action_map
+	 PredicateMap.empty in
      let merged_map =
        List.fold_right
          (fun ((a,_),b) map ->
@@ -489,8 +472,9 @@
               with 
                 None -> false
               | Some action ->
-                try not ((get_init_state pid = action) || action = Undefined)
-                with Not_found -> false),
+		 match PredicateMap.find_option pid blackboard.init_state with
+		 | Some x -> not (x = action) || action = Undefined
+		 | None -> false),
              match action 
              with 
              | None | Some Undefined -> list 
@@ -514,20 +498,12 @@
                | None -> init_state
                | Some action -> 
                    begin 
-                     try 
-                       let _ = PredicateMap.find id init_state in 
-                       init_state
-                     with 
-                       Not_found -> 
-                         PredicateMap.add id action init_state
+                     if PredicateMap.mem id init_state then init_state
+		     else PredicateMap.add id action init_state
                    end
              in 
-             let old_list = 
-               try 
-                 PredicateMap.find id map 
-               with 
-               | Not_found -> [-1,Undefined,false] 
-            in 
+             let old_list =
+                 PredicateMap.find_default [-1,Undefined,false] id map in
              let old_value = 
                match 
                  old_list

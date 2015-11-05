@@ -23,5 +23,5 @@ val print_compare_op : Format.formatter -> compare_op -> unit
 (** {6 Dependencies management} *)
 
 type rev_dep = ALG of int | RULE of int | PERT of int
-module DepSet : Set.S with type elt = rev_dep
+module DepSet : SetMap.Set with type elt = rev_dep
 val print_rev_dep : Format.formatter -> rev_dep -> unit

@@ -24,7 +24,7 @@ let compare_level = compare
 let min_level a b = if compare a b <=0 then a else b 
 let default = 0 
 
-module LevelMap = Map.Make (struct type t = level let compare = compare_level end)
+module LevelMap = Mods.IntMap
 
 type priorities = 
   { 

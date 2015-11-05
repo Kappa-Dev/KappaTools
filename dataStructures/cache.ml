@@ -20,7 +20,7 @@
 
 module type Cache = 
 sig 
-  module O:Map.OrderedType 
+  module O:SetMap.OrderedType
   type t 
   val last:t -> O.t option 
   val create: int option  -> t 
@@ -30,11 +30,12 @@ sig
 end 
   
 module Cache = 
-  (functor (OO:Map.OrderedType) -> 
+  (functor (OO:SetMap.OrderedType) -> 
     (struct 
         
       module O = OO 
-      module S = Set.Make(O) 
+      module SM = SetMap.Make(O)
+      module S = SM.Set
 
       type finite_cache = 
           { 
@@ -84,8 +85,6 @@ module Cache =
         end 
            
     let last_finite t = t.last 
-
-    let fold_finite f t = S.fold f t.bag  
 
     type infinite_cache = 
         { 

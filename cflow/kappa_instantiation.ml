@@ -29,7 +29,7 @@ sig
   module P:StoryProfiling.StoryStats
 
   type agent_id = int 
-  module AgentIdSet:Set.S with type elt = agent_id
+  module AgentIdSet:SetMap.Set with type elt = agent_id
 
   type internal_state = int 
 
@@ -101,17 +101,15 @@ module Cflow_linker =
     module P = StoryProfiling.StoryStats
     module PI = Instantiation
 
-  type site_name = int
-
   type agent_id = int
 
-  module AgIdSet = Set.Make (struct type t = agent_id let compare = compare end)
+  module AgIdSet = Mods.IntSet
   type side_effect = PI.concrete PI.site list
 
-  module AgentIdMap = Map.Make (struct type t = agent_id let compare=compare end)
-  module AgentIdSet = Set.Make (struct type t = agent_id let compare=compare end)
-  module SiteMap = Map.Make (struct type t = site_name let compare=compare end)
-  module SiteSet = Set.Make (struct type t = site_name let compare = compare end) 
+  module AgentIdMap = Mods.IntMap
+  module AgentIdSet = Mods.IntSet
+  module SiteMap = Mods.IntMap
+  module SiteSet = Mods.IntSet
   type internal_state  = int 
 
   type refined_event =
@@ -386,19 +384,19 @@ module Cflow_linker =
        Event
 	 (a,
 	  PI.subst_map_agent_in_concrete_event
-	    (fun x -> try AgentIdMap.find x mapping with Not_found -> x)
+	    (fun x -> AgentIdMap.find_default x x mapping)
 	    event)
     | Obs (a,b,c) ->
        Obs(a,
 	   Tools.list_smart_map
 	     (PI.subst_map_agent_in_concrete_test
-		(fun x -> try AgentIdMap.find x mapping with Not_found -> x)) b,
+		(fun x -> AgentIdMap.find_default x x mapping)) b,
 	   c)
     | Init b ->
        Init
 	 (Tools.list_smart_map
 	    (PI.subst_map_agent_in_concrete_action
-	       (fun x -> try AgentIdMap.find x mapping with Not_found -> x)) b)
+	       (fun x -> AgentIdMap.find_default x x mapping)) b)
     | Dummy _ | Subs _ as event -> event
 
   let disambiguate event_list =
@@ -475,10 +473,13 @@ module Cflow_linker =
   let mod_site site state (remanent,set) = 
     let agid = agent_id_of_site site in 
     let s_name = site_name_of_site site in 
-    try 
-      let ag_info = AgentIdMap.find agid remanent in 
-      let state_ref =  SiteMap.find s_name ag_info.internal_states in 
-      if state_ref = state 
+    match AgentIdMap.find_option agid remanent with
+    | None -> remanent,set
+    | Some ag_info ->
+       match SiteMap.find_option s_name ag_info.internal_states with
+       | None -> remanent,set
+       | Some state_ref ->
+	  if state_ref = state
       then 
 	begin
 	  if SiteSet.mem s_name ag_info.sites_with_wrong_internal_state 
@@ -522,14 +523,12 @@ module Cflow_linker =
 		remanent, 
 		AgentIdSet.remove agid set
 	    end 
-	end 
-    with 
-  Not_found -> 
-    remanent,set 
+	end
 	
   let unbind_side (agid,s_name) (remanent,set) = 
-     try 
-      let ag_info = AgentIdMap.find agid remanent in 
+    match AgentIdMap.find_option agid remanent with
+    | None -> remanent,set
+    | Some ag_info ->
 	if SiteSet.mem s_name ag_info.bound_sites 
 	then 
 	  let ag_info = 
@@ -549,9 +548,6 @@ module Cflow_linker =
 	      set
 	  end 
 	else remanent,set 
-     with
-  Not_found -> 
-    remanent,set 
 
 
   let unbind site rem  = 
@@ -562,32 +558,28 @@ module Cflow_linker =
   let bind site (remanent,set) = 
     let agid = agent_id_of_site site in 
     let s_name = site_name_of_site site in 
-    try 
-      let ag_info = AgentIdMap.find agid remanent in 
-      begin
-	if SiteSet.mem s_name ag_info.bound_sites
-	then
-	  remanent,set 
-	else 
-	  let ag_info = 
-	    { 
-	      ag_info with 
-		bound_sites = 
-		SiteSet.add s_name ag_info.bound_sites}
-	  in 
-	  let remanent = AgentIdMap.add agid ag_info remanent in 
-	    begin
-	      if as_init ag_info 
-	      then 
-		remanent,set 
-	      else 
-		remanent, 
-		AgentIdSet.remove agid set
-	    end 
-      end 
-    with 
-      Not_found -> 
-      remanent,set
+    match AgentIdMap.find_option agid remanent with
+    | None -> remanent,set
+    | Some ag_info ->
+       if SiteSet.mem s_name ag_info.bound_sites
+       then
+	 remanent,set 
+       else 
+	 let ag_info = 
+	   { 
+	     ag_info with 
+	     bound_sites = 
+	       SiteSet.add s_name ag_info.bound_sites}
+	 in 
+	 let remanent = AgentIdMap.add agid ag_info remanent in 
+	 begin
+	   if as_init ag_info 
+	   then 
+	     remanent,set 
+	   else 
+	     remanent, 
+	     AgentIdSet.remove agid set
+	 end 
 
   let split_init refined_step_list =
     let remanent = AgentIdMap.empty in 
@@ -625,8 +617,9 @@ module Cflow_linker =
 	    in
 	    ((AgentIdSet.fold
 		(fun id list ->
-		 try (AgentIdMap.find id remanent).initial_step::list
-		 with Not_found -> list)
+		 match AgentIdMap.find_option id remanent with
+		 | Some x -> x.initial_step::list
+		 | None -> list)
 		set
 		(refined_step::step_list)),remanent)
 	 | Subs _ | Obs _ | Dummy _ -> (refined_step::step_list,remanent))

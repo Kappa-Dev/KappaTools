@@ -445,12 +445,10 @@ module Blackboard =
       
      let get_npredicate_id blackboard = blackboard.n_predicate_id 
      let get_n_unresolved_events_of_pid_by_level blackboard pid level = 
-       try 
-         PB.A.get 
-           (Priority.LevelMap.find level blackboard.weigth_of_predicate_id_by_level)  
-           pid 
-       with 
-       | Not_found -> 0
+       match Priority.LevelMap.find_option
+	       level blackboard.weigth_of_predicate_id_by_level with
+       | Some x -> PB.A.get x pid
+       | None -> 0
      let get_n_unresolved_events_of_pid blackboard pid = 
        PB.A.get 
          blackboard.weigth_of_predicate_id  
@@ -659,12 +657,9 @@ module Blackboard =
      let add_event eid (pid,seid) array level unsolved = 
        let event_case_address = build_event_case_address pid seid in 
        let old = PB.A.get array eid in 
-       let unsolved = 
-         try 
-           Priority.LevelMap.add level ((Priority.LevelMap.find level unsolved)+1) unsolved 
-         with 
-           Not_found -> Priority.LevelMap.add level 1 unsolved
-       in 
+       let unsolved =
+         Priority.LevelMap.add
+	   level ((Priority.LevelMap.find_default 0 level unsolved)+1) unsolved in
        PB.A.set array eid (event_case_address::old),unsolved 
 
      let empty_stack = []
@@ -697,19 +692,17 @@ module Blackboard =
          aux priority_max Priority.LevelMap.empty
        in 
        let inc_depth level p_id = 
-         try 
-           let a = 
-             Priority.LevelMap.find level weigth_of_predicate_id_by_level 
-           in 
-           let old = 
-             try 
-               PB.A.get a p_id
-             with 
-             | Not_found -> 0 
-           in 
-           PB.A.set a  p_id (old+1) 
-         with 
-         | Not_found -> ()
+	 match Priority.LevelMap.find_option
+		 level weigth_of_predicate_id_by_level with
+	 | Some a ->
+            let old = 
+              try 
+		PB.A.get a p_id
+              with 
+              | Not_found -> 0 
+            in 
+            PB.A.set a  p_id (old+1) 
+	 | None -> ()
        in 
 
        let weigth_of_predicate_id = PB.A.make 0 0 in 
@@ -790,12 +783,8 @@ module Blackboard =
              map
            else
              let error,level = PB.get_level_of_event parameter handler error pre_blackboard k in 
-             let map = 
-               try 
-                 Priority.LevelMap.add level ((Priority.LevelMap.find level map)+1) map 
-               with 
-               | Not_found ->
-                 Priority.LevelMap.add level 1 map
+             let map =
+               Priority.LevelMap.add level ((Priority.LevelMap.find_default 0 level map)+1) map
              in aux (k-1) map 
          in aux n_events unsolved_by_level 
        in 
@@ -852,13 +841,13 @@ module Blackboard =
              with 
                | Counter int2 -> 
                  begin 
-                   try 
-                     let a = Priority.LevelMap.find level blackboard.weigth_of_predicate_id_by_level in 
+                   match Priority.LevelMap.find_option
+			   level blackboard.weigth_of_predicate_id_by_level with
+		   | Some a ->
                      let _ = 
                        PB.A.set a int int2 in 
                      error,blackboard 
-                   with 
-                     Not_found -> 
+		   | None ->
                        begin
                          let error_list,error = 
                            PB.CI.Po.K.H.create_error parameter handler error (Some "blackboard.ml") None (Some "set") (Some "698") (Some "Incompatible address and value in function set") (failwith "Incompatible address and value in function Blackboard.set")
@@ -997,12 +986,10 @@ module Blackboard =
          | Keep_event step_id -> error,Boolean (PB.A.get blackboard.selected_events step_id) 
          | N_unresolved_events_in_column_at_level (int,level) -> 
            let n = 
-             try 
-               let a = Priority.LevelMap.find level blackboard.weigth_of_predicate_id_by_level in
-               PB.A.get a int 
-             with 
-               Not_found -> 0 
-               in 
+             match Priority.LevelMap.find_option
+		     level blackboard.weigth_of_predicate_id_by_level with
+	     | Some a -> PB.A.get a int
+	     | None -> 0 in
                error,Counter n
          | N_unresolved_events_in_column int -> error,Counter (PB.A.get blackboard.weigth_of_predicate_id int)
          | Exist case_address -> 
@@ -1029,11 +1016,10 @@ module Blackboard =
            let error,case = get_case parameter handler error case_address blackboard in 
            error,Pointer case.dynamic.pointer_previous 
          | N_unresolved_events -> error,Counter blackboard.n_unresolved_events
-         | N_unresolved_events_at_level lvl -> error,
-           Counter(try 
-           Priority.LevelMap.find lvl blackboard.n_unresolved_events_by_level
-             with Not_found -> 0)
-
+         | N_unresolved_events_at_level lvl ->
+	    error,
+	    Counter(Priority.LevelMap.find_default
+		      0 lvl blackboard.n_unresolved_events_by_level)
 
      let export_blackboard_to_xls parameter handler error prefix int int2 blackboard = 
         let file_name = prefix^"_"^(string_of_int int)^"_"^(string_of_int int2)^".sxw" in 
@@ -1538,8 +1524,6 @@ module Blackboard =
      let log_info = PB.CI.Po.K.P.set_step_time log_info in 
      let log_info = PB.CI.Po.K.P.inc_k_cut_events n_events_removed log_info in 
      error,log_info,blackboard,cut_causal_flow
-
-   let n = ref 0 
 
    let import parameter handler error log_info list = 
      let error,preblackboard = PB.init parameter handler error in

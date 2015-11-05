@@ -6,7 +6,8 @@ type bool_op = AND | OR
 type compare_op = GREATER | SMALLER | EQUAL | DIFF
 
 type rev_dep = ALG of int | RULE of int | PERT of int
-module DepSet = Set.Make (struct type t = rev_dep let compare = compare end)
+module DepSetMap = SetMap.Make (struct type t = rev_dep let compare = compare end)
+module DepSet = DepSetMap.Set
 
 let bin_alg_op_to_string () = function
   | MULT -> "*"

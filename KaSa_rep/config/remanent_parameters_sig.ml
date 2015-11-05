@@ -15,7 +15,7 @@
 
 (** if unsafe = true, then whenever an exception is raised, a default value is output, and no exception is raised*)
 
-module CharMap = Map.Make (struct type t = char let compare = compare end)
+module CharMap = Mods.CharMap
 
 type accuracy_level = None | Low | Medium | High
 type link_mode = Bound_indices | Site_address | Bound_type 
