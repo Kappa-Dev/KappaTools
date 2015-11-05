@@ -92,8 +92,8 @@ let rules_of_ast ?deps_machinery algs tokens contact_map domain
 	 | (0 | 1) -> unrate,None,uncc
 	 | 2 ->
 	    crate,Some unrate,
-	    Connected_component.SetMap.Set.add
-	      ccs.(0) (Connected_component.SetMap.Set.add ccs.(1) uncc)
+	    Connected_component.Set.add
+	      ccs.(0) (Connected_component.Set.add ccs.(1) uncc)
 	 | n ->
 	    raise (ExceptionDefn.Malformed_Decl
 		     ("Unary rule does not deal with "^
@@ -140,11 +140,11 @@ let rules_of_ast ?deps_machinery algs tokens contact_map domain
 			       | None -> failwith "ugly Eval.rule_of_ast")),
     unary_ccs',rules_l in
   let rev = match ast_rule.arrow, ast_rule.k_op with
-    | RAR, None -> domain'',deps_machinery,Connected_component.SetMap.Set.empty,[]
+    | RAR, None -> domain'',deps_machinery,Connected_component.Set.empty,[]
     | LRAR, Some rate ->
        let un_rate = match ast_rule.k_un with None -> None | Some (_,x) -> x in
        one_side (~- syntax_ref) (opposite label)
-	 (domain'',deps_machinery,Connected_component.SetMap.Set.empty,[]) rate un_rate
+	 (domain'',deps_machinery,Connected_component.Set.empty,[]) rate un_rate
 	 ast_rule.rhs ast_rule.lhs add_toks rm_toks
     | (RAR, Some _ | LRAR, None) ->
        raise
@@ -613,10 +613,10 @@ let compile_rules algs alg_deps tokens contact_map domain rules =
 	 rules_of_ast algs tokens ?deps_machinery contact_map domain
 		      ~syntax_ref rule_label rule in
        (domain',succ syntax_ref,origin',
-	Connected_component.SetMap.Set.union unary_cc extra_unary_cc,
+	Connected_component.Set.union unary_cc extra_unary_cc,
 	List.append cr acc))
       (domain,1,Some (Operator.RULE 0,alg_deps),
-       Connected_component.SetMap.Set.empty,[])
+       Connected_component.Set.empty,[])
       rules with
   | fdomain,_,Some (_,falg_deps),unary_cc,frules ->
      fdomain,falg_deps,List.rev frules,unary_cc
