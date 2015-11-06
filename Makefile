@@ -36,7 +36,7 @@ SCRIPTSWITNESS = $(SCRIPTSSOURCE:.sh=.witness)
 MODELS = $(wildcard $(MANKAPPAMODELSREP)*.ka)
 
 .PHONY: all clean temp-clean-for-ignorant-that-clean-must-be-done-before-fetch
-.PHONY: check build-tests doc clean_doc fetch_version
+.PHONY: check build-tests doc clean_doc fetch_version on_linux_for_windows
 
 .PRECIOUS: $(SCRIPTSWITNESS)
 
@@ -116,6 +116,12 @@ build-tests:
 temp-clean-for-ignorant-that-clean-must-be-done-before-fetch:
 	find . \( -name \*.cm\* -or -name \*.o -or -name \*.annot \) -delete
 	rm -f grammar/kappaLexer.ml grammar/kappaParser.ml grammar/kappaParser.mli
+
+on_linux_for_windows:
+	$(MAKE) clean
+	$(MAKE) OCAMLFIND_CONF=/etc/x86_64-w64-mingw32-ocamlfind.conf KaSim.native KaSa.native
+	mv _build/main/KaSim.native KaSim.exe
+	mv _build/KaSa_rep/main/KaSa.native KaSa.exe
 
 full: 
 	$(MAKE) clean
