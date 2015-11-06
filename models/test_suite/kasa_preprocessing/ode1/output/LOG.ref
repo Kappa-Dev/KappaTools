@@ -400,7 +400,6 @@ Covering_class_id:0
 site':1:state:0
 - Bdu of test restriction:
 agent_type_0:
-rule_id:0
 Covering_class_id:0
 site':2:state:0
 site':1:state:0
@@ -420,7 +419,6 @@ agent_type_0:  else
 agent_type_0:   false
 
 agent_type_1:
-rule_id:0
 Covering_class_id:0
 site':2:state:0
 site':1:state:0
@@ -439,7 +437,6 @@ agent_type_1:     false
 agent_type_1:  else 
 agent_type_1:   false
 
-rule_id:1
 Covering_class_id:0
 site':1:state:0
 
@@ -452,7 +449,6 @@ agent_type_1:  else
 agent_type_1:   false
 
 agent_type_2:
-rule_id:1
 Covering_class_id:0
 site':1:state:0
 
@@ -503,4 +499,11 @@ site_type':1
 agent_type_2:
 rule_id:1
 site_type':1
+
+------------------------------------------------------------
+* Build BDU MAP:
+------------------------------------------------------------
+- A map of covering classes with test rules:
+rule_id:1:covering_class_id:0@agent_type:2:site_type:0
+rule_id:1:covering_class_id:0@agent_type:2:site_type:1
 execution finished without any exception

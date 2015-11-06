@@ -202,9 +202,8 @@ let collect_modification_sites_without_creation parameter error
 	    Site_map_and_set.Map.fold
 	      (fun site_type _ (error, store_result) ->
 		let error, store_result =
-		  (*TEST ME: check whether or not creation_sites is empty*)
 		  if Int2Map_Modif.Map.is_empty store_creation_sites
-		  then (*error, store_result*)
+		  then
 		    let error, store_result =
 		      add_link (agent_type, site_type) rule_id store_result
 		    in

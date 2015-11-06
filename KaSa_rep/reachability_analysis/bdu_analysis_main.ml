@@ -24,7 +24,8 @@ open Bdu_modification_sites
 open Bdu_contact_map
 open Bdu_update
 open Bdu_working_list
-open Bdu_build
+open Bdu_build (*REMOVE*)
+open Bdu_structure (*RENAME*)
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "BDU analysis") message exn (fun () -> default)  
@@ -207,7 +208,7 @@ let scan_rule_dynamic parameter error handler rule_id rule
   }
 
 (************************************************************************************)
-(*rule bdu build*)
+(*rule bdu build REMOVE*)
 
 let scan_rule_bdu_build parameter error rule_id rule covering_classes store_result =
   let error, store_remanent_test =
@@ -232,7 +233,6 @@ let scan_rule_bdu_build parameter error rule_id rule covering_classes store_resu
     collect_bdu_test
       parameter
       error
-      rule_id
       store_test_restriction
       store_result.store_bdu_test
   in
@@ -283,6 +283,24 @@ let scan_rule_bdu_build parameter error rule_id rule covering_classes store_resu
   }
 
 (************************************************************************************)
+(*rule bdu build map*)
+
+let scan_rule_bdu_build_map parameter error rule_id rule covering_classes store_result =
+  let error, store_remanent_test_map =
+    collect_remanent_test_map
+      parameter
+      error
+      rule_id
+      rule
+      covering_classes
+      store_result.store_remanent_test_map
+  in
+  error, 
+  {
+    store_remanent_test_map = store_remanent_test_map
+  }
+
+(************************************************************************************)
 (*rule*)
 
 let scan_rule parameter error handler rule_id rule store_covering_classes
@@ -322,12 +340,23 @@ let scan_rule parameter error handler rule_id rule store_covering_classes
       covering_classes
       store_result.store_bdu_build
   in
+  (*-------------------------------------------------------------------------------*)
+  let error, store_bdu_build_map =
+    scan_rule_bdu_build_map
+      parameter
+      error
+      rule_id
+      rule
+      covering_classes
+      store_result.store_bdu_build_map
+  in
   (*------------------------------------------------------------------------------*)
   (*store*)
   error,
   {
     store_bdu_analysis_static  = store_bdu_analysis_static;
     store_bdu_analysis_dynamic = store_bdu_analysis_dynamic;
+    store_bdu_build_map        = store_bdu_build_map;
     store_bdu_build            = store_bdu_build
   }
  
@@ -389,7 +418,7 @@ let init_bdu_analysis_dynamic parameter error =
   error, init_bdu_analysis_dynamic
 
 (************************************************************************************)
-(*init of bdu build*)
+(*init of bdu build REMOVE*)
 
 let init_bdu_build parameter error =
   let error, init_remanent_test    = AgentMap.create parameter error 0 in
@@ -413,16 +442,30 @@ let init_bdu_build parameter error =
   error, init_restriction_bdu_test
 
 (************************************************************************************)
+(*init of bdu build map*)
+
+let init_bdu_build_map error =
+  let init_remanent_test_map = Map_test.Map.empty in
+  let init_bdu_build_map =
+    {
+      store_remanent_test_map = init_remanent_test_map;
+    }
+  in
+  error, init_bdu_build_map
+
+(************************************************************************************)
 (*rules*)
 
 let scan_rule_set parameter error handler store_covering_classes compiled rules =
   let error, init_bdu_analysis_dynamic = init_bdu_analysis_dynamic parameter error in
   let error, init_bdu_build            = init_bdu_build parameter error in
+  let error, init_bdu_build_map        = init_bdu_build_map error in
   let init_bdu =
     {
       store_bdu_analysis_static  = init_bdu_analysis_static;
       store_bdu_analysis_dynamic = init_bdu_analysis_dynamic;
       store_bdu_build            = init_bdu_build;
+      store_bdu_build_map        = init_bdu_build_map
     }
   in
   (*------------------------------------------------------------------------------*)

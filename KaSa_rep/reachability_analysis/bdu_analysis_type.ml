@@ -31,6 +31,7 @@ module AgentMap = Quick_Nearly_inf_Imperatif
 module Int2Map_CV =
   SetMap.Make (
     struct
+      (*agent_type, site*)
       type t = int * int
       let compare = compare
     end)
@@ -41,6 +42,7 @@ module Int2Map_CV =
 module Int2Map_CM_state =
   SetMap.Make (
     struct
+      (*agent_type, site, state*)
       type t = int * int * int
       let compare = compare
     end
@@ -52,6 +54,7 @@ module Int2Map_CM_state =
 module Int2Map_Modif =
   SetMap.Make (
     struct
+      (*agent_type, site*)
       type t = int * int
       let compare = compare
     end)
@@ -62,6 +65,7 @@ module Int2Map_Modif =
 module Int2Map_HalfBreak_effect =
   SetMap.Make (
     struct
+      (*agent_type, site*)
       type t = int * int
       let compare = compare
     end)
@@ -69,6 +73,7 @@ module Int2Map_HalfBreak_effect =
 module Int2Map_Remove_effect =
   SetMap.Make (
     struct
+      (*agent_type, site*)
       type t = int * int
       let compare = compare
     end)
@@ -79,6 +84,18 @@ module Int2Map_Remove_effect =
 module Int2Map_CV_Modif =
   SetMap.Make (
     struct
+      (*agent_type, site, covering_class_id*)
+      type t = int * int * int
+      let compare = compare
+    end)
+
+(************************************************************************************)
+(*module type for bdu structure*)
+
+module Map_test =
+  SetMap.Make (
+    struct
+      (*rule_id, covering_class_id, agent_type*)
       type t = int * int * int
       let compare = compare
     end)
@@ -151,12 +168,20 @@ type bdu_build =
   {
     store_remanent_test    : ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
     store_test_restriction : (int * int Site_map_and_set.Map.t) list AgentMap.t;
-    store_bdu_test         : (int list *
-                                ((int * int) list * int * pair_bdu) list) AgentMap.t;
+    store_bdu_test         : (((int * int) list * int * pair_bdu) list) AgentMap.t;
     store_remanent_creation : ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
     store_remanent_modif    : ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
     store_modif_restriction : (int * int Site_map_and_set.Map.t) list AgentMap.t;
     store_modif_restriction_list : (int list * int list) AgentMap.t
+  }
+
+(************************************************************************************)
+(*bdu build map*)
+
+type bdu_build_map =
+  {
+    store_remanent_test_map : ((int list * (int list * Site_map_and_set.Set.t) list)
+    Map_test.Map.t) ;
   }
 
 (************************************************************************************)
@@ -166,5 +191,6 @@ type bdu_analysic =
     {
       store_bdu_analysis_static  : bdu_analysis_static;
       store_bdu_analysis_dynamic : bdu_analysis_dynamic;
-      store_bdu_build            : bdu_build;
+      store_bdu_build_map        : bdu_build_map;
+      store_bdu_build            : bdu_build; (*REMOVE*)
     }

@@ -59,11 +59,6 @@ let store_covering_classes_modification_update_aux parameter error agent_type_cv
       Int2Map_CV_Modif.Map.add (agent_type_cv, site_type_cv, cv_id)
 			       (l, new_set) store_result
     in
-    (*add the fresh signature into the old result and store them*)
-    (*let error, result =
-      Int2Map_CV_Modif.add_map parameter error (agent_type_cv, site_type_cv, cv_id)
-        (l, rule_id :: old) store_result
-    in*)
     error, result
   in
   (*Example:

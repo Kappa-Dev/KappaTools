@@ -151,4 +151,9 @@ agent_type_2:
 - Covering classes of modification:
 - Covering classes of modification restriction:
 - Modification restriction list:
+
+------------------------------------------------------------
+* Build BDU MAP:
+------------------------------------------------------------
+- A map of covering classes with test rules:
 execution finished without any exception

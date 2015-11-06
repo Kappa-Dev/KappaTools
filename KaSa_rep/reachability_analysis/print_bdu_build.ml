@@ -83,25 +83,24 @@ let print_site_state_list l =
       aux tl
   in aux l
 
-let print_bdu_list parameter error l l' =
-  let rec aux acc acc' =
-    match acc, acc' with
-    | [], [] | _, [] | [], _ -> []
-    | rule_id :: tl, (l, id, (handler, bdu_test)) :: tl' ->
-      fprintf stdout "rule_id:%i\n" rule_id;
+let print_bdu_list parameter error l =
+  let rec aux acc =
+    match acc with
+    | [] -> []
+    | (l, id, (handler, bdu_test)) :: tl ->
       fprintf stdout "Covering_class_id:%i\n" id;
       let _ = print_site_state_list l in
       fprintf stdout "\n";
       let _ = print_bdu parameter error bdu_test in
       fprintf stdout "\n";
-      aux tl tl'
-  in aux l l'
+      aux tl
+  in aux l
 
 let print_bdu_test parameter error result =
   AgentMap.print error
-    (fun error parameter (rule_id_list, triple_list) ->
+    (fun error parameter triple_list ->
       let _ =
-        print_bdu_list parameter error rule_id_list triple_list
+        print_bdu_list parameter error triple_list
       in
       error
     ) parameter result

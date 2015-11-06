@@ -711,71 +711,70 @@ agent_type_3:
 ------------------------------------------------------------
 - Covering classes of test:
 agent_type_0:
-Covering_class_id:1
-site_type:1
 Covering_class_id:2
 site_type:0
+Covering_class_id:1
+site_type:1
 Covering_class_id:0
 site_type:2
 agent_type_2:
-Covering_class_id:1
-site_type:1
 Covering_class_id:2
 site_type:0
+Covering_class_id:1
+site_type:1
 Covering_class_id:0
 site_type:2
 agent_type_4:
-Covering_class_id:1
-site_type:1
 Covering_class_id:2
 site_type:0
+Covering_class_id:1
+site_type:1
 Covering_class_id:0
 site_type:2
 agent_type_5:
-Covering_class_id:1
-site_type:1
 Covering_class_id:2
 site_type:0
+Covering_class_id:1
+site_type:1
 Covering_class_id:0
 site_type:2
 - Covering classes of test restriction:
 agent_type_0:
 Covering_class_id:0
 site':1:state:0
-Covering_class_id:2
 Covering_class_id:1
+Covering_class_id:2
 Covering_class_id:0
+Covering_class_id:1
 Covering_class_id:2
 site':1:state:0
-Covering_class_id:1
 agent_type_2:
 Covering_class_id:0
-Covering_class_id:2
-site':1:state:0
 Covering_class_id:1
+site':1:state:0
+Covering_class_id:2
 site':1:state:0
 agent_type_4:
 Covering_class_id:0
-Covering_class_id:2
 Covering_class_id:1
 site':1:state:1
-Covering_class_id:0
 Covering_class_id:2
-site':1:state:0
+Covering_class_id:0
 Covering_class_id:1
+site':1:state:0
+Covering_class_id:2
 site':1:state:0
 agent_type_5:
 Covering_class_id:0
-Covering_class_id:2
 Covering_class_id:1
 site':1:state:0
+Covering_class_id:2
 Covering_class_id:0
+Covering_class_id:1
 Covering_class_id:2
 site':1:state:0
-Covering_class_id:1
 - Bdu of test restriction:
 agent_type_0:
-rule_id:7
 Covering_class_id:0
 site':1:state:0
 
@@ -787,22 +786,22 @@ agent_type_0:   true
 agent_type_0:  else 
 agent_type_0:   false
 
-rule_id:7
-Covering_class_id:2
-
-agent_type_0: false
-
-rule_id:7
 Covering_class_id:1
 
 agent_type_0: false
 
-rule_id:5
+Covering_class_id:2
+
+agent_type_0: false
+
 Covering_class_id:0
 
 agent_type_0: false
 
-rule_id:5
+Covering_class_id:1
+
+agent_type_0: false
+
 Covering_class_id:2
 site':1:state:0
 
@@ -813,31 +812,12 @@ agent_type_0:  if(mvbdu_id:2) x1 < 1 then
 agent_type_0:   true
 agent_type_0:  else 
 agent_type_0:   false
-
-rule_id:5
-Covering_class_id:1
-
-agent_type_0: false
 
 agent_type_2:
-rule_id:7
 Covering_class_id:0
 
 agent_type_2: false
 
-rule_id:7
-Covering_class_id:2
-site':1:state:0
-
-agent_type_2: if(mvbdu_id:3) x1 < 0 then 
-agent_type_2:  false
-agent_type_2: else 
-agent_type_2:  if(mvbdu_id:2) x1 < 1 then 
-agent_type_2:   true
-agent_type_2:  else 
-agent_type_2:   false
-
-rule_id:7
 Covering_class_id:1
 site':1:state:0
 
@@ -849,18 +829,22 @@ agent_type_2:   true
 agent_type_2:  else 
 agent_type_2:   false
 
+Covering_class_id:2
+site':1:state:0
+
+agent_type_2: if(mvbdu_id:3) x1 < 0 then 
+agent_type_2:  false
+agent_type_2: else 
+agent_type_2:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_2:   true
+agent_type_2:  else 
+agent_type_2:   false
+
 agent_type_4:
-rule_id:7
 Covering_class_id:0
 
 agent_type_4: false
 
-rule_id:7
-Covering_class_id:2
-
-agent_type_4: false
-
-rule_id:7
 Covering_class_id:1
 site':1:state:1
 
@@ -872,13 +856,15 @@ agent_type_4:   true
 agent_type_4:  else 
 agent_type_4:   false
 
-rule_id:7
+Covering_class_id:2
+
+agent_type_4: false
+
 Covering_class_id:0
 
 agent_type_4: false
 
-rule_id:7
-Covering_class_id:2
+Covering_class_id:1
 site':1:state:0
 
 agent_type_4: if(mvbdu_id:3) x1 < 0 then 
@@ -889,8 +875,7 @@ agent_type_4:   true
 agent_type_4:  else 
 agent_type_4:   false
 
-rule_id:7
-Covering_class_id:1
+Covering_class_id:2
 site':1:state:0
 
 agent_type_4: if(mvbdu_id:3) x1 < 0 then 
@@ -902,17 +887,10 @@ agent_type_4:  else
 agent_type_4:   false
 
 agent_type_5:
-rule_id:7
 Covering_class_id:0
 
 agent_type_5: false
 
-rule_id:7
-Covering_class_id:2
-
-agent_type_5: false
-
-rule_id:7
 Covering_class_id:1
 site':1:state:0
 
@@ -924,12 +902,18 @@ agent_type_5:   true
 agent_type_5:  else 
 agent_type_5:   false
 
-rule_id:7
+Covering_class_id:2
+
+agent_type_5: false
+
 Covering_class_id:0
 
 agent_type_5: false
 
-rule_id:7
+Covering_class_id:1
+
+agent_type_5: false
+
 Covering_class_id:2
 site':1:state:0
 
@@ -940,11 +924,6 @@ agent_type_5:  if(mvbdu_id:2) x1 < 1 then
 agent_type_5:   true
 agent_type_5:  else 
 agent_type_5:   false
-
-rule_id:7
-Covering_class_id:1
-
-agent_type_5: false
 
 - Creation restriction:
 agent_type_1:
@@ -1023,4 +1002,12 @@ agent_type_2:
 agent_type_3:
 rule_id:7
 site_type':1
+
+------------------------------------------------------------
+* Build BDU MAP:
+------------------------------------------------------------
+- A map of covering classes with test rules:
+rule_id:8:covering_class_id:0@agent_type:0:site_type:2
+rule_id:8:covering_class_id:1@agent_type:0:site_type:1
+rule_id:8:covering_class_id:2@agent_type:0:site_type:0
 execution finished without any exception

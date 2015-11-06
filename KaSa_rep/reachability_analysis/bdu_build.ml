@@ -141,8 +141,8 @@ let collect_remanent_test parameter error rule store_remanent store_result =
               let error, set = list2set parameter error list in
               (*-------------------------------------------------------------------*)
               (*get the next_set*)
-              let new_set = (id, list, set) :: current_list in
-              error, List.rev new_set
+              let triple_list = (id, list, set) :: current_list in
+              error, triple_list
             ) store_dic (error, [])
         in
         (*-------------------------------------------------------------------------*)
@@ -152,7 +152,7 @@ let collect_remanent_test parameter error rule store_remanent store_result =
             parameter
             error
             agent_type_test
-            triple_list
+            (List.rev triple_list)
             store_result
         in
         error, store_result
@@ -220,13 +220,14 @@ let collect_test_restriction parameter error rule store_remanent_test store_resu
 (************************************************************************************)
 (*build bdu for test rules*)
 
-let collect_bdu_test parameter error rule_id store_test_restriction store_result =
+let collect_bdu_test parameter error store_test_restriction store_result =
   let error, (handler, bdu_init) = bdu_init parameter error in
   AgentMap.fold parameter error
     (fun parameter error agent_type pair_list store_result ->
       (*build bdu test*)
-      let error, (rule_id_list, plist) =
-        List.fold_left (fun (error, (rule_id_list, store_list)) (id, map_res) ->
+      let error, plist =
+        List.fold_left (fun (error, store_list) (id, map_res) ->
+          (*-----------------------------------------------------------------*)
           let error, (l, (handler, bdu_test)) =
             Site_map_and_set.Map.fold
               (fun site' state (error, (current_list, _)) ->
@@ -237,29 +238,22 @@ let collect_bdu_test parameter error rule_id store_test_restriction store_result
                 error, (p, (handler, bdu_test))
               ) map_res (error, ([], (handler, bdu_init)))
           in
+          (*-----------------------------------------------------------------*)
           (*store*)
           let new_triple_list = 
             (l, id, (handler, bdu_test)) :: store_list
-          in
-          (*add_map to get rule_id*)
-          let rule_id_map = rule_id :: rule_id_list in
-          error, (rule_id_map, new_triple_list)
-        ) (error, ([], [])) pair_list
+          in          
+          error, new_triple_list
+        ) (error, []) pair_list
       in
-      (*get old*)
-      let error, (old_list, _) =
-        match AgentMap.unsafe_get parameter error agent_type store_result with
-        | error, None -> error, ([], [])
-        | error, Some (l, l') -> error, (l, l')
-      in
-      let new_rule_id = List.concat [rule_id_list; old_list] in
+      (*-----------------------------------------------------------------*)
       (*store*)
       let error, store_result =
         AgentMap.set
           parameter
           error
           agent_type
-          (List.rev new_rule_id, List.rev plist)
+          (List.rev plist)
           store_result
       in
       error, store_result
@@ -316,6 +310,7 @@ let collect_remanent_modif parameter error rule store_remanent store_result =
 	let agent_type_modif = agent_modif.agent_name in
 	(*store_dic*)
 	let store_dic = remanent.store_dic in
+        (*-----------------------------------------------------------------*)
 	let error, triple_list =
 	  Dictionary_of_Covering_class.fold
 	    (fun list _ id (error, current_list) ->
@@ -324,6 +319,7 @@ let collect_remanent_modif parameter error rule store_remanent store_result =
 	      error, List.rev new_set
 	    ) store_dic (error, [])
 	in
+        (*-----------------------------------------------------------------*)
 	let error, store_result =
 	  AgentMap.set
 	    parameter
@@ -349,6 +345,7 @@ let collect_modif_restriction parameter error rule store_remanent_modif store_re
 	    let error, (map_new_index_forward, _) =
 	      new_index_pair_map parameter error list
 	    in
+            (*-----------------------------------------------------------------*)
 	    let error, map_res =
 	      Site_map_and_set.Map.monadic_fold_restriction parameter error
 		(fun parameters error site port store_result ->
@@ -367,6 +364,7 @@ let collect_modif_restriction parameter error rule store_remanent_modif store_re
 	    error, ((id, map_res) :: current_list)
 	  ) (error, []) triple_list
 	in
+        (*-----------------------------------------------------------------*)
 	(*get old*)
 	let error, old_pair =
 	  match AgentMap.unsafe_get parameter error agent_type_modif store_result with
@@ -374,6 +372,7 @@ let collect_modif_restriction parameter error rule store_remanent_modif store_re
 	    | error, Some l -> error, l
 	in
 	let new_pair_list = List.concat [pair_list; old_pair] in
+        (*-----------------------------------------------------------------*)
 	(*store*)
 	let error, store_result =
 	  AgentMap.set
@@ -389,6 +388,7 @@ let collect_modif_restriction parameter error rule store_remanent_modif store_re
 (************************************************************************************)
 (*build a list of site in modification restriction*)
 (*TODO*)
+
 let collect_modif_list parameter error rule_id store_modif_restriction store_result =
   AgentMap.fold parameter error
     (fun parameter error agent_type pair_list store_result ->
@@ -407,6 +407,7 @@ let collect_modif_list parameter error rule_id store_modif_restriction store_res
 	  error, (rule_id_map, site_list)
 	) (error, ([], [])) pair_list
       in
+      (*-----------------------------------------------------------------*)
       (*get old*)
       let error, (old_list, _) =
 	match AgentMap.unsafe_get parameter error agent_type store_result with
@@ -414,6 +415,7 @@ let collect_modif_list parameter error rule_id store_modif_restriction store_res
 	  | error, Some (l, l') -> error, (l, l')
       in
       let new_rule_id = List.concat [rule_id_list; old_list] in
+      (*-----------------------------------------------------------------*)
       (*store*)
       let error, store_result =
 	AgentMap.set

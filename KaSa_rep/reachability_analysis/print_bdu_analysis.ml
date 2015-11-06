@@ -19,7 +19,8 @@ open Remanent_parameters_sig
 open Bdu_analysis_type
 open Print_bdu_analysis_static
 open Print_bdu_analysis_dynamic
-open Print_bdu_build
+open Print_bdu_build (*REMOVE*)
+open Print_bdu_build_map
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "BDU creation") message exn (fun () -> default)  
@@ -52,5 +53,11 @@ let print_result parameter error result =
       parameter
       error
       result.store_bdu_build
+  in
+  let _ =
+    print_bdu_build_map
+      parameter
+      error
+      result.store_bdu_build_map
   in
   error
