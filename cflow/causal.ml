@@ -562,8 +562,13 @@ let js_of_grid env enriched_grid f =
   let () = Pp.set
 	     ~trailing:Pp.space IntMap.bindings Pp.space
 	     (fun f (eid,atom) ->
-	      Format.fprintf f "g.setNode(%i, { label: \"%s\" });"
-			     eid (label ~env atom.kind))
+	      Format.fprintf
+		f "g.setNode(%i, { label: \"%s\", style: \"fill: %s\" });"
+		eid (label ~env atom.kind)
+		(match atom.kind with
+		 | OBS _ -> "#f77"
+		 | (INIT _ | PERT _) -> "#7f7"
+		 | RULE _ -> "#77f"))
 	     f enriched_grid.config.events in
   let () = Pp.set
 	     IntMap.bindings Pp.empty
@@ -605,7 +610,7 @@ let html_of_grid profiling compression_type cpt env enriched_grid f =
     Format.fprintf f "<script src=\"%s\" charset=\"utf-8\"></script>@," t in
 
   let () = Format.fprintf f "@[<v><!doctype html>@,@,<html>@," in
-  let () = Format.fprintf f "@[<v 2><head>@,<meta charset=\"utf8\">@," in
+  let () = Format.fprintf f "@[<v 2><head>@,<meta charset=\"utf-8\">@," in
   let () = Format.fprintf f "<title>%t</title>@," title in
   let () = dependency f "http://d3js.org/d3.v3.min.js" in
   let () =
