@@ -70,31 +70,30 @@ let compress_and_print logger env log_info step_list =
             then Debug.tag logger "+ Producing causal compressions"
             else Debug.tag logger "+ Producing causal traces"
           in
-          let error = D.S.PH.B.PB.CI.Po.K.H.error_init in
-          let refined_event_list = D.S.PH.B.PB.CI.Po.K.disambiguate (D.S.PH.B.PB.CI.Po.K.split_init step_list) in
+          let error = U.error_init in
+          let refined_event_list = U.disambiguate (U.split_init step_list) in
           let () = if log_step then Debug.tag logger"\t - refining events" in
 	  let refined_event_list_wo_siphon =
-	    if Graph_closure.ignore_flow_from_outgoing_siphon then
+	    if Graph_closure.ignore_flow_from_outgoing_siphon
+	    then
 	      let () =
-		if log_step then Debug.tag logger"\t - detecting siphons" in
-	      let siphoned_event_list =
-		D.S.PH.B.PB.CI.Po.K.fill_siphon refined_event_list in
-              D.S.PH.B.PB.CI.Po.K.disambiguate siphoned_event_list
-	    else refined_event_list in
+		if log_step then Debug.tag logger"\t - detecting siphons"
+	      in
+	      U.disambiguate (U.fill_siphon refined_event_list) 
+            else refined_event_list
+	  in
           let () =
             if debug_mode then
-	      Format.fprintf
-		parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel "@[<v>%a@]@."
-		(Pp.list Pp.space (D.S.PH.B.PB.CI.Po.K.print_refined_step ~handler))
-                refined_event_list_wo_siphon in
-          let refined_event_list_cut,int =
+	      U.print_trace parameter handler refined_event_list_wo_siphon
+	  in
+	  let refined_event_list_cut,int =
             if (weak_compression_on || strong_compression_on)
 	       && Parameter.do_global_cut then
               let () =
                 if log_step then
                   Debug.tag logger "\t - cutting concurrent events" in
               let error,(refined_event_list_cut,int) =
-		D.S.PH.B.PB.CI.Po.cut parameter handler error refined_event_list_wo_siphon in
+		U.cut parameter handler error refined_event_list_wo_siphon in
 	      let () =
 		if debug_mode then
 		  Format.fprintf

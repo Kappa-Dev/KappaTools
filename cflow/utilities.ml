@@ -20,19 +20,35 @@
 let debug_mode = false
 let dummy_weak = false
 		   
-module D=Dag.Dag 
+module D=Dag.Dag
+type error_log =  D.S.PH.B.PB.CI.Po.K.H.error_channel
+type refined_trace = D.S.PH.B.PB.CI.Po.K.refined_step list
+type parameter =  D.S.PH.B.PB.CI.Po.K.H.parameter
+type kappa_handler = D.S.PH.B.PB.CI.Po.K.H.handler 
+		       
 type ('a,'b,'c) remanent =  
-  D.S.PH.B.PB.CI.Po.K.H.error_channel * int * (bool * int * int) *
+  error_log * int * (bool * int * int) *
     D.S.PH.B.blackboard *
       (D.prehash *
          (Causal.grid * D.graph * 'a option *
             ('b * D.S.PH.update_order list *
-               D.S.PH.B.PB.CI.Po.K.refined_step list) *
-              D.S.PH.B.PB.CI.Po.K.refined_step list *
+               refined_trace) *
+              refined_trace *
 		'c Mods.simulation_info option list)
            list)
         list * int
-		 
+
+let error_init = D.S.PH.B.PB.CI.Po.K.H.error_init
+let split_init = D.S.PH.B.PB.CI.Po.K.split_init
+let disambiguate = D.S.PH.B.PB.CI.Po.K.disambiguate
+let fill_siphon = D.S.PH.B.PB.CI.Po.K.fill_siphon 
+let cut = D.S.PH.B.PB.CI.Po.cut
+
+let print_trace parameter handler =
+      Format.fprintf
+	parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel "@[<v>%a@]@."
+	(Pp.list Pp.space (D.S.PH.B.PB.CI.Po.K.print_refined_step ~handler))
+        
 let from_none_to_weak parameter handler log_info logger (error,counter,tick,blackboard,weakly_compressed_story_array,weakly_compression_faillure) ((event_id_list,list_order,event_list),step_list,list_info) = 
   let info = List.hd list_info in 
   let error,log_info,blackboard_tmp,list_order = 
