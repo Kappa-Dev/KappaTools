@@ -1001,8 +1001,10 @@ parameter & possible values & description \\
 \textit{Causality analysis}&\\
 \ttt{"displayCompression"} & any combination of \\
 &  \ttt{"none", "strong", "weak"} & \small type of compression \\
-\ttt{"cflowFileName"} & \ttt{"cflow.dot"}, any string & \small file name for causal flows\\ & \\
+\ttt{"cflowFileName"} & \ttt{"cflow"}, any string & \small file name prefix for causal flows\\ & \\
 \ttt{"showIntroEvents"} & \ttt{"no", "yes"} & \small show introduction events in causal flows\\ & \\
+\ttt{"dotCflows"} & \ttt{"no", "yes"} & \small generate causal flows in dot format\\
+\ttt{"reduceCflows"} & \ttt{"no", "yes"} & \small pretty print the transitive reduction of causal flows\\
 \textit{Pretty printing}&\\
 \ttt{"plotSepChar"} & \ttt{" "} or any character & \small separation character for plots\\
 \ttt{"dotSnapshots"} & \ttt{"no", "yes"} & \small generate dot snapshots\\
