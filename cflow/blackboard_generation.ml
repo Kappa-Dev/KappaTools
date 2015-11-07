@@ -2054,7 +2054,10 @@ according to the corresponding substitution *)
            let f error log_info blackboard set = 
               AgentId2Set.fold 
                (fun link (error,log_info,blackboard) -> 
-                 let link_mutex = AgentId2Map.find_default (-42) link data_structure.links_mutex in
+                let link_mutex =
+		  match AgentId2Map.find_option link data_structure.links_mutex with
+		  | Some x -> x
+		  | None -> raise Not_found in
                  let rule_ag_id1,rule_ag_id2=link in
                  let l_ag_1 =
                    AgentIdMap.find_default

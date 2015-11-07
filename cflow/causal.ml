@@ -130,7 +130,11 @@ let subset subs l s =
   List.fold_left
     (fun s' a ->
      if IntSet.mem a s
-     then IntSet.add (IntMap.find_default (-42) a subs) s'
+     then IntSet.add
+	    (match IntMap.find_option a subs with
+	     | Some i -> i
+	     | None -> raise Not_found)
+	    s'
      else s')
     IntSet.empty l
 
