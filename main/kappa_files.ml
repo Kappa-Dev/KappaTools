@@ -30,12 +30,15 @@ let find_available_name name facultative ext =
     else base'^"."^ext
   else base^"."^ext
 
-let open_out_fresh_filename base_name concat_list facultative ext =
+let get_fresh_filename base_name concat_list facultative ext =
   let tmp_name =
     path (try Filename.chop_extension base_name
 		with Invalid_argument _ -> base_name) in
   let base_name = String.concat "_" (tmp_name::concat_list) in
-  open_out (find_available_name base_name facultative ext)
+  find_available_name base_name facultative ext
+
+let open_out_fresh_filename base_name concat_list facultative ext =
+  open_out (get_fresh_filename base_name concat_list facultative ext)
 
 let mk_dir_r d =
   let rec aux d =
@@ -115,7 +118,8 @@ let with_marshalized f =
      close_out d
 
 let set_cflow s = cflowFileName := s
-let fresh_cflow_filename l e = open_out_fresh_filename !cflowFileName l "" e
+let with_cflow_file l e f =
+  with_formatter (get_fresh_filename !cflowFileName l "" e) f
 
 let open_profiling () = open_out !profilingName
 

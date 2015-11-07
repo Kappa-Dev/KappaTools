@@ -54,7 +54,8 @@ let (pointNumberValue:int ref) = ref 0
 let (seedValue:int option ref) = ref None
 let compileModeOn = ref false
 let implicitSignature = ref false
-let dotOutput = ref false
+let dotSnapshots = ref false
+let dotCflows = ref true
 let fluxModeOn = ref false
 let snapshotHighres = ref true
 

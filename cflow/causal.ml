@@ -457,8 +457,7 @@ let enrich_grid err_fmt config_closure grid =
     depth_of_event = depth_of_event
   }
 
-let dot_of_grid profiling desc env enriched_grid =
-  (*dump grid fic state env ; *)
+let dot_of_grid profiling env enriched_grid form =
   let t = Sys.time () in
   let config = enriched_grid.config in
   let prec_star = enriched_grid.prec_star in
@@ -469,10 +468,7 @@ let dot_of_grid profiling desc env enriched_grid =
        let set = IntMap.find_default IntSet.empty d dmap in
        IntMap.add d (IntSet.add eid set) dmap
       ) depth_of_event IntMap.empty in
-  let () = Kappa_files.add_out_desc desc in
-  let form  = Format.formatter_of_out_channel desc in
-  let _ = profiling form in
-  Format.fprintf form "@[<v>digraph G{@, ranksep=.5 ;@," ;
+  Format.fprintf form "@[<v>%t@,digraph G{@, ranksep=.5 ;@," profiling;
   IntMap.iter
     (fun d eids_at_d ->
      Format.fprintf form "@[<hv>{ rank = same ; \"%d\" [shape=plaintext] ;@," d;
@@ -481,29 +477,29 @@ let dot_of_grid profiling desc env enriched_grid =
 	match IntMap.find_option eid config.events with
 	| None -> raise Not_found
 	| Some atom ->
-	  if eid <> 0 then
-	    match atom.kind  with
-	    | RULE _  ->
-	      Format.fprintf
-		form
-		"node_%d [label=\"%s\", shape=%s, style=%s, fillcolor = %s] ;@,"
-		eid (label ~env atom.kind) "invhouse" "filled" "lightblue"
-            | OBS _  ->
-	      Format.fprintf
-		form "node_%d [label=\"%s\", style=filled, fillcolor=red] ;@,"
-		eid (label ~env atom.kind)
-            | INIT _ ->
-	      if !Parameter.showIntroEvents then
+	   if eid <> 0 then
+	     match atom.kind  with
+	     | RULE _  ->
 		Format.fprintf
 		  form
-		  "node_%d [label=\"%s\", shape=%s, style=%s, fillcolor=%s] ;@,"
-		  eid (label ~env atom.kind) "house" "filled" "green"
-	    | PERT _ ->
-	      Format.fprintf
-		form
-		"node_%d [label=\"%s\", shape=%s, style=%s, fillcolor = %s] ;@,"
-		eid (label ~env atom.kind) "invhouse" "filled" "green"
-       (* List.iter (fun obs -> fprintf desc "obs_%d [label =\"%s\", style=filled, fillcolor=red] ;\n node_%d -> obs_%d [arrowhead=vee];\n" eid obs eid eid) atom.observation ;*) 
+		  "node_%d [label=\"%s\", shape=%s, style=%s, fillcolor = %s] ;@,"
+		  eid (label ~env atom.kind) "invhouse" "filled" "lightblue"
+	     | OBS _  ->
+		Format.fprintf
+		  form "node_%d [label=\"%s\", style=filled, fillcolor=red] ;@,"
+		  eid (label ~env atom.kind)
+	     | INIT _ ->
+		if !Parameter.showIntroEvents then
+		  Format.fprintf
+		    form
+		    "node_%d [label=\"%s\", shape=%s, style=%s, fillcolor=%s] ;@,"
+		    eid (label ~env atom.kind) "house" "filled" "green"
+	     | PERT _ ->
+		Format.fprintf
+		  form
+		  "node_%d [label=\"%s\", shape=%s, style=%s, fillcolor = %s] ;@,"
+		  eid (label ~env atom.kind) "invhouse" "filled" "green"
+       (* List.iter (fun obs -> fprintf desc "obs_%d [label =\"%s\", style=filled, fillcolor=red] ;\n node_%d -> obs_%d [arrowhead=vee];\n" eid obs eid eid) atom.observation ;*)
        ) eids_at_d ;
      Format.fprintf form "}@]@," ;
     ) sorted_events ;
@@ -514,21 +510,21 @@ let dot_of_grid profiling desc env enriched_grid =
   done ;
   IntMap.iter
     (fun eid pred_set ->
-      if eid <> 0 then
-	IntSet.iter
-	  (fun eid' ->
-	    if eid' = 0 then ()
+     if eid <> 0 then
+       IntSet.iter
+	 (fun eid' ->
+	  if eid' = 0 then ()
+	  else
+	    if !Parameter.showIntroEvents then
+	      Format.fprintf form "node_%d -> node_%d@," eid' eid
 	    else
-	      if !Parameter.showIntroEvents then
-		Format.fprintf form "node_%d -> node_%d@," eid' eid
-	      else
-		match IntMap.find_option eid' config.events with
-		| None -> raise Not_found
-		| Some atom ->
-		  match atom.kind with
-		  | INIT _ -> ()
-		  | PERT _ | RULE _ | OBS _ -> Format.fprintf form "node_%d -> node_%d@," eid' eid
-	  ) pred_set
+	      match IntMap.find_option eid' config.events with
+	      | None -> raise Not_found
+	      | Some atom ->
+		 match atom.kind with
+		 | INIT _ -> ()
+		 | PERT _ | RULE _ | OBS _ -> Format.fprintf form "node_%d -> node_%d@," eid' eid
+	 ) pred_set
     ) config.prec_1 ;
   IntMap.iter
     (fun eid cflct_set ->
@@ -538,13 +534,13 @@ let dot_of_grid profiling desc env enriched_grid =
          IntSet.fold_inv
            (fun eid' prec ->
             let bool,prec =
-              let rec aux prec =
+	      let rec aux prec =
                 match prec with
                 | []   -> true,prec
                 | h::t ->
                    if h=eid' then false,t else
 		     if h>eid' then aux t else true,prec
-              in aux prec in
+	      in aux prec in
             let () =
 	      if bool then
 		Format.fprintf
@@ -556,8 +552,78 @@ let dot_of_grid profiling desc env enriched_grid =
        in ()
     ) config.conflict ;
   Format.fprintf form "}@," ;
-  Format.fprintf form "/*@, Dot generation time: %f@,*/@]@." (Sys.time () -. t);
-  close_out desc
+  Format.fprintf form "/*@, Dot generation time: %f@,*/@]@." (Sys.time () -. t)
+
+let js_of_grid env enriched_grid f =
+  let () = Format.fprintf f "// Create a new directed graph@," in
+  let () =
+    Format.fprintf f "var g = new dagreD3.graphlib.Graph().setGraph({});@," in
+
+  let () = Pp.set
+	     ~trailing:Pp.space IntMap.bindings Pp.space
+	     (fun f (eid,atom) ->
+	      Format.fprintf f "g.setNode(%i, { label: \"%s\" });"
+			     eid (label ~env atom.kind))
+	     f enriched_grid.config.events in
+  let () = Pp.set
+	     IntMap.bindings Pp.empty
+	     (fun f (eid,set) ->
+	      Pp.set IntSet.elements ~trailing:Pp.space Pp.space
+		     (fun f eid' -> Format.fprintf f "g.setEdge(%i,%i,{});" eid' eid)
+		     f set)
+	     f enriched_grid.config.prec_1 in
+
+  let () = Format.fprintf
+	     f "var svg = d3.select(\"svg\"),inner = svg.select(\"g\");@," in
+
+  let () = Format.fprintf
+	     f "// Set up zoom support
+		var zoom = d3.behavior.zoom().on(\"zoom\", function() {
+		inner.attr(\"transform\", \"translate(\" + d3.event.translate + \")\" +
+		\"scale(\" + d3.event.scale + \")\");
+		});
+		svg.call(zoom);" in
+  let () = Format.fprintf
+	     f "// Create the renderer@, var render = new dagreD3.render();@," in
+  let () = Format.fprintf
+	   f "// Run the renderer. This is what draws the final graph.@," in
+  let () = Format.fprintf f "render(inner, g);@," in
+
+  let () = Format.fprintf f "// Center the graph@,var initialScale = 0.75;@," in
+  Format.fprintf
+    f
+    "zoom
+     .translate([(svg.attr(\"width\") - g.graph().width * initialScale) / 2, 20])
+     .scale(initialScale)
+     .event(svg);
+     svg.attr('height', g.graph().height * initialScale + 40);"
+
+let html_of_grid profiling compression_type cpt env enriched_grid f =
+  let title f = Format.fprintf
+		  f "%s compressed story number %i" compression_type cpt in
+  let dependency f t =
+    Format.fprintf f "<script src=\"%s\" charset=\"utf-8\"></script>@," t in
+
+  let () = Format.fprintf f "@[<v><!doctype html>@,@,<html>@," in
+  let () = Format.fprintf f "@[<v 2><head>@,<meta charset=\"utf8\">@," in
+  let () = Format.fprintf f "<title>%t</title>@," title in
+  let () = dependency f "http://d3js.org/d3.v3.min.js" in
+  let () =
+    dependency
+      f "http://cpettitt.github.io/project/dagre-d3/latest/dagre-d3.min.js" in
+  let () = Format.fprintf f "@[<v 2><style>@," in
+  let () = Format.fprintf f ".node rect {stroke: #333; fill: #fff;}@," in
+  let () = Format.fprintf
+	     f ".edgePath path {stroke: #333; fill: #333; stroke-width: 1.5px;}" in
+  let () = Format.fprintf f "@]@,</style>" in
+  let () = Format.fprintf f "@]@,</head>@," in
+  let () = Format.fprintf f "@[<v 2><body>@,<h1>%t</h1>@," title in
+  let () = Format.fprintf f "<svg width=960 height=600><g/></svg>@," in
+  let () = Format.fprintf f "<p>@[%t@]</p>@," profiling in
+  let () = Format.fprintf
+	     f "@[<v 2><script>@,%t@]@,</script>"
+	     (js_of_grid env enriched_grid) in
+  Format.fprintf f "@]@,</body>@,</html>@]"
 
 (*story_list:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_id:int story_time: float ; story_event: int}*)
 let pretty_print err_fmt env config_closure compression_type label story_list =
@@ -588,40 +654,44 @@ let pretty_print err_fmt env config_closure compression_type label story_list =
        in
        let profiling desc =
 	 Format.fprintf
-	   desc "/* @[Compression of %d causal flows@ obtained in average at %E t.u@] */@."
+	   desc "/* @[Compression of %d causal flows@ obtained in average at %E t.u@] */@,"
 	   n (av_t/.(float_of_int n)) ;
-	 Format.fprintf desc "@[/* Compressed causal flows were:@ [%a] */@]@."
+	 Format.fprintf desc "@[/* Compressed causal flows were:@ [%a] */@]"
 			(Pp.list (fun f -> Format.fprintf f ";@,")
 				 Format.pp_print_int) ids
 	in
-	let desc = Kappa_files.fresh_cflow_filename
-		     [compression_type;string_of_int cpt] "dot" in
-        let () = dot_of_grid profiling desc env enriched_config in
-	close_out desc;
+        let () =   (*dump grid fic state env ; *)
+	  if !Parameter.dotCflows then
+	    Kappa_files.with_cflow_file
+	      [compression_type;string_of_int cpt] "dot"
+	      (dot_of_grid profiling env enriched_config)
+	  else
+	    Kappa_files.with_cflow_file
+	      [compression_type;string_of_int cpt] "html"
+	      (html_of_grid profiling compression_type cpt env enriched_config) in
 	cpt+1
       ) 0 story_list
   in
-  let desc =
-    Kappa_files.fresh_cflow_filename [compression_type;"Summary"] "dat" in
-  let form = Format.formatter_of_out_channel desc in
-  let () = Format.fprintf form "@[<v>#id\tE\tT\t\tdepth\tsize\t@," in
-  let () =
-    Pp.listi Pp.empty
-	    (fun cpt f (enriched_config,story) ->
-	     let depth = enriched_config.depth in
-	     let size = enriched_config.size in
-	     List.iter
-               (fun story ->
-		match story with
-		| None -> invalid_arg "Causal.pretty_print"
-		| Some info ->
-		   let time = info.story_time in
-		   let event = info.story_event in
-		   Format.fprintf f "%i\t%i\t%E\t%i\t%i\t@,"
-				  cpt event time depth size
-               ) story) form story_list in
-  let () = Format.fprintf form "@]@?" in
-  close_out desc
+  Kappa_files.with_cflow_file
+    [compression_type;"Summary"] "dat"
+    (fun form ->
+     let () = Format.fprintf form "@[<v>#id\tE\tT\t\tdepth\tsize\t@," in
+     let () =
+       Pp.listi Pp.empty
+		(fun cpt f (enriched_config,story) ->
+		 let depth = enriched_config.depth in
+		 let size = enriched_config.size in
+		 List.iter
+		   (fun story ->
+		    match story with
+		    | None -> invalid_arg "Causal.pretty_print"
+		    | Some info ->
+		       let time = info.story_time in
+		       let event = info.story_event in
+		       Format.fprintf f "%i\t%i\t%E\t%i\t%i\t@,"
+				      cpt event time depth size
+		   ) story) form story_list in
+     Format.fprintf form "@]@?")
 
 let print_stat f parameter handler enriched_grid =
   let size = Array.length enriched_grid.prec_star in

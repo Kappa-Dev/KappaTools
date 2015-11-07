@@ -58,7 +58,7 @@ let tokenify algs tokens contact_map domain l =
      let id =
        match StringMap.find_option nme tokens with
        | Some x -> x
-       | none ->
+       | None ->
 	 raise (ExceptionDefn.Malformed_Decl
 		  ("Token "^nme^" is undefined",pos)) in
      let (domain',(alg,_pos)) =
@@ -477,6 +477,17 @@ let configurations_of_result result =
   in
   let set_value pos_p param value_list f ass =
     raw_set_value pos_p param value_list (fun x p -> ass := f x p) in
+  let set_bool_value pos_p param value_list ass =
+    set_value pos_p param value_list
+	      (fun value pos_v ->
+	       match value with
+	       | "true" | "yes" -> true
+	       | "false" | "no" -> false
+	       | _ as error ->
+		  raise
+		    (ExceptionDefn.Malformed_Decl
+		       ("Value "^error^" should be either \"yes\" or \"no\"", pos_v))
+	      ) ass in
   List.iter
     (fun ((param,pos_p),value_list) ->
      match param with
@@ -517,15 +528,7 @@ let configurations_of_result result =
 		  ) Parameter.progressBarSymbol
 
      | "dumpIfDeadlocked" ->
-	set_value pos_p param value_list
-		  (fun value pos_v ->
-		   match value with
-		   | "true" | "yes" -> true
-		   | "false" | "no" -> false
-		   | _ as error ->
-		      raise (ExceptionDefn.Malformed_Decl
-			       ("Value "^error^" should be either \"yes\" or \"no\"", pos_v))
-		  ) Parameter.dumpIfDeadlocked
+	set_bool_value pos_p param value_list Parameter.dumpIfDeadlocked
      | "plotSepChar" ->
 	set_value pos_p param value_list
 		  (fun v _ ->
@@ -541,15 +544,9 @@ let configurations_of_result result =
 		  ) Parameter.maxConsecutiveClash
 
      | "dotSnapshots" ->
-	set_value pos_p param value_list
-		  (fun value pos_v ->
-		   match value with
-		   | "true" | "yes" -> true
-		   | "false" | "no" -> false
-		   | _ as error ->
-		      raise (ExceptionDefn.Malformed_Decl
-			       ("Value "^error^" should be either \"yes\" or \"no\"", pos_v))
-		  ) Parameter.dotOutput
+	set_bool_value pos_p param value_list Parameter.dotSnapshots
+     | "dotCflows" ->
+	set_bool_value pos_p param value_list Parameter.dotCflows
      | "colorDot" ->
 	set_value pos_p param value_list
 		  (fun value pos_v ->
@@ -575,15 +572,7 @@ let configurations_of_result result =
 	raw_set_value pos_p param value_list
 		      (fun x _ -> Kappa_files.set_influence x)
      | "showIntroEvents" ->
-	set_value pos_p param value_list
-		  (fun v p -> match v with
-				| "true" | "yes" -> true
-				| "false" | "no" -> false
-				| _ as error ->
-				   raise (ExceptionDefn.Malformed_Decl
-					    ("Value "^error^" should be either \"yes\" or \"no\"",p))
-		  )
-		  Parameter.showIntroEvents
+	set_bool_value pos_p param value_list Parameter.showIntroEvents
      | _ as error ->
 	raise (ExceptionDefn.Malformed_Decl ("Unkown parameter "^error, pos_p))
     ) result.configurations

@@ -51,7 +51,7 @@ let observables_values env counter graph state =
      env)
 
 let snapshot env counter file graph =
-  if !Parameter.dotOutput then
+  if !Parameter.dotSnapshots then
     Kappa_files.with_snapshot
       file (Mods.Counter.event counter) "dot"
       (fun f -> Format.fprintf f "%a@." (Rule_interpreter.print_dot env) graph)

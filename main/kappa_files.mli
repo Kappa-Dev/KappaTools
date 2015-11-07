@@ -11,7 +11,8 @@ val set_marshalized : string -> unit
 val with_marshalized : (out_channel -> unit) -> unit
 
 val set_cflow : string -> unit
-val fresh_cflow_filename : string list -> string -> out_channel
+val with_cflow_file :
+  string list -> string -> (Format.formatter -> unit) -> unit
 
 val open_profiling : unit -> out_channel
 
