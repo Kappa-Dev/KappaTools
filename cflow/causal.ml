@@ -149,7 +149,7 @@ let subenriched_grid_with_subs subs  grid l =
   {
     ids = grid.ids;
     prec_star = grid.prec_star;
-    config = subconfig_with_subs subs  grid.config l ;
+    config = subconfig_with_subs subs grid.config l ;
     depth_of_event = depth_of_event ;
     depth = depth ;
     size = List.length l ;
@@ -406,16 +406,16 @@ let config_of_grid = cut
       IntMap.add eid set prec_star
     ) config.events IntMap.empty *)
 
-let prec_star_of_config err_fmt config_closure config to_keep init_to_eidmax
+let prec_star_of_config err_fmt config_closure prec to_keep init_to_eidmax
 			weak_events init =
   let a =
-    Graph_closure.closure err_fmt config_closure config.prec_1 to_keep
+    Graph_closure.closure err_fmt config_closure prec to_keep
 			  init_to_eidmax weak_events init in
   Graph_closure.A.map fst a
 
 let depth_and_size_of_event config =
   IntMap.fold
-    (fun eid prec_eids (emap,size,_depth) ->
+    (fun eid prec_eids (emap,_) ->
       let d =
 	IntSet.fold
 	  (fun eid' d ->
@@ -423,8 +423,8 @@ let depth_and_size_of_event config =
 	   max (d'+1) d
 	  ) prec_eids 0
       in
-      IntMap.add eid d emap,size+1,d
-    ) config.prec_1 (IntMap.empty,0,0)
+      IntMap.add eid d emap,d
+    ) config.prec_1 (IntMap.empty,0)
 
 let enrich_grid err_fmt config_closure grid =
   let keep_l =
@@ -445,16 +445,17 @@ let enrich_grid err_fmt config_closure grid =
   let init_to_eid_max i =
     try Hashtbl.find grid.init_to_eidmax i
     with Not_found -> 0 in
-  let prec_star = prec_star_of_config err_fmt config_closure config to_keep
-				      init_to_eid_max weak_fun init_fun in
-  let depth_of_event,size,depth = depth_and_size_of_event config in
+  let prec_star = prec_star_of_config
+		    err_fmt config_closure config.prec_1 to_keep
+		    init_to_eid_max weak_fun init_fun in
+  let depth_of_event,depth = depth_and_size_of_event config in
   {
     config = config ;
     ids = ids ;
-    size = size ;
     prec_star = prec_star ;
     depth = depth ;
-    depth_of_event = depth_of_event
+    depth_of_event = depth_of_event ;
+    size = IntMap.size config.prec_1 ;
   }
 
 let dot_of_grid profiling env enriched_grid form =
@@ -664,16 +665,23 @@ let pretty_print err_fmt env config_closure compression_type label story_list =
 	 Format.fprintf desc "@[/* Compressed causal flows were:@ [%a] */@]"
 			(Pp.list (fun f -> Format.fprintf f ";@,")
 				 Format.pp_print_int) ids
-	in
+       in
+       let enriched_config' =
+	 if !Parameter.reduceCflows
+	 then {enriched_config with
+		config = {enriched_config.config with
+			   prec_1 = Graph_closure.reduction
+				      enriched_config.config.prec_1}}
+	 else enriched_config in
         let () =   (*dump grid fic state env ; *)
 	  if !Parameter.dotCflows then
 	    Kappa_files.with_cflow_file
 	      [compression_type;string_of_int cpt] "dot"
-	      (dot_of_grid profiling env enriched_config)
+	      (dot_of_grid profiling env enriched_config')
 	  else
 	    Kappa_files.with_cflow_file
 	      [compression_type;string_of_int cpt] "html"
-	      (html_of_grid profiling compression_type cpt env enriched_config) in
+	      (html_of_grid profiling compression_type cpt env enriched_config') in
 	cpt+1
       ) 0 story_list
   in

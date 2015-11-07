@@ -54,8 +54,8 @@ let config_std =
   }
 
 
-let swap f a b = f b a 
-let ignore_fst f = (fun _ -> f) 
+let swap f a b = f b a
+let ignore_fst f = (fun _ -> f)
 
 let rec compare_succ p l = 
   match l with 
@@ -63,7 +63,7 @@ let rec compare_succ p l =
   | a::q -> 
     begin 
       match q with 
-      | b::t when p a b -> compare_succ p q
+      | b::_ when p a b -> compare_succ p q
       | _ -> false 
     end
 
@@ -71,14 +71,7 @@ let rec compare_succ p l =
 let strictly_increasing = compare_succ (fun (a:int) b -> a < b)
 let strictly_decreasing = compare_succ (fun (a:int) b -> a > b)
 
-let concat_rev a b = 
-  List.fold_left 
-    (fun list t -> 
-      t::list)
-    b 
-    a 
-
-let concat a = concat_rev (List.rev a)
+let concat a = List.rev_append (List.rev a)
 
 let print_list f l =
   Format.fprintf f "@[%a@]@." (Pp.list Pp.comma Format.pp_print_string) l
@@ -100,23 +93,22 @@ let check form p f string a b =
 
 let merge_list p a b =
   let rec aux a b accu =
-    match a,b with
-    | l,[] | [],l ->  List.rev (concat_rev l accu)
+    match a,b with 
+    | l,[] | [],l ->  List.rev (List.rev_append l accu)
     | h::t,h'::t' when h=h' -> aux t t' (h::accu)
-    | h::t,h'::t' when p h h' -> aux t b (h::accu)
-    | h::t,h'::t' -> aux a t' (h'::accu)
+    | h::t,h'::_ when p h h' -> aux t b (h::accu)
+    | _,h'::t' -> aux a t' (h'::accu)
   in aux a b []
 
-let is_sublist p a b = 
-  let rec aux a b = 
-    match a,b 
-    with 
-    | l,[] -> false 
-    | [],l -> true 
-    | h::t,h'::t' when h=h' -> aux t t' 
-    | h::t,h'::t' when p h h' -> false 
-    | h::t,h'::t' -> aux a t' 
-  in aux a b 
+let is_strict_sublist p a b =
+  let rec aux a b =
+    match a,b with
+    | _,[] -> false
+    | [],_::_ -> true
+    | h::t,h'::t' when h=h' -> aux t t'
+    | h::_,h'::_ when p h h' -> false
+    | _,_::t' -> aux a t'
+  in aux a b
 
 let insert_elt p e = merge_list p [e]
   
@@ -124,11 +116,11 @@ let diff_list p a b =
   let rec aux a b accu = 
     match a,b 
     with 
-    | b,[] -> List.rev (concat_rev b accu)
-    | [],b -> List.rev accu 
+    | b,[] -> List.rev (List.rev_append b accu)
+    | [],_::_ -> List.rev accu
     | h::t,h'::t' when h=h' -> aux t t' accu
-    | h::t,h'::t' when p h h' -> aux t b (h::accu) 
-    | h::t,h'::t' -> aux a t' accu 
+    | h::t,h'::_ when p h h' -> aux t b (h::accu)
+    | _,_::t' -> aux a t' accu
   in aux a b []
 
 let compare_bool a b = compare a b < 0 
@@ -187,16 +179,11 @@ let closure err_fmt config prec is_obs init_to_eidmax weak_events init =
             max_succ 
         in 
         let _ = A.set is_last_succ_of 0 [] in 
-        let gc_when_visit node = 
-          List.iter 
-            (fun k -> A.set s_pred_star k ([],0))
-            (A.get is_last_succ_of node)
-        in 
-        let gc_when_visit = 
-          if config.enable_gc 
-          then gc_when_visit 
-          else (fun _ -> ())
-        in 
+        let gc_when_visit node =
+          if config.enable_gc then
+            List.iter
+              (fun k -> A.set s_pred_star k ([],0))
+              (A.get is_last_succ_of node) in
         gc_when_visit,
         (fun i -> A.get max_succ i)
       end 
@@ -253,5 +240,28 @@ let closure err_fmt config prec is_obs init_to_eidmax weak_events init =
   in 
   s_pred_star 
 
+let neighbor_non_direct_descendant sons prec =
+  let selection x = S.mem x sons in
+  let rec aux (selected,todos) don =
+    if S.is_empty todos then selected
+    else
+      let done' = S.inter don todos in
+      aux
+	(S.fold
+	   (fun eid (sel',todos') ->
+	    match M.find_option eid prec with
+	    | None -> raise Not_found
+	    | Some sons' ->
+	       let todos'' = S.union todos' (S.minus sons' done') in
+	       let sel'' = S.union sel' (S.filter selection sons') in
+	       (sel'',todos'')
+	   ) todos (selected,S.empty)) done'
+  in aux (S.empty,sons) S.empty
 
-
+let reduction prec =
+  M.fold
+    (fun eid neigh out ->
+     let to_remove = neighbor_non_direct_descendant neigh prec in
+     if S.is_empty to_remove then out
+     else M.add eid (S.minus neigh to_remove) out
+    ) prec prec
