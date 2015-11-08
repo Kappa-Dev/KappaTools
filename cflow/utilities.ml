@@ -22,10 +22,14 @@ let dummy_weak = false
 		   
 module D=Dag.Dag
 type error_log =  D.S.PH.B.PB.CI.Po.K.H.error_channel
-type refined_trace = D.S.PH.B.PB.CI.Po.K.refined_step list
 type parameter =  D.S.PH.B.PB.CI.Po.K.H.parameter
 type kappa_handler = D.S.PH.B.PB.CI.Po.K.H.handler 
+type profiling_info = D.S.PH.B.PB.CI.Po.K.P.log_info
 		       
+type refined_trace = D.S.PH.B.PB.CI.Po.K.refined_step list
+type cflow_grid = Causal.grid  
+type musical_grid =  D.S.PH.B.blackboard 
+		      
 type ('a,'b,'c) remanent =  
   error_log * int * (bool * int * int) *
     D.S.PH.B.blackboard *
@@ -38,12 +42,18 @@ type ('a,'b,'c) remanent =
            list)
         list * int
 
+module Profiling = D.S.PH.B.PB.CI.Po.K.P
+		     
 let error_init = D.S.PH.B.PB.CI.Po.K.H.error_init
 let split_init = D.S.PH.B.PB.CI.Po.K.split_init
 let disambiguate = D.S.PH.B.PB.CI.Po.K.disambiguate
 let fill_siphon = D.S.PH.B.PB.CI.Po.K.fill_siphon 
 let cut = D.S.PH.B.PB.CI.Po.cut
 
+let remove_pseudo_inverse_events a b c d =
+  let a,b,c = D.S.PH.B.PB.CI.cut a b c d in
+  a,(List.rev_map fst (List.rev b),c)
+	    
 let print_trace parameter handler =
       Format.fprintf
 	parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel "@[<v>%a@]@."
@@ -113,6 +123,14 @@ let from_none_to_weak parameter handler log_info logger (error,counter,tick,blac
   let error,log_info,blackboard = D.S.PH.B.reset_init parameter handler error log_info blackboard in 
   error,counter,tick,blackboard,weakly_compressed_story_array,weakly_compression_faillure
 
+let convert_trace_into_grid_while_trusting_side_effects trace handler = 
+  let refined_list = 
+    List.rev_map (fun (x) -> (x,[],dummy_weak)) (List.rev trace)
+  in 
+  D.S.PH.B.PB.CI.Po.K.build_grid refined_list true handler 
+    
+let convert_trace_into_musical_notation = D.S.PH.B.import
+	   							
 let from_none_to_weak_with_tick parameter handler log_info logger n_stories x y =
   let error,counter,tick,blackboard,w1,w2 = from_none_to_weak parameter handler log_info logger x y in
   let tick = Mods.tick_stories logger n_stories tick in 

@@ -96,15 +96,12 @@ let compress_and_print logger env log_info step_list =
 		U.cut parameter handler error refined_event_list_wo_siphon in
 	      let () =
 		if debug_mode then
-		  Format.fprintf
-		    parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel "@[<v>%a@]@."
-		    (Pp.list Pp.space (D.S.PH.B.PB.CI.Po.K.print_refined_step ~handler))
-                    refined_event_list_cut in
+		  U.print_trace parameter handler refined_event_list_cut in
               refined_event_list_cut,int
             else refined_event_list_wo_siphon,0
           in
           
-          let deal_with error cut  log_info = 
+          let deal_with error cut log_info = 
             let refined_event_list_without_pseudo_inverse,int_pseudo_inverse = 
               if cut && Parameter.cut_pseudo_inverse_event 
               then 
@@ -114,36 +111,24 @@ let compress_and_print logger env log_info step_list =
                     then 
                       Debug.tag logger "\t - detecting pseudo inverse events" 
                   in 
-                  let error,refined_event_list_without_pseudo_inverse,int_pseudo_inverse  = D.S.PH.B.PB.CI.cut parameter handler error refined_event_list_cut  in
+                  let error,(refined_event_list_without_pseudo_inverse,int_pseudo_inverse)  = U.remove_pseudo_inverse_events parameter handler error refined_event_list_cut  in
 		  let () =
 		    if debug_mode then
-		      Format.fprintf
-			parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel "@[<v>%a@]@."
-			(Pp.list
-			   Pp.space
-			   (fun f (x,bool) ->
-			    Format.fprintf
-			      f "%a@,%t"
-			      (D.S.PH.B.PB.CI.Po.K.print_refined_step ~handler) x
-			      (fun f ->
-			       if bool then
-				 Format.fprintf f "Weak event @,@,")))
-                        refined_event_list_without_pseudo_inverse
-                  in
+		      U.print_trace parameter handler refined_event_list_without_pseudo_inverse
+		  in
                   refined_event_list_without_pseudo_inverse,int_pseudo_inverse 
                 end
               else 
-                List.rev_map (fun x -> x,dummy_weak) (List.rev refined_event_list),0 
+                refined_event_list,0				      
             in 
             let () = 
               if log_step 
               then 
                 Debug.tag logger "\t - blackboard generation"
             in 
-            let error,log_info,blackboard = D.S.PH.B.import parameter handler error log_info (List.rev_map (fun (x,_)->x) (List.rev refined_event_list_without_pseudo_inverse)) in 
-           
-            let log_info = D.S.PH.B.PB.CI.Po.K.P.set_global_cut int log_info in 
-            let log_info = D.S.PH.B.PB.CI.Po.K.P.set_pseudo_inv int_pseudo_inverse log_info in 
+            let error,log_info,blackboard = U.convert_trace_into_musical_notation parameter handler error log_info refined_event_list_without_pseudo_inverse in 
+            let log_info = U.Profiling.set_global_cut int log_info in 
+            let log_info = U.Profiling.set_pseudo_inv int_pseudo_inverse log_info in 
             let () = 
               if debug_mode && log_step  
               then 
@@ -164,7 +149,7 @@ let compress_and_print logger env log_info step_list =
 	      then 
 	      Format.fprintf logger "\t - computing causal past of each observed events (%i)@." n_stories 
 	    in
-	    (* Partial order reduction: generation of uncomressed stories *)
+	    (* Partial order reduction: generation of uncompressed stories *)
 	    let error,_,_,_,causal_story_array,causal_story_faillure = 
               let () = 
                 if debug_mode
@@ -172,15 +157,10 @@ let compress_and_print logger env log_info step_list =
                   Debug.tag logger "\t\t * causal compression "
               in 
               let log_info = D.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
-              let refined_list = 
-                if cut && Parameter.do_detect_separable_components 
-                then 
-                  (List.rev_map (fun (x,bool) -> (x,[],bool)) (List.rev refined_event_list_without_pseudo_inverse))
-                else 
-                  (List.rev_map (fun (x,_) -> (x,[],dummy_weak)) (List.rev refined_event_list_without_pseudo_inverse))
-              in 
-              let grid = D.S.PH.B.PB.CI.Po.K.build_grid refined_list true handler in
-              let config_init = 
+
+	      (* We use the grid to get the causal precedence (pred* ) of each observable *)
+	      let grid = U.convert_trace_into_grid_while_trusting_side_effects refined_event_list_without_pseudo_inverse handler in
+	      let config_init = 
                 if cut
                 then 
                   Graph_closure.config_init
@@ -204,6 +184,7 @@ let compress_and_print logger env log_info step_list =
 		        "causal & weak flow compression") 
 		    n_stories 
 	      in
+	      
 	      let tick = 
                 if n_stories > 0 
                 then Mods.tick_stories logger n_stories (false,0,0) 
@@ -298,7 +279,8 @@ let compress_and_print logger env log_info step_list =
             in 
             error,log_info,causal_story_array,causal_story_faillure,n_stories,blackboard
           in
-          let error,log_info,causal,_,_,_ = 
+
+	  let error,log_info,causal,_,_,_ = 
             if causal_trace_on 
             then 
               deal_with error false log_info 
