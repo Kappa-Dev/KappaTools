@@ -571,38 +571,38 @@ let js_of_grid env enriched_grid f =
 		 | (INIT _ | PERT _) -> "#7f7"
 		 | RULE _ -> "#77f"))
 	     f enriched_grid.config.events in
-  let () = Pp.set
-	     IntMap.bindings Pp.empty
-	     (fun f (eid,set) ->
-	      Pp.set IntSet.elements ~trailing:Pp.space Pp.space
-		     (fun f eid' -> Format.fprintf f "g.setEdge(%i,%i,{});" eid' eid)
-		     f set)
-	     f enriched_grid.config.prec_1 in
+  let () =
+    Pp.set
+      IntMap.bindings Pp.empty
+      (fun f (eid,set) ->
+       Pp.set IntSet.elements ~trailing:Pp.space Pp.space
+	      (fun f eid' -> Format.fprintf f "g.setEdge(%i,%i,{});" eid' eid)
+	      f set)
+      f enriched_grid.config.prec_1 in
 
   let () = Format.fprintf
 	     f "var svg = d3.select(\"svg\"),inner = svg.select(\"g\");@," in
 
   let () = Format.fprintf
-	     f "// Set up zoom support
-		var zoom = d3.behavior.zoom().on(\"zoom\", function() {
-		inner.attr(\"transform\", \"translate(\" + d3.event.translate + \")\" +
-		\"scale(\" + d3.event.scale + \")\");
-		});
-		svg.call(zoom);" in
+	     f "// Set up zoom support@," in
+  let () = Format.fprintf
+	     f "var zoom = d3.behavior.zoom().on(\"zoom\", function() {@," in
+  let () = Format.fprintf
+	     f "inner.attr(\"transform\", \"translate(\" + d3.event.translate + \")\" +@," in
+  let () = Format.fprintf
+	     f "\"scale(\" + d3.event.scale + \")\");@,});@,svg.call(zoom);" in
   let () = Format.fprintf
 	     f "// Create the renderer@, var render = new dagreD3.render();@," in
   let () = Format.fprintf
-	   f "// Run the renderer. This is what draws the final graph.@," in
+	     f "// Run the renderer. This is what draws the final graph.@," in
   let () = Format.fprintf f "render(inner, g);@," in
 
   let () = Format.fprintf f "// Center the graph@,var initialScale = 0.75;@," in
-  Format.fprintf
-    f
-    "zoom
-     .translate([(svg.attr(\"width\") - g.graph().width * initialScale) / 2, 20])
-     .scale(initialScale)
-     .event(svg);
-     svg.attr('height', g.graph().height * initialScale + 40);"
+  let () = Format.fprintf f "zoom@," in
+  let () = Format.fprintf
+	     f ".translate([(svg.attr(\"width\") - g.graph().width * initialScale) / 2, 20])@," in
+  let () = Format.fprintf f ".scale(initialScale)@,.event(svg);@," in
+  Format.fprintf f "svg.attr('height', g.graph().height * initialScale + 40);"
 
 let html_of_grid profiling compression_type cpt env enriched_grid f =
   let title f = Format.fprintf
@@ -629,7 +629,7 @@ let html_of_grid profiling compression_type cpt env enriched_grid f =
   let () = Format.fprintf
 	     f "@[<v 2><script>@,%t@]@,</script>"
 	     (js_of_grid env enriched_grid) in
-  Format.fprintf f "@]@,</body>@,</html>@]"
+  Format.fprintf f "@]@,</body>@,</html>@]@."
 
 (*story_list:[(key_i,list_i)] et list_i:[(grid,_,sim_info option)...] et sim_info:{with story_id:int story_time: float ; story_event: int}*)
 let pretty_print err_fmt env config_closure compression_type label story_list =
