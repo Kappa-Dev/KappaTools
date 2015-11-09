@@ -86,11 +86,14 @@ let several_internal_states pos =
   raise (ExceptionDefn.Malformed_Decl
 	   ("In a pattern, a site cannot have several internal state ",pos))
 
-let too_much_or_not_enough too_much agent_name (na,pos) =
-  let spec = if too_much then "over" else "under" in
+let several_occurence_of_site agent_name (na,pos) =
+  raise (ExceptionDefn.Malformed_Decl
+	   ("Site '"^na^"' occurs more than once in this agent '"^agent_name^"'",pos))
+
+let not_enough_specified agent_name (na,pos) =
   raise (ExceptionDefn.Malformed_Decl
 	   ("The link status of agent '"^agent_name^"', site '"^na
-	    ^"' on the right hand side is "^spec^"specified",pos))
+	    ^"' on the right hand side is underspecified",pos))
 
 let annotate_dropped_agent sigs ((agent_name, _ as ag_ty),intf) =
   let ag_id = Signature.num_of_agent ag_ty sigs in
@@ -108,6 +111,13 @@ let annotate_dropped_agent sigs ((agent_name, _ as ag_ty),intf) =
       (fun p ->
        let p_na = p.Ast.port_nme in
        let p_id = Signature.num_of_site ~agent_name p_na sign in
+       let () =
+	 if ports.(p_id) <> L_ANY Erased ||
+	      match Signature.default_internal_state ag_id p_id sigs with
+	      | None -> internals.(p_id) <> I_ANY
+	      | Some _ -> internals.(p_id) <> I_ANY_ERASED
+	 then several_occurence_of_site agent_name p_na in
+
        let () = match p.Ast.port_int with
 	 | [] -> ()
 	 | [ va ] ->
@@ -156,6 +166,10 @@ let annotate_created_agent id sigs ((agent_name, pos as ag_ty),intf) =
       (fun p ->
        let p_na = p.Ast.port_nme in
        let p_id = Signature.num_of_site ~agent_name p_na sign in
+       let () =
+	 if ports.(p_id) <> Raw_mixture.FREE ||
+	      internals.(p_id) <> Signature.default_internal_state ag_id p_id sigs
+	 then several_occurence_of_site agent_name p_na in
        let () = match p.Ast.port_int with
 	 | [] -> ()
 	 | [ va ] ->
@@ -165,7 +179,7 @@ let annotate_created_agent id sigs ((agent_name, pos as ag_ty),intf) =
        match p.Ast.port_lnk with
        | (Ast.LNK_ANY, _) -> ()
        | ((Ast.LNK_SOME, _) | (Ast.LNK_TYPE _,_)) ->
-	  too_much_or_not_enough false agent_name p_na
+	  not_enough_specified agent_name p_na
        | (Ast.LNK_VALUE i, _) ->  ports.(p_id) <- Raw_mixture.VAL i
        | (Ast.FREE, _) -> ()
       ) intf in
@@ -190,7 +204,7 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
 	 when dst_p'' = dst_p' && dst_ty'' = dst_ty' ->
        ports.(p_id) <- build_l_type sigs dst_ty dst_p Maintained
     | _, (Ast.LNK_ANY,_ | Ast.LNK_SOME,_ | Ast.LNK_TYPE _,_) ->
-       too_much_or_not_enough false agent_name p'.Ast.port_nme
+       not_enough_specified agent_name p'.Ast.port_nme
     | (Ast.LNK_ANY,_), (Ast.FREE,_) -> ports.(p_id) <- L_ANY Freed
     | (Ast.LNK_SOME,_), (Ast.FREE,_) ->
        let (na,pos) = p'.Ast.port_nme in
@@ -272,12 +286,16 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
       List.partition (fun p -> String.compare (fst p.Ast.port_nme) na = 0) rp in
     match p' with
     | [p'] -> (p',r)
-    | l -> too_much_or_not_enough (l <> []) agent_name (na,pos) in
+    | [] -> not_enough_specified agent_name (na,pos)
+    | _ :: _ -> several_occurence_of_site agent_name (na,pos) in
   let rp_r =
     List.fold_left
       (fun rp p ->
        let p_na = p.Ast.port_nme in
        let p_id = Signature.num_of_site ~agent_name p_na sign in
+       let () =
+	 if ports.(p_id) <> L_ANY Maintained || internals.(p_id) <> I_ANY
+	 then several_occurence_of_site agent_name p_na in
        let p',rp' = find_in_rp p_na rp in
        let () = register_port_modif p_id p.Ast.port_lnk p' in
        let () = register_internal_modif p_id p.Ast.port_int p' in

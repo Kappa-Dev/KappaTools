@@ -1,0 +1,3 @@
+%agent: A(x~a~b,y)
+
+A(x!1),A(x~a?,y,x!1) -> A(x),A(x~b,y) @ 1
