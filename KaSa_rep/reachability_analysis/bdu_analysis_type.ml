@@ -100,7 +100,7 @@ module Map_test =
       let compare = compare
     end)
 
-module Map_creation = (*with creation rules*)
+module Map_creation =
   SetMap.Make (
     struct
       (*agent_type, cv_id, site, state, rule_id*)
@@ -108,7 +108,7 @@ module Map_creation = (*with creation rules*)
       let compare = compare
     end)
 
-module Map_modif = (*with modification rules*)
+module Map_modif =
   SetMap.Make (
     struct
       (*agent_type, cv_id, site, state, rule_id*)
@@ -119,7 +119,7 @@ module Map_modif = (*with modification rules*)
 module Map_modif_creation = (*without creation rules*)
   SetMap.Make (
     struct
-      (*agent_type, cv_id, site, rule_id*)
+      (*agent_type, cv_id, site, state, rule_id*)
       type t = int * int * int * int
       let compare = compare
     end)
@@ -174,7 +174,7 @@ type bdu_analysis_dynamic =
   }
 
 (************************************************************************************)
-(*build bdu type*)
+(*build covering classes with new index*)
 
 type pair_bdu =
   (Boolean_mvbdu.memo_tables, Boolean_mvbdu.mvbdu_dic,
@@ -182,14 +182,14 @@ type pair_bdu =
   
 type bdu_build =
   {
-    store_remanent_triple : ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
-    store_remanent_test   : (int * int * int * int) list AgentMap.t;
-    store_remanent_creation  : (int * int * int * int) list AgentMap.t;
-    store_remanent_modif  : (int * int * int * int) list AgentMap.t;
+    store_remanent_triple   : ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
+    store_remanent_test     : (int * int * int * int) list AgentMap.t;
+    store_remanent_creation : (int * int * int * int) list AgentMap.t;
+    store_remanent_modif    : (int * int * int * int) list AgentMap.t;
   }
 
 (************************************************************************************)
-(*bdu build map*)
+(*build covering classes in map and bdu with new indexes for site_type*)
 
 type pair_map = int list * Site_map_and_set.Set.t
 
@@ -208,6 +208,6 @@ type bdu_analysic =
     {
       store_bdu_analysis_static  : bdu_analysis_static;
       store_bdu_analysis_dynamic : bdu_analysis_dynamic;
+      store_bdu_build            : bdu_build;
       store_bdu_build_map        : bdu_build_map;
-      store_bdu_build            : bdu_build; (*REMOVE*)
     }

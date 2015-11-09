@@ -41,6 +41,7 @@ let collect_remanent_test_map parameter error rule_id rule store_remanent_test s
     in
     error, result_map
   in
+  (*-----------------------------------------------------------------*)
   AgentMap.fold parameter error
     (fun parameter error agent_type fourth_list store_result ->
       let error, map =
@@ -75,6 +76,7 @@ let collect_remanent_creation_map parameter error rule_id rule store_remanent_cr
     in
     error, result_map
   in
+  (*-----------------------------------------------------------------*)
   AgentMap.fold parameter error
     (fun parameter error agent_type fourth_list store_result ->
       let error, map =
@@ -109,6 +111,7 @@ let collect_remanent_modif_map parameter error rule_id rule store_remanent_modif
     in
     error, result_map
   in
+  (*-----------------------------------------------------------------*)
   AgentMap.fold parameter error
     (fun parameter error agent_type fourth_list store_result ->
       let error, map =
@@ -128,7 +131,7 @@ let collect_remanent_modif_map parameter error rule_id rule store_remanent_modif
 
 let collect_remanent_modif_op_map parameter error rule_id rule store_remanent_creation_map
     store_remanent_triple store_result =
- let add_link (agent_type, cv_id, site, state) rule_id store_result =
+  let add_link (agent_type, cv_id, site, state) rule_id store_result =
     let (l, old) =
       Map_modif_creation.Map.find_default ([], Site_map_and_set.Set.empty)
         (agent_type, cv_id, site, state) store_result
@@ -143,6 +146,7 @@ let collect_remanent_modif_op_map parameter error rule_id rule store_remanent_cr
     in
     error, result_map
   in
+  (*-----------------------------------------------------------------*)
   AgentMap.fold parameter error 
     (fun parameter error agent_id agent_modif store_result ->
       if Site_map_and_set.Map.is_empty agent_modif.agent_interface
@@ -165,6 +169,7 @@ let collect_remanent_modif_op_map parameter error rule_id rule store_remanent_cr
             | error, None -> error, []
             | error, Some l -> error, l
         in
+        (*-----------------------------------------------------------------*)
         let error, store_result =
           List.fold_left (fun (error, store_result) (id, map_res) ->
             let error, store_result =
@@ -178,6 +183,7 @@ let collect_remanent_modif_op_map parameter error rule_id rule store_remanent_cr
                       in
                       error, store_result
                     else
+                      (*-----------------------------------------------------------------*)
                       Map_creation.Map.fold (fun (agent_type', id', site', state')
                         (l1, s2) (error, store_result) ->
                           if Site_map_and_set.Set.mem rule_id s2
@@ -197,8 +203,15 @@ let collect_remanent_modif_op_map parameter error rule_id rule store_remanent_cr
                   error, store_result
                 ) map_res (error, store_result)
             in
+            (*-----------------------------------------------------------------*)
             error, store_result
           ) (error, store_result) pair_list
         in
         error, store_result
     ) rule.diff_direct store_result
+
+(*************************************************************************************)
+(* Build BDU test, creation and a list of modification rules*)
+(*************************************************************************************)
+
+
