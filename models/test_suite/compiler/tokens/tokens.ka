@@ -3,4 +3,4 @@
 
 %init: tt <- 33
 
-%mod: [E+] = 5 do tt <- 22
+%mod: [E] = 5 do tt <- 22

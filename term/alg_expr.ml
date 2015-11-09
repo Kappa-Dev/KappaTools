@@ -17,8 +17,8 @@ let rec add_dep (in_t,in_e,out as x) d = function
   | STATE_ALG_OP op, _ ->
      match op with
      | Operator.TIME_VAR -> (Operator.DepSet.add d in_t,in_e,out)
-     | (Operator.CPUTIME | Operator.EVENT_VAR | Operator.NULL_EVENT_VAR |
-	Operator.PROD_EVENT_VAR) -> (in_t,Operator.DepSet.add d in_e,out)
+     | (Operator.CPUTIME | Operator.EVENT_VAR | Operator.NULL_EVENT_VAR) ->
+	(in_t,Operator.DepSet.add d in_e,out)
 
 let setup_alg_vars_rev_dep vars =
   let in_t = Operator.DepSet.empty in

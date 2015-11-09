@@ -601,9 +601,8 @@ where \ttt{var\_name} can be any string and \textit{algebraic\_expression} are d
 \toprule
 \ttt{\tcb{variable}} & Interpretation \\
 \midrule
-\ttt{[E]} & the total number of simulation events\index{event}\\
+\ttt{[E]} & the total number of (productive) simulation events\index{event}\\
 & since the beginning of the simulation \\
-\ttt{[E+]} & the total number of productive events\index{event} \\
 \ttt{[E-]} & the total number of null events\index{null event}\\
 \ttt{[Emax]} & the max (productive) event limit as set by the option \ttt{-e}. \\ &Note that if unset \ttt{Emax}$=\infty$\\
 \ttt{[T]} & the bio-time of the simulation \\
@@ -838,17 +837,17 @@ one obtains the curve given in Fig.~\ref{fig:abc2}.
 In the previous example, we let the system evolve for some time without its main reactant \ttt{C} in order to let other reactants go to a less arbitrary initial state. One may object that this way of proceeding is CPU-time consuming if one has to do this at each simulation. An alternative is to use the \ttt{\$SNAPSHOT} primitive that allows a user to export a snapshot of the mixture\index{mixture} at a given time point as a new (piece of) kappa file.
 For instance, the declaration\index{declaration}:
 \ttt{\ITE{
-\item[] \%mod:  [E-]/[E]>0.9 do \$SNAPSHOT \textquotedbl prefix\textquotedbl
+\item[] \%mod:  [E-]/([E]+[E-])>0.9 do \$SNAPSHOT \textquotedbl prefix\textquotedbl
 }}
 
 will ask \KaSim~to export the mixture\index{mixture} the first time the percentage of null events reaches 90\%. The exported file will be named \ttt{prefix\_$n$.ka} where $n$ is the event number at which the snapshot was taken. One may also use a \textit{string\_expression} to construct any prefix using local variables. Note that one may omit to define a prefix and simply type:
 \ttt{\ITE{
-\item[] \%mod:  [E-]/[E]>0.9 do \$SNAPSHOT
+\item[] \%mod:  [E-]/([E]+[E-])>0.9 do \$SNAPSHOT
 }}
 in which case the default prefix \ttt{snap} will be used for naming snapshots.
 If the name already exists a counter will be appended at the end of the file to prevent overwriting. Snapshots can be performed multiple times, for instance every 1000 events, using the declaration\index{declaration}:
 \ttt{\ITE{
-\item[] \%mod: \ttt{repeat} ([E+] [mod] 1000)=0 do \$SNAPSHOT \textquotedbl abc\textquotedbl~until [false] 
+\item[] \%mod: \ttt{repeat} ([E] [mod] 1000)=0 do \$SNAPSHOT \textquotedbl abc\textquotedbl~until [false]
 }}
 which results in \KaSim~producing a snapshot every 1000 (productive) events until the simulation ends. The perturbation \ttt{\$STOP "final\_state"} will terminate the simulation whenever its precondition is satisfied and produce a snapshot of the last mixture\index{mixture}. Note that instead of producing kappa files, one may use snapshot perturbations to produce an image of the mixture\index{mixture} in the dot format using the parameter \ttt{"dotSnapshots"} (see Section~\ref{sec:param}).
 
@@ -945,7 +944,7 @@ The last line stops causality analysis whenever time is greater than 20 or when 
 The effect \ttt{\$PRINT <\textit{string\_expression}>} enables one to output values during a computation to standard output, or to a specific file when using \ttt{\$PRINTF}. For instance:
  \ttt{\ITE{
 \item[] \%mod: repeat \textbackslash
-\item[] |A|<0 do \$PRINTF <"token\_".[E+].".dat" <"Token A is: " . |A| . " at time=". [T]>\textbackslash 
+\item[] |A|<0 do \$PRINTF <"token\_".[E].".dat" <"Token A is: " . |A| . " at time=". [T]>\textbackslash 
 \item [] until [false]
 }}
 will ask \KaSim~to output the value of token \ttt{A} in a file "token\_$n$.dat" which changes at each new productive event, each time its value gets below 0.
@@ -953,7 +952,7 @@ will ask \KaSim~to output the value of token \ttt{A} in a file "token\_$n$.dat" 
 \subsection{Add an entry in the output data}
 The effect \ttt{\$PLOTENTRY} outputs a line with the current value of observables in the data file. For example,
 \ttt{\ITE{
-\item[] \%mod: repeat [E+] [mod] 10 = 0 do \$PLOTENTRY until [false]
+\item[] \%mod: repeat [E] [mod] 10 = 0 do \$PLOTENTRY until [false]
 }}
 will store the value of observables every 10 productive events.
 
@@ -1208,7 +1207,7 @@ In order to make sure that \KaSim~is not incorrectly blocked you may wish to plo
 
 \section*{What do null events mean, why do I have any?}
 
-Null events\index{null event} is a way for \KaSim~to compensate for some over approximation it is doing, in order deal with large simulations more efficiently. They usually do not impact significantly the performances of the simulator, unless the model contains rules using the special notation to deal with ambiguous molecularity (see Section~\ref{sec:ambiguous}). With pure Kappa rules, the ratio $r$ of null event over productive ones (that you can track using the observable \ttt{\%obs: {\textquotesingle}r{\textquotesingle}  [E-]/[E+]}) should tend to 0 when models have a lot of agents.
+Null events\index{null event} is a way for \KaSim~to compensate for some over approximation it is doing, in order deal with large simulations more efficiently. They usually do not impact significantly the performances of the simulator, unless the model contains rules using the special notation to deal with ambiguous molecularity (see Section~\ref{sec:ambiguous}). With pure Kappa rules, the ratio $r$ of null event over productive ones (that you can track using the observable \ttt{\%obs: {\textquotesingle}r{\textquotesingle}  [E-]/[E]}) should tend to 0 when models have a lot of agents.
 
 \section*{No data points are generated}
 Make sure you have \ttt{\%obs} or \ttt{\%plot} instructions in your KF\index{kappa file}. Also make sure to use the \ttt{-p} option in the command line to tell KaSim how many points you wish to have on your curves. 

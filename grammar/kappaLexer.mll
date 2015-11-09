@@ -67,7 +67,6 @@ rule token = parse
 	 | '[' {let lab = read_label [] [']'] lexbuf in
 		match lab with
 		| "E" -> EVENT
-		| "E+" -> PROD_EVENT
 		| "E-" -> NULL_EVENT
 		| "T" -> TIME
 		| "Tsim" -> CPUTIME

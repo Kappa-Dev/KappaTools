@@ -12,7 +12,7 @@ Environment:
   Rules:
     
   Perturbations:
-    /*0*/%mod: ([E+] = 5) do tt <- 22
+    /*0*/%mod: ([E] = 5) do tt <- 22
 Domain:
   () -> /*cc0*/  -> ()
 Intial graph;

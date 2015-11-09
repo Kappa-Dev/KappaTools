@@ -243,8 +243,8 @@ let rec has_time_dep (in_t,_,deps as vars_deps) = function
   | (UN_ALG_OP (_, a),_) -> has_time_dep vars_deps a
   | ((KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _),_) -> false
   | (STATE_ALG_OP Operator.TIME_VAR,_) -> true
-  | (STATE_ALG_OP (Operator.CPUTIME | Operator.EVENT_VAR| Operator.NULL_EVENT_VAR
-		  | Operator.PROD_EVENT_VAR),_) -> false
+  | (STATE_ALG_OP (Operator.CPUTIME | Operator.EVENT_VAR|
+		   Operator.NULL_EVENT_VAR),_) -> false
   | (ALG_VAR i,_) ->
      let rec aux j =
        Operator.DepSet.mem (Operator.ALG j) in_t ||
@@ -271,8 +271,8 @@ let rec stops_of_bool_expr vars_deps = function
 		| STATE_ALG_OP (Operator.TIME_VAR), CONST n
 		| CONST n, STATE_ALG_OP (Operator.TIME_VAR) -> [n]
 		| ( BIN_ALG_OP _ | UN_ALG_OP _ | ALG_VAR _
-		    | STATE_ALG_OP (Operator.CPUTIME | Operator.EVENT_VAR | Operator.TIME_VAR
-				    | Operator.NULL_EVENT_VAR | Operator.PROD_EVENT_VAR)
+		    | STATE_ALG_OP (Operator.CPUTIME | Operator.EVENT_VAR |
+				    Operator.TIME_VAR | Operator.NULL_EVENT_VAR)
 		    | KAPPA_INSTANCE _ | TOKEN_ID _ | CONST _), _ ->
 		   raise ExceptionDefn.Unsatisfiable
 	  end
