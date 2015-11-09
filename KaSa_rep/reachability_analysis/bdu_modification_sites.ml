@@ -213,8 +213,7 @@ let collect_modification_sites_without_creation parameter error
 		    the result then remove them*)
 		  Int2Map_Modif.Map.fold (fun (agent_type', site_type') (l1, s2)
 		    (error, store_result) ->
-		      if Int2Map_Modif.Map.mem (agent_type', site_type') store_result
-			&& Site_map_and_set.Set.mem rule_id s2
+		      if Site_map_and_set.Set.mem rule_id s2
 		      then
 			let store_result =
 			  Int2Map_Modif.Map.remove

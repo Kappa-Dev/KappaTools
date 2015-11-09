@@ -142,18 +142,9 @@ agent_type_2:
 - Working list update and creation:
 
 ------------------------------------------------------------
-* Build BDU:
-------------------------------------------------------------
-- Covering classes of test:
-- Covering classes of test restriction:
-- Bdu of test restriction:
-- Creation restriction:
-- Covering classes of modification:
-- Covering classes of modification restriction:
-- Modification restriction list:
-
-------------------------------------------------------------
-* Build BDU MAP:
+* Covering classes with new index :
 ------------------------------------------------------------
 - A map of covering classes with test rules:
+- A map of covering classes with creation rules:
+- A map of covering classes with modification rules (without creation rules):
 execution finished without any exception

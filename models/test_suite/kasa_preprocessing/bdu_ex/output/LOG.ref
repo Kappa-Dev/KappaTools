@@ -176,13 +176,11 @@ agent_type:0@site_type:0:rule_id:0
 ------------------------------------------------------------
 Modification sites without creation:
 ------------------------------------------------------------
-agent_type:0@site_type:0:rule_id:0
 agent_type:0@site_type:0:rule_id:1
 agent_type:0@site_type:1:rule_id:2
 ------------------------------------------------------------
 Test and modification sites without creation (will be removed):
 ------------------------------------------------------------
-agent_type:0@site_type:0:rule_id:0
 agent_type:0@site_type:0:rule_id:1
 agent_type:0@site_type:1:rule_id:2
 agent_type:0@site_type:0:rule_id:1
@@ -198,7 +196,6 @@ Contact map with state (there is no lhs binding):
 ------------------------------------------------------------
 Update function before adding the side effects rules:
 ------------------------------------------------------------
-agent_type:0@site_type:0:covering_class_id:0:rule_id:0
 agent_type:0@site_type:0:covering_class_id:0:rule_id:1
 agent_type:0@site_type:0:covering_class_id:0:rule_id:2
 agent_type:0@site_type:1:covering_class_id:0:rule_id:2
@@ -222,78 +219,15 @@ agent_type_0:
 - Working list update and creation:
 
 ------------------------------------------------------------
-* Build BDU:
-------------------------------------------------------------
-- Covering classes of test:
-agent_type_0:
-Covering_class_id:0
-site_type:0
-site_type:1
-- Covering classes of test restriction:
-agent_type_0:
-Covering_class_id:0
-site':1:state:1
-site':2:state:0
-Covering_class_id:0
-site':1:state:0
-- Bdu of test restriction:
-agent_type_0:
-Covering_class_id:0
-site':2:state:0
-site':1:state:1
-
-agent_type_0: if(mvbdu_id:7) x1 < 1 then 
-agent_type_0:  false
-agent_type_0: else 
-agent_type_0:  if(mvbdu_id:6) x1 < 2 then 
-agent_type_0:   if(mvbdu_id:5) x2 < 0 then 
-agent_type_0:    false
-agent_type_0:   else 
-agent_type_0:    if(mvbdu_id:4) x2 < 1 then 
-agent_type_0:     true
-agent_type_0:    else 
-agent_type_0:     false
-agent_type_0:  else 
-agent_type_0:   false
-
-Covering_class_id:0
-site':1:state:0
-
-agent_type_0: if(mvbdu_id:3) x1 < 0 then 
-agent_type_0:  false
-agent_type_0: else 
-agent_type_0:  if(mvbdu_id:2) x1 < 1 then 
-agent_type_0:   true
-agent_type_0:  else 
-agent_type_0:   false
-
-- Creation restriction:
-agent_type_0:
-Covering_class_id:0
-site_type:0
-site_type:1
-- Covering classes of modification:
-agent_type_0:
-Covering_class_id:0
-site_type:0
-site_type:1
-- Covering classes of modification restriction:
-agent_type_0:
-Covering_class_id:0
-site':2:state:1
-Covering_class_id:0
-site':1:state:1
-Covering_class_id:0
-site':1:state:0
-- Modification restriction list:
-agent_type_0:
-rule_id:1
-site_type':1
-
-------------------------------------------------------------
-* Build BDU MAP:
+* Covering classes with new index :
 ------------------------------------------------------------
 - A map of covering classes with test rules:
-rule_id:2:covering_class_id:0@agent_type:0:site_type:0
-rule_id:2:covering_class_id:0@agent_type:0:site_type:1
+agent_type:0:covering_class_id:0@site_type':1:state:0:rule_id:1
+agent_type:0:covering_class_id:0@site_type':1:state:1:rule_id:2
+agent_type:0:covering_class_id:0@site_type':2:state:0:rule_id:2
+- A map of covering classes with creation rules:
+agent_type:0:covering_class_id:0@site_type':1:state:0:rule_id:0
+- A map of covering classes with modification rules (without creation rules):
+agent_type:0:covering_class_id:0@site_type':1:state:1:rule_id:1
+agent_type:0:covering_class_id:0@site_type':2:state:1:rule_id:2
 execution finished without any exception

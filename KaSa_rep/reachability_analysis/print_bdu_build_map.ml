@@ -26,34 +26,156 @@ let trace = false
 
 let print_remanent_test_map parameter error result =
   Map_test.Map.iter
-    (fun (rule_id, cv_id, agent_type) (l1, l2) ->
+    (fun (agent_type, cv_id, site, state) (l1, l2) ->
       if l1 <> []
       then
         begin
           let _ = fprintf parameter.log
-            "rule_id:%i:covering_class_id:%i@agent_type:%i\n"
-            rule_id cv_id agent_type
+            "agent_type:%i:covering_class_id:%i:site_type':%i:state:%i\n"
+            agent_type cv_id site state
           in
           let _ = List.fold_left
             (fun bool x ->
               (if bool
                then
                   fprintf parameter.log ", ");
-              fprintf parameter.log "rule_id:%i" rule_id;
+              fprintf parameter.log "cv_id:%i" cv_id;
               true
             ) false l1
           in
           fprintf stdout "\n"
         end
       else ();
-      List.iter (fun (list, set) ->
-        (*print set*)
-        Site_map_and_set.Set.iter (fun site ->
-          fprintf parameter.log "rule_id:%i:covering_class_id:%i@agent_type:%i:site_type:%i\n"
-            rule_id cv_id agent_type site
-        ) set
-      ) l2
+      Site_map_and_set.Set.iter (fun rule_id ->
+          fprintf parameter.log 
+            "agent_type:%i:covering_class_id:%i@site_type':%i:state:%i:rule_id:%i\n"
+            agent_type cv_id site state rule_id
+        ) l2
     ) result
+
+(************************************************************************************)
+
+let print_remanent_creation_map parameter error result =
+  Map_creation.Map.iter
+    (fun (agent_type, cv_id, site, state) (l1, l2) ->
+      if l1 <> []
+      then
+        begin
+          let _ = fprintf parameter.log
+            "agent_type:%i:covering_class_id:%i:site_type':%i:state:%i\n"
+            agent_type cv_id site state
+          in
+          let _ = List.fold_left
+            (fun bool x ->
+              (if bool
+               then
+                  fprintf parameter.log ", ");
+              fprintf parameter.log "cv_id:%i" cv_id;
+              true
+            ) false l1
+          in
+          fprintf stdout "\n"
+        end
+      else ();
+      Site_map_and_set.Set.iter (fun rule_id ->
+          fprintf parameter.log 
+            "agent_type:%i:covering_class_id:%i@site_type':%i:state:%i:rule_id:%i\n"
+            agent_type cv_id site state rule_id
+        ) l2
+    ) result
+
+(************************************************************************************)
+
+let print_remanent_modif_map parameter error result =
+  Map_modif.Map.iter
+    (fun (agent_type, cv_id, site, state) (l1, l2) ->
+      if l1 <> []
+      then
+        begin
+          let _ = fprintf parameter.log
+            "agent_type:%i:covering_class_id:%i:site_type':%i:state:%i\n"
+            agent_type cv_id site state
+          in
+          let _ = List.fold_left
+            (fun bool x ->
+              (if bool
+               then
+                  fprintf parameter.log ", ");
+              fprintf parameter.log "cv_id:%i" cv_id;
+              true
+            ) false l1
+          in
+          fprintf stdout "\n"
+        end
+      else ();
+      Site_map_and_set.Set.iter (fun rule_id ->
+          fprintf parameter.log 
+            "agent_type:%i:covering_class_id:%i@site_type':%i:state:%i:rule_id:%i\n"
+            agent_type cv_id site state rule_id
+        ) l2
+    ) result
+
+(************************************************************************************)
+
+let print_remanent_modif_op_map parameter error result =
+  (*let result1, result2 = result in
+  let _ = 
+    Map_modif_creation.Map.iter
+      (fun (agent_type, cv_id, site, state) (l1, l2) ->
+        if l1 <> []
+        then
+          begin
+            let _ = fprintf parameter.log
+              "agent_type:%i:covering_class_id:%i:site_type':%i:state:%i\n"
+              agent_type cv_id site state
+            in
+            let _ = List.fold_left
+              (fun bool x ->
+                (if bool
+                 then
+                    fprintf parameter.log ", ");
+                fprintf parameter.log "cv_id:%i" cv_id;
+                true
+              ) false l1
+            in
+            fprintf stdout "\n"
+          end
+        else ();
+        Site_map_and_set.Set.iter (fun rule_id ->
+          fprintf parameter.log 
+            "agent_type:%i:covering_class_id:%i@site_type':%i:state:%i:rule_id:%i\n"
+            agent_type cv_id site state rule_id
+        ) l2
+      ) result1
+  in
+  fprintf stdout "result 2:\n";*)
+   Map_modif_creation.Map.iter
+      (fun (agent_type, cv_id, site, state) (l1, l2) ->
+        if l1 <> []
+        then
+          begin
+            let _ = fprintf parameter.log
+              "agent_type:%i:covering_class_id:%i:site_type':%i\n"
+              agent_type cv_id site
+            in
+            let _ = List.fold_left
+              (fun bool x ->
+                (if bool
+                 then
+                    fprintf parameter.log ", ");
+                fprintf parameter.log "cv_id:%i" cv_id;
+                true
+              ) false l1
+            in
+            fprintf stdout "\n"
+          end
+        else ();
+        Site_map_and_set.Set.iter (fun rule_id ->
+          fprintf parameter.log 
+            "agent_type:%i:covering_class_id:%i@site_type':%i:state:%i:rule_id:%i\n"
+            agent_type cv_id site state rule_id
+        ) l2
+      ) result
 
 (************************************************************************************)
 (*main print*)
@@ -63,7 +185,7 @@ let print_bdu_build_map parameter error result =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
-      "* Build BDU MAP:\n";
+      "* Covering classes with new index :\n";
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
   in
@@ -74,5 +196,30 @@ let print_bdu_build_map parameter error result =
       parameter
       error
       result.store_remanent_test_map
+  in
+  let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "- A map of covering classes with creation rules:\n";
+    print_remanent_creation_map
+      parameter
+      error
+      result.store_remanent_creation_map
+  in
+  (*only print if one would like to test*)
+  (*let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "- A map of covering classes with modification rules (with creation rules):\n";
+    print_remanent_modif_map
+      parameter
+      error
+      result.store_remanent_modif_map
+  in*)
+  let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "- A map of covering classes with modification rules (without creation rules):\n";
+    print_remanent_modif_op_map
+      parameter
+      error
+      result.store_remanent_modif_op_map
   in
   error
