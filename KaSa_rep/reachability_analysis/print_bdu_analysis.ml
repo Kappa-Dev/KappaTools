@@ -49,12 +49,12 @@ let print_result parameter error result =
       result.store_bdu_analysis_dynamic
   in
   (*print if one would like to test*)
-  (*let _ =
+  let _ =
     print_bdu_build
       parameter
       error
       result.store_bdu_build
-  in*)
+  in
   let _ =
     print_bdu_build_map
       parameter

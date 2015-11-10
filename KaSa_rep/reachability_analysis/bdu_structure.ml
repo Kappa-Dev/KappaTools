@@ -25,53 +25,44 @@ let trace = false
 (*************************************************************************************)
 (*collect remanent test as a map function*)
 
-let collect_remanent_test_map parameter error rule_id rule store_remanent_test store_result =
-  let add_link (agent_type, cv_id, site, state) rule_id store_result =
+let collect_remanent_test_map parameter error rule_id rule store_remanent_test =
+  let add_link (agent_type, rule_id) triple_list store_result =
     let (l, old) =
-      Map_test.Map.find_default ([], Site_map_and_set.Set.empty)
-        (agent_type, cv_id, site, state) store_result
+      Map_test.Map.find_default ([], []) (agent_type, rule_id) store_result
     in
-    let current_set =
-      Site_map_and_set.Set.add rule_id old
-    in
-    let new_set = Site_map_and_set.Set.union current_set old in
     let result_map =
-      Map_test.Map.add (agent_type, cv_id, site, state)
-        (l, new_set) store_result
+      Map_test.Map.add (agent_type, rule_id)
+        (l, List.concat [triple_list; old]) store_result
     in
     error, result_map
   in
   (*-----------------------------------------------------------------*)
   AgentMap.fold parameter error
-    (fun parameter error agent_type fourth_list store_result ->
-      let error, map =
-        List.fold_left
-          (fun (error, store_result) (rule_id, id, site', state) ->
-            let error, result =
-              add_link (agent_type, id, site', state) rule_id store_result
-            in
-            error, result
-          ) (error, store_result) fourth_list
-      in
-      error, map          
-    ) store_remanent_test store_result
+    (fun parameter error agent_type l store_result ->
+      List.fold_left (fun (error, store_result) (rule_id, triple_list) ->
+        let error, map =
+          add_link (agent_type, rule_id) triple_list store_result
+        in
+        error, map
+      ) (error, store_result) l
+    ) store_remanent_test Map_test.Map.empty
 
 (*************************************************************************************)
 (*collect remanent creation as a map function*)
 
 let collect_remanent_creation_map parameter error rule_id rule store_remanent_creation
     store_result =
-  let add_link (agent_type, cv_id, site, state) rule_id store_result =
+  let add_link (agent_type, rule_id, pair_list) rule_id store_result =
     let (l, old) =
       Map_creation.Map.find_default ([], Site_map_and_set.Set.empty)
-        (agent_type, cv_id, site, state) store_result
+        (agent_type, rule_id, pair_list) store_result
     in
     let current_set =
       Site_map_and_set.Set.add rule_id old
     in
     let new_set = Site_map_and_set.Set.union current_set old in
     let result_map =
-      Map_creation.Map.add (agent_type, cv_id, site, state)
+      Map_creation.Map.add (agent_type, rule_id, pair_list)
         (l, new_set) store_result
     in
     error, result_map
@@ -81,9 +72,9 @@ let collect_remanent_creation_map parameter error rule_id rule store_remanent_cr
     (fun parameter error agent_type fourth_list store_result ->
       let error, map =
         List.fold_left
-          (fun (error, store_result) (rule_id, id, site', state) ->
+          (fun (error, store_result) (rule_id, pair_list) ->
             let error, result =
-              add_link (agent_type, id, site', state) rule_id store_result
+              add_link (agent_type, rule_id, pair_list) rule_id store_result
             in
             error, result
           ) (error, store_result) fourth_list
@@ -94,7 +85,7 @@ let collect_remanent_creation_map parameter error rule_id rule store_remanent_cr
 (*************************************************************************************)
 (*collect remanent modification as a map function (this function content creation rules)*)
 
-let collect_remanent_modif_map parameter error rule_id rule store_remanent_modif
+(*let collect_remanent_modif_map parameter error rule_id rule store_remanent_modif
     store_result =
   let add_link (agent_type, cv_id, site, state) rule_id store_result =
     let (l, old) =
@@ -124,12 +115,12 @@ let collect_remanent_modif_map parameter error rule_id rule store_remanent_modif
           ) (error, store_result) fourth_list
       in
       error, map          
-    ) store_remanent_modif store_result
+    ) store_remanent_modif store_result*)
 
 (*************************************************************************************)
 (*collect remanent modification as a map function (this function without creation rules)*)
 
-let collect_remanent_modif_op_map parameter error rule_id rule store_remanent_creation_map
+(*let collect_remanent_modif_op_map parameter error rule_id rule store_remanent_creation_map
     store_remanent_triple store_result =
   let add_link (agent_type, cv_id, site, state) rule_id store_result =
     let (l, old) =
@@ -163,7 +154,7 @@ let collect_remanent_modif_op_map parameter error rule_id rule store_remanent_cr
             store_remanent_triple
         in
         (*get*)
-        let error, pair_list =
+        let error, get_pair_list =
           match AgentMap.unsafe_get parameter error agent_type 
             store_remanent_restriction with
             | error, None -> error, []
@@ -205,10 +196,10 @@ let collect_remanent_modif_op_map parameter error rule_id rule store_remanent_cr
             in
             (*-----------------------------------------------------------------*)
             error, store_result
-          ) (error, store_result) pair_list
+          ) (error, store_result) get_pair_list
         in
         error, store_result
-    ) rule.diff_direct store_result
+    ) rule.diff_direct store_result*)
 
 (*************************************************************************************)
 (* Build BDU test, creation and a list of modification rules*)

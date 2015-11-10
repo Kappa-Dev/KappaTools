@@ -219,15 +219,30 @@ update function:
 - Working list update and creation:
 
 ------------------------------------------------------------
+* Taking information of covering class:
+------------------------------------------------------------
+- Covering classes triple (id, list, set):
+agent_type_0:
+Covering_class_id:0
+site_type:0
+site_type:1
+- Covering classes fourth (rule_id, cv_id, site', state) of test rule:
+agent_type_0:
+rule_id:0:
+covering_class_id:0:site_type':2:state:0
+covering_class_id:0:site_type':1:state:0
+rule_id:1:
+covering_class_id:0:site_type':2:state:0
+- Covering classes fourth (rule_id, cv_id, site', state) of creation rule:
+- Covering classes fourth (rule_id, cv_id, site', state) of modification rule:
+agent_type_0:
+
+------------------------------------------------------------
 * Covering classes with new index :
 ------------------------------------------------------------
 - A map of covering classes with test rules:
-agent_type:0:covering_class_id:0@site_type':1:state:0:rule_id:0
-agent_type:0:covering_class_id:0@site_type':2:state:0:rule_id:0
-agent_type:0:covering_class_id:0@site_type':2:state:0:rule_id:1
+agent_type:0:rule_id:0@covering_class_id:0:site_type':2:state:0
+agent_type:0:rule_id:0@covering_class_id:0:site_type':1:state:0
+agent_type:0:rule_id:1@covering_class_id:0:site_type':2:state:0
 - A map of covering classes with creation rules:
-- A map of covering classes with modification rules (without creation rules):
-agent_type:0:covering_class_id:0@site_type':1:state:1:rule_id:0
-agent_type:0:covering_class_id:0@site_type':2:state:1:rule_id:0
-agent_type:0:covering_class_id:0@site_type':2:state:1:rule_id:1
 execution finished without any exception

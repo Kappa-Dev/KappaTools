@@ -16,6 +16,7 @@ open Printf
 open Bdu_analysis_type
 open SetMap
 open Cckappa_sig
+open Remanent_parameters_sig
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "BDU creation") message exn (fun () -> default)  
@@ -47,21 +48,30 @@ let print_remanent_triple parameter error result =
 (************************************************************************************)
 (*restriction of test rules*)
 
-let print_fourth_list l =
+let print_list l =
   let rec aux acc =
     match acc with
     | [] -> []
-    | (rule_id, id, site', state) :: tl ->
-      fprintf stdout "rule_id:%i:covering_class_id:%i:site':%i:state:%i\n"
-        rule_id id site' state     
-      ; aux tl
+    | (id, site, state) :: tl ->
+      fprintf stdout "covering_class_id:%i:site_type':%i:state:%i\n" id site state;
+      aux tl
   in aux l
+
+let print_pair_list parameter p =
+  let rec aux acc =
+    match acc with
+    | [] -> []
+    | (rule_id, l) :: tl ->
+      fprintf stdout "rule_id:%i:\n" rule_id; print_list l;
+      aux tl
+  in
+  aux p
 
 let print_remanent_test parameter error result =
   AgentMap.print error
-    (fun error parameter fourth_list ->
+    (fun error parameter pair_list ->
       let _ =
-        print_fourth_list fourth_list
+        print_pair_list parameter pair_list
       in
       error
     ) parameter result
@@ -70,9 +80,9 @@ let print_remanent_test parameter error result =
 
 let print_remanent_creation parameter error result =
   AgentMap.print error
-    (fun error parameter fourth_list ->
+    (fun error parameter pair_list ->
       let _ =
-        print_fourth_list fourth_list
+        print_pair_list pair_list
       in
       error
     ) parameter result
@@ -81,9 +91,9 @@ let print_remanent_creation parameter error result =
 
 let print_remanent_modif parameter error result =
   AgentMap.print error
-    (fun error parameter fourth_list ->
+    (fun error parameter pair_list ->
       let _ =
-        print_fourth_list fourth_list
+        print_pair_list pair_list
       in
       error
     ) parameter result

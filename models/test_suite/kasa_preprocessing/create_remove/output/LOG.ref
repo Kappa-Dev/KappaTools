@@ -142,9 +142,20 @@ agent_type_2:
 - Working list update and creation:
 
 ------------------------------------------------------------
+* Taking information of covering class:
+------------------------------------------------------------
+- Covering classes triple (id, list, set):
+- Covering classes fourth (rule_id, cv_id, site', state) of test rule:
+agent_type_0:
+agent_type_1:
+- Covering classes fourth (rule_id, cv_id, site', state) of creation rule:
+agent_type_1:
+agent_type_2:
+- Covering classes fourth (rule_id, cv_id, site', state) of modification rule:
+
+------------------------------------------------------------
 * Covering classes with new index :
 ------------------------------------------------------------
 - A map of covering classes with test rules:
 - A map of covering classes with creation rules:
-- A map of covering classes with modification rules (without creation rules):
 execution finished without any exception

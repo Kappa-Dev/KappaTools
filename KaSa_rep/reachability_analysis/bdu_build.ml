@@ -221,38 +221,36 @@ let collect_test_restriction parameter error rule_id rule store_remanent_triple
             store_remanent_triple
         in
         (*get*)
-        let error, pair_list =
+        let error, get_pair_list =
           match AgentMap.unsafe_get parameter error agent_type 
             store_remanent_restriction with
             | error, None -> error, []
             | error, Some l -> error, l
         in
         (*-----------------------------------------------------------------*)
-        (*fold a list and get a pair of site and state and rule_id*)
-        let error, fourth_list =
+        let error, pair_list =
           List.fold_left 
             (fun (error, current_list) (id, map_res) ->
-              let error, l =
+              let error, pair_list =
                 Site_map_and_set.Map.fold
                   (fun site' state (error, current_list) ->
-                    let fourth_list = (rule_id, id, site', state) :: current_list in
-                    error, fourth_list
+                    let pair_list = (id, site', state) :: current_list in
+                    error, pair_list
                   ) map_res (error, [])
               in
-              let new_fourth_list =
-                List.concat [l; current_list]
-              in
-              error, new_fourth_list
-            ) (error, []) pair_list
-        in
+              error, (rule_id, pair_list) :: current_list
+            ) (error, []) get_pair_list
+        in 
         (*-----------------------------------------------------------------*)
+        (*fold a list and get a pair of site and state and rule_id*)
         let error, old_list =
           match AgentMap.unsafe_get parameter error agent_type store_result with
           | error, None -> error, []
           | error, Some l -> error, l
         in
-        let new_list = List.concat [fourth_list; old_list] in
+        let new_list = List.concat [pair_list; old_list] in
         (*-----------------------------------------------------------------*)
+      
         let error, store_result =
           AgentMap.set
             parameter
@@ -285,7 +283,7 @@ let collect_creation_restriction parameter error rule_id rule store_remanent_tri
           store_remanent_triple
       in
       (*get*)
-      let error, pair_list =
+      let error, get_pair_list =
         match AgentMap.unsafe_get parameter error agent_type 
           store_remanent_restriction with
           | error, None -> error, []
@@ -293,29 +291,26 @@ let collect_creation_restriction parameter error rule_id rule store_remanent_tri
       in
       (*-----------------------------------------------------------------*)
       (*fold a list and get a pair of site and state and rule_id*)
-      let error, fourth_list =
-        List.fold_left 
-          (fun (error, current_list) (id, map_res) ->
-            let error, l =
-              Site_map_and_set.Map.fold
-                (fun site' state (error, current_list) ->
-                  let fourth_list = (rule_id, id, site', state) :: current_list in
-                  error, fourth_list
-                ) map_res (error, [])
-            in
-            let new_fourth_list =
-              List.concat [l; current_list]
-            in
-            error, new_fourth_list
-          ) (error, []) pair_list
-      in
+      let error, pair_list =
+          List.fold_left 
+            (fun (error, current_list) (id, map_res) ->
+              let error, pair_list =
+                Site_map_and_set.Map.fold
+                  (fun site' state (error, current_list) ->
+                    let pair_list = (id, site', state) :: current_list in
+                    error, pair_list
+                  ) map_res (error, [])
+              in
+              error, (rule_id, pair_list) :: current_list
+            ) (error, []) get_pair_list
+       in       
       (*-----------------------------------------------------------------*)
       let error, old_list =
         match AgentMap.unsafe_get parameter error agent_type store_result with
         | error, None -> error, []
         | error, Some l -> error, l
       in
-      let new_list = List.concat [fourth_list; old_list] in
+      let new_list = List.concat [pair_list; old_list] in
       (*-----------------------------------------------------------------*)
       let error, store_result =
         AgentMap.set
@@ -349,7 +344,7 @@ let collect_modif_restriction parameter error rule_id rule store_remanent_triple
             store_remanent_triple
         in
         (*get*)
-        let error, pair_list =
+        let error, get_pair_list =
           match AgentMap.unsafe_get parameter error agent_type 
             store_remanent_restriction with
             | error, None -> error, []
@@ -357,29 +352,26 @@ let collect_modif_restriction parameter error rule_id rule store_remanent_triple
         in
         (*-----------------------------------------------------------------*)
         (*fold a list and get a pair of site and state and rule_id*)
-        let error, fourth_list =
+        let error, pair_list =
           List.fold_left 
             (fun (error, current_list) (id, map_res) ->
-              let error, l =
+              let error, pair_list =
                 Site_map_and_set.Map.fold
                   (fun site' state (error, current_list) ->
-                    let fourth_list = (rule_id, id, site', state) :: current_list in
-                    error, fourth_list
+                    let pair_list = (id, site', state) :: current_list in
+                    error, pair_list
                   ) map_res (error, [])
               in
-              let new_fourth_list =
-                List.concat [l; current_list]
-              in
-              error, new_fourth_list
-            ) (error, []) pair_list
-        in
+              error, (rule_id, pair_list) :: current_list
+            ) (error, []) get_pair_list
+        in 
         (*-----------------------------------------------------------------*)
         let error, old_list =
           match AgentMap.unsafe_get parameter error agent_type store_result with
           | error, None -> error, []
           | error, Some l -> error, l
         in
-        let new_list = List.concat [fourth_list; old_list] in
+        let new_list = List.concat [pair_list; old_list] in
         (*-----------------------------------------------------------------*)
         let error, store_result =
           AgentMap.set
