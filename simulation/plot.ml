@@ -80,11 +80,11 @@ let set_up filename env init_va =
   plotDescr :=
     Ready {format = format; last_point = 0}
 
-let next_point counter time_increment =
+let next_point counter =
   match counter.Counter.dT with
   | Some dT ->
      int_of_float
-       ((counter.Counter.time +. time_increment -. counter.Counter.init_time)
+       ((counter.Counter.time -. counter.Counter.init_time)
 	/. dT)
   | None ->
      match counter.Counter.dE with
@@ -104,12 +104,12 @@ let plot_now env observables_values =
      | Svg s ->
 	s.Pp_svg.points <- observables_values :: s.Pp_svg.points
 
-let fill form counter env time_increment observables_values =
+let fill form counter env observables_values =
   let () =
     match !plotDescr with
     | Wait _ -> ()
     | Ready plot ->
-       let next = next_point counter time_increment in
+       let next = next_point counter in
        let last = plot.last_point in
        let n = next - last in
        let () = set_last_point plot next in

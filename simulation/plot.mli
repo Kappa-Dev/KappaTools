@@ -6,4 +6,4 @@ val plot_now : Environment.t -> (float * Nbr.t array) -> unit
 
 (** Warning: This function is also in charge of the progressBar *)
 val fill : Format.formatter -> Mods.Counter.t ->
-	   Environment.t -> float -> (float * Nbr.t array) -> unit
+	   Environment.t -> (float * Nbr.t array) -> unit

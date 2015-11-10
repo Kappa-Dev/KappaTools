@@ -249,9 +249,6 @@ let one_rule form dt stop env domain counter graph state =
        if !Parameter.debugModeOn then
 	 Format.printf "@[<v>Obtained@ %a@]@."
 		       (Rule_interpreter.print env) graph'' in
-     let () =
-       Plot.fill form counter env dt
-		 (observables_values env counter graph'' state) in
      (not (Mods.Counter.one_constructive_event counter dt)||stop,graph'',state)
   | Rule_interpreter.Clash ->
      if Mods.Counter.consecutive_null_event counter <
@@ -332,10 +329,10 @@ let loop_cps form hook return env domain counter graph state =
       try
 	let (stop,graph',state') as out =
 	  a_loop form env domain counter graph state in
+	let () =
+	  Plot.fill
+	    form counter env (observables_values env counter graph' state') in
 	let () = if stop then
-		   let () =
-		     Plot.fill form counter env 0.0
-			       (observables_values env counter graph' state') in
 		   ignore (perturbate env domain counter graph' state') in
 	out
       with ExceptionDefn.UserInterrupted f ->
