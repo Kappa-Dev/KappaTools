@@ -2,14 +2,14 @@
   * compression_main.ml 
   *
   * Causal flow compression: a module for KaSim 
-  * Jerome Feret, projet Abstraction, INRIA Paris-Rocquencourt
+  * Jerome Feret, projet Antique, INRIA Paris-Rocquencourt
   * Jean Krivine, Université Paris-Diderot, CNRS 
   * 
   * KaSim
   * Jean Krivine, Universite Paris-Diderot, CNRS 
   *  
   * Creation: 19/10/2011
-  * Last modification: 21/11/2013
+  * Last modification: 10/11/2015
   * * 
   * Some parameters references can be tuned thanks to command-line options
   * other variables has to be set before compilation   
@@ -20,9 +20,10 @@
 
 module U = Utilities 
 module D = U.D
-type secret_log_info = D.S.PH.B.PB.CI.Po.K.P.log_info
+
+type secret_log_info = U.Profiling.log_info
 type secret_step = D.S.PH.B.PB.CI.Po.K.refined_step
-let init_secret_log_info = D.S.PH.B.PB.CI.Po.K.P.init_log_info
+let init_secret_log_info = U.Profiling.init_log_info
 let secret_store_event = D.S.PH.B.PB.CI.Po.K.store_event
 let secret_store_obs = D.S.PH.B.PB.CI.Po.K.store_obs
 
@@ -137,12 +138,13 @@ let compress_and_print logger env log_info step_list =
             let error = 
               if debug_mode 
               then 
-                let error = D.S.PH.B.export_blackboard_to_xls parameter handler error "a" 0 0 blackboard in 
-                let error = D.S.PH.B.print_blackboard parameter handler error blackboard in error
+                let error = U.export_musical_grid_to_xls parameter handler error "a" 0 0 blackboard in 
+                let error = U.print_musical_grid parameter handler error blackboard in 
+		error
               else 
                 error 
             in  
-            let error,list = D.S.PH.forced_events parameter handler error blackboard in 
+            let error,list = U.extract_observable_hits_from_musical_notation parameter handler error blackboard in 
             let n_stories = List.length list in 
             let () =
 	      if log_step 
@@ -156,7 +158,7 @@ let compress_and_print logger env log_info step_list =
                 then 
                   Debug.tag logger "\t\t * causal compression "
               in 
-              let log_info = D.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
+              let log_info = U.Profiling.set_start_compression log_info in 
 
 	      (* We use the grid to get the causal precedence (pred* ) of each observable *)
 	      let grid = U.convert_trace_into_grid_while_trusting_side_effects refined_event_list_without_pseudo_inverse handler in
@@ -192,52 +194,45 @@ let compress_and_print logger env log_info step_list =
               in
 	      let blackboard_cflow = blackboard in 
               List.fold_left 
-                (fun (error,counter,tick,blackboard,causal_story_array,causal_story_faillure) (list_order,list_eid,info) -> 
+                (fun (error,counter,tick,blackboard,causal_story_array,causal_story_faillure) observable_id
+ -> 
                   let () = 
                     if debug_mode
                     then 
                       Debug.tag logger "\t\t * causal compression "
                   in 
-                  let eid = 
-                    match list_eid with [a] -> a 
-                    | _ -> failwith "no observable in that story, compression main, 302" 
-                  in 
-                  let log_info = D.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
-                  let event_id_list_rev = ((eid+1)::(enriched_grid.Causal.prec_star.(eid+1))) in 
-                  let event_id_list = List.rev_map pred (event_id_list_rev) in 
-                  let error,event_list,result_wo_compression = D.S.translate parameter handler error blackboard_cflow event_id_list in 
-                  let result_wo_compression = List.rev_map fst (List.rev result_wo_compression) in 
-                  let error,refined_event_list_without_pseudo_inverse,int_pseudo_inverse  = 
+		  let error,trace_before_compression = U.causal_prefix_of_an_observable_hit "compression_main, line 2014" parameter handler error log_info blackboard enriched_grid observable_id in 
+                  let error,(trace_without_pseudo_inverse_events,int_pseudo_inverse)  = 
                     if cut 
                     then 
-                      D.S.PH.B.PB.CI.cut parameter handler error result_wo_compression   
+                      U.remove_pseudo_inverse_events  parameter handler error trace_before_compression
                     else 
-                      D.S.PH.B.PB.CI.do_not_cut parameter handler error result_wo_compression 
+                      error,(trace_before_compression,0)
                   in 
-                  
-                  let error,log_info,blackboard_cflow = D.S.PH.B.import parameter handler error log_info (List.rev_map (fun (x,_)->x) (List.rev refined_event_list_without_pseudo_inverse)) in 
-                  let error,list = D.S.PH.forced_events parameter handler error blackboard_cflow in 
-                  let list_order,list_eid,info = 
-                    match list with [a,b,c] -> a,b,c
-                    | _ -> failwith "wrong list, compression_main, 344"  
-                  in 
+                  let error,log_info,blackboard_cflow = U.convert_trace_into_musical_notation parameter handler error log_info trace_without_pseudo_inverse_events in 
+                  let error,observable_hit = U.extract_observable_hit_from_musical_notation "compression_main.ml, line 214, " parameter handler error blackboard_cflow in 
+		  let grid = U.convert_trace_into_grid_while_trusting_side_effects trace_without_pseudo_inverse_events  handler in 
+		  let enriched_grid = Causal.enrich_grid logger Graph_closure.config_intermediary grid in 
                   let eid = 
-                    match list_eid with [a] -> a 
+                    match U.get_event_list_from_observable_hit observable_hit 
+		    with 
+		    | [a] -> a 
                     | _ -> failwith "wrong list, compression_main, 325" 
                   in 
+
                   let refined_list = 
                     if cut && Parameter.do_detect_separable_components 
                     then 
-                      (List.rev_map (fun (x,bool) -> (x,[],bool)) (List.rev refined_event_list_without_pseudo_inverse))
+                      (List.rev_map (fun x -> (x,[],(*bool*) dummy_weak)) (List.rev trace_without_pseudo_inverse_events))
                     else 
-                      (List.rev_map (fun (x,_) -> (x,[],dummy_weak)) (List.rev refined_event_list_without_pseudo_inverse))
+                      (List.rev_map (fun x -> (x,[],dummy_weak)) (List.rev trace_without_pseudo_inverse_events))
                   in 
 		  let grid = D.S.PH.B.PB.CI.Po.K.build_grid refined_list true handler in
                   let enriched_grid = Causal.enrich_grid logger Graph_closure.config_intermediary grid in 
                   let event_id_list_rev = ((eid+1)::(enriched_grid.Causal.prec_star.(eid+1))) in 
                   let event_id_list = List.rev_map pred (event_id_list_rev) in 
 		  let info = 
-                    match info 
+                    match U.get_runtime_info_from_observable_hit observable_hit 
                     with 
                     | None -> None 
                     | Some info -> 
@@ -248,6 +243,7 @@ let compress_and_print logger env log_info step_list =
 		       in 
                        Some info
                   in
+		  let list_order = U.get_list_order observable_hit in 
 		  if
 		    store_uncompressed_stories || not cut
 		  then
@@ -261,8 +257,8 @@ let compress_and_print logger env log_info step_list =
                     error,counter+1,tick,blackboard,causal_story_array,causal_story_faillure
 		  else
 		    U.from_none_to_weak_with_tick  parameter handler log_info logger n_stories
-						 (error,counter,tick,blackboard,causal_story_array,causal_story_faillure)
-						 ((event_id_list,list_order,event_list),[],[info])
+		      (error,counter,tick,blackboard,causal_story_array,causal_story_faillure)
+		      ((event_id_list,list_order,trace_before_compression),[],[info])
 		)
                 (error,1,tick,blackboard,[],0) 
                 (List.rev list)

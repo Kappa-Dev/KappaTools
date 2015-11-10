@@ -21,15 +21,32 @@ let debug_mode = false
 let dummy_weak = false
 		   
 module D=Dag.Dag
+
 type error_log =  D.S.PH.B.PB.CI.Po.K.H.error_channel
 type parameter =  D.S.PH.B.PB.CI.Po.K.H.parameter
 type kappa_handler = D.S.PH.B.PB.CI.Po.K.H.handler 
 type profiling_info = D.S.PH.B.PB.CI.Po.K.P.log_info
 		       
 type refined_trace = D.S.PH.B.PB.CI.Po.K.refined_step list
+type refined_trace_with_weak_events = (D.S.PH.B.PB.CI.Po.K.refined_step * bool) list 
+type refined_trace_with_side_effect = 
+  (D.S.PH.B.PB.CI.Po.K.refined_step * 
+     D.S.PH.B.PB.CI.Po.K.side_effect) list 
+type step_id = D.S.PH.B.PB.step_id
 type cflow_grid = Causal.grid  
+type enriched_cflow_grid = Causal.enriched_grid
 type musical_grid =  D.S.PH.B.blackboard 
-		      
+
+type observable_hit = 
+  {
+    list_of_actions: D.S.PH.update_order list ;
+    list_of_events: step_id  list ; 
+    runtime_info:  unit Mods.simulation_info option}
+
+let get_event_list_from_observable_hit a = a.list_of_events 
+let get_runtime_info_from_observable_hit a = a.runtime_info 
+let get_list_order a = a.list_of_actions 
+
 type ('a,'b,'c) remanent =  
   error_log * int * (bool * int * int) *
     D.S.PH.B.blackboard *
@@ -50,15 +67,76 @@ let disambiguate = D.S.PH.B.PB.CI.Po.K.disambiguate
 let fill_siphon = D.S.PH.B.PB.CI.Po.K.fill_siphon 
 let cut = D.S.PH.B.PB.CI.Po.cut
 
+let remove_weak_events_annotation l = 
+  List.rev_map fst (List.rev l) 
+
 let remove_pseudo_inverse_events a b c d =
   let a,b,c = D.S.PH.B.PB.CI.cut a b c d in
-  a,(List.rev_map fst (List.rev b),c)
+  a,(remove_weak_events_annotation b,c)
 	    
+(*let remove_pseudo_inverse_events_and_tag_weak_events a b c d = 
+  let a,b,c = D.S.PH.B.PB.CI.cut a b c d in 
+  a,(b,c)
+
+let tag_weak_events a b c d = 
+  let a,b,c = D.S.PH.B.PB.CI.do_not_cut a b c d in 
+  a,b
+*)
+
+
+
+
+let extract_observable_hits_from_musical_notation a b c d = 
+  let error,l = D.S.PH.forced_events a b c d in 
+  error,
+  List.rev_map
+    (fun (a,b,c) -> 
+      {
+      list_of_actions = a;
+      list_of_events = b ;
+      runtime_info = c
+      })
+    (List.rev l)
+
+let extract_observable_hit_from_musical_notation string a b c d = 
+  let error,l = D.S.PH.forced_events a b c d in 
+  match l with [a,b,c] -> 
+    error,{
+      list_of_actions = a;
+      list_of_events = b; 
+      runtime_info = c}
+  | [] -> failwith (string^" no story")
+  | [] -> failwith (string^" several stories")
+      
+    
+let causal_prefix_of_an_observable_hit string parameter handler error log_info blackboard (enriched_grid:enriched_cflow_grid) observable_id = 
+  let eid = 
+    match 
+      get_event_list_from_observable_hit observable_id  
+    with 
+    | [a] -> a 
+    | [] -> failwith ("no observable in that story"^string)
+    | _ -> failwith  ("several observables in that story"^string)
+  in 
+  let log_info = Profiling.set_start_compression log_info in 
+  let event_id_list_rev = ((eid+1)::(enriched_grid.Causal.prec_star.(eid+1))) in 
+  let event_id_list = List.rev_map pred (event_id_list_rev) in 
+  let error,list_eid,_ = D.S.translate parameter handler error blackboard event_id_list in 
+  error,list_eid 
+
+  
+
 let print_trace parameter handler =
       Format.fprintf
 	parameter.D.S.PH.B.PB.CI.Po.K.H.out_channel "@[<v>%a@]@."
 	(Pp.list Pp.space (D.S.PH.B.PB.CI.Po.K.print_refined_step ~handler))
-        
+
+
+let export_musical_grid_to_xls = D.S.PH.B.export_blackboard_to_xls
+  
+let print_musical_grid = D.S.PH.B.print_blackboard 
+
+
 let from_none_to_weak parameter handler log_info logger (error,counter,tick,blackboard,weakly_compressed_story_array,weakly_compression_faillure) ((event_id_list,list_order,event_list),step_list,list_info) = 
   let info = List.hd list_info in 
   let error,log_info,blackboard_tmp,list_order = 
