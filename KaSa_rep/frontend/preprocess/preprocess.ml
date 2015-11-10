@@ -656,8 +656,8 @@ let translate_mixture parameters error handler mixture =
             let interface = ag.Cckappa_sig.agent_interface in
 	    match Cckappa_sig.Site_map_and_set.Map.find_option add.Cckappa_sig.site interface with
 	    | None ->  Exception.warn parameters error
-				      (Some "SetMap.ml") (Some "find_map, line 405")
-				      Not_found (fun () -> raise Not_found)
+				      (Some "Preprocess") (Some "find_map, line 405")
+				      Not_found (fun () -> (add,None)::list)
             | Some state -> error,(add,Some state.Cckappa_sig.site_state)::list)
        (error,[])
        (List.rev list) 
