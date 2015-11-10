@@ -817,15 +817,21 @@ let rec add_agents_in_cc sigs id wk registered_links transf links_transf
 		      define_positive_transformation
 			sigs transf l_t place site_id s in
 		    match List.partition (is_linked_on i) re with
-		    | [], re'
-			 when Tools.list_exists_uniq (is_linked_on i) acc ->
-		       handle_ports wk' r_l' c_l transf' l_t' re' acc (succ site_id)
+		    | [], re' ->
+		       if Tools.list_exists_uniq (is_linked_on i) acc then
+		         handle_ports
+			   wk' r_l' c_l transf' l_t' re' acc (succ site_id)
+		       else
+			 raise (ExceptionDefn.Malformed_Decl
+				  ("There is only 1 occurence of link "^
+				     string_of_int i,pos))
 		    | [n], re' when List.for_all
 				      (fun x -> not(is_linked_on i x)) acc ->
-		       handle_ports wk' r_l' c_l transf' l_t' re' (n::acc) (succ site_id)
+		       handle_ports
+			 wk' r_l' c_l transf' l_t' re' (n::acc) (succ site_id)
 		    | _, _ ->
 		       raise (ExceptionDefn.Malformed_Decl
-				("There are more than two agents using link "^
+				("There are more than two occurences of link "^
 				   string_of_int i,pos))
      in handle_ports wk registered_links IntMap.empty transf links_transf remains ag_l 0
 
