@@ -34,9 +34,9 @@
 
 %var: 'counter' 0
 
-#%mod: repeat ([E+] [mod] 1000 = 0) do \
+#%mod: repeat ([E] [mod] 1000 = 0) do \
 # ($UPDATE 'counter' ('counter'+1) ; \
-# $SNAPSHOT <"snap".'counter'."_".[E+].".ka">) \
+# $SNAPSHOT <"snap".'counter'."_".[E].".ka">) \
 # until [false]
 
 %mod: [T]>5 do $ADD 10000 C()
