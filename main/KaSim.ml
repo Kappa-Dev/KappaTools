@@ -138,7 +138,6 @@ let () =
     let (kasa_state,env, cc_env, counter, graph, new_state) =
       match !Parameter.marshalizedInFile with
       | "" ->
-	let _ = Printf.fprintf stderr "OK0\n" in 
 	 Eval.initialize Format.std_formatter !Parameter.alg_var_overwrite result
       | marshalized_file ->
 	 try
@@ -165,7 +164,6 @@ let () =
 	      "!Simulation package seems to have been created with a different version of KaSim, aborting...@.";
 	    exit 1
     in
-    let _ = Printf.fprintf stderr "OK1\n" in 
     let () = Kappa_files.with_marshalized
 	       (fun d -> Marshal.to_channel
 			   d (env,cc_env,counter) [Marshal.Closures]) in

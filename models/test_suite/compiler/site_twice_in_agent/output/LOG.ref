@@ -6,6 +6,7 @@ done
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
+Some exceptions have been raised during the static analysis, please analyse your file with KaSa
 + Compute the contact map
 	 -variable declarations
 	 -rules
@@ -17,6 +18,7 @@ done
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
+Some exceptions have been raised during the static analysis, please analyse your file with KaSa
 + Compute the contact map
 	 -variable declarations
 	 -rules
@@ -28,6 +30,7 @@ done
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
+Some exceptions have been raised during the static analysis, please analyse your file with KaSa
 + Compute the contact map
 	 -variable declarations
 	 -rules
@@ -39,6 +42,7 @@ done
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
+Some exceptions have been raised during the static analysis, please analyse your file with KaSa
 + Compute the contact map
 	 -variable declarations
 	 -rules
