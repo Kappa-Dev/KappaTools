@@ -51,6 +51,7 @@ module type Export_to_KaSim =
       state -> state * Signature.s
 
     val dump_errors: state -> unit
+    val dump_errors_light: state -> unit
     val flush_errors: state -> state
 
     val dump_influence_map: state -> unit
@@ -338,4 +339,8 @@ module Export_to_KaSim =
       
     let dump_errors state =
       Exception.print state.parameters state.errors
+
+    let dump_errors_light state = 
+      Exception.print_errors_light_for_kasim state.parameters state.errors 
+
   end:Export_to_KaSim)

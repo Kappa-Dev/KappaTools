@@ -135,9 +135,10 @@ let () =
     Format.printf
       "+ Initialized random number generator with seed %d@." theSeed;
 
-    let (env, cc_env, counter, graph, new_state) =
+    let (kasa_state,env, cc_env, counter, graph, new_state) =
       match !Parameter.marshalizedInFile with
       | "" ->
+	let _ = Printf.fprintf stderr "OK0\n" in 
 	 Eval.initialize Format.std_formatter !Parameter.alg_var_overwrite result
       | marshalized_file ->
 	 try
@@ -150,13 +151,13 @@ let () =
 	     else
 	       Format.printf "+Loading simulation package %s...@."
 			     marshalized_file in
-	   let env,cc_env,counter,graph,new_state =
+	   let kasa_state,env,cc_env,counter,graph,new_state =
 	     (Marshal.from_channel d :
-		Environment.t*Connected_component.Env.t*Counter.t*
+		Export_to_KaSim.Export_to_KaSim.state*Environment.t*Connected_component.Env.t*Counter.t*
 		  Rule_interpreter.t * State_interpreter.t) in
 	   let () = Pervasives.close_in d  in
 	   let () = Format.printf "Done@." in
-	   (env,cc_env,counter,graph,new_state)
+	   (kasa_state,env,cc_env,counter,graph,new_state)
 	 with
 	 | _exn ->
 	    Debug.tag
@@ -164,12 +165,14 @@ let () =
 	      "!Simulation package seems to have been created with a different version of KaSim, aborting...@.";
 	    exit 1
     in
-
+    let _ = Printf.fprintf stderr "OK1\n" in 
     let () = Kappa_files.with_marshalized
 	       (fun d -> Marshal.to_channel
 			   d (env,cc_env,counter) [Marshal.Closures]) in
     let () = Kappa_files.with_ccFile
 	       (fun f -> Connected_component.Env.print_dot f cc_env) in
+    let _ = Export_to_KaSim.Export_to_KaSim.dump_errors_light kasa_state in 
+    let kasa_state = Export_to_KaSim.Export_to_KaSim.flush_errors kasa_state in 
     ExceptionDefn.flush_warning Format.err_formatter ;
     if !Parameter.compileModeOn then exit 0 else ();
 

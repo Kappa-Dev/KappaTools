@@ -630,9 +630,10 @@ let initialize logger overwrite result =
     NamedDecls.create (array_map_of_list (fun x -> (x,())) result.Ast.tokens) in
 
   let pre_kasa_state = Export_to_KaSim.Export_to_KaSim.init result in
-  let _kasa_state,contact_map =
+  let kasa_state,contact_map =
     Export_to_KaSim.Export_to_KaSim.get_contact_map pre_kasa_state in
-
+  let _ = Export_to_KaSim.Export_to_KaSim.dump_errors_light kasa_state in 
+  let kasa_state = Export_to_KaSim.Export_to_KaSim.flush_errors kasa_state in 
   let domain = Connected_component.Env.empty sigs_nd in
   Debug.tag logger "\t -variable declarations";
   let ((_,extra_vars),cleaned_rules) =
@@ -674,4 +675,4 @@ let initialize logger overwrite result =
 	Connected_component.Env.print domain
 	(Rule_interpreter.print env) graph in
   let graph',state = State_interpreter.initial env counter graph stops in
-  (Debug.tag logger "\t Done"; (env, domain, counter, graph', state))
+  (Debug.tag logger "\t Done"; (kasa_state,env, domain, counter, graph', state))

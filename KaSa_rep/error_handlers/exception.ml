@@ -69,6 +69,22 @@ and stringlist_of_caught x stack =
       (fun sol string -> string::", "::sol) 
       ("; "::(stringlist_of_uncaught x.uncaught_exception ("; "::stack))))
       x.calling_stack  
+
+and stringlist_of_uncaught_light x stack = 
+    (match x.file_name with 
+        None -> ""
+    | Some file_name -> "file_name: "^file_name^"; ")
+    ::(match x.message with 
+        None -> ""
+    | Some message -> "message: "^message^"; ")
+    ::"exception:"
+    ::(stringlist_of_exception x.alarm stack) 
+and stringlist_of_caught_light x stack = 
+  "calling_stack: "
+  ::(List.fold_left 
+      (fun sol string -> string::", "::sol) 
+      ("; "::(stringlist_of_uncaught x.uncaught_exception ("; "::stack))))
+      x.calling_stack 
   
 type method_handler = 
   {mh_caught_error_list:caught_exception list;
@@ -142,3 +158,10 @@ let print parameters handlers =
         (List.rev (handlers.mh_uncaught_error_list))
     in 
       ()
+
+let print_errors_light_for_kasim parameters handlers =
+  if handlers.mh_caught_error_list = [] && handlers.mh_uncaught_error_list = [] 
+  then () 
+  else 
+    let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%sSome exceptions have been raised during the static analysis, please analyse your file with KaSa\n" (Remanent_parameters.get_prefix parameters) in 
+    ()
