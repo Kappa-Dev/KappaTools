@@ -28,7 +28,7 @@ let run stop out_div s =
      >>= fun () ->
      let result = !Ast.result in
      wrap3 Eval.initialize log_form [] result
-     >>= fun (env,domain,counter,graph,state) ->
+     >>= fun (kasa_state,env,domain,counter,graph,state) ->
      let () = Plot.create "foo.svg" in
      let () =
        if !Parameter.pointNumberValue > 0 then
