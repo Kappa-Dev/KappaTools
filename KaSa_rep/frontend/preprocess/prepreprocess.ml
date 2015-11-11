@@ -4,7 +4,7 @@
   * Jérôme Feret, projet Abstraction/Antique, INRIA Paris-Rocquencourt
   * 
   * Creation: 01/17/2011
-  * Last modification: Time-stamp: <2015-11-11 00:18:21 feret>
+  * Last modification: Time-stamp: <2015-11-11 06:13:21 feret>
   * * 
   * Translation from kASim ast to ckappa representation,
   *  
@@ -14,7 +14,7 @@
   * under the terms of the GNU Library General Public License *)
 
 let warn parameters mh message exn default = 
-     Exception.warn parameters mh (Some "Prepreprocess") message exn (fun () -> default) 
+     Exception.warn parameters mh (Some "Prepreprocess.ml") message exn (fun () -> default) 
   
 
 let local_trace = false 
@@ -47,17 +47,25 @@ let rev_ast = List.rev
       | agent :: mixture -> aux mixture (agent :: sol)
   in aux mixture []*)
   
-let pop_entry parameters error id map =
+let pop_entry parameters error id (map,set) =
+  if Ckappa_sig.Int_Set_and_Map.Set.mem id set 
+  then 
+    match Ckappa_sig.Int_Set_and_Map.Map.find_option id map 
+    with 
+    | Some [a] -> warn parameters error (Some "line 55, dandling bond detected\n") Exit (None,(Ckappa_sig.Int_Set_and_Map.Map.remove id map))
+    | Some [] | None ->  warn parameters error (Some "line 56, internal bug, link id is ignored") Exit (None,map) 
+    | Some (h::t) -> warn parameters error (Some "line 57, internal bug, link id is ignored") Exit (None,(Ckappa_sig.Int_Set_and_Map.Map.add id t map))
+  else
   match Ckappa_sig.Int_Set_and_Map.Map.find_option id map  with
   | Some [a] ->
      let map = Ckappa_sig.Int_Set_and_Map.Map.remove id map in
-     error,(a,map)
+     error,(Some a,map)
   | Some [b;a] ->
      let map = Ckappa_sig.Int_Set_and_Map.Map.add id [a] map in
-     error,(b,map)
-  | Some _ ->
-     warn parameters error (Some "line 69") Exit (("","",0),map)
-  | None -> warn parameters error (Some "line 70") Exit (("","",0),map)
+     error,(Some b,map)
+  | Some (h::t) ->
+     warn parameters error (Some "line 69, too many instances of a link identifier, ignore them") Exit (None,Ckappa_sig.Int_Set_and_Map.Map.add id t map)
+  | Some [] | None -> warn parameters error (Some "line 70, internal bug, link identifier") Exit (None,map)
 
 let rec scan_interface parameters k agent interface remanent = 
       match interface with 
@@ -86,30 +94,41 @@ let rec collect_binding_label parameters mixture f k remanent =
 let collect_binding_label parameters mixture f k remanent = 
   let error,map = collect_binding_label parameters mixture f k remanent in 
   Ckappa_sig.Int_Set_and_Map.Map.fold
-    (fun x l (error,map) -> 
+    (fun x l (error,(map,set)) -> 
      if (List.length l = 1)
       then 
 	let map = Ckappa_sig.Int_Set_and_Map.Map.remove x map in 
-	warn parameters error (Some "line 100") Exit map 
+	let set = Ckappa_sig.Int_Set_and_Map.Set.add x set in
+	warn parameters error (Some "line 100, dangling bond detected") Exit (map,set) 
       else 
-	(error,map))
+	(error,(map,set)))
     map 
-    (error,map)
+    (error,(map,Ckappa_sig.Int_Set_and_Map.Set.empty))
 
 let translate_lnk_state parameters lnk_state remanent = 
     match lnk_state with 
      | Ast.LNK_VALUE (id),position ->  
-         let error,map = remanent  in 
-         let error,((agent,site,index),map) = pop_entry parameters error id map  in 
-	 if (agent,site,index) = ("","",0) 
-	 then 
-	   let site = Ckappa_sig.LNK_ANY position in 
+       begin 
+	 let error,remanent = remanent in 
+	 let error,(triple,map) = pop_entry parameters error id remanent  in 
+	 match triple with 
+	 | None ->
+	   let site = Ckappa_sig.LNK_SOME position in 
 	   let remanent = 
-	     warn parameters error (Some "line 119") Exit map
+	     warn parameters error (Some ("line 116... "^(Location.to_string position)^"one dandling bond has been replaced by a wild card")) Exit remanent 
 	   in 
 	   site,remanent
-	 else
-	   Ckappa_sig.LNK_VALUE (index,agent,site,id,position),(error,map)
+	 | Some (agent,site,index) -> 
+	   if (agent,site,index) = ("","",0) 
+	   then 
+	     let site = Ckappa_sig.LNK_SOME position in 
+	     let remanent = 
+	       warn parameters error (Some "line 119") Exit remanent
+	     in 
+	     site,remanent
+	   else
+	     Ckappa_sig.LNK_VALUE (index,agent,site,id,position),(error,(map,(snd remanent)))
+       end 
      | Ast.FREE,_ -> Ckappa_sig.FREE,remanent
      | Ast.LNK_ANY,position -> Ckappa_sig.LNK_ANY position,remanent 
      | Ast.LNK_SOME,position -> Ckappa_sig.LNK_SOME position,remanent
@@ -465,8 +484,9 @@ let refine_init_t parameters error init_t =
 
 let refine_agent parameters error agent_set agent =
   let error,agent_set = check_freshness parameters error "Agent" (fst (fst agent)) agent_set in 
-  let remanent = scan_agent parameters 0 agent (error,Ckappa_sig.Int_Set_and_Map.Map.empty) in 
-  let agent,(error,map) = translate_agent parameters agent remanent in 
+  let error,map = scan_agent parameters 0 agent (error,Ckappa_sig.Int_Set_and_Map.Map.empty) in 
+  
+  let agent,(error,map) = translate_agent parameters agent (error,(map,Ckappa_sig.Int_Set_and_Map.Set.empty)) in 
   error,agent_set,agent 
 
 

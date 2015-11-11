@@ -25,5 +25,22 @@ let print f (beg_pos,end_pos) =
 		 (beg_pos.Lexing.pos_cnum - beg_pos.Lexing.pos_bol)
 		 (end_pos.Lexing.pos_cnum - end_pos.Lexing.pos_bol)
 
+let to_string (beg_pos,end_pos) =
+  let () = assert (beg_pos.Lexing.pos_fname = end_pos.Lexing.pos_fname) in
+  let pr_f =
+    if beg_pos.Lexing.pos_fname <> "" then
+      Printf.sprintf "File \"%s\", " beg_pos.Lexing.pos_fname 
+    else "" in 
+  let pr_l =
+    if beg_pos.Lexing.pos_lnum = end_pos.Lexing.pos_lnum
+    then Printf.sprintf "line %i" beg_pos.Lexing.pos_lnum
+    else Printf.sprintf "lines %i-%i" beg_pos.Lexing.pos_lnum
+			end_pos.Lexing.pos_lnum
+  in
+  Printf.sprintf "%s%s, characters %i-%i:" pr_f pr_l
+		 (beg_pos.Lexing.pos_cnum - beg_pos.Lexing.pos_bol)
+		 (end_pos.Lexing.pos_cnum - end_pos.Lexing.pos_bol)
+
+
 let print_annot pr f (x,l) =
   Format.fprintf f "%a@ %a" print l pr x

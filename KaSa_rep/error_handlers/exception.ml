@@ -130,7 +130,7 @@ let print parameters handlers =
             let _ = List.iter (Printf.fprintf (Remanent_parameters.get_log parameters) "%s") stringlist in 
             let _ = Printf.fprintf  (Remanent_parameters.get_log parameters) "\n" in 
             ())
-        handlers.mh_caught_error_list 
+        (List.rev (handlers.mh_caught_error_list))
     in 
     let _ = 
       List.iter 
@@ -139,6 +139,6 @@ let print parameters handlers =
             let _ = List.iter (Printf.fprintf (Remanent_parameters.get_log parameters) "%s") stringlist in 
             let _ = Printf.fprintf  (Remanent_parameters.get_log parameters) "\n" in 
             ())
-        handlers.mh_uncaught_error_list 
+        (List.rev (handlers.mh_uncaught_error_list))
     in 
       ()
