@@ -106,19 +106,17 @@ module Map_creation =
       let compare = compare
     end)
 
-module Map_modif =
+module Map_creation_set =
   SetMap.Make (
     struct
-      (*agent_type, cv_id, site, state, rule_id*)
-      type t = int * int * int * int
+      type t = int * (int * int * int) list
       let compare = compare
     end)
 
 module Map_modif_creation = (*without creation rules*)
   SetMap.Make (
     struct
-      (*agent_type, cv_id, site, state, rule_id*)
-      type t = int * int * int * int
+      type t = int * int
       let compare = compare
     end)
 
@@ -183,7 +181,7 @@ type bdu_build =
     store_remanent_triple   : ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
     store_remanent_test     : (int * (int * int * int) list) list AgentMap.t;
     store_remanent_creation : (int * (int * int * int) list) list AgentMap.t;
-    (*store_remanent_modif    : (int * (int * int * int) list) list AgentMap.t;*)
+    store_remanent_modif    : (int * (int * int * int) list) list AgentMap.t;
   }
 
 (************************************************************************************)
@@ -195,8 +193,11 @@ type bdu_build_map =
   {
     store_remanent_test_map     : (int list * (int * int * int) list) Map_test.Map.t;
     store_remanent_creation_map : (int list * (int * int * int) list) Map_creation.Map.t;
-    (*store_remanent_modif_map    : pair_map Map_modif.Map.t;
-    store_remanent_modif_op_map : pair_map Map_modif_creation.Map.t;*)
+    store_remanent_creation_set_map :
+      (int list * Site_map_and_set.Set.t) Map_creation_set.Map.t;
+    store_remanent_modif_op_map : 
+      (int list * (int * int) list ) Map_modif_creation.Map.t
+      
   }
 
 (************************************************************************************)

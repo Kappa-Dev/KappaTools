@@ -146,12 +146,12 @@ let print_bdu_build parameter error result =
       error
       result.store_remanent_creation
   in
-  (*let _ =
+  let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "- Modification rule with new index (without creation rules):\n";
     print_remanent_modif
       parameter
       error
       result.store_remanent_modif
-  in*)
+  in
   error

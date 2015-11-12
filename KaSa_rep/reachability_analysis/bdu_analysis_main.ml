@@ -239,7 +239,7 @@ let scan_rule_bdu_build parameter error rule_id rule covering_classes store_resu
       store_result.store_remanent_creation
   in
   (*-------------------------------------------------------------------------------*)
-  (*let error, store_remanent_modif =
+  let error, store_remanent_modif =
     collect_modif_restriction
       parameter
       error
@@ -247,14 +247,14 @@ let scan_rule_bdu_build parameter error rule_id rule covering_classes store_resu
       rule
       store_remanent_triple
       store_result.store_remanent_modif
-  in*)
+  in
   (*-------------------------------------------------------------------------------*)
   error, 
   {
     store_remanent_triple   = store_remanent_triple;
     store_remanent_test     = store_remanent_test;
     store_remanent_creation = store_remanent_creation;
-    (*store_remanent_modif    = store_remanent_modif*)
+    store_remanent_modif    = store_remanent_modif
   }
 
 (************************************************************************************)
@@ -264,14 +264,12 @@ let scan_rule_bdu_build_map parameter error rule_id rule
     store_remanent_test
     store_remanent_triple
     store_remanent_creation
-    (*store_remanent_modif*)
+    store_remanent_modif
     store_result =
   let error, store_remanent_test_map =
     collect_remanent_test_map
       parameter
       error
-      rule_id
-      rule
       store_remanent_test
   in
   (*-------------------------------------------------------------------------------*)
@@ -279,39 +277,32 @@ let scan_rule_bdu_build_map parameter error rule_id rule
     collect_remanent_creation_map
       parameter
       error
-      rule_id
-      rule
       store_remanent_creation
-      (*store_result.store_remanent_creation_map*)
+  in
+  let error, store_remanent_creation_set_map =
+    collect_remanent_creation_set_map
+      parameter
+      error
+      store_remanent_creation
   in
   (*-------------------------------------------------------------------------------*)
-  (*let error, store_remanent_modif_map =
+  let error, store_remanent_modif_op_map =
     collect_remanent_modif_map
       parameter
       error
       rule_id
       rule
-      store_remanent_modif
-      store_result.store_remanent_modif_map
-  in
-  (*-------------------------------------------------------------------------------*)
-  let error, store_remanent_modif_op_map =
-    collect_remanent_modif_op_map
-      parameter
-      error
-      rule_id
-      rule
-      store_remanent_creation_map
       store_remanent_triple
+      store_remanent_creation_set_map
       store_result.store_remanent_modif_op_map
-  in*)
+  in
   (*-------------------------------------------------------------------------------*)
   error, 
   {
     store_remanent_test_map     = store_remanent_test_map;
     store_remanent_creation_map = store_remanent_creation_map;
-    (*store_remanent_modif_map    = store_remanent_modif_map;
-    store_remanent_modif_op_map = store_remanent_modif_op_map;*)
+    store_remanent_creation_set_map = store_remanent_creation_set_map;
+    store_remanent_modif_op_map = store_remanent_modif_op_map;
   }
 
 (************************************************************************************)
@@ -364,7 +355,7 @@ let scan_rule parameter error handler rule_id rule store_covering_classes
       store_bdu_build.store_remanent_test
       store_bdu_build.store_remanent_triple
       store_bdu_build.store_remanent_creation
-      (*store_bdu_build.store_remanent_modif*)
+      store_bdu_build.store_remanent_modif
       store_result.store_bdu_build_map
   in
   (*------------------------------------------------------------------------------*)
@@ -441,13 +432,13 @@ let init_bdu_build parameter error =
   let error, init_remanent_triple   = AgentMap.create parameter error 0 in
   let error, init_remanent_test     = AgentMap.create parameter error 0 in
   let error, init_remanent_creation = AgentMap.create parameter error 0 in
-  (*let error, init_remanent_modif    = AgentMap.create parameter error 0 in*)
+  let error, init_remanent_modif    = AgentMap.create parameter error 0 in
   let init_restriction_bdu_test =
     {
       store_remanent_triple   = init_remanent_triple;
       store_remanent_test     = init_remanent_test;
       store_remanent_creation = init_remanent_creation;
-      (*store_remanent_modif    = init_remanent_modif*)
+      store_remanent_modif    = init_remanent_modif
     }
   in
   error, init_restriction_bdu_test
@@ -455,17 +446,17 @@ let init_bdu_build parameter error =
 (************************************************************************************)
 (*init of bdu build map*)
 
-let init_bdu_build_map error =
+let init_bdu_build_map parameter error =
   let init_remanent_test_map     = Map_test.Map.empty in
   let init_remanent_creation_map = Map_creation.Map.empty in
-  (*let init_remanent_modif_map    = Map_modif.Map.empty in
-  let init_remanent_modif_op_map = Map_modif_creation.Map.empty in*)
+  let init_remanent_creation_set_map = Map_creation_set.Map.empty in
+  let init_remanent_modif_op_map     = Map_modif_creation.Map.empty in
   let init_bdu_build_map =
     {
       store_remanent_test_map     = init_remanent_test_map;
       store_remanent_creation_map = init_remanent_creation_map;
-      (*store_remanent_modif_map    = init_remanent_modif_map;
-      store_remanent_modif_op_map = init_remanent_modif_op_map;*)
+      store_remanent_creation_set_map = init_remanent_creation_set_map;
+      store_remanent_modif_op_map = init_remanent_modif_op_map;
     }
   in
   error, init_bdu_build_map
@@ -476,7 +467,7 @@ let init_bdu_build_map error =
 let scan_rule_set parameter error handler store_covering_classes compiled rules =
   let error, init_bdu_analysis_dynamic = init_bdu_analysis_dynamic parameter error in
   let error, init_bdu_build            = init_bdu_build parameter error in
-  let error, init_bdu_build_map        = init_bdu_build_map error in
+  let error, init_bdu_build_map        = init_bdu_build_map parameter error in
   let init_bdu =
     {
       store_bdu_analysis_static  = init_bdu_analysis_static;
