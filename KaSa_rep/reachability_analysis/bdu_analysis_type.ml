@@ -196,7 +196,7 @@ type bdu_build_map =
     store_remanent_creation_set_map :
       (int list * Site_map_and_set.Set.t) Map_creation_set.Map.t;
     store_remanent_modif_op_map : 
-      (int list * (int * int) list ) Map_modif_creation.Map.t
+      (int list * (int * int* int) list) Map_modif_creation.Map.t
       
   }
 

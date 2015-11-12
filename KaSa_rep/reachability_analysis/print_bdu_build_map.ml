@@ -60,10 +60,10 @@ let print_remanent_modif_op_map parameter error result =
         if l1 <> []
         then ()
         else ();
-        List.iter (fun (site, state) ->
+        List.iter (fun (id, site, state) ->
           fprintf parameter.log 
-            "agent_type:%i:rule_id:%i@site_type':%i:state:%i\n"
-            agent_type rule_id site state
+            "agent_type:%i:rule_id:%i@covering_class_id:%i:site_type':%i:state:%i\n"
+            agent_type rule_id id site state
         ) l2
       ) result
 

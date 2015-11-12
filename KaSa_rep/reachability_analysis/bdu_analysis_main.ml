@@ -290,11 +290,8 @@ let scan_rule_bdu_build_map parameter error rule_id rule
     collect_remanent_modif_map
       parameter
       error
-      rule_id
-      rule
-      store_remanent_triple
+      store_remanent_modif
       store_remanent_creation_set_map
-      store_result.store_remanent_modif_op_map
   in
   (*-------------------------------------------------------------------------------*)
   error, 

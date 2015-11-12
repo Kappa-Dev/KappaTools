@@ -741,9 +741,19 @@ agent_type:0:rule_id:2@covering_class_id:0:site_type':1:state:0
 agent_type:1:rule_id:1@covering_class_id:0:site_type':1:state:1
 agent_type:2:rule_id:2@covering_class_id:0:site_type':1:state:1
 - A map of covering classes with modification rules (without creation rules):
-agent_type:0:rule_id:5@site_type':1:state:0
-agent_type:0:rule_id:6@site_type':1:state:1
-agent_type:0:rule_id:7@site_type':2:state:1
-agent_type:1:rule_id:6@site_type':1:state:1
-agent_type:2:rule_id:7@site_type':1:state:1
+agent_type:0:rule_id:0@covering_class_id:0:site_type':2:state:0
+agent_type:0:rule_id:0@covering_class_id:0:site_type':1:state:0
+agent_type:0:rule_id:1@covering_class_id:0:site_type':1:state:1
+agent_type:0:rule_id:1@covering_class_id:0:site_type':1:state:1
+agent_type:0:rule_id:5@covering_class_id:0:site_type':1:state:0
+agent_type:0:rule_id:5@covering_class_id:0:site_type':1:state:0
+agent_type:0:rule_id:5@covering_class_id:0:site_type':1:state:0
+agent_type:0:rule_id:6@covering_class_id:0:site_type':1:state:1
+agent_type:0:rule_id:6@covering_class_id:0:site_type':1:state:1
+agent_type:0:rule_id:6@covering_class_id:0:site_type':1:state:1
+agent_type:0:rule_id:7@covering_class_id:0:site_type':2:state:1
+agent_type:0:rule_id:7@covering_class_id:0:site_type':2:state:1
+agent_type:0:rule_id:7@covering_class_id:0:site_type':2:state:1
+agent_type:1:rule_id:6@covering_class_id:0:site_type':1:state:1
+agent_type:2:rule_id:7@covering_class_id:0:site_type':1:state:1
 execution finished without any exception
