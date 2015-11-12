@@ -34,15 +34,21 @@ module type Set =
     val is_singleton: t -> bool
 
     val add: elt -> t -> t
+    val add_safe:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * t 
     val remove: elt -> t -> t
+    (*   val remove_safe: ('parameters -> 'error -> string -> string -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * t *)			      
     val split: elt -> t -> (t * bool * t)
     val union: t -> t -> t
     val inter: t -> t -> t
-    val minus: t -> t -> t
+    val minus: t -> t -> t		   
     (** [minus a b] contains elements of [a] that are not in [b] *)
     val diff: t -> t -> t
     (** [diff a b] = [minus (union a b) (inter a b)] *)
-
+  (*  val union_safe: ('parameters -> 'error -> string -> string -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t 
+    val inter_safe: ('parameters -> 'error -> string -> string -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t
+    val diff_safe:  ('parameters -> 'error -> string -> string -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t
+    val split_safe: ('parameters -> 'error -> string -> string -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * ( t * bool * t)*)
+																    
     val cardinal: t -> int
 
     val mem: elt -> t -> bool
@@ -85,8 +91,8 @@ module type Map =
     val min_elt: (elt -> 'a -> bool) -> 'a t -> elt option
     val find_option: elt -> 'a t -> 'a option
     val find_default: 'a -> elt -> 'a t -> 'a
-    val find_option_safe: ('parameters -> 'error -> string -> string -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * 'a option
-    val find_default_safe: ('parameters -> 'error -> string -> string -> exn -> 'error) -> 'parameters -> 'error -> 'a -> elt -> 'a t -> 'error * 'a
+    val find_option_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * 'a option
+    val find_default_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a -> elt -> 'a t -> 'error * 'a
     val mem:  elt -> 'a t -> bool
     val diff: 'a t -> 'a t -> 'a t * 'a t
     val union: 'a t -> 'a t -> 'a t
@@ -162,7 +168,53 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 
 	let node left value right =
 	  Node(left,value,right,(max (height left) (height right))+1)
-
+	      
+        let balance_safe warn parameters error left value right = 
+	  let height_left = height left in 
+	  let height_right = height right in 
+	  if height_left > height_right + 2 then begin
+              match left with 
+              | Empty ->
+		   let error = warn parameters error "setMap.ml" (Some "balance_set,line 94") (invalid_arg "Set_and_map.balance_set") in
+		   error,Empty
+              | Node(leftleft,leftvalue,leftright,_) -> 
+		 if height leftleft >= height leftright then 
+		   error,node leftleft leftvalue (node leftright value right)
+		 else begin
+		     match leftright with 
+                     | Empty ->
+			let error = warn parameters error "setMap.ml" (Some "balance_set,line 100") (invalid_arg "Set_and_Map.balance_set") in
+			error,Empty
+                     | Node(leftrightleft,leftrightvalue,leftrightright,_) ->
+			(error,
+			 node 
+			   (node leftleft leftvalue leftrightleft) 
+			   leftrightvalue
+			   (node leftrightright value right))
+		   end
+	    end else if height_right > height_left + 2 then begin 
+              match right with
+              | Empty ->
+		 let error = warn parameters error "setMap.ml" (Some  "balance_set,line 110") (invalid_arg "Set_and_Map.balance_set") in
+		 error,Empty 
+              | Node (rightleft,rightvalue,rightright,_) -> 
+		 if height rightright >= height rightleft then 
+		   error,node (node left value rightleft) rightvalue rightright
+		 else begin
+              match rightleft with 
+              | Empty ->
+		 let error = warn parameters error "setMap.ml"  
+				  (Some "balance_set,line 116") (invalid_arg "Set_and_Map.balance_set") in
+		 error,Empty 
+              | Node(rightleftleft,rightleftvalue,rightleftright,_) -> 
+                 error,node 
+                      (node left value rightleftleft)
+                      rightleftvalue (node rightleftright rightvalue rightright)
+		   end
+	    end
+	  else
+            error,Node (left,value,right,1+(max height_left height_right))
+	      
 	let balance left value right =
 	  let height_left = height left in
 	  let height_right = height right in
@@ -200,6 +252,44 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		      (node rightleftright rightvalue rightright)
 	    else Node (left,value,right,1+(max height_left height_right))
 
+	let balance left value right =
+	  let height_left = height left in
+	  let height_right = height right in
+	  if height_left > height_right + 2 then
+            match left with
+            | Empty ->
+	       assert false (* height_left > height_right + 2 >= 2 *)
+            | Node(leftleft,leftvalue,leftright,_) ->
+	       if height leftleft >= height leftright then
+		 node leftleft leftvalue (node leftright value right)
+	       else
+		 match leftright with
+                 | Empty ->
+		    assert false (* 0 <= height leftleft < height leftright *)
+                 | Node(leftrightleft,leftrightvalue,leftrightright,_) ->
+		    node
+		      (node leftleft leftvalue leftrightleft)
+		      leftrightvalue
+		      (node leftrightright value right)
+	  else if height_right > height_left + 2 then
+            match right with
+            | Empty ->
+	       assert false (* height_right > height_left + 2 >= 2 *)
+            | Node(rightleft,rightvalue,rightright,_) ->
+	       if height rightright >= height rightleft then
+		 node (node left value rightleft) rightvalue rightright
+	       else
+		 match rightleft with
+                 | Empty ->
+		    assert false (* 0 <= height rightright < height rightleft *)
+                 | Node(rightleftleft,rightleftvalue,rightleftright,_) ->
+		    node
+		      (node left value rightleftleft)
+		      rightleftvalue
+		      (node rightleftright rightvalue rightright)
+	  else Node (left,value,right,1+(max height_left height_right))
+
+		    
 	let rec add x = function
 	  | Empty -> Node(Empty, x, Empty, 1)
 	  | Node(l, v, r, _) as t ->
@@ -209,6 +299,19 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	       then let o = add x l in if o == l then t else balance o v r
 	       else let o = add x r in if o == r then t else balance l v o
 
+	let rec add_safe warn parameters error new_value set = 
+	  match set with 
+          | Empty -> error,singleton new_value 
+          | Node(left,value_set,right,_) -> 
+          let c = Ord.compare new_value value_set in 
+          if c = 0 then error,set 
+          else if c<0 then 
+            let error', left' = add_safe warn parameters error new_value left in  
+            balance_safe warn parameters error' left' value_set right 
+          else 
+            let error', right' = add_safe warn parameters error new_value right in  
+            balance_safe warn parameters error' left value_set right'
+								     
 	let rec join left value right =
 	  match left,right with
           | Empty,_ -> add value right
@@ -656,7 +759,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 
 	let rec find_option_safe warn parameter error key = function 
 	  | Empty ->
-	     let error = warn parameter error "setMap.ml" "line 659" Not_found in
+	     let error = warn parameter error "setMap.ml" (Some "line 659") Not_found in
 	     error,None
 	  | Node (left,key_map,data,right,_,_) ->
              let cmp = Ord.compare key key_map in
@@ -666,7 +769,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 
 	let rec find_default_safe warn parameter error d key = function
 	  | Empty ->
-	     let error = warn parameter error "setMap.ml" "line 669" Not_found in
+	     let error = warn parameter error "setMap.ml" (Some "line 669") Not_found in
 	     error,d
 	  | Node (left,key_map,data,right,_,_) ->
              let cmp = Ord.compare key key_map in
