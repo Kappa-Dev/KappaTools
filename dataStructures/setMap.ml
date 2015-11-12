@@ -85,6 +85,8 @@ module type Map =
     val min_elt: (elt -> 'a -> bool) -> 'a t -> elt option
     val find_option: elt -> 'a t -> 'a option
     val find_default: 'a -> elt -> 'a t -> 'a
+    val find_option_safe: ('parameters -> 'error -> string -> string -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * 'a option
+    val find_default_safe: ('parameters -> 'error -> string -> string -> exn -> 'error) -> 'parameters -> 'error -> 'a -> elt -> 'a t -> 'error * 'a
     val mem:  elt -> 'a t -> bool
     val diff: 'a t -> 'a t -> 'a t * 'a t
     val union: 'a t -> 'a t -> 'a t
@@ -651,6 +653,25 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              let cmp = Ord.compare key key_map in
              if cmp = 0 then data
              else find_default d key (if cmp<0 then left else right)
+
+	let rec find_option_safe warn parameter error key = function 
+	  | Empty ->
+	     let error = warn parameter error "setMap.ml" "line 659" Not_found in
+	     error,None
+	  | Node (left,key_map,data,right,_,_) ->
+             let cmp = Ord.compare key key_map in
+             if cmp = 0 then (error,Some data)
+	     else find_option_safe warn parameter error key (if cmp<0 then left else right)
+
+
+	let rec find_default_safe warn parameter error d key = function
+	  | Empty ->
+	     let error = warn parameter error "setMap.ml" "line 669" Not_found in
+	     error,d
+	  | Node (left,key_map,data,right,_,_) ->
+             let cmp = Ord.compare key key_map in
+             if cmp = 0 then error,data
+             else find_default_safe warn parameter error d key (if cmp<0 then left else right)
 
 	let rec mem key = function
           | Empty -> false

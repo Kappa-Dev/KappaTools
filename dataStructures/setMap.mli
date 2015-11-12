@@ -70,6 +70,8 @@ module type Map =
     val min_elt: (elt -> 'a -> bool) -> 'a t -> elt option
     val find_option: elt -> 'a t -> 'a option
     val find_default: 'a -> elt -> 'a t -> 'a
+    val find_option_safe: ('parameters -> 'error -> string -> string -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * 'a option
+    val find_default_safe: ('parameters -> 'error -> string -> string -> exn -> 'error) -> 'parameters -> 'error -> 'a -> elt -> 'a t -> 'error * 'a
     val mem:  elt -> 'a t -> bool
     val diff: 'a t -> 'a t -> 'a t * 'a t
     val union: 'a t -> 'a t -> 'a t
