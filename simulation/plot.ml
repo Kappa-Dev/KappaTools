@@ -94,15 +94,15 @@ let next_point counter =
 
 let set_last_point plot p = plot.last_point <- p
 
-let plot_now env observables_values =
+let plot_now env time observables_values =
   match !plotDescr with
-  | Wait f -> set_up f env observables_values
+  | Wait f -> set_up f env (time,observables_values)
   | Ready plot ->
      match plot.format with
      | Raw fd ->
-	print_values_raw fd.form observables_values
+	print_values_raw fd.form (time,observables_values)
      | Svg s ->
-	s.Pp_svg.points <- observables_values :: s.Pp_svg.points
+	s.Pp_svg.points <- (time,observables_values) :: s.Pp_svg.points
 
 let fill form counter env observables_values =
   let () =
@@ -119,7 +119,7 @@ let fill form counter env observables_values =
 	    invalid_arg ("Plot.fill: invalid increment "^string_of_int n)
 	  else
 	    if n <> 0
-	    then plot_now env observables_values
+	    then plot_now env counter.Mods.Counter.time observables_values
        | None ->
 	  match counter.Counter.dT with
 	  | None -> ()
@@ -129,7 +129,7 @@ let fill form counter env observables_values =
 	     while (!n > 0) && (Counter.check_output_time counter !output_time) do
 	       output_time := !output_time +. dT ;
 	       Counter.tick form counter !output_time counter.Counter.events ;
-	       plot_now env observables_values;
+	       plot_now env !output_time observables_values;
 	       n:=!n-1 ;
 	     done in
   Counter.tick form counter counter.Counter.time counter.Counter.events

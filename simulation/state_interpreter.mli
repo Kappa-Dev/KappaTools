@@ -8,7 +8,7 @@ val initial : Environment.t -> Mods.Counter.t -> Rule_interpreter.t ->
 
 val observables_values :
   Environment.t -> Mods.Counter.t -> Rule_interpreter.t ->
-  t -> float * Nbr.t array
+  t -> Nbr.t array
 (** Returns (the current biological time, an array of the current
 values of observables) *)
 

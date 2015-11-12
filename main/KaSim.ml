@@ -180,7 +180,7 @@ let () =
     let () =
       if !Parameter.pointNumberValue > 0 then
 	Plot.plot_now
-	  env
+	  env counter.Mods.Counter.time
 	  (State_interpreter.observables_values env counter graph new_state) in
 
     Parameter.initSimTime () ;

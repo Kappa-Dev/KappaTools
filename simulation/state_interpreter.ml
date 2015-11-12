@@ -45,10 +45,9 @@ let get_alg env state i =
 
 let observables_values env counter graph state =
   let get_alg i = get_alg env state i in
-  (counter.Mods.Counter.time,
    Environment.map_observables
      (Rule_interpreter.value_alg counter graph ~get_alg)
-     env)
+     env
 
 let snapshot env counter file graph =
   if !Parameter.dotSnapshots then
@@ -119,7 +118,8 @@ let do_it env domain counter graph state = function
 	 pe_expr in
      (false, graph, state)
   | Primitives.PLOTENTRY ->
-     let () = Plot.plot_now env (observables_values env counter graph state) in
+     let () = Plot.plot_now env counter.Mods.Counter.time
+			    (observables_values env counter graph state) in
      (false, graph, state)
   | Primitives.SNAPSHOT pexpr  ->
      let get_alg i = get_alg env state i in
