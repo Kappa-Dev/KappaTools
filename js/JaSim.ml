@@ -28,12 +28,13 @@ let run stop out_div s =
      >>= fun () ->
      let result = !Ast.result in
      wrap3 Eval.initialize log_form [] result
-     >>= fun (kasa_state,env,domain,counter,graph,state) ->
+     >>= fun (_kasa_state,env,domain,counter,graph,state) ->
      let () = Plot.create "foo.svg" in
      let () =
        if !Parameter.pointNumberValue > 0 then
 	 Plot.plot_now
-	   env (State_interpreter.observables_values env counter graph state) in
+	   env counter.Mods.Counter.time
+	   (State_interpreter.observables_values env counter graph state) in
      let () = Feedback.show_warnings out_div in
      State_interpreter.loop_cps
        log_form
