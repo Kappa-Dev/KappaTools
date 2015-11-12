@@ -36,7 +36,7 @@ module type Set =
     val add: elt -> t -> t
     val add_safe:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * t 
     val remove: elt -> t -> t
-    (*   val remove_safe: ('parameters -> 'error -> string -> string -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * t *)			      
+    val remove_safe: ('parameters -> 'error -> string -> string option  -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * t 			      
     val split: elt -> t -> (t * bool * t)
     val union: t -> t -> t
     val inter: t -> t -> t
@@ -44,10 +44,10 @@ module type Set =
     (** [minus a b] contains elements of [a] that are not in [b] *)
     val diff: t -> t -> t
     (** [diff a b] = [minus (union a b) (inter a b)] *)
-  (*  val union_safe: ('parameters -> 'error -> string -> string -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t 
-    val inter_safe: ('parameters -> 'error -> string -> string -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t
-    val diff_safe:  ('parameters -> 'error -> string -> string -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t
-    val split_safe: ('parameters -> 'error -> string -> string -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * ( t * bool * t)*)
+  (*  val union_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t 
+    val inter_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t
+    val diff_safe:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t
+    val split_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * ( t * bool * t)*)
 																    
     val cardinal: t -> int
 
@@ -250,43 +250,6 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		      (node left value rightleftleft)
 		      rightleftvalue
 		      (node rightleftright rightvalue rightright)
-	    else Node (left,value,right,1+(max height_left height_right))
-
-	let balance left value right =
-	  let height_left = height left in
-	  let height_right = height right in
-	  if height_left > height_right + 2 then
-            match left with
-            | Empty ->
-	       assert false (* height_left > height_right + 2 >= 2 *)
-            | Node(leftleft,leftvalue,leftright,_) ->
-	       if height leftleft >= height leftright then
-		 node leftleft leftvalue (node leftright value right)
-	       else
-		 match leftright with
-                 | Empty ->
-		    assert false (* 0 <= height leftleft < height leftright *)
-                 | Node(leftrightleft,leftrightvalue,leftrightright,_) ->
-		    node
-		      (node leftleft leftvalue leftrightleft)
-		      leftrightvalue
-		      (node leftrightright value right)
-	  else if height_right > height_left + 2 then
-            match right with
-            | Empty ->
-	       assert false (* height_right > height_left + 2 >= 2 *)
-            | Node(rightleft,rightvalue,rightright,_) ->
-	       if height rightright >= height rightleft then
-		 node (node left value rightleft) rightvalue rightright
-	       else
-		 match rightleft with
-                 | Empty ->
-		    assert false (* 0 <= height rightright < height rightleft *)
-                 | Node(rightleftleft,rightleftvalue,rightleftright,_) ->
-		    node
-		      (node left value rightleftleft)
-		      rightleftvalue
-		      (node rightleftright rightvalue rightright)
 	  else Node (left,value,right,1+(max height_left height_right))
 
 		    
@@ -334,6 +297,25 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	       safe_extract_min_elt leftleft leftvalue leftright in
 	     min,balance left' value right
 
+	let rec min_elt_safe warn parameters error set  =
+	  match set with
+	  | Empty ->
+	     let error = warn parameters error "setMap.ml" (Some "min_elt_safe, line 303") Not_found in
+	     error,None
+	  | Node(Empty,v,_,_) -> error,Some v
+	  | Node(left,_,_,_) -> min_elt_safe warn parameters error left 
+
+	let rec remove_min_elt_safe warn parameters error set =
+	  match set with 
+          | Empty ->
+	     let error = warn parameters error "setMap.ml" (Some "remove_min_elt_safe, line 311") Not_found in
+	     error,empty
+          | Node(Empty,_,right,_) -> error,right
+          | Node(left,value,right,_) -> 
+             let error, left' = remove_min_elt_safe warn parameters error left in 
+             balance_safe warn parameters error left' value right
+		      
+					     
 	let merge set1 set2 =
 	  match set1,set2 with
           | Empty,_ -> set2
@@ -342,6 +324,23 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              let min2,set2' = safe_extract_min_elt left2 value2 right2 in
              balance set1 min2 set2'
 
+	let merge_safe warn parameters error set1 set2 = 
+	  match set1,set2 with 
+          | Empty,_ -> error,set2
+	  | _,Empty -> error,set1 
+	  | _ -> 
+             let error,left2 = remove_min_elt_safe warn parameters error set2 in
+	     let error,elt_opt = min_elt_safe warn parameters error set2 in
+	     begin
+	       match
+		 elt_opt 
+	       with
+	       | None ->
+		  let error = warn parameters error "setMap.ml" (Some "merge_sage,line 339") Not_found in
+		  error,set1  
+	       | Some elt -> 
+		   balance_safe warn parameters error set1 elt left2 
+	     end
 	let concat set1 set2 =
 	  match set1,set2 with
 	  |   Empty,_ -> set2
@@ -362,6 +361,19 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	       let right' = remove value right in
 	       if right == right' then set else balance left value_set right'
 
+	let rec remove_safe warn parameters error value set = 
+	  match set with 
+	  | Empty -> error,empty		     
+          | Node(left,value_set,right,_) ->
+             let c = Ord.compare value value_set in 
+             if c = 0 then merge_safe warn parameters error left right 
+	     else if c < 0 then 
+            let error, left' = remove_safe warn parameters error value left in 
+            balance_safe warn parameters error left' value_set right
+          else 
+            let error, right' = remove_safe warn parameters error value right in  
+            balance_safe warn parameters error left value_set right'
+							
 	let rec split split_value set =
 	  match set with
           | Empty -> (Empty,false,Empty)

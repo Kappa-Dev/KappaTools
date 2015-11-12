@@ -22,7 +22,7 @@ module type Set =
     val add_safe:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * t 
 																				   
     val remove: elt -> t -> t
-    (*   val remove_safe: ('parameters -> 'error -> string -> string -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * t *)			      
+    val remove_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * t 			      
    
     val split: elt -> t -> (t * bool * t)
     val union: t -> t -> t
@@ -31,10 +31,10 @@ module type Set =
     (** [minus a b] contains elements of [a] that are not in [b] *)
     val diff: t -> t -> t
     (** [diff a b] = [minus (union a b) (inter a b)] *)
-    (*  val union_safe: ('parameters -> 'error -> string -> string -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t 
-    val inter_safe: ('parameters -> 'error -> string -> string -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t
-    val diff_safe:  ('parameters -> 'error -> string -> string -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t
-    val split_safe: ('parameters -> 'error -> string -> string -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * ( t * bool * t)*)
+    (*  val union_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t 
+    val inter_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t
+    val diff_safe:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t
+    val split_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * ( t * bool * t)*)
 
   
     val cardinal: t -> int
