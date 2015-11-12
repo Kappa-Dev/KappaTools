@@ -51,36 +51,31 @@ let collect_remanent_test_map parameter error rule_id rule store_remanent_test =
 (*collect remanent creation as a map function*)
 
 let collect_remanent_creation_map parameter error rule_id rule store_remanent_creation
-    store_result =
-  let add_link (agent_type, rule_id, pair_list) rule_id store_result =
+    =
+  let add_link (agent_type, rule_id) triple_list store_result =
     let (l, old) =
-      Map_creation.Map.find_default ([], Site_map_and_set.Set.empty)
-        (agent_type, rule_id, pair_list) store_result
+      Map_creation.Map.find_default ([], []) (agent_type, rule_id) store_result
     in
-    let current_set =
-      Site_map_and_set.Set.add rule_id old
-    in
-    let new_set = Site_map_and_set.Set.union current_set old in
     let result_map =
-      Map_creation.Map.add (agent_type, rule_id, pair_list)
-        (l, new_set) store_result
+      Map_creation.Map.add (agent_type, rule_id)
+        (l, List.concat [triple_list; old]) store_result
     in
     error, result_map
   in
   (*-----------------------------------------------------------------*)
   AgentMap.fold parameter error
-    (fun parameter error agent_type fourth_list store_result ->
+    (fun parameter error agent_type l store_result ->
       let error, map =
         List.fold_left
-          (fun (error, store_result) (rule_id, pair_list) ->
+          (fun (error, store_result) (rule_id, triple_list) ->
             let error, result =
-              add_link (agent_type, rule_id, pair_list) rule_id store_result
+              add_link (agent_type, rule_id) triple_list store_result
             in
             error, result
-          ) (error, store_result) fourth_list
+          ) (error, store_result) l
       in
       error, map          
-    ) store_remanent_creation store_result
+    ) store_remanent_creation Map_creation.Map.empty
 
 (*************************************************************************************)
 (*collect remanent modification as a map function (this function content creation rules)*)

@@ -53,16 +53,20 @@ let print_list l =
     match acc with
     | [] -> []
     | (id, site, state) :: tl ->
-      fprintf stdout "covering_class_id:%i:site_type':%i:state:%i\n" id site state;
+      fprintf stdout "covering_class_id:%i:site_type':%i:state:%i\n" 
+        id site state;
       aux tl
   in aux l
 
-let print_pair_list parameter p =
+let print_pair_list p =
   let rec aux acc =
     match acc with
     | [] -> []
     | (rule_id, l) :: tl ->
-      fprintf stdout "rule_id:%i:\n" rule_id; print_list l;
+      let _ = 
+        fprintf stdout "rule_id:%i:\n" rule_id
+      in
+      let _ = print_list l in
       aux tl
   in
   aux p
@@ -71,7 +75,7 @@ let print_remanent_test parameter error result =
   AgentMap.print error
     (fun error parameter pair_list ->
       let _ =
-        print_pair_list parameter pair_list
+        print_pair_list pair_list
       in
       error
     ) parameter result
@@ -128,7 +132,7 @@ let print_bdu_build parameter error result =
   in
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
-      "- Covering classes fourth (rule_id, cv_id, site', state) of test rule:\n";
+      "- Test rule with new index:\n";
     print_remanent_test
       parameter
       error
@@ -136,18 +140,18 @@ let print_bdu_build parameter error result =
   in
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
-      "- Covering classes fourth (rule_id, cv_id, site', state) of creation rule:\n";
+      "- Creation rule with new index:\n";
     print_remanent_creation
       parameter
       error
       result.store_remanent_creation
   in
-  let _ =
+  (*let _ =
     fprintf (Remanent_parameters.get_log parameter)
-      "- Covering classes fourth (rule_id, cv_id, site', state) of modification rule:\n";
+      "- Modification rule with new index (without creation rules):\n";
     print_remanent_modif
       parameter
       error
       result.store_remanent_modif
-  in
+  in*)
   error

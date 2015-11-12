@@ -239,7 +239,7 @@ let scan_rule_bdu_build parameter error rule_id rule covering_classes store_resu
       store_result.store_remanent_creation
   in
   (*-------------------------------------------------------------------------------*)
-  let error, store_remanent_modif =
+  (*let error, store_remanent_modif =
     collect_modif_restriction
       parameter
       error
@@ -247,14 +247,14 @@ let scan_rule_bdu_build parameter error rule_id rule covering_classes store_resu
       rule
       store_remanent_triple
       store_result.store_remanent_modif
-  in
+  in*)
   (*-------------------------------------------------------------------------------*)
   error, 
   {
     store_remanent_triple   = store_remanent_triple;
     store_remanent_test     = store_remanent_test;
     store_remanent_creation = store_remanent_creation;
-    store_remanent_modif    = store_remanent_modif
+    (*store_remanent_modif    = store_remanent_modif*)
   }
 
 (************************************************************************************)
@@ -264,7 +264,7 @@ let scan_rule_bdu_build_map parameter error rule_id rule
     store_remanent_test
     store_remanent_triple
     store_remanent_creation
-    store_remanent_modif
+    (*store_remanent_modif*)
     store_result =
   let error, store_remanent_test_map =
     collect_remanent_test_map
@@ -282,7 +282,7 @@ let scan_rule_bdu_build_map parameter error rule_id rule
       rule_id
       rule
       store_remanent_creation
-      store_result.store_remanent_creation_map
+      (*store_result.store_remanent_creation_map*)
   in
   (*-------------------------------------------------------------------------------*)
   (*let error, store_remanent_modif_map =
@@ -364,7 +364,7 @@ let scan_rule parameter error handler rule_id rule store_covering_classes
       store_bdu_build.store_remanent_test
       store_bdu_build.store_remanent_triple
       store_bdu_build.store_remanent_creation
-      store_bdu_build.store_remanent_modif
+      (*store_bdu_build.store_remanent_modif*)
       store_result.store_bdu_build_map
   in
   (*------------------------------------------------------------------------------*)
@@ -441,13 +441,13 @@ let init_bdu_build parameter error =
   let error, init_remanent_triple   = AgentMap.create parameter error 0 in
   let error, init_remanent_test     = AgentMap.create parameter error 0 in
   let error, init_remanent_creation = AgentMap.create parameter error 0 in
-  let error, init_remanent_modif    = AgentMap.create parameter error 0 in
+  (*let error, init_remanent_modif    = AgentMap.create parameter error 0 in*)
   let init_restriction_bdu_test =
     {
       store_remanent_triple   = init_remanent_triple;
       store_remanent_test     = init_remanent_test;
       store_remanent_creation = init_remanent_creation;
-      store_remanent_modif    = init_remanent_modif
+      (*store_remanent_modif    = init_remanent_modif*)
     }
   in
   error, init_restriction_bdu_test

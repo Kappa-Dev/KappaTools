@@ -41,16 +41,14 @@ let print_remanent_test_map parameter error result =
 
 let print_remanent_creation_map parameter error result =
   Map_creation.Map.iter
-    (fun (agent_type, rule_id, pair_list) (l1, l2) ->
+    (fun (agent_type, rule_id) (l1, l2) ->
       if l1 <> []
       then ()
       else ();
-      Site_map_and_set.Set.iter (fun rule_id' ->
-        List.iter (fun (id, site, state) ->
-          fprintf parameter.log 
-            "agent_type:%i:rule_id:%i@covering_class_id:%i:site_type':%i:state:%i\n"
-            agent_type rule_id id site state
-        ) pair_list
+      List.iter (fun (id, site, state) ->
+        fprintf parameter.log 
+          "agent_type:%i:rule_id:%i@covering_class_id:%i:site_type':%i:state:%i\n"
+          agent_type rule_id id site state
       ) l2
     ) result
 

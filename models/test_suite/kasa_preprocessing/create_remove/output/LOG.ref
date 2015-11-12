@@ -145,13 +145,8 @@ agent_type_2:
 * Taking information of covering class:
 ------------------------------------------------------------
 - Covering classes triple (id, list, set):
-- Covering classes fourth (rule_id, cv_id, site', state) of test rule:
-agent_type_0:
-agent_type_1:
-- Covering classes fourth (rule_id, cv_id, site', state) of creation rule:
-agent_type_1:
-agent_type_2:
-- Covering classes fourth (rule_id, cv_id, site', state) of modification rule:
+- Test rule with new index:
+- Creation rule with new index:
 
 ------------------------------------------------------------
 * Covering classes with new index :
