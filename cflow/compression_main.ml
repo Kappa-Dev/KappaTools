@@ -21,9 +21,9 @@
 module U = Utilities 
 module D = U.D
 
-type secret_log_info = U.Profiling.log_info
+type secret_log_info = U.D.S.PH.B.PB.CI.Po.K.P.log_info
 type secret_step = D.S.PH.B.PB.CI.Po.K.refined_step
-let init_secret_log_info = U.Profiling.init_log_info
+let init_secret_log_info = U.D.S.PH.B.PB.CI.Po.K.P.init_log_info
 let secret_store_event = D.S.PH.B.PB.CI.Po.K.store_event
 let secret_store_obs = D.S.PH.B.PB.CI.Po.K.store_obs
 
@@ -128,8 +128,8 @@ let compress_and_print logger env log_info step_list =
                 Debug.tag logger "\t - blackboard generation"
             in 
             let error,log_info,blackboard = U.convert_trace_into_musical_notation parameter handler error log_info refined_event_list_without_pseudo_inverse in 
-            let log_info = U.Profiling.set_global_cut int log_info in 
-            let log_info = U.Profiling.set_pseudo_inv int_pseudo_inverse log_info in 
+            let log_info = U.D.S.PH.B.PB.CI.Po.K.P.set_global_cut int log_info in 
+            let log_info = U.D.S.PH.B.PB.CI.Po.K.P.set_pseudo_inv int_pseudo_inverse log_info in 
             let () = 
               if debug_mode && log_step  
               then 
@@ -158,7 +158,7 @@ let compress_and_print logger env log_info step_list =
                 then 
                   Debug.tag logger "\t\t * causal compression "
               in 
-              let log_info = U.Profiling.set_start_compression log_info in 
+              let log_info = U.D.S.PH.B.PB.CI.Po.K.P.set_start_compression log_info in 
 
 	      (* We use the grid to get the causal precedence (pred* ) of each observable *)
 	      let grid = U.convert_trace_into_grid_while_trusting_side_effects refined_event_list_without_pseudo_inverse handler in

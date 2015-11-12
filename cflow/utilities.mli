@@ -90,11 +90,6 @@ val get_list_order: observable_hit -> D.S.PH.update_order list
 
 val causal_prefix_of_an_observable_hit: string -> parameter -> kappa_handler -> error_log -> profiling_info -> musical_grid -> enriched_cflow_grid -> observable_hit -> error_log * refined_trace (* (*D.S.PH.B.result*) refined_trace *)
 
-
-(** Profiling *)
-																		      
-module Profiling = D.S.PH.B.PB.CI.Po.K.P												    
-
 (** Print utilities *)													    
 val print_trace: parameter -> kappa_handler -> refined_trace -> unit  
 		
