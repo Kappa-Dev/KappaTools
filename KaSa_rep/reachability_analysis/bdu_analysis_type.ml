@@ -201,6 +201,11 @@ type bdu_build =
 (************************************************************************************)
 (*build covering classes in map and bdu with new indexes for site_type*)
 
+type pair_bdu =
+  (Boolean_mvbdu.memo_tables, Boolean_mvbdu.mvbdu_dic,
+   Boolean_mvbdu.list_dic, bool, int) Memo_sig.handler * bool Mvbdu_sig.mvbdu
+
+
 type bdu_build_map =
   {
     store_remanent_test_map     : (int list * (int * int * int) list) Map_test.Map.t;
@@ -208,6 +213,9 @@ type bdu_build_map =
     store_remanent_modif_opt_map: (int list * (int * int* int) list)Map_modif_creation.Map.t;
     store_test_bdu              : (int * bool Mvbdu_sig.mvbdu) list AgentMap.t;
     store_creation_bdu          : (int * bool Mvbdu_sig.mvbdu) list AgentMap.t;
+    (*TEST*)
+    store_test_bdu_map          : (int list * pair_bdu list) Map_test_bdu.Map.t;
+    store_creation_bdu_map      : (int list * pair_bdu list) Map_creation_bdu.Map.t;
     store_modif_list_map        : (int list * int list) Map_modif_list.Map.t
   }
 
@@ -216,8 +224,11 @@ type bdu_build_map =
 
 type bdu_fixpoint =
   {
-    store_bdu_creation_array : bool Mvbdu_sig.mvbdu array AgentMap.t;
-    store_bdu_test_array     : bool Mvbdu_sig.mvbdu array AgentMap.t;
+    store_bdu_creation_array      : bool Mvbdu_sig.mvbdu array AgentMap.t;
+    store_bdu_test_array          : bool Mvbdu_sig.mvbdu array AgentMap.t;
+    (*TEST*)
+    store_bdu_creation_array_map  : bool Mvbdu_sig.mvbdu array;
+    store_bdu_test_array_map      : bool Mvbdu_sig.mvbdu array;
     store_bdu_creation_test_array : bool Mvbdu_sig.mvbdu array AgentMap.t
   }
 

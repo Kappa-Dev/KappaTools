@@ -301,6 +301,13 @@ let scan_rule_bdu_build_map parameter error rule_id rule
   in
   (*-------------------------------------------------------------------------------*)
   (*bdu*)
+  let error, store_test_bdu_map =
+    collect_test_bdu_map
+      parameter
+      error
+      store_remanent_test_map
+  in
+  (*TEST*)
   let error, store_test_bdu =
     collect_test_bdu
       parameter
@@ -310,6 +317,13 @@ let scan_rule_bdu_build_map parameter error rule_id rule
   (*-------------------------------------------------------------------------------*)
   let error, store_creation_bdu =
     collect_creation_bdu
+      parameter
+      error
+      store_remanent_creation_map
+  in
+  (*-------------------------------------------------------------------------------*)
+  let error, store_creation_bdu_map =
+    collect_creation_bdu_map
       parameter
       error
       store_remanent_creation_map
@@ -327,15 +341,21 @@ let scan_rule_bdu_build_map parameter error rule_id rule
     store_remanent_test_map      = store_remanent_test_map;
     store_remanent_creation_map  = store_remanent_creation_map;
     store_remanent_modif_opt_map = store_remanent_modif_opt_map;
+    (*TEST*)
+    store_test_bdu_map           = store_test_bdu_map;
     store_test_bdu               = store_test_bdu;
     store_creation_bdu           = store_creation_bdu;
+    store_creation_bdu_map       = store_creation_bdu_map;
     store_modif_list_map         = store_modif_list_map
   }
 
 (************************************************************************************)
 (*scan rule fixpoint*)
 
-let scan_rule_fixpoint parameter error handler store_creation_bdu
+let scan_rule_fixpoint parameter error handler
+    store_creation_bdu
+    store_creation_bdu_map
+    store_test_bdu_map
     store_test_bdu
     store_result =
   let error, store_bdu_creation_array =
@@ -356,7 +376,7 @@ let scan_rule_fixpoint parameter error handler store_creation_bdu
       store_result.store_bdu_test_array
   in
   (*-------------------------------------------------------------------------------*)
-  let error, store_bdu_creation_test_array =
+  let error, store_bdu_creation_test_array = (*TEST*)
     collect_bdu_creation_test_array
       parameter
       error
@@ -366,11 +386,31 @@ let scan_rule_fixpoint parameter error handler store_creation_bdu
       store_result.store_bdu_creation_test_array
   in
   (*-------------------------------------------------------------------------------*)
+  let error, store_bdu_creation_array_map = (*TEST*)
+    collect_bdu_creation_array_map
+      parameter
+      error
+      handler
+      store_creation_bdu_map
+      store_result.store_bdu_creation_array_map
+  in
+  let error, store_bdu_test_array_map = (*TEST*)
+    collect_bdu_test_array_map
+      parameter
+      error
+      handler
+      store_test_bdu_map
+      store_result.store_bdu_test_array_map
+ in
+  (*-------------------------------------------------------------------------------*)
   error, 
   {
-    store_bdu_creation_array = store_bdu_creation_array;
-    store_bdu_test_array     = store_bdu_test_array;
-    store_bdu_creation_test_array     = store_bdu_creation_test_array
+    store_bdu_creation_array      = store_bdu_creation_array;
+    store_bdu_test_array          = store_bdu_test_array;
+    (*TEST*)
+    store_bdu_creation_array_map  = store_bdu_creation_array_map;
+    store_bdu_test_array_map      = store_bdu_test_array_map;
+    store_bdu_creation_test_array = store_bdu_creation_test_array
   }
   
 (************************************************************************************)
@@ -433,6 +473,8 @@ let scan_rule parameter error handler rule_id rule store_covering_classes
       error
       handler
       store_bdu_build_map.store_creation_bdu
+      store_bdu_build_map.store_creation_bdu_map
+      store_bdu_build_map.store_test_bdu_map
       store_bdu_build_map.store_test_bdu
       store_result.store_bdu_fixpoint
   in
@@ -531,6 +573,9 @@ let init_bdu_build_map parameter error =
   let init_remanent_test_map      = Map_test.Map.empty in
   let init_remanent_creation_map  = Map_creation.Map.empty in
   let init_remanent_modif_opt_map = Map_modif_creation.Map.empty in
+  (*TEST*)
+  let init_test_bdu_map           = Map_test_bdu.Map.empty in
+  let init_creation_bdu_map       = Map_creation_bdu.Map.empty in
   let error, init_test_bdu        = AgentMap.create parameter error 0 in
   let error, init_creation_bdu    = AgentMap.create parameter error 0 in
   let init_modif_list_map         = Map_modif_list.Map.empty in
@@ -539,6 +584,9 @@ let init_bdu_build_map parameter error =
       store_remanent_test_map      = init_remanent_test_map;
       store_remanent_creation_map  = init_remanent_creation_map;
       store_remanent_modif_opt_map = init_remanent_modif_opt_map;
+      (*TEST*)
+      store_test_bdu_map           = init_test_bdu_map;
+      store_creation_bdu_map       = init_creation_bdu_map;
       store_test_bdu               = init_test_bdu;
       store_creation_bdu           = init_creation_bdu;
       store_modif_list_map         = init_modif_list_map
@@ -553,10 +601,14 @@ let init_bdu_fixpoint parameter error =
   let error, init_bdu_creation_array = AgentMap.create parameter error 0 in
   let error, init_bdu_test_array     = AgentMap.create parameter error 0 in
   let error, init_bdu_creation_test_array = AgentMap.create parameter error 0 in
+  let init_bdu_creation_array_map = [||] in
+  let init_bdu_test_array_map = [||] in
   let init_bdu_fixpoint =
     {
       store_bdu_creation_array = init_bdu_creation_array;
       store_bdu_test_array     = init_bdu_test_array;
+      store_bdu_creation_array_map = init_bdu_creation_array_map;
+      store_bdu_test_array_map     = init_bdu_test_array_map;
       store_bdu_creation_test_array = init_bdu_creation_test_array
     }
   in

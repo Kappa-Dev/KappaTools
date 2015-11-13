@@ -122,6 +122,25 @@ let collect_bdu_creation_array parameter error handler_sig
   in
   error, store_result
 
+(*build creation rule from a map of bdu_creation*)
+
+let collect_bdu_creation_array_map parameter error handler_sig store_creation_bdu_map
+    store_result =
+  let error, (handler, bdu_init) = bdu_init parameter error in
+  (*create an empty array*)
+  let nrules = Handler.nrules parameter error handler_sig in
+  let store_array = Array.make nrules bdu_init in
+  (*get rule_id in creation_map*)
+  let error, store_result =
+    Map_creation_bdu.Map.fold (fun (agent_type, rule_id)(l1, l2) (error, _) ->
+      List.fold_left (fun (error, current_array) (handler, bdu_creation) ->
+        current_array.(rule_id) <- bdu_creation;
+        error, current_array
+      ) (error, store_array) l2
+    ) store_creation_bdu_map (error, [||])
+  in
+  error, store_result
+
 (************************************************************************************)
 (*store bdu_test in an array, index of this array is rule_id of test
   rules. The lenght of this array is the number of rules.*)
@@ -138,9 +157,9 @@ let collect_bdu_test_array parameter error handler_sig store_test_bdu store_resu
      (fun parameter error agent_type l store_result ->
          let error, result_array =
            List.fold_left (fun (error, current_array) (rule_id, bdu_test) ->
-             store_array.(rule_id) <- bdu_test;
-             error, store_array
-           ) (error, [||]) l
+             current_array.(rule_id) <- bdu_test;
+             error, current_array
+           ) (error, store_array) l
          in
         (*store*)
          let error, store_result =
@@ -155,7 +174,26 @@ let collect_bdu_test_array parameter error handler_sig store_test_bdu store_resu
      ) store_test_bdu store_result
   in
   error, store_result
-  
+
+(*build test rule from a map of bdu_test*)
+
+let collect_bdu_test_array_map parameter error handler_sig store_test_bdu_map
+    store_result =
+  let error, (handler, bdu_init) = bdu_init parameter error in
+  (*create an empty array*)
+  let nrules = Handler.nrules parameter error handler_sig in
+  let store_array = Array.make nrules bdu_init in
+  (*get rule_id in creation_map*)
+  let error, store_result =
+    Map_test_bdu.Map.fold (fun (agent_type, rule_id)(l1, l2) (error, _) ->
+      List.fold_left (fun (error, current_array) (handler, bdu_test) ->
+        current_array.(rule_id) <- bdu_test;
+        error, current_array
+      ) (error, store_array) l2
+    ) store_test_bdu_map (error, [||])
+  in
+  error, store_result
+
 (************************************************************************************)
 (*combine creation and test*)
 

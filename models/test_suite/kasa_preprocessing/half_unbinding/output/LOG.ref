@@ -230,6 +230,32 @@ agent_type:2:rule_id:1@covering_class_id:0:site_type':1:state:0
 - A map of covering classes with creation rules:
 agent_type:0:rule_id:1@covering_class_id:0:site_type':1:state:0
 - A map of covering classes with modification rules (without creation rules):
+- Map of Bdu test rules:
+agent_type:0:rule_id:0
+agent_type_ if(mvbdu_id:3) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 1 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+agent_type:2:rule_id:1
+agent_type_ if(mvbdu_id:3) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 1 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+- Map of Bdu creation rules:
+agent_type:0:rule_id:1
+agent_type_ if(mvbdu_id:3) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 1 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
 - Bdu test rules:
 agent_type_0:
 rule_id:0
@@ -276,6 +302,34 @@ agent_type_0:  if(mvbdu_id:2) x1 < 1 then
 agent_type_0:   true
 agent_type_0:  else 
 agent_type_0:   false
+- TEST with MAP An array of bdu_creation:
+index of this array:0
+agent_type_ false
+index of this array:1
+agent_type_ if(mvbdu_id:3) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 1 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+- TEST with MAP An array of bdu_test:
+index of this array:0
+agent_type_ if(mvbdu_id:3) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 1 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+index of this array:1
+agent_type_ if(mvbdu_id:3) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 1 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
 ------------------------------------------------------------
 - An array of bdu_test:
 agent_type_0:

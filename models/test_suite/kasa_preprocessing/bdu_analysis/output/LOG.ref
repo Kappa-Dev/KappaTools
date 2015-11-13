@@ -671,6 +671,116 @@ agent_type:0:rule_id:6@covering_class_id:0:site_type':1:state:1
 agent_type:0:rule_id:7@covering_class_id:0:site_type':2:state:1
 agent_type:1:rule_id:6@covering_class_id:0:site_type':1:state:1
 agent_type:2:rule_id:7@covering_class_id:0:site_type':1:state:1
+- Map of Bdu test rules:
+agent_type:0:rule_id:3
+agent_type_ true
+agent_type:0:rule_id:4
+agent_type_ if(mvbdu_id:3) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 1 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+agent_type:0:rule_id:5
+agent_type_ if(mvbdu_id:3) x1 < 1 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 2 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+agent_type:0:rule_id:6
+agent_type_ if(mvbdu_id:3) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 1 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+agent_type:0:rule_id:7
+agent_type_ if(mvbdu_id:7) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:6) x1 < 1 then 
+agent_type_   if(mvbdu_id:5) x2 < 0 then 
+agent_type_    false
+agent_type_   else 
+agent_type_    if(mvbdu_id:4) x2 < 1 then 
+agent_type_     true
+agent_type_    else 
+agent_type_     false
+agent_type_  else 
+agent_type_   false
+agent_type:1:rule_id:6
+agent_type_ if(mvbdu_id:3) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 1 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+agent_type:2:rule_id:7
+agent_type_ if(mvbdu_id:3) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 1 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+- Map of Bdu creation rules:
+agent_type:0:rule_id:0
+agent_type_ if(mvbdu_id:7) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:6) x1 < 1 then 
+agent_type_   if(mvbdu_id:5) x2 < 0 then 
+agent_type_    false
+agent_type_   else 
+agent_type_    if(mvbdu_id:4) x2 < 1 then 
+agent_type_     true
+agent_type_    else 
+agent_type_     false
+agent_type_  else 
+agent_type_   false
+agent_type:0:rule_id:1
+agent_type_ if(mvbdu_id:3) x1 < 1 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 2 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+agent_type:0:rule_id:2
+agent_type_ if(mvbdu_id:7) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:6) x1 < 1 then 
+agent_type_   if(mvbdu_id:5) x2 < 1 then 
+agent_type_    false
+agent_type_   else 
+agent_type_    if(mvbdu_id:4) x2 < 2 then 
+agent_type_     true
+agent_type_    else 
+agent_type_     false
+agent_type_  else 
+agent_type_   false
+agent_type:1:rule_id:1
+agent_type_ if(mvbdu_id:3) x1 < 1 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 2 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+agent_type:2:rule_id:2
+agent_type_ if(mvbdu_id:3) x1 < 1 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 2 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
 - Bdu test rules:
 agent_type_0:
 rule_id:6
@@ -921,6 +1031,88 @@ index of this array:6
 agent_type_2: false
 index of this array:7
 agent_type_2: false
+- TEST with MAP An array of bdu_creation:
+index of this array:0
+agent_type_ if(mvbdu_id:7) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:6) x1 < 1 then 
+agent_type_   if(mvbdu_id:5) x2 < 0 then 
+agent_type_    false
+agent_type_   else 
+agent_type_    if(mvbdu_id:4) x2 < 1 then 
+agent_type_     true
+agent_type_    else 
+agent_type_     false
+agent_type_  else 
+agent_type_   false
+index of this array:1
+agent_type_ if(mvbdu_id:3) x1 < 1 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 2 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+index of this array:2
+agent_type_ if(mvbdu_id:3) x1 < 1 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 2 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+index of this array:3
+agent_type_ false
+index of this array:4
+agent_type_ false
+index of this array:5
+agent_type_ false
+index of this array:6
+agent_type_ false
+index of this array:7
+agent_type_ false
+- TEST with MAP An array of bdu_test:
+index of this array:0
+agent_type_ false
+index of this array:1
+agent_type_ false
+index of this array:2
+agent_type_ false
+index of this array:3
+agent_type_ true
+index of this array:4
+agent_type_ if(mvbdu_id:3) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 1 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+index of this array:5
+agent_type_ if(mvbdu_id:3) x1 < 1 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 2 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+index of this array:6
+agent_type_ if(mvbdu_id:3) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 1 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+index of this array:7
+agent_type_ if(mvbdu_id:3) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 1 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
 ------------------------------------------------------------
 - An array of bdu_test:
 agent_type_0:
