@@ -125,15 +125,30 @@ NB inj should not change if [is_add] is false*)
 	 Connected_component.Matching.observables_from_link
 	   domain (if is_add then edges' else edges) ty id s ty' id' s' in
        (inj2graph'',edges',new_obs)
-    | Primitives.Transformation.Internalized (n,s,i) ->
-       let ty, id, inj2graph' = from_place inj2graph n in
-       let edges' =
-	 if is_add then Edges.add_internal id s i edges
-	 else Edges.remove_internal id s i edges in
-       let new_obs =
-	 Connected_component.Matching.observables_from_internal
-	   domain (if is_add then edges' else edges) ty id s i in
-       (inj2graph',edges',new_obs)
+    | Primitives.Transformation.PositiveInternalized (n,s,i) ->
+       if not is_add then
+	 raise
+	   (ExceptionDefn.Internal_Error
+	      (Location.dummy_annot "PositiveInternalized in negative update"))
+       else
+	 let ty, id, inj2graph' = from_place inj2graph n in
+	 let edges' = Edges.add_internal id s i edges in
+	 let new_obs =
+	   Connected_component.Matching.observables_from_internal
+	     domain edges' ty id s i in
+	 (inj2graph',edges',new_obs)
+    | Primitives.Transformation.NegativeInternalized (n,s) ->
+       if is_add then
+	 raise
+	   (ExceptionDefn.Internal_Error
+	      (Location.dummy_annot "NegativeInternalized in positive update"))
+       else
+	 let ty, id, inj2graph' = from_place inj2graph n in
+	 let edges',i = Edges.remove_internal id s edges in
+	 let new_obs =
+	   Connected_component.Matching.observables_from_internal
+	     domain edges ty id s i in
+	 (inj2graph',edges',new_obs)
   in
   let roots' =
     List.fold_left
@@ -147,8 +162,9 @@ NB inj should not change if [is_add] is false*)
     if not is_add then to_explore_unaries
     else
       match transf with
-      | (Primitives.Transformation.Freed _
-	| Primitives.Transformation.Internalized _) -> to_explore_unaries
+      | (Primitives.Transformation.Freed _ |
+	 Primitives.Transformation.PositiveInternalized _) -> to_explore_unaries
+      | Primitives.Transformation.NegativeInternalized _ -> assert false
       | Primitives.Transformation.Linked ((n,_),(n',_)) ->
 	 if Agent_place.same_connected_component n n'
 	 then to_explore_unaries
@@ -305,13 +321,13 @@ let new_unary_instances rule_id cc1 cc2 created_obs state =
 	     try
 	       let goals,reverse =
 		 if Connected_component.is_equal_canonicals cc cc1
-		 then 
+		 then
 		   match Connected_component.Map.find_option
 		     cc2 state.roots_of_ccs with
 		   | Some x -> x,false
 		   | None -> raise Not_found
 		 else if Connected_component.is_equal_canonicals cc cc2
-		 then 
+		 then
 		   match Connected_component.Map.find_option
 		     cc1 state.roots_of_ccs with
 		   | Some x -> x,true
@@ -404,7 +420,7 @@ let apply_unary_rule
   let cc1 = rule.Primitives.connected_components.(0) in
   let cc2 = rule.Primitives.connected_components.(1) in
   let pair = (min root1 root2,max root1 root2) in
-  let candidate = 
+  let candidate =
     match Mods.Int2Map.find_option pair state.unary_pathes with
     | Some x -> x
     | None -> raise Not_found in
@@ -468,7 +484,7 @@ let apply_rule ?rule_id ~get_alg domain unary_ccs counter state event_kind rule 
      | Some _ ->
 	try
 	  let point = (min roots.(0) roots.(1), max roots.(0) roots.(1)) in
-	  let candidate = 
+	  let candidate =
 	    match Mods.Int2Map.find_option point state.unary_pathes with
 	    | Some x -> x
 	    | None -> raise Not_found in

@@ -37,8 +37,12 @@ let remove ag s (connect,state,sort) = function
   | Edge.Link (_,ag',s') ->
      (Int2Map.remove (ag,s) (Int2Map.remove (ag',s') connect),state,sort)
 let remove_free ag s t = remove ag s t Edge.ToFree
-let remove_internal ag s i (connect,state,sort) =
-  (connect,Int2Map.remove (ag,s) state,sort)
+let remove_internal ag s (connect,state,sort) =
+  match Int2Map.pop (ag,s) state with
+  | Some i, state' -> (connect,state',sort),i
+  | None, _ ->
+     failwith ("Site "^string_of_int s^ " of agent "^string_of_int ag^
+		 " has no internal state to remove in the current graph.")
 let remove_link ag s ag' s' t = remove ag s t (Edge.Link (-1,ag',s'))
 
 let is_free ag s (t,_,_) =

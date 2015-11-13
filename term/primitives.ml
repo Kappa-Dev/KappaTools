@@ -3,7 +3,8 @@ module Transformation =
     type t =
 	Freed of Agent_place.t * int
       | Linked of (Agent_place.t * int) * (Agent_place.t * int)
-      | Internalized of Agent_place.t * int * int
+      | PositiveInternalized of Agent_place.t * int * int
+      | NegativeInternalized of Agent_place.t * int
 
     let rename wk id cc inj = function
       | Freed (p,s) as x ->
@@ -13,9 +14,12 @@ module Transformation =
 	 let p1' = Agent_place.rename wk id cc inj p1 in
 	 let p2' = Agent_place.rename wk id cc inj p2 in
 	 if p1 == p1' && p2 == p2' then x else Linked ((p1',s1),(p2',s2))
-      | Internalized (p,s,i) as x ->
+      | PositiveInternalized (p,s,i) as x ->
 	 let p' = Agent_place.rename wk id cc inj p in
-	 if p == p' then x else Internalized (p',s,i)
+	 if p == p' then x else PositiveInternalized (p',s,i)
+      | NegativeInternalized (p,s) as x ->
+	 let p' = Agent_place.rename wk id cc inj p in
+	 if p == p' then x else NegativeInternalized (p',s)
 
     let print ?sigs f = function
       | Freed (p,s) ->
@@ -27,10 +31,14 @@ module Transformation =
 	   f "@[%a.%a = %a.%a@]"
 	   (Agent_place.print ?sigs) p1 (Agent_place.print_site ?sigs p1) s1
 	   (Agent_place.print ?sigs) p2 (Agent_place.print_site ?sigs p2) s2
-      | Internalized (p,s,i) ->
+      | PositiveInternalized (p,s,i) ->
 	 Format.fprintf
 	   f "@[%a.%a =@]" (Agent_place.print ?sigs) p
 	   (Agent_place.print_internal ?sigs p s) i
+      | NegativeInternalized (p,s) ->
+	 Format.fprintf
+	   f "@[%a.%a~ =@]" (Agent_place.print ?sigs) p
+	   (Agent_place.print_site ?sigs p) s
   end
 
 type elementary_rule = {

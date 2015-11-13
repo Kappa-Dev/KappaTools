@@ -741,19 +741,22 @@ let rec add_agents_in_cc sigs id wk registered_links transf links_transf
        else
 	 let transf,wk' = match ag.ra_ints.(site_id) with
 	   | I_ANY -> (removed,added),wk
+	   | I_ANY_ERASED ->
+	      (Primitives.Transformation.NegativeInternalized (place,site_id)::removed,added),
+	      wk
+	   | I_ANY_CHANGED j ->
+	      (Primitives.Transformation.NegativeInternalized (place,site_id)::removed,
+	       Primitives.Transformation.PositiveInternalized (place,site_id,j)::added),
+	      wk
 	   | I_VAL_CHANGED (i,j) ->
 	      (if i = j then (removed,added)
 	       else
-		 Primitives.Transformation.Internalized (place,site_id,i)::removed,
-		 Primitives.Transformation.Internalized (place,site_id,j)::added),
+		 Primitives.Transformation.NegativeInternalized (place,site_id)::removed,
+		 Primitives.Transformation.PositiveInternalized (place,site_id,j)::added),
 		Connected_component.new_internal_state wk (node,site_id) i
 	   | I_VAL_ERASED i ->
-	      (Primitives.Transformation.Internalized (place,site_id,i)::removed,added),
+	      (Primitives.Transformation.NegativeInternalized (place,site_id)::removed,added),
 	      Connected_component.new_internal_state wk (node,site_id) i
-	   | (I_ANY_ERASED | I_ANY_CHANGED _) ->
-	      raise (ExceptionDefn.Internal_Error
-		       (Location.dummy_annot
-			  "Try to create the connected components of an ambiguous mixture."))
 	 in
 	 match ag.ra_ports.(site_id) with
 	 | L_ANY Maintained ->
@@ -858,7 +861,7 @@ let rec complete_with_creation
 	   match ag.Raw_mixture.a_ints.(site_id) with
 	   | None -> added,(site_id,None)
 	   | Some i ->
-	      Primitives.Transformation.Internalized (place,site_id,i)::added,
+	      Primitives.Transformation.PositiveInternalized (place,site_id,i)::added,
 	      (site_id,Some i) in
 	 let added'',actions',l_t' =
 	   match ag.Raw_mixture.a_ports.(site_id) with
@@ -911,7 +914,8 @@ let connected_components_of_mixture created (env,origin) mix =
 		    | Primitives.Transformation.Linked (x,y) ->
 		       Instantiation.Bind (x,y) :: acs
 		    | (Primitives.Transformation.Freed _ |
-		       Primitives.Transformation.Internalized _) -> acs)
+		       Primitives.Transformation.PositiveInternalized _ |
+		       Primitives.Transformation.NegativeInternalized _) -> acs)
 	   actions added in
        let transformations' = (List.rev removed, List.rev added) in
        let actions'',transformations'' =
