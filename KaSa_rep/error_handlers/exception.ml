@@ -165,3 +165,8 @@ let print_errors_light_for_kasim parameters handlers =
   else 
     let _ = Printf.fprintf (Remanent_parameters.get_log parameters) "%sSome exceptions have been raised during the static analysis, please analyse your file with KaSa\n" (Remanent_parameters.get_prefix parameters) in 
     ()
+
+
+
+   
+let lift_error_logs_for_KaSa f = f (fun parameters error string string_opt exn -> fst (warn parameters error string string_opt exn (fun  () -> ())))

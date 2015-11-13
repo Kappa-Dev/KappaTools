@@ -44,8 +44,8 @@ module type Set =
     (** [minus a b] contains elements of [a] that are not in [b] *)
     val diff: t -> t -> t
     (** [diff a b] = [minus (union a b) (inter a b)] *)
-  (*  val union_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t 
-    val inter_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t
+    val union_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t 
+  (*  val inter_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t
     val diff_safe:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t
     val split_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * ( t * bool * t)*)
 
@@ -228,7 +228,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  else
             error,node left value right
 
-	let balance left value right =
+(*	let balance left value right =
 	  let height_left = height left in
 	  let height_right = height right in
 	  if height_left > height_right + 2 then
@@ -263,16 +263,19 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		      (node left value rightleftleft)
 		      rightleftvalue
 		      (node rightleftright rightvalue rightright)
-	  else node left value right
+	  else node left value right*)
 
-	let rec add x = function
+	let balance = Lift_error_logs.lift_generic_ternary_for_KaSim balance_safe 					 
+
+		       
+(*	let rec add x = function
 	  | Private.Empty -> singleton x
 	  | Private.Node(l, v, r, _) as t ->
 	     let c = Ord.compare x v in
 	     if c = 0 then t else
 	       if c < 0
 	       then let o = add x l in if o == l then t else balance o v r
-	       else let o = add x r in if o == r then t else balance l v o
+	       else let o = add x r in if o == r then t else balance l v o*)
 
 	let rec add_safe warn parameters error new_value set =
 	  match set with
@@ -286,7 +289,8 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
           else
             let error', right' = add_safe warn parameters error new_value right in
             balance_safe warn parameters error' left value_set right'
-	let rec join left value right =
+
+	(*let rec join left value right =
 	  match left,right with
           | Private.Empty,_ -> add value right
           | _,Private.Empty -> add value left
@@ -298,7 +302,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              else if rightheight > leftheight +2 then
                let left' = join left value rightleft in
                balance left' rightvalue rightright
-             else node left value right
+             else node left value right*)
 
 	let rec safe_extract_min_elt left value right =
 	  match left with
@@ -326,13 +330,13 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              let error, left' = remove_min_elt_safe warn parameters error left in
              balance_safe warn parameters error left' value right
 
-	let merge set1 set2 =
+(*	let merge set1 set2 =
 	  match set1,set2 with
           | Private.Empty,_ -> set2
           | _,Private.Empty -> set1
           | Private.Node _, Private.Node (left2,value2,right2,_) ->
              let min2,set2' = safe_extract_min_elt left2 value2 right2 in
-             balance set1 min2 set2'
+             balance set1 min2 set2'*)
 
 	let merge_safe warn parameters error set1 set2 =
 	  match set1,set2 with
@@ -346,20 +350,69 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		 elt_opt
 	       with
 	       | None ->
-		  let error = warn parameters error "setMap.ml" (Some "merge_sage,line 339") Not_found in
+		  let error = warn parameters error "setMap.ml" (Some "merge_safe,line 339") Not_found in
 		  error,set1
 	       | Some elt ->
 		  balance_safe warn parameters error set1 elt left2
 	     end
-	let concat set1 set2 =
+
+	let rec join_safe warn parameters error left value right = 
+	  match left,right with 
+          | Private.Empty,_ -> add_safe warn parameters error value right 
+          | _,Private.Empty -> add_safe warn parameters error value left
+        | Private.Node(leftleft,leftvalue,leftright,leftheight),
+          Private.Node(rightleft,rightvalue,rightright,rightheight) -> 
+           if leftheight > rightheight + 2 
+           then 
+            let error, right' = join_safe warn parameters error leftright value right in  
+            balance_safe warn parameters error leftleft leftvalue right'
+          else if rightheight > leftheight +2 then 
+            let error, left' = join_safe warn parameters error left value rightleft in 
+            balance_safe warn parameters error left'  rightvalue rightright 
+          else 
+            error,node left value right 
+	       
+(*	let concat set1 set2 =
 	  match set1,set2 with
 	  |   Private.Empty,_ -> set2
 	  | _,Private.Empty -> set1
 	  | Private.Node _, Private.Node (left2,value2,right2,_) ->
              let min2,set2' = safe_extract_min_elt left2 value2 right2 in
-             join set1 min2 set2'
+             join set1 min2 set2'*)
 
-	let rec remove value = function
+	let concat_safe warn parameters error set1 set2 = 
+	  match set1,set2 with 
+          | Private.Empty,_ -> error,set2 
+          | _,Private.Empty -> error,set1 
+          | _ -> 
+             let error,left2 =remove_min_elt_safe warn parameters error set2 in
+	     let error,elt_opt = min_elt_safe warn parameters error set2 in 
+             match
+	       elt_opt
+	     with
+	     | None ->
+		let error = warn parameters error "setMap.ml" (Some "concat_safe,line 390") Not_found in
+		error,set1
+	     | Some elt -> join_safe warn parameters error set1 elt left2 
+		  
+		  
+	let rec split_safe warn parameters error split_value set = 
+	  match set with 
+          | Private.Empty -> error,(empty,false,empty)
+          | Private.Node(left,set_value,right,_) ->
+             let c = Ord.compare split_value set_value in 
+             if c=0 then error,(left,true,right)
+             else if c<0 then 
+               let error,(leftleft,bool,rightleft) = split_safe warn  parameters error split_value left in  
+               let error,rightright = join_safe warn parameters error rightleft set_value right in  
+               error,(leftleft,bool,rightright) 
+             else 
+               let error,(leftright,bool,rightright) = split_safe warn  parameters error split_value right in 
+               let error,leftleft = join_safe warn parameters error left set_value leftright in 
+	       error,(leftleft,bool,rightright)
+				 
+		  
+(*	let rec remove value = function
           | Private.Empty as set -> set
           | Private.Node(left,value_set,right,_) as set ->
              let c = Ord.compare value value_set in
@@ -369,7 +422,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	       if left == left' then set else balance left' value_set right
              else
 	       let right' = remove value right in
-	       if right == right' then set else balance left value_set right'
+	       if right == right' then set else balance left value_set right'*)
 
 	let rec remove_safe warn parameters error value set =
 	  match set with
@@ -384,7 +437,10 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
             let error, right' = remove_safe warn parameters error value right in
             balance_safe warn parameters error left value_set right'
 
-	let rec split split_value set =
+
+								    
+
+(*	let rec split split_value set =
 	  match set with
           | Private.Empty -> (empty,false,empty)
           | Private.Node(left,set_value,right,_) ->
@@ -397,9 +453,9 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              else
                let (leftright,bool,rightright) = split split_value right in
                let leftleft = join left set_value leftright in
-               (leftleft,bool,rightright)
+               (leftleft,bool,rightright)*)
 
-	let rec union set1 set2 =
+(*	let rec union set1 set2 =
 	  match set1,set2 with
           | Private.Empty,_ -> set2
           | _,Private.Empty -> set1
@@ -418,41 +474,107 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		 let (left1,_,right1) = split value2 set1 in
 		 let left' = union left1 left2 in
 		 let right' = union right1 right2 in
-		 join left' value2 right'
+		 join left' value2 right'*)
 
-	let suture (left1,value1,right1) (left2,bool,right2) f =
+	let rec union_safe warn parameters error set1 set2 = 
+	  match set1,set2 with 
+	  | Private.Empty,_ -> error,set2 
+          | _,Private.Empty -> error,set1   
+	  | Private.Node(left1,value1,right1,height1),Private.Node(left2,value2,right2,height2) -> 
+	     if height1 > height2 then 
+               if height2 = 1 then add_safe warn parameters error value2 set1 
+	       else
+		 begin 
+		   let error,(left2,_,right2) = split_safe warn parameters error value1 set2 in
+		   let error,left' = union_safe warn parameters error left1 left2 in 
+		   let error, right' = union_safe warn parameters error right1 right2 in 
+		   join_safe warn parameters error left' value1 right'
+		 end  
+	     else 
+	       if height1 = 1 then add_safe warn parameters error value1 set2 
+	       else
+		 begin 
+		   let error,(left1,_,right1) = split_safe warn parameters error value2 set1 in
+		   let error,left' = union_safe warn parameters error left1 left2 in 
+		   let error,right' = union_safe warn parameters error right1 right2 in  
+		   join_safe warn parameters error left' value2 right'
+		 end
+		   
+(*	let suture (left1,value1,right1) (left2,bool,right2) f =
 	  let left' = f left1 left2 in
 	  let right' = f right1 right2 in
-	  if bool then join left' value1 right' else concat left' right'
+	  if bool then join left' value1 right' else concat left' right'*)
 
-	let suture_not (left1,value1,right1) (left2,bool,right2) f =
+(*	let suture_not (left1,value1,right1) (left2,bool,right2) f =
 	  let left' = f left1 left2 in
 	  let right' = f right1 right2 in
-	  if bool then concat left' right' else join left' value1 right'
+	  if bool then concat left' right' else join left' value1 right'*)
 
-	let rec inter set1 set2 =
+						     
+						     
+(*	let rec inter set1 set2 =
 	  match set1,set2 with
           | Private.Empty,_
           | _,Private.Empty -> empty
           | Private.Node(left1,value1,right1,_),_ ->
              let triple2 = split value1 set2 in
-             suture (left1,value1,right1) triple2 inter
+             suture (left1,value1,right1) triple2 inter*)
 
-	let rec diff set1 set2 =
+	let suture_safe warn parameters error (left1,value1,right1) (left2,bool,right2) f = 
+	  let error ,left' = f warn parameters error left1 left2 in 
+	  let error, right' = f warn parameters error right1 right2 in 
+	  if bool then 
+	    join_safe warn parameters error left' value1 right'
+	  else
+	    concat_safe warn parameters error left' right' 
+          
+	let suture_not_safe warn parameters error (left1,value1,right1) (left2,bool,right2) f = 
+	  let error ,left' = f warn parameters error left1 left2 in 
+	  let error, right' = f warn parameters error right1 right2 in 
+	  if bool then 
+	    concat_safe warn parameters error left' right'
+	  else 
+	    join_safe warn parameters error left' value1 right'
+         
+	let rec inter_safe warn parameters error set1 set2 = 
+	  match set1,set2 with 
+	  | Private.Empty,_ 
+	  | _,Private.Empty -> error,empty
+	  | Private.Node(left1,value1,right1,_),_ ->
+	     let mh',triple2 = split_safe warn parameters error value1 set2 in  
+	     suture_safe warn parameters error (left1,value1,right1) triple2 inter_safe 
+		    
+(*	let rec diff set1 set2 =
 	  match set1,set2 with
 	  | Private.Empty,_ -> set2
 	  | _,Private.Empty -> set1
 	  | Private.Node(left1,value1,right1,_),_ ->
              let triple2 = split value1 set2 in
-             suture_not (left1,value1,right1) triple2 diff
+             suture_not (left1,value1,right1) triple2 diff*)
 
-	let rec minus set1 set2 =
+	let rec diff_safe warn parameters error set1 set2 = 
+	  match set1,set2 with 
+          | Private.Empty,_ -> error,empty
+	  | _,Private.Empty -> error,set1 
+	  | Private.Node(left1,value1,right1,_),_ -> 
+             let error,triple2 = split_safe warn parameters error value1 set2 in 
+             suture_not_safe warn parameters error (left1,value1,right1) triple2 diff_safe  
+			
+(*	let rec minus set1 set2 =
 	  match set1,set2 with
 	  | Private.Empty,_ -> empty
 	  | _,Private.Empty -> set1
 	  | Private.Node(left1,value1,right1,_),_ ->
              let triple2 = split value1 set2 in
-             suture_not (left1,value1,right1) triple2 minus
+             suture_not (left1,value1,right1) triple2 minus*)
+
+	let rec minus_safe warn parameters error set1 set2 =
+	  match set1,set2 with
+	  | Private.Empty,_ -> error,empty
+	  | _,Private.Empty -> error,set1
+	  | Private.Node(left1,value1,right1,_),_ ->
+             let error,triple2 = split_safe warn parameters error value1 set2 in
+             suture_not_safe warn parameters error (left1,value1,right1) triple2 minus_safe     
 
 	let rec mem searched_value = function
           | Private.Empty -> false
@@ -460,14 +582,24 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              let c = Ord.compare searched_value set_value in
              c==0 || mem searched_value (if c < 0 then left else right)
 
-	let filter p set =
+(*	let filter p set =
 	  let rec filt accu = function
             | Private.Empty -> accu
             | Private.Node(left,value,right,_) ->
                filt (filt (if p value then add value accu else accu) left) right
-	  in filt empty set
+	  in filt empty set*)
 
-	let partition p set =
+       let filter_safe warn parameters error p set = 
+	 let rec filt accu set = 
+	   match set with 
+           | Private.Empty -> accu
+           | Private.Node(left,value,right,_) ->
+              let error,list = accu in  
+              filt (filt (if p value then add_safe warn parameters error value list else accu) left) right in 
+	 filt (error,empty) set 
+        
+
+(*	let partition p set =
 	  let rec part (t,f as accu) = function
             | Private.Empty -> accu
             | Private.Node(left,value,right,_) ->
@@ -476,8 +608,31 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
                     (if p value then add value t,f else t,add value f)
                     left)
 		 right
-	  in part (empty,empty) set
+	  in part (empty,empty) set*)
 
+       let partition_safe warn parameters error p set =  
+	 let rec part (rh,t,f as accu) set = 
+           match set with 
+          | Private.Empty -> accu 
+          | Private.Node(left,value,right,_) ->              
+            part 
+              (part 
+                 begin
+                   if p value 
+                   then   
+                     let a,b = add_safe warn parameters error value t
+                     in a,b,f
+                   else 
+                     let a,c = add_safe warn parameters error value f in 
+                     a,t,c
+                 end  
+                 left) 
+              right
+      in 
+      part (error,empty,empty) set
+
+		  
+		  
 	type enumeration = End | More of elt * t * enumeration
 
 	let rec cons_enum enum = function
@@ -558,6 +713,17 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	let choose = (* function
 	  | Private.Empty -> None
 	  | Private.Node (_,v,_,_) -> Some v *) min_elt
+						  
+	let add = Lift_error_logs.lift_generic_binary_for_KaSim add_safe 
+	let split = Lift_error_logs.lift_generic_binary_for_KaSim split_safe 					 
+	let remove =  Lift_error_logs.lift_generic_binary_for_KaSim remove_safe 
+	let union = Lift_error_logs.lift_generic_binary_for_KaSim union_safe 
+	let inter = Lift_error_logs.lift_generic_binary_for_KaSim inter_safe 
+	let diff = Lift_error_logs.lift_generic_binary_for_KaSim diff_safe
+	let minus = Lift_error_logs.lift_generic_binary_for_KaSim minus_safe 
+	let filter = Lift_error_logs.lift_generic_binary_for_KaSim filter_safe
+	let partition = Lift_error_logs.lift_generic_binary_binary_for_KaSim partition_safe
+								      
       end
 
     (************************************************************************************)
