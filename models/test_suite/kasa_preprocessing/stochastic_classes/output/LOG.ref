@@ -705,100 +705,6 @@ agent_type_3:
 - Working list update and creation:
 
 ------------------------------------------------------------
-* Taking information of covering class:
-------------------------------------------------------------
-- Covering classes triple (id, list, set):
-agent_type_0:
-Covering_class_id:2
-site_type:0
-Covering_class_id:1
-site_type:1
-Covering_class_id:0
-site_type:2
-agent_type_2:
-Covering_class_id:0
-site_type:0
-site_type:1
-agent_type_4:
-Covering_class_id:0
-site_type:0
-site_type:1
-Covering_class_id:1
-site_type:2
-agent_type_5:
-Covering_class_id:1
-site_type:0
-Covering_class_id:0
-site_type:1
-- Test rule with new index:
-agent_type_0:
-rule_id:0:
-covering_class_id:2:site_type':1:state:0
-rule_id:0:
-rule_id:0:
-rule_id:8:
-covering_class_id:0:site_type':1:state:0
-rule_id:8:
-rule_id:8:
-agent_type_2:
-rule_id:2:
-rule_id:2:
-covering_class_id:1:site_type':1:state:0
-rule_id:2:
-covering_class_id:2:site_type':1:state:0
-agent_type_4:
-rule_id:4:
-covering_class_id:2:site_type':1:state:0
-rule_id:4:
-covering_class_id:1:site_type':1:state:0
-rule_id:4:
-rule_id:5:
-rule_id:5:
-covering_class_id:1:site_type':1:state:1
-rule_id:5:
-agent_type_5:
-rule_id:6:
-covering_class_id:2:site_type':1:state:0
-rule_id:6:
-rule_id:6:
-rule_id:7:
-rule_id:7:
-covering_class_id:1:site_type':1:state:0
-rule_id:7:
-- Creation rule with new index:
-- Modification rule with new index (with creation rules):
-agent_type_0:
-rule_id:0:
-covering_class_id:2:site_type':1:state:1
-rule_id:0:
-rule_id:0:
-rule_id:8:
-covering_class_id:0:site_type':1:state:1
-rule_id:8:
-rule_id:8:
-agent_type_1:
-rule_id:1:
-rule_id:1:
-rule_id:1:
-covering_class_id:2:site_type':1:state:0
-agent_type_2:
-rule_id:2:
-rule_id:2:
-rule_id:2:
-covering_class_id:2:site_type':1:state:1
-agent_type_3:
-rule_id:3:
-rule_id:3:
-covering_class_id:1:site_type':1:state:0
-rule_id:3:
-covering_class_id:2:site_type':1:state:0
-- Modification rule with new index (without creation rules):
-agent_type_0:
-agent_type_1:
-agent_type_2:
-agent_type_3:
-
-------------------------------------------------------------
 * Covering classes with new index :
 ------------------------------------------------------------
 - A map of covering classes with test rules:
@@ -813,4 +719,63 @@ agent_type:5:rule_id:6@covering_class_id:2:site_type':1:state:0
 agent_type:5:rule_id:7@covering_class_id:1:site_type':1:state:0
 - A map of covering classes with creation rules:
 - A map of covering classes with modification rules (without creation rules):
+- A map of bdu test rules:
+agent_type:0:rule_id:0
+agent_type_ if(mvbdu_id:3) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 1 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+agent_type:0:rule_id:8
+agent_type_ if(mvbdu_id:3) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 1 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+agent_type:2:rule_id:2
+agent_type_ if(mvbdu_id:3) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 1 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+agent_type:4:rule_id:4
+agent_type_ if(mvbdu_id:3) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 1 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+agent_type:4:rule_id:5
+agent_type_ if(mvbdu_id:3) x1 < 1 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 2 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+agent_type:5:rule_id:6
+agent_type_ if(mvbdu_id:3) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 1 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+agent_type:5:rule_id:7
+agent_type_ if(mvbdu_id:3) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:2) x1 < 1 then 
+agent_type_   true
+agent_type_  else 
+agent_type_   false
+- A map of bdu creation rules:
+- A map of modification rules:
 execution finished without any exception

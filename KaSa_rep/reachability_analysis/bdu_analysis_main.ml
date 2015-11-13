@@ -24,7 +24,7 @@ open Bdu_modification_sites
 open Bdu_contact_map
 open Bdu_update
 open Bdu_working_list
-open Bdu_build (*REMOVE*)
+open Bdu_build (*RENAME*)
 open Bdu_structure (*RENAME*)
 
 let warn parameters mh message exn default =
@@ -299,11 +299,36 @@ let scan_rule_bdu_build_map parameter error rule_id rule
       store_remanent_modif_opt
   in
   (*-------------------------------------------------------------------------------*)
+  (*bdu*)
+  let error, store_test_bdu_map =
+    collect_test_bdu_map
+      parameter
+      error
+      store_remanent_test_map
+  in
+  (*-------------------------------------------------------------------------------*)
+  let error, store_creation_bdu_map =
+    collect_creation_bdu_map
+      parameter
+      error
+      store_remanent_creation_map
+  in
+  (*-------------------------------------------------------------------------------*)
+  let error, store_modif_list_map =
+    collect_modif_list_map
+      parameter
+      error
+      store_remanent_modif_opt_map
+  in
+  (*-------------------------------------------------------------------------------*)
   error, 
   {
     store_remanent_test_map      = store_remanent_test_map;
     store_remanent_creation_map  = store_remanent_creation_map;
     store_remanent_modif_opt_map = store_remanent_modif_opt_map;
+    store_test_bdu_map           = store_test_bdu_map;
+    store_creation_bdu_map       = store_creation_bdu_map;
+    store_modif_list_map         = store_modif_list_map
   }
 
 (************************************************************************************)
@@ -453,11 +478,17 @@ let init_bdu_build_map parameter error =
   let init_remanent_test_map      = Map_test.Map.empty in
   let init_remanent_creation_map  = Map_creation.Map.empty in
   let init_remanent_modif_opt_map = Map_modif_creation.Map.empty in
+  let init_test_bdu_map           = Map_test_bdu.Map.empty in
+  let init_creation_bdu_map       = Map_creation_bdu.Map.empty in
+  let init_modif_list_map         = Map_modif_list.Map.empty in
   let init_bdu_build_map =
     {
       store_remanent_test_map      = init_remanent_test_map;
       store_remanent_creation_map  = init_remanent_creation_map;
       store_remanent_modif_opt_map = init_remanent_modif_opt_map;
+      store_test_bdu_map           = init_test_bdu_map;
+      store_creation_bdu_map       = init_creation_bdu_map;
+      store_modif_list_map         = init_modif_list_map
     }
   in
   error, init_bdu_build_map

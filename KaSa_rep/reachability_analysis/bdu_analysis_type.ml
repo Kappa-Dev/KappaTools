@@ -106,14 +106,31 @@ module Map_creation =
       let compare = compare
     end)
 
-module Map_creation_set =
+module Map_modif_creation = (*without creation rules*)
   SetMap.Make (
     struct
-      type t = int * (int * int * int) list
+      type t = int * int
       let compare = compare
     end)
 
-module Map_modif_creation = (*without creation rules*)
+(************************************************************************************)
+(*type map for bdu*)
+
+module Map_test_bdu =
+  SetMap.Make (
+    struct
+      type t = int * int
+      let compare = compare
+    end)
+
+module Map_creation_bdu =
+  SetMap.Make (
+    struct
+      type t = int * int
+      let compare = compare
+    end)
+
+module Map_modif_list =
   SetMap.Make (
     struct
       type t = int * int
@@ -172,10 +189,6 @@ type bdu_analysis_dynamic =
 (************************************************************************************)
 (*build covering classes with new index*)
 
-type pair_bdu =
-  (Boolean_mvbdu.memo_tables, Boolean_mvbdu.mvbdu_dic,
-   Boolean_mvbdu.list_dic, bool, int) Memo_sig.handler * bool Mvbdu_sig.mvbdu
-  
 type bdu_build =
   {
     store_remanent_triple    : ((int * int list * Site_map_and_set.Set.t) list) AgentMap.t;
@@ -188,13 +201,18 @@ type bdu_build =
 (************************************************************************************)
 (*build covering classes in map and bdu with new indexes for site_type*)
 
-type pair_map = (int * int * (int * int * int) list) list * Site_map_and_set.Set.t
+type pair_bdu =
+  (Boolean_mvbdu.memo_tables, Boolean_mvbdu.mvbdu_dic,
+   Boolean_mvbdu.list_dic, bool, int) Memo_sig.handler * bool Mvbdu_sig.mvbdu
 
 type bdu_build_map =
   {
     store_remanent_test_map     : (int list * (int * int * int) list) Map_test.Map.t;
     store_remanent_creation_map : (int list * (int * int * int) list) Map_creation.Map.t;
-    store_remanent_modif_opt_map: (int list * (int * int* int) list) Map_modif_creation.Map.t
+    store_remanent_modif_opt_map: (int list * (int * int* int) list)Map_modif_creation.Map.t;
+    store_test_bdu_map          : (int list * pair_bdu list) Map_test_bdu.Map.t;
+    store_creation_bdu_map      : (int list * pair_bdu list) Map_creation_bdu.Map.t;
+    store_modif_list_map        : (int list * int list) Map_modif_list.Map.t
   }
 
 (************************************************************************************)

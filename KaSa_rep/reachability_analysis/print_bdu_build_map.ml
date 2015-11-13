@@ -68,6 +68,59 @@ let print_remanent_modif_opt_map parameter error result =
       ) result
 
 (************************************************************************************)
+
+let print_bdu parameter error bdu =
+  Boolean_mvbdu.print_boolean_mvbdu error
+    (Remanent_parameters.update_prefix parameter "") bdu
+    
+let print_test_bdu_map parameter error result =
+  Map_test_bdu.Map.iter
+    (fun (agent_type, rule_id) (l1, l2) ->
+      if l1 <> []
+      then ()
+      else ();
+      List.iter (fun (handler, bdu) ->
+        fprintf parameter.log 
+          "agent_type:%i:rule_id:%i\n"
+          agent_type rule_id;
+        let _ = print_bdu parameter error bdu in
+        ()
+      ) l2
+    ) result
+
+(************************************************************************************)
+
+let print_creation_bdu_map parameter error result =
+  Map_creation_bdu.Map.iter
+    (fun (agent_type, rule_id) (l1, l2) ->
+      if l1 <> []
+      then ()
+      else ();
+      List.iter (fun (handler, bdu) ->
+        fprintf parameter.log 
+          "agent_type:%i:rule_id:%i\n"
+          agent_type rule_id;
+        let _ = print_bdu parameter error bdu in
+        ()
+      ) l2
+    ) result
+
+(************************************************************************************)
+
+let print_modif_list_map parameter error result =
+  Map_modif_list.Map.iter
+    (fun (agent_type, rule_id) (l1, l2) ->
+      if l1 <> []
+      then ()
+      else ();
+      List.iter (fun site ->
+          fprintf parameter.log 
+            "agent_type:%i:rule_id:%i:site_type:%i\n"
+            agent_type rule_id site;
+      ) l2
+    ) result
+
+(************************************************************************************)
 (*main print*)
 
 let print_bdu_build_map parameter error result =
@@ -102,5 +155,31 @@ let print_bdu_build_map parameter error result =
       parameter
       error
       result.store_remanent_modif_opt_map
+  in
+  (*-----------------------------------------------------------------*)
+  (*print bdu*)
+  let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "- A map of bdu test rules:\n";
+    print_test_bdu_map
+      parameter
+      error
+      result.store_test_bdu_map
+  in
+  let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "- A map of bdu creation rules:\n";
+    print_creation_bdu_map
+      parameter
+      error
+      result.store_creation_bdu_map
+  in
+  let _ =
+    fprintf (Remanent_parameters.get_log parameter)
+      "- A map of modification rules:\n";
+    print_modif_list_map
+      parameter
+      error
+      result.store_modif_list_map
   in
   error

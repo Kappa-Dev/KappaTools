@@ -113,13 +113,6 @@ let print_remanent_modif_opt parameter error result =
   ) parameter result
 
 (************************************************************************************)
-(*bdu_test*)
-
-let print_bdu parameter error bdu =
-  Boolean_mvbdu.print_boolean_mvbdu error
-    (Remanent_parameters.update_prefix parameter "") bdu
-   
-(************************************************************************************)
 (*main print*)
 
 let print_bdu_build parameter error result =

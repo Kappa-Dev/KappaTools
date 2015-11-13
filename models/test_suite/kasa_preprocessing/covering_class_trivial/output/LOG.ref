@@ -266,47 +266,6 @@ update function:
 - Working list update and creation:
 
 ------------------------------------------------------------
-* Taking information of covering class:
-------------------------------------------------------------
-- Covering classes triple (id, list, set):
-agent_type_0:
-Covering_class_id:1
-site_type:0
-site_type:1
-Covering_class_id:0
-site_type:0
-site_type:2
-- Test rule with new index:
-agent_type_0:
-rule_id:1:
-covering_class_id:1:site_type':1:state:0
-rule_id:1:
-covering_class_id:0:site_type':2:state:0
-covering_class_id:0:site_type':1:state:0
-rule_id:0:
-covering_class_id:0:site_type':1:state:0
-rule_id:0:
-covering_class_id:1:site_type':2:state:0
-covering_class_id:1:site_type':1:state:0
-rule_id:2:
-covering_class_id:0:site_type':2:state:0
-covering_class_id:0:site_type':1:state:0
-rule_id:2:
-covering_class_id:1:site_type':2:state:0
-covering_class_id:1:site_type':1:state:0
-- Creation rule with new index:
-- Modification rule with new index (with creation rules):
-agent_type_0:
-rule_id:0:
-covering_class_id:1:site_type':2:state:1
-rule_id:0:
-rule_id:1:
-covering_class_id:0:site_type':2:state:1
-rule_id:1:
-- Modification rule with new index (without creation rules):
-agent_type_0:
-
-------------------------------------------------------------
 * Covering classes with new index :
 ------------------------------------------------------------
 - A map of covering classes with test rules:
@@ -322,4 +281,49 @@ agent_type:0:rule_id:2@covering_class_id:0:site_type':2:state:0
 agent_type:0:rule_id:2@covering_class_id:0:site_type':1:state:0
 - A map of covering classes with creation rules:
 - A map of covering classes with modification rules (without creation rules):
+- A map of bdu test rules:
+agent_type:0:rule_id:0
+agent_type_ if(mvbdu_id:7) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:6) x1 < 1 then 
+agent_type_   if(mvbdu_id:5) x2 < 0 then 
+agent_type_    false
+agent_type_   else 
+agent_type_    if(mvbdu_id:4) x2 < 1 then 
+agent_type_     true
+agent_type_    else 
+agent_type_     false
+agent_type_  else 
+agent_type_   false
+agent_type:0:rule_id:1
+agent_type_ if(mvbdu_id:7) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:6) x1 < 1 then 
+agent_type_   if(mvbdu_id:5) x2 < 0 then 
+agent_type_    false
+agent_type_   else 
+agent_type_    if(mvbdu_id:4) x2 < 1 then 
+agent_type_     true
+agent_type_    else 
+agent_type_     false
+agent_type_  else 
+agent_type_   false
+agent_type:0:rule_id:2
+agent_type_ if(mvbdu_id:7) x1 < 0 then 
+agent_type_  false
+agent_type_ else 
+agent_type_  if(mvbdu_id:6) x1 < 1 then 
+agent_type_   if(mvbdu_id:5) x2 < 0 then 
+agent_type_    false
+agent_type_   else 
+agent_type_    if(mvbdu_id:4) x2 < 1 then 
+agent_type_     true
+agent_type_    else 
+agent_type_     false
+agent_type_  else 
+agent_type_   false
+- A map of bdu creation rules:
+- A map of modification rules:
 execution finished without any exception

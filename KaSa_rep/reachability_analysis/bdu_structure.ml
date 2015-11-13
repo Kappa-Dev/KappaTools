@@ -16,6 +16,7 @@ open Bdu_analysis_type
 open Covering_classes_type
 open Cckappa_sig
 open Bdu_build
+open Bdu_build_common
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "BDU structure") message exn (fun () -> default)  
@@ -109,4 +110,108 @@ let collect_remanent_modif_opt_map parameter error store_remanent_modif_opt =
 (* Build BDU test, creation and a list of modification rules*)
 (*************************************************************************************)
 
+(*************************************************************************************)
+(*build bdu for test rules*)
+
+let collect_test_bdu_map parameter error store_test_map =
+  let add_link (agent_type, rule_id) (handler, bdu) store_result =
+    let (l, old) =
+      Map_test_bdu.Map.find_default ([], []) (agent_type, rule_id) store_result
+    in
+    let result_map =
+      Map_test_bdu.Map.add (agent_type, rule_id)
+        (l, (handler, bdu) :: old) store_result
+    in
+    error, result_map
+  in
+  Map_test.Map.fold (fun (agent_type, rule_id) (l1, l2) (error, store_result) ->
+    (*return a list of a pair (site, state) *)
+    let error, pair_list =
+      List.fold_left (fun (error, current_list) (cv_id, site, state) ->
+        let pair_list = (site, state) :: current_list in
+        error, pair_list
+      ) (error, []) l2
+    in
+    (*build bdu test from this pair_list*)
+    let error, (handler, bdu_test) =
+      build_bdu parameter error pair_list
+    in
+    (*store handler, bdu_test in a map with (agent_type, rule_id) *)
+    let error, store_result =
+      add_link (agent_type, rule_id) (handler, bdu_test) store_result
+    in
+    error, store_result
+  ) store_test_map (error, Map_test_bdu.Map.empty)
+
+(*************************************************************************************)
+(*build bdu for creation rules*)
+
+let collect_creation_bdu_map parameter error store_creation_map =
+  let add_link (agent_type, rule_id) (handler, bdu) store_result =
+    let (l, old) =
+      Map_creation_bdu.Map.find_default ([], []) (agent_type, rule_id) store_result
+    in
+    let result_map =
+      Map_creation_bdu.Map.add (agent_type, rule_id)
+        (l, (handler, bdu) :: old) store_result
+    in
+    error, result_map
+  in
+  Map_creation.Map.fold (fun (agent_type, rule_id) (l1, l2) (error, store_result) ->
+    (*return a list of a pair (site, state) *)
+    let error, pair_list =
+      List.fold_left (fun (error, current_list) (cv_id, site, state) ->
+        let pair_list = (site, state) :: current_list in
+        error, pair_list
+      ) (error, []) l2
+    in
+    (*build bdu test from this pair_list*)
+    let error, (handler, bdu_creation) =
+      build_bdu parameter error pair_list
+    in
+    (*store handler, bdu_test in a map with (agent_type, rule_id) *)
+    let error, store_result =
+      add_link (agent_type, rule_id) (handler, bdu_creation) store_result
+    in
+    error, store_result
+  ) store_creation_map (error, Map_creation_bdu.Map.empty)
+
+(*************************************************************************************)
+(*list of modification rules*)
+
+let collect_modif_list_map parameter error store_modif_opt_map =
+  (*let error, (handler, bdu_init) = bdu_init parameter error in*)
+  let add_link (agent_type, rule_id) list store_result =
+    let (l, old) =
+      Map_modif_list.Map.find_default ([], []) (agent_type, rule_id) store_result
+    in
+    let result_map =
+      Map_modif_list.Map.add (agent_type, rule_id)
+        (l, (List.concat [list; old])) store_result
+    in
+    error, result_map
+  in
+  Map_modif_creation.Map.fold (fun (agent_type, rule_id) (l1, l2) (error, store_result) ->
+    (*return a list of a pair (site, state) *)
+    let error, list =
+      List.fold_left (fun (error, current_list) (cv_id, site, state) ->
+        let list = site :: current_list in
+        error, list
+      ) (error, []) l2
+    in
+    (*build hanlder and list_a from modification list*)
+    (*let error, (handler, list_a) =
+      List_algebra.build_list
+        (Boolean_mvbdu.list_allocate parameter)
+        error
+        parameter
+        handler
+        list
+    in*)
+    (*store handler, bdu_test in a map with (agent_type, rule_id) *)
+    let error, store_result =
+      add_link (agent_type, rule_id) list store_result
+    in
+    error, store_result
+  ) store_modif_opt_map (error, Map_modif_list.Map.empty)
 
