@@ -13,7 +13,6 @@
   * under the terms of the GNU Library General Public License *)
 
 open Bdu_analysis_type
-open Covering_classes_type
 open Cckappa_sig
 open Bdu_build
 open Bdu_build_common
@@ -113,7 +112,7 @@ let collect_remanent_modif_opt_map parameter error store_remanent_modif_opt =
 (*************************************************************************************)
 (*build bdu for test rules*)
 
-let collect_test_bdu_map parameter error store_test_map =
+(*let collect_test_bdu_map parameter error store_test_map =
   let add_link (agent_type, rule_id) (handler, bdu) store_result =
     let (l, old) =
       Map_test_bdu.Map.find_default ([], []) (agent_type, rule_id) store_result
@@ -141,12 +140,47 @@ let collect_test_bdu_map parameter error store_test_map =
       add_link (agent_type, rule_id) (handler, bdu_test) store_result
     in
     error, store_result
-  ) store_test_map (error, Map_test_bdu.Map.empty)
+  ) store_test_map (error, Map_test_bdu.Map.empty)*)
+
+let collect_test_bdu parameter error store_test_map =
+  let error, init = AgentMap.create parameter error 0 in
+  Map_test.Map.fold (fun (agent_type, rule_id) (l1, l2) (error, store_result) ->
+    (*return a list of a pair (site, state) *)
+    let error, pair_list =
+      List.fold_left (fun (error, current_list) (cv_id, site, state) ->
+        let pair_list = (site, state) :: current_list in
+        error, pair_list
+      ) (error, []) l2
+    in
+    (*-----------------------------------------------------------------------*)
+    (*build bdu test from this pair_list*)
+    let error, (handler, bdu_test) =
+      build_bdu parameter error pair_list
+    in
+    (*-----------------------------------------------------------------------*)
+    (*store handler, bdu_test in a map with (agent_type, rule_id) *)
+    let error, old_list = 
+      match AgentMap.unsafe_get parameter error agent_type store_result with
+      | error, None -> error, []
+      | error, Some l -> error, l
+    in
+    let new_list = (rule_id, bdu_test) :: old_list in
+    (*-----------------------------------------------------------------------*)
+    let error, store_result =
+      AgentMap.set
+        parameter
+        error
+        agent_type
+        (List.rev new_list)
+        store_result
+    in
+    error, store_result
+  ) store_test_map (error, init)
 
 (*************************************************************************************)
 (*build bdu for creation rules*)
 
-let collect_creation_bdu_map parameter error store_creation_map =
+(*let collect_creation_bdu_map parameter error store_creation_map =
   let add_link (agent_type, rule_id) (handler, bdu) store_result =
     let (l, old) =
       Map_creation_bdu.Map.find_default ([], []) (agent_type, rule_id) store_result
@@ -174,7 +208,42 @@ let collect_creation_bdu_map parameter error store_creation_map =
       add_link (agent_type, rule_id) (handler, bdu_creation) store_result
     in
     error, store_result
-  ) store_creation_map (error, Map_creation_bdu.Map.empty)
+  ) store_creation_map (error, Map_creation_bdu.Map.empty)*)
+
+let collect_creation_bdu parameter error store_creation_map =
+  let error, init = AgentMap.create parameter error 0 in
+  Map_creation.Map.fold (fun (agent_type, rule_id) (l1, l2) (error, store_result) ->
+    (*return a list of a pair (site, state) *)
+    let error, pair_list =
+      List.fold_left (fun (error, current_list) (cv_id, site, state) ->
+        let pair_list = (site, state) :: current_list in
+        error, pair_list
+      ) (error, []) l2
+    in
+    (*-----------------------------------------------------------------------*)
+    (*build bdu test from this pair_list*)
+    let error, (handler, bdu_creation) =
+      build_bdu parameter error pair_list
+    in
+    (*-----------------------------------------------------------------------*)
+    (*store handler, bdu_test in a map with (agent_type, rule_id) *)
+    let error, old_list = 
+      match AgentMap.unsafe_get parameter error agent_type store_result with
+      | error, None -> error, []
+      | error, Some l -> error, l
+    in
+    let new_list = (rule_id, bdu_creation) :: old_list in
+    (*-----------------------------------------------------------------------*)
+    let error, store_result =
+      AgentMap.set
+        parameter
+        error
+        agent_type
+        (List.rev new_list)
+        store_result
+    in
+    error, store_result
+  ) store_creation_map (error, init)
 
 (*************************************************************************************)
 (*list of modification rules*)

@@ -380,51 +380,114 @@ agent_type:1:rule_id:1@covering_class_id:0:site_type':1:state:0
 agent_type:2:rule_id:1@covering_class_id:0:site_type':1:state:0
 - A map of covering classes with creation rules:
 - A map of covering classes with modification rules (without creation rules):
-- A map of bdu test rules:
-agent_type:0:rule_id:0
-agent_type_ if(mvbdu_id:7) x1 < 0 then 
-agent_type_  false
-agent_type_ else 
-agent_type_  if(mvbdu_id:6) x1 < 1 then 
-agent_type_   if(mvbdu_id:5) x2 < 0 then 
-agent_type_    false
-agent_type_   else 
-agent_type_    if(mvbdu_id:4) x2 < 1 then 
-agent_type_     true
-agent_type_    else 
-agent_type_     false
-agent_type_  else 
-agent_type_   false
-agent_type:1:rule_id:0
-agent_type_ if(mvbdu_id:3) x1 < 0 then 
-agent_type_  false
-agent_type_ else 
-agent_type_  if(mvbdu_id:2) x1 < 1 then 
-agent_type_   true
-agent_type_  else 
-agent_type_   false
-agent_type:1:rule_id:1
-agent_type_ if(mvbdu_id:7) x1 < 0 then 
-agent_type_  false
-agent_type_ else 
-agent_type_  if(mvbdu_id:6) x1 < 1 then 
-agent_type_   if(mvbdu_id:5) x2 < 0 then 
-agent_type_    false
-agent_type_   else 
-agent_type_    if(mvbdu_id:4) x2 < 1 then 
-agent_type_     true
-agent_type_    else 
-agent_type_     false
-agent_type_  else 
-agent_type_   false
-agent_type:2:rule_id:1
-agent_type_ if(mvbdu_id:3) x1 < 0 then 
-agent_type_  false
-agent_type_ else 
-agent_type_  if(mvbdu_id:2) x1 < 1 then 
-agent_type_   true
-agent_type_  else 
-agent_type_   false
-- A map of bdu creation rules:
+- Bdu test rules:
+agent_type_0:
+rule_id:0
+agent_type_0: if(mvbdu_id:7) x1 < 0 then 
+agent_type_0:  false
+agent_type_0: else 
+agent_type_0:  if(mvbdu_id:6) x1 < 1 then 
+agent_type_0:   if(mvbdu_id:5) x2 < 0 then 
+agent_type_0:    false
+agent_type_0:   else 
+agent_type_0:    if(mvbdu_id:4) x2 < 1 then 
+agent_type_0:     true
+agent_type_0:    else 
+agent_type_0:     false
+agent_type_0:  else 
+agent_type_0:   false
+agent_type_1:
+rule_id:0
+agent_type_1: if(mvbdu_id:3) x1 < 0 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_1:   true
+agent_type_1:  else 
+agent_type_1:   false
+rule_id:1
+agent_type_1: if(mvbdu_id:7) x1 < 0 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:6) x1 < 1 then 
+agent_type_1:   if(mvbdu_id:5) x2 < 0 then 
+agent_type_1:    false
+agent_type_1:   else 
+agent_type_1:    if(mvbdu_id:4) x2 < 1 then 
+agent_type_1:     true
+agent_type_1:    else 
+agent_type_1:     false
+agent_type_1:  else 
+agent_type_1:   false
+agent_type_2:
+rule_id:1
+agent_type_2: if(mvbdu_id:3) x1 < 0 then 
+agent_type_2:  false
+agent_type_2: else 
+agent_type_2:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_2:   true
+agent_type_2:  else 
+agent_type_2:   false
+- Bdu creation rules:
 - A map of modification rules:
+
+------------------------------------------------------------
+* Fixpoint iteration :
+------------------------------------------------------------
+- An array of bdu_creation:
+------------------------------------------------------------
+- An array of bdu_test:
+agent_type_0:
+index of this array:0
+agent_type_0: if(mvbdu_id:3) x1 < 0 then 
+agent_type_0:  false
+agent_type_0: else 
+agent_type_0:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_0:   true
+agent_type_0:  else 
+agent_type_0:   false
+index of this array:1
+agent_type_0: if(mvbdu_id:3) x1 < 0 then 
+agent_type_0:  false
+agent_type_0: else 
+agent_type_0:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_0:   true
+agent_type_0:  else 
+agent_type_0:   false
+agent_type_1:
+index of this array:0
+agent_type_1: if(mvbdu_id:3) x1 < 0 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_1:   true
+agent_type_1:  else 
+agent_type_1:   false
+index of this array:1
+agent_type_1: if(mvbdu_id:3) x1 < 0 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_1:   true
+agent_type_1:  else 
+agent_type_1:   false
+agent_type_2:
+index of this array:0
+agent_type_2: if(mvbdu_id:3) x1 < 0 then 
+agent_type_2:  false
+agent_type_2: else 
+agent_type_2:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_2:   true
+agent_type_2:  else 
+agent_type_2:   false
+index of this array:1
+agent_type_2: if(mvbdu_id:3) x1 < 0 then 
+agent_type_2:  false
+agent_type_2: else 
+agent_type_2:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_2:   true
+agent_type_2:  else 
+agent_type_2:   false
+------------------------------------------------------------
+- An array of bdu_creation and bdu_test:
 execution finished without any exception

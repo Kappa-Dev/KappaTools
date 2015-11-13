@@ -21,6 +21,7 @@ open Memo_sig
 open Site_map_and_set
 open Covering_classes_type
 open Bdu_build_common
+open Bdu_structure
 
 (************************************************************************************)
 (*fixpoint iteration function*)
@@ -86,173 +87,103 @@ let compute_update parameter error rule_id handler bdu_test modif_list bdu_creat
     bdu_remanent_array
   in
   error, bdu_remanent_array
-    
-(************************************************************************************)
-(*function mapping a list of covering class, return triple
-  (list of new_index, map1, map2)
-  For example:
-  - intput : covering_class_list [0;1]
-  - output : 
-  {new_index_of_covering_class: [1;2],
-  map1 (from 0->1, 1->2),
-  map2 (from 1->0, 2->1)
-  }
-*)
-
-let new_index_pair_map parameter error l =
-  let rec aux acc k map1 map2 =
-    match acc with
-    | [] -> error, (map1, map2)
-    | h :: tl ->
-      let error, map1 =
-        add_map parameter error h k map1
-      in
-      let error, map2 =
-        add_map parameter error k h map2
-      in
-      aux tl (k+1) map1 map2
-  in aux l 1 empty_map empty_map
 
 (************************************************************************************)
-(*convert a list to a set*)
+(*store the product of [|bdu_creation * bdu_test * modif_list|], rule_id is
+  an index, nrules is the length of this array. *)
 
-let list2set parameter error list =
-  List.fold_left (fun (error, current_set) elt ->
-    let add_set =
-      Set.add elt current_set
-    in
-    error, add_set
-  ) (error, Set.empty) list
-
-(************************************************************************************)
-(* From each covering class, with their new index for sites, build 
-   (bdu_test, bdu_creation and list of modification).
-   Note: not taking sites in the local, because it will be longer.
-   - Convert type set of sites into map restriction
-*)
-
-let collect_remanent_test parameter error rule store_remanent store_result =
-  AgentMap.fold2_common parameter error 
-    (fun parameter error agent_type remanent agent store_result ->
-      match agent with
-      | Ghost -> error, store_result
-      | Agent agent ->
-        let agent_type_test = agent.agent_name in
-        (*get store_dic*)
-        let store_dic = remanent.store_dic in
-        (*restriction map*)
-        let error, triple_list =
-          Dictionary_of_Covering_class.fold
-            (fun list _ id (error, current_list) ->
-              (*-------------------------------------------------------------------*)
-              (*convert a list of a covering class into a set*)
-              let error, set = list2set parameter error list in
-              (*-------------------------------------------------------------------*)
-              (*get the next_set*)
-              let new_set = (id, list, set) :: current_list in
-              error, List.rev new_set
-            ) store_dic (error, [])
-        in
-        (*-------------------------------------------------------------------------*)
-        (*store*)
-        let error, store_result =
-          AgentMap.set
-            parameter
-            error
-            agent_type_test
-            triple_list
-            store_result
-        in
-        error, store_result
-    ) store_remanent rule.rule_lhs.views store_result
-
-(************************************************************************************)
-
-let collect_test_restriction parameter error rule store_remanent_test store_result =
-  AgentMap.fold2_common parameter error
-    (fun parameter error agent_type agent triple_list store_result ->
-      match agent with
-      | Ghost -> error, store_result
-      | Agent agent ->
-        let agent_type_test = agent.agent_name in
-        let error, pair_list =
-          List.fold_left (fun (error, current_list) (id, list, set) ->
-            (*-----------------------------------------------------------------*)
-            let error, (map_new_index_forward, _) =
-              new_index_pair_map parameter error list
-            in
-            (*-----------------------------------------------------------------*)
-            let error, map_res =
-              Site_map_and_set.Map.monadic_fold_restriction parameter error
-                (fun paramaters error site port store_result ->
-                  let state = port.site_state.min in
-                  (*-----------------------------------------------------------*)
-                  (*search new_index of site inside a map forward*)
-                  let site' =
-                    Site_map_and_set.Map.find_default
-                      0 site map_new_index_forward in
-                  (*-----------------------------------------------------------*)
-                  (*add this new_index site into a map restriction*)
-                    error,Site_map_and_set.Map.add
-                      site'
-                      state
-                      store_result
-                ) set agent.agent_interface Site_map_and_set.Map.empty
-            in
-            error, ((id, map_res) :: current_list)
-          ) (error, []) triple_list
-        in
-        (*-----------------------------------------------------------------*)
-        (*get old*)
-        let error, old_pair =
-          match AgentMap.unsafe_get parameter error agent_type_test store_result with
-          | error, None -> error, []
-          | error, Some l -> error, l
-        in
-        let new_pair_list = List.concat [pair_list; old_pair] in
-        (*-----------------------------------------------------------------*)
-        let error, store_result =
-          AgentMap.set
-            parameter
-            error
-            agent_type_test
-            new_pair_list
-            store_result
-        in
-        error, store_result
-    ) rule.rule_lhs.views store_remanent_test store_result
-
-(************************************************************************************)
-
-let collect_bdu_test parameter error store_test_restriction store_result =
+let collect_bdu_creation_array parameter error handler_sig 
+    store_creation_bdu store_result =
   let error, (handler, bdu_init) = bdu_init parameter error in
-  AgentMap.fold parameter error
-    (fun parameter error agent_type pair_list store_result ->
-      (*build bdu test*)
-      let error, list =
-        List.fold_left (fun (error, store_list) (id, map_res) ->
-          let error, (l, (handler, bdu_test)) =
-            Site_map_and_set.Map.fold
-              (fun site' state (error, (current_list, _)) ->
-                let p = (site', state) :: current_list in
-                let error, (handler, bdu_test) =
-                  build_bdu parameter error p
-                in
-                error, (p, (handler, bdu_test))
-              ) map_res (error, ([], (handler, bdu_init)))
-          in
-          (*store in an array*)
-          error, ((l, id, (handler, bdu_test)) :: store_list)
-        ) (error, []) pair_list
+  (*create an empty array*)
+  let nrules = Handler.nrules parameter error handler_sig in
+  let store_array = Array.make nrules bdu_init in
+  (*get rule_id in creation_map*)
+  let error, store_result =
+   AgentMap.fold parameter error
+     (fun parameter error agent_type l store_result ->
+         let error, result_array =
+           List.fold_left (fun (error, current_array) (rule_id, bdu_creation) ->
+             current_array.(rule_id) <- bdu_creation;
+             error, current_array
+           ) (error, store_array) l
+         in
+        (*store*)
+         let error, store_result =
+           AgentMap.set
+             parameter
+             error
+             agent_type
+             result_array
+             store_result
+         in
+         error, store_result
+     ) store_creation_bdu store_result
+  in
+  error, store_result
+
+(************************************************************************************)
+(*store bdu_test in an array, index of this array is rule_id of test
+  rules. The lenght of this array is the number of rules.*)
+(*FIXME*)
+
+let collect_bdu_test_array parameter error handler_sig store_test_bdu store_result =
+  let error, (handler, bdu_init) = bdu_init parameter error in
+  (*create an empty array*)
+  let nrules = Handler.nrules parameter error handler_sig in
+  let store_array = Array.make nrules bdu_init in
+  (*get rule_id in creation_map*)
+  let error, store_result =
+   AgentMap.fold parameter error
+     (fun parameter error agent_type l store_result ->
+         let error, result_array =
+           List.fold_left (fun (error, current_array) (rule_id, bdu_test) ->
+             store_array.(rule_id) <- bdu_test;
+             error, store_array
+           ) (error, [||]) l
+         in
+        (*store*)
+         let error, store_result =
+           AgentMap.set
+             parameter
+             error
+             agent_type
+             result_array
+             store_result
+         in
+         error, store_result
+     ) store_test_bdu store_result
+  in
+  error, store_result
+  
+(************************************************************************************)
+(*combine creation and test*)
+
+let collect_bdu_creation_test_array parameter error handler_sig store_creation_bdu
+    store_test_bdu store_result =
+  let error, (handler, bdu_init) = bdu_init parameter error in
+  (*create an empty array*)
+  let nrules = Handler.nrules parameter error handler_sig in
+  let store_array = Array.make nrules bdu_init in
+  AgentMap.fold2_common parameter error
+    (fun parameter error agent_type l1 l2 store_result ->
+      let result_array =
+        List.fold_left (fun _ (rule_id_creation, bdu_creation) ->
+          List.fold_left (fun _ (rule_id_test, bdu_test) ->
+            store_array.(rule_id_test) <- bdu_test;
+            store_array.(rule_id_creation) <- bdu_creation;
+            store_array
+          ) [||] l2
+        ) [||] l1
       in
-      (*store*)
       let error, store_result =
         AgentMap.set
           parameter
           error
           agent_type
-          (List.rev list)
+          result_array
           store_result
       in
       error, store_result
-    ) store_test_restriction store_result
+    ) store_creation_bdu store_test_bdu store_result
+  

@@ -21,15 +21,12 @@ open Print_bdu_analysis_static
 open Print_bdu_analysis_dynamic
 open Print_bdu_build (*REMOVE*)
 open Print_bdu_build_map
+open Print_bdu_fixpoint
 
 let warn parameters mh message exn default =
   Exception.warn parameters mh (Some "BDU creation") message exn (fun () -> default)  
 
 let trace = false
-
-(************************************************************************************)
-(*fixpoint iteration*)
-
 
 (************************************************************************************)
 (*MAIN PRINT*)
@@ -60,5 +57,11 @@ let print_result parameter error result =
       parameter
       error
       result.store_bdu_build_map
+  in
+  let _ =
+    print_bdu_fixpoint
+      parameter
+      error
+      result.store_bdu_fixpoint
   in
   error
