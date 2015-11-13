@@ -371,31 +371,6 @@ let find_implicit_infos sigs contact_map ags =
   let max_s m = function
     | Linked (i,_) -> max i m
     | Freed | Maintained | Erased -> m in
-  let rec aux_internals ty_id ints acc i =
-    if i = Array.length ints then acc
-    else
-      let acc' =
-	match ints.(i) with
-	| (I_ANY | I_VAL_CHANGED _ | I_VAL_ERASED _) -> acc
-	| I_ANY_CHANGED j ->
-	   Tools.list_map_flatten
-	     (fun ints' ->
-	      List.map (fun x ->
-			let ints'' = Array.copy ints' in
-			let () = ints''.(i) <- I_VAL_CHANGED (x,j) in
-			ints'')
-		       (internals_from_contact_map sigs contact_map ty_id i))
-	     acc
-	| I_ANY_ERASED ->
-	   Tools.list_map_flatten
-	     (fun ints' ->
-	      List.map (fun x ->
-			let ints'' = Array.copy ints' in
-			let () = ints''.(i) <- I_VAL_ERASED x in
-			ints'')
-		       (internals_from_contact_map sigs contact_map ty_id i))
-	     acc in
-      aux_internals ty_id ints acc' (succ i) in
   let new_switch free_id = function
     | Maintained -> Linked (Location.dummy_annot free_id)
     | Freed | Linked _ | Erased -> Freed in
@@ -454,14 +429,12 @@ let find_implicit_infos sigs contact_map ags =
   and aux_ags max_id = function
     | [] -> [succ max_id,[],[]]
     | ag :: ag_tail ->
-       Tools.list_map_flatten
+       List.map
 	 (fun (free_id,ports,ags,cor) ->
-	  List.map (fun ints ->
-		    (free_id,
-		     {ra_type = ag.ra_type; ra_ports = ports; ra_ints = ints;
-		      ra_syntax = ag.ra_syntax}::ags,
-		     cor))
-		   (aux_internals ag.ra_type ag.ra_ints [ag.ra_ints] 0)
+	  (free_id,
+	   {ra_type = ag.ra_type; ra_ports = ports; ra_ints = ag.ra_ints;
+	    ra_syntax = ag.ra_syntax}::ags,
+	   cor)
 	 )
 	 (aux_one ag_tail ag.ra_type max_id ag.ra_ports 0)
   in List.map (fun (_,mix,todo) -> (mix,todo)) (aux_ags 0 ags)
