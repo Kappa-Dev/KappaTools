@@ -89,13 +89,15 @@ module type Map =
     val add_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a -> 'a t -> 'error * 'a t
     val remove_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * 'a t
 
-    (*
+    
     val join_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> elt -> 'a -> 'a t -> 'error * 'a t
     val split_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * ('a t * 'a option * 'a t)
-    val update: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error  -> 'a t -> 'a t -> 'error * 'a t    
-    val map2_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('a -> 'a -> 'a) -> 'a t -> 'a t -> 'error * 'a t 
-    val fold2z_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a  -> 'b  -> ('error * 'c)  -> ('error * 'c)) -> 'a t -> 'b t -> 'c -> 'error * 'c 
-    val fold2_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a  -> 'b  -> ('error * 'c)  -> ('error * 'c)) -> (elt -> 'a   -> ('error * 'c)  -> ('error * 'c)) -> (elt -> 'b  -> ('error * 'c)  -> ('error * 'c)) ->  'a t -> 'b t -> 'c -> 'error * 'c 
+    val update_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error  -> 'a t -> 'a t -> 'error * 'a t    
+    val map2_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('parameters -> 'error -> 'a -> 'error * 'a) -> ('parameters -> 'error -> 'a -> 'error *  'a) -> ('parameters -> 'error -> 'a -> 'a -> 'error * 'a) -> 'a t -> 'a t -> 'error * 'a t
+    val map2z_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('parameters -> 'error -> 'a -> 'a -> 'error * 'a) -> 'a t -> 'a t -> 'error * 'a t 
+  (*  val fold2z_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a  -> 'b  -> ('error * 'c)  -> ('error * 'c)) -> 'a t -> 'b t -> 'c -> 'error * 'c 
+   *)  
+    (*  val fold2_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a  -> 'b  -> ('error * 'c)  -> ('error * 'c)) -> (elt -> 'a   -> ('error * 'c)  -> ('error * 'c)) -> (elt -> 'b  -> ('error * 'c)  -> ('error * 'c)) ->  'a t -> 'b t -> 'c -> 'error * 'c 
     val fold2_sparse_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a  -> 'b  -> ('error * 'c)  -> ('error * 'c)) ->  'a t -> 'b t -> 'c -> 'error * 'c
     val iter2_sparse_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a  -> 'b  -> 'error -> 'error)->  'a t -> 'b t -> 'error
     val diff_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t * 'a t 
