@@ -45,9 +45,9 @@ module type Set =
     val diff: t -> t -> t
     (** [diff a b] = [minus (union a b) (inter a b)] *)
     val union_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t 
-  (*  val inter_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t
+    val inter_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t
     val diff_safe:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t
-    val split_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * ( t * bool * t)*)
+  (*  val split_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * ( t * bool * t)*)
 
     val cardinal: t -> int
 
@@ -59,6 +59,8 @@ module type Set =
 
     val compare: t -> t -> int
     val equal: t -> t -> bool
+
+
     val subset: t -> t -> bool
 
     val iter: (elt -> unit) -> t -> unit
@@ -97,8 +99,28 @@ module type Map =
     val diff: 'a t -> 'a t -> 'a t * 'a t
     val union: 'a t -> 'a t -> 'a t
     val update: 'a t -> 'a t -> 'a t
-    val diff_pred: ('a -> 'a -> bool) -> 'a t -> 'a t -> 'a t * 'a t
-
+    val diff_pred: ('a -> 'a -> bool) -> 'a t -> 'a t -> 'a t * 'a t 						 
+    (*   val add_safe:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a -> 'a t -> 'error * 'a t*)
+    (*    val remove_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * 'a t
+    val mem_safe:  elt -> 'a t -> bool
+    val map_safe: ('a -> 'b) -> 'a t -> 'b t
+    val mapi_safe: (elt -> 'a -> 'b) -> 'a t -> 'b t
+    val join_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> elt -> 'a -> 'a t -> 'error * 'a t
+    val split_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * ('a t * 'a option * 'a t)
+    val update: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error  -> 'a t -> 'a t -> 'error * 'a t    
+    val map2_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('a -> 'a -> 'a) -> 'a t -> 'a t -> 'error * 'a t 
+    val fold2z_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a  -> 'b  -> ('error * 'c)  -> ('error * 'c)) -> 'a t -> 'b t -> 'c -> 'error * 'c 
+    val fold2_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a  -> 'b  -> ('error * 'c)  -> ('error * 'c)) -> (elt -> 'a   -> ('error * 'c)  -> ('error * 'c)) -> (elt -> 'b  -> ('error * 'c)  -> ('error * 'c)) ->  'a t -> 'b t -> 'c -> 'error * 'c 
+    val fold2_sparse_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a  -> 'b  -> ('error * 'c)  -> ('error * 'c)) ->  'a t -> 'b t -> 'c -> 'error * 'c
+    val iter2_sparse_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a  -> 'b  -> 'error -> 'error)->  'a t -> 'b t -> 'error
+    val min_elt: (elt -> 'a -> bool) -> 'a t -> elt option  
+    val diff_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t * 'a t 
+    val diff_pred_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('a -> 'a -> bool) -> 'a t -> 'a t -> 'error * 'a t * 'a t 
+    val merge_safe : ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t
+    val union_safe : ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t
+    val fold_map_restriction_safe:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a -> ('error * 'b) -> ('error* 'b)) -> set -> 'a t -> 'b -> 'error * 'b 
+ *)																					
+																									     
     val iter: (elt -> 'a -> unit) -> 'a t -> unit
     val fold: (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
     val monadic_fold2:
@@ -188,7 +210,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  if height_left > height_right + 2 then begin
               match left with
               | Private.Empty ->
-		   let error = warn parameters error "setMap.ml" (Some "balance_set,line 94") (invalid_arg "Set_and_map.balance_set") in
+		   let error = warn parameters error "setMap.ml" (Some "Set.balance,line 91") (invalid_arg "Set_and_map.Set.balance") in
 		   error,empty
               | Private.Node(leftleft,leftvalue,leftright,_) ->
 		 if height leftleft >= height leftright then
@@ -196,7 +218,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		 else begin
 		     match leftright with
                      | Private.Empty ->
-			let error = warn parameters error "setMap.ml" (Some "balance_set,line 100") (invalid_arg "Set_and_Map.balance_set") in
+			let error = warn parameters error "setMap.ml" (Some "Set.balance,line 221") (invalid_arg "Set_and_Map.Set.balance") in
 			error,empty
                      | Private.Node(leftrightleft,leftrightvalue,leftrightright,_) ->
 			(error,
@@ -208,7 +230,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	    end else if height_right > height_left + 2 then begin
               match right with
               | Private.Empty ->
-		 let error = warn parameters error "setMap.ml" (Some  "balance_set,line 110") (invalid_arg "Set_and_Map.balance_set") in
+		 let error = warn parameters error "setMap.ml" (Some  "balance_set,line 233") (invalid_arg "Set_and_Map.Set.balance") in
 		 error,empty
               | Private.Node (rightleft,rightvalue,rightright,_) ->
 		 if height rightright >= height rightleft then
@@ -217,7 +239,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
               match rightleft with
               | Private.Empty ->
 		 let error = warn parameters error "setMap.ml"
-				  (Some "balance_set,line 116") (invalid_arg "Set_and_Map.balance_set") in
+				  (Some "balance_set,line 242") (invalid_arg "Set_and_Map.Set.balance") in
 		 error,empty
               | Private.Node(rightleftleft,rightleftvalue,rightleftright,_) ->
                  error,node
@@ -814,6 +836,46 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 			   (node right1 key0 data0 right0)
             else node left key data right
 
+	let balance_safe warn parameter error left key data right =
+	  let height_left = height left in
+	  let height_right = height right in
+	  if height_left > height_right + 2 then
+	    match left with
+            | Private.Empty ->
+	       let error = warn parameter error "setMap.ml" (Some "Map.balance_safe,line 845") (invalid_arg "Map.balance_map") in
+	       error,empty (* height_left > height_right + 2 >= 2 *)
+            | Private.Node (left0,key0,data0,right0,_,_) ->
+               if height left0 >= height right0 then
+		 error,node left0 key0 data0 (node right0 key data right)
+               else
+		 match right0 with
+		 | Private.Empty ->
+		    let error = warn parameter error "setMap.ml" (Some "Map.balance_safe,line 853") (invalid_arg "Map.balance_map") in
+		    error,empty  (* 0 <= height left0 < height right0 *)
+		 | Private.Node (left1,key1,data1,right1,_,_) ->
+                    error,node (node left0 key0 data0 left1)
+			 key1 data1
+			 (node right1 key data right)
+	  else
+            if height_right > height_left + 2 then
+              match right with
+              | Private.Empty ->
+		  let error = warn parameter error "setMap.ml" (Some "Map.balance_safe,line 853") (invalid_arg "Map.balance_map") in
+		  error,empty (* height_left > height_right + 2 >= 2 *)			  
+              | Private.Node (left0,key0,data0,right0,_,_) ->
+		 if height right0 >= height left0 then
+		   error,node (node left key data left0) key0 data0 right0
+		 else
+		   match left0 with
+		   | Private.Empty ->
+		      let error = warn parameter error "setMap.ml" (Some "Map.balance_safe,line 853") (invalid_arg "Map.balance_map") in
+		      error,empty (* height_left > height_right + 2 >= 2 *)			  
+		   | Private.Node (left1,key1,data1,right1,_,_) ->
+                      error,node (node left key data left1)
+			   key1 data1
+			   (node right1 key0 data0 right0)
+            else error,node left key data right
+
 	let rec add key data = function
 	  | Private.Empty -> node empty key data empty
 	  | Private.Node (left,key_map,data_map,right,_,_) ->
@@ -823,6 +885,18 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	       balance (add key data left) key_map data_map right
              else balance left key_map data_map (add key data right)
 
+	let rec add_safe warn parameter error key data = function
+	  | Private.Empty -> error,node empty key data empty
+	  | Private.Node (left,key_map,data_map,right,_,_) ->
+             let cmp = Ord.compare key key_map in
+             if cmp = 0 then error,node left key_map data right
+             else if cmp < 0 then
+	       let error, left' = add_safe warn parameter error  key data left in 
+	       balance_safe warn parameter error left' key_map data_map right
+             else
+	       let error, right' = add_safe warn parameter error key data right in 
+	       balance_safe warn parameter error left key_map data_map right'
+		       
 	let rec extract_min_binding map key data map' =
 	  match map with
 	  | Private.Empty -> (key,data),map'
