@@ -115,7 +115,7 @@ let print_bdu_fixpoint parameter error result =
       error
       result.store_bdu_creation_array    
   in
-  let _ =
+  (*let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "- TEST with MAP An array of bdu_creation:\n";
     print_bdu_creation_array_map
@@ -130,7 +130,7 @@ let print_bdu_fixpoint parameter error result =
       parameter
       error
       result.store_bdu_test_array_map    
-  in
+  in*)
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
@@ -141,7 +141,7 @@ let print_bdu_fixpoint parameter error result =
       error
       result.store_bdu_test_array    
   in
-  let _ =
+  (*let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
     fprintf (Remanent_parameters.get_log parameter)
@@ -150,5 +150,5 @@ let print_bdu_fixpoint parameter error result =
       parameter
       error
       result.store_bdu_creation_test_array    
-  in
+  in*)
   error

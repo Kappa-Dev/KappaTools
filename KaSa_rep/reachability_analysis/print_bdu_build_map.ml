@@ -188,7 +188,7 @@ let print_bdu_build_map parameter error result =
   in
   (*-----------------------------------------------------------------*)
   (*print bdu*)
-  let _ =
+  (*let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "- Map of Bdu test rules:\n";
     print_test_bdu_map
@@ -203,7 +203,7 @@ let print_bdu_build_map parameter error result =
       parameter
       error
       result.store_creation_bdu_map
-  in
+  in*)
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "- Bdu test rules:\n";

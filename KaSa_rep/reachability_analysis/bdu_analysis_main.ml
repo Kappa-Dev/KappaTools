@@ -364,7 +364,6 @@ let scan_rule_fixpoint parameter error handler
       error
       handler
       store_creation_bdu
-      store_result.store_bdu_creation_array
   in
   (*-------------------------------------------------------------------------------*)
   let error, store_bdu_test_array =
@@ -373,7 +372,6 @@ let scan_rule_fixpoint parameter error handler
       error
       handler
       store_test_bdu
-      store_result.store_bdu_test_array
   in
   (*-------------------------------------------------------------------------------*)
   let error, store_bdu_creation_test_array = (*TEST*)
@@ -601,7 +599,7 @@ let init_bdu_fixpoint parameter error =
   let error, init_bdu_creation_array = AgentMap.create parameter error 0 in
   let error, init_bdu_test_array     = AgentMap.create parameter error 0 in
   let error, init_bdu_creation_test_array = AgentMap.create parameter error 0 in
-  let init_bdu_creation_array_map = [||] in
+  let init_bdu_creation_array_map = [||] in (*REMOVE*)
   let error, init_bdu_test_array_map = AgentMap.create parameter error 0 in
   let init_bdu_fixpoint =
     {

@@ -147,8 +147,6 @@ agent_type_2:
 - A map of covering classes with test rules:
 - A map of covering classes with creation rules:
 - A map of covering classes with modification rules (without creation rules):
-- Map of Bdu test rules:
-- Map of Bdu creation rules:
 - Bdu test rules:
 - Bdu creation rules:
 - A map of modification rules:
@@ -157,10 +155,6 @@ agent_type_2:
 * Fixpoint iteration :
 ------------------------------------------------------------
 - An array of bdu_creation:
-- TEST with MAP An array of bdu_creation:
-- TEST with MAP An array of bdu_test:
 ------------------------------------------------------------
 - An array of bdu_test:
-------------------------------------------------------------
-- An array of bdu_creation and bdu_test:
 execution finished without any exception

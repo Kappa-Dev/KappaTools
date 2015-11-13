@@ -93,7 +93,8 @@ let compute_update parameter error rule_id handler bdu_test modif_list bdu_creat
   an index, nrules is the length of this array. *)
 
 let collect_bdu_creation_array parameter error handler_sig 
-    store_creation_bdu store_result =
+    store_creation_bdu =
+  let error, init = AgentMap.create parameter error 0 in
   let error, (handler, bdu_init) = bdu_init parameter error in
   (*create an empty array*)
   let nrules = Handler.nrules parameter error handler_sig in
@@ -108,21 +109,30 @@ let collect_bdu_creation_array parameter error handler_sig
              error, current_array
            ) (error, store_array) l
          in
-        (*store*)
+         (*--------------------------------------------------------------------------*)
+         (*store*)
+         let error, old_array =
+           match AgentMap.unsafe_get parameter error agent_type store_result with
+           | error, None -> error, [||]
+           | error, Some a -> error, a
+         in
+         let new_array = Array.append result_array old_array in
+         (*--------------------------------------------------------------------------*)
+         (*store*)
          let error, store_result =
            AgentMap.set
              parameter
              error
              agent_type
-             result_array
+             new_array
              store_result
          in
          error, store_result
-     ) store_creation_bdu store_result
+     ) store_creation_bdu init
   in
   error, store_result
 
-(*build creation rule from a map of bdu_creation*)
+(*build creation rule from a map of bdu_creation REMOVE*)
 
 let collect_bdu_creation_array_map parameter error handler_sig store_creation_bdu_map
     store_result =
@@ -146,7 +156,8 @@ let collect_bdu_creation_array_map parameter error handler_sig store_creation_bd
   rules. The lenght of this array is the number of rules.*)
 (*FIXME*)
 
-let collect_bdu_test_array parameter error handler_sig store_test_bdu store_result =
+let collect_bdu_test_array parameter error handler_sig store_test_bdu =
+  let error, init = AgentMap.create parameter error 0 in
   let error, (handler, bdu_init) = bdu_init parameter error in
   (*create an empty array*)
   let nrules = Handler.nrules parameter error handler_sig in
@@ -161,21 +172,29 @@ let collect_bdu_test_array parameter error handler_sig store_test_bdu store_resu
              error, current_array
            ) (error, store_array) l
          in
+         (*--------------------------------------------------------------------------*)
         (*store*)
+         let error, old_array =
+           match AgentMap.unsafe_get parameter error agent_type store_result with
+           | error, None -> error, [||]
+           | error, Some a -> error, a
+         in
+         let new_array = Array.append result_array old_array in
+         (*--------------------------------------------------------------------------*)
          let error, store_result =
            AgentMap.set
              parameter
              error
              agent_type
-             result_array
+             new_array
              store_result
          in
          error, store_result
-     ) store_test_bdu store_result
+     ) store_test_bdu init
   in
   error, store_result
 
-(*build test rule from a map of bdu_test*)
+(*build test rule from a map of bdu_test REMOVE*)
 
 let collect_bdu_test_array_map parameter error handler_sig store_test_bdu_map
     store_result =
@@ -194,12 +213,14 @@ let collect_bdu_test_array_map parameter error handler_sig store_test_bdu_map
           error, store_array
         ) (error, [||]) l2
       in
+      (*--------------------------------------------------------------------------*)
       let error, old_array =
         match AgentMap.unsafe_get parameter error agent_type store_result with
         | error, None -> error, [||]
         | error, Some a -> error, a
       in
       let new_array = Array.append result_array old_array in
+      (*--------------------------------------------------------------------------*)
       let error, store_result =
         AgentMap.set
           parameter
@@ -214,7 +235,7 @@ let collect_bdu_test_array_map parameter error handler_sig store_test_bdu_map
   error, store_result
 
 (************************************************************************************)
-(*combine creation and test*)
+(*combine creation and test REMOVE*)
 
 let collect_bdu_creation_test_array parameter error handler_sig store_creation_bdu
     store_test_bdu store_result =
@@ -233,12 +254,21 @@ let collect_bdu_creation_test_array parameter error handler_sig store_creation_b
           ) [||] l2
         ) [||] l1
       in
+      (*--------------------------------------------------------------------------*)
+      (*store*)
+      let error, old_array =
+        match AgentMap.unsafe_get parameter error agent_type store_result with
+        | error, None -> error, [||]
+        | error, Some a -> error, a
+      in
+      let new_array = Array.append result_array old_array in
+      (*--------------------------------------------------------------------------*)
       let error, store_result =
         AgentMap.set
           parameter
           error
           agent_type
-          result_array
+          new_array
           store_result
       in
       error, store_result
