@@ -20,30 +20,30 @@ ____________________________________________________________
 	 - detecting siphons
 	 - cutting concurrent events
 	 - blackboard generation
-	 - computing causal past of each observed events (2676)
+	 - computing causal past of each observed events (3024)
 Stats:
- number of step   : 32678
+ number of step   : 33026
  longest story    : 2
- average length   : 1.0912290366
- geometric mean   : 1.12857747178
+ average length   : 1.10153221899
+ geometric mean   : 1.14218941379
 
-	 - causal & weak flow compression (2676)
+	 - causal & weak flow compression (3024)
 
 ____________________________________________________________
 ############################################################
 	 - detecting pseudo inverse events
 	 - blackboard generation
-	 - computing causal past of each observed events (2676)
+	 - computing causal past of each observed events (3024)
 
 ____________________________________________________________
 ############################################################
 Stats:
- number of step   : 10898
+ number of step   : 11430
  longest story    : 2
- average length   : 1.43597262952
- geometric mean   : 1.51918329657
+ average length   : 1.47361002349
+ geometric mean   : 1.55590169049
 
-	 - causal & weak flow compression (2676)
+	 - causal & weak flow compression (3024)
 
 ____________________________________________________________
 ############################################################
