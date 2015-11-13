@@ -537,7 +537,7 @@ covering_class_id:0:site_type':1:state:0
 agent_type_2:
 rule_id:3:
 covering_class_id:0:site_type':1:state:0
-- Modification rule with new index (without creation rules):
+- Modification rule with new index (with creation rules):
 agent_type_0:
 rule_id:1:
 rule_id:1:
@@ -550,6 +550,10 @@ covering_class_id:0:site_type':1:state:0
 agent_type_2:
 rule_id:3:
 covering_class_id:0:site_type':1:state:0
+- Modification rule with new index (without creation rules):
+agent_type_0:
+agent_type_1:
+agent_type_2:
 
 ------------------------------------------------------------
 * Covering classes with new index :
@@ -566,5 +570,4 @@ agent_type:2:rule_id:3@covering_class_id:0:site_type':1:state:1
 agent_type:1:rule_id:2@covering_class_id:0:site_type':1:state:0
 agent_type:2:rule_id:3@covering_class_id:0:site_type':1:state:0
 - A map of covering classes with modification rules (without creation rules):
-agent_type:1:rule_id:1@covering_class_id:0:site_type':1:state:0
 execution finished without any exception

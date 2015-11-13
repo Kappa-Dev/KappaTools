@@ -766,7 +766,7 @@ rule_id:7:
 covering_class_id:1:site_type':1:state:0
 rule_id:7:
 - Creation rule with new index:
-- Modification rule with new index (without creation rules):
+- Modification rule with new index (with creation rules):
 agent_type_0:
 rule_id:0:
 covering_class_id:2:site_type':1:state:1
@@ -792,6 +792,11 @@ rule_id:3:
 covering_class_id:1:site_type':1:state:0
 rule_id:3:
 covering_class_id:2:site_type':1:state:0
+- Modification rule with new index (without creation rules):
+agent_type_0:
+agent_type_1:
+agent_type_2:
+agent_type_3:
 
 ------------------------------------------------------------
 * Covering classes with new index :

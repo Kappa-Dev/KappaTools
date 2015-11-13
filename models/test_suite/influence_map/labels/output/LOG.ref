@@ -264,7 +264,7 @@ covering_class_id:0:site_type':1:state:1
 rule_id:3:
 covering_class_id:0:site_type':1:state:2
 - Creation rule with new index:
-- Modification rule with new index (without creation rules):
+- Modification rule with new index (with creation rules):
 agent_type_0:
 rule_id:2:
 covering_class_id:0:site_type':1:state:0
@@ -274,6 +274,8 @@ rule_id:1:
 covering_class_id:0:site_type':1:state:2
 rule_id:3:
 covering_class_id:0:site_type':1:state:1
+- Modification rule with new index (without creation rules):
+agent_type_0:
 
 ------------------------------------------------------------
 * Covering classes with new index :

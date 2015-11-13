@@ -77,41 +77,9 @@ let collect_remanent_creation_map parameter error store_remanent_creation =
     ) store_remanent_creation Map_creation.Map.empty
 
 (*************************************************************************************)
-(*collect remanent modification as a map function (this function content creation rules)*)
+(*collect remanent modification as a map function without creation rules*)
 
-let collect_remanent_creation_set_map parameter error store_remanent_creation  =
-  let add_link (agent_type, triple_list) rule_id store_result =
-    let (l, old) =
-      Map_creation_set.Map.find_default ([], Site_map_and_set.Set.empty)
-        (agent_type, triple_list) store_result
-    in
-    let current_set = Site_map_and_set.Set.add rule_id old in
-    let new_set = Site_map_and_set.Set.union current_set old in
-    let result_map =
-      Map_creation_set.Map.add (agent_type, triple_list) (l, new_set) store_result
-    in
-    error, result_map
-  in
-  (*-----------------------------------------------------------------*)
-  AgentMap.fold parameter error
-    (fun parameter error agent_type l store_result ->
-      let error, map =
-        List.fold_left
-          (fun (error, store_result) (rule_id, triple_list) ->
-            let error, result =
-              add_link (agent_type, triple_list) rule_id store_result
-            in
-            error, result
-          ) (error, store_result) l
-      in
-      error, map          
-    ) store_remanent_creation Map_creation_set.Map.empty
-
-(*************************************************************************************)
-(*TODO*)
-
-let collect_remanent_modif_map parameter error store_remanent_modif store_creation_map 
-    =
+let collect_remanent_modif_opt_map parameter error store_remanent_modif_opt =
   let add_link (agent_type, rule_id) triple_list store_result =
     let (l, old) =
       Map_modif_creation.Map.find_default ([], []) (agent_type, rule_id) store_result
@@ -122,28 +90,20 @@ let collect_remanent_modif_map parameter error store_remanent_modif store_creati
     in
     error, result_map
   in
+  (*-----------------------------------------------------------------*)
   AgentMap.fold parameter error
     (fun parameter error agent_type l store_result ->
-      List.fold_left (fun (error, store_result) (rule_id, triple_list) ->
-        Map_creation_set.Map.fold (fun (agent_type', triple_list')
-          (l1, s2) (error, store_result) ->
-            if agent_type = agent_type'
-            then
-              if Site_map_and_set.Set.mem rule_id s2
-              then
-                let store_result =
-                  Site_map_and_set.Set.fold (fun rule_id' store_result ->
-                    Map_modif_creation.Map.remove (agent_type', rule_id') store_result
-                  ) s2 store_result
-                in
-                error, store_result
-              else
-                add_link (agent_type, rule_id) triple_list store_result
-            else
-              error, store_result
-        ) store_creation_map (error, store_result)
-      ) (error, store_result) l
-    ) store_remanent_modif Map_modif_creation.Map.empty
+      let error, map =
+        List.fold_left
+          (fun (error, store_result) (rule_id, triple_list) ->
+            let error, result =
+              add_link (agent_type, rule_id) triple_list store_result
+            in
+            error, result
+          ) (error, store_result) l
+      in
+      error, map          
+    ) store_remanent_modif_opt Map_modif_creation.Map.empty
 
 (*************************************************************************************)
 (* Build BDU test, creation and a list of modification rules*)

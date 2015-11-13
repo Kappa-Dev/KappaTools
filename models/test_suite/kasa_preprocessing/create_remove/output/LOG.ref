@@ -147,6 +147,7 @@ agent_type_2:
 - Covering classes triple (id, list, set):
 - Test rule with new index:
 - Creation rule with new index:
+- Modification rule with new index (with creation rules):
 - Modification rule with new index (without creation rules):
 
 ------------------------------------------------------------

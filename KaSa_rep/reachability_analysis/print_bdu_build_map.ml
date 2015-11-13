@@ -54,7 +54,7 @@ let print_remanent_creation_map parameter error result =
 
 (************************************************************************************)
 
-let print_remanent_modif_op_map parameter error result =
+let print_remanent_modif_opt_map parameter error result =
    Map_modif_creation.Map.iter
       (fun (agent_type, rule_id) (l1, l2) ->
         if l1 <> []
@@ -98,9 +98,9 @@ let print_bdu_build_map parameter error result =
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "- A map of covering classes with modification rules (without creation rules):\n";
-    print_remanent_modif_op_map
+    print_remanent_modif_opt_map
       parameter
       error
-      result.store_remanent_modif_op_map
+      result.store_remanent_modif_opt_map
   in
   error
