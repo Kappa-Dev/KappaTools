@@ -86,7 +86,25 @@ module type Map =
     val union: 'a t -> 'a t -> 'a t
     val update: 'a t -> 'a t -> 'a t
     val diff_pred: ('a -> 'a -> bool) -> 'a t -> 'a t -> 'a t * 'a t
+    val add_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a -> 'a t -> 'error * 'a t
+    val remove_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * 'a t
 
+    (*
+    val join_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> elt -> 'a -> 'a t -> 'error * 'a t
+    val split_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * ('a t * 'a option * 'a t)
+    val update: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error  -> 'a t -> 'a t -> 'error * 'a t    
+    val map2_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('a -> 'a -> 'a) -> 'a t -> 'a t -> 'error * 'a t 
+    val fold2z_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a  -> 'b  -> ('error * 'c)  -> ('error * 'c)) -> 'a t -> 'b t -> 'c -> 'error * 'c 
+    val fold2_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a  -> 'b  -> ('error * 'c)  -> ('error * 'c)) -> (elt -> 'a   -> ('error * 'c)  -> ('error * 'c)) -> (elt -> 'b  -> ('error * 'c)  -> ('error * 'c)) ->  'a t -> 'b t -> 'c -> 'error * 'c 
+    val fold2_sparse_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a  -> 'b  -> ('error * 'c)  -> ('error * 'c)) ->  'a t -> 'b t -> 'c -> 'error * 'c
+    val iter2_sparse_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a  -> 'b  -> 'error -> 'error)->  'a t -> 'b t -> 'error
+    val diff_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t * 'a t 
+    val diff_pred_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('a -> 'a -> bool) -> 'a t -> 'a t -> 'error * 'a t * 'a t 
+    val merge_safe : ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t
+    val union_safe : ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t
+    val fold_map_restriction_safe:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a -> ('error * 'b) -> ('error* 'b)) -> set -> 'a t -> 'b -> 'error * 'b 
+ *)
+								   
     val iter: (elt -> 'a -> unit) -> 'a t -> unit
     val fold: (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
     val monadic_fold2:

@@ -100,11 +100,9 @@ module type Map =
     val union: 'a t -> 'a t -> 'a t
     val update: 'a t -> 'a t -> 'a t
     val diff_pred: ('a -> 'a -> bool) -> 'a t -> 'a t -> 'a t * 'a t 						 
-    (*   val add_safe:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a -> 'a t -> 'error * 'a t*)
-    (*    val remove_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * 'a t
-    val mem_safe:  elt -> 'a t -> bool
-    val map_safe: ('a -> 'b) -> 'a t -> 'b t
-    val mapi_safe: (elt -> 'a -> 'b) -> 'a t -> 'b t
+    val add_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a -> 'a t -> 'error * 'a t
+    val remove_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * 'a t
+    (*
     val join_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> elt -> 'a -> 'a t -> 'error * 'a t
     val split_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * ('a t * 'a option * 'a t)
     val update: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error  -> 'a t -> 'a t -> 'error * 'a t    
@@ -843,7 +841,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	    match left with
             | Private.Empty ->
 	       let error = warn parameter error "setMap.ml" (Some "Map.balance_safe,line 845") (invalid_arg "Map.balance_map") in
-	       error,empty (* height_left > height_right + 2 >= 2 *)
+	       error,empty (* Height_left > height_right + 2 >= 2 *)
             | Private.Node (left0,key0,data0,right0,_,_) ->
                if height left0 >= height right0 then
 		 error,node left0 key0 data0 (node right0 key data right)
@@ -886,7 +884,8 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              else balance left key_map data_map (add key data right)
 
 	let rec add_safe warn parameter error key data = function
-	  | Private.Empty -> error,node empty key data empty
+	  | Private.Empty ->
+	     error,node empty key data empty
 	  | Private.Node (left,key_map,data_map,right,_,_) ->
              let cmp = Ord.compare key key_map in
              if cmp = 0 then error,node left key_map data right
@@ -904,6 +903,13 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              let min, left' = extract_min_binding left2 key2 data2 right2 in
              min,balance left' key data map'
 
+	let rec extract_min_binding_safe warn parameters error map key data map' =
+	  match map with
+	  | Private.Empty -> error,((key,data),map')
+	  | Private.Node (left2,key2,data2,right2,_,_) ->
+             let error,(min, left') = extract_min_binding_safe warn parameters error left2 key2 data2 right2 in
+             error,(min,balance left' key data map')
+			 
 	let merge map1 map2 =
 	  match map1 with
 	  | Private.Empty -> map2
@@ -915,6 +921,17 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		  extract_min_binding left2 key2 data2 right2 in
 		balance map1 key3 data3 left'
 
+	let merge_safe warn parameters error map1 map2 =
+	  match map1 with
+	  | Private.Empty -> error,map2
+	  | Private.Node _ ->
+             match map2 with
+             | Private.Empty -> error,map1
+             | Private.Node(left2,key2,data2,right2,_,_) ->
+		let error,((key3,data3), left') =
+		  extract_min_binding_safe warn parameters error left2 key2 data2 right2 in
+		balance_safe warn parameters error map1 key3 data3 left'
+			
 	let rec remove key = function
 	  | Private.Empty -> empty
 	  | Private.Node (left,key_map,data,right,_,_) ->
@@ -923,6 +940,24 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              else if cmp < 0 then balance (remove key left) key_map data right
              else balance left key_map data (remove key right)
 
+	let rec remove_safe warn parameters error key map = 
+	  match map with 
+	  | Private.Empty ->
+	       let error = warn parameters error "setMap.ml" (Some "Map.remove_map,line 932") (failwith "Try to remove an association of an unknown key") in
+	       error,empty
+	  | Private.Node (left,key_map,data,right,_,_) ->
+             let cmp = compare key key_map in 
+	     if cmp = 0 
+	     then merge_safe warn parameters error left right
+	     else if cmp < 0 
+	     then 
+	       let error, left' = remove_safe warn parameters error key left in 
+	       balance_safe warn parameters error left' key_map data right
+	     else 
+	       let error, right' = remove_safe warn parameters error key right in 
+	       balance_safe warn parameters error left key_map data right'
+			  
+			  
 	let rec pop x = function
 	  | Private.Empty as m -> (None, m)
 	  | Private.Node(l, v, d, r, _,_) as m ->
@@ -944,6 +979,17 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
           | Private.Node (left2,key2,data2,right2,_,_) as map2 ->
              let h = height left2 - height right2 in
              if h > 2 || h< -2 then join left2 key2 data2 right2 else map2
+
+	let rec join_safe warn parameters error left key value right =
+	  match balance_safe warn parameters error left key value right with 
+          | error,Private.Empty ->
+	      let error = warn parameters error "setMap.ml" (Some "Map.join_safe, line 986, the output of balance should not be empty") (failwith "the output of balance should not be empty") in
+	      error,empty
+          | error,(Private.Node (left2,key2,data2,right2,_,_) as map2) -> 
+             let h = height left2 - height right2 in 
+             if h > 2 || h< -2 
+             then join_safe warn parameters error left2 key2 data2 right2 
+             else error,map2 
 
 	let rec split value = function
 	  | Private.Empty -> (empty,None,empty)
