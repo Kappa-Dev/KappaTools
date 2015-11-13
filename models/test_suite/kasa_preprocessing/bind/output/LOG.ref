@@ -662,50 +662,271 @@ agent_type_2:   false
 - An array of bdu_creation:
 - TEST with MAP An array of bdu_creation:
 - TEST with MAP An array of bdu_test:
+agent_type_0:
 index of this array:0
-agent_type_ if(mvbdu_id:7) x1 < 0 then 
-agent_type_  false
-agent_type_ else 
-agent_type_  if(mvbdu_id:6) x1 < 1 then 
-agent_type_   if(mvbdu_id:5) x2 < 0 then 
-agent_type_    false
-agent_type_   else 
-agent_type_    if(mvbdu_id:4) x2 < 1 then 
-agent_type_     true
-agent_type_    else 
-agent_type_     false
-agent_type_  else 
-agent_type_   false
+agent_type_0: if(mvbdu_id:3) x1 < 0 then 
+agent_type_0:  false
+agent_type_0: else 
+agent_type_0:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_0:   true
+agent_type_0:  else 
+agent_type_0:   false
 index of this array:1
-agent_type_ if(mvbdu_id:7) x1 < 0 then 
-agent_type_  false
-agent_type_ else 
-agent_type_  if(mvbdu_id:6) x1 < 1 then 
-agent_type_   if(mvbdu_id:5) x2 < 1 then 
-agent_type_    false
-agent_type_   else 
-agent_type_    if(mvbdu_id:4) x2 < 2 then 
-agent_type_     true
-agent_type_    else 
-agent_type_     false
-agent_type_  else 
-agent_type_   false
+agent_type_0: if(mvbdu_id:3) x1 < 1 then 
+agent_type_0:  false
+agent_type_0: else 
+agent_type_0:  if(mvbdu_id:2) x1 < 2 then 
+agent_type_0:   true
+agent_type_0:  else 
+agent_type_0:   false
 index of this array:2
-agent_type_ if(mvbdu_id:3) x1 < 0 then 
-agent_type_  false
-agent_type_ else 
-agent_type_  if(mvbdu_id:2) x1 < 1 then 
-agent_type_   true
-agent_type_  else 
-agent_type_   false
+agent_type_0: if(mvbdu_id:3) x1 < 0 then 
+agent_type_0:  false
+agent_type_0: else 
+agent_type_0:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_0:   true
+agent_type_0:  else 
+agent_type_0:   false
 index of this array:3
-agent_type_ if(mvbdu_id:3) x1 < 1 then 
-agent_type_  false
-agent_type_ else 
-agent_type_  if(mvbdu_id:2) x1 < 2 then 
-agent_type_   true
-agent_type_  else 
-agent_type_   false
+agent_type_0: false
+index of this array:4
+agent_type_0: if(mvbdu_id:3) x1 < 0 then 
+agent_type_0:  false
+agent_type_0: else 
+agent_type_0:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_0:   true
+agent_type_0:  else 
+agent_type_0:   false
+index of this array:5
+agent_type_0: if(mvbdu_id:3) x1 < 1 then 
+agent_type_0:  false
+agent_type_0: else 
+agent_type_0:  if(mvbdu_id:2) x1 < 2 then 
+agent_type_0:   true
+agent_type_0:  else 
+agent_type_0:   false
+index of this array:6
+agent_type_0: false
+index of this array:7
+agent_type_0: false
+index of this array:8
+agent_type_0: if(mvbdu_id:3) x1 < 0 then 
+agent_type_0:  false
+agent_type_0: else 
+agent_type_0:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_0:   true
+agent_type_0:  else 
+agent_type_0:   false
+index of this array:9
+agent_type_0: false
+index of this array:10
+agent_type_0: false
+index of this array:11
+agent_type_0: false
+agent_type_1:
+index of this array:0
+agent_type_1: if(mvbdu_id:7) x1 < 0 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:6) x1 < 1 then 
+agent_type_1:   if(mvbdu_id:5) x2 < 0 then 
+agent_type_1:    false
+agent_type_1:   else 
+agent_type_1:    if(mvbdu_id:4) x2 < 1 then 
+agent_type_1:     true
+agent_type_1:    else 
+agent_type_1:     false
+agent_type_1:  else 
+agent_type_1:   false
+index of this array:1
+agent_type_1: if(mvbdu_id:7) x1 < 0 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:6) x1 < 1 then 
+agent_type_1:   if(mvbdu_id:5) x2 < 1 then 
+agent_type_1:    false
+agent_type_1:   else 
+agent_type_1:    if(mvbdu_id:4) x2 < 2 then 
+agent_type_1:     true
+agent_type_1:    else 
+agent_type_1:     false
+agent_type_1:  else 
+agent_type_1:   false
+index of this array:2
+agent_type_1: if(mvbdu_id:3) x1 < 0 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_1:   true
+agent_type_1:  else 
+agent_type_1:   false
+index of this array:3
+agent_type_1: if(mvbdu_id:3) x1 < 0 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_1:   true
+agent_type_1:  else 
+agent_type_1:   false
+index of this array:4
+agent_type_1: if(mvbdu_id:7) x1 < 0 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:6) x1 < 1 then 
+agent_type_1:   if(mvbdu_id:5) x2 < 0 then 
+agent_type_1:    false
+agent_type_1:   else 
+agent_type_1:    if(mvbdu_id:4) x2 < 1 then 
+agent_type_1:     true
+agent_type_1:    else 
+agent_type_1:     false
+agent_type_1:  else 
+agent_type_1:   false
+index of this array:5
+agent_type_1: if(mvbdu_id:7) x1 < 0 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:6) x1 < 1 then 
+agent_type_1:   if(mvbdu_id:5) x2 < 1 then 
+agent_type_1:    false
+agent_type_1:   else 
+agent_type_1:    if(mvbdu_id:4) x2 < 2 then 
+agent_type_1:     true
+agent_type_1:    else 
+agent_type_1:     false
+agent_type_1:  else 
+agent_type_1:   false
+index of this array:6
+agent_type_1: if(mvbdu_id:3) x1 < 0 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_1:   true
+agent_type_1:  else 
+agent_type_1:   false
+index of this array:7
+agent_type_1: false
+index of this array:8
+agent_type_1: if(mvbdu_id:7) x1 < 0 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:6) x1 < 1 then 
+agent_type_1:   if(mvbdu_id:5) x2 < 0 then 
+agent_type_1:    false
+agent_type_1:   else 
+agent_type_1:    if(mvbdu_id:4) x2 < 1 then 
+agent_type_1:     true
+agent_type_1:    else 
+agent_type_1:     false
+agent_type_1:  else 
+agent_type_1:   false
+index of this array:9
+agent_type_1: if(mvbdu_id:3) x1 < 1 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:2) x1 < 2 then 
+agent_type_1:   true
+agent_type_1:  else 
+agent_type_1:   false
+index of this array:10
+agent_type_1: if(mvbdu_id:3) x1 < 0 then 
+agent_type_1:  false
+agent_type_1: else 
+agent_type_1:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_1:   true
+agent_type_1:  else 
+agent_type_1:   false
+index of this array:11
+agent_type_1: false
+agent_type_2:
+index of this array:0
+agent_type_2: if(mvbdu_id:7) x1 < 0 then 
+agent_type_2:  false
+agent_type_2: else 
+agent_type_2:  if(mvbdu_id:6) x1 < 1 then 
+agent_type_2:   if(mvbdu_id:5) x2 < 0 then 
+agent_type_2:    false
+agent_type_2:   else 
+agent_type_2:    if(mvbdu_id:4) x2 < 1 then 
+agent_type_2:     true
+agent_type_2:    else 
+agent_type_2:     false
+agent_type_2:  else 
+agent_type_2:   false
+index of this array:1
+agent_type_2: if(mvbdu_id:7) x1 < 0 then 
+agent_type_2:  false
+agent_type_2: else 
+agent_type_2:  if(mvbdu_id:6) x1 < 1 then 
+agent_type_2:   if(mvbdu_id:5) x2 < 1 then 
+agent_type_2:    false
+agent_type_2:   else 
+agent_type_2:    if(mvbdu_id:4) x2 < 2 then 
+agent_type_2:     true
+agent_type_2:    else 
+agent_type_2:     false
+agent_type_2:  else 
+agent_type_2:   false
+index of this array:2
+agent_type_2: if(mvbdu_id:3) x1 < 0 then 
+agent_type_2:  false
+agent_type_2: else 
+agent_type_2:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_2:   true
+agent_type_2:  else 
+agent_type_2:   false
+index of this array:3
+agent_type_2: if(mvbdu_id:3) x1 < 1 then 
+agent_type_2:  false
+agent_type_2: else 
+agent_type_2:  if(mvbdu_id:2) x1 < 2 then 
+agent_type_2:   true
+agent_type_2:  else 
+agent_type_2:   false
+index of this array:4
+agent_type_2: if(mvbdu_id:7) x1 < 0 then 
+agent_type_2:  false
+agent_type_2: else 
+agent_type_2:  if(mvbdu_id:6) x1 < 1 then 
+agent_type_2:   if(mvbdu_id:5) x2 < 0 then 
+agent_type_2:    false
+agent_type_2:   else 
+agent_type_2:    if(mvbdu_id:4) x2 < 1 then 
+agent_type_2:     true
+agent_type_2:    else 
+agent_type_2:     false
+agent_type_2:  else 
+agent_type_2:   false
+index of this array:5
+agent_type_2: if(mvbdu_id:7) x1 < 0 then 
+agent_type_2:  false
+agent_type_2: else 
+agent_type_2:  if(mvbdu_id:6) x1 < 1 then 
+agent_type_2:   if(mvbdu_id:5) x2 < 1 then 
+agent_type_2:    false
+agent_type_2:   else 
+agent_type_2:    if(mvbdu_id:4) x2 < 2 then 
+agent_type_2:     true
+agent_type_2:    else 
+agent_type_2:     false
+agent_type_2:  else 
+agent_type_2:   false
+index of this array:6
+agent_type_2: if(mvbdu_id:3) x1 < 0 then 
+agent_type_2:  false
+agent_type_2: else 
+agent_type_2:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_2:   true
+agent_type_2:  else 
+agent_type_2:   false
+index of this array:7
+agent_type_2: if(mvbdu_id:3) x1 < 0 then 
+agent_type_2:  false
+agent_type_2: else 
+agent_type_2:  if(mvbdu_id:2) x1 < 1 then 
+agent_type_2:   true
+agent_type_2:  else 
+agent_type_2:   false
 ------------------------------------------------------------
 - An array of bdu_test:
 agent_type_0:

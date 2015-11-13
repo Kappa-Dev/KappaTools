@@ -65,13 +65,18 @@ let print_bdu_test_array parameter error result =
     ) parameter result
 
 let print_bdu_test_array_map parameter error result =
-  Array.iteri (fun index bdu_test ->
-    let _ =
-      fprintf stdout "index of this array:%i\n" index;
-      print_bdu parameter error bdu_test
-    in
-    ()
-  ) result
+  AgentMap.print error
+    (fun error parameter array ->
+      let _ =
+        Array.iteri (fun index bdu_test ->
+          let _ =
+            fprintf stdout "index of this array:%i\n" index;
+            print_bdu parameter error bdu_test
+          in
+          ()
+        ) array
+      in
+      error) parameter result
 
 (************************************************************************************)
 

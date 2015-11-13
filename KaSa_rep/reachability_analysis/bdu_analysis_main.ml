@@ -602,7 +602,7 @@ let init_bdu_fixpoint parameter error =
   let error, init_bdu_test_array     = AgentMap.create parameter error 0 in
   let error, init_bdu_creation_test_array = AgentMap.create parameter error 0 in
   let init_bdu_creation_array_map = [||] in
-  let init_bdu_test_array_map = [||] in
+  let error, init_bdu_test_array_map = AgentMap.create parameter error 0 in
   let init_bdu_fixpoint =
     {
       store_bdu_creation_array = init_bdu_creation_array;

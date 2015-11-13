@@ -228,7 +228,7 @@ type bdu_fixpoint =
     store_bdu_test_array          : bool Mvbdu_sig.mvbdu array AgentMap.t;
     (*TEST*)
     store_bdu_creation_array_map  : bool Mvbdu_sig.mvbdu array;
-    store_bdu_test_array_map      : bool Mvbdu_sig.mvbdu array;
+    store_bdu_test_array_map      : bool Mvbdu_sig.mvbdu array AgentMap.t;
     store_bdu_creation_test_array : bool Mvbdu_sig.mvbdu array AgentMap.t
   }
 
