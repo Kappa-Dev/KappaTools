@@ -134,7 +134,7 @@ let collect_bdu_creation_array parameter error handler_sig
 
 (*build creation rule from a map of bdu_creation REMOVE*)
 
-let collect_bdu_creation_array_map parameter error handler_sig store_creation_bdu_map
+(*let collect_bdu_creation_array_map parameter error handler_sig store_creation_bdu_map
     store_result =
   let error, (handler, bdu_init) = bdu_init parameter error in
   (*create an empty array*)
@@ -149,7 +149,7 @@ let collect_bdu_creation_array_map parameter error handler_sig store_creation_bd
       ) (error, store_array) l2
     ) store_creation_bdu_map (error, [||])
   in
-  error, store_result
+  error, store_result*)
 
 (************************************************************************************)
 (*store bdu_test in an array, index of this array is rule_id of test
@@ -196,8 +196,8 @@ let collect_bdu_test_array parameter error handler_sig store_test_bdu =
 
 (*build test rule from a map of bdu_test REMOVE*)
 
-let collect_bdu_test_array_map parameter error handler_sig store_test_bdu_map
-    store_result =
+(*let collect_bdu_test_array_map parameter error handler_sig store_test_bdu_map
+   store_result =
   let error, init = AgentMap.create parameter error 0 in
   let error, (handler, bdu_init) = bdu_init parameter error in
   (*create an empty array*)
@@ -232,12 +232,12 @@ let collect_bdu_test_array_map parameter error handler_sig store_test_bdu_map
       error, store_result
     ) store_test_bdu_map (error, init)
   in
-  error, store_result
+  error, store_result*)
 
 (************************************************************************************)
 (*combine creation and test REMOVE*)
 
-let collect_bdu_creation_test_array parameter error handler_sig store_creation_bdu
+(*let collect_bdu_creation_test_array parameter error handler_sig store_creation_bdu
     store_test_bdu store_result =
   let error, (handler, bdu_init) = bdu_init parameter error in
   (*create an empty array*)
@@ -272,5 +272,4 @@ let collect_bdu_creation_test_array parameter error handler_sig store_creation_b
           store_result
       in
       error, store_result
-    ) store_creation_bdu store_test_bdu store_result
-  
+    ) store_creation_bdu store_test_bdu store_result*)

@@ -112,7 +112,7 @@ let collect_remanent_modif_opt_map parameter error store_remanent_modif_opt =
 (*************************************************************************************)
 (*build bdu for test rules*)
 
-let collect_test_bdu_map parameter error store_test_map =
+(*let collect_test_bdu_map parameter error store_test_map =
   let add_link (agent_type, rule_id) (handler, bdu) store_result =
     let (l, old) =
       Map_test_bdu.Map.find_default ([], []) (agent_type, rule_id) store_result
@@ -140,9 +140,7 @@ let collect_test_bdu_map parameter error store_test_map =
       add_link (agent_type, rule_id) (handler, bdu_test) store_result
     in
     error, store_result
-  ) store_test_map (error, Map_test_bdu.Map.empty)
-
-(*TEST*)
+  ) store_test_map (error, Map_test_bdu.Map.empty)*)
 
 let collect_test_bdu parameter error store_test_map =
   let error, init = AgentMap.create parameter error 0 in
@@ -182,7 +180,7 @@ let collect_test_bdu parameter error store_test_map =
 (*************************************************************************************)
 (*build bdu for creation rules*)
 
-let collect_creation_bdu_map parameter error store_creation_map =
+(*let collect_creation_bdu_map parameter error store_creation_map =
   let add_link (agent_type, rule_id) (handler, bdu) store_result =
     let (l, old) =
       Map_creation_bdu.Map.find_default ([], []) (agent_type, rule_id) store_result
@@ -210,9 +208,7 @@ let collect_creation_bdu_map parameter error store_creation_map =
       add_link (agent_type, rule_id) (handler, bdu_creation) store_result
     in
     error, store_result
-  ) store_creation_map (error, Map_creation_bdu.Map.empty)
-
-(*TEST*)
+  ) store_creation_map (error, Map_creation_bdu.Map.empty)*)
 
 let collect_creation_bdu parameter error store_creation_map =
   let error, init = AgentMap.create parameter error 0 in

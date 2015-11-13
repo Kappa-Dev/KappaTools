@@ -38,14 +38,14 @@ let print_bdu_creation_array parameter error result =
       error
     ) parameter result
 
-let print_bdu_creation_array_map parameter error result =
+(*let print_bdu_creation_array_map parameter error result =
   Array.iteri (fun index bdu_creation ->
     let _ =
       fprintf stdout "index of this array:%i\n" index;
       print_bdu parameter error bdu_creation
     in
     ()
-  ) result
+  ) result*)
 
 (************************************************************************************)
 
@@ -64,7 +64,7 @@ let print_bdu_test_array parameter error result =
       error
     ) parameter result
 
-let print_bdu_test_array_map parameter error result =
+(*let print_bdu_test_array_map parameter error result =
   AgentMap.print error
     (fun error parameter array ->
       let _ =
@@ -76,11 +76,11 @@ let print_bdu_test_array_map parameter error result =
           ()
         ) array
       in
-      error) parameter result
+      error) parameter result*)
 
 (************************************************************************************)
 
-let print_bdu_creation_test_array parameter error result =
+(*let print_bdu_creation_test_array parameter error result =
   AgentMap.print error
     (fun error parameter array ->
       let _ =
@@ -93,7 +93,7 @@ let print_bdu_creation_test_array parameter error result =
         ) array
       in
       error
-    ) parameter result
+    ) parameter result*)
 
 (************************************************************************************)
 (*main print*)
