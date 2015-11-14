@@ -18,8 +18,8 @@ let set_visibility (a:Superarg.t) =
   List.iter 
     (fun (key,_,_,_,lvl) ->
       try
-	let f = Misc_sa.unsome (error,StringMap.find_option key !fmap)
-			       (fun _ -> raise Not_found) in
+	let f = snd (Misc_sa.unsome (error,StringMap.find_option key !fmap)
+			       (fun _ -> raise Not_found)) in
 	if Superarg.show_level lvl
 	then 
 	  List.iter (fun f -> pack ~side:`Top ~anchor:`W [coe f]) f
@@ -43,7 +43,7 @@ let set_visibility (a,b) =
 (* option value => widget value *)
 let widget_update_from_spec (a:Superarg.t) =
   let set n v =
-    try Textvariable.set (snd (StringSetMap.find_map parameters error n !map)) v
+    try Textvariable.set (snd (Misc_sa.unsome (error,StringMap.find_option (*_map*) (*parameters error*) n !map) (fun _ -> raise Not_found))) v
     with Not_found -> ()
   in
   List.iter 
@@ -84,8 +84,8 @@ let widget_update_from_cmd (a:Superarg.t) l =
 	try 
 	  let key,spec,_,_,_ =
 	    List.find (fun (key,_,_,_,_) -> opt=key || opt=(Superarg.nokey key)) a in
-	  let set n v = Textvariable.set (snd (StringSetMap.find_map parameters error n !map)) v
-	  and get n = Textvariable.get (snd (StringSetMap.find_map parameters error n !map)) in
+	  let set n v = Textvariable.set (snd (Misc_sa.unsome (error,StringMap.find_option (*parameters error*) n !map) (fun _ -> raise Not_found))) v
+	  and get n = Textvariable.get (snd (Misc_sa.unsome (error,StringMap.find_option (*parameters error*) n !map) (fun _ -> raise Not_found))) in
 	  let rem = match spec,rem with
 	  | Superarg.Void , rem -> rem
 	  | Superarg.Bool _, rem -> set key (if opt=key then "1" else "0"); rem
@@ -126,7 +126,7 @@ let widget_update_from_cmd (a:Superarg.t) l =
 (* widget value => command-line argument,
    if [short]=[true] no command is output is the value is the default one *)
 let cmd_of_widget (a:Superarg.t) short =
-  let get n = Textvariable.get (snd (StringSetMap.find_map parameters error n !map)) in
+  let get n = Textvariable.get (snd (Misc_sa.unsome (error,StringMap.find_option (* parameters error*) n !map) (fun _ -> raise Not_found))) in
   List.fold_left
     (fun accum (key,spec,msg,cat,lvl) ->
       try match spec with
@@ -200,16 +200,17 @@ let widget_of_spec (a:Superarg.t) key spec msg lvl parent =
   let f = Frame.create parent in
   let error =
     let old =
-	StringMap.Map.find_default [] key !fmap in
+	StringMap.find_default [] key !fmap in
     let fmap' = StringMap.add key (f::old) !fmap in
     let _ = fmap:=fmap' 
     in 
     error
   in 
-  let v = 
-    try (snd (StringSetMap.find_map parameters error key (!map)))
-    with Not_found 
+  let v = snd (
+    (* match ((*snd*)*) Misc_sa.unsome (error,StringMap.find_option (*parameters error*) key (!map)) (fun _ -> error,Textvariable.create ()))
+    (*with None  
       -> (Textvariable.create ())
+       | Some a -> a *)
   in 
   (match spec with
   | Superarg.Bool _ ->
@@ -235,7 +236,7 @@ let widget_of_spec (a:Superarg.t) key spec msg lvl parent =
       pack ~side:`Left ~expand:true ~fill:`X ~anchor:`W [coe lbl;coe entry];
       Balloon.put ~on:(coe lbl) ~ms:balloon_delay msg;
       Balloon.put ~on:(coe entry) ~ms:balloon_delay msg;
-      map := snd StringMap.add key v !map
+      map := (*snd*) StringMap.add key v !map
   | Superarg.Choice (l,_) ->
       let lbl = Label.create ~text:key ~padx:20 f in
       let fff = Frame.create f in
@@ -348,13 +349,13 @@ class pager bparent fparent =
     (* sets the page currently viewed *)
     method set_page name = 
       (try 
-	let fr,_,b = snd (StringSetMap.find_map parameters error !cur !pages) in
+	  let fr,_,b = snd (Misc_sa.unsome (error,StringMap.find_option (*parameters error*) !cur !pages) (fun _ -> raise Not_found)) in
 	cur := "";
 	Button.configure ~relief:`Raised b;
 	Pack.forget [coe fr];
       with Not_found -> ());
       (try 
-	let fr,_,b = snd (StringSetMap.find_map parameters error name !pages) in
+	  let fr,_,b = snd (Misc_sa.unsome (error,StringMap.find_option (*parameters error*) name !pages) (fun _ -> raise Not_found)) in
 	cur := name;
 	Button.configure ~relief:`Sunken b;
 	pack ~expand:true ~fill:`Both ~anchor:`Center [coe fr];
@@ -363,7 +364,7 @@ class pager bparent fparent =
 
     (* gets a page (create if non existing) *)
     method get_page name (lvl:Superarg.level) : Widget.frame Widget.widget =
-      try let _,p,_ = snd (StringMap.find_map parameters error name !pages) in p
+      try let _,p,_ = snd (Misc_sa.unsome (error,StringMap.find_option (*parameters error*) name !pages) (fun _ -> raise Not_found)) in p
       with Not_found ->
 	if !barsize/maxbarwidth <> (!barsize+String.length name)/maxbarwidth
 	then (bar := Frame.create bars; pack ~side:`Top [coe !bar]);
@@ -376,7 +377,7 @@ class pager bparent fparent =
 	Grid.row_configure ~minsize:400 (coe fr) 0;
 	Grid.configure ~column:0 ~row:0 [coe p];
 	barsize := !barsize + String.length name;
-	pages := snd (StringMap.add_map parameters error name (fr,p,lbl) !pages);
+	pages := (*snd*) (StringMap.add(*_map*) (*parameters error*) name (fr,p,lbl) !pages);
 	pages_lvl:= (lbl,lvl)::(!pages_lvl);
 	if !cur = "" then self#set_page name;
 	p
@@ -387,7 +388,7 @@ class pager bparent fparent =
 
 let build_spec (a:Superarg.t) bparent fparent =
   let opts = new pager bparent fparent in
-  Superarg.StringMap.iter_map 
+  Superarg.StringMap.iter(*_map*) 
     (fun  _ (l,cat_lvl) ->
       List.iter
 	(fun (key,spec,msg,cat,lvl) -> 
