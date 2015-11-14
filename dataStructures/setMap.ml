@@ -115,8 +115,8 @@ module type Map =
 			  ('parameters -> 'error -> elt -> 'a -> 'b  -> 'c  -> 'error * 'c) ->  'a t -> 'b t -> 'c -> 'error * 'c 
      val fold2_sparse_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error ->
 				 ('parameters -> 'error -> elt -> 'a  -> 'b  -> 'c  -> ('error * 'c)) ->  'a t -> 'b t -> 'c -> 'error * 'c
-   (* val iter2_sparse_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a  -> 'b  -> 'error -> 'error)->  'a t -> 'b t -> 'error
-    val min_elt: (elt -> 'a -> bool) -> 'a t -> elt option  
+     val iter2_sparse_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('parameters -> 'error -> elt -> 'a  -> 'b  -> 'error)->  'a t -> 'b t -> 'error
+   (* val min_elt: (elt -> 'a -> bool) -> 'a t -> elt option  
     val diff_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t * 'a t 
     val diff_pred_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('a -> 'a -> bool) -> 'a t -> 'a t -> 'error * 'a t * 'a t 
     val merge_with_logs : ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t
@@ -1313,6 +1313,10 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
                   fold2_sparse_with_logs warn parameters error f right1 right2 res''
              end
 
+	let iter2_sparse_with_logs warn parameters error f map1 map2 =
+	  let error,_ = fold2_sparse_with_logs warn parameters error (fun par err a b c  _ -> f par err a b c,()) map1 map2 () 
+	  in error 
+	       
 	let rec for_all p = function
           | Private.Empty -> true
           | Private.Node(left,key,data,right,_,_) ->
