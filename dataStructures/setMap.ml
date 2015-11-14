@@ -34,9 +34,9 @@ module type Set =
     val is_singleton: t -> bool
 
     val add: elt -> t -> t
-    val add_safe:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * t 
+    val add_with_logs:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * t 
     val remove: elt -> t -> t
-    val remove_safe: ('parameters -> 'error -> string -> string option  -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * t 			      
+    val remove_with_logs: ('parameters -> 'error -> string -> string option  -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * t 			      
     val split: elt -> t -> (t * bool * t)
     val union: t -> t -> t
     val inter: t -> t -> t
@@ -44,10 +44,10 @@ module type Set =
     (** [minus a b] contains elements of [a] that are not in [b] *)
     val diff: t -> t -> t
     (** [diff a b] = [minus (union a b) (inter a b)] *)
-    val union_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t 
-    val inter_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t
-    val diff_safe:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t
-  (*  val split_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * ( t * bool * t)*)
+    val union_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t 
+    val inter_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t
+    val diff_with_logs:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> t -> t -> 'error * t
+  (*  val split_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> t -> 'error * ( t * bool * t)*)
 
     val cardinal: t -> int
 
@@ -93,31 +93,35 @@ module type Map =
     val min_elt: (elt -> 'a -> bool) -> 'a t -> elt option
     val find_option: elt -> 'a t -> 'a option
     val find_default: 'a -> elt -> 'a t -> 'a
-    val find_option_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * 'a option
-    val find_default_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a -> elt -> 'a t -> 'error * 'a
+    val find_option_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * 'a option
+    val find_default_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a -> elt -> 'a t -> 'error * 'a
     val mem:  elt -> 'a t -> bool
     val diff: 'a t -> 'a t -> 'a t * 'a t
     val union: 'a t -> 'a t -> 'a t
     val update: 'a t -> 'a t -> 'a t
     val diff_pred: ('a -> 'a -> bool) -> 'a t -> 'a t -> 'a t * 'a t 						 
-    val add_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a -> 'a t -> 'error * 'a t
-    val remove_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * 'a t
+    val add_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a -> 'a t -> 'error * 'a t
+    val remove_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * 'a t
     
-    val join_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> elt -> 'a -> 'a t -> 'error * 'a t
-    val split_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * ('a t * 'a option * 'a t)
-    val update_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error  -> 'a t -> 'a t -> 'error * 'a t    
-    val map2_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('parameters -> 'error -> 'a -> 'error * 'a) -> ('parameters -> 'error -> 'a -> 'error  * 'a) -> ('parameters -> 'error -> 'a -> 'a -> 'error * 'a) -> 'a t -> 'a t -> 'error * 'a t 
-    val map2z_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('parameters -> 'error -> 'a -> 'a -> 'error * 'a) -> 'a t -> 'a t -> 'error * 'a t																																			      
-    (*  val fold2z_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a  -> 'b  -> ('error * 'c)  -> ('error * 'c)) -> 'a t -> 'b t -> 'c -> 'error * 'c 
-    val fold2_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a  -> 'b  -> ('error * 'c)  -> ('error * 'c)) -> (elt -> 'a   -> ('error * 'c)  -> ('error * 'c)) -> (elt -> 'b  -> ('error * 'c)  -> ('error * 'c)) ->  'a t -> 'b t -> 'c -> 'error * 'c 
-    val fold2_sparse_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a  -> 'b  -> ('error * 'c)  -> ('error * 'c)) ->  'a t -> 'b t -> 'c -> 'error * 'c
-    val iter2_sparse_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a  -> 'b  -> 'error -> 'error)->  'a t -> 'b t -> 'error
+    val join_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> elt -> 'a -> 'a t -> 'error * 'a t
+    val split_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> elt -> 'a t -> 'error * ('a t * 'a option * 'a t)
+    val update_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error  -> 'a t -> 'a t -> 'error * 'a t    
+    val map2_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('parameters -> 'error -> 'a -> 'error * 'a) -> ('parameters -> 'error -> 'a -> 'error  * 'a) -> ('parameters -> 'error -> 'a -> 'a -> 'error * 'a) -> 'a t -> 'a t -> 'error * 'a t 
+    val map2z_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('parameters -> 'error -> 'a -> 'a -> 'error * 'a) -> 'a t -> 'a t -> 'error * 'a t																																			      
+     val fold2z_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('parameters -> 'error -> elt -> 'a  -> 'b  -> 'c  -> ('error * 'c)) -> 'a t -> 'b t -> 'c -> 'error * 'c 
+     val fold2_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error ->
+			  ('parameters -> 'error -> elt -> 'a   -> 'c  -> 'error * 'c) ->
+			  ('parameters -> 'error -> elt -> 'b  ->  'c  -> 'error * 'c) ->
+			  ('parameters -> 'error -> elt -> 'a -> 'b  -> 'c  -> 'error * 'c) ->  'a t -> 'b t -> 'c -> 'error * 'c 
+     val fold2_sparse_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error ->
+				 ('parameters -> 'error -> elt -> 'a  -> 'b  -> 'c  -> ('error * 'c)) ->  'a t -> 'b t -> 'c -> 'error * 'c
+   (* val iter2_sparse_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a  -> 'b  -> 'error -> 'error)->  'a t -> 'b t -> 'error
     val min_elt: (elt -> 'a -> bool) -> 'a t -> elt option  
-    val diff_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t * 'a t 
-    val diff_pred_safe: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('a -> 'a -> bool) -> 'a t -> 'a t -> 'error * 'a t * 'a t 
-    val merge_safe : ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t
-    val union_safe : ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t
-    val fold_map_restriction_safe:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a -> ('error * 'b) -> ('error* 'b)) -> set -> 'a t -> 'b -> 'error * 'b 
+    val diff_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t * 'a t 
+    val diff_pred_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('a -> 'a -> bool) -> 'a t -> 'a t -> 'error * 'a t * 'a t 
+    val merge_with_logs : ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t
+    val union_with_logs : ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t
+    val fold_map_restriction_with_logs:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a -> ('error * 'b) -> ('error* 'b)) -> set -> 'a t -> 'b -> 'error * 'b 
  *)																					
 																									     
     val iter: (elt -> 'a -> unit) -> 'a t -> unit
@@ -203,7 +207,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  | Private.Empty -> 0
 	  | Private.Node(left,_,right,_) -> cardinal left + 1 + cardinal right
 
-        let balance_safe warn parameters error left value right =
+        let balance_with_logs warn parameters error left value right =
 	  let height_left = height left in
 	  let height_right = height right in
 	  if height_left > height_right + 2 then begin
@@ -286,7 +290,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		      (node rightleftright rightvalue rightright)
 	  else node left value right
 		    
-	(*	let balance = Lift_error_logs.lift_generic_ternary_for_KaSim balance_safe 					 *)
+	(*	let balance = Lift_error_logs.lift_generic_ternary_for_KaSim balance_with_logs 					 *)
 
 		       
 	let rec add x = function
@@ -298,18 +302,18 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	       then let o = add x l in if o == l then t else balance o v r
 	       else let o = add x r in if o == r then t else balance l v o
 
-	let rec add_safe warn parameters error new_value set =
+	let rec add_with_logs warn parameters error new_value set =
 	  match set with
           | Private.Empty -> error,singleton new_value
           | Private.Node(left,value_set,right,_) ->
           let c = Ord.compare new_value value_set in
           if c = 0 then error,set
           else if c<0 then
-            let error', left' = add_safe warn parameters error new_value left in
-            balance_safe warn parameters error' left' value_set right
+            let error', left' = add_with_logs warn parameters error new_value left in
+            balance_with_logs warn parameters error' left' value_set right
           else
-            let error', right' = add_safe warn parameters error new_value right in
-            balance_safe warn parameters error' left value_set right'
+            let error', right' = add_with_logs warn parameters error new_value right in
+            balance_with_logs warn parameters error' left value_set right'
 
 	let rec join left value right =
 	  match left,right with
@@ -333,23 +337,23 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	       safe_extract_min_elt leftleft leftvalue leftright in
 	     min,balance left' value right
 
-	let rec min_elt_safe warn parameters error set  =
+	let rec min_elt_with_logs warn parameters error set  =
 	  match set with
 	  | Private.Empty ->
-	     let error = warn parameters error "setMap.ml" (Some "min_elt_safe, line 303") Not_found in
+	     let error = warn parameters error "setMap.ml" (Some "min_elt_with_logs, line 303") Not_found in
 	     error,None
 	  | Private.Node(Private.Empty,v,_,_) -> error,Some v
-	  | Private.Node(left,_,_,_) -> min_elt_safe warn parameters error left
+	  | Private.Node(left,_,_,_) -> min_elt_with_logs warn parameters error left
 
-	let rec remove_min_elt_safe warn parameters error set =
+	let rec remove_min_elt_with_logs warn parameters error set =
 	  match set with
           | Private.Empty ->
-	     let error = warn parameters error "setMap.ml" (Some "remove_min_elt_safe, line 311") Not_found in
+	     let error = warn parameters error "setMap.ml" (Some "remove_min_elt_with_logs, line 311") Not_found in
 	     error,empty
           | Private.Node(Private.Empty,_,right,_) -> error,right
           | Private.Node(left,value,right,_) ->
-             let error, left' = remove_min_elt_safe warn parameters error left in
-             balance_safe warn parameters error left' value right
+             let error, left' = remove_min_elt_with_logs warn parameters error left in
+             balance_with_logs warn parameters error left' value right
 
 	let merge set1 set2 =
 	  match set1,set2 with
@@ -359,37 +363,37 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              let min2,set2' = safe_extract_min_elt left2 value2 right2 in
              balance set1 min2 set2'
 
-	let merge_safe warn parameters error set1 set2 =
+	let merge_with_logs warn parameters error set1 set2 =
 	  match set1,set2 with
           | Private.Empty,_ -> error,set2
 	  | _,Private.Empty -> error,set1
 	  | Private.Node _, Private.Node _ ->
-             let error,left2 = remove_min_elt_safe warn parameters error set2 in
-	     let error,elt_opt = min_elt_safe warn parameters error set2 in
+             let error,left2 = remove_min_elt_with_logs warn parameters error set2 in
+	     let error,elt_opt = min_elt_with_logs warn parameters error set2 in
 	     begin
 	       match
 		 elt_opt
 	       with
 	       | None ->
-		  let error = warn parameters error "setMap.ml" (Some "merge_safe,line 339") Not_found in
+		  let error = warn parameters error "setMap.ml" (Some "merge_with_logs,line 339") Not_found in
 		  error,set1
 	       | Some elt ->
-		  balance_safe warn parameters error set1 elt left2
+		  balance_with_logs warn parameters error set1 elt left2
 	     end
 
-	let rec join_safe warn parameters error left value right = 
+	let rec join_with_logs warn parameters error left value right = 
 	  match left,right with 
-          | Private.Empty,_ -> add_safe warn parameters error value right 
-          | _,Private.Empty -> add_safe warn parameters error value left
+          | Private.Empty,_ -> add_with_logs warn parameters error value right 
+          | _,Private.Empty -> add_with_logs warn parameters error value left
         | Private.Node(leftleft,leftvalue,leftright,leftheight),
           Private.Node(rightleft,rightvalue,rightright,rightheight) -> 
            if leftheight > rightheight + 2 
            then 
-            let error, right' = join_safe warn parameters error leftright value right in  
-            balance_safe warn parameters error leftleft leftvalue right'
+            let error, right' = join_with_logs warn parameters error leftright value right in  
+            balance_with_logs warn parameters error leftleft leftvalue right'
           else if rightheight > leftheight +2 then 
-            let error, left' = join_safe warn parameters error left value rightleft in 
-            balance_safe warn parameters error left'  rightvalue rightright 
+            let error, left' = join_with_logs warn parameters error left value rightleft in 
+            balance_with_logs warn parameters error left'  rightvalue rightright 
           else 
             error,node left value right 
 	       
@@ -402,35 +406,35 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              let min2,set2' = safe_extract_min_elt left2 value2 right2 in
              join set1 min2 set2'
 
-	let concat_safe warn parameters error set1 set2 = 
+	let concat_with_logs warn parameters error set1 set2 = 
 	  match set1,set2 with 
           | Private.Empty,_ -> error,set2 
           | _,Private.Empty -> error,set1 
           | _ -> 
-             let error,left2 =remove_min_elt_safe warn parameters error set2 in
-	     let error,elt_opt = min_elt_safe warn parameters error set2 in 
+             let error,left2 =remove_min_elt_with_logs warn parameters error set2 in
+	     let error,elt_opt = min_elt_with_logs warn parameters error set2 in 
              match
 	       elt_opt
 	     with
 	     | None ->
-		let error = warn parameters error "setMap.ml" (Some "concat_safe,line 390") Not_found in
+		let error = warn parameters error "setMap.ml" (Some "concat_with_logs,line 390") Not_found in
 		error,set1
-	     | Some elt -> join_safe warn parameters error set1 elt left2 
+	     | Some elt -> join_with_logs warn parameters error set1 elt left2 
 		  
 		  
-	let rec split_safe warn parameters error split_value set = 
+	let rec split_with_logs warn parameters error split_value set = 
 	  match set with 
           | Private.Empty -> error,(empty,false,empty)
           | Private.Node(left,set_value,right,_) ->
              let c = Ord.compare split_value set_value in 
              if c=0 then error,(left,true,right)
              else if c<0 then 
-               let error,(leftleft,bool,rightleft) = split_safe warn  parameters error split_value left in  
-               let error,rightright = join_safe warn parameters error rightleft set_value right in  
+               let error,(leftleft,bool,rightleft) = split_with_logs warn  parameters error split_value left in  
+               let error,rightright = join_with_logs warn parameters error rightleft set_value right in  
                error,(leftleft,bool,rightright) 
              else 
-               let error,(leftright,bool,rightright) = split_safe warn  parameters error split_value right in 
-               let error,leftleft = join_safe warn parameters error left set_value leftright in 
+               let error,(leftright,bool,rightright) = split_with_logs warn  parameters error split_value right in 
+               let error,leftleft = join_with_logs warn parameters error left set_value leftright in 
 	       error,(leftleft,bool,rightright)
 				 
 		  
@@ -446,18 +450,18 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	       let right' = remove value right in
 	       if right == right' then set else balance left value_set right'
 
-	let rec remove_safe warn parameters error value set =
+	let rec remove_with_logs warn parameters error value set =
 	  match set with
 	  | Private.Empty -> error,empty
           | Private.Node(left,value_set,right,_) ->
              let c = Ord.compare value value_set in
-             if c = 0 then merge_safe warn parameters error left right
+             if c = 0 then merge_with_logs warn parameters error left right
 	     else if c < 0 then
-            let error, left' = remove_safe warn parameters error value left in
-            balance_safe warn parameters error left' value_set right
+            let error, left' = remove_with_logs warn parameters error value left in
+            balance_with_logs warn parameters error left' value_set right
           else
-            let error, right' = remove_safe warn parameters error value right in
-            balance_safe warn parameters error left value_set right'								    
+            let error, right' = remove_with_logs warn parameters error value right in
+            balance_with_logs warn parameters error left value_set right'								    
 
 	let rec split split_value set =
 	  match set with
@@ -495,28 +499,28 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		 let right' = union right1 right2 in
 		 join left' value2 right'
 
-	let rec union_safe warn parameters error set1 set2 = 
+	let rec union_with_logs warn parameters error set1 set2 = 
 	  match set1,set2 with 
 	  | Private.Empty,_ -> error,set2 
           | _,Private.Empty -> error,set1   
 	  | Private.Node(left1,value1,right1,height1),Private.Node(left2,value2,right2,height2) -> 
 	     if height1 > height2 then 
-               if height2 = 1 then add_safe warn parameters error value2 set1 
+               if height2 = 1 then add_with_logs warn parameters error value2 set1 
 	       else
 		 begin 
-		   let error,(left2,_,right2) = split_safe warn parameters error value1 set2 in
-		   let error,left' = union_safe warn parameters error left1 left2 in 
-		   let error, right' = union_safe warn parameters error right1 right2 in 
-		   join_safe warn parameters error left' value1 right'
+		   let error,(left2,_,right2) = split_with_logs warn parameters error value1 set2 in
+		   let error,left' = union_with_logs warn parameters error left1 left2 in 
+		   let error, right' = union_with_logs warn parameters error right1 right2 in 
+		   join_with_logs warn parameters error left' value1 right'
 		 end  
 	     else 
-	       if height1 = 1 then add_safe warn parameters error value1 set2 
+	       if height1 = 1 then add_with_logs warn parameters error value1 set2 
 	       else
 		 begin 
-		   let error,(left1,_,right1) = split_safe warn parameters error value2 set1 in
-		   let error,left' = union_safe warn parameters error left1 left2 in 
-		   let error,right' = union_safe warn parameters error right1 right2 in  
-		   join_safe warn parameters error left' value2 right'
+		   let error,(left1,_,right1) = split_with_logs warn parameters error value2 set1 in
+		   let error,left' = union_with_logs warn parameters error left1 left2 in 
+		   let error,right' = union_with_logs warn parameters error right1 right2 in  
+		   join_with_logs warn parameters error left' value2 right'
 		 end
 		   
 	let suture (left1,value1,right1) (left2,bool,right2) f =
@@ -539,29 +543,29 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              let triple2 = split value1 set2 in
              suture (left1,value1,right1) triple2 inter
 
-	let suture_safe warn parameters error (left1,value1,right1) (left2,bool,right2) f = 
+	let suture_with_logs warn parameters error (left1,value1,right1) (left2,bool,right2) f = 
 	  let error ,left' = f warn parameters error left1 left2 in 
 	  let error, right' = f warn parameters error right1 right2 in 
 	  if bool then 
-	    join_safe warn parameters error left' value1 right'
+	    join_with_logs warn parameters error left' value1 right'
 	  else
-	    concat_safe warn parameters error left' right' 
+	    concat_with_logs warn parameters error left' right' 
           
-	let suture_not_safe warn parameters error (left1,value1,right1) (left2,bool,right2) f = 
+	let suture_not_with_logs warn parameters error (left1,value1,right1) (left2,bool,right2) f = 
 	  let error ,left' = f warn parameters error left1 left2 in 
 	  let error, right' = f warn parameters error right1 right2 in 
 	  if bool then 
-	    concat_safe warn parameters error left' right'
+	    concat_with_logs warn parameters error left' right'
 	  else 
-	    join_safe warn parameters error left' value1 right'
+	    join_with_logs warn parameters error left' value1 right'
          
-	let rec inter_safe warn parameters error set1 set2 = 
+	let rec inter_with_logs warn parameters error set1 set2 = 
 	  match set1,set2 with 
 	  | Private.Empty,_ 
 	  | _,Private.Empty -> error,empty
 	  | Private.Node(left1,value1,right1,_),_ ->
-	     let mh',triple2 = split_safe warn parameters error value1 set2 in  
-	     suture_safe warn parameters error (left1,value1,right1) triple2 inter_safe 
+	     let mh',triple2 = split_with_logs warn parameters error value1 set2 in  
+	     suture_with_logs warn parameters error (left1,value1,right1) triple2 inter_with_logs 
 		    
 	let rec diff set1 set2 =
 	  match set1,set2 with
@@ -571,13 +575,13 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              let triple2 = split value1 set2 in
              suture_not (left1,value1,right1) triple2 diff
 
-	let rec diff_safe warn parameters error set1 set2 = 
+	let rec diff_with_logs warn parameters error set1 set2 = 
 	  match set1,set2 with 
           | Private.Empty,_ -> error,empty
 	  | _,Private.Empty -> error,set1 
 	  | Private.Node(left1,value1,right1,_),_ -> 
-             let error,triple2 = split_safe warn parameters error value1 set2 in 
-             suture_not_safe warn parameters error (left1,value1,right1) triple2 diff_safe  
+             let error,triple2 = split_with_logs warn parameters error value1 set2 in 
+             suture_not_with_logs warn parameters error (left1,value1,right1) triple2 diff_with_logs  
 			
 	let rec minus set1 set2 =
 	  match set1,set2 with
@@ -587,13 +591,13 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              let triple2 = split value1 set2 in
              suture_not (left1,value1,right1) triple2 minus
 
-	let rec minus_safe warn parameters error set1 set2 =
+	let rec minus_with_logs warn parameters error set1 set2 =
 	  match set1,set2 with
 	  | Private.Empty,_ -> error,empty
 	  | _,Private.Empty -> error,set1
 	  | Private.Node(left1,value1,right1,_),_ ->
-             let error,triple2 = split_safe warn parameters error value1 set2 in
-             suture_not_safe warn parameters error (left1,value1,right1) triple2 minus_safe     
+             let error,triple2 = split_with_logs warn parameters error value1 set2 in
+             suture_not_with_logs warn parameters error (left1,value1,right1) triple2 minus_with_logs     
 
 	let rec mem searched_value = function
           | Private.Empty -> false
@@ -608,13 +612,13 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
                filt (filt (if p value then add value accu else accu) left) right
 	  in filt empty set
 
-       let filter_safe warn parameters error p set = 
+       let filter_with_logs warn parameters error p set = 
 	 let rec filt accu set = 
 	   match set with 
            | Private.Empty -> accu
            | Private.Node(left,value,right,_) ->
               let error,list = accu in  
-              filt (filt (if p value then add_safe warn parameters error value list else accu) left) right in 
+              filt (filt (if p value then add_with_logs warn parameters error value list else accu) left) right in 
 	 filt (error,empty) set 
         
 
@@ -629,7 +633,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		 right
 	  in part (empty,empty) set
 
-       let partition_safe warn parameters error p set =  
+       let partition_with_logs warn parameters error p set =  
 	 let rec part (rh,t,f as accu) set = 
            match set with 
           | Private.Empty -> accu 
@@ -639,10 +643,10 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
                  begin
                    if p value 
                    then   
-                     let a,b = add_safe warn parameters error value t
+                     let a,b = add_with_logs warn parameters error value t
                      in a,b,f
                    else 
-                     let a,c = add_safe warn parameters error value f in 
+                     let a,c = add_with_logs warn parameters error value f in 
                      a,t,c
                  end  
                  left) 
@@ -733,15 +737,15 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  | Private.Empty -> None
 	  | Private.Node (_,v,_,_) -> Some v *) min_elt
 						  
-(*	let add = Lift_error_logs.lift_generic_binary_for_KaSim add_safe 
-	let split = Lift_error_logs.lift_generic_binary_for_KaSim split_safe 					 
-	let remove =  Lift_error_logs.lift_generic_binary_for_KaSim remove_safe 
-	let union = Lift_error_logs.lift_generic_binary_for_KaSim union_safe 
-	let inter = Lift_error_logs.lift_generic_binary_for_KaSim inter_safe 
-	let diff = Lift_error_logs.lift_generic_binary_for_KaSim diff_safe
-	let minus = Lift_error_logs.lift_generic_binary_for_KaSim minus_safe 
-	let filter = Lift_error_logs.lift_generic_binary_for_KaSim filter_safe
-	let partition = Lift_error_logs.lift_generic_binary_binary_for_KaSim partition_safe
+(*	let add = Lift_error_logs.lift_generic_binary_for_KaSim add_with_logs 
+	let split = Lift_error_logs.lift_generic_binary_for_KaSim split_with_logs 					 
+	let remove =  Lift_error_logs.lift_generic_binary_for_KaSim remove_with_logs 
+	let union = Lift_error_logs.lift_generic_binary_for_KaSim union_with_logs 
+	let inter = Lift_error_logs.lift_generic_binary_for_KaSim inter_with_logs 
+	let diff = Lift_error_logs.lift_generic_binary_for_KaSim diff_with_logs
+	let minus = Lift_error_logs.lift_generic_binary_for_KaSim minus_with_logs 
+	let filter = Lift_error_logs.lift_generic_binary_for_KaSim filter_with_logs
+	let partition = Lift_error_logs.lift_generic_binary_binary_for_KaSim partition_with_logs
  *)								      
       end
 
@@ -833,13 +837,13 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 			   (node right1 key0 data0 right0)
             else node left key data right
 
-	let balance_safe warn parameter error left key data right =
+	let balance_with_logs warn parameter error left key data right =
 	  let height_left = height left in
 	  let height_right = height right in
 	  if height_left > height_right + 2 then
 	    match left with
             | Private.Empty ->
-	       let error = warn parameter error "setMap.ml" (Some "Map.balance_safe,line 845") (invalid_arg "Map.balance_map") in
+	       let error = warn parameter error "setMap.ml" (Some "Map.balance_with_logs,line 845") (invalid_arg "Map.balance_map") in
 	       error,empty (* Height_left > height_right + 2 >= 2 *)
             | Private.Node (left0,key0,data0,right0,_,_) ->
                if height left0 >= height right0 then
@@ -847,7 +851,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
                else
 		 match right0 with
 		 | Private.Empty ->
-		    let error = warn parameter error "setMap.ml" (Some "Map.balance_safe,line 853") (invalid_arg "Map.balance_map") in
+		    let error = warn parameter error "setMap.ml" (Some "Map.balance_with_logs,line 853") (invalid_arg "Map.balance_map") in
 		    error,empty  (* 0 <= height left0 < height right0 *)
 		 | Private.Node (left1,key1,data1,right1,_,_) ->
                     error,node (node left0 key0 data0 left1)
@@ -857,7 +861,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
             if height_right > height_left + 2 then
               match right with
               | Private.Empty ->
-		  let error = warn parameter error "setMap.ml" (Some "Map.balance_safe,line 853") (invalid_arg "Map.balance_map") in
+		  let error = warn parameter error "setMap.ml" (Some "Map.balance_with_logs,line 853") (invalid_arg "Map.balance_map") in
 		  error,empty (* height_left > height_right + 2 >= 2 *)			  
               | Private.Node (left0,key0,data0,right0,_,_) ->
 		 if height right0 >= height left0 then
@@ -865,7 +869,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		 else
 		   match left0 with
 		   | Private.Empty ->
-		      let error = warn parameter error "setMap.ml" (Some "Map.balance_safe,line 853") (invalid_arg "Map.balance_map") in
+		      let error = warn parameter error "setMap.ml" (Some "Map.balance_with_logs,line 853") (invalid_arg "Map.balance_map") in
 		      error,empty (* height_left > height_right + 2 >= 2 *)			  
 		   | Private.Node (left1,key1,data1,right1,_,_) ->
                       error,node (node left key data left1)
@@ -882,18 +886,18 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	       balance (add key data left) key_map data_map right
              else balance left key_map data_map (add key data right)
 
-	let rec add_safe warn parameter error key data = function
+	let rec add_with_logs warn parameter error key data = function
 	  | Private.Empty ->
 	     error,node empty key data empty
 	  | Private.Node (left,key_map,data_map,right,_,_) ->
              let cmp = Ord.compare key key_map in
              if cmp = 0 then error,node left key_map data right
              else if cmp < 0 then
-	       let error, left' = add_safe warn parameter error  key data left in 
-	       balance_safe warn parameter error left' key_map data_map right
+	       let error, left' = add_with_logs warn parameter error  key data left in 
+	       balance_with_logs warn parameter error left' key_map data_map right
              else
-	       let error, right' = add_safe warn parameter error key data right in 
-	       balance_safe warn parameter error left key_map data_map right'
+	       let error, right' = add_with_logs warn parameter error key data right in 
+	       balance_with_logs warn parameter error left key_map data_map right'
 		       
 	let rec extract_min_binding map key data map' =
 	  match map with
@@ -902,11 +906,11 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              let min, left' = extract_min_binding left2 key2 data2 right2 in
              min,balance left' key data map'
 
-	let rec extract_min_binding_safe warn parameters error map key data map' =
+	let rec extract_min_binding_with_logs warn parameters error map key data map' =
 	  match map with
 	  | Private.Empty -> error,((key,data),map')
 	  | Private.Node (left2,key2,data2,right2,_,_) ->
-             let error,(min, left') = extract_min_binding_safe warn parameters error left2 key2 data2 right2 in
+             let error,(min, left') = extract_min_binding_with_logs warn parameters error left2 key2 data2 right2 in
              error,(min,balance left' key data map')
 			 
 	let merge map1 map2 =
@@ -920,7 +924,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		  extract_min_binding left2 key2 data2 right2 in
 		balance map1 key3 data3 left'
 
-	let merge_safe warn parameters error map1 map2 =
+	let merge_with_logs warn parameters error map1 map2 =
 	  match map1 with
 	  | Private.Empty -> error,map2
 	  | Private.Node _ ->
@@ -928,8 +932,8 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              | Private.Empty -> error,map1
              | Private.Node(left2,key2,data2,right2,_,_) ->
 		let error,((key3,data3), left') =
-		  extract_min_binding_safe warn parameters error left2 key2 data2 right2 in
-		balance_safe warn parameters error map1 key3 data3 left'
+		  extract_min_binding_with_logs warn parameters error left2 key2 data2 right2 in
+		balance_with_logs warn parameters error map1 key3 data3 left'
 			
 	let rec remove key = function
 	  | Private.Empty -> empty
@@ -939,7 +943,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              else if cmp < 0 then balance (remove key left) key_map data right
              else balance left key_map data (remove key right)
 
-	let rec remove_safe warn parameters error key map = 
+	let rec remove_with_logs warn parameters error key map = 
 	  match map with 
 	  | Private.Empty ->
 	       let error = warn parameters error "setMap.ml" (Some "Map.remove_map,line 932") (failwith "Try to remove an association of an unknown key") in
@@ -947,14 +951,14 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  | Private.Node (left,key_map,data,right,_,_) ->
              let cmp = compare key key_map in 
 	     if cmp = 0 
-	     then merge_safe warn parameters error left right
+	     then merge_with_logs warn parameters error left right
 	     else if cmp < 0 
 	     then 
-	       let error, left' = remove_safe warn parameters error key left in 
-	       balance_safe warn parameters error left' key_map data right
+	       let error, left' = remove_with_logs warn parameters error key left in 
+	       balance_with_logs warn parameters error left' key_map data right
 	     else 
-	       let error, right' = remove_safe warn parameters error key right in 
-	       balance_safe warn parameters error left key_map data right'
+	       let error, right' = remove_with_logs warn parameters error key right in 
+	       balance_with_logs warn parameters error left key_map data right'
 			  
 			  
 	let rec pop x = function
@@ -979,15 +983,15 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              let h = height left2 - height right2 in
              if h > 2 || h< -2 then join left2 key2 data2 right2 else map2
 
-	let rec join_safe warn parameters error left key value right =
-	  match balance_safe warn parameters error left key value right with 
+	let rec join_with_logs warn parameters error left key value right =
+	  match balance_with_logs warn parameters error left key value right with 
           | error,Private.Empty ->
-	      let error = warn parameters error "setMap.ml" (Some "Map.join_safe, line 986, the output of balance should not be empty") (failwith "the output of balance should not be empty") in
+	      let error = warn parameters error "setMap.ml" (Some "Map.join_with_logs, line 986, the output of balance should not be empty") (failwith "the output of balance should not be empty") in
 	      error,empty
           | error,(Private.Node (left2,key2,data2,right2,_,_) as map2) -> 
              let h = height left2 - height right2 in 
              if h > 2 || h< -2 
-             then join_safe warn parameters error left2 key2 data2 right2 
+             then join_with_logs warn parameters error left2 key2 data2 right2 
              else error,map2 
 
 	let rec split value = function
@@ -1004,7 +1008,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
                let left2' = join left1 key1 data1 left2 in
                (left2',data2,right2)
 
-	let rec split_safe warn parameters error value map = 
+	let rec split_with_logs warn parameters error value map = 
 	  match map with 
           | Private.Empty -> error,(empty,None,empty) 
           | Private.Node (left1,key1,data1,right1,_,_) -> 
@@ -1012,12 +1016,12 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              if cmp = 0 then
                error,(left1,Some data1,right1)
              else if cmp < 0 then 
-               let error,(left2,data2,right2) = split_safe warn parameters error value left1 in 
-               let error,right2' = join_safe warn parameters error right2 key1 data1 right1 in     
+               let error,(left2,data2,right2) = split_with_logs warn parameters error value left1 in 
+               let error,right2' = join_with_logs warn parameters error right2 key1 data1 right1 in     
                error,(left2,data2,right2')
              else 
-               let error,(left2,data2,right2) = split_safe warn parameters error value right1 in
-               let error,left2' = join_safe warn parameters error left1 key1 data1 left2 in  
+               let error,(left2,data2,right2) = split_with_logs warn parameters error value right1 in
+               let error,left2' = join_with_logs warn parameters error left1 key1 data1 left2 in  
                error,(left2',data2,right2)   
 		 
 	let rec diff map1 map2 =
@@ -1063,16 +1067,16 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		    key1 (match data2 with None -> data1 | Some d2 -> d2)
 		    (update right1 right2)
 
-	let rec update_safe warn parameters error map1 map2 =
+	let rec update_with_logs warn parameters error map1 map2 =
 	  if map1==map2 then error,map2 
 	  else  
 	    match map1 with 
 	    | Private.Empty -> error,map2 
 	    | Private.Node(left1,key1,data1,right1,_,_) -> 
-	       let error,(left2,data2,right2) = split_safe warn parameters error key1 map2 in 
-               let error, left' = update_safe warn parameters error left1 left2 in
-               let error, right' = update_safe warn parameters error right1 right2 in 
-               join_safe warn parameters error left' key1 
+	       let error,(left2,data2,right2) = split_with_logs warn parameters error key1 map2 in 
+               let error, left' = update_with_logs warn parameters error left1 left2 in
+               let error, right' = update_with_logs warn parameters error right1 right2 in 
+               join_with_logs warn parameters error left' key1 
 			(match data2 with 
 			   None -> data1 
 			 | Some d2 -> d2)
@@ -1114,24 +1118,24 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              if cmp = 0 then data
              else find_default d key (if cmp<0 then left else right)
 
-	let rec find_option_safe warn parameter error key = function
+	let rec find_option_with_logs warn parameter error key = function
 	  | Private.Empty ->
 	     let error = warn parameter error "setMap.ml" (Some "line 659") Not_found in
 	     error,None
 	  | Private.Node (left,key_map,data,right,_,_) ->
              let cmp = Ord.compare key key_map in
              if cmp = 0 then (error,Some data)
-	     else find_option_safe warn parameter error key (if cmp<0 then left else right)
+	     else find_option_with_logs warn parameter error key (if cmp<0 then left else right)
 
 
-	let rec find_default_safe warn parameter error d key = function
+	let rec find_default_with_logs warn parameter error d key = function
 	  | Private.Empty ->
 	     let error = warn parameter error "setMap.ml" (Some "line 669") Not_found in
 	     error,d
 	  | Private.Node (left,key_map,data,right,_,_) ->
              let cmp = Ord.compare key key_map in
              if cmp = 0 then error,data
-             else find_default_safe warn parameter error d key (if cmp<0 then left else right)
+             else find_default_with_logs warn parameter error d key (if cmp<0 then left else right)
 
 	let rec mem key = function
           | Private.Empty -> false
@@ -1159,6 +1163,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	     let err'',value'' = f param err' key data value' in
 	     monadic_fold param err'' f right value''
 
+		      			  
 	let rec monadic_fold2 parameters rh f g h map1 map2 res =
 	  match map1,map2 with
           | Private.Empty,Private.Empty -> rh,res
@@ -1211,15 +1216,15 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 
 	let map f s = mapi (fun _ x -> f x) s
 
-	let rec map_safe warn parameters errors f map =
+	let rec map_with_logs warn parameters errors f map =
 	  match
 	    map
 	  with
 	  | Private.Empty -> errors,empty
 	  | Private.Node(left,key,data,right,_,_) ->
-	     let error,left' = map_safe warn parameters errors f left in
+	     let error,left' = map_with_logs warn parameters errors f left in
 	     let error,data' = f parameters errors data in
-	     let error,right' = map_safe warn parameters errors f right in 
+	     let error,right' = map_with_logs warn parameters errors f right in 
 	     error,node left' key data' right' 
 			   
 	let rec map2 f map map' =
@@ -1231,19 +1236,19 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		  key1 (match data2 with None -> data1 | Some d2 -> f data1 d2)
 		  (map2 f right1 right2)
 
-	let rec map2_safe warn parameters errors f g h map1 map2 =
+	let rec map2_with_logs warn parameters errors f g h map1 map2 =
 	  match map1 with 
 	  | Private.Empty ->
 	      begin
 	       match map2
 	       with 
 	       | Private.Empty -> errors,empty
-	       | Private.Node (_) -> map_safe warn parameters errors g map2 	
+	       | Private.Node (_) -> map_with_logs warn parameters errors g map2 	
 	      end
           | Private.Node(left1,key1,data1,right1,_,_) -> 
-             let error,(left2,data2,right2) = split_safe warn parameters errors key1 map2 in 
-             let error, left' = map2_safe warn parameters errors f g h left1 left2 in 
-             let error, right' = map2_safe warn parameters errors f g h right1 right2 in 
+             let error,(left2,data2,right2) = split_with_logs warn parameters errors key1 map2 in 
+             let error, left' = map2_with_logs warn parameters errors f g h left1 left2 in 
+             let error, right' = map2_with_logs warn parameters errors f g h right1 right2 in 
 	     let error, data' =
 	       begin
 		 match data2
@@ -1252,16 +1257,61 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		 | Some d2 -> h parameters errors data1 d2 
 	       end
 	     in 
-	     join_safe warn parameters error left' key1 data' right'
+	     join_with_logs warn parameters error left' key1 data' right'
 
-	let map2z_safe warn parameters errors =
-	  map2_safe warn parameters errors
-		     (fun _ error a ->
+	let map2z_with_logs warn parameters errors =
+	  map2_with_logs warn parameters errors
+		     (fun parameters error a ->
 		      let error = warn parameters error "setMap.ml" (Some "line 1248, incompatible maps in map2z_safe") Not_found in
 		      error,a)
-		     (fun _ error a ->
+		     (fun parameters error a ->
 		      let error = warn parameters error "setMap.ml" (Some "line 1251, incompatible maps in map2z_safe") Not_found in
-		      error,a)
+		      error,a)		    
+
+	let rec fold2_with_logs warn parameters error f g h map1 map2 res =
+	  match map1,map2 with 
+          | Private.Empty,Private.Empty -> error,res 
+          | Private.Empty , _ -> monadic_fold parameters error g map2 res					      
+	  | _ , Private.Empty -> monadic_fold parameters error f map1 res						 
+          | Private.Node(left1,key1,data1,right1,_,_),_ -> 
+             let error,(left2,data2,right2) = split_with_logs warn parameters error key1 map2 in 
+             begin 
+               match data2 with 
+               | None -> 
+		  let error, res' = fold2_with_logs warn parameters error f g h left1 left2 res in 
+                  let error, res'' = f parameters error key1 data1 res' in
+                  fold2_with_logs warn parameters error f g h right1 right2 res''
+               | Some data2 -> 
+                  let error, res' = fold2_with_logs warn parameters error f g h left1 left2 res in 
+                  let error,res'' = h parameters error (key1:elt) data1 data2 res' in
+                  fold2_with_logs warn parameters error f g h right1 right2 res''
+             end
+
+	let fold2z_with_logs warn parameters error =
+	  fold2_with_logs warn parameters error
+			  (fun parameters error _ _ a ->
+			   let error = warn parameters error "setMap.ml" (Some "line 1248, incompatible maps in fold2z_safe") Not_found in
+			   error,a)
+			  (fun parameters error _ _ a ->
+			   let error = warn parameters error "setMap.ml" (Some "line 1251, incompatible maps in fold2z_safe") Not_found in
+			   error,a)
+
+	let rec fold2_sparse_with_logs warn parameters error f map1 map2 res =
+	  match map1,map2 with 
+          | Private.Empty , _ 
+	  | _ , Private.Empty -> (error,res) 
+          | Private.Node(left1,key1,data1,right1,_,_),_ -> 
+             let error,(left2,data2,right2) = split_with_logs warn parameters error key1 map2 in 
+             begin 
+               match data2 with 
+               | None -> 
+		  let error, res' = fold2_sparse_with_logs warn parameters error f left1 left2 res in 
+                  fold2_sparse_with_logs warn parameters error f right1 right2 res'
+               | Some data2 -> 
+                  let error, res' = fold2_sparse_with_logs warn parameters error f left1 left2 res in 
+                  let error,res'' = f parameters error key1 data1 data2 res' in
+                  fold2_sparse_with_logs warn parameters error f right1 right2 res''
+             end
 
 	let rec for_all p = function
           | Private.Empty -> true
