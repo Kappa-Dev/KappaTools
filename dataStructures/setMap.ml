@@ -116,13 +116,13 @@ module type Map =
      val fold2_sparse_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error ->
 				 ('parameters -> 'error -> elt -> 'a  -> 'b  -> 'c  -> ('error * 'c)) ->  'a t -> 'b t -> 'c -> 'error * 'c
      val iter2_sparse_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('parameters -> 'error -> elt -> 'a  -> 'b  -> 'error)->  'a t -> 'b t -> 'error
-   (* val min_elt: (elt -> 'a -> bool) -> 'a t -> elt option  
     val diff_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t * 'a t 
+
     val diff_pred_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('a -> 'a -> bool) -> 'a t -> 'a t -> 'error * 'a t * 'a t 
     val merge_with_logs : ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t
     val union_with_logs : ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t
     val fold_map_restriction_with_logs:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a -> ('error * 'b) -> ('error* 'b)) -> set -> 'a t -> 'b -> 'error * 'b 
- *)																					
+ 																					
 																									     
     val iter: (elt -> 'a -> unit) -> 'a t -> unit
     val fold: (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
@@ -1056,6 +1056,36 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		    value1 (match op_data1 with None -> data2 | Some d1 -> d1)
 		    (union right1 right2)
 
+	let rec union_with_logs warn parameters error map1 map2 =
+	  match map1, map2 with
+        | Private.Empty, _ -> error, map2
+        | _, Private.Empty -> error, map1
+        | Private.Node (left1, value1, data1, right1, height1,_),
+          Private.Node (left2, value2, data2, right2, height2,_) ->
+           if height1 >= height2 then
+            begin
+              let error, (left2, op_data2, right2) =
+                split_with_logs warn parameters error value1 map2 in
+              let error, left' = union_with_logs warn parameters error left1 left2 in
+              let error, right' = union_with_logs warn parameters error right1 right2 in
+              join_with_logs warn parameters error left' value1 
+                       (match op_data2 with
+			| None -> data1
+			| Some d2 -> d2
+                       ) right'
+            end
+          else
+            begin
+              let error, (left1, op_data1, right1) =
+                split_with_logs warn parameters error value2 map1 in
+              let error, left' = union_with_logs warn parameters error  left1 left2 in
+              let error, right' = union_with_logs warn parameters error right1 right2 in
+              join_with_logs warn parameters error left' value1
+                       (match op_data1 with
+			| None -> data2
+			| Some d1 -> d1) right'
+            end
+
 	let rec update map1 map2 =
 	  if map1==map2 then map2
 	  else
@@ -1353,6 +1383,73 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 
 	let bindings s = bindings_aux [] s
 
+
+	let rec diff_with_logs warn parameters error map1 map2 =
+	  match map1 with 
+	  | Private.Empty -> error,empty,map2
+          | Private.Node (left1,key1,data1,right1,_,_) -> 
+          let error,(left2,data2,right2) = split_with_logs warn parameters error key1 map2 in 
+          let error,oleft1,oleft2 = diff_with_logs warn parameters error left1 left2 in
+          let error,oright1,oright2 = diff_with_logs warn parameters error right1 right2 in
+          begin 
+            match data2 with 
+            | Some x when x = data1 ->  
+               let error,o1 = merge_with_logs warn parameters error oleft1 oright1 in 
+               let error,o2 = merge_with_logs warn parameters error oleft2 oright2 in
+               error,o1,o2 
+            | Some data2  ->  
+               let error,o1 = join_with_logs warn parameters error oleft1 key1 data1 oright1 in 
+               let error,o2 = join_with_logs warn parameters error oleft2 key1 data2 oright2 in
+               error,o1,o2 
+            | None -> 
+               let error,o1 = join_with_logs warn parameters error oleft1 key1 data1 oright1 in 
+               let error,o2 = merge_with_logs warn parameters error oleft2 oright2 in
+               error,o1,o2 
+	  end
+
+	let rec diff_pred_with_logs warn parameters error pred map1 map2 =
+	  match map1 with 
+          | Private.Empty -> 
+             error,empty,map2 
+          | Private.Node(left1,key1,data1,right1,_,_) -> 
+           let error,(left2,data2,right2) = split_with_logs warn parameters error key1 map2 in 
+           let error,oleft1,oleft2 = diff_pred_with_logs warn parameters error pred left1 left2 in
+           let error,oright1,oright2 = diff_pred_with_logs warn parameters error pred right1 right2 in
+           begin 
+             match data2 with 
+             | Some x when pred x data1 ->  
+                let error,o1 = merge_with_logs warn parameters error oleft1 oright1 in 
+                let error,o2 = merge_with_logs warn parameters error oleft2 oright2 in
+                error,o1,o2 
+			   
+             | Some data2  ->  
+                let error,o1 = join_with_logs warn parameters error oleft1 key1 data1 oright1 in 
+                let error,o2 = join_with_logs warn parameters error oleft2 key1 data2 oright2 in
+                error,o1,o2 
+             | None ->
+                let error,o1 = join_with_logs warn parameters error oleft1 key1 data1 oright1 in 
+                let error,o2 = merge_with_logs warn parameters error oleft2 oright2 in
+                error,o1,o2 
+           end
+
+	let rec fold_map_restriction_with_logs warn parameters error f set map res =
+	  match set,map with 
+          | Set.Private.Empty,_ -> error,res
+          | Set.Private.Node(left1,key1,right1,_),_ -> 
+             let error,(left2,data2,right2) = split_with_logs warn parameters error key1 map in 
+             begin 
+               match data2 with 
+               | None -> 
+		let error, res' = fold_map_restriction_with_logs warn parameters error f left1 left2 res in 
+                fold_map_restriction_with_logs warn parameters error f right1 right2 res'
+               | Some data2 ->
+                  let error, res' = fold_map_restriction_with_logs warn parameters error f left1 left2 res in 
+                  let error,res'' = f key1 data2 (error,res') in
+                  fold_map_restriction_with_logs warn parameters error f right1 right2 res''
+          end
+
+	     
+	     
 	let random m =
 	  let s = size m in
 	  if s = 0 then raise Not_found

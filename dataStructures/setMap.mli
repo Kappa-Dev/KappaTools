@@ -101,12 +101,12 @@ module type Map =
    
     val fold2_sparse_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('parameters -> 'error -> elt -> 'a  -> 'b  -> 'c  -> ('error * 'c)) ->  'a t -> 'b t -> 'c -> 'error * 'c
     val iter2_sparse_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('parameters -> 'error -> elt -> 'a  -> 'b  -> 'error)->  'a t -> 'b t -> 'error 
-(*    val diff_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t * 'a t 
+    val diff_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t * 'a t 
     val diff_pred_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('a -> 'a -> bool) -> 'a t -> 'a t -> 'error * 'a t * 'a t 
     val merge_with_logs : ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t
     val union_with_logs : ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t
     val fold_map_restriction_with_logs:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a -> ('error * 'b) -> ('error* 'b)) -> set -> 'a t -> 'b -> 'error * 'b 
- *)
+ 
 								   
     val iter: (elt -> 'a -> unit) -> 'a t -> unit
     val fold: (elt -> 'a -> 'b -> 'b) -> 'a t -> 'b -> 'b
