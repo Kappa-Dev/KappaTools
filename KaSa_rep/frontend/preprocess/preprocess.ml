@@ -255,8 +255,35 @@ let translate_view parameters error handler k kasim_id agent bond_list =
         in 
         let error,(c_interface,bond_list) =
           match port.Ckappa_sig.port_lnk with 
-            | Ckappa_sig.LNK_ANY _ -> error,(c_interface,bond_list) 
-            | Ckappa_sig.FREE ->     
+             | Ckappa_sig.LNK_ANY pos -> 
+              begin
+                let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Binding port.Ckappa_sig.port_nme) () Misc_sa.const_unit site_dic in
+                let error,site_name = 
+                  match bool,output with
+                    | _ , None  | true, _  -> warn parameters error (Some "line 228") Exit 0
+                    | _ , Some (i,_,_,_) ->  
+                  error,i
+                in
+                let error,state_dic = 
+                  Misc_sa.unsome 
+                    (Int_storage.Nearly_Inf_Int_Int_storage_Imperatif_Imperatif.get parameters error (agent_name,site_name) handler.Cckappa_sig.states_dic)
+                    (fun error -> warn parameters error (Some "line 240") Exit (Cckappa_sig.Dictionary_of_States.init ()))
+                in                    
+                let error,max = Cckappa_sig.Dictionary_of_States.last_entry parameters error state_dic in 
+                let c_interface =
+                    Cckappa_sig.Site_map_and_set.Map.add
+                      site_name 
+                      { 
+                        Cckappa_sig.site_name = site_name ;
+                        Cckappa_sig.site_free = port.Ckappa_sig.port_free; 
+                        Cckappa_sig.site_position = Location.dummy ;
+                        Cckappa_sig.site_state = {Cckappa_sig.min = min 0 max; Cckappa_sig.max = max}
+                      } 
+                      c_interface 
+                in 
+                 error,(c_interface,bond_list) 
+              end
+	     | Ckappa_sig.FREE ->     
               begin
               let error,(bool,output) = Ckappa_sig.Dictionary_of_sites.allocate_bool parameters error Misc_sa.compare_unit (Ckappa_sig.Binding port.Ckappa_sig.port_nme) () Misc_sa.const_unit site_dic in
                 match bool,output with
