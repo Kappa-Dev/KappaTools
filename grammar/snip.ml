@@ -371,31 +371,6 @@ let find_implicit_infos sigs contact_map ags =
   let max_s m = function
     | Linked (i,_) -> max i m
     | Freed | Maintained | Erased -> m in
-  let rec aux_internals ty_id ints acc i =
-    if i = Array.length ints then acc
-    else
-      let acc' =
-	match ints.(i) with
-	| (I_ANY | I_VAL_CHANGED _ | I_VAL_ERASED _) -> acc
-	| I_ANY_CHANGED j ->
-	   Tools.list_map_flatten
-	     (fun ints' ->
-	      List.map (fun x ->
-			let ints'' = Array.copy ints' in
-			let () = ints''.(i) <- I_VAL_CHANGED (x,j) in
-			ints'')
-		       (internals_from_contact_map sigs contact_map ty_id i))
-	     acc
-	| I_ANY_ERASED ->
-	   Tools.list_map_flatten
-	     (fun ints' ->
-	      List.map (fun x ->
-			let ints'' = Array.copy ints' in
-			let () = ints''.(i) <- I_VAL_ERASED x in
-			ints'')
-		       (internals_from_contact_map sigs contact_map ty_id i))
-	     acc in
-      aux_internals ty_id ints acc' (succ i) in
   let new_switch free_id = function
     | Maintained -> Linked (Location.dummy_annot free_id)
     | Freed | Linked _ | Erased -> Freed in
@@ -454,14 +429,12 @@ let find_implicit_infos sigs contact_map ags =
   and aux_ags max_id = function
     | [] -> [succ max_id,[],[]]
     | ag :: ag_tail ->
-       Tools.list_map_flatten
+       List.map
 	 (fun (free_id,ports,ags,cor) ->
-	  List.map (fun ints ->
-		    (free_id,
-		     {ra_type = ag.ra_type; ra_ports = ports; ra_ints = ints;
-		      ra_syntax = ag.ra_syntax}::ags,
-		     cor))
-		   (aux_internals ag.ra_type ag.ra_ints [ag.ra_ints] 0)
+	  (free_id,
+	   {ra_type = ag.ra_type; ra_ports = ports; ra_ints = ag.ra_ints;
+	    ra_syntax = ag.ra_syntax}::ags,
+	   cor)
 	 )
 	 (aux_one ag_tail ag.ra_type max_id ag.ra_ports 0)
   in List.map (fun (_,mix,todo) -> (mix,todo)) (aux_ags 0 ags)
@@ -741,19 +714,22 @@ let rec add_agents_in_cc sigs id wk registered_links transf links_transf
        else
 	 let transf,wk' = match ag.ra_ints.(site_id) with
 	   | I_ANY -> (removed,added),wk
+	   | I_ANY_ERASED ->
+	      (Primitives.Transformation.NegativeInternalized (place,site_id)::removed,added),
+	      wk
+	   | I_ANY_CHANGED j ->
+	      (Primitives.Transformation.NegativeInternalized (place,site_id)::removed,
+	       Primitives.Transformation.PositiveInternalized (place,site_id,j)::added),
+	      wk
 	   | I_VAL_CHANGED (i,j) ->
 	      (if i = j then (removed,added)
 	       else
-		 Primitives.Transformation.Internalized (place,site_id,i)::removed,
-		 Primitives.Transformation.Internalized (place,site_id,j)::added),
+		 Primitives.Transformation.NegativeInternalized (place,site_id)::removed,
+		 Primitives.Transformation.PositiveInternalized (place,site_id,j)::added),
 		Connected_component.new_internal_state wk (node,site_id) i
 	   | I_VAL_ERASED i ->
-	      (Primitives.Transformation.Internalized (place,site_id,i)::removed,added),
+	      (Primitives.Transformation.NegativeInternalized (place,site_id)::removed,added),
 	      Connected_component.new_internal_state wk (node,site_id) i
-	   | (I_ANY_ERASED | I_ANY_CHANGED _) ->
-	      raise (ExceptionDefn.Internal_Error
-		       (Location.dummy_annot
-			  "Try to create the connected components of an ambiguous mixture."))
 	 in
 	 match ag.ra_ports.(site_id) with
 	 | L_ANY Maintained ->
@@ -858,7 +834,7 @@ let rec complete_with_creation
 	   match ag.Raw_mixture.a_ints.(site_id) with
 	   | None -> added,(site_id,None)
 	   | Some i ->
-	      Primitives.Transformation.Internalized (place,site_id,i)::added,
+	      Primitives.Transformation.PositiveInternalized (place,site_id,i)::added,
 	      (site_id,Some i) in
 	 let added'',actions',l_t' =
 	   match ag.Raw_mixture.a_ports.(site_id) with
@@ -911,7 +887,8 @@ let connected_components_of_mixture created (env,origin) mix =
 		    | Primitives.Transformation.Linked (x,y) ->
 		       Instantiation.Bind (x,y) :: acs
 		    | (Primitives.Transformation.Freed _ |
-		       Primitives.Transformation.Internalized _) -> acs)
+		       Primitives.Transformation.PositiveInternalized _ |
+		       Primitives.Transformation.NegativeInternalized _) -> acs)
 	   actions added in
        let transformations' = (List.rev removed, List.rev added) in
        let actions'',transformations'' =

@@ -6,7 +6,8 @@ sig
   type t =
       Freed of Agent_place.t * int
     | Linked of (Agent_place.t * int) * (Agent_place.t * int)
-    | Internalized of Agent_place.t * int * int
+    | PositiveInternalized of Agent_place.t * int * int
+    | NegativeInternalized of Agent_place.t * int
 
   val rename :
     Connected_component.work -> int ->

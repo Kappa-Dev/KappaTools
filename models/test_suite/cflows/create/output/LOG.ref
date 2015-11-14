@@ -21,27 +21,27 @@ ____________________________________________________________
 	 - cutting concurrent events
 	 - detecting pseudo inverse events
 	 - blackboard generation
-	 - computing causal past of each observed events (67)
+	 - computing causal past of each observed events (65)
 
 ____________________________________________________________
 ############################################################
 Stats:
  number of step   : 322
- longest story    : 10
- average length   : 4.26865671642
- geometric mean   : 4.38450460109
+ longest story    : 9
+ average length   : 4.24242424242
+ geometric mean   : 4.36237355465
 
-	 - causal & weak flow compression (67)
-
-____________________________________________________________
-############################################################
-
-
-
-	 - strong flow compression (3)
+	 - causal & weak flow compression (65)
 
 ____________________________________________________________
 ############################################################
-+ Pretty printing 3 weakly compressed flows
+
+
+
+	 - strong flow compression (2)
+
+____________________________________________________________
+############################################################
++ Pretty printing 2 weakly compressed flows
 + Pretty printing 1 strongly compressed flow
 Simulation ended
