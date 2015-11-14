@@ -68,7 +68,7 @@ module Site_map_and_set = SetMap.Make
     type t      = site_name
     let compare = compare
    end)
- 
+
 type 'state interface = 'state port Site_map_and_set.Map.t
                                                                            
 type 'interface proper_agent = 
