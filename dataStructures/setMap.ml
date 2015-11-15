@@ -207,7 +207,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  | Private.Empty -> 0
 	  | Private.Node(left,_,right,_) -> cardinal left + 1 + cardinal right
 
-        let balance_with_logs warn parameters error left value right =
+       (* let balance_with_logs warn parameters error left value right =
 	  let height_left = height left in
 	  let height_right = height right in
 	  if height_left > height_right + 2 then begin
@@ -251,7 +251,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		   end
 	    end
 	  else
-            error,node left value right
+            error,node left value right*)
 
 	let balance left value right =
 	  let height_left = height left in
@@ -289,8 +289,14 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 		      rightleftvalue
 		      (node rightleftright rightvalue rightright)
 	  else node left value right
-		    
-	(*	let balance = Lift_error_logs.lift_generic_ternary_for_KaSim balance_with_logs 					 *)
+
+	let balance_with_logs warn parameters error left value right =
+	  try
+	     error,balance left value right
+	  with
+	    assert_faillure ->
+	    let error = warn parameters error "setMap.ml" (Some "Set.balance,line 295, Set invariant is broken, keep on with unbalanced set") (invalid_arg "Set_and_Map.SET.balance")
+	    in error,node left value right 
 
 		       
 	let rec add x = function
@@ -802,6 +808,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  | Private.Node (_,_,_,m,_,_) -> max_key m
 
 	let balance left key data right =
+	  let _ = assert false in 
 	  let height_left = height left in
 	  let height_right = height right in
 	  if height_left > height_right + 2 then
@@ -837,7 +844,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 			   (node right1 key0 data0 right0)
             else node left key data right
 
-	let balance_with_logs warn parameter error left key data right =
+(*	let balance_with_logs warn parameter error left key data right =
 	  let height_left = height left in
 	  let height_right = height right in
 	  if height_left > height_right + 2 then
@@ -875,8 +882,17 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
                       error,node (node left key data left1)
 			   key1 data1
 			   (node right1 key0 data0 right0)
-            else error,node left key data right
+            else error,node left key data right*)
 
+	let balance_with_logs warn parameters error left key data right =
+	  try
+	     error,balance left key data right
+	  with
+	    assert_faillure ->
+	    let error = warn parameters error "setMap.ml" (Some "Map.balance,line 891, Map invariant is broken, keep on with unbalanced map") (invalid_arg "Set_and_Map.Map.balance")
+	    in error,node left key data right 
+
+			    
 	let rec add key data = function
 	  | Private.Empty -> node empty key data empty
 	  | Private.Node (left,key_map,data_map,right,_,_) ->
