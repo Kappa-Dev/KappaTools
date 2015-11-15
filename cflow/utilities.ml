@@ -28,15 +28,29 @@ type kappa_handler = D.S.PH.B.PB.CI.Po.K.H.handler
 type profiling_info = D.S.PH.B.PB.CI.Po.K.P.log_info
 		       
 type refined_trace = D.S.PH.B.PB.CI.Po.K.refined_step list
-type refined_trace_with_weak_events = (D.S.PH.B.PB.CI.Po.K.refined_step * bool) list 
-type refined_trace_with_side_effect = 
-  (D.S.PH.B.PB.CI.Po.K.refined_step * 
-     D.S.PH.B.PB.CI.Po.K.side_effect) list 
+type refined_trace_with_weak_events = (D.S.PH.B.PB.CI.Po.K.refined_step * bool) list
+type step_with_side_effects = D.S.PH.B.PB.CI.Po.K.refined_step * D.S.PH.B.PB.CI.Po.K.side_effect										
+type refined_trace_with_side_effect = step_with_side_effects list
 type step_id = D.S.PH.B.PB.step_id
+
+		 
 type cflow_grid = Causal.grid  
 type enriched_cflow_grid = Causal.enriched_grid
 type musical_grid =  D.S.PH.B.blackboard 
+type transitive_closure_config = Graph_closure.config 
+		       
+(* dag: internal representation for cflows *)
+type dag = D.graph
+(* cannonical form for cflows (completely capture isomorphisms) *)
+type dag_connonical_form = D.canonical_form
+(* prehashform for cflows, if two cflows are isomorphic, they have the same prehash form *) 
+type dag_prehash = D.prehash 
 
+(* I need to investigate further, what I know is that:
+   for each hash, there is a list of stories having this hash, for each one, we have the grid, the dag, I do not remember the three following components, and then a list of timestamp that indicated when the observables have been hit *) 
+type ('a,'b,'c) story_list =
+  dag_prehash * (cflow_grid * dag  * 'a option * ('b * D.S.PH.update_order list * refined_trace) * refined_trace * 'c Mods.simulation_info option list) list
+			     
 type observable_hit = 
   {
     list_of_actions: D.S.PH.update_order list ;
@@ -47,17 +61,7 @@ let get_event_list_from_observable_hit a = a.list_of_events
 let get_runtime_info_from_observable_hit a = a.runtime_info 
 let get_list_order a = a.list_of_actions 
 
-type ('a,'b,'c) remanent =  
-  error_log * int * (bool * int * int) *
-    D.S.PH.B.blackboard *
-      (D.prehash *
-         (Causal.grid * D.graph * 'a option *
-            ('b * D.S.PH.update_order list *
-               refined_trace) *
-              refined_trace *
-		'c Mods.simulation_info option list)
-           list)
-        list * int
+type ('a,'b,'c) remanent =  error_log * int * (bool * int * int) * D.S.PH.B.blackboard * (('a,'b,'c) story_list) list * int
 
 module Profiling = D.S.PH.B.PB.CI.Po.K.P
 		     
@@ -208,7 +212,12 @@ let convert_trace_into_grid_while_trusting_side_effects trace handler =
   D.S.PH.B.PB.CI.Po.K.build_grid refined_list true handler 
     
 let convert_trace_into_musical_notation = D.S.PH.B.import
-	   							
+
+let enrich_grid_with_transitive_closure = Causal.enrich_grid
+let enrich_big_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_init
+let enrich_small_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_intermediary
+let enrich_std_grid_with_transitive_closure f = Causal.enrich_grid f Graph_closure.config_std
+					    
 let from_none_to_weak_with_tick parameter handler log_info logger n_stories x y =
   let error,counter,tick,blackboard,w1,w2 = from_none_to_weak parameter handler log_info logger x y in
   let tick = Mods.tick_stories logger n_stories tick in 

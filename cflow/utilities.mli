@@ -31,19 +31,25 @@ type step_id = D.S.PH.B.PB.step_id
 type cflow_grid = Causal.grid  
 type enriched_cflow_grid = Causal.enriched_grid 
 type musical_grid = D.S.PH.B.blackboard 
+type transitive_closure_config = Graph_closure.config
+				   
+		      
+(* dag: internal representation for cflows *)
+type dag = D.graph
+(* cannonical form for cflows (completely capture isomorphisms) *)
+type dag_connonical_form = D.canonical_form
+(* prehashform for cflows, if two cflows are isomorphic, they have the same prehash form *) 
+type dag_prehash = D.prehash 
 
+(* I need to investigate further, what I know is that:
+   for each hash, there is a list of stories having this hash, for each one, we have the grid, the dag, I do not remember the three following components, and then a list of timestamp that indicated when the observables have been hit *) 
+type ('a,'b,'c) story_list =
+  dag_prehash * (cflow_grid * dag  * 'a option * ('b * D.S.PH.update_order list * refined_trace) * refined_trace * 'c Mods.simulation_info option list) list
+			     
+		      
 type observable_hit 
 			
-type ('a,'b,'c) remanent =  
-  error_log * int * (bool * int * int) *
-    D.S.PH.B.blackboard *
-      (D.prehash *
-         (Causal.grid * D.graph * 'a option *
-            ('b * D.S.PH.update_order list * refined_trace) *
-              refined_trace * 'c Mods.simulation_info option list)
-           list)
-        list * int
-
+type ('a,'b,'c) remanent =  error_log * int * (bool * int * int) * D.S.PH.B.blackboard * (('a,'b,'c) story_list) list * int
 
 (** error_init is an empty log of errors *)
 val error_init: D.S.PH.B.PB.CI.Po.K.H.error_channel
@@ -76,10 +82,16 @@ val remove_weak_events_annotation: refined_trace_with_weak_events -> refined_tra
 
 (** causal flows *)
 val convert_trace_into_grid_while_trusting_side_effects: refined_trace -> kappa_handler -> cflow_grid 
-
-													    
+val enrich_grid_with_transitive_closure:  Format.formatter -> transitive_closure_config -> cflow_grid -> enriched_cflow_grid
+val enrich_big_grid_with_transitive_closure: Format.formatter -> cflow_grid -> enriched_cflow_grid
+val enrich_small_grid_with_transitive_closure: Format.formatter -> cflow_grid -> enriched_cflow_grid 
+val enrich_std_grid_with_transitive_closure: Format.formatter -> cflow_grid -> enriched_cflow_grid 
+										   
 (** Musical processing *)
-val convert_trace_into_musical_notation: parameter -> kappa_handler -> error_log -> profiling_info -> refined_trace -> error_log * profiling_info * musical_grid 												    
+val convert_trace_into_musical_notation: parameter -> kappa_handler -> error_log -> profiling_info -> refined_trace -> error_log * profiling_info * musical_grid
+
+ 
+											     
 val extract_observable_hits_from_musical_notation: parameter -> kappa_handler -> error_log ->  musical_grid -> error_log * observable_hit list 
 val extract_observable_hit_from_musical_notation: string -> parameter -> kappa_handler -> error_log ->  musical_grid -> error_log * observable_hit  
 
@@ -90,11 +102,20 @@ val get_list_order: observable_hit -> D.S.PH.update_order list
 
 val causal_prefix_of_an_observable_hit: string -> parameter -> kappa_handler -> error_log -> profiling_info -> musical_grid -> enriched_cflow_grid -> observable_hit -> error_log * refined_trace (* (*D.S.PH.B.result*) refined_trace *)
 
+
+    
+
+
+																						      
 (** Print utilities *)													    
 val print_trace: parameter -> kappa_handler -> refined_trace -> unit  
 		
 val export_musical_grid_to_xls: parameter -> kappa_handler -> error_log  -> string -> int -> int -> musical_grid  -> error_log				
 val print_musical_grid: parameter -> kappa_handler -> error_log  -> musical_grid  -> error_log					   
+
+
+										       
+
 val from_none_to_weak_with_tick:
   D.S.PH.B.PB.CI.Po.K.H.parameter ->
   D.S.PH.B.PB.CI.Po.K.H.handler ->

@@ -169,8 +169,14 @@ let compress_and_print logger env log_info step_list =
                 else 
                   Graph_closure.config_std 
               in 
-              let enriched_grid = Causal.enrich_grid logger config_init grid in 
-              let _ = 
+              let enriched_grid =
+		if cut
+		then
+		  U.enrich_big_grid_with_transitive_closure logger grid
+		else
+	          U.enrich_std_grid_with_transitive_closure logger grid
+	      in 
+	      let _ = 
                 if Parameter.log_number_of_causal_flows
                 then 
                   Causal.print_stat logger parameter handler enriched_grid 
@@ -212,8 +218,8 @@ let compress_and_print logger env log_info step_list =
                   let error,log_info,blackboard_cflow = U.convert_trace_into_musical_notation parameter handler error log_info trace_without_pseudo_inverse_events in 
                   let error,observable_hit = U.extract_observable_hit_from_musical_notation "compression_main.ml, line 214, " parameter handler error blackboard_cflow in 
 		  let grid = U.convert_trace_into_grid_while_trusting_side_effects trace_without_pseudo_inverse_events  handler in 
-		  let enriched_grid = Causal.enrich_grid logger Graph_closure.config_intermediary grid in 
-                  let eid = 
+	      	  let enriched_grid = U.enrich_small_grid_with_transitive_closure logger grid in 
+		  let eid = 
                     match U.get_event_list_from_observable_hit observable_hit 
 		    with 
 		    | [a] -> a 
