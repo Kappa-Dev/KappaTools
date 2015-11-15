@@ -103,7 +103,8 @@ let remanent parameters =
 module I = SetMap.Make (struct type t = int let compare = compare end)
 module LI = (Map_wrapper.Make(I):Map_wrapper.S_with_logs with type 'a Map.t = 'a I.Map.t and type elt = int and type Set.t = I.Set.t)
 
-			
+module LLI = Map_wrapper.Make(SetMap.Make (struct type t = int let compare = compare end))
+					   
 let main () =
   let error = Exception.empty_error_handler in
   let error,parameters,files= Get_option.get_option error in
@@ -119,6 +120,18 @@ let main () =
     match i with None -> Printf.fprintf stderr "OK\n"
 	       | Some i -> Printf.fprintf stderr "KO %i \n" i
   in
+  let m' = LLI.Map.empty in
+  let error,m' = LLI.Map.add parameters error 2 3 m' in
+  let error,i = LLI.Map.find_option parameters error 2 m' in 
+  let _ =
+    match i with None -> Printf.fprintf stderr "KO\n"
+	       | Some i -> Printf.fprintf stderr "OK %i \n" i
+  in
+  let error,i = LLI.Map.find_option parameters error 3 m' in 
+  let _ =
+    match i with None -> Printf.fprintf stderr "OK\n"
+	       | Some i -> Printf.fprintf stderr "KO %i \n" i
+  in					
   let _ = Exception.print parameters error  in 
   ()
     
