@@ -17,7 +17,7 @@ addons:
 matrix:
   include:
   - env: CHECKED=js
-  - env: CHECKED=tk
+  - env: USE_TK=1
     addons:
       apt:
         sources:
@@ -43,13 +43,12 @@ install:
   - opam init -a git://github.com/ocaml/opam-repository && eval $(opam config env)
   - opam install ocamlfind
   - sh -c "if [ '$CHECKED' = js ] ; then opam install -y reactiveData tyxml js_of_ocaml ; fi"
-  - sh -c "if [ '$CHECKED' = tk ] ; then opam install -y labltk ; fi"
+  - sh -c "if [ '$USE_TK' = 1 ] ; then opam install -y labltk ; fi"
 
 script:
   - make all
   - sh -c "if [ '$CHECKED' = native ] ; then make doc_html ; fi"
   - sh -c "if [ '$CHECKED' = native ] ; then make -j2 check ; fi"
-  - sh -c "if [ '$CHECKED' = tk ] ; then make USE_TK=1 bin/KaSa ; fi"
   - sh -c "if [ '$CHECKED' = js ] ; then make js/JaSim.js ; fi"
 
 after_success:
