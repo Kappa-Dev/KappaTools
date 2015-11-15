@@ -168,5 +168,6 @@ let print_errors_light_for_kasim parameters handlers =
 
 
 
-   
-let lift_error_logs_for_KaSa f = f (fun parameters error string string_opt exn -> fst (warn parameters error string string_opt exn (fun  () -> ())))
+let wrap = (fun parameters error string string_opt exn -> fst (warn parameters error (Some string) string_opt exn (fun  () -> ())))
+	      
+let lift_error_logs_for_KaSa f = f (fun parameters error string string_opt exn -> fst (warn parameters error (Some string) string_opt exn (fun  () -> ())))

@@ -99,6 +99,28 @@ let remanent parameters =
               | None -> error, None 
               | Some (i, a, b, new_dic) -> error,
                 Some (i, a, b, List_core.update_dictionary old_handler new_dic)))           
+
+module I = SetMap.Make (struct type t = int let compare = compare end)
+module LI = (Map_wrapper.Make(I):Map_wrapper.S_with_logs with type 'a Map.t = 'a I.Map.t and type elt = int and type Set.t = I.Set.t)
+
+			
+let main () =
+  let error = Exception.empty_error_handler in
+  let error,parameters,files= Get_option.get_option error in
+  let m = LI.Map.empty in
+  let m = I.Map.add 2 3 m in
+  let error,i = LI.Map.find_option parameters error 2 m in 
+  let _ =
+    match i with None -> Printf.fprintf stderr "KO\n"
+	       | Some i -> Printf.fprintf stderr "OK %i \n" i
+  in
+  let error,i = LI.Map.find_option parameters error 3 m in 
+  let _ =
+    match i with None -> Printf.fprintf stderr "OK\n"
+	       | Some i -> Printf.fprintf stderr "KO %i \n" i
+  in
+  let _ = Exception.print parameters error  in 
+  ()
     
 (*let main () =
   let error = Exception.empty_error_handler in    
@@ -112,6 +134,6 @@ let remanent parameters =
       remanent 
       bdu_test_list
   in 
-  ()
+  ()*)
 
-let _ = main ()*)
+let _ = main ()

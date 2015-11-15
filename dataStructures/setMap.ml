@@ -121,7 +121,7 @@ module type Map =
     val diff_pred_with_logs: ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> ('a -> 'a -> bool) -> 'a t -> 'a t -> 'error * 'a t * 'a t 
     val merge_with_logs : ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t
     val union_with_logs : ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> 'a t -> 'a t -> 'error * 'a t
-    val fold_map_restriction_with_logs:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a -> ('error * 'b) -> ('error* 'b)) -> set -> 'a t -> 'b -> 'error * 'b 
+    val fold_restriction_with_logs:  ('parameters -> 'error -> string -> string option -> exn -> 'error) -> 'parameters -> 'error -> (elt -> 'a -> ('error * 'b) -> ('error* 'b)) -> set -> 'a t -> 'b -> 'error * 'b 
  																					
 																									     
     val iter: (elt -> 'a -> unit) -> 'a t -> unit
@@ -808,7 +808,6 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
 	  | Private.Node (_,_,_,m,_,_) -> max_key m
 
 	let balance left key data right =
-	  let _ = assert false in 
 	  let height_left = height left in
 	  let height_right = height right in
 	  if height_left > height_right + 2 then
@@ -1448,7 +1447,7 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
                 error,o1,o2 
            end
 
-	let rec fold_map_restriction_with_logs warn parameters error f set map res =
+	let rec fold_restriction_with_logs warn parameters error f set map res =
 	  match set,map with 
           | Set.Private.Empty,_ -> error,res
           | Set.Private.Node(left1,key1,right1,_),_ -> 
@@ -1456,12 +1455,12 @@ module Make(Ord:OrderedType): S with type elt = Ord.t =
              begin 
                match data2 with 
                | None -> 
-		let error, res' = fold_map_restriction_with_logs warn parameters error f left1 left2 res in 
-                fold_map_restriction_with_logs warn parameters error f right1 right2 res'
+		let error, res' = fold_restriction_with_logs warn parameters error f left1 left2 res in 
+                fold_restriction_with_logs warn parameters error f right1 right2 res'
                | Some data2 ->
-                  let error, res' = fold_map_restriction_with_logs warn parameters error f left1 left2 res in 
+                  let error, res' = fold_restriction_with_logs warn parameters error f left1 left2 res in 
                   let error,res'' = f key1 data2 (error,res') in
-                  fold_map_restriction_with_logs warn parameters error f right1 right2 res''
+                  fold_restriction_with_logs warn parameters error f right1 right2 res''
           end
 
 	     
