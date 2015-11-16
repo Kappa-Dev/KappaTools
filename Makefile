@@ -26,7 +26,7 @@ endif
 USE_TK?=0
 
 ifeq ($(USE_TK),1)
-OCAMLINCLUDES = -I KaSa_rep/lib/full -cflags -I,$(LABLTKLIBREP),-I,+labltk -lflags -I,$(LABLTKLIBREP),-I,+labltk -libs labltk,jpflib
+OCAMLINCLUDES = -pkg labltk -I KaSa_rep/lib/full -cflags -I,$(LABLTKLIBREP),-I,+labltk -lflags -I,$(LABLTKLIBREP),-I,+labltk -libs labltk,jpflib
 else
 OCAMLINCLUDES = -I KaSa_rep/lib/light
 endif
