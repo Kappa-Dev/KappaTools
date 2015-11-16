@@ -33,32 +33,16 @@ module type Dag =
     val dot_of_graph: (graph -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler
     val prehash: (graph -> S.PH.B.PB.CI.Po.K.H.error_channel * prehash) S.PH.B.PB.CI.Po.K.H.with_handler
     val canonicalize: (graph -> S.PH.B.PB.CI.Po.K.H.error_channel * canonical_form) S.PH.B.PB.CI.Po.K.H.with_handler
-(*    val compare: compact_representation -> compact_representation -> int *)
       
     val print_prehash: (prehash -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler
     val print_canonical_form: (canonical_form -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler
     val print_graph: (graph -> S.PH.B.PB.CI.Po.K.H.error_channel) S.PH.B.PB.CI.Po.K.H.with_handler
 
     val hash_list:
-      ((prehash *
-	  (Causal.grid * graph * canonical_form option *
-	     (S.PH.B.PB.step_id list * S.PH.update_order list *
-		S.PH.B.PB.CI.Po.K.refined_step list) *
-	       S.PH.B.PB.CI.Po.K.refined_step list  (** S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option*)*
-		 S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list)
-	    list) list ->
-       S.PH.B.PB.CI.Po.K.H.error_channel *
-	 (prehash *
-	    (Causal.grid * graph * canonical_form option *
-	       (S.PH.B.PB.step_id list * S.PH.update_order list *
-		  S.PH.B.PB.CI.Po.K.refined_step list) *
-		 S.PH.B.PB.CI.Po.K.refined_step list  (** S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option*)*
-		   S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list)
-	      list) list) S.PH.B.PB.CI.Po.K.H.with_handler
+      ((prehash * (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list) list) list -> S.PH.B.PB.CI.Po.K.H.error_channel * (prehash * (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list  * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option  list) list) list) S.PH.B.PB.CI.Po.K.H.with_handler
 
     val sort_list:
-      (prehash * (Causal.grid * graph * canonical_form option * (S.PH.B.PB.step_id list * S.PH.update_order list * S.PH.B.PB.CI.Po.K.refined_step list (** S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option*))* S.PH.B.PB.CI.Po.K.refined_step list * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list ) list) list ->
-      (Causal.grid * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list) list
+      (prehash * (Causal.grid * graph * canonical_form option * S.PH.B.PB.CI.Po.K.refined_step list * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list ) list) list -> (Causal.grid * S.PH.B.PB.CI.Po.K.P.log_info Mods.simulation_info option list) list
   end
 
 
@@ -305,9 +289,7 @@ module Dag =
           }
 
       let graph_of_config parameter handler error config = 
- (*       let ids = Hashtbl.fold (fun key _ l -> key::l) grid.Causal.flow [] in*)
         let label = label handler in 
-(*        let config = Causal.cut ids grid in *)
         let labels = A.make 1 (FICTITIOUS,"") in 
         let set =  
           Mods.IntMap.fold
@@ -621,7 +603,7 @@ module Dag =
         List.sort compare  
 
       let sort_inner = 
-        let compare (_,_,a,_,_,_) (_,_,b,_,_,_) = compare_canonic_opt a b in 
+        let compare (_,_,a,_,_) (_,_,b,_,_) = compare_canonic_opt a b in 
         List.sort compare 
           
       let hash_inner parameter handler error cmp list = 
@@ -629,7 +611,7 @@ module Dag =
         let rec visit elements_to_store stored_elements last_element last_element_occurrences = 
           match elements_to_store,last_element
           with 
-            | (_,_,t,_,_,list)::q,Some (_,_,old,_,_) when compare t old = 0 ->
+            | (_,_,t,_,list)::q,Some (_,_,old,_) when compare t old = 0 ->
               visit 
                 q 
                 stored_elements 
@@ -638,14 +620,14 @@ module Dag =
                    (fun list a -> a::list) 
                    list 
                    last_element_occurrences)
-            | (grid,graph,t,asso,event,list)::q,Some (grid',graph',a,event',first_asso) ->
+            | (grid,graph,t,event,list)::q,Some (grid',graph',a,event') ->
               
-              visit q ((grid',graph',a,first_asso,event',List.sort cmp last_element_occurrences)::stored_elements) (Some (grid,graph,t,event,asso)) ((*List.rev*) list)
-            | (grid,graph,t,asso,event,list)::q,None -> 
-              visit q stored_elements (Some (grid,graph,t,event,asso)) (List.rev list)
+              visit q ((grid',graph',a,event',List.sort cmp last_element_occurrences)::stored_elements) (Some (grid,graph,t,event)) ((*List.rev*) list)
+            | (grid,graph,t,event,list)::q,None -> 
+              visit q stored_elements (Some (grid,graph,t,event)) (List.rev list)
             | [],None -> []
-            | [],Some (grid,graph,a,event,first_asso) -> 
-              List.rev ((grid,graph,a,first_asso,event,List.sort cmp last_element_occurrences)::stored_elements)
+            | [],Some (grid,graph,a,event) -> 
+              List.rev ((grid,graph,a,event,List.sort cmp last_element_occurrences)::stored_elements)
         in
         let list = visit list [] None [] in 
         error,list 
@@ -678,14 +660,14 @@ module Dag =
               else 
                 let error,list' = 
                   List.fold_left 
-                    (fun (error,list') (grid,graph,dag,a,b,c) -> 
+                    (fun (error,list') (grid,graph,dag,b,c) -> 
                       let error,dag' = 
                         match dag 
                         with 
                           | None -> canonicalize parameter handler error graph 
                           | Some dag -> error,dag
                       in 
-                      (error,(grid,graph,Some dag',a,b,c)::list')
+                      (error,(grid,graph,Some dag',b,c)::list')
                     ) (error,[]) list 
                 in 
                 let error,list' = 
@@ -696,7 +678,7 @@ module Dag =
         let error,list = visit2 list error [] in 
         error,list 
 
-      let project_tuple (grid,_,_,_,_,list) = 
+      let project_tuple (grid,_,_,_,list) = 
         List.hd list,grid,list
 
       let sort_list list = 

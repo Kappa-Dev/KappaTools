@@ -42,14 +42,14 @@ type dag_connonical_form = D.canonical_form
 type dag_prehash = D.prehash 
 
 (* I need to investigate further, what I know is that:
-   for each hash, there is a list of stories having this hash, for each one, we have the grid, the dag, I do not remember the three following components, and then a list of timestamp that indicated when the observables have been hit *) 
-type ('a,'b,'c) story_list =
-  dag_prehash * (cflow_grid * dag  * 'a option * ('b * D.S.PH.update_order list * refined_trace) * refined_trace * 'c Mods.simulation_info option list) list
+   for each hash, there is a list of stories having this hash, for each one, we have the grid, the dag, I do not know what is the optional component, the compressed trace, then a list of timestamp that indicated when the observables have been hit *) 
+type ('a,'b) story_list =
+  dag_prehash * (cflow_grid * dag  * 'a option * refined_trace * 'b Mods.simulation_info option list) list
 			     
 		      
 type observable_hit 
 			
-type ('a,'b,'c) remanent =  error_log * int * (bool * int * int) * D.S.PH.B.blackboard * (('a,'b,'c) story_list) list * int
+type ('a,'b) remanent =  error_log * int * (bool * int * int) * D.S.PH.B.blackboard * (('a,'b) story_list) list * int
 
 (** error_init is an empty log of errors *)
 val error_init: D.S.PH.B.PB.CI.Po.K.H.error_channel
@@ -122,9 +122,10 @@ val from_none_to_weak_with_tick:
   D.S.PH.B.PB.CI.Po.K.P.log_info ->
   Format.formatter ->
   int ->
-  ('a,'b,'c) remanent ->
-  ('b * 'd * D.S.PH.B.PB.CI.Po.K.refined_step list) * 'e * 'c Mods.simulation_info option list ->
-  ('a,'b,'c) remanent
+  ('a,'b) remanent ->
+  D.S.PH.B.PB.CI.Po.K.refined_step list
+  * 'b Mods.simulation_info option list ->
+  ('a,'b) remanent
     
 val from_none_to_weak_with_tick_ext:
        D.S.PH.B.PB.CI.Po.K.H.parameter ->
@@ -132,9 +133,8 @@ val from_none_to_weak_with_tick_ext:
            D.S.PH.B.PB.CI.Po.K.P.log_info ->
            Format.formatter ->
            int ->
-           ('a,'b,'c) remanent ->
-	   'd * 'e * 'f * ('b * 'g * D.S.PH.B.PB.CI.Po.K.refined_step list) *
-           'h * 'c Mods.simulation_info option list ->
-           ('a,'b,'c) remanent
+           ('a,'b) remanent ->
+	   'd * 'e * 'f * D.S.PH.B.PB.CI.Po.K.refined_step list  * 'b Mods.simulation_info option list ->
+           ('a,'b) remanent
 	     
 		      

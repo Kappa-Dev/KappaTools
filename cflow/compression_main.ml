@@ -259,12 +259,12 @@ let compress_and_print logger env log_info step_list =
                     let error,prehash = D.prehash parameter handler error graph in
 		    let tick = Mods.tick_stories logger n_stories tick in
                     let causal_story_array =
-		      (prehash,[grid,graph,None,(event_id_list,list_order,event_list),[],[info]])::causal_story_array in 
+		      (prehash,[grid,graph,None,event_list,[info]])::causal_story_array in 
                     error,counter+1,tick,blackboard,causal_story_array,causal_story_faillure
 		  else
 		    U.from_none_to_weak_with_tick  parameter handler log_info logger n_stories
 		      (error,counter,tick,blackboard,causal_story_array,causal_story_faillure)
-		      ((event_id_list,list_order,trace_before_compression),[],[info])
+		      (trace_before_compression,[info])
 		)
                 (error,1,tick,blackboard,[],0) 
                 (List.rev list)
@@ -364,7 +364,7 @@ let compress_and_print logger env log_info step_list =
                   List.fold_left 
                     (fun (error,counter,tick,blackboard,strong_compression_faillure,strongly_compressed_story_array) (_,a) ->
                       List.fold_left 
-                        (fun (error,counter,tick,blackboard,strong_compression_faillure,strongly_compressed_story_array) (_,grid,graph,(event_id_list,list_order,event_list),refined_event_list,list_info) -> 
+                        (fun (error,counter,tick,blackboard,strong_compression_faillure,strongly_compressed_story_array) (_,grid,graph,refined_event_list,list_info) -> 
                           let info = List.hd list_info in 
                           let error,log_info,blackboard_tmp = D.S.PH.B.import parameter handler error log_info refined_event_list in 
                           let error,list = D.S.PH.forced_events parameter handler error blackboard_tmp in     
@@ -418,7 +418,7 @@ let compress_and_print logger env log_info step_list =
                                     in 
                                     Some info
                                 in 
-                                error,strong_compression_faillure,(prehash,[grid,graph,None,(event_id_list,list_order,event_list),[],list_info])::strongly_compressed_story_array,info
+                                error,strong_compression_faillure,(prehash,[grid,graph,None,[](* TO DO PROVIDE TRACE, IN CASE OF FURTHER COMPRESSION *),list_info])::strongly_compressed_story_array,info
                           in 
                           let error,log_info,blackboard = D.S.PH.B.reset_init parameter handler error log_info blackboard in 
                           let tick = Mods.tick_stories logger n_stories tick in

@@ -48,8 +48,8 @@ type dag_prehash = D.prehash
 
 (* I need to investigate further, what I know is that:
    for each hash, there is a list of stories having this hash, for each one, we have the grid, the dag, I do not remember the three following components, and then a list of timestamp that indicated when the observables have been hit *) 
-type ('a,'b,'c) story_list =
-  dag_prehash * (cflow_grid * dag  * 'a option * ('b * D.S.PH.update_order list * refined_trace) * refined_trace * 'c Mods.simulation_info option list) list
+type ('a,'b) story_list =
+  dag_prehash * (cflow_grid * dag  * 'a option * refined_trace * 'b Mods.simulation_info option list) list
 			     
 type observable_hit = 
   {
@@ -61,7 +61,7 @@ let get_event_list_from_observable_hit a = a.list_of_events
 let get_runtime_info_from_observable_hit a = a.runtime_info 
 let get_list_order a = a.list_of_actions 
 
-type ('a,'b,'c) remanent =  error_log * int * (bool * int * int) * D.S.PH.B.blackboard * (('a,'b,'c) story_list) list * int
+type ('a,'b) remanent =  error_log * int * (bool * int * int) * D.S.PH.B.blackboard * (('a,'b) story_list) list * int
 
 module Profiling = D.S.PH.B.PB.CI.Po.K.P
 		     
@@ -141,8 +141,9 @@ let export_musical_grid_to_xls = D.S.PH.B.export_blackboard_to_xls
 let print_musical_grid = D.S.PH.B.print_blackboard 
 
 
-let from_none_to_weak parameter handler log_info logger (error,counter,tick,blackboard,weakly_compressed_story_array,weakly_compression_faillure) ((event_id_list,list_order,event_list),step_list,list_info) = 
+let from_none_to_weak parameter handler log_info logger (error,counter,tick,blackboard,weakly_compressed_story_array,weakly_compression_faillure) ((*(event_id_list,list_order,event_list),*)step_list,list_info) = 
   let info = List.hd list_info in 
+  let event_list = step_list in 
   let error,log_info,blackboard_tmp,list_order = 
     let error,log_info,blackboard_tmp = D.S.sub parameter handler error log_info blackboard event_list in 
     let error,list = D.S.PH.forced_events parameter handler error blackboard_tmp in 
@@ -200,7 +201,7 @@ let from_none_to_weak parameter handler log_info logger (error,counter,tick,blac
               in 
               Some info
          in 
-         error,(prehash,[grid,graph,None,(event_id_list,list_order,event_list),weak_event_list,list_info])::weakly_compressed_story_array,weakly_compression_faillure,info
+         error,(prehash,[grid,graph,None,weak_event_list,list_info])::weakly_compressed_story_array,weakly_compression_faillure,info
   in 
   let error,log_info,blackboard = D.S.PH.B.reset_init parameter handler error log_info blackboard in 
   error,counter,tick,blackboard,weakly_compressed_story_array,weakly_compression_faillure
@@ -223,8 +224,8 @@ let from_none_to_weak_with_tick parameter handler log_info logger n_stories x y 
   let tick = Mods.tick_stories logger n_stories tick in 
   error,counter+1,tick,blackboard,w1,w2
 
-let from_none_to_weak_with_tick_ext parameter handler log_info logger n_stories x (_,_,_,y,z,t) =
-  let error,counter,tick,blackboard,w1,w2 = from_none_to_weak parameter handler log_info logger x (y,z,t) in
+let from_none_to_weak_with_tick_ext parameter handler log_info logger n_stories x (_,_,_,z,t) =
+  let error,counter,tick,blackboard,w1,w2 = from_none_to_weak parameter handler log_info logger x (z,t) in
   let tick = Mods.tick_stories logger n_stories tick in 
   error,counter+1,tick,blackboard,w1,w2
 				       
