@@ -579,15 +579,7 @@ let configurations_of_result result =
 	raise (ExceptionDefn.Malformed_Decl ("Unkown parameter "^error, pos_p))
     ) result.configurations
 
-let compile_alg_vars tokens contact_map domain overwrite vars =
-  let alg_vars_over =
-    Tools.list_rev_map_append
-      (fun (x,v) -> (Location.dummy_annot x,
-		     Location.dummy_annot (Ast.CONST v))) overwrite
-      (List.filter
-	 (fun ((x,_),_) ->
-	  List.for_all (fun (x',_) -> x <> x') overwrite) vars) in
-  let vars_nd = NamedDecls.create (Array.of_list alg_vars_over) in
+let compile_alg_vars tokens contact_map domain vars_nd =
   array_fold_left_mapi
     (fun i domain (lbl_pos,ast) ->
      let (domain',alg) =
@@ -621,26 +613,37 @@ let initialize logger overwrite result =
 		   0.0 0 !Parameter.maxTimeValue !Parameter.maxEventValue in
   Debug.tag logger "+ Compiling..." ;
   Debug.tag logger "\t -simulation parameters" ;
-  let _ = configurations_of_result result in
+  let () = configurations_of_result result in
 
   Debug.tag logger "\t -agent signatures" ;
   let sigs_nd = Signature.create result.Ast.signatures in
   let () = Debug.global_sigs := sigs_nd in
   let tk_nd =
     NamedDecls.create (array_map_of_list (fun x -> (x,())) result.Ast.tokens) in
-
+  Debug.tag logger "\t -sanity checks";
+  let ((_,extra_vars),cleaned_rules) =
+    Tools.list_fold_right_map name_and_purify_rule (0,[]) result.rules in
+  let alg_vars_over =
+    Tools.list_rev_map_append
+      (fun (x,v) -> (Location.dummy_annot x,
+		     Location.dummy_annot (Ast.CONST v))) overwrite
+      (List.filter
+	 (fun ((x,_),_) ->
+	  List.for_all (fun (x',_) -> x <> x') overwrite)
+	 (result.Ast.variables@extra_vars)) in
+  let vars_nd = NamedDecls.create (Array.of_list alg_vars_over) in
+  let () = Sanity.compil sigs_nd tk_nd vars_nd
+			 {result with variables = alg_vars_over } in
+  Debug.tag logger "\t -KaSa tools initialization";
   let pre_kasa_state = Export_to_KaSim.Export_to_KaSim.init result in
   let kasa_state,contact_map =
     Export_to_KaSim.Export_to_KaSim.get_contact_map pre_kasa_state in
-  let _ = Export_to_KaSim.Export_to_KaSim.dump_errors_light kasa_state in 
-  let kasa_state = Export_to_KaSim.Export_to_KaSim.flush_errors kasa_state in 
+  let _ = Export_to_KaSim.Export_to_KaSim.dump_errors_light kasa_state in
+  let kasa_state = Export_to_KaSim.Export_to_KaSim.flush_errors kasa_state in
   let domain = Connected_component.Env.empty sigs_nd in
   Debug.tag logger "\t -variable declarations";
-  let ((_,extra_vars),cleaned_rules) =
-    Tools.list_fold_right_map name_and_purify_rule (0,[]) result.rules in
   let domain',alg_a =
-    compile_alg_vars tk_nd.NamedDecls.finder contact_map domain
-		     overwrite (result.Ast.variables@extra_vars) in
+    compile_alg_vars tk_nd.NamedDecls.finder contact_map domain vars_nd in
   let alg_nd = NamedDecls.create alg_a in
   let alg_deps = Alg_expr.setup_alg_vars_rev_dep alg_a in
 

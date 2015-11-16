@@ -1,8 +1,7 @@
 open Mods
 
 type switching =
-  | Linked of int Location.annot | Freed | Maintained
-  | Erased
+  | Linked of int Location.annot | Freed | Maintained | Erased
 
 type rule_internal =
     I_ANY
@@ -82,13 +81,22 @@ let build_l_type sigs dst_ty dst_p switch =
   let p_id = Signature.id_of_site dst_ty dst_p sigs in
   L_TYPE (ty_id,p_id,switch)
 
-let several_internal_states pos =
-  raise (ExceptionDefn.Malformed_Decl
-	   ("In a pattern, a site cannot have several internal state ",pos))
+let link_occurence_failure key pos =
+  raise (ExceptionDefn.Internal_Error
+	   ("Link "^string_of_int key^
+	      " is problematic! Either Sanity.mixture is broken"^
+		" or you don't use it!",pos))
 
-let several_occurence_of_site agent_name (na,pos) =
-  raise (ExceptionDefn.Malformed_Decl
-	   ("Site '"^na^"' occurs more than once in this agent '"^agent_name^"'",pos))
+let internal_state_failure pos =
+  raise (ExceptionDefn.Internal_Error
+	   ("Internal state of site is problematic! Either Sanity.mixture is"^
+	      "broken or you don't use it!",pos))
+
+let site_occurence_failure ag_na (na,pos) =
+  raise (ExceptionDefn.Internal_Error
+	   ("Site '"^na^"' of agent '"^ag_na^
+	      "' is problematic! Either Sanity.mixture is"^
+		"broken or you don't use it!",pos))
 
 let not_enough_specified agent_name (na,pos) =
   raise (ExceptionDefn.Malformed_Decl
@@ -116,14 +124,14 @@ let annotate_dropped_agent sigs ((agent_name, _ as ag_ty),intf) =
 	      match Signature.default_internal_state ag_id p_id sigs with
 	      | None -> internals.(p_id) <> I_ANY
 	      | Some _ -> internals.(p_id) <> I_ANY_ERASED
-	 then several_occurence_of_site agent_name p_na in
+	 then site_occurence_failure agent_name p_na in
 
        let () = match p.Ast.port_int with
 	 | [] -> ()
 	 | [ va ] ->
 	    internals.(p_id) <-
 	      I_VAL_ERASED (Signature.num_of_internal_state p_id va sign)
-	 | _ :: (_, pos) :: _ -> several_internal_states pos in
+	 | _ :: (_, pos) :: _ -> internal_state_failure pos in
        match p.Ast.port_lnk with
        | (Ast.LNK_ANY, _) -> ports.(p_id) <- L_ANY Erased
        | (Ast.LNK_SOME, _) ->
@@ -169,13 +177,13 @@ let annotate_created_agent id sigs ((agent_name, pos as ag_ty),intf) =
        let () =
 	 if ports.(p_id) <> Raw_mixture.FREE ||
 	      internals.(p_id) <> Signature.default_internal_state ag_id p_id sigs
-	 then several_occurence_of_site agent_name p_na in
+	 then site_occurence_failure agent_name p_na in
        let () = match p.Ast.port_int with
 	 | [] -> ()
 	 | [ va ] ->
 	    internals.(p_id) <-
 	      Some (Signature.num_of_internal_state p_id va sign)
-	 | _ :: (_, pos) :: _ -> several_internal_states pos in
+	 | _ :: (_, pos) :: _ -> internal_state_failure pos in
        match p.Ast.port_lnk with
        | (Ast.LNK_ANY, _) -> ()
        | ((Ast.LNK_SOME, _) | (Ast.LNK_TYPE _,_)) ->
@@ -279,15 +287,14 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
 		("The internal state of port '"^na^
 		   "' is underspecified on the right hand side", pos))
     | (_ :: (_,pos) :: _, _ | _, _ :: (_,pos) :: _) ->
-       several_internal_states pos
-  in
+       internal_state_failure pos in
   let find_in_rp (na,pos) rp =
     let (p',r) =
       List.partition (fun p -> String.compare (fst p.Ast.port_nme) na = 0) rp in
     match p' with
     | [p'] -> (p',r)
     | [] -> not_enough_specified agent_name (na,pos)
-    | _ :: _ -> several_occurence_of_site agent_name (na,pos) in
+    | _ :: _ -> site_occurence_failure agent_name (na,pos) in
   let rp_r =
     List.fold_left
       (fun rp p ->
@@ -295,7 +302,7 @@ let annotate_agent_with_diff sigs (agent_name, _ as ag_ty) lp rp =
        let p_id = Signature.num_of_site ~agent_name p_na sign in
        let () =
 	 if ports.(p_id) <> L_ANY Maintained || internals.(p_id) <> I_ANY
-	 then several_occurence_of_site agent_name p_na in
+	 then site_occurence_failure agent_name p_na in
        let p',rp' = find_in_rp p_na rp in
        let () = register_port_modif p_id p.Ast.port_lnk p' in
        let () = register_internal_modif p_id p.Ast.port_int p' in
@@ -506,11 +513,6 @@ let is_linked_on_port me i id = function
 let is_linked_on i ag =
   Tools.array_filter (is_linked_on_port (-1) i) ag.ra_ports <> []
 
-let dangling_link side key =
-  raise (ExceptionDefn.Malformed_Decl
-	   (Location.dummy_annot ("At least link "^string_of_int key^
-				   " is dangling on the " ^side)))
-
 let define_full_transformation
       sigs (removed,added as transf) links_transf place site dst switch =
   let cand = match dst with
@@ -691,14 +693,13 @@ let make_instantiation
 	 aux (pred site_id) tests'' actions'' side_sites' side_effects' links' in
      aux (pred (Array.length ports)) tests actions side_sites side_effects links
 
-
 let rec add_agents_in_cc sigs id wk registered_links transf links_transf
 			 instantiations remains =
   function
   | [] ->
      begin match IntMap.root registered_links with
 	   | None -> (wk,transf,links_transf,instantiations,remains)
-	   | Some (key,_) -> dangling_link "left" key
+	   | Some (key,_) -> link_occurence_failure key Location.dummy
      end
   | ag :: ag_l ->
      let (node,wk) = Connected_component.new_node wk ag.ra_type in
@@ -784,9 +785,7 @@ let rec add_agents_in_cc sigs id wk registered_links transf links_transf
 		    handle_ports
 		      wk'' r_l c_l' transf'' l_t'' re acc (succ site_id)
 		 | _ :: _ ->
-		    raise (ExceptionDefn.Malformed_Decl
-			     ("There are more than two sites using link "^
-				string_of_int i,pos))
+		    link_occurence_failure i pos
 		 | [] -> (* link between 2 agents *)
 		    let r_l' = IntMap.add i (node,site_id) r_l in
 		    let transf',l_t' =
@@ -798,17 +797,12 @@ let rec add_agents_in_cc sigs id wk registered_links transf links_transf
 		         handle_ports
 			   wk' r_l' c_l transf' l_t' re' acc (succ site_id)
 		       else
-			 raise (ExceptionDefn.Malformed_Decl
-				  ("There is only 1 occurence of link "^
-				     string_of_int i,pos))
+			 link_occurence_failure i pos
 		    | [n], re' when List.for_all
 				      (fun x -> not(is_linked_on i x)) acc ->
 		       handle_ports
 			 wk' r_l' c_l transf' l_t' re' (n::acc) (succ site_id)
-		    | _, _ ->
-		       raise (ExceptionDefn.Malformed_Decl
-				("There are more than two occurences of link "^
-				   string_of_int i,pos))
+		    | _, _ -> link_occurence_failure i pos
      in handle_ports wk registered_links IntMap.empty transf links_transf remains ag_l 0
 
 let rec complete_with_creation
@@ -818,7 +812,7 @@ let rec complete_with_creation
      begin match IntMap.root links_transf with
 	   | None -> List.rev_append create_actions actions,
 		     (List.rev removed, List.rev added)
-	   | Some (i,_) -> dangling_link "right" i
+	   | Some (i,_) -> link_occurence_failure i Location.dummy
      end
   | (ag,pos) :: ag_l ->
      let place = Agent_place.Fresh (ag.Raw_mixture.a_type,fresh) in
@@ -844,10 +838,9 @@ let rec complete_with_creation
 	       else Instantiation.Free (place,site_id) :: actions),
 	      l_t
 	   | Raw_mixture.VAL i ->
-	      match IntMap.find_option i l_t with
-	      | Some ((place',site' as dst),safe) ->
-		let l_t' = IntMap.remove i l_t in
-		let () =
+	      match IntMap.pop i l_t with
+	      | Some ((place',site' as dst),safe),l_t' ->
+		 let () =
 		  if not safe then
 		    let sort = Agent_place.get_type place' in
 		    ExceptionDefn.warning
@@ -861,7 +854,7 @@ let rec complete_with_creation
 		(Instantiation.Bind_to((place,site_id),dst)
 		 ::(Instantiation.Bind_to((dst,(place,site_id))))::actions),
 		l_t'
-	      | None ->
+	      | None,l_t ->
 		let l_t' = IntMap.add i ((place,site_id),true) l_t in
 		(added',actions,l_t') in
 	 handle_ports added'' l_t' actions' (point::intf) (succ site_id) in

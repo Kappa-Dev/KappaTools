@@ -6,10 +6,7 @@ done
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
-Some exceptions have been raised during the static analysis, please analyse your file with KaSa
-+ Compute the contact map
-	 -variable declarations
-	 -rules
+	 -sanity checks
 + Command line is: 'KaSim' 'rhs.ka' '-seed' '924556145' '-d' 'output' '--compile'
 Parsing rhs.ka...
 done
@@ -18,10 +15,7 @@ done
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
-Some exceptions have been raised during the static analysis, please analyse your file with KaSa
-+ Compute the contact map
-	 -variable declarations
-	 -rules
+	 -sanity checks
 + Command line is: 'KaSim' 'internal.ka' '-seed' '924556145' '-d' 'output' '--compile'
 Parsing internal.ka...
 done
@@ -30,10 +24,7 @@ done
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
-Some exceptions have been raised during the static analysis, please analyse your file with KaSa
-+ Compute the contact map
-	 -variable declarations
-	 -rules
+	 -sanity checks
 + Command line is: 'KaSim' 'remove.ka' '-seed' '924556145' '-d' 'output' '--compile'
 Parsing remove.ka...
 done
@@ -42,7 +33,4 @@ done
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
-Some exceptions have been raised during the static analysis, please analyse your file with KaSa
-+ Compute the contact map
-	 -variable declarations
-	 -rules
+	 -sanity checks

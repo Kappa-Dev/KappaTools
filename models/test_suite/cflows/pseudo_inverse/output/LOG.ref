@@ -6,6 +6,8 @@ done
 + Compiling...
 	 -simulation parameters
 	 -agent signatures
+	 -sanity checks
+	 -KaSa tools initialization
 + Compute the contact map
 	 -variable declarations
 	 -rules
