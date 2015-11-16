@@ -437,7 +437,7 @@ let find_implicit_infos sigs contact_map ags =
 	   cor)
 	 )
 	 (aux_one ag_tail ag.ra_type max_id ag.ra_ports 0)
-  in List.map (fun (_,mix,todo) -> (mix,todo)) (aux_ags 0 ags)
+  in List.rev @@ List.rev_map (fun (_,mix,todo) -> (mix,todo)) (aux_ags 0 ags)
 
 let complete_with_candidate ag id todo p_id p_switch =
   Tools.array_fold_lefti
@@ -928,15 +928,13 @@ let rule_mixtures_of_ambiguous_rule contact_map sigs lhs rhs =
   created
 
 let aux_connected_components_sum_of_ambiguous_rule contact_map env ?origin lhs rhs =
-  let () =
-    if !Parameter.compileModeOn then
-      Format.eprintf "@[<v>_____@,"(*"@[<2>%a@]@," Expr.print_ast_mix lhs*) in
   let sigs = Connected_component.Env.sigs env in
   let all_mixs,(_,created) =
     rule_mixtures_of_ambiguous_rule contact_map sigs lhs rhs in
   let () =
     if !Parameter.compileModeOn then
-      Format.eprintf "%a@]@."
+      Format.eprintf "@[<v>_____(%i)@,%a@]@."
+		     (List.length all_mixs)
 		     (Pp.list
 			Pp.cut
 			(fun f x ->
