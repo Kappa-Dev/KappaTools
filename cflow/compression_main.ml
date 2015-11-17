@@ -51,6 +51,7 @@ let compress_and_print logger env log_info step_list =
     if get_all_stories
     then D.S.PH.B.PB.CI.Po.K.H.set_all_stories_per_obs parameter 
     else parameter 
+  in 
   let mode = parameter.D.S.PH.B.PB.CI.Po.K.H.compression_mode in
   let causal_trace_on = Parameter.get_causal_trace mode in
   let weak_compression_on = Parameter.get_weak_compression mode in
