@@ -169,13 +169,6 @@ let compress_and_print logger env log_info step_list =
 
 	      (* We use the grid to get the causal precedence (pred* ) of each observable *)
 	      let grid = U.convert_trace_into_grid_while_trusting_side_effects refined_event_list_without_pseudo_inverse handler in
-	      let config_init = 
-                if cut
-                then 
-                  Graph_closure.config_init
-                else 
-                  Graph_closure.config_std 
-              in 
               let enriched_grid =
 		if cut
 		then
@@ -205,7 +198,6 @@ let compress_and_print logger env log_info step_list =
                 then Mods.tick_stories logger n_stories (false,0,0) 
                 else (false,0,0)
               in
-	      let blackboard_cflow = blackboard in 
               List.fold_left 
                 (fun (error,counter,tick,blackboard,causal_story_array,causal_story_faillure) observable_id
  -> 
@@ -224,8 +216,6 @@ let compress_and_print logger env log_info step_list =
                   in 
                   let error,log_info,blackboard_cflow = U.convert_trace_into_musical_notation parameter handler error log_info trace_without_pseudo_inverse_events in 
                   let error,observable_hit = U.extract_observable_hit_from_musical_notation "compression_main.ml, line 214, " parameter handler error blackboard_cflow in 
-		  let grid = U.convert_trace_into_grid_while_trusting_side_effects trace_without_pseudo_inverse_events  handler in 
-	      	  let enriched_grid = U.enrich_small_grid_with_transitive_closure logger grid in 
 		  let eid = 
                     match U.get_event_list_from_observable_hit observable_hit 
 		    with 
@@ -256,7 +246,6 @@ let compress_and_print logger env log_info step_list =
 		       in 
                        Some info
                   in
-		  let list_order = U.get_list_order observable_hit in 
 		  if
 		    store_uncompressed_stories || not cut
 		  then
