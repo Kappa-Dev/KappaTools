@@ -1,6 +1,7 @@
 (**Graph rewriting module*)
 
 type t (**Abstract graph*)
+
 type result = Clash | Success of t | Corrected of t
 
 (** {6 Initialisation} *)

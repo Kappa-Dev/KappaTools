@@ -4,7 +4,7 @@ module Edge = struct
   type t = ToFree
 	 | Link of (int * int * int) (** sort * id * site *)
 
-  let compare x y = match x,y with
+  let _compare x y = match x,y with
     | ToFree, Link _ -> -2
     | Link _, ToFree -> 2
     | ToFree, ToFree -> 0

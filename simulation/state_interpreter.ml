@@ -60,9 +60,13 @@ let snapshot env counter file graph =
       (fun f -> Format.fprintf f "%a@." (Rule_interpreter.print env) graph)
 
 
-let do_it env domain counter graph state = function
+let do_it env domain counter graph state modification =
+  let get_alg i = get_alg env state i in
+  let print_expr_val =
+    Kappa_printer.print_expr_val
+      (Rule_interpreter.value_alg counter graph ~get_alg) in
+  match modification with
   | Primitives.ITER_RULE ((v,_),r) ->
-     let get_alg i = get_alg env state i in
      let n = Rule_interpreter.value_alg counter graph ~get_alg v in
      (false,
       Nbr.iteri
@@ -73,7 +77,6 @@ let do_it env domain counter graph state = function
 		counter g (Causal.PERT "pert") r))
 	graph n,state)
   | Primitives.UPDATE (va,(expr,_)) ->
-     let get_alg i = get_alg env state i in
      begin
        match va with
        | Operator.ALG i ->
@@ -86,13 +89,7 @@ let do_it env domain counter graph state = function
 	  failwith "Problematic update perturbation"
      end
   | Primitives.STOP pexpr ->
-     let get_alg i = get_alg env state i in
-     let file =
-       Format.asprintf
-	 "@[<h>%a@]" (Kappa_printer.print_expr_val
-			~env (fun ?env ->
-			      Rule_interpreter.value_alg counter graph ~get_alg))
-	 pexpr in
+     let file = Format.asprintf "@[<h>%a@]" print_expr_val pexpr in
      let () = snapshot env counter file graph in
      (true,graph,state)
   (*     raise (ExceptionDefn.StopReached
@@ -100,35 +97,18 @@ let do_it env domain counter graph state = function
 		 "STOP instruction was satisfied at (%d e,%f t.u)"
 		 (Mods.Counter.event counter) (Mods.Counter.time counter))) *)
   | Primitives.PRINT (pe_file,pe_expr) ->
-     let get_alg i = get_alg env state i in
-     let file =
-       Format.asprintf
-	 "@[<h>%a@]" (Kappa_printer.print_expr_val
-			~env (fun ?env ->
-			      Rule_interpreter.value_alg counter graph ~get_alg))
-	 pe_file in
+     let file = Format.asprintf "@[<h>%a@]" print_expr_val pe_file in
      let desc =
        match file with "" -> Format.std_formatter
 		     | _ -> Environment.get_desc file env in
-     let () =
-       Format.fprintf
-	 desc "%a@." (Kappa_printer.print_expr_val
-			~env (fun ?env ->
-			      Rule_interpreter.value_alg counter graph ~get_alg))
-	 pe_expr in
+     let () = Format.fprintf desc "%a@." print_expr_val pe_expr in
      (false, graph, state)
   | Primitives.PLOTENTRY ->
      let () = Plot.plot_now env counter.Mods.Counter.time
 			    (observables_values env counter graph state) in
      (false, graph, state)
   | Primitives.SNAPSHOT pexpr  ->
-     let get_alg i = get_alg env state i in
-     let file =
-       Format.asprintf
-	 "@[<h>%a@]" (Kappa_printer.print_expr_val
-			~env (fun ?env ->
-			      Rule_interpreter.value_alg counter graph ~get_alg))
-	 pexpr in
+     let file = Format.asprintf "@[<h>%a@]" print_expr_val pexpr in
      let () = snapshot env counter file graph in
      (false, graph, state)
   | Primitives.CFLOW (name,cc,tests) ->
@@ -146,13 +126,7 @@ let do_it env domain counter graph state = function
   | Primitives.CFLOWOFF cc ->
      (false, Rule_interpreter.remove_tracked cc graph, state)
   | Primitives.FLUX s ->
-     let get_alg i = get_alg env state i in
-     let file =
-       Format.asprintf
-	 "@[<h>%a@]"
-	 (Kappa_printer.print_expr_val
-	    ~env (fun ?env ->
-		  Rule_interpreter.value_alg counter graph ~get_alg)) s in
+     let file = Format.asprintf "@[<h>%a@]" print_expr_val s in
      let size = 2 * Environment.nb_syntactic_rules env + 1 in
      let () =
        if List.exists (fun (x,_) -> x = file) state.flux
@@ -165,13 +139,7 @@ let do_it env domain counter graph state = function
      let el = file,Array.make_matrix size size 0. in
      (false, graph, {state with flux = el::state.flux})
   | Primitives.FLUXOFF s ->
-     let get_alg i = get_alg env state i in
-     let file =
-       Format.asprintf
-	 "@[<h>%a@]"
-	 (Kappa_printer.print_expr_val
-	    ~env (fun ?env ->
-		  Rule_interpreter.value_alg counter graph ~get_alg)) s in
+     let file = Format.asprintf "@[<h>%a@]" print_expr_val s in
      let (these,others) = List.partition (fun (x,_) -> x = file) state.flux in
      let () = List.iter (Outputs.dot_of_flux env) these in
      (false, graph, {state with flux = others})
@@ -210,7 +178,7 @@ let perturbate env domain counter graph state =
 	do_until_noop (succ i) graph state stop in
   do_until_noop 0 graph state false
 
-let one_rule form dt stop env domain counter graph state =
+let one_rule _form dt stop env domain counter graph state =
   let choice,_ = Random_tree.random state.activities in
   let rule_id = choice/2 in
   let rule = Environment.get_rule env rule_id in
