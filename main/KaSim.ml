@@ -169,8 +169,8 @@ let () =
 			   d (env,cc_env,counter) [Marshal.Closures]) in
     let () = Kappa_files.with_ccFile
 	       (fun f -> Connected_component.Env.print_dot f cc_env) in
-    let _ = Export_to_KaSim.Export_to_KaSim.dump_errors_light kasa_state in 
-    let kasa_state = Export_to_KaSim.Export_to_KaSim.flush_errors kasa_state in 
+    let () = Export_to_KaSim.Export_to_KaSim.dump_errors_light kasa_state in
+    let _kasa_state = Export_to_KaSim.Export_to_KaSim.flush_errors kasa_state in
     ExceptionDefn.flush_warning Format.err_formatter ;
     if !Parameter.compileModeOn then exit 0 else ();
 

@@ -110,7 +110,7 @@ let extract_observable_hit_from_musical_notation string a b c d =
       list_of_events = b; 
       runtime_info = c}
   | [] -> failwith (string^" no story")
-  | [] -> failwith (string^" several stories")
+  | _::_ -> failwith (string^" several stories")
       
     
 let causal_prefix_of_an_observable_hit string parameter handler error log_info blackboard (enriched_grid:enriched_cflow_grid) observable_id = 
@@ -122,7 +122,6 @@ let causal_prefix_of_an_observable_hit string parameter handler error log_info b
     | [] -> failwith ("no observable in that story"^string)
     | _ -> failwith  ("several observables in that story"^string)
   in 
-  let log_info = Profiling.set_start_compression log_info in 
   let event_id_list_rev = ((eid+1)::(enriched_grid.Causal.prec_star.(eid+1))) in 
   let event_id_list = List.rev_map pred (event_id_list_rev) in 
   let error,list_eid,_ = D.S.translate parameter handler error blackboard event_id_list in 
