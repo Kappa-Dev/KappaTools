@@ -103,20 +103,9 @@ let print_remanent_modif parameter error result =
     ) parameter result
 
 (************************************************************************************)
-
-(*let print_remanent_modif_opt parameter error result =
-  AgentMap.print error (fun error parameter pair_list ->
-    let _ =
-      print_pair_list pair_list
-    in
-    error
-  ) parameter result*)
-
-(************************************************************************************)
 (*main print*)
 
 let print_bdu_build parameter error result =
-  (*print if one would like to test*)
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "\n------------------------------------------------------------\n";
@@ -125,6 +114,7 @@ let print_bdu_build parameter error result =
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
   in
+  (*------------------------------------------------------------------------------*)
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "- Covering classes triple (id, list, set):\n";
@@ -133,6 +123,7 @@ let print_bdu_build parameter error result =
       error
       result.store_remanent_triple
   in
+  (*------------------------------------------------------------------------------*)
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "- Test rule with new index:\n";
@@ -141,6 +132,7 @@ let print_bdu_build parameter error result =
       error
       result.store_remanent_test
   in
+  (*------------------------------------------------------------------------------*)
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "- Creation rule with new index:\n";
@@ -149,6 +141,7 @@ let print_bdu_build parameter error result =
       error
       result.store_remanent_creation
   in
+  (*------------------------------------------------------------------------------*)
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "- Modification rule with new index (excluding created agents):\n";
@@ -157,12 +150,4 @@ let print_bdu_build parameter error result =
       error
       result.store_remanent_modif
   in
-  (*let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "- Modification rule with new index (without creation rules):\n";
-    print_remanent_modif_opt
-      parameter
-      error
-      result.store_remanent_modif_opt
-  in*)
   error

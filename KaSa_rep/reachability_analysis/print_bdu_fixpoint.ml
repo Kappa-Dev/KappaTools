@@ -38,15 +38,6 @@ let print_bdu_creation_array parameter error result =
       error
     ) parameter result
 
-(*let print_bdu_creation_array_map parameter error result =
-  Array.iteri (fun index bdu_creation ->
-    let _ =
-      fprintf stdout "index of this array:%i\n" index;
-      print_bdu parameter error bdu_creation
-    in
-    ()
-  ) result*)
-
 (************************************************************************************)
 
 let print_bdu_test_array parameter error result =
@@ -63,37 +54,6 @@ let print_bdu_test_array parameter error result =
       in
       error
     ) parameter result
-
-(*let print_bdu_test_array_map parameter error result =
-  AgentMap.print error
-    (fun error parameter array ->
-      let _ =
-        Array.iteri (fun index bdu_test ->
-          let _ =
-            fprintf stdout "index of this array:%i\n" index;
-            print_bdu parameter error bdu_test
-          in
-          ()
-        ) array
-      in
-      error) parameter result*)
-
-(************************************************************************************)
-
-(*let print_bdu_creation_test_array parameter error result =
-  AgentMap.print error
-    (fun error parameter array ->
-      let _ =
-        Array.iteri (fun index bdu ->
-          let _ =
-            fprintf stdout "index of this array:%i\n" index;
-            print_bdu parameter error bdu
-          in
-          ()
-        ) array
-      in
-      error
-    ) parameter result*)
 
 (************************************************************************************)
 (*main print*)
@@ -115,22 +75,6 @@ let print_bdu_fixpoint parameter error result =
       error
       result.store_bdu_creation_array    
   in
-  (*let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "- TEST with MAP An array of bdu_creation:\n";
-    print_bdu_creation_array_map
-      parameter
-      error
-      result.store_bdu_creation_array_map    
-  in
-  let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "- TEST with MAP An array of bdu_test:\n";
-    print_bdu_test_array_map
-      parameter
-      error
-      result.store_bdu_test_array_map    
-  in*)
   let _ =
     fprintf (Remanent_parameters.get_log parameter)
       "------------------------------------------------------------\n";
@@ -141,14 +85,4 @@ let print_bdu_fixpoint parameter error result =
       error
       result.store_bdu_test_array    
   in
-  (*let _ =
-    fprintf (Remanent_parameters.get_log parameter)
-      "------------------------------------------------------------\n";
-    fprintf (Remanent_parameters.get_log parameter)
-      "- An array of bdu_creation and bdu_test:\n";
-    print_bdu_creation_test_array
-      parameter
-      error
-      result.store_bdu_creation_test_array    
-  in*)
   error

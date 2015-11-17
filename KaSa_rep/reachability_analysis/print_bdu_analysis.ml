@@ -39,12 +39,14 @@ let print_result parameter error result =
       error 
       result.store_bdu_analysis_static
   in
+  (*------------------------------------------------------------------------------*)
   let _ =
     print_result_dynamic
       parameter
       error
       result.store_bdu_analysis_dynamic
   in
+  (*------------------------------------------------------------------------------*)
   (*print if one would like to test*)
   (*let _ =
     print_bdu_build
@@ -52,12 +54,14 @@ let print_result parameter error result =
       error
       result.store_bdu_build
   in*)
+  (*------------------------------------------------------------------------------*)
   let _ =
     print_bdu_build_map
       parameter
       error
       result.store_bdu_build_map
   in
+  (*------------------------------------------------------------------------------*)
   let _ =
     print_bdu_fixpoint
       parameter

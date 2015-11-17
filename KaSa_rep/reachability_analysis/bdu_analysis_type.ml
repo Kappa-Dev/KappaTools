@@ -81,14 +81,6 @@ module Int2Map_Remove_effect =
 (*------------------------------------------------------------------------------*)
 (*update function of covering classes and modification sites*)
 
-(*module Int2Map_CV_Modif = (*TODO:CHANGE int * int*)
-  SetMap.Make (
-    struct
-      (*agent_type, site, covering_class_id*)
-      type t = int * int * int
-      let compare = compare
-    end)*)
-
 module Int2Map_CV_Modif = 
   SetMap.Make (
     struct
@@ -108,13 +100,6 @@ module Map_test =
     end)
 
 module Map_creation =
-  SetMap.Make (
-    struct
-      type t = int * int
-      let compare = compare
-    end)
-
-module Map_modif_creation = (*without creation rules - REMOVE*)
   SetMap.Make (
     struct
       type t = int * int
@@ -159,17 +144,12 @@ type bdu_analysis_static =
   {
     store_covering_classes_id : (int list * int list) Int2Map_CV.Map.t;
     store_side_effects        : half_break_action * remove_action;
-    (*store_creation_sites      : (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t;*)
-    (*store_modification_sites_without_creation : (int list * Site_map_and_set.Set.t)
-      Int2Map_Modif.Map.t;*)
     store_modification_sites  :
       (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t;
     store_test_sites :
       (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t;
-    store_test_modification_sites : (*use in update function*)
+    store_test_modification_sites :
       (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t;
-    (*store_test_modification_without_creation : (*use in update*)
-      (int list * Site_map_and_set.Set.t) Int2Map_Modif.Map.t;*)
   }
 
 (************************************************************************************)
@@ -182,20 +162,9 @@ type bdu_analysis_dynamic =
     store_contact_map      : 
     (*TODO: combine contact map and modification update into a product type*)
     (int list * (int * int * int) list) Int2Map_CM_state.Map.t;
-    (*store_covering_classes_modification_update :
-      (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;*)
-    (*TODO*)
     store_covering_classes_modification_update :
       (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;
     store_wl_creation : wl_int;
-    (*store_update :
-      (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t *
-      (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t *
-      (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t *
-      (int list * Site_map_and_set.Set.t) Int2Map_CV_Modif.Map.t;
-    store_wl_update          : wl_int AgentMap.t;
-    store_wl_creation        : wl_int AgentMap.t;
-    store_wl_creation_update : wl_int AgentMap.t*)
   }
 
 (************************************************************************************)
@@ -207,7 +176,6 @@ type bdu_build =
     store_remanent_test      : (int * (int * int * int) list) list AgentMap.t;
     store_remanent_creation  : (int * (int * int * int) list) list AgentMap.t;
     store_remanent_modif     : (int * (int * int * int) list) list AgentMap.t;
-    (*store_remanent_modif_opt : (int * (int * int * int) list) list AgentMap.t;*)
   }
 
 (************************************************************************************)
@@ -222,12 +190,9 @@ type bdu_build_map =
   {
     store_remanent_test_map     : (int list * (int * int * int) list) Map_test.Map.t;
     store_remanent_creation_map : (int list * (int * int * int) list) Map_creation.Map.t;
-    (*store_remanent_modif_opt_map: (int list * (int * int* int) list)Map_modif_creation.Map.t;*)
     store_test_bdu              : (int * bool Mvbdu_sig.mvbdu) list AgentMap.t;
     store_creation_bdu          : (int * bool Mvbdu_sig.mvbdu) list AgentMap.t;
-    (*store_test_bdu_map          : (int list * pair_bdu list) Map_test_bdu.Map.t;
-    store_creation_bdu_map      : (int list * pair_bdu list) Map_creation_bdu.Map.t;*)
-    (*store_modif_list_map        : (int list * int list) Map_modif_list.Map.t*)
+  (*store_modif_list_map        : (int list * int list) Map_modif_list.Map.t*)
   }
 
 (************************************************************************************)
@@ -237,9 +202,6 @@ type bdu_fixpoint =
   {
     store_bdu_creation_array      : bool Mvbdu_sig.mvbdu array AgentMap.t;
     store_bdu_test_array          : bool Mvbdu_sig.mvbdu array AgentMap.t;
-    (*store_bdu_creation_array_map  : bool Mvbdu_sig.mvbdu array;
-    store_bdu_test_array_map      : bool Mvbdu_sig.mvbdu array AgentMap.t;*)
-    (*store_bdu_creation_test_array : bool Mvbdu_sig.mvbdu array AgentMap.t*)
   }
 
 (************************************************************************************)

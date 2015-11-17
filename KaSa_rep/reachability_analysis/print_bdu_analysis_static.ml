@@ -251,57 +251,6 @@ let print_test_modification_sites parameter error result =
   error
 
 (************************************************************************************)
-(*creation*)
-
-(*let print_creation_sites parameter error result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "Creation sites (will be removed):\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  let error =
-    print_modification_sites_aux
-      parameter
-      error 
-      result
-  in
-  error*)
-
-(************************************************************************************)
-(*test/modification without creation*)
-
-(*let print_modification_sites_without_creation parameter error result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "Modification sites without creation:\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  let error =
-    print_modification_sites_aux 
-      parameter
-      error 
-      result
-  in
-  error*)
-
-(*let print_test_modification_without_creation parameter error result =
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "Test and modification sites without creation (will be removed):\n";
-  fprintf (Remanent_parameters.get_log parameter)
-    "------------------------------------------------------------\n";
-  let error =
-    print_modification_sites_aux 
-      parameter
-      error
-      result;
-  in
-  error*)
-
-(************************************************************************************)
 (*main print*)
 
 let print_result_static parameter error result =
@@ -344,22 +293,4 @@ let print_result_static parameter error result =
       error 
       result.store_test_modification_sites
   in
-  (*let _ =
-    print_creation_sites
-      parameter
-      error
-      result.store_creation_sites
-  in*)
-  (*let _ =
-    print_modification_sites_without_creation
-      parameter
-      error
-      result.store_modification_sites_without_creation
-  in*)
-  (*let _ = 
-    print_test_modification_without_creation
-      parameter
-      error
-      result.store_test_modification_without_creation
-  in*)
   error
