@@ -37,15 +37,14 @@ type grid =
       init_to_eidmax: (int,int) Hashtbl.t;
     }
 type config =
-    {
-      events: atom IntMap.t ;
-      prec_1: IntSet.t IntMap.t ;
-      conflict : IntSet.t IntMap.t ;
-      top : IntSet.t}
+  {
+    events_kind: event_kind IntMap.t ;
+    prec_1: IntSet.t IntMap.t ;
+    conflict : IntSet.t IntMap.t ;
+  }
 type enriched_grid =
     {
       config:config;
-      ids:(int * int * int) list ;
       depth:int;
       prec_star: int list array ; (*decreasing*)
       depth_of_event: int Mods.IntMap.t ;
@@ -53,10 +52,7 @@ type enriched_grid =
     }
 
 let empty_config =
-  {events=IntMap.empty ;
-   conflict = IntMap.empty ;
-   prec_1 = IntMap.empty ;
-   top = IntSet.empty}
+  { events_kind=IntMap.empty; conflict = IntMap.empty; prec_1 = IntMap.empty }
 
 let debug_print_event_kind f = function
   | OBS i -> Format.fprintf f "OBS(%s)" i
@@ -139,15 +135,15 @@ let subset subs l s =
     IntSet.empty l
 
 let subconfig_with_subs subs config l =
-  {events = submap subs l config.events None ;
-   prec_1 = submap subs l config.prec_1 (Some IntSet.empty);
-   conflict = submap subs l config.conflict (Some IntSet.empty);
-   top = subset subs l config.top}
+  {
+    events_kind = submap subs l config.events_kind None ;
+    prec_1 = submap subs l config.prec_1 (Some IntSet.empty);
+    conflict = submap subs l config.conflict (Some IntSet.empty);
+  }
 let subenriched_grid_with_subs subs  grid l =
   let depth_of_event = submap subs  l grid.depth_of_event (Some 0) in
   let depth = IntMap.fold (fun _ -> max) depth_of_event 0 in
   {
-    ids = grid.ids;
     prec_star = grid.prec_star;
     config = subconfig_with_subs subs grid.config l ;
     depth_of_event = depth_of_event ;
@@ -282,28 +278,28 @@ let record_init (lbl,actions) is_weak event_number env grid =
   add_actions env grid event_number (INIT lbl)  actions
 
 let add_pred eid atom config =
-  let events = IntMap.add atom.eid atom config.events in
+  let events_kind = IntMap.add atom.eid atom.kind config.events_kind in
   let pred_set =
     IntMap.find_default IntSet.empty eid config.prec_1 in
   let prec_1 = IntMap.add eid (IntSet.add atom.eid pred_set) config.prec_1 in
-  {config with prec_1 = prec_1 ; events = events}
+  {config with prec_1 = prec_1 ; events_kind = events_kind}
 
 let add_conflict eid atom config =
-  let events = IntMap.add atom.eid atom config.events in
+  let events_kind = IntMap.add atom.eid atom.kind config.events_kind in
   let cflct_set =
     IntMap.find_default IntSet.empty eid config.conflict in
   let cflct = IntMap.add eid (IntSet.add atom.eid cflct_set) config.conflict in
-  {config with conflict = cflct ; events = events }
+  {config with conflict = cflct ; events_kind = events_kind }
 
 let rec parse_attribute last_modif last_tested attribute config =
   match attribute with
   | [] -> config
   | atom::att ->
-     let events = IntMap.add atom.eid atom config.events in
+     let events_kind = IntMap.add atom.eid atom.kind config.events_kind in
      let prec_1 =
        let preds = IntMap.find_default IntSet.empty atom.eid config.prec_1 in
        IntMap.add atom.eid preds config.prec_1 in
-     let config = {config with events =  events ; prec_1 = prec_1} in
+     let config = {config with events_kind =  events_kind ; prec_1 = prec_1} in
      (*atom has a modification*)
      if (atom.causal_impact = atom_modified) || (atom.causal_impact = 3) then
        let config =
@@ -336,12 +332,11 @@ let cut attribute_ids grid =
 	 match attribute with
 	 | [] -> cfg
 	 | atom::att ->
-	    let events = IntMap.add atom.eid atom cfg.events in
+	    let events_kind = IntMap.add atom.eid atom.kind cfg.events_kind in
 	    let prec_1 =
 	      let preds =
 		IntMap.find_default IntSet.empty atom.eid cfg.prec_1 in
 	      IntMap.add atom.eid preds cfg.prec_1 in
-	    let top = IntSet.add atom.eid cfg.top in
 	    let tested =
 	      if (atom.causal_impact = atom_tested) || (atom.causal_impact = 3)
 	      then [atom.eid] else [] in
@@ -350,7 +345,7 @@ let cut attribute_ids grid =
 	      then Some atom.eid else None in
 	    parse_attribute
 	      modif tested att
-	      {cfg with prec_1 = prec_1 ; events = events ; top = top}
+	      {cfg with prec_1 = prec_1 ; events_kind = events_kind}
        in build_config tl cfg
   in
   build_config attribute_ids empty_config
@@ -451,7 +446,6 @@ let enrich_grid err_fmt config_closure grid =
   let depth_of_event,depth = depth_and_size_of_event config in
   {
     config = config ;
-    ids = ids ;
     prec_star = prec_star ;
     depth = depth ;
     depth_of_event = depth_of_event ;
@@ -475,31 +469,31 @@ let dot_of_grid profiling env enriched_grid form =
      Format.fprintf form "@[<hv>{ rank = same ; \"%d\" [shape=plaintext] ;@," d;
      IntSet.iter
        (fun eid ->
-	match IntMap.find_option eid config.events with
+	match IntMap.find_option eid config.events_kind with
 	| None -> raise Not_found
-	| Some atom ->
+	| Some atom_kind ->
 	   if eid <> 0 then
-	     match atom.kind  with
+	     match atom_kind  with
 	     | RULE _  ->
 		Format.fprintf
 		  form
 		  "node_%d [label=\"%s\", shape=%s, style=%s, fillcolor = %s] ;@,"
-		  eid (label ~env atom.kind) "invhouse" "filled" "lightblue"
+		  eid (label ~env atom_kind) "invhouse" "filled" "lightblue"
 	     | OBS _  ->
 		Format.fprintf
 		  form "node_%d [label=\"%s\", style=filled, fillcolor=red] ;@,"
-		  eid (label ~env atom.kind)
+		  eid (label ~env atom_kind)
 	     | INIT _ ->
 		if !Parameter.showIntroEvents then
 		  Format.fprintf
 		    form
 		    "node_%d [label=\"%s\", shape=%s, style=%s, fillcolor=%s] ;@,"
-		    eid (label ~env atom.kind) "house" "filled" "green"
+		    eid (label ~env atom_kind) "house" "filled" "green"
 	     | PERT _ ->
 		Format.fprintf
 		  form
 		  "node_%d [label=\"%s\", shape=%s, style=%s, fillcolor = %s] ;@,"
-		  eid (label ~env atom.kind) "invhouse" "filled" "green"
+		  eid (label ~env atom_kind) "invhouse" "filled" "green"
        (* List.iter (fun obs -> fprintf desc "obs_%d [label =\"%s\", style=filled, fillcolor=red] ;\n node_%d -> obs_%d [arrowhead=vee];\n" eid obs eid eid) atom.observation ;*)
        ) eids_at_d ;
      Format.fprintf form "}@]@," ;
@@ -519,10 +513,10 @@ let dot_of_grid profiling env enriched_grid form =
 	    if !Parameter.showIntroEvents then
 	      Format.fprintf form "node_%d -> node_%d@," eid' eid
 	    else
-	      match IntMap.find_option eid' config.events with
+	      match IntMap.find_option eid' config.events_kind with
 	      | None -> raise Not_found
-	      | Some atom ->
-		 match atom.kind with
+	      | Some atom_kind ->
+		 match atom_kind with
 		 | INIT _ -> ()
 		 | PERT _ | RULE _ | OBS _ -> Format.fprintf form "node_%d -> node_%d@," eid' eid
 	 ) pred_set
@@ -562,15 +556,15 @@ let js_of_grid env enriched_grid f =
 
   let () = Pp.set
 	     ~trailing:Pp.space IntMap.bindings Pp.space
-	     (fun f (eid,atom) ->
+	     (fun f (eid,atom_kind) ->
 	      Format.fprintf
 		f "g.setNode(%i, { label: \"%s\", style: \"fill: %s\" });"
-		eid (label ~env atom.kind)
-		(match atom.kind with
+		eid (label ~env atom_kind)
+		(match atom_kind with
 		 | OBS _ -> "#f77"
 		 | (INIT _ | PERT _) -> "#7f7"
 		 | RULE _ -> "#77f"))
-	     f enriched_grid.config.events in
+	     f enriched_grid.config.events_kind in
   let () =
     Pp.set
       IntMap.bindings Pp.empty

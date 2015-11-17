@@ -32,15 +32,14 @@ type grid =
       init_to_eidmax: (int,int) Hashtbl.t;
     }
 type config =
-    {
-      events: atom Mods.IntMap.t ;
-      prec_1: Mods.IntSet.t Mods.IntMap.t ;
-      conflict : Mods.IntSet.t Mods.IntMap.t ;
-      top : Mods.IntSet.t}
+  {
+    events_kind: event_kind Mods.IntMap.t ;
+    prec_1: Mods.IntSet.t Mods.IntMap.t ;
+    conflict : Mods.IntSet.t Mods.IntMap.t ;
+  }
 type enriched_grid =
     {
       config:config;
-      ids:(int * int * int) list ;
       depth:int;
       prec_star: int list array ; (*decreasing*)
       depth_of_event: int Mods.IntMap.t ;

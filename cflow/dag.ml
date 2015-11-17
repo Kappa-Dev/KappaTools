@@ -211,11 +211,11 @@ module Dag =
         let labels = A.make 1 (FICTITIOUS,"") in 
         let set =  
           Mods.IntMap.fold
-            (fun i atom  ->
-              let _ = A.set labels i (kind atom.Causal.kind,label atom.Causal.kind) in 
+            (fun i atom_kind ->
+              let _ = A.set labels i (kind atom_kind,label atom_kind) in
               Mods.IntSet.add i 
             )
-            config.Causal.events
+            config.Causal.events_kind
             Mods.IntSet.empty 
         in 
         let add_to_list_array i j a = 
@@ -293,11 +293,11 @@ module Dag =
         let labels = A.make 1 (FICTITIOUS,"") in 
         let set =  
           Mods.IntMap.fold
-            (fun i atom  ->
-              let _ = A.set labels i (kind atom.Causal.kind,label atom.Causal.kind) in 
+            (fun i atom_kind ->
+              let _ = A.set labels i (kind atom_kind,label atom_kind) in
               Mods.IntSet.add i 
             )
-            config.Causal.events
+            config.Causal.events_kind
             Mods.IntSet.empty 
         in 
         let add_to_list_array i j a = 
